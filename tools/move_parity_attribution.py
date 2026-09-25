@@ -39,14 +39,13 @@ SIGNATURES (each a measured property of the root's own window, never its name al
                  "DECIDED (maintainer, 2026-08-14): OPTION (b)" (the maintainer's own words were not kept),
                  SUPERSEDED 2026-09-18: "take the vs2 rows" (docs/project/tables/defense_rows.md)
   P2-DISPLACEMENT a seeded root whose own fields are IDENT while P2's x differs in its window — #159
-  DMG-OPEN       the same signature on Donovan or Pyron the victim with the row already vs2's (14z-181, the
-                 guard-cancel parts: Demitri's 5HP 12 native / 13 ours on BOTH) — #161's residual on a
-                 second and third tenant; the rows are frozen under the open ticket
-  PHOBOS-DMG-OPEN the DEFENSE-ROW signature (P1's HP alone, Phobos the victim, ours taking MORE) on a build
-                 whose defense-curve row 0x10 ALREADY equals vs2's (read from the build's own data image and
-                 vs2's): the ruled fix is in and the excess remains — Demitri's 5HP 11 native / 12 ours at M19
-                 (M18: 13), deterministic across RNG pins; cause UNMEASURED, an open ticket (ruled 2026-09-19:
-                 "Freeze, ticket it (Recommended)", DECISIONS_HISTORY.md)
+  DMG-VSAVJ      the DEFENSE-ROW signature (P1's HP alone, the tenant the victim, ours taking MORE) on a build
+                 whose defense row is ALREADY vs2's (read from the build's own data image and vs2's): vsavj's OWN
+                 damage pipeline, not the port — a LEGACY victim reads the same +1 with no port in the loop
+                 (Demitri's 5HP on Victor, 12 on pristine vsavj / 11 on pristine vs2,
+                 tests/audit_phobos_dmg_residual.sh); Phobos 11 native / 12 ours, Donovan and Pyron 12 / 13.
+                 RULED 2026-09-25 (14z-182): #161 closed as not-ours, "vanilla wins ties" (DECISIONS_HISTORY.md);
+                 until then two open classes, PHOBOS-DMG-OPEN (14z-170) and DMG-OPEN (14z-181)
   OTHER          none of the above: an UNATTRIBUTED root (the gate fails on it)
 
 Usage: move_parity_attribution.py run --build DIR --romdir DIR --work DIR [--jobs 6] [--no-ablate]
@@ -183,13 +182,13 @@ def classify(part, k, trdir, rigdir, row):
         if 0 < dn < do:
             if tenant == "huitzil":   # vsavj's row 0x10 indexes lower unless the vs2 row is in
                 if ROW_NATIVE.get("huitzil"):
-                    return "PHOBOS-DMG-OPEN", f"Phobos takes {dn} native / {do} ours; his defense row is already vs2's"
+                    return "DMG-VSAVJ", f"Phobos takes {dn} native / {do} ours; his defense row is already vs2's (vsavj's own pipeline, #161)"
                 return "DEFENSE-ROW", f"Phobos takes {dn} native / {do} ours"
             # 14z-181, the guard-cancel parts: Donovan and Pyron take 13 from Demitri's 5HP on our build for
             # native's 12 with their defense rows already vs2's (Donovan's ported at M19, Pyron's identical in
-            # every game) — #161's residual is not Phobos's alone
+            # every game) — the same vsavj-pipeline +1 as Phobos's (#161, ruled not-ours 2026-09-25)
             if ROW_NATIVE.get(tenant):
-                return "DMG-OPEN", f"{tenant} takes {dn} native / {do} ours; the defense row is already vs2's (#161's residual, a second/third tenant)"
+                return "DMG-VSAVJ", f"{tenant} takes {dn} native / {do} ours; the defense row is already vs2's (vsavj's own pipeline, #161)"
             return "DEFENSE-ROW", f"{tenant} takes {dn} native / {do} ours"
     return "OTHER", f"first DIFF {row[4]} on {row[5]}"
 

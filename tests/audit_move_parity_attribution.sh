@@ -5,8 +5,8 @@
 #   found by ablation (its event's inputs removed, both legs re-run, the rows that vanish
 #   are its) and named by a measured signature class (METER-SWAP, SLOWDOWN, DF-STOCK,
 #   ENTRANCE, GUARD-REENTRY, P2-DISPLACEMENT, TRAP-REMAP, COLUMN-SHOCK, DEFENSE-ROW /
-#   PHOBOS-DMG-OPEN / DMG-OPEN — the last since 14z-181: Donovan and Pyron taking one more from
-#   Demitri's 5HP with their rows already vs2's, #161's residual on every tenant); no root is
+#   DMG-VSAVJ — the last the tenant taking one more from Demitri's 5HP with its rows already
+#   vs2's, vsavj's own damage pipeline: #161 ruled not-ours 2026-09-25); no root is
 #   OTHER and no row UNATTRIBUTED.
 # HOW: tools/move_parity_attribution.py on MAME: step 0 re-runs the committed rigs and must
 #   reproduce the frozen table, then iterative ablation over the ~19 parts carrying a DIFF
@@ -33,8 +33,9 @@
 # (ENTRANCE), vsavj's block re-entry (GUARD-REENTRY, tests/audit_guard_reentry.sh), #159
 # (P2-DISPLACEMENT), the ruled trap remap (TRAP-REMAP), the column shock (COLUMN-SHOCK,
 # tests/audit_column_shock.sh), the defense row (DEFENSE-ROW; the vs2 rows ruled 2026-09-18, BUILT at the M19 freeze — on a build whose row
-# 0x10 is already vs2's the same signature is PHOBOS-DMG-OPEN: Demitri's 5HP 11 native / 12 ours, cause unmeasured, an
-# open ticket, ruled 2026-09-19 "Freeze, ticket it (Recommended)").
+# 0x10 is already vs2's the same signature is DMG-VSAVJ: Demitri's 5HP 11 native / 12 ours — frozen 2026-09-19 "Freeze,
+# ticket it (Recommended)" as the open class PHOBOS-DMG-OPEN, measured 14z-181 as vsavj's own damage pipeline (a legacy
+# victim reads the same +1), and renamed when #161 closed as not-ours, 2026-09-25).
 #
 # WHAT IT FREEZES (tests/expected/move_parity_attribution.tsv), the tool's rows:
 #   root <part:event | opening> <event name> <class> step=<n> <the signature's evidence>

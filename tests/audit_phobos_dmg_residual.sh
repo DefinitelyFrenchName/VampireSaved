@@ -1,9 +1,9 @@
 #!/bin/sh
-# audit_phobos_dmg_residual.sh — PHOBOS TAKES ONE MORE HP THAN NATIVE FROM DEMITRI'S 5HP, WITH HIS DEFENSE ROW ALREADY VS2'S, frozen AS MEASURED (14z-170, the open bug ticket): native vs2 11, our merged build 12, the same at three RNG pins — the residual the M19 defense-row fix left (merged-m18 read 13), cause unmeasured.
+# audit_phobos_dmg_residual.sh — PHOBOS TAKES ONE MORE HP THAN NATIVE FROM DEMITRI'S 5HP, WITH HIS DEFENSE ROW ALREADY VS2'S, frozen AS MEASURED (14z-170): native vs2 11, our merged build 12, the same at three RNG pins — the residual the M19 defense-row fix left (merged-m18 read 13); a LEGACY victim reads the same +1 (14z-181), so it is vsavj's own damage pipeline — #161 ruled not-ours 2026-09-25, this gate kept as the record.
 #
 # WHAT: Phobos takes one more HP than native from Demitri's 5HP with his defense row already
-#   vs2's — native 11, ours 12, at three RNG pins — frozen as measured as the open bug's
-#   reproducer (#161); the premise 'his rows are already native' is checked from the build's
+#   vs2's — native 11, ours 12, at three RNG pins — frozen as measured as the record of
+#   #161 (ruled not-ours 2026-09-25); the premise 'his rows are already native' is checked from the build's
 #   own image.
 # HOW: twelve MAME runs, two at a time: the #136 parts huitzil_5 and huitzil_6 on native and
 #   ours (the merged wheel's Phobos path, the part's pokes, the level pin) at RNG pins
@@ -15,7 +15,7 @@
 #   5HP on Victor, real picks on pristine vsavj and pristine vsav2, Victor's row byte-identical
 #   between the games — frozen at vsavj 12 / vsav2 11, two hits per leg on the same frames: the
 #   same +1 with no port in the loop, so the residual is the two ENGINES' damage pipelines, not
-#   ours (#161's answer, recorded for the maintainer's ruling); both planted steps fail.
+#   ours (#161's answer; the maintainer ruled it not-ours 2026-09-25); both planted steps fail.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/phobos_dmg_residual.tsv tests/replays/judge/04_demitri_5hp_victor.rpl
 #   tests/expected/registry.tsv tests/lib/controls.sh tests/lua/field_trace.lua
 #   tests/replays/ tools/build_fingerprint.py tools/name_moves.py tools/run_mame.sh
@@ -26,9 +26,10 @@
 #
 # WHY. The maintainer ruled the #136 defense-row fix (vs2's defense curve and threshold rows for
 # Phobos and Donovan, 2026-09-18) and, when the M19 freeze measured it, "Freeze, ticket it
-# (Recommended)" (2026-09-19): M19 is frozen as built, the attribution gate carries the two rows as
-# the open class PHOBOS-DMG-OPEN (tools/move_parity_attribution.py), and this gate is the ticket's
-# reproducer — the damage-chain trace that finds the cause starts from it. Measured in scratch
+# (Recommended)" (2026-09-19): M19 is frozen as built, the attribution gate carried the two rows as
+# the open class PHOBOS-DMG-OPEN (tools/move_parity_attribution.py; DMG-VSAVJ since the 2026-09-25
+# ruling), and this gate was the ticket's reproducer; 14z-181's legacy pair answered it, and #161
+# closed as not-ours (DECISIONS_HISTORY.md "Ruled 2026-09-25 (14z-182) — #161"). Measured in scratch
 # (build/rc170/freeze/dmg/) and captured here ([VSP-18]).
 #
 # THE RIG: the #136 naming parts huitzil_5 and huitzil_6 (Phobos P1 against Demitri P2; Demitri's
@@ -187,7 +188,7 @@ if [ "${FREEZE:-0}" = 1 ] && [ -z "$MODE" ]; then
     [ "$fail" = 0 ] || { echo "FAIL: not freezing a table whose structural checks failed"; exit 1; }
     { echo "# tests/expected/phobos_dmg_residual.tsv — every P1 (Phobos) HP step on the #136 naming parts huitzil_5/huitzil_6 (Demitri's"
       echo "# 5HP), native vsav2 against our merged build, at RNG pins 0000/1234/5a5a (tests/audit_phobos_dmg_residual.sh). Evidence"
-      echo "# class: in-emulator, MAME. Frozen AS MEASURED with FREEZE=1 on $(basename "$BUILD") — the open bug ticket: native 11,"
+      echo "# class: in-emulator, MAME. Frozen AS MEASURED with FREEZE=1 on $(basename "$BUILD") — #161, ruled not-ours 2026-09-25: native 11,"
       echo "# ours one more with the defense row already vs2's. Columns: <part> <pin> <leg> <frame> <hp before> <hp after>; one build row."
       echo "# Since 14z-181 the \`legacy\` rows: Demitri's 5HP on VICTOR (P2, its HP) on pristine vsavj and pristine vsav2 at the same pins —"
       echo "# vsavj 12 / vsav2 11 with Victor's row byte-identical between the games: the +1 is the two engines' (GitHub #161)."

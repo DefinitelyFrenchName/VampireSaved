@@ -1,6 +1,6 @@
 # tests/expected/phobos_dmg_residual.tsv — every P1 (Phobos) HP step on the #136 naming parts huitzil_5/huitzil_6 (Demitri's
 # 5HP), native vsav2 against our merged build, at RNG pins 0000/1234/5a5a (tests/audit_phobos_dmg_residual.sh). Evidence
-# class: in-emulator, MAME. Frozen AS MEASURED with FREEZE=1 on m3b_merged27 — the open bug ticket: native 11,
+# class: in-emulator, MAME. Frozen AS MEASURED with FREEZE=1 on m3b_merged27 — #161, ruled not-ours 2026-09-25: native 11,
 # ours one more with the defense row already vs2's. Columns: <part> <pin> <leg> <frame> <hp before> <hp after>; one build row.
 # Since 14z-181 the `legacy` rows: Demitri's 5HP on VICTOR (P2, its HP) on pristine vsavj and pristine vsav2 at the same pins —
 # vsavj 12 / vsav2 11 with Victor's row byte-identical between the games: the +1 is the two engines' (GitHub #161).

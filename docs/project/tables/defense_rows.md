@@ -163,10 +163,14 @@ shift is a ±1 on a throw's damage. Re-ruling option (a) would move the two
 tenant cells and leave Sasquatch's, which is vanilla vsavj's own data.
 
 **After the fix (14z-170, M19):** the two tenant cells are gone — `audit_tenant_throw_geometry`'s residue is
-Sasquatch's 0x0A alone, re-frozen. **ONE RESIDUAL IS OPEN:** Demitri's 5HP takes 12 HP from Phobos where native vs2
-takes 11 (merged-m18 13), deterministic across RNG pins, with Phobos's curve row AND threshold word already vs2's —
-so the extra point enters elsewhere in the chain; cause unmeasured (GitHub #161). Reproducer:
-`tests/audit_phobos_dmg_residual.sh`; the attribution class `PHOBOS-DMG-OPEN` (`tools/move_parity_attribution.py`).
+Sasquatch's 0x0A alone, re-frozen. **THE ONE RESIDUAL IS VSAVJ'S OWN (RULED NOT-OURS 2026-09-25, #161):** Demitri's
+5HP takes 12 HP from Phobos where native vs2 takes 11 (merged-m18 13), deterministic across RNG pins, with Phobos's curve
+row AND threshold word already vs2's; Donovan and Pyron read the same +1 (12 native / 13 ours, rows already vs2's). A
+LEGACY victim reads it with no port in the loop — Demitri's 5HP on Victor takes 12 on pristine vsavj and 11 on pristine
+vs2, Victor's rows byte-identical between the games (measured 14z-181) — so the extra point is vsavj's damage pipeline
+against vs2's, and our build runs vsavj's. Kept under "vanilla wins ties" (STATE "STANDING PRINCIPLE"); WHERE in the
+pipeline vsavj adds it is not measured. Record: `tests/audit_phobos_dmg_residual.sh` (its `legacy` rows); the
+attribution class `DMG-VSAVJ` (`tools/move_parity_attribution.py`; `PHOBOS-DMG-OPEN` / `DMG-OPEN` until the ruling).
 
 ## Cross-references
 

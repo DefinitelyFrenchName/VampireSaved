@@ -5505,8 +5505,10 @@ was already byte-identical to vs2's, so the class no longer explained the number
 gate's only control proved every DIFF row carries a class. It never proved that a class still
 explains its row after the fix. The rule-checker caught it (run 2026-09-19-60 Q1/Q4). Measured
 across three RNG pins, the extra point was deterministic. It went to the maintainer and was ruled
-"Freeze, ticket it". It is now the open class `PHOBOS-DMG-OPEN`, and
-`tests/audit_phobos_dmg_residual.sh` is its reproducer. Rule: after a ruled fix, compare every
+"Freeze, ticket it". It became the open class `PHOBOS-DMG-OPEN`, with
+`tests/audit_phobos_dmg_residual.sh` its reproducer; 14z-181 measured the same +1 on a LEGACY victim
+(vsavj 12 / vs2 11), so it is vsavj's own pipeline — #161 ruled not-ours 2026-09-25, the class
+renamed `DMG-VSAVJ`. Rule: after a ruled fix, compare every
 row it moved against NATIVE, not against the old defect. A value that is neither is a finding, and
 it goes to the maintainer before anything is re-frozen. An attribution class that names a root
 has to re-check that root on the build (here, the row read against vs2's).

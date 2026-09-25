@@ -2,8 +2,9 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 175
+# issues: 176
 number	state	reason	closed	labels	title
+176	OPEN	-	-	evolution	Compare the RNG's per-frame advance between our build and native: the parity gates pin the RNG word every frame, so an advance defect would read as agreement
 175	OPEN	-	-	evolution	Plasma Trap dome vs a truly AIRBORNE victim: the air stager's case for the trap is unreached by any rig (a neutral jump clears the dome and is hit on landing)
 174	OPEN	-	-	evolution	35 never-entered a2 chains of the tenants (7 with attack records) — moves the naming corpus never produces, so their ours-vs-native parity is unmeasured
 173	CLOSED	COMPLETED	2026-09-25	bug	Pyron's heavy-hit reaction runs the generic chain b:0x03 on our build where native vs2 runs his b:0x19 (5HP, j.HP, throw release) — class, freeze and length equal
@@ -18,7 +19,7 @@ number	state	reason	closed	labels	title
 164	CLOSED	COMPLETED	2026-09-19	bug	Phobos and Donovan took damage and rallied through their shells' defense rows (vsavj's copies for ids 0x10/0x13), not vs2's own
 163	CLOSED	COMPLETED	2026-09-25	bug	The Killshread Lightning column and the Plasma Trap ran vsavj's shock remap instead of vs2's class-0x52 rule — the victim's freeze and the attacker's hit-freeze differed from native
 162	OPEN	-	-	cosmetic	The deity above Donovan flashes orange as the Killshread Lightning column ends — an extra palette-sequence upload of row 11 native does not make
-161	OPEN	-	-	bug	Phobos takes one more HP than native from Demitri's 5HP with his defense rows already vs2's (12 against 11)
+161	CLOSED	NOT_PLANNED	2026-09-25	bug	Phobos takes one more HP than native from Demitri's 5HP with his defense rows already vs2's (12 against 11)
 160	OPEN	-	-	bug,severity: low	rulecheck.py: prepare's auto id collides with a run directory that has no ledger row
 159	OPEN	-	-	bug,needs-maintainer-ruling,severity: medium	Tenant attack records with facing rule 5 are XORed into the victim's facing by vsavj's hit code (Killshread Summon (ES) pushes Demitri away where native drags him in)
 158	CLOSED	COMPLETED	2026-09-24	bug	rulecheck.py: a model change never invalidates a calibration (the checklist hash is checked, the model is not, and the ledger records 'default')
@@ -47,15 +48,15 @@ number	state	reason	closed	labels	title
 135	CLOSED	COMPLETED	2026-09-15	evolution	The VS-vs-VS2 tick cadence: re-establish its measurement, mechanism and scope, and document it properly
 134	OPEN	-	-	bug	The hit rigs' LP events whiff at contact range
 133	OPEN	-	-	evolution	Re-measure the emulator runner's pull-queue gain on a wider host
-132	OPEN	-	-	bug	release/merged-m15 was never packaged
+132	CLOSED	NOT_PLANNED	2026-09-25	bug	release/merged-m15 was never packaged
 131	OPEN	-	-	evolution	audit_mask_window_ff42a2: deprecate it, or keep it as a case-specific gate?
 130	OPEN	-	-	bug	bundle_win_dlls.py prints a broken character for its em dash on MSYS2 (build logs only)
 129	OPEN	-	-	bug,evolution,severity: low	Tenant CPU AI looks lackluster (unproven; first question: are the ported script blocks complete?)
 128	OPEN	-	-	evolution,parked	Marionette: parked until further notice
 127	OPEN	-	-	cosmetic,parked	#112 option (B): the Press of Death effect owns its palette row (scope first)
-126	OPEN	-	-	cosmetic	Select-wheel look-and-feel polish
+126	OPEN	-	-	cosmetic,parked	Select-wheel look-and-feel polish
 125	OPEN	-	-	cosmetic	Arcade-ladder map names and pictures (not investigated)
-124	OPEN	-	-	cosmetic	Arcade-ladder roulette tag shows the base/shell character for a tenant opponent on the arcade ladder map screen
+124	OPEN	-	-	cosmetic,parked	Arcade-ladder roulette tag shows the base/shell character for a tenant opponent on the arcade ladder map screen
 123	OPEN	-	-	cosmetic,parked	Win-quote text for the three tenants (forgone for now; only the clean way, vanilla untouched)
 122	OPEN	-	-	evolution	Run the --controls release tier on the dedicated Linux server and compare its speed with the Mac
 121	OPEN	-	-	evolution	Linux release binaries built on the dedicated server, plus the clean-machine check at release (option 3)

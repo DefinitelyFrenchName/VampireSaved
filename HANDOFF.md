@@ -726,8 +726,9 @@ not `only_variant_slot`.
 **WHAT TO LOOK AT FIRST ON THIS ONE:** the wheel reads **M19**, and the four
 rulings of 2026-09-18 play: (1) no gauge is built inside the tenants' Dark
 Force; (2) Phobos and Donovan take damage and rally through vs2's own defense
-rows (one residual open: Demitri's 5HP takes 12 from Phobos, native 11 —
-#161, `tests/audit_phobos_dmg_residual.sh`); (3) the tenants' vs2 EX inputs (Donovan 421+KK, Phobos 263+PP, Pyron
+rows (one residual: Demitri's 5HP takes 12 from Phobos, native 11 — vsavj's
+own damage pipeline, a legacy victim reads it too; #161 ruled not-ours
+2026-09-25, `tests/audit_phobos_dmg_residual.sh`); (3) the tenants' vs2 EX inputs (Donovan 421+KK, Phobos 263+PP, Pyron
 2623+PP) no longer enter Dark Force — they do the no-stock move (Pyron's reads
 623+PP, his ES, ruled "Natural reading"); (4) Donovan's Killshread Lightning
 column shocks 24 frames and Donovan takes no hit-freeze, as on vs2 — and on

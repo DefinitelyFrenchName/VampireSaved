@@ -27,6 +27,45 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-25 (14z-182) — the parity gates' per-frame level and RNG pins are their equalised input; #176 opened for the RNG's advance
+
+The maintainer, at the 14z-182 opener, on the entry below as put to them (*"The parity gates pin the level and RNG on every frame. The recommendation is (a): rule these pins the comparisons' equalised input, and open a separate ticket to compare how each game advances the RNG. Every 14z-181 rule-checker run flagged this. Nothing a player feels changes either way."*): *"agreed"*. So option (a): the per-frame level and RNG pins are the parity gates' equalised INPUT, and the rule-checker's Q3 on a packet comparing two legs under them reads a named, ruled premise; the RNG-advance question is GitHub #176 (opened the same sitting by the session agent).
+
+**The STATE.md "Decisions pending" entry, moved verbatim:**
+
+- **The parity gates' per-frame RNG and level pins as their equalised INPUT — a ruling that settles the rule-checker's Q3 for every cross-game gate (opened 14z-181, 2026-09-25).** Every ours-vs-native parity gate (`audit_move_parity`, `audit_df_moves`, `test_don_immortal_native`, their kin) writes the speed level (`RAM:$FF8116` := 6) and the RNG word (`RAM:$FF80D4` := 0) on EVERY frame of both legs — the method the maintainer chose for `test_don_immortal_native` on 2026-09-15 (*"Pin both, assert frames"*, `DECISIONS_HISTORY.md` "Ruled 2026-09-15 (14z-158)") and the gates adopted since 14z-160. The pinned rule-checker returns Q3 VIOLATED on every packet that compares two legs under those pins (runs `2026-09-25-150`, `-152`, `-153`, `-154`): a shared write that selects the compared hits (the RNG's bit 0 picks the pass order), so a port defect in the RNG's ADVANCE would be reset away on both legs and read as agreement. The session accepted the finding in writing as the gates' design (run 153's resolution). Options: (a) RULE the per-frame pins the parity gates' equalised input, with the RNG-advance question its own ticket (a gate that compares the RNG's consumption per frame between the games, which `audit_df_moves`' sword rows already record without a verdict: native 201 / ours 198 reads in one window) — Q3 then reads as a named, ruled premise; (b) require every parity gate to add an unpinned-leg control (`audit_df_moves` has `pins-unpinned` since 14z-181; `audit_move_parity` has `unpinned-level`) and keep accepting Q3 per packet; (c) redesign the comparison to pin the RNG once at the match anchor only (the 14z-160 form) and accept that the two engines' draws diverge. Recommendation: (a) with the ticket — the per-frame pin is what makes a two-engine comparison a comparison, and the advance question is real but separate. Nothing a player feels changes by this ruling.
+
+---
+
+## Ruled 2026-09-25 (14z-182) — #161 closed as `not-ours`: the +1 is vsavj's own damage pipeline
+
+The maintainer, at the 14z-182 opener, on the entry below as put to them (*"#161: close as not-ours?"*, the recommendation (a) stated with it): *"agreed"*. So option (a): #161 closes as `not-ours` — vanilla vsavj behaviour under the STANDING PRINCIPLE "vanilla wins ties"; `tests/audit_phobos_dmg_residual.sh` stays as the record, and the attribution classes `PHOBOS-DMG-OPEN` / `DMG-OPEN` are renamed to the ruled class `DMG-VSAVJ` (`tools/move_parity_attribution.py`).
+
+**The STATE.md "Decisions pending" entry, moved verbatim:**
+
+- **#161 — close as `not-ours`? (opened 14z-181).** The residual "Phobos takes one more HP than
+  native from Demitri's 5HP with his rows already vs2's" is not Phobos's: Donovan and Pyron read
+  the same +1 (12 native / 13 ours, both defense tables already vs2's), and a LEGACY victim reads
+  it with no port in the loop — Demitri's 5HP on Victor takes 12 on pristine vsavj and 11 on
+  pristine vs2 at three RNG pins, Victor's rows byte-identical between the games
+  (`tests/audit_phobos_dmg_residual.sh`, the frozen `legacy` rows). The +1 is vsavj's damage
+  pipeline against vs2's; our build runs vsavj's. Options: (a) **close #161 as `not-ours`
+  (Recommended)** — vanilla vsavj behaviour under the STANDING PRINCIPLE "vanilla wins ties"; the
+  gate stays as the record, the attribution rows keep their DMG-OPEN class renamed to a ruled one;
+  (b) keep it open to find WHERE in the pipeline vsavj adds the point (a documentation question,
+  no fix would follow under "vanilla wins ties"); (c) rule the tenants should take vs2's damage
+  anyway — a port of vs2's pipeline stage for tenant victims only, the kind of change the
+  2026-09-18 ruling warned against ("it would be wrong to make changes that correct the 3 tenants
+  but break vanilla characters").
+
+---
+
+## Ruled 2026-09-25 (14z-182) — #132 closed as `declined`: merged-m15 stays unpackaged
+
+Asked at the 14z-182 opener (the maintainer: *"Can we rule on #132 before any other ticket?"*), with the question: *"#132: merged-m15 (the 14z-130 M13 boot-title freeze) was never packaged. It was replaced by merged-m16 (14z-132) before any release. The 14z-134 opener recorded it as 'superseded before release, recorded, not owed', but nobody ever ruled on it. Its tag freeze/merged-m15 (1101112c) is still there. release/ has m6–m14 and m16–m19, and GitHub has releases for m18 and m19 only. How do you rule?"* The maintainer chose *"Close as declined (Recommended)"*, whose text read: *"Record the gap as intended: m15 was replaced before any release. The tag stays as the way back. Nothing is packaged. The ticket closes as 'declined' with the ruling written down."* The recommendation went through rule-checker run `2026-09-25-215` first (plant caught; VIOLATED on Q1/Q4 — the packet had tied `build/m3b_merged22` to merged-m15 on a program fingerprint merged-m16 shares — resolved by resting the way back on the tag alone). So: `release/` keeps no `merged-m15/`; the gap is intended; the tag `freeze/merged-m15` is the way back to that build.
+
+---
+
 ## Ruled 2026-09-25 (after the 14z-181 close) — the orchestrator is Opus 5.5 at effort High
 
 The maintainer, unprompted, after the 14z-181 push: *"One change I'll need to enforce for the foreseeable future: The orchestrator must be a Opus 5.5 High instead of Fable 5.1 (access to Fable not guaranteed so I need to account for it)"* So, from the next sitting on and until the maintainer says otherwise: the orchestrator — the plain session the maintainer starts — runs on **Opus 5.5 (`claude-opus-5-5`) at effort `high`**, not Fable 5.1. This SUPERSEDES the model named in the 2026-09-24 (14z-178) ruling of #172's S5 (*"You start the sitting on Fable 5.1"*); the rest of that ruling stands (no orchestrator definition, a plain session, the C0 hooks, the C1 procedure check, the worker cap). The model is set at launch by the maintainer (`claude --model claude-opus-5-5`, or the settings `model` key, which only the maintainer edits), the effort by the per-model settings. Consequence for the worker cap: a worker with no `model` runs on the caller's model (probe A9), which is now Opus 5.5 — inside the cap. A sitting that finds itself on another model says so at the opener.

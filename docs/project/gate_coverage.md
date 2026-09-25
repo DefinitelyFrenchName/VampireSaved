@@ -2502,7 +2502,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 ### `audit_move_parity_attribution.sh` — audit, emulator
 
-**WHAT:** every DIFF row of the #136 move-parity table has a MEASURED cause: each root is found by ablation (its event's inputs removed, both legs re-run, the rows that vanish are its) and named by a measured signature class (METER-SWAP, SLOWDOWN, DF-STOCK, ENTRANCE, GUARD-REENTRY, P2-DISPLACEMENT, TRAP-REMAP, COLUMN-SHOCK, DEFENSE-ROW / PHOBOS-DMG-OPEN / DMG-OPEN — the last since 14z-181: Donovan and Pyron taking one more from Demitri's 5HP with their rows already vs2's, #161's residual on every tenant); no root is OTHER and no row UNATTRIBUTED.
+**WHAT:** every DIFF row of the #136 move-parity table has a MEASURED cause: each root is found by ablation (its event's inputs removed, both legs re-run, the rows that vanish are its) and named by a measured signature class (METER-SWAP, SLOWDOWN, DF-STOCK, ENTRANCE, GUARD-REENTRY, P2-DISPLACEMENT, TRAP-REMAP, COLUMN-SHOCK, DEFENSE-ROW / DMG-VSAVJ — the last the tenant taking one more from Demitri's 5HP with its rows already vs2's, vsavj's own damage pipeline: #161 ruled not-ours 2026-09-25); no root is OTHER and no row UNATTRIBUTED.
 
 **HOW:** tools/move_parity_attribution.py on MAME: step 0 re-runs the committed rigs and must reproduce the frozen table, then iterative ablation over the ~19 parts carrying a DIFF with each root's signature read from its own window; the control disables ablation, which must leave rows unattributed.
 
@@ -2518,11 +2518,11 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 ### `audit_phobos_dmg_residual.sh` — audit, emulator
 
-**WHAT:** Phobos takes one more HP than native from Demitri's 5HP with his defense row already vs2's — native 11, ours 12, at three RNG pins — frozen as measured as the open bug's reproducer (#161); the premise 'his rows are already native' is checked from the build's own image.
+**WHAT:** Phobos takes one more HP than native from Demitri's 5HP with his defense row already vs2's — native 11, ours 12, at three RNG pins — frozen as measured as the record of #161 (ruled not-ours 2026-09-25); the premise 'his rows are already native' is checked from the build's own image.
 
 **HOW:** twelve MAME runs, two at a time: the #136 parts huitzil_5 and huitzil_6 on native and ours (the merged wheel's Phobos path, the part's pokes, the level pin) at RNG pins 0000/1234/5a5a, P1's HP traced every frame from 2300 and every loss frozen; the build's curve row 0x10 and threshold words compared with vs2's; the control replaces our step by native's.
 
-**EXPECTS:** one P1 HP step per part on the same frame on both legs, not moving with the pin, the rows equal to vs2's, the frozen 11/12; AND, since 14z-181, the LEGACY pair — Demitri's 5HP on Victor, real picks on pristine vsavj and pristine vsav2, Victor's row byte-identical between the games — frozen at vsavj 12 / vsav2 11, two hits per leg on the same frames: the same +1 with no port in the loop, so the residual is the two ENGINES' damage pipelines, not ours (#161's answer, recorded for the maintainer's ruling); both planted steps fail.
+**EXPECTS:** one P1 HP step per part on the same frame on both legs, not moving with the pin, the rows equal to vs2's, the frozen 11/12; AND, since 14z-181, the LEGACY pair — Demitri's 5HP on Victor, real picks on pristine vsavj and pristine vsav2, Victor's row byte-identical between the games — frozen at vsavj 12 / vsav2 11, two hits per leg on the same frames: the same +1 with no port in the loop, so the residual is the two ENGINES' damage pipelines, not ours (#161's answer; the maintainer ruled it not-ours 2026-09-25); both planted steps fail.
 
 ### `audit_pyron_capture_block.sh` — audit, emulator
 
