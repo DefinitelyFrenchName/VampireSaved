@@ -38,7 +38,9 @@ read as "airborne" when 40 is the ground — no gate had).
    **Then (2026-09-25, a capture of the trap's hitbox drawn in pink over the sprite):** *"that does
    not indicate if there's a flag that make the hitbox only active against grounded enemies but it at
    least explains why you would need to be very low to the ground to be hit airborne"* — so the
-   question is a LOW box plus, possibly, a grounded-only flag; the box's extents are data
+   question is a LOW box plus, possibly, a grounded-only flag (a second, clearer capture shows
+   one flat box at the dome's base, about the dome's full width and — by eye, not measured — its
+   lowest fifth to quarter in height, down to the floor); the box's extents are data
    (`tools/hitbox_records.py`), measurable before any rig.
 3. **#174 (the 36 never-entered a2 chains, 8 with attack records — re-counted by the promoted
    `tools/chain_census.py` at the close: Pyron's a2:0x03 joined the list once the Galactic Throw
