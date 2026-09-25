@@ -1,0 +1,10 @@
+decision	procedure
+subject	one AI agent working session (14z-182), transcript 39efeec2 from the first record to the cut of this extract after the close's second strict tier read green, the survivor was killed on the maintainer's command and the sweep read CLEAN, plus the unchecked tail of 14z-181 (152495c2 from record 3209) carried to this close
+session	39efeec2
+model	rule-checker@163e4ce9cf7b
+claim	In this sitting the agent did what it said and ran what it claimed: every rule-checker packet (runs 215-223) was prepared by tools/rulecheck.py and its two prompts passed verbatim (the spawn check read IDENTICAL at every record), every plant was caught, every VIOLATED was resolved in writing or by work before the action it gated; two preparations were discarded UNSPAWNED and re-prepared under the same id (219's first form lacked the maintainer's words, 223's first form had a broken excerpt), their staging directories removed, no ledger row; the figures quoted for #136's scope map, the #134/#138/#140/#154 statuses and the #132 inventory came from measurer/reader workers whose returns are saved under build/agent182/; the #175 figures (probe traces, box geometry, breakpoints, census counts, sweeps) came from runs the agent made itself with the tools it wrote (tools/trap_air_probe.sh, trap_air_boxes.py, air_hurtbox_census.py), each shown in the transcript, and the frozen gate tests/audit_trap_air_hit.sh reproduces the load-bearing ones; the mid-session tier started before the close was stopped with TaskStop and replaced by the strict close tier; every background job is accounted for; the survivor tree was killed only after the maintainer's command. NOT claimed: that every intermediate figure of the #175 probing was quoted after a worker re-derived it — the agent's own tool runs were the source there; one intermediate reading (a grounded-only rule) was stated to the maintainer and retracted in the same sitting.
+checklist	f3ec4d9849f7
+family	procedure
+questions	QP1 QP2 QP3 QP4 QP5
+reader	rule-checker@163e4ce9cf7b
+head	04e70515b43857ee7c43176fca3e0907c0870a4c

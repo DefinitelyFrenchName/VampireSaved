@@ -20,6 +20,10 @@ prompt files pasted VERBATIM, `record --session`, `resolve` on ONE line. Say so 
    `152495c2`); this session was not under it (STATE 14z-182 row (6)). **The maintainer's standing ruling:
    it is killed before a push ONLY on their command** (STATE 'Standing rulings'). What the 14z-182 close did
    with it is in its CLOSE row.
+0b. **CARRIED FROM THE 14z-182 CLOSE (procedure run `2026-09-25-224`, QP1):** a `measurer` re-derives the
+    #175 figures `docs/game/engine_internals.md` quotes — the dome record `(0, 0, 40, 6)`, Victor's airborne
+    vuln0 `(0, 69, 32, 36)`, Felicia's `b:0x0f` head boxes `(-8, 70, 12, 8)` / `(-3, 76, 17, 14)` — from the
+    data views with a spec, since 14z-182 promised it and ran them itself (the gate reproduces them).
 1. **Nothing is pending a ruling** — STATE "Decisions pending" is empty after 14z-182.
 2. **Open tickets from 14z-182, the maintainer's to order:** **#177** (tenant movement parity vs native —
    no gate compares walk / dash / jumps / arcs against vs2), **#178** (a rig that makes Hop Kick connect
@@ -50,5 +54,8 @@ parity pins as the equalised input. #136 re-derived against its whole thread (fo
    values (boxes), not build-dependent pointers, and prove each data file is the romset the leg runs.
 5. **A victim's own attack can end the rig**: Felicia's j.HP hit Phobos and cancelled his trap until he was
    parked out of reach. Read both players' HP in any rig where the victim attacks.
+7. **This Mac's `grep` has no `-P`** — a worker spec that uses it fails, and workers then improvised
+   substitutions and ran past errors (procedure run 224, QP5). Write specs with `-E`, and read a worker's
+   return against its spec before quoting it.
 6. **A ticket closed against its LAST list is not closed against its scope** — #136 needed a re-derivation
    from its body and whole thread to find four uncovered items.
