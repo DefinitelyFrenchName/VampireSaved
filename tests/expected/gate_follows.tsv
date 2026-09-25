@@ -43,6 +43,7 @@ declares	audit_grenade_ground_tiles
 declares	audit_guard_corpus
 declares	audit_guard_mask_reads
 declares	audit_guard_reentry
+declares	audit_hitbox_parity
 declares	audit_hitclass_map_cost
 declares	audit_hui_grunt
 declares	audit_id_writers
@@ -90,6 +91,7 @@ declares	audit_trap_shock
 declares	audit_trap_sound
 declares	audit_tripwire_reach
 declares	audit_type_writes
+declares	audit_victim_parity
 declares	audit_voice_borrow
 declares	audit_walker_ghost
 declares	audit_walker_repoint

@@ -13,7 +13,7 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**385 of 385 gates described.**
+**387 of 387 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
@@ -24,7 +24,7 @@ first sentence) is `gate_index.md`.
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 82 | 82 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 55 | 55 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 57 | 57 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -2290,7 +2290,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 ## character-data
 
-the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 55 of 55 described.
+the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 57 of 57 described.
 
 ### `audit_column_flash.sh` — audit, emulator
 
@@ -2452,6 +2452,14 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **EXPECTS:** the frozen windows per game, the superset row 0 (vsavj vs ours), the act rows identical for vsavj and ours; both controls fail. Ruled identical by the maintainer on the captures and the first-frame test.
 
+### `audit_hitbox_parity.sh` — audit, emulator
+
+**WHAT:** whether the hitboxes a tenant's moves put in play are the same on our build as on native vs2: per frame of the parity gate's default parts (donovan_1, pyron_4, huitzil_1), where both legs are on the same node (translated), the five resolved table pointers +0x80..+0x90 (three vuln, push, attack), the hitbox base +0x60 and family table +0x64 (translated out of the build's placements) and the node's box-id word +0x94 — frozen per part and field.
+
+**HOW:** both legs on MAME as tests/audit_move_parity.sh runs them (real cursor picks, the level pinned at 6 and the RNG at 0000, the rig's own pokes), field_trace sampling the fighter block's pointer fields; tools/hitbox_parity.py translates our pointers through every placed region of the tenant and compares on the node-equal frames only (a frame whose nodes differ is the parity gate's DIFF, attributed there); three controls.
+
+**EXPECTS:** SAME on every pointer and the box-id word of every part, the node-equal frame count at or above its floor, the three controls failing. Not covered: frames whose nodes differ, P2's boxes (Demitri's hitbox families differ between the games — same_data_p2.tsv), and the table BYTES themselves (the charmap gates' subject).
+
 ### `audit_lag_budget.sh` — audit, emulator
 
 **WHAT:** a fix set adds no frame of lag: over every #136 naming part, the build under test has no zero-pass frame (the pass counter $FF8081 not advancing after the round start) that the reference build before the fixes does not have — the maintainer's combined-overhead condition, under 1/60 s at all times.
@@ -2478,7 +2486,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 ### `audit_move_parity_attribution.sh` — audit, emulator
 
-**WHAT:** every DIFF row of the #136 move-parity table has a MEASURED cause: each root is found by ablation (its event's inputs removed, both legs re-run, the rows that vanish are its) and named by a measured signature class (METER-SWAP, SLOWDOWN, DF-STOCK, ENTRANCE, GUARD-REENTRY, P2-DISPLACEMENT, TRAP-REMAP, COLUMN-SHOCK, DEFENSE-ROW / PHOBOS-DMG-OPEN); no root is OTHER and no row UNATTRIBUTED.
+**WHAT:** every DIFF row of the #136 move-parity table has a MEASURED cause: each root is found by ablation (its event's inputs removed, both legs re-run, the rows that vanish are its) and named by a measured signature class (METER-SWAP, SLOWDOWN, DF-STOCK, ENTRANCE, GUARD-REENTRY, P2-DISPLACEMENT, TRAP-REMAP, COLUMN-SHOCK, DEFENSE-ROW / PHOBOS-DMG-OPEN / DMG-OPEN — the last since 14z-181: Donovan and Pyron taking one more from Demitri's 5HP with their rows already vs2's, #161's residual on every tenant); no root is OTHER and no row UNATTRIBUTED.
 
 **HOW:** tools/move_parity_attribution.py on MAME: step 0 re-runs the committed rigs and must reproduce the frozen table, then iterative ablation over the ~19 parts carrying a DIFF with each root's signature read from its own window; the control disables ablation, which must leave rows unattributed.
 
@@ -2498,7 +2506,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **HOW:** twelve MAME runs, two at a time: the #136 parts huitzil_5 and huitzil_6 on native and ours (the merged wheel's Phobos path, the part's pokes, the level pin) at RNG pins 0000/1234/5a5a, P1's HP traced every frame from 2300 and every loss frozen; the build's curve row 0x10 and threshold words compared with vs2's; the control replaces our step by native's.
 
-**EXPECTS:** one P1 HP step per part on the same frame on both legs, not moving with the pin, the rows equal to vs2's, the frozen 11/12; the planted native step fails. WHY the extra point is the ticket's question, not covered.
+**EXPECTS:** one P1 HP step per part on the same frame on both legs, not moving with the pin, the rows equal to vs2's, the frozen 11/12; AND, since 14z-181, the LEGACY pair — Demitri's 5HP on Victor, real picks on pristine vsavj and pristine vsav2, Victor's row byte-identical between the games — frozen at vsavj 12 / vsav2 11, two hits per leg on the same frames: the same +1 with no port in the loop, so the residual is the two ENGINES' damage pipelines, not ours (#161's answer, recorded for the maintainer's ruling); both planted steps fail.
 
 ### `audit_pyron_capture_block.sh` — audit, emulator
 
@@ -2555,6 +2563,14 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 **HOW:** one naming-rig leg on native vsav2 on MAME at each level, the pass counter's double steps classed by frame index; the generator's constants read from its source; a second leg without the level pin for the round start; controls flatten the pass counter and perturb TICK_QUANTUM.
 
 **EXPECTS:** the residue classes exact, the constants equal to the measured periods and round start; the flat trace and the wrong quantum fail. WHY a shift must be a multiple of 39 rather than 3 is recorded as its own ticket, not explained here.
+
+### `audit_victim_parity.sh` — audit, emulator
+
+**WHAT:** what the tenant DOES when hit, blocked or anti-aired, ours against native vs2, per contact of the victim rigs: the class byte +0x54, the freeze +0x5C, the chain PATH the reaction runs (table:seq@entry-node) and the frames until a stand chain returns — the phase-3 reaction map (tests/test_reactions.sh) given its ours leg, frozen per contact.
+
+**HOW:** both legs on MAME as REAL cursor picks (P1 Victor, P2 the tenant, the routes decoded from each game's own select wheel by tools/select_paths.py — no id poke on either leg), the speed level pinned at 8 on both (vs2's TURBO, the level the victim rigs and test_reactions' lines were measured at; our build's own is NORMAL 6 — matched modes, ruled 2026-09-15) and the RNG at 0000, P2's HP re-pinned 10 frames before each event (never inside a compared window: the reader refuses one); our P2 node pointers translated into the native address space (placements.json) and both legs read by tools/reaction_map.py over the tenant's vs2 extract (asserted byte-identical to the decrypted vsav2's anim region, as our data view is to the decrypted romset; its a/a2/b/c chains asserted to decode to the same shapes from our build); P1 asserted Victor on each leg and never inside one of his REACTION chains whose data differs between the games (tools/audit_same_data_p2.py, run by the gate on the two data views), and every row attributed (`attacker=`) to the differing ATTACK chains of his that ran inside its event, and charged (`attributed=`) to the attacker only when nothing but the timing (len, frz) differs AND the attacker's own shift explains it (the contact and the return each on the same frame or his delta earlier, the freeze within it) — a chain-path or class difference, or a timing difference of another size, is the tenant's whatever ran beside it.
+
+**EXPECTS:** every contact row as frozen in tests/expected/victim_parity.tsv (SAME, or the frozen DIFFER rows); the native leg reading test_reactions' frozen lines exactly; both ids from each leg's trace; no schedule poke inside a compared window; the five controls failing. The contact FRAME is printed, not compared (#168).
 
 ### `audit_x2b7ef4_reach_m18.sh` — audit, emulator
 

@@ -73,6 +73,8 @@ test_pyron_cosmo	ff8782	DUMPS:f$f	READS-BACK	ruled 2026-09-25 (14z-181) as propo
 test_reactions	ff8410	FIELDS:x	RETIRED	READS-BACK ruled 2026-09-25 (14z-181): reaction_map.py:80 contacts from p2hp/p2white/p2frz; x never read — drop from FIELDS; the column DROPPED 14z-181, so the finding no longer derives	main
 test_reactions	ff8810	FIELDS:p2x	RETIRED	READS-BACK ruled 2026-09-25 (14z-181): as x; the column DROPPED 14z-181, so the finding no longer derives	main
 test_reactions	ff8850	FIELDS:p2hp	OBSERVES	ruled 2026-09-25 (14z-181): reaction_map.py:80 contact = p2hp DROP	main
+audit_victim_parity	ff8850	FIELDS:p2hp	OBSERVES	classed at creation 2026-09-25 (14z-181) under the test_reactions ruling of the same day: reaction_map.py contact = p2hp DROP; the gate's own HP pins sit 10 frames before each event and the reader refuses one inside a contact window	main
+audit_victim_parity	ff8850	FIELDS:p2white	OBSERVES	classed at creation 2026-09-25 (14z-181) under the test_reactions ruling: reaction_map.py contact = p2white DROP	main
 test_rehit_ring	ff8850	FIELDS:p2hp	OBSERVES	ruled 2026-09-25 (14z-181): rehit_ring.py:90 + vanilla_join_rig.py:233 contacts = p2hp DROPS	main
 test_vanilla_aerial_join	ff8410	FIELDS:p1x	RETIRED	READS-BACK ruled 2026-09-25 (14z-181): no use line in the gate or vanilla_join_rig.py beyond the pins (:118/121) — drop from FIELDS; the column DROPPED 14z-181, so the finding no longer derives	main
 test_vanilla_aerial_join	ff8782	FIELDS:id	RETIRED	READS-BACK ruled 2026-09-25 (14z-181): no line in the gate or vanilla_join_rig.py reads id (reader E C7/C9 NOT MEASURED) — drop from FIELDS; NOTE for the maintainer: the forced pick is never asserted here; the column DROPPED 14z-181, so the finding no longer derives	main

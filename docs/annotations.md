@@ -23,15 +23,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3225 |
+| distinct program-space addresses named | 3228 |
 | named by a document or manifest only | 2126 |
 | named by both a document/manifest and code | 732 |
-| named by CODE ONLY (the gap list below) | 367 |
+| named by CODE ONLY (the gap list below) | 370 |
 | carried by atlas | 571 |
 | carried by engine_internals | 657 |
 | carried by other docs | 1000 |
 | carried by manifests | 1818 |
-| carried by code | 1099 |
+| carried by code | 1102 |
 
 ## Addresses
 
@@ -2153,7 +2153,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0BC448` | build/manifest/donovan.toml — capture_kf_qbee; build/manifest/huitzil.toml — capture_kf_qbee; build/manifest/pyron.toml — capture_kf_qbee |
 | `PRG:0x0BC680` | docs/project/patch_notes.md — 14z-111 — #99 ROOT CAUSE FIX (option A): the CPU AI action-script tables unparked, byte detail; build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x0BCBB6` | build/manifest/donovan.toml — capture_kf_qbee; build/manifest/huitzil.toml — capture_kf_qbee; build/manifest/pyron.toml — capture_kf_qbee |
-| `PRG:0x0BCC80` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/tables/defense_rows.md — Cross-references; docs/project/tables/defense_rows.md — What this covers; docs/project/tables/defense_rows.md — vsavj d82320a0… / vs2 ac31740c…; re-derive with the snippet below); docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/donovan.toml — defense_rally_threshold; +7 more |
+| `PRG:0x0BCC80` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/tables/defense_rows.md — Cross-references; docs/project/tables/defense_rows.md — What this covers; docs/project/tables/defense_rows.md — vsavj d82320a0… / vs2 ac31740c…; re-derive with the snippet below); docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/donovan.toml — defense_rally_threshold; +8 more |
 | `PRG:0x0BCC90` | build/manifest/huitzil.toml — defense_rally_threshold |
 | `PRG:0x0BCC92` | build/manifest/donovan.toml — defense_rally_threshold; build/manifest/huitzil.toml — defense_rally_threshold |
 | `PRG:0x0BCC94` | build/manifest/donovan.toml — defense_rally_threshold |
@@ -2354,7 +2354,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0D66C2` | build/manifest/donovan.toml — defense_rally_threshold |
 | `PRG:0x0D681E` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x0D6B2A` | docs/game/atlas/character_tables.md — The full per-character table BANK — layout identical in all three sets [vh2]; build/manifest/bank_map.toml — origins [vh2]; tests/test_capture_pose_sources.sh; tests/test_df_startup_provenance.sh |
-| `PRG:0x0D6E1E` | docs/project/tables/defense_rows.md — Cross-references; docs/project/tables/defense_rows.md — What this covers; docs/project/tables/defense_rows.md — vsavj d82320a0… / vs2 ac31740c…; re-derive with the snippet below); docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/donovan.toml — defense_rally_threshold [vs2]; build/manifest/huitzil.toml — defense_rally_threshold [vs2]; +5 more |
+| `PRG:0x0D6E1E` | docs/project/tables/defense_rows.md — Cross-references; docs/project/tables/defense_rows.md — What this covers; docs/project/tables/defense_rows.md — vsavj d82320a0… / vs2 ac31740c…; re-derive with the snippet below); docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/donovan.toml — defense_rally_threshold [vs2]; build/manifest/huitzil.toml — defense_rally_threshold [vs2]; +6 more |
 | `PRG:0x0D6E2E` | build/manifest/huitzil.toml — defense_rally_threshold |
 | `PRG:0x0D6E30` | build/manifest/donovan.toml — defense_rally_threshold |
 | `PRG:0x0D6EBE` | build/manifest/reconciliation_huitzil.toml — map |
@@ -2531,7 +2531,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x257FFF` | docs/game/engine_internals.md — The QSound Z80 driver: id table, songs, streams, sample records (measured 14z-86, reader-traced on live vsavj, id 0x119) [vs2]; build/manifest/qs_songs.toml — (top) [vs2]; tests/test_qs_id_table.sh |
 | `PRG:0x2601EC` | docs/game/gotchas.md — The per-char strip zone interleaves the SHARED MUSIC POOL; tools/overlay_port.py |
 | `PRG:0x263186` | docs/project/gotchas.md — "the ported data is corrupt" (14z-75) |
-| `PRG:0x264086` | docs/game/atlas/character_tables.md — Animation index tables (bank extends below bank[0]); build/manifest/gfx_layout3.toml — pyron; build/manifest/pyron.toml — (top); tests/test_list_type_census.sh; tools/extract_char.py; tools/list_type_census.py |
+| `PRG:0x264086` | docs/game/atlas/character_tables.md — Animation index tables (bank extends below bank[0]); build/manifest/gfx_layout3.toml — pyron; build/manifest/pyron.toml — (top); tests/test_list_type_census.sh; tools/extract_char.py; tools/list_type_census.py; +1 more |
 | `PRG:0x2641EC` | docs/project/gotchas.md — "the ported data is corrupt" (14z-75) [vs2] |
 | `PRG:0x2650EC` | docs/project/gotchas.md — "the ported data is corrupt" (14z-75); build/manifest/pyron.toml — sprite [vs2] |
 | `PRG:0x26614C` | docs/project/gotchas.md — two traps from the #104 re-measurement — both produced a CONFIDENT WRONG ANSWER from a working instrument (paid: 14z-99); tests/audit_don_grab_pose.sh |
@@ -3223,12 +3223,15 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x272532` | tools/select_arrays.py |
 | `PRG:0x272FB0` | tools/overlay_port.py; tools/select_port.py |
 | `PRG:0x272FDA` | tools/overlay_port.py; tools/select_port.py |
+| `PRG:0x2735A6` | tools/victim_parity.py |
 | `PRG:0x273766` | tools/overlay_port.py; tools/select_port.py |
 | `PRG:0x2738B8` | tests/test_tenant_select_records.sh |
 | `PRG:0x273A02` | tests/test_tenant_select_records.sh |
 | `PRG:0x273AAC` | tools/overlay_port.py; tools/select_port.py |
 | `PRG:0x274642` | tools/overlay_port.py; tools/select_port.py |
 | `PRG:0x2748F0` | tools/overlay_port.py |
+| `PRG:0x27EA80` | tools/victim_parity.py |
+| `PRG:0x27F586` | tools/victim_parity.py |
 | `PRG:0x287BA8` | tests/audit_don_lilith_ko.sh |
 | `PRG:0x28A300` | tests/test_biased_list_inventory.sh |
 | `PRG:0x29AF34` | tests/test_biased_list_inventory.sh |

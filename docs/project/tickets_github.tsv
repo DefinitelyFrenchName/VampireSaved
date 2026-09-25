@@ -2,8 +2,10 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 172
+# issues: 174
 number	state	reason	closed	labels	title
+174	OPEN	-	-	evolution	35 never-entered a2 chains of the tenants (7 with attack records) — moves the naming corpus never produces, so their ours-vs-native parity is unmeasured
+173	OPEN	-	-	bug	Pyron's heavy-hit reaction runs the generic chain b:0x03 on our build where native vs2 runs his b:0x19 (5HP, j.HP, throw release) — class, freeze and length equal
 172	CLOSED	COMPLETED	2026-09-24	enhancement	Enforce the discipline at the AGENT level: orchestrator / checker / workers, with the checker unable to be overridden
 171	OPEN	-	-	enhancement	Qualify every gate: prove it measures what it claims, and that it notices when its inputs move
 170	OPEN	-	-	enhancement	Notarize the macOS release binaries (PARKED on community demand)
@@ -40,7 +42,7 @@ number	state	reason	closed	labels	title
 139	CLOSED	COMPLETED	2026-09-14	bug	A rejected build keeps its packed rompath, indistinguishable on disk from a finished build (the #1 residual)
 138	OPEN	-	-	bug	A stock-track build directory without its vsavj.zip silently dispatches run_suite to the VANILLA expectations — the reference-row rule nothing enforces (the #55 residual)
 137	CLOSED	COMPLETED	2026-09-14	bug	test_wide_profile's reference guard trusts a profile check that nothing in the run proves can see the profile (the #63 residual)
-136	OPEN	REOPENED	-	evolution	Tenant move parity vs native VS2: compare Donovan, Phobos and Pyron's moves on the WIDE merged build against vsav2
+136	CLOSED	COMPLETED	2026-09-25	evolution	Tenant move parity vs native VS2: compare Donovan, Phobos and Pyron's moves on the WIDE merged build against vsav2
 135	CLOSED	COMPLETED	2026-09-15	evolution	The VS-vs-VS2 tick cadence: re-establish its measurement, mechanism and scope, and document it properly
 134	OPEN	-	-	bug	The hit rigs' LP events whiff at contact range
 133	OPEN	-	-	evolution	Re-measure the emulator runner's pull-queue gain on a wider host

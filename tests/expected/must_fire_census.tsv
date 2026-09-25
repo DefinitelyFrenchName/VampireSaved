@@ -25,6 +25,7 @@ declares	audit_forced_pick_fidelity
 declares	audit_guard_corpus
 declares	audit_guard_mask_reads
 declares	audit_guard_reentry
+declares	audit_hitbox_parity
 declares	audit_hui_grunt
 declares	audit_kill_poke_shape
 declares	audit_ladder_selector
@@ -45,6 +46,7 @@ declares	audit_throw_registration
 declares	audit_tick_cadence
 declares	audit_tick_phase
 declares	audit_trap_shock
+declares	audit_victim_parity
 declares	audit_voice_borrow
 declares	audit_walker_repoint
 declares	audit_x2b7ef4_reach_m18

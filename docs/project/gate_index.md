@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**385 scripts** — 98 ci_portable, 84 ci_static, 203 emulator-tier (run by name).
+**387 scripts** — 98 ci_portable, 84 ci_static, 205 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -27,7 +27,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 82 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 55 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 57 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -385,6 +385,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/audit_front_comparator.sh` | audit | emulator | MAME, a build dir, ~3 min | what $FF8127 is, and what its input byte +0x10 is (14z-123, the documentation rationalization pass, inferred_claims row 4; closes the 14z-118 (16) leftover "Open: what object byte +0x10 is"). | 14z-123 |
 | `tests/audit_guard_mask_reads.sh` | audit | emulator | MAME, a build dir, ~4 min | WHICH LONGWORDS OF THE GUARD-MASH MASK TABLE `PRG:0x028D50` THE ENGINE READS, ours vs vanilla — and that the port's bytes in its FIRST longword sit behind an index the check never produces. (14z-145.) | 14z-145 |
 | `tests/audit_guard_reentry.sh` | audit | emulator | MAME, a build dir, ~20 s | THE BLOCK ANIMATION RE-ENTERS ON vsavj, NOT ON vs2, on legacy content (14z-168, GitHub #136): when a block's hit-freeze ends into the blockstun slide (seq 0 -> 2) with BACK still held, vsavj re-enters the block animation (the node counter r… | 14z-168 |
+| `tests/audit_hitbox_parity.sh` | audit | emulator | MAME, a build dir, ~2 min | THE HITBOXES IN PLAY, ours vs native (14z-181, GitHub #136): on every frame where a tenant's naming rig has both legs on the SAME node, the seven resolved hitbox pointers and the node's box-id word are equal — the resolution per node is ide… | 14z-181 |
 | `tests/audit_lag_budget.sh` | audit | emulator | MAME, FBNeo, a build dir | A FIX SET ADDS NO FRAME OF LAG: over every #136 naming part (the three tenants' moves, and legacy attackers against each tenant), the build under test has no zero-pass frame that the reference build — the one before the fixes — does not hav… | 14z-170 |
 | `tests/audit_latch_reads.sh` | audit | emulator | MAME, a build dir, ~2 min | WHO READS THE SELECT-CONFIRM LATCH IN PLAY, per leg shape, with the VALUE each reader saw: the measured half of the #151 step-3 sweep, frozen (14z-161). | 14z-161 |
 | `tests/audit_move_parity.sh` | audit | emulator | MAME, a build dir | EVERY TENANT MOVE, OURS vs NATIVE vsav2, AT A MATCHED SPEED LEVEL AND A PINNED RNG (GitHub #136, 14z-159). | 14z-159 |
@@ -398,6 +399,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/audit_throw_registration.sh` | audit | emulator | MAME, a build dir, ~3 min | THE HIT-REGISTRATION PAIR AT A TENANT THROW, ours vs native, frozen: on every tenant throw contact native's throw code writes the engine's (attacker, victim) registration pair right before the generic hit stager awards meter, while our plac… | 14z-166 |
 | `tests/audit_tick_cadence.sh` | audit | emulator | MAME, ~1.5 min | THE EXTRA LOGIC PASS IS DECIDED BY THE SPEED LEVEL, and on vanilla content each game's DEFAULT play mode sets a different one: | 14z-156 |
 | `tests/audit_tick_phase.sh` | audit | emulator | MAME, a build dir, ~60 s | THE ENGINE'S DOUBLE-PASS CADENCE IS PERIODIC IN FRAMES, AND ITS PERIOD IS WHAT tools/name_moves.py QUANTISES ITS SCHEDULE SHIFT TO (14z-172, GitHub #168). | 14z-172 |
+| `tests/audit_victim_parity.sh` | audit | emulator | MAME, a build dir, ~2 min | THE TENANT AS THE VICTIM, ours vs native (14z-181, GitHub #136): the `<tenant>_victim` rigs of tools/name_moves.py — Victor attacking the tenant with every contact class — run on BOTH legs as REAL cursor picks, and the victim's reaction per… | 14z-181 |
 | `tests/audit_x2b7ef4_reach_m18.sh` | audit | emulator | MAME, FBNeo, a build dir | DOES ANY NAMING PART READ A CORRUPTED x2b7ef4 RECORD ON merged-m18? The reachability the maintainer asked for (2026-09-19, "Measure it now (Recommended)"), re-measured SOUNDLY (14z-170): | 2026-09-19 |
 | `tests/test_advancing_guard.sh` | test | emulator | MAME, ~2.5 min | THE ADVANCING GUARD (guard push), MEASURED on native vs2 and on vsavj, and frozen (14z-123, the documentation pass's G2). | 14z-123 |
 | `tests/test_anim_node_walk.sh` | test | emulator | MAME, a build dir, ~2 min | THE ANIMATION-NODE DECODER IS AN INSTRUMENT (character-data map, phase 1; 14z-118). tools/anim_nodes.py reads the per-character anim index tables and walks the 0x18-byte node chains by the rules read off vs2's walker (PRG:0x02713C / 0x0271C… | 14z-118 |
