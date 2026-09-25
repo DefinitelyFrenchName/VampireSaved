@@ -91,3 +91,13 @@ Galactic Throw pair; naming/parity/attribution re-frozen). The 73 poke rulings a
     the NEXT id (`prepare --id`). Answer side questions
     in prose from context; if a fork must run, check `git status` and the run dir's mtimes before
     the next `record`.
+11. **The close's own checks found three more (procedure run `2026-09-25-214`, the tier, the
+    cap).** (a) "the fork is stopped, the sweep is clean" was SAID with no sweep run after the
+    fork — state a checked condition only after the check that shows it; (b) a figure read off a
+    regenerated schedule (3810) was quoted before any tool printed it — print it first; (c) two
+    measurers polled other tasks' outputs and a return carried notes outside its RETURN form — a
+    worker's extras are read against its spec at the close, not trusted; (d) a move-note edit in
+    `build/manifest/moves_<tenant>.toml` changes the out-of-tree html page's hash
+    (`tests/test_charmap_current.sh` names it now): re-freeze `charmap_pages.sha256` in the
+    commit that edits a note; (e) the btw fork ran on the SESSION's model (Fable 5.1), so
+    `transcript_gaps.py --cap` reads it as a breach — the worker cap has no declaration path.

@@ -1,0 +1,4 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent181/extract_1c426425.txt	ae652eb39924c8914504233b68e83228852785db
+build/agent181/extract_152495c2.txt	f5a6b6b7732965dce16e3ea54d2ac756e59f1f44
+build/agent172/extract_63442647_tail.txt	4456a842a1b5657e4a3032833403545d426ceac2
