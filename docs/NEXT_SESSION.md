@@ -24,6 +24,10 @@ prompt files pasted VERBATIM, `record --session`, `resolve` on ONE line. Say so 
     #175 figures `docs/game/engine_internals.md` quotes — the dome record `(0, 0, 40, 6)`, Victor's airborne
     vuln0 `(0, 69, 32, 36)`, Felicia's `b:0x0f` head boxes `(-8, 70, 12, 8)` / `(-3, 76, 17, 14)` — from the
     data views with a spec, since 14z-182 promised it and ran them itself (the gate reproduces them).
+0c. **CARRIED: 14z-182's unchecked transcript tail.** Procedure run `2026-09-25-224` read this session's
+    transcript (39efeec2) through record 2820; the rest — recording and resolving run 224, the close's last
+    commit `256edd70`, the push, and this carry note's commit (LOCAL, not pushed: a push needs a procedure run
+    covering it) — is THIS close's to check: `extract.py --session 39efeec2 --from 2821`, and `--cap` over it.
 1. **Nothing is pending a ruling** — STATE "Decisions pending" is empty after 14z-182.
 2. **Open tickets from 14z-182, the maintainer's to order:** **#177** (tenant movement parity vs native —
    no gate compares walk / dash / jumps / arcs against vs2), **#178** (a rig that makes Hop Kick connect
