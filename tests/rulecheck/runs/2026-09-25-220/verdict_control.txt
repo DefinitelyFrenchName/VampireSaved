@@ -1,0 +1,6 @@
+Q1: VIOLATED — the claim says "Not tested: nothing further", but it rests on two premises nobody tested: that the actor is the maintainer, and that the close was deliberate. issue_151_timeline.txt:2 says "the sessions and the maintainer shared ONE GitHub account (DefinitelyFrenchName)", so the actor field cannot tell them apart.
+Q2: N-A — the claim draws no conclusion about behaviour a player could feel.
+Q3: N-A — no two legs are compared.
+Q4: VIOLATED — nothing controls for this close being an automatic close triggered by the session's own commit, and the claim does not name that risk. issue_151_timeline.txt:5 "2026-09-17T00:17:08Z closed   actor=DefinitelyFrenchName commit=afff693875340868f0aaf63362a6773535ef8a73" is 3 seconds after git_log.txt:3 "afff6938 ... 2026-09-17 02:17:05 +0200 14z-161 CLOSE: #151 step 3" (00:17:05Z). The close at line 3 follows the 14z-160 "CLOSE: #151" commit (22:22:52Z) the same way, and git_log.txt:3 records that close as unintended: "#151/#136 found closed on GitHub by the 14z-160 close and reopened".
+Q5: VIOLATED — none of the files quotes the maintainer. The closure is inferred from an event log's actor field ("the close event is in the issue's timeline with the maintainer's account as its actor"), and per issue_151_timeline.txt:2 that account is shared with the sessions.
+VERDICT: VIOLATED

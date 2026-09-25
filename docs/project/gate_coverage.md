@@ -13,7 +13,7 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**389 of 389 gates described.**
+**390 of 390 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
@@ -23,7 +23,7 @@ first sentence) is `gate_index.md`.
 | [pipeline](#pipeline) | 58 | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
-| [tenant](#tenant) | 83 | 83 | tenant content — per-character gates and on-demand audits on the ported characters |
+| [tenant](#tenant) | 84 | 84 | tenant content — per-character gates and on-demand audits on the ported characters |
 | [character-data](#character-data) | 57 | 57 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
@@ -1638,7 +1638,7 @@ tiles, OBJ records, sprite lists, render-layer verdicts. 25 of 25 described.
 
 ## tenant
 
-tenant content — per-character gates and on-demand audits on the ported characters. 83 of 83 described.
+tenant content — per-character gates and on-demand audits on the ported characters. 84 of 84 described.
 
 ### `audit_continue_ladder.sh` — audit, emulator
 
@@ -1904,13 +1904,21 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 **EXPECTS:** each leg's teched damage equals its frozen value; notech deals 13. A red is a ported reaction row that stopped honouring the escape, or a tech landing where native has none.
 
+### `audit_trap_air_hit.sh` — audit, emulator
+
+**WHAT:** whether the Plasma Trap can hit an airborne opponent, measured ours vs native: with Felicia pressing j.HP at 3508 she is hit on her last descent frame (y 42, j.HP node 4) with class 0x07 (the air stager) on native vs2 and on the merged build alike, every traced field equal; pressing at 3511 she passes over the box and is hit on the landing frame (the ground path, class 0x52 native / the ruled marker 0x38 ours).
+
+**HOW:** tools/trap_air_probe.sh on MAME, four legs in parallel (native and merged, press 3508 and 3511): the trap rig of tests/replays/hui/92_hui_trap_shock.rpl with REAL cursor picks (P1 Phobos, P2 Felicia 0x07, tools/select_paths.py on each leg's own wheel), Felicia pinned at x 695 and Phobos at x 540 over 3470-3489 (before the window), a neutral jump at 3490, j.HP at the press; level 6 and RNG 0000 pinned (the ruled equalised input); the victim's position, HP, class, freeze, sequence, family ids, node, facing and RESOLVED world-space hurtboxes, the dome's type, live attack record and box extents, and Phobos's x, HP and freeze traced 3500-3530 and reduced to per-field steps (raw table pointers and node addresses differ by build and are compared through what they resolve to); the fighters named by their hitbox base against each image's bank row.
+
+**EXPECTS:** P1 0x10 and P2 0x07 on every leg; the 3508 legs hit at a frame with y > 40 in a2:0x14#4 with class 0x07, identical in every field; the 3511 legs hit on the landing frame (y > 40 the frame before, 40 at the hit), identical but for the class byte 0x52 / 0x38; the frozen rows; the victim's resolved hurtboxes equal on every frame whose node has the same static boxes in both games' Felicia data (the air-hit frame among them), differing only where those static boxes differ (frozen per leg: the victim is each game's own Felicia, by the superset invariant — 14z-182, her b:0x0f head hurtbox (-8, 70, 12, 8) ours / (-3, 76, 17, 14) native), with our build's Felicia equal to PRISTINE vsavj's (build/out/vsavj_data.bin) on every node our legs enter; the three data files it reads byte-identical to the decrypted romsets the legs run; the seven controls failing.
+
 ### `audit_trap_airborne.sh` — audit, emulator
 
 **WHAT:** what the Plasma Trap dome does to a victim who JUMPS while it is active: on the deep-overlap trap rig with Victor pressing up at 3490 the jump takes (y 40 -> apex 127 -> 40, 3493-3528), the dome does not touch him in the air, and it hits him on the LANDING frame (f3529, y 43 -> 40) on both legs; the shock then plays as on the ground — freeze from 0x18, sub-state 4, Phobos never frozen — the class byte 0x52 on native and the marker 0x38 on the merged build (the class-0x52 rule, ruled 2026-09-18); frozen per leg as steps. THE GROUND IS y = 40 (engine_internals.md), so "airborne" is y > 40 — reading y > 0 as airborne is the error rule-checker run 2026-09-25-164 caught in this gate's first form.
 
 **HOW:** two MAME runs (native vsav2, the merged build) of tests/replays/hui/92_hui_trap_shock.rpl with one added line (P2 up at 3490), the trap gate's forced-pick pokes, level and RNG pins; the victim's class, freeze, sub-state, HP and height and Phobos's freeze traced every frame 3395-3620; the STEPS of each field frozen per leg with the jump's airborne span, apex and landing frame; both legs must be identical in every field but the class marker; the jump must have TAKEN (apex > 40), the hit must land ON the landing frame (y > 40 the frame before, 40 at the hit) and never inside the airborne span.
 
-**EXPECTS:** the frozen rows; the two legs equal but for 0x52 / 0x38; the hit on the landing frame on both; the three controls failing. SWEEP=1 adds the five other jump timings whose jump takes and lands while the dome is active (3466, 3470, 3474, 3480, 3486): each asserted the same way, printed, never frozen. Not covered: an airborne hit by the dome (none exists in this rig — every press timing 3440-3499 was traced on native: 3440-3460 land before the dome is active, 3461-3498 are hit on the landing frame, 3499+ never jump; a lower arc or a juggled victim is not tried — GitHub #175), the solo Phobos track.
+**EXPECTS:** the frozen rows; the two legs equal but for 0x52 / 0x38; the hit on the landing frame on both; the three controls failing. SWEEP=1 adds the five other jump timings whose jump takes and lands while the dome is active (3466, 3470, 3474, 3480, 3486): each asserted the same way, printed, never frozen. Not covered: an airborne hit by the dome (none exists in this rig — every press timing 3440-3499 was traced on native: 3440-3460 land before the dome's attack box switches on (f3500 in this rig, measured 14z-182 by tools/trap_air_probe.sh), 3461-3498 are hit on the landing frame, 3499+ never jump; a lower arc or a juggled victim is not tried — GitHub #175), the solo Phobos track.
 
 ### `audit_trap_parity.sh` — audit, emulator
 

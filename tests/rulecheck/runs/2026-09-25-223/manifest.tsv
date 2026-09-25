@@ -1,0 +1,6 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+STATE.md	6eb60063fa741985436fa18ee18351eac2d312e0
+build/agent182/packet_homes_14z182.txt	96dfd81911c3c080ab7871333648f6229b80e009
+build/agent182/close_findings_14z182.txt	ebb4303584cfe9a8d0f4eb0504d41116ed7fae3b
+build/agent182/homes_tracked_14z182.txt	3d200cdeb87831435dd4459594fdaa81e8ae1471
+build/agent182/retraction_greps_14z182.txt	561321f22bf72f00d98fd7c4ddd5544b1ceb0e7f

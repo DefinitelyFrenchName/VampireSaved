@@ -397,4 +397,5 @@ tests/test_agent_worker.sh	runner
 tests/audit_victim_parity.sh	character-data
 tests/audit_hitbox_parity.sh	character-data
 tests/audit_trap_airborne.sh	tenant
+tests/audit_trap_air_hit.sh	tenant
 tests/test_close_tools.sh	docs

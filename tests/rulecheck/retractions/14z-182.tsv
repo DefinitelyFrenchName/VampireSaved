@@ -1,0 +1,9 @@
+# tests/rulecheck/retractions/14z-182.tsv — the wordings retracted or corrected in 14z-182 (the maintainer's rulings on #161 and #136's scope, the #175 measurement); columns pattern, source, kind (retracted — classed by hand | gone — must read 0 hits | reach[:N] — must be found). Run: python3 tools/retraction_grep.py tests/rulecheck/retractions/14z-182.tsv build/agent182/retraction_greps_14z182.txt
+jump over the active dome	14z-182 #175: the dome's box switches on at f3500	retracted
+ONE RESIDUAL IS OPEN	14z-182 #161 ruled not-ours	retracted
+PHOBOS-DMG-OPEN	14z-182 #161: the class renamed DMG-VSAVJ	retracted
+the whole scope covered	14z-182 #136 re-derived: four findings	retracted
+cause unmeasured	14z-182 #161: measured (a legacy victim reads the same +1)	retracted
+A VULN ID OF 0 IS NO BOX	14z-182 gotcha	reach
+THE ONE RESIDUAL IS VSAVJ'S OWN	14z-182 defense_rows.md	reach
+grounded-only rule	14z-182 #175: the dome tests an airborne victim every pass; the 'overlap but no hit' was a phantom id-0 box	retracted

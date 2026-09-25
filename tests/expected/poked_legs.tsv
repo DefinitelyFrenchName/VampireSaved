@@ -290,3 +290,7 @@ tools/name_moves.py	native	replays/naming/huitzil_victim_*.rpl	P1	R R	13 Donovan
 tools/name_moves.py	native	replays/naming/huitzil_victim_*.rpl	P2	R R	03 Victor	10	CROSS-INERT	P2 R,R is Victor on vsav2
 tools/name_moves.py	native	replays/naming/pyron_victim_*.rpl	P1	R R	13 Donovan	03	CROSS-INERT	the rig's prologue is replay 17's (P1 R,R on vsav2)
 tools/name_moves.py	native	replays/naming/pyron_victim_*.rpl	P2	R R	03 Victor	11	CROSS-INERT	P2 R,R is Victor on vsav2
+tools/trap_air_probe.sh	native	replays/hui/92_hui_trap_shock.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tools/trap_air_probe.sh	native	replays/hui/92_hui_trap_shock.rpl	P2	R R	03 Victor	$P2CELL	PARAM	CROSS-FLAVOR if id in 0x13
+tools/trap_air_probe.sh	ours	replays/hui/92_hui_trap_shock.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tools/trap_air_probe.sh	ours	replays/hui/92_hui_trap_shock.rpl	P2	R R	03 Victor	$P2CELL	PARAM	no id is CROSS-FLAVOR here

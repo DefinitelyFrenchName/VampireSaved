@@ -857,7 +857,8 @@ two `-debug` write-tap legs); the per-tenant tables are in
 `docs/project/tables/chars/<tenant>.md` "Hitboxes and attack records" and
 the per-chain frame data in the out-of-tree `<tenant>_anim.md`.
 **Gates:** `tests/test_hitbox_encoding.sh`, `tests/test_charmap_current.sh`,
-`tests/test_projectile_params.sh`.
+`tests/test_projectile_params.sh`, `tests/audit_trap_airborne.sh`, `tests/audit_trap_air_hit.sh`
+(instrument `tools/trap_air_probe.sh`).
 
 - **The five tables.** `+0x60.l` is the hitbox BASE, a table of word
   offsets from itself; the fighter caches `+0x80 = base+base[0]`, `+0x84 =
@@ -910,6 +911,36 @@ the per-chain frame data in the out-of-tree `<tenant>_anim.md`.
   Blizzard Sword's record 1 (`+0x17` = 0x14) put 0x14 on the victim.
 - Sizes: Donovan 144 family entries / 200 attack records, Huitzil 72 /
   364, Pyron 63 / 143 (the per-tenant pages).
+- **A vuln id of 0 is NO BOX (measured 14z-182, #175).** The per-box hit loop reads the family
+  entry's vuln ids one by one and skips a zero (vs2 `PRG:0x01698A` `move.b -$4b70(a5),d0 ; beq`
+  past vuln0's test, `0x0169DE` the same for vuln1): an id of 0 is not "box 0 of the table". A
+  jumping Victor carries `+0x94` = `0x03000003` — vuln0 only — against `0x01010101` standing. A
+  resolver that reads table + 8 x id for a zero id builds a PHANTOM box the engine never tests
+  (`tools/hitbox_records.py` `node_boxes()` does; its comparisons read both legs alike, so no
+  verdict rests on it; `docs/project/gotchas.md` "A VULN ID OF 0 IS NO BOX").
+- **A projectile hits a fighter through the SAME per-box loop, on every pass, with no grounded
+  rule (measured 14z-182 on native vs2, #175).** Execution breakpoints on the loop's three calls
+  to the box test (`PRG:0x01699C` / `0x0169F0` / `0x016A46`, the overlap test itself at
+  `0x017B74`: x then y, centre distance against the summed half-extents) fire with A6 = the
+  projectile object (the Plasma Trap dome, pool slot `RAM:$FF9500`), A1 = the victim, A3 = the
+  dome's attack record — once per pass against an airborne victim (vuln0 only), three times on the
+  landing pass. So whether an airborne victim is hit is plain geometry. **The Plasma Trap dome's
+  attack records** (Huitzil's projectile records 5 and 6, `docs/project/tables/chars/huitzil.md`)
+  carry the box `(0, 0, 40, 6)`: 80 px wide and 12 px tall, its top 6 px above the dome's y (the
+  ground, 40), identical on our build. A jumping Victor's one airborne hurtbox, vuln0
+  `(0, 69, 32, 36)`, has its bottom 33 px above his feet, so the dome never reaches him in the air
+  (`tests/audit_trap_airborne.sh`). **Felicia's j.HP (`a2:0x14` / `0x1a`) node 4 carries a
+  hurtbox whose bottom is 6 px BELOW her feet**; timed onto her last descent frame (y 42) over the
+  active dome she is hit IN THE AIR — class 0x07, the air stager, knocked upward — frame-identical
+  on native vs2 and our merged build in every traced field (`tests/audit_trap_air_hit.sh`; the
+  maintainer read the capture sheets identical, 2026-09-25) but one, which is the two GAMES' own
+  data: **Felicia's hit reaction `b:0x0f` carries a different head hurtbox (vuln0) on vsavj,
+  `(-8, 70, 12, 8)`, than on vs2, `(-3, 76, 17, 14)`** — static in both images, our build's equal to
+  pristine vsavj's on every node the rig enters (the gate's pristine check); her j.HP chain `a2:0x14`
+  is listed as differing between the games by `tools/audit_same_data_p2.py`, but its hurtboxes are
+  equal node for node. Which nodes of which characters
+  reach that low: `tools/air_hurtbox_census.py` (six characters' jump attacks do; whether a
+  given node is AIRBORNE is not in the data and is measured per case).
 
 ## The anim index a2's TWO aerial slot sets — neutral and forward jump (14z-145, MEASURED on all 15 vanilla characters)
 

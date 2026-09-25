@@ -1,5 +1,26 @@
 # GOTCHAS (project) — traps in OUR pipeline and method
 
+## A VULN ID OF 0 IS NO BOX — a resolver that reads it builds a PHANTOM hurtbox the engine never tests (paid: 14z-182, GitHub #175)
+
+**What happened.** Measuring whether the Plasma Trap dome can reach an airborne Victor, the first
+form of `tools/trap_air_boxes.py` resolved each of the victim's three vuln boxes as
+`table + 8 x id` for the ids in `+0x94`, and reported the dome's box overlapping two of them on the
+frame before landing — "the boxes overlap in the air and no hit lands", which read as a
+grounded-only rule. A read-tap then showed the dome's hit test reading Victor's y ONCE per airborne
+pass and three times on the landing pass, and the disassembly showed why: the per-box loop skips a
+zero id (vs2 `PRG:0x01698A` / `0x0169DE`, `beq` past the test). A jumping Victor carries
+`0x03000003` — vuln0 alone; the two "overlapping" boxes were entry 0 of tables 1 and 2, which the
+engine never tests. The grounded-only reading was wrong twice over: the register the tap showed
+holding 40 was the dome's box centre, not a ground constant.
+
+**The rule.** Resolve a hurtbox only for a NONZERO id, and when a geometric claim meets a behaviour
+that contradicts it ("overlapping but not hit"), count how many times the engine actually runs the
+test before theorising a rule — an execution breakpoint on the test's call sites answers it in one
+run. `tools/hitbox_records.py` `node_boxes()` still resolves id 0 (both legs of its comparisons read
+alike, so no verdict rests on it); any NEW use that reasons about which boxes exist must skip zero
+ids (`tools/air_hurtbox_census.py` does). The facts: `docs/game/engine_internals.md` "Hitboxes and
+attack records".
+
 ## A CHAIN ID IN A NAMING EXPECTATION IS IDENTIFIED FROM THE SLOT TABLE, NEVER DESCRIBED IN PROSE (paid: 14z-171, caught 14z-172, GitHub #168)
 
 14z-171 reported that two `pyron_3` / `pyron_5` events "had never fired their

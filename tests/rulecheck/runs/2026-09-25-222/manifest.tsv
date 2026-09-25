@@ -1,0 +1,13 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_trap_air_hit.sh	6300d87be7af36e64cf91c1f0ea24fffb0764c87
+tests/expected/trap_air_hit.tsv	6d8b9d874688533c0d40f955b82a328cbf0c2cd5
+build/agent182/tah_verify.log	89823c066951578c2bc0dea6a24bd834a4669e77
+build/agent182/tah_mode_stale-image.log	d36a6834f8834455696c837d3bfbc71678211816
+build/agent182/tah_mode_merge-corrupt.log	f5176baf5d6302c76547df0bddde23aa01a8e30a
+build/agent182/tah_mode_box-drift.log	da1a12f9bd0d9c8416b018a48be4ee277ed6517f
+build/agent182/tah_mode_dome-drift.log	ff3cf050852d4350b7ad4a8d028cb185fce3ac64
+tools/trap_air_probe.sh	7b2a812b3ba9f3ab510b1ce5b7bf99a55ec9fdaa
+tools/trap_air_boxes.py	86ff7499aad144ab57b50061a16378832247e6d5
+build/agent182/rc_sheet_3508.png	42297bf8d66488565ae8554a8fcffa8e524204af
+build/agent182/rc_sheet_3511.png	f5e7e59ad5984877a083a1f0426858d1b2dbcfa3
+build/agent182/maintainer_read_175.txt	27aeebb25525b42361d0be4eb68bf4cbda2bc250

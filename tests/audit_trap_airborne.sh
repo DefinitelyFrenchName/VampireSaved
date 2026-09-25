@@ -20,7 +20,8 @@
 #   both; the three controls failing. SWEEP=1 adds the five other jump timings whose jump takes and
 #   lands while the dome is active (3466, 3470, 3474, 3480, 3486): each asserted the same way,
 #   printed, never frozen. Not covered: an airborne hit by the dome (none exists in this rig —
-#   every press timing 3440-3499 was traced on native: 3440-3460 land before the dome is active,
+#   every press timing 3440-3499 was traced on native: 3440-3460 land before the dome's attack
+#   box switches on (f3500 in this rig, measured 14z-182 by tools/trap_air_probe.sh),
 #   3461-3498 are hit on the landing frame, 3499+ never jump; a lower arc or a juggled victim is not
 #   tried — GitHub #175), the solo Phobos track.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/trap_airborne.tsv
@@ -36,7 +37,9 @@
 # column on a jumping Demitri (height 103) takes the air stager (class 7) identically on both legs
 # (tests/audit_column_shock.sh section 1c); the dome never reaches a jumping Victor in the air — of
 # the presses 3440-3499 on native, 3440-3460 land before the dome is active and are hit on the
-# ground, 3461-3498 jump over the active dome (apex 127) and are hit as they LAND, 3499 never
+# ground, 3461-3498 are airborne across or after the box's switch-on at f3500 (apex 127) and are
+# hit as they LAND (a jumping Victor's one airborne hurtbox sits 33 px above his feet, over the
+# box's 12 px — GitHub #175, tests/audit_trap_air_hit.sh for the victim who IS hit in the air), 3499 never
 # jumps; the landing-frame hits take the ground path, identically on both games. The first form of this gate read y > 0 as airborne and
 # called the landing-frame hit "the falling victim at height 40"; rule-checker run 2026-09-25-164
 # found it from the sweep (jumps pressed after the hit still read 40). So with this rig no dome hit

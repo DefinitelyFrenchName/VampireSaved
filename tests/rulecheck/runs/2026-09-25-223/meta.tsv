@@ -1,0 +1,9 @@
+decision	recommendation
+subject	14z-182 CLOSE, checklist item 6 — the documentation packet: every finding (a)-(q) of the findings table has a live home in the tracked tree, and a reproducing test where one exists
+session	39efeec2
+model	rule-checker@163e4ce9cf7b
+claim	THE DOCUMENTATION PACKET of 14z-182: every finding of STATE.md row (8) '(8) THE FINDINGS TABLE' — (a) the #132 recommendation's shared-fingerprint tie, (b) the stale coverage row, (c) #136 closed against its last list only, (d) Hop Kick in DF never compared, (e) no movement-vs-native gate, (f) #161's +1 vsavj's own and the class renamed DMG-VSAVJ, (g) #134's 6 VOID legs, (h) #138/#140/#154 still present, (i) a zero vuln id is no box, (j) the projectile per-box loop with no grounded rule, (k) the dome's box and Victor's airborne box, (l) the airborne Felicia hit identical on both games, (m) Felicia's b:0x0f vanilla data difference, (n) the corrected 'jump over the active dome' wording, (o) the agent hook and inline '&', (p) the sweep survivor's origin, (q) node_boxes() also resolving id 0 — has the live home the row names, in a tracked file, and the test it names where it names one; the close tools' outputs are build/agent182/close_findings_14z182.txt (clean), build/agent182/homes_tracked_14z182.txt (exit 0), build/agent182/retraction_greps_14z182.txt (every retracted hit classed, reach found); the homes are excerpted with path:line in build/agent182/packet_homes_14z182.txt. NOT tested: that each home's text is sufficient (judged here, not by a tool); findings (j), (n), (o), (p) and (q) have no reproducing gate (named as such in the row); the tools read what the row names, so a finding the row omits is invisible to them — the table's completeness is this session's own claim.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b

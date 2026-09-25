@@ -7,7 +7,7 @@ number	state	reason	closed	labels	title
 178	OPEN	-	-	evolution	Hop Kick in Donovan's Dark Force connects on neither leg of any rig: the thread's 'native lands, ours whiffs' was never compared
 177	OPEN	-	-	evolution	Tenant movement parity vs native vs2: walk, dash, jumps and arcs, Phobos's float and air dash — no gate compares movement against native
 176	OPEN	-	-	evolution	Compare the RNG's per-frame advance between our build and native: the parity gates pin the RNG word every frame, so an advance defect would read as agreement
-175	OPEN	-	-	evolution	Plasma Trap dome vs a truly AIRBORNE victim: the air stager's case for the trap is unreached by any rig (a neutral jump clears the dome and is hit on landing)
+175	CLOSED	COMPLETED	2026-09-25	evolution	Plasma Trap dome vs a truly AIRBORNE victim: the air stager's case for the trap is unreached by any rig (a neutral jump clears the dome and is hit on landing)
 174	OPEN	-	-	evolution	35 never-entered a2 chains of the tenants (7 with attack records) — moves the naming corpus never produces, so their ours-vs-native parity is unmeasured
 173	CLOSED	COMPLETED	2026-09-25	bug	Pyron's heavy-hit reaction runs the generic chain b:0x03 on our build where native vs2 runs his b:0x19 (5HP, j.HP, throw release) — class, freeze and length equal
 172	CLOSED	COMPLETED	2026-09-24	enhancement	Enforce the discipline at the AGENT level: orchestrator / checker / workers, with the checker unable to be overridden
@@ -48,7 +48,7 @@ number	state	reason	closed	labels	title
 137	CLOSED	COMPLETED	2026-09-14	bug	test_wide_profile's reference guard trusts a profile check that nothing in the run proves can see the profile (the #63 residual)
 136	CLOSED	COMPLETED	2026-09-25	evolution	Tenant move parity vs native VS2: compare Donovan, Phobos and Pyron's moves on the WIDE merged build against vsav2
 135	CLOSED	COMPLETED	2026-09-15	evolution	The VS-vs-VS2 tick cadence: re-establish its measurement, mechanism and scope, and document it properly
-134	OPEN	-	-	bug	The hit rigs' LP events whiff at contact range
+134	OPEN	-	-	bug	The vanilla hit rigs leave 6 legs VOID at contact range (5 LP, 1 LK): those frame-data cells are unmeasured
 133	OPEN	-	-	evolution	Re-measure the emulator runner's pull-queue gain on a wider host
 132	CLOSED	NOT_PLANNED	2026-09-25	bug	release/merged-m15 was never packaged
 131	OPEN	-	-	evolution	audit_mask_window_ff42a2: deprecate it, or keep it as a case-specific gate?

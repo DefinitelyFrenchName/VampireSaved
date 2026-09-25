@@ -23,15 +23,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3228 |
+| distinct program-space addresses named | 3233 |
 | named by a document or manifest only | 2126 |
-| named by both a document/manifest and code | 732 |
+| named by both a document/manifest and code | 737 |
 | named by CODE ONLY (the gap list below) | 370 |
 | carried by atlas | 571 |
-| carried by engine_internals | 657 |
-| carried by other docs | 1000 |
+| carried by engine_internals | 663 |
+| carried by other docs | 1002 |
 | carried by manifests | 1818 |
-| carried by code | 1102 |
+| carried by code | 1107 |
 
 ## Addresses
 
@@ -362,6 +362,11 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x016878` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2] |
 | `PRG:0x01688A` | build/manifest/reconciliation.toml — map |
 | `PRG:0x016930` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) [vs2]; tools/charmap_gen.py |
+| `PRG:0x01698A` | docs/game/engine_internals.md — Hitboxes and attack records (phase 2 of the character-data map, 14z-120 (5), MEASURED) [vs2]; docs/project/gotchas.md — A VULN ID OF 0 IS NO BOX — a resolver that reads it builds a PHANTOM hurtbox the engine never tests (paid: 14z-182, GitHub #175) [vs2]; tools/air_hurtbox_census.py; tools/trap_air_boxes.py |
+| `PRG:0x01699C` | docs/game/engine_internals.md — Hitboxes and attack records (phase 2 of the character-data map, 14z-120 (5), MEASURED); tests/audit_trap_air_hit.sh; tools/air_hurtbox_census.py |
+| `PRG:0x0169DE` | docs/game/engine_internals.md — Hitboxes and attack records (phase 2 of the character-data map, 14z-120 (5), MEASURED); docs/project/gotchas.md — A VULN ID OF 0 IS NO BOX — a resolver that reads it builds a PHANTOM hurtbox the engine never tests (paid: 14z-182, GitHub #175) [vs2]; tools/air_hurtbox_census.py; tools/trap_air_boxes.py |
+| `PRG:0x0169F0` | docs/game/engine_internals.md — Hitboxes and attack records (phase 2 of the character-data map, 14z-120 (5), MEASURED); tests/audit_trap_air_hit.sh; tools/air_hurtbox_census.py |
+| `PRG:0x016A46` | docs/game/engine_internals.md — Hitboxes and attack records (phase 2 of the character-data map, 14z-120 (5), MEASURED); tests/audit_trap_air_hit.sh; tools/air_hurtbox_census.py |
 | `PRG:0x016B38` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x016B3E` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x016B44` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
@@ -435,7 +440,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0178C2` | docs/game/gotchas.md — In the engine hit-spark spawner, a1 is the VICTIM, a6 the attacker [vs2] |
 | `PRG:0x017A48` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x017B22` | docs/project/patch_notes.md — donovan-m2 stage 4 — damage-pipeline R1 rows; BOTH GATES GREEN (2026-07-27, session 10) [vs2]; docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/reconciliation.toml — map [vs2] |
-| `PRG:0x017B74` | build/manifest/reconciliation.toml — map [vs2] |
+| `PRG:0x017B74` | docs/game/engine_internals.md — Hitboxes and attack records (phase 2 of the character-data map, 14z-120 (5), MEASURED); build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x017BE4` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x017D5C` | docs/project/gotchas.md — "THE ONLY WRITER" IS A CLAIM ABOUT THE TAP'S WINDOW — a light hit's overlap frames named the wrong mechanism for the pushback (14z-120 (12), corrected 14z-121 (3)) |
 | `PRG:0x017E90` | build/manifest/reconciliation.toml — map [vs2] |

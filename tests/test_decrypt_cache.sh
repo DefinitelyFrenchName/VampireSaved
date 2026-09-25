@@ -93,13 +93,16 @@ echo "== 4. CONTROL — the size check is what rejects it, not an absent file ==
     || fail "the fixture file vanished — section 3 proved nothing"
 
 echo "== 5. no converted gate still shells out to the decrypt =="
-# Three are exempt BY DESIGN and are asserted as such rather than skipped
+# Four are exempt BY DESIGN and are asserted as such rather than skipped
 # silently: the oracle must re-decrypt (that is its whole purpose), and
 # test_hui_walk and audit_victim_parity decrypt a BUILD, which is not a
 # cacheable reference set (the victim gate proves, at every run, that the data
 # view its chain-shape check reads is the decrypted romset its leg runs —
-# 14z-181, rule-checker run 2026-09-25-158).
-EXEMPT="tests/test_decrypt_oracle.sh tests/test_hui_walk.sh tests/audit_victim_parity.sh"
+# 14z-181, rule-checker run 2026-09-25-158); audit_trap_air_hit decrypts the three
+# zips its legs RUN (vsav2.zip, vsavj.zip, a build's vsavjw.zip) to prove the data
+# files it reads its boxes from — build/out's cache among them — are those romsets:
+# it checks the cache, so it cannot read it (14z-182, rule-checker run 2026-09-25-221).
+EXEMPT="tests/test_decrypt_oracle.sh tests/test_hui_walk.sh tests/audit_victim_parity.sh tests/audit_trap_air_hit.sh"
 # Match an INVOCATION (`python3 ... cps2_decrypt.py`), not a mention. Three
 # scripts legitimately name the path without running it — this gate's own
 # symlink fixture, test_optimize_guard's guarded-tool list, and
@@ -111,7 +114,7 @@ for f in tests/*.sh; do
     case " $EXEMPT " in *" $f "*) continue;; esac
     sed 's/#.*//' "$f" | grep -qE "$INVOKE" && stray="$stray $(basename "$f")"
 done
-[ -z "$stray" ] && echo "  ok: only the three exempt scripts decrypt directly" \
+[ -z "$stray" ] && echo "  ok: only the four exempt scripts decrypt directly" \
     || fail "still decrypting directly:$stray"
 for f in $EXEMPT; do
     sed 's/#.*//' "$f" | grep -qE "$INVOKE" \

@@ -27,6 +27,24 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-25 (14z-182) — #175 closed: the Plasma Trap hits an airborne victim identically on vs2 and Vampire Saved
+
+The maintainer, on the two capture sheets of `tools/trap_air_sheet.sh` (Felicia's j.HP pressed at 3508 — hit IN THE AIR at f3521, y 42, class 0x07 — and at 3511, the control, hit on the landing frame; native vs2 beside Vampire Saved, real picks on both legs): *"Yes, identical and this confirms the behavior is the same in both games so #175 can be clsoed"*. The measurement it rests on (14z-182): the dome's attack records are `(0, 0, 40, 6)`; the projectile's hit test runs the fighter-hit per-box loop on every pass with no grounded rule (a zero vuln id is no box); a jumping Victor's one airborne hurtbox sits 33 px above his feet and is never reached; Felicia's j.HP node 4 reaches 6 px below hers and is hit in the air — every traced field equal on the two legs over 3500-3530. Frozen as `tests/audit_trap_air_hit.sh`; the facts in `docs/game/engine_internals.md` "Hitboxes and attack records".
+
+---
+
+## Ruled 2026-09-25 (14z-182) — the opener's sweep survivor is killed before the push, only on the maintainer's command
+
+The 14z-182 opener's `python3 tools/agent/sweep.py` read NOT CLEAN: one survivor, PID 85150 (`claude.exe daemon run`, Claude Code's own background daemon, with two `bg-pty-host` / `bg-spare` pairs). Asked *"Do you want me to declare it as your Claude Code daemon, or will you handle it?"*, the maintainer: *"we shall kill it before the push BUT ONLY ON MY COMMAND after we have made sure that we won't have any adverse effects should Claude crash"*. So: the close neither kills nor declares that tree on its own; it puts the evidence that killing it has no adverse effect to the maintainer (measured read-only the same sitting: a leftover of 14z-181, this session not under it and holding no socket to it, no active background session in it — STATE 14z-182 row (6)) and kills it only on the maintainer's command.
+
+---
+
+## Ruled 2026-09-25 (14z-182) — #134 kept open, its record corrected; #138, #140 and #154 stay open as still relevant
+
+The maintainer asked for the status of #134, #138, #140 and #154 (*"they may be still relevant or not but we need to establish that"*). Measured the same sitting (two readers on the current code, a measurer on the git history since each filing, a measurer on the out-of-tree meter table): #138, #140 and #154 are each still present exactly as filed, no commit since touching their logic; #134 leaves **6 VOID legs of 49** (Lilith j.LP/j.LK, Sasquatch 5LP/2LP, Zabel 5LP/J.2LP) — five LP and one LK, reported and never counted by `tests/test_meter_gain.sh`, so unmeasured vanilla frame-data cells with no port or gameplay effect. Put to the maintainer for #134: *"keep it open with its record corrected (6 VOID legs: 5 LP and 1 LK; origin pinned; no impact on the port), or close it as `declined`?"* The ruling: *"#134: keep it open with its record corrected -> yes"*. The title, row and a GitHub comment carry the corrected record.
+
+---
+
 ## Ruled 2026-09-25 (14z-182) — #136's full-scope re-derivation: four findings, two new tickets (#177, #178), a check on #157, the coverage row corrected
 
 The maintainer asked (*"last session you went over all of #136 again at my request to check if all the scope had been covered and if not, create the remaining tickets ... however I never had the confirmation that now all the scope had been covered, can you tell me more?"*), and on the proposal to re-derive the whole scope from the issue body and thread: *"yes!"*. The scope was re-derived from #136's body and all 11 comments by a reader (every item quoted), each item mapped to the gate that measures it or the ticket that carries it, and the map read by the pinned rule-checker three times (runs `2026-09-25-216` to `-218`, every plant caught, every real finding true and fixed — among them the fourth finding below). Put to the maintainer: *"My recommendation: open one ticket for movement parity and one for Hop Kick in Dark Force (a rig that makes it connect on both sides), add the throw-damage question to #157 as a check its fix must measure, fix the coverage row now, and leave #136 closed."* The ruling: *"AGREEED!"*

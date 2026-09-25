@@ -1,0 +1,9 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_trap_air_hit.sh	933c0ba931dbdcdf19a766c324848db89d279df7
+tests/expected/trap_air_hit.tsv	a9bb62ee9b7f0dc56abf209bebe1529bc556c7d1
+build/agent182/trap_air_hit_verify.log	02507cf847ac7751b638ea5c82adc1e9ced5846c
+build/agent182/trap_air_hit_modes.log	91ece349f67ed62193da9c8d7861a7e0245a2fa9
+tools/trap_air_probe.sh	7b2a812b3ba9f3ab510b1ce5b7bf99a55ec9fdaa
+tools/trap_air_boxes.py	6da3d2e76d77185bf2e5146a53353d5b90a13513
+build/agent182/rc_sheet_3508.png	42297bf8d66488565ae8554a8fcffa8e524204af
+build/agent182/maintainer_read_175.txt	2655f0e3e261ecba8bddce0037c6a41ddc016efc

@@ -248,6 +248,7 @@ audit_fg_parity	mame	release	romset	-	the same, against the frozen native stairc
 audit_trap_parity	mame	release	romset	-	the Plasma Trap SOUND parity A/B
 audit_trap_shock	mame	release	romset	-	the Plasma Trap dome inflicts SHOCK
 audit_trap_airborne	mame	release	romset	-	release: THE PLASMA TRAP DOME AND A JUMPING VICTOR (14z-181, #163): the dome never connects in the air — the jump clears it and the hit lands on the LANDING frame on both legs, then the ground shock path frame for frame (the class the ruled marker) — no dome hit reaches the air stager with this rig
+audit_trap_air_hit	mame	release	romset	-	release: THE PLASMA TRAP DOME HITS AN AIRBORNE VICTIM (14z-182, #175): Felicia's j.HP node 4 (a hurtbox below her feet) meets the dome's flat box on her last descent frame (y 42) and is hit IN THE AIR — class 0x07, the air stager — frame-identical native vs2 and ours; a press 3 frames later lands first (the ground path, 0x52 / the ruled 0x38). Real picks both legs. ~2 min, four MAME legs in parallel.
 audit_trap_sound	mame	release	romset	-	the MK Plasma Trap fires, ring live
 audit_hui_grunt	mame	release	romset	-	the electrocute-grunt A/B over five electrocutions
 audit_pyron_ring	mame	release	romset	-	Pyron's merged-vs-solo sound-ring inventory
