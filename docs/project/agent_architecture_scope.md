@@ -1,5 +1,7 @@
 # THE AGENT ARCHITECTURE — scope, before the work (GitHub #172)
 
+> **THE ORCHESTRATOR'S MODEL, SUPERSEDED 2026-09-25 (maintainer, after the 14z-181 close): Opus 5.5 at effort `high`, NOT Fable 5.1** — *"access to Fable not guaranteed"* (DECISIONS_HISTORY.md 'Ruled 2026-09-25 (after the 14z-181 close) — the orchestrator'). Every "Fable 5.1" below names the orchestrator of the design as built and gated (14z-175 to 14z-179); the rest of S5 stands.
+
 > **STATUS (14z-179, 2026-09-24): EVERY SLICE LANDED AND S5's GATE READ GREEN; #172 CLOSED. S5's gate sitting was 14z-179 — a plain session on Fable 5.1 at effort `high`, measured from its own transcript — and its close read GREEN on every item of the ruling's list: hook refusals 0 of every kind, six workers all `claude-opus-5-5` at `high` with 0 fallbacks (`--cap` exit 0), the orchestrator's 171 assistant records all `claude-fable-5-1` at `high`, tier PASS 157 with 203/203 controls, sweep CLEAN, procedure run `2026-09-24-140` resolved (STATE 14z-179; ruled *"Close it on green"*).** The earlier banner, kept: SLICES S1-S4 LANDED; S5 RULED (a plain session on Fable 5.1, no definition) — ITS GATE IS THE NEXT SITTING, WHICH THE MAINTAINER STARTS. The maintainer ruled
 > all four questions of §6 the same day (`DECISIONS_HISTORY.md` "Ruled 2026-09-23
 > (14z-175) — #172"), adding one constraint that binds every slice: **a block stops

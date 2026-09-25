@@ -7,7 +7,7 @@
 
 ## THE SETUP, RESTATED
 
-A plain Fable 5.1 session on the #172 setup: every quoted figure from a `measurer` spec
+A plain **Opus 5.5 session at effort High** (ruled 2026-09-25: the orchestrator is Opus 5.5 High, not Fable 5.1 — STATE 'Standing rulings'; a sitting on another model says so at the opener) on the #172 setup: every quoted figure from a `measurer` spec
 (`docs/project/worker_spec.md`, spawned with NO model; the spec text goes IN the prompt —
 the call gate refuses a pointer to a file), every freeze and recommendation through the
 pinned `rule-checker` with the prompt files pasted VERBATIM (a wrapper that tells the reader

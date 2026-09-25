@@ -27,6 +27,12 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-25 (after the 14z-181 close) — the orchestrator is Opus 5.5 at effort High
+
+The maintainer, unprompted, after the 14z-181 push: *"One change I'll need to enforce for the foreseeable future: The orchestrator must be a Opus 5.5 High instead of Fable 5.1 (access to Fable not guaranteed so I need to account for it)"* So, from the next sitting on and until the maintainer says otherwise: the orchestrator — the plain session the maintainer starts — runs on **Opus 5.5 (`claude-opus-5-5`) at effort `high`**, not Fable 5.1. This SUPERSEDES the model named in the 2026-09-24 (14z-178) ruling of #172's S5 (*"You start the sitting on Fable 5.1"*); the rest of that ruling stands (no orchestrator definition, a plain session, the C0 hooks, the C1 procedure check, the worker cap). The model is set at launch by the maintainer (`claude --model claude-opus-5-5`, or the settings `model` key, which only the maintainer edits), the effort by the per-model settings. Consequence for the worker cap: a worker with no `model` runs on the caller's model (probe A9), which is now Opus 5.5 — inside the cap. A sitting that finds itself on another model says so at the opener.
+
+---
+
 ## Ruled 2026-09-25 (14z-181) — the worker cap: a /btw fork is exempt
 
 Asked at the 14z-181 close, after `python3 tools/agent/transcript_gaps.py --subagents 1c426425 --cap` read 1 breach over 155 workers — the /btw fork the maintainer started ran on the session's model, claude-fable-5-1 (a fork inherits the parent's model), and the tool has no declaration path — with every other close check green: *"Push main?"* The maintainer chose the option *"Push; fork is exempt (Recommended)"*, whose text read: *"Rule that a /btw fork runs on the session's model and is not a worker the agent spawned, so it is exempt from the cap. I record the ruling in DECISIONS_HISTORY and STATE, then push main."* So: a /btw fork is not a worker the agent spawned and does not count against the worker cap; a cap read whose only breach is such a fork is green for the push, and the close names the fork.
