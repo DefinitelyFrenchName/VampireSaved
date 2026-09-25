@@ -13,7 +13,7 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**387 of 387 gates described.**
+**388 of 388 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
@@ -23,7 +23,7 @@ first sentence) is `gate_index.md`.
 | [pipeline](#pipeline) | 58 | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
-| [tenant](#tenant) | 82 | 82 | tenant content — per-character gates and on-demand audits on the ported characters |
+| [tenant](#tenant) | 83 | 83 | tenant content — per-character gates and on-demand audits on the ported characters |
 | [character-data](#character-data) | 57 | 57 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
@@ -1630,7 +1630,7 @@ tiles, OBJ records, sprite lists, render-layer verdicts. 25 of 25 described.
 
 ## tenant
 
-tenant content — per-character gates and on-demand audits on the ported characters. 82 of 82 described.
+tenant content — per-character gates and on-demand audits on the ported characters. 83 of 83 described.
 
 ### `audit_continue_ladder.sh` — audit, emulator
 
@@ -1895,6 +1895,14 @@ tenant content — per-character gates and on-demand audits on the ported charac
 **HOW:** the judge/02_throw rig on MAME plus the victim's own throw input held from about 2 frames after the grab connects; damage read from dumps; a `notech` control (no victim input) must deal the full 13.
 
 **EXPECTS:** each leg's teched damage equals its frozen value; notech deals 13. A red is a ported reaction row that stopped honouring the escape, or a tech landing where native has none.
+
+### `audit_trap_airborne.sh` — audit, emulator
+
+**WHAT:** what the Plasma Trap dome does to a victim who JUMPS while it is active: on the deep-overlap trap rig with Victor pressing up at 3490 the jump takes (y 40 -> apex 127 -> 40, 3493-3528), the dome does not touch him in the air, and it hits him on the LANDING frame (f3529, y 43 -> 40) on both legs; the shock then plays as on the ground — freeze from 0x18, sub-state 4, Phobos never frozen — the class byte 0x52 on native and the marker 0x38 on the merged build (the class-0x52 rule, ruled 2026-09-18); frozen per leg as steps. THE GROUND IS y = 40 (engine_internals.md), so "airborne" is y > 40 — reading y > 0 as airborne is the error rule-checker run 2026-09-25-164 caught in this gate's first form.
+
+**HOW:** two MAME runs (native vsav2, the merged build) of tests/replays/hui/92_hui_trap_shock.rpl with one added line (P2 up at 3490), the trap gate's forced-pick pokes, level and RNG pins; the victim's class, freeze, sub-state, HP and height and Phobos's freeze traced every frame 3395-3620; the STEPS of each field frozen per leg with the jump's airborne span, apex and landing frame; both legs must be identical in every field but the class marker; the jump must have TAKEN (apex > 40), the hit must land ON the landing frame (y > 40 the frame before, 40 at the hit) and never inside the airborne span.
+
+**EXPECTS:** the frozen rows; the two legs equal but for 0x52 / 0x38; the hit on the landing frame on both; the two controls failing. SWEEP=1 adds the five other jump timings whose jump takes and lands while the dome is active (3466, 3470, 3474, 3480, 3486): each asserted the same way, printed, never frozen. Not covered: an airborne hit by the dome (none exists in this rig — every press timing 3440-3499 was traced on native: 3440-3460 land before the dome is active, 3461-3498 are hit on the landing frame, 3499+ never jump; a lower arc or a juggled victim is not tried — GitHub #175), the solo Phobos track.
 
 ### `audit_trap_parity.sh` — audit, emulator
 
@@ -2302,9 +2310,9 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 ### `audit_column_shock.sh` — audit, emulator
 
-**WHAT:** Donovan's Killshread Lightning column plays vs2's class-0x52 rule on our build (since the 14z-170 fix): the victim shocked 24 frames and Donovan exempt, every +0x5C write of both fighters equal to native's in frame and value, the move's timeline equal, and a column KO taking the same class-8 path with no exception.
+**WHAT:** Donovan's Killshread Lightning column plays vs2's class-0x52 rule on our build (since the 14z-170 fix): the victim shocked 24 frames and Donovan exempt, every +0x5C write of both fighters equal to native's in frame and value, the move's timeline equal, and a column KO taking the same class-8 path with no exception; since 14z-181 also the AIR stager: the column on an AIRBORNE victim reads class 7, the same freeze and sub-state, on both legs.
 
-**HOW:** four non-debug write-tap runs and two field traces of the committed #136 rig donovan_4 on MAME, both legs real cursor picks with the parity gate's pins; every write to P1's and P2's +0x5C over 2836-2852 is frozen with its writer PC and value, plus a timeline row per leg; section 1b pokes P2 to 1 HP and traces the KO on both legs; the control plants the pre-fix values (12 and 4) into our rows.
+**HOW:** four non-debug write-tap runs and two field traces of the committed #136 rig donovan_4 on MAME, both legs real cursor picks with the parity gate's pins; every write to P1's and P2's +0x5C over 2836-2852 is frozen with its writer PC and value, plus a timeline row per leg; section 1b pokes P2 to 1 HP and traces the KO on both legs; the control plants the pre-fix values (12 and 4) into our rows; section 1c makes P2 jump at 2826 and traces the airborne hit on both legs, the air-marker control planting the ground marker into our row.
 
 **EXPECTS:** our writes equal native's frame for frame, the timelines equal, the KO path equal and exception-free; the planted pre-fix shape fails. A red is the remap class back.
 

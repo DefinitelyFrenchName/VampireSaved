@@ -4,18 +4,21 @@
 # WHAT: Donovan's Killshread Lightning column plays vs2's class-0x52 rule on our build
 #   (since the 14z-170 fix): the victim shocked 24 frames and Donovan exempt, every +0x5C
 #   write of both fighters equal to native's in frame and value, the move's timeline equal,
-#   and a column KO taking the same class-8 path with no exception.
+#   and a column KO taking the same class-8 path with no exception; since 14z-181 also the AIR
+#   stager: the column on an AIRBORNE victim reads class 7, the same freeze and sub-state, on both legs.
 # HOW: four non-debug write-tap runs and two field traces of the committed #136 rig
 #   donovan_4 on MAME, both legs real cursor picks with the parity gate's pins; every write
 #   to P1's and P2's +0x5C over 2836-2852 is frozen with its writer PC and value, plus a
 #   timeline row per leg; section 1b pokes P2 to 1 HP and traces the KO on both legs; the
-#   control plants the pre-fix values (12 and 4) into our rows.
+#   control plants the pre-fix values (12 and 4) into our rows; section 1c makes P2 jump at 2826 and
+#   traces the airborne hit on both legs, the air-marker control planting the ground marker into our row.
 # EXPECTS: our writes equal native's frame for frame, the timelines equal, the KO path equal
 #   and exception-free; the planted pre-fix shape fails. A red is the remap class back.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/column_shock.tsv
 #   tests/lua/field_trace.lua tests/lua/read_tap.lua tests/replays/ tools/name_moves.py
 #   tools/run_mame.sh tools/setup_mame.sh
 #
+# MUST-FIRE: perturbed-copy: air-marker — our AIR row (section 1c, the column on an airborne victim) with the GROUND case's marker 0x38 in place of the air stager's class 7 must differ from native's row and FAIL, so the air case is shown measured on the victim's class, not assumed from the ground case (in-gate: the perturbed row must differ; mode: our row is rewritten and the gate FAILs) — 14z-181, #163
 # MUST-FIRE: perturbed-copy: old-shock — a copy of our rows with the pre-fix mechanism planted (the victim's hit writes 24 -> 12, a 4 written to Donovan's +0x5C at each hit — the 14z-42 Lightning Sword values the column took until 14z-170) must FAIL the native-equality check, so "equal to native" is a comparison of the two legs' writes (in-gate: the planted copy must be caught; mode: our rows are planted before the checks and the gate FAILs)
 #
 # WHY. #136's donovan_4 event 1 (Killshread Lightning [MP]) and donovan_10 event 9
@@ -65,7 +68,7 @@ CONTROL="${CONTROL:-}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 [ -f "$ROMDIR/vsav2.zip" ] || { echo "SKIP: no vsav2.zip in $ROMDIR"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no WIDE build at $BUILD"; exit 0; }
-case "$CONTROL" in ""|old-shock) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
+case "$CONTROL" in ""|old-shock|air-marker) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
@@ -240,6 +243,57 @@ PY
 grep '^ko' "$W/got.tsv" | sed 's/^/  /'
 awk -F'\t' '$1=="ko" && $2=="ours" && $5!="exc_max=0"' "$W/got.tsv" | grep -q . && bad "ours: an exception was raised on the KO path"
 awk -F'\t' '$1=="ko"' "$W/got.tsv" | grep -q . && [ "$fail" = 0 ] && ok "the column KO takes the same path on both legs (every traced field, every frame), no exception"
+
+echo "== 1c. the AIR stager: the column on an AIRBORNE victim on both legs (P2 jumps at 2826; 14z-181, #163's open item)"
+# vs2's dispatcher-2 case for class 0x52 on an airborne victim writes class 7 (donovan.toml reaction_hook, d2_case_a4);
+# the fix's air case was never measured before 14z-181. P2 (Demitri) presses U at 2826 and is airborne over the
+# column's hits (2836-2852); both legs' victim class, freeze, sub-state, HP and height, and Donovan's freeze, are
+# read every frame from 2790 and their STEPS frozen — the two legs must be identical.
+air_rpl() { awk -v ins="2826-2828 p2=U" '/^1360-1362 p2=1$/ {print; print ins; next} {print}' "$1" > "$2"; }
+air_rpl "$W/native.rpl" "$W/air_native.rpl"; air_rpl "$W/ours.rpl" "$W/air_ours.rpl"
+air_trace() {  # air_trace <name> <set> <rompath> <rpl> <out.ft>   (background)
+    mkdir -p "$W/$1"
+    ( set +e; cd "$W/$1" && MAME_SANDBOX="$W/$1/sb" MAME_ROMPATH="$3" REPLAY="$4" POKES="$(pokes_for "$j" 2990)" \
+        FIELDS="ff8406:b:seq,ff845c:b:frz,ff8806:b:p2seq,ff8807:b:p2sub,ff8854:b:p2cls,ff885c:b:p2frz,ff8850:w:p2hp,ff8814:w:p2y" \
+        FIELD_OUT="$5" FIELD_FROM=2790 FIELD_TO=2990 FRAMES=2990 \
+        "$REPO/tools/run_mame.sh" "$2" -autoboot_script "$REPO/tests/lua/field_trace.lua" > "$W/$1/mame.log" 2>&1
+      _st=$?; grep -q -E '^(FIELDSUMMARY|END )' "$5" 2>/dev/null && _st=0; echo $_st > "$W/$1/rc"; rm -rf "$W/$1/sb" ) </dev/null &
+}
+air_trace an vsav2  "$ROMDIR" "$W/air_native.rpl" "$W/air_native.ft"
+air_trace ao vsavjw "$ORP"    "$W/air_ours.rpl"   "$W/air_ours.ft"
+wait
+for t in an ao; do _rc="$(cat "$W/$t/rc" 2>/dev/null || echo none)"; [ "$_rc" = 0 ] || bad "air trace $t exited $_rc"; done
+python3 - "$W" >> "$W/got.tsv" 2> "$W/err" <<'PY' || bad "air: $(cat "$W/err")"
+import sys
+W = sys.argv[1]
+def load(p):
+    d = {}
+    for l in open(p):
+        t = l.split()
+        if t and t[0] == "F": d[int(t[1])] = {k: int(v) for k, v in (kv.split("=", 1) for kv in t[2:])}
+    return d
+def steps(d, k): return ",".join("%d:%d" % (f, d[f][k]) for f in sorted(d) if f - 1 in d and d[f][k] != d[f - 1][k])
+for leg in ("native", "ours"):
+    d = load(f"{W}/air_{leg}.ft")
+    if 2790 not in d or max(d) < 2989: sys.exit(f"VOID: {leg} air trace incomplete")
+    hits = [f for f in range(2791, 2990) if d[f]["p2hp"] < d[f - 1]["p2hp"]]
+    if not hits: sys.exit(f"VOID: {leg} the column did not hit the airborne victim")
+    if d[hits[0]]["p2y"] <= 40: sys.exit(f"VOID: {leg} the victim was on the ground at the hit (y {d[hits[0]]['p2y']}; the ground is y = 40)")
+    print(f"air\t{leg}\thits={','.join(map(str, hits))}\ty_at_hit={d[hits[0]]['p2y']}\tcls={steps(d, 'p2cls')}\tp2frz={steps(d, 'p2frz')}\tp2sub={steps(d, 'p2sub')}\tp2hp={steps(d, 'p2hp')}\tp1frz={steps(d, 'frz')}")
+PY
+grep '^air' "$W/got.tsv" | cut -c1-160 | sed 's/^/  /'
+_an="$(awk -F'\t' '$1=="air" && $2=="native" {sub(/^air\tnative\t/, ""); print}' "$W/got.tsv")"
+_ao="$(awk -F'\t' '$1=="air" && $2=="ours" {sub(/^air\tours\t/, ""); print}' "$W/got.tsv")"
+[ -n "$_an" ] && [ "$_an" = "$_ao" ] && ok "the airborne victim's class, freeze, sub-state and Donovan's freeze equal native's frame for frame (the air stager's class 7 on both)" || bad "air: ours differs from native"
+# the air-marker control: our air row with the class the GROUND case writes (0x38) in place of the air stager's 7 must fail the compare
+_ap="$(printf '%s' "$_ao" | sed 's/cls=\([0-9]*\):7/cls=\1:56/')"
+if [ "$CONTROL" != air-marker ]; then
+    if [ "$_ap" = "$_an" ]; then echo "CONTROL DEAD: air-marker — our air row with the ground marker in place of class 7 still equals native's"; fail=1
+    else echo "CONTROL FIRED: air-marker — our air row with the ground marker (0x38) in place of the air stager's class 7 differs from native's"; fi
+else
+    awk -F'\t' -v r="air\tours\t$_ap" 'BEGIN{OFS="\t"} $1=="air" && $2=="ours" {print r; next} {print}' "$W/got.tsv" > "$W/got.am" && mv "$W/got.am" "$W/got.tsv"
+    echo "MODE: air-marker — our air row carries the ground marker in place of class 7"; [ "$_ap" = "$_an" ] || fail=1
+fi
 
 echo "== 2. the frozen rows"
 if [ "${FREEZE:-0}" = 1 ]; then

@@ -247,6 +247,7 @@ audit_fg_damage	mame	release	romset	-	Phobos' EX Final Guardian damage, frozen
 audit_fg_parity	mame	release	romset	-	the same, against the frozen native staircase
 audit_trap_parity	mame	release	romset	-	the Plasma Trap SOUND parity A/B
 audit_trap_shock	mame	release	romset	-	the Plasma Trap dome inflicts SHOCK
+audit_trap_airborne	mame	release	romset	-	release: THE PLASMA TRAP DOME AND A JUMPING VICTOR (14z-181, #163): the dome never connects in the air — the jump clears it and the hit lands on the LANDING frame on both legs, then the ground shock path frame for frame (the class the ruled marker) — no dome hit reaches the air stager with this rig
 audit_trap_sound	mame	release	romset	-	the MK Plasma Trap fires, ring live
 audit_hui_grunt	mame	release	romset	-	the electrocute-grunt A/B over five electrocutions
 audit_pyron_ring	mame	release	romset	-	Pyron's merged-vs-solo sound-ring inventory
@@ -281,7 +282,7 @@ audit_tick_phase	mame	release	romset	-	release: THE ENGINE'S DOUBLE-PASS CADENCE
 audit_df_modes	mame	release	romset	-	release: DARK FORCE POWER vs DARK FORCE CHANGE on every selectable character, frozen (14z-168, #136): vsav2's P+K is Power (2 stocks, +0x147 never armed, seq 0x16 never held) on all 15; vsavj's and ours' is each character's Change; the tenants' vs2 EX input reaches their Change handler on both games (the EX route on ours frozen AS MEASURED; ruled disabled 2026-09-18)
 audit_df_meter	mame	release	romset	-	release: NO GAUGE IN DARK FORCE CHANGE, and the tenants build it, frozen AS MEASURED (14z-168, #157's DF tail): the shells gain nothing from a whiffed attack inside +0x111; our tenants gain +6 (their placed vs2 adder tests +0x1C3)
 audit_guard_reentry	mame	release	romset	-	release: vsavj RE-ENTERS the block animation while back is held after the freeze, vsav2 does not — an engine difference on a Demitri mirror, frozen (14z-168, #136's Reflect Wall rows); vsavj == ours on every sampled frame (superset)
-audit_column_shock	mame	release	romset	-	release: Donovan's Killshread Lightning column shocks 12 frames on ours, 24 natively, and freezes Donovan 4 where vs2 exempts him — the 14z-33 class remap meeting the 14z-42 thunks, frozen AS MEASURED (14z-168, #136)
+audit_column_shock	mame	release	romset	-	release: Donovan's Killshread Lightning column shocks 12 frames on ours, 24 natively, and freezes Donovan 4 where vs2 exempts him — the 14z-33 class remap meeting the 14z-42 thunks, frozen AS MEASURED (14z-168, #136) — since 14z-181 also the AIR stager: the column on a jumping Demitri reads class 7 with the same freeze on both legs (section 1c)
 audit_move_parity_attribution	mame	release	romset	-	release: EVERY DIFF ROW OF THE #136 MOVE-PARITY TABLE HAS A MEASURED CAUSE (14z-168): ablation + signature classes, no OTHER root and no UNATTRIBUTED row; a fix changes the frozen table by design
 audit_entrance_draw	mame	release	romset	-	release: Phobos's round-start entrance is drawn from the same three variants on ours as on vsav2 over six RNG seeds (14z-168, #136's rig opening)
 audit_pass_overrun	mame	release	romset	-	release: THE BLIZZARD SWORD CPU OVERRUNS, frozen AS MEASURED (14z-168, #136 class SLOWDOWN): zero-pass frames on native (donovan_2, donovan_11) and ours (donovan_10); the scheduler's idle equal per window within ~1%

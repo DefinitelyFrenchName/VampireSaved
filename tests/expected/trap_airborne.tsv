@@ -1,0 +1,6 @@
+# tests/expected/trap_airborne.tsv — the Plasma Trap dome on a JUMPING Victor, native vsav2 vs the merged build
+# (m3b_merged27): the steps of the victim's class, freeze, sub-state and HP and Phobos's freeze from f3395, P2 up at 3490; the jump's apex, airborne span and landing frame (the ground is y = 40)
+# (tests/audit_trap_airborne.sh). Evidence class: in-emulator. Frozen 14z-181 with FREEZE=1 (GitHub #163's airborne item).
+#--
+air	native	hits=3529	y_at_hit=40	y_before=43	apex=127	airborne=3493..3528	landing=3529	cls=3529:82,3561:0	p2frz=3529:12,3530:24,3531:22,3532:21,3533:20,3534:19,3535:17,3536:16,3537:15,3538:14,3539:12,3540:11,3541:10,3542:9,3543:8,3544:6,3545:5,3546:4,3547:3,3548:1,3549:0	p2sub=3490:0,3492:2,3529:0,3530:4,3550:0,3551:2,3560:4,3561:0,3562:2	p2hp=3529:285	p1frz=
+air	merged	hits=3529	y_at_hit=40	y_before=43	apex=127	airborne=3493..3528	landing=3529	cls=3529:56,3561:0	p2frz=3529:12,3530:24,3531:22,3532:21,3533:20,3534:19,3535:17,3536:16,3537:15,3538:14,3539:12,3540:11,3541:10,3542:9,3543:8,3544:6,3545:5,3546:4,3547:3,3548:1,3549:0	p2sub=3490:0,3492:2,3529:0,3530:4,3550:0,3551:2,3560:4,3561:0,3562:2	p2hp=3529:285	p1frz=

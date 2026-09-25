@@ -1,0 +1,39 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent181/column_shock_gate_14z181.diff	f1187bf001059c7efacbe8b77e9a64151a60767c
+build/agent181/column_shock_table_14z181.diff	e94a9f1b06396f6c6866729606cbfae23dfc9897
+build/agent181/column_air_verify3.log	2fac6e4ffab5f0465f7a8c2c93b227f3a386464e
+build/agent181/column_mode_old-shock.log	49ef22eea5e773f729f534dfbb707bd39a648e59
+build/agent181/column_mode_air-marker2.log	12031decbeea63be4649d88a8ab0dd11fee0ac5d
+tests/replays/naming/donovan_4.json	f108f344f632c3fb3aa732a5d32d768ee3c450f4
+tests/audit_trap_airborne.sh	473839794d8814949ee4b15627649c92b132f9b2
+tests/expected/trap_airborne.tsv	7145d4f1f6d2d51051345e2fb95c357c5fdab780
+build/agent181/trap_air_freeze3.log	8fa1e31a86a48c9b8211877ddd33e6e15290c7a4
+build/agent181/trap_air_verify4.log	ff47451c82808da05cc42ec93df848e4fc771a44
+build/agent181/trap_air_mode4_air-class.log	c9b563138064191c5522b3a383ee6368dcf2426e
+build/agent181/trap_air_mode4_grounded-hit.log	655f9687500675d0187f0553be6b1aac0d060032
+build/agent181/trap_air_mode4_air-hit.log	d50467c93d5841640da25689fd7f0df35686364f
+build/agent181/trap_air_sweep2.log	23dc15cb2d1e6e3f0104fc86b39ff47b4c3de5b8
+build/agent181/trap_airborne_sweep_14z181.txt	b5e87407aaae979f2d1b12f8f38d3bd00d6c7555
+build/agent181/trap_carriers_14z181.diff	965d3254b7c66fe616a399b29c1e5060af3c2c65
+build/agent181/gotcha_ground40_14z181.diff	89621249e40d8c505a865ef8a22d14c1f7dfcfd2
+build/agent181/cap_column_airborne.png	41e93a074039b5519400f7077be8f0f58d3122f2
+build/agent181/cap_trap_airborne.png	4590d1ace023cfd1c7b6bb1c1962d1db8346adf2
+build/agent181/captures_sent_14z181.txt	8cbb137e15fd75d8bb5616fae68930cc1d597c39
+build/agent181/issue163_close.md	d2bb2049cb26bc8a64784b2851ff0e6a3563c026
+build/agent181/issue163_posted.txt	dd69fc8991f6d69ac3b5ff492c86ae97986a49ef
+build/agent181/issue163_comment3.md	40725228dbc69aae375b16b20ee800ed275a1bae
+build/agent181/issue163_posted3.txt	729a01b3178d4383e9813cff500348f8cee68516
+build/agent181/issue175.md	1bc201023f4c9f27f7bb27dfde67a720119af51f
+build/agent181/issue175_posted.txt	8618178b9ae31704025d22034adc204aaa423b26
+build/manifest/donovan.toml.lines-240-256 (lines 240-256 of build/manifest/donovan.toml)	6303eb73fa6f69010ad798058a0b5b794ce17b79
+tests/audit_trap_shock.sh.lines-1-40 (lines 1-40 of tests/audit_trap_shock.sh)	36ce477ccd976abf76cb1e9080bdf976a6f578da
+docs/project/tickets.tsv.lines-86-86 (lines 86-86 of docs/project/tickets.tsv)	e3678adc3ae06db6c33a1d34b069c5a30311e103
+docs/project/tickets.tsv.lines-74-74 (lines 74-74 of docs/project/tickets.tsv)	089a463b354405c8311efc111ef173cad43e6a44
+DECISIONS_HISTORY.md.lines-747-751 (lines 747-751 of DECISIONS_HISTORY.md)	2bcc720b0930a87165c7c39457189e370ef39d09
+docs/game/engine_internals.md.lines-868-874 (lines 868-874 of docs/game/engine_internals.md)	4b652d6e32d6bd2ef5121e9262ac06d226713d04
+tests/rulecheck/runs/2026-09-25-166/verdict_real.txt	41c9d6bf39a8c0e1683a488c1c932ec21037f881
+build/agent181/resolve166.txt	6f9099793fc9186524186e05cf6673d222e49a7d
+build/agent181/resolve165.txt	1df44c54555881d7bec39d2b5078d9c13bdb8a9c
+build/agent181/resolve164.txt	6f461ece2164766664e9759443e4834f71f95ea1
+build/agent181/resolve153.txt	85ec442bbe3e6b4a71afb688b7c39c97489e509d
+build/agent181/resolve162.txt	48801688328a63a8b6517c8a02540c806e7d7661

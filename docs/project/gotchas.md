@@ -39,6 +39,53 @@ name in prose. And when the claim is about what a move DOES, produce the capture
 before the sentence ([VSP-173]) — here the picture is what settled it, and the
 slot table is what over-reached when it was used as a shortcut.
 
+## AN AIR-THROW RIG IS DECIDED BY THE VICTIM'S JUMP LEAD, NOT BY THE PAIR'S SPACING — and with both jumps on one frame the double-pass phase picks which strength connects (paid: 14z-120 to 14z-181, GitHub #169)
+
+**What happened.** `pyron_3`'s two Galactic Throw events (`air_throw("MP")` /
+`air_throw("HP")`: both fighters jump on the event frame, P1 presses toward +
+button at +14) had frozen ONE connecting strength since 14z-120, and which
+one it was moved with the schedule shift (#168's sweep: MP at shifts ≡ 0 mod
+3, HP at the others, neither at 273). Three theories were measured and were
+NOT it: the wall (every "near" event ends at the right wall, and the MP throw
+connected at the wall), the screen-edge clamp of the pin after a throw (real,
+but the throw connected at every x from 700 to 950 with the pair pinned
+still), and the walk length (a 60-frame walk made both whiff). The determinant
+is the VICTIM'S HEIGHT RELATIVE TO THE THROWER at the grab frame: the throw
+needs P2 above P1 (P2 y 134 to P1's 111 connects; 113 or 111 whiffs into a
+plain j.P). With both up-presses on the same frame, the double-pass phase
+decides whose press registers a tick earlier, so the pair is bistable.
+
+**The rule.** The rig gives P2 a two-frame jump lead (`(-2, 0, "U", "p2")`):
+swept at -3/-2/-1 both strengths throw, at 0 one does, at +1..+3 neither; -2 is
+the middle of the working band. More generally: when an event's outcome does
+not follow the double-pass phase the way the rest of the corpus does, look
+for a RACE between two inputs on the same frame before looking at geometry;
+and a search runs from the cheapest dimension (inputs) outward, one variable
+at a time, with the pair pinned still so the walk is not a second variable.
+
+## THE GROUND IS y = 40 — "AIRBORNE" IS y > 40, AND A HIT ON THE LANDING FRAME READS 40 (paid: 14z-181, caught by rule-checker run 2026-09-25-164, GitHub #163)
+
+**What happened.** The first form of `tests/audit_trap_airborne.sh` asserted the
+victim "airborne at the hit" as `p2y > 0` and read the Plasma Trap's hit on a
+jumping Victor as "the dome connects with the falling victim at height 40"; a
+six-timing sweep "confirmed" 40 at every timing. `engine_internals.md` already
+says the fighters' y is **40 on the ground** (the hitbox section: "y up, ground
+y = 40"; the DF section: "native stays grounded at y=40"). The victim had
+LANDED: y runs 40 -> 127 -> 43 -> 40 and the hit is on the frame y returns to
+40, the landing frame; three of the six "airborne" sweep timings pressed the
+jump AFTER the hit and never left the ground at all. The rule-checker found it
+from the sweep artifact (a jump pressed at 3512 "hit at 3500 at height 40").
+
+**The rule.** An airborne assertion reads `y > 40`, never `y > 0`, and a claim
+about WHERE in a jump a hit lands names the apex, the airborne span and the
+landing frame beside the hit frame (the gate's `apex= airborne= landing=`
+columns). A control for "the victim never left the ground" is the
+`grounded-hit` perturbation: erase the jump from a copy of the rows and the
+landing-frame check must fail. More generally: a field's ZERO is not its REST
+value — look the rest value up in the atlas or the engine notes before
+writing a threshold against it, and a sweep whose every row reads the same
+number is a reason to check what the number means, not a confirmation.
+
 ## MOVING A RIG'S SCHEDULE MOVES EVERY EVENT'S DOUBLE-PASS PHASE — a shift is a MEASURED QUANTITY, not a spacing choice (paid: 14z-171 to 14z-172, GitHub #168)
 
 The naming rigs' first position pin had to move 175 frames later to clear the

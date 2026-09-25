@@ -12,6 +12,8 @@
 # leg: main (the measuring leg's poke), control (a poke on a line naming a plant, a control or a mode — a
 # known-bad plant that reads its poke back by design; rule-checker run 2026-09-24-144) or mixed.
 # gate<TAB>addr<TAB>sample<TAB>class<TAB>note<TAB>leg
+audit_trap_airborne	ff8782	FIELDS:id	OBSERVES	classed at creation 2026-09-25 (14z-181) under the ruling of the same day for id pokes sampled as an identity guard: the trap rig's forced-pick pair (1400-1500) is read back at 3400 as Phobos/Victor and the leg VOIDs otherwise — the guard is what the poke is for	main
+audit_trap_airborne	ff8b82	FIELDS:p2id	OBSERVES	classed at creation 2026-09-25 (14z-181): as id	main
 audit_column_shock	ff8850	FIELDS:hp	OBSERVES	ruled 2026-09-25 (14z-181): audit_column_shock.sh:228/236-242 the KO trace compares EVERY traced field every frame native vs ours; hp goes 1 -> 0 at the KO (the engine's), the pinned frames are equal on both legs by construction (no evidence, no harm)	main
 audit_column_shock	ff8850	FIELDS:p2hp	OBSERVES	ruled 2026-09-25 (14z-181): audit_column_shock.sh:181 hits = frames where p2hp DROPS (2791-2990), pin at 2826/2830 is the stage	main
 audit_column_shock	ff8852	FIELDS:white	OBSERVES	ruled 2026-09-25 (14z-181): as hp (:228/236-242)	main

@@ -86,6 +86,7 @@ declares	audit_throw_registration
 declares	audit_throw_tech
 declares	audit_tick_cadence
 declares	audit_tick_phase
+declares	audit_trap_airborne
 declares	audit_trap_parity
 declares	audit_trap_shock
 declares	audit_trap_sound

@@ -45,6 +45,7 @@ declares	audit_tech_roll
 declares	audit_throw_registration
 declares	audit_tick_cadence
 declares	audit_tick_phase
+declares	audit_trap_airborne
 declares	audit_trap_shock
 declares	audit_victim_parity
 declares	audit_voice_borrow

@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**387 scripts** — 98 ci_portable, 84 ci_static, 205 emulator-tier (run by name).
+**388 scripts** — 98 ci_portable, 84 ci_static, 206 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -26,7 +26,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [pipeline](#pipeline) | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
-| [tenant](#tenant) | 82 | tenant content — per-character gates and on-demand audits on the ported characters |
+| [tenant](#tenant) | 83 | tenant content — per-character gates and on-demand audits on the ported characters |
 | [character-data](#character-data) | 57 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
@@ -309,6 +309,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 | `tests/audit_tenant_throws.sh` | audit | emulator | MAME, a build dir, ~1 min | NORMAL THROWS, both directions per tenant (14z-104, coverage matrix). | 14z-104 |
 | `tests/audit_tenant_timeout.sh` | audit | emulator | MAME, a build dir, ~2 min | THE TIMEOUT JUDGE, per tenant (14z-104). | 14z-104 |
 | `tests/audit_throw_tech.sh` | audit | emulator | MAME, a build dir, ~1 min | THE THROW TECH-HIT (escape), both directions per tenant (14z-104 (3); coverage matrix gap 1's second half). | 14z-104 (3) |
+| `tests/audit_trap_airborne.sh` | audit | emulator | MAME, a build dir, ~1 min | THE PLASMA TRAP DOME AND A JUMPING VICTOR, native vs merged (14z-181, GitHub #163's last open item): the dome NEVER connects with the victim in the air — he jumps over the active dome to apex 127 and is hit on the frame he lands (y back to… | 14z-181 |
 | `tests/audit_trap_parity.sh` | audit | emulator | MAME, a build dir, ~5 min | the Plasma Trap SOUND parity A/B (14z-85g): the same far/timer replay on native vsav2 and on the build, trap-event ring-id inventories compared against the frozen measurement. On-demand, ~5 min (2 MAME runs, parallel). | 14z-85g |
 | `tests/audit_trap_shock.sh` | audit | emulator | MAME, a build dir, ~4 min | the Plasma Trap dome inflicts SHOCK on BOTH of Phobos's tracks, and since the 14z-170 class-0x52 fix (ruled 2026-09-18, scoped S1) the two differ by design: | 14z-170 |
 | `tests/audit_trap_sound.sh` | audit | emulator | MAME, a build dir, ~10 min | the MK Plasma Trap fires, ring live (14z-82d lock, RE-SCOPED 14z-85g). | 14z-82d |
