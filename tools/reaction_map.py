@@ -59,7 +59,13 @@ def label_for(cands, prev):
     return min(entries or cands, key=lambda c: (c[0], c[1]))
 
 
-def contacts(sched_path, trace_path, chains_dir):
+def contacts(sched_path, trace_path, chains_dir, with_frame=False, max_labels=8):
+    """one line per contact (see the module docstring); with_frame=True appends
+    a seventh column `@<contact frame>`, and max_labels the number of chain labels
+    the path keeps (tools/victim_parity.py, 14z-181, passes 64: a parity compare cut
+    at 8 labels hid a release-chain difference behind a throw's eight `c:` labels —
+    rule-checker run 2026-09-25-156 Q4) — the default output is unchanged, so
+    tests/expected/reactions_<tenant>.txt stands."""
     sched = json.load(open(sched_path)); node2 = load_chains(chains_dir)
     rows = {}
     for line in open(trace_path):
@@ -89,7 +95,8 @@ def contacts(sched_path, trace_path, chains_dir):
                 if not (key and key[0] == "a"): reacted = True          # a reaction chain (b/c/OFF) has run
                 elif reacted: back = k - fr; break                        # the first table-a chain after it = the return
                 k += 1
-            out.append(f"{sched['part']}\t{evname(fr)}\tcls={v['p2cls']:#04x}\tfrz={v['p2frz']}\t{' '.join(path[:8])}\tlen={back}")
+            line = f"{sched['part']}\t{evname(fr)}\tcls={v['p2cls']:#04x}\tfrz={v['p2frz']}\t{' '.join(path[:max_labels])}\tlen={back}"
+            out.append(line + (f"\t@{fr}" if with_frame else ""))
         prev = fr
     return out
 

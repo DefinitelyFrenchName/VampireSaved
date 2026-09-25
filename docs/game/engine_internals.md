@@ -994,6 +994,26 @@ the victim".
   `b` AND `c`), so `reaction_map.py` labels deterministically: the previous
   node's chain, else the entering chain with the smallest seq. (The 14z-120
   "each tenant's own table" reading was that labelling artefact — history.)
+- **The OURS leg of the reaction map (14z-181, `tests/audit_victim_parity.sh`)** [M: 58
+  contacts, 41 SAME, on merged-m19 against native vs2, both legs real cursor
+  picks at speed level 8, the RNG pinned]: every tenant's reaction (class byte,
+  freeze, chain path, frames to the stand) is identical to native but for two
+  families. (1) Victor's throw: his throw start `a2:0x38` is 25 data frames on
+  vs2 and 24 on vsavj (his data, not ours), so five of the six throw hits land
+  one frame earlier on our leg (the third on the same frame) and the victim's
+  release chains read one frame longer —
+  the gate charges those TIMING differences to the attacker (`attributed=attacker`;
+  a chain-path or class difference is the tenant's whatever ran beside it). (2)
+  **Pyron's heavy-hit reaction: ours enters the convention's `b:0x03` where
+  native enters his `b:0x19`** (5HP class 0x04, j.HP 0x37, the throw release;
+  class, freeze and length equal; b:0x19 is a 4-node 12-frame loop, b:0x03 the
+  12-node 24-frame hold) — the engine's choice, not the ported data (Pyron's
+  a/a2/b/c chains decode to the same shapes from our build as from the vs2
+  extract, measured by the gate); GitHub #173, the capture before the
+  maintainer. The real-pick, per-event-pinned
+  native leg reproduces `tests/expected/reactions_<tenant>.txt` exactly at
+  level 8 (the poked pick and the every-400 HP pins move nothing on these rigs;
+  at level 6 every length moves and Pyron's j.HP whiffs).
 - **A block is class `0xFF`** on every tenant: the block stance (Donovan
   `a:0x14`, Huitzil `a:0x15`, Pyron an unindexed node) then the SHARED
   blockstun chain **`b:0x0c`** (one node, 3 data frames, held).

@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-419 entries (46 game / 120 platform / 253 project), counted from the buckets at generation.
+420 entries (46 game / 120 platform / 254 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 46 entries
 
@@ -194,7 +194,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A WORKER CAN FINISH ON ANOTHER MODEL THAN ITS DEFINITION NAMES — A SAFETY-CLASSIFIER STOP TRIGGERS A SILENT FALLBACK (measured 2026-09-24, 14z-178, Claude Code 2.1.281)
 - A MAIN SESSION RUN AS A DEFINITION (`claude --agent <name>`) LOSES CLAUDE CODE'S WHOLE DEFAULT SYSTEM PROMPT — THE DEFINITION'S BODY REPLACES IT (measured 2026-09-24, 14z-178, Claude Code 2.1.281)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 253 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 254 entries
 
 - A CHAIN ID IN A NAMING EXPECTATION IS IDENTIFIED FROM THE SLOT TABLE, NEVER DESCRIBED IN PROSE (paid: 14z-171, caught 14z-172, GitHub #168)
 - MOVING A RIG'S SCHEDULE MOVES EVERY EVENT'S DOUBLE-PASS PHASE — a shift is a MEASURED QUANTITY, not a spacing choice (paid: 14z-171 to 14z-172, GitHub #168)
@@ -449,3 +449,4 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A `&` IN A COMMAND IS NOT A DETACH UNTIL YOU HAVE RULED OUT FIVE LOOK-ALIKES (paid: 14z-175, GitHub #172)
 - A PATH EXTRACTOR OVER SHELL TEXT MISSES THE PATHS THAT ARE NOT SPELLED AS PATHS — read its proposals against what each gate SAYS it uses before trusting a census (paid: 14z-180, GitHub #171)
 - A RIG'S SHARED PIN INSIDE A COMPARED WINDOW ERASES A HIT ON BOTH LEGS — and the frozen row then agrees with itself (paid: 14z-181, GitHub #136, rule-checker run 2026-09-25-148)
+- A RIG IS TUNED AT ONE SPEED LEVEL — pin the level it was tuned at, or its contacts whiff and every length moves (paid: 14z-181, GitHub #136)

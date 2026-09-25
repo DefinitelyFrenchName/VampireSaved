@@ -1,0 +1,31 @@
+# tests/expected/hitbox_parity.tsv — the hitboxes in play, ours (m3b_merged27) vs native vsav2: per part and field, over the
+# frames where both legs are on the same node, the resolved pointers (translated) and the box-id word (tests/audit_hitbox_parity.sh).
+# Evidence class: in-emulator. Frozen 14z-181 with FREEZE=1 (GitHub #136: the 14z-159 'hitboxes EXACT' sentence given its gate).
+#--
+hb	donovan_1	t0	SAME	n=0/4331	first=-	native=-	ours=-
+hb	donovan_1	t1	SAME	n=0/4331	first=-	native=-	ours=-
+hb	donovan_1	t2	SAME	n=0/4331	first=-	native=-	ours=-
+hb	donovan_1	t3	SAME	n=0/4331	first=-	native=-	ours=-
+hb	donovan_1	t4	SAME	n=0/4331	first=-	native=-	ours=-
+hb	donovan_1	hbase	SAME	n=0/4331	first=-	native=-	ours=-
+hb	donovan_1	hcomp	SAME	n=0/4331	first=-	native=-	ours=-
+hb	donovan_1	boxes	SAME	n=0/4331	first=-	native=-	ours=-
+hb	donovan_1	frames	4331	node-equal=4331	regions=21
+hb	pyron_4	t0	SAME	n=0/3928	first=-	native=-	ours=-
+hb	pyron_4	t1	SAME	n=0/3928	first=-	native=-	ours=-
+hb	pyron_4	t2	SAME	n=0/3928	first=-	native=-	ours=-
+hb	pyron_4	t3	SAME	n=0/3928	first=-	native=-	ours=-
+hb	pyron_4	t4	SAME	n=0/3928	first=-	native=-	ours=-
+hb	pyron_4	hbase	SAME	n=0/3928	first=-	native=-	ours=-
+hb	pyron_4	hcomp	SAME	n=0/3928	first=-	native=-	ours=-
+hb	pyron_4	boxes	SAME	n=0/3928	first=-	native=-	ours=-
+hb	pyron_4	frames	4691	node-equal=3928	regions=26
+hb	huitzil_1	t0	SAME	n=0/6631	first=-	native=-	ours=-
+hb	huitzil_1	t1	SAME	n=0/6631	first=-	native=-	ours=-
+hb	huitzil_1	t2	SAME	n=0/6631	first=-	native=-	ours=-
+hb	huitzil_1	t3	SAME	n=0/6631	first=-	native=-	ours=-
+hb	huitzil_1	t4	SAME	n=0/6631	first=-	native=-	ours=-
+hb	huitzil_1	hbase	SAME	n=0/6631	first=-	native=-	ours=-
+hb	huitzil_1	hcomp	SAME	n=0/6631	first=-	native=-	ours=-
+hb	huitzil_1	boxes	SAME	n=0/6631	first=-	native=-	ours=-
+hb	huitzil_1	frames	6631	node-equal=6631	regions=31

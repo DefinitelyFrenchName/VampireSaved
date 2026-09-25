@@ -5654,3 +5654,25 @@ the frozen row will pass every later run while being wrong. The reader with no c
 found it by reading `HP_PIN_EVERY` against the window arithmetic; the run that moved the
 pins found the hit. The order matters: the finding came from the artifacts before the
 measurement confirmed it, which is the rule-checker doing what it exists for.
+
+## A RIG IS TUNED AT ONE SPEED LEVEL — pin the level it was tuned at, or its contacts whiff and every length moves (paid: 14z-181, GitHub #136)
+
+The tenant-as-victim parity gate (`tests/audit_victim_parity.sh`) was first built at
+level 6, the level `tests/audit_move_parity.sh` pins, and its native leg read every
+reaction one to six frames longer than `tests/expected/reactions_<tenant>.txt` and
+Pyron's part 1 twelve contacts for the frozen thirteen — Victor's j.HP whiffed. The
+victim rigs (`tools/name_moves.py` `<tenant>_victim`) were measured on native vs2 with
+no level pin, i.e. at vs2's own TURBO (level 8), and their walk-ins and jump timings
+are tuned to it: at level 6 the fighters cover less ground per input and the jumping
+heavy passes over the victim. Pinned at 8 on both legs the real-pick, per-event-pinned,
+RNG-pinned native leg reproduced the frozen lines EXACTLY (13/13, pinned or unpinned
+alike), which is also what showed the poked pick and the every-400 HP pins of the
+original rig to move nothing.
+
+**Transferable:** a "matched speed level" is two numbers, not one — both legs matched
+(the 2026-09-15 ruling), AND the level the rig's inputs were tuned at. A rig moved to
+another level is a different rig, and a frozen expectation measured at the rig's own
+level is the cheapest control there is: if the new leg reproduces it, the pick, the
+pins and the level are all discharged at once; if it does not, do not freeze — one of
+them moved the rig. The level a gate pins is a design choice to state in its header
+(the victim gate: 8; the move-parity gates: 6), never an inheritance.
