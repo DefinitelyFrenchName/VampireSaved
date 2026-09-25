@@ -197,7 +197,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 ## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 256 entries
 
 - A CHAIN ID IN A NAMING EXPECTATION IS IDENTIFIED FROM THE SLOT TABLE, NEVER DESCRIBED IN PROSE (paid: 14z-171, caught 14z-172, GitHub #168)
-- AN AIR-THROW RIG IS DECIDED BY THE VICTIM'S JUMP LEAD, NOT BY THE PAIR'S SPACING — and with both jumps on one frame the double-pass phase picks which strength connects (paid: 14z-120 to 14z-181, GitHub #169)
+- AN AIR-THROW RIG IS DECIDED BY THE VICTIM'S JUMP LEAD, NOT BY THE PAIR'S SPACING — with both jumps on one frame the pair is bistable across schedule shifts (paid: 14z-120 to 14z-181, GitHub #169)
 - THE GROUND IS y = 40 — "AIRBORNE" IS y > 40, AND A HIT ON THE LANDING FRAME READS 40 (paid: 14z-181, caught by rule-checker run 2026-09-25-164, GitHub #163)
 - MOVING A RIG'S SCHEDULE MOVES EVERY EVENT'S DOUBLE-PASS PHASE — a shift is a MEASURED QUANTITY, not a spacing choice (paid: 14z-171 to 14z-172, GitHub #168)
 - A POSITIVE CONTROL DEFINED IN THE INSTRUMENT'S OWN COORDINATES CANNOT SHOW THAT THOSE COORDINATES ARE WRONG (paid: 14z-156, found 14z-172, GitHub #168)

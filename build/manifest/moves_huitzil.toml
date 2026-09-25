@@ -34,7 +34,7 @@ seq = "0x1e"
 name = "Sky Capture"
 input = "j.4MP, j.6MP, j.4HP, j.6HP"
 kind = "throw"
-notes = "Air throw, must be performed up close; direction by 4/6, MP or HP; MEASURED 14z-120 (P2 scripted to jump with P1): MP and HP both enter a2:0x4e"
+notes = "Air throw, must be performed up close; direction by 4/6, MP or HP; MEASURED 14z-120 (P2 scripted to jump with P1): MP and HP both enter a2:0x4e; the shared air_throw recipe gained P2's two-frame jump lead 14z-181 (GitHub #169, Pyron's pair) and both lines re-measured unchanged"
 table = "a2"
 seq = "0x4e"
 

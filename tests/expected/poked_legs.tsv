@@ -201,6 +201,10 @@ tests/audit_throw_tech.sh	ours	replays/judge/02_throw.rpl	P1	-	01 Demitri	$a	PAR
 tests/audit_throw_tech.sh	ours	replays/judge/02_throw.rpl	P2	R R	03 Victor	$b	PARAM	no id is CROSS-FLAVOR here
 tests/audit_tick_cadence.sh	native	replays/48_don_immortal_ko.rpl	P1	U U R	11 Pyron	03	CROSS-INERT	
 tests/audit_tick_cadence.sh	native	replays/48_don_immortal_ko.rpl	P2	R R	03 Victor	03	SAME	
+tests/audit_trap_airborne.sh	native	replays/hui/92_hui_trap_shock.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/audit_trap_airborne.sh	native	replays/hui/92_hui_trap_shock.rpl	P2	R R	03 Victor	03	SAME	
+tests/audit_trap_airborne.sh	ours	replays/hui/92_hui_trap_shock.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/audit_trap_airborne.sh	ours	replays/hui/92_hui_trap_shock.rpl	P2	R R	03 Victor	03	SAME	
 tests/audit_trap_parity.sh	native	replays/hui/87_hui_plasma_trap.rpl	P1	-	01 Demitri	10	CROSS-INERT	
 tests/audit_trap_parity.sh	native	replays/hui/87_hui_plasma_trap.rpl	P2	R R	03 Victor	03	SAME	
 tests/audit_trap_parity.sh	ours	replays/hui/87_hui_plasma_trap.rpl	P1	-	01 Demitri	10	CROSS-INERT	

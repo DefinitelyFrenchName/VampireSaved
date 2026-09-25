@@ -173,7 +173,26 @@ def throw_then_pursuit(b):
 
 
 def air_throw(b):   # both jump from contact; P1 presses toward+button at the apex
-    return [(0, 2, "U"), (0, 2, "U", "p2"), (14, 17, "R" + B[b])]
+    # P2 JUMPS TWO FRAMES BEFORE P1 (GitHub #169, measured 14z-181 on native): with the two
+    # jumps on the same frame the pair was bistable — which STRENGTH connected moved with the
+    # schedule shift (#168's sweep). The DETERMINANT is P2's jump lead: swept with the pair
+    # pinned still AT THE COMMITTED PHASE (shift 0), P2 at -3, -2, -1 both strengths throw
+    # (a2:0x23), at 0 one does, at +1..+3 neither — the band's other values were not swept
+    # at other phases; -2 is the middle of the band, and with it both throw at sixteen schedule shifts
+    # (0..12, 13, 26, 39: every double-pass phase mod 3 at level 8, vsav2's default and where the
+    # naming gate and these sweeps run; the shifts also span every residue mod 13, the level-6
+    # period, but no sweep ran at level 6), at 858/898 and at the wall alike
+    # (tools/air_throw_sweep.sh reruns every sweep; LEAD=0 for the walk / x / press ones,
+    # which were measured with P2 jumping WITH P1).
+    # In every row that records it (the lead, phase and walk-under-fix sweeps; the walk,
+    # x-pin and press sweeps at lead 0 sample no y) the OUTCOME FOLLOWS P2's y at +14: 134/132/129
+    # throws, 113/111/106/103 whiffs — the two events at lead 0 read 134 (throws) and 113
+    # (whiffs) at the SAME lead. The lead is the rig knob that makes P2 read 134 (132 where P1
+    # reads 109: five of the sixteen shifts, the phase-2-mod-3 ones) on both events at every phase; whether the height itself is the cause, or a state that
+    # co-varies with it, is not isolated (no run changes P2's height by another means), and
+    # press-registration ticks were not recorded — a tick race on the double-pass phase is a
+    # hypothesis, not a measurement (build/agent181/air_throw_sweeps_14z181.txt).
+    return [(-2, 0, "U", "p2"), (0, 2, "U"), (14, 17, "R" + B[b])]
 def hold_pair(motion, pair, hold):  # an EX whose pair is HELD then released
     r = motion("LP")[:-1]; a, bb, _ = motion("LP")[-1]
     return r + [(a, a + hold, pair)]
@@ -735,6 +754,27 @@ PIN_LEAD = {"near": 230, "far": 40}   # how far ahead of its event each pin land
 # The facing byte +0x0B (flip_x: 1 = P1 faces RIGHT) is sampled and `expect`
 # marks an event whose P1 faces left at its frame, so a flipped rig can
 # never freeze silently.
+# WHERE A NEAR EVENT REALLY STANDS (measured 14z-181 on pyron_3 while working
+# GitHub #169; the per-event table is build/agent181/near_event_geometry_14z181.txt):
+# when the previous event carried the camera right (its left edge at 640), the
+# pin's 552 is off-screen and the engine clamps P1 to 664 the next frame; a
+# camera poke ($FF8290) to 448 on the pin frame reads 635 one frame later and
+# 615 four frames later — the same 635 the unpoked rig reads — so the engine's
+# own smoother overwrites it at once. From 664/728 P1 walks alone at 5-6
+# px/frame, meets P2 within ~10 frames and pushes at ~1.9-2.2 px/frame for the
+# rest of the 150 — the right wall (1000) on every such event. The one near
+# event whose pin was overridden (event 6: the Planet Burning before it CONNECTS
+# and its positioning carries both fighters until f5006) started walking from
+# 496/642 (487/632 on the camera-poked trace) and ended at 858/898: the walk's
+# end, not the wall. That geometry is NOT what decides
+# the air throw (#169): with the pair pinned still at any x from 700 to 950 the
+# MP throw connected and the HP one never did, and a 60-frame walk (mid-screen)
+# made both whiff at lead 0 — the walk length is a second variable at lead 0 (walk 105
+# whiffs where a still pin at the same x connects) and none under the fix (with the -2
+# lead both strengths throw at every walk 30-150) — the determinant is P2's jump lead
+# (see air_throw). Event 5 of pyron_3, named 'far (whiff)', in fact CONNECTS (a grab:
+# P2 in seq 2 from f4914, HP 288 -> 273 at f4973, P1 in the move until f5006), which
+# is why event 6's pin is overridden and its walk ends at 858/898.
 
 
 def gen(tenant, part, out_rpl, out_sched):

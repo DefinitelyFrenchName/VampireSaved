@@ -41,7 +41,7 @@
 # found it from the sweep (jumps pressed after the hit still read 40). So with this rig no dome hit
 # reaches the air stager, and whether ANY arc can is the open question of the ticket that carries it.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [MERGED=build/m3b_merged27] [FREEZE=1] [SWEEP=1] [CONTROL=air-class|grounded-hit|air-hit] tests/audit_trap_airborne.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [MERGED=build/m3b_merged27] [FREEZE=1] [SWEEP=1 [SWEEP_JUMPS="3440 3441 ..."]] [CONTROL=air-class|grounded-hit|air-hit] tests/audit_trap_airborne.sh
 #   emulator tier, MAME: two legs in parallel, ~1 min (SWEEP=1: five more pairs, ~6 min).
 set -u
 ROMDIR="${ROMDIR:?set ROMDIR}"; if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
@@ -56,7 +56,7 @@ EXPECT="$REPO/tests/expected/trap_airborne.tsv"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0; ok() { printf '  ok    %s\n' "$1"; }; bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
 JUMP=3490
-SWEEP_JUMPS="3466 3470 3474 3480 3486"
+SWEEP_JUMPS="${SWEEP_JUMPS:-3466 3470 3474 3480 3486}"   # override to re-run the 14z-181 census: every press 3440-3499 (build/agent181/trap_airborne_sweep_14z181.txt)
 PK="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10;1400:ff8b82:03;1450:ff8b82:03;1500:ff8b82:03;$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,3640)))");$(python3 -c "print(';'.join(f'{f}:ff80d4:0000' for f in range(2363,3640)))")"
 # legs <dir> <jump>: the two legs of the trap rig with P2 up at <jump>, traces at <dir>/{native,merged}.ft
 legs() {

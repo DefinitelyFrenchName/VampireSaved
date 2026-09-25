@@ -39,29 +39,48 @@ name in prose. And when the claim is about what a move DOES, produce the capture
 before the sentence ([VSP-173]) — here the picture is what settled it, and the
 slot table is what over-reached when it was used as a shortcut.
 
-## AN AIR-THROW RIG IS DECIDED BY THE VICTIM'S JUMP LEAD, NOT BY THE PAIR'S SPACING — and with both jumps on one frame the double-pass phase picks which strength connects (paid: 14z-120 to 14z-181, GitHub #169)
+## AN AIR-THROW RIG IS DECIDED BY THE VICTIM'S JUMP LEAD, NOT BY THE PAIR'S SPACING — with both jumps on one frame the pair is bistable across schedule shifts (paid: 14z-120 to 14z-181, GitHub #169)
 
 **What happened.** `pyron_3`'s two Galactic Throw events (`air_throw("MP")` /
 `air_throw("HP")`: both fighters jump on the event frame, P1 presses toward +
 button at +14) had frozen ONE connecting strength since 14z-120, and which
 one it was moved with the schedule shift (#168's sweep: MP at shifts ≡ 0 mod
 3, HP at the others, neither at 273). Three theories were measured and were
-NOT it: the wall (every "near" event ends at the right wall, and the MP throw
-connected at the wall), the screen-edge clamp of the pin after a throw (real,
+NOT it: the wall (the HP event stands at the right wall, 960/1000, where the
+150-frame walk-in — P1 pushing at ~2 px/frame from a pin the screen edge
+clamped to 664 — leaves every near event whose previous event did not knock
+P2 left; the per-event table is `build/agent181/near_event_geometry_14z181.txt`
+— but the HP throw whiffed just the same pinned OFF the wall at 858/898, and
+with the lead it connects ON it), the screen-edge clamp of the pin after a throw (real,
 but the throw connected at every x from 700 to 950 with the pair pinned
-still), and the walk length (a 60-frame walk made both whiff). The determinant
-is the VICTIM'S HEIGHT RELATIVE TO THE THROWER at the grab frame: the throw
-needs P2 above P1 (P2 y 134 to P1's 111 connects; 113 or 111 whiffs into a
-plain j.P). With both up-presses on the same frame, the double-pass phase
-decides whose press registers a tick earlier, so the pair is bistable.
+still), and the walk length — which IS a second variable at lead 0 (30-105 both
+whiff, and walk 105 ends at 842/882 where a still pin at 842 connects) and
+none under the fix (every walk 30-150 throws on both strengths). The
+determinant is P2's JUMP LEAD: swept with the pair pinned still at the
+committed phase, P2 at -3/-2/-1 both strengths throw, at 0 one does, at +1..+3
+neither (the band beyond -2 was not swept at other phases; -2 was). In every
+row that records it (the lead, phase and walk-under-fix sweeps) the OUTCOME
+FOLLOWS P2's y at the grab frame: 134/132/129 throws,
+113 and below whiffs — the two lead-0 events read 134 and 113 at the same
+lead. The lead is the rig knob that makes P2 read 134 (132 at the five phase-2-mod-3 shifts, where P1 reads 109)
+on both events at every phase; whether the height itself is the cause or a state that co-varies with
+it is not isolated (no run changes P2's height by another means), and no run
+recorded press-registration ticks — a tick race on the double-pass phase is
+the hypothesis, consistent with #168's shift sweep, not a measurement.
 
-**The rule.** The rig gives P2 a two-frame jump lead (`(-2, 0, "U", "p2")`):
-swept at -3/-2/-1 both strengths throw, at 0 one does, at +1..+3 neither; -2 is
-the middle of the working band. More generally: when an event's outcome does
-not follow the double-pass phase the way the rest of the corpus does, look
-for a RACE between two inputs on the same frame before looking at geometry;
-and a search runs from the cheapest dimension (inputs) outward, one variable
-at a time, with the pair pinned still so the walk is not a second variable.
+**The rule.** The rig gives P2 a two-frame jump lead (`(-2, 0, "U", "p2")`),
+the middle of the band, and with it both strengths throw at sixteen schedule
+shifts (0..12, 13, 26, 39: every double-pass phase mod 3 at level 8, where the
+naming gate and the sweeps run; every residue mod 13 too, but no sweep ran at
+level 6), at 858/898 and at the wall alike; `tools/air_throw_sweep.sh` reruns every sweep
+(`LEAD=0` for the walk, x-pin and press ones, measured with P2 jumping with P1).
+More generally: when an event's outcome does not follow the double-pass phase
+the way the rest of the corpus does, look for two inputs on the same frame
+before looking at geometry; a search runs from the cheapest dimension
+(inputs) outward, ONE variable at a time, with the pair pinned still so the
+walk is not a second variable; and a correlate that moves with the variable
+you swept is not the cause until a run holds the variable and moves the
+correlate (rule-checker run 2026-09-25-168, Q4).
 
 ## THE GROUND IS y = 40 — "AIRBORNE" IS y > 40, AND A HIT ON THE LANDING FRAME READS 40 (paid: 14z-181, caught by rule-checker run 2026-09-25-164, GitHub #163)
 
