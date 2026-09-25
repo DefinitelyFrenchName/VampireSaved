@@ -2,6 +2,8 @@
 # 5HP), native vsav2 against our merged build, at RNG pins 0000/1234/5a5a (tests/audit_phobos_dmg_residual.sh). Evidence
 # class: in-emulator, MAME. Frozen AS MEASURED with FREEZE=1 on m3b_merged27 — the open bug ticket: native 11,
 # ours one more with the defense row already vs2's. Columns: <part> <pin> <leg> <frame> <hp before> <hp after>; one build row.
+# Since 14z-181 the `legacy` rows: Demitri's 5HP on VICTOR (P2, its HP) on pristine vsavj and pristine vsav2 at the same pins —
+# vsavj 12 / vsav2 11 with Victor's row byte-identical between the games: the +1 is the two engines' (GitHub #161).
 #--
 huitzil_5	0000	native	6161	288	277
 huitzil_5	0000	ours	6161	288	276
@@ -15,4 +17,16 @@ huitzil_6	1234	native	7920	288	277
 huitzil_6	1234	ours	7920	288	276
 huitzil_6	5a5a	native	7920	288	277
 huitzil_6	5a5a	ours	7920	288	276
+legacy	0000	vsavj	3006	288	276
+legacy	0000	vsavj	3345	276	264
+legacy	0000	vsav2	3006	288	277
+legacy	0000	vsav2	3345	277	266
+legacy	1234	vsavj	3006	288	276
+legacy	1234	vsavj	3345	276	264
+legacy	1234	vsav2	3006	288	277
+legacy	1234	vsav2	3345	277	266
+legacy	5a5a	vsavj	3006	288	276
+legacy	5a5a	vsavj	3345	276	264
+legacy	5a5a	vsav2	3006	288	277
+legacy	5a5a	vsav2	3345	277	266
 ours	build	merged-m19	61e9815a

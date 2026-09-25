@@ -200,3 +200,13 @@
 14	j.LK [9]	a2:0x15
 14	j.MK [9]	a2:0x16
 14	j.HK [9]	a2:0x17
+15	Ifrit Sword [gc LP]	a:0x13 b:0x0c a2:0x2d
+15	Ifrit Sword [gc MP]	a:0x13 b:0x0c a2:0x2e
+15	Ifrit Sword [gc HP]	a:0x13 b:0x0c a2:0x2f
+15	Ifrit Sword [gc LK]	a:0x13 b:0x0c
+15	Ifrit Sword [gc MK]	a:0x13 b:0x0c
+15	Ifrit Sword [gc HK]	a:0x13 b:0x0c
+15	Ifrit Sword [gc PP]	a:0x13 b:0x0c a2:0x2d
+15	Ifrit Sword [gc v: 623 buffered pre-hit, LP at hit+2]	a:0x13 a:0x15 b:0x0c a2:0x2d
+15	Ifrit Sword [gc v: P2 HK, L to hit+1, 623LP at hit+4]	a:0x13 b:0x0c a2:0x2d
+15	Ifrit Sword [gc LP at hit+6] (control: no block)	b:0x05

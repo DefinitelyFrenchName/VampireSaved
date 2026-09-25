@@ -280,6 +280,16 @@ donovan_14	2	j.HP [9]	IDENT	-	-	150	-	2
 donovan_14	3	j.LK [9]	IDENT	-	-	150	-	1
 donovan_14	4	j.MK [9]	IDENT	-	-	150	-	1
 donovan_14	5	j.HK [9]	IDENT	-	-	401	-	1
+donovan_15	0	Ifrit Sword [gc LP]	IDENT	-	-	420	-	2
+donovan_15	1	Ifrit Sword [gc MP]	IDENT	-	-	420	-	2
+donovan_15	2	Ifrit Sword [gc HP]	IDENT	-	-	420	-	2
+donovan_15	3	Ifrit Sword [gc LK]	IDENT	-	-	420	-	2
+donovan_15	4	Ifrit Sword [gc MK]	IDENT	-	-	420	-	2
+donovan_15	5	Ifrit Sword [gc HK]	IDENT	-	-	420	-	2
+donovan_15	6	Ifrit Sword [gc PP]	IDENT	-	-	420	-	2
+donovan_15	7	Ifrit Sword [gc v: 623 buffered pre-hit, LP at hit+2]	DIFF	+6	p1hp	420	-	2
+donovan_15	8	Ifrit Sword [gc v: P2 HK, L to hit+1, 623LP at hit+4]	IDENT	-	-	420	after:7	2
+donovan_15	9	Ifrit Sword [gc LP at hit+6] (control: no block)	DIFF	+6	p1hp	671	after:7	2
 huitzil_1	0	Walk forward	IDENT	-	-	120	-	1
 huitzil_1	1	Walk back	IDENT	-	-	120	-	1
 huitzil_1	2	Crouch	IDENT	-	-	120	-	2
@@ -531,3 +541,13 @@ pyron_6	2	j.HP [9]	IDENT	-	-	150	-	2
 pyron_6	3	j.LK [9]	IDENT	-	-	150	-	1
 pyron_6	4	j.MK [9]	IDENT	-	-	150	-	1
 pyron_6	5	j.HK [9]	IDENT	-	-	401	-	1
+pyron_7	0	Zodiac Fire [gc LP]	IDENT	-	-	420	-	2
+pyron_7	1	Zodiac Fire [gc MP]	IDENT	-	-	420	-	2
+pyron_7	2	Zodiac Fire [gc HP]	IDENT	-	-	420	-	2
+pyron_7	3	Zodiac Fire [gc LK]	IDENT	-	-	420	-	2
+pyron_7	4	Zodiac Fire [gc MK]	IDENT	-	-	420	-	2
+pyron_7	5	Zodiac Fire [gc HK]	IDENT	-	-	420	-	2
+pyron_7	6	Zodiac Fire [gc PP]	IDENT	-	-	420	-	2
+pyron_7	7	Zodiac Fire [gc v: 623 buffered pre-hit, LP at hit+2]	DIFF	+6	p1hp	420	-	2
+pyron_7	8	Zodiac Fire [gc v: P2 HK, L to hit+1, 623LP at hit+4]	IDENT	-	-	420	after:7	2
+pyron_7	9	Zodiac Fire [gc LP at hit+6] (control: no block)	DIFF	+6	p1hp	671	after:7	2

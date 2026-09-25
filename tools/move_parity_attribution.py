@@ -39,6 +39,9 @@ SIGNATURES (each a measured property of the root's own window, never its name al
                  "DECIDED (maintainer, 2026-08-14): OPTION (b)" (the maintainer's own words were not kept),
                  SUPERSEDED 2026-09-18: "take the vs2 rows" (docs/project/tables/defense_rows.md)
   P2-DISPLACEMENT a seeded root whose own fields are IDENT while P2's x differs in its window — #159
+  DMG-OPEN       the same signature on Donovan or Pyron the victim with the row already vs2's (14z-181, the
+                 guard-cancel parts: Demitri's 5HP 12 native / 13 ours on BOTH) — #161's residual on a
+                 second and third tenant; the rows are frozen under the open ticket
   PHOBOS-DMG-OPEN the DEFENSE-ROW signature (P1's HP alone, Phobos the victim, ours taking MORE) on a build
                  whose defense-curve row 0x10 ALREADY equals vs2's (read from the build's own data image and
                  vs2's): the ruled fix is in and the excess remains — Demitri's 5HP 11 native / 12 ours at M19
@@ -55,7 +58,7 @@ import argparse, json, os, subprocess, sys
 from concurrent.futures import ThreadPoolExecutor
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ROW10_NATIVE = False   # set in main() from the build under test
+ROW_NATIVE = {}   # tenant -> are its defense-curve row AND rally-threshold byte in the build vs2's own; set in main() from the build under test
 sys.path.insert(0, os.path.join(REPO, "tools"))
 import move_parity as mp  # noqa: E402
 import name_moves as nm   # noqa: E402
@@ -175,12 +178,19 @@ def classify(part, k, trdir, rigdir, row):
         for t in (f0, f0 - 1):   # the node differs on the freeze-end frame or the one after it
             if t - 1 in n and n[t - 1]["seq"] == 0 and n[t]["seq"] == 2 and o[t - 1]["seq"] == 0 and o[t]["seq"] == 2:
                 return "GUARD-REENTRY", f"node differs at {f0}, both legs leaving the block freeze at {t} (seq 0 -> 2)"
-    if fields == ["p1hp"] and tenant == "huitzil":   # Phobos the VICTIM, ours taking more: vsavj's row 0x10 indexes lower
+    if fields == ["p1hp"]:   # the tenant the VICTIM, ours taking more
         dn = n[f0 - 1]["p1hp"] - n[f0]["p1hp"]; do = o[f0 - 1]["p1hp"] - o[f0]["p1hp"]
         if 0 < dn < do:
-            if ROW10_NATIVE:
-                return "PHOBOS-DMG-OPEN", f"Phobos takes {dn} native / {do} ours; his defense row is already vs2's"
-            return "DEFENSE-ROW", f"Phobos takes {dn} native / {do} ours"
+            if tenant == "huitzil":   # vsavj's row 0x10 indexes lower unless the vs2 row is in
+                if ROW_NATIVE.get("huitzil"):
+                    return "PHOBOS-DMG-OPEN", f"Phobos takes {dn} native / {do} ours; his defense row is already vs2's"
+                return "DEFENSE-ROW", f"Phobos takes {dn} native / {do} ours"
+            # 14z-181, the guard-cancel parts: Donovan and Pyron take 13 from Demitri's 5HP on our build for
+            # native's 12 with their defense rows already vs2's (Donovan's ported at M19, Pyron's identical in
+            # every game) — #161's residual is not Phobos's alone
+            if ROW_NATIVE.get(tenant):
+                return "DMG-OPEN", f"{tenant} takes {dn} native / {do} ours; the defense row is already vs2's (#161's residual, a second/third tenant)"
+            return "DEFENSE-ROW", f"{tenant} takes {dn} native / {do} ours"
     return "OTHER", f"first DIFF {row[4]} on {row[5]}"
 
 
@@ -193,14 +203,21 @@ def main():
     ap.add_argument("--mame-bin", default=os.path.expanduser("~/.cache/vampire-saved/mame/cps2"))
     a = ap.parse_args()
     a.build = os.path.abspath(a.build); a.romdir = os.path.abspath(a.romdir); a.work = os.path.abspath(a.work)
-    # is Phobos's defense-curve row (vsavj 0x0B8940 + 0x10*32) in THIS build vs2's own (vs2 0x0D2ABE + 0x10*32)?
-    global ROW10_NATIVE
+    # is each tenant's defense-curve row (vsavj 0x0B8940 + id*32) in THIS build vs2's own (vs2 0x0D2ABE + id*32)?
+    # Phobos 0x10 (ported at M19), Donovan 0x13 (ported at M19), Pyron 0x11 (identical in every game)
+    global ROW_NATIVE
     try:
-        _b = open(f"{a.build}/verify_data.bin", "rb").read()[0x0B8940 + 0x200:0x0B8940 + 0x220]
-        _v = open(os.path.join(REPO, "build/out/vsav2_data.bin"), "rb").read()[0x0D2ABE + 0x200:0x0D2ABE + 0x220]
-        ROW10_NATIVE = len(_b) == 0x20 and _b == _v
+        _bimg = open(f"{a.build}/verify_data.bin", "rb").read()
+        _vimg = open(os.path.join(REPO, "build/out/vsav2_data.bin"), "rb").read()
+        # BOTH tables the damage chain indexes by the victim's id: the 32-byte curve row AND the rally-threshold
+        # byte (vsavj PRG:0x0BCC80 + id, vs2 PRG:0x0D6E1E + id) — rule-checker run 2026-09-25-157 Q1: the first
+        # form read the curve row alone and called the rows "already vs2's"
+        for _t, _id in (("huitzil", 0x10), ("donovan", 0x13), ("pyron", 0x11)):
+            _b = _bimg[0x0B8940 + _id * 32:0x0B8940 + _id * 32 + 32]; _v = _vimg[0x0D2ABE + _id * 32:0x0D2ABE + _id * 32 + 32]
+            _tb = _bimg[0x0BCC80 + _id:0x0BCC80 + _id + 1]; _tv = _vimg[0x0D6E1E + _id:0x0D6E1E + _id + 1]
+            ROW_NATIVE[_t] = len(_b) == 0x20 and _b == _v and len(_tb) == 1 and _tb == _tv
     except OSError:
-        ROW10_NATIVE = False
+        ROW_NATIVE = {}
     frozen = rows_of(f"{REPO}/tests/expected/move_parity_events.tsv")
     parts = a.parts.split() if a.parts else sorted({k[0] for k, r in frozen.items() if r[3] == "DIFF"},
                                                    key=lambda s: (s.split("_")[0], int(s.split("_")[1])))

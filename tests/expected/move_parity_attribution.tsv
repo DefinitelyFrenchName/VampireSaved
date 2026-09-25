@@ -13,6 +13,7 @@ root	donovan_7:29	Sharirum Luna [6MP] swordless	METER-SWAP	step=1	at 7367 native
 root	donovan_8:1	Sharirum Luna [4MP]	METER-SWAP	step=1	at 2887 native (P1,P2) (9, 8) ours (8, 9)
 root	donovan_10:1	Blizzard Sword [MP] at range	SLOWDOWN	step=1	zero-pass frame native [] ours [2977]
 root	donovan_11:12	Blizzard Sword [LP] blocked	SLOWDOWN	step=1	zero-pass frame native [4580] ours []
+root	donovan_15:7	Ifrit Sword [gc v: 623 buffered pre-hit, LP at hit+2]	DMG-OPEN	step=1	donovan takes 12 native / 13 ours; the defense row is already vs2's (#161's residual, a second/third tenant)
 root	huitzil_3:0	Magnet Slam [6MP]	METER-SWAP	step=1	at 2885 native (P1,P2) (9, 8) ours (8, 9)
 root	huitzil_4:10	Sitting Attack (ES) [8PP] off throw	METER-SWAP	step=1	at 5669 native (P1,P2) (9, 8) ours (8, 9)
 root	huitzil_5:1	Reflect Wall [gc LP at hit+6]	GUARD-REENTRY	step=1	node differs at 3232, both legs leaving the block freeze at 3231 (seq 0 -> 2)
@@ -22,18 +23,21 @@ root	huitzil_8:5	Circuit Scrapper [63214MP] step back	METER-SWAP	step=1	at 4482 
 root	pyron_3:0	Corona Whip [6MP]	METER-SWAP	step=1	at 2825 native (P1,P2) (6, 8) ours (8, 6)
 root	pyron_4:11	Sitting Attack (ES) [8PP] off throw	METER-SWAP	step=1	at 5950 native (P1,P2) (6, 8) ours (8, 6)
 root	pyron_5:0	Planet Burning [MP] step back (control)	METER-SWAP	step=1	at 2900 native (P1,P2) (18, 8) ours (8, 18)
+root	pyron_7:7	Zodiac Fire [gc v: 623 buffered pre-hit, LP at hit+2]	DMG-OPEN	step=1	pyron takes 12 native / 13 ours; the defense row is already vs2's (#161's residual, a second/third tenant)
 root	donovan_2:15	Sharirum Luna [6MP]	METER-SWAP	step=2	at 6007 native (P1,P2) (9, 8) ours (8, 9)
 root	donovan_3:14	Slay Shred [MP+MK]	DF-STOCK	step=2	stock 7 native vs 8 ours at the activation
 root	donovan_4:16	Foot Stab [8K] off throw	METER-SWAP	step=2	at 6147 native (P1,P2) (9, 8) ours (8, 9)
 root	donovan_5:3	Sword Grapple [HP]	METER-SWAP	step=2	at 3318 native (P1,P2) (9, 8) ours (8, 9)
 root	donovan_7:31	Foot Stab [8P] swordless off throw	METER-SWAP	step=2	at 7767 native (P1,P2) (9, 8) ours (8, 9)
 root	donovan_8:3	Sharirum Luna [4HP]	METER-SWAP	step=2	at 3287 native (P1,P2) (9, 8) ours (8, 9)
+root	donovan_15:9	Ifrit Sword [gc LP at hit+6] (control: no block)	DMG-OPEN	step=2	donovan takes 12 native / 13 ours; the defense row is already vs2's (#161's residual, a second/third tenant)
 root	huitzil_3:1	Magnet Slam [6HP]	METER-SWAP	step=2	at 3305 native (P1,P2) (9, 8) ours (8, 9)
 root	huitzil_4:11	Ray of Doom [LP+LK]	DF-STOCK	step=2	stock 7 native vs 8 ours at the activation
 root	huitzil_5:2	Reflect Wall [gc LP at hit+10]	GUARD-REENTRY	step=2	node differs at 3651, both legs leaving the block freeze at 3650 (seq 0 -> 2)
 root	huitzil_6:1	Circuit Scrapper [HP] cont	METER-SWAP	step=2	at 3287 native (P1,P2) (9, 8) ours (8, 9)
 root	pyron_3:1	Corona Whip [6HP]	METER-SWAP	step=2	at 3245 native (P1,P2) (6, 8) ours (8, 6)
 root	pyron_4:12	Shining Gemini [LP+LK]	DF-STOCK	step=2	stock 7 native vs 8 ours at the activation
+root	pyron_7:9	Zodiac Fire [gc LP at hit+6] (control: no block)	DMG-OPEN	step=2	pyron takes 12 native / 13 ours; the defense row is already vs2's (#161's residual, a second/third tenant)
 root	donovan_2:17	Sharirum Luna [6HP]	METER-SWAP	step=3	at 6407 native (P1,P2) (9, 8) ours (8, 9)
 root	donovan_4:18	Foot Stab (ES) [8PP] off throw	METER-SWAP	step=3	at 6647 native (P1,P2) (9, 8) ours (8, 9)
 root	donovan_7:32	Slay Shred [LP+LK] swordless	DF-STOCK	step=3	stock 7 native vs 8 ours at the activation
@@ -118,6 +122,8 @@ row	donovan_10	7	base	donovan_10:1	SLOWDOWN
 row	donovan_10	8	base	donovan_10:1	SLOWDOWN
 row	donovan_10	9	base	donovan_10:1	SLOWDOWN
 row	donovan_11	12	base	donovan_11:12	SLOWDOWN
+row	donovan_15	7	base	donovan_15:7	DMG-OPEN
+row	donovan_15	9	base	donovan_15:9	DMG-OPEN
 row	huitzil_3	0	base	huitzil_3:0	METER-SWAP
 row	huitzil_3	1	base	huitzil_3:1	METER-SWAP
 row	huitzil_3	2	base	huitzil_3:2	METER-SWAP
@@ -157,3 +163,5 @@ row	pyron_4	11	base	pyron_4:11	METER-SWAP
 row	pyron_4	12	base	pyron_4:12	DF-STOCK
 row	pyron_4	13	base	pyron_4:12	DF-STOCK
 row	pyron_5	0	base	pyron_5:0	METER-SWAP
+row	pyron_7	7	base	pyron_7:7	DMG-OPEN
+row	pyron_7	9	base	pyron_7:9	DMG-OPEN

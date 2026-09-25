@@ -108,7 +108,7 @@ seq = "0x26,0x2a"
 name = "Zodiac Fire"
 input = "623P"
 kind = "special"
-notes = "Pyron's guard cancel: can be guard cancelled into (623P in blockstun) for 1 meter stock; ES = Zodiac Fire (ES); MEASURED 14z-120: LP/MP/HP -> a2:0x2e/0x2f/0x30 then the tail a2:0x35; a forward rush of ~180 px with attack boxes"
+notes = "Pyron's guard cancel: can be guard cancelled into (623P in blockstun) for 1 meter stock; ES = Zodiac Fire (ES); MEASURED 14z-120: LP/MP/HP -> a2:0x2e/0x2f/0x30 then the tail a2:0x35; a forward rush of ~180 px with attack boxes; MEASURED 14z-181 AS THE GUARD CANCEL (part 7, P2 Demitri's 5HP blocked at a near pin, 623+button from hit+2): a:0x13 -> b:0x0c -> a2:0x2e/0x2f/0x30 then the tail a2:0x35 by punch strength, PP -> a2:0x2e (the LP version, not the ES); a kick in blockstun enters no a2 chain (block only) — chain entries read from RAM, not a visual read; audit_move_parity: the eight events where no hit is taken IDENT ours vs native, the buffered variant and the no-block control DIFF on P1's HP at +6 (Demitri's 5HP taken, 12 native / 13 ours — #161's residual) so their cancel is not compared past that frame"
 table = "a2"
 seq = "0x2e,0x2f,0x30"
 

@@ -664,6 +664,21 @@ _FWD = [(f"j.{b} [9]", jump_fwd(b), 150, "far") for b in ("LP", "MP", "HP", "LK"
 DONOVAN["14"] = list(_FWD)
 PYRON["6"] = list(_FWD)
 HUITZIL["10"] = list(_FWD)
+# THE GUARD CANCELS OF DONOVAN AND PYRON (14z-181, GitHub #136: "Donovan's and Pyron's guard cancels
+# ... measured ours-vs-native nowhere"). Every character's guard cancel is 623P or 623K in blockstun
+# (moves_donovan.toml header); Donovan's is Ifrit Sword and Pyron's Zodiac Fire, both 623P. The recipes
+# are the Phobos ones that FIRED Reflect Wall on native (tests/expected/move_naming_huitzil.txt parts
+# 6/7: a:0x13 -> b:0x0c -> a2:0x4c): P2 Demitri's 5HP blocked at a "near" pin, back held to hit+1,
+# 623+button from hit+2; the kicks are the negative rows (a punch move), and the last event is the
+# no-block control (the 623 lands on a HIT, not in blockstun). No stock poke: Reflect Wall fired with
+# none (the toml's "THE BANKED STOCK COUNT DID NOT MOVE").
+def _gc_part(move):
+    return [(f"{move} [gc {b}]", gc_v(b, 11, 12), 240, "near") for b in ("LP", "MP", "HP", "LK", "MK", "HK", "PP")] + [
+        (f"{move} [gc v: 623 buffered pre-hit, LP at hit+2]", [(0, 3, "3", "p2"), (-4, 4, "L"), (5, 6, "R"), (7, 8, "D"), (9, 10, "DR"), (12, 15, "1")], 240, "near"),
+        (f"{move} [gc v: P2 HK, L to hit+1, 623LP at hit+4]", [(0, 3, "6", "p2"), (-4, 13, "L"), (14, 15, "R"), (16, 17, "D"), (18, 21, "DR1")], 240, "near"),
+        (f"{move} [gc LP at hit+6] (control: no block)", [(0, 3, "3", "p2"), (16, 17, "R"), (18, 19, "D"), (20, 23, "DR1")], 240, "near")]
+DONOVAN["15"] = _gc_part("Ifrit Sword")
+PYRON["7"] = _gc_part("Zodiac Fire")
 
 SCHEDULES = {"donovan": DONOVAN, "pyron": PYRON, "huitzil": HUITZIL,
              "donovan_victim": DONOVAN_VICTIM, "huitzil_victim": DONOVAN_VICTIM, "pyron_victim": DONOVAN_VICTIM}

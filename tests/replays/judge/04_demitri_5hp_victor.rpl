@@ -1,0 +1,19 @@
+# DEMITRI'S 5HP ON VICTOR — the LEGACY pair of tests/audit_phobos_dmg_residual.sh (14z-181, GitHub
+# #161): both fighters REAL cursor picks on both pristine games (P1's default cell is Demitri 0x01,
+# P2's R,R is Victor 0x03 on the vsavj AND the vsav2 wheel — tools/select_paths.py --resolve), the
+# 02_throw prologue, then a walk-in and a standing HP twice. Victor is a no-input dummy. Victor's
+# defense row is byte-identical between the games (docs/project/tables/defense_rows.md), so a
+# different HP step here is the two ENGINES, not a row. Measured 14z-181: vsavj takes 12, vs2 11.
+300-305 sys=C1
+420-425 sys=C2
+800-803 sys=S1
+940-943 sys=S2
+1100-1102 p2=R
+1160-1162 p2=R
+1300-1302 p1=1
+1360-1362 p2=1
+2860-2990 p1=R
+3000-3003 p1=3
+3200-3330 p1=R
+3340-3343 p1=3
+3600 wait

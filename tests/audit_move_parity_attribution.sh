@@ -5,7 +5,9 @@
 #   found by ablation (its event's inputs removed, both legs re-run, the rows that vanish
 #   are its) and named by a measured signature class (METER-SWAP, SLOWDOWN, DF-STOCK,
 #   ENTRANCE, GUARD-REENTRY, P2-DISPLACEMENT, TRAP-REMAP, COLUMN-SHOCK, DEFENSE-ROW /
-#   PHOBOS-DMG-OPEN); no root is OTHER and no row UNATTRIBUTED.
+#   PHOBOS-DMG-OPEN / DMG-OPEN — the last since 14z-181: Donovan and Pyron taking one more from
+#   Demitri's 5HP with their rows already vs2's, #161's residual on every tenant); no root is
+#   OTHER and no row UNATTRIBUTED.
 # HOW: tools/move_parity_attribution.py on MAME: step 0 re-runs the committed rigs and must
 #   reproduce the frozen table, then iterative ablation over the ~19 parts carrying a DIFF
 #   with each root's signature read from its own window; the control disables ablation,
