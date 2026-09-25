@@ -3,82 +3,86 @@
 # POKES. class: UNCLASSIFIED (the maintainer's to rule, one by one), OBSERVES (the poke sets the
 # stage, the game changes it, the gate measures the change — grows only), READS-BACK (the column
 # records the rig, not the engine — shrinks only: a READS-BACK column is dropped from the compare or
-# labelled in the gate's header as a rig record), RETIRED (the finding no longer derives; kept for the
-# record). Gate: tests/test_poke_readback.sh — every derived finding has a row, every live row derives.
+# labelled in the gate's header as a rig record), CONTROL-PLANT (a known-bad plant on a control leg that
+# reads its poke back BY DESIGN), CROSS-LEG (the census joined a poke on one leg to a dump on ANOTHER leg
+# that runs with no poke — a census limitation: it compares addresses per gate, not per leg), RETIRED (the
+# finding no longer derives; kept for the record). The 73 UNCLASSIFIED rows were ruled 2026-09-25 (14z-181,
+# DECISIONS_HISTORY.md "Ruled 2026-09-25 (14z-181)"), each note naming its deciding line; a READS-BACK
+# column dropped from its gate is RETIRED with the ruling in its note. Gate: tests/test_poke_readback.sh — every derived finding has a row, every live row derives.
 # leg: main (the measuring leg's poke), control (a poke on a line naming a plant, a control or a mode — a
 # known-bad plant that reads its poke back by design; rule-checker run 2026-09-24-144) or mixed.
 # gate<TAB>addr<TAB>sample<TAB>class<TAB>note<TAB>leg
-audit_column_shock	ff8850	FIELDS:hp	UNCLASSIFIED	derived 14z-180 (poke frames 2826-2830x2); awaiting the maintainer's ruling	main
-audit_column_shock	ff8850	FIELDS:p2hp	UNCLASSIFIED	derived 14z-180 (poke frames 2826-2830x2); awaiting the maintainer's ruling	main
-audit_column_shock	ff8852	FIELDS:white	UNCLASSIFIED	derived 14z-180 (poke frames 2826-2830x2); awaiting the maintainer's ruling	main
-audit_defense_row_reads	ff8b82	RTAP:ff8b82	UNCLASSIFIED	derived 14z-180 (poke frames 2680-2680x1); awaiting the maintainer's ruling	control
-audit_df_framework	ff8509	FIELDS:stocks	UNCLASSIFIED	derived 14z-180 (poke frames 3100-3120x2); awaiting the maintainer's ruling	main
-audit_df_modes	ff8509	FIELDS:stock	UNCLASSIFIED	derived 14z-180 (poke frames 3100-3120x2); awaiting the maintainer's ruling	main
-audit_df_moves	ff8509	FIELDS:stock	UNCLASSIFIED	derived 14z-180 (poke frames 2540-8695x167); awaiting the maintainer's ruling	main
-audit_df_moves	ff8850	FIELDS:p2hp	UNCLASSIFIED	derived 14z-180 (poke frames 2550-9145x34); awaiting the maintainer's ruling	main
-audit_df_startup_invuln	ff8410	FIELDS:p1x	UNCLASSIFIED	derived 14z-180 (poke frames 2370-4770x8); awaiting the maintainer's ruling	main
-audit_df_startup_invuln	ff8450	FIELDS:p1hp	UNCLASSIFIED	derived 14z-180 (poke frames 3240-4240x2); awaiting the maintainer's ruling	main
-audit_df_startup_invuln	ff8509	FIELDS:stocks	UNCLASSIFIED	derived 14z-180 (poke frames 3100-4120x4); awaiting the maintainer's ruling	main
-audit_df_startup_invuln	ff8810	FIELDS:p2x	UNCLASSIFIED	derived 14z-180 (poke frames 2370-4770x8); awaiting the maintainer's ruling	main
-audit_don_ko_writer	ff8450	RTAP:ff8450	UNCLASSIFIED	derived 14z-180 (poke frames 6200-6320x3); awaiting the maintainer's ruling	main
-audit_edge_cases	ff8450	FIELDS:p1hp	UNCLASSIFIED	derived 14z-180 (poke frames 3004-3004x1); awaiting the maintainer's ruling	main
-audit_edge_cases	ff8509	FIELDS:stk	UNCLASSIFIED	derived 14z-180 (poke frames 2860-2880x2); awaiting the maintainer's ruling	main
-audit_edge_cases	ff8850	FIELDS:p2hp	UNCLASSIFIED	derived 14z-180 (poke frames 3006-3006x1); awaiting the maintainer's ruling	main
-audit_entrance_draw	ff8410	FIELDS:x	UNCLASSIFIED	derived 14z-180 (poke frames 2565-5925x9); awaiting the maintainer's ruling	main
-audit_guard_reentry	ff8410	FIELDS:x	UNCLASSIFIED	derived 14z-180 (poke frames 2565-5925x9); awaiting the maintainer's ruling	main
-audit_legacy_pairings	ff8782	FIELDS:p1id	UNCLASSIFIED	derived 14z-180 (poke frames 1400-1500x3); awaiting the maintainer's ruling	main
-audit_move_parity	ff8410	FIELDS:x	UNCLASSIFIED	derived 14z-180 (poke frames 2560-8690x166); awaiting the maintainer's ruling	main
-audit_move_parity	ff8509	FIELDS:stock	UNCLASSIFIED	derived 14z-180 (poke frames 2540-8695x167); awaiting the maintainer's ruling	main
-audit_move_parity	ff8850	FIELDS:p2hp	UNCLASSIFIED	derived 14z-180 (poke frames 2550-9145x34); awaiting the maintainer's ruling	main
-audit_reaction_class_live	ff8454	RTAP:ff8454	UNCLASSIFIED	derived 14z-180 (poke frames 3000-3000x1); awaiting the maintainer's ruling	control
-audit_rig_opening	ff8410	FIELDS:x	UNCLASSIFIED	derived 14z-180 (poke frames 2560-8690x121); awaiting the maintainer's ruling	main
-audit_stage_sweep	ff8100	DUMPS:f3000	UNCLASSIFIED	derived 14z-180 (poke frames 2150-2200x2); awaiting the maintainer's ruling	main
-audit_tenant_downwin	ff8850	FIELDS:p2hp	UNCLASSIFIED	derived 14z-180 (poke frames 3006-3006x1); awaiting the maintainer's ruling	main
-audit_tenant_timeout	ff8109	FIELDS:timer	UNCLASSIFIED	derived 14z-180 (poke frames 3300-3300x1); awaiting the maintainer's ruling	main
-audit_tenant_timeout	ff8450	FIELDS:p1hp	UNCLASSIFIED	derived 14z-180 (poke frames 3200-3200x1); awaiting the maintainer's ruling	main
-audit_voice_borrow	ff8782	RTAP:ff8782	UNCLASSIFIED	derived 14z-180 (poke frames 1400-1500x3); awaiting the maintainer's ruling	main
-test_advancing_guard	ff8410	FIELDS:p1x	UNCLASSIFIED	derived 14z-180 (poke frames 2670-5890x8); awaiting the maintainer's ruling	main
-test_advancing_guard	ff8782	FIELDS:id	UNCLASSIFIED	derived 14z-180 (poke frames 1400-1500x3); awaiting the maintainer's ruling	main
-test_advancing_guard	ff8810	FIELDS:p2x	UNCLASSIFIED	derived 14z-180 (poke frames 2670-5890x8); awaiting the maintainer's ruling	main
-test_advancing_guard	ff8850	FIELDS:p2hp	UNCLASSIFIED	derived 14z-180 (poke frames 2550-6550x11); awaiting the maintainer's ruling	main
-test_advancing_guard	ff8b82	FIELDS:p2id	UNCLASSIFIED	derived 14z-180 (poke frames 1400-1500x3); awaiting the maintainer's ruling	main
-test_don_immortal_native	ff8509	DUMPS:f2600	UNCLASSIFIED	derived 14z-180 (poke frames 2550-2550x1); awaiting the maintainer's ruling	main
-test_hitbox_encoding	ff8410	FIELDS:x	UNCLASSIFIED	derived 14z-180 (poke frames 2560-7395x30); awaiting the maintainer's ruling	main
-test_hitbox_encoding	ff8810	FIELDS:p2x	UNCLASSIFIED	derived 14z-180 (poke frames 2560-7395x30); awaiting the maintainer's ruling	main
-test_hitbox_encoding	ff8850	FIELDS:p2hp	UNCLASSIFIED	derived 14z-180 (poke frames 2550-8150x28); awaiting the maintainer's ruling	main
-test_hitbox_encoding	ff8850	WATCH:ff8850	UNCLASSIFIED	derived 14z-180 (poke frames 2550-8150x28); awaiting the maintainer's ruling	main
-test_hui_ex	ff8509	DUMPS:f$lastdump	UNCLASSIFIED	derived 14z-180 (poke frames 3000-4000x2); awaiting the maintainer's ruling	main
-test_hui_ex	ff8509	DUMPS:f3200	UNCLASSIFIED	derived 14z-180 (poke frames 3000-4000x2); awaiting the maintainer's ruling	main
-test_hui_ex	ff8509	DUMPS:f3900	UNCLASSIFIED	derived 14z-180 (poke frames 3000-4000x2); awaiting the maintainer's ruling	main
-test_killshread_es	ff8410	FIELDS:p1x	UNCLASSIFIED	derived 14z-180 (poke frames 2560-4560x8); awaiting the maintainer's ruling	main
+audit_column_shock	ff8850	FIELDS:hp	OBSERVES	ruled 2026-09-25 (14z-181): audit_column_shock.sh:228/236-242 the KO trace compares EVERY traced field every frame native vs ours; hp goes 1 -> 0 at the KO (the engine's), the pinned frames are equal on both legs by construction (no evidence, no harm)	main
+audit_column_shock	ff8850	FIELDS:p2hp	OBSERVES	ruled 2026-09-25 (14z-181): audit_column_shock.sh:181 hits = frames where p2hp DROPS (2791-2990), pin at 2826/2830 is the stage	main
+audit_column_shock	ff8852	FIELDS:white	OBSERVES	ruled 2026-09-25 (14z-181): as hp (:228/236-242)	main
+audit_defense_row_reads	ff8b82	RTAP:ff8b82	CONTROL-PLANT	ruled 2026-09-25 (14z-181): audit_defense_row_reads.sh:86 PLANT_POKE="2680:ff8b82:01" (the foreign-flavour control)	control
+audit_df_framework	ff8509	FIELDS:stocks	OBSERVES	ruled 2026-09-25 (14z-181): audit_df_framework.sh:119-122 cost = stocks_before(max after 3130) - stocks_after(onset+2) must be 1: the SPEND is the engine's	main
+audit_df_modes	ff8509	FIELDS:stock	OBSERVES	ruled 2026-09-25 (14z-181): audit_df_modes.sh:163 frozen row stock=<3250>-><3400>: the before half IS the pin (3), the after half the engine's spend; the row asserts the transition	main
+audit_df_moves	ff8509	FIELDS:stock	OBSERVES	ruled 2026-09-25 (14z-181): audit_df_moves.sh:180 VOID unless stock[lo-5] - stock[lo+60] == 1 (the activation SPENT one)	main
+audit_df_moves	ff8850	FIELDS:p2hp	OBSERVES	ruled 2026-09-25 (14z-181): audit_df_moves.sh:185/186/219/268 hits = p2hp DROPS between events	main
+audit_df_startup_invuln	ff8410	FIELDS:p1x	READS-BACK	ruled 2026-09-25 (14z-181): audit_df_startup_invuln.sh:316 dx=p2x-p1x appears only inside a message string; no assertion on x (pins :153, vanilla_join_rig.py:118/121) — label a rig record	main
+audit_df_startup_invuln	ff8450	FIELDS:p1hp	OBSERVES	ruled 2026-09-25 (14z-181): audit_df_startup_invuln.sh:312-313 drop = hp0 - min(p1hp after the attack): inside the window refused, outside landing	main
+audit_df_startup_invuln	ff8509	FIELDS:stocks	RETIRED	READS-BACK ruled 2026-09-25 (14z-181): only F1 :118 declares it; no line reads stocks — drop from F1; the column DROPPED 14z-181, so the finding no longer derives	main
+audit_df_startup_invuln	ff8810	FIELDS:p2x	READS-BACK	ruled 2026-09-25 (14z-181): as p1x (:316, message only)	main
+audit_don_ko_writer	ff8450	RTAP:ff8450	OBSERVES	ruled 2026-09-25 (14z-181): audit_don_ko_writer.sh:130 pokes HP to 5 (stage); :133 RTAP ff8450 with PC — asserts the ENGINE's kill commit (0xFFFF) and zero ported-window writers by PC	main
+audit_edge_cases	ff8450	FIELDS:p1hp	READS-BACK	ruled 2026-09-25 (14z-181): audit_edge_cases.sh:160 both_low = p1hp<=1 and p2hp<=1 is the STAGE GUARD (the pin was 1); the verdict is $FF8120's draw code — label the guard	main
+audit_edge_cases	ff8509	FIELDS:stk	OBSERVES	ruled 2026-09-25 (14z-181): audit_edge_cases.sh:180-181 fired = any DECREMENT of stk after 2886 (pin 3 at 2860/2880)	main
+audit_edge_cases	ff8850	FIELDS:p2hp	OBSERVES	ruled 2026-09-25 (14z-181): audit_edge_cases.sh:137 half = any p2hp == 144 (Phobos's throw RESTORES to half; pin was 1/2) — plus the :160 stage guard	main
+audit_entrance_draw	ff8410	FIELDS:x	OBSERVES	ruled 2026-09-25 (14z-181): audit_entrance_draw.sh:101 drive = 3 distinct x in f0..2545 — the window ENDS before the first pin (2565 = 2795-230)	main
+audit_guard_reentry	ff8410	FIELDS:x	RETIRED	READS-BACK ruled 2026-09-25 (14z-181): no line uses the x column (:156's x is a loop variable over frozen rows); sampled, never compared — drop from FIELDS; the column DROPPED 14z-181, so the finding no longer derives	main
+audit_legacy_pairings	ff8782	FIELDS:p1id	CONTROL-PLANT	ruled 2026-09-25 (14z-181): audit_legacy_pairings.sh:228/236-237 the :237 pokes belong to the leg named CONTROL_forced, "The live POSITIVE CONTROL" — the census read it as main (the leg name is not one of its keywords)	main
+audit_move_parity	ff8410	FIELDS:x	OBSERVES	ruled 2026-09-25 (14z-181): audit_move_parity.sh:231/237/470/473: x compared every frame EXCEPT the pin frames (the exclusion), the pins-ignored control proves the exclusion is live	main
+audit_move_parity	ff8509	FIELDS:stock	OBSERVES	ruled 2026-09-25 (14z-181): move_parity.py:95 stock is CUMULATIVE (compared as the delta since the event, i.e. the spend); :408/:438 2b reads the stock AT each event as a headroom guard (the killshread shape, but not frozen as a value) — the maintainer may prefer READS-BACK for 2b's read	main
+audit_move_parity	ff8850	FIELDS:p2hp	OBSERVES	ruled 2026-09-25 (14z-181): move_parity.py:84/95 p2hp CUMULATIVE = damage dealt since the event; pins re-set 0x120 every HP_PIN_EVERY	main
+audit_reaction_class_live	ff8454	RTAP:ff8454	CONTROL-PLANT	ruled 2026-09-25 (14z-181): audit_reaction_class_live.sh:76 PLANT_POKE="3000:ff8454:38"	control
+audit_rig_opening	ff8410	FIELDS:x	OBSERVES	ruled 2026-09-25 (14z-181): audit_rig_opening.sh:225/231/232: post-pin agreement with the pin frame EXCLUDED and 2.5 requiring an x the pin never wrote — the gate already refuses the echo	main
+audit_stage_sweep	ff8100	DUMPS:f3000	READS-BACK	ruled 2026-09-25 (14z-181): audit_stage_sweep.sh:100 sw = rd(dump_3000_ff8100) compared to the poked stage — the "poke landed and stuck" check; the OBSERVES half is the 90c2c0 palette distinctness, a different address — label the readback	main
+audit_tenant_downwin	ff8850	FIELDS:p2hp	OBSERVES	ruled 2026-09-25 (14z-181): audit_tenant_downwin.sh:121 round 2 spawns with p2hp == 0x120 (pin was 1)	main
+audit_tenant_timeout	ff8109	FIELDS:timer	OBSERVES	ruled 2026-09-25 (14z-181): audit_tenant_timeout.sh:99 any(timer == 0) (pin was 3)	main
+audit_tenant_timeout	ff8450	FIELDS:p1hp	OBSERVES	ruled 2026-09-25 (14z-181): audit_tenant_timeout.sh:139 rounds >= 1 and p1hp == 0x120 (the inv leg pinned 0x80)	main
+audit_voice_borrow	ff8782	RTAP:ff8782	OBSERVES	ruled 2026-09-25 (14z-181): audit_voice_borrow.sh:83 pokes at 1400-1500; :131 the tap WINDOW is 3984-4004 — the sampled window never contains the poke	main
+test_advancing_guard	ff8410	FIELDS:p1x	OBSERVES	ruled 2026-09-25 (14z-181): advancing_guard.py:89/104/109/110 the push = DELTAS of p1x against the list	main
+test_advancing_guard	ff8782	FIELDS:id	OBSERVES	ruled 2026-09-25 (14z-181): advancing_guard.py:63 ids = {(id,p2id)} — the identity guard the poke is for	main
+test_advancing_guard	ff8810	FIELDS:p2x	RETIRED	READS-BACK ruled 2026-09-25 (14z-181): advancing_guard.py never reads p2x (reader C: NOT MEASURED) — sampled, never compared; drop from FIELDS; the column DROPPED 14z-181, so the finding no longer derives	main
+test_advancing_guard	ff8850	FIELDS:p2hp	RETIRED	READS-BACK ruled 2026-09-25 (14z-181): advancing_guard.py never reads p2hp (reader C: NOT MEASURED) — drop from FIELDS; the column DROPPED 14z-181, so the finding no longer derives	main
+test_advancing_guard	ff8b82	FIELDS:p2id	OBSERVES	ruled 2026-09-25 (14z-181): advancing_guard.py:63 (identity guard)	main
+test_don_immortal_native	ff8509	DUMPS:f2600	READS-BACK	ruled 2026-09-25 (14z-181): test_don_immortal_native.sh:259 the f2600 ff8400 dump is read at +0x60 only (who was selected); ff8509 lies in the range and is never read — label	main
+test_hitbox_encoding	ff8410	FIELDS:x	OBSERVES	ruled 2026-09-25 (14z-181): test_hitbox_encoding.sh:163 hr.placed(r["x"],...) at each HIT frame (the fighter moved from the pin)	main
+test_hitbox_encoding	ff8810	FIELDS:p2x	OBSERVES	ruled 2026-09-25 (14z-181): test_hitbox_encoding.sh:165 vul = hr.placed(r["p2x"],...) at hit frames	main
+test_hitbox_encoding	ff8850	FIELDS:p2hp	OBSERVES	ruled 2026-09-25 (14z-181): test_hitbox_encoding.sh:175 hit_frames = p2hp DROPS	main
+test_hitbox_encoding	ff8850	WATCH:ff8850	OBSERVES	ruled 2026-09-25 (14z-181): test_hitbox_encoding.sh:107 WATCH="ff8850,6" is the -debug CPU write tap: every write must carry A3 = the record; a Lua poke has no A3, so the tap does not see the pins or the gate would be red — INFERRED from the gate's EXPECTS (:14, A3 on every tapped write) and its pass with the pins in place, not directly measured (rule-checker run 2026-09-25-147 Q1)	main
+test_hui_ex	ff8509	DUMPS:f$lastdump	OBSERVES	ruled 2026-09-25 (14z-181): test_hui_ex.sh:26 "STOCK CONSUMED (ff8509 decrements from the poked 9)"	main
+test_hui_ex	ff8509	DUMPS:f3200	OBSERVES	ruled 2026-09-25 (14z-181): same (the before dump)	main
+test_hui_ex	ff8509	DUMPS:f3900	OBSERVES	ruled 2026-09-25 (14z-181): same (the after dump)	main
+test_killshread_es	ff8410	FIELDS:p1x	RETIRED	READS-BACK ruled 2026-09-25 (14z-181): test_killshread_es.sh:101/103 the contact line carries cls/hp/white/stock — p1x is never compared or printed; drop from FIELDS; the column DROPPED 14z-181, so the finding no longer derives	main
 test_killshread_es	ff8509	FIELDS:stock	READS-BACK	the known case: name_moves.py pokes ff8509 := 09 sixty frames before every event of a meter part and the `stock` column samples it (the gate's header, rule-checker run 2026-09-22-91 Q3, maintainer-ruled 2026-09-22 to re-freeze as-is and record it); poke frames 2540-4540x8	main
-test_killshread_es	ff8810	FIELDS:p2x	UNCLASSIFIED	derived 14z-180 (poke frames 2560-4560x8); awaiting the maintainer's ruling	main
-test_killshread_es	ff8850	FIELDS:p2hp	UNCLASSIFIED	derived 14z-180 (poke frames 2550-4950x7); awaiting the maintainer's ruling	main
-test_ladder_tenant_vs_palette	90c140	DUMPS:f$ROUL	UNCLASSIFIED	derived 14z-180 (poke frames 2450-2650x2); awaiting the maintainer's ruling	main
-test_ladder_tenant_vs_palette	90c140	DUMPS:f$VS1P	UNCLASSIFIED	derived 14z-180 (poke frames 2450-2650x2); awaiting the maintainer's ruling	main
-test_ladder_tenant_vs_palette	90c140	DUMPS:f$VS2P	UNCLASSIFIED	derived 14z-180 (poke frames 2450-2650x2); awaiting the maintainer's ruling	main
-test_meter_gain	ff8850	FIELDS:p2hp	UNCLASSIFIED	derived 14z-180 (poke frames 2580-4980x6); awaiting the maintainer's ruling	main
-test_move_naming	ff8410	FIELDS:x	UNCLASSIFIED	derived 14z-180 (poke frames 2560-8690x166); awaiting the maintainer's ruling	main
-test_move_naming	ff8509	FIELDS:stock	UNCLASSIFIED	derived 14z-180 (poke frames 2540-8695x167); awaiting the maintainer's ruling	main
-test_move_naming	ff8810	FIELDS:p2x	UNCLASSIFIED	derived 14z-180 (poke frames 2560-8690x166); awaiting the maintainer's ruling	main
-test_move_naming	ff8850	FIELDS:p2hp	UNCLASSIFIED	derived 14z-180 (poke frames 2550-9145x34); awaiting the maintainer's ruling	main
-test_pyron_cosmo	ff8509	DUMPS:f$f	UNCLASSIFIED	derived 14z-180 (poke frames 3300-4100x3); awaiting the maintainer's ruling	main
-test_pyron_cosmo	ff8509	DUMPS:f3290	UNCLASSIFIED	derived 14z-180 (poke frames 3300-4100x3); awaiting the maintainer's ruling	main
-test_pyron_cosmo	ff8509	DUMPS:f3450	UNCLASSIFIED	derived 14z-180 (poke frames 3300-4100x3); awaiting the maintainer's ruling	main
-test_pyron_cosmo	ff8782	DUMPS:f$f	UNCLASSIFIED	derived 14z-180 (poke frames 1400-1500x3); awaiting the maintainer's ruling	main
-test_reactions	ff8410	FIELDS:x	UNCLASSIFIED	derived 14z-180 (poke frames 2560-8690x166); awaiting the maintainer's ruling	main
-test_reactions	ff8810	FIELDS:p2x	UNCLASSIFIED	derived 14z-180 (poke frames 2560-8690x166); awaiting the maintainer's ruling	main
-test_reactions	ff8850	FIELDS:p2hp	UNCLASSIFIED	derived 14z-180 (poke frames 2550-9145x34); awaiting the maintainer's ruling	main
-test_rehit_ring	ff8850	FIELDS:p2hp	UNCLASSIFIED	derived 14z-180 (poke frames 2580-4980x6); awaiting the maintainer's ruling	main
-test_vanilla_aerial_join	ff8410	FIELDS:p1x	UNCLASSIFIED	derived 14z-180 (poke frames 2370-4770x12); awaiting the maintainer's ruling	main
-test_vanilla_aerial_join	ff8782	FIELDS:id	UNCLASSIFIED	derived 14z-180 (poke frames 1400-1500x3); awaiting the maintainer's ruling	main
-test_vanilla_aerial_join	ff8810	FIELDS:p2x	UNCLASSIFIED	derived 14z-180 (poke frames 2370-4770x12); awaiting the maintainer's ruling	main
-test_vanilla_aerial_join	ff8850	FIELDS:p2hp	UNCLASSIFIED	derived 14z-180 (poke frames 2550-5350x8); awaiting the maintainer's ruling	main
-test_vanilla_aerial_join	ff8b82	FIELDS:p2id	UNCLASSIFIED	derived 14z-180 (poke frames 1400-1500x3); awaiting the maintainer's ruling	main
-test_vanilla_frame_join	ff8410	FIELDS:p1x	UNCLASSIFIED	derived 14z-180 (poke frames 2370-4770x12); awaiting the maintainer's ruling	main
-test_vanilla_frame_join	ff8782	FIELDS:id	UNCLASSIFIED	derived 14z-180 (poke frames 1400-1500x3); awaiting the maintainer's ruling	main
-test_vanilla_frame_join	ff8810	FIELDS:p2x	UNCLASSIFIED	derived 14z-180 (poke frames 2370-4770x12); awaiting the maintainer's ruling	main
-test_vanilla_frame_join	ff8850	FIELDS:p2hp	UNCLASSIFIED	derived 14z-180 (poke frames 2550-5350x14); awaiting the maintainer's ruling	main
-test_vanilla_frame_join	ff8b82	FIELDS:p2id	UNCLASSIFIED	derived 14z-180 (poke frames 1400-1500x3); awaiting the maintainer's ruling	main
-test_killshread_es	ff8850	FIELDS:p2white	UNCLASSIFIED	derived 2026-09-24; awaiting the maintainer's ruling	main
-test_reactions	ff8850	FIELDS:p2white	UNCLASSIFIED	derived 2026-09-24; awaiting the maintainer's ruling	main
+test_killshread_es	ff8810	FIELDS:p2x	RETIRED	READS-BACK ruled 2026-09-25 (14z-181): as p1x; the column DROPPED 14z-181, so the finding no longer derives	main
+test_killshread_es	ff8850	FIELDS:p2hp	OBSERVES	ruled 2026-09-25 (14z-181): test_killshread_es.sh:101 contact = p2hp DROP	main
+test_ladder_tenant_vs_palette	90c140	DUMPS:f$ROUL	READS-BACK	ruled 2026-09-25 (14z-181): no quoted line reads the ROUL 90c140 dump (:177-180 read VS1P) — label or drop the ROUL:90c140 range	main
+test_ladder_tenant_vs_palette	90c140	DUMPS:f$VS1P	OBSERVES	ruled 2026-09-25 (14z-181): test_ladder_tenant_vs_palette.sh:180 must(got == pool_row | 0xF000) on phobos_red too: the RED poke at 2450/2650 must have been OVERWRITTEN by the copy helper at the VS frame	main
+test_ladder_tenant_vs_palette	90c140	DUMPS:f$VS2P	CROSS-LEG	ruled 2026-09-25 (14z-181): test_ladder_tenant_vs_palette.sh:123 leg p2_ctl runs with POKES "" and is the only leg dumping at VS2P — the census joined another leg's poke to it	main
+test_meter_gain	ff8850	FIELDS:p2hp	OBSERVES	ruled 2026-09-25 (14z-181): meter_gain.py:50 + vanilla_join_rig.py:233/260 hits landed = p2hp DROPS in the event window (pins re-set 0x120 at event-20)	main
+test_move_naming	ff8410	FIELDS:x	RETIRED	READS-BACK ruled 2026-09-25 (14z-181): no use in the gate (the verdict is the entered CHAIN and P2's id); name_moves.py:905 prints it in a diagnostic listing only — drop from FIELDS or label; the column DROPPED 14z-181, so the finding no longer derives	main
+test_move_naming	ff8509	FIELDS:stock	RETIRED	READS-BACK ruled 2026-09-25 (14z-181): as x (name_moves.py:886/905 diagnostic only) — the killshread shape; the column DROPPED 14z-181, so the finding no longer derives	main
+test_move_naming	ff8810	FIELDS:p2x	RETIRED	READS-BACK ruled 2026-09-25 (14z-181): as x; the column DROPPED 14z-181, so the finding no longer derives	main
+test_move_naming	ff8850	FIELDS:p2hp	RETIRED	READS-BACK ruled 2026-09-25 (14z-181): no use in the gate — drop from FIELDS or label; the column DROPPED 14z-181, so the finding no longer derives	main
+test_pyron_cosmo	ff8509	DUMPS:f$f	READS-BACK	ruled 2026-09-25 (14z-181): test_pyron_cosmo.sh:157-159 the $f ff8400 dump is read at [0x382] only; ff8509 (offset 0x109) never read — label	main
+test_pyron_cosmo	ff8509	DUMPS:f3290	OBSERVES	ruled 2026-09-25 (14z-181): test_pyron_cosmo.sh:145-155 before/after = dump[0x09]; FAIL "the EX did not fire (no stock spent)" — the SPEND	main
+test_pyron_cosmo	ff8509	DUMPS:f3450	OBSERVES	ruled 2026-09-25 (14z-181): same	main
+test_pyron_cosmo	ff8782	DUMPS:f$f	READS-BACK	ruled 2026-09-25 (14z-181) as proposed, the proposal CORRECTED the same sitting after rule-checker run 2026-09-25-147: test_pyron_cosmo.sh:122 judges survival by +0x382 "still holding 0x11" — the POKED id read back as the no-reset stage guard (a rig record, labelled in the header); the stock SPEND at 3290/3450 is the OBSERVES read	main
+test_reactions	ff8410	FIELDS:x	RETIRED	READS-BACK ruled 2026-09-25 (14z-181): reaction_map.py:80 contacts from p2hp/p2white/p2frz; x never read — drop from FIELDS; the column DROPPED 14z-181, so the finding no longer derives	main
+test_reactions	ff8810	FIELDS:p2x	RETIRED	READS-BACK ruled 2026-09-25 (14z-181): as x; the column DROPPED 14z-181, so the finding no longer derives	main
+test_reactions	ff8850	FIELDS:p2hp	OBSERVES	ruled 2026-09-25 (14z-181): reaction_map.py:80 contact = p2hp DROP	main
+test_rehit_ring	ff8850	FIELDS:p2hp	OBSERVES	ruled 2026-09-25 (14z-181): rehit_ring.py:90 + vanilla_join_rig.py:233 contacts = p2hp DROPS	main
+test_vanilla_aerial_join	ff8410	FIELDS:p1x	RETIRED	READS-BACK ruled 2026-09-25 (14z-181): no use line in the gate or vanilla_join_rig.py beyond the pins (:118/121) — drop from FIELDS; the column DROPPED 14z-181, so the finding no longer derives	main
+test_vanilla_aerial_join	ff8782	FIELDS:id	RETIRED	READS-BACK ruled 2026-09-25 (14z-181): no line in the gate or vanilla_join_rig.py reads id (reader E C7/C9 NOT MEASURED) — drop from FIELDS; NOTE for the maintainer: the forced pick is never asserted here; the column DROPPED 14z-181, so the finding no longer derives	main
+test_vanilla_aerial_join	ff8810	FIELDS:p2x	RETIRED	READS-BACK ruled 2026-09-25 (14z-181): as p1x; the column DROPPED 14z-181, so the finding no longer derives	main
+test_vanilla_aerial_join	ff8850	FIELDS:p2hp	RETIRED	READS-BACK ruled 2026-09-25 (14z-181): the aerial gate runs no hit set (C7: only the FIELDS line matches p2hp|hit_) — drop from FIELDS; the column DROPPED 14z-181, so the finding no longer derives	main
+test_vanilla_aerial_join	ff8b82	FIELDS:p2id	RETIRED	READS-BACK ruled 2026-09-25 (14z-181): as id; the column DROPPED 14z-181, so the finding no longer derives	main
+test_vanilla_frame_join	ff8410	FIELDS:p1x	RETIRED	READS-BACK ruled 2026-09-25 (14z-181): no use line — drop from FIELDS; the column DROPPED 14z-181, so the finding no longer derives	main
+test_vanilla_frame_join	ff8782	FIELDS:id	RETIRED	READS-BACK ruled 2026-09-25 (14z-181): no line reads id (C8/C9) — drop from FIELDS; same NOTE; the column DROPPED 14z-181, so the finding no longer derives	main
+test_vanilla_frame_join	ff8810	FIELDS:p2x	RETIRED	READS-BACK ruled 2026-09-25 (14z-181): as p1x; the column DROPPED 14z-181, so the finding no longer derives	main
+test_vanilla_frame_join	ff8850	FIELDS:p2hp	OBSERVES	ruled 2026-09-25 (14z-181): test_vanilla_frame_join.sh:168 the hit leg; vanilla_join_rig.py:233/260 hit COUNT and damage = p2hp DROPS (the 90 frozen rows)	main
+test_vanilla_frame_join	ff8b82	FIELDS:p2id	RETIRED	READS-BACK ruled 2026-09-25 (14z-181): as id; the column DROPPED 14z-181, so the finding no longer derives	main
+test_killshread_es	ff8850	FIELDS:p2white	OBSERVES	ruled 2026-09-25 (14z-181): test_killshread_es.sh:101 contact = p2white DROP	main
+test_reactions	ff8850	FIELDS:p2white	OBSERVES	ruled 2026-09-25 (14z-181): reaction_map.py:80 contact = p2white DROP	main

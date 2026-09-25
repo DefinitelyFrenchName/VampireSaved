@@ -210,7 +210,7 @@ the suite runners and their own ground truth. 27 of 27 described.
 
 ### `test_poke_readback.sh` — test, ci_portable
 
-**WHAT:** the census of tools/audit_poke_readback.py — for every tests/ci_emulator.tsv gate, each address the gate's rig POKES (literal `frame:addr:hex` tokens and the pokes of the name_moves / vanilla_join_rig schedules it generates) that a SAMPLE of the same gate reads (FIELDS, DUMPS, TAP/WATCH/RTAP, FBNEO_HTAP) — equals the live rows of the frozen tests/expected/poke_readback.tsv: every derived finding has a row with the census's LEG (main / control / mixed — a control leg's plant reads its poke back by design), every non-RETIRED row still derives, a READS-BACK row never silently disappears, and the known positive case (test_killshread_es's `stock` column over the rig's ff8509 poke) derives and is classed READS-BACK.
+**WHAT:** the census of tools/audit_poke_readback.py — for every tests/ci_emulator.tsv gate, each address the gate's rig POKES (literal `frame:addr:hex` tokens and the pokes of the name_moves / vanilla_join_rig schedules it generates) that a SAMPLE of the same gate reads (FIELDS, DUMPS, TAP/WATCH/RTAP, FBNEO_HTAP) — equals the live rows of the frozen tests/expected/poke_readback.tsv: every derived finding has a row with the census's LEG (main / control / mixed — a control leg's plant reads its poke back by design), every non-RETIRED row still derives, a READS-BACK row never silently disappears, and the known positive case (test_killshread_es's `stock` column over the rig's ff8509 poke) derives and is classed READS-BACK. The classes are OBSERVES, READS-BACK, CONTROL-PLANT (a control leg's plant), CROSS-LEG (a poke joined to another leg's dump) and RETIRED — ruled 2026-09-25 (14z-181).
 
 **HOW:** the tool runs over the tree (and, for the controls, over a copy with one gate perturbed); the gate joins its output with the frozen table by (gate, address, sample); a finding without a row, a live row without a finding, or a mis-classed known case is a red.
 
@@ -2374,11 +2374,11 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 ### `audit_df_moves.sh` — audit, emulator
 
-**WHAT:** the tenants' moves INSIDE their Dark Force, ours (Change, P+K) against native (the vs2 personal-Dark-Force EX install), frozen as measured: all 29 in-DF events match in ordered hits and damage but for the known remaps, and the gauge differs by the two ruled rules — with the mode proven ENTERED on both legs at every activation.
+**WHAT:** the tenants' moves INSIDE their Dark Force, ours (Change, P+K) against native (the vs2 personal-Dark-Force EX install), frozen as measured: all 29 in-DF events match in ordered hits and damage but for the known remaps, and the gauge differs by the two ruled rules — with the mode proven ENTERED on both legs at every activation. Since 14z-181 also the CONTACT group (#109's folded leg): Phobos's beams with P2 grounded at a near pin and jumping into the band, far and near, its own part.
 
-**HOW:** 10 legs in parallel on MAME, the #136 in-DF events re-run in groups of at most two per activation (110 frames after it, stocks re-poked, groups spaced past the longer mode), both legs' ordered hits (damage, class), gauge steps, palette page and RNG reads compared; six controls (the mode lost, an idle leg, a blind palette, a dead RNG pin, a moved form, a dropped hit) each must be refused.
+**HOW:** the legs in parallel on MAME, the #136 in-DF events re-run ONE per activation (110 frames after it, stocks re-poked, groups spaced past the longer mode; no rig write of any kind inside a compared window since 14z-181), both legs' ordered hits (damage, class), gauge steps, palette page and RNG reads compared; nine controls (the mode lost, an idle leg, a blind palette, a dead RNG pin, a moved form, a dropped hit, an HP pin inside a compared window, the native leg unpinned, a poke inside the sword window) each must be refused. `CAPTURE=<dir>` also snapshots the CONTACT group's events at their hit frames on both legs.
 
-**EXPECTS:** SAME on every event but the frozen DIFFER rows, every activation entered on both legs (else VOID), the six controls failing. Not shown: that the named move came out AS that move — the printed state paths say what it did.
+**EXPECTS:** SAME on every event but the frozen DIFFER rows, every activation entered on both legs (else VOID), the nine controls failing. Not shown: that the named move came out AS that move — the printed state paths say what it did.
 
 ### `audit_df_startup_invuln.sh` — audit, emulator
 

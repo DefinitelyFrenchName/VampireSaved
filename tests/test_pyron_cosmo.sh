@@ -12,6 +12,7 @@
 # EXPECTS: static bytes right, 0 out-of-range reads against a live control, no reset and the
 #   EX firing. The withdrawn 14z-74 engine-word fix is recorded in the header: right effect,
 #   wrong byte.
+# POKE READ-BACK (ruled 2026-09-25 (14z-181), tests/expected/poke_readback.tsv): the $f ff8400-ff87ff dump is read at +0x382 only — the no-reset guard judges survival by the POKED id still holding 0x11 (:122), a stage guard reading the poke back (READS-BACK, a rig record); ff8509 inside it is never read from that dump (READS-BACK, a rig record) — the stock SPEND is read from the ff8500 dumps at 3290/3450 (OBSERVES).
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/decrypt_cache.sh tests/lua/replay.lua
 #   tests/replays/pyron/72_pyron_cosmo_2p.rpl tools/run_mame.sh tools/run_replay_mame.sh
 #   tools/setup_mame.sh

@@ -14,7 +14,7 @@ evidence the poke landed, not evidence about the engine's meter (rule-checker ru
 2026-09-22-91, Q3; the gate's header says so). A value poked BEFORE an event and read
 AFTER it can be a legitimate observation (the poke sets the stage, the game changes
 it, the gate measures the change), so every intersection is a FINDING for a human to
-classify — OBSERVES or READS-BACK — never a verdict of this tool.
+classify — OBSERVES, READS-BACK, CONTROL-PLANT or CROSS-LEG (ruled 2026-09-25, 14z-181) — never a verdict of this tool.
 
 WHAT IT READS, per registry gate (tests/ci_emulator.tsv):
   POKES   literal `frame:addr:hexbytes` tokens anywhere in the script's non-comment

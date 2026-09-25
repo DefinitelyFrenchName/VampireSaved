@@ -12,6 +12,7 @@
 #   and near rows.
 # EXPECTS: every event fires, the 180 rows equal to the frozen slot map, the out-of-tree
 #   hash equal; the swapped rows fail.
+# POKE READ-BACK (ruled 2026-09-25 (14z-181), tests/expected/poke_readback.tsv): the `p1x`/`p2x` (ff8410/ff8810) and `id`/`p2id` (ff8782/ff8b82) columns — rig pokes — were sampled and never compared — DROPPED; `p2hp` is the hit set's signal (OBSERVES). That the forced pick is not asserted here is a separate, unruled question.
 # FOLLOWS: emu/mame-patches/ tests/expected/vanilla_hit_damage.sha256
 #   tests/expected/vanilla_normal_slots.tsv tests/lib/controls.sh tests/lib/measures.sh tests/lib/decrypt_cache.sh
 #   tests/lua/field_trace.lua tools/run_mame.sh tools/setup_mame.sh
@@ -95,7 +96,7 @@ fi
 # tab:id — the sheet tab beside the vsavj character id (STATE 14z-124)
 ALL="BU:0x00 DE:0x01 GA:0x02 VI:0x03 ZA:0x04 MO:0x05 AN:0x06 FE:0x07 BI:0x08 AU:0x09 SA:0x0a QB:0x0c LE:0x0d LI:0x0e JE:0x0f"
 WANT="${CHARS:-}"
-FIELDS="ff8410:w:p1x,ff840b:b:p1face,ff841c:l:node,ff8420:b:cnt,ff8810:w:p2x,ff8850:w:p2hp,ff8782:b:id,ff8b82:b:p2id"
+FIELDS="ff840b:b:p1face,ff841c:l:node,ff8420:b:cnt,ff8850:w:p2hp"
 
 echo "== test_vanilla_frame_join: the standing-normal slot map, measured on vsavj =="
 

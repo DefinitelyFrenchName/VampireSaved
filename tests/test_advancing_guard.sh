@@ -15,6 +15,7 @@
 # EXPECTS: the frozen per-event lines and the structural rules (weights and threshold 10 on
 #   vs2, count and the RNG on vsavj, steps equal to the list, the attacker pushed AWAY,
 #   Anakaris inert); a red is the mechanic or threshold moving.
+# POKE READ-BACK (ruled 2026-09-25 (14z-181), tests/expected/poke_readback.tsv): the `p2x` (ff8810) and `p2hp` (ff8850) columns, both rig pins, were sampled and never read by tools/advancing_guard.py — DROPPED.
 # FOLLOWS: emu/mame-patches/ tests/expected/advancing_guard.txt tests/lib/decrypt_cache.sh
 #   tests/lua/field_trace.lua tests/replays/ tools/advancing_guard.py tools/name_moves.py
 #   tools/run_mame.sh tools/setup_mame.sh
@@ -146,7 +147,7 @@ PY
 echo "== 3. the four legs"
 POKES="$(python3 -c "import json;print(';'.join(json.load(open('$W/r.json'))['pokes']))")"
 FR="$(python3 -c "import json;print(json.load(open('$W/r.json'))['frames'])")"
-FIELDS="ff8410:w:p1x,ff840b:b:p1face,ff845d:b:p1_5d,ff8459:b:p1_59,ff8585:b:p1_185,ff85b0:w:p1_1b0,ff8810:w:p2x,ff8970:b:p2_170,ff8971:b:p2_171,ff8984:b:p2_184,ff89ab:b:p2_1ab,ff8bb5:b:p2_3b5,ff885c:b:p2_5c,ff8926:b:p2_126,ff8850:w:p2hp,ff8854:b:p2cls,ff8782:b:id,ff8b82:b:p2id"
+FIELDS="ff8410:w:p1x,ff840b:b:p1face,ff845d:b:p1_5d,ff8459:b:p1_59,ff8585:b:p1_185,ff85b0:w:p1_1b0,ff8970:b:p2_170,ff8971:b:p2_171,ff8984:b:p2_184,ff89ab:b:p2_1ab,ff8bb5:b:p2_3b5,ff885c:b:p2_5c,ff8926:b:p2_126,ff8854:b:p2cls,ff8782:b:id,ff8b82:b:p2id"
 leg() {  # name set p2id
     mkdir -p "$W/$1"
     ( cd "$W/$1" && MAME_SANDBOX="$W/$1/sb" REPLAY="$W/r.rpl" POKES="$(echo "$POKES" | sed "s/ff8b82:13/ff8b82:$3/g")" FIELDS="$FIELDS" FIELD_OUT="$W/$1/t.txt" FIELD_FROM=2300 FIELD_TO="$FR" FRAMES="$FR" \

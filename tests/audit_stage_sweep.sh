@@ -11,6 +11,7 @@
 # EXPECTS: 37 legs: the stage word reads the poked value, P2 at 0x120 then damaged, run
 #   complete; the sweep produces at least 8 distinct stage-palette blocks. A red names the
 #   tenant and stage.
+# POKE READ-BACK (ruled 2026-09-25 (14z-181), tests/expected/poke_readback.tsv): the f3000 dump of ff8100 reads the poked stage word back (READS-BACK — the "poke landed and stuck" check, a rig record); the venue evidence is the 90c2c0 palette distinctness.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua
 #   tests/replays/judge/02_throw.rpl tools/run_mame.sh tools/setup_mame.sh
 #

@@ -12,6 +12,7 @@
 # EXPECTS: ours == native in every cell, both pins proven held by each leg's own dumps; the
 #   three controls fail as they must. Testimony has no place here: every constant is
 #   measured in the run.
+# POKE READ-BACK (ruled 2026-09-25 (14z-181), tests/expected/poke_readback.tsv): the f2600 ff8400-ff8600 dump is read at +0x60 only (who was selected); ff8509, the ES stock poke, lies inside the range and is never read (READS-BACK, a rig record).
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/roster_pairings/bases.tsv
 #   tests/lib/controls.sh tests/lua/replay.lua tests/lua/tap_writes.lua tests/replays/
 #   tools/run_mame.sh tools/setup_mame.sh

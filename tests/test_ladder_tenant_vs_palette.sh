@@ -14,6 +14,7 @@
 # EXPECTS: one probe hit per 1P leg with the right addresses, zero on the 2P leg, the row
 #   equal to pool | 0xF000, only the tag box changing under the red poke, 0 px differing on
 #   the VS screen. The cosmetic roulette tag (base name and colours) is recorded, not fixed.
+# POKE READ-BACK (ruled 2026-09-25 (14z-181), tests/expected/poke_readback.tsv): the ROUL:90c140 dump is never read (READS-BACK, a rig record; VS1P is the read that asserts the red poke was overwritten — OBSERVES); the VS2P:90c140 dump is the p2_ctl leg's, which runs with no poke — the census joins another leg's poke to it (CROSS-LEG).
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ladder_tenant_vs_palette.txt
 #   tests/lua/replay_guard.lua tests/replays/109_2p_don_vs_phobos.rpl
 #   tests/replays/111_don_arcade_vs_screen.rpl tools/run_mame.sh tools/run_replay_guarded.sh

@@ -12,7 +12,8 @@
 #   (main / control / mixed — a control leg's plant reads its poke back by design), every
 #   non-RETIRED row still derives, a READS-BACK row never silently disappears, and the known positive case
 #   (test_killshread_es's `stock` column over the rig's ff8509 poke) derives and is classed
-#   READS-BACK.
+#   READS-BACK. The classes are OBSERVES, READS-BACK, CONTROL-PLANT (a control leg's plant), CROSS-LEG
+#   (a poke joined to another leg's dump) and RETIRED — ruled 2026-09-25 (14z-181).
 # HOW: the tool runs over the tree (and, for the controls, over a copy with one gate perturbed);
 #   the gate joins its output with the frozen table by (gate, address, sample); a finding
 #   without a row, a live row without a finding, or a mis-classed known case is a red.
@@ -110,7 +111,7 @@ if grep -qx "test_killshread_es	ff8509	FIELDS:stock" "$W/got.tsv"; then
     cls="$(awk -F'\t' '$1=="test_killshread_es" && $2=="ff8509" && $3=="FIELDS:stock" {print $4}' "$EXP")"
     [ "$cls" = READS-BACK ] && ok "derived and classed READS-BACK" || bad "derived but classed '$cls' — the ruled case must read READS-BACK"
 else bad "the known case did NOT derive — the census is blind to its positive control"; fi
-for c in UNCLASSIFIED OBSERVES READS-BACK RETIRED; do printf '  %-13s %s\n' "$c" "$(awk -F'\t' -v c="$c" '!/^#/ && $4==c' "$EXP" | wc -l | tr -d ' ')"; done
+for c in UNCLASSIFIED OBSERVES READS-BACK CONTROL-PLANT CROSS-LEG RETIRED; do printf '  %-13s %s\n' "$c" "$(awk -F'\t' -v c="$c" '!/^#/ && $4==c' "$EXP" | wc -l | tr -d ' ')"; done
 
 if [ -z "$VS_CTL" ]; then
     echo "== 3. controls"

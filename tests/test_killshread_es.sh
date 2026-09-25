@@ -16,6 +16,7 @@
 #   `stock` COLUMN READS THE RIG'S OWN POKE BACK (the generator tops the stock up before
 #   every event), never the engine's meter — recorded in the header and PROVENANCE; the
 #   ES/normal distinction here rests on the wave counts (#171 shape 4).
+# POKE READ-BACK (ruled 2026-09-25 (14z-181), tests/expected/poke_readback.tsv): the `p1x`/`p2x` columns (ff8410/ff8810, the rig's pins) were sampled and never compared or printed — DROPPED; `p2hp`/`p2white` are the contact signal (OBSERVES).
 # FOLLOWS: emu/mame-patches/ tests/expected/killshread_es.txt tests/lua/field_trace.lua
 #   tests/replays/ tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh
 #
@@ -79,7 +80,7 @@ cmp -s "$W/r.rpl" tests/replays/naming/donovan_12.rpl && cmp -s "$W/r.json" test
 echo "== 2. the native leg"
 POKES="$(python3 -c "import json;print(';'.join(json.load(open('$W/r.json'))['pokes']))")"
 FR="$(python3 -c "import json;print(json.load(open('$W/r.json'))['frames'])")"
-FIELDS="ff8410:w:p1x,ff8810:w:p2x,ff8850:w:p2hp,ff8852:w:p2white,ff8854:b:cls,ff885c:b:frz,ff8509:b:stock,ff8782:b:id,ff8b82:b:p2id"
+FIELDS="ff8850:w:p2hp,ff8852:w:p2white,ff8854:b:cls,ff885c:b:frz,ff8509:b:stock,ff8782:b:id,ff8b82:b:p2id"
 ( cd "$W" && MAME_SANDBOX="$W/sb" REPLAY="$W/r.rpl" POKES="$POKES" FIELDS="$FIELDS" FIELD_OUT="$W/t.txt" FIELD_FROM=2300 FIELD_TO="$FR" FRAMES="$FR" \
   "$REPO/tools/run_mame.sh" vsav2 -autoboot_script "$REPO/tests/lua/field_trace.lua" > "$W/l.log" 2>&1 ) </dev/null
 [ -s "$W/t.txt" ] || bad "no samples"

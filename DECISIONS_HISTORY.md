@@ -27,6 +27,35 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-25 (14z-181) — #171 Q6: the 73 poke read-back findings, classed as proposed
+
+**The STATE.md "Decisions pending" entry, moved verbatim:**
+
+- **#171 slice Q6 — the 73 UNCLASSIFIED poke read-back findings (opened 14z-180, 2026-09-24).**
+  `tests/expected/poke_readback.tsv` lists every gate that SAMPLES an address its own rig
+  POKES (74 findings over 31 emulator gates, derived by `tools/audit_poke_readback.py`).
+  One is ruled: the killshread `stock` column, READS-BACK (2026-09-22). The other 73 need a
+  ruling each — **OBSERVES** (the poke sets the stage, the game changes it, the gate measures
+  the change: the row stays and grows the class) or **READS-BACK** (the column records the rig,
+  not the engine: it is dropped from the gate's compare or labelled a rig record in its
+  header, then the row shrinks the class). Recommendation: rule by family of poke — the
+  position pins (`ff8410`/`ff8810`, poked 40 frames before an event and sampled as `p1x`/`p2x`)
+  and the P2 HP pins (`ff8850`) are OBSERVES wherever the gate asserts a CHANGE after the pin,
+  READS-BACK wherever it asserts the pinned value itself; the id pokes (`ff8782`/`ff8b82`) sampled
+  as an identity guard are OBSERVES (the guard is what the poke is for); the stock top-ups
+  (`ff8509`) sampled as a meter reading are READS-BACK, the killshread shape. The table is the
+  list; this entry is the pointer. Nothing a player feels changes by the ruling — what changes
+  is what a gate CLAIMS. Two of the 73 sit on a CONTROL leg (`leg` column: a known-bad plant
+  that reads its poke back by design — `audit_defense_row_reads` ff8b82, `audit_reaction_class_live`
+  ff8454); the recommendation for those is a class of their own, CONTROL-PLANT, if the maintainer
+  wants them off the list rather than ruled one by one.
+
+**What was put (the ruling packet, `build/agent181/poke_rulings_packet_14z181.tsv`, one row per UNCLASSIFIED finding of `tests/expected/poke_readback.tsv`, every class taken from the gate's own compare as five readers quoted it — A, B, C, D and a follow-up E; verbatim reports `build/agent181/worker_reports_verbatim/`):** four classes, not two — **OBSERVES** for 41 rows *(CORRECTED the same sitting after rule-checker run 2026-09-25-147 Q1: `test_pyron_cosmo` ff8782 in the block dump is a stage guard reading the poked id back — `test_pyron_cosmo.sh:122` — so 40 OBSERVES / 29 READS-BACK; the ruling "as proposed" is applied to the corrected proposal, the maintainer told)* (the gate asserts a CHANGE after the pin, or samples a window the pin never touches: HP drops as the hit signal, stock SPENT, position after the pin with the pin frames excluded, tap windows outside the poke frames, identity guards); **READS-BACK** for 28 rows in three sub-shapes (2 stage guards asserting the pinned value — `audit_edge_cases` p1hp, `audit_stage_sweep` f3000; 2 printed-only — `audit_df_startup_invuln` p1x/p2x; 24 sampled and NEVER compared — `audit_df_startup_invuln` stocks, `audit_guard_reentry` x, `test_advancing_guard` p2x/p2hp, `test_killshread_es` p1x/p2x, `test_move_naming` x/stock/p2x/p2hp, `test_reactions` x/p2x, `test_vanilla_aerial_join` p1x/p2x/id/p2id/p2hp, `test_vanilla_frame_join` p1x/p2x/id/p2id, `test_don_immortal_native` f2600, `test_pyron_cosmo` ff8509 in the block dump, `test_ladder_tenant_vs_palette` ROUL — remedy: drop from FIELDS/DUMPS, or label where the dump serves another read); **CONTROL-PLANT** for 3 rows (`audit_defense_row_reads` ff8b82, `audit_reaction_class_live` ff8454, and `audit_legacy_pairings` p1id, whose poke belongs to the leg the script calls "the live POSITIVE CONTROL" under the name `CONTROL_forced`, which the census's leg heuristic does not know); **CROSS-LEG** for 1 row (`test_ladder_tenant_vs_palette` VS2P, dumped only on the leg that runs with no poke — the census joined another leg's poke to it). Three judgment calls were flagged: `audit_move_parity` stock (compared as the delta since each event, the spend; section 2b also reads the stock at each event as a headroom guard, the ruled killshread shape); the two vanilla join gates sample both ids and never assert them, so their forced picks are unproven by the gate itself; `audit_column_shock`'s KO trace compares the pinned frames on both legs (no evidence, no harm). The rulings asked: the 41 OBSERVES as proposed or with exceptions; the 28 READS-BACK as proposed, and whether "drop from FIELDS" is the remedy for the 24 never-compared columns; whether CONTROL-PLANT and CROSS-LEG become classes in the table or fold into READS-BACK.
+
+**Ruling (verbatim):** *"The 73 poke read-back rulings are in front of you -> I agree with the proposal"*
+
+**What it means.** Every row takes the proposed class; CONTROL-PLANT and CROSS-LEG are classes of the table (each a census limitation as much as a ruling, recorded in the table's header and the tool's); the 24 never-compared columns are DROPPED from their gates' FIELDS/DUMPS where the sample serves no other read and LABELLED in the header where it does (the three block dumps), the 4 guard/printed rows labelled; a dropped column's row goes RETIRED with the ruling named (READS-BACK shrinks only). Nothing a player feels changes. The two vanilla join gates' unasserted forced picks are a separate question, not ruled here.
+
 ## Ruled 2026-09-24 (14z-180) — #171 gate qualification: the scope's six slices, a seventh the maintainer added first, and six answers
 
 **The questions put**, from `docs/project/gate_qualification_scope.md` §6 after rule-checker run

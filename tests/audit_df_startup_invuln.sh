@@ -14,6 +14,7 @@
 #   perturbs a frozen arm value.
 # EXPECTS: every frozen arm as ruled, the shells' merged traces byte-identical to pristine,
 #   the inside contact refused and the outside one landing; the perturbed value fails.
+# POKE READ-BACK (ruled 2026-09-25 (14z-181), tests/expected/poke_readback.tsv): F1's `stocks` column (ff8509, the rig's own top-up) was sampled and never read — DROPPED; F2's `p1x`/`p2x` (ff8410/ff8810, pinned at 3030/4030) appear only in the contact message, never asserted — a rig record, READS-BACK.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/df_startup_invuln.tsv
 #   tests/lib/controls.sh tests/lib/decrypt_cache.sh tests/lua/field_trace.lua
 #   tests/replays/df/97_df_mech.rpl tests/replays/df/98_df_startup_contact.rpl
@@ -115,7 +116,7 @@ decrypt_view vsavj "$W/vj_op.bin" "$W/vj_data.bin"
 
 RPL97="$REPO/tests/replays/df/97_df_mech.rpl"
 RPL98="$REPO/tests/replays/df/98_df_startup_contact.rpl"
-F1="ff802e:b:df,ff8547:b:inv,ff8543:b:thr,ff8406:b:seq,ff8407:b:sub,ff8509:b:stocks"
+F1="ff802e:b:df,ff8547:b:inv,ff8543:b:thr,ff8406:b:seq,ff8407:b:sub"
 F2="ff802e:b:df,ff8547:b:inv,ff8450:w:p1hp,ff8406:b:p1seq,ff881c:l:p2node,ff8806:b:p2seq,ff8410:w:p1x,ff8810:w:p2x,ff8414:w:p1y"
 
 njobs=0

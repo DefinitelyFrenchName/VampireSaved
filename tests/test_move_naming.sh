@@ -12,6 +12,7 @@
 #   neighbour's.
 # EXPECTS: every event's entered-chain list equal to the frozen line, every TOML seq
 #   entered, P2 = 0x01 at every event and never in b:0x71/b:0x74; the neighbour swap fails.
+# POKE READ-BACK (ruled 2026-09-25 (14z-181), tests/expected/poke_readback.tsv): the `stock` (ff8509), `x` (ff8410), `p2hp` (ff8850) and `p2x` (ff8810) columns — every one a rig pin — were sampled and never compared (name_moves prints them in a diagnostic listing only) — DROPPED.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/lib/decrypt_cache.sh
 #   tests/lua/field_trace.lua tests/replays/ tools/anim_nodes.py tools/move_parity.py
 #   tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh
@@ -133,7 +134,7 @@ for p in $PARTS; do
     POKES="$(python3 -c "import json;print(';'.join(json.load(open('$W/r_$p.json'))['pokes']))")"
     FR="$(python3 -c "import json;print(json.load(open('$W/r_$p.json'))['frames'])")"
     ( cd "$W" && MAME_SANDBOX="$W/sb$p" REPLAY="$W/r_$p.rpl" POKES="$POKES" \
-      FIELDS="ff841c:l:node,ff8420:b:cnt,ff8406:b:seq,ff8407:b:sub,ff8509:b:stock,ff8410:w:x,ff8414:w:y,ff8850:w:p2hp,ff8109:b:timer,ff8782:b:id,ff881c:l:p2node,ff802e:b:df,ff8810:w:p2x,ff840b:b:face,ff8b82:b:p2id" \
+      FIELDS="ff841c:l:node,ff8420:b:cnt,ff8406:b:seq,ff8407:b:sub,ff8414:w:y,ff8109:b:timer,ff8782:b:id,ff881c:l:p2node,ff802e:b:df,ff840b:b:face,ff8b82:b:p2id" \
       FIELD_OUT="$W/trace_$p.txt" FIELD_FROM=2300 FIELD_TO="$FR" FRAMES="$FR" \
       "$REPO/tools/run_mame.sh" vsav2 -autoboot_script "$REPO/tests/lua/field_trace.lua" > "$W/out_$p.log" 2>&1 ) </dev/null &
 done

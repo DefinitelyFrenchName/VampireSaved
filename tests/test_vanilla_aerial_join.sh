@@ -13,6 +13,7 @@
 #   byte-identically; the control swaps one character's neutral and forward rows.
 # EXPECTS: every event fires (never UNFIRED but Anakaris's declared six), the 360 rows equal
 #   to the frozen map, the structural rule per direction; the swapped rows fail.
+# POKE READ-BACK (ruled 2026-09-25 (14z-181), tests/expected/poke_readback.tsv): the `p1x`/`p2x` (ff8410/ff8810), `p2hp` (ff8850) and `id`/`p2id` (ff8782/ff8b82) columns — all rig pokes — were sampled and never compared (this gate runs no hit set and asserts no identity) — DROPPED. That the forced pick is not asserted here is a separate, unruled question.
 # FOLLOWS: emu/mame-patches/ tests/expected/vanilla_aerial_slots.tsv tests/lib/controls.sh
 #   tests/lib/decrypt_cache.sh tests/lua/field_trace.lua tools/run_mame.sh
 #   tools/setup_mame.sh tools/vanilla_join_rig.py
@@ -84,7 +85,7 @@ fi
 
 ALL="BU:0x00 DE:0x01 GA:0x02 VI:0x03 ZA:0x04 MO:0x05 AN:0x06 FE:0x07 BI:0x08 AU:0x09 SA:0x0a QB:0x0c LE:0x0d LI:0x0e JE:0x0f"
 WANT="${CHARS:-}"
-FIELDS="ff8410:w:p1x,ff8414:w:p1y,ff840b:b:p1face,ff841c:l:node,ff8420:b:cnt,ff8810:w:p2x,ff8850:w:p2hp,ff8782:b:id,ff8b82:b:p2id"
+FIELDS="ff8414:w:p1y,ff840b:b:p1face,ff841c:l:node,ff8420:b:cnt"
 DIRS="jump jump_fwd jump_down jump_fwd_down"   # jump_fwd_down (14z-146): a FORWARD jump then D+button — Anakaris's J.2K
 
 echo "== test_vanilla_aerial_join: the aerial slot map by jump direction, measured on vsavj =="

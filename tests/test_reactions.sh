@@ -10,6 +10,7 @@
 #   tools/reaction_map.py; both fighters' ids asserted from the trace.
 # EXPECTS: the per-tenant files equal (re-frozen only after a change is attributed); a red
 #   is a changed reaction set, extract, decoder or rig.
+# POKE READ-BACK (ruled 2026-09-25 (14z-181), tests/expected/poke_readback.tsv): the `x`/`p2x` columns (ff8410/ff8810, the rig's pins) were sampled and never read by tools/reaction_map.py — DROPPED; `p2hp`/`p2white` are the contact signal (OBSERVES).
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/lua/field_trace.lua
 #   tests/replays/ tools/anim_nodes.py tools/name_moves.py tools/reaction_map.py
 #   tools/run_mame.sh tools/setup_mame.sh
@@ -60,7 +61,7 @@ TENANTS="${TENANTS:-donovan pyron huitzil}"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
-FIELDS="ff8410:w:x,ff8414:w:y,ff840b:b:face,ff841c:l:node,ff8782:b:id,ff8810:w:p2x,ff8814:w:p2y,ff880b:b:p2face,ff881c:l:p2node,ff8820:b:p2cnt,ff8821:b:p2flags,ff8854:b:p2cls,ff8850:w:p2hp,ff8852:w:p2white,ff885c:b:p2frz,ff8b82:b:p2id,ff8840:l:p2xv,ff8844:l:p2yv"
+FIELDS="ff8414:w:y,ff840b:b:face,ff841c:l:node,ff8782:b:id,ff8814:w:p2y,ff880b:b:p2face,ff881c:l:p2node,ff8820:b:p2cnt,ff8821:b:p2flags,ff8854:b:p2cls,ff8850:w:p2hp,ff8852:w:p2white,ff885c:b:p2frz,ff8b82:b:p2id,ff8840:l:p2xv,ff8844:l:p2yv"
 allfail=0
 for TENANT in $TENANTS; do
 fail=0

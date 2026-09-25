@@ -14,6 +14,7 @@
 # EXPECTS: the frozen windows per game, the superset row 0 (vsavj vs ours), the act rows
 #   identical for vsavj and ours; both controls fail. Ruled identical by the maintainer on
 #   the captures and the first-frame test.
+# POKE READ-BACK (ruled 2026-09-25 (14z-181), tests/expected/poke_readback.tsv): the `x` column (ff8410, the rig's pin) was sampled and never compared — DROPPED.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/guard_reentry.tsv
 #   tests/lua/field_trace.lua tests/lua/snapshot_frames.lua tools/name_moves.py
 #   tools/run_mame.sh tools/setup_mame.sh
@@ -93,7 +94,7 @@ python3 -c "import json;print(' '.join(str(e['frame']) for e in json.load(open('
 ok "huitzil part 5 at FIRST_EVENT 2800, P1's cursor lines removed"
 
 echo "== 2. the legs"
-FIELDS="ff841c:l:node,ff8420:b:cnt,ff8406:b:seq,ff8407:b:sub,ff8410:w:x,ff845c:b:frz,ff8450:w:p1hp,ff8782:b:id,ff8b82:b:p2id,ff8081:b:pc,ff881c:l:p2node,ff8806:b:p2seq"
+FIELDS="ff841c:l:node,ff8420:b:cnt,ff8406:b:seq,ff8407:b:sub,ff845c:b:frz,ff8450:w:p1hp,ff8782:b:id,ff8b82:b:p2id,ff8081:b:pc,ff881c:l:p2node,ff8806:b:p2seq"
 for s in vsav2:vsav2:"$ROMDIR" vsavj:vsavj:"$ROMDIR" ours:vsavjw:"$BUILD/rompath;$ROMDIR"; do
     leg="${s%%:*}"; rest="${s#*:}"; set_="${rest%%:*}"; rp="${rest#*:}"
     mkdir -p "$W/$leg"
