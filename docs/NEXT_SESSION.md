@@ -19,6 +19,13 @@ read as "airborne" when 40 is the ground — no gate had).
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`**, not a `ps` grep.
+0b. **CARRIED FROM 14z-181 (maintainer, 2026-09-25: *"let's leave them local and next session
+    carries them"*):** `main` is AHEAD of `origin/main` by the post-close commits — the
+    orchestrator ruling (5df2bf88), the two #175 hitbox notes (3f4adeb7, 4fb2d932) and this
+    carry note — none of them through a tier or a procedure check. THIS close's tier covers them;
+    its procedure run adds 14z-181's unchecked tail: `extract.py --session 152495c2 --from 3209`
+    (procedure run `2026-09-25-214` read that transcript to record 3208); `--cap` over it too.
+    The push hook refuses until a procedure run's head lies inside the pushed range.
 1. **THE MAINTAINER'S READS AND RULINGS, in STATE "Decisions pending":** (a) the parity
    gates' per-frame level and RNG pins as their equalised INPUT (every rule-checker run of
    14z-181 flagged it; accepted in writing pending the ruling); (b) **#161 — close as
