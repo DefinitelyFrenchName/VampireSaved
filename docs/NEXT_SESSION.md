@@ -35,6 +35,11 @@ read as "airborne" when 40 is the ground — no gate had).
    hitbox-height proof that the dome cannot reach the air would settle it. Inputs first. **The
    maintainer (2026-09-25, reading the trap sheet):** *"whether the trap can hit airborne opponents
    at all … can be confirmed in VS2 if you haven't already"* — do that on native vs2 first.
+   **Then (2026-09-25, a capture of the trap's hitbox drawn in pink over the sprite):** *"that does
+   not indicate if there's a flag that make the hitbox only active against grounded enemies but it at
+   least explains why you would need to be very low to the ground to be hit airborne"* — so the
+   question is a LOW box plus, possibly, a grounded-only flag; the box's extents are data
+   (`tools/hitbox_records.py`), measurable before any rig.
 3. **#174 (the 36 never-entered a2 chains, 8 with attack records — re-counted by the promoted
    `tools/chain_census.py` at the close: Pyron's a2:0x03 joined the list once the Galactic Throw
    HP rig stopped whiffing into it)** — inputs first.
