@@ -1,99 +1,93 @@
-# NEXT SESSION — orientation (rewritten at the 14z-180 CLOSE, 2026-09-24)
+# NEXT SESSION — orientation (rewritten at the 14z-181 CLOSE, 2026-09-25)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
 > the live orientation. Session state, not knowledge: facts belong in the docs,
 > status in STATE.md.
 
-## #171 IS THE WORK, ON THE #172 SETUP
+## THE SETUP, RESTATED
 
-#172 is closed and this sitting ran on it: a plain Fable 5.1 session, every quoted
-figure from a `measurer` spec (`docs/project/worker_spec.md`, spawned with NO model),
-every recommendation through the pinned `rule-checker` and `rulecheck.py record --session`.
-The maintainer asked for confirmation that every further session uses it: say so at the
-opener, and route figures through workers from the first measurement, not after (14z-180
-ran its opener inline and had to say so).
-
-#171's shape is RULED (`DECISIONS_HISTORY.md` "Ruled 2026-09-24 (14z-180)",
-`docs/project/gate_qualification_scope.md` §4-§6): seven slices in the order
-**Q0, Q1 (landed), Q3+Q4 (Q5 inside), Q2, Q6.** Q0 is the maintainer's addition and the
-foundation of their supervision: every gate carries `# WHAT:` / `# HOW:` / `# EXPECTS:`
-(`docs/project/gate_header_contract.md`), rendered from the headers into the GENERATED
-`docs/project/gate_coverage.md` (the site page `docs/site/project/gate_coverage.html` after
-`python3 tools/mk_docs_site.py`), which the maintainer reviews family by family — a wrong
-description is corrected IN THE GATE.
+A plain Fable 5.1 session on the #172 setup: every quoted figure from a `measurer` spec
+(`docs/project/worker_spec.md`, spawned with NO model; the spec text goes IN the prompt —
+the call gate refuses a pointer to a file), every freeze and recommendation through the
+pinned `rule-checker` with the prompt files pasted VERBATIM (a wrapper that tells the reader
+to Read its file is refused at `record`), `record --session`, `resolve` with `Q<n>:` labels
+on ONE line. Say so at the opener. The loop's mechanical traps are in the memory
+`rulecheck-workflow-traps`; the readers earned their cost this sitting (run 164 found y = 40
+read as "airborne" when 40 is the ground — no gate had).
 
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`**, not a `ps` grep.
-0b. **CARRIED FROM 14z-180:** its procedure check (run `2026-09-24-146`) stopped at the
-   check itself; cut `extract.py --session 63442647 --from 3458` and put the span after it
-   — the tier's result, the push — through this close's procedure run beside the session's own
-   extract, as 14z-180 did for 14z-179.
-1. **Q0 IS WRITTEN — 385 of 385 gates described, census frozen 385/0** (380 at `6e6be0c9`, plus
-   the five gates the sitting added; `tests/expected/gate_descriptions.tsv` is the count, this
-   line is narrative). The
-   maintainer reviews `docs/site/project/gate_coverage.html` (re-render `python3
-   tools/mk_docs_site.py`; source `docs/project/gate_coverage.md`) family by family, in
-   the ruled order; every correction is a header edit in the gate script, followed by
-   `python3 tools/gen_gate_coverage.py` and `tests/test_gate_descriptions.sh` (a reworded
-   field needs no re-freeze; only the declares/undeclared sets are frozen). The
-   maintainer's corrections come before any new slice.
-2. **#171: the seven slices are built (14z-180); what is open is the maintainer's.** Q0 the
-   descriptions (385/385, reviewed family by family on `docs/site/project/gate_coverage.html`),
-   Q1 the module references, Q2 the MEASURES contract (five gates, six floors, the freeze
-   guard), Q3 the FOLLOWS declarations (199, three reconciliation classes), Q4+Q5 the commit
-   of record, the staleness gate and `--stale`, Q6 the poke read-back CENSUS. Open, and the
-   maintainer's: the 73 UNCLASSIFIED rows of `tests/expected/poke_readback.tsv` (STATE
-   "Decisions pending" carries them as one item — rule each OBSERVES or READS-BACK; a
-   READS-BACK column is then dropped from its gate's compare or labelled a rig record in
-   the header), and any correction to a description or a declaration (a header edit).
-   The first emulator run after these commits is the first run of record for the
-   staleness gate; `test_release_binaries` has not yet printed its declared measurement in
-   a run. #171 closes when the rulings are given and recorded (the four local answers in
-   `tickets.tsv`).
-3. **#145 Windows binaries**, **no Windows launcher**, **#170**, **#161**, **#169**,
-   **#157 / #159 / #163** — unchanged, the maintainer's to schedule.
+1. **THE MAINTAINER'S READS AND RULINGS, in STATE "Decisions pending":** (a) the parity
+   gates' per-frame level and RNG pins as their equalised INPUT (every rule-checker run of
+   14z-181 flagged it; accepted in writing pending the ruling); (b) **#161 — close as
+   `not-ours`?** The +1 Phobos takes from Demitri's 5HP is vsavj's own damage pipeline: a
+   legacy victim reads it too (Victor, 12 on pristine vsavj / 11 on pristine vs2, identical
+   rows; `tests/audit_phobos_dmg_residual.sh`'s `legacy` rows). (c) **Every capture of the sitting is READ** — nine reads covering eighteen sheets, every one identical (the first *"correct"*) (`DECISIONS_HISTORY.md`
+   "Ruled 2026-09-25 (14z-181) — the maintainer's reads"); on #169's: *"looks identical. I'll double
+   check the air throw on my end but everything looks good"* — theirs to double-check, nothing
+   in the tree waits on it.
+2. **#175 (new): the Plasma Trap dome vs a truly AIRBORNE victim is UNREACHED.** Of the 60
+   presses 3440-3499 on native, 3440-3460 land before the dome is active and are hit on the
+   ground, 3461-3498 jump over the active dome (apex 127) and are hit on the landing frame,
+   3499 never jumps — none is hit in the air (`tests/audit_trap_airborne.sh`, `SWEEP=1`). A lower arc, a juggled victim, or a
+   hitbox-height proof that the dome cannot reach the air would settle it. Inputs first. **The
+   maintainer (2026-09-25, reading the trap sheet):** *"whether the trap can hit airborne opponents
+   at all … can be confirmed in VS2 if you haven't already"* — do that on native vs2 first.
+3. **#174 (the 36 never-entered a2 chains, 8 with attack records — re-counted by the promoted
+   `tools/chain_census.py` at the close: Pyron's a2:0x03 joined the list once the Galactic Throw
+   HP rig stopped whiffing into it)** — inputs first.
+4. **#145 Windows binaries**, **no Windows launcher**, **#170**, **#157 / #159** — unchanged,
+   the maintainer's to schedule.
 
-## TRAPS PAID THIS SITTING (14z-180)
+## WHAT CLOSED THIS SITTING
 
-1. **A worker figure can contradict its own list.** Worker C returned "13" where its C6 list
-   had 14 entries and the command prints 14. Re-derive any worker figure that disagrees with
-   another of its own before quoting it; keep the wrong one beside the correction.
-2. **A control that perturbs the wrong root perturbs nothing and passes.** The census gate's
-   `perturb` ran the tool with `--root tests` (the tool appends `/tests`), found no declaring
-   gate, printed REFUSED inside a `$(...)` and the modes exited 0. Run every mode and read
-   its exit before trusting a CONTROL FIRED line.
-3. **A pros-and-cons written ABOVE a question dialog is not seen.** The maintainer: *"I don't
-   see the pros and cons anywhere"*. Put the comparison inside the question text.
-4. **A stray `*` in generated prose pairs into an `<em>` on the site.** `tests/*.sh` twice in
-   a cell broke `test_docs_site`; the renderer now code-spans asterisk-bearing tokens.
-5. **Never edit during the tier.** The mid-session tier ran ~35 min; the next family's
-   descriptions were drafted under build/ and applied after it.
-6. **A reconciliation that checks an extractor against itself agrees by construction.** "0
-   uncovered" said nothing about reach until a SECOND witness read the same thing another way
-   (the description prose naming the replay). Rule-checker run 142, Q3 — look for the second
-   witness before quoting a census as coverage.
-7. **A floor taken from a file's line count includes its header lines.** 51 for a 49-row table;
-   the gate RUN on MAME printed 49. Take a floor from the gate's own MEASURED line in a real run,
-   and derive it once more from a different file.
-8. **A known-bad plant reads its poke back BY DESIGN.** A census that joins pokes to samples
-   without the leg they sit on lists a control's plant as the measuring leg's finding (run 144).
-   Attribute the leg, and say what the attribution rests on.
-9. **Run `test_bbh_fidelity` alone.** Beside a MAME gate it read FAIL; alone, PASS (the known
-   flake, memory `bbh-fidelity-flake`).
-10. **A completion notice is not a result.** "The tier is alive and passing" was said on a
-   liveness task's completion alone, its output unread (procedure run 146, QP2). Read the
-   output, then say what it showed.
-11. **Read a worker's tool calls against its COMMANDS, not only its figures.** Two measurers
-   ran `git rev-parse HEAD` outside their spec, one did not STOP on an error, both appended
-   a conclusion; the orchestrator's read caught the wrong figure and missed the rest (run
-   146, QP5). The extract's WT lines against WS is the read.
-12. **`rulecheck.py resolve --how "…"` eats backticks** like any double-quoted shell string:
-   run 146's resolution has two holes and cannot be re-resolved. Write the text to a file.
+#136 (the whole scope: contact leg, the tenant as victim, hitboxes in play, guard cancels;
+residues #173/#174), #163 (the column's airborne case measured identical; the trap's air
+case unreachable and ticketed as #175), #169 (P2's two-frame jump lead de-bistables Pyron's
+Galactic Throw pair; naming/parity/attribution re-frozen). The 73 poke rulings applied.
 
-**IF A DOC IS TOUCHED:** the doc gates (`test_checkdocs`, `test_docshape`,
-`test_doc_anchor_census`, `test_checkskills`, `test_gotchas_index_current`,
-`test_gate_index_current`, `test_state_open_lists`, `test_tickets`, `test_docs_site`) plus
-`tools/check_state_lists.py` and `tools/tickets.py check`, exit statuses captured
-directly, `${=cmd}` in zsh. **A running script is never edited** ([MSC-54]).
+## TRAPS PAID THIS SITTING (14z-181)
+
+1. **THE GROUND IS y = 40** (gotcha filed). An "airborne" assertion is `y > 40`; a hit reading
+   40 is on the ground or the landing frame. A six-timing sweep whose rows all read 40
+   "confirmed" the wrong reading; the rule-checker caught it from a row whose jump was
+   pressed AFTER the hit. A field's zero is not its rest value — look the rest value up.
+2. **"Every timing" must be every timing.** Two packets overclaimed a range a third of which
+   was untraced (runs 165, 166); the fix was to trace every frame and let the script that
+   writes the artifact compute the counts and LIST the gaps in its header.
+3. **An air-throw rig is decided by the victim's jump lead** (gotcha filed); WHY is not
+   isolated (the height reading is a correlate, run 168). Three geometry theories were measured
+   and killed first (the wall, the screen-edge clamp of a pin after a throw, the walk length) —
+   pin the pair still and sweep ONE variable at a time; `tools/air_throw_sweep.sh` reruns them.
+   "Every phase" means every phase (shifts 13/26/39 were ONE phase mod 13, run 169); a
+   theory is "eliminated" only where the sweep held the other variables (the walk length
+   still moved the outcome at lead 0, run 173); a rig event named "whiff" can connect
+   (pyron_3's event 5, a grab that carries P2 and overrides the next event's pin); and
+   write the CONDITION a sweep ran under from its pokes, not from the gate you had in
+   mind — the naming rig carries no level pin, so it runs at vsav2's default level 8, and
+   my artifact header said level 6 for ten runs (run 177).
+4. **A rig is tuned at one speed level** (gotcha filed): the victim gate at level 6 lost a
+   contact; at the rigs' native 8 the frozen lines reproduced exactly.
+5. **A parity compare cut at 8 path labels hid a release-chain difference** behind a throw's
+   eight `c:` labels; `reaction_map.contacts` has `max_labels` now.
+6. **Artifacts regenerated AFTER `prepare`**, a line-range artifact shifted by a row
+   inserted above it, a verdict with sub-bullets refused by `record`, a `resolve` text with
+   newlines — each cost a run (memory `rulecheck-workflow-traps`).
+7. **A gate edited while a measurer ran it** exited 2 mid-file — the running-script trap.
+8. **The Phobos-only attribution class hid a three-tenant fact** — generalise a class the
+   moment a second tenant shows the signature.
+9. **A close check that lives in an inline script is not a check, and a home in `build/` is
+   not a home.** The findings table cited five build-only files as homes or tests before the
+   rule-checker (run 185) and then `tools/homes_tracked.py` caught them; the retraction grep is
+   `tools/retraction_grep.py` over `tests/rulecheck/retractions/<key>.tsv`, both locked by
+   `test_close_tools`. Run the homes tool on the findings row BEFORE the packet.
+10. **A btw side question runs as a FORK with the whole context, and the fork ACTS.** At the
+    14z-181 close it re-prepared rule-checker run 198 (dir deleted and rebuilt, slots re-drawn, a
+    saved verdict gone), spawned two readers and appended to an artifact — the run in flight no
+    longer matched its prompt files, and `record` refused the spawn check — twice: a run name once
+    spawned under is burnt for the session (the check reads the stale spawn), so re-prepare under
+    the NEXT id (`prepare --id`). Answer side questions
+    in prose from context; if a fork must run, check `git status` and the run dir's mtimes before
+    the next `record`.

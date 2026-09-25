@@ -1003,7 +1003,10 @@ the victim".
   one frame earlier on our leg (the third on the same frame) and the victim's
   release chains read one frame longer —
   the gate charges those TIMING differences to the attacker (`attributed=attacker`;
-  a chain-path or class difference is the tenant's whatever ran beside it). (2)
+  a chain-path or class difference is the tenant's whatever ran beside it) — the
+  maintainer read the throw sheet 2026-09-25: *"looks identical. The 1 frame difference and its
+  origin must be documented but identical and validated otherwise"* — VALIDATED, the origin is
+  this sentence. (2)
   **Pyron's heavy-hit reaction: ours enters the convention's `b:0x03` where
   native enters his `b:0x19`** (5HP class 0x04, j.HP 0x37, the throw release;
   class, freeze and length equal; b:0x19 is a 4-node 12-frame loop, b:0x03 the
@@ -1013,7 +1016,12 @@ the victim".
   maintainer. The real-pick, per-event-pinned
   native leg reproduces `tests/expected/reactions_<tenant>.txt` exactly at
   level 8 (the poked pick and the every-400 HP pins move nothing on these rigs;
-  at level 6 every length moves and Pyron's j.HP whiffs).
+  at level 6 every length moves and Pyron's j.HP whiffs). The maintainer read that capture 2026-09-25: *"yes, identical."* — #173 CLOSED on the read; the chain difference stays documented here and is not a defect to the eye.
+- **Donovan's vs2 EX activation enters `a2:0x51` then `a2:0x52`** (14z-181) [M: a scratch
+  field trace on native vs2 with the activation input, never promoted — the naming corpus has
+  no EX-activation rig, so the pair is two of the 36 never-entered a2 chains of GitHub #174 (36 since the
+  14z-181 re-count by `tools/chain_census.py`),
+  whose rig comes with its inputs; no gate locks this yet].
 - **A block is class `0xFF`** on every tenant: the block stance (Donovan
   `a:0x14`, Huitzil `a:0x15`, Pyron an unindexed node) then the SHARED
   blockstun chain **`b:0x0c`** (one node, 3 data frames, held).

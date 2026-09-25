@@ -6,7 +6,7 @@
 number	state	reason	closed	labels	title
 175	OPEN	-	-	evolution	Plasma Trap dome vs a truly AIRBORNE victim: the air stager's case for the trap is unreached by any rig (a neutral jump clears the dome and is hit on landing)
 174	OPEN	-	-	evolution	35 never-entered a2 chains of the tenants (7 with attack records) — moves the naming corpus never produces, so their ours-vs-native parity is unmeasured
-173	OPEN	-	-	bug	Pyron's heavy-hit reaction runs the generic chain b:0x03 on our build where native vs2 runs his b:0x19 (5HP, j.HP, throw release) — class, freeze and length equal
+173	CLOSED	COMPLETED	2026-09-25	bug	Pyron's heavy-hit reaction runs the generic chain b:0x03 on our build where native vs2 runs his b:0x19 (5HP, j.HP, throw release) — class, freeze and length equal
 172	CLOSED	COMPLETED	2026-09-24	enhancement	Enforce the discipline at the AGENT level: orchestrator / checker / workers, with the checker unable to be overridden
 171	OPEN	-	-	enhancement	Qualify every gate: prove it measures what it claims, and that it notices when its inputs move
 170	OPEN	-	-	enhancement	Notarize the macOS release binaries (PARKED on community demand)

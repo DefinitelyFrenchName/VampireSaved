@@ -39,6 +39,31 @@ name in prose. And when the claim is about what a move DOES, produce the capture
 before the sentence ([VSP-173]) — here the picture is what settled it, and the
 slot table is what over-reached when it was used as a shortcut.
 
+## "EVERY" MEANS EVERY, AND A RETRACTION GREP MUST MATCH THE CARRIER'S SHAPE (paid: 14z-181, rule-checker runs 165-166, 169, 183-186)
+
+**What happened.** Two packets said "every press timing 3440-3499 was
+traced" when a third of the range was untraced; another said "every
+double-pass phase mod 13" from three shifts that were ONE phase mod 13; and
+the close's retraction greps read 0 hits over live carriers because the
+pattern kept a trailing semicolon, the carrier wrapped across a line, or the
+words sat inside backticks or behind a `# ` comment prefix.
+
+**The rule, two halves.** (1) A range or an "every" is stated as the EXACT
+set measured, and the script that writes the artifact computes the counts and
+LISTS the gaps inside the span in its header — never a range typed from
+memory. (2) A retraction grep ([VSP-13] step 3) matches the carrier's SHAPE,
+not its bytes: the shortest distinctive fragment of the retracted wording, no
+trailing punctuation, matched over each file's WHOLE text with runs of
+whitespace, backticks and comment prefixes collapsed, and the artifact carries
+reach controls that must be found — a known live heading, a known live
+corrected wording in its code-spanned form, a known line-wrapped carrier
+across a comment prefix, and a known sentence that lives only in a ROOT
+document (README.md) — the scan reads EVERY TRACKED FILE, because a root
+document outside a hand-listed root set is a live carrier the grep never
+reaches (rule-checker run 2026-09-25-204). The tool is `tools/retraction_grep.py` over the sitting's pattern
+file `tests/rulecheck/retractions/<key>.tsv`; it exits 1 when a reach control
+reads 0 hits, and the hits' classing is written by hand below its output.
+
 ## AN AIR-THROW RIG IS DECIDED BY THE VICTIM'S JUMP LEAD, NOT BY THE PAIR'S SPACING — with both jumps on one frame the pair is bistable across schedule shifts (paid: 14z-120 to 14z-181, GitHub #169)
 
 **What happened.** `pyron_3`'s two Galactic Throw events (`air_throw("MP")` /
@@ -47,9 +72,9 @@ button at +14) had frozen ONE connecting strength since 14z-120, and which
 one it was moved with the schedule shift (#168's sweep: MP at shifts ≡ 0 mod
 3, HP at the others, neither at 273). Three theories were measured and were
 NOT it: the wall (the HP event stands at the right wall, 960/1000, where the
-150-frame walk-in — P1 pushing at ~2 px/frame from a pin the screen edge
-clamped to 664 — leaves every near event whose previous event did not knock
-P2 left; the per-event table is `build/agent181/near_event_geometry_14z181.txt`
+150-frame walk-in — P1 pushing at ~2 px/frame from 664 where the screen edge
+clamped the pin and from 552/563 where it did not — leaves every near event
+whose previous event did not knock P2 left; the per-event table is below
 — but the HP throw whiffed just the same pinned OFF the wall at 858/898, and
 with the lead it connects ON it), the screen-edge clamp of the pin after a throw (real,
 but the throw connected at every x from 700 to 950 with the pair pinned
@@ -67,6 +92,33 @@ on both events at every phase; whether the height itself is the cause or a state
 it is not isolated (no run changes P2's height by another means), and no run
 recorded press-registration ticks — a tick race on the double-pass phase is
 the hypothesis, consistent with #168's shift sweep, not a measurement.
+
+**Where a near event of pyron_3 really stands** (native vsav2, the schedule's
+own pokes only — level 8, unpinned RNG; the committed rig before the fix;
+per event: the pin frame, x/p2x/camera the frame after the pin, the walk's
+end at t-40, P1's px/frame alone and pushing):
+
+| ev | name | pin | after the pin x/p2x/cam | walk end | alone | pushing |
+|---|---|---|---|---|---|---|
+| 0 | Corona Whip [6MP] | 2565 | 552/728/448 | 960/1000 | 5.44 | 2.18 |
+| 1 | Corona Whip [6HP] | 2985 | 664/728/635 | 960/1000 | 6.00 | 1.86 |
+| 2 | Corona Whip [4MP] | 3405 | 664/728/635 | 960/1000 | 6.00 | 1.86 |
+| 3 | Planet Burning [MP] | 3825 | 563/728/534 | 960/1000 | 5.39 | 2.15 |
+| 4 | Planet Burning [HP] | 4245 | 664/728/635 | 960/1000 | 6.00 | 1.86 |
+| 5 | Planet Burning [MP] "far (whiff)" | 4665 | 852/998/640 (far pin) | 552/728 | - | - |
+| 6 | Galactic Throw [j.6MP] | 4925 | 568/632/539 | 858/898 | - | 2.40 |
+| 7 | Galactic Throw [j.6HP] | 5345 | 664/728/635 | 960/1000 | 5.00 | 1.86 |
+| 8 | Sitting Attack [8P] | 5765 | 664/728/635 | 960/1000 | 5.00 | 1.86 |
+| 9 | Sitting Attack [8K] | 6185 | 664/728/635 | 960/1000 | 5.00 | 1.86 |
+
+The clamp: a 552 pin reads 664 the frame after on every pin made with the
+camera at 640; a camera poke to 448 reads 635 one frame later (the unpoked
+value). Event 5 CONNECTS as a grab (P2 in seq 2 from f4914, carried with P1,
+HP 288 -> 273 at f4973, P1 in the move until f5006), which overrides event 6's
+pin: its walk starts from 496/642 and ends at 858/898, the walk's end, not the
+wall. Rerun: the session's traces are not kept; `tools/air_throw_sweep.sh`
+regenerates the rig and the naming gate's fields, and a field trace of
+$FF8410/$FF8810/$FF8290 over 2500-6700 reproduces the table.
 
 **The rule.** The rig gives P2 a two-frame jump lead (`(-2, 0, "U", "p2")`),
 the middle of the band, and with it both strengths throw at sixteen schedule

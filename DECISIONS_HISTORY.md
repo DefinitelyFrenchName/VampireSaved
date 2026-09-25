@@ -27,6 +27,21 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-25 (14z-181) — the maintainer's reads of the capture sheets: every one identical; Victor's one-frame throw difference documented and validated; #173 closed on the read; #175 gains a vs2 check
+
+The maintainer's reads of the 14z-181 capture sheets (2026-09-25, in the sitting, verbatim):
+- #136 clone-beam contact leg, four Phobos events (ev1/ev4/ev7/ev10): *"correct"*.
+- donovan_dfx1 ev19, 2HP in Dark Force re-frozen at three hits: *"killshread starts at a different angle, which is a known variance without impact on the move itself. Move looks identical."*
+- the same five events under the FINAL rig: *"captures look identical"*.
+- Pyron as the victim of Victor's 5HP (b:0x19 native / b:0x03 ours): *"yes, identical."*
+- Victor's 6MP throw on Donovan (five of six hits one frame earlier on ours, attributed to Victor's a2:0x38): *"looks identical. The 1 frame difference and its origin must be documented but identical and validated otherwise."*
+- Donovan's Ifrit Sword guard cancel: *"looks identical"*.
+- the Killshread column on a jumping Demitri: *"looks identical"*.
+- the Plasma Trap dome on a jumping Victor: *"Looks identical, and Victor only gets shocked when coming in contact with the trap's hitbox. The only poential caveat is whether the trap can hit airborne opponents at all but this can be confirmed in VS2 if you haven't already"*.
+- *"One thing where captures are missing is #169"* — three sheets (pyron_3 events 6, 7 and 5) taken and sent in the same sitting; the read: *"looks identical. I'll double check the air throw on my end but everything looks good"* — the air throw is the maintainer's to double-check on their side; nothing in the tree waits on it.
+
+**What followed in the tree (14z-181):** the Victor throw attribution (`attributed=attacker`, a2:0x38 25 data frames on vs2 / 24 on vsavj) is VALIDATED and stays documented in `docs/game/engine_internals.md` "The OURS leg"; **#173 CLOSED** — the b:0x19 / b:0x03 chain difference is documented there and is not a defect to the eye (the "where vs2 selects it" question is not pursued: nothing a player feels rides on it); **#175** carries the maintainer's caveat as its next step (confirm on vs2 whether the dome can hit an airborne opponent at all); the #169 sheets sent and read identical (the maintainer double-checks the air throw on their side).
+
 ## Ruled 2026-09-25 (14z-181) — #171 Q6: the 73 poke read-back findings, classed as proposed
 
 **The STATE.md "Decisions pending" entry, moved verbatim:**

@@ -17,7 +17,7 @@
 #   have TAKEN (apex > 40), the hit must land ON the landing frame (y > 40 the frame before, 40 at
 #   the hit) and never inside the airborne span.
 # EXPECTS: the frozen rows; the two legs equal but for 0x52 / 0x38; the hit on the landing frame on
-#   both; the two controls failing. SWEEP=1 adds the five other jump timings whose jump takes and
+#   both; the three controls failing. SWEEP=1 adds the five other jump timings whose jump takes and
 #   lands while the dome is active (3466, 3470, 3474, 3480, 3486): each asserted the same way,
 #   printed, never frozen. Not covered: an airborne hit by the dome (none exists in this rig —
 #   every press timing 3440-3499 was traced on native: 3440-3460 land before the dome is active,
@@ -34,9 +34,10 @@
 # WHY. #163 (the class-0x52 rule, shipped in M19) kept one item open: a column hit or a Plasma Trap
 # hit on an AIRBORNE victim — the air stager's case — was not measured. 14z-181 measured both: the
 # column on a jumping Demitri (height 103) takes the air stager (class 7) identically on both legs
-# (tests/audit_column_shock.sh section 1c); the dome never reaches a jumping Victor in the air — at
-# every timing from 3440 to 3490 he clears the active dome (apex 127) and is hit as he LANDS, on the
-# ground path, identically on both games. The first form of this gate read y > 0 as airborne and
+# (tests/audit_column_shock.sh section 1c); the dome never reaches a jumping Victor in the air — of
+# the presses 3440-3499 on native, 3440-3460 land before the dome is active and are hit on the
+# ground, 3461-3498 jump over the active dome (apex 127) and are hit as they LAND, 3499 never
+# jumps; the landing-frame hits take the ground path, identically on both games. The first form of this gate read y > 0 as airborne and
 # called the landing-frame hit "the falling victim at height 40"; rule-checker run 2026-09-25-164
 # found it from the sweep (jumps pressed after the hit still read 40). So with this rig no dome hit
 # reaches the air stager, and whether ANY arc can is the open question of the ticket that carries it.

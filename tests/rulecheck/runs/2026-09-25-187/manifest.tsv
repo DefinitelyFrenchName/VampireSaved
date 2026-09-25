@@ -1,0 +1,22 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+STATE.md.lines-72-100 (lines 72-100 of STATE.md)	ca0c3941218c35b8d0ef914e01db1e1e839a2e9d
+build/agent181/close_findings_14z181.txt	cacd4249d5fea6096f73721c11a6d157f0833223
+build/agent181/homes_tracked_14z181.txt	795f455b18816fb273c4a405ceb0e333c8d5e46a
+build/agent181/retraction_greps_14z181.txt	f1ed25a9b18ea8c26d746519371a4404f74f5e0d
+build/agent181/close_carriers_14z181.diff	9445e470d11b2b040afc5ef1faf6696a5918988f
+build/agent181/name_moves_close_14z181.diff	a92e1462b1a00add9e3c7356bc7181e6eefdc158
+build/agent181/trap_air_mode4_air-hit.log	d50467c93d5841640da25689fd7f0df35686364f
+build/agent181/victim_parity_mode5_unpinned-level.log	460d7dd9ffe1620de8328a245f4176a0c3c4e3e9
+docs/project/gotchas.md.lines-1-160 (lines 1-160 of docs/project/gotchas.md)	7136e785a1275519b5baa3cd915b53cbe1ee2d2b
+build/agent181/gotchas_close_14z181.diff	74002a7d00de6d31fffd5d1dfd7204358d69cd41
+docs/game/engine_internals.md.lines-990-1020 (lines 990-1020 of docs/game/engine_internals.md)	529f7d42fb7baa3799297598ea9dc6da40c3d761
+tools/name_moves.py.lines-160-220 (lines 160-220 of tools/name_moves.py)	9447e48c1f1e028356a93c3108896f059ef81e5d
+tools/name_moves.py.lines-735-795 (lines 735-795 of tools/name_moves.py)	7d3abb6db1edd2808c92e74ab650b052cfa55ed0
+docs/NEXT_SESSION.md	8d6a1ff5c693ff566ed6872d6281cf94d197ebd9
+build/agent181/state_14z181_close.diff	092c1b832446819515b7fa561fbe5c56dd658e5b
+tests/expected/victim_parity.tsv.lines-1-12 (lines 1-12 of tests/expected/victim_parity.tsv)	853e26d082abf8cab6b2c3085848b32f27b0c3da
+tests/audit_trap_airborne.sh.lines-1-45 (lines 1-45 of tests/audit_trap_airborne.sh)	4e81cbef5a5d20f3896f9f6fb9da71eb0baea625
+tests/audit_victim_parity.sh.lines-1-60 (lines 1-60 of tests/audit_victim_parity.sh)	09a9cda37649ef358407b8492786a64f6bfa0bac
+docs/project/tickets.tsv.lines-74-90 (lines 74-90 of docs/project/tickets.tsv)	877b66f89c8c617d78650953a3f8bd945130e88b
+tests/rulecheck/runs/2026-09-25-186/verdict_real.txt	4d615c958001b664440b74282669fedd644b43b4
+build/agent181/resolve186.txt	4248a0eee494a6e501cfe0e0f090a30de58aaddc

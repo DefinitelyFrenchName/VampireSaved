@@ -13,12 +13,12 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**388 of 388 gates described.**
+**389 of 389 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
 | [runner](#runner) | 27 | 27 | the suite runners and their own ground truth |
-| [docs](#docs) | 20 | 20 | the documentation locks — docs, skills, indexes, tables follow the tree |
+| [docs](#docs) | 21 | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 38 | 38 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 58 | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
@@ -250,7 +250,7 @@ the suite runners and their own ground truth. 27 of 27 described.
 
 ## docs
 
-the documentation locks — docs, skills, indexes, tables follow the tree. 20 of 20 described.
+the documentation locks — docs, skills, indexes, tables follow the tree. 21 of 21 described.
 
 ### `test_annotations_current.sh` — test, ci_portable
 
@@ -299,6 +299,14 @@ the documentation locks — docs, skills, indexes, tables follow the tree. 20 of
 **HOW:** tools/checkskills.py over `.claude/skills/*/SKILL.md` and the docs (~1 s) with extractor self-tests; eleven controls perturb copies (an unanchored rule, a stripped anchor, a game name in level 1, a number no log carries, a dangling cross-ref, a port token in the game skill, a VSP anchor outside STATE's standing sections, a board name in level 0, a deleted redirect stub).
 
 **EXPECTS:** every rule anchored both ways and every control failing; a red is a skill quoting something no document holds.
+
+### `test_close_tools.sh` — test, ci_portable
+
+**WHAT:** (1) tools/retraction_grep.py over every `tests/rulecheck/retractions/*.tsv` exits 0, ON THE LIVE TREE at every tier (an output file is a snapshot with a tree fingerprint, never the check) — each file's REACH controls (a live heading, a corrected wording in plain AND code-spanned form — a `reach:2` control that fails when either carrier is missed — a carrier line-wrapped across a `#` comment prefix, a sentence that lives only in a ROOT document, README.md — the scan reads every tracked file since rule-checker run 2026-09-25-204) are found in the live tree and every GONE wording reads 0 hits, so the sitting's retracted wordings were searched by a grep that reaches; (2) tools/homes_tracked.py --selftest passes, and (2b) the tool runs on the NEWEST findings-table row of STATE.md (the current sitting's, on the live tree: every home and test it names is tracked) — a planted findings row citing a backticked build/ file, a prose build/ path, a name that resolves nowhere, a gate stem that resolves nowhere, a ticket with no index row, ticket rows citing a build/ file, an untracked file and a § anchor on no line, a prose-cited document that resolves nowhere and a parenthesised test clause saying scratch, and a backticked and a prose name that end two or more tracked files but are none of them exactly (AMBIGUOUS, rule-checker run 2026-09-25-206), are caught on all eleven, and a real gate stem, a clean ticket and a prose-cited README resolve.
+
+**HOW:** both tools run in-process on the tree; the controls run the grep on a copy of a pattern file with an unreachable reach control planted, and the homes tool's self-test on its BLIND variant (--blind, the build/ reads disabled), which must fail it.
+
+**EXPECTS:** PASS when every reach control of every retraction file is found, every gone wording is absent, the self-test passes and the newest findings row is clean. A tool that exits non-zero WITHOUT its own FAIL line (a crash, a refused pattern file) is REFUSED (exit 3, dead), never a red — in a MODE too: a mode passes only on the plant's own FAIL text. A red names the pattern file and the dead control (the tree lost a carrier the sitting's close depended on, or a pattern was written narrower than its carrier).
 
 ### `test_commit_subject.sh` — test, ci_portable
 
@@ -1902,7 +1910,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 **HOW:** two MAME runs (native vsav2, the merged build) of tests/replays/hui/92_hui_trap_shock.rpl with one added line (P2 up at 3490), the trap gate's forced-pick pokes, level and RNG pins; the victim's class, freeze, sub-state, HP and height and Phobos's freeze traced every frame 3395-3620; the STEPS of each field frozen per leg with the jump's airborne span, apex and landing frame; both legs must be identical in every field but the class marker; the jump must have TAKEN (apex > 40), the hit must land ON the landing frame (y > 40 the frame before, 40 at the hit) and never inside the airborne span.
 
-**EXPECTS:** the frozen rows; the two legs equal but for 0x52 / 0x38; the hit on the landing frame on both; the two controls failing. SWEEP=1 adds the five other jump timings whose jump takes and lands while the dome is active (3466, 3470, 3474, 3480, 3486): each asserted the same way, printed, never frozen. Not covered: an airborne hit by the dome (none exists in this rig — every press timing 3440-3499 was traced on native: 3440-3460 land before the dome is active, 3461-3498 are hit on the landing frame, 3499+ never jump; a lower arc or a juggled victim is not tried — GitHub #175), the solo Phobos track.
+**EXPECTS:** the frozen rows; the two legs equal but for 0x52 / 0x38; the hit on the landing frame on both; the three controls failing. SWEEP=1 adds the five other jump timings whose jump takes and lands while the dome is active (3466, 3470, 3474, 3480, 3486): each asserted the same way, printed, never frozen. Not covered: an airborne hit by the dome (none exists in this rig — every press timing 3440-3499 was traced on native: 3440-3460 land before the dome is active, 3461-3498 are hit on the landing frame, 3499+ never jump; a lower arc or a juggled victim is not tried — GitHub #175), the solo Phobos track.
 
 ### `audit_trap_parity.sh` — audit, emulator
 
@@ -2578,7 +2586,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **HOW:** both legs on MAME as REAL cursor picks (P1 Victor, P2 the tenant, the routes decoded from each game's own select wheel by tools/select_paths.py — no id poke on either leg), the speed level pinned at 8 on both (vs2's TURBO, the level the victim rigs and test_reactions' lines were measured at; our build's own is NORMAL 6 — matched modes, ruled 2026-09-15) and the RNG at 0000, P2's HP re-pinned 10 frames before each event (never inside a compared window: the reader refuses one); our P2 node pointers translated into the native address space (placements.json) and both legs read by tools/reaction_map.py over the tenant's vs2 extract (asserted byte-identical to the decrypted vsav2's anim region, as our data view is to the decrypted romset; its a/a2/b/c chains asserted to decode to the same shapes from our build); P1 asserted Victor on each leg and never inside one of his REACTION chains whose data differs between the games (tools/audit_same_data_p2.py, run by the gate on the two data views), and every row attributed (`attacker=`) to the differing ATTACK chains of his that ran inside its event, and charged (`attributed=`) to the attacker only when nothing but the timing (len, frz) differs AND the attacker's own shift explains it (the contact and the return each on the same frame or his delta earlier, the freeze within it) — a chain-path or class difference, or a timing difference of another size, is the tenant's whatever ran beside it.
 
-**EXPECTS:** every contact row as frozen in tests/expected/victim_parity.tsv (SAME, or the frozen DIFFER rows); the native leg reading test_reactions' frozen lines exactly; both ids from each leg's trace; no schedule poke inside a compared window; the five controls failing. The contact FRAME is printed, not compared (#168).
+**EXPECTS:** every contact row as frozen in tests/expected/victim_parity.tsv (SAME, or the frozen DIFFER rows); the native leg reading test_reactions' frozen lines exactly; both ids from each leg's trace; no schedule poke inside a compared window; the ten declared controls failing (every MUST-FIRE line below has its in-gate fire and its mode). The contact FRAME is printed, not compared (#168).
 
 ### `audit_x2b7ef4_reach_m18.sh` — audit, emulator
 

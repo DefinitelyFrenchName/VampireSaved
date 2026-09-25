@@ -1,0 +1,47 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+STATE.md.lines-46-56 (lines 46-56 of STATE.md)	0c53c6df0f1397659685cb398b836f7a2aacf522
+STATE.md.lines-72-101 (lines 72-101 of STATE.md)	15f794e6f86be3bc63a3a55c8b27963b78abd157
+STATE.md.lines-135-142 (lines 135-142 of STATE.md)	cfaa3b528fa90b0ab24613a18dbeadd4dc95899a
+DECISIONS_HISTORY.md.lines-28-48 (lines 28-48 of DECISIONS_HISTORY.md)	af6e12b3bdd2aa70b5de323dabb06f24ccf5f815
+build/agent181/captures_sent_14z181.txt	9ed317ec614c9a5897dc9b41f7dc6691c6ae3df7
+build/agent181/close_findings_14z181.txt	cacd4249d5fea6096f73721c11a6d157f0833223
+build/agent181/homes_tracked_14z181.txt	8e081a4ebfa1d510929f01cbf6df3e7a1d062e42
+tools/homes_tracked.py	8a347ebf225b73baaa02948ebea58d63d7ffeda3
+build/agent181/retraction_greps_14z181.txt	4bdde44bd7a6160c5195ed2a0e903f21572444b6
+tools/retraction_grep.py	ed16862d6375f6d6db6394e3fd4e6b63bb039121
+tests/rulecheck/retractions/14z-181.tsv	d46b4f2eb90c0e118cb8735b9cdb8e474c7f29d0
+tests/test_close_tools.sh	ac6ee41cd70509954f4494cfe129c83953111df2
+build/agent181/test_close_tools_14z181.log	2c49ed6a9634a43690150167d925db8babcda6e3
+build/agent181/test_close_tools_mode_build-home-planted.log	695f18c84dbc92ebc4c47f2ab347706dfbf4ed56
+build/agent181/test_close_tools_mode_unreachable-control.log	db654fc839a67569c1dbe8243a87f189238a3441
+build/agent181/test_close_tools_mode_reach-threshold.log	9f311c0ef07f7f4914e768989e1573f2f65fec00
+build/agent181/test_close_tools_mode_gone-reintroduced.log	e3141eafd592aeb868c33ef67b530b0ee011b01a
+build/agent181/test_close_tools_mode_case-fold-dropped.log	dea41864f57cc4e7c0218d41b86a9eac0d61d616
+build/agent181/close_tools_crash_probe_14z181.log	45de8f302233293b64bbd196317687b619d4c5cb
+build/agent181/close_carriers_14z181.diff	ac6d9e1b3b590fa8222adc71faa66ede72a04118
+build/agent181/name_moves_close_14z181.diff	a92e1462b1a00add9e3c7356bc7181e6eefdc158
+build/agent181/trap_air_mode4_air-hit.log	d50467c93d5841640da25689fd7f0df35686364f
+build/agent181/trap_air_verify4.log	ff47451c82808da05cc42ec93df848e4fc771a44
+build/agent181/victim_parity_mode_unpinned-level_14z181.log	7aec8a70870fe09d9b0631be1fd77d8e2e364c08
+build/agent181/victim_parity_plain_14z181.log	b6c7ead442553b6bd0d0829d07127ecf5547e60b
+docs/project/gotchas.md.lines-1-160 (lines 1-160 of docs/project/gotchas.md)	3352c85a77c058410a77a75bbeb971de19bc9765
+build/agent181/gotchas_close_14z181.diff	83467dbc439062d0f6d6cbd427946b2e233010f9
+docs/game/engine_internals.md.lines-990-1030 (lines 990-1030 of docs/game/engine_internals.md)	167df82785f77d50c2db4cf0b3719006c1c3747f
+tools/name_moves.py.lines-160-220 (lines 160-220 of tools/name_moves.py)	9447e48c1f1e028356a93c3108896f059ef81e5d
+tools/name_moves.py.lines-735-795 (lines 735-795 of tools/name_moves.py)	7d3abb6db1edd2808c92e74ab650b052cfa55ed0
+docs/NEXT_SESSION.md	73133b178fc93f256a51ae615575f0d8f3b68f18
+build/agent181/state_14z181_close.diff	d24fc3a717863c2f4210b175e108c5ab2d28e667
+tests/expected/victim_parity.tsv.lines-1-12 (lines 1-12 of tests/expected/victim_parity.tsv)	853e26d082abf8cab6b2c3085848b32f27b0c3da
+tests/audit_trap_airborne.sh.lines-1-45 (lines 1-45 of tests/audit_trap_airborne.sh)	8e331c82423bf5b1cefec185a60405fe15702a46
+tests/audit_victim_parity.sh.lines-1-60 (lines 1-60 of tests/audit_victim_parity.sh)	99107f795afd3456942c1faa14a6b5f2a2869bca
+docs/project/tickets.tsv.lines-74-90 (lines 74-90 of docs/project/tickets.tsv)	808538bff237d7d4b1cfd53c64065388387550c6
+tools/chain_census.py	238c5a162ea6922c0fdb814bb3ae8a3f998e521a
+build/agent181/chain_census_rerun_14z181.txt	c2ae32b7e3aae43e5b046ab74b79de9ecabfb6ee
+tests/rulecheck/runs/2026-09-25-162/verdict_real.txt	60080c5b6d54bb7a0c6c8b8e2502d8b1c899c5a0
+tests/rulecheck/runs/2026-09-25-167/verdict_real.txt	4b8cc5df2631de31cab17a4d7d4134528c3bf481
+tests/rulecheck/runs/2026-09-25-179/verdict_real.txt	828580bd423dc1038a625af53f9dc2d5bbddb252
+tests/rulecheck/runs/2026-09-25-200/verdict_real.txt	076f50e051791d3e35c4b726e86a097e98a40bf7
+build/agent181/run198_unrecorded/README.txt	a4f2567030898b6af51d8f0b368bcba736488487
+build/agent181/run198_unrecorded/verdict_b.txt	f321d14cdc9c6cf52e9a64aeee5cdd3d59a2bde2
+build/agent181/run198_unrecorded/verdict_forkprepared_real.txt	765f31d58f4173684c415c2a41a71f2a9e5af748
+build/agent181/resolve200.txt	bafa2c3f8f7e1a5c93e84712b038413ae4d795f5

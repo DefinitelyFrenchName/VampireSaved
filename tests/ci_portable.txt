@@ -286,3 +286,5 @@ test_agent_defs
 # #172 slice S4 step 2 (14z-177): a frozen real measurer run (tests/agent/worker_fixture/, CUT — no e-mail)
 # returns figures each traceable to a spec command it ran, re-derived here; conformance; three controls. ~1 s.
 test_agent_worker
+# 14z-181: the close ritual's two file-level checks (retraction grep reach, tracked homes) run and can fail. ~3 s.
+test_close_tools

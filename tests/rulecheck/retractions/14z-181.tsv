@@ -1,0 +1,41 @@
+# tests/rulecheck/retractions/14z-181.tsv — the wordings retracted by the rule-checker resolves of 14z-181 (runs 163-193), read from build/agent181/resolve1NN.txt; columns pattern, source, kind (retracted — classed by hand | gone — must read 0 hits | reach[:N] — must be found). Run: python3 tools/retraction_grep.py tests/rulecheck/retractions/14z-181.tsv build/agent181/retraction_greps_14z181.txt
+falling victim at height 40	run 164	retracted
+every timing 3440-3490	run 165/166	gone
+the mechanism measured	run 168	retracted
+needs P2 ABOVE P1	run 168	gone
+every double-pass phase (mod 3 and mod 13)	run 169	gone
+reruns every sweep	run 170 — the retracted form was UNCONDITIONAL; a hit carrying the LEAD=0 condition is the corrected wording	retracted
+MP throw connected at the wall	run 171	gone
+every near event ends at the wall	run 171	retracted
+2.65 px	run 172/173	gone
+unclamped 552	run 173	retracted
+HIT and knocked P2 left	run 173	retracted
+walk length) are eliminated	run 173	gone
+moves with the lead	run 175	retracted
+never bistable	run 175	retracted
+134 on both events at every phase	run 177	retracted
+four of the sixteen	run 178	gone
+four shifts where P1 reads 109	run 178	retracted
+level 6 / RNG 0000 as the naming gate	run 177	gone
+clears the dome (apex 127) and is hit on the landing frame — 63	run 182	gone
+every timing from 3440 to 3490 he clears	run 182	gone
+overwritten in four frames	run 182	gone
+poked assertion	run 183 — (g) cited the level-8 reproduction for a level-6 fact	gone
+from a pin the screen edge clamped to 664	run 183/184	retracted
+the per-event table is build/agent181	run 185/186 — a home in the untracked build dir	gone
+the greps artifact's method	run 186/187 — a home and a test in the untracked build dir	gone
+inline script recorded in that close's artifact	run 187 — the script was in no file	gone
+THE GROUND IS y = 40	REACH CONTROL 1: a known live heading in docs/project/gotchas.md	reach
+LEAD=0 for the walk	REACH CONTROL 2: the known live CORRECTED wording, in tools/name_moves.py (plain) and docs/project/gotchas.md (code-spanned) — BOTH must be found	reach:2
+read y > 0 as airborne and called the landing-frame hit	REACH CONTROL 3: a carrier line-wrapped across a '#' comment prefix in tests/audit_trap_airborne.sh	reach
+the FGC loves what ifs	REACH CONTROL 4: a known live sentence found ONLY in README.md, a root document — a scan that stopped reaching the root documents reads 0 (run 204: README.md was outside the old root list)	reach
+
+at height 40 on the way down	run 164 — the trap sheet's caption; corrected on #163, the opener's carrier removed at the 14z-181 close	gone
+the 35 never-entered a2 chains	run 192/193 — the count is 36 since the 14z-181 re-run (a stale carrier in tools/chain_census.py's docstring)	gone
+read not yet given	run 193 — STATE row (4) outlived the maintainer's read	gone
+both reads pending	run 193 — STATE row (11c) outlived the maintainer's reads	gone
+the first four reads were	run 193 — only the first read was "correct"	gone
+reads of the eight capture sheets	run 200/201 — the count and the heading renamed; the #173 index row kept the old anchor until run 201	gone
+close_findings_14z181.txt: 0 addresses checked, GAPS none, REVIEW none, PROMISES none	run 203 — the tool printed one PROMISE line; the row said none	gone
+their read is pending	run 205 — the capture record said the #169 read was pending two lines above the read (found at run 204); `retracted`, not `gone`: run 205's own resolve quotes it in the append-only ledger	retracted
+the grab frame in every swept row, and	run 206 — three sweeps (walk, x-pin, press at lead 0) sample no height; the row now says 'every swept row that records it'	gone

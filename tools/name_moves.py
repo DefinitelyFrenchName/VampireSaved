@@ -755,7 +755,8 @@ PIN_LEAD = {"near": 230, "far": 40}   # how far ahead of its event each pin land
 # marks an event whose P1 faces left at its frame, so a flipped rig can
 # never freeze silently.
 # WHERE A NEAR EVENT REALLY STANDS (measured 14z-181 on pyron_3 while working
-# GitHub #169; the per-event table is build/agent181/near_event_geometry_14z181.txt):
+# GitHub #169; the per-event table is in docs/project/gotchas.md, "AN AIR-THROW RIG IS
+# DECIDED BY THE VICTIM'S JUMP LEAD"):
 # when the previous event carried the camera right (its left edge at 640), the
 # pin's 552 is off-screen and the engine clamps P1 to 664 the next frame; a
 # camera poke ($FF8290) to 448 on the pin frame reads 635 one frame later and

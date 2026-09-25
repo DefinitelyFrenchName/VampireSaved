@@ -1,0 +1,21 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+STATE.md.lines-72-100 (lines 72-100 of STATE.md)	0b2002a77350cf4a3f998e7fd0b92799c6a79e4f
+build/agent181/close_findings_14z181.txt	cacd4249d5fea6096f73721c11a6d157f0833223
+build/agent181/retraction_greps_14z181.txt	c7ebd7cb20f2ec540ca8dd944f3f3208adef6e1b
+build/agent181/close_carriers_14z181.diff	9445e470d11b2b040afc5ef1faf6696a5918988f
+build/agent181/name_moves_close_14z181.diff	a92e1462b1a00add9e3c7356bc7181e6eefdc158
+build/agent181/trap_air_mode4_air-hit.log	d50467c93d5841640da25689fd7f0df35686364f
+build/agent181/victim_parity_mode5_unpinned-level.log	460d7dd9ffe1620de8328a245f4176a0c3c4e3e9
+docs/project/gotchas.md.lines-1-160 (lines 1-160 of docs/project/gotchas.md)	564abd492a6667f024417c4d9dbe5682a04c904b
+build/agent181/gotchas_close_14z181.diff	e5352c328a30df49ec05d86a19cb0754e6d44a52
+docs/game/engine_internals.md.lines-990-1020 (lines 990-1020 of docs/game/engine_internals.md)	529f7d42fb7baa3799297598ea9dc6da40c3d761
+tools/name_moves.py.lines-160-220 (lines 160-220 of tools/name_moves.py)	9447e48c1f1e028356a93c3108896f059ef81e5d
+tools/name_moves.py.lines-735-795 (lines 735-795 of tools/name_moves.py)	7d3abb6db1edd2808c92e74ab650b052cfa55ed0
+docs/NEXT_SESSION.md	8d6a1ff5c693ff566ed6872d6281cf94d197ebd9
+build/agent181/state_14z181_close.diff	026f3c1eb4f6f2614068bd18a44aba7fa159d761
+tests/expected/victim_parity.tsv.lines-1-12 (lines 1-12 of tests/expected/victim_parity.tsv)	853e26d082abf8cab6b2c3085848b32f27b0c3da
+tests/audit_trap_airborne.sh.lines-1-45 (lines 1-45 of tests/audit_trap_airborne.sh)	4e81cbef5a5d20f3896f9f6fb9da71eb0baea625
+tests/audit_victim_parity.sh.lines-1-60 (lines 1-60 of tests/audit_victim_parity.sh)	09a9cda37649ef358407b8492786a64f6bfa0bac
+docs/project/tickets.tsv.lines-74-90 (lines 74-90 of docs/project/tickets.tsv)	877b66f89c8c617d78650953a3f8bd945130e88b
+tests/rulecheck/runs/2026-09-25-185/verdict_real.txt	f61eb4a7c182bae1e1631c680baf17fb2c6cb03a
+build/agent181/resolve185.txt	feee927188462d2ae36824365564993a41b5d5d3

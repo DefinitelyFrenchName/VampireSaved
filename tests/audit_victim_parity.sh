@@ -24,8 +24,8 @@
 #   tenant's whatever ran beside it.
 # EXPECTS: every contact row as frozen in tests/expected/victim_parity.tsv (SAME, or the
 #   frozen DIFFER rows); the native leg reading test_reactions' frozen lines exactly; both ids
-#   from each leg's trace; no schedule poke inside a compared window; the five controls
-#   failing. The contact FRAME is printed, not compared (#168).
+#   from each leg's trace; no schedule poke inside a compared window; the ten declared controls
+#   failing (every MUST-FIRE line below has its in-gate fire and its mode). The contact FRAME is printed, not compared (#168).
 # FOLLOWS: build/manifest/ emu/mame-patches/ tools/audit_same_data_p2.py
 #   tests/expected/victim_parity.tsv tests/expected/reactions_ tests/lib/controls.sh
 #   tests/lib/decrypt_cache.sh tests/lib/measures.sh

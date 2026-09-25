@@ -1,0 +1,34 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+STATE.md.lines-46-56 (lines 46-56 of STATE.md)	0c53c6df0f1397659685cb398b836f7a2aacf522
+STATE.md.lines-72-101 (lines 72-101 of STATE.md)	d56a78e031dfcce2af986dc7c9d083dbf55cc1e6
+STATE.md.lines-135-142 (lines 135-142 of STATE.md)	720f00555c4da0a3ff619b35338a4b7639a17589
+DECISIONS_HISTORY.md.lines-28-48 (lines 28-48 of DECISIONS_HISTORY.md)	ab7edc31b2227d647fa5c4e5fbb5935e012e3c22
+build/agent181/captures_sent_14z181.txt	9ed317ec614c9a5897dc9b41f7dc6691c6ae3df7
+build/agent181/close_findings_14z181.txt	cacd4249d5fea6096f73721c11a6d157f0833223
+build/agent181/homes_tracked_14z181.txt	8458788ed1ad764d0fd396796a3cc65f738d50f5
+tools/homes_tracked.py	c5519fba2571a19df9b27e86ae9c12e619f5e56a
+build/agent181/retraction_greps_14z181.txt	5718fe0dfab6a9a7b896b5aa3dd048568aa6eff5
+tools/retraction_grep.py	df13f36ecef37822f3e8813aeaa85e6e9adb5e45
+tests/rulecheck/retractions/14z-181.tsv	5cb14a201bac73fb78017041e4bd0c4f72b8847a
+tests/test_close_tools.sh	4f51fdff4377bfa9f016591fd98b2102528cbde0
+build/agent181/test_close_tools_14z181.log	839f890a012d94f33908371748ffe3a8c2343188
+build/agent181/test_close_tools_mode_build-home-planted.log	3855b6c8a696ff24be138f7cde3eb5016ea37889
+build/agent181/close_carriers_14z181.diff	3702689aec041df624c3e1922d2ccbc24998ad93
+build/agent181/name_moves_close_14z181.diff	a92e1462b1a00add9e3c7356bc7181e6eefdc158
+build/agent181/trap_air_mode4_air-hit.log	d50467c93d5841640da25689fd7f0df35686364f
+build/agent181/victim_parity_mode5_unpinned-level.log	460d7dd9ffe1620de8328a245f4176a0c3c4e3e9
+docs/project/gotchas.md.lines-1-160 (lines 1-160 of docs/project/gotchas.md)	3352c85a77c058410a77a75bbeb971de19bc9765
+build/agent181/gotchas_close_14z181.diff	83467dbc439062d0f6d6cbd427946b2e233010f9
+docs/game/engine_internals.md.lines-990-1030 (lines 990-1030 of docs/game/engine_internals.md)	167df82785f77d50c2db4cf0b3719006c1c3747f
+tools/name_moves.py.lines-160-220 (lines 160-220 of tools/name_moves.py)	9447e48c1f1e028356a93c3108896f059ef81e5d
+tools/name_moves.py.lines-735-795 (lines 735-795 of tools/name_moves.py)	7d3abb6db1edd2808c92e74ab650b052cfa55ed0
+docs/NEXT_SESSION.md	2fd71a6775e4738208bd6e8d1c035c39dad53c79
+build/agent181/state_14z181_close.diff	4c1e65d2326ad908830f20bcc98a3fb9b238bb92
+tests/expected/victim_parity.tsv.lines-1-12 (lines 1-12 of tests/expected/victim_parity.tsv)	853e26d082abf8cab6b2c3085848b32f27b0c3da
+tests/audit_trap_airborne.sh.lines-1-45 (lines 1-45 of tests/audit_trap_airborne.sh)	4e81cbef5a5d20f3896f9f6fb9da71eb0baea625
+tests/audit_victim_parity.sh.lines-1-60 (lines 1-60 of tests/audit_victim_parity.sh)	09a9cda37649ef358407b8492786a64f6bfa0bac
+docs/project/tickets.tsv.lines-74-90 (lines 74-90 of docs/project/tickets.tsv)	808538bff237d7d4b1cfd53c64065388387550c6
+tools/chain_census.py	2e26961bd26963329ab471128b3be5f311814359
+build/agent181/chain_census_rerun_14z181.txt	c2ae32b7e3aae43e5b046ab74b79de9ecabfb6ee
+tests/rulecheck/runs/2026-09-25-192/verdict_real.txt	205470eb46cc84655fb4024478663f909058ace9
+build/agent181/resolve192.txt	a33ecaf43a0110f6b23680b7f72d8575d84f30f3

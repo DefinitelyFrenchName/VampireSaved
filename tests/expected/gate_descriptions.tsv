@@ -148,6 +148,7 @@ declares	test_checkdocs_rom
 declares	test_checkskills
 declares	test_classify_hitclass_probe
 declares	test_classify_pool_spawns
+declares	test_close_tools
 declares	test_commit_subject
 declares	test_community_crosscheck
 declares	test_compare_composite

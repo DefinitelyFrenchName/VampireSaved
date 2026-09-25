@@ -1,0 +1,20 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+STATE.md.lines-72-100 (lines 72-100 of STATE.md)	c6fd4c0ccff2037df32c1712a67ec60ea2ef2e7b
+build/agent181/close_findings_14z181.txt	cacd4249d5fea6096f73721c11a6d157f0833223
+build/agent181/retraction_greps_14z181.txt	a31f2176a2e256b81a7afb44b26ef509dcda9e19
+build/agent181/close_carriers_14z181.diff	9445e470d11b2b040afc5ef1faf6696a5918988f
+build/agent181/trap_air_mode4_air-hit.log	d50467c93d5841640da25689fd7f0df35686364f
+build/agent181/victim_parity_mode5_unpinned-level.log	460d7dd9ffe1620de8328a245f4176a0c3c4e3e9
+docs/project/gotchas.md.lines-1-160 (lines 1-160 of docs/project/gotchas.md)	4bf99415f5a4f4208dc16a4824da3950ed82fc7f
+build/agent181/gotchas_close_14z181.diff	7a30764dcc6a2d049e024406bd42d72efdcf7516
+docs/game/engine_internals.md.lines-990-1020 (lines 990-1020 of docs/game/engine_internals.md)	529f7d42fb7baa3799297598ea9dc6da40c3d761
+tools/name_moves.py.lines-160-220 (lines 160-220 of tools/name_moves.py)	9447e48c1f1e028356a93c3108896f059ef81e5d
+tools/name_moves.py.lines-735-795 (lines 735-795 of tools/name_moves.py)	2da388add9fb734d3dbf91112f833469dcc3362d
+docs/NEXT_SESSION.md	8d6a1ff5c693ff566ed6872d6281cf94d197ebd9
+build/agent181/state_14z181_close.diff	2fda36c8094cf47949f2b42038ae5d15f64aaf7e
+tests/expected/victim_parity.tsv.lines-1-12 (lines 1-12 of tests/expected/victim_parity.tsv)	853e26d082abf8cab6b2c3085848b32f27b0c3da
+tests/audit_trap_airborne.sh.lines-1-45 (lines 1-45 of tests/audit_trap_airborne.sh)	4e81cbef5a5d20f3896f9f6fb9da71eb0baea625
+tests/audit_victim_parity.sh.lines-1-60 (lines 1-60 of tests/audit_victim_parity.sh)	09a9cda37649ef358407b8492786a64f6bfa0bac
+docs/project/tickets.tsv.lines-74-90 (lines 74-90 of docs/project/tickets.tsv)	877b66f89c8c617d78650953a3f8bd945130e88b
+tests/rulecheck/runs/2026-09-25-183/verdict_real.txt	e347cb94ee2f3193ec9c9e56f6cf0b506ec749e5
+build/agent181/resolve183.txt	a975520f4b69dea879831caa491195fd14abeece
