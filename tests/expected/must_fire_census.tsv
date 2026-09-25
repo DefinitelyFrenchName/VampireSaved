@@ -70,6 +70,7 @@ declares	test_charmap_overrides
 declares	test_checkdocs
 declares	test_checkdocs_rom
 declares	test_checkskills
+declares	test_close_tools
 declares	test_commit_subject
 declares	test_community_crosscheck
 declares	test_controls_contract

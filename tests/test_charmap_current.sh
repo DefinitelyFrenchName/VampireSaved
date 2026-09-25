@@ -121,6 +121,9 @@ for pair in "$DON:donovan" "$HUI:huitzil" "$PYR:pyron"; do
     # <tenant>_anim.md and <tenant>.html stay OUT of the tree (tools/framedata_pages.sh
     # regenerates them under ../charpages/framedata/); their currency is locked by
     # SHA-256 in tests/expected/charmap_pages.sha256 — FREEZE=1 re-freezes after review.
+    # The html also reads build/manifest/moves_<tenant>.toml (names AND notes), so a
+    # move-note edit changes its hash: a91a555a (#169) edited two air-throw notes without
+    # re-freezing and the 14z-181 close tier caught it (rule-checker run 2026-09-25-213).
     [ "$n" = donovan ] && vs_ctl_is empty-page-frozen && : > "$W/${n}_anim.md"
     SHA="$(python3 -c 'import hashlib,sys; print(hashlib.sha256(open(sys.argv[1],"rb").read()).hexdigest())' "$W/${n}_anim.md")"
     HSHA="$(python3 -c 'import hashlib,sys; print(hashlib.sha256(open(sys.argv[1],"rb").read()).hexdigest())' "$W/$n.html")"

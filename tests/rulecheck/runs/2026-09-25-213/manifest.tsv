@@ -1,0 +1,8 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent181/refreeze_close_14z181.txt	5dfc59fcd9a3ad350959e62857f0d1f3575128af
+tests/test_charmap_current.sh	2552d01dc1b918700730d0135cebde62f63d92c8
+tests/test_must_fire_census.sh	2e2a53ecc54e94c4143863e7df237464fd23af88
+tests/expected/charmap_pages.sha256	f915c76d4dcf2c41b9872b974f84c8efece404da
+tests/expected/must_fire_census.tsv	1d66bc371443ab06e592721a297d72b6a76cf895
+tools/charmap_html.py.lines-1-60 (lines 1-60 of tools/charmap_html.py)	d2dae85cea38a911adce86860468f207e4a5bdb8
+build/agent181/tier_close_14z181.log	ece3f5e99b35b8bb781480fabc89c599d3d28b6b
