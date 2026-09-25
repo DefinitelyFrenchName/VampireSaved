@@ -100,4 +100,5 @@ Galactic Throw pair; naming/parity/attribution re-frozen). The 73 poke rulings a
     `build/manifest/moves_<tenant>.toml` changes the out-of-tree html page's hash
     (`tests/test_charmap_current.sh` names it now): re-freeze `charmap_pages.sha256` in the
     commit that edits a note; (e) the btw fork ran on the SESSION's model (Fable 5.1), so
-    `transcript_gaps.py --cap` reads it as a breach — the worker cap has no declaration path.
+    `transcript_gaps.py --cap` reads it as a breach — the tool has no declaration path, and the
+    maintainer RULED a /btw fork exempt (STATE 'Standing rulings'): name it in the close and push.

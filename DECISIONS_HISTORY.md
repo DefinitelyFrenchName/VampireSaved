@@ -27,6 +27,12 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-25 (14z-181) — the worker cap: a /btw fork is exempt
+
+Asked at the 14z-181 close, after `python3 tools/agent/transcript_gaps.py --subagents 1c426425 --cap` read 1 breach over 155 workers — the /btw fork the maintainer started ran on the session's model, claude-fable-5-1 (a fork inherits the parent's model), and the tool has no declaration path — with every other close check green: *"Push main?"* The maintainer chose the option *"Push; fork is exempt (Recommended)"*, whose text read: *"Rule that a /btw fork runs on the session's model and is not a worker the agent spawned, so it is exempt from the cap. I record the ruling in DECISIONS_HISTORY and STATE, then push main."* So: a /btw fork is not a worker the agent spawned and does not count against the worker cap; a cap read whose only breach is such a fork is green for the push, and the close names the fork.
+
+---
+
 ## Ruled 2026-09-25 (14z-181) — the maintainer's reads of the capture sheets: every one identical; Victor's one-frame throw difference documented and validated; #173 closed on the read; #175 gains a vs2 check
 
 The maintainer's reads of the 14z-181 capture sheets (2026-09-25, in the sitting, verbatim):
