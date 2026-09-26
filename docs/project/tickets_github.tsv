@@ -4,7 +4,7 @@
 # repo: DefinitelyFrenchName/VampireSaved
 # issues: 178
 number	state	reason	closed	labels	title
-178	OPEN	-	-	evolution	Hop Kick in Donovan's Dark Force connects on neither leg of any rig: the thread's 'native lands, ours whiffs' was never compared
+178	OPEN	-	-	evolution,severity: medium	Hop Kick in Donovan's Dark Force connects on neither leg of any rig: the thread's 'native lands, ours whiffs' was never compared
 177	OPEN	-	-	evolution	Tenant movement parity vs native vs2: walk, dash, jumps and arcs, Phobos's float and air dash — no gate compares movement against native
 176	OPEN	-	-	evolution	Compare the RNG's per-frame advance between our build and native: the parity gates pin the RNG word every frame, so an advance defect would read as agreement
 175	CLOSED	COMPLETED	2026-09-25	evolution	Plasma Trap dome vs a truly AIRBORNE victim: the air stager's case for the trap is unreached by any rig (a neutral jump clears the dome and is hit on landing)
@@ -28,7 +28,7 @@ number	state	reason	closed	labels	title
 157	OPEN	-	-	bug,needs-maintainer-ruling,severity: high	Tenant throws pay meter to the wrong fighters — the ported throw code never registers the hit pair on vsavj (the 14x rollback's price; #136's meter family)
 156	CLOSED	COMPLETED	2026-09-17	bug	rulecheck.py: two line ranges of one artifact collide in staging, the reader sees only the last
 155	OPEN	-	-	bug	audit_forced_pick_fidelity: the poked leg is a hand-typed replica of the #136 rig's leg with no control against drift
-154	OPEN	-	-	bug	audit_forced_pick_fidelity: the FREEZE branch exits before the identity assertions and the controls, so a failed run can freeze
+154	CLOSED	COMPLETED	2026-09-26	bug	audit_forced_pick_fidelity: the FREEZE branch exits before the identity assertions and the controls, so a failed run can freeze
 153	OPEN	-	-	evolution	Run the test tiers on a scratch clone at a named commit (lever B of #148): integrity and traceability at freeze and release, as bbh/BBX do
 152	CLOSED	COMPLETED	2026-09-17	evolution	An independent adversarial rule-checker at every decision point — redundancy for rule APPLICATION, not for measurement
 151	CLOSED	COMPLETED	2026-09-17	evolution	Re-examine #136 end to end: the forced-pick native leg is unvalidated, so 17 of 27 parity verdicts rest on an unmeasured assumption
@@ -42,13 +42,13 @@ number	state	reason	closed	labels	title
 143	OPEN	-	-	bug	tests/lua/walker_sp.lua reads the supervisor stack on MAME 0.288 (no A7 state); two walker audits consume its ranges
 142	CLOSED	NOT_PLANNED	2026-09-15	bug	Donovan's 421+MP with no mash lands 5 hits on our build and 4 on native vsav2 at NORMAL speed (equal at TURBO)
 141	OPEN	-	-	evolution	The full FBNeo hacked-vs-vanilla legacy track — CLAUDE.md [VSP-24]'s deferral, now its own ticket (the #78 residual)
-140	OPEN	-	-	bug	The static runners' controls readout re-adds the previous gate's must-fire counts for every gate that does not PASS — fired/declared overstated on a red run
+140	CLOSED	COMPLETED	2026-09-26	bug	The static runners' controls readout re-adds the previous gate's must-fire counts for every gate that does not PASS — fired/declared overstated on a red run
 139	CLOSED	COMPLETED	2026-09-14	bug	A rejected build keeps its packed rompath, indistinguishable on disk from a finished build (the #1 residual)
-138	OPEN	-	-	bug	A stock-track build directory without its vsavj.zip silently dispatches run_suite to the VANILLA expectations — the reference-row rule nothing enforces (the #55 residual)
+138	CLOSED	COMPLETED	2026-09-26	bug	A stock-track build directory without its vsavj.zip silently dispatches run_suite to the VANILLA expectations — the reference-row rule nothing enforces (the #55 residual)
 137	CLOSED	COMPLETED	2026-09-14	bug	test_wide_profile's reference guard trusts a profile check that nothing in the run proves can see the profile (the #63 residual)
 136	CLOSED	COMPLETED	2026-09-25	evolution	Tenant move parity vs native VS2: compare Donovan, Phobos and Pyron's moves on the WIDE merged build against vsav2
 135	CLOSED	COMPLETED	2026-09-15	evolution	The VS-vs-VS2 tick cadence: re-establish its measurement, mechanism and scope, and document it properly
-134	OPEN	-	-	bug	The vanilla hit rigs leave 6 legs VOID at contact range (5 LP, 1 LK): those frame-data cells are unmeasured
+134	CLOSED	COMPLETED	2026-09-26	bug	The vanilla hit rigs leave 6 legs VOID at contact range (5 LP, 1 LK): those frame-data cells are unmeasured
 133	OPEN	-	-	evolution	Re-measure the emulator runner's pull-queue gain on a wider host
 132	CLOSED	NOT_PLANNED	2026-09-25	bug	release/merged-m15 was never packaged
 131	OPEN	-	-	evolution	audit_mask_window_ff42a2: deprecate it, or keep it as a case-specific gate?

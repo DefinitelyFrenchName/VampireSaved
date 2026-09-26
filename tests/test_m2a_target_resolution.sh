@@ -104,6 +104,17 @@ else
     echo "  ok: it stops before running any replay"
 fi
 
+echo "== 2b. a FRONTED dir without vsavj.zip resolves to NOTHING (GitHub #138) =="
+# Without --fronted this fell through to $ROMDIR's pristine set and dispatched the
+# battery onto the VANILLA expectations; it must stop instead, like an unregistered build.
+mkdir -p "$WORK/front_empty"
+got=$(m2a_masked_target "$WORK/front_empty;$ROMDIR" || true)
+if [ -n "$got" ]; then
+    echo "FAIL: an empty fronted dir resolved to '$got' — the fall-through #138 closes"; fail=1
+else
+    echo "  ok: it resolves to nothing"
+fi
+
 echo "== 3. the escape hatch announces itself =="
 # M2A_EXPSET exists for authoring a set for a build that is not registered
 # yet. A silent override would be the old pin with extra steps, so the run

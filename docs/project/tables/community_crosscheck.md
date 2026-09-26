@@ -72,9 +72,12 @@ fitting our numbers against this very workbook — which is circular, and wrong:
   no proximity variants at all. Zabel is why it mattered — the fixed model handed
   him the odd slots, which are his `6`-prefixed COMMAND normals, and he came out
   INCONSISTENT on all five columns. On the measured join he is clean on all five.
-- **DE, MO, FE, SA, LE, LI** take odd at far / even at near for MP..HK, but LP is
-  `0x01` at both distances; **GA, VI** the same with LP at `0x00`; **BU** and **AU**
-  additionally have no close variant for HP (BU none for MK).
+- **DE, MO, FE, LE, LI** take odd at far / even at near on every button, LP included;
+  **SA** the same, his HP a knife edge at the rig's near separation (0x04 at 59 px,
+  0x05 at 60); **GA, VI** have no close LP (`0x00` at both), GA none for MK either;
+  **BU** has no close variant for HP, MK or HK, **AU** none for HP. (Until 14z-183,
+  GitHub #134, this read "LP is `0x01` at both distances": the rig's first event, LP,
+  was pressed at mid range because the round intro ate its walk-in.)
 
 The **crouching** (`0x0c-0x11`) slots are the layout measured on the three TENANTS by
 `tools/name_moves.py` (gate `tests/test_move_naming.sh`), carried over and **not**
@@ -107,11 +110,11 @@ per MOVE, over all 15 characters:
 
 | column | convention | moves agreeing |
 |---|---|---|
-| `startup` | sheet = ours +1 — the sheet counts the first active frame as startup; ours counts the frames before it | **288/291** (98%) |
-| `active` | sheet = ours +0 — identical | **283/286** (98%) |
-| `recovery` | sheet = ours +2 — a 2-frame tail the sheet counts and our last node does not | **190/197** (96%) |
-| `white` | sheet = ours +0 — identical — the record's +9 is the dealt white damage, unscaled | **280/291** (96%) |
-| `gauge_hit` | sheet = ours +0 — identical once the sheet's own `gauge whiff` is subtracted | **285/291** (97%) |
+| `startup` | sheet = ours +1 — the sheet counts the first active frame as startup; ours counts the frames before it | **293/296** (98%) |
+| `active` | sheet = ours +0 — identical | **288/291** (98%) |
+| `recovery` | sheet = ours +2 — a 2-frame tail the sheet counts and our last node does not | **195/202** (96%) |
+| `white` | sheet = ours +0 — identical — the record's +9 is the dealt white damage, unscaled | **285/296** (96%) |
+| `gauge_hit` | sheet = ours +0 — identical once the sheet's own `gauge whiff` is subtracted | **290/296** (97%) |
 
 So the two measurements corroborate each other on ~96% of every column we can
 compare, under one stated convention per column. The residue is the worklist below.
@@ -123,16 +126,16 @@ compare, under one stated convention per column. The residue is the worklist bel
 | **AN** Anakaris `0x06` | 16 | CONSTANT OFFSET (sheet = ours +1 on all 16) · n=16 | EXACT · n=15 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | INCONSISTENT · n=16 | EXACT · n=16 | INCONSISTENT · n=16 |
 | **AU** Aulbath `0x09` | 20 | INCONSISTENT · n=20 | INCONSISTENT · n=19 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | EXACT · n=20 | EXACT · n=20 | EXACT · n=20 |
 | **BI** Bishamon `0x08` | 19 | INCONSISTENT · n=18 | EXACT · n=18 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | EXACT · n=18 | INCONSISTENT · n=18 | EXACT · n=18 |
-| **BU** Bulleta `0x00` | 18 | CONSTANT OFFSET (sheet = ours +1 on all 18) · n=18 | EXACT · n=18 | CONSTANT OFFSET (sheet = ours +2 on all 13) · n=13 | EXACT · n=18 | EXACT · n=18 | EXACT · n=18 |
+| **BU** Bulleta `0x00` | 19 | CONSTANT OFFSET (sheet = ours +1 on all 19) · n=19 | EXACT · n=19 | CONSTANT OFFSET (sheet = ours +2 on all 14) · n=14 | EXACT · n=19 | EXACT · n=19 | EXACT · n=19 |
 | **DE** Demitri `0x01` | 21 | CONSTANT OFFSET (sheet = ours +1 on all 21) · n=21 | EXACT · n=21 | CONSTANT OFFSET (sheet = ours +2 on all 15) · n=15 | EXACT · n=21 | EXACT · n=21 | EXACT · n=21 |
 | **FE** Felicia `0x07` | 19 | CONSTANT OFFSET (sheet = ours +1 on all 19) · n=19 | EXACT · n=19 | CONSTANT OFFSET (sheet = ours +2 on all 13) · n=13 | EXACT · n=19 | INCONSISTENT · n=19 | EXACT · n=19 |
 | **GA** Gallon `0x02` | 18 | CONSTANT OFFSET (sheet = ours +1 on all 18) · n=18 | EXACT · n=18 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | EXACT · n=18 | EXACT · n=18 | EXACT · n=18 |
 | **JE** Jedah `0x0f` | 18 | CONSTANT OFFSET (sheet = ours +1 on all 18) · n=18 | EXACT · n=18 | INCONSISTENT · n=12 | INCONSISTENT · n=18 | EXACT · n=18 | INCONSISTENT · n=18 |
-| **LE** Lei-Lei `0x0d` | 19 | CONSTANT OFFSET (sheet = ours +1 on all 19) · n=19 | INCONSISTENT · n=19 | CONSTANT OFFSET (sheet = ours +2 on all 13) · n=13 | INCONSISTENT · n=19 | INCONSISTENT · n=19 | INCONSISTENT · n=19 |
-| **LI** Lilith `0x0e` | 22 | CONSTANT OFFSET (sheet = ours +1 on all 22) · n=22 | EXACT · n=22 | INCONSISTENT · n=16 | INCONSISTENT · n=22 | EXACT · n=22 | INCONSISTENT · n=22 |
-| **MO** Morrigan `0x05` | 21 | CONSTANT OFFSET (sheet = ours +1 on all 21) · n=21 | EXACT · n=21 | CONSTANT OFFSET (sheet = ours +2 on all 15) · n=15 | INCONSISTENT · n=21 | EXACT · n=21 | INCONSISTENT · n=21 |
+| **LE** Lei-Lei `0x0d` | 20 | CONSTANT OFFSET (sheet = ours +1 on all 20) · n=20 | INCONSISTENT · n=20 | CONSTANT OFFSET (sheet = ours +2 on all 14) · n=14 | INCONSISTENT · n=20 | INCONSISTENT · n=20 | INCONSISTENT · n=20 |
+| **LI** Lilith `0x0e` | 23 | CONSTANT OFFSET (sheet = ours +1 on all 23) · n=23 | EXACT · n=23 | INCONSISTENT · n=17 | INCONSISTENT · n=23 | EXACT · n=23 | INCONSISTENT · n=23 |
+| **MO** Morrigan `0x05` | 22 | CONSTANT OFFSET (sheet = ours +1 on all 22) · n=22 | EXACT · n=22 | CONSTANT OFFSET (sheet = ours +2 on all 16) · n=16 | INCONSISTENT · n=22 | EXACT · n=22 | INCONSISTENT · n=22 |
 | **QB** Q-Bee `0x0c` | 15 | CONSTANT OFFSET (sheet = ours +1 on all 15) · n=15 | EXACT · n=15 | CONSTANT OFFSET (sheet = ours +2 on all 10) · n=10 | INCONSISTENT · n=15 | EXACT · n=15 | INCONSISTENT · n=15 |
-| **SA** Sasquatch `0x0a` | 19 | INCONSISTENT · n=19 | EXACT · n=19 | CONSTANT OFFSET (sheet = ours +2 on all 13) · n=13 | INCONSISTENT · n=19 | INCONSISTENT · n=19 | INCONSISTENT · n=19 |
+| **SA** Sasquatch `0x0a` | 20 | INCONSISTENT · n=20 | EXACT · n=20 | CONSTANT OFFSET (sheet = ours +2 on all 14) · n=14 | INCONSISTENT · n=20 | INCONSISTENT · n=20 | INCONSISTENT · n=20 |
 | **VI** Victor `0x03` | 23 | CONSTANT OFFSET (sheet = ours +1 on all 23) · n=23 | EXACT · n=23 | CONSTANT OFFSET (sheet = ours +2 on all 17) · n=17 | INCONSISTENT · n=23 | EXACT · n=23 | INCONSISTENT · n=23 |
 | **ZA** Zabel `0x04` | 24 | CONSTANT OFFSET (sheet = ours +1 on all 24) · n=24 | EXACT · n=21 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | EXACT · n=24 | INCONSISTENT · n=24 | EXACT · n=24 |
 
@@ -288,41 +291,41 @@ direction); startup 8 (+1 = the sheet's 9), red 16 = 8+8, white 8: EXACT.
 
 18 move(s) deviate; the per-move table is on the full page.
 
-### LE Lei-Lei — `active` — most common delta +0 on 18/19; spread -1..+0
+### LE Lei-Lei — `active` — most common delta +0 on 19/20; spread -1..+0
 
-19 move(s) deviate; the per-move table is on the full page.
+20 move(s) deviate; the per-move table is on the full page.
 
-### LE Lei-Lei — `white` — most common delta +0 on 18/19; spread -9..+0
+### LE Lei-Lei — `white` — most common delta +0 on 19/20; spread -9..+0
 
-19 move(s) deviate; the per-move table is on the full page.
+20 move(s) deviate; the per-move table is on the full page.
 
-### LE Lei-Lei — `gauge_hit` — most common delta +0 on 18/19; spread -18..+0
+### LE Lei-Lei — `gauge_hit` — most common delta +0 on 19/20; spread -18..+0
 
-19 move(s) deviate; the per-move table is on the full page.
+20 move(s) deviate; the per-move table is on the full page.
 
-### LE Lei-Lei — `red` — most common delta +0 on 18/19; spread -21..+0
+### LE Lei-Lei — `red` — most common delta +0 on 19/20; spread -21..+0
 
-19 move(s) deviate; the per-move table is on the full page.
+20 move(s) deviate; the per-move table is on the full page.
 
-### LI Lilith — `recovery` — most common delta +2 on 15/16; spread +2..+3
+### LI Lilith — `recovery` — most common delta +2 on 16/17; spread +2..+3
 
-16 move(s) deviate; the per-move table is on the full page.
+17 move(s) deviate; the per-move table is on the full page.
 
-### LI Lilith — `white` — most common delta +0 on 18/22; spread -1..+7
+### LI Lilith — `white` — most common delta +0 on 19/23; spread -1..+7
+
+23 move(s) deviate; the per-move table is on the full page.
+
+### LI Lilith — `red` — most common delta +0 on 19/23; spread -1..+18
+
+23 move(s) deviate; the per-move table is on the full page.
+
+### MO Morrigan — `white` — most common delta +0 on 21/22; spread +0..+7
 
 22 move(s) deviate; the per-move table is on the full page.
 
-### LI Lilith — `red` — most common delta +0 on 18/22; spread -1..+18
+### MO Morrigan — `red` — most common delta +0 on 21/22; spread +0..+19
 
 22 move(s) deviate; the per-move table is on the full page.
-
-### MO Morrigan — `white` — most common delta +0 on 20/21; spread +0..+7
-
-21 move(s) deviate; the per-move table is on the full page.
-
-### MO Morrigan — `red` — most common delta +0 on 20/21; spread +0..+19
-
-21 move(s) deviate; the per-move table is on the full page.
 
 ### QB Q-Bee — `white` — most common delta +0 on 14/15; spread +0..+7
 
@@ -332,21 +335,21 @@ direction); startup 8 (+1 = the sheet's 9), red 16 = 8+8, white 8: EXACT.
 
 15 move(s) deviate; the per-move table is on the full page.
 
-### SA Sasquatch — `startup` — most common delta +1 on 18/19; spread +0..+1
+### SA Sasquatch — `startup` — most common delta +1 on 19/20; spread +0..+1
 
-19 move(s) deviate; the per-move table is on the full page.
+20 move(s) deviate; the per-move table is on the full page.
 
-### SA Sasquatch — `white` — most common delta +0 on 18/19; spread +0..+8
+### SA Sasquatch — `white` — most common delta +0 on 19/20; spread +0..+8
 
-19 move(s) deviate; the per-move table is on the full page.
+20 move(s) deviate; the per-move table is on the full page.
 
-### SA Sasquatch — `gauge_hit` — most common delta +0 on 17/19; spread -18..+0
+### SA Sasquatch — `gauge_hit` — most common delta +0 on 18/20; spread -18..+0
 
-19 move(s) deviate; the per-move table is on the full page.
+20 move(s) deviate; the per-move table is on the full page.
 
-### SA Sasquatch — `red` — most common delta +0 on 18/19; spread +0..+20
+### SA Sasquatch — `red` — most common delta +0 on 19/20; spread +0..+20
 
-19 move(s) deviate; the per-move table is on the full page.
+20 move(s) deviate; the per-move table is on the full page.
 
 ### VI Victor — `white` — most common delta +0 on 22/23; spread +0..+8
 

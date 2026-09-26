@@ -164,7 +164,7 @@ m2a_masked_target() {
     # exits 2, so "whatever it printed" is not the set. Contract here: print a
     # set name and return 0, or print NOTHING and return 1 — a caller that
     # forgets to check the status must not end up with a 40-hex "set name".
-    _mt_out=$(python3 "$REPO/tools/build_fingerprint.py" "$1" --set vsavj 2>/dev/null) \
+    _mt_out=$(python3 "$REPO/tools/build_fingerprint.py" "$1" --set vsavj --fronted 2>/dev/null) \
         || return 1
     echo "$_mt_out"
 }

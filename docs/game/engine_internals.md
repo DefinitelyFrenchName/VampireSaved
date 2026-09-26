@@ -929,7 +929,9 @@ the per-chain frame data in the out-of-tree `<tenant>_anim.md`.
   carry the box `(0, 0, 40, 6)`: 80 px wide and 12 px tall, its top 6 px above the dome's y (the
   ground, 40), identical on our build. A jumping Victor's one airborne hurtbox, vuln0
   `(0, 69, 32, 36)`, has its bottom 33 px above his feet, so the dome never reaches him in the air
-  (`tests/audit_trap_airborne.sh`). **Felicia's j.HP (`a2:0x14` / `0x1a`) node 4 carries a
+  (`tests/audit_trap_airborne.sh`; the static figures — the dome's records, Victor's vuln0-only families,
+  Felicia's `b:0x0f` and `a2:0x14#4` boxes on vs2, vsavj and our build — re-derived by a measurer 14z-183 with
+  `tools/trap_air_static.py`). **Felicia's j.HP (`a2:0x14` / `0x1a`) node 4 carries a
   hurtbox whose bottom is 6 px BELOW her feet**; timed onto her last descent frame (y 42) over the
   active dome she is hit IN THE AIR — class 0x07, the air stager, knocked upward — frame-identical
   on native vs2 and our merged build in every traced field (`tests/audit_trap_air_hit.sh`; the

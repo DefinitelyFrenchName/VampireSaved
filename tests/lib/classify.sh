@@ -71,6 +71,11 @@
 
 vs_classify() {
     _st="$1"; _log="$2"; _w="${3:-90}"; _gate="${4:-}"
+    # GitHub #140 (14z-183): the controls reader runs only on a PASS below, so without
+    # this reset a FAIL / SKIP / TIMEOUT row kept the PREVIOUS gate's VS_CTL_* — the
+    # runners re-added its fired/declared counts and took a FAIL's label from it.
+    VS_CTL_VERDICT=""; VS_CTL_DECLARED=0; VS_CTL_FIRED=0; VS_CTL_DEAD=0; VS_CTL_UNDECLARED=0
+    VS_CTL_MISSING=""; VS_CTL_DETAIL=""
     _vs_classify_base "$_st" "$_log" "$_w"
     [ "$VS_VERDICT" = PASS ] && [ -n "$_gate" ] && [ -f "$_gate" ] || return 0
     if command -v vs_ctl_read >/dev/null 2>&1; then

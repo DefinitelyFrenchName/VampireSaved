@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-424 entries (46 game / 120 platform / 258 project), counted from the buckets at generation.
+426 entries (46 game / 120 platform / 260 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 46 entries
 
@@ -194,7 +194,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A WORKER CAN FINISH ON ANOTHER MODEL THAN ITS DEFINITION NAMES — A SAFETY-CLASSIFIER STOP TRIGGERS A SILENT FALLBACK (measured 2026-09-24, 14z-178, Claude Code 2.1.281)
 - A MAIN SESSION RUN AS A DEFINITION (`claude --agent <name>`) LOSES CLAUDE CODE'S WHOLE DEFAULT SYSTEM PROMPT — THE DEFINITION'S BODY REPLACES IT (measured 2026-09-24, 14z-178, Claude Code 2.1.281)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 258 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 260 entries
 
 - A VULN ID OF 0 IS NO BOX — a resolver that reads it builds a PHANTOM hurtbox the engine never tests (paid: 14z-182, GitHub #175)
 - A CHAIN ID IN A NAMING EXPECTATION IS IDENTIFIED FROM THE SLOT TABLE, NEVER DESCRIBED IN PROSE (paid: 14z-171, caught 14z-172, GitHub #168)
@@ -408,7 +408,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A MUST-FIRE CONTROL THAT PLANTS ITS PERTURBATION AT END OF FILE DEPENDS ON WHICH SECTION IS LAST — the STATE.md clean-up killed `test_checkskills`' `state-anchor-outside` (paid: 14z-154)
 - A TEXT LINT MATCHES ITS BANNED PATTERN INSIDE A PRINTED MESSAGE — a new gate's own `ok` line naming `${VAR:?}` turned two gates red (paid: 14z-155)
 - A STRICT TIER STARTED INSIDE A BACKGROUND TASK DIES WITH THE TASK — the harness's low-memory kill takes `nohup … &!` children too (paid: 14z-155)
-- THE STATIC TIER'S MUST-FIRE READOUT OVERSTATES `fired / declared` ON A RED RUN — a gate that does not PASS re-adds the previous gate's counts (paid: 14z-155, #140)
+- THE STATIC TIER'S MUST-FIRE READOUT OVERSTATED `fired / declared` ON A RED RUN — a gate that did not PASS re-added the previous gate's counts (paid: 14z-155, #140; FIXED 14z-183)
 - PINNING THE ENGINE RNG THROUGH CHARACTER LOAD STOPS OUR BUILD LOADING THE MATCH AT ALL (paid: 14z-159, #136)
 - A CROSS-GAME COMPARISON MUST START AT THE FIRST SCRIPTED EVENT, NOT AT THE MATCH ANCHOR — the intro is an RNG draw (paid: 14z-159, #136)
 - A CONTROL FIXTURE BUILT BESIDE ITS CONTROL SECTION LEAVES THE CONTROL'S *MODE* COMPARING NOTHING — and an empty result reads as PASS (paid: 14z-159)
@@ -454,3 +454,5 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A PATH EXTRACTOR OVER SHELL TEXT MISSES THE PATHS THAT ARE NOT SPELLED AS PATHS — read its proposals against what each gate SAYS it uses before trusting a census (paid: 14z-180, GitHub #171)
 - A RIG'S SHARED PIN INSIDE A COMPARED WINDOW ERASES A HIT ON BOTH LEGS — and the frozen row then agrees with itself (paid: 14z-181, GitHub #136, rule-checker run 2026-09-25-148)
 - A RIG IS TUNED AT ONE SPEED LEVEL — pin the level it was tuned at, or its contacts whiff and every length moves (paid: 14z-181, GitHub #136)
+- A RIG'S FIRST EVENT CAN BE EATEN BY THE ROUND INTRO — a walk-in that starts before the fighters are released never happens, and every table built on that event measures a different distance (paid: 14z-183, #134)
+- A FREEZE BRANCH THAT COPIES AND EXITS BEFORE ITS ASSERTIONS CAN FREEZE A RED RUN (paid: 14z-163 by the rule-checker's first real read, fixed 14z-183, #154)

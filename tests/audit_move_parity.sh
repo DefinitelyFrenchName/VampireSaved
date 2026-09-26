@@ -116,7 +116,9 @@
 # real picks on both sides; the 27 verdicts were re-frozen on them at 14z-160
 # and the ten Phobos DIVERGES rows of 14z-159 were verdicts on the VH2 branch.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged27] [PARTS="donovan_1 pyron_2"] [ALL=1] [JOBS=6] [FREEZE=1] tests/audit_move_parity.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged27] [PARTS="donovan_1 pyron_2"] [ALL=1] [JOBS=6] [FREEZE=1] [GOT_OUT=<path>] tests/audit_move_parity.sh
+#   GOT_OUT (14z-183): also copy this run's computed per-event table to <path> (verdicts unaffected) — how a probe build's
+#   whole table is read when it moves rows (the failure diff shows only each part's first changed rows).
 #   emulator tier, MAME. MEASURED 14z-159 on this MacBook, solo, at the default
 #   JOBS=6: the default 3-part set 25 s; ALL=1 (27 parts, 54 legs) 130 s. Both
 #   figures are wall clock, not MAME's emulated-time line — that line reads ~10x
@@ -349,6 +351,7 @@ for part in $SET; do
     t="${part%_*}"; p="${part##*_}"
     verdict_for "$t" "$p" >> "$W/got.tsv"
 done
+[ -n "${GOT_OUT:-}" ] && cp "$W/got.tsv" "$GOT_OUT"
 if [ "${FREEZE:-0}" = 1 ]; then
     { sed -n '1,/^#--$/p' "$EXPECT" 2>/dev/null || true; cat "$W/got.tsv"; } > "$W/new.tsv"
     cp "$W/new.tsv" "$EXPECT"

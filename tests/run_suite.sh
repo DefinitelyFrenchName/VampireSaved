@@ -83,8 +83,8 @@ trap 'rm -rf "$WORK"' EXIT
 # equally hermetic, or the two are not measuring the same thing.
 unset POKES DUMPS SNAP_FRAMES TAIL_FRAMES VIDEO_OUT INPUT_OUT INPUT_INJECT_TEST NO_INPUT_CHECK || true
 
-EXPSET=$(python3 "$REPO/tools/build_fingerprint.py" "$ROMPATH" --set "$SET") \
-    || { echo "unregistered build fingerprint — see message above"; exit 1; }
+EXPSET=$(python3 "$REPO/tools/build_fingerprint.py" "$ROMPATH" --set "$SET" --fronted) \
+    || { echo "unregistered build fingerprint, or a fronted rompath without $SET.zip (#138) — see message above"; exit 1; }
 EXPDIR="$REPO/tests/expected/$EXPSET"
 mkdir -p "$EXPDIR"
 echo "build fingerprint -> expectation set '$EXPSET'"

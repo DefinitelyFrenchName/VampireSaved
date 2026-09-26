@@ -20,10 +20,6 @@ prompt files pasted VERBATIM, `record --session`, `resolve` on ONE line. Say so 
    `152495c2`); this session was not under it (STATE 14z-182 row (6)). **The maintainer's standing ruling:
    it is killed before a push ONLY on their command** (STATE 'Standing rulings'). What the 14z-182 close did
    with it is in its CLOSE row.
-0b. **CARRIED FROM THE 14z-182 CLOSE (procedure run `2026-09-25-224`, QP1):** a `measurer` re-derives the
-    #175 figures `docs/game/engine_internals.md` quotes — the dome record `(0, 0, 40, 6)`, Victor's airborne
-    vuln0 `(0, 69, 32, 36)`, Felicia's `b:0x0f` head boxes `(-8, 70, 12, 8)` / `(-3, 76, 17, 14)` — from the
-    data views with a spec, since 14z-182 promised it and ran them itself (the gate reproduces them).
 0c. **CARRIED: 14z-182's unchecked transcript tail.** Procedure run `2026-09-25-224` read this session's
     transcript (39efeec2) through record 2820; the rest — recording and resolving run 224, the close's last
     commit `256edd70`, the push, and this carry note's commit (LOCAL, not pushed: a push needs a procedure run
@@ -33,8 +29,7 @@ prompt files pasted VERBATIM, `record --session`, `resolve` on ONE line. Say so 
    no gate compares walk / dash / jumps / arcs against vs2), **#178** (a rig that makes Hop Kick connect
    inside Donovan's Dark Force on both legs, with a control that fails an empty SAME), **#176** (the RNG's
    per-frame advance ours vs native — the parity gates pin the RNG word every frame, ruled). #157 now
-   carries a named check: its pair-store fix must also measure throw DAMAGE. #134 / #138 / #140 / #154 are
-   still present and kept open (statuses established 14z-182). #174 (the 36 never-entered a2 chains) —
+   carries a named check: its pair-store fix must also measure throw DAMAGE. #174 (the 36 never-entered a2 chains) —
    inputs first. #145, #170, #157, #159 unchanged.
 
 ## WHAT CLOSED THIS SITTING

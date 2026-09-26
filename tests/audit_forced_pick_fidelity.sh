@@ -307,6 +307,11 @@ for row in $ROWS; do
 done
 [ "${MEASURE:-0}" = 1 ] && { echo "MEASURE: nothing frozen, nothing compared"; exit 0; }
 if [ "${FREEZE:-0}" = 1 ]; then
+    # GitHub #154 (14z-183): a freeze is written only from a run whose section 2 is green —
+    # the identity, P2-block and REAL-vs-SELF assertions each only set fail=1, and this
+    # branch used to copy and exit before testing it. A control mode never freezes either.
+    [ "$fail" = 0 ] || { echo "FAIL: section 2 is red — REFUSED to freeze $(basename "$EXPECT") (#154)"; exit 1; }
+    [ -z "$CONTROL" ] || { echo "REFUSED: FREEZE=1 under CONTROL=$CONTROL — a control mode never writes the expectation (#154)"; exit 3; }
     { sed -n '1,/^#--$/p' "$EXPECT" 2>/dev/null || true; cat "$W/got.tsv"; } > "$W/new.tsv"
     cp "$W/new.tsv" "$EXPECT"
     echo "  FROZE  $(basename "$EXPECT") ($(wc -l < "$W/got.tsv" | tr -d ' ') rows) — VERIFY by re-running without FREEZE"

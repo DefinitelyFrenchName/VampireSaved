@@ -1117,7 +1117,7 @@ Rules:
 - If a fingerprint ever equals a known reference row, treat that as a bug
   until proven otherwise — a patched build cannot hash to the pristine ROM.
 
-**NOTHING ENFORCES THAT SECOND RULE — measured 2026-09-14 (14z-155, #138).**
+**~~NOTHING ENFORCES THAT SECOND RULE~~ — ENFORCED AT BOTH DISPATCHERS SINCE 14z-183 (#138):** `tools/build_fingerprint.py --fronted` refuses (exit 3) a `;` rompath whose FIRST directory holds no `<set>.zip`, and `tests/run_suite.sh` and the M2 battery's `m2a_masked_target` (`tests/lib/m2a_common.sh`) both pass it; a one-directory rompath (the vanilla oracle's bare `$ROMDIR`) is unaffected. Locked by `tests/test_suite_dispatch.sh` (section 1c, control `fronted-fallthrough`) and `tests/test_m2a_target_resolution.sh` (2b). The measurement that opened the ticket, kept: **(measured 2026-09-14, 14z-155)**
 `python3 tools/build_fingerprint.py "<an empty dir>;$ROMDIR" --set vsavj`
 answers `vsavj` (exit 0): the search path falls through to the pristine set,
 whose fingerprint IS the vanilla registry row, while `--set vsavjw` fails
@@ -4960,7 +4960,7 @@ SEPARATE task**, whose death then costs nothing; take the verdict from the log's
 A watcher that leaves its loop when the PID dies must still print what was logged after
 its last poll, or a red run's last FAIL goes unreported (one did).
 
-## THE STATIC TIER'S MUST-FIRE READOUT OVERSTATES `fired / declared` ON A RED RUN — a gate that does not PASS re-adds the previous gate's counts (paid: 14z-155, #140)
+## THE STATIC TIER'S MUST-FIRE READOUT OVERSTATED `fired / declared` ON A RED RUN — a gate that did not PASS re-added the previous gate's counts (paid: 14z-155, #140; FIXED 14z-183)
 
 The 14z-155 close tier read `fired 175 / declared 175` while the gate headers declare 172.
 `vs_classify` (`tests/lib/classify.sh`) runs the controls reader only on a PASS, and the
@@ -4975,7 +4975,14 @@ reads `fired 2 / declared 2`), identically on the harness's `bbh-run-static`, wh
 the same lines; `tests/run_all_emulator.sh` reads afresh for every row and is not
 affected. Verdicts and the PASS / SKIP / FAIL counts are untouched. **On a red run, trust
 the verdict rows, not `fired / declared` or `gates declaring none`** — the readout is
-exact only on a run in which every gate PASSED — until #140 is fixed.
+exact only on a run in which every gate PASSED — until #140 is fixed. **FIXED 14z-183:**
+`vs_classify` (and the harness's `bbh_classify`) reset every `VS_CTL_*` / `BBH_CTL_*` at
+entry, so a non-PASS row reads nothing stale; `tests/test_static_runner.sh` 11b and the
+harness's `selftest/test_run_static.sh` 10b replay the ticket's orders and FAIL on the
+unfixed classifier with its numbers (fired 3 / declared 5, two `none` gates, the stale
+label); F1's fake repo carries a failing stub after a declaring one. The lesson that
+stays: a reader called on SOME rows only leaves its globals holding the last row it
+read — reset a reader's outputs where it is called, not where it runs.
 
 ## PINNING THE ENGINE RNG THROUGH CHARACTER LOAD STOPS OUR BUILD LOADING THE MATCH AT ALL (paid: 14z-159, #136)
 
@@ -5817,3 +5824,33 @@ level is the cheapest control there is: if the new leg reproduces it, the pick, 
 pins and the level are all discharged at once; if it does not, do not freeze — one of
 them moved the rig. The level a gate pins is a design choice to state in its header
 (the victim gate: 8; the move-parity gates: 6), never an inheritance.
+
+## A RIG'S FIRST EVENT CAN BE EATEN BY THE ROUND INTRO — a walk-in that starts before the fighters are released never happens, and every table built on that event measures a different distance (paid: 14z-183, #134)
+
+`tools/vanilla_join_rig.py`'s walk-in sets put their first event (LP) at 2600 with the walk
+from 2410, but the round intro held the fighters until f2546 (P1's first walk step), so LP
+was pressed at 115-134 px where every later event sat at 43-60 px. Five LP legs of the
+connecting sets read VOID, ten 5LP rows of the hit-damage table were frozen as whiffs, and
+every `near LP` row of `tests/expected/vanilla_normal_slots.tsv` was a MID-range reading —
+which the rig header then generalised into "their LP is 0x01 at BOTH distances". The naming
+rigs had paid the same artifact before (the attribution's step E, `audit_entrance_draw`,
+`audit_guard_reentry` all move a first event to 2800); this rig never inherited the remedy.
+Two lessons. (1) A VOID or zero on the FIRST event of a part is a rig question before it is
+a move question: print the separation (or the pinned field) AT the press for every event,
+and suspect an event whose value differs from its siblings'. (2) A per-move press offset
+is chosen from a sweep of EVERY offset across the band, never from a few samples: the
+first choice (+18, from a four-point sweep) sat one frame inside the band's edge — Lei-Lei's
+j.LK connects at every offset +17..+32 and whiffs +11..+16 (rule-checker runs
+2026-09-25-226/227).
+
+## A FREEZE BRANCH THAT COPIES AND EXITS BEFORE ITS ASSERTIONS CAN FREEZE A RED RUN (paid: 14z-163 by the rule-checker's first real read, fixed 14z-183, #154)
+
+`tests/audit_forced_pick_fidelity.sh`'s `FREEZE=1` branch copied `got.tsv` over the
+expectation and exited BEFORE testing `$fail` from section 2 (the identity, P2-block and
+REAL-vs-SELF assertions each only set `fail=1`) and before the must-fire controls, so a
+freeze run whose identity assertion failed would still write the expectation and print
+`FROZE`. Since 14z-183 it refuses — `FAIL: section 2 is red — REFUSED to freeze` — and a
+control mode never freezes; proven on a genuinely red run (`FREEZE=1 CONTROL=wrong-cursor`),
+the expectation's sha1 unchanged. The same shape in the other gates that carry a `FREEZE=1`
+branch is #150's class and was not swept here. A freeze must be the LAST thing a gate does,
+after every assertion it makes on the run it freezes.

@@ -10,6 +10,8 @@
 #      whole-set-ONLY row is unreachable by the program fallback (must-fire
 #      control — the merged1-vs-shipped-merged hazard); and the key does not
 #      move with the rompath chain.
+#   1c. a FRONTED rompath dir without the set zip is REFUSED under --fronted (exit 3),
+#      never resolved through to the vanilla row (GitHub #138); both dispatchers pass it.
 #   2. check_diverge verdicts on synthetic logs: divergence at exactly the
 #      expected frame PASSes; early divergence, no divergence, and a missing
 #      base log all FAIL.
@@ -25,12 +27,14 @@
 # EXPECTS: every dispatch case gives the designed answer; a red names the piece. The
 #   emulator-side behaviours these pieces gate are proven by test_m2_repoint.sh and the
 #   suite itself.
-# FOLLOWS: build/manifest/ tests/audit_legacy_pairings.sh tests/expected/
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/audit_legacy_pairings.sh tests/expected/ tests/lib/m2a_common.sh
+#   tests/lua/replay.lua tools/propose_masked_specs.sh tools/run_mame.sh tools/run_replay_mame.sh tools/setup_mame.sh
 #   tests/lib/controls.sh tests/lib/masked_compare.sh tests/replays/ tests/run_battery_m2.sh
 #   tests/run_suite.sh tools/build_fingerprint.py tools/check_diverge.py
 #   tools/compare_composite.py tools/compare_flicker.py tools/compare_window.py
 #   tools/freeze_masked_basis.sh tools/pack_build.sh tools/patch_prg.py
 #
+# MUST-FIRE: known-bad: fronted-fallthrough — a ';' rompath whose FRONTED directory holds no set zip must be REFUSED by build_fingerprint.py --fronted (exit 3), never resolved through to $ROMDIR's vanilla row (GitHub #138); the mode demands the forbidden fall-through (rc 0) and the gate FAILs
 # MUST-FIRE: known-bad: program-fallback-reaches-wholeset — a whole-set-only registry row must be UNREACHABLE by the program-key fallback (the merged1-vs-shipped hazard); the mode demands the forbidden resolution (rc 0) where the design refuses it (rc 2), so the run must FAIL
 #
 # Usage: ROMDIR=... tests/test_suite_dispatch.sh
@@ -143,6 +147,34 @@ if [ "$set_chain" = "$set_a" ]; then
 else
     echo "FAIL: the chain moved the key: $set_a vs $set_chain"; fail=1
 fi
+
+# GitHub #138 (the #55 residual, [VSP-106]): a FRONTED rompath directory without the
+# set's zip must not fall through to $ROMDIR's pristine set — whose fingerprint is the
+# registered vanilla row, so run_suite would run vanilla against vanilla, green.
+mkdir -p "$WORK/front_empty"
+rc=0; out=$(fpr "$WORK/front_empty;$ROMDIR" --set vsavj 2>/dev/null) || rc=$?
+if [ "$rc" = 0 ] && [ "$out" = vsavj ]; then
+    echo "  ok: without --fronted an empty fronted dir falls through to 'vsavj' (the #138 hazard, reproduced)"
+else
+    echo "FAIL: the #138 reproduction no longer reproduces (rc $rc, '$out') — re-read the ticket before trusting the check below"; fail=1
+fi
+rc=0; out=$(fpr "$WORK/front_empty;$ROMDIR" --set vsavj --fronted 2>/dev/null) || rc=$?
+want_rc=3
+[ "$MODE" = fronted-fallthrough ] && want_rc=0
+if [ "$rc" = "$want_rc" ]; then
+    vs_ctl_fired fronted-fallthrough "--fronted REFUSES an empty fronted dir (exit 3) instead of dispatching to '$(printf vsavj)'"
+elif [ "$MODE" = fronted-fallthrough ]; then
+    echo "FAIL (mode fronted-fallthrough): --fronted refused (rc $rc), so the demanded fall-through did not occur"; fail=1
+else
+    vs_ctl_dead fronted-fallthrough "an empty fronted dir resolved to '$out' rc=$rc — the fall-through reached the vanilla row"; fail=1
+fi
+rc=0; out=$(fpr "$WORK/rompath;$ROMDIR" --set vsavj --fronted 2>/dev/null) || rc=$?
+[ "$rc" = 2 ] && echo "  ok: a fronted dir that HOLDS the set is unaffected (resolves as before: unregistered, exit 2)" \
+    || { echo "FAIL: --fronted changed a fronted dir that holds the set (rc $rc)"; fail=1; }
+for _d in tests/run_suite.sh tests/lib/m2a_common.sh; do
+    if grep -q 'build_fingerprint.py.*--fronted' "$REPO/$_d"; then echo "  ok: $_d dispatches with --fronted"
+    else echo "FAIL: $_d dispatches without --fronted (#138)"; fail=1; fi
+done
 
 # --- 2. check_diverge verdicts on synthetic logs -----------------------------
 EXPROOT="$WORK/expected"

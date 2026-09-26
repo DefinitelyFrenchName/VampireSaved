@@ -76,7 +76,11 @@ W = sys.argv[1]
 ft = {int(m.group(1)): m.group(2) for m in (re.match(r"F (\d+) (.*)", l) for l in open(f"{W}/JE.ft")) if m}
 tap = open(f"{W}/JE.tap").read().splitlines()
 cleared = {int(m.group(1)) for m in (re.match(r"frame (\d+) PC 022276", l) for l in tap) if m}
-cands = [f for f, s in ft.items() if 3560 <= f < 3700 and f not in cleared and "cnt=1 " not in s + " " and re.search(r"cnt=(\d+)", s) and int(re.search(r"cnt=(\d+)", s).group(1)) > 1]
+# the 5HP window from the rig's OWN schedule (it read 3560-3700 as a literal until 14z-183, when #134 moved
+# the walk-in sets' first event to 2800 and the literal window found no candidate — an IndexError, not a verdict)
+import json
+t0 = next(e["frame"] for e in json.load(open(f"{W}/JE.json"))["events"] if e["name"] == "HP")
+cands = [f for f, s in ft.items() if t0 <= f < t0 + 140 and f not in cleared and "cnt=1 " not in s + " " and re.search(r"cnt=(\d+)", s) and int(re.search(r"cnt=(\d+)", s).group(1)) > 1]
 f = cands[0]
 tap.insert(0, f"frame {f} PC 022276 off ff886c data 00000000 mask 0000ffff")
 open(f"{W}/JEc.tap", "w").write("\n".join(tap) + "\n")

@@ -142,7 +142,25 @@ def main():
                     help="whole-set fingerprint (all members, all resolved "
                          "zips) + region breakdown — covers the gfx/QSound "
                          "content the dispatch fingerprint cannot see")
+    ap.add_argument("--fronted", action="store_true",
+                    help="GitHub #138: a ';' rompath's FIRST directory is the "
+                         "build under test and must hold <set>.zip itself; "
+                         "refuse (exit 3) rather than fall through to a later "
+                         "directory's pristine set. A one-directory rompath "
+                         "(the vanilla oracle's bare $ROMDIR) is unaffected")
     args = ap.parse_args()
+
+    # #138 (the #55 residual, [VSP-106]): a rompath is a SEARCH path, so a
+    # fronted build dir without the set falls through to $ROMDIR's pristine zip,
+    # whose fingerprint is the registered vanilla row — vanilla against vanilla,
+    # green. The dispatchers (run_suite, the M2 battery) pass --fronted.
+    _dirs = args.rompath.split(";")
+    if args.fronted and len(_dirs) > 1 and not (Path(_dirs[0]) / f"{args.setname}.zip").is_file():
+        print(f"REFUSED: the fronted rompath directory {_dirs[0]} holds no "
+              f"{args.setname}.zip — resolution would fall through to "
+              f"{';'.join(_dirs[1:])} (GitHub #138: name the set you actually "
+              f"built)", file=sys.stderr)
+        sys.exit(3)
 
     zpath = None
     for d in args.rompath.split(";"):

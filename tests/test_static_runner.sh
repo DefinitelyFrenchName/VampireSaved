@@ -371,6 +371,24 @@ printf '%s' "$o11" | grep -q 'PASS 3 .*SKIP 0 .*FAIL 3' \
     || fail "wrong tally: $(printf '%s' "$o11" | grep -E '^PASS ' || echo '(none printed)')"
 [ "$s11" != 0 ] && echo "  ok: and the runner exits nonzero ($s11)" || fail "a dead control left the runner green"
 
+echo "== 11b. a NON-PASS gate after a declaring one adds nothing to the readout and keeps its own label (GitHub #140) =="
+# The reader runs only on a PASS, so before 14z-183 a FAIL row kept the previous gate's
+# VS_CTL_*: `g_cfired g_fail g_fail` read fired 3 / declared 3, `g_cnone g_fail` counted
+# two none-declaring gates, and a shell-crash stub after a controls-red gate took that
+# gate's detail as its label. The orders below are the ticket's reproduction.
+mk g_shellcrash 0 "tests/g_shellcrash.sh: line 3: FOO: parameter not set"
+printf 'g_cfired\ng_fail\ng_fail\ng_cnone\ng_fail\ng_cmissing\ng_shellcrash\n' > "$FR/tests/ci_portable.txt"
+o11b="$(cd "$FR" && sh tests/run_all_static.sh --tier portable --exec-controls none 2>&1)" || true
+printf '%s' "$o11b" | grep -q 'read:     fired 1 / declared 2' \
+    && echo "  ok: fired 1 / declared 2 — only g_cfired's and g_cmissing's own declarations, none re-added after a FAIL" \
+    || fail "#140 readout wrong: $(printf '%s' "$o11b" | grep 'read:' || echo '(none)')"
+printf '%s' "$o11b" | grep -q 'gates declaring none: 1;' \
+    && echo "  ok: one none-declaring gate, not re-counted by the FAIL after it" \
+    || fail "#140 none count wrong: $(printf '%s' "$o11b" | grep 'read:' || echo '(none)')"
+printf '%s' "$o11b" | grep -qE '^  g_shellcrash +FAIL .*\(exit 0 after a shell error\)$' \
+    && echo "  ok: the shell-crash stub after a controls-red gate keeps its own label" \
+    || fail "#140 label: $(printf '%s' "$o11b" | grep -E '^  g_shellcrash' || echo '(none)')"
+
 echo "== 12. the must-fire controls are EXECUTED: CONTROL=<name> must reach the gate's own FAIL =="
 # Four stubs: one honours the mode (FAIL under it), one LIES (stays green),
 # one REFUSES (declares a name it never reads), one DIES (a shell error under

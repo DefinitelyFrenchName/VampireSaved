@@ -17,12 +17,12 @@ BI	recovery	CONSTANT OFFSET	12	sheet = ours +2 on all 12
 BI	white	EXACT	18	18/18
 BI	gauge_hit	INCONSISTENT	18	most common delta +0 on 17/18; spread -18..+0
 BI	red	EXACT	18	18/18
-BU	startup	CONSTANT OFFSET	18	sheet = ours +1 on all 18
-BU	active	EXACT	18	18/18
-BU	recovery	CONSTANT OFFSET	13	sheet = ours +2 on all 13
-BU	white	EXACT	18	18/18
-BU	gauge_hit	EXACT	18	18/18
-BU	red	EXACT	18	18/18
+BU	startup	CONSTANT OFFSET	19	sheet = ours +1 on all 19
+BU	active	EXACT	19	19/19
+BU	recovery	CONSTANT OFFSET	14	sheet = ours +2 on all 14
+BU	white	EXACT	19	19/19
+BU	gauge_hit	EXACT	19	19/19
+BU	red	EXACT	19	19/19
 DE	startup	CONSTANT OFFSET	21	sheet = ours +1 on all 21
 DE	active	EXACT	21	21/21
 DE	recovery	CONSTANT OFFSET	15	sheet = ours +2 on all 15
@@ -47,36 +47,36 @@ JE	recovery	INCONSISTENT	12	most common delta +3 on 6/12; spread +2..+3
 JE	white	INCONSISTENT	18	most common delta +0 on 17/18; spread +0..+6
 JE	gauge_hit	EXACT	18	18/18
 JE	red	INCONSISTENT	18	most common delta +0 on 17/18; spread +0..+16
-LE	startup	CONSTANT OFFSET	19	sheet = ours +1 on all 19
-LE	active	INCONSISTENT	19	most common delta +0 on 18/19; spread -1..+0
-LE	recovery	CONSTANT OFFSET	13	sheet = ours +2 on all 13
-LE	white	INCONSISTENT	19	most common delta +0 on 18/19; spread -9..+0
-LE	gauge_hit	INCONSISTENT	19	most common delta +0 on 18/19; spread -18..+0
-LE	red	INCONSISTENT	19	most common delta +0 on 18/19; spread -21..+0
-LI	startup	CONSTANT OFFSET	22	sheet = ours +1 on all 22
-LI	active	EXACT	22	22/22
-LI	recovery	INCONSISTENT	16	most common delta +2 on 15/16; spread +2..+3
-LI	white	INCONSISTENT	22	most common delta +0 on 18/22; spread -1..+7
-LI	gauge_hit	EXACT	22	22/22
-LI	red	INCONSISTENT	22	most common delta +0 on 18/22; spread -1..+18
-MO	startup	CONSTANT OFFSET	21	sheet = ours +1 on all 21
-MO	active	EXACT	21	21/21
-MO	recovery	CONSTANT OFFSET	15	sheet = ours +2 on all 15
-MO	white	INCONSISTENT	21	most common delta +0 on 20/21; spread +0..+7
-MO	gauge_hit	EXACT	21	21/21
-MO	red	INCONSISTENT	21	most common delta +0 on 20/21; spread +0..+19
+LE	startup	CONSTANT OFFSET	20	sheet = ours +1 on all 20
+LE	active	INCONSISTENT	20	most common delta +0 on 19/20; spread -1..+0
+LE	recovery	CONSTANT OFFSET	14	sheet = ours +2 on all 14
+LE	white	INCONSISTENT	20	most common delta +0 on 19/20; spread -9..+0
+LE	gauge_hit	INCONSISTENT	20	most common delta +0 on 19/20; spread -18..+0
+LE	red	INCONSISTENT	20	most common delta +0 on 19/20; spread -21..+0
+LI	startup	CONSTANT OFFSET	23	sheet = ours +1 on all 23
+LI	active	EXACT	23	23/23
+LI	recovery	INCONSISTENT	17	most common delta +2 on 16/17; spread +2..+3
+LI	white	INCONSISTENT	23	most common delta +0 on 19/23; spread -1..+7
+LI	gauge_hit	EXACT	23	23/23
+LI	red	INCONSISTENT	23	most common delta +0 on 19/23; spread -1..+18
+MO	startup	CONSTANT OFFSET	22	sheet = ours +1 on all 22
+MO	active	EXACT	22	22/22
+MO	recovery	CONSTANT OFFSET	16	sheet = ours +2 on all 16
+MO	white	INCONSISTENT	22	most common delta +0 on 21/22; spread +0..+7
+MO	gauge_hit	EXACT	22	22/22
+MO	red	INCONSISTENT	22	most common delta +0 on 21/22; spread +0..+19
 QB	startup	CONSTANT OFFSET	15	sheet = ours +1 on all 15
 QB	active	EXACT	15	15/15
 QB	recovery	CONSTANT OFFSET	10	sheet = ours +2 on all 10
 QB	white	INCONSISTENT	15	most common delta +0 on 14/15; spread +0..+7
 QB	gauge_hit	EXACT	15	15/15
 QB	red	INCONSISTENT	15	most common delta +0 on 14/15; spread +0..+16
-SA	startup	INCONSISTENT	19	most common delta +1 on 18/19; spread +0..+1
-SA	active	EXACT	19	19/19
-SA	recovery	CONSTANT OFFSET	13	sheet = ours +2 on all 13
-SA	white	INCONSISTENT	19	most common delta +0 on 18/19; spread +0..+8
-SA	gauge_hit	INCONSISTENT	19	most common delta +0 on 17/19; spread -18..+0
-SA	red	INCONSISTENT	19	most common delta +0 on 18/19; spread +0..+20
+SA	startup	INCONSISTENT	20	most common delta +1 on 19/20; spread +0..+1
+SA	active	EXACT	20	20/20
+SA	recovery	CONSTANT OFFSET	14	sheet = ours +2 on all 14
+SA	white	INCONSISTENT	20	most common delta +0 on 19/20; spread +0..+8
+SA	gauge_hit	INCONSISTENT	20	most common delta +0 on 18/20; spread -18..+0
+SA	red	INCONSISTENT	20	most common delta +0 on 19/20; spread +0..+20
 VI	startup	CONSTANT OFFSET	23	sheet = ours +1 on all 23
 VI	active	EXACT	23	23/23
 VI	recovery	CONSTANT OFFSET	17	sheet = ours +2 on all 17

@@ -11,7 +11,7 @@ BU	far	HP	a2:0x04
 BU	far	LK	a2:0x07
 BU	far	MK	a2:0x08
 BU	far	HK	a2:0x0a
-BU	near	LP	a2:0x01
+BU	near	LP	a2:0x00
 BU	near	MP	a2:0x02
 BU	near	HP	a2:0x04
 BU	near	LK	a2:0x06
@@ -23,7 +23,7 @@ DE	far	HP	a2:0x05
 DE	far	LK	a2:0x07
 DE	far	MK	a2:0x09
 DE	far	HK	a2:0x0b
-DE	near	LP	a2:0x01
+DE	near	LP	a2:0x00
 DE	near	MP	a2:0x02
 DE	near	HP	a2:0x04
 DE	near	LK	a2:0x06
@@ -71,7 +71,7 @@ MO	far	HP	a2:0x05
 MO	far	LK	a2:0x07
 MO	far	MK	a2:0x09
 MO	far	HK	a2:0x0b
-MO	near	LP	a2:0x01
+MO	near	LP	a2:0x00
 MO	near	MP	a2:0x02
 MO	near	HP	a2:0x04
 MO	near	LK	a2:0x06
@@ -95,7 +95,7 @@ FE	far	HP	a2:0x05
 FE	far	LK	a2:0x07
 FE	far	MK	a2:0x09
 FE	far	HK	a2:0x0b
-FE	near	LP	a2:0x01
+FE	near	LP	a2:0x00
 FE	near	MP	a2:0x02
 FE	near	HP	a2:0x04
 FE	near	LK	a2:0x06
@@ -119,7 +119,7 @@ AU	far	HP	a2:0x04
 AU	far	LK	a2:0x07
 AU	far	MK	a2:0x09
 AU	far	HK	a2:0x0b
-AU	near	LP	a2:0x01
+AU	near	LP	a2:0x00
 AU	near	MP	a2:0x02
 AU	near	HP	a2:0x04
 AU	near	LK	a2:0x06
@@ -131,9 +131,9 @@ SA	far	HP	a2:0x05
 SA	far	LK	a2:0x07
 SA	far	MK	a2:0x09
 SA	far	HK	a2:0x0b
-SA	near	LP	a2:0x01
+SA	near	LP	a2:0x00
 SA	near	MP	a2:0x02
-SA	near	HP	a2:0x04
+SA	near	HP	a2:0x05
 SA	near	LK	a2:0x06
 SA	near	MK	a2:0x08
 SA	near	HK	a2:0x0a
@@ -155,7 +155,7 @@ LE	far	HP	a2:0x05
 LE	far	LK	a2:0x07
 LE	far	MK	a2:0x09
 LE	far	HK	a2:0x0b
-LE	near	LP	a2:0x01
+LE	near	LP	a2:0x00
 LE	near	MP	a2:0x02
 LE	near	HP	a2:0x04
 LE	near	LK	a2:0x06
@@ -167,7 +167,7 @@ LI	far	HP	a2:0x05
 LI	far	LK	a2:0x07
 LI	far	MK	a2:0x09
 LI	far	HK	a2:0x0b
-LI	near	LP	a2:0x01
+LI	near	LP	a2:0x00
 LI	near	MP	a2:0x02
 LI	near	HP	a2:0x04
 LI	near	LK	a2:0x06

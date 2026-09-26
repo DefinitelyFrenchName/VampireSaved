@@ -20,12 +20,20 @@ all 15 measured):
     0x00/02/04/06/08/0a. Zabel was the whole reason: the fixed model gave him
     the odd slots, which are his `6`-prefixed COMMAND normals, and he came out
     INCONSISTENT on every column.
-  * DE, MO, FE, SA, LE, LI take odd at far and even at near for MP..HK, but
-    their LP is 0x01 at BOTH distances.
-  * GA and VI are the same except LP is 0x00.
-  * BU and AU additionally have no close variant for HP (and BU none for MK).
-So slot 0x00 vs 0x01 for LP is character-dependent, and "even = close" is a
-tendency, not a law. Nothing downstream may assume it.
+  * DE, MO, FE, LE, LI take odd at far and even at near on EVERY button, LP
+    included (LP 0x01 far, 0x00 near).
+  * SA the same, but his HP is a KNIFE EDGE at this rig's near separation: 0x04
+    at 59 px, 0x05 at 60 px (14z-183); the frozen row is whichever the walk-in lands.
+  * GA and VI have NO close LP (0x00 at both); GA has none for MK either (0x08).
+  * BU has no close variant for HP, MK or HK (0x04/0x08/0x0a at both); AU none for HP.
+**CORRECTED 14z-183 (GitHub #134):** until then this list said "their LP is 0x01
+at BOTH distances" for DE, MO, FE, SA, LE, LI (and BU/AU's LP was read the same):
+the `near` LP had never been pressed at near range — the first event's walk-in
+was eaten by the round intro (the header's last paragraph). It also said BU had
+no close variant for "HP (and MK)" and GA was "VI except LP", missing BU's HK and
+GA's MK, which the table already carried. So slot 0x00 vs 0x01 for a FAR LP is
+character-dependent, and "even = close" is a tendency, not a law. Nothing
+downstream may assume it.
 
 THE AERIAL DIRECTION (14z-145). `jump` is a NEUTRAL jump (U) and `jump_fwd` a
 FORWARD jump (UR); a2 carries TWO aerial slot sets, 0x12-0x17 and 0x18-0x1D,
@@ -43,6 +51,23 @@ pushboxes and the engine resolved it by CROSSING the fighters, leaving P1
 facing left for whole parts (14z-120 (2)) — so `near` is the far pin plus a
 150-frame walk-in; `$FF8109` is a BINARY timer and must never be poked (a 0x99
 poke ended the round); and each part is kept under one round.
+
+THE FIRST WALK-IN WAS EATEN BY THE ROUND INTRO (14z-183, GitHub #134). The walk-in
+sets put their first event (LP) at name_moves.FIRST_EVENT = 2600 with the walk from
+2410, but the round intro holds the fighters until f2546 (P1's first walk step, measured
+on Sasquatch, Zabel and Lei-Lei), so LP was pressed at 115-134 px where every later
+event is at 43-60 px: five LP legs of the connecting sets whiffed (the VOID legs), and
+every `near LP` row of tests/expected/vanilla_normal_slots.tsv was a MID-range
+measurement. So a walk-in set's first event is at FIRST_EVENT + WALKIN_SHIFT (2800 —
+the naming rigs' own remedy for the same entrance artifact: audit_entrance_draw,
+audit_guard_reentry, the attribution's step E); the sets without a walk-in pin at
+t-40 = 2560, after the intro, and are unchanged. PRESS_AT holds a per-(char, set,
+button) press offset for a move the default timing whiffs at contact range: Lei-Lei's
+j.LK lands nothing at +14 (49 px, where her other jump normals connect); measured 14z-183
+at EVERY offset from +10 to +34 (`hit_jump`): it connects at +10, whiffs at +11..+16,
+connects at every offset from +17 to +32 and whiffs at +33 and +34 — so the press is +24,
+inside that 16-offset band with 7 connecting offsets below it and 8 above (rule-checker runs
+2026-09-25-226/227 found +18 one frame inside the band's edge, then the band's edges unmeasured).
 """
 import argparse
 import json
@@ -80,6 +105,9 @@ SETS = {"far":    ("stand",  300, False),
         "hit_jump": ("jump", 480, True),
         "hit_jump_down": ("jump_down", 480, True)}
 GAP = {k: v[1] for k, v in SETS.items()}
+WALKIN_SHIFT = 200          # a walk-in set's first event at FIRST_EVENT + 200 (the header, #134)
+# (char id, set, button) -> the button's press offset after the jump (name_moves.jump presses at +14..+17)
+PRESS_AT = {(0x0D, "hit_jump", "LK"): 24}   # Lei-Lei j.LK: whiffs +11..+16 and +33..+34, connects +17..+32 (#134)
 
 
 def _jump_fwd(b):
@@ -110,7 +138,7 @@ def gen(cid, dist, out_rpl, out_sched, pins=None):
              name_moves.REPLAY17_PROLOGUE.rstrip()]
     kind, gap, walkin = SETS[dist]
     x1, x2 = pins or name_moves.PIN["far"]     # pins: a wider pair for a WHIFF leg of a long-reach move (14z-146)
-    t = name_moves.FIRST_EVENT
+    t0 = t = name_moves.FIRST_EVENT + (WALKIN_SHIFT if walkin else 0)
     sched = {"char": f"{cid:#04x}", "distance": dist, "kind": kind, "events": [], "pokes": []}
     pins = []
     for b in BUTTONS:
@@ -119,13 +147,17 @@ def gen(cid, dist, out_rpl, out_sched, pins=None):
             lines.append(f"{t - 190}-{t - 40} p1=R")      # walk in; never poke a near pair
         else:
             pins += [f"{t - 40}:ff8410:{x1:04x}", f"{t - 40}:ff8810:{x2:04x}"]
-        for a, bb, tok in _recipe(kind, b):
+        rec = _recipe(kind, b)
+        if (cid, dist, b) in PRESS_AT:     # move only the BUTTON token, keep the direction inputs
+            o = PRESS_AT[(cid, dist, b)]
+            rec = [(o, o + (bb - a), tok) if tok == name_moves.B[b] else (a, bb, tok) for a, bb, tok in rec]
+        for a, bb, tok in rec:
             lines.append(f"{t + a}-{t + bb} p1={tok}")
         sched["events"].append({"name": b, "frame": t, "gap": gap})
         t += gap
     end = t + 200
     lines.append(f"{end} wait")
-    assert end - name_moves.FIRST_EVENT < 7500, "a part must fit inside one round"
+    assert end - t0 < 7500, "a part must fit inside one round"
     pokes = [f"{f}:ff8782:{cid:02x}" for f in (1400, 1450, 1500)]
     pokes += [f"{f}:ff8b82:03" for f in (1400, 1450, 1500)]      # P2 = Victor, idle
     if dist.startswith("hit"):
@@ -133,7 +165,7 @@ def gen(cid, dist, out_rpl, out_sched, pins=None):
         # read the drop the move causes ([VSP-125]'s pin, moved off the event windows)
         pokes += [f"{e['frame'] - 20}:ff8850:01200120" for e in sched["events"]]
     else:
-        pokes += [f"{f}:ff8850:01200120" for f in range(name_moves.FIRST_EVENT - 50, end, name_moves.HP_PIN_EVERY)]
+        pokes += [f"{f}:ff8850:01200120" for f in range(t0 - 50, end, name_moves.HP_PIN_EVERY)]
     pokes += pins
     sched["pokes"] = pokes
     sched["frames"] = end + 50
