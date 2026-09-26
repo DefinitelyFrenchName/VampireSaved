@@ -16,7 +16,7 @@
 #   records": box (x, y, hw, hh) signed words, centre at (X + (flip ? -x : x), Y + y), y up,
 #   ground y = 40; a node's hbA word (+0xA) >> 8 is the attack-record index, 0x20 bytes a record).
 #
-# Usage: ROMDIR=... [LEG=native|merged] [JUMP=3490] [DIR=U|UL|UR (P2's jump direction, replay grammar)] [XPIN=<x>@<from>-<to>] [P1XPIN=<x>@<from>-<to>] [ORDER=1] [SNAP=f1,f2] [PICK=forced|real] [P2CELL=03] [ATK='<from>-<to> p2=<btn>'] [FROM=3505] [TO=3535] [MERGED=build/m3b_merged27]
+# Usage: ROMDIR=... [LEG=native|merged] [JUMP=3490] [DIR=U|UL|UR (P2's jump direction, replay grammar)] [XPIN=<x>@<from>-<to>] [P1XPIN=<x>@<from>-<to>] [ORDER=1] [SNAP=f1,f2] [PICK=forced|real] [P2CELL=03] [ATK='<from>-<to> p2=<btn>'] [FROM=3505] [TO=3535] [MERGED=build/m3b_merged28]
 #          tools/trap_air_probe.sh [out_dir]
 #   native: vsav2 from $ROMDIR, boxes read from build/out/vsav2_data.bin;
 #   merged: the merged build, boxes read from <MERGED>/verify_data.bin.
@@ -24,7 +24,7 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"; [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 LEG="${LEG:-native}"; JUMP="${JUMP:-3490}"; DIR="${DIR:-U}"; XPIN="${XPIN:-}"; PICK="${PICK:-forced}"; P2CELL="${P2CELL:-03}"; ATK="${ATK:-}"; FROM="${FROM:-3505}"; TO="${TO:-3535}"
-MERGED="${MERGED:-build/m3b_merged27}"; case "$MERGED" in /*) ;; *) MERGED="$REPO/$MERGED" ;; esac
+MERGED="${MERGED:-build/m3b_merged28}"; case "$MERGED" in /*) ;; *) MERGED="$REPO/$MERGED" ;; esac
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
 OUT="${1:-$REPO/build/trap_air_probe/$LEG-$DIR-j$JUMP${XPIN:+-x$XPIN}}"; mkdir -p "$OUT"; OUT="$(cd "$OUT" && pwd)"
 case "$LEG" in

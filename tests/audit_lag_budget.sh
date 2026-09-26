@@ -37,14 +37,14 @@
 # battery's oracles cover legacy content); the idle-time margin short of a zero-pass frame (a slower
 # frame that still completes a pass is not lag by this definition); FBNeo and the MiSTer core.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged27] [REF=build/m3b_merged26] [JOBS=6] [PARTS="donovan_1 pyron_2"] tests/audit_lag_budget.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged28] [REF=build/m3b_merged26] [JOBS=6] [PARTS="donovan_1 pyron_2"] tests/audit_lag_budget.sh
 #   emulator tier, MAME; 84 field-trace runs — measured 14z-170 on this MacBook at JOBS=6: see ci_emulator.tsv
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged27}"
+BUILD="${BUILD:-build/m3b_merged28}"
 REF="${REF:-build/m3b_merged26}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 case "$REF" in /*) ;; *) REF="$REPO/$REF" ;; esac

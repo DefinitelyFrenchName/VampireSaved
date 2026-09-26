@@ -55,7 +55,7 @@
 # delta is the 010a/010b pair audit_trap_parity already records as cosmetic
 # (same content, relocated banks, the defense-rows class).
 #
-# Usage: ROMDIR=... [BUILD=build/m3b_merged27] tests/test_hui_electrocute.sh
+# Usage: ROMDIR=... [BUILD=build/m3b_merged28] tests/test_hui_electrocute.sh
 # ~2 min (4 MAME runs, parallel).
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
@@ -86,7 +86,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 # VARIABLE (forks set their own); only made absolute, and only if it exists,
 # so a gate that means to SKIP on a missing ROMDIR still does.
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
-BUILD="${BUILD:-build/m3b_merged27}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${BUILD:-build/m3b_merged28}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 [ -d "$BUILD/rompath" ] || { echo "SKIP: no build at $BUILD"; exit 0; }
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no WIDE MAME binary"; exit 0; }

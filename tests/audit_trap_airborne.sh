@@ -45,12 +45,12 @@
 # found it from the sweep (jumps pressed after the hit still read 40). So with this rig no dome hit
 # reaches the air stager, and whether ANY arc can is the open question of the ticket that carries it.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [MERGED=build/m3b_merged27] [FREEZE=1] [SWEEP=1 [SWEEP_JUMPS="3440 3441 ..."]] [CONTROL=air-class|grounded-hit|air-hit] tests/audit_trap_airborne.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [MERGED=build/m3b_merged28] [FREEZE=1] [SWEEP=1 [SWEEP_JUMPS="3440 3441 ..."]] [CONTROL=air-class|grounded-hit|air-hit] tests/audit_trap_airborne.sh
 #   emulator tier, MAME: two legs in parallel, ~1 min (SWEEP=1: five more pairs, ~6 min).
 set -u
 ROMDIR="${ROMDIR:?set ROMDIR}"; if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
-MERGED="${MERGED:-build/m3b_merged27}"; case "$MERGED" in /*) ;; *) MERGED="$REPO/$MERGED" ;; esac
+MERGED="${MERGED:-build/m3b_merged28}"; case "$MERGED" in /*) ;; *) MERGED="$REPO/$MERGED" ;; esac
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
 EXPECT="$REPO/tests/expected/trap_airborne.tsv"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

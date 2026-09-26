@@ -46,14 +46,14 @@
 # WHAT IT DOES NOT COVER: the other 26 +0x1C3 readers' consequences (the static census
 # names them); P2's gauge; the gauge a HIT pays in the mode beyond these rows.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged27] [FREEZE=1] tests/audit_df_meter.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged28] [FREEZE=1] tests/audit_df_meter.sh
 #   emulator tier, MAME; 10 field_trace legs in parallel — measured 14z-168 on this MacBook, solo: ~25 s wall
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged27}"
+BUILD="${BUILD:-build/m3b_merged28}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/df_meter.tsv"
 CONTROL="${CONTROL:-}"

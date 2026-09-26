@@ -2474,8 +2474,9 @@ check. And its converse from 14x still binds: do NOT blanket-copy the
 rolled-back families (the grab-pointer/state rows are stage-99 parked
 in donovan.toml ~~because ported READERS consume those vars at vs2
 offsets~~ — **that reason was RETRACTED 14z-166: no ported instruction reads
-them, and the rows' price is GitHub #157**; they stay parked until the
-maintainer schedules the re-attempt).
+them, and the rows' price is GitHub #157**; ~~they stay parked until the
+maintainer schedules the re-attempt~~ — **the six pair-store rows LANDED at stage 6 in
+the 14z-183 M20 freeze; the `-0x4B3D` state-byte clears stay parked**).
 
 ## **[VSP-91]** A 0x7xx sfx id's faithfulness is a property of its CONTENT, not its number (14z-85g)
 
@@ -5854,3 +5855,62 @@ control mode never freezes; proven on a genuinely red run (`FREEZE=1 CONTROL=wro
 the expectation's sha1 unchanged. The same shape in the other gates that carry a `FREEZE=1`
 branch is #150's class and was not swept here. A freeze must be the LAST thing a gate does,
 after every assertion it makes on the run it freezes.
+
+## A KEPT PARITY WORK DIR HOLDS AN UNPINNED NATIVE TRACE FOR ITS CONTROL PART — the `unpinned-level` control re-runs that part's native leg over the file (paid: 14z-183, #157)
+
+`tests/audit_move_parity.sh` section 3 re-runs the CONTROL part's native leg at vs2's default play mode
+(`CTL_ONE=unpinned-level run_leg "$ct" "$cp" native`) and writes it to the same
+`tr_<part>_native.txt` the verdicts were computed from. The verdicts are unaffected (section 2 ran
+first), but a work directory kept for analysis — a scratch copy with `KEEP_W`, or any future keep knob —
+holds the UNPINNED native leg for the control part, and with `PARTS=<one part>` that is the part under
+study. Compared against it, the probe of #157 showed a meter step "7 frames late" on Phobos's Sitting
+Attack off throw and a first x difference at +116; against the pinned leg (saved before the control
+runs) the meter and P2 HP matched native on every frame and x first differed at +156, exactly as the
+gate reported. A rule-checker reader caught the disagreement between the kept traces and the gate's own
+verdict (run 2026-09-25-233 Q4). **Before analysing a kept work dir, check that the trace you read is the
+one the verdict used** — for this gate, copy `tr_<ct>_<cp>_native.txt` aside before section 3, or keep
+two parts so the control part is not the one studied — and when a trace analysis disagrees with the
+gate's verdict, suspect the trace before the gate.
+
+## A RIG CHANGE RE-FROZEN IN THE GATES IT WAS MADE FOR LEAVES EVERY OTHER GATE THAT COPIES THE RIG STALE — and the staleness audit names nothing until a run of record exists (paid: 14z-183)
+
+14z-181 (#169, commit `a91a555a`) changed the shared `air_throw` recipe in
+`tools/name_moves.py` so that Pyron's Galactic Throw connects on native, and
+re-froze the three gates it was working on (naming, parity, attribution).
+`tests/audit_throw_registration.sh` copies the same rig and lists
+`tools/name_moves.py` under `# FOLLOWS:`, but nothing re-ran it: on the M20
+freeze its `pyron_3` part read two contacts (f5182, f5602 — the air throw)
+that its frozen rows had never seen, on the NATIVE leg as well as ours, and
+on merged-m19 as well as M20 — a pre-existing stale expectation, not the
+freeze. `tools/audit_emulator_staleness.py` exists to name exactly this gate
+from its FOLLOWS line, but it compares against the last emulator run of
+record (`build/emu_*/commit.txt`), and there was none since 14z-180 (`NO RUN
+OF RECORD`), so it could name nothing. Two lessons. (1) When a commit edits
+a shared rig generator, run `tests/run_all_emulator.sh --stale` (or grep the
+FOLLOWS lines for the path) before calling the change landed; re-freezing
+only the gates in hand leaves the rest to go red on someone else's watch.
+(2) A native leg that moved between two runs of one gate is a RIG change —
+the native game did not change — and says so before any theory about ours.
+The same freeze found the corpus-side twin: 14z-181 (`f194f8ca`) ADDED two naming
+parts (`donovan_15`, `pyron_7`) and re-froze the parity tables, while
+`audit_df_field_readers_live`, `audit_reaction_class_live` and
+`audit_defense_row_reads` — which iterate over every `tests/replays/naming/`
+part — kept expectations frozen over 30 parts (`ours runs 30`); each read 32 and
+went red on merged-m19 exactly as on M20 (`build/rc183/m19ab/`). A gate that
+globs a corpus FOLLOWS the corpus directory, and adding a file to it is a change
+to every such gate.
+
+## A GATE'S PRINTED DIFF IS A WINDOW — compare two builds' measurements as WHOLE FILES, never through the gate logs (paid: 14z-183, rule-checker run 2026-09-25-238)
+
+To show that three live audits (`audit_reaction_class_live`, `audit_defense_row_reads`,
+`audit_df_field_readers_live`) went red on merged-m20 for a reason that was not M20's,
+the frozen-vs-measured diffs in the battery logs of merged-m19 and merged-m20 were
+compared line for line and found identical. Both gates print that diff through
+`head -40`: the comparison saw the first 30 lines of a 217-line diff on one gate and
+stopped mid-table on the other, so "identical on merged-m19" was true of a window. The
+remedy that settled it: dry-run FREEZE each gate on BOTH builds (copy the written table
+aside, restore the tracked file) and diff the two tables whole — two identical but for
+the header's build name, the third differing exactly where #157 reaches
+(`build/rc183/refreeze2/*.m19_vs_m20.diff`). Any comparison of two runs of one gate goes
+through the full measured tables, never through what the gate chose to print.
+

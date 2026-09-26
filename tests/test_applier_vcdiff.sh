@@ -26,14 +26,14 @@
 #
 # MUST-FIRE: perturbed-copy: flipped-patch-byte — one byte flipped in a copy of one patch must make the JS decoder produce a member that does NOT match the manifest (a wrong sha1, or a refusal); if it still matched, the comparison would not be reading the decoder's output at all (mode: the gate runs against that perturbed copy)
 #
-# Usage: ROMDIR=... tests/test_applier_vcdiff.sh [release/merged-m19/mame]   # ci_static
+# Usage: ROMDIR=... tests/test_applier_vcdiff.sh [release/merged-m20/mame]   # ci_static
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
-REL="${1:-release/merged-m19/mame}"
+REL="${1:-release/merged-m20/mame}"
 [ -f "$REL/manifest.json" ] || { echo "SKIP: no release manifest at $REL"; exit 0; }
 command -v node >/dev/null 2>&1 || { echo "SKIP: no node on this host (the module is ES-module JS; the browser is its real target)"; exit 0; }
 

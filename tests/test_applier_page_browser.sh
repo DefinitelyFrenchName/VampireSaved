@@ -41,14 +41,14 @@
 # MUST-FIRE: perturbed-copy: starved-control-leg — the control leg run with a 1 ms virtual-time budget cannot complete, and the gate must report the control as NOT JUDGED (FAIL) — never as a page verdict, which is what it printed under 14z-176's loaded tier (mode: the gate starves its control leg)
 # MUST-FIRE: perturbed-copy: broken-page — a copy of the page with one byte of its inlined manifest's declared set key changed must make the browser run FAIL, because the page would then build a set it cannot vouch for; if the run still passed, the gate would not be reading the page's verdict at all (mode: the gate drives that copy)
 #
-# Usage: ROMDIR=... tests/test_applier_page_browser.sh [release/merged-m19/fbneo]   # ci_static
+# Usage: ROMDIR=... tests/test_applier_page_browser.sh [release/merged-m20/fbneo]   # ci_static
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
-REL="${1:-release/merged-m19/fbneo}"
+REL="${1:-release/merged-m20/fbneo}"
 [ -f "$REL/manifest.json" ] || { echo "SKIP: no release manifest at $REL"; exit 0; }
 
 CHROME="${CHROME_BIN:-}"

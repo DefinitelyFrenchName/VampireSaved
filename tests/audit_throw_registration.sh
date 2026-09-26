@@ -1,20 +1,22 @@
 #!/bin/sh
-# audit_throw_registration.sh — THE HIT-REGISTRATION PAIR AT A TENANT THROW, ours vs native, frozen: on every tenant throw contact native's throw code writes the engine's (attacker, victim) registration pair right before the generic hit stager awards meter, while our placed copies of those stores write vs2's displacements (dead on vsavj), so the vsavj stager reads the collision pass's leftover pair reversed — the attacker gets the victim's flat 8 and the victim the throw record's meter. The mechanism behind GitHub #136's meter-fraction family (14z-166).
+# audit_throw_registration.sh — THE HIT-REGISTRATION PAIR AT A TENANT THROW, ours vs native, frozen: on every tenant throw contact native's throw code writes the engine's (attacker, victim) registration pair right before the generic hit stager awards meter. Through M19 our placed copies of those stores wrote vs2's displacements (dead on vsavj), so the vsavj stager read the collision pass's leftover pair reversed — the attacker got the victim's flat 8 and the victim the throw record's meter, the mechanism behind GitHub #136's meter-fraction family (14z-166). Since M20 (14z-183, #157) the stores are re-pointed at vsavj's live pair and ours pays like native; the gate freezes that.
 #
 # WHAT: the hit-registration pair at a tenant throw, ours vs native: native's throw code
-#   writes the engine's (attacker, victim) pair before the generic hit stager awards meter,
-#   while our placed copies write vs2's displacements (dead on vsavj), so the stager reads
-#   the collision pass's leftover pair reversed — the attacker gets the flat 8 and the
+#   writes the engine's (attacker, victim) pair before the generic hit stager awards meter.
+#   Through M19 our placed copies wrote vs2's displacements (dead on vsavj), so the stager
+#   read the collision pass's leftover pair reversed — the attacker got the flat 8 and the
 #   victim the record's meter (#136's meter family, #157); the legacy control shows both
-#   engines register the pair, so it is a port defect.
+#   engines register the pair, so it was a port defect. Since M20 (14z-183) the stores are
+#   re-pointed at vsavj's live pair.
 # HOW: read taps on MAME over the live pair, the dead pair and both meters for pyron_3,
 #   huitzil_3 and donovan_5 (7 tap runs each, the parity gate's rig and pins) and the legacy
 #   Demitri-throws-Victor part on pristine vsavj and vs2 with real picks; contact rows,
 #   writer rows and the legacy ids frozen; controls swap the P1/P2 steps, plant a reader of
 #   the dead pair, and plant a second write on a contact frame.
-# EXPECTS: the frozen defect rows (ours p1=+8 p2=record; native the reverse), no in-play
+# EXPECTS: the frozen rows — since the 14z-183 re-freeze ours pays like native (p1=record
+#   p2=+8), the defect rows (ours p1=+8 p2=record) live in the file's git history; no in-play
 #   reader of the dead pair, the legacy legs paying the attacker the record on both engines;
-#   all three controls fail. A fix re-freezes this file deliberately.
+#   all three controls fail.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/throw_registration.tsv
 #   tests/lua/read_tap.lua tests/replays/ tools/name_moves.py tools/run_mame.sh
 #   tools/setup_mame.sh
@@ -38,8 +40,11 @@
 # reads its own pair at RAM:$FF343A-D — written in play only by the per-frame
 # collision registration (vsavj 0x17FF8/0x18000), whose last write before the throw's
 # damage call leaves (P2, P1). The three parts cover one tenant each and both throw
-# kinds Phobos has (ground and the Sky Capture air throw); Pyron's air throw is not
-# produced by the Demitri-P2 rig (an air normal on both legs) and is not covered.
+# kinds Phobos has (ground and the Sky Capture air throw). Pyron's air throw (Galactic
+# Throw) was not produced by the Demitri-P2 rig until 14z-181 fixed the shared air_throw
+# recipe (#169, P2's jump lead); since then pyron_3 carries it (f5182, f5602) on both legs —
+# the frozen rows did not see it until the 14z-183 re-freeze (docs/project/gotchas.md "A RIG
+# CHANGE RE-FROZEN IN THE GATES IT WAS MADE FOR LEAVES EVERY OTHER GATE ... STALE").
 #
 # THE LEGACY CONTROL — the maintainer, 2026-09-18, in their own words: "correct me if I'm wrong but that measurement could give us an answer because if legacy characters exhibit the same behaviour this is a nothing burger but if they don't that at least tells us what it is not"
 # and "the values are quite widly different, we really need that control you're doing with a legacy character". The same taps on a LEGACY throw —
@@ -54,10 +59,13 @@
 # WHAT IT FREEZES, per part and leg (tests/expected/throw_registration.tsv):
 #   ids rows (legacy part only) — both fighters' id bytes as the last pre-match byte write left them, with the
 #     writer's PC (real picks; a write with any mask but ff00 is the neighbour byte and is skipped);
-#   contact rows — every frame with a throw-site write of that leg's OWN pair
-#     (native: vs2's pair, ours: the dead vs2 pair), with the P1 and P2 meter steps
-#     on that frame: native p1=record p2=+8, ours p1=+8 p2=record — THE DEFECT AS
-#     MEASURED; a fix that reconciles the stores re-freezes this file deliberately;
+#   contact rows — every frame with a throw-site write of that leg's LIVE pair from
+#     a non-collision PC (native: vs2's pair at its throw sites; ours: vsavj's pair
+#     from the placed copies' re-pointed stores) or, on ours, of the dead vs2 pair
+#     (the unfixed stores — the M19-and-earlier shape; 14z-183 widened the rule so
+#     one reducer reads both), with the P1 and P2 meter steps on that frame. Frozen
+#     14z-166..182 as THE DEFECT (ours p1=+8 p2=record); RE-FROZEN 14z-183 on the
+#     #157 fix (M20): ours pays the attacker the record like native;
 #   writer rows — the non-collision writer PCs of the engine's live pair
 #     (native: the throw sites; ours: none) and, on ours, the writer and reader PC
 #     sets of the dead vs2 pair (readers: the boot RAM test only).
@@ -65,14 +73,14 @@
 # tests/audit_move_parity.sh's, copied here; every tap is tests/lua/read_tap.lua,
 # non-debug, so frames are replay-exact; a tap log without END is VOID, never read.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged27] [PARTS="pyron_3 huitzil_3 donovan_5 legacy_demitri"] [FREEZE=1] tests/audit_throw_registration.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged28] [PARTS="pyron_3 huitzil_3 donovan_5 legacy_demitri"] [FREEZE=1] tests/audit_throw_registration.sh
 #   emulator tier, MAME; ~3 min (7 tap runs per part, in parallel)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged27}"
+BUILD="${BUILD:-build/m3b_merged28}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/throw_registration.tsv"
 CONTROL="${CONTROL:-}"
@@ -129,7 +137,10 @@ def lines(p, kind):
 COLLISION = {"017ff8", "018000", "016870", "016878"}   # the per-frame collision registration, vsavj / vs2
 THROW = {"0289c6", "0289ca", "028a94", "028a98"}      # vs2's throw-site stores (native) — ours' placed twins are found by frame
 pw = [x for x in lines(pair, "W") if x[0] >= floor and x[1] not in COLLISION]
-contacts = sorted({f for f, pc, v in lines(dead, "W") if f >= floor}) if leg == "ours" else sorted({f for f, pc, v in pw})
+# a contact is a frame with a non-collision write to the leg's LIVE pair (native: vs2's throw sites; ours since the
+# 14z-183 fix: the placed copies' re-pointed stores) — and, on ours, also a frame with a write to the DEAD vs2 pair (the
+# unfixed placed stores, M19 and earlier), so one rule reads a fixed and an unfixed build alike
+contacts = sorted({f for f, pc, v in pw} | ({f for f, pc, v in lines(dead, "W") if f >= floor} if leg == "ours" else set()))
 def steps(p):
     # the FRAME's net change of the meter word: the deltas of every write on that frame summed (a contact frame
     # with two writes — a swing and a hit — reads as their sum; the count of writes is kept for the row)
@@ -236,11 +247,11 @@ if [ "${FREEZE:-0}" = 1 ]; then
     {
         echo "# tests/expected/throw_registration.tsv — the hit-registration pair at every tenant throw contact, ours vs native"
         echo "# (tests/audit_throw_registration.sh; tests/lua/read_tap.lua, non-debug). Evidence class: in-emulator (MAME,"
-        echo "# native vsav2 and the WIDE build $(basename "$BUILD"); frames >= $FLOOR). Frozen 14z-166 with FREEZE=1."
-        echo "# THE DEFECT IS FROZEN AS MEASURED: ours p1=+8 p2=<record> on every contact where native reads p1=<record> p2=+8"
-        echo "# — GitHub #136's meter family. A fix that reconciles the placed pair stores re-freezes this file DELIBERATELY,"
-        echo "# with its rule-checker run named in the commit. A new dead-pair READER on ours is a finding (the vs2 displacements"
-        echo "# stopped being dead on vsavj); a contact frame that moves means the rig moved — re-derive before re-freezing."
+        echo "# native vsav2 and the WIDE build $(basename "$BUILD"); frames >= $FLOOR). Frozen 14z-166 with FREEZE=1 on the"
+        echo "# defect (ours p1=+8 p2=<record> where native read p1=<record> p2=+8 — GitHub #136's meter family, #157);"
+        echo "# RE-FROZEN 14z-183 on the #157 fix (M20: the placed copies' pair stores re-pointed at vsavj's live pair), with"
+        echo "# its rule-checker run named in the commit. A new dead-pair READER or WRITER on ours is a finding; a contact"
+        echo "# frame that moves means the rig moved — re-derive before re-freezing."
         echo "# Columns: part, leg, kind (contact | live-pair-writers | dead-pair-writers | dead-pair-readers), frame, a, b"
         echo "#--"
         cat "$W/got.tsv"

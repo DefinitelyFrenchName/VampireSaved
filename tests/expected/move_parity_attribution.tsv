@@ -1,73 +1,34 @@
 # tests/expected/move_parity_attribution.tsv — the cause of every DIFF row of tests/expected/move_parity_events.tsv, by ablation
 # and a measured signature (tests/audit_move_parity_attribution.sh; tools/move_parity_attribution.py). Evidence class:
-# in-emulator. Frozen 14z-168 with FREEZE=1 on m3b_merged27 (GitHub #136). A FIX CHANGES THIS FILE BY DESIGN — re-freeze it
+# in-emulator. Frozen 14z-168 with FREEZE=1 on m3b_merged28 (GitHub #136). A FIX CHANGES THIS FILE BY DESIGN — re-freeze it
 # with the move-parity table and read the diff as the fix's effect.
 # Columns: root <part:event|opening> <name> <class> step=<n> <evidence> | row <part> <event> <base|surfaced> <root> <class>
 #--
 root	donovan_2:2	Blizzard Sword [HP]	SLOWDOWN	step=1	zero-pass frame native [3098] ours []
 root	donovan_3:5	Killshread Summon (ES)	P2-DISPLACEMENT	step=1	P2's x differs in the window while the tenant's fields are IDENT
-root	donovan_4:14	Foot Stab [8P] off throw	METER-SWAP	step=1	at 5647 native (P1,P2) (9, 8) ours (8, 9)
-root	donovan_5:1	Sword Grapple [MP]	METER-SWAP	step=1	at 2918 native (P1,P2) (9, 8) ours (8, 9)
+root	donovan_4:21	Slay Shred [LP+LK]	DF-STOCK	step=1	stock 7 native vs 8 ours at the activation
 root	donovan_6:2	Slay Shred [LP+LK]	DF-STOCK	step=1	stock 7 native vs 8 ours at the activation
-root	donovan_7:29	Sharirum Luna [6MP] swordless	METER-SWAP	step=1	at 7367 native (P1,P2) (9, 8) ours (8, 9)
-root	donovan_8:1	Sharirum Luna [4MP]	METER-SWAP	step=1	at 2887 native (P1,P2) (9, 8) ours (8, 9)
+root	donovan_7:32	Slay Shred [LP+LK] swordless	DF-STOCK	step=1	stock 7 native vs 8 ours at the activation
 root	donovan_10:1	Blizzard Sword [MP] at range	SLOWDOWN	step=1	zero-pass frame native [] ours [2977]
 root	donovan_11:12	Blizzard Sword [LP] blocked	SLOWDOWN	step=1	zero-pass frame native [4580] ours []
 root	donovan_15:7	Ifrit Sword [gc v: 623 buffered pre-hit, LP at hit+2]	DMG-VSAVJ	step=1	donovan takes 12 native / 13 ours; the defense row is already vs2's (vsavj's own pipeline, #161)
-root	huitzil_3:0	Magnet Slam [6MP]	METER-SWAP	step=1	at 2885 native (P1,P2) (9, 8) ours (8, 9)
-root	huitzil_4:10	Sitting Attack (ES) [8PP] off throw	METER-SWAP	step=1	at 5669 native (P1,P2) (9, 8) ours (8, 9)
+root	huitzil_3:8	Sitting Attack [8P] off throw	LANDING-TURN-OPEN	step=1	native x holds at 1000 and turns; ours moves 1000 -> 969 and keeps facing (#179)
+root	huitzil_4:11	Ray of Doom [LP+LK]	DF-STOCK	step=1	stock 7 native vs 8 ours at the activation
 root	huitzil_5:1	Reflect Wall [gc LP at hit+6]	GUARD-REENTRY	step=1	node differs at 3232, both legs leaving the block freeze at 3231 (seq 0 -> 2)
-root	huitzil_6:0	Circuit Scrapper [MP] cont	METER-SWAP	step=1	at 2867 native (P1,P2) (9, 8) ours (8, 9)
-root	huitzil_7:10	Circuit Scrapper [MP] motion then button	METER-SWAP	step=1	at 6870 native (P1,P2) (9, 8) ours (8, 9)
-root	huitzil_8:5	Circuit Scrapper [63214MP] step back	METER-SWAP	step=1	at 4482 native (P1,P2) (9, 8) ours (8, 9)
-root	pyron_3:0	Corona Whip [6MP]	METER-SWAP	step=1	at 2825 native (P1,P2) (6, 8) ours (8, 6)
-root	pyron_4:11	Sitting Attack (ES) [8PP] off throw	METER-SWAP	step=1	at 5950 native (P1,P2) (6, 8) ours (8, 6)
-root	pyron_5:0	Planet Burning [MP] step back (control)	METER-SWAP	step=1	at 2900 native (P1,P2) (18, 8) ours (8, 18)
+root	huitzil_6:16	Reflect Wall [gc v: 623 buffered pre-hit, LP at hit+2]	DMG-VSAVJ	step=1	Phobos takes 11 native / 12 ours; his defense row is already vs2's (vsavj's own pipeline, #161)
+root	pyron_4:12	Shining Gemini [LP+LK]	DF-STOCK	step=1	stock 7 native vs 8 ours at the activation
 root	pyron_7:7	Zodiac Fire [gc v: 623 buffered pre-hit, LP at hit+2]	DMG-VSAVJ	step=1	pyron takes 12 native / 13 ours; the defense row is already vs2's (vsavj's own pipeline, #161)
-root	donovan_2:15	Sharirum Luna [6MP]	METER-SWAP	step=2	at 6007 native (P1,P2) (9, 8) ours (8, 9)
 root	donovan_3:14	Slay Shred [MP+MK]	DF-STOCK	step=2	stock 7 native vs 8 ours at the activation
-root	donovan_4:16	Foot Stab [8K] off throw	METER-SWAP	step=2	at 6147 native (P1,P2) (9, 8) ours (8, 9)
-root	donovan_5:3	Sword Grapple [HP]	METER-SWAP	step=2	at 3318 native (P1,P2) (9, 8) ours (8, 9)
-root	donovan_7:31	Foot Stab [8P] swordless off throw	METER-SWAP	step=2	at 7767 native (P1,P2) (9, 8) ours (8, 9)
-root	donovan_8:3	Sharirum Luna [4HP]	METER-SWAP	step=2	at 3287 native (P1,P2) (9, 8) ours (8, 9)
 root	donovan_15:9	Ifrit Sword [gc LP at hit+6] (control: no block)	DMG-VSAVJ	step=2	donovan takes 12 native / 13 ours; the defense row is already vs2's (vsavj's own pipeline, #161)
-root	huitzil_3:1	Magnet Slam [6HP]	METER-SWAP	step=2	at 3305 native (P1,P2) (9, 8) ours (8, 9)
-root	huitzil_4:11	Ray of Doom [LP+LK]	DF-STOCK	step=2	stock 7 native vs 8 ours at the activation
+root	huitzil_3:9	Sitting Attack [8K] off throw	LANDING-TURN-OPEN	step=2	native x holds at 1000 and turns; ours moves 1000 -> 969 and keeps facing (#179)
 root	huitzil_5:2	Reflect Wall [gc LP at hit+10]	GUARD-REENTRY	step=2	node differs at 3651, both legs leaving the block freeze at 3650 (seq 0 -> 2)
-root	huitzil_6:1	Circuit Scrapper [HP] cont	METER-SWAP	step=2	at 3287 native (P1,P2) (9, 8) ours (8, 9)
-root	pyron_3:1	Corona Whip [6HP]	METER-SWAP	step=2	at 3245 native (P1,P2) (6, 8) ours (8, 6)
-root	pyron_4:12	Shining Gemini [LP+LK]	DF-STOCK	step=2	stock 7 native vs 8 ours at the activation
 root	pyron_7:9	Zodiac Fire [gc LP at hit+6] (control: no block)	DMG-VSAVJ	step=2	pyron takes 12 native / 13 ours; the defense row is already vs2's (vsavj's own pipeline, #161)
-root	donovan_2:17	Sharirum Luna [6HP]	METER-SWAP	step=3	at 6407 native (P1,P2) (9, 8) ours (8, 9)
-root	donovan_4:18	Foot Stab (ES) [8PP] off throw	METER-SWAP	step=3	at 6647 native (P1,P2) (9, 8) ours (8, 9)
-root	donovan_7:32	Slay Shred [LP+LK] swordless	DF-STOCK	step=3	stock 7 native vs 8 ours at the activation
-root	huitzil_3:2	Magnet Slam [4MP]	METER-SWAP	step=3	at 3708 native (P1,P2) (9, 8) ours (8, 9)
 root	huitzil_5:3	Reflect Wall [gc LP at hit+14]	GUARD-REENTRY	step=3	node differs at 4071, both legs leaving the block freeze at 4070 (seq 0 -> 2)
-root	huitzil_6:16	Reflect Wall [gc v: 623 buffered pre-hit, LP at hit+2]	DMG-VSAVJ	step=3	Phobos takes 11 native / 12 ours; his defense row is already vs2's (vsavj's own pipeline, #161)
-root	pyron_3:2	Corona Whip [4MP]	METER-SWAP	step=3	at 3665 native (P1,P2) (6, 8) ours (8, 6)
-root	donovan_2:19	Sword Grapple [MP]	METER-SWAP	step=4	at 6838 native (P1,P2) (9, 8) ours (8, 9)
-root	donovan_4:20	Foot Stab (ES) [8KK] off throw	METER-SWAP	step=4	at 7147 native (P1,P2) (9, 8) ours (8, 9)
-root	huitzil_3:3	Circuit Scrapper [MP]	METER-SWAP	step=4	at 4135 native (P1,P2) (9, 8) ours (8, 9)
 root	huitzil_5:4	Reflect Wall [gc HP at hit+6]	GUARD-REENTRY	step=4	node differs at 4491, both legs leaving the block freeze at 4490 (seq 0 -> 2)
-root	pyron_3:3	Planet Burning [MP]	METER-SWAP	step=4	at 4138 native (P1,P2) (18, 8) ours (8, 18)
-root	donovan_2:21	Sword Grapple [HP]	METER-SWAP	step=5	at 7238 native (P1,P2) (9, 8) ours (8, 9)
-root	donovan_4:21	Slay Shred [LP+LK]	DF-STOCK	step=5	stock 7 native vs 8 ours at the activation
-root	huitzil_3:4	Circuit Scrapper [HP]	METER-SWAP	step=5	at 4554 native (P1,P2) (9, 8) ours (8, 9)
 root	huitzil_5:5	Reflect Wall [gc LK at hit+6]	GUARD-REENTRY	step=5	node differs at 4911, both legs leaving the block freeze at 4910 (seq 0 -> 2)
-root	pyron_3:4	Planet Burning [HP]	METER-SWAP	step=5	at 4558 native (P1,P2) (18, 8) ours (8, 18)
-root	huitzil_3:5	Circuit Scrapper [MP] far (whiff)	METER-SWAP	step=6	at 4974 native (P1,P2) (9, 8) ours (8, 9)
 root	huitzil_5:6	Reflect Wall [gc HK at hit+6]	GUARD-REENTRY	step=6	node differs at 5331, both legs leaving the block freeze at 5330 (seq 0 -> 2)
-root	pyron_3:5	Planet Burning [MP] far (whiff)	METER-SWAP	step=6	at 4978 native (P1,P2) (18, 8) ours (8, 18)
-root	huitzil_3:6	Sky Capture [j.6MP]	METER-SWAP	step=7	at 5195 native (P1,P2) (9, 8) ours (8, 9)
 root	huitzil_5:7	Reflect Wall [gc PP at hit+6]	GUARD-REENTRY	step=7	node differs at 5751, both legs leaving the block freeze at 5750 (seq 0 -> 2)
-root	pyron_3:6	Galactic Throw [j.6MP]	METER-SWAP	step=7	at 5183 native (P1,P2) (12, 8) ours (8, 12)
-root	huitzil_3:7	Sky Capture [j.6HP]	METER-SWAP	step=8	at 5615 native (P1,P2) (9, 8) ours (8, 9)
 root	huitzil_5:8	Reflect Wall [gc LP at hit+6] (control: no block)	DMG-VSAVJ	step=8	Phobos takes 11 native / 12 ours; his defense row is already vs2's (vsavj's own pipeline, #161)
-root	pyron_3:7	Galactic Throw [j.6HP]	METER-SWAP	step=8	at 5603 native (P1,P2) (12, 8) ours (8, 12)
-root	huitzil_3:8	Sitting Attack [8P] off throw	METER-SWAP	step=9	at 6084 native (P1,P2) (9, 8) ours (8, 9)
-root	pyron_3:8	Sitting Attack [8P] off throw	METER-SWAP	step=9	at 6025 native (P1,P2) (6, 8) ours (8, 6)
-root	huitzil_3:9	Sitting Attack [8K] off throw	METER-SWAP	step=10	at 6504 native (P1,P2) (9, 8) ours (8, 9)
-root	pyron_3:9	Sitting Attack [8K] off throw	METER-SWAP	step=10	at 6445 native (P1,P2) (6, 8) ours (8, 6)
 row	donovan_2	2	base	donovan_2:2	SLOWDOWN
 row	donovan_2	3	base	donovan_2:2	SLOWDOWN
 row	donovan_2	4	base	donovan_2:2	SLOWDOWN
@@ -81,13 +42,13 @@ row	donovan_2	11	base	donovan_2:2	SLOWDOWN
 row	donovan_2	12	base	donovan_2:2	SLOWDOWN
 row	donovan_2	13	base	donovan_2:2	SLOWDOWN
 row	donovan_2	14	base	donovan_2:2	SLOWDOWN
-row	donovan_2	15	base	donovan_2:15	METER-SWAP
+row	donovan_2	15	base	donovan_2:2	SLOWDOWN
 row	donovan_2	16	base	donovan_2:2	SLOWDOWN
-row	donovan_2	17	base	donovan_2:17	METER-SWAP
+row	donovan_2	17	base	donovan_2:2	SLOWDOWN
 row	donovan_2	18	base	donovan_2:2	SLOWDOWN
-row	donovan_2	19	base	donovan_2:19	METER-SWAP
+row	donovan_2	19	base	donovan_2:2	SLOWDOWN
 row	donovan_2	20	base	donovan_2:2	SLOWDOWN
-row	donovan_2	21	base	donovan_2:21	METER-SWAP
+row	donovan_2	21	base	donovan_2:2	SLOWDOWN
 row	donovan_2	22	base	donovan_2:2	SLOWDOWN
 row	donovan_2	23	base	donovan_2:2	SLOWDOWN
 row	donovan_2	24	base	donovan_2:2	SLOWDOWN
@@ -98,22 +59,12 @@ row	donovan_3	8	base	donovan_3:5	P2-DISPLACEMENT
 row	donovan_3	9	base	donovan_3:5	P2-DISPLACEMENT
 row	donovan_3	10	base	donovan_3:5	P2-DISPLACEMENT
 row	donovan_3	14	base	donovan_3:14	DF-STOCK
-row	donovan_4	14	base	donovan_4:14	METER-SWAP
-row	donovan_4	16	base	donovan_4:16	METER-SWAP
-row	donovan_4	18	base	donovan_4:18	METER-SWAP
-row	donovan_4	20	base	donovan_4:20	METER-SWAP
 row	donovan_4	21	base	donovan_4:21	DF-STOCK
-row	donovan_5	1	base	donovan_5:1	METER-SWAP
-row	donovan_5	3	base	donovan_5:3	METER-SWAP
 row	donovan_6	2	base	donovan_6:2	DF-STOCK
 row	donovan_6	3	base	donovan_6:2	DF-STOCK
 row	donovan_6	4	base	donovan_6:2	DF-STOCK
 row	donovan_6	27	base	donovan_6:2	DF-STOCK
-row	donovan_7	29	base	donovan_7:29	METER-SWAP
-row	donovan_7	31	base	donovan_7:31	METER-SWAP
 row	donovan_7	32	base	donovan_7:32	DF-STOCK
-row	donovan_8	1	base	donovan_8:1	METER-SWAP
-row	donovan_8	3	surfaced	donovan_8:3	METER-SWAP
 row	donovan_10	1	base	donovan_10:1	SLOWDOWN
 row	donovan_10	2	base	donovan_10:1	SLOWDOWN
 row	donovan_10	3	base	donovan_10:1	SLOWDOWN
@@ -126,17 +77,8 @@ row	donovan_10	9	base	donovan_10:1	SLOWDOWN
 row	donovan_11	12	base	donovan_11:12	SLOWDOWN
 row	donovan_15	7	base	donovan_15:7	DMG-VSAVJ
 row	donovan_15	9	base	donovan_15:9	DMG-VSAVJ
-row	huitzil_3	0	base	huitzil_3:0	METER-SWAP
-row	huitzil_3	1	base	huitzil_3:1	METER-SWAP
-row	huitzil_3	2	base	huitzil_3:2	METER-SWAP
-row	huitzil_3	3	base	huitzil_3:3	METER-SWAP
-row	huitzil_3	4	base	huitzil_3:4	METER-SWAP
-row	huitzil_3	5	base	huitzil_3:5	METER-SWAP
-row	huitzil_3	6	base	huitzil_3:6	METER-SWAP
-row	huitzil_3	7	base	huitzil_3:7	METER-SWAP
-row	huitzil_3	8	base	huitzil_3:8	METER-SWAP
-row	huitzil_3	9	base	huitzil_3:9	METER-SWAP
-row	huitzil_4	10	base	huitzil_4:10	METER-SWAP
+row	huitzil_3	8	base	huitzil_3:8	LANDING-TURN-OPEN
+row	huitzil_3	9	base	huitzil_3:9	LANDING-TURN-OPEN
 row	huitzil_4	11	base	huitzil_4:11	DF-STOCK
 row	huitzil_4	12	base	huitzil_4:11	DF-STOCK
 row	huitzil_5	1	base	huitzil_5:1	GUARD-REENTRY
@@ -147,24 +89,8 @@ row	huitzil_5	5	base	huitzil_5:5	GUARD-REENTRY
 row	huitzil_5	6	base	huitzil_5:6	GUARD-REENTRY
 row	huitzil_5	7	base	huitzil_5:7	GUARD-REENTRY
 row	huitzil_5	8	base	huitzil_5:8	DMG-VSAVJ
-row	huitzil_6	0	base	huitzil_6:0	METER-SWAP
-row	huitzil_6	1	base	huitzil_6:1	METER-SWAP
 row	huitzil_6	16	base	huitzil_6:16	DMG-VSAVJ
-row	huitzil_7	10	base	huitzil_7:10	METER-SWAP
-row	huitzil_8	5	base	huitzil_8:5	METER-SWAP
-row	pyron_3	0	base	pyron_3:0	METER-SWAP
-row	pyron_3	1	base	pyron_3:1	METER-SWAP
-row	pyron_3	2	base	pyron_3:2	METER-SWAP
-row	pyron_3	3	base	pyron_3:3	METER-SWAP
-row	pyron_3	4	base	pyron_3:4	METER-SWAP
-row	pyron_3	5	base	pyron_3:5	METER-SWAP
-row	pyron_3	6	base	pyron_3:6	METER-SWAP
-row	pyron_3	7	base	pyron_3:7	METER-SWAP
-row	pyron_3	8	base	pyron_3:8	METER-SWAP
-row	pyron_3	9	base	pyron_3:9	METER-SWAP
-row	pyron_4	11	base	pyron_4:11	METER-SWAP
 row	pyron_4	12	base	pyron_4:12	DF-STOCK
 row	pyron_4	13	base	pyron_4:12	DF-STOCK
-row	pyron_5	0	base	pyron_5:0	METER-SWAP
 row	pyron_7	7	base	pyron_7:7	DMG-VSAVJ
 row	pyron_7	9	base	pyron_7:9	DMG-VSAVJ

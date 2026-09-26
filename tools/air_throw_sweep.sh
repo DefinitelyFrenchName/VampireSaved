@@ -18,12 +18,12 @@
 # lead/press/xpin the pair is pinned at t-40..t-38 (the walk's end overwritten) so the walk is not a second
 # variable; every other input is what the committed rig generates.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [PYR=build/pyron42] [LEAD=n] tools/air_throw_sweep.sh <walk|lead|phase|press|xpin> [out_dir]
+# Usage: ROMDIR=... [MAME_BIN=...] [PYR=build/pyron43] [LEAD=n] tools/air_throw_sweep.sh <walk|lead|phase|press|xpin> [out_dir]
 #   MAME, native only, one leg per value in parallel; ~1 min per batch of legs.
 set -u
 ROMDIR="${ROMDIR:?set ROMDIR}"; REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-PYR="${PYR:-build/pyron42}"; EX="$PYR/extract"
+PYR="${PYR:-build/pyron43}"; EX="$PYR/extract"
 MODE="${1:?mode: lead|phase|press|xpin}"; OUT="${2:-$(mktemp -d)}"; case "$OUT" in /*) ;; *) OUT="$REPO/$OUT" ;; esac; mkdir -p "$OUT/chains"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 [ -f "$EX/regions.json" ] || { echo "SKIP: no extract at $EX"; exit 0; }

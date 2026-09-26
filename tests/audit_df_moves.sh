@@ -79,14 +79,14 @@
 # (docs/game/atlas/ram.md +0x10A), so the no-hit L rows have no gauge step whether or not the
 # attack came out.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged27] [FREEZE=1] tests/audit_df_moves.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged28] [FREEZE=1] tests/audit_df_moves.sh
 #   emulator tier, MAME; 10 legs in parallel — measured 14z-168 on this MacBook, solo: ~40 s wall
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged27}"
+BUILD="${BUILD:-build/m3b_merged28}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/df_moves.tsv"
 CONTROL="${CONTROL:-}"

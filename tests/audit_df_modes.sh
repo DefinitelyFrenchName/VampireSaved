@@ -69,14 +69,14 @@
 # the modes DO beyond their fields (the altered attacks — the next #136 rig);
 # Sasquatch's alternate DFs; P2-side activations.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged27] [JOBS=6] [FREEZE=1] tests/audit_df_modes.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged28] [JOBS=6] [FREEZE=1] tests/audit_df_modes.sh
 #   emulator tier, MAME; 40 legs x 2 runs — measured 14z-168 on this MacBook, solo: ~95 s wall
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged27}"
+BUILD="${BUILD:-build/m3b_merged28}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/df_modes.tsv"
 JOBS="${JOBS:-6}"

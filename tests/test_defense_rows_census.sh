@@ -48,13 +48,13 @@
 #   reader <game> <table> <instruction pc> <form>          (since 14z-169)
 # where a curve class names the base characters whose vsavj row it equals.
 #
-# Usage: ROMDIR=... [BUILD=build/m3b_merged27] [FREEZE=1] tests/test_defense_rows_census.sh
+# Usage: ROMDIR=... [BUILD=build/m3b_merged28] [FREEZE=1] tests/test_defense_rows_census.sh
 #   static tier (the decrypt cache, a build's data view); measured 14z-168 on this MacBook: ~2 s
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
-BUILD="${BUILD:-build/m3b_merged27}"
+BUILD="${BUILD:-build/m3b_merged28}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/defense_rows_census.tsv"
 CONTROL="${CONTROL:-}"

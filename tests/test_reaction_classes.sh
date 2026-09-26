@@ -40,11 +40,11 @@
 # The `ours` rows follow the merged build: re-freeze at every freeze (FREEZE=1), reviewing
 # the diff; the vsavj and vsav2 rows move only if the reference images or the tool do.
 #
-# Usage: ROMDIR=... [BUILD=build/m3b_merged27] [FREEZE=1] tests/test_reaction_classes.sh
+# Usage: ROMDIR=... [BUILD=build/m3b_merged28] [FREEZE=1] tests/test_reaction_classes.sh
 #   static tier (a build dir + the decrypted reference views, no emulator); measured 14z-169 on this MacBook: ~3 s
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
-BUILD="${BUILD:-build/m3b_merged27}"
+BUILD="${BUILD:-build/m3b_merged28}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/reaction_classes.tsv"
 CONTROL="${CONTROL:-}"

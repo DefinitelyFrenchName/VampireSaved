@@ -26,16 +26,16 @@
 # would be false and this fails. The frozen divergence frame is where the stock descriptor's
 # missing extension first reaches RAM; it moves only if boot-time code moves.
 #
-# Usage: ROMDIR=... [MERGED=build/m3b_merged27] [MAME_REF_BIN=~/.cache/vampire-saved/mame-ref/cps2]
+# Usage: ROMDIR=... [MERGED=build/m3b_merged28] [MAME_REF_BIN=~/.cache/vampire-saved/mame-ref/cps2]
 #        tests/audit_stock_emulator_stall.sh
-#   defaults build/m3b_merged27 (re-pointed 14z-148 at M18, 14z-170 at M19); the reference binary is the
+#   defaults build/m3b_merged28 (re-pointed 14z-148 at M18, 14z-170 at M19); the reference binary is the
 #   WIDE=0 build of tools/setup_mame.sh. MAME_BIN (the WIDE binary) as every MAME gate.
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="$(cd "$ROMDIR" && pwd)"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
-MERGED="${MERGED:-build/m3b_merged27}"
+MERGED="${MERGED:-build/m3b_merged28}"
 REF="${MAME_REF_BIN:-$HOME/.cache/vampire-saved/mame-ref/cps2}"
 WIDE="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 [ -f "$MERGED/rompath/vsavjw.zip" ] || { echo "SKIP: $MERGED/rompath/vsavjw.zip missing"; exit 0; }

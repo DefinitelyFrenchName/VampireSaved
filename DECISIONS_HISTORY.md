@@ -27,9 +27,39 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-26 (14z-183) — M20 freezes with Phobos's landing difference ticketed (#179)
+
+**The question (14z-183, the M20 freeze's attribution re-freeze), verbatim:** *"The M20 freeze exposed a pre-existing Phobos difference: in the parity rig's huitzil_3 events 8/9 (throw, then Sitting Attack 8P/8K), on the landing frame (+156) native Phobos stays at x=1000 and turns around the next frame; ours is pushed 31 px back (x=969) and keeps facing. Identical on merged-m19 (it shipped), hidden until now behind the meter difference #157 fixed. The attribution gate refuses to freeze with an unexplained root. How should M20 proceed?"* Options: freeze, ticket it (Recommended); investigate first.
+
+**The maintainer:** *"Freeze, ticket it (Recommended)"*.
+
+**What it means.** M20 freezes as built. `tools/move_parity_attribution.py` names the two rows under an OPEN class (`LANDING-TURN-OPEN`, a measured signature, like PHOBOS-DMG-OPEN at M19) and GitHub #179 carries the difference; the next step is a native-vs-ours capture for the maintainer before any mechanism work. Evidence: `build/rc183/h3x/ev89.txt`.
+
+---
+
+## Ruled 2026-09-26 (14z-183) — the #112 black-foot gate is pinned to the M19 build
+
+**The question (14z-183, the M20 freeze's emulator battery), verbatim:** *"test_pod_black_foot_palette (#112's black foot, declined ticket) fails on M20: your recording pod-black-m14-01 plays out differently from f4812 on, because the #157 fix changes the Donovan-vs-CPU fight after his first throw/applier hit at f4236/f4280. At its frozen frame (14355-14375) there are 0 black pixels on M20, 7007 on M19. The gate's subject, palette row 0b index 14, is in code M20 does not change (the M20 delta is 18 words in the x028122 copies). How should the gate continue?"* Options: pin it to M19 (Recommended), re-find it on M20, re-record on M20.
+
+**The maintainer:** *"Pin it to M19 (Recommended)"*.
+
+**What it means.** `tests/test_pod_black_foot_palette.sh` runs on `build/m3b_merged27` (merged-m19), where the recording reproduces as captured, and no longer on the current merged build; a freeze's re-point sweep must NOT move it, and the build-dir policy keeps `build/m3b_merged27` while the gate names it. Evidence: `build/rc183/pod/` (the two playbacks' first differences, the registration-pair write taps).
+
+---
+
+## Ruled 2026-09-26 (14z-183) — #157 lands WITH an M20 freeze, now
+
+**The first question**, after the probe's evidence and the maintainer's three recordings: *"… How do you want to proceed?"* — answered *"Land it (Recommended)"*, whose description read *"Rows into the tracked manifests, the gate adapted, the three tables re-frozen, each through the rule-checker. The merged build then carries the fix; freezing it as M20 is decided later."* **That option was WRONG as offered** and was corrected before any byte moved: a manifest change cannot be committed green between freezes (`docs/project/gotchas.md` "A MANIFEST FIX CANNOT BE COMMITTED GREEN BETWEEN FREEZES", paid 14z-169 — `test_m3a_reproducible` requires every frozen reference to rebuild bit-exact from the tree). **The corrected question**, verbatim: *"Correction: landing #157's manifest rows without a freeze turns the tier red, because test_m3a_reproducible requires every frozen reference to rebuild bit-exact. So a manifest fix lands WITH a freeze (gotcha, paid 14z-169). The real options are:"* — *"Hold as a patch (Recommended)"*, *"Freeze M20 now"*, *"Hold, no commit"*. **The maintainer chose "Freeze M20 now"**: *"Land it with a full freeze: rebuild the five tracks, registry rows, re-point sweep, the freeze-cadence tier, the M2 battery and suites (the battery alone is about 5 h), re-frozen expectations and tags. Starts this sitting and likely runs past it."*
+
+**What it means.** The six hit-pair stores per tenant (the probe's rows) enter the three tracked manifests at stage 6 — Donovan's six stage-99 rows flipped, the two throw-state `clr.b` rows left at 99 — with the mark `M19` -> `M20`, and land together with the freeze ritual (`vampire-saved-port` D.4), each measurement-based step through the rule-checker (`build`, then `expectation` and `freeze`). A release is a separate decision.
+
+---
+
 ## Ruled 2026-09-25 (14z-183) — #134: fix the walk-in rigs' first event, re-freeze what moves, and chase Lei-Lei's j.LK too
 
 **The question (14z-183), verbatim:** *"#134, measured. Every walk-in rig puts LP first at f2600, but the round intro holds the fighters until f2546, so LP is pressed at 115-134 px instead of ~50. That's why the five LP legs whiff. Moving the first event to f2800 (the naming rigs' own remedy) makes all five connect. The same artifact is in the frozen chain table: for eight characters (Aulbath, Bulleta, Demitri, Felicia, Lei-Lei, Lilith, Morrigan, Sasquatch), LP at near range enters a2:0x00, not the frozen 0x01. The sixth VOID, Lei-Lei's j.LK (it was Lei-Lei, not Lilith — corrected), is a genuine whiff at 49 px where her other jump normals connect. The fix moves five gates' frozen measurements (frame join, meter gain, rehit ring, DF startup invuln, aerial join) and the out-of-tree frame-data pages. How do you want #134 handled?"* The option chosen: *"Fix, and chase j.LK too"* — *"As recommended, plus a per-move timing or pin so Lei-Lei's j.LK connects and her cell gets measured."* (The recommended option it extends: *"First event at f2800 for the walk-in sets in tools/vanilla_join_rig.py; re-run the five gates, read every moved row, re-freeze through the rule-checker, regenerate the pages, fix the LP claim in the docs."*)
+
+---
 
 ## Ruled 2026-09-25 (14z-183) — #157's fix goes to a PROBE BUILD now; nothing frozen or shipped until the maintainer rules on the result
 

@@ -5,7 +5,7 @@
 #   rally threshold at 0x018C7C) actually INDEX, by the victim's identity, over the corpus
 #   on our merged build and on pristine vsavj — the live half of the ruled defense-row fix's
 #   premise that a tenant victim's hit reads the tenant's own row.
-# HOW: 218 non-debug read-tap runs on MAME (the 12 victim parts, the 30 naming parts, every
+# HOW: 221 non-debug read-tap runs on MAME (218 at 14z-169; the 12 victim parts, every naming part — 32 since 14z-181, every
 #   suite replay on ours, and every suite replay on pristine vsavj as the legacy control),
 #   each read attributed by PC with the +0x382 value it took, identity from each block's
 #   tapped hitbox base (never +0x382 itself, the thing in question); liveness per window by
@@ -40,7 +40,7 @@
 # THE SAMPLE (our build unless named):
 #   victim   — the 12 naming victim parts (tests/replays/naming/<tenant>_victim_<n>, Victor
 #              P1 attacking the tenant poked as P2, as committed);
-#   attacker — the 30 naming parts (the tenant P1, real picks, tests/audit_move_parity.sh's
+#   attacker — every naming part, 32 since 14z-181 (the tenant P1, real picks, tests/audit_move_parity.sh's
 #              inputs and pins; the tenant is a victim only when Demitri lands a hit);
 #   suite    — every tests/replays/*.rpl, unpoked (tenant picks on the merged wheel, 1P CPU
 #              matches where the voice-class borrow runs, legacy matches);
@@ -60,14 +60,14 @@
 # <reads> <runs>`. The ours rows follow the build (a freeze can move a tenant's base):
 # re-freeze at every freeze (FREEZE=1), reviewing the diff.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged27] [JOBS=6] [LEGS="victim attacker suite vsavj"] [FREEZE=1] tests/audit_defense_row_reads.sh
-#   emulator tier, MAME; 218 tap runs — measured 14z-169 on this MacBook, solo, JOBS=6: see PROVENANCE
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged28] [JOBS=6] [LEGS="victim attacker suite vsavj"] [FREEZE=1] tests/audit_defense_row_reads.sh
+#   emulator tier, MAME; 221 tap runs (14z-183; 218 when measured 14z-169) on this MacBook, solo, JOBS=6: see PROVENANCE
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged27}"
+BUILD="${BUILD:-build/m3b_merged28}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/defense_row_reads.tsv"
 BASES="$REPO/tests/expected/roster_pairings/bases.tsv"

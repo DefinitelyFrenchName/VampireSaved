@@ -6,7 +6,7 @@
 #   attributed by PC with the values, frozen: the live half of the reaction-class analysis,
 #   seeing what a static scan cannot (a class written from a register, code outside the
 #   scanned range), and naming the consumers of +0x54.
-# HOW: 148 non-debug read-tap runs on MAME over both fighter blocks' +0x54/+0x55 with
+# HOW: 153 non-debug read-tap runs on MAME (148 at 14z-169; 153 measured 14z-183 as the corpus grew) over both fighter blocks' +0x54/+0x55 with
 #   liveness per window by the END probe; positive controls on the reading (vsavj's ground
 #   stager writing 6 on ours, vs2's writing 0x52 on native); controls plant a 0x38 write via
 #   a Lua poke and delete a window's accesses.
@@ -32,7 +32,7 @@
 # THE SAMPLE (three legs):
 #   vsavj  — pristine vsavj, EVERY replay under tests/replays/*.rpl, unpoked, for its
 #            scripted length + 120 frames (tests/lua/replay.lua's tail) — the legacy corpus;
-#   ours   — the merged build, the 30 #136 naming parts (tests/replays/naming/<tenant>_<n>)
+#   ours   — the merged build, every #136 naming part (tests/replays/naming/<tenant>_<n>; 30 until 14z-181, 32 since)
 #            with tests/audit_move_parity.sh's own inputs and pokes (the merged wheel's
 #            path, the level pinned to 6 from 2000 and the RNG from 2363);
 #   native — vsav2, the same 30 parts as committed, with the same pins.
@@ -52,14 +52,14 @@
 # and `<leg> runs <n>`. The ours rows follow the build (placed pcs move): re-freeze at every
 # freeze (FREEZE=1), reviewing the diff.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged27] [JOBS=6] [LEGS="vsavj ours native"] [FREEZE=1] tests/audit_reaction_class_live.sh
-#   emulator tier, MAME; 148 tap runs — measured 14z-169 on this MacBook, solo, JOBS=6: see the header of the first frozen run (PROVENANCE)
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged28] [JOBS=6] [LEGS="vsavj ours native"] [FREEZE=1] tests/audit_reaction_class_live.sh
+#   emulator tier, MAME; 153 tap runs (14z-183; 148 when measured 14z-169) on this MacBook, solo, JOBS=6: see the header of the first frozen run (PROVENANCE)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged27}"
+BUILD="${BUILD:-build/m3b_merged28}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/reaction_class_live.tsv"
 JOBS="${JOBS:-6}"
@@ -241,7 +241,7 @@ if [ "${FREEZE:-0}" = 1 ]; then
     [ "$fail" = 0 ] && [ -z "$CONTROL" ] && [ "$LEGS" = "vsavj ours native" ] || { echo "FAIL: audit_reaction_class_live (not frozen: fix the red first, all three legs, no control)"; exit 1; }
     {
         echo "# tests/expected/reaction_class_live.tsv — every write and read of the victim's reaction class (+0x54, both fighter blocks)"
-        echo "# over the corpus: vsavj = pristine vsavj, every tests/replays/*.rpl; ours = $(basename "$BUILD"), the 30 #136 naming parts; native = vsav2,"
+        echo "# over the corpus: vsavj = pristine vsavj, every tests/replays/*.rpl; ours = $(basename "$BUILD"), every #136 naming part ($(ls "$REPO"/tests/replays/naming/donovan_[0-9]*.json "$REPO"/tests/replays/naming/huitzil_[0-9]*.json "$REPO"/tests/replays/naming/pyron_[0-9]*.json | wc -l | tr -d " ")); native = vsav2,"
         echo "# the same parts (tests/audit_reaction_class_live.sh; tests/lua/read_tap.lua). Evidence class: in-emulator. Frozen 14z-169"
         echo "# with FREEZE=1. Columns: <leg> W <pc> <+0x54 value> <blocks> <runs> | <leg> R <pc> <blocks> <runs> <values seen>."
         echo "# The ours rows follow the build: re-freeze at every freeze, reviewing the diff."

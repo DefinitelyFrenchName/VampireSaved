@@ -55,14 +55,14 @@
 # first-possible-frame test (section 2b) and, on its result, ruled: "agreed, all the tests
 # converge : it's identical" (2026-09-18, DECISIONS_HISTORY.md, the 14z-168 captures entry).
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged27] [FREEZE=1] tests/audit_guard_reentry.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged28] [FREEZE=1] tests/audit_guard_reentry.sh
 #   emulator tier, MAME; three field_trace and three snapshot legs, then 12 act legs — measured 14z-168 on this MacBook, solo: ~20 s wall
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged27}"
+BUILD="${BUILD:-build/m3b_merged28}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/guard_reentry.tsv"
 CONTROL="${CONTROL:-}"

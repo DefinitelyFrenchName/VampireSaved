@@ -60,7 +60,7 @@
 # Env: BUILDS="don_m19 hui53 pyron37" to re-point at another freeze.
 set -u
 cd "$(dirname "$0")/.."
-BUILDS="${BUILDS:-don_m23 hui57 pyron42}"
+BUILDS="${BUILDS:-don_m24 hui58 pyron43}"
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }

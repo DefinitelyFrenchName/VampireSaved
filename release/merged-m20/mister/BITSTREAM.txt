@@ -1,0 +1,24 @@
+jtcps2w.rbf — the CPS-2 WIDE MiSTer core, fitter seed 18269 (THE CANONICAL COPY)
+==================================================================================
+sha256   46fc74afb6a6c5c6143db64d9c9f5d2e298cdd5c79449bb0370fbe9c2b3df66f
+size     3,111,944 B
+seed     18269            (jtcore cps2w -mister --nodbg --seed 18269)
+slack    +0.066 ns        (SDRAM 96 MHz domain, slow corner; jtframe timing gate PASS)
+built    2026-08-25 (build_id datestamp 260825), Quartus 20.1.1 Lite, jotego/jtcore20x
+fork     DefinitelyFrenchName/jtcores @ 7b9a0d2d (branch vampire-saved). RTL unchanged
+         through the current pin 63496069 — commits after 7b9a0d2d touch only the
+         Verilator harness, the README and doc/mame.xml — so this bitstream is
+         current for every romset release since merged-m6.
+field    PASSED 14z-109 (bundle 14z108), 14z-112 (bundle 14z111), 2026-08-28 (bundle
+         14z112: WIDE on this core, stock on Jotego's own core, STOCK CONTROL on this)
+
+THIS DIRECTORY IS THE BUILD RESOURCE. release/bitstreams/CURRENT names the seed
+directory every release packages from (tools/package_release_platforms.py copies
+this .rbf and this record into release/<name>/mister/ after verifying the sha256
+above against the file). A release never copies the bitstream from another
+release. A rebuilt bitstream (new seed, slice or pin) gets its OWN directory
+here and a CURRENT bump — never overwrite: a timing-FAILING seed emits an .rbf
+indistinguishable from a passing one, and the same seed rebuilds to a DIFFERENT
+hash on a different day (datestamp), so the record is the identity.
+Recipe: docs/platform/mister.md "SYNTHESISING THE CORE" / "REPRODUCING THE
+SHIPPING BITSTREAM". Rebuildable, not reproducible byte-for-byte.

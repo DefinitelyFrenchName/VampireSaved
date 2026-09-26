@@ -44,14 +44,14 @@
 # rig never lands). A FIX CHANGES THIS FILE BY DESIGN: re-freeze it with the move-parity
 # table, and read the diff as the fix's effect (rows gone, roots gone), never as noise.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged27] [JOBS=6] [FREEZE=1] tests/audit_move_parity_attribution.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged28] [JOBS=6] [FREEZE=1] tests/audit_move_parity_attribution.sh
 #   emulator tier, MAME; ~12 ablation steps over the 19 parts carrying a DIFF — measured 14z-168 on this MacBook, solo: ~5 min wall
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged27}"
+BUILD="${BUILD:-build/m3b_merged28}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/move_parity_attribution.tsv"
 EVENTS="$REPO/tests/expected/move_parity_events.tsv"

@@ -1,0 +1,68 @@
+fbneo — FBNeo (SDL2 frontend) carrying the CPS-2 WIDE v1 driver patch, prebuilt for windows-x86_64
+==================================================================================================
+
+# Every file in this directory, and its sha256 — verify before running:
+#   awk '/^sha256 /{print $2"  "$3}' BINARY.txt | shasum -a 256 -c     (macOS, or any host with perl)
+#   awk '/^sha256 /{print $2"  "$3}' BINARY.txt | sha256sum -c        (Linux, MSYS2)
+sha256 81b7cd6947f938c57fe12fe1538d131af371d66568439cd956098e822adac1a6 fbneo.exe
+sha256 0d43a27f3f2e1ebb4d25236122a6e7b14a190cc986a28f8fe0443d1f045edae8 libaom.dll
+sha256 47afa7f14e332e220325c8d6fc837064fbc0fdcbfc3901dfc340fbb93102300e libavif-16.dll
+sha256 ca7bc06ead80259971badf2cd0bfc688db9154dad65f139f49a38b4be9976f97 libbrotlicommon.dll
+sha256 a142dc6cfa77cb907028aa9426f486f3d8de37855e8db2ae2894147908121881 libbrotlidec.dll
+sha256 50c3aca8abcf0d5576f0b62dbd608be285246f8fd1b48ef87d58fa6b8b744e5f libbrotlienc.dll
+sha256 29385f5f9b9f8c945eac3366403f529b3bd4bd59aa6eb492e043ffd2d82268c0 libdav1d-7.dll
+sha256 4be2ffe36137f533825a853642051f2c1f6ddd2f6515e33c2c32712bc9a6d214 libdeflate.dll
+sha256 b37c1770c8ca092700875845b34918803ee6311573eba1c32ff4b1166e4a0e1e libgcc_s_seh-1.dll
+sha256 4cd65f4bb3c123471a23f3eed734adbb31522b012c2c1776640d9634fbeb623c libhwy.dll
+sha256 9286b1f637ff4a249d81238ea9c9ebf4fb083727dfc4235c750bf749606d85f0 libjbig-0.dll
+sha256 b564d34adaca83e73af0e2231719dd0198ea6cd074c64b2ba85bfd7182f27db7 libjpeg-8.dll
+sha256 d8d1ba0ba4c12ae74a15d44e06a798eafe18842dde71130653dd982dab5fe2a1 libjxl.dll
+sha256 6d822a9ac8288fda334b460cbe008716c7b6e9b20e160b9b6ca23871506f0a00 libjxl_cms.dll
+sha256 dc241cbdf2d295846ec564c1eb3c01639d43c0d72415a8758e65d71df31cc0ba liblcms2-2.dll
+sha256 6887fb5aeabf382a835a4cb693025e8d48d9c90e82ca4eae5d2d8ffb70c6ca9a libLerc.dll
+sha256 ccb6a179acf35e704b2ffd7f232677982c4856bd1dda1341713a27518cf97ce1 liblzma-5.dll
+sha256 3737838ee8d6b893df7bdabf7439775371a57dce7e17ee6b35586023c64bd9ab libpng16-16.dll
+sha256 6fe18e4a040c471dc13bcea44ecd2c6a3c040971542c6b798627e4c787056acb librav1e.dll
+sha256 ab0c9f61dc69b6bcdff1011e215f8d5fd6e5096aba9be3386ab87f217fbbeffe libsharpyuv-0.dll
+sha256 887c21dbe2a211ac4d1a790e4f608b7dee27fae12352856963004e7a715d2e6c libstdc++-6.dll
+sha256 c4d9e2ae03f80d43c0a16d1461503e1768b160cdba9f3fe9e95e339f69fc2b24 libSvtAv1Enc-4.dll
+sha256 47fe69165bf8e211aaa84224f51f145dc894e330fe7ca167f7c99419e0c8c894 libtiff-6.dll
+sha256 c6c21a10f8cfe13270832e64640b82709e1d87b956b5f15af435a6c25acd6bbf libwebp-7.dll
+sha256 10fd43e1820a03dea175e3c4a7c96ba0463d41971f4ec75dbd375d10b585446a libwebpdemux-2.dll
+sha256 2da71960a872bd1e59b60377f798f285ce630106509d6bd1d75e553f16218b7b libwinpthread-1.dll
+sha256 32dc2899b7cb6e5403f13d723c885db7025b50c41a2d930a033daff4acb955ae libyuv.dll
+sha256 b95c223a9548a9ecf51377c962e0bc8f0c51eb0c6f67a296dbc885996f0dd40d libzstd.dll
+sha256 47a3b27654832d9f7e5719c88078210a3dbfd6407b559c5a3c4eb8ab7d0ebdb6 SDL2.dll
+sha256 af7bdfa2a2333291776297e85acdecf7801bde20b4025229de304a3d1555a2ef SDL2_image.dll
+sha256 93e9243a44c29200eeacaf9658efe2558581770e4b11ca4b500e18e424a6e3b5 zlib1.dll
+
+upstream   https://github.com/finalburnneo/FBNeo
+pin        79188379cc8442c54712acbe3b7e73dce157985f
+patch      0002-cps2-wide-v1.patch  sha1 17cd7516a25e6198376bc69b88b3392d85122d0e  (the ONLY patch applied; the project's replay-harness patch is a test instrument and is not in this binary)
+recipe     git clone https://github.com/finalburnneo/FBNeo fbneo && cd fbneo && git checkout 79188379cc8442c54712acbe3b7e73dce157985f && git apply 0002-cps2-wide-v1.patch && make sdl2 SKIPDEPEND=1 -j24 -k; make sdl2 SKIPDEPEND=1 -j24   (twice on a fresh clone: the first parallel pass dies on burn.o until the driver list is generated)
+built      2026-09-13 on Windows via MINGW64 (x86_64), cc.exe (Rev3, Built by MSYS2 project) 16.2.0, by tools/build_release_emulators.sh fbneo
+tree       666b14d9e8dc
+jobs       24
+env        Microsoft Windows [version 10.0.19045.7663]; MSYS2 runtime 3.6.10-da84778c.x86_64; MSYSTEM=MINGW64
+env        pacman git 2.55.0-1
+env        pacman make 4.4.1-3
+env        pacman patch 2.7.6-3
+env        pacman rsync 3.5.0-1
+env        pacman zip 3.0-5
+env        pacman unzip 6.0-3
+env        pacman perl 5.42.3-1
+env        pacman coreutils 8.32-5
+env        pacman diffutils 3.12-1
+env        pacman mingw-w64-x86_64-gcc 16.2.0-3
+env        pacman mingw-w64-x86_64-binutils 2.47-3
+env        pacman mingw-w64-x86_64-python 3.14.7-1
+env        pacman mingw-w64-x86_64-pkgconf 1~3.0.7-1
+env        pacman mingw-w64-x86_64-SDL2 2.32.10-1
+env        pacman mingw-w64-x86_64-SDL2_image 2.8.12-1
+env        pacman mingw-w64-x86_64-sdl3 3.4.16-1
+requires   Windows 10 or later, x86_64. Nothing to install: the DLLs the recipe links from MSYS2 (SDL2 (sdl2-compat over SDL3 where the host uses it), SDL2_image and their image codecs) sit beside the .exe, where the loader looks first. Keep the folder together.
+run        run it from a directory that has a `roms/` subdirectory holding your built vsavjw.zip AND your pristine vsav.zip (FBNeo has no rom-path option: it reads `roms/` relative to the current directory, or the paths set in its config): `./fbneo.exe vsavjw`. Controls: FBNeo's own menu (Tab).
+first run  Windows SmartScreen warns about an unsigned download: More info > Run anyway. Keep every file in this folder TOGETHER — the .exe finds its DLLs beside itself. The sha256 rows above are the integrity check.
+not works  "Unknown system: vsavjw" means the binary is not this one (no driver patch). A stock emulator fed the set renamed to vsavj.zip STALLS on the legal screen forever (measured 2026-09-11) — renaming is never the fix.
+asset      merged-m19-fbneo-windows-x86_64.zip attached to the GitHub release on tag freeze/merged-m19 — https://github.com/DefinitelyFrenchName/VampireSaved/releases/tag/freeze/merged-m19 (verify the rows above after unzipping; the previous freeze's assets are deleted at each release)
+provenance a prebuilt is the recipe above run on one host and nothing else; the reviewable trust surface stays the patch (its sha1 above). Rebuild from the recipe to check: the binary is rebuildable, not byte-reproducible (link order, timestamps).

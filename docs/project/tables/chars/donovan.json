@@ -12,20 +12,20 @@
  },
  "inputs": {
   "bank_map.toml": "ece2b13bfbddaf6fea14e56baf65502945ba52dd",
-  "manifest": "62fa548cbd65a5acacfb2678703a70cee4627d49",
+  "manifest": "abeba808b3c781746730c06d3f0bdda081c66d9d",
   "overrides": "72b9812942192bf348508ddf7473cbb37b2d5275",
   "placements.json": "74b756174c2eac1a4e41919145114e2498d11082",
   "reconciliation.toml": "477efcb72d82fcbafe1e4a4f59252385bcb75bac",
   "reconciliation_donovan.toml": "242368518282f41a728d879e0714380f621aaf49",
   "regions.json": "a819047aa0b2491e3bc5e72149608639854a813d",
-  "verify_data.bin": "98578cccb8540ad1b8be5e288735be37a87c21e4"
+  "verify_data.bin": "74c5ef16c9f7e03a17d23fcc8c830fec4ba904b0"
  },
  "overrides": [],
  "schema": 1,
  "sources": {
   "ours": {
    "kind": "built",
-   "set": "build/don_m23"
+   "set": "build/don_m24"
   },
   "vh": null,
   "vs2": {
@@ -206370,7 +206370,7 @@
     "orc": "0x028150",
     "placed": "0x0cf370",
     "refs": 46,
-    "sha1_ours": "f004bb6f855304789e32863fcea025dd7cfc2087",
+    "sha1_ours": "183c96eed474320849f55f2bfbbd3f4157391801",
     "sha1_vs2": "25f8809c49687e0e954078fb6e4f6841591cc5fb",
     "src": "0x028122",
     "variant_sites": 0

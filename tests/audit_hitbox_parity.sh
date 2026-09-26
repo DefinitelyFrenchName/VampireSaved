@@ -31,13 +31,13 @@
 # +0x80..+0x90, selected by the node's box ids at +0x94 — so "the hitboxes in play" IS "the same
 # node resolves the same pointers and ids", and the table bytes are the charmap gates' question.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged27] [PARTS="donovan_1 pyron_4 huitzil_1"] [FREEZE=1] [CONTROL=<name>] tests/audit_hitbox_parity.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged28] [PARTS="donovan_1 pyron_4 huitzil_1"] [FREEZE=1] [CONTROL=<name>] tests/audit_hitbox_parity.sh
 #   emulator tier, MAME: six legs in parallel, ~2 min.
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"; if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged27}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
+BUILD="${BUILD:-build/m3b_merged28}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 PARTS="${PARTS:-donovan_1 pyron_4 huitzil_1}"
 EXPECT="$REPO/tests/expected/hitbox_parity.tsv"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

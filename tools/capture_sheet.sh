@@ -38,7 +38,7 @@
 # Usage:
 #   ROMDIR=... tools/capture_sheet.sh <attacker_hex> <victim_hex> [out.png]
 # Env (code defaults, [VSP-165]):
-#   BUILD=build/m3b_merged27      the "ours" leg
+#   BUILD=build/m3b_merged28      the "ours" leg
 #   BEFORE=                       optional third column (a pre-fix build), drawn
 #                                 at OURS' frame numbers — a leg whose geometry
 #                                 differs has no matching keyframe by definition
@@ -57,7 +57,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 # strings that still contain $ROMDIR; a relative value resolves against the WORK
 # dir and silently finds no reference members.
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
-BUILD="${BUILD:-build/m3b_merged27}"
+BUILD="${BUILD:-build/m3b_merged28}"
 BEFORE="${BEFORE:-}"
 RPL="${RPL:-$REPO/tests/replays/judge/02_throw.rpl}"
 WINDOW="${WINDOW:-3005-3074}"

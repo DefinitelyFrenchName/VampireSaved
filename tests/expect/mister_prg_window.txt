@@ -35,5 +35,14 @@
 # 6 -> 7 -> 8; a sparse 7 differing from a dense 6 and 8 would produce this.
 # first_addr 4c13d0, first_frame 1119, min 413c70, blocks 8, cyc_hi_rd/wr and
 # rd_hi are all UNCHANGED, and every structural assertion PASSED in that run.
-pos frame 2900 wide 1 cyc 97641516 cyc_hi_rd 1211302 cyc_hi_wr 10816 rd_hi 1211302 rd_lo 75763296 blocks 7 first_frame 1119 first_addr 4c1400 min 413c70 max 4d47ce
+# RE-FROZEN 14z-183 on merged-m20 (build/m3b_merged28) from the M20 freeze's own MiSTer romset
+# lane (build/emu_freeze_m20_mister/test_mister_prg_window.log — every structural assertion PASSED
+# there; only the pos pair moved, the neg line UNCHANGED). WHAT MOVED M19 -> M20: `cyc` 97641516 ->
+# 97643082 and `rd_lo` 75763296 -> 75764759; `first_addr`, `min`, `max`, `blocks`, `cyc_hi_rd/wr` and
+# `rd_hi` all UNCHANGED. RECORDED AS MEASURED, NOT EXPLAINED ([VSP-116]): the M20 delta is the #157
+# store words (18 on merged; whether this replay's frames execute any of them is not measured) and
+# the mark's glyphs (M19 -> M20); the candidate is the gfx-content timing the M17 -> M18 note names,
+# untested.
+#
+pos frame 2900 wide 1 cyc 97643082 cyc_hi_rd 1211302 cyc_hi_wr 10816 rd_hi 1211302 rd_lo 75764759 blocks 7 first_frame 1119 first_addr 4c1400 min 413c70 max 4d47ce
 neg frame 2900 wide 0 cyc 97337938 cyc_hi_rd 4 cyc_hi_wr 10113 rd_hi 0 rd_lo 75503450 blocks 0 first_frame -1 first_addr 000000 min 7ffffe max 000000

@@ -58,7 +58,7 @@ cd "$REPO"
 # it reported PASS about three builds nobody ships. Section 5 adds the CURRENT
 # trio. Both are true at once; neither replaces the other.
 HIST_BUILDS="build/m5_wide build/hui30 build/pyron21"
-CUR_BUILDS="build/don_m23 build/hui57 build/pyron42"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+CUR_BUILDS="build/don_m24 build/hui58 build/pyron43"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 BUILDS="${*:-$HIST_BUILDS}"
 
 # Presence is two-tier. An UNBUILT tree (no build dir has placements.json at
@@ -192,7 +192,7 @@ if [ $# -eq 0 ]; then
 # — the shared regions' tenant copies differ in placement-dependent bytes,
 # so the 1-differs counts and the totals move (2089 / 7604). The control's
 # superseded trio still measures 2000 and is still rejected.
-echo "== 5: the CURRENT trio — don_m23 / hui57 / pyron42 (label re-pointed 14z-117) =="  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+echo "== 5: the CURRENT trio — don_m24 / hui58 / pyron43 (label re-pointed 14z-117) =="  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
     for b in $CUR_BUILDS; do
         [ -f "$b/patch/placements.json" ] || {
             echo "FAIL: current build $b has no patch/placements.json"; exit 1; }

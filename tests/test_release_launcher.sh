@@ -29,12 +29,12 @@
 #
 # MUST-FIRE: perturbed-copy: launcher-accepts-unpatched — a copy whose emulator binary does NOT carry the profile must be REFUSED by the launcher; without that check a player runs a stock emulator, gets "Unknown system: vsavjw" and has no idea why (mode: the gate stages that copy as the success path)
 #
-# Usage: tests/test_release_launcher.sh [release/merged-m19]   # ci_portable (no ROMDIR, no emulator, no ROM bytes)
+# Usage: tests/test_release_launcher.sh [release/merged-m20]   # ci_portable (no ROMDIR, no emulator, no ROM bytes)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
-REL="${1:-release/merged-m19}"
+REL="${1:-release/merged-m20}"
 [ -d "$REL" ] || { echo "SKIP: no release tree at $REL"; exit 0; }
 
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT

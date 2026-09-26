@@ -724,6 +724,12 @@ old_hex = "3b42b496"
 new_hex = "3b42b444"
 note = "throw dmg: white damage -> vsavj layout (-0x4BBC)"
 
+# ── 14z-183 (GitHub #157, M20): the SIX grab-pointer stores below are LIVE again at stage 6 — the
+# hit-registration pair reconciled to vsavj's -0x4BC6/-0x4BC4, so the stager pays the thrower the record's
+# meter and the victim 8 as native does, and the damage scaler reads the attacker (tests/audit_move_parity.sh,
+# tests/audit_throw_registration.sh; DECISIONS_HISTORY.md "Ruled 2026-09-26 (14z-183)"). The two throw-state
+# clr.b rows (-0x4B3D) stay at stage 99: which half broke Donovan's throw in 14x was never shown, and the
+# probe with the pairs alone played clean (the maintainer's recordings p157-probe-04/07/08).
 # ── Throw GRAB-POINTER + state-byte work vars — ROLLED BACK (session
 # 14x, maintainer decision round 20): these 8 rows BROKE Donovan's
 # throw in play (the vsavj engine consumes its grab-pointer vars with
@@ -750,7 +756,7 @@ new_hex = "422db471"
 note = "throw state clr.b: vs2 -0x4B3D -> vsavj -0x4B8F"
 
 [[port_patch]]
-stage = 99
+stage = 6
 region = "x028122"
 src_addr = 0x0289C6
 old_hex = "3b4eb48c"
@@ -758,7 +764,7 @@ new_hex = "3b4eb43a"
 note = "grab ptr store a6: vs2 -0x4B74 -> vsavj -0x4BC6"
 
 [[port_patch]]
-stage = 99
+stage = 6
 region = "x028122"
 src_addr = 0x0289CA
 old_hex = "3b49b48e"
@@ -774,7 +780,7 @@ new_hex = "422db471"
 note = "throw state clr.b (site 2)"
 
 [[port_patch]]
-stage = 99
+stage = 6
 region = "x028122"
 src_addr = 0x028A94
 old_hex = "3b4eb48c"
@@ -782,7 +788,7 @@ new_hex = "3b4eb43a"
 note = "grab ptr store a6 (site 2)"
 
 [[port_patch]]
-stage = 99
+stage = 6
 region = "x028122"
 src_addr = 0x028A98
 old_hex = "3b49b48e"
@@ -790,7 +796,7 @@ new_hex = "3b49b43c"
 note = "grab ptr store a1 (site 2)"
 
 [[port_patch]]
-stage = 99
+stage = 6
 region = "x028122"
 src_addr = 0x028B5A
 old_hex = "3b4eb48c"
@@ -798,7 +804,7 @@ new_hex = "3b4eb43a"
 note = "grab ptr store a6 (site 3)"
 
 [[port_patch]]
-stage = 99
+stage = 6
 region = "x028122"
 src_addr = 0x028B5E
 old_hex = "3b49b48e"
@@ -2444,7 +2450,7 @@ march_retarget_mid = true
 # same-source-or-fail names any future collision). Screen position =
 # the empty bottom-right corner (measured on merged-m5 snapshots, 14z-105).
 # THE TEXT NAMES THE FREEZE GENERATION — change it at every freeze.
-version_text = "M19"
+version_text = "M20"
 version_font = "build/manifest/version_font.json"
 version_x = 324
 version_y = 202

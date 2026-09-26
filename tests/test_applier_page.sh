@@ -62,14 +62,14 @@
 # MUST-FIRE: perturbed-copy: page-with-fetch — a copy of the page shell carrying a fetch() call must make section 1 fail; if it passed, the self-containment property would be unchecked and the page's one hard constraint would rest on nothing (mode: the gate generates from that shell)
 # MUST-FIRE: perturbed-copy: page-without-csp — a copy of the page shell with its Content-Security-Policy meta removed must make section 1 fail; the CSP is what makes "no network of any kind" a property the BROWSER enforces rather than one a denylist guesses at, and a denylist cannot prove absence, so a page that lost it must not ship (mode: the gate generates from that shell)
 #
-# Usage: ROMDIR=... tests/test_applier_page.sh [release/merged-m19/fbneo]   # ci_static
+# Usage: ROMDIR=... tests/test_applier_page.sh [release/merged-m20/fbneo]   # ci_static
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
-REL="${1:-release/merged-m19/fbneo}"
+REL="${1:-release/merged-m20/fbneo}"
 [ -f "$REL/manifest.json" ] || { echo "SKIP: no release manifest at $REL"; exit 0; }
 command -v node >/dev/null 2>&1 || { echo "SKIP: no node on this host (the page is ES-module JS; a browser is its real target)"; exit 0; }
 

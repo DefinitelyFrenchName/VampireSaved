@@ -218,7 +218,7 @@ PY
 # never be exempt again; they are all still here.
 HID="0x0be29a 0x0be29e 0x0be2a2 0x0be2a6 0x0be2aa 0x0be2ae 0x0be2b2 0x0be2b6"
 CUR=""
-for b in build/m3b_merged27 build/don_m23 build/hui57 build/pyron42; do
+for b in build/m3b_merged28 build/don_m24 build/hui58 build/pyron43; do
     [ -f "$b/patch/patch.json" ] && { CUR="$b"; break; }
 done
 if [ -z "$CUR" ]; then

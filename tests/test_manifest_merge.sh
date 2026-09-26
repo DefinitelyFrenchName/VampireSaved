@@ -119,7 +119,11 @@ FROZEN = [
     # rows per manifest — the meter-adder test (region x028122, vs2 0x028D6C,
     # IDENTICAL in all three, so it dedupes: shared +1) and the EX-site branch
     # (each tenant's own vs2 address, so it concatenates: +3) — merged +4
-    ("port_patch",       (23, 63, 22), 97, 10),
+    # RE-FROZEN 14z-183 (was (23,63,22),97,10): #157 (M20) appends six x028122
+    # hit-pair store rows to huitzil and pyron (+6 each) and moves Donovan's six
+    # from stage 99 to 6 (his count unchanged); merged +6, shared +6 as this gate
+    # measured them — the merge key, not a theory, decides what dedupes
+    ("port_patch",       (23, 69, 28), 103, 16),
     ("tenant",           (1, 1, 1),  3,  0),   # never shared, by definition
     ("select_records",   (6, 6, 6),  18, 0),   # six pieces PER TENANT
     ("win_pal_variant",  (1, 1, 1),  3,  0),

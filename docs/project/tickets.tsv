@@ -71,6 +71,7 @@
 # WHAT THE GATE DOES NOT CLAIM: that an answer is ENOUGH. That is judged at the
 # close that closes the ticket.
 issue	kind	status	title	repro	decided	learned	wrong	sessions
+179	bug	open	Phobos's Sitting Attack landing after a throw (parity rig huitzil_3 events 8/9): ours is displaced 31 px and does not turn, native stays and turns — pre-existing, identical on merged-m19	tests/audit_move_parity.sh ; tests/replays/naming/huitzil_3.json	DECISIONS_HISTORY.md § M20 freezes with Phobos's landing difference ticketed (#179)	none	none	14z-183
 178	evolution	open	Hop Kick in Donovan's Dark Force connects on neither leg of any rig: #136's 'native lands, ours whiffs' was never compared	tests/audit_df_moves.sh	DECISIONS_HISTORY.md § Ruled 2026-09-25 (14z-182) — #136's full-scope re-derivation	none	none	14z-182
 177	evolution	open	Tenant movement parity vs native vs2 (walk, dash, jumps and arcs, Phobos's float and air dash): no gate compares movement against native	tests/test_hui_walk.sh ; tests/test_hui_air.sh	DECISIONS_HISTORY.md § Ruled 2026-09-25 (14z-182) — #136's full-scope re-derivation	docs/project/coverage_matrix.md § tenant moves vs native vsav2	none	14z-182
 176	evolution	open	Compare the RNG's per-frame advance between our build and native: the parity gates pin the RNG word every frame (ruled their equalised input), so an advance defect would read as agreement	tests/audit_df_moves.sh	DECISIONS_HISTORY.md § Ruled 2026-09-25 (14z-182) — the parity gates' per-frame level and RNG pins	none	none	14z-182

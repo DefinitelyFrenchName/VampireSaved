@@ -38,11 +38,11 @@
 # moves a placed region moves these addresses: re-freeze at every freeze (FREEZE=1),
 # reviewing the diff.
 #
-# Usage: [BUILD=build/m3b_merged27] [FREEZE=1] tests/test_df_field_readers.sh
+# Usage: [BUILD=build/m3b_merged28] [FREEZE=1] tests/test_df_field_readers.sh
 #   static tier (a build dir, no emulator); measured 14z-168 on this MacBook: ~6 s
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
-BUILD="${BUILD:-build/m3b_merged27}"
+BUILD="${BUILD:-build/m3b_merged28}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/df_field_readers.tsv"
 CONTROL="${CONTROL:-}"

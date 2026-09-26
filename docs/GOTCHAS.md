@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-426 entries (46 game / 120 platform / 260 project), counted from the buckets at generation.
+429 entries (46 game / 120 platform / 263 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 46 entries
 
@@ -194,7 +194,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A WORKER CAN FINISH ON ANOTHER MODEL THAN ITS DEFINITION NAMES — A SAFETY-CLASSIFIER STOP TRIGGERS A SILENT FALLBACK (measured 2026-09-24, 14z-178, Claude Code 2.1.281)
 - A MAIN SESSION RUN AS A DEFINITION (`claude --agent <name>`) LOSES CLAUDE CODE'S WHOLE DEFAULT SYSTEM PROMPT — THE DEFINITION'S BODY REPLACES IT (measured 2026-09-24, 14z-178, Claude Code 2.1.281)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 260 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 263 entries
 
 - A VULN ID OF 0 IS NO BOX — a resolver that reads it builds a PHANTOM hurtbox the engine never tests (paid: 14z-182, GitHub #175)
 - A CHAIN ID IN A NAMING EXPECTATION IS IDENTIFIED FROM THE SLOT TABLE, NEVER DESCRIBED IN PROSE (paid: 14z-171, caught 14z-172, GitHub #168)
@@ -456,3 +456,6 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A RIG IS TUNED AT ONE SPEED LEVEL — pin the level it was tuned at, or its contacts whiff and every length moves (paid: 14z-181, GitHub #136)
 - A RIG'S FIRST EVENT CAN BE EATEN BY THE ROUND INTRO — a walk-in that starts before the fighters are released never happens, and every table built on that event measures a different distance (paid: 14z-183, #134)
 - A FREEZE BRANCH THAT COPIES AND EXITS BEFORE ITS ASSERTIONS CAN FREEZE A RED RUN (paid: 14z-163 by the rule-checker's first real read, fixed 14z-183, #154)
+- A KEPT PARITY WORK DIR HOLDS AN UNPINNED NATIVE TRACE FOR ITS CONTROL PART — the `unpinned-level` control re-runs that part's native leg over the file (paid: 14z-183, #157)
+- A RIG CHANGE RE-FROZEN IN THE GATES IT WAS MADE FOR LEAVES EVERY OTHER GATE THAT COPIES THE RIG STALE — and the staleness audit names nothing until a run of record exists (paid: 14z-183)
+- A GATE'S PRINTED DIFF IS A WINDOW — compare two builds' measurements as WHOLE FILES, never through the gate logs (paid: 14z-183, rule-checker run 2026-09-25-238)

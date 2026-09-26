@@ -2344,7 +2344,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **WHAT:** which row every hit's two defense-table reads (the curve at PRG:0x018C20 and the rally threshold at 0x018C7C) actually INDEX, by the victim's identity, over the corpus on our merged build and on pristine vsavj — the live half of the ruled defense-row fix's premise that a tenant victim's hit reads the tenant's own row.
 
-**HOW:** 218 non-debug read-tap runs on MAME (the 12 victim parts, the 30 naming parts, every suite replay on ours, and every suite replay on pristine vsavj as the legacy control), each read attributed by PC with the +0x382 value it took, identity from each block's tapped hitbox base (never +0x382 itself, the thing in question); liveness per window by the END probe; controls plant a foreign flavour poke and delete a tap window.
+**HOW:** 221 non-debug read-tap runs on MAME (218 at 14z-169; the 12 victim parts, every naming part — 32 since 14z-181, every suite replay on ours, and every suite replay on pristine vsavj as the legacy control), each read attributed by PC with the +0x382 value it took, identity from each block's tapped hitbox base (never +0x382 itself, the thing in question); liveness per window by the END probe; controls plant a foreign flavour poke and delete a tap window.
 
 **EXPECTS:** every tenant hit reads the tenant's own row, the legacy control reads vanilla's rows, the frozen table equal; a dead window or a foreign row fails. NOT covered: a table base computed at run time or reached through a data pointer.
 
@@ -2544,7 +2544,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **WHAT:** every write and read of the victim's reaction class (+0x54) over the corpus — pristine vsavj's whole legacy suite, our merged build's and native vs2's #136 parts — attributed by PC with the values, frozen: the live half of the reaction-class analysis, seeing what a static scan cannot (a class written from a register, code outside the scanned range), and naming the consumers of +0x54.
 
-**HOW:** 148 non-debug read-tap runs on MAME over both fighter blocks' +0x54/+0x55 with liveness per window by the END probe; positive controls on the reading (vsavj's ground stager writing 6 on ours, vs2's writing 0x52 on native); controls plant a 0x38 write via a Lua poke and delete a window's accesses.
+**HOW:** 153 non-debug read-tap runs on MAME (148 at 14z-169; 153 measured 14z-183 as the corpus grew) over both fighter blocks' +0x54/+0x55 with liveness per window by the END probe; positive controls on the reading (vsavj's ground stager writing 6 on ours, vs2's writing 0x52 on native); controls plant a 0x38 write via a Lua poke and delete a window's accesses.
 
 **EXPECTS:** no 0x38 write anywhere, the positive controls present, the frozen W/R rows equal per leg; the planted 0x38 is reported and the silent window reads DEAD. Not sampled: every path the corpus does not run.
 
@@ -2566,11 +2566,11 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 ### `audit_throw_registration.sh` — audit, emulator
 
-**WHAT:** the hit-registration pair at a tenant throw, ours vs native: native's throw code writes the engine's (attacker, victim) pair before the generic hit stager awards meter, while our placed copies write vs2's displacements (dead on vsavj), so the stager reads the collision pass's leftover pair reversed — the attacker gets the flat 8 and the victim the record's meter (#136's meter family, #157); the legacy control shows both engines register the pair, so it is a port defect.
+**WHAT:** the hit-registration pair at a tenant throw, ours vs native: native's throw code writes the engine's (attacker, victim) pair before the generic hit stager awards meter. Through M19 our placed copies wrote vs2's displacements (dead on vsavj), so the stager read the collision pass's leftover pair reversed — the attacker got the flat 8 and the victim the record's meter (#136's meter family, #157); the legacy control shows both engines register the pair, so it was a port defect. Since M20 (14z-183) the stores are re-pointed at vsavj's live pair.
 
 **HOW:** read taps on MAME over the live pair, the dead pair and both meters for pyron_3, huitzil_3 and donovan_5 (7 tap runs each, the parity gate's rig and pins) and the legacy Demitri-throws-Victor part on pristine vsavj and vs2 with real picks; contact rows, writer rows and the legacy ids frozen; controls swap the P1/P2 steps, plant a reader of the dead pair, and plant a second write on a contact frame.
 
-**EXPECTS:** the frozen defect rows (ours p1=+8 p2=record; native the reverse), no in-play reader of the dead pair, the legacy legs paying the attacker the record on both engines; all three controls fail. A fix re-freezes this file deliberately.
+**EXPECTS:** the frozen rows — since the 14z-183 re-freeze ours pays like native (p1=record p2=+8), the defect rows (ours p1=+8 p2=record) live in the file's git history; no in-play reader of the dead pair, the legacy legs paying the attacker the record on both engines; all three controls fail.
 
 ### `audit_tick_cadence.sh` — audit, emulator
 
@@ -2672,7 +2672,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **WHAT:** who CAN read the select-confirm latch: the static census of every instruction naming a fighter block's +0x3BC/+0x3BD/+0x3C2/+0x3E0/+0x3E3 on vsav2, vsavj and the ported image, by addressing form, frozen — the whole population the per-leg tap (audit_latch_reads) can ever attribute a read to, with the census's data-region `movep` noise frozen and named.
 
-**HOW:** tools/audit_latch_readers.py over the decrypted opcode views and build/m3b_merged27/verify_op.bin, anchored on the extension word so a data table is not an instruction, its --selftest on both reference views first; controls: a shadow copy of the tool blind to the (d16,An) form, and the frozen inventory minus one vs2 reader row.
+**HOW:** tools/audit_latch_readers.py over the decrypted opcode views and build/m3b_merged28/verify_op.bin, anchored on the extension word so a data table is not an instruction, its --selftest on both reference views first; controls: a shadow copy of the tool blind to the (d16,An) form, and the frozen inventory minus one vs2 reader row.
 
 **EXPECTS:** the frozen inventory equal (vs2's confirm writers and clears, the tenants' in-play flavour readers and their relocated copies, the Shadow-flag readers); the blind tool fails its selftest, the dropped row fails the compare.
 

@@ -1,0 +1,20 @@
+THE PACKET
+
+Decision kind: build
+Subject: #157: the six hit-pair stores per tenant enter the tracked manifests at stage 6 (mark M20), to land with the M20 freeze (after run 232)
+Claim (the working agent's sentence): Moving Donovan's six parked stage-99 hit-pair store rows (x028122 src 0x0289C6/CA, 0x028A94/98, 0x028B5A/5E: vs2 -0x4B74/-0x4B72 -> vsavj -0x4BC6/-0x4BC4) to stage 6 and adding the same six rows to Phobos's and Pyron's manifests (manifest.diff; the two throw-state clr.b rows stay at 99), with the mark M19 -> M20, is correct because the probe built from these exact rows (build/probe157/merged, mark P57) differs from merged-m19 in exactly 18 program words — the six displacement words of each tenant copy — and four members, two program members and the mark's two glyph members (probe_delta.txt, members.txt); on it the tenant throw sites write the live pair (throw_registration_writers.txt); all 36 frozen parity events whose first difference was meter moved, 34 to identical and 2 (huitzil_3 8/9) to an x/y difference that the gate's own traces show identical frame for frame on merged-m19 (parity_moved.txt, xdiff_traces.txt); no p2hp verdict moved; with P2's +0x3B3 held at 8 on both legs, merged-m19 differs from native vs2 first on P2's HP in 49 events, and on the probe those 49 read 46 identical, 2 the same pre-existing x/y rows and 1 (pyron_4 13, '5LP in DF') whose p2hp difference is frozen on merged-m19 too (parity_moved.txt); 86 of 88 suite replays give byte-identical canonical whole-RAM checksum logs on merged-m19 and the probe (legacy_ab_summary.txt, ab_method.txt) and the two that differ, Donovan's arcade-mash replays 110 and 111, first differ where the damage scaler reads the attacker instead of the victim, 4 vs 6 damage (replay110_damage.txt, replay111_damage.txt); the maintainer's three hand-played recordings play back on the probe with no exception, and at every throw but two the traces show the thrower paid the move's step and the victim 8 on the probe, the reverse on merged-m19 (recordings.txt); the two exceptions pay the thrower 0 a stock spend after — not Dark Force Change, +0x111 never set — and the Pyron one pays 0 on merged-m19 too (zero_meter_throws.txt); the maintainer said everything felt normal while stating they measured nothing (maintainer_read.txt). NOT tested: the build from the TRACKED manifests (mark M20) is not built yet — its program must equal the probe's, to be measured in the freeze; the M20 suites, M2 battery and freeze tier are not run yet; whether the parked clr.b rows matter; why the two stock-spend throws pay the thrower 0 (the same on merged-m19 where comparable, so not introduced here, but unexplained); the damage change against the CPU rests on replays 110/111's one hit each and a poke of +0x3B3 to 8 on the 2P rig, not on a native 1P-vs-CPU leg; the throw-registration gate's contact rule still counts the dead pair (0 contacts on the probe) and is to be adapted with the re-freeze; no human judged the look or feel beyond the maintainer's 'felt normal'.
+Artifacts (read every one, in full):
+  - build/agent183/p157_evidence/manifest.diff
+  - build/agent183/p157_evidence/probe_delta.txt
+  - build/agent183/p157_evidence/members.txt
+  - build/agent183/p157_evidence/parity_moved.txt
+  - build/agent183/p157_evidence/xdiff_traces.txt
+  - build/agent183/p157_evidence/legacy_ab_summary.txt
+  - build/agent183/p157_evidence/ab_method.txt
+  - build/agent183/p157_evidence/replay110_damage.txt
+  - build/agent183/p157_evidence/replay111_damage.txt
+  - build/agent183/p157_evidence/recordings.txt
+  - build/agent183/p157_evidence/zero_meter_throws.txt
+  - build/agent183/p157_evidence/throw_registration_writers.txt
+  - build/agent183/p157_evidence/maintainer_read.txt
+  - DECISIONS_HISTORY.md.lines-30-34 (lines 30-34 of DECISIONS_HISTORY.md)

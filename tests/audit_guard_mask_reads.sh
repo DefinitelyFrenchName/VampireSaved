@@ -72,12 +72,12 @@
 #
 # Emulator tier (MAME -debug, two ~4 min legs in parallel). Usage:
 #   ROMDIR=... [MAME_BIN=$HOME/.cache/vampire-saved/mame/cps2] \
-#     [MERGED=build/m3b_merged27] [KEEP=dir] tests/audit_guard_mask_reads.sh
+#     [MERGED=build/m3b_merged28] [KEEP=dir] tests/audit_guard_mask_reads.sh
 #   (KEEP copies the traces and dumps out before the workdir is removed.)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 : "${ROMDIR:?set ROMDIR}"
-MERGED="${MERGED:-build/m3b_merged27}"
+MERGED="${MERGED:-build/m3b_merged28}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
 [ -x "$MAME_BIN" ] || { echo "FAIL: MAME_BIN=$MAME_BIN is not executable (tools/setup_mame.sh)"; exit 1; }
 [ -f "$MERGED/rompath/vsavjw.zip" ] || { echo "FAIL: no $MERGED/rompath/vsavjw.zip — set MERGED to the current merged build"; exit 1; }

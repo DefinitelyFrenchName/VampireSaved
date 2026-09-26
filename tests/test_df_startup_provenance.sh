@@ -44,7 +44,7 @@
 #      at arm the same three values (the port carried them unchanged);
 #   4. must-fire control: a perturbed expected value is caught.
 #
-# Usage: ROMDIR=... [BUILD=build/m3b_merged27] tests/test_df_startup_provenance.sh
+# Usage: ROMDIR=... [BUILD=build/m3b_merged28] tests/test_df_startup_provenance.sh
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
@@ -56,7 +56,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 # VARIABLE (forks set their own); only made absolute, and only if it exists,
 # so a gate that means to SKIP on a missing ROMDIR still does.
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
-BUILD="${BUILD:-build/m3b_merged27}"
+BUILD="${BUILD:-build/m3b_merged28}"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 DFSP_MODE=0; vs_ctl_is perturbed-expectation && DFSP_MODE=1; export DFSP_MODE
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT

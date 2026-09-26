@@ -64,7 +64,7 @@
 #      round trip is what proves that decoder against xdelta3's encoder.
 #
 # Usage: ROMDIR=... tests/test_release_roundtrip.sh [build_rompath] [name]
-#   defaults build/m3b_merged27/rompath, merged-m19. Needs xdelta3.
+#   defaults build/m3b_merged28/rompath, merged-m20. Needs xdelta3.
 #   re-pointed 14z-130 (M13 boot-title freeze) <- 14z-119 <- 14z-117b
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
@@ -84,8 +84,8 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-RP="${1:-build/m3b_merged27/rompath}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-NAME="${2:-merged-m19}"  # re-pointed 14z-170 (M19 freeze) <- 14z-144 (M18 donovan/jedah freeze) <- 14z-143  # re-pointed 14z-134 (the M16 release: the m16 layout had NEVER been gated — code said m14, header m15) <- 14z-119 <- 14z-117b
+RP="${1:-build/m3b_merged28/rompath}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+NAME="${2:-merged-m20}"  # re-pointed 14z-183 (M20 freeze) <- 14z-170 (M19 freeze) <- 14z-144 (M18 donovan/jedah freeze) <- 14z-143  # re-pointed 14z-134 (the M16 release: the m16 layout had NEVER been gated — code said m14, header m15) <- 14z-119 <- 14z-117b
 [ -d "$RP" ] || { echo "SKIP: $RP missing"; exit 77; }
 command -v xdelta3 >/dev/null || { echo "SKIP: xdelta3 not installed (the PACKAGER encodes with it; the applier needs only python3)"; exit 77; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT

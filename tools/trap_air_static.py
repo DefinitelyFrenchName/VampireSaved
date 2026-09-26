@@ -7,7 +7,7 @@ readers (tools/hitbox_records.py, tools/anim_nodes.py, tools/trap_air_boxes.py).
 Written 14z-183 for NEXT_SESSION item 0b (procedure run 2026-09-25-224, QP1): 14z-182 quoted these figures in
 docs/game/engine_internals.md "Hitboxes and attack records" (the bullet on the projectile's per-box loop) from its own runs; a
 measurer re-derived them with this script on build/out/vsav2_data.bin, build/out/vsavj_data.bin and
-build/m3b_merged27/verify_data.bin (each first shown to be the decrypted view of the zip it is named for).
+build/m3b_merged28/verify_data.bin (each first shown to be the decrypted view of the zip it is named for).
 The live verdict stays tests/audit_trap_air_hit.sh; this is the static half.
 
 dome     — Huitzil/Phobos (id 0x10) projectile attack records 5 and 6: box (x, y, hw, hh) and class +0x17

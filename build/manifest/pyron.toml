@@ -859,7 +859,7 @@ march_retarget_mid = true
 # same-source-or-fail names any future collision). Screen position =
 # the empty bottom-right corner (measured on merged-m5 snapshots, 14z-105).
 # THE TEXT NAMES THE FREEZE GENERATION — change it at every freeze.
-version_text = "M19"
+version_text = "M20"
 version_font = "build/manifest/version_font.json"
 version_x = 324
 version_y = 202
@@ -1832,3 +1832,55 @@ name = "boot_title_saved_3"
 addr = 0x01C826
 op = "poke16"
 val = 0x2020             # "  "  (was " R")
+
+# ── 14z-183 (GitHub #157, M20): the hit-registration pair stores of this tenant's x028122 copy reconciled to
+# vsavj's layout (-0x4B74/-0x4B72 -> -0x4BC6/-0x4BC4) — Donovan's six rows verbatim (donovan.toml); the two
+# throw-state clr.b rows (-0x4B3D) are NOT carried (they stay parked there). DECISIONS_HISTORY.md "Ruled 2026-09-26 (14z-183)".
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x0289c6
+old_hex = "3b4eb48c"
+new_hex = "3b4eb43a"
+note = "#157: grab ptr store a6: vs2 -0x4B74 -> vsavj -0x4BC6"
+
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x0289ca
+old_hex = "3b49b48e"
+new_hex = "3b49b43c"
+note = "#157: grab ptr store a1: vs2 -0x4B72 -> vsavj -0x4BC4"
+
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x028a94
+old_hex = "3b4eb48c"
+new_hex = "3b4eb43a"
+note = "#157: grab ptr store a6 (site 2)"
+
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x028a98
+old_hex = "3b49b48e"
+new_hex = "3b49b43c"
+note = "#157: grab ptr store a1 (site 2)"
+
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x028b5a
+old_hex = "3b4eb48c"
+new_hex = "3b4eb43a"
+note = "#157: grab ptr store a6 (site 3)"
+
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x028b5e
+old_hex = "3b49b48e"
+new_hex = "3b49b43c"
+note = "#157: grab ptr store a1 (site 3)"
+

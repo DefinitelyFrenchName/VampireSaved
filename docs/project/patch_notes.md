@@ -1,5 +1,95 @@
 # patch_notes — per-change detail: every byte, and why
 
+## 14z-183 — THE M20 FREEZE (donovan-m24 / huitzil-m31 / pyron-m25 / merged-m20, mark M20): #157, the hit-registration pair reconciled
+
+**WHAT THE FREEZE CARRIES.** One fix, ruled *"Freeze M20 now"* on 2026-09-26
+(`DECISIONS_HISTORY.md` "Ruled 2026-09-26 (14z-183) — #157 lands WITH an M20
+freeze"), after a probe build the maintainer played. The mark `M19` -> `M20`.
+
+**THE DEFECT.** vsavj's generic hit stager (`0x18980`) pays the record's meter
+to the fighter registered at `A5-0x4BC6` (`RAM:$FF343A`) and a flat 8 to the one
+at `A5-0x4BC4`; native vs2's throw code and object-hit applier write that pair
+(attacker, victim) before the stager runs. Each tenant's placed copy of vs2's
+throw code (region `x028122`: Donovan `PRG:0x0CF370`, Phobos `0x41ECB0`, Pyron
+`0x477F50` on the merged image) kept vs2's displacements `-0x4B74/-0x4B72`
+(`RAM:$FF348C`), dead on vsavj — Donovan's six as the stage-99 rows the 14x
+rollback parked, Phobos's and Pyron's never reconciled. So the stager read the
+collision pass's leftover pair: a tenant throw paid the thrower 8 and the
+victim the record's meter (GitHub #136's meter family, 14z-166), and vsavj's
+damage scaler, which indexes the ATTACKER's `+0x3B3`, scaled throw and applier
+damage by the VICTIM's — equal in 2P versus, wrong against the CPU, whose
+`+0x3B3` is rewritten every frame (14z-183 row (6b)).
+
+**THE FIX.** Six `[[port_patch]]` rows per tenant (stage 6; Donovan's the
+parked rows moved from stage 99, Phobos's and Pyron's added) re-point the three
+store pairs of the copy — vs2 `0x0289C6/CA` (the throw site), `0x028A94/98` (the
+object-hit applier) and `0x028B5A/5E` (a third pair, never observed writing) —
+from `-0x4B74/-0x4B72` to `-0x4BC6/-0x4BC4`. The two state-byte clears
+(`clr.b -0x4B3D`) stay parked at stage 99.
+
+**THE DELTA** (a `measurer`, `build/rc183/deltas_measurer.txt`): six program
+words per solo track (`b48c` -> `b43a`, `b48e` -> `b43c`), eighteen on merged,
+equal to the probe's (`build/probe157/merged` -> `m3b_merged28`: 0 program
+words). Members: solo tracks `vm3j.04d` + the mark's `vsw.33m`/`vsw.37m`; merged
+adds `vsw.41` (Phobos's and Pyron's copies sit in the extension). The stock twin
+MOVED, `vm3j.04d` only (Donovan's rows are not `only_variant_slot`); the stage-4
+image did not (`2fa7c2f1`, `donovan-m23-stage4` carries).
+
+**WHAT WAS MEASURED BEFORE THE FREEZE** (on the probe, 14z-183 rows (5)-(6b),
+(13)): the parity table's 36 meter-first DIFF rows moved, 34 to IDENT and 2 to
+a PRE-EXISTING `x` difference (`huitzil_3` events 8/9, identical on merged-m19);
+with P2's `+0x3B3` held at 8 on both legs, merged-m19 diverged from native on
+P2's HP in 49 events (every tenant throw, Final Guardian Beta, Planet Burning)
+and the probe matched native on all 49; 86 of 88 suite replays byte-identical
+whole-RAM, the two others Donovan's arcade mash (the damage the fix corrects).
+The maintainer's three recordings (`p157-probe-04/07/08`) play back to `END`
+under `tools/run_inp_guarded.sh`, every tenant throw paying the thrower the
+move's step. **Not explained:** two throws pay the thrower 0 on both builds
+(after a stock spend, through the routine holding the third pair); the third
+pair was never observed writing.
+
+**FINGERPRINTS.** program / whole-set: donovan `07ffc1af` / `c009a717`;
+huitzil `fe055def` / `10e629c4`; pyron `5f33c110` / `3d016d45`; merged
+`2dca438d` / `c707b25e`; stock twin `67fdc4de`; stage 4 `2fa7c2f1`.
+
+**THE FREEZE.** Registry rows (whole-set keyed): donovan-m24, huitzil-m31,
+pyron-m25, merged-m20, and the battery's donovan-m24-stock. The four WIDE
+expectation sets CARRY M19's authored `.masked`, `.skip` and mask byte-identical,
+were frozen and verified SUITE GREEN (PASS 69 / 69 / 70 / 69, SKIP 19 / 19 / 18 /
+19, FAIL 0); merged-m20's 16 self-frozen tenant `.sha1` deleted per #111. The
+stock and stage-4 legs pass 14/14 through the battery's masked leg. The MiSTer
+tail: the fork's `vsavjw` catalogue regenerated (four members), pin bumped,
+series `0036`; `release/merged-m20/` packaged (the WIDE MRA's BUILD block and
+four CRCs; the stock control MRA unchanged).
+
+**THE EMULATOR BATTERY.** Pass 1 (`build/emu_freeze_m20_p1/`, `--freeze --jobs 4`):
+156 PASS / 9 FAIL; the romset-cadence MiSTer lane (`build/emu_freeze_m20_mister/`):
+2 PASS / 1 FAIL. Every red attributed against merged-m19 before a re-freeze
+(`build/rc183/m19ab/`, `build/rc183/refreeze2/`; rule-checker runs 2026-09-25-238..244,
+the last OK):
+- **#157 by design:** `audit_move_parity` (ALL=1: 34 meter-first DIFF rows IDENT, 2
+  DIFF on `x`, nothing else), `audit_move_parity_attribution` (the METER-SWAP roots
+  gone), `audit_throw_registration` (every ours contact pays like native; the contact
+  rule widened to read live-pair writes), `audit_defense_row_reads` (the attacker-combo
+  read indexes the tenant's own row, and replays 110/111's suite counts).
+- **Stale since 14z-181, not M20's** (the naming corpus grew and two parts were
+  regenerated after these files were frozen; identical on merged-m19):
+  `audit_df_field_readers_live`, `audit_reaction_class_live`, the rest of
+  `audit_defense_row_reads`, and Pyron's air-throw contacts in the throw rows.
+- **The build row only:** `audit_column_flash`, `audit_phobos_dmg_residual`.
+- **`test_mister_prg_window`:** the pos pair's `cyc` and `rd_lo` moved, every structural
+  field unchanged — recorded as measured, not explained.
+- **`test_pod_black_foot_palette`:** the recording plays out differently on M20 after
+  Donovan's first pair store (f4236), so its frame no longer holds the black foot; pinned
+  to merged-m19 by ruling (*"Pin it to M19 (Recommended)"*).
+- **Exposed, pre-existing:** Phobos's Sitting Attack landing after a throw (huitzil_3
+  events 8/9) — ours displaced 31 px and not turning where native stays and turns,
+  identical on merged-m19; ruled *"Freeze, ticket it (Recommended)"*: GitHub #179, the
+  attribution's open class `LANDING-TURN-OPEN`.
+
+Pass 2 (`build/emu_freeze_m20_p2/`): the nine MAME reds PASS against the re-frozen
+expectations, and the full parity table (ALL=1) verifies.
+
 ## 14z-170 — THE M19 FREEZE (donovan-m23 / huitzil-m30 / pyron-m24 / merged-m19, mark M19): the four ruled #136 fixes, and a placeholder corruption that had shipped since merged-m16
 
 **WHAT THE FREEZE CARRIES.** The four fixes the maintainer ruled on 2026-09-18

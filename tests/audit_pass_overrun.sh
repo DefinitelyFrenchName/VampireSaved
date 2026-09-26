@@ -37,7 +37,7 @@
 #   for donovan_2 (events 0-2), donovan_10 (0-1) and donovan_11 (the P2 block event and
 #   Blizzard Sword [LP] blocked), the committed rigs with the parity gate's pins.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged27] [FREEZE=1] tests/audit_pass_overrun.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged28] [FREEZE=1] tests/audit_pass_overrun.sh
 #   emulator tier, MAME; 12 runs (the task taps write ~100 MB each, deleted with the work dir) —
 #   measured 14z-168 on this MacBook, solo: ~60 s wall
 set -eu
@@ -45,7 +45,7 @@ set -eu
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged27}"
+BUILD="${BUILD:-build/m3b_merged28}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/pass_overrun.tsv"
 CONTROL="${CONTROL:-}"

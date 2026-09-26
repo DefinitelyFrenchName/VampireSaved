@@ -1,0 +1,9 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/rc183/refreeze/reaction_classes.before.log	538b07b69a24b37b44ae553eb48cc0c402b98e4d
+build/rc183/refreeze/charmap.before.log	3a02c3dab9326e860a467b7413ccef3b2ac33f00
+build/rc183/refreeze/chars_pages.diff	40eb405d44cdbea6523fe655bcfb3178be469f17
+build/rc183/refreeze/framedata_pages.log	619f10468888f0263536de81c82e7f5a05c7a3fb
+build/rc183/refreeze/donovan.html.m19_vs_m20.diff	5742f63922ce37ea253776847a3d117bb0c188cc
+build/rc183/refreeze/huitzil.html.m19_vs_m20.diff	12142f9dfe9869367e0d4690a4ef1964473b4813
+build/rc183/refreeze/pyron.html.m19_vs_m20.diff	3fe0c012dd4a7de27876c66113a70acc24cdc83e
+build/rc183/refreeze/deltas_measurer.txt	9de7a9d30a283e300057147c4db16cfa13c7ef6e

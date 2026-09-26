@@ -3236,8 +3236,11 @@ instruction reads that family — all 24 placed sites naming vs2's displacements
 are WRITES, and the only other instructions naming them are 4 in vsavj's own
 engine, the ring shift (`build/meter_probe_14z166/census.txt` part 4) — and leaving the
 stores at vs2 offsets is what pays every tenant throw's meter to the wrong
-fighters (GitHub #157). The rows stay at stage 99 until the maintainer
-schedules the re-attempt.** Gate: `tests/audit_fg_parity.sh`.
+fighters (GitHub #157). ~~The rows stay at stage 99 until the maintainer
+schedules the re-attempt.~~** **LANDED 14z-183 (the M20 freeze, ruled "Freeze M20 now"):** the
+six pair-store rows are stage 6 in all three tenant manifests (Donovan's moved from 99,
+Phobos's and Pyron's added); the two `-0x4B3D` state-byte clears stay parked at 99
+(patch_notes 14z-183). Gate: `tests/audit_fg_parity.sh`.
 
 **THE HIT-REGISTRATION PAIR, MEASURED (14z-166, `tests/audit_throw_registration.sh`,
 `build/meter_probe_14z166/`):** the pair vsavj `-0x4BC6/-0x4BC4(a5)` =
@@ -3268,9 +3271,16 @@ fired was the boot RAM test `0x000D32/0x000D36`; so at a tenant throw's damage
 the vsavj stager reads the collision walk's leftover (P2, P1) and pays the
 VICTIM the throw record's `+0x14` and the ATTACKER the flat 8 — native pays the
 reverse. That is GitHub #136's meter family (28 DIFF rows) in full; whether the
-four scaler reads change tenant throw DAMAGE is unmeasured (equal HP drops on
+four scaler reads change tenant throw DAMAGE was ~~unmeasured (equal HP drops on
 every measured throw; the parity gate compares P2's HP per event) — a named
-check that #157's pair-store fix must measure (ruled 2026-09-25). **THE LEGACY CONTROL (the maintainer, 2026-09-18: "the values are quite widly different, we really need that control you're doing with a legacy character"):**
+check that #157's pair-store fix must measure (ruled 2026-09-25)~~ **MEASURED 14z-183:**
+they do — the scaler indexes the ATTACKER's `+0x3B3`, so through M19 a tenant's throw
+and object-hit damage was scaled by the VICTIM's (equal in 2P versus, where both hold
+0x10; wrong against the CPU, whose byte `PC 0x00D46A` rewrites every frame); with P2's
+`+0x3B3` held at 8 on both legs, merged-m19 diverged from native on P2's HP in 49 events
+and the probe (M20's program) matched native on all 49 (STATE 14z-183 row (6b)).
+**FIXED in M20** (the pair stores re-pointed; `tests/audit_throw_registration.sh`
+re-frozen on the fix). **THE LEGACY CONTROL (the maintainer, 2026-09-18: "the values are quite widly different, we really need that control you're doing with a legacy character"):**
 Demitri throwing Victor under the same taps registers the pair at each engine's
 own throw site (vsavj `0x029694/98`, vs2 `0x0289C6/CA`) and pays Demitri +9 and
 Victor +8 on BOTH pristine vsavj and vsav2 — the host engine's rule is vs2's and

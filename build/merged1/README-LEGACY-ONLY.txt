@@ -3,4 +3,4 @@ LEGACY-ONLY INSTRUMENT (tests/audit_merged_legacy.sh, 14z-81).
 group C is EMPTY, so Donovan/Huitzil/Pyron render blank tiles BY DESIGN.
 Legacy characters are unaffected (they read groups A/B; group B pristine).
 NEVER playtest this build. NEVER give it a registry row.
-fingerprint: 681ac3adbb927c4936b896af4205e38d9155401e
+fingerprint: 2dca438dcbf171ad13158109ec5225ab8585e1c9

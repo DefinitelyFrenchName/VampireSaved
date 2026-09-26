@@ -50,12 +50,12 @@
 # maintainer read the capture sheets (tools/trap_air_sheet.sh) identical on 2026-09-25 and #175 closed
 # on it. The facts: docs/game/engine_internals.md "Hitboxes and attack records".
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [MERGED=build/m3b_merged27] [FREEZE=1] [CONTROL=air-grounded|air-class|ours-drift|dome-drift|box-drift|merge-corrupt|stale-image] tests/audit_trap_air_hit.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [MERGED=build/m3b_merged28] [FREEZE=1] [CONTROL=air-grounded|air-class|ours-drift|dome-drift|box-drift|merge-corrupt|stale-image] tests/audit_trap_air_hit.sh
 #   emulator tier, MAME: four legs in parallel, ~2 min.
 set -u
 ROMDIR="${ROMDIR:?set ROMDIR}"; if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
-MERGED="${MERGED:-build/m3b_merged27}"; case "$MERGED" in /*) ;; *) MERGED="$REPO/$MERGED" ;; esac
+MERGED="${MERGED:-build/m3b_merged28}"; case "$MERGED" in /*) ;; *) MERGED="$REPO/$MERGED" ;; esac
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN ROMDIR MERGED
 EXPECT="$REPO/tests/expected/trap_air_hit.tsv"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

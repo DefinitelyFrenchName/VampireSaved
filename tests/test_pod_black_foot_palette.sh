@@ -45,6 +45,16 @@
 # inside its window. docs/game/engine_internals.md "EFFECT PALETTES ARE OWNED
 # BY THE PLAYER, NOT THE EFFECT".
 #
+# PINNED TO THE M19 BUILD (maintainer-ruled 2026-09-26, 14z-183: "Pin it to M19
+# (Recommended)" — DECISIONS_HISTORY.md). The recording is a hand-played
+# Donovan-vs-CPU run; on merged-m20 the #157 fix changes that fight after his first
+# registration-pair store (f4236), the playback diverges from f4812 on, and the
+# frozen frame holds 0 black pixels there (7007 on M19; build/rc183/pod/). The
+# gate's subject — palette row 0b index 14 — is code the M20 delta does not touch,
+# so it keeps running on the build where the recording reproduces as captured:
+# build/m3b_merged27, kept by the build-dir policy while this line names it. A
+# freeze's re-point sweep must leave the default alone.
+#
 # Usage: ROMDIR=... tests/test_pod_black_foot_palette.sh   (~2.5 min, 3 MAME runs — 145 s measured 2026-09-15; it said ~7 min, 2 runs until then)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
@@ -52,7 +62,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 case "$ROMDIR" in /*) ;; *) ROMDIR="$(cd "$ROMDIR" && pwd)" ;; esac
 export ROMDIR
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
-BUILD="${BUILD:-build/m3b_merged27}"
+BUILD="${BUILD:-build/m3b_merged27}"   # PINNED to merged-m19 (maintainer-ruled 2026-09-26, 14z-183) — NEVER re-point this line in a freeze sweep; see the header
 [ -f "$REPO/$BUILD/rompath/vsavjw.zip" ] || { if [ -n "$MODE" ]; then echo "REFUSED: CONTROL=$MODE needs a WIDE build at $BUILD (absent)"; exit 3; fi; echo "SKIP: no WIDE build at $BUILD"; exit 0; }
 [ -f "$REPO/tests/inp/pod-black-m14-01/pod-black-m14-01.inp" ] || { if [ -n "$MODE" ]; then echo "REFUSED: CONTROL=$MODE needs the pod-black-m14-01 recording (absent)"; exit 3; fi; echo "SKIP: recording absent"; exit 0; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT

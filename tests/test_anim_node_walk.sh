@@ -35,7 +35,7 @@
 #   tests/replays/17_don_oracle_vsav2.rpl tools/anim_nodes.py tools/run_mame.sh
 #   tools/setup_mame.sh
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/don_m23] tests/test_anim_node_walk.sh  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/don_m24] tests/test_anim_node_walk.sh  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 #
 # HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -58,7 +58,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 # so a gate that means to SKIP on a missing ROMDIR still does.
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/don_m23}"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${BUILD:-build/don_m24}"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 EX="$BUILD/extract"
 [ -f "$EX/regions.json" ] || { echo "SKIP: no $EX/regions.json"; exit 0; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM

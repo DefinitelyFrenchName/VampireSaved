@@ -1,0 +1,10 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent183/p157_evidence/manifest.diff	fa841aa35dbc865ee77db7b8c84d5bfb24526653
+build/agent183/p157_evidence/probe_delta.txt	f8c9652a65b910a629513d86e6e91c0851f9bcf3
+build/agent183/p157_evidence/parity_moved.txt	7c07240cfb059b1f9546b92e31577cd7dd395ead
+build/agent183/p157_evidence/legacy_ab_summary.txt	f101bf188520659313d350ff84867331b251fbd5
+build/agent183/p157_evidence/replay110_damage.txt	d2c769289ee8399bca1588f4cc153c0f59bc7321
+build/agent183/p157_evidence/recordings.txt	acf543956f5d6bc05e30c9643c857ebbbb3d5f16
+build/agent183/p157_evidence/throw_registration_writers.txt	a4674e91d76c85322486bc59c38492f2afafb46f
+build/agent183/p157_evidence/maintainer_read.txt	a0ad65fc899ef5aa693cdae7775fede5f28c0eb6
+DECISIONS_HISTORY.md.lines-30-34 (lines 30-34 of DECISIONS_HISTORY.md)	9293c4016b25ef273fb1b904e441479f67df03c0
