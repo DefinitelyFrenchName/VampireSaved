@@ -1,0 +1,6 @@
+QP1: OK — every stated intention is followed by the matching call: [222]->[223], [247]->[248], [313]->[314]/[315], [331]->[332], [385]->[390], [405]->[406], [410]->[411], [422]->[423], [458]->[459]
+QP2: VIOLATED — [422] "The full static tier already re-ran green with the sweep registered." No call ran the static tier after the sweep was registered at [390] and before this statement. The only gates run before it were the doc and census gates at [443], which came afterwards. The tier itself was first launched at [459], still running when the extract ends, with no result.
+QP3: OK — the extract has no A# or W# lines. "76 of 76 members match" [458] comes from [456] "verified 76 members against checksums.txt: all match".
+QP4: OK — bmy9jiy8t finished [238] and was acknowledged at [247]. bi3rc93y5 was killed at [332] and its end was reported at [336]. bfcuxdh43 [460] is tracked and still running at the end, so its end will notify. There are 0 detached launches.
+QP5: N-A — the extract shows no worker (no W/WS/WX lines)
+VERDICT: VIOLATED

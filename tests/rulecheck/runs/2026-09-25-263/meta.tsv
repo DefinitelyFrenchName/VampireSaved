@@ -1,0 +1,10 @@
+decision	procedure
+subject	one AI agent working session (14z-183), part 2 of 3: transcript d33b9bfe records 3571-6753 (the M20 build deltas to the freeze check's run 246)
+session	d33b9bfe
+model	rule-checker@163e4ce9cf7b
+claim	In this span the agent did what it said and ran what it claimed. It built the five M20 tracks and the stage-4 image from the tracked manifests, carried M19's authored expectations and ran the suite freeze and verify (PASS 69/69/70/69), deleted merged-m20's 16 self-frozen .sha1, ran the MiSTer tail (fork commit cf075a09, patch 0036, MRAs, release/merged-m20) and re-pointed the harness; the M2 battery's pass 1 (156 PASS / 9 FAIL) was read, every red re-run on merged-m19, dry-run frozen with the tracked file restored and put through the rule-checker (runs 235-246, each prepared with --id, prompts passed to pinned rule-checker workers, every plant caught, every VIOLATED resolved by work before the freeze step it gated); two rulings were asked and recorded in the maintainer's words ('Pin it to M19 (Recommended)', 'Freeze, ticket it (Recommended)'); pass 2 and the freeze-cadence tier were run. DEVIATIONS the agent knows of: an M19 html comparison first shared an input with the M20 side and was redone [4355]; a comparison script read the wrong column and its evidence file was rewritten [4459]; a ground truth was first run on the wrong trace dirs and redone [5715]; in pass 1 the throw gate's controls fired against stale rows, so they discriminated nothing, found by a checker and fixed by a dry-run verify [6110]; a zsh glob error broke a carry file, redone [6630]. The figure 14365 at [5281] is a frame the agent chose to snap (five before the gate's SNAP_FRAMES=14370), not a measurement. The M line at [3823] is the harness's context summary and the M lines reading 'Another Claude session sent a message' are worker hand-backs, not the maintainer. NOT claimed: that every figure was re-derived by a worker — many came from the agent's own tool runs shown in the extract.
+checklist	f3ec4d9849f7
+family	procedure
+questions	QP1 QP2 QP3 QP4 QP5
+reader	rule-checker@163e4ce9cf7b
+head	1a20119e130b1231bf711999957fdf4933d5e9d2

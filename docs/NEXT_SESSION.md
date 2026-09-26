@@ -64,3 +64,9 @@ now"*, the #112 gate *"Pin it to M19"*, Phobos's landing *"Freeze, ticket it"* (
    header, a count restated in prose. Build the table from a FULL re-read of the session's rows, not a
    keyword scan. State each test's reach (replays / runs the fixed state / none) per finding. Point at
    artifacts instead of restating counts.
+8. **The procedure check (runs 262-264) found two working-method slips.** At the opener, state the delegation
+   scope exactly: figures that enter documents and freezes come from worker specs, and figures from my own
+   runs are labelled as such in chat. Do not promise that every figure goes through a worker. Pass a
+   rule-checker an EXCERPT, not a whole gotchas bucket: its readers cannot read ~6000 lines in one pass, and
+   an OK then rests on slices. A session extract over ~580k characters is split into spans (`extract.py
+   --from/--to`), one procedure run per span.
