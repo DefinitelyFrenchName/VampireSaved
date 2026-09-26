@@ -1,0 +1,19 @@
+# tests/rulecheck/retractions/14z-183.tsv — the wordings retracted or corrected in 14z-183 (#134's rig, #157's fix and the M20 freeze, the stale standing line); columns pattern, source, kind (retracted — classed by hand | gone — must read 0 hits | reach[:N] — must be found). Run: python3 tools/retraction_grep.py tests/rulecheck/retractions/14z-183.tsv build/agent183/retraction_greps_14z183.txt
+their LP is 0x01 at BOTH distances	14z-183 #134: the near LP rows were mid-range readings	retracted
+THE DEFECT IS FROZEN AS MEASURED: ours p1=+8	14z-183 #157: the throw rows re-frozen on the fix	retracted
+No freeze is current beyond merged-m18	14z-183: the stale standing line deleted (M19 was frozen 14z-170)	retracted
+The rows stay at stage 99 until the maintainer	14z-183 #157: the pair-store rows landed at stage 6 in M20	retracted
+they stay parked until the maintainer schedules the re-attempt	14z-183 #157: the pair-store rows landed; only the clr.b rows stay parked	retracted
+Pyron's air throw is not produced by the Demitri-P2 rig	14z-183: produced since 14z-181's air_throw fix (a91a555a)	retracted
+throw DAMAGE is unmeasured	14z-183 #157: measured — the scaler reads the attacker's +0x3B3	retracted
++82 native	14z-183: the native trace behind it was the unpinned control's overwrite	retracted
+LANDED 14z-183 (the M20 freeze	control: engine_internals' #157 status line	reach
+LANDING-TURN-OPEN	control: the open class in the tool, the frozen attribution and the docs	reach:3
+PINNED to merged-m19	control: the #112 gate's pinned default	reach
+THE MERGED EXPECTATION SET MUST HAVE ITS 16 SELF-FROZEN	control: the gotcha heading (a carrier the grep must reach)	reach
+Lilith j.LP/j.LK	14z-183 #134: the two jump legs are Lei-Lei's (LE, 0x0D), marked in place in DECISIONS_HISTORY.md	retracted
+is a genuine whiff at this geometry	14z-183 #134: a whiff at the default press (+14) only; it connects at every offset +17..+32 (row (8)), marked in place in row (7)	retracted
+from a four-point sweep	14z-183 #134: +18 sat one frame inside the band's edge; every offset +10..+34 then measured	retracted
+the 506 rows equal to	14z-183: audit_move_parity's header count stale since 14z-181 (the table has 526 rows)	retracted
+the 30 naming parts	14z-183: 32 parts since 14z-181 added donovan_15 and pyron_7	retracted
+x 179 / 35 frames from +116	14z-183 #157: read from the kept native trace, the unpinned control's overwrite; pinned, x first differed at +156 (marked in place in row (6))	retracted

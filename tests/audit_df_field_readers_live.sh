@@ -5,7 +5,7 @@
 #   (+0x1C3..+0x1C8) on our build, cross-checked against the static census: every placed
 #   instruction that runs and touches a field is a census row with the right access class,
 #   nothing hides in a skipped region, and the host's own accesses are frozen.
-# HOW: 30 non-debug read-tap runs on MAME (every naming part of the three tenants with the
+# HOW: 32 non-debug read-tap runs on MAME (30 until 14z-181; 32 at the M20 re-freeze, 14z-183) (every naming part of the three tenants with the
 #   parity gate's inputs and pins), both fighter blocks' +0x1C2..+0x1C9 tapped, every access
 #   attributed by PC and matched to tests/expected/df_field_readers.tsv; liveness per range
 #   needs a game write and the END probe; controls delete the first reached census row and
@@ -36,7 +36,7 @@
 #   - any other pc is vsavj's own code (the block clears), listed as `host` and frozen.
 #
 # THE SAMPLE: every committed naming part of the three tenants on OUR build (the #136
-# rigs, tests/replays/naming/<tenant>_<n>, 30 parts, the in-Dark-Force parts included),
+# rigs, tests/replays/naming/<tenant>_<n>, 32 parts since 14z-181 (30 before), the in-Dark-Force parts included),
 # with tests/audit_move_parity.sh's own inputs and pokes for our leg (rpl_for, the level
 # and the RNG pinned) — that gate's field trace asserts P1's id on the same inputs; this
 # one does not re-assert it, and the per-run attribution in the frozen rows is what moves

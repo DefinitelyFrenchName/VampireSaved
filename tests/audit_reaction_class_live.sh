@@ -35,7 +35,7 @@
 #   ours   — the merged build, every #136 naming part (tests/replays/naming/<tenant>_<n>; 30 until 14z-181, 32 since)
 #            with tests/audit_move_parity.sh's own inputs and pokes (the merged wheel's
 #            path, the level pinned to 6 from 2000 and the RNG from 2363);
-#   native — vsav2, the same 30 parts as committed, with the same pins.
+#   native — vsav2, the same parts as committed (32 since 14z-181), with the same pins.
 # NOT SAMPLED: every path the corpus does not run. A 0x38 write on a path no replay takes
 # is not excluded by this gate — the static census (test_reaction_classes) is the other
 # half, and neither is a proof of universal absence.

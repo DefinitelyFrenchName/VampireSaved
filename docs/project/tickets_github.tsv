@@ -2,8 +2,9 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 179
+# issues: 180
 number	state	reason	closed	labels	title
+180	OPEN	-	-	bug	Two stock-spend tenant throws pay the thrower 0 meter on M19 and M20 alike; the x028122 copy's third store pair was never observed writing (split from #157)
 179	OPEN	-	-	bug	Phobos's Sitting Attack landing after a throw: ours is displaced 31 px and does not turn, native stays and turns (parity rig huitzil_3 events 8/9)
 178	OPEN	-	-	evolution,severity: medium	Hop Kick in Donovan's Dark Force connects on neither leg of any rig: the thread's 'native lands, ours whiffs' was never compared
 177	OPEN	-	-	evolution	Tenant movement parity vs native vs2: walk, dash, jumps and arcs, Phobos's float and air dash — no gate compares movement against native
@@ -26,7 +27,7 @@ number	state	reason	closed	labels	title
 160	OPEN	-	-	bug,severity: low	rulecheck.py: prepare's auto id collides with a run directory that has no ledger row
 159	OPEN	-	-	bug,needs-maintainer-ruling,severity: medium	Tenant attack records with facing rule 5 are XORed into the victim's facing by vsavj's hit code (Killshread Summon (ES) pushes Demitri away where native drags him in)
 158	CLOSED	COMPLETED	2026-09-24	bug	rulecheck.py: a model change never invalidates a calibration (the checklist hash is checked, the model is not, and the ledger records 'default')
-157	OPEN	-	-	bug,needs-maintainer-ruling,severity: high	Tenant throws pay meter to the wrong fighters — the ported throw code never registers the hit pair on vsavj (the 14x rollback's price; #136's meter family)
+157	CLOSED	COMPLETED	2026-09-26	bug,needs-maintainer-ruling,severity: high	Tenant throws pay meter to the wrong fighters — the ported throw code never registers the hit pair on vsavj (the 14x rollback's price; #136's meter family)
 156	CLOSED	COMPLETED	2026-09-17	bug	rulecheck.py: two line ranges of one artifact collide in staging, the reader sees only the last
 155	OPEN	-	-	bug	audit_forced_pick_fidelity: the poked leg is a hand-typed replica of the #136 rig's leg with no control against drift
 154	CLOSED	COMPLETED	2026-09-26	bug	audit_forced_pick_fidelity: the FREEZE branch exits before the identity assertions and the controls, so a failed run can freeze

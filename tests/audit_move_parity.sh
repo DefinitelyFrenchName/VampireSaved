@@ -5,13 +5,13 @@
 #   (#136): the same naming rigs on both games, the tenant's own state compared every frame
 #   (node translated out of its placement, seq, sub-state, counter, x, y, stock, facing, DF
 #   flag, HP, meter fraction, P2's HP), one verdict per EVENT — IDENT / DIFF / VOID — frozen
-#   for all 506 events.
-# HOW: the 30 naming parts on MAME on both legs as REAL cursor picks (the merged wheel's
+#   for all 526 events (506 until 14z-181 added donovan_15 and pyron_7; corrected 14z-183).
+# HOW: the 32 naming parts on MAME on both legs as REAL cursor picks (the merged wheel's
 #   path on ours), the level pinned to 6 from 2000 and the RNG from the match anchor, the
 #   comparison window starting at each rig's first event and each event judged in its own
 #   X-pinned window (tools/move_parity.py); four controls (the native level unpinned, the
 #   node untranslated, a stock starved, the X pins ignored).
-# EXPECTS: the 506 rows equal to tests/expected/move_parity_events.tsv, every in-DF event
+# EXPECTS: the 526 rows equal to tests/expected/move_parity_events.tsv, every in-DF event
 #   with the flag up on both legs, every DF activation seen; each control turns verdicts. A
 #   DIFF's cause is audit_move_parity_attribution's question.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/move_parity_events.tsv
@@ -35,7 +35,7 @@
 #
 # THE VERDICT IS PER EVENT SINCE 14z-164 (GitHub #136, maintainer-agreed
 # 2026-09-17): the rig re-pins both fighters' X before every event, so each of the
-# 506 events is judged IN ITS OWN WINDOW — IDENT / DIFF (+first frame, fields) /
+# 526 events is judged IN ITS OWN WINDOW — IDENT / DIFF (+first frame, fields) /
 # VOID — and frozen as one row of tests/expected/move_parity_events.tsv; an
 # event labelled "in DF" must run with the DF flag up on both legs (NOT-IN-DF
 # otherwise) and a DF-activating event must see the flag rise (DF-NOT-ENTERED).

@@ -1,0 +1,11 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+STATE.md	6031f4e22802ad01e9efd223b004bc005ff6a573
+build/agent183/packet_homes_14z183.txt	ffe1bcce6172032d2506024bb22ffbe6a0115e48
+build/agent183/packet_verify.py	cd48101bad46c3aac1e7f3e9e55a16735ed28a4b
+build/agent183/packet_quotes_verified.txt	7886f2e8eafc94fee321af788af931f438ef5753
+build/agent183/close_findings_14z183.txt	3c3ced026de6e1b6c37761df637921f93d9ecc5e
+build/agent183/homes_tracked.txt	f6a1c98937e87cc685f829d62a0ec6501624c462
+build/agent183/retraction_greps_14z183.txt	6cce1f1ad9babdabc9102328dfb7330a58b7206b
+build/agent183/classing_cover.py	1914f126a292ae20e9769191aeaff48ba6c0f3ab
+build/agent183/classing_coverage.txt	f77b5cd7e4e2c8a653ed68a7ebf8c0b675c89076
+docs/project/gotchas.md	52b9a90a46cf2ef41218b4190f0bd1836674be66

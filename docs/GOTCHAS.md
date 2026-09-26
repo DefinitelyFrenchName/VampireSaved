@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-429 entries (46 game / 120 platform / 263 project), counted from the buckets at generation.
+430 entries (46 game / 120 platform / 264 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 46 entries
 
@@ -194,7 +194,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A WORKER CAN FINISH ON ANOTHER MODEL THAN ITS DEFINITION NAMES — A SAFETY-CLASSIFIER STOP TRIGGERS A SILENT FALLBACK (measured 2026-09-24, 14z-178, Claude Code 2.1.281)
 - A MAIN SESSION RUN AS A DEFINITION (`claude --agent <name>`) LOSES CLAUDE CODE'S WHOLE DEFAULT SYSTEM PROMPT — THE DEFINITION'S BODY REPLACES IT (measured 2026-09-24, 14z-178, Claude Code 2.1.281)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 263 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 264 entries
 
 - A VULN ID OF 0 IS NO BOX — a resolver that reads it builds a PHANTOM hurtbox the engine never tests (paid: 14z-182, GitHub #175)
 - A CHAIN ID IN A NAMING EXPECTATION IS IDENTIFIED FROM THE SLOT TABLE, NEVER DESCRIBED IN PROSE (paid: 14z-171, caught 14z-172, GitHub #168)
@@ -446,6 +446,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A CLASS THAT ABSORBS ANOTHER CLASS HIDES IT FROM EVERY LISTING (paid: 14z-170)
 - A DIRECTORY'S MODIFICATION TIME HIDES A REMOVAL BEHIND ANY LATER ADDITION (paid: 14z-170)
 - A CAPTURE IS EVIDENCE FOR THE BUILD IT WAS SHOT ON (paid: 14z-170)
+- A CAPTURE LABELLED WITH THE TRACE'S VALUES IS NOT INDEPENDENT OF THE TRACE — and a sheet too short to show the reaction settles nothing (paid: 14z-183, GitHub #134)
 - THE RE-POINT SWEEP SEES BUILD NAMES IN THIS TREE — A PINNED FINGERPRINT AND THE HARNESS'S DEFAULTS ARE OUTSIDE IT (paid: 14z-170)
 - A DOCUMENT WRITTEN BY THE EXPERT READS AS COMPLETE TO THE EXPERT — the tell is FIRST USE against FIRST NEED, and you will write a fresh instance of the bug while fixing it (paid: 14z-173/14z-174, GitHub #146)
 - WHEN A RULE-CHECKER PACKET ATTRIBUTES A DECISION, THE DECISION RECORD IS AN ARTIFACT — otherwise Q5 is VIOLATED and it is right to be (paid: 14z-174, run 2026-09-21-90)

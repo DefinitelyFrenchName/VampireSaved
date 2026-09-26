@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-182 CLOSE, 2026-09-25)
+# NEXT SESSION — orientation (rewritten at the 14z-183 CLOSE, 2026-09-26)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
@@ -14,47 +14,53 @@ prompt files pasted VERBATIM, `record --session`, `resolve` on ONE line. Say so 
 
 ## START HERE
 
-0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** At the 14z-182 opener it found ONE survivor, PID
-   85150 — Claude Code's own `claude.exe daemon run` with idle `bg-spare` children, a LEFTOVER of 14z-181
-   (spawned by a claude process of this repo that no longer exists; its only session socket is 14z-181's
-   `152495c2`); this session was not under it (STATE 14z-182 row (6)). **The maintainer's standing ruling:
-   it is killed before a push ONLY on their command** (STATE 'Standing rulings'). What the 14z-182 close did
-   with it is in its CLOSE row.
-0c. **CARRIED: 14z-182's unchecked transcript tail.** Procedure run `2026-09-25-224` read this session's
-    transcript (39efeec2) through record 2820; the rest — recording and resolving run 224, the close's last
-    commit `256edd70`, the push, and this carry note's commit (LOCAL, not pushed: a push needs a procedure run
-    covering it) — is THIS close's to check: `extract.py --session 39efeec2 --from 2821`, and `--cap` over it.
-1. **Nothing is pending a ruling** — STATE "Decisions pending" is empty after 14z-182.
-2. **Open tickets from 14z-182, the maintainer's to order:** **#177** (tenant movement parity vs native —
-   no gate compares walk / dash / jumps / arcs against vs2), **#178** (a rig that makes Hop Kick connect
-   inside Donovan's Dark Force on both legs, with a control that fails an empty SAME), **#176** (the RNG's
-   per-frame advance ours vs native — the parity gates pin the RNG word every frame, ruled). #157 now
-   carries a named check: its pair-store fix must also measure throw DAMAGE. #174 (the 36 never-entered a2 chains) —
-   inputs first. #145, #170, #157, #159 unchanged.
+0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** What the 14z-183 close found and did is in its
+   CLOSE row (STATE 14z-183).
+1. **M20 IS FROZEN, NOT RELEASED.** `freeze/merged-m20` (and donovan-m24 / huitzil-m31 / pyron-m25), commit
+   `d4cd4d51`, `release/merged-m20/` packaged. The GitHub release (README still names merged-m19) is a
+   separate decision — the maintainer's. A release run executes every emulator control (`--controls`) and
+   the bitstream-cadence MiSTer gates; **the re-frozen `test_mister_prg_window` pair was copied from the
+   freeze lane's own log and NOT re-run** — the release run is its verify.
+2. **Nothing is pending a ruling** — STATE "Decisions pending" is empty.
+3. **Open tickets, the maintainer's to order:** **#179** (Phobos's Sitting Attack landing after a throw —
+   ours displaced 31 px and not turning; the NEXT STEP is a native-vs-ours capture for the maintainer,
+   before any mechanism work), **#180** (two stock-spend throws pay the thrower 0 on M19 and M20 alike; the
+   third store pair never observed writing — a vs2 leg on the same inputs first), **#177** (movement parity
+   vs native), **#178** (Hop Kick in Donovan's Dark Force), **#176** (the RNG's advance), #174, #145, #170,
+   #159.
+4. **Three close-time checkers are ON TRIAL** (`build/agent183/`, untracked): `packet_verify.py` (re-opens every
+   packet quote), `class_letters.py` (every finding letter in exactly one test class), `classing_cover.py`
+   (every retracted hit classed). Each has a plant that fires. Promote them to `tools/` beside
+   `homes_tracked.py`, with a gate, or let them go. The 14z-183 CLOSE row, step (6), says why they exist.
+5. **Three gate headers changed at the 14z-183 close, comments only** (`audit_move_parity`,
+   `audit_df_field_readers_live`, `audit_reaction_class_live`: the part count 30 -> 32). The staleness gate
+   will list them as a NOTE at session cadence; at the next freeze, `--stale` re-runs them.
 
 ## WHAT CLOSED THIS SITTING
 
-#161 (`not-ours`: vsavj's own damage pipeline), #132 (`declined`: merged-m15 stays unpackaged), #175 (the
-Plasma Trap hits an airborne victim identically on both games — `tests/audit_trap_air_hit.sh`). Ruled: the
-parity pins as the equalised input. #136 re-derived against its whole thread (four findings, #177/#178).
+#157 (FIXED in M20: a tenant throw pays the thrower the record's meter, and the damage scaler reads the
+attacker — the two measured by `tests/audit_throw_registration.sh` / `tests/audit_move_parity.sh`), #134,
+#138, #140, #154. Item 0b (every #175 figure re-derived, `tools/trap_air_static.py`). Ruled: *"Freeze M20
+now"*, the #112 gate *"Pin it to M19"*, Phobos's landing *"Freeze, ticket it"* (#179).
 
-## TRAPS PAID THIS SITTING (14z-182)
+## TRAPS PAID THIS SITTING (14z-183)
 
-1. **A VULN ID OF 0 IS NO BOX** (gotcha filed). A resolver that reads it builds a phantom box; mine read
-   "boxes overlap in the air but no hit" as a grounded-only rule. Before theorising a rule from "overlap but
-   no hit", COUNT how many times the engine runs the test (execution breakpoints on its call sites).
-2. **A register in a tap is not a constant until the disassembly says so.** The `0x28` I read as "the
-   ground height compared" was the dome box's centre y. Read the instruction at the PC before naming a value.
-3. **The Bash agent hook reads an inline `&` as a background job** — a Python heredoc with `& 0xFFFFFF`
-   masks was refused. Write such an edit script to a scratch file and run it.
-4. **"Every traced field equal" must be every traced field.** Four rule-checker rounds (219-222) each found
-   the gate comparing less than the probe traced, or charging too coarsely, or trusting a data file; widening
-   it found a real vanilla difference (Felicia's `b:0x0f` head hurtbox, vsavj vs vs2). Compare RESOLVED
-   values (boxes), not build-dependent pointers, and prove each data file is the romset the leg runs.
-5. **A victim's own attack can end the rig**: Felicia's j.HP hit Phobos and cancelled his trap until he was
-   parked out of reach. Read both players' HP in any rig where the victim attacks.
-7. **This Mac's `grep` has no `-P`** — a worker spec that uses it fails, and workers then improvised
-   substitutions and ran past errors (procedure run 224, QP5). Write specs with `-E`, and read a worker's
-   return against its spec before quoting it.
-6. **A ticket closed against its LAST list is not closed against its scope** — #136 needed a re-derivation
-   from its body and whole thread to find four uncovered items.
+1. **A gate's printed diff is a `head -40` window.** Comparing two builds through gate logs compared a
+   window; freeze the table on BOTH builds (copy aside, restore) and diff the files whole (gotcha filed).
+2. **A rig or corpus commit re-frozen in the gates it was made for leaves every other gate that reads it
+   stale** — four were, since 14z-181; `tests/run_all_emulator.sh --stale` names them once a run of record
+   exists (gotcha filed).
+3. **A kept parity work dir holds an UNPINNED native trace for its control part** — a timing reported to the
+   maintainer from one was an artifact and retracted (gotcha filed).
+4. **The freeze-cadence staleness gate wants the emulator run of record ON THE COMMITTED TREE** — so the order
+   is: freeze commit, tags, `run_all_emulator.sh --freeze --stale`, then the freeze tier; three tier reds
+   (tags, the `freeze` row, staleness) clear only in that order.
+5. **A self-frozen `.sha1` passes by construction** — compare each to its predecessor's file before a freeze
+   packet says the sets verified (the rule-checker's run 249 caught it).
+6. **zsh**: an unquoted `$A` of `--artifact` flags does not split — use `${=A}`; `setopt null_glob` before a
+   glob that may match nothing.
+7. **The documentation packet took eleven rule-checker runs (251-261).** Each missed item was real: findings
+   left out of the table, a test credited with replaying what it only guards, a stale count in a quoted
+   header, a count restated in prose. Build the table from a FULL re-read of the session's rows, not a
+   keyword scan. State each test's reach (replays / runs the fixed state / none) per finding. Point at
+   artifacts instead of restating counts.

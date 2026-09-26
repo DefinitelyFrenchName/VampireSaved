@@ -57,7 +57,12 @@ pyron-m25, merged-m20, and the battery's donovan-m24-stock. The four WIDE
 expectation sets CARRY M19's authored `.masked`, `.skip` and mask byte-identical,
 were frozen and verified SUITE GREEN (PASS 69 / 69 / 70 / 69, SKIP 19 / 19 / 18 /
 19, FAIL 0); merged-m20's 16 self-frozen tenant `.sha1` deleted per #111. The
-stock and stage-4 legs pass 14/14 through the battery's masked leg. The MiSTer
+stock and stage-4 legs pass 14/14 through the battery's masked leg. The solo sets'
+self-frozen `.sha1`, compared byte for byte to M19's: 49 of 51 identical; the two that
+moved are Donovan's replays 110/111, the only two of 88 the whole-RAM A/B found
+differing, their damage difference traced to the fix (`build/rc183/freeze/sha1_moves.txt`).
+The freeze check: rule-checker runs 2026-09-25-245..250, the last OK; the freeze-cadence tier
+on the committed tree GREEN (183/0, every control executed). The MiSTer
 tail: the fork's `vsavjw` catalogue regenerated (four members), pin bumped,
 series `0036`; `release/merged-m20/` packaged (the WIDE MRA's BUILD block and
 four CRCs; the stock control MRA unchanged).

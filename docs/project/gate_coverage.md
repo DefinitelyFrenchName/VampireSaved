@@ -2376,7 +2376,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **WHAT:** what the #136 corpus actually EXECUTES against vs2's Dark Force POWER fields (+0x1C3..+0x1C8) on our build, cross-checked against the static census: every placed instruction that runs and touches a field is a census row with the right access class, nothing hides in a skipped region, and the host's own accesses are frozen.
 
-**HOW:** 30 non-debug read-tap runs on MAME (every naming part of the three tenants with the parity gate's inputs and pins), both fighter blocks' +0x1C2..+0x1C9 tapped, every access attributed by PC and matched to tests/expected/df_field_readers.tsv; liveness per range needs a game write and the END probe; controls delete the first reached census row and delete a range's accesses.
+**HOW:** 32 non-debug read-tap runs on MAME (30 until 14z-181; 32 at the M20 re-freeze, 14z-183) (every naming part of the three tenants with the parity gate's inputs and pins), both fighter blocks' +0x1C2..+0x1C9 tapped, every access attributed by PC and matched to tests/expected/df_field_readers.tsv; liveness per range needs a game write and the END probe; controls delete the first reached census row and delete a range's accesses.
 
 **EXPECTS:** no MISSED or MISLABELLED access, no access inside a skipped region, the sampled and host rows frozen with the unsampled count; the deleted-row copy reports a missed PC, the silent range reads DEAD. Unsampled: the tenant as P2, the vs2 EX route, every path the corpus never runs.
 
@@ -2502,11 +2502,11 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 ### `audit_move_parity.sh` — audit, emulator
 
-**WHAT:** every tenant move, ours vs native vsav2, at a matched speed level and a pinned RNG (#136): the same naming rigs on both games, the tenant's own state compared every frame (node translated out of its placement, seq, sub-state, counter, x, y, stock, facing, DF flag, HP, meter fraction, P2's HP), one verdict per EVENT — IDENT / DIFF / VOID — frozen for all 506 events.
+**WHAT:** every tenant move, ours vs native vsav2, at a matched speed level and a pinned RNG (#136): the same naming rigs on both games, the tenant's own state compared every frame (node translated out of its placement, seq, sub-state, counter, x, y, stock, facing, DF flag, HP, meter fraction, P2's HP), one verdict per EVENT — IDENT / DIFF / VOID — frozen for all 526 events (506 until 14z-181 added donovan_15 and pyron_7; corrected 14z-183).
 
-**HOW:** the 30 naming parts on MAME on both legs as REAL cursor picks (the merged wheel's path on ours), the level pinned to 6 from 2000 and the RNG from the match anchor, the comparison window starting at each rig's first event and each event judged in its own X-pinned window (tools/move_parity.py); four controls (the native level unpinned, the node untranslated, a stock starved, the X pins ignored).
+**HOW:** the 32 naming parts on MAME on both legs as REAL cursor picks (the merged wheel's path on ours), the level pinned to 6 from 2000 and the RNG from the match anchor, the comparison window starting at each rig's first event and each event judged in its own X-pinned window (tools/move_parity.py); four controls (the native level unpinned, the node untranslated, a stock starved, the X pins ignored).
 
-**EXPECTS:** the 506 rows equal to tests/expected/move_parity_events.tsv, every in-DF event with the flag up on both legs, every DF activation seen; each control turns verdicts. A DIFF's cause is audit_move_parity_attribution's question.
+**EXPECTS:** the 526 rows equal to tests/expected/move_parity_events.tsv, every in-DF event with the flag up on both legs, every DF activation seen; each control turns verdicts. A DIFF's cause is audit_move_parity_attribution's question.
 
 ### `audit_move_parity_attribution.sh` — audit, emulator
 

@@ -3274,9 +3274,11 @@ reverse. That is GitHub #136's meter family (28 DIFF rows) in full; whether the
 four scaler reads change tenant throw DAMAGE was ~~unmeasured (equal HP drops on
 every measured throw; the parity gate compares P2's HP per event) — a named
 check that #157's pair-store fix must measure (ruled 2026-09-25)~~ **MEASURED 14z-183:**
-they do — the scaler indexes the ATTACKER's `+0x3B3`, so through M19 a tenant's throw
-and object-hit damage was scaled by the VICTIM's (equal in 2P versus, where both hold
-0x10; wrong against the CPU, whose byte `PC 0x00D46A` rewrites every frame); with P2's
+they do — the scaler indexes the ATTACKER's `+0x3B3` (its reads `0x018B9C` and `0x018D28` take the
+registered attacker; the tenants' object-hit applier is the placed copy of vs2's `0x28A6A`), so through
+M19 a tenant's throw and object-hit damage was scaled by the VICTIM's (equal in 2P versus, where both hold
+0x10; wrong against the CPU: both fighters' byte is set to 0x10 at round start by `PC 0x02231E`, then
+P2's alone is rewritten every frame by `PC 0x00D46A` when P2 is the CPU); with P2's
 `+0x3B3` held at 8 on both legs, merged-m19 diverged from native on P2's HP in 49 events
 and the probe (M20's program) matched native on all 49 (STATE 14z-183 row (6b)).
 **FIXED in M20** (the pair stores re-pointed; `tests/audit_throw_registration.sh`

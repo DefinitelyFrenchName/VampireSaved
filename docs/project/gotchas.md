@@ -5609,6 +5609,19 @@ re-shoot and compare before the conclusion transfers. And cite a history entry b
 by a line number. The packet's `DECISIONS_HISTORY.md:a-b` citations went stale as entries were
 added at the head (run -75's note). They were re-derived by looking each quoted line up verbatim.
 
+## A CAPTURE LABELLED WITH THE TRACE'S VALUES IS NOT INDEPENDENT OF THE TRACE — and a sheet too short to show the reaction settles nothing (paid: 14z-183, GitHub #134)
+
+#134's hit/whiff conclusions for Lei-Lei's j.LK were put to the maintainer as capture sheets, and
+three of them were weaker evidence than they looked. The first sheet had too few frames: *"I got
+too few frames to know because I have no frame with a reaction to being hit."* A strip then
+printed the trace's HP under each frame, so a reader agreeing with it was reading the trace
+again, not the picture (rule-checker run 2026-09-25-230). Only the dense unlabelled 16-frame
+sheet was independent of the trace. And my own description claimed a FIRST ATTACK banner in the
++18 row, which marks the round's first hit in both legs (run -228). Rule: a sheet meant to
+confirm a trace carries NO value read from that trace, spans the event through the victim's
+reaction (or its absence) on both sides, and its description states only what a frame shows.
+Record the maintainer's reading as given.
+
 ## **[VSP-185]** THE RE-POINT SWEEP SEES BUILD NAMES IN THIS TREE — A PINNED FINGERPRINT AND THE HARNESS'S DEFAULTS ARE OUTSIDE IT (paid: 14z-170)
 
 The M19 freeze re-pointed 304 live build references in 153 files and re-froze every static gate it
