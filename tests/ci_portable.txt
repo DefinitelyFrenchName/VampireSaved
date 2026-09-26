@@ -288,3 +288,6 @@ test_agent_defs
 test_agent_worker
 # 14z-181: the close ritual's two file-level checks (retraction grep reach, tracked homes) run and can fail. ~3 s.
 test_close_tools
+# 14z-183b (#153 S6): a run on a snapshot (tests/run_on_snapshot.sh) is immune to the working tree — a tracked
+# edit and commit, build/, a submodule, both siblings perturbed mid-run reach nothing; three controls. ~5 s.
+test_run_on_snapshot

@@ -170,17 +170,26 @@ behaviour is a failed change, not a trade-off.
   red — and a skipped check is never counted as a passed one.
 - Every crash or misbehaviour a person can reproduce is captured first as a recording, then replayed
   against every new build.
+- Every step that rests on a measurement — a fix, a freeze, a closed ticket — is first read by a separate
+  AI checker that sees only the evidence files, never the working agent's reasoning, and that must also
+  catch a deliberately flawed case planted beside the real one. Each objection it raises is answered in
+  writing before the step goes ahead. At the end of every working session, the same kind of checker reads
+  the session's transcript to confirm the agent did what it said and ran what it claimed.
+- Freeze and release test runs play out on a snapshot of a named commit, so nothing changed in the
+  working copy while they run can reach them, and each run records exactly what it tested.
 
-**The scale, on 2026-09-15** (re-derive these rather than trusting this page): 1,596 commits over
-seven and a half weeks, more than 150 working sessions, 331 test scripts, 154 checks run before every
-commit with 172 planted-defect controls executed at every session's close, 173 emulator and FPGA
-simulation checks, 184 scripted replays, 7 hand-played recordings of reported problems, and 140 tracked tickets.
+**The scale, on 2026-09-26** (re-derive these rather than trusting this page): 1,731 commits over
+nine weeks, more than 180 working sessions, 392 test scripts, 184 checks that need no emulator (run at
+every session's close, the slowest few only at a freeze or a release) with 254 planted-defect controls
+executed at the last close, 203 emulator and FPGA simulation checks, 194 scripted replays, 10
+hand-played recordings of reported problems, and 181 tracked tickets.
 
 **What all that green does not prove.** It does not prove that the new characters *feel* right —
 only players can judge that. The frame-by-frame guarantee covers the scripted replays, not every match
 anyone could play. And a few original sequences are allowed small, measured and frozen tolerances,
 because code added to reach the new characters costs the processor time. A move-by-move comparison of the three
-new characters with Vampire Savior 2 is tracked separately ([#136](https://github.com/DefinitelyFrenchName/VampireSaved/issues/136)).
+new characters with Vampire Savior 2 has been done ([#136](https://github.com/DefinitelyFrenchName/VampireSaved/issues/136)),
+and the differences it found are tracked as their own tickets.
 
 **Lineage.** The working discipline began in a Super Nintendo romhack project,
 [Sailor Moon S — FrenchName edition](https://github.com/DefinitelyFrenchName/SMS-FrenchName-edition),

@@ -27,6 +27,28 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-26 (14z-183b) — #153 closes with slice 1; slice 2 (the emulator tier) is #181
+
+**The question (14z-183b, once slice 1 was built and its immunity gate green), verbatim:** *"#153 slice 1 (the static tier on a snapshot, with its immunity gate) is built; slice 2 (the emulator tier) is not. How should the ticket stand once slice 1 lands?"*
+
+**The maintainer:** *"Close; new ticket for slice 2 (Recommended)"*.
+
+**What it means.** #153 closes as done for the static tier; GitHub #181 (opened by `mechanyaa-ai`) carries running the emulator tier on a snapshot, its out-of-git inputs under `~/.cache/vampire-saved` to be probed first.
+
+---
+
+## Ruled 2026-09-26 (14z-183b) — #153: the freeze/release static tier runs on a snapshot at a named commit; the record is a listing plus fingerprints
+
+**The principle, stated by the maintainer before the design was put (verbatim):** *"To be clear, you don't have to reuse the same mechanism used elsewhere. Examples were quoted as examples. The principle is what matters: being immune from any change in the tree while tests, especially long tests, run. Also, know against which commit we ran the tests, just in case an issue resolution could benefit from it."*
+
+**The questions (14z-183b, after the census and three controls; rule-checker runs 265-269, 269 OK), verbatim:** *"Build #153 as designed (clone at a named commit + copy-on-write snapshot of build/, submodules and siblings, a run record, and the immunity control), starting with the static tier at freeze/release cadence?"* and *"How much should each run's record hold, so an issue can be traced back to exactly what was tested?"*
+
+**The maintainer:** *"Build slice 1 (Recommended)"* and *"Listing + fingerprints (Recommended)"*.
+
+**What it means.** `tests/run_on_snapshot.sh` runs a tier in a plain clone of the named commit (its own object store), with all of `build/`, the submodule checkouts and the declared siblings snapshotted by copy-on-write at the start, `ROMDIR` checksum-verified at start and end, the snapshot under `~/.cache/vampire-saved/`, and a record of the commit, the start porcelain, the runner's log, the submodule and bbh commits, a path/size/mtime listing of the snapshot and every build's fingerprint. Immunity is proved by a must-fire control that perturbs a working tree during a snapshot run (and must reach an in-place run). Slice 1 is the static tier at freeze and release cadence; the emulator tier is a later slice; session cadence stays in the working tree (the 2026-09-17 ruling). The census and controls: `build/agent183b/plan_153.md`.
+
+---
+
 ## Ruled 2026-09-26 (14z-183) — M20 freezes with Phobos's landing difference ticketed (#179)
 
 **The question (14z-183, the M20 freeze's attribution re-freeze), verbatim:** *"The M20 freeze exposed a pre-existing Phobos difference: in the parity rig's huitzil_3 events 8/9 (throw, then Sitting Attack 8P/8K), on the landing frame (+156) native Phobos stays at x=1000 and turns around the next frame; ours is pushed 31 px back (x=969) and keeps facing. Identical on merged-m19 (it shipped), hidden until now behind the meter difference #157 fixed. The attribution gate refuses to freeze with an unexplained root. How should M20 proceed?"* Options: freeze, ticket it (Recommended); investigate first.

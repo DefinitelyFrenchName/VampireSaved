@@ -5609,6 +5609,29 @@ re-shoot and compare before the conclusion transfers. And cite a history entry b
 by a line number. The packet's `DECISIONS_HISTORY.md:a-b` citations went stale as entries were
 added at the head (run -75's note). They were re-derived by looking each quoted line up verbatim.
 
+## A CONTROL THAT "FIRES" BECAUSE ITS COPY CRASHED PROVES NOTHING — count a control only when its perturbation reaches the measured state (paid: 14z-183b, GitHub #153)
+
+`tests/test_run_on_snapshot.sh`'s first in-gate controls all read CONTROL FIRED, and every one of them had
+fired on "the probe never reached its pause": the perturbed copy had died before running anything. Two
+bugs of the gate's own made them crash — each control leg's world dir had the same name as the copy's
+dir, so building the world deleted the copy, and a shell function shared its `c` with the loop that
+called it — and the third, once those were fixed, was DEAD for a reason the crash had hidden (the
+runner's own `git checkout <commit> -- build` restored the symlinked `build/` to a real directory). Run
+as MODES, the same controls failed for the right reason, which is how the difference showed. Rule: a
+control's evidence must name the property it perturbs (here "the perturbation REACHED the run: <field>"),
+and any other failure of the perturbed run is a DEAD control, not a fired one.
+
+## A SCRIPT THAT RE-IMPLEMENTS THE RUNNER IS NOT THE RUNNER — it dropped `VS_CADENCE` and read a freeze-cadence red as PASS (paid: 14z-183b, GitHub #153)
+
+#153's census re-ran 50 gates one by one with a small script "invoked as the runner does"
+(`tests/<g>.sh </dev/null`, then `vs_classify`). It read `test_emulator_staleness` PASS in the working
+tree and in the clone alike, while `tests/run_all_static.sh --cadence freeze` read it FAIL in both: the
+runner EXPORTS `VS_CADENCE`, the gate reads it (`CAD="${VS_CADENCE:-session}"`), and the script did not
+set it, so the gate ran at session cadence. A rule-checker reader asked for the runner itself to be
+run (run 2026-09-25-266 Q3/Q4), and that run is what decided. Rule: a per-gate re-run is a probe, not
+a verdict. A verdict about what a tier reads comes from the tier's own runner, or from a script that
+takes the runner's environment verbatim (`grep export tests/run_all_static.sh` names it).
+
 ## A CAPTURE LABELLED WITH THE TRACE'S VALUES IS NOT INDEPENDENT OF THE TRACE — and a sheet too short to show the reaction settles nothing (paid: 14z-183, GitHub #134)
 
 #134's hit/whiff conclusions for Lei-Lei's j.LK were put to the maintainer as capture sheets, and

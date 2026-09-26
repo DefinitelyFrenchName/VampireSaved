@@ -1,0 +1,7 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent183b/plan_153.md	2e05eb3f7ac26dbbf9264a58c8f63a7b7e47bd3e
+build/agent183b/probe153_static.log	9a31c8c3ed1dcffb4b0b68b18941133fc62b6ce8
+build/agent183b/probe_nonpass.txt	220e471ef7b8335b051312e6534d12bdee0edee1
+build/agent183b/nonpass_build_refs_class.txt	f4c7c9e13d640b31a5465669065a795c10e7c5cd
+build/agent183b/build_dir_fingerprints.txt	0a4e5d888fdfce38cdc6dbe96dbdbfdf0f482227
+build/agent183b/prior_art_reader.txt	069718984102a87343c1c324302be08103ced200

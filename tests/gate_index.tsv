@@ -399,3 +399,5 @@ tests/audit_hitbox_parity.sh	character-data
 tests/audit_trap_airborne.sh	tenant
 tests/audit_trap_air_hit.sh	tenant
 tests/test_close_tools.sh	docs
+tests/run_on_snapshot.sh	runner
+tests/test_run_on_snapshot.sh	runner

@@ -1,0 +1,4 @@
+# tests/rulecheck/retractions/14z-183b.tsv — the wordings retracted or corrected in 14z-183b (#153), and reach controls that must be found live. No tracked wording was retracted this sitting: the plan's superseded forms (a curated input list, a pin list for old builds, a --shared clone) lived only in build/agent183b/plan_153.md.
+IMMUNE to the working tree	control: the snapshot-runs doc and README route	reach
+A SCRIPT THAT RE-IMPLEMENTS THE RUNNER IS NOT THE RUNNER	control: the gotcha heading (and its index line)	reach
+closes with slice 1; slice 2 (the emulator tier)	control: the ruling heading, cited by the ticket row	reach

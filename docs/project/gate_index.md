@@ -16,11 +16,11 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**390 scripts** — 99 ci_portable, 84 ci_static, 207 emulator-tier (run by name).
+**392 scripts** — 100 ci_portable, 84 ci_static, 208 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 27 | the suite runners and their own ground truth |
+| [runner](#runner) | 29 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 38 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -40,6 +40,7 @@ the suite runners and their own ground truth.
 | `tests/run_all_emulator.sh` | run | emulator | Verilator, MAME, FBNeo, a build dir, ~1 s | THE EMULATOR-TIER GATE CHAIN. One command, every gate that needs MAME, FBNeo or the Verilator simulator. (14z-128.) | 14z-128 |
 | `tests/run_all_static.sh` | run | emulator | FBNeo, a build dir | THE PRE-COMMIT GATE CHAIN. One command, every gate that does not need an emulator. (14z-94, GitHub #30.) | 14z-94 |
 | `tests/run_battery_m2.sh` | run | emulator | MAME, FBNeo, a build dir, ~15 min | the M2 deliverable battery: the EXACT gate chain a stage-6 dev build must pass before any commit that touches the build (CLAUDE.md rule 2 / persistent-suite doctrine). One command, no chat-memory chain. Sections: 0. | M2 |
+| `tests/run_on_snapshot.sh` | run | emulator | FBNeo, a build dir | RUN A TIER ON A SNAPSHOT AT A NAMED COMMIT, immune to the working tree (GitHub #153, lever B of #148; ruled 2026-09-26, DECISIONS_HISTORY.md "Ruled 2026-09-26 (14z-183b) — #153"). | 2026-09-26 |
 | `tests/run_suite.sh` | run | emulator | MAME | the oracle replay suite (MAME side), auto-detecting runner. | 14z-94 |
 | `tests/test_agent_defs.sh` | test | ci_portable | — | SLICE S4 OF GitHub #172, step 1: every worker definition under `.claude/agents/` STATES its caps (tools/agent/agent_defs.py), ruled 2026-09-23 (14z-177, DECISIONS_HISTORY.md "Ruled 2026-09-23 (14z-177)"): | 2026-09-23 |
 | `tests/test_agent_extract.sh` | test | ci_portable | — | SLICE S3 OF GitHub #172: the transcript EXTRACT the procedural checker (C1) reads says what the transcript says (`tools/agent/extract.py`, 2026-09-23). | 2026-09-23 |
@@ -61,6 +62,7 @@ the suite runners and their own ground truth.
 | `tests/test_must_fire_census.sh` | test | ci_portable | — | THE MUST-FIRE DOCTRINE, MACHINE-READ under the R10 grammar: which gates DECLARE a must-fire control (`# MUST-FIRE: <shape>: | 14z-145 |
 | `tests/test_poke_readback.sh` | test | ci_portable | — | EVERY GATE THAT SAMPLES AN ADDRESS ITS OWN RIG POKES IS ON THE TABLE, and the table's classification is the maintainer's, not the tool's (GitHub #171 slice Q6, shape 4 of docs/project/gate_qualification_scope.md). ci_portable: | 14z-180 |
 | `tests/test_rule_checker.sh` | test | ci_portable | — | the adversarial RULE-CHECKER's record is sound: every run in tests/rulecheck/ledger.tsv is complete and structured, every planted violation was caught, every fixture is calibrated, every VIOLATED resolved, and every freeze since the checker… | 14z-163 |
+| `tests/test_run_on_snapshot.sh` | test | ci_portable | — | S6 OF GitHub #153: a run on a snapshot is IMMUNE to the working tree (ruled 2026-09-26, DECISIONS_HISTORY.md "Ruled 2026-09-26 (14z-183b) — #153"). | 2026-09-26 |
 | `tests/test_shell_portability.sh` | test | ci_portable | — | a `#!/bin/sh` script must actually be POSIX sh (14z-90, GitHub issue #15). | 14z-90 |
 | `tests/test_suite_dispatch.sh` | test | emulator | MAME, a build dir | ground truth for the auto-detecting runner's dispatch pieces (no emulator needed; the emulator-side behaviors they gate are proven by test_m2_repoint.sh and the suite itself): 1. build_fingerprint: vanilla rompath -> 'vsavj'; | 14z-132 |
 | `tests/test_suite_dispatch_selftest.sh` | test | ci_static | ROMDIR | ground truth for the kind->owner table in tests/test_suite_dispatch.sh (14z-90, GitHub issue #7). | 14z-90 |

@@ -107,6 +107,7 @@ declares	audit_x2b7ef4_reach_m18
 declares	run_all_emulator
 declares	run_all_static
 declares	run_battery_m2
+declares	run_on_snapshot
 declares	run_suite
 declares	test_accent_census
 declares	test_advancing_guard
@@ -355,6 +356,7 @@ declares	test_romset_path_guard
 declares	test_rpl2siminputs
 declares	test_rule5_census
 declares	test_rule_checker
+declares	test_run_on_snapshot
 declares	test_s4_thresholds
 declares	test_same_data_p2
 declares	test_select_arrays

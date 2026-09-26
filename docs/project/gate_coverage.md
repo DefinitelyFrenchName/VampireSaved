@@ -13,11 +13,11 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**390 of 390 gates described.**
+**392 of 392 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
-| [runner](#runner) | 27 | 27 | the suite runners and their own ground truth |
+| [runner](#runner) | 29 | 29 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 38 | 38 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 58 | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -30,7 +30,7 @@ first sentence) is `gate_index.md`.
 
 ## runner
 
-the suite runners and their own ground truth. 27 of 27 described.
+the suite runners and their own ground truth. 29 of 29 described.
 
 ### `run_all_emulator.sh` — run, emulator
 
@@ -55,6 +55,14 @@ the suite runners and their own ground truth. 27 of 27 described.
 **HOW:** builds the dev ROM with GEN_FLAGS, then runs the numbered sections in order against it and against the reference sets, each section a gate script with its own verdict, the whole read through tests/lib/classify.sh.
 
 **EXPECTS:** every section PASS; the first red stops the chain and names the section. A build that passes the battery is a candidate for a freeze, not a frozen build.
+
+### `run_on_snapshot.sh` — run, emulator
+
+**WHAT:** a test tier (the runner and its arguments after `--`) runs on a SNAPSHOT of a named commit — a clone of the commit plus every out-of-git input copied at the start — so nothing done to the working tree during the run reaches it, and the run leaves a record of what it tested.
+
+**HOW:** clones the commit, snapshots build/, the submodules and the siblings by copy-on-write, verifies the clone whole and ROMDIR against docs/checksums.txt, writes the record (commit, start porcelain, listing, fingerprints), runs the runner inside the clone, checks the clone and ROMDIR again, removes the snapshot.
+
+**EXPECTS:** the runner's own exit status and log; 2 when a step before the runner is refused (a submodule off its gitlink, the clone not whole, ROMDIR failing verification).
 
 ### `run_suite.sh` — run, emulator
 
@@ -223,6 +231,14 @@ the suite runners and their own ground truth. 27 of 27 described.
 **HOW:** section 1 runs tools/rulecheck.py's parser selftest; section 2 runs `rulecheck.py check` on the real ledger, fixtures, run dirs and registry; section 3 fires six controls on perturbed copies (a quiet plant, a moved reader, an unchecked freeze, a prose verdict, an unbound recorder, a cross-family plant); the RECORD BINDING section proves a pinned-reader run cannot be recorded without its transcript.
 
 **EXPECTS:** PASS with every control fired; a red names the run or fixture and the shape in which the checker could look alive while asserting nothing.
+
+### `test_run_on_snapshot.sh` — test, ci_portable
+
+**WHAT:** tests/run_on_snapshot.sh runs its command on a snapshot that nothing done to the working tree during the run can reach — a tracked file edited and committed, a build/ output rewritten, a tracked build/ file, a submodule file, the ../community sibling, the bbh checkout, and the runner's own file — and its record names the commit the run was taken at.
+
+**HOW:** builds a throwaway world (a repo with a submodule, a build/ output, a community sibling, a bbh checkout), starts a probe under run_on_snapshot.sh that reads all six inputs, pauses it, perturbs all six in the working tree, releases it and has it read them again; then runs the SAME probe IN PLACE with the same perturbation (the positive leg: the perturbation must reach an unsnapshotted run, or the immunity leg proves nothing).
+
+**EXPECTS:** the snapshot run reads all six inputs unchanged and records the commit taken before the perturbation; the in-place run sees all six change; each control makes the gate FAIL.
 
 ### `test_shell_portability.sh` — test, ci_portable
 

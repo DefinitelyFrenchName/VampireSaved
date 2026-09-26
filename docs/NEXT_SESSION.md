@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-183 CLOSE, 2026-09-26)
+# NEXT SESSION — orientation (rewritten at the 14z-183b CLOSE, 2026-09-26)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
@@ -14,15 +14,21 @@ prompt files pasted VERBATIM, `record --session`, `resolve` on ONE line. Say so 
 
 ## START HERE
 
-0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** What the 14z-183 close found and did is in its
-   CLOSE row (STATE 14z-183).
+0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** What the 14z-183 and 14z-183b closes found and did
+   is in their CLOSE rows (STATE 14z-183, 14z-183b).
+0b. **A FREEZE OR RELEASE TIER NOW RUNS ON A SNAPSHOT (#153, ruled 2026-09-26):**
+   `ROMDIR=... tests/run_on_snapshot.sh -- tests/run_all_static.sh --strict --cadence freeze|release` —
+   immune to the working tree while it runs, its commit and inputs recorded under `build/snapshot_runs/`
+   (`docs/project/snapshot_runs.md`). Work may continue in the tree beside it. The emulator tier is #181
+   (not yet on a snapshot: run it in place, never beside edits to what it reads).
 1. **M20 IS FROZEN, NOT RELEASED.** `freeze/merged-m20` (and donovan-m24 / huitzil-m31 / pyron-m25), commit
    `d4cd4d51`, `release/merged-m20/` packaged. The GitHub release (README still names merged-m19) is a
    separate decision — the maintainer's. A release run executes every emulator control (`--controls`) and
    the bitstream-cadence MiSTer gates; **the re-frozen `test_mister_prg_window` pair was copied from the
    freeze lane's own log and NOT re-run** — the release run is its verify.
 2. **Nothing is pending a ruling** — STATE "Decisions pending" is empty.
-3. **Open tickets, the maintainer's to order:** **#179** (Phobos's Sitting Attack landing after a throw —
+3. **Open tickets, the maintainer's to order:** **#181** (the emulator tier on a snapshot — slice 2 of #153;
+   probe its `~/.cache/vampire-saved` inputs first, the way slice 1's census did), **#179** (Phobos's Sitting Attack landing after a throw —
    ours displaced 31 px and not turning; the NEXT STEP is a native-vs-ours capture for the maintainer,
    before any mechanism work), **#180** (two stock-spend throws pay the thrower 0 on M19 and M20 alike; the
    third store pair never observed writing — a vs2 leg on the same inputs first), **#177** (movement parity
@@ -38,12 +44,20 @@ prompt files pasted VERBATIM, `record --session`, `resolve` on ONE line. Say so 
 
 ## WHAT CLOSED THIS SITTING
 
-#157 (FIXED in M20: a tenant throw pays the thrower the record's meter, and the damage scaler reads the
+**14z-183b:** #153 (the freeze/release static tier on a snapshot, immune to the tree: `tests/run_on_snapshot.sh`,
+`tests/test_run_on_snapshot.sh`); slice 2 opened as #181. Ruled: *"Build slice 1"*, *"Listing + fingerprints"*, *"Close; new ticket
+ for slice 2"* — `DECISIONS_HISTORY.md` "Ruled 2026-09-26 (14z-183b)". **14z-183:** #157 (FIXED in M20: a tenant throw pays the thrower the record's meter, and the damage scaler reads the
 attacker — the two measured by `tests/audit_throw_registration.sh` / `tests/audit_move_parity.sh`), #134,
 #138, #140, #154. Item 0b (every #175 figure re-derived, `tools/trap_air_static.py`). Ruled: *"Freeze M20
 now"*, the #112 gate *"Pin it to M19"*, Phobos's landing *"Freeze, ticket it"* (#179).
 
-## TRAPS PAID THIS SITTING (14z-183)
+## TRAPS PAID THIS SITTING (14z-183, 14z-183b)
+
+9. **A per-gate re-run is a probe, not the runner** — mine dropped the runner's `VS_CADENCE` and read a
+   freeze-cadence red as PASS (`docs/project/gotchas.md`). **`sh` reads a script as it runs** — editing
+   `run_on_snapshot.sh` under a live run killed it at a syntax error; the runner now re-execs from a private copy.
+10. **A control that "fires" because its copy crashed proves nothing** — three did at first; a control now
+   counts only when the perturbation REACHES the run.
 
 1. **A gate's printed diff is a `head -40` window.** Comparing two builds through gate logs compared a
    window; freeze the table on BOTH builds (copy aside, restore) and diff the files whole (gotcha filed).
