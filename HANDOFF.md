@@ -35,6 +35,7 @@ a heading):
 | know whether a behavioural value is DOCUMENTED or only baked into a manifest | `python3 tools/audit_rule5.py --report` — the rule-5 census; the migration log is `docs/project/tables/rule5_ledger.md` |
 | know whether an atlas claim still matches the ROM | `python3 tools/checkdocs_rom.py` — every check quotes its claim from the document and re-derives it from the decrypted image; `--uncovered` lists what no check reaches |
 | SEE what a capture/throw looks like, ours vs native | `tools/capture_sheet.sh <att> <vic>` — the "What exists" row; matched by KEYFRAME, never by frame |
+| SEE any naming-rig event, ours vs native, on the same frames (movement, a landing, a move) | `tools/naming_pair_sheet.sh <tenant> <part> <out.png> "<label>:<frames>" ...` — the parity gate's rig and pins, native vs2 above ours; at the matched level the same frame is the same moment (14z-184, #177/#179) |
 | know why something that "should work" does not | `docs/GOTCHAS.md` — always before re-deriving |
 | declare a gate's must-fire control, run one as a mode, or read the controls readout | `docs/project/must_fire_contract.md` — the grammar, `CONTROL=<name> tests/<gate>.sh`, the runners' verdicts ([VSP-181]); the census is `tests/test_must_fire_census.sh` |
 | find a bug, cosmetic item or evolution, see what became of one, or file a new one | `docs/project/tickets.md` (GENERATED from `docs/project/tickets.tsv`, whose header is the spec of record); a new ticket is an issue first, then `python3 tools/tickets.py refresh`, then its row — CLAUDE.md [VSP-182] |

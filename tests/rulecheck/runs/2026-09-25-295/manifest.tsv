@@ -1,0 +1,17 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_move_parity.sh.lines-1-45 (lines 1-45 of tests/audit_move_parity.sh)	955e421fd1b1478514dbccde6cf876cb4cb923fd
+build/agent184/t177/census.txt	79045a49e1576fe182504862c287b88e6fb6b40a
+tools/name_moves.py.lines-250-262 (lines 250-262 of tools/name_moves.py)	f3c2b9132f5e33fe5f33142c71b6eb29ddf06c27
+tools/name_moves.py.lines-464-469 (lines 464-469 of tools/name_moves.py)	27e72a5ac505170c5c024be3c2c8857c48ef3b56
+tools/name_moves.py.lines-524-535 (lines 524-535 of tools/name_moves.py)	10b0fce47f40ca7bf1f9cd9cc1fbdf68afb4f3df
+build/agent184/t177/captures_sent.txt	3c4aa5947aed73ced0a1918015cc7fb0c25d2a14
+build/agent184/t177/movement_sheet.png	358ebc3e5ee00aad52eb7383eb38d1572641ac7b
+build/agent184/t177/phobos_air_sheet.png	ab5ddb7be69fb4c65f1b0f10e5fb64074dc79fb7
+build/agent184/t177/movement2_donovan.png	2aa6ff39979c2b33e61d5dd23fa0a242f0631ae2
+build/agent184/t177/movement2_huitzil.png	7102ee39e6c38c60793fa096203f9318ddafa003
+build/agent184/t177/movement2_pyron.png	fef755138ef5aec2af4568135f2cfc7f8f84ac27
+build/agent184/t177/jump8_donovan.png	50b3fef79801f68cf128e927cbc09050eed3c212
+build/agent184/t177/jump8_huitzil.png	235489b0a75d492f5b83eb8a530e997a72263831
+build/agent184/t177/jump8_pyron.png	fe4f870b75964c54f06d35642c2b15b34b66afcd
+docs/project/coverage_matrix.md.lines-30-30 (lines 30-30 of docs/project/coverage_matrix.md)	2318a4db8d5f8eb657a142ef80f12f6ed9d0b282
+DECISIONS_HISTORY.md.lines-158-158 (lines 158-158 of DECISIONS_HISTORY.md)	2b924b12462f976e1b21d5e5c47da686d654993f

@@ -9,8 +9,8 @@
 # HOW: the 32 naming parts on MAME on both legs as REAL cursor picks (the merged wheel's
 #   path on ours), the level pinned to 6 from 2000 and the RNG from the match anchor, the
 #   comparison window starting at each rig's first event and each event judged in its own
-#   X-pinned window (tools/move_parity.py); four controls (the native level unpinned, the
-#   node untranslated, a stock starved, the X pins ignored).
+#   X-pinned window (tools/move_parity.py); five controls (the native level unpinned, the
+#   node untranslated, a stock starved, the X pins ignored, one movement frame's x moved).
 # EXPECTS: the 526 rows equal to tests/expected/move_parity_events.tsv, every in-DF event
 #   with the flag up on both legs, every DF activation seen; each control turns verdicts. A
 #   DIFF's cause is audit_move_parity_attribution's question.
@@ -22,6 +22,7 @@
 # MUST-FIRE: shadow-tool: no-translation — comparing our RAW anim node pointer against native's, without translating it out of its placement, must fail, so every IDENTICAL verdict is proven to rest on the translation (in-gate: one part is compared both ways; mode: every part is compared untranslated and FAILs)
 # MUST-FIRE: perturbed-copy: stock-starved — a copy of a meter part's OWN trace with the stock zeroed at one event frame must make section 2b report that event as starved, so the headroom check is live on the real traces (in-gate: the first meter part's ours leg, perturbed; mode: every meter part's ours leg is perturbed before 2b and the section FAILs)
 # MUST-FIRE: perturbed-copy: pins-ignored — a copy of OUR trace with the compared X altered on exactly the rig's own X-pin frames (RAM:$FF8410, 40 f before each pinned event) must leave every verdict of the part as frozen under the pin exclusion and move at least one verdict with the exclusion off, so the exclusion is proven live in the comparator and load-bearing on the rig's own writes; a schedule without a `pokes` key is refused by the comparator (in-gate: the first part of the set whose schedule pins X — pyron_4 in the default set — compared both ways on its perturbed copy; mode: every part compared on its perturbed copy with the exclusion off, verdict columns only, and the table FAILs). Until 14z-165 this control hunted for a part whose REAL rows moved with the exclusion off; with Demitri on P2 no part of the 30 does (both legs agree on every pin frame), so a data-dependent control read DEAD
+# MUST-FIRE: perturbed-copy: movement-x — a copy of OUR trace with x altered by +3 on ONE frame ten frames into every MOVEMENT event (Walk forward/back, Jump [8]/[9]/[7], Forward/Back dash, Air Dash, Float — the events #177 asked a gate for) must turn exactly those events DIFF on x and leave every other verdict as frozen, so an IDENT movement verdict is proven to rest on the x path frame by frame (in-gate: the first part of the set with movement events — donovan_1 in the default set; mode: every part's movement events perturbed, and the table FAILs) — added 14z-184 on rule-checker run 2026-09-25-296 Q4
 #
 # WHAT IT MEASURES. tools/name_moves.py already performs every move of the
 # maintainer's move lists (build/manifest/moves_<tenant>.toml, 145 moves) on the
@@ -141,7 +142,7 @@ CONTROL="${CONTROL:-}"
 [ -f "$BUILD/patch/placements.json" ] || { echo "SKIP: no placements.json at $BUILD"; exit 0; }
 [ -f "$EXPECT" ] || { echo "FAIL: no frozen expectation at $EXPECT"; exit 1; }
 case "$CONTROL" in
-    ""|unpinned-level|no-translation|pins-ignored|stock-starved) ;;
+    ""|unpinned-level|no-translation|pins-ignored|stock-starved|movement-x) ;;
     *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;;
 esac
 
@@ -243,7 +244,28 @@ print(n)
 PYX
 }
 
-verdict_for() {  # verdict_for <tenant> <part> [--raw | --pert | --pert-no-pins]
+# perturb_x_moves <schedule.json> <trace in> <trace out>: OUR trace with x altered by +3
+# on ONE frame, ten frames into every MOVEMENT event of the schedule — the movement-x
+# control's perturbed copy (one function, the control and the mode). Prints how many
+# frames were altered (0 = the part has no movement event).
+perturb_x_moves() {
+    python3 - "$1" "$2" "$3" <<'PYM'
+import json, re, sys
+MOVE = re.compile(r"^(Walk forward|Walk back|Jump \[[789]\]|Forward dash|Back dash|Air Dash|Float)")
+at = {e["frame"] + 10 for e in json.load(open(sys.argv[1]))["events"] if MOVE.match(e["name"])}
+n = 0
+with open(sys.argv[2]) as fi, open(sys.argv[3], "w") as fo:
+    for line in fi:
+        f = line.split()
+        if len(f) >= 3 and f[0] == "F" and int(f[1]) in at:
+            f = [("x=%d" % (int(t[2:]) + 3)) if t.startswith("x=") else t for t in f]; n += 1
+            line = " ".join(f) + "\n"
+        fo.write(line)
+print(n)
+PYM
+}
+
+verdict_for() {  # verdict_for <tenant> <part> [--raw | --pert | --pert-no-pins | --pert-move]
     _t="$1"; _p="$2"; _raw="${3:-}"
     # the no-translation MODE applies the same perturbation to every part
     [ "$CONTROL" = no-translation ] && _raw=--raw
@@ -254,6 +276,11 @@ verdict_for() {  # verdict_for <tenant> <part> [--raw | --pert | --pert-no-pins]
     _ours="$W/tr_${_t}_${_p}_ours.txt"
     # the pins-ignored MODE compares every part on its perturbed copy with the exclusion off
     [ "$CONTROL" = pins-ignored ] && _raw=--pert-no-pins
+    [ "$CONTROL" = movement-x ] && _raw=--pert-move
+    case "$_raw" in --pert-move)
+        _ours="$W/tr_${_t}_${_p}_ours.pertmove.txt"
+        [ -f "$_ours" ] || perturb_x_moves "$_j" "$W/tr_${_t}_${_p}_ours.txt" "$_ours" > /dev/null ;;
+    esac
     case "$_raw" in --pert|--pert-no-pins)
         _ours="$W/tr_${_t}_${_p}_ours.pert.txt"
         [ -f "$_ours" ] || perturb_x_pins "$_j" "$W/tr_${_t}_${_p}_ours.txt" "$_ours" > /dev/null ;;
@@ -474,6 +501,40 @@ for part in $SET; do
 done
 if [ -z "$PP" ]; then echo "CONTROL DEAD: pins-ignored — no part in the set both keeps its verdicts under the exclusion and moves one without it, on a copy perturbed on its X-pin frames"; fail=1
 else echo "CONTROL FIRED: pins-ignored — $PP: x altered on its $PN X-pin frames leaves every verdict as frozen under the exclusion and moves $(command diff "$W/exp_ctl_$PP.tsv" "$W/ctl_pertnp_$PP.tsv" | command grep -c '^>' || true) verdict row(s) with the exclusion off"; fi
+
+# movement-x (perturbed-copy, 14z-184, rule-checker run 2026-09-25-296 Q4): the first part of
+# the set with MOVEMENT events gets a copy of OUR trace with x moved by +3 on one frame ten
+# frames into each; exactly those events must read DIFF with x among the fields, and every
+# other row must stay as frozen (verdict columns only).
+MP=""; MN=0; MV=""
+for part in $SET; do
+    t="${part%_*}"; p="${part##*_}"
+    rm -f "$W/tr_${t}_${p}_ours.pertmove.txt"
+    MN="$(perturb_x_moves "$REPO/tests/replays/naming/${t}_${p}.json" "$W/tr_${t}_${p}_ours.txt" "$W/tr_${t}_${p}_ours.pertmove.txt")"
+    [ "$MN" -gt 0 ] || continue
+    verdict_for "$t" "$p" --pert-move | cut -f1-6 > "$W/ctl_pertmove_$part.tsv"
+    awk -F'\t' -v n="$part" '!/^#/ && $1==n' "$EXPECT" | cut -f1-6 > "$W/exp_move_$part.tsv"
+    MV="$(python3 - "$W/exp_move_$part.tsv" "$W/ctl_pertmove_$part.tsv" <<'PYC'
+import re, sys
+MOVE = re.compile(r"^(Walk forward|Walk back|Jump \[[789]\]|Forward dash|Back dash|Air Dash|Float)")
+exp = [l.rstrip("\n").split("\t") for l in open(sys.argv[1]) if l.strip()]
+got = [l.rstrip("\n").split("\t") for l in open(sys.argv[2]) if l.strip()]
+if len(exp) != len(got) or not exp: print("BAD rows %d vs %d" % (len(exp), len(got))); sys.exit()
+moved = still = other = 0
+for e, g in zip(exp, got):
+    if MOVE.match(e[2]):
+        if g[3] == "DIFF" and "x" in g[5].split(","): moved += 1
+        else: still += 1
+    elif e != g: other += 1
+print("OK %d" % moved if still == 0 and other == 0 and moved else "BAD %d moved, %d movement events still as frozen, %d other rows changed" % (moved, still, other))
+PYC
+)"
+    MP="$part"; break
+done
+case "$MV" in
+    "OK "*) echo "CONTROL FIRED: movement-x — $MP: x moved on one frame of each of its ${MV#OK } movement events turns every one DIFF on x and leaves every other row as frozen" ;;
+    *) echo "CONTROL DEAD: movement-x — ${MP:-no part with movement events}: ${MV:-not run}"; fail=1 ;;
+esac
 
 # no-translation: compare the raw pointer. The control part's IDENT events must
 # stop being identical without the placement translation.

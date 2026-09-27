@@ -1,0 +1,25 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_move_parity.sh.lines-1-47 (lines 1-47 of tests/audit_move_parity.sh)	af2f87ebad3456548df19a11d050be0446feaa3d
+tools/move_parity.py.lines-147-207 (lines 147-207 of tools/move_parity.py)	5ffdb0a2e9152b0862aab776f841d50da3290de7
+build/agent184/t177/census.txt	79045a49e1576fe182504862c287b88e6fb6b40a
+tools/name_moves.py.lines-250-262 (lines 250-262 of tools/name_moves.py)	f3c2b9132f5e33fe5f33142c71b6eb29ddf06c27
+tools/name_moves.py.lines-464-469 (lines 464-469 of tools/name_moves.py)	27e72a5ac505170c5c024be3c2c8857c48ef3b56
+tools/name_moves.py.lines-524-535 (lines 524-535 of tools/name_moves.py)	10b0fce47f40ca7bf1f9cd9cc1fbdf68afb4f3df
+build/agent184/t177/parity_plain.log	44488ce28e179bd3b16aaaefc9b9c9fb190b7899
+build/agent184/t177/parity_mode_movex.log	43d3b55307a0b53692bdcb39bb13d5eed52759de
+build/agent184/t177/parity_ingate_huitzil_1.log	28b23e2e5ad1593d6248d01f96ebeafc075434c6
+build/agent184/t177/parity_ingate_pyron_1.log	fe4c8ead692023038ad25d70339d8bb855cac93a
+build/agent184/t177/captures_sent.txt	2866de8a68534091685cf501e5366bb0ea52341e
+build/agent184/t177/movement_sheet.png	358ebc3e5ee00aad52eb7383eb38d1572641ac7b
+build/agent184/t177/phobos_air_sheet.png	ab5ddb7be69fb4c65f1b0f10e5fb64074dc79fb7
+build/agent184/t177/movement2_donovan.png	2aa6ff39979c2b33e61d5dd23fa0a242f0631ae2
+build/agent184/t177/movement2_huitzil.png	7102ee39e6c38c60793fa096203f9318ddafa003
+build/agent184/t177/movement2_pyron.png	fef755138ef5aec2af4568135f2cfc7f8f84ac27
+build/agent184/t177/jump8_donovan.png	50b3fef79801f68cf128e927cbc09050eed3c212
+build/agent184/t177/jump8_huitzil.png	235489b0a75d492f5b83eb8a530e997a72263831
+build/agent184/t177/jump8_pyron.png	fe4f870b75964c54f06d35642c2b15b34b66afcd
+build/agent184/t177/phobos_airdash_rest.png	60fa14b7f20c7a751617db2184eacf301e79485d
+build/agent184/t177/phobos_float_rest.png	9cfd92eface9144177c180c0d7c0a27c7dcbfa38
+docs/project/coverage_matrix.md.lines-30-30 (lines 30-30 of docs/project/coverage_matrix.md)	2318a4db8d5f8eb657a142ef80f12f6ed9d0b282
+DECISIONS_HISTORY.md.lines-158-158 (lines 158-158 of DECISIONS_HISTORY.md)	2b924b12462f976e1b21d5e5c47da686d654993f
+DECISIONS_HISTORY.md.lines-162-164 (lines 162-164 of DECISIONS_HISTORY.md)	7eb3960715eda38c92c3809b76a354ffac897b92

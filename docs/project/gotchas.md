@@ -5977,3 +5977,17 @@ the landing (Lilith's) is evidence; the others' end states are data. Rule: befor
 a cross-game control's outcome, find its FIRST differing frame; if it precedes the event,
 the control compares setups, not the event. `tests/audit_shared_wall_push.sh` freezes that
 first split and carries a control (`early-split`) that proves it can see an earlier one.
+
+## A COVERAGE FINDING READ FROM A GATE'S DESCRIPTION IS NOT A COVERAGE FINDING — read the rigs it runs (paid: 14z-182 filed #177, closed invalid 14z-184)
+
+The 14z-182 re-derivation of #136's scope concluded "no gate compares a tenant's movement
+with native vsav2 ... the parity gate compares x/y only inside move events", and filed #177
+for a movement gate. The sentence about the gate was true and the conclusion false: the
+naming rigs' EVENTS include the movements themselves — part 1 of every tenant runs Walk
+forward/back, Jump [8]/[9]/[7] and Forward/Back dash (Phobos's also five Air Dashes and four
+Floats), every one frozen IDENT frame by frame in `tests/expected/move_parity_events.tsv`.
+Two commands would have shown it (`grep -n "Walk\|Jump\|dash\|Float" tools/name_moves.py`,
+and the part-1 rows of the events table); a session and a ticket were spent instead, and the
+captures the maintainer then had to review. Rule: before a coverage finding says "no gate
+compares X", find X's INPUTS in the rigs and X's ROWS in the frozen tables, not in the prose
+that describes the gate.

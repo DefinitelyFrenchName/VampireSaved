@@ -2520,7 +2520,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **WHAT:** every tenant move, ours vs native vsav2, at a matched speed level and a pinned RNG (#136): the same naming rigs on both games, the tenant's own state compared every frame (node translated out of its placement, seq, sub-state, counter, x, y, stock, facing, DF flag, HP, meter fraction, P2's HP), one verdict per EVENT — IDENT / DIFF / VOID — frozen for all 526 events (506 until 14z-181 added donovan_15 and pyron_7; corrected 14z-183).
 
-**HOW:** the 32 naming parts on MAME on both legs as REAL cursor picks (the merged wheel's path on ours), the level pinned to 6 from 2000 and the RNG from the match anchor, the comparison window starting at each rig's first event and each event judged in its own X-pinned window (tools/move_parity.py); four controls (the native level unpinned, the node untranslated, a stock starved, the X pins ignored).
+**HOW:** the 32 naming parts on MAME on both legs as REAL cursor picks (the merged wheel's path on ours), the level pinned to 6 from 2000 and the RNG from the match anchor, the comparison window starting at each rig's first event and each event judged in its own X-pinned window (tools/move_parity.py); five controls (the native level unpinned, the node untranslated, a stock starved, the X pins ignored, one movement frame's x moved).
 
 **EXPECTS:** the 526 rows equal to tests/expected/move_parity_events.tsv, every in-DF event with the flag up on both legs, every DF activation seen; each control turns verdicts. A DIFF's cause is audit_move_parity_attribution's question.
 
