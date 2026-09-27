@@ -44,15 +44,8 @@ prompt files pasted VERBATIM, `record --session`, `resolve` on ONE line. Say so 
    `tests/test_replay_stage_census.sh`; `tests/lua/trace_writes.lua` was edited for the retired m18 gate's
    pointer. Comments only; every gate whose `# FOLLOWS:` names one of these reads stale until the freeze's
    `--stale` re-run.
-5. **Carried from 14z-183b, still open:** the three ON-TRIAL close checkers under `build/agent183/`
-   (`packet_verify.py`, `class_letters.py`, `classing_cover.py`) — promote or let go; the three gate headers
-   changed at the 14z-183 close re-run at the next freeze's `--stale`; M20 is frozen, not released.
-   **From the 14z-184 close, for the maintainer to rule:** `tests/expected/poke_readback.tsv` carries three
-   UNCLASSIFIED rows for `audit_chains174` (x at `ff8410`, stock at `ff8509`, P2 HP at `ff8850` — the rig's
-   own pins, sampled by the gate); the table's header makes each class the maintainer's. The same three fields
-   of `audit_move_parity`, compared by the same `tools/move_parity.py`, were ruled OBSERVES in 14z-181.
-   Also the close-time checkers of `build/agent184/close/` (`run_checks.sh`, `home_texts.py`,
-   `retraction_classes.py`, `retraction_base.py`) — promote or let go, as for 14z-183b's three.
+5. **Carried from 14z-183b, still open:** the three gate headers changed at the 14z-183 close re-run at the
+   next freeze's `--stale`; M20 is frozen, not released.
 6. **Instrument facts learned this sitting** (read before tapping): a `read_tap.lua` write labelled N is
    replay.lua's / `field_trace.lua`'s frame N+1 (`docs/platform/gotchas.md`); a rig event's outcome can
    depend on its absolute frame — keep measured frames with spacers (`docs/project/gotchas.md`).

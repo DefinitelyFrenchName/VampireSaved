@@ -1,0 +1,20 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: item 5: class audit_chains174's three poke read-back rows OBSERVES; add a three-field pins-ignored control and a landing check (re-checked after 344)
+Claim (the working agent's sentence): Recommend to the maintainer: rule audit_chains174's three UNCLASSIFIED rows in tests/expected/poke_readback.tsv (x at ff8410, stock at ff8509, P2 HP at ff8850) OBSERVES, the class 14z-181 gave the same three fields of audit_move_parity (poke_rows.txt); and add to audit_chains174 two checks, a pins-ignored must-fire control over all three fields and a landing check with its own control (both described below, neither built yet). The evidence is this gate's own traces, kept by a gate run that PASSed (gate.log; the KEEP command in keep_note.txt). gate_match.py ties them to that run: the comparator run on the kept traces reproduces all 14 parity rows gate.log printed (gate_match.log, 3/3 tenants), and swapping two tenants' traces breaks the match (gate_match_plant.log, exit 1). landing.log and probe2.log name the keep dir and each trace's sha1. (1) WHERE THE PINS LAND, read from the traces without the comparator (landing.py, landing.log): every pin whose value was not already held first shows its value at its listed schedule frame, on both legs: x 22, stock 16, p2hp 21, none later and none unseen. 29 pins found their value already held, so where they land cannot be read; they are UNKNOWN. (2) THE COMPARATOR (tools/move_parity.py compare_events, which the gate calls, audit_chains174.sh.lines-150-156) skips a field's own pin frames and compares stock and p2hp as frame-to-frame changes (move_parity.py.lines-147-207). probe2.py calls compare_events directly, with the comparator's own window bounds, and counts only the (verdict, first, fields) triple (probe2.log). OUR trace is perturbed on exactly the pin frames: x +7 on those frames; stock +1 and p2hp -5 as a step from each pin frame on. With the exclusion ON, 0 verdicts move for every field and tenant. With it OFF (--no-pin-exclusion), 30 move, each listed with its from and to, all IDENT to DIFF on the perturbed field, and none outside a window that holds a pin. Every pin-holding row that is IDENT unperturbed moves. The 4 that do not (huitzil rows 6 and 7, the #182 air-block rows) are already DIFF at +30 and +32, before every pin in them (+170 to +570). Unperturbed, turning the exclusion off moves no verdict. Pins before the first event fall in the intro, which the comparator does not compare. NOT tested: that absolute x after an in-window pin is not equalised by the pin for the rest of the window (the shared-write shape audit_move_parity's OBSERVES ruling accepted); where the 29 UNKNOWN pins land; the pins' effect on fields other than these three; any rig other than chains174's; whether a pin inside huitzil rows 6 and 7 would be seen once those rows turn IDENT at the M21 freeze; the proposed checks themselves. The perturbation values are arbitrary.
+Artifacts (read every one, in full):
+  - build/agent185/poke5/probe2.py
+  - build/agent185/poke5/probe2.log
+  - build/agent185/poke5/landing.py
+  - build/agent185/poke5/landing.log
+  - build/agent185/poke5/gate_match.py
+  - build/agent185/poke5/gate_match.log
+  - build/agent185/poke5/gate_match_plant.log
+  - build/agent185/poke5/gate.log
+  - build/agent185/poke5/keep_note.txt
+  - build/agent185/poke5/poke_rows.txt
+  - build/agent185/poke5/move_parity_pins_ignored.txt
+  - tools/move_parity.py.lines-147-207 (lines 147-207 of tools/move_parity.py)
+  - tests/audit_chains174.sh.lines-150-156 (lines 150-156 of tests/audit_chains174.sh)
+  - tests/expected/poke_readback.tsv.lines-1-15 (lines 1-15 of tests/expected/poke_readback.tsv)

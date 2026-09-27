@@ -27,6 +27,20 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-27 (14z-185) — `audit_chains174`'s three poke read-back rows OBSERVES, with a landing check and a three-field pins-ignored control; the seven one-off close checkers let go
+
+**Carried in `docs/NEXT_SESSION.md` item 5 (from the 14z-183b and 14z-184 closes), never a STATE "Decisions pending" entry.** The item as it stood, verbatim: *"`tests/expected/poke_readback.tsv` carries three UNCLASSIFIED rows for `audit_chains174` (x at `ff8410`, stock at `ff8509`, P2 HP at `ff8850` — the rig's own pins, sampled by the gate); the table's header makes each class the maintainer's. The same three fields of `audit_move_parity`, compared by the same `tools/move_parity.py`, were ruled OBSERVES in 14z-181. Also the close-time checkers of `build/agent184/close/` (`run_checks.sh`, `home_texts.py`, `retraction_classes.py`, `retraction_base.py`) — promote or let go, as for 14z-183b's three."* The maintainer's instruction on item 5 this sitting: *"Look at each first"*.
+
+**What was measured first** (`build/agent185/poke5/`; rule-checker runs 2026-09-25-343 to -346, the last OK): on the gate's own kept traces (tied to the PASSing run that kept them by `gate_match.py`, two plants), every observable pin of the three fields lands on its listed frame on both legs (59; 29 already held their value); the comparator's pin exclusion is live (ours perturbed on exactly the pin frames: 0 verdicts move with it, 30 without it, every IDENT pin-holding row among them); and a pin cannot hide a difference from a verdict (31 of the 35 pins in compared windows met equal legs, the other 4 sit in the two #182 rows already DIFF before them; a difference planted on the frame before each pin was caught 30/30). Named as not measured: each event after a pin starts from the rig's shared position by design, and a verdict reports only its window's first difference.
+
+**The questions (AskUserQuestion), verbatim in substance:** (1) how to class the three rows — options "OBSERVES + both checks (Recommended)", "OBSERVES only", "READS-BACK"; (2) the seven one-off checkers (`build/agent183/packet_verify.py`, `class_letters.py`, `classing_cover.py`; `build/agent184/close/run_checks.sh`, `home_texts.py`, `retraction_classes.py`, `retraction_base.py`), three of them doing jobs no tracked tool does — options "Promote the three (Recommended)", "Promote the first two only", "Let all seven go".
+
+**The maintainer:** *"OBSERVES + both checks (Recommended)"* and *"Let all seven go"*.
+
+**What it means.** The three rows read OBSERVES in `tests/expected/poke_readback.tsv`; `tests/audit_chains174.sh` gains the landing check (every observable pin of x, stock and P2 HP lands on its listed frame on both legs, and each field and leg reads at least one) with control `pins-shifted`, and the control `pins-ignored` over all three fields and every tenant (the mode judges the verdict columns only). The seven checkers stay in `build/` as the record of the closes that ran them; no close tool is added.
+
+---
+
 ## Ruled 2026-09-27 (14z-185) — #178 closed as `done`: Hop Kick in Donovan's Dark Force connects alike on both legs (the maintainer said "close"; `done`, a delivered evolution, is the index's reading)
 
 **The question (14z-185, with the capture sheet `build/agent185/t178/hopkick_sheet.png`, native vs2 above ours), verbatim:** *"On the Hop Kick sheet, do you read the same as I do? Inside Dark Force, Hop Kick connects the same way on native vs2 and ours (one hit, 12 damage, same frame; only the gauge differs, by the ruled no-gauge-in-DF rule). #136's \"native lands, ours whiffs\" doesn't reproduce. If so, I freeze the new contact row and close #178."*

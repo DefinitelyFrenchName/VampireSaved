@@ -1,0 +1,12 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent185/poke5/probe.py	e105084d8f084409fb2ba9771a227591b600fd45
+build/agent185/poke5/probe.log	b4e370e81e1a99c7bcb760e48c914f79e8d06cf6
+build/agent185/poke5/landing.py	572ecbad1a6cdc54705f457718662cba8165117a
+build/agent185/poke5/landing.log	7a4311416c4013fb093707d45254734711ec6167
+build/agent185/poke5/gate.log	80f1c8f7c7dad8fba5ddfacf303dbab279739d7c
+build/agent185/poke5/keep_note.txt	745c0f13639dcae790b8b78d4ae60828b0a0bf89
+build/agent185/poke5/poke_rows.txt	c4d2cfc062e72942358d2a3803093d53b610e1e3
+build/agent185/poke5/move_parity_pins_ignored.txt	488c78b141f6e5b319a7676f144c3716facd1b4f
+tools/move_parity.py.lines-40-100 (lines 40-100 of tools/move_parity.py)	5d6fbe2935ebb045d9f1ec28e58bc4cd757aee79
+tests/audit_chains174.sh.lines-150-156 (lines 150-156 of tests/audit_chains174.sh)	30d58a2845e83a8a31a779ecbdf79b069f760c9e
+tests/expected/poke_readback.tsv.lines-1-15 (lines 1-15 of tests/expected/poke_readback.tsv)	2fe64c9b170be7eafc215b874141443aeceefee8

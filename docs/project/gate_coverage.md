@@ -2346,7 +2346,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **HOW:** the rigs are tools/chains174_rigs.py's (built with tools/name_moves.py's machinery, kept OUTSIDE the naming corpus in tests/replays/chains174/, maintainer-ruled 2026-09-27 "Dedicated gate (Recommended)"); each tenant's rig on MAME on native vs2 and on the merged WIDE build as the parity gate runs them (real cursor picks, level 6 from 2000, the RNG from the match anchor); the native trace read against the chain graph decoded from the tenant's vs2 extract (tools/name_moves.py analyse); the two traces compared per event by tools/move_parity.py.
 
-**EXPECTS:** the committed rigs equal a regeneration; every event enters its TARGET chain(s) on native; the per-event rows equal tests/expected/chains174.tsv; both controls fail.
+**EXPECTS:** the committed rigs equal a regeneration; every event enters its TARGET chain(s) on native; every rig pin of x, stock and P2 HP lands on its listed frame on both legs; the per-event rows equal tests/expected/chains174.tsv; every control fails.
 
 ### `audit_column_flash.sh` — audit, emulator
 

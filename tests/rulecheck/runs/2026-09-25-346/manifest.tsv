@@ -1,0 +1,19 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent185/poke5/probe2.py	3b0faba847d27874365747a274846981d4f122c6
+build/agent185/poke5/probe2.log	70ff29135c865353592d09d4591a697754109c0c
+build/agent185/poke5/landing.py	03aebb1eddd15fc102e1659323f506710bb2722a
+build/agent185/poke5/landing.log	8c1948257ec45b488d4a5a5b97aa43e32a529ad8
+build/agent185/poke5/gate_match.py	9f7a411025f7f02a1903c4ccbf3cb2ce4265f2a1
+build/agent185/poke5/gate_match.log	bc25adc096379828994a4544f65667f6392309bf
+build/agent185/poke5/gate_match_plant.log	7e5c5d3c11bfbd928120e4c3b0ef5ee944c8f358
+build/agent185/poke5/gate_match_plant-noexcl.log	32ee1b24fc43ec829eaf0b3da932be69d018044e
+build/agent185/poke5/equalise.py	7aba7602188822457ff7799e04375fddb2bcdab9
+build/agent185/poke5/equalise.log	f3afcfab421726f801c2e7ab9bd27154b676338f
+build/agent185/poke5/gate.log	80f1c8f7c7dad8fba5ddfacf303dbab279739d7c
+build/agent185/poke5/keep_note.txt	745c0f13639dcae790b8b78d4ae60828b0a0bf89
+build/agent185/poke5/poke_rows.txt	c4d2cfc062e72942358d2a3803093d53b610e1e3
+DECISIONS_HISTORY.md.lines-272-297 (lines 272-297 of DECISIONS_HISTORY.md)	8be087f747ec63e0460ba52681f07640dff61ca8
+tools/move_parity.py.lines-147-207 (lines 147-207 of tools/move_parity.py)	5ffdb0a2e9152b0862aab776f841d50da3290de7
+tools/move_parity.py.lines-290-309 (lines 290-309 of tools/move_parity.py)	d0a26c56e8609a496f05b79612a0709dbb922201
+tests/audit_chains174.sh.lines-150-156 (lines 150-156 of tests/audit_chains174.sh)	30d58a2845e83a8a31a779ecbdf79b069f760c9e
+tests/expected/poke_readback.tsv.lines-1-15 (lines 1-15 of tests/expected/poke_readback.tsv)	2fe64c9b170be7eafc215b874141443aeceefee8
