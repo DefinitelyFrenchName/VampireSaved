@@ -344,7 +344,7 @@ echo "  ok: two masked runs of 03_two_player_vs bit-identical"
 
 echo "== 1 (leg a): merged vs VANILLA on the masked-v2 basis — the superset"
 echo "      question. Expectation: the merged build's OWN ratified"
-echo "      classes in tests/expected/merged1 (14z-91),"
+echo "      classes in $EXPECT (merged1 is the default table since 14z-91; MERGED_EXPECT= re-targets it),"
 # --- ENUMERATE (14z-90, GitHub issue #17) --------------------------------
 # The glob below evaluates *.masked ONLY, and said nothing about anything
 # else in the directory. `.pending` marks a legacy pairing with NO ratified
@@ -578,7 +578,7 @@ if [ "$fail" != 0 ]; then
     exit 1
 fi
 echo "PASS: the 3-tenant merged program image lands on the ratified legacy"
-echo "      classes in tests/expected/merged1 — its OWN table since 14z-91 (leg a),"
+echo "      classes in $EXPECT (leg a; merged1, the default, is its OWN table since 14z-91),"
 echo "      and each tenant's own content forms"
 echo "      matches, survives the crash guard, and leaves boot/attract"
 echo "      untouched relative to its frozen single-tenant build (leg b)."

@@ -43,7 +43,8 @@ prompt files pasted VERBATIM, `record --session`, `resolve` on ONE line. Say so 
    `qs_sweep.lua`, `qs_table_trace.lua`, `ring_tap.lua`, `unmapped_probe.lua`) and in
    `tests/test_replay_stage_census.sh`; `tests/lua/trace_writes.lua` was edited for the retired m18 gate's
    pointer. Comments only; every gate whose `# FOLLOWS:` names one of these reads stale until the freeze's
-   `--stale` re-run.
+   `--stale` re-run. 14z-185 adds `tests/audit_merged_legacy.sh` (two echo lines now print `$EXPECT`, the table
+   actually read, instead of a fixed "tests/expected/merged1").
 5. **Carried from 14z-183b, still open:** the three gate headers changed at the 14z-183 close re-run at the
    next freeze's `--stale`; M20 is frozen, not released.
 6. **Instrument facts learned this sitting** (read before tapping): a `read_tap.lua` write labelled N is
