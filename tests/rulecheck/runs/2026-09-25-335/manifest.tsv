@@ -1,0 +1,10 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent185/buildcommit/manifest.diff	a69fead9c4fc324edbac93d26b6de15115960155
+build/agent185/buildcommit/tenant_loop.diff	89c010c6c24aa9bc5825521302f636a1b3259eb4
+build/agent185/buildcommit/row_vs_probe.txt	1a9e201e8bb20b937adf085d1806418040857d50
+build/agent185/buildcommit/fingerprints.txt	112265f3ea400598d34876b23d552f387fa49f52
+build/agent185/buildcommit/tenant_loop.log	0f2b209e8220ee5093f3ff0370806512f0916052
+build/agent185/buildcommit/decisions.diff	62c0f04489732588a347b6460b4ecb22ee222462
+build/agent185/buildcommit/run334_verdict_real.txt	a5ceeb6590a39187fc34fb43aa41813b6e149b75
+build/agent185/plan182.md	b6faaf5f3c338d62b95f058dd8931d6a74159e37
+build/agent185/air_gc/maintainer_14z185.txt	e6d383268dd981ba8e15b890b9be32713c0a3042

@@ -4822,6 +4822,22 @@ the three-leg sheets were read by the maintainer, *"Same, confirmed"*.
 cancel during Dark Force *"will often"* leave Phobos unable to move or attack (*"Fixed in VSAV
 arranged"*). A fix that reproduces vs2's native behaviour must ask whether it reproduces that too.
 
+**THE FIX (14z-185, #182 — Design A, ruled; STAGED for the M21 freeze, NOT YET in the manifests):** a
+`build/manifest/huitzil.toml` row `air_block_guard_window` (staged as `build/manifest/staged/182_designA.patch`), a `[[site_thunk]]` at vsavj's block entry `0x02393A` doing vs2's own id-0x10 stores:
+`move.b #$12,$140(a6); cmpi.b #TT,$382(a6); bne.s; move.b #$e,$158(a6); move.b #$e,$1ab(a6); jmp $023940`. Every
+character's block passes through it (the original store, one compare, one branch). Measured on its probe before
+building: Phobos matches native vs2 on every traced frame of both air-block events of the chains174 rig, with the
+guard cancel and without it (the window's full length, 12 and 11 frames at level 6); the merged legacy oracle
+identical to merged-m20 on all 53 replays while 171 legacy block entries ran through the thunk. A patch confined to
+Phobos's own check was rejected: it has no window to read, and the air-block state it could key on lasts 28 and 27
+frames. **The vs2 Dark Force air-GC glitch** (Mizuumi, quoted by the maintainer: Phobos stuck after an air guard
+cancel in Dark Force) is vs2's P+K Dark Force Power's (the maintainer, 14z-185: *"P+K Power"*). Our reading, not a
+ruling: on our build P+K is vsav's Dark Force Change (`DECISIONS_HISTORY.md` "Ruled 2026-09-18 (14z-168)"; Phobos's
+enters his vs2 EX flight form, `tests/audit_df_modes.sh`), so the Power the glitch is reported in is not reachable
+here. NOT MEASURED: a first probe (P+K on both games) was not like-for-like — on ours P+K put Phobos in his
+flight form where native Power stayed grounded — and the maintainer ruled it dropped, including what it seemed to
+show about native Power: *"we don't know enough to guarantee we reproduced the protocol triggering the glitch"*.
+
 ~~RETRACTED 14z-185 (replaced by the paragraphs above): "the original characters with an air guard
 cancel — the maintainer: *"only Lei-Lei, Zabel and Phobos have an AIR GC. Lei-Lei is 623+P, Zabel
 is 421+K"* — do not read the window; Lei-Lei's air guard cancel (command 0x06, sequence 0x0E) fires

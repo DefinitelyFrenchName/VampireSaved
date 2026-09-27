@@ -1,5 +1,28 @@
 # patch_notes — per-change detail: every byte, and why
 
+## 14z-185 — #182: Phobos's air-block guard window (Design A), RULED AND STAGED for M21 — NOT YET IN THE MANIFESTS
+
+**THE DEFECT.** vs2's block entry (`0x022480`) sends fighter id 0x10 to `0x0224C4`, which opens the guard
+window `+0x158` := 0x0E (and `+0x1AB` := 0x0E) BEFORE the airborne test; vsavj's block entry (`0x02393A`),
+which ours runs, opens it only on a grounded block. Phobos's guard-cancel check (vs2 `0x055470`, ported at
+`0x414920` on the merged image) requires the window, so from an AIR block his Reflect Wall never fired on ours
+(`tests/audit_chains174.sh` events 6 and 7, frozen DIFF at 14z-184). The air guard cancel is Phobos's alone in
+both games (the maintainer, 14z-185; `tests/audit_air_gc_legacy.sh`).
+
+**THE FIX (staged: `build/manifest/staged/182_designA.patch`, applied by the M21 freeze).** One `[[site_thunk]]` in `build/manifest/huitzil.toml`, `air_block_guard_window`, stage 4: the
+site `0x02393A`'s `move.b #$12,$140(a6)` (6 bytes, `1d7c00120140`) becomes `jmp thunk`; the thunk is
+`move.b #$12,$140(a6); cmpi.b #TT,$382(a6); bne.s +12; move.b #$e,$158(a6); move.b #$e,$1ab(a6); jmp $023940`
+(`1d7c001201400c2e00TT0382660c1d7c000e01581d7c000e01ab4ef900023940`, TT = the tenant id, 0x10). Byte
+provenance: the site VSAV -> a jmp; the thunk NEW (authored, reproducing vs2's stores). Ops: huitzil
+375 -> 377, 2-tenant 622 -> 624, 3-tenant 835 -> 837.
+
+**WHAT IT WAS BUILT ON.** Ruled *"Design A"* after rule-checker runs 331-334 (334 OK) on the probe build (this
+row in a copy of the manifest; `build/agent185/probeA/`): Phobos 540/540 traced frames identical to native vs2
+on both air-block events, with and without the guard cancel; the merged legacy oracle identical to merged-m20 on
+all 53 replays with 171 legacy block entries through the thunk; the maintainer's read of the capture *"Same,
+confirmed"*. The vs2 Dark Force air-GC glitch is vs2's P+K Power's (the maintainer: *"P+K Power"*); on ours P+K is vsav's
+Change (ruled 14z-168), so that Power is not reachable here — our reading, not a ruling.
+
 ## 14z-183 — THE M20 FREEZE (donovan-m24 / huitzil-m31 / pyron-m25 / merged-m20, mark M20): #157, the hit-registration pair reconciled
 
 **WHAT THE FREEZE CARRIES.** One fix, ruled *"Freeze M20 now"* on 2026-09-26
