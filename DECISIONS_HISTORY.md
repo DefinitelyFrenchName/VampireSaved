@@ -27,6 +27,16 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-27 (14z-184) — #180 closed as `not-ours`: the zero-meter throws are vs2's own ES behaviour
+
+**The question (14z-184, after rule-checker runs 283-284, 284 OK), verbatim:** *"#180: the two zero-meter throws are ES command throws that native vs2 also pays nothing for, and the third store pair is the applier's KO branch, now observed and gated. Close #180 as not-ours?"* The maintainer first asked for the moves in terms they could identify — *"Can you give me more info on these moves: their input, their names or screen captures... anything that I can easily identify because your inner references are not something I can relate to"* — and was shown a capture sheet from their own recordings (`build/agent184/t180/es_throws_sheet.png`: Pyron's Planet Burning (ES), 63214 + two punches, and Phobos's Circuit Scrapper (ES), 63214 + two punches, each against the CPU's Morrigan, the stock spent and the thrower's gauge not moving at the hit).
+
+**The maintainer:** *"I confirm your judgment : this is VS2 behavior and we can close"*.
+
+**What it means.** #180 closes `not-ours`: an ES command throw pays its user no meter on native vs2, and ours matches it (`docs/game/engine_internals.md` "THE THIRD PAIR STORE IS THE APPLIER'S KO BRANCH"); the third registration-pair store is the object-hit applier's KO branch, observed writing on both games and locked by `tests/audit_throw_registration.sh` part `donovan_2_ko` and its `pair-values` rows. The cases not tested — the recordings' own low-stock ES events on vs2, Donovan's ES moves, whether Pyron's or Phobos's copy of the third store is reachable — were put to the maintainer with the question and are not kept open.
+
+---
+
 ## Ruled 2026-09-27 (14z-184) — #181: the emulator tier on a snapshot — the cache under a private HOME, commit-time mtimes, the run of record copied back, private simulator scratch
 
 **The questions (14z-184, after the census — four snapshot runs of the prereq and fbneo lanes and a static read of the mame and mister lanes; rule-checker runs 277-279, 279 OK), verbatim:** *"How should an emulator-tier snapshot run treat the instrument binaries (the MAME and FBNeo builds under ~/.cache/vampire-saved)?"*, *"test_wide_profile compares file modification times, which a fresh clone resets. What should the snapshot give tracked files?"*, *"Where should a snapshot run's results (build/emu_*) end up?"* and *"The MiSTer simulator's scratch clones are working directories every simulation writes into. What should a snapshot run use?"*

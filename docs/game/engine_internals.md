@@ -3282,7 +3282,23 @@ P2's alone is rewritten every frame by `PC 0x00D46A` when P2 is the CPU); with P
 `+0x3B3` held at 8 on both legs, merged-m19 diverged from native on P2's HP in 49 events
 and the probe (M20's program) matched native on all 49 (STATE 14z-183 row (6b)).
 **FIXED in M20** (the pair stores re-pointed; `tests/audit_throw_registration.sh`
-re-frozen on the fix). **THE LEGACY CONTROL (the maintainer, 2026-09-18: "the values are quite widly different, we really need that control you're doing with a legacy character"):**
+re-frozen on the fix). **THE THIRD PAIR STORE IS THE APPLIER'S KO BRANCH (14z-184, GitHub #180):** the
+x028122 copy's third store (vs2 `0x028B5A/5E`) sits in the object-hit applier `0x28A6A` behind ONE
+branch, `bmi` at `0x28B08` on the victim's `+0x52` after the applier's own damage call (`0x17422`):
+`0x28B10` refills from `+0x138` (the next life bar, rally flags `+0x11F/+0x117` set) when the result is
+at or below it, and `0x28B3C` — the victim on its LAST bar and taken below zero — sets `+0x50/+0x52` to
+`$FFFF` and `+0x11E/+0x11F`, calls `0x17E90`, writes the pair and calls `0x17B22`. It is reached only when
+the applier's damage itself KOs: Donovan's throws deal their damage there (Sharirum Luna [6MP] with the
+victim poked to 4 HP on its last bar reaches it on native, PC `0x028B5A`, and on ours, the placed
+`0x0CFDA8/AC`, frame for frame, both writing (`0x8400`, `0x8800`) to their engine's live pair — M19's
+stores went to the dead pair); Pyron's Planet Burning and his Zodiac Fire (ES) KO through the damage
+routine instead (vs2 `0x0173EE`, vsavj `0x018A7C`) and never reach it, and no Phobos KO was tried
+(`tests/audit_throw_registration.sh` part `donovan_2_ko`, and its `pair-values` rows, which freeze the
+VALUES every contact frame's stores write). **An ES command throw pays its user NO meter on native vs2:**
+Planet Burning (ES) and Circuit Scrapper (ES) spend the stock and deal their hits with the thrower's meter
+fraction unchanged, while the normal Circuit Scrapper pays +12 and +9 — the two zero-meter throws of the
+#157 recordings are these moves, and ours matches native frame for frame (`tests/audit_move_parity.sh`
+parts `pyron_4`, `pyron_5`, `huitzil_4`, `huitzil_6`, meter compared per event). **THE LEGACY CONTROL (the maintainer, 2026-09-18: "the values are quite widly different, we really need that control you're doing with a legacy character"):**
 Demitri throwing Victor under the same taps registers the pair at each engine's
 own throw site (vsavj `0x029694/98`, vs2 `0x0289C6/CA`) and pays Demitri +9 and
 Victor +8 on BOTH pristine vsavj and vsav2 — the host engine's rule is vs2's and

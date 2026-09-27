@@ -1,0 +1,10 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent184/t180/recording_moves.txt	f597f657b88d6e436541dc7dc91c3013843f0bf5
+build/agent184/t180/es_meter_pyron4.txt	35a2163b671a7e3e5c54a85518c50724612e777f
+build/agent184/t180/es_meter_pyron5.txt	03a5ab5fbab6577c0201c89400576851925f32c4
+build/agent184/t180/es_meter_huitzil4.txt	2a2cd799e52560a3359335df92b0010c3a1b8c1b
+build/agent184/t180/es_meter_huitzil6.txt	44c083b8216ae86c88105f4a12f2e085b7951329
+build/agent184/t180/parity_keep.log	9ce074e97eb5124623997770315e6050a381de04
+build/agent184/t180/ko_summary.txt	a512060b14f4d574b97c1d9e9f526cd161631770
+build/agent184/t180/tr_verify.log	8e7391bb7bf517234928d414d909e61f2a21e667
+docs/game/engine_internals.md.lines-3285-3304 (lines 3285-3304 of docs/game/engine_internals.md)	63e24d1d5d9139a2cb071bf454b0421269e58da0

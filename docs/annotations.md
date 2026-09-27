@@ -23,15 +23,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3236 |
-| named by a document or manifest only | 2129 |
-| named by both a document/manifest and code | 737 |
+| distinct program-space addresses named | 3241 |
+| named by a document or manifest only | 2128 |
+| named by both a document/manifest and code | 743 |
 | named by CODE ONLY (the gap list below) | 370 |
 | carried by atlas | 571 |
-| carried by engine_internals | 665 |
-| carried by other docs | 1005 |
+| carried by engine_internals | 673 |
+| carried by other docs | 1010 |
 | carried by manifests | 1818 |
-| carried by code | 1107 |
+| carried by code | 1113 |
 
 ## Addresses
 
@@ -425,7 +425,8 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x01735C` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x017390` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x0173DE` | docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f) |
-| `PRG:0x017422` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; docs/project/patch_notes.md — donovan-m2 stage 4 — damage-pipeline R1 rows; BOTH GATES GREEN (2026-07-27, session 10) [vs2]; docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/reconciliation.toml — map [vs2] |
+| `PRG:0x0173EE` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; docs/game/gotchas.md — A POKED KO NEEDS THE VICTIM ON ITS LAST BAR, AND THE KO MUST COME FROM THE PATH YOU MEAN TO TEST — a low HP alone rallies (paid: 14z-184, GitHub #180) [vs2]; tests/audit_throw_registration.sh |
+| `PRG:0x017422` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; docs/project/patch_notes.md — donovan-m2 stage 4 — damage-pipeline R1 rows; BOTH GATES GREEN (2026-07-27, session 10) [vs2]; docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x01745E` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x017480` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x017522` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; docs/project/patch_notes.md — donovan-m2 stage 4 — damage-pipeline R1 rows; BOTH GATES GREEN (2026-07-27, session 10) [vs2]; docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/reconciliation.toml — map [vs2] |
@@ -440,11 +441,11 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x017806` | docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f) |
 | `PRG:0x0178C2` | docs/game/gotchas.md — In the engine hit-spark spawner, a1 is the VICTIM, a6 the attacker [vs2] |
 | `PRG:0x017A48` | build/manifest/reconciliation.toml — map [vs2] |
-| `PRG:0x017B22` | docs/project/patch_notes.md — donovan-m2 stage 4 — damage-pipeline R1 rows; BOTH GATES GREEN (2026-07-27, session 10) [vs2]; docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/reconciliation.toml — map [vs2] |
+| `PRG:0x017B22` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/patch_notes.md — donovan-m2 stage 4 — damage-pipeline R1 rows; BOTH GATES GREEN (2026-07-27, session 10) [vs2]; docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/reconciliation.toml — map [vs2]; tests/audit_throw_registration.sh |
 | `PRG:0x017B74` | docs/game/engine_internals.md — Hitboxes and attack records (phase 2 of the character-data map, 14z-120 (5), MEASURED); build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x017BE4` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x017D5C` | docs/project/gotchas.md — "THE ONLY WRITER" IS A CLAIM ABOUT THE TAP'S WINDOW — a light hit's overlap frames named the wrong mechanism for the pushback (14z-120 (12), corrected 14z-121 (3)) |
-| `PRG:0x017E90` | build/manifest/reconciliation.toml — map [vs2] |
+| `PRG:0x017E90` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x017FA4` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); tools/charmap_gen.py; tools/hitbox_records.py |
 | `PRG:0x017FA6` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x017FF8` | docs/game/atlas/ram.md — System / match globals; docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); tests/audit_throw_registration.sh |
@@ -513,7 +514,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x018A46` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2] |
 | `PRG:0x018A66` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — machine that consumes it (14z-98, measured end to end on #103) |
 | `PRG:0x018A6C` | docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f) |
-| `PRG:0x018A7C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — machine that consumes it (14z-98, measured end to end on #103); tests/audit_don_ko_writer.sh |
+| `PRG:0x018A7C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — machine that consumes it (14z-98, measured end to end on #103); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/game/gotchas.md — A POKED KO NEEDS THE VICTIM ON ITS LAST BAR, AND THE KO MUST COME FROM THE PATH YOU MEAN TO TEST — a low HP alone rallies (paid: 14z-184, GitHub #180); tests/audit_don_ko_writer.sh; tests/audit_throw_registration.sh |
 | `PRG:0x018A9E` | docs/project/gotchas.md — A ROLLED-BACK RECONCILIATION IS A LIVE DEFECT WITH A NAMED PRICE, NOT A SETTLED STATE — the 14x grab-pointer rollback pays every tenant throw's meter to the wrong fighter (paid: 14z-166, GitHub #136) |
 | `PRG:0x018AB0` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — machine that consumes it (14z-98, measured end to end on #103); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/patch_notes.md — (huitzil-m8 / pyron-m5: the FINAL GUARDIAN zero-damage fix); docs/project/patch_notes.md — donovan-m2 stage 4 — damage-pipeline R1 rows; BOTH GATES GREEN (2026-07-27, session 10); docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); +2 more |
 | `PRG:0x018AC0` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) |
@@ -1128,7 +1129,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0289BE` | build/manifest/donovan.toml — port_patch; build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x0289C6` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; HANDOFF.md — Build registry [vs2]; docs/game/gotchas.md — THE HIT STAGER PAYS METER TO WHOEVER IS REGISTERED, AND ONLY A HIT THAT REGISTERS ITSELF GETS IT RIGHT — the collision walk leaves the pair as (P2, P1) (measured: 14z-166) [vs2]; docs/project/patch_index.md — Romset patch bundles (program + gfx content) [vs2]; docs/project/patch_notes.md — 14z-183 — THE M20 FREEZE (donovan-m24 / huitzil-m31 / pyron-m25 / merged-m20, mark M20): #157, the hit-registration pair reconciled [vs2]; build/manifest/donovan.toml — port_patch; +3 more |
 | `PRG:0x0289CA` | build/manifest/donovan.toml — port_patch; build/manifest/huitzil.toml — port_patch; build/manifest/pyron.toml — port_patch; tests/audit_throw_registration.sh |
-| `PRG:0x028A6A` | docs/game/engine_internals.md — Hitboxes and attack records (phase 2 of the character-data map, 14z-120 (5), MEASURED); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; docs/project/patch_notes.md — (huitzil-m8 / pyron-m5: the FINAL GUARDIAN zero-damage fix); docs/project/patch_notes.md — (huitzil-m8 / pyron-m5: the FINAL GUARDIAN zero-damage fix) [vs2]; docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/donovan.toml — port_patch; +5 more |
+| `PRG:0x028A6A` | docs/game/engine_internals.md — Hitboxes and attack records (phase 2 of the character-data map, 14z-120 (5), MEASURED); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; docs/project/patch_notes.md — (huitzil-m8 / pyron-m5: the FINAL GUARDIAN zero-damage fix); docs/project/patch_notes.md — (huitzil-m8 / pyron-m5: the FINAL GUARDIAN zero-damage fix) [vs2]; docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/donovan.toml — port_patch; +6 more |
 | `PRG:0x028A94` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; HANDOFF.md — Build registry [vs2]; docs/project/patch_index.md — Romset patch bundles (program + gfx content) [vs2]; docs/project/patch_notes.md — 14z-183 — THE M20 FREEZE (donovan-m24 / huitzil-m31 / pyron-m25 / merged-m20, mark M20): #157, the hit-registration pair reconciled [vs2]; build/manifest/donovan.toml — port_patch; build/manifest/huitzil.toml — port_patch; +2 more |
 | `PRG:0x028A98` | build/manifest/donovan.toml — port_patch; build/manifest/huitzil.toml — port_patch; build/manifest/pyron.toml — port_patch; tests/audit_throw_registration.sh |
 | `PRG:0x028AC2` | docs/project/patch_index.md — Mechanism inventory (generator vocabulary) [vs2]; docs/project/patch_notes.md — (huitzil-m8 / pyron-m5: the FINAL GUARDIAN zero-damage fix); build/manifest/donovan.toml — effect [vs2]; build/manifest/donovan.toml — port_patch; build/manifest/huitzil.toml — port_patch; build/manifest/pyron.toml — port_patch |
@@ -1138,7 +1139,10 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x028AE2` | docs/project/patch_notes.md — (huitzil-m8 / pyron-m5: the FINAL GUARDIAN zero-damage fix); build/manifest/donovan.toml — port_patch; build/manifest/huitzil.toml — port_patch; build/manifest/pyron.toml — port_patch |
 | `PRG:0x028AF2` | docs/project/patch_index.md — Mechanism inventory (generator vocabulary) [vs2]; docs/project/patch_notes.md — (huitzil-m8 / pyron-m5: the FINAL GUARDIAN zero-damage fix); build/manifest/donovan.toml — port_patch; build/manifest/huitzil.toml — port_patch; build/manifest/pyron.toml — port_patch |
 | `PRG:0x028AF6` | build/manifest/donovan.toml — effect [vs2] |
-| `PRG:0x028B5A` | HANDOFF.md — Build registry [vs2]; docs/project/patch_index.md — Romset patch bundles (program + gfx content) [vs2]; docs/project/patch_notes.md — 14z-183 — THE M20 FREEZE (donovan-m24 / huitzil-m31 / pyron-m25 / merged-m20, mark M20): #157, the hit-registration pair reconciled; build/manifest/donovan.toml — port_patch; build/manifest/huitzil.toml — port_patch; build/manifest/pyron.toml — port_patch |
+| `PRG:0x028B08` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/game/gotchas.md — A POKED KO NEEDS THE VICTIM ON ITS LAST BAR, AND THE KO MUST COME FROM THE PATH YOU MEAN TO TEST — a low HP alone rallies (paid: 14z-184, GitHub #180); tests/audit_throw_registration.sh |
+| `PRG:0x028B10` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/game/gotchas.md — A POKED KO NEEDS THE VICTIM ON ITS LAST BAR, AND THE KO MUST COME FROM THE PATH YOU MEAN TO TEST — a low HP alone rallies (paid: 14z-184, GitHub #180) |
+| `PRG:0x028B3C` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/game/gotchas.md — A POKED KO NEEDS THE VICTIM ON ITS LAST BAR, AND THE KO MUST COME FROM THE PATH YOU MEAN TO TEST — a low HP alone rallies (paid: 14z-184, GitHub #180); docs/game/gotchas.md — A POKED KO NEEDS THE VICTIM ON ITS LAST BAR, AND THE KO MUST COME FROM THE PATH YOU MEAN TO TEST — a low HP alone rallies (paid: 14z-184, GitHub #180) [vs2]; tests/audit_throw_registration.sh |
+| `PRG:0x028B5A` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; HANDOFF.md — Build registry [vs2]; docs/project/patch_index.md — Romset patch bundles (program + gfx content) [vs2]; docs/project/patch_notes.md — 14z-183 — THE M20 FREEZE (donovan-m24 / huitzil-m31 / pyron-m25 / merged-m20, mark M20): #157, the hit-registration pair reconciled; build/manifest/donovan.toml — port_patch; +3 more |
 | `PRG:0x028B5E` | build/manifest/donovan.toml — port_patch; build/manifest/huitzil.toml — port_patch; build/manifest/pyron.toml — port_patch |
 | `PRG:0x028B7E` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x028BE0` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); tools/audit_reaction_classes.py |
@@ -2330,6 +2334,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0CF360` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 |
 | `PRG:0x0CF370` | docs/project/patch_notes.md — 14z-183 — THE M20 FREEZE (donovan-m24 / huitzil-m31 / pyron-m25 / merged-m20, mark M20): #157, the hit-registration pair reconciled |
 | `PRG:0x0CF598` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
+| `PRG:0x0CFDA8` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); tests/audit_throw_registration.sh |
 | `PRG:0x0D0C7E` | build/manifest/pyron.toml — port_patch; tools/audit_index_users.py |
 | `PRG:0x0D0C7F` | build/manifest/pyron.toml — palette_routine_row_11_c [vs2]; build/manifest/pyron.toml — roster21 [vs2]; tests/test_pyron_cosmo.sh |
 | `PRG:0x0D0CA8` | docs/game/atlas/character_tables.md — M2a extraction findings (session 4, oracle-validated) |

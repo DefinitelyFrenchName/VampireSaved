@@ -7,22 +7,29 @@
 #   read the collision pass's leftover pair reversed — the attacker got the flat 8 and the
 #   victim the record's meter (#136's meter family, #157); the legacy control shows both
 #   engines register the pair, so it was a port defect. Since M20 (14z-183) the stores are
-#   re-pointed at vsavj's live pair.
+#   re-pointed at vsavj's live pair. Since 14z-184 (#180) the KO branch too: the copy's THIRD pair
+#   store (vs2 0x028B5A/5E) is written only when the object-hit applier's own damage leaves the
+#   victim's +0x52 negative, which the donovan_2_ko part makes happen.
 # HOW: read taps on MAME over the live pair, the dead pair and both meters for pyron_3,
-#   huitzil_3 and donovan_5 (7 tap runs each, the parity gate's rig and pins) and the legacy
+#   huitzil_3, donovan_5 and donovan_2_ko (7 tap runs each, the parity gate's rig and pins;
+#   donovan_2_ko is donovan_2's rig to frame 6260 with the victim's HP words poked to 4 and
+#   its +0x138 to 0 two frames into Sharirum Luna [6MP], so the throw KOs him) and the legacy
 #   Demitri-throws-Victor part on pristine vsavj and vs2 with real picks; contact rows,
-#   writer rows and the legacy ids frozen; controls swap the P1/P2 steps, plant a reader of
-#   the dead pair, and plant a second write on a contact frame.
-# EXPECTS: the frozen rows — since the 14z-183 re-freeze ours pays like native (p1=record
+#   the values the live pair's stores wrote per contact (pair-values), writer rows
+#   (donovan_2_ko's carry the third pair on both legs) and the legacy ids frozen; controls swap
+#   the P1/P2 steps, swap a contact's pair values, plant a reader of the dead pair, and plant a
+#   second write on a contact frame.
+# EXPECTS: the frozen rows, pair values included — since the 14z-183 re-freeze ours pays like native (p1=record
 #   p2=+8), the defect rows (ours p1=+8 p2=record) live in the file's git history; no in-play
 #   reader of the dead pair, the legacy legs paying the attacker the record on both engines;
-#   all three controls fail.
+#   all four controls fail.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/throw_registration.tsv
 #   tests/lua/read_tap.lua tests/replays/ tools/name_moves.py tools/run_mame.sh
 #   tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: legs-swapped — a copy of our reduced rows with the P1 and P2 meter steps swapped (the fixed shape) must FAIL the frozen compare (in-gate: the perturbed copy is diffed against the frozen rows and must differ; mode: the real rows are swapped and the gate FAILs)
 # MUST-FIRE: perturbed-copy: dead-reader-planted — a copy of our dead-pair tap with ONE in-play read planted at a game PC must add a reader row and FAIL the frozen compare (in-gate: the planted copy is reduced and must differ; mode: the real tap is planted and the gate FAILs)
+# MUST-FIRE: perturbed-copy: pair-swapped — a copy of our first part's live-pair tap with the two words of its first contact frame's stores swapped (the right place, the wrong values) must change a pair-values row and FAIL the frozen compare (in-gate: the swapped copy is reduced and diffed against the frozen rows; mode: every ours leg is reduced from a swapped copy)
 # MUST-FIRE: perturbed-copy: double-write — a copy of our first part's P1 meter tap with a SECOND write planted on its first contact frame (the same value, a game PC) must print the `/2w` marker and FAIL the frozen compare, so the frozen rows' one-write reading is something the reducer can refuse and not merely a marker that never printed (in-gate: the planted copy is reduced and must differ from the frozen rows and carry /2w; mode: the P1 meter tap of every ours leg is planted and the table FAILs) — added 14z-167 on rule-checker run 2026-09-18-41 Q4
 #
 # WHY. tests/expected/move_parity_events.tsv froze 28 DIFF rows whose first differing
@@ -66,6 +73,10 @@
 #     one reducer reads both), with the P1 and P2 meter steps on that frame. Frozen
 #     14z-166..182 as THE DEFECT (ours p1=+8 p2=record); RE-FROZEN 14z-183 on the
 #     #157 fix (M20): ours pays the attacker the record like native;
+#   pair-values rows (14z-184, #180) — per contact frame, the VALUES the live pair's non-collision
+#     stores wrote, in order (word 0 = attacker slot, word 1 = victim slot): a store that writes the
+#     right place with the wrong value is caught here, and the KO frame's third store, which moves
+#     no meter on its frame, is frozen by value only here;
 #   writer rows — the non-collision writer PCs of the engine's live pair
 #     (native: the throw sites; ours: none) and, on ours, the writer and reader PC
 #     sets of the dead vs2 pair (readers: the boot RAM test only).
@@ -73,7 +84,19 @@
 # tests/audit_move_parity.sh's, copied here; every tap is tests/lua/read_tap.lua,
 # non-debug, so frames are replay-exact; a tap log without END is VOID, never read.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged28] [PARTS="pyron_3 huitzil_3 donovan_5 legacy_demitri"] [FREEZE=1] tests/audit_throw_registration.sh
+# THE KO PART (14z-184, GitHub #180): the x028122 copy's THIRD pair store sits in the object-hit
+# applier (vs2 0x28A6A) behind ONE branch, `bmi` at vs2 0x28B08 on the victim's +0x52 after the
+# applier's own damage call — the victim on its LAST bar (+0x138 = 0) and taken below zero, the KO
+# (0x28B3C sets +0x50/+0x52 to $FFFF and +0x11E/+0x11F, then writes the pair at 0x28B5A/5E and calls
+# 0x17B22). No hand recording and no rig had reached it: a throw's damage goes through the applier
+# only on Donovan's throws, and a KO through another path (the damage routine's own, vs2 0x0173EE /
+# vsavj 0x018A7C) leaves the branch unreached. donovan_2_ko makes that KO. Measured 14z-184 before
+# it was frozen (build/agent184/t180/): native writes the third pair at 0x028B5A/5E on the KO frame and
+# ours at the placed 0x0CFDA8/AC to vsavj's live pair; the meters after the KO equal native's on
+# M20, and on merged-m19 (the unfixed stores) the thrower's and the victim's are swapped.
+KO_donovan_2="5962 6260"   # <poke frame> <frames>: Sharirum Luna [6MP] at 5960 + 2, run to the KO + ~250
+#
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged28] [PARTS="pyron_3 huitzil_3 donovan_5 donovan_2_ko legacy_demitri"] [FREEZE=1] tests/audit_throw_registration.sh
 #   emulator tier, MAME; ~3 min (7 tap runs per part, in parallel)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
@@ -84,12 +107,12 @@ BUILD="${BUILD:-build/m3b_merged28}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/throw_registration.tsv"
 CONTROL="${CONTROL:-}"
-PARTS="${PARTS:-pyron_3 huitzil_3 donovan_5 legacy_demitri}"
+PARTS="${PARTS:-pyron_3 huitzil_3 donovan_5 donovan_2_ko legacy_demitri}"
 FLOOR=2300
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 [ -f "$ROMDIR/vsav2.zip" ] || { echo "SKIP: no vsav2.zip in $ROMDIR"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no WIDE build at $BUILD"; exit 0; }
-case "$CONTROL" in ""|legs-swapped|dead-reader-planted|double-write) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
+case "$CONTROL" in ""|legs-swapped|dead-reader-planted|double-write|pair-swapped) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
@@ -121,7 +144,9 @@ tap() {  # tap <name> <set> <rompath> <rpl> <pokes> <frames> <rtap> <out.txt>   
 }
 # ONE reducer, shared by the gate and both control modes ([VSP-181]): tap logs -> rows
 reduce() {  # reduce <part> <leg> <meter_p1.txt> <meter_p2.txt> <pair.txt> <dead.txt|-> -> rows on stdout
-    python3 - "$@" "$FLOOR" <<'PY'
+    # the floor: FLOOR, or for a KO part its poke frame (the rig's other hits are not the KO)
+    _fl="$FLOOR"; case "$1" in *_ko) eval "_ko=\${KO_${1%_ko}:-}"; _fl="${_ko% *}" ;; esac
+    python3 - "$@" "$_fl" <<'PY'
 import sys
 part, leg, mp1, mp2, pair, dead, floor = sys.argv[1:8]; floor = int(floor)
 def lines(p, kind):
@@ -151,10 +176,20 @@ def steps(p):
     return st, n
 (s1, n1), (s2, n2) = steps(mp1), steps(mp2)
 def fmt(d, n): return (f"{d:+d}" + (f"/{n}w" if n > 1 else "")) if d is not None else "none"
+# the VALUES the live pair's non-collision stores wrote, per contact frame and in order (14z-184, #180: the KO frame's
+# third store changes no meter on that frame, so its value is frozen here or nowhere) — word 0 is the attacker slot
+# (vs2 A5-0x4B74 / vsavj A5-0x4BC6), word 1 the victim slot
+pv = {}
+base_off = min((int(o, 16) for o in {l.split()[5] for l in open(pair) if l.startswith("W ")}), default=0)
+for l in open(pair):
+    t = l.split()
+    if not t or t[0] != "W" or int(t[1]) < floor or t[3] in COLLISION: continue
+    pv.setdefault(int(t[1]), []).append(f"{(int(t[5], 16) - base_off) // 2}={int(t[7], 16) & 0xffff:04x}")
 for f in contacts:
     # the meter's net change on the contact frame (a stock crossing wraps by 0x90 — the raw signed sum is reported);
     # `/Nw` marks a frame with more than one write to that meter word
     print(f"{part}\t{leg}\tcontact\t{f}\tp1={fmt(s1.get(f), n1.get(f, 0))}\tp2={fmt(s2.get(f), n2.get(f, 0))}")
+    print(f"{part}\t{leg}\tpair-values\t{f}\t{','.join(pv.get(f, [])) or '-'}\t-")
 print(f"{part}\t{leg}\tlive-pair-writers\t-\t{','.join(sorted({pc for f,pc,v in pw})) or '-'}\t-")
 if part.startswith("legacy_"):
     import os
@@ -182,6 +217,9 @@ PY
 # the two perturbations, ONE function each (the control section and the mode both call them)
 swap_legs()   { awk -F'\t' 'BEGIN{OFS="\t"} $3=="contact" {t=$5; $5=$6; $6=t; sub(/^p2=/,"p1=",$5); sub(/^p1=/,"p2=",$6)} {print}' "$1"; }
 plant_double(){ awk -v f="$(awk -F'\t' '$3=="contact"{print $4; exit}' "$1")" '{print} $1=="W" && $2==f && !d {d=1; $4="0189a0"; print}' "$2"; }   # plant_double <rows> <meter tap> -> the tap with its contact-frame write doubled
+swap_pair()   { awk -v f="$(awk -F'\t' '$3=="contact"{print $4; exit}' "$1")" '$1=="W" && $2==f && ($4 !~ /^(017ff8|018000|016870|016878)$/) {
+                    if ($6 ~ /(3a|8c)$/) sub(/^ff343a$|^ff348c$/, "SWAP_HI", $6); else if ($6 ~ /(3c|8e)$/) sub(/^ff343c$|^ff348e$/, "SWAP_LO", $6) }
+                  { print }' "$2" | sed -e 's/SWAP_HI/'"$3"'/' -e 's/SWAP_LO/'"$4"'/'; }   # swap_pair <rows> <pair tap> <word1 off> <word0 off>
 plant_reader(){ awk -v f="$FLOOR" '{print} /^END/ && !d {d=1} 1==0' "$1"; printf 'R %d PC 0189a0 off ff348c data 00008400 mask 0000ffff\n' "$((FLOOR + 800))" >> "$2"; }
 
 echo "== 1. the taps, both legs, per part"
@@ -204,10 +242,17 @@ for p in $PARTS; do
         tap "$p.n.i2" vsav2 "$ROMDIR" "$r" "$pk" "$fr" ff8b82,2 "$W/$p.native.id2.txt"
         continue ;;
     esac
-    t="${p%_*}"; j="$R/$p.json"; r="$R/$p.rpl"
+    base="${p%_ko}"; t="${base%_*}"; j="$R/$base.json"; r="$R/$base.rpl"
     [ -f "$j" ] && [ -f "$r" ] || { bad "$p: no naming rig $j / $r"; continue; }
     fr="$(python3 -c "import json;print(json.load(open('$j'))['frames'])")"
+    ko=""
+    if [ "$base" != "$p" ]; then
+        eval "ko=\${KO_$base:-}"; [ -n "$ko" ] || { bad "$p: no KO_$base row (poke frame, frames)"; continue; }
+        fr="${ko#* }"
+    fi
     pk="$(pokes_for "$j" "$fr")"
+    # the KO: both HP words low and the victim on its last bar, two frames into the event (THE KO PART above)
+    [ -z "$ko" ] || pk="$pk;${ko% *}:ff8850:00040004;${ko% *}:ff8938:0000"
     rpl_for "$t" "$r" native "$W/$p.native.rpl"; rpl_for "$t" "$r" ours "$W/$p.ours.rpl"
     ORP="$BUILD/rompath;$ROMDIR"
     tap "$p.o.m1" vsavjw "$ORP"    "$W/$p.ours.rpl"   "$pk" "$fr" ff850a,2 "$W/$p.ours.m1.txt"
@@ -231,6 +276,10 @@ for p in $PARTS; do
         if ! reduce "$p" "$leg" "$W/$p.$leg.m1.txt" "$W/$p.$leg.m2.txt" "$W/$p.$leg.pair.txt" "$dead" > "$W/$p.$leg.rows" 2> "$W/$p.$leg.err"; then
             bad "$p $leg: $(cat "$W/$p.$leg.err")"; continue
         fi
+        if [ "$CONTROL" = pair-swapped ] && [ "$leg" = ours ]; then
+            swap_pair "$W/$p.$leg.rows" "$W/$p.$leg.pair.txt" ff343c ff343a > "$W/$p.$leg.pair.sw"
+            reduce "$p" "$leg" "$W/$p.$leg.m1.txt" "$W/$p.$leg.m2.txt" "$W/$p.$leg.pair.sw" "$dead" > "$W/$p.$leg.rows" 2>> "$W/$p.$leg.err" || bad "$p $leg: the pair-swapped reduction failed"
+        fi
         if [ "$CONTROL" = legs-swapped ] && [ "$leg" = ours ]; then swap_legs "$W/$p.$leg.rows" > "$W/$p.$leg.sw" && mv "$W/$p.$leg.sw" "$W/$p.$leg.rows"; fi
         if [ "$CONTROL" = double-write ] && [ "$leg" = ours ]; then
             plant_double "$W/$p.$leg.rows" "$W/$p.$leg.m1.txt" > "$W/$p.$leg.m1.dbl"
@@ -252,7 +301,9 @@ if [ "${FREEZE:-0}" = 1 ]; then
         echo "# RE-FROZEN 14z-183 on the #157 fix (M20: the placed copies' pair stores re-pointed at vsavj's live pair), with"
         echo "# its rule-checker run named in the commit. A new dead-pair READER or WRITER on ours is a finding; a contact"
         echo "# frame that moves means the rig moved — re-derive before re-freezing."
-        echo "# Columns: part, leg, kind (contact | live-pair-writers | dead-pair-writers | dead-pair-readers), frame, a, b"
+        echo "# Columns: part, leg, kind (contact | pair-values | live-pair-writers | dead-pair-writers | dead-pair-readers), frame, a, b"
+        echo "# pair-values (since 14z-184, #180): the live pair's non-collision stores on that contact frame in order, <word>=<value>,"
+        echo "# word 0 the attacker slot and word 1 the victim slot — the KO frame's third store changes no meter, so its value is frozen here"
         echo "#--"
         cat "$W/got.tsv"
     } > "$EXPECT"
@@ -274,6 +325,10 @@ if [ "$CONTROL" = dead-reader-planted ]; then
     if [ "$fail" = 1 ]; then echo "CONTROL FIRED: dead-reader-planted — the planted in-play reader is a new row"; echo "FAIL: audit_throw_registration (control mode)"; exit 1
     else echo "CONTROL DEAD: dead-reader-planted — the planted reader was not seen"; echo "FAIL: audit_throw_registration"; exit 1; fi
 fi
+if [ "$CONTROL" = pair-swapped ]; then
+    if [ "$fail" = 1 ]; then echo "CONTROL FIRED: pair-swapped — the swapped pair values lose the frozen rows"; echo "FAIL: audit_throw_registration (control mode)"; exit 1
+    else echo "CONTROL DEAD: pair-swapped — the swapped pair values still matched"; echo "FAIL: audit_throw_registration"; exit 1; fi
+fi
 if [ "$CONTROL" = double-write ]; then
     if [ "$fail" = 1 ]; then echo "CONTROL FIRED: double-write — a second write on a contact frame prints /2w and loses the frozen rows"; echo "FAIL: audit_throw_registration (control mode)"; exit 1
     else echo "CONTROL DEAD: double-write — the doubled write still matched"; echo "FAIL: audit_throw_registration"; exit 1; fi
@@ -286,6 +341,11 @@ cp "$W/$first.ours.dead.txt" "$W/ctl.dead"; plant_reader "$W/ctl.dead" "$W/ctl.d
 if reduce "$first" ours "$W/$first.ours.m1.txt" "$W/$first.ours.m2.txt" "$W/$first.ours.pair.txt" "$W/ctl.dead" > "$W/ctl.rows" 2>/dev/null && ! diff -q "$W/$first.ours.want" "$W/ctl.rows" > /dev/null; then
     echo "CONTROL FIRED: dead-reader-planted — one planted in-play read of the dead pair adds a reader row on $first ours"
 else echo "CONTROL DEAD: dead-reader-planted — the planted read changed nothing"; fail=1; fi
+swap_pair "$W/$first.ours.rows" "$W/$first.ours.pair.txt" ff343c ff343a > "$W/ctl.pair"
+if reduce "$first" ours "$W/$first.ours.m1.txt" "$W/$first.ours.m2.txt" "$W/ctl.pair" "$W/$first.ours.dead.txt" > "$W/ctl.prs" 2>/dev/null \
+   && ! diff -q "$W/$first.ours.want" "$W/ctl.prs" > /dev/null && [ "$(grep -c pair-values "$W/ctl.prs")" -gt 0 ]; then
+    echo "CONTROL FIRED: pair-swapped — the two pair words swapped on $first ours' first contact frame change its pair-values row ($(diff "$W/$first.ours.want" "$W/ctl.prs" | grep '^>' | grep -m1 pair-values | cut -f4,5))"
+else echo "CONTROL DEAD: pair-swapped — the swapped pair values changed nothing"; fail=1; fi
 plant_double "$W/$first.ours.rows" "$W/$first.ours.m1.txt" > "$W/ctl.m1"
 if reduce "$first" ours "$W/ctl.m1" "$W/$first.ours.m2.txt" "$W/$first.ours.pair.txt" "$W/$first.ours.dead.txt" > "$W/ctl.dbl" 2>/dev/null \
    && grep -q '/2w' "$W/ctl.dbl" && ! diff -q "$W/$first.ours.want" "$W/ctl.dbl" > /dev/null; then

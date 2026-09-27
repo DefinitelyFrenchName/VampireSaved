@@ -5,7 +5,7 @@
 # issues: 181
 number	state	reason	closed	labels	title
 181	OPEN	-	-	evolution	Run the emulator tier on a snapshot at a named commit (slice 2 of #153)
-180	OPEN	-	-	bug	Two stock-spend tenant throws pay the thrower 0 meter on M19 and M20 alike; the x028122 copy's third store pair was never observed writing (split from #157)
+180	CLOSED	NOT_PLANNED	2026-09-27	bug	Two stock-spend tenant throws pay the thrower 0 meter on M19 and M20 alike; the x028122 copy's third store pair was never observed writing (split from #157)
 179	OPEN	-	-	bug	Phobos's Sitting Attack landing after a throw: ours is displaced 31 px and does not turn, native stays and turns (parity rig huitzil_3 events 8/9)
 178	OPEN	-	-	evolution,severity: medium	Hop Kick in Donovan's Dark Force connects on neither leg of any rig: the thread's 'native lands, ours whiffs' was never compared
 177	OPEN	-	-	evolution	Tenant movement parity vs native vs2: walk, dash, jumps and arcs, Phobos's float and air dash — no gate compares movement against native

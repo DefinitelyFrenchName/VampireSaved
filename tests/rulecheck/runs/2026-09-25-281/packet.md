@@ -1,0 +1,14 @@
+THE PACKET
+
+Decision kind: expectation
+Subject: #180: freeze tests/audit_throw_registration.sh's new rows — the donovan_2_ko part (the third hit-registration pair store, reached by an applier KO) and a pair-values row per contact frame
+Claim (the working agent's sentence): Freeze the 80 rows the full default-parts run adds to tests/expected/throw_registration.tsv — 72 pair-values rows (every contact frame of every part: the live pair's non-collision stores in order, equal between native and ours on every tenant part, including 0=8400,1=8800 twice at the KO frame f6002) and the donovan_2_ko part's contact, writer and reader rows (native live-pair writers 0289c6,0289ca,028a94,028a98,028b5a,028b5e; ours 0cfc14,0cfc18,0cfce2,0cfce6,0cfda8,0cfdac, no dead-pair writer; steps f6002 none/none and f6018 +9/+8 on both) — with every existing row unchanged in that run, because the third pair store (vs2 0x028B5A/5E) is reached only by the object-hit applier's KO branch, which donovan_2_ko produces by poking the victim's HP words to 4 and its +0x138 to 0 two frames into Sharirum Luna [6MP], its evidence being the pair VALUES the store writes (the KO frame moves no meter), and merged-m19 writes nothing to the live pair there and swaps f6018 (+8/+9); NOT tested: a KO reached in real play rather than by pokes, whether Pyron's or Phobos's copy of the third pair is reachable at all (their Planet Burning and Zodiac Fire KOs went through the damage routine instead), a P2-side attacker, and the four controls on the frozen file — they are read in the verify run after the freeze, the unfrozen run's in-gate controls diffing against rows that lack the new kinds.
+Artifacts (read every one, in full):
+  - build/agent184/t180/tr_gate.diff
+  - build/agent184/t180/tr_full_unfrozen.log
+  - build/agent184/t180/tr_added_rows.tsv
+  - build/agent184/t180/tr_ko_m19b.log
+  - build/agent184/t180/ko_summary.txt
+  - build/agent184/t180/ko_other_summary.txt
+  - build/agent184/t180/vs2_028a6a.dis
+  - tests/expected/throw_registration.tsv

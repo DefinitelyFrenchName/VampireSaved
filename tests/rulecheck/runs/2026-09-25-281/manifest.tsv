@@ -1,0 +1,9 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent184/t180/tr_gate.diff	ee40edf4b3c4020ee508a61bdebee65fb963c8c2
+build/agent184/t180/tr_full_unfrozen.log	0d0cca3aab5ac45adb2da74841212cefb1078eff
+build/agent184/t180/tr_added_rows.tsv	dcd96a6313940b885b95167d75714fdc3242d1cb
+build/agent184/t180/tr_ko_m19b.log	439de1a54b24b7fd54f650653b006d336e38cded
+build/agent184/t180/ko_summary.txt	a512060b14f4d574b97c1d9e9f526cd161631770
+build/agent184/t180/ko_other_summary.txt	1830eef3c6d4dcb0fd4c0d4a23ec9f832eb100b4
+build/agent184/t180/vs2_028a6a.dis	5e1e70fc11e4914e3c04d4ff24b51713bf71024b
+tests/expected/throw_registration.tsv	dfc452a1b909359b2748acf1172bbf6212d8d0d9

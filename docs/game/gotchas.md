@@ -927,3 +927,17 @@ changed what the guard decision does with the record (neither a hit of such a re
 every table and compare it passes through, in order — read the chain record → guard →
 stager → `+0x54` → reaction (`tests/test_reaction_classes.sh` prints it for any class;
 `docs/game/engine_internals.md`, "The licence covers the class").
+
+## A POKED KO NEEDS THE VICTIM ON ITS LAST BAR, AND THE KO MUST COME FROM THE PATH YOU MEAN TO TEST — a low HP alone rallies (paid: 14z-184, GitHub #180)
+
+To reach the object-hit applier's KO branch (vs2 `0x28B3C`, the x028122 copy's third registration-pair
+store) I poked the victim's HP words to 4 before a Planet Burning throw. The engine did not KO: at
+`0x28B08` the damage left `+0x52` at or below `+0x138` (the next life bar, 0x90), so `0x28B10` REFILLED
+HP from it and set the rally flags — the life-bar system, not a death. With `+0x138` poked to 0 as well
+(the last bar) the victim died, but through the damage routine (vs2 `0x0173EE`, vsavj `0x018A7C`), not the
+applier: that move's and Zodiac Fire (ES)'s damage never goes through the applier's own damage call. Only a
+move whose damage IS the applier's (Donovan's throws — the #157 taps show the applier dealing the HP four
+frames before the throw event) reaches `0x28B3C`. Rule: a poked KO pokes BOTH HP words and `+0x138`, and the
+tap proves which writer set `$FFFF` before the result is read as the branch under test
+(`tests/audit_throw_registration.sh`, part `donovan_2_ko`; `docs/game/engine_internals.md`, "THE THIRD PAIR
+STORE IS THE APPLIER'S KO BRANCH").

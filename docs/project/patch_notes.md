@@ -23,7 +23,8 @@ damage by the VICTIM's — equal in 2P versus, wrong against the CPU, whose
 **THE FIX.** Six `[[port_patch]]` rows per tenant (stage 6; Donovan's the
 parked rows moved from stage 99, Phobos's and Pyron's added) re-point the three
 store pairs of the copy — vs2 `0x0289C6/CA` (the throw site), `0x028A94/98` (the
-object-hit applier) and `0x028B5A/5E` (a third pair, never observed writing) —
+object-hit applier) and `0x028B5A/5E` (a third pair, never observed writing — *[OBSERVED 14z-184, #180: the
+applier's KO branch; `engine_internals.md` "THE THIRD PAIR STORE IS THE APPLIER'S KO BRANCH"]*) —
 from `-0x4B74/-0x4B72` to `-0x4BC6/-0x4BC4`. The two state-byte clears
 (`clr.b -0x4B3D`) stay parked at stage 99.
 
@@ -46,7 +47,10 @@ The maintainer's three recordings (`p157-probe-04/07/08`) play back to `END`
 under `tools/run_inp_guarded.sh`, every tenant throw paying the thrower the
 move's step. **Not explained:** two throws pay the thrower 0 on both builds
 (after a stock spend, through the routine holding the third pair); the third
-pair was never observed writing.
+pair was never observed writing. *[EXPLAINED 14z-184, #180: both are ES command throws — Planet Burning (ES)
+and Circuit Scrapper (ES) — which pay their user no meter on native vs2 too; the third pair is the object-hit
+applier's KO branch, observed writing on both games (`engine_internals.md`, `tests/audit_throw_registration.sh`
+part `donovan_2_ko`)]*
 
 **FINGERPRINTS.** program / whole-set: donovan `07ffc1af` / `c009a717`;
 huitzil `fe055def` / `10e629c4`; pyron `5f33c110` / `3d016d45`; merged
