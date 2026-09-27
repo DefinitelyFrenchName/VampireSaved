@@ -27,6 +27,16 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-27 (14z-185) — #178 closed as `done`: Hop Kick in Donovan's Dark Force connects alike on both legs (the maintainer said "close"; `done`, a delivered evolution, is the index's reading)
+
+**The question (14z-185, with the capture sheet `build/agent185/t178/hopkick_sheet.png`, native vs2 above ours), verbatim:** *"On the Hop Kick sheet, do you read the same as I do? Inside Dark Force, Hop Kick connects the same way on native vs2 and ours (one hit, 12 damage, same frame; only the gauge differs, by the ruled no-gauge-in-DF rule). #136's \"native lands, ours whiffs\" doesn't reproduce. If so, I freeze the new contact row and close #178."*
+
+**The maintainer:** *"Same, confirmed; close #178 (Recommended)"*.
+
+**What it means.** #178 closes; its index status `done` (the evolution's ask delivered) is the session's reading of the index vocabulary, not the maintainer's word: `tests/audit_df_moves.sh` carries Donovan's contact event (Hop Kick in DF, P2 at the near pin 640, part `donovan_dfx4`), frozen at one hit of 12 damage, class 1, 9 frames after the press on both legs, gauge per the ruled no-gauge-in-DF rule; the gate's CONTACT rule refuses a contact event with no hit on a leg (control `contact-emptied`). The row does not rest on the gate's shared level and RNG pins: the native leg re-run with vsav2's own level and RNG reads the same hit (`build/agent185/t178/unpin_donovan_rows.txt`). The far-pin row (`donovan_dfx2` ev22) stays as frozen: a whiff on both legs (`docs/project/gotchas.md` "AN EMPTY SAME IS AGREEMENT ON A WHIFF, NOT A COMPARISON").
+
+---
+
 ## Ruled 2026-09-27 (14z-185) — #182: Design A (vs2's Phobos-only guard window at vsavj's block entry); the Dark Force glitch placed by the maintainer in vs2's P+K Power, its first measurement dropped
 
 **The facts that framed it, the maintainer (14z-185), verbatim:** *"Many things: 1) apparently Zabel's GC is 623+K and there is no consistency on whether he can GC in the air but mizuumi says no so I believe he doesn't 2) Similarlly, Lei-Lei is not listed by mizuumi as being Air OK, 3) Phobos is confirmed unique in his ability to air GC by Mizuumi"* ... *"So our problem is that apparently only Phobos can Air GC. On the plus side, if this is character specific the vanilla engine does not supersedes the behaviour but the problem is how do we implement it back without side effects"* (the whole answer, with the Mizuumi quotation, is kept at `build/agent185/air_gc/maintainer_14z185.txt`); on the legacy three-leg sheets and on the Phobos sheet (native, merged-m20, Probe A): *"Same, confirmed"* (twice).

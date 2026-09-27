@@ -6,17 +6,19 @@
 #   ordered hits and damage but for the known remaps, and the gauge differs by the two ruled
 #   rules — with the mode proven ENTERED on both legs at every activation. Since 14z-181 also
 #   the CONTACT group (#109's folded leg): Phobos's beams with P2 grounded at a near pin and
-#   jumping into the band, far and near, its own part.
+#   jumping into the band, far and near, its own part; since 14z-185 (#178) Donovan's Hop Kick
+#   in DF with P2 at the near pin, which must HIT on both legs (the CONTACT rule).
 # HOW: the legs in parallel on MAME, the #136 in-DF events re-run ONE per activation (110
 #   frames after it, stocks re-poked, groups spaced past the longer mode; no rig write of any
 #   kind inside a compared window since 14z-181), both legs' ordered hits (damage, class), gauge steps, palette page and RNG reads
-#   compared; nine controls (the mode lost, an idle leg, a blind palette, a dead RNG pin, a
+#   compared; ten controls (the mode lost, an idle leg, a blind palette, a dead RNG pin, a
 #   moved form, a dropped hit, an HP pin inside a compared window, the native leg unpinned, a
-#   poke inside the sword window) each must be refused.
+#   poke inside the sword window, a contact event emptied on our leg) each must be refused.
 #   CAPTURE=<dir> also snapshots the CONTACT group's events at their hit frames on both legs.
 # EXPECTS: SAME on every event but the frozen DIFFER rows, every activation entered on both
-#   legs (else VOID), the nine controls failing. Not shown: that the named move came out AS
-#   that move — the printed state paths say what it did.
+#   legs (else VOID), every CONTACT event hitting on both legs, the ten controls failing.
+#   Not shown: that the named move came out AS that move — the printed state paths say what it
+#   did.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/df_moves.tsv
 #   tests/expected/registry.tsv tests/lua/field_trace.lua tests/lua/read_tap.lua
 #   tests/lua/snapshot_frames.lua tests/lua/sprite_capture.lua tools/build_fingerprint.py
@@ -30,6 +32,7 @@
 # MUST-FIRE: perturbed-copy: pin-in-window — an HP pin planted (in memory) inside the first compared event's window must be refused by the compare, so no compared window carries ANY rig write shared by both legs (the reader refuses every poke address; since 14z-181 the rig itself puts none there: one event per activation, no pin on the expiry wait, the HP pins moved) (in-gate: the planted copy must be refused; mode: the pin is planted before the compare and the gate FAILs) — 14z-181, rule-checker run 2026-09-25-148 Q3
 # MUST-FIRE: perturbed-copy: pins-unpinned — one native leg (UNPIN_PART, default huitzil_dfx2) run with the schedule's pokes only, vsav2's own play-mode level and RNG, must read rows that DIFFER from the pinned native's (or be refused), so the level and RNG pins both legs share are shown load-bearing rather than assumed (the 14z-158 ruling's control, brought to this gate 14z-181 — rule-checker run 2026-09-25-152 Q3; in-gate: the unpinned rows against the pinned; mode: the native leg is replaced by the unpinned one and the gate FAILs)
 # MUST-FIRE: perturbed-copy: sword-poke-planted — a schedule poke planted (in memory) at T5+10, inside the sword flight window, must be refused by the sword-window check, so the check that keeps the frozen form rows free of any shared rig write is itself shown live (in-gate: the planted copy must be refused; mode: the poke is planted before the check and the gate FAILs) — 14z-181, rule-checker run 2026-09-25-154 Q4
+# MUST-FIRE: perturbed-copy: contact-emptied — a copy of the rows with our leg's hits removed from the first CONTACT event (Hop Kick in DF, P2 near) must be refused by the contact rule, so a contact event cannot pass as two whiffs reading SAME (in-gate: the emptied copy must fail the contact reader; mode: the real rows are emptied and the gate FAILs) — GitHub #178, 14z-185
 # MUST-FIRE: perturbed-copy: hit-dropped — a copy of our rows with the first event's first hit removed (what a mode that lost an altered attack would read) must FAIL the frozen compare, so the frozen rows are what the altered attacks did (in-gate: the perturbed copy must differ from the frozen rows; mode: our rows are rewritten before the compare and the table FAILs)
 #
 # WHY. The #136 parity rigs outran the 360-frame Dark Force (25 NOT-IN-DF rows). Put to the
@@ -93,7 +96,7 @@ CONTROL="${CONTROL:-}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 [ -f "$ROMDIR/vsav2.zip" ] || { echo "SKIP: no vsav2.zip in $ROMDIR"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no WIDE build at $BUILD"; exit 0; }
-case "$CONTROL" in ""|hit-dropped|mode-lost|idle-leg|form-moved|rng-dead|palette-blind|pin-in-window|pins-unpinned|sword-poke-planted) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
+case "$CONTROL" in ""|hit-dropped|contact-emptied|mode-lost|idle-leg|form-moved|rng-dead|palette-blind|pin-in-window|pins-unpinned|sword-poke-planted) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
@@ -133,7 +136,11 @@ SRC = {"donovan": [("6", range(3, 27)), ("4", [22])], "huitzil": [("4", [12, 13]
 EXTRA = {"huitzil": [("5LP press in DF, P2 grounded near", [(0, 3, "1")], 220, "far", 640),
                      ("5HP press in DF, P2 grounded near", [(0, 3, "3")], 220, "far", 640),
                      ("5LP press in DF, P2 jumping far", [(0, 2, "U", "p2"), (10, 13, "1")], 220, "far", None),
-                     ("5LP press in DF, P2 jumping near", [(0, 2, "U", "p2"), (10, 13, "1")], 220, "far", 640)]}
+                     ("5LP press in DF, P2 jumping near", [(0, 2, "U", "p2"), (10, 13, "1")], 220, "far", 640)],
+         # GitHub #178 (14z-185): Hop Kick INSIDE Donovan's Dark Force with P2 at the near pin. At the far pin (dfx2's
+         # "Hop Kick in DF") it whiffs on both legs, an empty SAME; measured 14z-185 at P2 640/680/700 it connects on
+         # both legs alike (build/agent185/t178/probe1.log). CONTACT_EVENTS below makes the gate refuse a no-hit leg.
+         "donovan": [("Hop Kick in DF, P2 near", nm.fwd("HK"), 150, "far", 640)]}
 for tenant, srcs in SRC.items():
     groups, cur, used = [], [], 0
     for part, evs in srcs:
@@ -619,6 +626,33 @@ if [ "$CONTROL" = hit-dropped ]; then drop_hit "$W/got.tsv" "$W/got.hd" && mv "$
 ok "$(grep -c '^ev' "$W/got.tsv" | tr -d ' ') in-DF events; $(awk -F'\t' '$5=="SAME"' "$W/got.tsv" | grep -c . || true) SAME, $(awk -F'\t' '$5=="DIFFER(p1meter)"' "$W/got.tsv" | grep -c . || true) differing only in P1's gauge, $(awk -F'\t' '$1=="ev" && $5!="SAME" && $5!="DIFFER(p1meter)"' "$W/got.tsv" | grep -c . || true) other"
 awk -F'\t' '$1=="ev" && $5!="SAME" && $5!="DIFFER(p1meter)" {print "        " $2 " ev" $3 " " $4 ": " $5}' "$W/got.tsv"
 
+# THE CONTACT RULE (14z-185, GitHub #178): a contact event must HIT on BOTH legs, or two whiffs read SAME and the
+# comparison it exists for was never made (Hop Kick in DF at the far pin, until 14z-185). ONE reader, shared by the
+# gate, the in-gate control and the mode; `empty_contact` rewrites a copy of the rows with our leg's hits removed
+# from the first contact event (what a rig that lost the contact on one leg would read).
+CONTACT_EVENTS="Hop Kick in DF, P2 near"
+contact() {  # contact <rows.tsv>: prints the checked events, exits 1 naming a contact event with no hit on a leg
+    awk -F'\t' -v names="$CONTACT_EVENTS" 'BEGIN { n = split(names, a, ";"); for (i = 1; i <= n; i++) want[a[i]] = 1 }
+        $1 == "ev" && ($4 in want) { seen[$4] = 1
+            if ($6 ~ /^native=\[\]/ || $7 ~ /^ours=\[\]/) { print $2 " ev" $3 " " $4 ": no hit on a leg (" $6 " | " $7 ")" > "/dev/stderr"; bad = 1 }
+            else print $2 " ev" $3 " " $4 }
+        END { for (k in want) if (!(k in seen)) { print k ": not in the rows" > "/dev/stderr"; bad = 1 }; exit bad }' "$1"
+}
+empty_contact() {  # empty_contact <rows in> <rows out>
+    awk -F'\t' -v OFS='\t' -v names="$CONTACT_EVENTS" 'BEGIN { split(names, a, ";"); first = a[1] }
+        $1 == "ev" && $4 == first && !done { sub(/^ours=\[[^]]*\]/, "ours=[]", $7); done = 1 } { print }' "$1" > "$2"
+}
+if [ "$CONTROL" = contact-emptied ]; then empty_contact "$W/got.tsv" "$W/got.ce" && mv "$W/got.ce" "$W/got.tsv"; fi
+if _c="$(contact "$W/got.tsv" 2> "$W/contact.err")"; then ok "every contact event hits on both legs: $(echo "$_c" | tr '\n' ';')"
+else bad "a contact event did not connect on both legs:"; sed 's/^/        /' "$W/contact.err"; fi
+if [ "$CONTROL" = contact-emptied ]; then
+    if [ "$fail" = 1 ]; then echo "CONTROL FIRED: contact-emptied — a contact event with no hit on our leg is refused"; echo "FAIL: audit_df_moves (control mode)"; exit 1
+    else echo "CONTROL DEAD: contact-emptied — the emptied row was not seen"; echo "FAIL: audit_df_moves"; exit 1; fi
+fi
+empty_contact "$W/got.tsv" "$W/ctl_ce.tsv"
+if contact "$W/ctl_ce.tsv" > /dev/null 2>&1; then echo "CONTROL DEAD: contact-emptied — emptying our leg's hits of the first contact event was not seen"; fail=1
+else echo "CONTROL FIRED: contact-emptied — emptying our leg's hits of the first contact event is refused"; fi
+
 # THE FREEZE COMES LAST AND IS REFUSED ON ANY RED (14z-181, rule-checker run 2026-09-25-149 Q4: until then the
 # block sat before the hit-dropped control and never read $fail, so a run with an event outside the mode, an idle
 # leg, a failed form check or a DEAD control would still have frozen).
@@ -635,6 +669,8 @@ if [ "${FREEZE:-0}" = 1 ] && [ -z "$CONTROL" ]; then
       echo "# Re-frozen 14z-181 (rule-checker runs 2026-09-25-148/149): the CONTACT group (huitzil_dfx2, #109's folded leg) and"
       echo "# donovan_dfx1 ev25 (2HP in DF) at three hits, with every rig HP pin moved out of the compared windows (the shared-pin"
       echo "# gotcha); runs 2026-09-25-150..155 moved the sword windows past the 5HP x pin and re-anchored them (see the sword rows)."
+      echo "# Re-frozen 14z-185 (GitHub #178): Donovan's CONTACT event, Hop Kick in DF with P2 at the near pin 640 (donovan_dfx4),"
+      echo "# which the CONTACT rule requires to hit on both legs."
       echo "#--"; cat "$W/got.tsv"; } > "$EXPECT"
     echo "  FROZE  $(basename "$EXPECT") — VERIFY by re-running without FREEZE"; exit 0
 fi

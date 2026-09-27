@@ -6003,3 +6003,12 @@ by). Rule: a rig whose events were MEASURED to enter keeps their absolute frames
 event is replaced by a SPACER of the same length (`tools/chains174_rigs.py` does, and its
 gate's entry check skips spacers) — and any reorder is re-measured on native before a freeze;
 the entry check then turns a lost phase into a red, never a silent pass.
+
+## AN EMPTY SAME IS AGREEMENT ON A WHIFF, NOT A COMPARISON — a contact event must be ASSERTED to hit on both legs (paid: #136's thread, #178, closed 14z-185)
+
+`tests/audit_df_moves.sh` froze "Hop Kick in DF" as SAME with `native=[] ours=[]`: at the rig's far pin
+(552/728) the kick whiffed on both legs, so the row compared two misses and said nothing about the hit #136's
+thread had described ("native lands, ours whiffs"). #178 asked for the contact; with P2 moved to the near pin 640
+the kick connects alike on both legs and the thread's claim does not reproduce. Rule: a row whose purpose is a
+HIT comparison needs a reader that REFUSES a leg with no hit (the gate's CONTACT rule, control `contact-emptied`),
+and a no-hit SAME is never evidence that two legs agree on the move — only that neither reached it.

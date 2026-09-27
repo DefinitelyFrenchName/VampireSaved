@@ -1,0 +1,14 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent185/t178/gate.diff	a54c72a31323fbd0d48721729986e2eb09b40dd8
+build/agent185/t178/df_moves.diff	72599d460e8ac97a2dc320bc98ae700cb4c07b9d
+build/agent185/t178/gate_freeze.log	58acb27c7bc13faa72c9b9ba8187fa216a16b680
+build/agent185/t178/gate_plain.log	fed977d15f4bb70bf18a94e61e33a81e26a6680e
+build/agent185/t178/gate_contact-emptied.log	4b0b716c9532bd05ea48d5dac90c452000adf32e
+build/agent185/t178/gate_hit-dropped.log	1c8c1ec7047625250417a8c72610ea21e6489c18
+build/agent185/t178/gate_pins-unpinned.log	a24b4a298215343673fdb4d37002fbdce670809a
+build/agent185/t178/gate_mode-lost.log	49403d2f3140f2b9253ca3afa0db776c25f9c8c1
+build/agent185/t178/probe1.log	4a48e7519065535deae0620f1fab9c4fac7d5368
+build/agent185/t178/hopkick_sheet.png	3ab254f552c25ac47f9663c658650b1769fc111c
+build/agent185/t178/maintainer_178.txt	f3f8a0700f783ab9752ddb427ccb8a4ebf91f843
+build/agent185/t178/issue178.txt	32cb637bb10497e27316eb61daa27688bdc1eeb8
+build/agent185/t178/docs.diff	d80a9a98d2e342ba6eab1035573fa5520679bc7a

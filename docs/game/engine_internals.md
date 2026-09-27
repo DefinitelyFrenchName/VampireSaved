@@ -4272,7 +4272,11 @@ the native leg). Compared by the ORDERED hits (damage, P2 reaction class) and ga
 flying sword and Anita (Donovan), the clone beams (Phobos) and the flame burst (Pyron) land the
 same hits for the same damage on the same frames (Phobos's clone hits one frame later on ours);
 the one hit difference is Lightning Sword's class byte (0x4E natively, 0x06 on ours — the 14z-35
-remap under the 14z-42 thunks; equal damage and frame). Every other difference is gauge: vs2's EX
+remap under the 14z-42 thunks; equal damage and frame). **Donovan's Hop Kick (6HK) in Dark Force** (#178, 14z-185): at the far pin it
+whiffs on BOTH legs (an agreement on a whiff, not a comparison); with P2 at the near pin 640 it connects alike on both —
+one hit, 12 damage, class 1, 9 frames after the press — so the #136 thread's "native lands, ours whiffs" does not
+reproduce; the gate's CONTACT rule now requires that event to hit on both legs (the maintainer read the capture:
+*"Same, confirmed"*). Every other difference is gauge: vs2's EX
 install pays start-up AND hit gauge, ours pays no hit gauge in the mode (vsav's rule, ruled correct)
 but still the tenants' start-up gauge (the defect below). So the first in-DF comparison's "extra
 hits" and "missing damage" (our P+K against vs2's P+K) were the two different modes, not the port.
