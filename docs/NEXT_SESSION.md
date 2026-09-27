@@ -27,13 +27,9 @@ prompt files pasted VERBATIM, `record --session`, `resolve` on ONE line. Say so 
    the bitstream-cadence MiSTer gates; **the re-frozen `test_mister_prg_window` pair was copied from the
    freeze lane's own log and NOT re-run** — the release run is its verify.
 2. **Nothing is pending a ruling** — STATE "Decisions pending" is empty.
-3. **Open tickets, the maintainer's to order:** **#181** (the emulator tier on a snapshot — slice 2 of #153;
-   probe its `~/.cache/vampire-saved` inputs first, the way slice 1's census did), **#179** (Phobos's Sitting Attack landing after a throw —
-   ours displaced 31 px and not turning; the NEXT STEP is a native-vs-ours capture for the maintainer,
-   before any mechanism work), **#180** (two stock-spend throws pay the thrower 0 on M19 and M20 alike; the
-   third store pair never observed writing — a vs2 leg on the same inputs first), **#177** (movement parity
-   vs native), **#178** (Hop Kick in Donovan's Dark Force), **#176** (the RNG's advance), #174, #145, #170,
-   #159.
+3. **Open tickets, the maintainer's to order** (14z-184 closed #181, #180 and #179; the maintainer's order continues):
+   **#177** (movement parity vs native), **#174**, **#178** (Hop Kick in Donovan's Dark Force), **#176** (the RNG's
+   advance), **#159**; then #145, #170.
 4. **Three close-time checkers are ON TRIAL** (`build/agent183/`, untracked): `packet_verify.py` (re-opens every
    packet quote), `class_letters.py` (every finding letter in exactly one test class), `classing_cover.py`
    (every retracted hit classed). Each has a plant that fires. Promote them to `tools/` beside

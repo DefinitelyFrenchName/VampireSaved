@@ -1,0 +1,15 @@
+THE PACKET
+
+Decision kind: expectation
+Subject: #179: freeze tests/expected/shared_wall_push.tsv, the new gate tests/audit_shared_wall_push.sh — re-check after run 292
+Claim (the working agent's sentence): Freeze tests/expected/shared_wall_push.tsv as measured by FREEZE=1 (gate_freeze.log, 17 rows; the frozen rows unchanged by the later gate edits, which added a second instrument and a control and re-ran green: gate_run_plain.log): legacy_lilith — vsavj's push-apart moves P1 (Lilith) to x 0x3C0 at PC 0x0193B2 on read_tap label f3144, vs2's moves P2 (Victor) at 0x017DB4, vs2's clamp PC 0x02745E the only non-zero +0x148 writer from f2300 to the run's end and vsavj none, the end x 960/1000 reversed between the games, ids 0x0E/0x03 on both, the first split f3144; huitzil_3 — ours moves P1 (Phobos) at 0x0193B2 from f6150, native moves P2 (Demitri) at 0x017DB4 on f6150-6151, native's +0x148 writers 0x027444 and 0x02745E and ours none. A second instrument, field_trace.lua (RAM sampled at frame_done), runs every leg and agrees with the write taps on every unpoked frame (859/859 on both Lilith legs, 3850/3850 on both Phobos legs, with the measured label offset — a tap write labelled N is the trace's N+1, offset_probe/compare.py — and the nine rig-poked frames excluded and counted), and re-derives the end rows and the legacy split, which must equal the taps'; the plain run PASSes with all three in-gate controls fired and each control mode FAILs. NOT tested: the push rows, the flag rows and the ids rows rest on read_tap.lua alone (field_trace samples values, not writer PCs); the flag-planted control plants at PC 0x0281F0, a vsavj clamp instruction, not a tenant (0x4xxxxx) PC; both instruments share MAME, the rig and its pokes (the huitzil_3 part's position pins before each event on both legs); the flag row covers frames 2300 to each run's end only; the ids row reads the last pre-match write.
+Artifacts (read every one, in full):
+  - tests/audit_shared_wall_push.sh
+  - tests/expected/shared_wall_push.tsv
+  - build/agent184/t179/gate_freeze.log
+  - build/agent184/t179/gate_run_plain.log
+  - build/agent184/t179/gate_run_flag-planted.log
+  - build/agent184/t179/gate_run_early-split.log
+  - build/agent184/t179/gate_run_legs-swapped.log
+  - build/agent184/t179/offset_probe/compare.py
+  - tests/replays/naming/huitzil_3.json

@@ -3,9 +3,13 @@
 --
 -- INPUT STAGING IS CANONICAL (GitHub #10, unified 14z-94). This instrument
 -- follows tests/lua/replay.lua exactly: parse `held[fr]`, stage for the NEXT
--- frame (`held[frame + 1]`). So a frame number in this log IS a replay.lua
--- frame number and CAN be cross-referenced with a compare_* first divergence,
--- a masked window onset or a checksum log.
+-- frame (`held[frame + 1]`). So INPUTS land on the same frames as replay.lua's.
+-- But the `f<N> id` lines are logged from the tap DURING the frame, labelled
+-- with the counter BEFORE frame_done increments it: such a line labelled N
+-- belongs to replay.lua's frame N+1 — add one before cross-referencing a
+-- compare_* first divergence, a masked window onset or a checksum log. Lines
+-- written inside frame_done carry replay.lua's number (14z-184,
+-- docs/platform/gotchas.md; measured on read_tap.lua, the same mechanism).
 --
 -- It was one of the ten `+1` deviants until 14z-94. The split is now pinned
 -- at ZERO by tests/test_replay_stage_census.sh, which fails any new

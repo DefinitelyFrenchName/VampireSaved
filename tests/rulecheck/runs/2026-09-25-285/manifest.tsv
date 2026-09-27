@@ -1,0 +1,9 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent184/t179/ev8_mechanism.txt	2d842c6da35e05493297a0335905c8d083988562
+build/agent184/t179/push_resolvers.dis	9f02f38506c3c197344bead5171e989bd346f44e
+build/agent184/t179/push_prologue.dis	3ad869c9757933320d92478919b2a180bbc3fd05
+build/agent184/t179/flag148.txt	79958580cacaf1d34bf8d613ccd1a359371a0a28
+build/agent184/t179/legacy_control.txt	5763f1a0449338df11090137f11fb508077f08e6
+build/agent184/t179/legacy/corner.rpl	fae6ba993d4937c9ae8f2f4f1b4a68cc3d5a63f2
+build/agent184/t179/legacy/run.sh	d40cdce50e88288fbc3747abb293519f702daa72
+build/agent184/t179/sitting_attack_ev8_landing.png	4ddc39473f40e57cc37d15d5e9abc5b6d358a417

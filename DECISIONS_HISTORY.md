@@ -27,6 +27,28 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-27 (14z-184) — #179 closed as `not-ours`: who keeps a shared corner is vsavj's own push rule; documented and gated
+
+**The captures and the maintainer's reading.** Phobos's Sitting Attack landing (huitzil_3 event 8, native vs2 above ours) was shown first; the maintainer: *"Yes, I see the difference and the difference is more important than just not being the same as in VS2, it's mechanically different. Especially in the corner, if the move makes Phobos switch sides, it means Phobos is now cornered, which changes the gameplay dynamics. So we need to dig deeper."* Two legacy controls were corrected by the maintainer (*"Victor is absolutely not in the corner. Both characters are around the mid point of the level"*; *"so you are literally comparing two entirely different setups"*), who then designed the control: *"You not only need the move but the same setup of character and positions ... As for the move what you need is a pursuit move and for all characters in VS and VS2 the command is 8P/K"* and *"pursuit moves (8+P/K) are performed OTG, so the opponent needs to have been knocked down first"*. On that control's capture (Lilith on Victor, pristine vsavj above vs2, identical until the landing, then split): *"from what I see it seems indeed to be an engine-wide property. If so, the vanilla engine works BUT we aboslutely must document this difference in the two games as we did with other game engine differences in the past"*.
+
+**The question (after rule-checker runs 289-294; 293 and 294 OK), verbatim:** *"#179: the difference is now documented and gated. docs/game/engine_internals.md has a new section, \"THE PUSH-APART AT A SHARED WALL\", with a vsavj/vs2 table for the Lilith and Phobos cases. The RAM atlas gains rows for the wall-side byte and the push-order flag. tests/audit_shared_wall_push.sh freezes both cases, and vsavj's rule stays as it is. Do we close #179 as not-ours?"*
+
+**The maintainer:** *"Close not-ours (Recommended)"*.
+
+**What it means.** #179 closes `not-ours`. The push-apart routine is the same in both games and, with both fighters walled, pushes out its first fighter — P1 unless P1's `+0x148` is set; vs2's view clamp sets it, vsavj's does not — so on a shared wall vsavj pushes P1 out and vs2 P2, for original characters as for the tenants (`docs/game/engine_internals.md` "THE PUSH-APART AT A SHARED WALL"; `docs/game/atlas/ram.md` `+0x116`, `+0x148`). vsavj's rule stays (vanilla wins ties). `tests/audit_shared_wall_push.sh` freezes the legacy control and the Phobos case; the parity attribution's open class `LANDING-TURN-OPEN` became `WALL-PUSH-VSAVJ`. Not tested, and not kept open: the attacker as P2, the left wall, the resolver's airborne and `+0x115` branches, Sitting Attack event 9, and every other legacy character (none of the sweep's other runs was a clean control).
+
+---
+
+## Ruled 2026-09-27 (14z-184) — the frame-label comment in `read_tap.lua` corrected now; `audit_x2b7ef4_reach_m18` retired
+
+**The questions, verbatim:** *"Side finding: read_tap.lua's header says its frame numbers are replay.lua's. That holds for inputs, but a write it labels N is replay.lua's frame N+1 (measured on every frame of four runs; now in docs/platform/gotchas.md). Correcting the comment in read_tap.lua marks every gate that follows it as stale at the next freeze, so they re-run. Fix the comment now?"* and *"Side finding from the #181 proof run: audit_x2b7ef4_reach_m18 fails the same way in the working tree. It is an out-of-scope gate pinned to merged-m18, and its frozen rows predate the 14z-181 change to the pyron_3 rig (an event moved from 1958 to 1957). What do we do with it?"*
+
+**The maintainer:** *"Fix it now (Recommended)"* and *"Retire it"*.
+
+**What it means.** The sentence was corrected in `read_tap.lua` and, by the retraction grep, in the five other instruments whose tap or breakpoint lines carry the same label and in `tests/test_replay_stage_census.sh` (`docs/platform/gotchas.md` "A `read_tap.lua` WRITE LABELLED N IS REPLAY.LUA'S FRAME N+1"); the gates that follow those files re-run at the next freeze. `tests/audit_x2b7ef4_reach_m18.sh` and `tests/expected/x2b7ef4_reach_m18.tsv` are deleted (last held at commit `206ff15b`), with their registry, census and provenance rows; the live documents that named the gate are marked in place, and ticket 166's reproduce answer points at the patch note.
+
+---
+
 ## Ruled 2026-09-27 (14z-184) — #180 closed as `not-ours`: the zero-meter throws are vs2's own ES behaviour
 
 **The question (14z-184, after rule-checker runs 283-284, 284 OK), verbatim:** *"#180: the two zero-meter throws are ES command throws that native vs2 also pays nothing for, and the third store pair is the applier's KO branch, now observed and gated. Close #180 as not-ours?"* The maintainer first asked for the moves in terms they could identify — *"Can you give me more info on these moves: their input, their names or screen captures... anything that I can easily identify because your inner references are not something I can relate to"* — and was shown a capture sheet from their own recordings (`build/agent184/t180/es_throws_sheet.png`: Pyron's Planet Burning (ES), 63214 + two punches, and Phobos's Circuit Scrapper (ES), 63214 + two punches, each against the CPU's Morrigan, the stock spent and the thrower's gauge not moving at the hit).

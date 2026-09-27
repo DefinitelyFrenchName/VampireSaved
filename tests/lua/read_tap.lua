@@ -95,9 +95,14 @@ end)
 -- replay + pokes playback.
 -- INPUT STAGING IS CANONICAL (GitHub #10, unified 14z-94). This instrument
 -- follows tests/lua/replay.lua exactly: parse `held[fr]`, stage for the NEXT
--- frame (`held[frame + 1]`). So a frame number in this log IS a replay.lua
--- frame number and CAN be cross-referenced with a compare_* first divergence,
--- a masked window onset or a checksum log.
+-- frame (`held[frame + 1]`). So INPUTS land on the same frames as replay.lua's.
+-- A LOGGED ACCESS is labelled with the counter BEFORE its frame's frame_done
+-- increments it, while replay.lua (and field_trace.lua) increment first and then
+-- checksum or sample: an access logged `W N` belongs to replay.lua's frame N+1.
+-- Add one before cross-referencing a compare_* first divergence, a masked
+-- window onset or a checksum log (measured 14z-184 on every unpoked frame of
+-- four runs; docs/platform/gotchas.md; tests/audit_shared_wall_push.sh re-proves
+-- it each run).
 --
 -- It was one of the ten `+1` deviants until 14z-94. The split is now pinned
 -- at ZERO by tests/test_replay_stage_census.sh, which fails any new

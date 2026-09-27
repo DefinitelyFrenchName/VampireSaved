@@ -75,6 +75,7 @@ declares	audit_region_movability
 declares	audit_rig_opening
 declares	audit_roster_pairings
 declares	audit_sdram_bank_load
+declares	audit_shared_wall_push
 declares	audit_stage_sweep
 declares	audit_stock_emulator_stall
 declares	audit_tech_roll
@@ -99,7 +100,6 @@ declares	audit_walker_ghost
 declares	audit_walker_repoint
 declares	audit_wide_phase_a
 declares	audit_win_pal_auto
-declares	audit_x2b7ef4_reach_m18
 declares	test_advancing_guard
 declares	test_anim_node_walk
 declares	test_attract_determinism

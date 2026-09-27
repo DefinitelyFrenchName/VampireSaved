@@ -94,7 +94,9 @@ the last OK):
 - **Exposed, pre-existing:** Phobos's Sitting Attack landing after a throw (huitzil_3
   events 8/9) — ours displaced 31 px and not turning where native stays and turns,
   identical on merged-m19; ruled *"Freeze, ticket it (Recommended)"*: GitHub #179, the
-  attribution's open class `LANDING-TURN-OPEN`.
+  attribution's open class `LANDING-TURN-OPEN`. **RESOLVED 14z-184: closed not-ours** —
+  vsavj's own shared-wall push rule, a legacy pursuit splits the same way (`docs/game/engine_internals.md`
+  "THE PUSH-APART AT A SHARED WALL", `tests/audit_shared_wall_push.sh`); the class is now `WALL-PUSH-VSAVJ`.
 
 Pass 2 (`build/emu_freeze_m20_p2/`): the nine MAME reds PASS against the re-frozen
 expectations, and the full parity table (ALL=1) verifies.
@@ -171,7 +173,7 @@ Pyron's merged copy: 12). The 22-site class is identical in merged-m16, -m17,
 -m18, `don_m22` and the stock twin. Now resolved at the RECORDED offsets
 (`resolve_tagged_placeholders()`, `tests/test_effect_placeholders.sh`). No
 naming part reads a corrupted span in a match (measured on merged-m18 by
-`tests/audit_x2b7ef4_reach_m18.sh`: a read watch on the corrupted bytes only, armed after
+`tests/audit_x2b7ef4_reach_m18.sh` (RETIRED 14z-184, maintainer-ruled 2026-09-27 "Retire it": its merged-m18 subject is out of release scope and its rows predated the 14z-181 `pyron_3` rig change; the script and its rows remain at commit `206ff15b`): a read watch on the corrupted bytes only, armed after
 boot, each run's node trajectory checked against a non-debug run — the first, whole-copy
 watch desynced Donovan's replays with its own stops and was VOID); which
 effect draws the records is not established. Donovan's character map moves

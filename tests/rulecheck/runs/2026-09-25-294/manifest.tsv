@@ -1,0 +1,10 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_shared_wall_push.sh	d31da68dce8732e2b0f8b4e9841e7956e38f6b17
+tests/expected/shared_wall_push.tsv	83146541b45747e8046c343996027d1e3cf1fe2f
+build/agent184/t179/gate_freeze.log	88d46cb7a7833b3d5fa8df7d93b9466291a8f73a
+build/agent184/t179/gate_run_plain.log	09d9e9d617c534cf538737ac15f5023ac3c70d1b
+build/agent184/t179/gate_run_flag-planted.log	fd1ce9644772a275f1b535dde4c6cd42c981652a
+build/agent184/t179/gate_run_early-split.log	0cbb8021ccd14ba817853231dff61c66891dad93
+build/agent184/t179/gate_run_legs-swapped.log	1aa965063691aac279b77287b6e72d385101d586
+build/agent184/t179/offset_probe/compare.py	6aba76ad68f593ece4361c2c2706f83d9306c664
+tests/replays/naming/huitzil_3.json	82df29434d7572ec41b688a65444afbeb928a61a

@@ -365,6 +365,7 @@ tests/test_latch_readers.sh	character-data
 tests/test_poked_legs.sh	character-data
 tests/audit_latch_reads.sh	character-data
 tests/audit_throw_registration.sh	character-data
+tests/audit_shared_wall_push.sh	character-data
 tests/audit_facing_rule.sh	character-data
 tests/audit_rig_opening.sh	character-data
 tests/audit_tick_phase.sh	character-data
@@ -379,7 +380,6 @@ tests/audit_pass_overrun.sh	character-data
 tests/audit_lag_budget.sh	character-data
 tests/audit_column_flash.sh	character-data
 tests/audit_phobos_dmg_residual.sh	character-data
-tests/audit_x2b7ef4_reach_m18.sh	character-data
 tests/test_df_field_readers.sh	character-data
 tests/test_defense_rows_census.sh	character-data
 tests/audit_df_moves.sh	character-data

@@ -26,7 +26,7 @@
 --                    change — a run's OWN liveness trace. EVERY DEBUGGER STOP ADVANCES THE FRAME
 --                    COUNTER ([CPE-5]): a "never read" is sound only from a run with no stop before
 --                    its question, checked by its SAMPLE trajectory against a non-debug run's
---                    (tests/audit_x2b7ef4_reach_m18.sh). Frame 1 always logs the debugger's own
+--                    (tests/audit_x2b7ef4_reach_m18.sh, retired 14z-184; at commit 206ff15b). Frame 1 always logs the debugger's own
 --                    initial break.
 --   env TRACE_OUT    log path (default trace_writes.txt)
 --   env FRAMES       stop after this many frames (default 3600)
@@ -129,7 +129,7 @@ end
 -- frame counter ([CPE-5], docs/platform/gotchas.md "Debugger stops DESYNC replay frame
 -- counting"): a watch that stops on the boot sweep or on hot records shifts every later input,
 -- so a "never read" answer is sound only from a run with NO stops before its question — the
--- 14z-170 reachability re-measurement (tests/audit_x2b7ef4_reach_m18.sh).
+-- 14z-170 reachability re-measurement (tests/audit_x2b7ef4_reach_m18.sh, retired 14z-184; at commit 206ff15b).
 local WPCMD = { p = "wpset", d = "wpdset", o = "wposet" }
 local cmds = {}
 for one in watch:gmatch("[^;]+") do

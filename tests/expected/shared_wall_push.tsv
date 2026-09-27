@@ -1,0 +1,31 @@
+# tests/expected/shared_wall_push.tsv — who keeps a shared corner: the push-apart at the landing frame, per engine
+# (tests/audit_shared_wall_push.sh; tests/lua/read_tap.lua, non-debug). Evidence class: in-emulator (MAME, pristine
+# vsavj, native vsav2 and the WIDE build m3b_merged28; frames >= 2300). Frozen 14z-184 (GitHub #179, ruled the host
+# engine's behaviour) with FREEZE=1, its rule-checker run named in the commit. A push row that changes PC or fighter,
+# a new non-zero +0x148 writer on vsavj or ours, or a legacy first split that moves EARLIER than the landing is a
+# finding; a landing frame that moves means the rig moved — re-derive before re-freezing.
+# Columns: part, leg, kind (push | flag148-set | end | ids | first-split), frames, value
+#   push: every x write by the push-apart routine in the window, <frame>:<pc>:<fighter>:<x hex>
+#   flag148-set: every PC storing a non-zero byte to either fighter's +0x148; end: both x at that frame;
+#   ids: the last pre-match id byte per fighter (the picks are real, never poked); first-split: the legacy legs'
+#   first frame whose x/y/facing differ
+# Frame numbers are read_tap.lua's WRITE labels: a write labelled N is the state replay.lua and field_trace.lua
+# sample as frame N+1 (measured 14z-184, every unpoked frame of all four legs; the gate re-proves it each run).
+#--
+legacy_lilith	vsavj	push	3140-3150	3144:0193b2:P1:03c0
+legacy_lilith	vsavj	flag148-set	2300-	-
+legacy_lilith	vsavj	end	3150	P1 x=960 P2 x=1000
+legacy_lilith	vsavj	ids	-	p1=0e p2=03
+legacy_lilith	vsav2	push	3140-3150	3144:017db4:P2:03c0
+legacy_lilith	vsav2	flag148-set	2300-	02745e
+legacy_lilith	vsav2	end	3150	P1 x=1000 P2 x=960
+legacy_lilith	vsav2	ids	-	p1=0e p2=03
+legacy_lilith	-	first-split	2300-	3144
+huitzil_3	ours	push	6146-6156	6150:0193b2:P1:03c9,6151:0193b2:P1:03c9,6151:0193b2:P1:03c9,6152:0193b2:P1:03c9,6153:0193b2:P1:03c9,6154:0193b2:P1:03c9,6155:0193b2:P1:03c9,6156:0193b2:P1:03c9,6156:0193b2:P1:03c9
+huitzil_3	ours	flag148-set	2300-	-
+huitzil_3	ours	end	6156	P1 x=969 P2 x=1000
+huitzil_3	ours	ids	-	p1=10 p2=01
+huitzil_3	vsav2	push	6146-6156	6150:017db4:P2:03c9,6151:017db4:P2:03ad
+huitzil_3	vsav2	flag148-set	2300-	027444,02745e
+huitzil_3	vsav2	end	6156	P1 x=1000 P2 x=941
+huitzil_3	vsav2	ids	-	p1=10 p2=01

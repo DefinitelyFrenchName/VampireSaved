@@ -1,0 +1,20 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent184/t179/push_resolvers.dis	9f02f38506c3c197344bead5171e989bd346f44e
+build/agent184/t179/push_prologue.dis	3ad869c9757933320d92478919b2a180bbc3fd05
+build/agent184/t179/clamp.dis	3f5340d22f27ae2110d808c451bafacac25ba526
+build/agent184/t179/flag148.txt	79958580cacaf1d34bf8d613ccd1a359371a0a28
+build/agent184/t179/flag148_context.txt	ed5dad2039295808c10dca9c1ce641cc4041c07c
+build/agent184/t179/lilith_mechanism.txt	e5527927a130ea75dbbe91c1f281b1f7098cef64
+build/agent184/t179/ev8_mechanism.txt	2d842c6da35e05493297a0335905c8d083988562
+build/agent184/t179/legacy_pursuit_control.txt	779d74d7f8666e8f0cf0c202b129682dc4790fd2
+build/agent184/t179/captures_sent.txt	01b2818442447f7db1ae172ae5f96612d742d559
+build/agent184/t179/legacy_lilith_pursuit_sheet.png	912cd69999573bd9b8ac05c4cd30975c2171062d
+build/agent184/t179/sitting_attack_ev8_landing_labelled.png	eadade55a4271a52bba864b27631fe60bd6889d3
+tests/audit_shared_wall_push.sh	d31da68dce8732e2b0f8b4e9841e7956e38f6b17
+tests/expected/shared_wall_push.tsv	83146541b45747e8046c343996027d1e3cf1fe2f
+build/agent184/t179/gate_run_plain.log	09d9e9d617c534cf538737ac15f5023ac3c70d1b
+build/agent184/t179/gate_run_flag-planted.log	fd1ce9644772a275f1b535dde4c6cd42c981652a
+build/agent184/t179/gate_run_early-split.log	0cbb8021ccd14ba817853231dff61c66891dad93
+build/agent184/t179/gate_run_legs-swapped.log	1aa965063691aac279b77287b6e72d385101d586
+docs/game/engine_internals.md.lines-4698-4764 (lines 4698-4764 of docs/game/engine_internals.md)	c15271935282363907667964e0bddf1e3751381d
+docs/game/atlas/ram.md.lines-200-201 (lines 200-201 of docs/game/atlas/ram.md)	2c8ff3bd0e377fcb015c0451f321306f77e7f12c

@@ -309,7 +309,7 @@ stays aligned" — and this measurement contradicts it.)
 The same sitting paid it a second time, worse. A reachability read watch over Donovan's whole
 x2b7ef4 copy stopped on a block the match reads thousands of times, so its replays desynced by
 up to ~5,700 frames and a "never read" was reported from runs that never played the moves.
-The sound form is `tests/audit_x2b7ef4_reach_m18.sh`. It watches only the bytes in question,
+The sound form is `tests/audit_x2b7ef4_reach_m18.sh` (RETIRED 14z-184, maintainer-ruled 2026-09-27 "Retire it": its merged-m18 subject is out of release scope and its rows predated the 14z-181 `pyron_3` rig change; the script and its rows remain at commit `206ff15b`). It watches only the bytes in question,
 arms after boot (`WATCH_FROM`, several ranges in one `WATCH`, both added to
 `trace_writes.lua` 14z-170), and compares each run's P1 anim-node trajectory (`SAMPLE`) with a
 non-debug run's. That comparison is the check a zero-hit debug run needs: with no stop, 18 of
@@ -2944,3 +2944,28 @@ it. **`--append-system-prompt` is the route that adds without replacing** (A16c:
 and an appended token are both named). Two discriminators FAILED before this one and must not be
 reused: "the first sentence of your system prompt" (both modes quote an SDK preamble that lives
 outside the snapshot) and "the primary working directory" (the environment block reaches both).
+
+## A `read_tap.lua` WRITE LABELLED N IS REPLAY.LUA'S FRAME N+1 — the tap names a write by the counter BEFORE that frame's `frame_done`; `field_trace.lua` and `replay.lua` increment first, then sample (measured 2026-09-27, 14z-184)
+
+`read_tap.lua` logs each write with its `frame` variable, which `frame_done`
+increments AFTER the frame's writes; `field_trace.lua` and `replay.lua`
+increment at `frame_done` and then sample or checksum. So the settled state
+after the writes labelled `W N` is the sample labelled `F N+1`. Measured on
+the #179 legs (`tests/audit_shared_wall_push.sh`, which re-proves it every
+run): the taps' end-of-frame x, y and facing at N equal the trace's at N+1 on
+every unpoked frame of four legs (859/859 twice, 3850/3850 twice), against
+710/999 and 709/999 at N on the two Lilith legs (`build/agent184/t179/offset_probe/`). Paid when a first cross-check read the two instruments'
+first split as f3144 against f3145. **`read_tap.lua`'s own header ("a frame
+number in this log IS a replay.lua frame number") holds for INPUT STAGING,
+not for write labels**: to cross-reference a tap write with a `compare_*`
+first divergence, add one. The same sentence stood in five more instruments
+whose tap or breakpoint lines carry the same label (`qs_sweep`, `ring_tap`,
+`bp_regs`, `qs_table_trace`, `unmapped_probe`) and in
+`tests/test_replay_stage_census.sh`; all corrected 14z-184 (maintainer-ruled
+2026-09-27, "Fix it now"). The four that log only inside `frame_done`
+(`obj_records_dump`, `objy_bits`, `qs_z80_trace`, `snapshot_frames`) keep it:
+for them it is true. Two further traps paid in the same comparison: a
+BYTE store's tap data word carries the other byte unspecified (merge by the
+`mask`), and a Lua POKE is sampled by the trace but never logged by the tap
+(the nine disagreeing frames were exactly the rig's nine in-window position
+pins).

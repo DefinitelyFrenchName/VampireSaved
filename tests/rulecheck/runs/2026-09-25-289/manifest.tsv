@@ -1,0 +1,13 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent184/t179/ev8_mechanism.txt	2d842c6da35e05493297a0335905c8d083988562
+build/agent184/t179/push_resolvers.dis	9f02f38506c3c197344bead5171e989bd346f44e
+build/agent184/t179/push_prologue.dis	3ad869c9757933320d92478919b2a180bbc3fd05
+build/agent184/t179/flag148.txt	79958580cacaf1d34bf8d613ccd1a359371a0a28
+build/agent184/t179/flag148_context.txt	ed5dad2039295808c10dca9c1ce641cc4041c07c
+build/agent184/t179/legacy_pursuit_control.txt	6b090a7d34c9f102ae5a6def30f205241f054504
+build/agent184/t179/legacy/sweep.sh	522479b9bf5d6a7c8241fde06fbc2abcb213e3a9
+build/agent184/t179/legacy/sweep_read.py	d189812676a7577df577357f0030491ff4b16b26
+build/agent184/t179/legacy_lilith_pursuit_sheet.png	912cd69999573bd9b8ac05c4cd30975c2171062d
+build/agent184/t179/sitting_attack_ev8_landing_labelled.png	eadade55a4271a52bba864b27631fe60bd6889d3
+build/agent184/t179/captures_sent.txt	04b12eff40e1ce6afa93db5079c57a4106878fe9
+build/agent184/t179/view_and_reads.txt	c2726ee0b0957aad853d72d71f49755c42f63ae4

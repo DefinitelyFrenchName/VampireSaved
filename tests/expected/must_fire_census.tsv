@@ -40,6 +40,7 @@ declares	audit_pyron_ring
 declares	audit_qs_voice_wav
 declares	audit_reaction_class_live
 declares	audit_rig_opening
+declares	audit_shared_wall_push
 declares	audit_stock_emulator_stall
 declares	audit_tech_roll
 declares	audit_throw_registration
@@ -51,7 +52,6 @@ declares	audit_trap_shock
 declares	audit_victim_parity
 declares	audit_voice_borrow
 declares	audit_walker_repoint
-declares	audit_x2b7ef4_reach_m18
 declares	test_agent_defs
 declares	test_agent_extract
 declares	test_agent_hooks

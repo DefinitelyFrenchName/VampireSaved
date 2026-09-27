@@ -1,0 +1,9 @@
+decision	recommendation
+subject	#179: recommend to the maintainer that Phobos's corner landing difference is vsavj's own push-apart rule (close not-ours)
+session	143a135b
+model	rule-checker@163e4ce9cf7b
+claim	Recommend closing #179 as not-ours: at huitzil_3 event 8 both fighters stand at the right wall x (1000) as Phobos's Sitting Attack lands, and the push-apart routine — the same instructions in both games (vs2 0x17C6C, vsavj 0x1926A) — moves the fighter in its first register: P1 unless P1's +0x148 is set, which swaps the order; vs2's wall clamp sets +0x148 on the fighter it clamps (st.b at vs2 0x27444 and 0x2745E) and no instruction of vsavj's names +0x148(An) as a store target for a fighter, so on native vs2 P1 (Phobos) keeps the corner and Demitri is pushed out, and on ours — vsavj's engine — Phobos is pushed out; a legacy control (Demitri as P1 against Victor, real picks, both pinned into the corner in one frame) reproduces the same split on pristine vsavj and vs2 (vsavj pushes P1 out, vs2 pushes P2 out and both turn), so the difference is the host engine's rule applied to every character, and making the tenants follow vs2's would either change legacy behaviour or give the tenants a corner rule the other fifteen do not have; NOT tested: a natural legacy case where one fighter lands ON a cornered one (three forward jumps onto a wall-held Victor landed in front of him on both games), the tenant as P2, the branches where a fighter is airborne or +0x115 is set in the resolver, and the other Sitting Attack event (9), which the parity table shows with the same offsets.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b

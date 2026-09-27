@@ -1,0 +1,15 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: #179: recommend to the maintainer that Phobos's corner landing difference is vsavj's own push-apart rule (close not-ours) — re-check after run 285
+Claim (the working agent's sentence): Recommend closing #179 as not-ours: at huitzil_3 event 8 both fighters stand at the right wall x (1000) as Phobos's Sitting Attack lands, and the push-apart routine — the same instructions in both games (vs2 0x17C6C, vsavj 0x1926A) — moves the fighter in its first register: P1 unless P1's +0x148 is set, which swaps the order; vs2's wall clamp sets +0x148 on the fighter it clamps (st.b at vs2 0x27444 and 0x2745E), while on the vsavj engine the only instructions naming +0x148(An) as a store are the push routine's own clears and a pc-relative jump table decoded as code (0x077BAE; vs2's twin 0x08331A), and every writer of the fighters' +0x148 over whole vsavj-engine runs (ours to f6172, pristine vsavj's legacy rig to f2900) stores 0 after the boot RAM test — so on native vs2 P1 (Phobos) keeps the corner and Demitri is pushed out, and on ours Phobos is pushed out; a legacy control (Demitri as P1 against Victor, real picks, both pinned into the corner in one frame) reproduces the same split on pristine vsavj and vs2 (vsavj pushes P1 out, vs2 pushes P2 out and both turn), so the difference is the host engine's rule applied to every character, and making the tenants follow vs2's would either change legacy behaviour or give the tenants a corner rule the other fifteen do not have; NOT tested: a natural legacy case where one fighter lands ON a cornered one (three forward jumps onto a wall-held Victor landed in front of him on both games), the tenant as P2, the branches where a fighter is airborne or +0x115 is set in the resolver, any +0x148 writer outside the runs tapped (the static census reaches every store instruction by linear decode, not every data-driven write), and the other Sitting Attack event (9), which the parity table shows with the same offsets.
+Artifacts (read every one, in full):
+  - build/agent184/t179/ev8_mechanism.txt
+  - build/agent184/t179/push_resolvers.dis
+  - build/agent184/t179/push_prologue.dis
+  - build/agent184/t179/flag148.txt
+  - build/agent184/t179/flag148_context.txt
+  - build/agent184/t179/legacy_control.txt
+  - build/agent184/t179/legacy/corner.rpl
+  - build/agent184/t179/legacy/run.sh
+  - build/agent184/t179/sitting_attack_ev8_landing.png

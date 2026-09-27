@@ -4685,12 +4685,82 @@ superset invariant), rig `tests/replays/judge/03_down_attack.rpl`:
   over the body, then the wall pushbox shoves the attacker off during
   the descent and the strike lands beside them — measured on the
   all-legacy control, i.e. vanilla behavior, not a port artifact.
+  **That is vsavj's rule, and vs2's differs** (14z-184, GitHub #179):
+  when both fighters land clamped at the same wall, vsavj pushes P1 out
+  and vs2 pushes P2 out — "THE PUSH-APART AT A SHARED WALL" below.
 - **The connect race:** with a sweep or throw knockdown, the victim's
   auto-wake and the pursuit's flight time run neck-and-neck (a Victor
   dummy woke at ~+22-45f; every rig geometry tried landed 1-10 frames
   late or beside the body). Connecting cleanly likely needs a longer
   knockdown than these rigs produce — carried as the pursuit-connect
   refinement in docs/project/coverage_matrix.md.
+
+## THE PUSH-APART AT A SHARED WALL — the two engines differ (measured 14z-184, GitHub #179)
+
+**Atlas rows this section depends on:** `atlas/ram.md` fighter `+0x10`
+(x), `+0x0B` (facing), `+0x38` (off the ground), `+0x116` (wall side),
+`+0x148` (push order), `RAM:$FF8290` (the view's left edge).
+**Gates:** `tests/audit_shared_wall_push.sh` (the legacy control on
+pristine vsavj and vs2, and Phobos's Sitting Attack on ours and native).
+
+**Who keeps the corner when both fighters are pinned against the same
+wall is decided differently by the two games**, and the tenants, running
+on vsavj's engine, follow vsavj's rule. The maintainer, on the legacy
+capture: *"from what I see it seems indeed to be an engine-wide property.
+If so, the vanilla engine works BUT we aboslutely must document this
+difference in the two games"* (2026-09-27).
+
+**The mechanism.** Two routines, the same in both games but for two
+stores:
+
+- **The view clamp** (vsavj `0x0281D6`-`0x028200`, vs2
+  `0x02742A`-`0x02745E`) holds each fighter's x inside the view
+  (`RAM:$FF8290` .. +0x180, less the fighter's margin `+0x132`) and
+  writes the side it clamped to `+0x116` (1 left, 2 right; cleared each
+  frame first). At the stage's end the view stops scrolling, so the
+  view's edge IS the corner (x 1000 at the right end, the view fixed at
+  640..1024); mid-stage the same clamp holds a fighter at the screen's
+  edge. **vs2's clamp also does `st.b $148(a6)` after each side store**
+  (`0x027444`, `0x02745E`); vsavj's has no such store.
+- **The push-apart routine** (vsavj `0x01926A`, vs2 `0x017C6C`) loads
+  P1 as its first fighter and P2 as its second, **swaps them if P1's
+  `+0x148` is set**, and clears both flags. When the push boxes overlap:
+  if only ONE fighter is walled, the other is pushed (the same on both
+  games, whatever the order); if BOTH are walled and both grounded
+  (`+0x38`, `+0x115` clear), **the FIRST fighter is pushed out**.
+
+So on a shared wall **vsavj pushes P1 out** (the order never swaps: the
+vsavj engine's only stores naming a fighter's `+0x148` are the push
+routine's clears) and **vs2 pushes P2 out** (its clamp flagged P1 that
+frame, so the order swapped). Which fighter ATTACKED plays no part; the
+side (P1 or P2) and the shared wall do.
+
+**What it looks like** (both captured and shown to the maintainer; frame
+numbers are `read_tap.lua` write labels, one below replay.lua's for the same
+settled state — `docs/platform/gotchas.md`):
+
+| case | vsavj (and ours) | vs2 |
+|---|---|---|
+| Lilith (P1) pursues Victor (P2) into the right corner — real picks, no position poke, the two games identical until the landing at f3144 | Lilith pushed out to 960 at `0x0193B2`, turns to face Victor; Victor keeps the corner | Victor pushed out to 960 at `0x017DB4`; Lilith keeps the corner |
+| Phobos (P1) Sitting Attack [8P] onto Demitri (P2) off a throw (`huitzil_3` event 8) | ours: Phobos pushed out 1000 -> 969 at `0x0193B2` | native: Demitri pushed out 1000 -> 969 -> 941 at `0x017DB4`; Phobos keeps the corner |
+
+The maintainer's point on why it matters: the corner changes hands —
+*"if the move makes Phobos switch sides, it means Phobos is now cornered,
+which changes the gameplay dynamics."* Ruled the host engine's behaviour
+(vanilla wins ties, [VSP-21]): porting vs2's flag for the tenants alone
+would give them a corner rule the other sixteen do not have, and for
+everyone would change legacy behaviour.
+
+**Not measured:** the attacker as P2 (the reading above predicts the
+split reversed: vsavj pushes the victim-as-P1 out, vs2 the attacker-as-P2);
+the LEFT wall (vs2's clamp flags `+0x148` there too, `0x027444`, so the
+reading predicts the same split; every rig was at the right corner);
+the resolver's airborne and `+0x115` branches; Sitting Attack event 9
+(the parity gate reads the same signature there). Of the 14z-184 sweep of
+every original character both wheels carry, **Lilith is the only clean
+control**: the others' two games differ from the throw onward, never share
+x at the landing, or run no pursuit (`tests/audit_shared_wall_push.sh`'s
+header), so nothing is concluded from them.
 
 ## CPU exceptions and the soft-reset path (14z-109)
 

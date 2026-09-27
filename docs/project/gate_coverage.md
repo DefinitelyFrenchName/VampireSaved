@@ -2572,6 +2572,14 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **EXPECTS:** the frozen rows equal, the pins after 2545, legs differing pre-pin and agreeing after; the swapped opening fails, the floor-less rig pins at 2370 and fails.
 
+### `audit_shared_wall_push.sh` — audit, emulator
+
+**WHAT:** the push-apart routine is the same code in both games (vsavj 0x01926A, vs2 0x017C6C); when BOTH fighters are walled (+0x116 set) and grounded it moves the fighter in its FIRST register — P1, unless P1's +0x148 is set, which swaps the order. vs2's view clamp sets +0x148 on the fighter it clamps (`st.b $148(a6)` at vs2 0x027444 / 0x02745E); vsavj's clamp (0x0281E6-0x028200) is the same code without those two stores. So on a shared wall vsavj pushes P1 out and vs2 pushes P2 out. The tenants run on vsavj's engine and follow vsavj's rule: native Phobos keeps the corner at his Sitting Attack landing, ours is pushed out — the #179 report, ruled the host engine's behaviour, documented, not ported.
+
+**HOW:** write taps (read_tap.lua) of both fighters' x, y, facing, +0x116, +0x148 and ids on MAME, two parts: `legacy_lilith` — the maintainer's control design, the same characters, positions and inputs on pristine vsavj and vs2: Lilith (P1) and Victor (P2) by REAL picks (tools/select_paths.py on each game's decoded wheel), no position poke, Lilith walks Victor into the right corner, throws him (f3000), pursuit U+P (8P) at +50..+110; `huitzil_3` — the naming rig's event 8 (Sitting Attack [8P] off a throw) on native vs2 and on ours, the parity gate's replays and pins. Level and RNG pinned as the parity gates do. A SECOND INSTRUMENT, field_trace.lua (RAM sampled at frame_done, not write taps), runs every leg again and must agree with the taps' end positions and the legacy first split.
+
+**EXPECTS:** the frozen rows (tests/expected/shared_wall_push.tsv): the legacy legs identical until the landing (first split f3144), then vsavj's push PC 0x0193B2 moving P1 and vs2's 0x017DB4 moving P2; vs2's clamp the only non-zero +0x148 writer, vsavj and ours none; the end positions (the pushed-out fighter at 960, the corner at 1000); the field trace agreeing with the taps on every end row and the legacy split; all three controls fail.
+
 ### `audit_tenant_throw_geometry.sh` — audit, emulator
 
 **WHAT:** Phobos's three throws (6+HP, Circuit Scrapper, ES Circuit Scrapper), ours vs native vs2, for all 18 roster victims: the held victim traverses the SAME ordered (pose, dx, dy) states in the same order on both legs, the end-of-hold tail is one uniform shape per throw, and damage is compared as (amount, pose) pairs — dwell reported, never asserted.
@@ -2611,14 +2619,6 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 **HOW:** both legs on MAME as REAL cursor picks (P1 Victor, P2 the tenant, the routes decoded from each game's own select wheel by tools/select_paths.py — no id poke on either leg), the speed level pinned at 8 on both (vs2's TURBO, the level the victim rigs and test_reactions' lines were measured at; our build's own is NORMAL 6 — matched modes, ruled 2026-09-15) and the RNG at 0000, P2's HP re-pinned 10 frames before each event (never inside a compared window: the reader refuses one); our P2 node pointers translated into the native address space (placements.json) and both legs read by tools/reaction_map.py over the tenant's vs2 extract (asserted byte-identical to the decrypted vsav2's anim region, as our data view is to the decrypted romset; its a/a2/b/c chains asserted to decode to the same shapes from our build); P1 asserted Victor on each leg and never inside one of his REACTION chains whose data differs between the games (tools/audit_same_data_p2.py, run by the gate on the two data views), and every row attributed (`attacker=`) to the differing ATTACK chains of his that ran inside its event, and charged (`attributed=`) to the attacker only when nothing but the timing (len, frz) differs AND the attacker's own shift explains it (the contact and the return each on the same frame or his delta earlier, the freeze within it) — a chain-path or class difference, or a timing difference of another size, is the tenant's whatever ran beside it.
 
 **EXPECTS:** every contact row as frozen in tests/expected/victim_parity.tsv (SAME, or the frozen DIFFER rows); the native leg reading test_reactions' frozen lines exactly; both ids from each leg's trace; no schedule poke inside a compared window; the ten declared controls failing (every MUST-FIRE line below has its in-gate fire and its mode). The contact FRAME is printed, not compared (#168).
-
-### `audit_x2b7ef4_reach_m18.sh` — audit, emulator
-
-**WHAT:** whether any naming part on merged-m18 READS one of the companion-effect records the placeholder scan corrupted there (fixed in M19): a -debug read watch over the corrupted bytes only, armed after boot, with every run's node trajectory checked frame-aligned against a non-debug run so a debugger stop cannot desync the replay unnoticed.
-
-**HOW:** 42 MAME runs (20 Donovan and Pyron parts, each a debug watch and a field-trace reference, through the merged wheel's path with the parity pins, plus the control's two); hits, first hit frame, the aligned prefix and the skew frame frozen per part; the control widens the watch over a hot block, which must hit in the match and desync the trajectory.
-
-**EXPECTS:** no read of a corrupted record on any part, every run tracking its reference (a run that never tracks is VOID), the frozen skews; the hot-block control hits and skews and fails. The gate refuses any build but merged-m18 by fingerprint.
 
 ### `test_advancing_guard.sh` — test, emulator
 

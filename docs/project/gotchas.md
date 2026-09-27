@@ -5958,3 +5958,22 @@ the header's build name, the third differing exactly where #157 reaches
 (`build/rc183/refreeze2/*.m19_vs_m20.diff`). Any comparison of two runs of one gate goes
 through the full measured tables, never through what the gate chose to print.
 
+
+## A LEGACY CONTROL IS THE SAME SETUP UNTIL THE EVENT — a cross-game control that differs before the event under test is two experiments (paid: 14z-184, GitHub #179, three controls the maintainer corrected)
+
+To learn whether Phobos's corner landing was the port or the host engine, the first
+legacy control pinned Demitri and Victor to x 1000 in the same frame and compared
+pristine vsavj with vs2. It was wrong three ways before one held: the pin met the
+VIEW's edge mid-stage, not the stage's corner (the maintainer: *"Victor is absolutely
+not in the corner. Both characters are around the mid point of the level"* — the wall
+clamp is the view's edge, `RAM:$FF8290`, and the view then scrolled); held at the real
+corner, the release left the two games in different setups before the scripted jump
+(*"so you are literally comparing two entirely different setups"*); and a sweep of every
+original character run afterwards counted end positions from runs whose two games had
+already differed since the throw. What held was the maintainer's design: the same
+characters, real picks, no position poke, the victim knocked down in the corner, then a
+pursuit (8P/K) — and only the run whose two games stay identical frame for frame until
+the landing (Lilith's) is evidence; the others' end states are data. Rule: before reading
+a cross-game control's outcome, find its FIRST differing frame; if it precedes the event,
+the control compares setups, not the event. `tests/audit_shared_wall_push.sh` freezes that
+first split and carries a control (`early-split`) that proves it can see an earlier one.

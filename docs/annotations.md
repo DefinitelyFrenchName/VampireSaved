@@ -23,15 +23,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3241 |
-| named by a document or manifest only | 2128 |
-| named by both a document/manifest and code | 743 |
-| named by CODE ONLY (the gap list below) | 370 |
-| carried by atlas | 571 |
-| carried by engine_internals | 673 |
+| distinct program-space addresses named | 3260 |
+| named by a document or manifest only | 2138 |
+| named by both a document/manifest and code | 750 |
+| named by CODE ONLY (the gap list below) | 372 |
+| carried by atlas | 584 |
+| carried by engine_internals | 682 |
 | carried by other docs | 1010 |
 | carried by manifests | 1818 |
-| carried by code | 1113 |
+| carried by code | 1122 |
 
 ## Addresses
 
@@ -257,7 +257,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x00F85A` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] |
 | `PRG:0x00F8EE` | docs/game/engine_internals.md — The child companion's shadow — a remapped tile never copied (fixed 14z-69o) |
 | `PRG:0x00F954` | docs/game/engine_internals.md — The WIN-QUOTE TEXT SYSTEM — fully decoded (14z-76) [vs2]; docs/project/patch_index.md — DEFERRED BY MAINTAINER DECISION (14z-76) — the win-quote bank relocation [vs2]; tools/decode_win_quotes.py |
-| `PRG:0x010000` | docs/game/atlas/select_screen.md — The wheel DRAWER — object, bank word, and the bank-5 move (14z-63); docs/game/engine_internals.md — GFX ROM (sprite/tile) subsystem; docs/game/engine_internals.md — The QSound Z80 driver: id table, songs, streams, sample records (measured 14z-86, reader-traced on live vsavj, id 0x119); docs/game/engine_internals.md — The WIN-QUOTE TEXT SYSTEM — fully decoded (14z-76); docs/game/engine_internals.md — The Z80 command dispatch, the note-table array, the dead type-C song class and the alias bit (measured 14z-86, the voice batch); docs/platform/gotchas.md — A member's REGION layout is not its FILE layout — and the Z80 driver's own address space is a THIRD thing (14z-86); +42 more |
+| `PRG:0x010000` | docs/game/atlas/select_screen.md — The wheel DRAWER — object, bank word, and the bank-5 move (14z-63); docs/game/engine_internals.md — GFX ROM (sprite/tile) subsystem; docs/game/engine_internals.md — The QSound Z80 driver: id table, songs, streams, sample records (measured 14z-86, reader-traced on live vsavj, id 0x119); docs/game/engine_internals.md — The WIN-QUOTE TEXT SYSTEM — fully decoded (14z-76); docs/game/engine_internals.md — The Z80 command dispatch, the note-table array, the dead type-C song class and the alias bit (measured 14z-86, the voice batch); docs/platform/gotchas.md — A member's REGION layout is not its FILE layout — and the Z80 driver's own address space is a THIRD thing (14z-86); +43 more |
 | `PRG:0x0104C8` | docs/platform/gotchas.md — PC-relative reads are DECRYPTED reads on CPS-2 (paid: 2026-07-25, ~45min) |
 | `PRG:0x010A80` | docs/game/engine_internals.md — GFX ROM (sprite/tile) subsystem |
 | `PRG:0x010DFA` | docs/project/patch_notes.md — B. the obj_hook dispatch sites left VANILLA — the WALKER is relocated; build/manifest/donovan.toml — obj_hook; build/manifest/huitzil.toml — obj_hook; build/manifest/pyron.toml — obj_hook |
@@ -444,7 +444,10 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x017B22` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/patch_notes.md — donovan-m2 stage 4 — damage-pipeline R1 rows; BOTH GATES GREEN (2026-07-27, session 10) [vs2]; docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/reconciliation.toml — map [vs2]; tests/audit_throw_registration.sh |
 | `PRG:0x017B74` | docs/game/engine_internals.md — Hitboxes and attack records (phase 2 of the character-data map, 14z-120 (5), MEASURED); build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x017BE4` | build/manifest/reconciliation.toml — map [vs2] |
+| `PRG:0x017C6C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — THE PUSH-APART AT A SHARED WALL — the two engines differ (measured 14z-184, GitHub #179) [vs2]; tests/audit_shared_wall_push.sh |
+| `PRG:0x017C82` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2] |
 | `PRG:0x017D5C` | docs/project/gotchas.md — "THE ONLY WRITER" IS A CLAIM ABOUT THE TAP'S WINDOW — a light hit's overlap frames named the wrong mechanism for the pushback (14z-120 (12), corrected 14z-121 (3)) |
+| `PRG:0x017DB4` | docs/game/engine_internals.md — THE PUSH-APART AT A SHARED WALL — the two engines differ (measured 14z-184, GitHub #179); tests/audit_shared_wall_push.sh |
 | `PRG:0x017E90` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x017FA4` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); tools/charmap_gen.py; tools/hitbox_records.py |
 | `PRG:0x017FA6` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
@@ -549,8 +552,11 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x019172` | build/manifest/reconciliation.toml — map |
 | `PRG:0x01919A` | docs/project/patch_notes.md — below is the record of the probe session and is NOT rewritten.) [vs2]; tools/gen_hitclass_map_thunk.py |
 | `PRG:0x0191E2` | build/manifest/reconciliation.toml — map |
+| `PRG:0x01926A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — THE PUSH-APART AT A SHARED WALL — the two engines differ (measured 14z-184, GitHub #179); tests/audit_shared_wall_push.sh |
+| `PRG:0x019280` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x019292` | docs/game/engine_internals.md — The projectile-pool HIT-CLASS map — a second type consumer, bounded at 64 (14z-82b) [vs2]; docs/project/patch_notes.md — below is the record of the probe session and is NOT rewritten.) [vs2]; tools/gen_hitclass_map_thunk.py |
 | `PRG:0x019298` | docs/game/engine_internals.md — The projectile-pool HIT-CLASS map — a second type consumer, bounded at 64 (14z-82b) [vs2]; docs/project/patch_notes.md — below is the record of the probe session and is NOT rewritten.) [vs2]; tools/gen_hitclass_map_thunk.py |
+| `PRG:0x0193B2` | docs/game/engine_internals.md — THE PUSH-APART AT A SHARED WALL — the two engines differ (measured 14z-184, GitHub #179); tests/audit_shared_wall_push.sh |
 | `PRG:0x0193F6` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) |
 | `PRG:0x0193FE` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) |
 | `PRG:0x01944A` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) |
@@ -1016,9 +1022,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x027314` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x0273E2` | build/manifest/reconciliation.toml — map |
 | `PRG:0x0273E6` | docs/game/atlas/select_screen.md — THE RANDOM CELL '0x0B' — the cycling draw, decoded (14z-116); build/manifest/reconciliation_huitzil.toml — map; build/manifest/reconciliation_huitzil.toml — map [vs2] |
+| `PRG:0x0273EE` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2] |
 | `PRG:0x02740C` | build/manifest/type_stamps.toml — triage |
 | `PRG:0x027412` | build/manifest/reconciliation.toml — map |
+| `PRG:0x02742A` | docs/game/engine_internals.md — THE PUSH-APART AT A SHARED WALL — the two engines differ (measured 14z-184, GitHub #179) |
+| `PRG:0x02743E` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2] |
+| `PRG:0x027444` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — THE PUSH-APART AT A SHARED WALL — the two engines differ (measured 14z-184, GitHub #179); docs/game/engine_internals.md — THE PUSH-APART AT A SHARED WALL — the two engines differ (measured 14z-184, GitHub #179) [vs2]; tests/audit_shared_wall_push.sh |
 | `PRG:0x027446` | build/manifest/reconciliation_huitzil.toml — map |
+| `PRG:0x027458` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2] |
+| `PRG:0x02745E` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — THE PUSH-APART AT A SHARED WALL — the two engines differ (measured 14z-184, GitHub #179); tests/audit_shared_wall_push.sh |
 | `PRG:0x027466` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x02749C` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x0274BA` | build/manifest/reconciliation.toml — map; build/manifest/reconciliation_huitzil.toml — map |
@@ -1101,6 +1113,10 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x02813E` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — port_patch |
 | `PRG:0x028140` | docs/game/engine_internals.md — The physics bank's 'gap_*' rows (14z-121, a reference scan of vsavj's code); docs/project/patch_notes.md — The correction; build/manifest/bank_map.toml — capture_kf_ptr; tests/test_capture_kf_ownership.sh; tests/test_capture_pose_sources.sh |
 | `PRG:0x028192` | build/manifest/reconciliation_huitzil.toml — map |
+| `PRG:0x02819A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
+| `PRG:0x0281D6` | docs/game/engine_internals.md — THE PUSH-APART AT A SHARED WALL — the two engines differ (measured 14z-184, GitHub #179) |
+| `PRG:0x0281EA` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
+| `PRG:0x028200` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — THE PUSH-APART AT A SHARED WALL — the two engines differ (measured 14z-184, GitHub #179); tests/audit_shared_wall_push.sh |
 | `PRG:0x028206` | build/manifest/type_stamps.toml — triage |
 | `PRG:0x02822C` | build/manifest/donovan.toml — pcrel_escape_fix [vs2]; build/manifest/huitzil.toml — capture_kf_jedah [vs2]; build/manifest/pyron.toml — pyron_capture_keyframes [vs2] |
 | `PRG:0x0282C0` | docs/project/gotchas.md — "The substitution landed for free" — invisible slot dependencies (14z-62c); docs/project/gotchas.md — The -debug write-trace and non-debug dumps can DISAGREE about one write (14z-100; RESOLVED 14z-101 — they never disagreed); docs/project/hardening_register.md — 5. Known-uncovered DYNAMIC surfaces (H4); build/manifest/donovan.toml — select_companion_entry_0f; tests/audit_projectile_clash.sh |
@@ -1959,6 +1975,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0752B2` | build/manifest/reconciliation.toml — map |
 | `PRG:0x0753DA` | build/manifest/reconciliation.toml — map |
 | `PRG:0x077376` | docs/game/engine_internals.md — The two engines run DIFFERENT Dark Force systems (traced 14z-69c); docs/project/gotchas.md — against the manifest/built image before planning on it; build/manifest/donovan.toml — accent_color_aware_3; build/manifest/reconciliation.toml — map |
+| `PRG:0x077BAE` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x07C428` | docs/game/atlas/select_screen.md — The wheel DRAWER — object, bank word, and the bank-5 move (14z-63); docs/platform/gotchas.md — screen the replay never left (14z-63); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — roster21; tests/test_wheel_bank5.sh; tools/gen_donovan_patch.py |
 | `PRG:0x07D4FC` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; tools/gen_donovan_patch.py; tools/select_port.py |
 | `PRG:0x07FFF0` | docs/project/mister_fit.md — 1. Program ROM (68k) |
@@ -2953,6 +2970,7 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x0175D0` | tests/audit_defense_row_residue.sh |
 | `PRG:0x017642` | tests/audit_defense_row_residue.sh |
 | `PRG:0x017646` | tests/audit_defense_row_residue.sh |
+| `PRG:0x017DBA` | tests/audit_shared_wall_push.sh |
 | `PRG:0x0182B4` | tests/audit_df_accumulator.sh |
 | `PRG:0x018358` | tools/audit_reaction_classes.py |
 | `PRG:0x0183BC` | tools/audit_reaction_classes.py |
@@ -2968,6 +2986,7 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x018C40` | tests/audit_defense_row_reads.sh |
 | `PRG:0x018C86` | tests/audit_defense_row_residue.sh |
 | `PRG:0x0191AA` | tools/gen_hitclass_map_thunk.py |
+| `PRG:0x0193B8` | tests/audit_shared_wall_push.sh |
 | `PRG:0x01A7A0` | tools/gen_hitclass_map_thunk.py |
 | `PRG:0x01AC44` | tests/audit_mask_window_ff42a2.sh |
 | `PRG:0x01ADC6` | tools/obj_records.py |
@@ -3033,6 +3052,7 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x02802C` | tests/audit_guard_mask_reads.sh |
 | `PRG:0x02804E` | tests/test_capture_pose_sources.sh |
 | `PRG:0x028065` | tests/test_capture_pose_sources.sh |
+| `PRG:0x0281E6` | tests/audit_shared_wall_push.sh |
 | `PRG:0x0282BA` | tools/audit_id_space.py |
 | `PRG:0x0282D8` | tests/test_checkdocs.sh; tools/checkdocs.py |
 | `PRG:0x028D40` | tools/audit_rule5.py |
@@ -3196,7 +3216,6 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x0F0400` | tests/test_mister_mra_map.sh |
 | `PRG:0x0F4000` | tests/audit_don_ko_writer.sh |
 | `PRG:0x0FC6AC` | tests/test_pyron_blink.sh |
-| `PRG:0x0FCC00` | tests/audit_x2b7ef4_reach_m18.sh |
 | `PRG:0x0FD180` | tests/test_index_window_thunk.sh |
 | `PRG:0x102436` | tests/test_biased_list_inventory.sh |
 | `PRG:0x123456` | tests/test_effect_placeholders.sh; tests/test_manifest_merge.sh; tests/test_rule5_census.sh; tests/test_type_stamp_census.sh; tools/audit_rule5.py; tools/checkskills.py |

@@ -78,8 +78,10 @@ python3 - <<'PY' || fail=1
 import glob, os, re, sys
 
 # UNIFIED 14z-94: the split is now ZERO. Every replay-driving instrument
-# parses `held[fr]` and stages `held[frame + 1]`, so a frame number from any
-# of their logs is a replay.lua frame number.
+# parses `held[fr]` and stages `held[frame + 1]`, so INPUTS land on replay.lua's
+# frames. (A line logged from a tap or breakpoint DURING a frame is labelled
+# with the counter before frame_done increments it, i.e. replay.lua's frame
+# minus one — docs/platform/gotchas.md, 14z-184; this census checks staging only.)
 #
 # The ten that were deviant, kept as history so a REGRESSION names itself
 # rather than appearing as an anonymous new file: bp_regs, obj_records_dump,

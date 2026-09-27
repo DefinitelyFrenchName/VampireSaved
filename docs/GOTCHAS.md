@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-433 entries (47 game / 120 platform / 266 project), counted from the buckets at generation.
+435 entries (47 game / 121 platform / 267 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 47 entries
 
@@ -72,7 +72,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A RECORD'S CLASS BYTE IS NOT THE VICTIM'S REACTION CLASS — the guard reads it first and the stager rewrites it (paid: 14z-169)
 - A POKED KO NEEDS THE VICTIM ON ITS LAST BAR, AND THE KO MUST COME FROM THE PATH YOU MEAN TO TEST — a low HP alone rallies (paid: 14z-184, GitHub #180)
 
-## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 120 entries
+## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 121 entries
 
 - `spctl -a` REPORTS THE SIGNING-POLICY VERDICT, NOT WHETHER A LAUNCH IS BLOCKED — and `unzip` DOES propagate com.apple.quarantine (measured: 2026-09-20, macOS 26.0 arm64, #144)
 - A ROMSET WITH MEMBERS MISSING RUNS FOR THOUSANDS OF FRAMES WITH WORK RAM BIT-IDENTICAL — only the framebuffer shows it (paid: 2026-09-20)
@@ -194,8 +194,9 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - CLAUDE CODE DELETES SESSION TRANSCRIPTS AFTER 30 DAYS — THE ARCHIVE THE AGENT TOOLING READS SHRINKS UNDER IT (measured 2026-09-24, 14z-178)
 - A WORKER CAN FINISH ON ANOTHER MODEL THAN ITS DEFINITION NAMES — A SAFETY-CLASSIFIER STOP TRIGGERS A SILENT FALLBACK (measured 2026-09-24, 14z-178, Claude Code 2.1.281)
 - A MAIN SESSION RUN AS A DEFINITION (`claude --agent <name>`) LOSES CLAUDE CODE'S WHOLE DEFAULT SYSTEM PROMPT — THE DEFINITION'S BODY REPLACES IT (measured 2026-09-24, 14z-178, Claude Code 2.1.281)
+- A `read_tap.lua` WRITE LABELLED N IS REPLAY.LUA'S FRAME N+1 — the tap names a write by the counter BEFORE that frame's `frame_done`; `field_trace.lua` and `replay.lua` increment first, then sample (measured 2026-09-27, 14z-184)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 266 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 267 entries
 
 - A VULN ID OF 0 IS NO BOX — a resolver that reads it builds a PHANTOM hurtbox the engine never tests (paid: 14z-182, GitHub #175)
 - A CHAIN ID IN A NAMING EXPECTATION IS IDENTIFIED FROM THE SLOT TABLE, NEVER DESCRIBED IN PROSE (paid: 14z-171, caught 14z-172, GitHub #168)
@@ -463,3 +464,4 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A KEPT PARITY WORK DIR HOLDS AN UNPINNED NATIVE TRACE FOR ITS CONTROL PART — the `unpinned-level` control re-runs that part's native leg over the file (paid: 14z-183, #157)
 - A RIG CHANGE RE-FROZEN IN THE GATES IT WAS MADE FOR LEAVES EVERY OTHER GATE THAT COPIES THE RIG STALE — and the staleness audit names nothing until a run of record exists (paid: 14z-183)
 - A GATE'S PRINTED DIFF IS A WINDOW — compare two builds' measurements as WHOLE FILES, never through the gate logs (paid: 14z-183, rule-checker run 2026-09-25-238)
+- A LEGACY CONTROL IS THE SAME SETUP UNTIL THE EVENT — a cross-game control that differs before the event under test is two experiments (paid: 14z-184, GitHub #179, three controls the maintainer corrected)

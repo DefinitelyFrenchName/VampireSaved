@@ -46,12 +46,16 @@ SIGNATURES (each a measured property of the root's own window, never its name al
                  tests/audit_phobos_dmg_residual.sh); Phobos 11 native / 12 ours, Donovan and Pyron 12 / 13.
                  RULED 2026-09-25 (14z-182): #161 closed as not-ours, "vanilla wins ties" (DECISIONS_HISTORY.md);
                  until then two open classes, PHOBOS-DMG-OPEN (14z-170) and DMG-OPEN (14z-181)
-  LANDING-TURN-OPEN the first DIFF is the tenant's x ALONE, on a frame where native's x holds and ours moves,
-                 and within two frames native's facing flips while ours does not — an OPEN class, GitHub #179
-                 (Phobos's Sitting Attack landing after a throw, huitzil_3 events 8/9: native stays at x 1000 and
-                 turns, ours is displaced 31 px and keeps facing; identical on merged-m19, exposed at the M20
-                 freeze when #157 removed the meter difference ahead of it). RULED 2026-09-26 (14z-183): "Freeze,
-                 ticket it (Recommended)" (DECISIONS_HISTORY.md); the class goes when #179 is resolved
+  WALL-PUSH-VSAVJ the first DIFF is the tenant's x ALONE, on a frame where native's x holds and ours moves,
+                 and within two frames native's facing flips while ours does not — vsavj's OWN shared-wall
+                 push rule, not the port: with both fighters clamped at one wall the push-apart pushes P1 out
+                 on vsavj and P2 out on vs2 (vs2's view clamp flags +0x148, vsavj's does not), and a LEGACY
+                 pursuit splits the same way (Lilith on Victor, pristine vsavj vs vs2 —
+                 tests/audit_shared_wall_push.sh; docs/game/engine_internals.md "THE PUSH-APART AT A SHARED
+                 WALL"). Phobos's Sitting Attack landing after a throw, huitzil_3 events 8/9: native stays at
+                 x 1000 and turns, ours is pushed 31 px and keeps facing. RULED 2026-09-27 (14z-184): #179
+                 closed as not-ours, "Close not-ours (Recommended)" (DECISIONS_HISTORY.md); until then the open
+                 class LANDING-TURN-OPEN (14z-183)
   OTHER          none of the above: an UNATTRIBUTED root (the gate fails on it)
 
 Usage: move_parity_attribution.py run --build DIR --romdir DIR --work DIR [--jobs 6] [--no-ablate]
@@ -197,12 +201,12 @@ def classify(part, k, trdir, rigdir, row):
                 return "DMG-VSAVJ", f"{tenant} takes {dn} native / {do} ours; the defense row is already vs2's (vsavj's own pipeline, #161)"
             return "DEFENSE-ROW", f"{tenant} takes {dn} native / {do} ours"
     if fields == ["x"] and f0 - 1 in n and f0 - 1 in o and f0 + 2 in n and f0 + 2 in o:
-        # 14z-183, #179 (OPEN): native's x holds on the first DIFF frame while ours moves, and native turns
+        # 14z-183, #179 (closed not-ours 14z-184, vsavj's shared-wall rule): native's x holds on the first DIFF frame while ours moves, and native turns
         # within two frames while ours keeps facing — a measured signature, never the part's name
         if n[f0]["x"] == n[f0 - 1]["x"] and o[f0]["x"] != o[f0 - 1]["x"] \
            and any(n[g]["face"] != n[f0]["face"] for g in (f0 + 1, f0 + 2)) \
            and all(o[g]["face"] == o[f0]["face"] for g in (f0 + 1, f0 + 2)):
-            return "LANDING-TURN-OPEN", f"native x holds at {n[f0]['x']} and turns; ours moves {o[f0 - 1]['x']} -> {o[f0]['x']} and keeps facing (#179)"
+            return "WALL-PUSH-VSAVJ", f"native x holds at {n[f0]['x']} and turns; ours is pushed {o[f0 - 1]['x']} -> {o[f0]['x']} and keeps facing (vsavj's shared-wall rule, #179)"
     return "OTHER", f"first DIFF {row[4]} on {row[5]}"
 
 

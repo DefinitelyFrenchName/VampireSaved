@@ -113,9 +113,15 @@ and 76 fingerprints; measured 14z-183b on this Mac).
 
 ## What is not
 
-- **The MAME and MiSTer lanes in a snapshot** were read only statically in the census (their
-  out-of-git inputs: the reference MAME, `release/emulators/`, the scratch clones); whether they read
-  anything else through HOME is proved only by a real run of them on a snapshot.
+- **The proof run (14z-184, 2026-09-27):** the whole emulator tier on a snapshot of `454a1e19` —
+  `tests/run_on_snapshot.sh -- tests/run_all_emulator.sh --freeze --lane all --scope all --strict
+  --jobs 4 --keep-going`, 3 h 25 min wall — read PASS 196 / SKIP 1 / FAIL 1: the SKIP the approved
+  `audit_mask_window_ff42a2`, the FAIL `audit_x2b7ef4_reach_m18`, an out-of-scope gate that fails
+  the same way in the working tree (its frozen rows predate a 14z-181 change to the `pyron_3` rig; the gate was retired the same session, maintainer-ruled 2026-09-27).
+  `test_wide_profile` passed on a snapshot for the first time (S1b), the live instruments were
+  unchanged, the run of record came back as `build/emu_sweep_20260927_065635` stamped `454a1e19`, and
+  none of the six copied scratch clones still named its original after the run (the record,
+  `build/snapshot_runs/20260927T065450-454a1e19c98b/`, and `build/agent184/proof181_outer.log`).
 - **Host tools** — Homebrew's SDL libraries the MAME binaries link, Verilator, python3, `timeout` —
   are neither snapshotted nor recorded.
 - **A commit other than `HEAD`** is refused whenever a submodule's gitlink differs from the tree's
