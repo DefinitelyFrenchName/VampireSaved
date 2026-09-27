@@ -234,11 +234,11 @@ the suite runners and their own ground truth. 29 of 29 described.
 
 ### `test_run_on_snapshot.sh` — test, ci_portable
 
-**WHAT:** tests/run_on_snapshot.sh runs its command on a snapshot that nothing done to the working tree during the run can reach — a tracked file edited and committed, a build/ output rewritten, a tracked build/ file, a submodule file, the ../community sibling, the bbh checkout, and the runner's own file — and its record names the commit the run was taken at.
+**WHAT:** tests/run_on_snapshot.sh runs its command on a snapshot that nothing done to the working tree during the run can reach — a tracked file edited and committed, a build/ output rewritten, a tracked build/ file, a submodule file, the ../community sibling, the bbh checkout, a file of the ~/.cache/vampire-saved instrument cache, a Verilator scratch clone, and the runner's own file — and its record names the commit the run was taken at; a tracked file carries its last commit's time, a `build/emu_*` the run writes comes back to the working tree, and an instrument binary changed in the LIVE cache during a run is reported.
 
-**HOW:** builds a throwaway world (a repo with a submodule, a build/ output, a community sibling, a bbh checkout), starts a probe under run_on_snapshot.sh that reads all six inputs, pauses it, perturbs all six in the working tree, releases it and has it read them again; then runs the SAME probe IN PLACE with the same perturbation (the positive leg: the perturbation must reach an unsnapshotted run, or the immunity leg proves nothing).
+**HOW:** builds a throwaway world (a repo with a submodule, a build/ output, a community sibling, a bbh checkout, a HOME holding an instrument cache, a scratch clone), starts a probe under run_on_snapshot.sh --emulator-inputs that reads all nine inputs, pauses it, perturbs them in the working tree, releases it and has it read them again; then runs the SAME probe IN PLACE with the same perturbation (the positive leg: the perturbation must reach an unsnapshotted run, or the immunity leg proves nothing); section 4 changes an instrument binary mid-run.
 
-**EXPECTS:** the snapshot run reads all six inputs unchanged and records the commit taken before the perturbation; the in-place run sees all six change; each control makes the gate FAIL.
+**EXPECTS:** the snapshot run reads every input unchanged, records the commit taken before the perturbation, sees t.txt at its commit's time, reaches the real HOME's other entries, and returns its build/emu_probe to the tree; the in-place run sees nine readings change; a mid-run instrument change reads unchanged inside the run and turns the run's exit to 2 with its AFTER line; each control makes the gate FAIL.
 
 ### `test_shell_portability.sh` — test, ci_portable
 

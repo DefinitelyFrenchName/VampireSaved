@@ -1318,6 +1318,7 @@ ROMDIR=... tests/run_all_emulator.sh --lane all       # + the Verilator lane (--
 ROMDIR=... tests/run_all_emulator.sh --lane all --jobs 4   # 14z-134: N Verilator runs at once, one scratch clone per slot
 ROMDIR=... tests/run_all_emulator.sh --strict         # SKIP and UNREGISTERED are failures too
 ROMDIR=... tests/run_all_emulator.sh --scope all --lane all --strict --controls   # THE RELEASE RUN (ruled 2026-09-10): every declared must-fire control executed as a `CONTROL=<name>` mode, rows `<gate>@<name>`; a REFUSED mode is a dead mode, not a pass
+ROMDIR=... tests/run_on_snapshot.sh -- tests/run_all_emulator.sh --freeze --lane all --strict   # the same tier on a SNAPSHOT at HEAD (#181, ruled 2026-09-27): the instrument cache under a private HOME, the Verilator scratch clones copied, tracked files at their commit's time, the run's build/emu_* copied back to the working tree (docs/project/snapshot_runs.md)
 tests/run_all_emulator.sh --list                      # the registry, as selected
 ROMDIR=... tests/run_all_emulator.sh --dry-run        # the resolved command per gate
 ```

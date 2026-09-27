@@ -1,0 +1,12 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent184/c181/plan_181.md	2c1a2d531cc307a84431110007cae98eb6ce4600
+build/agent184/c181/runA/results.tsv	4eedd69cc1475032fd0a394630e07772d5ee41a3
+build/agent184/c181/runB/results.tsv	8c5a89d4024c26ca3c98db0dbf540b1e84a17848
+build/agent184/c181/runA_attribution.tsv	cbe27187743e1e466e5e0168c28a65baa9e6dac6
+build/agent184/c181/static_census.tsv	74cb397c48b7363a51890bad517d7b21236fed04
+build/agent184/c181/literal_readers.txt	a6b95e94e02a83c6c5e9e2d8a09e5aa8105d07d4
+build/agent184/c181/runB/test_wide_profile.log	990eee3483a6f166d1829f8b2b8eef82e2052808
+build/agent184/c181/cache_diff.txt	386bbb8c41f93ea988033730b71e2ee454737245
+tests/test_wide_profile.sh.lines-88-110 (lines 88-110 of tests/test_wide_profile.sh)	b31a55676cccd067b4abdd37fd6539ab80a2898b
+tools/audit_emulator_staleness.py.lines-55-75 (lines 55-75 of tools/audit_emulator_staleness.py)	abce1655d5bcdadb71e410f499fc21c09ae12331
+tests/run_all_emulator.sh.lines-300-330 (lines 300-330 of tests/run_all_emulator.sh)	dfcc897c1c04a3988b63846ab2cf58a679d98226

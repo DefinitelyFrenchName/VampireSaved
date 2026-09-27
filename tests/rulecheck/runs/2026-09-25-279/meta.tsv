@@ -1,0 +1,9 @@
+decision	recommendation
+subject	#181: the emulator tier on a snapshot — design options put to the maintainer (re-check after run 278)
+session	143a135b
+model	rule-checker@163e4ce9cf7b
+claim	The recommendation to put to the maintainer for #181's design is Q1 (b) a copy-on-write snapshot of ~/.cache/vampire-saved under a run-private HOME whose other entries are symlinks to the real HOME's, with sha256 hashes of the instrument binaries at start and end, Q2 (a) every tracked file's mtime set to its last-commit time, Q3 (a) the run's build/emu_* copied back into the working tree, Q4 (a) copy-on-write copies of the jtsim scratch clones; it rests on four snapshot runs of the prereq and fbneo lanes (26 gates each: A with an empty HOME, 16 non-PASS; C with a HOME holding only the three cache binaries, which turned 15 of those 16 into PASS and left test_wide_profile failing only on an mtime comparison; B with the real HOME and D with the Q1 (b) prototype, each PASS 25 / FAIL 1 on that same mtime comparison), on a static grep of the mame and mister lanes, and, for Q3, on the code alone (the runner's relative default log dir, the snapshot runner's cd into the clone, the staleness tool's root); NOT tested: the mame and mister lanes in a snapshot (so neither whether they read anything else through HOME nor whether the prototype breaks them), the default log location (every census run passed an absolute --log), any option built, the Q2 outcome on test_wide_profile, and whether the host tools (Homebrew SDL, Verilator) moved.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b

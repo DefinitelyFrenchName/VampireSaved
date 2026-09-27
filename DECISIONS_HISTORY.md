@@ -27,6 +27,16 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-27 (14z-184) — #181: the emulator tier on a snapshot — the cache under a private HOME, commit-time mtimes, the run of record copied back, private simulator scratch
+
+**The questions (14z-184, after the census — four snapshot runs of the prereq and fbneo lanes and a static read of the mame and mister lanes; rule-checker runs 277-279, 279 OK), verbatim:** *"How should an emulator-tier snapshot run treat the instrument binaries (the MAME and FBNeo builds under ~/.cache/vampire-saved)?"*, *"test_wide_profile compares file modification times, which a fresh clone resets. What should the snapshot give tracked files?"*, *"Where should a snapshot run's results (build/emu_*) end up?"* and *"The MiSTer simulator's scratch clones are working directories every simulation writes into. What should a snapshot run use?"*
+
+**The maintainer:** *"Copy the cache (Recommended)"*, *"Last-commit time (Recommended)"*, *"Copied back (Recommended)"* and *"Private copies (Recommended)"*.
+
+**What it means.** For the emulator tier, `tests/run_on_snapshot.sh` also (1) copies `~/.cache/vampire-saved` (minus `snapshots/`) into the snapshot by copy-on-write and runs the tier under a run-private `HOME` whose `.cache/vampire-saved` is that copy and whose every other entry is a symlink to the real HOME's, with the instrument binaries hashed at start and end; (2) gives every tracked file in the clone the time of the commit that last changed it; (3) copies every `build/emu_*` the run created back into the working tree's `build/` and names it in the record; (4) copies the existing `$TMPDIR/vampire-saved-jtsim*` scratch clones into the snapshot and points `JTSIM_SCRATCH` there. The census and the options as put: `build/agent184/c181/plan_181.md`.
+
+---
+
 ## Ruled 2026-09-26 (14z-183b) — #153 closes with slice 1; slice 2 (the emulator tier) is #181
 
 **The question (14z-183b, once slice 1 was built and its immunity gate green), verbatim:** *"#153 slice 1 (the static tier on a snapshot, with its immunity gate) is built; slice 2 (the emulator tier) is not. How should the ticket stand once slice 1 lands?"*

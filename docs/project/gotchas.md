@@ -5620,6 +5620,14 @@ runner's own `git checkout <commit> -- build` restored the symlinked `build/` to
 as MODES, the same controls failed for the right reason, which is how the difference showed. Rule: a
 control's evidence must name the property it perturbs (here "the perturbation REACHED the run: <field>"),
 and any other failure of the perturbed run is a DEAD control, not a fired one.
+**Paid again 14z-184 (#181):** the new `no-instrument-check` control replaced `if cmp …; then` with
+`if true; then  # CONTROL …`, but the original line CONTINUED past `then` (`… then say "…"`), so the
+comment swallowed the branch body and the copy died at `syntax error near unexpected token 'else'` —
+after writing `runner_exit 0`, so its marker "exited 0, expected 2" matched and the control read FIRED.
+Run as a mode it failed in section 2 instead, which is how it showed. Fixed: the edit is now
+`: CONTROL …; if true; then` (the rest of the line kept), the control counts only when the run's record
+is WHOLE, and every perturbed copy is `sh -n`-checked. Rule: a control's replacement text never ends in
+a comment unless the line it replaces ends there too.
 
 ## A SCRIPT THAT RE-IMPLEMENTS THE RUNNER IS NOT THE RUNNER — it dropped `VS_CADENCE` and read a freeze-cadence red as PASS (paid: 14z-183b, GitHub #153)
 
