@@ -3,6 +3,7 @@
 # and the RETROFIT DEBT — pre-grammar mentions with no declaration (shrinks only).
 # Gate: tests/test_must_fire_census.sh. Regenerate with FREEZE=1 after review.
 # class<TAB>gate
+declares	audit_air_gc_legacy
 declares	audit_capture_matrix
 declares	audit_chains174
 declares	audit_clone_beam_lines

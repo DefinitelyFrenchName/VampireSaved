@@ -1,0 +1,190 @@
+# tests/expected/air_gc_legacy.tsv — the legacy control for #182: an original character's guard-cancel motion from a
+# ground and an air block, P1's block / guard-window / commit / command / sequence bytes per event
+# (tests/audit_air_gc_legacy.sh; tests/lua/read_tap.lua, non-debug). Evidence class: in-emulator (MAME, pristine vsavj,
+# native vsav2 and the WIDE build m3b_merged28). Frozen 14z-185 (GitHub #182) with FREEZE=1, its rule-checker run named
+# in the commit. A non-zero window158 write or a commit3b5 := 06 in E1/E2 on any leg, or a leg whose rows stop equalling
+# pristine vsavj's, is a finding.
+# Rows for phobos are the POSITIVE leg (native vsav2 only): the same rig commits an air guard cancel there.
+# Columns: character, leg (vsavj | vsav2 | ours), event (- | E0 ground 2800 | E1 air 3220 | E2 air 3640), field, value
+#   ids: the last pre-match id byte per fighter (real picks, never poked)
+#   block140 / window158 / commit3b5 / x147 / air38 / cmd106 / seq06: every write of P1's byte +0x140 / +0x158 / +0x3B5
+#   (the guard-cancel commit writes 06) / +0x147 / +0x38 (airborne) / +0x106 / +0x06 in [t-10, t+70), as
+#   <frame>:<byte hex>, in write order; "-" when none
+#   commit_pc: every PC that wrote +0x3B5 := 06 in the event (the commit routine: vsavj/ours 029c6e, vs2 028fa0)
+# Frame numbers are read_tap.lua's WRITE labels (a write labelled N is replay.lua's frame N+1,
+# docs/platform/gotchas.md); every leg is read by the same instrument, so they compare exactly.
+leilei	vsavj	-	ids	p1=0d p2=01
+leilei	vsavj	E0	block140	2806:12,2806:02
+leilei	vsavj	E0	window158	2806:00,2806:0e,2806:0d,2807:0c,2808:0b,2809:0a,2810:09,2810:08,2811:07,2812:06,2813:05,2814:04,2815:00
+leilei	vsavj	E0	commit3b5	2815:06,2815:00,2841:02,2841:00
+leilei	vsavj	E0	x147	2815:1a,2815:19,2815:18,2816:17,2817:16,2818:15,2819:14,2819:13,2820:12,2821:11,2822:10,2823:0f,2823:0e,2824:0d,2825:0c,2826:0b,2827:0a,2828:09,2828:08,2829:07,2830:06,2831:05,2832:04,2832:03,2833:02,2834:01,2835:00
+leilei	vsavj	E0	air38	2832:01,2867:01,2868:00
+leilei	vsavj	E0	cmd106	2815:06
+leilei	vsavj	E0	seq06	2795:04,2800:0c,2805:00,2815:0e,2867:06,2868:08
+leilei	vsavj	E0	commit_pc	029c6e
+leilei	vsavj	E1	block140	3235:12
+leilei	vsavj	E1	window158	3235:00
+leilei	vsavj	E1	commit3b5	-
+leilei	vsavj	E1	x147	-
+leilei	vsavj	E1	air38	3223:01,3244:01,3262:01,3284:01
+leilei	vsavj	E1	cmd106	3245:06
+leilei	vsavj	E1	seq06	3221:06,3234:00,3244:02,3244:06,3245:0e,3284:06
+leilei	vsavj	E1	commit_pc	-
+leilei	vsavj	E2	block140	3659:12
+leilei	vsavj	E2	window158	3659:00
+leilei	vsavj	E2	commit3b5	-
+leilei	vsavj	E2	x147	-
+leilei	vsavj	E2	air38	3647:01,3668:01,3686:01,3709:01
+leilei	vsavj	E2	cmd106	3669:06
+leilei	vsavj	E2	seq06	3645:06,3658:00,3668:02,3668:06,3669:0e,3709:06
+leilei	vsavj	E2	commit_pc	-
+leilei	vsav2	-	ids	p1=0d p2=01
+leilei	vsav2	E0	block140	2806:12,2806:02
+leilei	vsav2	E0	window158	2806:00,2806:0e,2806:0d,2807:0c,2808:0b,2809:0a,2810:09,2810:08,2811:07,2812:06,2813:05,2814:04,2815:00
+leilei	vsav2	E0	commit3b5	2815:06,2815:00,2841:02,2841:00
+leilei	vsav2	E0	x147	2815:1a,2815:19,2815:18,2816:17,2817:16,2818:15,2819:14,2819:13,2820:12,2821:11,2822:10,2823:0f,2823:0e,2824:0d,2825:0c,2826:0b,2827:0a,2828:09,2828:08,2829:07,2830:06,2831:05,2832:04,2832:03,2833:02,2834:01,2835:00
+leilei	vsav2	E0	air38	2832:01,2867:01,2868:00
+leilei	vsav2	E0	cmd106	2815:06
+leilei	vsav2	E0	seq06	2795:04,2800:0c,2805:00,2815:0e,2867:06,2868:08
+leilei	vsav2	E0	commit_pc	028fa0
+leilei	vsav2	E1	block140	3235:12
+leilei	vsav2	E1	window158	3235:00
+leilei	vsav2	E1	commit3b5	-
+leilei	vsav2	E1	x147	-
+leilei	vsav2	E1	air38	3223:01,3244:01,3262:01,3284:01
+leilei	vsav2	E1	cmd106	3245:06
+leilei	vsav2	E1	seq06	3221:06,3234:00,3244:02,3244:06,3245:0e,3284:06
+leilei	vsav2	E1	commit_pc	-
+leilei	vsav2	E2	block140	3659:12
+leilei	vsav2	E2	window158	3659:00
+leilei	vsav2	E2	commit3b5	-
+leilei	vsav2	E2	x147	-
+leilei	vsav2	E2	air38	3647:01,3668:01,3686:01,3709:01
+leilei	vsav2	E2	cmd106	3669:06
+leilei	vsav2	E2	seq06	3645:06,3658:00,3668:02,3668:06,3669:0e,3709:06
+leilei	vsav2	E2	commit_pc	-
+leilei	ours	-	ids	p1=0d p2=01
+leilei	ours	E0	block140	2806:12,2806:02
+leilei	ours	E0	window158	2806:00,2806:0e,2806:0d,2807:0c,2808:0b,2809:0a,2810:09,2810:08,2811:07,2812:06,2813:05,2814:04,2815:00
+leilei	ours	E0	commit3b5	2815:06,2815:00,2841:02,2841:00
+leilei	ours	E0	x147	2815:1a,2815:19,2815:18,2816:17,2817:16,2818:15,2819:14,2819:13,2820:12,2821:11,2822:10,2823:0f,2823:0e,2824:0d,2825:0c,2826:0b,2827:0a,2828:09,2828:08,2829:07,2830:06,2831:05,2832:04,2832:03,2833:02,2834:01,2835:00
+leilei	ours	E0	air38	2832:01,2867:01,2868:00
+leilei	ours	E0	cmd106	2815:06
+leilei	ours	E0	seq06	2795:04,2800:0c,2805:00,2815:0e,2867:06,2868:08
+leilei	ours	E0	commit_pc	029c6e
+leilei	ours	E1	block140	3235:12
+leilei	ours	E1	window158	3235:00
+leilei	ours	E1	commit3b5	-
+leilei	ours	E1	x147	-
+leilei	ours	E1	air38	3223:01,3244:01,3262:01,3284:01
+leilei	ours	E1	cmd106	3245:06
+leilei	ours	E1	seq06	3221:06,3234:00,3244:02,3244:06,3245:0e,3284:06
+leilei	ours	E1	commit_pc	-
+leilei	ours	E2	block140	3659:12
+leilei	ours	E2	window158	3659:00
+leilei	ours	E2	commit3b5	-
+leilei	ours	E2	x147	-
+leilei	ours	E2	air38	3647:01,3668:01,3686:01,3709:01
+leilei	ours	E2	cmd106	3669:06
+leilei	ours	E2	seq06	3645:06,3658:00,3668:02,3668:06,3669:0e,3709:06
+leilei	ours	E2	commit_pc	-
+zabel	vsavj	-	ids	p1=04 p2=01
+zabel	vsavj	E0	block140	2806:12,2806:02,2869:00
+zabel	vsavj	E0	window158	2806:00,2806:0e,2806:0d,2807:0c,2808:0b,2809:0a,2810:09,2810:08,2811:07,2812:06,2813:05,2814:04,2815:00,2869:00,2869:00
+zabel	vsavj	E0	commit3b5	2815:06,2815:00,2822:02,2823:00
+zabel	vsavj	E0	x147	2815:0e,2815:0d,2815:0c,2816:0b,2817:0a,2818:09,2819:08,2819:07,2820:06,2821:05,2822:04,2823:03,2823:02,2824:01,2825:00
+zabel	vsavj	E0	air38	2869:00
+zabel	vsavj	E0	cmd106	2815:10
+zabel	vsavj	E0	seq06	2795:04,2800:0c,2805:00,2815:0e,2869:00
+zabel	vsavj	E0	commit_pc	029c6e
+zabel	vsavj	E1	block140	3235:12,3286:00
+zabel	vsavj	E1	window158	3235:00,3286:00,3286:00
+zabel	vsavj	E1	commit3b5	-
+zabel	vsavj	E1	x147	-
+zabel	vsavj	E1	air38	3223:01,3244:01,3280:00,3286:00
+zabel	vsavj	E1	cmd106	-
+zabel	vsavj	E1	seq06	3221:06,3234:00,3244:02,3244:06,3245:0a,3261:06,3286:00
+zabel	vsavj	E1	commit_pc	-
+zabel	vsavj	E2	block140	3659:12
+zabel	vsavj	E2	window158	3659:00
+zabel	vsavj	E2	commit3b5	-
+zabel	vsavj	E2	x147	-
+zabel	vsavj	E2	air38	3647:01,3668:01,3704:00
+zabel	vsavj	E2	cmd106	-
+zabel	vsavj	E2	seq06	3645:06,3658:00,3668:02,3668:06,3669:0a,3686:06
+zabel	vsavj	E2	commit_pc	-
+zabel	vsav2	-	ids	p1=04 p2=01
+zabel	vsav2	E0	block140	2806:12,2806:02,2869:00
+zabel	vsav2	E0	window158	2806:00,2806:0e,2806:0d,2807:0c,2808:0b,2809:0a,2810:09,2810:08,2811:07,2812:06,2813:05,2814:04,2815:00,2869:00,2869:00
+zabel	vsav2	E0	commit3b5	2815:06,2815:00,2822:02,2823:00
+zabel	vsav2	E0	x147	2815:0e,2815:0d,2815:0c,2816:0b,2817:0a,2818:09,2819:08,2819:07,2820:06,2821:05,2822:04,2823:03,2823:02,2824:01,2825:00
+zabel	vsav2	E0	air38	2869:00
+zabel	vsav2	E0	cmd106	2815:10
+zabel	vsav2	E0	seq06	2795:04,2800:0c,2805:00,2815:0e,2869:00
+zabel	vsav2	E0	commit_pc	028fa0
+zabel	vsav2	E1	block140	3235:12,3286:00
+zabel	vsav2	E1	window158	3235:00,3286:00,3286:00
+zabel	vsav2	E1	commit3b5	-
+zabel	vsav2	E1	x147	-
+zabel	vsav2	E1	air38	3223:01,3244:01,3280:00,3286:00
+zabel	vsav2	E1	cmd106	-
+zabel	vsav2	E1	seq06	3221:06,3234:00,3244:02,3244:06,3245:0a,3261:06,3286:00
+zabel	vsav2	E1	commit_pc	-
+zabel	vsav2	E2	block140	3659:12
+zabel	vsav2	E2	window158	3659:00
+zabel	vsav2	E2	commit3b5	-
+zabel	vsav2	E2	x147	-
+zabel	vsav2	E2	air38	3647:01,3668:01,3704:00
+zabel	vsav2	E2	cmd106	-
+zabel	vsav2	E2	seq06	3645:06,3658:00,3668:02,3668:06,3669:0a,3686:06
+zabel	vsav2	E2	commit_pc	-
+zabel	ours	-	ids	p1=04 p2=01
+zabel	ours	E0	block140	2806:12,2806:02,2869:00
+zabel	ours	E0	window158	2806:00,2806:0e,2806:0d,2807:0c,2808:0b,2809:0a,2810:09,2810:08,2811:07,2812:06,2813:05,2814:04,2815:00,2869:00,2869:00
+zabel	ours	E0	commit3b5	2815:06,2815:00,2822:02,2823:00
+zabel	ours	E0	x147	2815:0e,2815:0d,2815:0c,2816:0b,2817:0a,2818:09,2819:08,2819:07,2820:06,2821:05,2822:04,2823:03,2823:02,2824:01,2825:00
+zabel	ours	E0	air38	2869:00
+zabel	ours	E0	cmd106	2815:10
+zabel	ours	E0	seq06	2795:04,2800:0c,2805:00,2815:0e,2869:00
+zabel	ours	E0	commit_pc	029c6e
+zabel	ours	E1	block140	3235:12,3286:00
+zabel	ours	E1	window158	3235:00,3286:00,3286:00
+zabel	ours	E1	commit3b5	-
+zabel	ours	E1	x147	-
+zabel	ours	E1	air38	3223:01,3244:01,3280:00,3286:00
+zabel	ours	E1	cmd106	-
+zabel	ours	E1	seq06	3221:06,3234:00,3244:02,3244:06,3245:0a,3261:06,3286:00
+zabel	ours	E1	commit_pc	-
+zabel	ours	E2	block140	3659:12
+zabel	ours	E2	window158	3659:00
+zabel	ours	E2	commit3b5	-
+zabel	ours	E2	x147	-
+zabel	ours	E2	air38	3647:01,3668:01,3704:00
+zabel	ours	E2	cmd106	-
+zabel	ours	E2	seq06	3645:06,3658:00,3668:02,3668:06,3669:0a,3686:06
+zabel	ours	E2	commit_pc	-
+phobos	vsav2	-	ids	p1=10 p2=01
+phobos	vsav2	E0	block140	2806:12,2806:02,2858:00
+phobos	vsav2	E0	window158	2806:00,2806:0e,2806:0d,2807:0c,2808:0b,2809:0a,2810:09,2810:08,2811:07,2812:06,2813:05,2814:04,2815:00,2858:00,2858:00
+phobos	vsav2	E0	commit3b5	2815:06,2815:00,2816:02,2817:00
+phobos	vsav2	E0	x147	2815:0e,2815:0d,2815:0c,2816:0b,2817:0a,2818:09,2819:08,2819:07,2820:06,2821:05,2822:04,2823:03,2823:02,2824:01,2825:00
+phobos	vsav2	E0	air38	2858:00
+phobos	vsav2	E0	cmd106	2815:0e
+phobos	vsav2	E0	seq06	2795:04,2800:0c,2805:00,2815:0e,2858:00
+phobos	vsav2	E0	commit_pc	028fa0
+phobos	vsav2	E1	block140	3235:12
+phobos	vsav2	E1	window158	3235:00,3235:0e,3235:0d,3236:0c,3237:0b,3238:0a,3239:09,3239:08,3240:07,3241:06,3242:05,3243:04,3244:03,3244:02,3245:00
+phobos	vsav2	E1	commit3b5	3245:06,3246:00
+phobos	vsav2	E1	x147	3245:0e,3245:0d,3246:0c,3247:0b,3248:0a,3248:09,3249:08,3250:07,3251:06,3252:05,3252:04,3253:03,3254:02,3255:01,3256:00
+phobos	vsav2	E1	air38	3223:01,3244:01
+phobos	vsav2	E1	cmd106	3245:0e
+phobos	vsav2	E1	seq06	3221:06,3234:00,3244:02,3244:06,3245:0e
+phobos	vsav2	E1	commit_pc	028fa0
+phobos	vsav2	E2	block140	3659:12
+phobos	vsav2	E2	window158	3659:00,3659:0e,3660:0d,3660:0c,3661:0b,3662:0a,3663:09,3664:08,3664:07,3665:06,3666:05,3667:04,3668:03,3668:02,3669:00
+phobos	vsav2	E2	commit3b5	3669:06,3670:00
+phobos	vsav2	E2	x147	3669:0e,3669:0d,3670:0c,3671:0b,3672:0a,3673:09,3673:08,3674:07,3675:06,3676:05,3677:04,3677:03,3678:02,3679:01,3680:00
+phobos	vsav2	E2	air38	3647:01,3668:01
+phobos	vsav2	E2	cmd106	3669:0e
+phobos	vsav2	E2	seq06	3645:06,3658:00,3668:02,3668:06,3669:0e
+phobos	vsav2	E2	commit_pc	028fa0

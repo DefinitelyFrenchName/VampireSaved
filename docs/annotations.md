@@ -23,15 +23,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3266 |
-| named by a document or manifest only | 2144 |
-| named by both a document/manifest and code | 750 |
+| distinct program-space addresses named | 3270 |
+| named by a document or manifest only | 2142 |
+| named by both a document/manifest and code | 756 |
 | named by CODE ONLY (the gap list below) | 372 |
-| carried by atlas | 590 |
-| carried by engine_internals | 688 |
+| carried by atlas | 594 |
+| carried by engine_internals | 694 |
 | carried by other docs | 1010 |
 | carried by manifests | 1818 |
-| carried by code | 1122 |
+| carried by code | 1128 |
 
 ## Addresses
 
@@ -251,6 +251,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x00D606` | build/manifest/reconciliation.toml — map |
 | `PRG:0x00D668` | build/manifest/reconciliation.toml — map |
 | `PRG:0x00D69A` | build/manifest/reconciliation.toml — map |
+| `PRG:0x00D6B2` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174) |
 | `PRG:0x00D6CA` | build/manifest/reconciliation.toml — map |
 | `PRG:0x00D73A` | build/manifest/reconciliation.toml — map |
 | `PRG:0x00D77C` | build/manifest/reconciliation.toml — map |
@@ -797,7 +798,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x022406` | build/manifest/type_stamps.toml — compare |
 | `PRG:0x02245E` | build/manifest/pcrel_escapes.toml — hui58 |
 | `PRG:0x02246E` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); docs/game/engine_internals.md — The STARTUP INVINCIBILITY window is per character, and the tenants arm their own (measured 14z-126); docs/project/gotchas.md — A WRITE TAP ON A COUNTDOWN FIELD NAMES THE DECREMENTER, NOT THE OPENER (paid: 14z-123 -> 14z-126); tests/audit_df_startup_invuln.sh; tests/test_advancing_guard.sh |
-| `PRG:0x022480` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174) |
+| `PRG:0x022480` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174); tests/audit_air_gc_legacy.sh |
 | `PRG:0x022492` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x0224AA` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x0224B4` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
@@ -895,7 +896,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x023874` | build/manifest/type_stamps.toml — compare |
 | `PRG:0x0238A0` | build/manifest/pcrel_escapes.toml — hui58 |
 | `PRG:0x0238FC` | build/manifest/huitzil.toml — throw_arc_tables |
-| `PRG:0x02393A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174) |
+| `PRG:0x02393A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174); tests/audit_air_gc_legacy.sh |
 | `PRG:0x02395A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); docs/game/engine_internals.md — The STARTUP INVINCIBILITY window is per character, and the tenants arm their own (measured 14z-126); docs/project/gotchas.md — A WRITE TAP ON A COUNTDOWN FIELD NAMES THE DECREMENTER, NOT THE OPENER (paid: 14z-123 -> 14z-126); build/manifest/pcrel_escapes.toml — hui58; tests/test_advancing_guard.sh |
 | `PRG:0x023966` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); docs/project/gotchas.md — A WRITE TAP ON A COUNTDOWN FIELD NAMES THE DECREMENTER, NOT THE OPENER (paid: 14z-123 -> 14z-126); tests/test_advancing_guard.sh |
 | `PRG:0x02399C` | build/manifest/donovan.toml — ls_freeze_vs2_attacker |
@@ -1185,13 +1186,13 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x028E42` | docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122); docs/project/patch_notes.md — 14z-99 — the window (#43(b) + #103 + #104 + #105): byte detail; build/manifest/reconciliation.toml — map |
 | `PRG:0x028EE6` | docs/game/atlas/ram.md — Fighter + effect-pool fields (14z-67, measured on the H effect arc); build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x028F5C` | build/manifest/reconciliation.toml — map [vs2] |
-| `PRG:0x028FA0` | build/manifest/reconciliation.toml — map [vs2]; tools/build_donovan.sh |
+| `PRG:0x028FA0` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174) [vs2]; build/manifest/reconciliation.toml — map [vs2]; tests/audit_air_gc_legacy.sh; tools/build_donovan.sh |
 | `PRG:0x028FF4` | build/manifest/pcrel_escapes.toml — don_m24; build/manifest/pcrel_escapes.toml — hui58; build/manifest/pcrel_escapes.toml — pyron43 |
 | `PRG:0x029034` | build/manifest/pcrel_escapes.toml — don_m24; build/manifest/pcrel_escapes.toml — hui58; build/manifest/pcrel_escapes.toml — pyron43 |
 | `PRG:0x02904A` | build/manifest/reconciliation.toml — map |
 | `PRG:0x029062` | build/manifest/reconciliation.toml — map |
 | `PRG:0x0290B2` | build/manifest/reconciliation.toml — map |
-| `PRG:0x0290C4` | build/manifest/reconciliation.toml — map |
+| `PRG:0x0290C4` | docs/game/engine_internals.md — THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174); build/manifest/reconciliation.toml — map |
 | `PRG:0x029104` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x02910C` | docs/project/patch_notes.md — 14z-65 (6) — the specials hunt: window widened, alias rule, farm verified (2026-08-07); build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x029114` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) [vs2]; build/manifest/reconciliation.toml — map [vs2] |
@@ -1242,7 +1243,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x029B6C` | build/manifest/donovan.toml — port_patch [vs2]; build/manifest/donovan.toml — state_hook |
 | `PRG:0x029BB4` | build/manifest/reconciliation.toml — map |
 | `PRG:0x029C2A` | build/manifest/reconciliation.toml — map |
-| `PRG:0x029C6E` | build/manifest/reconciliation.toml — map |
+| `PRG:0x029C6E` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174); build/manifest/reconciliation.toml — map; tests/audit_air_gc_legacy.sh |
 | `PRG:0x029DC2` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) |
 | `PRG:0x029DCA` | build/manifest/reconciliation.toml — map |
 | `PRG:0x029DD2` | docs/project/patch_notes.md — 14z-65 (6) — the specials hunt: window widened, alias rule, farm verified (2026-08-07); build/manifest/reconciliation.toml — map |
@@ -1387,6 +1388,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0358EA` | build/manifest/qs_songs.toml — hui_kernel_v0_alt |
 | `PRG:0x035969` | build/manifest/qs_songs.toml — hui_kernel_v3_alt |
 | `PRG:0x035ACD` | build/manifest/qs_songs.toml — hui_trap_eject_alt |
+| `PRG:0x036A6E` | docs/game/engine_internals.md — THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174); tests/audit_air_gc_legacy.sh |
 | `PRG:0x03844E` | docs/project/patch_notes.md — 14z-65 (4) — Huitzil stage 4 BUILDS; the R1 frontier enumerated (2026-08-07); build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x03975E` | HANDOFF.md — THE OUT-OF-RANGE INDEX TOOLKIT — three instruments, one class (measured 14z-78); tests/lua/index_watch.lua; tools/gen_index_window_thunk.py |
 | `PRG:0x03B77C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
@@ -1560,6 +1562,8 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x04A9C2` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] [vs2] |
 | `PRG:0x04AD8F` | docs/project/gotchas.md — sweep gates when a design changes (14z-67, paid twice in one day); tests/test_merged_render_content.sh; tests/test_wide_render_content.sh |
 | `PRG:0x04B0C4` | docs/platform/mister.md — The tenant-content measurements: the tenant anchor, both group-C fetches, bank 1 under load, the QSound extension, the OBJ-list oracle, the synthesis fit (measured 14z-108/109, entered 14z-114); docs/project/mister_core.md — 12. The holes — what has never been tried; tests/test_mister_obj_oracle.sh |
+| `PRG:0x04B3FA` | docs/game/engine_internals.md — THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174); tests/audit_air_gc_legacy.sh |
+| `PRG:0x04B42A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2] |
 | `PRG:0x04C6C0` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; tests/audit_df_startup_invuln.sh |
 | `PRG:0x04C78E` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x04C7A0` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
@@ -1599,7 +1603,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0551D0` | docs/game/engine_internals.md — Dark Force POWER, Dark Force CHANGE, and the newcomers' personal Dark Force (measured 14z-168) [vs2] |
 | `PRG:0x05524A` | build/manifest/huitzil.toml — port_patch [vs2] |
 | `PRG:0x05540C` | docs/game/engine_internals.md — Dark Force POWER, Dark Force CHANGE, and the newcomers' personal Dark Force (measured 14z-168) [vs2] |
-| `PRG:0x055470` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174) |
+| `PRG:0x055470` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174); docs/game/engine_internals.md — THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174) [vs2]; tests/audit_air_gc_legacy.sh |
 | `PRG:0x055478` | docs/project/patch_notes.md — 14z-65 (3) — the Huitzil stage 1-3 ladder opens (2026-08-07); docs/project/patch_notes.md — 14z-65 (4) — Huitzil stage 4 BUILDS; the R1 frontier enumerated (2026-08-07); tools/build_donovan.sh |
 | `PRG:0x055482` | build/manifest/reconciliation.toml — map |
 | `PRG:0x055538` | docs/game/engine_internals.md — Dark Force POWER, Dark Force CHANGE, and the newcomers' personal Dark Force (measured 14z-168) [vs2]; build/manifest/huitzil.toml — port_patch [vs2] |

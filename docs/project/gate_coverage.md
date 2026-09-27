@@ -13,7 +13,7 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**393 of 393 gates described.**
+**394 of 394 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
@@ -24,7 +24,7 @@ first sentence) is `gate_index.md`.
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 84 | 84 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 58 | 58 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 59 | 59 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -2330,7 +2330,15 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 ## character-data
 
-the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 58 of 58 described.
+the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 59 of 59 described.
+
+### `audit_air_gc_legacy.sh` — audit, emulator
+
+**WHAT:** the evidence that the air guard cancel is PHOBOS'S ALONE in both games, so #182 (it never fires on ours) is a port gap and no host-engine rule is overridden by fixing it; and the legacy guard any #182 fix must keep green. Both engines' block entry (vsavj 0x02393A, vs2 0x022480) open the guard window +0x158 := 0x0E on a GROUNDED block only; vs2 alone also opens it in the air, for fighter id 0x10 (docs/game/engine_internals.md "THE GUARD WINDOW ON AN AIR BLOCK"). The maintainer, 2026-09-27 (14z-185), from Mizuumi: Phobos's Reflect Wall is "(Air OK)" and he is unique in that; Lei-Lei is not listed as Air OK; Zabel's guard cancel is 623+K and he has no air one. A guard cancel is COMMITTED by one routine in both games (vsavj 0x029C6E, vs2 0x028FA0: +0x3B5 := 6, the window cleared — the GUARD CANCEL banner), which is what this gate reads as "a guard cancel happened". Zabel's check (vsavj 0x036A6E) and Phobos's (vs2 0x055470) require the window with no fall-through; Lei-Lei's (vsavj 0x04B3FA) falls through to her plain 623+P, which comes out of an air block with no commit and no banner.
+
+**HOW:** the 14z-184 rig (build/agent184/t174/legacy/run.sh, promoted; Zabel's motion corrected to 623+K at 14z-185): P1 = Lei-Lei (0x0d, 623+LP) or Zabel (0x04, 623+LK), P2 = Demitri (0x01), by REAL picks (tools/select_paths.py on the decoded wheel; vsavj's wheel drives ours, whose original cells are vsavj's, and every leg's picked ids are asserted); level 6 and the RNG pinned as the parity gates do; three events, each after a far position pin at t-230 and P1 walking in (t-190..t-40): E0 the guard-cancel motion from a GROUND block (P2 5HP at 2800, P1 holds back, the motion from +12), E1/E2 the same motion from an AIR block at Phobos's two timings (P2 jumps in, j.HP at +10 / +14; P1 jumps straight up at +2 / +6 and holds back; the motion from +22 / +26). THE POSITIVE LEG: Phobos (0x10, 623+LP) on native vs2 on the same rig and timings, the one character that has an air guard cancel — it must open the window and commit one in E1 and E2, so the legacy characters' zero is a zero at a timing that CAN produce an air guard cancel. Non-debug write taps (read_tap.lua) on P1's +0x140 (block kind), +0x158 (guard window), +0x3B5 (the guard-cancel commit), +0x147, +0x38 (airborne), +0x106 (command) and +0x06 (sequence), each one byte of its tapped word; seven MAME legs in parallel (two characters x pristine vsavj, native vs2, ours — the WIDE build, its fingerprint printed and its MAME log required to name the vsavjw set — plus Phobos on native vs2).
+
+**EXPECTS:** per character and leg, the picked ids and every event's byte writes (frame:value) equal tests/expected/air_gc_legacy.tsv; the three legs' rows identical once the leg label is dropped; every E0 opens the window AND commits a guard cancel, the commit mark written by the commit routine's first instruction (vsavj/ours 0x029C6E, vs2 0x028FA0) (the instrument sees both); no E1/E2 writes a non-zero +0x158 or commits a guard cancel on any legacy leg; native Phobos opens the window and commits in E1 and in E2; all five controls fail.
 
 ### `audit_chains174.sh` — audit, emulator
 

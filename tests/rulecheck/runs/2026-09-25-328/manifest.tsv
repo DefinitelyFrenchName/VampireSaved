@@ -1,0 +1,12 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_air_gc_legacy.sh	20e9433106861c815c6fe08e4d71052504a444e9
+tests/expected/air_gc_legacy.tsv	ddc1d69f711550b5cf3181b1e87a2c1631b53017
+build/agent185/air_gc/gate_freeze.log	f88f006ec880464007fcaa3d17568196200e2a32
+build/agent185/air_gc/gate_plain.log	76888564ecfce6287ec8c04f37f4a475746dd0ba
+build/agent185/air_gc/gate_air-window-planted.log	2712b02db6f773d0007c86fa7e968368461db4fb
+build/agent185/air_gc/gate_ground-window-removed.log	6d0620821fee84d19138ef152253189b0936f51a
+build/agent185/air_gc/gate_gc-dropped.log	b5cb52e8925698537d6b6e00de07f9dc16f5bc35
+build/agent185/air_gc/rigcheck.sh	6ef85a78bcae468bfa8f7d68e85bca1b3311cc10
+build/agent185/air_gc/rigcheck.log	3839dd90a92327be2392875509cf8daf02d59c61
+build/agent184/t174/legacy/run.sh	7ff7e8b37214c98b8dfab3e21a503faea352d7bb
+docs/game/engine_internals.md.lines-4775-4798 (lines 4775-4798 of docs/game/engine_internals.md)	d54e0ff66626c876cad2a2502ead5ad08dbac4b9

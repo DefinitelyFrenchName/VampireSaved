@@ -4775,8 +4775,11 @@ header), so nothing is concluded from them.
 ## THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174)
 
 **Atlas rows this section depends on:** `atlas/ram.md` fighter `+0x158` (the guard window),
-`+0x140`, `+0x38` (off the ground), `+0x106` (the command id), `+0x382` (the character id).
-**Gates:** `tests/audit_chains174.sh` (Phobos's air guard cancel, native and ours).
+`+0x140`, `+0x38` (off the ground), `+0x106` (the command id), `+0x382` (the character id),
+`+0x3B5` (the guard-cancel commit mark), `+0x147` (the invincibility timer).
+**Gates:** `tests/audit_chains174.sh` (Phobos's air guard cancel, native and ours);
+`tests/audit_air_gc_legacy.sh` (the legacy control: no original character's air block opens the
+window or commits a guard cancel, on pristine vsavj, native vs2 and ours).
 
 Every character's guard cancel is a command input while blocking; how each character's
 command check decides it is "while blocking" is its own. **Phobos's (vs2-coded) check requires
@@ -4793,12 +4796,40 @@ So natively Phobos guard-cancels from an air block (the GUARD CANCEL banner, Ref
 a2:0x4d), and on our build the window never opens and the command is never stamped: he blocks
 and falls (write taps, `build/agent184/t174/tapgc`; captured and shown to the maintainer, who
 read it: *"Indeed there's a difference, the GC doesn't trigger or if it does it doesn't
-resolve"*). **This is a port gap, not a host-engine rule** (contrast #179): the original
-characters with an air guard cancel — the maintainer: *"only Lei-Lei, Zabel and Phobos have an AIR
-GC. Lei-Lei is 623+P, Zabel is 421+K"* — do not read the window; Lei-Lei's air guard cancel
-(command 0x06, sequence 0x0E) fires at the same frames on pristine vsavj and on vs2, by real picks
-against Demitri (`build/agent184/t174/legacy`). vs2 special-cases Phobos in its engine; vsavj,
-which never had him, does not, and the port did not carry the case over.
+resolve"*). **This is a port gap, not a host-engine rule** (contrast #179): **the air guard
+cancel is Phobos's alone, in both games.** The maintainer, 14z-185, from Mizuumi: Phobos is
+*"confirmed unique in his ability to air GC"* (Reflect Wall, *"(Air OK) 623 P"*), Lei-Lei *"is not
+listed by mizuumi as being Air OK"*, and *"Zabel's GC is 623+K ... mizuumi says no so I believe he
+doesn't"* [air GC]. Measured to match, by real picks against Demitri on pristine vsavj, native vs2
+and ours (`tests/audit_air_gc_legacy.sh`, captured and shown to the maintainer): Lei-Lei's 623+P
+and Zabel's 623+K from a GROUND block open the window and COMMIT a guard cancel (the GUARD CANCEL
+banner); from an AIR block neither opens the window nor commits one, on any leg. vs2
+special-cases Phobos in its engine; vsavj, which never had him, does not, and the port did not
+carry the case over.
+
+**A guard cancel is COMMITTED by one routine in each game** — vsavj `0x029C6E`, vs2 `0x028FA0`,
+the same code: `+0x3B5` := 6, `+0x14E` := 0x14, the window cleared, both fighters' hitstop `+0x5C`
+cleared, then `jsr 0x00D6B2`. A character's command check reaches it only from its guard-cancel
+branch: Lei-Lei's (`0x04B3FA`) tests `+0x158` and, with the window open, arms her invincibility timer `+0x147` := 0x1A and
+calls the commit; with it closed it falls through (`+0x115`, `jsr 0x0290C4`) to her plain 623+P —
+which DOES come out of an air block (sequence 0x0E, no commit, no banner), identically on both
+games and ours. Zabel's (`0x036A6E`) and Phobos's vs2 check (`0x055470`) have no such fall-through:
+no window, no guard cancel. The rig's air timing is proven able to produce one: native Phobos on the
+identical rig and frames opens the window and commits in both air events (the gate's positive leg);
+the three-leg sheets were read by the maintainer, *"Same, confirmed"*.
+
+**A community report, NOT measured here:** the maintainer quotes Mizuumi that in vs2 an air guard
+cancel during Dark Force *"will often"* leave Phobos unable to move or attack (*"Fixed in VSAV
+arranged"*). A fix that reproduces vs2's native behaviour must ask whether it reproduces that too.
+
+~~RETRACTED 14z-185 (replaced by the paragraphs above): "the original characters with an air guard
+cancel — the maintainer: *"only Lei-Lei, Zabel and Phobos have an AIR GC. Lei-Lei is 623+P, Zabel
+is 421+K"* — do not read the window; Lei-Lei's air guard cancel (command 0x06, sequence 0x0E) fires
+at the same frames on pristine vsavj and on vs2".~~ What 14z-184 measured as Lei-Lei's "air guard
+cancel" was her plain 623+P out of an air block (no commit, no banner — rule-checker run
+2026-09-25-328 Q1/Q4 found the premise unshown), and its Zabel rig used 421+K, which is not his
+guard cancel; the maintainer corrected both statements at 14z-185. The eliminations stand: neither
+game opens the window on a legacy air block.
 
 ## CPU exceptions and the soft-reset path (14z-109)
 

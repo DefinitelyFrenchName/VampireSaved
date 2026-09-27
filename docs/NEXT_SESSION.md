@@ -24,9 +24,9 @@ prompt files pasted VERBATIM, `record --session`, `resolve` on ONE line. Say so 
    entry opens the guard window `+0x158` in the air for fighter id 0x10 alone (`cmpi.b #$10,$382(a6)` at
    `0x022480`), vsavj's never does (`docs/game/engine_internals.md` "THE GUARD WINDOW ON AN AIR BLOCK").
    In order:
-   a. **Promote the legacy control** (`build/agent184/t174/legacy/run.sh`, untracked: Lei-Lei's air guard
-      cancel fires alike on pristine vsavj and vs2, by real picks) into a tracked gate — it is the evidence
-      that #182 is ours, and [VSP-18] wants it rerunnable. Not done at the 14z-184 close.
+   a. **Promote the legacy control** into a tracked gate — IN PROGRESS 14z-185: `tests/audit_air_gc_legacy.sh`
+      (corrected 14z-185: the air guard cancel is Phobos's alone, the maintainer; `engine_internals.md`
+      "THE GUARD WINDOW ON AN AIR BLOCK").
    b. **Measure the two designs before recommending** (no shipped byte first): **A** — a hook in vsavj's
       block entry (`0x02393a`) doing vs2's id-0x10 check (exact native behaviour; every character's block
       runs the check, so the legacy oracle and the flicker inventory must be measured); **B** — a patch in

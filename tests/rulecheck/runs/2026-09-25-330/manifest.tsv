@@ -1,0 +1,20 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_air_gc_legacy.sh	b74f6be957bd5f10b96dceaf7c3cde4a1482655d
+tests/expected/air_gc_legacy.tsv	4fda4e0928a344edb4835cc8b8d013a83ead98e4
+build/agent185/air_gc/gate_freeze.log	a0f985b26f8d8fe579f0133e75758a8cd72238c1
+build/agent185/air_gc/gate_plain.log	d90bcb94d7fbe536f239d3d668978727a6a4130f
+build/agent185/air_gc/gate_air-window-planted.log	fc4da82fce296c2b57d0ed5233cc95a9f2c3c70e
+build/agent185/air_gc/gate_ground-window-removed.log	487cef36243fd39acee5b15eb0921b77beb30a52
+build/agent185/air_gc/gate_air-commit-planted.log	bffcdbd162af83223d8797e008fb07a7eb7698d0
+build/agent185/air_gc/gate_ground-commit-removed.log	0e5e8318ca4d44204f7c5e76cd519624557a4913
+build/agent185/air_gc/gate_positive-stripped.log	c07a61743c852aa113974aee3b6a7eb629f94dde
+build/agent185/air_gc/rigcheck.sh	032a185fedcef9d2fa4fe12cde3b1d98c04d8895
+build/agent185/air_gc/rigcheck.log	ac6c1387714045ab3b2d417afbf322989b171b60
+build/agent185/air_gc/disasm_gc.txt	e8bba8e1ab8794dc4afb0f10d91caf99d07067ec
+build/agent185/air_gc/sheet/run_ch.sh	45d9b2ab0ac271df5d8ce760f38ce52dc6246133
+build/agent185/air_gc/sheet/leilei_gc_sheet_3legs.png	d41a3016694f714f5e56d899d95ffd90e1f13086
+build/agent185/air_gc/sheet/zabel_gc_sheet_3legs.png	8d8e0c7ae5c5261812a7b82593937b66a5118b40
+build/agent185/air_gc/maintainer_14z185.txt	fb2c4103d9e8bf43536218cce0dd0e43acdad491
+build/agent185/air_gc/resolve_328.txt	9cfd2acd2c869e09c062e9d903702240468d7c53
+build/agent185/air_gc/resolve_329.txt	3972742f493fac751e15902f0ee474182b3b2a02
+docs/game/engine_internals.md.lines-4775-4833 (lines 4775-4833 of docs/game/engine_internals.md)	3e9f9afe3f9bb21a624e483f90c3b04b35a66cb1
