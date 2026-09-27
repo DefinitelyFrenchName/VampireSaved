@@ -1,0 +1,38 @@
+# tests/expected/chains174.tsv — GitHub #174: the tenants' once never-entered a2 attack chains, each rig's native
+# entry and its ours-vs-native per-event verdict (tests/audit_chains174.sh; tools/chains174_rigs.py rigs in
+# tests/replays/chains174/; tools/name_moves.py analyse for the entry, tools/move_parity.py for the verdict).
+# Evidence class: in-emulator (MAME, native vsav2 and the WIDE build m3b_merged28; parity pins: level 6 from 2000,
+# the RNG from 2363). Frozen 14z-184 with FREEZE=1, its rule-checker run named in the commit. An entry row turning
+# MISSING means the rig no longer enters its chain on native (the rig moved, not ours); a parity row changing is
+# ours changing — read the diff as that.
+# Columns: entry <tenant> <event> <name> <target chains> ENTERED|MISSING:<chains>
+#          parity <part> <event> <name> <verdict> <first> <fields> <frames> <coupled> <excluded>
+#--
+entry	huitzil	0	Reflect Wall [crouch block, 623LP at hit+2]	a2:0x4b	ENTERED
+entry	huitzil	1	Reflect Wall [crouch block, 623HP at hit+2]	a2:0x4b	ENTERED
+entry	huitzil	2	spacer (keeps the Genocide Vulcan events on their measured frames)	-	SPACER
+entry	huitzil	3	Genocide Vulcan (ES) [421PP] vs a jump-in, from +22	a2:0x50 a2:0x29	ENTERED
+entry	huitzil	4	Genocide Vulcan (ES) [421PP] vs a jump-in, from +25	a2:0x50 a2:0x29	ENTERED
+entry	huitzil	5	spacer (keeps the air-block events on their measured frames)	-	SPACER
+entry	huitzil	6	Reflect Wall [air block, P1 j.8 at +2, P2 j.HP at +14, 623LP at +26]	a2:0x4d	ENTERED
+entry	huitzil	7	Reflect Wall [air block, P1 j.8 at +4, P2 j.HP at +16, 623LP at +28]	a2:0x4d	ENTERED
+parity	huitzil_c174	0	Reflect Wall [crouch block, 623LP at hit+2]	IDENT	-	-	420	-	3
+parity	huitzil_c174	1	Reflect Wall [crouch block, 623HP at hit+2]	IDENT	-	-	420	-	3
+parity	huitzil_c174	2	spacer (keeps the Genocide Vulcan events on their measured frames)	IDENT	-	-	300	-	2
+parity	huitzil_c174	3	Genocide Vulcan (ES) [421PP] vs a jump-in, from +22	IDENT	-	-	300	-	3
+parity	huitzil_c174	4	Genocide Vulcan (ES) [421PP] vs a jump-in, from +25	IDENT	-	-	300	-	3
+parity	huitzil_c174	5	spacer (keeps the air-block events on their measured frames)	IDENT	-	-	420	-	3
+parity	huitzil_c174	6	Reflect Wall [air block, P1 j.8 at +2, P2 j.HP at +14, 623LP at +26]	DIFF	+30	cnt,meter,node,seq,sub,x,y	420	-	3
+parity	huitzil_c174	7	Reflect Wall [air block, P1 j.8 at +4, P2 j.HP at +16, 623LP at +28]	DIFF	+32	cnt,meter,node,p2hp,seq,x,y	671	after:6	2
+entry	donovan	0	Foot Stab (ES) [8KK] off Sword Grapple [63214HP], press at +104	a2:0x4f	ENTERED
+entry	donovan	1	Foot Stab (ES) [8KK] off Sword Grapple [63214HP], press at +112	a2:0x4f	ENTERED
+parity	donovan_c174	0	Foot Stab (ES) [8KK] off Sword Grapple [63214HP], press at +104	IDENT	-	-	420	-	3
+parity	donovan_c174	1	Foot Stab (ES) [8KK] off Sword Grapple [63214HP], press at +112	IDENT	-	-	671	-	1
+entry	pyron	0	Piled Hell [623 KKK]	a2:0x48	ENTERED
+entry	pyron	1	Piled Hell [623 KKK] near	a2:0x48	ENTERED
+entry	pyron	2	6MP far	a2:0x03	ENTERED
+entry	pyron	3	6HP far	a2:0x05	ENTERED
+parity	pyron_c174	0	Piled Hell [623 KKK]	IDENT	-	-	300	-	2
+parity	pyron_c174	1	Piled Hell [623 KKK] near	IDENT	-	-	420	-	3
+parity	pyron_c174	2	6MP far	IDENT	-	-	160	-	3
+parity	pyron_c174	3	6HP far	IDENT	-	-	411	-	1

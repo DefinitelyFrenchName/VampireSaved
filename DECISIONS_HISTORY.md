@@ -27,6 +27,16 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-27 (14z-184) — #174's rigs go in a dedicated gate, outside the naming corpus
+
+**The question (after rule-checker runs 299-306; 306 OK), verbatim:** *"#174: a static read of vs2's code gives a likely identity for each of the 8 never-entered special chains with attack records (still to be confirmed on native, by rigs): [the eight listed] Where should the rigs go?"*, with the options *"Dedicated gate (Recommended)"* — its own gate and replay subfolder, each rig first entering its chain on native, the corpus gates untouched — and *"New naming parts"* — the ticket's first suggestion, which moves the 19 tracked files that glob `tests/replays/naming/`.
+
+**The maintainer:** *"Dedicated gate (Recommended)"*. Asked next how Donovan's ES pursuit ever connects: *"I actually have difficulties make Foot Stab (regular or ES) connect, even in VS2. For instance it connects after 63214+MP/HP but not after regular throw (4/6+MP/HP). The only setup I have that conceistently works for me is Foot Stab after 63214+MP/HP"*.
+
+**What it means.** `tools/chains174_rigs.py` builds the rigs with `name_moves.py`'s machinery without editing it, into `tests/replays/chains174/`; `tests/audit_chains174.sh` requires each rig to enter its chain on native and compares ours with native per event. It found #182.
+
+---
+
 ## Ruled 2026-09-27 (14z-184) — #177 closed as `invalid`: the movement comparison it asked for already existed
 
 **The captures and the maintainer's readings.** Native vs2 above ours on the same frames, the parity gate's rig and pins, `build/m3b_merged28` (merged-m20): Jump [9] and Forward dash for the three tenants and Phobos's Air Dash and Float — *"Same movement confirmed. Can you add neutral jump, back jump, backdash, walk forward and walk backwards for each?"*; those five per tenant — *"Same movement confirmed for everything but neutral jump. I need more intermediate frames to confirm neutral jump"*; the neutral jump every 2 frames from take-off to landing — *"Same movement"*; Phobos's other four air dashes and three floats — *"Same movement"*.

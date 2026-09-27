@@ -13,7 +13,7 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**392 of 392 gates described.**
+**393 of 393 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
@@ -24,7 +24,7 @@ first sentence) is `gate_index.md`.
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 84 | 84 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 57 | 57 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 58 | 58 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -2330,7 +2330,15 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 ## character-data
 
-the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 57 of 57 described.
+the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 58 of 58 described.
+
+### `audit_chains174.sh` — audit, emulator
+
+**WHAT:** the eight a2 chains of the three tenants that carry attack records and that no naming rig entered (#174's census, 36 never-entered starts, 8 with attack records): Phobos's Reflect Wall from a crouching block (a2:0x4b) and from an air block (a2:0x4d), his Genocide Vulcan (ES) catching a jump-in (a2:0x50 then a2:0x29), Donovan's ES pursuit connecting after Sword Grapple (a2:0x4f), Pyron's Piled Hell with three kicks (a2:0x48) and his 6MP and 6HP at range (a2:0x03, a2:0x05) — each rig first proven to ENTER its chain on native vs2, then compared ours against native event by event.
+
+**HOW:** the rigs are tools/chains174_rigs.py's (built with tools/name_moves.py's machinery, kept OUTSIDE the naming corpus in tests/replays/chains174/, maintainer-ruled 2026-09-27 "Dedicated gate (Recommended)"); each tenant's rig on MAME on native vs2 and on the merged WIDE build as the parity gate runs them (real cursor picks, level 6 from 2000, the RNG from the match anchor); the native trace read against the chain graph decoded from the tenant's vs2 extract (tools/name_moves.py analyse); the two traces compared per event by tools/move_parity.py.
+
+**EXPECTS:** the committed rigs equal a regeneration; every event enters its TARGET chain(s) on native; the per-event rows equal tests/expected/chains174.tsv; both controls fail.
 
 ### `audit_column_flash.sh` — audit, emulator
 

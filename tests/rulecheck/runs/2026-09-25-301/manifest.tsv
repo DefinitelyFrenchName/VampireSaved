@@ -1,0 +1,10 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent184/t174_census.txt	c2ae32b7e3aae43e5b046ab74b79de9ecabfb6ee
+build/agent184/t174_hypotheses.md	f557f1b2aaf0f395b3e3e26c693c26c9e0dd1234
+build/agent184/t174_calls.txt	63ade0576282392440963fcfc12113906dfeba64
+build/agent184/t174_handlers.txt	b2f6f675dc041084d080d7354f1e41b471bb81bf
+build/agent184/t174_handlers.dis	c7b4371cff6e082cbd8c787ba8d8cc6f045cc7e4
+build/agent184/t174_corpus_gates.txt	2e1e961b1faf200d049b6df2fc5fc236e32afbe8
+build/agent184/t174_replay_walkers.txt	6637855b1d70c60ce329e977fafefa3913a250ee
+build/agent184/t174_issue_body.md	a23c6b71bc288b0ad035690dc76faf8d5cf9095b
+docs/project/gotchas.md.lines-5936-5946 (lines 5936-5946 of docs/project/gotchas.md)	178f834eb3053c28a6a1e696811d2cd0dd072650

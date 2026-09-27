@@ -1,0 +1,12 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: #174: recommend rigging the eight never-entered a2 attack chains as a dedicated gate — re-check after run 303, the claim narrowed
+Claim (the working agent's sentence): Recommend building #174's rigs as a DEDICATED gate whose replays live in a new subdirectory of tests/replays/ rather than as new naming parts in tests/replays/naming/, because a gate that globs a corpus follows it — 14z-181's two added naming parts turned three corpus gates red (project gotchas) — and 17 tracked gates glob the naming corpus (t174_corpus_gates.txt, one grep, its patterns in its header). The gate's first step runs each rig on native vs2 and REQUIRES it to enter its chain; only then does it compare ours with native through tools/move_parity.py. The rigs are designed from HYPOTHESES (t174_hypotheses.md, every condition the disassembly shows), none claimed as a finding. SCOPE: #174's set as re-counted at the 14z-181 close (t174_issue_body.md, the comment: 36 never-entered distinct starts of table a2, 8 with attack records), reproduced by t174_census.txt; tables a, b and c are out of this recommendation. NOT tested: whether any existing gate or tool reaches a new subdirectory of tests/replays/ (t174_replay_walkers.txt is a partial census — walkers with variable bases and gate_follows's reconcile are not traced), to be settled after the rig files land by the static tier and a trace of every walker's base, before any expectation is frozen; every hypothesis — one refuted on native means a rig redesign or a question to the maintainer, not a comparison; the 28 non-attack never-entered a2 starts.
+Artifacts (read every one, in full):
+  - build/agent184/t174_census.txt
+  - build/agent184/t174_hypotheses.md
+  - build/agent184/t174_corpus_gates.txt
+  - build/agent184/t174_replay_walkers.txt
+  - build/agent184/t174_issue_body.md
+  - docs/project/gotchas.md.lines-5936-5946 (lines 5936-5946 of docs/project/gotchas.md)

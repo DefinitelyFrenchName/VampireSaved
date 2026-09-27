@@ -1,0 +1,13 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_chains174.sh	b559a24558a34681f66355dea50309b08b164f03
+tools/chains174_rigs.py	7f73ffeacd482194674ec1ac15565b68d14c56a6
+tests/expected/chains174.tsv	8d6b3802015dddefd5e21eb458256749a47c2a0b
+build/agent184/t174/gate_freeze.log	30df9ec48da8da1fda9f5f73a92c52831b3f233b
+build/agent184/t174/gate_plain.log	670dc2d6f72f14db27b1dda8a0849baa9f7be5d4
+build/agent184/t174/gate_wrong-target.log	48a98a57223222291dcd411ee1ee0fe278c5b12e
+build/agent184/t174/gate_x-moved.log	d637b85c15ecf8f1a55205469859f7724c6095b6
+build/agent184/t174/legacy_and_phobos_taps.txt	0227a031ff54fd7d01e0be60cd11be090b991e49
+build/agent184/t174/captures_sent.txt	d8b071009ae5fd8f8e87e4ae4849637e50d85241
+build/agent184/t174/air_gc_sheet.png	63230c0cb9af4a6e61e4c1353ae235cd5a8e8160
+build/agent184/t174/air_gc_frozen_sheet.png	259be769304ea0568b77655a5a51604a690706f0
+docs/game/engine_internals.md.lines-4765-4798 (lines 4765-4798 of docs/game/engine_internals.md)	4186f643134c875d89315be4c8f15c67849a1a5a

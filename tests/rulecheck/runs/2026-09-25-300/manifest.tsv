@@ -1,0 +1,13 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent184/t174_census.txt	c2ae32b7e3aae43e5b046ab74b79de9ecabfb6ee
+build/agent184/t174_calls.py	4887c08add8804f5bb4bc39d65bb9c677051d945
+build/agent184/t174_calls.txt	63ade0576282392440963fcfc12113906dfeba64
+build/agent184/t174_handlers.py	b79b099d9683fd2fc2231eaeb4e2e150f58ab42c
+build/agent184/t174_handlers.txt	b2f6f675dc041084d080d7354f1e41b471bb81bf
+build/agent184/t174_handlers.dis	c7b4371cff6e082cbd8c787ba8d8cc6f045cc7e4
+build/agent184/t174_corpus_gates.txt	2e1e961b1faf200d049b6df2fc5fc236e32afbe8
+build/manifest/moves_pyron.toml.lines-23-37 (lines 23-37 of build/manifest/moves_pyron.toml)	dcee55c2a45d57f148358df5d926c7be16e3ae42
+build/manifest/moves_huitzil.toml.lines-156-164 (lines 156-164 of build/manifest/moves_huitzil.toml)	5cfe8712e59389997a5bc5e9be3089bbc95adcce
+tests/expected/move_naming_huitzil.txt.lines-108-110 (lines 108-110 of tests/expected/move_naming_huitzil.txt)	771227f09e0f7bcd24c6ed5a86760d6415e2c052
+docs/game/atlas/ram.md.lines-165-166 (lines 165-166 of docs/game/atlas/ram.md)	1af88b6a8f6d8872841834838a29d07b589bbb6a
+docs/project/gotchas.md.lines-5936-5946 (lines 5936-5946 of docs/project/gotchas.md)	178f834eb3053c28a6a1e696811d2cd0dd072650

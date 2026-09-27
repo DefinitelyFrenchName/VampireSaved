@@ -1,0 +1,43 @@
+{
+ "tenant": "donovan",
+ "part": "c174",
+ "events": [
+  {
+   "name": "Foot Stab (ES) [8KK] off Sword Grapple [63214HP], press at +104",
+   "frame": 2795,
+   "gap": 420,
+   "movement": false
+  },
+  {
+   "name": "Foot Stab (ES) [8KK] off Sword Grapple [63214HP], press at +112",
+   "frame": 3215,
+   "gap": 420,
+   "movement": false
+  }
+ ],
+ "pokes": [
+  "2745:ff8850:01200120",
+  "3145:ff8850:01200120",
+  "3545:ff8850:01200120",
+  "2565:ff8410:0228",
+  "2565:ff8810:02d8",
+  "2985:ff8410:0228",
+  "2985:ff8810:02d8",
+  "2735:ff8509:09",
+  "3155:ff8509:09"
+ ],
+ "p2": {
+  "id": "01",
+  "path": [
+   "R"
+  ],
+  "never": [
+   "b:0x71",
+   "b:0x74"
+  ],
+  "report": [
+   "b:0x10"
+  ]
+ },
+ "frames": 3885
+}

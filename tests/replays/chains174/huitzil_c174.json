@@ -1,0 +1,103 @@
+{
+ "tenant": "huitzil",
+ "part": "c174",
+ "events": [
+  {
+   "name": "Reflect Wall [crouch block, 623LP at hit+2]",
+   "frame": 2795,
+   "gap": 420,
+   "movement": false
+  },
+  {
+   "name": "Reflect Wall [crouch block, 623HP at hit+2]",
+   "frame": 3215,
+   "gap": 420,
+   "movement": false
+  },
+  {
+   "name": "spacer (keeps the Genocide Vulcan events on their measured frames)",
+   "frame": 3635,
+   "gap": 300,
+   "movement": true
+  },
+  {
+   "name": "Genocide Vulcan (ES) [421PP] vs a jump-in, from +22",
+   "frame": 3935,
+   "gap": 300,
+   "movement": false
+  },
+  {
+   "name": "Genocide Vulcan (ES) [421PP] vs a jump-in, from +25",
+   "frame": 4235,
+   "gap": 300,
+   "movement": false
+  },
+  {
+   "name": "spacer (keeps the air-block events on their measured frames)",
+   "frame": 4535,
+   "gap": 420,
+   "movement": true
+  },
+  {
+   "name": "Reflect Wall [air block, P1 j.8 at +2, P2 j.HP at +14, 623LP at +26]",
+   "frame": 4955,
+   "gap": 420,
+   "movement": false
+  },
+  {
+   "name": "Reflect Wall [air block, P1 j.8 at +4, P2 j.HP at +16, 623LP at +28]",
+   "frame": 5375,
+   "gap": 420,
+   "movement": false
+  }
+ ],
+ "pokes": [
+  "2745:ff8850:01200120",
+  "3145:ff8850:01200120",
+  "3545:ff8850:01200120",
+  "3945:ff8850:01200120",
+  "4345:ff8850:01200120",
+  "4745:ff8850:01200120",
+  "5145:ff8850:01200120",
+  "5545:ff8850:01200120",
+  "5945:ff8850:01200120",
+  "2565:ff8410:0228",
+  "2565:ff8810:02d8",
+  "2985:ff8410:0228",
+  "2985:ff8810:02d8",
+  "3595:ff8410:0228",
+  "3595:ff8810:02d8",
+  "3895:ff8410:0228",
+  "3895:ff8810:02d8",
+  "4195:ff8410:0228",
+  "4195:ff8810:02d8",
+  "4305:ff8410:0228",
+  "4305:ff8810:02d8",
+  "4725:ff8410:0228",
+  "4725:ff8810:02d8",
+  "5145:ff8410:0228",
+  "5145:ff8810:02d8",
+  "2735:ff8509:09",
+  "3155:ff8509:09",
+  "3575:ff8509:09",
+  "3875:ff8509:09",
+  "4175:ff8509:09",
+  "4475:ff8509:09",
+  "4895:ff8509:09",
+  "5315:ff8509:09"
+ ],
+ "p2": {
+  "id": "01",
+  "path": [
+   "R"
+  ],
+  "never": [
+   "b:0x71",
+   "b:0x74"
+  ],
+  "report": [
+   "b:0x10"
+  ]
+ },
+ "frames": 6045
+}

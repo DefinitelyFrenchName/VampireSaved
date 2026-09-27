@@ -1,0 +1,2 @@
+fixture	forced-pick-14z159
+slot	b

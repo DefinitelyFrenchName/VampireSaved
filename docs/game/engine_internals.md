@@ -4762,6 +4762,34 @@ control**: the others' two games differ from the throw onward, never share
 x at the landing, or run no pursuit (`tests/audit_shared_wall_push.sh`'s
 header), so nothing is concluded from them.
 
+## THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174)
+
+**Atlas rows this section depends on:** `atlas/ram.md` fighter `+0x158` (the guard window),
+`+0x140`, `+0x38` (off the ground), `+0x106` (the command id), `+0x382` (the character id).
+**Gates:** `tests/audit_chains174.sh` (Phobos's air guard cancel, native and ours).
+
+Every character's guard cancel is a command input while blocking; how each character's
+command check decides it is "while blocking" is its own. **Phobos's (vs2-coded) check requires
+the guard window `+0x158`** (eval `0x55470`: the 623 helper, then `tst.b $158(a6)`, then command
+0x0E, Reflect Wall). The block-entry code opens that window:
+
+| | vsavj (host engine, ours) | vs2 (native) |
+|---|---|---|
+| block entry | `0x02393A` | `0x022480` |
+| grounded block | `+0x140` := 2, `+0x158` := 0x0E | the same |
+| air block | `+0x140` := 0x12, **no window** | the same, **except fighter id 0x10**: `cmpi.b #$10,$382(a6); beq 0x0224C4`, which sets `+0x158` := 0x0E before the airborne test |
+
+So natively Phobos guard-cancels from an air block (the GUARD CANCEL banner, Reflect Wall's
+a2:0x4d), and on our build the window never opens and the command is never stamped: he blocks
+and falls (write taps, `build/agent184/t174/tapgc`; captured and shown to the maintainer, who
+read it: *"Indeed there's a difference, the GC doesn't trigger or if it does it doesn't
+resolve"*). **This is a port gap, not a host-engine rule** (contrast #179): the original
+characters with an air guard cancel — the maintainer: *"only Lei-Lei, Zabel and Phobos have an AIR
+GC. Lei-Lei is 623+P, Zabel is 421+K"* — do not read the window; Lei-Lei's air guard cancel
+(command 0x06, sequence 0x0E) fires at the same frames on pristine vsavj and on vs2, by real picks
+against Demitri (`build/agent184/t174/legacy`). vs2 special-cases Phobos in its engine; vsavj,
+which never had him, does not, and the port did not carry the case over.
+
 ## CPU exceptions and the soft-reset path (14z-109)
 
 **Atlas rows this section depends on:** `ram.md` `$FF0000.w` (exception

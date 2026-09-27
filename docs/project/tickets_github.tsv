@@ -2,8 +2,9 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 181
+# issues: 182
 number	state	reason	closed	labels	title
+182	OPEN	-	-	bug	Phobos's guard cancel from an air block (Reflect Wall, j.623P) never fires on our build: vsavj's block entry lacks vs2's Phobos-only case that opens the guard window in the air
 181	CLOSED	COMPLETED	2026-09-27	evolution	Run the emulator tier on a snapshot at a named commit (slice 2 of #153)
 180	CLOSED	NOT_PLANNED	2026-09-27	bug	Two stock-spend tenant throws pay the thrower 0 meter on M19 and M20 alike; the x028122 copy's third store pair was never observed writing (split from #157)
 179	CLOSED	NOT_PLANNED	2026-09-27	bug	Phobos's Sitting Attack (Pursuit, 8+P/K) landing after a throw: ours is displaced 31 px and does not turn, native stays and turns (parity rig huitzil_3 events 8/9)

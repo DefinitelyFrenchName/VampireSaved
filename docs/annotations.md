@@ -23,12 +23,12 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3260 |
-| named by a document or manifest only | 2138 |
+| distinct program-space addresses named | 3266 |
+| named by a document or manifest only | 2144 |
 | named by both a document/manifest and code | 750 |
 | named by CODE ONLY (the gap list below) | 372 |
-| carried by atlas | 584 |
-| carried by engine_internals | 682 |
+| carried by atlas | 590 |
+| carried by engine_internals | 686 |
 | carried by other docs | 1010 |
 | carried by manifests | 1818 |
 | carried by code | 1122 |
@@ -753,6 +753,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x020DD2` | docs/game/engine_internals.md — Dark Force POWER, Dark Force CHANGE, and the newcomers' personal Dark Force (measured 14z-168) |
 | `PRG:0x020DF2` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/atlas/ram.md — System / match globals; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x020E00` | docs/game/atlas/select_screen.md — THE RANDOM CELL '0x0B' — the cycling draw, decoded (14z-116) |
+| `PRG:0x020E48` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2] |
 | `PRG:0x020E6A` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x020ED6` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2] |
 | `PRG:0x020F00` | docs/game/atlas/character_tables.md — M2a extraction findings (session 4, oracle-validated); docs/project/patch_notes.md — donovan-m2 stage 3 — anim + sprite sub-tables (2026-07-25, session 4); build/manifest/gfx_layout3.toml — donovan; tests/audit_region_movability.sh; tests/test_list_type_census.sh |
@@ -796,8 +797,11 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x022406` | build/manifest/type_stamps.toml — compare |
 | `PRG:0x02245E` | build/manifest/pcrel_escapes.toml — hui58 |
 | `PRG:0x02246E` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); docs/game/engine_internals.md — The STARTUP INVINCIBILITY window is per character, and the tenants arm their own (measured 14z-126); docs/project/gotchas.md — A WRITE TAP ON A COUNTDOWN FIELD NAMES THE DECREMENTER, NOT THE OPENER (paid: 14z-123 -> 14z-126); tests/audit_df_startup_invuln.sh; tests/test_advancing_guard.sh |
+| `PRG:0x022480` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174) |
+| `PRG:0x022492` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x0224AA` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x0224B4` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
+| `PRG:0x0224C4` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174) |
 | `PRG:0x022500` | docs/game/engine_internals.md — The per-char effect system (14z-67, decoded on the H ping rounds); docs/project/gotchas.md — (14z-68, refutes half of the 14z-67 entry theory); build/manifest/huitzil.toml — pcrel_escape_fix |
 | `PRG:0x022514` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Dark Force POWER, Dark Force CHANGE, and the newcomers' personal Dark Force (measured 14z-168) |
 | `PRG:0x022520` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
@@ -891,6 +895,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x023874` | build/manifest/type_stamps.toml — compare |
 | `PRG:0x0238A0` | build/manifest/pcrel_escapes.toml — hui58 |
 | `PRG:0x0238FC` | build/manifest/huitzil.toml — throw_arc_tables |
+| `PRG:0x02393A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174) |
 | `PRG:0x02395A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); docs/game/engine_internals.md — The STARTUP INVINCIBILITY window is per character, and the tenants arm their own (measured 14z-126); docs/project/gotchas.md — A WRITE TAP ON A COUNTDOWN FIELD NAMES THE DECREMENTER, NOT THE OPENER (paid: 14z-123 -> 14z-126); build/manifest/pcrel_escapes.toml — hui58; tests/test_advancing_guard.sh |
 | `PRG:0x023966` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); docs/project/gotchas.md — A WRITE TAP ON A COUNTDOWN FIELD NAMES THE DECREMENTER, NOT THE OPENER (paid: 14z-123 -> 14z-126); tests/test_advancing_guard.sh |
 | `PRG:0x02399C` | build/manifest/donovan.toml — ls_freeze_vs2_attacker |
@@ -1594,6 +1599,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0551D0` | docs/game/engine_internals.md — Dark Force POWER, Dark Force CHANGE, and the newcomers' personal Dark Force (measured 14z-168) [vs2] |
 | `PRG:0x05524A` | build/manifest/huitzil.toml — port_patch [vs2] |
 | `PRG:0x05540C` | docs/game/engine_internals.md — Dark Force POWER, Dark Force CHANGE, and the newcomers' personal Dark Force (measured 14z-168) [vs2] |
+| `PRG:0x055470` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174) |
 | `PRG:0x055478` | docs/project/patch_notes.md — 14z-65 (3) — the Huitzil stage 1-3 ladder opens (2026-08-07); docs/project/patch_notes.md — 14z-65 (4) — Huitzil stage 4 BUILDS; the R1 frontier enumerated (2026-08-07); tools/build_donovan.sh |
 | `PRG:0x055482` | build/manifest/reconciliation.toml — map |
 | `PRG:0x055538` | docs/game/engine_internals.md — Dark Force POWER, Dark Force CHANGE, and the newcomers' personal Dark Force (measured 14z-168) [vs2]; build/manifest/huitzil.toml — port_patch [vs2] |

@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**392 scripts** — 100 ci_portable, 84 ci_static, 208 emulator-tier (run by name).
+**393 scripts** — 100 ci_portable, 84 ci_static, 209 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -27,7 +27,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 84 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 57 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 58 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -370,6 +370,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 | gate | kind | tier | needs | locks (the script's own header) | since |
 |---|---|---|---|---|---|
+| `tests/audit_chains174.sh` | audit | emulator | MAME, a build dir, ~2 min | THE TENANTS' ONCE NEVER-ENTERED a2 ATTACK CHAINS, ENTERED ON NATIVE AND COMPARED WITH OURS (GitHub #174, 14z-184). | 14z-184 |
 | `tests/audit_column_flash.sh` | audit | emulator | MAME, FBNeo, a build dir | THE ORANGE FLASH ON THE DEITY AS DONOVAN'S KILLSHREAD LIGHTNING COLUMN ENDS, frozen AS MEASURED (14z-170, the maintainer's capture read): | 14z-170 |
 | `tests/audit_column_shock.sh` | audit | emulator | MAME, a build dir, ~12 s | DONOVAN'S KILLSHREAD LIGHTNING COLUMN PLAYS vs2's CLASS-0x52 RULE ON OUR BUILD (since the 14z-170 fix, ruled 2026-09-18): the victim shocked 24 frames and Donovan exempt, every +0x5C write of both fighters equal to native's in frame and val… | 14z-170 |
 | `tests/audit_crouch_flag.sh` | audit | emulator | MAME, a build dir, ~15 s | THE FIGHTER'S +0x121 IS THE CROUCH FLAG, measured against a scripted Down on native vsav2 and on our merged build (14z-169): | 14z-169 |

@@ -28,7 +28,8 @@ prompt files pasted VERBATIM, `record --session`, `resolve` on ONE line. Say so 
    freeze lane's own log and NOT re-run** — the release run is its verify.
 2. **Nothing is pending a ruling** — STATE "Decisions pending" is empty.
 3. **Open tickets, the maintainer's to order** (14z-184 closed #181, #180, #179 and #177; the maintainer's order continues):
-   **#174**, **#178** (Hop Kick in Donovan's Dark Force), **#176** (the RNG's
+   **#182** (Phobos's air guard cancel never fires on ours — the fix plan to bring to the maintainer, rule-checked, before any shipped byte),
+   **#174** (its eight attack chains now gated by `tests/audit_chains174.sh`; the 28 non-attack starts remain), **#178** (Hop Kick in Donovan's Dark Force), **#176** (the RNG's
    advance), **#159**; then #145, #170.
 4. **Three close-time checkers are ON TRIAL** (`build/agent183/`, untracked): `packet_verify.py` (re-opens every
    packet quote), `class_letters.py` (every finding letter in exactly one test class), `classing_cover.py`

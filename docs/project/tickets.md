@@ -11,12 +11,13 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**181 tickets** — status: open 16 · parked 16 · done 132 · declined 4 · not-ours 5 · invalid 7 · duplicate 1 · kind: bug 134 · cosmetic 11 · evolution 36 · **backfill debt: 0 rows**.
+**182 tickets** — status: open 17 · parked 16 · done 132 · declined 4 · not-ours 5 · invalid 7 · duplicate 1 · kind: bug 135 · cosmetic 11 · evolution 36 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#182](https://github.com/DefinitelyFrenchName/VampireSaved/issues/182) | bug | open | Phobos's guard cancel from an air block (Reflect Wall, j.623P) never fires on our build: vsavj's block entry lacks vs2's Phobos-only case that opens the guard window +0x158 in the air | `tests/audit_chains174.sh` · `tests/replays/chains174/huitzil_c174.rpl` | none | `docs/game/engine_internals.md § THE GUARD WINDOW ON AN AIR BLOCK` · `docs/game/atlas/ram.md § the GUARD WINDOW` | none | 14z-184 |
 | [#178](https://github.com/DefinitelyFrenchName/VampireSaved/issues/178) | evolution | open | Hop Kick in Donovan's Dark Force connects on neither leg of any rig: #136's 'native lands, ours whiffs' was never compared | `tests/audit_df_moves.sh` | `DECISIONS_HISTORY.md § Ruled 2026-09-25 (14z-182) — #136's full-scope re-derivation` | none | none | 14z-182 |
 | [#176](https://github.com/DefinitelyFrenchName/VampireSaved/issues/176) | evolution | open | Compare the RNG's per-frame advance between our build and native: the parity gates pin the RNG word every frame (ruled their equalised input), so an advance defect would read as agreement | `tests/audit_df_moves.sh` | `DECISIONS_HISTORY.md § Ruled 2026-09-25 (14z-182) — the parity gates' per-frame level and RNG pins` | none | none | 14z-182 |
 | [#174](https://github.com/DefinitelyFrenchName/VampireSaved/issues/174) | evolution | open | 36 never-entered a2 chains of the tenants (8 with attack records; re-counted at the 14z-181 close by the promoted tools/chain_census.py — 35/7 at 14z-164): moves the naming corpus never produces, their ours-vs-native parity unmeasured | `tools/framedata_pages.sh` · `tools/chain_census.py` | none | `docs/game/engine_internals.md § The OURS leg of the reaction map` | none | 14z-181 |

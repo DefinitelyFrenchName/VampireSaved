@@ -1,0 +1,8 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent184/t174_census.txt	c2ae32b7e3aae43e5b046ab74b79de9ecabfb6ee
+build/agent184/t174_hypotheses.md	f557f1b2aaf0f395b3e3e26c693c26c9e0dd1234
+build/agent184/t174_corpus_gates.txt	9e901397456a842b92050b5f4c39cc55445c42ac
+build/agent184/t174_replay_walkers.txt	96b589540473722ee88b0fbc157e87a225f26095
+build/agent184/t174_issue_body.md	8b3f5f7469aaa7e287ddf034f4d3625c0c394a55
+tools/move_parity.py.lines-274-312 (lines 274-312 of tools/move_parity.py)	9fb965d1083cda7b3e2660223994e057b3d3ba9f
+docs/project/gotchas.md.lines-5936-5946 (lines 5936-5946 of docs/project/gotchas.md)	178f834eb3053c28a6a1e696811d2cd0dd072650

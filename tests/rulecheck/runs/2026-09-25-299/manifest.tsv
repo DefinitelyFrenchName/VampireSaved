@@ -1,0 +1,10 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent184/t174_census.txt	c2ae32b7e3aae43e5b046ab74b79de9ecabfb6ee
+build/agent184/t174_calls.py	4887c08add8804f5bb4bc39d65bb9c677051d945
+build/agent184/t174_calls.txt	63ade0576282392440963fcfc12113906dfeba64
+build/agent184/t174_handlers.py	b79b099d9683fd2fc2231eaeb4e2e150f58ab42c
+build/agent184/t174_handlers.txt	b2f6f675dc041084d080d7354f1e41b471bb81bf
+build/agent184/t174_handlers.dis	fb17e545ca215c05e2a0c7b0c291a526581bbc58
+build/agent184/t174_corpus_gates.txt	2e1e961b1faf200d049b6df2fc5fc236e32afbe8
+build/manifest/moves_pyron.toml.lines-23-37 (lines 23-37 of build/manifest/moves_pyron.toml)	dcee55c2a45d57f148358df5d926c7be16e3ae42
+build/manifest/moves_huitzil.toml.lines-31-37 (lines 31-37 of build/manifest/moves_huitzil.toml)	1e4158239c1bc68232c3e959e1624e7d54cc6f71

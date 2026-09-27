@@ -1,0 +1,16 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: #174: recommend rigging the eight never-entered a2 attack chains as a dedicated gate — re-check after run 302
+Claim (the working agent's sentence): Recommend building #174's rigs as a DEDICATED gate whose replays live in a new subdirectory of tests/replays/ (not in tests/replays/naming/), each named without a leading number: the naming corpus is followed by the gates that glob it (t174_corpus_gates.txt; a gate that globs a corpus follows it — 14z-181's two added parts turned three such gates red, project gotchas), while a new subdirectory is reached by no gate's glob — t174_replay_walkers.txt: of the tracked .sh/.py/.lua files under tests/ and tools/, searched for the recursive and subdirectory forms listed in its (1) (a regex that matches 6 of 6 planted lines, its (4)), the only one that walks tests/replays recursively is tools/gate_follows.py, whose _replay_index is used only by its prose reconciliation (t174_aliases_and_index.txt: both call sites), and the top-level tests/replays/*.rpl glob does not descend (its (5)). The gate's first step runs each rig on native vs2 and REQUIRES it to enter its chain; only then does it compare ours with native through tools/move_parity.py. The rigs are designed from HYPOTHESES, listed with every condition the disassembly shows in t174_hypotheses.md — none is claimed as a finding. SCOPE: #174's set as re-counted at the 14z-181 close (t174_issue_body.md, the comment: 36 never-entered distinct starts of table a2, 8 with attack records, Pyron's a2:0x03 the one added since the body's 35/7), which t174_census.txt reproduces; the handler map's extra marks on Pyron a2:0x25 and a2:0x2c are aliases of entered chains (t174_aliases_and_index.txt); the never-entered attack chains of tables a, b and c are out of this recommendation. NOT tested: every hypothesis; a hypothesis refuted on native means a rig redesign or a question to the maintainer, not a comparison; the walker census covers tracked .sh/.py/.lua files under tests/ and tools/ and the forms its regex matches only — a walker written another way, or in another file type, would not be found; the 28 non-attack never-entered a2 starts are not addressed.
+Artifacts (read every one, in full):
+  - build/agent184/t174_census.txt
+  - build/agent184/t174_hypotheses.md
+  - build/agent184/t174_calls.txt
+  - build/agent184/t174_handlers.txt
+  - build/agent184/t174_handlers.dis
+  - build/agent184/t174_corpus_gates.txt
+  - build/agent184/t174_replay_walkers.txt
+  - build/agent184/t174_aliases_and_index.txt
+  - build/agent184/t174_issue_body.md
+  - docs/project/gotchas.md.lines-5936-5946 (lines 5936-5946 of docs/project/gotchas.md)
