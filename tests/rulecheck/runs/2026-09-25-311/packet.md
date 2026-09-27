@@ -1,0 +1,11 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: 14z-184 close: the documentation packet — the findings table (STATE 14z-184 row (9)) as complete
+Claim (the working agent's sentence): Recommend recording the 14z-184 findings table (STATE.md 14z-184 row (9), findings (a)-(o)) as the session's complete findings, each homed in a live, tracked document and each with the test that reproduces it or an explicit 'test: none' and why: close_findings.py reports no GAP and no REVIEW (its one REVIEW, the chain-start 0x2710C, answered by a new sentence in engine_internals.md), homes_tracked.py exits 0 on the row (every file it names is tracked), and retraction_grep.py exits 0 with every reach control found and every retracted hit classed as a quoted retraction or a record (the classing below its output). The three PROMISE hits of close_findings.py are facts that use the word 'until', not promises; the session's one real open promise (the #182 fix plan, and promoting its legacy control) is ticket #182 and NEXT_SESSION's step one. NOT tested: that the table lists EVERY finding — the tools see addresses, homes and wordings, not findings, so completeness rests on the table's own reading of the session (STATE rows (1)-(8)); finding (h) and (j) have no test by nature (a deletion, an instrument); three scratch scripts whose figures are quoted were not promoted (the #179 all-character sweep, the static call-site census, the #182 legacy control — the last staged as NEXT_SESSION step 1a).
+Artifacts (read every one, in full):
+  - STATE.md.lines-78-87 (lines 78-87 of STATE.md)
+  - build/agent184/close/close_findings.txt
+  - build/agent184/close/homes_tracked.txt
+  - build/agent184/close/retraction_14z184.txt
+  - docs/NEXT_SESSION.md

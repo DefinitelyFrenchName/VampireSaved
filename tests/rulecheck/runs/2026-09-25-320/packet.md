@@ -1,0 +1,27 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: 14z-184 close: the documentation packet — re-check after run 319
+Claim (the working agent's sentence): Recommend recording the 14z-184 findings table (STATE.md 14z-184 row (9), findings (a)-(p); (p) added after run 317) as the session's findings, each homed and each with the test that reproduces it or an explicit 'test: none' and why. Every check below was run by build/agent184/close/run_checks.sh, which keeps each output in its own file under build/agent184/close/runs/ and writes each exit code, and a 'why' row per plant (the plant's own output must name it), to runs/exits.tsv: 18 runs, 0 not as expected. homes_tracked.py exit 0 on the row, fingerprint f623e63563e3; home_texts.py exit 0 — 23 pairs covering (a)-(p) and the REVIEW's answer, 23/23, and from the row itself 16 findings, 20 named home files, 0 without a pair, the same row fingerprint and a fingerprint of the 14 home files read — its two plants exit 1 (--plant: COVERAGE MISS for (k)'s tools/chains174_rigs.py; --plant-text: MISSING for a mis-typed heading); retraction_grep.py exit 0, every reach control found (14), its normaliser now dropping Lua '--' comment prefixes as well as '#' (finding (p)), its --selftest exit 0 naming the Lua plant; tests/test_close_tools.sh exit 0, PASS, five CONTROL FIRED lines; retraction_base.py exit 0 — each of the 7 retracted patterns (#177's two paraphrases added) matches the tree at the session's base 16faa71d under the grep's own normaliser — its plant exit 1 (NEVER-MATCHED); retraction_classes.py exit 0 — 46 occurrences over 34 (pattern, file) pairs, 24 distinct files: ARCHIVE 16, MARKED 12, SCOPED-TRUE 4 (the read_tap sentence in the four frame_done instruments the platform gotcha names as true, the list parsed from the gotcha and each checked for no tap or breakpoint call), SESSION 7, SITE 7, UNMARKED 0 — its plant exit 1 (UNMARKED); close_findings.py exit 0, no GAP and no REVIEW (its one REVIEW, the chain-start 0x2710C, answered by the engine_internals.md sentence 'the START entries'), four PROMISE hits: three facts in STATE's rows using the word 'until', the fourth the ledger's copy of run 312's claim quoting the maintainer's step-3 question. The session's open promises, carried in NEXT_SESSION with the scope STATE records: the #182 fix plan with promoting its legacy control (NEXT_SESSION step 1, quoting the maintainer's 'yes' and 'So you advise to close properly and stage step 3 for next session, right?'), and the re-run at the next freeze of the gates following the files edited for comments (NEXT_SESSION item 4). NOT tested: that the table lists EVERY finding (the tools see addresses, homes and wordings, not findings); that each named test reproduces its finding in this packet (run during the session, not here; the static tier re-runs the static ones before the push); that each home is a LIVE document (by reading); that each pair's TEXT is the finding's own statement rather than merely a string in that file (by reading); the coverage parse reads backticked file names in each home clause, so a home named without backticks would escape it (by reading the 16 clauses: none is); that a MARKED occurrence's mark refers to that occurrence (a 400-character window, a heuristic — the twelve MARKED lines are printed with their context, read by hand); that ARCHIVE and SITE files need no mark (archives are never rewritten; docs/site is generated from the classed sources); that the retracted patterns list EVERY wording and paraphrase of each retracted claim (the base control proves each listed pattern matched, not that no other wording exists; paraphrases found by grep, by hand); that retraction_grep's normaliser covers every comment syntax in the tree ('#' and '--' only; '//' and '/* */' are not collapsed); run_checks.sh's 'why' rows match a pattern in the output, not the plant's full meaning; home_texts.py, retraction_classes.py, retraction_base.py and run_checks.sh are untracked close-time scripts; no tool matches a carried promise's scope against its STATE record (by reading); close_findings' promise scan keys on trigger words and its output carries no tree fingerprint; findings (h) and (j) have no test by nature; three scratch scripts whose figures are quoted were not promoted (the #179 all-character sweep, the static call-site census, the #182 legacy control — the last NEXT_SESSION step 1a).
+Artifacts (read every one, in full):
+  - STATE.md.lines-78-87 (lines 78-87 of STATE.md)
+  - build/agent184/close/run_checks.sh
+  - build/agent184/close/home_texts.py
+  - build/agent184/close/retraction_classes.py
+  - build/agent184/close/retraction_base.py
+  - build/agent184/close/runs/exits.tsv
+  - build/agent184/close/runs/homes_tracked.out
+  - build/agent184/close/runs/close_findings.out
+  - build/agent184/close/runs/retraction_grep.out
+  - build/agent184/close/runs/retraction_grep_selftest.out
+  - build/agent184/close/runs/home_texts.out
+  - build/agent184/close/runs/home_texts_plant.out
+  - build/agent184/close/runs/home_texts_plant_text.out
+  - build/agent184/close/runs/retraction_classes.out
+  - build/agent184/close/runs/retraction_classes_plant.out
+  - build/agent184/close/runs/retraction_base.out
+  - build/agent184/close/runs/retraction_base_plant.out
+  - build/agent184/close/runs/test_close_tools.out
+  - tests/rulecheck/retractions/14z-184.tsv
+  - docs/NEXT_SESSION.md
+  - docs/game/engine_internals.md.lines-479-485 (lines 479-485 of docs/game/engine_internals.md)

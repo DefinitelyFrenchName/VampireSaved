@@ -16,8 +16,8 @@ CONTROL: a wording known to be live that MUST be found (a heading; a corrected
 wording in its plain and code-spanned carriers; a carrier line-wrapped across a
 `#` comment prefix) — `reach:N` demands at least N hits, so a control with two
 known carriers (plain and code-spanned) fails when either is missed. Each file under the roots is read WHOLE, with runs of
-whitespace, backticks and `#` comment prefixes at line starts collapsed to one
-space and the text CASE-FOLDED, and each pattern is matched the same way — so a wrapped, code-spanned or
+whitespace, backticks and `#` or `--` comment prefixes at line starts collapsed to one
+space (`--` since 14z-184: a wording wrapped across Lua comment lines was invisible, rule-checker run 2026-09-25-317) and the text CASE-FOLDED, and each pattern is matched the same way — so a wrapped, code-spanned or
 comment-wrapped carrier is found. Every hit is printed with its file and the
 matched text; the CLASSING of retracted hits is the working agent's, written
 in the artifact by hand below the tool's output. EXIT 1 when any reach control
@@ -52,7 +52,7 @@ NOFOLD = False   # --nofold: case-folding disabled — a KNOWN-BAD variant for t
 
 
 def norm(t):
-    t = re.sub(r"(^|\n)[ \t]*#+[ \t]*", " ", t)
+    t = re.sub(r"(^|\n)[ \t]*(?:#+|--)[ \t]*", " ", t)   # shell/python `#` and Lua `--` (14z-184, run 317)
     t = re.sub(r"\s+", " ", t.replace("`", ""))
     return t if NOFOLD else t.lower()   # case-folded: a HEADING carries a wording too (run 196)
 
@@ -62,12 +62,13 @@ def selftest():
     cannot isolate the matcher — a stray carrier of the other case masks a missing fold)."""
     cases = [("upper-case heading", "## THE GROUND IS Y = 40 — a heading\n", "the ground is y = 40"),
              ("comment-wrapped", "# first half of the\n# wrapped wording here\n", "of the wrapped wording"),
+             ("lua-comment-wrapped", "-- first half of the\n-- lua wrapped wording\n", "of the lua wrapped wording"),
              ("code-spanned", "the `LEAD=0` for the walk\n", "LEAD=0 for the walk")]
     bad = [name for name, text, pat in cases if norm(pat).strip() not in norm(text)]
     if bad:
         print("SELFTEST FAIL: the matcher missed the planted " + ", ".join(bad) + " case(s)" + (" (no-fold variant)" if NOFOLD else ""))
         sys.exit(1)
-    print("SELFTEST PASS: the upper-case heading, comment-wrapped and code-spanned plants are each matched")
+    print("SELFTEST PASS: the upper-case heading, comment-wrapped (`#` and Lua `--`) and code-spanned plants are each matched")
     sys.exit(0)
 
 

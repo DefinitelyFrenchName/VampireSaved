@@ -63,6 +63,8 @@ def promises(key, group):
             out.append(f"  PROMISE  {src}: ...{text[a:m.end() + 50]}...".replace("\n", " ")[:220])
     return out
 
+SUF = re.compile(r"0x([0-9A-Fa-f]{5,8})((?:/[0-9A-Fa-f]{1,4}\b)+)")   # `0x028B5A/5E`: the suffix replaces the last digits
+
 def addrs(text):
     out = {}
     for m in TOK.finditer(text):
@@ -70,6 +72,10 @@ def addrs(text):
         v = int(h, 16)
         if m.group(2) and len(h) == 4: v |= 0xFF0000        # a short $xxxx in a RAM context is $FFxxxx
         out.setdefault(v, m.group(0))
+    for m in SUF.finditer(text):   # the suffix form named a SECOND address the token above never read (14z-184, run 322)
+        h = m.group(1)
+        for sfx in m.group(2).strip("/").split("/"):
+            out.setdefault(int(h[:len(h) - len(sfx)] + sfx, 16), f"0x{h}/{sfx}")
     return out
 
 def live_docs():
@@ -99,13 +105,17 @@ def selftest():
     """the must-fire control: a synthetic group naming one address present nowhere and one the atlas homes"""
     import tempfile
     planted, homed = "PRG:0x7FFFF1", "RAM:$FF812D"
+    suffixed = "PRG:0x7FFFE0/F3"   # the suffix form: 0x7FFFF3 must be read and reported a gap (14z-184, run 322)
     with tempfile.NamedTemporaryFile("w", suffix=".md", delete=False) as f:
-        f.write(f"## Session 99z-1 — **selftest**\n\n| | |\n|---|---|\n| (1) | {planted} and {homed}; PLANTED-PROMISE: this is stated so from here on |\n\n---\n")
+        f.write(f"## Session 99z-1 — **selftest**\n\n| | |\n|---|---|\n| (1) | {planted} and {homed} and {suffixed}; PLANTED-PROMISE: this is stated so from here on |\n\n---\n")
     import subprocess
     out = subprocess.run([sys.executable, __file__, "99z-1", "--state", f.name], capture_output=True, text=True).stdout
     gaps = out.split("REVIEW")[0]
     ok = ("0x7FFFF1" in gaps) and ("FF812D" not in gaps) and ("PLANTED-PROMISE" in out)
     print(("CONTROL FIRED: planted-address — " if ok else "CONTROL DEAD: planted-address — ") + "the planted address is a gap, the homed one is not, and the planted promise is listed")
+    ok3 = "(0x7FFFF3)" in gaps
+    print(("CONTROL FIRED: suffix-address — " if ok3 else "CONTROL DEAD: suffix-address — ") + "the second address of a `0x7FFFE0/F3` suffix form is read and reported a gap")
+    ok = ok and ok3
     # the review control: an address the atlas homes, with the base at HEAD, has no line added since the base
     out2 = subprocess.run([sys.executable, __file__, "99z-1", "--state", f.name, "--base", "HEAD"], capture_output=True, text=True).stdout
     rev = out2.split("REVIEW", 1)[1] if "REVIEW" in out2 else ""

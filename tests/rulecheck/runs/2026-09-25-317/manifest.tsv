@@ -1,0 +1,11 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+STATE.md.lines-78-87 (lines 78-87 of STATE.md)	f68736d2766bd6bbbb369ebdd9547771b76e644f
+build/agent184/close/home_texts.py	50a58acea9f11e7b35c25f0cebfc4020b250afd9
+build/agent184/close/home_texts.txt	3fd1e3a4fb05284423af1ee83db3153930be8dda
+build/agent184/close/close_findings.txt	4a32794c760c301cc3cb850430135f5e81716902
+build/agent184/close/homes_tracked.txt	797f31a8ea080da67bb7a423a87dae5f834c627d
+build/agent184/close/retraction_14z184.txt	ee2f0455e3406c80ced2dc0c122922c6014a0283
+build/agent184/close/retraction_classes.py	e9b147d9745a593f0427000e752afb361a465dc1
+build/agent184/close/retraction_classes.txt	4875899ff28e52acc6de5691916b06ec7b8602fc
+docs/NEXT_SESSION.md	d86f1fb7f4e0afd3a2d9410b787ba4441c0569ef
+docs/game/engine_internals.md.lines-479-485 (lines 479-485 of docs/game/engine_internals.md)	ca32591f532dad95ae738f5ca0026cfd616c8d64

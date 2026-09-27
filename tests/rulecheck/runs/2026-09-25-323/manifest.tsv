@@ -1,0 +1,26 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+STATE.md.lines-78-87 (lines 78-87 of STATE.md)	a6bef65db1b2137e649ad39f9396789c5205db27
+build/agent184/close/run_checks.sh	6ee55d6fb43bd51c4a1e5e7c2ae07aa83305e82a
+build/agent184/close/home_texts.py	bb513259403e55c0060fd94b90c6e14135118ba1
+build/agent184/close/retraction_classes.py	658d43d747357456a0b2658ff08ec0e53d671393
+build/agent184/close/retraction_base.py	7f972a1c6bdbbed4b813b6a34d88b957737ddb82
+tools/close_findings.py	a60f8a6148508a06551a1a38edb2e2b4c1ccd73f
+build/agent184/close/runs/exits.tsv	85b48b2bca17730a6944cfc41c744764c7533e53
+build/agent184/close/runs/homes_tracked.out	9e8f26f1b069896a3af5c418219167c920ef2a30
+build/agent184/close/runs/close_findings.out	4791cf9b3bad00a2acfb2177e2cfbdda9cce5833
+build/agent184/close/runs/close_findings_selftest.out	1a6e2233fcbd559188b75487172c4bfd1448f7ab
+build/agent184/close/runs/retraction_grep.out	fe2b758c671073ad6c072d3f4c34221557e59f57
+build/agent184/close/runs/retraction_grep_selftest.out	2ab9c07fdca4248959558b13218fe90065c2ac48
+build/agent184/close/runs/home_texts.out	608ae781f6a42a6211cec9bd1e7fe60bae09ce91
+build/agent184/close/runs/home_texts_plant.out	279990cb1f53b2706a07d3c9345329ea37fdb87b
+build/agent184/close/runs/home_texts_plant_text.out	032d11df9693e1c16f57ee4db22feb7423684e88
+build/agent184/close/runs/retraction_classes.out	fb665a8262bd7afa1bb3b3126b7219d605b97b00
+build/agent184/close/runs/retraction_classes_plant.out	3162bb153811a08c463be7815545aa2f4bd91ce4
+build/agent184/close/runs/retraction_classes_plant_scoped.out	6241c27d5b41091d729a78febf506f8f49dd1204
+build/agent184/close/runs/retraction_classes_plant_session.out	df6e702c9d85d3f9dd80d4aa6f09ff7490308f4c
+build/agent184/close/runs/retraction_base.out	71fb16731a4ab0e68729f7f69c53e8bca30339d3
+build/agent184/close/runs/retraction_base_plant.out	c462dd13c6dacc4a566d9e44c54f5a7cf55b18df
+build/agent184/close/runs/test_close_tools.out	01ee3cd6af2ffb0431d8fe0bd1597e7a833ece4a
+tests/rulecheck/retractions/14z-184.tsv	86b776925d6dd175a24ec4a7b6e42f49e52ec375
+docs/NEXT_SESSION.md	d86f1fb7f4e0afd3a2d9410b787ba4441c0569ef
+docs/game/engine_internals.md.lines-479-485 (lines 479-485 of docs/game/engine_internals.md)	ca32591f532dad95ae738f5ca0026cfd616c8d64

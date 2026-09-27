@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-183b CLOSE, 2026-09-26)
+# NEXT SESSION — orientation (rewritten at the 14z-184 CLOSE, 2026-09-27)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
@@ -14,70 +14,65 @@ prompt files pasted VERBATIM, `record --session`, `resolve` on ONE line. Say so 
 
 ## START HERE
 
-0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** What the 14z-183 and 14z-183b closes found and did
-   is in their CLOSE rows (STATE 14z-183, 14z-183b).
-0b. **A FREEZE OR RELEASE TIER NOW RUNS ON A SNAPSHOT (#153, ruled 2026-09-26):**
-   `ROMDIR=... tests/run_on_snapshot.sh -- tests/run_all_static.sh --strict --cadence freeze|release` —
-   immune to the working tree while it runs, its commit and inputs recorded under `build/snapshot_runs/`
-   (`docs/project/snapshot_runs.md`). Work may continue in the tree beside it. The emulator tier is #181
-   (not yet on a snapshot: run it in place, never beside edits to what it reads).
-1. **M20 IS FROZEN, NOT RELEASED.** `freeze/merged-m20` (and donovan-m24 / huitzil-m31 / pyron-m25), commit
-   `d4cd4d51`, `release/merged-m20/` packaged. The GitHub release (README still names merged-m19) is a
-   separate decision — the maintainer's. A release run executes every emulator control (`--controls`) and
-   the bitstream-cadence MiSTer gates; **the re-frozen `test_mister_prg_window` pair was copied from the
-   freeze lane's own log and NOT re-run** — the release run is its verify.
-2. **Nothing is pending a ruling** — STATE "Decisions pending" is empty.
-3. **Open tickets, the maintainer's to order** (14z-184 closed #181, #180, #179 and #177; the maintainer's order continues):
-   **#182** (Phobos's air guard cancel never fires on ours — the fix plan to bring to the maintainer, rule-checked, before any shipped byte),
-   **#174** (its eight attack chains now gated by `tests/audit_chains174.sh`; the 28 non-attack starts remain), **#178** (Hop Kick in Donovan's Dark Force), **#176** (the RNG's
-   advance), **#159**; then #145, #170.
-4. **Three close-time checkers are ON TRIAL** (`build/agent183/`, untracked): `packet_verify.py` (re-opens every
-   packet quote), `class_letters.py` (every finding letter in exactly one test class), `classing_cover.py`
-   (every retracted hit classed). Each has a plant that fires. Promote them to `tools/` beside
-   `homes_tracked.py`, with a gate, or let them go. The 14z-183 CLOSE row, step (6), says why they exist.
-5. **Three gate headers changed at the 14z-183 close, comments only** (`audit_move_parity`,
-   `audit_df_field_readers_live`, `audit_reaction_class_live`: the part count 30 -> 32). The staleness gate
-   will list them as a NOTE at session cadence; at the next freeze, `--stale` re-runs them.
+0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** What the 14z-184 close found and did is in its
+   CLOSE row (STATE 14z-184).
+1. **#182 IS STEP ONE — staged by the maintainer.** At 14z-184 the session proposed three steps — (1) open a
+   ticket for #182, (2) finish #174's gate, (3) *"Bring you a fix plan through the rule-checker before building"* —
+   and asked *"Shall I go ahead with 1 and 2, and prepare the plan for 3?"*; the maintainer: *"yes"*. After 1 and 2
+   landed, the maintainer: *"So you advise to close properly and stage step 3 for next session, right?"* — the
+   session agreed, so step 3, the #182 fix plan, opens this session. Phobos's guard cancel from an AIR block never fires on ours: vs2's block
+   entry opens the guard window `+0x158` in the air for fighter id 0x10 alone (`cmpi.b #$10,$382(a6)` at
+   `0x022480`), vsavj's never does (`docs/game/engine_internals.md` "THE GUARD WINDOW ON AN AIR BLOCK").
+   In order:
+   a. **Promote the legacy control** (`build/agent184/t174/legacy/run.sh`, untracked: Lei-Lei's air guard
+      cancel fires alike on pristine vsavj and vs2, by real picks) into a tracked gate — it is the evidence
+      that #182 is ours, and [VSP-18] wants it rerunnable. Not done at the 14z-184 close.
+   b. **Measure the two designs before recommending** (no shipped byte first): **A** — a hook in vsavj's
+      block entry (`0x02393a`) doing vs2's id-0x10 check (exact native behaviour; every character's block
+      runs the check, so the legacy oracle and the flicker inventory must be measured); **B** — a patch in
+      Phobos's own ported guard-cancel check (legacy untouched by construction; vs2's 14-frame window must be
+      reproduced or it is a feel difference). Probe builds, the legacy corpus for A, `audit_move_parity` and
+      `audit_chains174` for both; then the plan through the rule-checker, then the maintainer.
+2. **`tests/audit_chains174.sh` freezes #182 AS THE DEFECT** (the two air-block rows DIFF). A fix re-freezes
+   those two rows by design; everything else in it is IDENT and must stay so.
+3. **Open tickets, the maintainer's to order after #182:** **#174** (its eight attack chains are gated; the
+   28 non-attack never-entered a2 starts remain), **#178** (Hop Kick in Donovan's Dark Force), **#176** (the
+   RNG's advance), **#159**; then #145, #170.
+4. **The 14z-184 promise: the gates following the files edited for comments re-run at the next freeze.** The
+   frame-label sentence was corrected in `tests/lua/read_tap.lua` and five more instruments (`bp_regs.lua`,
+   `qs_sweep.lua`, `qs_table_trace.lua`, `ring_tap.lua`, `unmapped_probe.lua`) and in
+   `tests/test_replay_stage_census.sh`; `tests/lua/trace_writes.lua` was edited for the retired m18 gate's
+   pointer. Comments only; every gate whose `# FOLLOWS:` names one of these reads stale until the freeze's
+   `--stale` re-run.
+5. **Carried from 14z-183b, still open:** the three ON-TRIAL close checkers under `build/agent183/`
+   (`packet_verify.py`, `class_letters.py`, `classing_cover.py`) — promote or let go; the three gate headers
+   changed at the 14z-183 close re-run at the next freeze's `--stale`; M20 is frozen, not released.
+   **From the 14z-184 close, for the maintainer to rule:** `tests/expected/poke_readback.tsv` carries three
+   UNCLASSIFIED rows for `audit_chains174` (x at `ff8410`, stock at `ff8509`, P2 HP at `ff8850` — the rig's
+   own pins, sampled by the gate); the table's header makes each class the maintainer's. The same three fields
+   of `audit_move_parity`, compared by the same `tools/move_parity.py`, were ruled OBSERVES in 14z-181.
+   Also the close-time checkers of `build/agent184/close/` (`run_checks.sh`, `home_texts.py`,
+   `retraction_classes.py`, `retraction_base.py`) — promote or let go, as for 14z-183b's three.
+6. **Instrument facts learned this sitting** (read before tapping): a `read_tap.lua` write labelled N is
+   replay.lua's / `field_trace.lua`'s frame N+1 (`docs/platform/gotchas.md`); a rig event's outcome can
+   depend on its absolute frame — keep measured frames with spacers (`docs/project/gotchas.md`).
 
-## WHAT CLOSED THIS SITTING
+## WHAT CLOSED THIS SITTING (14z-184)
 
-**14z-183b:** #153 (the freeze/release static tier on a snapshot, immune to the tree: `tests/run_on_snapshot.sh`,
-`tests/test_run_on_snapshot.sh`); slice 2 opened as #181. Ruled: *"Build slice 1"*, *"Listing + fingerprints"*, *"Close; new ticket
- for slice 2"* — `DECISIONS_HISTORY.md` "Ruled 2026-09-26 (14z-183b)". **14z-183:** #157 (FIXED in M20: a tenant throw pays the thrower the record's meter, and the damage scaler reads the
-attacker — the two measured by `tests/audit_throw_registration.sh` / `tests/audit_move_parity.sh`), #134,
-#138, #140, #154. Item 0b (every #175 figure re-derived, `tools/trap_air_static.py`). Ruled: *"Freeze M20
-now"*, the #112 gate *"Pin it to M19"*, Phobos's landing *"Freeze, ticket it"* (#179).
+**#181** (the emulator tier on a snapshot — ruled *"Copy the cache"*, *"Last-commit time"*, *"Copied back"*,
+*"Private copies"*); **#180** `not-ours` (vs2's own ES throws; the third pair store is the applier's KO
+branch); **#179** `not-ours` (on a shared wall vsavj pushes P1 out, vs2 P2 — documented, gated by
+`tests/audit_shared_wall_push.sh`); **#177** `invalid` (the movement comparison existed; `movement-x`
+proves it). Ruled also: `read_tap.lua`'s frame-label comment fixed now; `audit_x2b7ef4_reach_m18` retired;
+#174's rigs in a dedicated gate. All in `DECISIONS_HISTORY.md` "Ruled 2026-09-27 (14z-184)".
 
-## TRAPS PAID THIS SITTING (14z-183, 14z-183b)
+## TRAPS PAID THIS SITTING
 
-9. **A per-gate re-run is a probe, not the runner** — mine dropped the runner's `VS_CADENCE` and read a
-   freeze-cadence red as PASS (`docs/project/gotchas.md`). **`sh` reads a script as it runs** — editing
-   `run_on_snapshot.sh` under a live run killed it at a syntax error; the runner now re-execs from a private copy.
-10. **A control that "fires" because its copy crashed proves nothing** — three did at first; a control now
-   counts only when the perturbation REACHES the run.
-
-1. **A gate's printed diff is a `head -40` window.** Comparing two builds through gate logs compared a
-   window; freeze the table on BOTH builds (copy aside, restore) and diff the files whole (gotcha filed).
-2. **A rig or corpus commit re-frozen in the gates it was made for leaves every other gate that reads it
-   stale** — four were, since 14z-181; `tests/run_all_emulator.sh --stale` names them once a run of record
-   exists (gotcha filed).
-3. **A kept parity work dir holds an UNPINNED native trace for its control part** — a timing reported to the
-   maintainer from one was an artifact and retracted (gotcha filed).
-4. **The freeze-cadence staleness gate wants the emulator run of record ON THE COMMITTED TREE** — so the order
-   is: freeze commit, tags, `run_all_emulator.sh --freeze --stale`, then the freeze tier; three tier reds
-   (tags, the `freeze` row, staleness) clear only in that order.
-5. **A self-frozen `.sha1` passes by construction** — compare each to its predecessor's file before a freeze
-   packet says the sets verified (the rule-checker's run 249 caught it).
-6. **zsh**: an unquoted `$A` of `--artifact` flags does not split — use `${=A}`; `setopt null_glob` before a
-   glob that may match nothing.
-7. **The documentation packet took eleven rule-checker runs (251-261).** Each missed item was real: findings
-   left out of the table, a test credited with replaying what it only guards, a stale count in a quoted
-   header, a count restated in prose. Build the table from a FULL re-read of the session's rows, not a
-   keyword scan. State each test's reach (replays / runs the fixed state / none) per finding. Point at
-   artifacts instead of restating counts.
-8. **The procedure check (runs 262-264) found two working-method slips.** At the opener, state the delegation
-   scope exactly: figures that enter documents and freezes come from worker specs, and figures from my own
-   runs are labelled as such in chat. Do not promise that every figure goes through a worker. Pass a
-   rule-checker an EXCERPT, not a whole gotchas bucket: its readers cannot read ~6000 lines in one pass, and
-   an OK then rests on slices. A session extract over ~580k characters is split into spans (`extract.py
-   --from/--to`), one procedure run per span.
+1. **Three legacy controls were wrong before one held (#179)** — a view-edge pin, then setups the games had
+   already split; the maintainer designed the fourth. A cross-game control is the same setup until the
+   event: find its first differing frame first (`docs/project/gotchas.md`).
+2. **A coverage finding read from a gate's description (#177)** — the rigs were the movements all along.
+3. **A recommendation that tried to prove a whole-tree negative (#174, rule-checker runs 299-306)** — seven
+   rounds; the claim converged only when the negative was NAMED as untested instead of asserted.
+4. **An expectation committed without its `PROVENANCE.md` row** (the #179 gate) — run
+   `tests/test_expectation_provenance.sh` in the registration checklist of every new gate.

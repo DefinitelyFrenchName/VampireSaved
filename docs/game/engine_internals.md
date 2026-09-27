@@ -478,7 +478,11 @@ PC 0xCE38A = vs2 0x2713C + port offset):
   sampled node pointers on the decoded graph): node SELECT — `a0 = table +
   word[table + 2*seq]` (the index-table words are offsets from the TABLE's own
   base; tables a/a2/b at vs2 `0xD7018/0xD7098/0xD7118`, c `0xD7198`, proj
-  `0xD7218` = bank[0]−0x280/−0x200/−0x180/−0x100/−0x80), `obj+0x1C = a0`,
+  `0xD7218` = bank[0]−0x280/−0x200/−0x180/−0x100/−0x80; the START entries,
+  d0 = the chain index: vs2 `0x2710C` table a2, `0x27114` table b, `0x2711C`
+  table a — every `jsr/jmp $2710c` with its `moveq #idx,d0` is a static
+  census of which a2 chains a character's code can start, the method that
+  identified #174's never-entered chains, 14z-184), `obj+0x1C = a0`,
   `obj+0x20.l = node[0..3]` (so `+0x21` = the flags byte), `node+8.w * 4`
   indexes the `obj+0x64` hitbox-family table (`obj+0x68`, `obj+0x94` = its
   first long), `node+0x16` * 8 indexes the per-node sfx array (`tail_data_ptr`
@@ -4693,7 +4697,13 @@ superset invariant), rig `tests/replays/judge/03_down_attack.rpl`:
   dummy woke at ~+22-45f; every rig geometry tried landed 1-10 frames
   late or beside the body). Connecting cleanly likely needs a longer
   knockdown than these rigs produce — carried as the pursuit-connect
-  refinement in docs/project/coverage_matrix.md.
+  refinement in docs/project/coverage_matrix.md. **A knockdown that does
+  connect (14z-184, #174):** Donovan's ES pursuit off **Sword Grapple
+  (63214+HP)**, pressed at +104 or +112 after the grapple's input, connects
+  on native vs2 (a2:0x4e, then a2:0x4f, the connecting hop, then a2:0x50) —
+  the maintainer: *"it connects after 63214+MP/HP but not after regular
+  throw (4/6+MP/HP)"*; off his regular throw it never did at any press
+  from +52 to +96 (`tests/audit_chains174.sh`).
 
 ## THE PUSH-APART AT A SHARED WALL — the two engines differ (measured 14z-184, GitHub #179)
 

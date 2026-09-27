@@ -1,0 +1,22 @@
+# tests/rulecheck/retractions/14z-184.tsv — the wordings retracted or corrected in 14z-184 (#179, #177, the read_tap frame-label claim, the retired m18 gate), and reach controls that must be found live; columns pattern, source, kind (tools/retraction_grep.py)
+no gate compares a tenant's walk, dash, jumps or arcs with native	14z-184 #177: the movements are events of audit_move_parity (closed invalid)	retracted
+this gate compares x/y only inside move events	14z-184 #177: the rigs' events are the movements	retracted
+a frame number in this log IS a replay.lua frame number	14z-184: false for tap/breakpoint lines (a write labelled N is replay.lua's N+1); true for the four frame_done instruments	retracted
+ours moves 1000 -> 969 and keeps facing (#179)	14z-184 #179: the class renamed WALL-PUSH-VSAVJ, its evidence text rewritten	retracted
+audit_x2b7ef4_reach_m18	14z-184: the gate retired (maintainer-ruled "Retire it")	retracted
+no gate compares a tenant's movement	14z-184 #177 (paraphrase, run 317): the premise as 14z-182 wrote it; the movements are events of audit_move_parity (closed invalid)	retracted
+compares x/y only inside move events	14z-184 #177 (paraphrase, run 317): the premise's second half without its subject	retracted
+THE PUSH-APART AT A SHARED WALL	control: the engine_internals heading, cited by the ticket row and the pursuit line	reach:2
+WALL-PUSH-VSAVJ	control: the parity class in the tool, the frozen attribution and the docs	reach:3
+THE GUARD WINDOW ON AN AIR BLOCK	control: the engine_internals heading, cited by the #182 row and the atlas	reach:2
+WRITE LABELLED N IS REPLAY.LUA'S FRAME N+1	control: the platform gotcha heading, cited by the #179 row	reach:2
+movement-x	control: the parity gate's new control, its header and census	reach:2
+THE THIRD PAIR STORE IS THE APPLIER'S KO BRANCH	control: finding (c)'s home heading in engine_internals	reach
+A POKED KO NEEDS THE VICTIM ON ITS LAST BAR	control: finding (d)'s home heading in docs/game/gotchas	reach
+A LEGACY CONTROL IS THE SAME SETUP UNTIL THE EVENT	control: finding (f)'s home heading in docs/project/gotchas	reach
+A COVERAGE FINDING READ FROM A GATE'S DESCRIPTION IS NOT A COVERAGE FINDING	control: finding (i)'s home heading in docs/project/gotchas	reach
+A RIG EVENT'S OUTCOME CAN DEPEND ON ITS ABSOLUTE FRAME	control: finding (m)'s home heading in docs/project/gotchas	reach
+A knockdown that does connect	control: finding (n)'s home, the pursuit section's connect-race line	reach
+the START entries	control: the 0x2710C sentence answering the close_findings REVIEW	reach
+A CONTROL THAT "FIRES" BECAUSE ITS COPY CRASHED	control: finding (b)'s home heading in docs/project/gotchas	reach
+SEE any naming-rig event, ours vs native	control: finding (j)'s home, its HANDOFF row	reach

@@ -484,6 +484,10 @@ def check_citations(root):
             if p.suffix not in (".py", ".sh", ".lua", ".md", ".txt") or not p.is_file():
                 continue
             rel = p.relative_to(root).as_posix()
+            if re.fullmatch(r"tests/rulecheck/runs/[^/]+/verdict_(?:real|control)\.txt", rel):
+                continue   # a rule-checker READER's verbatim answer, a record never rewritten: its mis-citation is the
+                #            reader's, not a doc defect (14z-184: run 2026-09-25-313's reader cited a table row as a
+                #            section). The working agent's own packet.md and control.txt stay checked.
             try:
                 text = p.read_text(errors="replace")
             except OSError:

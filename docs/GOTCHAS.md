@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-436 entries (47 game / 121 platform / 268 project), counted from the buckets at generation.
+437 entries (47 game / 121 platform / 269 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 47 entries
 
@@ -196,7 +196,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A MAIN SESSION RUN AS A DEFINITION (`claude --agent <name>`) LOSES CLAUDE CODE'S WHOLE DEFAULT SYSTEM PROMPT — THE DEFINITION'S BODY REPLACES IT (measured 2026-09-24, 14z-178, Claude Code 2.1.281)
 - A `read_tap.lua` WRITE LABELLED N IS REPLAY.LUA'S FRAME N+1 — the tap names a write by the counter BEFORE that frame's `frame_done`; `field_trace.lua` and `replay.lua` increment first, then sample (measured 2026-09-27, 14z-184)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 268 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 269 entries
 
 - A VULN ID OF 0 IS NO BOX — a resolver that reads it builds a PHANTOM hurtbox the engine never tests (paid: 14z-182, GitHub #175)
 - A CHAIN ID IN A NAMING EXPECTATION IS IDENTIFIED FROM THE SLOT TABLE, NEVER DESCRIBED IN PROSE (paid: 14z-171, caught 14z-172, GitHub #168)
@@ -466,3 +466,4 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A GATE'S PRINTED DIFF IS A WINDOW — compare two builds' measurements as WHOLE FILES, never through the gate logs (paid: 14z-183, rule-checker run 2026-09-25-238)
 - A LEGACY CONTROL IS THE SAME SETUP UNTIL THE EVENT — a cross-game control that differs before the event under test is two experiments (paid: 14z-184, GitHub #179, three controls the maintainer corrected)
 - A COVERAGE FINDING READ FROM A GATE'S DESCRIPTION IS NOT A COVERAGE FINDING — read the rigs it runs (paid: 14z-182 filed #177, closed invalid 14z-184)
+- A RIG EVENT'S OUTCOME CAN DEPEND ON ITS ABSOLUTE FRAME — removing or reordering an event moves every later one and can un-enter a measured chain (paid: 14z-184, #174)

@@ -5991,3 +5991,15 @@ and the part-1 rows of the events table); a session and a ticket were spent inst
 captures the maintainer then had to review. Rule: before a coverage finding says "no gate
 compares X", find X's INPUTS in the rigs and X's ROWS in the frozen tables, not in the prose
 that describes the gate.
+
+## A RIG EVENT'S OUTCOME CAN DEPEND ON ITS ABSOLUTE FRAME — removing or reordering an event moves every later one and can un-enter a measured chain (paid: 14z-184, #174)
+
+Building `tests/audit_chains174.sh`, dropping one Genocide Vulcan (ES) variant that entered
+nothing moved the next one earlier, and that one — which had entered a2:0x50 then a2:0x29 —
+stopped entering; the same happened to the first air-block guard-cancel slot when the air
+events were moved last. The catch and the air block both depend on where in the engine's
+double-pass cadence the event starts (the cadence #168 quantises the naming rigs' first event
+by). Rule: a rig whose events were MEASURED to enter keeps their absolute frames — a dropped
+event is replaced by a SPACER of the same length (`tools/chains174_rigs.py` does, and its
+gate's entry check skips spacers) — and any reorder is re-measured on native before a freeze;
+the entry check then turns a lost phase into a red, never a silent pass.

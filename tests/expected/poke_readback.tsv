@@ -90,3 +90,6 @@ test_vanilla_frame_join	ff8850	FIELDS:p2hp	OBSERVES	ruled 2026-09-25 (14z-181): 
 test_vanilla_frame_join	ff8b82	FIELDS:p2id	RETIRED	READS-BACK ruled 2026-09-25 (14z-181): as id; the column DROPPED 14z-181, so the finding no longer derives	main
 test_killshread_es	ff8850	FIELDS:p2white	OBSERVES	ruled 2026-09-25 (14z-181): test_killshread_es.sh:101 contact = p2white DROP	main
 test_reactions	ff8850	FIELDS:p2white	OBSERVES	ruled 2026-09-25 (14z-181): reaction_map.py:80 contact = p2white DROP	main
+audit_chains174	ff8410	FIELDS:x	UNCLASSIFIED	derived 2026-09-27; awaiting the maintainer's ruling	main
+audit_chains174	ff8509	FIELDS:stock	UNCLASSIFIED	derived 2026-09-27; awaiting the maintainer's ruling	main
+audit_chains174	ff8850	FIELDS:p2hp	UNCLASSIFIED	derived 2026-09-27; awaiting the maintainer's ruling	main

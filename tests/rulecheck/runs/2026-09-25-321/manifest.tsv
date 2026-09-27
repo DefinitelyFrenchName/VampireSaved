@@ -1,0 +1,23 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+STATE.md.lines-78-87 (lines 78-87 of STATE.md)	67ab0962db7e44e9f127a753c7746c72809fda7d
+build/agent184/close/run_checks.sh	c4ad9f7aa6837912e5ff6625c56111e16288fe38
+build/agent184/close/home_texts.py	14f31780026cd76920252960d0c4e6a08172def6
+build/agent184/close/retraction_classes.py	60280dda46ae262eb28c2b8d6d6892e115f6069f
+build/agent184/close/retraction_base.py	7f972a1c6bdbbed4b813b6a34d88b957737ddb82
+build/agent184/close/runs/exits.tsv	fd6f0ced2ad551ab93acec894aa2c4cac6d5da72
+build/agent184/close/runs/homes_tracked.out	57b4e7ed7ee7a326556e127d0faed31bc8b6e311
+build/agent184/close/runs/close_findings.out	ae12f0935198821e3c96431a734f38650fd7b84c
+build/agent184/close/runs/retraction_grep.out	7542439e1d65d5bd2559eb56547990592b619a71
+build/agent184/close/runs/retraction_grep_selftest.out	2ab9c07fdca4248959558b13218fe90065c2ac48
+build/agent184/close/runs/home_texts.out	17b246a02b5e2081ba87beef6229493735fe1211
+build/agent184/close/runs/home_texts_plant.out	87230a2788e861df63ca20c7a94cb0c69089c8fd
+build/agent184/close/runs/home_texts_plant_text.out	17c26d19fe7c319f1049f9beadfc8be581e25c27
+build/agent184/close/runs/retraction_classes.out	5aff3e80270a14309e7d77216e3a056f4dab405a
+build/agent184/close/runs/retraction_classes_plant.out	29f463c4bef50ae0fdd0c41df016510944409d52
+build/agent184/close/runs/retraction_classes_plant_scoped.out	7fae9444d7dfc3bd6829d411ff42cf63d6c79107
+build/agent184/close/runs/retraction_base.out	71fb16731a4ab0e68729f7f69c53e8bca30339d3
+build/agent184/close/runs/retraction_base_plant.out	c462dd13c6dacc4a566d9e44c54f5a7cf55b18df
+build/agent184/close/runs/test_close_tools.out	eae58ce9ab0d5f55747177e4c1c1eed8732253e5
+tests/rulecheck/retractions/14z-184.tsv	86b776925d6dd175a24ec4a7b6e42f49e52ec375
+docs/NEXT_SESSION.md	d86f1fb7f4e0afd3a2d9410b787ba4441c0569ef
+docs/game/engine_internals.md.lines-479-485 (lines 479-485 of docs/game/engine_internals.md)	ca32591f532dad95ae738f5ca0026cfd616c8d64

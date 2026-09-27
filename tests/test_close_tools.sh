@@ -17,7 +17,11 @@
 #   citing a build/ file, an untracked file and a § anchor on no line, a prose-cited document that resolves nowhere and a
 #   parenthesised test clause saying scratch, and a backticked and a prose name that end two or
 #   more tracked files but are none of them exactly (AMBIGUOUS, rule-checker run 2026-09-25-206), are
-#   caught on all eleven, and a real gate stem, a clean ticket and a prose-cited README resolve.
+#   caught on all eleven, and a real gate stem, a clean ticket and a prose-cited README resolve;
+#   (1c, since 14z-184) tools/close_findings.py --selftest: its planted-address, suffix-address (the
+#   second address a `/NN` suffix form names) and old-home-only controls all fire. NEVER write a
+#   self-test's planted address in this header: a gate header is a live home to that tool, and the
+#   plant would read homed (paid 14z-184: the suffix control read DEAD until the literal left).
 # HOW: both tools run in-process on the tree; the controls run the grep on a copy of a pattern
 #   file with an unreachable reach control planted, and the homes tool's self-test on its BLIND
 #   variant (--blind, the build/ reads disabled), which must fail it.
@@ -30,7 +34,7 @@
 # MUST-FIRE: perturbed-copy: unreachable-control — a copy of a retraction TSV with a reach pattern that exists nowhere must make tools/retraction_grep.py exit 1 with a FAIL line naming it (in-gate; mode: the copy replaces the real file and the gate FAILs)
 # MUST-FIRE: perturbed-copy: reach-threshold — a copy of a retraction TSV whose `reach:2` control is raised to `reach:3` (a third carrier does not exist) must make tools/retraction_grep.py exit 1 naming it, so a reach:N control that lost a carrier cannot pass on the ones left (in-gate; mode: the copy replaces the real file and the gate FAILs)
 # MUST-FIRE: perturbed-copy: gone-reintroduced — a copy of a retraction TSV with a wording KNOWN to be live (a reach control's text minus its first word, so the copy repeats no pattern) marked `gone` must make tools/retraction_grep.py exit 1 naming it, so a retracted wording that comes back is a red (in-gate; mode: the copy replaces the real file and the gate FAILs)
-# MUST-FIRE: known-bad: case-fold-dropped — tools/retraction_grep.py --selftest --nofold: the matcher with its case-folding REMOVED (a known-bad variant) must print SELFTEST FAIL naming the upper-case heading case, while --selftest prints SELFTEST PASS — the self-test matches planted TEXTS (a wording in an UPPER-CASE heading, one wrapped across a `#` prefix, one code-spanned), not the tree, so no stray carrier elsewhere can mask a matcher defect (rule-checker run 2026-09-25-199 Q4) (in-gate; mode: the no-fold variant is the one checked, so the gate FAILs)
+# MUST-FIRE: known-bad: case-fold-dropped — tools/retraction_grep.py --selftest --nofold: the matcher with its case-folding REMOVED (a known-bad variant) must print SELFTEST FAIL naming the upper-case heading case, while --selftest prints SELFTEST PASS — the self-test matches planted TEXTS (a wording in an UPPER-CASE heading, one wrapped across a `#` prefix, one across a Lua `--` prefix, one code-spanned), not the tree, so no stray carrier elsewhere can mask a matcher defect (rule-checker run 2026-09-25-199 Q4) (in-gate; mode: the no-fold variant is the one checked, so the gate FAILs)
 # MUST-FIRE: known-bad: build-home-planted — tools/homes_tracked.py --selftest --blind: the tool with its build/ reads DISABLED (a known-bad variant) must FAIL its own self-test, whose planted row cites a backticked build/ file and a prose build/ path, an unresolved name, an unresolved gate stem, a ticket with no index row, ticket rows (a planted index) citing a build/ file, an untracked file and a § anchor on no line, a prose-cited document that resolves nowhere and a parenthesised scratch-citing test clause (in-gate: --selftest must print SELFTEST PASS and --selftest --blind must print SELFTEST FAIL naming the two build/ reads as missed — a traceback is DEAD, not fired; mode: the blind variant is the one checked, so the gate FAILs because the plant is not caught)
 #
 # WHY: at the 14z-181 close the two checks lived in inline scripts recorded nowhere, and the
@@ -84,6 +88,15 @@ elif printf '%s\n' "$out" | grep -q '^SELFTEST FAIL'; then
     bad "$(printf '%s\n' "$out" | grep '^SELFTEST FAIL' | cut -c1-160)"
     if vs_ctl_is case-fold-dropped && ! printf '%s\n' "$out" | grep -q '^SELFTEST FAIL:.*upper-case'; then echo "REFUSED: mode case-fold-dropped — the no-fold self-test failed but NOT on the upper-case case"; exit 3; fi
 else echo "REFUSED: the matcher self-test neither passed nor failed on its own line (exit $rc — a crash, not a verdict): $(printf '%s\n' "$out" | tail -1 | cut -c1-160)"; exit 3; fi
+
+echo "== 1c. the address scan (tools/close_findings.py --selftest): a planted address, a suffix-form address and an old-only home"
+# its three control lines are the tool's own, reported here as one verdict (not as this gate's CONTROL lines): no gate ran
+# the self-test until 14z-184, when the documentation packet (rule-checker run 2026-09-25-322) found `0x028B5A/5E`'s second
+# address unread
+out="$(python3 tools/close_findings.py --selftest 2>&1)"; rc=$?
+if [ "$rc" -eq 0 ] && [ "$(printf '%s\n' "$out" | grep -c '^CONTROL FIRED:')" -eq 3 ]; then ok "close_findings self-test: planted-address, suffix-address and old-home-only all fire"
+elif printf '%s\n' "$out" | grep -q '^CONTROL DEAD:'; then bad "close_findings self-test: $(printf '%s\n' "$out" | grep '^CONTROL DEAD:' | cut -c1-140 | tr '\n' ' ')"
+else echo "REFUSED: tools/close_findings.py --selftest neither passed nor named a dead control (exit $rc — a crash, not a verdict): $(printf '%s\n' "$out" | tail -1 | cut -c1-160)"; exit 3; fi
 
 echo "== 2. the homes tool catches a planted untracked home"
 blind=""
