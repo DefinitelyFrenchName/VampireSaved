@@ -96,7 +96,11 @@ FROZEN = [
     # 14z-117b: +2 per file (random_select_bound + random_select_roster,
     # declared identically by all three tenants), merged +2, shared +2 —
     # both dedupe to ONE engine-site thunk each (823 ops measured).
-    ("site_thunk",       (22, 17, 9), 33, 8),
+    # RE-FROZEN 14z-185 (was (22,17,9),33,8): +1 HUITZIL = air_block_guard_window (#182, Design A), declared by
+    # huitzil.toml alone -> merged +1, shared unchanged (837 ops measured, tests/test_tenant_loop.sh).
+    # RE-FROZEN 14z-185 (was (22,18,9),34,8): +1 DONOVAN = facing_rule5 (#159, Design A), declared by
+    # donovan.toml alone -> merged +1, shared unchanged (839 ops measured, tests/test_tenant_loop.sh).
+    ("site_thunk",       (23, 18, 9), 35, 8),
     # RE-FROZEN 14z-99 (was (0,5,2),5,2): the WINDOW landed donovan's two
     # #103 rows. MEASURED merged=5 shared=2: his x05c800 row dedupes into
     # the existing H<->P shared-source pair (one merged row, shared count

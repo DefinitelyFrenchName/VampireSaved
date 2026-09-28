@@ -28,7 +28,7 @@
 # and prints each file's SHA-256 beside the frozen one in
 # tests/expected/charmap_pages.sha256, so the run doubles as the currency check.
 #
-# Usage: ROMDIR=... tools/framedata_pages.sh [DON=build/don_m24 HUI=build/hui58 PYR=build/pyron43]  # re-pointed 14z-127 (boot-title freeze) <- 14z-119
+# Usage: ROMDIR=... tools/framedata_pages.sh [DON=build/don_m25 HUI=build/hui59 PYR=build/pyron44]  # re-pointed 14z-127 (boot-title freeze) <- 14z-119
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
@@ -43,7 +43,7 @@ OUT="$(python3 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "$OUT")"
 case "$OUT/" in "$(python3 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "$REPO")"/*)
     echo "refusing: FRAMEDATA_OUT is inside the repository ($OUT) — per-move frame data stays OUT of the tree"; exit 2;; esac
 mkdir -p "$OUT"
-DON="${DON:-build/don_m24}"; HUI="${HUI:-build/hui58}"; PYR="${PYR:-build/pyron43}"
+DON="${DON:-build/don_m25}"; HUI="${HUI:-build/hui59}"; PYR="${PYR:-build/pyron44}"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 PAGES="$REPO/tests/expected/charmap_pages.sha256"
 sha() { python3 -c 'import hashlib,sys; print(hashlib.sha256(open(sys.argv[1],"rb").read()).hexdigest())' "$1"; }

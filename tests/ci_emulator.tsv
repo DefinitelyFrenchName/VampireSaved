@@ -14,7 +14,11 @@
 # COLUMNS   gate <TAB> lane <TAB> scope <TAB> cadence <TAB> args <TAB> note [<TAB> timeout]
 #   timeout (14z-134, OPTIONAL 7th column) seconds for THIS gate, overriding
 #           run_all_emulator.sh --timeout (default 5400). Set from a MEASURED
-#           runtime × ~1.5, rounded up to the hour: the M16 release run killed
+#           runtime × MORE THAN 2, rounded up to the hour — the HEADROOM rule
+#           (tools/audit_emulator_staleness.py: a row at or above HALF its cap
+#           FAILS). × ~1.5 until 14z-185, when test_mister_sdram_census (~2,400 s
+#           at every freeze since M18, cap 3600) met the half-cap rule and went to
+#           7200. Why a cap at all: the M16 release run killed
 #           two 3-hour Verilator gates at the one-size cap while their notes
 #           said "~93 min a leg, two legs" in prose the runner cannot read.
 #
@@ -268,7 +272,7 @@ test_mister_obj_oracle	mister	release	bitstream	-	cross-implementation agreement
 test_mister_gfxc_fetch	mister	release	romset	--rpl tests/replays/36_pick_tenant_cell.rpl --frames 4400	the core FETCHES a tenant tile. THE ARGS ARE LOAD-BEARING: the gate's own default replay ends at the select screen, so a bare run is red by construction. These are the operands measured PASS in full at 14z-108 (~93 min a leg, two legs).	14400
 test_mister_prg_window	mister	release	romset	-	slice D4's own evidence: the 68k and CPU:$400000-$5FFFFF; ~55 min a leg measured 14z-134, legs parallel — CADENCE romset since 14z-134: its frozen pair is the relocated OBJ walker's PLACEMENT, which moves with the romset (frozen on merged-m10, stale from merged-m11, caught by the M16 release run)	10800
 test_mister_qsound_ext	mister	release	bitstream	-	the QSound extension is fetched on the core; ~94 min a leg measured 14z-134 (--stats --timing), legs parallel	14400
-test_mister_sdram_census	mister	release	romset	-	the WIDE romset lands in SDRAM exactly where mister_map.md places it	3600
+test_mister_sdram_census	mister	release	romset	-	the WIDE romset lands in SDRAM exactly where mister_map.md places it	7200
 audit_sdram_bank_load	mister	out	romset	-	romset: stock vsavj on the STOCK jtcps2 core — the D2 repack's GO measurement, not a verdict on the shipped core	7200
 audit_stock_emulator_stall	mame	out	romset	-	platform: the STOCK reference MAME (WIDE=0 build, ~/.cache/vampire-saved/mame-ref) is a leg — locks the README diagnostic that the WIDE set forced into an unpatched emulator STALLS on the legal screen (diverges at frame 469, never crashes, never plays; measured 14z-148); ~1 min, three MAME runs
 test_release_binaries	mame	release	romset	-	THE PREBUILT EMULATOR BINARIES for this host (release/emulators/{fbneo,mame}/<os-arch>/, 14z-149): record sha256s, self-contained (resolved with the host's own loader tooling), signed where the platform has a signature, profile present and NO harness, and a BOOT of %MERGED% on each — FBNeo headless 20 s (every vsavjw member (OK); the profile line wherever FBNeo prints the core's messages, never on Windows — tests/lib/fbneo_boot_log.sh), MAME -verifyroms flagging exactly the WIDE members + 05_timeout_idle reproducing its frozen masked expectation on the release binary. Both emulators in one gate (the MAME leg dominates); SKIPs on a host with no resource dir. ~2 min TIMEOUT 900 (14z-174): the cap was 300 and the release run KILLED the flipped-library-byte control at it. Measured: the gate itself takes 234 s UNDER --jobs 4 load, and the control — which rebuilds a perturbed bundle, strictly more work — takes 210 s ALONE and exceeded 300 s under that load. So 300 was set from a quiet measurement and the release run's own contention broke it. Set from the LOADED case with margin, not the quiet one: a cap that is too small costs a false red and a six-hour re-run, a cap that is too large costs nothing until something genuinely hangs.	900

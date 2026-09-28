@@ -1,0 +1,76 @@
+From 286076e022f34640be5930c426141a0393dbfc03 Mon Sep 17 00:00:00 2001
+From: mechanyaa-ai <mechanyaa@gmail.com>
+Date: Mon, 28 Sep 2026 15:17:16 +0200
+Subject: [PATCH] cps2w: the vsavjw catalogue entry re-pointed to merged-m21
+ (14z-185)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+jtframe's .rom builder locates every zip member by CRC32 and by nothing else
+(mra2rom.go:163-172, no name fallback), so the machine entry must name the
+CRCs of the actual build or the MRA produces no .rom at all. Regenerated from
+build/m3b_merged29/rompath/vsavjw.zip by tools/gen_vsavjw_xml.py in the
+consuming tree; --check now reports the catalogue matches the build.
+
+EIGHT members moved, and they are the M21 delta exactly (the consuming tree's
+build/agent185/m21/deltas_measurer.txt):
+  vm3j.03d  0dbc14a6 -> e537ef29   program: the two new sites — #159's facing
+                                   resolver (0x01886C) and #182's block entry
+                                   (0x02393A)
+  vm3j.04d  3e4098b8 -> d522cfe7   program: placement shifted by the two
+  vm3j.07b  b845aef9 -> 8f131ac1   thunks (Donovan's at 0x3FFD60, Phobos's at
+  vm3j.10b  05cdacd0 -> b1a24511   0x4718D0); every relocation target
+  vsw.41    c47529fa -> 02991388   content-identical
+  vsw.42    7823ef8e -> 5b75ebbd
+  vsw.33m   70bc7941 -> 27a0fd82   group-C glyphs, the M20 -> M21 mark
+  vsw.37m   aba94e63 -> b759cc68   likewise
+
+No RTL, no cfg, no core change: doc/mame.xml only. cores/cps1, cores/cps2 and
+cores/cps15 remain byte-untouched.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01NZtrb3GCyt4TpaeTSbQL4N
+---
+ doc/mame.xml | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/doc/mame.xml b/doc/mame.xml
+index 53df632be..de2d4abe4 100644
+--- a/doc/mame.xml
++++ b/doc/mame.xml
+@@ -147713,16 +147713,16 @@
+ 		<description>Vampire Saved - CPS-2 WIDE (Japan 970519)</description>
+ 		<year>1997</year>
+ 		<manufacturer>Capcom</manufacturer>
+-		<rom name="vm3j.03d" size="524288" crc="0dbc14a6" sha1="cc681144d7d368c26e4f2d69f6ba1d76b28c3b99" region="maincpu" offset="0"/>
+-		<rom name="vm3j.04d" size="524288" crc="3e4098b8" sha1="ee399e9840a910e724ecd920ae23ffe6080cb2de" region="maincpu" offset="80000"/>
++		<rom name="vm3j.03d" size="524288" crc="e537ef29" sha1="79cf503262b5d1050bc946479494d6aa7c2beb80" region="maincpu" offset="0"/>
++		<rom name="vm3j.04d" size="524288" crc="d522cfe7" sha1="5dac962bb63575e8ac510d693801d8144887a7ad" region="maincpu" offset="80000"/>
+ 		<rom name="vm3j.05a" size="524288" crc="95ce88d5" sha1="ba5e64c2551d97a71d2f4d7a78663aede4b722e8" region="maincpu" offset="100000"/>
+ 		<rom name="vm3j.06b" size="524288" crc="2c4297e0" sha1="3a7103456ba3937f63c28dd42020cac1955b5741" region="maincpu" offset="180000"/>
+-		<rom name="vm3j.07b" size="524288" crc="b845aef9" sha1="a688024e7a065a8c55f4fd8b695a33292a9a6d2f" region="maincpu" offset="200000"/>
++		<rom name="vm3j.07b" size="524288" crc="8f131ac1" sha1="f9167736f9ade48006a760eeddf6b0e01d5885b1" region="maincpu" offset="200000"/>
+ 		<rom name="vm3j.08a" size="524288" crc="5773e5c9" sha1="551afc5d921f9ef1fe928ca83d072b6a6105ab0e" region="maincpu" offset="280000"/>
+ 		<rom name="vm3j.09b" size="524288" crc="d064f8b9" sha1="09f77f7b466c147a5d894a4ec3b40bd068dfab26" region="maincpu" offset="300000"/>
+-		<rom name="vm3j.10b" size="524288" crc="05cdacd0" sha1="3824f17955444773e1dcbe1e08f2a2a0ac04623e" region="maincpu" offset="380000"/>
+-		<rom name="vsw.41" size="524288" crc="c47529fa" sha1="a5aa18e2f4e64f363e9b88294610597d3ede7b18" region="maincpu" offset="400000"/>
+-		<rom name="vsw.42" size="524288" crc="7823ef8e" sha1="d9cd0366953c870248cedabf2dd1a2eecad81d2b" region="maincpu" offset="480000"/>
++		<rom name="vm3j.10b" size="524288" crc="b1a24511" sha1="214483682ec11e1c5b1156f58d38923ee0f28cd8" region="maincpu" offset="380000"/>
++		<rom name="vsw.41" size="524288" crc="02991388" sha1="0e5cf4b97c3f65f3faf7a4cf7941dfa724c97737" region="maincpu" offset="400000"/>
++		<rom name="vsw.42" size="524288" crc="5b75ebbd" sha1="7c49541f567fcdf81c0137871294d33e0d892997" region="maincpu" offset="480000"/>
+ 		<rom name="vsw.43" size="524288" crc="504bf849" sha1="13a184ec9e176371808938015111f8918cb4df7d" region="maincpu" offset="500000"/>
+ 		<rom name="vsw.44" size="524288" crc="ceb1784e" sha1="739ad1d33c279d69588cfe8e184ce49ab150684c" region="maincpu" offset="580000"/>
+ 		<rom name="vm3.13m" merge="vm3.13m" size="4194304" crc="dd2551ff" sha1="969485a0d225d15e5d04b19c9fd12e609b56f712" region="gfx" offset="0"/>
+@@ -147734,9 +147734,9 @@
+ 		<rom name="vm3.18m" merge="vm3.18m" size="4194304" crc="df9a9f47" sha1="ce29ff00cf4b6fdd9b3b1ed87823534f1d364eab" region="gfx" offset="1000004"/>
+ 		<rom name="vm3.20m" merge="vm3.20m" size="4194304" crc="c22fc3d9" sha1="df7538c05b03a4ad94d369f8083799979e6fac42" region="gfx" offset="1000006"/>
+ 		<rom name="vsw.31m" size="4194304" crc="d75f7a69" sha1="f448504e1f71fabbb6bbecd12628b8358f157ce9" region="gfx" offset="2000000"/>
+-		<rom name="vsw.33m" size="4194304" crc="70bc7941" sha1="11ee66397f5a700605b85fb3ea9ffefa7f94e725" region="gfx" offset="2000002"/>
++		<rom name="vsw.33m" size="4194304" crc="27a0fd82" sha1="87033d295a07506d9dd0055360efd2e043f66041" region="gfx" offset="2000002"/>
+ 		<rom name="vsw.35m" size="4194304" crc="4eae3882" sha1="dbe0276c8c8427d5c90eab1d0130674ed3728aa6" region="gfx" offset="2000004"/>
+-		<rom name="vsw.37m" size="4194304" crc="aba94e63" sha1="27480a81c73f754a15e0e4e83b35957bf523aa09" region="gfx" offset="2000006"/>
++		<rom name="vsw.37m" size="4194304" crc="b759cc68" sha1="63e7329ecefea92e2eae27bfb490f81b573f728e" region="gfx" offset="2000006"/>
+ 		<rom name="vsw.z01" size="131072" crc="153600b9" sha1="255e3523b5fc49b63d420c04547a69784eb5171f" region="audiocpu" offset="0"/>
+ 		<rom name="vsw.z02" size="131072" crc="26b6ecc5" sha1="9f113542d7bc75de01d62743af489e8ccc0559d8" region="audiocpu" offset="28000"/>
+ 		<rom name="vm3.11m" merge="vm3.11m" size="4194304" crc="e80e956e" sha1="74181fca4b764fb3c56ceef2cb4c6fd6c18ec4b6" region="qsound" offset="0"/>

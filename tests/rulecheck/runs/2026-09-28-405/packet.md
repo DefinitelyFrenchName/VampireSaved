@@ -1,0 +1,49 @@
+THE PACKET
+
+Decision kind: freeze
+Subject: 14z-185 M21 freeze: registry rows donovan-m25 huitzil-m32 pyron-m26 merged-m21 donovan-m25-stock (donovan-m23-stage4 carried) and their expectation sets (after runs 389-404)
+Claim (the working agent's sentence): Freeze M21. REGISTRY: registry.diff adds donovan-m25, huitzil-m32, pyron-m26, merged-m21 and donovan-m25-stock, marks donovan-m24-stock SUPERSEDED, and carries donovan-m23-stage4. Each M21 build resolves to its own new row by the tree's resolver, and the stage-4 image resolves to the carried row, unchanged at program 2fa7c2f1 (sets_and_fingerprints.txt). Which fix each merged build carries is read from its own decrypted opcode view: merged-m21 has both #159's site (CPU:$01886C) and #182's (CPU:$02393A) patched, merged-m20 neither (site_check.txt).
+DELTA against M20, as designed (deltas_measurer.txt, edit_check.txt, placement_shift.txt): each solo track inserts 2 ops (site + thunk) and moves every other op SAME; pyron changes 0 program words (the mark only). The merged track inserts 4 ops, and 325 MOVED / 109 RELOCATED ops come from the placement shift (26 Pyron regions +0x40, one Huitzil region +0x20), every relocation target content-identical, plus 1 EDIT that is an alignment pairing. Every track rebuilds bit-exact from the tracked manifests (rerun_test_m3a_reproducible.log, with the re-pins in pin_edits.diff), and test_phasec_spaces holds the stock twin (rerun_test_phasec_spaces.log). The authored suite sets are carried byte-identical and verify SUITE GREEN (carry_and_suite.txt).
+BATTERY (both results.tsv): 11 reds in prereq/fbneo/mame and 1 in MiSTer, each attributed to the placement shift, a build row or #159, and each re-frozen under rule-checker runs 389-404 (ledger_389_404.tsv: 391, 401 and 404 OK, every plant CAUGHT, each VIOLATED run resolved on a true finding). One of those re-freezes retired the attribution tool's #159 seed (diff_frozen_vs_noseed.txt). Every FREEZE and verify step reads PASS or FROZE, and every declared control mode reads FAIL (refreeze_summary.tsv: 34 steps, 39 control modes, including the three moved gates frozen before the battery). The MiSTer pair is re-frozen from the M21 lane's own measured line: first_addr and max +0x40, every counter unchanged (prg_window_refreeze.diff).
+TIER at freeze cadence (tier_freeze_m21.log): 173 PASS, 11 FAIL, 236/236 controls honoured.
+- Five static pins moved with the placement shift. Every moved address is attributed (attr_placement.txt: 24, 22 exact and 2 holes with their offset preserved; its plant caught, attr_placement_plant.txt), and the pointer-flow WEAK count -1 is the scan straddle of a relocated pointer (pf_weak_straddle.txt). All five are re-pinned.
+- Four are fixed (tier_fixes.diff): two gates' FOLLOWS gain tools/build_fingerprint.py; the jtcores PATCH_NAMES gains 0037, with the patch regenerated without the git signature; and test_mister_sdram_census's cap goes 3600 -> 7200 by the HEADROOM rule (measured 2324-2442 s at M18-M21). The ticket snapshot is refreshed after #182 and #159 closed (tickets_snapshot.diff).
+- Re-run, all of them pass except test_freeze_tag_coverage and test_rule_checker, which clear only by the freeze's own order: the tags and this row (rerun.tsv).
+MISTER TAIL: the MRAs are regenerated and release/merged-m21 is packaged (mra_m21.log, package_m21.log).
+RULINGS: the maintainer's own words are quoted: "Run the M21 freeze now" (maintainer_queue_14z185.txt); "Probe plays like native" and "Design A, stage for M21 (Recommended)" (maintainer_159_probe.txt); and the #182 rulings (decisions_182_159.txt).
+NOT TESTED:
+- That the tags, the --stale emulator re-run and the tier on the committed tree come out green. They follow this check and the commit, and test_emulator_staleness FAILs at freeze cadence until that --stale run.
+- The re-frozen MiSTer pair was not re-run (a ~1 h Verilator gate); the --stale run re-runs it.
+- The mechanisms behind #159's two side moves (the Pyron ring stream and one arcade replay's defense reads), which are measured and attributed on the probes but not explained.
+- That each single-row probe differs from M20 in its one row only.
+- No capture of the M21 build itself.
+- The bitstream-cadence MiSTer gates, the out-of-scope rows, and behaviour outside the corpus.
+Artifacts (read every one, in full):
+  - build/agent185/maintainer_queue_14z185.txt
+  - build/agent185/t159/maintainer_159_probe.txt
+  - build/rc185/freeze/decisions_182_159.txt
+  - build/rc185/freeze/registry.diff
+  - build/rc185/freeze/sets_and_fingerprints.txt
+  - build/rc185/sites/site_check.txt
+  - build/agent185/m21/deltas_measurer.txt
+  - build/agent185/m21/edit_check.txt
+  - build/rc185/placement_shift.txt
+  - build/rc185/tierreds/rerun_test_m3a_reproducible.log
+  - build/rc185/tierreds/rerun_test_phasec_spaces.log
+  - build/rc185/freeze/pin_edits.diff
+  - build/rc185/suite/carry_and_suite.txt
+  - build/emu_freeze_m21_p1/results.tsv
+  - build/emu_freeze_m21_mister/results.tsv
+  - build/rc185/freeze/ledger_389_404.tsv
+  - build/rc185/attr/diff_frozen_vs_noseed.txt
+  - build/rc185/freeze/refreeze_summary.tsv
+  - build/rc185/freeze/prg_window_refreeze.diff
+  - build/rc185/tier_freeze_m21.log
+  - build/rc185/tierreds/attr_placement.txt
+  - build/rc185/tierreds/attr_placement_plant.txt
+  - build/rc185/tierreds/pf_weak_straddle.txt
+  - build/rc185/freeze/tier_fixes.diff
+  - build/rc185/freeze/tickets_snapshot.diff
+  - build/rc185/tierreds/rerun.tsv
+  - build/rc185/mra_m21.log
+  - build/rc185/package_m21.log

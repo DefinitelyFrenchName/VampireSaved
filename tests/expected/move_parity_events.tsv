@@ -87,15 +87,15 @@ donovan_3	2	Lightning Sword (ES)	IDENT	-	-	300	-	2
 donovan_3	3	Killshread (ES)	IDENT	-	-	220	-	1
 donovan_3	4	Killshread Lightning (ES)	IDENT	-	-	260	-	2
 donovan_3	5	Killshread Summon (ES)	IDENT	-	-	240	-	1
-donovan_3	6	Press of Death [LK]	DIFF	+1	x	260	-	2
-donovan_3	7	Press of Death [MK]	DIFF	+0	x	260	after:6	2
-donovan_3	8	Press of Death [HK]	DIFF	+0	x	260	after:6	1
-donovan_3	9	Change Immortal	DIFF	+0	x	400	after:6	2
-donovan_3	10	walk-in	DIFF	+0	x	120	after:6	2
-donovan_3	11	Foot Stab (ES) [8PP]	IDENT	-	-	260	after:6	1
-donovan_3	12	walk-in	IDENT	-	-	120	after:6	2
-donovan_3	13	Foot Stab (ES) [8KK]	IDENT	-	-	260	after:6	1
-donovan_3	14	Slay Shred [MP+MK]	DIFF	+0	cnt,node,seq,stock,sub	751	after:6	2
+donovan_3	6	Press of Death [LK]	IDENT	-	-	260	-	2
+donovan_3	7	Press of Death [MK]	IDENT	-	-	260	-	2
+donovan_3	8	Press of Death [HK]	IDENT	-	-	260	-	1
+donovan_3	9	Change Immortal	IDENT	-	-	400	-	2
+donovan_3	10	walk-in	IDENT	-	-	120	-	2
+donovan_3	11	Foot Stab (ES) [8PP]	IDENT	-	-	260	-	1
+donovan_3	12	walk-in	IDENT	-	-	120	-	2
+donovan_3	13	Foot Stab (ES) [8KK]	IDENT	-	-	260	-	1
+donovan_3	14	Slay Shred [MP+MK]	DIFF	+0	cnt,node,seq,stock,sub	751	-	2
 donovan_4	0	Killshread [MK]	IDENT	-	-	200	-	1
 donovan_4	1	Killshread Lightning [MP]	IDENT	-	-	240	-	2
 donovan_4	2	Killshread Summon [LK] (2)	IDENT	-	-	220	-	1

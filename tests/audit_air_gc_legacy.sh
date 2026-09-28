@@ -53,14 +53,14 @@
 #   commit and no banner, identically on every leg — recorded in the rows, captured and shown to
 #   the maintainer (14z-185), and not a guard cancel.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged28] [CHARS="leilei zabel phobos"] [FREEZE=1] [KEEP=<dir>] tests/audit_air_gc_legacy.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged29] [CHARS="leilei zabel phobos"] [FREEZE=1] [KEEP=<dir>] tests/audit_air_gc_legacy.sh
 #   emulator tier, MAME; ~7 s (7 legs in parallel)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged28}"
+BUILD="${BUILD:-build/m3b_merged29}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/air_gc_legacy.tsv"
 CHARS="${CHARS:-leilei zabel phobos}"

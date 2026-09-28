@@ -27,6 +27,18 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-28 (14z-185) — #182: "do #182" means the M21 freeze, now
+
+**The queue (14z-185), verbatim:** *"quick aside, when you have finished #159, do #160, #155, #143 and #182 in that order"*.
+
+**The question (after #143), verbatim** (`build/agent185/maintainer_queue_14z185.txt`): *"#182 is next in your queue. Its fix (Design A) is already ruled and staged, and all that's left is the M21 freeze that applies it. #159's fix is staged on top of it. Neither fix has been measured together with the other yet. What does "do #182" mean for this session?"* Options offered: run the M21 freeze now; probe the pair first; keep it staged and go to the close.
+
+**The maintainer:** *"Run the M21 freeze now"*.
+
+**What it means.** The M21 freeze applies `build/manifest/staged/182_designA.patch` then `159_designA.patch` (both retired in the freeze commit), bumps the mark to M21, rebuilds every track and the merged set, re-freezes the gates the fixes move (`audit_chains174`'s two Phobos air-block rows IDENT, `audit_facing_rule` and `audit_facing_sweep` AS FIXED — rule-checker runs 2026-09-28-389..391, 391 OK), carries the suite, re-points the fork catalogue, packages `release/merged-m21/`, and runs the freeze battery; #182 and #159 close with it. The combined build is the one "Neither fix has been measured together" named: its measurements are the freeze's.
+
+---
+
 ## Ruled 2026-09-28 (14z-185) — #143: the walker-ghost gate is re-stated on the live stack ("Freeze the real ranges"); walker_sp.lua reads the live pointer
 
 **The queue (14z-185), verbatim:** *"quick aside, when you have finished #159, do #160, #155, #143 and #182 in that order"*; the filing ruling (2026-09-16): *"yes but we probably want to be cautious when solving it"*.

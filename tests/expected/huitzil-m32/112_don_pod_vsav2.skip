@@ -1,0 +1,1 @@
+targets vsav2 (the native ground-truth half of the #112 Press-of-Death palette rig, 14z-112): on this set the R,R cursor path lands on legacy characters and the rig measures nothing — the vsav2 leg is run by tools/run_inp_probe.sh, not by the suite (classified 14z-115 by audit_legacy_pairings)

@@ -28,8 +28,8 @@
 #   no pin in a compared window erased a difference before the comparator read it).
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/chains174.tsv
 #   tests/lib/controls.sh tests/lib/decrypt_cache.sh tests/lua/field_trace.lua
-#   tests/replays/chains174/ tools/anim_nodes.py tools/chains174_rigs.py tools/move_parity.py
-#   tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh
+#   tests/replays/chains174/ tools/anim_nodes.py tools/build_fingerprint.py tools/chains174_rigs.py
+#   tools/move_parity.py tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: wrong-target — the entry check run with every event's target replaced by a chain the rig never enters (a:0x7f) must report MISSING for every event, so "enters its target" is something the check can refuse (in-gate: the first tenant's events, each must read MISSING; mode: every tenant's targets replaced, and the gate FAILs)
 # MUST-FIRE: perturbed-copy: order-swapped — the entry check run with every multi-chain target REVERSED (Genocide Vulcan's a2:0x50 then a2:0x29 read as a2:0x29 then a2:0x50) must report those events MISSING, so the check reads the ORDER of the entered chains, not only their presence (in-gate: the first tenant's multi-chain events; mode: every tenant's multi-chain targets reversed, and the gate FAILs) — added 14z-184 on rule-checker run 2026-09-25-308 Q4
@@ -50,7 +50,7 @@
 # NOT COVERED: the other 28 never-entered a2 starts (no attack record); the never-entered chains
 # of tables a, b and c; P2 as the tenant; the ES pursuit's KKK/PP inputs and Sword Grapple [MP].
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged28] [DON=build/don_m24 HUI=build/hui58 PYR=build/pyron43] [FREEZE=1] [KEEP=<dir>] tests/audit_chains174.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged29] [DON=build/don_m25 HUI=build/hui59 PYR=build/pyron44] [FREEZE=1] [KEEP=<dir>] tests/audit_chains174.sh
 #   emulator tier, MAME; ~2 min (6 legs in parallel)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
@@ -58,8 +58,8 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged28}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
-DON="${DON:-build/don_m24}"; HUI="${HUI:-build/hui58}"; PYR="${PYR:-build/pyron43}"
+BUILD="${BUILD:-build/m3b_merged29}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
+DON="${DON:-build/don_m25}"; HUI="${HUI:-build/hui59}"; PYR="${PYR:-build/pyron44}"
 EXPECT="$REPO/tests/expected/chains174.tsv"
 RIGS="$REPO/tests/replays/chains174"
 TENANTS="huitzil donovan pyron"
@@ -87,6 +87,8 @@ done
 [ "$fail" = 0 ] || { echo "FAIL: audit_chains174"; exit 1; }
 
 echo "== 2. the legs (native vs2 and ours, parity pins), and the chain graphs"
+# the build under test, named by its program fingerprint (rule-checker run 2026-09-28-389: a row read with no build named is a premise)
+echo "  build under test: $BUILD — program fingerprint $(python3 "$REPO/tools/build_fingerprint.py" "$BUILD/rompath;$ROMDIR" --set vsavjw --sha-only 2>/dev/null | cut -c1-8)"
 for t in $TENANTS; do
     ex="$(extract_of "$t")"; [ -f "$ex/regions.json" ] || { echo "SKIP: no $ex/regions.json"; exit 0; }
     mkdir -p "$W/chains_$t"

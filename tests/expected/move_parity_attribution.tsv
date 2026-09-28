@@ -1,11 +1,11 @@
 # tests/expected/move_parity_attribution.tsv — the cause of every DIFF row of tests/expected/move_parity_events.tsv, by ablation
 # and a measured signature (tests/audit_move_parity_attribution.sh; tools/move_parity_attribution.py). Evidence class:
-# in-emulator. Frozen 14z-168 with FREEZE=1 on m3b_merged28 (GitHub #136). A FIX CHANGES THIS FILE BY DESIGN — re-freeze it
+# in-emulator. Frozen 14z-168 with FREEZE=1 on m3b_merged29 (GitHub #136). A FIX CHANGES THIS FILE BY DESIGN — re-freeze it
 # with the move-parity table and read the diff as the fix's effect.
 # Columns: root <part:event|opening> <name> <class> step=<n> <evidence> | row <part> <event> <base|surfaced> <root> <class>
 #--
 root	donovan_2:2	Blizzard Sword [HP]	SLOWDOWN	step=1	zero-pass frame native [3098] ours []
-root	donovan_3:5	Killshread Summon (ES)	P2-DISPLACEMENT	step=1	P2's x differs in the window while the tenant's fields are IDENT
+root	donovan_3:14	Slay Shred [MP+MK]	DF-STOCK	step=1	stock 7 native vs 8 ours at the activation
 root	donovan_4:21	Slay Shred [LP+LK]	DF-STOCK	step=1	stock 7 native vs 8 ours at the activation
 root	donovan_6:2	Slay Shred [LP+LK]	DF-STOCK	step=1	stock 7 native vs 8 ours at the activation
 root	donovan_7:32	Slay Shred [LP+LK] swordless	DF-STOCK	step=1	stock 7 native vs 8 ours at the activation
@@ -18,7 +18,6 @@ root	huitzil_5:1	Reflect Wall [gc LP at hit+6]	GUARD-REENTRY	step=1	node differs
 root	huitzil_6:16	Reflect Wall [gc v: 623 buffered pre-hit, LP at hit+2]	DMG-VSAVJ	step=1	Phobos takes 11 native / 12 ours; his defense row is already vs2's (vsavj's own pipeline, #161)
 root	pyron_4:12	Shining Gemini [LP+LK]	DF-STOCK	step=1	stock 7 native vs 8 ours at the activation
 root	pyron_7:7	Zodiac Fire [gc v: 623 buffered pre-hit, LP at hit+2]	DMG-VSAVJ	step=1	pyron takes 12 native / 13 ours; the defense row is already vs2's (vsavj's own pipeline, #161)
-root	donovan_3:14	Slay Shred [MP+MK]	DF-STOCK	step=2	stock 7 native vs 8 ours at the activation
 root	donovan_15:9	Ifrit Sword [gc LP at hit+6] (control: no block)	DMG-VSAVJ	step=2	donovan takes 12 native / 13 ours; the defense row is already vs2's (vsavj's own pipeline, #161)
 root	huitzil_3:9	Sitting Attack [8K] off throw	WALL-PUSH-VSAVJ	step=2	native x holds at 1000 and turns; ours is pushed 1000 -> 969 and keeps facing (vsavj's shared-wall rule, #179)
 root	huitzil_5:2	Reflect Wall [gc LP at hit+10]	GUARD-REENTRY	step=2	node differs at 3651, both legs leaving the block freeze at 3650 (seq 0 -> 2)
@@ -53,11 +52,6 @@ row	donovan_2	22	base	donovan_2:2	SLOWDOWN
 row	donovan_2	23	base	donovan_2:2	SLOWDOWN
 row	donovan_2	24	base	donovan_2:2	SLOWDOWN
 row	donovan_2	25	base	donovan_2:2	SLOWDOWN
-row	donovan_3	6	base	donovan_3:5	P2-DISPLACEMENT
-row	donovan_3	7	base	donovan_3:5	P2-DISPLACEMENT
-row	donovan_3	8	base	donovan_3:5	P2-DISPLACEMENT
-row	donovan_3	9	base	donovan_3:5	P2-DISPLACEMENT
-row	donovan_3	10	base	donovan_3:5	P2-DISPLACEMENT
 row	donovan_3	14	base	donovan_3:14	DF-STOCK
 row	donovan_4	21	base	donovan_4:21	DF-STOCK
 row	donovan_6	2	base	donovan_6:2	DF-STOCK

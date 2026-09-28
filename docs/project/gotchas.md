@@ -6061,3 +6061,52 @@ leg silently received the pick pokes, and the gate still PASSED (the poke over
 the same id is inert, which is exactly what the SELF leg measures). Call a
 borrowed function in a subshell `( ... )` or through `$( ... )`; the pokes
 assertion above is what would have caught it.
+
+## "NOTHING THE BATTERY RAN READS IT" IS A REACH QUESTION — follow imports and external roots, never paths alone, and prove the finder sees a planted reader (paid: 14z-185, the M21 freeze, rule-checker runs 2026-09-28-398..400)
+
+The M21 battery reported files DIRTIED during its run: STATE.md and two static
+pins edited mid-run, and `build/merged1` rebuilt by `audit_merged_legacy`. The
+claim that no gate read them was checked three times too narrowly, and the
+rule-checker caught each one:
+
+1. Only the gate scripts and the `tests/lib` / `tests/lua` files they name —
+   missed every `tools/` program the gates run.
+2. Paths only — missed every `import` (a module name is not a path; a heredoc's
+   `import name_moves` reaches `tools/name_moves.py` with no slash in sight).
+3. In-tree imports only — `PYTHONPATH=lib/py python3 -m bbh.config` resolves
+   in the sibling harness repo, and a resolver that indexes only `tools/` and
+   `tests/` DROPS it silently.
+
+**The method that held** (`build/rc185/battery_closure.py`, 14z-185): reach from
+every gate row and from the driver, following every slash token (each suffix,
+against the repo, `tests/` and every EXTRA_ROOT, programs only) and every
+import form (line-start, `;`-segments, `python3 -c`, `-m`, relative). Every
+import that resolves to no searched file is CLASSED by a fresh interpreter
+(stdlib / installed) or LISTED unresolved, never dropped. Then take two sets:
+the over-approximate one (comments included), and a STRICT one that ignores
+comment lines and python docstrings, because a mention there runs nothing.
+Print the chain that reached every reader. A planted-reader control runs FIRST
+on a synthetic tree — readers reached only by import, by `-m`, by a heredoc and
+through a variable-rooted path outside the tree — against three finders (with
+the root, without it, paths only). **The rule:** a "nothing reads it" claim
+names its reach forms and its roots, lists what it could not resolve, and shows
+its finder catching a planted reader of each form.
+
+## A SEEDED ATTRIBUTION ROOT OUTLIVES THE FIX IT NAMED — the freeze refuses, and the seed is retired WITH the fix's freeze (paid: 14z-185, the M21 freeze, #159; rule-checker runs 2026-09-28-402..404)
+
+`tools/move_parity_attribution.py` seeded donovan_3's root at event 5
+(`SEED = {"donovan_3": [5]}`), because the parity table does not compare P2's x
+and #159's displacement was therefore invisible to it. The M21 freeze landed
+#159's fix, and the attribution freeze then REFUSED: the seeded root read OTHER,
+"seeded root with no P2 displacement". The refusal is the design working. The
+seed was a claim about the build, and the build changed under it.
+
+**The rule:** a hand-seeded root is part of the fix's own landing checklist. At
+the freeze that lands the fix, retire the seed, and measure before re-freezing
+WHICH fix removed the effect. Here that was the seeded tool on the two
+single-row probes: OTHER with #159 alone, and P2-DISPLACEMENT with #182 alone,
+the latter through a one-line shadow pointing step 0 at the M20 table that probe
+reproduces. Read each probe's identity from its OWN program image as well: the
+patch sites in its decrypted opcode view against pristine vsavj
+(`build/rc185/sites/site_check.sh`), because two builds that read byte-identical
+on every instrument cannot be told apart by those instruments.

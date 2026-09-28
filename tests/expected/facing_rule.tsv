@@ -1,8 +1,8 @@
-# tests/expected/facing_rule.tsv — the victim facing rule 5, ours (merged-m18) vs native vsav2 (tests/audit_facing_rule.sh;
+# tests/expected/facing_rule.tsv — the victim facing rule 5, ours (m3b_merged29) vs native vsav2 (tests/audit_facing_rule.sh;
 # tests/lua/read_tap.lua, non-debug; the static rows from the decrypted opcode images). Evidence class: in-emulator
-# plus static. Frozen 14z-167 with FREEZE=1 (GitHub #159). THE DEFECT IS FROZEN AS MEASURED: vsavj's resolver lists no rule 5,
-# ours writes 4 at 0x1886C where native's rule-5 branch 0x171E0 writes 1 / 0, and ours' x holds where native's slides.
-# A fix re-freezes this file DELIBERATELY, with its rule-checker run named in the commit.
+# plus static. Frozen with FREEZE=1 (GitHub #159): 14z-167 AS THE DEFECT (ours wrote 4 at 0x1886C, x 835 against 755);
+# re-frozen 14z-185 AS FIXED at M21 (Design A, the facing_rule5 thunk): vsavj's resolver still lists no rule 5 (the
+# static row), ours writes native's values from the thunk, and x reads 755 on both legs.
 # Columns: kind (static | facing | x), game or leg, address or frame, then rules= / writer PC and value / x
 #--
 static	vsavj	0x018854	rules=2,3,4
@@ -24,16 +24,16 @@ facing	native	3924	0171e0	00
 x	native	3924	835
 x	native	3946	755
 facing	ours	3882	01884e	01
-facing	ours	3882	01886c	04
+facing	ours	3882	3ffd76	01
 facing	ours	3885	01884e	01
-facing	ours	3885	01886c	04
+facing	ours	3885	3ffd76	01
 facing	ours	3887	01884e	01
-facing	ours	3887	01886c	04
+facing	ours	3887	3ffd76	01
 facing	ours	3919	01884e	01
-facing	ours	3919	01886c	04
+facing	ours	3919	3ffd76	00
 facing	ours	3921	01884e	01
-facing	ours	3921	01886c	04
+facing	ours	3921	3ffd76	00
 facing	ours	3924	01884e	01
-facing	ours	3924	01886c	04
+facing	ours	3924	3ffd76	00
 x	ours	3924	835
-x	ours	3946	835
+x	ours	3946	755

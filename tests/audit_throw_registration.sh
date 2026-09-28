@@ -96,14 +96,14 @@
 # M20, and on merged-m19 (the unfixed stores) the thrower's and the victim's are swapped.
 KO_donovan_2="5962 6260"   # <poke frame> <frames>: Sharirum Luna [6MP] at 5960 + 2, run to the KO + ~250
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged28] [PARTS="pyron_3 huitzil_3 donovan_5 donovan_2_ko legacy_demitri"] [FREEZE=1] tests/audit_throw_registration.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged29] [PARTS="pyron_3 huitzil_3 donovan_5 donovan_2_ko legacy_demitri"] [FREEZE=1] tests/audit_throw_registration.sh
 #   emulator tier, MAME; ~3 min (7 tap runs per part, in parallel)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged28}"
+BUILD="${BUILD:-build/m3b_merged29}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/throw_registration.tsv"
 CONTROL="${CONTROL:-}"

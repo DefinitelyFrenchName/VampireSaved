@@ -43,6 +43,14 @@
 # store words (18 on merged; whether this replay's frames execute any of them is not measured) and
 # the mark's glyphs (M19 -> M20); the candidate is the gfx-content timing the M17 -> M18 note names,
 # untested.
+# RE-FROZEN 14z-185 on merged-m21 (build/m3b_merged29) from the M21 freeze's own MiSTer romset lane
+# (build/emu_freeze_m21_mister/test_mister_prg_window.log — every structural assertion PASSED there;
+# only the pos pair moved, the neg line UNCHANGED). WHAT MOVED M20 -> M21: `first_addr` 4c1400 ->
+# 4c1440 and `max` 4d47ce -> 4d480e, both +0x40 — the relocated OBJ walker's copies, which the
+# placement cascade of the two M21 site thunks (#182 Phobos, #159 Donovan) moved +0x40 with 26 Pyron
+# regions (patch_notes 14z-185). EVERY COUNTER UNCHANGED (`cyc`, `cyc_hi_rd/wr`, `rd_hi`, `rd_lo`,
+# `blocks`, `first_frame`, `min`): M21's two new thunks are not executed in the frames this replay
+# (11_pick_donovan, 2900 f) reaches, or cost no bus reads there — which of the two is not measured.
 #
-pos frame 2900 wide 1 cyc 97643082 cyc_hi_rd 1211302 cyc_hi_wr 10816 rd_hi 1211302 rd_lo 75764759 blocks 7 first_frame 1119 first_addr 4c1400 min 413c70 max 4d47ce
+pos frame 2900 wide 1 cyc 97643082 cyc_hi_rd 1211302 cyc_hi_wr 10816 rd_hi 1211302 rd_lo 75764759 blocks 7 first_frame 1119 first_addr 4c1440 min 413c70 max 4d480e
 neg frame 2900 wide 0 cyc 97337938 cyc_hi_rd 4 cyc_hi_wr 10113 rd_hi 0 rd_lo 75503450 blocks 0 first_frame -1 first_addr 000000 min 7ffffe max 000000

@@ -1,0 +1,12 @@
+# pointer-flow baseline for merged-m21 (build/m3b_merged29), frozen 14z-185 — the M21 freeze (#182 and #159, Design A).
+# vs the 14z-170 baseline (merged-m19, which merged-m20 satisfied unchanged): the two STRONG `code:movea_imm`
+# findings are the SAME two, RELOCATED BY EXACTLY 0x40 — site 0x4d4550 -> 0x4d4590 (MOVED op[810]) and targets
+# 0x4c7ad0 -> 0x4c7b10 (+0x140 past MOVED op[788]) and 0x4cda70 -> 0x4cdab0 (the end of MOVED op[798]) — the
+# placement cascade of the two new site thunks (26 Pyron regions +0x40; build/rc185/tierreds/attr_placement.txt).
+# Same class (WIDE-HOLE), same count. `data:long` 1189 -> 1188 (-1): the ONE long the M19 note added, the
+# straddle at 0x487764 (fixed_anim.pyron.bin +0x1ff4) of the relocated pointer 0x004A005A, now 0x004A009A: its
+# 2-offset window reads 0x009A0000, above WIDE_TOP, class IO-OTHER, no longer WEAK (the tool's own classify on
+# both builds: build/rc185/tierreds/pf_weak_straddle.txt). No STRONG finding appears or disappears.
+STRONG	code:movea_imm	0x4d4590+0x16	0x4c7b10	WIDE-HOLE
+STRONG	code:movea_imm	0x4d4590+0x24	0x4cdab0	WIDE-HOLE
+WEAK-COUNT	data:long	1188

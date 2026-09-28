@@ -1842,11 +1842,11 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 ### `audit_pyron_ring.sh` — audit, emulator
 
-**WHAT:** Pyron's sound-ring id inventory on the MERGED build equals the SOLO build's per replay (the frozen diff is EMPTY), so no merged-only music-range id (the 0x729 retrigger class) and no missing solo id can appear.
+**WHAT:** Pyron's sound-ring event stream on the MERGED build equals the SOLO build's, event for event and frame for frame, per replay, so no merged-only id (the 0x729 music retrigger class) and no missing solo id can appear.
 
-**HOW:** two replays on merged and solo builds on MAME (four runs), the sound ring's ids collected whole-run and diffed; housekeeping ids excluded; the control moves the frozen mash onset later so a real onset reads as moved earlier.
+**HOW:** two replays on merged and solo builds on MAME (four runs), the sound ring's (frame, id) events compared in order, housekeeping ids excluded, each stream against its frozen onset (None = the whole run must agree); the control shifts one merged mash event by a frame.
 
-**EXPECTS:** the merged-vs-solo id-set diff equals the frozen inventory (empty); any new id or a solo id missing on merged fails.
+**EXPECTS:** cosmo and mash agree for the WHOLE run (mash since M21: until then it diverged at a frozen onset, f4741, merged one frame ahead — GitHub #98); an onset appearing, or moving EARLIER than a frozen one, fails.
 
 ### `audit_qs_voice_batch.sh` — audit, emulator
 
@@ -2462,11 +2462,11 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 ### `audit_facing_rule.sh` — audit, emulator
 
-**WHAT:** the victim facing rule 5 on our engine, frozen AS MEASURED (#159): vs2's facing resolver knows rule 5 and vsavj's does not, so a tenant attack record carrying it is XORed into the victim's +0x5D on our build — Killshread Summon (ES)'s returning wave drags Demitri toward Donovan on native and leaves him in place on ours.
+**WHAT:** the victim facing rule 5 on our engine, frozen AS MEASURED (#159): vs2's facing resolver knows rule 5 and vsavj's does not. Until M21 a tenant attack record carrying it was XORed into the victim's +0x5D on our build, and Killshread Summon (ES)'s returning wave dragged Demitri toward Donovan on native and left him in place on ours. Since M21 (Design A, the `facing_rule5` [[site_thunk]] at 0x1886C) ours writes native's values.
 
-**HOW:** static: the compare chains of both resolvers read from the decrypted opcode images, and the legacy record census of +0xE (vsavj 0 of 1,085 carry rule 5, vs2 1 of 1,143); live: every write to Demitri's +0x5D over 3850-3960 and his x at 3924 and 3946 on the #136 rig donovan_3, both legs real cursor picks, on MAME; controls replace our writes by native's and plant a `cmpi.b #5` into vsavj's image.
+**HOW:** static: the compare chains of both resolvers read from the decrypted opcode images, and the legacy record census of +0xE (vsavj 0 of 1,085 carry rule 5, vs2 1 of 1,143); live: every write to Demitri's +0x5D over 3850-3960 and his x at 3924 and 3946 on the #136 rig donovan_3, both legs real cursor picks, on MAME; controls flip our writes' side bit and plant a `cmpi.b #5` into vsavj's image.
 
-**EXPECTS:** the frozen defect rows (ours writes 4 at 0x1886C, native 1 and 0; x 835 vs 755) and static rows exact; both controls fail. A fix re-freezes this file deliberately.
+**EXPECTS:** the frozen rows AS FIXED at M21 (ours writes native's 1 1 1 0 0 0 from the thunk; x 755 on both legs) and static rows exact; both controls fail. Until M21 it froze the defect (ours wrote 4 at 0x1886C; x 835 against native's 755).
 
 ### `audit_facing_sweep.sh` — audit, emulator
 
@@ -2474,7 +2474,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **HOW:** the donovan_3 rig (event 5, Killshread Summon (ES) at 3840), the level and RNG pinned as the parity gates pin them, P1/P2 x poked over 3790-3800: side L = P1 0x1F3, P2 0x1F3+d; side R = P1 0x343, P2 0x343-d with the motion mirrored (D DL L -> D DR R); d = 0x60..0x150 step 0x10. Each geometry runs on native vs2 and on the build (ours by the parity gate's cursor path D D DR DR), to frame 4040, tests/lua/facing_tap.lua tapping Demitri's +0x5C word from 3850 with the rule inputs at every write; tools/facing_sweep.py reads the 64 taps.
 
-**EXPECTS:** the reader's CHECK PASS and its rows equal tests/expected/facing_sweep.tsv. FROZEN AS MEASURED on merged-m20: every leg DIFF — the #159 defect: the build5 rows show vsavj's resolver XORing rule 5 into the prior value, 4 on side L (1^5) and 5 on side R (0^5), where native writes 1/0, and on 4 side-R legs the later contacts landing on other frames (-); and 13 of the 29 native nodes fit NO vsavj rule (no data-only fix). On probe 159 (the staged row, build/manifest/staged/159_designA.patch, in a copy of donovan.toml; its build fingerprint e4d712eb equals a build of the staged row itself, 14z-185) every leg is SAME, 32/32; the M21 freeze applies the patch and re-freezes the leg and build5 rows. Both controls fail the gate.
+**EXPECTS:** the reader's CHECK PASS and its rows equal tests/expected/facing_sweep.tsv. RE-FROZEN AS FIXED on merged-m21 (14z-185, the M21 freeze applied the patch below): every leg SAME, 32/32, the leg and build5 rows moving and nothing else (native, geometry, node rows as frozen). FROZEN AS MEASURED on merged-m20 until then: every leg DIFF — the #159 defect: the build5 rows show vsavj's resolver XORing rule 5 into the prior value, 4 on side L (1^5) and 5 on side R (0^5), where native writes 1/0, and on 4 side-R legs the later contacts landing on other frames (-); and 13 of the 29 native nodes fit NO vsavj rule (no data-only fix). On probe 159 (the staged row, build/manifest/staged/159_designA.patch until M21, in a copy of donovan.toml; its build fingerprint e4d712eb equals a build of the staged row itself, 14z-185) every leg is SAME, 32/32; the M21 freeze applied the patch (the staged file retired into build/manifest/donovan.toml's `facing_rule5` row) and re-froze the leg and build5 rows. Both controls fail the gate.
 
 ### `audit_ff8130_writers.sh` — audit, emulator
 
@@ -2720,7 +2720,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **WHAT:** who CAN read the select-confirm latch: the static census of every instruction naming a fighter block's +0x3BC/+0x3BD/+0x3C2/+0x3E0/+0x3E3 on vsav2, vsavj and the ported image, by addressing form, frozen — the whole population the per-leg tap (audit_latch_reads) can ever attribute a read to, with the census's data-region `movep` noise frozen and named.
 
-**HOW:** tools/audit_latch_readers.py over the decrypted opcode views and build/m3b_merged28/verify_op.bin, anchored on the extension word so a data table is not an instruction, its --selftest on both reference views first; controls: a shadow copy of the tool blind to the (d16,An) form, and the frozen inventory minus one vs2 reader row.
+**HOW:** tools/audit_latch_readers.py over the decrypted opcode views and build/m3b_merged29/verify_op.bin, anchored on the extension word so a data table is not an instruction, its --selftest on both reference views first; controls: a shadow copy of the tool blind to the (d16,An) form, and the frozen inventory minus one vs2 reader row.
 
 **EXPECTS:** the frozen inventory equal (vs2's confirm writers and clears, the tenants' in-play flavour readers and their relocated copies, the Shadow-flag readers); the blind tool fails its selftest, the dropped row fails the compare.
 

@@ -3,6 +3,10 @@
 # (docs/game/atlas/character_tables.md:30), NOT observed in a run.
 # The 16 legacy rows are byte-identical in vanilla vsavj — measured
 # 14z-97, and that agreement is a superset-invariant check in itself.
+# RE-DERIVED 14z-185 from build/m3b_merged29 (merged-m21, the M21 freeze): the two new thunks (#159 at 0x3FFD60, #182
+# at 0x4718D0) shift the later placements — MOVED: pyron 0x004ae8bc -> 0x004ae8fc; phobos (0x45a770) and donovan
+# (0x3fa9d0) held; the 16 legacy rows byte-identical (read from the image's own table PRG:0x0BD97A, data view;
+# the same read reproduces all 19 merged-m20 rows).
 # RE-DERIVED 14z-170 from build/m3b_merged27 (merged-m19, the M19 freeze): the three regrown class-0x52
 # thunks shift 27 placed regions +0x30 — MOVED: pyron 0x004ae88c -> 0x4ae8bc; phobos (0x45a770) and donovan
 # (0x3fa9d0) held; the 16 legacy rows byte-identical (all read from the image's own table PRG:0x0BD97A).
@@ -54,5 +58,5 @@
 0x0F	jedah	0x000b0d2e
 0x18	oboro	0x000b3450
 0x10	phobos	0x0045a770
-0x11	pyron	0x004ae8bc
+0x11	pyron	0x004ae8fc
 0x13	donovan	0x003fa9d0

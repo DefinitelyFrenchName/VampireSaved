@@ -23,14 +23,14 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3289 |
-| named by a document or manifest only | 2148 |
+| distinct program-space addresses named | 3292 |
+| named by a document or manifest only | 2151 |
 | named by both a document/manifest and code | 768 |
 | named by CODE ONLY (the gap list below) | 373 |
 | carried by atlas | 596 |
 | carried by engine_internals | 707 |
-| carried by other docs | 1024 |
-| carried by manifests | 1818 |
+| carried by other docs | 1026 |
+| carried by manifests | 1829 |
 | carried by code | 1141 |
 
 ## Addresses
@@ -410,10 +410,10 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0170DE` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) [vs2] |
 | `PRG:0x01714A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED) |
 | `PRG:0x017178` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; build/manifest/reconciliation.toml — map [vs2]; tools/facing_sweep.py |
-| `PRG:0x01717E` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); docs/project/patch_notes.md — 14z-185 — #159: the victim facing rule 5 (Design A), RULED AND STAGED for M21 on top of #182 — NOT YET IN THE MANIFESTS [vs2]; tests/audit_facing_rule.sh; tests/audit_facing_sweep.sh |
-| `PRG:0x0171D6` | docs/project/patch_notes.md — 14z-185 — #159: the victim facing rule 5 (Design A), RULED AND STAGED for M21 on top of #182 — NOT YET IN THE MANIFESTS; docs/project/patch_notes.md — 14z-185 — #159: the victim facing rule 5 (Design A), RULED AND STAGED for M21 on top of #182 — NOT YET IN THE MANIFESTS [vs2]; tests/audit_facing_sweep.sh |
+| `PRG:0x01717E` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); docs/project/patch_notes.md — 14z-185 — #159: the victim facing rule 5 (Design A), RULED AND STAGED for M21 on top of #182 — LANDED at the M21 freeze (the entry above) [vs2]; build/manifest/donovan.toml — random_select_roster; tests/audit_facing_rule.sh; tests/audit_facing_sweep.sh |
+| `PRG:0x0171D6` | docs/project/patch_notes.md — 14z-185 — #159: the victim facing rule 5 (Design A), RULED AND STAGED for M21 on top of #182 — LANDED at the M21 freeze (the entry above); docs/project/patch_notes.md — 14z-185 — #159: the victim facing rule 5 (Design A), RULED AND STAGED for M21 on top of #182 — LANDED at the M21 freeze (the entry above) [vs2]; build/manifest/donovan.toml — random_select_roster; build/manifest/donovan.toml — random_select_roster [vs2]; tests/audit_facing_sweep.sh |
 | `PRG:0x0171E0` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; tests/audit_facing_rule.sh; tools/facing_sweep.py |
-| `PRG:0x0171E5` | docs/project/patch_notes.md — 14z-185 — #159: the victim facing rule 5 (Design A), RULED AND STAGED for M21 on top of #182 — NOT YET IN THE MANIFESTS |
+| `PRG:0x0171E5` | docs/project/patch_notes.md — 14z-185 — #159: the victim facing rule 5 (Design A), RULED AND STAGED for M21 on top of #182 — LANDED at the M21 freeze (the entry above); build/manifest/donovan.toml — random_select_roster [vs2] |
 | `PRG:0x0171FA` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x0171FC` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x0172B0` | build/manifest/reconciliation.toml — map [vs2] |
@@ -508,9 +508,9 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0187BC` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) [vs2]; tests/test_index_window_thunk.sh |
 | `PRG:0x01881A` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x01884E` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; build/manifest/reconciliation.toml — map |
-| `PRG:0x018854` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); docs/project/patch_notes.md — 14z-185 — #159: the victim facing rule 5 (Design A), RULED AND STAGED for M21 on top of #182 — NOT YET IN THE MANIFESTS; tests/audit_facing_rule.sh; tests/audit_facing_sweep.sh; tools/facing_sweep.py |
-| `PRG:0x01886C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); docs/project/patch_index.md — Romset patch bundles (program + gfx content); docs/project/patch_notes.md — 14z-185 — #159: the victim facing rule 5 (Design A), RULED AND STAGED for M21 on top of #182 — NOT YET IN THE MANIFESTS; tests/audit_facing_rule.sh; tools/close_findings.py |
-| `PRG:0x0188B8` | docs/project/patch_notes.md — 14z-185 — #159: the victim facing rule 5 (Design A), RULED AND STAGED for M21 on top of #182 — NOT YET IN THE MANIFESTS |
+| `PRG:0x018854` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); docs/project/patch_notes.md — 14z-185 — #159: the victim facing rule 5 (Design A), RULED AND STAGED for M21 on top of #182 — LANDED at the M21 freeze (the entry above); build/manifest/donovan.toml — random_select_roster; tests/audit_facing_rule.sh; tests/audit_facing_sweep.sh; +1 more |
+| `PRG:0x01886C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); HANDOFF.md — Build registry; HANDOFF.md — Running a CPS-2 WIDE build (playtest); docs/project/patch_index.md — Romset patch bundles (program + gfx content); docs/project/patch_notes.md — 14z-185 — #159: the victim facing rule 5 (Design A), RULED AND STAGED for M21 on top of #182 — LANDED at the M21 freeze (the entry above); +6 more |
+| `PRG:0x0188B8` | docs/project/patch_notes.md — 14z-185 — #159: the victim facing rule 5 (Design A), RULED AND STAGED for M21 on top of #182 — LANDED at the M21 freeze (the entry above); build/manifest/donovan.toml — random_select_roster |
 | `PRG:0x0188BA` | build/manifest/reconciliation.toml — map |
 | `PRG:0x018952` | build/manifest/reconciliation.toml — map |
 | `PRG:0x018980` | docs/game/gotchas.md — THE HIT STAGER PAYS METER TO WHOEVER IS REGISTERED, AND ONLY A HIT THAT REGISTERS ITSELF GETS IT RIGHT — the collision walk leaves the pair as (P2, P1) (measured: 14z-166); docs/project/patch_notes.md — 14z-183 — THE M20 FREEZE (donovan-m24 / huitzil-m31 / pyron-m25 / merged-m20, mark M20): #157, the hit-registration pair reconciled; build/manifest/reconciliation.toml — map; tests/audit_throw_registration.sh |
@@ -654,7 +654,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x01C5CE` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; tools/gen_donovan_patch.py; tools/select_port.py |
 | `PRG:0x01C670` | build/manifest/donovan.toml — hit_class_props_ext_lo |
 | `PRG:0x01C68E` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; build/manifest/donovan.toml — hit_class_props_ext_lo |
-| `PRG:0x01C806` | docs/game/gotchas.md — THE BOOT NAME SCREEN'S DISPLAY SCRIPT TAKES AN EVEN COLUMN — an odd one is a 68k ADDRESS ERROR that soft-boots the machine (paid: 14z-127); docs/project/patch_index.md — Romset patch bundles (program + gfx content); docs/project/patch_notes.md — 14z-127 — THE BOOT NAME SCREEN: "VAMPIRE SAVIOR" -> "VAMPIRE SAVED"; build/manifest/donovan.toml — random_select_roster; build/manifest/huitzil.toml — random_select_roster; build/manifest/pyron.toml — random_select_roster; +3 more |
+| `PRG:0x01C806` | docs/game/gotchas.md — THE BOOT NAME SCREEN'S DISPLAY SCRIPT TAKES AN EVEN COLUMN — an odd one is a 68k ADDRESS ERROR that soft-boots the machine (paid: 14z-127); docs/project/patch_index.md — Romset patch bundles (program + gfx content); docs/project/patch_notes.md — 14z-127 — THE BOOT NAME SCREEN: "VAMPIRE SAVIOR" -> "VAMPIRE SAVED"; build/manifest/donovan.toml — facing_rule5; build/manifest/huitzil.toml — air_block_guard_window; build/manifest/pyron.toml — random_select_roster; +3 more |
 | `PRG:0x01C822` | HANDOFF.md — Build registry; docs/project/patch_index.md — Romset patch bundles (program + gfx content); docs/project/patch_notes.md — 14z-127 — THE BOOT NAME SCREEN: "VAMPIRE SAVIOR" -> "VAMPIRE SAVED"; build/manifest/donovan.toml — boot_title_saved_1; build/manifest/huitzil.toml — boot_title_saved_1; build/manifest/pyron.toml — boot_title_saved_1; +8 more |
 | `PRG:0x01C823` | docs/project/patch_notes.md — 14z-130 — THE M13 BOOT-TITLE FREEZE (donovan-m19 / huitzil-m26 / pyron-m20 / merged-m15, mark M13), and the 'gap_be27a' bank-map correction folded into it |
 | `PRG:0x01C824` | docs/project/patch_notes.md — 14z-127 — THE BOOT NAME SCREEN: "VAMPIRE SAVIOR" -> "VAMPIRE SAVED"; build/manifest/donovan.toml — boot_title_saved_2; build/manifest/huitzil.toml — boot_title_saved_2; build/manifest/pyron.toml — boot_title_saved_2; build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; +1 more |
@@ -800,108 +800,109 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x022392` | docs/game/engine_internals.md — The physics bank's 'gap_*' rows (14z-121, a reference scan of vsavj's code) |
 | `PRG:0x022400` | docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail); tools/build_donovan.sh |
 | `PRG:0x022406` | build/manifest/type_stamps.toml — compare |
-| `PRG:0x02245E` | build/manifest/pcrel_escapes.toml — hui58 |
+| `PRG:0x02245E` | build/manifest/pcrel_escapes.toml — hui59 |
 | `PRG:0x02246E` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); docs/game/engine_internals.md — The STARTUP INVINCIBILITY window is per character, and the tenants arm their own (measured 14z-126); docs/project/gotchas.md — A WRITE TAP ON A COUNTDOWN FIELD NAMES THE DECREMENTER, NOT THE OPENER (paid: 14z-123 -> 14z-126); tests/audit_df_startup_invuln.sh; tests/test_advancing_guard.sh |
-| `PRG:0x022480` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174); docs/project/patch_notes.md — 14z-185 — #182: Phobos's air-block guard window (Design A), RULED AND STAGED for M21 — NOT YET IN THE MANIFESTS [vs2]; tests/audit_air_gc_legacy.sh |
+| `PRG:0x022480` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174); docs/project/patch_notes.md — 14z-185 — #182: Phobos's air-block guard window (Design A), RULED AND STAGED for M21 — LANDED at the M21 freeze (the entry above) [vs2]; build/manifest/huitzil.toml — random_select_roster [vs2]; tests/audit_air_gc_legacy.sh |
 | `PRG:0x022492` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x0224AA` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x0224B4` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
-| `PRG:0x0224C4` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174); docs/project/patch_notes.md — 14z-185 — #182: Phobos's air-block guard window (Design A), RULED AND STAGED for M21 — NOT YET IN THE MANIFESTS [vs2] |
+| `PRG:0x0224C4` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174); docs/project/patch_notes.md — 14z-185 — #182: Phobos's air-block guard window (Design A), RULED AND STAGED for M21 — LANDED at the M21 freeze (the entry above) [vs2]; build/manifest/huitzil.toml — random_select_roster [vs2] |
 | `PRG:0x022500` | docs/game/engine_internals.md — The per-char effect system (14z-67, decoded on the H ping rounds); docs/project/gotchas.md — (14z-68, refutes half of the 14z-67 entry theory); build/manifest/huitzil.toml — pcrel_escape_fix |
 | `PRG:0x022514` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Dark Force POWER, Dark Force CHANGE, and the newcomers' personal Dark Force (measured 14z-168) |
 | `PRG:0x022520` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x022526` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x022530` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Dark Force POWER, Dark Force CHANGE, and the newcomers' personal Dark Force (measured 14z-168) |
 | `PRG:0x02255E` | build/manifest/type_stamps.toml — compare |
-| `PRG:0x022576` | build/manifest/pcrel_escapes.toml — hui58 |
+| `PRG:0x022576` | build/manifest/pcrel_escapes.toml — hui59 |
 | `PRG:0x0225B8` | build/manifest/type_stamps.toml — compare |
 | `PRG:0x0225C2` | docs/project/gotchas.md — (14z-68, refutes half of the 14z-67 entry theory) |
 | `PRG:0x0225C4` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port); docs/game/gotchas.md — code inside per-char families — hook the LIVE one, found by tracing; build/manifest/huitzil.toml — data_in_code |
 | `PRG:0x0225EE` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port); docs/game/gotchas.md — code inside per-char families — hook the LIVE one, found by tracing; docs/project/gotchas.md — (14z-68, refutes half of the 14z-67 entry theory); build/manifest/huitzil.toml — pcrel_escape_fix |
 | `PRG:0x0225F4` | build/manifest/type_stamps.toml — compare |
-| `PRG:0x02264A` | build/manifest/pcrel_escapes.toml — hui58 |
+| `PRG:0x02264A` | build/manifest/pcrel_escapes.toml — hui59 |
 | `PRG:0x022656` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; docs/project/patch_notes.md — vs2-licensed class remaps; maintainer-ruled option (a)) [vs2]; build/manifest/donovan.toml — accent_color_aware_3 [vs2]; build/manifest/donovan.toml — reaction_hook; build/manifest/huitzil.toml — hitclass_map_extend; +2 more |
-| `PRG:0x022694` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x0226D4` | build/manifest/pcrel_escapes.toml — hui58 |
+| `PRG:0x022694` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x0226D4` | build/manifest/pcrel_escapes.toml — hui59 |
 | `PRG:0x0226DC` | docs/project/patch_notes.md — handler clone + the x026142 escape fix; build/manifest/reconciliation_donovan.toml — map; build/manifest/reconciliation_huitzil.toml — map; build/manifest/reconciliation_pyron.toml — map |
 | `PRG:0x0226E0` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured) [vs2]; build/manifest/donovan.toml — accent_color_aware_3 [vs2]; build/manifest/donovan.toml — hit_class_props_ext_hi |
-| `PRG:0x02271C` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022750` | build/manifest/pcrel_escapes.toml — hui58 |
+| `PRG:0x02271C` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022750` | build/manifest/pcrel_escapes.toml — hui59 |
 | `PRG:0x022780` | build/manifest/type_stamps.toml — compare |
-| `PRG:0x022798` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x0227F0` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022830` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x02286E` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x02289A` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x0228C0` | build/manifest/pcrel_escapes.toml — hui58 |
+| `PRG:0x022798` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x0227F0` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022830` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x02286E` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x02289A` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x0228C0` | build/manifest/pcrel_escapes.toml — hui59 |
 | `PRG:0x0228E2` | docs/project/patch_notes.md — rows 0x10 + the per-tenant VALUE_SKIP default; build/manifest/bank_map.toml — gap_bd8fa |
-| `PRG:0x0228EC` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x02290C` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022936` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022960` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022994` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x0229CE` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x0229F8` | build/manifest/pcrel_escapes.toml — hui58 |
+| `PRG:0x0228EC` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x02290C` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022936` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022960` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022994` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x0229CE` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x0229F8` | build/manifest/pcrel_escapes.toml — hui59 |
 | `PRG:0x022A0E` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — The anim index a2's TWO aerial slot sets — neutral and forward jump (14z-145, MEASURED on all 15 vanilla characters); docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port); docs/game/gotchas.md — code inside per-char families — hook the LIVE one, found by tracing; build/manifest/huitzil.toml — data_in_code; build/manifest/huitzil.toml — tenant_jump_seq; +3 more |
 | `PRG:0x022A14` | build/manifest/huitzil.toml — data_in_code |
 | `PRG:0x022A24` | docs/game/engine_internals.md — The CPU AI action-script system (14z-111, measured on the #99 capture); docs/game/engine_internals.md — The anim index a2's TWO aerial slot sets — neutral and forward jump (14z-145, MEASURED on all 15 vanilla characters) |
-| `PRG:0x022A42` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022AAA` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022AD2` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022AF4` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022B2A` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022B74` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022BA2` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022BEC` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022C14` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022C36` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022C52` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022C90` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022CC0` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022CFA` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022D26` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022D4E` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022D74` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022DB0` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022DD4` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022DEA` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022E00` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022E3C` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022E8C` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022EB2` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022EF8` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022F0E` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022F30` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022F58` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x022FBC` | build/manifest/pcrel_escapes.toml — hui58 |
+| `PRG:0x022A42` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022AAA` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022AD2` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022AF4` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022B2A` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022B74` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022BA2` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022BEC` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022C14` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022C36` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022C52` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022C90` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022CC0` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022CFA` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022D26` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022D4E` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022D74` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022DB0` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022DD4` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022DEA` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022E00` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022E3C` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022E8C` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022EB2` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022EF8` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022F0E` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022F30` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022F58` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x022FBC` | build/manifest/pcrel_escapes.toml — hui59 |
 | `PRG:0x022FC0` | docs/project/patch_notes.md — handler clone + the x026142 escape fix; build/manifest/reconciliation_donovan.toml — map; build/manifest/reconciliation_huitzil.toml — map; build/manifest/reconciliation_pyron.toml — map |
-| `PRG:0x022FFA` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x02300C` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x0230A4` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x0230EA` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x0231AE` | build/manifest/pcrel_escapes.toml — hui58 |
+| `PRG:0x022FFA` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x02300C` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x0230A4` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x0230EA` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x0231AE` | build/manifest/pcrel_escapes.toml — hui59 |
 | `PRG:0x0231D0` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/audit_tick_cadence.sh |
-| `PRG:0x02320A` | build/manifest/pcrel_escapes.toml — hui58 |
+| `PRG:0x02320A` | build/manifest/pcrel_escapes.toml — hui59 |
 | `PRG:0x023244` | docs/project/patch_notes.md — handler clone + the x026142 escape fix; build/manifest/reconciliation_donovan.toml — map; build/manifest/reconciliation_huitzil.toml — map; build/manifest/reconciliation_pyron.toml — map |
 | `PRG:0x023258` | build/manifest/bank_map.toml — tail_data_ptr |
 | `PRG:0x02325E` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) [vs2] |
-| `PRG:0x02328E` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x0232E6` | build/manifest/pcrel_escapes.toml — hui58 |
+| `PRG:0x02328E` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x0232E6` | build/manifest/pcrel_escapes.toml — hui59 |
 | `PRG:0x023500` | docs/project/gotchas.md — (14z-68, refutes half of the 14z-67 entry theory); docs/project/patch_notes.md — handler clone + the x026142 escape fix; build/manifest/huitzil.toml — pcrel_escape_fix; build/manifest/reconciliation_donovan.toml — map; build/manifest/reconciliation_huitzil.toml — map; build/manifest/reconciliation_pyron.toml — map |
 | `PRG:0x023532` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
-| `PRG:0x02356E` | build/manifest/pcrel_escapes.toml — hui58 |
+| `PRG:0x02356E` | build/manifest/pcrel_escapes.toml — hui59 |
 | `PRG:0x023570` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
-| `PRG:0x023624` | build/manifest/pcrel_escapes.toml — hui58 |
+| `PRG:0x023624` | build/manifest/pcrel_escapes.toml — hui59 |
 | `PRG:0x02377A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x02380C` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — select_companion_resolve_s2 |
-| `PRG:0x02380E` | build/manifest/pcrel_escapes.toml — hui58 |
+| `PRG:0x02380E` | build/manifest/pcrel_escapes.toml — hui59 |
 | `PRG:0x02384E` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122); docs/project/patch_notes.md — 14z-110b — the 0x51 -> 0x44 state remap: byte detail; docs/project/patch_notes.md — vs2-licensed class remaps; maintainer-ruled option (a)); build/manifest/donovan.toml — ls_freeze_vs2_attacker; build/manifest/donovan.toml — region_fix [vs2] |
 | `PRG:0x02385C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/patch_notes.md — vs2-licensed class remaps; maintainer-ruled option (a)); build/manifest/huitzil.toml — hitclass_map_extend; tests/audit_trap_shock.sh; tools/audit_reaction_classes.py |
 | `PRG:0x023874` | build/manifest/type_stamps.toml — compare |
-| `PRG:0x0238A0` | build/manifest/pcrel_escapes.toml — hui58 |
+| `PRG:0x0238A0` | build/manifest/pcrel_escapes.toml — hui59 |
 | `PRG:0x0238FC` | build/manifest/huitzil.toml — throw_arc_tables |
-| `PRG:0x02393A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174); docs/project/patch_index.md — Romset patch bundles (program + gfx content); docs/project/patch_notes.md — 14z-185 — #182: Phobos's air-block guard window (Design A), RULED AND STAGED for M21 — NOT YET IN THE MANIFESTS; tests/audit_air_gc_legacy.sh |
-| `PRG:0x02395A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); docs/game/engine_internals.md — The STARTUP INVINCIBILITY window is per character, and the tenants arm their own (measured 14z-126); docs/project/gotchas.md — A WRITE TAP ON A COUNTDOWN FIELD NAMES THE DECREMENTER, NOT THE OPENER (paid: 14z-123 -> 14z-126); build/manifest/pcrel_escapes.toml — hui58; tests/test_advancing_guard.sh |
+| `PRG:0x02393A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174); HANDOFF.md — Build registry; HANDOFF.md — Running a CPS-2 WIDE build (playtest); docs/project/patch_index.md — Romset patch bundles (program + gfx content); docs/project/patch_notes.md — 14z-185 — #182: Phobos's air-block guard window (Design A), RULED AND STAGED for M21 — LANDED at the M21 freeze (the entry above); +5 more |
+| `PRG:0x023940` | build/manifest/huitzil.toml — random_select_roster [vs2] |
+| `PRG:0x02395A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); docs/game/engine_internals.md — The STARTUP INVINCIBILITY window is per character, and the tenants arm their own (measured 14z-126); docs/project/gotchas.md — A WRITE TAP ON A COUNTDOWN FIELD NAMES THE DECREMENTER, NOT THE OPENER (paid: 14z-123 -> 14z-126); build/manifest/pcrel_escapes.toml — hui59; tests/test_advancing_guard.sh |
 | `PRG:0x023966` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); docs/project/gotchas.md — A WRITE TAP ON A COUNTDOWN FIELD NAMES THE DECREMENTER, NOT THE OPENER (paid: 14z-123 -> 14z-126); tests/test_advancing_guard.sh |
 | `PRG:0x02399C` | build/manifest/donovan.toml — ls_freeze_vs2_attacker |
 | `PRG:0x0239E8` | build/manifest/donovan.toml — ls_freeze_vs2_attacker [vs2] |
@@ -992,22 +993,22 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x026E16` | docs/project/patch_notes.md — handler clone + the x026142 escape fix; build/manifest/reconciliation_donovan.toml — (top); build/manifest/reconciliation_donovan.toml — map; build/manifest/reconciliation_huitzil.toml — map; build/manifest/reconciliation_pyron.toml — map |
 | `PRG:0x026E92` | build/manifest/reconciliation_huitzil.toml — map [vs2] |
 | `PRG:0x026F7A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
-| `PRG:0x026F80` | build/manifest/pcrel_escapes.toml — don_m24; build/manifest/pcrel_escapes.toml — hui58; build/manifest/pcrel_escapes.toml — pyron43 |
-| `PRG:0x026F8A` | build/manifest/pcrel_escapes.toml — don_m24; build/manifest/pcrel_escapes.toml — hui58; build/manifest/pcrel_escapes.toml — pyron43 |
-| `PRG:0x026F94` | build/manifest/pcrel_escapes.toml — don_m24; build/manifest/pcrel_escapes.toml — hui58; build/manifest/pcrel_escapes.toml — pyron43 |
+| `PRG:0x026F80` | build/manifest/pcrel_escapes.toml — don_m25; build/manifest/pcrel_escapes.toml — hui59; build/manifest/pcrel_escapes.toml — pyron44 |
+| `PRG:0x026F8A` | build/manifest/pcrel_escapes.toml — don_m25; build/manifest/pcrel_escapes.toml — hui59; build/manifest/pcrel_escapes.toml — pyron44 |
+| `PRG:0x026F94` | build/manifest/pcrel_escapes.toml — don_m25; build/manifest/pcrel_escapes.toml — hui59; build/manifest/pcrel_escapes.toml — pyron44 |
 | `PRG:0x026FBE` | docs/game/atlas/id_space.md — Which ids vanilla ever assigns (measured over the corpus); tests/audit_id_writers.sh |
 | `PRG:0x027000` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Dark Force POWER, Dark Force CHANGE, and the newcomers' personal Dark Force (measured 14z-168); docs/game/engine_internals.md — The STARTUP INVINCIBILITY window is per character, and the tenants arm their own (measured 14z-126); docs/game/engine_internals.md — The two engines run DIFFERENT Dark Force systems (traced 14z-69c); build/manifest/huitzil.toml — pcrel_escape_fix; tests/audit_df_startup_invuln.sh; +1 more |
 | `PRG:0x027008` | docs/game/engine_internals.md — What Dark Force is on each engine (measured 14z-69, both games) [vs2]; build/manifest/reconciliation.toml — map |
 | `PRG:0x02701A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Dark Force POWER, Dark Force CHANGE, and the newcomers' personal Dark Force (measured 14z-168) |
 | `PRG:0x027024` | docs/game/engine_internals.md — What Dark Force is on each engine (measured 14z-69, both games) [vs2] |
 | `PRG:0x027038` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); docs/project/gotchas.md — "THE ONLY WRITER" IS A CLAIM ABOUT THE TAP'S WINDOW — a light hit's overlap frames named the wrong mechanism for the pushback (14z-120 (12), corrected 14z-121 (3)); tests/audit_facing_rule.sh; +1 more |
-| `PRG:0x027044` | build/manifest/pcrel_escapes.toml — don_m24; build/manifest/pcrel_escapes.toml — hui58; build/manifest/pcrel_escapes.toml — pyron43 |
+| `PRG:0x027044` | build/manifest/pcrel_escapes.toml — don_m25; build/manifest/pcrel_escapes.toml — hui59; build/manifest/pcrel_escapes.toml — pyron44 |
 | `PRG:0x02704E` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Dark Force POWER, Dark Force CHANGE, and the newcomers' personal Dark Force (measured 14z-168); docs/game/engine_internals.md — The two engines run DIFFERENT Dark Force systems (traced 14z-69c) |
 | `PRG:0x027050` | docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); docs/project/gotchas.md — A WORD COUNTER SAMPLED AS A BYTE READS ITS HIGH BYTE — and a flat trace field then "excludes" the very mechanism it belongs to (paid: 14z-167, GitHub #159, rule-checker run 2026-09-18-42 Q3) [vs2] |
 | `PRG:0x02705A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x02706E` | docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x027082` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); docs/project/inferred_claims.md — G2/G3 — measurements feeding engine_internals; tests/test_advancing_guard.sh |
-| `PRG:0x02708E` | build/manifest/pcrel_escapes.toml — don_m24; build/manifest/pcrel_escapes.toml — hui58; build/manifest/pcrel_escapes.toml — pyron43 |
+| `PRG:0x02708E` | build/manifest/pcrel_escapes.toml — don_m25; build/manifest/pcrel_escapes.toml — hui59; build/manifest/pcrel_escapes.toml — pyron44 |
 | `PRG:0x0270A4` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x0270B6` | build/manifest/reconciliation.toml — map |
 | `PRG:0x0270DA` | build/manifest/reconciliation.toml — map [vs2] |
@@ -1061,10 +1062,10 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0277A2` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x0277F8` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x027812` | build/manifest/reconciliation_huitzil.toml — map |
-| `PRG:0x02783C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED) [vs2]; build/manifest/pcrel_escapes.toml — don_m24; build/manifest/pcrel_escapes.toml — hui58; build/manifest/pcrel_escapes.toml — pyron43; tools/charmap_gen.py; +2 more |
+| `PRG:0x02783C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED) [vs2]; build/manifest/pcrel_escapes.toml — don_m25; build/manifest/pcrel_escapes.toml — hui59; build/manifest/pcrel_escapes.toml — pyron44; tools/charmap_gen.py; +2 more |
 | `PRG:0x02786A` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x02790A` | build/manifest/reconciliation_huitzil.toml — map |
-| `PRG:0x02797A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); docs/project/inferred_claims.md — G2/G3 — measurements feeding engine_internals; build/manifest/pcrel_escapes.toml — don_m24; build/manifest/pcrel_escapes.toml — hui58; build/manifest/pcrel_escapes.toml — pyron43; +3 more |
+| `PRG:0x02797A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); docs/project/inferred_claims.md — G2/G3 — measurements feeding engine_internals; build/manifest/pcrel_escapes.toml — don_m25; build/manifest/pcrel_escapes.toml — hui59; build/manifest/pcrel_escapes.toml — pyron44; +3 more |
 | `PRG:0x027982` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x0279B4` | docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail); build/manifest/huitzil.toml — throw_arc_tables |
 | `PRG:0x027A08` | docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail); build/manifest/huitzil.toml — throw_arc_tables |
@@ -1076,14 +1077,14 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x027BC2` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x027C40` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x027D46` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) |
-| `PRG:0x027D78` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x027DF8` | build/manifest/pcrel_escapes.toml — hui58 |
-| `PRG:0x027E18` | build/manifest/pcrel_escapes.toml — hui58 |
+| `PRG:0x027D78` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x027DF8` | build/manifest/pcrel_escapes.toml — hui59 |
+| `PRG:0x027E18` | build/manifest/pcrel_escapes.toml — hui59 |
 | `PRG:0x027E2E` | docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); tests/test_advancing_guard.sh |
-| `PRG:0x027E38` | build/manifest/pcrel_escapes.toml — hui58 |
+| `PRG:0x027E38` | build/manifest/pcrel_escapes.toml — hui59 |
 | `PRG:0x027E86` | build/manifest/reconciliation.toml — map |
 | `PRG:0x027EB4` | docs/game/engine_internals.md — The per-char effect system (14z-67, decoded on the H ping rounds); docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail); build/manifest/reconciliation_huitzil.toml — map |
-| `PRG:0x027EB8` | docs/project/patch_notes.md — donovan-m2 stage 4 — +0x14E state hook, sound stubs, anim_index_a2 (2026-07-27, session 9); build/manifest/bank_map.toml — anim_index_a; build/manifest/pcrel_escapes.toml — don_m24; build/manifest/pcrel_escapes.toml — hui58; build/manifest/pcrel_escapes.toml — pyron43; build/manifest/reconciliation.toml — map; +1 more |
+| `PRG:0x027EB8` | docs/project/patch_notes.md — donovan-m2 stage 4 — +0x14E state hook, sound stubs, anim_index_a2 (2026-07-27, session 9); build/manifest/bank_map.toml — anim_index_a; build/manifest/pcrel_escapes.toml — don_m25; build/manifest/pcrel_escapes.toml — hui59; build/manifest/pcrel_escapes.toml — pyron44; build/manifest/reconciliation.toml — map; +1 more |
 | `PRG:0x027EBC` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x027EC0` | docs/game/atlas/character_tables.md — Animation index tables (bank extends below bank[0]); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/patch_notes.md — vs2-licensed class remaps; maintainer-ruled option (a)); build/manifest/reconciliation.toml — map |
 | `PRG:0x027EC4` | build/manifest/reconciliation_huitzil.toml — map |
@@ -1093,10 +1094,10 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x027EEC` | docs/game/engine_internals.md — THE ENGINE TICK IS DIRECTLY OBSERVABLE — a write tap on '+0x20' is a TICK-ACCURATE instrument (14z-126b); docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/audit_tick_cadence.sh; tools/tick_durations.py |
 | `PRG:0x027F0E` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) |
 | `PRG:0x027F16` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/engine_internals.md — THE VOICE-CLASS BORROW: '(0x382,A6)' is the fighter's voice-FLAVOR class (measured 14z-87); docs/game/engine_internals.md — The per-node sfx dispatcher and per-char record arrays (14z-52); docs/game/gotchas.md — +0x382 is the char id only at SELECT — in match it is the VOICE-FLAVOR CLASS, and the engine reassigns it (14z-87); tests/audit_voice_borrow.sh |
-| `PRG:0x027F18` | build/manifest/pcrel_escapes.toml — don_m24; build/manifest/pcrel_escapes.toml — hui58; build/manifest/pcrel_escapes.toml — pyron43; tools/audit_reaction_classes.py |
+| `PRG:0x027F18` | build/manifest/pcrel_escapes.toml — don_m25; build/manifest/pcrel_escapes.toml — hui59; build/manifest/pcrel_escapes.toml — pyron44; tools/audit_reaction_classes.py |
 | `PRG:0x027F6E` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) |
 | `PRG:0x027F70` | docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); docs/game/engine_internals.md — THE ENGINE TICK IS DIRECTLY OBSERVABLE — a write tap on '+0x20' is a TICK-ACCURATE instrument (14z-126b); docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); build/manifest/reconciliation.toml — map; tests/audit_tick_cadence.sh; tests/test_tick_durations.sh; +2 more |
-| `PRG:0x027F78` | build/manifest/pcrel_escapes.toml — don_m24; build/manifest/pcrel_escapes.toml — hui58; build/manifest/pcrel_escapes.toml — pyron43; tools/audit_reaction_classes.py |
+| `PRG:0x027F78` | build/manifest/pcrel_escapes.toml — don_m25; build/manifest/pcrel_escapes.toml — hui59; build/manifest/pcrel_escapes.toml — pyron44; tools/audit_reaction_classes.py |
 | `PRG:0x027F88` | docs/game/engine_internals.md — THE ENGINE TICK IS DIRECTLY OBSERVABLE — a write tap on '+0x20' is a TICK-ACCURATE instrument (14z-126b); tools/tick_durations.py |
 | `PRG:0x027FA0` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); docs/project/gotchas.md — two traps from the #104 re-measurement — both produced a CONFIDENT WRONG ANSWER from a working instrument (paid: 14z-99); docs/project/patch_notes.md — 14z-143 — PYRON'S CAPTURE ROW '0x11' PORTED: he throws with his own geometry, not Demitri's; build/manifest/pyron.toml — capture_kf_jedah; +1 more |
 | `PRG:0x027FAA` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); docs/project/patch_notes.md — 14z-143 — PYRON'S CAPTURE ROW '0x11' PORTED: he throws with his own geometry, not Demitri's; build/manifest/pyron.toml — capture_kf_jedah; build/manifest/reconciliation.toml — map; tests/audit_pyron_capture_block.sh |
@@ -1173,8 +1174,8 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x028B7E` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x028BE0` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); tools/audit_reaction_classes.py |
 | `PRG:0x028C40` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); tools/audit_reaction_classes.py |
-| `PRG:0x028C76` | build/manifest/pcrel_escapes.toml — don_m24; build/manifest/pcrel_escapes.toml — hui58; build/manifest/pcrel_escapes.toml — pyron43 |
-| `PRG:0x028C98` | build/manifest/pcrel_escapes.toml — don_m24; build/manifest/pcrel_escapes.toml — hui58; build/manifest/pcrel_escapes.toml — pyron43 |
+| `PRG:0x028C76` | build/manifest/pcrel_escapes.toml — don_m25; build/manifest/pcrel_escapes.toml — hui59; build/manifest/pcrel_escapes.toml — pyron44 |
+| `PRG:0x028C98` | build/manifest/pcrel_escapes.toml — don_m25; build/manifest/pcrel_escapes.toml — hui59; build/manifest/pcrel_escapes.toml — pyron44 |
 | `PRG:0x028CA0` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); tools/audit_reaction_classes.py |
 | `PRG:0x028D00` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured); docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); docs/game/engine_internals.md — The per-char effect system (14z-67, decoded on the H ping rounds); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/platform/gotchas.md — absolutizing a pc-relative table read on CPS-2 reads CIPHERTEXT; docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail); +7 more |
 | `PRG:0x028D02` | build/manifest/reconciliation_huitzil.toml — map |
@@ -1191,8 +1192,8 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x028EE6` | docs/game/atlas/ram.md — Fighter + effect-pool fields (14z-67, measured on the H effect arc); build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x028F5C` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x028FA0` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174) [vs2]; build/manifest/reconciliation.toml — map [vs2]; tests/audit_air_gc_legacy.sh; tools/build_donovan.sh |
-| `PRG:0x028FF4` | build/manifest/pcrel_escapes.toml — don_m24; build/manifest/pcrel_escapes.toml — hui58; build/manifest/pcrel_escapes.toml — pyron43 |
-| `PRG:0x029034` | build/manifest/pcrel_escapes.toml — don_m24; build/manifest/pcrel_escapes.toml — hui58; build/manifest/pcrel_escapes.toml — pyron43 |
+| `PRG:0x028FF4` | build/manifest/pcrel_escapes.toml — don_m25; build/manifest/pcrel_escapes.toml — hui59; build/manifest/pcrel_escapes.toml — pyron44 |
+| `PRG:0x029034` | build/manifest/pcrel_escapes.toml — don_m25; build/manifest/pcrel_escapes.toml — hui59; build/manifest/pcrel_escapes.toml — pyron44 |
 | `PRG:0x02904A` | build/manifest/reconciliation.toml — map |
 | `PRG:0x029062` | build/manifest/reconciliation.toml — map |
 | `PRG:0x0290B2` | build/manifest/reconciliation.toml — map |
@@ -1617,7 +1618,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x05524A` | build/manifest/huitzil.toml — port_patch [vs2] |
 | `PRG:0x0552AC` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) [vs2] |
 | `PRG:0x05540C` | docs/game/engine_internals.md — Dark Force POWER, Dark Force CHANGE, and the newcomers' personal Dark Force (measured 14z-168) [vs2] |
-| `PRG:0x055470` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174); docs/game/engine_internals.md — THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174) [vs2]; docs/project/patch_notes.md — 14z-185 — #182: Phobos's air-block guard window (Design A), RULED AND STAGED for M21 — NOT YET IN THE MANIFESTS [vs2]; tests/audit_air_gc_legacy.sh |
+| `PRG:0x055470` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174); docs/game/engine_internals.md — THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174) [vs2]; docs/project/patch_notes.md — 14z-185 — #182: Phobos's air-block guard window (Design A), RULED AND STAGED for M21 — LANDED at the M21 freeze (the entry above) [vs2]; build/manifest/huitzil.toml — random_select_roster [vs2]; tests/audit_air_gc_legacy.sh |
 | `PRG:0x055478` | docs/project/patch_notes.md — 14z-65 (3) — the Huitzil stage 1-3 ladder opens (2026-08-07); docs/project/patch_notes.md — 14z-65 (4) — Huitzil stage 4 BUILDS; the R1 frontier enumerated (2026-08-07); tools/build_donovan.sh |
 | `PRG:0x055482` | build/manifest/reconciliation.toml — map |
 | `PRG:0x055538` | docs/game/engine_internals.md — Dark Force POWER, Dark Force CHANGE, and the newcomers' personal Dark Force (measured 14z-168) [vs2]; build/manifest/huitzil.toml — port_patch [vs2] |
@@ -1911,8 +1912,8 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0646DE` | docs/project/tables/reconciliation.md — Twin-choice case law; build/manifest/reconciliation.toml — map |
 | `PRG:0x065B8A` | build/manifest/type_stamps.toml — compare |
 | `PRG:0x065C7C` | build/manifest/donovan.toml — pcrel_escape_fix [vs2] |
-| `PRG:0x065C98` | build/manifest/pcrel_escapes.toml — don_m24 |
-| `PRG:0x065DFA` | build/manifest/pcrel_escapes.toml — don_m24 |
+| `PRG:0x065C98` | build/manifest/pcrel_escapes.toml — don_m25 |
+| `PRG:0x065DFA` | build/manifest/pcrel_escapes.toml — don_m25 |
 | `PRG:0x065FE2` | docs/game/atlas/character_tables.md — Start-hold flavor: RESOLVED (community-confirmed 2026-07-27, mechanism pinned) [vs2]; docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; tests/audit_latch_reads.sh; tests/test_latch_readers.sh |
 | `PRG:0x065FE6` | docs/game/atlas/character_tables.md — Start-hold flavor: RESOLVED (community-confirmed 2026-07-27, mechanism pinned); docs/project/patch_notes.md — donovan-m2 stage 4 — VS2 default flavor via the init shim (2026-07-27) |
 | `PRG:0x066020` | docs/game/atlas/character_tables.md — Start-hold flavor: RESOLVED (community-confirmed 2026-07-27, mechanism pinned) [vs2]; docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; tests/audit_latch_reads.sh; tests/test_latch_readers.sh |
@@ -2080,7 +2081,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x08B5C4` | build/manifest/type_stamps.toml — stamp |
 | `PRG:0x08B5EE` | build/manifest/type_stamps.toml — stamp |
 | `PRG:0x08B618` | build/manifest/type_stamps.toml — stamp |
-| `PRG:0x08B61E` | build/manifest/pcrel_escapes.toml — don_m24 |
+| `PRG:0x08B61E` | build/manifest/pcrel_escapes.toml — don_m25 |
 | `PRG:0x08B642` | build/manifest/type_stamps.toml — stamp |
 | `PRG:0x08B6EA` | build/manifest/donovan.toml — pcrel_escape_fix |
 | `PRG:0x08B7AC` | build/manifest/type_stamps.toml — stamp |
@@ -2100,21 +2101,21 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x08BF1A` | docs/project/patch_notes.md — where the detail lives |
 | `PRG:0x08BF52` | docs/project/patch_notes.md — Session 14z-67b — the ping-round fixes (byte detail); build/manifest/huitzil.toml — port_patch |
 | `PRG:0x08BFF6` | build/manifest/huitzil.toml — data_in_code; build/manifest/pyron.toml — data_in_code; tests/test_census_regions.sh |
-| `PRG:0x08C014` | docs/project/patch_notes.md — 14z-70 — the ground explosion, and one inert repair; build/manifest/pcrel_escapes.toml — pyron43; tools/extract_char.py |
-| `PRG:0x08C026` | build/manifest/pcrel_escapes.toml — pyron43 |
-| `PRG:0x08C038` | build/manifest/pcrel_escapes.toml — pyron43; tests/test_census_regions.sh |
+| `PRG:0x08C014` | docs/project/patch_notes.md — 14z-70 — the ground explosion, and one inert repair; build/manifest/pcrel_escapes.toml — pyron44; tools/extract_char.py |
+| `PRG:0x08C026` | build/manifest/pcrel_escapes.toml — pyron44 |
+| `PRG:0x08C038` | build/manifest/pcrel_escapes.toml — pyron44; tests/test_census_regions.sh |
 | `PRG:0x08C042` | docs/project/patch_notes.md — crypt-placed code (data_in_code mechanism + census); build/manifest/huitzil.toml — data_in_code; build/manifest/pyron.toml — data_in_code; tools/audit_type_stamps.py |
-| `PRG:0x08C08A` | docs/project/patch_index.md — Mechanism inventory (generator vocabulary); docs/project/patch_notes.md — 14z-70 — the ground explosion, and one inert repair; build/manifest/pcrel_escapes.toml — pyron43; tools/extract_char.py |
-| `PRG:0x08C09A` | build/manifest/pcrel_escapes.toml — pyron43 |
-| `PRG:0x08C0A2` | build/manifest/pcrel_escapes.toml — pyron43; tests/test_census_regions.sh |
+| `PRG:0x08C08A` | docs/project/patch_index.md — Mechanism inventory (generator vocabulary); docs/project/patch_notes.md — 14z-70 — the ground explosion, and one inert repair; build/manifest/pcrel_escapes.toml — pyron44; tools/extract_char.py |
+| `PRG:0x08C09A` | build/manifest/pcrel_escapes.toml — pyron44 |
+| `PRG:0x08C0A2` | build/manifest/pcrel_escapes.toml — pyron44; tests/test_census_regions.sh |
 | `PRG:0x08C6E2` | docs/game/gotchas.md — "Slot-indexed cell" does not mean "slot-exclusive data" — three surgery traps; tools/select_port.py |
 | `PRG:0x08E336` | docs/game/atlas/ram.md — System / match globals; docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100); tests/audit_ff8130_writers.sh |
 | `PRG:0x08E342` | docs/game/atlas/ram.md — System / match globals; docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100); tests/audit_ff8130_writers.sh |
 | `PRG:0x08EDE2` | build/manifest/huitzil.toml — grab_hold_keyframes |
 | `PRG:0x08F1D6` | build/manifest/huitzil.toml — grab_hold_keyframes [vs2] |
-| `PRG:0x0907F6` | build/manifest/pcrel_escapes.toml — don_m24 |
-| `PRG:0x0908A0` | build/manifest/pcrel_escapes.toml — don_m24 |
-| `PRG:0x09098A` | build/manifest/pcrel_escapes.toml — don_m24 |
+| `PRG:0x0907F6` | build/manifest/pcrel_escapes.toml — don_m25 |
+| `PRG:0x0908A0` | build/manifest/pcrel_escapes.toml — don_m25 |
+| `PRG:0x09098A` | build/manifest/pcrel_escapes.toml — don_m25 |
 | `PRG:0x090B08` | docs/project/patch_notes.md — (round-2 report; the capture-anim shadow over-index) [vs2] |
 | `PRG:0x090B0C` | docs/game/engine_internals.md — The child-companion shadow item (14z-68g/q — measured, still open) [vs2] |
 | `PRG:0x090BD2` | docs/game/atlas/ram.md — System / match globals; docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100); tests/audit_ff8130_writers.sh |
@@ -2358,8 +2359,8 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0C986A` | docs/game/engine_internals.md — Hitboxes and attack records (phase 2 of the character-data map, 14z-120 (5), MEASURED); tools/hitbox_records.py |
 | `PRG:0x0C9A5C` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 [vh2]; docs/project/patch_notes.md — The correction; build/manifest/bank_map.toml — gap_be23a; build/manifest/donovan.toml — port_patch [vh2]; build/manifest/donovan.toml — throw_victim_keyframes |
 | `PRG:0x0C9EB0` | docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port); docs/project/patch_index.md — Mechanism inventory (generator vocabulary); build/manifest/huitzil.toml — df_seq_entry_10 |
-| `PRG:0x0CA1CA` | docs/project/patch_notes.md — 14z-143 — PYRON'S CAPTURE ROW '0x11' PORTED: he throws with his own geometry, not Demitri's [vs2]; docs/project/patch_notes.md — 14z-185 — #159: the victim facing rule 5 (Design A), RULED AND STAGED for M21 on top of #182 — NOT YET IN THE MANIFESTS; docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 [vs2]; docs/project/patch_notes.md — The correction [vs2]; build/manifest/bank_map.toml — gap_be23a [vs2]; build/manifest/donovan.toml — port_patch; +4 more |
-| `PRG:0x0CA1EA` | docs/project/patch_notes.md — 14z-185 — #159: the victim facing rule 5 (Design A), RULED AND STAGED for M21 on top of #182 — NOT YET IN THE MANIFESTS; tests/audit_facing_rule.sh; tests/audit_facing_sweep.sh |
+| `PRG:0x0CA1CA` | docs/project/patch_notes.md — 14z-143 — PYRON'S CAPTURE ROW '0x11' PORTED: he throws with his own geometry, not Demitri's [vs2]; docs/project/patch_notes.md — 14z-185 — #159: the victim facing rule 5 (Design A), RULED AND STAGED for M21 on top of #182 — LANDED at the M21 freeze (the entry above); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 [vs2]; docs/project/patch_notes.md — The correction [vs2]; build/manifest/bank_map.toml — gap_be23a [vs2]; build/manifest/donovan.toml — port_patch; +4 more |
+| `PRG:0x0CA1EA` | docs/project/patch_notes.md — 14z-185 — #159: the victim facing rule 5 (Design A), RULED AND STAGED for M21 on top of #182 — LANDED at the M21 freeze (the entry above); tests/audit_facing_rule.sh; tests/audit_facing_sweep.sh |
 | `PRG:0x0CAA5A` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 |
 | `PRG:0x0CB01A` | docs/project/tables/sfx_records.md — donovan — 'don_sfx_records' (44 entries, vs2 '0x0CB01A'; ratified 14z-52) [vs2]; build/manifest/donovan.toml — don_sfx_records |
 | `PRG:0x0CB880` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; tools/build_donovan.sh |
@@ -2385,8 +2386,8 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0D10F4` | docs/project/mister_core.md — 2. What the roster needs; docs/project/mister_fit.md — 1. Program ROM (68k); docs/project/mister_fit.md — The arithmetic, with the numbers used |
 | `PRG:0x0D143E` | docs/project/patch_notes.md — 14z-65 (4) — Huitzil stage 4 BUILDS; the R1 frontier enumerated (2026-08-07); tools/build_donovan.sh |
 | `PRG:0x0D153E` | docs/game/engine_internals.md — Select-screen (portrait/name) pipeline — mapped (session 14c); docs/game/engine_internals.md — Select-screen (portrait/name) pipeline — mapped (session 14c) [vs2]; docs/project/doc_audit_14z118.md — 4. Log of the pass (one line per commit); docs/project/inferred_claims.md — What is NOT known — labelled unknowns that stay labelled (no measurement this pass) |
-| `PRG:0x0D17C2` | docs/project/patch_notes.md — 14z-185 — #159: the victim facing rule 5 (Design A), RULED AND STAGED for M21 on top of #182 — NOT YET IN THE MANIFESTS; tests/audit_facing_rule.sh; tests/audit_facing_sweep.sh |
-| `PRG:0x0D1822` | docs/project/patch_notes.md — 14z-185 — #159: the victim facing rule 5 (Design A), RULED AND STAGED for M21 on top of #182 — NOT YET IN THE MANIFESTS; tests/audit_facing_rule.sh; tests/audit_facing_sweep.sh |
+| `PRG:0x0D17C2` | docs/project/patch_notes.md — 14z-185 — #159: the victim facing rule 5 (Design A), RULED AND STAGED for M21 on top of #182 — LANDED at the M21 freeze (the entry above); tests/audit_facing_rule.sh; tests/audit_facing_sweep.sh |
+| `PRG:0x0D1822` | docs/project/patch_notes.md — 14z-185 — #159: the victim facing rule 5 (Design A), RULED AND STAGED for M21 on top of #182 — LANDED at the M21 freeze (the entry above); tests/audit_facing_rule.sh; tests/audit_facing_sweep.sh |
 | `PRG:0x0D22BE` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; docs/project/patch_notes.md — (huitzil-m8 / pyron-m5: the FINAL GUARDIAN zero-damage fix); docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x0D2350` | docs/project/tables/defense_rows.md — Tenant DEFENSE-side rows — vs2's rows, as ruled, SHIPPED IN M19 (merged-m19) [vh2]; build/manifest/donovan.toml — defense_curve_row [vh2]; build/manifest/huitzil.toml — defense_curve_row [vh2]; build/manifest/huitzil.toml — voice_borrow_voicenums_b [vh2] |
 | `PRG:0x0D2550` | build/manifest/huitzil.toml — defense_curve_row |
@@ -2473,6 +2474,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0FCECA` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; tools/gen_anita_bank2.py |
 | `PRG:0x0FD5A4` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 |
 | `PRG:0x0FDF52` | build/manifest/pyron.toml — palette_routine_row_11_c |
+| `PRG:0x0FE300` | docs/project/patch_notes.md — 14z-185 — THE M21 FREEZE (donovan-m25 / huitzil-m32 / pyron-m26 / merged-m21, mark M21): #182 and #159 LANDED |
 | `PRG:0x0FEE08` | docs/project/patch_notes.md — 14z-170 — THE M19 FREEZE (donovan-m23 / huitzil-m30 / pyron-m24 / merged-m19, mark M19): the four ruled #136 fixes, and a placeholder corruption that had shipped since merged-m16 [vs2] |
 | `PRG:0x0FFF50` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) |
 | `PRG:0x0FFFFF` | docs/game/atlas/README.md — The three sets (measured M0; every figure still current); HANDOFF.md — CPS-2 WIDE — the extended hardware profile (2026-08-03, B0-B4 all green); docs/project/cps2_wide.md — B4 prg: PASSED, with the control that made it meaningful; docs/project/gotchas.md — Inside the crypt range the VIEW follows the ACCESS MODE, and the wrong one is plausible garbage (paid again: 14z-142); docs/project/mister_map.md — The minimal, profile-gated proposal — **IMPLEMENTED, slice D4**; tests/test_index_window_thunk.sh; +4 more |
@@ -2947,6 +2949,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x3FFCA6` | docs/project/patch_notes.md — 14z-116 — PYRON'S MEDALLION WHITE-OUT: byte detail (maintainer-chosen fix, field-validated 2026-08-29); build/manifest/donovan.toml — winquote_bank_variant_id; tests/test_pyron_medallion_2p.sh |
 | `PRG:0x3FFD00` | docs/project/patch_notes.md — 14z-117 (2) — RANDOM SELECT INCLUDES THE TENANTS (maintainer-directed, freeze donovan-m17 / huitzil-m24 / pyron-m18 / merged-m13, mark M11; field-validated on the board 2026-08-29, 14z-118): byte detail |
 | `PRG:0x3FFD10` | docs/project/patch_notes.md — 14z-117 (2) — RANDOM SELECT INCLUDES THE TENANTS (maintainer-directed, freeze donovan-m17 / huitzil-m24 / pyron-m18 / merged-m13, mark M11; field-validated on the board 2026-08-29, 14z-118): byte detail |
+| `PRG:0x3FFD60` | docs/project/patch_notes.md — 14z-185 — THE M21 FREEZE (donovan-m25 / huitzil-m32 / pyron-m26 / merged-m21, mark M21): #182 and #159 LANDED |
 | `PRG:0x3FFE10` | build/manifest/donovan.toml — region_fix |
 | `PRG:0x3FFEEE` | build/manifest/huitzil.toml — obj_hook |
 | `PRG:0x3FFFC0` | docs/project/patch_notes.md — 14z-170 — THE M19 FREEZE (donovan-m23 / huitzil-m30 / pyron-m24 / merged-m19, mark M19): the four ruled #136 fixes, and a placeholder corruption that had shipped since merged-m16 |

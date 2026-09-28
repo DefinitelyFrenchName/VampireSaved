@@ -1,8 +1,10 @@
 # tests/expected/chains174.tsv — GitHub #174: the tenants' once never-entered a2 attack chains, each rig's native
 # entry and its ours-vs-native per-event verdict (tests/audit_chains174.sh; tools/chains174_rigs.py rigs in
 # tests/replays/chains174/; tools/name_moves.py analyse for the entry, tools/move_parity.py for the verdict).
-# Evidence class: in-emulator (MAME, native vsav2 and the WIDE build m3b_merged28; parity pins: level 6 from 2000,
-# the RNG from 2363). Frozen 14z-184 with FREEZE=1, its rule-checker run named in the commit. An entry row turning
+# Evidence class: in-emulator (MAME, native vsav2 and the WIDE build m3b_merged28 until 14z-185, m3b_merged29 since; parity pins: level 6 from 2000,
+# the RNG from 2363). Frozen 14z-184 with FREEZE=1, its rule-checker run named in the commit. RE-FROZEN 14z-185 on
+# merged-m21 (build/m3b_merged29, the M21 freeze; rule-checker run 2026-09-28-391 OK): #182's fix (Design A) turns the
+# two Phobos air-block Reflect Wall rows (huitzil_c174 events 6, 7) from DIFF to IDENT; no other row moved. An entry row turning
 # MISSING means the rig no longer enters its chain on native (the rig moved, not ours); a parity row changing is
 # ours changing — read the diff as that.
 # Columns: entry <tenant> <event> <name> <target chains> ENTERED|MISSING:<chains>
@@ -22,8 +24,8 @@ parity	huitzil_c174	2	spacer (keeps the Genocide Vulcan events on their measured
 parity	huitzil_c174	3	Genocide Vulcan (ES) [421PP] vs a jump-in, from +22	IDENT	-	-	300	-	3
 parity	huitzil_c174	4	Genocide Vulcan (ES) [421PP] vs a jump-in, from +25	IDENT	-	-	300	-	3
 parity	huitzil_c174	5	spacer (keeps the air-block events on their measured frames)	IDENT	-	-	420	-	3
-parity	huitzil_c174	6	Reflect Wall [air block, P1 j.8 at +2, P2 j.HP at +14, 623LP at +26]	DIFF	+30	cnt,meter,node,seq,sub,x,y	420	-	3
-parity	huitzil_c174	7	Reflect Wall [air block, P1 j.8 at +4, P2 j.HP at +16, 623LP at +28]	DIFF	+32	cnt,meter,node,p2hp,seq,x,y	671	after:6	2
+parity	huitzil_c174	6	Reflect Wall [air block, P1 j.8 at +2, P2 j.HP at +14, 623LP at +26]	IDENT	-	-	420	-	3
+parity	huitzil_c174	7	Reflect Wall [air block, P1 j.8 at +4, P2 j.HP at +16, 623LP at +28]	IDENT	-	-	671	-	2
 entry	donovan	0	Foot Stab (ES) [8KK] off Sword Grapple [63214HP], press at +104	a2:0x4f	ENTERED
 entry	donovan	1	Foot Stab (ES) [8KK] off Sword Grapple [63214HP], press at +112	a2:0x4f	ENTERED
 parity	donovan_c174	0	Foot Stab (ES) [8KK] off Sword Grapple [63214HP], press at +104	IDENT	-	-	420	-	3

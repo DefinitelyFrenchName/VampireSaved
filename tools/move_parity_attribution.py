@@ -15,8 +15,12 @@ SIGNATURE:
   step N  ITERATIVE ABLATION: for every part still carrying a DIFF, the first DIFF event's INPUTS
           are removed (tools/name_moves.gen with that recipe emptied — every other event's frame,
           pin and poke unchanged) and both legs re-run; rows that vanish are that root's.
-          donovan_3's root is SEEDED at event 5 (Killshread Summon (ES), GitHub #159: its own
-          fields read IDENT because P2's x is not compared).
+          A part's root may be SEEDED (SEED below) when the table cannot see it. donovan_3's was
+          seeded at event 5 (Killshread Summon (ES), GitHub #159: its own fields read IDENT because
+          P2's x is not compared) until the M21 freeze (14z-185) landed #159's fix: the seeded root
+          then read no P2-x difference from native in its window (class OTHER), on merged-m21 and on
+          the #159-only probe alike, where the #182-only probe still read P2-DISPLACEMENT — and the
+          seed was retired.
   classify each root on the traces of the step where it was still a DIFF (see SIGNATURES).
 
 SIGNATURES (each a measured property of the root's own window, never its name alone):
@@ -39,6 +43,7 @@ SIGNATURES (each a measured property of the root's own window, never its name al
                  "DECIDED (maintainer, 2026-08-14): OPTION (b)" (the maintainer's own words were not kept),
                  SUPERSEDED 2026-09-18: "take the vs2 rows" (docs/project/tables/defense_rows.md)
   P2-DISPLACEMENT a seeded root whose own fields are IDENT while P2's x differs in its window — #159
+                 (fixed at M21, 14z-185; no seed carries it since)
   DMG-VSAVJ      the DEFENSE-ROW signature (P1's HP alone, the tenant the victim, ours taking MORE) on a build
                  whose defense row is ALREADY vs2's (read from the build's own data image and vs2's): vsavj's OWN
                  damage pipeline, not the port — a LEGACY victim reads the same +1 with no port in the loop
@@ -74,7 +79,8 @@ import name_moves as nm   # noqa: E402
 
 ROUND_START = 2545
 OURS_PATH = {"donovan": "D D DR DR", "huitzil": "D D D", "pyron": "D D D D"}
-SEED = {"donovan_3": [5]}   # GitHub #159: Killshread Summon (ES) displaces P2, whose x the table does not compare
+SEED = {}   # RETIRED 14z-185 (M21): was {"donovan_3": [5]} — GitHub #159, Killshread Summon (ES) displacing P2, whose x the
+           # table does not compare; #159 landed at M21 and the seeded root read OTHER ("seeded root with no P2 displacement")
 FIELDS = ("ff841c:l:node,ff8420:b:cnt,ff8406:b:seq,ff8407:b:sub,ff8509:b:stock,ff8410:w:x,ff8414:w:y,"
           "ff8450:w:p1hp,ff8782:b:id,ff802e:b:df,ff840b:b:face,ff8116:b:lvl,ff850a:w:meter,ff8850:w:p2hp,"
           "ff881c:l:p2node,ff8b82:b:p2id,ff8081:b:pc,ff890a:w:p2meter,ff8854:b:p2cls,ff8810:w:p2x,ff845c:b:frz")

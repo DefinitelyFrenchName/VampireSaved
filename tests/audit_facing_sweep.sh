@@ -15,14 +15,16 @@
 #   geometry runs on native vs2 and on the build (ours by the parity gate's cursor path D D DR DR),
 #   to frame 4040, tests/lua/facing_tap.lua tapping Demitri's +0x5C word from 3850 with the rule
 #   inputs at every write; tools/facing_sweep.py reads the 64 taps.
-# EXPECTS: the reader's CHECK PASS and its rows equal tests/expected/facing_sweep.tsv. FROZEN AS
-#   MEASURED on merged-m20: every leg DIFF — the #159 defect: the build5 rows show vsavj's
+# EXPECTS: the reader's CHECK PASS and its rows equal tests/expected/facing_sweep.tsv. RE-FROZEN
+#   AS FIXED on merged-m21 (14z-185, the M21 freeze applied the patch below): every leg SAME,
+#   32/32, the leg and build5 rows moving and nothing else (native, geometry, node rows as frozen).
+#   FROZEN AS MEASURED on merged-m20 until then: every leg DIFF — the #159 defect: the build5 rows show vsavj's
 #   resolver XORing rule 5 into the prior value, 4 on side L (1^5) and 5 on side R (0^5), where
 #   native writes 1/0, and on 4 side-R legs the later contacts landing on other frames (-);
-#   and 13 of the 29 native nodes fit NO vsavj rule (no data-only fix). On probe 159 (the staged row, build/manifest/staged/159_designA.patch,
+#   and 13 of the 29 native nodes fit NO vsavj rule (no data-only fix). On probe 159 (the staged row, build/manifest/staged/159_designA.patch until M21,
 #   in a copy of donovan.toml; its build fingerprint e4d712eb equals a build of the staged row
-#   itself, 14z-185) every leg is SAME, 32/32; the M21 freeze applies the patch and re-freezes the
-#   leg and build5 rows. Both controls fail the gate.
+#   itself, 14z-185) every leg is SAME, 32/32; the M21 freeze applied the patch (the staged file
+#   retired into build/manifest/donovan.toml's `facing_rule5` row) and re-froze the leg and build5 rows. Both controls fail the gate.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/facing_sweep.tsv tests/lib/controls.sh
 #   tests/lua/facing_tap.lua tests/replays/naming/ tools/build_fingerprint.py tools/facing_sweep.py
 #   tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh
@@ -49,7 +51,7 @@
 #   geometries) and checked equal on both legs (check (c)), not assumed; legs whose write sequences
 #   coincide are still distinct geometries when their geom rows differ.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged28] [JOBS=8] [FREEZE=1] [KEEP=<dir>] tests/audit_facing_sweep.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged29] [JOBS=8] [FREEZE=1] [KEEP=<dir>] tests/audit_facing_sweep.sh
 #   emulator tier, MAME; ~41 s (64 legs to frame 4040 at JOBS=8, measured 14z-185 on this MacBook)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
@@ -57,7 +59,7 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged28}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
+BUILD="${BUILD:-build/m3b_merged29}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 JOBS="${JOBS:-8}"
 EXPECT="$REPO/tests/expected/facing_sweep.tsv"
 R="$REPO/tests/replays/naming/donovan_3.rpl"; J="$REPO/tests/replays/naming/donovan_3.json"

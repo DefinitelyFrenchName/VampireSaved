@@ -26,7 +26,7 @@
 # Usage:
 #   ROMDIR=... tools/naming_pair_sheet.sh <tenant> <part> <out.png> "<label>:<f1,f2,...>" ...
 #   e.g. tools/naming_pair_sheet.sh huitzil 1 jump.png "Jump [8]:2966,2974,2982" "Back dash:3474,3480"
-# Env: BUILD (default build/m3b_merged28), MAME_BIN, SCALE (default 0.5), TITLE, KEEP=<dir> (keep the runs),
+# Env: BUILD (default build/m3b_merged29), MAME_BIN, SCALE (default 0.5), TITLE, KEEP=<dir> (keep the runs),
 #      RIG_DIR (default tests/replays/naming)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
@@ -36,7 +36,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 T="$1"; P="$2"; OUT="$3"; shift 3
 case "$OUT" in /*) ;; *) OUT="$PWD/$OUT" ;; esac
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged28}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
+BUILD="${BUILD:-build/m3b_merged29}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 [ -x "$MAME_BIN" ] || { echo "FAIL: no MAME at $MAME_BIN"; exit 1; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "FAIL: no WIDE build at $BUILD"; exit 1; }
 RIG_DIR="${RIG_DIR:-$REPO/tests/replays/naming}"   # another rig directory (e.g. tests/replays/chains174, part c174)

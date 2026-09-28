@@ -6,7 +6,7 @@
 number	state	reason	closed	labels	title
 184	OPEN	-	-	evolution	28 never-entered a2 chains of the tenants with no attack record (poses and transitions): split from #174, their ours-vs-native parity unmeasured
 183	OPEN	-	-	evolution	The parity gates pin the RNG to 0000, its fixed point: every draw returns 0, so no gate compares a non-zero random path
-182	OPEN	-	-	bug	Phobos's guard cancel from an air block (Reflect Wall, j.623P) never fires on our build: vsavj's block entry lacks vs2's Phobos-only case that opens the guard window in the air
+182	CLOSED	COMPLETED	2026-09-28	bug	Phobos's guard cancel from an air block (Reflect Wall, j.623P) never fires on our build: vsavj's block entry lacks vs2's Phobos-only case that opens the guard window in the air
 181	CLOSED	COMPLETED	2026-09-27	evolution	Run the emulator tier on a snapshot at a named commit (slice 2 of #153)
 180	CLOSED	NOT_PLANNED	2026-09-27	bug	Two stock-spend tenant throws pay the thrower 0 meter on M19 and M20 alike; the x028122 copy's third store pair was never observed writing (split from #157)
 179	CLOSED	NOT_PLANNED	2026-09-27	bug	Phobos's Sitting Attack (Pursuit, 8+P/K) landing after a throw: ours is displaced 31 px and does not turn, native stays and turns (parity rig huitzil_3 events 8/9)
@@ -29,7 +29,7 @@ number	state	reason	closed	labels	title
 162	OPEN	-	-	cosmetic	The deity above Donovan flashes orange as the Killshread Lightning column ends — an extra palette-sequence upload of row 11 native does not make
 161	CLOSED	NOT_PLANNED	2026-09-25	bug	Phobos takes one more HP than native from Demitri's 5HP with his defense rows already vs2's (12 against 11)
 160	CLOSED	COMPLETED	2026-09-28	bug,severity: low	rulecheck.py: prepare's auto id collides with a run directory that has no ledger row
-159	OPEN	-	-	bug,needs-maintainer-ruling,severity: medium	Tenant attack records with facing rule 5 are XORed into the victim's facing by vsavj's hit code (Killshread Summon (ES) pushes Demitri away where native drags him in)
+159	CLOSED	COMPLETED	2026-09-28	bug,needs-maintainer-ruling,severity: medium	Tenant attack records with facing rule 5 are XORed into the victim's facing by vsavj's hit code (Killshread Summon (ES) pushes Demitri away where native drags him in)
 158	CLOSED	COMPLETED	2026-09-24	bug	rulecheck.py: a model change never invalidates a calibration (the checklist hash is checked, the model is not, and the ledger records 'default')
 157	CLOSED	COMPLETED	2026-09-26	bug,needs-maintainer-ruling,severity: high	Tenant throws pay meter to the wrong fighters — the ported throw code never registers the hit pair on vsavj (the 14x rollback's price; #136's meter family)
 156	CLOSED	COMPLETED	2026-09-17	bug	rulecheck.py: two line ranges of one artifact collide in staging, the reader sees only the last
@@ -38,7 +38,7 @@ number	state	reason	closed	labels	title
 153	CLOSED	COMPLETED	2026-09-26	evolution	Run the test tiers on a scratch clone at a named commit (lever B of #148): integrity and traceability at freeze and release, as bbh/BBX do
 152	CLOSED	COMPLETED	2026-09-17	evolution	An independent adversarial rule-checker at every decision point — redundancy for rule APPLICATION, not for measurement
 151	CLOSED	COMPLETED	2026-09-17	evolution	Re-examine #136 end to end: the forced-pick native leg is unvalidated, so 17 of 27 parity verdicts rest on an unmeasured assumption
-150	OPEN	-	-	evolution	The freeze ritual's three silent-green failure modes need a mechanical guard (test_freeze_set_shape + a committed freeze driver)
+150	OPEN	-	-	evolution,severity: medium	The freeze ritual's three silent-green failure modes need a mechanical guard (test_freeze_set_shape + a committed freeze driver)
 149	CLOSED	NOT_PLANNED	2026-09-16	bug	Phobos's specials skip a 2-frame seq-4 startup state native vsav2 plays (one cause behind ~11 of his moves)
 148	CLOSED	COMPLETED	2026-09-17	evolution	Review the static tier's contents and when it is applied — a commit currently blocks the tree for ~25 min, a close for ~40
 147	CLOSED	NOT_PLANNED	2026-09-16	bug	Phobos's float runs the VH2 flavor: huitzil.toml flavor_default is 0x00 where native vsav2 seeds 0x01
@@ -63,7 +63,7 @@ number	state	reason	closed	labels	title
 128	OPEN	-	-	evolution,parked	Marionette: parked until further notice
 127	OPEN	-	-	cosmetic,parked	#112 option (B): the Press of Death effect owns its palette row (scope first)
 126	OPEN	-	-	cosmetic,parked	Select-wheel look-and-feel polish
-125	OPEN	-	-	cosmetic	Arcade-ladder map names and pictures (not investigated)
+125	OPEN	-	-	cosmetic,parked	Arcade-ladder map names and pictures (not investigated)
 124	OPEN	-	-	cosmetic,parked	Arcade-ladder roulette tag shows the base/shell character for a tenant opponent on the arcade ladder map screen
 123	OPEN	-	-	cosmetic,parked	Win-quote text for the three tenants (forgone for now; only the clean way, vanilla untouched)
 122	OPEN	-	-	evolution	Run the --controls release tier on the dedicated Linux server and compare its speed with the Mac

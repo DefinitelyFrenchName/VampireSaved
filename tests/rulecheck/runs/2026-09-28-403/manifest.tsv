@@ -1,0 +1,19 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/rc185/attr/refusal_freeze.log	bdafac39385f4d8fcdec7ef82127b2e3a268c895
+build/rc185/attr/laneA_status.txt	3cc23a71ad45ee4f3708b7c34206629d6954a419
+build/rc185/attr/events_diff.txt	482ef0b0a1753c759bf483665220af2d3981df25
+build/rc185/attr/tool.diff	353c8fb804bb85090ceffcf98aa8812f046c5607
+build/rc185/attr/commands.txt	0f48d7f265c3da63fc4c49e935cede74d8f451cb
+build/rc185/attr/got_seeded.tsv	96814f76f157529bcc932e16033c6bd979d87aca
+build/rc185/attr/got_noseed.tsv	3e6e407995fd842fdeefc74ba668936fe94209d9
+build/rc185/attr/frozen_m20.tsv	0130e40bd4e52b8c60ce3c6d490fefda871d991b
+build/rc185/attr/diff_frozen_vs_noseed.txt	33c9a5bc80f2f84854802a2b6c7b892ec413039a
+build/rc185/attr/got_p159_seeded.tsv	96814f76f157529bcc932e16033c6bd979d87aca
+build/rc185/attr/got_p182_seeded_m20ev.tsv	0130e40bd4e52b8c60ce3c6d490fefda871d991b
+build/rc185/attr/shadow_m20ev.diff	dd4ae408170f33b9758be34213d47c5adfed7071
+build/rc185/probe_identities.txt	cbe7dae56b22a9adc26759088beaf2d15b1ff42b
+build/rc185/parity/diff_m21.txt	66ca70f0e1559c246ce0ee2d32a4b4ae2ec2b0fa
+build/rc185/parity/diff_probe159.txt	66ca70f0e1559c246ce0ee2d32a4b4ae2ec2b0fa
+build/rc185/parity/diff_merged182.txt	da39a3ee5e6b4b0d3255bfef95601890afd80709
+build/agent185/t159/maintainer_159_probe.txt	1edebba19c6ebfbce3ca7500534c93e4eb1b2d07
+build/agent185/maintainer_queue_14z185.txt	f9c2fddc07915e32cc785c52e1597bb7b668b1db

@@ -1,23 +1,25 @@
 #!/bin/sh
-# audit_facing_rule.sh — THE VICTIM FACING RULE 5 ON OUR ENGINE, ours vs native, frozen AS MEASURED (GitHub #159, 14z-167): vs2's facing-rule resolver knows rule 5 and vsavj's does not, so a tenant attack record carrying it is XORed into the victim's facing on our build.
+# audit_facing_rule.sh — THE VICTIM FACING RULE 5 ON OUR ENGINE, ours vs native, frozen AS MEASURED (GitHub #159, 14z-167; FIXED at the M21 freeze, 14z-185): vs2's facing-rule resolver knows rule 5 and vsavj's does not; since M21 Donovan's `facing_rule5` thunk teaches vsavj's resolver vs2's rule-5 branch, and ours writes native's values.
 #
 # WHAT: the victim facing rule 5 on our engine, frozen AS MEASURED (#159): vs2's facing
-#   resolver knows rule 5 and vsavj's does not, so a tenant attack record carrying it is
-#   XORed into the victim's +0x5D on our build — Killshread Summon (ES)'s returning wave
-#   drags Demitri toward Donovan on native and leaves him in place on ours.
+#   resolver knows rule 5 and vsavj's does not. Until M21 a tenant attack record carrying it
+#   was XORed into the victim's +0x5D on our build, and Killshread Summon (ES)'s returning
+#   wave dragged Demitri toward Donovan on native and left him in place on ours. Since M21
+#   (Design A, the `facing_rule5` [[site_thunk]] at 0x1886C) ours writes native's values.
 # HOW: static: the compare chains of both resolvers read from the decrypted opcode images,
 #   and the legacy record census of +0xE (vsavj 0 of 1,085 carry rule 5, vs2 1 of 1,143);
 #   live: every write to Demitri's +0x5D over 3850-3960 and his x at 3924 and 3946 on the
-#   #136 rig donovan_3, both legs real cursor picks, on MAME; controls replace our writes by
-#   native's and plant a `cmpi.b #5` into vsavj's image.
-# EXPECTS: the frozen defect rows (ours writes 4 at 0x1886C, native 1 and 0; x 835 vs 755)
-#   and static rows exact; both controls fail. A fix re-freezes this file deliberately.
+#   #136 rig donovan_3, both legs real cursor picks, on MAME; controls flip our writes'
+#   side bit and plant a `cmpi.b #5` into vsavj's image.
+# EXPECTS: the frozen rows AS FIXED at M21 (ours writes native's 1 1 1 0 0 0 from the
+#   thunk; x 755 on both legs) and static rows exact; both controls fail. Until M21 it froze
+#   the defect (ours wrote 4 at 0x1886C; x 835 against native's 755).
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/facing_rule.tsv
 #   tests/lib/decrypt_cache.sh tests/lua/field_trace.lua tests/lua/read_tap.lua
-#   tests/replays/ tools/audit_facing_rules.py tools/name_moves.py tools/run_mame.sh
-#   tools/setup_mame.sh
+#   tests/replays/ tools/audit_facing_rules.py tools/build_fingerprint.py tools/name_moves.py
+#   tools/run_mame.sh tools/setup_mame.sh
 #
-# MUST-FIRE: perturbed-copy: rule5-resolved — a copy of our facing rows with the resolver's value replaced by native's at the same frame (what a fixed build would write) must FAIL the frozen compare, so the frozen rows are the defect and a fix is a deliberate re-freeze (in-gate: the perturbed copy must differ from the frozen rows; mode: our reduced rows are replaced before the compare and the table FAILs)
+# MUST-FIRE: perturbed-copy: rule5-flipped — a copy of our facing rows with every value's side bit (bit 0) flipped — the victim put on the other side — must FAIL the frozen compare, so a regression of the fix is caught (in-gate: the table with the flipped copy must differ from the frozen rows; mode: our reduced rows are flipped before the compare and the table FAILs). Replaced 14z-185 the M21 control `rule5-resolved` (native's values over ours), which cannot fire once ours IS native's (it read DEAD on merged-m21).
 # MUST-FIRE: perturbed-copy: branch-planted — a copy of vsavj's decrypted opcode image with the resolver's rule-4 compare rewritten to `cmpi.b #5` must change vsavj's static row and FAIL, so the static read sees the compare chain it claims to list (in-gate: the planted copy must read differently; mode: the real image is planted before the static read and the table FAILs)
 #
 # WHY. An attack record's +0xE is the victim's FACING RULE, resolved into the
@@ -45,16 +47,18 @@
 #   x       <leg> <frame> <Demitri's x>  — sampled per frame (tests/lua/field_trace.lua;
 #           a write tap of $FF8810 crashed MAME, 14z-167) at 3924 (the last contact)
 #           and 3946 (the slide's end)
-# THE DEFECT IS FROZEN AS MEASURED: ours writes 4 at 0x1886C where native's
+# THE DEFECT WAS FROZEN AS MEASURED until M21: ours wrote 4 at 0x1886C where native's
 # rule-5 branch 0x171E0 writes 1 (outgoing wave) and 0 (returning wave), and
-# ours' x holds at 835 where native's slides to 755. A fix re-freezes this file
-# DELIBERATELY, with its rule-checker run named in the commit.
+# ours' x held at 835 where native's slides to 755. FIXED at the M21 freeze (14z-185,
+# the maintainer: "Design A, stage for M21 (Recommended)"): the file is re-frozen AS
+# FIXED — ours writes the same values from the thunk (its writer PC is the thunk's
+# placement, which moves with every freeze) and x reads 755 on both legs.
 #
 # WHAT IT DOES NOT COVER: the other rule-5 records (Donovan's 0xCA1CA/0xCA1EA,
 # 0xD17C2/0xD1822 — GitHub #159); what holds ours at 835; P2-side tenants; the
 # one-leg taps are non-debug (tests/lua/read_tap.lua), frames >= 3850 only.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged28] [FREEZE=1] tests/audit_facing_rule.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged29] [FREEZE=1] tests/audit_facing_rule.sh
 #   emulator tier, MAME; four runs in parallel plus the two views from the build/out decrypt cache —
 #   measured 14z-167b on this MacBook, solo: ~5 s wall (verify), each control mode the same
 set -eu
@@ -62,14 +66,14 @@ set -eu
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged28}"
+BUILD="${BUILD:-build/m3b_merged29}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/facing_rule.tsv"
 CONTROL="${CONTROL:-}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 [ -f "$ROMDIR/vsav2.zip" ] || { echo "SKIP: no vsav2.zip in $ROMDIR"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no WIDE build at $BUILD"; exit 0; }
-case "$CONTROL" in ""|rule5-resolved|branch-planted) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
+case "$CONTROL" in ""|rule5-flipped|branch-planted) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
@@ -161,19 +165,12 @@ for at in (3924, 3946):
     print(f"x\t{leg}\t{at}\t{xs[at]}")
 PY
 }
-fix_rows() {  # fix_rows <native rows> <ours rows>: ours' resolver values replaced by native's at the same frame
-    python3 - "$1" "$2" <<'PY'
+flip_rows() {  # flip_rows <ours rows>: every facing value's side bit (bit 0) flipped — the wrong side
+    python3 - "$1" <<'PY'
 import sys
-nat = {}
 for l in open(sys.argv[1]):
     t = l.rstrip("\n").split("\t")
-    if t[0] == "facing": nat.setdefault(t[2], []).append(t[4])
-seen = {}
-for l in open(sys.argv[2]):
-    t = l.rstrip("\n").split("\t")
-    if t[0] == "facing":
-        k = seen.get(t[2], 0); seen[t[2]] = k + 1
-        if t[2] in nat and k < len(nat[t[2]]): t[4] = nat[t[2]][k]
+    if t[0] == "facing": t[4] = "%02x" % (int(t[4], 16) ^ 1)
     print("\t".join(t))
 PY
 }
@@ -191,6 +188,8 @@ if [ "$CONTROL" = branch-planted ]; then plant_branch "$W/vsavj_op.bin" "$W/vsav
 sed 's/^/  /' "$W/static.rows"
 
 echo "== 2. the taps, both legs ($PART, frames $FROM-$FR)"
+# the build under test, named by its program fingerprint (rule-checker runs 2026-09-28-389/-390: a row read with no build named is a premise)
+echo "  build under test: $BUILD — program fingerprint $(python3 "$REPO/tools/build_fingerprint.py" "$BUILD/rompath;$ROMDIR" --set vsavjw --sha-only 2>/dev/null | cut -c1-8)"
 j="$REPO/tests/replays/naming/$PART.json"; r="$REPO/tests/replays/naming/$PART.rpl"
 pk="$(pokes_for "$j" "$FR")"
 rpl_for "$TENANT" "$r" native "$W/native.rpl"; rpl_for "$TENANT" "$r" ours "$W/ours.rpl"
@@ -206,18 +205,18 @@ for leg in native ours; do
     reduce "$leg" "$W/$leg.face.txt" "$W/$leg.x.txt" > "$W/$leg.rows" 2> "$W/$leg.err" || bad "$leg: $(cat "$W/$leg.err")"
 done
 [ "$fail" = 0 ] || { echo "FAIL: audit_facing_rule (a leg did not run or was VOID)"; exit 1; }
-if [ "$CONTROL" = rule5-resolved ]; then fix_rows "$W/native.rows" "$W/ours.rows" > "$W/ours.fx" && mv "$W/ours.fx" "$W/ours.rows"; fi
+if [ "$CONTROL" = rule5-flipped ]; then flip_rows "$W/ours.rows" > "$W/ours.fx" && mv "$W/ours.fx" "$W/ours.rows"; fi
 cat "$W/static.rows" "$W/native.rows" "$W/ours.rows" > "$W/got.tsv"
 ok "static rows $(wc -l < "$W/static.rows" | tr -d ' '), native $(grep -c '^facing' "$W/native.rows" | tr -d ' ') facing writes, ours $(grep -c '^facing' "$W/ours.rows" | tr -d ' ')"
 
 echo "== 3. the frozen rows"
 if [ "${FREEZE:-0}" = 1 ]; then
     {
-        echo "# tests/expected/facing_rule.tsv — the victim facing rule 5, ours (merged-m18) vs native vsav2 (tests/audit_facing_rule.sh;"
+        echo "# tests/expected/facing_rule.tsv — the victim facing rule 5, ours ($(basename "$BUILD")) vs native vsav2 (tests/audit_facing_rule.sh;"
         echo "# tests/lua/read_tap.lua, non-debug; the static rows from the decrypted opcode images). Evidence class: in-emulator"
-        echo "# plus static. Frozen 14z-167 with FREEZE=1 (GitHub #159). THE DEFECT IS FROZEN AS MEASURED: vsavj's resolver lists no rule 5,"
-        echo "# ours writes 4 at 0x1886C where native's rule-5 branch 0x171E0 writes 1 / 0, and ours' x holds where native's slides."
-        echo "# A fix re-freezes this file DELIBERATELY, with its rule-checker run named in the commit."
+        echo "# plus static. Frozen with FREEZE=1 (GitHub #159): 14z-167 AS THE DEFECT (ours wrote 4 at 0x1886C, x 835 against 755);"
+        echo "# re-frozen 14z-185 AS FIXED at M21 (Design A, the facing_rule5 thunk): vsavj's resolver still lists no rule 5 (the"
+        echo "# static row), ours writes native's values from the thunk, and x reads 755 on both legs."
         echo "# Columns: kind (static | facing | x), game or leg, address or frame, then rules= / writer PC and value / x"
         echo "#--"
         cat "$W/got.tsv"
@@ -230,13 +229,15 @@ if diff "$W/want.tsv" "$W/got.tsv" > "$W/diff.txt"; then ok "every row as frozen
 else bad "differs from the frozen rows"; sed 's/^/        /' "$W/diff.txt"; fi
 
 echo "== 4. must-fire controls"
-if [ "$CONTROL" = rule5-resolved ] || [ "$CONTROL" = branch-planted ]; then
+if [ "$CONTROL" = rule5-flipped ] || [ "$CONTROL" = branch-planted ]; then
     if [ "$fail" = 1 ]; then echo "CONTROL FIRED: $CONTROL — the perturbed input loses the frozen rows"; echo "FAIL: audit_facing_rule (control mode)"; exit 1
     else echo "CONTROL DEAD: $CONTROL — the perturbed input still matched"; echo "FAIL: audit_facing_rule"; exit 1; fi
 fi
-fix_rows "$W/native.rows" "$W/ours.rows" > "$W/ctl.rows"
-if diff -q "$W/ours.rows" "$W/ctl.rows" > /dev/null; then echo "CONTROL DEAD: rule5-resolved — native's values change nothing in ours' rows"; fail=1
-else echo "CONTROL FIRED: rule5-resolved — ours' rows with native's resolver values differ from the frozen rows ($(diff "$W/ours.rows" "$W/ctl.rows" | grep -c '^>' | tr -d ' ') rows)"; fi
+# against the FROZEN rows, the compare it guards (rule-checker run 2026-09-28-389 Q4: flipped-vs-ours could never read DEAD)
+flip_rows "$W/ours.rows" > "$W/ctl.rows"
+cat "$W/static.rows" "$W/native.rows" "$W/ctl.rows" > "$W/ctl.got"
+if diff -q "$W/want.tsv" "$W/ctl.got" > /dev/null; then echo "CONTROL DEAD: rule5-flipped — the table with ours' side bits flipped still equals the frozen rows"; fail=1
+else echo "CONTROL FIRED: rule5-flipped — the table with ours' side bits flipped differs from the frozen rows ($(diff "$W/want.tsv" "$W/ctl.got" | grep -c '^>' | tr -d ' ') rows)"; fi
 plant_branch "$W/vsavj_op.bin" "$W/ctl_op.bin" && static_row vsavj "$W/ctl_op.bin" > "$W/ctl.static" 2>/dev/null || true
 if [ -s "$W/ctl.static" ] && ! grep -qxF "$(head -1 "$W/static.rows")" "$W/ctl.static"; then
     echo "CONTROL FIRED: branch-planted — the planted image reads $(cut -f4 "$W/ctl.static") against the real $(head -1 "$W/static.rows" | cut -f4)"

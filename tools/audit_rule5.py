@@ -151,7 +151,7 @@ KNOWN_PAIRS = {
         "note", "only_base_slot", "only_variant_slot", "orc",
         "slot_ptr_table", "slot_rows", "src", "stage"
     },
-    "don_m24": {
+    "don_m25": {
         "escapes", "resolved", "unresolved"
     },
     "file": {
@@ -169,7 +169,7 @@ KNOWN_PAIRS = {
     "hole_b": {
         "end", "start"
     },
-    "hui58": {
+    "hui59": {
         "escapes", "resolved", "unresolved"
     },
     "init_shim": {
@@ -223,7 +223,7 @@ KNOWN_PAIRS = {
     "profile": {
         "bank4_word", "bank5_word", "collision_rule", "group", "name"
     },
-    "pyron43": {
+    "pyron44": {
         "escapes", "resolved", "unresolved"
     },
     "reaction_hook": {

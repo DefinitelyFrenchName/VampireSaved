@@ -2,18 +2,19 @@
 # audit_pyron_ring.sh — Pyron's merged-vs-solo sound-ring inventory,
 # frozen (14z-85). On-demand, ~10 min (2 replays x merged+solo = 4 runs).
 #
-# WHAT: Pyron's sound-ring id inventory on the MERGED build equals the SOLO build's per
-#   replay (the frozen diff is EMPTY), so no merged-only music-range id (the 0x729 retrigger
+# WHAT: Pyron's sound-ring event stream on the MERGED build equals the SOLO build's, event for
+#   event and frame for frame, per replay, so no merged-only id (the 0x729 music retrigger
 #   class) and no missing solo id can appear.
-# HOW: two replays on merged and solo builds on MAME (four runs), the sound ring's ids
-#   collected whole-run and diffed; housekeeping ids excluded; the control moves the frozen
-#   mash onset later so a real onset reads as moved earlier.
-# EXPECTS: the merged-vs-solo id-set diff equals the frozen inventory (empty); any new id or
-#   a solo id missing on merged fails.
+# HOW: two replays on merged and solo builds on MAME (four runs), the sound ring's (frame, id)
+#   events compared in order, housekeeping ids excluded, each stream against its frozen onset
+#   (None = the whole run must agree); the control shifts one merged mash event by a frame.
+# EXPECTS: cosmo and mash agree for the WHOLE run (mash since M21: until then it diverged at a
+#   frozen onset, f4741, merged one frame ahead — GitHub #98); an onset appearing, or moving
+#   EARLIER than a frozen one, fails.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/ring_tap.lua
 #   tests/replays/ tools/run_mame.sh tools/setup_mame.sh
 #
-# MUST-FIRE: known-bad: onset-earlier — the mash divergence onset moving EARLIER than the frozen one must FAIL (mode: PYRON_RING_ONSET is set LATER than the real onset so the real onset reads as moved earlier and the gate must FAIL)
+# MUST-FIRE: perturbed-copy: stream-shifted — a copy of the merged mash stream with ONE event (the middle one) moved a frame earlier must break the whole-run agreement and FAIL, so "agrees for the whole run" is a comparison that can fail (in-gate: the shifted copy must be caught; mode: the real merged stream is shifted before the compare and the gate FAILs). Replaced 14z-185 (the M21 freeze) the control `onset-earlier`, which guarded a frozen onset and read DEAD once the mash stream stopped diverging.
 #
 # WHAT 14z-85 MEASURED (the owner-tag fix's own before/after): the ring
 # inventory is IDENTICAL before and after the owner tag — the music
@@ -68,8 +69,8 @@ cd "$REPO"
 # after which a mash rig is playing two different fights, so the whole-run
 # id-SET comparison was invalid rather than failing. The comparison is now
 # event-stream-with-a-frozen-onset; see the block below for the measurements.
-MERGED="${1:-build/m3b_merged28}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-SOLO="${2:-build/pyron43}"    # pyron-m15 (14z-105; was pyron-m13, the shipping solo (carries  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+MERGED="${1:-build/m3b_merged29}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+SOLO="${2:-build/pyron44}"    # pyron-m15 (14z-105; was pyron-m13, the shipping solo (carries  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
                               # pyr_sfx_records, as pyron-m4 did at 14z-85b)
 [ -f "$MERGED/rompath/vsavjw.zip" ] || { echo "SKIP: no $MERGED"; exit 0; }
 [ -f "$SOLO/rompath/vsavjw.zip" ] || { echo "SKIP: no $SOLO"; exit 0; }
@@ -80,7 +81,7 @@ fail=0
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 # THE EXECUTABLE MODE: a frozen mash onset LATER than the real one makes the real
 # onset read as "moved EARLIER" (the load-bearing failure) so the gate FAILs.
-if [ "$MODE" = onset-earlier ]; then PYRON_RING_ONSET=999999; export PYRON_RING_ONSET; fi
+[ "$MODE" = stream-shifted ] && { PYRON_RING_SHIFT=1; export PYRON_RING_SHIFT; }
 
 PK="1400:ff8782:11;1450:ff8782:11;1500:ff8782:11;3000:ff8509:03;3020:ff8509:03"
 for leg in cosmo:pyron/71_pyron_cosmo:5200 mash:pyron/70_pyron_mash:8400; do
@@ -130,7 +131,12 @@ W = sys.argv[1]
 # inventory (which absorbs) or the old set compare (which cries wolf).
 import os
 ONSET = {"cosmo": None,   # None = must agree for the WHOLE run
-         "mash":  4741}   # frozen 14z-95, merged one frame ahead of solo
+         "mash":  None}   # RE-FROZEN 14z-185 (the M21 freeze): was 4741, frozen 14z-95 with merged one frame ahead of
+                          # solo (#98). On merged-m21 the whole mash stream agrees (364 events). ATTRIBUTED BY
+                          # MEASUREMENT to #159's facing_rule5 hook (the #159-only probe agrees whole-run; the
+                          # #182-only probe and merged-m20 diverge at f4742); the MECHANISM is not measured (the
+                          # candidate: the hook's added cycles on the shared facing resolver moving one event
+                          # across a frame boundary, [VSP-39]). An onset reappearing now FAILS.
 # MUST-FIRE CONTROL. "an onset moving EARLIER is a FAILURE" is this gate's
 # load-bearing assertion, and a frozen constant that happens to match is
 # indistinguishable from a comparison that cannot fail. PYRON_RING_ONSET
@@ -138,6 +144,19 @@ ONSET = {"cosmo": None,   # None = must agree for the WHOLE run
 # caller sets it.
 if os.environ.get("PYRON_RING_ONSET"):
     ONSET["mash"] = int(os.environ["PYRON_RING_ONSET"])
+SHIFT = bool(os.environ.get("PYRON_RING_SHIFT"))   # the stream-shifted mode
+
+def shifted(stream):   # the middle event moved one frame earlier
+    k = len(stream) // 2
+    return stream[:k] + [(stream[k][0] - 1, stream[k][1])] + stream[k + 1:]
+
+def agreement(m, s):
+    agree = 0
+    for a, b in zip(m, s):
+        if a != b:
+            break
+        agree += 1
+    return agree
 
 def events(path):
     out, end = [], False
@@ -150,10 +169,16 @@ def events(path):
     return out, end
 
 errs = []
-mash_diverges = False; mash_onset = None
+mash_diverges = False; mash_onset = None; shift_caught = False; ctl_agree = None
 for name in ("cosmo", "mash"):
     m, m_end = events(f"{W}/{name}_merged/ring.txt")
     s, s_end = events(f"{W}/{name}_solo/ring.txt")
+    if name == "mash" and m:
+        ctl_m = shifted(m)   # the in-gate control: must NOT agree for the whole run
+        ctl_agree = agreement(ctl_m, s)
+        shift_caught = ctl_agree < len(ctl_m) or len(ctl_m) != len(s)
+        if SHIFT:
+            m = ctl_m
     if not (m_end and s_end):
         errs.append(f"{name}: a tap run did not complete (no END line)")
         continue
@@ -200,10 +225,10 @@ for name in ("cosmo", "mash"):
     else:
         print(f"  ok: {name} — {agree} events identical, divergence at the "
               f"frozen onset f{onset} (merged one frame ahead)")
-if mash_diverges:
-    print(f"CONTROL FIRED: onset-earlier — the mash stream diverges at f{mash_onset}; a frozen onset set LATER (the mode's PYRON_RING_ONSET) makes it read as moved EARLIER and the gate FAILs")
+if shift_caught:
+    print(f"CONTROL FIRED: stream-shifted — the merged mash stream with its middle event moved a frame earlier breaks the whole-run agreement at event {ctl_agree}")
 else:
-    print("CONTROL DEAD: onset-earlier — the mash stream never diverges, so the onset guard has nothing to protect")
+    print("CONTROL DEAD: stream-shifted — a merged mash stream with one event moved a frame still reads as agreeing")
 for e in errs:
     print("FAIL:", e)
 sys.exit(1 if errs else 0)
@@ -211,5 +236,5 @@ PY
 
 [ "$fail" = 0 ] || { echo "FAIL: pyron ring audit"; exit 1; }
 echo "PASS: merged/solo ring streams agree to their frozen onsets"
-echo "      (cosmo whole-run; mash to f4741, where merged runs one frame"
-echo "      ahead — GitHub #98, measured 14z-95)"
+echo "      (cosmo and mash whole-run since M21; mash diverged at f4741 until"
+echo "      then, merged one frame ahead — GitHub #98, measured 14z-95)"

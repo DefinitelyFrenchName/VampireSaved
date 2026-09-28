@@ -1,6 +1,66 @@
 # patch_notes — per-change detail: every byte, and why
 
-## 14z-185 — #159: the victim facing rule 5 (Design A), RULED AND STAGED for M21 on top of #182 — NOT YET IN THE MANIFESTS
+## 14z-185 — THE M21 FREEZE (donovan-m25 / huitzil-m32 / pyron-m26 / merged-m21, mark M21): #182 and #159 LANDED
+
+**WHAT THE FREEZE CARRIES.** The two fixes ruled and staged earlier in this sitting, the entries below: #182
+(Phobos's air-block guard window) and then #159 (the victim facing rule 5), applied in that order from
+`build/manifest/staged/182_designA.patch` and `159_designA.patch`, which the freeze commit retires. The
+maintainer, asked what "do #182" meant once only the freeze remained: *"Run the M21 freeze now"*. The mark
+`M20` -> `M21` (`version_text` in the three tenant manifests).
+
+**THE DELTA, MEASURED** (`build/agent185/m21/deltas_measurer.txt`, measurer returns; `tools/attribute_patch_delta.py`):
+- donovan-m25: 2 INSERTED ops, the site at `PRG:0x01886C` and its 28-byte thunk at `0x41A3C0`. Every other op
+  SAME, 0 EDIT; 17 program words; members `vm3j.03d`, `vsw.41` plus the mark's `vsw.33m`/`vsw.37m`.
+- huitzil-m32: 2 INSERTED ops, the site at `PRG:0x02393A` and its 32-byte thunk at `0x0FE300`. Every other op
+  SAME, 0 EDIT; 19 program words; members `vm3j.03d`, `vm3j.04d` plus the mark.
+- pyron-m26: 0 program words; the mark only.
+- merged-m21: both thunks and sites INSERTED (Donovan's at `0x3FFD60`, Phobos's at `0x4718D0`); 400 ops SAME,
+  325 MOVED and 109 RELOCATED by the placement shift. All 7,414 relocation targets are content-identical.
+  The one EDIT the tool reports is an alignment pairing of two equal-length jumps (`build/agent185/m21/edit_check.txt`).
+  The program (`aacc7e71`) is byte-identical to the 14z-185 probe built with both staged rows.
+- the stock twin MOVED (`67fdc4de` -> `a3910ded`): #159's row is stage 6 and not `only_variant_slot`. It adds
+  2 INSERTED ops and moves members `vm3j.03d`, `vm3j.04d`.
+- The stage-4 image is UNCHANGED (`2fa7c2f1`).
+
+**WHAT MOVED IN THE GATES, BY DESIGN** (rule-checker runs 2026-09-28-389..391, 391 OK):
+- `tests/audit_chains174.sh`: Phobos's two air-block Reflect Wall rows DIFF -> IDENT, no other row.
+- `tests/audit_facing_rule.sh`: ours writes native's `1 1 1 0 0 0` from the thunk, and x 755 on both legs.
+  Its control `rule5-resolved`, which cannot fire on a fixed build, is replaced by `rule5-flipped`.
+- `tests/audit_facing_sweep.sh`: all 32 legs SAME.
+- `tests/audit_air_gc_legacy.sh` unchanged.
+- The suite on the four WIDE sets, carried from M20 (`build/rc185/suite/`): self-frozen tenant `.sha1` moved,
+  donovan 9 of 16 (first differing frames 2748-3183, in-match) and huitzil 3 of 17 (5587, 10282, 13249);
+  pyron 0 of 18. The stock and stage-4 masked legacy legs pass 14/14 each.
+
+**THE FREEZE BATTERY AND THE TIER** (rule-checker runs 2026-09-28-392..405; 401, 404 and the freeze check 405 OK;
+STATE 14z-185 row (13)). The emulator battery raised 11 reds in prereq/fbneo/mame and 1 in MiSTer. The legacy
+oracle, the lag budget, the pass overrun, the walker ghost, the FBNeo legacy oracle, the dual-track and the WIDE
+profile PASS. Each red was re-run on M20, where it passed, and then attributed:
+- THE PLACEMENT SHIFT (26 Pyron regions +0x40, one Huitzil region +0x20, the relocated walker +0x40) moved:
+  - Pyron's hitbox base in `tests/expected/roster_pairings/bases.tsv`, re-derived from the image's own table;
+  - the Pyron PCs of `audit_throw_registration`, `audit_df_modes`, `audit_df_field_readers_live` and
+    `audit_reaction_class_live`;
+  - `test_mister_prg_window`'s `first_addr` and `max`, every counter unchanged.
+- THE BUILD ROW alone moved in `audit_column_flash` and `audit_phobos_dmg_residual`.
+- #159 moved:
+  - `audit_move_parity` (donovan_3 events 6-14) and `audit_move_parity_attribution`, whose tool's hand seed for
+    #159 was retired: the seeded tool reads the displacement with #182 alone and not with #159 alone;
+  - `audit_pyron_ring`'s mash stream, which now agrees merged vs solo for the whole run (the gate re-stated;
+    mechanism not measured);
+  - one arcade replay's defense reads (`110_don_arcade_mash`, from f8394).
+
+Every re-freeze was verified, and every declared control mode FAILs. The freeze-cadence tier's static pins
+moved with the same placement: `test_pointer_flow` (a new `merged-m21` baseline), `test_escape_triage`,
+`test_latch_readers`, `test_df_field_readers` and `test_reaction_classes`. Every moved address was attributed
+by `build/rc185/tierreds/attr_placement.py`, and pointer-flow's WEAK count -1 is the M19 straddle long
+leaving the class. Four tier reds were ours and are fixed:
+- two gates' FOLLOWS lacked `tools/build_fingerprint.py`;
+- the fork commit needed its `PATCH_NAMES` entry;
+- patch 0037 carried a git signature;
+- `test_mister_sdram_census`'s cap was 3600 against a measured ~2,400 s, so it goes to 7200 by the HEADROOM
+  rule.
+
+## 14z-185 — #159: the victim facing rule 5 (Design A), RULED AND STAGED for M21 on top of #182 — LANDED at the M21 freeze (the entry above)
 
 **THE DEFECT.** An attack record's `+0xE` is the victim's facing rule, resolved into the victim's `+0x5D` at every
 contact. vs2's resolver (`0x1717E`) handles rule 5 (by the attacker's x-velocity sign, branch `0x171D6`); vsavj's
@@ -30,7 +90,7 @@ A, stage for M21 (Recommended)"*. Rule-checker runs 2026-09-25-361..371 (369, 37
 rule-5 records (`0xCA1CA`, `0xCA1EA`, `0xD17C2`, `0xD1822`), a fighter as the rule-5 attacker, Donovan on the P2
 side, FBNeo and MiSTer, and the combination with #182's row (the M21 freeze battery).
 
-## 14z-185 — #182: Phobos's air-block guard window (Design A), RULED AND STAGED for M21 — NOT YET IN THE MANIFESTS
+## 14z-185 — #182: Phobos's air-block guard window (Design A), RULED AND STAGED for M21 — LANDED at the M21 freeze (the entry above)
 
 **THE DEFECT.** vs2's block entry (`0x022480`) sends fighter id 0x10 to `0x0224C4`, which opens the guard
 window `+0x158` := 0x0E (and `+0x1AB` := 0x0E) BEFORE the airborne test; vsavj's block entry (`0x02393A`),

@@ -1,0 +1,12 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/rc185/attr/refusal_freeze.log	bdafac39385f4d8fcdec7ef82127b2e3a268c895
+build/rc185/attr/laneA_status.txt	3cc23a71ad45ee4f3708b7c34206629d6954a419
+build/rc185/attr/events_diff.txt	482ef0b0a1753c759bf483665220af2d3981df25
+build/rc185/attr/tool.diff	3793bfb1a8137fa1d01cfcca29fe9229e3215483
+build/rc185/attr/commands.txt	acc662813a1556961f758d3ea34c94b1db5e143f
+build/rc185/attr/got_seeded.tsv	96814f76f157529bcc932e16033c6bd979d87aca
+build/rc185/attr/got_noseed.tsv	3e6e407995fd842fdeefc74ba668936fe94209d9
+build/rc185/attr/frozen_m20.tsv	0130e40bd4e52b8c60ce3c6d490fefda871d991b
+build/rc185/attr/diff_frozen_vs_noseed.txt	33c9a5bc80f2f84854802a2b6c7b892ec413039a
+build/agent185/t159/maintainer_159_probe.txt	1edebba19c6ebfbce3ca7500534c93e4eb1b2d07
+build/agent185/maintainer_queue_14z185.txt	f9c2fddc07915e32cc785c52e1597bb7b668b1db

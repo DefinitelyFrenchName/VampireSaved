@@ -1,0 +1,21 @@
+decision	expectation
+subject	M21 freeze: re-freeze chains174.tsv (#182's two air-block rows IDENT), facing_rule.tsv (ours = native's rule-5 values, control rule5-flipped) and facing_sweep.tsv (32/32 SAME) on build/m3b_merged29 (re-checked after 389)
+session	-
+model	rule-checker@163e4ce9cf7b
+claim	Re-freeze three expectations on the M21 merged build (build/m3b_merged29, program aacc7e71, deltas_measurer.txt), which the maintainer's "Run the M21 freeze now" (maintainer_queue_14z185.txt) makes the build under test. The two ruled fixes it carries are #182 (maintainer_14z185.txt, "Design A") and #159 (maintainer_159_probe.txt, "Design A, stage for M21 (Recommended)").
+WHAT MOVES, read from each gate's plain run on M21 before any freeze.
+- tests/expected/chains174.tsv (audit_chains174.log, whose line 6 names the build under test, build/m3b_merged29, program aacc7e71; the gate prints it since chains174_gate.diff): exactly two rows move — a KEEP run's rows diffed WHOLE against the frozen file (c174_fulldiff.txt) differ in those two rows and no other. The two Phobos air-block Reflect Wall events, huitzil_c174 events 6 and 7, go from DIFF at +30 / +32 to IDENT. Every other row is unchanged, the entry and pin-landing checks read ok, and the five in-gate controls FIRED.
+- tests/expected/facing_rule.tsv (audit_facing_rule.log): the six ours rows at 0x01886C writing 04 become rows at 0x3FFD76 (the merged thunk, a placement address) writing 01 01 01 00 00 00. These are native's rule-5 values at the same frames (the frozen native rows). Ours' x at 3946 goes from 835 to 755, native's value. The static, legacy and native rows and ours' 0x01884E caller rows are unchanged.
+- The gate's rule5-resolved control (native's values over ours) read DEAD on M21, as the #159 staging predicted. It is replaced by rule5-flipped (facing_rule_gate.diff): ours' facing values with bit 0 flipped must differ. Its in-gate check builds the table with ours flipped and compares it against the FROZEN rows. Before the re-freeze that firing is trivial (the frozen rows are still the defect) and is not cited as evidence: the evidence is the verify run and the CONTROL=rule5-flipped mode run after the re-freeze. branch-planted FIRED (it reads vsavj's static image, not the frozen ours rows). The header now states the fixed state and keeps the defect as history.
+- tests/expected/facing_sweep.tsv (audit_facing_sweep2.log, sweep_keep/got.tsv, sweep_keep/diff.txt): all 32 legs read SAME (native and build write sequences identical). The diff against the frozen file is exactly the 32 leg rows and 32 build5 rows. No geom, masks, rule5, node or nodes-nofit row moves. The in-gate controls flip and perturb FIRED. Header: facing_sweep_gate.diff.
+- audit_air_gc_legacy (the legacy control for #182) PASSes on M21 unchanged (audit_air_gc_legacy.log).
+HOW each re-freeze is made: FREEZE=1 with each gate's own writer, then a plain verify run, then every CONTROL=<name> mode run against the new file. (The modes run before the freeze, facing_*_ctl_*.log, fail trivially against the old defect rows and are not evidence.) chains174.tsv's kept header gets a dated note of the move.
+NOT TESTED, named:
+- The captures the maintainer read were of the single-fix probes (Probe A for #182, phobos_air_gc_sheet; probe 159 for #159, summon_sheet), not of M21. M21's merged program equals the 14z-185 probe built with both staged rows (build/agent185/merged_182_159.log:88 and build/agent185/m21/b_merged.log both read "build fingerprint: aacc7e71..."), which no capture showed.
+- The rest of the M21 freeze battery (the legacy oracle on M21, the suite, FBNeo, MiSTer) is not part of these re-freezes and has not run yet.
+- Donovan's other rule-5 records (0xCA1CA/0xCA1EA, 0xD17C2/0xD1822) and P2-side tenants are outside audit_facing_rule (its header says so).
+- Other air guard cancels, beyond Lei-Lei's and Zabel's legacy control and Phobos's two rig events, are not covered.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
