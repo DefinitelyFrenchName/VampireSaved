@@ -7,7 +7,8 @@
 #   the poke cannot reach (the #147 mechanism) and whether PLAY differences follow.
 # HOW: per row (Phobos, Pyron, the donovan-self negative control) three MAME legs: POKED
 #   (R,R + the id poke), REAL (the decoded cursor path, no poke) and SELF (real path plus
-#   the same-id poke, expected empty); work RAM dumped at fixed frames, every differing
+#   the same-id poke, expected empty), each built by the rig's own rpl_for and pokes_for
+#   (read out of tests/audit_move_parity.sh; #155) and asserted to be the committed rig; work RAM dumped at fixed frames, every differing
 #   P1-block byte classed LATCHED / TRANSIENT / PLAY; identity asserted on every leg from
 #   the id at 1600 and the cursor cell at 1290; controls diff a leg against itself and drop
 #   the last cursor move.
@@ -15,10 +16,11 @@
 #   block empty pre-match; the self-diff control comes out empty against a non-empty
 #   expectation and fails, the short cursor path confirms another character and fails
 #   identity.
-# FOLLOWS: emu/mame-patches/ tests/expected/forced_pick_fidelity.tsv tests/lua/replay.lua
-#   tests/replays/ tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh
+# FOLLOWS: emu/mame-patches/ tests/audit_move_parity.sh tests/expected/forced_pick_fidelity.tsv
+#   tests/lua/replay.lua tests/replays/ tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: same-leg — the poked leg diffed against ITSELF yields no latched offset, and that empty set must fail the frozen non-empty expectation (in-gate: the first row's poked leg is diffed against itself and must come out empty where the frozen set is not; mode: every row is diffed leg-against-itself and the comparison FAILs)
+# MUST-FIRE: known-bad: retyped-prologue — the pre-#155 hand-typed prologue (Victor's two P2 moves) over the rig's events must differ from the committed rig, and section 1b must FAIL on it: the legs are the rig's, not a replica that can drift (in-gate: the first row's rig retyped and compared; mode: every leg is built from the retyped prologue and section 1b FAILs) (GitHub #155, 14z-185)
 # MUST-FIRE: known-bad: wrong-cursor — a real-cursor leg whose path is one move short confirms ANOTHER character, and the gate's identity assertion on the real leg must FAIL (in-gate: one extra leg with the last cursor move dropped; mode: every real leg runs one move short and the identity assertions FAIL)
 #
 # WHY. tests/audit_move_parity.sh (#136) forces Phobos and Pyron on its NATIVE
@@ -35,8 +37,11 @@
 # field list is how +0x3C2 was missed.
 #
 # WHAT IT MEASURES, per row of tests/expected/forced_pick_fidelity.tsv:
-#   POKED  — the #136 rig's own native leg: prologue R,R (Donovan's confirm)
-#            + the id poke, + the rig's level and RNG pins (pokes_for, copied).
+#   POKED  — the #136 rig's native leg as it was before 14z-160: prologue R,R
+#            (Donovan's confirm) + the id poke, + the rig's level and RNG pins.
+#            Every leg is built by the rig's own functions (rpl_for, pokes_for,
+#            read out of tests/audit_move_parity.sh) from the committed rig files:
+#            only the P1 cursor path and the id poke are this gate's (#155).
 #   REAL   — the same rig with a REAL cursor path to the tenant (decoded from
 #            vsav2's TABLE B by tools/select_wheel.py: from the default cell
 #            Phobos is L,L,L and Pyron R,R,R) and NO id poke.
@@ -54,7 +59,8 @@
 # The frozen expectation is the LATCHED set per row (offsets into the P1
 # block) and whether PLAY differences follow (the latch's behavioural
 # consequence). P2's block and the globals are reported, not frozen: P2 is
-# Victor by the same R,R on every leg, so its block is the instrument's own
+# Demitri by the rig's same `R` on every leg (Victor by R,R until #155 took
+# the prologue from the rig, 14z-185), so its block is the instrument's own
 # negative control and is asserted EMPTY pre-match.
 #
 # IDENTITY is asserted on every leg, never assumed: RAM:$FF8782 (the id at
@@ -67,7 +73,7 @@
 # NOTHING — if it does, the poke mechanism itself perturbs state and every
 # LATCHED finding above is suspect.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [ROWS="huitzil pyron donovan-self"] [JOBS=6] [FREEZE=1] [MEASURE=1 [WHOLE=1]] tests/audit_forced_pick_fidelity.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [ROWS="huitzil pyron donovan-self"] [JOBS=6] [FREEZE=1] [MEASURE=1 [WHOLE=1]] [KEEP=<dir>] tests/audit_forced_pick_fidelity.sh
 #   emulator tier, MAME, native vsav2 only (no build). MEASURE=1 prints every
 #   differing offset with its values and classification and freezes nothing.
 set -eu
@@ -85,15 +91,14 @@ ROWS="${ROWS:-huitzil pyron donovan-self}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 [ -f "$ROMDIR/vsav2.zip" ] || { echo "SKIP: no vsav2.zip in $ROMDIR"; exit 0; }
 case "$CONTROL" in
-    ""|same-leg|wrong-cursor) ;;
+    ""|same-leg|wrong-cursor|retyped-prologue) ;;
     *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;;
 esac
 if [ "${FREEZE:-0}" != 1 ] && [ "${MEASURE:-0}" != 1 ]; then
     [ -f "$EXPECT" ] || { echo "FAIL: no frozen expectation at $EXPECT (FREEZE=1 to create it)"; exit 1; }
 fi
 
-W="$(mktemp -d)"
-trap 'rm -rf "$W"' EXIT INT TERM
+if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM; fi
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
@@ -123,36 +128,51 @@ DSPEC="$(for f in $DFRAMES; do printf '%s:ff8000-ff8c00;' "$f"; done)"
 [ "${WHOLE:-0}" = 1 ] && [ "${MEASURE:-0}" = 1 ] \
     && DSPEC="$DSPEC$(for f in $DFRAMES; do printf '%s:ff0000-ff7fff;%s:ff8c00-ffffff;' "$f" "$f"; done)"
 
+# THE RIG'S OWN LEG BUILDERS (GitHub #155, 14z-185). The legs used to be a hand-typed REPLICA of the
+# #136 rig's native leg — its select prologue re-typed here and its pins "per pokes_for's protocol" —
+# and nothing held the replica to the rig. It drifted: the rig's P2 became Demitri at 14z-165, one
+# cursor move (`1104-1106 p2=R`), while the replica kept Victor's two (`1104`, `1164`). The rig's own
+# functions are now read out of the gate that runs the rig and used as they are: rpl_for (the
+# committed rig replay, P1's prologue cursor moves replaced by a leg's path) and pokes_for (the rig's
+# pokes plus its level and RNG pins, native leg). Section 1b asserts the REAL leg's replay IS the
+# committed rig's, cut at END; the known-bad control retyped-prologue proves that assertion catches
+# the old replica.
+eval "$(sed -n '/^pokes_for() {/,/^}/p; /^rpl_for() {/,/^}/p' "$REPO/tests/audit_move_parity.sh")"
+command -v pokes_for > /dev/null && command -v rpl_for > /dev/null \
+    || { echo "FAIL: pokes_for / rpl_for not found in tests/audit_move_parity.sh"; exit 1; }
+# the pre-#155 hand-typed prologue (Victor's two P2 moves) over the rig's events — the known-bad
+retyped() {  # retyped <rig.rpl> <path>
+    printf '300-305 sys=C1\n420-425 sys=C2\n800-803 sys=S1\n940-943 sys=S2\n'
+    _t=1100; for _m in $2; do printf '%d-%d p1=%s\n' $_t $((_t + 2)) "$_m"; _t=$((_t + 60)); done
+    printf '1104-1106 p2=R\n1164-1166 p2=R\n1300-1302 p1=1\n1360-1362 p2=1\n'
+    awk '!/^#/ && !/^(300|420|800|940|1100|1160|1104|1164|1300|1360)-/ && $1+0 >= 2000' "$1"
+}
+cut_end() {  # cut_end <rpl>: the replay's lines up to END (comments dropped), then the END wait
+    awk -v end=$END '!/^#/ { split($1, a, "-"); if (a[1]+0 <= end) print }' "$1"; printf '%d wait\n' $END
+}
+
 # ONE function writes a leg's replay and pokes, so what the controls perturb
 # is what the gate asserts ([VSP-181]).
-#   mkleg <row> <leg: poked|real|self> <name> [short]
+#   mkleg <row> <leg: poked|real|self|alt> <name> [short]
 mkleg() {
     _row="$1"; _leg="$2"; _name="$3"; _short="${4:-}"
     _id="$(row_id "$_row")"; _rig="$(row_rig "$_row")"
     _j="$REPO/tests/replays/naming/$_rig.json"; _r="$REPO/tests/replays/naming/$_rig.rpl"
     mkdir -p "$W/$_name"
-    _path="R R"                                   # the rig's own prologue: Donovan's confirm
+    _path="R R"                                   # the poked leg's prologue: Donovan's confirm
     [ "$_leg" = poked ] || _path="$(row_path "$_row")"
     [ "$_leg" = alt ] && _path="$(row_alt "$_row")"
     if [ "$_short" = short ]; then _path="$(echo $_path | awk '{$NF=""; print}')"; fi
-    {
-        printf '300-305 sys=C1\n420-425 sys=C2\n800-803 sys=S1\n940-943 sys=S2\n'
-        _t=1100; for _m in $_path; do printf '%d-%d p1=%s\n' $_t $((_t + 2)) "$_m"; _t=$((_t + 60)); done
-        printf '1104-1106 p2=R\n1164-1166 p2=R\n1300-1302 p1=1\n1360-1362 p2=1\n'
-        # the rig's events up to END (its prologue lines are the ones above, re-emitted)
-        awk -v end=$END '!/^#/ && !/^(300|420|800|940|1100|1160|1104|1164|1300|1360)-/ && $1+0 >= 2000 { split($1, a, "-"); if (a[1]+0 <= end) print }' "$_r"
-        printf '%d wait\n' $END
-    } > "$W/$_name/leg.rpl"
-    # pokes: the rig's own (id pokes stripped, re-added below), the level pin
-    # from 2000 and the RNG pin from the match anchor — pokes_for's protocol.
-    _base="$(python3 -c "
-import json; p=[x for x in json.load(open('$_j'))['pokes'] if ':ff8782:' not in x and int(x.split(':')[0]) <= $END]; print(';'.join(p))")"
-    _lvl="$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$END)))")"
-    _rng="$(python3 -c "print(';'.join(f'{f}:ff80d4:0000' for f in range(2363,$END)))")"
+    OURS_PATH_leg="$_path"
+    if [ "$CONTROL" = retyped-prologue ]; then retyped "$_r" "$_path" > "$W/$_name/full.rpl"
+    else ( rpl_for leg "$_r" ours "$W/$_name/full.rpl" ); fi   # a subshell: rpl_for sets _leg/_path/_r/_t
+    cut_end "$W/$_name/full.rpl" > "$W/$_name/leg.rpl"
+    # pokes: the rig's (pokes_for, native leg), cut at END, id pokes stripped and re-added below
+    _base="$(pokes_for leg "$_j" native "$END" | tr ';' '\n' | awk -F: -v end=$END 'NF == 3 && $2 != "ff8782" && $1+0 <= end' | paste -sd ';' -)"
     _pick="$(python3 -c "print(';'.join(f'{f}:ff8782:$_id' for f in (1400,1450,1500)))")"
     case "$_leg" in
-        real|alt) printf '%s;%s;%s' "$_base" "$_lvl" "$_rng" ;;
-        *)    printf '%s;%s;%s;%s' "$_pick" "$_base" "$_lvl" "$_rng" ;;
+        real|alt) printf '%s' "$_base" ;;
+        *)        printf '%s;%s' "$_pick" "$_base" ;;
     esac > "$W/$_name/pokes"
 }
 
@@ -279,6 +299,25 @@ done
 [ "$fail" = 0 ] || { echo "FAIL: a leg did not run"; exit 1; }
 ok "$n legs ran"
 
+echo "== 1b. the legs ARE the rig's (#155): each REAL leg's replay equals the committed rig replay, cut at $END"
+for row in $ROWS; do
+    cut_end "$REPO/tests/replays/naming/$(row_rig "$row").rpl" > "$W/rig_$row.rpl"
+    if cmp -s "$W/${row}_real/leg.rpl" "$W/rig_$row.rpl"; then
+        ok "$row: the REAL leg's replay is tests/replays/naming/$(row_rig "$row").rpl, cut at $END"
+    else
+        bad "$row: the REAL leg's replay differs from the committed rig's — the legs drifted from the rig (#155):"
+        diff "$W/rig_$row.rpl" "$W/${row}_real/leg.rpl" | head -6 | sed 's/^/        /'
+    fi
+    # the pokes: REAL carries no id poke, and POKED is exactly the three pick pokes over REAL's
+    tr ';' '\n' < "$W/${row}_real/pokes" | command grep -q ':ff8782:' \
+        && bad "$row: the REAL leg carries an id poke" || ok "$row: the REAL leg carries no id poke"
+    _p3="$(tr ';' '\n' < "$W/${row}_poked/pokes" | command grep -c ':ff8782:' || true)"
+    _rest="$(tr ';' '\n' < "$W/${row}_poked/pokes" | command grep -v ':ff8782:' | paste -sd ';' -)"
+    [ "$_p3" = 3 ] && [ "$_rest" = "$(cat "$W/${row}_real/pokes")" ] \
+        && ok "$row: the POKED leg is the REAL leg's pokes plus the three id pokes" \
+        || bad "$row: the POKED leg's pokes are not the REAL leg's plus the id pokes ($_p3 id pokes)"
+done
+
 echo "== 2. identity on every leg, the P2 block empty pre-match, and the LATCHED set per row"
 : > "$W/got.tsv"
 for row in $ROWS; do
@@ -293,7 +332,7 @@ for row in $ROWS; do
     p2pre="$(printf '%s' "$line" | cut -f5)"; idn="$(printf '%s' "$line" | cut -f6)"
     selfl="$(printf '%s' "$self" | cut -f1)"; selfidn="$(printf '%s' "$self" | cut -f6)"
     case "$idn $selfidn" in *MISMATCH*) bad "$row: identity — $idn / $selfidn";; *) ok "$row: identity — $idn";; esac
-    [ "$p2pre" = "-" ] && ok "$row: P2 block (Victor on every leg) has no pre-match difference" \
+    [ "$p2pre" = "-" ] && ok "$row: P2 block (Demitri on every leg) has no pre-match difference" \
                        || bad "$row: P2 block differs pre-match at $p2pre — the instrument's negative control is not clean"
     [ "$selfl" = "-" ] && ok "$row: REAL vs SELF latches nothing (the poke mechanism itself is inert)" \
                        || bad "$row: REAL vs SELF latches $selfl — the poke mechanism perturbs state"
@@ -342,5 +381,14 @@ case "$wc_" in
     *MISMATCH*) echo "CONTROL FIRED: wrong-cursor — the one-move-short real leg reads $wc_" ;;
     *) echo "CONTROL DEAD: wrong-cursor — the one-move-short real leg still reads the tenant: $wc_"; fail=1 ;;
 esac
+# retyped-prologue: the pre-#155 hand-typed prologue over the first row's rig must NOT equal the rig
+# — proving section 1b sees the replica's drift (the in-gate form; the mode retypes every leg)
+retyped "$REPO/tests/replays/naming/$(row_rig "$CTLROW").rpl" "$(row_path "$CTLROW")" > "$W/ctl_retyped.full"
+cut_end "$W/ctl_retyped.full" > "$W/ctl_retyped.rpl"
+if cmp -s "$W/ctl_retyped.rpl" "$W/rig_$CTLROW.rpl"; then
+    echo "CONTROL DEAD: retyped-prologue — the hand-typed replica equals the rig, so section 1b could not see a drift"; fail=1
+else
+    echo "CONTROL FIRED: retyped-prologue — the hand-typed replica differs from the rig in $(diff "$W/rig_$CTLROW.rpl" "$W/ctl_retyped.rpl" | command grep -c '^[<>]') line(s): $(diff "$W/rig_$CTLROW.rpl" "$W/ctl_retyped.rpl" | command grep '^[<>]' | head -2 | tr '\n' ' ')"
+fi
 
 if [ "$fail" = 0 ]; then echo "PASS: audit_forced_pick_fidelity"; else echo "FAIL: audit_forced_pick_fidelity"; exit 1; fi

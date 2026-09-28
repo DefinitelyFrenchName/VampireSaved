@@ -6012,3 +6012,30 @@ thread had described ("native lands, ours whiffs"). #178 asked for the contact; 
 the kick connects alike on both legs and the thread's claim does not reproduce. Rule: a row whose purpose is a
 HIT comparison needs a reader that REFUSES a leg with no hit (the gate's CONTACT rule, control `contact-emptied`),
 and a no-hit SAME is never evidence that two legs agree on the move — only that neither reached it.
+
+## A GATE'S HAND-TYPED COPY OF A RIG DRIFTS SILENTLY — build the legs with the rig's own functions and ASSERT they are the rig (paid: #155, found by the rule-checker 14z-163, the drift measured 14z-185)
+
+`tests/audit_forced_pick_fidelity.sh` re-typed the #136 rig's select prologue and
+its pins "per pokes_for's protocol" instead of taking them from the rig. Its
+expectation header asked for a re-freeze "after a change to the naming rigs'
+prologue" — an obligation, not a control — and when the rig's P2 became Demitri
+at 14z-165 (one cursor move, `1104-1106 p2=R`), the replica kept Victor's two
+(`1104`, `1164`) for twenty sessions. Nothing failed: every leg of the gate used
+the same replica, so its comparisons stayed self-consistent while measuring a rig
+that no longer existed.
+
+**The rule:** a gate that measures ANOTHER gate's rig builds its legs with that
+rig's own functions (here `rpl_for` and `pokes_for`, read out of
+`tests/audit_move_parity.sh` with `sed` and `eval`), and asserts the result: the
+REAL leg's replay IS the committed rig replay, the REAL leg carries no id poke,
+the POKED leg is the REAL leg's pokes plus the three id pokes. A known-bad control
+(`retyped-prologue`: the old hand-typed prologue) proves the assertion sees a
+drift. Re-measured on the derived legs, the frozen rows held.
+
+**And the trap paid building it:** a shell function read out of another script
+SHARES THE CALLER'S VARIABLES. `rpl_for` assigns `_leg`, `_path`, `_r` and `_t`,
+and calling it directly from `mkleg` overwrote `mkleg`'s own `_leg` — every REAL
+leg silently received the pick pokes, and the gate still PASSED (the poke over
+the same id is inert, which is exactly what the SELF leg measures). Call a
+borrowed function in a subshell `( ... )` or through `$( ... )`; the pokes
+assertion above is what would have caught it.

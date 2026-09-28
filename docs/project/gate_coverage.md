@@ -2488,7 +2488,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **WHAT:** whether a forced-pick native leg is faithful: the #136 rig's poked pick of a tenant on native vsav2, diffed over the WHOLE P1 fighter block against a REAL cursor pick of the same tenant, freezing the offsets the confirm LATCHED for the cursor character that the poke cannot reach (the #147 mechanism) and whether PLAY differences follow.
 
-**HOW:** per row (Phobos, Pyron, the donovan-self negative control) three MAME legs: POKED (R,R + the id poke), REAL (the decoded cursor path, no poke) and SELF (real path plus the same-id poke, expected empty); work RAM dumped at fixed frames, every differing P1-block byte classed LATCHED / TRANSIENT / PLAY; identity asserted on every leg from the id at 1600 and the cursor cell at 1290; controls diff a leg against itself and drop the last cursor move.
+**HOW:** per row (Phobos, Pyron, the donovan-self negative control) three MAME legs: POKED (R,R + the id poke), REAL (the decoded cursor path, no poke) and SELF (real path plus the same-id poke, expected empty), each built by the rig's own rpl_for and pokes_for (read out of tests/audit_move_parity.sh; #155) and asserted to be the committed rig; work RAM dumped at fixed frames, every differing P1-block byte classed LATCHED / TRANSIENT / PLAY; identity asserted on every leg from the id at 1600 and the cursor cell at 1290; controls diff a leg against itself and drop the last cursor move.
 
 **EXPECTS:** the frozen LATCHED set per row, SELF empty, donovan-self latching nothing, P2's block empty pre-match; the self-diff control comes out empty against a non-empty expectation and fails, the short cursor path confirms another character and fails identity.
 

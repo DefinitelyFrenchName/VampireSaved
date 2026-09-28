@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-439 entries (47 game / 122 platform / 270 project), counted from the buckets at generation.
+440 entries (47 game / 122 platform / 271 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 47 entries
 
@@ -197,7 +197,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A `read_tap.lua` WRITE LABELLED N IS REPLAY.LUA'S FRAME N+1 — the tap names a write by the counter BEFORE that frame's `frame_done`; `field_trace.lua` and `replay.lua` increment first, then sample (measured 2026-09-27, 14z-184)
 - IN A MAME LUA TAP, `cpu.state["SP"]` IS THE SUPERVISOR STACK — THIS GAME RUNS IN USER MODE, SO A CALLER'S RETURN ADDRESS SITS AT `USP` (paid: 2026-09-28, 14z-185, #176)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 270 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 271 entries
 
 - A VULN ID OF 0 IS NO BOX — a resolver that reads it builds a PHANTOM hurtbox the engine never tests (paid: 14z-182, GitHub #175)
 - A CHAIN ID IN A NAMING EXPECTATION IS IDENTIFIED FROM THE SLOT TABLE, NEVER DESCRIBED IN PROSE (paid: 14z-171, caught 14z-172, GitHub #168)
@@ -469,3 +469,4 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A COVERAGE FINDING READ FROM A GATE'S DESCRIPTION IS NOT A COVERAGE FINDING — read the rigs it runs (paid: 14z-182 filed #177, closed invalid 14z-184)
 - A RIG EVENT'S OUTCOME CAN DEPEND ON ITS ABSOLUTE FRAME — removing or reordering an event moves every later one and can un-enter a measured chain (paid: 14z-184, #174)
 - AN EMPTY SAME IS AGREEMENT ON A WHIFF, NOT A COMPARISON — a contact event must be ASSERTED to hit on both legs (paid: #136's thread, #178, closed 14z-185)
+- A GATE'S HAND-TYPED COPY OF A RIG DRIFTS SILENTLY — build the legs with the rig's own functions and ASSERT they are the rig (paid: #155, found by the rule-checker 14z-163, the drift measured 14z-185)
