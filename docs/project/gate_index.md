@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**394 scripts** — 100 ci_portable, 84 ci_static, 210 emulator-tier (run by name).
+**395 scripts** — 100 ci_portable, 84 ci_static, 211 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -27,7 +27,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 84 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 59 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 60 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -402,6 +402,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/audit_pyron_capture_block.sh` | audit | emulator | MAME, a build dir, ~4 min | PYRON THROWS WITH DEMITRI'S CAPTURE GEOMETRY (measured 14z-131, maintainer-ruled "measure against native vs2 first"). | 14z-131 |
 | `tests/audit_reaction_class_live.sh` | audit | emulator | MAME, a build dir | EVERY WRITE AND READ OF THE VICTIM'S REACTION CLASS (+0x54) OVER THE CORPUS, on pristine vsavj (the whole legacy suite), on our merged build and on native vs2 (the #136 naming parts), frozen (14z-169, the analysis before the class-0x52 fix… | 14z-169 |
 | `tests/audit_rig_opening.sh` | audit | emulator | MAME, a build dir, ~5 s | THE NAMING RIGS' OPENING: the two legs draw DIFFERENT round-start entrances, and the rig no longer samples across the difference (14z-167, rewritten 14z-172 for GitHub #168). | 14z-167 |
+| `tests/audit_rng_draws.sh` | audit | emulator | MAME, FBNeo, a build dir, ~1 min | THE ENGINE RNG'S DRAWS, BY CALLER: ours against native vs2 for the three tenants, and legacy content on ours against pristine vsavj (GitHub #176, 14z-185). | 14z-185 |
 | `tests/audit_shared_wall_push.sh` | audit | emulator | MAME, a build dir, ~20 s | WHO KEEPS A SHARED CORNER: the two engines' push-apart differs when both fighters are clamped against the same wall edge in the same frame (14z-184, GitHub #179). | 14z-184 |
 | `tests/audit_tenant_throw_geometry.sh` | audit | emulator | MAME, a build dir, ~12 min | PHOBOS'S THREE THROWS, OURS vs NATIVE VS2 (14z-131, maintainer-directed 2026-09-04). | 14z-131 |
 | `tests/audit_throw_registration.sh` | audit | emulator | MAME, a build dir | THE HIT-REGISTRATION PAIR AT A TENANT THROW, ours vs native, frozen: on every tenant throw contact native's throw code writes the engine's (attacker, victim) registration pair right before the generic hit stager awards meter. | 14z-166 |

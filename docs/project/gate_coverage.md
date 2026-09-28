@@ -13,7 +13,7 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**394 of 394 gates described.**
+**395 of 395 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
@@ -24,7 +24,7 @@ first sentence) is `gate_index.md`.
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 84 | 84 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 59 | 59 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 60 | 60 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -2330,7 +2330,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 ## character-data
 
-the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 59 of 59 described.
+the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 60 of 60 described.
 
 ### `audit_air_gc_legacy.sh` — audit, emulator
 
@@ -2587,6 +2587,14 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 **HOW:** two field-trace runs in parallel on MAME (huitzil_5 on both legs), the round-start frame read from $FF812D on both, every part's first pin read from its committed schedule JSON, a pre-pin sample that must differ, post-pin x and seq that must agree (the pin frame itself excluded — x is the poked field), and a sample carrying an x the pin never wrote; controls swap in native's opening rows and regenerate the rig with the round-start floor removed.
 
 **EXPECTS:** the frozen rows equal, the pins after 2545, legs differing pre-pin and agreeing after; the swapped opening fails, the floor-less rig pins at 2370 and fails.
+
+### `audit_rng_draws.sh` — audit, emulator
+
+**WHAT:** #176's question. The parity gates pin the RNG word every frame, so a port defect in how the RNG ADVANCES would be reset away on both legs; this gate seeds the RNG once and lets it run free, then compares the DRAWS. The facts it rests on (docs/game/engine_internals.md "`0000` IS THE RNG'S FIXED POINT"): the routine (vsavj 0x014E8A, vs2 0x01357E, byte-identical) is deterministic, so consecutive draws form a chain; the object loop draws once per pass on both engines; vsavj's motion trackers arm their step timeout with a random draw where vs2's write a constant 16, and the tenants' tracker calls run vsavj's trackers on ours — ruled host behaviour, recorded, no ticket (maintainer, 2026-09-28: "Host behaviour, no ticket").
+
+**HOW:** tests/lua/rng_draws.lua reads every draw at the routine's first instruction with its caller (the return address at USP; the game runs in user mode) and 48 longs of the active stack, on MAME, frames 2600 to the rig's end, the RNG poked to 5a5a over 2363..2599 and then FREE, the level pinned to 6 throughout. Legs: Lei-Lei vs Demitri (audit_air_gc_legacy's rig, real picks) on pristine vsavj and on ours; each tenant's audit_chains174 rig on native vs2 and on ours. tools/rng_draws.py reads them: (a) legacy ours equals pristine vsavj draw for draw; (b) a draw whose stack holds a return address into the tenant's code is keyed by the innermost one (ours mapped to native by the placement map), and a key on both legs counts alike; (c) the object loop counts alike; (e) every leg's draws form an unbroken generator chain, so none was missed; (f) legacy ours has no tenant frame; (g) each tenant's tracker-call block — declared, and verified against the vs2 image as jsr's into vs2's motion helpers — is on the stack of no native draw and of some ours draw.
+
+**EXPECTS:** the reader's CHECK PASS; its rows equal tests/expected/rng_draws.tsv (the one-leg keys and their counts are FROZEN there: the tenants' tracker blocks on ours, vs2 engine code the port copied on native); all five controls fail.
 
 ### `audit_shared_wall_push.sh` — audit, emulator
 

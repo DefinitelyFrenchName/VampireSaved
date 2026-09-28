@@ -1,0 +1,19 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent185/t176/probe.sh	e4bfa3d973721af0c0d0d2358ad057d9205c1bb8
+build/agent185/t176/cmp.py	bc37102e9c7c7ba643ba1f45f4037d9c5bd9c485
+build/agent185/t176/draws.py	ae20471008d3564343edd53cde474b09318a8728
+build/agent185/t176/callers.sh	24b5b2b4f5771c09c23105e6e423e38c42d20090
+build/agent185/t176/rng_callers.lua	736dfca428eb36e94088f04bbfc7b93786eb1c2a
+build/agent185/t176/seed0000.log	ab5cf869578321c44a233f6fbd5c8467ec8c3fa8
+build/agent185/t176/seed0000_values.log	6c1300501999032ae38834a035923d8496a574b2
+build/agent185/t176/seed5a5a.log	8cfd0eabf41a50823f5cb94586ff1e1c66a2126f
+build/agent185/t176/callers.log	311723c1d292c953a5381d8edd4f94aa5789d973
+build/agent185/t176/tenant_caller.log	d4552a42a6797401c39f42d55dd229ebf11c564d
+build/agent185/t176/rng_routine_vsavj.txt	c4ccac01e349ac2204e7779604b37c1d27789883
+build/agent185/t176/rng_routine_vsav2.txt	e26037fb5d1376532d9cac773e003fda1736757f
+build/agent185/t176/caller_0220a0_vsavj.txt	e794ac3c37e5c7cea466e93cf73838291b024d50
+build/agent185/t176/caller_020a50_vsav2.txt	64df811af0925121a96bf35d34435e8a0418a431
+build/agent185/t176/caller_02a52e_vsavj.txt	a3a55b77bc5915f83cc8f44b1a8aee54f8445e0d
+build/agent185/t176/caller_02a52e_ours.txt	009345b6a7c82c591aaf10a37d7b5853a4b3cc97
+build/agent185/t176/caller_42bae2_ours.txt	f6e950cc277bc1cb9e5835812bf8f4a85be87f6a
+build/agent185/t176/caller_08a904_vsav2.txt	f5937adb03d3d0b196d118e0ecffff3864372f1d

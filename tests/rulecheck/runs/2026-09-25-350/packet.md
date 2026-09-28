@@ -1,0 +1,69 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: #176: build tests/audit_rng_draws.sh (RNG draws by call path, ours vs native, seeded then free); report 0000 as the RNG's fixed point and the tenants' use of the host effect-channel machine (re-checked after 349)
+Claim (the working agent's sentence): Recommend to the maintainer, for #176:
+(A) a new MAME gate, tests/audit_rng_draws.sh, as designed below;
+(B) two findings.
+(B1) 0000, the value the parity gates pin over their windows (gate_rng_pins.txt: `ff80d4:0000` in audit_move_parity, audit_chains174, test_don_immortal_native and audit_df_moves, each over its own frame range), is the RNG's FIXED POINT. The routine is byte-identical on vsavj 0x014E8A and vs2 0x01357E (rng_routine_*.txt): the new high byte is the high byte of 3*W, and the low byte adds it. So 0000 maps to 0000. Poked 2363..2599, then free, the word read 0000 on every traced frame of all five traced legs (analyse.log section 1). Under those pins every draw returns 0.
+(B2) The tenants' own code calls the HOST's fighter effect-channel machine, which draws a random delay; vs2's machine calls no RNG. The evidence:
+- ours: Phobos's code (native addresses 0x55238..0x552B6, the same instructions) jsr to vsavj's channel entries (caller_block_ours.txt against caller_block_vsav2.txt);
+- the RNG calls in each machine's code (machine_rng_calls.txt, absolute-long jsr only; a pc-relative call cannot reach the RNG from there): vsav2 0x29000-0x2A000 has none; vsavj 0x29D00-0x2AD00 has two, 0x2A528 and 0x2A53E. Measured as well: no native draw has Phobos's channel block (0x55238..0x552B6) as its innermost tenant frame (mediated.log, native keys);
+- on ours this adds draws that native never makes: 265, 88 and 63 on the three chains174 rigs (mediated.log, ours-only keys);
+- vsavj runs the same machine for legacy characters: 107 draws on Lei-Lei, vsavj and ours alike.
+NO conclusion is drawn about what a player sees. The channels' visible effect is not captured or measured.
+Every figure below is from fresh runs of the scripts in the packet; each log names its traces' sha1s.
+Setup: seed 5a5a poked 2363..2599, then free; level pinned to 06. The rigs are audit_air_gc_legacy's (Lei-Lei vs Demitri) and audit_chains174's (Phobos, Donovan and Pyron vs Demitri).
+(1) On the five field-traced legs (Lei-Lei on vsavj, vs2 and ours; Phobos native and ours):
+- no frame without a draw;
+- the chain of words resolves on every frame (analyse.log section 2).
+Donovan and Pyron were read by the tap only.
+(2) Legacy on ours against pristine vsavj: the tap matches draw for draw, on frame, caller and data: 2125 draws (section 4). Its control, one caller relabelled, fails it (analyse_relabel.log).
+(3) The tap's draws labelled N equal the chain's count at N+1 on every compared frame of all five legs (section 3). Its control, one tap line dropped, fails it (analyse_drop.log).
+(4) Each draw's active stack is dumped (48 longs from USP; the tap with the dump equals the tap without it, draw for draw on all nine legs: r2_r3_same.log). mediated.py finds each return address into the tenant's code: a long inside the tenant's regions whose preceding bytes in that leg's image are a call instruction. The regions are ours' placement regions, and native's vs2 extract regions. Each draw is keyed by the innermost such address, with ours mapped to native. The results:
+- keys on BOTH legs count alike: Phobos 0x8a904 3/3; Donovan 0x28a42 4/4, 0x28ad8 2/2, 0x28af2 2/2; Pyron none (mediated.log).
+- the ours-only keys are the host channel machine's callers above.
+- the native-only keys (Phobos 0x8b99a 65, 0x2347c 2, 0x237a4 2; Pyron 0x8b99a 28) are vs2 ENGINE code inside regions the port copied. Legacy Lei-Lei on vs2 draws through the same addresses: 0x8b99a 25, 0x2347c 3.
+- legacy on ours draws through no tenant region: 0.
+- controls: the placement map shifted by 2 fails the check (mediated_plant-map.log); ours' first draw of a common key dropped fails it (mediated_plant-strip.log).
+(5) The object loop draws alike on every rig: 1969, 4240, 1439 and 1588 (analyse.log section 5).
+THE GATE (A), not built:
+- rigs: the three chains174 tenant rigs and the Lei-Lei legacy rig, seeded 5a5a at 2363..2599, then free;
+- instrument: rng_callers.lua promoted to tests/lua/rng_draws.lua, with the stack dump;
+- checks, from the scripts above:
+(a) legacy on ours equals pristine vsavj, draw for draw;
+(b) keys on both legs count alike;
+(c) the object loop's count is equal;
+(d) the one-leg keys are FROZEN with their counts, so a change fails;
+(e) the tap equals the chain per frame;
+(f) legacy on ours draws through no tenant region;
+- controls: the five plants above, each as a must-fire mode;
+- the frozen inventory (d) carries the host-machine rows. If the maintainer later rules the machine's draws should follow vs2, those rows move, by a ruling.
+NOT tested:
+- any seed but 5a5a and 0000, and any seed frame but 2600;
+- other rigs (the naming corpus); FBNeo and MiSTer;
+- whether a tenant's conditional draw could count differently after the streams part with no port defect (measured only where the common keys matched);
+- a call made by a jmp or a pushed return, which the call-instruction check does not see, and a register-indirect call to the RNG from vs2's machine, which the code search does not see;
+- stack deeper than 48 longs;
+- what the channel machine's random delay does on screen.
+The consequence for the parity gates' existing verdicts of every draw returning 0 is not measured.
+Artifacts (read every one, in full):
+  - build/agent185/t176/probe.sh
+  - build/agent185/t176/callers.sh
+  - build/agent185/t176/callers_t.sh
+  - build/agent185/t176/rng_callers.lua
+  - build/agent185/t176/analyse.py
+  - build/agent185/t176/analyse.log
+  - build/agent185/t176/analyse_relabel.log
+  - build/agent185/t176/analyse_drop.log
+  - build/agent185/t176/mediated.py
+  - build/agent185/t176/mediated.log
+  - build/agent185/t176/mediated_plant-map.log
+  - build/agent185/t176/mediated_plant-strip.log
+  - build/agent185/t176/r2_r3_same.log
+  - build/agent185/t176/gate_rng_pins.txt
+  - build/agent185/t176/rng_routine_vsavj.txt
+  - build/agent185/t176/rng_routine_vsav2.txt
+  - build/agent185/t176/machine_rng_calls.txt
+  - build/agent185/t176/caller_block_vsav2.txt
+  - build/agent185/t176/caller_block_ours.txt

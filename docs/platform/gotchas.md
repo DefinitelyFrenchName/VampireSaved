@@ -2969,3 +2969,12 @@ BYTE store's tap data word carries the other byte unspecified (merge by the
 `mask`), and a Lua POKE is sampled by the trace but never logged by the tap
 (the nine disagreeing frames were exactly the rig's nine in-window position
 pins).
+
+## IN A MAME LUA TAP, `cpu.state["SP"]` IS THE SUPERVISOR STACK — THIS GAME RUNS IN USER MODE, SO A CALLER'S RETURN ADDRESS SITS AT `USP` (paid: 2026-09-28, 14z-185, #176)
+
+The first caller-attributing RNG tap read the long at `SP` inside the RNG routine and got `0x00FF02DC`, a work-RAM
+address, for every draw. At that moment SR read `4` (bit 13, the supervisor bit, clear): the game's code runs in
+USER mode, and MAME's `SP` state register is then the supervisor stack (`0xFF7FF6`), not the one the `jsr` pushed
+onto. The long at `USP` was the real caller (`0x0220A0`, the object loop). Rule: pick the ACTIVE stack by SR bit
+13 — `(SR & 0x2000) ? SP : USP` — before reading anything off it (`tests/lua/rng_draws.lua`). A tell that you
+read the wrong one: every "return address" is the same RAM address.

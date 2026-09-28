@@ -632,6 +632,64 @@ and every hit frame. **The counts themselves follow the RNG path** (HP with no m
 each game's own draws, 7 pinned), so a frozen count holds only under the pin it was measured
 with. [M: `tests/test_don_immortal_native.sh` §0-§5 and its `unpinned-rng` control; 14z-158]
 
+**`0000` IS THE RNG'S FIXED POINT — a pin of `0000` makes every draw return 0 (measured 14z-185, #176).**
+The routine (vsavj `PRG:0x014E8A`, vs2 `0x01357E`, byte-identical) steps the word W at `RAM:$FF80D4-D5`
+as: the new high byte = the high byte of `3*W` (16-bit), the low byte += that new high byte, and it
+returns the low byte. From `0000` both bytes stay 0, forever. Measured: with `0000` poked on every frame
+2363..2599 and the RNG then left free, the word read `0000` on every frame to the end of the part on all five
+legs (Lei-Lei vs Demitri on vsavj, vs2 and ours; Phobos vs Demitri on native vs2 and ours; 1,600 to
+3,400 frames). With `5a5a` in the same window it moves on every frame. **So the parity gates' per-frame `0000`
+pin does not merely equalise the RNG: every draw returns 0, and every branch the RNG decides takes its
+zero path on both legs** (the object loop above, for one, always updates P1 first). **Because the routine is deterministic,
+the number of draws between two frames is the number of steps from one frame's word to the next's**,
+and a read tap at the routine's first instruction gives the same counts, each draw with its caller
+(the return address on the ACTIVE stack: the game runs in USER mode, SR bit 13 clear, so it sits at
+USP, not at MAME's `SP`). The two instruments agree on every frame. Seeded `5a5a` at 2600 and then free:
+- **Legacy content on ours against pristine vsavj:** identical draw for draw, with the same frame, caller and value
+  (2,126 draws each).
+- **The two engines on legacy content (Lei-Lei):** they part at 2610. The object loop draws alike on
+  both (1,969 each). vsavj's motion-tracker step code (`jsr` at `PRG:0x02A528`, the tracker's
+  timeout picked from the table at `0x02A55A`) draws 107 times, with no vs2 caller drawing in its place.
+- **The three tenants' chains174 rigs, native against ours:** the object loop draws alike on each
+  (4,240, 1,439 and 1,588 for Phobos, Donovan and Pyron). Phobos's own ported draw draws 3 times on
+  each leg (ours `0x42BAE2` = native `0x08A904` by the placement map, the same instructions apart
+  from the relocated `jsr`). Donovan and Pyron draw nothing from their own code. vsavj's
+  motion-tracker step code draws 265, 88 and 63 times on ours.
+**The motion trackers' timeout is where the two engines differ, and the tenants run the host's.** The
+draws are the command-input MOTION TRACKERS' (the command-input section: helpers `lea <steps>(pc),a3;
+bra <dispatcher>`, trackers `+0x308..+0x338`, "+4 timeout counter"). When a tracker accepts a step,
+vsavj arms its `+4` counter with a random pick from a 32-entry table at `0x02A55A`: 14 on half the
+entries, 15 to 19 on the rest, mean 15.34 (reached by `bsr` from `0x029F90`; `jsr` to the RNG at
+`0x02A528`, store at `0x02A532`). vs2's same code (`0x02987E`) arms it with a constant 16
+(`move.b #$10,$4(a4)`) and still carries the same table, unread there. The counter drops by 1 per pass
+(`subq.b #1,$4(a4)` at vsavj `0x029F96`, vs2 `0x0292F0`), and at 0 the tracker is cleared. Both games
+also have a fixed-12 arm (vsavj `0x02A552`, vs2 `0x029898`). Measured (the timeout writes, seed
+`5a5a`):
+- Lei-Lei on vsavj: 107 random arms (14×53, 15×13, 16×8, 17×13, 18×13, 19×7).
+- Lei-Lei on vs2: 102 arms, all 16.
+- Lei-Lei on ours: identical to vsavj.
+- Phobos on native vs2: 252 arms, all 16.
+- Phobos on ours: 265 random arms.
+The RNG word is read only by the routine itself during play, on both games; an unfiltered tap sees
+the boot's readers, so it would see others. The port routes a tenant's tracker calls (Phobos: the block
+at vs2 `0x5522E..0x552AC`, one `lea $3xx(a6),a4; jsr` per tracker) to vsavj's helpers, or through three
+shims into vsavj's dispatcher `0x029F4A`. So on ours a tenant's step timeouts are vsavj's random ones,
+as every original character's are on vsavj, where native vs2 used 16. No native draw passes through a
+tenant's tracker block (a raw stack scan, the block shown live on native). Draws through the tenants'
+OTHER ported code match native (Phobos's `0x08A904` 3/3; Donovan's calls into the ported `x028122`
+copy 4/2/2), found by scanning each draw's stack for return addresses into ported code.
+**Community cross-check (the maintainer pointed to it, 14z-185):** seesaawiki vswiki "【共通】コマンド成立条件"
+says 「入力猶予が規定値＋乱数パターンで決まる」 (the input leniency is a base value plus a random pattern).
+Its "AA数値" table is 14 to 19/60 s, weighted 16/32, 4/32, 4/32, 3/32, 3/32, 2/32 — the same values and
+weights as the table at `0x02A55A`. Its own measured gap between two operations is 10 to 15 frames,
+with the same weights ("ノーマルの数値"). That is our counter minus 4: a constant offset, and by the
+community-data rule a validation. The page says nothing about vs2. **What the timeout does to a
+player's inputs is not captured here:** a first gap-sweep capture did not isolate it, because it could not
+tell which special came out.
+[M: `tests/audit_rng_draws.sh` (the draws by caller, the tracker blocks); the tracker timeout writes and the
+unfiltered RNG readers are probes, build/agent185/t176 (`tracker_delay.log`, `rng_readers.log`), 14z-185]
+s #176's]
+
 ~~**THE TWO ENGINES DO NOT TICK AT THE SAME VIDEO-FRAME RATE, and it is not a
 per-character fact.**~~ **RETRACTED 14z-158 (#135) — it measured the PLAY MODE (vs2's default
 TURBO against vsavj's NORMAL), not the engine; the paragraph above replaces it. Kept verbatim:**
@@ -3912,7 +3970,11 @@ ordinary movement and are in the history (`game/gotchas.md` "A MODE-gated
 symptom needs the MODE PROVEN ENTERED"). Poke a stock in (`$FF8509`) and
 assert `$FF802E` = 1 before measuring anything below.
 
-**The DF effect-channel machine** [M: 14z-68v on the downgrade path, and
+~~**The DF effect-channel machine**~~ **— NAME RETRACTED 14z-185: these structs and this dispatcher are
+the command-input MOTION TRACKERS** (the section "Command-input / motion-tracker subsystem": the same
+dispatcher `0x029F4A`, step tables inside its `0x2A610-0x2A780`, and `+0x12A` is the direction code), measured
+14z-185 by their `+4` timeout writes. Whether the writers listed below as "only while DF is up" are specific to
+Dark Force was not re-measured. The original text, kept: [M: 14z-68v on the downgrade path, and
 the same machine H's form drives, 14z-69c]: the fighter's effect channels
 `+0x318 / +0x320 / +0x330 / +0x340` (the effect-system section) run scripts
 through a small state machine — per-frame clear path `0x029F60` /
@@ -3997,7 +4059,9 @@ noise.
   H's placed port of vs2's handler. That handler is a `+0x07`-keyed
   sub-state machine which calls **`0x2A7E0`** — the DF effect-channel
   script machine (the `+0x318/+0x320/+0x330` channels decoded in
-  14z-68v) — and then drives him to **seq 0x18**, where he stays for the
+  14z-68v) *(14z-185: the "effect channels" name is RETRACTED, above — those structs are the motion
+  trackers; at vsavj `PRG:0x02A7E0` the opcode view reads `rts`; what this handler reaches there was not
+  re-read)* — and then drives him to **seq 0x18**, where he stays for the
   whole mode. The channels are what draw the trailing copies; the mode
   is what recolours row 0x0A.
 

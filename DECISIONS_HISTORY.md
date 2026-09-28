@@ -27,6 +27,23 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-28 (14z-185) — #176: the RNG-draw gate is built; the tenants' random motion-input window is host behaviour, recorded, no ticket; the parity gates' `0000` RNG pin (the RNG's fixed point) gets a ticket
+
+**The questions (AskUserQuestion), verbatim in substance, after rule-checker runs 2026-09-25-348..353 (353 OK):**
+(1) Build `tests/audit_rng_draws.sh`, which checks: legacy content on ours equals pristine vsavj draw for draw; draws through the tenants' ported code match native; the object loop's counts are equal; the one-leg keys are frozen; and the two draw counters agree. Options: "Build it (Recommended)", "Build it, more rigs", "Not yet".
+(2) Two findings: `0000`, the parity gates' RNG pin, is the RNG's fixed point; and on ours the tenants run vsavj's random delay where native vs2 does not. Options: "Record both, ticket each (Recommended)"; "Record; (2) is host behaviour" (described as "Both go in the docs. (2) is accepted as host-engine behaviour (vanilla wins ties); only (1) gets a ticket."); "Capture (2) now".
+**The maintainer:** *"Build it (Recommended)"*. On (2): *"I lean 2 but I need more information and context: what is this delay, when is it applied, how does it affect vanilla characters. When you say VS2 never call the RNG, have you checked the same characters in both games (asking as VS2 could never call the RNG in the same way vsavj does but call the RNG a different way)"*.
+**What was measured to answer** (`build/agent185/t176/`, rule-checker runs 354..360, the last OK). The delay is the command-input motion trackers' `+4` timeout. On each accepted step, vsavj arms it with a random pick from a 32-entry table (14 on half the entries, 15..19 on the rest). vs2's same code arms it with a constant 16 and still carries the table, unread. The values written, measured on the same character on both games, and on Phobos:
+- Lei-Lei: random on vsavj, all 16 on vs2, identical to vsavj on ours.
+- Phobos: all 16 on native vs2, random on ours.
+An unfiltered tap shows the RNG word read only by the routine itself during play, and its positive control is the boot's readers. The earlier name "effect-channel machine" was wrong and is retracted. Then the maintainer, unprompted: *"https://seesaawiki.jp/vswiki/d/%A1%DA%B6%A6%C4%CC%A1%DB%A5%B3%A5%DE%A5%F3%A5%C9%C0%AE%CE%A9%BE%F2%B7%EF confirms there is a variable input window, which I didn't know about and feels very counter intuitive but this aligns with your findings (also that wiki is a goldmine of reverse engineering, even moreso than mizuumi depending on the topics)"*. The page's "AA数値" table has the ROM table's values and weights; its measured gaps are the same minus 4.
+**The decision re-asked**, with options: "Host behaviour, no ticket" ("Your lean as offered earlier: record it as host behaviour (vanilla wins ties, by analogy), change nothing. Only the RNG-pin finding gets a ticket."), "Host behaviour + ticket", "Tenants get vs2's 16", "Capture first".
+**The maintainer:** *"Host behaviour, no ticket"*.
+
+**What it means.** The tenants keep the host's random motion-input window, as every original character has on vsavj; no byte changes and no ticket follows. The fact is recorded in `docs/game/engine_internals.md` ("`0000` IS THE RNG'S FIXED POINT") and `docs/game/atlas/ram.md` (the tracker row). `tests/audit_rng_draws.sh` is built with the tenants' tracker draws in its frozen one-leg inventory. The parity gates' `0000` pin gets its own ticket: whether they should pin a non-zero seed is a question for later, and nothing about them changes now.
+
+---
+
 ## Ruled 2026-09-27 (14z-185) — `audit_chains174`'s three poke read-back rows OBSERVES, with a landing check and a three-field pins-ignored control; the seven one-off close checkers let go
 
 **Carried in `docs/NEXT_SESSION.md` item 5 (from the 14z-183b and 14z-184 closes), never a STATE "Decisions pending" entry.** The item as it stood, verbatim: *"`tests/expected/poke_readback.tsv` carries three UNCLASSIFIED rows for `audit_chains174` (x at `ff8410`, stock at `ff8509`, P2 HP at `ff8850` — the rig's own pins, sampled by the gate); the table's header makes each class the maintainer's. The same three fields of `audit_move_parity`, compared by the same `tools/move_parity.py`, were ruled OBSERVES in 14z-181. Also the close-time checkers of `build/agent184/close/` (`run_checks.sh`, `home_texts.py`, `retraction_classes.py`, `retraction_base.py`) — promote or let go, as for 14z-183b's three."* The maintainer's instruction on item 5 this sitting: *"Look at each first"*.

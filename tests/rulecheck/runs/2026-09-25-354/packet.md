@@ -1,0 +1,39 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: #176 finding (2): the delay is the motion-input window (random 14-19 on vsavj, fixed 16 on vs2); the tenants run vsavj's; re-ask the decision with a recommendation
+Claim (the working agent's sentence): Answer the maintainer's questions on #176 finding (2), and re-ask the decision with a recommendation. The questions were: "what is this delay, when is it applied, how does it affect vanilla characters"; "have you checked the same characters in both games (... VS2 could ... call the RNG a different way)".
+THE ANSWER. The "channel machine" named in the earlier finding is the command-input MOTION TRACKER system (engine_internals_1318_1360.txt, the 14z-48 section). Its helpers "lea <step-table>(pc),a3; bra <tracker-dispatcher>" are vsavj 0x29DC2-0x29F42, and its dispatcher kinds include vsavj 0x29F4A and vs2 0x292A4. Its trackers are 8-byte structs at +0x308..+0x338, with "+4 timeout counter". The earlier finding's name "effect-channel" was wrong and will be corrected in the docs.
+The delay is that timeout: the window the player has to enter a motion's next step.
+- When it is armed: each time a tracker accepts a step (addq.b #2,$1(a4)).
+- How it runs: the counter is decremented per pass (subq.b #1,$4(a4)); at 0 the tracker is cleared (clr.b (a4)).
+- vsavj arms it with table[rand&31] from 0x2A55A (tracker_vsavj_window.txt). vs2's same code arms it with the constant move.b #$10,$4(a4) (tracker_vsav2_window.txt).
+- The table is 16/32 of 14, 4/32 each of 15 and 16, 3/32 each of 17 and 18, 2/32 of 19; mean 15.344. vs2 still carries the same table, unread by that code (window_table.txt).
+MEASURED on the same character on both games, and on Phobos (tracker_delay.sh, tracker_delay.py, tracker_delay.log). These are the values written to P1's tracker timeout bytes from frame 2600, seed 5a5a:
+- Lei-Lei vsavj: 107 writes at the random site, 14x53 15x13 16x8 17x13 18x13 19x7.
+- Lei-Lei vs2: 102 writes, all 16.
+- Lei-Lei ours: identical to vsavj (the same tap sha1).
+- Phobos native: 252 writes, all 16.
+- Phobos ours: 265 writes at the random site, 14..19.
+An UNFILTERED read tap on the RNG word shows only the routine's own three reads, on Lei-Lei vs2 (0x01357E/8A/92) and on vsavj (0x014E8A/96/9E). So neither game reads the RNG any other way.
+So: on vsavj every character's motion windows are random, 14 half the time and up to 19. vs2 made them a fixed 16 for every character. Ours keeps vsavj's random window for the original characters (bit-identical, as the superset requires) and gives the tenants the same random window, where native vs2 gave them 16.
+THE DECISION RE-ASKED (a gameplay-feel question; it is the maintainer's):
+- keep the host's random window for the tenants, as the original characters have on vsavj (vanilla wins ties, the maintainer's standing principle), and record it;
+- or give the tenants vs2's fixed 16 (their native feel), which a port change would do only for the tenants' trackers.
+Recommendation: keep it, record it, and ticket finding (1) (the parity gates' 0000 pin is the RNG's fixed point), as the maintainer leaned.
+NOT tested:
+- whether a player can feel a 14-19 window against 16;
+- trackers other than the ones these rigs used;
+- P2's trackers;
+- the second random site 0x2A53E, which did not fire on these rigs;
+- the writers 0x29FD6 and 0x29330, which are reported but not read here;
+- turbo speed, where a frame can hold two passes.
+Artifacts (read every one, in full):
+  - build/agent185/t176/engine_internals_1318_1360.txt
+  - build/agent185/t176/tracker_vsavj_window.txt
+  - build/agent185/t176/tracker_vsav2_window.txt
+  - build/agent185/t176/window_table.txt
+  - build/agent185/t176/tracker_delay.sh
+  - build/agent185/t176/tracker_delay.py
+  - build/agent185/t176/tracker_delay.log
+  - build/agent185/t176/vsavj_entries.txt

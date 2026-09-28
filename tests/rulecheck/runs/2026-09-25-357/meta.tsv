@@ -1,0 +1,48 @@
+decision	recommendation
+subject	#176 finding (2): the delay is the motion trackers' timeout (random 14-19 on vsavj, fixed 16 on vs2), cross-checked against seesaawiki; answer as facts and re-ask (re-checked after 356)
+session	14z-185
+model	rule-checker@163e4ce9cf7b
+claim	Answer the maintainer's questions on #176 finding (2) as facts, and re-ask the decision without concluding anything about feel. The maintainer's words (maintainer_176.txt): "I lean 2 but I need more information and context: what is this delay, when is it applied, how does it affect vanilla characters. When you say VS2 never call the RNG, have you checked the same characters in both games ...". "2" is the option "Record; (2) is host behaviour".
+WHAT IT IS. The earlier finding (claim_353.txt, its (B2)) named the draws' caller "the HOST's channel machine" at 0x2A52E (callers.log: 02a52e, the return address of the draws). The instruction after that return is the store at 0x2A532 (tracker_vsavj_window.txt), and 0x2A532 is the writer of the trackers' +4 byte in tracker_delay.log. So that "channel machine" is the command-input MOTION TRACKER system (engine_internals_1318_1360.txt), and the earlier name "effect-channel" was wrong; it will be corrected in the docs. The helpers "lea <step-table>(pc),a3; bra <tracker-dispatcher>" are vsavj 0x29DC2-0x29F42 (vsavj_entries.txt); the trackers are 8-byte structs, "+4 timeout counter".
+The delay is that timeout. By the 14z-48 code reading, it is the "+4 timeout counter" of a tracker, armed when the tracker accepts a step and cleared-on-zero. What it does to a player's inputs is NOT captured (below).
+- The counter is decremented at vsavj 0x29F96 and vs2 0x292F0, both subq.b #1,$4(a4) (tracker_countdown.txt).
+- On a step, vsavj's code reaches 0x2A524 (bsr from 0x29F90) and arms the counter with table[rand&31] from 0x2A55A (tracker_vsavj_window.txt). vs2's same code arms it with move.b #$10,$4(a4), a constant 16 (tracker_vsav2_window.txt).
+- The table is 16/32 of 14, 4/32 each of 15 and 16, 3/32 each of 17 and 18, 2/32 of 19; mean 15.344. vs2 still carries the same table, unread by that code (window_table.txt).
+- Both games also have a fixed-12 arm (vsavj 0x2A552, vs2 0x29898). It did not fire in these runs, and the second random site 0x2A53E did not either.
+MEASURED (tracker_delay.sh/.py/.log): the values written to P1's tracker timeout bytes from frame 2600, seed 5a5a.
+- Lei-Lei on vsavj: 107 random arms, 14x53 15x13 16x8 17x13 18x13 19x7.
+- Lei-Lei on vs2: 102 arms, all 16.
+- Lei-Lei on ours: identical to vsavj (the same tap sha1). Of the original characters, only Lei-Lei was measured here.
+- Phobos on native vs2: 252 arms, all 16.
+- Phobos on ours: 265 random arms, 14..19.
+Every reader of the RNG word ($FF80D4-D5), tapped unfiltered, is only the routine's own three reads on both games, in these legs:
+- from 2600 on Lei-Lei, vsav2 and vsavj (tracker_delay.log);
+- from 2600 on Phobos, native and ours, in a tap run over the whole run (rng_readers.sh, rng_readers.log). Before 2600 that same tap also caught the boot readers 0x000D32 and 0x000D36 (2 each), which shows it sees readers outside the routine. So vs2 does not reach randomness another way at this point: its code writes a constant there.
+Summary, from the code and these measurements:
+- vsavj's arm is random for every character; vs2's is a constant 16 for every character (the code).
+- Ours matched vsavj on Lei-Lei's rig, bit for bit.
+- Ours arms the tenant Phobos with vsavj's random values, where native armed him with 16.
+A COMMUNITY CROSS-CHECK the maintainer pointed to (maintainer_176.txt: "confirms there is a variable input window ... this aligns with your findings"). The seesaawiki vswiki page (wiki_excerpt.txt, decoded from EUC-JP) states "入力猶予が規定値＋乱数パターンで決まる" (the input leniency is a base value plus a random pattern). It gives:
+- a table "AA数値" of 14..19/60 s with probabilities 16/32, 4/32, 4/32, 3/32, 3/32, 2/32. These are the same values and the same weights as the 0x2A55A table.
+- its own "必殺技コマンド受付時間" of 10..15/60 s with the same weights, "ノーマルの数値" (Normal's figures), glossed as the gap left between two operations ("各操作の間に10F空けても成立する").
+- the note that the AA figures are "おそらく間違い" (probably wrong): "実測では16〜19Fでは出せない" (measured: impossible with 16-19F).
+The page's measured gap is the counter minus 4, a constant offset that is not measured here. The page says nothing about vs2.
+NO CONCLUSION ABOUT FEEL. One capture was attempted and did not isolate the window: a special came out at every gap, and the detector does not say which special (gapsweep.sh, gapsweep.py, gapsweep.log, gapsweep_note.txt).
+THE DECISION RE-ASKED (the maintainer's):
+(a) record it as host behaviour, the maintainer's lean. This changes no byte: it keeps what the build does today. The standing principle "vanilla wins ties" (state_vanilla_wins_ties.txt) speaks of a console port against arcade vsav, so here it applies by analogy only.
+(b) give the tenants vs2's fixed 16. This would change the tenants' tracker code. It would need a working capture and the usual measurement before any byte moves.
+(c) first build a capture that isolates the window, then decide.
+The recommendation is (a), because it moves nothing and keeps (b) open as a ticket.
+NOT tested:
+- what the timeout does to a player's inputs (the wiki's counter-minus-4 gap is theirs, not measured here), and whether a player can feel 14-19 against 16 (no capture);
+- original characters other than Lei-Lei;
+- P2's trackers;
+- trackers these rigs did not arm;
+- turbo speed;
+- seeds other than 5a5a;
+- other RNG words or timers used elsewhere in either game, which were not searched.
+The Phobos "ours" legs run ours' cursor path: the prologue's p1 inputs at 1100-1280 are rewritten, as the parity gates do (tracker_delay.sh, rng_readers.sh). The Lei-Lei legs run leilei.vsavj.rpl (vsavj, ours) and leilei.vsav2.rpl (vs2), byte-identical files (replay_sha.txt). Their pokes: the level pin ff8116:06 from 2000; the seed ff80d4:5a5a at 2363..2599; and the position pins ff8410:0228 / ff8810:02d8 at 2570, 2990 and 3410 (tracker_delay.sh). The Phobos legs take the chains174 rig's own pokes, the level pin and the same seed.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b

@@ -1,0 +1,16 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent185/t176/probe.sh	e4bfa3d973721af0c0d0d2358ad057d9205c1bb8
+build/agent185/t176/callers.sh	e00b6c08b9f891ed3357140a9a9f1ceb6c2b99c0
+build/agent185/t176/callers_t.sh	f68e4fc841f5d9942f38de137b91c0ebe820e751
+build/agent185/t176/rng_callers.lua	736dfca428eb36e94088f04bbfc7b93786eb1c2a
+build/agent185/t176/analyse.py	3fd3aa1a0e3459a75f6b896c2707624cb9b70baf
+build/agent185/t176/analyse.log	40810a0341b6c9307ad962ae9dc69ab6b80bd0de
+build/agent185/t176/gate_rng_pins.txt	83bf6751ff1deab1764d94af8ab9053bc2304a5a
+build/agent185/t176/rng_routine_vsavj.txt	c4ccac01e349ac2204e7779604b37c1d27789883
+build/agent185/t176/rng_routine_vsav2.txt	e26037fb5d1376532d9cac773e003fda1736757f
+build/agent185/t176/caller_0220a0_vsavj.txt	e794ac3c37e5c7cea466e93cf73838291b024d50
+build/agent185/t176/caller_020a50_vsav2.txt	64df811af0925121a96bf35d34435e8a0418a431
+build/agent185/t176/caller_02a52e_vsavj.txt	a3a55b77bc5915f83cc8f44b1a8aee54f8445e0d
+build/agent185/t176/caller_02a52e_ours.txt	009345b6a7c82c591aaf10a37d7b5853a4b3cc97
+build/agent185/t176/caller_42bae2_ours.txt	f6e950cc277bc1cb9e5835812bf8f4a85be87f6a
+build/agent185/t176/caller_08a904_vsav2.txt	f5937adb03d3d0b196d118e0ecffff3864372f1d

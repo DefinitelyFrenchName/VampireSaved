@@ -35,9 +35,9 @@ prompt files pasted VERBATIM, `record --session`, `resolve` on ONE line. Say so 
       `audit_chains174` for both; then the plan through the rule-checker, then the maintainer.
 2. **`tests/audit_chains174.sh` freezes #182 AS THE DEFECT** (the two air-block rows DIFF). A fix re-freezes
    those two rows by design; everything else in it is IDENT and must stay so.
-3. **Open tickets, the maintainer's to order after #182:** **#174** (its eight attack chains are gated; the
-   28 non-attack never-entered a2 starts remain), **#178** (Hop Kick in Donovan's Dark Force), **#176** (the
-   RNG's advance), **#159**; then #145, #170.
+3. **Open tickets in the maintainer's order (14z-185: "do #182, #176, #174, #159 in that order"):** **#174** (its
+   eight attack chains are gated; the 28 non-attack never-entered a2 starts remain), **#159**; then #145, #170,
+   and #183 (the parity gates' `0000` RNG pin is the RNG's fixed point; opened 14z-185).
 4. **The 14z-184 promise: the gates following the files edited for comments re-run at the next freeze.** The
    frame-label sentence was corrected in `tests/lua/read_tap.lua` and five more instruments (`bp_regs.lua`,
    `qs_sweep.lua`, `qs_table_trace.lua`, `ring_tap.lua`, `unmapped_probe.lua`) and in

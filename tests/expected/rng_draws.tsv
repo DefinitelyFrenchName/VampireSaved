@@ -1,0 +1,58 @@
+# tests/expected/rng_draws.tsv — GitHub #176: the engine RNG's draws by caller (tests/audit_rng_draws.sh; the reader
+# tools/rng_draws.py). Rows: legacy (Lei-Lei draws on vsavj and ours, identical); chain (breaks per leg, 0); tenantless
+# (legacy ours draws with a tenant frame, 0); blockdecl (each tenant's declared tracker-call block, verified against
+# vs2); objloop (native, ours); key (native address, side, native count, ours count — the one-leg keys are FROZEN:
+# ours-only = the tenant's tracker block on vsavj's random-timeout trackers, ruled host behaviour 2026-09-28;
+# native-only = vs2 engine code inside regions the port copied); block (native, ours draws with the block on the stack).
+# Seed 5a5a at 2363..2599, then free; level 6; frames 2600 to each rig's end.
+legacy	leilei	draws	2125	2125	identical
+chain	leilei_vsavj	breaks	0
+chain	leilei_ours	breaks	0
+chain	huitzil_native	breaks	0
+chain	huitzil_ours	breaks	0
+chain	donovan_native	breaks	0
+chain	donovan_ours	breaks	0
+chain	pyron_native	breaks	0
+chain	pyron_ours	breaks	0
+tenantless	leilei_ours	0
+blockdecl	huitzil	10	verified
+blockdecl	donovan	9	verified
+blockdecl	pyron	10	verified
+objloop	huitzil	4240	4240
+key	huitzil	0x02347c	native-only	2	0
+key	huitzil	0x0237a4	native-only	2	0
+key	huitzil	0x055238	ours-only	0	65
+key	huitzil	0x055246	ours-only	0	6
+key	huitzil	0x055254	ours-only	0	68
+key	huitzil	0x055262	ours-only	0	68
+key	huitzil	0x055270	ours-only	0	16
+key	huitzil	0x05527e	ours-only	0	16
+key	huitzil	0x05528c	ours-only	0	10
+key	huitzil	0x0552a8	ours-only	0	8
+key	huitzil	0x0552b6	ours-only	0	8
+key	huitzil	0x08a904	both	3	3
+key	huitzil	0x08b99a	native-only	65	0
+block	huitzil	0	265
+objloop	donovan	1439	1439
+key	donovan	0x028a42	both	4	4
+key	donovan	0x028ad8	both	2	2
+key	donovan	0x028af2	both	2	2
+key	donovan	0x059a2c	ours-only	0	34
+key	donovan	0x059a3a	ours-only	0	2
+key	donovan	0x059a48	ours-only	0	2
+key	donovan	0x059a56	ours-only	0	28
+key	donovan	0x059a64	ours-only	0	2
+key	donovan	0x059a72	ours-only	0	2
+key	donovan	0x059a80	ours-only	0	6
+key	donovan	0x059a8e	ours-only	0	6
+key	donovan	0x059a9c	ours-only	0	6
+block	donovan	0	88
+objloop	pyron	1588	1588
+key	pyron	0x0579cc	ours-only	0	17
+key	pyron	0x0579f6	ours-only	0	2
+key	pyron	0x057a04	ours-only	0	19
+key	pyron	0x057a12	ours-only	0	19
+key	pyron	0x057a3c	ours-only	0	4
+key	pyron	0x057a4a	ours-only	0	2
+key	pyron	0x08b99a	native-only	28	0
+block	pyron	0	63

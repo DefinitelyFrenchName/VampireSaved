@@ -258,7 +258,7 @@ hazards recorded with it:
 | +0x20/+0x21 | anim node timer / node header flags — bit 7 of +0x21 = the FLOAT LICENSE, installed per node from the header long (node stride 0x18; +0xC low 13 bits = shadow-seq id) | [D] |
 | +0x1C0.w | float duration timer (armed 0x78 by the float conversion) | [D] |
 | +0x179 | air-action resource counter (0x10 at load; float start decrements) | [D] |
-| $FF80D4/D5 | the engine RNG state (routine vsavj 0x14E8A) — poke to determinize cross-game comparisons | [D: oracle gate] |
+| $FF80D4/D5 | the engine RNG state (routine vsavj 0x14E8A) — poke to determinize cross-game comparisons. `0000` is its FIXED POINT: from `0000` it never moves, and every draw returns 0 (14z-185, `engine_internals.md` "`0000` IS THE RNG'S FIXED POINT") | [D: oracle gate] [M: 14z-185] |
 | +0x2A/+0x2C (extended block) | registered SHADOW/REFLECTION servant slots (the class-0x0C trio per player; installer 0x8237E) — shared shadow tables 0x2083BC/0x2087CA (row space 0x40E each, hardcoded at 0x823E2/0x823F2), sequence data from 0x208BD8 | [D: 14z-66 FG arc] |
 
 Per-char tables decoded (bank scheme: vs2 = vsavj + (0xD7298-0xBD0FA)):
@@ -285,9 +285,14 @@ Fighter object ($FF8400 P1 / $FF8800 P2):
   live on throw launches).
 - +0x54 seq-related id fields (context-dependent; the effect machine
   reads its object's +0x54 as the EFFECT id).
-- +0x318 / +0x320 / +0x330 / +0x340 — per-fighter effect-channel
-  sub-structs (his handler passes a4 = &fighter+0x3n0 to the channel
-  subs 0x28EE6/0x29124/0x29134/0x2916C-family).
+- +0x300..+0x348 — the command-input MOTION TRACKERS, 8 bytes each (+0 state, +1 step index,
+  +4 timeout counter; `engine_internals.md` "Command-input / motion-tracker subsystem"). On each
+  accepted step vsavj arms +4 with a random 14..19 and vs2 with a constant 16 (14z-185,
+  `engine_internals.md` "`0000` IS THE RNG'S FIXED POINT"). ~~"per-fighter effect-channel
+  sub-structs (his handler passes a4 = &fighter+0x3n0 to the channel subs
+  0x28EE6/0x29124/0x29134/0x2916C-family)"~~ — the name RETRACTED 14z-185: vs2 0x29124/0x29134/0x2916C
+  are motion helpers (the command-input section's vs2 family 0x29114-0x291EC), and the structs are its
+  trackers.
 - +0x382 char id (the per-char dispatch index — the seq-D head and
   the effect stage-2 record installer both read it).
 

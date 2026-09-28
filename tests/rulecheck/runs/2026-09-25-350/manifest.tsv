@@ -1,0 +1,20 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent185/t176/probe.sh	e4bfa3d973721af0c0d0d2358ad057d9205c1bb8
+build/agent185/t176/callers.sh	6b0a624268c7d3f1fb1eeea5b9f6fe1804922520
+build/agent185/t176/callers_t.sh	2cef406780814b12760adb31ad01615e4ef78b3a
+build/agent185/t176/rng_callers.lua	a69d80af757e5485721fa6122ac16d59aaf08a8e
+build/agent185/t176/analyse.py	109962e5e66d7a224b348288c758721d0e8ac376
+build/agent185/t176/analyse.log	a8ad2b5f6634192653fb80e5c34d8b60fca1a29a
+build/agent185/t176/analyse_relabel.log	3a9912806e1cca0fe4f9d82b21dd3209c286510b
+build/agent185/t176/analyse_drop.log	42e45127bf93b678f2af089e9e2a914d33d91548
+build/agent185/t176/mediated.py	0a4cbc041188138df2756e1ec63190648e93f559
+build/agent185/t176/mediated.log	45bb4ee867dc9545a55d4fb8b3c00afe317ed027
+build/agent185/t176/mediated_plant-map.log	088ac250d08bbacd6a80f546e5787001becf2cf6
+build/agent185/t176/mediated_plant-strip.log	dd6c3265784464c829e1ff65d26d6bdfa32668fe
+build/agent185/t176/r2_r3_same.log	c37e36d3c595ba61799720581d2ebf27a6a6c307
+build/agent185/t176/gate_rng_pins.txt	83bf6751ff1deab1764d94af8ab9053bc2304a5a
+build/agent185/t176/rng_routine_vsavj.txt	c4ccac01e349ac2204e7779604b37c1d27789883
+build/agent185/t176/rng_routine_vsav2.txt	e26037fb5d1376532d9cac773e003fda1736757f
+build/agent185/t176/machine_rng_calls.txt	722d63aa567a3a337659818a0b12ecc649386993
+build/agent185/t176/caller_block_vsav2.txt	1b11b99a8fe47908717568fea74c0c218e87caa1
+build/agent185/t176/caller_block_ours.txt	3930fdd0b588a29476e67a91f2ed985dbb661c8e

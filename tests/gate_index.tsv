@@ -368,6 +368,7 @@ tests/audit_throw_registration.sh	character-data
 tests/audit_shared_wall_push.sh	character-data
 tests/audit_chains174.sh	character-data
 tests/audit_air_gc_legacy.sh	character-data
+tests/audit_rng_draws.sh	character-data
 tests/audit_facing_rule.sh	character-data
 tests/audit_rig_opening.sh	character-data
 tests/audit_tick_phase.sh	character-data
