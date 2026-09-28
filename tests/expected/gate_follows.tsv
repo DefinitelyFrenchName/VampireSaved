@@ -34,6 +34,7 @@ declares	audit_empty_tiles
 declares	audit_entrance_draw
 declares	audit_ex_refused
 declares	audit_facing_rule
+declares	audit_facing_sweep
 declares	audit_ff0460_writer
 declares	audit_ff8130_writers
 declares	audit_fg_damage
@@ -75,6 +76,7 @@ declares	audit_qs_voice_wav
 declares	audit_reaction_class_live
 declares	audit_region_movability
 declares	audit_rig_opening
+declares	audit_rng_draws
 declares	audit_roster_pairings
 declares	audit_sdram_bank_load
 declares	audit_shared_wall_push

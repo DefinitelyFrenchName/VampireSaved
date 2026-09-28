@@ -1,0 +1,22 @@
+decision	expectation
+subject	tests/expected/facing_sweep.tsv frozen on merged-m20 (new gate tests/audit_facing_sweep.sh, #159's 32-geometry sweep promoted; re-checked after 373)
+session	14z-185
+model	rule-checker@163e4ce9cf7b
+claim	Freeze tests/expected/facing_sweep.tsv as measured on merged-m20 (build/m3b_merged28, program fingerprint 2dca438d: HANDOFF.md's M20 freeze row names the pair, and the gate now prints the fingerprint it ran, gate_freeze.log:1), and commit the new gate tests/audit_facing_sweep.sh with its reader tools/facing_sweep.py and instrument tests/lua/facing_tap.lua. This promotes the #159 sweep this session ran from build/ into the suite ([VSP-18]).
+WHAT IT FREEZES (facing_sweep_frozen.tsv, 126 rows). There are 32 legs: the donovan_3 rig's Killshread Summon (ES), with P1/P2 x poked over 3790-3800 to 16 separations on each side, each run on native vs2 and on the build.
+- One leg row per geometry: every write to Demitri's +0x5C word as (frame, mask, value), native and build, count and sha; all 32 read DIFF on M20, the #159 defect.
+- One rule5 row per leg: native's rule-5 values in order.
+- One build5 row per leg: the build's last +0x5D value on each of native's rule-5 frames. On M20: 4,4,4,4,4,4 on all 16 side-L legs (1 XOR 5); on side R, 5 at every contact on 12 legs (0 XOR 5), and on 4 legs 5 at the first contact or two and "-" after (no build write on those frames).
+- One node row per native anim node: which vsavj facing rule, computed from native's logged state at each contact, equals native's value at every contact of that node; nodes-nofit 13 of 29.
+THE RUNS (all on this commit's gate, M20 unless named):
+- FREEZE=1 wrote 126 rows (gate_freeze.log).
+- A plain run PASSes with both in-gate controls FIRED: flip ("native's values inverted change the node rows (18 rows)") and perturb ("one build write XORed changes the L_60 row") (gate_plain.log).
+- CONTROL=flip and CONTROL=perturb each FAIL the gate: "CONTROL FIRED: ... the planted read fails the gate" (gate_ctl_flip.log, gate_ctl_perturb.log).
+- BUILD= probe 159: all 32 legs SAME and nodes-nofit 13 of 29, and the gate FAILs against the M20 rows (gate_probe159.log). That is the change the M21 freeze will re-freeze. Probe 159 is the staged row in a copy of donovan.toml (manifest_diff.txt). Its program fingerprint e4d712eb (probe159_build.log; gate_probe159.log:1) equals a build made from the staged patch's own donovan.toml hunk applied to the tracked file: staged_row_build.log shows the apply, the row it added, the builder copy's diff from tools/build_merged.sh (the REPO path and the op-count relax only) and the fingerprint e4d712eb.
+THE NODE TABLE'S INPUTS. They are computed from native's logged state, not executed on vsavj. Two cross-checks were made on the probe_geo legs (build/agent185/t159/probe_geo.sh), whose five geometries are three distinct ones (far repeats base and mirror_far repeats mirror: the same trace sha1s in geo_analysis.log). First, ours' state equalled native's on every input the rules read at every same-frame, same-node contact: 13 lines in pre_check.log, 8 distinct contacts, all on the OUTGOING wave. The return-wave contacts were not compared, because ours' facing differed there, so they landed on other frames. Second, vsavj's negative rule, EXECUTED on ours (both Summon records patched to it), equalled the computed position sign on 30 of 30 contacts (geo_analysis.log), 18 of them distinct. The swept legs' own inputs on ours were not compared.
+THE RULING the gate's header quotes: maintainer_159_probe.txt and the DECISIONS_HISTORY.md #159 entry carry the question and the maintainer's answer, "Design A, stage for M21 (Recommended)", verbatim.
+NOT covered (the gate's header says so): P2 standing only; Donovan as P1 only; the other four rule-5 records; a node STRUCTURE change as a data fix; FBNeo and MiSTer; separations the engine clamps (the far/mirror_far pokes of probe_geo did not move P2).
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b

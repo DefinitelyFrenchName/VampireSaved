@@ -1,0 +1,15 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent185/t159/facing_sweep_frozen.tsv	cc20f565a6eedfea7a8e33d60f734ba0e0f505cd
+build/agent185/t159/gate_freeze.log	38ccd52ba63ddbc76cf9ae5030b0959aae7bd4f3
+build/agent185/t159/gate_plain.log	68037d4e082e30c92c605d410f5e714df0ca9557
+build/agent185/t159/gate_ctl_flip.log	3ed37507124d7a2d8ec9d701d29c9455537aa7d1
+build/agent185/t159/gate_ctl_perturb.log	b58dbbb46562aa04d107923446a6ba462772e1dc
+build/agent185/t159/gate_probe159.log	8044fee9ee2ee5e5edcbd3922d50b335fd48d1b6
+build/agent185/t159/pre_check.py	a0bc7c85103eaf5775df2a4d2541353c93af6f47
+build/agent185/t159/pre_check.log	87b1bf2c1642a29df36e491dd8fb61a834e6fea9
+build/agent185/t159/geo.py	a525a0c87b4851b2725cc7d0ca0ec6bc8a0d4e00
+build/agent185/t159/geo_analysis.log	2a7c0ab7a68b00fff4539c6aadd975f6734be795
+build/agent185/t159/probe_geo.sh	e2dfa92a36e6204028fbe0260882554f0a49253f
+tests/audit_facing_sweep.sh	348d3d81707d5b4b8ea0451761f4a5133e7dcb39
+tools/facing_sweep.py	28a685a9ad2b829ec5cdbb63de59e2ab5b8effef
+tests/lua/facing_tap.lua	6bf7691f9374a0ab830999cb9066016fc70c8935

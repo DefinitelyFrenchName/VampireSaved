@@ -35,6 +35,7 @@ declares	audit_empty_tiles
 declares	audit_entrance_draw
 declares	audit_ex_refused
 declares	audit_facing_rule
+declares	audit_facing_sweep
 declares	audit_ff0460_writer
 declares	audit_ff8130_writers
 declares	audit_fg_damage

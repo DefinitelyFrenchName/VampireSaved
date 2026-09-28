@@ -1,0 +1,46 @@
+decision	recommendation
+subject	#159: fix with Design A (a thunk at vsavj's facing resolver 0x1886C adding vs2's rule 5), measured on a probe first; no per-record or per-node data layout reproduces native (re-checked after 367, every rule input compared)
+session	14z-185
+model	rule-checker@163e4ce9cf7b
+claim	Recommend to the maintainer, for #159 (the maintainer: "do #182, #176, #174, #159 in that order"; the issue left the fix "the maintainer's to schedule", maintainer_159.txt): fix it with DESIGN A, an engine hook that teaches vsavj's facing resolver vs2's rule 5. Measure it on a probe build first, before any shipped byte moves.
+THE TWO RESOLVERS (resolver_vsavj.txt, resolver_vsav2.txt):
+- vsavj's (0x18854) tests rules 2, 3 and 4 and the negative case. Anything else falls through to eor.b d0,$5d(a1); bra.b $188b8 at 0x1886C (6 bytes).
+- vs2's (0x1717E) adds cmpi.b #5 / beq 0x171D6. There, facing := 1 if the attacker's +0x40 (x velocity) is >= 0, else 0, then rts.
+DESIGN A: replace vsavj's 6 bytes at 0x1886C with jmp <thunk>.l. The thunk: cmpi.b #5,d0; bne -> eor.b d0,$5d(a1); jmp $188b8. Rule 5 -> vs2's branch (moveq #0,d0; tst.w $40(a6); bmi; addq.b #1,d0; move.b d0,$5d(a1); rts).
+DESIGN B (data only) is NOT viable on this move. It was tested by EXECUTION on one geometry and by a per-node sweep across 32 geometries.
+- One rule for both records, executed: probe_rules.sh runs OURS on the donovan_3 rig with the Summon's two attack records (ours 0xCA97A, 0xCA99A) patched to each candidate facing rule at boot. The patch goes into the :maincpu region byte and is verified read back through the program space ("PATCH ... before 05 after NN"). vsavj's own resolver then writes the value. rules_exec.py reads those writes at the six contacts (resolver PCs only, attacker $FF9400), against native's 1, 1, 1, 0, 0, 0 (rules_exec.log):
+  - rule 05, the unpatched positive control: 4 at all six, as today;
+  - rule 00: 1 at all six;
+  - rule 01: 0 at all six;
+  - rule 02: 1 at all six (after an intermediate 0);
+  - rule 03: 6 at all six;
+  - rule 04: 1 at all six;
+  - rule 80 (negative): 1, 0, 0, 0, 0, 0.
+- A different rule per anim node (the record each node selects repointed), swept:
+  - probe_sweep.sh runs NATIVE with the Summon at 32 geometries, set by x pokes over 3790-3800. the poked P1-P2 separation is 0x60 to 0x150 in steps of 0x10, with Donovan on the left (L_*) and on the right (R_*, the motion mirrored).
+  - sweep.py reads 37 native legs: the 32, plus probe_geo.sh's five. The far and mirror_far pokes did not move P2; their traces equal base's and mirror's (the same sha1 in geo_analysis.log).
+  - At every rule-5 contact, sweep.py computes what each vsavj rule gives from that contact's state, as resolver_vsavj.txt computes it: rule 0 = the caller's prior write; rule 1 = that value XOR 1; rule 2 = victim +0x0B XOR 1; rule 3 = attacker +0x0A; rule 4 = 1 if P1 x < victim x (on ours the object at -$4BC6(A5) is P1); negative = 1 if attacker x < victim x.
+  - Every one of those inputs (the caller's value, victim +0x0B, attacker +0x0A, P1 x, attacker x, victim x) and the attacker's +0x40 were compared, ours against native, at every same-frame, same-node contact of probe_geo.sh. So was ours' rule-4 object being P1. All were the same on 13 of 13 contacts (pre_check.log). On those legs, ours' negative rule, EXECUTED (RULE=80), equals the computed position sign on 30 of 30 contacts (geo_analysis.log).
+  - A node FITS a rule if the rule equals native on every contact that node took. 13 of the 29 nodes contacted fit NO vsavj rule (sweep_analysis.log). They include 0xDE44C, 0xDE494 and 0xDE4DC, which a per-node layout fitted to the base rig would need. Example, node 0xDE494 (native 0x28A96C):
+    - at L_130 f3885, native wrote 1, where the negative rule and rule 1 give 0 and rule 3 gives 6;
+    - at L_90 f3937, native wrote 0, where rules 0, 2 and 4 give 1.
+  - So no assignment of vsavj's rules to records or nodes reproduces native across these geometries. sweep.py keeps only the writes of vs2's rule-5 store (PC 0x0171E0), so every contact is a rule-5 write by construction. Its last line (222 of 222) only confirms the store wrote the velocity sign.
+WHAT A TOUCHES. Every contact whose rule is not 2, 3, 4 or negative runs the thunk. That is legacy records too: vsavj's reachable legacy records (facing_census_doc.txt) are rule 0 on 1017 of 1085 and rule 1 on 23 (facing_rule_head.txt). On ours, three contacts at 2666-2685 already have their resolver write come from the fall-through 0x1886C (rules_vs_probe.log). For those the thunk does the original eor and returns to the original tail, so the result is the same. It adds a jmp, a compare and a branch per such contact. No legacy record carries rule 5 (vsavj 0 of 1085, facing_rule_head.txt), so the new branch is taken only for tenant records. That census is static, over vsavj's data. It counts the records reachable from walked anim nodes in tables a/a2/b/c and proj, for every legacy id both games carry (facing_census_doc.txt). A record reached any other way is outside it.
+THE MEASUREMENTS BEFORE A BUILD, on a probe (a copy of the manifest with the row):
+- tests/audit_facing_rule.sh: ours must write native's values (1, 1, 1, 0, 0, 0) and move Demitri as native does.
+- the merged legacy oracle: identical to the shipped build on its replays, and the thunk shown to run on legacy content.
+- a capture of the Summon, native / shipped / probe, put before the maintainer.
+- the cycle cost, measured rather than estimated.
+NOT tested:
+- Design A itself (no probe built yet);
+- the four other rule-5 records named in the issue (0xCA1CA, 0xCA1EA, 0xD17C2, 0xD1822), whose effect is unmeasured;
+- rule 5 reached by a fighter rather than a projectile as the attacker;
+- legacy records outside the census's reach (not walked from an anim node), and the patched build itself;
+- P2-side tenants;
+- FBNeo and MiSTer;
+- the cycle cost.
+Design B was measured on this one move only, with P2 standing. For the 32 swept legs, ours' state at each contact (the node and every rule input above) is taken as native's; it was checked only on probe_geo.sh's 13 contacts. A change to the animation's node STRUCTURE (a separate node chain for the return) was not considered, because it is not a data-only change. The probe ran build/m3b_merged28, while the frozen facing_rule.tsv was taken on merged-m18 (its header).
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b

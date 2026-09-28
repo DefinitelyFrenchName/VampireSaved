@@ -27,6 +27,18 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-28 (14z-185) — #159: Design A (vs2's rule-5 branch taught to vsavj's facing resolver), STAGED for M21 on top of #182's patch
+
+**The instruction (14z-185), verbatim:** *"do #182, #176, #174, #159 in that order."*
+
+**The questions, verbatim** (`build/agent185/t159/maintainer_159_probe.txt`): after rule-checker run 369 OK, *"#159: Design A (teach vsavj's facing resolver vs2's rule 5 through one hook) is checked and recommended; no data-only fix can reproduce native. Build it on a probe build now? That means the facing gate, the legacy oracle, a native/shipped/probe capture of the Summon for you, and the cycle cost. Like #182, nothing would be frozen: the change would be staged for M21."*; with the capture sent first, *"I've sent the #159 capture: Killshread Summon (ES) vs Demitri on native vs2, shipped M20 and probe 159 (Design A), same frames, plus a full-size crop of f3924/3935/3946. How does the probe compare?"*; after rule-checker run 371 OK, *"#159: rule Design A as the fix, and stage it for M21 like #182? It would be one hook row in donovan.toml (only Donovan's records carry rule 5), held as build/manifest/staged/159_designA.patch on top of #182's patch, with its op counts measured with both applied. The M21 freeze would apply it after #182's, rebuild, and re-freeze the facing gate (redesigning its native-values control, which can't fire on a fixed build)."*
+
+**The maintainer:** *"Build the probe now (Recommended)"*, *"Probe plays like native"*, *"Design A, stage for M21 (Recommended)"*.
+
+**What it means.** #159 is fixed by ONE `[[site_thunk]]` in `build/manifest/donovan.toml` (`facing_rule5`) at `CPU:$01886C`, vsavj's facing resolver's fall-through (`eor.b d0,$5d(a1); bra.b $188b8`): `cmpi.b #5,d0; beq.s +6; eor.b d0,$5d(a1); rts`, then vs2's rule-5 branch (`0x171D6-0x171E5`) byte for byte. Every other rule that falls through does the original eor and returns. It is STAGED, not in the manifests: `build/manifest/staged/159_designA.patch`, made ON TOP of `182_designA.patch` (both re-freeze `tests/test_tenant_loop.sh`, now 346/626/839, and `tests/test_manifest_merge.sh`, site_thunk (23,18,9),35), applied after it by the M21 freeze, which rebuilds every track (both rows: merged fingerprint `aacc7e71`; this row alone `e4d712eb`, identical to the measured probe) and re-freezes `tests/audit_facing_rule.sh` with its rule5-resolved control redesigned. Measured on probe 159 (`build/agent185/probe159/`): native's 1,1,1,0,0,0 and Demitri's slide to 755; every `+0x5D` write equal to native's at 32 P1-P2 geometries (192 rule-5 contacts); the merged legacy oracle identical to merged-m20 on 53/53 while 1,091 legacy fall-through contacts ran through the thunk; no new zero-pass frame over 44 parts. A data-only fix (Design B) is not viable: over 37 native legs, 13 of the 29 anim nodes the Summon contacted fit no vsavj rule (`build/agent185/t159/sweep_analysis.log`; the 32 geometries gated by `tests/audit_facing_sweep.sh`, frozen on merged-m20 with every leg DIFF, re-frozen SAME at M21). Rule-checker runs 2026-09-25-361..371 (369 and 371 OK). Not measured: the other four rule-5 records, a fighter as the rule-5 attacker, Donovan on the P2 side, FBNeo and MiSTer, and the combination with #182's row (the M21 freeze battery).
+
+---
+
 ## Ruled 2026-09-28 (14z-185) — #174 split: its attack-record part closed `done`, the 28 non-attack chains moved to #184
 
 **The question (AskUserQuestion), verbatim:** *"#174 has 28 never-entered a2 chains left, all without attack records (poses and transitions; the ticket rated them lower priority). The 8 attack-record chains are done and gated. How should I handle #174?"* The options were:

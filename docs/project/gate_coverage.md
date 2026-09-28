@@ -13,7 +13,7 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**395 of 395 gates described.**
+**396 of 396 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
@@ -24,7 +24,7 @@ first sentence) is `gate_index.md`.
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 84 | 84 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 60 | 60 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 61 | 61 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -2330,7 +2330,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 ## character-data
 
-the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 60 of 60 described.
+the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 61 of 61 described.
 
 ### `audit_air_gc_legacy.sh` — audit, emulator
 
@@ -2467,6 +2467,14 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 **HOW:** static: the compare chains of both resolvers read from the decrypted opcode images, and the legacy record census of +0xE (vsavj 0 of 1,085 carry rule 5, vs2 1 of 1,143); live: every write to Demitri's +0x5D over 3850-3960 and his x at 3924 and 3946 on the #136 rig donovan_3, both legs real cursor picks, on MAME; controls replace our writes by native's and plant a `cmpi.b #5` into vsavj's image.
 
 **EXPECTS:** the frozen defect rows (ours writes 4 at 0x1886C, native 1 and 0; x 835 vs 755) and static rows exact; both controls fail. A fix re-freezes this file deliberately.
+
+### `audit_facing_sweep.sh` — audit, emulator
+
+**WHAT:** #159 at more than one geometry. tests/audit_facing_rule.sh measures the Summon on the donovan_3 rig as authored; this gate moves the players before the Summon so its six contacts land on different anim nodes and on both sides of Demitri, and asks two things. (1) Does the build under test write what native writes, write for write? (2) On native, could any vsavj facing rule, given per anim node (a data-only fix: repoint a node's attack record), give native's value at every contact of that node? Native's value is rule 5, the attacker's x-velocity sign (vs2 PRG:0x1717E -> 0x171D6); vsavj's resolver (PRG:0x18854) has rules 0-4 and the negative (position) rule only (docs/game/engine_internals.md, the attack record's +0xE).
+
+**HOW:** the donovan_3 rig (event 5, Killshread Summon (ES) at 3840), the level and RNG pinned as the parity gates pin them, P1/P2 x poked over 3790-3800: side L = P1 0x1F3, P2 0x1F3+d; side R = P1 0x343, P2 0x343-d with the motion mirrored (D DL L -> D DR R); d = 0x60..0x150 step 0x10. Each geometry runs on native vs2 and on the build (ours by the parity gate's cursor path D D DR DR), to frame 4040, tests/lua/facing_tap.lua tapping Demitri's +0x5C word from 3850 with the rule inputs at every write; tools/facing_sweep.py reads the 64 taps.
+
+**EXPECTS:** the reader's CHECK PASS and its rows equal tests/expected/facing_sweep.tsv. FROZEN AS MEASURED on merged-m20: every leg DIFF — the #159 defect: the build5 rows show vsavj's resolver XORing rule 5 into the prior value, 4 on side L (1^5) and 5 on side R (0^5), where native writes 1/0, and on 4 side-R legs the later contacts landing on other frames (-); and 13 of the 29 native nodes fit NO vsavj rule (no data-only fix). On probe 159 (the staged row, build/manifest/staged/159_designA.patch, in a copy of donovan.toml; its build fingerprint e4d712eb equals a build of the staged row itself, 14z-185) every leg is SAME, 32/32; the M21 freeze applies the patch and re-freezes the leg and build5 rows. Both controls fail the gate.
 
 ### `audit_ff8130_writers.sh` — audit, emulator
 

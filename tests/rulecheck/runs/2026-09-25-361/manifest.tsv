@@ -1,0 +1,8 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent185/t159/maintainer_159.txt	36ea50e982a51ca049d1b1b107ac413cbc35095b
+build/agent185/t159/resolver_vsavj.txt	a0da1b7bbaeba8d8aa29b0c6d53f6124552e05f3
+build/agent185/t159/resolver_vsav2.txt	b0d85dfa143bcf214ba2fd04123d85985c88ba4d
+build/agent185/t159/probe.sh	542ef6203ad85dc34de76cbf589f3249c5ff70f6
+build/agent185/t159/facing_probe.lua	e11354e9e5c7cba3614edd19daaa7e72e35d057c
+build/agent185/t159/rules_vs_probe.log	8402b4ff880a19c5fdfa0c4bce40f4ef1ca967f4
+build/agent185/t159/facing_rule_head.txt	5986946ac3cf31fa95bc20322118a945ced4ccf4

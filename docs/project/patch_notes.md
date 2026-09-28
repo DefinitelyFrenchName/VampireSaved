@@ -1,5 +1,35 @@
 # patch_notes — per-change detail: every byte, and why
 
+## 14z-185 — #159: the victim facing rule 5 (Design A), RULED AND STAGED for M21 on top of #182 — NOT YET IN THE MANIFESTS
+
+**THE DEFECT.** An attack record's `+0xE` is the victim's facing rule, resolved into the victim's `+0x5D` at every
+contact. vs2's resolver (`0x1717E`) handles rule 5 (by the attacker's x-velocity sign, branch `0x171D6`); vsavj's
+(`0x18854`) does not, so a 5 falls through to `eor.b d0,$5d(a1)` at `0x1886C` and 1 XOR 5 = 4 lands in the byte.
+Killshread Summon (ES)'s returning wave therefore pushed Demitri away where native drags him toward Donovan
+(`tests/audit_facing_rule.sh`, frozen as the defect at 14z-167: ours 4, native 1/0; x 835 against 755).
+
+**THE FIX (staged: `build/manifest/staged/159_designA.patch`, applied by the M21 freeze AFTER `182_designA.patch`).**
+One `[[site_thunk]]` in `build/manifest/donovan.toml`, `facing_rule5`, stage 6, `patch = "jmp"`: the site
+`0x1886C`'s `eor.b d0,$5d(a1); bra.b $188b8` (6 bytes, `b129005d6046`) becomes `jmp thunk`; the thunk is
+`cmpi.b #5,d0; beq.s +6; eor.b d0,$5d(a1); rts; moveq #0,d0; tst.w $40(a6); bmi.s +2; addq.b #1,d0;
+move.b d0,$5d(a1); rts` (`0c0000056706b129005d4e7570004a6e00406b0252001340005d4e75`; its second half is vs2's
+`0x171D6-0x171E5` byte for byte, `0x188B8` being `rts`). Byte provenance: the site VSAV -> a jmp; the thunk NEW, its
+rule-5 half VS2. Ops (with #182's row): donovan 344 -> 346, 2-tenant 624 -> 626, 3-tenant 837 -> 839;
+`test_manifest_merge` site_thunk (22,18,9),34 -> (23,18,9),35. Adding the body moves the first-fit placement of
+later thunk bodies (364 shipped ops at new addresses on the probe); the oracle and lag measurements ran on those.
+
+**WHAT IT WAS BUILT ON.** Design B (a data-only fix) was measured first and is not viable: no single vsavj rule
+executed on the Summon's records gives native's values, and over 37 native legs (32 P1-P2 geometries on both sides)
+13 of the 29 anim nodes contacted fit no vsavj rule — native's value is the velocity sign (`tests/audit_facing_sweep.sh`, which the M21 freeze re-freezes with every leg SAME). Probe 159 (this row in a
+copy of the manifest; `build/agent185/probe159/`): the facing rows equal native's and Demitri slides to 755; every
+`+0x5D` write equals native's at the 32 geometries (192 rule-5 contacts); the merged legacy oracle identical to
+merged-m20 on 53/53 replays with 1,091 legacy fall-through contacts through the thunk (the same per replay as
+merged-m20 and pristine vsavj; the rule-5 branch never ran on legacy content); `tests/audit_lag_budget.sh` finds no
+new zero-pass frame over 44 parts. The maintainer read the capture (*"Probe plays like native"*) and ruled *"Design
+A, stage for M21 (Recommended)"*. Rule-checker runs 2026-09-25-361..371 (369, 371 OK). NOT measured: the other four
+rule-5 records (`0xCA1CA`, `0xCA1EA`, `0xD17C2`, `0xD1822`), a fighter as the rule-5 attacker, Donovan on the P2
+side, FBNeo and MiSTer, and the combination with #182's row (the M21 freeze battery).
+
 ## 14z-185 — #182: Phobos's air-block guard window (Design A), RULED AND STAGED for M21 — NOT YET IN THE MANIFESTS
 
 **THE DEFECT.** vs2's block entry (`0x022480`) sends fighter id 0x10 to `0x0224C4`, which opens the guard
