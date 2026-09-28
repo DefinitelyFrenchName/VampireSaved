@@ -17,6 +17,13 @@
 -- does not, the relocation is not bit-identical and the design stops — the
 -- answer is NOT to widen the mask (that redefines the baseline the superset
 -- invariant rests on).
+-- [RETRACTED 14z-185, GitHub #143: this paragraph's premise. The push does NOT
+-- land inside the window (THE LIVE STACK, below); "not in the window" was read
+-- here as "not bit-identical", and the oracle says otherwise: the relocation is
+-- live on merged-m20 and tests/audit_merged_legacy.sh lands all 53 legacy
+-- pairings on their ratified classes there. The relocation's legacy safety
+-- rests on those verdicts, not on a mask; tests/audit_walker_ghost.sh asserts no
+-- mask hides the push (the maintainer: "Freeze the real ranges (Recommended)").]
 --
 -- THE PUSH OCCUPIES [A7-4, A7-1] at the moment of the jsr, so the window
 -- test is A7-4 >= 0xFF7F00 AND A7 <= 0xFF8000.
@@ -32,9 +39,20 @@
 --   env REPLAY    input script (replay.lua grammar subset)
 --   env FRAMES    stop after this many frames (default 3600)
 --
+-- THE LIVE STACK (14z-185, GitHub #143). MAME 0.288's 68000 core has no A7 state and its SP is the
+-- SUPERVISOR stack (docs/platform/gotchas.md "MAME 0.288'S 68000 CORE HAS NO `A7` STATE"); this game's code
+-- runs in USER mode. Until 14z-185 this read `A7 or SP` — the idle supervisor stack, a constant $FF7FF6 —
+-- and tests/audit_walker_ghost.sh froze that. The pointer is now chosen by SR's S bit, and each hit also
+-- records the long on top of the stack it read: the return address of the call INTO the walker, which the
+-- consuming gate proves against the opcode image (a genuine return address ends a call).
+--   env WALKER_SP_READ=sp   CONTROL ONLY: read MAME's SP whatever the mode (the pre-14z-185 read), so the
+--                           gate's ground truth can be shown to fail on it (audit_walker_ghost supervisor-read)
+--
 -- Output, one block per site:
---   SP <addr> hits <n> min <a7min> max <a7max>
+--   SP <addr> hits <n> min <a7min> max <a7max>   (the LIVE stack pointer, at the `jsr (A0)`)
 --   PAGES <addr> : <page>=<count> ...          (A7 >> 8, hex)
+--   MODE <addr> super <n> user <n>             (SR's S bit at each hit)
+--   RET <addr> : <long>=<count> ...            (the long on top of the live stack)
 -- then "SPEND <frames>". Needs -debug -debugger none.
 local machine = manager.machine
 local debugger = machine.debugger
@@ -42,13 +60,14 @@ assert(debugger, "run mame with -debug")
 local cpu = machine.devices[":maincpu"]
 
 local out_path = os.getenv("SP_OUT") or "walker_sp.txt"
+local FORCE_SP = os.getenv("WALKER_SP_READ") == "sp"   -- control only (see the header)
 local max_frames = tonumber(os.getenv("FRAMES") or "") or 3600
 
 local sites = {}          -- [addr] = {hits, min, max, pages = {}}
 for spec in (os.getenv("SPSITES") or ""):gmatch("[^,]+") do
     local a = spec:match("^%s*(%x+)%s*$")
     assert(a, "SPSITES entry must be a hex PC — got '" .. spec .. "'")
-    sites[tonumber(a, 16)] = { hits = 0, min = nil, max = nil, pages = {} }
+    sites[tonumber(a, 16)] = { hits = 0, min = nil, max = nil, pages = {}, super = 0, user = 0, rets = {} }
 end
 assert(next(sites), "set SPSITES=hexpc,...")
 
@@ -137,6 +156,13 @@ emu.register_frame_done(function()
                 parts[#parts + 1] = string.format("%06x=%d", p << 8, s.pages[p])
             end
             f:write(string.format("PAGES %06x : %s\n", a, table.concat(parts, " ")))
+            f:write(string.format("MODE %06x super %d user %d\n", a, s.super, s.user))
+            local rk = {}
+            for r, _ in pairs(s.rets) do rk[#rk + 1] = r end
+            table.sort(rk)
+            local rp = {}
+            for _, r in ipairs(rk) do rp[#rp + 1] = string.format("%06x=%d", r, s.rets[r]) end
+            f:write(string.format("RET %06x : %s\n", a, table.concat(rp, " ")))
         end
         f:write(string.format("SPEND %d\n", frame))
         f:close()
@@ -150,10 +176,13 @@ emu.register_periodic(function()
         local pc = st["CURPC"].value & 0xFFFFFF
         local s = sites[pc]
         if s then
-            -- A7 is the ACTIVE stack pointer; MAME's "SP" state can resolve
-            -- to the inactive one (measured 14z-85g, tests/lua/bp_regs.lua).
-            local spr = st["A7"] or st["SP"]
+            -- the LIVE stack: SR's S bit picks SP (supervisor) or USP (user) — see the header (#143)
+            local sup = (st["SR"].value & 0x2000) ~= 0
+            local spr = (sup or FORCE_SP) and st["SP"] or st["USP"]
             local sp = spr.value & 0xFFFFFF
+            if sup then s.super = s.super + 1 else s.user = s.user + 1 end
+            local ret = cpu.spaces["program"]:read_u32(sp) & 0xFFFFFF
+            s.rets[ret] = (s.rets[ret] or 0) + 1
             s.hits = s.hits + 1
             if not s.min or sp < s.min then s.min = sp end
             if not s.max or sp > s.max then s.max = sp end

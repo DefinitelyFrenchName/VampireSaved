@@ -55,6 +55,7 @@ declares	audit_trap_airborne
 declares	audit_trap_shock
 declares	audit_victim_parity
 declares	audit_voice_borrow
+declares	audit_walker_ghost
 declares	audit_walker_repoint
 declares	test_agent_defs
 declares	test_agent_extract

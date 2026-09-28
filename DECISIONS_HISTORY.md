@@ -27,6 +27,18 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-28 (14z-185) — #143: the walker-ghost gate is re-stated on the live stack ("Freeze the real ranges"); walker_sp.lua reads the live pointer
+
+**The queue (14z-185), verbatim:** *"quick aside, when you have finished #159, do #160, #155, #143 and #182 in that order"*; the filing ruling (2026-09-16): *"yes but we probably want to be cautious when solving it"*.
+
+**The questions, verbatim** (`build/agent185/t143/maintainer_143.txt`), after rule-checker run 2026-09-28-382 OK: *"#143: the walker instrument reads an idle stack, and the walker-ghost gate's premise is false: the relocated walker's return address lands in unmasked RAM, not the masked dead-stack window. I'll fix the instrument and retract the premise. What should the ghost gate check from now on?"*; then, after the cost/benefit, *"With that cost/benefit, which do you want for the walker-ghost gate?"*
+
+**The maintainer:** *"what's the cost/benefit analysis of all 3 options, given all the existing gates and instruments?"*, then *"Freeze the real ranges (Recommended)"*.
+
+**What it means.** The walker sites run in USER mode (the S bit clear on every hit, vanilla and merged-m20); `tests/lua/walker_sp.lua` read `A7 or SP`, the idle supervisor stack (a constant `$FF7FF6`), and `tests/audit_walker_ghost.sh` froze that as its "inside the masked dead-stack window" proof. The live push lands at `$FF055A-$FF06DD`, in unmasked work RAM, proven by the return address on top of the live stack (323,594 of 323,594 hits on vanilla, 298,494 of 298,494 on merged-m20). The premise is RETRACTED; `walker_sp.lua` reads the live pointer by SR; the gate (reader `tools/walker_ghost.py`) proves the pointer against the opcode image, asserts the push lies OUTSIDE every legacy-oracle mask (no mask hides it from the oracle's checksum; that the checksum sees a changed byte there is measured for one planted byte only), and compares the live ranges with the re-frozen `build/manifest/walker_ghost.toml` (0x54476 `0xff06de`, 0x5E548 `0xff055e..0xff06de`); controls supervisor-read, range-moved and mask-covers. Uncovered, by the ruling: the oracle's window, composite and flicker verdicts tolerate divergences inside ratified ranges, so a push surviving to a checksum there would pass. Also retracted: the 14z-91 inference "not in the window = not bit-identical, the design stops" (`walker_sp.lua`'s and the gate's WHY sections) — the relocation is live on merged-m20 and `tests/audit_merged_legacy.sh` lands all 53 legacy pairings on their ratified classes there, so its legacy safety rests on those verdicts, not on a mask. Rule-checker runs 2026-09-28-377..388 (382 and 388 OK).
+
+---
+
 ## Ruled 2026-09-28 (14z-185) — #159: Design A (vs2's rule-5 branch taught to vsavj's facing resolver), STAGED for M21 on top of #182's patch
 
 **The instruction (14z-185), verbatim:** *"do #182, #176, #174, #159 in that order."*

@@ -2666,11 +2666,17 @@ pointer from SR's S bit** (`(SR & 0x2000) ~= 0 and SP or USP`) and PROVE the cho
 data: a genuine return address is preceded by a `jsr`/`bsr` whose length ends exactly on it
 (2,611 such on the user stack over 520 vs2 tick writes, 0 on the supervisor stack).
 `tap_writes.lua`'s `STACKLOG` and `bp_regs.lua` read the live pointer since 14z-158.
-**`tests/lua/walker_sp.lua` still reads `A7 or SP`** (so, on this core, the supervisor
+~~**`tests/lua/walker_sp.lua` still reads `A7 or SP`** (so, on this core, the supervisor
 stack) and was NOT changed: `tests/audit_walker_ghost.sh` and `tests/audit_walker_repoint.sh`
 consume its stack ranges, and moving an instrument under frozen measurements is a question
 to answer first — whether the walker sites run in user mode, and what those audits' ranges
-therefore measured.
+therefore measured.~~ **RESOLVED 14z-185 (GitHub #143):** the walker sites run in USER
+mode (the S bit clear on every hit, vanilla and merged-m20), so `audit_walker_ghost`'s frozen
+range was the idle supervisor stack and its "inside the masked window" premise false;
+`walker_sp.lua` reads the live pointer by SR since 14z-185, and the gate is re-stated on the
+live stack with the return-address proof built in (`audit_walker_repoint` reads hit counts
+only). **This entry was paid AGAIN at 14z-185** by `tests/lua/rng_draws.lua` (#176) — the
+entry below — because no one grepped this file for `USP` before writing a new tap.
 
 ## A NON-DEBUG WRITE TAP ON A FIELD WRITTEN MANY TIMES A FRAME CRASHED MAME — sample such a field instead (paid: 14z-167)
 
@@ -2970,7 +2976,7 @@ BYTE store's tap data word carries the other byte unspecified (merge by the
 (the nine disagreeing frames were exactly the rig's nine in-window position
 pins).
 
-## IN A MAME LUA TAP, `cpu.state["SP"]` IS THE SUPERVISOR STACK — THIS GAME RUNS IN USER MODE, SO A CALLER'S RETURN ADDRESS SITS AT `USP` (paid: 2026-09-28, 14z-185, #176)
+## IN A MAME LUA TAP, `cpu.state["SP"]` IS THE SUPERVISOR STACK — THIS GAME RUNS IN USER MODE, SO A CALLER'S RETURN ADDRESS SITS AT `USP` — A REPEAT of the entry "MAME 0.288'S 68000 CORE HAS NO `A7` STATE" above (paid: 2026-09-28, 14z-185, #176; that 14z-158 entry already held the rule — what went wrong is that the archaeology grep, [VSP-14], was not run before writing the tap)
 
 The first caller-attributing RNG tap read the long at `SP` inside the RNG routine and got `0x00FF02DC`, a work-RAM
 address, for every draw. At that moment SR read `4` (bit 13, the supervisor bit, clear): the game's code runs in

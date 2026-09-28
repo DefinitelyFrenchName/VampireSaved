@@ -1,0 +1,7 @@
+# tests/rulecheck/retractions/14z-185.tsv — the wordings retracted or corrected in 14z-185 (#143 so far; the close adds the rest), and reach controls that must be found live; columns pattern, source, kind (tools/retraction_grep.py)
+oracle compares it	14z-185 #143 (rule-checker runs 385-386): the push is outside every mask; that the oracle's verdicts catch it is measured for one planted byte only	retracted
+compares it every frame	14z-185 #143 (run 385): the engine_internals header's first correction, scoped down	retracted
+a7 = 0xff7ff6 constant	14z-185 #143: that A7 was MAME's idle supervisor stack	retracted
+inside the masked dead-stack window	14z-185 #143: the push lands at $FF055A-$FF06DD, unmasked	retracted
+the design stops	14z-185 #143: the 14z-91 inference 'not in the window = not bit-identical'; the relocation's safety rests on the oracle's verdicts	retracted
+outside every legacy-oracle mask	control: the corrected wording, live in the gate, the toml, engine_internals and the two wrapped comment carriers (donovan.toml, gen_donovan_patch.py)	reach:5

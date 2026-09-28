@@ -24,14 +24,14 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | figure | count |
 |---|---|
 | distinct program-space addresses named | 3289 |
-| named by a document or manifest only | 2152 |
-| named by both a document/manifest and code | 764 |
+| named by a document or manifest only | 2148 |
+| named by both a document/manifest and code | 768 |
 | named by CODE ONLY (the gap list below) | 373 |
 | carried by atlas | 596 |
-| carried by engine_internals | 705 |
+| carried by engine_internals | 707 |
 | carried by other docs | 1024 |
 | carried by manifests | 1818 |
-| carried by code | 1137 |
+| carried by code | 1141 |
 
 ## Addresses
 
@@ -140,7 +140,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0050D4` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x0050EE` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x005122` | build/manifest/donovan.toml — don_sfx_records; build/manifest/donovan.toml — don_sfx_records [vs2]; build/manifest/huitzil.toml — hui_sfx_records; build/manifest/pyron.toml — pyr_sfx_records; build/manifest/reconciliation.toml — map [vs2] |
-| `PRG:0x0053F6` | docs/project/patch_notes.md — B. the obj_hook dispatch sites left VANILLA — the WALKER is relocated; build/manifest/donovan.toml — obj_hook; build/manifest/huitzil.toml — obj_hook; build/manifest/pyron.toml — obj_hook |
+| `PRG:0x0053F6` | docs/project/patch_notes.md — B. the obj_hook dispatch sites left VANILLA — the WALKER is relocated; build/manifest/donovan.toml — obj_hook; build/manifest/huitzil.toml — obj_hook; build/manifest/pyron.toml — obj_hook; tests/audit_walker_ghost.sh |
 | `PRG:0x0053F8` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
 | `PRG:0x005410` | docs/project/patch_notes.md — B. the obj_hook dispatch sites left VANILLA — the WALKER is relocated; build/manifest/donovan.toml — obj_hook; build/manifest/huitzil.toml — obj_hook; build/manifest/pyron.toml — obj_hook |
 | `PRG:0x005412` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
@@ -178,7 +178,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x009030` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) [vs2]; tests/audit_tick_cadence.sh |
 | `PRG:0x009074` | docs/game/atlas/ram.md — System / match globals; docs/project/doc_audit_14z118.md — 4. Log of the pass (one line per commit) |
 | `PRG:0x0090B2` | docs/game/atlas/select_screen.md — SHADOW vs A TENANT — the static pass (14z-116, the maintainer's question) |
-| `PRG:0x009436` | docs/project/patch_notes.md — B. the obj_hook dispatch sites left VANILLA — the WALKER is relocated; build/manifest/donovan.toml — obj_hook; build/manifest/huitzil.toml — obj_hook; build/manifest/pyron.toml — obj_hook |
+| `PRG:0x009436` | docs/project/patch_notes.md — B. the obj_hook dispatch sites left VANILLA — the WALKER is relocated; build/manifest/donovan.toml — obj_hook; build/manifest/huitzil.toml — obj_hook; build/manifest/pyron.toml — obj_hook; tests/audit_walker_ghost.sh |
 | `PRG:0x009438` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
 | `PRG:0x00943C` | docs/project/patch_notes.md — B. the obj_hook dispatch sites left VANILLA — the WALKER is relocated; build/manifest/donovan.toml — obj_hook; build/manifest/huitzil.toml — obj_hook; build/manifest/pyron.toml — obj_hook |
 | `PRG:0x00943E` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
@@ -790,7 +790,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x022000` | docs/game/engine_internals.md — The WIN-QUOTE TEXT SYSTEM — fully decoded (14z-76); docs/project/patch_index.md — DEFERRED BY MAINTAINER DECISION (14z-76) — the win-quote bank relocation |
 | `PRG:0x022008` | docs/game/engine_internals.md — The per-char effect system (14z-67, decoded on the H ping rounds) [vs2]; docs/project/gotchas.md — (14z-68, refutes half of the 14z-67 entry theory) [vs2]; docs/project/patch_notes.md — handler clone + the x026142 escape fix; build/manifest/huitzil.toml — pcrel_escape_fix [vs2]; build/manifest/reconciliation_donovan.toml — map [vs2]; build/manifest/reconciliation_huitzil.toml — map [vs2]; +1 more |
 | `PRG:0x02207E` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/test_don_immortal_native.sh |
-| `PRG:0x0220A0` | docs/platform/gotchas.md — IN A MAME LUA TAP, 'cpu.state["SP"]' IS THE SUPERVISOR STACK — THIS GAME RUNS IN USER MODE, SO A CALLER'S RETURN ADDRESS SITS AT 'USP' (paid: 2026-09-28, 14z-185, #176); tools/rng_draws.py |
+| `PRG:0x0220A0` | docs/platform/gotchas.md — IN A MAME LUA TAP, 'cpu.state["SP"]' IS THE SUPERVISOR STACK — THIS GAME RUNS IN USER MODE, SO A CALLER'S RETURN ADDRESS SITS AT 'USP' — A REPEAT of the entry "MAME 0.288'S 68000 CORE HAS NO 'A7' STATE" above (paid: 2026-09-28, 14z-185, #176; that 14z-158 entry already held the rule — what went wrong is that the archaeology grep, [VSP-14], was not run before writing the tap); tools/rng_draws.py |
 | `PRG:0x022174` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x022268` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); tests/test_rehit_ring.sh; tools/rehit_ring.py |
 | `PRG:0x02228E` | docs/game/atlas/ram.md — System / match globals; docs/project/doc_audit_14z118.md — 4. Log of the pass (one line per commit); tests/audit_front_comparator.sh; tests/audit_tenant_timeout.sh |
@@ -1597,7 +1597,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x054380` | docs/project/hardening_register.md — 2. The 13 plausible reconciliation rows (triaged 14z-100, H3.2) |
 | `PRG:0x054458` | docs/game/atlas/ram.md — Fighter + effect-pool fields (14z-67, measured on the H effect arc); docs/game/engine_internals.md — Per-tenant TYPE NUMBERS on multi-tenant builds (14z-82); docs/game/engine_internals.md — measured 14z-68d on the Huitzil effect arc); docs/project/gotchas.md — A pool measurement is a claim about ONE pool — decode the walker first (14z-85); docs/project/patch_index.md — Mechanism inventory (generator vocabulary); docs/project/patch_notes.md — 14z-85 — the spawn-time OWNER TAG (site 0x54470's 59-75 family; maintainer option (a)); +12 more |
 | `PRG:0x054470` | docs/game/atlas/ram.md — Fighter + effect-pool fields (14z-67, measured on the H effect arc); docs/game/engine_internals.md — Per-tenant TYPE NUMBERS on multi-tenant builds (14z-82); docs/game/engine_internals.md — Per-tenant TYPE NUMBERS on multi-tenant builds (14z-82) [vs2]; docs/game/engine_internals.md — measured 14z-68d on the Huitzil effect arc); docs/platform/gotchas.md — PC-relative reads are DECRYPTED reads on CPS-2 (paid: 2026-07-25, ~45min); docs/project/patch_index.md — Mechanism inventory (generator vocabulary); +25 more |
-| `PRG:0x054476` | build/manifest/walker_ghost.toml — site |
+| `PRG:0x054476` | docs/game/engine_internals.md — measured 14z-68d on the Huitzil effect arc); build/manifest/walker_ghost.toml — site; tests/audit_walker_ghost.sh |
 | `PRG:0x054484` | docs/game/atlas/ram.md — Fighter + effect-pool fields (14z-67, measured on the H effect arc); docs/game/engine_internals.md — measured 14z-68d on the Huitzil effect arc); docs/platform/gotchas.md — PC-relative reads are DECRYPTED reads on CPS-2 (paid: 2026-07-25, ~45min); docs/project/patch_notes.md — donovan-m2 stage 4 — IN PROGRESS (2026-07-25, session 4); build/manifest/donovan.toml — obj_hook; build/manifest/huitzil.toml — obj_hook; +1 more |
 | `PRG:0x054570` | docs/game/engine_internals.md — measured 14z-68d on the Huitzil effect arc); build/manifest/reconciliation.toml — map |
 | `PRG:0x05459A` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/reconciliation.toml — map |
@@ -1807,7 +1807,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x05E504` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x05E52A` | docs/game/atlas/ram.md — Fighter + effect-pool fields (14z-67, measured on the H effect arc); docs/game/engine_internals.md — measured 14z-68d on the Huitzil effect arc); docs/project/patch_index.md — Mechanism inventory (generator vocabulary); docs/project/patch_notes.md — B. the obj_hook dispatch sites left VANILLA — the WALKER is relocated; build/manifest/donovan.toml — obj_hook; build/manifest/huitzil.toml — obj_hook; +8 more |
 | `PRG:0x05E542` | docs/game/engine_internals.md — Per-tenant TYPE NUMBERS on multi-tenant builds (14z-82); docs/game/engine_internals.md — measured 14z-68d on the Huitzil effect arc); docs/project/patch_index.md — Mechanism inventory (generator vocabulary); docs/project/patch_notes.md — 14z-82 — per-tenant TYPE NUMBERS (the merged obj_hook vec3 fix) + the F2 merged shim; docs/project/patch_notes.md — 14z-85 — the spawn-time OWNER TAG (site 0x54470's 59-75 family; maintainer option (a)); docs/project/patch_notes.md — B. the obj_hook dispatch sites left VANILLA — the WALKER is relocated; +19 more |
-| `PRG:0x05E548` | build/manifest/walker_ghost.toml — site |
+| `PRG:0x05E548` | docs/game/engine_internals.md — measured 14z-68d on the Huitzil effect arc); build/manifest/walker_ghost.toml — site; tests/audit_walker_ghost.sh |
 | `PRG:0x05E556` | docs/game/atlas/ram.md — Fighter + effect-pool fields (14z-67, measured on the H effect arc); docs/game/engine_internals.md — measured 14z-68d on the Huitzil effect arc); docs/project/patch_notes.md — Stage 4 addendum (session 4 close); build/manifest/donovan.toml — obj_hook; build/manifest/donovan.toml — throw_victim_keyframes; build/manifest/huitzil.toml — obj_hook; +1 more |
 | `PRG:0x05E71E` | docs/game/engine_internals.md — measured 14z-68d on the Huitzil effect arc) |
 | `PRG:0x05E780` | build/manifest/huitzil.toml — pcrel_escape_fix; build/manifest/huitzil.toml — throw_arc_tables; tests/test_hui_fx_flow.sh |

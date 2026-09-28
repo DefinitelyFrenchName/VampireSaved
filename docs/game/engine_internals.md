@@ -2711,11 +2711,23 @@ operand while `movea.l (d8,PC,Dn.w)` costs the same wherever PC points.
 Measured either side of the move, the dispatch counts are IDENTICAL
 (1243 and 40236 on the same replay set), with the vanilla entries silent.
 
-Exactly one byte of state differs — the `jsr (A0)` pushes copy+0x20
-instead of walker+0x20. `tests/audit_walker_ghost.sh` measured A7 at both
-walkers as a **constant 0xff7ff6** over 279,577 dispatches in all 49
-corpus replays, so that longword lands at 0xff7ff2-0xff7ff5, inside the
-masked dead-stack window `$FF7F00-$FF7FFF`.
+Exactly one longword of state differs — the `jsr (A0)` pushes copy+0x20
+instead of walker+0x20. **It lands in UNMASKED work RAM, `$FF055A-$FF06DD`,
+outside every legacy-oracle mask** (14z-185, GitHub #143):
+the walkers run in USER mode, and the live stack at the `jsr (A0)` is
+`$FF06DE` (0x54476) / `$FF055E..$FF06DE` (0x5E548), proven by the return
+address on top of it on every hit (vanilla and merged-m20). The legacy
+oracle's window, composite and flicker verdicts tolerate divergences inside
+ratified ranges, so a push surviving to a checksum there would pass; that is
+not measured. That the oracle's checksum sees a byte changed in this range is
+measured for one planted byte only (`$FF06DA`, one exact replay, 14z-185).
+Gate: `tests/audit_walker_ghost.sh`, re-stated on the live stack.
+~~`tests/audit_walker_ghost.sh` measured A7 at both walkers as a **constant
+0xff7ff6** over 279,577 dispatches in all 49 corpus replays, so that longword
+lands at 0xff7ff2-0xff7ff5, inside the masked dead-stack window
+`$FF7F00-$FF7FFF`.~~ — RETRACTED 14z-185 (#143): that A7 was MAME's idle
+supervisor stack (`tests/lua/walker_sp.lua` read `A7 or SP`; the 68000 core
+has no A7 state).
 
 Two things a repeat of this work will get wrong:
 - **the table must be emitted as a `code` op** once a relocated walker

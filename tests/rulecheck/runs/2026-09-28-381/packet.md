@@ -1,0 +1,61 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: #143: walker_sp.lua reads the live stack by SR; audit_walker_ghost's inside-the-mask premise retracted, its re-statement put to the maintainer (re-checked after 380: no timeline-dependent counts)
+Claim (the working agent's sentence): Recommend to the maintainer, for #143: (1) change tests/lua/walker_sp.lua to read the LIVE stack, chosen by SR's S bit; (2) RETRACT tests/audit_walker_ghost.sh's premise that the relocated walker's push lands inside the masked dead-stack window, and ask the maintainer how the gate is re-stated. The maintainer filed #143 with "yes but we probably want to be cautious when solving it" (DECISIONS_HISTORY.md:1503-1506) and queued it: "do #160, #155, #143 and #182 in that order" (maintainer_queue_14z185.txt). The issue's first three steps (issue143_steps.txt) were done with the instrument UNCHANGED.
+WHICH STACK IS LIVE. A probe copy of walker_sp.lua (walker_sp_probe.lua; its diff only ADDS reads of SR, SP, USP and the long at each, plus the frames each site fires on, which this claim does not use) ran under -debug.
+- On pristine vsavj (probe.sh: the ghost audit's own legs, every legacy replay with a vanilla basis log, 56), at the walkers' `jsr (A0)` 0x54476 and 0x5E548 (aggregate.log):
+  - the S bit is clear on all 8,586 and all 315,008 hits;
+  - walker_sp.lua's own read (A7 or SP) is 0xFF7FF6, the supervisor stack, which is walker_ghost.toml's frozen sp_min = sp_max = 0xff7ff6;
+  - USP reads 0xFF06DE and 0xFF055E..0xFF06DE.
+- On merged-m20 (probe_m20.sh: the legacy oracle's own 53 replays), where the relocation is live (relocation_m20.log: the ten walker call sites the corpus reaches jump to the copies 0x4C1400 / 0x4C1290) (windows_m20.log, per-hit fields only):
+  - the vanilla sites fire 0 times;
+  - the relocated `jsr (A0)` sites 0x4C12AE and 0x4C141E (relocated_sites_dis.txt) run with the S bit clear on all 8,591 and 289,903 hits;
+  - USP reads 0xFF06DE and 0xFF055E..0xFF06DE.
+Ground truth: the long at USP is the return of a `jsr abs.l` to a walker, ending exactly on it, on every hit. That is 323,594 of 323,594 against the vsavj opcode image (ground_truth.log) and 298,494 of 298,494 against M20's (ground_truth_m20.log). The long at SP is, on 0 of either.
+So the relocated push, at USP-4..USP-1, lands within $FF055A-$FF06DD, outside $FF7F00-$FF7FFF. walker_ghost's premise does not hold, and its PASS measured the idle stack.
+WHAT THE ORACLE SHOWS AND DOES NOT. The legacy oracle reads its mask from tests/expected/merged-m20/mask (audit_merged_legacy.sh:330, $EXPECT; merged_legacy_m20base.log:26 names tests/expected/merged-m20). It runs each replay through tools/run_replay_mame.sh, which is tests/lua/replay.lua with no debugger (audit_merged_legacy.sh:399-413; run_replay_mame.sh:20).
+- The mask (oracle_mask.txt) does not cover $FF055A-$FF06DD, and the checksum SEES that range. plant_ctl.sh ran that instrument and mask on M20, replay 01_attract_long: a byte poked at $FF06DA at frame 1200 moves the checksum from frame 1200 on, and the same poke at $FF7FF2, inside the masked window, moves it on no frame (plant_ctl.log).
+- On M20 the oracle passed 53/53, but only 2 replays are exact; 38 pass as window and 13 as composite (merged_legacy_m20base.log). A pushed value that survived to a checksum OUTSIDE a replay's tolerated ranges would fail the oracle. Inside those ranges (mostly the select-screen windows) it would pass unseen.
+tests/audit_walker_repoint.sh uses only hit counts, so no stack value reaches its verdict.
+THE RECOMMENDATION.
+(1) walker_sp.lua reads `(SR & 0x2000) ~= 0 and SP or USP` (the rule of docs/platform/gotchas.md:2653-2673), with the ground-truth check in the consuming gate.
+(2) audit_walker_ghost's inside-the-mask premise is retracted in its header, walker_ghost.toml and the docs. The maintainer chooses the re-statement between:
+    (a) freeze the live ranges and assert the push lies outside every oracle mask, so the oracle sees it outside the tolerated ranges, the tolerated ranges named as uncovered;
+    (b) also measure the ghost slots directly inside the tolerated ranges, a new instrument;
+    (c) retire the gate, leaving legacy safety to the oracle.
+(3) Today's duplicate gotcha (docs/platform/gotchas.md:2973-2980, the #176 entry on SP and USP) is reconciled with the 14z-158 entry (lines 2653-2673).
+NOT tested:
+- on which frames the walker runs inside each replay's tolerated ranges, in the oracle's own run;
+- whether a pushed value ever survives to a checksum there;
+- the -debug probe's timeline against the oracle's non-debug run;
+- which write replaces a pushed slot;
+- FBNeo, where $FF06D0-$FF06EF is a ratified phase class, and MiSTer;
+- the 13 static callers the corpus never reaches (audit_walker_repoint's scope);
+- replays outside the 56 and the 53.
+Artifacts (read every one, in full):
+  - build/agent185/t143/walker_sp_probe.lua
+  - build/agent185/t143/probe.sh
+  - build/agent185/t143/aggregate.log
+  - build/agent185/t143/ground_truth.log
+  - build/agent185/t143/ground_truth_m20.log
+  - build/agent185/t143/probe_m20.sh
+  - build/agent185/t143/windows_m20.log
+  - build/agent185/t143/relocation_m20.log
+  - build/agent185/t143/relocated_sites_dis.txt
+  - build/agent185/t143/oracle_mask.txt
+  - build/agent185/t143/merged_legacy_m20base.log
+  - build/agent185/t143/plant_ctl.sh
+  - build/agent185/t143/plant_ctl.log
+  - build/agent185/t143/issue143_steps.txt
+  - build/agent185/maintainer_queue_14z185.txt
+  - tests/lua/walker_sp.lua
+  - tests/audit_walker_ghost.sh
+  - tests/audit_walker_repoint.sh
+  - build/manifest/walker_ghost.toml
+  - tests/audit_merged_legacy.sh.lines-325-345 (lines 325-345 of tests/audit_merged_legacy.sh)
+  - tests/audit_merged_legacy.sh.lines-395-415 (lines 395-415 of tests/audit_merged_legacy.sh)
+  - tools/run_replay_mame.sh
+  - docs/platform/gotchas.md.lines-2653-2673 (lines 2653-2673 of docs/platform/gotchas.md)
+  - docs/platform/gotchas.md.lines-2973-2980 (lines 2973-2980 of docs/platform/gotchas.md)
+  - DECISIONS_HISTORY.md.lines-1503-1506 (lines 1503-1506 of DECISIONS_HISTORY.md)

@@ -1,19 +1,43 @@
 #!/bin/sh
-# audit_walker_ghost.sh — WHERE ON THE STACK does each object-pool walker's
-# `jsr (A0)` push its return address, and is that longword inside the masked
-# dead-stack window?
+# audit_walker_ghost.sh — WHERE ON THE LIVE STACK does each object-pool walker's `jsr (A0)` push its return address, and does that longword lie outside every legacy-oracle mask? (14z-91; re-stated on the live stack 14z-185, GitHub #143)
 #
-# WHAT: where each relocated object-pool walker's `jsr (A0)` pushes its return address: the
-#   one longword of state the walker relocation changes must land inside the ratified
-#   dead-stack mask window $FF7F00-$FF7FFF, or the design stops (never widen the mask).
-# HOW: corpus-wide MAME -debug runs recording A7 at both walker sites over every dispatch,
-#   with a per-page stack histogram; the frozen figure lives in
-#   build/manifest/walker_ghost.toml.
-# EXPECTS: min(A7)-4 >= 0xFF7F00 and max(A7) <= 0xFF8000 at both sites (measured A7 =
-#   0xff7ff6 constant over 279,577 dispatches); the dispatch counts reproduce the dispatch
-#   census. A red is an escalation, not a mask change.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/vsavj/masked-v2/logs/
-#   tests/lua/walker_sp.lua tests/replays/ tools/run_mame.sh tools/setup_mame.sh
+# WHAT: where each object-pool walker's `jsr (A0)` pushes its return address — the one
+#   longword of state the walker relocation changes — measured on the LIVE stack, and that it
+#   lands outside every legacy-oracle mask, so no mask hides it from the per-frame oracle's
+#   checksum (whether the oracle's verdicts catch a differing byte there: see NOT covered below).
+# HOW: corpus-wide MAME -debug runs of tests/lua/walker_sp.lua (the live stack chosen by SR's
+#   S bit, and the long on top of it) at both walker sites on pristine vsavj, and at the RELOCATED
+#   walkers' sites on the build under test (derived from its own call sites); tools/walker_ghost.py
+#   proves the pointer against the vsavj opcode image (each long on top ends a `jsr abs.l` to the
+#   walker; the build's own image for the relocated leg), checks the push against the union of
+#   tests/expected/**/mask, and compares the live ranges with build/manifest/walker_ghost.toml —
+#   the relocated sites with the vanilla sites' frozen ranges (the relocation pushes at the same depth).
+# EXPECTS: the reader's PASS: every long on top of the read stack a genuine return address, the
+#   push outside every mask, the live ranges as frozen; the three controls fail.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/lib/controls.sh
+#   tests/lib/decrypt_cache.sh tests/lua/walker_sp.lua tests/replays/ tools/run_mame.sh
+#   tools/setup_mame.sh tools/walker_ghost.py
+#
+# MUST-FIRE: known-bad: supervisor-read — the instrument forced to read MAME's SP (the idle supervisor stack, the pre-14z-185 read) must fail the ground-truth check: the longs on top of that stack end no call to the walker (in-gate: one extra run of 21_don_mash with WALKER_SP_READ=sp must fail GROUND; mode: every corpus run of BOTH legs reads SP and the gate FAILs on each) (GitHub #143, 14z-185)
+# MUST-FIRE: perturbed-copy: range-moved — the frozen sp_min shifted by 2 must fail the frozen compare, so a moved live range is re-frozen deliberately (in-gate: the reader run with --frozen-shift 2 must fail FROZEN; mode: the gate's own read carries the shift and FAILs)
+# MUST-FIRE: perturbed-copy: mask-covers — one extra mask range over the push must fail the visibility check, so a mask hiding the relocated return address is caught (in-gate: the reader run with --extra-mask over the push must fail VISIBLE; mode: the gate's own read carries the mask and FAILs)
+#
+# THE PREMISE THIS GATE WAS BUILT ON IS RETRACTED (14z-185, GitHub #143, the maintainer's ruling
+# "Freeze the real ranges (Recommended)", DECISIONS_HISTORY.md "Ruled 2026-09-28 (14z-185) — #143").
+# Until 14z-185 it asserted the push lay INSIDE the masked dead-stack window $FF7F00-$FF7FFF, from
+# walker_sp.lua reading `A7 or SP` — on MAME 0.288 the SUPERVISOR stack, idle at a constant
+# $FF7FF6. The walkers run in USER mode (the S bit clear on every hit, vanilla and merged-m20): the
+# live stack at the `jsr (A0)` is $FF06DE / $FF055E..$FF06DE, and the push lands at $FF055A-$FF06DD,
+# in UNMASKED work RAM, proven by the return address on top of it on every hit of this gate's two
+# legs (14z-185: 8,586 + 315,008 on pristine vsavj, 8,591 + 313,113 at the relocated sites on
+# merged-m20, the relocated ranges equal to the vanilla ones). The
+# relocation's legacy safety therefore rests on the legacy oracle, not on a mask: no oracle mask
+# covers that range (the VISIBLE check). Measured once, 14z-185: a byte planted at $FF06DA under
+# the oracle's own replay.lua and mask moved its checksum on one exact replay (01_attract_long);
+# the rest of the range and the other replays were not planted. NOT covered: the oracle's window, composite and
+# flicker verdicts tolerate divergences inside ratified ranges, so a push that survived to a
+# checksum there would pass; whether one does is not measured here. An unmeasured lead: 14z-89
+# saw live "execution position" divergences at $FF06B5-$FF06D3, inside this range.
 #
 # WHY (14z-91). The obj_hook legacy-cycle regression's fix relocates each
 # walker (0x54458 / 0x5E52A, 0x2C bytes) into free space, appends the
@@ -27,7 +51,10 @@
 #
 # EXACTLY ONE BYTE OF STATE DIFFERS: the relocated `jsr (A0)` pushes
 # <copy>+0x20 where vanilla pushed <walker>+0x20. Same stack DEPTH, same
-# order, same everything else. That longword is invisible to the legacy
+# order, same everything else. [RETRACTED 14z-185, #143 — see above: the
+# claim that followed, that the longword is invisible to the legacy oracle
+# because it lands inside the dead-stack mask window, rested on the idle
+# supervisor stack.] That longword is invisible to the legacy
 # oracle if and only if it lands inside the ratified dead-stack mask window
 # RAM:$FF7F00-$FF7FFF (CLAUDE.md §4; docs/game/atlas/ram.md). The push
 # occupies [A7-4, A7-1], so the test is:
@@ -37,6 +64,12 @@
 # IF THIS FAILS, THE DESIGN STOPS. The answer is NOT to widen the mask —
 # that silently redefines the baseline the superset invariant rests on, and
 # it would buy a permanent blind spot over live work RAM. Escalate.
+# [14z-185, #143: measured on the live stack, it FAILS — the push lands at
+# $FF055A-$FF06DD — and "fails the window" is not "not bit-identical": the
+# relocation is live on merged-m20 and tests/audit_merged_legacy.sh lands all
+# 53 legacy pairings on their ratified classes there. Escalated as #143; the
+# maintainer, told the push lands in unmasked RAM, ruled what this gate checks
+# from now on: "Freeze the real ranges (Recommended)". No mask was widened.]
 #
 # DO NOT ASSUME ONE STACK. 14z-89 attributed live divergences to execution
 # position at BOTH $FF06B5-$FF06D3 and $FFF991-$FFF9D3, so this engine keeps
@@ -50,8 +83,8 @@
 # at a fixed call site is a structural property of the call chain. Still,
 # the per-site replay count is printed so the base is visible.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [JOBS=8] [--freeze] tests/audit_walker_ghost.sh
-# ~5 min (corpus-wide debug runs, JOBS-parallel).
+# Usage: ROMDIR=... [MAME_BIN=...] [JOBS=8] [BUILD=build/m3b_merged28] [--freeze] tests/audit_walker_ghost.sh
+# ~1.5 min (two corpus-wide debug legs, JOBS-parallel; measured 14z-185 on this MacBook: 83 s).
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -60,7 +93,8 @@
 #   measurement that gates the walker relocation — it is the single piece of
 #   state the move changes. Measured A7 = 0xff7ff6 CONSTANT at BOTH walkers
 #   over 279,577 dispatches in all 49 corpus replays, so the push lands at
-#   0xff7ff2-0xff7ff5, inside $FF7F00-$FF7FFF. Frozen in
+#   0xff7ff2-0xff7ff5, inside $FF7F00-$FF7FFF. [RETRACTED 14z-185, #143: that
+#   A7 was the idle supervisor stack; the live push lands at $FF055A-$FF06DD.] Frozen in
 #   build/manifest/walker_ghost.toml. FAILS rather than widening anything: the
 #   header says widening the mask is NOT the remedy. Cross-check: the dispatch
 #   counts reproduce dispatch_census.toml exactly on a different register. ~5
@@ -77,108 +111,100 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
 JOBS="${JOBS:-8}"
-# the `jsr (A0)` of each walker = site + 6 (site = walker + 0x18)
+# the `jsr (A0)` of each walker = walker + 0x1E (walker 0x54458 / 0x5E52A)
 SPSITES="54476,5e548"
 FROZEN="build/manifest/walker_ghost.toml"
+BUILD="${BUILD:-build/m3b_merged28}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
+. "$REPO/tests/lib/controls.sh"
+vs_ctl_mode "$0"
+[ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
+. "$REPO/tests/lib/decrypt_cache.sh"
+decrypt_view vsavj "$W/vj_op.bin" "$W/vj_da.bin" || { echo "FAIL: vsavj views not delivered"; exit 1; }
 
+run1() {  # run1 <replay> <out dir> [sp] [set rompath sites]  — one walker_sp.lua run (background)
+    _n="$1"; _o="$2"; _rpl="tests/replays/$_n.rpl"; mkdir -p "$_o"
+    _set="${4:-vsavj}"; _rp="${5:-$ROMDIR}"; _sites="${6:-$SPSITES}"
+    _lf=$(sed 's/#.*//' "$_rpl" | awk 'NF { split($1, r, "-"); f=(r[2]?r[2]:r[1]);
+         if (f + 0 > m) m = f + 0 } END { print m + 0 }')
+    ( MAME_SANDBOX="$_o/sb_$_n" REPLAY="$PWD/$_rpl" SPSITES="$_sites" SP_OUT="$_o/$_n.txt" \
+      WALKER_SP_READ="${3:-}" FRAMES=$((_lf + 120)) MAME_ROMPATH="$_rp" \
+      tools/run_mame.sh "$_set" -debug -debugger none \
+      -autoboot_script "$PWD/tests/lua/walker_sp.lua" >"$_o/$_n.log" 2>&1; rm -rf "$_o/sb_$_n" ) </dev/null &
+}
 names="$(ls tests/expected/vsavj/masked-v2/logs/*.log | xargs -n1 basename | sed 's/\.log$//')"
 echo "corpus: $(echo "$names" | wc -w | tr -d ' ') legacy replays (every replay with a vanilla basis log)"
+_sp=""; vs_ctl_is supervisor-read && _sp=sp
 pool=0
 for n in $names; do
-    rpl="tests/replays/$n.rpl"
-    [ -f "$rpl" ] || continue
-    lf=$(sed 's/#.*//' "$rpl" | awk 'NF { split($1, r, "-"); f=(r[2]?r[2]:r[1]);
-         if (f + 0 > m) m = f + 0 } END { print m + 0 }')
-    ( MAME_SANDBOX="$W/sb_$n" REPLAY="$PWD/$rpl" SPSITES="$SPSITES" SP_OUT="$W/$n.txt" \
-      FRAMES=$((lf + 120)) MAME_ROMPATH="$ROMDIR" \
-      tools/run_mame.sh vsavj -debug -debugger none \
-      -autoboot_script "$PWD/tests/lua/walker_sp.lua" >"$W/$n.log" 2>&1 ) &
+    [ -f "tests/replays/$n.rpl" ] || continue
+    run1 "$n" "$W/runs" "$_sp"
     pool=$((pool + 1)); if [ "$pool" -ge "$JOBS" ]; then wait; pool=0; fi
 done
+run1 21_don_mash "$W/ctl_sp" sp      # the supervisor-read control's one run
 wait
+# THE RELOCATED LEG (rule-checker 2026-09-28-383 Q4): the ghost IS the relocated walker's push, so the same corpus
+# runs on the build under test at its RELOCATED `jsr (A0)` sites, derived from the build's own image: the call sites
+# 0x0053F6 (vanilla `jsr 0x05E52A`) and 0x009436 (`jsr 0x054458`) jump to the copies, and site = copy + 0x1E.
+RELOC=""
+if [ -f "$BUILD/verify_op.bin" ] && [ -f "$BUILD/rompath/vsavjw.zip" ]; then
+    RELOC="$(python3 -c "
+import sys
+img = open('$BUILD/verify_op.bin', 'rb').read()
+out = []
+for call, van in ((0x0053F6, 0x5E548), (0x009436, 0x54476)):
+    assert img[call:call + 2] == b'\x4e\xb9', hex(call)
+    copy = int.from_bytes(img[call + 2:call + 6], 'big')
+    out.append(f'{copy + 0x1E:x}={van:x}')
+print(' '.join(out))")" || { echo "FAIL: the relocated walker sites could not be derived from $BUILD"; exit 1; }
+    _rsites="$(echo $RELOC | tr ' ' '\n' | cut -d= -f1 | paste -sd, -)"
+    echo "relocated leg: $BUILD, sites $_rsites (mapped to the vanilla sites: $RELOC)"
+    pool=0
+    for n in $names; do
+        [ -f "tests/replays/$n.rpl" ] || continue
+        run1 "$n" "$W/reloc" "$_sp" vsavjw "$BUILD/rompath;$ROMDIR" "$_rsites"   # the supervisor-read mode forces SP here too
+        pool=$((pool + 1)); if [ "$pool" -ge "$JOBS" ]; then wait; pool=0; fi
+    done
+    wait
+else
+    echo "FAIL: no build (verify_op.bin, rompath/vsavjw.zip) at $BUILD for the relocated leg"; exit 1
+fi
 
-W="$W" FROZEN="$FROZEN" python3 - "${1:---check}" <<'PY'
-import glob, os, re, sys
-W, FROZEN = os.environ["W"], os.environ["FROZEN"]
-mode = sys.argv[1]
-MASK_LO, MASK_HI = 0xFF7F00, 0xFF8000      # window is [LO, HI), i.e. ..$FF7FFF
-sites, per_replay, incomplete = {}, {}, []
-nfiles = len(glob.glob(f"{W}/*.txt"))
-for f in sorted(glob.glob(f"{W}/*.txt")):
-    name = os.path.basename(f)[:-4]
-    txt = open(f).read()
-    if "SPEND" not in txt:
-        incomplete.append(name); continue
-    for m in re.finditer(r"SP (\w+) hits (\d+) min (\S+) max (\S+)", txt):
-        a, hits = int(m.group(1), 16), int(m.group(2))
-        s = sites.setdefault(a, {"hits": 0, "min": None, "max": None,
-                                 "live": 0, "pages": {}})
-        s["hits"] += hits
-        if hits:
-            s["live"] += 1
-            lo, hi = int(m.group(3), 16), int(m.group(4), 16)
-            s["min"] = lo if s["min"] is None else min(s["min"], lo)
-            s["max"] = hi if s["max"] is None else max(s["max"], hi)
-            per_replay.setdefault(a, []).append((name, hits, lo, hi))
-    for m in re.finditer(r"PAGES (\w+) : (.*)", txt):
-        a = int(m.group(1), 16)
-        if a not in sites: continue
-        for tok in m.group(2).split():
-            if "=" not in tok: continue
-            p, c = tok.split("=")
-            sites[a]["pages"][int(p, 16)] = sites[a]["pages"].get(int(p, 16), 0) + int(c)
-fail = 0
-if incomplete:
-    print("  FAIL: incomplete runs: " + ", ".join(incomplete)); fail = 1
-frozen = {}
-if os.path.exists(FROZEN):
-    cur = None
-    for ln in open(FROZEN):
-        m = re.match(r'site = 0x(\w+)', ln.strip())
-        if m: cur = int(m.group(1), 16)
-        m = re.match(r'sp_min = 0x(\w+)', ln.strip())
-        if m and cur is not None: frozen[cur] = int(m.group(1), 16)
-out = ["# build/manifest/walker_ghost.toml — FROZEN stack-depth observation",
-       "# at each object-pool walker's `jsr (A0)` (14z-91). Regenerate with",
-       "# tests/audit_walker_ghost.sh --freeze. The relocated walker pushes a",
-       "# different return address at exactly this depth; it is invisible to",
-       "# the legacy oracle only while [sp_min-4, sp_max-1] stays inside the",
-       "# masked dead-stack window $FF7F00-$FF7FFF.",
-       "schema = 1"]
-for a in sorted(sites):
-    s = sites[a]
-    print(f"\n=== walker jsr at {a:#08x}: {s['hits']:,} dispatches in {s['live']}/{nfiles} replays")
-    if s["hits"] == 0:
-        print("    FAIL: zero dispatches — dead instrument, not a finding"); fail = 1
-        continue
-    push_lo, push_hi = s["min"] - 4, s["max"] - 1
-    print(f"    A7 range      {s['min']:#08x} .. {s['max']:#08x}")
-    print(f"    pushed long   {push_lo:#08x} .. {push_hi:#08x}")
-    pg = " ".join(f"{p:#08x}={c:,}" for p, c in sorted(s["pages"].items()))
-    print(f"    A7 pages      {pg}")
-    if push_lo >= MASK_LO and s["max"] <= MASK_HI:
-        print(f"    ok: INSIDE the masked dead-stack window "
-              f"{MASK_LO:#08x}-{MASK_HI - 1:#08x} — a relocated walker's return")
-        print( "        address is invisible to the legacy oracle here")
-    else:
-        print(f"    FAIL: OUTSIDE the masked window {MASK_LO:#08x}-{MASK_HI - 1:#08x}.")
-        print( "          The relocation would put a differing longword in LIVE work")
-        print( "          RAM. STOP — do not widen the mask to accommodate it; that")
-        print( "          redefines the baseline the superset invariant rests on.")
-        fail = 1
-    if s["live"] <= 5:
-        print(f"    NOTE: only {s['live']} replays reach this walker — thin base; see header")
-        for nm, h, lo, hi in sorted(per_replay.get(a, [])):
-            print(f"      {nm:32s} {h:>9,} hits  A7 {lo:#08x}..{hi:#08x}")
-    if a in frozen and frozen[a] != s["min"]:
-        print(f"    note: sp_min moved {frozen[a]:#08x} -> {s['min']:#08x} since the freeze")
-    out += ["", "[[site]]", f"site = 0x{a:05x}", f"sp_min = 0x{s['min']:06x}",
-            f"sp_max = 0x{s['max']:06x}", f"hits = {s['hits']}", f"replays = {s['live']}"]
-if mode == "--freeze" and not fail:
-    open(FROZEN, "w").write("\n".join(out) + "\n")
-    print(f"\nFROZE {FROZEN}")
-    sys.exit(0)
-print("\n" + ("WALKER GHOST: PASS" if not fail else "WALKER GHOST: FAIL"))
-sys.exit(fail)
-PY
+_flags=""
+vs_ctl_is range-moved && _flags="--frozen-shift 2"
+vs_ctl_is mask-covers && _flags="--extra-mask ff0550-ff06e0"
+if [ "${1:-}" = "--freeze" ]; then
+    [ -z "${VS_CTL:-}" ] || { echo "REFUSED: --freeze in control mode"; exit 3; }
+    python3 tools/walker_ghost.py "$W/runs" "$FROZEN" "$W/vj_op.bin" --freeze; exit $?
+fi
+fail=0
+python3 tools/walker_ghost.py "$W/runs" "$FROZEN" "$W/vj_op.bin" ${_flags} > "$W/read.txt" || fail=1
+cat "$W/read.txt"
+_map=""; for m in $RELOC; do _map="$_map --map $m"; done
+echo
+echo "== the relocated leg ($BUILD)"
+python3 tools/walker_ghost.py "$W/reloc" "$FROZEN" "$BUILD/verify_op.bin" ${_flags} ${_map} > "$W/read_reloc.txt" || fail=1
+cat "$W/read_reloc.txt"
+
+echo
+echo "== must-fire controls"
+if [ -n "${VS_CTL:-}" ]; then
+    if [ "$fail" = 1 ]; then vs_ctl_fired "$VS_CTL" "the gate's own read fails under the control"; echo "FAIL: audit_walker_ghost (control mode)"; exit 1
+    else vs_ctl_dead "$VS_CTL" "the gate's own read still passed" || true; echo "FAIL: audit_walker_ghost"; exit 1; fi
+fi
+# supervisor-read: the instrument reading SP on 21_don_mash must fail the ground truth
+if python3 tools/walker_ghost.py "$W/ctl_sp" "$FROZEN" "$W/vj_op.bin" --no-frozen > "$W/ctl_sp.txt"; then
+    vs_ctl_dead supervisor-read "the SP read passed the ground truth" || fail=1
+elif command grep -q "GROUND" "$W/ctl_sp.txt"; then
+    vs_ctl_fired supervisor-read "the SP read fails the ground truth: $(command grep -m1 '^    ground truth' "$W/ctl_sp.txt" | cut -c19-110)"
+else vs_ctl_dead supervisor-read "failed, but not on the ground truth" || fail=1; fi
+for c in "range-moved:--frozen-shift 2:FROZEN" "mask-covers:--extra-mask ff0550-ff06e0:VISIBLE"; do
+    n="${c%%:*}"; rest="${c#*:}"; fl="${rest%%:*}"; want="${rest##*:}"
+    if python3 tools/walker_ghost.py "$W/runs" "$FROZEN" "$W/vj_op.bin" $fl > "$W/ctl_$n.txt"; then
+        vs_ctl_dead "$n" "the perturbed read passed" || fail=1
+    elif command grep -q "CHECK FAIL.*$want" "$W/ctl_$n.txt"; then
+        vs_ctl_fired "$n" "$(command grep -m1 "CHECK FAIL.*$want" "$W/ctl_$n.txt" | cut -f2 | cut -c1-110)"
+    else vs_ctl_dead "$n" "failed, but not on $want" || fail=1; fi
+done
+if [ "$fail" = 0 ]; then echo "PASS: audit_walker_ghost — the walkers' pushes land on the live stack outside every oracle mask, at the frozen ranges"
+else echo "FAIL: audit_walker_ghost"; exit 1; fi

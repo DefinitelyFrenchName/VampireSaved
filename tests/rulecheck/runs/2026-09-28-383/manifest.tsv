@@ -1,0 +1,16 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent185/t143/maintainer_143.txt	0f03fe5d88b3143b6b4c4248c20aa23c5b1f0b25
+build/agent185/t143/walker_sp_lua.diff	2b3a0f92ebd03c64cbbdb0f575675830fdb647b6
+build/agent185/t143/audit_walker_ghost.before.sh	b9c624d43760b4d3bea78a850071b39ccbf15b8f
+build/agent185/t143/audit_walker_ghost.after.sh	b30d3230125fefdf3c0603fd351205b8de7742a9
+build/agent185/t143/walker_ghost_toml.diff	b264c96b41af8e3715c6875ed4b773ae4417e73e
+build/agent185/t143/gate_before_freeze.log	b4b1fec33a7191462bcdd05c6a2541561c255f37
+build/agent185/t143/gate_freeze.log	2a8f3e1e6adddda71d73ae55a9735f967d1c5cfc
+build/agent185/t143/gate_plain.log	fcaf587af671c255a789f006ee69eecd6171a8b2
+build/agent185/t143/gate_ctl_supervisor-read.log	67a0861364209f825090f91f2147d2795813aae1
+build/agent185/t143/gate_ctl_range-moved.log	689c6d6e5101ed4dca48137e8144f90890ff795b
+build/agent185/t143/gate_ctl_mask-covers.log	0236f43b35436ac93d177933c601d95f51995749
+build/agent185/t143/repoint.log	0c4d658ee73753ed1c8c850291e5199dc5ed607c
+build/agent185/t143/retraction_regrep.txt	101d5c9f27f86f87d46c08b9ae99d27eba5901d3
+tools/walker_ghost.py	ea26f66708bc6e555a938ee8d9fabb667b255ee8
+build/manifest/walker_ghost.toml	3a23772dab3bebd1ef4b96f7f09d25246fe63ab2

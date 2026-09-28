@@ -1,5 +1,19 @@
 # GOTCHAS (project) — traps in OUR pipeline and method
 
+## A PROBE THAT DERIVES A "FREE" NAME FROM LIVE STATE STOPS WORKING AS THE STATE GROWS (paid: 14z-185, GitHub #160's probe)
+
+**What happened.** `tests/test_rule_checker.sh`'s PREPARE IDS probe (written 14z-185 for #160) put
+its orphan run directory at today plus the ledger's row count plus one, the name the pre-#160 tool
+would pick. It passed when written. Six runs later, today's run numbers had passed the row count, so
+the name was a real run (2026-09-28-385). The probe refused itself (`ORPHAN-NAME-TAKEN`), its
+`counted-id` control read DEAD, and the static tier went red.
+
+**The rule.** A probe's scenario is built on its COPY with the variable part removed, never
+computed against live state that later work keeps growing. Here that means dropping today's ledger
+rows and run directories from the copy, so the count-based name is a true orphan on any day. A
+probe that passes on the day it is written has shown nothing about later days. Ask what the
+computed name depends on, and whether normal use will move it.
+
 ## A VULN ID OF 0 IS NO BOX — a resolver that reads it builds a PHANTOM hurtbox the engine never tests (paid: 14z-182, GitHub #175)
 
 **What happened.** Measuring whether the Plasma Trap dome can reach an airborne Victor, the first
@@ -84,6 +98,14 @@ document outside a hand-listed root set is a live carrier the grep never
 reaches (rule-checker run 2026-09-25-204). The tool is `tools/retraction_grep.py` over the sitting's pattern
 file `tests/rulecheck/retractions/<key>.tsv`; it exits 1 when a reach control
 reads 0 hits, and the hits' classing is written by hand below its output.
+
+**Paid again 14z-185 (GitHub #143, rule-checker runs 2026-09-28-385..386).**
+A retraction mid-session was re-grepped with an ad-hoc line grep instead of
+the tool. It missed the corrected claim in `build/manifest/donovan.toml`,
+wrapped across two `#` lines ("where the legacy oracle compares / it"), and it
+excluded the rendered `docs/site/`, which still carried the old text. The
+tool, run over the sitting's pattern file, found both. **The rule does not
+wait for the close:** use the tool for any retraction, whenever it happens.
 
 ## AN AIR-THROW RIG IS DECIDED BY THE VICTIM'S JUMP LEAD, NOT BY THE PAIR'S SPACING — with both jumps on one frame the pair is bistable across schedule shifts (paid: 14z-120 to 14z-181, GitHub #169)
 

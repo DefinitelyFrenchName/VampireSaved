@@ -4030,10 +4030,12 @@ def main():
             # opcodes in identical order, and `jsr abs.l` costs the same
             # whatever its operand while `movea.l (d8,PC,Dn.w)` costs the same
             # wherever PC points. The single state difference is the pushed
-            # return address (copy+0x20 vs walker+0x20) — measured by
-            # tests/audit_walker_ghost.sh at A7 = 0xff7ff6 CONSTANT over
-            # 279,577 dispatches in all 49 corpus replays, i.e. inside the
-            # masked dead-stack window $FF7F00-$FF7FFF.
+            # return address (copy+0x20 vs walker+0x20). It lands in UNMASKED
+            # work RAM, $FF055A-$FF06DD, on the LIVE (user) stack, outside
+            # every legacy-oracle mask (tests/audit_walker_ghost.sh, re-stated
+            # 14z-185, #143). RETRACTED 14z-185: "A7 = 0xff7ff6 CONSTANT ...
+            # inside the masked dead-stack window" — that A7 was the idle
+            # supervisor stack.
             walker = _int(ph["walker"])
             wlen = _int(ph["walker_len"])
             callers = [int(c, 0) for c in str(ph["callers"]).split(",") if c.strip()]

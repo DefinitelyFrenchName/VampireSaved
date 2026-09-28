@@ -350,11 +350,12 @@ flavor_hold_flag = 0xFF8060
 # Legacy cost is zero by construction, not by census: the relocated walker
 # executes the same opcodes in the same order, and `jsr abs.l` costs the same
 # whatever its operand while `movea.l (d8,PC,Dn.w)` costs the same wherever
-# PC points. Exactly one byte of state differs — the `jsr (A0)` pushes
-# copy+0x20 instead of walker+0x20 — and tests/audit_walker_ghost.sh measured
-# A7 = 0xff7ff6 CONSTANT at both walkers over 279,577 dispatches in all 49
-# corpus replays, so that longword lands at 0xff7ff2-0xff7ff5, inside the
-# masked dead-stack window $FF7F00-$FF7FFF.
+# PC points. Exactly one longword of state differs — the `jsr (A0)` pushes
+# copy+0x20 instead of walker+0x20 — and it lands in UNMASKED work RAM,
+# $FF055A-$FF06DD, on the LIVE (user) stack, outside every legacy-oracle
+# mask (tests/audit_walker_ghost.sh, re-stated 14z-185, #143). RETRACTED 14z-185:
+# "A7 = 0xff7ff6 CONSTANT ... inside the masked dead-stack window" — that A7 was
+# the idle supervisor stack.
 #
 # COMPLETENESS IS THE CORRECTNESS ARGUMENT: a caller we miss keeps walking
 # the VANILLA table — bit-identical for legacy, since it IS vanilla, but an

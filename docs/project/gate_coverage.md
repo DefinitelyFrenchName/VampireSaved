@@ -1978,11 +1978,11 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 ### `audit_walker_ghost.sh` — audit, emulator
 
-**WHAT:** where each relocated object-pool walker's `jsr (A0)` pushes its return address: the one longword of state the walker relocation changes must land inside the ratified dead-stack mask window $FF7F00-$FF7FFF, or the design stops (never widen the mask).
+**WHAT:** where each object-pool walker's `jsr (A0)` pushes its return address — the one longword of state the walker relocation changes — measured on the LIVE stack, and that it lands outside every legacy-oracle mask, so no mask hides it from the per-frame oracle's checksum (whether the oracle's verdicts catch a differing byte there: see NOT covered below).
 
-**HOW:** corpus-wide MAME -debug runs recording A7 at both walker sites over every dispatch, with a per-page stack histogram; the frozen figure lives in build/manifest/walker_ghost.toml.
+**HOW:** corpus-wide MAME -debug runs of tests/lua/walker_sp.lua (the live stack chosen by SR's S bit, and the long on top of it) at both walker sites on pristine vsavj, and at the RELOCATED walkers' sites on the build under test (derived from its own call sites); tools/walker_ghost.py proves the pointer against the vsavj opcode image (each long on top ends a `jsr abs.l` to the walker; the build's own image for the relocated leg), checks the push against the union of `tests/expected/**/mask,` and compares the live ranges with build/manifest/walker_ghost.toml — the relocated sites with the vanilla sites' frozen ranges (the relocation pushes at the same depth).
 
-**EXPECTS:** min(A7)-4 >= 0xFF7F00 and max(A7) <= 0xFF8000 at both sites (measured A7 = 0xff7ff6 constant over 279,577 dispatches); the dispatch counts reproduce the dispatch census. A red is an escalation, not a mask change.
+**EXPECTS:** the reader's PASS: every long on top of the read stack a genuine return address, the push outside every mask, the live ranges as frozen; the three controls fail.
 
 ### `audit_walker_repoint.sh` — audit, emulator
 

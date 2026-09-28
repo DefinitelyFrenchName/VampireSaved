@@ -1,21 +1,20 @@
-# build/manifest/walker_ghost.toml — FROZEN stack-depth observation
-# at each object-pool walker's `jsr (A0)` (14z-91). Regenerate with
-# tests/audit_walker_ghost.sh --freeze. The relocated walker pushes a
-# different return address at exactly this depth; it is invisible to
-# the legacy oracle only while [sp_min-4, sp_max-1] stays inside the
-# masked dead-stack window $FF7F00-$FF7FFF.
-schema = 1
+# build/manifest/walker_ghost.toml — FROZEN live-stack range at each object-pool walker's `jsr (A0)`
+# (14z-91; re-measured on the LIVE stack 14z-185, GitHub #143 — until then this held the idle
+# supervisor stack, a constant 0xff7ff6). Regenerate with tests/audit_walker_ghost.sh --freeze.
+# The relocated walker pushes a different return address at [sp_min-4, sp_max-1]; the gate asserts
+# that range lies OUTSIDE every legacy-oracle mask (no mask hides it from the oracle's checksum).
+schema = 2
 
 [[site]]
 site = 0x54476
-sp_min = 0xff7ff6
-sp_max = 0xff7ff6
+sp_min = 0xff06de
+sp_max = 0xff06de
 hits = 8586
 replays = 5
 
 [[site]]
 site = 0x5e548
-sp_min = 0xff7ff6
-sp_max = 0xff7ff6
-hits = 270991
-replays = 49
+sp_min = 0xff055e
+sp_max = 0xff06de
+hits = 315008
+replays = 56

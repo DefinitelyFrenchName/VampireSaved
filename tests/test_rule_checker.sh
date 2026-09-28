@@ -126,8 +126,16 @@ record_binding() {  # record_binding <rulecheck.py to test> <root>
 # next auto id (the 2026-09-18-36 collision), must not stop `prepare` without --id; (b) a prepare naming
 # a missing artifact must fail AND leave no run directory behind (runs 2026-09-25-347 and -370 did).
 # Prints IDS-OK or the way it was not.
+# The scenario is built on the COPY with TODAY's ledger rows and run directories removed, so the
+# count-based name is a true orphan (no ledger row, no directory) whatever today's runs were: on the
+# live ledger the name can land on a real run of today's, and did (14z-185, run -385 — the probe
+# then refused, ORPHAN-NAME-TAKEN, and its counted-id control read DEAD).
 prepare_ids() {  # prepare_ids <rulecheck.py to test> <root>
     rm -rf "$2"; mkcopy "$2"; cp "$1" "$2/tools/rulecheck.py"
+    _today="$(date +%Y-%m-%d)"
+    awk -F'\t' -v t="$_today-" 'index($1, t) != 1' "$2/tests/rulecheck/ledger.tsv" > "$2/ledger.today-less" \
+        && mv "$2/ledger.today-less" "$2/tests/rulecheck/ledger.tsv" || { echo "NO-LEDGER-TRIM"; return; }
+    find "$2/tests/rulecheck/runs" -maxdepth 1 -name "$_today-*" -exec rm -rf {} + 2>/dev/null
     _cnt="$(python3 -c "import sys; sys.path.insert(0, '$2/tools'); import rulecheck as r; print(len(r.read_ledger(r.Path('$2'))))")" \
         || { echo "NO-LEDGER-COUNT"; return; }
     _orphan="$2/tests/rulecheck/runs/$(date +%Y-%m-%d)-$(printf '%02d' $((_cnt + 1)))"

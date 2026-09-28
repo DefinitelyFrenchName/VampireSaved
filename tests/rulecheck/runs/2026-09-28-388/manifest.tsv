@@ -1,0 +1,32 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent185/t143/maintainer_143.txt	0f03fe5d88b3143b6b4c4248c20aa23c5b1f0b25
+build/agent185/t143/walker_sp_lua.diff	d2027eadd730c23d1c9c88d18f89582f03611a31
+build/agent185/t143/audit_walker_ghost.before.sh	b9c624d43760b4d3bea78a850071b39ccbf15b8f
+build/agent185/t143/audit_walker_ghost.after.sh	0e6a08e830fcb392c6cf3bf2cd075b1b6205cbca
+build/agent185/t143/walker_ghost_toml.diff	f79af7062172ff300f4e37accea99cd73d2123ad
+build/agent185/t143/gate_before_freeze.log	b4b1fec33a7191462bcdd05c6a2541561c255f37
+build/agent185/t143/stamped.sh	9ba8fb573cecef844c734e445f72781148883dd1
+build/agent185/t143/gate_freeze.log	4bdbae4e4df3c9f14fdd7713f6b51c28872f7c54
+build/agent185/t143/freeze_cmp.txt	75c27abc5a2568f54933a719b7b31527e4dc3e5e
+build/agent185/t143/gate_plain.log	d87a8e3ab2385745010febee3d5cd452a7fe9612
+build/agent185/t143/gate_ctl_supervisor-read.log	4f2f99174a7fc11f0efa9805ea2d243c04e47bbf
+build/agent185/t143/gate_ctl_range-moved.log	a0b7241ad89561850a8abbadab1914f0616cee59
+build/agent185/t143/gate_ctl_mask-covers.log	abeb5ce07354d7208d6c2905478667eec91b06e5
+build/agent185/t143/repoint.log	d2b6d135e492e3ca47ed0fc40ca463a3df3e5bd0
+build/agent185/t143/order_check.sh	a40ae3f94826fb4c0e92f065e17b1f88e7d5419f
+build/agent185/t143/order_check.txt	08754855e0e9d789eeff2b21a34fcf21a1e3aa4e
+build/agent185/t143/page_patch_check.sh	d2a84b49e31bf95146f7b55c137a7a828e8a9f08
+build/agent185/t143/page_patch_check.txt	35140dcd946f3d198fab2067aa2da3568fc9eb15
+build/agent185/t143/regrep.sh	4d7eb6e23fcfe78f84227cab2dc1bb640d4e1780
+build/agent185/t143/retraction_regrep.txt	197f881caba6c9b26a85324d995371fea089523a
+build/agent185/t143/regrep_wrapped.py	020874feb79f343b397dda0a27694d45f5839775
+build/agent185/t143/retraction_regrep_wrapped.txt	8f707e9ed60b9615825dc5b5eca7093e5a788164
+build/agent185/t143/retraction_grep_14z185.txt	f654ac4ee4ae0d4c0565648849285798f29ea8e1
+build/agent185/t143/merged_legacy_m20base.log	dee36569478270b432143111e0d9787a5f82fa5e
+build/agent185/t143/plant_ctl.sh	be5f757e32f153c09b8a5bb00bb379602003d397
+build/agent185/t143/plant_ctl.log	12cbd9de18508eb0818ef5bbd6b9c9faa2116615
+tools/walker_ghost.py	6dffcea79f396393b51cbc14c6c8f607f2b235f0
+build/manifest/walker_ghost.toml	5a7bc82054578aa7b32a33f583e1aacb71af3e5e
+tests/rulecheck/retractions/14z-185.tsv	f39558a7881ac59ddc8e29c2a166ba6e39a66b34
+HANDOFF.md.lines-1610-1610 (lines 1610-1610 of HANDOFF.md)	ec0c1acd79bbabcd139285ae21c07944ea03f99f
+docs/game/engine_internals.md.lines-2712-2731 (lines 2712-2731 of docs/game/engine_internals.md)	6ee7453e2c380477defa17c9de70b084a3bd23a9

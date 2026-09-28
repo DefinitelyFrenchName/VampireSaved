@@ -1,0 +1,19 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent185/t143/walker_sp_probe.lua	1d24785841690ec5f6a7688661cb47c1fe471c69
+build/agent185/t143/probe.sh	47904367f43ffb4557d166349ee1c69b5c54f5a1
+build/agent185/t143/aggregate.log	86fd5aac93e0deaee1e224d21dcf00e6bbdef4ab
+build/agent185/t143/ground_truth.log	1cee28679e5bc0797272c1fc9683bc6c83161388
+build/agent185/t143/probe_m20.sh	8f8176d2d1c02b93eac15439e67946b3c865478a
+build/agent185/t143/windows.py	3a3acc0bc1bd8b17df298f3a5b5420f54db690b3
+build/agent185/t143/windows_m20.log	515f8327248b3125c2d65ff1f01c5b43f321d5fe
+build/agent185/t143/relocation_m20.log	3a1f901cd652be3930fe1f27311f55fc3f41d48e
+build/agent185/t143/relocated_sites_dis.txt	ba4bdc73118bf6fb8334763faf2b2f4aeaf17120
+build/agent185/t143/oracle_mask.txt	866dae2ebc0d6c76b34e5f4e156d949e996f2f0f
+build/agent185/t143/merged_legacy_m20base.log	dee36569478270b432143111e0d9787a5f82fa5e
+build/agent185/maintainer_queue_14z185.txt	d0fae9f22dc80dc1857e460458bdf2de1fd5ebd4
+tests/lua/walker_sp.lua	fe61dc57c402361a4278c1beb51c82abeab7bf1f
+tests/audit_walker_ghost.sh	b9c624d43760b4d3bea78a850071b39ccbf15b8f
+tests/audit_walker_repoint.sh	312ca0a47d1bc83557e6c1fa6271576e4b836f70
+build/manifest/walker_ghost.toml	1c6f47f3481fd1de1100a70c528afe93710eef06
+docs/platform/gotchas.md.lines-2653-2673 (lines 2653-2673 of docs/platform/gotchas.md)	fda6d47a261ba5630b2fa55479e91904f5495d52
+DECISIONS_HISTORY.md.lines-1503-1506 (lines 1503-1506 of DECISIONS_HISTORY.md)	dfd36ad2e653f709251e30a13505ffb57a66ef2a
