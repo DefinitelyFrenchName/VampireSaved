@@ -19,6 +19,8 @@
 # MUST-FIRE: perturbed-copy: unchecked-freeze — a copy of the registry with one more row after the birth row, named by no `freeze` run, must fail: a freeze is bound to the checker mechanically
 # MUST-FIRE: perturbed-copy: prose-verdict — a copy of the record in which one run's real verdict is prose instead of the six structured lines must fail: a prose verdict is unfalsifiable and the recorder refuses it
 # MUST-FIRE: shadow-tool: unbound-record — a copy of rulecheck.py with the spawn binding removed must let a pinned-reader run be recorded without its transcript, and the RECORD BINDING section must FAIL: `record` binds every reader to the spawn check (14z-178, rule-checker run 2026-09-24-134 Q4)
+# MUST-FIRE: shadow-tool: counted-id — a copy of rulecheck.py numbering prepare's auto id by a COUNT (the pre-#160 line) must collide with a run directory that has no ledger row, and the PREPARE IDS section must FAIL: the auto id is the next free number above every run directory and ledger id (GitHub #160, 14z-185)
+# MUST-FIRE: shadow-tool: late-validate — a copy of rulecheck.py with prepare's early artifact check removed must leave a run directory with no ledger row behind when an artifact is missing, and the PREPARE IDS section must FAIL: prepare checks every artifact before it creates anything (GitHub #160, 14z-185)
 # MUST-FIRE: perturbed-copy: cross-family-plant — a copy of the record in which a PROCEDURE calibration names an EVIDENCE fixture as its plant must fail: a plant answers its own family's questions, so one from the other checklist proves nothing about the reader (#172 S3, 14z-176)
 #
 # WHY. The rule-checker (docs/project/rule_checker.md, [VSP-183]/[VSP-184]) is a
@@ -119,6 +121,35 @@ record_binding() {  # record_binding <rulecheck.py to test> <root>
     grep -q "never spawned" "$2/rb.log" || { echo "REFUSED-FOR-ANOTHER-REASON: $(tail -1 "$2/rb.log")"; return; }
     echo BOUND
 }
+# SECTION PREPARE IDS's probe (GitHub #160, 14z-185): on a throwaway root carrying its own copy of the
+# tool, (a) a run directory with no ledger row, named where a COUNT of the ledger's rows would put the
+# next auto id (the 2026-09-18-36 collision), must not stop `prepare` without --id; (b) a prepare naming
+# a missing artifact must fail AND leave no run directory behind (runs 2026-09-25-347 and -370 did).
+# Prints IDS-OK or the way it was not.
+prepare_ids() {  # prepare_ids <rulecheck.py to test> <root>
+    rm -rf "$2"; mkcopy "$2"; cp "$1" "$2/tools/rulecheck.py"
+    _cnt="$(python3 -c "import sys; sys.path.insert(0, '$2/tools'); import rulecheck as r; print(len(r.read_ledger(r.Path('$2'))))")" \
+        || { echo "NO-LEDGER-COUNT"; return; }
+    _orphan="$2/tests/rulecheck/runs/$(date +%Y-%m-%d)-$(printf '%02d' $((_cnt + 1)))"
+    [ -e "$_orphan" ] && { echo "ORPHAN-NAME-TAKEN $(basename "$_orphan")"; return; }
+    mkdir -p "$_orphan"
+    ( cd "$2" && python3 tools/rulecheck.py prepare --calibrate proc-planted-spec-14z178 ) > "$2/pa.log" 2>&1 \
+        || { echo "COLLIDED: $(tail -1 "$2/pa.log")"; return; }
+    _before="$(ls "$2/tests/rulecheck/runs" | wc -l | tr -d ' ')"
+    ( cd "$2" && python3 tools/rulecheck.py prepare --decision recommendation --subject s --claim c --artifact no/such/file ) > "$2/pb.log" 2>&1 \
+        && { echo "PREPARED-WITH-A-MISSING-ARTIFACT"; return; }
+    grep -q "artifact not found" "$2/pb.log" || { echo "REFUSED-FOR-ANOTHER-REASON: $(tail -1 "$2/pb.log")"; return; }
+    [ "$(ls "$2/tests/rulecheck/runs" | wc -l | tr -d ' ')" = "$_before" ] || { echo "LEFT-A-RUN-DIRECTORY"; return; }
+    echo IDS-OK
+}
+counted() {  # counted <out> — the shadow tool: prepare's auto id by the pre-#160 count
+    sed 's/^    n = max(taken + \[0\])$/    n = max(len(ledger_rows), len([p for p in (root \/ RUNS).glob(f"{today}-*") if p.is_dir()]) if (root \/ RUNS).exists() else 0)/' tools/rulecheck.py > "$1"
+    grep -q 'n = max(len(ledger_rows)' "$1" || { echo "the auto-id line was not found to revert" >&2; return 1; }
+}
+latecheck() {  # latecheck <out> — the shadow tool: prepare's early artifact check switched off
+    sed 's/^    if missing:$/    if False:/' tools/rulecheck.py > "$1"
+    grep -q '^    if False:$' "$1" || { echo "the early artifact check was not found to remove" >&2; return 1; }
+}
 unbind() {  # unbind <out> — the shadow tool: rulecheck.py with the spawn binding switched off
     sed 's/^    if meta.get("reader"):$/    if False:/' tools/rulecheck.py > "$1"
     grep -q '^    if False:$' "$1" || { echo "the binding line was not found to remove" >&2; return 1; }
@@ -131,6 +162,14 @@ if [ "${VS_CTL:-}" = unbound-record ]; then
     case "$got" in RECORDED-*) ;; *) echo "REFUSED: the unbound copy did not record the unchecked run ($got)"; exit 3;; esac
     echo "FAIL: rule-checker record (control mode unbound-record: a pinned-reader run could be recorded unchecked — $got)"; exit 1
 fi
+
+case "${VS_CTL:-}" in counted-id|late-validate)
+    if [ "$VS_CTL" = counted-id ]; then counted "$W/shadow.py" || exit 3; else latecheck "$W/shadow.py" || exit 3; fi
+    got="$(prepare_ids "$W/shadow.py" "$W/pimode")"
+    echo "MODE: control $VS_CTL — the shadow copy reads: $got"
+    [ "$got" != IDS-OK ] || { echo "REFUSED: the shadow copy still read IDS-OK"; exit 3; }
+    echo "FAIL: rule-checker prepare ids (control mode $VS_CTL — $got)"; exit 1;;
+esac
 
 if [ -n "${VS_CTL:-}" ]; then
     # THE EXECUTABLE FORM: the real record, copied, perturbed, checked — must FAIL
@@ -157,6 +196,11 @@ got="$(record_binding tools/rulecheck.py "$W/rb")"
 echo "  the real tool: $got"
 [ "$got" = BOUND ] || { echo "FAIL: a pinned-reader run could be recorded without its readers checked ($got)"; fail=1; }
 
+echo "== PREPARE IDS: the auto id is the next free number; a refused prepare leaves no run directory (#160) =="
+got="$(prepare_ids tools/rulecheck.py "$W/pi")"
+echo "  the real tool: $got"
+[ "$got" = IDS-OK ] || { echo "FAIL: prepare's ids or its refusal left the runs inconsistent ($got)"; fail=1; }
+
 echo "== 3. MUST-FIRE CONTROLS on a copy =="
 for c in quiet-control moved-reader unchecked-freeze prose-verdict cross-family-plant; do
     rm -rf "$W/c"; mkcopy "$W/c"; perturb "$c" "$W/c"
@@ -178,8 +222,17 @@ else
     vs_ctl_dead unbound-record "the binding line was not found to remove"; fail=1
 fi
 
+for c in counted-id late-validate; do
+    if [ "$c" = counted-id ]; then counted "$W/shadow_$c.py"; else latecheck "$W/shadow_$c.py"; fi || { vs_ctl_dead "$c" "the shadow copy could not be made"; fail=1; continue; }
+    got="$(prepare_ids "$W/shadow_$c.py" "$W/pc_$c")"
+    case "$got" in
+        COLLIDED*|LEFT-A-RUN-DIRECTORY) vs_ctl_fired "$c" "the shadow copy: $got";;
+        *) vs_ctl_dead "$c" "the shadow copy read $got"; fail=1;;
+    esac
+done
+
 if [ "$fail" -eq 0 ]; then
-    echo "PASS: the rule-checker's record is sound, record binds the spawn check, and its six controls fire"
+    echo "PASS: the rule-checker's record is sound, record binds the spawn check, prepare's ids hold, and its eight controls fire"
 else
     echo "FAIL: rule-checker record"
     exit 1

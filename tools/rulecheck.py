@@ -310,11 +310,25 @@ def cmd_prepare(a):
     reader = reader_id(root)
     model = a.model or reader
     today = _dt.date.today().isoformat()
-    n = max(len(ledger_rows), len([p for p in (root / RUNS).glob(f"{today}-*") if p.is_dir()]) if (root / RUNS).exists() else 0)
+    # THE AUTO ID IS THE NEXT FREE NUMBER, NOT A COUNT (GitHub #160, 14z-185): a count of ledger
+    # rows or of today's run directories lags a run directory that has no ledger row (a prepared
+    # run never recorded, 2026-09-18-36), and the next auto id collided with it. Take the number
+    # above every run directory's and every ledger id's.
+    taken = [int(m.group(1)) for m in (re.fullmatch(r"\d{4}-\d{2}-\d{2}-(\d+)", x)
+             for x in [r["id"] for r in ledger_rows]
+             + ([p.name for p in (root / RUNS).iterdir() if p.is_dir()] if (root / RUNS).exists() else []))
+             if m]
+    n = max(taken + [0])
     rid = a.id or f"{today}-{n + 1:02d}"
     rdir = root / RUNS / rid
     if rdir.exists():
         die(f"run {rid} exists")
+    # EVERY ARTIFACT IS CHECKED BEFORE ANYTHING IS CREATED (GitHub #160, 14z-185): a missing one
+    # used to be found while staging, AFTER the run directory was made, leaving a run directory
+    # with no ledger row behind (runs 2026-09-25-347 and -370)
+    missing = [s for s in (a.artifact or []) if not (root / s.partition(":")[0]).is_file()]
+    if missing:
+        die(f"artifact not found: {missing[0].partition(':')[0]}")
     stage = root / STAGING / rid
     if stage.exists():
         shutil.rmtree(stage)

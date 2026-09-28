@@ -261,7 +261,12 @@ spawns the readers on that model, and checks the ledger's calibration rows
 under it before a real run. *(— SUPERSEDED 14z-178 by the pinned reader: the definition carries
 the model, and the calibration binds to the definition's sha; `--model` is no longer passed.)* And a prepared run that was never recorded (run
 2026-09-18-36, a `NOT-RUN.txt` only) makes `prepare`'s automatic id collide with
-it, so every later `prepare` takes `--id` (#160).
+it, so every later `prepare` takes `--id` (#160). *(— RESOLVED 14z-185, #160: the automatic id is
+now the NEXT FREE NUMBER above every run directory's and every ledger id's, never a count, and
+`prepare` checks every artifact before it creates anything — a missing one used to be found while
+staging, after the run directory was made, leaving a run directory with no ledger row behind (runs
+2026-09-25-347 and -370). `tests/test_rule_checker.sh` "PREPARE IDS" holds both, with the
+shadow-tool controls `counted-id` and `late-validate`. `--id` is no longer needed.)*
 
 **The effort (14z-177) — a second unbound parameter of the instrument.** The readers are
 spawned as `general-purpose` with `model: "opus"` and no effort, and a subagent with no

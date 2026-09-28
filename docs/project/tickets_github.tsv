@@ -28,7 +28,7 @@ number	state	reason	closed	labels	title
 163	CLOSED	COMPLETED	2026-09-25	bug	The Killshread Lightning column and the Plasma Trap ran vsavj's shock remap instead of vs2's class-0x52 rule — the victim's freeze and the attacker's hit-freeze differed from native
 162	OPEN	-	-	cosmetic	The deity above Donovan flashes orange as the Killshread Lightning column ends — an extra palette-sequence upload of row 11 native does not make
 161	CLOSED	NOT_PLANNED	2026-09-25	bug	Phobos takes one more HP than native from Demitri's 5HP with his defense rows already vs2's (12 against 11)
-160	OPEN	-	-	bug,severity: low	rulecheck.py: prepare's auto id collides with a run directory that has no ledger row
+160	CLOSED	COMPLETED	2026-09-28	bug,severity: low	rulecheck.py: prepare's auto id collides with a run directory that has no ledger row
 159	OPEN	-	-	bug,needs-maintainer-ruling,severity: medium	Tenant attack records with facing rule 5 are XORed into the victim's facing by vsavj's hit code (Killshread Summon (ES) pushes Demitri away where native drags him in)
 158	CLOSED	COMPLETED	2026-09-24	bug	rulecheck.py: a model change never invalidates a calibration (the checklist hash is checked, the model is not, and the ledger records 'default')
 157	CLOSED	COMPLETED	2026-09-26	bug,needs-maintainer-ruling,severity: high	Tenant throws pay meter to the wrong fighters — the ported throw code never registers the hit pair on vsavj (the 14x rollback's price; #136's meter family)
