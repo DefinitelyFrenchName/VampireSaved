@@ -27,6 +27,20 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-28 (14z-185) — #174 split: its attack-record part closed `done`, the 28 non-attack chains moved to #184
+
+**The question (AskUserQuestion), verbatim:** *"#174 has 28 never-entered a2 chains left, all without attack records (poses and transitions; the ticket rated them lower priority). The 8 attack-record chains are done and gated. How should I handle #174?"* The options were:
+- "Split and close (Recommended)": "Close #174 as done for its attack-record part; open a new, lower-priority ticket for the 28 pose/transition chains. Then go on to #159."
+- "Work the 28 now"
+- "Skip to #159"
+- "Close the session"
+
+**The maintainer:** *"Split and close (Recommended)"*.
+
+**What it means.** #174 closes `done`: its eight attack-record chains are entered on native and gated by `tests/audit_chains174.sh` (14z-184; that work found #182). The 28 chains with no attack record (31 seqs, from `tools/chain_census.py`) are #184, an open evolution. Its ticket text is filed from the census's own output.
+
+---
+
 ## Ruled 2026-09-28 (14z-185) — #176: the RNG-draw gate is built; the tenants' random motion-input window is host behaviour, recorded, no ticket; the parity gates' `0000` RNG pin (the RNG's fixed point) gets a ticket
 
 **The questions (AskUserQuestion), verbatim in substance, after rule-checker runs 2026-09-25-348..353 (353 OK):**

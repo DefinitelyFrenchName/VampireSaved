@@ -2,8 +2,9 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 183
+# issues: 184
 number	state	reason	closed	labels	title
+184	OPEN	-	-	evolution	28 never-entered a2 chains of the tenants with no attack record (poses and transitions): split from #174, their ours-vs-native parity unmeasured
 183	OPEN	-	-	evolution	The parity gates pin the RNG to 0000, its fixed point: every draw returns 0, so no gate compares a non-zero random path
 182	OPEN	-	-	bug	Phobos's guard cancel from an air block (Reflect Wall, j.623P) never fires on our build: vsavj's block entry lacks vs2's Phobos-only case that opens the guard window in the air
 181	CLOSED	COMPLETED	2026-09-27	evolution	Run the emulator tier on a snapshot at a named commit (slice 2 of #153)
@@ -13,7 +14,7 @@ number	state	reason	closed	labels	title
 177	CLOSED	NOT_PLANNED	2026-09-27	evolution	Tenant movement parity vs native vs2: walk, dash, jumps and arcs, Phobos's float and air dash — no gate compares movement against native
 176	CLOSED	COMPLETED	2026-09-28	evolution	Compare the RNG's per-frame advance between our build and native: the parity gates pin the RNG word every frame, so an advance defect would read as agreement
 175	CLOSED	COMPLETED	2026-09-25	evolution	Plasma Trap dome vs a truly AIRBORNE victim: the air stager's case for the trap is unreached by any rig (a neutral jump clears the dome and is hit on landing)
-174	OPEN	-	-	evolution	35 never-entered a2 chains of the tenants (7 with attack records) — moves the naming corpus never produces, so their ours-vs-native parity is unmeasured
+174	CLOSED	COMPLETED	2026-09-28	evolution	35 never-entered a2 chains of the tenants (7 with attack records) — moves the naming corpus never produces, so their ours-vs-native parity is unmeasured
 173	CLOSED	COMPLETED	2026-09-25	bug	Pyron's heavy-hit reaction runs the generic chain b:0x03 on our build where native vs2 runs his b:0x19 (5HP, j.HP, throw release) — class, freeze and length equal
 172	CLOSED	COMPLETED	2026-09-24	enhancement	Enforce the discipline at the AGENT level: orchestrator / checker / workers, with the checker unable to be overridden
 171	OPEN	-	-	enhancement	Qualify every gate: prove it measures what it claims, and that it notices when its inputs move

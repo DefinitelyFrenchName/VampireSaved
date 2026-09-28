@@ -1114,8 +1114,8 @@ the victim".
   at level 6 every length moves and Pyron's j.HP whiffs). The maintainer read that capture 2026-09-25: *"yes, identical."* — #173 CLOSED on the read; the chain difference stays documented here and is not a defect to the eye.
 - **Donovan's vs2 EX activation enters `a2:0x51` then `a2:0x52`** (14z-181) [M: a scratch
   field trace on native vs2 with the activation input, never promoted — the naming corpus has
-  no EX-activation rig, so the pair is two of the 36 never-entered a2 chains of GitHub #174 (36 since the
-  14z-181 re-count by `tools/chain_census.py`),
+  no EX-activation rig, so the pair is two of the never-entered a2 chains counted by `tools/chain_census.py`
+  — since 14z-185 two of the 28 with no attack record, GitHub #184 (split from #174),
   whose rig comes with its inputs; no gate locks this yet].
 - **A block is class `0xFF`** on every tenant: the block stance (Donovan
   `a:0x14`, Huitzil `a:0x15`, Pyron an unindexed node) then the SHARED
