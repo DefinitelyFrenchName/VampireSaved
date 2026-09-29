@@ -1,0 +1,5 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent185b/scope_150.md	766afb0564f2d41c49f0fd206ebf5763730ad703
+build/agent185b/set_shape_history.txt	5c2d7e544a9b7e1455960d2cdc7292be548a920e
+build/agent185b/m21_carry.py.txt	bf2ce43bdf184c4a1097474b8eec61e43c834c97
+build/agent185b/m21_run.sh.txt	72120bd3fd6e162524ee7216524cac4d9009c09a
