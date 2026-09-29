@@ -27,6 +27,16 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-29 (14z-185b) — #133 un-parked; #141 closed `declined`, a measured FBNeo-vs-MAME disagreement on legacy content to be a NEW ticket
+
+**The question (14z-185 close report and after), verbatim:** *"#133 and #141 are both parked, so what should "do" mean for each: reopen and work them, or decide whether they stay parked?"*
+
+**The maintainer, verbatim:** *"Let's focus on optimizing time and effort while keeping quality and safety levels. So start with #187 and #188. Then we'll rule what to continue with (and btw, #133 and #141 are to be reopened)"*; then, mid-turn, *"Wait my bad #141 should have been closed in the first place"*; asked which status it closes with, *"Actuallly should be closed and "re-openened" as a new ticket on a measured FBNeo-vs-MAME disagreement on legacy content". Closed the ticket as such"* (the maintainer closed #141 on GitHub, 2026-09-29 17:22Z, with the same words as a comment).
+
+**What it means.** #133 (the emulator runner's pull-queue gain re-measured on a wider host) goes from `parked` to `open`; its order in the queue is ruled later. #141 (the full FBNeo hacked-vs-vanilla legacy track) is CLOSED as `declined`: nothing is left to do under it, and the reopening condition CLAUDE.md [VSP-24] names ("parked as #141, to be reopened on a measured FBNeo-vs-MAME disagreement on legacy content") now means a NEW ticket opened on such a measurement. CLAUDE.md and the `vampire-saved-port` skill's [VSP-24] line still say "parked as #141"; they are the maintainer's to amend (proposed wording in STATE 14z-185b) and are not edited by the session. The session's earlier comment on #141 ("Un-parked") was written from the first message and is superseded by the closing comment.
+
+---
+
 ## Ruled 2026-09-29 (14z-185b) — the close-cost tickets: #187 (the close loop's re-runs), #188 (the static tier's carry-forward), #189 (the emulator driver's run record) and #190 (the close checks promoted), from #185 and a side conversation
 
 **The maintainer, verbatim (main session):** *"Yes, stage 4 should be done. HOWEVER, before we do stage 4 or any other ticket, as you noticed I opened #185 and it goes further. I'd like to send you for review and action a side chat I had during the staging + freeze"*. **In the side conversation (a no-tools fork during the 14z-185 close), verbatim:** *"Can you open a new ticket related to improving re-run (i.e. improving their run time and/or running less of them) ?"*; *"I think we could also optimize the static tier. Currently we're re-running the strict static tier a third time and I might be wrong but I think in most cases we could only have to run it twice"*; *"I think it's worth it because I know we touched a lot of things but at this rate we'll reach 24 hours just to stage M21"*. **In #185 (the maintainer's issue, 2026-09-29):** *"We should go over those and open tickets for the run-record upgrade and the tool promotions."*
