@@ -27,6 +27,16 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-29 (14z-185b) — #188 route A: backtested on the recorded history now, traced on WSL2 later
+
+**The question, verbatim:** *"How should route A (#188's reach-predicted carry-forward) be backtested before it is trusted?"* (options: a traced tier on WSL2, history only, both, or pause A).
+
+**The maintainer, verbatim:** *"History for now, traced on WSL2 later"*.
+
+**What it means.** `tools/static_confirm.py` (the predictor) is backtested now against the recorded change-caused static-tier reds (`tests/expected/static_confirm_backtest.tsv`); it stays PROVISIONAL and unwired from `tests/run_all_static.sh` until a Linux run of the tier under `strace` shows no gate reads a file the predictor misses.
+
+---
+
 ## Ruled 2026-09-29 (14z-185b) — #187/#188: D + E + F now, carry-forward by route A
 
 **The questions (after rule-checker runs 2026-09-29-454 and -455 on `build/agent185b/scope_187_188.md`), verbatim:** *"What should be built first for #187/#188? (None of these changes a gate's verdict logic; one full --strict run of record per close is kept.)"* and *"For #188's carry-forward (re-running only what changed after a red), which route?"*

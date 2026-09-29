@@ -406,3 +406,4 @@ tests/test_close_tools.sh	docs
 tests/run_on_snapshot.sh	runner
 tests/test_run_on_snapshot.sh	runner
 tests/test_close_checks.sh	runner
+tests/test_static_confirm.sh	runner

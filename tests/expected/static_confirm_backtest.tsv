@@ -1,0 +1,7 @@
+# tests/expected/static_confirm_backtest.tsv — the recorded static-tier reds CAUSED BY A CHANGE, each with the
+# commit pair (or untracked path) that caused it: tools/static_confirm.py must mark the red gate STALE.
+# Flakes and environment reds are not listed (a predictor cannot see them). 14z-185b, #188 route A.
+# gate<TAB>base<TAB>head<TAB>extra changed paths (or -)<TAB>note
+test_annotations_current	28555610	75e71bfa	-	14z-185 close: carrier docs edited without regenerating the index (fixed a55863c3)
+test_charmap_current	a91a555a~1	a91a555a	-	14z-181: air-throw move notes edited without re-freezing charmap_pages.sha256 (re-frozen 108f0481)
+test_release_asset_shape	d86e3a46~1	d86e3a46~1	release/merged-m18/.DS_Store	14z-153: a git-ignored Finder file under release/ (d86e3a46)

@@ -374,6 +374,7 @@ declares	test_shim_charid
 declares	test_sim_wram_contract
 declares	test_skill_guides
 declares	test_state_open_lists
+declares	test_static_confirm
 declares	test_static_runner
 declares	test_suite_dispatch
 declares	test_suite_dispatch_selftest
