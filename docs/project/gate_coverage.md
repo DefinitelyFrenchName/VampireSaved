@@ -13,11 +13,11 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**400 of 400 gates described.**
+**401 of 401 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
-| [runner](#runner) | 33 | 33 | the suite runners and their own ground truth |
+| [runner](#runner) | 34 | 34 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 38 | 38 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 58 | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -30,7 +30,7 @@ first sentence) is `gate_index.md`.
 
 ## runner
 
-the suite runners and their own ground truth. 33 of 33 described.
+the suite runners and their own ground truth. 34 of 34 described.
 
 ### `run_all_emulator.sh` — run, emulator
 
@@ -247,6 +247,14 @@ the suite runners and their own ground truth. 33 of 33 described.
 **HOW:** section 1 runs tools/rulecheck.py's parser selftest; section 2 runs `rulecheck.py check` on the real ledger, fixtures, run dirs and registry; section 3 fires six controls on perturbed copies (a quiet plant, a moved reader, an unchecked freeze, a prose verdict, an unbound recorder, a cross-family plant); the RECORD BINDING section proves a pinned-reader run cannot be recorded without its transcript.
 
 **EXPECTS:** PASS with every control fired; a red names the run or fixture and the shape in which the checker could look alive while asserting nothing.
+
+### `test_rulings_verbatim.sh` — test, ci_portable
+
+**WHAT:** tools/agent/rulings_verbatim.py fails on each of its conditions and only then: a quote labelled the maintainer's that none of their messages or answers contains (NOT FOUND — including the session's own question relabelled as the maintainer's), a maintainer message or answer quoted in no record and not exempt (UNHOMED), and an exempt row matching no message or without a reason (STALE); a clean record passes, two questions joined by "and" stay the session's, and an answer introduced by "then, asked X," is checked as the maintainer's.
+
+**HOW:** drives the tool's selftest (eight cases over a synthetic transcript with a user message, a mid-turn enqueue, a task notification and an AskUserQuestion answer); four controls, one per condition of the verdict (#185 item 5), run copies with it switched off, and each must fail.
+
+**EXPECTS:** the selftest's eight cases read as designed and all four controls fail on their copies.
 
 ### `test_run_on_snapshot.sh` — test, ci_portable
 

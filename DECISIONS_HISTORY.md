@@ -29,6 +29,8 @@ retraction grep covers this file.
 
 ## Ruled 2026-09-29 (14z-185b) — #189: R-reach for both runners; #190: P1 and P2, then P4
 
+**The instruction, from the maintainer, verbatim:** *"Then tackle #185's items as tickets: #189 (the run record) and #190 (promoting the close checks)"* (recorded here after `tools/agent/rulings_verbatim.py`'s first run found it quoted only in the scratch scope, 14z-185b).
+
 **The questions (after rule-checker run 2026-09-29-456 on `build/agent185b/scope_189_190.md`), verbatim:** *"#189: what should the run record cover? (Written by the runner at start and end, with a `compare` command; commit.txt kept; a gate that plants one change per recorded field.)"* and *"#190: which close checks to promote, and in what order?"*
 
 **The maintainer's answers, verbatim:** *"R-reach, both runners (Recommended)"* and *"P1+P2, then P4 (Recommended)"*.

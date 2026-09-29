@@ -409,3 +409,4 @@ tests/test_close_checks.sh	runner
 tests/test_static_confirm.sh	runner
 tests/test_run_record.sh	runner
 tests/test_figure_check.sh	runner
+tests/test_rulings_verbatim.sh	runner

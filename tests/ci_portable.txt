@@ -303,3 +303,6 @@ test_run_record
 # 14z-185b (#190 P1): a close's stated figures against their sources, and a claim's figure census
 # (tools/figure_check.py); four controls, one per failure condition. ~1 s.
 test_figure_check
+# 14z-185b (#190 P2): a session's quotes of the maintainer are verbatim, and every maintainer message is on
+# record (tools/agent/rulings_verbatim.py); four controls, one per failure condition. ~1 s.
+test_rulings_verbatim
