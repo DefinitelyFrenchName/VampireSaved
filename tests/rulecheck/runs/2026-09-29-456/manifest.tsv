@@ -1,0 +1,6 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent185b/scope_189_190.md	c33a2bdbf1265cd285380166bc5d2358fe8198b4
+build/agent185b/ledger_414_445.txt	4fe33fb5a67869786df43956146aa1dc92d02651
+build/agent185b/scratch_hardcoding.txt	ddf52730dc463d520e6133e62767c2da83560d08
+build/agent185b/commit_txt_block.txt	9e542a78c895fdc66c4a5ac68b8ab27a83a22fc3
+build/rc185/tier_close185c.log	99afa56404a2b27dede03fa9ff93ea736cafe568

@@ -1,0 +1,9 @@
+decision	recommendation
+subject	#189 (the emulator driver's run record) and #190 (promoting the close checks): scope, options and a recommendation for the maintainer's ruling (14z-185b)
+session	dd342b19
+model	rule-checker@163e4ce9cf7b
+claim	The recommendation in scope_189_190.md follows from what it cites: build #189's R-reach for both runners first, then #190's P1 and P2, P4 after, P3 not now. Its figures are in the named files. Not tested: the family grouping (the session's judgement from 170-character resolution heads), whether the run record would have prevented runs 429-435 (a forecast), the environment allow-list (not yet enumerated), and effort — the document's own 'Not tested' section.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
