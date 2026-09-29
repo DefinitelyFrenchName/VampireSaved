@@ -2,7 +2,7 @@
 # test_m3a_reproducible.sh — the M3b Phase 0 reproducibility gate (14z-65).
 #
 # WHAT: every frozen reference rebuilds BIT-EXACT from the current tree: the three solo
-#   tenant builds, the stock twin and the merged image (the one that gets played), each
+#   tenant builds, the stock twin, the stage-4 image and the merged image (the one that gets played), each
 #   against its frozen fingerprint — three independent tenant fingerprints are three oracles
 #   over any machinery refactor.
 # HOW: rebuilds each track into a scratch dir with tools/build_donovan.sh and compares
@@ -16,10 +16,11 @@
 # header: the four names it used to list carried fingerprints superseded
 # several freezes ago (donovan-m5 3c599fb6, m5_stock 6c93cfa8, huitzil-m13
 # 2629561c, pyron-m7 94ce9a48), which is the same stale-copy trap 14z-94
-# found in three other gates. The set is now FIVE:
+# found in three other gates. The set is now SIX:
 #
 #   donovan-m7 (WIDE) | m5_stock2 | huitzil-m16 | pyron-m10   — the solos
 #   merged-m2                                                 — added 14z-94
+#   the stage-4 image (the M2 battery's stage-4 target)       — added 14z-185b
 #
 # THE MERGED IMAGE IS THE ONE THAT GETS PLAYED. Until 14z-94 nothing asserted
 # that it rebuilds at all, so a playtest bug report would have been about an
@@ -107,6 +108,10 @@ EXPECT_WIDE="f09979402375c05e2c452d51777b24cbbfa246ff"  # 14z-185 M21  # RE-FROZ
 # his stock slot 0x0F too: six data ops (param32_a/b + jump_params, [0xf]
 # value + [0x1f] mirror), member vm3j.04d only; no legacy row written.
 EXPECT_STOCK="a3910ded0b90844df36c0bb31de0336816cc6ad3"  # 14z-185 M21  # RE-FROZEN 14z-185 (was 67fdc4de): Donovan's facing_rule5 site_thunk reaches the stock track (#159, stage 6, not only_variant_slot), the mark M21 (STATE 14z-185; build/agent185/m21/deltas_measurer.txt)  # 14z-183 M20  # RE-FROZEN 14z-183 (was c54f1fb8): #157, THE SIX HIT-PAIR STORES PER TENANT + the mark M20 (STATE 14z-183; build/rc183/deltas_measurer.txt)  # 14z-170 M19  # RE-FROZEN 14z-170 (was e86e1d04): THE FOUR RULED #136 FIXES + THE x2b7ef4 PLACEHOLDER RESOLVER (STATE 14z-170; patch_notes 14z-170), attributed op by op against the predecessor (build/rc170/freeze/delta_*.txt): THE STOCK TWIN MOVED — the same edits as donovan's WIDE track minus the defense rows (only_variant_slot) and the version mark (no group C): EX branch, column records, adder, case_a4, the thunks, the x2b7ef4 repair. Ops 252 unchanged.  # previous: # 14z-127 donovan-m19-stock  # RE-FROZEN 14z-127 (was 38e9cb2c): the boot name screen SAVIOR -> SAVED — three `boot_title_saved_*` aux_poke poke16 rows at PRG:0x01C822/24/26, declared in all three tenant manifests and deduped to one shared engine row on a merged build; plus the M12 -> M13 mark (gfx). Legacy unaffected: audit_merged_legacy 96/0 with 01_attract_long bit-identical, and work RAM identical to pristine over 1,621 frames of boot+attract.  # previous:  # 14z-119 donovan-m18-stock
+# THE STAGE-4 IMAGE (14z-185b, maintainer: "Yes, stage 4 should be done"): the M2 battery's stage-4
+# target (tests/expected/registry.tsv `donovan-m23-stage4`), built by tools/build_donovan.sh 4 with the
+# stock flags. Until now only a freeze's battery rebuilt it; a drift between freezes went unseen.
+EXPECT_STAGE4="2fa7c2f13dba4a2886acb6f3d4365f39bc22ee9a"  # 14z-185b, = registry donovan-m23-stage4 (unchanged since M19)
 # huitzil-m3 (14z-79, maintainer-ratified). Supersedes huitzil-m2
 # (9deda0808e87601b10e2171405805d4669ba2624), which can no longer be
 # produced from the tree: huitzil.toml gained the (b') index-window thunk
@@ -202,6 +207,17 @@ FP_STOCK="$(python3 tools/build_fingerprint.py "$WORK/m3a_stock/rompath;$ROMDIR"
     echo "  (the tree no longer reproduces the frozen stock twin)"; exit 1; }
 echo "  ok: m5_stock reproduced ($FP_STOCK)"
 
+echo "== rebuild the stage-4 image"
+GEN_FLAGS="--allow-plausible --tripwire-open" \
+    tools/build_donovan.sh 4 "$WORK/m3a_stage4" > "$WORK/stage4.log" 2>&1 \
+    || { tail -20 "$WORK/stage4.log"; echo "FAIL: stage-4 rebuild errored"; exit 1; }
+FP_STAGE4="$(python3 tools/build_fingerprint.py "$WORK/m3a_stage4/rompath;$ROMDIR" \
+    --set vsavj --sha-only)"
+[ "$FP_STAGE4" = "$EXPECT_STAGE4" ] || {
+    echo "FAIL: stage-4 fingerprint $FP_STAGE4 != donovan-m23-stage4 $EXPECT_STAGE4"
+    echo "  (the tree no longer reproduces the frozen stage-4 image)"; exit 1; }
+echo "  ok: the stage-4 image reproduced ($FP_STAGE4)"
+
 # The two tenant verticals. Same WIDE overlay, their own manifests/ids.
 for _t in "huitzil:0x10:$EXPECT_HUI" "pyron:0x11:$EXPECT_PYR"; do
     _name="${_t%%:*}"; _rest="${_t#*:}"; _char="${_rest%%:*}"; _want="${_rest#*:}"
@@ -261,6 +277,7 @@ MANI_WIDE="745e2bf18d4622f90b70bb6150797636db177570 25"  # 14z-185 (delta: THE M
 # MANI_STOCK="23314532b00a77adaed4bda4b9e52155ad209252 30"  # 14z-102
 # MANI_STOCK="9985bf46a62732b32cbe143850b65a05038093f1 30"   # 14z-110 (delta: vm3j.03d/04d/10b PROGRAM only — the d2 wind...  # 14z-110
 MANI_STOCK="c86098e76381f7b0cd3df54db7dc441e58ad0c2b 30"  # 14z-185 (delta: THE M21 FREEZE — THE STOCK TWIN MOVED: PROGRAM vm3j.03d (the site) + vm3j.04d (the thunk) only (#159's row is stage 6 and not only_variant_slot; no mark on the stock track))
+MANI_STAGE4="c4535aa3a41c86ff096b2bfaa9c76213cb57af90 9"  # 14z-185b: SELF-FROZEN from the M21 freeze's own stage-4 build (build/rc185/stage4) with this tool; its outside anchor is the registry fingerprint above (rule-checker run 2026-09-29-457)
 # MANI_STOCK="8b45da99dc292991f25dce77e6adc00ecce9cd84 30"  # 14z-183 (delta: THE M20 FREEZE — THE STOCK TWIN MOVED: PROGRAM vm3j.04d only (Donovan's six hit-pair stores are not only_variant_slot; the mark is WIDE-only). ONE member; build/rc183/deltas_measurer.txt, member digests measured against the M19 builds)
 # MANI_STOCK="a7ee53169eeed6a44d666eaa31b5c532af69a43d 30"  # 14z-170 (delta: THE M19 FREEZE — THE STOCK TWIN MOVED: PROGRAM vm3j.03d/04d/10b (the fixes minus the defense rows, which are only_variant_slot; no group C, so no mark). THREE members; count unchanged)  # previous: # 14z-132: UNCHANGED by the M16 mark freeze (measured) — the mark is a select_wheel knob and the stock track has no group C. The count read "30 30" from 14z-127 until here; the parser took the last word so it worked, but it was a typo. # 14z-127 (THE STOCK TWIN MOVED: vm3j.03d only — the same three boot-title poke16; no group C on this track, so no glyph member moves; inventory 30 unchanged)  [SUPERSEDED 14z-183]
 # MANI_STOCK="8d18778d8a77886b3256bad4f8625d251b9f355b 30 30"  # 14z-119  # 14z-119 (THE STOCK TWIN MOVED: vm3j.04d — six data ops, Donovan's VS2 physics on stock slot 0x0F [0xf] value + [0x1f] mirror; nothing else moved; inventory 30 unchanged)
@@ -335,6 +352,7 @@ m3a_manifest() {   # m3a_manifest <label> <rompath> <"digest count">
 echo "== whole-artifact manifests (HARD on content and inventory, 14z-91)"
 m3a_manifest donovan-m3a "$WORK/m3a_wide/rompath" "$MANI_WIDE"
 m3a_manifest m5_stock    "$WORK/m3a_stock/rompath" "$MANI_STOCK"
+m3a_manifest stage4      "$WORK/m3a_stage4/rompath" "$MANI_STAGE4"
 m3a_manifest huitzil     "$WORK/huitzil/rompath"   "$MANI_HUI"
 m3a_manifest pyron       "$WORK/pyron/rompath"     "$MANI_PYR"
 

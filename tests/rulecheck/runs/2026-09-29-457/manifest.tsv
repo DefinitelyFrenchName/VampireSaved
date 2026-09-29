@@ -1,0 +1,5 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent185b/m3a_stage4.diff	8c1341e44a70e6e753372d475ea9f90d48054cbf
+build/agent185b/m3a_stage4.log	705d4f7b5074297c044400f44099fcde69f44913
+build/agent185b/registry_stage4_row.txt	f26e52bc8dd5c31372052583bff4623dc014d037
+build/agent185b/stage4_manifest.txt	b81f18629a6e45e10c92217668f4ca67bea5c10b

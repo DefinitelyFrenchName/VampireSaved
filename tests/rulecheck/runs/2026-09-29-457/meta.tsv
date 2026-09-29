@@ -1,0 +1,9 @@
+decision	expectation
+subject	test_m3a_reproducible: add the stage-4 image (EXPECT_STAGE4 2fa7c2f1..., MANI_STAGE4 c4535aa3... 9 members) as a sixth frozen reference (14z-185b)
+session	dd342b19
+model	rule-checker@163e4ce9cf7b
+claim	The stage-4 expectation is anchored OUTSIDE the tool that now checks it: its fingerprint equals the registry's donovan-m23-stage4 row (written by the M19 freeze and carried unchanged since), and the gate, rebuilding stage 4 from the tree with the stock flags, reproduced that fingerprint and the 9-member manifest measured on the M21 freeze's own stage-4 build. Not tested: whether the stage-4 build is deterministic across machines (measured here on this Mac only), and the added runtime of the stage-4 rebuild inside the gate (not isolated; the whole gate ran 4 min 13 s).
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
