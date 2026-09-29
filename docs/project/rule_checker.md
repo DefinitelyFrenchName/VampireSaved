@@ -176,8 +176,11 @@ VERDICT: <VIOLATED if any question is VIOLATED, otherwise OK>
 the action until the violation is resolved and the resolution recorded
 (`tools/rulecheck.py resolve <id> --how "..."`; the gate fails on a
 `VIOLATED` row with no resolution). The resolution answers EACH violated
-question by its label (`Q1: … Q4: …`) — what changed, or why the finding is
-accepted — and the tool refuses one that does not (maintainer-ruled, option
+question by its label (`Q1: … Q4: …`; `Q1+Q4:` is refused) — what changed, or why the finding is
+accepted — and the tool refuses one that does not (never chain `resolve` and the next
+`prepare` in one command: a refused resolve lets the prepare run anyway, and the next run is
+then prepared before its predecessor is resolved — paid TWICE in 14z-185: runs 374/375, where `Q1 and Q4:`
+was refused, and runs 399/400, where `Q1+Q4:` was) (maintainer-ruled, option
 C: the questions are bounded AND what they still find is answered in
 writing). The checker's output is reported to the
 maintainer VERBATIM, never summarised — paraphrase is where softening

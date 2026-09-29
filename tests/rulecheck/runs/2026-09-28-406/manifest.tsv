@@ -1,0 +1,16 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent185/close/row14.txt	4654b31d56015baa15028822e72db375eed12a29
+build/agent185/close/close_row.txt	0ccec7fdce1496675b160fbe3d7d056c56638a4c
+build/agent185/close/pointers.txt	24b126474f0b233f93ef6a4e927b207046027955
+build/agent185/close/promotion_equivalence.txt	db149a33865bf2d61de03de6a7f25af1511f32ca
+build/agent185/close/ordering_374_375.txt	a523f511ce88b86d682be37e55aa5c37c8c37fc8
+build/agent185/close/home_texts.py	3ef445c0ff8a94d1db47c035d99d9d14d9f89a59
+build/agent185/close/run_checks.sh	ac34a8b87098161ed8b610bbdf0dc49d8e9e413c
+build/agent185/close/runs/exits.tsv	404cd3f23a7fffdb7b1e8a5229c477e8bc7e60a3
+build/agent185/close/runs/home_texts.out	cea4525adcf8142cff54457953e6142b718a5eef
+build/agent185/close/runs/close_findings.out	e19b54972565b1d9957bd0a9889a56c1fbb8a7c9
+build/agent185/close/runs/homes_tracked.out	2f7914ef907e6a28105fd265388cdc40c65048e7
+build/agent185/close/runs/retraction_grep.out	9ac0898dc151ac9da3da62a46a825e02a96c2e08
+build/agent185/close/runs/attr_placement_plant.out	f76fc69873a2b415ce1051d16a7b7e777aab49ca
+build/agent185/close/runs/home_texts_plant.out	01a5b5e7382bea71b5e005b6bbaf93da0fb714ed
+docs/NEXT_SESSION.md	6d731144bec6713492452756573de7ba5e3aef9d

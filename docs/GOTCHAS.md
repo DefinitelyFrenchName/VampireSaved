@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-443 entries (47 game / 122 platform / 274 project), counted from the buckets at generation.
+444 entries (47 game / 122 platform / 275 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 47 entries
 
@@ -197,7 +197,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A `read_tap.lua` WRITE LABELLED N IS REPLAY.LUA'S FRAME N+1 — the tap names a write by the counter BEFORE that frame's `frame_done`; `field_trace.lua` and `replay.lua` increment first, then sample (measured 2026-09-27, 14z-184)
 - IN A MAME LUA TAP, `cpu.state["SP"]` IS THE SUPERVISOR STACK — THIS GAME RUNS IN USER MODE, SO A CALLER'S RETURN ADDRESS SITS AT `USP` — A REPEAT of the entry "MAME 0.288'S 68000 CORE HAS NO `A7` STATE" above (paid: 2026-09-28, 14z-185, #176; that 14z-158 entry already held the rule — what went wrong is that the archaeology grep, [VSP-14], was not run before writing the tap)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 274 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 275 entries
 
 - A PROBE THAT DERIVES A "FREE" NAME FROM LIVE STATE STOPS WORKING AS THE STATE GROWS (paid: 14z-185, GitHub #160's probe)
 - A VULN ID OF 0 IS NO BOX — a resolver that reads it builds a PHANTOM hurtbox the engine never tests (paid: 14z-182, GitHub #175)
@@ -473,3 +473,4 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A GATE'S HAND-TYPED COPY OF A RIG DRIFTS SILENTLY — build the legs with the rig's own functions and ASSERT they are the rig (paid: #155, found by the rule-checker 14z-163, the drift measured 14z-185)
 - "NOTHING THE BATTERY RAN READS IT" IS A REACH QUESTION — follow imports and external roots, never paths alone, and prove the finder sees a planted reader (paid: 14z-185, the M21 freeze, rule-checker runs 2026-09-28-398..400)
 - A SEEDED ATTRIBUTION ROOT OUTLIVES THE FIX IT NAMED — the freeze refuses, and the seed is retired WITH the fix's freeze (paid: 14z-185, the M21 freeze, #159; rule-checker runs 2026-09-28-402..404)
+- `--stale` RE-RUNS ONLY GATES THAT PASSED — a freeze that re-freezes a FAILED gate's expectation re-runs that gate itself (paid: 14z-185, the M21 freeze)

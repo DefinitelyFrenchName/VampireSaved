@@ -27,6 +27,14 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-29 (14z-185) — the swarm's workers prefer Sonnet 5.5 at effort xhigh from after the 14z-185 close; no swarm model at max effort, ever
+
+**The maintainer (typed during the 14z-185 close), verbatim:** *"quick update  for after the close: workers (not the orchestrator, not the checkers) should preferably use Sonnet 5.5 at xhigh effort. No model used in the swarm is allowed to use max effort, under any circumstance"*.
+
+**What it means.** From the session after this close, the WORKERS — the `measurer` and `reader` agents and any `general-purpose` worker — prefer Sonnet 5.5 at effort `xhigh`; the orchestrator (Opus 5.5 at High, ruled 2026-09-25) and the `rule-checker` keep theirs. No agent of the swarm is configured or spawned at effort `max`, under any circumstance. At this ruling `.claude/agents/measurer.md` and `reader.md` carry `model: sonnet` and `effort: high`; the agent definitions are edit-locked, so the frontmatter change is proposed to the maintainer, not made by a session.
+
+---
+
 ## Ruled 2026-09-28 (14z-185) — #182: "do #182" means the M21 freeze, now
 
 **The queue (14z-185), verbatim:** *"quick aside, when you have finished #159, do #160, #155, #143 and #182 in that order"*.

@@ -64,7 +64,7 @@
 # IF THIS FAILS, THE DESIGN STOPS. The answer is NOT to widen the mask —
 # that silently redefines the baseline the superset invariant rests on, and
 # it would buy a permanent blind spot over live work RAM. Escalate.
-# [14z-185, #143: measured on the live stack, it FAILS — the push lands at
+# [RETRACTED 14z-185, #143: measured on the live stack, it FAILS — the push lands at
 # $FF055A-$FF06DD — and "fails the window" is not "not bit-identical": the
 # relocation is live on merged-m20 and tests/audit_merged_legacy.sh lands all
 # 53 legacy pairings on their ratified classes there. Escalated as #143; the

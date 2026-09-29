@@ -5,3 +5,7 @@ a7 = 0xff7ff6 constant	14z-185 #143: that A7 was MAME's idle supervisor stack	re
 inside the masked dead-stack window	14z-185 #143: the push lands at $FF055A-$FF06DD, unmasked	retracted
 the design stops	14z-185 #143: the 14z-91 inference 'not in the window = not bit-identical'; the relocation's safety rests on the oracle's verdicts	retracted
 outside every legacy-oracle mask	control: the corrected wording, live in the gate, the toml, engine_internals and the two wrapped comment carriers (donovan.toml, gen_donovan_patch.py)	reach:5
+the --stale run re-runs it	14z-185 M21 freeze: --stale never selects a gate that FAILED; test_mister_prg_window is verified by the explicit --lane mister --freeze re-run (docs/project/gotchas.md)	retracted
+it re-measures the mister pair	14z-185 M21 freeze: the freeze commit's message (history, kept); the same false premise	retracted
+verified by the `--stale` run	14z-185 M21 freeze: STATE row (13)'s first wording	retracted
+RE-RUNS ONLY GATES THAT PASSED	control: the corrected rule, live in docs/project/gotchas.md and STATE's findings table	reach:2

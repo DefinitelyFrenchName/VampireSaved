@@ -6077,7 +6077,7 @@ rule-checker caught each one:
    in the sibling harness repo, and a resolver that indexes only `tools/` and
    `tests/` DROPS it silently.
 
-**The method that held** (`build/rc185/battery_closure.py`, 14z-185): reach from
+**The method that held** (`tools/battery_reach.py`, 14z-185; promoted from the scratch finder): reach from
 every gate row and from the driver, following every slash token (each suffix,
 against the repo, `tests/` and every EXTRA_ROOT, programs only) and every
 import form (line-start, `;`-segments, `python3 -c`, `-m`, relative). Every
@@ -6108,5 +6108,22 @@ single-row probes: OTHER with #159 alone, and P2-DISPLACEMENT with #182 alone,
 the latter through a one-line shadow pointing step 0 at the M20 table that probe
 reproduces. Read each probe's identity from its OWN program image as well: the
 patch sites in its decrypted opcode view against pristine vsavj
-(`build/rc185/sites/site_check.sh`), because two builds that read byte-identical
+(`tools/patch_site_read.py`), because two builds that read byte-identical
 on every instrument cannot be told apart by those instruments.
+
+## `--stale` RE-RUNS ONLY GATES THAT PASSED — a freeze that re-freezes a FAILED gate's expectation re-runs that gate itself (paid: 14z-185, the M21 freeze)
+
+The M21 MiSTer lane FAILED `test_mister_prg_window` because the pair moved +0x40
+with the placement. Its expectation was then re-frozen from the lane's own measured
+line, as at M18 and M20, and the freeze plan said the post-commit
+`tests/run_all_emulator.sh --stale` "re-runs it". It does not.
+`tools/audit_emulator_staleness.py --names` lists a PASSED gate whose `# FOLLOWS:`
+path moved after the run of record; a gate that FAILED in that run is never
+"stale". So the one gate whose expectation had just been rewritten was the one
+gate `--stale` would skip. It selected `test_mister_gfxc_fetch` and
+`test_mister_sdram_census` only.
+
+**The rule:** after a freeze re-freezes an expectation from a failed run, re-run
+THAT gate explicitly on the committed tree. Here that is
+`--lane mister --freeze`, which runs all three romset MiSTer gates. Never count
+the `--stale` run as its verification.

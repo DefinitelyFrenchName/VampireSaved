@@ -1,0 +1,10 @@
+THE PACKET
+
+Decision kind: procedure
+Subject: one AI agent working session (14z-185), part 6 of 8: transcript dd342b19 records 10183-12653 (#143 committed, the M21 freeze begun)
+Claim (the working agent's sentence): In this span the agent did what it said and ran what it claimed.
+- #143: the walker instrument now reads the live stack by SR. audit_walker_ghost was re-stated on the real ranges through rule-checker packets, and the premise it had frozen was retracted in its carriers. Committed (7b9dbe72).
+- The M21 freeze: the agent asked the maintainer what "do #182" meant now that its fix was staged; the answer was "Run the M21 freeze now". It then began the freeze: the two staged patches applied, the builds made, the deltas measured, the re-point sweep, and the suite carried.
+- One tracked background task, bs2sqje0j, was launched at [12263]. It is still running where this span ends; its end is notified in the next part.
+Artifacts (read every one, in full):
+  - build/agent185/c1/extract_dd342b19_6.txt

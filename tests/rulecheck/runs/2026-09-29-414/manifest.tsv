@@ -1,0 +1,22 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent185/close/row14.txt	4654b31d56015baa15028822e72db375eed12a29
+build/agent185/close/close_row.txt	4d2eb11c92b063520f90df953c056d35579c3dfd
+build/agent185/close/pointers.txt	24b126474f0b233f93ef6a4e927b207046027955
+build/agent185/close/promotion_equivalence.txt	db149a33865bf2d61de03de6a7f25af1511f32ca
+build/agent185/close/ordering_374_375.txt	a523f511ce88b86d682be37e55aa5c37c8c37fc8
+build/agent185/close/evidence.txt	c276a7ab8851c76708f81f2e4d63b826f12f7854
+build/agent185/close/evidence.sh	882560f31fcbe78c193d7d5889fa0133df136278
+build/agent185/close/home_texts.py	3ef445c0ff8a94d1db47c035d99d9d14d9f89a59
+build/agent185/close/retraction_classes.py	1c809269d17f92a3915c412814a895388b45f29a
+build/agent185/close/run_checks.sh	70b358f01f10720356a3841b6d5c4c2d3f8ecf6c
+build/agent185/close/runs/exits.tsv	f73c2f862b062685ecfe46074c4b160777e73464
+build/agent185/close/runs/home_texts.out	6d4b12f32701b36ba29ff4b3b025537cc68d668a
+build/agent185/close/runs/close_findings.out	a664c71bcc8673fa6666d8840258ab2e6f8988c6
+build/agent185/close/runs/homes_tracked.out	9fccb644bce1169179e709dda4492ecafd7cd89f
+build/agent185/close/runs/retraction_grep.out	aa57ba739316bb6c744e20377f6f885c606c8950
+build/agent185/close/runs/retraction_classes.out	385f1a8af60d264a2dfe850fdc9ca6207d7a75aa
+build/agent185/close/runs/state_open_lists.out	a7522abee74c9af5b54c878e621072a1d3493df3
+build/agent185/close/runs/attr_placement_plant.out	f76fc69873a2b415ce1051d16a7b7e777aab49ca
+build/agent185/close/runs/home_texts_plant.out	3fc052ca1d3dd8ee504c22f098b8b83f8108d178
+build/agent185/close/audit_wide_phase_a.log	982a44d5cfe39e8be0f34a4a650812c91303c234
+docs/NEXT_SESSION.md	1149cbe4d3cf60ab31e1fd0444b057e2b3e58e2e

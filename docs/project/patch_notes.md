@@ -52,7 +52,7 @@ profile PASS. Each red was re-run on M20, where it passed, and then attributed:
 Every re-freeze was verified, and every declared control mode FAILs. The freeze-cadence tier's static pins
 moved with the same placement: `test_pointer_flow` (a new `merged-m21` baseline), `test_escape_triage`,
 `test_latch_readers`, `test_df_field_readers` and `test_reaction_classes`. Every moved address was attributed
-by `build/rc185/tierreds/attr_placement.py`, and pointer-flow's WEAK count -1 is the M19 straddle long
+by `tools/attr_placement_moves.py`, and pointer-flow's WEAK count -1 is the M19 straddle long
 leaving the class. Four tier reds were ours and are fixed:
 - two gates' FOLLOWS lacked `tools/build_fingerprint.py`;
 - the fork commit needed its `PATCH_NAMES` entry;
