@@ -1,0 +1,9 @@
+decision	recommendation
+subject	#187 and #188 (the close loop's re-run cost; the static tier's carry-forward): scope, options and a recommendation for the maintainer's ruling (14z-185b)
+session	dd342b19
+model	rule-checker@163e4ce9cf7b
+claim	The recommendation in scope_187_188.md follows from the measurements it cites and from the project's rules: build D, E (timing and --only, no cache) and F now, because they change no gate verdict and keep one full run of record; build A only after its backtest; then C after measuring gate independence. Every figure in the document is found in the named output files.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b

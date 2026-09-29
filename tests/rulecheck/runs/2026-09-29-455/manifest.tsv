@@ -1,0 +1,9 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent185b/scope_187_188.md	b38974ba48ce8fdba409c6a2d5133a03d366ca98
+build/agent185b/close_loop_cost.out	4b0c58f1b23d18ec4ee8d5a360770064b353e2f5
+build/agent185b/tier_time.out	8358bd21baa8e9b33aa2cbd55d1cd999a3f61610
+build/agent185b/follows_census.out	efe3fb02c459d4dd43ec7ef5ae7c771bc0d54bd7
+build/rc185/tier_close185.log	47d7b40f89f3ed5f218ce6c952a2ae27666ab54e
+build/rc185/tier_close185b.log	925dc550b8a058d04793622db80dea8263bee983
+build/rc185/tier_close185c.log	99afa56404a2b27dede03fa9ff93ea736cafe568
+tools/battery_reach.py	45da7f2858c947e1b124853ca1972380b7b71584
