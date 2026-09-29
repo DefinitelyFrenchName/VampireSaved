@@ -54,6 +54,9 @@ prompt files pasted VERBATIM, `record --session`, `resolve` on ONE line with one
   (a hand-run `format-patch` carries git's signature).
 - A Lua tap's `SP` is the supervisor stack; the game runs in user mode, its caller is at `USP`
   (`docs/platform/gotchas.md`).
+- The 14z-185 procedure check's recurring finding (runs 449, 450, 452, 453): a step called done in a
+  status message before the call that did it — once a ruling reported "recorded" to the maintainer before
+  any write. Say "next I will", and say "done" only after the result is on screen.
 
 ## WHAT CLOSED THIS SITTING (14z-185)
 
