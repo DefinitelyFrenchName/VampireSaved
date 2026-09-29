@@ -161,6 +161,7 @@ declares	test_state_open_lists
 declares	test_static_confirm
 declares	test_static_runner
 declares	test_suite_dispatch
+declares	test_superseded_pins
 declares	test_tables_current
 declares	test_tenant_anim_relocation
 declares	test_tenant_id

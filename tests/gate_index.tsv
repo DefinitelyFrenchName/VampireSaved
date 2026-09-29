@@ -411,3 +411,4 @@ tests/test_run_record.sh	runner
 tests/test_figure_check.sh	runner
 tests/test_rulings_verbatim.sh	runner
 tests/test_scratch_census.sh	runner
+tests/test_superseded_pins.sh	runner

@@ -5691,7 +5691,8 @@ is what it is for. Rule: at a freeze, run `tests/run_all_static.sh --strict --ca
 old build names, and re-point the harness's defaults in the same sitting. The phasec re-freeze is
 attributed by the freeze's own op-by-op delta of the stock twin (`attr2_m5_stock18.txt`). A gate for the
 fingerprint half — a live pin on a SUPERSEDED registry row's key, with the rule-checker's birth anchor
-exempt and a planted pin as its control — is open as #167; until it lands, the grep is the only guard.
+exempt and a planted pin as its control — is `tests/test_superseded_pins.sh` since 14z-185b (#167; portable, so
+every tier runs it). It sees this tree only: the grep stays the guard for the harness's defaults.
 
 ## A DOCUMENT WRITTEN BY THE EXPERT READS AS COMPLETE TO THE EXPERT — the tell is FIRST USE against FIRST NEED, and you will write a fresh instance of the bug while fixing it (paid: 14z-173/14z-174, GitHub #146)
 

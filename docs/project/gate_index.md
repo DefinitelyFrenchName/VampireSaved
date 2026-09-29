@@ -16,11 +16,11 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**402 scripts** — 106 ci_portable, 84 ci_static, 212 emulator-tier (run by name).
+**403 scripts** — 107 ci_portable, 84 ci_static, 212 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 35 | the suite runners and their own ground truth |
+| [runner](#runner) | 36 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 38 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -72,6 +72,7 @@ the suite runners and their own ground truth.
 | `tests/test_static_confirm.sh` | test | ci_portable | — | the static tier's carry-forward predictor marks a gate STALE by every rule it states (`tools/static_confirm.py`, 14z-185b, GitHub #188 route A — PROVISIONAL). | 14z-185b |
 | `tests/test_suite_dispatch.sh` | test | emulator | MAME, a build dir | ground truth for the auto-detecting runner's dispatch pieces (no emulator needed; the emulator-side behaviors they gate are proven by test_m2_repoint.sh and the suite itself): 1. build_fingerprint: vanilla rompath -> 'vsavj'; | 14z-132 |
 | `tests/test_suite_dispatch_selftest.sh` | test | ci_static | ROMDIR | ground truth for the kind->owner table in tests/test_suite_dispatch.sh (14z-90, GitHub issue #7). | 14z-90 |
+| `tests/test_superseded_pins.sh` | test | ci_portable | — | no live line in tests/ or tools/ pins a fingerprint the registry has SUPERSEDED (`tools/superseded_pins.py`, 14z-185b, GitHub #167). | 14z-185b |
 
 ## docs
 

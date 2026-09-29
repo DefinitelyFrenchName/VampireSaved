@@ -1596,8 +1596,8 @@ well as the old build names, and re-point the harness
 placeholders and inp build, its config page's default row, the consumer toml,
 the fidelity selftest) in the same sitting — its own selftest
 and this tree's `test_bbh_fidelity` are the acceptance. The gotcha is
-`docs/project/gotchas.md` [VSP-185]; the gate that would catch the fingerprint
-half by machine is #167.
+`docs/project/gotchas.md` [VSP-185]; the fingerprint half in THIS tree is caught by
+`tests/test_superseded_pins.sh` since 14z-185b (#167); the harness's defaults still need the grep.
 
 **TWO REGISTRY ROWS ARE NOT BUILDS** (14z-97, GitHub #96; RATIFIED by the
 maintainer 2026-09-15): the M2 battery's two legs, the stock twin

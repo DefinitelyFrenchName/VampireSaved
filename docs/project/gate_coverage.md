@@ -13,11 +13,11 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**402 of 402 gates described.**
+**403 of 403 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
-| [runner](#runner) | 35 | 35 | the suite runners and their own ground truth |
+| [runner](#runner) | 36 | 36 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 38 | 38 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 58 | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -30,7 +30,7 @@ first sentence) is `gate_index.md`.
 
 ## runner
 
-the suite runners and their own ground truth. 35 of 35 described.
+the suite runners and their own ground truth. 36 of 36 described.
 
 ### `run_all_emulator.sh` — run, emulator
 
@@ -311,6 +311,14 @@ the suite runners and their own ground truth. 35 of 35 described.
 **HOW:** plants a real fixture kind and removes it again; runs scratch COPIES of test_suite_dispatch.sh with the table rewritten (never an env override, which an operator could switch off) and checks each copy goes red naming the reason.
 
 **EXPECTS:** three reds, each with its reason; a green here on any of the three means the guard that keeps every expectation kind read by somebody has been loosened into prose.
+
+### `test_superseded_pins.sh` — test, ci_portable
+
+**WHAT:** no program under tests/ or tools/ holds, on a live line, a hex token that is a prefix of a superseded registry key (a key a family's older row carries and its current row does not); a comment, a docstring and a `RE-FROZEN … (was …)` note never count; the rule-checker's birth key is the one named exemption, and an exemption that no live pin uses any more fails as stale.
+
+**HOW:** runs the tool's selftest (seven cases), then the tool over this tree; two controls plant, in a scratch root built from this tree's own registry, a live pin on a real superseded key, and a rulecheck.py without its birth key — each must be refused.
+
+**EXPECTS:** the selftest PASS, the tree clean (0 live pins, 0 stale exemptions), both controls FAIL their scratch root.
 
 ## docs
 

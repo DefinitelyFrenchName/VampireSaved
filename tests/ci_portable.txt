@@ -309,3 +309,6 @@ test_rulings_verbatim
 # 14z-185b (#190 P4): every scratch program a session wrote is classed, and each class holds
 # (tools/scratch_census.py); seven controls, one per failure condition. ~2 s.
 test_scratch_census
+# 14z-185b (#167): no live line in tests/ or tools/ pins a SUPERSEDED registry fingerprint
+# (tools/superseded_pins.py); the birth key exempt by name; two controls. ~2 s.
+test_superseded_pins
