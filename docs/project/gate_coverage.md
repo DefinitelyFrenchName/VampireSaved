@@ -13,11 +13,11 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**399 of 399 gates described.**
+**400 of 400 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
-| [runner](#runner) | 32 | 32 | the suite runners and their own ground truth |
+| [runner](#runner) | 33 | 33 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 38 | 38 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 58 | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -30,7 +30,7 @@ first sentence) is `gate_index.md`.
 
 ## runner
 
-the suite runners and their own ground truth. 32 of 32 described.
+the suite runners and their own ground truth. 33 of 33 described.
 
 ### `run_all_emulator.sh` — run, emulator
 
@@ -167,6 +167,14 @@ the suite runners and their own ground truth. 32 of 32 described.
 **HOW:** tools/audit_emulator_staleness.py (importing the one FOLLOWS reader) diffs the recorded commit against the tree and matches the moved paths to each passed gate's declaration; the cadence comes from VS_CADENCE (exported by tests/run_all_static.sh, default session). Section 2 proves the instrument on a scratch git repository: a planted run whose declared replay moved must name its gate, an unmoved one must not, an undeclared gate must be named as unjudgeable, and a planted row at 0.5 of its cap must fail; the controls run the tool at freeze cadence over the moved plant and over the headroom plant.
 
 **EXPECTS:** at session cadence a PASS whatever is stale (the stale list is a NOTE and the command to retire it: tests/run_all_emulator.sh --stale); at freeze or release cadence a stale or undeclared passed gate is a FAIL; a row at or above half its cap is a FAIL at every cadence; no run of record is a NOTE at session and a FAIL at freeze/release.
+
+### `test_figure_check.sh` — test, ci_portable
+
+**WHAT:** tools/figure_check.py fails on each of its four conditions and only then: a stated figure that differs from its source (MISMATCH), a figure or source value its regex cannot find (NOT FOUND), a claim figure neither checked nor named unchecked (UNCOVERED), and an unchecked row the claim no longer needs (STALE); a clean spec passes.
+
+**HOW:** drives the tool's selftest (five cases over a synthetic row, claim and output); four controls — one per condition of the verdict (#185 item 5, one plant per conjunct) — run copies with that condition switched off, and each must fail the selftest.
+
+**EXPECTS:** the selftest's five cases read as designed and all four controls fail on their copies.
 
 ### `test_gate_follows.sh` — test, ci_portable
 

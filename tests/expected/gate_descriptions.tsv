@@ -204,6 +204,7 @@ declares	test_fbneo_runner_hygiene
 declares	test_fbneo_smoke
 declares	test_fbneo_tree_integrity
 declares	test_fbneo_tree_integrity_control
+declares	test_figure_check
 declares	test_freeze_artifacts_current
 declares	test_freeze_basis_sandbox
 declares	test_freeze_retires_diverge

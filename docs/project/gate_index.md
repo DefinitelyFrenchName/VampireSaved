@@ -16,11 +16,11 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**399 scripts** — 103 ci_portable, 84 ci_static, 212 emulator-tier (run by name).
+**400 scripts** — 104 ci_portable, 84 ci_static, 212 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 32 | the suite runners and their own ground truth |
+| [runner](#runner) | 33 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 38 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -54,6 +54,7 @@ the suite runners and their own ground truth.
 | `tests/test_demand_after_trap.sh` | test | ci_portable | — | no gate carries a `${VAR:?msg}` DEMAND after its EXIT trap (14z-134). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-134 |
 | `tests/test_emulator_runner.sh` | test | ci_portable | — | ground truth for tests/run_all_emulator.sh (14z-128). ROM-free, ~26 s (measured 14z-162; the header said ~5 s). | 14z-128 |
 | `tests/test_emulator_staleness.sh` | test | ci_portable | — | WHICH EMULATOR GATES' GREEN IS STALE, and is any row eating its cap (GitHub #171 slices Q4 and Q5, ruled 2026-09-24: "NOTE at session, FAIL at freeze/release"; | 2026-09-24 |
+| `tests/test_figure_check.sh` | test | ci_portable | — | a close's stated figures equal their sources, and a claim's figures are each checked or named unchecked (`tools/figure_check.py`, 14z-185b, GitHub #190 P1). | 14z-185b |
 | `tests/test_gate_follows.sh` | test | ci_portable | — | EVERY EMULATOR-TIER GATE DECLARES WHAT IT FOLLOWS, and no declaration is narrower than what the gate's own text reads (GitHub #171 slice Q3, ruled 2026-09-24 "Header line" — DECISIONS_HISTORY.md "Ruled 2026-09-24 (14z-180) — #171 gate quali… | 2026-09-24 |
 | `tests/test_header_defaults.sh` | test | ci_portable | — | a gate's HEADER must state the default its CODE actually uses (14z-128). ROM-free, ~2 s. | 14z-128 |
 | `tests/test_lane_carry.sh` | test | ci_portable | — | ground truth for tools/audit_lane_carry.py: a lane's carry verdict is derived from its gates' `# FOLLOWS:` declarations and fails when one moved or one is missing (GitHub #171 slice Q3; the tool itself 14z-174). ci_portable: | 14z-174 |
