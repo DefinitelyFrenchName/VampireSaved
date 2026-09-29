@@ -2806,6 +2806,12 @@ starving only that leg's budget: the old gate prints that line verbatim; the fix
 says the control's run did not complete and claims nothing). Both legs now go through
 one `run_leg`. **When a gate drives a browser more than once, every leg needs the
 completion marker** — a fix applied to "the run" is applied to one call site.
+**Recurred, 14z-185 (2026-09-29):** the control leg's run was incomplete twice under the
+close's strict tier (`build/rc185/tier_close185b.log`, the gate done in 12 s against 18-20 s
+alone), and the gate said so and claimed nothing — the fix working as designed. The same
+gate passed in the tier before and 3 of 3 alone (`build/rc185/applier_browser_rerun1-3.log`).
+The retry makes the race rare, not impossible: a twice-incomplete run is answered by
+re-running the tier, never by passing the gate by hand.
 
 ## A SUBAGENT WITH NO `effort` LINE RUNS AT ITS CALLER'S EFFORT, AND THE CALLER'S `model` BEATS THE DEFINITION'S — a cap written in `.claude/agents/<name>.md` alone does not hold (measured 2026-09-23, 14z-177, Claude Code 2.1.280, and all twelve legs re-run on 2.1.281 after it updated mid-session)
 
