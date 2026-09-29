@@ -63,7 +63,7 @@ number	state	reason	closed	labels	title
 134	CLOSED	COMPLETED	2026-09-26	bug	The vanilla hit rigs leave 6 legs VOID at contact range (5 LP, 1 LK): those frame-data cells are unmeasured
 133	OPEN	-	-	evolution	Re-measure the emulator runner's pull-queue gain on a wider host
 132	CLOSED	NOT_PLANNED	2026-09-25	bug	release/merged-m15 was never packaged
-131	OPEN	-	-	evolution	audit_mask_window_ff42a2: deprecate it, or keep it as a case-specific gate?
+131	CLOSED	NOT_PLANNED	2026-09-29	evolution	audit_mask_window_ff42a2: deprecate it, or keep it as a case-specific gate?
 130	OPEN	-	-	bug	bundle_win_dlls.py prints a broken character for its em dash on MSYS2 (build logs only)
 129	OPEN	-	-	bug,evolution,severity: low	Tenant CPU AI looks lackluster (unproven; first question: are the ported script blocks complete?)
 128	OPEN	-	-	evolution,parked	Marionette: parked until further notice

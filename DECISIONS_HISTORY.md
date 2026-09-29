@@ -27,6 +27,16 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-29 (14z-185b) — #131: audit_mask_window_ff42a2 is KEPT as a case-specific instrument
+
+**The question, verbatim (asked with its facts: a pre/post attribution instrument for a select-palette row move, operands a pre-move and a post-move build and the replays that moved; a bare run SKIPs as a standing release exception since 2026-09-06; last real run 2026-08-15; still named by the port skill's [VSP-35] and `docs/project/gotchas.md`):** *"#131: what becomes of tests/audit_mask_window_ff42a2.sh?"*
+
+**The maintainer's answer, verbatim:** *"Keep, case-specific"*.
+
+**What it means.** The instrument stays where [VSP-35] points: before moving or recolouring a select palette row, attribute the moved `.sha1`s with it. Its registry row and its standing SKIP stay. #131 closes `declined`: the deprecation it weighed is not done.
+
+---
+
 ## Ruled 2026-09-29 (14z-185b) — #189: R-reach for both runners; #190: P1 and P2, then P4
 
 **The instruction, from the maintainer, verbatim:** *"Then tackle #185's items as tickets: #189 (the run record) and #190 (promoting the close checks)"* (recorded here after `tools/agent/rulings_verbatim.py`'s first run found it quoted only in the scratch scope, 14z-185b).

@@ -1038,7 +1038,7 @@ the build pipeline — manifests, patch ops, extraction/reconciliation/generatio
 
 ### `test_m3a_reproducible.sh` — test, ci_static
 
-**WHAT:** every frozen reference rebuilds BIT-EXACT from the current tree: the three solo tenant builds, the stock twin and the merged image (the one that gets played), each against its frozen fingerprint — three independent tenant fingerprints are three oracles over any machinery refactor.
+**WHAT:** every frozen reference rebuilds BIT-EXACT from the current tree: the three solo tenant builds, the stock twin, the stage-4 image and the merged image (the one that gets played), each against its frozen fingerprint — three independent tenant fingerprints are three oracles over any machinery refactor.
 
 **HOW:** rebuilds each track into a scratch dir with tools/build_donovan.sh and compares fingerprints and artifact manifests (skipping the merged image, and saying so, when its untracked inputs are absent).
 
@@ -1302,7 +1302,7 @@ the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, du
 
 **HOW:** A/B of the PRE-move build against the POST-move build on each replay on MAME, unmasked and masked, with work RAM dumped at every isolated differing frame and every byte classified.
 
-**EXPECTS:** (1) a differing unmasked pair (else the replay is not on the list), (2) exact or isolated-and-attributed under the mask; anything else is a mechanism outside the family — stop and root-cause (its first run caught the 38 regression this way). Its future is ticket #131.
+**EXPECTS:** (1) a differing unmasked pair (else the replay is not on the list), (2) exact or isolated-and-attributed under the mask; anything else is a mechanism outside the family — stop and root-cause (its first run caught the 38 regression this way). KEPT as a case-specific instrument (maintainer-ruled 2026-09-29, #131): run it for a select-palette row move.
 
 ### `audit_merged_legacy.sh` — audit, emulator
 

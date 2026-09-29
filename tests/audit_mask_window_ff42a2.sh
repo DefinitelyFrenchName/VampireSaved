@@ -16,8 +16,8 @@
 #   byte classified.
 # EXPECTS: (1) a differing unmasked pair (else the replay is not on the list), (2) exact or
 #   isolated-and-attributed under the mask; anything else is a mechanism outside the family
-#   — stop and root-cause (its first run caught the 38 regression this way). Its future is
-#   ticket #131.
+#   — stop and root-cause (its first run caught the 38 regression this way). KEPT as a
+#   case-specific instrument (maintainer-ruled 2026-09-29, #131): run it for a select-palette row move.
 # FOLLOWS: emu/mame-patches/ tests/lua/replay.lua tests/replays/ tools/compare_flicker.py
 #   tools/run_mame.sh tools/run_replay_mame.sh tools/setup_mame.sh
 #
