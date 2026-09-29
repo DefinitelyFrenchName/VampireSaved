@@ -25,7 +25,9 @@ prompt files pasted VERBATIM, `record --session`, `resolve` on ONE line with one
    measured FBNeo-vs-MAME disagreement on legacy content opens a NEW ticket; CLAUDE.md [VSP-24]'s "parked as
    #141" wording is the maintainer's to amend). 14z-185b's order, verbatim: *"start with #187 and #188. Then we'll rule what to continue with"*.
    #188 route A (`tools/static_confirm.py`) is PROVISIONAL: backtested on three recorded reds, not wired; its
-   trust waits for the traced tier on WSL2 (*"History for now, traced on WSL2 later"*, `DECISIONS_HISTORY.md`). The full open list is `docs/project/tickets.md`. Opened in 14z-185: #183 (the parity gates'
+   trust waits for the traced tier on WSL2 (*"History for now, traced on WSL2 later"*, `DECISIONS_HISTORY.md`).
+   The Windows box was reinstalled (the maintainer, 2026-09-29: *"it's technically available but there's all the
+   WSL2 setup to do again"*): WSL2 per `docs/project/WSL2_SETUP.md` comes first. The full open list is `docs/project/tickets.md`. Opened in 14z-185: #183 (the parity gates'
    `0000` RNG pin is the RNG's fixed point) and #184 (the 28 never-entered a2 chains with no attack record, split
    from #174).
    Also during the close, verbatim: *"quick update  for after the close: workers (not the orchestrator, not the checkers) should preferably use Sonnet 5.5 at xhigh effort. No model used in the swarm is allowed to use max effort, under any circumstance"* (`DECISIONS_HISTORY.md`, 2026-09-29): at the opener, propose the
