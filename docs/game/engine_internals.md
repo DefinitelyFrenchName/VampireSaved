@@ -2722,6 +2722,8 @@ ratified ranges, so a push surviving to a checksum there would pass; that is
 not measured. That the oracle's checksum sees a byte changed in this range is
 measured for one planted byte only (`$FF06DA`, one exact replay, 14z-185).
 Gate: `tests/audit_walker_ghost.sh`, re-stated on the live stack.
+This oracle-backed basis, weaker than the mask the retracted premise claimed, is accepted for now
+(the maintainer, 2026-09-29: *"document it but it's fine for now"*, `DECISIONS_HISTORY.md`).
 ~~`tests/audit_walker_ghost.sh` measured A7 at both walkers as a **constant
 0xff7ff6** over 279,577 dispatches in all 49 corpus replays, so that longword
 lands at 0xff7ff2-0xff7ff5, inside the masked dead-stack window

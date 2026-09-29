@@ -27,6 +27,36 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-29 (14z-185b) — #143's retraction of the 14z-91 "design stops" clause: documented, and fine for now
+
+**The report (14z-185 close), verbatim:** *"#143 retracted the old "design stops" clause from 14z-91."*, then, asked to elaborate: the relocated walker's return-address push lands at `$FF055A-$FF06DD`, unmasked, so the clause read literally would have stopped the relocation; the relocation's legacy safety now rests on the oracle's verdicts (`audit_merged_legacy`, all 53 pairings on their ratified classes with the relocation live; 51 of them under tolerated classes where a surviving push would be unseen, not measured), and reverting the relocation was never among the options measured.
+
+**The maintainer, verbatim:** *"document it but it's fine for now"*.
+
+**What it means.** The walker relocation stays, backed by the legacy oracle's verdicts and by `tests/audit_walker_ghost.sh` (no mask hides the push), not by a mask. The weaker basis is recorded at its subject (`docs/game/engine_internals.md`, the walker section) and accepted for now; reopening it (a costed revert, or measuring whether a push survives to a checksum under a tolerated class) is the maintainer's call.
+
+---
+
+## Ruled 2026-09-29 (14z-185b) — #159's two side moves: clean on what was measured; the mechanism goes to a ticket (#186)
+
+**The report, verbatim:** *"#159 had two side moves: the Pyron ring, and the defense reads in the `110_don_arcade_mash` replay."* — Pyron's merged-vs-solo ring stream now agrees for the whole run (it diverged at f4742 on M20), and `110_don_arcade_mash` reads more defense rows from f8394; both attributed to #159 by single-row probes, the mechanism not measured.
+
+**The maintainer, verbatim:** *"the moves are clean from what we both measured. As for the mechanism, open a ticket to have it measured and ruled upon"*.
+
+**What it means.** The M21 freeze's re-statements of `tests/audit_pyron_ring.sh` and `tests/audit_defense_row_reads.sh` stand. #186 holds the measurement of why each moved (the candidate: the thunk's added cycles on the shared facing resolver), to be put to the maintainer for a ruling.
+
+---
+
+## Ruled 2026-09-29 (14z-185b) — `test_mister_gfxc_fetch`'s cap raised
+
+**The report, verbatim:** *"The MiSTer graphics-fetch gate (`test_mister_gfxc_fetch`) used 0.47 of its time limit, and 0.41 on the re-run."* — 6,814 s and 5,895 s of a 14,400 s cap; `tests/test_emulator_staleness.sh` fails a row at half its cap.
+
+**The maintainer, verbatim:** *"We should raise the cap (and we have room for optimisation too)"*.
+
+**What it means.** The row's cap in `tests/ci_emulator.tsv` goes from 14,400 s to 21,600 s, the larger measured runtime × 3 (20,442 s) rounded up to the hour by HANDOFF's HEADROOM rule; the two measured runs sit at 0.32 and 0.27 of it. Optimising the gate is not ruled here.
+
+---
+
 ## Ruled 2026-09-29 (14z-185) — the swarm's workers prefer Sonnet 5.5 at effort xhigh from after the 14z-185 close; no swarm model at max effort, ever
 
 **The maintainer (typed during the 14z-185 close), verbatim:** *"quick update  for after the close: workers (not the orchestrator, not the checkers) should preferably use Sonnet 5.5 at xhigh effort. No model used in the swarm is allowed to use max effort, under any circumstance"*.

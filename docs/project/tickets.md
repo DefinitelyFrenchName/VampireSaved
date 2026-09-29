@@ -11,12 +11,14 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**184 tickets** — status: open 11 · parked 16 · done 140 · declined 4 · not-ours 5 · invalid 7 · duplicate 1 · kind: bug 135 · cosmetic 11 · evolution 38 · **backfill debt: 0 rows**.
+**186 tickets** — status: open 13 · parked 16 · done 140 · declined 4 · not-ours 5 · invalid 7 · duplicate 1 · kind: bug 135 · cosmetic 11 · evolution 40 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#186](https://github.com/DefinitelyFrenchName/VampireSaved/issues/186) | evolution | open | #159's two side moves outside the Summon (Pyron's ring stream, 110_don_arcade_mash's defense reads): their mechanism unmeasured | `tests/audit_pyron_ring.sh` · `tests/audit_defense_row_reads.sh` | `DECISIONS_HISTORY.md § Ruled 2026-09-29 (14z-185b) — #159's two side moves` | none | none | 14z-185b |
+| [#185](https://github.com/DefinitelyFrenchName/VampireSaved/issues/185) | evolution | open | The close's rule-checker gaps fall into recurring structural families (run record, unpromoted close checks, universal claims, self-mutating counts, one plant per conjunct): fix the causes, not the symptoms | none | none | none | none | - |
 | [#184](https://github.com/DefinitelyFrenchName/VampireSaved/issues/184) | evolution | open | 28 never-entered a2 chains of the tenants with no attack record (poses and transitions): split from #174, their ours-vs-native parity unmeasured | `tools/framedata_pages.sh` · `tools/chain_census.py` | `DECISIONS_HISTORY.md § Ruled 2026-09-28 (14z-185) — #174 split` | none | none | 14z-185 |
 | [#183](https://github.com/DefinitelyFrenchName/VampireSaved/issues/183) | evolution | open | The parity gates pin the RNG to 0000, its fixed point: every draw returns 0, so no gate compares a non-zero random path | `tests/audit_move_parity.sh` · `tests/audit_chains174.sh` | `DECISIONS_HISTORY.md § Ruled 2026-09-28 (14z-185) — #176` | `docs/game/engine_internals.md § `0000` IS THE RNG'S FIXED POINT` | none | 14z-185 |
 | [#171](https://github.com/DefinitelyFrenchName/VampireSaved/issues/171) | evolution | open | Qualify every gate: prove it measures what it claims, and that it notices when its inputs move | `docs/project/gotchas.md § A DOCUMENT WRITTEN BY THE EXPERT` | `DECISIONS_HISTORY.md § Ruled 2026-09-22 (14z-174)` | `docs/platform/gotchas.md § A PAGE OPENED FROM `file://`` | none | 14z-174 |
