@@ -122,9 +122,10 @@ legacy behavior is a failed change.
   ACCEPTED-AND-DEFERRED: every FBNeo gate is a live A/B by design (no frozen
   corpus), which is what makes them machine-independent. Its revisit point,
   MiSTer, has passed: the MiSTer lane answered with its own oracles (the
-  simulator anchor, FPGA inertness, the tenant oracle), and the track is
-  parked as #141, to be reopened on a measured FBNeo-vs-MAME disagreement on
-  legacy content (restated 2026-09-15, maintainer-agreed).
+  simulator anchor, FPGA inertness, the tenant oracle), and #141, which held
+  the track, is closed `declined` (2026-09-29, maintainer-ruled): a measured
+  FBNeo-vs-MAME disagreement on legacy content opens a new ticket (restated
+  2026-09-15, maintainer-agreed).
 
   **[VSP-25]** **Dual-track "inertness" means bit-identical UP TO SELECT
   ENTRY, not for the whole replay** (ratified 2026-08-17, GitHub #95). The

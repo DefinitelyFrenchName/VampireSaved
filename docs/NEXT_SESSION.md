@@ -22,16 +22,19 @@ prompt files pasted VERBATIM, `record --session`, `resolve` on ONE line with one
    M21 is the maintainer's.
 2. **THE MAINTAINER'S QUEUE, given during the 14z-185 close, verbatim:** *"When everything is done, please do
    #184, #131, #133, #141, #150, #167"*. At 14z-185b #133 was UN-PARKED and #141 ruled `declined` (a
-   measured FBNeo-vs-MAME disagreement on legacy content opens a NEW ticket; CLAUDE.md [VSP-24]'s "parked as
-   #141" wording is the maintainer's to amend). 14z-185b's order, verbatim: *"start with #187 and #188. Then we'll rule what to continue with"*.
+   measured FBNeo-vs-MAME disagreement on legacy content opens a NEW ticket; CLAUDE.md [VSP-24] and the port
+   skill's [VSP-24] line say so since 14z-185b, applied at the maintainer's word). 14z-185b's order, verbatim: *"start with #187 and #188. Then we'll rule what to continue with"*.
    #188 route A (`tools/static_confirm.py`) is PROVISIONAL: backtested on three recorded reds, not wired; its
    trust waits for the traced tier on WSL2 (*"History for now, traced on WSL2 later"*, `DECISIONS_HISTORY.md`).
    The Windows box was reinstalled (the maintainer, 2026-09-29: *"it's technically available but there's all the
    WSL2 setup to do again"*): WSL2 per `docs/project/WSL2_SETUP.md` comes first. The full open list is `docs/project/tickets.md`. Opened in 14z-185: #183 (the parity gates'
    `0000` RNG pin is the RNG's fixed point) and #184 (the 28 never-entered a2 chains with no attack record, split
    from #174).
-   Also during the close, verbatim: *"quick update  for after the close: workers (not the orchestrator, not the checkers) should preferably use Sonnet 5.5 at xhigh effort. No model used in the swarm is allowed to use max effort, under any circumstance"* (`DECISIONS_HISTORY.md`, 2026-09-29): at the opener, propose the
-   `measurer`/`reader` frontmatter change (their definitions are edit-locked) and never spawn any agent at `max`.
+   Also during the close, verbatim: *"quick update  for after the close: workers (not the orchestrator, not the checkers) should preferably use Sonnet 5.5 at xhigh effort. No model used in the swarm is allowed to use max effort, under any circumstance"* (`DECISIONS_HISTORY.md`, 2026-09-29). The
+   `measurer`/`reader` frontmatter change (their `effort: high` -> `xhigh`, edit-locked) was proposed at 14z-185b and
+   SHELVED by the maintainer: *"The worker model and effort let's drop. I'll come back to it later."* — the change
+   also needs `tests/test_agent_worker.sh`'s fixture re-recorded (its line 79 compares the recorded run to the live
+   definition). Never spawn any agent at `max`.
 3. **Put to the maintainer (measured, not ticketed — their call whether to ticket):**
    a. #159's fix moved two things outside the Summon, each attributed to #159 on the single-row probes, the
       mechanism NOT measured: Pyron's merged-vs-solo ring stream now agrees for the whole run (it diverged at
