@@ -13,11 +13,11 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**401 of 401 gates described.**
+**402 of 402 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
-| [runner](#runner) | 34 | 34 | the suite runners and their own ground truth |
+| [runner](#runner) | 35 | 35 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 38 | 38 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 58 | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -30,7 +30,7 @@ first sentence) is `gate_index.md`.
 
 ## runner
 
-the suite runners and their own ground truth. 34 of 34 described.
+the suite runners and their own ground truth. 35 of 35 described.
 
 ### `run_all_emulator.sh` — run, emulator
 
@@ -271,6 +271,14 @@ the suite runners and their own ground truth. 34 of 34 described.
 **HOW:** drives the tool's selftest over a synthetic repository with a submodule; three controls run copies blind to untracked files, blind to the reach, and with the secret filter removed, and each must fail the selftest.
 
 **EXPECTS:** the selftest's 14 checks pass and all three controls fail on their copies; a red names the plant compare did not name.
+
+### `test_scratch_census.sh` — test, ci_portable
+
+**WHAT:** tools/scratch_census.py fails on each of its conditions and only then: an UNCLASSED scratch program; a PROMOTED row whose target is untracked, or not named in HANDOFF.md; a CLOSE-CHECK row the close's checks file does not run, or that a tracked file names; a NOT PROMOTED row with no reason; a STALE row; a clean class file passes.
+
+**HOW:** drives the tool's selftest (eight cases in a synthetic git repository); seven controls — one per failure condition (#185 item 5) — run copies with that condition's failure turned into a print, and each must fail the selftest.
+
+**EXPECTS:** the selftest's eight cases read as designed and all seven controls fail on their copies.
 
 ### `test_shell_portability.sh` — test, ci_portable
 

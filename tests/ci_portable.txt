@@ -306,3 +306,6 @@ test_figure_check
 # 14z-185b (#190 P2): a session's quotes of the maintainer are verbatim, and every maintainer message is on
 # record (tools/agent/rulings_verbatim.py); four controls, one per failure condition. ~1 s.
 test_rulings_verbatim
+# 14z-185b (#190 P4): every scratch program a session wrote is classed, and each class holds
+# (tools/scratch_census.py); seven controls, one per failure condition. ~2 s.
+test_scratch_census

@@ -152,6 +152,7 @@ declares	test_rulings_verbatim
 declares	test_run_on_snapshot
 declares	test_run_record
 declares	test_same_data_p2
+declares	test_scratch_census
 declares	test_shadow_tenant
 declares	test_shell_portability
 declares	test_sim_wram_contract

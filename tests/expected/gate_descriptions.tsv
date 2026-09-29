@@ -367,6 +367,7 @@ declares	test_run_on_snapshot
 declares	test_run_record
 declares	test_s4_thresholds
 declares	test_same_data_p2
+declares	test_scratch_census
 declares	test_select_arrays
 declares	test_select_port_hygiene
 declares	test_select_wheel
