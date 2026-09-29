@@ -27,6 +27,14 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-29 (14z-185b) — the close-cost tickets: #187 (the close loop's re-runs), #188 (the static tier's carry-forward), #189 (the emulator driver's run record) and #190 (the close checks promoted), from #185 and a side conversation
+
+**The maintainer, verbatim (main session):** *"Yes, stage 4 should be done. HOWEVER, before we do stage 4 or any other ticket, as you noticed I opened #185 and it goes further. I'd like to send you for review and action a side chat I had during the staging + freeze"*. **In the side conversation (a no-tools fork during the 14z-185 close), verbatim:** *"Can you open a new ticket related to improving re-run (i.e. improving their run time and/or running less of them) ?"*; *"I think we could also optimize the static tier. Currently we're re-running the strict static tier a third time and I might be wrong but I think in most cases we could only have to run it twice"*; *"I think it's worth it because I know we touched a lot of things but at this rate we'll reach 24 hours just to stage M21"*. **In #185 (the maintainer's issue, 2026-09-29):** *"We should go over those and open tickets for the run-record upgrade and the tool promotions."*
+
+**What it means.** Four evolution tickets, each needing rulings before any build: #187, #188, #189, #190. #185 keeps its item 3 (a claim lint) and the hand-written judgement tables; its item 4 is carried as a direction of #187 and its item 5 as a property of #190's gates. The side conversation's figures were recalled, not measured; the main session re-measured them (`tools/agent/close_loop_cost.py`, a measurer's independent run) and the tickets carry the measured values. The corrections: each strict tier run took 3,748 s, 4,174 s and 4,428 s, not "about 45 minutes"; the count-driven passes cost 4,775 s over ten passes, not "roughly two hours"; the packet ran 11.52 h, 2026-09-28 22:04Z to 2026-09-29 09:35Z; and which checks dominate a pass was never measured, because per-check durations were not recorded.
+
+---
+
 ## Ruled 2026-09-29 (14z-185b) — #143's retraction of the 14z-91 "design stops" clause: documented, and fine for now
 
 **The report (14z-185 close), verbatim:** *"#143 retracted the old "design stops" clause from 14z-91."*, then, asked to elaborate: the relocated walker's return-address push lands at `$FF055A-$FF06DD`, unmasked, so the clause read literally would have stopped the relocation; the relocation's legacy safety now rests on the oracle's verdicts (`audit_merged_legacy`, all 53 pairings on their ratified classes with the relocation live; 51 of them under tolerated classes where a surviving push would be unseen, not measured), and reverting the relocation was never among the options measured.

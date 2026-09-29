@@ -11,12 +11,16 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**186 tickets** — status: open 13 · parked 16 · done 140 · declined 4 · not-ours 5 · invalid 7 · duplicate 1 · kind: bug 135 · cosmetic 11 · evolution 40 · **backfill debt: 0 rows**.
+**190 tickets** — status: open 17 · parked 16 · done 140 · declined 4 · not-ours 5 · invalid 7 · duplicate 1 · kind: bug 135 · cosmetic 11 · evolution 44 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#190](https://github.com/DefinitelyFrenchName/VampireSaved/issues/190) | evolution | open | Promote the recurring close checks into tools/ with gates (#185 item 2) | none | `DECISIONS_HISTORY.md § Ruled 2026-09-29 (14z-185b) — the close-cost tickets` | none | none | 14z-185b |
+| [#189](https://github.com/DefinitelyFrenchName/VampireSaved/issues/189) | evolution | open | The emulator driver's run record: full status, submodules, command, environment and reach hashes at start and end (#185 item 1) | `tests/run_all_emulator.sh` | `DECISIONS_HISTORY.md § Ruled 2026-09-29 (14z-185b) — the close-cost tickets` | none | none | 14z-185b |
+| [#188](https://github.com/DefinitelyFrenchName/VampireSaved/issues/188) | evolution | open | Static tier: carry forward passes after a red (re-run only the failed and stale gates) | `tests/run_all_static.sh` | `DECISIONS_HISTORY.md § Ruled 2026-09-29 (14z-185b) — the close-cost tickets` | none | none | 14z-185b |
+| [#187](https://github.com/DefinitelyFrenchName/VampireSaved/issues/187) | evolution | open | Close checks: cut the checking loop's re-run cost (fewer full passes, faster passes) | `tools/agent/close_loop_cost.py` | `DECISIONS_HISTORY.md § Ruled 2026-09-29 (14z-185b) — the close-cost tickets` | none | none | 14z-185b |
 | [#186](https://github.com/DefinitelyFrenchName/VampireSaved/issues/186) | evolution | open | #159's two side moves outside the Summon (Pyron's ring stream, 110_don_arcade_mash's defense reads): their mechanism unmeasured | `tests/audit_pyron_ring.sh` · `tests/audit_defense_row_reads.sh` | `DECISIONS_HISTORY.md § Ruled 2026-09-29 (14z-185b) — #159's two side moves` | none | none | 14z-185b |
 | [#185](https://github.com/DefinitelyFrenchName/VampireSaved/issues/185) | evolution | open | The close's rule-checker gaps fall into recurring structural families (run record, unpromoted close checks, universal claims, self-mutating counts, one plant per conjunct): fix the causes, not the symptoms | none | none | none | none | - |
 | [#184](https://github.com/DefinitelyFrenchName/VampireSaved/issues/184) | evolution | open | 28 never-entered a2 chains of the tenants with no attack record (poses and transitions): split from #174, their ours-vs-native parity unmeasured | `tools/framedata_pages.sh` · `tools/chain_census.py` | `DECISIONS_HISTORY.md § Ruled 2026-09-28 (14z-185) — #174 split` | none | none | 14z-185 |

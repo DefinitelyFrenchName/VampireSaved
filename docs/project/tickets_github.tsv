@@ -2,8 +2,12 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 186
+# issues: 190
 number	state	reason	closed	labels	title
+190	OPEN	-	-	evolution	Promote the recurring close checks into tools/ with gates (#185 item 2)
+189	OPEN	-	-	evolution	The emulator driver's run record: full status, submodules, command, environment and reach hashes at start and end (#185 item 1)
+188	OPEN	-	-	evolution	Static tier: carry forward passes after a red (re-run only the failed and stale gates)
+187	OPEN	-	-	evolution	Close checks: cut the checking loop's re-run cost (fewer full passes, faster passes)
 186	OPEN	-	-	evolution	#159's two side moves outside the Summon (Pyron's ring stream, 110_don_arcade_mash's defense reads): their mechanism unmeasured
 185	OPEN	-	-	evolution,performance,severity: medium	Addressing the structural causes of many rule-checkers caught gaps
 184	OPEN	-	-	evolution	28 never-entered a2 chains of the tenants with no attack record (poses and transitions): split from #174, their ours-vs-native parity unmeasured
