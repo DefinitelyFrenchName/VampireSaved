@@ -362,6 +362,7 @@ declares	test_rpl2siminputs
 declares	test_rule5_census
 declares	test_rule_checker
 declares	test_run_on_snapshot
+declares	test_run_record
 declares	test_s4_thresholds
 declares	test_same_data_p2
 declares	test_select_arrays

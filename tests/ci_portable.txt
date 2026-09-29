@@ -297,3 +297,6 @@ test_close_checks
 # 14z-185b (#188 route A, PROVISIONAL): the carry-forward predictor (tools/static_confirm.py) marks a gate STALE
 # by each of its four rules; two controls. Not wired into this runner until the traced test. ~1 s.
 test_static_confirm
+# 14z-185b (#189): what a run ran on (tools/run_record.py, written by both runners at start and end)
+# — one planted change per recorded field is named; three controls. ~10 s.
+test_run_record

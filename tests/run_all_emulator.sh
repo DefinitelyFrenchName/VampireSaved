@@ -128,6 +128,7 @@ cd "$REPO"
 
 REG=tests/ci_emulator.tsv
 SCOPE=release; CADENCE=all; LANES="prereq fbneo mame"; LANES_SET=""; ONLY=""; JOBS=1; TMO=5400
+_ORIG_ARGS="$*"   # the command line as given, for the run record (#189) — the loop below shifts it away
 LOGDIR=""; RESUME=0; STRICT=0; KEEPGOING=0; DRY=0; LIST=0; CONTROLS=0; STALE=0
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -250,6 +251,26 @@ if [ ! -f "$LOGDIR/commit.txt" ]; then
         { git rev-parse HEAD; git status --porcelain -- . 2>/dev/null | grep -v '^??' | awk '{print $2}'; } > "$LOGDIR/commit.txt"
     else
         echo "no-git" > "$LOGDIR/commit.txt"
+    fi
+fi
+# THE RUN RECORD (14z-185b, GitHub #189, maintainer-ruled 2026-09-29 "R-reach, both runners"):
+# beside commit.txt (kept: test_emulator_staleness.sh reads it), tools/run_record.py writes what
+# this run ran on — HEAD, the status WITH untracked files and their hashes, the submodules (SHA,
+# diff hash, untracked), the command line, an allow-listed environment and a sha256 of every
+# program the registry's gates can reach — at the START (once per run directory: a --resume
+# continues the run it records) and at the END of every invocation (the exit trap), so "the tree
+# then against the tree now" and "what changed during the run" are one
+# `python3 tools/run_record.py compare`. Not under --dry-run; SILENT unless it fails (bbh's
+# fidelity compares --list and --dry-run output with bbh's own).
+if [ "$DRY" = 0 ] && [ -f tools/run_record.py ] && git rev-parse --git-dir >/dev/null 2>&1; then
+    if [ ! -f "$LOGDIR/run_record_start.json" ]; then
+        python3 tools/run_record.py write "$LOGDIR/run_record_start.json" --phase start \
+            --registry "$REG" --runner tests/run_all_emulator.sh \
+            -- tests/run_all_emulator.sh $_ORIG_ARGS > "$LOGDIR/run_record_start.log" 2>&1 \
+            || echo "run record: the START record FAILED — see $LOGDIR/run_record_start.log"
+    fi
+    if [ -f "$LOGDIR/run_record_start.json" ]; then
+        trap 'python3 tools/run_record.py write "$LOGDIR/run_record_end.json" --phase end --start "$LOGDIR/run_record_start.json" -- tests/run_all_emulator.sh $_ORIG_ARGS > "$LOGDIR/run_record_end.log" 2>&1 || echo "run record: the END record FAILED — see $LOGDIR/run_record_end.log"' EXIT INT TERM
     fi
 fi
 

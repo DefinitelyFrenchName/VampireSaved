@@ -104,6 +104,7 @@ cd "$REPO"
 # read it as FAIL. Sourced, not copied, so the two cannot drift again.
 . "$REPO/tests/lib/classify.sh"
 
+_ORIG_ARGS="$*"   # the command line as given, for the run record (#189) — the loop below shifts it away
 STRICT=0; TIER=all; LIST=0; EXEC_CTL=all; CADENCE=session
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -219,6 +220,23 @@ WORK="$(mktemp -d)"; trap 'rm -rf "$WORK"' EXIT INT TERM
 # current is the same trap wearing a different hat.
 KEEP="${STATIC_FAIL_LOGS:-build/gate_failures_static}"
 rm -f "$KEEP"/*.log 2>/dev/null || true
+# THE RUN RECORD (14z-185b, GitHub #189, maintainer-ruled 2026-09-29 "R-reach, both runners"):
+# tools/run_record.py writes what this run ran on — HEAD, the status with untracked files and their
+# hashes, the submodules, the command line, an allow-listed environment and a sha256 of every
+# program the registered gates can reach — at the START here and at the END in the exit trap, so a
+# red run has one too. SILENT: bbh's fidelity test compares this runner's output with bbh's own
+# exactly, so the record prints nothing unless it fails. A root without the tool (the runner test's
+# fake root, bbh's) writes none. `python3 tools/run_record.py compare <start> <end|--now>` reads it.
+RUNREC=""
+if [ -f tools/run_record.py ] && git rev-parse --git-dir >/dev/null 2>&1; then
+    RUNREC="${STATIC_RUN_RECORDS:-build/static_runs}/$(date -u +%Y%m%dT%H%M%SZ)_$$"
+    mkdir -p "$RUNREC"
+    python3 tools/run_record.py write "$RUNREC/run_record_start.json" --phase start \
+        --registry tests/ci_portable.txt --registry tests/ci_static.txt --runner tests/run_all_static.sh \
+        -- tests/run_all_static.sh $_ORIG_ARGS > "$RUNREC/start.log" 2>&1 \
+        || { echo "run record: the START record FAILED — see $RUNREC/start.log"; RUNREC=""; }
+fi
+trap 'rm -rf "$WORK"; [ -z "$RUNREC" ] || python3 tools/run_record.py write "$RUNREC/run_record_end.json" --phase end --start "$RUNREC/run_record_start.json" -- tests/run_all_static.sh $_ORIG_ARGS > "$RUNREC/end.log" 2>&1 || echo "run record: the END record FAILED — see $RUNREC/end.log"' EXIT INT TERM
 n_pass=0; n_skip=0; n_fail=0; n_miss=0
 failed=""; skipped=""
 # the controls ledger: declared / fired over the tier, the undeclared count,

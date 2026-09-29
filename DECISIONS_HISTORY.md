@@ -27,6 +27,16 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-29 (14z-185b) — #189: R-reach for both runners; #190: P1 and P2, then P4
+
+**The questions (after rule-checker run 2026-09-29-456 on `build/agent185b/scope_189_190.md`), verbatim:** *"#189: what should the run record cover? (Written by the runner at start and end, with a `compare` command; commit.txt kept; a gate that plants one change per recorded field.)"* and *"#190: which close checks to promote, and in what order?"*
+
+**The maintainer's answers, verbatim:** *"R-reach, both runners (Recommended)"* and *"P1+P2, then P4 (Recommended)"*.
+
+**What it means.** #189: `tools/run_record.py`, written by `tests/run_all_emulator.sh` and `tests/run_all_static.sh` at a run's start and end — HEAD, the full status with untracked files and their hashes, each submodule's SHA and diff hash, the exact command, an allow-listed environment, and a sha256 of every program in the run's reach — with a `compare` sub-command; `commit.txt` kept; a gate planting one change per recorded field. #190: P1 (a figure check with a numeral census) and P2 (maintainer quotes verbatim against the transcript, every recorded ruling homed), then P4 (the scratch census); P3 (promise fulfilment) not now. **Then, mid-turn, verbatim:** *"Of note, P3 should be considered for promotion later"* — P3 is deferred, not dropped: it stays in #190's scope for a later promotion.
+
+---
+
 ## Ruled 2026-09-29 (14z-185b) — #188 route A: backtested on the recorded history now, traced on WSL2 later
 
 **The question, verbatim:** *"How should route A (#188's reach-predicted carry-forward) be backtested before it is trusted?"* (options: a traced tier on WSL2, history only, both, or pause A).

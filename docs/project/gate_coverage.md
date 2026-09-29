@@ -13,11 +13,11 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**396 of 396 gates described.**
+**399 of 399 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
-| [runner](#runner) | 29 | 29 | the suite runners and their own ground truth |
+| [runner](#runner) | 32 | 32 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 38 | 38 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 58 | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -30,7 +30,7 @@ first sentence) is `gate_index.md`.
 
 ## runner
 
-the suite runners and their own ground truth. 29 of 29 described.
+the suite runners and their own ground truth. 32 of 32 described.
 
 ### `run_all_emulator.sh` — run, emulator
 
@@ -127,6 +127,14 @@ the suite runners and their own ground truth. 29 of 29 described.
 **HOW:** tools/audit_bg_leg_shape.py reads every `tests/*.sh` for a backgrounded group that captures `$?` under errexit and classes it SAFE or RISKY; the control deletes one real gate's `set +e` in a copy of the whole tests/ tree and audits that copy.
 
 **EXPECTS:** PASS when no group is RISKY; a red names the gate and the group. It does not claim the status file is USED or that the right subshell carries the `set +e` — only that a captured status cannot be lost.
+
+### `test_close_checks.sh` — test, ci_portable
+
+**WHAT:** tools/close_checks.py's verdicts mean what they say: a check is OK when its exit equals its EXPECTED exit (a plant expects non-zero), every row carries its seconds, `--only` re-runs one check and records the run partial, and `status` accepts only a FULL, all-OK run of the current checks file.
+
+**HOW:** drives the runner's selftest over a synthetic checks file with known answers; two controls run copies with the partial marker forced to full and the expected exit ignored, and each must fail the selftest.
+
+**EXPECTS:** the selftest's eight checks pass and both controls fail on their copies; a red names the check.
 
 ### `test_controls_contract.sh` — test, ci_portable
 
@@ -240,6 +248,14 @@ the suite runners and their own ground truth. 29 of 29 described.
 
 **EXPECTS:** the snapshot run reads every input unchanged, records the commit taken before the perturbation, sees t.txt at its commit's time, reaches the real HOME's other entries, and returns its build/emu_probe to the tree; the in-place run sees nine readings change; a mid-run instrument change reads unchanged inside the run and turns the run's exit to 2 with its AFTER line; each control makes the gate FAIL.
 
+### `test_run_record.sh` — test, ci_portable
+
+**WHAT:** tools/run_record.py's records and `compare` mean what they say: one planted change per recorded field — HEAD moved, a tracked file dirtied, one removed, an untracked file added, a submodule dirtied, a reached program edited, a dirty file edited again, a different command line, a changed allow-listed variable — is each NAMED; an untracked build/ product and a record against itself are not differences; a secret-looking variable is neither named nor valued.
+
+**HOW:** drives the tool's selftest over a synthetic repository with a submodule; three controls run copies blind to untracked files, blind to the reach, and with the secret filter removed, and each must fail the selftest.
+
+**EXPECTS:** the selftest's 14 checks pass and all three controls fail on their copies; a red names the plant compare did not name.
+
 ### `test_shell_portability.sh` — test, ci_portable
 
 **WHAT:** a `#!/bin/sh` script is POSIX sh — no `[[ ]]`, no `set -o pipefail`, no continuation chain of assignments reaching no command (the #84 shape) — and a script that needs bash says so in its shebang, so the tree runs under dash on Debian, Ubuntu and WSL2, not only under macOS's bash-as-sh.
@@ -247,6 +263,14 @@ the suite runners and their own ground truth. 29 of 29 described.
 **HOW:** strips heredoc bodies (embedded Python and TOML would give ~16 false `[[table]]` hits) and scans every sh-shebang script for shell-context bashisms; two controls add stub scripts with a bashism and with the assignment chain to the real file list.
 
 **EXPECTS:** PASS when every sh script is clean; a red names the script and the construct. `dash -n` is not a substitute — it passed the very file proven dead.
+
+### `test_static_confirm.sh` — test, ci_portable
+
+**WHAT:** tools/static_confirm.py's predictions mean what they say: a changed path makes a gate STALE when it is a program in the gate's reach (R1), is named by basename on a code line of the reach (R2), lies under a directory the reach reads (R3), or the reach reads the whole tree (R4); any other gate is CARRIED.
+
+**HOW:** drives the predictor's selftest over a synthetic repo of five gates, one per reader class, with known answers; two controls run copies with the directory rule and the whole-tree rule removed, and each must fail the selftest.
+
+**EXPECTS:** the selftest's six cases pass and both controls fail on their copies. The HISTORY backtest (tests/expected/static_confirm_backtest.tsv, `static_confirm.py backtest`) takes minutes of worktrees and is run by hand, not here.
 
 ### `test_suite_dispatch.sh` — test, emulator
 
@@ -3066,7 +3090,7 @@ the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guar
 
 ### `test_static_runner.sh` — test, ci_portable
 
-**WHAT:** tests/run_all_static.sh's verdicts mean what they say: PASS / SKIP / FAIL counted apart with SKIP in PROSE still PASS, an exit-0 shell crash FAIL, the anti-orphan registry check both ways, --strict, the controls readout, and the cadence triggers (a freeze-cadence gate runs when a path it follows changed).
+**WHAT:** tests/run_all_static.sh's verdicts mean what they say: PASS / SKIP / FAIL counted apart with SKIP in PROSE still PASS, an exit-0 shell crash FAIL, the anti-orphan registry check both ways, --strict, the controls readout, and the cadence triggers (a freeze-cadence gate runs when a path it follows changed), and a gate marked `# ORDER: last` runs after every other gate of its tier (14z-185b, #188).
 
 **HOW:** a synthetic repo of stub gates with known verdicts run through the REAL runner via its registry files (never a copy of its logic); two shadow-tool controls unplug the controls reader and blind the cadence trigger match.
 

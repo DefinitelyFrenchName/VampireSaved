@@ -6127,3 +6127,17 @@ gate `--stale` would skip. It selected `test_mister_gfxc_fetch` and
 THAT gate explicitly on the committed tree. Here that is
 `--lane mister --freeze`, which runs all three romset MiSTer gates. Never count
 the `--stale` run as its verification.
+
+## A ONE-GATE TEST RUN BECOMES THE RUN OF RECORD — `test_emulator_staleness` judges the NEWEST run under build/ (paid: 14z-185b, #189's wiring test)
+
+Testing the emulator driver's run record needed one real run, so a single prereq gate was run
+into `build/emu_runrec_14z185b/`. The driver writes `commit.txt` into every run directory, and
+`tools/audit_emulator_staleness.py` takes the NEWEST run under `build/` that carries one as the
+tree's run of record. `tests/test_emulator_staleness.sh` then read "1 gate(s) PASSED there" and
+judged staleness against that one gate instead of the last battery: the readout still said PASS,
+now about the wrong run.
+
+**The rule:** a run made to test the driver itself is removed once its evidence is copied out
+(here, the two records to `build/agent185b/emu_wiring/`), and the staleness readout is re-read
+to confirm it names the battery's run again. Never leave a partial run as the newest one before
+a close or a freeze.
