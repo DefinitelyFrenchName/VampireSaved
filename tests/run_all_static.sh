@@ -126,6 +126,23 @@ read_reg() {  # read_reg <file> — non-comment, non-blank lines
 PORTABLE="$(read_reg tests/ci_portable.txt)"
 STATIC="$(read_reg tests/ci_static.txt)"
 
+# ORDER: last (14z-185b, #188, maintainer-ruled 2026-09-29 "D + E + F now"). A gate whose
+# header carries the line `# ORDER: last` runs after every other gate of its tier, its
+# controls with it (they run right after their gate). For the browser-driving gate whose
+# documented race went red once in a strict tier (docs/platform/gotchas.md "Recurred,
+# 14z-185"): last, its run is the one nothing else in the tier follows. Registry order is
+# kept otherwise; one name per line, as the counts below read them.
+order_last() {  # order_last <names>
+    _first=""; _last=""
+    for _g in $1; do
+        if [ -f "tests/$_g.sh" ] && grep -q '^# ORDER: last' "tests/$_g.sh"; then _last="$_last $_g"   # ORDER-LAST
+        else _first="$_first $_g"; fi
+    done
+    for _g in $_first $_last; do echo "$_g"; done
+}
+PORTABLE="$(order_last "$PORTABLE")"
+STATIC="$(order_last "$STATIC")"
+
 # THE CADENCE (14z-162, GitHub #148, maintainer-ruled 2026-09-17). tests/ci_cadence.tsv
 # lists the gates that are NOT session cadence, each with the path prefixes it
 # depends on. Absent file = every gate is session = the pre-#148 behaviour,

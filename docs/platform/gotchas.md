@@ -2812,6 +2812,8 @@ alone), and the gate said so and claimed nothing — the fix working as designed
 gate passed in the tier before and 3 of 3 alone (`build/rc185/applier_browser_rerun1-3.log`).
 The retry makes the race rare, not impossible: a twice-incomplete run is answered by
 re-running the tier, never by passing the gate by hand.
+Since 14z-185b (#188) the gate carries `# ORDER: last`, so it and its controls run after every other
+gate of the static tier; the race's cause is still not measured.
 
 ## A SUBAGENT WITH NO `effort` LINE RUNS AT ITS CALLER'S EFFORT, AND THE CALLER'S `model` BEATS THE DEFINITION'S — a cap written in `.claude/agents/<name>.md` alone does not hold (measured 2026-09-23, 14z-177, Claude Code 2.1.280, and all twelve legs re-run on 2.1.281 after it updated mid-session)
 

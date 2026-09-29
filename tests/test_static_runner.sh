@@ -5,7 +5,8 @@
 # WHAT: tests/run_all_static.sh's verdicts mean what they say: PASS / SKIP / FAIL counted
 #   apart with SKIP in PROSE still PASS, an exit-0 shell crash FAIL, the anti-orphan
 #   registry check both ways, --strict, the controls readout, and the cadence triggers (a
-#   freeze-cadence gate runs when a path it follows changed).
+#   freeze-cadence gate runs when a path it follows changed), and a gate marked `# ORDER: last`
+#   runs after every other gate of its tier (14z-185b, #188).
 # HOW: a synthetic repo of stub gates with known verdicts run through the REAL runner via
 #   its registry files (never a copy of its logic); two shadow-tool controls unplug the
 #   controls reader and blind the cadence trigger match.
@@ -15,6 +16,7 @@
 #
 # MUST-FIRE: shadow-tool: reader-unplugged — a copy of run_all_static.sh that hands the classifier no gate script must let a stub with a declared-but-unfired control read PASS (mode: that copy is the runner every section drives, and section 11 must fail)
 # MUST-FIRE: shadow-tool: trigger-blind — a copy of run_all_static.sh with its cadence TRIGGER match disabled must leave a freeze-cadence gate deferred although a path it depends on changed; section 14's triggered case must FAIL under it
+# MUST-FIRE: shadow-tool: order-ignored — a copy of run_all_static.sh whose `# ORDER: last` test is disabled must run the marked stub FIRST, and section 16 must FAIL (mode: that copy drives every section; section 17 fires it in-run; 14z-185b, #188)
 #
 # WHY A GATE FOR THE RUNNER. CLAUDE.md §4: "Verdict logic is itself tested. A
 # test's classification code must be validated against known ground-truth
@@ -63,8 +65,15 @@ SHADOW_T="$T/run_all_static_triggerblind.sh"
 sed 's|case "$_pth" in "$_t"\*) _hit="$_pth"; break 2 ;; esac   # TRIGGER-MATCH|: # TRIGGER-MATCH disabled|' "$RUNNER" > "$SHADOW_T"
 cmp -s "$RUNNER" "$SHADOW_T" && fail "could not blind the trigger — the TRIGGER-MATCH line moved"
 chmod +x "$SHADOW_T"
+# THE THIRD SHADOW (14z-185b, #188): the runner with its `# ORDER: last` test disabled —
+# a marked gate keeps its registry place.
+SHADOW_O="$T/run_all_static_orderignored.sh"
+sed 's|_last="$_last $_g"   # ORDER-LAST|_first="$_first $_g"   # ORDER-LAST disabled|' "$RUNNER" > "$SHADOW_O"
+cmp -s "$RUNNER" "$SHADOW_O" && fail "could not disable ORDER: last — the ORDER-LAST line moved"
+chmod +x "$SHADOW_O"
 if vs_ctl_is reader-unplugged; then ln -s "$SHADOW" "$FR/tests/run_all_static.sh"
 elif vs_ctl_is trigger-blind; then ln -s "$SHADOW_T" "$FR/tests/run_all_static.sh"
+elif vs_ctl_is order-ignored; then ln -s "$SHADOW_O" "$FR/tests/run_all_static.sh"
 else ln -s "$RUNNER" "$FR/tests/run_all_static.sh"; fi
 # the runner sources THE ONE classifier relative to its repo (14z-139), so
 # the synthetic repo carries it too — the shipped lib, never a copy
@@ -508,6 +517,27 @@ else
     vs_ctl_dead trigger-blind "the blinded runner still triggered g_fail (exit $s15)"; rc=1
 fi
 rm -f "$FR/tests/run_all_static_triggerblind.sh" "$FR/tests/ci_cadence.tsv"
+
+echo "== 16. ORDER: last (14z-185b, #188): a marked gate runs after every other gate of its tier, registry order kept otherwise =="
+mk g_pass 0 "PASS: fine"; mk g_two 0 "PASS: two"
+{ echo "#!/bin/sh"; echo "# ORDER: last"; echo "echo 'PASS: ran last'"; echo "exit 0"; } > "$FR/tests/g_last.sh"; chmod +x "$FR/tests/g_last.sh"
+printf 'g_last\ng_pass\ng_two\n' > "$FR/tests/ci_portable.txt"; : > "$FR/tests/ci_static.txt"; rm -f "$FR/tests/ci_cadence.tsv"
+o16="$(cd "$FR" && STATIC_CHANGED_PATHS= sh tests/run_all_static.sh --tier portable --exec-controls none 2>&1)" && s16=0 || s16=$?
+ord16="$(printf '%s\n' "$o16" | awk '/^  g_(last|pass|two) /{printf "%s ", $1}')"
+if [ "$s16" = 0 ] && [ "$ord16" = "g_pass g_two g_last " ]; then
+    echo "  ok: registered first, g_last ran last; the others kept their order ($ord16)"
+else fail "16: order was '$ord16' (exit $s16), expected 'g_pass g_two g_last '"; fi
+
+echo "== 17. MUST-FIRE: with ORDER: last disabled, section 16's marked stub runs in its registry place =="
+ln -s "$SHADOW_O" "$FR/tests/run_all_static_orderignored.sh"
+o17="$(cd "$FR" && STATIC_CHANGED_PATHS= sh tests/run_all_static_orderignored.sh --tier portable --exec-controls none 2>&1)" || true
+ord17="$(printf '%s\n' "$o17" | awk '/^  g_(last|pass|two) /{printf "%s ", $1}')"
+if [ "$ord17" = "g_last g_pass g_two " ]; then
+    vs_ctl_fired order-ignored "with ORDER: last disabled, the marked stub ran first, in its registry place ($ord17)"
+else
+    vs_ctl_dead order-ignored "the disabled copy ran '$ord17'"; rc=1
+fi
+rm -f "$FR/tests/run_all_static_orderignored.sh" "$FR/tests/g_last.sh" "$FR/tests/g_two.sh"
 
 echo
 [ "$rc" = 0 ] && echo "PASS: the runner's verdicts mean what they say." \

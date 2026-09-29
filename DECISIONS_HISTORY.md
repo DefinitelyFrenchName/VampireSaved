@@ -27,6 +27,16 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-29 (14z-185b) — #187/#188: D + E + F now, carry-forward by route A
+
+**The questions (after rule-checker runs 2026-09-29-454 and -455 on `build/agent185b/scope_187_188.md`), verbatim:** *"What should be built first for #187/#188? (None of these changes a gate's verdict logic; one full --strict run of record per close is kept.)"* and *"For #188's carry-forward (re-running only what changed after a red), which route?"*
+
+**The maintainer's answers, verbatim:** *"D + E + F now (Recommended)"* and *"A, backtested (Recommended)"*.
+
+**What it means.** Built at 14z-185b: (D) `# ORDER: last` read by `tests/run_all_static.sh` (the browser-driving gate runs last in its tier; `tests/test_static_runner.sh` sections 16-17, control `order-ignored`), and a close-checklist rule to batch doc edits before a confirmation tier; (E) `tools/close_checks.py` (per-check seconds, `--only`, a run record that says full or partial, `status`), gated by `tests/test_close_checks.sh`; (F) a close-checklist rule: no stated count includes `tests/rulecheck/runs/`. Route A for #188 (a reach-predicted confirmation run) is built only after its backtest over past tier runs and one planted change per reader class; the tier's run record comes with it. The one full `--strict` run of record per close stays.
+
+---
+
 ## Ruled 2026-09-29 (14z-185b) — #133 un-parked; #141 closed `declined`, a measured FBNeo-vs-MAME disagreement on legacy content to be a NEW ticket
 
 **The question (14z-185 close report and after), verbatim:** *"#133 and #141 are both parked, so what should "do" mean for each: reopen and work them, or decide whether they stay parked?"*

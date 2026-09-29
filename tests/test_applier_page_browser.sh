@@ -13,6 +13,11 @@
 #   broken page fails. A stalled driver retries once for incompleteness only, never for a
 #   content failure.
 #
+# ORDER: last
+# (14z-185b, #188: tests/run_all_static.sh runs this gate and its controls after every other
+# gate of the tier; its race went red once in a strict tier, docs/platform/gotchas.md
+# "Recurred, 14z-185".)
+#
 # tests/test_applier_page.sh proves the page's MODULES equal tools/apply_release.py under
 # node, and that the page carries those modules verbatim. This gate answers the other
 # half, which node cannot: does the shipped HTML actually RUN where a player runs it —

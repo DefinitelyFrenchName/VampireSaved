@@ -291,3 +291,6 @@ test_close_tools
 # 14z-183b (#153 S6): a run on a snapshot (tests/run_on_snapshot.sh) is immune to the working tree — a tracked
 # edit and commit, build/, a submodule, both siblings perturbed mid-run reach nothing; three controls. ~5 s.
 test_run_on_snapshot
+# 14z-185b (#187): the close's check runner (tools/close_checks.py) times every check, re-runs one alone with
+# --only, and never lets a partial run read as the run of record; two controls. ~1 s.
+test_close_checks
