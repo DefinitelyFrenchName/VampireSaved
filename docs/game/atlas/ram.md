@@ -257,7 +257,7 @@ hazards recorded with it:
 | +0x06/+0x07 (of +0x04.l) | seq id byte / sub-state byte (class-02 seqs: stepper 0x225C4, table 0x225EE; jump = seq 06 -> handler 0x22A0E; air dash = seq 0x14) | [D] |
 | +0x20/+0x21 | anim node timer / node header flags — bit 7 of +0x21 = the FLOAT LICENSE, installed per node from the header long (node stride 0x18; +0xC low 13 bits = shadow-seq id) | [D] |
 | +0x1C0.w | float duration timer (armed 0x78 by the float conversion) | [D] |
-| +0x179 | air-action resource counter (0x10 at load; float start decrements) | [D] |
+| +0x179 | a per-round USE COUNTER (0x10 at load): the float start decrements it, and so does the START-button TAUNT — vs2 Donovan's eval stamps command 0x12 only while it is non-zero and decrements it per taunt (measured 14z-186, #184: 16 -> 13 over three taunts, `build/agent186/p17_don`); "air-action" alone was too narrow | [D] |
 | $FF80D4/D5 | the engine RNG state (routine vsavj 0x14E8A) — poke to determinize cross-game comparisons. `0000` is its FIXED POINT: from `0000` it never moves, and every draw returns 0 (14z-185, `engine_internals.md` "`0000` IS THE RNG'S FIXED POINT") | [D: oracle gate] [M: 14z-185] |
 | +0x2A/+0x2C (extended block) | registered SHADOW/REFLECTION servant slots (the class-0x0C trio per player; installer 0x8237E) — shared shadow tables 0x2083BC/0x2087CA (row space 0x40E each, hardcoded at 0x823E2/0x823F2), sequence data from 0x208BD8 | [D: 14z-66 FG arc] |
 

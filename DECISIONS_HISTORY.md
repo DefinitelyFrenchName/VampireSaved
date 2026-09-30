@@ -27,6 +27,30 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-30 (14z-186) — #184's captures read identical; the Chaos Flare capture confirmed; the white-HP gap becomes a ticket
+
+**The questions, verbatim:** *"The #184 sheets (Donovan, Phobos, Pyron): native above ours, 1, 6 and 12 frames after each chain starts. I read every pair as identical. With your confirmation, the gate goes back to the rule-checker and then gets committed."* — *"The Change Immortal / Chaos Flare capture from earlier (+77..+83): I read ours' Demitri upright at +81 and +82 while native's still lunges, and both identical at +83. With your confirmation, the Demitri ticket goes back to the rule-checker and gets filed."* — *"Should the white-HP gap become a ticket? I recommend yes (make `move_parity` compare `+0x52` too). It changes a tool that several frozen gates depend on, so re-freezing them would come with it."*
+
+**The maintainer, verbatim:** *"I read then as identical too."* — *"correct"* — *"yes it should become a ticket"*.
+
+**What it means.** `tests/audit_chains184.sh`'s ten chains are confirmed identical on pictures (`build/agent186/sheets184/`) as well as by the gate's rows; the gate goes to the rule-checker and is committed on an OK. The ours-vs-native capture of Change Immortal against Demitri's Chaos Flare (`build/agent186/p3_don/ci_event7_sheet.png`) is read as described, and the Demitri ticket goes to the rule-checker and is filed. `tools/move_parity.py` comparing P2's HP word `+0x50` but not the white word `+0x52` becomes a ticket, its fix re-freezing the gates that use the comparator — filed as #193 after rule-checker runs 2026-09-30-473 to -478.
+
+**The chain the first sheets missed (rule-checker run 2026-09-30-470 Q2).** The question, verbatim: *"The one chain the earlier sheets missed: Phobos a2:0x3d (Sitting Attack's contact branch), 1/6/12 frames after it starts, both events, native vs2 above ours. My reading: identical."* The maintainer, verbatim: *"agreed: visually identical"* (`build/agent186/sheets184/huitzil_3d.png`). All ten of the gate's chains are now read identical on pictures.
+
+---
+
+## Ruled 2026-09-30 (14z-186) — two tickets found under #184: Donovan's 2HK damage (#191) and Change Immortal's one-frame timing
+
+**The question, verbatim:** *"Should the 2HK damage and the Change Immortal timing become tickets? I'd put each through the rule-checker before filing."*
+
+**The maintainer, verbatim:** *"yes, regardless of what becomes of them, it's enough to justify at least tracking and addressing the issues"*.
+
+**What it means.** Each finding becomes a ticket after its claim passes the rule-checker: Donovan's 2HK damage is #191 (runs 2026-09-30-463, VIOLATED and resolved by re-measuring the legacy control with the victim's HP pinned on both sides, then -464 OK); Change Immortal's one-frame timing difference is filed the same way — **→ it moved to its first cause, Demitri's Chaos Flare differing between vsavj and vs2, filed as #192 (runs -465 to -467, then -471 OK).** Tracking does not presume the outcome: either may close `not-ours`.
+
+**The capture read (2026-09-30, 14z-186), after rule-checker runs 2026-09-30-465 and -466 moved the second finding to Demitri's own Chaos Flare** (a legacy control with no port: his animation node changes land 1-2 frames earlier on pristine vsavj than on vsav2 from +45; the sheet `build/agent186/legacy_cf/chaos_flare_sheet.png`, +42..+48, vsavj above vsav2). The question, verbatim: *"Does vsavj's Demitri stand upright at +47 while vsav2's is still lunging, and both are upright at +48?"* The maintainer, verbatim: *"Yes, frame 47 is different in both games, while the other frames, including 46 and 48 are identical. However, what I can confirm is that the sprite is different, not that the boxes (hit/hurt/etc. )actually used by the game engine are different, so it could be a purely cosmetic change where in VS2 the art was tweaked but not the moves properties"*. So the ticket states a SPRITE difference at +47 and the node-change timing, and names both explanations — art retouched on vs2, or engine timing — untested; whether the boxes differ is part of what it measures.
+
+---
+
 ## Ruled 2026-09-29 (14z-185b) — #150: the shape gate is "nothing lost" (S1), predecessors by family (P1), and a full committed freeze driver (D1)
 
 **The questions (after rule-checker run 2026-09-29-458 on `build/agent185b/scope_150.md`), verbatim:** *"#150's shape gate: which rule should a new expectation set pass?"*, *"How does a set name its predecessor?"* and *"The freeze driver: how much should the committed tool do?"*

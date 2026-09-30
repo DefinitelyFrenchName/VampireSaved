@@ -1,0 +1,83 @@
+{
+ "tenant": "huitzil",
+ "part": "c184",
+ "events": [
+  {
+   "name": "Sitting Attack [8LP] off 2HK, press at +50",
+   "frame": 2795,
+   "gap": 420,
+   "movement": false
+  },
+  {
+   "name": "Sitting Attack [8LP] off 2HK, press at +55",
+   "frame": 3215,
+   "gap": 420,
+   "movement": false
+  },
+  {
+   "name": "taunt, crouching",
+   "frame": 3635,
+   "gap": 300,
+   "movement": false
+  },
+  {
+   "name": "taunt, standing",
+   "frame": 3935,
+   "gap": 300,
+   "movement": false
+  },
+  {
+   "name": "Circuit Scrapper [HP], P2 jumps at +16",
+   "frame": 4235,
+   "gap": 420,
+   "movement": false
+  },
+  {
+   "name": "Circuit Scrapper [HP], P2 jumps at +17",
+   "frame": 4655,
+   "gap": 420,
+   "movement": false
+  }
+ ],
+ "pokes": [
+  "2745:ff8850:01200120",
+  "3145:ff8850:01200120",
+  "3545:ff8850:01200120",
+  "3945:ff8850:01200120",
+  "4345:ff8850:01200120",
+  "4745:ff8850:01200120",
+  "5145:ff8850:01200120",
+  "2565:ff8410:0228",
+  "2565:ff8810:02d8",
+  "2985:ff8410:0228",
+  "2985:ff8810:02d8",
+  "3595:ff8410:0228",
+  "3595:ff8810:02d8",
+  "3895:ff8410:0228",
+  "3895:ff8810:02d8",
+  "4005:ff8410:0228",
+  "4005:ff8810:02d8",
+  "4425:ff8410:0228",
+  "4425:ff8810:02d8",
+  "2735:ff8509:09",
+  "3155:ff8509:09",
+  "3575:ff8509:09",
+  "3875:ff8509:09",
+  "4175:ff8509:09",
+  "4595:ff8509:09"
+ ],
+ "p2": {
+  "id": "01",
+  "path": [
+   "R"
+  ],
+  "never": [
+   "b:0x71",
+   "b:0x74"
+  ],
+  "report": [
+   "b:0x10"
+  ]
+ },
+ "frames": 5325
+}

@@ -1,0 +1,17 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: open a ticket: Change Immortal's hit lands one frame later on ours than on native in one setup (P2's fireball at +30)
+Claim (the working agent's sentence): In probe p3_don's event 7 (Donovan's Change Immortal from the far pin, P2 Demitri's 236+LP pressed at +30), on merged-m21 (program fingerprint aacc7e71, merged29_fingerprint.txt) P2's HP step 278 to 250 lands at +81 against +80 on native vs2 and Donovan's seq returns 18 to 0 at +138 against +137 (ci_timing_summary.txt, computed by ticket_summaries.py from the two traces), a repeat run reproducing both traces byte for byte (p3_repeat_sha.txt), while the probe's other seven Change Immortal events read IDENT under tools/move_parity.py (parity.tsv), which justifies a ticket to find the mechanism of the one-frame difference; the claim is about RAM timing only, and no capture was made or shown, so no judgement of how it plays is drawn; NOT tested: whether P2's projectile is the cause, other fireball timings or strengths, other P2 characters, the near pin, and FBNeo.
+Artifacts (read every one, in full):
+  - build/agent186/ci_timing_summary.txt
+  - build/agent186/ticket_summaries.py
+  - build/agent186/merged29_fingerprint.txt
+  - build/agent186/p3_don/tr_native.txt
+  - build/agent186/p3_don/tr_ours.txt
+  - build/agent186/p3_don/parity.tsv
+  - build/agent186/don_c184c.json
+  - build/agent186/don_c184c.rpl
+  - build/agent186/p3_repeat_sha.txt
+  - build/agent186/t184_rigs.py
+  - build/agent186/t184_legs.sh

@@ -1,0 +1,143 @@
+{
+ "tenant": "donovan",
+ "part": "c184",
+ "events": [
+  {
+   "name": "j.2LK blocked",
+   "frame": 2795,
+   "gap": 420,
+   "movement": false
+  },
+  {
+   "name": "j.2MK blocked",
+   "frame": 3215,
+   "gap": 420,
+   "movement": false
+  },
+  {
+   "name": "j.2LK hit (control: no rebound)",
+   "frame": 3635,
+   "gap": 420,
+   "movement": false
+  },
+  {
+   "name": "Change Immortal, Up held, P2 crouches",
+   "frame": 4055,
+   "gap": 400,
+   "movement": false
+  },
+  {
+   "name": "Change Immortal, Up held, P2 stands",
+   "frame": 4455,
+   "gap": 400,
+   "movement": false
+  },
+  {
+   "name": "Change Immortal, Down held (control: contact)",
+   "frame": 4855,
+   "gap": 400,
+   "movement": false
+  },
+  {
+   "name": "Foot Stab [8LK] off Sword Grapple, press at +104",
+   "frame": 5255,
+   "gap": 420,
+   "movement": false
+  },
+  {
+   "name": "Foot Stab [8LP] off Sword Grapple, press at +104",
+   "frame": 5675,
+   "gap": 420,
+   "movement": false
+  },
+  {
+   "name": "taunt, crouching",
+   "frame": 6095,
+   "gap": 300,
+   "movement": false
+  },
+  {
+   "name": "taunt, standing",
+   "frame": 6395,
+   "gap": 300,
+   "movement": false
+  },
+  {
+   "name": "Sword Grapple [HP], P2 jumps at +8",
+   "frame": 6695,
+   "gap": 420,
+   "movement": false
+  },
+  {
+   "name": "Sword Grapple [HP], P2 jumps at +9",
+   "frame": 7115,
+   "gap": 420,
+   "movement": false
+  }
+ ],
+ "pokes": [
+  "2745:ff8850:01200120",
+  "3145:ff8850:01200120",
+  "3545:ff8850:01200120",
+  "3945:ff8850:01200120",
+  "4345:ff8850:01200120",
+  "4745:ff8850:01200120",
+  "5145:ff8850:01200120",
+  "5545:ff8850:01200120",
+  "5945:ff8850:01200120",
+  "6345:ff8850:01200120",
+  "6745:ff8850:01200120",
+  "7145:ff8850:01200120",
+  "7545:ff8850:01200120",
+  "2565:ff8410:0228",
+  "2565:ff8810:02d8",
+  "2985:ff8410:0228",
+  "2985:ff8810:02d8",
+  "3405:ff8410:0228",
+  "3405:ff8810:02d8",
+  "4015:ff8410:0228",
+  "4015:ff8810:02d8",
+  "4415:ff8410:0228",
+  "4415:ff8810:02d8",
+  "4815:ff8410:0228",
+  "4815:ff8810:02d8",
+  "5025:ff8410:0228",
+  "5025:ff8810:02d8",
+  "5445:ff8410:0228",
+  "5445:ff8810:02d8",
+  "6055:ff8410:0228",
+  "6055:ff8810:02d8",
+  "6355:ff8410:0228",
+  "6355:ff8810:02d8",
+  "6465:ff8410:0228",
+  "6465:ff8810:02d8",
+  "6885:ff8410:0228",
+  "6885:ff8810:02d8",
+  "2735:ff8509:09",
+  "3155:ff8509:09",
+  "3575:ff8509:09",
+  "3995:ff8509:09",
+  "4395:ff8509:09",
+  "4795:ff8509:09",
+  "5195:ff8509:09",
+  "5615:ff8509:09",
+  "6035:ff8509:09",
+  "6335:ff8509:09",
+  "6635:ff8509:09",
+  "7055:ff8509:09"
+ ],
+ "p2": {
+  "id": "01",
+  "path": [
+   "R"
+  ],
+  "never": [
+   "b:0x71",
+   "b:0x74"
+  ],
+  "report": [
+   "b:0x10"
+  ]
+ },
+ "frames": 7785
+}

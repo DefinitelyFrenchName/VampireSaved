@@ -1,0 +1,39 @@
+# naming rig — huitzil part c184 (tools/name_moves.py gen; DO NOT hand-edit,
+# regenerate). Native-game select prologue from replay 17; events from the
+# schedule in the tool. Analyse with: name_moves.py analyse <schedule.json>.
+300-305 sys=C1
+420-425 sys=C2
+800-803 sys=S1
+940-943 sys=S2
+1100-1102 p1=L
+1160-1162 p1=L
+1220-1222 p1=L
+1104-1106 p2=R
+1300-1302 p1=1
+1360-1362 p2=1
+2605-2755 p1=R
+2795-2798 p1=D6
+2845-2847 p1=U1
+3025-3175 p1=R
+3215-3218 p1=D6
+3270-3272 p1=U1
+3635-3665 p1=D
+3645-3647 sys=S1
+3935-3937 sys=S1
+4045-4195 p1=R
+4251-4253 p2=U
+4235-4237 p1=R
+4239-4241 p1=DR
+4243-4245 p1=D
+4247-4249 p1=DL
+4251-4257 p1=L
+4253-4257 p1=3
+4465-4615 p1=R
+4672-4674 p2=U
+4655-4657 p1=R
+4659-4661 p1=DR
+4663-4665 p1=D
+4667-4669 p1=DL
+4671-4677 p1=L
+4673-4677 p1=3
+5275 wait

@@ -1,0 +1,17 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent186/dmg_summary.txt	815647e7d8bc3e0dfbc6740a258acc00924f465a
+build/agent186/ticket_summaries.py	384aecad2b79afce3053e80211635a7f1eab8ffa
+build/agent186/merged29_fingerprint.txt	d366c8c4bf17b6fa29ff6706145ab3e08fe5f7fa
+build/agent186/p11_don/tr_native.txt	5325be2d600eb8de48574889973f5a11a3b50cbf
+build/agent186/p11_don/tr_ours.txt	8d999e1e7446f68728400beb7602f8aa86480dfb
+build/agent186/don_c184k.json	ac473e42b17a671ce09ffdef665a7e339ae64fbe
+build/agent186/p12_don/tr_native.txt	4e85491ac0ab86182cb9c4537aea7a46d1a392b9
+build/agent186/p12_don/tr_ours.txt	13eef61aee4b74cd400f921384a375590df4eff5
+build/agent186/don_c184l.json	234a7e95a6cc8a44ccb71c5b52b3f471eec84bea
+build/agent186/legacy_dmg/vsavj/f.ft	36472da774abf493e827b6b12fce6ab27fd07913
+build/agent186/legacy_dmg/vsav2/f.ft	cd7f1eb9c0c711c42c3a5128dade1a57e8f813bd
+build/agent186/legacy_dmg/legacy_623_2hk.rpl	063b851287dd6b6ac4246cf66aa0ceb18f5bfa1d
+build/agent186/legacy_dmg/run.sh	ed413466c5897ed22883ca4d5c34dbc71de3bb74
+build/agent186/t184_rigs.py	b40ec36e175c9fadf58e8cb5ba895ae00d14b170
+build/agent186/t184_legs.sh	e24f27551887e831e587911b1e1ef8c654539e08
+docs/project/tables/defense_rows.md.lines-164-172 (lines 164-172 of docs/project/tables/defense_rows.md)	c12fa13eb90e6e85125a46b866238453dc1ca2f2

@@ -1,0 +1,12 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent186/ci_timing_summary.txt	8409fd9ab489f013a3acce904460b6dbfbc7fc9a
+build/agent186/ticket_summaries.py	384aecad2b79afce3053e80211635a7f1eab8ffa
+build/agent186/merged29_fingerprint.txt	5c62b5b0342b796980abd9a4b44612ca7baf3493
+build/agent186/p3_don/tr_native.txt	3226b35c7c3bb7b4ab61792daacc7c1aa1919239
+build/agent186/p3_don/tr_ours.txt	644c90b7f5dc78cf732d944102f3340c7b2e915b
+build/agent186/p3_don/parity.tsv	32fc9e7301befe41f3ccc0eeadf62307f6773553
+build/agent186/don_c184c.json	5b8467f53718fb256291bd1818681ee1f874d1e3
+build/agent186/don_c184c.rpl	3785185ff7bcb152f30ec93a2c22305f8e3d16d9
+build/agent186/p3_repeat_sha.txt	efa41c76090aba553ea4fec06b40d1617f490551
+build/agent186/t184_rigs.py	0e198a18f3d9b6c387ad487ac38d3fcf19fc4b12
+build/agent186/t184_legs.sh	e24f27551887e831e587911b1e1ef8c654539e08

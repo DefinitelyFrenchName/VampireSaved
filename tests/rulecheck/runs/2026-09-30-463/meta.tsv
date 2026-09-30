@@ -1,0 +1,9 @@
+decision	recommendation
+subject	open a ticket: Donovan takes 9 from Demitri's 2HK on ours against 8 on native, unexplained by #161's engine difference
+session	a67e2668
+model	rule-checker@163e4ce9cf7b
+claim	On merged-m21 (program fingerprint aacc7e71), Donovan as P1 loses 9 HP to Demitri's 2HK where native vs2 loses 8, in three hits over two rigs (two of them from HP pinned equal at 288, p12_don), and 13 against 12 to 5HP and 19 against 17 to 623HP; the legacy control with no port (Demitri on Victor, pristine vsavj against pristine vsav2) reads 2HK 8 against 8, 5HP 12 against 11 and 623HP 18 against 16, so the 5HP and 623HP differences match the engines' own difference (#161's class) and the 2HK difference does not, which justifies a ticket to attribute it; NOT tested: other legacy victims, other attackers or strengths, FBNeo, the pipeline stage where vsavj adds its point, and whether Donovan's own defense row is involved.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b

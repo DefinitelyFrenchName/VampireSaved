@@ -6,6 +6,7 @@
 declares	audit_air_gc_legacy
 declares	audit_capture_matrix
 declares	audit_chains174
+declares	audit_chains184
 declares	audit_clone_beam_lines
 declares	audit_column_flash
 declares	audit_column_shock

@@ -1,0 +1,9 @@
+decision	recommendation
+subject	open a ticket: Change Immortal's hit lands one frame later on ours than on native in one setup (P2's fireball at +30)
+session	a67e2668
+model	rule-checker@163e4ce9cf7b
+claim	In probe p3_don's event 7 (Donovan's Change Immortal from the far pin, P2 Demitri's 236+LP pressed at +30), on merged-m21 (program fingerprint aacc7e71, merged29_fingerprint.txt) P2's HP step 278 to 250 lands at +81 against +80 on native vs2 and Donovan's seq returns 18 to 0 at +138 against +137 (ci_timing_summary.txt, computed by ticket_summaries.py from the two traces), a repeat run reproducing both traces byte for byte (p3_repeat_sha.txt), while the probe's other seven Change Immortal events read IDENT under tools/move_parity.py (parity.tsv), which justifies a ticket to find the mechanism of the one-frame difference; the claim is about RAM timing only, and no capture was made or shown, so no judgement of how it plays is drawn; NOT tested: whether P2's projectile is the cause, other fireball timings or strengths, other P2 characters, the near pin, and FBNeo.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b

@@ -1,0 +1,17 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: open a ticket: tools/move_parity.py compares P2's HP word +0x50 but not the white word +0x52, so the ours-vs-native gates cannot see a white-word-only damage difference (after runs 2026-09-30-473 to -477)
+Claim (the working agent's sentence): tools/move_parity.py does not compare the white HP word +0x52: fed the new gate's own passing traces with our p2white ($FF8852, present on 3026 lines of our huitzil trace) stepped by -5 from each event's frame + 100 on, all six huitzil rows stay IDENT, while the same step on p2hp ($FF8850) turns all six DIFF at +100 on p2hp — the live positive control (white_hp_evidence.txt section 11; a first version with a constant offset was invisible to this comparator, which reads HP as frame-to-frame changes, and its control read IDENT, recorded there); its two comparison loops iterate TENANT_FIELDS and EVENT_FIELDS only (section 12), which name p1hp and p2hp, and the file spells +0x52 under none of three case-insensitive forms while the same search finds 0xFF8850 twice (section 5); the gates whose non-comment lines run its per-event comparison, found by the grep shown over tests/*.sh, are tests/audit_chains174.sh:167, tests/audit_chains184.sh:185 and tests/audit_move_parity.sh:289, each tracing P2's HP as ff8850:w (section 9), audit_chains184's p2white read only by its native-trace outcome check (section 10); on native vs2 (hui_hp/run.sh: set, rig and addresses named; P1 Phobos id 16, P2 Demitri id 1), over the rig's event 0 (2795 up to 3215), P2's HP words fall on five frames — both at 2804 and 2816, the white word alone at 2885, 2890 and 2896 (to 257, 255, 254) while $FF8850 stays 272 (section 7); the maintainer ruled it a ticket, quoted verbatim in DECISIONS_HISTORY.md; this justifies a ticket to add +0x52 to the comparator and re-run the gates that use it; NOT tested: the behaviour test on the donovan and pyron traces, which hit each fall belongs to (section 8 lists P2's hit entries separately), the trace's later events, a caller outside tests/*.sh or reached by a path the grep does not match, whether any frozen parity row hides a +0x52-only difference, the same native trace on ours, and which moves damage the white word alone.
+Artifacts (read every one, in full):
+  - build/agent186/white_hp_evidence.txt
+  - build/agent186/white_hp_evidence.sh
+  - build/agent186/wh_perturb.py
+  - build/agent186/hui_hp/run.sh
+  - build/agent186/hui_hp/f.ft
+  - tools/move_parity.py.lines-82-101 (lines 82-101 of tools/move_parity.py)
+  - tools/move_parity.py.lines-126-200 (lines 126-200 of tools/move_parity.py)
+  - tests/audit_chains184.sh
+  - tools/chains184_rigs.py.lines-128-190 (lines 128-190 of tools/chains184_rigs.py)
+  - tests/replays/chains184/huitzil_c184.json
+  - DECISIONS_HISTORY.md.lines-30-40 (lines 30-40 of DECISIONS_HISTORY.md)

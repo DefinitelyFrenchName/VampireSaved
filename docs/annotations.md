@@ -23,13 +23,13 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3298 |
-| named by a document or manifest only | 2157 |
+| distinct program-space addresses named | 3302 |
+| named by a document or manifest only | 2161 |
 | named by both a document/manifest and code | 768 |
 | named by CODE ONLY (the gap list below) | 373 |
 | carried by atlas | 596 |
-| carried by engine_internals | 713 |
-| carried by other docs | 1026 |
+| carried by engine_internals | 718 |
+| carried by other docs | 1027 |
 | carried by manifests | 1829 |
 | carried by code | 1141 |
 
@@ -377,6 +377,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x016BD6` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x016C64` | docs/game/engine_internals.md — Pool seeding and the '[[init_shim]]' (14z-65 — the watchdog class); build/manifest/donovan.toml — init_shim; build/manifest/donovan.toml — reaction_hook; build/manifest/huitzil.toml — init_shim; tests/test_shim_charid.sh |
 | `PRG:0x016CCE` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
+| `PRG:0x016CEC` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) [vs2] |
 | `PRG:0x016CF2` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) |
 | `PRG:0x016D2C` | docs/game/engine_internals.md — The SUB-STATE DISPATCHER FAMILY at 0x018460 (14z-79); docs/project/patch_notes.md — donovan-m2 stage 5 — reaction_hook: ES-DP crash fix (2026-07-27, session 11, playtest-driven) [vs2]; build/manifest/donovan.toml — state_hook [vs2]; tools/audit_fsm_census.py; tools/gen_index_window_thunk.py |
 | `PRG:0x016D30` | build/manifest/pyron.toml — roster21 [vs2] |
@@ -387,6 +388,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x016E04` | build/manifest/huitzil.toml — beam_effect_class31; tests/audit_effect_class_rows.sh |
 | `PRG:0x016E4C` | docs/game/atlas/id_space.md — Which ids vanilla ever assigns (measured over the corpus); tests/audit_id_writers.sh |
 | `PRG:0x016E4E` | docs/game/atlas/id_space.md — Which ids vanilla ever assigns (measured over the corpus); tests/audit_id_writers.sh |
+| `PRG:0x016E98` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) [vs2] |
 | `PRG:0x016EB6` | docs/game/engine_internals.md — The object-script state dispatcher at 'PRG:0x018508' (14z-109); tools/audit_fsm_census.py; tools/audit_reaction_classes.py |
 | `PRG:0x016F56` | docs/game/engine_internals.md — The anim walker reads the sprite list from node+4 (measured 14z-70) |
 | `PRG:0x016F5E` | docs/game/engine_internals.md — Hitboxes and attack records (phase 2 of the character-data map, 14z-120 (5), MEASURED); tools/hitbox_records.py |
@@ -445,7 +447,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0178C2` | docs/game/gotchas.md — In the engine hit-spark spawner, a1 is the VICTIM, a6 the attacker [vs2] |
 | `PRG:0x017A48` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x017B22` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/patch_notes.md — donovan-m2 stage 4 — damage-pipeline R1 rows; BOTH GATES GREEN (2026-07-27, session 10) [vs2]; docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/reconciliation.toml — map [vs2]; tests/audit_throw_registration.sh |
-| `PRG:0x017B74` | docs/game/engine_internals.md — Hitboxes and attack records (phase 2 of the character-data map, 14z-120 (5), MEASURED); build/manifest/reconciliation.toml — map [vs2] |
+| `PRG:0x017B74` | docs/game/engine_internals.md — Hitboxes and attack records (phase 2 of the character-data map, 14z-120 (5), MEASURED); docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) [vs2]; build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x017BE4` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x017C6C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — THE PUSH-APART AT A SHARED WALL — the two engines differ (measured 14z-184, GitHub #179) [vs2]; tests/audit_shared_wall_push.sh |
 | `PRG:0x017C82` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2] |
@@ -1019,7 +1021,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x02711C` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured) [vs2]; docs/project/patch_notes.md — 14z-102 — the #107 row flip — FROZEN in donovan-m10 + every tenant + stock (the shared map), #107 CLOSED; build/manifest/reconciliation.toml — map; build/manifest/reconciliation.toml — map [vs2]; build/manifest/reconciliation_huitzil.toml — map; build/manifest/reconciliation_huitzil.toml — map [vs2] |
 | `PRG:0x027122` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x027130` | build/manifest/reconciliation_huitzil.toml — map |
-| `PRG:0x02713C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured) [vs2]; docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/audit_tick_cadence.sh; tests/test_anim_node_walk.sh; tools/anim_nodes.py |
+| `PRG:0x02713C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured) [vs2]; docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); docs/project/gotchas.md — LANDING ON A CHAIN'S START NODE IS NOT ENTERING THE CHAIN — a start can sit inside another chain, or last under a sampled frame (paid: 14z-185b to 14z-186, GitHub #184) [vs2]; tests/audit_chains184.sh; tests/audit_tick_cadence.sh; +3 more |
 | `PRG:0x027140` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/audit_tick_cadence.sh |
 | `PRG:0x0271A8` | docs/project/patch_notes.md — rows 0x10 + the per-tenant VALUE_SKIP default; build/manifest/bank_map.toml — gap_bd8fa |
 | `PRG:0x0271B6` | docs/game/engine_internals.md — The per-node sfx dispatcher and per-char record arrays (14z-52) [vs2]; docs/project/patch_notes.md — donovan-m2 stage 5 — the last two music triggers: engine_data masquerade rows (2026-07-28, playtest round 2) [vs2] |
@@ -1148,9 +1150,10 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x028546` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x028684` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x0286C0` | build/manifest/reconciliation.toml — map [vs2] |
-| `PRG:0x028708` | build/manifest/reconciliation.toml — map [vs2] |
+| `PRG:0x028708` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) [vs2]; build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x02871C` | docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); tests/test_advancing_guard.sh; tools/advancing_guard.py |
 | `PRG:0x028778` | build/manifest/reconciliation.toml — map [vs2] |
+| `PRG:0x028796` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) [vs2] |
 | `PRG:0x0287D2` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x028992` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x0289BE` | build/manifest/donovan.toml — port_patch; build/manifest/reconciliation.toml — map [vs2] |
@@ -1733,6 +1736,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x05A05C` | build/manifest/type_stamps.toml — stamp |
 | `PRG:0x05A16E` | build/manifest/type_stamps.toml — stamp |
 | `PRG:0x05A244` | build/manifest/type_stamps.toml — stamp |
+| `PRG:0x05A28E` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) [vs2] |
 | `PRG:0x05A384` | build/manifest/type_stamps.toml — reader |
 | `PRG:0x05A426` | build/manifest/type_stamps.toml — stamp |
 | `PRG:0x05A650` | docs/game/atlas/character_tables.md — Start-hold flavor: RESOLVED (community-confirmed 2026-07-27, mechanism pinned) [vs2]; docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; tests/audit_latch_reads.sh; tests/test_latch_readers.sh |

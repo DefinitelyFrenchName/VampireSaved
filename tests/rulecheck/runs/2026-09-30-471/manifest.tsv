@@ -1,0 +1,20 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent186/legacy_cf/summary.txt	f9c8a80916d526bfa46abc81de471235f70c252c
+build/agent186/legacy_cf/run.sh	d365e27e6d4047dab7159bdc0a6f2a68f43dd870
+build/agent186/legacy_cf/legacy_cf.rpl	e5afc1310465070fe3ade205451a5639bef5c2a7
+build/agent186/legacy_cf/vsavj/f.ft	088dd080b1de98cbdad7912ad31dcef55d5d7723
+build/agent186/legacy_cf/vsav2/f.ft	fdb5ed9bfed7e61aba035e55527a2fd1251e6ce8
+build/agent186/legacy_cf/snap.sh	316ae3baa55a1cfb12ac8192f2f1000e89c6e58f
+build/agent186/legacy_cf/chaos_flare_sheet.png	16cf3cee809b6f4c7caeb28c3c0c8266570f06bf
+build/agent186/p3_snap.sh	b2e87ead0dfb527422db1ae6244dbeadbf950b56
+build/agent186/p3_don/ci_event7_sheet.png	299a88f82b5039d0f9812fa80a5145163168e776
+build/agent186/ci_split_frames.txt	ba6656a6564f2f50df707008286409392dae0a46
+build/agent186/p3_don/tr_native.txt	3226b35c7c3bb7b4ab61792daacc7c1aa1919239
+build/agent186/p3_don/tr_ours.txt	644c90b7f5dc78cf732d944102f3340c7b2e915b
+build/agent186/merged29_fingerprint.txt	4c1a2555ff5eaf0cd5549d8caf56a31cc023499c
+build/agent186/p3_repeat_sha.txt	efa41c76090aba553ea4fec06b40d1617f490551
+build/agent186/don_c184c.json	5b8467f53718fb256291bd1818681ee1f874d1e3
+DECISIONS_HISTORY.md.lines-30-38 (lines 30-38 of DECISIONS_HISTORY.md)	ec0cef0d0318d68a46cf510cbc5db70bd032e807
+DECISIONS_HISTORY.md.lines-48-48 (lines 48-48 of DECISIONS_HISTORY.md)	595a48be7ab6f1936a51b916b82c57b934f799cf
+DECISIONS_HISTORY.md.lines-1404-1419 (lines 1404-1419 of DECISIONS_HISTORY.md)	783cee4945392effe1251123bc2972bee73fb89b
+tests/expected/same_data_p2.tsv.lines-1-3 (lines 1-3 of tests/expected/same_data_p2.tsv)	0d54dd71509be03eca057b4cf6af32d45279a3ed

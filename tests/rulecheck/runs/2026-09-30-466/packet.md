@@ -1,0 +1,22 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: open a ticket: Demitri's Chaos Flare runs on different frames on vsavj and vsav2 (no port), and that split reaches an ours-vs-native comparison with Demitri as P2 (after run 2026-09-30-465)
+Claim (the working agent's sentence): Demitri's Chaos Flare (236+LP) changes animation nodes on different frames on pristine vsavj and pristine vsav2 with no port in the loop — the same frames to +20, then 1-2 frames earlier on vsavj from +45, at both of two inputs, with the level and RNG pinned on both legs (legacy_cf/summary.txt) — and the same kind of split is the first ours-vs-native difference in probe p3_don's event 7 on merged-m21 (whole-set key a97d1ace, merged29_fingerprint.txt): P2 Demitri's node changes at +75 on ours against +76 on native while Donovan's node, seq and x and P2's HP match through +80, and Change Immortal's hit on P2 lands a frame later only after it (ci_split_frames.txt), both traces reproducing byte for byte on a repeat run (p3_repeat_sha.txt); this justifies a ticket to measure where the two engines' Chaos Flare timing differs and which ours-vs-native gates that run Demitri as P2 it reaches, since those gates chose Demitri on a static byte-identity; NOT tested: which engine mechanism causes it, Demitri's other moves and strengths, whether any frozen parity row already contains it, a legacy victim other than Victor, FBNeo, and how it plays (no capture was made).
+Artifacts (read every one, in full):
+  - build/agent186/legacy_cf/summary.txt
+  - build/agent186/legacy_cf/run.sh
+  - build/agent186/legacy_cf/legacy_cf.rpl
+  - build/agent186/legacy_cf/vsavj/f.ft
+  - build/agent186/legacy_cf/vsav2/f.ft
+  - build/agent186/ci_split_frames.txt
+  - build/agent186/p3_don/tr_native.txt
+  - build/agent186/p3_don/tr_ours.txt
+  - build/agent186/p3_don/parity.tsv
+  - build/agent186/ci_timing_summary.txt
+  - build/agent186/merged29_fingerprint.txt
+  - build/agent186/p3_repeat_sha.txt
+  - build/agent186/don_c184c.json
+  - build/agent186/don_c184c.rpl
+  - build/agent186/t184_legs.sh
+  - build/agent186/t184_rigs.py

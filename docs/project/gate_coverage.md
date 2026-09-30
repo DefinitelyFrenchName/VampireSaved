@@ -13,7 +13,7 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**404 of 404 gates described.**
+**405 of 405 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
@@ -24,7 +24,7 @@ first sentence) is `gate_index.md`.
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 84 | 84 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 61 | 61 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 62 | 62 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -2394,7 +2394,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 ## character-data
 
-the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 61 of 61 described.
+the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 62 of 62 described.
 
 ### `audit_air_gc_legacy.sh` — audit, emulator
 
@@ -2411,6 +2411,14 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 **HOW:** the rigs are tools/chains174_rigs.py's (built with tools/name_moves.py's machinery, kept OUTSIDE the naming corpus in tests/replays/chains174/, maintainer-ruled 2026-09-27 "Dedicated gate (Recommended)"); each tenant's rig on MAME on native vs2 and on the merged WIDE build as the parity gate runs them (real cursor picks, level 6 from 2000, the RNG from the match anchor); the native trace read against the chain graph decoded from the tenant's vs2 extract (tools/name_moves.py analyse); the two traces compared per event by tools/move_parity.py.
 
 **EXPECTS:** the committed rigs equal a regeneration; every event enters its TARGET chain(s) on native; every rig pin of x, stock and P2 HP lands on its listed frame on both legs; the per-event rows equal tests/expected/chains174.tsv; every control fails.
+
+### `audit_chains184.sh` — audit, emulator
+
+**WHAT:** the ten of #184's 31 never-entered a2 seqs that a focused native rig enters — Donovan a2:0x2b (Killshread Surf/Dive's blocked rebound), 0x3d (Change Immortal's miss, Up held), 0x42 (Sword Grapple's whiff), 0x4d (a normal Foot Stab connecting off Sword Grapple), 0x59 (the Start-button taunt); Phobos a2:0x3d/0x3e (Sitting Attack connecting off a sweep), 0x4f (Circuit Scrapper's whiff), 0x53 (his taunt); Pyron a2:0x1f (his taunt and Planet Burning's whiff) — each rig first proven to ENTER its chain on native vs2, then compared ours against native event by event. The other 21 are answered in docs/game/engine_internals.md (#184's paragraphs): replaced by design, the passage of another chain, inside audit_chains174's windows, or no vs2 code path found.
+
+**HOW:** the rigs are tools/chains184_rigs.py's (tools/name_moves.py's machinery, kept OUTSIDE the naming corpus in tests/replays/chains184/, as #174's); each tenant's rig on MAME on native vs2 and on the merged WIDE build as the parity gate runs them (real cursor picks, level 6 from 2000, the RNG from the match anchor); the ENTRY read from a third, native-only leg — a non-debug write tap (tests/lua/tap_writes.lua) on P1's node field +0x1C, a write from vs2's chain-start instruction PRG:0x02713C counting as a START only when the node before it is not that node's predecessor in any chain (tools/chains184_rigs.py entry): landing on a start node is NOT entering it (the 14z-185b miscount of Pyron's a2:0x49, the tail of j.LP; Donovan's a2:0x3d is a2:0x3c minus its first node); the traces compared per event by tools/move_parity.py. The tap leg and the traced native leg are SEPARATE runs, so the gate first proves they played identically (tools/chains184_rigs.py agree: every node change the native trace samples is a tap write of that node on that frame, and the tap run reached its END line — its MAME teardown segfault is not a failure, a missing END is) — rule-checker run 2026-09-30-468.
+
+**EXPECTS:** the committed rigs equal a regeneration; the tap run agrees with the traced native run; every event's OUTCOME holds on native — P2's HP falls, or never falls, from the event's first target chain on (tools/chains184_rigs.py OUTCOME, P2's HP words +0x50 and +0x52 both read: the hit and contact events DAMAGE, the blocks, misses, whiffs and taunts do not) — so a whiff cannot pass for the hit control (rule-checker run 2026-09-30-469); every event's TARGET — an ORDERED list of starts, `!chain` a start that must NOT happen (the two separating controls: a HIT surf does not rebound, a Down-held Change Immortal contacts) — holds on native; the per-event rows equal tests/expected/chains184.tsv; every control fails.
 
 ### `audit_column_flash.sh` — audit, emulator
 

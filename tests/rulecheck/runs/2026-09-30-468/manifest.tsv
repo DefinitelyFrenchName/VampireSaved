@@ -1,0 +1,13 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_chains184.sh	31a48ebde73574afd18282ff8ebac93e6405f634
+tests/expected/chains184.tsv	807c454563cc6cfc4792d23eb8187c50f82db18d
+tools/chains184_rigs.py	565509942d3a241d29c9d8ed612eec1ac5255c67
+tests/replays/chains184/donovan_c184.json	e79e4e313e1f27a95f1ddec4f2ee13e28a9b2e52
+tests/replays/chains184/huitzil_c184.json	1bd4f55802ed67b1bd2b5be4ec7bf39c52a705cb
+tests/replays/chains184/pyron_c184.json	f4b34b1e370be831bc268cf450b5558ea8de23cd
+build/agent186/g184_freeze.log	196541b1d9aab65c166e18124810ea50df9e3289
+build/agent186/g184_verify.log	1ecfe1b038597479fab51aed034eaa49db44eb5d
+build/agent186/g184_mode_wrong-target.log	cf87f71c5f1e5421d8c315c8bc04364095e1c753
+build/agent186/g184_mode_order-swapped.log	9b61cf3190836d9641e2729d2b62b83cdf6b2a58
+build/agent186/g184_mode_passage-counted.log	d34497c84cf6fde17998f02479f3decdb1cee02a
+build/agent186/g184_mode_x-moved.log	12372c99588232d970af51a63f945c30026b44e4

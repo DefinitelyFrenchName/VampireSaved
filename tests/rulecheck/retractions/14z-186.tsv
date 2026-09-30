@@ -1,0 +1,4 @@
+# tests/rulecheck/retractions/14z-186.tsv — the wordings retracted or corrected in 14z-186, and reach controls that must be found live; columns pattern, source, class (retracted | reach:N)
+Pyron a2:0x49 (8 times	14z-186 #184: all eight landings came from j.LP's second node — passage through a2:0x12, not entries	retracted
+only 3 of the 31	14z-186 #184: random play entered 2 of 31 (a2:0x49 is the tail of a2:0x12)	retracted
+is the tail of a2:0x12	control: the corrected wording in engine_internals.md	reach:1

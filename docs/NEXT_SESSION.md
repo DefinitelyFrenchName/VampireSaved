@@ -19,7 +19,7 @@ prompt files pasted VERBATIM, `record --session`, `resolve` on ONE line with one
    CLOSE row (STATE 14z-185b).
 1. **M21 IS FROZEN, NOT RELEASED.** Whether and when to release it is the maintainer's.
 2. **THE OPEN QUEUE.** #184 is IN PROGRESS: phases 1-2 done (STATE 14z-185b row (15), the issue's comment,
-   scratch `build/agent185b/t184_notes.md`); next are focused rigs for Donovan a2:0x2b and Pyron a2:0x49 compared
+   scratch `build/agent185b/t184_notes.md`); next are focused rigs for Donovan a2:0x2b (Pyron a2:0x49 was passage through j.LP, corrected 14z-186) compared
    ours-vs-native through the #174 machinery, then the handler reading for the other 28. Still queued from the
    14z-185 close: #133 (un-parked; needs a wider host — WSL2 first). Opened at 14z-185b, each with its rulings in
    `DECISIONS_HISTORY.md`: #186 (#159's side-move mechanism), #187/#188 (built D, E, F and route A, PROVISIONAL),

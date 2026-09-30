@@ -1,0 +1,11 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent186/white_hp_evidence.txt	cfef9eacb345e9cdb27bbff541264274bb61b678
+build/agent186/white_hp_evidence.sh	4378e4b7fe6145c0a72bdc16924adbfa449dcf72
+build/agent186/hui_hp/run.sh	c7705288b54494f5bd2ce2907bf369a17f55023d
+build/agent186/hui_hp/f.ft	760766a630707c0ed80ecbdb08961dfa2effefce
+tools/move_parity.py.lines-82-101 (lines 82-101 of tools/move_parity.py)	2af9f6f5e53e9821cb12e396089abeded0538fc4
+tests/audit_move_parity.sh.lines-285-292 (lines 285-292 of tests/audit_move_parity.sh)	49263629989ebc15a9dc39859ae25ac4f400306f
+tests/audit_chains174.sh.lines-164-170 (lines 164-170 of tests/audit_chains174.sh)	e09da5f4bb3e322ee4b47ee3862f9286bc9318b8
+tests/audit_chains184.sh.lines-182-188 (lines 182-188 of tests/audit_chains184.sh)	9fd8ef050155d581e3777c00f0e98eec990cec72
+tests/replays/chains184/huitzil_c184.json	1bd4f55802ed67b1bd2b5be4ec7bf39c52a705cb
+DECISIONS_HISTORY.md.lines-30-40 (lines 30-40 of DECISIONS_HISTORY.md)	ebca7de5877ff27069f43dba527351c4f60520ff

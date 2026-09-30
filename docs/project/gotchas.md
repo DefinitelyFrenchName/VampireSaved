@@ -1,5 +1,22 @@
 # GOTCHAS (project) — traps in OUR pipeline and method
 
+## LANDING ON A CHAIN'S START NODE IS NOT ENTERING THE CHAIN — a start can sit inside another chain, or last under a sampled frame (paid: 14z-185b to 14z-186, GitHub #184)
+
+**What happened.** #184's broad native leg (14z-185b) counted a chain ENTERED when P1's sampled node landed on
+its start node, and reported 3 of 31. One of the three, Pyron's a2:0x49, is the TAIL of a2:0x12 (j.LP is two
+nodes then exactly a2:0x49's eleven): all eight "entries" were j.LP passing through (14z-186). The same day
+Donovan's a2:0x3d turned out to be a2:0x3c minus its first node, which lasts under one sampled frame — so the
+CONTACT path (a2:0x3c) and the MISS path (a2:0x3d) both read as landing on the same node, and
+`tools/name_moves.py analyse` (which maps each node to ONE chain) labelled the miss a2:0x3c.
+
+**The rule.** An entry is the engine STARTING the chain, not the walker reaching its first node. Check the
+start node's membership first (is it a non-first node of any chain? `build/agent186/t184_shared.py`). Where it
+is, or where the first node is shorter than the sampling, read the entry from the chain-start write itself —
+vs2's `move.l a0,$1c(a6)` at `PRG:0x02713C`, tapped without the debugger by `tests/lua/tap_writes.lua` on the
+fighter's `+0x1C` (`build/agent186/t184_starts.sh`); that PC also carries the walker's advances, so a start
+is the written node with the node BEFORE it outside the chain — or from the handler's own state byte. A count
+of "entered" chains is a claim about the instrument's resolution before it is a claim about the game.
+
 ## A PROBE THAT DERIVES A "FREE" NAME FROM LIVE STATE STOPS WORKING AS THE STATE GROWS (paid: 14z-185, GitHub #160's probe)
 
 **What happened.** `tests/test_rule_checker.sh`'s PREPARE IDS probe (written 14z-185 for #160) put

@@ -11,12 +11,15 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**190 tickets** — status: open 15 · parked 14 · done 142 · declined 6 · not-ours 5 · invalid 7 · duplicate 1 · kind: bug 135 · cosmetic 11 · evolution 44 · **backfill debt: 0 rows**.
+**193 tickets** — status: open 18 · parked 14 · done 142 · declined 6 · not-ours 5 · invalid 7 · duplicate 1 · kind: bug 138 · cosmetic 11 · evolution 44 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#193](https://github.com/DefinitelyFrenchName/VampireSaved/issues/193) | bug | open | tools/move_parity.py never compares the white HP word +0x52, so the ours-vs-native gates cannot see a white-word-only damage difference | none | `DECISIONS_HISTORY.md § Ruled 2026-09-30 (14z-186) — #184's captures read identical` | none | none | 14z-186 |
+| [#192](https://github.com/DefinitelyFrenchName/VampireSaved/issues/192) | bug | open | Demitri's Chaos Flare differs between vsavj and vsav2 with no port (a sprite at +47, node timing from +45), and the split reaches ours-vs-native comparisons with Demitri as P2 | none | `DECISIONS_HISTORY.md § Ruled 2026-09-30 (14z-186) — two tickets found under #184` · `DECISIONS_HISTORY.md § Ruled 2026-09-30 (14z-186) — #184's captures read identical` | none | none | 14z-186 |
+| [#191](https://github.com/DefinitelyFrenchName/VampireSaved/issues/191) | bug | open | Donovan takes 9 from Demitri's 2HK on ours against 8 on native, where the engines agree on a legacy victim (not #161's class) | none | `DECISIONS_HISTORY.md § Ruled 2026-09-30 (14z-186) — two tickets found under #184` | none | none | 14z-186 |
 | [#190](https://github.com/DefinitelyFrenchName/VampireSaved/issues/190) | evolution | open | Promote the recurring close checks into tools/ with gates (#185 item 2) | none | `DECISIONS_HISTORY.md § Ruled 2026-09-29 (14z-185b) — the close-cost tickets` · `DECISIONS_HISTORY.md § Ruled 2026-09-29 (14z-185b) — #189: R-reach for both runners` | none | none | 14z-185b |
 | [#189](https://github.com/DefinitelyFrenchName/VampireSaved/issues/189) | evolution | open | The emulator driver's run record: full status, submodules, command, environment and reach hashes at start and end (#185 item 1) | `tests/run_all_emulator.sh` | `DECISIONS_HISTORY.md § Ruled 2026-09-29 (14z-185b) — the close-cost tickets` · `DECISIONS_HISTORY.md § Ruled 2026-09-29 (14z-185b) — #189: R-reach for both runners` | none | none | 14z-185b |
 | [#188](https://github.com/DefinitelyFrenchName/VampireSaved/issues/188) | evolution | open | Static tier: carry forward passes after a red (re-run only the failed and stale gates) | `tests/run_all_static.sh` | `DECISIONS_HISTORY.md § Ruled 2026-09-29 (14z-185b) — the close-cost tickets` · `DECISIONS_HISTORY.md § Ruled 2026-09-29 (14z-185b) — #187/#188: D + E + F now` · `DECISIONS_HISTORY.md § Ruled 2026-09-29 (14z-185b) — #188 route A: backtested on the recorded history now` | none | none | 14z-185b |
