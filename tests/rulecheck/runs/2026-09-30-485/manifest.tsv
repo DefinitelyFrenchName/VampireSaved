@@ -1,0 +1,19 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent186/t193/code_diff.txt	bafdb88b4c1741b3a0a15c22874a65280e5ae886
+build/agent186/t193/cmp193.txt	49eeb8f474ccfbb0ed10acfa7fef9b667adf032a
+build/agent186/t193/repeat_check.txt	e961934304a2f8f07a3d2328725c2e85cd0b76a7
+build/agent186/t193/table_diff_small.txt	658c059589e0c096b3b1123f48c46a1f95d66f50
+build/agent186/t193/vf3_audit_move_parity.log	9ff3fa72cab73cd0f058223491261e60ddb84ee5
+build/agent186/t193/vf3_audit_chains174.log	a60019344a3c4db499bab6e08a4ddbbba35bc580
+build/agent186/t193/vf3_audit_chains184.log	48aaa6a7e47eddd64fd4c46dc20703395e3b937e
+build/agent186/t193/vf3_audit_move_parity_attribution.log	76e3ddd7de493660f627de3952e5a9e98e91608b
+build/agent186/t193/fz2_attr.log	5a1e1d58354cf87a15984d32441df3cdf02df19f
+build/agent186/t193/cls_summary.txt	8239aa4ab7c0a8e93e0ba9d3935827cafaa9e644
+build/agent186/t193/wh_hits_all.txt	b019359d62dd47bbbaaf20abab1dbc1db43b225d
+build/agent186/t193/mp_ctl.log	38905e4a8e71ac1f083ba3864097f22ea122b0e8
+build/agent186/t193/mp_mode_white-pin.log	e3bd780ce38640e52b3ee4b41afe09e1d823941b
+build/agent186/t193/mp_mode_field-dropped.log	16bd07e190a167f4979e84d67fe831ef7536a5d0
+build/agent186/t193/white_pin_shadow.txt	00d9af13f17dd9884a3747baa5c561fb3c104a1b
+build/agent186/t193/late_drop_check.txt	922eb90a1571b5d189767403cac4590598e80d8e
+build/agent186/t186/builds_meta.txt	03e30b825073a46e17fcac97774943a877a3774f
+docs/project/patch_index.md.lines-20-21 (lines 20-21 of docs/project/patch_index.md)	5560d9c40d4f2cf8b963cae48c35eb836a64e63e

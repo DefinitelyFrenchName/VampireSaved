@@ -41,8 +41,8 @@
 #   and the RNG word $FF80D4 held at 0000 from 2363, on both legs (the ruled equalised input, STATE "Standing rulings";
 #   0000 is the RNG's fixed point, every draw 0 — #183, kept as the basis 2026-09-30; with RNG_WORD=0100 the Sword
 #   Grapple whiff at +8 no longer starts a2:0x41 on native, measured 14z-186 by audit_rng_forms);
-#   tools/move_parity.py compares P2's HP word +0x50 but NOT the white word +0x52, so a damage difference on the white
-#   word alone is invisible to every IDENT row here (measured 14z-186: Phobos's pursuit damages +0x52 only);
+#   [RESOLVED 14z-186, #193: tools/move_parity.py now compares both white HP words +0x52 as well — the rows were
+#   re-frozen, only their excluded-sample counts moved; the gap it closed: Phobos's pursuit damages +0x52 only]
 #   the 21 other seqs (see WHAT); P2 as the tenant; FBNeo; the chains' boxes and properties beyond what
 #   tools/move_parity.py compares; the phase-sensitive grab whiffs at timings other than the rig's (Sword Grapple's
 #   window is P2's jump input at +8/+9, Circuit Scrapper's +16/+17 in this rig, Planet Burning's +16 only — measured
@@ -75,7 +75,7 @@ fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
 # the parity gate's field list and ours cursor path (tests/audit_move_parity.sh, copied as audit_chains174 copies it)
-FIELDS="ff841c:l:node,ff8420:b:cnt,ff8406:b:seq,ff8407:b:sub,ff8509:b:stock,ff8410:w:x,ff8414:w:y,ff8450:w:p1hp,ff8782:b:id,ff802e:b:df,ff840b:b:face,ff8116:b:lvl,ff850a:w:meter,ff8850:w:p2hp,ff881c:l:p2node,ff8b82:b:p2id,ff8852:w:p2white"   # + P2's white HP word, for the outcome check only (move_parity compares its own fixed field list)
+FIELDS="ff841c:l:node,ff8420:b:cnt,ff8406:b:seq,ff8407:b:sub,ff8509:b:stock,ff8410:w:x,ff8414:w:y,ff8450:w:p1hp,ff8782:b:id,ff802e:b:df,ff840b:b:face,ff8116:b:lvl,ff850a:w:meter,ff8850:w:p2hp,ff881c:l:p2node,ff8b82:b:p2id,ff8852:w:p2white,ff8452:w:p1white"   # both white HP words: compared by tools/move_parity.py since #193 (14z-186), P2's also read by the outcome check
 OURS_PATH_donovan="D D DR DR"; OURS_PATH_huitzil="D D D"; OURS_PATH_pyron="D D D D"
 extract_of() { case "$1" in donovan) echo "$DON/extract" ;; huitzil) echo "$HUI/extract" ;; pyron) echo "$PYR/extract" ;; esac; }
 

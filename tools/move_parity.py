@@ -45,11 +45,15 @@ each event is compared IN ITS OWN WINDOW [its frame, the next event's frame)
 and judged on its own: IDENT, DIFF (first differing frame and fields), VOID (no
 live frames). Two more fields join the tenant's: METER (`RAM:$FF850A`, the
 meter fraction — a stock crossing was the only way a meter difference showed
-before) and P2HP (`RAM:$FF8850`, P2's HP — damage dealt); these two, the
+before) and P2HP (`RAM:$FF8850`, P2's HP — damage dealt); since 14z-186 (GitHub
+#193) also both fighters' WHITE HP (`+0x52`: P2WHITE `RAM:$FF8852`, P1WHITE
+`RAM:$FF8452` — the word the round judge kills on, which a hit can lower while
+`+0x50` stays put: Phobos's Sitting Attack pursuit, measured 14z-186); these, the
 stock and the tenant's own HP are CUMULATIVE and are compared as their change
 from the previous sample; and EVERY compared field the rig itself writes (its
 per-event X pin, which lands 40 frames before the next event and so inside the
-current window; its P2 HP pin; its stock poke) is excluded ON THE PIN FRAMES,
+current window; its P2 HP pin, a LONG that sets +0x50 and +0x52 together — a pin excludes
+every byte it writes, not only its address; its stock poke) is excluded ON THE PIN FRAMES,
 so an earlier difference is neither carried into every later event as a
 constant offset nor turned into a DIFF at the pin frame that resets it, and
 agreement on a pinned frame is never counted. The number of excluded samples
@@ -81,7 +85,7 @@ import json
 import sys
 
 TENANT_FIELDS = ("node", "seq", "sub", "cnt", "x", "y", "stock", "face", "df", "p1hp")
-EVENT_FIELDS = TENANT_FIELDS + ("meter", "p2hp")
+EVENT_FIELDS = TENANT_FIELDS + ("meter", "p2hp", "p2white", "p1white")
 # cumulative fields are compared as their PER-FRAME CHANGE (value minus the value
 # at the previous sample), never as absolutes: the meter fraction and HP carry any
 # earlier difference forward as a constant offset, and the first freeze read 79 of
@@ -92,12 +96,13 @@ EVENT_FIELDS = TENANT_FIELDS + ("meter", "p2hp")
 # a change-from-window-start comparison froze a DIFF against the event that
 # happened to hold the pin (rule-checker run 2026-09-17-24, Q4). The pin frames
 # come from the rig's own schedule json (`pokes`), per address.
-CUMULATIVE = ("meter", "p2hp", "stock", "p1hp")
+CUMULATIVE = ("meter", "p2hp", "stock", "p1hp", "p2white", "p1white")
 # every compared field the rig can write, by address: a frame on which the schedule
 # writes it is excluded for that field, cumulative or not — the per-event X pin at
 # $FF8410 lands 40 frames BEFORE the next event, i.e. inside the current window, and
 # an absolute x compared on that frame agrees by the pin's doing (run 2026-09-17-25 Q3)
-FIELD_ADDR = {"meter": 0xFF850A, "p2hp": 0xFF8850, "stock": 0xFF8509, "p1hp": 0xFF8450, "x": 0xFF8410, "y": 0xFF8414}
+FIELD_ADDR = {"meter": 0xFF850A, "p2hp": 0xFF8850, "stock": 0xFF8509, "p1hp": 0xFF8450, "x": 0xFF8410, "y": 0xFF8414,
+              "p2white": 0xFF8852, "p1white": 0xFF8452}
 DF_MOVES = ("Slay Shred", "Ray of Doom", "Shining Gemini")
 ANIM_KEY = {"donovan": "anim", "huitzil": "anim@huitzil", "pyron": "anim@pyron"}
 
@@ -155,11 +160,18 @@ def compare_events(tenant, native, ours, placements, events, pokes, exclude_pins
     tr, (dst, src, ln) = translator(placements, tenant)
     n, o = load_trace(native), load_trace(ours)
     fr = sorted(set(n) & set(o))
+    for leg, t in (("native", n), ("ours", o)):   # a trace without a compared field is refused, never read as agreement
+        miss = sorted({k for f in fr for k in EVENT_FIELDS if k not in t[f]})   # on EVERY compared frame (run 2026-09-30-484 Q1)
+        if miss:
+            sys.exit("%s trace lacks compared field(s) %s — add them to the gate's FIELDS" % (leg, ",".join(miss)))
     pinned = {}  # addr -> set of frames the rig writes it
     if exclude_pins:
         for pk in pokes:
-            f, addr, _ = pk.split(":")
-            pinned.setdefault(int(addr, 16), set()).add(int(f))
+            f, addr, val = pk.split(":")
+            # every BYTE the poke writes (its width is its value's: 2 hex digits a byte): the rigs'
+            # HP pin `ff8850:01200120` is a long that sets +0x50 AND +0x52 (#193, 14z-186)
+            for b in range(max(1, len(val) // 2)):
+                pinned.setdefault(int(addr, 16) + b, set()).add(int(f))
     prev = {f: fr[i - 1] for i, f in enumerate(fr) if i > 0}
     excluded_total = 0
     out = []

@@ -1,0 +1,11 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent186/t193/code_diff.txt	f29d6c75bfeb5379756958f6a8d86609d346383c
+build/agent186/t193/cmp193.txt	49eeb8f474ccfbb0ed10acfa7fef9b667adf032a
+build/agent186/t193/repeat_check.txt	e961934304a2f8f07a3d2328725c2e85cd0b76a7
+build/agent186/t193/table_diff_small.txt	658c059589e0c096b3b1123f48c46a1f95d66f50
+build/agent186/t193/vf_audit_move_parity.log	8d25cab11d65ec056a1b0a056ccda19db40e9de8
+build/agent186/t193/vf_audit_chains174.log	a60019344a3c4db499bab6e08a4ddbbba35bc580
+build/agent186/t193/vf2_c184.log	cc54b692aa32babc6033da817fe68865f5f05f47
+build/agent186/t193/fz2_attr.log	5a1e1d58354cf87a15984d32441df3cdf02df19f
+build/agent186/t193/vf2_attr.log	76e3ddd7de493660f627de3952e5a9e98e91608b
+build/agent186/t193/cls_summary.txt	8239aa4ab7c0a8e93e0ba9d3935827cafaa9e644

@@ -1,0 +1,10 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+DECISIONS_HISTORY.md.lines-30-38 (lines 30-38 of DECISIONS_HISTORY.md)	7c7c3d2941ab3d450091a8e546fe213faba08501
+build/agent186/t193/cls_summary.txt	8239aa4ab7c0a8e93e0ba9d3935827cafaa9e644
+build/agent186/t193/cls_trace.sh	b78734f6fc90ae6752c7ec69ddf407db68c0fd8f
+build/agent186/t193/cosmo_snap2.sh	d1194a42c535f4ff581491e3891a872fceb664a6
+build/agent186/t193/snap2/cosmo_full_sheet.png	3f6ccc0026c27db840dddf1e2e6f18217ade15e0
+build/agent186/t193/cmp193.txt	49eeb8f474ccfbb0ed10acfa7fef9b667adf032a
+build/agent186/t193/wh_pyron_4_7.txt	f53fef04d1bacc5f86df421e25767c24ed96022b
+build/manifest/pyron.toml.lines-1080-1093 (lines 1080-1093 of build/manifest/pyron.toml)	2f5c4f514e1f83bb03679ea621da294006ca136e
+docs/game/engine_internals.md.lines-530-556 (lines 530-556 of docs/game/engine_internals.md)	40cc28c3c241cf5f8505ad9d0d02bb0de3e9a03a

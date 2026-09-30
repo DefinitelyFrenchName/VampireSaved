@@ -22,6 +22,8 @@
 # MUST-FIRE: shadow-tool: no-translation — comparing our RAW anim node pointer against native's, without translating it out of its placement, must fail, so every IDENTICAL verdict is proven to rest on the translation (in-gate: one part is compared both ways; mode: every part is compared untranslated and FAILs)
 # MUST-FIRE: perturbed-copy: stock-starved — a copy of a meter part's OWN trace with the stock zeroed at one event frame must make section 2b report that event as starved, so the headroom check is live on the real traces (in-gate: the first meter part's ours leg, perturbed; mode: every meter part's ours leg is perturbed before 2b and the section FAILs)
 # MUST-FIRE: perturbed-copy: pins-ignored — a copy of OUR trace with the compared X altered on exactly the rig's own X-pin frames (RAM:$FF8410, 40 f before each pinned event) must leave every verdict of the part as frozen under the pin exclusion and move at least one verdict with the exclusion off, so the exclusion is proven live in the comparator and load-bearing on the rig's own writes; a schedule without a `pokes` key is refused by the comparator (in-gate: the first part of the set whose schedule pins X — pyron_4 in the default set — compared both ways on its perturbed copy; mode: every part compared on its perturbed copy with the exclusion off, verdict columns only, and the table FAILs). Until 14z-165 this control hunted for a part whose REAL rows moved with the exclusion off; with Demitri on P2 no part of the 30 does (both legs agree on every pin frame), so a data-dependent control read DEAD
+# MUST-FIRE: perturbed-copy: white-pin — a copy of OUR trace with P2's white HP (+0x52) stepped by +5 at exactly the rig's own HP-pin frames (the long ff8850:01200120 pin writes +0x50 AND +0x52), carried forward as a pin carries it, must leave every verdict of the part as frozen under the pin exclusion and move at least one with the exclusion off, so the per-BYTE exclusion is proven live on the white word (an address-only exclusion keeps the step and moves verdicts) — added 14z-186 on rule-checker run 2026-09-30-483 Q4 (in-gate: the first part of the set that pins HP; mode: every part compared on its perturbed copy with the exclusion off, and the gate FAILs)
+# MUST-FIRE: perturbed-copy: field-dropped — a copy of OUR trace with every p2white sample removed must be REFUSED by tools/move_parity.py ("lacks compared field", non-zero exit), so a gate whose trace list omits a compared field fails instead of reading agreement — added 14z-186 on rule-checker run 2026-09-30-483 Q4 (in-gate: the control part's copy; mode: every part's ours trace loses the field and the gate FAILs)
 # MUST-FIRE: perturbed-copy: movement-x — a copy of OUR trace with x altered by +3 on ONE frame ten frames into every MOVEMENT event (Walk forward/back, Jump [8]/[9]/[7], Forward/Back dash, Air Dash, Float — the events #177 asked a gate for) must turn exactly those events DIFF on x and leave every other verdict as frozen, so an IDENT movement verdict is proven to rest on the x path frame by frame (in-gate: the first part of the set with movement events — donovan_1 in the default set; mode: every part's movement events perturbed, and the table FAILs) — added 14z-184 on rule-checker run 2026-09-25-296 Q4
 #
 # WHAT IT MEASURES. tools/name_moves.py already performs every move of the
@@ -121,7 +123,7 @@
 # real picks on both sides; the 27 verdicts were re-frozen on them at 14z-160
 # and the ten Phobos DIVERGES rows of 14z-159 were verdicts on the VH2 branch.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged29] [PARTS="donovan_1 pyron_2"] [ALL=1] [JOBS=6] [FREEZE=1] [GOT_OUT=<path>] [RNG_WORD=0100] [RNG_UNTIL=2600] tests/audit_move_parity.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged29] [PARTS="donovan_1 pyron_2"] [ALL=1] [JOBS=6] [FREEZE=1] [GOT_OUT=<path>] [KEEP=<dir>] [RNG_WORD=0100] [RNG_UNTIL=2600] tests/audit_move_parity.sh
 #   RNG_WORD / RNG_UNTIL (#183, 14z-186): a PROBE knob — the word poked into $FF80D4 on every frame from 2363 (default
 #   0000) and the frame the pin stops (default the part's end, i.e. never free); FREEZE=1 refuses either
 #   GOT_OUT (14z-183): also copy this run's computed per-event table to <path> (verdicts unaffected) — how a probe build's
@@ -149,12 +151,12 @@ CONTROL="${CONTROL:-}"
 [ -f "$BUILD/patch/placements.json" ] || { echo "SKIP: no placements.json at $BUILD"; exit 0; }
 [ -f "$EXPECT" ] || { echo "FAIL: no frozen expectation at $EXPECT"; exit 1; }
 case "$CONTROL" in
-    ""|unpinned-level|no-translation|pins-ignored|stock-starved|movement-x) ;;
+    ""|unpinned-level|no-translation|pins-ignored|stock-starved|movement-x|white-pin|field-dropped) ;;
     *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;;
 esac
 
-W="$(mktemp -d)"
-trap 'rm -rf "$W"' EXIT INT TERM
+if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM; fi
+W="$(cd "$W" && pwd)"   # KEEP (14z-186, #193): the legs' traces kept for reading
 # the no-translation fixture is built HERE, not beside its control section: when it
 # was created later, the control MODE found no file, every comparison silently
 # produced nothing and the gate reported PASS on an empty result (measured 14z-159).
@@ -210,7 +212,7 @@ rpl_for() {
         { print }' "$_r" > "$_o"
 }
 
-FIELDS="ff841c:l:node,ff8420:b:cnt,ff8406:b:seq,ff8407:b:sub,ff8509:b:stock,ff8410:w:x,ff8414:w:y,ff8450:w:p1hp,ff8782:b:id,ff802e:b:df,ff840b:b:face,ff8116:b:lvl,ff850a:w:meter,ff8850:w:p2hp,ff881c:l:p2node,ff8b82:b:p2id"
+FIELDS="ff841c:l:node,ff8420:b:cnt,ff8406:b:seq,ff8407:b:sub,ff8509:b:stock,ff8410:w:x,ff8414:w:y,ff8450:w:p1hp,ff8782:b:id,ff802e:b:df,ff840b:b:face,ff8116:b:lvl,ff850a:w:meter,ff8850:w:p2hp,ff8852:w:p2white,ff8452:w:p1white,ff881c:l:p2node,ff8b82:b:p2id"
 
 run_leg() {  # run_leg <tenant> <part> <leg>
     _t="$1"; _p="$2"; _leg="$3"
@@ -251,6 +253,35 @@ print(n)
 PYX
 }
 
+# perturb_white_pins <schedule.json> <trace in> <trace out>: OUR trace with p2white stepped by +5 at every frame the
+# rig pins RAM:$FF8850 with a LONG (which writes +0x52 too), the step carried forward as a pin carries it — only the
+# pin frames' frame-to-frame change differs. The white-pin control's copy (one function, the control and the mode).
+# Prints how many pin frames were stepped (0 = the part pins no HP).
+perturb_white_pins() {
+    python3 - "$1" "$2" "$3" <<'PYW'
+import json, sys
+pins = {int(p.split(":")[0]) for p in json.load(open(sys.argv[1]))["pokes"]
+        if p.split(":")[1].lower() == "ff8850" and len(p.split(":")[2]) == 8}
+off, n = 0, 0
+with open(sys.argv[2]) as fi, open(sys.argv[3], "w") as fo:
+    for line in fi:
+        f = line.split()
+        if len(f) >= 3 and f[0] == "F":
+            if int(f[1]) in pins:
+                off += 5; n += 1
+            if off:
+                f = [("p2white=%d" % (int(t[8:]) + off)) if t.startswith("p2white=") else t for t in f]
+                line = " ".join(f) + "\n"
+        fo.write(line)
+print(n)
+PYW
+}
+
+# drop_white <trace in> <trace out>: OUR trace with every p2white sample removed — the field-dropped control's copy.
+drop_white() {
+    sed -E 's/ p2white=-?[0-9]+//' "$1" > "$2"
+}
+
 # perturb_x_moves <schedule.json> <trace in> <trace out>: OUR trace with x altered by +3
 # on ONE frame, ten frames into every MOVEMENT event of the schedule — the movement-x
 # control's perturbed copy (one function, the control and the mode). Prints how many
@@ -284,6 +315,8 @@ verdict_for() {  # verdict_for <tenant> <part> [--raw | --pert | --pert-no-pins 
     # the pins-ignored MODE compares every part on its perturbed copy with the exclusion off
     [ "$CONTROL" = pins-ignored ] && _raw=--pert-no-pins
     [ "$CONTROL" = movement-x ] && _raw=--pert-move
+    [ "$CONTROL" = white-pin ] && _raw=--wpert-no-pins
+    [ "$CONTROL" = field-dropped ] && _raw=--wdrop
     case "$_raw" in --pert-move)
         _ours="$W/tr_${_t}_${_p}_ours.pertmove.txt"
         [ -f "$_ours" ] || perturb_x_moves "$_j" "$W/tr_${_t}_${_p}_ours.txt" "$_ours" > /dev/null ;;
@@ -292,7 +325,15 @@ verdict_for() {  # verdict_for <tenant> <part> [--raw | --pert | --pert-no-pins 
         _ours="$W/tr_${_t}_${_p}_ours.pert.txt"
         [ -f "$_ours" ] || perturb_x_pins "$_j" "$W/tr_${_t}_${_p}_ours.txt" "$_ours" > /dev/null ;;
     esac
-    _np=""; [ "$_raw" = --pert-no-pins ] && _np="--no-pin-exclusion"
+    case "$_raw" in --wpert|--wpert-no-pins)
+        _ours="$W/tr_${_t}_${_p}_ours.wpert.txt"
+        [ -f "$_ours" ] || perturb_white_pins "$_j" "$W/tr_${_t}_${_p}_ours.txt" "$_ours" > /dev/null ;;
+    esac
+    case "$_raw" in --wdrop)
+        _ours="$W/tr_${_t}_${_p}_ours.wdrop.txt"
+        [ -f "$_ours" ] || drop_white "$W/tr_${_t}_${_p}_ours.txt" "$_ours" ;;
+    esac
+    _np=""; { [ "$_raw" = --pert-no-pins ] || [ "$_raw" = --wpert-no-pins ]; } && _np="--no-pin-exclusion"
     python3 "$REPO/tools/move_parity.py" events "$_t" "$_p" \
         "$W/tr_${_t}_${_p}_native.txt" "$_ours" "$_pl" \
         --first-event "$_fe" --events "$_j" $_np 2>/dev/null || true
@@ -397,7 +438,7 @@ fi
 # the pins-ignored MODE judges the VERDICT columns only (part, event, name, verdict,
 # first, fields): the `excluded` count changes trivially with the exclusion off and
 # would make the mode fire on its own bookkeeping (14z-164, 14z-165)
-CUT=cat; [ "$CONTROL" = pins-ignored ] && CUT="cut -f1-6"
+CUT=cat; { [ "$CONTROL" = pins-ignored ] || [ "$CONTROL" = white-pin ]; } && CUT="cut -f1-6"
 for part in $SET; do
     awk -F'\t' -v n="$part" '!/^#/ && $1==n' "$EXPECT" | $CUT > "$W/exp_$part.tsv"
     awk -F'\t' -v n="$part" '$1==n' "$W/got.tsv" | $CUT > "$W/got_$part.tsv"
@@ -509,6 +550,39 @@ done
 if [ -z "$PP" ]; then echo "CONTROL DEAD: pins-ignored — no part in the set both keeps its verdicts under the exclusion and moves one without it, on a copy perturbed on its X-pin frames"; fail=1
 else echo "CONTROL FIRED: pins-ignored — $PP: x altered on its $PN X-pin frames leaves every verdict as frozen under the exclusion and moves $(command diff "$W/exp_ctl_$PP.tsv" "$W/ctl_pertnp_$PP.tsv" | command grep -c '^>' || true) verdict row(s) with the exclusion off"; fi
 
+# white-pin (perturbed-copy, 14z-186, #193, rule-checker run 2026-09-30-483 Q4): the first part of the set whose
+# schedule pins HP with a long gets a copy of OUR trace with p2white stepped +5 at those pin frames (carried forward);
+# its verdict columns must equal the frozen rows under the per-byte exclusion AND differ with the exclusion off.
+WP=""; WN=0
+for part in $SET; do
+    t="${part%_*}"; p="${part##*_}"
+    rm -f "$W/tr_${t}_${p}_ours.wpert.txt"
+    WN="$(perturb_white_pins "$REPO/tests/replays/naming/${t}_${p}.json" "$W/tr_${t}_${p}_ours.txt" "$W/tr_${t}_${p}_ours.wpert.txt")"
+    [ "$WN" -gt 0 ] || continue
+    verdict_for "$t" "$p" --wpert | cut -f1-6 > "$W/ctl_wpert_$part.tsv"
+    verdict_for "$t" "$p" --wpert-no-pins | cut -f1-6 > "$W/ctl_wpertnp_$part.tsv"
+    awk -F'\t' -v n="$part" '!/^#/ && $1==n' "$EXPECT" | cut -f1-6 > "$W/exp_ctl_$part.tsv"
+    if command diff -q "$W/exp_ctl_$part.tsv" "$W/ctl_wpert_$part.tsv" > /dev/null \
+       && ! command diff -q "$W/exp_ctl_$part.tsv" "$W/ctl_wpertnp_$part.tsv" > /dev/null; then WP="$part"; break; fi
+    echo "  note  $part: p2white stepped at $WN HP-pin frames — under the exclusion $(command diff "$W/exp_ctl_$part.tsv" "$W/ctl_wpert_$part.tsv" | command grep -c '^>' || true) verdict row(s) moved (must be 0), without it $(command diff "$W/exp_ctl_$part.tsv" "$W/ctl_wpertnp_$part.tsv" | command grep -c '^>' || true) (must be >0)"
+done
+if [ -z "$WP" ]; then echo "CONTROL DEAD: white-pin — no part in the set both keeps its verdicts under the per-byte exclusion and moves one without it, on a copy with p2white stepped at its HP-pin frames"; fail=1
+else echo "CONTROL FIRED: white-pin — $WP: p2white stepped at its $WN HP-pin frames leaves every verdict as frozen under the per-byte exclusion and moves $(command diff "$W/exp_ctl_$WP.tsv" "$W/ctl_wpertnp_$WP.tsv" | command grep -c '^>' || true) verdict row(s) with the exclusion off"; fi
+
+# field-dropped (perturbed-copy, 14z-186, #193, rule-checker run 2026-09-30-483 Q4): the control part's OUR trace with
+# every p2white sample removed must be REFUSED by the comparator (non-zero exit, "lacks compared field").
+drop_white "$W/tr_${ct}_${cp}_ours.txt" "$W/tr_${ct}_${cp}_ours.wdrop.txt"
+_fj="$REPO/tests/replays/naming/${ct}_${cp}.json"
+_fe="$(python3 -c "import json;print(json.load(open('$_fj'))['events'][0]['frame'])")"
+if _fo="$(python3 "$REPO/tools/move_parity.py" events "$ct" "$cp" "$W/tr_${ct}_${cp}_native.txt" "$W/tr_${ct}_${cp}_ours.wdrop.txt" \
+          "$BUILD/patch/placements.json" --first-event "$_fe" --events "$_fj" 2>&1)"; then
+    echo "CONTROL DEAD: field-dropped — $CTL's trace without p2white was compared, not refused"; fail=1
+elif printf '%s\n' "$_fo" | command grep -q "lacks compared field(s) p2white"; then
+    echo "CONTROL FIRED: field-dropped — $CTL's trace without p2white is refused: $(printf '%s\n' "$_fo" | command grep -m1 'lacks compared field' | cut -c1-100)"
+else
+    echo "CONTROL DEAD: field-dropped — $CTL's trace without p2white failed for another reason: $(printf '%s\n' "$_fo" | tail -1 | cut -c1-120)"; fail=1
+fi
+
 # movement-x (perturbed-copy, 14z-184, rule-checker run 2026-09-25-296 Q4): the first part of
 # the set with MOVEMENT events gets a copy of OUR trace with x moved by +3 on one frame ten
 # frames into each; exactly those events must read DIFF with x among the fields, and every
@@ -557,6 +631,9 @@ else
 fi
 
 # unpinned-level: re-run the control part's NATIVE leg at vsav2's own default.
+# It OVERWRITES that part's native trace, so under KEEP the real one is copied aside first (14z-186: a kept
+# control-part trace read as the real one is how #193's first reading went wrong).
+[ -n "${KEEP:-}" ] && cp "$W/tr_${ct}_${cp}_native.txt" "$W/tr_${ct}_${cp}_native.real.txt"
 CTL_ONE=unpinned-level run_leg "$ct" "$cp" native
 wait
 verdict_for "$ct" "$cp" > "$W/ctl_up.tsv"; up="$(n_ident "$W/ctl_up.tsv")"

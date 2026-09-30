@@ -78,7 +78,7 @@ fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
 # the parity gate's field list, pins and ours cursor path (tests/audit_move_parity.sh, copied)
-FIELDS="ff841c:l:node,ff8420:b:cnt,ff8406:b:seq,ff8407:b:sub,ff8509:b:stock,ff8410:w:x,ff8414:w:y,ff8450:w:p1hp,ff8782:b:id,ff802e:b:df,ff840b:b:face,ff8116:b:lvl,ff850a:w:meter,ff8850:w:p2hp,ff881c:l:p2node,ff8b82:b:p2id"
+FIELDS="ff841c:l:node,ff8420:b:cnt,ff8406:b:seq,ff8407:b:sub,ff8509:b:stock,ff8410:w:x,ff8414:w:y,ff8450:w:p1hp,ff8782:b:id,ff802e:b:df,ff840b:b:face,ff8116:b:lvl,ff850a:w:meter,ff8850:w:p2hp,ff8852:w:p2white,ff8452:w:p1white,ff881c:l:p2node,ff8b82:b:p2id"
 OURS_PATH_donovan="D D DR DR"; OURS_PATH_huitzil="D D D"; OURS_PATH_pyron="D D D D"
 extract_of() { case "$1" in donovan) echo "$DON/extract" ;; huitzil) echo "$HUI/extract" ;; pyron) echo "$PYR/extract" ;; esac; }
 

@@ -14,35 +14,35 @@ entry	donovan	8	taunt, crouching	a2:0x59	ENTERED
 entry	donovan	9	taunt, standing	a2:0x59	ENTERED
 entry	donovan	10	Sword Grapple [HP], P2 jumps at +8	a2:0x41 a2:0x42	ENTERED
 entry	donovan	11	Sword Grapple [HP], P2 jumps at +9	a2:0x41 a2:0x42	ENTERED
-parity	donovan_c184	0	j.2LK blocked	IDENT	-	-	420	-	3
-parity	donovan_c184	1	j.2MK blocked	IDENT	-	-	420	-	3
-parity	donovan_c184	2	j.2LK hit (control: no rebound)	IDENT	-	-	420	-	3
-parity	donovan_c184	3	Change Immortal, Up held, P2 crouches	IDENT	-	-	400	-	3
-parity	donovan_c184	4	Change Immortal, Up held, P2 stands	IDENT	-	-	400	-	3
-parity	donovan_c184	5	Change Immortal, Down held (control: contact)	IDENT	-	-	400	-	3
-parity	donovan_c184	6	Foot Stab [8LK] off Sword Grapple, press at +104	IDENT	-	-	420	-	3
-parity	donovan_c184	7	Foot Stab [8LP] off Sword Grapple, press at +104	IDENT	-	-	420	-	3
-parity	donovan_c184	8	taunt, crouching	IDENT	-	-	300	-	3
+parity	donovan_c184	0	j.2LK blocked	IDENT	-	-	420	-	4
+parity	donovan_c184	1	j.2MK blocked	IDENT	-	-	420	-	4
+parity	donovan_c184	2	j.2LK hit (control: no rebound)	IDENT	-	-	420	-	4
+parity	donovan_c184	3	Change Immortal, Up held, P2 crouches	IDENT	-	-	400	-	4
+parity	donovan_c184	4	Change Immortal, Up held, P2 stands	IDENT	-	-	400	-	4
+parity	donovan_c184	5	Change Immortal, Down held (control: contact)	IDENT	-	-	400	-	4
+parity	donovan_c184	6	Foot Stab [8LK] off Sword Grapple, press at +104	IDENT	-	-	420	-	4
+parity	donovan_c184	7	Foot Stab [8LP] off Sword Grapple, press at +104	IDENT	-	-	420	-	4
+parity	donovan_c184	8	taunt, crouching	IDENT	-	-	300	-	4
 parity	donovan_c184	9	taunt, standing	IDENT	-	-	300	-	2
-parity	donovan_c184	10	Sword Grapple [HP], P2 jumps at +8	IDENT	-	-	420	-	3
-parity	donovan_c184	11	Sword Grapple [HP], P2 jumps at +9	IDENT	-	-	671	-	2
+parity	donovan_c184	10	Sword Grapple [HP], P2 jumps at +8	IDENT	-	-	420	-	4
+parity	donovan_c184	11	Sword Grapple [HP], P2 jumps at +9	IDENT	-	-	671	-	4
 entry	huitzil	0	Sitting Attack [8LP] off 2HK, press at +50	a2:0x3c a2:0x3d a2:0x3e	ENTERED
 entry	huitzil	1	Sitting Attack [8LP] off 2HK, press at +55	a2:0x3c a2:0x3d a2:0x3e	ENTERED
 entry	huitzil	2	taunt, crouching	a2:0x53	ENTERED
 entry	huitzil	3	taunt, standing	a2:0x53	ENTERED
 entry	huitzil	4	Circuit Scrapper [HP], P2 jumps at +16	a2:0x1e a2:0x4f	ENTERED
 entry	huitzil	5	Circuit Scrapper [HP], P2 jumps at +17	a2:0x1e a2:0x4f	ENTERED
-parity	huitzil_c184	0	Sitting Attack [8LP] off 2HK, press at +50	IDENT	-	-	420	-	3
-parity	huitzil_c184	1	Sitting Attack [8LP] off 2HK, press at +55	IDENT	-	-	420	-	3
+parity	huitzil_c184	0	Sitting Attack [8LP] off 2HK, press at +50	IDENT	-	-	420	-	4
+parity	huitzil_c184	1	Sitting Attack [8LP] off 2HK, press at +55	IDENT	-	-	420	-	4
 parity	huitzil_c184	2	taunt, crouching	IDENT	-	-	300	-	2
-parity	huitzil_c184	3	taunt, standing	IDENT	-	-	300	-	3
-parity	huitzil_c184	4	Circuit Scrapper [HP], P2 jumps at +16	IDENT	-	-	420	-	3
-parity	huitzil_c184	5	Circuit Scrapper [HP], P2 jumps at +17	IDENT	-	-	671	-	2
+parity	huitzil_c184	3	taunt, standing	IDENT	-	-	300	-	4
+parity	huitzil_c184	4	Circuit Scrapper [HP], P2 jumps at +16	IDENT	-	-	420	-	4
+parity	huitzil_c184	5	Circuit Scrapper [HP], P2 jumps at +17	IDENT	-	-	671	-	4
 entry	pyron	0	taunt, crouching	a2:0x1f	ENTERED
 entry	pyron	1	taunt, standing	a2:0x1f	ENTERED
 entry	pyron	2	Planet Burning [HP], P2 jumps at +16	a2:0x1e a2:0x1f	ENTERED
 entry	pyron	3	Planet Burning [HP], P2 jumps at +16 (2)	a2:0x1e a2:0x1f	ENTERED
 parity	pyron_c184	0	taunt, crouching	IDENT	-	-	300	-	2
-parity	pyron_c184	1	taunt, standing	IDENT	-	-	300	-	3
-parity	pyron_c184	2	Planet Burning [HP], P2 jumps at +16	IDENT	-	-	420	-	3
-parity	pyron_c184	3	Planet Burning [HP], P2 jumps at +16 (2)	IDENT	-	-	671	-	2
+parity	pyron_c184	1	taunt, standing	IDENT	-	-	300	-	4
+parity	pyron_c184	2	Planet Burning [HP], P2 jumps at +16	IDENT	-	-	420	-	4
+parity	pyron_c184	3	Planet Burning [HP], P2 jumps at +16 (2)	IDENT	-	-	671	-	4

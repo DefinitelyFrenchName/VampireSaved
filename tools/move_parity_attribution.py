@@ -36,6 +36,11 @@ SIGNATURES (each a measured property of the root's own window, never its name al
                  deviation WITHDRAWN 2026-09-18 — the class takes vs2's 0x52 rule (tests/audit_trap_shock.sh)
   COLUMN-SHOCK   the same class pair on a Donovan part — the column's 14z-33 remap meeting the
                  14z-42 Lightning Sword thunks (tests/audit_column_shock.sh)
+  REACTION-51-OPEN P2's reaction class 0x51 natively, 0x4F on ours, first differing at or before the first DIFF
+                 frame or one frame after it (the TRAP-REMAP window, `cl <= f0 + 1`) — Pyron's
+                 Cosmo Disruption record remapped 0x51 -> 0x4F at 14z-75 (build/manifest/pyron.toml): the victim
+                 takes a plain hit reaction where native takes the fire / knockdown one, the maintainer's read of
+                 the captures "Same reading: defect" (14z-186, #194, OPEN — the remap is the candidate cause)
   GUARD-REENTRY  the first DIFF is P1's node on, or one frame after, the frame both legs leave the
                  block freeze (seq 0 -> 2) — vsavj re-enters the block animation (tests/audit_guard_reentry.sh)
   DEFENSE-ROW    the first DIFF is P1's HP alone, Phobos the victim, ours taking MORE (measured 11/13 on
@@ -83,6 +88,8 @@ SEED = {}   # RETIRED 14z-185 (M21): was {"donovan_3": [5]} — GitHub #159, Kil
            # table does not compare; #159 landed at M21 and the seeded root read OTHER ("seeded root with no P2 displacement")
 FIELDS = ("ff841c:l:node,ff8420:b:cnt,ff8406:b:seq,ff8407:b:sub,ff8509:b:stock,ff8410:w:x,ff8414:w:y,"
           "ff8450:w:p1hp,ff8782:b:id,ff802e:b:df,ff840b:b:face,ff8116:b:lvl,ff850a:w:meter,ff8850:w:p2hp,"
+          "ff8852:w:p2white,ff8452:w:p1white,"   # both white HP words, compared by tools/move_parity.py since #193 (14z-186)
+          
           "ff881c:l:p2node,ff8b82:b:p2id,ff8081:b:pc,ff890a:w:p2meter,ff8854:b:p2cls,ff8810:w:p2x,ff845c:b:frz")
 
 
@@ -189,11 +196,21 @@ def classify(part, k, trdir, rigdir, row):
     cl = next((f for f in range(lo, hi) if f in n and f in o and n[f]["p2cls"] != o[f]["p2cls"]), None)
     if cl is not None and (n[cl]["p2cls"], o[cl]["p2cls"]) == (0x52, 0x06) and cl <= f0 + 1:
         return ("TRAP-REMAP" if tenant == "huitzil" else "COLUMN-SHOCK"), f"P2 class 0x52 native / 0x06 ours at {cl}"
+    if cl is not None and (n[cl]["p2cls"], o[cl]["p2cls"]) == (0x51, 0x4F) and cl <= f0 + 1:
+        # 14z-186, found under #193: Pyron's Cosmo Disruption record class 0x51 remapped to 0x4F (14z-75) — the victim
+        # takes a plain hit reaction where native takes the fire / knockdown one (#194, open: the remap is the
+        # candidate cause, unmeasured as the cause)
+        return "REACTION-51-OPEN", f"P2 class 0x51 native / 0x4F ours at {cl} (#194)"
     if fields == ["node"] or fields == ["cnt", "node"]:
         for t in (f0, f0 - 1):   # the node differs on the freeze-end frame or the one after it
             if t - 1 in n and n[t - 1]["seq"] == 0 and n[t]["seq"] == 2 and o[t - 1]["seq"] == 0 and o[t]["seq"] == 2:
                 return "GUARD-REENTRY", f"node differs at {f0}, both legs leaving the block freeze at {t} (seq 0 -> 2)"
-    if fields == ["p1hp"]:   # the tenant the VICTIM, ours taking more
+    # the tenant the VICTIM, ours taking more. Since #193 (14z-186) the white word is compared too, and a hit lowers
+    # both words on the same frame, so the signature reads p1hp alone OR p1hp with p1white — the white word then
+    # required to show the same direction (ours taking more), never merely present
+    white_ok = fields == ["p1hp"] or (fields == ["p1hp", "p1white"]
+                                      and 0 < n[f0 - 1]["p1white"] - n[f0]["p1white"] < o[f0 - 1]["p1white"] - o[f0]["p1white"])
+    if fields in (["p1hp"], ["p1hp", "p1white"]) and white_ok:
         dn = n[f0 - 1]["p1hp"] - n[f0]["p1hp"]; do = o[f0 - 1]["p1hp"] - o[f0]["p1hp"]
         if 0 < dn < do:
             if tenant == "huitzil":   # vsavj's row 0x10 indexes lower unless the vs2 row is in
