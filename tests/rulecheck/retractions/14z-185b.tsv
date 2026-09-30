@@ -1,0 +1,12 @@
+# tests/rulecheck/retractions/14z-185b.tsv — the wordings retracted or corrected in 14z-185b, and reach controls that must be found live; columns pattern, source, class (retracted | reach:N)
+in steps of 6	14z-185b rule-checker run 454: the untracked figure rose +12 then eleven steps of +6	retracted
+independently by a measurer	14z-185b run 454: the measurer re-ran the SAME tool, a transcription check, not an independent method	retracted
+1,621 + 2,119 = 3,748	14z-185b run 454: the sum is 3,740	retracted
+is open as #167	14z-185b #167: the gate landed as tests/test_superseded_pins.sh	retracted
+would catch the fingerprint half	14z-185b #167: the gate landed	retracted
+and nothing enforces it	14z-185b #150: enforced by tests/test_freeze_set_shape.sh	retracted
+count EQUALS its	14z-185b #150: false on history (21 of 63 legitimate freezes); the rule is "nothing lost"	retracted
+parked as #141	14z-185b: #141 closed declined; a measured disagreement opens a new ticket	retracted
+Its future is	14z-185b #131: kept as a case-specific instrument	retracted
+paid only because of the loop itself	14z-185b run 455: 4,775 s is an upper bound	retracted
+tests/test_superseded_pins.sh	control: the gate that replaced #167's open wording, named in the gotcha, HANDOFF and the port skill	reach:3

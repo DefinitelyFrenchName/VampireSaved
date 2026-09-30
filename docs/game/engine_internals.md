@@ -690,6 +690,8 @@ tell which special came out.
 unfiltered RNG readers are probes, build/agent185/t176 (`tracker_delay.log`, `rng_readers.log`), 14z-185]
 s #176's]
 
+**Two chain choices draw from the RNG, and neither varies (vs2, read 14z-185b, #184).** Only two of the tenants' a2 chain-start sites call the RNG (`0x1357E`, the word at `RAM:$FF80D4`) first: Donovan's command 0x12 (`0x5A718` then `index = 0x59 + table[rand & 15]`) and Pyron's command 0x12 (`0x58C3A`, `index = table[rand & 15]`). Both tables are pc-relative, read in the OPCODE view ([VSE-18]), and each holds ONE repeated value — Donovan's sixteen `00` (always a2:0x59), Pyron's sixteen `1f` (always a2:0x1f). So the `0000` pin above changes neither choice, and it does not explain why Donovan's a2:0x5a-0x5d were never entered; Pyron's never-entered a2:0x1f has this second entry beside command 0x0c's site. Re-derive with `tools/m68dis.py <vs2 opcodes> 0x5a6fe 0x5a740` and `0x58c26 0x58c60` (the tables print as the words after each `jmp $2710c`). **Random native play reaches few of the never-entered chains (#184, 14z-185b):** nine native vs2 legs, each tenant as P1 against Demitri with seeded random play by both for a full round, landed P1 on the start node of only 3 of the 31: Donovan a2:0x51 (after 623 with all three kicks: vs2's EX activation), Donovan a2:0x2b (once, trigger ambiguous) and Pyron a2:0x49 (8 times, mostly after air inputs).
+
 ~~**THE TWO ENGINES DO NOT TICK AT THE SAME VIDEO-FRAME RATE, and it is not a
 per-character fact.**~~ **RETRACTED 14z-158 (#135) — it measured the PLAY MODE (vs2's default
 TURBO against vsavj's NORMAL), not the engine; the paragraph above replaces it. Kept verbatim:**

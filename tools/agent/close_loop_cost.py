@@ -3,6 +3,10 @@
 
 Written 14z-185b from the 14z-185 close (the figures of the re-run tickets); promoted
 from build/agent185b/loop_cost.py so the figures those tickets quote stay reproducible.
+MEASURED on that close (transcript dd342b19, --script build/agent185/close/run_checks.sh --first-run 414
+--last-run 446): 62 passes, 18,799 s; ten passes started by the command that re-edited the untracked
+figure took 4,775 s, an UPPER bound on what that count cost; the figure rose 1,461 -> 1,539 (+12, then
+eleven steps of +6: each recorded rule-checker run leaves a 6-file directory); the packet ran 11.52 h.
 
 Usage: python3 tools/agent/close_loop_cost.py <transcript.jsonl> [--script NAME]
          [--first-run N] [--last-run N] [--figure WORD] [--plant]

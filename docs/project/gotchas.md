@@ -5077,7 +5077,7 @@ went red — `git status` the expectation dir — before re-running.
 **Since 14z-185b (#150)** a freeze is run with the committed `tools/freeze_expectation_set.py`, which
 pins `MAME_BIN` itself (its selftest and `tests/test_freeze_set_shape.sh`'s `unpinned` control hold it).
 
-## THE MERGED EXPECTATION SET MUST HAVE ITS 16 SELF-FROZEN `.sha1` DELETED AFTER EVERY FREEZE — enforced since 14z-185b by `tests/test_freeze_set_shape.sh`, and done by `tools/freeze_expectation_set.py` (paid: 14z-159)
+## THE MERGED EXPECTATION SET MUST HAVE ITS 16 SELF-FROZEN `.sha1` DELETED AFTER EVERY FREEZE — enforced by `tests/test_freeze_set_shape.sh`, and done by `tools/freeze_expectation_set.py` (paid: 14z-159)
 
 `run_suite.sh --freeze` self-freezes any replay with no `.masked` in the target dir.
 On the merged set that is exactly the 16 TENANT-CONTENT replays (`36_pick_tenant_cell`,

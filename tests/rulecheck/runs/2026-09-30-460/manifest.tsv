@@ -1,0 +1,7 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent185b/close/findings_row.txt	d4e65aba19b9df2d2319dff8a76ac42f217f4fb6
+build/agent185b/close/evidence.txt	a08e9fc2ef4d0987206a637f63bfe63de613b77a
+build/agent185b/close/exits_of_record.tsv	e06598b332e3f6b6271b4311b6db2b439ba7639b
+build/agent185b/close/check_outputs.txt	ee306423b37f748e8d9bb95e9ccacf5bbbf40e31
+build/agent185b/close/checks.tsv	337b17a21181ba02c002f2e2987d875969371f2e
+build/agent185b/close/figures.tsv	2408cd5cd48d6c1a46e9f9fe2ee58c4bfd64dd15
