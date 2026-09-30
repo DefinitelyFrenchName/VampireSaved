@@ -1,0 +1,25 @@
+# tests/audit_facing_hook_ab.sh — frozen by FREEZE=1 (tools/facing_hook_ab.py check). key<TAB>value
+facing_arc110_logicoff_vs_build	f4318:R5
+facing_arc110_logicoff_vs_unhooked	same
+facing_arc110_unhooked_vs_build	f4318:R5
+facing_mash_logicoff_vs_build	same
+facing_mash_logicoff_vs_unhooked	f4834:PRE
+facing_mash_unhooked_vs_build	f4835:PRE
+r5_arc110_build	7@f4318
+r5_arc110_logicoff	0
+r5_arc110_unhooked	0
+r5_mash_build	0
+r5_mash_logicoff	0
+r5_mash_unhooked	0
+reads_arc110_build_vs_unhooked	366:f8516/f8394
+reads_arc110_counts	412/426/426
+reads_arc110_logicoff_vs_unhooked	same
+ring_build	whole
+ring_logicoff	whole
+ring_unhooked	f4742
+writes_arc110_build	178
+writes_arc110_logicoff	178
+writes_arc110_unhooked	178
+writes_mash_build	154
+writes_mash_logicoff	154
+writes_mash_unhooked	178

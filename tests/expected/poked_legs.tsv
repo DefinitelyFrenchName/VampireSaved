@@ -105,6 +105,8 @@ tests/audit_edge_cases.sh	native	replays/judge/02_throw.rpl	P2	R R	03 Victor	$b	
 tests/audit_edge_cases.sh	ours	replays/judge/02_throw.rpl	P1	-	01 Demitri	$a	PARAM	no id is CROSS-FLAVOR here
 tests/audit_edge_cases.sh	ours	replays/judge/02_throw.rpl	P2	R R	03 Victor	$b	PARAM	no id is CROSS-FLAVOR here
 tests/audit_empty_tiles.sh	ours	(replay not named in the script)	P1	-	-	10	?	
+tests/audit_facing_hook_ab.sh	ours	replays/110_don_arcade_mash.rpl	P1	L L D D	13 Donovan	11	CROSS-INERT	
+tests/audit_facing_hook_ab.sh	ours	replays/pyron/70_pyron_mash.rpl	P1	-	01 Demitri	11	CROSS-INERT	
 tests/audit_fg_damage.sh	ours	(replay not named in the script)	P1	-	-	10	?	
 tests/audit_fg_damage.sh	ours	(replay not named in the script)	P2	-	-	03	?	
 tests/audit_fg_parity.sh	native	replays/hui/89_hui_ex_fg_vs2.rpl	P1	-	01 Demitri	10	CROSS-INERT	

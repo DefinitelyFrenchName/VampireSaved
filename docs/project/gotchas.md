@@ -1,5 +1,22 @@
 # GOTCHAS (project) — traps in OUR pipeline and method
 
+## ONE CANDIDATE FOR TWO SIDE MOVES OF ONE FIX CAN BE HALF RIGHT — split every hook into its cycles and its logic, per replay (paid: 14z-185b to 14z-186, GitHub #186)
+
+**What happened.** #159's fix (a `jmp` thunk on vsavj's facing resolver) moved two things at the M21 freeze:
+Pyron's mash ring stream on the merged build and `110_don_arcade_mash`'s defense reads. The single-row probes
+attributed both to #159, and #186 was opened naming ONE candidate for both, the hook's added cycles crossing a
+frame boundary ([VSP-39]). Measured 14z-186, it was right for one only: the mash moves with the hook's
+EXECUTION (rule 5 never fires there), the arcade replay with the RULE-5 LOGIC (the fix's own facing write at
+f4318, 4,076 frames before the reads moved).
+
+**The rule.** A hook changes three things at once — the logic it adds, the cycles it costs, and the placement
+of everything allocated after it — and one probe that removes the whole hook cannot tell them apart. Build the
+variants from the build's OWN patch so the placement is held: the hook with its logic disabled (cycles, no
+logic) and the thunk placed with the site unhooked (placement, no cycles), plus the unfiltered patch as the
+control that reproduces the build (`tools/facing_hook_ab.py`, `tests/audit_facing_hook_ab.sh`). Then read EACH
+side move against both variants separately, and check whether the logic even fires on that replay: a count of
+the logic's own store PC, with a replay where it does fire as the positive control.
+
 ## LANDING ON A CHAIN'S START NODE IS NOT ENTERING THE CHAIN — a start can sit inside another chain, or last under a sampled frame (paid: 14z-185b to 14z-186, GitHub #184)
 
 **What happened.** #184's broad native leg (14z-185b) counted a chain ENTERED when P1's sampled node landed on

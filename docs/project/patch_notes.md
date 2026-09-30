@@ -48,6 +48,12 @@ profile PASS. Each red was re-run on M20, where it passed, and then attributed:
   - `audit_pyron_ring`'s mash stream, which now agrees merged vs solo for the whole run (the gate re-stated;
     mechanism not measured);
   - one arcade replay's defense reads (`110_don_arcade_mash`, from f8394).
+  - → 14z-186 (#186): both mechanisms MEASURED by `tests/audit_facing_hook_ab.sh` (two variants of merged-m21
+    from its own patch). The mash stream moves with the hook's EXECUTION: a variant that runs the hook with rule 5
+    never taken agrees with solo for the whole run, one with the thunk placed but the site unhooked diverges at
+    f4742 as M20 did, and rule 5 never fires on that replay. The arcade replay moves with the RULE-5 LOGIC: both
+    variants read M20's 426 defense rows, and the build's first differing facing write is a rule-5 store at f4318
+    (`01` where the fall-through wrote `04`).
 
 Every re-freeze was verified, and every declared control mode FAILs. The freeze-cadence tier's static pins
 moved with the same placement: `test_pointer_flow` (a new `merged-m21` baseline), `test_escape_triage`,

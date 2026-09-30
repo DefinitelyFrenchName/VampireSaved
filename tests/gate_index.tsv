@@ -372,6 +372,7 @@ tests/audit_air_gc_legacy.sh	character-data
 tests/audit_rng_draws.sh	character-data
 tests/audit_facing_rule.sh	character-data
 tests/audit_facing_sweep.sh	character-data
+tests/audit_facing_hook_ab.sh	character-data
 tests/audit_rig_opening.sh	character-data
 tests/audit_tick_phase.sh	character-data
 tests/test_same_data_p2.sh	character-data

@@ -34,6 +34,7 @@ declares	audit_effect_class_rows
 declares	audit_empty_tiles
 declares	audit_entrance_draw
 declares	audit_ex_refused
+declares	audit_facing_hook_ab
 declares	audit_facing_rule
 declares	audit_facing_sweep
 declares	audit_ff0460_writer

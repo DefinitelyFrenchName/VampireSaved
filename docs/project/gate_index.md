@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**405 scripts** — 108 ci_portable, 84 ci_static, 213 emulator-tier (run by name).
+**406 scripts** — 108 ci_portable, 84 ci_static, 214 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -27,7 +27,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 84 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 62 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 63 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -395,6 +395,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/audit_df_startup_invuln.sh` | audit | emulator | MAME, a build dir, ~3 min | THE DARK FORCE STARTUP INVINCIBILITY IS +0x147, ARMED PER CHARACTER BY THE seq-0x16 HANDLER, AND THE TENANTS ARM THEIR OWN (measured 14z-126; STATE "Decisions pending" DF-startup item). | 14z-126 |
 | `tests/audit_entrance_draw.sh` | audit | emulator | MAME, a build dir, ~15 s | PHOBOS'S ROUND-START ENTRANCE IS DRAWN FROM THE SAME THREE VARIANTS ON OUR BUILD AS ON vsav2 (14z-168, GitHub #136): the legs of #136's guard-cancel rigs drew different entrances because the draw follows each game's RNG state at character l… | 14z-168 |
 | `tests/audit_ex_refused.sh` | audit | emulator | MAME, a build dir | WHAT THE TENANTS' vs2 EX INPUT DOES WHEN THE MODE IS REFUSED, on native vsav2 and on our merged build, frozen AS MEASURED (14z-169; since 14z-170 the ruled EX-route fix's gate): | 14z-169 |
+| `tests/audit_facing_hook_ab.sh` | audit | emulator | MAME, a build dir, ~6 min | #159'S FACING HOOK SPLIT INTO ITS CYCLES AND ITS LOGIC: which of the two moved each of its side moves (GitHub #186, 14z-186). | 14z-186 |
 | `tests/audit_facing_rule.sh` | audit | emulator | MAME, a build dir, ~5 s | THE VICTIM FACING RULE 5 ON OUR ENGINE, ours vs native, frozen AS MEASURED (GitHub #159, 14z-167; FIXED at the M21 freeze, 14z-185): vs2's facing-rule resolver knows rule 5 and vsavj's does not; | 14z-167 |
 | `tests/audit_facing_sweep.sh` | audit | emulator | MAME, FBNeo, a build dir, ~41 s | THE VICTIM FACING RULE 5 AT 32 GEOMETRIES: Killshread Summon (ES)'s facing writes on native vs2 against the build under test, and which vsavj facing rule could reproduce native's value per anim node (GitHub #159, 14z-185). | 14z-185 |
 | `tests/audit_ff8130_writers.sh` | audit | emulator | MAME, ~1 min | who writes RAM:$FF8130 on vanilla vsavj, every write form and both byte lanes: five DIRECT writers (the id fold's store at PRG:0x00A446 and four constant writes), block writes that cover the word, and two writers of the NEIGHBOUR byte $FF81… | 14z-157 |

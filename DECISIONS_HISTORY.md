@@ -27,6 +27,19 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-30 (14z-186) — #186: #159's two side moves measured (the mash by the hook's execution, the arcade replay by its rule-5 logic); accepted, closed `done`
+
+**The question (AskUserQuestion), verbatim:** *"#186, measured (rule-checker run 479 OK). Pyron's mash ring stream moved because the hook RUNS: a variant that runs it with rule 5 disabled still agrees with solo for the whole run, while one with the code placed but never called diverges at f4742 like M20; rule 5 never fires on that replay. The arcade replay's defense reads moved because rule 5 ACTS: both variants read exactly M20's 426 rows, and the first difference is the fix's own facing write at f4318 (01 where M20 wrote 04). Both are tenant content; the legacy oracle passed at M21. What was not located: which frame's event the extra cycles push across a frame boundary. The gate tests/audit_facing_hook_ab.sh locks both results. How do you rule?"* The options were:
+- "Accept, close done (Recommended)": "Both moves are explained and clean: the mash by the hook's run time (merged now matches solo, as it should), the arcade replay by the fix itself. Close #186 as done, with the new gate as its test."
+- "Accept, find the frame": "Keep #186 open, or open a follow-up, to locate the exact frame and event the hook's cycles push across the boundary on the mash replay."
+- "Not accepted": "Something in the reading needs more measurement before a ruling; tell me what."
+
+**The maintainer:** *"Accept, close done (Recommended)"*.
+
+**What it means.** #186 closes `done`. `tests/audit_facing_hook_ab.sh` (with `tools/facing_hook_ab.py`) is its test: two variants of the merged build from its own `patch.json` — `logicoff` (the hook runs, rule 5 never taken) and `unhooked` (the thunk placed, the site pristine), with the unfiltered patch reproducing the build — read against Pyron's mash ring stream (solo `pyron44`) and against `110_don_arcade_mash`'s facing writes and defense reads, frozen in `tests/expected/facing_hook_ab.tsv` on merged-m21, four must-fire controls. Not located, and not pursued by this ruling: which frame's event the hook's cycles move across a boundary on the mash.
+
+---
+
 ## Ruled 2026-09-30 (14z-186) — #184's captures read identical; the Chaos Flare capture confirmed; the white-HP gap becomes a ticket
 
 **The questions, verbatim:** *"The #184 sheets (Donovan, Phobos, Pyron): native above ours, 1, 6 and 12 frames after each chain starts. I read every pair as identical. With your confirmation, the gate goes back to the rule-checker and then gets committed."* — *"The Change Immortal / Chaos Flare capture from earlier (+77..+83): I read ours' Demitri upright at +81 and +82 while native's still lunges, and both identical at +83. With your confirmation, the Demitri ticket goes back to the rule-checker and gets filed."* — *"Should the white-HP gap become a ticket? I recommend yes (make `move_parity` compare `+0x52` too). It changes a tool that several frozen gates depend on, so re-freezing them would come with it."*

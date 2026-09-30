@@ -13,7 +13,7 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**405 of 405 gates described.**
+**406 of 406 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
@@ -24,7 +24,7 @@ first sentence) is `gate_index.md`.
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 84 | 84 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 62 | 62 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 63 | 63 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -2394,7 +2394,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 ## character-data
 
-the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 62 of 62 described.
+the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 63 of 63 described.
 
 ### `audit_air_gc_legacy.sh` — audit, emulator
 
@@ -2531,6 +2531,14 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 **HOW:** 12 field-trace runs on MAME (each tenant's EX input on vsav2 and ours, stock poked to 0 and to 3, real cursor picks, level and RNG pinned), freezing whether the mode was entered, the stock after and P1's state path over 3255-3400; the control leaves the refused legs' stock at 3.
 
 **EXPECTS:** no leg of ours enters the mode, vs2's stock-3 legs enter, our stocked paths equal vs2's refused paths (Pyron's the ES move); the stock-kept control fails. Which move a path IS is for the captures, not frozen here.
+
+### `audit_facing_hook_ab.sh` — audit, emulator
+
+**WHAT:** #159 routes vsavj's facing resolver's fall-through (CPU:$01886C) through a `jmp` to a thunk that adds vs2's rule 5. The M21 freeze that landed it moved two things outside the Summon it fixes: Pyron's mash ring stream on the merged build (tests/audit_pyron_ring.sh: it diverged from solo at f4742, and now agrees for the whole run) and 110_don_arcade_mash's defense reads (tests/audit_defense_row_reads.sh's suite leg, from f8394). This gate says WHICH PART of the hook moves each: executing the hook (its cycles) or the rule-5 branch (its logic).
+
+**HOW:** two probe variants of the merged build, made by tools/facing_hook_ab.py FROM THE BUILD'S OWN patch.json (the thunk found through the hook's `jmp`, so the placement is the build's): `logicoff` (the thunk's `cmpi.b #5,d0` made `cmpi.b #$FF,d0` — the hook runs, rule 5 is never taken) and `unhooked` (the site op dropped — the thunk placed, the site pristine), plus `ctl` (the patch unfiltered, whose program must equal the build's). Each variant is read back from its decrypted opcode view. Ten MAME runs: Pyron's mash ring stream (tests/lua/ring_tap.lua, the ring gate's pokes and length) on the build, both variants and solo Pyron; a write tap on both fighters' +0x5C word (the +0x5D facing byte, by writer PC: the fall-through eor or the rule-5 store) on the mash and on 110_don_arcade_mash, the latter with the defense gate's own read tap (its RTAP ranges and RPCS pcs) in the same run, 9000 frames.
+
+**EXPECTS:** THE READING — Pyron mash: the build and `logicoff` agree with solo for the whole run while `unhooked` diverges, and rule 5 never fires on it (so the hook's EXECUTION moves it, not its logic and not the placement); 110_don_arcade_mash: `logicoff` reads the same defense rows and writes the same facing bytes as `unhooked`, and the build's first facing write that differs from them is a rule-5 store (so the rule-5 LOGIC moves it); every row equal to tests/expected/facing_hook_ab.tsv; every control fails.
 
 ### `audit_facing_rule.sh` — audit, emulator
 

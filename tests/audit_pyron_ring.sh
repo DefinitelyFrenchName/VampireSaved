@@ -134,9 +134,12 @@ ONSET = {"cosmo": None,   # None = must agree for the WHOLE run
          "mash":  None}   # RE-FROZEN 14z-185 (the M21 freeze): was 4741, frozen 14z-95 with merged one frame ahead of
                           # solo (#98). On merged-m21 the whole mash stream agrees (364 events). ATTRIBUTED BY
                           # MEASUREMENT to #159's facing_rule5 hook (the #159-only probe agrees whole-run; the
-                          # #182-only probe and merged-m20 diverge at f4742); the MECHANISM is not measured (the
-                          # candidate: the hook's added cycles on the shared facing resolver moving one event
-                          # across a frame boundary, [VSP-39]). An onset reappearing now FAILS.
+                          # #182-only probe and merged-m20 diverge at f4742); the MECHANISM, measured 14z-186 (#186,
+                          # tests/audit_facing_hook_ab.sh): the hook's EXECUTION, not its rule-5 logic (which never
+                          # fires on this replay) and not the placement — a variant running the hook with rule 5
+                          # never taken agrees whole-run, one with the thunk placed but the site unhooked diverges
+                          # at f4742; which frame's event it moves across a boundary is not located ([VSP-39]).
+                          # An onset reappearing now FAILS.
 # MUST-FIRE CONTROL. "an onset moving EARLIER is a FAILURE" is this gate's
 # load-bearing assertion, and a frozen constant that happens to match is
 # indistinguishable from a comparison that cannot fail. PYRON_RING_ONSET

@@ -1,0 +1,14 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_facing_hook_ab.sh	ccd02691638f999d07ca763d5b8e150e554af3b7
+tools/facing_hook_ab.py	c6f3e7a4c159c2c0435074f14aa9aae399dca737
+tests/expected/facing_hook_ab.tsv	c479764fce8b6fb4cabbf95b17c4a9efa4d002b9
+build/agent186/t186/g1.log	31456223b0eac7b3cb4621407c41499078eeb20f
+build/agent186/t186/g_verify.log	fecd147b72d4ee7b3e9de3c8eae8e04249306c7f
+build/agent186/t186/g_mode_variant-inert.log	7cdc432fd342f6377ee7ac1a4ed0a5ed40222d05
+build/agent186/t186/g_mode_stream-shifted.log	ca963879ee4271a27803889902cdb87aada9a2f4
+build/agent186/t186/g_mode_read-dropped.log	96dcc89b7f8ad2ba912128dae1ceb12133b36c32
+build/agent186/t186/g_mode_r5-planted.log	8d12672a6b4b27cd1d527ca944b3e88bbeca55e3
+build/agent186/t186/cmp2.py	976b55f3892d19fc779be5325b2596b17ff8db5a
+build/agent186/t186/cmp2.txt	b2be9a4bfdd84af0c1ac194f02002d3bee5e6ee2
+build/agent186/t186/builds_meta.txt	03e30b825073a46e17fcac97774943a877a3774f
+DECISIONS_HISTORY.md.lines-134-140 (lines 134-140 of DECISIONS_HISTORY.md)	9d04c6aed1291b432f2da8e2a1f3e3de4794d61b
