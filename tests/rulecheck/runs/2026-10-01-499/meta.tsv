@@ -1,0 +1,12 @@
+decision	procedure
+subject	one AI agent working session (14z-186), part 2 of 5: transcript a67e2668 records 2612-3252
+session	14z-186
+model	rule-checker@163e4ce9cf7b
+claim	In this span the agent did what it said and ran what it claimed.
+- It recorded the maintainer's capture reads verbatim, took the #184 gate through rule-checker runs 470 and 472 (OK), filed #192 after run 471 (OK), and took the white-HP ticket through runs 473-477, each VIOLATED on true findings (run 475 on the agent's own misreading of a trace, which it said to the maintainer), each resolved before the next run.
+- Every rule-checker worker launched in the span finished and was read; no tier or other background job ran in it.
+checklist	f3ec4d9849f7
+family	procedure
+questions	QP1 QP2 QP3 QP4 QP5
+reader	rule-checker@163e4ce9cf7b
+head	4828829812fdfe05782f067a4977072429cf9550
