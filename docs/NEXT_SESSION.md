@@ -49,6 +49,9 @@ prompt files pasted VERBATIM, `record --session`, `resolve` on ONE line with one
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
+- The next FREEZE runs `tools/freeze_expectation_set.py` (#150; its first real use): the registry rows first,
+  then `ROMDIR=... python3 tools/freeze_expectation_set.py <build>:<set> ... --jobs 4`; the shape gate runs on its output.
+
 - A "nothing the battery ran reads it" claim is a REACH question: `tools/battery_reach.py` (paths AND imports,
   extra roots, a strict set, a planted-reader control) — `docs/project/gotchas.md` "IS A REACH QUESTION".
 - `--stale` re-runs only gates that PASSED: a freeze that re-freezes a FAILED gate's expectation re-runs that

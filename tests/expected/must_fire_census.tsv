@@ -100,6 +100,7 @@ declares	test_expectation_provenance
 declares	test_fbneo_boot_log
 declares	test_figure_check
 declares	test_freeze_artifacts_current
+declares	test_freeze_set_shape
 declares	test_freeze_tag_coverage
 declares	test_gate_coverage_current
 declares	test_gate_descriptions

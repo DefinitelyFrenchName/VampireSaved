@@ -5074,7 +5074,10 @@ green forever after.
 scripts a freeze is actually run with. Check the artifacts after any freeze pass that
 went red — `git status` the expectation dir — before re-running.
 
-## THE MERGED EXPECTATION SET MUST HAVE ITS 16 SELF-FROZEN `.sha1` DELETED AFTER EVERY FREEZE — and nothing enforces it (paid: 14z-159)
+**Since 14z-185b (#150)** a freeze is run with the committed `tools/freeze_expectation_set.py`, which
+pins `MAME_BIN` itself (its selftest and `tests/test_freeze_set_shape.sh`'s `unpinned` control hold it).
+
+## THE MERGED EXPECTATION SET MUST HAVE ITS 16 SELF-FROZEN `.sha1` DELETED AFTER EVERY FREEZE — enforced since 14z-185b by `tests/test_freeze_set_shape.sh`, and done by `tools/freeze_expectation_set.py` (paid: 14z-159)
 
 `run_suite.sh --freeze` self-freezes any replay with no `.masked` in the target dir.
 On the merged set that is exactly the 16 TENANT-CONTENT replays (`36_pick_tenant_cell`,
@@ -5092,6 +5095,10 @@ SKIP 19 / 16 NO-EXPECTATION. That is the SHIPPED shape, not a defect: `merged-m1
 measures identically on `build/m3b_merged26` (measured 14z-159 as the control). The
 merged build's legacy coverage is `audit_merged_legacy` leg (b) and the tenant gates,
 never a bare suite run. Do not "fix" that red by re-freezing the 16.
+
+The headline read "— and nothing enforces it" until 14z-185b (RETRACTED then: `tests/test_freeze_set_shape.sh`
+fails a merged set holding any `.sha1`, and the driver removes them AFTER the set's verify, the order this
+entry's last paragraph requires).
 
 ## A FORCED-PICK NATIVE LEG MEASURES THE RIG FOR ANYTHING THE SELECT CONFIRM LATCHES — and two poked legs agree with each other perfectly (paid: 14z-159, GitHub #147/#151)
 

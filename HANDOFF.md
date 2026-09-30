@@ -1552,7 +1552,13 @@ that order, or the legacy oracle is replaced by a tautology (14z-143).**
 `run_suite.sh --freeze` self-freezes any replay that has no `.masked` in the
 target dir, so freezing into an EMPTY new set writes a `.sha1` for the whole
 legacy corpus and prints `frozen <sha>` for each, exit 0 ([VSP-36]; the
-mechanism and the tell are in `docs/GOTCHAS.md`). The order is:
+mechanism and the tell are in `docs/GOTCHAS.md`).
+
+**Since 14z-185b (#150) the order is DONE by `tools/freeze_expectation_set.py BUILD_DIR:NEW_SET ... [--jobs N]`**
+(ROMDIR set; the registry row first): it refuses an existing set or a build registered to another
+set, carries the predecessor's authored files verbatim, pins `MAME_BIN`, freezes, verifies, removes a
+merged set's `.sha1` and `logs/` AFTER its verify (#111), and runs `tools/freeze_set_shape.py --set` on
+the result; logs under `build/freeze_<UTC>/`. The manual order it performs, for reading:
 
 ```sh
 # 1. the registry row FIRST (run_suite resolves the set name from the fingerprint)
@@ -1567,8 +1573,9 @@ MAME_ROMPATH="$PWD/build/<dir>/rompath;$ROMDIR" tests/run_suite.sh vsavjw
 
 The freeze log must print `authored .masked expectation — not self-frozen`
 for ~52 of the 88 replays; if `01_attract_long` reads `frozen <sha>`, the
-carry was missed. Acceptance: the new set's `.masked` count EQUALS its
-predecessor's. Tracks run in parallel safely — every MAME run takes a fresh
+carry was missed. Acceptance: `python3 tools/freeze_set_shape.py --set <new>` clean — NOTHING its
+predecessor held is lost (`tests/test_freeze_set_shape.sh` checks every set; "counts EQUAL" was the
+old wording, measured 14z-185b to fail 21 of 63 legitimate freezes that added replays). Tracks run in parallel safely — every MAME run takes a fresh
 sandbox — but launch them from a wrapper that ends in `wait`, or the shell
 that started them exits and orphans them mid-corpus. This matters most for SUPERSEDED builds — `pyron-m1` and
 `huitzil-m1` cannot be produced from today's tree because their manifests

@@ -1,0 +1,4 @@
+# tests/expected/set_shape_exceptions.tsv — the LOSSES tools/freeze_set_shape.py allows: an expectation a set's predecessor
+# held that the set does not, declared with its reason (GitHub #150, 14z-185b). A row matching no loss FAILS (STALE).
+# A .sha1 reclassified as .masked/.skip/.diverge is not a loss and needs no row. set<TAB>class<TAB>name<TAB>reason
+donovan-m5	sha1	24_don_winmash	absent from donovan-m5 in every class (the M2 -> M5 rework, measured 14z-185b); the record names the replay only as the cause of a fixed superset regression (docs/project/patch_index.md), not why its expectation left the set

@@ -312,3 +312,6 @@ test_scratch_census
 # 14z-185b (#167): no live line in tests/ or tools/ pins a SUPERSEDED registry fingerprint
 # (tools/superseded_pins.py); the birth key exempt by name; two controls. ~2 s.
 test_superseded_pins
+# 14z-185b (#150): every numbered expectation set loses nothing its predecessor held, and the committed freeze
+# driver carries, pins, verifies and cleans up in order (tools/freeze_set_shape.py, tools/freeze_expectation_set.py); seven controls. ~3 s.
+test_freeze_set_shape

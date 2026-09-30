@@ -27,6 +27,16 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-29 (14z-185b) — #150: the shape gate is "nothing lost" (S1), predecessors by family (P1), and a full committed freeze driver (D1)
+
+**The questions (after rule-checker run 2026-09-29-458 on `build/agent185b/scope_150.md`), verbatim:** *"#150's shape gate: which rule should a new expectation set pass?"*, *"How does a set name its predecessor?"* and *"The freeze driver: how much should the committed tool do?"*
+
+**The maintainer's answers, verbatim:** *"S1 nothing lost (Recommended)"*, *"P1 by family (Recommended)"*, *"D1 full driver (Recommended)"*.
+
+**What it means.** A new expectation set keeps every `.masked`, `.skip` and `.sha1` name and the mask of its predecessor unless the removal or change is declared in a tracked exceptions file (seeded with the four historical `.sha1` removals and the one mask change); additions are allowed and printed; a merged set holds zero `.sha1`. The predecessor is the same family's (the name with its milestone number removed) highest lower number. The committed driver carries, freezes, removes a merged set's `.sha1`, verifies with `MAME_BIN` pinned inside, and runs the shape gate on its output. The ticket's "counts equal" was measured to fail 21 of 63 historical pairs and is not the rule.
+
+---
+
 ## Ruled 2026-09-29 (14z-185b) — #131: audit_mask_window_ff42a2 is KEPT as a case-specific instrument
 
 **The question, verbatim (asked with its facts: a pre/post attribution instrument for a select-palette row move, operands a pre-move and a post-move build and the replays that moved; a bare run SKIPs as a standing release exception since 2026-09-06; last real run 2026-08-15; still named by the port skill's [VSP-35] and `docs/project/gotchas.md`):** *"#131: what becomes of tests/audit_mask_window_ff42a2.sh?"*

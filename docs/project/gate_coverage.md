@@ -13,11 +13,11 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**403 of 403 gates described.**
+**404 of 404 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
-| [runner](#runner) | 36 | 36 | the suite runners and their own ground truth |
+| [runner](#runner) | 37 | 37 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 38 | 38 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 58 | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -30,7 +30,7 @@ first sentence) is `gate_index.md`.
 
 ## runner
 
-the suite runners and their own ground truth. 36 of 36 described.
+the suite runners and their own ground truth. 37 of 37 described.
 
 ### `run_all_emulator.sh` — run, emulator
 
@@ -175,6 +175,14 @@ the suite runners and their own ground truth. 36 of 36 described.
 **HOW:** drives the tool's selftest (five cases over a synthetic row, claim and output); four controls — one per condition of the verdict (#185 item 5, one plant per conjunct) — run copies with that condition switched off, and each must fail the selftest.
 
 **EXPECTS:** the selftest's five cases read as designed and all four controls fail on their copies.
+
+### `test_freeze_set_shape.sh` — test, ci_portable
+
+**WHAT:** over every numbered set under tests/expected/, against its predecessor (the family's next lower number): no `.masked`/`.skip` name lost, no `.sha1` lost unless reclassified as `.masked`/`.skip`/`.diverge`, the mask unchanged (introduced is allowed), a merged set with zero `.sha1`, and every declared exception (tests/expected/set_shape_exceptions.tsv) still matching a loss; and the driver carries the authored files verbatim, hands the suite a pinned MAME_BIN, verifies a merged set BEFORE removing its `.sha1`, and refuses an existing set or a build registered to another set.
+
+**HOW:** runs both tools' selftests, then the shape rule over the real sets; seven controls run copies with one safeguard switched off — four for the shape rule's failure conditions (#185 item 5), three for the driver's (the carry, the pin, the verify-before-cleanup order) — and each must fail its selftest.
+
+**EXPECTS:** both selftests PASS, the real sets clean (0 failures), all seven controls fail on their copies.
 
 ### `test_gate_follows.sh` — test, ci_portable
 

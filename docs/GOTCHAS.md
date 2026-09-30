@@ -417,7 +417,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A CROSS-GAME COMPARISON MUST START AT THE FIRST SCRIPTED EVENT, NOT AT THE MATCH ANCHOR — the intro is an RNG draw (paid: 14z-159, #136)
 - A CONTROL FIXTURE BUILT BESIDE ITS CONTROL SECTION LEAVES THE CONTROL'S *MODE* COMPARING NOTHING — and an empty result reads as PASS (paid: 14z-159)
 - A FREEZE DRIVER THAT DOES NOT PIN `MAME_BIN` BOOTS HOMEBREW'S MAME, WHICH DOES NOT KNOW `vsavjw` — and the freeze can still write expectations (paid: 14z-159)
-- THE MERGED EXPECTATION SET MUST HAVE ITS 16 SELF-FROZEN `.sha1` DELETED AFTER EVERY FREEZE — and nothing enforces it (paid: 14z-159)
+- THE MERGED EXPECTATION SET MUST HAVE ITS 16 SELF-FROZEN `.sha1` DELETED AFTER EVERY FREEZE — enforced since 14z-185b by `tests/test_freeze_set_shape.sh`, and done by `tools/freeze_expectation_set.py` (paid: 14z-159)
 - A FORCED-PICK NATIVE LEG MEASURES THE RIG FOR ANYTHING THE SELECT CONFIRM LATCHES — and two poked legs agree with each other perfectly (paid: 14z-159, GitHub #147/#151)
 - WHAT A FORCED PICK GETS WRONG IS DECIDED BY THE CELL'S TABLE AND THE FIGHTER'S READERS, NOT BY THE POKE — measure both halves before converting a single gate (paid: 14z-161, GitHub #151 step 3)
 - THE FIELD THAT LOOKS LIKE THE ANSWER IS NOT THE ONE THE INSTRUMENT READS — an A/B on `RAM:$FF8406` "proved" two legs identical whose reported chains differed (paid: 14z-171, GitHub #168)
