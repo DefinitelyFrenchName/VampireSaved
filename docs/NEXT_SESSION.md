@@ -18,10 +18,7 @@ prompt files pasted VERBATIM, `record --session`, `resolve` on ONE line with one
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** What the 14z-185b close found and did is in its
    CLOSE row (STATE 14z-185b).
 1. **M21 IS FROZEN, NOT RELEASED.** Whether and when to release it is the maintainer's.
-2. **THE OPEN QUEUE.** #184 is IN PROGRESS: phases 1-2 done (STATE 14z-185b row (15), the issue's comment,
-   scratch `build/agent185b/t184_notes.md`); next are focused rigs for Donovan a2:0x2b (Pyron a2:0x49 was passage through j.LP, corrected 14z-186) compared
-   ours-vs-native through the #174 machinery, then the handler reading for the other 28. Still queued from the
-   14z-185 close: #133 (un-parked; needs a wider host — WSL2 first). Opened at 14z-185b, each with its rulings in
+2. **THE OPEN QUEUE.** Still queued from the 14z-185 close: #133 (un-parked; needs a wider host — WSL2 first). Opened at 14z-185b, each with its rulings in
    `DECISIONS_HISTORY.md`: #187/#188 (built D, E, F and route A, PROVISIONAL),
    #189 (built), #190 (P1, P2, P4 built; P3 kept for later). The full list is `docs/project/tickets.md`.
 3. **WAITING ON THE WINDOWS BOX.** It was reinstalled (the maintainer, 2026-09-29: *"it's technically available but

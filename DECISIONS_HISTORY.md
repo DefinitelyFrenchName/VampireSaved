@@ -27,6 +27,16 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-30 (14z-186) — #184 closed `done`; `audit_facing_hook_ab`'s poke-census row classed CROSS-LEG
+
+**The questions (AskUserQuestion), verbatim:** (1) *"#184 (the 31 never-entered chains): all 31 are answered. Ten are measured on native and gated identical ours-vs-native (tests/audit_chains184.sh); the other 21 are covered by design, pass through another chain, or have no vs2 code path. What it turned up became #191 (Donovan's 2HK damage), #192 (Demitri's Chaos Flare, vsavj vs vs2) and #193 (the comparator never checks white HP). Close #184 as done?"* The options were "Close done (Recommended)": "Every seq answered and the measurable ten gated; the follow-ups live in #191-#193." and "Keep open": "Something in the 21 answered without a rig needs more work first; tell me which." (2) *"A new row in the poke census (tests/expected/poke_readback.tsv): audit_facing_hook_ab taps P1's +0x382 on its arcade-replay legs, which run with no pokes, while its Pyron-mash legs poke that byte (the forced pick). The census joins the two because it matches per gate, not per leg. That is the CROSS-LEG class (as test_ladder_tenant_vs_palette's row). How do you class it?"* The options were "CROSS-LEG (Recommended)": "A census limitation: the poke and the tap are on different legs, so nothing is read back." and "Leave unclassified": "Keep it UNCLASSIFIED for now."
+
+**The maintainer:** *"Close done (Recommended)"*; *"CROSS-LEG (Recommended)"*.
+
+**What it means.** #184 closes `done`: its ten measurable chains are gated by `tests/audit_chains184.sh`, the other 21 answered in `docs/game/engine_internals.md` (#184's paragraphs), and what it found is #191, #192 and #193. The poke-census row `audit_facing_hook_ab ff8782` is CROSS-LEG in `tests/expected/poke_readback.tsv`, its note naming the deciding lines.
+
+---
+
 ## Ruled 2026-09-30 (14z-186) — #183: the parity gates keep the `0000` RNG pin as their basis; closed `done`
 
 **The question (AskUserQuestion), verbatim:** *"#183: the parity gates pin the RNG to 0000, where every random draw returns 0. I re-ran audit_move_parity (all 32 rigs), audit_chains174 and audit_chains184 on M21 under three settings (rule-checker run 481 OK). (A) Today's 0000 pin: identical to the frozen results. (B) A non-zero value pinned every frame: no row that matched native stops matching; 10 rows that differed now match (all of donovan_10, which loses a pass to a frame overrun on ours, and donovan_11:12); chains174 unchanged; chains184's grab-whiff rig stops producing the grab on native, so it would need re-timing. (C) Seed once, then free: 32 matching rows start differing; ours draws extra random numbers in its motion trackers where native doesn't (#176), so the two sides no longer get the same input. Not measured: which fighter updates first under B, other values, and the ~20 other gates that pin 0000. How do you rule?"* The options were:
