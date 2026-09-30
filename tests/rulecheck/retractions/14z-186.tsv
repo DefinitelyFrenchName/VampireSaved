@@ -2,3 +2,7 @@
 Pyron a2:0x49 (8 times	14z-186 #184: all eight landings came from j.LP's second node — passage through a2:0x12, not entries	retracted
 only 3 of the 31	14z-186 #184: random play entered 2 of 31 (a2:0x49 is the tail of a2:0x12)	retracted
 is the tail of a2:0x12	control: the corrected wording in engine_internals.md	reach:1
+but NOT the white word +0x52	14z-186 #193: tools/move_parity.py now compares both white HP words; the audit_chains184 header resolved, STATE rows (5)/(7) marked in place	retracted
+tools/move_parity.py now compares both white HP words	control: the corrected wording in audit_chains184.sh's header	reach:1
+the MECHANISM is not measured	14z-186 #186: measured by tests/audit_facing_hook_ab.sh; audit_pyron_ring.sh's onset comment corrected	retracted
+both mechanisms MEASURED	control: the marked correction in docs/project/patch_notes.md's M21 entry	reach:1

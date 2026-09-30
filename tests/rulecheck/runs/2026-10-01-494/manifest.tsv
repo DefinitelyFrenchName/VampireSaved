@@ -1,0 +1,12 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent186/close/findings_row.txt	10f856db1f95c788037863d57e8ae2eec2938d53
+build/agent186/close/evidence.txt	97c5766e60409db489c4ce7402b9eacb4c7fbd7f
+build/agent186/close/evidence.py.txt	39245d8b690105662c091b96a203ead1b129ea9b
+build/agent186/close/promise_check.py.txt	2990aba9a7b1b9ea88a0cad47d64d88cb1ee20b0
+build/agent186/close/exempt_check.py.txt	c9e0827346c32382fd8a644cf234ce1d45804336
+build/agent186/close/exits_of_record.tsv	1f029197da5b37d66fcbbf3a540ad8895fd378af
+build/agent186/close/check_outputs.txt	0adb6a983017fe94977517bde18d4f7931eb280a
+build/agent186/close/checks.tsv	97151b1f4a2b037a609424657870942c2fc4ed8c
+build/agent186/close/classes.tsv	e7b95dc751c78ef10665734973797db757edcacb
+build/agent186/close/rulings_exempt.tsv	68c9703ddfc8b316b3cceb738420bea77a4cd830
+tools/agent/rulings_verbatim.py.lines-60-174 (lines 60-174 of tools/agent/rulings_verbatim.py)	73b86ee276365a97ef51ec6cb7b4c8085fdd422b

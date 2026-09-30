@@ -1,0 +1,11 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent186/close/findings_row.txt	10f856db1f95c788037863d57e8ae2eec2938d53
+build/agent186/close/evidence.txt	97c5766e60409db489c4ce7402b9eacb4c7fbd7f
+build/agent186/close/evidence.py.txt	39245d8b690105662c091b96a203ead1b129ea9b
+build/agent186/close/promise_check.py.txt	2990aba9a7b1b9ea88a0cad47d64d88cb1ee20b0
+build/agent186/close/exempt_check.py.txt	1388406b95851670683e0a619f3ba0090783ef9d
+build/agent186/close/exits_of_record.tsv	faef569aee5c008ad079ff207d1b5a052e6a27fd
+build/agent186/close/check_outputs.txt	453ff283e7696e850f9d903475d7bf0c0c99b71e
+build/agent186/close/checks.tsv	97151b1f4a2b037a609424657870942c2fc4ed8c
+build/agent186/close/classes.tsv	e7b95dc751c78ef10665734973797db757edcacb
+build/agent186/close/rulings_exempt.tsv	68c9703ddfc8b316b3cceb738420bea77a4cd830
