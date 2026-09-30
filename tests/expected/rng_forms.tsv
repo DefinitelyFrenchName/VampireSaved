@@ -1,0 +1,18 @@
+# tests/audit_rng_forms.sh — frozen by FREEZE=1 (tools/rng_forms.py). gate<TAB>form<TAB>what<TAB>value
+c174	B	same	14
+c174	C	IDENT->DIFF	2	huitzil_c174:0 huitzil_c174:7
+c174	C	IDENT->IDENT	6	huitzil_c174:1 huitzil_c174:2 huitzil_c174:3 huitzil_c174:4 huitzil_c174:5 huitzil_c174:6
+c174	C	same	6
+c184	B	outcome-wrong	1	donovan	10	Sword Grapple [HP], P2 jumps at +8	none from a2:0x41	WRONG:NO-START
+c184	B	table	absent
+c184	C	outcome-wrong	1	donovan	10	Sword Grapple [HP], P2 jumps at +8	none from a2:0x41	WRONG:NO-START
+c184	C	table	absent
+mp	B	DIFF->DIFF	15	donovan_2:3 donovan_2:4 donovan_2:6 donovan_2:7 donovan_2:10 donovan_2:11 donovan_2:12 donovan_2:13 donovan_2:14 donovan_2:19 donovan_2:20 donovan_2:21 donovan_2:22 donovan_2:23 donovan_2:24
+mp	B	DIFF->IDENT	10	donovan_10:1 donovan_10:2 donovan_10:3 donovan_10:4 donovan_10:5 donovan_10:6 donovan_10:7 donovan_10:8 donovan_10:9 donovan_11:12
+mp	B	same	501
+mp	C	DIFF->DIFF	16	donovan_10:4 donovan_15:7 donovan_15:9 donovan_4:21 donovan_7:32 huitzil_5:1 huitzil_5:2 huitzil_5:3 huitzil_5:4 huitzil_5:5 huitzil_5:6 huitzil_5:7 huitzil_5:8 huitzil_6:16 pyron_7:7 pyron_7:9
+mp	C	DIFF->IDENT	33	donovan_10:1 donovan_10:2 donovan_10:3 donovan_10:5 donovan_10:6 donovan_10:7 donovan_10:8 donovan_10:9 donovan_11:12 donovan_2:2 donovan_2:3 donovan_2:4 donovan_2:5 donovan_2:6 donovan_2:7 donovan_2:8 donovan_2:9 donovan_2:10 donovan_2:11 donovan_2:12 donovan_2:13 donovan_2:14 donovan_2:15 donovan_2:16 donovan_2:17 donovan_2:18 donovan_2:19 donovan_2:20 donovan_2:21 donovan_2:22 donovan_2:23 donovan_2:24 donovan_2:25
+mp	C	IDENT->DIFF	32	donovan_15:0 donovan_15:1 donovan_15:2 donovan_15:3 donovan_15:4 donovan_15:5 donovan_15:8 donovan_4:16 donovan_4:18 donovan_4:20 donovan_7:31 huitzil_5:0 huitzil_6:14 huitzil_6:15 huitzil_6:17 huitzil_7:0 huitzil_7:1 huitzil_7:2 huitzil_7:3 huitzil_7:4 huitzil_7:5 huitzil_7:6 pyron_2:18 pyron_2:20 pyron_2:26 pyron_7:0 pyron_7:1 pyron_7:3 pyron_7:4 pyron_7:5 pyron_7:6 pyron_7:8
+mp	C	IDENT->IDENT	22	donovan_15:6 donovan_4:17 donovan_4:19 huitzil_6:18 huitzil_7:7 huitzil_7:8 huitzil_7:9 huitzil_7:10 huitzil_7:11 huitzil_7:12 huitzil_7:13 huitzil_7:14 huitzil_7:15 huitzil_7:16 huitzil_7:17 pyron_2:19 pyron_2:21 pyron_2:22 pyron_2:23 pyron_2:24 pyron_2:25 pyron_7:2
+mp	C	NOT-IN-DF->NOT-IN-DF	1	donovan_4:22
+mp	C	same	422

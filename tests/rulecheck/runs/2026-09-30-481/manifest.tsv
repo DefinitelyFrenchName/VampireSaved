@@ -1,0 +1,24 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent186/t183/scratch_vs_gates.diff	cbfe0050f10be355b76c82d49a00b4b98ca2a515
+build/agent186/t183/cmp183b.py	33386e2f95234a2ff7834ee56a57f86be1c01848
+build/agent186/t183/cmp183b.txt	b6a3a2130d34f4cd957d794905f1b52e53976320
+build/agent186/t183/mp_A.got.tsv	d08d1874c5269188b5b05dade538d3b300600fe1
+build/agent186/t183/mp_B.got.tsv	7bb89e7aaa3a8eaf413110c9e8823b9e3a4df5e1
+build/agent186/t183/mp_C.got.tsv	120d33159d208cf6087b06df5f754b0aade4df35
+build/agent186/t183/c174_A/got.tsv	af8f058e232760eae7f4b9d5ca56c9b40bd47a1d
+build/agent186/t183/c174_B/got.tsv	af8f058e232760eae7f4b9d5ca56c9b40bd47a1d
+build/agent186/t183/c174_C/got.tsv	21a42973b333e7e3a55d6d297d8f39f6986023c1
+build/agent186/t183/c184_A/got.tsv	53efa0dabe255500924003b19be46bf571d2c57a
+build/agent186/t183/mp_A.log	787f815966881e51ec5d78c12b43f20613149b04
+build/agent186/t183/mp_B.log	74dcfe1bdcc4eb8f8d9f6901c184545f8257a186
+build/agent186/t183/mp_C.log	d62cae19c64dc869b2a51c3e45a8d49aacffd2c1
+build/agent186/t183/c174_A.log	98b074ca5e04c41105f1cdebfb306b735544f94e
+build/agent186/t183/c174_B.log	98b074ca5e04c41105f1cdebfb306b735544f94e
+build/agent186/t183/c174_C.log	47f23203c3946b7b21dc92724421028c0566a45a
+build/agent186/t183/c184_A.log	036178fa9268084f32f01d3f8700ed72637d6e7f
+build/agent186/t183/c184_B.log	841d28e15429fd321cce0fbc27fab7452f774d71
+build/agent186/t183/c184_C.log	1e3321eda3ceb896c5eebd71629d9a9f9c03d08b
+tests/expected/move_parity_events.tsv	42e4d951f1d4906cd9eb435ea556b0681c48dfcb
+tests/audit_chains184.sh.lines-1-30 (lines 1-30 of tests/audit_chains184.sh)	f85d182425a64f146796417e9e2adbdc8b666eee
+docs/game/engine_internals.md.lines-620-680 (lines 620-680 of docs/game/engine_internals.md)	6e4e2e2124abe87cc57bc44b8ddb3343d473ff55
+DECISIONS_HISTORY.md.lines-225-241 (lines 225-241 of DECISIONS_HISTORY.md)	648961ecaf241c7561260a3ecfa336252eaa773f

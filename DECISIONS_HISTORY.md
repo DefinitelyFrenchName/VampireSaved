@@ -27,6 +27,19 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-09-30 (14z-186) — #183: the parity gates keep the `0000` RNG pin as their basis; closed `done`
+
+**The question (AskUserQuestion), verbatim:** *"#183: the parity gates pin the RNG to 0000, where every random draw returns 0. I re-ran audit_move_parity (all 32 rigs), audit_chains174 and audit_chains184 on M21 under three settings (rule-checker run 481 OK). (A) Today's 0000 pin: identical to the frozen results. (B) A non-zero value pinned every frame: no row that matched native stops matching; 10 rows that differed now match (all of donovan_10, which loses a pass to a frame overrun on ours, and donovan_11:12); chains174 unchanged; chains184's grab-whiff rig stops producing the grab on native, so it would need re-timing. (C) Seed once, then free: 32 matching rows start differing; ours draws extra random numbers in its motion trackers where native doesn't (#176), so the two sides no longer get the same input. Not measured: which fighter updates first under B, other values, and the ~20 other gates that pin 0000. How do you rule?"* The options were:
+- "Keep 0000, close (Recommended)": "Keep the 0000 pin as the gates' basis; add to each parity gate's NOT COVERED that it compares the zero random path only, citing B as evidence that a non-zero pin raises no new difference on move_parity's and chains174's rows. Close #183 done."
+- "Add a non-zero leg": "Keep 0000 and add a second pinned leg at a non-zero value to the parity gates (about twice the runtime; chains184's grab-whiff rig re-timed for it)."
+- "Switch to seed-then-free": "Seed once and let the RNG run free. Not recommended: ours and native draw differently (#176), so rows would differ for reasons unrelated to the port."
+
+**The maintainer:** *"Keep 0000, close (Recommended)"*.
+
+**What it means.** The `0000` pin stays the parity gates' equalised input. `tests/audit_move_parity.sh`, `tests/audit_chains174.sh` and `tests/audit_chains184.sh` state in their NOT COVERED that they compare the zero random path only, with the measurement, and carry an `RNG_WORD`/`RNG_UNTIL` probe knob (default the `0000` pin; `FREEZE=1` refuses it). The measurement is rerunnable as `tests/audit_rng_forms.sh` (forms A, B and C against form A, frozen in `tests/expected/rng_forms.tsv`, three must-fire controls). Rule-checker runs 2026-09-30-480 (VIOLATED on true findings: the baseline was a table frozen on an older build, so a `0000` control on the same build was added; two counts corrected; a teardown segfault named) and -481 (OK).
+
+---
+
 ## Ruled 2026-09-30 (14z-186) — #186: #159's two side moves measured (the mash by the hook's execution, the arcade replay by its rule-5 logic); accepted, closed `done`
 
 **The question (AskUserQuestion), verbatim:** *"#186, measured (rule-checker run 479 OK). Pyron's mash ring stream moved because the hook RUNS: a variant that runs it with rule 5 disabled still agrees with solo for the whole run, while one with the code placed but never called diverges at f4742 like M20; rule 5 never fires on that replay. The arcade replay's defense reads moved because rule 5 ACTS: both variants read exactly M20's 426 rows, and the first difference is the fix's own facing write at f4318 (01 where M20 wrote 04). Both are tenant content; the legacy oracle passed at M21. What was not located: which frame's event the extra cycles push across a frame boundary. The gate tests/audit_facing_hook_ab.sh locks both results. How do you rule?"* The options were:

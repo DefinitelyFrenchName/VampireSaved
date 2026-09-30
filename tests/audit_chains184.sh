@@ -38,7 +38,9 @@
 # MUST-FIRE: perturbed-copy: x-moved — a copy of OUR trace with x moved by +3 on ONE frame two frames after the event's LAST target chain starts must turn every event DIFF on x, so an IDENT row is proven to rest on the compared x path inside the target chain (in-gate: every tenant; mode: every tenant's ours trace perturbed, and the table FAILs)
 #
 # NOT COVERED: every entry and verdict holds at the parity gates' pins only — the speed level 6 on every frame from 2000
-#   and the RNG word $FF80D4 held at 0000 from 2363, on both legs (the ruled equalised input, STATE "Standing rulings");
+#   and the RNG word $FF80D4 held at 0000 from 2363, on both legs (the ruled equalised input, STATE "Standing rulings";
+#   0000 is the RNG's fixed point, every draw 0 — #183, kept as the basis 2026-09-30; with RNG_WORD=0100 the Sword
+#   Grapple whiff at +8 no longer starts a2:0x41 on native, measured 14z-186 by audit_rng_forms);
 #   tools/move_parity.py compares P2's HP word +0x50 but NOT the white word +0x52, so a damage difference on the white
 #   word alone is invisible to every IDENT row here (measured 14z-186: Phobos's pursuit damages +0x52 only);
 #   the 21 other seqs (see WHAT); P2 as the tenant; FBNeo; the chains' boxes and properties beyond what
@@ -46,13 +48,15 @@
 #   window is P2's jump input at +8/+9, Circuit Scrapper's +16/+17 in this rig, Planet Burning's +16 only — measured
 #   14z-186; a schedule change moves them, the double-pass phase of GitHub #168).
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged29] [DON=build/don_m25 HUI=build/hui59 PYR=build/pyron44] [FREEZE=1] [KEEP=<dir>] tests/audit_chains184.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged29] [DON=build/don_m25 HUI=build/hui59 PYR=build/pyron44] [FREEZE=1] [KEEP=<dir>] [RNG_WORD=0100] [RNG_UNTIL=2600] tests/audit_chains184.sh
+#   RNG_WORD / RNG_UNTIL (#183, 14z-186): a PROBE knob, as audit_move_parity's; FREEZE=1 refuses either
 #   emulator tier, MAME; ~3 min (9 legs in parallel)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
+[ -n "${FREEZE:-}" ] && { [ -n "${RNG_WORD:-}" ] || [ -n "${RNG_UNTIL:-}" ]; } && { echo "REFUSED: FREEZE=1 with the RNG_WORD/RNG_UNTIL probe knob (#183) — the expectation is frozen at the 0000 pin only"; exit 3; }
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
 BUILD="${BUILD:-build/m3b_merged29}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 DON="${DON:-build/don_m25}"; HUI="${HUI:-build/hui59}"; PYR="${PYR:-build/pyron44}"
@@ -103,7 +107,7 @@ for name in ("a", "a2", "b", "c", "proj"):
 PY
     fr="$(python3 -c "import json;print(json.load(open('$RIGS/${t}_c184.json'))['frames'])")"
     base="$(python3 -c "import json;print(';'.join(json.load(open('$RIGS/${t}_c184.json'))['pokes']))")"
-    pins="$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$fr)) + ';' + ';'.join(f'{f}:ff80d4:0000' for f in range(2363,$fr)))")"
+    pins="$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$fr)) + ';' + ';'.join(f'{f}:ff80d4:${RNG_WORD:-0000}' for f in range(2363,${RNG_UNTIL:-$fr})))")"
     eval "cur=\$OURS_PATH_$t"
     cp "$RIGS/${t}_c184.rpl" "$W/$t.native.rpl"
     awk -v p="$cur" '

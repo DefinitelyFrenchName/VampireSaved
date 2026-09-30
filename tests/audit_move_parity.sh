@@ -94,7 +94,11 @@
 # 0x05 on BOTH wheels (tools/select_paths.py), so the two legs share the P2
 # prologue lines verbatim. The 506 events were re-frozen on him at 14z-165.
 #
-# WHAT IT DOES NOT COVER: hitboxes and projectile parameters — separate
+# WHAT IT DOES NOT COVER: the NON-ZERO random path — the pin 0000 is the RNG routine's fixed point, so every draw
+# returns 0 and every RNG-decided branch takes its zero path on both legs (#183; kept as the basis, ruled
+# 2026-09-30). Measured 14z-186 (audit_rng_forms): with RNG_WORD=0100 no IDENT row turned DIFF and 10 DIFF rows
+# (donovan_10:1-9, donovan_11:12) turned IDENT; with a seed then free, 32 IDENT rows turned DIFF, ours drawing in
+# vsavj's motion trackers where native does not (#176). Also not covered: hitboxes and projectile parameters — separate
 # instruments; P2's POSITION — P2's x is not a compared field, so a move that
 # displaces P2 differently reads IDENT until P1's own fields feel it downstream
 # (14z-167: Killshread Summon (ES) moved Demitri on native only, event 5 read IDENT
@@ -117,7 +121,9 @@
 # real picks on both sides; the 27 verdicts were re-frozen on them at 14z-160
 # and the ten Phobos DIVERGES rows of 14z-159 were verdicts on the VH2 branch.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged29] [PARTS="donovan_1 pyron_2"] [ALL=1] [JOBS=6] [FREEZE=1] [GOT_OUT=<path>] tests/audit_move_parity.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged29] [PARTS="donovan_1 pyron_2"] [ALL=1] [JOBS=6] [FREEZE=1] [GOT_OUT=<path>] [RNG_WORD=0100] [RNG_UNTIL=2600] tests/audit_move_parity.sh
+#   RNG_WORD / RNG_UNTIL (#183, 14z-186): a PROBE knob — the word poked into $FF80D4 on every frame from 2363 (default
+#   0000) and the frame the pin stops (default the part's end, i.e. never free); FREEZE=1 refuses either
 #   GOT_OUT (14z-183): also copy this run's computed per-event table to <path> (verdicts unaffected) — how a probe build's
 #   whole table is read when it moves rows (the failure diff shows only each part's first changed rows).
 #   emulator tier, MAME. MEASURED 14z-159 on this MacBook, solo, at the default
@@ -136,6 +142,7 @@ export MAME_BIN
 EXPECT="$REPO/tests/expected/move_parity_events.tsv"
 JOBS="${JOBS:-6}"
 CONTROL="${CONTROL:-}"
+[ -n "${FREEZE:-}" ] && { [ -n "${RNG_WORD:-}" ] || [ -n "${RNG_UNTIL:-}" ]; } && { echo "REFUSED: FREEZE=1 with the RNG_WORD/RNG_UNTIL probe knob (#183) — the expectation is frozen at the 0000 pin only"; exit 3; }
 
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no WIDE build at $BUILD"; exit 0; }
@@ -176,7 +183,7 @@ pokes_for() {  # pokes_for <tenant> <json> <leg> <frames>
     _t="$1"; _j="$2"; _leg="$3"; _fr="$4"
     _base="$(python3 -c "import json;print(';'.join(json.load(open('$_j'))['pokes']))")"
     _lvl="$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$_fr)))")"
-    _rng="$(python3 -c "print(';'.join(f'{f}:ff80d4:0000' for f in range(2363,$_fr)))")"
+    _rng="$(python3 -c "print(';'.join(f'{f}:ff80d4:${RNG_WORD:-0000}' for f in range(2363,${RNG_UNTIL:-$_fr})))")"
     if [ "$_leg" = native ]; then
         # the unpinned-level control withholds the level from the NATIVE leg only
         if [ "$CONTROL" = unpinned-level ] || [ "${CTL_ONE:-}" = unpinned-level ]; then

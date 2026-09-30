@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-447 entries (47 game / 122 platform / 278 project), counted from the buckets at generation.
+449 entries (47 game / 122 platform / 280 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 47 entries
 
@@ -197,8 +197,10 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A `read_tap.lua` WRITE LABELLED N IS REPLAY.LUA'S FRAME N+1 — the tap names a write by the counter BEFORE that frame's `frame_done`; `field_trace.lua` and `replay.lua` increment first, then sample (measured 2026-09-27, 14z-184)
 - IN A MAME LUA TAP, `cpu.state["SP"]` IS THE SUPERVISOR STACK — THIS GAME RUNS IN USER MODE, SO A CALLER'S RETURN ADDRESS SITS AT `USP` — A REPEAT of the entry "MAME 0.288'S 68000 CORE HAS NO `A7` STATE" above (paid: 2026-09-28, 14z-185, #176; that 14z-158 entry already held the rule — what went wrong is that the archaeology grep, [VSP-14], was not run before writing the tap)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 278 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 280 entries
 
+- A FROZEN TABLE IS NOT THE CONTROL FOR A VARIANT RUN — run the unchanged form through the same script on the same build (paid: 14z-186, GitHub #183, rule-checker run 2026-09-30-480)
+- `tools/homes_tracked.py`'S SECOND POSITIONAL IS AN OUTPUT FILE — `--newest STATE.md` OVERWRITES STATE.md (paid: 14z-186)
 - ONE CANDIDATE FOR TWO SIDE MOVES OF ONE FIX CAN BE HALF RIGHT — split every hook into its cycles and its logic, per replay (paid: 14z-185b to 14z-186, GitHub #186)
 - LANDING ON A CHAIN'S START NODE IS NOT ENTERING THE CHAIN — a start can sit inside another chain, or last under a sampled frame (paid: 14z-185b to 14z-186, GitHub #184)
 - A PROBE THAT DERIVES A "FREE" NAME FROM LIVE STATE STOPS WORKING AS THE STATE GROWS (paid: 14z-185, GitHub #160's probe)

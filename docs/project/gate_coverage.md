@@ -13,7 +13,7 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**406 of 406 gates described.**
+**407 of 407 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
@@ -24,7 +24,7 @@ first sentence) is `gate_index.md`.
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 84 | 84 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 63 | 63 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 64 | 64 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -2394,7 +2394,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 ## character-data
 
-the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 63 of 63 described.
+the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 64 of 64 described.
 
 ### `audit_air_gc_legacy.sh` — audit, emulator
 
@@ -2683,6 +2683,14 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 **HOW:** tests/lua/rng_draws.lua reads every draw at the routine's first instruction with its caller (the return address at USP; the game runs in user mode) and 48 longs of the active stack, on MAME, frames 2600 to the rig's end, the RNG poked to 5a5a over 2363..2599 and then FREE, the level pinned to 6 throughout. Legs: Lei-Lei vs Demitri (audit_air_gc_legacy's rig, real picks) on pristine vsavj and on ours; each tenant's audit_chains174 rig on native vs2 and on ours. tools/rng_draws.py reads them: (a) legacy ours equals pristine vsavj draw for draw; (b) a draw whose stack holds a return address into the tenant's code is keyed by the innermost one (ours mapped to native by the placement map), and a key on both legs counts alike; (c) the object loop counts alike; (e) every leg's draws form an unbroken generator chain, so none was missed; (f) legacy ours has no tenant frame; (g) each tenant's tracker-call block — declared, and verified against the vs2 image as jsr's into vs2's motion helpers — is on the stack of no native draw and of some ours draw.
 
 **EXPECTS:** the reader's CHECK PASS; its rows equal tests/expected/rng_draws.tsv (the one-leg keys and their counts are FROZEN there: the tenants' tracker blocks on ours, vs2 engine code the port copied on native); all five controls fail.
+
+### `audit_rng_forms.sh` — audit, emulator
+
+**WHAT:** the ours-vs-native parity gates pin the engine RNG word $FF80D4 to 0000 on every frame from the match anchor (2363) — the routine's FIXED POINT, so every draw returns 0 and every RNG-decided branch takes its zero path on both legs. #183 asked whether they should pin otherwise; the maintainer ruled (2026-09-30) to keep 0000 as the basis on this audit's measurement, which it re-runs: audit_move_parity (ALL=1, 32 parts), audit_chains174 and audit_chains184 under form A (their own pin), form B (0100 poked on every frame — a non-zero word) and form C (5a5a poked 2363..2599, then free).
+
+**HOW:** each gate is run UNCHANGED through its RNG_WORD/RNG_UNTIL probe knob (A: none; B: RNG_WORD=0100; C: RNG_WORD=5a5a RNG_UNTIL=2600), its table kept (GOT_OUT, KEEP); tools/rng_forms.py compares every B and C row against form A's row from the same build and script, and form A's move_parity table against the frozen tests/expected/move_parity_events.tsv, so a build or basis move cannot pass for an RNG effect. A gate's own verdict under B or C is not this audit's verdict (audit_chains184 stops at its native outcome check under both).
+
+**EXPECTS:** form A passes all three gates and equals the frozen move_parity table; under B no IDENT row of audit_move_parity or audit_chains174 turns DIFF, and some move_parity rows move (the pin reaches the game); every tally row equal to tests/expected/rng_forms.tsv; every control fails.
 
 ### `audit_shared_wall_push.sh` — audit, emulator
 

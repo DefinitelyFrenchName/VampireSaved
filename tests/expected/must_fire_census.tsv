@@ -46,6 +46,7 @@ declares	audit_qs_voice_wav
 declares	audit_reaction_class_live
 declares	audit_rig_opening
 declares	audit_rng_draws
+declares	audit_rng_forms
 declares	audit_shared_wall_push
 declares	audit_stock_emulator_stall
 declares	audit_tech_roll

@@ -1,0 +1,13 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent186/t183/scratch_vs_gates.diff	2b3b2ba6c41397dd24ca02653621a2fce2769966
+build/agent186/t183/cmp183.py	56eab05663403a007521e03bbf9118f11e666e67
+build/agent186/t183/cmp183.txt	21cea087a42d66cc26ad38145e37bc1222cd3dd0
+build/agent186/t183/mp_B.log	74dcfe1bdcc4eb8f8d9f6901c184545f8257a186
+build/agent186/t183/mp_C.log	d62cae19c64dc869b2a51c3e45a8d49aacffd2c1
+build/agent186/t183/c174_B.log	98b074ca5e04c41105f1cdebfb306b735544f94e
+build/agent186/t183/c174_C.log	47f23203c3946b7b21dc92724421028c0566a45a
+build/agent186/t183/c184_B.log	841d28e15429fd321cce0fbc27fab7452f774d71
+build/agent186/t183/c184_C.log	1e3321eda3ceb896c5eebd71629d9a9f9c03d08b
+tests/expected/move_parity_events.tsv	42e4d951f1d4906cd9eb435ea556b0681c48dfcb
+docs/game/engine_internals.md.lines-620-680 (lines 620-680 of docs/game/engine_internals.md)	6e4e2e2124abe87cc57bc44b8ddb3343d473ff55
+DECISIONS_HISTORY.md.lines-225-241 (lines 225-241 of DECISIONS_HISTORY.md)	648961ecaf241c7561260a3ecfa336252eaa773f

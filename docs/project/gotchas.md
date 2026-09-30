@@ -1,5 +1,30 @@
 # GOTCHAS (project) — traps in OUR pipeline and method
 
+## A FROZEN TABLE IS NOT THE CONTROL FOR A VARIANT RUN — run the unchanged form through the same script on the same build (paid: 14z-186, GitHub #183, rule-checker run 2026-09-30-480)
+
+**What happened.** #183's RNG forms B and C were run through scratch copies of three parity gates on merged-m21
+and tallied against the gates' FROZEN table. The recommendation went to the rule-checker, which found the table
+frozen on an older build (m3b_merged26): any row the build move shifted, or the scratch copy's own edit, would
+have been credited to the RNG form. The control — form A, the same scratch copies with the gates' own pin on
+the same build — was then run: it equalled the frozen table on 526/526 rows, so the tallies stood, but only from
+that run on. The same packet also miscounted two rows and left out a teardown segfault.
+
+**The rule.** A variant is compared against a control run of the SAME script, on the SAME build, differing in the
+one thing under test — never against a frozen expectation, which is a claim about another run. Keep the control's
+agreement with the frozen table as its own check (it is what shows the basis did not move).
+
+## `tools/homes_tracked.py`'S SECOND POSITIONAL IS AN OUTPUT FILE — `--newest STATE.md` OVERWRITES STATE.md (paid: 14z-186)
+
+**What happened.** Debugging a red `test_close_tools`, the session ran
+`python3 tools/homes_tracked.py --newest STATE.md`, reading the second argument as the file to check. The
+usage is `homes_tracked.py <row prefix> [--state STATE.md] [out]`: the state file is named by `--state`, and
+a bare second positional is where the report is WRITTEN. STATE.md was replaced by the tool's report; the
+next run then found no findings row and printed "no row starting with '| **--newest'". Restored from HEAD
+plus the one row written since, checked as a one-line diff.
+
+**The rule.** Read a tool's usage line before calling it by hand on a tracked file, and check `git diff
+--stat` after any hand run that names one. Here the state file goes after `--state`, never bare.
+
 ## ONE CANDIDATE FOR TWO SIDE MOVES OF ONE FIX CAN BE HALF RIGHT — split every hook into its cycles and its logic, per replay (paid: 14z-185b to 14z-186, GitHub #186)
 
 **What happened.** #159's fix (a `jmp` thunk on vsavj's facing resolver) moved two things at the M21 freeze:

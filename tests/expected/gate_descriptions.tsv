@@ -82,6 +82,7 @@ declares	audit_reaction_class_live
 declares	audit_region_movability
 declares	audit_rig_opening
 declares	audit_rng_draws
+declares	audit_rng_forms
 declares	audit_roster_pairings
 declares	audit_sdram_bank_load
 declares	audit_select_bank_gates

@@ -48,15 +48,19 @@
 # 2026-09-27: "it connects after 63214+MP/HP but not after regular throw (4/6+MP/HP)".
 #
 # NOT COVERED: the other 28 never-entered a2 starts (no attack record); the never-entered chains
-# of tables a, b and c; P2 as the tenant; the ES pursuit's KKK/PP inputs and Sword Grapple [MP].
+# of tables a, b and c; P2 as the tenant; the ES pursuit's KKK/PP inputs and Sword Grapple [MP]; the NON-ZERO random
+# path — the RNG pin 0000 is the routine's fixed point, every draw 0 (#183, kept as the basis 2026-09-30; with
+# RNG_WORD=0100 the 14 parity rows read as at 0000, measured 14z-186 by audit_rng_forms).
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged29] [DON=build/don_m25 HUI=build/hui59 PYR=build/pyron44] [FREEZE=1] [KEEP=<dir>] tests/audit_chains174.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged29] [DON=build/don_m25 HUI=build/hui59 PYR=build/pyron44] [FREEZE=1] [KEEP=<dir>] [RNG_WORD=0100] [RNG_UNTIL=2600] tests/audit_chains174.sh
+#   RNG_WORD / RNG_UNTIL (#183, 14z-186): a PROBE knob, as audit_move_parity's; FREEZE=1 refuses either
 #   emulator tier, MAME; ~2 min (6 legs in parallel)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
+[ -n "${FREEZE:-}" ] && { [ -n "${RNG_WORD:-}" ] || [ -n "${RNG_UNTIL:-}" ]; } && { echo "REFUSED: FREEZE=1 with the RNG_WORD/RNG_UNTIL probe knob (#183) — the expectation is frozen at the 0000 pin only"; exit 3; }
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
 BUILD="${BUILD:-build/m3b_merged29}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 DON="${DON:-build/don_m25}"; HUI="${HUI:-build/hui59}"; PYR="${PYR:-build/pyron44}"
@@ -104,7 +108,7 @@ for name in ("a", "a2", "b", "c", "proj"):
 PY
     fr="$(python3 -c "import json;print(json.load(open('$RIGS/${t}_c174.json'))['frames'])")"
     base="$(python3 -c "import json;print(';'.join(json.load(open('$RIGS/${t}_c174.json'))['pokes']))")"
-    pins="$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$fr)) + ';' + ';'.join(f'{f}:ff80d4:0000' for f in range(2363,$fr)))")"
+    pins="$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$fr)) + ';' + ';'.join(f'{f}:ff80d4:${RNG_WORD:-0000}' for f in range(2363,${RNG_UNTIL:-$fr})))")"
     eval "cur=\$OURS_PATH_$t"
     cp "$RIGS/${t}_c174.rpl" "$W/$t.native.rpl"
     awk -v p="$cur" '

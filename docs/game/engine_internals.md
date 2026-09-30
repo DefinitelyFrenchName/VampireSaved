@@ -640,7 +640,7 @@ returns the low byte. From `0000` both bytes stay 0, forever. Measured: with `00
 legs (Lei-Lei vs Demitri on vsavj, vs2 and ours; Phobos vs Demitri on native vs2 and ours; 1,600 to
 3,400 frames). With `5a5a` in the same window it moves on every frame. **So the parity gates' per-frame `0000`
 pin does not merely equalise the RNG: every draw returns 0, and every branch the RNG decides takes its
-zero path on both legs** (the object loop above, for one, always updates P1 first). **Because the routine is deterministic,
+zero path on both legs** (the object loop above, for one, always updates P1 first). (#183, ruled 2026-09-30: the gates keep this pin as their basis; how their rows move under a non-zero pin and under a seed-then-free RNG is measured by `tests/audit_rng_forms.sh`.) **Because the routine is deterministic,
 the number of draws between two frames is the number of steps from one frame's word to the next's**,
 and a read tap at the routine's first instruction gives the same counts, each draw with its caller
 (the return address on the ACTIVE stack: the game runs in USER mode, SR bit 13 clear, so it sits at
