@@ -6,6 +6,23 @@ it is specific to this roster hack.
 
 Append the moment one is paid for. Read before touching the related area.
 
+## LINUX CAPS ONE ENVIRONMENT STRING AT 128 KiB; `/bin/sh` IS DASH; THE PINNED MAME'S VERBOSITY IS A BUILD FACT — three macOS facts the first Linux emulator tier paid for (paid: 2026-10-01, ERIS WSL2 Ubuntu, GitHub #201)
+
+The first emulator tier off macOS (ERIS, `e3f0d7c2`) failed 30 gates; three causes were facts of macOS written as everyone's:
+* **`MAX_ARG_STRLEN`.** Linux refuses to exec a process whose environment holds ONE string over 128 KiB (measured on ERIS:
+  `X=<n bytes> /bin/true` fails at 131,072, passes at 131,067; `ARG_MAX` is 2 MB). macOS has no per-string cap. The
+  per-frame level/RNG pins in `POKES` reached 164,095 bytes for a long rig, so the leg never started ("Argument list too
+  long", exit 126, then "no samples"). Fixed by the range form `F1-F2:addr:hex` (`tests/lua/pokes_spec.lua`,
+  `tests/test_pokes_ranges.sh`). `DUMPS`, `DSPEC` and `ANCHOR_SPEC` are built per frame too and were not measured against it.
+* **dash.** macOS's `/bin/sh` is bash 3.2; Ubuntu's is dash, which refuses bash arithmetic like `$((16#13))` ("expecting
+  EOF"). `$((0x13))` is portable.
+* **MAME's log is not a contract.** The pinned MAME built on the Mac logs "Attempting load of <set>.ini" by default; the
+  same source built on Linux logs it only under `-verbose`. Three gates identified the set by that line; they now pass
+  `-verbose` explicitly. A gate that reads a side effect of logging names the flag that produces it.
+
+**The rule:** a gate's environment strings stay small (ranges, files), its shell is POSIX, and what it reads from an
+emulator's log is produced by a flag the gate passes. A Linux run is the check: the Mac cannot see any of the three.
+
 ## `spctl -a` REPORTS THE SIGNING-POLICY VERDICT, NOT WHETHER A LAUNCH IS BLOCKED — and `unzip` DOES propagate com.apple.quarantine (measured: 2026-09-20, macOS 26.0 arm64, #144)
 
 Rehearsing a player's route on the published `merged-m18-fbneo-macos-arm64.zip`:

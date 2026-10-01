@@ -201,6 +201,13 @@ Yes, Donovan's deity states should be in scope. However, if they would rely on t
 **What it means.** #195 is built as option A, its cost measured against the performance rule. Before building, the session measures whether Donovan's six vs2 class-0x51 records (character records 33-38) reach the same writer and the same knockdown tail as Cosmo's projectile record: if they do, they join the hooks' list in this work; if their path differs, they get their own ticket.
 ---
 
+## Ruled 2026-10-01 — #126 (select-wheel look-and-feel polish) closed `declined`: the look is right on a CRT
+
+**The maintainer, verbatim** (GitHub #126, comment and close, 2026-10-01T21:14:59Z, from the maintainer's account — the sessions act as `mechanyaa-ai` since 2026-09-17): *"look and feel is actually great on CRT. Closing this ticket"*
+
+**What it means.** No select-wheel polish is pending; the wheel ships as it is. Found by the session (14z-187b) when `tests/test_tickets.sh` reported the index row still `parked` against a closed issue; the row now reads `declined`. Its facts stay in `docs/game/atlas/select_screen.md`.
+---
+
 ## Ruled 2026-09-30 (14z-186) — two tickets found under #184: Donovan's 2HK damage (#191) and Change Immortal's one-frame timing
 
 **The question, verbatim:** *"Should the 2HK damage and the Change Immortal timing become tickets? I'd put each through the rule-checker before filing."*
