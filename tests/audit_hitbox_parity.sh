@@ -79,7 +79,7 @@ for part in $PARTS; do
     J="tests/replays/naming/${part}.json"; R="tests/replays/naming/${part}.rpl"
     [ -f "$J" ] && [ -f "$R" ] || { bad "no committed rig $part"; continue; }
     FR="$(python3 -c "import json;print(json.load(open('$J'))['frames'])")"
-    PK="$(python3 -c "import json;j=json.load(open('$J'));fr=j['frames'];print(';'.join(j['pokes']+[f'{f}:ff8116:06' for f in range(2000,fr)]+[f'{f}:ff80d4:0000' for f in range(2363,fr)]))")"
+    PK="$(python3 -c "import json;j=json.load(open('$J'));fr=j['frames'];print(';'.join(j['pokes']+[f'{2000}-{(fr)-1}:ff8116:06']+[f'{2363}-{(fr)-1}:ff80d4:0000']))")"
     for leg in native ours; do
         P1="$(route $leg 1 "$ID")"; P2="$(route $leg 2 01)"
         [ -n "$P1" ] && [ -n "$P2" ] || { bad "$part $leg: no route"; continue; }

@@ -78,8 +78,8 @@ PART=donovan_4; TENANT=donovan; FR=2860; LO=2836; HI=2852
 OURS_PATH_donovan="D D DR DR"
 pokes_for() {  # pokes_for <json> <frames>
     _b="$(python3 -c "import json;print(';'.join(json.load(open('$1'))['pokes']))")"
-    _l="$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$2)))")"
-    _r="$(python3 -c "print(';'.join(f'{f}:ff80d4:0000' for f in range(2363,$2)))")"
+    _l="$(python3 -c "print(f'{2000}-{($2)-1}:ff8116:06')")"
+    _r="$(python3 -c "print(f'{2363}-{($2)-1}:ff80d4:0000')")"
     printf '%s;%s;%s' "$_b" "$_l" "$_r"
 }
 rpl_for() {  # rpl_for <tenant> <rig.rpl> <leg> <out.rpl>

@@ -20,7 +20,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 : "${ROMDIR:?set ROMDIR to the reference-set directory}"
 ROMDIR="$(cd "$ROMDIR" && pwd)"; export ROMDIR
 OUT="${1:?usage: tools/demitri_split_sheet.sh <out_dir>}"; mkdir -p "$OUT"; OUT="$(cd "$OUT" && pwd)"
-PK="$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,3800)) + ';' + ';'.join(f'{f}:ff80d4:0000' for f in range(2363,3800)))")"
+PK="$(python3 -c "print(f'{2000}-{(3800)-1}:ff8116:06' + ';' + f'{2363}-{(3800)-1}:ff80d4:0000')")"
 SNAPS="$(python3 -c "print(','.join(str(e+o) for e in (3000, 3400) for o in list(range(40,51))+list(range(84,91))))")"
 leg() {  # leg <game> <snap|ft>
     d="$OUT/$1"; mkdir -p "$d/$2"

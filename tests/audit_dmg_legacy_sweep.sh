@@ -98,7 +98,7 @@ grep -qx 'defense rows differing by id: 0a 10 13 19 1a' "$W/tables.txt" \
     && ok "defense rows differ only for 0a 10 13 19 1a; the attack table and the 2D map are equal" \
     || bad "the tables are not as the attribution needs them (rows differing only for 0a 10 13 19 1a, the two tables equal)"
 
-LV="$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,4730)) + ';' + ';'.join(f'{f}:ff80d4:0000' for f in range(2363,4730)))")"
+LV="$(python3 -c "print(f'{2000}-{(4730)-1}:ff8116:06' + ';' + f'{2363}-{(4730)-1}:ff80d4:0000')")"
 lleg() {  # lleg <side p1|p2> <victim id> <vsavj|vsav2>
     _s="$1"; _v="$2"; _g="$3"; _d="$W/L.$_s.$_v.$_g"; mkdir -p "$_d"
     if [ "$_s" = p1 ]; then _pk="1400:ff8b82:$_v;1450:ff8b82:$_v;1500:ff8b82:$_v;2940:ff8850:01200120;3380:ff8850:01200120;3780:ff8850:01200120"

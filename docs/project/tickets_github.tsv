@@ -2,8 +2,9 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 200
+# issues: 201
 number	state	reason	closed	labels	title
+201	OPEN	-	-	bug	Linux: per-frame pin lists in POKES exceed the 128 KiB single-environment-string limit, so the parity-style gates' legs never start off macOS
 200	OPEN	-	-	bug	Donovan's Lightning Sword (ES): native marks the victim pursuit-able at hit (class 0x4E, +0x117); ours (class 0x06 since the 14z-35 remap) does not
 199	OPEN	-	-	bug	Merged-image extracts on a fresh host: the reproducibility gate reads INPUTS OK on directories alone, and the tracked regions.json are stale (region data identical)
 198	OPEN	-	-	evolution	Parity rigs: P2 Demitri attacks with a chain whose record is equal on both games (forbid the record-differing a2 chains in P2_NEVER)

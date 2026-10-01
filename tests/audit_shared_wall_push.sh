@@ -74,7 +74,7 @@ RT="ff8410,2;ff8810,2;ff8414,2;ff8814,2;ff840a,2;ff880a,2;ff8516,2;ff8916,2;ff85
 GEOM_legacy_lilith="3160 3140 3150 3150"
 GEOM_huitzil_3="6160 6146 6156 6156"
 pins() {  # pins <frames> — the parity gates' level and RNG pins
-    python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$1)) + ';' + ';'.join(f'{f}:ff80d4:0000' for f in range(2363,$1)))"
+    python3 -c "print(f'{2000}-{($1)-1}:ff8116:06' + ';' + f'{2363}-{($1)-1}:ff80d4:0000')"
 }
 tap() {  # tap <name> <set> <rompath> <rpl> <pokes> <frames>   (background)
     mkdir -p "$W/$1"

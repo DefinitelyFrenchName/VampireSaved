@@ -167,7 +167,7 @@ assert len(ids) == 6, "expected the six early-window id pokes, found %d" % len(i
 assert len(hp) + len(ids) + len(rest) == len(j["pokes"])
 sched = rest + ["%d:ff8850:01200120" % (e["frame"] - 10) for e in j["events"]]
 fr = j["frames"]
-pins = (["%d:ff8116:08" % f for f in range(2000, fr)] if lvl else []) + ["%d:ff80d4:0000" % f for f in range(2363, fr)]
+pins = (["%d-%d:ff8116:08" % (2000, (fr) - 1)] if lvl else []) + ["%d-%d:ff80d4:0000" % (2363, (fr) - 1)]
 open(sys.argv[3], "w").write(";".join(sched))
 open(sys.argv[4], "w").write(";".join(sched + pins))
 print("dropped %d id pokes and %d cadence HP pins; %d event HP pins; %d other; level pin %s; RNG pin on" % (len(ids), len(hp), len(j["events"]), len(rest), "on" if lvl else "OFF"))

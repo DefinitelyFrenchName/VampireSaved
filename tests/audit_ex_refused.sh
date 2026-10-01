@@ -61,7 +61,7 @@ fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
 FR=3700
-PINS="$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$FR)))");$(python3 -c "print(';'.join(f'{f}:ff80d4:0000' for f in range(2363,$FR)))")"
+PINS="$(python3 -c "print(f'{2000}-{($FR)-1}:ff8116:06')");$(python3 -c "print(f'{2363}-{($FR)-1}:ff80d4:0000')")"
 FIELDS="ff802e:b:df,ff8509:b:stock,ff8406:b:seq,ff8407:b:sub,ff8511:b:f111,ff8782:b:id"
 ex_lines() {  # the same inputs as tests/audit_df_modes.sh, relative to the activation frame
     case $1 in

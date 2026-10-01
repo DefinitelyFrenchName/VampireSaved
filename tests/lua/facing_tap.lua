@@ -175,13 +175,7 @@ end
 
 local pokes = {}
 do
-    local p = os.getenv("POKES")
-    if p then
-        for spec2 in p:gmatch("[^;]+") do
-            local fr, addr, hexs = spec2:match("^(%d+):(%x+):(%x+)$")
-            if fr then pokes[#pokes + 1] = { tonumber(fr), tonumber(addr, 16), hexs } end
-        end
-    end
+    dofile((debug.getinfo(1, "S").source:match("^@(.*/)") or "./") .. "pokes_spec.lua").append(pokes, os.getenv("POKES"))   -- #201: F and F1-F2 entries
 end
 
 local pressed = {}

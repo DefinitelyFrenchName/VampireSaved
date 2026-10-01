@@ -79,7 +79,7 @@ ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
 FRAMES_AT="2858 2860 2866"
 J="$REPO/tests/replays/naming/donovan_4.json"; R="$REPO/tests/replays/naming/donovan_4.rpl"; FR=2870
-PK="$(python3 -c "import json;print(';'.join(json.load(open('$J'))['pokes']))");$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$FR)))");$(python3 -c "print(';'.join(f'{f}:ff80d4:0000' for f in range(2363,$FR)))")"
+PK="$(python3 -c "import json;print(';'.join(json.load(open('$J'))['pokes']))");$(python3 -c "print(f'{2000}-{($FR)-1}:ff8116:06')");$(python3 -c "print(f'{2363}-{($FR)-1}:ff80d4:0000')")"
 DUMPS="$(for f in $FRAMES_AT; do printf '%s:90c000-90c400;' "$f"; done | sed 's/;$//')"
 # ours: the merged wheel's real cursor path for Donovan (tests/audit_move_parity.sh's OURS_PATH)
 awk -v path="D D DR DR" '/^1104-1106 p2=R$/ && !done { n = split(path, m, " "); t = 1100

@@ -117,7 +117,7 @@ for leg in $LEGS; do
         mkdir -p "$W/rpl"
         for j in "$REPO"/tests/replays/naming/donovan_[0-9]*.json "$REPO"/tests/replays/naming/huitzil_[0-9]*.json "$REPO"/tests/replays/naming/pyron_[0-9]*.json; do
             name="$(basename "$j" .json)"; t="${name%_*}"; fr="$(json_frames "$j")"
-            pk="$(json_pokes "$j");$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$fr)))");$(python3 -c "print(';'.join(f'{f}:ff80d4:0000' for f in range(2363,$fr)))")"
+            pk="$(json_pokes "$j");$(python3 -c "print(f'{2000}-{($fr)-1}:ff8116:06')");$(python3 -c "print(f'{2363}-{($fr)-1}:ff80d4:0000')")"
             eval "_path=\$OURS_PATH_$t"
             awk -v path="$_path" '
                 /^1104-1106 p2=R$/ && !done { n = split(path, m, " "); t = 1100

@@ -501,10 +501,7 @@ local pressed = {}
 -- POKES="frame:addr:hexbytes;..." — scheduled RAM writes (mirrors
 -- replay.lua / tap_writes.lua; lets guarded runs use HP-poke repros)
 local pokes = {}
-for spec in (os.getenv("POKES") or ""):gmatch("[^;]+") do
-    local fr, addr, hexs = spec:match("^(%d+):(%x+):(%x+)$")
-    if fr then pokes[#pokes + 1] = { tonumber(fr), tonumber(addr, 16), hexs } end
-end
+dofile((debug.getinfo(1, "S").source:match("^@(.*/)") or "./") .. "pokes_spec.lua").append(pokes, os.getenv("POKES"))   -- #201: F and F1-F2 entries
 
 -- ── INPUT INTEGRITY ASSERTION (GitHub #31) ───────────────────────────────
 -- Ported from replay.lua, where it is "deliberately not opt-in". ~17 gates

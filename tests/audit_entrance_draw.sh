@@ -67,7 +67,7 @@ PY
 # our leg's cursor path on the merged wheel (tests/audit_move_parity.sh rpl_for)
 awk '/^1104-1106 p2=R$/ && !done { print "1100-1102 p1=D"; print "1160-1162 p1=D"; print "1220-1222 p1=D"; done = 1 }
      /^(1100|1160|1220|1280)-[0-9]+ p1=/ { next } { print }' "$W/rig.rpl" > "$W/ours.rpl"
-BASE="$(python3 -c "import json;print(';'.join(json.load(open('$W/rig.json'))['pokes']))");$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$FR)))")"
+BASE="$(python3 -c "import json;print(';'.join(json.load(open('$W/rig.json'))['pokes']))");$(python3 -c "print(f'{2000}-{($FR)-1}:ff8116:06')")"
 for s in $SEEDS; do for leg in native ours; do
     if [ $leg = native ]; then set_=vsav2; rp="$ROMDIR"; r="$W/rig.rpl"; else set_=vsavjw; rp="$BUILD/rompath;$ROMDIR"; r="$W/ours.rpl"; fi
     d="$W/$leg.$s"; mkdir -p "$d"

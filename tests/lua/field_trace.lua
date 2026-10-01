@@ -100,10 +100,7 @@ if replay_path then
 end
 
 local pokes = {}
-for spec in (os.getenv("POKES") or ""):gmatch("[^;]+") do
-    local fr, addr, hexs = spec:match("^(%d+):(%x+):(%x+)$")
-    if fr then pokes[#pokes + 1] = { tonumber(fr), tonumber(addr, 16), hexs } end
-end
+dofile((debug.getinfo(1, "S").source:match("^@(.*/)") or "./") .. "pokes_spec.lua").append(pokes, os.getenv("POKES"))   -- #201: F and F1-F2 entries
 
 local function read_field(fd)
     if fd.size == "b" then return mem:read_u8(fd.addr) end

@@ -13,13 +13,13 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**411 of 411 gates described.**
+**412 of 412 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
 | [runner](#runner) | 39 | 39 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
-| [platform](#platform) | 38 | 38 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
+| [platform](#platform) | 39 | 39 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 58 | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
@@ -518,7 +518,7 @@ the documentation locks — docs, skills, indexes, tables follow the tree. 21 of
 
 ## platform
 
-the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene. 38 of 38 described.
+the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene. 39 of 39 described.
 
 ### `audit_wide_phase_a.sh` — audit, emulator
 
@@ -743,6 +743,14 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 **HOW:** builds the stock track and compares its fingerprint with the frozen pre-refactor value; builds the WIDE track and reads its diagnosis.
 
 **EXPECTS:** stock fingerprint unmoved, the WIDE expectation as frozen; a re-freeze is a recorded decision, never a silent green.
+
+### `test_pokes_ranges.sh` — test, emulator
+
+**WHAT:** the shared POKES parser expands `F1-F2:addr:hex` into the per-frame entries it stands for, so a run pinned by ranges is the run pinned by per-frame entries — whole work RAM, every frame.
+
+**HOW:** tests/lua/replay.lua on pristine vsavj, tests/replays/dmg192/chaos_flare.rpl (a match from ~2363), three runs: PER-FRAME (the level pinned 8 over 2000-3399, the RNG word 1234 over 2363-3399 and the frame counter $FF8080 0000 over 2500-3049, one entry per frame — the form every gate used before #201), RANGES (the same pins as three range entries), and SHORT (the frame-counter range ending one frame early, 3048). The per-frame RAM checksum logs are compared.
+
+**EXPECTS:** PER-FRAME and RANGES byte-identical over the whole run; SHORT differs from RANGES (so the comparison can see a one-frame error in a range's end); the two strings' lengths printed (per-frame against ranges).
 
 ### `test_readme_recording.sh` — test, emulator
 

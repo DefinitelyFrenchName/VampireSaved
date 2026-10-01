@@ -105,6 +105,7 @@ test_attract_determinism	prereq	release	romset	-	M0 acceptance, 3600 frames
 test_decrypt_oracle	prereq	release	romset	-	python decrypt == MAME opcode space
 test_crash_guard	prereq	release	romset	-	clean negative + vec4/vec3 positive controls ([VSP-19])
 test_input_integrity	prereq	release	romset	-	ground truth for the input-integrity check
+test_pokes_ranges	prereq	release	romset	-	ground truth for the POKES grammar's RANGE form (#201): pins as ranges reproduce pins per frame byte for byte over whole work RAM; one control (range-short). ~1 min, three MAME runs
 test_replay_video_selfcheck	prereq	release	romset	-	ground truth for replay.lua VIDEO_OUT
 test_record_window	prereq	release	romset	-	ground truth for record_window.lua; REC_BUILD default may have rotted
 test_obj_records	prereq	release	romset	-	ground truth for tools/oram_obj_records.py

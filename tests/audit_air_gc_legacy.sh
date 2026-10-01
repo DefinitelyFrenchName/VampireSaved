@@ -98,7 +98,7 @@ rig() {  # rig <char> <wheel.json> — the 14z-184 rig, byte for byte but for Za
 }
 pins() {  # the parity gates' level and RNG pins, and the three far position pins
     python3 -c "
-p=[f'{f}:ff8116:06' for f in range(2000,$FR)]+[f'{f}:ff80d4:0000' for f in range(2363,$FR)]
+p=[f'{2000}-{($FR)-1}:ff8116:06']+[f'{2363}-{($FR)-1}:ff80d4:0000']
 for t in (2800,3220,3640): p+=[f'{t-230}:ff8410:0228', f'{t-230}:ff8810:02d8']
 print(';'.join(p))"
 }

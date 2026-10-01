@@ -86,10 +86,7 @@ space:add_change_notifier(function() if tap then install() end end)
 -- can be ring-tapped (the pick never happens and the tap reads a
 -- different character's sounds as if they were the tenant's).
 local pokes={}
-for spec in (os.getenv("POKES") or ""):gmatch("[^;]+") do
-    local fr,addr,hexs=spec:match("^(%d+):(%x+):(%x+)$")
-    if fr then pokes[#pokes+1]={tonumber(fr),tonumber(addr,16),hexs} end
-end
+dofile((debug.getinfo(1, "S").source:match("^@(.*/)") or "./") .. "pokes_spec.lua").append(pokes, os.getenv("POKES"))   -- #201: F and F1-F2 entries
 local prev={}
 emu.register_frame_done(function()
     frame=frame+1

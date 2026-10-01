@@ -86,10 +86,10 @@ for s in native ours; do
 done
 pk() { python3 -c "
 import json,sys
-p=json.load(open('$J'))['pokes']+[f'{f}:ff8116:06' for f in range(2000,$FR)]+[f'{f}:ff80d4:0000' for f in range(2363,$FR)]
+p=json.load(open('$J'))['pokes']+[f'{2000}-{($FR)-1}:ff8116:06']+[f'{2363}-{($FR)-1}:ff80d4:0000']
 for spec in sys.argv[1:]:
     a,v=spec.split('=')
-    p+=[f'{f}:{a}:{v}' for f in range(3790,3801)]
+    p+=[f'{3790}-{(3801)-1}:{a}:{v}']
 print(';'.join(p))" "$@"; }
 leg() {  # leg <name> <set> <rompath> <rpl> <x pokes...>
     _n="$1"; _s="$2"; _rp="$3"; _rpl="$4"; shift 4; _p="$(pk "$@")"; mkdir -p "$W/$_n"

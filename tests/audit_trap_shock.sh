@@ -84,7 +84,7 @@ abspath() { case "$1" in /*) echo "$1";; *) echo "$PWD/$1";; esac; }
 
 RPL="$PWD/tests/replays/hui/92_hui_trap_shock.rpl"
 PK="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10;1400:ff8b82:03;1450:ff8b82:03;1500:ff8b82:03"
-PK="$PK;$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,3640)))");$(python3 -c "print(';'.join(f'{f}:ff80d4:0000' for f in range(2363,3640)))")"
+PK="$PK;$(python3 -c "print(f'{2000}-{(3640)-1}:ff8116:06')");$(python3 -c "print(f'{2363}-{(3640)-1}:ff80d4:0000')")"
 DF="$(python3 -c "print(';'.join(f'{f}:ff8800-ff89ff;{f}:ff8400-ff85ff' for f in range(3480,3620,2)))")"
 
 SOLO_RP="$(abspath "$BUILD")/rompath"; MERGED_RP="$(abspath "$MERGED")/rompath"   # BEFORE any cd (abspath reads $PWD)

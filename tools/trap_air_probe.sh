@@ -38,17 +38,17 @@ esac
 # both fighters by their REAL cursor routes on this leg's own wheel (tools/select_paths.py), P1 Phobos
 # (0x10) and P2 the cell P2CELL — a forced-pick leg carries the cursor character's confirm latch (#151)
 if [ "$PICK" = real ]; then IDPK=""; else IDPK="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10;1400:ff8b82:$P2CELL;1450:ff8b82:$P2CELL;1500:ff8b82:$P2CELL;"; fi
-PK="$IDPK$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$TO+20)))");$(python3 -c "print(';'.join(f'{f}:ff80d4:0000' for f in range(2363,$TO+20)))")"
+PK="$IDPK$(python3 -c "print(f'{2000}-{($TO+20)-1}:ff8116:06')");$(python3 -c "print(f'{2363}-{($TO+20)-1}:ff80d4:0000')")"
 # XPIN="<x>@<from>-<to>": pin P2's x word ($FF8810) over a frame range BEFORE the jump (never inside the
 # observed window: a rig write on a compared field is the "shared pin" gotcha), to set where he jumps from
 if [ -n "$XPIN" ]; then PK="$PK;$(python3 -c "
 x, r = '$XPIN'.split('@'); a, b = map(int, r.split('-'))
-print(';'.join(f'{f}:ff8810:{int(x):04x}' for f in range(a, b + 1)))")"; fi
+print(f'{a}-{(b + 1)-1}:ff8810:{int(x):04x}')")"; fi
 # P1XPIN: the same for P1's x ($FF8410) — to park Phobos out of the victim's attack reach once the
 # trap is placed (the dome is its own object and stays where it rolled)
 if [ -n "${P1XPIN:-}" ]; then PK="$PK;$(python3 -c "
 x, r = '$P1XPIN'.split('@'); a, b = map(int, r.split('-'))
-print(';'.join(f'{f}:ff8410:{int(x):04x}' for f in range(a, b + 1)))")"; fi
+print(f'{a}-{(b + 1)-1}:ff8410:{int(x):04x}')")"; fi
 { sed '/^3900 wait/d' tests/replays/hui/92_hui_trap_shock.rpl | grep -v '^#'; echo "$JUMP-$((JUMP + 2)) p2=$DIR"; [ -n "$ATK" ] && echo "$ATK"; echo "3900 wait"; } > "$OUT/air.rpl"
 if [ "$PICK" = real ]; then
     WSET=$([ "$LEG" = native ] && echo vsav2 || echo vsavj)

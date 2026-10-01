@@ -185,6 +185,7 @@ declares	test_oboro_select
 declares	test_patch_prg
 declares	test_phasec_image
 declares	test_pod_black_foot_palette
+declares	test_pokes_ranges
 declares	test_projectile_census
 declares	test_projectile_params
 declares	test_pyron_blink

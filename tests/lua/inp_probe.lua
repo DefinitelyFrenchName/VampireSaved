@@ -134,10 +134,7 @@ end
 local prev = {}
 local in_ports = { machine.ioport.ports[":IN0"], machine.ioport.ports[":IN1"], machine.ioport.ports[":IN2"] }
 local pokes = {}
-for spec in (os.getenv("POKES") or ""):gmatch("[^;]+") do
-    local fr, addr, hexs = spec:match("^(%d+):(%x+):(%x+)$")
-    if fr then pokes[#pokes + 1] = { tonumber(fr), tonumber(addr, 16), hexs } end
-end
+dofile((debug.getinfo(1, "S").source:match("^@(.*/)") or "./") .. "pokes_spec.lua").append(pokes, os.getenv("POKES"))   -- #201: F and F1-F2 entries
 local frame, snaps = 0, 0
 -- WRITETAP (14z-112): "lo-hi" program-space range + WRITETAP_FRAMES "a-b".
 -- Logs each distinct (PC, address) WRITE in the window as

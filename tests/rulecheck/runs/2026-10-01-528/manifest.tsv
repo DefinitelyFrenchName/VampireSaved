@@ -1,0 +1,16 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/lua/pokes_spec.lua	09d54db556f899e2d3c021e730e7ab2319f35402
+tests/test_pokes_ranges.sh	c63ab98a3631d29a8d4401c6bdd0c09e94a69f79
+build/agent187b/t201/lua.diff	f3fa7b66131e31a097df7a9da917ddd742f988c2
+build/agent187b/t201/callers.diff	d0426a3ce727b1e4b16188a129d811cb64c2eea9
+build/agent187b/t201/census.diff	17a7d9616cfd4e6622c909fc0d09153c62579deb
+build/agent187b/t201/pokes_gate.log	ec46c716b76496c3028859b3252b3ad5fcda4b22
+build/agent187b/t201/pokes_mode.log	e7cd08ec9275845d43ad3f4a9759187b2af39f47
+build/agent187b/t201/results.tsv	eb254ddc3b86479a34367d0c0da89ccaa723ef6c
+build/agent187b/t201/audit_trap_shock.log	5e009b5ce33a7f9f5236cc63467611d2966ccf76
+build/agent187b/t201/sha.txt	c56236a28ecd941a856bcccf22f90b5aae66f6c8
+build/agent187b/t201/pair_check.py	8e67d0117e77d734ae329cabe2f521ceacb5e45f
+build/agent187b/t201/pair_check.txt	f34e64fb1e4db7c29645329fc2ad87c223338220
+build/agent187b/t201/pair_check_plant.txt	5e254279a4f010a093326275de931d3e4238f62f
+build/agent187b/t201/expected_status.txt	1ca749f1783668b2ec7531f80ac07b7a5dde5c4e
+build/agent187b/t201/sheet_compare.txt	4a83f4a243d4eb431572d473b4022d0828cfffab

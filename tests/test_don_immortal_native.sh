@@ -186,8 +186,8 @@ tapleg() {   # tapleg <name> <set> <rompath> <rpl file> <pokes> [mame_bin] — t
 # THE TWO PINS — one function each, used by every leg. The unmatched-modes mode
 # withholds the level from the native legs (vsav2 stays at its default, 8); the
 # unpinned-rng mode withholds the RNG pin from every leg.
-level_pokes() { python3 -c "print(';'.join(f'{f}:ff8116:$1' for f in range(2400, 2801)))"; }
-rng_pokes()   { python3 -c "print(';'.join(f'{f}:ff80d4:0000' for f in range(2400, 2801)))"; }
+level_pokes() { python3 -c "print(f'{2400}-{(2801)-1}:ff8116:$1')"; }
+rng_pokes()   { python3 -c "print(f'{2400}-{(2801)-1}:ff80d4:0000')"; }
 join_pokes() { _o=""; for _p in "$@"; do [ -n "$_p" ] && { [ -n "$_o" ] && _o="$_o;$_p" || _o="$_p"; }; done; echo "$_o"; }
 
 if [ -f "$RPDIR/vsavjw.zip" ]; then

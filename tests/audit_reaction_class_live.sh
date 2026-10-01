@@ -104,7 +104,7 @@ for leg in $LEGS; do
         for j in "$REPO"/tests/replays/naming/donovan_[0-9]*.json "$REPO"/tests/replays/naming/huitzil_[0-9]*.json "$REPO"/tests/replays/naming/pyron_[0-9]*.json; do
             name="$(basename "$j" .json)"; t="${name%_*}"
             fr="$(python3 -c "import json;print(json.load(open('$j'))['frames'])")"
-            pk="$(python3 -c "import json;print(';'.join(json.load(open('$j'))['pokes']))");$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$fr)))");$(python3 -c "print(';'.join(f'{f}:ff80d4:0000' for f in range(2363,$fr)))")"
+            pk="$(python3 -c "import json;print(';'.join(json.load(open('$j'))['pokes']))");$(python3 -c "print(f'{2000}-{($fr)-1}:ff8116:06')");$(python3 -c "print(f'{2363}-{($fr)-1}:ff80d4:0000')")"
             if [ "$leg" = native ]; then
                 tap_run native "$name" vsav2 "$ROMDIR" "${j%.json}.rpl" "$pk" "$fr"
             else

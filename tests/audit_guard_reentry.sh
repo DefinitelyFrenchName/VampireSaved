@@ -87,7 +87,7 @@ PY
 ) > "$W/gen.log" 2>&1 || { bad "rig generation: $(tail -1 "$W/gen.log")"; }
 [ "$fail" = 0 ] || { echo "FAIL: audit_guard_reentry"; exit 1; }
 grep -v -E '^(1100|1160|1220|1280)-[0-9]+ p1=' "$W/rig.rpl" > "$W/demitri.rpl"
-PK="$(python3 -c "import json;print(';'.join(json.load(open('$W/rig.json'))['pokes']))");$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$FR)))");$(python3 -c "print(';'.join(f'{f}:ff80d4:0000' for f in range(2363,$FR)))")"
+PK="$(python3 -c "import json;print(';'.join(json.load(open('$W/rig.json'))['pokes']))");$(python3 -c "print(f'{2000}-{($FR)-1}:ff8116:06')");$(python3 -c "print(f'{2363}-{($FR)-1}:ff80d4:0000')")"
 python3 -c "import json;print(' '.join(str(e['frame']) for e in json.load(open('$W/rig.json'))['events'][:3]))" > "$W/ev.txt"
 [ "$(cat "$W/ev.txt")" = "$EVENTS" ] || bad "the generated events start at $(cat "$W/ev.txt"), not $EVENTS — the schedule moved"
 [ "$fail" = 0 ] || { echo "FAIL: audit_guard_reentry"; exit 1; }
@@ -192,7 +192,7 @@ echo "== 2b. the victim acts at its first possible frame (the maintainer's test,
 # attack state (seq 0x0A) at +35 on vsav2, vsavj and ours, both holds. Ruled: "agreed, all the tests
 # converge : it's identical" (DECISIONS_HISTORY.md, the 14z-168 captures entry).
 AFR=3760
-APK="$(python3 -c "import json;print(';'.join(json.load(open('$W/rig.json'))['pokes']))");$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$AFR)))");$(python3 -c "print(';'.join(f'{f}:ff80d4:0000' for f in range(2363,$AFR)))")"
+APK="$(python3 -c "import json;print(';'.join(json.load(open('$W/rig.json'))['pokes']))");$(python3 -c "print(f'{2000}-{($AFR)-1}:ff8116:06')");$(python3 -c "print(f'{2363}-{($AFR)-1}:ff80d4:0000')")"
 for hold in 3661 3690; do for ph in 0 1; do
     { grep -v -E '^(3660-3661|3662-3663|3664-3667|3636-3661) p1=' "$W/demitri.rpl" | grep -v -E '^[0-9]+ wait$'
       echo "3636-$hold p1=L"; f=$((3662 + ph)); while [ $f -lt 3740 ]; do echo "$f-$f p1=1"; f=$((f + 2)); done

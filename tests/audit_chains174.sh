@@ -108,7 +108,7 @@ for name in ("a", "a2", "b", "c", "proj"):
 PY
     fr="$(python3 -c "import json;print(json.load(open('$RIGS/${t}_c174.json'))['frames'])")"
     base="$(python3 -c "import json;print(';'.join(json.load(open('$RIGS/${t}_c174.json'))['pokes']))")"
-    pins="$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$fr)) + ';' + ';'.join(f'{f}:ff80d4:${RNG_WORD:-0000}' for f in range(2363,${RNG_UNTIL:-$fr})))")"
+    pins="$(python3 -c "print(f'{2000}-{($fr)-1}:ff8116:06' + ';' + f'{2363}-{(${RNG_UNTIL:-$fr})-1}:ff80d4:${RNG_WORD:-0000}')")"
     eval "cur=\$OURS_PATH_$t"
     cp "$RIGS/${t}_c174.rpl" "$W/$t.native.rpl"
     awk -v p="$cur" '

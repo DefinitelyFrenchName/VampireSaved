@@ -118,10 +118,7 @@ local started, stopped = nil, nil
 local cpu = machine.devices[":maincpu"]
 local program = cpu.spaces["program"]
 local pokes = {}
-for spec in (os.getenv("POKES") or ""):gmatch("[^;]+") do
-    local fr, addr, hexs = spec:match("^(%d+):(%x+):(%x+)$")
-    if fr then pokes[#pokes + 1] = { tonumber(fr), tonumber(addr, 16), hexs } end
-end
+dofile((debug.getinfo(1, "S").source:match("^@(.*/)") or "./") .. "pokes_spec.lua").append(pokes, os.getenv("POKES"))   -- #201: F and F1-F2 entries
 
 emu.register_frame_done(function()
     frame = frame + 1

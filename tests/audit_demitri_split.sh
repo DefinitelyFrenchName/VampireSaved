@@ -57,7 +57,7 @@ grep '^chain ' "$W/census.txt" | sed 's/^/static\t/' > "$W/static.tsv"
 ok "$(wc -l < "$W/static.tsv" | tr -d ' ') differing chains listed"
 
 echo "== 2. Chaos Flare on pristine vsavj and vsav2 (Demitri P1, Victor P2)"
-PK="$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,3800)) + ';' + ';'.join(f'{f}:ff80d4:0000' for f in range(2363,3800)))")"
+PK="$(python3 -c "print(f'{2000}-{(3800)-1}:ff8116:06' + ';' + f'{2363}-{(3800)-1}:ff80d4:0000')")"
 for g in vsavj vsav2; do
     d="$W/$g"; mkdir -p "$d"
     ( cd "$d" && MAME_SANDBOX="$d/sb" MAME_ROMPATH="$ROMDIR" REPLAY="$REPO/tests/replays/dmg192/chaos_flare.rpl" POKES="$PK" \

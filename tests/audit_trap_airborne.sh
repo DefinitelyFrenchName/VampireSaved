@@ -61,7 +61,7 @@ W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0; ok() { printf '  ok    %s\n' "$1"; }; bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
 JUMP=3490
 SWEEP_JUMPS="${SWEEP_JUMPS:-3466 3470 3474 3480 3486}"   # override to re-run the 14z-181 census: every press 3440-3499 (build/agent181/trap_airborne_sweep_14z181.txt)
-PK="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10;1400:ff8b82:03;1450:ff8b82:03;1500:ff8b82:03;$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,3640)))");$(python3 -c "print(';'.join(f'{f}:ff80d4:0000' for f in range(2363,3640)))")"
+PK="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10;1400:ff8b82:03;1450:ff8b82:03;1500:ff8b82:03;$(python3 -c "print(f'{2000}-{(3640)-1}:ff8116:06')");$(python3 -c "print(f'{2363}-{(3640)-1}:ff80d4:0000')")"
 # legs <dir> <jump>: the two legs of the trap rig with P2 up at <jump>, traces at <dir>/{native,merged}.ft
 legs() {
     _d="$1"; _j="$2"; mkdir -p "$_d"

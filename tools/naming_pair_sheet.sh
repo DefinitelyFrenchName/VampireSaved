@@ -47,7 +47,7 @@ if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; tra
 FRAMES="$(printf '%s\n' "$@" | sed 's/^[^:]*://' | tr '\n' ',' | tr -s ',' | sed 's/,$//')"
 FR=$(python3 -c "print(max(int(x) for x in '$FRAMES'.split(','))+2)")
 base="$(python3 -c "import json;print(';'.join(json.load(open('$J'))['pokes']))")"
-pins="$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$FR)) + ';' + ';'.join(f'{f}:ff80d4:0000' for f in range(2363,$FR)))")"
+pins="$(python3 -c "print(f'{2000}-{($FR)-1}:ff8116:06' + ';' + f'{2363}-{($FR)-1}:ff80d4:0000')")"
 cp "$R" "$W/native.rpl"
 awk -v cur="$CUR" '
     /^1104-1106 p2=R$/ && !done { n = split(cur, m, " "); t = 1100

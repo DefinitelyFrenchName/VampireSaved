@@ -91,7 +91,7 @@ fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
 FR=3900
-PK="3100:ff8509:03;3120:ff8509:03;$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$FR)))");$(python3 -c "print(';'.join(f'{f}:ff80d4:0000' for f in range(2363,$FR)))")"
+PK="3100:ff8509:03;3120:ff8509:03;$(python3 -c "print(f'{2000}-{($FR)-1}:ff8116:06')");$(python3 -c "print(f'{2363}-{($FR)-1}:ff80d4:0000')")"
 FIELDS="ff802e:b:df,ff8509:b:stock,ff8406:b:seq,ff8511:b:f111,ff8782:b:id,ff85c3:b:pow"
 # the tenants' vs2 EX inputs, as replay lines relative to the activation frame (measured 14z-168)
 ex_lines() {  # ex_lines <id> <t>

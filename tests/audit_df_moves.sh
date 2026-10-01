@@ -213,7 +213,7 @@ FIELDS="ff8509:b:stock,ff802e:b:df,ff850a:w:meter,ff890a:w:p2meter,ff8850:w:p2hp
 for part in $PARTS; do
     t="${part%_*}"; eval "path=\$OURS_PATH_$t"
     fr="$(python3 -c "import json;print(json.load(open('$W/$part.json'))['frames'])")"
-    pk="$(python3 -c "import json;print(';'.join(json.load(open('$W/$part.json'))['pokes']))");$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$fr)))");$(python3 -c "print(';'.join(f'{f}:ff80d4:0000' for f in range(2363,$fr)))")"
+    pk="$(python3 -c "import json;print(';'.join(json.load(open('$W/$part.json'))['pokes']))");$(python3 -c "print(f'{2000}-{($fr)-1}:ff8116:06')");$(python3 -c "print(f'{2363}-{($fr)-1}:ff80d4:0000')")"
     awk -v path="$path" '/^1104-1106 p2=R$/ && !done { n = split(path, m, " "); t = 1100
         for (i = 1; i <= n; i++) { printf "%d-%d p1=%s\n", t, t + 2, m[i]; t += 60 }; done = 1 }
         /^(1100|1160|1220|1280)-[0-9]+ p1=/ { next } { print }' "$W/$part.ours.rpl" > "$W/$part.ours.cur.rpl"
@@ -423,7 +423,7 @@ for l in open(f"{W}/got.tsv"):
     print(k, ",".join(str(x) for x in frames))
 PY
         fr="$(python3 -c "import json;print(json.load(open('$W/$part.json'))['frames'])")"
-        pk="$(python3 -c "import json;print(';'.join(json.load(open('$W/$part.json'))['pokes']))");$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$fr)))");$(python3 -c "print(';'.join(f'{f}:ff80d4:0000' for f in range(2363,$fr)))")"
+        pk="$(python3 -c "import json;print(';'.join(json.load(open('$W/$part.json'))['pokes']))");$(python3 -c "print(f'{2000}-{($fr)-1}:ff8116:06')");$(python3 -c "print(f'{2363}-{($fr)-1}:ff80d4:0000')")"
         while read -r k frames; do
             [ -n "$frames" ] || continue
             for leg in native ours; do
@@ -483,10 +483,10 @@ else echo "CONTROL FIRED: sword-poke-planted — a poke planted at T5+10 inside 
 [ -n "${FORM_EXTRA_POKES:-}" ] && echo "  PROBE  FORM_EXTRA_POKES in effect on the form legs: $FORM_EXTRA_POKES"
 for part in pyron_dfx1 donovan_dfx1; do
     fr="$(python3 -c "import json;print(json.load(open('$W/$part.json'))['frames'])")"
-    base="$(python3 -c "import json;print(';'.join(json.load(open('$W/$part.json'))['pokes']))");$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$fr)))")"
+    base="$(python3 -c "import json;print(';'.join(json.load(open('$W/$part.json'))['pokes']))");$(python3 -c "print(f'{2000}-{($fr)-1}:ff8116:06')")"
     if [ $part = pyron_dfx1 ]; then FL="2690,2700,2710,2730"; MX=2735; SEEDS="0000"; else FL="$(python3 -c "print(','.join(str(f) for f in range($T5-115,$T5+46)))")"; MX=$((T5+46)); SEEDS="0000 1234"; fi
     for seed in $SEEDS; do
-        pks="$base;$(python3 -c "print(';'.join(f'{f}:ff80d4:$seed' for f in range(2363,$MX)))")${FORM_EXTRA_POKES:+;$FORM_EXTRA_POKES}"   # FORM_EXTRA_POKES: a PROBE knob for attributing a form-row change to a rig write (never set in a gated run)
+        pks="$base;$(python3 -c "print(f'{2363}-{($MX)-1}:ff80d4:$seed')")${FORM_EXTRA_POKES:+;$FORM_EXTRA_POKES}"   # FORM_EXTRA_POKES: a PROBE knob for attributing a form-row change to a rig write (never set in a gated run)
         spr "$part.native.$seed" vsav2  "$ROMDIR" "$W/$part.native.rpl" "$pks" "$FL" "$MX"
         spr "$part.ours.$seed"   vsavjw "$BUILD/rompath;$ROMDIR" "$W/$part.ours.cur.rpl" "$pks" "$FL" "$MX"
     done
@@ -503,7 +503,7 @@ done
 for leg in native ours; do
     if [ $leg = native ]; then set_=vsav2; rp="$ROMDIR"; r="$W/donovan_dfx1.native.rpl"; else set_=vsavjw; rp="$BUILD/rompath;$ROMDIR"; r="$W/donovan_dfx1.ours.cur.rpl"; fi
     fr="$(python3 -c "import json;print(json.load(open('$W/donovan_dfx1.json'))['frames'])")"
-    pks="$(python3 -c "import json;print(';'.join(json.load(open('$W/donovan_dfx1.json'))['pokes']))");$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$fr)))");$(python3 -c "print(';'.join(f'{f}:ff80d4:0000' for f in range(2363,$T5+46)))")${FORM_EXTRA_POKES:+;$FORM_EXTRA_POKES}"
+    pks="$(python3 -c "import json;print(';'.join(json.load(open('$W/donovan_dfx1.json'))['pokes']))");$(python3 -c "print(f'{2000}-{($fr)-1}:ff8116:06')");$(python3 -c "print(f'{2363}-{($T5+46)-1}:ff80d4:0000')")${FORM_EXTRA_POKES:+;$FORM_EXTRA_POKES}"
     mkdir -p "$W/rng.$leg"
     ( set +e; cd "$W/rng.$leg" && MAME_SANDBOX="$W/rng.$leg/sb" MAME_ROMPATH="$rp" REPLAY="$r" POKES="$pks" RTAP=ff80d4,2 \
         WINDOW=$T5,$((T5+45)) FRAMES=$((T5+46)) TRACE_OUT="$W/rng.$leg.tap" \

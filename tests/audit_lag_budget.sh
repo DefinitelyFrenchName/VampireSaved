@@ -79,8 +79,8 @@ run() {  # run <part> <leg: build|ref>
             /^(1100|1160|1220|1280)-[0-9]+ p1=/ { next } { print }' "$_r" > "$_d/r.rpl"
     else cp "$_r" "$_d/r.rpl"; fi
     _b="$(python3 -c "import json;print(';'.join(json.load(open('$_j'))['pokes']))")"
-    _lv="$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$_fr)))")"
-    _rn="$(python3 -c "print(';'.join(f'{f}:ff80d4:0000' for f in range(2363,$_fr)))")"
+    _lv="$(python3 -c "print(f'{2000}-{($_fr)-1}:ff8116:06')")"
+    _rn="$(python3 -c "print(f'{2363}-{($_fr)-1}:ff80d4:0000')")"
     ( set +e; cd "$_d" && MAME_SANDBOX="$_d/sb" MAME_ROMPATH="$_rp" REPLAY="$_d/r.rpl" POKES="$_b;$_lv;$_rn" \
         FIELDS="ff8081:b:pc" FIELD_OUT="$_d/f.ft" FIELD_FROM=2540 FIELD_TO="$_fr" FRAMES="$_fr" \
         "$REPO/tools/run_mame.sh" vsavjw -autoboot_script "$REPO/tests/lua/field_trace.lua" > "$_d/mame.log" 2>&1

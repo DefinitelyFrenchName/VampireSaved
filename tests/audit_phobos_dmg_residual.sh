@@ -96,7 +96,7 @@ leg() {  # leg <part> <pin> <native|ours>
             for (i = 1; i <= n; i++) { printf "%d-%d p1=%s\n", t, t + 2, m[i]; t += 60 }; done = 1 }
             /^(1100|1160|1220|1280)-[0-9]+ p1=/ { next } { print }' "$_r" > "$_d/r.rpl"
     fi
-    _pk="$(python3 -c "import json;print(';'.join(json.load(open('$_j'))['pokes']))");$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$_fr)))");$(python3 -c "print(';'.join(f'{f}:ff80d4:$_v' for f in range(2363,$_fr)))")"
+    _pk="$(python3 -c "import json;print(';'.join(json.load(open('$_j'))['pokes']))");$(python3 -c "print(f'{2000}-{($_fr)-1}:ff8116:06')");$(python3 -c "print(f'{2363}-{($_fr)-1}:ff80d4:$_v')")"
     ( cd "$_d" && MAME_SANDBOX="$_d/sb" MAME_ROMPATH="$_rp" REPLAY="$_d/r.rpl" POKES="$_pk" \
         FIELDS="ff8450:w:p1hp,ff8782:b:id,ff8b82:b:p2id" FIELD_OUT="$_d/f.ft" FIELD_FROM=2300 FIELD_TO=$_fr FRAMES=$_fr \
         "$REPO/tools/run_mame.sh" $_set -autoboot_script "$REPO/tests/lua/field_trace.lua" > "$_d/mame.log" 2>&1; rm -rf "$_d/sb" ) </dev/null
@@ -105,7 +105,7 @@ leg() {  # leg <part> <pin> <native|ours>
 # both wheels, Victor's defense row byte-identical between the games — so the same +1 here is the two ENGINES'
 lleg() {  # lleg <pin> <vsavj|vsav2>
     _v="$1"; _g="$2"; _d="$W/legacy.$_v.$_g"; mkdir -p "$_d"; _fr=3600
-    _pk="$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$_fr)))");$(python3 -c "print(';'.join(f'{f}:ff80d4:$_v' for f in range(2363,$_fr)))")"
+    _pk="$(python3 -c "print(f'{2000}-{($_fr)-1}:ff8116:06')");$(python3 -c "print(f'{2363}-{($_fr)-1}:ff80d4:$_v')")"
     ( cd "$_d" && MAME_SANDBOX="$_d/sb" MAME_ROMPATH="$ROMDIR" REPLAY="$REPO/tests/replays/judge/04_demitri_5hp_victor.rpl" POKES="$_pk" \
         FIELDS="ff8850:w:p2hp,ff8782:b:id,ff8b82:b:p2id" FIELD_OUT="$_d/f.ft" FIELD_FROM=2300 FIELD_TO=$_fr FRAMES=$_fr \
         "$REPO/tools/run_mame.sh" $_g -autoboot_script "$REPO/tests/lua/field_trace.lua" > "$_d/mame.log" 2>&1; rm -rf "$_d/sb" ) </dev/null

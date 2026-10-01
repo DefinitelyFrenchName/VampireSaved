@@ -88,7 +88,7 @@ python3 "$REPO/tools/select_wheel.py" "$W/vj_da.bin" --set vsavj --json "$W/whee
 } > "$W/leilei.rpl"
 lfr=4200
 lpk="$(python3 -c "
-p=[f'{f}:ff8116:06' for f in range(2000,$lfr)]+[f'{f}:ff80d4:$SEED' for f in range(2363,$S)]
+p=[f'{2000}-{($lfr)-1}:ff8116:06']+[f'{2363}-{($S)-1}:ff80d4:$SEED']
 for t in (2800,3220,3640): p+=[f'{t-230}:ff8410:0228', f'{t-230}:ff8810:02d8']
 print(';'.join(p))")"
 leg() {  # leg <name> <set> <rompath> <rpl> <pokes> <frames> <rng pc>
@@ -105,7 +105,7 @@ for t in $TENANTS; do
     fr="$(python3 -c "import json;print(json.load(open('$RIGS/${t}_c174.json'))['frames'])")"
     pk="$(python3 -c "
 import json
-p=json.load(open('$RIGS/${t}_c174.json'))['pokes']+[f'{f}:ff8116:06' for f in range(2000,$fr)]+[f'{f}:ff80d4:$SEED' for f in range(2363,$S)]
+p=json.load(open('$RIGS/${t}_c174.json'))['pokes']+[f'{2000}-{($fr)-1}:ff8116:06']+[f'{2363}-{($S)-1}:ff80d4:$SEED']
 print(';'.join(p))")"
     awk -v p="$p" '/^1104-1106 p2=R$/ && !done { n = split(p, m, " "); t = 1100
         for (i = 1; i <= n; i++) { printf "%d-%d p1=%s\n", t, t + 2, m[i]; t += 60 }; done = 1 }

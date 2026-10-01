@@ -122,7 +122,7 @@ def gen(part, outdir, ablate=(), first_event=None):
 def run_leg(a, part, leg, rigdir, outdir, rompoke="", suffix=""):
     tenant = part.rsplit("_", 1)[0]
     j = json.load(open(f"{rigdir}/{part}.json")); fr = j["frames"]
-    pokes = ";".join(j["pokes"] + [f"{f}:ff8116:06" for f in range(2000, fr)] + [f"{f}:ff80d4:0000" for f in range(2363, fr)])
+    pokes = ";".join(j["pokes"] + [f"{2000}-{(fr)-1}:ff8116:06"] + [f"{2363}-{(fr)-1}:ff80d4:0000"])
     rpl = open(f"{rigdir}/{part}.rpl").read().splitlines(True)
     if leg == "ours":   # the merged wheel's path replaces P1's prologue (tests/audit_move_parity.sh rpl_for)
         new, done = [], False

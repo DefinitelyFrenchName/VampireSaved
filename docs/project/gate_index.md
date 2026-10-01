@@ -16,13 +16,13 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**411 scripts** — 110 ci_portable, 84 ci_static, 217 emulator-tier (run by name).
+**412 scripts** — 110 ci_portable, 84 ci_static, 218 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
 | [runner](#runner) | 39 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
-| [platform](#platform) | 38 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
+| [platform](#platform) | 39 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
@@ -139,6 +139,7 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 | `tests/test_null_build.sh` | test | ci_static | ROMDIR | M0 acceptance: the null-patch build reproduces vanilla vsavj bit-identically from reference inputs, deterministically. | M0 |
 | `tests/test_phasec_image.sh` | test | emulator | MAME, FBNeo, a build dir | Phase C step 2: the program image grows, and the extension is genuinely READ. | 14z-59g |
 | `tests/test_phasec_spaces.sh` | test | ci_static | ROMDIR | the address-space refactor must not move a byte. | 14z-123 |
+| `tests/test_pokes_ranges.sh` | test | emulator | MAME, ~1 min | a RANGE in the POKES grammar (F1-F2:addr:hex) writes exactly what its per-frame entries write, frame for frame (tests/lua/pokes_spec.lua, 14z-187b, GitHub #201). | 14z-187b |
 | `tests/test_readme_recording.sh` | test | emulator | MAME, a build dir, ~50 s | the README's "record it on MAME" command, run as written on this host's release MAME against the current merged romset, records a session the project replays frame for frame: | 14z-158 |
 | `tests/test_release_asset_shape.sh` | test | ci_portable | — | EVERY PUBLISHED ASSET IS SELF-SUFFICIENT, and the two emulator routes never travel together. ROM-free, no emulator, ~10 s. | 14z-149 |
 | `tests/test_release_binaries.sh` | test | emulator | MAME, FBNeo, a build dir, ~2 min | the PREBUILT emulator binaries for THIS host under release/emulators/{fbneo,mame}/<os-arch>/ (the build resource every release's emulator/bin/<os-arch>/ is hash-verified from; maintainer-ruled 2026-09-11: | 2026-09-11 |

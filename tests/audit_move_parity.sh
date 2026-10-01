@@ -184,8 +184,8 @@ OURS_PATH_donovan="D D DR DR"; OURS_PATH_huitzil="D D D"; OURS_PATH_pyron="D D D
 pokes_for() {  # pokes_for <tenant> <json> <leg> <frames>
     _t="$1"; _j="$2"; _leg="$3"; _fr="$4"
     _base="$(python3 -c "import json;print(';'.join(json.load(open('$_j'))['pokes']))")"
-    _lvl="$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$_fr)))")"
-    _rng="$(python3 -c "print(';'.join(f'{f}:ff80d4:${RNG_WORD:-0000}' for f in range(2363,${RNG_UNTIL:-$_fr})))")"
+    _lvl="$(python3 -c "print(f'{2000}-{($_fr)-1}:ff8116:06')")"
+    _rng="$(python3 -c "print(f'{2363}-{(${RNG_UNTIL:-$_fr})-1}:ff80d4:${RNG_WORD:-0000}')")"
     if [ "$_leg" = native ]; then
         # the unpinned-level control withholds the level from the NATIVE leg only
         if [ "$CONTROL" = unpinned-level ] || [ "${CTL_ONE:-}" = unpinned-level ]; then

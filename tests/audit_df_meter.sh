@@ -67,7 +67,7 @@ fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
 FR=3600
-PK="2560:ff8410:0228;2560:ff8810:02d8;2950:ff8509:03;3120:ff8410:0228;3120:ff8810:02d8;$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$FR)))")"
+PK="2560:ff8410:0228;2560:ff8810:02d8;2950:ff8509:03;3120:ff8410:0228;3120:ff8810:02d8;$(python3 -c "print(f'{2000}-{($FR)-1}:ff8116:06')")"
 FIELDS="ff850a:w:meter,ff8511:b:f111,ff8782:b:id"
 act_lines() {  # act_lines <game> <id>: the mode's activation at 3000
     if [ "$1" != vsav2 ]; then echo "3000-3004 p1=14"; return; fi

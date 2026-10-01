@@ -46,10 +46,7 @@ local program = cpu.spaces["program"]
 -- breakpoints (unlike GUARD_PROBE, STATE_HISTORY:5173) — the two are
 -- independent here.
 local pokes = {}
-for spec in (os.getenv("POKES") or ""):gmatch("[^;]+") do
-    local fr, addr, hexs = spec:match("^(%d+):(%x+):(%x+)$")
-    if fr then pokes[#pokes + 1] = { tonumber(fr), tonumber(addr, 16), hexs } end
-end
+dofile((debug.getinfo(1, "S").source:match("^@(.*/)") or "./") .. "pokes_spec.lua").append(pokes, os.getenv("POKES"))   -- #201: F and F1-F2 entries
 
 local out_path = os.getenv("CENSUS_OUT") or "fsm_census.txt"
 local max_frames = tonumber(os.getenv("FRAMES") or "") or 3600

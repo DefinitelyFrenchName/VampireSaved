@@ -93,7 +93,7 @@ leg() {  # leg <name> <extra pokes>   (background)
         "$REPO/tools/run_mame.sh" vsav2 -autoboot_script "$REPO/tests/lua/field_trace.lua" > "$W/$1/mame.log" 2>&1
       _st=$?; grep -q -E '^(FIELDSUMMARY|END )' "$W/$1.tr" 2>/dev/null && _st=0; echo $_st > "$W/$1/rc"; rm -rf "$W/$1/sb" ) </dev/null &
 }
-LVL6=";$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$FR)))")"
+LVL6=";$(python3 -c "print(f'{2000}-{($FR)-1}:ff8116:06')")"
 echo "== 1. the double-pass cadence on $PART, frames $FROM-$TO"
 leg lvl8 ""
 leg lvl6 "$LVL6"
