@@ -25,7 +25,9 @@ prompt files pasted VERBATIM, `record --session`, `resolve` on ONE line with one
    where native's is fire / knockdown; P2 class `0x51` native / `0x4F` ours; the candidate cause is the 14z-75
    remap in `build/manifest/pyron.toml`, unmeasured as the cause — the next step is a probe build with the byte
    restored, checked for the 14z-75 watchdog reset and against the captures; any fix changes how the move plays,
-   so it goes to the maintainer), #191 (Donovan's 2HK damage; next, a second legacy victim), #192 (Demitri's
+   so it goes to the maintainer), #191 (Donovan's 2HK damage; next, a second legacy victim; it was filed on rule-checker run 464, whose
+   reader grepped its six traces instead of reading them (procedure run 2026-10-01-498), so re-measure its
+   9-against-8 before relying on it), #192 (Demitri's
    Chaos Flare, vsavj against vsav2). Still queued: #133, #187/#188 (route A provisional), #189, #190 (P3 kept
    for later). The full list is `docs/project/tickets.md`.
 4. **SHELVED BY THE MAINTAINER:** the measurer/reader frontmatter change to Sonnet 5.5 at `xhigh`.
@@ -41,6 +43,9 @@ prompt files pasted VERBATIM, `record --session`, `resolve` on ONE line with one
   a side move of a fix is attributed by that split, never by one candidate for all.
 - `tools/homes_tracked.py`'s second positional is an OUTPUT file: pass the state file with `--state`.
 - A variant is compared against a control of the same script on the same build, never against a frozen table.
+- The close packet's checks are rebuilt at every close: start the next one from `build/agent186/close/checks.tsv`
+  and its four scripts (gotcha "THE CLOSE PACKET'S CHECKS ARE REBUILT AT EVERY CLOSE"); a reader may grep a
+  large artifact instead of reading it, so hand it the window the claim rests on (`docs/project/rule_checker.md`).
 
 ## WHAT CLOSED THIS SITTING (14z-186)
 

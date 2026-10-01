@@ -328,6 +328,14 @@ was handed. Nothing in the six-line verdict distinguishes a figure read from a f
 extract's `W#` line (QP3 over workers, S4 step 4) is what sees it, and the procedure check is where it
 is judged. A reader's evidence is therefore a pointer to check, never a measurement of its own.
 
+**A reader can grep a large artifact instead of reading it (measured 14z-186, procedure run
+`2026-10-01-498` QP5).** The prompt says "Read every named file yourself, in full"; the real readers of
+runs `2026-09-30-464` and `-467` ran pattern Greps over named MAME traces (six in run 464, two in run 467)
+and never read them, and run 464's OK is what cleared #191 for filing. Nothing in the six-line verdict
+shows how a file was read; the procedure check's `WT` lines are what see it. An OK on a packet whose
+large artifacts the reader only grepped is not a reading of them: hand the reader the script-written
+window the claim rests on as its own artifact, beside the full file.
+
 - **Operational slips.** A waiter wedged for hours is not a rule-application
   failure; it was not looking. The checker does not fix that.
 - **A premise nobody wrote down.** It can only ask whether the premise is

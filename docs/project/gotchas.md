@@ -1,5 +1,23 @@
 # GOTCHAS (project) — traps in OUR pipeline and method
 
+## THE CLOSE PACKET'S CHECKS ARE REBUILT AT EVERY CLOSE — start from the last close's checks file, not from the tools (paid: 14z-186, rule-checker runs 2026-09-30-486 to 2026-10-01-497)
+
+**What happened.** The 14z-186 documentation packet took twelve rule-checker rounds: 486 to 496 each VIOLATED
+on a true gap in the CLOSE'S OWN CHECKING, never in a finding or a home. In order: a promised item unchecked; a
+plant judged by its exit alone (a crash also exits 1); each check's output missing from the packet; a quote's
+file accepted as a home for the wrong finding letter; self-tests of the tools the run used left out of the run;
+exempted messages never shown; a plant too weak to tell a per-letter check from a whole-row one; the rulings
+tool's quote search including the loaded skill texts. Each was answered by a check with a plant that must fail.
+Four of them exist only as scratch, classed CLOSE-CHECK by `tools/scratch_census.py`: an evidence check (each
+finding quoted from a file the row names for THAT letter, and the row's sha1 equal to the packet's), a
+promise check (the flagged promise carried in START HERE), an exemption check (each exempted text is only its
+marker, read with `tools/agent/rulings_verbatim.py`'s own reader), and a quote-source check (each maintainer
+quote found with the exempted texts removed from the pool). The 14z-185b close had built its own evidence check.
+
+**The rule.** A close starts its checks file from the previous close's (`build/agent186/close/checks.tsv` and
+its four scripts, while they exist), with every plant, and runs the tools' self-tests in the same run of record.
+The tracked close tools do not yet carry these checks; until they do, each close pays to rebuild them.
+
 ## A FROZEN TABLE IS NOT THE CONTROL FOR A VARIANT RUN — run the unchanged form through the same script on the same build (paid: 14z-186, GitHub #183, rule-checker run 2026-09-30-480)
 
 **What happened.** #183's RNG forms B and C were run through scratch copies of three parity gates on merged-m21
