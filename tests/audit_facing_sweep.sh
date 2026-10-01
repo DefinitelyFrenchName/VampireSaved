@@ -95,7 +95,7 @@ leg() {  # leg <name> <set> <rompath> <rpl> <x pokes...>
     _n="$1"; _s="$2"; _rp="$3"; _rpl="$4"; shift 4; _p="$(pk "$@")"; mkdir -p "$W/$_n"
     ( cd "$W/$_n" && MAME_SANDBOX="$W/$_n/sb" MAME_ROMPATH="$_rp" REPLAY="$_rpl" POKES="$_p" FRAMES=$FR \
         RTAP=ff885c,2 WINDOW="$FROM,$FR" TRACE_OUT="$W/w_$_n.txt" \
-        "$REPO/tools/run_mame.sh" "$_s" -autoboot_script "$REPO/tests/lua/facing_tap.lua" > "$W/$_n/mame.log" 2>&1
+        "$REPO/tools/run_mame.sh" "$_s" -verbose -autoboot_script "$REPO/tests/lua/facing_tap.lua" > "$W/$_n/mame.log" 2>&1
       rm -rf "$W/$_n/sb" ) </dev/null &
 }
 i=0

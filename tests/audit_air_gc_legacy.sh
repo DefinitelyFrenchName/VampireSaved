@@ -106,7 +106,7 @@ tap() {  # tap <name> <set> <rompath> <rpl>   (background)
     mkdir -p "$W/$1"
     ( cd "$W/$1" && MAME_SANDBOX="$W/$1/sb" MAME_ROMPATH="$3" REPLAY="$4" POKES="$(pins)" FRAMES="$FR" \
         RTAP="$RT" WINDOW="0,0" TRACE_OUT="$W/$1.txt" \
-        "$REPO/tools/run_mame.sh" "$2" -autoboot_script "$REPO/tests/lua/read_tap.lua" > "$W/$1/mame.log" 2>&1
+        "$REPO/tools/run_mame.sh" "$2" -verbose -autoboot_script "$REPO/tests/lua/read_tap.lua" > "$W/$1/mame.log" 2>&1
       rm -rf "$W/$1/sb" ) </dev/null &
 }
 # ONE reducer, shared by the gate and every control ([VSP-181]): one leg's tap -> rows. Each field is ONE byte of its

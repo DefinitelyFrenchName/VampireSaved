@@ -101,7 +101,7 @@ for part in $PARTS; do
     FE="$(python3 -c "import json;print(json.load(open('tests/replays/naming/${part}.json'))['events'][0]['frame'])")"
     for leg in native ours; do
         ids="$(awk -v f="$FE" '$1=="F"&&$2==f{for(i=3;i<=NF;i++){split($i,a,"=");if(a[1]=="id"||a[1]=="p2id")printf "%s=%s ",a[1],a[2]}}' "$W/$part.$leg.ft")"
-        want="id=$((16#$ID)) p2id=1 "; [ "$ids" = "$want" ] && ok "$part $leg at f$FE: $ids" || bad "$part $leg at f$FE: $ids (want $want)"
+        want="id=$((0x$ID)) p2id=1 "; [ "$ids" = "$want" ] && ok "$part $leg at f$FE: $ids" || bad "$part $leg at f$FE: $ids (want $want)"
     done
     RAW=""; vs_ctl_is no-translation && RAW=--raw
     OURS="$W/$part.ours.ft"

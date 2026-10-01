@@ -95,7 +95,7 @@ leg() {  # leg <name> <set> <rompath> <rpl> <pokes> <frames> <rng pc>
     mkdir -p "$W/$1"
     ( cd "$W/$1" && MAME_SANDBOX="$W/$1/sb" MAME_ROMPATH="$3" REPLAY="$4" POKES="$5" FRAMES="$6" \
         RSTACKN=48 RTAP=ff80d4,2 RPCS="$7" WINDOW="$S,$6" TRACE_OUT="$W/rt_$1.txt" \
-        "$REPO/tools/run_mame.sh" "$2" -autoboot_script "$REPO/tests/lua/rng_draws.lua" > "$W/$1/mame.log" 2>&1
+        "$REPO/tools/run_mame.sh" "$2" -verbose -autoboot_script "$REPO/tests/lua/rng_draws.lua" > "$W/$1/mame.log" 2>&1
       rm -rf "$W/$1/sb" ) </dev/null &
 }
 leg leilei_vsavj vsavj  "$ROMDIR"             "$W/leilei.rpl" "$lpk" $lfr 14e8a
