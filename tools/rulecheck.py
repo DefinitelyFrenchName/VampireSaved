@@ -359,6 +359,19 @@ def cmd_prepare(a):
         if a.decision not in DECISIONS[:-1]:
             die(f"--decision must be one of {DECISIONS[:-1]}")
         decision, subject, claim = a.decision, a.subject, a.claim
+        # #185 item 3 (ruled 2026-10-01, 14z-187b): every universal/definite in the claim is tied to a named check in its
+        # sentence or sits under NOT TESTED (tools/claim_lint.py) — or the writer says why not, recorded in meta.tsv
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        try:
+            import claim_lint
+        except ImportError:
+            die("tools/claim_lint.py is missing beside rulecheck.py (#185 item 3)")
+        untied = claim_lint.lint(claim)
+        if untied and not a.untied_ok:
+            die("claim_lint (#185 item 3): " + str(len(untied)) + " universal/definite sentence(s) tied to no named check:\n"
+                + "\n".join(f"  UNTIED [{w}]: {c}" for w, c in untied)
+                + "\n  tie each to a check in its sentence (an artifact path, a `name`, a control's verdict), move it under"
+                  " NOT TESTED, or pass --untied-ok \"<why>\" (recorded in the run's meta.tsv)")
         family = decision_family(decision)
         real_packet = None
         # the plant, by rotation over the calibrated fixtures of THIS family, positive ones only
@@ -414,7 +427,8 @@ def cmd_prepare(a):
     (rdir / "meta.tsv").write_text(
         f"decision\t{decision}\nsubject\t{subject}\nsession\t{session}\nmodel\t{model}\nclaim\t{claim}\n"
         f"checklist\t{checklist_sha1(root, family)}\nfamily\t{family}\n"
-        f"questions\t{' '.join(FAMILIES[family][2])}\nreader\t{reader}\n" + (f"head\t{head}\n" if head else ""))
+        f"questions\t{' '.join(FAMILIES[family][2])}\nreader\t{reader}\n" + (f"head\t{head}\n" if head else "")
+        + (f"untied_ok\t{a.untied_ok}\n" if getattr(a, "untied_ok", None) else ""))
     print(f"prepared run {rid}")
     print(f"  prompts: {stage}/prompt_a.md and {stage}/prompt_b.md")
     print(f"  spawn TWO agents with subagent_type \"rule-checker\" and NO model parameter ({reader}; never a")
@@ -1114,6 +1128,7 @@ def main():
     p.add_argument("--decision"); p.add_argument("--subject"); p.add_argument("--claim")
     p.add_argument("--artifact", action="append")
     p.add_argument("--calibrate"); p.add_argument("--session"); p.add_argument("--model"); p.add_argument("--id")
+    p.add_argument("--untied-ok", help="#185 item 3: why an untied universal/definite stands (recorded in meta.tsv)")
     r = sub.add_parser("record"); r.add_argument("id"); r.add_argument("--a"); r.add_argument("--b")
     r.add_argument("--session"); r.add_argument("--transcript")
     s = sub.add_parser("resolve"); s.add_argument("id"); s.add_argument("--how", required=True)

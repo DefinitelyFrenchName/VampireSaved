@@ -1,0 +1,11 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tools/claim_lint.py	49fb35b90676ac6e016cfe06287b7ce43825023c
+tests/test_claim_lint.sh	ffed99a70b73901abd84d610af6c47855aaef6be
+build/agent187b/t185/wiring.diff	e6016ce7aa378c116a45bfee1864e8f93c59ebfd
+build/agent187b/t185/census.diff	ae95156cb75ef33b5142503d50dbbd657fe8cff7
+build/agent187b/t185/gate.log	a432474345549a38c1272806fbbefb9ffbc12c57
+build/agent187b/t185/mode_gap-ignored.log	e5ea8964aa4450e31a48a601b521ee57e0ced86c
+build/agent187b/t185/mode_frequency-read.log	85a2f79267e09726f6ec4f54808753e5cf901df2
+build/agent187b/t185/rule_checker_gate.log	11cfab5a0de09d8766f41b6c34d8bf3a6aaa5c2e
+build/agent187b/t185/refusal_probe.txt	99633f73dde999338e7b868433b47f2b836cf482
+build/agent187b/t185/backtest.txt	2d9f5e7c67292ca87a49ccef7ea1fe7951b6c855

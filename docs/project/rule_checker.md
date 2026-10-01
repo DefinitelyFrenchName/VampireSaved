@@ -52,6 +52,16 @@ kinds, each a `--decision` of `tools/rulecheck.py prepare`:
 | `recommendation` | a report or recommendation to the maintainer that proposes an action, closes a question, or attributes a decision to anyone |
 | `procedure` | (the PROCEDURE family, #172 S3) a push or a close: the session's working method, read from its transcript extract under the procedure questions below (QP1-QP4 from 14z-176, QP5 and the widened QP3 from 14z-178) |
 
+**The claim lint, before the packet (#185 item 3, ruled 2026-10-01, 14z-187b).** `prepare` refuses a real
+packet whose claim holds a universal or definite — `every`, `only`, `none`, `all`, `the one` — in a sentence that
+names no check (an artifact path, a backticked gate or control, a control's verdict) and does not sit under its NOT
+TESTED part (`tools/claim_lint.py`; a frequency such as "every 20 frames" and a quotation are not read). The writer
+ties it, moves it under NOT TESTED, or passes `--untied-ok "<why>"`, which the run's `meta.tsv` records. It lints, it
+does not judge truth. Backtested on runs 2026-10-01-512 to -529: it flags the sentence of run 518 that held the universal its reader found
+violated — but by that sentence's undisputed "every byte write verified"; the violated "each ... an own-value poke
+inert" is carried by `each`, which is not one of the five words (nor are `no`, `never`, `always`). Only a number or
+"other" after "every" makes a frequency; a quotation opens and closes at a word edge. Gate: `tests/test_claim_lint.sh`.
+
 **What goes in.** The packet is the decision kind, a SUBJECT, ONE claim
 sentence written by the working agent — what is claimed, what it rests on,
 and what was NOT tested — and the ARTIFACTS by repo-relative path: the diff,

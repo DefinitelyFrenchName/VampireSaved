@@ -13,11 +13,11 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**412 of 412 gates described.**
+**413 of 413 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
-| [runner](#runner) | 39 | 39 | the suite runners and their own ground truth |
+| [runner](#runner) | 40 | 40 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 39 | 39 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 58 | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -30,7 +30,7 @@ first sentence) is `gate_index.md`.
 
 ## runner
 
-the suite runners and their own ground truth. 39 of 39 described.
+the suite runners and their own ground truth. 40 of 40 described.
 
 ### `run_all_emulator.sh` — run, emulator
 
@@ -127,6 +127,14 @@ the suite runners and their own ground truth. 39 of 39 described.
 **HOW:** tools/audit_bg_leg_shape.py reads every `tests/*.sh` for a backgrounded group that captures `$?` under errexit and classes it SAFE or RISKY; the control deletes one real gate's `set +e` in a copy of the whole tests/ tree and audits that copy.
 
 **EXPECTS:** PASS when no group is RISKY; a red names the gate and the group. It does not claim the status file is USED or that the right subshell carries the `set +e` — only that a captured status cannot be lost.
+
+### `test_claim_lint.sh` — test, ci_portable
+
+**WHAT:** tools/claim_lint.py's verdicts mean what they say: a sentence holding every/only/none/all/the one is TIED by a path, a backticked name or a control's verdict in the same sentence (outside parentheses), or by sitting in the NOT TESTED part; a frequency ("every 20 frames") and a quotation are not read; anything else is UNTIED.
+
+**HOW:** the tool's --selftest (eighteen cases, one per rule); a REAL fixture — rule-checker run 2026-10-01-518's claim (tests/rulecheck/runs/2026-10-01-518/meta.tsv) — the sentence whose "each ... an own-value poke inert" its reader found VIOLATED must be reported UNTIED (by its undisputed "every byte write verified": `each` is not one of the five words, so the lint flags the SENTENCE, not that universal itself); three shadow copies with one perturbation each must fail the selftest; and THE WIRING: on a throwaway root carrying its own copy of the rule-checker's files, `tools/rulecheck.py prepare` is run on a real packet whose claim holds an untied universal — it must refuse and leave no run directory; the same packet with --untied-ok must be prepared and its meta.tsv must record the reason.
+
+**EXPECTS:** SELFTEST PASS; run 518's first sentence UNTIED; each control's copy SELFTEST FAIL on its own case; prepare REFUSED (no run directory) without --untied-ok, PREPARED with it (an untied_ok row); a copy of rulecheck.py with the lint call removed PREPARES the untied packet, so the refusal is the lint's.
 
 ### `test_close_checks.sh` — test, ci_portable
 

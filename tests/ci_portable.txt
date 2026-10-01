@@ -321,3 +321,6 @@ test_superseded_pins
 # 14z-185b (#150): every numbered expectation set loses nothing its predecessor held, and the committed freeze
 # driver carries, pins, verifies and cleans up in order (tools/freeze_set_shape.py, tools/freeze_expectation_set.py); seven controls. ~3 s.
 test_freeze_set_shape
+# #185 item 3: every universal/definite in a rule-checker claim is tied to a named check or the NOT TESTED part
+# (tools/claim_lint.py, wired into rulecheck prepare); a real fixture (run 2026-10-01-518); four controls. ~2 s.
+test_claim_lint

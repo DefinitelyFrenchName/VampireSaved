@@ -81,6 +81,7 @@ declares	test_charmap_overrides
 declares	test_checkdocs
 declares	test_checkdocs_rom
 declares	test_checkskills
+declares	test_claim_lint
 declares	test_close_checks
 declares	test_close_loop_cost
 declares	test_close_tools

@@ -1,0 +1,16 @@
+THE PACKET
+
+Decision kind: build
+Subject: #185 item 3: the claim lint before the rule-checker (tools/claim_lint.py, wired into rulecheck prepare)
+Claim (the working agent's sentence): #185 item 3 is built: tools/claim_lint.py reports a sentence of a rule-checker claim that holds every/only/none/all/the one with no named check in it and not under its NOT TESTED part, and tools/rulecheck.py prepare now refuses such a real packet unless --untied-ok records why (t185/wiring.diff; the refusal shown live, before any run directory is made, in t185/refusal_probe.txt). Evidence: the selftest's fifteen cases pass and the real fixture — run 2026-10-01-518's claim, whose reader found VIOLATED the universal "every byte write verified and an own-value poke inert" — has exactly that sentence reported UNTIED (t185/gate.log PASS); the controls gap-ignored and frequency-read FIRED in-gate and each FAILs the gate as a mode (t185/mode_gap-ignored.log, t185/mode_frequency-read.log); the backtest over runs 2026-10-01-512 to -529 is in t185/backtest.txt; test_rule_checker still passes with its eight controls firing after its throwaway root was given claim_lint.py (t185/rule_checker_gate.log); the new gate is registered and frozen into the description and must-fire censuses (t185/census.diff). NOT tested: whether the lint lowers the number of rule-checker rounds (no run has been prepared through it yet); its precision on future claims — on the backtest the readers passed runs whose claims still held untied universals (runs 523 and 526), so a flagged sentence is not necessarily false; procedure-kind packets, which go through the same refusal and were not tried; any claim wording outside the five words the ruling names (each, no, never, always are not read).
+Artifacts (read every one, in full):
+  - tools/claim_lint.py
+  - tests/test_claim_lint.sh
+  - build/agent187b/t185/wiring.diff
+  - build/agent187b/t185/census.diff
+  - build/agent187b/t185/gate.log
+  - build/agent187b/t185/mode_gap-ignored.log
+  - build/agent187b/t185/mode_frequency-read.log
+  - build/agent187b/t185/rule_checker_gate.log
+  - build/agent187b/t185/refusal_probe.txt
+  - build/agent187b/t185/backtest.txt

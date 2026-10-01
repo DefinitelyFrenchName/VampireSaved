@@ -1,0 +1,19 @@
+THE PACKET
+
+Decision kind: build
+Subject: #185 item 3: the claim lint before the rule-checker (after runs 530-531)
+Claim (the working agent's sentence): #185 item 3 is built: tools/claim_lint.py reports a sentence of a rule-checker claim that holds every/only/none/all/the one with no named check in it and not under its NOT TESTED part, and tools/rulecheck.py prepare now refuses such a real packet unless --untied-ok records why (t185/wiring.diff); the gate drives prepare on a throwaway root and requires the untied packet REFUSED with the runs directory unchanged, and PREPARED with --untied-ok with the reason in its meta.tsv (t185/gate.log, the wiring section). Evidence: the selftest's eighteen cases pass, and on the real fixture — run 2026-10-01-518's claim, whose reader found VIOLATED its "each ... an own-value poke inert" (t185/run518_verdict_real.txt, Q1) — the sentence holding that universal is reported UNTIED, but by its undisputed "every byte write verified": `each` is not one of the five words, so the lint flagged the sentence, not the violated universal itself (t185/gate.log PASS); a quotation is read only between word edges (two possessives are not a quotation) and only a number or "other" after "every" makes a frequency; the controls gap-ignored, frequency-read, possessive-quote (the old quotation pattern, which dropped "every" between two possessives) and lint-unwired (a copy of rulecheck.py whose prepare never calls the lint, which then prepares the untied packet) FIRED in-gate and each FAILs the gate as a mode (t185/mode_*.log); the backtest over runs 2026-10-01-512 to -529 is in t185/backtest.txt; test_rule_checker still passes with its eight controls firing after its throwaway root was given claim_lint.py (t185/rule_checker_gate.log); the new gate is registered and frozen into the description and must-fire censuses (t185/census.diff). NOT tested: whether the lint lowers the number of rule-checker rounds (runs 2026-10-02-530, -531 and this one have gone through it — too few to measure); its precision on future claims — on the backtest the readers passed runs whose claims still held untied universals (runs 523 and 526), so a flagged sentence is not necessarily false; procedure-kind packets, which go through the same refusal and were not tried; recall outside the five words the proposal names (t185/ruling.txt): a universal carried by each, no, never or always passes unseen, as run 518's violated one would have; and any other exclusion pattern not covered by a selftest case.
+Artifacts (read every one, in full):
+  - tools/claim_lint.py
+  - tests/test_claim_lint.sh
+  - build/agent187b/t185/wiring.diff
+  - build/agent187b/t185/census.diff
+  - build/agent187b/t185/gate.log
+  - build/agent187b/t185/mode_gap-ignored.log
+  - build/agent187b/t185/mode_frequency-read.log
+  - build/agent187b/t185/mode_lint-unwired.log
+  - build/agent187b/t185/mode_possessive-quote.log
+  - build/agent187b/t185/rule_checker_gate.log
+  - build/agent187b/t185/backtest.txt
+  - build/agent187b/t185/run518_verdict_real.txt
+  - build/agent187b/t185/ruling.txt
