@@ -1,5 +1,17 @@
 # GOTCHAS (project) — traps in OUR pipeline and method
 
+## A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
+
+`tools/audit_latch_readers.py` finds a displacement's extension word and decodes backwards from 1, 2 or 3 words before
+it. It stopped at the FIRST decodable instruction (`# the nearest decodable opcode wins`). In an immediate store,
+`move.b #$1,$117(a6)` = `1d7c 0001 0117`, the pair `0001 0117` decodes on its own as `ori.b #$17,d1`, so the real
+opcode two words back was never reached: the census missed EVERY immediate store — eleven latch writers over the
+three images, among them a vs2 clear of the flavor latch and the port's own four flavor writes. It stood since 14z-161
+because every positive control of its `--selftest` was a register or memory form; no control was an immediate store.
+Found only when the same method, reused for #195's `+0x117`, missed its own positive control (vs2 `0x0239EE`).
+
+**The rule:** an anchored backward decode keeps going until a decode NAMES the anchored operand; and a census's
+positive controls include one site of every operand form it claims to see (register, memory, immediate, absolute).
 ## A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
 
 #192's expectation freezes Chaos Flare's node timing on TWO events of one replay (frames 3000 and 3400). The first
@@ -5854,6 +5866,13 @@ changed, and this defect is about what is around it.
 that is structure, and structure is all a gate can see here. Whether a sentence
 is comprehensible to someone who has never seen the project is a maintainer
 judgement, which is why #146 was closed on the maintainer's word and not on ours.
+
+**Paid again, 14z-187b (#171).** #171 left the maintainer a family-by-family review of the gate descriptions
+(`docs/project/gate_coverage.md`, 411 gates). The maintainer: *"while I technically understand what is written, I often
+either lack the references or the detailed context to make proper rulings"* — the descriptions are written for the
+reader of the gate, not for a ruler of it. #171 closed with the review withdrawn; a review handed to the maintainer
+carries its references and context in the packet (what the gate replaced, what it protects, the measurement behind
+each figure), or it is not handed over at all and the gaps are caught where they surface.
 
 ## WHEN A RULE-CHECKER PACKET ATTRIBUTES A DECISION, THE DECISION RECORD IS AN ARTIFACT — otherwise Q5 is VIOLATED and it is right to be (paid: 14z-174, run 2026-09-21-90)
 

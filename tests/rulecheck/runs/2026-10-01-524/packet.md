@@ -1,0 +1,17 @@
+THE PACKET
+
+Decision kind: expectation
+Subject: #197: latch-readers census learns immediate stores; tests/expected/latch_readers.tsv re-frozen (+11 rows)
+Claim (the working agent's sentence): tests/expected/latch_readers.tsv re-frozen with 11 added rows and nothing else changed (t197/freeze.diff), after fixing GitHub #197: tools/audit_latch_readers.py stopped its backward decode at the first DECODABLE opcode, so an immediate store (move.b #n,$off(An), whose last two words decode alone as ori.b) was never reached; it now stops at the first decode that NAMES the offset (t197/tool_gate.diff). The 11 rows, each read from the disassembly (t197/sites.dis): vs2 0x00712A and 0x007138 (+0x3E0 := 1, or 5 when +0x381 is set) and vsavj 0x00895C / 0x00896A (the same), inside a run of field clears; vs2 0x007A78 (+0x3C2 := 0 via a0, in a block init); the merged build's copies of vsavj's two (same addresses); and the merged build's four flavor writes at 0x4D488A-0x4D48E2 (the port's own start-hold flavor thunk: id 0x13 Donovan 1, or 0 with that player's Start bit held; id 0x10 Phobos 0, or 1 with it held). The census is otherwise unchanged on all three images (no row removed or altered). Controls: the tool's --selftest now includes one immediate-store positive control per reference image (vs2 0x00712A, vsavj 0x00895C), both found; a new must-fire control nearest-decode runs a copy with the pre-fix scan and FIRES in-gate on exactly the immediate store vs2 PRG:0x00712A, and FAILs the gate as a mode; blind-census and dropped-reader still fire, and all three modes FAIL the gate on the final files (t197/verify.log PASS, t197/mode_*.log, t197/final_sha.txt). NOT tested: whether any new row changes a conclusion drawn from the census (#151's forced-pick fidelity, the atlas READERS lists) — the 11 are writers, and the census's readers are unchanged; that the new writers execute in play (no tap; the init reading is from the code); operand forms other than the ones the controls cover (register/memory displacement, abs.l, immediate — e.g. indexed (d8,An,Xn) forms naming the offset are not searched); other tools sharing the pattern (searched: no other tool under tools/ has the backward-decode loop).
+Artifacts (read every one, in full):
+  - tests/expected/latch_readers.tsv
+  - build/agent187b/t197/freeze.diff
+  - build/agent187b/t197/tool_gate.diff
+  - build/agent187b/t197/verify.log
+  - build/agent187b/t197/mode_nearest.log
+  - build/agent187b/t197/mode_blind.log
+  - build/agent187b/t197/mode_dropped.log
+  - build/agent187b/t197/sites.dis
+  - build/agent187b/t197/final_sha.txt
+  - tools/audit_latch_readers.py
+  - tests/test_latch_readers.sh

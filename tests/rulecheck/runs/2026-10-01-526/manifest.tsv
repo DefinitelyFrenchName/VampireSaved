@@ -1,0 +1,11 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/expected/latch_readers.tsv	454e4f463816075b61b815dc85033201d722b019
+build/agent187b/t197/freeze.diff	dc47d55b57130f9b070dcd62ff1e27f68a7aebcf
+build/agent187b/t197/tool_gate.diff	75872deba92d94ccf5252683266deac6a144fa53
+build/agent187b/t197/run_verify.log	d5ba757a48484967b7a1517a7b9bad47882c5687
+build/agent187b/t197/run_nearest-decode.log	f618939902b2d1a674eb2b137ac57ad82cb57a9f
+build/agent187b/t197/run_blind-census.log	1aa90e450d4da0df2b01778e0549fe087a776cdd
+build/agent187b/t197/run_dropped-reader.log	f33f628f8fd28c5b1fe2898daecf69e81cb8dcf3
+build/agent187b/t197/sites.dis	2b9e5eee46c97d6a7762f6ce0ef9a22b6d500f63
+tools/audit_latch_readers.py	d04554d4937b6b7749a82a4117647065b2ac3f36
+tests/test_latch_readers.sh	3f0d5130f87292708c141be9fbcd4b7cc887794e

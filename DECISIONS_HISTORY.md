@@ -173,6 +173,34 @@ retraction grep covers this file.
 **What it means.** `P2_REPORT` (`tools/name_moves.py`) lists a2:0x04, a2:0x05 and a2:0x0a beside b:0x10, their frame counts asserted equal on both legs by `tests/audit_move_parity.sh` (PASS, ALL=1); the rigs regenerated (every `.rpl` byte-identical, the JSONs' `p2.report` alone changed; naming, chains174, chains184). Forbidding them — re-authoring the guard-cancel rigs so P2 attacks with an equal-record chain — is #198.
 ---
 
+## Ruled 2026-10-01 (14z-187b) — #171 closed `done`: the family review of the gate descriptions is not the maintainer's to do; gaps keep being caught as they surface
+
+**The question, verbatim (the session's message, after the status of #171, #185, #187-#190):** *"What's left is your family-by-family review of the gate descriptions in `gate_coverage.md`. **Do you want to do that review, or close #171 as done with it left optional?**"*
+
+**The maintainer, verbatim:** *"Yes, add that to the plan and the plan is validated. I also want to add that I tried to do the review for #171 but while I technically understand what is written, I often either lack the references or the detailed context to make proper rulings so let's close #171 and continue catching gaps and inconsistencies as we have recently."*
+
+**What it means.** #171 closes `done`: every ruled slice is built and gated (Q0-Q6, 14z-180; the 73 poke read-back rows classed 14z-181), and the family review it left to the maintainer is withdrawn — a review needs the references and context the descriptions do not carry. Gaps and inconsistencies in the gates keep being caught as they surface (the rule-checker, the census gates, the close), each as its own ticket. The same message validated the plan: the #195 hook design, then the ticket and fix design for the 128 KiB pokes limit, the ERIS tier folding into the close, #188's traced test on ERIS after it, and #187/#189/#190 closed at this session's close.
+---
+
+## Ruled 2026-10-01 (14z-187b) — #185 item 3 (a claim lint before the rule-checker): agreed, after the current plan; the judgement tables carry no proposal
+
+**The question, verbatim (the session's message):** *"Item 3, a claim lint before the rule-checker that would flag "every / only / none", **awaits your ruling.** So do the hand-written judgement tables named in its findings."*
+
+**The maintainer, verbatim:** *"Also, about #185 I agree with the item 3 proposal, to be done after the current plan. As for the "So do the hand-written judgement tables named in its findings." onto which I should rule, I don't see them referenced in the ticket."*
+
+**What it means.** Item 3 is built after the plan validated the same day (#195's hook design, the pokes-limit ticket and design, the close): every universal or definite in a packet ("every", "only", "none", "all", "the one") tied to a named check or a NOT TESTED line before the rule-checker reads it. The judgement tables (the walker table, the READ/MENTION table, the NOT PROMOTED reasons) are named in #185 only among the FINDINGS, with no avenue proposed for them, so there is nothing to rule: the 2026-09-29 comment's "awaiting rulings … and the hand-written judgement tables" overstated it, and the session repeated it unchecked. Read 2026-10-01: the NOT PROMOTED reasons are checked by `tools/scratch_census.py` (#190 P4, a class and a reason per row); the walker table reconstructed a past run, the job #189's run record now does (coverage of its rows not verified); the READ/MENTION table has no tool (not verified what replaced it).
+---
+
+## Ruled 2026-10-01 (14z-187b) — #195: option A (two small hooks); Donovan's deity states in scope — in this work if they use the same hooks, a separate ticket otherwise
+
+**The question, verbatim (the session's message):** *"**Option A, my recommendation: two small hooks.**"* (a hit-time mark when the hitting record is one of the remapped-from-0x51 ones; the knockdown tail's 8-byte `move.l` at vsavj `0x24D92` replaced by a `jsr` that does it and sets `+0x117` on a marked victim) against *"**Option B:** restore class 0x51 in the data and teach vsavj's dispatcher about it"*, and *"should Donovan's deity states be in scope, measured first and included only if native allows a pursuit after them, or Cosmo only?"*
+
+**The maintainer, verbatim:** *"I prefer option A as it touches less code and I doubt the two hook would significnatly impact performance (which we can confirm)
+Yes, Donovan's deity states should be in scope. However, if they would rely on the same hooks they are in direct scope and should be included to the work at the same time we address Pyron. But if it's a similar but different case for Donovan, we should put it in scope, but as a separate ticket"*
+
+**What it means.** #195 is built as option A, its cost measured against the performance rule. Before building, the session measures whether Donovan's six vs2 class-0x51 records (character records 33-38) reach the same writer and the same knockdown tail as Cosmo's projectile record: if they do, they join the hooks' list in this work; if their path differs, they get their own ticket.
+---
+
 ## Ruled 2026-09-30 (14z-186) — two tickets found under #184: Donovan's 2HK damage (#191) and Change Immortal's one-frame timing
 
 **The question, verbatim:** *"Should the 2HK damage and the Change Immortal timing become tickets? I'd put each through the rule-checker before filing."*

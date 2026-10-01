@@ -32,7 +32,9 @@ POSITIVE CONTROLS (--selftest): the sites the atlas already names must be found
 with the stated class — vs2 `PRG:0x01F6CE` / `0x01F6C8` (writes of the copies),
 `0x01F848` (the flavor write), `0x026322` / `0x02595A` / `0x02598A` (flavor
 reads); vsavj `0x020AC8` (the copy), `0x00A782` (`$3bd` read), `0x00AF1C`
-(`$3bc(a0)`). A census that misses a known site is blind and says so.
+(`$3bc(a0)`); and an IMMEDIATE store on each game, vs2 `0x00712A` / vsavj `0x00895C`
+(`move.b #$1,$3e0(a6)`, #197 — the census missed every immediate store until 14z-187b). A census that misses a
+known site is blind and says so.
 
 Usage:
   audit_latch_readers.py <opcodes.bin> [--label vs2] [--tsv out.tsv] [--selftest vs2|vsavj]
@@ -127,6 +129,7 @@ def main():
             if ins is None or ins.size < (back + 1) * 2:
                 continue
             ops = [o.strip() for o in ins.op_str.split(",")] if ins.op_str else []
+            named = False
             for kind, val in cands:
                 for oi, o in enumerate(ops):
                     hit = None
@@ -139,13 +142,19 @@ def main():
                     else:
                         if f"${val:x}" in o or f"${val & 0xFFFFFF:x}" in o:
                             hit = (abs_want[val], o)
+                    if hit:
+                        named = True
                     if hit and (addr, oi) not in seen:
                         seen.add((addr, oi))
                         off, o = hit
                         width = ins.mnemonic.split(".")[1] if "." in ins.mnemonic else "?"
                         cls = classify(ins.mnemonic, ins.op_str, oi, len(ops))
                         rows.append((addr, off, OFFS[off], cls, width, ins.mnemonic, ins.op_str))
-            break  # the nearest decodable opcode wins; a farther one would straddle it
+            # the nearest decode that NAMES the offset wins (GitHub #197, 14z-187b): an immediate store
+            # `move.b #n,$off(An)` (1d7c 00nn 0off) has a nearer decodable pair (`00nn 0off` = `ori.b`) that does
+            # not name it, and stopping there missed every immediate store
+            if named:
+                break
     rows.sort()
     lab = a.label or a.image
     print(f"== {lab}: {len(rows)} instruction operands name a latch offset")
@@ -160,9 +169,10 @@ def main():
                 f.write(f"0x{addr:06X}\t0x{off:03X}\t{what}\t{cls}\t{width}\t{mn}\t{ops}\n")
     if a.selftest:
         ctl = {"vs2": [(0x01F6CE, 0x3BD, "write"), (0x01F6C8, 0x3E0, "write"), (0x01F848, 0x3C2, "write"),
-                       (0x026322, 0x3C2, "read"), (0x02595A, 0x3C2, "read"), (0x02598A, 0x3C2, "read")],
+                       (0x026322, 0x3C2, "read"), (0x02595A, 0x3C2, "read"), (0x02598A, 0x3C2, "read"),
+                       (0x00712A, 0x3E0, "write")],   # an IMMEDIATE store, move.b #$1,$3e0(a6) (#197)
                "vsavj": [(0x020AC8, 0x3BD, "write"), (0x020ACE, 0x3E3, "write"), (0x00A782, 0x3BD, "read"),
-                         (0x00AF1C, 0x3BC, "read")]}[a.selftest]
+                         (0x00AF1C, 0x3BC, "read"), (0x00895C, 0x3E0, "write")]}[a.selftest]   # immediate (#197)
         have = {(r[0], r[1]): r[3] for r in rows}
         bad = 0
         for addr, off, cls in ctl:

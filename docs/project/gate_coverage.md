@@ -2840,9 +2840,9 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **WHAT:** who CAN read the select-confirm latch: the static census of every instruction naming a fighter block's +0x3BC/+0x3BD/+0x3C2/+0x3E0/+0x3E3 on vsav2, vsavj and the ported image, by addressing form, frozen — the whole population the per-leg tap (audit_latch_reads) can ever attribute a read to, with the census's data-region `movep` noise frozen and named.
 
-**HOW:** tools/audit_latch_readers.py over the decrypted opcode views and build/m3b_merged29/verify_op.bin, anchored on the extension word so a data table is not an instruction, its --selftest on both reference views first; controls: a shadow copy of the tool blind to the (d16,An) form, and the frozen inventory minus one vs2 reader row.
+**HOW:** tools/audit_latch_readers.py over the decrypted opcode views and build/m3b_merged29/verify_op.bin, anchored on the extension word so a data table is not an instruction, its --selftest on both reference views first (an immediate store among its positive controls since #197); controls: a shadow copy of the tool blind to the (d16,An) form, a copy with the pre-#197 nearest-decodable scan, and the frozen inventory minus one vs2 reader row; a PLANTED 44-byte opcode image carries one site of each form (abs.l immediate, abs.l register, (d16,An) immediate), since no abs.l site exists in any real image.
 
-**EXPECTS:** the frozen inventory equal (vs2's confirm writers and clears, the tenants' in-play flavour readers and their relocated copies, the Shadow-flag readers); the blind tool fails its selftest, the dropped row fails the compare.
+**EXPECTS:** the frozen inventory equal (vs2's confirm writers and clears, the tenants' in-play flavour readers and their relocated copies, the Shadow-flag readers); the blind tool fails its selftest, the planted image gives exactly its three write rows, the pre-#197 copy misses the immediate store vs2 PRG:0x00712A and both planted immediates, the dropped row fails the compare.
 
 ### `test_meter_gain.sh` — test, emulator
 

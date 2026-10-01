@@ -586,6 +586,19 @@ the attacker's `+4` word `0x0202` -> class 5, `+0x117` := 1, on to `0x22582`) th
 two are a difference between the games, as #191's records are (vsavj is the standard); which moves reach them is not
 measured.
 
+**The paths, tapped (14z-187b, #195; the victim's `+0x26` countdown, `+0x54` class and `+0x117`, PC-attributed by
+`tests/lua/read_tap.lua`; native vs2 against the staged #194 merged build):** Pyron's Cosmo Disruption and Donovan's
+Ifrit Sword (ES, a2:0x30 — the six class-0x51 records 33-38; P2 pinned 60 px in front of him over 2800-2839 of
+`donovan_3`, where the rig alone whiffs) take ONE path on each game. The class is written at hit time by the generic
+`move.b $17(a3),$54(a1)` — vs2 `0x16F70` (0x51), vsavj `0x01868C` (0x44 on ours) — and the knockdown tail runs its
+countdown (vs2 `0x239D0`, vsavj `0x24D84`, the same frames on both); at its end vs2 sets `+0x117` (`0x239EE`, Cosmo +154,
+Ifrit +70) and ours does not (cleared on both at the get-up, vs2 `0x24CEC`/`0x25FB4`, vsavj `0x2608A`/`0x26E30`). So one
+hit-time mark at vsavj `0x01868C`'s path and one tail hook at `0x24D92` cover both moves. A DIFFERENT path, seen in the same
+run: Donovan's Lightning Sword (ES) sets `+0x117` AT HIT on vs2 through the class-0x4E handler (`0x16FDE`, class 0x4E at
+`0x16FE4`), while ours writes class 0x06 (`0x0186D0`, the 14z-35 remap) and no flag — whether a pursuit connects after it
+natively is not measured. A guard-cancel Ifrit (donovan_15 event 6, class 0x0A) sets `+0x117` at hit identically on both
+(vs2 `0x16FF4`, vsavj `0x186EE`).
+
 **421+P (the sworded Lightning Sword / deity) on native vsav2, MEASURED at
 four strengths, no mash.** LP lands **3 hits for 7 damage**, MP **5 for 9**,
 HP **6 for 10**, ES **9 for 13** — in each case a 5-point sword hit then

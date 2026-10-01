@@ -2,11 +2,12 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 199
+# issues: 200
 number	state	reason	closed	labels	title
+200	OPEN	-	-	bug	Donovan's Lightning Sword (ES): native marks the victim pursuit-able at hit (class 0x4E, +0x117); ours (class 0x06 since the 14z-35 remap) does not
 199	OPEN	-	-	bug	Merged-image extracts on a fresh host: the reproducibility gate reads INPUTS OK on directories alone, and the tracked regions.json are stale (region data identical)
 198	OPEN	-	-	evolution	Parity rigs: P2 Demitri attacks with a chain whose record is equal on both games (forbid the record-differing a2 chains in P2_NEVER)
-197	OPEN	-	-	bug	The latch-readers census misses every immediate store (move.b #n,$off(An)): five latch writers unlisted, one a flavor write
+197	CLOSED	COMPLETED	2026-10-01	bug	The latch-readers census misses every immediate store (move.b #n,$off(An)): five latch writers unlisted, one a flavor write
 196	OPEN	-	-	evolution	The MAME wrappers default to the pinned source build on every host, not to whatever mame is on PATH
 195	OPEN	-	-	bug	After Cosmo Disruption Pyron cannot pursue on our build: vs2 marks the victim pursuit-able (+0x117) for reaction class 0x51 alone, which vsavj never stores
 194	OPEN	-	-	bug	Pyron's Cosmo Disruption gives the victim a plain hit reaction on ours where native vs2 gives the fire / knockdown reaction (record class 0x51 remapped to 0x4F)
@@ -32,7 +33,7 @@ number	state	reason	closed	labels	title
 174	CLOSED	COMPLETED	2026-09-28	evolution	35 never-entered a2 chains of the tenants (7 with attack records) — moves the naming corpus never produces, so their ours-vs-native parity is unmeasured
 173	CLOSED	COMPLETED	2026-09-25	bug	Pyron's heavy-hit reaction runs the generic chain b:0x03 on our build where native vs2 runs his b:0x19 (5HP, j.HP, throw release) — class, freeze and length equal
 172	CLOSED	COMPLETED	2026-09-24	enhancement	Enforce the discipline at the AGENT level: orchestrator / checker / workers, with the checker unable to be overridden
-171	OPEN	-	-	enhancement	Qualify every gate: prove it measures what it claims, and that it notices when its inputs move
+171	CLOSED	COMPLETED	2026-10-01	enhancement	Qualify every gate: prove it measures what it claims, and that it notices when its inputs move
 170	OPEN	-	-	enhancement,parked	Notarize the macOS release binaries (PARKED, would need community demand *and* ressources to justify the cost)
 169	CLOSED	COMPLETED	2026-09-25	bug	pyron_3 Galactic Throw: the air throw connects on only one strength, and [j.6HP]'s frozen chain is a plain j.HP
 168	CLOSED	COMPLETED	2026-09-20	bug	The naming rigs' first X pin lands before the round starts on seven parts — the #136 ENTRANCE class
