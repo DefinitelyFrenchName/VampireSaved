@@ -1,0 +1,19 @@
+THE PACKET
+
+Decision kind: build
+Subject: #194 stage Cosmo class 0x44 for the next freeze
+Claim (the working agent's sentence): Stage build/manifest/staged/194_cosmo44.patch (Pyron's Cosmo Disruption record class 0x4F -> 0x44 in build/manifest/pyron.toml, every track) for the next freeze, the option the maintainer chose (maintainer_14z187.txt: "0x44 now, gap as new ticket", whose text reads "Stage the one-byte 0x44 fix"), because: the patched manifest builds the merged set fingerprinted 702c98d0, the same as probe 194b (staged_identity.txt), one byte from merged-m21 and one from pyron-m26 (probe194b_bytes.txt); on the pyron_4 parity rig the probe's P2 class reads 0x44 where native's reads 0x51 (the remap itself) and every other compared P2 field — both HP words, seq/sub and the exception store — equals native's on every traced frame +90..+218 except +0x117 (cls4_summary.txt; node is traced but not compared, raw pointers being incomparable across the two ROMs), and the five Cosmo rows of audit_move_parity turn IDENT with every other verdict unchanged (mp_m21.got.tsv, mp_probe2.got.tsv); the merged legacy oracle PASSES against tests/expected/merged-m21, the 47 verdict lines it shares with the M21 freeze run and leg (b)'s six report entries identical to that run (oracle_window.txt); the 14z-75 crash gate, shown under sh -x to run each solo build by its own ROM path, PASSES on pyron-m26 (0x4F) and the probe (0x44) and FAILS with the watchdog reset on a control carrying native 0x51 (crash_gate_identity.txt); and the +0x117 residual, which gates Pyron's pursuit after Cosmo (pursuit_cf_summary.txt), is unchanged from M21 and ticketed (#195). NOT tested: that 0x44 equals 0x51 at the five consumers for Cosmo's own record — the 14z-110b measurement was on the deity states (donovan.toml lines), applied here on that argument and this rig's outcome; the freeze's gates and the reproducibility gate on the patched tree (they run at the freeze); the solo probe in any rig but the crash gate; P2 state outside the compared fields; victims other than Demitri; Pyron as P2; FBNeo and the MiSTer core.
+Artifacts (read every one, in full):
+  - build/manifest/staged/194_cosmo44.patch
+  - build/agent187/t194/staged_identity.txt
+  - build/agent187/t194/probe194b_bytes.txt
+  - build/agent187/t194/cls4_summary.txt
+  - build/agent187/t194/cls4.sh
+  - build/agent187/t194/mp_m21.got.tsv
+  - build/agent187/t194/mp_probe2.got.tsv
+  - build/agent187/t194/oracle_window.txt
+  - build/agent187/t194/crash_gate_identity.txt
+  - build/agent187/t194/pursuit_cf_summary.txt
+  - build/agent187/t194/pursuit_cf.py
+  - build/agent187/t194/maintainer_14z187.txt
+  - build/manifest/donovan.toml.lines-1488-1512 (lines 1488-1512 of build/manifest/donovan.toml)

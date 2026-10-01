@@ -171,6 +171,12 @@ vs2, Victor's rows byte-identical between the games (measured 14z-181) — so th
 against vs2's, and our build runs vsavj's. Kept under "vanilla wins ties" (STATE "STANDING PRINCIPLE"); WHERE in the
 pipeline vsavj adds it is not measured. Record: `tests/audit_phobos_dmg_residual.sh` (its `legacy` rows); the
 attribution class `DMG-VSAVJ` (`tools/move_parity_attribution.py`; `PHOBOS-DMG-OPEN` / `DMG-OPEN` until the ruling).
+**THE SAME CLASS ON 2HK (RULED NOT-OURS 2026-10-01, #191):** Donovan takes 9 from Demitri's 2HK on our build where
+native vs2 takes 8. The first legacy control (Victor) agreed on 2HK, which is why #191 was opened; widened to every
+legacy victim from both sides (14z-187), pristine vsavj takes one more than pristine vs2 from that 2HK on 14 of the 15
+victims it hits — Victor is the one exception — with their rows byte-identical between the games. The game fact and its
+table: `docs/game/engine_internals.md` "THE TWO ENGINES DEAL DIFFERENT DAMAGE FROM THE SAME HIT"; record
+`tests/audit_dmg_legacy_sweep.sh`.
 
 ## Cross-references
 

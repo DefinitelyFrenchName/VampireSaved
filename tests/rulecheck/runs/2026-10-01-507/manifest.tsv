@@ -1,0 +1,18 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent187/t194/probe194b_manifest.diff	e1741a0a07f4da2952429b91bd872745e9c5c624
+build/agent187/t194/probe194b_bytes.txt	2de79464b4b228c4c35b4ba72cf80d168ad86f21
+build/agent187/t194/cls4_summary.txt	57051ddac8190027fda444af405b8f37003fb9b3
+build/agent187/t194/cls4.sh	c68810b6d4562cea58bfc79eaaa8ab88e17dba14
+build/agent187/t194/mp_m21.got.tsv	2c3d5b5e773d5649f5d78ef7168461ac5b0b61cd
+build/agent187/t194/mp_probe2.got.tsv	0b85de7586202e386c9f428acc4b25c027398b9b
+build/agent187/t194/maintainer_14z187.txt	bb064dfba494fdd29e41a68501c273cee45c1055
+build/agent187/t194/dis117.txt	c71da51b12fd40516c09e552121e6d61c21c7fef
+build/agent187/t194/rtap117_summary.txt	e37b647ee3b6784b163d47533a227ef2a7806377
+build/agent187/t194/rtap117_sum.py	d9dd4fce9b2106e691b1cef8b044efad505a962e
+build/agent187/t194/rtap117.sh	6025afc6833a20d44b5fa11b5a00b097b18582a8
+build/agent187/t194/pursuit_summary.txt	5d2ab015a7d040d299cb236ce4d81184344824d0
+build/agent187/t194/pursuit_sum.py	51caa9ae1d318242cbf32a81314ae24655ade0d5
+build/agent187/t194/p2path_all.txt	3654537b8052dcc18ad87d8b553b30a0d9518a6a
+build/agent187/t194/rig194.py	5a37515e1b98ade2b0a87dc48c6bcd283bc48411
+build/agent187/t194/snap3/cosmo_full_sheet.png	a534a85b7af384dfd2a96d02ade49227734bd85f
+build/agent187/t194/psnap/pursuit_sheet.png	c94eeb3659f606eaf9e527689442bdea23f49fc6

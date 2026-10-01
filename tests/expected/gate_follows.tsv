@@ -24,6 +24,7 @@ declares	audit_df_modes
 declares	audit_df_moves
 declares	audit_df_startup_invuln
 declares	audit_dispatch_census
+declares	audit_dmg_legacy_sweep
 declares	audit_don_grab_pose
 declares	audit_don_ko_writer
 declares	audit_don_lilith_ko

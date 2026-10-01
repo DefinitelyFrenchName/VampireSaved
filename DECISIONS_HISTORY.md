@@ -95,6 +95,42 @@ retraction grep covers this file.
 
 ---
 
+## Ruled 2026-10-01 (14z-187) — the poke census rows of `audit_dmg_legacy_sweep` (#191's gate)
+
+**The questions, verbatim:** *"The new #191 gate (tests/audit_dmg_legacy_sweep.sh) reads back four HP fields its rig pokes: P2 and P1's red and white HP words (ff8850 / ff8450). It pins the victim's HP to 288 sixty frames before each hit, then measures only the DROPS inside a window that opens after the pin frame. How should the poke census class these four?"* and *"The same gate reads back the two character ids its forced picks poke (ff8782 / ff8b82). It reads them at frame 2300 only to check that the forced picks landed, and refuses a leg whose ids aren't the forced pair. How should those two be classed?"*
+
+**The maintainer, verbatim:** *"OBSERVES (Recommended)"* and *"READS-BACK, labelled (Recommended)"*.
+
+**What it means.** Six rows in `tests/expected/poke_readback.tsv`: the four HP words OBSERVES, the two ids READS-BACK, labelled as a rig record in the gate's header.
+
+---
+
+## Ruled 2026-10-01 (14z-187) — #191 closed `not-ours`: Demitri's 2HK on Donovan is the two engines' damage difference (#161's class)
+
+**The question, verbatim:** *"#191: Demitri's 2HK takes 9 from Donovan on ours vs 8 native. With no port involved, pristine vsavj takes 1 more than vsav2 from that same 2HK on 14 of the 15 legacy victims it hit, from either side. Victor, the one victim the 14z-186 control used, is the only one where the two games agree. That is the same engine difference as #161, which you ruled not-ours. Close #191 as not-ours?"*
+
+**The maintainer, verbatim:** *"1) close as not ours 2) document with the other engine differences between vsavj and VS2"*.
+
+**What it means.** #191 closes `not-ours`, kept under "vanilla wins ties" like #161. The game fact is documented with the other measured differences between the two engines, in `docs/game/engine_internals.md` "THE TWO ENGINES DEAL DIFFERENT DAMAGE FROM THE SAME HIT" (with the port-side pointer in `docs/project/tables/defense_rows.md`); the record is `tests/audit_dmg_legacy_sweep.sh`. The recommendation passed rule-checker runs 2026-10-01-504 and -505 (VIOLATED on true findings: the attacker and the hit unprinted, the pins and the id names unshown, the trace identities unshown, Demitri's side untested — each resolved by work) and -506 (OK, plant caught). Where in vsavj's pipeline the point is added stays unmeasured, as for #161.
+
+---
+
+## Ruled 2026-10-01 (14z-187) — #194: Cosmo Disruption takes record class 0x44; the missing pursuit is a new ticket
+
+**The first question (the three-row Cosmo sheet: native / M21 class 0x4F / probe class 0x44), verbatim:** *"#194: the sheet I sent shows Cosmo Disruption with the class remapped to 0x44 (third row of each block) next to native and M21. 0x44 is the class already shipped for Donovan's deity states (14z-110b). All five Cosmo parity rows turn IDENT, nothing else moves, and it doesn't crash on merged or solo Pyron. One residual: native sets P2's +0x117 flag from +155 to +200 and ours doesn't, as with the deity states. Does the probe row read like native to you, and should I adopt it?"*
+
+**The maintainer, verbatim:** *"Reads native; measure +0x117 first"*.
+
+**Measured then (14z-187, `build/agent187/t194/`):** vs2 writes the victim's `+0x117` := 1 for reaction class 0x51 alone (vs2 `0x239E6`), and the attacker-side pursuit check (vs2 `0x26D60`, vsavj `0x27B0E`, instruction-parallel) requires it; after Cosmo, Pyron's pursuit (Up+LP) pressed at +170 connects natively and never starts on M21 or on the 0x44 probe; poking `+0x117` to 1 on the probe reproduces native's pursuit hit for hit, poking it to 0 on native removes it; a pursuit off a throw is identical on every leg.
+
+**The second questions, verbatim:** *"#194, the pursuit sheet I sent (Cosmo, then Up+LP at +170): row 1 native, row 2 M21 (0x4F), row 3 probe (0x44). Do you read native's pursuit landing (the 3→5 hit counter, Demitri pinned) and no pursuit on either of ours?"* and *"How should #194 handle the pursuit? vs2 marks a victim pursuit-able (+0x117) only for class 0x51. 0x44 restores the fire/knockdown reaction but not the pursuit, which M21 lacks too. Measured: forcing +0x117=1 on the probe gives native's pursuit hit for hit, and forcing 0 on native removes it."*
+
+**The maintainer, verbatim:** *"Yes, that's what I see"* and *"0x44 now, gap as new ticket (Recommended)"*.
+
+**What it means.** The one-byte change (Cosmo's record class 0x4F -> 0x44, `build/manifest/pyron.toml`, every track) is staged for the next freeze once the merged legacy oracle has run on it and its build passes the rule-checker; the missing pursuit after Cosmo (and wherever else a vs2 class-0x51 reaction is remapped) is a new ticket, designed and measured separately.
+
+---
+
 ## Ruled 2026-09-30 (14z-186) — two tickets found under #184: Donovan's 2HK damage (#191) and Change Immortal's one-frame timing
 
 **The question, verbatim:** *"Should the 2HK damage and the Change Immortal timing become tickets? I'd put each through the rule-checker before filing."*

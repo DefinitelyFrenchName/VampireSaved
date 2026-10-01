@@ -1,0 +1,14 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/manifest/staged/194_cosmo44.patch	f97942780fbda5978e901eade6b553bc33cb6a4b
+build/agent187/t194/staged_identity.txt	31748ad4fa4561dd9e9205e82a35fc839cab9f5c
+build/agent187/t194/probe194b_bytes.txt	2de79464b4b228c4c35b4ba72cf80d168ad86f21
+build/agent187/t194/cls4_summary.txt	57051ddac8190027fda444af405b8f37003fb9b3
+build/agent187/t194/cls4.sh	c68810b6d4562cea58bfc79eaaa8ab88e17dba14
+build/agent187/t194/mp_m21.got.tsv	2c3d5b5e773d5649f5d78ef7168461ac5b0b61cd
+build/agent187/t194/mp_probe2.got.tsv	0b85de7586202e386c9f428acc4b25c027398b9b
+build/agent187/t194/oracle_window.txt	79e9cc73f006825ff0ffd2af5b5fc789fdb43beb
+build/agent187/t194/crash_gate_identity.txt	57810c24d6d6db20a9ad15e8de970c50bdc814be
+build/agent187/t194/pursuit_cf_summary.txt	7b3a6ac116943f78b957c202d26826d36f00bd7b
+build/agent187/t194/pursuit_cf.py	cabced37690fbdd12684e330db49e180b97293fd
+build/agent187/t194/maintainer_14z187.txt	a47e07a0a798c4eec6641153664dc8b245094eb2
+build/manifest/donovan.toml.lines-1488-1512 (lines 1488-1512 of build/manifest/donovan.toml)	872193510c193d59f592700a5f3c22d38e3869fc

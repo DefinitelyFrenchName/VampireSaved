@@ -1,0 +1,9 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent187/t191/dmg191.txt	a11bfd089ad336853766d952f06b33a5f058b4c6
+build/agent187/t191/dmg191.py	9c45a14667e7ea54fa4fa2c126110be235c1634b
+build/agent187/t191/sweep_summary.txt	462334e455bbe6da6364b8cf6badd02e7efe3569
+build/agent187/t191/sweep/summary.py	87dbba483701c9abecb8705ca11def58647b1a6c
+build/agent187/t191/sweep/leg.sh	12898b714b66d79eb9b0b472ac33a2f322a41bf3
+build/agent187/t191/rows191.txt	2bd1ef7918d343631da6a547c770bc12a58ede11
+build/agent187/t191/rows191.py	f8b00481ec7aed6d26845035c50e703cf0befc93
+build/agent186/legacy_dmg/legacy_v2_p1.rpl	dd886cf9d7dcf682dbde74c7998de25f5590b1eb

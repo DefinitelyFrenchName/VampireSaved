@@ -12,6 +12,12 @@
 # leg: main (the measuring leg's poke), control (a poke on a line naming a plant, a control or a mode — a
 # known-bad plant that reads its poke back by design; rule-checker run 2026-09-24-144) or mixed.
 # gate<TAB>addr<TAB>sample<TAB>class<TAB>note<TAB>leg
+audit_dmg_legacy_sweep	ff8450	FIELDS:p1hp	OBSERVES	ruled 2026-10-01 (14z-187): the victim's HP pinned to 288 sixty frames before each hit (lleg side p2, dleg), only the DROPS counted in windows opening after the pin frame (tools/dmg_sweep.py drops) — the damage	main
+audit_dmg_legacy_sweep	ff8450	FIELDS:p1white	OBSERVES	ruled 2026-10-01 (14z-187): same, the white word	main
+audit_dmg_legacy_sweep	ff8850	FIELDS:p2hp	OBSERVES	ruled 2026-10-01 (14z-187): same, P2 as the victim (lleg side p1)	main
+audit_dmg_legacy_sweep	ff8850	FIELDS:p2white	OBSERVES	ruled 2026-10-01 (14z-187): same, the white word	main
+audit_dmg_legacy_sweep	ff8782	FIELDS:id	READS-BACK	ruled 2026-10-01 (14z-187): the forced pick's id read at 2300 only, to refuse a leg whose picks did not land (tools/dmg_sweep.py rows) — a stage guard, labelled in the gate's header	main
+audit_dmg_legacy_sweep	ff8b82	FIELDS:p2id	READS-BACK	ruled 2026-10-01 (14z-187): same, P2's id (and the attacker id read at each hit, which the forced pick also wrote)	main
 audit_trap_airborne	ff8782	FIELDS:id	OBSERVES	classed at creation 2026-09-25 (14z-181) under the ruling of the same day for id pokes sampled as an identity guard: the trap rig's forced-pick pair (1400-1500) is read back at 3400 as Phobos/Victor and the leg VOIDs otherwise — the guard is what the poke is for	main
 audit_trap_airborne	ff8b82	FIELDS:p2id	OBSERVES	classed at creation 2026-09-25 (14z-181): as id	main
 audit_column_shock	ff8850	FIELDS:hp	OBSERVES	ruled 2026-09-25 (14z-181): audit_column_shock.sh:228/236-242 the KO trace compares EVERY traced field every frame native vs ours; hp goes 1 -> 0 at the KO (the engine's), the pinned frames are equal on both legs by construction (no evidence, no harm)	main

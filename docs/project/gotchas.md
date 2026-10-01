@@ -1,5 +1,18 @@
 # GOTCHAS (project) — traps in OUR pipeline and method
 
+## ONE LEGACY VICTIM IS NOT A CONTROL FOR A DAMAGE DIFFERENCE — sweep every legacy victim, from both sides (paid: 14z-186/187, GitHub #191)
+
+#191 was filed because a legacy control said the two engines agree: Demitri's 2HK took 8 from Victor on both
+pristine vsavj and pristine vsav2, so Donovan's 9-against-8 on our build looked like the port's. The control used ONE
+victim, and that victim was the exception: over all 16 legacy victims, from P1 and from P2, vsavj takes one more from
+that 2HK on 14 of the 15 it hits, and Victor is the only one where the engines agree (`tests/audit_dmg_legacy_sweep.sh`).
+Damage goes through per-victim rows and a 2D map with rounding, so whether two engines' pipelines differ on a hit can
+depend on the victim.
+
+**The rule:** before calling a damage difference ours, run the legacy control over every legacy victim (and both sides)
+with the same pins, and read the per-victim differences. One agreeing victim proves nothing about the others. The
+gate above is the instrument; it takes about two minutes.
+
 ## THE CLOSE PACKET'S CHECKS ARE REBUILT AT EVERY CLOSE — start from the last close's checks file, not from the tools (paid: 14z-186, rule-checker runs 2026-09-30-486 to 2026-10-01-497)
 
 **What happened.** The 14z-186 documentation packet took twelve rule-checker rounds: 486 to 496 each VIOLATED

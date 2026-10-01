@@ -13,7 +13,7 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**407 of 407 gates described.**
+**408 of 408 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
@@ -24,7 +24,7 @@ first sentence) is `gate_index.md`.
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 84 | 84 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 64 | 64 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 65 | 65 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -2394,7 +2394,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 ## character-data
 
-the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 64 of 64 described.
+the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 65 of 65 described.
 
 ### `audit_air_gc_legacy.sh` — audit, emulator
 
@@ -2515,6 +2515,14 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 **HOW:** field traces on MAME of the df/97 activation for the 15 vanilla ids on pristine vsavj, the three shells and the three tenants on the merged build, and Donovan on native vs2: the first non-zero +0x147, its peak and frames to zero and +0x143's first sample frozen; a CONTACT rig (df/98) lands 5HP inside and outside the window; the control perturbs a frozen arm value.
 
 **EXPECTS:** every frozen arm as ruled, the shells' merged traces byte-identical to pristine, the inside contact refused and the outside one landing; the perturbed value fails.
+
+### `audit_dmg_legacy_sweep.sh` — audit, emulator
+
+**WHAT:** Demitri's 2HK, 5HP and 623HP on every legacy victim, from P1 and from P2, on pristine vsavj against pristine vsav2, and on Donovan (P1) on our merged build against native vs2 — the record of #191 (the maintainer: "1) close as not ours 2) document with the other engine differences between vsavj and VS2", 2026-10-01).
+
+**HOW:** 66 MAME runs, six at a time: 16 legacy victims x 2 games x 2 sides on the 14z-186 control's two replays (victim and Demitri by the early-window forced picks, the victim's HP pinned to 288 sixty frames before each hit, the level pinned 6 from 2000 and the RNG word 0000 from 2363), and Donovan's 14z-186 probe-12 rig on native vs2 and ours (the parity gates' cursor path and pins); tools/dmg_sweep.py reads every line of every trace into one row per hit (red and white HP lost, first-drop frame, the attacker's id and the victim's reaction class there); the damage pipeline's tables compared between the two games' data images.
+
+**EXPECTS:** every leg's forced ids as traced, Demitri the attacker at every hit, the defense rows differing only for ids 0a 10 13 19 1a with the attack table and the 2D map equal, and every row equal to tests/expected/dmg_legacy_sweep.tsv (on 2026-10-01: vsavj one more red HP on 2HK on 14 of the 15 victims hit, Victor 0x03 alone equal, Oboro 0x18's 2HK no hit on vsavj; the same on both sides; Donovan 9 ours / 8 native); both controls fire.
 
 ### `audit_entrance_draw.sh` — audit, emulator
 

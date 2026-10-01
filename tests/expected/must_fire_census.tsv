@@ -20,6 +20,7 @@ declares	audit_df_meter
 declares	audit_df_modes
 declares	audit_df_moves
 declares	audit_df_startup_invuln
+declares	audit_dmg_legacy_sweep
 declares	audit_entrance_draw
 declares	audit_ex_refused
 declares	audit_facing_hook_ab

@@ -1,5 +1,37 @@
 # patch_notes — per-change detail: every byte, and why
 
+## 14z-187 — #194: Pyron's Cosmo Disruption reaction class 0x4F -> 0x44, RULED AND STAGED for the next freeze
+
+**THE FIX (staged: `build/manifest/staged/194_cosmo44.patch`, applied by the next freeze).** One byte of one
+existing row: `build/manifest/pyron.toml`'s `[[port_patch]]` on `hitbox_proj` (`src_addr = 0x0D0C7E`, Cosmo
+Disruption's record class, `+0x17`), `new_hex` `014f` -> `0144`, on every track that carries `pyron.toml`.
+
+```
+merged (probe 194b, fingerprint 702c98d0, against merged-m21 aacc7e71):  vsw.42    offset 197049  4F -> 44
+solo   (probe 194b,                       against pyron-m26):          vm3j.04d  offset 515945  4F -> 44
+```
+
+**Why 0x44.** vs2's class 0x51 is outside vsavj's 80-entry tables. 14z-75 remapped it to 0x4F by the first
+stager alone (entry 79 reaches the copy handler `0x01868C`), but the class also indexes the stored-state
+dispatcher `0x2384E` and the property map, where 0x4F is the ES-freeze family (property 0x0F): Demitri played a
+plain hit stagger where native is engulfed in fire, carried up and knocked down (#194). 0x44 is the 14z-110b
+five-consumer equivalent of 0x51 (the deity states, `donovan.toml`; "14z-110b — the 0x51 -> 0x44 state remap"
+below), and it needs no machinery on any track. Native 0x51 kept on the merged build was probed and rejected: it
+over-runs `0x2384E` (the second hit lost, the victim neutral at +136).
+
+**Measured on probe 194b (14z-187, `build/agent187/t194/`):** equal to native vs2 on every traced P2 field
++90..+218 but `+0x117`; the five Cosmo rows of `tests/audit_move_parity.sh` IDENT with every other verdict
+unchanged; the merged legacy oracle PASS against `tests/expected/merged-m21` (the 47 verdicts shared with the M21
+freeze run identical); `tests/test_pyron_cosmo.sh` (the 14z-75 crash rig) PASS on the solo probe. The maintainer:
+*"Reads native; measure +0x117 first"*, then *"0x44 now, gap as new ticket (Recommended)"*.
+
+**THE RESIDUAL:** vs2 sets the victim's `+0x117` (pursuit-able) for class 0x51 alone; Pyron's pursuit after
+Cosmo connects natively and never starts on our build, before or after this fix — GitHub #195.
+
+**AT THE FREEZE:** `git apply build/manifest/staged/194_cosmo44.patch`, rebuild every track, re-freeze
+`tests/audit_move_parity.sh` (pyron_4:5/6/7, pyron_5:6/9 DIFF -> IDENT) and `tests/audit_move_parity_attribution.sh`
+(REACTION-51-OPEN retires), the reproducibility gate's fingerprints; delete the staged file in the freeze commit.
+
 ## 14z-185 — THE M21 FREEZE (donovan-m25 / huitzil-m32 / pyron-m26 / merged-m21, mark M21): #182 and #159 LANDED
 
 **WHAT THE FREEZE CARRIES.** The two fixes ruled and staged earlier in this sitting, the entries below: #182
@@ -756,6 +788,7 @@ whole blocks and changed no entry text):
 
 **The #99 arc (CPU AI / dispatch):**
 - 14z-111 — #99 ROOT CAUSE FIX (option A): the CPU AI action-script tables unparked, byte detail
+- 14z-187 — #194: Pyron's Cosmo Disruption reaction class 0x4F -> 0x44 (STAGED)
 - 14z-110b — the 0x51 -> 0x44 state remap: byte detail
 - 14z-110 — the #99 fix: the reaction_hook D2 WINDOW, byte detail
 - donovan-m2 stage 5 — reaction_hook: ES-DP crash fix (2026-07-27, session 11, playtest-driven)

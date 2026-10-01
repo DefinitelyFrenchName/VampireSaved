@@ -1,0 +1,19 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent187/t191/dmg191.txt	383c9336de6f368b0058fb08246d6fbb30d41c85
+build/agent187/t191/dmg191.py	5fffa4f188f43f3af840b4db3ecd413f1aa07cf0
+build/agent187/t191/legs_identity.txt	e5286f457918bf3f9e0375550b21e90d0d1e18f1
+build/agent186/t184_legs.sh	e24f27551887e831e587911b1e1ef8c654539e08
+build/agent187/t191/sweep_summary.txt	4c4815735e47f59d5b3d74efe81514b56836c6be
+build/agent187/t191/sweep/summary.py	4cb90732335b2ec8f7b9719715d54428f701b5f9
+build/agent187/t191/sweep/leg.sh	12898b714b66d79eb9b0b472ac33a2f322a41bf3
+build/agent187/t191/sweep2_summary.txt	0a7600524151d56e62e16df1c3e50424e09e75c1
+build/agent187/t191/sweep2/summary.py	a729f38f441794696f467e73a51a4f74e20ac351
+build/agent187/t191/sweep2/leg.sh	b88f0f22fe8c725137eac83298bac61c3438097e
+build/agent187/t191/rows191.txt	2bd1ef7918d343631da6a547c770bc12a58ede11
+build/agent187/t191/rows191.py	f8b00481ec7aed6d26845035c50e703cf0befc93
+build/agent186/legacy_dmg/legacy_v2_p1.rpl	dd886cf9d7dcf682dbde74c7998de25f5590b1eb
+build/agent186/legacy_dmg/legacy_v2_p2.rpl	6e8cbb41a3b2e5201ddfc119fbb7dcc4229bef27
+build/agent186/legacy_dmg/run2.sh	314c70f9c318e809c1ccd0cef6c50ec8920cee1b
+build/agent186/legacy_dmg/v2_summary.txt	3ab2b4c92e71e7276fdcc1b8a8c25de2433488fa
+tests/expected/roster_pairings/bases.tsv	9a8dac331d48dc6d46b3a9c397f42cee0a937069
+docs/project/tables/defense_rows.md.lines-166-173 (lines 166-173 of docs/project/tables/defense_rows.md)	40ea69e337247a9ddb3af15492bce491e3a9d19f

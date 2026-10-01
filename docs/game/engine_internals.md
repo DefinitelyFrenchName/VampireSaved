@@ -559,6 +559,20 @@ from the reference ROMs + three verdict controls); bytes in
 `../project/patch_notes.md` "14z-110 — the #99 fix: the reaction_hook D2
 WINDOW"]
 
+**A vs2 class 0x51 knockdown is pursuit-able; vsavj's equivalent 0x44 is not (measured 14z-187, GitHub #194,
+#195).** Depends on atlas rows: the fighter's `+0x54` class and `+0x117` (`atlas/ram.md`). **Gates:**
+`tests/audit_move_parity.sh` (Pyron's Cosmo rows), `tests/test_pyron_cosmo.sh`. vs2's shared reaction tail
+`0x239E6` (`cmpi.b #$51,$54(a6); bne; move.b #1,$117(a6)`) marks a class-0x51 victim pursuit-able, and the
+attacker-side pursuit check (vs2 `0x26D60`, vsavj `0x27B0E`, instruction-parallel) requires the opponent's
+`+0x117`. 0x44 — the five-consumer equivalent above — gets no such store, so a vs2 0x51 record remapped to 0x44
+reacts natively in every traced field (Pyron's Cosmo Disruption on Demitri: both HP words, seq/sub, the
+fire/knockdown timeline, +90..+218) but is never pursuit-able: after Cosmo, Pyron's Up+LP at +170 connects on vs2
+and never starts on ours; `+0x117` poked to 1 on ours restores the pursuit hit for hit, and poked to 0 on vs2
+removes it. And 0x4F (Cosmo's class from 14z-75 to 14z-187) reaches the right stager handler but the ES-freeze
+reaction family (property 0x0F): a plain hit stagger where vs2 plays fire and a knockdown. Native 0x51 kept on
+our build over-runs `0x2384E` (the second hit lost, the victim neutral at +136). Whether the deity states'
+14z-110b remap carries the same pursuit gap is not measured.
+
 **421+P (the sworded Lightning Sword / deity) on native vsav2, MEASURED at
 four strengths, no mash.** LP lands **3 hits for 7 damage**, MP **5 for 9**,
 HP **6 for 10**, ES **9 for 13** — in each case a 5-point sword hit then
@@ -3586,6 +3600,37 @@ measured 14z-145:** the ±1 damage residue of `audit_tenant_throw_geometry`
 defense[victim][attacker]` differs between the games on exactly those ids,
 0x0A being a cross-generation retune of Sasquatch, not the port's
 [M: `tests/audit_defense_row_residue.sh`, read watch both legs].
+
+### THE TWO ENGINES DEAL DIFFERENT DAMAGE FROM THE SAME HIT — vsavj usually one or two more (measured 14z-181 and 14z-187, GitHub #161, #191)
+
+Depends on atlas rows: fighter structs `$FF8400/$FF8800` (`+0x50` HP, `+0x52` white HP,
+`+0x54` reaction class), the select ids `$FF8782/$FF8B82`, the level byte `RAM:$FF8116` and
+the RNG word `RAM:$FF80D4`. **Gates:** `tests/audit_dmg_legacy_sweep.sh` (every legacy
+victim, both sides), `tests/audit_phobos_dmg_residual.sh` (the first instance, its `legacy`
+rows).
+
+With no port in the loop — pristine vsavj against pristine vsav2, the same replay, the same
+forced picks, the level pinned 6 and the RNG word pinned 0000, the victim's HP pinned to 288
+before each hit — Demitri's 2HK, 5HP and 623HP take MORE HP on vsavj than on vsav2 from
+almost every legacy victim, and the same from either side:
+
+| hit (Demitri) | vsavj minus vsav2, red HP | the exceptions |
+|---|---|---|
+| 2HK (victim class 0x49) | +1 on 14 of the 15 victims hit | Victor 0x03 equal; Oboro 0x18's 2HK does not hit on vsavj |
+| 5HP (class 0x01) | +1 on 15 of 16 | Sasquatch 0x0A equal (his row differs between the games) |
+| 623HP (class 0x05) | +2 on 14 of 16 | Sasquatch +1; Oboro's 623HP lands as a different hit on vsavj (class 0x02) |
+
+The victims' defense rows (vsavj `PRG:0x0B8940`, vs2 `PRG:0x0D2ABE`), the attack table and the
+final 2D map are byte-equal between the games in the DATA view for every legacy id but 0x0A
+(rows 0x10/0x13/0x19/0x1A differ too, outside the legacy roster), so the extra point is the two
+engines' damage PIPELINES, not their data. WHERE in vsavj's pipeline it is added is NOT
+measured (the damage-level config byte `(0xB2,a6)` and the scaler chain above are the
+candidates). Consequence for the port: a tenant victim on our build takes vsavj's pipeline, so it
+takes the same extra point from a move that hits it natively for less — Phobos's 12/11 from 5HP
+(#161) and Donovan's 9/8 from 2HK (#191) are this, not the port's; both ruled not-ours by the
+maintainer and kept under "vanilla wins ties". **A legacy control for a damage difference needs
+more than one victim:** #191 was opened because the one victim the first control used, Victor,
+is the only legacy victim on which the two engines agree on 2HK.
 
 ## The down-transition WHITE FRAME (14z-112, measured on stock vsavj)
 
