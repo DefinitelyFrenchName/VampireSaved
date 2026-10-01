@@ -129,6 +129,16 @@ retraction grep covers this file.
 
 **What it means.** The one-byte change (Cosmo's record class 0x4F -> 0x44, `build/manifest/pyron.toml`, every track) is staged for the next freeze once the merged legacy oracle has run on it and its build passes the rule-checker; the missing pursuit after Cosmo (and wherever else a vs2 class-0x51 reaction is remapped) is a new ticket, designed and measured separately.
 
+
+---
+
+## Ruled 2026-10-01 (14z-187b) — the MAME parity gate on hosts without the reference binary: option A, and Homebrew's MAME pinned
+
+**The question, verbatim (the session's message, no AskUserQuestion):** *"A. Freeze sections 2 and 3 on the Mac (recommended)."*, *"B. Compare across machines without freezing."*, *"C. Change the doc only."*, and *"I'd also run `brew pin mame` on the Mac now. [...] Should I run it?"* — after the measurement on ERIS (WSL2): `tests/test_mame_parity.sh` ended `PARTIAL`, exit 2, section 1 24/24 and sections 2/3 (48 vsavj + 16 vsav2 replays) SKIPPED for want of the reference binary (Homebrew MAME 0.288, macOS only), and Homebrew offered 0.289 with `mame` unpinned.
+
+**The maintainer, verbatim:** *"option A and pin mame"*.
+
+**What it means.** The reference binary's logs of every replay with no frozen `tests/expected/vsavj/<name>.sha1` are frozen into `tests/expected/mame_parity_ab.tsv` (64 rows) by the gate's `FREEZE=1` on the Mac (the reference twice, the source build once, all three equal, a self-check that the agreement test refuses a perturbed log), reproduced by the gate's section 1b on any host; sections 2/3 keep the live A/B for a replay frozen nowhere. `mame` is `brew pin`ned at 0.288 on the Mac (2026-10-01; `brew unpin mame` reverses it). WSL2_SETUP.md §7 states the new PASS.
 ---
 
 ## Ruled 2026-09-30 (14z-186) — two tickets found under #184: Donovan's 2HK damage (#191) and Change Immortal's one-frame timing

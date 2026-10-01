@@ -1,0 +1,16 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/expected/mame_parity_ab.tsv	7a2d52b0d55d85d6fe046779e2d33a1efff3cc4b
+tests/test_mame_parity.sh	d57a9f24e2519744e21757adff7d2df0484c2639
+build/agent187b/parity/gate_change.diff	60ac53dffea9be17741292016e6fbac4222c838d
+DECISIONS_HISTORY.md	06b58bc8b2d60b8fa08edbf366dee1be245d00e9
+build/agent187b/parity/freeze.log	2f4bf5b585f0178f5cc65c2aa4c0c91f89f03486
+build/agent187b/parity/freeze2.log	2b2534b6a70a7ae367d7db0f65dcc87097ddc62f
+build/agent187b/parity/gen.sh	67fc491b8d8a90c81f5490bc246b6c2f915e8733
+build/agent187b/parity/gen.log	a5ea04e946ff0f7d535e33e1cb9d96a523c93733
+build/agent187b/parity/out/verdicts.tsv	ab56171494b71d911502fd7956e605f48edf3fb5
+build/agent187b/parity/q1_evidence.txt	08d19dcb1ac2d22db6f2c3bc2fe6f2807617210e
+build/agent187b/parity/q3_runner_control.txt	e80d21ab0907d496ad078df29bd5391151dbd02d
+build/agent187b/parity/verify_mac2.log	2923d87980e585be5624da4419171160e3879dd6
+build/agent187b/parity/control_mac2.log	b092017caf24c62ca3a9cd4777826c1cef13f9e7
+build/agent187b/parity/verify_eris2.log	24a50302474ccd2021924fa418d57dd0f79cfb56
+build/agent187b/parity/eris_partial_before.log	1b3409189781f4593a783629d8da0cfff3b12723

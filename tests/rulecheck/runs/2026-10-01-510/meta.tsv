@@ -1,0 +1,9 @@
+decision	expectation
+subject	test_mame_parity: freeze tests/expected/mame_parity_ab.tsv (option A)
+session	14z-187b
+model	rule-checker@163e4ce9cf7b
+claim	Freezing tests/expected/mame_parity_ab.tsv (64 rows: 48 vsavj, 16 vsav2 — every tests/replays/*.rpl with no tests/expected/vsavj/<name>.sha1) is correct: each row is the sha1 of the Homebrew MAME 0.288 REFERENCE binary's checksum log, the reference run twice and the unpatched source build once with all three logs equal (gate FREEZE=1, freeze.log), the same 64 rows as an independent script (gen.sh, out/verdicts.tsv, run with ../ROMS/cfg and nvram present, the FREEZE without them); the changed gate then PASSES 88/88 (24 section 1 + 64 section 1b, each replay twice) on the Mac (verify_mac.log) and on ERIS/WSL2 (verify_eris.log), where before it ended PARTIAL with 48+16 skipped (eris_partial_before.log), and its wrong-hash control FIRED in-gate on both and as a mode FAILed the gate on ERIS. NOT tested: the CONTROL=wrong-hash mode on the Mac; the gate run under the static or emulator runners; both verify runs used the gate copy with a FOLLOWS comment line one path shorter than the committed one (gate_verified_vs_committed.diff); the replays under tests/replays/ subdirectories, which the gate's glob never reads.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b

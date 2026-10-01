@@ -457,7 +457,7 @@ into another game: MAME builds a fresh driver object per run.
 
 | Gate | What it establishes | Result |
 |---|---|---|
-| `tests/test_mame_parity.sh` | the unpatched source build reproduces every frozen oracle log bit-for-bit, and is byte-identical to the reference binary on every other replay, on vsavj **and** vsav2 | **62/62** |
+| `tests/test_mame_parity.sh` | the unpatched source build reproduces every frozen oracle log bit-for-bit, and every frozen REFERENCE log (`tests/expected/mame_parity_ab.tsv`, the Homebrew 0.288 binary's own logs of every other replay, frozen 14z-187b so a host without that binary can pass — before it, those replays were compared live against the reference), on vsavj **and** vsav2 | **62/62** at B5; **88/88** since 14z-187b (24 + 64), on the Mac and on ERIS (WSL2) |
 | `tests/test_replay_video_selfcheck.sh` | replay.lua's new `VIDEO_OUT` framebuffer checksum is live, deterministic, non-perturbing, and detects a known pixel difference **without** crying wolf on a known-identical frame | **4/4** |
 | `tests/test_mame_wide.sh` | the MAME twin of `test_wide_profile.sh`: superset invariant + inertness + the B4 canary, each on work RAM **and** framebuffer | **36/36** |
 | `tests/test_mame_determinism.sh` | bounds the run-to-run divergence rate the whole oracle assumes is zero | 480/480 on the boot probe (see the caveat in STATE 14z-59) |

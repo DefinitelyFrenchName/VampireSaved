@@ -1725,6 +1725,16 @@ target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
   IMMEDIATELY** — restoring the exact previous bytes re-aligns the
   interpreter, and the two runs that had not yet resumed reading survived
   untouched because of it.
+  **WHICH EDITS REACH THE RUNNING SHELL (measured 14z-187b, macOS):** the
+  shell holds the FILE, not the path. BSD `sed -i ''` writes a new file and
+  renames it over the old (inode 148966099 -> 148966101 on a scratch file),
+  so a running `sh` keeps reading the old bytes; a Python
+  `open(p, 'w').write(...)` rewrites the SAME inode (148966100 -> 148966100),
+  so the running `sh` reads the new bytes at its old offset. 14z-187b did one
+  of each to a running `tests/test_mame_parity.sh`: the `sed` edit's verify
+  run completed PASS; the Python edit's control run was killed and re-run on
+  the final file. The rule stands — freeze the script — but a slip by
+  rename is survivable and a slip in place is not.
 - **A scratch clone re-pointed at a public `origin` cannot reach a
   LOCAL-ONLY commit.** `tools/run_sim_jtcps2.sh` clones from
   `emu/jtcores` and then sets `origin` to the GitHub fork URL, so

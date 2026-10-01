@@ -132,7 +132,7 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 | `tests/test_host_libs.sh` | test | ci_portable | — | tools/check_host_libs.py, the rule a Linux release folder is held to (every file's DIRECT NEEDED sonames are shipped in the folder and resolve there, or are on tests/expected/linux_host_provided.tsv; | 2026-09-13 |
 | `tests/test_input_integrity.sh` | test | emulator | MAME | ground truth for the input-integrity check. | session 14z |
 | `tests/test_mame_determinism.sh` | test | emulator | MAME | is MAME actually deterministic, run to run? | session 14z |
-| `tests/test_mame_parity.sh` | test | emulator | MAME, FBNeo | B5 PREREQUISITE: the pinned MAME source build must be indistinguishable from the binary that froze the oracle, BEFORE any profile patch is applied to it. | session 1 |
+| `tests/test_mame_parity.sh` | test | emulator | MAME, FBNeo, ~16 s | B5 PREREQUISITE: the pinned MAME source build must be indistinguishable from the binary that froze the oracle, BEFORE any profile patch is applied to it. | 14z-187b |
 | `tests/test_mame_wide.sh` | test | emulator | MAME, FBNeo, a build dir | CPS-2 WIDE profile gate, MAME side (B5). | session 14z |
 | `tests/test_null_build.sh` | test | ci_static | ROMDIR | M0 acceptance: the null-patch build reproduces vanilla vsavj bit-identically from reference inputs, deterministically. | M0 |
 | `tests/test_phasec_image.sh` | test | emulator | MAME, FBNeo, a build dir | Phase C step 2: the program image grows, and the extension is genuinely READ. | 14z-59g |

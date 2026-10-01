@@ -293,14 +293,31 @@ stock binary.
 This is the step that decides whether the machine can be trusted:
 
 ```bash
-ROMDIR=~/roms tests/test_mame_parity.sh
+ROMDIR=~/roms PARITY_JOBS=20 tests/test_mame_parity.sh
 ```
 
-It runs the whole frozen oracle corpus and must end with:
+It runs the whole frozen corpus — section 1, the vsavj oracle logs
+(`tests/expected/vsavj/*.sha1`), and section 1b, the reference table
+(`tests/expected/mame_parity_ab.tsv`, every other replay), each replay twice
+— and must end with:
 
 ```
-PASS: MAME parity. ... 62/62
+PASS: MAME parity. The pinned source build reproduces every frozen
 ```
+
+`PARITY_JOBS` runs that many replays at a time (the default, 1, is serial:
+24 replays twice took 15 min 50 s on ERIS). Leave a few threads free.
+
+**Until 2026-10-01 this step could not pass on any machine but the Mac.**
+Sections 2 and 3 compared each replay that had no frozen log against the
+REFERENCE binary — the Homebrew MAME 0.288 that froze the oracle, which no
+other OS has — so here they could only `SKIPPED` and the gate ended
+`PARTIAL` (measured on ERIS: 24/24 frozen, 48 + 16 skipped). The fix
+(maintainer-ruled, 14z-187b) froze those replays' REFERENCE logs into
+`tests/expected/mame_parity_ab.tsv` on the Mac. A `PARTIAL` now means a
+replay was added since that freeze and is frozen nowhere: re-freeze the
+table on the Mac with `FREEZE=1` (it needs the reference binary), never
+here.
 
 **What green means:** this machine reproduces every frozen expectation
 bit-for-bit, so every result in `tests/expected/` transfers unchanged and

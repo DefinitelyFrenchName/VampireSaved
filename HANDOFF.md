@@ -210,7 +210,8 @@ MAME is pinned as a submodule: `emu/mame`, tag **mame0288**, commit
 `27a8d9e8`. A Homebrew binary cannot follow a descriptor change, so the
 WIDE profile needs a source build.
 
-Status: parity **62/62**, MAME WIDE gate **36/36** (superset invariant +
+Status: parity **62/62** at B5 (**88/88** since 14z-187b: the replays with no frozen vsavj log are now frozen as the REFERENCE binary's logs in
+`tests/expected/mame_parity_ab.tsv`, so the gate passes on a host without Homebrew's MAME — WSL2_SETUP.md §7), MAME WIDE gate **36/36** (superset invariant +
 inertness + B4 canary, work RAM AND framebuffer). `-verifyroms vsavjw`
 reports the romset good ON THE ZERO-FILLED `wide0` OVERLAY, so both emulators
 load byte-identical members. **On a CONTENT build it says "is bad" BY DESIGN**

@@ -1,0 +1,12 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/expected/mame_parity_ab.tsv	7a2d52b0d55d85d6fe046779e2d33a1efff3cc4b
+tests/test_mame_parity.sh	7885fe94ffcccc984f764bb2e6a3ecbba6bdf473
+build/agent187b/parity/gate_change.diff	a5e388437af4a8d5b9262fc708068cc840f96130
+build/agent187b/parity/gate_verified_vs_committed.diff	ea5c5d2bd6c82ff0b93dc0827ae6df2189c9331a
+build/agent187b/parity/freeze.log	2f4bf5b585f0178f5cc65c2aa4c0c91f89f03486
+build/agent187b/parity/gen.sh	67fc491b8d8a90c81f5490bc246b6c2f915e8733
+build/agent187b/parity/gen.log	a5ea04e946ff0f7d535e33e1cb9d96a523c93733
+build/agent187b/parity/out/verdicts.tsv	ab56171494b71d911502fd7956e605f48edf3fb5
+build/agent187b/parity/verify_mac.log	213ef971cc00a272fbd19cfd7d4f5c853be887aa
+build/agent187b/parity/verify_eris.log	1376479c080c41b73a0a0655dc1c08553e8c932c
+build/agent187b/parity/eris_partial_before.log	1b3409189781f4593a783629d8da0cfff3b12723
