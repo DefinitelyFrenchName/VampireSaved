@@ -139,6 +139,16 @@ retraction grep covers this file.
 **The maintainer, verbatim:** *"option A and pin mame"*.
 
 **What it means.** The reference binary's logs of every replay with no frozen `tests/expected/vsavj/<name>.sha1` are frozen into `tests/expected/mame_parity_ab.tsv` (64 rows) by the gate's `FREEZE=1` on the Mac (the reference twice, the source build once, all three equal, a self-check that the agreement test refuses a perturbed log), reproduced by the gate's section 1b on any host; sections 2/3 keep the live A/B for a replay frozen nowhere. `mame` is `brew pin`ned at 0.288 on the Mac (2026-10-01; `brew unpin mame` reverses it). WSL2_SETUP.md §7 states the new PASS.
+
+---
+
+## Ruled 2026-10-01 (14z-187b) — gates that run stock sets with no MAME_BIN, on a host without Homebrew's MAME: a `mame` shim now, a wrapper-level default as a ticket
+
+**The question, verbatim (the session's message, no AskUserQuestion):** after `test_input_integrity.sh` failed on ERIS with `exec: mame: not found` and passed once `MAME_BIN` named the pinned source build: *"(a) Put a `mame` on ERIS's PATH pointing to the pinned source build. That's host setup only, and verdict-equivalent now that parity passes there."*, *"(b) Make the wrapper default to the pinned build on every host. This also changes the Mac's instrument, for those 43 gates."*, *"(c) Pin each gate individually."*, *"I'd go with (a) now and (b) as a ticket."*
+
+**The maintainer, verbatim:** *"A and B as a ticket"*.
+
+**What it means.** (a): ERIS's `~/.local/bin/mame` links to `~/.cache/vampire-saved/mame-ref/cps2`, written into WSL2_SETUP.md §6 for any non-Mac host; `tests/test_mame_parity.sh` refuses a reference binary whose sha1 equals the source build's, so the shim can never become its own A/B reference. (b) is a ticket: a wrapper-level default to the pinned build on every host, the Mac included.
 ---
 
 ## Ruled 2026-09-30 (14z-186) — two tickets found under #184: Donovan's 2HK damage (#191) and Change Immortal's one-frame timing

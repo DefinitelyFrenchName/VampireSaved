@@ -16,11 +16,11 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**408 scripts** — 108 ci_portable, 84 ci_static, 216 emulator-tier (run by name).
+**410 scripts** — 110 ci_portable, 84 ci_static, 216 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 37 | the suite runners and their own ground truth |
+| [runner](#runner) | 39 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 38 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -50,6 +50,7 @@ the suite runners and their own ground truth.
 | `tests/test_bbh_fidelity.sh` | test | ci_static | ROMDIR | the generic black-box harness (`bbh`, the SEPARATE repository extracted from this tree, docs/project/harness_scope.md) reproduces THIS tree's verdicts: its fidelity gate is run against this tree and must be green. | 2026-09-06 |
 | `tests/test_bg_leg_shape.sh` | test | ci_portable | — | NO GATE MAY BACKGROUND AN EMULATOR LEG THAT WRITES ITS EXIT STATUS UNDER `set -e` WITHOUT `set +e` INSIDE THE GROUP (14z-171). ROM-free, ~2 s. Tool: tools/audit_bg_leg_shape.py (its docstring is the WHY). | 14z-171 |
 | `tests/test_close_checks.sh` | test | ci_portable | — | the close's check runner times every check, re-runs one alone, and never lets a partial run read as the run of record (`tools/close_checks.py`, 14z-185b, GitHub #187). | 14z-185b |
+| `tests/test_close_loop_cost.sh` | test | ci_portable | — | the close-loop cost reader counts every pass of a close's check runner and the packet's span, whatever interpreter ran the runner and however a prepare's output was cut (`tools/agent/close_loop_cost.py`, 14z-187b, GitHub #187). | 14z-187b |
 | `tests/test_controls_contract.sh` | test | ci_portable | — | ground truth for THE MUST-FIRE CONTRACT'S READER, tests/lib/controls.sh: the four regexes of the R10 grammar, the leading comment block as the header (a bare `#` continues it, a non-comment line ends it), the declared-vs-fired readback the… | 14z-147 |
 | `tests/test_demand_after_trap.sh` | test | ci_portable | — | no gate carries a `${VAR:?msg}` DEMAND after its EXIT trap (14z-134). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-134 |
 | `tests/test_emulator_runner.sh` | test | ci_portable | — | ground truth for tests/run_all_emulator.sh (14z-128). ROM-free, ~26 s (measured 14z-162; the header said ~5 s). | 14z-128 |
@@ -64,6 +65,7 @@ the suite runners and their own ground truth.
 | `tests/test_module_refs.sh` | test | ci_portable | — | EVERY CROSS-MODULE PYTHON NAME THE TOOLS AND GATES REFERENCE STILL EXISTS (GitHub #171 slice Q1, ruled 2026-09-24 — DECISIONS_HISTORY.md "Ruled 2026-09-24 (14z-180) — #171 gate qualification", "Land it now"). ci_portable: | 2026-09-24 |
 | `tests/test_must_fire_census.sh` | test | ci_portable | — | THE MUST-FIRE DOCTRINE, MACHINE-READ under the R10 grammar: which gates DECLARE a must-fire control (`# MUST-FIRE: <shape>: | 14z-145 |
 | `tests/test_poke_readback.sh` | test | ci_portable | — | EVERY GATE THAT SAMPLES AN ADDRESS ITS OWN RIG POKES IS ON THE TABLE, and the table's classification is the maintainer's, not the tool's (GitHub #171 slice Q6, shape 4 of docs/project/gate_qualification_scope.md). ci_portable: | 14z-180 |
+| `tests/test_promise_check.sh` | test | ci_portable | — | every promise a sitting's record makes is classed FULFILLED, CARRIED or NOT A PROMISE, and each class holds (`tools/promise_check.py`, 14z-187b, GitHub #190 P3). | 14z-187b |
 | `tests/test_rule_checker.sh` | test | ci_portable | — | the adversarial RULE-CHECKER's record is sound: every run in tests/rulecheck/ledger.tsv is complete and structured, every planted violation was caught, every fixture is calibrated, every VIOLATED resolved, and every freeze since the checker… | 14z-163 |
 | `tests/test_rulings_verbatim.sh` | test | ci_portable | — | a quote a session attributes to the maintainer is the maintainer's own words, and every message the maintainer sent is on record (`tools/agent/rulings_verbatim.py`, 14z-185b, #190 P2). | 14z-185b |
 | `tests/test_run_on_snapshot.sh` | test | ci_portable | — | S6 OF GitHub #153 (and #181's inputs): a run on a snapshot is IMMUNE to the working tree (ruled 2026-09-26, DECISIONS_HISTORY.md "Ruled 2026-09-26 (14z-183b) — #153"; | 2026-09-26 |

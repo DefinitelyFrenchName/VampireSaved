@@ -294,6 +294,12 @@ test_run_on_snapshot
 # 14z-185b (#187): the close's check runner (tools/close_checks.py) times every check, re-runs one alone with
 # --only, and never lets a partial run read as the run of record; two controls. ~1 s.
 test_close_checks
+# 14z-187b (#187): the close-loop cost reader (tools/agent/close_loop_cost.py) counts every pass of a close's
+# check runner whatever interpreter runs it, and finds the packet's span from a tail-cut prepare; three controls. ~1 s.
+test_close_loop_cost
+# 14z-187b (#190 P3): every promise a sitting's record makes is classed FULFILLED / CARRIED / NOT-A-PROMISE and
+# each class holds (tools/promise_check.py; the timing leg: fulfilment text absent at the base); three controls. ~3 s.
+test_promise_check
 # 14z-185b (#188 route A, PROVISIONAL): the carry-forward predictor (tools/static_confirm.py) marks a gate STALE
 # by each of its four rules; two controls. Not wired into this runner until the traced test. ~1 s.
 test_static_confirm

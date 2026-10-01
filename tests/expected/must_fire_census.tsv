@@ -81,6 +81,7 @@ declares	test_checkdocs
 declares	test_checkdocs_rom
 declares	test_checkskills
 declares	test_close_checks
+declares	test_close_loop_cost
 declares	test_close_tools
 declares	test_commit_subject
 declares	test_community_crosscheck
@@ -138,6 +139,7 @@ declares	test_pcrel_escapes
 declares	test_pod_black_foot_palette
 declares	test_poke_readback
 declares	test_poked_legs
+declares	test_promise_check
 declares	test_pyron_medallion_2p
 declares	test_random_select_tenants
 declares	test_reaction_classes

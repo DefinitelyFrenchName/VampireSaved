@@ -159,6 +159,7 @@ declares	test_checkskills
 declares	test_classify_hitclass_probe
 declares	test_classify_pool_spawns
 declares	test_close_checks
+declares	test_close_loop_cost
 declares	test_close_tools
 declares	test_commit_subject
 declares	test_community_crosscheck
@@ -332,6 +333,7 @@ declares	test_poke_readback
 declares	test_poked_legs
 declares	test_projectile_census
 declares	test_projectile_params
+declares	test_promise_check
 declares	test_pyron_blink
 declares	test_pyron_cosmo
 declares	test_pyron_ladder

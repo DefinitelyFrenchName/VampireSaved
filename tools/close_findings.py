@@ -129,7 +129,7 @@ def main():
     ap.add_argument("--base", help="the commit before the session (default: the parent of the first commit adding its STATE heading)")
     a = ap.parse_args()
     s = Path(a.state).read_text()
-    m = re.search(rf"^## Session {re.escape(a.session)} — .*?(?=^## Session |^---$)", s, re.M | re.S)
+    m = re.search(rf"^## Session {re.escape(a.session)} — .*?(?=^## Session |^---$|^# )", s, re.M | re.S)
     if not m: sys.exit(f"no session group {a.session} in {a.state}")
     group = m.group(0)
     want = addrs(group)

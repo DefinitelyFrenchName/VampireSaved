@@ -11,12 +11,13 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**195 tickets** — status: open 15 · parked 14 · done 146 · declined 6 · not-ours 6 · invalid 7 · duplicate 1 · kind: bug 140 · cosmetic 11 · evolution 44 · **backfill debt: 0 rows**.
+**196 tickets** — status: open 16 · parked 14 · done 146 · declined 6 · not-ours 6 · invalid 7 · duplicate 1 · kind: bug 140 · cosmetic 11 · evolution 45 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#196](https://github.com/DefinitelyFrenchName/VampireSaved/issues/196) | evolution | open | The MAME wrappers default to the pinned source build on every host, not to whatever mame is on PATH (the ~43 unpinned stock-set gates) | `tests/test_input_integrity.sh` | `DECISIONS_HISTORY.md § Ruled 2026-10-01 (14z-187b) — gates that run stock sets with no MAME_BIN` | `docs/platform/gotchas.md § The recorded, un-gated remainder` | none | 14z-187b |
 | [#195](https://github.com/DefinitelyFrenchName/VampireSaved/issues/195) | bug | open | After Cosmo Disruption Pyron cannot pursue on our build: vs2 marks the victim pursuit-able (+0x117) for reaction class 0x51 alone, which vsavj never stores | none | `DECISIONS_HISTORY.md § Ruled 2026-10-01 (14z-187) — #194: Cosmo Disruption takes record class 0x44` | none | none | 14z-187 |
 | [#194](https://github.com/DefinitelyFrenchName/VampireSaved/issues/194) | bug | open | Pyron's Cosmo Disruption gives the victim a plain hit reaction on ours where native vs2 gives the fire / knockdown reaction (record class 0x51 remapped to 0x4F) | none | `DECISIONS_HISTORY.md § Ruled 2026-09-30 (14z-186) — Pyron's Cosmo Disruption on Demitri` · `DECISIONS_HISTORY.md § Ruled 2026-10-01 (14z-187) — #194: Cosmo Disruption takes record class 0x44` | none | none | 14z-186,14z-187 |
 | [#192](https://github.com/DefinitelyFrenchName/VampireSaved/issues/192) | bug | open | Demitri's Chaos Flare differs between vsavj and vsav2 with no port (a sprite at +47, node timing from +45), and the split reaches ours-vs-native comparisons with Demitri as P2 | none | `DECISIONS_HISTORY.md § Ruled 2026-09-30 (14z-186) — two tickets found under #184` · `DECISIONS_HISTORY.md § Ruled 2026-09-30 (14z-186) — #184's captures read identical` | none | none | 14z-186 |

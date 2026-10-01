@@ -2,8 +2,9 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 195
+# issues: 196
 number	state	reason	closed	labels	title
+196	OPEN	-	-	evolution	The MAME wrappers default to the pinned source build on every host, not to whatever mame is on PATH
 195	OPEN	-	-	bug	After Cosmo Disruption Pyron cannot pursue on our build: vs2 marks the victim pursuit-able (+0x117) for reaction class 0x51 alone, which vsavj never stores
 194	OPEN	-	-	bug	Pyron's Cosmo Disruption gives the victim a plain hit reaction on ours where native vs2 gives the fire / knockdown reaction (record class 0x51 remapped to 0x4F)
 193	CLOSED	COMPLETED	2026-09-30	bug	tools/move_parity.py never compares the white HP word +0x52, so the ours-vs-native gates cannot see a white-word-only damage difference

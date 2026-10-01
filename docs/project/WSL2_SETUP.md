@@ -288,6 +288,23 @@ driver` when the WIDE build is genuinely patched; if that line is missing,
 something went wrong and the script will say so rather than hand you a
 stock binary.
 
+**Then give the gates a `mame` on PATH (14z-187b).** About 43 gates run the
+stock sets through the wrappers without naming a binary, and fall back to
+`mame` on PATH — on the Mac that is Homebrew's 0.288, which froze the oracle;
+here there is none, so each of them fails with `exec: mame: not found`
+(measured on ERIS, `test_input_integrity.sh`). Point `mame` at the pinned,
+UNPATCHED source build — verdict-equivalent to Homebrew's binary, which is
+exactly what §7's parity gate proves on this machine:
+
+```bash
+mkdir -p ~/.local/bin && ln -sfn ~/.cache/vampire-saved/mame-ref/cps2 ~/.local/bin/mame
+# Ubuntu's ~/.profile puts ~/.local/bin on PATH at the next login shell
+```
+
+`test_mame_parity.sh` recognises this binary (same sha1 as the source build)
+and refuses it as its reference, so it can never A/B the build against
+itself. A wrapper-level default on every host is a ticket, not done.
+
 ## 7. THE ACCEPTANCE TEST
 
 This is the step that decides whether the machine can be trusted:
@@ -333,7 +350,7 @@ distinguishable from the log.
 Then the rest:
 
 ```bash
-ROMDIR=~/roms tests/test_input_integrity.sh
+ROMDIR=~/roms tests/test_input_integrity.sh     # needs the `mame` shim of §6, or MAME_BIN=~/.cache/vampire-saved/mame-ref/cps2
 ROMDIR=~/roms tests/test_mame_wide.sh
 ROMDIR=~/roms FBNEO_REF=~/fbneo_ref tests/test_wide_profile.sh
 ```

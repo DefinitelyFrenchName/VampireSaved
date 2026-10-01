@@ -147,10 +147,18 @@ echo "== 0. instrument identity =="
     echo "  no source-built MAME at $SRC_BIN"
     echo "  build it: tools/setup_mame.sh   (WIDE=0 for the unpatched binary)"
     exit 1; }
+SRC_SHA="$(shasum "$SRC_BIN" | cut -d' ' -f1)"
 echo "  under test : $SRC_BIN"
-echo "               sha1 $(shasum "$SRC_BIN" | cut -d' ' -f1)"
+echo "               sha1 $SRC_SHA"
 echo "               $("$SRC_BIN" -version 2>/dev/null | head -1)"
-if [ -n "$REF_BIN" ]; then
+# A host without Homebrew's MAME may put the pinned source build on PATH as
+# `mame` for the gates that run stock sets unpinned (14z-187b, the maintainer:
+# "A and B as a ticket"). That binary is NOT a reference: an A/B of the source
+# build against itself passes by construction. Refuse it as one.
+if [ -n "$REF_BIN" ] && [ -x "$REF_BIN" ] && [ "$(shasum "$REF_BIN" | cut -d' ' -f1)" = "$SRC_SHA" ]; then
+    echo "  reference  : $REF_BIN IS the source build under test (same sha1) — not a reference"
+    REF_BIN=""
+elif [ -n "$REF_BIN" ]; then
     echo "  reference  : $REF_BIN"
     echo "               sha1 $(shasum "$REF_BIN" | cut -d' ' -f1)"
     echo "               $("$REF_BIN" -version 2>/dev/null | head -1)"

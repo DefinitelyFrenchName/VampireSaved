@@ -13,11 +13,11 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**408 of 408 gates described.**
+**410 of 410 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
-| [runner](#runner) | 37 | 37 | the suite runners and their own ground truth |
+| [runner](#runner) | 39 | 39 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 38 | 38 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 58 | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -30,7 +30,7 @@ first sentence) is `gate_index.md`.
 
 ## runner
 
-the suite runners and their own ground truth. 37 of 37 described.
+the suite runners and their own ground truth. 39 of 39 described.
 
 ### `run_all_emulator.sh` — run, emulator
 
@@ -135,6 +135,14 @@ the suite runners and their own ground truth. 37 of 37 described.
 **HOW:** drives the runner's selftest over a synthetic checks file with known answers; two controls run copies with the partial marker forced to full and the expected exit ignored, and each must fail the selftest.
 
 **EXPECTS:** the selftest's eight checks pass and both controls fail on their copies; a red names the check.
+
+### `test_close_loop_cost.sh` — test, ci_portable
+
+**WHAT:** tools/agent/close_loop_cost.py reads a session transcript and reports each execution of a close's check runner with its seconds, the passes whose own command edited a count, the packet's span from the first rule-checker prepare to the last record, and every distinct `"<n>` untracked" figure.
+
+**HOW:** builds a SYNTHETIC transcript (no real transcript is committed: one carries the user's identity) holding every shape that has broken the reader — a runner run by python3 with a subcommand, its `status` call and a mere mention (neither a pass), a background pass ended by its task notification, a sh-run runner, a prepare whose output was cut to its last line, a record — and requires the reader's exact lines; then runs the reader's own --plant; three controls run shadow copies with one perturbation each, and each must fail the comparison.
+
+**EXPECTS:** the python3 runner 2 passes / 190 s (70 s foreground EDITS-COUNT, 120 s background), the sh runner 1 pass / 30 s, the span 0.67 h, the figure 1,234, the plant CAUGHT; each control FIRES.
 
 ### `test_controls_contract.sh` — test, ci_portable
 
@@ -247,6 +255,14 @@ the suite runners and their own ground truth. 37 of 37 described.
 **HOW:** the tool runs over the tree (and, for the controls, over a copy with one gate perturbed); the gate joins its output with the frozen table by (gate, address, sample); a finding without a row, a live row without a finding, or a mis-classed known case is a red.
 
 **EXPECTS:** PASS when the derived findings and the table agree. A red names the finding and the direction (new finding: classify it — FREEZE=1 adds it as UNCLASSIFIED for the maintainer; stale row: mark it RETIRED with why; the known case lost: the census went blind).
+
+### `test_promise_check.sh` — test, ci_portable
+
+**WHAT:** tools/promise_check.py's verdicts mean what they say: the promise list is read from the sitting's STATE group (bounded by the next group, a `---` or a level-1 heading) and its ledger resolutions; a FULFILLED row's text must be in a tracked file and absent at the sitting's base commit; a CARRIED row names an open or parked ticket or a START HERE item; a NOT-A-PROMISE row gives its reason; an unclassed, ambiguous or stale row fails.
+
+**HOW:** drives the checker's selftest — a synthetic git repository with one case per failure condition and a passing case that requires exactly four listed promises; three controls run shadow copies with one perturbation each, and each must fail the selftest.
+
+**EXPECTS:** SELFTEST PASS (ten cases); each control's copy SELFTEST FAIL.
 
 ### `test_rule_checker.sh` — test, ci_portable
 
