@@ -2,14 +2,17 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 196
+# issues: 199
 number	state	reason	closed	labels	title
+199	OPEN	-	-	bug	Merged-image extracts on a fresh host: the reproducibility gate reads INPUTS OK on directories alone, and the tracked regions.json are stale (region data identical)
+198	OPEN	-	-	evolution	Parity rigs: P2 Demitri attacks with a chain whose record is equal on both games (forbid the record-differing a2 chains in P2_NEVER)
+197	OPEN	-	-	bug	The latch-readers census misses every immediate store (move.b #n,$off(An)): five latch writers unlisted, one a flavor write
 196	OPEN	-	-	evolution	The MAME wrappers default to the pinned source build on every host, not to whatever mame is on PATH
 195	OPEN	-	-	bug	After Cosmo Disruption Pyron cannot pursue on our build: vs2 marks the victim pursuit-able (+0x117) for reaction class 0x51 alone, which vsavj never stores
 194	OPEN	-	-	bug	Pyron's Cosmo Disruption gives the victim a plain hit reaction on ours where native vs2 gives the fire / knockdown reaction (record class 0x51 remapped to 0x4F)
 193	CLOSED	COMPLETED	2026-09-30	bug	tools/move_parity.py never compares the white HP word +0x52, so the ours-vs-native gates cannot see a white-word-only damage difference
-192	OPEN	-	-	bug	Demitri's Chaos Flare differs between vsavj and vsav2 with no port (a sprite at +47, node timing from +45), and the split reaches ours-vs-native comparisons with Demitri as P2
-191	CLOSED	COMPLETED	2026-10-01	bug	Donovan takes 9 from Demitri's 2HK on ours against 8 on native, where the engines agree on a legacy victim (not #161's class)
+192	CLOSED	NOT_PLANNED	2026-10-01	bug	Demitri's Chaos Flare differs between vsavj and vsav2: vs2 lengthened its hold node (30 -> 32 ticks) and lowered its fireball's records (12 -> 11); ours runs vsavj's
+191	CLOSED	COMPLETED	2026-10-01	bug	Donovan takes 9 from Demitri's 2HK on ours against 8 on native: vs2 lowered Demitri's 2HK record (10 -> 9); ours runs vsavj's
 190	OPEN	-	-	evolution	Promote the recurring close checks into tools/ with gates (#185 item 2)
 189	OPEN	-	-	evolution	The emulator driver's run record: full status, submodules, command, environment and reach hashes at start and end (#185 item 1)
 188	OPEN	-	-	evolution,severity: medium	Static tier: carry forward passes after a red (re-run only the failed and stale gates)
@@ -30,7 +33,7 @@ number	state	reason	closed	labels	title
 173	CLOSED	COMPLETED	2026-09-25	bug	Pyron's heavy-hit reaction runs the generic chain b:0x03 on our build where native vs2 runs his b:0x19 (5HP, j.HP, throw release) — class, freeze and length equal
 172	CLOSED	COMPLETED	2026-09-24	enhancement	Enforce the discipline at the AGENT level: orchestrator / checker / workers, with the checker unable to be overridden
 171	OPEN	-	-	enhancement	Qualify every gate: prove it measures what it claims, and that it notices when its inputs move
-170	OPEN	-	-	enhancement,parked	Notarize the macOS release binaries (PARKED, would need community demand and ressources to justify the cost)
+170	OPEN	-	-	enhancement,parked	Notarize the macOS release binaries (PARKED, would need community demand *and* ressources to justify the cost)
 169	CLOSED	COMPLETED	2026-09-25	bug	pyron_3 Galactic Throw: the air throw connects on only one strength, and [j.6HP]'s frozen chain is a plain j.HP
 168	CLOSED	COMPLETED	2026-09-20	bug	The naming rigs' first X pin lands before the round starts on seven parts — the #136 ENTRANCE class
 167	CLOSED	COMPLETED	2026-09-29	evolution	A freeze leaves stale PINS the re-point sweep cannot see: a gate for superseded-fingerprint references

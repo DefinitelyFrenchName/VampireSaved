@@ -105,6 +105,8 @@ retraction grep covers this file.
 
 ---
 
+*(14z-187b marker: the ruling below stands — #191 stays `not-ours` — but its stated mechanism "the two engines' damage difference" is RETRACTED: vs2 lowered Demitri's own attack records, shown by swapping the record bytes both ways; `docs/game/engine_internals.md` "DEMITRI'S DATA DIFFERS BETWEEN VSAVJ AND VS2", STATE 14z-187 row (8).)*
+
 ## Ruled 2026-10-01 (14z-187) — #191 closed `not-ours`: Demitri's 2HK on Donovan is the two engines' damage difference (#161's class)
 
 **The question, verbatim:** *"#191: Demitri's 2HK takes 9 from Donovan on ours vs 8 native. With no port involved, pristine vsavj takes 1 more than vsav2 from that same 2HK on 14 of the 15 legacy victims it hit, from either side. Victor, the one victim the 14z-186 control used, is the only one where the two games agree. That is the same engine difference as #161, which you ruled not-ours. Close #191 as not-ours?"*
@@ -149,6 +151,26 @@ retraction grep covers this file.
 **The maintainer, verbatim:** *"A and B as a ticket"*.
 
 **What it means.** (a): ERIS's `~/.local/bin/mame` links to `~/.cache/vampire-saved/mame-ref/cps2`, written into WSL2_SETUP.md §6 for any non-Mac host; `tests/test_mame_parity.sh` refuses a reference binary whose sha1 equals the source build's, so the shim can never become its own A/B reference. (b) is a ticket: a wrapper-level default to the pinned build on every host, the Mac included.
+
+---
+
+## Ruled 2026-10-01 (14z-187b) — #192 closed `not-ours`, documented with the other differences between the two games; the measured order of work after it
+
+**The question, verbatim (the session's message):** *"Since vsavj's Demitri is the vanilla one we ship, I'd close #192 as **not-ours**, like #191. That's your ruling."* — after measuring that vs2 lengthened Demitri's Chaos Flare recovery (a2:0x1e-0x21 node 5, 30 ticks -> 32/33/34/31) and lowered its fireball's red power (12 -> 11, 15 -> 14), and *"Should I measure the DMG-VSAVJ rows now, before #195 continues?"*
+
+**The maintainer, verbatim:** *"agreed but we document the finding about the difference in the two games, as we did for the other differences found"*, and *"yes"* (measure the DMG-VSAVJ rows now). Then, on the plan after that measurement (the retraction of #191's mechanism, the re-class of the six rows, #161, the P2 guard, #192's close): *"Yes, proceed in that order. And yes, proceed as well on ERIS"*.
+
+**What it means.** #192 closes `not-ours`; its facts live in `docs/game/engine_internals.md` "DEMITRI'S DATA DIFFERS BETWEEN VSAVJ AND VS2" beside #191's and #161's (whose stated mechanism, "the engines", was corrected the same sitting: vs2 lowered Demitri's own records), and its record is `tests/audit_demitri_split.sh`.
+
+---
+
+## Ruled 2026-10-01 (14z-187b) — the parity rigs' P2 guard: declare the record-differing chains now, forbid them as a ticket
+
+**The question (AskUserQuestion), verbatim:** *"P2 Demitri enters three chains whose attack records differ between the games (a2:0x04 his 5HP, a2:0x05, a2:0x0a), which the rig guard P2_NEVER doesn't list. All six rows they touch are now attributed P2-RECORD and measured. How should the guard handle them?"* — options *"Declare, ticket forbid (Recommended)"*, *"Forbid now"*, *"Declare only"*.
+
+**The maintainer:** *"Declare, ticket forbid (Recommended)"*.
+
+**What it means.** `P2_REPORT` (`tools/name_moves.py`) lists a2:0x04, a2:0x05 and a2:0x0a beside b:0x10, their frame counts asserted equal on both legs by `tests/audit_move_parity.sh` (PASS, ALL=1); the rigs regenerated (every `.rpl` byte-identical, the JSONs' `p2.report` alone changed; naming, chains174, chains184). Forbidding them — re-authoring the guard-cancel rigs so P2 attacks with an equal-record chain — is #198.
 ---
 
 ## Ruled 2026-09-30 (14z-186) — two tickets found under #184: Donovan's 2HK damage (#191) and Change Immortal's one-frame timing
@@ -537,6 +559,8 @@ The maintainer, at the 14z-182 opener, on the entry below as put to them (*"The 
 - **The parity gates' per-frame RNG and level pins as their equalised INPUT — a ruling that settles the rule-checker's Q3 for every cross-game gate (opened 14z-181, 2026-09-25).** Every ours-vs-native parity gate (`audit_move_parity`, `audit_df_moves`, `test_don_immortal_native`, their kin) writes the speed level (`RAM:$FF8116` := 6) and the RNG word (`RAM:$FF80D4` := 0) on EVERY frame of both legs — the method the maintainer chose for `test_don_immortal_native` on 2026-09-15 (*"Pin both, assert frames"*, `DECISIONS_HISTORY.md` "Ruled 2026-09-15 (14z-158)") and the gates adopted since 14z-160. The pinned rule-checker returns Q3 VIOLATED on every packet that compares two legs under those pins (runs `2026-09-25-150`, `-152`, `-153`, `-154`): a shared write that selects the compared hits (the RNG's bit 0 picks the pass order), so a port defect in the RNG's ADVANCE would be reset away on both legs and read as agreement. The session accepted the finding in writing as the gates' design (run 153's resolution). Options: (a) RULE the per-frame pins the parity gates' equalised input, with the RNG-advance question its own ticket (a gate that compares the RNG's consumption per frame between the games, which `audit_df_moves`' sword rows already record without a verdict: native 201 / ours 198 reads in one window) — Q3 then reads as a named, ruled premise; (b) require every parity gate to add an unpinned-leg control (`audit_df_moves` has `pins-unpinned` since 14z-181; `audit_move_parity` has `unpinned-level`) and keep accepting Q3 per packet; (c) redesign the comparison to pin the RNG once at the match anchor only (the 14z-160 form) and accept that the two engines' draws diverge. Recommendation: (a) with the ticket — the per-frame pin is what makes a two-engine comparison a comparison, and the advance question is real but separate. Nothing a player feels changes by this ruling.
 
 ---
+
+*(14z-187b marker: the ruling below stands — #161 stays `not-ours` — but "the +1 is vsavj's own damage pipeline" is RETRACTED: it is Demitri's own 5HP record (a2:0x04#2, 14 on vsavj, 13 on vs2); swapping that byte swaps Phobos's damage both ways (huitzil_5:8, huitzil_6:16) and on Victor; `docs/game/engine_internals.md` "DEMITRI'S DATA DIFFERS BETWEEN VSAVJ AND VS2", STATE 14z-187 row (8).)*
 
 ## Ruled 2026-09-25 (14z-182) — #161 closed as `not-ours`: the +1 is vsavj's own damage pipeline
 

@@ -5,20 +5,25 @@
 #   found by ablation (its event's inputs removed, both legs re-run, the rows that vanish
 #   are its) and named by a measured signature class (METER-SWAP, SLOWDOWN, DF-STOCK,
 #   ENTRANCE, GUARD-REENTRY, P2-DISPLACEMENT, TRAP-REMAP, COLUMN-SHOCK, DEFENSE-ROW /
-#   DMG-VSAVJ — the last the tenant taking one more from Demitri's 5HP with its rows already
-#   vs2's, vsavj's own damage pipeline: #161 ruled not-ours 2026-09-25); no root is
+#   P2-RECORD — the last the tenant taking one more from Demitri's 5HP with its rows already
+#   vs2's, because vs2 lowered that hit's own attack record (P2's node mapped on both legs, the
+#   record read from both images; #161 ruled not-ours 2026-09-25; replaces DMG-VSAVJ, whose
+#   "vsavj's own damage pipeline" was RETRACTED 14z-187b); no root is
 #   OTHER and no row UNATTRIBUTED.
 # HOW: tools/move_parity_attribution.py on MAME: step 0 re-runs the committed rigs and must
 #   reproduce the frozen table, then iterative ablation over the ~19 parts carrying a DIFF
-#   with each root's signature read from its own window; the control disables ablation,
-#   which must leave rows unattributed.
+#   with each root's signature read from its own window; each P2-RECORD root's legs re-run
+#   with the record byte poked to the other game's value and to its OWN value (the inert
+#   control); the control disables ablation, which must leave rows unattributed.
 # EXPECTS: the frozen root and row tables equal (a fix changes them by design and is read as
-#   the fix's effect), no OTHER, no UNATTRIBUTED; the no-ablation run fails.
+#   the fix's effect), no OTHER, no UNATTRIBUTED; every swapped leg takes the other leg's
+#   damage and every own-value leg reproduces its unpoked trace; the no-ablation run fails.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/move_parity_attribution.tsv
-#   tests/expected/move_parity_events.tsv tools/move_parity_attribution.py
+#   tests/expected/move_parity_events.tsv tools/move_parity_attribution.py tests/lua/rom_poke.lua tools/dmg_sweep.py
 #   tools/setup_mame.sh
 #
 # MUST-FIRE: shadow-tool: no-ablation — the tool with ablation disabled (roots classified, never removed) must leave rows UNATTRIBUTED and FAIL, so every attribution rests on a row actually vanishing when its root's inputs are removed (in-gate: donovan_11 alone with ablation disabled must leave its row unattributed; mode: the whole table with ablation disabled FAILs)
+# MUST-FIRE: perturbed-copy: p2-record-unswapped — every P2-RECORD root's legs re-run with P2 Demitri's record byte set to the other game's value must take the other leg's damage; with the UNPOKED traces in their place the check must FAIL, and in-gate the unpoked legs must differ (in-gate: the unpoked legs differ on every root; mode: the unpoked traces stand in for the swapped ones and the gate FAILs)
 #
 # WHY. The maintainer, 2026-09-18 (14z-168): "here we have many divergences which may
 # or may not share sources so let's finish all the analysis first. Then we'll fix and
@@ -33,9 +38,10 @@
 # (ENTRANCE), vsavj's block re-entry (GUARD-REENTRY, tests/audit_guard_reentry.sh), #159
 # (P2-DISPLACEMENT; fixed at the M21 freeze, 14z-185, and the tool's seed for it retired), the ruled trap remap (TRAP-REMAP), the column shock (COLUMN-SHOCK,
 # tests/audit_column_shock.sh), the defense row (DEFENSE-ROW; the vs2 rows ruled 2026-09-18, BUILT at the M19 freeze — on a build whose row
-# 0x10 is already vs2's the same signature is DMG-VSAVJ: Demitri's 5HP 11 native / 12 ours — frozen 2026-09-19 "Freeze,
-# ticket it (Recommended)" as the open class PHOBOS-DMG-OPEN, measured 14z-181 as vsavj's own damage pipeline (a legacy
-# victim reads the same +1), and renamed when #161 closed as not-ours, 2026-09-25).
+# 0x10 is already vs2's the same signature is P2-RECORD: Demitri's 5HP 11 native / 12 ours — frozen 2026-09-19 "Freeze,
+# ticket it (Recommended)" as the open class PHOBOS-DMG-OPEN, read 14z-181 as vsavj's own damage pipeline (a legacy
+# victim reads the same +1), renamed DMG-VSAVJ when #161 closed as not-ours, 2026-09-25, and RE-CLASSED 14z-187b: the
+# +1 is Demitri's own 5HP record, lower on vs2, swapped both ways by tests/audit_dmg_legacy_sweep.sh section 5).
 #
 # WHAT IT FREEZES (tests/expected/move_parity_attribution.tsv), the tool's rows:
 #   root <part:event | opening> <event name> <class> step=<n> <the signature's evidence>
@@ -60,7 +66,7 @@ CONTROL="${CONTROL:-}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 [ -f "$ROMDIR/vsav2.zip" ] || { echo "SKIP: no vsav2.zip in $ROMDIR"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no WIDE build at $BUILD"; exit 0; }
-case "$CONTROL" in ""|no-ablation) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
+case "$CONTROL" in ""|no-ablation|p2-record-unswapped) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
@@ -69,7 +75,8 @@ TOOL="$REPO/tools/move_parity_attribution.py"
 
 echo "== 1. the attribution (steps 0, E, 1..N)"
 NA=""; [ "$CONTROL" = no-ablation ] && NA="--no-ablate"
-python3 "$TOOL" run --build "$BUILD" --romdir "$ROMDIR" --work "$W/run" --jobs "$JOBS" --mame-bin "$MAME_BIN" $NA > "$W/got.tsv" 2> "$W/err" \
+US=""; [ "$CONTROL" = p2-record-unswapped ] && US="--p2check-unswapped"
+python3 "$TOOL" run --build "$BUILD" --romdir "$ROMDIR" --work "$W/run" --jobs "$JOBS" --mame-bin "$MAME_BIN" $NA $US --p2check-out "$W/p2check.txt" > "$W/got.tsv" 2> "$W/err" \
     || { bad "the tool: $(tail -1 "$W/err")"; }
 [ "$fail" = 0 ] || { echo "FAIL: audit_move_parity_attribution"; exit 1; }
 ok "$(grep -c '^root' "$W/got.tsv" | tr -d ' ') roots, $(grep -c '^row' "$W/got.tsv" | tr -d ' ') rows"
@@ -81,6 +88,23 @@ awk -F'\t' '!/^#/ && $4=="DIFF" {print $1 "\t" $2}' "$EVENTS" | sort > "$W/diff_
 awk -F'\t' '$1=="row" && $4=="base" {print $2 "\t" $3}' "$W/got.tsv" | sort > "$W/diff_attr.txt"
 if diff "$W/diff_frozen.txt" "$W/diff_attr.txt" > "$W/cov.txt"; then ok "every one of the $(wc -l < "$W/diff_frozen.txt" | tr -d ' ') frozen DIFF rows is attributed"
 else bad "the attributed rows and the frozen DIFF rows differ:"; sed 's/^/        /' "$W/cov.txt" | head -10; fi
+
+echo "== 1b. every P2-RECORD root's mechanism, measured (14z-187b): the record byte swapped, both ways"
+if [ -s "$W/p2check.txt" ]; then
+    sed 's/^/     /' "$W/p2check.txt" | cut -c1-220
+    n_root="$(awk -F'\t' '$1=="root" && $4=="P2-RECORD"' "$W/got.tsv" | grep -c . || true)"
+    n_ok="$(grep -c '^check	.*	confirmed	' "$W/p2check.txt" || true)"
+    if [ "$n_ok" = "$((2 * n_root))" ] && ! grep -q 'NOT VERIFIED' "$W/p2check.txt"; then
+        ok "all $n_root P2-RECORD roots confirmed both ways: each leg given the other game's record takes the other leg's damage"
+    else bad "P2-RECORD not confirmed: $n_ok of $((2 * n_root)) legs, $(grep -c 'NOT VERIFIED' "$W/p2check.txt") unverified poke(s)"; fi
+    # the inert control (rule-checker run 2026-10-01-518 Q1/Q4): the byte poked to its OWN value reproduces each leg's
+    # unpoked trace exactly, on the merged image and on vs2's, while the swapped trace differs under the same comparison
+    n_in="$(awk -F'\t' '$1=="inert"' "$W/p2check.txt" | grep -c . || true)"
+    n_id="$(awk -F'\t' '$1=="inert" && $5=="identical" && $6=="swapped trace differs"' "$W/p2check.txt" | grep -c . || true)"
+    if [ "$n_in" -gt 0 ] && [ "$n_id" = "$n_in" ]; then
+        ok "the poke path is inert on both images: $n_id of $n_in own-value legs reproduce their unpoked trace, each swapped trace differs"
+    else bad "own-value legs: $n_id of $n_in identical with a differing swapped trace"; fi
+elif awk -F'\t' '$1=="root" && $4=="P2-RECORD"' "$W/got.tsv" | grep -q .; then bad "P2-RECORD roots with no check file"; fi
 
 echo "== 2. the frozen rows"
 if [ "${FREEZE:-0}" = 1 ]; then
@@ -106,6 +130,13 @@ if [ "$CONTROL" = no-ablation ]; then
     if [ "$fail" = 1 ]; then echo "CONTROL FIRED: no-ablation — without removing roots, rows stay unattributed"; echo "FAIL: audit_move_parity_attribution (control mode)"; exit 1
     else echo "CONTROL DEAD: no-ablation — the table was attributed without any ablation"; echo "FAIL: audit_move_parity_attribution"; exit 1; fi
 fi
+if [ "$CONTROL" = p2-record-unswapped ]; then
+    if [ "$fail" = 1 ]; then echo "CONTROL FIRED: p2-record-unswapped — with the unpoked traces in place of the swapped ones the P2-RECORD check fails"; echo "FAIL: audit_move_parity_attribution (control mode)"; exit 1
+    else echo "CONTROL DEAD: p2-record-unswapped — the check passed on unswapped traces"; echo "FAIL: audit_move_parity_attribution"; exit 1; fi
+fi
+if grep -q '^control	p2-record-unswapped	fired' "$W/p2check.txt" 2>/dev/null; then
+    echo "CONTROL FIRED: p2-record-unswapped — $(awk -F'\t' '$1=="control"{print $4}' "$W/p2check.txt"), so the swap's equality is something the check can refuse"
+else echo "CONTROL DEAD: p2-record-unswapped — $(awk -F'\t' '$1=="control"{print $4}' "$W/p2check.txt" 2>/dev/null)"; fail=1; fi
 python3 "$TOOL" run --build "$BUILD" --romdir "$ROMDIR" --work "$W/ctl" --jobs "$JOBS" --mame-bin "$MAME_BIN" --parts donovan_11 --no-ablate > "$W/ctl.tsv" 2>/dev/null || true
 if awk -F'\t' '$1=="row" && $2=="donovan_11" && $5=="UNATTRIBUTED"' "$W/ctl.tsv" | grep -q .; then
     echo "CONTROL FIRED: no-ablation — donovan_11's row stays UNATTRIBUTED when its root is not removed"

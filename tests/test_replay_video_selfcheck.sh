@@ -11,7 +11,7 @@
 # EXPECTS: all four checks; an instrument that always differs is as useless as one that
 #   never does.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/vsavj/02_demitri_vs_cpu.sha1
-#   tests/lua/replay.lua tests/replays/02_demitri_vs_cpu.rpl tools/build_donovan.sh
+#   tests/lua/replay.lua tests/replays/02_demitri_vs_cpu.rpl tests/test_m2b_stage6.sh tools/build_donovan.sh
 #   tools/run_mame.sh tools/run_replay_mame.sh tools/setup_mame.sh
 #
 # WHY: session 14z-55 discovered that the FBNeo harness had never rendered a
@@ -96,7 +96,7 @@ fi
 
 echo "== 4. two-sided ground truth vs a known pixel difference =="
 if [ ! -f "build/donovan6/rompath/vsavj.zip" ]; then
-    echo "  SKIPPED: no build/donovan6/rompath (tools/build_donovan.sh 6 build/donovan6)"
+    echo "  SKIPPED: no build/donovan6/rompath (the dev build tests/test_m2b_stage6.sh makes: GEN_FLAGS=\"--allow-plausible --tripwire-open\" tools/build_donovan.sh 6 build/donovan6)"
     echo "  NOTE: checks 1-3 show the instrument is live, deterministic and"
     echo "        harmless, but NOT that it detects a real pixel difference."
     skipped=1

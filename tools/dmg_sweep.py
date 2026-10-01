@@ -10,6 +10,17 @@ Two commands, both reading every line of every field trace they are given:
       docs/game/engine_internals.md "The DAMAGE pipeline". Prints the SHA-1 of each image, the ids whose rows
       differ, and equal/DIFF for the two tables; never a byte.
 
+  records <vsavj data view> <vsav2 data view>
+      THE MECHANISM (14z-187b, corrected by counterfactual): Demitri's three hits are nodes of his OWN a2 chains
+      whose attack records differ between the games — HITS below, the nodes traced at each hit on both games
+      (build/agent187b/t191n, the attacker's ff841c mapped through tools/audit_same_data_p2.py's node index). For
+      each: the chain/node, the record's red-damage byte address in each data view and its value, equal/DIFF.
+      Prints the addresses so the gate's counterfactual can set one game's bytes to the other's.
+
+  nodes <data view> <vsavj|vsav2> <trace>
+      Demitri's (P1) node at each victim red drop in one trace, mapped to (table, seq, node) — the gate's check
+      that the counterfactual legs' hits are HITS' nodes.
+
   rows <work dir> <donovan rig json> [--perturb engines-agree|attacker-swapped]
       One row per hit of every leg the gate ran (traces <dir>/L.<side>.<victim>.<game>/f.ft and
       <dir>/D.<native|ours>/f.ft), on stdout, and every structural problem on stderr as `PROBLEM ...` (exit 1 if
@@ -117,7 +128,58 @@ def rows(work, rig, perturb=None):
     return out, probs
 
 
+HITS = (("2HK", "a2", "0x11", 2), ("5HP", "a2", "0x04", 2), ("623HP", "a2", "0x28", 1))
+
+
+def _demitri(img, layout):
+    """Demitri's (0x01) node index and walker chains, read with the census's own bank layout"""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import audit_same_data_p2 as sd
+    from hitbox_records import HitboxSet
+    from anim_nodes import walk_table
+    from pathlib import Path
+    bank = sd.mt.loads((Path(__file__).resolve().parent.parent / "build/manifest/bank_map.toml").read_text())
+    d = int(bank["origins"][layout]) - int(bank["origins"]["vsavj"])
+    rows_ = {t["name"]: int(t["vsavj"]) for t in bank["table"]}
+    hb = HitboxSet.from_image(img, sd.rd32(img, rows_["hitbox_base"] + d + 4), sd.rd32(img, rows_["hitbox_comp"] + d + 4))
+    chains = lambda t: walk_table(img, 0, sd.rd32(img, rows_["anim_index_" + t] + d + 4))["chains"]
+    return sd.node_index(img, rows_, d, 0x01), hb, chains
+
+
+def records(jp, vp):
+    out = []
+    for g, p in (("vsavj", jp), ("vsav2", vp)):
+        img = open(p, "rb").read()
+        print(f"{g}: {p} sha1 {hashlib.sha1(img).hexdigest()}")
+        _, hb, chains = _demitri(img, g)
+        got = {}
+        for name, t, seq, k in HITS:
+            n = chains(t)[seq]["nodes"][k]
+            r = hb.node_boxes(n["hb8"], n["hbA"])["attack"]
+            got[name] = (int(r["addr"], 16) + 8, r["real"])
+        out.append(got)
+    for name, t, seq, k in HITS:
+        (ja, jv), (va, vv) = out[0][name], out[1][name]
+        print(f"record {name} {t}:{seq}#{k} vsavj {ja:#x}={jv} vsav2 {va:#x}={vv} {'equal' if jv == vv else 'DIFF'}")
+
+
+def nodes(img_path, layout, trace):
+    img = open(img_path, "rb").read()
+    idx, _, _ = _demitri(img, layout)
+    R, _ = load(trace)
+    for f in sorted(R):
+        if f - 1 in R and R[f]["p2hp"] < R[f - 1]["p2hp"]:
+            w = idx.get(f"0x{R[f]['node']:x}")
+            print(f"hit f{f} red -{R[f - 1]['p2hp'] - R[f]['p2hp']} node {w[0]}:{w[1]}#{w[2]}" if w else f"hit f{f} node UNMAPPED")
+
+
 def main():
+    if len(sys.argv) >= 4 and sys.argv[1] == "records":
+        records(sys.argv[2], sys.argv[3])
+        return
+    if len(sys.argv) >= 5 and sys.argv[1] == "nodes":
+        nodes(sys.argv[2], sys.argv[3], sys.argv[4])
+        return
     if len(sys.argv) >= 4 and sys.argv[1] == "tables":
         tables(sys.argv[2], sys.argv[3])
         return 0

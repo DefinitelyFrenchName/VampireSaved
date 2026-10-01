@@ -419,3 +419,4 @@ tests/test_superseded_pins.sh	runner
 tests/test_freeze_set_shape.sh	runner
 tests/test_close_loop_cost.sh	runner
 tests/test_promise_check.sh	runner
+tests/audit_demitri_split.sh	character-data

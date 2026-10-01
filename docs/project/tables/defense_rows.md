@@ -167,16 +167,20 @@ Sasquatch's 0x0A alone, re-frozen. **THE ONE RESIDUAL IS VSAVJ'S OWN (RULED NOT-
 5HP takes 12 HP from Phobos where native vs2 takes 11 (merged-m18 13), deterministic across RNG pins, with Phobos's curve
 row AND threshold word already vs2's; Donovan and Pyron read the same +1 (12 native / 13 ours, rows already vs2's). A
 LEGACY victim reads it with no port in the loop — Demitri's 5HP on Victor takes 12 on pristine vsavj and 11 on pristine
-vs2, Victor's rows byte-identical between the games (measured 14z-181) — so the extra point is vsavj's damage pipeline
-against vs2's, and our build runs vsavj's. Kept under "vanilla wins ties" (STATE "STANDING PRINCIPLE"); WHERE in the
-pipeline vsavj adds it is not measured. Record: `tests/audit_phobos_dmg_residual.sh` (its `legacy` rows); the
+vs2, Victor's rows byte-identical between the games (measured 14z-181) — ~~so the extra point is vsavj's damage pipeline
+against vs2's~~ **RETRACTED 14z-187b: the extra point is Demitri's OWN 5HP record (a2:0x04#2, red power 14 on vsavj, 13
+on vs2); setting it to the other game's value moves the damage to the other game's, both ways, on Victor and on all six
+parity rows (`tests/audit_dmg_legacy_sweep.sh` section 5; `docs/game/engine_internals.md` "DEMITRI'S DATA DIFFERS
+BETWEEN VSAVJ AND VS2")** — and our build runs vsavj's Demitri. Kept under "vanilla wins ties" (STATE "STANDING
+PRINCIPLE"). Record: `tests/audit_phobos_dmg_residual.sh` (its `legacy` rows); the
 attribution class `DMG-VSAVJ` (`tools/move_parity_attribution.py`; `PHOBOS-DMG-OPEN` / `DMG-OPEN` until the ruling).
 **THE SAME CLASS ON 2HK (RULED NOT-OURS 2026-10-01, #191):** Donovan takes 9 from Demitri's 2HK on our build where
 native vs2 takes 8. The first legacy control (Victor) agreed on 2HK, which is why #191 was opened; widened to every
 legacy victim from both sides (14z-187), pristine vsavj takes one more than pristine vs2 from that 2HK on 14 of the 15
-victims it hits — Victor is the one exception — with their rows byte-identical between the games. The game fact and its
-table: `docs/game/engine_internals.md` "THE TWO ENGINES DEAL DIFFERENT DAMAGE FROM THE SAME HIT"; record
-`tests/audit_dmg_legacy_sweep.sh`.
+victims it hits — Victor is the one exception — with their rows byte-identical between the games. **14z-187b: the same
+mechanism — Demitri's 2HK record (a2:0x11#2) is 10 on vsavj and 9 on vs2, and the counterfactual swaps the damage.** The
+game fact and its table: `docs/game/engine_internals.md` "DEMITRI'S DATA DIFFERS BETWEEN VSAVJ AND VS2" (formerly "THE
+TWO ENGINES DEAL DIFFERENT DAMAGE FROM THE SAME HIT", retracted); record `tests/audit_dmg_legacy_sweep.sh`.
 
 ## Cross-references
 

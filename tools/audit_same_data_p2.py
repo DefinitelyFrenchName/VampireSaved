@@ -177,12 +177,45 @@ def chain_shape(img, table, hb, index):
     return out
 
 
+def chain_lines(imgs, tables, delta, cid, t):
+    """per chain of table t that differs for id cid: what differs, per node — through chain_shape, the census's own
+    comparison (so a chain listed here is exactly one the census counts)"""
+    rows = {x["name"]: int(x["vsavj"]) for x in tables}
+    sh = {}
+    for g, img in imgs.items():
+        d = 0 if g == "vsavj" else delta
+        hb = HitboxSet.from_image(img, rd32(img, rows["hitbox_base"] + d + cid * 4), rd32(img, rows["hitbox_comp"] + d + cid * 4))
+        sh[g] = chain_shape(img, rd32(img, rows["anim_index_" + t] + d + cid * 4), hb, node_index(img, rows, d, cid))
+    out = []
+    for seq in sorted(set(sh["vsavj"]) & set(sh["vsav2"]), key=lambda x: int(x, 16)):
+        A, B = sh["vsavj"][seq], sh["vsav2"][seq]
+        if A == B or A[0] == "INVALID" or B[0] == "INVALID":
+            continue
+        if len(A[0]) != len(B[0]):
+            out.append(f"chain {cid:#04x} {t}:{seq} nodes {len(A[0])}/{len(B[0])}"); continue
+        kinds, durs, recs = set(), [], []
+        for k, (x, y) in enumerate(zip(A[0], B[0])):
+            for i, lab in enumerate(("dur", "flags", "shadow", "op", "sfx", "link", "boxes")):
+                if x[i] != y[i]: kinds.add(lab)
+            if x[0] != y[0]: durs.append(f"n{k} {x[0]}->{y[0]}")
+            rx = x[6][2] if len(x[6]) == 3 else None; ry = y[6][2] if len(y[6]) == 3 else None
+            if rx and ry and (rx[1], rx[2]) != (ry[1], ry[2]):   # REC_KEYS[1:3] = real, white
+                recs.append(f"n{k} {rx[1]}/{rx[2]}->{ry[1]}/{ry[2]}")
+        out.append(f"chain {cid:#04x} {t}:{seq} differs {','.join(sorted(kinds))}"
+                   + (f" | dur {' '.join(durs)}" if durs else "") + (f" | real/white {' '.join(recs)}" if recs else "")
+                   + (" | end" if A[1] != B[1] else ""))
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("vsavj"); ap.add_argument("vsav2")
     ap.add_argument("--ids", help="comma-separated hex ids (default: every legacy id both games carry)")
     ap.add_argument("--bank", default=str(Path(__file__).parent.parent / "build/manifest/bank_map.toml"))
     ap.add_argument("--json")
+    ap.add_argument("--chains", help="comma-separated tables (a,a2,b,c,proj): also print, per id, one `chain` line per chain that differs — "
+                                     "the fields that differ, every node duration that differs and every attack record's red/white power "
+                                     "that differs (14z-187b, #192: the census counts said WHICH chains, never by what)")
     ap.add_argument("--layout", choices=("vsav2", "vsavj"), default="vsav2",
                     help="which game's LAYOUT (bank origin, defense table) the SECOND image is read with; vsavj = read both images alike (the gate's self-compare control)")
     a = ap.parse_args()
@@ -291,6 +324,10 @@ def main():
               f"anim:{r['anim_diff'] or '-'} defense:{'same' if r['defense_same'] else 'DIFFERS'} auto-rows-differing:{len(r['auto_diff'])} "
               f"unresolved-nodes:{r['unresolved_nodes']} external-links:{r.get('external_links')} unknown-links:{r['unknown_links']} invalid-chains:{r.get('invalid_chains')} "
               f"not-compared: {r['code_ptr_rows']} code_ptr rows, data_ptr {r['data_ptr_not_compared']}")
+    if a.chains:
+        for cid in ids:
+            for t in a.chains.split(","):
+                for line in chain_lines(imgs, tables, delta, cid, t): print(line)
     if a.json:
         Path(a.json).write_text(json.dumps(report, indent=1))
     n = sum(1 for r in report.values() if r["verdict"] == "SAME-DATA")

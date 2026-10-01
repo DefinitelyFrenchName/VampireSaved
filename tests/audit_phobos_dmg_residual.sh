@@ -14,14 +14,16 @@
 #   the rows equal to vs2's, the frozen 11/12; AND, since 14z-181, the LEGACY pair — Demitri's
 #   5HP on Victor, real picks on pristine vsavj and pristine vsav2, Victor's row byte-identical
 #   between the games — frozen at vsavj 12 / vsav2 11, two hits per leg on the same frames: the
-#   same +1 with no port in the loop, so the residual is the two ENGINES' damage pipelines, not
-#   ours (#161's answer; the maintainer ruled it not-ours 2026-09-25); both planted steps fail.
+#   same +1 with no port in the loop, so the residual is ~~the two ENGINES' damage pipelines~~
+#   (RETRACTED 14z-187b) Demitri's OWN 5HP record, 14 on vsavj and 13 on vs2 — swapping that byte
+#   swaps the damage both ways (tests/audit_dmg_legacy_sweep.sh section 5) — not ours (#161's
+#   answer; the maintainer ruled it not-ours 2026-09-25); both planted steps fail.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/phobos_dmg_residual.tsv tests/replays/judge/04_demitri_5hp_victor.rpl
 #   tests/expected/registry.tsv tests/lib/controls.sh tests/lua/field_trace.lua
 #   tests/replays/ tools/build_fingerprint.py tools/name_moves.py tools/run_mame.sh
 #   tools/setup_mame.sh
 #
-# MUST-FIRE: perturbed-copy: legacy-same — a copy of the legacy pair's rows with vsav2's step in place of vsavj's (what two engines that agreed would read) must FAIL the frozen compare, so the +1 the LEGACY victim takes on vsavj is read from the rows, not assumed (in-gate: the perturbed copy must differ from the frozen rows; mode: the rows are rewritten and the compare FAILs) — 14z-181, #161
+# MUST-FIRE: perturbed-copy: legacy-same — a copy of the legacy pair's rows with vsav2's step in place of vsavj's (what two games that agreed would read) must FAIL the frozen compare, so the +1 the LEGACY victim takes on vsavj is read from the rows, not assumed (in-gate: the perturbed copy must differ from the frozen rows; mode: the rows are rewritten and the compare FAILs) — 14z-181, #161
 # MUST-FIRE: perturbed-copy: residual-gone — a copy of our leg's HP trace with native's step in place of ours (what a fix of the residual looks like) must FAIL the frozen compare, so the gate reads the step it claims to read (in-gate: the planted copy must differ from the frozen rows; mode: the planted copy IS our leg and the gate FAILs)
 #
 # WHY. The maintainer ruled the #136 defense-row fix (vs2's defense curve and threshold rows for

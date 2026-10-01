@@ -295,7 +295,7 @@ def main():
     ap.add_argument("--layout", choices=("vsav2", "vsavj"), help="p2check: the bank layout the image is read with")
     ap.add_argument("--id", help="p2check: P2's character id, hex (Demitri 01)")
     ap.add_argument("--never", default="b:0x71,b:0x74", help="p2check: attack-record chains P2 must NEVER enter (they carry P2 damage, a compared field; comma-separated table:0xNN)")
-    ap.add_argument("--report", default="b:0x10", help="p2check: pose chains whose data differs but which P2 may enter — their frame count is PRINTED as P2REPORT for the caller to assert equal on both legs (comma-separated table:0xNN)")
+    ap.add_argument("--report", default="b:0x10", help="p2check: chains whose data differs but which P2 may enter (a pose, or an attack whose record differs, 14z-187b) — their frame count is PRINTED as P2REPORT for the caller to assert equal on both legs (comma-separated table:0xNN)")
     ap.add_argument("--from", dest="from_frame", type=int, default=0, help="p2check: first frame to judge (default: every sampled frame)")
     ap.add_argument("--events", help="the rig's schedule json, to name the divergent event")
     ap.add_argument("--tsv", action="store_true")

@@ -49,13 +49,15 @@ SIGNATURES (each a measured property of the root's own window, never its name al
                  SUPERSEDED 2026-09-18: "take the vs2 rows" (docs/project/tables/defense_rows.md)
   P2-DISPLACEMENT a seeded root whose own fields are IDENT while P2's x differs in its window — #159
                  (fixed at M21, 14z-185; no seed carries it since)
-  DMG-VSAVJ      the DEFENSE-ROW signature (P1's HP alone, the tenant the victim, ours taking MORE) on a build
-                 whose defense row is ALREADY vs2's (read from the build's own data image and vs2's): vsavj's OWN
-                 damage pipeline, not the port — a LEGACY victim reads the same +1 with no port in the loop
-                 (Demitri's 5HP on Victor, 12 on pristine vsavj / 11 on pristine vs2,
-                 tests/audit_phobos_dmg_residual.sh); Phobos 11 native / 12 ours, Donovan and Pyron 12 / 13.
-                 RULED 2026-09-25 (14z-182): #161 closed as not-ours, "vanilla wins ties" (DECISIONS_HISTORY.md);
-                 until then two open classes, PHOBOS-DMG-OPEN (14z-170) and DMG-OPEN (14z-181)
+  P2-RECORD      the DEFENSE-ROW signature (P1's HP alone, the tenant the victim, ours taking MORE) on a build
+                 whose defense row is ALREADY vs2's, AND P2 Demitri on the SAME node at the hit on both legs (mapped
+                 on each leg's own image) with that node's attack record LOWER on vs2 by exactly what the tenant took
+                 less: vs2 lowered Demitri's own data, and ours runs vsavj's Demitri — not the port. Re-measured every run
+                 by swapping the record byte both ways (p2check; the gate's section 1b); Phobos 11 native / 12 ours,
+                 Donovan and Pyron 12 / 13, all from his 5HP (a2:0x04#2, 13 vs2 / 14 vsavj). #161 RULED not-ours
+                 2026-09-25 (14z-182, DECISIONS_HISTORY.md). REPLACES (14z-187b) DMG-VSAVJ, whose reading "vsavj's
+                 OWN damage pipeline" was RETRACTED — the legacy control it rested on (Demitri's 5HP on Victor,
+                 12/11) is the same record; before it, PHOBOS-DMG-OPEN (14z-170) and DMG-OPEN (14z-181)
   WALL-PUSH-VSAVJ the first DIFF is the tenant's x ALONE, on a frame where native's x holds and ours moves,
                  and within two frames native's facing flips while ours does not — vsavj's OWN shared-wall
                  push rule, not the port: with both fighters clamped at one wall the push-apart pushes P1 out
@@ -117,7 +119,7 @@ def gen(part, outdir, ablate=(), first_event=None):
         sch[p] = orig; nm.FIRST_EVENT = fe
 
 
-def run_leg(a, part, leg, rigdir, outdir):
+def run_leg(a, part, leg, rigdir, outdir, rompoke="", suffix=""):
     tenant = part.rsplit("_", 1)[0]
     j = json.load(open(f"{rigdir}/{part}.json")); fr = j["frames"]
     pokes = ";".join(j["pokes"] + [f"{f}:ff8116:06" for f in range(2000, fr)] + [f"{f}:ff80d4:0000" for f in range(2363, fr)])
@@ -134,20 +136,22 @@ def run_leg(a, part, leg, rigdir, outdir):
                 continue
             new.append(line)
         rpl = new
-    os.makedirs(f"{outdir}/run_{part}_{leg}", exist_ok=True)
-    rp = f"{outdir}/rpl_{part}_{leg}.rpl"; open(rp, "w").writelines(rpl)
-    env = dict(os.environ, ROMDIR=a.romdir, MAME_BIN=a.mame_bin, MAME_SANDBOX=f"{outdir}/run_{part}_{leg}/sb",
+    L = f"{leg}{suffix}"
+    os.makedirs(f"{outdir}/run_{part}_{L}", exist_ok=True)
+    rp = f"{outdir}/rpl_{part}_{L}.rpl"; open(rp, "w").writelines(rpl)
+    env = dict(os.environ, ROMDIR=a.romdir, MAME_BIN=a.mame_bin, MAME_SANDBOX=f"{outdir}/run_{part}_{L}/sb",
                MAME_ROMPATH=a.romdir if leg == "native" else f"{a.build}/rompath;{a.romdir}",
-               REPLAY=rp, POKES=pokes, FIELDS=FIELDS, FIELD_OUT=f"{outdir}/tr_{part}_{leg}.txt",
-               FIELD_FROM="2300", FIELD_TO=str(fr), FRAMES=str(fr))
-    with open(f"{outdir}/run_{part}_{leg}/mame.log", "w") as log:
+               REPLAY=rp, POKES=pokes, FIELDS=FIELDS, FIELD_OUT=f"{outdir}/tr_{part}_{L}.txt",
+               FIELD_FROM="2300", FIELD_TO=str(fr), FRAMES=str(fr), ROMPOKE=rompoke)
+    script = "rom_poke.lua" if rompoke else "field_trace.lua"   # rom_poke.lua chains field_trace.lua
+    with open(f"{outdir}/run_{part}_{L}/mame.log", "w") as log:
         r = subprocess.run([f"{REPO}/tools/run_mame.sh", "vsav2" if leg == "native" else "vsavjw",
-                            "-autoboot_script", f"{REPO}/tests/lua/field_trace.lua"],
-                           env=env, cwd=f"{outdir}/run_{part}_{leg}", stdout=log, stderr=subprocess.STDOUT)
-    subprocess.run(["rm", "-rf", f"{outdir}/run_{part}_{leg}/sb"])
+                            "-autoboot_script", f"{REPO}/tests/lua/{script}"],
+                           env=env, cwd=f"{outdir}/run_{part}_{L}", stdout=log, stderr=subprocess.STDOUT)
+    subprocess.run(["rm", "-rf", f"{outdir}/run_{part}_{L}/sb"])
     # MAME can segfault at TEARDOWN after the log is closed (docs/platform/gotchas.md): the leg is judged
     # by field_trace's own summary line, the exit status only when that line is missing (14z-168)
-    tr = f"{outdir}/tr_{part}_{leg}.txt"
+    tr = f"{outdir}/tr_{part}_{L}.txt"
     done = os.path.exists(tr) and any(l.startswith("FIELDSUMMARY") for l in open(tr))
     if not done:
         raise SystemExit(f"VOID: {part} {leg} exited {r.returncode} and its trace has no FIELDSUMMARY line")
@@ -168,6 +172,34 @@ def step(a, name, specs):
         for r in mp.compare_events(tenant, f"{out}/tr_{part}_native.txt", f"{out}/tr_{part}_ours.txt", pl, j["events"], j["pokes"]):
             rows[(part, r["k"])] = [part, str(r["k"]), r["name"], r["verdict"], r["first"], r["fields"], str(r["frames"]), r["coupled"], str(r["excluded"])]
     return rows, out, rig
+
+
+IMG = {}   # "native" / "ours": the data views P2's node is mapped on (set in main(): vs2's, and the build's own)
+
+
+def p2_record(n, o, f0):
+    """(native red power, ours red power, "table:seq#node") of P2 Demitri's attack node at the hit frame f0 (or the
+    frame before, the node whose record exists), mapped on each leg's own image — None unless both legs are on the
+    SAME node and it carries an attack record on both"""
+    if not IMG:
+        return None
+    import dmg_sweep
+    got = {}
+    for leg, d, layout in (("native", n, "vsav2"), ("ours", o, "vsavj")):
+        idx, hb, chains = dmg_sweep._demitri(IMG[leg], layout)
+        for t in (f0, f0 - 1):
+            w = idx.get(f"0x{d[t]['p2node']:x}") if t in d else None
+            if w:
+                nd = chains(w[0])[w[1]]["nodes"][w[2]]
+                rec = hb.node_boxes(nd["hb8"], nd["hbA"])["attack"]
+                if rec:
+                    got[leg] = (rec["real"], f"{w[0]}:{w[1]}#{w[2]}", int(rec["addr"], 16) + 8); break
+    if len(got) == 2 and got["native"][1] == got["ours"][1]:
+        return got["native"][0], got["ours"][0], got["native"][1], got["native"][2], got["ours"][2]
+    return None
+
+
+P2REC = {}   # "part:event" -> the p2_record of a P2-RECORD root (the counterfactual's bytes)
 
 
 def classify(part, k, trdir, rigdir, row):
@@ -213,16 +245,20 @@ def classify(part, k, trdir, rigdir, row):
     if fields in (["p1hp"], ["p1hp", "p1white"]) and white_ok:
         dn = n[f0 - 1]["p1hp"] - n[f0]["p1hp"]; do = o[f0 - 1]["p1hp"] - o[f0]["p1hp"]
         if 0 < dn < do:
-            if tenant == "huitzil":   # vsavj's row 0x10 indexes lower unless the vs2 row is in
-                if ROW_NATIVE.get("huitzil"):
-                    return "DMG-VSAVJ", f"Phobos takes {dn} native / {do} ours; his defense row is already vs2's (vsavj's own pipeline, #161)"
-                return "DEFENSE-ROW", f"Phobos takes {dn} native / {do} ours"
-            # 14z-181, the guard-cancel parts: Donovan and Pyron take 13 from Demitri's 5HP on our build for
-            # native's 12 with their defense rows already vs2's (Donovan's ported at M19, Pyron's identical in
-            # every game) — the same vsavj-pipeline +1 as Phobos's (#161, ruled not-ours 2026-09-25)
-            if ROW_NATIVE.get(tenant):
-                return "DMG-VSAVJ", f"{tenant} takes {dn} native / {do} ours; the defense row is already vs2's (vsavj's own pipeline, #161)"
-            return "DEFENSE-ROW", f"{tenant} takes {dn} native / {do} ours"
+            who = "Phobos" if tenant == "huitzil" else tenant
+            if not ROW_NATIVE.get(tenant):   # vsavj's row indexes lower unless the vs2 row is in
+                return "DEFENSE-ROW", f"{who} takes {dn} native / {do} ours"
+            # 14z-187b (P2-RECORD replaces DMG-VSAVJ, whose "vsavj's own pipeline" was RETRACTED): with the
+            # victim's rows already vs2's, the extra point is the ATTACKER's own data — P2 Demitri's node at the hit,
+            # mapped on each leg's own image, must be the SAME node, and its attack record lower on vs2 by exactly
+            # what the tenant took less. Its mechanism is re-measured on every run: each root's legs re-run with that record
+            # byte swapped both ways (p2check below; tests/audit_move_parity_attribution.sh section 1b; the legacy sweep's own
+            # swap is tests/audit_dmg_legacy_sweep.sh section 5; docs/game/engine_internals.md "DEMITRI'S DATA DIFFERS BETWEEN VSAVJ AND VS2"). Records equal
+            # leaves the row OTHER: no class may claim an engine difference without a measurement.
+            pr = p2_record(n, o, f0)
+            if pr and pr[1] - pr[0] == do - dn:
+                P2REC[f"{part}:{k}"] = pr
+                return "P2-RECORD", f"{who} takes {dn} native / {do} ours: P2 Demitri's attack record {pr[2]} red power {pr[0]} native / {pr[1]} ours (vs2 lowered it; ours runs vsavj's Demitri, #161/#191)"
     if fields == ["x"] and f0 - 1 in n and f0 - 1 in o and f0 + 2 in n and f0 + 2 in o:
         # 14z-183, #179 (closed not-ours 14z-184, vsavj's shared-wall rule): native's x holds on the first DIFF frame while ours moves, and native turns
         # within two frames while ours keeps facing — a measured signature, never the part's name
@@ -233,11 +269,67 @@ def classify(part, k, trdir, rigdir, row):
     return "OTHER", f"first DIFF {row[4]} on {row[5]}"
 
 
+def p1_drops(trace, lo, hi):
+    R = {}
+    for l in open(trace):
+        t = l.split()
+        if t and t[0] == "F": R[int(t[1])] = {kv.split("=")[0]: int(kv.split("=")[1]) for kv in t[2:]}
+    return [(f - lo, R[f - 1]["p1hp"] - R[f]["p1hp"], R[f - 1]["p1white"] - R[f]["p1white"])
+            for f in range(lo, hi) if f in R and f - 1 in R and R[f]["p1hp"] != R[f - 1]["p1hp"]]
+
+
+def p2check(a, roots, rig, base):
+    """14z-187b (rule-checker run 2026-10-01-516): every P2-RECORD root's MECHANISM, measured: the part's two legs re-run
+    from the committed rig with P2 Demitri's attack-record byte set to the OTHER game's value (tests/lua/rom_poke.lua,
+    each write verified through the program space) — ours given vs2's, native given vsavj's — and each swapped leg's
+    tenant HP drops in the root event's window must equal the OTHER leg's unpoked drops (step 0's traces). The control
+    p2-record-unswapped: the unpoked legs must DIFFER (else the equality is vacuous); --p2check-unswapped (the gate's
+    CONTROL mode) puts the unpoked traces in place of the swapped ones, and the check must then fail. The inert control
+    (run 2026-10-01-518): each leg re-run with the byte poked to its OWN value must reproduce its unpoked trace exactly."""
+    out = []
+    todo = [r_ for r_, _, cls, _, _ in roots if cls == "P2-RECORD"]
+    parts = sorted({r_.split(":")[0] for r_ in todo})
+    jobs, same = [], []
+    for part in parts:
+        pr = next(P2REC[r_] for r_ in todo if r_.startswith(part + ":"))
+        jobs += [(part, "ours", f"{pr[4]:x}:{pr[0]:02x}"), (part, "native", f"{pr[3]:x}:{pr[1]:02x}")]
+        # the inert control (rule-checker run 2026-10-01-518 Q1/Q4): each leg's byte poked to its OWN value must
+        # reproduce that leg's unpoked trace byte for byte, on the merged image as on vs2's
+        same += [(part, "ours", f"{pr[4]:x}:{pr[1]:02x}"), (part, "native", f"{pr[3]:x}:{pr[0]:02x}")]
+    with ThreadPoolExecutor(max_workers=a.jobs) as ex:
+        list(ex.map(lambda j: run_leg(a, j[0], j[1], rig, f"{a.work}/p2check", rompoke=j[2], suffix=j[3]),
+                    [j + ("_swap",) for j in jobs] + [j + ("_same",) for j in same]))
+    for (part, leg, rp), sfx in [(j, "_swap") for j in jobs] + [(j, "_same") for j in same]:
+        log = open(f"{a.work}/p2check/run_{part}_{leg}{sfx}/mame.log").read()
+        out.append(f"poke\t{part}\t{leg}{sfx}\t{rp}\t{'verified' if 'ROMPOKE ok' in log and 'ROMPOKE FAIL' not in log else 'NOT VERIFIED'}")
+    for part, leg, rp in same:
+        t0, t1, t2 = (open(f).read() for f in (f"{base}/tr_{part}_{leg}.txt", f"{a.work}/p2check/tr_{part}_{leg}_same.txt",
+                                                f"{a.work}/p2check/tr_{part}_{leg}_swap.txt"))
+        # the comparison can refuse: the same file comparison sees the SWAPPED leg's trace as different
+        out.append(f"inert\t{part}\t{leg}\t{rp}\t{'identical' if t0 == t1 else 'CHANGED'}\t"
+                   f"swapped trace {'differs' if t0 != t2 else 'IDENTICAL'}")
+    other = {"ours": "native", "native": "ours"}
+    differ = 0
+    for r_ in todo:
+        part, k = r_.split(":"); e = json.load(open(f"{rig}/{part}.json"))["events"][int(k)]
+        lo, hi = e["frame"], e["frame"] + e["gap"]
+        bd = {leg: p1_drops(f"{base}/tr_{part}_{leg}.txt", lo, hi) for leg in ("ours", "native")}
+        differ += bd["ours"] != bd["native"]
+        for leg in ("ours", "native"):
+            sw = bd[leg] if a.p2check_unswapped else p1_drops(f"{a.work}/p2check/tr_{part}_{leg}_swap.txt", lo, hi)
+            v = "confirmed" if sw == bd[other[leg]] else "MISMATCH"
+            out.append(f"check\t{r_}\t{leg}\t{v}\tswapped {sw} | {other[leg]} unpoked {bd[other[leg]]}")
+    out.append(f"control\tp2-record-unswapped\t{'fired' if todo and differ == len(todo) else 'dead'}\tunpoked legs differ on {differ} of {len(todo)} roots")
+    open(a.p2check_out, "w").write("\n".join(out) + "\n")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("mode", choices=["run"])
     ap.add_argument("--build", required=True); ap.add_argument("--romdir", required=True); ap.add_argument("--work", required=True)
     ap.add_argument("--jobs", type=int, default=6); ap.add_argument("--no-ablate", action="store_true")
+    ap.add_argument("--p2check-out", help="write the P2-RECORD counterfactual check here (never to stdout, the frozen table)")
+    ap.add_argument("--p2check-unswapped", action="store_true", help="the gate's p2-record-unswapped CONTROL mode")
     ap.add_argument("--parts", default="")
     ap.add_argument("--mame-bin", default=os.path.expanduser("~/.cache/vampire-saved/mame/cps2"))
     a = ap.parse_args()
@@ -255,6 +347,7 @@ def main():
             _b = _bimg[0x0B8940 + _id * 32:0x0B8940 + _id * 32 + 32]; _v = _vimg[0x0D2ABE + _id * 32:0x0D2ABE + _id * 32 + 32]
             _tb = _bimg[0x0BCC80 + _id:0x0BCC80 + _id + 1]; _tv = _vimg[0x0D6E1E + _id:0x0D6E1E + _id + 1]
             ROW_NATIVE[_t] = len(_b) == 0x20 and _b == _v and len(_tb) == 1 and _tb == _tv
+        IMG.update({"native": _vimg, "ours": _bimg})
     except OSError:
         ROW_NATIVE = {}
     frozen = rows_of(f"{REPO}/tests/expected/move_parity_events.tsv")
@@ -328,6 +421,8 @@ def main():
             ever |= now
             where[p] = (dN, rN)
         cur = {kk: r for kk, r in cur.items() if kk[0] not in todo}; cur.update(got)
+    if a.p2check_out:
+        p2check(a, roots, r0, d0)
     for r_, name, cls, st, why in roots:
         print(f"root\t{r_}\t{name}\t{cls}\tstep={st}\t{why}")
     for key in sorted(ever, key=lambda x: (x[0].split("_")[0], int(x[0].split("_")[1]), x[1])):

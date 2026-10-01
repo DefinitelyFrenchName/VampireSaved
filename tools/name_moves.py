@@ -101,9 +101,11 @@ FIRST_EVENT = 2600
 # the fallback"): `p2_id` / `p2_path` — the real cursor route from P2's default
 # cell 0x05, `R` on the vsav2 wheel AND on the merged wheel (tools/select_paths.py,
 # measured 14z-165), so the parity gate's two legs share the P2 lines verbatim.
-# Demitri's data differs between vsavj and vs2 on three chains only (b:0x10 the
-# held-pose push box every legacy character carries, and b:0x71 / b:0x74, one
-# attack record each — tests/expected/same_data_p2.tsv); every rig that puts
+# Demitri's data differs between vsavj and vs2 on ~~three chains only~~ (RETRACTED
+# 14z-187b: that read the census's b column alone — his a2 table differs on 52 chains
+# and proj on 6, tests/expected/same_data_p2.tsv and tools/audit_same_data_p2.py
+# --chains) — among them b:0x10 (the held-pose push box every legacy character
+# carries) and b:0x71 / b:0x74 (one attack record each); every rig that puts
 # him on P2 asserts he never enters the two ATTACK records b:0x71/b:0x74
 # (tools/move_parity.py p2check --never), and REPORTS his frame count in the pose
 # b:0x10 and asserts it equal on both legs (--report; 14z-165, rule-checker run
@@ -121,7 +123,11 @@ TENANTS = {"donovan": {"id": None, "p2_id": "01", "p2_path": ("R",), "build": "b
            "huitzil": {"id": "10", "path": ("L", "L", "L"), "p2_id": "01", "p2_path": ("R",), "build": "build/hui59"},
            "pyron":   {"id": "11", "path": ("R", "R", "R"), "p2_id": "01", "p2_path": ("R",), "build": "build/pyron44"}}
 P2_NEVER  = ("b:0x71", "b:0x74")   # Demitri's two ATTACK-record chains whose data differs between vsavj and vs2 (tests/expected/same_data_p2.tsv row 0x01): if P2 entered one his compared HP would differ by his own data, so the rigs assert he never does (measured: never entered)
-P2_REPORT = ("b:0x10",)            # his held-pose PUSH-BOX chain, the third differing one — every legacy character gained it on vs2. He DOES enter it (a pose, not an attack), so it is not a never; the gate reports his frame count and asserts it EQUAL on both legs, so the datum difference is a bounded positional confound (a candidate for the x-DIFF rows) rather than a divergence in what he does (rule-checker run 2026-09-17-29 Q4)
+P2_REPORT = ("b:0x10", "a2:0x04", "a2:0x05", "a2:0x0a")   # 14z-187b (ruled "Declare, ticket forbid"): the three a2 chains P2 ENTERS
+                                    # over all 32 parts whose ATTACK RECORDS differ between the games (a2:0x04 his 5HP 14/13, a2:0x05 13/12,
+                                    # a2:0x0a a node and an attack box vs2 added) — entered for EQUAL frame counts on both legs, and every
+                                    # row they touch attributed P2-RECORD by measurement (tools/move_parity_attribution.py); forbidding
+                                    # them (re-authoring the guard-cancel rigs) is its own ticket. The first entry: his held-pose PUSH-BOX chain, the third differing one — every legacy character gained it on vs2. He DOES enter it (a pose, not an attack), so it is not a never; the gate reports his frame count and asserts it EQUAL on both legs, so the datum difference is a bounded positional confound (a candidate for the x-DIFF rows) rather than a divergence in what he does (rule-checker run 2026-09-17-29 Q4)
 # P2 HP re-pin (both words, [VSP-125]) so a projectile-fed P2 never dies.
 HP_PIN_EVERY = 400
 

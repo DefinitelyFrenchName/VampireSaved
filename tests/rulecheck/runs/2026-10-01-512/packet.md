@@ -1,0 +1,21 @@
+THE PACKET
+
+Decision kind: expectation
+Subject: #191/#161 mechanism retracted; DMG-VSAVJ -> P2-RECORD re-freeze; #192 gate freeze
+Claim (the working agent's sentence): Three expectation changes rest on one measurement: Demitri's damage differs between pristine vsavj and vs2 because vs2 lowered his own attack records, not because the engines differ. (1) tests/expected/move_parity_attribution.tsv re-frozen: its six DMG-VSAVJ roots (and their six row lines, 12 diff lines, attr/freeze.diff) become P2-RECORD, the class now computed from P2 Demitri's node at the hit mapped on both legs' images and that node's record (a2:0x04#2, 13 vs2 / 14 vsavj) lower on vs2 by exactly the HP difference (attr/tool.diff), verify PASS (attr/verify.log); each of the six rows' damage moves to the other leg's value when that one record byte is set to the other game's value in memory, both ways, with every unpoked leg reproducing the trace of the passing ALL=1 run and every poke verified through the program space (t192/cf_six_rows.txt). (2) tests/audit_dmg_legacy_sweep.sh gains section 5 (t191n/gate_tool.diff): on #191's own leg each game with the other's three records (2HK 10/9, 5HP 14/13, 623HP 20/18) deals the other's damage (t191n/gate_run2.log), the three hits mapped to those nodes, an own-value poke inert, control counterfactual-skipped FIRED and each of the three controls FAILs the gate as a mode (t191n/gate_mode_*.log); its frozen rows unchanged. (3) tests/expected/demitri_split.tsv frozen for #192 (t192/split_verify.log PASS, its control fired; t192/split_mode.log FAIL as a mode). NOT tested: other attackers, other Demitri moves' damage beyond these three and the fireball, P2 Demitri's records against FBNeo; why Victor alone reads 2HK equal; whether the engines differ on any hit whose records are equal (nothing here claims they never do); the P2 guard's declared chains on parts beyond the ALL=1 set.
+Artifacts (read every one, in full):
+  - tests/expected/move_parity_attribution.tsv
+  - build/agent187b/attr/freeze.diff
+  - build/agent187b/attr/tool.diff
+  - build/agent187b/attr/verify.log
+  - build/agent187b/t192/cf_six_rows.txt
+  - build/agent187b/t191n/gate_tool.diff
+  - build/agent187b/t191n/gate_run2.log
+  - build/agent187b/t191n/gate_mode_counterfactual-skipped.log
+  - build/agent187b/t191n/gate_mode_engines-agree.log
+  - build/agent187b/t191n/gate_mode_attacker-swapped.log
+  - tests/expected/demitri_split.tsv
+  - tests/audit_demitri_split.sh
+  - build/agent187b/t192/split_verify.log
+  - build/agent187b/t192/split_mode.log
+  - tests/lua/rom_poke.lua

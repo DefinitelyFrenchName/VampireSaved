@@ -13,7 +13,7 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**410 of 410 gates described.**
+**411 of 411 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
@@ -24,7 +24,7 @@ first sentence) is `gate_index.md`.
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 84 | 84 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 65 | 65 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 66 | 66 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -2410,7 +2410,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 ## character-data
 
-the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 65 of 65 described.
+the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 66 of 66 described.
 
 ### `audit_air_gc_legacy.sh` — audit, emulator
 
@@ -2476,6 +2476,14 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **EXPECTS:** the read fires on every leg from the one reader, the indices equal, the bytes differ on residue victims only; the equal-bytes control fails section 3, the empty trace fails liveness.
 
+### `audit_demitri_split.sh` — audit, emulator
+
+**WHAT:** Demitri's (0x01) a2 and proj chains that differ between pristine vsavj and pristine vsav2, each with WHAT differs per node (durations, attack records' red/white power), and his Chaos Flare (236+LP) on both games: the frames on which his node changes and the HP the fireball takes from Victor — the record of #192.
+
+**HOW:** tools/audit_same_data_p2.py --ids 01 --chains a2,proj over the two data views (the census's own comparison, per chain); two MAME runs (pristine vsavj and vsav2, Demitri P1 against Victor P2, Chaos Flare at 3000 and 3400, the level pinned 6 from 2000 and the RNG word 0000 from 2363, tests/replays/dmg192/chaos_flare.rpl), Demitri's node and Victor's two HP words traced every frame; every row compared with the frozen table.
+
+**EXPECTS:** every row equal to tests/expected/demitri_split.tsv — on 2026-10-01: Chaos Flare a2:0x1e-0x21 differ ONLY in node 5's duration (30 -> 32/33/34/31), proj 0x00-0x02 red power 12 -> 11 and 0x03 15 -> 14; the node changes equal through +20 and from +45 earlier on vsavj at both inputs; Victor losing 11 red on vsavj and 10 on vs2 per fireball; and section 3: each game given the other game's five bytes (the hold duration, the fireball's four records) reads the other game's rows exactly, an own-value poke changes nothing; the hold duration ALONE moves the node rows and the four records ALONE the hit rows, both games; the hold node's ticks counted (30 in 25/24 frames, 32 in 26/26, the level-6 double ticks deciding one frame or two); both controls fire.
+
 ### `audit_df_accumulator.sh` — audit, emulator
 
 **WHAT:** the fighter's +0x161 accumulator is SASQUATCH's Dark Force armor (dispatch_16 row 0x0A), not Aulbath's: while armed each contact adds the record's +0x1C with no reaction until the sum passes 60, the HP+HK activation never arms it, no stocks means no mode, and the merged build's trace is byte-identical to pristine vsavj's.
@@ -2534,11 +2542,11 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 ### `audit_dmg_legacy_sweep.sh` — audit, emulator
 
-**WHAT:** Demitri's 2HK, 5HP and 623HP on every legacy victim, from P1 and from P2, on pristine vsavj against pristine vsav2, and on Donovan (P1) on our merged build against native vs2 — the record of #191 (the maintainer: "1) close as not ours 2) document with the other engine differences between vsavj and VS2", 2026-10-01).
+**WHAT:** Demitri's 2HK, 5HP and 623HP on every legacy victim, from P1 and from P2, on pristine vsavj against pristine vsav2, and on Donovan (P1) on our merged build against native vs2; and WHY the games differ: those hits' own attack records, swapped between the games, swap the damage — the record of #191 (the maintainer: "1) close as not ours 2) document with the other engine differences between vsavj and VS2", 2026-10-01).
 
-**HOW:** 66 MAME runs, six at a time: 16 legacy victims x 2 games x 2 sides on the 14z-186 control's two replays (victim and Demitri by the early-window forced picks, the victim's HP pinned to 288 sixty frames before each hit, the level pinned 6 from 2000 and the RNG word 0000 from 2363), and Donovan's 14z-186 probe-12 rig on native vs2 and ours (the parity gates' cursor path and pins); tools/dmg_sweep.py reads every line of every trace into one row per hit (red and white HP lost, first-drop frame, the attacker's id and the victim's reaction class there); the damage pipeline's tables compared between the two games' data images.
+**HOW:** 66 MAME runs, six at a time: 16 legacy victims x 2 games x 2 sides on the 14z-186 control's two replays (victim and Demitri by the early-window forced picks, the victim's HP pinned to 288 sixty frames before each hit, the level pinned 6 from 2000 and the RNG word 0000 from 2363), and Donovan's 14z-186 probe-12 rig on native vs2 and ours (the parity gates' cursor path and pins); tools/dmg_sweep.py reads every line of every trace into one row per hit (red and white HP lost, first-drop frame, the attacker's id and the victim's reaction class there); the damage pipeline's tables compared between the two games' data images; section 5 reads the three hits' attack records on both games (tools/dmg_sweep.py records) and replays one leg per game with those bytes set to the other game's values through tests/lua/rom_poke.lua (verified writes, an own-value poke as the inert control on each of the three images: vsavj and vs2 on victim 0x00's leg, the merged build and vs2 on Donovan's).
 
-**EXPECTS:** every leg's forced ids as traced, Demitri the attacker at every hit, the defense rows differing only for ids 0a 10 13 19 1a with the attack table and the 2D map equal, and every row equal to tests/expected/dmg_legacy_sweep.tsv (on 2026-10-01: vsavj one more red HP on 2HK on 14 of the 15 victims hit, Victor 0x03 alone equal, Oboro 0x18's 2HK no hit on vsavj; the same on both sides; Donovan 9 ours / 8 native); both controls fire.
+**EXPECTS:** every leg's forced ids as traced, Demitri the attacker at every hit, the defense rows differing only for ids 0a 10 13 19 1a with the attack table and the 2D map equal, and every row equal to tests/expected/dmg_legacy_sweep.tsv (on 2026-10-01: vsavj one more red HP on 2HK on 14 of the 15 victims hit, Victor 0x03 alone equal, Oboro 0x18's 2HK no hit on vsavj; the same on both sides; Donovan 9 ours / 8 native); the three records differ, each game poked to the other's records deals the other's damage hit for hit (vsavj 9/13/19, vs2 8/12/17 on victim 0x00), the hits are the record chains' nodes; over the WHOLE sweep (64 swapped legs) 176 of 192 rows equal the other game's frozen row, the 16 others exactly Sasquatch 0x0A's and Oboro 0x18's; Donovan's own legs swapped (ours given vs2's records, native given vsavj's) read the other leg's frozen rows, 8 of 8, and his own-value legs reproduce their unpoked traces; all three controls fire.
 
 ### `audit_entrance_draw.sh` — audit, emulator
 
@@ -2654,11 +2662,11 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 ### `audit_move_parity_attribution.sh` — audit, emulator
 
-**WHAT:** every DIFF row of the #136 move-parity table has a MEASURED cause: each root is found by ablation (its event's inputs removed, both legs re-run, the rows that vanish are its) and named by a measured signature class (METER-SWAP, SLOWDOWN, DF-STOCK, ENTRANCE, GUARD-REENTRY, P2-DISPLACEMENT, TRAP-REMAP, COLUMN-SHOCK, DEFENSE-ROW / DMG-VSAVJ — the last the tenant taking one more from Demitri's 5HP with its rows already vs2's, vsavj's own damage pipeline: #161 ruled not-ours 2026-09-25); no root is OTHER and no row UNATTRIBUTED.
+**WHAT:** every DIFF row of the #136 move-parity table has a MEASURED cause: each root is found by ablation (its event's inputs removed, both legs re-run, the rows that vanish are its) and named by a measured signature class (METER-SWAP, SLOWDOWN, DF-STOCK, ENTRANCE, GUARD-REENTRY, P2-DISPLACEMENT, TRAP-REMAP, COLUMN-SHOCK, DEFENSE-ROW / P2-RECORD — the last the tenant taking one more from Demitri's 5HP with its rows already vs2's, because vs2 lowered that hit's own attack record (P2's node mapped on both legs, the record read from both images; #161 ruled not-ours 2026-09-25; replaces DMG-VSAVJ, whose "vsavj's own damage pipeline" was RETRACTED 14z-187b); no root is OTHER and no row UNATTRIBUTED.
 
-**HOW:** tools/move_parity_attribution.py on MAME: step 0 re-runs the committed rigs and must reproduce the frozen table, then iterative ablation over the ~19 parts carrying a DIFF with each root's signature read from its own window; the control disables ablation, which must leave rows unattributed.
+**HOW:** tools/move_parity_attribution.py on MAME: step 0 re-runs the committed rigs and must reproduce the frozen table, then iterative ablation over the ~19 parts carrying a DIFF with each root's signature read from its own window; each P2-RECORD root's legs re-run with the record byte poked to the other game's value and to its OWN value (the inert control); the control disables ablation, which must leave rows unattributed.
 
-**EXPECTS:** the frozen root and row tables equal (a fix changes them by design and is read as the fix's effect), no OTHER, no UNATTRIBUTED; the no-ablation run fails.
+**EXPECTS:** the frozen root and row tables equal (a fix changes them by design and is read as the fix's effect), no OTHER, no UNATTRIBUTED; every swapped leg takes the other leg's damage and every own-value leg reproduces its unpoked trace; the no-ablation run fails.
 
 ### `audit_pass_overrun.sh` — audit, emulator
 
@@ -2674,7 +2682,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **HOW:** twelve MAME runs, two at a time: the #136 parts huitzil_5 and huitzil_6 on native and ours (the merged wheel's Phobos path, the part's pokes, the level pin) at RNG pins 0000/1234/5a5a, P1's HP traced every frame from 2300 and every loss frozen; the build's curve row 0x10 and threshold words compared with vs2's; the control replaces our step by native's.
 
-**EXPECTS:** one P1 HP step per part on the same frame on both legs, not moving with the pin, the rows equal to vs2's, the frozen 11/12; AND, since 14z-181, the LEGACY pair — Demitri's 5HP on Victor, real picks on pristine vsavj and pristine vsav2, Victor's row byte-identical between the games — frozen at vsavj 12 / vsav2 11, two hits per leg on the same frames: the same +1 with no port in the loop, so the residual is the two ENGINES' damage pipelines, not ours (#161's answer; the maintainer ruled it not-ours 2026-09-25); both planted steps fail.
+**EXPECTS:** one P1 HP step per part on the same frame on both legs, not moving with the pin, the rows equal to vs2's, the frozen 11/12; AND, since 14z-181, the LEGACY pair — Demitri's 5HP on Victor, real picks on pristine vsavj and pristine vsav2, Victor's row byte-identical between the games — frozen at vsavj 12 / vsav2 11, two hits per leg on the same frames: the same +1 with no port in the loop, so the residual is ~~the two ENGINES' damage pipelines~~ (RETRACTED 14z-187b) Demitri's OWN 5HP record, 14 on vsavj and 13 on vs2 — swapping that byte swaps the damage both ways (tests/audit_dmg_legacy_sweep.sh section 5) — not ours (#161's answer; the maintainer ruled it not-ours 2026-09-25); both planted steps fail.
 
 ### `audit_pyron_capture_block.sh` — audit, emulator
 

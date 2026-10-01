@@ -573,6 +573,19 @@ reaction family (property 0x0F): a plain hit stagger where vs2 plays fire and a 
 our build over-runs `0x2384E` (the second hit lost, the victim neutral at +136). Whether the deity states'
 14z-110b remap carries the same pursuit gap is not measured.
 
+**Who uses class 0x51, and vs2's other `+0x117` changes (read 14z-187b from the images, GitHub #195; not measured in
+play).** The reaction dispatch is a word table indexed by the victim's `+0x54`: vsavj `0x23854` (table `0x2385C`, 80
+classes, 0x00-0x4F), vs2 `0x22380` (table `0x22388`, 84 classes, 0x00-0x53); vs2 0x51 shares 0x44's handler (vs2
+`0x22762`, vsavj `0x23B84`), so 0x51 differs from 0x44 only by the tail's store above. Every attack record's class byte
+(`+0x17`), character and projectile tables of every id: vs2 uses 0x51 in exactly seven records — Pyron's (0x11)
+projectile record 21 and Donovan's (0x13) character records 33-38 — and 0x44 in fifteen, Pyron's projectile record 4
+among them, so an attacker id alone cannot tell a remapped 0x51 record from Pyron's own 0x44 one. vs2 also changed
+`+0x117` for LEGACY classes, with no vsavj counterpart: the handler of classes 0x0C and 0x4D clears it (vs2
+`0x22824`; vsavj's same handler `0x23C16` does not), and the class-0x36 handler opens with a branch (vs2 `0x22F3C`:
+the attacker's `+4` word `0x0202` -> class 5, `+0x117` := 1, on to `0x22582`) that vsavj's `0x2433C` lacks. Those
+two are a difference between the games, as #191's records are (vsavj is the standard); which moves reach them is not
+measured.
+
 **421+P (the sworded Lightning Sword / deity) on native vsav2, MEASURED at
 four strengths, no mash.** LP lands **3 hits for 7 damage**, MP **5 for 9**,
 HP **6 for 10**, ES **9 for 13** — in each case a 5-point sword hit then
@@ -3601,13 +3614,59 @@ defense[victim][attacker]` differs between the games on exactly those ids,
 0x0A being a cross-generation retune of Sasquatch, not the port's
 [M: `tests/audit_defense_row_residue.sh`, read watch both legs].
 
-### THE TWO ENGINES DEAL DIFFERENT DAMAGE FROM THE SAME HIT — vsavj usually one or two more (measured 14z-181 and 14z-187, GitHub #161, #191)
+### DEMITRI'S DATA DIFFERS BETWEEN VSAVJ AND VS2 — vs2 lowered his attack records and lengthened Chaos Flare; on his measured hits the damage follows the record, not the engine (measured 14z-181 and 14z-187; mechanism corrected by counterfactual 14z-187b, GitHub #161, #191, #192)
 
 Depends on atlas rows: fighter structs `$FF8400/$FF8800` (`+0x50` HP, `+0x52` white HP,
 `+0x54` reaction class), the select ids `$FF8782/$FF8B82`, the level byte `RAM:$FF8116` and
 the RNG word `RAM:$FF80D4`. **Gates:** `tests/audit_dmg_legacy_sweep.sh` (every legacy
 victim, both sides), `tests/audit_phobos_dmg_residual.sh` (the first instance, its `legacy`
 rows).
+
+**THE MECHANISM, CORRECTED 14z-187b (the header above was "THE TWO ENGINES DEAL DIFFERENT DAMAGE FROM THE SAME
+HIT", RETRACTED):** Demitri's damage differs between the games because **vs2 changed his own data**, not because the
+engines compute it differently. His 2HK, 5HP and 623HP are nodes of his own a2 chains whose attack records vs2 LOWERED:
+
+| hit | node | red power in the record, vsavj -> vs2 | dealt to victim 0x00, vsavj / vs2 |
+|---|---|---|---|
+| 2HK | a2:0x11#2 | 10 -> 9 | 9 / 8 |
+| 5HP | a2:0x04#2 | 14 -> 13 | 13 / 12 |
+| 623HP | a2:0x28#1 | 20 -> 18 | 19 / 17 |
+
+**The counterfactual, both ways** (`tests/audit_dmg_legacy_sweep.sh` section 5, `tests/lua/rom_poke.lua`): the three
+record bytes set in memory to the other game's values (each write verified through the program space; an own-value
+poke changes nothing) make pristine vsavj deal exactly vs2's 8/12/17 and pristine vs2 exactly vsavj's 9/13/19. The same
+swap on the 5HP record alone moves the six `DMG-VSAVJ` rows of `tests/expected/move_parity_attribution.tsv` (Donovan,
+Phobos and Pyron taking Demitri's 5HP; #161's case is Phobos's) to the other leg's value, both ways, every unpoked control
+reproducing its frozen trace (and an own-value poke inert on all eight legs). Over the WHOLE sweep — every legacy
+victim, both sides, each game given the other's three records — 176 of the 192 rows equal the other game's frozen row,
+red and white; the 16 others are exactly Sasquatch 0x0A's (his own defense row differs between the games; whether it alone
+explains his rows is not separated) and Oboro 0x18's (his hits land differently: 2HK misses on vsavj, 623HP lands as
+class 0x02 — why is not measured). Victor's "exception" below is
+reproduced by the swap too, and so are Donovan's own legs on our merged build against native vs2 (#191's 9-against-8): ours given
+vs2's three records reads native's rows and native given vsavj's reads ours, all four events, red and white. The earlier check found "the attack table ... byte-equal": that table is the pipeline's
+shared 1 KB table at `PRG:0x0B8140`, never the attacker's per-character records, which is why it missed this. Scope:
+the engines are shown to agree on these three hits from these records on 14 of the 16 legacy victims; why Victor's 2HK
+reads equal on both games is not measured.
+
+**Demitri's other data differences (#192, 14z-187b, static census `tools/audit_same_data_p2.py` read per chain):** his
+table a is identical between the games; 52 of 98 a2 chains differ (43 in boxes, flags or
+node count, nine ONLY in node durations) and 6 proj chains in their attack records. CHAOS FLARE is a2:0x1e-0x21: vs2
+lengthened its recovery hold (node 5) from 30 ticks to 32/33/34/31, so — at speed level 6 with the RNG pinned, the only
+conditions measured — his later nodes change 1-2 frames earlier on vsavj from +45 (traced on both games, the same with the fireball connecting at +17 or at +24), and lowered its fireball's
+red power (proj 0x00-0x02 12 -> 11, proj 0x03 15 -> 14: Victor loses 11 on vsavj, 10 on vs2). Each cause swapped ALONE
+between the games (`tests/audit_demitri_split.sh` section 3, 14z-187b): the hold duration moves the node rows and nothing
+else, the four records the damage and nothing else. One frame or two depends on where the level-6 double-tick frames
+fall (the speed level, above): counted on the hold node's `+0x20`, 30 ticks take 25 frames (first event) or 24
+(second) on vsavj and 32 take 26 on vs2 — the two extra ticks cost one frame when one lands on a double-tick frame
+(+45, the first event) and two when neither does. a2:0x22-0x25 differ only in
+their first two nodes' durations (8 -> 9..12, 6 -> 7), a2:0x45 in one (16 -> 18). The 14z-186 capture's frame-47 sprite
+difference is consistent with the timing (vsavj has left the hold node there); the art itself was not compared.
+Both games photographed from the gate's replay and pins, each frame labelled with its node: `tools/demitri_split_sheet.sh`
+(14z-187b, both of the gate's events; at the hold release the next pose first shows at +47 on vsavj against +48 on vs2
+for the event at 3000 and +49 for the one at 3400 — one and two frames, as the nodes; the stage art differs by game).
+**Consequence for the parity rigs:** P2 Demitri enters three of the differing a2 chains (a2:0x04 — his 5HP — and
+a2:0x05 and 0x0a, each carrying an attack record that differs; equal frame counts on both legs), which `P2_NEVER` in `tools/name_moves.py` does not list; see #192 and
+the attribution entry above.
 
 With no port in the loop — pristine vsavj against pristine vsav2, the same replay, the same
 forced picks, the level pinned 6 and the RNG word pinned 0000, the victim's HP pinned to 288
@@ -3622,13 +3681,14 @@ almost every legacy victim, and the same from either side:
 
 The victims' defense rows (vsavj `PRG:0x0B8940`, vs2 `PRG:0x0D2ABE`), the attack table and the
 final 2D map are byte-equal between the games in the DATA view for every legacy id but 0x0A
-(rows 0x10/0x13/0x19/0x1A differ too, outside the legacy roster), so the extra point is the two
+(rows 0x10/0x13/0x19/0x1A differ too, outside the legacy roster), ~~so the extra point is the two
 engines' damage PIPELINES, not their data. WHERE in vsavj's pipeline it is added is NOT
-measured (the damage-level config byte `(0xB2,a6)` and the scaler chain above are the
-candidates). Consequence for the port: a tenant victim on our build takes vsavj's pipeline, so it
-takes the same extra point from a move that hits it natively for less — Phobos's 12/11 from 5HP
-(#161) and Donovan's 9/8 from 2HK (#191) are this, not the port's; both ruled not-ours by the
-maintainer and kept under "vanilla wins ties". **A legacy control for a damage difference needs
+measured~~ **RETRACTED 14z-187b: the extra point is Demitri's OWN attack record, lower on vs2 (the
+corrected mechanism above); the tables compared here never included it.** Consequence for the port:
+a tenant victim on our build is hit by vsavj's Demitri, whose records are vsavj's, so it takes the
+extra point from a move that hits it natively for less — Phobos's 12/11 from 5HP (#161) and
+Donovan's 9/8 from 2HK (#191) are this, not the port's; both ruled not-ours by the maintainer and
+kept under "vanilla wins ties". **A legacy control for a damage difference needs
 more than one victim:** #191 was opened because the one victim the first control used, Victor,
 is the only legacy victim on which the two engines agree on 2HK.
 

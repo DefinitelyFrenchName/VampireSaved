@@ -1,6 +1,37 @@
 # GOTCHAS (project) — traps in OUR pipeline and method
 
+## A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
+
+#192's expectation freezes Chaos Flare's node timing on TWO events of one replay (frames 3000 and 3400). The first
+capture photographed only the first (`FRAMES=3100`); the rule-checker caught it (run 519 Q2), and the second event,
+once captured, differs by TWO frames where the first differs by one. Its sheet was then read against a sheet of the
+first set: both carried "frame 3000+"-style labels and `chaos_flare_release.png`-style names, and the maintainer
+answered about the wrong one before correcting it. The measured pose-change frames (each frame against the one two
+earlier, which cancels Demitri's two-frame aura flash) settled what the eye could not at full size, and a zoomed strip
+of the four frames around the change made it visible.
+
+**The rule:** a capture for a frozen timing covers every event the frozen rows hold; every sheet's FILE NAME and title
+carry its event (`chaos_flare_3400_release.png`, `tools/demitri_split_sheet.sh`); the question names the file; and a
+one- or two-frame offset goes to the maintainer as a zoomed strip of the frames around the change, with the measured
+change frames beside it.
+
+## A TABLE CHECK OF THE PIPELINE IS NOT A CHECK OF THE ATTACKER'S DATA — before calling a damage difference "the engines", swap the hit's own record (paid: 14z-187b, GitHub #191, #161)
+
+#191 and #161 were documented as "the two engines deal different damage from the same hit": the defense rows, "the
+attack table" and the 2D map were byte-equal between vsavj and vs2, so the extra point was read as the PIPELINE's. That
+"attack table" is the pipeline's shared 1 KB table (`PRG:0x0B8140`); the ATTACKER'S OWN record — the node's attack record,
+`tools/hitbox_records.py` — was never compared, and vs2 had lowered Demitri's (2HK 10 -> 9, 5HP 14 -> 13, 623HP 20 -> 18).
+Setting those bytes in memory to the other game's values (`tests/lua/rom_poke.lua`, each write verified through the
+program space, an own-value poke as the inert control) swapped the damage exactly, both ways. The wrong mechanism stood
+for two sittings and fed an attribution class (`DMG-VSAVJ`) that six frozen parity rows carry.
+
+**The rule:** an "equal data, so it is the engine" claim names the hit's NODE (trace the attacker's `+0x1C` at the HP
+drop and map it, `tools/dmg_sweep.py nodes`) and compares THAT node's attack record between the games; and when a
+data byte is suspected, the counterfactual on that byte is cheap and decisive — run it before writing the mechanism.
+
 ## ONE LEGACY VICTIM IS NOT A CONTROL FOR A DAMAGE DIFFERENCE — sweep every legacy victim, from both sides (paid: 14z-186/187, GitHub #191)
+
+*(14z-187b: the sweep's measurements stand; its reading "the engines differ" is RETRACTED — the gotcha above.)*
 
 #191 was filed because a legacy control said the two engines agree: Demitri's 2HK took 8 from Victor on both
 pristine vsavj and pristine vsav2, so Donovan's 9-against-8 on our build looked like the port's. The control used ONE
@@ -5656,7 +5687,8 @@ across three RNG pins, the extra point was deterministic. It went to the maintai
 "Freeze, ticket it". It became the open class `PHOBOS-DMG-OPEN`, with
 `tests/audit_phobos_dmg_residual.sh` its reproducer; 14z-181 measured the same +1 on a LEGACY victim
 (vsavj 12 / vs2 11), so it is vsavj's own pipeline — #161 ruled not-ours 2026-09-25, the class
-renamed `DMG-VSAVJ`. Rule: after a ruled fix, compare every
+renamed `DMG-VSAVJ`. **RETRACTED 14z-187b: not the pipeline — Demitri's own 5HP record (14 on vsavj, 13 on vs2),
+shown by swapping that byte (the gotcha "A TABLE CHECK OF THE PIPELINE IS NOT A CHECK OF THE ATTACKER'S DATA").** Rule: after a ruled fix, compare every
 row it moved against NATIVE, not against the old defect. A value that is neither is a finding, and
 it goes to the maintainer before anything is re-frozen. An attribution class that names a root
 has to re-check that root on the build (here, the row read against vs2's).
