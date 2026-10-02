@@ -1,0 +1,10 @@
+decision	procedure
+subject	one AI agent working session (14z-188), part 5 of 5: transcript 74077d05 records 7359-8604
+session	-
+model	rule-checker@163e4ce9cf7b
+claim	In this span (transcript 74077d05 records 7359 to 8604, the 14z-188 close after the procedure parts were cut) the agent did what it said and ran what it claimed. It ran the documentation packet through rule-checker runs 562, 563 and 568-572, resolving each VIOLATED run by work (reasons and paths written into the findings row, the maintainer's words quoted, a reason check promoted to tools/none_reasons.py with a gated control, findings (x) and (y) added, the open-ticket list derived) until run 572 passed; ran the four procedure runs 564-567 and resolved each, re-measuring the row-writer test in two scratch worktrees and the PILOT package versions, and correcting the "exactly seven" class-0x51 claim in docs/game/engine_internals.md; declared PILOT's lane in the sweep and read the worker cap (0 breaches over 69 workers); ran the final strict confirm pass GREEN; answered the maintainer's convergence question and, on the maintainer's word, filed #204-#207 with their index rows and a DECISIONS_HISTORY entry; and committed 9ab9e06f. NOT TESTED: this sentence was written from the agent's own account of the span, not from a full re-read; the measurer's per-session ledger counts were keyed on a column that is not a session key and were not used, the counts given to the maintainer came from the STATE CLOSE rows; the push comes after this span.
+checklist	f3ec4d9849f7
+family	procedure
+questions	QP1 QP2 QP3 QP4 QP5
+reader	rule-checker@163e4ce9cf7b
+head	9ab9e06fdcea3e7f26fc9027b2a7208d43a2fea2
