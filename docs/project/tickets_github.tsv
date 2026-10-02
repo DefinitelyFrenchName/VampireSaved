@@ -2,8 +2,9 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 202
+# issues: 203
 number	state	reason	closed	labels	title
+203	OPEN	-	-	bug,severity: low	Linux: test_agent_sweep's post-kill check and test_run_on_snapshot's no-self-copy control fail on their own premises (fixed sleep vs zombies; dash reads ahead)
 202	OPEN	-	-	bug,severity: low	1P arcade: the 14z-87 keep-tenant thunk may make a tenant CPU opponent repeat (the ladder's pick skipped when the CPU side already holds a tenant id)
 201	CLOSED	COMPLETED	2026-10-01	bug	Linux: per-frame pin lists in POKES exceed the 128 KiB single-environment-string limit, so the parity-style gates' legs never start off macOS
 200	CLOSED	COMPLETED	2026-10-02	bug,severity: high	Donovan's Lightning Sword (ES): native marks the victim pursuit-able at hit (class 0x4E, +0x117); ours (class 0x06 since the 14z-35 remap) does not

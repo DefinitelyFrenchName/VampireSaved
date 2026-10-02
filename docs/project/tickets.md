@@ -11,12 +11,13 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**202 tickets** — status: open 11 · parked 13 · done 154 · declined 7 · not-ours 7 · invalid 9 · duplicate 1 · kind: bug 145 · cosmetic 11 · evolution 46 · **backfill debt: 0 rows**.
+**203 tickets** — status: open 12 · parked 13 · done 154 · declined 7 · not-ours 7 · invalid 9 · duplicate 1 · kind: bug 146 · cosmetic 11 · evolution 46 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#203](https://github.com/DefinitelyFrenchName/VampireSaved/issues/203) | bug | open | Linux: test_agent_sweep's post-kill check and test_run_on_snapshot's no-self-copy control fail on their own premises (a fixed sleep against lingering zombies; dash reads a script ahead) | `tests/test_agent_sweep.sh` · `tests/test_run_on_snapshot.sh` | `DECISIONS_HISTORY.md § Ruled 2026-10-02 (14z-188) — PILOT` | `docs/project/WSL2_SETUP.md § Done 2026-10-02 (14z-188) on PILOT` | none | 14z-188 |
 | [#202](https://github.com/DefinitelyFrenchName/VampireSaved/issues/202) | bug | open | 1P arcade: the 14z-87 keep-tenant thunk may make a tenant CPU opponent repeat (the ladder's pick skipped when the CPU side already holds a tenant id) | none | `DECISIONS_HISTORY.md § Ruled 2026-10-02 (14z-188) — #195: "Close the P2 gap first"` | `docs/game/engine_internals.md § The per-node sfx row is the fighter's OWN` · `docs/game/atlas/ram.md § the ARCADE LADDER's pick` | `docs/game/gotchas.md § +0x382 is the character id, and the 1P arcade ladder writes` | 14z-188 |
 | [#196](https://github.com/DefinitelyFrenchName/VampireSaved/issues/196) | evolution | open | The MAME wrappers default to the pinned source build on every host, not to whatever mame is on PATH (the ~43 unpinned stock-set gates) | `tests/test_input_integrity.sh` | `DECISIONS_HISTORY.md § Ruled 2026-10-01 (14z-187b) — gates that run stock sets with no MAME_BIN` | `docs/platform/gotchas.md § The recorded, un-gated remainder` | none | 14z-187b |
 | [#195](https://github.com/DefinitelyFrenchName/VampireSaved/issues/195) | bug | open | After Cosmo Disruption Pyron cannot pursue on our build: vs2 marks the victim pursuit-able (+0x117) for reaction class 0x51 alone, which vsavj never stores | none | `DECISIONS_HISTORY.md § Ruled 2026-10-01 (14z-187) — #194: Cosmo Disruption takes record class 0x44` | none | none | 14z-187 |

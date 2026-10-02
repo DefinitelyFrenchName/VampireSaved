@@ -344,7 +344,8 @@ else
     cp -r "release/$NAME" "$W/layout_stray"; echo "notes" > "$W/layout_stray/mame/notes.bin"
     vs_ctl_is stray-file && REL="$W/layout_stray"
     cp -r "release/$NAME" "$W/layout_readme"
-    sed -i '' '/^## If it does not work/d' "$W/layout_readme/fbneo/README.md"
+    sed '/^## If it does not work/d' "$W/layout_readme/fbneo/README.md" > "$W/layout_readme/readme.new" \
+        && mv "$W/layout_readme/readme.new" "$W/layout_readme/fbneo/README.md"   # not `sed -i ''`: GNU sed reads '' as the script (14z-188)
     vs_ctl_is readme-missing-section && REL="$W/layout_readme"
     for p in fbneo mame mister; do
         for f in manifest.json apply_release.py apply_release.html README.md patches; do

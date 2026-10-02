@@ -102,7 +102,7 @@ note = "control"
 EOF
 exp="$(python3 -c "import sys; b=open('$DON/extract/region_hitbox.bin','rb').read(); print(b[0x100:0x101].hex())")"
 val="$(python3 -c "print('%02x' % ((0x$exp ^ 1) & 0xff))")"
-sed -i '' "s/__EXP__/$exp/; s/__VAL__/$val/" "$W/ov.toml"
+sed "s/__EXP__/$exp/; s/__VAL__/$val/" "$W/ov.toml" > "$W/ov.toml.new" && mv "$W/ov.toml.new" "$W/ov.toml"   # not `sed -i ''`: GNU sed reads '' as the script (14z-188, PILOT)
 GEN_DON_ARGS=""
 vs_ctl_is changed-built-byte && DON="$W/ctl"
 vs_ctl_is added-override && GEN_DON_ARGS="--overrides $W/ov.toml"

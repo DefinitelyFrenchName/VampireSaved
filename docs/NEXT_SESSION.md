@@ -32,9 +32,13 @@ recorder's gloss (rule-checker run 2026-10-02-561 Q5). When no ruling covers it,
    for by-hand runs only: put whether to still change it, or close #196, to the maintainer.
 4. **#133 IS MEASURED ON A GREEN TIER** (STATE 14z-188 row 10: mame lane 7.13× at `--jobs 12`, bounded by
    `audit_guard_corpus`). Put the close or a follow-up to the maintainer.
-5. **#202** (the keep-tenant thunk's possible 1P repeat): no rig yet; a 1P arcade run as a tenant past a tenant
+5. **PILOT (`ssh pilot`, Ubuntu 24.04) is ACCEPTED (parity green); what it has not run yet:** the MiSTer lane
+   (Verilator 5.020 against the Mac's 5.050 — compare before trusting it), the emulator tier with `--controls`
+   for the speed comparison the maintainer asked for, and the known-good environment write-up
+   (`docs/project/build_environments.md`). #203 holds its two Linux-only static reds. STATE 14z-188 row 12.
+6. **#202** (the keep-tenant thunk's possible 1P repeat): no rig yet; a 1P arcade run as a tenant past a tenant
    CPU opponent is the repro to write.
-6. **SHELVED BY THE MAINTAINER:** the measurer/reader frontmatter change to Sonnet 5.5 at `xhigh`.
+7. **SHELVED BY THE MAINTAINER:** the measurer/reader frontmatter change to Sonnet 5.5 at `xhigh`.
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 

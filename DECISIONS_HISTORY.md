@@ -287,6 +287,16 @@ Yes, Donovan's deity states should be in scope. However, if they would rely on t
 
 ---
 
+## Ruled 2026-10-02 (14z-188) — PILOT: the four M21 freeze tags pushed with the close; the two Linux gate failures ticketed
+
+**The questions, verbatim:** *"The four M21 freeze tags (freeze/donovan-m25, huitzil-m32, merged-m21, pyron-m26) exist only on this Mac; GitHub has the other 102. PILOT needed them (test_freeze_tag_coverage) and now has them by bundle. Push them to GitHub with this close's push?"* and *"On Linux two process-tooling static gates fail on their own premises: test_agent_sweep's post-kill check (a fixed 0.4 s wait; the killed plants linger, likely as zombies) and test_run_on_snapshot's no-self-copy control (it assumes sh reads a script line by line; dash on Ubuntu reads ahead, so the control can never fire). Both pass on the Mac. How do you want them handled?"*
+
+**The maintainer:** *"Push them with the close"* and *"File a ticket"*.
+
+**What it means.** The close's push carries the four tags beside `main`. The two gates are GitHub #203; until it is worked they are known reds on Linux hosts only. Also from the same setup request (*"Can you help me set it up for all our needs?"*, then *"At the moment it is running 24.04. I could upgrade to 26.04 but 24.04 was deemed the best middle ground when we brainsotrmed. CPU type is host indeed. fixed 40GiB RAM"*): PILOT stays on Ubuntu 24.04 (glibc 2.39), the Linux runner and release builder.
+
+---
+
 ## Ruled 2026-09-30 (14z-186) — two tickets found under #184: Donovan's 2HK damage (#191) and Change Immortal's one-frame timing
 
 **The question, verbatim:** *"Should the 2HK damage and the Change Immortal timing become tickets? I'd put each through the rule-checker before filing."*
