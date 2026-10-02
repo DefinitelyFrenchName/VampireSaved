@@ -26,18 +26,33 @@ sentence, or put it under NOT TESTED, or pass `--untied-ok "<why>"`.
    thunk. Options on #195: a data-address placeholder in the generator; attacker id + class (the session's lean;
    measure first whether the attacker's id is reachable at `0x01868C` for a projectile hit); a box-coordinate
    signature (fragile).
-2. **ERIS (the WSL2 box) — ITS GAPS BEFORE THE NEXT EMULATOR TIER.** `sudo apt install python3-pil
-   python3-capstone` (asked, not yet done); the build directories it lacks (`m5_wide`, `donovan`, `donovan5`,
-   `merged1`, `m3b_merged27`, `hui30`, `hui41`, `don_m5`, `m3b_merged26`); five failures not yet explained
-   (`audit_type_writes`, `test_hitbox_encoding`, `test_select_wheel` segfault, `test_random_select_tenants` whose
-   control run finds no ROMs, `audit_qs_voice_wav`'s 5,400 s timeout, which also left two MAME children running).
-   ERIS's main clone is at `e3f0d7c2`; a second clone `~/vs201` carries the later commits by `git bundle`.
-3. **#188 — ROUTE A'S TRACED TEST IS NOT FINISHED.** Every static gate was traced under `strace` on ERIS
-   (`~/t188/st/`, at `e3f0d7c2`); the analysis (`~/t188/analyse_mp.py`) ran 3.5 h with one gate stuck in the
-   predictor's per-read regex and was stopped. Restarted at the close (2026-10-02, 05:24 ERIS time) as `~/t188/analyse_capped.py`: each gate in its own process
-   under a 600 s cap, one line per gate in `~/t188/capped.tsv` (TIMEOUT names the stuck gate). Next: read it; route A stays
-   unwired until the test shows no miss (an early sample found one: `audit_mister_map_fit` reads two tracked files
-   under `build/m3b_merged29/patch/` the predictor does not flag).
+2. **ERIS (the WSL2 box) — ITS GAPS BEFORE THE NEXT EMULATOR TIER.** `ssh eris` now lands in Windows `cmd`:
+   reach WSL2 with the heredoc form `ssh eris 'bash -l -s' <<'EOF' ... EOF` (a quoted one-liner runs in `cmd` and
+   fails). `sudo apt install python3-pil python3-capstone` (asked, not yet done). Four of the five unexplained
+   failures were diagnosed at the close (ERIS only, scratch under `~/t_err/`):
+   - `test_hitbox_encoding`: line 108 runs `-debug` without `-debugger none`; on Linux MAME then defaults to the
+     ImGui debugger, which needs BGFX, and dies (`Fatal error: Error: ImGui debugger requires the BGFX renderer`).
+     Fix: add `-debugger none` (the only `-debug` line without it in the tracked `tests/*.sh` and `tools/*.sh`).
+   - `test_select_wheel`: MAME exits SIGSEGV (139) AFTER the run, under `tests/lua/tap_writes.lua` only — 11 of 12
+     parallel runs, 2 of 4 serial; every trace complete and byte-identical; `replay.lua` on the same replay 0 of
+     12; removing the tap before `machine:exit()` did not help (9 of 12). Cause open; the gate fails on the exit
+     code, not on the data.
+   - `audit_type_writes`: `build/hui30`, `build/pyron21` and `build/m5_wide` on ERIS have no `patch/`, `prg/` or
+     `rompath/`; the gate's rig-liveness check rightly fails. Fix: build them on ERIS.
+   - `test_random_select_tenants`: `build/m3b_merged19/rompath` on ERIS holds the ledger but no `vsavjw.zip`, so
+     the control leg cannot boot. Fix: build it on ERIS.
+   - `audit_qs_voice_wav`'s 5,400 s timeout (and its two orphaned MAME children): not examined.
+   The other build directories ERIS lacks: `donovan`, `donovan5`, `merged1`, `m3b_merged27`, `hui41`, `don_m5`,
+   `m3b_merged26`. ERIS's main clone is at `e3f0d7c2`; a second clone `~/vs201` carries the later commits by
+   `git bundle`.
+3. **#188 — ROUTE A'S TRACED TEST: MEASURED, ROUTE A STAYS UNWIRED.** Rerun at the close on ERIS (`~/t188/analyse_capped.py`,
+   each gate in its own process under a 600 s cap; one line per gate in `~/t188/capped.tsv`, a copy in the Mac's
+   untracked `build/agent187b/t188/capped.tsv`; posted on #188): 192 of 194 gates analysed, 2 TIMEOUT
+   (`test_harness_frame_bound`, `test_suite_dispatch_selftest`); 29,577 (gate, read) pairs, **270 misses in 8
+   gates** — `test_tickets` 168, `test_md_subset` 86, `test_charmap_overrides` 6, `test_pointer_flow` 4,
+   `audit_mister_map_fit` 2, `test_checkdocs` 2, `test_fbneo_tree_integrity` and its control 1 each. Next, per
+   gate: teach the predictor the reader (a whole-tree reader marked WHOLE) or leave the gate out of the confirm;
+   find why the predictor runs away on the two TIMEOUT gates.
 4. **#194 IS STAGED** (`build/manifest/staged/194_cosmo44.patch`) for the next freeze; M21 is frozen, not released.
 5. **THE OPEN QUEUE:** #195 (above), #198 (forbid the record-differing P2 chains), #200 (Lightning Sword ES's
    pursuit flag at hit), #133 (the ERIS figure is on the issue; re-measure on a green tier), #187 (built; its

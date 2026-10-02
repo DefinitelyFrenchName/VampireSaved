@@ -23,12 +23,12 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3344 |
-| named by a document or manifest only | 2181 |
+| distinct program-space addresses named | 3345 |
+| named by a document or manifest only | 2182 |
 | named by both a document/manifest and code | 776 |
 | named by CODE ONLY (the gap list below) | 387 |
 | carried by atlas | 604 |
-| carried by engine_internals | 741 |
+| carried by engine_internals | 742 |
 | carried by other docs | 1029 |
 | carried by manifests | 1829 |
 | carried by code | 1163 |
@@ -1187,6 +1187,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0289BE` | build/manifest/donovan.toml — port_patch; build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x0289C6` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; HANDOFF.md — Build registry [vs2]; docs/game/gotchas.md — THE HIT STAGER PAYS METER TO WHOEVER IS REGISTERED, AND ONLY A HIT THAT REGISTERS ITSELF GETS IT RIGHT — the collision walk leaves the pair as (P2, P1) (measured: 14z-166) [vs2]; docs/project/patch_index.md — Romset patch bundles (program + gfx content) [vs2]; docs/project/patch_notes.md — 14z-183 — THE M20 FREEZE (donovan-m24 / huitzil-m31 / pyron-m25 / merged-m20, mark M20): #157, the hit-registration pair reconciled [vs2]; build/manifest/donovan.toml — port_patch; +3 more |
 | `PRG:0x0289CA` | build/manifest/donovan.toml — port_patch; build/manifest/huitzil.toml — port_patch; build/manifest/pyron.toml — port_patch; tests/audit_throw_registration.sh |
+| `PRG:0x0289FA` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) |
 | `PRG:0x028A6A` | docs/game/engine_internals.md — Hitboxes and attack records (phase 2 of the character-data map, 14z-120 (5), MEASURED); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; docs/project/patch_notes.md — (huitzil-m8 / pyron-m5: the FINAL GUARDIAN zero-damage fix); docs/project/patch_notes.md — (huitzil-m8 / pyron-m5: the FINAL GUARDIAN zero-damage fix) [vs2]; docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/donovan.toml — port_patch; +6 more |
 | `PRG:0x028A94` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; HANDOFF.md — Build registry [vs2]; docs/project/patch_index.md — Romset patch bundles (program + gfx content) [vs2]; docs/project/patch_notes.md — 14z-183 — THE M20 FREEZE (donovan-m24 / huitzil-m31 / pyron-m25 / merged-m20, mark M20): #157, the hit-registration pair reconciled [vs2]; build/manifest/donovan.toml — port_patch; build/manifest/huitzil.toml — port_patch; +2 more |
 | `PRG:0x028A98` | build/manifest/donovan.toml — port_patch; build/manifest/huitzil.toml — port_patch; build/manifest/pyron.toml — port_patch; tests/audit_throw_registration.sh |
