@@ -1,0 +1,7 @@
+THE PACKET
+
+Decision kind: procedure
+Subject: one AI agent working session (14z-187b), part 1 of 5: transcript e539afe4 records 4-3536
+Claim (the working agent's sentence): In this span (transcript e539afe4 records 4-3536, the 14z-187b sitting's first part) the agent did what it said and ran what it claimed. It read the opener files and checked the tree after the network failure; set up SSH to ERIS with the maintainer (the French group name, the LAN move); found §7's parity gap, fixed ERIS's ROM set (vsavjw moved aside, the audit matching), and built option A — the frozen reference table for `tests/test_mame_parity.sh` — through rule-checker runs 510 (VIOLATED on four true findings, resolved by work) and 511, with the gate verified on the Mac and on ERIS (PASS 88/88); ran the mid-session tier GREEN and committed `9b551710`; ran the rest of §7 on ERIS, added the MAME shim and its guard, filed #196, built #187's reader fix and #190 P3 with their gates, ran the tier GREEN and committed `e3f0d7c2`; launched the four-track reproducibility rebuild on ERIS (bit-exact); worked #192 (Chaos Flare's hold node and fireball records, counterfactual swaps), re-classed the six parity roots P2-RECORD, filed #197 and #198, and prepared rule-checker run 512. NOT tested: whether each statement's wording matches the full tool output — the extract shows result heads only.
+Artifacts (read every one, in full):
+  - build/agent187b/c1/x187b_1.txt

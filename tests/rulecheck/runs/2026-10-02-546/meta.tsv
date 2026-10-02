@@ -1,0 +1,10 @@
+decision	procedure
+subject	one AI agent working session (14z-187b), part 5 of 5: transcript e539afe4 records 9011-10968
+session	-
+model	rule-checker@163e4ce9cf7b
+claim	In this span (transcript e539afe4 records 9011-10968, the close up to this procedure check) the agent did what it said and ran what it claimed. On the maintainer's order it worked #195 until its discriminator needed a ruling, posted the question on the issue and corrected the engine document's +0x1D statement; it then ran the close: the findings table, the promise and scratch classes, NEXT_SESSION rolled and rewritten, #189 and #190 closed, the close's checks through `tools/close_checks.py`, and the documentation packet through rule-checker runs 533-540, each VIOLATED reader finding recorded and resolved before the next prepare (run 539 withdrawn and re-prepared before any reader saw it), 540 OK; committed `68b56600`; ran the strict static tier (NOT GREEN, PASS 188 / FAIL 1, `test_annotations_current`), regenerated the index, committed `72ea71f3` and ran the whole tier again (GREEN, PASS 189, 295 controls honoured); ran the sweep and declared the Claude Code daemon. On ERIS, at the maintainer's word, it ran #188's capped analysis — its first launch went to Windows `cmd` and never started, which it found and disclosed at record 10377 before relaunching — posted the result on #188, and diagnosed four ERIS failures, stating what it had not checked. NOT tested: whether each statement's wording matches the full tool output — the extract shows result heads only; the steps after this check (the procedure runs' resolution and the push) are outside the extract.
+checklist	f3ec4d9849f7
+family	procedure
+questions	QP1 QP2 QP3 QP4 QP5
+reader	rule-checker@163e4ce9cf7b
+head	72ea71f3ee7fb9f7cc939cba3d6516ca90714cc8
