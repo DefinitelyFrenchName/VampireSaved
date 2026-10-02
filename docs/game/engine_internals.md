@@ -577,8 +577,10 @@ our build over-runs `0x2384E` (the second hit lost, the victim neutral at +136).
 play).** The reaction dispatch is a word table indexed by the victim's `+0x54`: vsavj `0x23854` (table `0x2385C`, 80
 classes, 0x00-0x4F), vs2 `0x22380` (table `0x22388`, 84 classes, 0x00-0x53); vs2 0x51 shares 0x44's handler (vs2
 `0x22762`, vsavj `0x23B84`), so 0x51 differs from 0x44 only by the tail's store above. Every attack record's class byte
-(`+0x17`), character and projectile tables of every id: vs2 uses 0x51 in exactly seven records — Pyron's (0x11)
-projectile record 21 and Donovan's (0x13) character records 33-38 — and 0x44 in fifteen, Pyron's projectile record 4
+(`+0x17`), character and projectile tables of every id: vs2 uses 0x51 in seven records within each table's measured extent — Pyron's (0x11)
+projectile record 21 and Donovan's (0x13) character records 33-38 (Donovan's projectile table is the last, with no
+next base below `0x400000`: scanned to there, the class position also holds 0x51 at slots 138, 350, 522 and on, all past
+the 125 slots his ported table carries; whether any is a record a move reaches is not measured, 14z-188) — and 0x44 in fifteen, Pyron's projectile record 4
 among them, so an attacker id alone cannot tell a remapped 0x51 record from Pyron's own 0x44 one. vs2 also changed
 `+0x117` for LEGACY classes, with no vsavj counterpart: the handler of classes 0x0C and 0x4D clears it (vs2
 `0x22824`; vsavj's same handler `0x23C16` does not), and the class-0x36 handler opens with a branch (vs2 `0x22F3C`:

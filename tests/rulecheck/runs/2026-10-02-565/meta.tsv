@@ -1,0 +1,10 @@
+decision	procedure
+subject	one AI agent working session (14z-188), part 3 of 4: transcript 74077d05 records 2584-5123
+session	-
+model	rule-checker@163e4ce9cf7b
+claim	In this span (transcript 74077d05 records 2584-5123, the 14z-188 sitting's third part, across the 08:06 compaction at record 3213) the agent did what it said and ran what it claimed. Rule-checker run 557 passed; the agent built #195 as ruled, gated it (tests/audit_pursuit_flag.sh, its controls run as modes and an undeclared mode refused), staged its patch, rebuilt Pyron's element in the ruled +0x1F form after first building it in an address form nobody had ruled, corrected the 14z-87 voice-borrow retraction's live carriers, filed #202 after run 558 passed, re-ran the two fixed ERIS gates, wrote the STATE 14z-188 group and rolled 14z-185b to STATE_HISTORY, extended #188's predictor (rules R5-R7, controls for each) and backtested it on ERIS's traces, committed, and queued #133 until ERIS was free on the maintainer's note. NOT TESTED: this sentence was written from the agent's summary of the span and a skim of its statements, not from a full re-read; whether every figure the agent quoted in the span came from a measurer or reader spec is not checked here; a gate edited while its own run was executing died on a shifted read in this sitting, and its rerun is the evidence, not the first run.
+checklist	f3ec4d9849f7
+family	procedure
+questions	QP1 QP2 QP3 QP4 QP5
+reader	rule-checker@163e4ce9cf7b
+head	78e1fd069ccd881349ddb8ce9b4b1b4e4682fb30

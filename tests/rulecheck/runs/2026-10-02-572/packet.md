@@ -1,0 +1,21 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: the 14z-188 close's documentation packet
+Claim (the working agent's sentence): The 14z-188 close's documentation is complete as far as its checks see: STATE.md's row (11), the findings table (copied to build/agent188/close/findings_row.txt, and row_copy_current shows the copy equals the live row), gives each of its 25 findings (a)-(y) a home — a file path, or for (e) the open ticket #202 — and a test, an open ticket or none, and the close's checks ran FULL with 26 checks and 0 not as expected (build/agent188/close/out/exits.tsv, its first line # run: full): close_findings (out/runs/close_findings.out), homes_tracked over row (11) (out/runs/homes_tracked.out, ROW FINGERPRINT ef378c89e400), the retraction grep for 14z-188 with its reach controls found (out/runs/retraction_grep.out), the scratch census with 51 programs classed (out/runs/scratch_census.out), the maintainer's quotes verbatim, including finding (m)'s (out/runs/rulings_verbatim.out), the promise check (out/runs/promise_check.out), the tickets gate, which refreshes the GitHub states first and checks every index row's state agrees (out/runs/tickets.out), open_tickets — every ticket docs/NEXT_SESSION.md's START HERE section cites and every ticket the row calls '(open)', the list DERIVED by the check's own command in exits.tsv, each open in the index (out/runs/open_tickets.out: cited 7, not open 0) — with a planted twin, a NEXT_SESSION copy citing the closed #185 in START HERE, that must fail (out/runs/open_tickets_plant.out), none_reasons over the LIVE row — each of the eight findings whose test is none gives a reason in parentheses, ROW SHA1 ef378c89e400 (out/runs/none_reasons.out) — with a planted twin, a STATE copy with (t)'s reason removed, that must fail (out/runs/none_reasons_plant.out), and the copy check with its plant (out/runs/row_copy_current.out, out/runs/row_copy_plant.out). NOT TESTED: that the table holds EVERY finding of the session — a hand read against the session's STATE rows and the maintainer's answered questions (rulings_verbatim's question lines), which found #203's and the sed lesson missing at rule-checker run 569 and added them as (x) and (y); whether a home is enough or a reason is a good one — the checks see addresses, file names and the presence of a reason, not findings; homes_tracked checks the names the row cites, not each letter, and drops a bare document name it cannot resolve without reporting it (rule-checker run 562), so that each letter's home exists and names a section present in its file was read by hand, not by a check; a ticket called open in prose other than START HERE or the row's '(open)' form is not seen by open_tickets; the promise check sees only the listed promises, and a commitment its pattern does not match is not seen; the retraction grep's retracted-class hits were read by the session, with no verdict file written; and the tier, the sweep, the procedure check and the push, which come after this packet.
+Artifacts (read every one, in full):
+  - build/agent188/close/findings_row.txt
+  - build/agent188/close/out/exits.tsv
+  - build/agent188/close/out/runs/close_findings.out
+  - build/agent188/close/out/runs/homes_tracked.out
+  - build/agent188/close/out/runs/retraction_grep.out
+  - build/agent188/close/out/runs/scratch_census.out
+  - build/agent188/close/out/runs/rulings_verbatim.out
+  - build/agent188/close/out/runs/promise_check.out
+  - build/agent188/close/out/runs/tickets.out
+  - build/agent188/close/out/runs/open_tickets.out
+  - build/agent188/close/out/runs/open_tickets_plant.out
+  - build/agent188/close/out/runs/none_reasons.out
+  - build/agent188/close/out/runs/none_reasons_plant.out
+  - build/agent188/close/out/runs/row_copy_current.out
+  - build/agent188/close/out/runs/row_copy_plant.out

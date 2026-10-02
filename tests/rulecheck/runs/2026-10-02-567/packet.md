@@ -1,0 +1,7 @@
+THE PACKET
+
+Decision kind: procedure
+Subject: one AI agent working session (14z-188), part 2 of 4: transcript 74077d05 records 1938-2583
+Claim (the working agent's sentence): In this span (transcript 74077d05 records 1938-2583, the 14z-188 sitting's second part) the agent did what it said and ran what it claimed. It resolved rule-checker run 550 and ran runs 551 to 556 on the #195 attacker-id-plus-class recommendation, each VIOLATED on findings it then settled by work rather than argument — Phobos (0x10) added to the completeness check, the P2 projectile lines re-derived by a measurer, the route from the class jmp at 0x018464 to the write at 0x01868C shown from the class tables, the tap's positive control on $FF8B82 counted, and the +0x382 writers after the select screen checked on the tenant legs — saving the verdicts verbatim and resolving each run on one line (tests/rulecheck/ledger.tsv); and it reported the ERIS tier's progress, including test_wide_profile's missing FBNeo reference path. NOT TESTED: this sentence was written from the agent's summary of the span and a skim of its statements, not from a full re-read; whether every figure the agent quoted in the span came from a measurer or reader spec is not checked here; run 556 is resolved and run 557 runs in the next span.
+Artifacts (read every one, in full):
+  - build/agent188/c1/x188_2.txt

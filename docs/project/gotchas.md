@@ -74,6 +74,16 @@ quote found with the exempted texts removed from the pool). The 14z-185b close h
 its four scripts, while they exist), with every plant, and runs the tools' self-tests in the same run of record.
 The tracked close tools do not yet carry these checks; until they do, each close pays to rebuild them.
 
+**Paid again, 14z-188 (runs 2026-10-02-562 to -572, 7 runs, 6 VIOLATED).** The copied checks file was
+rewritten by hand where it is session-specific — the open-ticket list, the row title, the plants — and four of
+the six VIOLATED rounds were holes in exactly those parts or in checks written during the close (a hard-coded
+ticket list that missed a ticket the same close added, then the list being hard-coded at all); the other two
+were a findings table reconstructed at the close from summaries. Each round's fix was the narrowest that
+answered the finding named, and the next round found the next hole in it: fix the CLASS a finding belongs to.
+The structural remedies are tickets: #204 (a tracked standing set, lists derived, plants generated), #205
+(`tools/homes_tracked.py` drops an unresolved bare name silently), #206 (the table written as findings are
+paid), #207 (the packet's claim generated from the run of record).
+
 ## A FROZEN TABLE IS NOT THE CONTROL FOR A VARIANT RUN — run the unchanged form through the same script on the same build (paid: 14z-186, GitHub #183, rule-checker run 2026-09-30-480)
 
 **What happened.** #183's RNG forms B and C were run through scratch copies of three parity gates on merged-m21

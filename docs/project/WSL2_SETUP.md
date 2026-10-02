@@ -434,6 +434,12 @@ The merged build's extracts are not copied: on a fresh clone
 `ROMDIR=~/roms tools/ensure_merged_inputs.sh` completes them (78 region files, byte-identical
 to the Mac's on PILOT).
 
+**What PILOT's static tier found that the Mac cannot:** two gates edited files with BSD
+`sed -i ''`, which GNU sed reads as `-i` followed by a FILE named `''` (fixed in
+`tests/test_charmap_current.sh` and `tests/test_release_roundtrip.sh` with the portable
+`sed ... > tmp && mv tmp file`); and two process-tooling gates fail on their own premises
+on Linux — GitHub #203.
+
 ## 10. BUILD THE RELEASE BINARIES FOR THIS OS — one command per emulator
 
 Written 14z-150, and **untested on any Linux or Windows host**: the tools

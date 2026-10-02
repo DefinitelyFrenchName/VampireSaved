@@ -6,3 +6,5 @@ region_subst	control: the mechanism named in the corrected text, live in the gen
 VOICE-FLAVOR CLASS	14z-188: +0x382 is the character id; the 14z-87 "voice-class borrow" is the arcade ladder's opponent pick (engine_internals "The per-node sfx row is the fighter's OWN")	retracted
 the engine reassigns it	14z-188: the same retraction, the 14z-87 wording	retracted
 audit_ladder_pick_store	control: the gate that measures the corrected reading, live in tests/	reach:1
+uses 0x51 in exactly seven	14z-188 (procedure run 2026-10-02-567): vs2's class-0x51 records counted within each table's measured extent; Donovan's open-ended projectile table holds 0x51 past his 125 ported slots, not measured as records	retracted
+within each table's measured extent	control: the corrected wording, live in docs/game/engine_internals.md	reach:1

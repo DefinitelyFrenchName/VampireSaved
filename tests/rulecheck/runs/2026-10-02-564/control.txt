@@ -1,0 +1,2 @@
+fixture	proc-planted-spec-14z178
+slot	b

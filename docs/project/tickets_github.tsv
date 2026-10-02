@@ -2,8 +2,12 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 203
+# issues: 207
 number	state	reason	closed	labels	title
+207	OPEN	-	-	architecture,evolution	Close: generate the documentation packet's claim from the run of record's check outputs
+206	OPEN	-	-	architecture,evolution	Close: append each finding to the findings table when it is paid for, not reconstructed at the close
+205	OPEN	-	-	bug,severity: medium,test-integrity	homes_tracked.py drops an unresolved bare document name silently and never checks each finding letter
+204	OPEN	-	-	architecture,evolution	Close: a tracked standing close-check set with derived lists and generated plants, inherited by every close
 203	OPEN	-	-	bug,severity: low	Linux: test_agent_sweep's post-kill check and test_run_on_snapshot's no-self-copy control fail on their own premises (fixed sleep vs zombies; dash reads ahead)
 202	OPEN	-	-	bug,severity: low	1P arcade: the 14z-87 keep-tenant thunk may make a tenant CPU opponent repeat (the ladder's pick skipped when the CPU side already holds a tenant id)
 201	CLOSED	COMPLETED	2026-10-01	bug	Linux: per-frame pin lists in POKES exceed the 128 KiB single-environment-string limit, so the parity-style gates' legs never start off macOS

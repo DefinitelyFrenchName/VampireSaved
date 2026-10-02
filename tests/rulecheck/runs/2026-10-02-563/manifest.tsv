@@ -1,0 +1,12 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent188/close/findings_row.txt	063893511bcc49c4a06e0c867247083e66e2d52b
+build/agent188/close/out/exits.tsv	fa62f8998f7de058c1d820a0166c8d81b3dc07a1
+build/agent188/close/out/runs/close_findings.out	33b1d7d1e8117755546a3eb3559f1af74a7c5d41
+build/agent188/close/out/runs/homes_tracked.out	3a80d7cc000823063d92688e8df79eba83a47f7a
+build/agent188/close/out/runs/retraction_grep.out	320d0a399778d7b1ef7f529c45e47e8e8cec2146
+build/agent188/close/out/runs/scratch_census.out	d8198e1de7ec7e19f576984e925e61159098837b
+build/agent188/close/out/runs/rulings_verbatim.out	776e90f0e7701548325b720c8a75bbbe17be1bcc
+build/agent188/close/out/runs/promise_check.out	452d1afe83a4f52edad4d2828283cc4718734c9e
+build/agent188/close/out/runs/tickets.out	ebae019018ac4f391b54d00700b8a6e87b9703c4
+build/agent188/close/out/runs/open_tickets.out	a90e72d6aeb61e844b73c8d18f4a9eb9a598ea8c
+build/agent188/close/out/runs/open_tickets_plant.out	d4299727d1670ddbeb9fd2d9235852a9d868a736

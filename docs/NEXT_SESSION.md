@@ -36,9 +36,15 @@ recorder's gloss (rule-checker run 2026-10-02-561 Q5). When no ruling covers it,
    (Verilator 5.020 against the Mac's 5.050 — compare before trusting it), the emulator tier with `--controls`
    for the speed comparison the maintainer asked for, and the known-good environment write-up
    (`docs/project/build_environments.md`). #203 holds its two Linux-only static reds. STATE 14z-188 row 12.
+   Its emulator tier's MAME lane (`--lane mame --jobs 6`, launched 16:19) outlived this session's 2-hour task
+   limit and kept running ON PILOT: read `~/pilot_emu_mame.log` there first (177 gates in at the close, 0 FAIL).
 6. **#202** (the keep-tenant thunk's possible 1P repeat): no rig yet; a 1P arcade run as a tenant past a tenant
    CPU opponent is the repro to write.
-7. **SHELVED BY THE MAINTAINER:** the measurer/reader frontmatter change to Sonnet 5.5 at `xhigh`.
+7. **THE CLOSE'S CONVERGENCE — #204, #205, #206, #207** (filed at this close on the maintainer's word): three
+   closes in a row took 12, 8 and 7 documentation-packet runs, mostly on holes in checks rebuilt by hand. Until
+   they are worked, start the checks file from `build/agent188/close/checks.tsv` (its open-ticket list is
+   DERIVED, not typed) and fix the CLASS a finding belongs to, not the instance (`docs/project/gotchas.md`).
+8. **SHELVED BY THE MAINTAINER:** the measurer/reader frontmatter change to Sonnet 5.5 at `xhigh`.
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 

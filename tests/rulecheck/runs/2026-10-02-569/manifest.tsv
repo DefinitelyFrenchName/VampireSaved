@@ -1,0 +1,16 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent188/close/findings_row.txt	463884d0f2772591305f2899cd53222d778cd5cf
+build/agent188/close/out/exits.tsv	987c954493df1e460ada5793e3329218ded46cf0
+build/agent188/close/out/runs/close_findings.out	33b1d7d1e8117755546a3eb3559f1af74a7c5d41
+build/agent188/close/out/runs/homes_tracked.out	2a5dd632be60d7f18fa0cb3b05645626733c847a
+build/agent188/close/out/runs/retraction_grep.out	914064ddce81e38ce7848e1498caeebe24eb8c2f
+build/agent188/close/out/runs/scratch_census.out	a4a0aa6c0c4207013900d9b9a6ad6cfe3bc7f896
+build/agent188/close/out/runs/rulings_verbatim.out	776e90f0e7701548325b720c8a75bbbe17be1bcc
+build/agent188/close/out/runs/promise_check.out	452d1afe83a4f52edad4d2828283cc4718734c9e
+build/agent188/close/out/runs/tickets.out	ebae019018ac4f391b54d00700b8a6e87b9703c4
+build/agent188/close/out/runs/open_tickets.out	a90e72d6aeb61e844b73c8d18f4a9eb9a598ea8c
+build/agent188/close/out/runs/open_tickets_plant.out	d4299727d1670ddbeb9fd2d9235852a9d868a736
+build/agent188/close/out/runs/none_reasons.out	1978ea5e89d5c6b8d136fb27b8507dd17f7227da
+build/agent188/close/out/runs/none_reasons_plant.out	cf32325db67473cd166882efb10047e3fb0a7463
+build/agent188/close/out/runs/row_copy_current.out	37b8c4add4e436fa0a76df8a96a618ce6e1b5e75
+build/agent188/close/out/runs/row_copy_plant.out	6a72a04dfafafbe0197005d96957063224ecc14d

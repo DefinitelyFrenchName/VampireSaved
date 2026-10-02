@@ -267,16 +267,6 @@ Yes, Donovan's deity states should be in scope. However, if they would rely on t
 
 ---
 
-## Ruled 2026-10-02 (14z-188) — the poke-census rows of `audit_ladder_pick_store`: OBSERVES ×3, CROSS-LEG ×1
-
-**The question, verbatim:** *"How should the four poke-census rows of the new audit_ladder_pick_store be classed? (OBSERVES: the poke sets the stage, the game changes it, the gate measures the change. READS-BACK: the column records the rig, not the engine. CROSS-LEG: a poke joined to another leg's sample that has no poke.)"*
-
-**The maintainer:** *"OBSERVES ×3, CROSS-LEG ×1"*
-
-**What it means.** In `tests/expected/poke_readback.tsv`, the gate's three `DUMPS` rows of `+0x382` (f3460, f3470, f4200) are OBSERVES — the measurement itself: whether the game overwrites a poke made before the ladder's store, and what loads after one made after it — and its `RTAP` row is CROSS-LEG (the tap legs carry no poke). Found by the close tier's `test_poke_readback` red.
-
----
-
 ## Ruled 2026-10-02 (14z-188) — #196: the immortal gate restores the caller's MAME_BIN — measured first, then landed
 
 **The proposal (the session's, on #196):** the helpers of `tests/test_don_immortal_native.sh` restore the caller's `MAME_BIN` instead of unsetting it, after a measurement of the gate under the restored binary.
@@ -284,6 +274,18 @@ Yes, Donovan's deity states should be in scope. However, if they would rely on t
 **The maintainer, verbatim:** *"As for ERIS and #196, I agree with you proposal for a fix but indeed it needs measurement first"*
 
 **What it means.** Measured on both hosts under the runner's `MAME_BIN` (the WIDE build), the gate as it was against the fixed copy: ERIS (PATH's `mame` = the pinned source build) and the Mac (PATH's `mame` = Homebrew 0.288) — 41 fallbacks against 0, both exit 0, every printed line identical (timings stripped). Landed. #196's wrapper default for BY-HAND runs remains the ticket's open question.
+
+---
+
+## Ruled 2026-10-02 (14z-188) — the close's convergence: four tickets, #204-#207
+
+**The question, verbatim:** *"It seems to me that we're struggling quite a bit to do all the close and that we've gone through many many runs again. I am not complaining since we're also catching a lot more rule breakings than we did but I wonder if the number is purely due to the scope or if it's linked to more structural issues."*
+
+**The session's answer, in short:** structural for the documentation packet (three closes in a row took 12, 8 and 7 packet runs; four of 14z-188's six VIOLATED runs were holes in checks written during the close itself, the other two slips in a findings table reconstructed at the close), scope for the procedure check (a session of more than 7,000 records over two compactions). Four avenues were offered.
+
+**The maintainer:** *"Yes please: open one or multiple tickets on these avenues to make the close converge faster"*.
+
+**What it means.** Filed: #204 (a tracked standing close-check set, lists derived and plants generated), #205 (`tools/homes_tracked.py` drops an unresolved bare name silently and never checks each letter — a bug), #206 (append each finding to the table when it is paid for), #207 (generate the packet's claim from the run of record). Nothing in the ritual changes until one of them is worked.
 
 ---
 

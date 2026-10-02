@@ -1,0 +1,10 @@
+decision	procedure
+subject	one AI agent working session (14z-188), part 4 of 4: transcript 74077d05 records 5124-end
+session	-
+model	rule-checker@163e4ce9cf7b
+claim	In this span (transcript 74077d05 records 5124 to the end, the 14z-188 sitting's last part, across the 17:34 compaction at record 7248) the agent did what it said and ran what it claimed. It showed the maintainer the #200 capture before #200's ruling; closed #187 and #185 with their index rows and closing comments; fixed #199's input check and tested it on real extracts and a copy missing a region file; closed #198, #200 and #199 on the maintainer's rulings; built #188's confirm wiring on the ruling "Build the wiring" and tested it on the Mac and ERIS; set up the PILOT VM (SSH, ROM sets, emulator builds, the merged inputs, the 12 Mac-absolute ROM links re-pointed) with its four acceptance gates passing; measured #196's fix on ERIS and the Mac before landing it; fixed the results row-writer; filed #203 on the maintainer's ruling; ran the Mac's strict tier of record GREEN and, because two gate scripts were edited with sed while that tier ran, a confirm pass GREEN after it; and ran the close's checks and documentation packet (rule-checker run 562 VIOLATED and resolved, run 563 following). NOT TESTED: this sentence was written from the agent's summary of the span and a skim of its statements, not from a full re-read; whether every figure the agent quoted in the span came from a measurer or reader spec is not checked here; PILOT's mame lane was still running at the span's end and is declared in the sweep, not finished.
+checklist	f3ec4d9849f7
+family	procedure
+questions	QP1 QP2 QP3 QP4 QP5
+reader	rule-checker@163e4ce9cf7b
+head	78e1fd069ccd881349ddb8ce9b4b1b4e4682fb30
