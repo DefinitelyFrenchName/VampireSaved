@@ -11,12 +11,13 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**201 tickets** — status: open 15 · parked 13 · done 151 · declined 7 · not-ours 7 · invalid 7 · duplicate 1 · kind: bug 144 · cosmetic 11 · evolution 46 · **backfill debt: 0 rows**.
+**202 tickets** — status: open 16 · parked 13 · done 151 · declined 7 · not-ours 7 · invalid 7 · duplicate 1 · kind: bug 145 · cosmetic 11 · evolution 46 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#202](https://github.com/DefinitelyFrenchName/VampireSaved/issues/202) | bug | open | 1P arcade: the 14z-87 keep-tenant thunk may make a tenant CPU opponent repeat (the ladder's pick skipped when the CPU side already holds a tenant id) | none | `DECISIONS_HISTORY.md § Ruled 2026-10-02 (14z-188) — #195: "Close the P2 gap first"` | `docs/game/engine_internals.md § The per-node sfx row is the fighter's OWN` · `docs/game/atlas/ram.md § the ARCADE LADDER's pick` | `docs/game/gotchas.md § +0x382 is the character id, and the 1P arcade ladder writes` | 14z-188 |
 | [#200](https://github.com/DefinitelyFrenchName/VampireSaved/issues/200) | bug | open | Donovan's Lightning Sword (ES): native marks the victim pursuit-able at hit (class 0x4E, +0x117); ours (class 0x06 since the 14z-35 remap) does not | none | `DECISIONS_HISTORY.md § Ruled 2026-10-01 (14z-187b) — #195: option A` | none | none | 14z-187b |
 | [#199](https://github.com/DefinitelyFrenchName/VampireSaved/issues/199) | bug | open | Merged-image extracts on a fresh host: the reproducibility gate reads INPUTS OK on directories alone, and the tracked regions.json are stale (region data identical) | `tests/test_m3a_reproducible.sh` | none | none | none | 14z-187b |
 | [#198](https://github.com/DefinitelyFrenchName/VampireSaved/issues/198) | evolution | open | Parity rigs: P2 Demitri attacks with a chain whose record is equal on both games (forbid the record-differing a2 chains P2 enters: a2:0x04/0x05/0x0a) | `tests/audit_move_parity.sh` | `DECISIONS_HISTORY.md § Ruled 2026-10-01 (14z-187b) — the parity rigs' P2 guard` | none | none | 14z-187b |

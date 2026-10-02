@@ -206,6 +206,35 @@ Yes, Donovan's deity states should be in scope. However, if they would rely on t
 **The maintainer, verbatim** (GitHub #126, comment and close, 2026-10-01T21:14:59Z, from the maintainer's account — the sessions act as `mechanyaa-ai` since 2026-09-17): *"look and feel is actually great on CRT. Closing this ticket"*
 
 **What it means.** No select-wheel polish is pending; the wheel ships as it is. Found by the session (14z-187b) when `tests/test_tickets.sh` reported the index row still `parked` against a closed issue; the row now reads `declined`. Its facts stay in `docs/game/atlas/select_screen.md`.
+
+---
+
+## Ruled 2026-10-02 (14z-188) — #195's discriminator: the maintainer's lean, then "Measure the borrow first"
+
+**The maintainer, verbatim (the session's opener):** *"let's do both. for #195 I lean attacker id plus class, using a data address as a backup option should the id+class approach should fail."*
+
+**The question, verbatim:** *"#195's discriminator: the measurements say id+class has a hole, and the data address is exact but needs generator work. Which do we build?"* **The answer:** *"Measure the borrow first"*.
+
+**What it means.** The hole was the 14z-87 "voice-class borrow" (could a legacy fighter's `+0x382` hold a tenant id?). Measured before choosing: the routine is the arcade ladder's opponent pick, so it cannot give a legacy fighter a tenant id in a match a tenant attacker is in; the id-plus-class form stands. The question's "needs generator work" was wrong (the 14z-80h multi-tenant chain already exists) — corrected on #195.
+
+---
+
+## Ruled 2026-10-02 (14z-188) — #195: "Close the P2 gap first"; the 14z-87 "voice-class borrow" reading: "Retract and file ticket (Recommended)"
+
+**The questions, verbatim:** *"#195: build the hit-time mark on attacker id plus class (0x13 + class 0x44; 0x11 + class 0x44 + Cosmo's record byte +0x1F), with the knockdown-tail hook at 0x24D92, as the next step?"* and *"The 14z-87 'voice-class borrow' reading (VSE-62, the ram.md +0x382 row, engine_internals) is contradicted: that routine is the 1P CPU opponent pick, written before the opponent loads, and never runs its store in 2P. How do you want it handled?"*
+
+**The answers:** *"Close the P2 gap first"* and *"Retract and file ticket (Recommended)"* — the option's text as shown: *"Correct the docs and skill line with the measurements (retraction discipline), and open a ticket for the possible defect: the 14z-87 keep-tenant thunk skips the pick when the CPU slot already holds a tenant id, so in 1P arcade a tenant CPU opponent may repeat."*
+
+**What it means.** A tenant on P2 was measured landing the target hits (A0 = P2's block, the same records) before building. The 14z-87 reading is retracted across its carriers (engine_internals "The per-node sfx row is the fighter's OWN", ram.md `+0x382`, docs/game/gotchas.md [VSE-62]); the possible repeat is GitHub #202.
+
+---
+
+## Ruled 2026-10-02 (14z-188) — #195: "Build it now (Recommended)"
+
+**The question, verbatim:** *"The P2 gap is closed. How do you want to proceed with #195's build?"* **The answer:** *"Build it now (Recommended)"* — the option's text as shown: *"Stage the two hooks on the merged build (one shared thunk at 0x01868C setting the mark byte, the tail hook at 0x24D92 turning it into +0x117), then the checks: cycle cost against the performance rule, the merged legacy oracle, and a pursuit gate (Cosmo / Ifrit Sword ES then Up+button: connects natively and on ours, fails on the unhooked build). Several hours with the gates."*
+
+**What it means.** Built and staged as `build/manifest/staged/195_pursuit_mark.patch` (`docs/project/patch_notes.md` "14z-188"), in the ruled form — attacker id plus class, Pyron's record told by `+0x1F`; a first build that keyed Pyron on the record's address was rebuilt the same session. Gate `tests/audit_pursuit_flag.sh`.
+
 ---
 
 ## Ruled 2026-09-30 (14z-186) — two tickets found under #184: Donovan's 2HK damage (#191) and Change Immortal's one-frame timing

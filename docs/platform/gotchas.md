@@ -352,7 +352,14 @@ logs boot writes only, reads as "nobody writes this field," which is a
 WRONG conclusion. `tests/lua/tap_writes.lua` carries the fix (re-install
 via `add_change_notifier`); use it instead of hand-rolling taps. Taps are
 the right tool for hot fields (positions) where trace_writes.lua-style
-watchpoint stops would desync the replay.
+watchpoint stops would desync the replay. **And judge a tap run by the
+tap's own END line, never MAME's exit code** — paid on Linux 14z-188
+(ERIS, WSL2): `test_select_wheel` and `test_don_immortal_native` went red
+on a MAME segfault at TEARDOWN after a complete log (`test_select_wheel`
+12 of 12 runs under a 24-way parallel load, 0 of 4 at 5-way); both now
+read the END line or the dumps. Removing the superseded tap before
+re-installing (`read_tap.lua`'s pattern) cut the rate to 5 of 12 but did
+not remove it: the crash is not root-caused.
 
 ## OBJ RAM dumps span BOTH pages — filter by code range and you will
 ## blame the wrong drawer
@@ -1007,8 +1014,9 @@ not read taps on device ROM spaces.
 was 0x06, a debugger bp said the dispatcher later READ 0x0C from that
 byte, both instruments were provably live — and no mechanism on either
 emulator can change RAM without a bus write. The resolution: **the value
-is a dynamic ALLOCATION result (the voice-class borrow scan), and every
-run allocates differently** — measured 0x06/0x0C/0x09/0x00 across
+is a dynamic ALLOCATION result (the arcade ladder's opponent pick — read
+then as a "voice-class borrow", a reading RETRACTED 14z-188 — on a rig
+whose match never formed), and every run allocates differently** — measured 0x06/0x0C/0x09/0x00 across
 identical-input MAME runs and 0x04 on FBNeo. The write from run A was
 being compared with the read from run B. In one run with read AND write
 taps installed together (`tests/lua/read_tap.lua`), the write was 0x0C
@@ -1019,7 +1027,7 @@ Two sub-traps, both paid for here:
   checksum gotcha), but so are two IDENTICAL non-debug runs when the
   value derives from sound state: the QSound handshake latch's one-frame
   phase (the documented masked non-determinism) feeds the in-use mask
-  the borrow scan consults, so even the canonical timeline is a lottery
+  the ladder's scan consults, so even the canonical timeline is a lottery
   at this one point.
 - **The watch window bounds the claim** (RH-26): the 14z-86 byte-watch
   covered the DISPATCH window and concluded "no write"; the write fires

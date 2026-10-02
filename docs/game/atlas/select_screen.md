@@ -103,8 +103,9 @@ Rows `0x10-0x1F` are a **verbatim copy** of rows `0x00-0x0F`.
 ## The identity that matters: cell index IS character id
 
 Both commit stores take the same `d0`. `$382(a6)` is the character-id field
-AT SELECT/COMMIT (14z-87: in MATCH the engine reassigns it as the voice-flavor
-class, so a match-time read is NOT the char id — see ram.md:85)
+(14z-87's "in MATCH it is a voice class the engine reassigns" is RETRACTED, 14z-188:
+the only later writer is the arcade ladder's pick of the CPU side's next opponent,
+before that fighter loads — see ram.md `+0x382`)
 of the player struct (`a6` = `RAM:$FF8400` P1 / `$FF8800` P2, so the live
 cursor cell is `RAM:$FF8403` and the id `RAM:$FF8782`). There is no
 translation layer between "which cell the cursor is on" and "which

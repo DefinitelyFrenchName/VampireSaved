@@ -49,7 +49,7 @@
 #   80 chars after the key unless in `also`). The atlas row is canonical;
 #   syntheses follow it. Seeded with 16 locks / 40 file-sites from
 #   `doc_audit_14z118.md` §2 (OBJ bank table, sprite-palette pointer table, AI
-#   script tables, the voice-borrow writer, the Gallon-variant idiom, the
+#   script tables, the ladder-pick writer (once "the voice-borrow"), the Gallon-variant idiom, the
 #   loader, the id fold, the id pair, the fade window, name entries, the ring
 #   base, match-init normalisation). Twelve extractor self-tests every run;
 #   three must-fire controls on a perturbed copy (dropped number, rival

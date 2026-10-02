@@ -552,21 +552,24 @@ needing an answer at all. STATE 14z-78 had specified this correctly ("D1 must
 be left holding the table OFFSET — a handler downstream may read it"); an
 entry-only measurement is not grounds to override a whole-effect rule.
 
-## +0x382 is the char id only at SELECT — in match it is the VOICE-FLAVOR CLASS, and the engine reassigns it (14z-87)
+## +0x382 is the character id, and the 1P arcade ladder writes the CPU side's before it loads — a forced pick there does not survive a CPU flow
 
 **[VSE-62]** The forced-pick pokes write the char id there, the TCRF cheat writes 0x18
-there, and audit_id_writers censuses it — all correct for select/commit.
-But mid-match the engine's voice-class borrow (match-sequencer event →
-`jsr $AE7C`, write at `PRG:0x0AEF6`) overwrites it with an allocated
-VOICE CLASS drawn from the OPPONENT's row of the candidate table
-`0x00B268` (rows authored per roster; vsavj's predate the tenants), and
-the per-node sfx dispatcher (`0x27F16`) plays `row[class][node]` from it.
-Consequences, both paid for: (1) a match-time "char id" read from +0x382
-is wrong (measured 0x06/0x0C on a Donovan P1); (2) a tenant's
-engine-voice events play a VANILLA character's flavor — the sword-plant
-"ding". Full mechanism: engine_internals "The per-node sfx dispatch,
-third pass"; decision brief: STATE "Decisions pending — 14z-87";
-mechanism gate: tests/audit_voice_borrow.sh.
+there, and audit_id_writers censuses it; the value held when the fighter
+loads decides the character. On the 1P CPU flow the ARCADE LADDER's pick
+(`jsr $AE7C` from `PRG:0x020704`, store at `PRG:0x0AEF6`) writes the CPU
+side's NEXT OPPONENT there before that fighter loads, overwriting any
+forced pick — so a rig that pokes an id and then lets the select screen
+time out into a CPU game fights whoever the ladder drew, and a read of
+`+0x382` names the drawn character, not the poked one. Identify the loaded
+character by the hitbox base `+0x60`. Paid for twice: 14z-87 read the
+drawn ids (0x06/0x0C/0x09/0x00 on a rig meant to be "Donovan P1", rig 90,
+which never formed its match — 14z-87b) as a VOICE CLASS the engine
+"borrows" mid-match, and the reading survived 14z-94's decoding of the
+same routine as the ladder until 14z-188 (#195) measured the store's
+timing and the load. RETRACTED with it: "a tenant's engine-voice events
+play a vanilla character's flavor". Mechanism: engine_internals "The
+ARCADE LADDER" and "The per-node sfx row is the fighter's OWN".
 
 ## vsav's AUTO is AUTO-GUARD (a handicap), NOT autoplay — and the victory
 ## portrait screen belongs to the 2P flow only (14z-99)

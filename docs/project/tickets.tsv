@@ -71,6 +71,7 @@
 # WHAT THE GATE DOES NOT CLAIM: that an answer is ENOUGH. That is judged at the
 # close that closes the ticket.
 issue	kind	status	title	repro	decided	learned	wrong	sessions
+202	bug	open	1P arcade: the 14z-87 keep-tenant thunk may make a tenant CPU opponent repeat (the ladder's pick skipped when the CPU side already holds a tenant id)	none	DECISIONS_HISTORY.md § Ruled 2026-10-02 (14z-188) — #195: "Close the P2 gap first"	docs/game/engine_internals.md § The per-node sfx row is the fighter's OWN ; docs/game/atlas/ram.md § the ARCADE LADDER's pick	docs/game/gotchas.md § +0x382 is the character id, and the 1P arcade ladder writes	14z-188
 201	bug	done	Linux: per-frame pin lists in POKES exceed the 128 KiB single-environment-string limit, so the parity-style gates' legs never start off macOS	tests/test_pokes_ranges.sh	none	docs/platform/gotchas.md § LINUX CAPS ONE ENVIRONMENT STRING AT 128 KiB	docs/platform/gotchas.md § LINUX CAPS ONE ENVIRONMENT STRING AT 128 KiB	14z-187b
 200	bug	open	Donovan's Lightning Sword (ES): native marks the victim pursuit-able at hit (class 0x4E, +0x117); ours (class 0x06 since the 14z-35 remap) does not	none	DECISIONS_HISTORY.md § Ruled 2026-10-01 (14z-187b) — #195: option A	none	none	14z-187b
 199	bug	open	Merged-image extracts on a fresh host: the reproducibility gate reads INPUTS OK on directories alone, and the tracked regions.json are stale (region data identical)	tests/test_m3a_reproducible.sh	none	none	none	14z-187b

@@ -105,7 +105,7 @@ for p in 9 10; do
     ( cd "$W" && MAME_SANDBOX="$W/sbf$p" REPLAY="$W/r_$p.rpl" FIELDS="$FIELDS" FIELD_OUT="$W/field_$p.txt" FIELD_FROM=2300 FIELD_TO="$FR" FRAMES="$FR" \
       "$REPO/tools/run_mame.sh" vsav2 -autoboot_script "$REPO/tests/lua/field_trace.lua" > "$W/field_$p.log" 2>&1 ) </dev/null &
     ( cd "$W" && MAME_SANDBOX="$W/sbw$p" REPLAY="$W/r_$p.rpl" WATCH="ff8850,6" TRACE_OUT="$W/writes_$p.txt" FRAMES="$FR" \
-      "$REPO/tools/run_mame.sh" vsav2 -debug -autoboot_script "$REPO/tests/lua/trace_writes.lua" > "$W/writes_$p.log" 2>&1 ) </dev/null &
+      "$REPO/tools/run_mame.sh" vsav2 -debug -debugger none -autoboot_script "$REPO/tests/lua/trace_writes.lua" > "$W/writes_$p.log" 2>&1 ) </dev/null &
 done
 wait
 for p in 9 10; do [ -s "$W/field_$p.txt" ] || bad "part $p: no field samples"; [ -s "$W/writes_$p.txt" ] || bad "part $p: no write-tap log"; done

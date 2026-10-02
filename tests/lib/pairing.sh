@@ -11,9 +11,10 @@
 #
 # ── THE THREE THINGS THAT ARE LOAD-BEARING, all measured, all easy to undo ──
 #
-# 1. THE SIGNATURE IS `+0x60.l`, NOT `+0x382`. 14z-87 proved `+0x382` is the
-#    VOICE-FLAVOR class in match, not the character id (`ram.md:85`): the
-#    engine reassigns it. GitHub #16 records a live gate (`test_pyron_blink`)
+# 1. THE SIGNATURE IS `+0x60.l`, NOT `+0x382`. On a 1P CPU flow the arcade
+#    ladder writes the CPU side's next opponent into `+0x382` before it loads,
+#    over any forced pick (`ram.md` `+0x382`, 14z-188; 14z-87's "voice-flavor
+#    class" reading is RETRACTED). GitHub #16 records a live gate (`test_pyron_blink`)
 #    whose guard reads `+0x382` in match and can therefore false-REFUSE.
 #    `audit_legacy_pairings` uses `+0x60.l` for the same reason. Measured
 #    14z-95: the base is stable per character AND independent of side —

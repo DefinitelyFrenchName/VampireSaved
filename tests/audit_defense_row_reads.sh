@@ -26,8 +26,8 @@
 # note): the curve at PRG:0x018C10 masks it to 5 bits (row = id*0x20 + +0x3B3, table
 # 0x0B8940) and the rally threshold at 0x018C78 reads it unmasked (table 0x0BCC80). So a
 # data-only edit of rows 0x10/0x13 is the fix IF every hit on a tenant victim reads the
-# tenant's own id there — but in a match +0x382 is the voice-flavor class, which the
-# engine can reassign ([VSE-62]). This gate measures the index each read actually took.
+# tenant's own id there — but on a 1P CPU flow the arcade ladder rewrites +0x382 before the
+# CPU side loads ([VSE-62]; the "voice class" reading RETRACTED 14z-188). This gate measures the index each read actually took.
 # THE TWO HALVES (rule-checker run 2026-09-18-51 Q4: this gate logs reads only at the listed
 # pcs, so a reader elsewhere is invisible to it): which instructions name either table is the
 # STATIC half, frozen by tests/test_defense_rows_census.sh's reader rows — every absolute long
@@ -43,7 +43,7 @@
 #   attacker — every naming part, 32 since 14z-181 (the tenant P1, real picks, tests/audit_move_parity.sh's
 #              inputs and pins; the tenant is a victim only when Demitri lands a hit);
 #   suite    — every tests/replays/*.rpl, unpoked (tenant picks on the merged wheel, 1P CPU
-#              matches where the voice-class borrow runs, legacy matches);
+#              matches where the arcade ladder picks, legacy matches);
 #   vsavj    — every tests/replays/*.rpl on pristine vsavj: the LEGACY CONTROL — which row a
 #              legacy victim's hit reads in vanilla, which the fix must not change.
 # IDENTITY is each block's hitbox base +0x60 (written at load, tapped; [VSP-163]), named by

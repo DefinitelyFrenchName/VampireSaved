@@ -166,7 +166,7 @@ run() {   # run <name> <set> <rompath> <rpl file> <pokes> [mame_bin]
     [ -n "${6:-}" ] && { MAME_BIN="$6"; export MAME_BIN; }
     DUMPS="$DSPEC" POKES="$5" REPLAY="$4" CHECKSUM_OUT="$WORK/$1/c.log" \
         MAME_SANDBOX="$WORK/$1/sb" MAME_ROMPATH="$3" tools/run_mame.sh "$2" \
-        -autoboot_script "$REPO/tests/lua/replay.lua" > "$WORK/$1/mame.log" 2>&1
+        -autoboot_script "$REPO/tests/lua/replay.lua" > "$WORK/$1/mame.log" 2>&1 || true   # a teardown segfault (MFI-12): the dumps decide
     unset MAME_BIN
     rm -rf "$WORK/$1/sb"
     [ "$(ls "$WORK/$1"/dump_*_ff8800.bin 2>/dev/null | wc -l)" -ge 150 ] \
@@ -177,7 +177,7 @@ tapleg() {   # tapleg <name> <set> <rompath> <rpl file> <pokes> [mame_bin] — t
     [ -n "${6:-}" ] && { MAME_BIN="$6"; export MAME_BIN; }
     POKES="$5" REPLAY="$4" TAP=ff845c,2 WINDOW=2655,2668 FRAMES=2668 TRACE_OUT="$WORK/$1/tap.log" \
         MAME_SANDBOX="$WORK/$1/sb" MAME_ROMPATH="$3" tools/run_mame.sh "$2" \
-        -autoboot_script "$REPO/tests/lua/tap_writes.lua" > "$WORK/$1/mame.log" 2>&1
+        -autoboot_script "$REPO/tests/lua/tap_writes.lua" > "$WORK/$1/mame.log" 2>&1 || true   # a teardown segfault (MFI-12): the END line decides
     unset MAME_BIN
     rm -rf "$WORK/$1/sb"
     grep -q '^END 2668 ' "$WORK/$1/tap.log" 2>/dev/null \

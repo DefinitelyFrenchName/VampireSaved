@@ -47,8 +47,8 @@
 # two ids native does not — 0x91 and 0x8e, both Phobos' OWN authored voices
 # (vs2 0x749/0x746, "verbatim" rows in qs_voice_map.md) — but they land
 # PRE-MATCH, not at the electrocute. And the native leg reaches Huitzil by
-# poking +0x382, which 14z-87 proved is the VOICE-FLAVOR class in match
-# (ram.md:85), so "native fires neither" may mean the native leg is not
+# poking +0x382, which the arcade ladder rewrites on a CPU flow before the
+# fighter loads (ram.md +0x382, 14z-188), so "native fires neither" may mean the native leg is not
 # voicing as Huitzil at all. Until that confound is closed those two ids are a
 # MEASUREMENT, not a finding, and freezing them here would ratify a possible
 # rig artifact. Section 3 freezes only the ELECTROCUTE WINDOW, where the sole

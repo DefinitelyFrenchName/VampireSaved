@@ -32,7 +32,7 @@
 #    window lies elsewhere simply degrades to a legacy run on that leg —
 #    still a valid guard leg; this soak measures CRASH-FREEDOM, not
 #    coverage attribution. (Poking later frames is deliberately avoided:
-#    +0x382 is the VOICE-FLAVOR class in match — ram.md:85 — and writing
+#    +0x382 is the live character id in match — ram.md +0x382 — and writing
 #    ids into it mid-match manufactures states real play cannot produce,
 #    the audit_kill_poke_shape lesson.)
 #  - A PASS means "no vector fired on THESE rigs" — rig-bounded, like

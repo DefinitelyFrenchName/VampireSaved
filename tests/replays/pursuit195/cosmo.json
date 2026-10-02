@@ -1,0 +1,86 @@
+{
+ "tenant": "pyron",
+ "part": "c194",
+ "events": [
+  {
+   "name": "Cosmo [PP tap] then U+LP at +160",
+   "frame": 2600,
+   "gap": 400,
+   "movement": false
+  },
+  {
+   "name": "Cosmo [PP tap] then U+LP at +170",
+   "frame": 3000,
+   "gap": 400,
+   "movement": false
+  },
+  {
+   "name": "Cosmo [PP tap] then U+LP at +180",
+   "frame": 3400,
+   "gap": 400,
+   "movement": false
+  },
+  {
+   "name": "Cosmo [PP tap] then U+LP at +190",
+   "frame": 3800,
+   "gap": 400,
+   "movement": false
+  },
+  {
+   "name": "Cosmo [PP tap] then U+LP at +200",
+   "frame": 4200,
+   "gap": 400,
+   "movement": false
+  },
+  {
+   "name": "CONTROL: throw then U+LP pursuit",
+   "frame": 4600,
+   "gap": 420,
+   "movement": false
+  }
+ ],
+ "pokes": [
+  "2550:ff8850:01200120",
+  "2950:ff8850:01200120",
+  "3350:ff8850:01200120",
+  "3750:ff8850:01200120",
+  "4150:ff8850:01200120",
+  "4550:ff8850:01200120",
+  "4950:ff8850:01200120",
+  "2560:ff8410:0228",
+  "2560:ff8810:02d8",
+  "2960:ff8410:0228",
+  "2960:ff8810:02d8",
+  "3360:ff8410:0228",
+  "3360:ff8810:02d8",
+  "3760:ff8410:0228",
+  "3760:ff8810:02d8",
+  "4160:ff8410:0228",
+  "4160:ff8810:02d8",
+  "4370:ff8410:0228",
+  "4370:ff8810:02d8",
+  "2540:ff8509:09",
+  "2940:ff8509:09",
+  "3340:ff8509:09",
+  "3740:ff8509:09",
+  "4140:ff8509:09",
+  "4540:ff8509:09"
+ ],
+ "p2": {
+  "id": "01",
+  "path": [
+   "R"
+  ],
+  "never": [
+   "b:0x71",
+   "b:0x74"
+  ],
+  "report": [
+   "b:0x10",
+   "a2:0x04",
+   "a2:0x05",
+   "a2:0x0a"
+  ]
+ },
+ "frames": 5270
+}

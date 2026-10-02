@@ -1,0 +1,10 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent188/t195/maintainer_195.txt	853c284c95082d69bd2ebbe1d8e52caea2730ee0
+build/manifest/donovan.toml.lines-2203-2250 (lines 2203-2250 of build/manifest/donovan.toml)	89651e8500d978b0006e0b5e47d61e83dcf9c8bc
+tests/replays/don/90_don_plant.rpl.lines-1-12 (lines 1-12 of tests/replays/don/90_don_plant.rpl)	05d5188fd3b60726f868b4fd40614a89f8a726cf
+build/agent188/t195/figs_measurer3.txt	140e10ea36316c3e9c501cc42badfae336ef9799
+build/agent188/t195/figs_measurer5.txt	3e7b5406a6277ee9b3daf042a930330cb638540e
+build/agent188/t195/figs_measurer14.txt	55c8fc22c374c9f55583d2f87e1ede21a4c36209
+tests/audit_voice_borrow.sh.lines-1-90 (lines 1-90 of tests/audit_voice_borrow.sh)	70f43ff17ec9aab4e8e1a6f84be44e7901b09506
+tests/audit_voice_borrow.sh.lines-160-185 (lines 160-185 of tests/audit_voice_borrow.sh)	1bace6b6a3947c6d5efaeccf3f6c3a4b22ab5588
+docs/game/engine_internals.md.lines-318-335 (lines 318-335 of docs/game/engine_internals.md)	888c1f271f6717ffe071ed5c4da291eb2964019f

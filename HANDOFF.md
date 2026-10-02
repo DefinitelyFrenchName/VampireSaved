@@ -1060,7 +1060,7 @@ POKES="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10"   # P1; P2 = $FF8B82
 tools/run_replay_mame.sh vsav2 <replay> out.log        # ~6 s
 ```
 
-Verified by `+0x382 = 0x10` on the native leg **(SELECT/commit time only — in MATCH this byte is the VOICE-FLAVOR class and the engine reassigns it; 14z-87, ram.md:85)**, with DF (seq 0x0A) and
+Verified by `+0x382 = 0x10` on the native leg **(read at select/commit; on a 1P CPU flow the arcade ladder writes the CPU side's next opponent there before it loads — ram.md `+0x382`, corrected 14z-188)**, with DF (seq 0x0A) and
 the air dash (seq 0x14) both firing. **Poke BOTH sides** when sprite
 lists are compared: the cursor path lands on different characters on
 the two wheels (P2 = 0x03 is Victor on vsav *and* vsav2).

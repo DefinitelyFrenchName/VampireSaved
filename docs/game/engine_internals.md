@@ -251,9 +251,9 @@ the `0x3A3CA0` pool measured 14z-123).
 
 Depends on `atlas/ram.md` rows: `$FF8100` (stage index), `$FF1E48`/`$FF1E50`
 (the pick block), `$FF8110` (in-use mask), `$FF8114` (chosen index),
-`$FF8121` (venue byte), `$FF8138` (scan bound), `$FF8782`/`+0x382` (voice
-class).
-**Gates:** `tests/audit_ladder_selector.sh`, `tests/audit_continue_ladder.sh`,
+`$FF8121` (venue byte), `$FF8138` (scan bound), `$FF8782`/`+0x382` (the
+character id).
+**Gates:** `tests/audit_ladder_selector.sh`, `tests/audit_ladder_pick_store.sh`, `tests/audit_continue_ladder.sh`,
 `tests/audit_don_vs_cpu.sh`, `tests/test_decode_stage_banners.sh`,
 `tests/test_ladder_tenant_vs_palette.sh`.
 
@@ -263,7 +263,7 @@ row is 8 groups of 8 bytes; a row is one character's ladder and a group is
 one rung.
 
 `0x00af16` copies 8 bytes from each table into `$FF1E48` and `$FF1E50`, at
-offset `($382(a0) << 6) + $FF8121` — the row is the character's voice class,
+offset `($382(a0) << 6) + $FF8121` — the row is the character's id,
 the group is the venue byte. `0x00aeca` then scans **one index across both
 lists**: it walks until it finds a candidate whose class bit is clear in the
 in-use mask `$FF8110.l`, or until the index reaches the bound `$FF8138`
@@ -561,7 +561,7 @@ WINDOW"]
 
 **A vs2 class 0x51 knockdown is pursuit-able; vsavj's equivalent 0x44 is not (measured 14z-187, GitHub #194,
 #195).** Depends on atlas rows: the fighter's `+0x54` class and `+0x117` (`atlas/ram.md`). **Gates:**
-`tests/audit_move_parity.sh` (Pyron's Cosmo rows), `tests/test_pyron_cosmo.sh`. vs2's shared reaction tail
+`tests/audit_move_parity.sh` (Pyron's Cosmo rows), `tests/test_pyron_cosmo.sh`, `tests/audit_pursuit_flag.sh`. vs2's shared reaction tail
 `0x239E6` (`cmpi.b #$51,$54(a6); bne; move.b #1,$117(a6)`) marks a class-0x51 victim pursuit-able, and the
 attacker-side pursuit check (vs2 `0x26D60`, vsavj `0x27B0E`, instruction-parallel) requires the opponent's
 `+0x117`. 0x44 — the five-consumer equivalent above — gets no such store, so a vs2 0x51 record remapped to 0x44
@@ -598,6 +598,17 @@ run: Donovan's Lightning Sword (ES) sets `+0x117` AT HIT on vs2 through the clas
 `0x16FE4`), while ours writes class 0x06 (`0x0186D0`, the 14z-35 remap) and no flag — whether a pursuit connects after it
 natively is not measured. A guard-cancel Ifrit (donovan_15 event 6, class 0x0A) sets `+0x117` at hit identically on both
 (vs2 `0x16FF4`, vsavj `0x186EE`).
+
+**The class write's registers (14z-188, #195; probed at vsavj `0x01868C` on our builds, non-drifting conditioned
+breakpoints, rule-checker 2026-10-02-557).** On the main entry A0 is the ATTACKER's fighter block — loaded by
+`movea.w -$4BC6(a5),a0` at `0x01842C` and not written again before the write — A1 the victim and A3 the attack
+record: P1's block on P1 hits (Pyron's projectile hits, Donovan's Ifrit Sword (ES)), P2's on P2 hits, fighter and
+projectile alike. Class 0x44 reaches the write from all three entry tables (the ground table `0x018468` entry
+`0x0224` lands on it directly; the air table `0x018510` and the `0x0185B0` path's table too). The second caller
+(`bsr` at `0x018AAA` into `0x0185B0`) skips the A0 load — A0 there is not measured. And a mark held in the victim
+across hits is not rewritten by hits that never pass the write: a throw (class 0x10) and a pursuit's class-0x0F
+hits do not (measured on the `tests/replays/pursuit195/` cosmo rig). The tenants' restoration of vs2's 0x51 tail
+built on these: `../project/patch_notes.md` "14z-188"; gate `tests/audit_pursuit_flag.sh`.
 
 **421+P (the sworded Lightning Sword / deity) on native vsav2, MEASURED at
 four strengths, no mash.** LP lands **3 hits for 7 damage**, MP **5 for 9**,
@@ -1665,7 +1676,7 @@ that stood for a whole session (STATE 14z-74/75 retraction).
 
 **Atlas rows this section depends on:** `atlas/ram.md` (`$FF0E0E` the sound
 ring, `$FF1E0E` its write index, `$FF043C` the QSound handshake latch,
-fighter `+0x382` the voice-flavor class), `atlas/character_tables.md`
+fighter `+0x382` the character id), `atlas/character_tables.md`
 (`tail_data_ptr` `0x0BF41A`).
 **Gates:** `tests/test_don_sound.sh`, `tests/test_qs_id_table.sh`,
 `tests/test_qs_songs.sh`, `tests/test_qs_window_law.sh`,
@@ -1937,75 +1948,48 @@ across the games.
   priority-suppressed track echo, measured moving with injection
   timing).
 
-### THE VOICE-CLASS BORROW: `(0x382,A6)` is the fighter's voice-FLAVOR class (measured 14z-87)
+### The per-node sfx row is the fighter's OWN: `(0x382,A6)` is the character id
 
-**Atlas rows this section depends on:** `atlas/ram.md` ($FF1E48 pool,
-$FF8110 mask, fighter +0x382), `bank_map.toml` `tail_data_ptr`
-(0x0BF41A).
+**Atlas rows this section depends on:** `atlas/ram.md` (fighter +0x382; the
+ARCADE-LADDER pick block), `bank_map.toml` `tail_data_ptr` (0x0BF41A).
+**Gates:** `tests/audit_ladder_pick_store.sh` (the store, its timing and the
+load, on pristine vsavj); `tests/audit_voice_borrow.sh` (the 14z-87 mechanism
+gate; its header carries the correction).
 
-- **The model:** table `0x0BF41A`'s 16 base rows are PER-CHARACTER
-  voice arrays; the per-node sfx dispatcher (`0x27F16`) plays
-  `row[(0x382,A6)][node]` — the NODE names an effect-sound slot, the
-  CLASS picks whose FLAVOR voices it. The byte usually holds the char
-  id, but the engine reassigns it.
-- **The borrow (measured end-to-end, rig 90):** at a match-sequencer
-  event (caller chain by history probe: state machine `PRG:0x0206DA`
-  sub-state advance → `jsr $AE7C`; ~f3463 in the rig), the engine hands
-  P1 a voice class: populator `PRG:0x0AF16` copies an 8-byte candidate
-  list into pool `RAM:$FF1E48` (paired voice-number list from
-  `0x00BB68` into `RAM:$FF1E50`) from ROM table **`0x00B268`**, row =
-  `(0x382,A0)<<6` + venue byte `$121(A5)` — **A0 is the OPPONENT**
-  after the entry exg dance (A5=$FF8000 here, so A0/A1 are the
-  $FF8400/$FF8800 fighter blocks). The scan at `PRG:0x0AEDA` takes the
-  first candidate whose bit in in-use mask `RAM:$FF8110` is clear and
-  writes it to `(0x382,A1)` at **`PRG:0x0AEF6`**. Verified with
-  independent redundancy: live pool bytes == ROM row 3 (Victor)
-  venue-slot 3 on both games. There is a tagged path too
-  (`tst.b $3bc(a0)` → row `0x800 + $3bd(a0)*8` — engine-tag rows after
-  the 32 char rows), and a `$AC(a5)==3` path that picks a voice number
-  by RNG — not yet needed for any port question.
-- **The candidate rows are ROSTER-AUTHORED:** vs2's Victor row is
-  `{13,00,0C,08,01,11,0F,18}` — Donovan's class first — so native
-  Donovan-vs-Victor keeps HIS OWN voice row for engine-voice events
-  (measured borrow = 0x13). vsavj's Victor row is
-  `{06,0C,01,08,07,02,0F,18}`: vanilla classes only, so a tenant P1
-  gets a vanilla flavor — the sword-plant "ding" is
-  `row[borrowed][13]` (node 13 per vsavj's engine anim). Rows
-  0x10-0x1F of both tables alias 0x00-0x0F (row 0x13 == row 0x03,
-  verified) — the tenant rows are unported.
-- **The borrow result is a LOTTERY:** the in-use mask is
-  sound-state-fed; identical-input runs measured borrows
-  0x06/0x0C/0x09/0x00 (MAME) and 0x04 (FBNeo) — the QSound-latch
-  one-frame phase (the standing masked non-determinism) flips it. So
-  the ding's exact id varies per run/venue; 14z-86's
-  ours{0x62B,0x308} / native{0x29B} ring signature reproduces
-  canonically but is one outcome, not a constant (0x308 = row0C[13];
-  0x29B = row07[28]).
-- **Fix status: SHIPPED 14z-87 (maintainer-decided option b+c,
-  2026-08-15).** (b) the tenant-keeps-own-class thunk at the borrow
-  write (`voice_borrow_keep_tenant` site_thunk @0x0AEF2 + site-pad
-  code_word @0x0AEF8, all three manifests, deduped): when `(0x382,a1)`'s
-  pre-value is 0x10/0x11/0x13 the borrow write is skipped
-  (skip-write-only — the scan and its $FF8114/$FF8100 side effects run
-  unchanged); tenants keep their own class and their engine-voice
-  events play their AUTHORED voice rows. (On the real plant — rig 91, the match verified by snapshots + ring — the
-  plant fires authored voices 0x5D/0x62 = vs2 0x705/0x70A; rig 90's "0x6A"
-  figure came from a match that never formed — history.) (c) vs2's candidate/voice-number rows 0x10/0x11/0x13
-  ported over the variant aliases (per-tenant [[data_port]] rows).
-  All only_variant_slot-gated; the stock twin measured BIT-IDENTICAL.
-  Cost measured: ~60 cycles on an event firing 0-1×/match (0 hits in
-  8000 frames of replay 03); the visible footprint on tenant-content
-  .sha1 logs is the hook-cycle dead-stack class (3 bytes in
-  $FF7F00-$FF7FFF at the event frame, live state identical) plus the
-  intended voice-content changes; legacy masked classes held with NO
-  flicker-inventory movement. Gate: `tests/audit_voice_borrow.sh`
-  (own-class default; lottery mode = the ground-truth-failing pair vs
-  build/don_m4).
+- **The model:** table `0x0BF41A`'s 16 base rows are PER-CHARACTER voice
+  arrays; the per-node sfx dispatcher (`0x27F16`) plays
+  `row[(0x382,A6)][node]` — the NODE names an effect-sound slot, `+0x382`
+  picks whose row. **`+0x382` is the fighter's character id:** the value it
+  holds when the fighter loads decides the character (poked 0x03, 0x13 and
+  0x11 before the load: Victor, Donovan and Pyron by the hitbox base
+  `+0x60`, 3 runs each — 14z-188, #195).
+- **RETRACTED 14z-188 (completing 14z-94's re-reading): "the engine reassigns
+  `+0x382` mid-match as a VOICE CLASS (the borrow)".** The routine at
+  `0x00AE7C` (one caller, the `jsr` at `PRG:0x020704`) is the ARCADE
+  LADDER's opponent pick ("The ARCADE LADDER", above): on the 1P CPU flow its
+  store at `PRG:0x0AEF6` writes the CPU side's `+0x382` — the next opponent —
+  before that fighter loads; on the 2P path (`$AC(a5)==3`) it stores nothing
+  (no store in nine 2P tap legs, 14z-188). Every 14z-87 measurement of "the
+  borrow" was on rig 90, which never formed a match (14z-87b): P1 was the
+  CPU side, the store overwrote the forced-pick 0x13 with the ladder's pick
+  (P1's `+0x60` still zero at f3470, loaded by f4200), and P1 played as that
+  character — the "borrowed classes" 0x06/0x0C/0x09/0x00 were the CPU
+  opponents drawn, the "lottery" is the ladder's in-use mask, and the
+  sword-plant "ding" was the drawn character's own sound.
+- **The 14z-87 fix (b+c), read again:** (c) ported vs2's table-A/B rows
+  0x10/0x11/0x13 — a tenant PLAYER's ladder ("WHO CAN BE DRAWN AGAINST WHOM",
+  above); (b) the keep-tenant thunk at `0x0AEF2` skips the store when the CPU
+  side's `+0x382` already holds 0x10/0x11/0x13, so it concerns the ladder's
+  pick, not a tenant's own voices — whether a tenant's voices differ without
+  it is not measured (rig 91's authored-voice check ran with it). Its effect
+  on the ladder: GitHub #202.
+- The superseded section, verbatim: `engine_internals_history.md`
+  "[14z-188] from «THE VOICE-CLASS BORROW»".
 
 ### The KERNEL per-class voice tables — a SECOND voice family in the sound kernel, not the 0x0BF41A record path (measured 14z-96)
 
 **Atlas rows this section depends on:** `atlas/ram.md` fighter +0x382
-(the voice-flavor class), `atlas/id_space.md` (the fold-site table —
+(the character id), `atlas/id_space.md` (the fold-site table —
 this family is the id_space "rows 0x10-0x1F are copies" shape, not an
 `andi` fold).
 
@@ -3286,9 +3270,10 @@ the thunk can be unconditional.
 ## measured on Phobos' FINAL GUARDIAN; twins verified in both engines)
 
 Depends on atlas rows: fighter structs `$FF8400/$FF8800` (`+0x50` HP,
-`+0x52` white HP, `+0x144` combo counter, `+0x382` char id AT SELECT ONLY
-(in match it is the voice-flavor class — 14z-87; use `+0x60.l` hitbox base
-for in-match identity),
+`+0x52` white HP, `+0x144` combo counter, `+0x382` char id (on the 1P CPU
+flow the arcade ladder writes the CPU side's next opponent there before it
+loads, over any forced pick — use `+0x60.l` hitbox base for the LOADED
+character),
 `+0x3B3` per-char stat byte, `+0x8C` attack-record table ptr,
 `+0x32` attacker/owner link), the A5 work-var families below, and
 docs/game/gotchas.md "Same-value class #4".
@@ -3609,15 +3594,16 @@ The values and the change recipe live in docs/project/tables/defense_rows.md.
 `0x18C10`-`0x18C26` takes `$382(a1)` masked `#$1f`, shifted 5, plus `$3B3(a1)`; the
 rally-threshold read `0x18C78`-`0x18C82` takes `$382(a1)` unmasked. So rows 0x10/0x13
 and threshold bytes 0x10/0x13 are the tenants' own storage — a data-only change is
-possible (the 14z-118 port_param32 pattern). The caution: in a match `+0x382` is the
-voice-flavor class, which the engine can reassign (14z-87); the tenants' class byte
-holds their own id since the 14z-87 fix (`tests/audit_voice_borrow.sh`, own-class), and
+possible (the 14z-118 port_param32 pattern). The caution, as 14z-87 wrote it — that in a
+match `+0x382` is a voice class the engine reassigns — is RETRACTED (14z-188: it is the
+character id; the writer was the arcade ladder's pick, "The per-node sfx row is the
+fighter's OWN"), and
 the 14z-145 read watch saw the tenant rows indexed — ~~but that EVERY hit on a tenant
 victim reads the tenant's rows is unmeasured over the corpus~~ **MEASURED 14z-169
 (`tests/audit_defense_row_reads.sh`): every read of both tables over the corpus indexed the
 VICTIM'S OWN id** — the victim identified by its hitbox base `+0x60`, never by `+0x382` —
 on our build (the 12 naming victim parts, the 30 attacker parts, every suite replay
-including the 1P CPU matches where the voice-class borrow runs: Donovan 394 hits,
+including the 1P CPU matches where the arcade ladder picks: Donovan 394 hits,
 Phobos 38, Pyron 28) and on pristine vsavj (15 legacy characters, every suite replay).
 No legacy victim read another id's row. What it does not show: paths the corpus does not
 run. (Pyron's rows are

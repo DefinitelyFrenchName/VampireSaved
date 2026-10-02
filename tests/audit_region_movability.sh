@@ -95,7 +95,7 @@
 # at three in-match frames (DUMPS through the guarded runner):
 #   (a) `+0x60.l` == the BUILD's own hitbox-base table row for the tenant
 #       (prg/vm3j.04d @ 0x3D97A, the audit_continue_switch derivation) —
-#       the tenant's match FORMED (never +0x382, the voice-flavor byte);
+#       the tenant's match FORMED (never +0x382, which a CPU flow's ladder pick rewrites);
 #   (b) `+0x1C.l` (the anim node pointer) lies INSIDE the placed anim range
 #       and that range sits at or above 0x400000 — the MOVED region is the
 #       one being walked. A "runs" without (b) would only prove the emulator

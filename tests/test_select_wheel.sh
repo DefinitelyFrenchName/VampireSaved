@@ -120,8 +120,9 @@ else
     REPLAY="$WORK/walk.rpl" TAP=ff8402,2 FRAMES=1450 \
         TRACE_OUT="$WORK/tap.txt" MAME_SANDBOX="$WORK/sandbox" \
         tools/run_mame.sh vsavj -autoboot_script tests/lua/tap_writes.lua \
-        >"$WORK/mame.txt" 2>&1 || {
-        note "  FAIL  MAME run"; tail -12 "$WORK/mame.txt"; exit 1; }
+        >"$WORK/mame.txt" 2>&1 || true   # MAME can segfault at TEARDOWN after the log is written (MFI-12; 12/12 runs on Linux, 14z-188): the tap's END line decides
+    grep -q '^END 1450 ' "$WORK/tap.txt" 2>/dev/null || {
+        note "  FAIL  MAME run (the tap never wrote END 1450)"; tail -12 "$WORK/mame.txt"; exit 1; }
     check "measured walk reproduces TABLE B (all 128 pairs)" 0 \
         python3 tools/check_wheel_walk.py "$WORK/tap.txt" "$WORK/walk.json"
 

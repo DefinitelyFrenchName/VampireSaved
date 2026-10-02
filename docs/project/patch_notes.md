@@ -1,5 +1,52 @@
 # patch_notes — per-change detail: every byte, and why
 
+## 14z-188 — #195: the class-0x51 pursuit flag for the tenants' remapped records, BUILT AND STAGED for the next freeze
+
+**THE FIX (staged: `build/manifest/staged/195_pursuit_mark.patch`, applied AFTER `194_cosmo44.patch` by the next
+freeze).** vs2's knockdown tail sets the victim's `+0x117` (pursuit-able) for reaction class 0x51 alone (vs2
+`0x239E6`); our tenants' 0x51 records are remapped to 0x44 (Donovan's Ifrit Sword (ES) records 33-38 at 14z-110b,
+Pyron's Cosmo Disruption by #194), whose tail never sets it. Two `only_variant_slot` hooks restore it, in
+`donovan.toml` and `pyron.toml`:
+
+```
+PRG:0x01868C  move.b $17(a3),$54(a1)   (the hit-time class write)  -> jsr  a 2-way site_thunk chain (0x4D4730 merged)
+   Donovan:  cmpi.b #$13,$382(a0) ; cmpi.b #$44,$17(a3)                        -> victim +0x293 := 1, else := 0
+   Pyron:    cmpi.b #$11,$382(a0) ; cmpi.b #$44,$17(a3) ; cmpi.b #$04,$1F(a3)  -> victim +0x293 := 1, else := 0
+PRG:0x024D92  move.l #$ffff8e39,$4c(a6)  (the knockdown tail, run once at the countdown's end)
+              -> jsr a shared thunk (0x3FFD80): tst.b $293(a6) ; cmpi.b #$44,$54(a6) -> move.b #1,$117(a6)
+PRG:0x024D98  the displaced word's pad -> nop (code_word)
+```
+
+**The discriminator — attacker id plus class, the maintainer's lean, rule-checker 2026-10-02-557 OK.** At the class
+write A0 is the attacker's fighter block (loaded by `movea.w -$4BC6(a5),a0` at `0x01842C`; read P2's block on P2
+hits), A1 the victim, A3 the record. Donovan's only class-0x44 records are the six Ifrit Sword (ES) records, all
+vs2 0x51; Pyron's are projectile records 21 (Cosmo, vs2 0x51, `+0x1F` = 0x04) and 4 (0x44 natively, `+0x1F` =
+0x00, a byte copied verbatim from vs2 and read by no hit code). Any other hit through the write clears the mark.
+A mark can outlive its hit — a throw (class 0x10) and the pursuit's own class-0x0F hits do not pass the write
+(measured, the cosmo rig on ours) — but the tail acts only while the class is 0x44, and class 0x44 reaches the
+write from the ground, air and `0x0185B0`-path tables alike, so every class-0x44 hit rewrites the mark. `+0x293` lies in the fighter-init clear range `+0x080..+0x37F` and was measured
+written only by the bulk clears (14z-187b). A first build compared Pyron's A3 against record 21's placed
+address (the backup form) without the maintainer's word; it was rebuilt in the ruled form the same session.
+
+```
+merged (build/agent188/t195/build195/merged195, fingerprint 110467a7, 844 ops = 839 + 5): the two site jsr's above,
+  the chain and the tail thunk; the existing site thunks placed after the chain move by its length, so 5858 runs /
+  335 187 bytes of the opcode image differ from #194's staged build (702c98d0) — placement, judged by the oracle
+```
+
+**Measured on it (14z-188):** `tests/audit_pursuit_flag.sh` PASS — Pyron's Cosmo then U+LP (+160..+200) and
+Donovan's Ifrit Sword (ES) then U+LP (+72..+92) equal native vs2 on every event (`+0x117` at the press, the
+pursuit starting and connecting on the same frames); the mark's writes over the naming rig `pyron_4` are
+`0 0 0 0 1 1 1 1` (record 4 clears, record 21 marks); on merged-m21 the same gate holds the known gap.
+`tests/audit_lag_budget.sh` PASS (no new zero-pass frame over 44 parts). The merged legacy oracle: see the
+staged patch's header. The maintainer: *"for #195 I lean attacker id plus class, using a data address as a
+backup option should the id+class approach should fail"*, then *"Measure the borrow first"*, *"Close the P2 gap
+first"*, *"Build it now (Recommended)"*.
+
+**AT THE FREEZE:** `git apply` `194_cosmo44.patch` then `195_pursuit_mark.patch`, rebuild every track, run
+`tests/audit_pursuit_flag.sh` (it reads the hooks from the build and turns over to equality by itself), re-freeze
+what the hooks move, and delete both staged files in the freeze commit. Not built yet: the solo tracks.
+
 ## 14z-187 — #194: Pyron's Cosmo Disruption reaction class 0x4F -> 0x44, RULED AND STAGED for the next freeze
 
 **THE FIX (staged: `build/manifest/staged/194_cosmo44.patch`, applied by the next freeze).** One byte of one

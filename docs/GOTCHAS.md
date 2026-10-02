@@ -54,7 +54,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - The two games' sprite-list handlers do NOT agree: a per-handler CODE BIAS differs between vsav and vs2 (14z-71)
 - A VARIANT ALIAS ROW holds a value vanilla uses — that does not make the SLOT used, and reading it that way deferred a fix for two sessions (14z-76)
 - "Dead on ENTRY" is not "dead" — a dispatcher's output register is read downstream of the handler's rts (14z-79, cost a build)
-- +0x382 is the char id only at SELECT — in match it is the VOICE-FLAVOR CLASS, and the engine reassigns it (14z-87)
+- +0x382 is the character id, and the 1P arcade ladder writes the CPU side's before it loads — a forced pick there does not survive a CPU flow
 - vsav's AUTO is AUTO-GUARD (a handicap), NOT autoplay — and the victory portrait screen belongs to the 2P flow only (14z-99)
 - A "flaky reset" that reboots to the NAME SCREEN is a CPU EXCEPTION — and the game names the vector for you (14z-109)
 - The ladder pick faults on an ODD venue byte — steer `$FF8121` with EVEN values only (14z-110)

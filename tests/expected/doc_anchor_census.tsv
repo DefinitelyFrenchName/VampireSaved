@@ -355,7 +355,7 @@ VSE-58	docs/game/engine_internals.md	The WIN-QUOTE TEXT SYSTEM — fully decoded
 VSE-59	docs/game/engine_internals.md	the #92 crash; decoded end to end and confirmed on screen)	IN-LIST
 VSE-60	docs/game/engine_internals.md	the #92 crash; decoded end to end and confirmed on screen)	IN-LIST
 VSE-61	docs/game/engine_internals.md	Sound subsystem: the QSound command path (session 14z-51, measured)	IN-LIST
-VSE-62	docs/game/gotchas.md	+0x382 is the char id only at SELECT — in match it is the VOICE-FLAVOR CLASS, and the engine reassig	IN-LIST
+VSE-62	docs/game/gotchas.md	+0x382 is the character id, and the 1P arcade ladder writes the CPU side's before it loads — a force	IN-LIST
 VSE-63	docs/game/engine_internals.md	The KERNEL per-class voice tables — a SECOND voice family in the sound kernel, not the 0x0BF41A reco	IN-LIST
 VSE-64	docs/game/engine_internals.md	The Z80 command dispatch, the note-table array, the dead type-C song class and the alias bit (measur	IN-LIST
 VSE-65	docs/game/engine_internals.md	The QSound Z80 driver: id table, songs, streams, sample records (measured 14z-86, reader-traced on l	IN-LIST

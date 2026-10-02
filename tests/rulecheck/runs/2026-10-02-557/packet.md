@@ -1,0 +1,38 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: #195: build the hit-time mark on attacker id plus class (the borrow premise measured)
+Claim (the working agent's sentence): Recommendation for #195: key the hit-time mark at PRG:0x01868C on attacker id plus class, the maintainer's stated lean (maintainer_195.txt), marking a class-0x44 hit when the attacker's +0x382 is 0x13, or is 0x11 and the record's +0x1F equals Cosmo record 21's, because class 0x44 reaches that write from the ground, air and 0x0185B0-path tables alike (figs_measurer12.txt C2), the ground table's jmp landing on it directly (figs_measurer11.txt C2 and C3); because A0 there is the attacker's fighter block on the main entry: loaded at 0x01842C by movea.w -$4BC6(a5),a0, not written up to the jmp (vj18.txt:270-285, figs_measurer11.txt C3) nor by the subroutine at 0x018434 (figs_measurer10.txt C5), reading P2's block on two legacy P2 fighter hits probed at 0x1868c (figs_measurer2.txt C5, probe195e.sh, probe195f.sh) and on two legacy P2 projectile hits probed at 0x018440 (figs_measurer9.txt C2 to C4), and P1's block reading 0x11 on Pyron's eight projectile hits (figs_measurer6.txt C4) and 0x13 on Donovan's six record 33 to 38 hits (figs_measurer.txt C4), values no write after the select screen changes in those rigs (figs_measurer14.txt C1 to C3); because native vs2's class-0x51 records, the class its tail marks (engine_internals.md:563-567), scanned per table to the next table base (figs_measurer10.txt C2 and C3), are Donovan's character records 33 to 38 and Pyron's projectile record 21, the last table, Donovan's projectile table, showing its first hit at slot 138, past the 125 slots ported for him (C4), while Pyron's record 4 is class 0x44 there (figs_measurer5.txt C7) and so not a target; because on the probe build the class-0x44 slots of Donovan's and Pyron's tables, scanned to the end of each placed region, are Donovan's character records 33 to 38 and Pyron's projectile records 4 and 21 (figs_measurer6.txt C2), records 4 and 21 differing at +0x08, +0x09 (power) and +0x1F (figs_measurer3.txt C9), a field the hit code does not read (C10); and because a fighter's +0x382 is the character it loads as: the probe build's routine matches vanilla over 0xAE7C to 0xAEF2 (figs_measurer5.txt C2) and is reached by no call form but the jsr at 0x020704 (figs_measurer14.txt C4), its 1P store sits in the keep-tenant thunk (figs_measurer5.txt C3) behind the branch the 2P path skips (figs_measurer3.txt C2), none of the nine 2P tap legs saw a store while rig 90's 1P CPU flow did (C7), the tap logging writes at both players' +0x382 in each of the 12 legs (figs_measurer13.txt C2 and C3), and the value held when the fighter loads decides it, legacy 0x03 loading Victor and tenant 0x13 and 0x11 loading Donovan and Pyron, 3 runs of 3 each (figs_measurer3.txt C4 to C6, figs_measurer5.txt C4 to C6). NOT TESTED: a class-0x44 hit thrown from the P2 side, legacy or tenant, fighter or projectile (the P2 hits measured are legacy and of other classes); A0 on the paths into 0x0185B0, the second caller's bsr at 0x018AAA, which skips the load at 0x01842C (figs_measurer12.txt C3), and the main entry's branch there through bsr $1948e, a path that sets +0x117 itself at 0x0185B6 and passes the existing thunk at 0x0185CA; whether vs2's projectile slot 138 or any later slot of that open-ended table is a record any vs2 move reaches; other flows that reach the store (later arcade matches, continues, a challenger joining); any writer of +0x382 after a fighter loads outside the 12 tap legs; moves of the tenants that no rig enters; the keep-tenant thunk's skip path in 1P arcade; and the hooks' build, cycle cost, legacy oracle and pursuit gate.
+Artifacts (read every one, in full):
+  - build/agent188/t195/maintainer_195.txt
+  - build/agent188/t195/figs_measurer.txt
+  - build/agent188/t195/figs_measurer2.txt
+  - build/agent188/t195/figs_measurer3.txt
+  - build/agent188/t195/figs_measurer4.txt
+  - build/agent188/t195/figs_measurer5.txt
+  - build/agent188/t195/figs_measurer6.txt
+  - build/agent188/t195/figs_measurer9.txt
+  - build/agent188/t195/figs_measurer10.txt
+  - build/agent188/t195/figs_measurer11.txt
+  - build/agent188/t195/figs_measurer12.txt
+  - build/agent188/t195/figs_measurer13.txt
+  - build/agent188/t195/figs_measurer14.txt
+  - build/agent188/t195/region_scan.py
+  - build/agent188/t195/vs2_extent_scan.py
+  - build/agent188/t195/probe195b.sh
+  - build/agent188/t195/probe195e.sh
+  - build/agent188/t195/probe195f.sh
+  - build/agent188/t195/probe195g.sh
+  - build/agent188/t195/out/cosmo_a0.log
+  - build/agent188/t195/cpuid.sh
+  - build/agent188/t195/cpuid_poke.sh
+  - build/agent188/t195/cpuid_poke2.sh
+  - build/agent188/t195/cpuid_poke_t13.sh
+  - build/agent188/t195/cpuid_poke_t11.sh
+  - build/agent188/t195/tapborrow.sh
+  - build/agent188/t195/borrow_table.txt
+  - build/agent187b/t195/vj18.txt.lines-268-286 (lines 268-286 of build/agent187b/t195/vj18.txt)
+  - tests/expected/roster_pairings/bases.tsv
+  - tests/replays/don/90_don_plant.rpl.lines-1-12 (lines 1-12 of tests/replays/don/90_don_plant.rpl)
+  - docs/game/engine_internals.md.lines-1255-1280 (lines 1255-1280 of docs/game/engine_internals.md)
+  - docs/game/engine_internals.md.lines-560-570 (lines 560-570 of docs/game/engine_internals.md)

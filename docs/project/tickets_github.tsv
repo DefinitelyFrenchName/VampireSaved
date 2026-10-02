@@ -2,10 +2,11 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 201
+# issues: 202
 number	state	reason	closed	labels	title
+202	OPEN	-	-	bug,severity: low	1P arcade: the 14z-87 keep-tenant thunk may make a tenant CPU opponent repeat (the ladder's pick skipped when the CPU side already holds a tenant id)
 201	CLOSED	COMPLETED	2026-10-01	bug	Linux: per-frame pin lists in POKES exceed the 128 KiB single-environment-string limit, so the parity-style gates' legs never start off macOS
-200	OPEN	-	-	bug	Donovan's Lightning Sword (ES): native marks the victim pursuit-able at hit (class 0x4E, +0x117); ours (class 0x06 since the 14z-35 remap) does not
+200	OPEN	-	-	bug,severity: high	Donovan's Lightning Sword (ES): native marks the victim pursuit-able at hit (class 0x4E, +0x117); ours (class 0x06 since the 14z-35 remap) does not
 199	OPEN	-	-	bug	Merged-image extracts on a fresh host: the reproducibility gate reads INPUTS OK on directories alone, and the tracked regions.json are stale (region data identical)
 198	OPEN	-	-	evolution	Parity rigs: P2 Demitri attacks with a chain whose record is equal on both games (forbid the record-differing a2 chains in P2_NEVER)
 197	CLOSED	COMPLETED	2026-10-01	bug	The latch-readers census misses every immediate store (move.b #n,$off(An)): five latch writers unlisted, one a flavor write
@@ -83,7 +84,7 @@ number	state	reason	closed	labels	title
 125	OPEN	-	-	cosmetic,parked	Arcade-ladder map names and pictures (not investigated)
 124	OPEN	-	-	cosmetic,parked	Arcade-ladder roulette tag shows the base/shell character for a tenant opponent on the arcade ladder map screen
 123	OPEN	-	-	cosmetic,parked	Win-quote text for the three tenants (forgone for now; only the clean way, vanilla untouched)
-122	OPEN	-	-	evolution	Run the --controls release tier on the dedicated Linux server and compare its speed with the Mac
+122	OPEN	-	-	evolution	Run the --controls release tier on the dedicated Linux server and compare its speed with the m2 pro (load balancing potential)
 121	OPEN	-	-	evolution	Linux release binaries built on dedicated server, plus clean-machine check at release (option 3)
 120	OPEN	-	-	evolution	The rebuild-from-docs option after MiSTer (a possibility to preserve, not a commitment)
 119	OPEN	-	-	evolution	The living-documentation framework as an independent sibling of bbh (ruled at the plan stage, not scheduled)

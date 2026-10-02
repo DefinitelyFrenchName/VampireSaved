@@ -55,6 +55,7 @@ declares	audit_hitclass_map_cost
 declares	audit_hui_grunt
 declares	audit_id_writers
 declares	audit_kill_poke_shape
+declares	audit_ladder_pick_store
 declares	audit_ladder_selector
 declares	audit_lag_budget
 declares	audit_latch_reads
@@ -72,6 +73,7 @@ declares	audit_phase_mode_cost
 declares	audit_phobos_dmg_residual
 declares	audit_pool_free_byte
 declares	audit_projectile_clash
+declares	audit_pursuit_flag
 declares	audit_pursuit_leap
 declares	audit_pyron_capture_block
 declares	audit_pyron_ring

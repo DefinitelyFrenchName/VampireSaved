@@ -1155,6 +1155,11 @@ remap_ids = "0x720:0x97,0x723:0x9a,0x727:0x9e,0x729:0xa0,0x72a:0xa1,0x72b:0xa2,0
 unstub = "0x005122=0x5FFF00"   # -> the voice alias thunk (14z-86)
 
 # ── THE VOICE-CLASS BORROW (14z-87, option b+c) ─────────────────────────────
+# CORRECTION (14z-188, GitHub #195): the "borrow" below is the ARCADE LADDER's opponent pick (engine_internals
+# "The per-node sfx row is the fighter's OWN"): on the 1P CPU flow PRG:0x0AEF6 writes the CPU side's NEXT OPPONENT
+# into +0x382, the character id, before that fighter loads. So (b) skips the ladder's pick whenever the CPU side
+# already holds a tenant id (its effect: GitHub #202), and (c) ports a tenant player's ladder rows. The "voice
+# class" wording in this block and its notes is the retracted 14z-87 reading; the bytes are unchanged.
 # Shared engine-site thunk + pad: byte-identical twins of donovan.toml's
 # rows (full mechanism narrative lives there; merged builds dedup them).
 # The per-tenant candidate/voice-number rows below port vs2's Pyron

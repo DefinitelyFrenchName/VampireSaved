@@ -29,8 +29,9 @@
 #      base `+0x60.l`
 #
 # THE SIGNATURE IS +0x60.l, NOT +0x382 — and that choice is load-bearing.
-# 14z-87 proved +0x382 is the VOICE-FLAVOR class in match, not the character
-# id (`ram.md:85`); the engine reassigns it. GitHub #16 records a live gate
+# On a 1P CPU flow the arcade ladder writes the CPU side's next opponent into
+# +0x382 before it loads, over any forced pick (`ram.md` +0x382, 14z-188; the
+# 14z-87 "voice-flavor class" reading is RETRACTED). GitHub #16 records a live gate
 # (`test_pyron_blink`) whose guard reads +0x382 in match and can therefore
 # false-REFUSE. `audit_legacy_pairings` already uses +0x60.l for the same
 # reason. Measured 14z-95: the base is stable per character AND independent of
@@ -62,8 +63,8 @@
 #   cannot close it: single-credit, ONE character, and (measured 14z-95) only
 #   two ladder rungs. Asserts per ordering: no crash (guarded) + BOTH
 #   characters loaded, checked on the per-character hitbox base +0x60.l. THE
-#   SIGNATURE CHOICE IS LOAD-BEARING: +0x382 is the VOICE-FLAVOR class in
-#   match, not the id (14z-87, ram.md:85) — GitHub #16 records a live gate
+#   SIGNATURE CHOICE IS LOAD-BEARING: a CPU flow's ladder pick rewrites
+#   +0x382 before the fighter loads (ram.md +0x382, 14z-188) — GitHub #16 records a live gate
 #   that false-REFUSEs on it. Frozen bases: donovan 0x3fa9d0, phobos 0x4477b0,
 #   pyron 0x49ab7c, measured identical as P1 and as P2. Replay 94 is
 #   character-AGNOSTIC, so adding a tenant is a row in CLASSES, not a new

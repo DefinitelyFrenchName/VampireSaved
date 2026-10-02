@@ -35,6 +35,7 @@ declares	audit_guard_reentry
 declares	audit_hitbox_parity
 declares	audit_hui_grunt
 declares	audit_kill_poke_shape
+declares	audit_ladder_pick_store
 declares	audit_ladder_selector
 declares	audit_lag_budget
 declares	audit_latch_reads
@@ -43,6 +44,7 @@ declares	audit_move_parity
 declares	audit_move_parity_attribution
 declares	audit_pass_overrun
 declares	audit_phobos_dmg_residual
+declares	audit_pursuit_flag
 declares	audit_pyron_ring
 declares	audit_qs_voice_wav
 declares	audit_reaction_class_live

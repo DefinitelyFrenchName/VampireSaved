@@ -52,8 +52,8 @@
 #                   cannot see. See the hand-judged list below.
 #
 # THE SIGNATURE IS +0x60, NOT +0x382 — see tools/check_legacy_pairings.py
-# (+0x382 is the char id only at SELECT; in match the engine reassigns it
-# as the voice-flavor class from a sound-state-fed list, 14z-87).
+# (+0x382 is the char id, but on a 1P CPU flow the arcade ladder writes the
+# CPU side's next opponent there before it loads — ram.md +0x382, 14z-188).
 #
 # NO POKES, DELIBERATELY. Several replays are only meaningful under the
 # forced-pick / HP pokes their own gate scripts supply. This audit runs
@@ -150,7 +150,7 @@ mk c_nom 'F 100 p1id=0 p2id=0 p1hb=0 p2hb=0
 F 200 p1id=0 p2id=0 p1hb=0 p2hb=0' 2
 cp "$W/c_nom" "$W/c_nom2"
 # same fighters, different IN-MATCH +0x382 — the verdict must not ride on the
-# voice-flavor class the engine reassigns there (14z-87)
+# value the arcade ladder writes there before the CPU side loads (14z-188)
 mk c_voice 'F 100 p1id=0 p2id=0 p1hb=0 p2hb=0
 F 200 p1id=6 p2id=12 p1hb=604522 p2hb=619678
 F 300 p1id=12 p2id=6 p1hb=604522 p2hb=619678' 3

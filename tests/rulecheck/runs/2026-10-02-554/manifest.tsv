@@ -1,0 +1,29 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent188/t195/maintainer_195.txt	cc7c1fb304cbcf5e854f2ad995d53cd295369f26
+build/agent188/t195/figs_measurer.txt	d8c53eb7492d2e1e3b522d9163f68bb4abdd68b1
+build/agent188/t195/figs_measurer2.txt	5aa3f3c532e2e2137fb575e4e46160674ad25984
+build/agent188/t195/figs_measurer3.txt	140e10ea36316c3e9c501cc42badfae336ef9799
+build/agent188/t195/figs_measurer4.txt	64ea1390d235aec1e3b9964614fdc94360fd18fc
+build/agent188/t195/figs_measurer5.txt	3e7b5406a6277ee9b3daf042a930330cb638540e
+build/agent188/t195/figs_measurer6.txt	4844945c0760818d4e5b4de1c3049439f2d26eca
+build/agent188/t195/figs_measurer9.txt	951f8acf027ef5e60b137850e9dd133d6702c99a
+build/agent188/t195/figs_measurer10.txt	f7e05e6634511a2cf8b1b51a02c1e6bae54e9897
+build/agent188/t195/region_scan.py	17dd06ed9b15f980e3f78d12a351a6222dd9b073
+build/agent188/t195/vs2_extent_scan.py	2d056fc0ad3c2fb9d4cb8cf4fcf4f20c4b0d426f
+build/agent188/t195/probe195b.sh	0769b37dfbc210dc29f082b48a51d62ba51f810a
+build/agent188/t195/probe195e.sh	d366d41952658885695be5d88c36129e881585c0
+build/agent188/t195/probe195f.sh	c6f5b4ecb14faa185d37fe4d8bd68092f58c0ad6
+build/agent188/t195/probe195g.sh	b82a49708ad2db9d0ecc6f1d1a4a49d3548a2a90
+build/agent188/t195/out/cosmo_a0.log	26104d72787a74bc804cc140dca0e80ed5860bf3
+build/agent188/t195/cpuid.sh	b63b1ebd15e1d1059497b44a85397545df4a1e4f
+build/agent188/t195/cpuid_poke.sh	473ea4f1c4cfc15e3ec849d50c3b2bfb79b86879
+build/agent188/t195/cpuid_poke2.sh	01a4ed9466ac90c36bc633dcd704e094ec154719
+build/agent188/t195/cpuid_poke_t13.sh	b8d063ca87d3169d2eff0ca1bc13c4cd3d048710
+build/agent188/t195/cpuid_poke_t11.sh	ab136eb1ae899dfe124b2f2596c31e5e9c68c83c
+build/agent188/t195/tapborrow.sh	3c9fce5c3d4ee550799bae48676b4beabc21667d
+build/agent188/t195/borrow_table.txt	4657a7d3ecebd0117b3d9bdcfd2756288732582c
+build/agent187b/t195/vj18.txt.lines-268-286 (lines 268-286 of build/agent187b/t195/vj18.txt)	aed6e7e12ee02736ff3b6d88c047394eef1d0719
+tests/expected/roster_pairings/bases.tsv	9a8dac331d48dc6d46b3a9c397f42cee0a937069
+tests/replays/don/90_don_plant.rpl.lines-1-12 (lines 1-12 of tests/replays/don/90_don_plant.rpl)	05d5188fd3b60726f868b4fd40614a89f8a726cf
+docs/game/engine_internals.md.lines-1255-1280 (lines 1255-1280 of docs/game/engine_internals.md)	9b303e212ffe3b2f5afdd07af907b3a32bcf3fe3
+docs/game/engine_internals.md.lines-560-570 (lines 560-570 of docs/game/engine_internals.md)	7502db85d447e37f059755a4183428e3c9769c22

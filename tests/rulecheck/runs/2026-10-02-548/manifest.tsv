@@ -1,0 +1,21 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent188/t195/figs_measurer.txt	d8c53eb7492d2e1e3b522d9163f68bb4abdd68b1
+build/agent188/t195/figs_measurer2.txt	5aa3f3c532e2e2137fb575e4e46160674ad25984
+build/agent188/t195/figs_reader.txt	89342e798de449d42325a6f4c80701b8cc37b28a
+build/agent188/t195/borrow_table.txt	4657a7d3ecebd0117b3d9bdcfd2756288732582c
+build/agent188/t195/tapborrow.sh	3c9fce5c3d4ee550799bae48676b4beabc21667d
+build/agent188/t195/probe195.sh	02cc9514c853d0e94b3e995e0254b506f316ba06
+build/agent188/t195/probe195b.sh	0769b37dfbc210dc29f082b48a51d62ba51f810a
+build/agent188/t195/probe195e.sh	d366d41952658885695be5d88c36129e881585c0
+build/agent188/t195/probe195f.sh	c6f5b4ecb14faa185d37fe4d8bd68092f58c0ad6
+build/agent188/t195/out/cosmo_a0.log	26104d72787a74bc804cc140dca0e80ed5860bf3
+build/agent188/t195/out/ifrit_a0.log	4183f52d6d584ed90dde66710f777471c5d350b3
+build/agent188/t195/out/cosmo_cls.log	3f84ce931329880cac82e299e33eceddd413d4df
+build/agent188/t195/out/ifrit_cls.log	5ec43c25f668dac65d219ad9e266ef48282a1347
+build/agent188/t195/out/dual_p2.log	2f5ebfc78ac27685b1964d4475ee25d996760aaa
+build/agent188/t195/out/r03_p2.log	258d59e4f11f080620db6a225ff1dbce1ef7cf31
+build/manifest/donovan.toml.lines-2300-2320 (lines 2300-2320 of build/manifest/donovan.toml)	bb9daf47a62d3794cec97f40a7b1955220aac126
+tools/gen_donovan_patch.py.lines-195-215 (lines 195-215 of tools/gen_donovan_patch.py)	dba538febebaff3af817679497e4794157b37149
+tools/gen_donovan_patch.py.lines-6043-6065 (lines 6043-6065 of tools/gen_donovan_patch.py)	c4b6604b9d2b0dfca6a25622652f823d6a45fa1e
+tools/patch_prg.py.lines-85-107 (lines 85-107 of tools/patch_prg.py)	0eb81de27f8b41f9c31c89c7dabb8bed4cb65586
+tests/replays/don/90_don_plant.rpl.lines-1-12 (lines 1-12 of tests/replays/don/90_don_plant.rpl)	05d5188fd3b60726f868b4fd40614a89f8a726cf

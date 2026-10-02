@@ -18,6 +18,14 @@
 #
 # MUST-FIRE: known-bad: foreign-ring-id — a foreign id in the plant-end ring window must be caught by the membership check (mode: a foreign id is injected into the REAL ring and section 2 must fail)
 #
+# CORRECTION (14z-188, GitHub #195; engine_internals "The per-node sfx row is the fighter's OWN"): the
+#   "voice-class borrow" this gate names is the ARCADE LADDER's opponent pick, and +0x382 is the character id.
+#   Rig 90 never forms its match (its own header, 14z-87b): P1 is the CPU side, so PRG:0x0AEF6 writes P1's
+#   next-opponent id over the forced 0x13 before P1 loads, and "own-class" below is the keep-tenant thunk
+#   keeping that forced 0x13 against the ladder's pick — P1 then plays as Donovan. Every invariant below
+#   still holds as measured; read "voice class" as "the CPU side's character id", and "the fired id is a
+#   lottery" as the ladder's draw. The thunk's effect on a real 1P ladder: GitHub #202.
+#
 # Freezes the sword-plant "ding" mechanism as its STABLE invariants. The
 # fired id itself is a LOTTERY (the borrow scan consults the sound-state
 # in-use mask, which moves with the QSound-latch one-frame phase — measured

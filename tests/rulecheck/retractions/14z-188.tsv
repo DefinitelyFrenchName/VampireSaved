@@ -1,0 +1,5 @@
+# tests/rulecheck/retractions/14z-188.tsv — the wordings retracted or corrected in 14z-188, and reach controls that must be found live; columns pattern, source, class (retracted | reach:N)
+the generator substitutes only the tenant id	14z-188 #195: region_subst (14z-66, tools/gen_donovan_patch.py) puts a region's PLACED address in a thunk, and the 14z-80h multi-tenant site_thunk chain gives each tenant its own element at a shared site — neither limit holds	retracted
+cannot bake a relocated data address	14z-188 #195: the same correction, the issue comment's wording	retracted
+needs generator work	14z-188 #195: the same correction, the wording of the question put to the maintainer (quoted verbatim in DECISIONS_HISTORY.md, where the entry says it was wrong)	retracted
+region_subst	control: the mechanism named in the corrected text, live in the generator	reach:1

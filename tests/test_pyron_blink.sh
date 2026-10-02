@@ -58,8 +58,8 @@
 #
 # THE PICK GUARD (GitHub #16, fixed 14z-92; hardened 14z-123): each leg's P1
 # `+0x60.l` (hitbox base) must be ONE non-zero value for the window AND equal
-# Pyron's row of that game's hitbox_base table — never `+0x382`, which is the
-# voice-flavor class in match and produced a false REFUSE on the native leg.
+# Pyron's row of that game's hitbox_base table — never `+0x382`, which a CPU
+# flow's ladder pick rewrites, and which produced a false REFUSE on the native leg.
 # Measured 14z-123 on build/pyron36: native 0x0c75fe, ours 0x0fc6ac, both ==
 # their tables' row 0x11.
 #
@@ -79,8 +79,8 @@
 #   2/39. Attribution is part of the verdict: ours' two values must be NAMED
 #   (native's constant + vsavj palette-seq row 0x26 under the uploader's
 #   0xF000 OR), so a look-alike defect fails. REFUSES to judge unless each
-#   leg's +0x60.l (the hitbox base; never +0x382, the in-match voice-flavor
-#   byte — #16, fixed 14z-92) is ONE non-zero value AND equals Pyron's row of
+#   leg's +0x60.l (the hitbox base; never +0x382, which a CPU flow's ladder
+#   pick rewrites — #16, fixed 14z-92) is ONE non-zero value AND equals Pyron's row of
 #   that game's own hitbox_base table (vs2 data 0xD7B18, the build's 0x3D97A);
 #   8 verdict controls incl. a loaded-wrong-character refusal (14z-123; this
 #   row carried a "KNOWN WEAKNESS … blocked" note for a fix already shipped at

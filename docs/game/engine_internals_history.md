@@ -1391,3 +1391,70 @@ TYPE before this counts. Do not promote it without that.
 **NEXT:** identify the animating object by TYPE on both legs (not by
 slot address), then find what selects base `0x24EDD4` + offset for it.
 That selection is the defect.
+
+## [14z-188] from «THE VOICE-CLASS BORROW» (RETRACTED 14z-188: `+0x382` is the character id; the routine is the arcade ladder's opponent pick — the live section "The per-node sfx row is the fighter's OWN")
+
+### THE VOICE-CLASS BORROW: `(0x382,A6)` is the fighter's voice-FLAVOR class (measured 14z-87)
+
+**Atlas rows this section depends on:** `atlas/ram.md` ($FF1E48 pool,
+$FF8110 mask, fighter +0x382), `bank_map.toml` `tail_data_ptr`
+(0x0BF41A).
+
+- **The model:** table `0x0BF41A`'s 16 base rows are PER-CHARACTER
+  voice arrays; the per-node sfx dispatcher (`0x27F16`) plays
+  `row[(0x382,A6)][node]` — the NODE names an effect-sound slot, the
+  CLASS picks whose FLAVOR voices it. The byte usually holds the char
+  id, but the engine reassigns it.
+- **The borrow (measured end-to-end, rig 90):** at a match-sequencer
+  event (caller chain by history probe: state machine `PRG:0x0206DA`
+  sub-state advance → `jsr $AE7C`; ~f3463 in the rig), the engine hands
+  P1 a voice class: populator `PRG:0x0AF16` copies an 8-byte candidate
+  list into pool `RAM:$FF1E48` (paired voice-number list from
+  `0x00BB68` into `RAM:$FF1E50`) from ROM table **`0x00B268`**, row =
+  `(0x382,A0)<<6` + venue byte `$121(A5)` — **A0 is the OPPONENT**
+  after the entry exg dance (A5=$FF8000 here, so A0/A1 are the
+  $FF8400/$FF8800 fighter blocks). The scan at `PRG:0x0AEDA` takes the
+  first candidate whose bit in in-use mask `RAM:$FF8110` is clear and
+  writes it to `(0x382,A1)` at **`PRG:0x0AEF6`**. Verified with
+  independent redundancy: live pool bytes == ROM row 3 (Victor)
+  venue-slot 3 on both games. There is a tagged path too
+  (`tst.b $3bc(a0)` → row `0x800 + $3bd(a0)*8` — engine-tag rows after
+  the 32 char rows), and a `$AC(a5)==3` path that picks a voice number
+  by RNG — not yet needed for any port question.
+- **The candidate rows are ROSTER-AUTHORED:** vs2's Victor row is
+  `{13,00,0C,08,01,11,0F,18}` — Donovan's class first — so native
+  Donovan-vs-Victor keeps HIS OWN voice row for engine-voice events
+  (measured borrow = 0x13). vsavj's Victor row is
+  `{06,0C,01,08,07,02,0F,18}`: vanilla classes only, so a tenant P1
+  gets a vanilla flavor — the sword-plant "ding" is
+  `row[borrowed][13]` (node 13 per vsavj's engine anim). Rows
+  0x10-0x1F of both tables alias 0x00-0x0F (row 0x13 == row 0x03,
+  verified) — the tenant rows are unported.
+- **The borrow result is a LOTTERY:** the in-use mask is
+  sound-state-fed; identical-input runs measured borrows
+  0x06/0x0C/0x09/0x00 (MAME) and 0x04 (FBNeo) — the QSound-latch
+  one-frame phase (the standing masked non-determinism) flips it. So
+  the ding's exact id varies per run/venue; 14z-86's
+  ours{0x62B,0x308} / native{0x29B} ring signature reproduces
+  canonically but is one outcome, not a constant (0x308 = row0C[13];
+  0x29B = row07[28]).
+- **Fix status: SHIPPED 14z-87 (maintainer-decided option b+c,
+  2026-08-15).** (b) the tenant-keeps-own-class thunk at the borrow
+  write (`voice_borrow_keep_tenant` site_thunk @0x0AEF2 + site-pad
+  code_word @0x0AEF8, all three manifests, deduped): when `(0x382,a1)`'s
+  pre-value is 0x10/0x11/0x13 the borrow write is skipped
+  (skip-write-only — the scan and its $FF8114/$FF8100 side effects run
+  unchanged); tenants keep their own class and their engine-voice
+  events play their AUTHORED voice rows. (On the real plant — rig 91, the match verified by snapshots + ring — the
+  plant fires authored voices 0x5D/0x62 = vs2 0x705/0x70A; rig 90's "0x6A"
+  figure came from a match that never formed — history.) (c) vs2's candidate/voice-number rows 0x10/0x11/0x13
+  ported over the variant aliases (per-tenant [[data_port]] rows).
+  All only_variant_slot-gated; the stock twin measured BIT-IDENTICAL.
+  Cost measured: ~60 cycles on an event firing 0-1×/match (0 hits in
+  8000 frames of replay 03); the visible footprint on tenant-content
+  .sha1 logs is the hook-cycle dead-stack class (3 bytes in
+  $FF7F00-$FF7FFF at the event frame, live state identical) plus the
+  intended voice-content changes; legacy masked classes held with NO
+  flicker-inventory movement. Gate: `tests/audit_voice_borrow.sh`
+  (own-class default; lottery mode = the ground-truth-failing pair vs
+  build/don_m4).

@@ -15,11 +15,12 @@ carrying self-frozen expectations.  That is exactly how the 14z-88 medallion
 regression (replay 38, Victor vs Jedah) went green in every battery.
 
 THE SIGNATURE IS +0x60, NOT +0x382.  The obvious field, the character id at
-player-block +0x382 ($FF8782/$FF8B82), is only the char id AT SELECT: in match
-the engine REASSIGNS it as the voice-flavor class, and the borrow that writes
-it draws from a sound-state-fed candidate list (docs/game/atlas/ram.md, 14z-87).
-Comparing it across a whole run would call legacy pairings "tenant" on voice
-noise.  So the verdict rides on +0x60.l ($FF8460/$FF8860), the per-character
+player-block +0x382 ($FF8782/$FF8B82), is the char id, but on a 1P CPU flow
+the arcade ladder writes the CPU side's next opponent there, drawn from a
+sound-state-fed candidate list, before it loads (docs/game/atlas/ram.md, 14z-188;
+14z-87's "voice-flavor class" reading is RETRACTED).
+Comparing it across a whole run would call legacy pairings "tenant" on
+ladder-pick noise.  So the verdict rides on +0x60.l ($FF8460/$FF8860), the per-character
 hitbox-data base — a ROM pointer, constant for the whole match, and different
 for every character (Demitri 0x93B6A, Victor 0x9769E).  Legacy characters are
 never relocated (the superset invariant), so a legacy pairing's pointers are

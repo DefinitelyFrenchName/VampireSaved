@@ -1,0 +1,9 @@
+decision	recommendation
+subject	#195: build the hit-time mark on attacker id plus class (the borrow premise measured)
+session	14z-188
+model	rule-checker@163e4ce9cf7b
+claim	Recommendation for #195: key the hit-time mark at PRG:0x01868C on attacker id plus class, the maintainer's stated lean (maintainer_195.txt), marking a class-0x44 hit when the attacker's +0x382 (A0, figs_measurer2.txt C5) is 0x13, or is 0x11 and the record's +0x1F equals Cosmo record 21's, because on the probe build Donovan's class-0x44 records are exactly the six targets 33 to 38 and Pyron's are records 4 and 21 (figs_measurer3.txt C8), which differ at +0x08, +0x09 (power) and +0x1F (C9), a field the hit code does not read (C10), and because the premise that a legacy fighter never holds 0x11 or 0x13 in +0x382 rests on the routine writing it: vsavj's sole jsr to it is at 0x020704 (C3), it writes +0x382 at 0x00AEF6 (figs_measurer4.txt) only on the branch taken when $AC(a5) is not 3, the 2P path returning before it (figs_measurer3.txt C2), none of the nine 2P tap legs saw it write while rig 90's 1P CPU flow did at f3463 (C7), and the fighter loads as the value then held in +0x382, since 0x03 poked after the write loaded Victor 3 times of 3 and 0x03 poked before it was overwritten (C4, C5, C6), so a tenant class written there makes the fighter that tenant. NOT TESTED: other flows that reach this routine (later arcade matches, continues, a challenger joining), any other writer of +0x382 after a fighter loads beyond the 12 tap legs, moves of the two tenants that no rig enters, the 14z-87 keep-tenant thunk's skip path in 1P arcade, and the hooks' build, cycle cost, legacy oracle and pursuit gate.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b

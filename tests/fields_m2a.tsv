@@ -15,9 +15,9 @@
 # documented in tools/compare_fields.py.
 timer	abs	0xFF8109	1	stable	round timer
 # 14z-90 (GitHub issue #16): p1/p2_char_id at +0x382 REMOVED from the
-# dual-emulator field set. 14z-87 measured that byte as the voice-flavor
-# class in match, reassigned by the engine from the opponent's candidate
-# row — and measured the borrow as a cross-emulator LOTTERY (0x06/0x0C/
+# dual-emulator field set. 14z-87 read that byte as a voice-flavor class
+# reassigned in match (RETRACTED 14z-188: the writer is the arcade ladder's
+# pick of a CPU flow's next opponent) — and measured that pick as a cross-emulator LOTTERY (0x06/0x0C/
 # 0x09/0x00 on MAME vs 0x04 on FBNeo, identical inputs). It is the one
 # field here known to disagree between the two codebases BY DESIGN, so
 # comparing it at every anchor asserts a disagreement. In-match identity

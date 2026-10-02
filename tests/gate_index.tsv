@@ -422,3 +422,5 @@ tests/test_close_loop_cost.sh	runner
 tests/test_promise_check.sh	runner
 tests/test_claim_lint.sh	runner
 tests/audit_demitri_split.sh	character-data
+tests/audit_pursuit_flag.sh	character-data
+tests/audit_ladder_pick_store.sh	character-data

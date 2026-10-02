@@ -2688,9 +2688,11 @@ Rules now:
   guarded only by a self-frozen expectation. Run it whenever a replay is
   added, a cell mapping moves, or a tenant changes id.
 - **The signature is +0x60, not +0x382.** Player-block +0x382 is the char
-  id only at select; in match it is the voice-flavor class and the engine
-  reassigns it from a sound-state-fed list (the entry above, 14z-87), so
-  it reports "different characters" on voice noise. +0x60.l is the
+  id, but on a 1P CPU flow the arcade ladder writes the CPU side's NEXT
+  opponent there from a sound-state-fed pick before that fighter loads,
+  over any forced pick (ram.md `+0x382`, corrected 14z-188 — the 14z-87
+  "voice-flavor class the engine reassigns" reading this entry first cited
+  is RETRACTED), so it can report a character the replay never fought. +0x60.l is the
   per-character hitbox-data base — a ROM pointer, constant for the match,
   distinct per character (Demitri 0x93B6A, Victor 0x9769E).
 - **Compare the distinct-value SEQUENCE, not the frame-indexed
@@ -3053,7 +3055,7 @@ in the field, not from the harness.
 ## **[VSP-124]** five traps from the #103 hunt — four are RIG grammar, one is a classifier lying by omission (paid: 14z-97b)
 
 **A blanket opponent-class poke window that overlaps a LIVE match kills the
-match.** `+0x382` is live in-match state (the voice-flavor class, ram.md:85);
+match.** `+0x382` is live in-match state (the character id, ram.md `+0x382`);
 writing the next opponent's class into `$FF8B82` mid-match ended the running
 match at the poke onset and read as a mysterious early game-over — a full
 run lost to diagnosis. The opponent poke must be windowed BETWEEN matches,

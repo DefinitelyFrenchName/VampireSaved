@@ -1,0 +1,14 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent188/t195/maintainer_195.txt	cc7c1fb304cbcf5e854f2ad995d53cd295369f26
+build/agent188/t195/figs_measurer2.txt	5aa3f3c532e2e2137fb575e4e46160674ad25984
+build/agent188/t195/figs_measurer3.txt	140e10ea36316c3e9c501cc42badfae336ef9799
+build/agent188/t195/figs_measurer4.txt	64ea1390d235aec1e3b9964614fdc94360fd18fc
+build/agent188/t195/cpuid.sh	b63b1ebd15e1d1059497b44a85397545df4a1e4f
+build/agent188/t195/cpuid_poke.sh	473ea4f1c4cfc15e3ec849d50c3b2bfb79b86879
+build/agent188/t195/cpuid_poke2.sh	01a4ed9466ac90c36bc633dcd704e094ec154719
+build/agent188/t195/tapborrow.sh	3c9fce5c3d4ee550799bae48676b4beabc21667d
+build/agent188/t195/borrow_table.txt	4657a7d3ecebd0117b3d9bdcfd2756288732582c
+build/agent187b/t195/class_census.py	50131597e8b78e9dac1841c490f31c24e46a874e
+tests/expected/roster_pairings/bases.tsv	9a8dac331d48dc6d46b3a9c397f42cee0a937069
+tests/replays/don/90_don_plant.rpl.lines-1-12 (lines 1-12 of tests/replays/don/90_don_plant.rpl)	05d5188fd3b60726f868b4fd40614a89f8a726cf
+docs/game/engine_internals.md.lines-1255-1280 (lines 1255-1280 of docs/game/engine_internals.md)	9b303e212ffe3b2f5afdd07af907b3a32bcf3fe3

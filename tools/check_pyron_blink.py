@@ -43,10 +43,10 @@ from pathlib import Path
 
 SEQ_ROW_26 = 0x39ADC0        # vsavj palette-seq table 0x39A900 + 0x26*0x20
 # 14z-92 (GitHub #16). This used to read +0x382 as "the character id" at
-# frames 3200/3400/3600 — all IN MATCH. 14z-87 proved that byte is the
-# fighter's VOICE-FLAVOR CLASS in match: the engine reassigns it at a
-# match-sequencer event by BORROWING from the opponent's row of candidate
-# table 0x00B268 (PRG:0x0AEF6). Our build is protected by the shipped
+# frames 3200/3400/3600 — all IN MATCH. 14z-87 read that byte as a VOICE-FLAVOR
+# CLASS the engine reassigns (RETRACTED 14z-188): on a 1P CPU flow the arcade
+# ladder writes the CPU side's next opponent there from candidate table
+# 0x00B268 (PRG:0x0AEF6) before it loads, over any forced pick. Our build is protected by the shipped
 # voice_borrow_keep_tenant thunk; the NATIVE leg is not, so a borrow there
 # produced a false REFUSE. Zero recorded firings, but a guard that can stop
 # measuring for the wrong reason is a guard that will eventually lie.
