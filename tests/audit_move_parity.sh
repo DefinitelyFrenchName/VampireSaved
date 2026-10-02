@@ -382,7 +382,7 @@ done
 [ "$fail" = 0 ] || { echo "FAIL: a leg did not run"; exit 1; }
 ok "$n legs ran"
 # IDENTITY: the id field at the first sampled frame (2300, before the match, when
-# +0x382 is still the pick — in match the engine reassigns it, ram.md) must be
+# +0x382 is still the pick — on a CPU flow the ladder rewrites it before load, ram.md) must be
 # the tenant on BOTH legs: a real cursor pick that landed elsewhere is not a leg.
 for part in $SET; do
     t="${part%_*}"; p="${part##*_}"; eval "_want=\$ID_$t"

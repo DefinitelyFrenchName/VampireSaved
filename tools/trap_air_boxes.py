@@ -14,7 +14,7 @@ Per (attack box, vuln box) pair it prints the two gaps: gx = |dcx| - (hw1 + hw2)
 gy = |dcy| - (hh1 + hh2). Both <= 0 means the rectangles overlap (touching counted as overlap —
 whether the engine's test is strict is NOT decided here; the margins are printed so it can be read).
 
-It also names each fighter by its hitbox base (+0x60 — in a match +0x382 is the voice class, [VSE-62])
+It also names each fighter by its hitbox base (+0x60 — a CPU flow's ladder pick rewrites +0x382, [VSE-62])
 against the image's bank row, and the victim's current node as (table, seq, node #) of its own chains.
 
 Usage: trap_air_boxes.py <trace.ft> <data image> [--layout vsav2|vsavj]

@@ -251,7 +251,7 @@ Yes, Donovan's deity states should be in scope. However, if they would rely on t
 
 **The question, verbatim:** *"#188: you asked for route A to be 'traced on WSL2 later'. It now is. On a fresh strace of all 195 static gates at 4e1859d9, the predictor misses 0 of 36,722 reads. The same run with the old predictor misses 271 in 8 gates, so the analysis can see misses. Its gate list equals the static runner's. Limits: 11 gates exited non-zero under strace, reads are counted by path only, and ignored files are not counted. Do you want route A wired into the static runner? That means after a red, re-run only the failed gates and the gates the predictor marks stale; the rest carry over."* — asked with no recommendation, after rule-checker run 2026-10-02-561 found that the "ruled condition" a draft recommendation leaned on was the recorder's gloss of the 2026-09-29 ruling, not the maintainer's words.
 
-**The maintainer:** *"Build the wiring"*; and to *"The queue is through, except #133 ... and #196 ... Close the session now?"*: *"Continue first"*.
+**The maintainer:** *"Build the wiring"*; and, to the session's second question (whether to close the session now, with #133's tier still running and #196's next step named): *"Continue first"*.
 
 **What it means.** `tests/run_all_static.sh --confirm <results.tsv>` (every run writes one): failed, absent and STALE gates re-run, the rest CARRIED with their recorded control counts; `tools/static_confirm.py plan` decides; `tests/test_static_runner.sh` sections 18-19 test it with the control `prediction-off`.
 

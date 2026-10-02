@@ -684,8 +684,8 @@ fi
 # Every leg dumps the P1 hitbox base ($FF8460, the +0x60.l signature
 # audit_legacy_pairings.sh classifies on) at three points spread across the
 # run, so a leg that never formed the tenant's match cannot present its zero
-# as a measurement. +0x382 would NOT do: in match that byte is the voice
-# class and the engine reassigns it (14z-87, ram.md:85).
+# as a measurement. +0x382 would NOT do: on a 1P CPU flow the arcade ladder
+# rewrites it before the CPU side loads (ram.md +0x382, corrected 14z-188).
 last_frame() { sed 's/#.*//' "$1" | awk 'NF { split($1, r, "-");
     f = (r[2] ? r[2] : r[1]); if (f + 0 > m) m = f + 0 } END { print m + 0 }'; }
 

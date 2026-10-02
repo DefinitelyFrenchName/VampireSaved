@@ -135,7 +135,7 @@ def main():
 
     if v_hb == b_hb:
         print("%sLEGACY — same characters as vanilla: %s" % (tag, fmt(v_hb)))
-        print("%s  ids (select-time; +0x382 is the voice class in match): "
+        print("%s  ids (select-time; a CPU flow's ladder pick rewrites +0x382): "
               "vanilla=%s build=%s" % (tag, fmt(v_id), fmt(b_id)))
         return 0
 

@@ -3,3 +3,6 @@ the generator substitutes only the tenant id	14z-188 #195: region_subst (14z-66,
 cannot bake a relocated data address	14z-188 #195: the same correction, the issue comment's wording	retracted
 needs generator work	14z-188 #195: the same correction, the wording of the question put to the maintainer (quoted verbatim in DECISIONS_HISTORY.md, where the entry says it was wrong)	retracted
 region_subst	control: the mechanism named in the corrected text, live in the generator	reach:1
+VOICE-FLAVOR CLASS	14z-188: +0x382 is the character id; the 14z-87 "voice-class borrow" is the arcade ladder's opponent pick (engine_internals "The per-node sfx row is the fighter's OWN")	retracted
+the engine reassigns it	14z-188: the same retraction, the 14z-87 wording	retracted
+audit_ladder_pick_store	control: the gate that measures the corrected reading, live in tests/	reach:1

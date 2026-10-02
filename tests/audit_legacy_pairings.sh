@@ -92,7 +92,7 @@
 #   *_don_*/*_victor_* families became LEGACY when M3a restored Jedah to cell
 #   0x0F, and 35 of ~43 self-frozen replays per set measured as legacy
 #   pairings. Signature is +0x60.l (the per-character hitbox base) NOT +0x382
-#   (the voice class in match, 14z-87); compares the distinct-value SEQUENCE
+#   (a CPU flow's ladder pick rewrites it, ram.md +0x382, 14z-188); compares the distinct-value SEQUENCE
 #   so a hook-cycle load phase is tolerated. 7 static verdict controls incl.
 #   the dead-instrument refusal, plus a LIVE positive control per set (the
 #   same replay with the tenant id poked must flip LEGACY->TENANT). NO POKES
