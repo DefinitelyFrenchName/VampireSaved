@@ -277,6 +277,16 @@ Yes, Donovan's deity states should be in scope. However, if they would rely on t
 
 ---
 
+## Ruled 2026-10-02 (14z-188) — the close's unhomed learnings: NEXT_SESSION item 0; #208 and #209 filed
+
+**The question, verbatim:** *"before I close the session for good: nothing stale, all learnings documented, ritual done?"* — answered: not quite, five learnings the close paid for had no home (ugrep's `$` anchor, the extract's hand-back report, the ledger's session column, a remote job outliving the task limit, a duplicated DECISIONS_HISTORY entry); offered: fix them now with a short follow-up close, or carry them as item 0, filing the two that are tool defects as tickets.
+
+**The maintainer:** *"put it as item zeo and file the tickets"*.
+
+**What it means.** NEXT_SESSION's START HERE item 0 carries all five; #208 (`tools/agent/extract.py`'s hand-back report) and #209 (`tools/rulecheck.py prepare`'s optional session key) are filed.
+
+---
+
 ## Ruled 2026-10-02 (14z-188) — the close's convergence: four tickets, #204-#207
 
 **The question, verbatim:** *"It seems to me that we're struggling quite a bit to do all the close and that we've gone through many many runs again. I am not complaining since we're also catching a lot more rule breakings than we did but I wonder if the number is purely due to the scope or if it's linked to more structural issues."*

@@ -19,6 +19,16 @@ recorder's gloss (rule-checker run 2026-10-02-561 Q5). When no ruling covers it,
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** What the 14z-188 close found and did is in its
    CLOSE row (STATE 14z-188).
+   **THEN, BEFORE ANYTHING ELSE: FIVE LEARNINGS THE 14z-188 CLOSE PAID FOR HAVE NO HOME YET** (found by the
+   maintainer's end-of-session question, "nothing stale, all learnings documented?"; ruled "put it as item zero"):
+   (a) the agent shell's ugrep reads a `$` INSIDE a pattern as an anchor — `grep -c '_rv="$VS_VERDICT"'` printed 0
+   for a line that existed (procedure run 2026-10-02-566); add it to `docs/project/gotchas.md`'s ugrep entry and
+   the memory; (b) `tools/agent/extract.py` shows a hand-back worker's FIRST message as its report — #208;
+   (c) the ledger's `session` column is `-` unless `prepare` gets `--session` — #209; document it in
+   `docs/project/rule_checker.md` beside the ledger spec; (d) a remote SSH job OUTLIVES the local 2-hour
+   background-task limit (PILOT's MAME lane kept running after the local task was killed) — a platform gotcha,
+   and the remote-machines memory; (e) nothing catches a DUPLICATED `DECISIONS_HISTORY.md` entry (one was
+   written twice this sitting and found by hand) — comment on #204, whose standing check set it belongs to.
 1. **THE NEXT FREEZE APPLIES TWO STAGED PATCHES, IN ORDER:** `build/manifest/staged/194_cosmo44.patch`, then
    `195_pursuit_mark.patch` (#194 and #195). Rebuild every track, run `tests/audit_pursuit_flag.sh` (it reads
    the hooks from the build and turns over to equality by itself), re-freeze what the hooks move, and delete

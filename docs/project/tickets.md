@@ -11,12 +11,14 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**207 tickets** — status: open 16 · parked 13 · done 154 · declined 7 · not-ours 7 · invalid 9 · duplicate 1 · kind: bug 147 · cosmetic 11 · evolution 49 · **backfill debt: 0 rows**.
+**209 tickets** — status: open 18 · parked 13 · done 154 · declined 7 · not-ours 7 · invalid 9 · duplicate 1 · kind: bug 149 · cosmetic 11 · evolution 49 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#209](https://github.com/DefinitelyFrenchName/VampireSaved/issues/209) | bug | open | tools/rulecheck.py prepare leaves the ledger's session column '-' unless --session is given, so per-session counts read from the ledger are wrong | `tests/rulecheck/ledger.tsv` | `DECISIONS_HISTORY.md § Ruled 2026-10-02 (14z-188) — the close's unhomed learnings: NEXT_SESSION item 0; #208 and #209 filed` | none | none | 14z-188 |
+| [#208](https://github.com/DefinitelyFrenchName/VampireSaved/issues/208) | bug | open | tools/agent/extract.py shows a hand-back worker's first message as its report (WX), so the procedure check can rule a false QP5 | `tools/agent/extract.py` | `DECISIONS_HISTORY.md § Ruled 2026-10-02 (14z-188) — the close's unhomed learnings: NEXT_SESSION item 0; #208 and #209 filed` | none | none | 14z-188 |
 | [#207](https://github.com/DefinitelyFrenchName/VampireSaved/issues/207) | evolution | open | Close: generate the documentation packet's claim from the run of record's check outputs (each check's declared WHAT and NOT-SEEN lines), so only session-specific premises are hand-typed | none | `DECISIONS_HISTORY.md § Ruled 2026-10-02 (14z-188) — the close's convergence: four tickets, #204-#207` | `docs/project/gotchas.md § THE CLOSE PACKET'S CHECKS ARE REBUILT AT EVERY CLOSE` | none | 14z-188 |
 | [#206](https://github.com/DefinitelyFrenchName/VampireSaved/issues/206) | evolution | open | Close: append each finding to the findings table when it is paid for (letter, live home, test or reason), so the close reviews the table instead of reconstructing it | none | `DECISIONS_HISTORY.md § Ruled 2026-10-02 (14z-188) — the close's convergence: four tickets, #204-#207` | `docs/project/gotchas.md § THE CLOSE PACKET'S CHECKS ARE REBUILT AT EVERY CLOSE` | none | 14z-188 |
 | [#205](https://github.com/DefinitelyFrenchName/VampireSaved/issues/205) | bug | open | tools/homes_tracked.py drops a bare document name it cannot resolve without reporting it, and checks the row's names as a whole, never each finding letter's home | `tools/homes_tracked.py` | `DECISIONS_HISTORY.md § Ruled 2026-10-02 (14z-188) — the close's convergence: four tickets, #204-#207` | `docs/project/gotchas.md § THE CLOSE PACKET'S CHECKS ARE REBUILT AT EVERY CLOSE` | none | 14z-188 |
