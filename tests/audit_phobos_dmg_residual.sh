@@ -1,5 +1,5 @@
 #!/bin/sh
-# audit_phobos_dmg_residual.sh — PHOBOS TAKES ONE MORE HP THAN NATIVE FROM DEMITRI'S 5HP, WITH HIS DEFENSE ROW ALREADY VS2'S, frozen AS MEASURED (14z-170): native vs2 11, our merged build 12, the same at three RNG pins — the residual the M19 defense-row fix left (merged-m18 read 13); a LEGACY victim reads the same +1 (14z-181), so it is vsavj's own damage pipeline — #161 ruled not-ours 2026-09-25, this gate kept as the record.
+# audit_phobos_dmg_residual.sh — PHOBOS TAKES ONE MORE HP THAN NATIVE FROM DEMITRI'S 5HP, WITH HIS DEFENSE ROW ALREADY VS2'S, frozen AS MEASURED (14z-170): native vs2 11, our merged build 12, the same at three RNG pins — the residual the M19 defense-row fix left (merged-m18 read 13); a LEGACY victim reads the same +1 (14z-181) — ~~so it is vsavj's own damage pipeline~~ RETRACTED 14z-187b: it is Demitri's own 5HP record, lower on vs2 (swapped both ways, tests/audit_dmg_legacy_sweep.sh section 5) — #161 ruled not-ours 2026-09-25, this gate kept as the record.
 #
 # WHAT: Phobos takes one more HP than native from Demitri's 5HP with his defense row already
 #   vs2's — native 11, ours 12, at three RNG pins — frozen as measured as the record of

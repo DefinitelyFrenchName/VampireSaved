@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-186 CLOSE, 2026-09-30)
+# NEXT SESSION — orientation (rewritten at the 14z-187 + 14z-187b CLOSE, 2026-10-02)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
@@ -12,43 +12,54 @@ A plain **Opus 5.5 session at effort High** (the ruled orchestrator — STATE 'S
 text IN the prompt, no model), every freeze and recommendation through the pinned `rule-checker` with the
 prompt files pasted VERBATIM, `record --session`, `resolve` on ONE line with one label per violated question
 (never chained with the next `prepare`). Say so at the opener. Never spawn any agent at `max`.
+`prepare` now runs the claim lint (#185 item 3): tie every every/only/none/all/the one to a check in its
+sentence, or put it under NOT TESTED, or pass `--untied-ok "<why>"`.
 
 ## START HERE
 
-0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** What the 14z-186 close found and did is in its
-   CLOSE row (STATE 14z-186).
-1. **WSL2 IS NEARLY READY** (the maintainer, 2026-09-30: *"On my end the WSL2 is almost ready so we'll be able to
-   continue, likely in the next session, with that."*). Work it by SSH from this Mac session, never a separate
-   session on the box; `docs/project/WSL2_SETUP.md`. What waits on it: #133 and #188 route A's traced tier.
-2. **M21 IS FROZEN, NOT RELEASED.** Whether and when to release it is the maintainer's.
-3. **THE OPEN QUEUE, by what 14z-186 left:** #194 (Pyron's Cosmo Disruption: the victim's plain hit reaction
-   where native's is fire / knockdown; P2 class `0x51` native / `0x4F` ours; the candidate cause is the 14z-75
-   remap in `build/manifest/pyron.toml`, unmeasured as the cause — the next step is a probe build with the byte
-   restored, checked for the 14z-75 watchdog reset and against the captures; any fix changes how the move plays,
-   so it goes to the maintainer), #191 (Donovan's 2HK damage; next, a second legacy victim; it was filed on rule-checker run 464, whose
-   reader grepped its six traces instead of reading them (procedure run 2026-10-01-498), so re-measure its
-   9-against-8 before relying on it), #192 (Demitri's
-   Chaos Flare, vsavj against vsav2). Still queued: #133, #187/#188 (route A provisional), #189, #190 (P3 kept
-   for later). The full list is `docs/project/tickets.md`.
-4. **SHELVED BY THE MAINTAINER:** the measurer/reader frontmatter change to Sonnet 5.5 at `xhigh`.
+0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** What the 14z-187 + 14z-187b close found and did is in
+   its CLOSE row (STATE 14z-187).
+1. **#195 — THE DISCRIMINATOR NEEDS A RULING BEFORE ANY BYTE MOVES.** Option A (two hooks) is ruled; the mark
+   byte (`+0x293` / `+0x2C9`) and the tail site (`0x24D92`) are measured. Open: how the hit-time hook tells the
+   seven remapped-from-0x51 records from the other class-0x44 records — the record's `+0x1D` is NOT spare (the hit
+   test reads it), no single record byte separates them, and the generator substitutes only the tenant id into a
+   thunk. Options on #195: a data-address placeholder in the generator; attacker id + class (the session's lean;
+   measure first whether the attacker's id is reachable at `0x01868C` for a projectile hit); a box-coordinate
+   signature (fragile).
+2. **ERIS (the WSL2 box) — ITS GAPS BEFORE THE NEXT EMULATOR TIER.** `sudo apt install python3-pil
+   python3-capstone` (asked, not yet done); the build directories it lacks (`m5_wide`, `donovan`, `donovan5`,
+   `merged1`, `m3b_merged27`, `hui30`, `hui41`, `don_m5`, `m3b_merged26`); five failures not yet explained
+   (`audit_type_writes`, `test_hitbox_encoding`, `test_select_wheel` segfault, `test_random_select_tenants` whose
+   control run finds no ROMs, `audit_qs_voice_wav`'s 5,400 s timeout, which also left two MAME children running).
+   ERIS's main clone is at `e3f0d7c2`; a second clone `~/vs201` carries the later commits by `git bundle`.
+3. **#188 — ROUTE A'S TRACED TEST IS NOT FINISHED.** Every static gate was traced under `strace` on ERIS
+   (`~/t188/st/`, at `e3f0d7c2`); the analysis (`~/t188/analyse_mp.py`) ran 3.5 h with one gate stuck in the
+   predictor's per-read regex and was stopped. Restarted at the close (2026-10-02, 05:24 ERIS time) as `~/t188/analyse_capped.py`: each gate in its own process
+   under a 600 s cap, one line per gate in `~/t188/capped.tsv` (TIMEOUT names the stuck gate). Next: read it; route A stays
+   unwired until the test shows no miss (an early sample found one: `audit_mister_map_fit` reads two tracked files
+   under `build/m3b_merged29/patch/` the predictor does not flag).
+4. **#194 IS STAGED** (`build/manifest/staged/194_cosmo44.patch`) for the next freeze; M21 is frozen, not released.
+5. **THE OPEN QUEUE:** #195 (above), #198 (forbid the record-differing P2 chains), #200 (Lightning Sword ES's
+   pursuit flag at hit), #133 (the ERIS figure is on the issue; re-measure on a green tier), #187 (built; its
+   close-loop figure is in this close's CLOSE row), #185 (items 1 and 2 done as #189/#190, item 4 carried by #187,
+   item 5 a property of #190's gates, item 3 built — close it with #187), #196, #199. The full list is
+   `docs/project/tickets.md`.
+6. **SHELVED BY THE MAINTAINER:** the measurer/reader frontmatter change to Sonnet 5.5 at `xhigh`.
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
-- `tools/move_parity.py` compares both white HP words now, excludes a pin from every BYTE it writes, and refuses a
-  trace missing a compared field; `tests/audit_move_parity.sh` has `KEEP=<dir>` (the control part's real native
-  trace is kept as `tr_<part>_native.real.txt` — the `unpinned-level` control overwrites the plain one).
-- The three parity gates take an `RNG_WORD` / `RNG_UNTIL` probe knob (FREEZE refuses it); `tests/audit_rng_forms.sh`
-  re-measures what the `0000` pin hides (#183, kept as the basis).
-- `tools/facing_hook_ab.py` splits a hook into its cycles, its logic and its placement from the build's own patch;
-  a side move of a fix is attributed by that split, never by one candidate for all.
-- `tools/homes_tracked.py`'s second positional is an OUTPUT file: pass the state file with `--state`.
-- A variant is compared against a control of the same script on the same build, never against a frozen table.
-- The close packet's checks are rebuilt at every close: start the next one from `build/agent186/close/checks.tsv`
-  and its four scripts (gotcha "THE CLOSE PACKET'S CHECKS ARE REBUILT AT EVERY CLOSE"); a reader may grep a
-  large artifact instead of reading it, so hand it the window the claim rests on (`docs/project/rule_checker.md`).
+- `tests/lua/rom_poke.lua` pokes PROGRAM-ROM bytes at boot, each verified through the program space; an own-value
+  write always "verifies", so its inert control is a trace comparison, not the ok line.
+- The POKES grammar takes ranges `F1-F2:addr:hex` (`tests/lua/pokes_spec.lua`, every instrument); build pins as
+  ranges — Linux refuses one environment string over 128 KiB. `DUMPS`, `DSPEC`, `ANCHOR_SPEC` are still per frame.
+- On Linux `/bin/sh` is dash (no `$((16#..))`), and the pinned MAME logs its ini lookups only with `-verbose`.
+- `tools/audit_latch_readers.py` sees immediate stores now; its census of any offset is a starting list, never a
+  proof of freeness — small offsets are displacements into other structures too; measure with `read_tap.lua`.
+- `tools/demitri_split_sheet.sh` is the capture instrument for #192's Chaos Flare; name sheets by their event.
+- The close's checks are in `build/agent187b/close/checks.tsv` (start the next close from it).
 
-## WHAT CLOSED THIS SITTING (14z-186)
+## WHAT CLOSED THIS SITTING (14z-187 + 14z-187b)
 
-**#184** `done` (all 31 seqs answered, the ten measurable gated by `tests/audit_chains184.sh`), **#186** `done`
-(#159's side moves: the mash by the hook's execution, the arcade replay by its rule-5 logic), **#183** `done`
-(the `0000` pin kept), **#193** `done` (the white HP compared). Opened: #191, #192, #193 (closed), #194.
+**#191** `not-ours` (mechanism corrected: vs2 lowered Demitri's records), **#192** `not-ours` (Chaos Flare's hold
+node and fireball records), **#197** `done`, **#171** `done`, **#201** `done`, **#126** `declined` (the maintainer's
+GitHub close), **#189** `done`, **#190** `done`. Built: #187's reader fix, #190 P3, #185 item 3, #201. Filed: #196-#201.

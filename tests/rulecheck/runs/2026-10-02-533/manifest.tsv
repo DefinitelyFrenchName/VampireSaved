@@ -1,0 +1,15 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent187b/close/findings_row.txt	113a74d8077739588fbe0eff7e7dd8b422fe7e7d
+build/agent187b/close/close_row.txt	aa566cdbf6d2941a697ff02b1340a98fff80081c
+build/agent187b/close/out/exits.tsv	bc2f3b149d9a241f90552e62583892e243c6d30d
+build/agent187b/close/out/runs/close_findings.out	a2da89f614a982f4f470120edfe0a8c89b9c769b
+build/agent187b/close/out/runs/homes_tracked.out	601fe3cd87f64f8252ced08763da5d0ae2530c9f
+build/agent187b/close/out/runs/retraction_grep.out	fb7f5f1bd8df9d91a3444c5af1d86ea2b0358d25
+build/agent187b/close/out/runs/rulings_verbatim.out	532bdd4c452642fe98c1d63af3824c121b162aa9
+build/agent187b/close/out/runs/promise_check.out	61a9dd69d2fdc9e5da8d4ccf4d46a3b01bc02785
+build/agent187b/close/out/runs/scratch_census.out	3a15e0285490291a53be20cf04f4849268d35c8d
+build/agent187b/close/out/runs/tickets.out	47e1115add7c63d72fd79a82863dd144984edf27
+build/agent187b/close/checks.tsv	1ef4a9c95b81cda6e1b94d7fc6863dd225103d15
+build/agent187b/close/promises.tsv	1d07b2bfa6658b89a91cc1191f5c71fce645e0a0
+build/agent187b/close/rulings_exempt.tsv	f41555536a83e4b5102bc571de0db76d556e21ec
+tests/rulecheck/retractions/14z-187b.tsv	4a9f4ab8e0958bcfaee96d7f533783bccae3bfc0

@@ -1,0 +1,8 @@
+# tests/rulecheck/retractions/14z-187b.tsv — the wordings retracted or corrected in 14z-187b, and reach controls that must be found live; columns pattern, source, class (retracted | reach:N)
+vsavj's own damage pipeline	14z-187b #161/#191: vs2 lowered Demitri's own attack records (swapped both ways, tests/audit_dmg_legacy_sweep.sh section 5)	retracted
+the two engines' damage difference	14z-187b #191: the same correction — the difference is the games' DATA, not the engines	retracted
+DEMITRI'S DATA DIFFERS BETWEEN VSAVJ AND VS2	control: the corrected section heading in engine_internals.md	reach:1
+P2-RECORD	control: the attribution class that replaced DMG-VSAVJ, in the gate's header	reach:1
+vsavj's own pipeline	14z-187b variant wording of the #161 retraction (run 2026-10-02-534 Q1/Q4)	retracted
+engines deal different damage	14z-187b variant wording of the #191 retraction, the former section heading (run 2026-10-02-534 Q1/Q4)	retracted
+engines' damage pipelines	14z-187b variant wording of the same correction (run 2026-10-02-534 Q1/Q4)	retracted

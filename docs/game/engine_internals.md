@@ -590,7 +590,7 @@ measured.
 `tests/lua/read_tap.lua`; native vs2 against the staged #194 merged build):** Pyron's Cosmo Disruption and Donovan's
 Ifrit Sword (ES, a2:0x30 — the six class-0x51 records 33-38; P2 pinned 60 px in front of him over 2800-2839 of
 `donovan_3`, where the rig alone whiffs) take ONE path on each game. The class is written at hit time by the generic
-`move.b $17(a3),$54(a1)` — vs2 `0x16F70` (0x51), vsavj `0x01868C` (0x44 on ours) — and the knockdown tail runs its
+`move.b $17(a3),$54(a1)` — vs2 `0x16F70` (0x51), vsavj `0x01868C` (0x44 on ours; vsavj's other identical instruction, `0x0289FA`, is not on this path — it was the first guess, refuted by the tap) — and the knockdown tail runs its
 countdown (vs2 `0x239D0`, vsavj `0x24D84`, the same frames on both); at its end vs2 sets `+0x117` (`0x239EE`, Cosmo +154,
 Ifrit +70) and ours does not (cleared on both at the get-up, vs2 `0x24CEC`/`0x25FB4`, vsavj `0x2608A`/`0x26E30`). So one
 hit-time mark at vsavj `0x01868C`'s path and one tail hook at `0x24D92` cover both moves. A DIFFERENT path, seen in the same
@@ -997,7 +997,8 @@ the per-chain frame data in the out-of-tree `<tenant>_anim.md`.
   below and `ram.md`; the 27/41/59 px pushback correlation once pinned on
   it was RETRACTED 14z-121 — the carrier is the record's `+0xC` step
   table, "Reactions as the victim"),
-  `+0x1D` zero in every record seen.
+  `+0x1D` zero in every record seen — but READ: the hit test tests it on the node-byte-3 branch (vs2 `0x16BD6`, vsavj
+  `0x018314`, the readers table below), so it is not a spare byte (#195, 14z-187b).
   Observed, not proven: `+0x12` = the strength index (1/2/3, 7 on
   specials), `+0x16` = 1 on specials and projectiles; `+0x11`, `+0x13`,
   `+0x15` open. A BLOCKED contact writes class `0xFF` on the victim

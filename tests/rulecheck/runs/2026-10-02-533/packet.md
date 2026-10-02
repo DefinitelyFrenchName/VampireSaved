@@ -1,0 +1,20 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: 14z-187 + 14z-187b close: the documentation packet (findings table row (18), the close's checks)
+Claim (the working agent's sentence): The 14z-187 + 14z-187b close's documentation is complete: the findings table (build/agent187b/close/findings_row.txt, row (18) of STATE.md) names a live home and a reproducing test or an open ticket for each of its fourteen findings (a)-(n), and the close's checks ran FULL with 19 checks and 0 not as expected (build/agent187b/close/out/exits.tsv, its first line "# run: full"): close_findings with its one gap homed (build/agent187b/close/out/runs/close_findings.out), homes_tracked over row (18) (build/agent187b/close/out/runs/homes_tracked.out), the retraction grep for 14z-187b (build/agent187b/close/out/runs/retraction_grep.out), the maintainer's quotes verbatim with each message quoted or exempted for a reason (build/agent187b/close/out/runs/rulings_verbatim.out), the promises classed (build/agent187b/close/out/runs/promise_check.out), the scratch census (build/agent187b/close/out/runs/scratch_census.out) and the tickets gate (build/agent187b/close/out/runs/tickets.out). NOT tested: that the table holds every finding of the two sittings — the checks see addresses, named homes and listed promises, not findings, so a finding never written into the table passes unseen; that each home's text is right (each was rule-checked when it was written, runs 2026-10-01-512 to 2026-10-02-532); the CLOSE row's later parts (the strict tier, the sweep, the procedure check and the push), which run after this packet.
+Artifacts (read every one, in full):
+  - build/agent187b/close/findings_row.txt
+  - build/agent187b/close/close_row.txt
+  - build/agent187b/close/out/exits.tsv
+  - build/agent187b/close/out/runs/close_findings.out
+  - build/agent187b/close/out/runs/homes_tracked.out
+  - build/agent187b/close/out/runs/retraction_grep.out
+  - build/agent187b/close/out/runs/rulings_verbatim.out
+  - build/agent187b/close/out/runs/promise_check.out
+  - build/agent187b/close/out/runs/scratch_census.out
+  - build/agent187b/close/out/runs/tickets.out
+  - build/agent187b/close/checks.tsv
+  - build/agent187b/close/promises.tsv
+  - build/agent187b/close/rulings_exempt.tsv
+  - tests/rulecheck/retractions/14z-187b.tsv
