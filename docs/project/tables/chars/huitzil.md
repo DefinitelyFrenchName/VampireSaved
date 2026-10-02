@@ -9,7 +9,7 @@ Sources: **vs2** = `vsav2` extract (oracle `vhunt2`); **ours** = the built image
 | input | SHA-1 |
 |---|---|
 | `bank_map.toml` | `ece2b13bfbddaf6fea14e56baf65502945ba52dd` |
-| `manifest` | `88621f9c8dc267c5c461e7a9bd63c703242e1710` |
+| `manifest` | `9e3ae35114822895e5a7d6eefc77f7f04425e64a` |
 | `overrides` | `be0e9b96c8414532cc7a1d60f7a4a235a7d6362d` |
 | `placements.json` | `913270ce40f1e46e11e9b6daa7ff4346771009c3` |
 | `reconciliation.toml` | `477efcb72d82fcbafe1e4a4f59252385bcb75bac` |

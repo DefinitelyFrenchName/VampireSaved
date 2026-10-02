@@ -257,6 +257,26 @@ Yes, Donovan's deity states should be in scope. However, if they would rely on t
 
 ---
 
+## Ruled 2026-10-02 (14z-188) — the poke-census rows of `audit_ladder_pick_store`: OBSERVES ×3, CROSS-LEG ×1
+
+**The question, verbatim:** *"How should the four poke-census rows of the new audit_ladder_pick_store be classed? (OBSERVES: the poke sets the stage, the game changes it, the gate measures the change. READS-BACK: the column records the rig, not the engine. CROSS-LEG: a poke joined to another leg's sample that has no poke.)"*
+
+**The maintainer:** *"OBSERVES ×3, CROSS-LEG ×1"*
+
+**What it means.** In `tests/expected/poke_readback.tsv`, the gate's three `DUMPS` rows of `+0x382` (f3460, f3470, f4200) are OBSERVES — the measurement itself: whether the game overwrites a poke made before the ladder's store, and what loads after one made after it — and its `RTAP` row is CROSS-LEG (the tap legs carry no poke). Found by the close tier's `test_poke_readback` red.
+
+---
+
+## Ruled 2026-10-02 (14z-188) — the poke-census rows of `audit_ladder_pick_store`: OBSERVES ×3, CROSS-LEG ×1
+
+**The question, verbatim:** *"How should the four poke-census rows of the new audit_ladder_pick_store be classed? (OBSERVES: the poke sets the stage, the game changes it, the gate measures the change. READS-BACK: the column records the rig, not the engine. CROSS-LEG: a poke joined to another leg's sample that has no poke.)"*
+
+**The maintainer:** *"OBSERVES ×3, CROSS-LEG ×1"*
+
+**What it means.** In `tests/expected/poke_readback.tsv`, the gate's three `DUMPS` rows of `+0x382` (f3460, f3470, f4200) are OBSERVES — the measurement itself: whether the game overwrites a poke made before the ladder's store, and what loads after one made after it — and its `RTAP` row is CROSS-LEG (the tap legs carry no poke). Found by the close tier's `test_poke_readback` red.
+
+---
+
 ## Ruled 2026-09-30 (14z-186) — two tickets found under #184: Donovan's 2HK damage (#191) and Change Immortal's one-frame timing
 
 **The question, verbatim:** *"Should the 2HK damage and the Change Immortal timing become tickets? I'd put each through the rule-checker before filing."*
