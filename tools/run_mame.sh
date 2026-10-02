@@ -74,6 +74,19 @@ if [ "$VS_NATIVE" = 1 ]; then
 else
     NSANDBOX="$SANDBOX"
 fi
+# THE FALLBACK INVENTORY (14z-188, GitHub #196), opt-in and inert unless asked: with MAME_FALLBACK_LOG set, a run
+# that falls back to `mame` on PATH (MAME_BIN unset) appends one line — the UTC time, the set, and the first
+# tests/<gate>.sh among this process's ancestors (or "-") — so one emulator tier names every gate that depends on
+# what `mame` happens to be. Nothing is printed and nothing else changes; unset, the line below never runs.
+if [ -z "${MAME_BIN:-}" ] && [ -n "${MAME_FALLBACK_LOG:-}" ]; then
+    _fg="-"; _fp=$PPID; _fi=0
+    while [ "$_fi" -lt 12 ] && [ -n "$_fp" ] && [ "$_fp" != 0 ] && [ "$_fp" != 1 ]; do
+        _fa="$(ps -o args= -p "$_fp" 2>/dev/null || true)"
+        case "$_fa" in *tests/*.sh*) _fg="$(printf '%s\n' "$_fa" | tr ' ' '\n' | grep -m1 'tests/[^/]*\.sh$' || echo -)"; break ;; esac
+        _fp="$(ps -o ppid= -p "$_fp" 2>/dev/null | tr -d ' ' || true)"; _fi=$((_fi + 1))
+    done
+    printf '%s\t%s\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$SET" "$_fg" >> "$MAME_FALLBACK_LOG" 2>/dev/null || true
+fi
 exec "${MAME_BIN:-mame}" "$SET" \
     -rompath "$ROMPATH" \
     -keyboardprovider none -mouseprovider none \
