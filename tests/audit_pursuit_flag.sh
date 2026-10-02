@@ -18,12 +18,16 @@
 #   (tests/lua/read_tap.lua) on P2's +0x293 over the naming rig pyron_4 (tests/replays/naming/), whose Pyron hits
 #   four times with projectile record 4 (class 0x44 natively) and then four times with record 21 (Cosmo, vs2 0x51);
 #   and the same rig with Pyron on P2 (tools/pursuit_rigs.py p2rig, his real cursor path from the build's own decoded
-#   wheel), tapping P1's +0x293 — the hook reads the ATTACKER's id from A0, so P2's hits must mark P1 alike.
+#   wheel), tapping P1's +0x293 — the hook reads the ATTACKER's id from A0, so P2's hits must mark P1 alike. A third
+#   rig, lsword (Donovan's Lightning Sword (ES) then U+LP at +40..+180), holds GitHub #200's answer: native marks the
+#   victim at the hit and clears the flag at +150 while Donovan is still in the move, so no pursuit starts on either
+#   game — `--expect inert` on every build (the hooks do not touch class 0x4E's path).
 # EXPECTS: the committed rigs equal a regeneration; native knocks the victim down on every event (+0x117 = 1 at every
 #   press) and starts the pursuit on at least one target event (VOID otherwise, never a pass); hooked build: every row
 #   equal to native; unhooked build: the gap on every target event, the control equal; the mark's byte writes in play
 #   are, in order, 0 0 0 0 1 1 1 1 on a hooked build (record 4 clears, record 21 marks) and none on an unhooked one,
-#   with Pyron on either side;
+#   with Pyron on either side; lsword inert (the flag set natively at some press, no pursuit on native, ours equal
+#   to native on every other field);
 #   every control fails.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/field_trace.lua tests/replays/pursuit195/
 #   tests/lua/read_tap.lua tests/replays/naming/pyron_4.rpl tests/replays/naming/pyron_4.json tools/select_paths.py
@@ -32,14 +36,15 @@
 #
 # MUST-FIRE: perturbed-copy: expect-flipped — the comparison run with the OTHER expectation (same on an unhooked build, gap on a hooked one) must fail on every rig, so the verdict is something the comparison can refuse (in-gate: both rigs; mode: the expectation flipped and the gate FAILs)
 # MUST-FIRE: perturbed-copy: flag-zeroed — the comparison of OUR trace with P2's +0x117 read as 0 at every press must fail --expect same on every rig, so the flag at the press is something the verdict reads — discriminating on a HOOKED build only: on an unhooked one ours' flag is already 0 and the pursuit already differs (in-gate: both rigs, against --expect same; mode: ours zeroed against --expect same and the gate FAILs)
+# MUST-FIRE: perturbed-copy: inert-as-same — the lsword rig compared with --expect same must fail on the flag, so "inert" is a comparison that sees the flag differ, not a blind one (in-gate: lsword; mode: lsword judged --expect same and the gate FAILs)
 # MUST-FIRE: perturbed-copy: record4-marked — the mark check run on a copy of the tap log with every clearing write (record 4's) turned into a mark and one stray mark added must fail, so "record 4 stays unmarked" (hooked) and "no mark is written" (unhooked) are things the check can refuse (in-gate: on the real tap log; mode: the copy checked and the gate FAILs)
 #
 # NOT COVERED: the pins (level 6 from 2000, RNG 0000 from 2363 — the ruled equalised input); the pursuit itself with the
-#   tenant on P2 (the P2 side is held at the mark, not at +0x117 and the pursuit); the two rigs' moves only —
-#   Donovan's Lightning Sword (ES) sets +0x117 at hit on another path (GitHub #200); FBNeo; the solo tracks.
+#   tenant on P2 (the P2 side is held at the mark, not at +0x117 and the pursuit); the three rigs' moves only (the
+#   LP/MP/HP Lightning Swords, other distances and unpinned play are not measured for #200); FBNeo; the solo tracks.
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged29] [KEEP=<dir>] tests/audit_pursuit_flag.sh
-#   emulator tier, MAME; ~3 min (4 legs in parallel)
+#   emulator tier, MAME; ~3 min (8 legs in parallel)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
@@ -61,7 +66,7 @@ RIGS=tests/replays/pursuit195
 
 echo "== 0. the rigs equal a regeneration"
 python3 tools/pursuit_rigs.py gen "$W/regen" > /dev/null
-for r in cosmo ifrit; do
+for r in cosmo ifrit lsword; do
     for x in rpl json; do
         cmp -s "$RIGS/$r.$x" "$W/regen/$r.$x" && ok "$r.$x == regeneration" || bad "$r.$x differs from tools/pursuit_rigs.py gen"
     done
@@ -101,7 +106,7 @@ leg() {  # leg <rig> <native|ours>
     if [ "$side" = native ]; then s=vsav2; rp="$ROMDIR"; R="$REPO/$RIGS/$r.rpl"
     else
         s=vsavjw; rp="$BUILD/rompath;$ROMDIR"; R="$W/$r.ours.rpl"
-        case $r in cosmo) CUR="D D D D";; ifrit) CUR="D D DR DR";; esac   # the merged wheel's real paths (HANDOFF [VSP-123])
+        case $r in cosmo) CUR="D D D D";; ifrit|lsword) CUR="D D DR DR";; esac   # the merged wheel's real paths (HANDOFF [VSP-123])
         cursor "$RIGS/$r.rpl" "$CUR" > "$R"
     fi
     d="$W/$r.$side"; rm -rf "$d"; mkdir -p "$d"
@@ -127,13 +132,13 @@ tapleg() {  # tapleg <p1|p2> — the mark tap over pyron_4 on ours, Pyron on tha
         "$REPO/tools/run_mame.sh" vsavjw -autoboot_script "$REPO/tests/lua/read_tap.lua" > "$d/mame.log" 2>&1
       rm -rf "$d/sb" ) </dev/null 2>/dev/null || true   # MAME can segfault at teardown after the log is written: the END line decides
 }
-for r in cosmo ifrit; do for side in native ours; do leg "$r" "$side" & done; done
+for r in cosmo ifrit lsword; do for side in native ours; do leg "$r" "$side" & done; done
 tapleg p1 & tapleg p2 &
 wait
 for t in p1 p2; do
     grep -q '^END ' "$W/tap_mark_$t.txt" 2>/dev/null && ok "pyron_4 mark tap, Pyron on $t: complete" || bad "pyron_4 mark tap, Pyron on $t: no END line (see $W/tap_$t/mame.log)"
 done
-for r in cosmo ifrit; do for side in native ours; do
+for r in cosmo ifrit lsword; do for side in native ours; do
     grep -q FIELDSUMMARY "$W/tr_$r.$side.txt" 2>/dev/null && ok "$r $side: complete trace" || bad "$r $side: no complete trace (see $W/$r.$side/mame.log)"
 done; done
 [ "$fail" = 0 ] || { echo "FAIL: audit_pursuit_flag (a leg did not complete — VOID)"; exit 1; }
@@ -149,6 +154,9 @@ for r in cosmo ifrit; do
     if cmpx "$r" "$e" $z > "$W/cmp_$r.txt" 2>&1; then ok "$r: $(tail -1 "$W/cmp_$r.txt")"
     else bad "$r: $(tail -1 "$W/cmp_$r.txt")"; grep '^  FAIL' "$W/cmp_$r.txt" | head -12; fi
 done
+e=inert; vs_ctl_is inert-as-same && e=same
+if cmpx lsword "$e" > "$W/cmp_lsword.txt" 2>&1; then ok "lsword (#200): $(tail -1 "$W/cmp_lsword.txt")"
+else bad "lsword (#200): $(tail -1 "$W/cmp_lsword.txt")"; grep '^  FAIL' "$W/cmp_lsword.txt" | head -12; fi
 
 echo "== 4. the mark: record 4 clears, record 21 marks (pyron_4, the victim's +0x293, Pyron on either side)"
 marks() {  # marks <tap log> — the byte writes of +0x293 in play (after the match anchor), in order
@@ -178,6 +186,9 @@ for r in cosmo ifrit; do
     else vs_ctl_fired flag-zeroed "$r fails --expect same with ours' +0x117 read as 0"; fi
 done
 
+if cmpx lsword same > /dev/null 2>&1; then
+    vs_ctl_dead inert-as-same "lsword passes --expect same: the comparison cannot see the flag differ" || fail=1
+else vs_ctl_fired inert-as-same "lsword fails --expect same on the flag"; fi
 for t in p1 p2; do
     perturb "$W/tap_mark_$t.txt" > "$W/tap_mark_$t.pert"
     if [ "$(marks "$W/tap_mark_$t.pert")" = "$WANT" ]; then

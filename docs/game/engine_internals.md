@@ -595,8 +595,11 @@ countdown (vs2 `0x239D0`, vsavj `0x24D84`, the same frames on both); at its end 
 Ifrit +70) and ours does not (cleared on both at the get-up, vs2 `0x24CEC`/`0x25FB4`, vsavj `0x2608A`/`0x26E30`). So one
 hit-time mark at vsavj `0x01868C`'s path and one tail hook at `0x24D92` cover both moves. A DIFFERENT path, seen in the same
 run: Donovan's Lightning Sword (ES) sets `+0x117` AT HIT on vs2 through the class-0x4E handler (`0x16FDE`, class 0x4E at
-`0x16FE4`), while ours writes class 0x06 (`0x0186D0`, the 14z-35 remap) and no flag — whether a pursuit connects after it
-natively is not measured. A guard-cancel Ifrit (donovan_15 event 6, class 0x0A) sets `+0x117` at hit identically on both
+`0x16FE4`), while ours writes class 0x06 (`0x0186D0`, the 14z-35 remap) and no flag — and natively the flag is never
+acted on: measured 14z-188 (GitHub #200, the lsword rig of `tests/audit_pursuit_flag.sh`), vs2 clears it at +150 while
+Donovan is still in the move (P1 seq 0x10 to about +155), so U+LP from +40 to +180 starts no pursuit on either game and
+ours equals native on every traced field but the flag (the maintainer, on the capture: *"ours matches vs2 so there is
+no issue"*). The LP/MP/HP Lightning Swords, other distances and unpinned play are not measured. A guard-cancel Ifrit (donovan_15 event 6, class 0x0A) sets `+0x117` at hit identically on both
 (vs2 `0x16FF4`, vsavj `0x186EE`).
 
 **The class write's registers (14z-188, #195; probed at vsavj `0x01868C` on our builds, non-drifting conditioned
@@ -3691,6 +3694,17 @@ Donovan's 9/8 from 2HK (#191) are this, not the port's; both ruled not-ours by t
 kept under "vanilla wins ties". **A legacy control for a damage difference needs
 more than one victim:** #191 was opened because the one victim the first control used, Victor,
 is the only legacy victim on which the two engines agree on 2HK.
+
+**Which of his chains ARE equal between the games (14z-188, GitHub #198; `tools/equal_attack_chains.py`, the
+census's own chain comparison, the projectile table on its own hitboxes).** Every one of his a2 chains 0x00-0x1d
+differs (power, boxes, durations or node counts), so no ground or air normal of his is the same move on both games.
+Of his chains that are equal on both AND carry an attack record, six have non-zero power: a2:0x29 (ten nodes of 6/2),
+a2:0x3c (white 6 only), a2:0x3e (white 1 only), a2:0x5e (nodes of 132/130, 137/132, 132/130 and 10/6) and the
+projectile chains proj:0x06 and proj:0x11 (four nodes of 3/1 each); 80 more equal chains carry records of 0/0.
+Two controls hold the reading: a2:0x04 classes DIFFERS and reads 14/7 vs 13/7, a2:0x29 classes equal and powered.
+What each of the six is in play, and whether a2:0x29 can be blocked standing, is not measured. So a parity rig's P2
+Demitri cannot attack with a like-for-like equal-record normal; his record-differing chains stay declared and
+attributed (`P2_REPORT`, `P2-RECORD`).
 
 ## The down-transition WHITE FRAME (14z-112, measured on stock vsavj)
 

@@ -1,0 +1,8 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent188/t198/census_demitri.txt	42df0d98177af47c23263d1c2c3763561a46dbe4
+build/agent188/t198/census_all.txt	5f96fe497f01ccadd65f7a4ae7480b46596c8514
+build/agent188/t198/equal_attacks.txt	50cbdbceba479b54f8d38e95edd661e56d0539cb
+build/agent188/t198/equal_attacks.py	3a4bc6208048cd1dd4088744cf06911c390ea7ab
+tools/name_moves.py.lines-118-130 (lines 118-130 of tools/name_moves.py)	23955a938a6150568c7b60ae41e6cab79c6faeee
+tools/name_moves.py.lines-205-232 (lines 205-232 of tools/name_moves.py)	52d035ef2eb92b607b1418c444f74a28e47dc879
+DECISIONS_HISTORY.md.lines-167-175 (lines 167-175 of DECISIONS_HISTORY.md)	3b2414f826a575f8df0442130877d22b77227559

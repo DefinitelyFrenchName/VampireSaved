@@ -6303,3 +6303,14 @@ now about the wrong run.
 (here, the two records to `build/agent185b/emu_wiring/`), and the staleness readout is re-read
 to confirm it names the battery's run again. Never leave a partial run as the newest one before
 a close or a freeze.
+
+## A COST READER THAT KNOWS ONE RUNNER COUNTS ZERO — check a reader's figure against a close you can count by hand before trusting it (paid: 14z-187b, #187)
+
+`tools/agent/close_loop_cost.py`, built to measure what a close's checking loop costs, counted **0** of the 14z-186
+close's **14** `tools/close_checks.py run` passes: it recognised only `sh`/`bash` runners, and the runner is
+`python3`. It also found rule-checker run 486's `prepare` nowhere, because that output had been piped through
+`tail -1`, and it crashed on `--help`. A zero from a cost reader looks like a cheap close, not like a blind reader.
+Fixed 14z-187b: python runners, `--verb run` (so a `status` call is not a pass), a `prepare` found by its run id in
+its command or output. The fixed tool reproduces the 14z-185 close's figures byte for byte, and
+`tests/test_close_loop_cost.sh` holds it on a synthetic transcript, with the controls `no-python`, `verb-ignored`
+and `prepare-by-line`.

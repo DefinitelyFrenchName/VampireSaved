@@ -237,6 +237,16 @@ Yes, Donovan's deity states should be in scope. However, if they would rely on t
 
 ---
 
+## Ruled 2026-10-02 (14z-188) — #200 closed `invalid`: ours matches vs2; #198 closed `invalid` (premise refuted); #199's regions.json re-committed
+
+**The questions, verbatim:** *"#200 (capture sent): after Lightning Sword (ES), native vs2 sets the victim's pursuit flag at the hit and clears it at +150, but Donovan is still inside the move until about +155, so Up+LP from +40 to +180 never starts a pursuit on either game, and ours matches native on every field except the flag. Do you read the capture the same way, and what should happen to #200?"*; *"#198: no like-for-like equal-record attack exists for P2 Demitri. All his normals (a2:0x00 to 0x1d) differ between vsavj and vs2. Six equal chains carry real power: a2:0x29 (ten small hits), a2:0x3c, a2:0x3e, a2:0x5e (a heavy one), and two projectiles. Whether a2:0x29 is blockable, and what input makes it, is untested. How do you want #198 handled?"*; *"#199 item 2: the three tracked regions.json files predate today's extractor (it adds the capture-pointer entries). A regenerated extract, today's regions.json included, produces the byte-identical merged patch (839 ops, measured by test_merged_inputs). Re-commit them from today's extractor?"*
+
+**The maintainer, verbatim:** #200 — *"I read the same way, so ours matches vs2 so there is no issue. A note about the control: this is one of the cases where either because of the timing or just the nature of the move preceding the pursuit, Donovan does the pursuit but the pursuit doesn't hit. This is a quirk of the pursuit moves: they are not guaranteed hits because they are a regular move following frame data, not a chain (though there are surefire setups. I believe pursuit after 63214+MP/HP command throws has frame data that guarantees the pursuit hit)"*; #198 — *"Close it (premise refuted)"*; #199 — *"Re-commit them"*.
+
+**What it means.** #200 closes `invalid`: the flag difference is real in RAM and invisible in play in the measured window; `tests/audit_pursuit_flag.sh` holds it inert (the lsword rig), and the pursuit fact is in `docs/game/atlas/ram.md` `+0x117` (the maintainer's words, not measured). On the control: the session's trace records that pursuit hitting at +115 (red −5, white −8), so in this rig it connects; the general point stands. #198 closes `invalid`, its declared half kept as the control. #199's three `regions.json` are re-committed from today's extractor (one more `values` row, `capture_kf_ptr`, naming the span two auto-detected gap tables held); the merged image reproduces `aacc7e71` from them.
+
+---
+
 ## Ruled 2026-09-30 (14z-186) — two tickets found under #184: Donovan's 2HK damage (#191) and Change Immortal's one-frame timing
 
 **The question, verbatim:** *"Should the 2HK damage and the Change Immortal timing become tickets? I'd put each through the rule-checker before filing."*

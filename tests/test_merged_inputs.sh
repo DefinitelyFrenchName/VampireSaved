@@ -8,7 +8,7 @@
 #   missing ROM-derived input is regenerated and the regenerated set yields the
 #   byte-identical merged patch (the ARTIFACT is reproducible — the extract dirs themselves
 #   are not byte-equal, a cosmetic staleness), an existing input is never rewritten, and
-#   --check reports without creating.
+#   --check reports without creating; an extract counts as present only with its region files.
 # HOW: three extractions and two generator runs against $ROMDIR and the pinned build dirs
 #   (~2 min), the emitted patch.json and blobs compared.
 # EXPECTS: identical merged patch from either input set, no rewrite of an existing input;
@@ -36,6 +36,8 @@
 #   2  a MISSING input is regenerated, and the regenerated one produces the
 #      byte-identical merged patch  [the load-bearing one]
 #   3  create-if-absent: an EXISTING input is never rewritten (the #26 rule)
+#   3b a PARTIAL extract — the fresh-clone shape, its two tracked files and no region data — is reported by
+#      --check and completed by a run with the pinned region bytes, its tracked files untouched (GitHub #199)
 #   4  verdict controls
 #
 # ROMDIR + the pinned build dirs. ~2 min (three extractions + two generator
@@ -160,6 +162,28 @@ after=$(find "$H_EX" -type f -exec shasum {} \; | shasum | cut -d' ' -f1)
 grep -q "present, untouched" "$W/ensure.log" \
     && ok "helper reports the existing inputs as untouched" \
     || bad "helper did not report the present inputs"
+
+echo "== 3b: a PARTIAL extract — the fresh-clone shape, its two tracked files only (GitHub #199)"
+P="$W/partial/hui32"; mkdir -p "$P/extract"; cp "$H_EX/regions.json" "$H_EX/report.txt" "$P/extract/"
+tracked=$(shasum "$P/extract/regions.json" "$P/extract/report.txt" | cut -d' ' -f1 | tr '\n' ' ')
+if MERGED_TENANTS="$P:0x10:build/manifest/huitzil.toml" tools/ensure_merged_inputs.sh --check >"$W/partial_check.log" 2>&1; then
+    bad "--check passed a partial extract (directory present, region files absent)"
+else
+    grep -q "MISSING: $P/extract (31 of 31 region files missing)" "$W/partial_check.log" \
+        && ok "--check names the partial extract and its 31 missing region files" \
+        || bad "--check failed without naming the partial extract's gap"
+fi
+MERGED_TENANTS="$P:0x10:build/manifest/huitzil.toml" tools/ensure_merged_inputs.sh >"$W/partial_run.log" 2>&1 \
+    || bad "the helper failed to complete a partial extract"
+n=0; diff_n=0
+for f in "$H_EX"/region_*.bin; do
+    n=$((n + 1)); cmp -s "$f" "$P/extract/$(basename "$f")" || diff_n=$((diff_n + 1))
+done
+[ "$n" -gt 0 ] && [ "$diff_n" = 0 ] && ok "the completed extract's $n region files equal the pinned $H_EX's" \
+    || bad "$diff_n of $n region files differ from (or are absent beside) the pinned extract's"
+[ "$(shasum "$P/extract/regions.json" "$P/extract/report.txt" | cut -d' ' -f1 | tr '\n' ' ')" = "$tracked" ] \
+    && ok "the partial extract's tracked regions.json/report.txt are left untouched" \
+    || bad "the helper REWROTE the partial extract's tracked files"
 
 echo "== 4: verdict controls"
 # (a) a missing extract must be REPORTED by --check, not passed over

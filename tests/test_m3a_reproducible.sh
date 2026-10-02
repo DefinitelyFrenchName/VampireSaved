@@ -404,11 +404,26 @@ MERGED_NEEDS="build/m5_wide/extract build/hui32/extract build/pyron21/extract
 build/wide0/rompath/vsavjw.zip"
 _absent=""
 for _d in $MERGED_NEEDS; do [ -e "$_d" ] || _absent="$_absent $_d"; done
+# An extract is an INPUT only with its region files: each holds two TRACKED files (regions.json, report.txt), so a
+# fresh clone has the directory and none of the data — 14z-187b on ERIS printed "INPUTS OK" and the generator then
+# crashed on the first region_*.bin (GitHub #199). Every key of regions.json's `regions` must have its region_<key>.bin.
+for _d in $MERGED_NEEDS; do
+    case "$_d" in */extract) [ -f "$_d/regions.json" ] || continue ;; *) continue ;; esac
+    _miss="$(python3 -c "
+import json, os, sys
+d = sys.argv[1]; r = json.load(open(os.path.join(d, 'regions.json'))).get('regions', {})
+m = [k for k in r if not os.path.isfile(os.path.join(d, 'region_' + k + '.bin'))]
+print(f'{len(m)} of {len(r)} region files' if m else '')" "$_d")"
+    [ -n "$_miss" ] && _absent="$_absent $_d($_miss missing)"
+done
 
 if [ -n "$_absent" ]; then
     MERGED_STATUS="NOT CHECKED — inputs absent (GitHub #27):$_absent"
     echo "== merged image: NOT CHECKED"
     echo "   build_merged.sh needs these and they are missing:$_absent"
+    echo "   make them with: ROMDIR=... tools/ensure_merged_inputs.sh  (one command; it completes a partial extract and"
+    echo "    passes each track's flags, '--profile cps2-wide-v1' included — without it Donovan's region x101aca is"
+    echo "    silently absent; GitHub #199)"
 else
     echo "== rebuild the MERGED image (all three tenants)"
     tools/build_merged.sh "$WORK/merged" > "$WORK/merged.log" 2>&1 \

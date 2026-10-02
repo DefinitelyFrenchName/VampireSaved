@@ -54,9 +54,9 @@ CHECK_ONLY=0
 # extract was first produced in); extraction depends only on
 # (vsav2.zip, vhunt2.zip, char, roots), which is why regenerating reproduces
 # them byte-for-byte.
-TENANTS="build/m5_wide:0x13:build/manifest/donovan.toml \
+TENANTS="${MERGED_TENANTS:-build/m5_wide:0x13:build/manifest/donovan.toml \
 build/hui32:0x10:build/manifest/huitzil.toml \
-build/pyron21:0x11:build/manifest/pyron.toml"
+build/pyron21:0x11:build/manifest/pyron.toml}"   # MERGED_TENANTS: tests/test_merged_inputs.sh's partial-extract leg only
 
 WIDE_DIR="build/wide0/rompath"
 WIDE_ZIP_DEFAULT="$WIDE_DIR/vsavjw.zip"
@@ -76,6 +76,20 @@ esac
 
 missing=""
 
+# AN EXTRACT IS PRESENT ONLY WITH ITS REGION FILES (14z-188, GitHub #199): each extract dir holds two TRACKED
+# files (regions.json, report.txt), so on a fresh clone the directory EXISTS with none of the data — a `-d` test
+# read that as present, never regenerated, and the generator crashed on the first region_*.bin (ERIS, 14z-187b).
+# extract_gap <dir> prints "" when every key of regions.json's `regions` has its region_<key>.bin, else
+# "N of M region files" (a dir with no regions.json is wholly absent: "no regions.json").
+extract_gap() {
+    [ -f "$1/regions.json" ] || { echo "no regions.json"; return; }
+    python3 -c "
+import json, os, sys
+d = sys.argv[1]; r = json.load(open(os.path.join(d, 'regions.json'))).get('regions', {})
+m = [k for k in r if not os.path.isfile(os.path.join(d, 'region_' + k + '.bin'))]
+print(f'{len(m)} of {len(r)} region files' if m else '')" "$1"
+}
+
 # NB a `for` over the row list, NOT `echo ... | while read`: a piped while runs
 # in a SUBSHELL, so its exit status and any variable it sets are lost to the
 # rest of the script — the shape that makes a loop look like it verified
@@ -83,22 +97,32 @@ missing=""
 for row in $TENANTS; do
     dir="${row%%:*}"; rest="${row#*:}"
     char="${rest%%:*}"; man="${rest#*:}"
-    if [ -d "$dir/extract" ]; then
+    gap="$(extract_gap "$dir/extract")"
+    if [ -z "$gap" ]; then
         echo "  ok (present, untouched): $dir/extract"
         continue
     fi
     if [ "$CHECK_ONLY" = "1" ]; then
-        echo "  MISSING: $dir/extract"
+        echo "  MISSING: $dir/extract ($gap missing)"
         missing="$missing $dir/extract"
         continue
     fi
-    echo "  regenerating $dir/extract (char $char) ..."
+    echo "  regenerating $dir/extract (char $char; $gap missing) ..."
+    # Into a scratch outbase, then only what is MISSING is copied in: a partial dir keeps its tracked
+    # regions.json/report.txt untouched (whether today's extractor's regions.json is re-committed is #199's own
+    # question; the region data is byte-identical either way, measured on ERIS 14z-187b).
+    _tmp="$(mktemp -d)"
     EXTRACT_ONLY=1 TENANT_CHAR="$char" TENANT_MANIFEST="$man" \
         GEN_FLAGS="--allow-plausible --tripwire-open --profile cps2-wide-v1" \
-        ROMDIR="$ROMDIR" tools/build_donovan.sh 6 "$dir" >/dev/null || {
-            echo "FAIL: could not extract char $char into $dir" >&2; exit 1; }
-    [ -d "$dir/extract" ] || {
-        echo "FAIL: $dir/extract still absent after extraction" >&2; exit 1; }
+        ROMDIR="$ROMDIR" tools/build_donovan.sh 6 "$_tmp/x" >/dev/null || {
+            rm -rf "$_tmp"; echo "FAIL: could not extract char $char" >&2; exit 1; }
+    mkdir -p "$dir/extract"
+    for _f in "$_tmp/x/extract"/*; do
+        _b="$(basename "$_f")"; [ -e "$dir/extract/$_b" ] || cp "$_f" "$dir/extract/$_b"
+    done
+    rm -rf "$_tmp"
+    gap="$(extract_gap "$dir/extract")"
+    [ -z "$gap" ] || { echo "FAIL: $dir/extract still incomplete after extraction ($gap missing)" >&2; exit 1; }
     echo "  made: $dir/extract"
 done
 
@@ -132,8 +156,9 @@ fi
 
 # final verification, independent of which branch produced each input
 missing=""
-for d in build/m5_wide/extract build/hui32/extract build/pyron21/extract; do
-    [ -d "$d" ] || missing="$missing $d"
+for row in $TENANTS; do
+    d="${row%%:*}/extract"
+    [ -z "$(extract_gap "$d")" ] || missing="$missing $d"
 done
 [ -f "$WIDE_ZIP" ] || missing="$missing $WIDE_ZIP"
 [ -z "$missing" ] || { echo "FAIL: still missing$missing" >&2; exit 1; }

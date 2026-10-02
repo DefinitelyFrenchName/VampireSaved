@@ -277,9 +277,14 @@ WIDE=0 tools/setup_mame.sh        # -> ~/.cache/vampire-saved/mame-ref/cps2
 tools/setup_mame.sh               # -> ~/.cache/vampire-saved/mame/cps2
 
 # FBNeo: reference binary, then the WIDE one.
-WIDE=0 tools/setup_fbneo.sh && cp emu/fbneo/fbneo ~/fbneo_ref
+WIDE=0 tools/setup_fbneo.sh && cp emu/fbneo/fbneo ~/.cache/vampire-saved/fbneo_ref
 tools/setup_fbneo.sh
 ```
+
+The FBNeo reference goes where `tests/test_wide_profile.sh` looks by default
+(`~/.cache/vampire-saved/fbneo_ref`; `FBNEO_REF` overrides it). This line said
+`~/fbneo_ref` until 14z-188, and ERIS's tier then read the emulator superset
+invariant as NOT RUN.
 
 Expect the first MAME build to take a while — it is a filtered CPS-2-only
 build, so minutes rather than hours, but the exact time depends on your
@@ -304,6 +309,20 @@ mkdir -p ~/.local/bin && ln -sfn ~/.cache/vampire-saved/mame-ref/cps2 ~/.local/b
 `test_mame_parity.sh` recognises this binary (same sha1 as the source build)
 and refuses it as its reference, so it can never A/B the build against
 itself. A wrapper-level default on every host is a ticket, not done.
+
+**Then the merged build's inputs (14z-188, GitHub #199).** A fresh clone has
+each extract directory the merged build reads (`build/m5_wide`, `build/hui32`,
+`build/pyron21`), but only its two tracked files and none of its region data.
+One command completes them with the right flags. Donovan's needs
+`--profile cps2-wide-v1`; without it his region `x101aca` is silently absent.
+
+```bash
+ROMDIR=~/roms tools/ensure_merged_inputs.sh      # --check reports without creating
+```
+
+The region data it writes is byte-identical to the Mac's, and
+`tests/test_merged_inputs.sh` proves the merged patch is identical from either
+set.
 
 ## 7. THE ACCEPTANCE TEST
 
@@ -352,7 +371,7 @@ Then the rest:
 ```bash
 ROMDIR=~/roms tests/test_input_integrity.sh     # needs the `mame` shim of §6, or MAME_BIN=~/.cache/vampire-saved/mame-ref/cps2
 ROMDIR=~/roms tests/test_mame_wide.sh
-ROMDIR=~/roms FBNEO_REF=~/fbneo_ref tests/test_wide_profile.sh
+ROMDIR=~/roms tests/test_wide_profile.sh        # the reference at its default path (§6)
 ```
 
 (`test_mame_wide.sh` and `test_wide_profile.sh` need a WIDE romset built

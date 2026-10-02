@@ -25,7 +25,9 @@ seq 0xe) and one that CONNECTS (P2's HP falls) are told apart (14z-187's pursuit
 native's flag is 1 and ours' 0, and ours never enters seq 0xe where native does on that event — the known pre-#195
 state; the CONTROL event must equal native either way. Both refuse a leg whose native side did not produce the event:
 native's flag must be 1 at every press and at least one target event must START the pursuit on native (VOID, never a
-pass). `--zero-flag` zeroes ours' +0x117 on every frame first (the gate's must-fire control).
+pass). `--zero-flag` zeroes ours' +0x117 on every frame first (the gate's must-fire control). `--expect inert` (the lsword
+rig, #200): native's flag is 1 at some target press yet no target event starts the pursuit on native, and every row of
+ours equals native's with the flag set aside — the flag differs and nothing a player sees does.
 
 `p2rig` puts a naming rig's tenant on P2 (14z-188's "Close the P2 gap first", promoted from the scratch
 gen_p2rig2.py): the select lines before frame 2000 give way to <prologue> (tools/select_paths.py --rpl-prologue
@@ -49,6 +51,13 @@ RIGS = {
               [(f"Ifrit Sword (ES) then U+LP at +{o}", nm.dp("PP") + [(o, o + 3, "U" + nm.B["LP"])], 300, "near")
                for o in (72, 76, 80, 84, 88, 92)]
               + [("CONTROL: throw then U+LP pursuit", nm.throw_then_pursuit("LP"), 320, "near")]),
+    # GitHub #200 (14z-188): native vs2 marks the victim at the HIT of Lightning Sword (ES) (class 0x4E) and ours does
+    # not — but native clears the flag at +150 while Donovan is still in the move (to ~+155), so no pursuit starts on
+    # either game; the maintainer, on the capture: "ours matches vs2 so there is no issue". Held as `--expect inert`.
+    "lsword": ("donovan", "d200",
+               [(f"Lightning Sword (ES) then U+LP at +{o}", nm.rdp("PP") + [(o, o + 3, "U" + nm.B["LP"])], 300, "near")
+                for o in range(40, 181, 20)]
+               + [("CONTROL: throw then U+LP pursuit", nm.throw_then_pursuit("LP"), 320, "near")]),
 }
 # the trace fields the gate adds to the parity gates' FIELDS (P2's white HP, class, seq and the word holding +0x117)
 EXTRA_FIELDS = "ff8852:w:p2white,ff8854:b:p2cls,ff8806:b:p2seq,ff8916:w:p2f116"
@@ -117,6 +126,19 @@ def fmt(r):
 def compare(rig_json, nat, ours, expect, zero_flag=False):
     N, O = rows(rig_json, nat), rows(rig_json, ours, zero_flag)
     bad = []
+    if expect == "inert":
+        T = [n for n in N if not n["control"]]
+        if not any(n["f117"] == 1 for n in T):
+            bad.append("VOID: native's +0x117 is never 1 at a target press — the rig does not reach the marked window")
+        if any(n["pursuit"] for n in T):
+            bad.append("NOT-INERT: a target event starts the pursuit on native — the flag is acted on")
+        for n, o in zip(N, O):
+            a, b = dict(n, f117=None), dict(o, f117=None)
+            if (fmt(n) if n["control"] else fmt(a)) != (fmt(o) if n["control"] else fmt(b)):
+                bad.append(f"DIFF {n['event']}\n    native {fmt(n)}\n    ours   {fmt(o)}")
+        for n, o in zip(N, O):
+            print(f"  native  {fmt(n)}\n  ours    {fmt(o)}")
+        return bad
     # VOID first: the native leg must have produced the events
     if any(n["f117"] != 1 for n in N):
         bad.append("VOID: native's +0x117 is not 1 at every press — the rig did not knock the victim down natively")
@@ -182,7 +204,7 @@ def main(argv):
         p2rig(*argv[1:6])
     elif cmd == "compare":
         expect = argv[argv.index("--expect") + 1]
-        assert expect in ("same", "gap"), expect
+        assert expect in ("same", "gap", "inert"), expect
         bad = compare(argv[1], argv[2], argv[3], expect, "--zero-flag" in argv)
         for b in bad:
             print(f"  FAIL  {b}")
