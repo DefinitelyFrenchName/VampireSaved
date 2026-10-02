@@ -50,6 +50,14 @@ DASHC = re.compile(r"python3?\s+(?:-\w+\s+)*-c\s+([\"'])(.*?)\1")
 MOD = re.compile(r"python3?\s+(?:-\w+\s+)*-m\s+([A-Za-z_][\w.]*)")
 SYSPATH = re.compile(r"sys\.path\.(?:insert|append)|PYTHONPATH")
 
+def is_comment(path, line):
+    """a comment line: `#` in every language here (shell, python, a Lua shebang), `--` in Lua ONLY — a shell or
+    python line that starts with `--` is an option continuation (`    --baseline "tests/expected/..."`), code
+    (14z-188, #188: 321 such lines in tests/ and tools/ were read as comments, and the reads they name missed)."""
+    s = line.strip()
+    return s.startswith("#") or (str(path).endswith(".lua") and s.startswith("--"))
+
+
 def index(root, extra):
     files = []
     for top in ["tools", "tests"] + list(extra):
@@ -105,7 +113,7 @@ def refs(root, p, files):
     bases = [root, os.path.join(root, "tests")] + EXTRA
     skip = docstring_lines(p, txt) if STRICT[0] else set()
     if STRICT[0]:
-        kept = [("" if (i + 1) in skip or l.strip().startswith(("#", "--")) else l) for i, l in enumerate(txt.split("\n"))]
+        kept = [("" if (i + 1) in skip or is_comment(p, l) else l) for i, l in enumerate(txt.split("\n"))]
         txt = "\n".join(kept)
     for ln, line in enumerate(txt.split("\n"), 1):
         for m in REF.finditer(line):
@@ -170,7 +178,7 @@ def hits(root, files_set):
             for k, rx in PATS.items():
                 if re.search(rx, l):
                     s = l.strip()
-                    out.append(("comment" if s.startswith(("#", "--")) else "CODE", k, p, i, s[:150]))
+                    out.append(("comment" if is_comment(p, s) else "CODE", k, p, i, s[:150]))
     return out
 
 def control():
@@ -275,7 +283,7 @@ if __name__ == "__main__":
         try: L = open(os.path.join(root, p), encoding="utf-8").read().split("\n")
         except Exception: continue
         for i, l in enumerate(L, 1):
-            if SYSPATH.search(l) and not l.strip().startswith(("#", "--")): sp.append(f"   syspath: {p}:{i}: {l.strip()[:150]}")
+            if SYSPATH.search(l) and not is_comment(p, l): sp.append(f"   syspath: {p}:{i}: {l.strip()[:150]}")
     print(f"== sys.path / PYTHONPATH lines in the ran set: {len(sp)}")
     for x in sp: print(x)
     dyn = []
@@ -284,7 +292,7 @@ if __name__ == "__main__":
         except Exception: continue
         for i, l in enumerate(L, 1):
             s = l.strip()
-            if s.startswith(("#", "--")): continue
+            if is_comment(p, s): continue
             if re.search(r"\bimportlib\b|__import__\(|\brunpy\b|\bexec\(|\bspec_from_file_location\b", l): dyn.append(f"   dynamic: {p}:{i}: {s[:140]}")
     print(f"== dynamic-load sites in the ran set (importlib, __import__, runpy, exec, spec_from_file_location): {len(dyn)}")
     for x in dyn: print(x)

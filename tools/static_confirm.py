@@ -16,8 +16,18 @@ A registered gate (tests/ci_portable.txt, tests/ci_static.txt) is STALE for a ch
      an optional `/` and then a non-path character (a quote, space, `*`, `)`, end of line), or as
      quoted components joined by commas (`"docs", "project"`);
   R4 the reach reads the whole tree (`git ls-files`, `git grep`, `git status`, `os.walk(`, `rglob(`,
-     `find .`, `glob.glob(` with `**`): every change.
-Otherwise the gate is CARRIED.
+     `find .`, `glob.glob(` with `**`): every change;
+  R5 a DATA file the reach names (a tracked .tsv/.txt/.json/.toml/.csv whose path or basename a code line
+     carries) names c by path or basename — the reader takes its file list from data (docs/doc_locks.tsv,
+     docs/doc_shape.tsv, docs/project/tickets.tsv; 14z-188, the traced test's misses);
+  R6 a TEMPLATED path in the reach matches c: a token carrying a placeholder (`$n`, `${n}`, `{expr}`, `%s`,
+     `*`) with its placeholders read as one path component each and a leading all-placeholder component
+     dropped (`build/manifest/charmap_$n.toml`, `"patch/effect_c5*.json"`), matched as a path suffix when it
+     holds a `/`, else against c's basename when its literal part is more than an extension;
+  R7 c is a `.gitignore` or `.gitattributes` and the reach runs `git` (git reads them on every command).
+Otherwise the gate is CARRIED. A BINARY file in the reach (a NUL in its first 8 KiB — the FBNeo executable
+is one) has no text: it names nothing, and R1 still covers a change to it (14z-188: read as text, its 42 MB
+made every rule search take seconds and two gates ran past the traced test's 600 s cap).
 
 Usage:
   python3 tools/static_confirm.py predict --root DIR (--base COMMIT [--head COMMIT] | --changed PATH ...)
@@ -41,16 +51,18 @@ _TEXT = {}
 
 
 def text(root, p):
-    """a file's CODE: comment lines (`#`, `--`) and python docstrings dropped, as battery_reach's
-    strict set does — a comment runs nothing and reads nothing."""
+    """a file's CODE: comment lines (`#`; `--` in Lua only, battery_reach.is_comment) and python docstrings
+    dropped, as battery_reach's strict set does — a comment runs nothing and reads nothing."""
     k = (root, p)
     if k not in _TEXT:
         try:
-            t = open(os.path.join(root, p), encoding="utf-8", errors="replace").read()
+            with open(os.path.join(root, p), "rb") as fh:
+                raw = fh.read()
+            t = "" if b"\0" in raw[:8192] else raw.decode("utf-8", errors="replace")
         except OSError:
             t = ""
         skip = br.docstring_lines(p, t)
-        _TEXT[k] = "\n".join("" if (i + 1) in skip or l.strip().startswith(("#", "--")) else l
+        _TEXT[k] = "\n".join("" if (i + 1) in skip or br.is_comment(p, l) else l
                               for i, l in enumerate(t.split("\n")))
     return _TEXT[k]
 
@@ -92,6 +104,69 @@ def patterns(c):
     return (re.compile(r"(?<![\w.-])" + re.escape(base) + r"(?![\w-])") if base else None, dir_patterns(c))
 
 
+DATA_EXT = (".tsv", ".txt", ".json", ".toml", ".csv")
+_DATA = {}
+_TMPL = {}
+GIT_RUN = re.compile(r"(?<![\w.-])git\s+(?:-C\s+\S+\s+)?[a-z][\w-]*")
+TOKEN = re.compile(r"[\w./${}*%<>-]+")
+PLACE = re.compile(r"\$\{\w+\}|\$\w+|\{[^{}/]*\}|%[sd]|\*")
+
+
+def data_files(root, blob):
+    """R5: the tracked data files the reach's code names, by path or basename (one scan per blob)."""
+    k = (root, hash(blob))
+    if k not in _DATA:
+        tracked = _tracked(root)
+        out = []
+        for f in tracked:
+            if f.endswith(DATA_EXT):
+                b = os.path.basename(f)
+                if b in blob and re.search(r"(?<![\w.-])" + re.escape(b) + r"(?![\w-])", blob):
+                    out.append(f)
+        _DATA[k] = out
+    return _DATA[k]
+
+
+_TRACKED = {}
+
+
+def _tracked(root):
+    if root not in _TRACKED:
+        r = subprocess.run(["git", "ls-files"], cwd=root, capture_output=True, text=True)
+        _TRACKED[root] = r.stdout.splitlines() if r.returncode == 0 else []
+    return _TRACKED[root]
+
+
+def templates(root, blob):
+    """R6: (regex, token, is_path) for every templated path token in the reach's code."""
+    k = (root, hash(blob))
+    if k not in _TMPL:
+        out, seen = [], set()
+        for tok in TOKEN.findall(blob):
+            if tok in seen or not PLACE.search(tok) or not ("/" in tok or "." in tok):
+                continue
+            seen.add(tok)
+            parts = tok.split("/")
+            while parts and PLACE.sub("", parts[0]) == "":
+                parts = parts[1:]
+            if not parts:
+                continue
+            t = "/".join(parts)
+            lit = PLACE.sub("", t)
+            rx = "".join("[^/]*" if PLACE.fullmatch(x) else re.escape(x) for x in re.split(r"(" + PLACE.pattern + r")", t) if x)
+            if "/" in t:
+                if len(lit.replace("/", "")) < 3:
+                    continue
+                out.append((re.compile(r"(?:^|/)" + rx + r"$"), tok, True))
+            else:
+                stem = re.sub(r"\.[\w]+$", "", lit)
+                if len(stem) < 3:
+                    continue
+                out.append((re.compile(r"^" + rx + r"$"), tok, False))
+        _TMPL[k] = out
+    return _TMPL[k]
+
+
 def stale_reason(root, rch, blob, c, pats):
     """the first rule that makes this gate STALE for c; `blob` is the reach's texts joined (searched
     once), the file is named only on a hit."""
@@ -103,6 +178,18 @@ def stale_reason(root, rch, blob, c, pats):
         if rx.search(blob):
             where = next((p for p in rch if rx.search(text(root, p))), "?")
             return f"R2 {where} names {what}" if rule == "R2" else f"R3 {where} reads directory {what}"
+    base = os.path.basename(c)
+    for d in data_files(root, blob):
+        if d == c:
+            continue
+        t = text(root, d)
+        if c in t or (bpat and base in t and bpat.search(t)):
+            return f"R5 the data file {d} names {c}"
+    for rx, tok, is_path in templates(root, blob):
+        if rx.search(c if is_path else base):
+            return f"R6 the template {tok} matches {c}"
+    if base in (".gitignore", ".gitattributes") and GIT_RUN.search(blob):
+        return f"R7 the reach runs git, which reads {c}"
     return None
 
 
@@ -110,10 +197,10 @@ def changed_set(root, base, head, extra):
     out = set(extra)
     if base:
         args = ["git", "diff", "--name-only", base] + ([head] if head else [])
-        out |= set(subprocess.run(args, cwd=root, capture_output=True, text=True, check=True).stdout.split())
-        if not head:
+        out |= set(subprocess.run(args, cwd=root, capture_output=True, text=True, check=True).stdout.splitlines())
+        if not head:   # one path per LINE: a name with a space is one path (14z-188: `.split()` made two)
             out |= set(subprocess.run(["git", "ls-files", "--others", "--exclude-standard"], cwd=root,
-                                      capture_output=True, text=True).stdout.split())
+                                      capture_output=True, text=True).stdout.splitlines())
     return sorted(out)
 
 
@@ -174,7 +261,7 @@ def backtest(events, repo):
             wt = os.path.join(d, "wt")
             subprocess.run(["git", "worktree", "add", "--detach", "-q", wt, head], cwd=repo, check=True)
             try:
-                _TEXT.clear(); _REFS.clear()
+                _TEXT.clear(); _REFS.clear(); _DATA.clear(); _TMPL.clear(); _TRACKED.clear()
                 changed = changed_set(wt, base, head, extra)
                 gates, stale, carried = predict(wt, changed)
                 ok = gate in stale
@@ -197,7 +284,15 @@ def selftest():
             open(p, "w").write(t)
             if x:
                 os.chmod(p, 0o755)
-        w("tests/ci_portable.txt", "g_named\ng_prog\ng_dir\ng_join\ng_whole\n")
+        w("tests/ci_portable.txt", "g_named\ng_prog\ng_dir\ng_join\ng_whole\ng_data\ng_tmpl\ng_git\ng_bin\n")
+        w("tests/g_data.sh", "#!/bin/sh\npython3 -c \"print(open('lists/locks.tsv').read())\"\n", True)
+        w("lists/locks.tsv", "notes/locked.md\tfirst\n")
+        w("notes/locked.md", "x\n")
+        w("tests/g_tmpl.sh", "#!/bin/sh\nfor n in a b; do cat cfg/rows/item_$n.toml; done\nls $W/$n.out\ndiff -q $W/x \\\n    --from-file \"cfg/base/$n.txt\"\n", True)
+        w("cfg/rows/item_a.toml", "x\n")
+        w("tests/g_git.sh", "#!/bin/sh\ngit -C sub diff --stat\n", True)
+        w("tests/g_bin.sh", "#!/bin/sh\nemu/tool --run\n", True)
+        w("emu/tool", "\0" * 16 + "notes/locked.md lists/locks.tsv\n", True)   # an extensionless executable, as emu/fbneo/fbneo
         w("tests/g_named.sh", "#!/bin/sh\ngrep x docs/data/table.tsv\n", True)
         w("tests/g_prog.sh", "#!/bin/sh\npython3 tools/helper.py\n", True)
         w("tools/helper.py", "import sys\n")
@@ -213,9 +308,23 @@ def selftest():
             ("docs/project/x.md", {"g_join", "g_whole"}),
             ("STATE.md", {"g_whole"}),
             ("tests/g_named.sh", {"g_named", "g_whole"}),
+            # R5: g_data reads a data file that names the changed file
+            ("notes/locked.md", {"g_data", "g_whole"}),
+            # R6: g_tmpl's templated path matches; `$W/$n.out` is too generic to count (no stem)
+            ("cfg/rows/item_b.toml", {"g_tmpl", "g_whole"}),
+            ("cfg/other.out", {"g_whole"}),
+            # an option continuation (`    --from-file "cfg/base/$n.txt"`) is code in a shell file, not a Lua comment
+            ("cfg/base/x.txt", {"g_tmpl", "g_whole"}),
+            # R7: every git user reads .gitignore
+            (".gitignore", {"g_git", "g_whole"}),
+            # a binary in the reach names nothing (R1 still covers the binary itself): read as text, the
+            # names inside it would make g_bin stale for notes/locked.md above
+            ("emu/tool", {"g_bin", "g_whole"}),
         ]
+        subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+        subprocess.run(["git", "add", "-A"], cwd=root, check=True)
         for c, want in cases:
-            _TEXT.clear(); _REFS.clear()
+            _TEXT.clear(); _REFS.clear(); _DATA.clear(); _TMPL.clear(); _TRACKED.clear()
             _, stale, _ = predict(root, [c])
             got = set(stale)
             good = got == want

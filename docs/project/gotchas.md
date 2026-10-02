@@ -6243,6 +6243,17 @@ the root, without it, paths only). **The rule:** a "nothing reads it" claim
 names its reach forms and its roots, lists what it could not resolve, and shows
 its finder catching a planted reader of each form.
 
+**Three more ways a reach silently under-reads, paid 14z-188 (#188's strace test, `tools/static_confirm.py`):**
+a line that STARTS with `--` is a Lua comment ONLY — in a shell or python file it is an option continuation
+(`    --baseline "tests/expected/pointer_flow/$n.txt"`), and treating it as a comment hid 321 code lines in
+`tests/` and `tools/` (`battery_reach.is_comment` now decides by the file's language); a BINARY in the reach
+(the FBNeo executable, 42 MB) read as text made every rule search take seconds and ran two gates past a
+600 s cap (a NUL in the first 8 KiB now means no text); and `git diff --name-only` output split on
+WHITESPACE turned an untracked `… (Japan).zip` into the bogus paths `(Japan` and `-`, marking every gate
+stale (one path per line). The readers the predictor did not model at all — a data file that lists the
+files (`docs/doc_locks.tsv`, `docs/doc_shape.tsv`, `tickets.tsv`), a templated path (`charmap_$n.toml`,
+`"patch/effect_c5*.json"`), git's own read of `.gitignore` — are its rules R5-R7.
+
 ## A SEEDED ATTRIBUTION ROOT OUTLIVES THE FIX IT NAMED — the freeze refuses, and the seed is retired WITH the fix's freeze (paid: 14z-185, the M21 freeze, #159; rule-checker runs 2026-09-28-402..404)
 
 `tools/move_parity_attribution.py` seeded donovan_3's root at event 5

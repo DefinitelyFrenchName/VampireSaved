@@ -13,7 +13,7 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**413 of 413 gates described.**
+**415 of 415 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
@@ -24,7 +24,7 @@ first sentence) is `gate_index.md`.
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 84 | 84 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 66 | 66 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 68 | 68 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -322,11 +322,11 @@ the suite runners and their own ground truth. 40 of 40 described.
 
 ### `test_static_confirm.sh` — test, ci_portable
 
-**WHAT:** tools/static_confirm.py's predictions mean what they say: a changed path makes a gate STALE when it is a program in the gate's reach (R1), is named by basename on a code line of the reach (R2), lies under a directory the reach reads (R3), or the reach reads the whole tree (R4); any other gate is CARRIED.
+**WHAT:** tools/static_confirm.py's predictions mean what they say: a changed path makes a gate STALE when it is a program in the gate's reach (R1), is named by basename on a code line of the reach (R2), lies under a directory the reach reads (R3), the reach reads the whole tree (R4), a data file the reach names names it (R5), a templated path in the reach matches it (R6), or it is a .gitignore/.gitattributes and the reach runs git (R7); a binary in the reach names nothing (14z-188, the traced test's misses and its two TIMEOUTs; a shell or python line starting `--` is code); any other gate is CARRIED.
 
-**HOW:** drives the predictor's selftest over a synthetic repo of five gates, one per reader class, with known answers; two controls run copies with the directory rule and the whole-tree rule removed, and each must fail the selftest.
+**HOW:** drives the predictor's selftest over a synthetic repo of nine gates, one per reader class, with known answers; seven controls run copies with one rule removed (directory, whole-tree, data, template, git), `--` read as a comment outside Lua (battery_reach.is_comment), or binaries read as text, and each must fail the selftest.
 
-**EXPECTS:** the selftest's six cases pass and both controls fail on their copies. The HISTORY backtest (tests/expected/static_confirm_backtest.tsv, `static_confirm.py backtest`) takes minutes of worktrees and is run by hand, not here.
+**EXPECTS:** the selftest's twelve cases pass and every control fails on its copy. The HISTORY backtest (tests/expected/static_confirm_backtest.tsv, `static_confirm.py backtest`) takes minutes of worktrees and is run by hand, not here.
 
 ### `test_suite_dispatch.sh` — test, emulator
 
@@ -2426,7 +2426,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 ## character-data
 
-the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 66 of 66 described.
+the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 68 of 68 described.
 
 ### `audit_air_gc_legacy.sh` — audit, emulator
 
@@ -2652,6 +2652,14 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **EXPECTS:** SAME on every pointer and the box-id word of every part, the node-equal frame count at or above its floor, the three controls failing. Not covered: frames whose nodes differ, P2's boxes (Demitri's hitbox families differ between the games — same_data_p2.tsv), and the table BYTES themselves (the charmap gates' subject).
 
+### `audit_ladder_pick_store.sh` — audit, emulator
+
+**WHAT:** the routine 14z-87 named a "voice-class borrow" (store PRG:0x0AEF6) is the arcade ladder's opponent pick. On a CPU flow it writes the CPU side's +0x382 once, before that fighter loads; a value poked there BEFORE the store is overwritten by the draw, one poked AFTER it is the character that loads (the hitbox base +0x60 names it); and a 2P match never runs the store. A game fact, so it is measured on pristine vsavj, no build involved.
+
+**HOW:** rig 90 (tests/replays/don/90_don_plant.rpl — its own header: it never forms its match and times out into a CPU game, P1 the CPU side) on MAME, five legs: a non-debug PC-attributed write tap on both players' +0x382 (tests/lua/read_tap.lua); fighter-block dumps at f3460/f3470/f4200 unpoked, with 0x03 (Victor) poked at f3300 (before the store) and at f3480 (after it); and the same tap over a 2P replay (tests/replays/16_xemu_2p.rpl). The loaded character is named by its +0x60 against the 16 legacy rows of tests/expected/roster_pairings/bases.tsv (byte-identical in vanilla vsavj, that file's header).
+
+**EXPECTS:** rig 90 — exactly one in-play write to $FF8782, by the store PC, between f3460 and f3470, and none to $FF8B82 by it; unpoked, P1's +0x60 at f4200 is the base of the character its +0x382 names; poked before, +0x382 reads 0x03 at f3460 and the unpoked leg's drawn value at f3470, and P1 loads as the unpoked leg's character; poked after, P1 loads as Victor. The 2P replay — boot-POST writes seen (liveness) and no write by the store PC. Every control fails.
+
 ### `audit_lag_budget.sh` — audit, emulator
 
 **WHAT:** a fix set adds no frame of lag: over every #136 naming part, the build under test has no zero-pass frame (the pass counter $FF8081 not advancing after the round start) that the reference build before the fixes does not have — the maintainer's combined-overhead condition, under 1/60 s at all times.
@@ -2699,6 +2707,14 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 **HOW:** twelve MAME runs, two at a time: the #136 parts huitzil_5 and huitzil_6 on native and ours (the merged wheel's Phobos path, the part's pokes, the level pin) at RNG pins 0000/1234/5a5a, P1's HP traced every frame from 2300 and every loss frozen; the build's curve row 0x10 and threshold words compared with vs2's; the control replaces our step by native's.
 
 **EXPECTS:** one P1 HP step per part on the same frame on both legs, not moving with the pin, the rows equal to vs2's, the frozen 11/12; AND, since 14z-181, the LEGACY pair — Demitri's 5HP on Victor, real picks on pristine vsavj and pristine vsav2, Victor's row byte-identical between the games — frozen at vsavj 12 / vsav2 11, two hits per leg on the same frames: the same +1 with no port in the loop, so the residual is ~~the two ENGINES' damage pipelines~~ (RETRACTED 14z-187b) Demitri's OWN 5HP record, 14 on vsavj and 13 on vs2 — swapping that byte swaps the damage both ways (tests/audit_dmg_legacy_sweep.sh section 5) — not ours (#161's answer; the maintainer ruled it not-ours 2026-09-25); both planted steps fail.
+
+### `audit_pursuit_flag.sh` — audit, emulator
+
+**WHAT:** vs2's knockdown tail sets the victim's +0x117 (the pursuit flag the attacker-side check reads) for reaction class 0x51 alone; our tenants' 0x51 records are remapped to 0x44, which never sets it, until #195's two hooks (the hit-time mark at PRG:0x01868C and the tail at PRG:0x024D92 — build/manifest/staged/195_pursuit_mark.patch). On a build that CARRIES the hooks, every event of the two rigs equals native: P2's +0x117 at the press, the pursuit starting (P1 seq 0xe) and connecting (P2's HP falling) on the same frames. On a build WITHOUT them (every freeze up to merged-m21), the known gap: the flag 0 and the pursuit never starting where native's does — so the gate holds today and turns over to equality, by itself, on the freeze that applies the patch.
+
+**HOW:** the rigs are tools/pursuit_rigs.py's (tools/name_moves.py's machinery, kept OUTSIDE the naming corpus in tests/replays/pursuit195/): cosmo (Pyron P1; Cosmo [41236 PP] then U+LP at +160..+200) and ifrit (Donovan P1; Ifrit Sword (ES) [623 PP, near] then U+LP at +72..+92), each with the throw-then-pursuit CONTROL; each on MAME on native vs2 and on the merged WIDE build as the parity gates run them (real cursor picks, level 6 from 2000, the RNG from the match anchor); whether the build carries the hooks is read from its own opcode view at the two sites (verify_op.bin: a jsr at both, or the original bytes at both — anything else fails); tools/pursuit_rigs.py compare --expect same|gap reads every event. Then the MARK's discriminator (hooked builds): a non-debug write tap (tests/lua/read_tap.lua) on P2's +0x293 over the naming rig pyron_4 (tests/replays/naming/), whose Pyron hits four times with projectile record 4 (class 0x44 natively) and then four times with record 21 (Cosmo, vs2 0x51); and the same rig with Pyron on P2 (tools/pursuit_rigs.py p2rig, his real cursor path from the build's own decoded wheel), tapping P1's +0x293 — the hook reads the ATTACKER's id from A0, so P2's hits must mark P1 alike.
+
+**EXPECTS:** the committed rigs equal a regeneration; native knocks the victim down on every event (+0x117 = 1 at every press) and starts the pursuit on at least one target event (VOID otherwise, never a pass); hooked build: every row equal to native; unhooked build: the gap on every target event, the control equal; the mark's byte writes in play are, in order, 0 0 0 0 1 1 1 1 on a hooked build (record 4 clears, record 21 marks) and none on an unhooked one, with Pyron on either side; every control fails.
 
 ### `audit_pyron_capture_block.sh` — audit, emulator
 
