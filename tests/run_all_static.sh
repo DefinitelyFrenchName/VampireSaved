@@ -327,6 +327,9 @@ run_tier() {  # run_tier <label> <names>
         # the 4th argument is the gate SCRIPT: the classifier reads its
         # MUST-FIRE declarations against the log (14z-147)
         vs_classify "$_st" "$WORK/$g.out" 58 "tests/$g.sh"
+        # the GATE's own verdict and control counts, taken before exec_controls runs its controls as modes —
+        # each mode is classified through the same variables (14z-188: read after them, 94 PASS rows read FAIL)
+        _gv="$VS_VERDICT"; _gdecl="${VS_CTL_DECLARED:-0}"; _gfired="${VS_CTL_FIRED:-0}"
         case "${VS_CTL_VERDICT:-}" in
         OK|RED)     c_decl=$((c_decl + VS_CTL_DECLARED)); c_fired=$((c_fired + VS_CTL_FIRED)) ;;
         NONE)       c_none=$((c_none + 1)) ;;
@@ -370,10 +373,10 @@ run_tier() {  # run_tier <label> <names>
         # the results row (14z-188, #188): the verdict as the tally counts it — a control that is not HONOURED makes it FAIL
         _hon=$(awk -F'\t' -v g="$g" '$1 == g && $3 == "HONOURED"' "$WORK/controls.tsv" | wc -l | tr -d ' ')
         _bad=$(awk -F'\t' -v g="$g" '$1 == g && $3 != "HONOURED"' "$WORK/controls.tsv" | wc -l | tr -d ' ')
-        _rv="$VS_VERDICT"
+        _rv="$_gv"
         case "$_rv" in PASS|SKIP|TIMEOUT) ;; *) _rv=FAIL ;; esac
         if [ "$_bad" != 0 ]; then _rv=FAIL; fi
-        record_row "$g" "$_rv" "$_dur" "${VS_CTL_DECLARED:-0}" "${VS_CTL_FIRED:-0}" "$_hon"
+        record_row "$g" "$_rv" "$_dur" "$_gdecl" "$_gfired" "$_hon"
     done
 }
 

@@ -277,6 +277,16 @@ Yes, Donovan's deity states should be in scope. However, if they would rely on t
 
 ---
 
+## Ruled 2026-10-02 (14z-188) — #196: the immortal gate restores the caller's MAME_BIN — measured first, then landed
+
+**The proposal (the session's, on #196):** the helpers of `tests/test_don_immortal_native.sh` restore the caller's `MAME_BIN` instead of unsetting it, after a measurement of the gate under the restored binary.
+
+**The maintainer, verbatim:** *"As for ERIS and #196, I agree with you proposal for a fix but indeed it needs measurement first"*
+
+**What it means.** Measured on both hosts under the runner's `MAME_BIN` (the WIDE build), the gate as it was against the fixed copy: ERIS (PATH's `mame` = the pinned source build) and the Mac (PATH's `mame` = Homebrew 0.288) — 41 fallbacks against 0, both exit 0, every printed line identical (timings stripped). Landed. #196's wrapper default for BY-HAND runs remains the ticket's open question.
+
+---
+
 ## Ruled 2026-09-30 (14z-186) — two tickets found under #184: Donovan's 2HK damage (#191) and Change Immortal's one-frame timing
 
 **The question, verbatim:** *"Should the 2HK damage and the Change Immortal timing become tickets? I'd put each through the rule-checker before filing."*

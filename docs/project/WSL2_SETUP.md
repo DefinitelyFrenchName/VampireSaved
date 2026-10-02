@@ -407,6 +407,33 @@ over native Windows. Sections 3 through 7 are the entire Linux setup, minus
 the WSL-specific parts (sections 0-2) and the `/mnt/c` caveat. Run the same
 acceptance test there.
 
+**Done 2026-10-02 (14z-188) on PILOT** — a Proxmox VM on a Ryzen 7 5700G (6 vCPUs, CPU
+type `host`, 40 GiB fixed), Ubuntu 24.04.5, worked over SSH from the Mac (`ssh pilot`).
+Section 3's packages plus `python3-pil python3-capstone strace zip unzip patchelf
+golang-go xmlstarlet verilator imagemagick` (the MiSTer lane's tools and the #188 strace
+work); the four emulator builds took 8.6, 7.8 and 2 minutes and seconds;
+`test_mame_parity` (441 s at `PARITY_JOBS=5`), `test_input_integrity`,
+`test_mame_wide` (1,922 s) and `test_wide_profile` all PASS. 24.04 is kept on purpose
+(glibc 2.39, the floor for published Linux binaries).
+
+**One trap, paid there: build directories copied from another host carry its
+ABSOLUTE symlinks.** The ROM overlays (`build/wide0/rompath`,
+`build/wide_canary/rompath`) link to the Mac's `/Users/.../ROMS/*.zip`; on the new host
+those links dangle, FBNeo finds no `vm3.*` parent member and still says `(OK)` for the
+rest, and the WIDE set renders BLACK while its RAM matches — `test_wide_profile`'s
+inertness section failed on all 12 replays. A sha1 check over `find -type f` cannot
+see it (symlinks are not files). After any copy:
+
+```bash
+cd ~/vampire-saved/build && find . -type l -lname '/Users/*'      # links into another host
+for l in $(find . -type l -lname '/Users/*'); do ln -sfn "$HOME/roms/$(basename "$(readlink "$l")")" "$l"; done
+find . -xtype l                                                    # nothing may dangle
+```
+
+The merged build's extracts are not copied: on a fresh clone
+`ROMDIR=~/roms tools/ensure_merged_inputs.sh` completes them (78 region files, byte-identical
+to the Mac's on PILOT).
+
 ## 10. BUILD THE RELEASE BINARIES FOR THIS OS — one command per emulator
 
 Written 14z-150, and **untested on any Linux or Windows host**: the tools

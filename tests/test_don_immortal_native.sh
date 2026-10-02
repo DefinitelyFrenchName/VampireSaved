@@ -163,22 +163,24 @@ EOP
 }
 run() {   # run <name> <set> <rompath> <rpl file> <pokes> [mame_bin]
     mkdir -p "$WORK/$1"
+    _mb_had="${MAME_BIN+x}"; _mb_val="${MAME_BIN-}"   # #196 (14z-188): restore the caller's MAME_BIN, never unset it — measured identical on ERIS and the Mac
     [ -n "${6:-}" ] && { MAME_BIN="$6"; export MAME_BIN; }
     DUMPS="$DSPEC" POKES="$5" REPLAY="$4" CHECKSUM_OUT="$WORK/$1/c.log" \
         MAME_SANDBOX="$WORK/$1/sb" MAME_ROMPATH="$3" tools/run_mame.sh "$2" \
         -autoboot_script "$REPO/tests/lua/replay.lua" > "$WORK/$1/mame.log" 2>&1 || true   # a teardown segfault (MFI-12): the dumps decide
-    unset MAME_BIN
+    if [ -n "$_mb_had" ]; then MAME_BIN="$_mb_val"; export MAME_BIN; else unset MAME_BIN; fi
     rm -rf "$WORK/$1/sb"
     [ "$(ls "$WORK/$1"/dump_*_ff8800.bin 2>/dev/null | wc -l)" -ge 150 ] \
         || { echo "FAIL: leg $1 produced no dumps (see $WORK/$1/mame.log)"; exit 1; }
 }
 tapleg() {   # tapleg <name> <set> <rompath> <rpl file> <pokes> [mame_bin] — the attacker's freeze writes, frames 2655..2668
     mkdir -p "$WORK/$1"
+    _mb_had="${MAME_BIN+x}"; _mb_val="${MAME_BIN-}"   # #196 (14z-188): restore the caller's MAME_BIN, never unset it — measured identical on ERIS and the Mac
     [ -n "${6:-}" ] && { MAME_BIN="$6"; export MAME_BIN; }
     POKES="$5" REPLAY="$4" TAP=ff845c,2 WINDOW=2655,2668 FRAMES=2668 TRACE_OUT="$WORK/$1/tap.log" \
         MAME_SANDBOX="$WORK/$1/sb" MAME_ROMPATH="$3" tools/run_mame.sh "$2" \
         -autoboot_script "$REPO/tests/lua/tap_writes.lua" > "$WORK/$1/mame.log" 2>&1 || true   # a teardown segfault (MFI-12): the END line decides
-    unset MAME_BIN
+    if [ -n "$_mb_had" ]; then MAME_BIN="$_mb_val"; export MAME_BIN; else unset MAME_BIN; fi
     rm -rf "$WORK/$1/sb"
     grep -q '^END 2668 ' "$WORK/$1/tap.log" 2>/dev/null \
         || { echo "FAIL: tap leg $1 did not reach frame 2668 (see $WORK/$1/mame.log)"; exit 1; }

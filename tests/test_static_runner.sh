@@ -559,18 +559,25 @@ vs_ctl_is prediction-off && cp "$T/static_confirm_off.py" "$FC/tools/static_conf
 printf '#!/bin/sh\ncat data/a.txt > /dev/null\necho "PASS: a"\n' > "$FC/tests/g_a.sh"
 printf '#!/bin/sh\necho "PASS: b"\n' > "$FC/tests/g_b.sh"
 printf '#!/bin/sh\nif grep -q good data/c.txt; then echo "PASS: c"; else echo "FAIL: c"; exit 1; fi\n' > "$FC/tests/g_c.sh"
+{ echo "#!/bin/sh"; echo "# g_d.sh — a stub with a declared control (the row-writer must record the GATE's verdict, not its control's)"
+  echo "# MUST-FIRE: perturbed-copy: flip — a flipped byte must fail"
+  echo 'if [ "${CONTROL:-}" = flip ]; then echo "FAIL: the flipped input was caught"; exit 1; fi'
+  echo "echo 'PASS: d'"; echo "echo 'CONTROL FIRED: flip — caught'"; echo "exit 0"; } > "$FC/tests/g_d.sh"
 chmod +x "$FC/tests/"g_*.sh
-printf 'g_a\ng_b\ng_c\n' > "$FC/tests/ci_portable.txt"; : > "$FC/tests/ci_static.txt"
+printf 'g_a\ng_b\ng_c\ng_d\n' > "$FC/tests/ci_portable.txt"; : > "$FC/tests/ci_static.txt"
 echo one > "$FC/data/a.txt"; echo bad > "$FC/data/c.txt"
 (cd "$FC" && git init -q && git add -A && git -c user.name=t -c user.email=t@t commit -qm base)
 r1="$(cd "$FC" && STATIC_RESULTS_OUT="$T/r1.tsv" sh tests/run_all_static.sh --tier portable 2>&1)" || true
+grep -q "^g_d	PASS	[0-9]*	1	1	1$" "$T/r1.tsv" && echo "  ok: a gate whose control ran as a mode is recorded by ITS verdict: g_d PASS, declared 1, fired 1, honoured 1" \
+    || fail "g_d's row (its control's FAIL must not overwrite its PASS): $(grep '^g_d' "$T/r1.tsv" 2>/dev/null)"
 grep -q "^g_c	FAIL" "$T/r1.tsv" && grep -q "^g_a	PASS" "$T/r1.tsv" && echo "  ok: the first run records g_c FAIL and g_a PASS in its results.tsv" \
     || fail "the first run's results.tsv: $(grep -v '^#' "$T/r1.tsv" 2>/dev/null | tr '\n' ' ')"
 echo good > "$FC/data/c.txt"; sleep 1
 r2="$(cd "$FC" && STATIC_RESULTS_OUT="$T/r2.tsv" sh tests/run_all_static.sh --tier portable --confirm "$T/r1.tsv" 2>&1)" && s2c=0 || s2c=$?
 if [ "$s2c" = 0 ] && printf '%s' "$r2" | grep -qE "^  g_a +PASS  carried" && printf '%s' "$r2" | grep -qE "^  g_b +PASS  carried" \
-        && printf '%s' "$r2" | grep -qE "^  g_c +PASS +[0-9]+s" && printf '%s' "$r2" | grep -q "carried: 2 of the PASS"; then
-    echo "  ok: confirming the red re-runs g_c (now PASS) and carries g_a and g_b — GREEN, 'carried: 2'"
+        && printf '%s' "$r2" | grep -qE "^  g_c +PASS +[0-9]+s" && printf '%s' "$r2" | grep -qE "^  g_d +PASS  carried" \
+        && printf '%s' "$r2" | grep -q "carried: 3 of the PASS"; then
+    echo "  ok: confirming the red re-runs g_c (now PASS) and carries g_a, g_b and g_d — GREEN, 'carried: 3'"
 else fail "the confirm run (exit $s2c): $(printf '%s' "$r2" | grep -E '^  g_|^carried|^  re-run' | tr '\n' '|')"; fi
 echo two > "$FC/data/a.txt"; sleep 1
 r3="$(cd "$FC" && STATIC_RESULTS_OUT="$T/r3.tsv" sh tests/run_all_static.sh --tier portable --confirm "$T/r2.tsv" 2>&1)" && s3c=0 || s3c=$?

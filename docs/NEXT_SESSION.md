@@ -25,12 +25,11 @@ recorder's gloss (rule-checker run 2026-10-02-561 Q5). When no ruling covers it,
    both files in the freeze commit. The solo tracks were not built with #195.
 2. **#188 IS WIRED; USE IT.** After a red static tier, fix, then run `tests/run_all_static.sh --strict
    --confirm <results.tsv>`, where the red run's `results.tsv` is named on its last lines. It re-runs the
-   failed, absent and STALE gates and CARRIES the rest. Measure what it saves at the next close. #188 stays
+   failed, absent and STALE gates and CARRIES the rest. Its first use (this close) saved nothing because of a row-writer bug, since fixed — measure what it saves at the next close. #188 stays
    open until then.
-3. **#196 — MEASURED; A RULING IS NEXT.** Inside a tier only `test_don_immortal_native` falls back to `mame` on
-   PATH (41 runs; its helpers `unset MAME_BIN` after a pinned leg). Every other gate is pinned by the runner's
-   export, so the wrapper default matters only for by-hand runs. The likely fix (restore the caller's value) is
-   on the issue for the maintainer, with the measurement of the gate under the restored binary first.
+3. **#196 — THE BY-HAND DEFAULT IS WHAT REMAINS.** Inside a tier no gate falls back to `mame` on PATH any more
+   (the immortal gate's helpers now restore the caller's value; STATE 14z-188 row 10). The wrapper default matters
+   for by-hand runs only: put whether to still change it, or close #196, to the maintainer.
 4. **#133 IS MEASURED ON A GREEN TIER** (STATE 14z-188 row 10: mame lane 7.13× at `--jobs 12`, bounded by
    `audit_guard_corpus`). Put the close or a follow-up to the maintainer.
 5. **#202** (the keep-tenant thunk's possible 1P repeat): no rig yet; a 1P arcade run as a tenant past a tenant
