@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-456 entries (47 game / 123 platform / 286 project), counted from the buckets at generation.
+457 entries (47 game / 123 platform / 287 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 47 entries
 
@@ -198,7 +198,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A `read_tap.lua` WRITE LABELLED N IS REPLAY.LUA'S FRAME N+1 — the tap names a write by the counter BEFORE that frame's `frame_done`; `field_trace.lua` and `replay.lua` increment first, then sample (measured 2026-09-27, 14z-184)
 - IN A MAME LUA TAP, `cpu.state["SP"]` IS THE SUPERVISOR STACK — THIS GAME RUNS IN USER MODE, SO A CALLER'S RETURN ADDRESS SITS AT `USP` — A REPEAT of the entry "MAME 0.288'S 68000 CORE HAS NO `A7` STATE" above (paid: 2026-09-28, 14z-185, #176; that 14z-158 entry already held the rule — what went wrong is that the archaeology grep, [VSP-14], was not run before writing the tap)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 286 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 287 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -486,3 +486,4 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - `--stale` RE-RUNS ONLY GATES THAT PASSED — a freeze that re-freezes a FAILED gate's expectation re-runs that gate itself (paid: 14z-185, the M21 freeze)
 - A ONE-GATE TEST RUN BECOMES THE RUN OF RECORD — `test_emulator_staleness` judges the NEWEST run under build/ (paid: 14z-185b, #189's wiring test)
 - A COST READER THAT KNOWS ONE RUNNER COUNTS ZERO — check a reader's figure against a close you can count by hand before trusting it (paid: 14z-187b, #187)
+- A RULED FORM IS BUILT AS RULED — a "better" variant found while building goes back to the maintainer first (paid: 14z-188, #195)

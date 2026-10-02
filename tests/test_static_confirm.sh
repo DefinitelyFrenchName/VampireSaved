@@ -1,6 +1,6 @@
 #!/bin/sh
 # test_static_confirm.sh — the static tier's carry-forward predictor marks a gate STALE by every rule
-# it states (`tools/static_confirm.py`, 14z-185b, GitHub #188 route A — PROVISIONAL).
+# it states (`tools/static_confirm.py`, 14z-185b, GitHub #188 route A — wired 14z-188).
 #
 # WHAT: tools/static_confirm.py's predictions mean what they say: a changed path makes a gate STALE
 #   when it is a program in the gate's reach (R1), is named by basename on a code line of the reach
@@ -17,8 +17,8 @@
 #   backtest (tests/expected/static_confirm_backtest.tsv, `static_confirm.py backtest`) takes
 #   minutes of worktrees and is run by hand, not here.
 #
-# PROVISIONAL (maintainer-ruled 2026-09-29, "History for now, traced on WSL2 later"): the predictor
-# is not wired into tests/run_all_static.sh. This gate locks its rules; it does not claim they are
+# WIRED 14z-188 (*"Build the wiring"*, after the strace test read 0 misses): tests/run_all_static.sh --confirm
+# runs its `plan` (the confirm mode's own test is tests/test_static_runner.sh sections 18-19). This gate locks its rules; it does not claim they are
 # enough — only a Linux run of the tier under strace, every gate's ACTUAL reads, can show that.
 #
 # MUST-FIRE: perturbed-copy: no-dir-rule — a copy with R3 (directory readers) removed must carry the gate that globs docs/game, and the selftest must FAIL (mode: that copy's selftest)
@@ -59,7 +59,7 @@ PY
     echo "$W/$1/tools/static_confirm.py"
 }
 
-echo "== test_static_confirm: #188 route A — the carry-forward predictor (PROVISIONAL) =="
+echo "== test_static_confirm: #188 route A — the carry-forward predictor =="
 fail=0
 SC=tools/static_confirm.py
 [ -n "${VS_CTL:-}" ] && SC="$(make_copy "$VS_CTL")"
@@ -75,5 +75,5 @@ if [ -z "${VS_CTL:-}" ]; then
     done
 fi
 
-if [ "$fail" = 0 ]; then echo "PASS: the predictor marks STALE by each of its seven rules and carries the rest (provisional: not wired)"
+if [ "$fail" = 0 ]; then echo "PASS: the predictor marks STALE by each of its seven rules and carries the rest"
 else echo "FAIL: test_static_confirm"; exit 1; fi

@@ -50,6 +50,15 @@
 #   ... --tier portable|static              one tier only
 #   ... --exec-controls all|portable|none  which tier's declared must-fire
 #                                          controls are EXECUTED (default all)
+#   ... --confirm RESULTS                  CONFIRM a red (14z-188, GitHub #188 route A, ruled
+#                                          "Build the wiring"): re-run only the gates that were
+#                                          not PASS in RESULTS (a previous run's results.tsv),
+#                                          are absent from it, or are STALE by
+#                                          tools/static_confirm.py since that run; every other
+#                                          gate is CARRIED — counted PASS, named, not re-run,
+#                                          its recorded control counts carried with it. Every run
+#                                          writes results.tsv into its run record (or to
+#                                          $STATIC_RESULTS_OUT), so any run can be confirmed.
 #   ... --cadence session|freeze|release   which CADENCE runs (default session):
 #                                          a gate listed in tests/ci_cadence.tsv
 #                                          above the requested cadence is
@@ -105,7 +114,7 @@ cd "$REPO"
 . "$REPO/tests/lib/classify.sh"
 
 _ORIG_ARGS="$*"   # the command line as given, for the run record (#189) — the loop below shifts it away
-STRICT=0; TIER=all; LIST=0; EXEC_CTL=all; CADENCE=session
+STRICT=0; TIER=all; LIST=0; EXEC_CTL=all; CADENCE=session; CONFIRM=""
 while [ $# -gt 0 ]; do
     case "$1" in
     --strict) STRICT=1 ;;
@@ -113,6 +122,7 @@ while [ $# -gt 0 ]; do
     --tier)   shift; TIER="${1:?--tier needs portable|static|all}" ;;
     --exec-controls) shift; EXEC_CTL="${1:?--exec-controls needs all|portable|none}" ;;
     --cadence) shift; CADENCE="${1:?--cadence needs session|freeze|release}" ;;
+    --confirm) shift; CONFIRM="${1:?--confirm needs the results.tsv of a previous run}" ;;
     -h|--help) sed -n '2,40p' "$0"; exit 0 ;;
     *) echo "unknown argument '$1' (try --help)" >&2; exit 2 ;;
     esac
@@ -237,6 +247,30 @@ if [ -f tools/run_record.py ] && git rev-parse --git-dir >/dev/null 2>&1; then
         || { echo "run record: the START record FAILED — see $RUNREC/start.log"; RUNREC=""; }
 fi
 trap 'rm -rf "$WORK"; [ -z "$RUNREC" ] || python3 tools/run_record.py write "$RUNREC/run_record_end.json" --phase end --start "$RUNREC/run_record_start.json" -- tests/run_all_static.sh $_ORIG_ARGS > "$RUNREC/end.log" 2>&1 || echo "run record: the END record FAILED — see $RUNREC/end.log"' EXIT INT TERM
+# THE RESULTS FILE (14z-188, #188): one row per gate this run judged, what --confirm reads back.
+RESULTS_OUT="${STATIC_RESULTS_OUT:-}"
+[ -z "$RESULTS_OUT" ] && [ -n "$RUNREC" ] && RESULTS_OUT="$RUNREC/results.tsv"
+if [ -n "$RESULTS_OUT" ]; then
+    mkdir -p "$(dirname "$RESULTS_OUT")"
+    { echo "# static results (tests/run_all_static.sh; read by tests/run_all_static.sh --confirm)"
+      echo "# head $(git rev-parse HEAD 2>/dev/null || echo none)"
+      echo "# utc $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+      echo "# args $_ORIG_ARGS"
+      git status --porcelain 2>/dev/null | grep -v '^??' | awk '{print "# dirty " $NF}' || true
+      printf '# gate\tverdict\tseconds\tdeclared\tfired\thonoured\n'
+    } > "$RESULTS_OUT"
+fi
+record_row() {  # record_row <gate> <verdict> <seconds> <declared> <fired> <honoured>
+    [ -z "$RESULTS_OUT" ] || printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$@" >> "$RESULTS_OUT"
+}
+n_carry=0
+if [ -n "$CONFIRM" ]; then
+    [ -f "$CONFIRM" ] || { echo "--confirm: no such results file '$CONFIRM'" >&2; exit 2; }
+    python3 tools/static_confirm.py plan --root . --results "$CONFIRM" > "$WORK/plan.tsv" 2> "$WORK/plan.err" || {
+        echo "--confirm: the plan FAILED — nothing is carried on a failed plan:" >&2; cat "$WORK/plan.err" >&2; exit 2; }
+    echo "== confirm: $(awk -F'\t' '$1 == "RERUN"' "$WORK/plan.tsv" | wc -l | tr -d ' ') gate(s) to re-run, $(awk -F'\t' '$1 == "CARRY"' "$WORK/plan.tsv" | wc -l | tr -d ' ') to carry, from $CONFIRM =="
+    awk -F'\t' '$1 == "RERUN" {printf "  re-run %-34s %s\n", $2, $3}' "$WORK/plan.tsv"
+fi
 n_pass=0; n_skip=0; n_fail=0; n_miss=0
 failed=""; skipped=""
 # the controls ledger: declared / fired over the tier, the undeclared count,
@@ -264,6 +298,17 @@ run_tier() {  # run_tier <label> <names>
     [ -n "$_names" ] || return 0
     echo "== $_label tier =="
     for g in $_names; do
+        if [ -n "$CONFIRM" ]; then   # CONFIRM-CARRY
+            _carry="$(awk -F'\t' -v g="$g" '$1 == "CARRY" && $2 == g {print $3 " " $4 " " $5}' "$WORK/plan.tsv")"
+            if [ -n "$_carry" ]; then
+                set -- $_carry
+                printf '  %-34s PASS  carried (PASS in the confirmed run, predicted unaffected)\n' "$g"
+                n_pass=$((n_pass + 1)); n_carry=$((n_carry + 1))
+                c_decl=$((c_decl + $1)); c_fired=$((c_fired + $2)); x_ok=$((x_ok + $3))
+                record_row "$g" PASS 0 "$1" "$2" "$3"
+                continue
+            fi
+        fi
         if [ ! -x "tests/$g.sh" ]; then
             printf '  %-34s %s\n' "$g" "MISSING (registered but not executable)"
             n_miss=$((n_miss + 1)); failed="$failed $g(missing)"
@@ -322,6 +367,13 @@ run_tier() {  # run_tier <label> <names>
             # runner is set -e — a false test here would end the tier
             if [ "${VS_CTL_DECLARED:-0}" != 0 ]; then exec_controls "$g" "$_label"; fi ;;
         esac
+        # the results row (14z-188, #188): the verdict as the tally counts it — a control that is not HONOURED makes it FAIL
+        _hon=$(awk -F'\t' -v g="$g" '$1 == g && $3 == "HONOURED"' "$WORK/controls.tsv" | wc -l | tr -d ' ')
+        _bad=$(awk -F'\t' -v g="$g" '$1 == g && $3 != "HONOURED"' "$WORK/controls.tsv" | wc -l | tr -d ' ')
+        _rv="$VS_VERDICT"
+        case "$_rv" in PASS|SKIP|TIMEOUT) ;; *) _rv=FAIL ;; esac
+        if [ "$_bad" != 0 ]; then _rv=FAIL; fi
+        record_row "$g" "$_rv" "$_dur" "${VS_CTL_DECLARED:-0}" "${VS_CTL_FIRED:-0}" "$_hon"
     done
 }
 
@@ -600,6 +652,8 @@ echo "======================================================================"
 printf 'PASS %-4s  SKIP %-4s  FAIL %-4s  MISSING %s\n' \
     "$n_pass" "$n_skip" "$n_fail" "$n_miss"
 [ "$n_defer" != 0 ] && echo "deferred: $n_defer (cadence $CADENCE — named above, not run)"
+[ "$n_carry" != 0 ] && echo "carried: $n_carry of the PASS (not re-run: PASS in $CONFIRM and predicted unaffected — tools/static_confirm.py plan)"
+[ -n "$RESULTS_OUT" ] && echo "results: $RESULTS_OUT (confirm a red with --confirm $RESULTS_OUT)"
 [ -n "$skipped" ] && echo "skipped:$skipped"
 [ -n "$failed" ]  && echo "failed: $failed"
 # THE CAVEAT BELONGS IN THE SUMMARY, not only in a section above it (14z-144).

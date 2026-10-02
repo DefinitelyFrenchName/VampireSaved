@@ -3218,11 +3218,11 @@ the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guar
 
 ### `test_static_runner.sh` — test, ci_portable
 
-**WHAT:** tests/run_all_static.sh's verdicts mean what they say: PASS / SKIP / FAIL counted apart with SKIP in PROSE still PASS, an exit-0 shell crash FAIL, the anti-orphan registry check both ways, --strict, the controls readout, and the cadence triggers (a freeze-cadence gate runs when a path it follows changed), and a gate marked `# ORDER: last` runs after every other gate of its tier (14z-185b, #188).
+**WHAT:** tests/run_all_static.sh's verdicts mean what they say: PASS / SKIP / FAIL counted apart with SKIP in PROSE still PASS, an exit-0 shell crash FAIL, the anti-orphan registry check both ways, --strict, the controls readout, and the cadence triggers (a freeze-cadence gate runs when a path it follows changed), and a gate marked `# ORDER: last` runs after every other gate of its tier (14z-185b, #188); and --confirm re-runs a red, the reader of a changed input and nothing else, CARRYING the rest (14z-188, #188 route A wired).
 
 **HOW:** a synthetic repo of stub gates with known verdicts run through the REAL runner via its registry files (never a copy of its logic); two shadow-tool controls unplug the controls reader and blind the cadence trigger match.
 
-**EXPECTS:** every case reads its designed verdict; the unplugged reader lets a dead control pass and fails section 11, the blind trigger leaves a triggered gate deferred and fails section 14.
+**EXPECTS:** every case reads its designed verdict; the unplugged reader lets a dead control pass and fails section 11, the blind trigger leaves a triggered gate deferred and fails section 14, and a planner with its prediction off carries a changed input's reader and fails section 18.
 
 ## mister
 

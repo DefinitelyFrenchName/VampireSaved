@@ -39,6 +39,8 @@
 # MUST-FIRE: perturbed-copy: inert-as-same — the lsword rig compared with --expect same must fail on the flag, so "inert" is a comparison that sees the flag differ, not a blind one (in-gate: lsword; mode: lsword judged --expect same and the gate FAILs)
 # MUST-FIRE: perturbed-copy: record4-marked — the mark check run on a copy of the tap log with every clearing write (record 4's) turned into a mark and one stray mark added must fail, so "record 4 stays unmarked" (hooked) and "no mark is written" (unhooked) are things the check can refuse (in-gate: on the real tap log; mode: the copy checked and the gate FAILs)
 #
+# THE PINS ARE RANGES (`F1-F2:addr:hex`, #201): a per-frame list over these rigs' lengths passes 128 KiB, and Linux
+#   refuses one environment string over that (the lsword and pyron_4 legs went VOID on ERIS, 14z-188).
 # NOT COVERED: the pins (level 6 from 2000, RNG 0000 from 2363 — the ruled equalised input); the pursuit itself with the
 #   tenant on P2 (the P2 side is held at the mark, not at +0x117 and the pursuit); the three rigs' moves only (the
 #   LP/MP/HP Lightning Swords, other distances and unpinned play are not measured for #200); FBNeo; the solo tracks.
@@ -102,7 +104,7 @@ cursor() {  # cursor <rpl> <path> — the merged wheel's real cursor path in pla
 leg() {  # leg <rig> <native|ours>
     r=$1; side=$2; J="$RIGS/$r.json"
     fr="$(python3 -c "import json;print(json.load(open('$J'))['frames'])")"
-    pk="$(python3 -c "import json;print(';'.join(json.load(open('$J'))['pokes']))");$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$fr)) + ';' + ';'.join(f'{f}:ff80d4:0000' for f in range(2363,$fr)))")"
+    pk="$(python3 -c "import json;print(';'.join(json.load(open('$J'))['pokes']))");2000-$((fr - 1)):ff8116:06;2363-$((fr - 1)):ff80d4:0000"
     if [ "$side" = native ]; then s=vsav2; rp="$ROMDIR"; R="$REPO/$RIGS/$r.rpl"
     else
         s=vsavjw; rp="$BUILD/rompath;$ROMDIR"; R="$W/$r.ours.rpl"
@@ -120,7 +122,7 @@ tapleg() {  # tapleg <p1|p2> — the mark tap over pyron_4 on ours, Pyron on tha
     fr="$(python3 -c "import json;print(json.load(open('$J'))['frames'])")"
     if [ "$1" = p1 ]; then
         cursor tests/replays/naming/pyron_4.rpl "D D D D" > "$R"; tap=ff8a92
-        pk="$(python3 -c "import json;print(';'.join(json.load(open('$J'))['pokes']))");$(python3 -c "print(';'.join(f'{f}:ff8116:06' for f in range(2000,$fr)) + ';' + ';'.join(f'{f}:ff80d4:0000' for f in range(2363,$fr)))")"
+        pk="$(python3 -c "import json;print(';'.join(json.load(open('$J'))['pokes']))");2000-$((fr - 1)):ff8116:06;2363-$((fr - 1)):ff80d4:0000"
     else
         python3 tools/select_wheel.py "$BUILD/verify_data.bin" --set vsavj --json "$W/wheel.json" > "$W/wheel.log" 2>&1
         python3 tools/select_paths.py "$W/wheel.json" --rpl-prologue 0x01 0x11 > "$W/p2_prologue.txt"

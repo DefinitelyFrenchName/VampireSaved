@@ -25,6 +25,9 @@
 #   keeping that forced 0x13 against the ladder's pick — P1 then plays as Donovan. Every invariant below
 #   still holds as measured; read "voice class" as "the CPU side's character id", and "the fired id is a
 #   lottery" as the ladder's draw. The thunk's effect on a real 1P ladder: GitHub #202.
+#   AND A BLIND ASSERTION (rule-checker run 2026-10-02-558): own-class's "no borrow write" checks the writer PC against
+#   0x0AEF6/0x0AEFA, but on a build carrying the thunk the store executes INSIDE the thunk, so that assertion cannot
+#   fail; the value check (every window read of $FF8782 is 0x13) is what carries own-class.
 #
 # Freezes the sword-plant "ding" mechanism as its STABLE invariants. The
 # fired id itself is a LOTTERY (the borrow scan consults the sound-state

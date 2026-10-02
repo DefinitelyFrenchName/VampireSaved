@@ -187,7 +187,7 @@ def p2rig(src_rpl, src_json, prologue, out_rpl, out_pokes):
             ai -= 0x400
         return f"{f}:{ai:06x}:{v}"
     pokes = [swap(pk) for pk in J["pokes"]]
-    pokes += [f"{f}:ff80d4:0000" for f in range(2363, J["frames"])] + [f"{f}:ff8116:06" for f in range(2000, J["frames"])]
+    pokes += [f"2363-{J['frames'] - 1}:ff80d4:0000", f"2000-{J['frames'] - 1}:ff8116:06"]   # ranges (#201): a per-frame list passes Linux's 128 KiB env cap
     open(out_pokes, "w").write(";".join(pokes))
 
 

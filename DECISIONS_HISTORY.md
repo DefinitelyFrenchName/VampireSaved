@@ -247,6 +247,16 @@ Yes, Donovan's deity states should be in scope. However, if they would rely on t
 
 ---
 
+## Ruled 2026-10-02 (14z-188) — #188: "Build the wiring" (route A wired into the static runner); the session continues
+
+**The question, verbatim:** *"#188: you asked for route A to be 'traced on WSL2 later'. It now is. On a fresh strace of all 195 static gates at 4e1859d9, the predictor misses 0 of 36,722 reads. The same run with the old predictor misses 271 in 8 gates, so the analysis can see misses. Its gate list equals the static runner's. Limits: 11 gates exited non-zero under strace, reads are counted by path only, and ignored files are not counted. Do you want route A wired into the static runner? That means after a red, re-run only the failed gates and the gates the predictor marks stale; the rest carry over."* — asked with no recommendation, after rule-checker run 2026-10-02-561 found that the "ruled condition" a draft recommendation leaned on was the recorder's gloss of the 2026-09-29 ruling, not the maintainer's words.
+
+**The maintainer:** *"Build the wiring"*; and to *"The queue is through, except #133 ... and #196 ... Close the session now?"*: *"Continue first"*.
+
+**What it means.** `tests/run_all_static.sh --confirm <results.tsv>` (every run writes one): failed, absent and STALE gates re-run, the rest CARRIED with their recorded control counts; `tools/static_confirm.py plan` decides; `tests/test_static_runner.sh` sections 18-19 test it with the control `prediction-off`.
+
+---
+
 ## Ruled 2026-09-30 (14z-186) — two tickets found under #184: Donovan's 2HK damage (#191) and Change Immortal's one-frame timing
 
 **The question, verbatim:** *"Should the 2HK damage and the Change Immortal timing become tickets? I'd put each through the rule-checker before filing."*

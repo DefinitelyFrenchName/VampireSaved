@@ -2,9 +2,12 @@
 """static_confirm.py — WHICH STATIC-TIER GATES MUST RE-RUN AFTER A CHANGE? (14z-185b, GitHub #188,
 route A, maintainer-ruled 2026-09-29: "A, backtested"; then "History for now, traced on WSL2 later").
 
-PROVISIONAL. Not wired into tests/run_all_static.sh: route A is trusted only after the traced test
-(every gate's ACTUAL reads under strace on Linux) finds no read this predictor misses. Until then
-it is a measurement, and its backtest over the recorded reds is what it has.
+WIRED 14z-188 (the maintainer, shown the traced test: *"Build the wiring"*): `tests/run_all_static.sh --confirm
+<results.tsv>` runs `plan` below. The traced test (every static gate's ACTUAL reads under strace on Linux, ERIS):
+at `4e1859d9`, 195/195 gates, 36,722 reads, 0 misses; the predictor as of `d1f9c6e8` on the same traces, 271 misses
+in eight gates and two TIMEOUTs (the control that the analysis can see a miss); its gate list equals the runner's.
+Its limits stand: reads by path only, relative paths resolved at the root only, ignored files not counted, and eleven
+gates exited non-zero under strace (their reads may be short of a passing run's).
 
 THE PREDICTION, over-approximate by design (a wrong STALE costs a re-run; a wrong CARRIED hides a red).
 A registered gate (tests/ci_portable.txt, tests/ci_static.txt) is STALE for a changed path c when:
@@ -38,6 +41,15 @@ Usage:
       EVENTS: `gate<TAB>base<TAB>head<TAB>extra changed paths (space-separated, or -)<TAB>note`,
       one recorded red per row. Each head is checked out in a temporary worktree; the red gate must
       be STALE. Exit 1 on any miss.
+  python3 tools/static_confirm.py plan --root DIR --results FILE
+      WIRED into tests/run_all_static.sh --confirm FILE (14z-188, ruled "Build the wiring"): FILE is a previous
+      run's results.tsv (written by the runner on every run: `# head <sha>`, `# utc <start>`, `# dirty <path>`
+      lines, then gate<TAB>verdict<TAB>seconds<TAB>declared<TAB>fired<TAB>honoured). Prints one line per
+      registered gate: `RERUN<TAB>gate<TAB>reason` — not PASS in FILE, absent from it, or STALE by the rules
+      above — or `CARRY<TAB>gate<TAB>declared<TAB>fired<TAB>honoured`. The changed set: `git diff --name-only
+      <head>` (tracked, working tree) + every path dirty at that run + every untracked, unignored file modified
+      after the run's start (an untracked file older than the run cannot have changed since). An unknown head
+      re-runs everything.
   python3 tools/static_confirm.py --selftest
       a synthetic repo of five gates, one per reader class, with known answers.
 """
@@ -334,6 +346,50 @@ def selftest():
     return 0 if ok else 1
 
 
+def plan(root, results):
+    import time, calendar
+    head, utc, dirty, rows = None, None, [], {}
+    for line in open(results, encoding="utf-8"):
+        line = line.rstrip("\n")
+        if line.startswith("# head "):
+            head = line.split()[2]
+        elif line.startswith("# utc "):
+            utc = line.split()[2]
+        elif line.startswith("# dirty "):
+            dirty.append(line[len("# dirty "):])
+        elif line and not line.startswith("#"):
+            c = line.split("\t")
+            rows[c[0]] = c
+    gates = registry(root)
+    known = head and subprocess.run(["git", "cat-file", "-e", head + "^{commit}"], cwd=root,
+                                    capture_output=True).returncode == 0
+    if not known:
+        return [("RERUN", g, f"the previous run's head {head or '(none)'} is not in this repository") for g in gates]
+    changed = set(subprocess.run(["git", "diff", "--name-only", head], cwd=root, capture_output=True, text=True,
+                                 check=True).stdout.splitlines()) | set(dirty)
+    t0 = calendar.timegm(time.strptime(utc, "%Y-%m-%dT%H:%M:%SZ")) if utc else 0
+    for f in subprocess.run(["git", "ls-files", "--others", "--exclude-standard"], cwd=root, capture_output=True,
+                            text=True).stdout.splitlines():
+        try:
+            if os.path.getmtime(os.path.join(root, f)) >= t0:
+                changed.add(f)
+        except OSError:
+            changed.add(f)
+    _, stale, _ = predict(root, sorted(changed)) if changed else (gates, {}, gates)
+    out = []
+    for g in gates:
+        r = rows.get(g)
+        if r is None:
+            out.append(("RERUN", g, "absent from the previous run"))
+        elif r[1] != "PASS":
+            out.append(("RERUN", g, f"{r[1]} in the previous run"))
+        elif g in stale:
+            out.append(("RERUN", g, "STALE: " + stale[g]))
+        else:
+            out.append(("CARRY", g, r[3] if len(r) > 3 else "0", r[4] if len(r) > 4 else "0", r[5] if len(r) > 5 else "0"))
+    return out
+
+
 def main():
     a = sys.argv[1:]
     if a[:1] == ["--selftest"]:
@@ -341,6 +397,10 @@ def main():
     def opt(k, many=False):
         v = [a[i + 1] for i, x in enumerate(a) if x == k]
         return v if many else (v[0] if v else None)
+    if a[:1] == ["plan"] and opt("--root") and opt("--results"):
+        for row in plan(os.path.abspath(opt("--root")), opt("--results")):
+            print("\t".join(row))
+        return 0
     if a[:1] == ["predict"] and opt("--root"):
         root = os.path.abspath(opt("--root"))
         changed = changed_set(root, opt("--base"), opt("--head"), opt("--changed", True))

@@ -6,17 +6,20 @@
 #   apart with SKIP in PROSE still PASS, an exit-0 shell crash FAIL, the anti-orphan
 #   registry check both ways, --strict, the controls readout, and the cadence triggers (a
 #   freeze-cadence gate runs when a path it follows changed), and a gate marked `# ORDER: last`
-#   runs after every other gate of its tier (14z-185b, #188).
+#   runs after every other gate of its tier (14z-185b, #188); and --confirm re-runs a red, the reader of
+#   a changed input and nothing else, CARRYING the rest (14z-188, #188 route A wired).
 # HOW: a synthetic repo of stub gates with known verdicts run through the REAL runner via
 #   its registry files (never a copy of its logic); two shadow-tool controls unplug the
 #   controls reader and blind the cadence trigger match.
 # EXPECTS: every case reads its designed verdict; the unplugged reader lets a dead control
 #   pass and fails section 11, the blind trigger leaves a triggered gate deferred and fails
-#   section 14.
+#   section 14, and a planner with its prediction off carries a changed input's reader and
+#   fails section 18.
 #
 # MUST-FIRE: shadow-tool: reader-unplugged — a copy of run_all_static.sh that hands the classifier no gate script must let a stub with a declared-but-unfired control read PASS (mode: that copy is the runner every section drives, and section 11 must fail)
 # MUST-FIRE: shadow-tool: trigger-blind — a copy of run_all_static.sh with its cadence TRIGGER match disabled must leave a freeze-cadence gate deferred although a path it depends on changed; section 14's triggered case must FAIL under it
 # MUST-FIRE: shadow-tool: order-ignored — a copy of run_all_static.sh whose `# ORDER: last` test is disabled must run the marked stub FIRST, and section 16 must FAIL (mode: that copy drives every section; section 17 fires it in-run; 14z-185b, #188)
+# MUST-FIRE: shadow-tool: prediction-off — a copy of tools/static_confirm.py whose plan marks nothing STALE must CARRY the stub whose input changed, and section 18 must FAIL (mode: that copy in the confirm repo)
 #
 # WHY A GATE FOR THE RUNNER. CLAUDE.md §4: "Verdict logic is itself tested. A
 # test's classification code must be validated against known ground-truth
@@ -540,6 +543,55 @@ fi
 rm -f "$FR/tests/run_all_static_orderignored.sh" "$FR/tests/g_last.sh" "$FR/tests/g_two.sh"
 
 echo
+echo "== 18. --confirm (14z-188, #188 route A): a red is re-run, a changed input re-runs its reader, the rest is CARRIED =="
+FC="$T/confirmrepo"; mkdir -p "$FC/tests/lib" "$FC/tools" "$FC/data"
+ln -s "$RUNNER" "$FC/tests/run_all_static.sh"
+for _l in classify controls measures; do ln -s "$REPO/tests/lib/$_l.sh" "$FC/tests/lib/$_l.sh"; done
+cp "$REPO/tools/static_confirm.py" "$REPO/tools/battery_reach.py" "$FC/tools/"
+cp "$FC/tools/static_confirm.py" "$T/static_confirm_off.py"
+python3 - "$T/static_confirm_off.py" <<'PYX'
+import sys; p = sys.argv[1]; s = open(p).read()
+a = "    _, stale, _ = predict(root, sorted(changed)) if changed else (gates, {}, gates)"
+assert s.count(a) == 1, "the plan's predict line moved"
+open(p, "w").write(s.replace(a, "    stale = {}  # CONTROL prediction-off"))
+PYX
+vs_ctl_is prediction-off && cp "$T/static_confirm_off.py" "$FC/tools/static_confirm.py"
+printf '#!/bin/sh\ncat data/a.txt > /dev/null\necho "PASS: a"\n' > "$FC/tests/g_a.sh"
+printf '#!/bin/sh\necho "PASS: b"\n' > "$FC/tests/g_b.sh"
+printf '#!/bin/sh\nif grep -q good data/c.txt; then echo "PASS: c"; else echo "FAIL: c"; exit 1; fi\n' > "$FC/tests/g_c.sh"
+chmod +x "$FC/tests/"g_*.sh
+printf 'g_a\ng_b\ng_c\n' > "$FC/tests/ci_portable.txt"; : > "$FC/tests/ci_static.txt"
+echo one > "$FC/data/a.txt"; echo bad > "$FC/data/c.txt"
+(cd "$FC" && git init -q && git add -A && git -c user.name=t -c user.email=t@t commit -qm base)
+r1="$(cd "$FC" && STATIC_RESULTS_OUT="$T/r1.tsv" sh tests/run_all_static.sh --tier portable 2>&1)" || true
+grep -q "^g_c	FAIL" "$T/r1.tsv" && grep -q "^g_a	PASS" "$T/r1.tsv" && echo "  ok: the first run records g_c FAIL and g_a PASS in its results.tsv" \
+    || fail "the first run's results.tsv: $(grep -v '^#' "$T/r1.tsv" 2>/dev/null | tr '\n' ' ')"
+echo good > "$FC/data/c.txt"; sleep 1
+r2="$(cd "$FC" && STATIC_RESULTS_OUT="$T/r2.tsv" sh tests/run_all_static.sh --tier portable --confirm "$T/r1.tsv" 2>&1)" && s2c=0 || s2c=$?
+if [ "$s2c" = 0 ] && printf '%s' "$r2" | grep -qE "^  g_a +PASS  carried" && printf '%s' "$r2" | grep -qE "^  g_b +PASS  carried" \
+        && printf '%s' "$r2" | grep -qE "^  g_c +PASS +[0-9]+s" && printf '%s' "$r2" | grep -q "carried: 2 of the PASS"; then
+    echo "  ok: confirming the red re-runs g_c (now PASS) and carries g_a and g_b — GREEN, 'carried: 2'"
+else fail "the confirm run (exit $s2c): $(printf '%s' "$r2" | grep -E '^  g_|^carried|^  re-run' | tr '\n' '|')"; fi
+echo two > "$FC/data/a.txt"; sleep 1
+r3="$(cd "$FC" && STATIC_RESULTS_OUT="$T/r3.tsv" sh tests/run_all_static.sh --tier portable --confirm "$T/r2.tsv" 2>&1)" && s3c=0 || s3c=$?
+if printf '%s' "$r3" | grep -qE "^  re-run g_a +STALE" && printf '%s' "$r3" | grep -qE "^  g_a +PASS +[0-9]+s" \
+        && printf '%s' "$r3" | grep -qE "^  g_b +PASS  carried"; then
+    echo "  ok: a change to data/a.txt re-runs its reader g_a (STALE), g_b stays carried"
+    S18=ok
+else fail "after data/a.txt changed (exit $s3c): $(printf '%s' "$r3" | grep -E '^  g_|^  re-run' | tr '\n' '|')"; S18=bad; fi
+r4="$(cd "$FC" && sh tests/run_all_static.sh --tier portable --confirm "$T/nope.tsv" 2>&1)" && s4c=0 || s4c=$?
+[ "$s4c" = 2 ] && echo "  ok: a missing results file refuses (exit 2) — nothing carried from nothing" || fail "--confirm on a missing file exited $s4c"
+
+echo "== 19. MUST-FIRE: with the plan's prediction off, section 18's changed input is CARRIED =="
+if ! vs_ctl_is prediction-off; then
+    cp "$T/static_confirm_off.py" "$FC/tools/static_confirm.py"
+    echo three > "$FC/data/a.txt"; sleep 1
+    r5="$(cd "$FC" && sh tests/run_all_static.sh --tier portable --confirm "$T/r3.tsv" 2>&1)" || true
+    if printf '%s' "$r5" | grep -qE "^  g_a +PASS  carried"; then
+        vs_ctl_fired prediction-off "with nothing marked STALE, g_a is carried although data/a.txt changed — section 18's check is what catches it"
+    else vs_ctl_dead prediction-off "the prediction-off copy still re-ran g_a: $(printf '%s' "$r5" | grep -E '^  g_a')"; rc=1; fi
+fi
+
 [ "$rc" = 0 ] && echo "PASS: the runner's verdicts mean what they say." \
              || echo "FAIL: see above."
 exit $rc

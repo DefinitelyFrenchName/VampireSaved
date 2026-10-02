@@ -24,14 +24,14 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | figure | count |
 |---|---|
 | distinct program-space addresses named | 3350 |
-| named by a document or manifest only | 2181 |
-| named by both a document/manifest and code | 781 |
+| named by a document or manifest only | 2180 |
+| named by both a document/manifest and code | 782 |
 | named by CODE ONLY (the gap list below) | 388 |
 | carried by atlas | 604 |
 | carried by engine_internals | 743 |
 | carried by other docs | 1034 |
 | carried by manifests | 1829 |
-| carried by code | 1169 |
+| carried by code | 1170 |
 
 ## Addresses
 
@@ -216,7 +216,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x00AEF2` | docs/game/engine_internals.md — The per-node sfx row is the fighter's OWN: '(0x382,A6)' is the character id; build/manifest/donovan.toml — don_sfx_records; build/manifest/donovan.toml — voice_borrow_keep_tenant; build/manifest/huitzil.toml — voice_borrow_keep_tenant; build/manifest/pyron.toml — voice_borrow_keep_tenant; build/manifest/shared_writes.toml — donovan; +2 more |
 | `PRG:0x00AEF6` | docs/game/atlas/id_space.md — The arcade-opponent path (a fourth roster work item); docs/game/atlas/id_space.md — Which ids vanilla ever assigns (measured over the corpus); docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/engine_internals.md — The per-node sfx row is the fighter's OWN: '(0x382,A6)' is the character id; docs/game/gotchas.md — +0x382 is the character id, and the 1P arcade ladder writes the CPU side's before it loads — a forced pick there does not survive a CPU flow; docs/project/doc_audit_14z118.md — 2. Cross-document numbers to lock (candidates for the script); +7 more |
 | `PRG:0x00AEF8` | build/manifest/donovan.toml — voice_borrow_site_pad; build/manifest/huitzil.toml — voice_borrow_site_pad; build/manifest/pyron.toml — voice_borrow_site_pad; build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
-| `PRG:0x00AEFA` | build/manifest/donovan.toml — don_sfx_records |
+| `PRG:0x00AEFA` | build/manifest/donovan.toml — don_sfx_records; tests/audit_voice_borrow.sh |
 | `PRG:0x00AF10` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/atlas/ram.md — System / match globals; tests/test_voice_row_range.sh |
 | `PRG:0x00AF16` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/engine_internals.md — the #92 crash; decoded end to end and confirmed on screen); tests/test_voice_row_range.sh |
 | `PRG:0x00AF1C` | docs/game/atlas/select_screen.md — SHADOW vs A TENANT — the static pass (14z-116, the maintainer's question); docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path; docs/game/engine_internals.md — the #92 crash; decoded end to end and confirmed on screen); tools/audit_latch_readers.py |

@@ -1,0 +1,9 @@
+decision	recommendation
+subject	#188: wire route A (the static-tier carry-forward predictor) now that the strace test reads no miss
+session	14z-188
+model	rule-checker@163e4ce9cf7b
+claim	Recommendation to the maintainer for #188: build route A's wiring — tests/run_all_static.sh re-running, after a red, only the failed gates and the gates tools/static_confirm.py marks stale since the red run's commit, carrying the rest — because the ruled condition for wiring it (DECISIONS_HISTORY.md:294-300, the predictor stays unwired until a Linux run of the tier under strace shows no gate reads a file the predictor misses) is met on the trace taken at 4e1859d9 (trace_meta.txt): 195 of 195 gates analysed, 36,722 (gate, tracked file) reads and 0 misses (capped4.tsv), the predictor's selftest and controls passing (test_static_confirm.log) and its backtest catching all three recorded reds (backtest.log). NOT TESTED: eleven gates exited non-zero under strace — seven with exit 1 and four with exit 77 (done4.tsv) — so their traced reads may fall short of a passing run's; reads are counted by path only (open, openat, execve), relative paths resolved at the repository root only, and reads of git-ignored files not counted (trace_meta.txt, analyse_mp.py's docstring); a gate added or changed after 4e1859d9 is untraced; the wiring itself is neither designed nor built, so its cost and its failure modes are unmeasured; and what share of the gates a close's fix re-runs was measured on five one-file changes only, 71 to 107 of 195 (share.txt).
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b

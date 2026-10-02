@@ -1,0 +1,8 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent188/t188/capped4.tsv	95b3e55cc0053b425b9412e0d5db3a26b0b51542
+build/agent188/t188/done4.tsv	aa592a6d902a3ad6b20e2cd6f79162ac0d9627f3
+build/agent188/t188/trace_meta.txt	fe902bcbd1c373d134ee95dce44b0a51d4c7e5c7
+build/agent188/t188/test_static_confirm.log	35222ad3df85b3b2b88faaf7c2ffa5cc2eff91c3
+build/agent188/t188/backtest.log	0ba3840e492ea44cbfacfe6ae526afc97d339ecf
+build/agent188/t188/share.txt	76c1fbbdc1201436eb67b36018df01c6a4878c06
+DECISIONS_HISTORY.md.lines-294-300 (lines 294-300 of DECISIONS_HISTORY.md)	1b99b03a7daa3aabca84c446f97237fe43d8a932

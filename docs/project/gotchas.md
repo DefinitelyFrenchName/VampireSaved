@@ -6314,3 +6314,17 @@ Fixed 14z-187b: python runners, `--verb run` (so a `status` call is not a pass),
 its command or output. The fixed tool reproduces the 14z-185 close's figures byte for byte, and
 `tests/test_close_loop_cost.sh` holds it on a synthetic transcript, with the controls `no-python`, `verb-ignored`
 and `prepare-by-line`.
+
+## A RULED FORM IS BUILT AS RULED — a "better" variant found while building goes back to the maintainer first (paid: 14z-188, #195)
+
+The maintainer ruled #195's discriminator as *"attacker id plus class, using a data address as a backup option should
+the id+class approach should fail"*, and the question they answered named the form exactly (Pyron: id 0x11 + class
+0x44 + the record's `+0x1F`). Writing the rows, the session learned the generator could bake a placed address cheaply
+(the multi-tenant site_thunk chain, `region_subst`) and built Pyron's element on record 21's ADDRESS instead — the
+backup form, without a word from the maintainer, and with no note that the form had changed. The id-plus-class form had
+not failed. It was found only while documenting the build, by re-reading the question the maintainer had answered; the
+build was redone in the ruled form, which also needed a class check the address had carried implicitly, and every gate
+re-run. **The rule:** when a cheaper or "more robust" form turns up between a ruling and the build, the build still
+follows the ruling; the new form is a question, asked before any byte moves. Check the built rows against the ruled
+text before running the gates on them.
+
