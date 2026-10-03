@@ -39,6 +39,16 @@ THE AERIAL DIRECTION (14z-145). `jump` is a NEUTRAL jump (U) and `jump_fwd` a
 FORWARD jump (UR); a2 carries TWO aerial slot sets, 0x12-0x17 and 0x18-0x1D,
 and which direction enters which is what tests/test_vanilla_aerial_join.sh
 measures (`--airborne` reports whether P1 had left the ground at the press).
+`--airborne` reads the y position only, so a GROUND move whose own first node
+raises the body reads `air`: Sasquatch's crouching LK (a2:0x0f) lifts p1y from
+the press frame (40 -> 54 -> 40 over +0..+12), on the `crouch` set and as his
+3LK on `cmd_df` alike (measured 14z-189; tests/test_vanilla_command_join.sh
+declares and asserts it).
+
+THE COMMAND NORMALS (14z-189, GitHub #117). `cmd` is toward+button (6x) and
+`cmd_df` down-toward+button (3x), both at the far pin; tests/test_vanilla_command_join.sh
+measures which chain each enters, and tools/vanilla_frames.command_slots() names a
+chain other than the plain far / crouching one.
 
 A scripted input is not the move it names ([VSE-47]), so nothing here trusts
 its own script: the verdict is the chain the fighter entered inside the event
@@ -103,7 +113,15 @@ SETS = {"far":    ("stand",  300, False),
         # walk in, then the crouching / neutral-jump / D+button recipe at contact range
         "hit_crouch": ("crouch", 480, True),
         "hit_jump": ("jump", 480, True),
-        "hit_jump_down": ("jump_down", 480, True)}
+        "hit_jump_down": ("jump_down", 480, True),
+        # the COMMAND normals (14z-189, GitHub #117 — the community cross-check's first
+        # non-normal slice): toward+button and down-toward+button at the FAR pin, out of
+        # throw range (6+MP/HP at contact is a throw on most of the cast — the workbook's
+        # `6MPor6HP` rows — and its `6xx` rows document the command normal). Which chain
+        # each enters is measured; a chain OTHER than the far standing (resp. crouching)
+        # one is named `6x` (resp. `3x`) by tools/vanilla_frames.py, never from the sheet.
+        "cmd": ("fwd", 300, False),
+        "cmd_df": ("dfwd", 300, False)}
 GAP = {k: v[1] for k, v in SETS.items()}
 WALKIN_SHIFT = 200          # a walk-in set's first event at FIRST_EVENT + 200 (the header, #134)
 # (char id, set, button) -> the button's press offset after the jump (name_moves.jump presses at +14..+17)
@@ -125,9 +143,16 @@ def _jump_fwd_down(b):
     return name_moves.jump_fwd_down(b)
 
 
+def _dfwd(b):
+    # 3+button: down-toward held with the button (P1 faces right, so DR), the same
+    # 0..3 frame window as name_moves.fwd's 6+button
+    return [(0, 3, "DR" + name_moves.B[b])]
+
+
 def _recipe(kind, b):
     return {"stand": name_moves.stand, "crouch": name_moves.crouch, "jump": name_moves.jump,
-            "jump_fwd": _jump_fwd, "jump_down": _jump_down, "jump_fwd_down": _jump_fwd_down}[kind](b)
+            "jump_fwd": _jump_fwd, "jump_down": _jump_down, "jump_fwd_down": _jump_fwd_down,
+            "fwd": name_moves.fwd, "dfwd": _dfwd}[kind](b)
 
 
 def gen(cid, dist, out_rpl, out_sched, pins=None):

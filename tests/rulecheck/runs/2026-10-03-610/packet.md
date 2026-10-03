@@ -1,0 +1,55 @@
+THE PACKET
+
+Decision kind: build
+Subject: 14z-189 merge of four worktrees: #117 command-normal join, #162 column-flash cause, #128 Marionette cost, #129 tenant CPU soak
+Claim (the working agent's sentence): Merge four finished background worktrees, each adding one emulator-tier gate with its expectation frozen by its worker, into one tree (merge189c, from main 7d2b348c): the four diffs applied with git apply -3, the six conflicts (tests/ci_emulator.tsv twice, tests/gate_index.tsv twice, tests/expected/PROVENANCE.md, tests/expected/poke_readback.tsv) append-only and resolved by keeping both sides, every line each worktree added present in the merged files (3,336 lines, 0 missing), and the generated pages regenerated (gen_gate_index, gen_gate_coverage, gen_gotchas_index, gen_annotations, each --check ok). (1) #117, tests/test_vanilla_command_join.sh: which anim chain each vanilla character enters on 6+button and 3+button at the far pin on pristine vsavj, 180 rows frozen in tests/expected/vanilla_command_slots.tsv, and docs/project/tables/community_crosscheck.md records that the 19 chains other than the plain far/crouching normal are exactly the workbook's 19 6x/3x rows, with tools/crosscheck_framedata.py, tools/vanilla_frames.py and tools/vanilla_join_rig.py extended and tests/expected/community_crosscheck.txt re-frozen. (2) #162, tests/audit_column_flash_cause.sh: the orange flash is the fighter's palette RELOAD at PRG:0x02ADAC keeping vsavj's per-character mask (PRG:0x02ADB2), which lacks Donovan's bit 0x13 where vs2's (PRG:0x02A108) sets it — ours reloads block rows 0-3 into palette rows 0x0A-0x0D at frames 2807 and 2858, native row 0 only, and a counterfactual leg with the bit set in the emulator's decrypted-opcode share (nothing built) reloads row 0 only; a static census (tools/audit_charid_masks.py) pairs vs2's 7 mask sites with ours and records 4 DIFF; docs/game/engine_internals.md and docs/platform/gotchas.md record it. (3) #128, tests/audit_marionette_cost.sh: vs2's 28 +0x3C3 sites classified (INSERT 23, REPLACE 4, NEW 1) with 26 vsavj hook points, her assets' size, and per-frame execution counts of each hook point on pristine vsavj over the legacy corpus plus the new replay tests/replays/128_shadow_vs_legacy_vsavj.rpl (24 of 26 reached; worst frame 14 executions, 812 cycles under the stated 58-cycle model, 3026 ppm of a 268,288-cycle frame), frozen in tests/expected/marionette_cost.tsv; no build. (4) #129, tests/audit_tenant_cpu_soak.sh: 12 MAME legs (three tenants x passive/active x ours/native vsav2), distributions and total-variation distances frozen in tests/expected/tenant_cpu_soak.txt, judging nothing about "plays the same"; it adds four poke_readback rows (ff8109, ff8116, ff8450, ff8850) and #117's gate one (ff8850), all UNCLASSIFIED, awaiting the maintainer's ruling, which test_poke_readback accepts. On the merged tree on the Mac (c1/BYTES.txt, c1/BYTES162.txt record the sha1 of every gate script, tool and expectation at run start and of the M22 romset, 5439d4ca): each of the four gates PASSes and each of its two declared controls, run as a mode, fails it (c1/summary.txt; c1/summary162.txt for #162, whose first attempt SKIPped for want of the opcode images in the worktree's build/out — its SKIP lines stay in summary.txt — and was re-run once build/out held images equal to main's); #129's figures, frozen on ERIS, reproduce on the Mac. Because #117 changed tools/vanilla_frames.py and tools/vanilla_join_rig.py, the eight other gates that use them were run on the merged tree: all PASS with their in-gate controls firing and none dead (c1/tools/summary.txt; test_community_crosscheck and test_meter_gain first SKIPped for want of the out-of-tree workbook path and were re-run with SHEET and FRAMEDATA_OUT set). The census and page gates PASS on the merged tree (c2/*.log). NOT TESTED: the eight tool-dependent gates' controls as modes (only their in-gate firing); any of the four gates on FBNeo or the MiSTer core; the gates on ERIS or PILOT in this merged tree (their workers ran them on ERIS in their own worktrees, not recorded here); the run_all_static tiers as a whole (only the gates named); whether #162's one-bit fix plays as native (no build, no capture); what #128's hooks would do to the frozen oracle classes (only measurable by building them); what #129's distances mean for how the AI plays (the maintainer's to read).
+Artifacts (read every one, in full):
+  - build/rc189/c1/claim.txt
+  - build/rc189/c1/merge.diff
+  - build/rc189/c1/BYTES.txt
+  - build/rc189/c1/BYTES162.txt
+  - build/rc189/c1/summary.txt
+  - build/rc189/c1/summary162.txt
+  - build/rc189/c1/run.sh
+  - build/rc189/c1/run162.sh
+  - build/rc189/c1/run_tools.sh
+  - build/rc189/c1/tools/BYTES.txt
+  - build/rc189/c1/tools/summary.txt
+  - build/rc189/c1/audit_column_flash_cause.log
+  - build/rc189/c1/audit_column_flash_cause_ctl_fix-ignored.log
+  - build/rc189/c1/audit_column_flash_cause_ctl_mask-bit-planted.log
+  - build/rc189/c1/audit_marionette_cost.log
+  - build/rc189/c1/audit_marionette_cost_ctl_drift-clock.log
+  - build/rc189/c1/audit_marionette_cost_ctl_site-removed.log
+  - build/rc189/c1/audit_tenant_cpu_soak.log
+  - build/rc189/c1/audit_tenant_cpu_soak_ctl_no-translation.log
+  - build/rc189/c1/audit_tenant_cpu_soak_ctl_wrong-character.log
+  - build/rc189/c1/test_vanilla_command_join.log
+  - build/rc189/c1/test_vanilla_command_join_ctl_swapped-commands.log
+  - build/rc189/c1/test_vanilla_command_join_ctl_three-hits.log
+  - build/rc189/c1/tools/audit_df_startup_invuln.log
+  - build/rc189/c1/tools/test_community_crosscheck.log
+  - build/rc189/c1/tools/test_meter_gain.log
+  - build/rc189/c1/tools/test_module_refs.log
+  - build/rc189/c1/tools/test_rehit_ring.log
+  - build/rc189/c1/tools/test_tick_durations.log
+  - build/rc189/c1/tools/test_vanilla_aerial_join.log
+  - build/rc189/c1/tools/test_vanilla_frame_join.log
+  - build/rc189/c2/test_annotations_current.log
+  - build/rc189/c2/test_controls_contract.log
+  - build/rc189/c2/test_demand_after_trap.log
+  - build/rc189/c2/test_doc_anchor_census.log
+  - build/rc189/c2/test_docshape.log
+  - build/rc189/c2/test_expectation_provenance.log
+  - build/rc189/c2/test_gate_coverage_current.log
+  - build/rc189/c2/test_gate_descriptions.log
+  - build/rc189/c2/test_gate_follows.log
+  - build/rc189/c2/test_gate_index_current.log
+  - build/rc189/c2/test_gotchas_index_current.log
+  - build/rc189/c2/test_header_defaults.log
+  - build/rc189/c2/test_must_fire_census.log
+  - build/rc189/c2/test_poke_readback.log
+  - build/rc189/c2/test_replay_stage_census.log
+  - build/rc189/c2/test_shell_portability.log
+  - build/rc189/c2/test_state_open_lists.log
+  - build/rc189/c2/test_tickets.log

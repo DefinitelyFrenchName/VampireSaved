@@ -9,6 +9,7 @@ declares	audit_chains174
 declares	audit_chains184
 declares	audit_clone_beam_lines
 declares	audit_column_flash
+declares	audit_column_flash_cause
 declares	audit_column_shock
 declares	audit_crouch_flag
 declares	audit_defense_row_reads
@@ -39,6 +40,7 @@ declares	audit_ladder_pick_store
 declares	audit_ladder_selector
 declares	audit_lag_budget
 declares	audit_latch_reads
+declares	audit_marionette_cost
 declares	audit_mister_map_fit
 declares	audit_mizuumi_struct
 declares	audit_move_parity
@@ -56,6 +58,7 @@ declares	audit_shared_wall_push
 declares	audit_stock_emulator_stall
 declares	audit_tech_roll
 declares	audit_tenant_continue_switch
+declares	audit_tenant_cpu_soak
 declares	audit_throw_registration
 declares	audit_tick_cadence
 declares	audit_tick_phase
@@ -190,6 +193,7 @@ declares	test_tick_durations
 declares	test_tickets
 declares	test_unless_composed
 declares	test_vanilla_aerial_join
+declares	test_vanilla_command_join
 declares	test_vanilla_frame_join
 declares	test_wide_profile
 declares	test_win_quote_decode

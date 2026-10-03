@@ -1,0 +1,1 @@
+WITHDRAWN 2026-10-03 (14z-189), never spawned: re-prepared after run 2026-10-03-610's withdrawal, but its claim did not name that withdrawal and its merge.diff did not carry 610's WITHDRAWN.txt (the run-599 finding: a withdrawal is an artifact of the next packet). Re-prepared as the next run with both runs' WITHDRAWN.txt in merge.diff and named in the claim.

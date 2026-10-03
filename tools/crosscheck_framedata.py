@@ -24,8 +24,9 @@ So every (character, column) pair is classified:
                    when our chain ends in a LOOP, not a hold — the tail is then
                    the data's, not the move's)
 
-The join is the 18 core normal slots of anim table a2 only (tools/vanilla_frames.py
-header says why, and why the command-normal slots are excluded).
+The join is the anim-table-a2 chains named by MEASUREMENT only (tools/vanilla_frames.py
+header says why): the 18 core normal slots, the close and second-aerial variants, and
+since 14z-189 (GitHub #117) the `6x`/`3x` command normals.
 
 NEITHER SOURCE IS IN THE TREE. The workbook is third-party work and is read
 from `../community/`; we commit only this comparison and cite it.
@@ -403,7 +404,19 @@ def render_md(vanilla, cmp_, full=False):
     A("aerials (the workbook's `J.2LP`..`J.2HK`, now joined by name), Aulbath's `J.2HK` is `a2:0x51`,")
     A("and Anakaris's D+button leaves his hover into `a:0x36` on every button. Anakaris has no")
     A("neutral-jump attacks at all: his neutral jump is a hover (`a:0x12`) that takes no normal.")
-    A("Specials, supers and the `6`-prefixed command normals are not joined at all.")
+    A("")
+    A("**The command normals are measured too (14z-189, GitHub #117).** The same rig performs")
+    A("each button with toward held (`6x`) and with down-toward held (`3x`) at the far pin, out")
+    A("of throw range (`tests/test_vanilla_command_join.sh`, `tests/expected/vanilla_command_slots.tsv`,")
+    A("180 rows). A `6x` entering a chain other than the far standing one, or a `3x` one other")
+    A("than the crouching one, names that chain. The measurement found **19 such chains — 18")
+    A("`6x` and Bulleta's `3HK` — and they are exactly the workbook's 19 `6x`/`3x` rows**, by")
+    A("character and button: BU `6MP`/`6MK`/`3HK`, GA `6MK`, ZA all six (his odd slots,")
+    A("`0x01`-`0x0b`), AN `6MK`, BI all six, LE `6MP`/`6HP`. On the other 72 `6x` and 89 `3x`")
+    A("presses the game enters the plain far or crouching normal. Bulleta's `3HK` joins by name")
+    A("and compares nothing: the workbook calls it a projectile and its chain carries no attack")
+    A("window (the hit is a spawned object's), so every column is structurally not the same")
+    A("quantity. Specials, supers, EX/ES moves, throws and pursuits are not joined at all.")
     A("")
     A("## The headline: per-move agreement")
     A("")
@@ -484,6 +497,17 @@ def render_md(vanilla, cmp_, full=False):
     if not full:
         A("Five moves carry it (MO 5HK, QB 2HK, SA 5HP, VI 2HP, JE 5HK — two or more attack")
         A("records sharing hit id 1; the per-record values are on the full page).")
+    A("")
+    A("**A sixth, of the same family, came with the command normals (14z-189): LE `6HP`.**")
+    A("Its one active run carries seven records, all hit id 1, and the workbook lists THREE")
+    A("hits whose values are those of the first three records to the byte, so its `white` and")
+    A("`red` cells are the only two misses of the 18 joined command normals.")
+    A("Measured on one rig, not inferred: on the idle standing victim at 128 px (the only")
+    A("distance measured) the move lands **one** hit (`tests/test_vanilla_command_join.sh`")
+    A("section 5, P2's `+0x50` drops once) — consecutive same-id attack nodes land once, the")
+    A("rule `tests/test_rehit_ring.sh` measured. Whether the workbook's three hits describe")
+    A("another move is OPEN, to be checked against the Japanese wiki: the maintainer, shown")
+    A("the capture (2026-10-03), recalls 5HP hitting three times and 6HP once (GitHub #216).")
     full and A("| move | records (id, red/white) | workbook white | ours |")
     full and A("|---|---|---|---|")
     full and A("| MO 5HK | 17 (id 1, 14/7), 99 (id 1, 12/7) | 14 = 7+7 | 7 |")
@@ -614,8 +638,8 @@ def render_md(vanilla, cmp_, full=False):
     A("  corpus and NOT yet measured:** mizuumi distinguishes NEUTRAL- from FORWARD-jump")
     A("  variants of the same button (`8J.LP` vs `9J.LP`) where our slot map carries ONE")
     A("  chain per aerial button. Needs a two-direction jump rig.")
-    A("- **Specials, supers, EX/ES moves, throws, pursuits and the `6`-prefixed command")
-    A("  normals are not joined.** Each needs its own measured naming rig on vsavj, the way")
+    A("- **Specials, supers, EX/ES moves, throws and pursuits are not joined** (the command")
+    A("  normals are, since 14z-189). Each needs its own measured naming rig on vsavj, the way")
     A("  `tools/name_moves.py` did for the tenants. That is the bulk of the workbook's 730")
     A("  rows and it is untouched here.")
     A("- **Seven workbook columns have no counterpart in the tree**: `on hit`, `on block`,")

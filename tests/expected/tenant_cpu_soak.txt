@@ -1,0 +1,106 @@
+# tests/expected/tenant_cpu_soak.txt — written by tests/audit_tenant_cpu_soak.sh FREEZE=1 (GitHub #129, 14z-189).
+# Evidence class: in-emulator (MAME). Per tenant x condition, tools/cpu_soak_dist.py's output on the ours leg
+# (merged build) against the native vsav2 leg: distributions of node entries, state families, AI commands and
+# script indices, and their total-variation distances. Figures only, no ROM bytes. VERIFY by re-running.
+== phobos passive
+# translate leg A's nodes: anim@huitzil dst 0x42d6a0 src 0x245872 len 0x1e800
+FRAMES ours 19981 native 19981
+DIST ours mean 132.5 native mean 133.8
+AIR ours 1431 native 865
+NODE tvd 0.114 events ours 5347 native 5443 keys ours 266 native 330 shared 238
+  NODE top ours: 0x2458fe:8.2% 0x245916:8.2% 0x24592e:5.2% 0x245946:3.9% 0x24595e:3.4% 0x245976:3.2% 0x24598e:3.1% 0x2459a6:2.9%
+  NODE top native: 0x2458fe:7.9% 0x245916:7.6% 0x24592e:4.6% 0x245946:3.8% 0x24595e:3.6% 0x245976:3.5% 0x24598e:3.3% 0x245bbe:2.9%
+SEQ tvd 0.074 events ours 19981 native 19981 keys ours 7 native 8 shared 5
+  SEQ top ours: 0x00:54.2% 0x04:17.1% 0x0a:16.9% 0x0e:5.1% 0x06:4.6% 0x18:1.7% 0x16:0.3%
+  SEQ top native: 0x00:50.7% 0x0a:20.4% 0x04:20.3% 0x0e:4.3% 0x06:3.6% 0x14:0.3% 0x10:0.3% 0x02:0.2%
+CMD tvd 0.007 events ours 981 native 1092 keys ours 5 native 5 shared 5
+  CMD top ours: 0x16:49.9% 0x00:29.0% 0x0e:19.0% 0x06:2.0% 0x22:0.1%
+  CMD top native: 0x16:49.9% 0x00:29.1% 0x0e:19.5% 0x06:1.4% 0x22:0.1%
+SCRIPT tvd 0.000 events ours 19981 native 19981 keys ours 1 native 1 shared 1
+  SCRIPT top ours: 0x02:100.0%
+  SCRIPT top native: 0x02:100.0%
+== phobos active
+# translate leg A's nodes: anim@huitzil dst 0x42d6a0 src 0x245872 len 0x1e800
+FRAMES ours 19981 native 19981
+DIST ours mean 119.3 native mean 123.3
+AIR ours 1236 native 1080
+NODE tvd 0.126 events ours 5728 native 5665 keys ours 423 native 416 shared 351
+  NODE top ours: 0x2458fe:7.9% 0x245916:6.5% 0x24592e:4.1% 0x245946:3.4% 0x24595e:3.2% 0x245976:3.0% 0x24598e:2.6% 0x245bbe:2.3%
+  NODE top native: 0x2458fe:7.9% 0x245916:6.8% 0x24592e:4.4% 0x245946:3.7% 0x24595e:3.4% 0x245976:3.1% 0x24598e:2.5% 0x245bbe:2.2%
+SEQ tvd 0.068 events ours 19981 native 19981 keys ours 10 native 8 shared 8
+  SEQ top ours: 0x00:46.4% 0x04:19.7% 0x0a:16.4% 0x0e:6.7% 0x02:4.3% 0x06:3.1% 0x18:1.7% 0x12:1.2%
+  SEQ top native: 0x00:47.7% 0x0a:18.3% 0x04:16.5% 0x0e:9.6% 0x02:4.0% 0x06:3.9% 0x0c:0.0% 0x12:0.0%
+CMD tvd 0.023 events ours 1155 native 1147 keys ours 8 native 8 shared 8
+  CMD top ours: 0x16:45.4% 0x00:27.4% 0x0e:18.3% 0x10:6.5% 0x06:1.2% 0x02:0.6% 0x18:0.5% 0x22:0.1%
+  CMD top native: 0x16:45.8% 0x00:28.9% 0x0e:17.4% 0x10:5.2% 0x06:1.7% 0x02:0.4% 0x18:0.4% 0x22:0.1%
+SCRIPT tvd 0.000 events ours 19981 native 19981 keys ours 1 native 1 shared 1
+  SCRIPT top ours: 0x02:100.0%
+  SCRIPT top native: 0x02:100.0%
+== pyron passive
+# translate leg A's nodes: anim@pyron dst 0x4857d0 src 0x264086 len 0x1b500
+FRAMES ours 19981 native 19981
+DIST ours mean 151.0 native mean 143.0
+AIR ours 3949 native 3785
+NODE tvd 0.074 events ours 8488 native 8497 keys ours 381 native 328 shared 315
+  NODE top ours: 0x264120:6.7% 0x264138:5.9% 0x264150:4.3% 0x264168:3.0% 0x264180:2.3% 0x264198:2.0% 0x2641b0:1.8% 0x2641c8:1.7%
+  NODE top native: 0x264120:6.7% 0x264138:6.0% 0x264150:4.3% 0x264168:2.8% 0x264180:2.3% 0x264198:2.1% 0x2641b0:1.9% 0x2641c8:1.7%
+SEQ tvd 0.041 events ours 19981 native 19981 keys ours 11 native 9 shared 9
+  SEQ top ours: 0x00:40.1% 0x0e:16.3% 0x06:14.9% 0x04:9.6% 0x0a:9.5% 0x14:5.7% 0x10:2.9% 0x12:0.4%
+  SEQ top native: 0x00:41.1% 0x06:14.8% 0x0e:13.8% 0x04:11.7% 0x0a:10.0% 0x14:5.8% 0x10:1.9% 0x12:0.8%
+CMD tvd 0.013 events ours 962 native 1000 keys ours 5 native 3 shared 3
+  CMD top ours: 0x16:49.3% 0x00:37.1% 0x0e:13.4% 0x22:0.1% 0x02:0.1%
+  CMD top native: 0x16:49.5% 0x00:36.0% 0x0e:14.5%
+SCRIPT tvd 0.000 events ours 19981 native 19981 keys ours 1 native 1 shared 1
+  SCRIPT top ours: 0x02:100.0%
+  SCRIPT top native: 0x02:100.0%
+== pyron active
+# translate leg A's nodes: anim@pyron dst 0x4857d0 src 0x264086 len 0x1b500
+FRAMES ours 19981 native 19981
+DIST ours mean 136.1 native mean 140.0
+AIR ours 4038 native 3806
+NODE tvd 0.094 events ours 8314 native 8489 keys ours 467 native 423 shared 393
+  NODE top ours: 0x264120:6.5% 0x264138:5.5% 0x264150:4.2% 0x264168:2.8% 0x264180:2.2% 0x264198:1.8% 0x2641b0:1.7% 0x2641c8:1.5%
+  NODE top native: 0x264120:6.6% 0x264138:5.5% 0x264150:3.9% 0x264168:2.8% 0x264180:2.2% 0x264198:1.9% 0x2641b0:1.7% 0x2641c8:1.5%
+SEQ tvd 0.043 events ours 19981 native 19981 keys ours 13 native 11 shared 11
+  SEQ top ours: 0x00:38.1% 0x0e:16.3% 0x06:13.6% 0x0a:10.6% 0x04:7.9% 0x10:4.5% 0x14:4.5% 0x02:2.9%
+  SEQ top native: 0x00:38.4% 0x0e:15.0% 0x06:14.4% 0x0a:10.6% 0x04:9.7% 0x14:4.9% 0x02:3.2% 0x10:1.9%
+CMD tvd 0.014 events ours 945 native 977 keys ours 7 native 6 shared 6
+  CMD top ours: 0x16:43.4% 0x00:35.3% 0x0e:11.4% 0x10:7.6% 0x18:1.9% 0x02:0.2% 0x22:0.1%
+  CMD top native: 0x16:43.6% 0x00:34.4% 0x0e:12.5% 0x10:7.4% 0x18:1.8% 0x02:0.3%
+SCRIPT tvd 0.000 events ours 19981 native 19981 keys ours 1 native 1 shared 1
+  SCRIPT top ours: 0x02:100.0%
+  SCRIPT top native: 0x02:100.0%
+== donovan passive
+# translate leg A's nodes: anim dst 0xd3070 src 0x27f548 len 0x20f00
+FRAMES ours 19981 native 19981
+DIST ours mean 116.3 native mean 118.8
+AIR ours 100 native 233
+NODE tvd 0.078 events ours 7109 native 7037 keys ours 339 native 279 shared 277
+  NODE top ours: 0x27f5ae:5.9% 0x27f5c6:5.8% 0x27f5de:5.1% 0x27f5f6:3.9% 0x27f60e:3.1% 0x27f626:2.6% 0x27f63e:2.5% 0x27f656:2.4%
+  NODE top native: 0x27f5ae:5.6% 0x27f5c6:5.4% 0x27f5de:4.6% 0x27f5f6:3.9% 0x27f60e:3.2% 0x27f626:2.8% 0x27f63e:2.5% 0x27f656:2.3%
+SEQ tvd 0.028 events ours 19981 native 19981 keys ours 11 native 8 shared 8
+  SEQ top ours: 0x00:52.8% 0x04:16.9% 0x0a:15.4% 0x0e:6.8% 0x12:3.3% 0x14:2.3% 0x10:0.7% 0x06:0.6%
+  SEQ top native: 0x00:53.4% 0x04:15.8% 0x0a:15.6% 0x0e:6.6% 0x12:3.8% 0x14:3.0% 0x06:1.4% 0x02:0.4%
+CMD tvd 0.005 events ours 993 native 962 keys ours 4 native 4 shared 4
+  CMD top ours: 0x16:49.8% 0x00:30.5% 0x0e:19.4% 0x22:0.2%
+  CMD top native: 0x16:49.8% 0x00:31.0% 0x0e:19.1% 0x22:0.1%
+SCRIPT tvd 0.000 events ours 19981 native 19981 keys ours 1 native 1 shared 1
+  SCRIPT top ours: 0x02:100.0%
+  SCRIPT top native: 0x02:100.0%
+== donovan active
+# translate leg A's nodes: anim dst 0xd3070 src 0x27f548 len 0x20f00
+FRAMES ours 19981 native 19981
+DIST ours mean 111.7 native mean 113.2
+AIR ours 820 native 1268
+NODE tvd 0.157 events ours 7073 native 7224 keys ours 449 native 537 shared 367
+  NODE top ours: 0x27f5ae:6.0% 0x27f5c6:5.5% 0x27f5de:4.3% 0x27f5f6:3.1% 0x27f60e:2.5% 0x27f626:2.2% 0x27f63e:2.0% 0x27f656:2.0%
+  NODE top native: 0x27f5ae:5.8% 0x27f5c6:4.9% 0x27f5de:3.5% 0x27f5f6:2.4% 0x27f60e:2.0% 0x27f626:1.8% 0x27f63e:1.7% 0x27f656:1.6%
+SEQ tvd 0.106 events ours 19981 native 19981 keys ours 13 native 11 shared 11
+  SEQ top ours: 0x00:48.3% 0x04:15.5% 0x0a:9.4% 0x0e:6.1% 0x02:5.9% 0x06:4.5% 0x14:3.9% 0x12:2.2%
+  SEQ top native: 0x00:41.8% 0x04:14.3% 0x0a:11.0% 0x0e:8.8% 0x02:5.9% 0x06:5.6% 0x14:4.9% 0x10:4.4%
+CMD tvd 0.026 events ours 994 native 948 keys ours 6 native 6 shared 5
+  CMD top ours: 0x16:43.1% 0x00:29.5% 0x0e:17.2% 0x10:8.0% 0x18:1.6% 0x22:0.6%
+  CMD top native: 0x16:42.0% 0x00:31.3% 0x0e:17.3% 0x10:7.2% 0x18:1.7% 0x02:0.5%
+SCRIPT tvd 0.000 events ours 19981 native 19981 keys ours 1 native 1 shared 1
+  SCRIPT top ours: 0x02:100.0%
+  SCRIPT top native: 0x02:100.0%

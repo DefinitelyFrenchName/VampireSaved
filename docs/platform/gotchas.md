@@ -3072,6 +3072,11 @@ USER mode, and MAME's `SP` state register is then the supervisor stack (`0xFF7FF
 onto. The long at `USP` was the real caller (`0x0220A0`, the object loop). Rule: pick the ACTIVE stack by SR bit
 13 — `(SR & 0x2000) ? SP : USP` — before reading anything off it (`tests/lua/rng_draws.lua`). A tell that you
 read the wrong one: every "return address" is the same RAM address.
+**PAID AGAIN 2026-10-03 (14z-189, #162, `tests/lua/upload_tap.lua`):** a new palette-uploader tap read `A7` (a Lua
+error, visible only once the callback was wrapped in `pcall`), then `SP` — every stack long read `0x00FF02DC` and a
+"it was jumped into, not called" reading followed from it, nearly reported. The archaeology grep of this bucket for
+`cpu.state` before writing the tap ([VSP-14]) would have found both entries; the USER stack then gave the real
+chain (`0x02ADB2`/`0x02A7D6`/`0x0220AE`).
 
 ## A BACKGROUND TASK THAT RUNS A JOB OVER SSH IS STOPPED AT THE 2-HOUR LIMIT, BUT THE REMOTE JOB IS NOT — it keeps running on the host, and its verdict arrives nowhere (paid: 14z-188, read 14z-189)
 

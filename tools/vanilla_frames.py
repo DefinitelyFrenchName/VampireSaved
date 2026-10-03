@@ -24,7 +24,9 @@ source being checked is circular and cannot be the evidence ([VSP-19]: verdict
 logic is itself tested). Two structural shortcuts were tried first and BOTH were
 discarded on their own controls: predicting a character's command normals from
 whether our odd slot aliases the even one scored 31/90, and the close/far fit
-against the sheet is the circular one. The rig replaced both.
+against the sheet is the circular one. The rig replaced both. The COMMAND normals
+(`6x`, `3x`) are named the same way, from their own measurement
+(tests/test_vanilla_command_join.sh, 14z-189, GitHub #117): command_slots() below.
 """
 import argparse
 import hashlib
@@ -76,6 +78,9 @@ AERIAL_TSV = REPO / "tests/expected/vanilla_aerial_slots.tsv"
 # than assumed (tools/vanilla_join_rig.py, frozen here). A first model — even = close,
 # odd = far for everyone — was overturned by that measurement; see the rig's header.
 SLOTS_TSV = REPO / "tests/expected/vanilla_normal_slots.tsv"
+# The COMMAND normals (6x, 3x) are named from their own measurement too
+# (tests/test_vanilla_command_join.sh, 14z-189).
+COMMAND_TSV = REPO / "tests/expected/vanilla_command_slots.tsv"
 
 
 def measured_slots(path=SLOTS_TSV):
@@ -105,6 +110,10 @@ def measured_slots(path=SLOTS_TSV):
         out[tab] = m
     for tab, m in aerial_slots().items():
         out.setdefault(tab, dict(FIXED)).update(m)
+    for tab, m in command_slots().items():
+        t = out.setdefault(tab, dict(FIXED))
+        for slot, name in m.items():
+            t.setdefault(slot, name)    # a chain already named by a plain normal keeps that name
     return out
 
 
@@ -141,6 +150,38 @@ def aerial_slots(path=AERIAL_TSV):
                         if c == d.get("jump_fwd") or slot in out.get(tab, {}):
                             continue
                     out.setdefault(tab, {})[slot] = prefix + btn
+    return out
+
+
+def command_slots(path=COMMAND_TSV, normal=SLOTS_TSV):
+    """{tab: {slot int: move name}} for the COMMAND normals, from the measured table
+    (14z-189, GitHub #117): toward+button entering an a2 chain other than the far
+    standing one names it "6<btn>"; down-toward+button entering one other than the
+    crouching chain (FIXED 0x0c-0x11) and the 6<btn> one names it "3<btn>"."""
+    far = {}
+    if Path(normal).exists():
+        for ln in Path(normal).read_text().splitlines():
+            if ln.strip() and not ln.startswith("#"):
+                tab, d, btn, chain = ln.split("\t")[:4]
+                if d == "far":
+                    far[(tab, btn)] = chain
+    out = {}
+    if not Path(path).exists():
+        return out
+    crouch = {name[1:]: f"a2:{slot:#04x}" for slot, name in FIXED.items() if name.startswith("2")}
+    six = {}
+    for ln in Path(path).read_text().splitlines():
+        if not ln.strip() or ln.startswith("#"):
+            continue
+        tab, d, btn, chain = ln.split("\t")[:4]
+        if not chain.startswith("a2:"):
+            continue
+        slot = int(chain.split(":")[1], 16)
+        if d == "cmd" and chain != far.get((tab, btn)):
+            out.setdefault(tab, {})[slot] = "6" + btn
+            six[(tab, btn)] = chain
+        elif d == "cmd_df" and chain not in (crouch.get(btn), far.get((tab, btn)), six.get((tab, btn))):
+            out.setdefault(tab, {}).setdefault(slot, "3" + btn)
     return out
 
 
@@ -195,7 +236,8 @@ def derive_char(img, rows, cid, names=None):
             nm = names if names is not None else FIXED
             if tn == "a2" and sq in nm:
                 row["move"] = nm[sq]
-                row["slot_role"] = SLOT_ROLE.get(sq, "standing (rig-measured)")
+                row["slot_role"] = ("command normal (rig-measured, 14z-189)" if nm[sq][0] in "36"
+                                    else SLOT_ROLE.get(sq, "standing (rig-measured)"))
             if fd:
                 row["frame_data"] = {k: fd[k] for k in ("startup", "active", "span", "recovery",
                                                         "first", "last", "records", "notation")}

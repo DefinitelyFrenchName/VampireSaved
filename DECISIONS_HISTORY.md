@@ -341,6 +341,16 @@ Yes, Donovan's deity states should be in scope. However, if they would rely on t
 
 ---
 
+## Ruled 2026-10-03 (14z-189) — #216: Lei-Lei's 6HP hit count is a knowledge gap, checked against the Japanese wiki
+
+**The question (AskUserQuestion), verbatim, after a capture sheet of vsavj's Lei-Lei 6+HP on idle Victor at 128 px (frames 3198-3250, every second frame; #117's gate rig) was sent:** *"#117's merge says Lei-Lei's 6+HP lands ONE hit on vsavj, where the community workbook lists THREE (its values match the move's first three attack records). The sheet I just sent shows the move on idle Victor at 128 px: one spark, and P2's HP field drops once (288 → 276). Does the capture match what you know of the move?"* — options: *"Yes, one hit"*, *"No, it should be three"*, *"Need another capture"*.
+
+**The maintainer:** *"I don't have a definite answer BUT as far as I know and my tests 5+HP hits 3 times, 6+HP hits once. Let's create a ticket with this gap in knowledge and any other we find and we'll check this against the Japanese community bible"*.
+
+So: GitHub #216 holds the gap (and any further ones found); the community-crosscheck page states the one measured hit at 128 px and calls the workbook's three hits OPEN, not refuted.
+
+---
+
 ## Ruled 2026-10-03 (14z-189) — #145 and #212: merged-m22 is published this session
 
 **The question (AskUserQuestion), verbatim, after #145 and #212 were merged (40b173c9) and found to reach players only through a release (the latest GitHub release is merged-m19):** *"#145 (PLAY.bat launcher) and #212 (the applier's Windows crash) are fixed in release/merged-m22, which is built and gated but not published (the latest GitHub release is merged-m19, without them). How should they close?"* — options: *"Publish merged-m22 now"* (*"I publish the merged-m22 release assets to GitHub this session (after the close tier is green), then close #145 and #212 against the published release."*), *"Close now, track publish"*, *"Keep open until a release"*.

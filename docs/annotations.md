@@ -23,15 +23,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3423 |
-| named by a document or manifest only | 2221 |
-| named by both a document/manifest and code | 810 |
-| named by CODE ONLY (the gap list below) | 392 |
+| distinct program-space addresses named | 3442 |
+| named by a document or manifest only | 2226 |
+| named by both a document/manifest and code | 820 |
+| named by CODE ONLY (the gap list below) | 396 |
 | carried by atlas | 643 |
-| carried by engine_internals | 783 |
-| carried by other docs | 1038 |
+| carried by engine_internals | 798 |
+| carried by other docs | 1041 |
 | carried by manifests | 1834 |
-| carried by code | 1202 |
+| carried by code | 1216 |
 
 ## Addresses
 
@@ -53,13 +53,17 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x00362A` | build/manifest/reconciliation.toml — map |
 | `PRG:0x00364A` | build/manifest/reconciliation_huitzil.toml — map; build/manifest/reconciliation_huitzil.toml — map [vs2] |
 | `PRG:0x00393C` | build/manifest/reconciliation.toml — map |
+| `PRG:0x00395E` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) |
 | `PRG:0x003972` | build/manifest/reconciliation.toml — map [vs2] |
+| `PRG:0x003994` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) [vs2] |
 | `PRG:0x0039D6` | build/manifest/reconciliation.toml — map |
 | `PRG:0x003A0C` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x003A8E` | build/manifest/reconciliation.toml — map |
 | `PRG:0x003AC4` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x003AF6` | build/manifest/reconciliation.toml — map |
 | `PRG:0x003B2C` | build/manifest/reconciliation.toml — map [vs2] |
+| `PRG:0x003B36` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) |
+| `PRG:0x003B6C` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) [vs2] |
 | `PRG:0x003BEE` | build/manifest/huitzil.toml — hui_kernel_voice_e0; build/manifest/shared_writes.toml — huitzil |
 | `PRG:0x003BF0` | build/manifest/pyron.toml — pyr_kernel_voice_e0; build/manifest/shared_writes.toml — pyron |
 | `PRG:0x003BF4` | build/manifest/donovan.toml — don_kernel_voice_e0; build/manifest/shared_writes.toml — donovan |
@@ -202,7 +206,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x009996` | docs/game/atlas/character_tables.md — Slot→character map, vsavj (COMPLETE; select-name/HUD verified picks) |
 | `PRG:0x009B88` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x009B8C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
-| `PRG:0x009BB2` | docs/game/atlas/character_tables.md — Slot→character map, vsavj (COMPLETE; select-name/HUD verified picks); docs/game/atlas/select_screen.md — SHADOW vs A TENANT — the static pass (14z-116, the maintainer's question); docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path; tests/test_copy_flags.sh; tests/test_shadow_tenant.sh |
+| `PRG:0x009BB2` | docs/game/atlas/character_tables.md — Slot→character map, vsavj (COMPLETE; select-name/HUD verified picks); docs/game/atlas/select_screen.md — SHADOW vs A TENANT — the static pass (14z-116, the maintainer's question); docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path; tests/audit_marionette_cost.sh; tests/test_copy_flags.sh; tests/test_shadow_tenant.sh |
 | `PRG:0x009BF2` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x009C8E` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x009CAA` | docs/project/patch_notes.md — B. the obj_hook dispatch sites left VANILLA — the WALKER is relocated; build/manifest/donovan.toml — obj_hook; build/manifest/huitzil.toml — obj_hook; build/manifest/pyron.toml — obj_hook |
@@ -226,7 +230,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x00AECA` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/atlas/ram.md — System / match globals; docs/game/engine_internals.md — the #92 crash; decoded end to end and confirmed on screen); build/manifest/huitzil.toml — voice_borrow_voicenums_b; tools/decode_stage_banners.py |
 | `PRG:0x00AED8` | docs/game/atlas/id_space.md — The arcade-opponent path (a fourth roster work item); tools/checkdocs_rom.py |
 | `PRG:0x00AEF2` | docs/game/engine_internals.md — The per-node sfx row is the fighter's OWN: '(0x382,A6)' is the character id; docs/game/engine_internals.md — the #92 crash; decoded end to end and confirmed on screen); build/manifest/donovan.toml — don_sfx_records; build/manifest/donovan.toml — voice_borrow_keep_tenant; build/manifest/huitzil.toml — voice_borrow_keep_tenant; build/manifest/pyron.toml — voice_borrow_keep_tenant; +3 more |
-| `PRG:0x00AEF6` | docs/game/atlas/id_space.md — The arcade-opponent path (a fourth roster work item); docs/game/atlas/id_space.md — Which ids vanilla ever assigns (measured over the corpus); docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/engine_internals.md — The per-node sfx row is the fighter's OWN: '(0x382,A6)' is the character id; docs/game/gotchas.md — +0x382 is the character id, and the 1P arcade ladder writes the CPU side's before it loads — a forced pick there does not survive a CPU flow; docs/project/doc_audit_14z118.md — 2. Cross-document numbers to lock (candidates for the script); +8 more |
+| `PRG:0x00AEF6` | docs/game/atlas/id_space.md — The arcade-opponent path (a fourth roster work item); docs/game/atlas/id_space.md — Which ids vanilla ever assigns (measured over the corpus); docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/engine_internals.md — The per-node sfx row is the fighter's OWN: '(0x382,A6)' is the character id; docs/game/gotchas.md — +0x382 is the character id, and the 1P arcade ladder writes the CPU side's before it loads — a forced pick there does not survive a CPU flow; docs/project/doc_audit_14z118.md — 2. Cross-document numbers to lock (candidates for the script); +9 more |
 | `PRG:0x00AEF8` | build/manifest/donovan.toml — voice_borrow_site_pad; build/manifest/huitzil.toml — voice_borrow_site_pad; build/manifest/pyron.toml — voice_borrow_site_pad; build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
 | `PRG:0x00AEFA` | build/manifest/donovan.toml — don_sfx_records; tests/audit_voice_borrow.sh |
 | `PRG:0x00AF10` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/atlas/ram.md — System / match globals; tests/audit_tenant_continue_switch.sh; tests/test_voice_row_range.sh |
@@ -238,7 +242,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x00AFD4` | build/manifest/reconciliation.toml — map |
 | `PRG:0x00B094` | docs/game/atlas/id_space.md — The arcade-opponent path (a fourth roster work item); docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven); docs/project/inferred_claims.md — G2/G3 — measurements feeding engine_internals; tests/test_ladder_tenant_vs_palette.sh |
 | `PRG:0x00B0B4` | docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven); tests/test_ladder_tenant_vs_palette.sh |
-| `PRG:0x00B268` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/atlas/select_screen.md — SHADOW vs A TENANT — the static pass (14z-116, the maintainer's question); docs/game/engine_internals.md — the #92 crash; decoded end to end and confirmed on screen); build/manifest/donovan.toml — don_sfx_records; build/manifest/shared_writes.toml — donovan; tests/audit_voice_borrow.sh; +4 more |
+| `PRG:0x00B268` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/atlas/select_screen.md — SHADOW vs A TENANT — the static pass (14z-116, the maintainer's question); docs/game/engine_internals.md — the #92 crash; decoded end to end and confirmed on screen); build/manifest/donovan.toml — don_sfx_records; build/manifest/shared_writes.toml — donovan; tests/audit_tenant_cpu_soak.sh; +5 more |
 | `PRG:0x00B63C` | docs/game/engine_internals.md — Per-tenant TYPE NUMBERS on multi-tenant builds (14z-82); build/manifest/type_stamps.toml — stamp; tools/audit_type_stamps.py |
 | `PRG:0x00B668` | build/manifest/shared_writes.toml — huitzil |
 | `PRG:0x00B6A8` | build/manifest/shared_writes.toml — pyron |
@@ -307,7 +311,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x01357E` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) [vs2]; build/manifest/reconciliation.toml — map [vs2]; build/manifest/reconciliation_huitzil.toml — map; tests/audit_rng_draws.sh; tests/test_don_immortal_native.sh; +1 more |
 | `PRG:0x013724` | docs/project/patch_notes.md — 14z-102 — #109 THE CLONE-BEAM FIX (row 31) — FROZEN as huitzil-m19/merged-m5 (bit-for-bit the probes), field-confirmed, #109 CLOSED; build/manifest/reconciliation.toml — map [vs2]; tools/build_donovan.sh |
 | `PRG:0x01374E` | build/manifest/reconciliation.toml — map [vs2] |
-| `PRG:0x013778` | docs/project/patch_notes.md — 14z-102 — #109 THE CLONE-BEAM FIX (row 31) — FROZEN as huitzil-m19/merged-m5 (bit-for-bit the probes), field-confirmed, #109 CLOSED; build/manifest/reconciliation.toml — map [vs2]; tools/build_donovan.sh |
+| `PRG:0x013778` | docs/project/patch_notes.md — 14z-102 — #109 THE CLONE-BEAM FIX (row 31) — FROZEN as huitzil-m19/merged-m5 (bit-for-bit the probes), field-confirmed, #109 CLOSED; build/manifest/reconciliation.toml — map [vs2]; tools/audit_marionette_cost.py; tools/build_donovan.sh |
 | `PRG:0x01378A` | docs/game/atlas/ram.md — Fighter + effect-pool fields (14z-67, measured on the H effect arc); docs/game/engine_internals.md — The anim walker reads the sprite list from node+4 (measured 14z-70); docs/game/engine_internals.md — The anim walker reads the sprite list from node+4 (measured 14z-70) [vs2] |
 | `PRG:0x013800` | docs/game/engine_internals.md — Per-tenant win-screen checklist; docs/game/engine_internals.md — The WIN-QUOTE TEXT SYSTEM — fully decoded (14z-76); docs/project/patch_index.md — DEFERRED BY MAINTAINER DECISION (14z-76) — the win-quote bank relocation; tests/test_quote_font_window.sh; tools/audit_quote_font.py |
 | `PRG:0x013820` | docs/game/engine_internals.md — The WIN-QUOTE TEXT SYSTEM — fully decoded (14z-76) |
@@ -779,7 +783,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x020AA0` | docs/game/atlas/character_tables.md — Slot→character map, vsavj (COMPLETE; select-name/HUD verified picks) |
 | `PRG:0x020AA6` | docs/game/atlas/select_screen.md — The routine |
 | `PRG:0x020AAE` | docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path |
-| `PRG:0x020AB4` | docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path; tests/test_shadow_tenant.sh |
+| `PRG:0x020AB4` | docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path; tests/audit_marionette_cost.sh; tests/test_shadow_tenant.sh |
 | `PRG:0x020AC2` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] |
 | `PRG:0x020AC8` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/atlas/select_screen.md — SHADOW vs A TENANT — the static pass (14z-116, the maintainer's question); docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path; tools/audit_latch_readers.py |
 | `PRG:0x020AE8` | docs/game/atlas/ram.md — System / match globals; docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100); docs/platform/gotchas.md — A 1-BYTE MEMORY TAP MISSES WORD ACCESSES ON THIS 16-BIT BUS — and reads as a clean, meaningless zero (paid: 14z-126b); tests/audit_ff8130_writers.sh |
@@ -824,6 +828,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x02126C` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
 | `PRG:0x02127C` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
 | `PRG:0x0213F2` | docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port) [vs2]; build/manifest/huitzil.toml — data_in_code [vs2]; build/manifest/reconciliation_huitzil.toml — map [vs2] |
+| `PRG:0x0214E4` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) [vs2] |
 | `PRG:0x021638` | docs/project/patch_notes.md — B. the obj_hook dispatch sites left VANILLA — the WALKER is relocated; build/manifest/donovan.toml — obj_hook; build/manifest/huitzil.toml — obj_hook; build/manifest/pyron.toml — obj_hook |
 | `PRG:0x02163A` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
 | `PRG:0x0216A8` | docs/game/engine_internals.md — The child companion's shadow — a remapped tile never copied (fixed 14z-69o) |
@@ -842,6 +847,8 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x022008` | docs/game/engine_internals.md — The per-char effect system (14z-67, decoded on the H ping rounds) [vs2]; docs/project/gotchas.md — (14z-68, refutes half of the 14z-67 entry theory) [vs2]; docs/project/patch_notes.md — handler clone + the x026142 escape fix; build/manifest/huitzil.toml — pcrel_escape_fix [vs2]; build/manifest/reconciliation_donovan.toml — map [vs2]; build/manifest/reconciliation_huitzil.toml — map [vs2]; +1 more |
 | `PRG:0x02207E` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/test_don_immortal_native.sh |
 | `PRG:0x0220A0` | docs/platform/gotchas.md — IN A MAME LUA TAP, 'cpu.state["SP"]' IS THE SUPERVISOR STACK — THIS GAME RUNS IN USER MODE, SO A CALLER'S RETURN ADDRESS SITS AT 'USP' — A REPEAT of the entry "MAME 0.288'S 68000 CORE HAS NO 'A7' STATE" above (paid: 2026-09-28, 14z-185, #176; that 14z-158 entry already held the rule — what went wrong is that the archaeology grep, [VSP-14], was not run before writing the tap); tools/rng_draws.py |
+| `PRG:0x0220AA` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) |
+| `PRG:0x0220AE` | docs/platform/gotchas.md — IN A MAME LUA TAP, 'cpu.state["SP"]' IS THE SUPERVISOR STACK — THIS GAME RUNS IN USER MODE, SO A CALLER'S RETURN ADDRESS SITS AT 'USP' — A REPEAT of the entry "MAME 0.288'S 68000 CORE HAS NO 'A7' STATE" above (paid: 2026-09-28, 14z-185, #176; that 14z-158 entry already held the rule — what went wrong is that the archaeology grep, [VSP-14], was not run before writing the tap) |
 | `PRG:0x022174` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x02221C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x022262` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
@@ -906,6 +913,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x022A42` | build/manifest/pcrel_escapes.toml — hui60 |
 | `PRG:0x022AAA` | build/manifest/pcrel_escapes.toml — hui60 |
 | `PRG:0x022AD2` | build/manifest/pcrel_escapes.toml — hui60 |
+| `PRG:0x022AF2` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) |
 | `PRG:0x022AF4` | build/manifest/pcrel_escapes.toml — hui60 |
 | `PRG:0x022B2A` | build/manifest/pcrel_escapes.toml — hui60 |
 | `PRG:0x022B74` | build/manifest/pcrel_escapes.toml — hui60 |
@@ -1149,7 +1157,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x027A9E` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x027AA8` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x027B0E` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tools/pursuit_rigs.py |
-| `PRG:0x027B80` | docs/game/engine_internals.md — The physics bank's 'gap_*' rows (14z-121, a reference scan of vsavj's code); build/manifest/bank_map.toml — gap_be23a; build/manifest/reconciliation_huitzil.toml — map |
+| `PRG:0x027B80` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink); docs/game/engine_internals.md — The physics bank's 'gap_*' rows (14z-121, a reference scan of vsavj's code); build/manifest/bank_map.toml — gap_be23a; build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x027BC2` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x027C40` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x027C54` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
@@ -1363,6 +1371,8 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x02A0BA` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) [vs2]; tests/audit_column_flash.sh |
 | `PRG:0x02A0C8` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) |
 | `PRG:0x02A0CE` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) [vs2]; tests/audit_column_flash.sh |
+| `PRG:0x02A102` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) [vs2]; tests/audit_column_flash_cause.sh |
+| `PRG:0x02A108` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) [vs2]; tests/audit_column_flash_cause.sh; tools/audit_charid_masks.py |
 | `PRG:0x02A128` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) |
 | `PRG:0x02A142` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) [vs2] |
 | `PRG:0x02A1B4` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) |
@@ -1378,9 +1388,9 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x02A606` | build/manifest/reconciliation.toml — map |
 | `PRG:0x02A610` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines); docs/game/engine_internals.md — Dark Force (measured 14z-69/69c/101, ruled 2026-08-21) |
 | `PRG:0x02A780` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines); docs/game/engine_internals.md — Dark Force (measured 14z-69/69c/101, ruled 2026-08-21) |
-| `PRG:0x02A7C8` | docs/project/patch_notes.md — donovan-m2 stage 4 — +0x14E state hook, sound stubs, anim_index_a2 (2026-07-27, session 9); build/manifest/donovan.toml — port_patch; build/manifest/donovan.toml — state_hook; build/manifest/shared_writes.toml — donovan; tests/test_pyron_ladder.sh |
+| `PRG:0x02A7C8` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink); docs/project/patch_notes.md — donovan-m2 stage 4 — +0x14E state hook, sound stubs, anim_index_a2 (2026-07-27, session 9); build/manifest/donovan.toml — port_patch; build/manifest/donovan.toml — state_hook; build/manifest/shared_writes.toml — donovan; tests/lua/upload_tap.lua; +1 more |
 | `PRG:0x02A7CE` | build/manifest/donovan.toml — state_hook |
-| `PRG:0x02A7D6` | build/manifest/donovan.toml — state_hook |
+| `PRG:0x02A7D6` | docs/platform/gotchas.md — IN A MAME LUA TAP, 'cpu.state["SP"]' IS THE SUPERVISOR STACK — THIS GAME RUNS IN USER MODE, SO A CALLER'S RETURN ADDRESS SITS AT 'USP' — A REPEAT of the entry "MAME 0.288'S 68000 CORE HAS NO 'A7' STATE" above (paid: 2026-09-28, 14z-185, #176; that 14z-158 entry already held the rule — what went wrong is that the archaeology grep, [VSP-14], was not run before writing the tap); build/manifest/donovan.toml — state_hook |
 | `PRG:0x02A7E0` | docs/game/engine_internals.md — The two engines run DIFFERENT Dark Force systems (traced 14z-69c); docs/project/patch_notes.md — (playtest round-1 item 1; manifest-data only, no machinery); docs/project/patch_notes.md — 14z-84 — Phobos' own Dark Force palette block (huitzil-m5 -> m6): byte detail; docs/project/patch_notes.md — donovan-m2 stage 4 — +0x14E state hook, sound stubs, anim_index_a2 (2026-07-27, session 9); docs/project/patch_notes.md — sound_stub row + the sound_table remap machinery); build/manifest/donovan.toml — port_patch; +6 more |
 | `PRG:0x02A7E2` | build/manifest/donovan.toml — port_patch |
 | `PRG:0x02A894` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink); build/manifest/pyron.toml — roster21 |
@@ -1388,7 +1398,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x02A8C4` | docs/project/patch_notes.md — 14z-84 — Phobos' own Dark Force palette block (huitzil-m5 -> m6): byte detail; build/manifest/shared_writes.toml — huitzil |
 | `PRG:0x02A8C6` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink); docs/game/engine_internals.md — vs2/vh2 fill them (named 14z-74; SIX instances and counting); build/manifest/pyron.toml — palette_routine_row_11; build/manifest/shared_writes.toml — pyron; tests/test_pyron_blink.sh; tools/check_pyron_blink.py |
 | `PRG:0x02A8D6` | docs/project/patch_notes.md — 14z-84 — Phobos' own Dark Force palette block (huitzil-m5 -> m6): byte detail; build/manifest/huitzil.toml — df_gold_variant_id; build/manifest/huitzil.toml — df_seq_entry_10; build/manifest/huitzil.toml — pcrel_escape_fix; build/manifest/shared_writes.toml — huitzil |
-| `PRG:0x02A8E4` | docs/game/engine_internals.md — THE DARK FORCE PALETTE-SEQUENCE BLOCKS — measured census (14z-79b); build/manifest/huitzil.toml — pcrel_escape_fix; build/manifest/pyron.toml — roster21 |
+| `PRG:0x02A8E4` | docs/game/engine_internals.md — THE DARK FORCE PALETTE-SEQUENCE BLOCKS — measured census (14z-79b); docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink); build/manifest/huitzil.toml — pcrel_escape_fix; build/manifest/pyron.toml — roster21 |
 | `PRG:0x02A8EE` | docs/game/engine_internals.md — THE DARK FORCE PALETTE-SEQUENCE BLOCKS — measured census (14z-79b); docs/project/patch_notes.md — 14z-84 — Phobos' own Dark Force palette block (huitzil-m5 -> m6): byte detail; build/manifest/huitzil.toml — pcrel_escape_fix; build/manifest/pyron.toml — roster21 |
 | `PRG:0x02A92C` | build/manifest/huitzil.toml — pcrel_escape_fix |
 | `PRG:0x02A932` | build/manifest/pyron.toml — roster21 |
@@ -1397,21 +1407,23 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x02ABCE` | docs/game/atlas/character_tables.md — The per-character palette POINTER tables (measured 14z-76); tools/audit_effect_palette_table.py |
 | `PRG:0x02ABF0` | docs/game/atlas/character_tables.md — The per-character palette POINTER tables (measured 14z-76); tools/audit_effect_palette_table.py |
 | `PRG:0x02AC12` | docs/game/atlas/character_tables.md — The per-character palette POINTER tables (measured 14z-76); tools/audit_effect_palette_table.py |
-| `PRG:0x02ACCA` | docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path |
+| `PRG:0x02ACCA` | docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path; tools/audit_marionette_cost.py |
 | `PRG:0x02AD20` | docs/game/atlas/character_tables.md — The per-character palette POINTER tables (measured 14z-76); docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/engine_internals.md — LIFETIME HAZARD (measured 14z-126b, 2026-09-02); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — sprite; build/manifest/pyron.toml — sprite; +1 more |
-| `PRG:0x02AD3C` | docs/game/engine_internals.md — THE DARK FORCE PALETTE-SEQUENCE BLOCKS — measured census (14z-79b); docs/project/patch_notes.md — 14z-84 — Phobos' own Dark Force palette block (huitzil-m5 -> m6): byte detail; build/manifest/huitzil.toml — pcrel_escape_fix |
+| `PRG:0x02AD3C` | docs/game/engine_internals.md — THE DARK FORCE PALETTE-SEQUENCE BLOCKS — measured census (14z-79b); docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink); docs/project/patch_notes.md — 14z-84 — Phobos' own Dark Force palette block (huitzil-m5 -> m6): byte detail; build/manifest/huitzil.toml — pcrel_escape_fix; tests/audit_column_flash_cause.sh |
 | `PRG:0x02AD44` | docs/project/gotchas.md — PERMANENTLY — flicker's evil twin (14z-64); docs/project/patch_notes.md — 14z-84 — Phobos' own Dark Force palette block (huitzil-m5 -> m6): byte detail; docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — roster21; build/manifest/huitzil.toml — pcrel_escape_fix; tests/test_wheel_bank5.sh; +1 more |
 | `PRG:0x02AD50` | docs/game/gotchas.md — There is no such thing as a free palette row on a venue screen (14z-63) |
-| `PRG:0x02AD64` | docs/game/engine_internals.md — Huitzil's form is a FLIGHT mode; the purple was a palette-sequence collision (measured 14z-69e, fixed 14z-84); docs/game/engine_internals.md — LIFETIME HAZARD (measured 14z-126b, 2026-09-02); docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink); build/manifest/huitzil.toml — pcrel_escape_fix; tests/audit_column_flash.sh; tests/test_pod_black_foot_palette.sh |
+| `PRG:0x02AD64` | docs/game/engine_internals.md — Huitzil's form is a FLIGHT mode; the purple was a palette-sequence collision (measured 14z-69e, fixed 14z-84); docs/game/engine_internals.md — LIFETIME HAZARD (measured 14z-126b, 2026-09-02); docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink); build/manifest/huitzil.toml — pcrel_escape_fix; tests/audit_column_flash.sh; tests/audit_column_flash_cause.sh; +1 more |
 | `PRG:0x02AD68` | docs/game/engine_internals.md — Huitzil's form is a FLIGHT mode; the purple was a palette-sequence collision (measured 14z-69e, fixed 14z-84); docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink); build/manifest/huitzil.toml — pcrel_escape_fix |
-| `PRG:0x02AD78` | docs/game/engine_internals.md — LIFETIME HAZARD (measured 14z-126b, 2026-09-02); docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink); tests/audit_column_flash.sh; tests/test_pod_black_foot_palette.sh |
+| `PRG:0x02AD78` | docs/game/engine_internals.md — LIFETIME HAZARD (measured 14z-126b, 2026-09-02); docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink); tests/audit_column_flash.sh; tests/audit_column_flash_cause.sh; tests/test_pod_black_foot_palette.sh |
 | `PRG:0x02AD7C` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) |
 | `PRG:0x02AD80` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/engine_internals.md — LIFETIME HAZARD (measured 14z-126b, 2026-09-02); tests/lua/scroll3_watch.lua |
 | `PRG:0x02AD82` | docs/game/engine_internals.md — Huitzil's form is a FLIGHT mode; the purple was a palette-sequence collision (measured 14z-69e, fixed 14z-84); docs/game/engine_internals.md — THE DARK FORCE PALETTE-SEQUENCE BLOCKS — measured census (14z-79b); docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink); docs/project/patch_notes.md — 14z-84 — Phobos' own Dark Force palette block (huitzil-m5 -> m6): byte detail; docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; docs/project/patch_notes.md — donovan-m2 stage 4 — +0x14E state hook, sound stubs, anim_index_a2 (2026-07-27, session 9); +7 more |
 | `PRG:0x02AD8F` | docs/platform/gotchas.md — Dump a tile band WITH its bank bits, or you will exonerate the guilty; docs/platform/gotchas.md — emulators resolve a ROM entry by HASH before NAME; tests/test_m2b_scroll3.sh; tests/test_merged_render_content.sh; tests/test_wide_render_content.sh |
 | `PRG:0x02AD94` | docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path; docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; docs/project/patch_notes.md — donovan-m2 stage 4 — +0x14E state hook, sound stubs, anim_index_a2 (2026-07-27, session 9); build/manifest/donovan.toml — accent_color_aware_1; build/manifest/donovan.toml — port_patch; build/manifest/donovan.toml — state_hook; +2 more |
 | `PRG:0x02ADA6` | docs/game/engine_internals.md — Huitzil's form is a FLIGHT mode; the purple was a palette-sequence collision (measured 14z-69e, fixed 14z-84) |
-| `PRG:0x02ADAC` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/engine_internals.md — Huitzil's form is a FLIGHT mode; the purple was a palette-sequence collision (measured 14z-69e, fixed 14z-84); docs/project/patch_notes.md — 14z-84 — Phobos' own Dark Force palette block (huitzil-m5 -> m6): byte detail; build/manifest/huitzil.toml — pcrel_escape_fix |
+| `PRG:0x02ADAC` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/engine_internals.md — Huitzil's form is a FLIGHT mode; the purple was a palette-sequence collision (measured 14z-69e, fixed 14z-84); docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink); docs/project/patch_notes.md — 14z-84 — Phobos' own Dark Force palette block (huitzil-m5 -> m6): byte detail; build/manifest/huitzil.toml — pcrel_escape_fix; tests/audit_column_flash_cause.sh |
+| `PRG:0x02ADB2` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink); docs/platform/gotchas.md — IN A MAME LUA TAP, 'cpu.state["SP"]' IS THE SUPERVISOR STACK — THIS GAME RUNS IN USER MODE, SO A CALLER'S RETURN ADDRESS SITS AT 'USP' — A REPEAT of the entry "MAME 0.288'S 68000 CORE HAS NO 'A7' STATE" above (paid: 2026-09-28, 14z-185, #176; that 14z-158 entry already held the rule — what went wrong is that the archaeology grep, [VSP-14], was not run before writing the tap); tests/audit_column_flash_cause.sh; tools/audit_charid_masks.py |
+| `PRG:0x02ADB4` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) |
 | `PRG:0x02ADB8` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 |
 | `PRG:0x02AFA2` | docs/game/atlas/character_tables.md — The per-character palette POINTER tables (measured 14z-76); build/manifest/pyron.toml — sprite; tests/test_effect_palette_table.sh; tools/audit_effect_palette_table.py |
 | `PRG:0x02B144` | docs/game/engine_internals.md — The CPU AI action-script system (14z-111, measured on the #99 capture); docs/project/patch_notes.md — 14z-111 — #99 ROOT CAUSE FIX (option A): the CPU AI action-script tables unparked, byte detail [vs2] |
@@ -1421,7 +1433,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x02B4CA` | docs/game/atlas/character_tables.md — The per-character palette POINTER tables (measured 14z-76); build/manifest/pyron.toml — sprite; tools/audit_effect_palette_table.py |
 | `PRG:0x02B54E` | docs/game/engine_internals.md — The CPU AI action-script system (14z-111, measured on the #99 capture) [vs2] |
 | `PRG:0x02B598` | docs/project/patch_notes.md — 14z-116 — PYRON'S MEDALLION WHITE-OUT: byte detail (maintainer-chosen fix, field-validated 2026-08-29); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron; tests/test_wheel_bank5.sh; +1 more |
-| `PRG:0x02B640` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; tools/gen_donovan_patch.py |
+| `PRG:0x02B640` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; tools/audit_marionette_cost.py; tools/gen_donovan_patch.py |
 | `PRG:0x02B64C` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink); build/manifest/pyron.toml — palette_routine_row_11 |
 | `PRG:0x02B650` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink); docs/game/engine_internals.md — vs2/vh2 fill them (named 14z-74; SIX instances and counting); build/manifest/pyron.toml — palette_routine_row_11; build/manifest/pyron.toml — sprite; tests/test_pyron_blink.sh; tests/test_variant_dispatch.sh |
 | `PRG:0x02B672` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink); docs/game/engine_internals.md — vs2/vh2 fill them (named 14z-74; SIX instances and counting); build/manifest/pyron.toml — palette_routine_row_11_b; build/manifest/shared_writes.toml — pyron; tests/test_pyron_blink.sh; tests/test_variant_dispatch.sh |
@@ -1599,7 +1611,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x03E440` | docs/project/patch_notes.md — option (a): native-exact, incl. two new authored Phobos songs); build/manifest/qs_songs.toml — hui_trap_eject_alt |
 | `PRG:0x03ED4C` | docs/game/engine_internals.md — Select-screen (portrait/name) pipeline — mapped (session 14c) [vs2] |
 | `PRG:0x03FFFF` | docs/game/engine_internals.md — GFX ROM (sprite/tile) subsystem; tests/lua/scroll3_watch.lua; tools/gfx_tiles.py |
-| `PRG:0x040000` | docs/game/atlas/ram.md — System / match globals; docs/game/engine_internals.md — GFX ROM (sprite/tile) subsystem; docs/game/engine_internals.md — The QSound Z80 driver: id table, songs, streams, sample records (measured 14z-86, reader-traced on live vsavj, id 0x119); docs/game/gotchas.md — The attract INTRO CUTSCENE is Jedah — per-char display sites are legacy surface; docs/project/gotchas.md — "Run once at match start" is a TIMING TRAP — use a match-active countdown; docs/project/mister_map.md — As mapped (the proposal); +23 more |
+| `PRG:0x040000` | docs/game/atlas/ram.md — System / match globals; docs/game/engine_internals.md — GFX ROM (sprite/tile) subsystem; docs/game/engine_internals.md — The QSound Z80 driver: id table, songs, streams, sample records (measured 14z-86, reader-traced on live vsavj, id 0x119); docs/game/gotchas.md — The attract INTRO CUTSCENE is Jedah — per-char display sites are legacy surface; docs/project/gotchas.md — "Run once at match start" is a TIMING TRAP — use a match-active countdown; docs/project/mister_map.md — As mapped (the proposal); +26 more |
 | `PRG:0x0402F4` | docs/project/mister_fit.md — 1. Program ROM (68k) |
 | `PRG:0x0409EC` | docs/game/atlas/id_space.md — The seven vsavj folding sites; docs/game/atlas/id_space.md — What a per-tenant manifest must declare; docs/project/tenant_manifest.md — The schema |
 | `PRG:0x040AF6` | docs/project/gotchas.md — A frozen build stops being a usable REFERENCE when the profile bumps (14z-92); tests/test_merged_render_content.sh |
@@ -2067,7 +2079,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x06BC78` | docs/game/atlas/select_screen.md — The ring/highlight POSITION source — the 32-row base table (14z-63); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 |
 | `PRG:0x06BDB2` | docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven) [vs2]; tests/test_roulette_tag_rows.sh |
 | `PRG:0x06C0E0` | docs/game/atlas/select_screen.md — The RECORD-POINTER array — what the hovered cell displays (14z-61); docs/game/engine_internals.md — The select screen's laws (the atlas is canonical); docs/project/doc_audit_14z118.md — 2. Cross-document numbers to lock (candidates for the script); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — name_bank_variant_id; build/manifest/donovan.toml — splash_bank_variant_id; +6 more |
-| `PRG:0x06C32A` | docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path |
+| `PRG:0x06C32A` | docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path; tools/audit_marionette_cost.py |
 | `PRG:0x06C494` | docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100) |
 | `PRG:0x06CA00` | build/manifest/huitzil.toml — throw_arc_tables [vs2] |
 | `PRG:0x06CAC0` | docs/game/engine_internals.md — The shared-type trap, and '[[obj_hook_extra]]' [vs2]; docs/project/gotchas.md — (14z-69; this is the real root of the parked effect family); docs/project/patch_notes.md — 14z-69 (session close) — byte detail; build/manifest/huitzil.toml — obj_hook; build/manifest/huitzil.toml — obj_hook [vs2]; tools/build_donovan.sh; +2 more |
@@ -2225,7 +2237,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0926E4` | docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122); docs/project/patch_notes.md — 14z-102 — #109 THE CLONE-BEAM FIX (row 31) — FROZEN as huitzil-m19/merged-m5 (bit-for-bit the probes), field-confirmed, #109 CLOSED; build/manifest/huitzil.toml — beam_effect_class16 [vs2]; tests/audit_clone_beam_lines.sh; tools/build_donovan.sh |
 | `PRG:0x092802` | docs/project/patch_notes.md — 14z-102 — #109 THE CLONE-BEAM FIX (row 31) — FROZEN as huitzil-m19/merged-m5 (bit-for-bit the probes), field-confirmed, #109 CLOSED; tools/build_donovan.sh |
 | `PRG:0x092C4A` | docs/project/patch_index.md — Mechanism inventory (generator vocabulary); build/manifest/donovan.toml — capture_kf_bulleta; build/manifest/huitzil.toml — capture_kf_bulleta; build/manifest/huitzil.toml — df_seq_entry_10; build/manifest/huitzil.toml — grab_hold_keyframes; build/manifest/huitzil.toml — grab_hold_keyframes [vs2]; +1 more |
-| `PRG:0x0933EA` | docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path |
+| `PRG:0x0933EA` | docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path; tools/audit_marionette_cost.py |
 | `PRG:0x093460` | docs/project/patch_notes.md — 14z-71 — the beam: byte detail; docs/project/porting_code_regions.md — 1. Bound the region by the SIBLING ORACLE, then check what it cut; build/manifest/huitzil.toml — grab_hold_keyframes [vs2]; tools/build_donovan.sh |
 | `PRG:0x093550` | docs/project/patch_notes.md — 14z-71 — the beam: byte detail; tools/build_donovan.sh |
 | `PRG:0x093764` | docs/project/patch_notes.md — 14z-71 — the beam: byte detail; tools/build_donovan.sh |
@@ -2431,7 +2443,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0BF9A0` | build/manifest/donovan.toml — capture_kf_lilith; build/manifest/huitzil.toml — capture_kf_lilith; build/manifest/pyron.toml — capture_kf_lilith |
 | `PRG:0x0BFF38` | build/manifest/donovan.toml — port_patch |
 | `PRG:0x0BFFFF` | docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path |
-| `PRG:0x0C0000` | docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path; tests/test_patch_prg.sh; tests/test_pointer_flow.sh; tools/audit_copy_flags.py |
+| `PRG:0x0C0000` | docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path; tests/test_patch_prg.sh; tests/test_pointer_flow.sh; tools/audit_copy_flags.py; tools/audit_marionette_cost.py |
 | `PRG:0x0C010E` | build/manifest/donovan.toml — capture_kf_lilith; build/manifest/huitzil.toml — capture_kf_lilith; build/manifest/pyron.toml — capture_kf_lilith |
 | `PRG:0x0C0D74` | docs/project/patch_notes.md — donovan-m2 stage 4 — dispatch_14 repoint (2026-07-27, session 8) |
 | `PRG:0x0C109C` | docs/game/engine_internals.md — The STARTUP INVINCIBILITY window is per character, and the tenants arm their own (measured 14z-126) [vs2]; docs/game/preserved_data.md — 1. The VS-style Dark Force handler family in vs2 and vh2 — for all 18 characters (measured 14z-69c, 14z-126) [vs2] |
@@ -2466,6 +2478,8 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0CB9C0` | docs/project/patch_notes.md — 14z-82 — per-tenant TYPE NUMBERS (the merged obj_hook vec3 fix) + the F2 merged shim; tests/audit_merged_vec3.sh |
 | `PRG:0x0CBAE0` | docs/project/patch_notes.md — 14z-170 — THE M19 FREEZE (donovan-m23 / huitzil-m30 / pyron-m24 / merged-m19, mark M19): the four ruled #136 fixes, and a placeholder corruption that had shipped since merged-m16 |
 | `PRG:0x0CBF50` | docs/project/patch_notes.md — 14z-170 — THE M19 FREEZE (donovan-m23 / huitzil-m30 / pyron-m24 / merged-m19, mark M19): the four ruled #136 fixes, and a placeholder corruption that had shipped since merged-m16 |
+| `PRG:0x0CC030` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) |
+| `PRG:0x0CC056` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) |
 | `PRG:0x0CC110` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 |
 | `PRG:0x0CD390` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured) [vs2] |
 | `PRG:0x0CE38A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured) |
@@ -2473,7 +2487,8 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0CE412` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured) [vs2] |
 | `PRG:0x0CE51C` | docs/project/gotchas.md — Disabling a heuristic CLASS wholesale can revert load-bearing writes |
 | `PRG:0x0CEAF0` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; tests/test_dualtrack.sh |
-| `PRG:0x0CEB50` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) |
+| `PRG:0x0CEB50` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink); tests/audit_column_flash_cause.sh |
+| `PRG:0x0CF050` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) |
 | `PRG:0x0CF360` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 |
 | `PRG:0x0CF370` | docs/project/patch_notes.md — 14z-183 — THE M20 FREEZE (donovan-m24 / huitzil-m31 / pyron-m25 / merged-m20, mark M20): #157, the hit-registration pair reconciled |
 | `PRG:0x0CF598` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
@@ -2828,7 +2843,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x28DEF8` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 [vs2]; tests/test_don_sword.sh |
 | `PRG:0x28ED08` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x2A0426` | docs/game/engine_internals.md — Select-screen (portrait/name) pipeline — mapped (session 14c); tools/gen_donovan_patch.py; tools/overlay_port.py |
-| `PRG:0x2A04FA` | docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path; tools/overlay_port.py |
+| `PRG:0x2A04FA` | docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path; tools/audit_marionette_cost.py; tools/overlay_port.py |
 | `PRG:0x2A05E2` | docs/game/engine_internals.md — The select screen's laws (the atlas is canonical); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 [vs2]; build/manifest/donovan.toml — splash_p1; build/manifest/huitzil.toml — splash_p1; build/manifest/pyron.toml — splash_p1; tools/check_tenant_select.py; +1 more |
 | `PRG:0x2A0662` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — splash_p2; build/manifest/huitzil.toml — splash_p2; build/manifest/pyron.toml — splash_p2; tools/check_tenant_select.py |
 | `PRG:0x2A06E2` | docs/game/engine_internals.md — 3. Portrait and quote — DIFFERENT mechanisms (measured 14z-73); docs/game/engine_internals.md — Per-tenant win-screen checklist; docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — win_quote; build/manifest/huitzil.toml — win_quote; build/manifest/pyron.toml — win_quote; +1 more |
@@ -2875,7 +2890,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x2A8CB6` | build/manifest/pyron.toml — win_quote |
 | `PRG:0x2A8CF8` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — win_quote; tools/overlay_port.py; tools/select_port.py |
 | `PRG:0x2ABD58` | build/manifest/reconciliation.toml — map [vs2] |
-| `PRG:0x2B7EF4` | docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path; docs/project/gotchas.md — below its base — never allocate it at the start of wide_ext (14z-68); docs/project/patch_notes.md — 14z-65 (4) — Huitzil stage 4 BUILDS; the R1 frontier enumerated (2026-08-07); build/manifest/reconciliation.toml — map [vs2]; tools/build_donovan.sh; tools/gen_anita_bank2.py |
+| `PRG:0x2B7EF4` | docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path; docs/project/gotchas.md — below its base — never allocate it at the start of wide_ext (14z-68); docs/project/patch_notes.md — 14z-65 (4) — Huitzil stage 4 BUILDS; the R1 frontier enumerated (2026-08-07); build/manifest/reconciliation.toml — map [vs2]; tools/audit_marionette_cost.py; tools/build_donovan.sh; +1 more |
 | `PRG:0x2B8060` | docs/project/patch_notes.md — 14z-65 (4) — Huitzil stage 4 BUILDS; the R1 frontier enumerated (2026-08-07); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 [vs2]; build/manifest/reconciliation.toml — map [vs2]; tools/build_donovan.sh |
 | `PRG:0x2B80D8` | build/manifest/huitzil.toml — throw_arc_tables |
 | `PRG:0x2B8190` | build/manifest/donovan.toml — throw_victim_keyframes [vs2] |
@@ -3036,7 +3051,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x3C6E9C` | build/manifest/donovan.toml — win_pal_slot0f_c5 |
 | `PRG:0x3C79DC` | build/manifest/donovan.toml — win_pal_slot0f_c6 |
 | `PRG:0x3C851C` | build/manifest/donovan.toml — win_pal_slot0f_c7 |
-| `PRG:0x3CB7DC` | docs/project/patch_notes.md — A. 'fixture_row0f_override_bank0/1' DELETED (donovan only) [vs2]; docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 [vs2]; build/manifest/donovan.toml — state_hook; build/manifest/donovan.toml — weapon_accent_rowd_slot; build/manifest/donovan.toml — weapon_accent_rowd_slot [vs2] |
+| `PRG:0x3CB7DC` | docs/project/patch_notes.md — A. 'fixture_row0f_override_bank0/1' DELETED (donovan only) [vs2]; docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 [vs2]; build/manifest/donovan.toml — state_hook; build/manifest/donovan.toml — weapon_accent_rowd_slot; build/manifest/donovan.toml — weapon_accent_rowd_slot [vs2]; +1 more |
 | `PRG:0x3CB7FC` | build/manifest/donovan.toml — weapon_accent_rowd_slot |
 | `PRG:0x3D15F0` | docs/game/atlas/character_tables.md — Palette pipeline (partial) |
 | `PRG:0x3D25F0` | docs/game/atlas/venue_assets.md — 2. Select / VS-screen palette blocks — FOLDED to 4 bits; tools/audit_palette_block_width.py |
@@ -3079,12 +3094,14 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x0020A4` | tests/test_effect_placeholders.sh |
 | `PRG:0x0020B8` | tests/test_effect_placeholders.sh |
 | `PRG:0x005C06` | tests/test_attract_roster.sh |
+| `PRG:0x007122` | tests/audit_marionette_cost.sh |
 | `PRG:0x0075F4` | tests/audit_tick_cadence.sh |
 | `PRG:0x007600` | tests/audit_tick_cadence.sh |
 | `PRG:0x007C1E` | tests/audit_tick_cadence.sh |
 | `PRG:0x008E26` | tests/audit_tick_cadence.sh |
 | `PRG:0x00941E` | tests/audit_tick_cadence.sh |
 | `PRG:0x009910` | tests/test_roulette_tag_rows.sh |
+| `PRG:0x009B2A` | tests/audit_tenant_cpu_soak.sh |
 | `PRG:0x00AEE2` | tests/test_voice_row_range.sh |
 | `PRG:0x00B0A0` | tests/test_roulette_tag_rows.sh |
 | `PRG:0x00B140` | tools/decode_win_quotes.py |
@@ -3098,6 +3115,7 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x00E7FF` | tests/lua/inp_probe.lua |
 | `PRG:0x010005` | tests/test_gfx_collision_gate.sh |
 | `PRG:0x0112C0` | tests/test_win_quote_decode.sh |
+| `PRG:0x013790` | tools/audit_marionette_cost.py |
 | `PRG:0x013890` | tests/test_biased_list_inventory.sh |
 | `PRG:0x014EA0` | tests/test_gfx_chain.sh |
 | `PRG:0x014FBF` | tests/test_gfx_chain.sh |
@@ -3318,6 +3336,7 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x08A362` | tests/test_m2a_stage4_code.sh |
 | `PRG:0x08A49A` | tests/test_m2a_stage4_code.sh |
 | `PRG:0x08A510` | tests/test_m2a_stage4_code.sh |
+| `PRG:0x08A6D4` | tools/audit_marionette_cost.py |
 | `PRG:0x08AA06` | tests/test_m2a_stage4_code.sh; tools/extract_char.py |
 | `PRG:0x08B156` | tools/build_donovan.sh |
 | `PRG:0x08B382` | tests/test_m2a_stage4_code.sh |

@@ -350,6 +350,7 @@ tests/test_tickets.sh	docs
 tests/test_type_stamp_census.sh	pipeline
 tests/test_vanilla_frame_join.sh	character-data
 tests/test_vanilla_aerial_join.sh	character-data
+tests/test_vanilla_command_join.sh	character-data
 tests/test_variant_dispatch.sh	pipeline
 tests/test_version_string.sh	gfx
 tests/test_voice_row_range.sh	pipeline
@@ -387,6 +388,7 @@ tests/audit_entrance_draw.sh	character-data
 tests/audit_pass_overrun.sh	character-data
 tests/audit_lag_budget.sh	character-data
 tests/audit_column_flash.sh	character-data
+tests/audit_column_flash_cause.sh	character-data
 tests/audit_phobos_dmg_residual.sh	character-data
 tests/audit_dmg_legacy_sweep.sh	character-data
 tests/test_df_field_readers.sh	character-data
@@ -433,3 +435,5 @@ tests/test_roulette_tag_rows.sh	tenant
 tests/test_copy_flags.sh	pipeline
 tests/audit_mizuumi_struct.sh	character-data
 tests/test_release_launcher_bat.sh	platform
+tests/audit_marionette_cost.sh	character-data
+tests/audit_tenant_cpu_soak.sh	tenant

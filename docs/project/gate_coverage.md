@@ -13,7 +13,7 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**424 of 424 gates described.**
+**428 of 428 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
@@ -23,8 +23,8 @@ first sentence) is `gate_index.md`.
 | [pipeline](#pipeline) | 60 | 60 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
-| [tenant](#tenant) | 86 | 86 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 69 | 69 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [tenant](#tenant) | 87 | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
+| [character-data](#character-data) | 72 | 72 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -1798,7 +1798,7 @@ tiles, OBJ records, sprite lists, render-layer verdicts. 25 of 25 described.
 
 ## tenant
 
-tenant content — per-character gates and on-demand audits on the ported characters. 86 of 86 described.
+tenant content — per-character gates and on-demand audits on the ported characters. 87 of 87 described.
 
 ### `audit_continue_ladder.sh` — audit, emulator
 
@@ -2039,6 +2039,14 @@ tenant content — per-character gates and on-demand audits on the ported charac
 **HOW:** one rig, two legs, merged build on MAME. tests/replays/don/202_don_continue_switch.rpl picks Donovan on the wheel, the venue byte $FF8121 is pinned to 0x10 (rung 1 Bishamon, rung 2 Phobos), P2's then P1's HP words are poked negative (Bishamon KO'd at f3000, Donovan KO'd by Phobos at f4600), and the replay continues, answers NO and moves the cursor to Aulbath. Leg HELD runs as is; leg RELEASED also pokes P2's +0x382 to 0x03 between the switch and the re-pick, so the store runs and writes the DRAW. Per leg: a non-debug write tap on $FF8B82/$FF8782/$FF8100 (tests/lua/read_tap.lua) and P1/P2 block dumps every 10 frames (tests/lua/replay.lua). Each loaded character is named by its +0x60 against the BUILD's own table (PRG:0x0BD97A, as audit_don_vs_cpu does), names from tests/expected/roster_pairings/bases.tsv.
 
 **EXPECTS:** both legs' setup events happen (else VOID): rung 1 loads Bishamon, P2 KO'd, rung 2 written 0x10 by PRG:0x0AFCE and Phobos loads, P1 KO'd, P1's +0x382 committed 0x09 after the continue, the re-pick's stage write (PRG:0x00AF10) follows it. RELEASED: the store writes $FF8B82 in the re-pick's frame with a class D != 0x10, and P2 loads D with P1 Aulbath. HELD (EXPECT=held, the default, as measured): no write to $FF8B82 between the switch and the re-pick, and P2 loads Phobos with P1 Aulbath. Both legs write the same stage. EXPECT=draw is the form once #202 is fixed: HELD loads D too. Every control fails.
+
+### `audit_tenant_cpu_soak.sh` — audit, emulator
+
+**WHAT:** #129 asks whether the tenants' CPU AI is lackluster on our build. Statically their AI blocks are byte-identical to vs2's (14z-189 analysis); this gate measures what the CPU DOES. For each tenant (Phobos, Pyron, Donovan) and two player conditions it reduces one long in-match window per leg to distributions — animation-node entries (the node read back to its vsav2 address through the build's placements), frames per state family +0x06, CPU AI current-command entries +0x241, frames per AI script index +0x205, mean |x1-x2|, airborne frames — and prints the total-variation distance between the legs (tools/cpu_soak_dist.py). It judges no "plays the same": the figures are frozen as measured, and what they mean is the maintainer's to read from the capture sheets.
+
+**HOW:** 12 MAME legs (3 tenants x 2 conditions x {ours, native}), 1P arcade. P1 picks by its REAL cursor route (tools/select_paths.py: ours Donovan L,L,D,D and Phobos D,D,D; vs2 Donovan R,R and Phobos L,L,L) and the ladder's OWN draw (PRG:0x0AEF6 / vs2 0x973C) picks the CPU, steered only by the venue byte $FF8121 and the in-use mask $FF8110 poked before the draw — our tenant rows of table A are byte-identical to vs2's (vsavj 0x0B268, vs2 0x09B2A, measured 14z-189), so the same venue and mask draw the same class on both legs: Donovan P1 venue 0x02 -> CPU Phobos; Donovan P1 venue 0x04 mask bit 1 -> CPU Pyron; Phobos P1 venue 0x00 mask bit 6 -> CPU Donovan. Pins on both legs: the speed level $FF8116 = 6 from 2000 (the parity rigs' matched level, [VSE-84]), both fighters' HP ($FF8450, $FF8850 = 0x120) and the round timer $FF8109 = 99 from 2880 — ONE stationary round, neither side ever at a lower HP (the first ERIS run without the P2 pin let the active P1 win rounds and end the match, so later in-match frames could belong to the next opponent — 14z-189, the check below now refuses that). The RNG is NOT pinned: the AI's random choices are the subject. Conditions: PASSIVE (P1 still after the confirm) and ACTIVE (a fixed 180-frame P1 cycle from 3000: walk forward, jump, LP, crouch + MK, hold back). field_trace.lua samples every frame from 2880 to FRAMES.
+
+**EXPECTS:** every leg LIVE — on EVERY frame of the window P1 and P2 hold the expected classes, P2 its loaded hitbox base, the match is on ($FF8008 == 0x40000) and the pins held (a wrong opponent, a lost round or a broken pin is a DEAD leg, never a pass) — and every analysis line equal to tests/expected/tenant_cpu_soak.txt (FREEZE=1 writes it; MAME runs are deterministic). Both controls fire.
 
 ### `audit_tenant_downwin.sh` — audit, emulator
 
@@ -2490,7 +2498,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 ## character-data
 
-the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 69 of 69 described.
+the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 72 of 72 described.
 
 ### `audit_air_gc_legacy.sh` — audit, emulator
 
@@ -2523,6 +2531,14 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 **HOW:** the naming part donovan_4 on native vs2 and on the build (the merged wheel's real cursor path, the parity gate's pins) on MAME; palette RAM dumped at 2858/2860/2866 and hashed per leg (a hash, never the bytes: rule 7), plus a non-debug write tap on row 11 attributing every writer PC; the control replaces our row 11 by native's.
 
 **EXPECTS:** the frozen hashes per leg, native's row constant over the three frames and ours equal to native at 2858 (so a leg that missed the move cannot pass), every writer the uploader's `movem.l` in its own opcode image. A red is the flash gone or moved; which sequence id we upload, and why, is NOT covered.
+
+### `audit_column_flash_cause.sh` — audit, emulator
+
+**WHAT:** at frames 2807 and 2858 (the move's start and end) P1's fighter block (Donovan, id 0x13) runs the palette RELOAD entry — vsavj/ours PRG:0x02ADAC, vs2 PRG:0x02A102: `movea.l $3a4(a6),a0 / bsr 0x2AD3C` (block row 0 into palette row +0x18B), then `move.l #mask,d1 / move.b $382(a6),d0 / btst.l d0,d1 / bne -> rts`, else block rows 1-3 into the next three rows. vs2's mask (PRG:0x02A108) sets bit 0x13, so native reloads row 0 ONLY; vsavj's (PRG:0x02ADB2, unchanged in our build) does not, so ours also reloads rows 1-3 and row 11 ($90C160) gets block row 1 — the orange ramp (Donovan's sprite-palette block, PRG:0x0CEB50, placed by `[[palette]]`). A COUNTERFACTUAL leg sets the bit in the emulator's decrypted-opcode share (nothing built, nothing on disk): the 2858 reload then writes row 0 only and nothing writes row 11 after the move's own 2813 upload. A STATIC CENSUS of every `move.l #mask,Dn / move.b $382(An),Dm / btst` site pairs vs2's to ours and records where a TENANT bit differs.
+
+**HOW:** the naming part donovan_4 (audit_column_flash.sh's rig: the part's pokes, the level and RNG pins, ours through the merged wheel's real cursor path) on MAME, three legs at once — native vsav2, ours, ours with OPATCH — each under tests/lua/upload_tap.lua: a NON-DEBUG write tap on the object palette that logs, per uploader instruction, the CPU registers at that instant (a0 = source + 0x10, the destination) and the requester's +0x382/+0x18B/+0x3A4. A -debug breakpoint would read the same registers but desynchronise the replay ([MFI-5]). Then tools/audit_charid_masks.py over vs2's, our build's and vsavj's opcode images.
+
+**EXPECTS:** the frozen rows; C1 ours reloads block rows 0-3 into rows 0x0A-0x0D at both frames, row 11 from block row 1; C2 native reloads row 0 only, no row-11 write at either frame; C3 the counterfactual reloads row 0 only and leaves row 11 untouched after 2813; C4 the census reads the #162 site DIFF (vs2 bit 0x13 set, ours clear).
 
 ### `audit_column_shock.sh` — audit, emulator
 
@@ -2739,6 +2755,14 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 **HOW:** seven leg shapes on MAME (Phobos real, Phobos over Donovan, Phobos over Demitri, Donovan over Demitri, the Donovan victim rig, Pyron over Demitri, our WIDE build's Phobos) each under the non-debug PC-attributed read tap over both blocks' latch windows, the in-play readers frozen per leg with the byte seen; controls swap the poked leg for the real path and move the tap windows off the bytes.
 
 **EXPECTS:** the frozen per-leg inventories (Phobos real 00, over Donovan 01, no reader for Donovan or Pyron in these rigs, ours only the float fork seeing the shim's 00); the real-path swap reads 00 where the row says 01 and fails, the moved windows read VOID.
+
+### `audit_marionette_cost.sh` — audit, emulator
+
+**WHAT:** (1) STATIC — tools/audit_marionette_cost.py classifies each of vs2's 28 +0x3C3 sites by the three-sibling method (masked unique anchors before and after the site, then an instruction diff of the two spans): INSERT (vs2 code vsavj lacks, a pure insertion), REPLACE (vs2 code that replaces vsavj code), NEW (vs2 code in a sub-state vsavj's twin routine does not have) — each with the vsavj HOOK POINT, the first vsavj instruction after the difference. (2) ASSETS — her records as the +0x3C3 code selects them (the select record, the VS/sprite record, the palette block), walked to their tile codes. (3) DYNAMIC — on PRISTINE vsavj, tests/lua/pc_count.lua counts every execution of every hook point, PER EMULATED FRAME, over every replay with a frozen vanilla masked-basis log (the legacy corpus, to its basis length) plus 128_shadow_vs_legacy_vsavj (Shadow on vanilla, to frame 9000) — Shadow is legacy content, and most +0x3C3 sites sit beside a +0x3BC (Shadow) test.
+
+**HOW:** the static and asset censuses on decrypted views (tests/lib/decrypt_cache.sh); MAME -debug breakpoints, one per hook point plus two WITNESSES (vsavj PRG:0x020AB4 `st.b $3bc(a6)` — Shadow's setter — and PRG:0x009BB2, the round-end morph test), JOBS legs in parallel. The cycle figure is a MODEL, stated: the cheapest hook that keeps vanilla's own instructions is `jsr abs.l` to a thunk that tests the flag, branches and returns — JSR abs.L 20 + TST.B d16(An) 12 + Bcc.B 10 (taken; 8 not) + RTS 16 = 58 cycles per execution (MC68000 user manual execution times); the displaced vanilla instructions run in the thunk at their own cost. The frame budget is MAME's model of the board: maincpu clock 16,000,000 / refresh 59.637405 = 268,288 cycles (`-listxml vsavj`).
+
+**EXPECTS:** the static table, the asset lines and every per-site count (hits, replays, frames, max-per-frame), the worst frame's combined hook executions and its modelled cycles, all equal to tests/expected/marionette_cost.tsv; every leg complete; the Shadow setter executed exactly once on the witness replay (the replay really armed Shadow under the instrument); each control FAILs.
 
 ### `audit_mizuumi_struct.sh` — audit, emulator
 
@@ -3035,6 +3059,14 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 **HOW:** tools/vanilla_join_rig.py performs each button during a neutral and a forward jump (60 legs on MAME in parallel), the entered chain read from the node pointer +0x1C within the event window and mapped onto the decoded graph; the rigs must regenerate byte-identically; the control swaps one character's neutral and forward rows.
 
 **EXPECTS:** every event fires (never UNFIRED but Anakaris's declared six), the 360 rows equal to the frozen map, the structural rule per direction; the swapped rows fail.
+
+### `test_vanilla_command_join.sh` — test, emulator
+
+**WHAT:** which anim chain each vanilla character enters on toward+button (6x) and on down-toward+button (3x) at the far pin, measured on vsavj — the join that names the `6x`/`3x` command normals the cross-check could not reach, a chain other than the character's far standing (resp. crouching) one being a command normal by measurement.
+
+**HOW:** tools/vanilla_join_rig.py performs each button with R and with DR held (30 legs on MAME in parallel), the entered chain read from the node pointer +0x1C within the event window and mapped onto the decoded graph; the rigs must regenerate byte-identically; the control swaps one character's 6x and 3x rows. One more leg connects Lei-Lei's 6x at 128 px and counts P2's HP drops.
+
+**EXPECTS:** every event fires, the 180 rows equal the frozen map, the structural rules on the values (ground moves, a2 chains, the plain-normal fallbacks), LE 6HP lands ONE hit; the swapped rows and the three-hit row fail.
 
 ### `test_vanilla_frame_join.sh` — test, emulator
 

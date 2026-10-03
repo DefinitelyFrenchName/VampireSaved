@@ -9,6 +9,7 @@ declares	audit_chains174
 declares	audit_chains184
 declares	audit_clone_beam_lines
 declares	audit_column_flash
+declares	audit_column_flash_cause
 declares	audit_column_shock
 declares	audit_continue_ladder
 declares	audit_continue_switch
@@ -62,6 +63,7 @@ declares	audit_ladder_selector
 declares	audit_lag_budget
 declares	audit_latch_reads
 declares	audit_legacy_pairings
+declares	audit_marionette_cost
 declares	audit_mask_window_ff4182
 declares	audit_mask_window_ff42a2
 declares	audit_merged_legacy
@@ -96,6 +98,7 @@ declares	audit_stage_sweep
 declares	audit_stock_emulator_stall
 declares	audit_tech_roll
 declares	audit_tenant_continue_switch
+declares	audit_tenant_cpu_soak
 declares	audit_tenant_downwin
 declares	audit_tenant_throw_geometry
 declares	audit_tenant_throws
@@ -418,6 +421,7 @@ declares	test_tickets
 declares	test_type_stamp_census
 declares	test_unless_composed
 declares	test_vanilla_aerial_join
+declares	test_vanilla_command_join
 declares	test_vanilla_frame_join
 declares	test_variant_dispatch
 declares	test_version_string

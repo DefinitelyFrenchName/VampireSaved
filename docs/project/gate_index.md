@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**424 scripts** — 115 ci_portable, 87 ci_static, 222 emulator-tier (run by name).
+**428 scripts** — 115 ci_portable, 87 ci_static, 226 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -26,8 +26,8 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [pipeline](#pipeline) | 60 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
-| [tenant](#tenant) | 86 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 69 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [tenant](#tenant) | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
+| [character-data](#character-data) | 72 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -327,6 +327,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 | `tests/audit_stage_sweep.sh` | audit | emulator | MAME, a build dir, ~6 min | EVERY TENANT ON EVERY STAGE (14z-104, the §4 "each stage" cell — no stage sweep existed anywhere before this). | 14z-104 |
 | `tests/audit_tech_roll.sh` | audit | emulator | MAME, a build dir, ~1 min | THE TECH ROLL (moving recovery), both directions per tenant, plus the pursuit-vs-roll counter (14z-104 (3); coverage matrix gap 1, maintainer-described mechanic 2026-08-22). | 14z-104 (3) |
 | `tests/audit_tenant_continue_switch.sh` | audit | emulator | MAME, FBNeo, a build dir, ~1.5 min | A TENANT CPU OPPONENT SURVIVES A CONTINUE-AND-SWITCH (GitHub #202, 14z-189): lose to CPU Phobos as Donovan, continue, answer NO to "same character?" and pick Aulbath, and the ladder's re-pick is SKIPPED by the 14z-87 keep-tenant thunk — Aul… | 14z-189 |
+| `tests/audit_tenant_cpu_soak.sh` | audit | emulator | MAME, FBNeo, a build dir | THE TENANT CPU SOAK: what each tenant does as a CPU opponent on our build, against the same character's CPU on native vsav2, as DISTRIBUTIONS over a long round (GitHub #129, 14z-189) | 14z-189 |
 | `tests/audit_tenant_downwin.sh` | audit | emulator | MAME, a build dir, ~1.5 min | THE LIFE-MARKER TRANSITION (KO-path judge), both directions per tenant (14z-104). | 14z-104 |
 | `tests/audit_tenant_throws.sh` | audit | emulator | MAME, a build dir, ~1 min | NORMAL THROWS, both directions per tenant (14z-104, coverage matrix). | 14z-104 |
 | `tests/audit_tenant_timeout.sh` | audit | emulator | MAME, a build dir, ~2 min | THE TIMEOUT JUDGE, per tenant (14z-104). | 14z-104 |
@@ -394,6 +395,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/audit_chains174.sh` | audit | emulator | MAME, a build dir, ~2 min | THE TENANTS' ONCE NEVER-ENTERED a2 ATTACK CHAINS, ENTERED ON NATIVE AND COMPARED WITH OURS (GitHub #174, 14z-184). | 14z-184 |
 | `tests/audit_chains184.sh` | audit | emulator | MAME, FBNeo, a build dir, ~3 min | THE TENANTS' ONCE NEVER-ENTERED a2 CHAINS WITH NO ATTACK RECORD, ENTERED ON NATIVE AND COMPARED WITH OURS (GitHub #184, 14z-186). | 14z-186 |
 | `tests/audit_column_flash.sh` | audit | emulator | MAME, FBNeo, a build dir | THE ORANGE FLASH ON THE DEITY AS DONOVAN'S KILLSHREAD LIGHTNING COLUMN ENDS, frozen AS MEASURED (14z-170, the maintainer's capture read): | 14z-170 |
+| `tests/audit_column_flash_cause.sh` | audit | emulator | MAME, FBNeo, a build dir | WHY THE DEITY FLASHES ORANGE as Donovan's Killshread Lightning column ends (14z-189, GitHub #162's open question, answered): | 14z-189 |
 | `tests/audit_column_shock.sh` | audit | emulator | MAME, a build dir, ~12 s | DONOVAN'S KILLSHREAD LIGHTNING COLUMN PLAYS vs2's CLASS-0x52 RULE ON OUR BUILD (since the 14z-170 fix, ruled 2026-09-18): the victim shocked 24 frames and Donovan exempt, every +0x5C write of both fighters equal to native's in frame and val… | 14z-170 |
 | `tests/audit_crouch_flag.sh` | audit | emulator | MAME, a build dir, ~15 s | THE FIGHTER'S +0x121 IS THE CROUCH FLAG, measured against a scripted Down on native vsav2 and on our merged build (14z-169): | 14z-169 |
 | `tests/audit_defense_row_reads.sh` | audit | emulator | MAME, a build dir | WHICH ROW EVERY HIT'S DEFENSE READS INDEX, by the victim's identity, over the corpus on our merged build and on pristine vsavj, frozen (14z-169, the analysis before the ruled fix "the tenants' defense rows become vs2's", #136). | 14z-169 |
@@ -421,6 +423,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/audit_ladder_pick_store.sh` | audit | emulator | MAME, ~2 min | +0x382 IS THE CHARACTER ID, AND THE 1P ARCADE LADDER WRITES THE CPU SIDE'S BEFORE IT LOADS: the measurements that retracted 14z-87's "voice-class borrow" (GitHub #195, #202; 14z-188), on pristine vsavj. | 14z-87 |
 | `tests/audit_lag_budget.sh` | audit | emulator | MAME, FBNeo, a build dir | A FIX SET ADDS NO FRAME OF LAG: over every #136 naming part (the three tenants' moves, and legacy attackers against each tenant), the build under test has no zero-pass frame that the reference build — the one before the fixes — does not hav… | 14z-170 |
 | `tests/audit_latch_reads.sh` | audit | emulator | MAME, a build dir, ~2 min | WHO READS THE SELECT-CONFIRM LATCH IN PLAY, per leg shape, with the VALUE each reader saw: the measured half of the #151 step-3 sweep, frozen (14z-161). | 14z-161 |
+| `tests/audit_marionette_cost.sh` | audit | emulator | MAME, FBNeo, ~4 min | WHAT A MARIONETTE PORT WOULD COST vsavj: every place vs2 touches her flag +0x3C3, the vsavj instruction a port would have to hook there, how often LEGACY content executes each one, and her assets' size (14z-189, GitHub #128 — the maintainer… | 14z-189 |
 | `tests/audit_mizuumi_struct.sh` | audit | emulator | MAME, FBNeo, a build dir, ~4 min | THE MIZUUMI PLAYER-STRUCT CANDIDATES, MEASURED: the offsets adopted into atlas/ram.md from the community's Reverse Engineering page, each held by a check whose CONTROL would disagree (14z-189, GitHub #118) | 14z-189 |
 | `tests/audit_move_parity.sh` | audit | emulator | MAME, a build dir | EVERY TENANT MOVE, OURS vs NATIVE vsav2, AT A MATCHED SPEED LEVEL AND A PINNED RNG (GitHub #136, 14z-159). | 14z-159 |
 | `tests/audit_move_parity_attribution.sh` | audit | emulator | MAME, a build dir, ~5 min | EVERY DIFF ROW OF THE #136 MOVE-PARITY TABLE HAS A MEASURED CAUSE, frozen (14z-168, GitHub #136): each root found by ablation (its event's inputs removed, both legs re-run, the rows that vanish are its) and named by a measured signature; | 14z-168 |
@@ -458,6 +461,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/test_same_data_p2.sh` | test | ci_static | ROMDIR | NO LEGACY CHARACTER CARRIES THE SAME CHARACTER DATA ON vsavj AND vsav2, AND WHICH CHAINS DIFFER FOR EACH IS FROZEN (14z-164, GitHub #136 proposition 2, maintainer-agreed 2026-09-17). | 14z-164 |
 | `tests/test_tick_durations.sh` | test | emulator | MAME, ~22 min | OUR DERIVED FRAME DATA IS THE ENGINE'S, measured in ENGINE TICKS (14z-126b). This is what closed the last open residue of the community cross-check: Jedah's crouching recovery. | 14z-126b |
 | `tests/test_vanilla_aerial_join.sh` | test | emulator | MAME, ~10 min | WHICH ANIM CHAIN EACH VANILLA CHARACTER'S JUMPING NORMALS ENTER FROM A NEUTRAL JUMP AND FROM A FORWARD JUMP, MEASURED ON vsavj (14z-145, the community cross-check's aerial join). | 14z-145 |
+| `tests/test_vanilla_command_join.sh` | test | emulator | MAME | WHICH ANIM CHAIN EACH VANILLA CHARACTER'S COMMAND NORMALS (6+BUTTON, 3+BUTTON) ENTER, MEASURED ON vsavj (14z-189, GitHub #117 — the community cross-check's first slice past the plain normals). | 14z-189 |
 | `tests/test_vanilla_frame_join.sh` | test | emulator | MAME, ~4 min | WHICH ANIM CHAIN EACH VANILLA CHARACTER'S STANDING NORMALS ENTER, MEASURED ON vsavj (14z-125, the community cross-check's join). | 14z-125 |
 
 ## review-triage

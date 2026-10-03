@@ -100,7 +100,19 @@ direction, neutral jump then D+button, showed that Zabel's `0x18-0x1D` are his D
 aerials (the workbook's `J.2LP`..`J.2HK`, now joined by name), Aulbath's `J.2HK` is `a2:0x51`,
 and Anakaris's D+button leaves his hover into `a:0x36` on every button. Anakaris has no
 neutral-jump attacks at all: his neutral jump is a hover (`a:0x12`) that takes no normal.
-Specials, supers and the `6`-prefixed command normals are not joined at all.
+
+**The command normals are measured too (14z-189, GitHub #117).** The same rig performs
+each button with toward held (`6x`) and with down-toward held (`3x`) at the far pin, out
+of throw range (`tests/test_vanilla_command_join.sh`, `tests/expected/vanilla_command_slots.tsv`,
+180 rows). A `6x` entering a chain other than the far standing one, or a `3x` one other
+than the crouching one, names that chain. The measurement found **19 such chains — 18
+`6x` and Bulleta's `3HK` — and they are exactly the workbook's 19 `6x`/`3x` rows**, by
+character and button: BU `6MP`/`6MK`/`3HK`, GA `6MK`, ZA all six (his odd slots,
+`0x01`-`0x0b`), AN `6MK`, BI all six, LE `6MP`/`6HP`. On the other 72 `6x` and 89 `3x`
+presses the game enters the plain far or crouching normal. Bulleta's `3HK` joins by name
+and compares nothing: the workbook calls it a projectile and its chain carries no attack
+window (the hit is a spawned object's), so every column is structurally not the same
+quantity. Specials, supers, EX/ES moves, throws and pursuits are not joined at all.
 
 ## The headline: per-move agreement
 
@@ -110,11 +122,11 @@ per MOVE, over all 15 characters:
 
 | column | convention | moves agreeing |
 |---|---|---|
-| `startup` | sheet = ours +1 — the sheet counts the first active frame as startup; ours counts the frames before it | **293/296** (98%) |
-| `active` | sheet = ours +0 — identical | **288/291** (98%) |
-| `recovery` | sheet = ours +2 — a 2-frame tail the sheet counts and our last node does not | **195/202** (96%) |
-| `white` | sheet = ours +0 — identical — the record's +9 is the dealt white damage, unscaled | **285/296** (96%) |
-| `gauge_hit` | sheet = ours +0 — identical once the sheet's own `gauge whiff` is subtracted | **290/296** (97%) |
+| `startup` | sheet = ours +1 — the sheet counts the first active frame as startup; ours counts the frames before it | **311/314** (99%) |
+| `active` | sheet = ours +0 — identical | **306/309** (99%) |
+| `recovery` | sheet = ours +2 — a 2-frame tail the sheet counts and our last node does not | **213/220** (96%) |
+| `white` | sheet = ours +0 — identical — the record's +9 is the dealt white damage, unscaled | **302/314** (96%) |
+| `gauge_hit` | sheet = ours +0 — identical once the sheet's own `gauge whiff` is subtracted | **308/314** (98%) |
 
 So the two measurements corroborate each other on ~96% of every column we can
 compare, under one stated convention per column. The residue is the worklist below.
@@ -123,21 +135,21 @@ compare, under one stated convention per column. The residue is the worklist bel
 
 | character | joined | startup | active | recovery | white | gauge_hit | red |
 |---|---|---|---|---|---|---|---|
-| **AN** Anakaris `0x06` | 16 | CONSTANT OFFSET (sheet = ours +1 on all 16) · n=16 | EXACT · n=15 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | INCONSISTENT · n=16 | EXACT · n=16 | INCONSISTENT · n=16 |
+| **AN** Anakaris `0x06` | 17 | CONSTANT OFFSET (sheet = ours +1 on all 17) · n=17 | EXACT · n=16 | CONSTANT OFFSET (sheet = ours +2 on all 13) · n=13 | INCONSISTENT · n=17 | EXACT · n=17 | INCONSISTENT · n=17 |
 | **AU** Aulbath `0x09` | 20 | INCONSISTENT · n=20 | INCONSISTENT · n=19 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | EXACT · n=20 | EXACT · n=20 | EXACT · n=20 |
-| **BI** Bishamon `0x08` | 19 | INCONSISTENT · n=18 | EXACT · n=18 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | EXACT · n=18 | INCONSISTENT · n=18 | EXACT · n=18 |
-| **BU** Bulleta `0x00` | 19 | CONSTANT OFFSET (sheet = ours +1 on all 19) · n=19 | EXACT · n=19 | CONSTANT OFFSET (sheet = ours +2 on all 14) · n=14 | EXACT · n=19 | EXACT · n=19 | EXACT · n=19 |
+| **BI** Bishamon `0x08` | 25 | INCONSISTENT · n=24 | EXACT · n=24 | CONSTANT OFFSET (sheet = ours +2 on all 18) · n=18 | EXACT · n=24 | INCONSISTENT · n=24 | EXACT · n=24 |
+| **BU** Bulleta `0x00` | 21 | CONSTANT OFFSET (sheet = ours +1 on all 21) · n=21 | EXACT · n=21 | CONSTANT OFFSET (sheet = ours +2 on all 16) · n=16 | EXACT · n=21 | EXACT · n=21 | EXACT · n=21 |
 | **DE** Demitri `0x01` | 21 | CONSTANT OFFSET (sheet = ours +1 on all 21) · n=21 | EXACT · n=21 | CONSTANT OFFSET (sheet = ours +2 on all 15) · n=15 | EXACT · n=21 | EXACT · n=21 | EXACT · n=21 |
 | **FE** Felicia `0x07` | 19 | CONSTANT OFFSET (sheet = ours +1 on all 19) · n=19 | EXACT · n=19 | CONSTANT OFFSET (sheet = ours +2 on all 13) · n=13 | EXACT · n=19 | INCONSISTENT · n=19 | EXACT · n=19 |
-| **GA** Gallon `0x02` | 18 | CONSTANT OFFSET (sheet = ours +1 on all 18) · n=18 | EXACT · n=18 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | EXACT · n=18 | EXACT · n=18 | EXACT · n=18 |
+| **GA** Gallon `0x02` | 19 | CONSTANT OFFSET (sheet = ours +1 on all 19) · n=19 | EXACT · n=19 | CONSTANT OFFSET (sheet = ours +2 on all 13) · n=13 | EXACT · n=19 | EXACT · n=19 | EXACT · n=19 |
 | **JE** Jedah `0x0f` | 18 | CONSTANT OFFSET (sheet = ours +1 on all 18) · n=18 | EXACT · n=18 | INCONSISTENT · n=12 | INCONSISTENT · n=18 | EXACT · n=18 | INCONSISTENT · n=18 |
-| **LE** Lei-Lei `0x0d` | 20 | CONSTANT OFFSET (sheet = ours +1 on all 20) · n=20 | INCONSISTENT · n=20 | CONSTANT OFFSET (sheet = ours +2 on all 14) · n=14 | INCONSISTENT · n=20 | INCONSISTENT · n=20 | INCONSISTENT · n=20 |
+| **LE** Lei-Lei `0x0d` | 22 | CONSTANT OFFSET (sheet = ours +1 on all 22) · n=22 | INCONSISTENT · n=22 | CONSTANT OFFSET (sheet = ours +2 on all 16) · n=16 | INCONSISTENT · n=22 | INCONSISTENT · n=22 | INCONSISTENT · n=22 |
 | **LI** Lilith `0x0e` | 23 | CONSTANT OFFSET (sheet = ours +1 on all 23) · n=23 | EXACT · n=23 | INCONSISTENT · n=17 | INCONSISTENT · n=23 | EXACT · n=23 | INCONSISTENT · n=23 |
 | **MO** Morrigan `0x05` | 22 | CONSTANT OFFSET (sheet = ours +1 on all 22) · n=22 | EXACT · n=22 | CONSTANT OFFSET (sheet = ours +2 on all 16) · n=16 | INCONSISTENT · n=22 | EXACT · n=22 | INCONSISTENT · n=22 |
 | **QB** Q-Bee `0x0c` | 15 | CONSTANT OFFSET (sheet = ours +1 on all 15) · n=15 | EXACT · n=15 | CONSTANT OFFSET (sheet = ours +2 on all 10) · n=10 | INCONSISTENT · n=15 | EXACT · n=15 | INCONSISTENT · n=15 |
 | **SA** Sasquatch `0x0a` | 20 | INCONSISTENT · n=20 | EXACT · n=20 | CONSTANT OFFSET (sheet = ours +2 on all 14) · n=14 | INCONSISTENT · n=20 | INCONSISTENT · n=20 | INCONSISTENT · n=20 |
 | **VI** Victor `0x03` | 23 | CONSTANT OFFSET (sheet = ours +1 on all 23) · n=23 | EXACT · n=23 | CONSTANT OFFSET (sheet = ours +2 on all 17) · n=17 | INCONSISTENT · n=23 | EXACT · n=23 | INCONSISTENT · n=23 |
-| **ZA** Zabel `0x04` | 24 | CONSTANT OFFSET (sheet = ours +1 on all 24) · n=24 | EXACT · n=21 | CONSTANT OFFSET (sheet = ours +2 on all 12) · n=12 | EXACT · n=24 | INCONSISTENT · n=24 | EXACT · n=24 |
+| **ZA** Zabel `0x04` | 30 | CONSTANT OFFSET (sheet = ours +1 on all 30) · n=30 | EXACT · n=27 | CONSTANT OFFSET (sheet = ours +2 on all 18) · n=18 | EXACT · n=30 | INCONSISTENT · n=30 | EXACT · n=30 |
 
 ## The arbitration — what the emulator said about the residue
 
@@ -178,6 +190,17 @@ victim and the juggle gate refuses the second: a victim-state effect, not the ch
 
 Five moves carry it (MO 5HK, QB 2HK, SA 5HP, VI 2HP, JE 5HK — two or more attack
 records sharing hit id 1; the per-record values are on the full page).
+
+**A sixth, of the same family, came with the command normals (14z-189): LE `6HP`.**
+Its one active run carries seven records, all hit id 1, and the workbook lists THREE
+hits whose values are those of the first three records to the byte, so its `white` and
+`red` cells are the only two misses of the 18 joined command normals.
+Measured on one rig, not inferred: on the idle standing victim at 128 px (the only
+distance measured) the move lands **one** hit (`tests/test_vanilla_command_join.sh`
+section 5, P2's `+0x50` drops once) — consecutive same-id attack nodes land once, the
+rule `tests/test_rehit_ring.sh` measured. Whether the workbook's three hits describe
+another move is OPEN, to be checked against the Japanese wiki: the maintainer, shown
+the capture (2026-10-03), recalls 5HP hitting three times and 6HP once (GitHub #216).
 
 **The hit rig confirms our reading and not theirs.** P1 performs each normal on a
 victim whose HP is re-pinned before every event, and each DROP in P2's `+0x50` is
@@ -251,13 +274,13 @@ direction); startup 8 (+1 = the sheet's 9), red 16 = 8+8, white 8: EXACT.
 
 ## Every INCONSISTENT column — per character (the moves are on the full page)
 
-### AN Anakaris — `white` — most common delta +0 on 15/16; spread +0..+5
+### AN Anakaris — `white` — most common delta +0 on 16/17; spread +0..+5
 
-16 move(s) deviate; the per-move table is on the full page.
+17 move(s) deviate; the per-move table is on the full page.
 
-### AN Anakaris — `red` — most common delta +0 on 15/16; spread +0..+15
+### AN Anakaris — `red` — most common delta +0 on 16/17; spread +0..+15
 
-16 move(s) deviate; the per-move table is on the full page.
+17 move(s) deviate; the per-move table is on the full page.
 
 ### AU Aulbath — `startup` — most common delta +1 on 19/20; spread +1..+2
 
@@ -267,13 +290,13 @@ direction); startup 8 (+1 = the sheet's 9), red 16 = 8+8, white 8: EXACT.
 
 19 move(s) deviate; the per-move table is on the full page.
 
-### BI Bishamon — `startup` — most common delta +1 on 17/18; spread +0..+1
+### BI Bishamon — `startup` — most common delta +1 on 23/24; spread +0..+1
 
-18 move(s) deviate; the per-move table is on the full page.
+24 move(s) deviate; the per-move table is on the full page.
 
-### BI Bishamon — `gauge_hit` — most common delta +0 on 17/18; spread -18..+0
+### BI Bishamon — `gauge_hit` — most common delta +0 on 23/24; spread -18..+0
 
-18 move(s) deviate; the per-move table is on the full page.
+24 move(s) deviate; the per-move table is on the full page.
 
 ### FE Felicia — `gauge_hit` — most common delta +0 on 18/19; spread -10..+0
 
@@ -291,21 +314,21 @@ direction); startup 8 (+1 = the sheet's 9), red 16 = 8+8, white 8: EXACT.
 
 18 move(s) deviate; the per-move table is on the full page.
 
-### LE Lei-Lei — `active` — most common delta +0 on 19/20; spread -1..+0
+### LE Lei-Lei — `active` — most common delta +0 on 21/22; spread -1..+0
 
-20 move(s) deviate; the per-move table is on the full page.
+22 move(s) deviate; the per-move table is on the full page.
 
-### LE Lei-Lei — `white` — most common delta +0 on 19/20; spread -9..+0
+### LE Lei-Lei — `white` — most common delta +0 on 20/22; spread -9..+9
 
-20 move(s) deviate; the per-move table is on the full page.
+22 move(s) deviate; the per-move table is on the full page.
 
-### LE Lei-Lei — `gauge_hit` — most common delta +0 on 19/20; spread -18..+0
+### LE Lei-Lei — `gauge_hit` — most common delta +0 on 21/22; spread -18..+0
 
-20 move(s) deviate; the per-move table is on the full page.
+22 move(s) deviate; the per-move table is on the full page.
 
-### LE Lei-Lei — `red` — most common delta +0 on 19/20; spread -21..+0
+### LE Lei-Lei — `red` — most common delta +0 on 20/22; spread -21..+27
 
-20 move(s) deviate; the per-move table is on the full page.
+22 move(s) deviate; the per-move table is on the full page.
 
 ### LI Lilith — `recovery` — most common delta +2 on 16/17; spread +2..+3
 
@@ -359,9 +382,9 @@ direction); startup 8 (+1 = the sheet's 9), red 16 = 8+8, white 8: EXACT.
 
 23 move(s) deviate; the per-move table is on the full page.
 
-### ZA Zabel — `gauge_hit` — most common delta +0 on 23/24; spread -6..+0
+### ZA Zabel — `gauge_hit` — most common delta +0 on 29/30; spread -6..+0
 
-24 move(s) deviate; the per-move table is on the full page.
+30 move(s) deviate; the per-move table is on the full page.
 
 ## What is NOT known
 
@@ -389,8 +412,8 @@ direction); startup 8 (+1 = the sheet's 9), red 16 = 8+8, white 8: EXACT.
   corpus and NOT yet measured:** mizuumi distinguishes NEUTRAL- from FORWARD-jump
   variants of the same button (`8J.LP` vs `9J.LP`) where our slot map carries ONE
   chain per aerial button. Needs a two-direction jump rig.
-- **Specials, supers, EX/ES moves, throws, pursuits and the `6`-prefixed command
-  normals are not joined.** Each needs its own measured naming rig on vsavj, the way
+- **Specials, supers, EX/ES moves, throws and pursuits are not joined** (the command
+  normals are, since 14z-189). Each needs its own measured naming rig on vsavj, the way
   `tools/name_moves.py` did for the tenants. That is the bulk of the workbook's 730
   rows and it is untouched here.
 - **Seven workbook columns have no counterpart in the tree**: `on hit`, `on block`,

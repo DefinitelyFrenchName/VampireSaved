@@ -1,0 +1,67 @@
+# tests/expected/marionette_cost.tsv — frozen by tests/audit_marionette_cost.sh (GitHub #128).
+# Evidence class: static census of the decrypted views + in-emulator counts on pristine vsavj. Frozen 14z-189 with FREEZE=1; addresses, counts and tile-cell totals only, no ROM bytes.
+SITE 00525a tst.b$3c3(a4) | INSERT 3 0x8 | hook 004dda move.b$382(a4),d1
+SITE 007122 move.bd0,$3c3(a6) | INSERT 2 0x8 | hook 00895c move.b#$1,$3e0(a6)
+SITE 007862 move.bd1,$3c3(a6) | INSERT 1 0x4 | hook 009094 move.bd1,$3c0(a6)
+SITE 008ca2 tst.b$3c3(a0) | INSERT 5 0x10 | hook 00a494 move.bd0,$780(a5)
+SITE 009740 tst.b$3c3(a0) | INSERT 3 0xa | hook 00aefa cmpi.b#$3,$ac(a5)
+SITE 009772 tst.b$3c3(a0) | INSERT 2 0x6 | hook 00af20 beq.b$af30
+SITE 009828 tst.b$3c3(a0) | INSERT 3 0xa | hook 00afd2 rts
+SITE 00b174 tst.b$3c3(a3) | INSERT 2 0x6 | hook 00c8a0 beq.b$c8a4
+SITE 01318c tst.b$3c3(a6) | INSERT 2 0x6 | hook 014a98 moveq#$0,d0
+SITE 01f57c clr.b$3c3(a6) | INSERT 1 0x4 | hook 0209e4 tst.b$3c1(a6)
+SITE 01f674 clr.b$3c3(a6) | INSERT 1 0x4 | hook 020aae tst.b$43(a6)
+SITE 01f69a tst.b$3c3(a0) | REPLACE 17 0x40 replacing 1 | hook 020abe move.bd0,$382(a6)
+SITE 01f6ac st.b$3c3(a6) | REPLACE 17 0x40 replacing 1 | hook 020abe move.bd0,$382(a6)
+SITE 01f6d8 or.b$3c3(a6),d0 | REPLACE 3 0xc replacing 1 | hook 020ace move.b$3bc(a6),$3e3(a6)
+SITE 01f95e clr.b$3c3(a6) | REPLACE 3 0xc replacing 22 | hook 020cbe clr.b$42(a6)
+SITE 024ed2 tst.b$3c3(a6) | INSERT 6 0x16 | hook 026244 move.b$382(a6),d0
+SITE 02acca tst.b$3c3(a6) | INSERT 119 0x1ba | hook 02b640 moveq#$0,d0
+SITE 02ad94 tst.b$3c3(a6) | INSERT 119 0x1ba | hook 02b640 moveq#$0,d0
+SITE 06b1d4 tst.b$3c3(a4) | INSERT 2 0x6 | hook 05f17e beq.b$5f186
+SITE 06b296 tst.b$3c3(a4) | INSERT 25 0x8c | hook 05f1b6 movea.l#$3ad700,a0
+SITE 06b558 tst.b$3c3(a4) | INSERT 2 0x6 | hook 05f408 move.b$382(a4),d6
+SITE 06c32a tst.b$3c3(a4) | INSERT 6 0x16 | hook 060002 moveq#$0,d6
+SITE 06c4b6 tst.b$3c3(a4) | INSERT 2 0x6 | hook 060188 move.b$382(a4),d0
+SITE 08a6d4 or.b$3c3(a4),d1 | NEW - - | twin 06b75a move.w$e(a4),$e(a6)
+SITE 09326c or.b$3c3(a3),d0 | INSERT 23 0x5c | hook 08464e addq.b#$2,$5(a6)
+SITE 0932b4 tst.b$3c3(a3) | INSERT 8 0x20 | hook 08466e movea.l#$283690,a0
+SITE 093350 tst.b$3c3(a3) | INSERT 32 0x70 | hook 084698 jmp$15030.l
+SITE 0933ea tst.b$3c3(a1) | INSERT 4 0xe | hook 0846d2 move.w#$aa,d0
+CLASSES INSERT 23 REPLACE 4 NEW 1
+HOOKS 26
+HOOKLIST 4dda,895c,9094,a494,aefa,af20,afd2,c8a0,14a98,209e4,20aae,20abe,20ace,20cbe,26244,2b640,5f17e,5f1b6,5f408,60002,60188,6b75a,8464e,8466e,84698,846d2
+ASSET select table 2a04fa idx 0x10 nodes 1 node_bytes 0x10 records 1 not_records 0 entries 8 tile_cells 6 | vs2 0x06C32A: the select-screen record, row 0x10
+ASSET vs table 2b7ef4 idx 0xb3 nodes 1 node_bytes 0x10 records 1 not_records 0 entries 17 tile_cells 52 | vs2 0x0933EA: the VS/sprite record, index 0xB3 (else 0xAA)
+ASSET palette base 3cb7dc block 3cb91c+ 0x140 bytes (10 rows) | vs2 0x02ACCA: `lea $140(a0)` past the palette base, + id($3AE)*32
+ASSET total_tile_cells 58 (7424 bytes of 16x16 4bpp art)
+HIT 004dda replays 12 hits 13 frames 13 max 1
+HIT 00895c replays 43 hits 43 frames 43 max 1
+HIT 009094 replays 56 hits 126 frames 63 max 2
+HIT 00a494 replays 0 hits 0 frames 0 max 0
+HIT 00aefa replays 55 hits 88 frames 88 max 1
+HIT 00af20 replays 23 hits 24 frames 24 max 1
+HIT 00afd2 replays 13 hits 14 frames 14 max 1
+HIT 00c8a0 replays 11 hits 11 frames 11 max 1
+HIT 014a98 replays 11 hits 12 frames 12 max 1
+HIT 0209e4 replays 55 hits 98 frames 94 max 2
+HIT 020aae replays 55 hits 98 frames 98 max 1
+HIT 020abe replays 0 hits 0 frames 0 max 0
+HIT 020ace replays 55 hits 98 frames 98 max 1
+HIT 020cbe replays 55 hits 43484 frames 28546 max 2
+HIT 026244 replays 54 hits 15563 frames 9008 max 3
+HIT 02b640 replays 55 hits 120520 frames 69704 max 4
+HIT 05f17e replays 13 hits 14 frames 14 max 1
+HIT 05f1b6 replays 13 hits 14 frames 14 max 1
+HIT 05f408 replays 55 hits 112262 frames 64703 max 2
+HIT 060002 replays 55 hits 120520 frames 69704 max 4
+HIT 060188 replays 55 hits 120520 frames 69704 max 4
+HIT 06b75a replays 4 hits 4 frames 4 max 1
+HIT 08464e replays 1 hits 2 frames 2 max 1
+HIT 08466e replays 1 hits 2 frames 2 max 1
+HIT 084698 replays 1 hits 722 frames 703 max 2
+HIT 0846d2 replays 1 hits 2 frames 2 max 1
+REACHED 24 of 26 hook points executed by the corpus
+WORST 14 hook executions in one frame at 128_shadow_vs_legacy_vsavj:2187
+COST per_exec 58 worst_frame_cycles 812 frame_budget 268288 ppm 3026
+WITNESS 128_shadow_vs_legacy_vsavj setter 1 morph 1

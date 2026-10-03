@@ -1641,8 +1641,45 @@ not the match-start palette load. **Read this before attributing any
   dispatcher's own byte sequence, the twin of vsavj's `0x02A8A4`) gives id
   `0x13` a real routine, displacement **`0x01D4`**. `build/manifest/pyron.toml`
   recorded this at 14z-75 as "a missing feature, not a spurious one".
-  NOT ESTABLISHED: which path sets `a0` to the sprite block at f2807/f2859.
-  Gate: `tests/audit_column_flash.sh`.
+  ~~NOT ESTABLISHED: which path sets `a0` to the sprite block at f2807/f2859.~~
+  **ANSWERED 14z-189 (#162; `tests/audit_column_flash_cause.sh`, measured on MAME on
+  the Mac and ERIS by a non-debug palette write tap that reads the registers at each
+  uploader write, `tests/lua/upload_tap.lua`):** it is the fighter's PALETTE RELOAD,
+  vsavj/ours `PRG:0x02ADAC` (vs2 twin `PRG:0x02A102`), entered for P1's block
+  (`$FF8400`) at f2807 and f2858 (the move's start and end). **The caller chain**
+  (return addresses read off the USER stack): the object loop (`0x0220AA`) → the
+  per-fighter PALETTE-STATE dispatcher `PRG:0x02A7C8` (`+0x14E` the state, `+0x14F`
+  the previous one; its head is the port's `state_hook` `jmp 0x0CC030`) → state
+  `0x00`'s handler `0x2A894`, the per-character palette-routine table `0x2A8A4`, where
+  Donovan's row `0x13` is the default `0x0040` → the default handler `0x2A8E4`,
+  `cmp.b $14f(a6),d0 / bne 0x2ADAC / rts`: on a palette-STATE CHANGE, reload. Both
+  legs read state `0x00` at f2807, `0xBE` at f2813 (the move's palette state; ours
+  serves it from the state-hook records, returning into `0x0CC056`) and `0x00` again
+  at f2858 (previous `0xBE`). The reload itself: `movea.l $3a4(a6),a0 /
+  bsr 0x2AD3C` uploads block row 0 into palette row `+0x18B` (`0x0A`), then
+  `move.l #mask,d1 / move.b $382(a6),d0 / btst.l d0,d1 / bne -> rts`, else block rows
+  1-3 into rows `0x0B-0x0D`. **vs2's mask (`PRG:0x02A108`) sets bit `0x13`; vsavj's
+  (`PRG:0x02ADB2`), unchanged in our build, does not** — so native reloads row 0
+  only, while ours reloads rows 1-3 too and row 11 gets block row 1, the orange ramp.
+  Rows 12/13 are rewritten with the same content native holds (palette dumps equal
+  at every sampled frame); row 11 is the one that differs. A COUNTERFACTUAL leg that
+  sets vs2's bit in the emulator's decrypted-opcode share (nothing built) reloads row
+  0 only at both frames and leaves row 11 untouched after the move's own 2813
+  upload, whose content equals native's. **The fix's surface is one bit of one
+  immediate (`PRG:0x02ADB4`, the mask's high word), vs2's own value; legacy reach is
+  nil by construction — `btst.l` tests `d0 mod 32`, and no legacy fighter carries id
+  `0x13` (`tests/audit_id_writers.sh`) — but it is not built.** ours' 2813 upload
+  (the blue row) comes from the port's state-hook sequence records (`PRG:0x0CF050`).
+  **Wider: the same class elsewhere** — a census of every `move.l #mask,Dn /
+  move.b $382(An),Dm / btst` site (`tools/audit_charid_masks.py`) pairs vs2's 7 to
+  ours and finds 4 where a TENANT bit differs: this one (`0x02ADB2`, bit `0x13`);
+  `0x022AF2` (vs2 `0x0214E4` sets bit `0x10`: Phobos goes through the minimum
+  air-attack height check `0x027B80`, and vs2's height table row `0x10` reads
+  `0x0018` where ours reads 0 — static only, a gameplay question, not measured in
+  play); `0x00395E` and `0x003B36` (vs2 `0x003994`/`0x003B6C`: vs2 sets bit `0x10` and
+  clears `0x13`, ours the reverse — a +1 on the sound id handed to `bsr 0x4CE2`,
+  the sound-request helper this section describes below; static only). The other 3 sites agree.
+  Gates: `tests/audit_column_flash.sh` (the symptom), `tests/audit_column_flash_cause.sh` (the path).
 - **Superseded note (14z-170), kept for the frames it measured:** inside the move's window, palette row 11 (`RAM:$90C160`) is written
   ONLY by this uploader on both games: ours uploads it at frames 2807, 2813 and 2858,
   native at 2813 only, and the 2858 upload is the fire ramp the maintainer saw. The

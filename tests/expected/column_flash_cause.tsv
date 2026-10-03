@@ -1,0 +1,26 @@
+# tests/expected/column_flash_cause.tsv — #162's cause, frozen AS MEASURED by tests/audit_column_flash_cause.sh on
+# m3b_merged30. Evidence class: in-emulator (MAME, a non-debug palette write tap with register reads) and static
+# (the char-id mask census). Columns: <leg> upload <palette row> <source: blk+off in the requester's +0x3A4 block, else its
+# address> <count> <first-last frame>, P1's uploads in frames 2800-2866; census <vs2 pc> <ours pc> <tenant bits 0x10 0x11 0x13
+# vs2> <ours> <SAME|DIFF> — addresses and derived bits only, never palette or mask bytes (rule 7).
+#--
+native	upload	0a	blk+000	2	2807-2858
+native	upload	0b	3b64bc	1	2813-2813
+native	upload	0c	blk+040	82	2800-2866
+ours	upload	0a	blk+000	2	2807-2858
+ours	upload	0b	0cf130	1	2813-2813
+ours	upload	0b	blk+020	2	2807-2858
+ours	upload	0c	blk+040	2	2807-2858
+ours	upload	0d	blk+060	2	2807-2858
+fix	upload	0a	blk+000	2	2807-2858
+fix	upload	0b	0cf130	1	2813-2813
+census	sites	vs2 7 ours 7 vsavj 7
+census	003994	00395e	100	001	DIFF
+census	0039ea	0039b4	010	010	SAME
+census	003b6c	003b36	100	001	DIFF
+census	0214e4	022af2	100	000	DIFF
+census	0214fc	022b0a	000	000	SAME
+census	0214fc	0232cc	000	000	SAME
+census	021cf0	022b0a	000	000	SAME
+census	021cf0	0232cc	000	000	SAME
+census	02a108	02adb2	011	010	DIFF

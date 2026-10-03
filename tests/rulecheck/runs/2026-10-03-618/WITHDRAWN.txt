@@ -1,0 +1,1 @@
+WITHDRAWN 2026-10-03 (14z-189), never spawned: its c5/diff_delta.txt filtered the diff-of-diffs by the string "2026-10-03-617", which kept the content lines of run 617's files and so misreported them as differences outside that directory. Re-prepared as the next run with a per-file comparison (c5/diff_delta.py), naming this withdrawal.
