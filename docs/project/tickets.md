@@ -11,12 +11,13 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**216 tickets** — status: open 18 · parked 10 · done 163 · declined 8 · not-ours 7 · invalid 9 · duplicate 1 · kind: bug 155 · cosmetic 11 · evolution 50 · **backfill debt: 0 rows**.
+**217 tickets** — status: open 19 · parked 10 · done 163 · declined 8 · not-ours 7 · invalid 9 · duplicate 1 · kind: bug 155 · cosmetic 11 · evolution 51 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#217](https://github.com/DefinitelyFrenchName/VampireSaved/issues/217) | evolution | open | Rule-checker throughput: check independent decisions in parallel, and split a multi-fork merge into per-fork packets | `tools/rulecheck.py` | none | none | none | 14z-189 |
 | [#216](https://github.com/DefinitelyFrenchName/VampireSaved/issues/216) | evolution | open | Community workbook vs the game: Lei-Lei 6HP three hits (game: one at 128 px) and other #117 gaps, to check against the Japanese wiki | `tests/test_vanilla_command_join.sh` | `DECISIONS_HISTORY.md § Ruled 2026-10-03 (14z-189) — #216` | none | none | 14z-189 |
 | [#215](https://github.com/DefinitelyFrenchName/VampireSaved/issues/215) | bug | open | apply_release.py's output zip differs by host (create_system 0 on Windows, 3 on Unix); zip.mjs and test_applier_page assume 3 | `tools/applier/zip.mjs` | none | none | none | 14z-189 |
 | [#214](https://github.com/DefinitelyFrenchName/VampireSaved/issues/214) | bug | open | MiSTer package README tells the player it contains an FBNeo/MAME emulator (shared template wording), which it does not | `release/merged-m22/mister/README.md` | none | none | none | 14z-189 |
