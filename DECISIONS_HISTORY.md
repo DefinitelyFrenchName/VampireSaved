@@ -341,6 +341,16 @@ Yes, Donovan's deity states should be in scope. However, if they would rely on t
 
 ---
 
+## Ruled 2026-10-03 (14z-189) — #145 and #212: merged-m22 is published this session
+
+**The question (AskUserQuestion), verbatim, after #145 and #212 were merged (40b173c9) and found to reach players only through a release (the latest GitHub release is merged-m19):** *"#145 (PLAY.bat launcher) and #212 (the applier's Windows crash) are fixed in release/merged-m22, which is built and gated but not published (the latest GitHub release is merged-m19, without them). How should they close?"* — options: *"Publish merged-m22 now"* (*"I publish the merged-m22 release assets to GitHub this session (after the close tier is green), then close #145 and #212 against the published release."*), *"Close now, track publish"*, *"Keep open until a release"*.
+
+**The maintainer:** *"Publish merged-m22 now"*.
+
+So: the merged-m22 release assets are published to GitHub this session, after the close tier is green, and #145 and #212 close against the published release.
+
+---
+
 ## Ruled 2026-10-03 (14z-189) — #145: a PLAY.bat launcher
 
 **The question (AskUserQuestion), verbatim, after a worker reproduced #145 on ERIS's Windows side:** *"#145, reproduced on ERIS with the published merged-m19 Windows assets: double-clicking fbneo.exe exits at once (it needs `fbneo.exe vsavjw`), and MAME's cps2.exe finds no ROMs (it needs `-rompath <package>\rompath`); both run fine with those arguments. The packages have no Windows launcher (PLAY.command is macOS/Linux only) and the README never shows the commands. How do you want it fixed?"* The options were "PLAY.bat launcher": "A double-clickable PLAY.bat in each Windows package: FBNeo copies vsavjw.zip into roms\ and runs `fbneo.exe vsavjw`; MAME runs `cps2.exe vsavjw -rompath rompath`. Plain cmd, no PowerShell execution-policy prompt. Plus the README lines."; "PLAY.ps1 launcher"; "README only".
