@@ -23,15 +23,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3442 |
-| named by a document or manifest only | 2226 |
-| named by both a document/manifest and code | 820 |
-| named by CODE ONLY (the gap list below) | 396 |
+| distinct program-space addresses named | 3451 |
+| named by a document or manifest only | 2225 |
+| named by both a document/manifest and code | 823 |
+| named by CODE ONLY (the gap list below) | 403 |
 | carried by atlas | 643 |
-| carried by engine_internals | 798 |
+| carried by engine_internals | 800 |
 | carried by other docs | 1041 |
 | carried by manifests | 1834 |
-| carried by code | 1216 |
+| carried by code | 1226 |
 
 ## Addresses
 
@@ -884,6 +884,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0225F4` | build/manifest/type_stamps.toml — compare |
 | `PRG:0x02264A` | build/manifest/pcrel_escapes.toml — hui60 |
 | `PRG:0x022656` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; docs/project/patch_notes.md — vs2-licensed class remaps; maintainer-ruled option (a)) [vs2]; build/manifest/donovan.toml — accent_color_aware_3 [vs2]; build/manifest/donovan.toml — reaction_hook; build/manifest/huitzil.toml — hitclass_map_extend; +2 more |
+| `PRG:0x02267C` | docs/game/engine_internals.md — The physics bank's 'gap_*' rows (14z-121, a reference scan of vsavj's code) |
 | `PRG:0x022694` | build/manifest/pcrel_escapes.toml — hui60 |
 | `PRG:0x0226D4` | build/manifest/pcrel_escapes.toml — hui60 |
 | `PRG:0x0226DC` | docs/project/patch_notes.md — handler clone + the x026142 escape fix; build/manifest/reconciliation_donovan.toml — map; build/manifest/reconciliation_huitzil.toml — map; build/manifest/reconciliation_pyron.toml — map |
@@ -1061,6 +1062,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x026A76` | build/manifest/huitzil.toml — data_in_code |
 | `PRG:0x026AB0` | build/manifest/reconciliation_huitzil.toml — map [vs2] |
 | `PRG:0x026B50` | build/manifest/reconciliation_huitzil.toml — map [vs2] |
+| `PRG:0x026BC0` | docs/game/engine_internals.md — The physics bank's 'gap_*' rows (14z-121, a reference scan of vsavj's code) |
 | `PRG:0x026BD4` | build/manifest/reconciliation_huitzil.toml — map [vs2] |
 | `PRG:0x026C86` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66) [vs2]; docs/project/patch_notes.md — (the float ceiling + jump feel); build/manifest/bank_map.toml — param32_a [vs2]; build/manifest/reconciliation_huitzil.toml — map [vs2] |
 | `PRG:0x026C94` | docs/game/atlas/select_screen.md — SHADOW vs A TENANT — the static pass (14z-116, the maintainer's question) |
@@ -1157,8 +1159,8 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x027A9E` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x027AA8` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x027B0E` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tools/pursuit_rigs.py |
-| `PRG:0x027B80` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink); docs/game/engine_internals.md — The physics bank's 'gap_*' rows (14z-121, a reference scan of vsavj's code); build/manifest/bank_map.toml — gap_be23a; build/manifest/reconciliation_huitzil.toml — map |
-| `PRG:0x027BC2` | build/manifest/reconciliation_huitzil.toml — map |
+| `PRG:0x027B80` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink); docs/game/engine_internals.md — The physics bank's 'gap_*' rows (14z-121, a reference scan of vsavj's code); build/manifest/bank_map.toml — gap_be23a; build/manifest/reconciliation_huitzil.toml — map; tests/test_air_attack_height.sh |
+| `PRG:0x027BC2` | build/manifest/reconciliation_huitzil.toml — map; tests/test_air_attack_height.sh |
 | `PRG:0x027C40` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x027C54` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x027C7C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
@@ -2369,7 +2371,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0BE17A` | docs/game/atlas/character_tables.md — Table addresses (32 entries each: slots 0x00-0x0F, variants 0x10-0x1F); docs/game/atlas/character_tables.md — The full per-character table BANK — layout identical in all three sets; docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/project/patch_notes.md — (the float ceiling + jump feel); build/manifest/bank_map.toml — gap_bdc7a; build/manifest/bank_map.toml — gap_bdcfa; +11 more |
 | `PRG:0x0BE1BA` | docs/game/atlas/character_tables.md — The full per-character table BANK — layout identical in all three sets; build/manifest/bank_map.toml — word_pos_a |
 | `PRG:0x0BE1FA` | docs/game/atlas/character_tables.md — The full per-character table BANK — layout identical in all three sets; build/manifest/bank_map.toml — word_pos_b; build/manifest/reconciliation.toml — map |
-| `PRG:0x0BE23A` | docs/game/engine_internals.md — The physics bank's 'gap_*' rows (14z-121, a reference scan of vsavj's code); build/manifest/bank_map.toml — gap_be23a; tools/charmap_gen.py |
+| `PRG:0x0BE23A` | docs/game/engine_internals.md — The physics bank's 'gap_*' rows (14z-121, a reference scan of vsavj's code); build/manifest/bank_map.toml — gap_be23a; tests/test_air_attack_height.sh; tools/charmap_gen.py |
 | `PRG:0x0BE27A` | docs/game/atlas/character_tables.md — M2a extraction findings (session 4, oracle-validated); docs/game/engine_internals.md — THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab); docs/game/engine_internals.md — The physics bank's 'gap_*' rows (14z-121, a reference scan of vsavj's code); docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port); docs/game/engine_internals.md — vs2/vh2 fill them (named 14z-74; SIX instances and counting); docs/project/patch_index.md — Mechanism inventory (generator vocabulary); +74 more |
 | `PRG:0x0BE27E` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron; tools/audit_shared_writes.py |
 | `PRG:0x0BE282` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
@@ -2442,8 +2444,8 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0BF7A0` | docs/project/patch_notes.md — donovan-m2 stage 1 — null relocation (2026-07-25, session 4); tests/test_m2a_stage1_nullreloc.sh |
 | `PRG:0x0BF9A0` | build/manifest/donovan.toml — capture_kf_lilith; build/manifest/huitzil.toml — capture_kf_lilith; build/manifest/pyron.toml — capture_kf_lilith |
 | `PRG:0x0BFF38` | build/manifest/donovan.toml — port_patch |
-| `PRG:0x0BFFFF` | docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path |
-| `PRG:0x0C0000` | docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path; tests/test_patch_prg.sh; tests/test_pointer_flow.sh; tools/audit_copy_flags.py; tools/audit_marionette_cost.py |
+| `PRG:0x0BFFFF` | docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path; tests/test_checkdocs_rom.sh; tools/checkdocs_rom.py |
+| `PRG:0x0C0000` | docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path; tests/test_checkdocs_rom.sh; tests/test_patch_prg.sh; tests/test_pointer_flow.sh; tools/audit_copy_flags.py; tools/audit_marionette_cost.py; +1 more |
 | `PRG:0x0C010E` | build/manifest/donovan.toml — capture_kf_lilith; build/manifest/huitzil.toml — capture_kf_lilith; build/manifest/pyron.toml — capture_kf_lilith |
 | `PRG:0x0C0D74` | docs/project/patch_notes.md — donovan-m2 stage 4 — dispatch_14 repoint (2026-07-27, session 8) |
 | `PRG:0x0C109C` | docs/game/engine_internals.md — The STARTUP INVINCIBILITY window is per character, and the tenants arm their own (measured 14z-126) [vs2]; docs/game/preserved_data.md — 1. The VS-style Dark Force handler family in vs2 and vh2 — for all 18 characters (measured 14z-69c, 14z-126) [vs2] |
@@ -3213,6 +3215,13 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x027624` | tests/test_advancing_guard.sh |
 | `PRG:0x027648` | tests/test_advancing_guard.sh |
 | `PRG:0x02764E` | tests/test_advancing_guard.sh |
+| `PRG:0x027B92` | tests/test_air_attack_height.sh |
+| `PRG:0x027B94` | tests/test_air_attack_height.sh |
+| `PRG:0x027B98` | tests/test_air_attack_height.sh |
+| `PRG:0x027BA6` | tests/test_air_attack_height.sh |
+| `PRG:0x027BAE` | tests/test_air_attack_height.sh |
+| `PRG:0x027BB0` | tests/test_air_attack_height.sh |
+| `PRG:0x027BC1` | tests/test_air_attack_height.sh |
 | `PRG:0x027E3C` | tests/test_advancing_guard.sh |
 | `PRG:0x027F1A` | tests/audit_voice_borrow.sh |
 | `PRG:0x02802C` | tests/audit_guard_mask_reads.sh |

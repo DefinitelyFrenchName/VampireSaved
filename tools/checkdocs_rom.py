@@ -52,7 +52,7 @@ THE MEASUREMENTS THAT SHAPED IT (§11.3, all made before this file existed):
   * COVERAGE IS REPORTED AGAINST THE ROM-TIER CENSUS (the definition
     maintainer-ruled 2026-09-07: the atlas addresses minus those carried only
     by `ram.md` — 346 at the ruling, 473 minus 127; 364 since 14z-157; 370
-    since 14z-160). Those
+    since 14z-160; 379 since 14z-161; 394 since 14z-189). Those
     ram.md-only addresses are
     program addresses, but their claims are dataflow ("this routine writes
     that field") and belong to the suite, not here (scope §6.5). Counting
@@ -85,11 +85,15 @@ ROM_TIER_DOCS = ("README.md", "character_tables.md", "id_space.md",
 
 # Ruled 2026-09-07: the coverage denominator. Asserted against the live
 # census by --uncovered, so it cannot drift from the tree unnoticed.
+# 394 since 14z-189 (f1ab31d9's select_screen.md paragraph on #128's Marionette
+# sites added 15: vs2 code sites and records, and the scan bounds 0x0BFFFF and
+# 0x0C0000); 379 since 14z-161 (this constant was left at 370 then, so --uncovered
+# printed its mismatch NOTE until 14z-189 set it);
 # 370 since 14z-160 (character_tables.md gained six vs2 PRG addresses: the
 # confirm's latch writers and Phobos's flavor readers, GitHub #151);
 # 346 at the ruling; 364 since 14z-157, when the venue_assets.md and ram.md
 # corrections for #100 and RAM:$FF8130 added 18 ROM-tier addresses.
-DENOMINATOR = 370
+DENOMINATOR = 394
 
 
 class Stale(Exception):

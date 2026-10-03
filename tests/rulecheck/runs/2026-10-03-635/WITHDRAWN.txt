@@ -1,0 +1,1 @@
+WITHDRAWN 2026-10-03 (14z-189), never spawned: its claim's NOT TESTED list still said 'a carrier of either old claim, or of the withdrawn hex explanation, worded beyond the grep's three patterns' after the grep had grown to four patterns over three old claims (the five callers added). Re-prepared as the next run with that item corrected.

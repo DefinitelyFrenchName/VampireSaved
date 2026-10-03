@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**428 scripts** — 115 ci_portable, 87 ci_static, 226 emulator-tier (run by name).
+**429 scripts** — 115 ci_portable, 88 ci_static, 226 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -27,7 +27,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 72 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 73 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -442,6 +442,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/audit_tick_phase.sh` | audit | emulator | MAME, a build dir, ~60 s | THE ENGINE'S DOUBLE-PASS CADENCE IS PERIODIC IN FRAMES, AND ITS PERIOD IS WHAT tools/name_moves.py QUANTISES ITS SCHEDULE SHIFT TO (14z-172, GitHub #168). | 14z-172 |
 | `tests/audit_victim_parity.sh` | audit | emulator | MAME, a build dir, ~2 min | THE TENANT AS THE VICTIM, ours vs native (14z-181, GitHub #136): the `<tenant>_victim` rigs of tools/name_moves.py — Victor attacking the tenant with every contact class — run on BOTH legs as REAL cursor picks, and the victim's reaction per… | 14z-181 |
 | `tests/test_advancing_guard.sh` | test | emulator | MAME, ~2.5 min | THE ADVANCING GUARD (guard push), MEASURED on native vs2 and on vsavj, and frozen (14z-123, the documentation pass's G2). | 14z-123 |
+| `tests/test_air_attack_height.sh` | test | ci_static | ROMDIR | vsavj's MINIMUM AIR-ATTACK HEIGHT table, read where the code reads it (14z-189; the 14z-121 "36" corrected). ci_static: ROMDIR only. | 14z-189 |
 | `tests/test_anim_node_walk.sh` | test | emulator | MAME, a build dir, ~2 min | THE ANIMATION-NODE DECODER IS AN INSTRUMENT (character-data map, phase 1; 14z-118). tools/anim_nodes.py reads the per-character anim index tables and walks the 0x18-byte node chains by the rules read off vs2's walker (PRG:0x02713C / 0x0271C… | 14z-118 |
 | `tests/test_community_crosscheck.sh` | test | ci_static | ROMDIR | OUR DERIVED VANILLA FRAME DATA STILL SAYS WHAT THE COMMUNITY WORKBOOK SAYS (14z-125, the community cross-check). | 14z-125 |
 | `tests/test_defense_rows_census.sh` | test | ci_static | ROMDIR | THE DEFENSE CURVE AND RALLY THRESHOLD OF EVERY CHARACTER ID, vsavj against vs2 and our build, frozen (14z-168): the 15 legacy characters are identical between the games but for Sasquatch's row, vsavj's variant ids carry COPIES of their base… | 14z-168 |

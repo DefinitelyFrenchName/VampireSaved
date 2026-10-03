@@ -49,6 +49,10 @@ fi
 [ -n "${BBH_HOME:-}" ] && [ -x "$BBH_HOME/bin/bbh" ] || { echo "SKIP: no generic harness beside this tree or its parent (set BBH_HOME; clone https://github.com/DefinitelyFrenchName/blackbox-harness)"; exit 0; }
 BBH_HOME="$(cd "$BBH_HOME" && pwd)"; export BBH_HOME
 if [ -n "${ROMDIR:-}" ] && [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; export ROMDIR; fi
+# STATIC_RESULTS_OUT is the CALLER's (14z-189): a static tier run with it exported reached the runner this gate
+# compares, which then printed its "results:" path where the harness runner prints none, and F1 went red on that
+# one line (build/rc189/h5/static_tier.log). The comparison is of the two runners, not of the caller's record.
+unset STATIC_RESULTS_OUT
 # The harness's consumer config names THIS tree by a relative root that is
 # ONE host's layout; this gate knows where it is and passes that as the
 # fidelity test's input (harness conventions 6, ruled 2026-09-07 — before

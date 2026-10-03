@@ -2,8 +2,9 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 217
+# issues: 218
 number	state	reason	closed	labels	title
+218	OPEN	-	-	bug	tools/audit_poked_legs.py's id→name map is shifted for 0x0A/0x0C/0x0D/0x0E (Lilith at 0x0D, Sasquatch at 0x0E); latent, no frozen label affected yet
 217	OPEN	-	-	evolution	Rule-checker throughput: check independent decisions in parallel, and split a multi-fork merge into per-fork packets
 216	OPEN	-	-	evolution	Community workbook vs the game: Lei-Lei 6HP three hits (game: one at 128 px) and other #117 gaps, to check against the Japanese wiki
 215	OPEN	-	-	bug	apply_release.py's output zip differs by host (create_system 0 on Windows, 3 on Unix); zip.mjs and test_applier_page assume 3

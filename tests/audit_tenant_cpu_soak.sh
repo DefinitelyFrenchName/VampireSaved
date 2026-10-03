@@ -39,7 +39,7 @@
 #   conditions; a CPU that is losing (P1 never wins a round here), later ladder rungs, difficulty settings other than
 #   the default; FBNeo; a frame-level comparison (the legs diverge from the first random draw by construction).
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged30] [FRAMES=22880] [FREEZE=1] [KEEP=<dir>]
+# Usage: ROMDIR=... [MAME_BIN=~/.cache/vampire-saved/mame/cps2] [BUILD=build/m3b_merged30] [FRAMES=22880] [FREEZE=1] [KEEP=<dir>]
 #        tests/audit_tenant_cpu_soak.sh
 #   emulator tier, MAME; 12 legs in parallel, ~20000 match frames each
 set -eu
@@ -50,6 +50,9 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 BUILD="${BUILD:-build/m3b_merged30}"
 FRAMES="${FRAMES:-22880}"
+# MAME_BIN is PINNED (test_mame_bin_pinned, 14z-133): the release runner exports none, and tools/run_mame.sh would
+# fall back to Homebrew's mame, which answers "Unknown system" for vsavjw. The patched binary also runs native vsav2.
+MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
 EXPECT="$REPO/tests/expected/tenant_cpu_soak.txt"
 . "$REPO/tests/lib/controls.sh"
 vs_ctl_mode "$0"
@@ -59,7 +62,7 @@ case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD";; esac
 [ -f "$ROMDIR/vsav2.zip" ] || { echo "FAIL: no vsav2.zip in ROMDIR"; exit 1; }
 if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM; fi
 W="$(cd "$W" && pwd)"
-echo "  host $(uname -sm); MAME_BIN ${MAME_BIN:-unset (tools/run_mame.sh defaults by set name)}"
+echo "  host $(uname -sm); MAME_BIN $MAME_BIN"
 echo "build under test: $BUILD ($(shasum "$BUILD/prg/vm3j.04d" | cut -c1-8) vm3j.04d), FRAMES=$FRAMES"
 fail=0
 PL="$BUILD/patch/placements.json"

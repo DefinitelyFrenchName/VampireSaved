@@ -1441,12 +1441,20 @@ longs, read at `0x026646` for chain `a2:0x4C`); the two halves of the
 installer of [VSE-44], `0x02802E/0x0280C6/0x028140`; the manifests'
 `throw_victim_keyframes`/`grab_hold_keyframes` rows repoint its rows);
 and ONE real per-character WORD table at `0x0BE23A`: the **MINIMUM
-AIR-ATTACK HEIGHT** — `0x027B80` (five callers in the state code) returns
-1 ("the attack input is taken") when a button is pressed (`+0x113|+0x114`)
-and the fighter is either grounded or airborne with `+0x14 − +0x3A` ≥ the
-word; below it the press is refused. 36 for Zabel, Lilith and Jedah (rows
-`0x04/0x0D/0x0F` + their variant mirrors), 0 for everyone else — so the
-tenants (rows 0x10/0x11/0x13 = 0) may attack at any height.
+AIR-ATTACK HEIGHT** — `0x027B80` (fifteen `bsr.w` callers, `0x02267C`-`0x026BC0`)
+tests `+0x190` first: when it is set, neither guard below applies. Otherwise
+it returns 0 when `+0x121` (the crouch flag) is set, and, when `+0x38` (off the
+ground) is set, returns 0 if `+0x14 − +0x3A` is below the word (an UNSIGNED
+compare, `bcs`). Every path that reaches the button test returns 1 ("the
+attack input is taken") exactly when `+0x113|+0x114` is nonzero — a button
+press in 14z-121's reading; neither byte has an `atlas/ram.md` row. `+0x3A` has no `atlas/ram.md` row: reading `+0x14 − +0x3A`
+as the height above the floor is 14z-121's, not re-derived. 24 (`0x0018`) for Zabel, Lei-Lei and Jedah (rows
+`0x04/0x0D/0x0F` + their `+0x10` mirrors `0x14/0x1D/0x1F`, of the table's 32), 0 for everyone else — so the
+tenants (rows 0x10/0x11/0x13 = 0) may attack at any height. (The 14z-121 text said 36 for
+"Zabel, Lilith and Jedah": the table reads `0x0018` = 24 — how 36 was obtained is not recorded — and
+`0x0D` is Lei-Lei, Lilith being `0x0E` (`atlas/character_tables.md`); the 14z-121 text said "five
+callers"; measured 14z-189 and locked, routine and callers included, by
+`tests/test_air_attack_height.sh`.)
 `byte15b` (`0x0BE87A`, read at `0x022392` → fighter `+0x15B`) is the
 accumulator threshold above. Each row's resolution is a `note` on the
 row in `bank_map.toml`, rendered in the maps' bank tables.

@@ -13,7 +13,7 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**428 of 428 gates described.**
+**429 of 429 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
@@ -24,7 +24,7 @@ first sentence) is `gate_index.md`.
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 87 | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 72 | 72 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 73 | 73 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -2498,7 +2498,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 ## character-data
 
-the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 72 of 72 described.
+the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 73 of 73 described.
 
 ### `audit_air_gc_legacy.sh` — audit, emulator
 
@@ -2907,6 +2907,14 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 **HOW:** the donovan_victim part 4 rig on MAME (Victor 5MP/5HP into a blocking, mashing P2 pinned mid-screen) on vs2 with Donovan and Anakaris blocking and on vsavj with Demitri and Anakaris; per-event counter values, push frame, list index, facing and per-frame steps reduced by tools/advancing_guard.py against the list bytes read from each game's data view; control and late-mash legs must never push.
 
 **EXPECTS:** the frozen per-event lines and the structural rules (weights and threshold 10 on vs2, count and the RNG on vsavj, steps equal to the list, the attacker pushed AWAY, Anakaris inert); a red is the mechanic or threshold moving.
+
+### `test_air_attack_height.sh` — test, ci_static
+
+**WHAT:** the routine at vsavj PRG:0x027B80 (fifteen bsr.w callers) tests +0x190 first; when it is set neither guard applies. Otherwise it returns 0 when +0x121 is set, and, with +0x38 set, returns 0 when +0x14 - +0x3A < word[+0x382] (unsigned, bcs), the word read from the table it loads with `movea.l #$0BE23A,a0` (PRG:0x027B92). Every path reaching the button test returns 1 exactly when +0x113|+0x114 is nonzero. The meanings of +0x121 (crouch), +0x38 (off the ground) and +0x14 (Y) are ram.md's; +0x3A, +0x113 and +0x114 have no ram.md row, so +0x14 - +0x3A as height above the floor and +0x113|+0x114 as a button press are 14z-121's readings. Its 32 rows read 0x0018 (24) for 0x04, 0x0D, 0x0F (Zabel, Lei-Lei, Jedah per docs/game/atlas/character_tables.md) and their +0x10 mirrors 0x14, 0x1D, 0x1F, and 0 for the other 26, the tenants' 0x10/0x11/0x13 included; the 33rd word on is another table. +0x382 is the character id per docs/game/atlas/ram.md (not re-measured here).
+
+**HOW:** static over the decrypted vsavj opcode and data views (tests/lib/decrypt_cache.sh): the table address is taken from the instruction's immediate, which must be the opcode view's only reference to 0x000BE23A; capstone (the disassembler tools/audit_marionette_cost.py uses) decodes the eight instructions after it, which must index the table by the character id +0x382 at WORD stride (ext.w / add.w d1,d1 / move.w (0,a0,d1.w),d1); the 32 words are then read from the data view at that stride. The whole routine (PRG:0x027B80-0x027BC1) is decoded and frozen, so which branch returns 0 and which returns 1 is read from the code; its direct callers are counted over every static transfer form (jsr/jmp abs.l, abs.w and (d16,PC); bra, bsr and every Bcc .b/.w; DBcc) targeting 0x027B80 (indirect and (d8,PC,Xn) transfers are not).
+
+**EXPECTS:** the instruction at PRG:0x027B92, one reference, the frozen index sequence, the frozen routine, fifteen callers and the frozen row values below; each control fails the run.
 
 ### `test_anim_node_walk.sh` — test, emulator
 

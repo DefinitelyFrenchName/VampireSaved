@@ -8,7 +8,7 @@ Sources: **vs2** = `vsav2` extract (oracle `vhunt2`); **ours** = the built image
 
 | input | SHA-1 |
 |---|---|
-| `bank_map.toml` | `ece2b13bfbddaf6fea14e56baf65502945ba52dd` |
+| `bank_map.toml` | `3b01c2790f53b0528ba881e8e65147c46a332cf8` |
 | `manifest` | `a5b89a69babeb1812b67017dc2e9570b4c57e256` |
 | `overrides` | `be0e9b96c8414532cc7a1d60f7a4a235a7d6362d` |
 | `placements.json` | `913270ce40f1e46e11e9b6daa7ff4346771009c3` |
@@ -80,7 +80,7 @@ Sources: **vs2** = `vsav2` extract (oracle `vhunt2`); **ours** = the built image
 | `gap_bdffa` | auto | `0x0be03a` | raw | hex | `None` | `00046000` |  | no-vs2-value — SLICE of jump_params (0x0BDB7A + id*0x30, 0x600 bytes to 0x0BE17A; 14z-121 scan: no reader of this base) |
 | `gap_be07a` | auto | `0x0be0ba` | raw | hex | `None` | `00000000` |  | no-vs2-value — SLICE of jump_params (0x0BDB7A + id*0x30, 0x600 bytes to 0x0BE17A; 14z-121 scan: no reader of this base) |
 | `gap_be0fa` | auto | `0x0be13a` | raw | hex | `None` | `fffbc000` |  | no-vs2-value — SLICE of jump_params (0x0BDB7A + id*0x30, 0x600 bytes to 0x0BE17A; 14z-121 scan: no reader of this base) |
-| `gap_be23a` | auto | `0x0be25a` | raw | hex | `None` | `0000` |  | no-vs2-value — REAL per-char WORD table (14z-121): the MINIMUM AIR-ATTACK HEIGHT, vsavj 0x027B80 refuses a button press while airborne below +0x14 - +0x3A < word; 36 for Zabel/Lilith/Jedah (0x04/0x0D/0x0F + variant mirrors), 0 for everyone else incl. the tenants |
+| `gap_be23a` | auto | `0x0be25a` | raw | hex | `None` | `0000` |  | no-vs2-value — REAL per-char WORD table (14z-121): the MINIMUM AIR-ATTACK HEIGHT, vsavj 0x027B80 refuses a button press while airborne below +0x14 - +0x3A < word; 24 (0x0018) for Zabel/Lei-Lei/Jedah (0x04/0x0D/0x0F, ids per docs/game/atlas/character_tables.md, and their +0x10 mirrors 0x14/0x1D/0x1F), 0 for the other 26 of the table's 32 rows incl. the tenants — measured 14z-189, replacing the 14z-121 '36' (how that figure was obtained is not recorded) and correcting 0x0D's name, which 14z-121 gave as Lilith, who is 0x0E (tests/test_air_attack_height.sh) |
 | `gap_be37a` | auto | `0x0be3ba` | raw | hex | `None` | `00019000` |  | no-vs2-value — SLICE of param32_b rows 16-31 (14z-121: param32_b read id*8 from 0x0BE2FA at vsavj 0x026484 for chain a2:0x4C, the pursuit leap; no reader of this base) |
 | `gap_be4fa` | auto | `0x0be53a` | raw | hex | `None` | `00000000` |  | no-vs2-value — SLICE of rec8_b, the pursuit physics record pair (0x0BE3FA + id*0x20; 14z-121 scan: no reader of this base) |
 | `gap_be57a` | auto | `0x0be5ba` | raw | hex | `None` | `00000000` |  | no-vs2-value — SLICE of rec8_b, the pursuit physics record pair (0x0BE3FA + id*0x20; 14z-121 scan: no reader of this base) |

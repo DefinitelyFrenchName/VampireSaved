@@ -1,0 +1,1 @@
+WITHDRAWN 2026-10-03 (14z-189), never spawned: its claim said the tier's diff sha1 8ffaf8cd was the sha1 of h11/fix.diff, but fix.diff had grown after the tier by the withdrawn run-635 directory. Re-prepared as the next run, with h11/diff_since_tier.txt showing the tree at the tier is fix.diff minus the run-635 and run-636 directories.

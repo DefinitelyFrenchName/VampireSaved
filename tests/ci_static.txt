@@ -219,3 +219,4 @@ test_defense_rows_census
 test_quote_font_window
 test_roulette_tag_rows
 test_copy_flags
+test_air_attack_height
