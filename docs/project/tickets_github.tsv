@@ -2,8 +2,10 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 213
+# issues: 215
 number	state	reason	closed	labels	title
+215	OPEN	-	-	bug	apply_release.py's output zip differs by host (create_system 0 on Windows, 3 on Unix); zip.mjs and test_applier_page assume 3
+214	OPEN	-	-	bug	MiSTer package README tells the player it contains an FBNeo/MAME emulator (shared template wording), which it does not
 213	OPEN	-	-	bug	dispatch_census.lua keys replay input to a frame_done counter while breakpoints are armed ([MFI-5] desync): its frozen dispatch inventory may come from drifted runs
 212	OPEN	-	-	bug	apply_release.py (the end-user applier) exits 1 with UnicodeEncodeError after writing a correct romset when stdout is cp932/cp437/cp850 (redirected on Windows)
 211	OPEN	-	-	architecture,bug	run_all_emulator.sh --stale that selects 0 gates prints GREEN and becomes the newest run of record, masking every stale gate from the staleness audit

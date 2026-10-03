@@ -341,4 +341,13 @@ def main():
 
 
 if __name__ == "__main__":
+    # A native Windows python writes a redirected or piped stdout in the ANSI code page: cp932 on
+    # Japanese Windows (and cp437/cp850 elsewhere) cannot encode the em dash of the final OK line, so
+    # the applier exited 1 with UnicodeEncodeError AFTER writing a correct romset; cp1252 wrote 0x97
+    # (#212, the #130 class; reproduced 2026-10-03, build/agent189/t212/). The same two lines as
+    # tools/bundle_win_dlls.py; on macOS and Linux they change nothing. GUARDED: reconfigure is Python 3.7+,
+    # and this applier promises Python 3 — an older one keeps its default streams and still runs
+    # (rule-checker run 2026-10-03-605; tests/test_win_stdout_utf8.sh, control guard-removed).
+    if hasattr(sys.stdout, "reconfigure"): sys.stdout.reconfigure(encoding="utf-8", newline="\n")
+    if hasattr(sys.stderr, "reconfigure"): sys.stderr.reconfigure(encoding="utf-8", newline="\n")
     main()

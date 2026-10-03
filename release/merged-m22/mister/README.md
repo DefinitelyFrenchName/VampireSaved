@@ -38,10 +38,9 @@ cannot help with:
 > **2. Get the emulator** — the program that pretends to be the arcade machine.
 > This package already contains one, prepared for this game. **An ordinary
 > emulator you may already own will not work**; the reason is below.
-> **3. Put them together and play.** On **macOS**, double-click
-> **`PLAY.command`** and it does steps 2 and 3 for you. On Linux, run
-> `sh PLAY.command`. On **Windows there is no launcher yet** — follow "Play on…"
-> below by hand; it is four short steps.
+> **3. Put them together and play.** Copy the file and the core to your
+> MiSTer's SD card as `MISTER.md` describes, and start the game from the
+> MiSTer menu. There is no launcher to run on a MiSTer.
 
 **THIS PACKAGE CONTAINS NO ROM DATA AND NO COPYRIGHTED ASSET, EVER.** What it
 carries instead is a list of *differences* — "take these bytes from the file you
@@ -87,11 +86,6 @@ copies of the patch set are byte-identical, and a gate asserts it).
 get the emulator or core ("Play on MiSTer" at the end), play.
 
 ## What is in this package
-- `PLAY.command` — **on macOS, double-click this to play** once you have done
-  step 1 (on Linux, `sh PLAY.command`; **not yet available for Windows**). It
-  finds the right emulator for your machine, checks it really is the prepared
-  one, puts the game file where the emulator will look, and starts it. If
-  anything is missing it tells you which thing and what to do about it.
 - `apply_release.html` — **step 1 in your browser.** Double-click it, choose your
   `.zip` dumps, press the button, save the file it gives you. Nothing is
   installed and nothing is uploaded: the page has no network code in it at all,
@@ -151,7 +145,8 @@ and `vsav2.zip`:
 If you have never used a terminal: on macOS open **Terminal** from
 Applications > Utilities, type `cd ` (with the space), drag this folder onto the
 window, and press Return — you are now "in" this folder. On Windows use
-**PowerShell** the same way. It prints a line per step and finishes with `OK:`.
+**PowerShell** the same way, and type `py` where the line says `python3`. It
+prints a line per step and finishes with `OK:`.
 
 `./rompath/` then holds `vsavjw.zip`, and that is **the only file you place** —
 it is a STANDALONE set: every member the emulator asks for is inside it,
@@ -204,22 +199,8 @@ and netplay peers must hold the same one.
   completion above, which is pristine content from your dumps.)
 
 ## If it does not work
-Almost every first-time problem is one of these five.
+Almost every first-time problem is one of these.
 
-- **macOS says the emulator "Not Opened — Apple could not verify…"** and offers
-  only *Done* and *Move to Bin*. macOS is refusing to run a program that was not
-  submitted to Apple for approval; nothing is wrong with the file. **Right-clicking
-  and choosing Open does NOT get past it** on current macOS. Two things do:
-  - **The one-step way (recommended).** On macOS, double-click `PLAY.command`; it
-    offers to clear the "downloaded from the internet" mark for the whole folder at
-    once and then starts the game. By hand, the same thing is one line in a terminal
-    opened in this folder: `xattr -dr com.apple.quarantine .`
-  - **Without a terminal at all.** After a blocked attempt, open **System Settings >
-    Privacy & Security**, scroll to the message about the blocked program, and click
-    **Open Anyway**. This works (confirmed 2026-09-20) but you must do it **for each
-    blocked file separately** — and there are more than one, because the program
-    carries its own copies of the libraries it needs. For MAME that is **2** files;
-    **for FBNeo it is 24**, so on FBNeo prefer the one-step way above.
 - **"Unknown system: vsavjw" / "no such driver"** — the emulator is not the
   prepared one, so it does not know this game. Use the emulator in this package,
   or build one with the recipe in `EMULATOR.md`. Your normal emulator cannot be

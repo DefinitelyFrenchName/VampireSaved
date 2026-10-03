@@ -9,8 +9,9 @@
 #   orphan, its own shell).
 # HOW: plants a live synthetic process world (a fake Claude, the six orphans, the quiet one)
 #   with the CLAUDE_* environment scrubbed, runs the sweep, then declares every survivor and
-#   expects CLEAN, then kills every plant and expects CLEAN with no survivor; three controls
-#   blind one signal each in a copy of the sweep.
+#   expects CLEAN, then kills every plant and expects CLEAN with no survivor (the killed tool
+#   shell left a zombie, which must not be named); three controls blind one signal each in a
+#   copy of the sweep, and a fourth (zombie-named) makes the copy name the zombie.
 # EXPECTS: each plant named with its signal, the quiet processes unnamed, CLEAN after
 #   declaration and after the kill; a red names the plant missed or the process wrongly
 #   named.
@@ -30,12 +31,17 @@
 #   - ONE QUIET ORPHAN pointing nowhere near the root, which must not be named.
 # Then every survivor is DECLARED and the sweep must say CLEAN with each one declared;
 # then every plant is killed and it must say CLEAN with no survivor, the quiet orphan and
-# the helper still alive. Every plant runs with the CLAUDE_* environment scrubbed, so a
+# the helper still alive. The killed tool shell stays an UNREAPED ZOMBIE (the fake Claude
+# never wait()s on it) and the gate asserts it is one at that read: a zombie cannot be
+# killed, so the sweep must not name it — on Linux getsid() answers for a zombie and the
+# sweep named it until it learned to skip state Z (#203, 14z-189); on macOS getsid()
+# raises ESRCH for it, which had hidden the case. Every plant runs with the CLAUDE_* environment scrubbed, so a
 # real session's sweep cannot mistake the gate's world for its own, and every pid is
 # killed on exit.
 #
 # MUST-FIRE: perturbed-copy: blind-orphans — a copy of the sweep whose orphan scan returns no candidate must miss all six orphans, and the gate must FAIL (mode: the gate runs against that copy)
 # MUST-FIRE: perturbed-copy: blind-cwd — a copy that never matches a working directory must miss the two cwd-only orphans, the `tail` shape among them, and the gate must FAIL (mode: the gate runs against that copy)
+# MUST-FIRE: perturbed-copy: zombie-named — a copy whose process table keeps zombies and whose getsid() answers for a zombie (Linux's behaviour; macOS raises ESRCH) must name the unreaped tool shell at phase 3, and the gate must FAIL (mode: the gate runs against that copy) — #203
 # MUST-FIRE: perturbed-copy: blind-leaders — a copy that treats no child of Claude as a tool shell must miss the ATTACHED plant, and the gate must FAIL (mode: the gate runs against that copy)
 #
 # Usage: tests/test_agent_sweep.sh      # ci_portable, ~10 s (macOS: ps + lsof; Linux: /proc)
@@ -59,16 +65,23 @@ make_copy() {
     python3 - "$W/$1/agent/sweep.py" "$1" <<'PY'
 import sys; p, name = sys.argv[1:3]; s = open(p).read()
 edits = {
-    "blind-orphans": ('def orphan_roots(procs, uid, exclude):\n',
-                      'def orphan_roots(procs, uid, exclude):\n    return []  # CONTROL blind-orphans\n'),
-    "blind-cwd": ('        if under(fi.get("cwd"), roots):\n',
-                  '        if False:  # CONTROL blind-cwd\n'),
-    "blind-leaders": ('        if getsid(c) != c:\n',
-                      '        if True:  # CONTROL blind-leaders\n'),
+    "blind-orphans": [('def orphan_roots(procs, uid, exclude):\n',
+                       'def orphan_roots(procs, uid, exclude):\n    return []  # CONTROL blind-orphans\n')],
+    "blind-cwd": [('        if under(fi.get("cwd"), roots):\n',
+                   '        if False:  # CONTROL blind-cwd\n')],
+    "blind-leaders": [('        if getsid(c) != c:\n',
+                       '        if True:  # CONTROL blind-leaders\n')],
+    # the zombie filter removed AND getsid() answering for a zombie as Linux does (macOS
+    # raises ESRCH for one), so the copy names the unreaped tool shell on either host
+    "zombie-named": [('        if f[3].startswith("Z"):\n',
+                      '        if False:  # CONTROL zombie-named\n'),
+                     ('    except OSError:\n        return None\n',
+                      '    except OSError:\n        return pid  # CONTROL zombie-named\n')],
 }
-a, b = edits[name]
-assert s.count(a) == 1, name
-open(p, "w").write(s.replace(a, b, 1))
+for a, b in edits[name]:
+    assert s.count(a) == 1, name
+    s = s.replace(a, b, 1)
+open(p, "w").write(s)
 PY
     echo "$W/$1/agent/sweep.py"
 }
@@ -152,13 +165,23 @@ def sub(r):
     while i < len(o):
         o += kids.get(o[i], []); i += 1
     return o
+killed = []
 for r in [tool.pid] + [p for k, p in plants.items() if not k.startswith("q")]:
     for q in reversed(sub(r)):
         try:
-            os.kill(q, 15)
+            os.kill(q, 15); killed.append(q)
         except OSError:
             pass
-time.sleep(0.4)
+# poll (bounded, 5 s) until every killed process is gone or a zombie: a fixed sleep let a
+# loaded machine read a process still dying (#203). The tool shell STAYS a zombie: this
+# fake never wait()s on it, the case the sweep must not name (it cannot be killed)
+def stat(q):
+    return subprocess.run(["ps", "-o", "stat=", "-p", str(q)], capture_output=True, text=True).stdout.strip()
+for _ in range(50):
+    if all(stat(q) == "" or stat(q).startswith("Z") for q in killed):
+        break
+    time.sleep(0.1)
+res["tool_stat3"] = stat(tool.pid)
 res["r3"] = run()
 res["alive_after"] = {"helper": helper.poll() is None}
 helper.kill()
@@ -227,6 +250,8 @@ if res["r2"]["rc"] != 0 or "CLEAN:" not in r2 or r2.count("\nDECLARED ") + r2.st
     bad.append(f"phase 2: every survivor declared must read CLEAN with {len(rows)} DECLARED rows (exit {res['r2']['rc']})")
 if res["r3"]["rc"] != 0 or "CLEAN: no survivor" not in res["r3"]["out"]:
     bad.append(f"phase 3: after the kill the sweep must read CLEAN: no survivor (exit {res['r3']['rc']})")
+if not res["tool_stat3"].startswith("Z"):
+    bad.append(f"phase 3: the tool shell must be an UNREAPED ZOMBIE at the read (ps stat {res['tool_stat3']!r}) — the zombie case was not tested")
 if not res["alive_after"]["helper"]:
     bad.append("phase 3: the helper died — the quiet case was not tested alive")
 for b in bad:
@@ -238,7 +263,7 @@ PY
 echo "== test_agent_sweep: #172 slice S2 — C0.3 against a planted process world =="
 fail=0
 SW=tools/agent/sweep.py
-if vs_ctl_is blind-orphans || vs_ctl_is blind-cwd || vs_ctl_is blind-leaders; then SW="$(make_copy "$VS_CTL")"; fi
+if vs_ctl_is blind-orphans || vs_ctl_is blind-cwd || vs_ctl_is blind-leaders || vs_ctl_is zombie-named; then SW="$(make_copy "$VS_CTL")"; fi
 world "$SW" "$W/main" > "$W/main.txt"
 sed -n '/^MISMATCH/p' "$W/main.txt" | head -12 | sed 's/^/  /'
 tail -1 "$W/main.txt" | sed 's/^/  /'
@@ -276,7 +301,7 @@ fi
 
 # the controls, in-gate: each perturbed copy must produce mismatches
 if [ -z "${VS_CTL:-}" ]; then
-    for c in blind-orphans blind-cwd blind-leaders; do
+    for c in blind-orphans blind-cwd blind-leaders zombie-named; do
         world "$(make_copy "$c")" "$W/ctl_$c" > "$W/ctl_$c.txt"
         k=$(grep -c '^MISMATCH' "$W/ctl_$c.txt" || true)
         if [ "${k:-0}" -gt 0 ]; then vs_ctl_fired "$c" "$k mismatches on the perturbed copy, e.g. $(grep -m1 '^MISMATCH' "$W/ctl_$c.txt" | cut -c10-110)"
@@ -284,5 +309,5 @@ if [ -z "${VS_CTL:-}" ]; then
     done
 fi
 
-if [ "$fail" = 0 ]; then echo "PASS: C0.3 names the ATTACHED tool shell and all six orphan shapes by their signals, stays quiet on the helper, the quiet orphan and itself, reads CLEAN once each is declared, and CLEAN with no survivor once they are killed"
+if [ "$fail" = 0 ]; then echo "PASS: C0.3 names the ATTACHED tool shell and all six orphan shapes by their signals, stays quiet on the helper, the quiet orphan and itself, reads CLEAN once each is declared, and CLEAN with no survivor once they are killed (the tool shell left an unreaped zombie, which it must not name)"
 else echo "FAIL: test_agent_sweep"; exit 1; fi

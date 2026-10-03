@@ -71,6 +71,8 @@
 # WHAT THE GATE DOES NOT CLAIM: that an answer is ENOUGH. That is judged at the
 # close that closes the ticket.
 issue	kind	status	title	repro	decided	learned	wrong	sessions
+215	bug	open	apply_release.py's output zip differs by host (create_system 0 on Windows, 3 on Unix); zip.mjs and test_applier_page assume 3	tools/applier/zip.mjs	none	none	none	14z-189
+214	bug	open	MiSTer package README tells the player it contains an FBNeo/MAME emulator (shared template wording), which it does not	release/merged-m22/mister/README.md	none	none	none	14z-189
 213	bug	open	dispatch_census.lua keys replay input to a frame_done counter while breakpoints are armed ([MFI-5] desync); its frozen dispatch inventory may come from drifted runs	tests/lua/dispatch_census.lua	none	none	none	14z-189
 212	bug	open	apply_release.py (the end-user applier) exits 1 with UnicodeEncodeError after writing a correct romset when stdout is cp932/cp437/cp850	tools/apply_release.py	none	none	none	14z-189
 211	bug	open	run_all_emulator.sh --stale that selects 0 gates prints GREEN and becomes the newest run of record, so the staleness audit sees no stale gate	tools/audit_emulator_staleness.py	none	none	none	14z-189

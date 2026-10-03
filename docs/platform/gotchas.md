@@ -2675,6 +2675,38 @@ as U+FFFD — reproduced on ERIS's MSYS2 MINGW64 (Python 3.14.7): unfixed, 2 byt
 (`build/agent189/t130_eris.txt`). `PYTHONIOENCODING=cp1252` reproduces the
 ENCODING half of it on macOS, and `tests/test_win_stdout_utf8.sh` uses exactly that
 as its portable stand-in (it cannot see the newline half).
+**And it bit the END-USER APPLIER, where it CRASHES (#212, fixed 14z-189):**
+`tools/apply_release.py` prints one em dash, on its final `OK: wrote …` line, AFTER the
+romset is written and verified. A redirected or piped stdout under a native Windows python
+is the ANSI code page: cp1252 writes 0x97 (#130's symptom), but cp932 (Japanese Windows),
+cp437 and cp850 cannot encode U+2014 at all, so the applier exited 1 with
+`UnicodeEncodeError` for a correct set — the exit code a launcher reads. Measured on ERIS's
+real Windows (French, cp1252 ANSI): the merged-m19 applier redirected wrote 1 byte 0x97 and
+5 CRs; under `PYTHONIOENCODING=cp932` it exited 1 with the traceback; the fixed applier wrote
+1 UTF-8 em dash and 0 CR, and exited 0 under cp932 (`build/t145/live_eris.txt` of the 14z-189
+#145 worktree). The gate's portable half runs the applier on a SYNTHETIC release (a manifest
+whose one member is a `pristine_from` copy of a made-up file: no ROM byte, no ROMDIR) to its
+final line — the only way to reach that print without dumps.
+
+## A WINDOWS BATCH FILE AND ITS TEST HOST HAVE FOUR TRAPS — `%` on a `rem` line, LF endings, MSYS2 rewriting `/J`, and an SSH session with no desktop (found 2026-10-03, 14z-189, building #145's PLAY.bat; each paid once)
+
+1. **cmd expands `%` on a `rem` line.** A comment reading `rem what %~a reports`
+   stopped a probe script with "invalid path operator in parameter substitution"
+   before its first command. A `.bat` comment never carries a `%`;
+   `tests/test_release_launcher_bat.sh` checks it.
+2. **A `.bat` must be CRLF.** cmd reads a batch file in blocks and can lose `goto`
+   labels in a LF-only file; the launcher generator writes CRLF and the gate's
+   must-fire control `lf-endings` is that perturbation.
+3. **MSYS2 rewrites a bare `/X` argument as a path.** `cmd //c mklink /J roms …` from an
+   MSYS2 shell passed something other than `/J`, created no junction, and the gate's
+   junction-refusal case "failed" on a launcher that was correct. Write `//J`, and assert
+   the fixture exists before its verdict counts (the gate now does).
+4. **An SSH session on Windows has no desktop.** MAME's `cps2.exe` started through ssh
+   exits 3 ("Unable to initialize Direct3D 9 / Unable to complete window creation") —
+   the launcher had reached it with the right arguments (0 `NOT FOUND`). FBNeo's SDL build
+   runs there regardless. To run a windowed program from ssh, use a scheduled task with
+   `/it` in the logged-on user's session: both launchers stayed up 25 s there
+   (session 1) on ERIS, 2026-10-03.
 
 ## MAME READS THE USER'S OWN `mame.ini` EVEN UNDER `-homepath` — every harness leg inherits what that file sets (found 2026-09-15, 14z-158, gating the README's recording command; nothing paid)
 
@@ -3054,3 +3086,38 @@ background processes notwithstanding (2026-09-13, on the Windows box ERIS replac
 sleep gone after 100 idle seconds, `uptime -s` showing the VM restarted; recorded then only in
 the session's own notes, NOT re-measured on ERIS), so on ERIS a stopped local task may take the
 job down with it — measure it there before relying on either outcome.
+
+## `os.getsid()` ANSWERS FOR A ZOMBIE ON LINUX AND RAISES ESRCH ON macOS — and Linux `ps` keeps the zombie's name (`[sh] <defunct>`) where macOS shows `<defunct>` (measured 2026-10-03, 14z-189, #203)
+
+An unreaped zombie (a killed child whose parent never `wait()`s) reads differently on the two
+hosts, and a tool that treats "a session leader under process X" as live work inherits the
+difference. Measured with one script on both (`ps -o pid,ppid,stat,command` and
+`os.getsid(zombie)` 0.4 s after killing a `start_new_session` `sh` child that is never waited):
+the Mac (Darwin arm64, Python 3.9.6) shows `Z    <defunct>` and `getsid` raises `OSError errno=3
+No such process`; PILOT (Ubuntu 24.04, Python 3.12.3) shows `Zs   [sh] <defunct>` and `getsid`
+returns the zombie's own pid. So `tools/agent/sweep.py`'s ATTACHED scan (a child of Claude with
+`getsid(c) == c`) named a zombie tool shell on Linux and never on macOS, and
+`tests/test_agent_sweep.sh` phase 3 failed only on PILOT — its fake Claude never reaps the tool
+shell it kills, so the zombie stays for the whole read, and a longer or polled wait would never
+have cleared it. **Rule:** a process scan that advises killing must skip state Z (a zombie holds
+nothing and cannot be killed; only its parent's `wait()` removes it) — `sweep.py`'s table now
+reads `stat` and drops it — and a gate that relies on "the zombie is not named" must assert the
+zombie EXISTS at the read and carry a control that makes a copy name it on either host
+(`zombie-named`: the filter removed AND `getsid` answering as Linux does).
+
+## UBUNTU'S `sh` (dash) READS A SCRIPT ~8 KB AHEAD; macOS `sh` (bash 3.2) READS IT AS IT RUNS — a script truncated or edited mid-run is cut short on one and not the other (measured 2026-10-03, 14z-189, #203)
+
+Measured with one probe on both hosts (`/tmp/t203_dash_readahead.sh` in the session: a script
+pauses on a flag, the driver truncates it, then releases it; the line after the pause sits past
+N bytes of comment): on PILOT (`/bin/sh` → `/usr/bin/dash`) the line still ran at N = 0, 100,
+1000, 4000 and 8000 and was cut short at 9000, 16000, 33000 and 70000 — dash had buffered up to
+its ~8 KB read; on the Mac (`/bin/sh`, bash 3.2) it was cut short at every N, 0 included.
+`tests/test_run_on_snapshot.sh` truncates its runner file mid-run to prove the runner's
+self-copy, and the runner's tail after the command it runs is ~2.6 KB of a 21.7 KB file — so
+under dash that tail was already buffered, the truncation reached nothing, and the
+`no-self-copy` control was DEAD on Linux (reproduced on PILOT with the unpadded gate: `CONTROL
+DEAD: no-self-copy`). **Rule:** a test that edits or truncates a running script must put the
+code it expects to cut off beyond the shell's read-ahead (the gate's `pad_runner` inserts 16 KB
+of comment right after the command block, in the leg's own copy) — and the reverse holds for
+real work: under dash an edit to a running script reaches it only past ~8 KB, under bash 3.2
+anywhere, so "it survived an edit" proves nothing across hosts.

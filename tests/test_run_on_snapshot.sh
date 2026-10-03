@@ -13,7 +13,9 @@
 # HOW: builds a throwaway world (a repo with a submodule, a build/ output, a community sibling,
 #   a bbh checkout, a HOME holding an instrument cache, a scratch clone), starts a probe under
 #   run_on_snapshot.sh --emulator-inputs that reads all nine inputs, pauses it, perturbs them in
-#   the working tree, releases it and has it read them again; then runs the SAME probe IN PLACE
+#   the working tree, releases it and has it read them again (its runner file truncated too, the
+#   leg's copy padded past any shell's read-ahead so that truncation reaches a dash run as well —
+#   #203); then runs the SAME probe IN PLACE
 #   with the same perturbation (the positive leg: the perturbation must reach an unsnapshotted
 #   run, or the immunity leg proves nothing); section 4 changes an instrument binary mid-run.
 # EXPECTS: the snapshot run reads every input unchanged, records the commit taken before the
@@ -133,6 +135,25 @@ perturb() {
     if [ "${INST:-0}" = 1 ]; then echo inst-v2 > "$D/home/.cache/vampire-saved/fbneo_ref"; fi
 }
 
+# pad_runner <file> — 16 KB of comment lines right after the compound command that runs the probe
+# (#203, measured 14z-189). The leg truncates its runner file mid-run; a shell that reads a script
+# as it goes (macOS sh, bash 3.2: cut short 0 bytes past the pause) then never reaches the record,
+# but dash (Ubuntu's sh) reads ~8 KB ahead (a line 8,000 bytes past the pause still ran, 9,000 was
+# cut short) and the runner's tail after its command is ~2.6 KB, already buffered — so the
+# truncation reached nothing on dash and the no-self-copy control was DEAD there. Past the padding
+# the record code is beyond any read-ahead, so the truncation can reach a run on either shell:
+# the immunity leg is then a real test of the self-copy, and the control fires.
+pad_runner() {
+    python3 - "$1" <<'PY'
+import sys
+p = sys.argv[1]; L = open(p).read().split("\n")
+i = max(k for k, l in enumerate(L) if '"$@" ) 2>&1; echo $? > "$REC/.runner_exit"; } | tee' in l)
+j = next(k for k in range(i + 1, len(L)) if L[k].strip() == "fi")
+L[j + 1:j + 1] = ["# test_run_on_snapshot.sh pad_runner: beyond any shell's read-ahead (#203)"] + ["#" * 79] * 205
+open(p, "w").write("\n".join(L))
+PY
+}
+
 # leg <label> <runner|-> [expected exit] — run the probe (under the runner, or in place with "-"),
 # perturb mid-run
 leg() {
@@ -143,6 +164,7 @@ leg() {
         ( cd "$D/tree" && HOME="$D/home" JTSIM_SCRATCH="$D/jtsim" BBH_HOME="$D/bbh" PROBE_OUT="$W/$L" PROBE_FLAGS="$FL" sh probe.sh ) > "$W/$L.log" 2>&1 &
     else
         cp "$R" "$W/$L.runner.sh"; R="$W/$L.runner.sh"   # the leg's own copy: truncated mid-run below
+        pad_runner "$R"
         ( HOME="$D/home" JTSIM_SCRATCH="$D/jtsim" BBH_HOME="$D/bbh" PROBE_OUT="$W/$L" PROBE_FLAGS="$FL" \
           SNAPSHOT_ROOT="$SROOT" sh "$R" --repo "$D/tree" --no-romdir --emulator-inputs -- sh probe.sh ) > "$W/$L.log" 2>&1 &
     fi

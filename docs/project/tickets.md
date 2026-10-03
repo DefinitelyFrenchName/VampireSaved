@@ -11,12 +11,14 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**213 tickets** — status: open 16 · parked 10 · done 162 · declined 8 · not-ours 7 · invalid 9 · duplicate 1 · kind: bug 153 · cosmetic 11 · evolution 49 · **backfill debt: 0 rows**.
+**215 tickets** — status: open 18 · parked 10 · done 162 · declined 8 · not-ours 7 · invalid 9 · duplicate 1 · kind: bug 155 · cosmetic 11 · evolution 49 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#215](https://github.com/DefinitelyFrenchName/VampireSaved/issues/215) | bug | open | apply_release.py's output zip differs by host (create_system 0 on Windows, 3 on Unix); zip.mjs and test_applier_page assume 3 | `tools/applier/zip.mjs` | none | none | none | 14z-189 |
+| [#214](https://github.com/DefinitelyFrenchName/VampireSaved/issues/214) | bug | open | MiSTer package README tells the player it contains an FBNeo/MAME emulator (shared template wording), which it does not | `release/merged-m22/mister/README.md` | none | none | none | 14z-189 |
 | [#213](https://github.com/DefinitelyFrenchName/VampireSaved/issues/213) | bug | open | dispatch_census.lua keys replay input to a frame_done counter while breakpoints are armed ([MFI-5] desync); its frozen dispatch inventory may come from drifted runs | `tests/lua/dispatch_census.lua` | none | none | none | 14z-189 |
 | [#212](https://github.com/DefinitelyFrenchName/VampireSaved/issues/212) | bug | open | apply_release.py (the end-user applier) exits 1 with UnicodeEncodeError after writing a correct romset when stdout is cp932/cp437/cp850 | `tools/apply_release.py` | none | none | none | 14z-189 |
 | [#211](https://github.com/DefinitelyFrenchName/VampireSaved/issues/211) | bug | open | run_all_emulator.sh --stale that selects 0 gates prints GREEN and becomes the newest run of record, so the staleness audit sees no stale gate | `tools/audit_emulator_staleness.py` | none | none | none | 14z-189 |

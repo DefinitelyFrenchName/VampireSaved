@@ -432,3 +432,4 @@ tests/test_quote_font_window.sh	pipeline
 tests/test_roulette_tag_rows.sh	tenant
 tests/test_copy_flags.sh	pipeline
 tests/audit_mizuumi_struct.sh	character-data
+tests/test_release_launcher_bat.sh	platform

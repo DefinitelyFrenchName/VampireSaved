@@ -69,19 +69,27 @@ INITS = {"launchd", "init", "systemd"}
 # ------------------------------------------------------------------ the process table
 
 def table():
-    """-> {pid: dict(pid, ppid, uid, lstart, etime, comm, command)} from one `ps` call."""
-    out = subprocess.run(["ps", "-Ao", "pid=,ppid=,uid=,lstart=,etime=,command="],
+    """-> {pid: dict(pid, ppid, uid, lstart, etime, comm, command)} from one `ps` call.
+
+    ZOMBIES (state Z) are left out (#203, measured 14z-189): a zombie holds nothing and
+    cannot be killed — only its parent's wait() removes it — so naming one as a survivor
+    to kill is wrong advice. The two hosts disagreed without this: on Linux os.getsid()
+    answers for a zombie (its own pid), so an unreaped tool shell under a live parent read
+    as an ATTACHED survivor; on macOS getsid() raises ESRCH for it, so it never did."""
+    out = subprocess.run(["ps", "-Ao", "pid=,ppid=,uid=,stat=,lstart=,etime=,command="],
                          capture_output=True, text=True).stdout
     procs = {}
     for line in out.splitlines():
-        f = line.split(None, 9)
-        if len(f) < 9:
+        f = line.split(None, 10)
+        if len(f) < 10:
             continue
+        if f[3].startswith("Z"):
+            continue  # a zombie: nothing to kill (docstring)
         pid, ppid, uid = int(f[0]), int(f[1]), int(f[2])
-        lstart = " ".join(f[3:8])
-        cmd = f[9] if len(f) > 9 else ""
+        lstart = " ".join(f[4:9])
+        cmd = f[10] if len(f) > 10 else ""
         procs[pid] = {"pid": pid, "ppid": ppid, "uid": uid, "lstart": lstart,
-                      "etime": f[8], "command": cmd,
+                      "etime": f[9], "command": cmd,
                       "comm": os.path.basename(cmd.split(" ", 1)[0]) if cmd else "?"}
     return procs
 

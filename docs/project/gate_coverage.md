@@ -13,13 +13,13 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**423 of 423 gates described.**
+**424 of 424 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
 | [runner](#runner) | 41 | 41 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
-| [platform](#platform) | 41 | 41 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
+| [platform](#platform) | 42 | 42 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 60 | 60 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
@@ -100,7 +100,7 @@ the suite runners and their own ground truth. 41 of 41 described.
 
 **WHAT:** the close-time process sweep (tools/agent/sweep.py) names every process a session left alive that it must — an ATTACHED tool shell under Claude with its child, six ORPHAN shapes pointing into the project — and nothing it must not (a non-leader helper, a quiet orphan, its own shell).
 
-**HOW:** plants a live synthetic process world (a fake Claude, the six orphans, the quiet one) with the `CLAUDE_*` environment scrubbed, runs the sweep, then declares every survivor and expects CLEAN, then kills every plant and expects CLEAN with no survivor; three controls blind one signal each in a copy of the sweep.
+**HOW:** plants a live synthetic process world (a fake Claude, the six orphans, the quiet one) with the `CLAUDE_*` environment scrubbed, runs the sweep, then declares every survivor and expects CLEAN, then kills every plant and expects CLEAN with no survivor (the killed tool shell left a zombie, which must not be named); three controls blind one signal each in a copy of the sweep, and a fourth (zombie-named) makes the copy name the zombie.
 
 **EXPECTS:** each plant named with its signal, the quiet processes unnamed, CLEAN after declaration and after the kill; a red names the plant missed or the process wrongly named.
 
@@ -300,7 +300,7 @@ the suite runners and their own ground truth. 41 of 41 described.
 
 **WHAT:** tests/run_on_snapshot.sh runs its command on a snapshot that nothing done to the working tree during the run can reach — a tracked file edited and committed, a build/ output rewritten, a tracked build/ file, a submodule file, the ../community sibling, the bbh checkout, a file of the ~/.cache/vampire-saved instrument cache, a Verilator scratch clone, and the runner's own file — and its record names the commit the run was taken at; a tracked file carries its last commit's time, a `build/emu_*` the run writes comes back to the working tree, and an instrument binary changed in the LIVE cache during a run is reported.
 
-**HOW:** builds a throwaway world (a repo with a submodule, a build/ output, a community sibling, a bbh checkout, a HOME holding an instrument cache, a scratch clone), starts a probe under run_on_snapshot.sh --emulator-inputs that reads all nine inputs, pauses it, perturbs them in the working tree, releases it and has it read them again; then runs the SAME probe IN PLACE with the same perturbation (the positive leg: the perturbation must reach an unsnapshotted run, or the immunity leg proves nothing); section 4 changes an instrument binary mid-run.
+**HOW:** builds a throwaway world (a repo with a submodule, a build/ output, a community sibling, a bbh checkout, a HOME holding an instrument cache, a scratch clone), starts a probe under run_on_snapshot.sh --emulator-inputs that reads all nine inputs, pauses it, perturbs them in the working tree, releases it and has it read them again (its runner file truncated too, the leg's copy padded past any shell's read-ahead so that truncation reaches a dash run as well — #203); then runs the SAME probe IN PLACE with the same perturbation (the positive leg: the perturbation must reach an unsnapshotted run, or the immunity leg proves nothing); section 4 changes an instrument binary mid-run.
 
 **EXPECTS:** the snapshot run reads every input unchanged, records the commit taken before the perturbation, sees t.txt at its commit's time, reaches the real HOME's other entries, and returns its build/emu_probe to the tree; the in-place run sees nine readings change; a mid-run instrument change reads unchanged inside the run and turns the run's exit to 2 with its AFTER line; each control makes the gate FAIL.
 
@@ -534,7 +534,7 @@ the documentation locks — docs, skills, indexes, tables follow the tree. 21 of
 
 ## platform
 
-the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene. 41 of 41 described.
+the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene. 42 of 42 described.
 
 ### `audit_wide_phase_a.sh` — audit, emulator
 
@@ -808,6 +808,14 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 
 **EXPECTS:** the success path's invocation, every refusal non-zero and named; the unpatched-emulator control refused. The real launch is test_release_binaries' half.
 
+### `test_release_launcher_bat.sh` — test, ci_portable
+
+**WHAT:** the PLAY.bat every emulator package carries is plain cmd (no PowerShell), CRLF and ASCII only, every `goto` lands on a label and no parenthesised block can be split by a path holding "(x86)", and it runs the ruled invocation: FBNeo `fbneo.exe vsavjw` from its own folder with the set copied into roms\ beside it, MAME `cps2.exe vsavjw -rompath <the set's folder>`; the release tree's copy is byte-identical to the generator's (both sha1s printed). Every shipped text of every package (README.md, MISTER.md, EMULATOR.md, apply_release.html) names only launchers THAT package ships, and carries no unselected platform marker. ON A WINDOWS HOST (MSYS2) it also drives BOTH .bat files — the shipped bytes — under cmd with PLAY_DRY_RUN=1: each success path (FBNeo: roms\vsavjw.zip created, the WOULD RUN line; MAME: the WOULD RUN line with -rompath at the set's folder) and each refusal (FBNeo: no romset, no binary, no profile, a junctioned roms\; MAME: no romset, no binary, a stock cps2.exe that does not know vsavjw), each non-zero and named.
+
+**HOW:** tools/package_release_platforms.py's launcher_bat_bytes() for both platforms (the bytes the packager writes), read as bytes; the package texts grepped for each launcher's name against the package's files; on Windows, staged copies driven by `cmd //c`, with a stub fbneo.exe that is a text file carrying (or lacking) the profile marker (the FBNeo check is findstr over the file) and two stub cps2.exe COMPILED here with the shell's gcc, one answering `-listfull vsavjw` and one refusing it as a stock MAME does (the MAME check RUNS the binary). The dry run stops before either would be launched.
+
+**EXPECTS:** every static property on both launchers and every package text; on Windows every path's exit code and message (a Windows host without gcc is a FAIL, never a skip: these paths went unrun once); elsewhere the Windows section SKIPs and says so. The real launch (the emulator staying up) is not this gate's: measured on ERIS 2026-10-03 (STATE 14z-189).
+
 ### `test_release_os_metadata.sh` — test, ci_portable
 
 **WHAT:** a file manager's folder metadata (.DS_Store) in a release tree is never shipped and never counted: the uploader cuts no asset carrying one, and every release listing that can see a dotfile drops it through the one definition tests/lib/os_metadata.sh.
@@ -860,9 +868,9 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 
 **WHAT:** every python tool that runs under a NATIVE Windows python (MSYS2 MINGW64) during a release build writes its console output as UTF-8, so an em dash reaches the log as e2 80 94, not as cp1252's single 0x97 byte (which the UTF-8 terminal shows as U+FFFD). The same reconfigure line sets LF newlines; this gate does NOT see that half (PYTHONIOENCODING has no newline setting) — it was measured on ERIS only (0 CR, build/agent189/t130_eris.txt).
 
-**HOW:** runs each listed tool with no arguments (its usage text, which carries an em dash, goes to stderr through sys.exit) under PYTHONIOENCODING=cp1252, the encoding a native Windows python gives a pipe, and counts the bytes: at least one UTF-8 em dash and no 0x97. The control runs a copy of the tool with its reconfigure lines removed, which must write 0x97.
+**HOW:** runs each listed tool with no arguments (its usage text, which carries an em dash, goes to stderr through sys.exit) under PYTHONIOENCODING=cp1252, the encoding a native Windows python gives a pipe, and counts the bytes: at least one UTF-8 em dash and no 0x97. The control runs a copy of the tool with its reconfigure lines removed, which must write 0x97. THE APPLIER (#212): tools/apply_release.py is run on a SYNTHETIC release (a manifest whose one member is a pristine_from copy of a made-up file in a made-up reference zip: no ROM byte, no ROMDIR) all the way to its final "OK: wrote ... — every member verified" line, under PYTHONIOENCODING=cp932 (the code page that cannot encode the dash: the crash half) and cp1252 (the 0x97 half). Its control runs a copy with the reconfigure lines removed, which must exit non-zero with UnicodeEncodeError under cp932.
 
-**EXPECTS:** PASS when every listed tool reconfigures its streams; a red names the tool and the counts.
+**EXPECTS:** PASS when every listed tool reconfigures its streams and the applier exits 0 under cp932 with one UTF-8 em dash; a red names the tool and the counts.
 
 ## pipeline
 

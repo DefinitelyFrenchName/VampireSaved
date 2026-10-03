@@ -403,7 +403,9 @@ else
     # asked for as "a local file in the asset" (DECISIONS_HISTORY.md, ruled 2026-09-20);
     # it is GENERATED per platform by tools/gen_applier_page.py and held by
     # tests/test_applier_page.sh and tests/test_applier_page_browser.sh
-    EMU_INV='^(manifest\.json|apply_release\.py|apply_release\.html|README\.md|EMULATOR\.md|PLAY\.command|patches/vsavjw/d_[a-z0-9_]+\.xdelta|emulator/0002-cps2-wide-v1\.patch|emulator/bin/[a-z0-9_-]+/[^/]+)$'
+    # PLAY.bat joined it 2026-10-03 (14z-189, #145: the Windows launcher, ruled "PLAY.bat
+    # launcher"; its content is tests/test_release_launcher_bat.sh's)
+    EMU_INV='^(manifest\.json|apply_release\.py|apply_release\.html|README\.md|EMULATOR\.md|PLAY\.command|PLAY\.bat|patches/vsavjw/d_[a-z0-9_]+\.xdelta|emulator/0002-cps2-wide-v1\.patch|emulator/bin/[a-z0-9_-]+/[^/]+)$'
     inv_check fbneo "$EMU_INV"; inv_check mame "$EMU_INV"
     inv_check mister '^(manifest\.json|apply_release\.py|apply_release\.html|README\.md|MISTER\.md|BITSTREAM\.txt|jtcps2w\.rbf|[^/]+\.mra|patches/vsavjw/d_[a-z0-9_]+\.xdelta)$'
     # every prebuilt-binary dir: BINARY.txt names each file with a matching sha256

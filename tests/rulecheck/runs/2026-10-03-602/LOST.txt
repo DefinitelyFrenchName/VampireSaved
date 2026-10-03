@@ -1,0 +1,10 @@
+LOST 2026-10-03 (14z-189): run 2026-10-03-602 (decision `build`, the merge of #203 and #145/#212 with
+release/merged-m22 re-packaged) was prepared, both readers were spawned with their prompts verbatim, and
+`rulecheck.py record` ran: plant `inferred-decision-14z162` in slot b CAUGHT; the real verdict VIOLATED Q1 Q4
+(the MAME PLAY.bat's refusal paths never run and both controls perturbing only the FBNeo launcher; the ERIS
+gate run on a tree without the re-packaged release; the MiSTer README naming a PLAY.bat its package does not
+ship). Its run directory here and its ledger row were then DELETED, before resolve, by a `git reset --hard`
++ `git clean` of the merge189b worktree that held them uncommitted (done to rebase the merge onto the #145
+fork's updated diff). The prompts survive in build/rulecheck/2026-10-03-602/ (untracked staging); the
+verbatim verdicts survive in the session transcript (7deb09bb). Every finding was fixed before the next run,
+which re-checks the merge: 2026-10-03-603.

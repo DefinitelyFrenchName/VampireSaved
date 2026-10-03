@@ -26,7 +26,8 @@
 # counter and has not been located". 14z-189 located it: vs2's select carries a second START
 # counter helper (vs2 0x01F930, called beside the Shadow helper at 0x01F656) whose 7th press
 # latches $49, and the confirm path turns $49 into +0x3C3. The scope of a port is in
-# docs/game/atlas/select_screen.md "THE MARIONETTE FLAG".
+# docs/game/atlas/select_screen.md "The confirm-path id override ($43 / $45)" (its bold paragraph
+# THE MARIONETTE FLAG).
 #
 # Usage: ROMDIR=... tests/test_copy_flags.sh
 set -eu

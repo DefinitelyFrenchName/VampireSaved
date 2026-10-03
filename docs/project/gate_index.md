@@ -16,13 +16,13 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**423 scripts** — 114 ci_portable, 87 ci_static, 222 emulator-tier (run by name).
+**424 scripts** — 115 ci_portable, 87 ci_static, 222 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
 | [runner](#runner) | 41 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
-| [platform](#platform) | 41 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
+| [platform](#platform) | 42 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 60 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
@@ -147,13 +147,14 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 | `tests/test_release_asset_shape.sh` | test | ci_portable | — | EVERY PUBLISHED ASSET IS SELF-SUFFICIENT, and the two emulator routes never travel together. ROM-free, no emulator, ~10 s. | 14z-149 |
 | `tests/test_release_binaries.sh` | test | emulator | MAME, FBNeo, a build dir, ~2 min | the PREBUILT emulator binaries for THIS host under release/emulators/{fbneo,mame}/<os-arch>/ (the build resource every release's emulator/bin/<os-arch>/ is hash-verified from; maintainer-ruled 2026-09-11: | 2026-09-11 |
 | `tests/test_release_launcher.sh` | test | ci_portable | — | THE PLAYER'S LAUNCHER, DRIVEN (2026-09-20). | 2026-09-20 |
+| `tests/test_release_launcher_bat.sh` | test | ci_portable | — | THE WINDOWS LAUNCHER, PLAY.bat, and WHAT EACH PACKAGE'S TEXT PROMISES ABOUT LAUNCHERS (14z-189, GitHub #145). | 14z-189 |
 | `tests/test_release_os_metadata.sh` | test | ci_portable | — | a file manager's folder metadata (`.DS_Store`) in a release tree is never shipped and never counted: the real uploader cuts no asset carrying one, and every release listing that can see a dotfile drops it through the one definition, tests/l… | 14z-180 |
 | `tests/test_release_roundtrip.sh` | test | ci_static | ROMDIR | THE RELEASE PACKAGE GATE (14z-105). | 14z-105 |
 | `tests/test_replay_stage_census.sh` | test | ci_portable | — | FREEZE the input-staging convention of every replay-driving Lua instrument (14z-93, GitHub issue #10). No ROMs, no emulator, ~1s. | 14z-93 |
 | `tests/test_replay_video_selfcheck.sh` | test | emulator | MAME, FBNeo, a build dir | ground truth for replay.lua's VIDEO_OUT, the MAME per-frame framebuffer checksum. | session 14z |
 | `tests/test_romset_identity.sh` | test | ci_static | ROMDIR | ground truth for tools/audit_romset_identity.py. | 14z-60z |
 | `tests/test_wide_profile.sh` | test | emulator | FBNeo, a build dir | CPS-2 WIDE profile gate (Phase B). | 14z-123 |
-| `tests/test_win_stdout_utf8.sh` | test | ci_portable | — | the Windows-run python tools write UTF-8, never cp1252 (14z-189, #130). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-189 |
+| `tests/test_win_stdout_utf8.sh` | test | ci_portable | — | the Windows-run python tools write UTF-8, never cp1252 (14z-189, #130, #212). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-189 |
 
 ## pipeline
 

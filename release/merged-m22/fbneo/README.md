@@ -40,8 +40,8 @@ cannot help with:
 > emulator you may already own will not work**; the reason is below.
 > **3. Put them together and play.** On **macOS**, double-click
 > **`PLAY.command`** and it does steps 2 and 3 for you. On Linux, run
-> `sh PLAY.command`. On **Windows there is no launcher yet** — follow "Play on…"
-> below by hand; it is four short steps.
+> `sh PLAY.command`. On **Windows**, double-click **`PLAY.bat`** — the same
+> thing for Windows.
 
 **THIS PACKAGE CONTAINS NO ROM DATA AND NO COPYRIGHTED ASSET, EVER.** What it
 carries instead is a list of *differences* — "take these bytes from the file you
@@ -87,8 +87,9 @@ copies of the patch set are byte-identical, and a gate asserts it).
 get the emulator or core ("Play on FBNeo" at the end), play.
 
 ## What is in this package
-- `PLAY.command` — **on macOS, double-click this to play** once you have done
-  step 1 (on Linux, `sh PLAY.command`; **not yet available for Windows**). It
+- `PLAY.command` / `PLAY.bat` — **double-click this to play** once you have done
+  step 1: `PLAY.command` on macOS (on Linux, `sh PLAY.command`), `PLAY.bat` on
+  Windows. It
   finds the right emulator for your machine, checks it really is the prepared
   one, puts the game file where the emulator will look, and starts it. If
   anything is missing it tells you which thing and what to do about it.
@@ -151,7 +152,8 @@ and `vsav2.zip`:
 If you have never used a terminal: on macOS open **Terminal** from
 Applications > Utilities, type `cd ` (with the space), drag this folder onto the
 window, and press Return — you are now "in" this folder. On Windows use
-**PowerShell** the same way. It prints a line per step and finishes with `OK:`.
+**PowerShell** the same way, and type `py` where the line says `python3`. It
+prints a line per step and finishes with `OK:`.
 
 `./rompath/` then holds `vsavjw.zip`, and that is **the only file you place** —
 it is a STANDALONE set: every member the emulator asks for is inside it,
@@ -177,11 +179,12 @@ You need the prepared emulator, and then the game file next to it.
      would rather build it yourself than trust a binary.
    Both routes give the same program.
 2. **The easy way — macOS: double-click `PLAY.command`** (Linux:
-   `sh PLAY.command`; not yet available on Windows). It picks the right program
-   for your machine, checks it is the prepared one and not an ordinary copy,
-   handles macOS's "downloaded from the internet" block, puts your `vsavjw.zip`
-   where this emulator actually looks for it, and starts the game. If anything is
-   missing it names it. Skip to step 4.
+   `sh PLAY.command`). **Windows: double-click `PLAY.bat`.** It picks the right
+   program for your machine, checks it is the prepared one and not an ordinary
+   copy, handles macOS's "downloaded from the internet" block, puts your
+   `vsavjw.zip` where this emulator actually looks for it, and starts the game.
+   If anything is missing it names it. Skip to step 4.
+   On Windows, double-clicking `fbneo.exe` itself only flashes a window shut: it needs the game name, which `PLAY.bat` gives it (`fbneo.exe vsavjw`, started from its own folder with the set in `roms\` beside it).
 3. **By hand.** Put the `vsavjw.zip` you built in step 1 in a folder called `roms/` next to the emulator program, and start the emulator FROM that folder. This sounds fussy and is: this version of FBNeo has no setting for where games live — it only ever looks in `roms/` beside wherever you started it, so pointing at the file from its menu will not work.
    It is the **only** file you put there — not `vsav.zip`, not `vsavj.zip`, not
    the sound file. Everything the emulator needs is already inside it.
@@ -225,7 +228,7 @@ and netplay peers must hold the same one.
   completion above, which is pristine content from your dumps.)
 
 ## If it does not work
-Almost every first-time problem is one of these five.
+Almost every first-time problem is one of these.
 
 - **macOS says the emulator "Not Opened — Apple could not verify…"** and offers
   only *Done* and *Move to Bin*. macOS is refusing to run a program that was not
@@ -241,6 +244,11 @@ Almost every first-time problem is one of these five.
     blocked file separately** — and there are more than one, because the program
     carries its own copies of the libraries it needs. For MAME that is **2** files;
     **for FBNeo it is 24**, so on FBNeo prefer the one-step way above.
+- **On Windows, double-clicking `fbneo.exe` flashes a window shut, or MAME's
+  `cps2.exe` says files are "NOT FOUND"** — the emulator was started without
+  being told which game to run or where it is. Double-click `PLAY.bat` instead:
+  it starts FBNeo as `fbneo.exe vsavjw` with the set in `roms\` beside it, and
+  MAME as `cps2.exe vsavjw -rompath rompath`.
 - **"Unknown system: vsavjw" / "no such driver"** — the emulator is not the
   prepared one, so it does not know this game. Use the emulator in this package,
   or build one with the recipe in `EMULATOR.md`. Your normal emulator cannot be

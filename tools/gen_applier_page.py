@@ -33,9 +33,9 @@ MODULES = ["vcdiff.mjs", "zip.mjs", "applier.mjs"]
 PLATFORM_LABEL = {"fbneo": "FBNeo", "mame": "MAME", "mister": "MiSTer"}
 NEXT_STEP = {
     "fbneo": "put it where the README's &ldquo;Play on FBNEO&rdquo; section says — on macOS or "
-             "Linux, <code>PLAY.command</code> does that part for you.",
+             "Linux, <code>PLAY.command</code> does that part for you, and on Windows <code>PLAY.bat</code>.",
     "mame": "put it where the README's &ldquo;Play on MAME&rdquo; section says — on macOS or "
-            "Linux, <code>PLAY.command</code> does that part for you.",
+            "Linux, <code>PLAY.command</code> does that part for you, and on Windows <code>PLAY.bat</code>.",
     "mister": "copy it to your MiSTer's <code>games/mame/</code> folder and use the "
               "<code>.mra</code> files, as <code>MISTER.md</code> describes. Choose "
               "&ldquo;leave it out&rdquo; above for MiSTer.",

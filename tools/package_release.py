@@ -368,10 +368,17 @@ cannot help with:
 > **2. Get the emulator** — the program that pretends to be the arcade machine.
 > This package already contains one, prepared for this game. **An ordinary
 > emulator you may already own will not work**; the reason is below.
+<!--EMU-->
 > **3. Put them together and play.** On **macOS**, double-click
 > **`PLAY.command`** and it does steps 2 and 3 for you. On Linux, run
-> `sh PLAY.command`. On **Windows there is no launcher yet** — follow "Play on…"
-> below by hand; it is four short steps.
+> `sh PLAY.command`. On **Windows**, double-click **`PLAY.bat`** — the same
+> thing for Windows.
+<!--/EMU-->
+<!--MISTER-->
+> **3. Put them together and play.** Copy the file and the core to your
+> MiSTer's SD card as `MISTER.md` describes, and start the game from the
+> MiSTer menu. There is no launcher to run on a MiSTer.
+<!--/MISTER-->
 
 **THIS PACKAGE CONTAINS NO ROM DATA AND NO COPYRIGHTED ASSET, EVER.** What it
 carries instead is a list of *differences* — "take these bytes from the file you
@@ -389,11 +396,14 @@ FBNeo or MAME with one small published change that teaches it the larger board �
 that is the only difference, and you can read the change if you want to.
 
 ## What is in this package
-- `PLAY.command` — **on macOS, double-click this to play** once you have done
-  step 1 (on Linux, `sh PLAY.command`; **not yet available for Windows**). It
+<!--EMU-->
+- `PLAY.command` / `PLAY.bat` — **double-click this to play** once you have done
+  step 1: `PLAY.command` on macOS (on Linux, `sh PLAY.command`), `PLAY.bat` on
+  Windows. It
   finds the right emulator for your machine, checks it really is the prepared
   one, puts the game file where the emulator will look, and starts it. If
   anything is missing it tells you which thing and what to do about it.
+<!--/EMU-->
 - `apply_release.html` — **step 1 in your browser.** Double-click it, choose your
   `.zip` dumps, press the button, save the file it gives you. Nothing is
   installed and nothing is uploaded: the page has no network code in it at all,
@@ -453,7 +463,8 @@ and `vsav2.zip`:
 If you have never used a terminal: on macOS open **Terminal** from
 Applications > Utilities, type `cd ` (with the space), drag this folder onto the
 window, and press Return — you are now "in" this folder. On Windows use
-**PowerShell** the same way. It prints a line per step and finishes with `OK:`.
+**PowerShell** the same way, and type `py` where the line says `python3`. It
+prints a line per step and finishes with `OK:`.
 
 `./rompath/` then holds `{zips}`, and that is **the only file you place** —
 it is a STANDALONE set: every member the emulator asks for is inside it,
@@ -500,8 +511,9 @@ and netplay peers must hold the same one.
   completion above, which is pristine content from your dumps.)
 
 ## If it does not work
-Almost every first-time problem is one of these five.
+Almost every first-time problem is one of these.
 
+<!--EMU-->
 - **macOS says the emulator "Not Opened — Apple could not verify…"** and offers
   only *Done* and *Move to Bin*. macOS is refusing to run a program that was not
   submitted to Apple for approval; nothing is wrong with the file. **Right-clicking
@@ -516,6 +528,12 @@ Almost every first-time problem is one of these five.
     blocked file separately** — and there are more than one, because the program
     carries its own copies of the libraries it needs. For MAME that is **2** files;
     **for FBNeo it is 24**, so on FBNeo prefer the one-step way above.
+- **On Windows, double-clicking `fbneo.exe` flashes a window shut, or MAME's
+  `cps2.exe` says files are "NOT FOUND"** — the emulator was started without
+  being told which game to run or where it is. Double-click `PLAY.bat` instead:
+  it starts FBNeo as `fbneo.exe vsavjw` with the set in `roms\` beside it, and
+  MAME as `cps2.exe vsavjw -rompath rompath`.
+<!--/EMU-->
 - **"Unknown system: vsavjw" / "no such driver"** — the emulator is not the
   prepared one, so it does not know this game. Use the emulator in this package,
   or build one with the recipe in `EMULATOR.md`. Your normal emulator cannot be

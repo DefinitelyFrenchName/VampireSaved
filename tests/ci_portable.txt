@@ -334,3 +334,4 @@ test_win_stdout_utf8
 # #196 (14z-189): an unset MAME_BIN makes tools/run_mame.sh run the PINNED build for the set (WIDE for vsavjw,
 # the reference build for stock sets), never the mame on PATH; a missing default is refused; one control. ~1 s.
 test_mame_default_bin
+test_release_launcher_bat
