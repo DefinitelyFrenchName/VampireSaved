@@ -428,3 +428,7 @@ tests/test_close_standing.sh	runner
 tests/audit_tenant_continue_switch.sh	tenant
 tests/test_win_stdout_utf8.sh	platform
 tests/test_mame_default_bin.sh	platform
+tests/test_quote_font_window.sh	pipeline
+tests/test_roulette_tag_rows.sh	tenant
+tests/test_copy_flags.sh	pipeline
+tests/audit_mizuumi_struct.sh	character-data

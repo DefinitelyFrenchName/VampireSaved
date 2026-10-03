@@ -314,8 +314,42 @@ Savior — she is a Vampire Savior 2 character**, and the "7 presses" code
 belongs to that game. Worth recording for anyone who goes looking: vsav2's
 twin routine (`PRG:0x01F8F2`, disassembled 14z-116) is structurally
 IDENTICAL to vsavj's and also carries only a `#$5`, so whatever arms
-Marionette in vs2 is NOT this counter and has not been located. It is out
-of scope for this port either way — nothing here ports her.
+Marionette in vs2 is NOT this counter ~~and has not been located~~ *(LOCATED
+14z-189 — next paragraph)*. It is out of scope for this port either way —
+nothing here ports her (#128, parked).
+
+**THE MARIONETTE FLAG (located 14z-189, GitHub #128; gate
+`tests/test_copy_flags.sh`).** vs2 and vh2 carry a SECOND copy flag,
+fighter `+0x3C3`, beside Shadow's `+0x3BC`, armed by a SECOND START counter:
+the helper at vs2 `PRG:0x01F930` (called at `0x01F656`, beside the Shadow
+helper) counts START presses on the "?" cell in `$48(a6)` and latches
+`$49(a6)` on exactly the 7th (`cmpi.b #$7,$48(a6)` at vs2 `0x01F948`, vh2
+`0x01F940`); the confirm path then does `st.b $3c3(a6)` (vs2 `0x01F6AC`) —
+the community's "7 presses" code, instruction for instruction. **What the
+vsavj census FINDS, scoped to the forms it reads** (`tests/test_copy_flags.sh`,
+a LINEAR disassembly of `0x000000-0x0BFFFF`): no `$3c3(aN)` operand (0; 19 for
+`+0x3BC`); every textual match of the a5-relative second-block forms
+`$7c3/$bc3(aN)` and the absolute byte addresses `$FF87C3` / `$FF8BC3` is listed
+and frozen — vsavj's one is the immediate `#$8bc3`, not an access; and of the
+`.b/.w/.l`-suffixed and `movep` displacement accesses whose bytes cover a flag
+(WIDE), vsavj's one covers `+0x7BC` through `a7`, the stack pointer — none
+`+0x3C3` (controls `plant-3c3`, `plant-alt-form`, `plant-wide`). **NOT read,
+so not claimed:** a multi-register `movem`, a word or long at an absolute
+address, an index-register or computed address, a mis-framed site, code above
+`0x0C0000`. vs2 has 28 `+0x3C3` sites (vh2 31), almost all beside a
+`+0x3BC` test (`tst.b $3bc / tst.b $3c3`, `or.b $3c3`). Among them, what she
+owns: a per-round re-copy (`move.b d1,$382(a0)` at vs2 `0x009740`/`0x009828`),
+a palette path offset `lea $140(a0)` (`0x02ACCA`/`0x02AD94`), a select-screen
+record (`0x06C32A`, array `0x2A04FA` row `0x10`) and her own VS/sprite
+record (`0x0933EA`, `0x2B7EF4`). **What a port would carry, statically
+sized:** a new per-player RAM flag (`+0x3C3`'s freeness in vsavj is absence
+evidence from code only — no write tap has run), the 7-press helper and the
+confirm write in the legacy select path, ~28 consumer sites (each a thunk on
+a path vanilla content runs — select, match init, round transitions, palette
+load, VS screen, win quote), and her assets (records, tiles, palette block).
+Marionette and Shadow are both mirror-match routes (STATE_HISTORY 14z-116
+"MARIONETTE — a vs2 character"), so the cost buys a second route to a mirror
+match.
 
 **THE ARCADE HAS EXACTLY THREE HIDDEN CHARACTERS: Oboro Bishamon, Dark Gallon
 and Shadow** (confirmed by the maintainer, 2026-08-28). The alternate Lilith,

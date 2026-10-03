@@ -225,13 +225,53 @@ red-poke A/B changes 0 px anywhere else, 0 px on the VS screen). The 2P
 path never executes it. For CPU Phobos the 1P VS screen is PIXEL-IDENTICAL
 to the 2P Donovan-vs-Phobos VS screen in both portrait regions. What a
 tenant opponent DOES show, on the roulette only: the BASE character's name
-and mini-art (Phobos `0x10` -> "BULLETA", a 4-bit-folded consumer whose PC
-is not attributed) in pool row `0x10`'s brown ramp. The pool is the tail of
+and mini-art (Phobos `0x10` -> "BULLETA") in pool row `0x10`'s brown ramp.
+**[The maintainer, 2026-10-03 (14z-189, #125), on the captures: the small
+portrait beside CPU Phobos's "BULLETA" is "neither Buletta nor Phobos".
+Whether that is row `0x00`'s art in pool row `0x10`'s colours (this section's
+reading) or something else is NOT measured — the art's source is #125's to
+name.]**
+*(14z-123 called it "a 4-bit-folded consumer whose PC is not attributed";
+RESOLVED 14z-189 — no code folds the id, the DATA does, below.)* The pool is the tail of
 a palette bank indexed from `0x3A3C00` (its 16th word is a running index;
 pen 15 is transparent): row `0x13` is a grey ramp, rows `0x10`/`0x11` are
-unrelated real palettes. The built image ships the pool byte-identical to
+real palettes — **byte-identical to vs2's own pool rows `0x10`/`0x11`**
+(vs2 pool `0x3BB3DC`, measured 14z-189), so Phobos's and Pyron's tag colours
+already ship in vanilla; vs2's row `0x13` (Donovan) differs from vsavj's grey
+ramp. The built image ships the pool byte-identical to
 vsavj (no manifest supplies rows). Single-player, tenant-plays-1P only,
 cosmetic — ticket #124, not fixed.
+
+**THE TAG'S "FOLD" IS DATA ALIASING, not a consumer (measured 14z-189,
+GitHub #124; gate `tests/test_roulette_tag_rows.sh`).** This roulette IS the
+arcade-ladder MAP screen (the venue banner at the bottom, the opponents'
+planets around the eye; #125's surface). For the current rung the tag object
+(type 7 sub `0x12`, init `PRG:0x05FCF0`, +0x5D = the opponent id from
+`$FF1E48+i`, +0x0A = the venue from `$FF1E50+i`) spawns a sub-`0x08` child
+(init `PRG:0x05FBE6`) whose +0x0A is the opponent id. That init takes an
+x-offset pair from two word tables (`lea $603de(pc)` / `lea $6041e(pc)`,
+read in the DATA view, index id*2) and sets +0x1C = `0x26752A + id*4 - 4`;
+the effect-pool builder's `movea.l $1c(a6),a0 / movea.l 4(a0),a0`
+(`PRG:0x01AFA6`) then draws **row id** of the long array at `0x26752A` —
+the name AND the mini-art (the mini-art's source is read from the code
+path and one pool dump on replay 111, not gated; see the maintainer's
+portrait note above). In vsavj that array and both width tables carry
+rows `0x10-0x13` as COPIES of rows `0x00-0x03` (gated by `tests/test_roulette_tag_rows.sh`; the analysis read `0x14-0x1F` the same way, not gated) (the [VSE-75] aliasing guard),
+so CPU Phobos draws row `0x00` = Bulleta's tag (measured: Phobos leg child
++0x0A `0x10`, +0x1C `0x267566`; Bishamon leg `0x08` / `0x267546`, which
+draws BISHAMON). vs2's twin (`0x2A0862`, init `0x06BDB2`) has its OWN rows at
+`0x10`/`0x11`/`0x13` (`0x2A73A8`/`0x2A7664`/`0x2A7672`) and aliases `0x12`
+(Dark Gallon -> Gallon) as vsavj must. **What a fix touches:** per tenant,
+row id of `0x26752A` repointed to vs2's record (the shipped `select_records`
+form — the neighbouring arrays `0x2675AA` / `0x26762A` are already repointed
+from vs2 `0x2A08E2` / `0x2A0962`; this is the array before them), the
+records' tiles placed, the two width words (vs2: Phobos `0x0010`/`0xFFE0`,
+Pyron `0x0010`/`0xFFE0`, Donovan `0x000E`/`0xFFDE`; vsavj's aliases differ for
+Phobos's second word and both of Donovan's), and Donovan's pool row `0x13`.
+Rows `0x10`/`0x11`/`0x13` have no legacy reader — vanilla never holds those
+ids (`tests/audit_id_writers.sh`); rows `0x12`/`0x18` (Dark Gallon, Oboro)
+are not touched. The sibling sub-`0x0A` child reads `0x26762A` row id, the
+array the port already repoints (VS-splash P2).
 
 ### Gates from the M2b step that still run
 
@@ -2238,6 +2278,27 @@ recording replays at every freeze), `tests/audit_don_vs_cpu.sh`.
   `0x2CD9C` (tables 1-3: `+0x382<<2` row, then `jsr 0x14E8A` (RNG) `andi #$1F`
   `+ (0x20A,a6)` picks one of 32 starts inside the row's block; write
   `+0x214/+0x218/+0x21C`). CPU-side only (14z-98 trace); 2P never reads them.
+  *(Precised 14z-189 from the disassembly: tables 1 and 2 are two-level —
+  `move.w (a0,$205.w)` selects a sub-block, then the RNG byte (`andi #$1F`
+  `+ $20A`) indexes a byte table whose value picks a word at `+0x60`; table
+  3 (`0x2CD9C`) is NOT RNG-picked — it indexes the row's word table by
+  `$22B(a6)`. Every offset is `lea (a0,d1.w)`, i.e. SIGNED.)*
+- **The tenants' blocks are complete at the first level (14z-189, #129's
+  first question).** The three placed blocks are byte-identical to vs2's
+  (`x100000@huitzil` `0xE3C`, `x100e3c@pyron` `0xC8E`, `x101aca` `0x10CE`
+  bytes: 0 differing), and rows `0x10`/`0x11`/`0x13` of all four tables land
+  inside the tenant's own placed block and map back exactly onto vs2's own
+  tables `0xD91B8`/`0xD9238`/`0xD92B8`/`0xD9338` (vs2 points only those
+  three rows into its pool `0x100000-0x102B98`). Each tenant's table-3 row
+  sits `0x16` bytes before its block's end — 11 word entries — and all 11
+  signed targets resolve inside the block. Not settled statically: the
+  script STREAMS' own operands (the long values that fall in vs2's pool
+  range inside the blocks look like word pairs, which "position-independent"
+  predicts, but the command set was not decoded), the maximum of `$22B`, and
+  the interpreter-body differences between the two games (the absolute
+  operands and the table-1 command-17 guard below). The row provisioning is
+  `tests/test_tenant_loop.sh`'s ai_script section; the byte-identity and
+  table-3 boundary checks are not yet a gate (#129).
 - **Scripts.** Word-offset streams (position-independent): the start block
   is a table of word offsets to the actual script; each command pulls three
   words into `+0x242/+0x244/+0x246`, the command byte lands in `+0x241`.
@@ -2564,7 +2625,8 @@ move.l  a1,$30(a4)                             ; INSTALL
 
 **4. The renderer** (`PRG:0x089062`) reads `$30(a6)` and walks
 `len.w, chars.w[len], len.w, chars.w[len], 0x0000`, masking each char with
-`andi.w #$fff`; the drawer adds the `0x3800` font base. Strings sit in flat
+`andi.w #$fff`; the drawer adds the `0x3800` font base, in gfx BANK 1 — both
+immediates of the emitter `0x01BA6A` (vs2: `0x4200`; measured 14z-189, see 8). Strings sit in flat
 runs (observed stride `0x46` for the 2x16 form).
 
 **5. WHY EVERY TENANT SHOWS A HOST LINE — it is the ALIAS class.**
@@ -2644,7 +2706,30 @@ controls) and `tools/audit_quote_font.py` compares the glyphs.
   (replay 23) and `0x0033101E` (replay 28) during the vanilla win screen. So
   RELOCATING THE BANK PERTURBS LEGACY WORK RAM BY CONSTRUCTION — the
   superset invariant, not a tolerance question.
-- **THE GLYPHS ARE THE REAL BLOCKER, and it is not the text.** The three vs2
+- **THE GLYPHS ARE 39 NEW TILES, NOT ~330 (CORRECTED 14z-189, GitHub #123;
+  the 14z-116 reading below compared the wrong window).** The quote is drawn
+  by the system-text emitter `PRG:0x01BA6A` (format 0 `0x01BA8E`, format 1
+  `0x01BACC`), whose OBJ y word takes an IMMEDIATE bank, `ori.w #$2000,d1`
+  (`0x01BAA8` / `0x01BAE4`, gfx bank 1), and whose code word adds an
+  IMMEDIATE base, `addi.w #$3800,d2` (`0x01BAB4`) — **vs2 and vh2 add
+  `0x4200`** (vs2 `0x01A520`/`0x01A55C`). So code C draws group-A tile
+  `0x13800 + (C & 0xFFF)` in vsavj and `0x14200 + (C & 0xFFF)` in vs2: the
+  SAME kana/kanji font, its base moved by `0x600` tiles. Measured on the
+  screen (merged-m22, replay 61, the tenant win): the 32 quote entries carry
+  y = `0x20b0` and tile addresses `0x13820`/`0x13ee5`..., written by PC
+  `0x01BABE`; the bank-0 window `0x3800-0x47FF` holds character art in both
+  games. Against each game's own base (`tools/audit_quote_font_window.py`,
+  gate `tests/test_quote_font_window.sh`): of the 331 codes, **289 draw the
+  identical glyph at the identical code in vsavj, 1 exists at another code,
+  2 are vs2-blank, and 39 are ABSENT — one contiguous block of vs2-only kanji
+  at codes `0xB13-0xB3B`** (21 for Phobos / 10 Pyron / 8 Donovan, 54 uses in
+  all), and **all 39 land on codes whose vsavj tile is BLANK** (vsavj's window
+  has 403/4096 blank tiles; its run `0x14311-0x143FF` holds them). So a port
+  needs no code remap: the text ports as data and 39 glyph tiles land at
+  their own codes — in vsavj's blank bank-1 slots, or with all 4096 in group C
+  bank 5 (4096/4096 blank on merged-m22, `vsavjw.zip` sha1 `5439d4ca`) if the
+  bank-1 immediate is changed for tenant text (the next bullet).
+  *The superseded 14z-116 reading, kept for its eliminations:* "The three vs2
   tenant blocks use **331 distinct codes**; at the shared font base `0x3800`
   **326 of 327 non-pad codes render a DIFFERENT glyph in vsavj** (they are
   each game's own kanji inventory, in each game's own order — the
@@ -2653,7 +2738,24 @@ controls) and `tools/audit_quote_font.py` compares the glyphs.
   unreachable from a 12-bit code in the quote object's own bank — and
   vsavj's bank-0 font window `0x3800-0x47FF` is **4096/4096 non-blank**, so
   there is no free slot to remap into either. A code remap cannot fix this;
-  the glyph TILES have to travel.
+  the glyph TILES have to travel." — RETRACTED: it compared tile
+  `0x3800 + code` (bank 0, character art) in both games.
+- **THE CLEAN ROUTE'S OPEN MEASUREMENT, ANSWERED (14z-189): the text object
+  does NOT take its bank from the field `winquote_bank_variant_id` writes.**
+  That gate (`site 0x05F328`) writes `+0x18` of the portrait DRAWER object;
+  the TEXT object lives in the `0x200`-stride pool at `$FFE800` (slot
+  `$FFF200`, so `+0x30` is `RAM:$FFF230`), its set-up (`0x00C840`, then
+  `0x089054`: `+0x1A = 0xE000`, `+0x1C -> +0x40`) never writes `+0x18`, and
+  the emitter ignores `+0x18` — measured: poking `RAM:$FFF218 = 0x3000` every
+  frame of the tenant win screen (replay 61, frames 5379-5560) changed
+  **0 px** at frames 5400/5450/5520 while the dump showed the poke landed.
+  The bank is the emitter's immediate, shared by EVERY system-text object
+  (the pool walker `0x01BA52`). So bank 5 for tenant text needs code on the
+  emitter path, not a field write: a thunk in that shared, legacy-reachable
+  emitter, or a tenant-only route around it. Blank bank-1 slots need no
+  emitter change but write 39 tiles into vanilla's group A — which side of
+  "the clean way, not touching vanilla" that falls on is the maintainer's
+  call (#123).
 
 ### Per-tenant win-screen checklist
 1. `[[code_word]]` x2 — position x/y (slot-following, CODE rows).
@@ -2663,7 +2765,11 @@ controls) and `tools/audit_quote_font.py` compares the glyphs.
    the tenant's portrait record (Huitzil = vs2 `0x2A881E`). Already done
    and working via the (misnamed) `win_quote` select_records entry.
 4. QUOTE text: separate structure (record → line char codes → shared
-   bank-1 `0xb6xx` font, pal 09) — STILL the un-ported part. Path measured
+   bank-1 `0xb6xx` font, pal 09) — STILL the un-ported part. *(CORRECTED
+   14z-189: the quote glyphs are pal-0 tiles `0x13800 + code`, emitted at
+   `0x01BABE` — the `0xb6xx` pal-09 entries on that screen are the static
+   furniture of item 1 of the decode above; see "THE GLYPHS ARE 39 NEW
+   TILES".)* Path measured
    14z-76: drawer `0x01B300`/`0x01B3F8`, sprite list `0x28D866`+, char codes
    `0x2F3A7A`. **Do NOT repoint the `0x267xxx` arrays for this — all three
    already carry a tenant repoint and none is read at the win screen.**
@@ -3819,6 +3925,30 @@ clipped mid-move. Causally gated by
 the state which requested its palette is exposed to this, and the exposure
 window is the effect's own duration. It is invisible until something
 interrupts the owner.
+
+**WHAT OPTION (B) — THE EFFECT OWNS ITS ROW — WOULD TAKE (scoped 14z-189,
+GitHub #127; nothing built).** Static: the vanilla palette copy
+(`PRG:0x02AD20-0x02AD80`, writers `0x02AD64`/`0x02AD78`) takes its DESTINATION
+row from `+0x18B` of the object in A6 and its source from `+0x3A4`; a pool
+object (effect `$FFB800`, `0x80` stride; projectile `$FF9400`, `0x100`) has no
+such fields inside its slot, and the shipped owner-aware accent thunks
+(`accent_color_aware_0..3`) already reach the OWNER's `+0x382`/`+0x3AE`
+through `+0x30`. So (B) is a new explicit-row request path, not a reuse of the
+copy with the pool object as A6. Measured, which OBJ palette row could be
+the effect's own (MAME on ERIS, write tap over `$90C000-$90C3FF` + OBJ dumps
+every 60 frames, restricted to FIGHTING frames = phase cursor `$FF800C == 6`
+written by the in-match machine): over merged-m22's 17-replay corpus
+(100,100 fighting frames) and vsavj's 6 (35,873), rows `0x0E`, `0x0F` and
+`0x14` are referenced by **no** OBJ entry while fighting in either corpus,
+and are written while fighting only by `0x01433C` and the round-start
+loaders `0x01C6E4`/`E8`/`EC`/`F0` (merged 1,536 writes each, vsavj 512);
+row `0x0B` (the #112 row) took 5,904 writes and 381 references. That is
+ABSENCE evidence ([VSE-52]): the corpus lacks many characters' specials and
+supers, and both OBJ buffers were counted. Freeness would need the whole
+roster's lifetimes under a write tap — and the legacy cost of a new request
+path on a path vanilla runs ([VSP-35]) is the other half of the price. The
+census rig is the scoping session's scratch (`build/t_analysis/pal_*`), not a
+gate.
 
 Atlas rows this rests on: `atlas/ram.md` player-block `+0x18B` (palette
 destination row), `+0x3A4` (palette source base), `+0x3AE` (the owner's

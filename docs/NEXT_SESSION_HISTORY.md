@@ -7447,7 +7447,7 @@ anchor lives in this file.
 > ## **WIN QUOTES — FORGONE** by ruling, parked CLEAN-WAY-ONLY (the 14z-76
 > ## whole-bank relocation is ruled OUT: it moves `RAM:$FFF230` on legacy
 > ## win screens). A data-only fix is impossible (zero free bytes at BOTH
-> ## hops); the real cost is ~330 GLYPH TILES. Tools + gate in the tree.
+> ## hops); the real cost is ~330 GLYPH TILES **[39 — CORRECTED 14z-189, #123, marked in place]**. Tools + gate in the tree.
 > ## **RANDOM SELECT** cannot pick a tenant — fixed 15-entry table at
 > ## `PRG:0x020C88`, hard bounds; **the maintainer ADDED "include the
 > ## tenants" to the list** (fix shape recorded in STATE, not built).

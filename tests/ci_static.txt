@@ -216,3 +216,6 @@ test_same_data_p2
 test_df_field_readers
 test_reaction_classes
 test_defense_rows_census
+test_quote_font_window
+test_roulette_tag_rows
+test_copy_flags

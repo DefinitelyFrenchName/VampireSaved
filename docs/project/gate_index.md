@@ -16,18 +16,18 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**419 scripts** — 114 ci_portable, 84 ci_static, 221 emulator-tier (run by name).
+**423 scripts** — 114 ci_portable, 87 ci_static, 222 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
 | [runner](#runner) | 41 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 41 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
-| [pipeline](#pipeline) | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
+| [pipeline](#pipeline) | 60 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
-| [tenant](#tenant) | 85 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 68 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [tenant](#tenant) | 86 | tenant content — per-character gates and on-demand audits on the ported characters |
+| [character-data](#character-data) | 69 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -174,6 +174,7 @@ the build pipeline — manifests, patch ops, extraction/reconciliation/generatio
 | `tests/test_capture_kf_ownership.sh` | test | ci_static | ROMDIR | THE CAPTURE-KEYFRAME POINTER TABLE IS HAND-OWNED, AND NO GENERIC bank_map REPOINT MAY WRITE IT (14z-130). | 14z-130 |
 | `tests/test_capture_pose_sources.sh` | test | ci_static | ROMDIR | THE #104 FIX PREMISES (14z-99). The maintainer ruled the fix scope: option (a), full, "measure first: if option (a) is not feasible, then we reassess". | 14z-99 |
 | `tests/test_census_regions.sh` | test | ci_static | ROMDIR | ground truth for tools/census_regions.py (the 14z-66 data_in_code + pcrel-escape censuses, promoted to a tool for the D4 step-2 Pyron early warning, 14z-67). | 14z-66 |
+| `tests/test_copy_flags.sh` | test | ci_static | ROMDIR | the copy-character flags and their arming counters in the three sets (14z-189, GitHub #128 Marionette scoping). ci_static: ROMDIR only. | 14z-189 |
 | `tests/test_effect_placeholders.sh` | test | ci_portable | — | THE x2b7ef4 COORDINATE-LIST PLACEHOLDERS ARE RESOLVED AT THE OFFSETS THEY WERE WRITTEN, never by an in-place scan (14z-170): | 14z-170 |
 | `tests/test_escape_triage.sh` | test | ci_static | ROMDIR | H3.1's verdicts, frozen (14z-100 hardening). | 14z-100 |
 | `tests/test_extract_hp.sh` | test | ci_static | ROMDIR | the Huitzil/Pyron extraction gate (14z-65, M3b Phase 1). | 14z-65 |
@@ -200,6 +201,7 @@ the build pipeline — manifests, patch ops, extraction/reconciliation/generatio
 | `tests/test_qs_id_table.sh` | test | ci_static | ROMDIR | the QSound Z80 driver id-table census gate (14z-86). | 14z-86 |
 | `tests/test_qs_songs.sh` | test | ci_static | ROMDIR | the authored-Z80-song machinery gate (14z-86, M5). | 14z-86 |
 | `tests/test_qs_window_law.sh` | test | ci_portable | — | ground truth for the QSound sample-window endpoint law (14z-93, GitHub #82). No ROMs, no emulator, ~1s. | 14z-93 |
+| `tests/test_quote_font_window.sh` | test | ci_static | ROMDIR | the win-quote glyph font WHERE THE EMITTER DRAWS IT, and the tenant blocks' glyph cost against it (14z-189, GitHub #123). ci_static: ROMDIR only. | 14z-189 |
 | `tests/test_reaction_hook_d2.sh` | test | ci_static | ROMDIR | the #99 fix gate: the reaction_hook D2 WINDOW (14z-110, maintainer-ruled 2026-08-26). | 14z-110 |
 | `tests/test_record_window.sh` | test | emulator | MAME, a build dir, ~40 s | ground truth for tests/lua/record_window.lua, the in-emulator windowed movie recorder (14z-94). ~40 s, needs ROMDIR + a WIDE build; no frozen expectations. | 14z-94 |
 | `tests/test_region_overlap.sh` | test | ci_static | ROMDIR | freeze what the three tenants' regions do together. | M3b |
@@ -372,6 +374,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 | `tests/test_pyron_medallion_2p.sh` | test | emulator | MAME, a build dir, ~5 min | the P2-HOVER half of medallion palette stability (14z-116). EMULATOR gate, ~5 min, two MAME runs. NOT in ci_static; indexed in HANDOFF. | 14z-116 |
 | `tests/test_pyron_soak.sh` | test | emulator | MAME, a build dir | the Pyron STAGE-6 chaos soak (14z-67 as stage 4; MOVED TO STAGE 6 at 14z-129, maintainer-approved). The full behavioral chain, guarded, on the real packed set: | 14z-67 |
 | `tests/test_random_select_tenants.sh` | test | emulator | MAME, a build dir, ~12 min | RANDOM SELECT INCLUDES THE TENANTS (14z-117, the maintainer's own list item, added 2026-08-28). | 14z-117 |
+| `tests/test_roulette_tag_rows.sh` | test | ci_static | ROMDIR | the arcade-ladder map's opponent TAG rows per character id, in vsavj and vs2 (14z-189, GitHub #124). ci_static: ROMDIR only. | 14z-189 |
 | `tests/test_select_wheel.sh` | test | emulator | MAME | the character-select cursor mechanism: decoded from the ROM, and MEASURED in the emulator. | 14z-123 |
 | `tests/test_shadow_tenant.sh` | test | emulator | MAME, a build dir, ~6 min | SHADOW morphing into a TENANT (14z-116). EMULATOR gate, ~6 min, two MAME runs. NOT in ci_static (see the registry check in run_all_static.sh); indexed in HANDOFF. | 14z-116 |
 | `tests/test_tenant_hud.sh` | test | emulator | MAME, a build dir | the variant-id HUD fix (14z-63, phase 3 item 4): a tenant at 0x13 must show its OWN in-match mugshot and name plate, and the host's own HUD cells must stay pristine. | 14z-63 |
@@ -417,6 +420,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/audit_ladder_pick_store.sh` | audit | emulator | MAME, ~2 min | +0x382 IS THE CHARACTER ID, AND THE 1P ARCADE LADDER WRITES THE CPU SIDE'S BEFORE IT LOADS: the measurements that retracted 14z-87's "voice-class borrow" (GitHub #195, #202; 14z-188), on pristine vsavj. | 14z-87 |
 | `tests/audit_lag_budget.sh` | audit | emulator | MAME, FBNeo, a build dir | A FIX SET ADDS NO FRAME OF LAG: over every #136 naming part (the three tenants' moves, and legacy attackers against each tenant), the build under test has no zero-pass frame that the reference build — the one before the fixes — does not hav… | 14z-170 |
 | `tests/audit_latch_reads.sh` | audit | emulator | MAME, a build dir, ~2 min | WHO READS THE SELECT-CONFIRM LATCH IN PLAY, per leg shape, with the VALUE each reader saw: the measured half of the #151 step-3 sweep, frozen (14z-161). | 14z-161 |
+| `tests/audit_mizuumi_struct.sh` | audit | emulator | MAME, FBNeo, a build dir, ~4 min | THE MIZUUMI PLAYER-STRUCT CANDIDATES, MEASURED: the offsets adopted into atlas/ram.md from the community's Reverse Engineering page, each held by a check whose CONTROL would disagree (14z-189, GitHub #118) | 14z-189 |
 | `tests/audit_move_parity.sh` | audit | emulator | MAME, a build dir | EVERY TENANT MOVE, OURS vs NATIVE vsav2, AT A MATCHED SPEED LEVEL AND A PINNED RNG (GitHub #136, 14z-159). | 14z-159 |
 | `tests/audit_move_parity_attribution.sh` | audit | emulator | MAME, a build dir, ~5 min | EVERY DIFF ROW OF THE #136 MOVE-PARITY TABLE HAS A MEASURED CAUSE, frozen (14z-168, GitHub #136): each root found by ablation (its event's inputs removed, both legs re-run, the rows that vanish are its) and named by a measured signature; | 14z-168 |
 | `tests/audit_pass_overrun.sh` | audit | emulator | MAME, a build dir, ~60 s | THE BLIZZARD SWORD CPU OVERRUNS, ours vs native, frozen AS MEASURED (14z-168, GitHub #136): on three Blizzard Sword frames of the whole #136 corpus a double-pass activation runs past the frame, so one frame completes NO logic pass — twice o… | 14z-168 |

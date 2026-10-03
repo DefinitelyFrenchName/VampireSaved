@@ -1,0 +1,1 @@
+WITHDRAWN 2026-10-03 (14z-189), never spawned: prepared before run 2026-10-03-596's resolution landed (the resolve was refused for answering Q1 and Q4 together and re-run after this prepare), so its staged merge.diff lacked 596's resolution while its claim said every run 584-596 was resolved — the run-594 finding. Re-prepared as the next run on the corrected diff.

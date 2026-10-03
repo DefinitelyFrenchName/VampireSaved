@@ -2,8 +2,11 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 210
+# issues: 213
 number	state	reason	closed	labels	title
+213	OPEN	-	-	bug	dispatch_census.lua keys replay input to a frame_done counter while breakpoints are armed ([MFI-5] desync): its frozen dispatch inventory may come from drifted runs
+212	OPEN	-	-	bug	apply_release.py (the end-user applier) exits 1 with UnicodeEncodeError after writing a correct romset when stdout is cp932/cp437/cp850 (redirected on Windows)
+211	OPEN	-	-	architecture,bug	run_all_emulator.sh --stale that selects 0 gates prints GREEN and becomes the newest run of record, masking every stale gate from the staleness audit
 210	OPEN	-	-	architecture,bug	pre_push hook's sample procedure command lacks --session, which rulecheck.py prepare now requires (#209)
 209	CLOSED	COMPLETED	2026-10-03	bug,severity: low	rulecheck.py prepare leaves the ledger's session column '-' unless --session is given, so per-session counts are wrong
 208	CLOSED	COMPLETED	2026-10-03	bug,severity: medium,test-integrity	extract.py showed a still-running worker's latest text as its report (WX) when the extract was cut before its hand-back, so the procedure check ruled a false QP5
@@ -69,7 +72,7 @@ number	state	reason	closed	labels	title
 148	CLOSED	COMPLETED	2026-09-17	evolution	Review the static tier's contents and when it is applied — a commit currently blocks the tree for ~25 min, a close for ~40
 147	CLOSED	NOT_PLANNED	2026-09-16	bug	Phobos's float runs the VH2 flavor: huitzil.toml flavor_default is 0x00 where native vsav2 seeds 0x01
 146	CLOSED	COMPLETED	2026-09-21	bug	The release packages' player READMEs are not complete or detailed enough (reported)
-145	OPEN	-	-	bug	Windows: the release packages' prebuilt emulator binaries fail to load the game (reported, not yet reproduced)
+145	OPEN	-	-	bug	Windows: the release packages' prebuilt emulators fail to load the game when double-clicked (reproduced 14z-189: no Windows launcher; fbneo.exe needs vsavjw, cps2.exe needs -rompath)
 144	CLOSED	COMPLETED	2026-09-21	bug	macOS: the release packages' prebuilt emulator binaries cannot be executed — macOS blocks them (reported, not yet reproduced)
 143	CLOSED	COMPLETED	2026-09-28	bug	tests/lua/walker_sp.lua reads the supervisor stack on MAME 0.288 (no A7 state); two walker audits consume its ranges
 142	CLOSED	NOT_PLANNED	2026-09-15	bug	Donovan's 421+MP with no mash lands 5 hits on our build and 4 on native vsav2 at NORMAL speed (equal at TURBO)
@@ -86,11 +89,11 @@ number	state	reason	closed	labels	title
 131	CLOSED	NOT_PLANNED	2026-09-29	evolution	audit_mask_window_ff42a2: deprecate it, or keep it as a case-specific gate?
 130	CLOSED	COMPLETED	2026-10-03	bug	bundle_win_dlls.py prints a broken character for its em dash on MSYS2 (build logs only)
 129	OPEN	-	-	bug,evolution,severity: low	Tenant CPU AI looks lackluster (unproven; first question: are the ported script blocks complete?)
-128	OPEN	-	-	evolution,parked	Marionette: parked until further notice
+128	OPEN	-	-	evolution	Marionette: parked until further notice
 127	OPEN	-	-	cosmetic,parked	#112 option (B): the Press of Death effect owns its palette row (scope first)
 126	CLOSED	COMPLETED	2026-10-01	cosmetic,parked	Select-wheel look-and-feel polish
-125	OPEN	-	-	cosmetic,parked	Arcade-ladder map names and pictures (not investigated)
-124	OPEN	-	-	cosmetic,parked	Arcade-ladder roulette tag shows the base/shell character for a tenant opponent on the arcade ladder map screen
+125	OPEN	-	-	cosmetic,parked	Arcade-ladder map: for the three tenants the next opponent's name and small portrait are wrong (the VS screen that follows is correct)
+124	OPEN	-	-	cosmetic	Arcade-ladder roulette tag shows the base/shell character for a tenant opponent on the arcade ladder map screen
 123	OPEN	-	-	cosmetic,parked	Win-quote text for the three tenants (forgone for now; only the clean way, vanilla untouched)
 122	OPEN	-	-	evolution	Run the --controls release tier on the dedicated Linux server and compare its speed with the m2 pro (load balancing potential)
 121	OPEN	-	-	evolution	Linux release binaries built on dedicated server, plus clean-machine check at release (option 3)

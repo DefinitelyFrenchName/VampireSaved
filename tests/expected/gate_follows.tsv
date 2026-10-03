@@ -64,6 +64,7 @@ declares	audit_mask_window_ff4182
 declares	audit_mask_window_ff42a2
 declares	audit_merged_legacy
 declares	audit_merged_vec3
+declares	audit_mizuumi_struct
 declares	audit_move_parity
 declares	audit_move_parity_attribution
 declares	audit_objhook_owner_census

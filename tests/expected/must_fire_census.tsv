@@ -40,6 +40,7 @@ declares	audit_ladder_selector
 declares	audit_lag_budget
 declares	audit_latch_reads
 declares	audit_mister_map_fit
+declares	audit_mizuumi_struct
 declares	audit_move_parity
 declares	audit_move_parity_attribution
 declares	audit_pass_overrun
@@ -92,6 +93,7 @@ declares	test_close_tools
 declares	test_commit_subject
 declares	test_community_crosscheck
 declares	test_controls_contract
+declares	test_copy_flags
 declares	test_defense_rows_census
 declares	test_demand_after_trap
 declares	test_df_field_readers
@@ -149,6 +151,7 @@ declares	test_poked_legs
 declares	test_pokes_ranges
 declares	test_promise_check
 declares	test_pyron_medallion_2p
+declares	test_quote_font_window
 declares	test_random_select_tenants
 declares	test_reaction_classes
 declares	test_readme_recording
@@ -161,6 +164,7 @@ declares	test_release_launcher
 declares	test_release_os_metadata
 declares	test_release_roundtrip
 declares	test_rompath_reject
+declares	test_roulette_tag_rows
 declares	test_rpl2siminputs
 declares	test_rule5_census
 declares	test_rule_checker

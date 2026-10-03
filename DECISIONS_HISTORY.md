@@ -331,6 +331,39 @@ Yes, Donovan's deity states should be in scope. However, if they would rely on t
 
 ---
 
+## Read 2026-10-03 (14z-189) — #129's CPU-soak captures: "seems similar overall"
+
+**What was sent:** six capture sheets (`build/t129/eris2/sheet_{phobos,pyron,donovan}_{passive,active}.png` in the #129 worktree): each tenant as the CPU opponent through a real ladder draw, native vs2 above ours, the same six most frequent actions at each leg's own 3rd late start, with the caption *"No conclusion drawn yet — your read first."*
+
+**The maintainer:** *"seems similar overall, in which case the question might be "are heuristics regarding reactions to the other player shared between all characters or are they character specific?""*
+
+**What the tree answers, and what it does not** (`docs/game/engine_internals.md` "The CPU AI action-script system"): the SCRIPTS are per character — four per-class tables of script-start pointers, indexed by the class `+0x382`, each class pointing into its own script block (the tenants' blocks byte-identical to vs2's) — while the INTERPRETER that runs them (the 15 nested command dispatchers at `0x2B96A..0x2C7D0`) is shared engine code. So whether a given reaction to the other player is per character (in the script streams) or shared (in a command's built-in condition) depends on the command set, which is NOT decoded — #129's open question.
+
+---
+
+## Ruled 2026-10-03 (14z-189) — #145: a PLAY.bat launcher
+
+**The question (AskUserQuestion), verbatim, after a worker reproduced #145 on ERIS's Windows side:** *"#145, reproduced on ERIS with the published merged-m19 Windows assets: double-clicking fbneo.exe exits at once (it needs `fbneo.exe vsavjw`), and MAME's cps2.exe finds no ROMs (it needs `-rompath <package>\rompath`); both run fine with those arguments. The packages have no Windows launcher (PLAY.command is macOS/Linux only) and the README never shows the commands. How do you want it fixed?"* The options were "PLAY.bat launcher": "A double-clickable PLAY.bat in each Windows package: FBNeo copies vsavjw.zip into roms\ and runs `fbneo.exe vsavjw`; MAME runs `cps2.exe vsavjw -rompath rompath`. Plain cmd, no PowerShell execution-policy prompt. Plus the README lines."; "PLAY.ps1 launcher"; "README only".
+
+**The maintainer:** *"PLAY.bat launcher"*.
+
+---
+
+## Ruled 2026-10-03 (14z-189) — the #123-#129 analysis: #123 and #127 stay parked; #124 scheduled; #125 keeps a second defect; #128 a cost measurement; #129 a CPU soak
+
+**The questions (AskUserQuestion), verbatim, after the capture sets were sent (`build/t_analysis/roul/{phobos,bishamon}_{0,1}.png`; `c_{vsj,vs2}_code{b00,6e0}.png`, `sheet_b1_13ec0.png`, `sheet_b0_3ec0.png`, in the analysis worktree):**
+
+- #123: *"#123 (win-quote TEXT for the tenants): the 14z-116 '~330 glyph tiles' figure was wrong. That comparison read character art; the real cost is 39 kanji, and every one lands on a vsavj font slot that is blank. Your 14z-116 ruling was 'forgone for now; if ever done, the clean way only, vanilla untouched'. What now?"* — options "Keep parked (Recommended)", "Do it via bank 5", "Do it via blank bank-1 slots". **The maintainer:** *"Keep parked (Recommended)"*.
+- #124: *"#124 (arcade ladder map): CPU Phobos's tag reads 'BULLETA' (see the captures) because vsavj's tag array rows 0x10-0x1F are copies of rows 0x00-0x0F. The fix is data only: 3 array rows plus their tiles, the width words, and Donovan's palette row 0x13. No legacy code reads those rows. Schedule it?"* — options "Schedule the data fix (Recommended)", "Leave parked". **The maintainer:** *"schedule the data fix. The tests will need to check that not only new tags are correct but older tags are not affected"*.
+- #125: *"#125 (ladder map screen): the analysis found that the #124 roulette screen IS the arcade map screen. In the captures, the Donovan P1 plate is right and the only wrong thing is the opponent tag (#124's mechanism). The banner was poked, so it doesn't count. Is #125 fully covered by #124?"* — options "Yes, covered by #124", "No, something else is wrong". **The maintainer:** *"Two things: 1) yes the roulette screen is the map screen but map is the better terminology for humans 2) iirc there is a second issue that #125 refers to: if you wait long enough to have the opponent shown to you, you see it's always the shell character when you're about to fight one of the 3 VS2 tenants"*.
+- #127: *"#127 (an effect owning its own palette row, option B): the vanilla palette copy takes its row from the object it runs on, so option B needs a NEW request path on a legacy-reachable route. Rows 0x0E/0x0F/0x14 show 0 sprite references, but only as absence evidence over 17+6 replays. Which way?"* — options "Keep parked (Recommended)", "Measure a free row first". **The maintainer:** *"Keep parked (Recommended)"*.
+- #128: *"#128 (Marionette): her arming mechanism is now located and gated. vs2/vh2 carry a second copy flag at +0x3C3, armed by exactly 7 START presses on the '?' cell. vsavj has no code touching +0x3C3 (0 sites vs 28/31). A port needs a new RAM flag, a counter plus a confirm write in the legacy select path, ~28 hooks on legacy-reachable paths, and her assets. Which way?"* — options "Keep parked (Recommended)", "Authorise a cost measurement". **The maintainer:** *"Authorise a cost measurement"*.
+- #129: *"#129 (tenant CPU AI): statically, the three tenants' AI blocks are byte-identical to vs2's and their table rows map exactly onto vs2's own tables. What is not known is whether vsavj's AI interpreter runs those scripts the way vs2's does. Next step?"* — options "CPU soak on ERIS (Recommended)", "Decode the interpreter first", "Keep parked". **The maintainer:** *"CPU soak on ERIS (Recommended)"*.
+
+**What it means.** "Map" is the screen's name for humans from now on (the analysis called it the roulette). #124 is scheduled as a data fix whose gates check the NEW tags are right AND every legacy tag is unchanged. #125 stays open (parked) for what is not #124's: waiting on the map until the opponent is revealed shows the SHELL character before a fight with any of the three tenants, and — added by the maintainer the same sitting: *"on the map next to the name of the next opponent is a small rectangular portrait, and it's wrong for the VS2 tenants. In you captures above, you can see that Bishamon has a Bishamon portrait but Buletta has something that is neither Buletta nor Phobos."* — so the portrait does not simply follow #124's aliased name row (both unmeasured). Then, the same sitting: *"the small rectangular portrait on the map and the name are the wrong thing, the character vs screen that follows is correct."* — so #125 is the map's name and portrait for the next opponent; the VS screen is right. #123 and #127 stay parked (#123's cost corrected to 39 tiles). #128: measure the port's cost (hooks and cycles), no build. #129: a CPU soak on ERIS, ours against native vs2, with captures put before the maintainer before any conclusion.
+
+---
+
 ## Ruled 2026-10-03 (14z-189) — #194's captures on M22: "M22 matches native"
 
 **The question (AskUserQuestion), verbatim, after two capture sheets were sent (`build/rc189/cosmo/cosmo_m22.png`, `cosmo_m21.png`, `tools/naming_pair_sheet.sh pyron 4`, frames 3866-3970):** *"On the two sheets just sent (Pyron's Cosmo Disruption [PP held] on Demitri, native vs2 on top), how do you read the victim's reaction on ours — the M22 sheet (with #194) and the M21 sheet (before it)?"* The options were "M22 matches native": "On M22 the victim reacts as on native (fire / knock-up, knocked down); M21 shows the old plain hit. #194 reads as fixed on screen." and "M22 still differs": "Something on the M22 row still does not match native — say what."
@@ -5245,6 +5278,12 @@ open) and the Zabel j.LK session (ruled, not started).
     bank-0 font window is **4096/4096 non-blank**, so there is no free slot
     to remap into. A code remap cannot fix this: ~330 glyph tiles must
     travel, which no version of the 14z-76 plan budgeted.
+    **[CORRECTED 14z-189, marked in place, GitHub #123: the comparison read
+    bank-0 tile `0x3800 + code`, which is character art; the emitter draws
+    bank 1. Against each game's real font base, 39 vs2-only glyphs are
+    absent and all 39 land on blank vsavj slots — 39 tiles, not ~330
+    (`docs/game/engine_internals.md` "THE GLYPHS ARE 39 NEW TILES",
+    `tests/test_quote_font_window.sh`).]**
   - **AND THERE IS A CLEAN ROUTE, if you want it.** Group C **bank 5's**
     font window (in-group `0x13800-0x147FF`) is **4096/4096 blank** on
     `build/m3b_merged18`, and the shipping `winquote_bank_variant_id` gate
@@ -5259,7 +5298,8 @@ open) and the Zabel j.LK session (ruled, not started).
     fed by `$30(a4)`) takes its bank from the same field that gate writes —
     the gate patches the drawer object at `0x5F328`, which is a different
     chain. If it does not, the thunk writes the bank itself.
-  **THE PRICE THAT DECIDED IT:** ~330 authored glyph tiles + a thunk on a
+  **THE PRICE THAT DECIDED IT:** ~330 authored glyph tiles **[39 — CORRECTED
+  14z-189, #123, see the mark above]** + a thunk on a
   legacy-reachable site + a new win-quote RENDER gate (pixels — no RAM gate
   can ever see text), for a single-player cosmetic surface the standing
   "cosmetic is optional" scope calls nice-to-have. **RESUMING IT LATER

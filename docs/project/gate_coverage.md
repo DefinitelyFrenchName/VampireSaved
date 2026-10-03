@@ -13,18 +13,18 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**419 of 419 gates described.**
+**423 of 423 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
 | [runner](#runner) | 41 | 41 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 41 | 41 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
-| [pipeline](#pipeline) | 58 | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
+| [pipeline](#pipeline) | 60 | 60 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
-| [tenant](#tenant) | 85 | 85 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 68 | 68 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [tenant](#tenant) | 86 | 86 | tenant content — per-character gates and on-demand audits on the ported characters |
+| [character-data](#character-data) | 69 | 69 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -866,7 +866,7 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 
 ## pipeline
 
-the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses. 58 of 58 described.
+the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses. 60 of 60 described.
 
 ### `audit_capture_matrix.sh` — audit, ci_static
 
@@ -971,6 +971,14 @@ the build pipeline — manifests, patch ops, extraction/reconciliation/generatio
 **HOW:** the tool over a stage-4 Huitzil build (self-built unless given) and the Pyron extraction, the counts compared with the frozen ones, adjacency asserted from placements.json.
 
 **EXPECTS:** every census number as frozen; growth in ANY number is stop and root-cause (latent escapes bite later).
+
+### `test_copy_flags.sh` — test, ci_static
+
+**WHAT:** vsavj has ONE copy flag (+0x3BC, Shadow; armed by 5 START presses, cmpi #5,$42 at PRG:0x020CB0) and no +0x3C3 anywhere in code; vs2 and vh2 add a SECOND flag, +0x3C3, armed by a second counter — exactly 7 START presses on the "?" cell (cmpi #7,$48: vs2 PRG:0x01F948, vh2 0x01F940) and set at confirm (vs2 0x01F6AC). That flag is Marionette's, and its 28 vs2 code sites are what a port would have to carry.
+
+**HOW:** static over the decrypted opcode views (ROMDIR only), tools/audit_copy_flags.py — a linear disassembly census of the code region; the counts are what that framing finds.
+
+**EXPECTS:** the per-game counts and sites below, and each game's ALTFORMS list — every textual match of the OTHER ways to name the flags (a5-relative at the second block, $7c3/$bc3/$7bc/$bbc(aN), or the absolute $FF87xx/$FF8Bxx): vsavj's one is an immediate (#$8bc3), vs2's a negative displacement, vh2's two branch targets — none an access; and each game's WIDE list — every .b/.w/.l-suffixed or movep access at a NEIGHBOURING displacement whose bytes cover a flag (bit ops on memory counted as byte-sized; a multi-register movem, an absolute word/long, an index-register or computed address are NOT read): vsavj's one covers +0x7BC through a7 (the stack pointer), none covers +0x3C3; the controls (a vsavj copy with one +0x3BC test turned into a +0x3C3 test, or into an a5-relative +0x3C3 test) fail the run.
 
 ### `test_effect_placeholders.sh` — test, ci_portable
 
@@ -1179,6 +1187,14 @@ the build pipeline — manifests, patch ops, extraction/reconciliation/generatio
 **HOW:** 14 cases over the shared module and its consumers (no ROMs, ~1 s), including a terminal-byte corruption control and a control reproducing the old exclusive blindness.
 
 **EXPECTS:** every case as specified; a red is the tree contradicting itself about the byte that caused the sword-plant beep.
+
+### `test_quote_font_window.sh` — test, ci_static
+
+**WHAT:** the system-text emitter's font base and bank are immediates (vsavj 0x3800 / vs2 0x4200, both bank 0x2000), so a quote code draws tile 0x10000 + base + (code & 0xFFF); at those bases the three vs2 tenant blocks' 331 codes need only 39 new glyphs (0xB13-0xB3B), all at codes whose vsavj tile is blank — not the ~330 the 14z-116 bank-0 comparison reported.
+
+**HOW:** static over the decrypted opcode/data views and the reference gfx (ROMDIR only), via tools/audit_quote_font_window.py, which READS the bases from the opcode views.
+
+**EXPECTS:** the emitter rows, the window's blank count and the census as frozen below; the control (vs2's base immediate moved) changes the census and fails the run.
 
 ### `test_reaction_hook_d2.sh` — test, ci_static
 
@@ -1774,7 +1790,7 @@ tiles, OBJ records, sprite lists, render-layer verdicts. 25 of 25 described.
 
 ## tenant
 
-tenant content — per-character gates and on-demand audits on the ported characters. 85 of 85 described.
+tenant content — per-character gates and on-demand audits on the ported characters. 86 of 86 described.
 
 ### `audit_continue_ladder.sh` — audit, emulator
 
@@ -2400,6 +2416,14 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 **EXPECTS:** the set of ids seen equals exactly the 15 vanilla ids plus the build's tenants and the cursor reaches every index; the no-thunk control draws no tenant.
 
+### `test_roulette_tag_rows.sh` — test, ci_static
+
+**WHAT:** the tag (name + mini-art beside the current opponent) is drawn from ROW id of the long array the sub-0x08 child's init names (vsavj 0x26752A), placed by two word tables (0x0603DE / 0x06041E) and coloured from pool 0x3A3CA0; in vsavj the array and both width tables carry rows 0x10-0x13 as COPIES of rows 0x00-0x03, so a tenant at 0x10 draws Bulleta's tag. vs2 carries its own rows at 0x10/0x11/0x13 (0x12 aliases, as Dark Gallon must). The "4-bit-folded consumer" of #124 is this data, not code.
+
+**HOW:** static over the decrypted views (ROMDIR only), tools/audit_roulette_tag_rows.py, which LOCATES the array, the tables and the pool by instruction pattern in each image.
+
+**EXPECTS:** the rows below; the control (a vsavj copy with array row 0x10 changed) fails.
+
 ### `test_select_wheel.sh` — test, emulator
 
 **WHAT:** the character-select cursor mechanism the roster design rests on: the joystick table (PRG:0x0211D4), the 32-row 8-way adjacency table (PRG:0x0211E4) and the two commit writes (cell and id, the same value) — decoded from vsavj and vsav2 every run and then MEASURED to agree in the emulator over every (cell, direction) pair, with each cell's screen position.
@@ -2458,7 +2482,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 ## character-data
 
-the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 68 of 68 described.
+the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 69 of 69 described.
 
 ### `audit_air_gc_legacy.sh` — audit, emulator
 
@@ -2707,6 +2731,14 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 **HOW:** seven leg shapes on MAME (Phobos real, Phobos over Donovan, Phobos over Demitri, Donovan over Demitri, the Donovan victim rig, Pyron over Demitri, our WIDE build's Phobos) each under the non-debug PC-attributed read tap over both blocks' latch windows, the in-play readers frozen per leg with the byte seen; controls swap the poked leg for the real path and move the tap windows off the bytes.
 
 **EXPECTS:** the frozen per-leg inventories (Phobos real 00, over Donovan 01, no reader for Donovan or Pyron in these rigs, ours only the float fork seeing the shim's 00); the real-path swap reads 00 where the row says 01 and fails, the moved windows read VOID.
+
+### `audit_mizuumi_struct.sh` — audit, emulator
+
+**WHAT:** on pristine vsavj, the community names below are CONSISTENT with the measured behaviour — and only that behaviour is claimed (whether +0x11D gates throws, or +0x39F counts consecutive wins, is not measured): +0x11D reads 1 only at close range, +0x1B6 counts the hits it LANDS, +0x380 is 2 on a human-controlled side, 0 on the CPU's, and cleared on a 2P loser after its death, +0x39F/+0x3F0 are set on the WINNER of a 2P replay's first decisive outcome only, and +0x05 reads 0x08 on the winner at both a time-over and a KO (the loser 0x0A / 0x0C); +0x130 tracks the X distance |x1-x2| LESS A PER-FIGHTER OFFSET (recorded, the offset unexplained, so the name is not adopted as exact); one name does NOT hold — +0x15A is never set, even at a measured time-over; +0x18D is RECORDED, its name not adopted (the time-over winner 0x0C, the KO winner 0). Every writer PC of these fields in two replays is frozen too, so the rows that name a writer are held. +0x6D is a CROSS-CHECK of ram.md's known recent-hit slots (+0x6C..+0x6F), not an adoption: the slot for hits from P2, so P1's rises when P1 is hit and P2's never rises.
+
+**HOW:** on MAME, three FIELD legs under tests/lua/field_trace.lua (per frame, addresses computed from the block bases) — 02_demitri_vs_cpu (1P: a CPU side that fights), 03_two_player_vs (2P to a time-over), 37_victor_ko_vsavj (2P to a KO) — and two WRITE-TAP legs under tests/lua/read_tap.lua (03 and 37, every write to the fields above, PC attributed). The checks compare each candidate with an INDEPENDENT quantity — both HP words, both X positions, the round timer $FF8109 — and every count, value set and writer set is frozen in tests/expected/mizuumi_struct.tsv. A sixth leg replays 03 with +0x130 POKED to |x1-x2| on 3000 in-match frames and +0x15A poked to 1 on 300: the positive control that the trace reads those two addresses (a misread address reads 0 and refutes anything) — every poked +0x130 value must read back, +0x15A must read back the poked 1 on every frame of its poked range, and the +0x15A refutation must fail on that leg. +0x130's own check carries a control in the check: the same statistic against |x1-x2| 120 frames earlier must collapse; +0x11D's check (C3) carries the same kind: against the distance 120 frames earlier its close-range relation must break.
+
+**EXPECTS:** every check PASS and every count equal to the frozen file; each control's run FAILs.
 
 ### `audit_move_parity.sh` — audit, emulator
 

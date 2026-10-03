@@ -67,6 +67,7 @@ declares	audit_mask_window_ff42a2
 declares	audit_merged_legacy
 declares	audit_merged_vec3
 declares	audit_mister_map_fit
+declares	audit_mizuumi_struct
 declares	audit_move_parity
 declares	audit_move_parity_attribution
 declares	audit_objhook_owner_census
@@ -174,6 +175,7 @@ declares	test_compare_fields_selfcheck
 declares	test_compare_flicker
 declares	test_compare_window
 declares	test_controls_contract
+declares	test_copy_flags
 declares	test_crash_guard
 declares	test_crypt_boundary
 declares	test_decode_stage_banners
@@ -352,6 +354,7 @@ declares	test_qs_ledger_binding
 declares	test_qs_songs
 declares	test_qs_wav_timebase
 declares	test_qs_window_law
+declares	test_quote_font_window
 declares	test_random_select_tenants
 declares	test_reaction_classes
 declares	test_reaction_hook_d2
@@ -374,6 +377,7 @@ declares	test_replay_video_selfcheck
 declares	test_rompath_reject
 declares	test_romset_identity
 declares	test_romset_path_guard
+declares	test_roulette_tag_rows
 declares	test_rpl2siminputs
 declares	test_rule5_census
 declares	test_rule_checker

@@ -49,7 +49,11 @@
 #     surface.
 #   * WHAT IS WRONG, cosmetically, on the ROULETTE screen for a tenant
 #     opponent: the tag shows the BASE character's name and mini-art
-#     (Phobos 0x10 -> "BULLETA", a 4-bit-folded consumer) drawn in pool
+#     [the maintainer, 2026-10-03, #125: that portrait is "neither Buletta nor
+#     Phobos" — whose art it is, is not measured]
+#     (Phobos 0x10 -> "BULLETA", a 4-bit-folded consumer — RESOLVED 14z-189:
+#     no code folds it; rows 0x10-0x13 of the tag array 0x26752A copy rows 0x00-0x03,
+#     tests/test_roulette_tag_rows.sh; 0x14-0x1F were read the same way, not gated) drawn in pool
 #     row 0x10's colours (a brown ramp; row 0x13 is the grey ramp). The
 #     legacy control (Bishamon) shows BISHAMON in its own colours.
 #     Single-player, tenant-plays-1P only, cosmetic — recorded, not fixed.

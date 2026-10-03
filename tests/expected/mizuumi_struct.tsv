@@ -1,0 +1,86 @@
+# tests/expected/mizuumi_struct.tsv — the counts tests/audit_mizuumi_struct.sh measured on pristine vsavj (GitHub #118).
+# Evidence class: in-emulator. Frozen 14z-189 with FREEZE=1; counts, value sets and writer PCs only, no ROM bytes.
+hitflag_rises_p1	48
+hitflag_near_own_drop_p1	44
+hitflag_near_opp_drop_p1	2
+hitflag_rises_p2	0
+p2_hp_drops	14
+hits_increments	63
+hits_near_opp_drop	59
+hits_near_own_drop	4
+throwrange_on_frames	7790
+throwrange_on_over80	22
+throwrange_off_frames	33840
+throwrange_off_over80	13816
+throwrange_on_lag120	7790
+throwrange_on_lag120_over80	2342
+human_02	P1
+playing_02_p1	0,2
+playing_02_p2	0
+cpu_side_hp_drops_02	5
+first_ko_02	P2 survives at f9299
+playing_37_loser_cleared	6881
+playing_37_winner_after	2
+winner_03	P1@11093
+streak_03	1/0
+streakm_03	1/0
+streak_first_03	11181
+winner_37	P2@6488
+streak_37	1/0
+streakm_37	1/0
+streak_first_37	6489
+streak_any_1p	0
+winpose_03	12/0
+winpose_37	0/0
+status_outcome_first_03	11181
+status_outcome_first_37	6603
+timeover_nonzero_frames	0
+dist_02_P1	mode -16 within3 6113/7153 lag120 256/7153
+dist_02_P2	mode -16 within3 5474/7153 lag120 370/7153
+dist_03_P1	mode -27 within3 8808/9537 lag120 7179/9537
+dist_03_P2	mode -16 within3 8964/9537 lag120 7305/9537
+dist_37_P1	mode -27 within3 3940/4125 lag120 1098/4125
+dist_37_P2	mode -26 within3 3742/4125 lag120 1105/4125
+writers_tap03_P1_dist	000d34:2 000d3a:2 000dd8:1 016e4c:9 02221c:11556 022262:11556 0222da:1
+writers_tap03_P1_hitflag	000d34:2=00/ff 000d3a:2=00 000dda:1=00 016e4c:9=00 01827c:4=01 022288:11542=00
+writers_tap03_P1_hits	000d34:2 000d3a:2 000dda:1 016e4c:9 018430:7 0222da:1
+writers_tap03_P1_playing	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 0058cc:1=02 00900e:1=02 009b88:1=00 009bf2:1=02 016e4c:4=00
+writers_tap03_P1_status	000d34:2=00/ff 000d3a:2=00 000dda:1=00 016e4c:9=00 0182d8:4=02 020904:1=00 02099a:1=02 020b22:1=00 020dbe:1=00 02235e:1=0e 0248d4:3=02 024bde:1=02 026d54:13=00 026d72:1=00 026d8a:8=00 0270fc:1=00 027110:1=00 027130:8=00 0274ce:10=00 027c7c:1=08
+writers_tap03_P1_streak	000d34:2=00/ff 000d3a:2=00 000dda:1=00 009084:1=00 00991c:1=01 016e4c:4=00
+writers_tap03_P1_streakm	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 009088:1=00 009920:1=01 009c8e:1=01 016e4c:4=00
+writers_tap03_P1_throwrange	000d34:2=00/ff 000d3a:2=00 000dda:1=00 016e4c:9=00 019272:11556=00 019312:560=01 0222da:1=00
+writers_tap03_P1_timeover	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 016e4c:9=00 0222da:1=00 026f06:26=00
+writers_tap03_P1_winpose	000d34:2=00/ff 000d3a:2=00 000dda:1=00 016e4c:9=00 0222da:1=00 027ccc:1=00 031206:1=0c
+writers_tap03_P2_dist	000d34:2 000d3a:2 000dd8:1 016e4e:9 02221c:11556 022262:11556 0222da:1
+writers_tap03_P2_hitflag	000d34:2=00/ff 000d3a:2=00 000dda:1=00 016e4e:9=00 022276:11497=00
+writers_tap03_P2_hits	000d34:2 000d3a:2 000dda:1 016e4e:9 018430:4 0222da:1
+writers_tap03_P2_playing	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 008a56:1=02 009b8c:1=00 016e4e:4=00
+writers_tap03_P2_status	000d34:2=00/ff 000d3a:2=00 000dda:1=00 016e4e:9=00 0182d8:7=02 020904:2=00 02099a:1=02 020b22:1=00 020b32:1=04 020f8e:1=00 02235e:1=0e 0248d4:7=02 026d54:13=00 026d72:1=00 026d8a:8=00 0270fc:1=00 027110:1=00 027130:8=00 0274ce:11=00 027c54:1=0a
+writers_tap03_P2_streak	000d34:2=00/ff 000d3a:2=00 000dda:1=00 008a78:1=00 009084:1=00 009924:1=00 016e4e:4=00
+writers_tap03_P2_streakm	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 008a64:1=00 009088:1=00 009c8e:1=00 016e4e:4=00
+writers_tap03_P2_throwrange	000d34:2=00/ff 000d3a:2=00 000dda:1=00 016e4e:9=00 019276:11556=00 019316:560=01 0222da:1=00
+writers_tap03_P2_timeover	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 016e4e:9=00 0222da:1=00 026f06:29=00
+writers_tap03_P2_winpose	000d34:2=00/ff 000d3a:2=00 000dda:1=00 016e4e:9=00 0222da:1=00
+writers_tap37_P1_dist	000d34:2 000d3a:2 000dd8:1 016e4c:11 02221c:5390 022262:5390 0222da:1
+writers_tap37_P1_hitflag	000d34:2=00/ff 000d3a:2=00 000dda:1=00 016e4c:11=00 01827c:9=01 022288:5349=00
+writers_tap37_P1_hits	000d34:2 000d3a:2 000dda:1 016e4c:11 0222da:1
+writers_tap37_P1_playing	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 0058cc:1=02 00900e:1=02 009b88:1=00 016e4c:4=00
+writers_tap37_P1_status	000d34:2=00/ff 000d3a:2=00 000dda:1=00 016e4c:11=00 0182d8:9=02 018a92:1=02 020904:1=00 02099a:1=02 020b22:1=00 020dbe:1=00 02235e:1=0e 024bde:8=02 024f0a:8=02 026d54:17=00 027ce8:1=0c 027d52:8=02 029482:8=06 02969c:8=02
+writers_tap37_P1_streak	000d34:2=00/ff 000d3a:2=00 000dda:1=00 009084:1=00 009924:1=00 016e4c:4=00
+writers_tap37_P1_streakm	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 009088:1=00 009c8e:1=00 016e4c:4=00
+writers_tap37_P1_throwrange	000d34:2=00/ff 000d3a:2=00 000dda:1=00 016e4c:11=00 019272:3587=00 019312:1665=01 0222da:1=00
+writers_tap37_P1_timeover	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 016e4c:11=00 0222da:1=00 026f06:34=00
+writers_tap37_P1_winpose	000d34:2=00/ff 000d3a:2=00 000dda:1=00 016e4c:11=00 0222da:1=00
+writers_tap37_P2_dist	000d34:2 000d3a:2 000dd8:1 016e4e:11 02221c:5394 022262:5394 0222da:1
+writers_tap37_P2_hitflag	000d34:2=00/ff 000d3a:2=00 000dda:1=00 016e4e:11=00 022276:5385=00
+writers_tap37_P2_hits	000d34:2 000d3a:2 000dda:1 016e4e:11 018430:9 0222da:1
+writers_tap37_P2_playing	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 008a56:1=02 009b8c:1=00 009bf2:1=02 016e4e:4=00
+writers_tap37_P2_status	000d34:2=00/ff 000d3a:2=00 000dda:1=00 016e4e:11=00 020904:2=00 02099a:1=02 020b22:1=00 020b32:1=04 020f8e:1=00 02235e:1=0e 026d54:18=00 026d8a:17=00 027130:17=00 0274ce:17=00 027c7c:1=08 0338b6:8=04
+writers_tap37_P2_streak	000d34:2=00/ff 000d3a:2=00 000dda:1=00 008a78:1=00 009084:1=00 00991c:1=01 016e4e:4=00
+writers_tap37_P2_streakm	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 008a64:1=00 009088:1=00 009920:1=01 009c8e:1=01 016e4e:4=00
+writers_tap37_P2_throwrange	000d34:2=00/ff 000d3a:2=00 000dda:1=00 016e4e:11=00 019276:3587=00 019316:1665=01 0222da:1=00
+writers_tap37_P2_timeover	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 016e4e:11=00 0222da:1=00 026f06:35=00
+writers_tap37_P2_winpose	000d34:2=00/ff 000d3a:2=00 000dda:1=00 016e4e:11=00 0222da:1=00 027ccc:1=00
+poke_dist_readback	3000/3000
+poke_timeover_frames	758
+poke_timeover_readback	300/300

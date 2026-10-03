@@ -2,6 +2,15 @@
 """audit_quote_font.py — does vsavj's font ROM carry the GLYPHS vs2's three
 tenant win-quote blocks ask for? (14z-116, the win-quote Phase-0 measurement.)
 
+CORRECTED 14z-189 (GitHub #123): the default `--font-base 0x3800` compares
+gfx BANK 0, which is character art in both games. The emitter draws a quote
+code at `0x13800 + (code & 0xFFF)` in vsavj and `0x14200 + ...` in vs2 (bank
+1, immediates of `PRG:0x01BA6A` and its vs2 twin), so this tool's DIFFER
+verdicts compared art with art. `tools/audit_quote_font_window.py` reads both
+bases from the opcode views and is the instrument of record
+(`tests/test_quote_font_window.sh`); this file is kept for its decode helper
+`tenant_codes`, which that tool imports.
+
 WHY THIS EXISTS. Porting the tenants' quote TEXT moves the vs2 char CODES
 into vsavj. A code is not a character: the renderer (`PRG:0x089062`) masks
 each code with `andi.w #$fff` and the drawer adds the font base `0x3800`, so

@@ -1,0 +1,4 @@
+# tests/rulecheck/retractions/14z-189.tsv — the wordings retracted or corrected in 14z-189, and reach controls that must be found live; columns pattern, source, class (retracted | reach:N)
+~330 glyph tiles	14z-189 #123: the 14z-116 comparison read bank-0 character art; against each game's real font base 39 vs2-only glyphs are absent (tests/test_quote_font_window.sh)	retracted
+THE GLYPHS ARE 39 NEW TILES	control: the corrected heading, live in docs/game/engine_internals.md	reach:1
+nine aligner pairings	14z-189 freeze run 2026-10-03-582: eight aligner pairings (op[284]-op[291]); the pad is op[292] and #194's byte op[582]	retracted

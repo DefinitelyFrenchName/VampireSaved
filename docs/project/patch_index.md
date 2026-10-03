@@ -214,7 +214,8 @@ relocation below OUT as an implementation, permanently, rather than merely
 ranking it second: it repoints a shared root and moves `RAM:$FFF230` on
 legacy win screens. **The sanctioned shape for any future attempt** is the
 tenant-only one: the three vs2 blocks + a generated first-level table in
-`wide_ext`, ~330 glyph tiles authored into group C **bank 5's** font window
+`wide_ext`, the glyph tiles (**39, not ~330 — CORRECTED 14z-189, #123**, item 3 below; where they go, bank 5 or
+vsavj's blank bank-1 font slots, is #123's open decision) authored into group C **bank 5's** font window
 (in-group `0x13800-0x147FF`, measured 4096/4096 BLANK on `m3b_merged18`),
 the shipping `winquote_bank_variant_id` gate (14z-62j) already routing the
 tenant win-quote drawer to bank 5, and ONE `site_thunk` on the selector for
@@ -239,15 +240,23 @@ is impossible). What changed:
    hit by construction, needing a new ratified class per replay for a
    cosmetic. That is the argument against the relocation, and it did not
    exist when this section was written.
-3. **The blocker is the GLYPHS, not the text.** 326 of 327 non-pad codes the
-   vs2 tenant blocks use render a DIFFERENT character at vsavj's shared font
-   base; the glyphs exist in vsavj only in gfx bank 1 (`0x22000-0x2FFFF`),
-   unreachable by a 12-bit code, and the bank-0 font window is 4096/4096
-   occupied, so no remap target exists. Any version of this fix must move
-   ~330 authored glyph TILES, which this section never budgeted.
+3. **The glyph cost is 39 tiles, not ~330 (CORRECTED 14z-189, #123).** The
+   emitter draws code C at tile `0x13800 + (C & 0xFFF)` (gfx bank 1, an
+   immediate) in vsavj and `0x14200 + (C & 0xFFF)` in vs2 — one font, moved
+   base. At those bases 289 of the 331 tenant codes draw the identical glyph
+   at the identical code; 39 vs2-only kanji (`0xB13-0xB3B`) are absent, all
+   at codes whose vsavj tile is blank. *(Superseded 14z-116 wording, which
+   compared bank-0 tile `0x3800 + code`, character art in both games: "326 of
+   327 non-pad codes the vs2 tenant blocks use render a DIFFERENT character at
+   vsavj's shared font base; the glyphs exist in vsavj only in gfx bank 1
+   (`0x22000-0x2FFFF`), unreachable by a 12-bit code, and the bank-0 font
+   window is 4096/4096 occupied, so no remap target exists. Any version of
+   this fix must move ~330 authored glyph TILES, which this section never
+   budgeted." — RETRACTED.)*
 Full measurements: `../game/engine_internals.md` "The WIN-QUOTE TEXT SYSTEM"
-§8; gate `tests/test_win_quote_decode.sh`; tools `decode_win_quotes.py`,
-`audit_quote_font.py`, `scan_quote_window.py`.
+§8; gates `tests/test_win_quote_decode.sh`, `tests/test_quote_font_window.sh`;
+tools `decode_win_quotes.py`, `audit_quote_font_window.py` (supersedes
+`audit_quote_font.py`'s bank-0 comparison), `scan_quote_window.py`.
 
 **Status: NOT STARTED, deliberately. Do this LAST**, on the merged M3b build,
 after the mechanical port is complete and certified. Maintainer's ordering,
