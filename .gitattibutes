@@ -1,0 +1,2 @@
+# making linguist exclude the apply-release files to avoid sewing the languages bar in GitHub
+release/*/*/apply_release.html -linguist-detectable
