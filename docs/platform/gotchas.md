@@ -2682,9 +2682,13 @@ is the ANSI code page: cp1252 writes 0x97 (#130's symptom), but cp932 (Japanese 
 cp437 and cp850 cannot encode U+2014 at all, so the applier exited 1 with
 `UnicodeEncodeError` for a correct set — the exit code a launcher reads. Measured on ERIS's
 real Windows (French, cp1252 ANSI): the merged-m19 applier redirected wrote 1 byte 0x97 and
-5 CRs; under `PYTHONIOENCODING=cp932` it exited 1 with the traceback; the fixed applier wrote
-1 UTF-8 em dash and 0 CR, and exited 0 under cp932 (`build/t145/live_eris.txt` of the 14z-189
-#145 worktree). The gate's portable half runs the applier on a SYNTHETIC release (a manifest
+5 CRs; under `PYTHONIOENCODING=cp932` it exited 1 with the traceback. The fix as SHIPPED
+(`reconfigure` on stdout and stderr, each guarded by `hasattr` so Python 3.6 still runs; sha1
+`835ff0c7` in release/merged-m22), run from cmd with output redirected, wrote 1 UTF-8 em dash,
+0 CR and 0 `UnicodeEncodeError` and exited 0 under the ANSI page and under cp932, for fbneo
+and mame (14z-189 rule-checker evidence `build/rc189/m7/eris_shipped_applier.txt`, after run
+2026-10-03-606 found the earlier measurement had run an unguarded copy whose bytes were not
+recorded). The gate's portable half runs the applier on a SYNTHETIC release (a manifest
 whose one member is a `pristine_from` copy of a made-up file: no ROM byte, no ROMDIR) to its
 final line — the only way to reach that print without dumps.
 
