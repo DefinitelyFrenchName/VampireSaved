@@ -12,20 +12,20 @@
  },
  "inputs": {
   "bank_map.toml": "ece2b13bfbddaf6fea14e56baf65502945ba52dd",
-  "manifest": "575a5ec07970cecf1dcbb57128487dffbc3bc047",
+  "manifest": "040da5648613c6d2468e05d2ec51b3ca7e4f30e7",
   "overrides": "c9fd380922c8aa18a77ee701da7589f037c25a42",
   "placements.json": "a15a693a9b57f85b73c16b22c2cf027567c1b6c0",
   "reconciliation.toml": "477efcb72d82fcbafe1e4a4f59252385bcb75bac",
   "reconciliation_pyron.toml": "366cbf0325dd3e633588b1062747755edc719b2c",
   "regions.json": "fbc97da4285b700b92f7122cb517117dd79dc147",
-  "verify_data.bin": "0402768a9e5f64e0d8e2c136a31ebf8b660260d8"
+  "verify_data.bin": "3db71fcbebe4a1cdcbd83048e1bb1139a1fd379b"
  },
  "overrides": [],
  "schema": 1,
  "sources": {
   "ours": {
    "kind": "built",
-   "set": "build/pyron44"
+   "set": "build/pyron45"
   },
   "vh": null,
   "vs2": {
@@ -149956,9 +149956,9 @@
      },
      "idx": 21,
      "ours_diff": [
-      "+0x17:0x51->0x4f"
+      "+0x17:0x51->0x44"
      ],
-     "ours_source": "port_patch:Cosmo Disruption sub-state 81 -> 79: vsavj's dispatch table "
+     "ours_source": "port_patch:Cosmo Disruption reaction class vs2 0x51 -> 0x44 (14z-187, #"
     },
     {
      "addr": "0xd0c88",
@@ -150361,7 +150361,7 @@
    "hitbox_proj": {
     "diff": {
      "attributed_by": {
-      "port_patch:Cosmo Disruption sub-state 81 -> 79: vsavj's dispatch table ": 1
+      "port_patch:Cosmo Disruption reaction class vs2 0x51 -> 0x44 (14z-187, #": 1
      },
      "counts": {
       "attributed": 1,
@@ -150379,7 +150379,7 @@
     "orc": "0x0d0218",
     "placed": "0x0fdc70",
     "refs": 0,
-    "sha1_ours": "75f4588df06e0ce64f0af3334485134a0779bdef",
+    "sha1_ours": "2229ed8e5a5df215bf31c0f0a49a30429b5c3e7f",
     "sha1_vs2": "4414316fe7cdd1b069947b5ec73a94d49b44914e",
     "src": "0x0d0986",
     "variant_sites": 0

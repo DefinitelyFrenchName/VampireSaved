@@ -4955,6 +4955,19 @@ a number that must be reproducible comes from a tool under `tools/` or a
 gate, never from an interactive recursive grep; when an interactive grep must
 reach ignored files, call `command grep` (or `/usr/bin/grep`) explicitly.
 
+**A SECOND WAY IT LIES: a `$` INSIDE the pattern is an ANCHOR to ugrep (paid:
+14z-188, measured 14z-189).** POSIX BRE makes `$` special only at the END of a
+pattern; ugrep reads it as end-of-line wherever it stands. On a file holding
+the line `x _rv="$VS_VERDICT" y`, `grep -c '_rv="$VS_VERDICT"'` from the
+tool printed **0**, while `/usr/bin/grep -c` printed **1**, and the tool's
+`grep -c '_rv="\$VS_VERDICT"'` and `grep -cF` printed **1** each
+(`build/agent189/handbacks/03_ugrep_dollar.txt`). The 14z-188 close read that 0 as "the old line is
+absent" while swapping a writer back in, and the procedure check caught the
+claim built on it (rule-checker run 2026-10-02-566, QP2). Rule: a pattern that
+carries a literal `$` (a shell variable name, a Perl sigil) is searched with
+`-F` or with the `$` escaped, and a ZERO count from an interactive grep is
+re-checked with `/usr/bin/grep` before anything is concluded from it.
+
 ## THE HIT RIG STANDS AT NEAR DISTANCE, SO IT MEASURES THE `CL.` VARIANT — read its counts against the CLOSE chain, never the far one (paid: 14z-145, found 14z-146)
 
 `tools/vanilla_join_rig.py`'s `hit` set walks P1 in (the `near` recipe) so the

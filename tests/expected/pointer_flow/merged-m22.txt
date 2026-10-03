@@ -1,0 +1,11 @@
+# pointer-flow baseline for merged-m22 (build/m3b_merged30), frozen 14z-189 — the M22 freeze (#194 and #195).
+# vs merged-m21: the two STRONG `code:movea_imm` findings are the SAME two, RELOCATED BY EXACTLY 0x20 — site
+# 0x4d4590 -> 0x4d45b0 and targets 0x4c7b10 -> 0x4c7b30 and 0x4cdab0 -> 0x4cdad0 (ok-HOLE, offset preserved past
+# MOVED op[792] / op[802]) — the placement cascade of #195's chain and tail thunk (Pyron's regions +0x20;
+# build/rc189/tierreds/placement_attr.txt). Same class (WIDE-HOLE), same count. `data:long` 1188 -> 1189 (+1): ONE new
+# long, at 0x4877ac in anim@pyron (moved +0x20), whose second word 0x003e -> 0x005e moved by the same +0x20, so the
+# long reads 0x005e0000, inside the WIDE hole (build/rc189/tierreds/weak_diff.py, weak_diff.txt). No STRONG finding
+# appears or disappears. Rule-checker run 2026-10-03-580.
+STRONG	code:movea_imm	0x4d45b0+0x16	0x4c7b30	WIDE-HOLE
+STRONG	code:movea_imm	0x4d45b0+0x24	0x4cdad0	WIDE-HOLE
+WEAK-COUNT	data:long	1189

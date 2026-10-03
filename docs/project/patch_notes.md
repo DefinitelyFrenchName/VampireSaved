@@ -1,6 +1,51 @@
 # patch_notes — per-change detail: every byte, and why
 
-## 14z-188 — #195: the class-0x51 pursuit flag for the tenants' remapped records, BUILT AND STAGED for the next freeze
+## 14z-189 — THE M22 FREEZE (donovan-m26 / huitzil-m33 / pyron-m27 / merged-m22, mark M22): #194 and #195 LANDED
+
+**WHAT THE FREEZE CARRIES.** The two fixes staged at 14z-187 and 14z-188, the entries below: #194 (Pyron's Cosmo
+Disruption record class 0x4F -> 0x44) and then #195 (the class-0x51 pursuit flag), applied in that order from
+`build/manifest/staged/194_cosmo44.patch` and `195_pursuit_mark.patch`, which the freeze commit retires. The
+maintainer: *"take the items in order"* (NEXT_SESSION item 1). The mark `M21` -> `M22` (`version_text` in the three
+tenant manifests).
+
+**THE DELTA, MEASURED** (`build/agent189/m22/deltas2.txt`, `opset_and_gain.txt`, measurer returns; the op sets
+compared as multisets of op, address and content, so an aligner pairing cannot read as an edit):
+- donovan-m26: ops 346 -> 351, 5 NEW, 0 removed — #195's site jsr at `PRG:0x01868C`, the knockdown-tail jsr at
+  `0x024D92` and its pad nop at `0x024D98`, and the two thunks at `0x41A3E0`/`0x41A410`; 42 program words; members
+  `vm3j.03d`, `vsw.41` plus the mark's `vsw.33m`/`vsw.37m`.
+- huitzil-m33: ops 377 -> 377, 0 differ; the mark only (program `f1fb0e45` UNCHANGED).
+- pyron-m27: ops 312 -> 317 — #195's three site ops and two thunks in hole a (`0x0FFF20`, `0x0FFF60`), plus #194's
+  one byte inside the placed `fixed_hitbox_proj.bin` (data_file `0x0FDC70`, content changed, the op kept); 48 program
+  words; members `vm3j.03d`, `vm3j.04d` plus the mark.
+- merged-m22: ops 839 -> 844 — the 2-way `pursuit_mark_hit` chain at `0x4D4730` and its site, the tail thunk at
+  `0x3FFD80`, its site and pad; #194's byte in the placed Cosmo record (`0x4AFEE0 +0x2F9`, 4f -> 44); RELOCATED 111,
+  MOVED 325, all 7,416 relocation targets content-identical. The ten EDITs the attribution tool reports are an aligner
+  cascade: nine pair ops present unchanged on both sides (`build/agent189/m22/edit_pairing.py`), the tenth is the new
+  pad nop. The program (`110467a7`) is byte-identical to the 14z-188 probe built with both staged rows.
+- the stock twin UNCHANGED (`a3910ded`, 0 members differ): every #195 row is `only_variant_slot`, #194 is Pyron's.
+- stage-4 UNCHANGED (`2fa7c2f1` = donovan-m23-stage4, carried).
+- All six program fingerprints reproduced on ERIS (WSL2, Ubuntu 26.04) from the same tree, byte for byte.
+
+**`tests/test_tenant_loop.sh` re-frozen** (donovan 346 -> 351, pyron 312 -> 317, 2-tenant 626 -> 631, 3-tenant
+839 -> 844) and its 4d chain check anchored to the site it names (`0x05f146`): #195's chain is emitted first and an
+unanchored search decoded it as "2-way with ids []".
+
+**THE BATTERY** (ERIS `build/emu_freeze_m22_p1`, prereq/fbneo/mame lanes: PASS 164, SKIP 2 — the Linux release binaries,
+both PASS on the Mac — FAIL 13; the Mac `build/emu_freeze_m22_mister`: PASS 2, FAIL 1). **Every red attributed**
+(`build/rc189/attr/battery_reds.txt`; each of the 13 re-run on M21 and PASS there): the merged placement shift
+(Pyron's regions and the relocated copies +0x20, every moved address through `tools/attr_placement_moves.py`, whose
+three branches now each carry a plant), the build row, #194 (`audit_move_parity`'s five Cosmo Disruption rows DIFF ->
+IDENT, the maintainer reading the M22 captures as "M22 matches native"), or #195's hooks. **Two instruments edited,
+not frozen around:** `tools/audit_reaction_classes.py` follows a `jsr` into #195's thunk, whose first instruction is the
+displaced class copy (control `thunk-copy-removed`); `tools/move_parity_attribution.py` records REACTION-51-OPEN as
+reading nothing on M22. **Re-frozen** under rule-checker runs 2026-10-03-575..580 (580 OK): 9 emulator gates by their
+own FREEZE writers, `bases.tsv` (Pyron 0x4ae8fc -> 0x4ae91c), `test_mister_prg_window` from the lane's own legs, and the
+static pins `test_manifest_merge`, `test_rule5_census` (+6 `only_variant_slot`, ledger row), `test_poked_legs`,
+`test_pointer_flow` (a merged-m22 baseline), `test_escape_triage`, `test_latch_readers`, `test_df_field_readers`,
+`test_reaction_classes`. NOT EXPLAINED, recorded as measured: `audit_reaction_class_live`'s 0x44+0x4F write-run total
+6 -> 5 and its read-run counts moving by one; `test_mister_prg_window`'s blocks 7 -> 8, cyc +532, rd_lo +477.
+
+## 14z-188 — #195: the class-0x51 pursuit flag for the tenants' remapped records, BUILT AND STAGED for the next freeze — LANDED at the M22 freeze (the entry above)
 
 **THE FIX (staged: `build/manifest/staged/195_pursuit_mark.patch`, applied AFTER `194_cosmo44.patch` by the next
 freeze).** vs2's knockdown tail sets the victim's `+0x117` (pursuit-able) for reaction class 0x51 alone (vs2
@@ -47,7 +92,7 @@ first"*, *"Build it now (Recommended)"*.
 `tests/audit_pursuit_flag.sh` (it reads the hooks from the build and turns over to equality by itself), re-freeze
 what the hooks move, and delete both staged files in the freeze commit. Not built yet: the solo tracks.
 
-## 14z-187 — #194: Pyron's Cosmo Disruption reaction class 0x4F -> 0x44, RULED AND STAGED for the next freeze
+## 14z-187 — #194: Pyron's Cosmo Disruption reaction class 0x4F -> 0x44, RULED AND STAGED for the next freeze — LANDED at the M22 freeze (the entry above)
 
 **THE FIX (staged: `build/manifest/staged/194_cosmo44.patch`, applied by the next freeze).** One byte of one
 existing row: `build/manifest/pyron.toml`'s `[[port_patch]]` on `hitbox_proj` (`src_addr = 0x0D0C7E`, Cosmo

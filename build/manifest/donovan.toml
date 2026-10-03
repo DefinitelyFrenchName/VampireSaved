@@ -2456,7 +2456,7 @@ march_retarget_mid = true
 # same-source-or-fail names any future collision). Screen position =
 # the empty bottom-right corner (measured on merged-m5 snapshots, 14z-105).
 # THE TEXT NAMES THE FREEZE GENERATION — change it at every freeze.
-version_text = "M21"
+version_text = "M22"
 version_font = "build/manifest/version_font.json"
 version_x = 324
 version_y = 202
@@ -3190,3 +3190,41 @@ name = "boot_title_saved_3"
 addr = 0x01C826
 op = "poke16"
 val = 0x2020             # "  "  (was " R")
+
+# ── #195: THE CLASS-0x51 PURSUIT FLAG (14z-188, staged; the maintainer: "for #195 I lean attacker id plus class, using
+# a data address as a backup option should the id+class approach should fail", then "Measure the borrow first",
+# "Close the P2 gap first", "Build it now (Recommended)") ─────────────────────────────────────────────────────────
+# vs2's knockdown tail sets the victim's +0x117 (the pursuit flag the attacker-side pursuit check reads) for class
+# 0x51 alone (vs2 0x239E6). Our tenants' 0x51 records are remapped to 0x44 (Donovan 14z-110b, Pyron's Cosmo #194),
+# whose tail never sets it. Two hooks restore it: at the hit-time class write PRG:0x01868C (every class-0x44 hit
+# lands there, from the ground, air and 0x0185B0 tables alike) the attacker A0 (loaded from -$4BC6(a5) at 0x01842C)
+# is checked by id: Donovan (TT) with class 0x44 — his only class-0x44 records are the six Ifrit Sword (ES) records
+# 33-38, all vs2 0x51 — or Pyron (TT) with A3 == his projectile record 21 (Cosmo; his record 4 is 0x44 natively and
+# stays unmarked); a hit sets the victim's mark +0x293 (measured touched only by the bulk clears, 14z-187b), any other
+# hit through that write clears it. At the knockdown tail PRG:0x024D92 (run once, at the countdown's end) a set mark
+# with the class still 0x44 sets +0x117, as vs2 does. Measurements: build/agent188/t195 (rule-checker 2026-10-02-557).
+[[site_thunk]]
+stage = 6
+name = "pursuit_mark_hit"
+site = 0x01868C
+old_hex = "136b00170054"
+only_variant_slot = true
+thunk_hex = "136b001700540c2800tt038266160c2b004400176608137c000102934e75422902934e75422902934e75"
+note = "#195 (14z-188): mark the victim (+0x293) on this tenant's vs2-class-0x51 hit; any other hit through the class write clears it"
+
+[[site_thunk]]
+stage = 6
+name = "pursuit_mark_tail"
+site = 0x024D92
+old_hex = "2d7cffff8e39"
+only_variant_slot = true
+thunk_hex = "2d7cffff8e39004c4a2e0293670e0c2e0044005466061d7c000101174e75"
+note = "#195 (14z-188): the knockdown tail's move.l, then +0x117 := 1 when the mark is set and the class is still 0x44 (vs2 0x239E6 sets it for class 0x51)"
+
+[[code_word]]
+name = "pursuit_mark_tail_pad"
+addr = 0x024D98
+old_hex = "004c"
+new_hex = "4e71"
+only_variant_slot = true
+note = "#195 (14z-188): the displaced move.l's last word -> nop; pairs with pursuit_mark_tail"

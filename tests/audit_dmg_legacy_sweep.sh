@@ -67,14 +67,14 @@
 # damage-level config byte; attackers other than Demitri and moves other than these three; Donovan as P2; whether
 # the level and RNG pins change the per-game difference; FBNeo and the MiSTer core.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged29] [JOBS=6] [FREEZE=1] tests/audit_dmg_legacy_sweep.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged30] [JOBS=6] [FREEZE=1] tests/audit_dmg_legacy_sweep.sh
 #   emulator tier, MAME; 66 runs of up to 4725 frames, six at a time (~10 min quiet)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged29}"
+BUILD="${BUILD:-build/m3b_merged30}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 JOBS="${JOBS:-6}"
 EXPECT="$REPO/tests/expected/dmg_legacy_sweep.tsv"

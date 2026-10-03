@@ -293,13 +293,15 @@ driver` when the WIDE build is genuinely patched; if that line is missing,
 something went wrong and the script will say so rather than hand you a
 stock binary.
 
-**Then give the gates a `mame` on PATH (14z-187b).** About 43 gates run the
-stock sets through the wrappers without naming a binary, and fall back to
-`mame` on PATH — on the Mac that is Homebrew's 0.288, which froze the oracle;
-here there is none, so each of them fails with `exec: mame: not found`
-(measured on ERIS, `test_input_integrity.sh`). Point `mame` at the pinned,
-UNPATCHED source build — verdict-equivalent to Homebrew's binary, which is
-exactly what §7's parity gate proves on this machine:
+**Then give the host a `mame` on PATH (14z-187b).** Until 14z-189 about 43 gates ran the
+stock sets through the wrappers without naming a binary and fell back to `mame` on PATH,
+which does not exist here (`exec: mame: not found`, measured on ERIS,
+`test_input_integrity.sh`). Since 14z-189 (#196) the wrappers default to the pinned
+build for the set instead, so they no longer need this; scripts that run `mame` BY NAME
+still do — `tests/test_mame_parity.sh` looks its reference binary up as `mame` on PATH
+unless `MAME_REF_BIN` is set. Point `mame` at the pinned, UNPATCHED source build —
+verdict-equivalent to Homebrew's binary, which is exactly what §7's parity gate proves
+on this machine:
 
 ```bash
 mkdir -p ~/.local/bin && ln -sfn ~/.cache/vampire-saved/mame-ref/cps2 ~/.local/bin/mame

@@ -2374,6 +2374,8 @@ callee could be branch-reached.
 
 ## `run_mame.sh` on `vsavjw` with `MAME_BIN` unset runs HOMEBREW's MAME, which does not know the set — the leg silently measures nothing (paid: 14z-133, three sweep reds)
 
+**STATUS 14z-189 (#196, maintainer-ruled "By set name"): CLOSED AT THE WRAPPER.** An unset `MAME_BIN` now runs the PINNED build for the set — `~/.cache/vampire-saved/mame/cps2` for `vsavjw`, `~/.cache/vampire-saved/mame-ref/cps2` for every stock set — and a missing pinned default is REFUSED (exit 2), never replaced by PATH's `mame` (`tools/run_mame.sh`, gate `tests/test_mame_default_bin.sh`). What follows is the history of the class; the gate-level pin rule below still stands.
+
 `tools/run_mame.sh` execs `${MAME_BIN:-mame}`. With the variable unset that
 is `/opt/homebrew/bin/mame`, the stock 0.288 binary, which answers
 `Unknown system 'vsavjw'` and exits in under a second. Every downstream
@@ -2407,13 +2409,13 @@ unpinned member. "Name `MAME_BIN` for a `vsavjw` run" had been an item in two
 session openers (`NEXT_SESSION_HISTORY.md`) and never a rule — the third
 payment is what made it one.
 
-**The recorded, un-gated remainder:** ~43 gates run only STOCK sets through the
-wrappers without pinning, so under the runner they use Homebrew's binary rather
-than the pinned reference build (`~/.cache/vampire-saved/mame-ref/cps2`).
-`test_mame_parity.sh` proves the reference build reproduces the frozen
-expectations bit-for-bit, so the two are verdict-equivalent today; it is an
-instrument variance ([CPE-24]) the maintainer may want closed by the same pin
-or by a runner-level export, and it is not decided here.
+**The recorded, un-gated remainder — RESOLVED 14z-189 (#196):** ~43 gates ran only STOCK sets through the
+wrappers without pinning, so outside the runner they used whatever `mame` was on PATH (Homebrew's 0.288 on
+the Mac). Since 14z-133b the runner exports `MAME_BIN`, so inside a tier only one gate still fell back
+(`test_don_immortal_native`, fixed 14z-188); since 14z-189 the wrapper's own default is the pinned build
+for the set, so a by-hand run uses the same instrument on every host. Measured first
+(`build/agent189/t196/`): the 15 gates that never set `MAME_BIN` gave the same verdict and output under
+Homebrew's binary, the reference build and the WIDE build, teardown-segfault PIDs aside.
 
 ## FBNeo `-hdump`'s specification buffer is 8,192 characters — entries past ~430 frames are DROPPED SILENTLY (paid: 14z-133b)
 
@@ -2666,6 +2668,13 @@ starts that prints verdict text needs the line (or its output through
 `tr -d '\r'`). `PYTHONIOENCODING` fixes the encoding and never the newline.
 macOS and Linux are unaffected, and the line is inert there (the macOS gate
 re-run identical, 0 CR).
+**The same per-process rule bit a TOOL (#130, fixed 14z-189):** `tools/bundle_win_dlls.py`
+printed each em dash as cp1252's single byte 0x97, which the UTF-8 terminal shows
+as U+FFFD — reproduced on ERIS's MSYS2 MINGW64 (Python 3.14.7): unfixed, 2 bytes
+0x97 and 3 CRs; with the two reconfigure lines, 2 UTF-8 em dashes and 0 CR
+(`build/agent189/t130_eris.txt`). `PYTHONIOENCODING=cp1252` reproduces the
+ENCODING half of it on macOS, and `tests/test_win_stdout_utf8.sh` uses exactly that
+as its portable stand-in (it cannot see the newline half).
 
 ## MAME READS THE USER'S OWN `mame.ini` EVEN UNDER `-homepath` — every harness leg inherits what that file sets (found 2026-09-15, 14z-158, gating the README's recording command; nothing paid)
 
@@ -3027,3 +3036,21 @@ USER mode, and MAME's `SP` state register is then the supervisor stack (`0xFF7FF
 onto. The long at `USP` was the real caller (`0x0220A0`, the object loop). Rule: pick the ACTIVE stack by SR bit
 13 — `(SR & 0x2000) ? SP : USP` — before reading anything off it (`tests/lua/rng_draws.lua`). A tell that you
 read the wrong one: every "return address" is the same RAM address.
+
+## A BACKGROUND TASK THAT RUNS A JOB OVER SSH IS STOPPED AT THE 2-HOUR LIMIT, BUT THE REMOTE JOB IS NOT — it keeps running on the host, and its verdict arrives nowhere (paid: 14z-188, read 14z-189)
+
+Claude Code's Bash tool stops a `run_in_background` command at its timeout (at most 2 hours).
+At the 14z-188 close, PILOT's emulator-tier MAME lane ran as `ssh pilot '... run_all_emulator.sh
+--lane mame --jobs 6 ...'` in such a task: the LOCAL task was stopped at the limit while the
+runner was 177 gates in (STATE 14z-188 row (13)), and the runner on PILOT kept going to its end
+— its log `~/pilot_emu_mame.log` there closes on `PASS 173 SKIP 4 FAIL 0 TIMEOUT 2 MISSING 0`
+(read 14z-189, `build/agent189/handbacks/02_pilot_mame.txt`). Nothing in the session was
+notified, and nothing local held the result. **Rule:** a remote job that may run past two hours
+writes its log and results ON THE HOST (a `--log` dir and a `> ~/<name>.log` redirect, as that
+run did), and the session reads them there, never from the local task's output; the local task
+ending is not the job ending, in either direction. **Not general:** this was a native Linux host
+(PILOT). Under WSL2 the distro was measured to shut down once no `wsl.exe` client remained,
+background processes notwithstanding (2026-09-13, on the Windows box ERIS replaced: a `setsid`
+sleep gone after 100 idle seconds, `uptime -s` showing the VM restarted; recorded then only in
+the session's own notes, NOT re-measured on ERIS), so on ERIS a stopped local task may take the
+job down with it — measure it there before relying on either outcome.

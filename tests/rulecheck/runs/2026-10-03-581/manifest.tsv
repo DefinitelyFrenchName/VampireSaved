@@ -1,0 +1,20 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/rc189/freeze/registry.diff	60fabc07a0977663dac76589b7dc32fe696f94e5
+build/rc189/freeze/sets_and_fingerprints.txt	08310dd40be662652c1d5cf2b39c878356b397b1
+build/rc189/freeze/deltas2.txt	8fb17cfbac6e629df69fe9cb63bf4b0909a4f71d
+build/rc189/freeze/opset_and_gain.txt	b9ceea777e9192205800011e87e2b981852bec03
+build/rc189/freeze/m3a_post.log	a3320e271c48ae9cb86b6c79dcb494b3d3ea1447
+build/rc189/freeze/phasec.log	ff827f9adb9ccc34be911ae4f9a21541ca4e9fff
+build/rc189/freeze/tenant_loop_post.log	57260b3ba260953c7422d1ce625d309d8ed8c23a
+build/rc189/freeze/suite_freeze_summary.txt	249b6676cee2a04deccd67c40f29d57b65c07a11
+build/rc189/freeze/battery_eris_results.tsv	17de6420e71ac6a1dfc40d74a068a31a418317f0
+build/rc189/freeze/battery_mister_results.tsv	56c5950345cef2a1816bd1d0e1301eca51ba26a8
+build/rc189/freeze/ledger_575_580.tsv	2a3ac130c58c738cc3254e41fb2c299f24794017
+build/rc189/freeze/refreeze_summary.txt	541d01db945d152b6abceeaf0009486aaec43628
+build/rc189/freeze/tier_freeze_m22.log	331a6beb6cd7d140175b5a977574faa6f3508945
+build/rc189/freeze/tier_reds_rerun.txt	f5a46478405feb3420e4e361472a12c33f8405fa
+build/rc189/freeze/staleness_mister.txt	237f7185e19ccf56a808fc298634367d6d55d0e2
+build/rc189/freeze/xml_check.txt	15769abce6d6c75a137c896f4ad7f49f6e3f4aff
+build/rc189/freeze/xml_check_post.txt	70ca71d3eecae3a52153eac33f5ace7e014af8d4
+build/rc189/freeze/mra_m22.log	2ab601d68539fb01cc1c5494ced17e56b6c579e5
+build/rc189/freeze/package_m22.log	1a136dc6152d61fee8310cdbce5225996b24a4b7

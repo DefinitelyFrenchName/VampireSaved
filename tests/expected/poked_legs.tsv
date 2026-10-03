@@ -211,6 +211,8 @@ tests/audit_tech_roll.sh	native	replays/judge/03_down_attack.rpl	P1	-	01 Demitri
 tests/audit_tech_roll.sh	native	replays/judge/03_down_attack.rpl	P2	R R	03 Victor	$b	PARAM	CROSS-FLAVOR if id in 0x13
 tests/audit_tech_roll.sh	ours	replays/judge/03_down_attack.rpl	P1	-	01 Demitri	$a	PARAM	no id is CROSS-FLAVOR here
 tests/audit_tech_roll.sh	ours	replays/judge/03_down_attack.rpl	P2	R R	03 Victor	$b	PARAM	no id is CROSS-FLAVOR here
+tests/audit_tenant_continue_switch.sh	ours	replays/don/202_don_continue_switch.rpl	P1	L L D D	13 Donovan	13	SAME	
+tests/audit_tenant_continue_switch.sh	ours	replays/don/202_don_continue_switch.rpl	P2	-	-	03	?	
 tests/audit_tenant_downwin.sh	ours	replays/judge/01_timeout_lead.rpl	P1	-	01 Demitri	$a	PARAM	no id is CROSS-FLAVOR here
 tests/audit_tenant_downwin.sh	ours	replays/judge/01_timeout_lead.rpl	P2	R R	03 Victor	$b	PARAM	no id is CROSS-FLAVOR here
 tests/audit_tenant_throw_geometry.sh	native	(replay not named in the script)	P1	-	-	$ATT	PARAM	no id is CROSS-FLAVOR here

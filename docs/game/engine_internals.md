@@ -327,7 +327,20 @@ all structural rather than probabilistic:
 - a tenant is scheduled as a CPU opponent **only when the player is a
   tenant** (the shape of the #99 field crash: Donovan 1P -> CPU Phobos);
 - **no legacy class `0x00-0x0F` can ever draw one**, so a vanilla 1P arcade
-  run never meets the new characters;
+  run never meets the new characters THROUGH THE DRAW — **but one path carries
+  a tenant over to a legacy player (measured 14z-189, #202, `tests/audit_tenant_continue_switch.sh`):**
+  lose to a tenant CPU opponent, continue, answer NO to "retry with the same
+  character?" and pick a legacy character. The re-pick runs the first-rung
+  routine `PRG:0x00AE7C` again on the new character's row, and our
+  keep-tenant thunk at `PRG:0x0AEF2` (14z-87, `voice_borrow_keep_tenant`)
+  SKIPS its store because the CPU side's `+0x382` still holds the tenant id,
+  so the held tenant loads: Aulbath vs CPU Phobos on merged-m21, where the
+  same re-pick with the slot released to 0x03 draws Sasquatch. A plain
+  repeat does NOT happen: later rungs pick through `PRG:0x0AFCE`, which has no
+  thunk (after beating Phobos the next draw was Bishamon). Retry-with-the-same-
+  character re-fights the tenant too, but the draw would have given that class
+  anyway. NOT FIXED, by ruling: the maintainer closed #202 under the 2026-08-28
+  ruling below ("Close under the ruling");
 - **Shadow's pool is rows 32-34** (`($3BD << 3) + 0x800`, `PRG:0x00AF1C`)
   **and holds no tenant in any group**, so the Shadow-vs-tenant matchup is
   unreachable from the ladder in either implementation — 2P versus is its
@@ -560,7 +573,7 @@ from the reference ROMs + three verdict controls); bytes in
 WINDOW"]
 
 **A vs2 class 0x51 knockdown is pursuit-able; vsavj's equivalent 0x44 is not (measured 14z-187, GitHub #194,
-#195).** Depends on atlas rows: the fighter's `+0x54` class and `+0x117` (`atlas/ram.md`). **Gates:**
+#195).** **STATUS 14z-189: LANDED in the M22 freeze** — #194's record class 0x44 and #195's two hooks are in every track that carries the tenants (merged-m22, donovan-m26, pyron-m27); `tests/audit_pursuit_flag.sh` reads ours equal to native vs2 on every event of its rigs, and the maintainer read the Cosmo Disruption captures as "M22 matches native" (`DECISIONS_HISTORY.md` "Ruled 2026-10-03 (14z-189)"). Depends on atlas rows: the fighter's `+0x54` class and `+0x117` (`atlas/ram.md`). **Gates:**
 `tests/audit_move_parity.sh` (Pyron's Cosmo rows), `tests/test_pyron_cosmo.sh`, `tests/audit_pursuit_flag.sh`. vs2's shared reaction tail
 `0x239E6` (`cmpi.b #$51,$54(a6); bne; move.b #1,$117(a6)`) marks a class-0x51 victim pursuit-able, and the
 attacker-side pursuit check (vs2 `0x26D60`, vsavj `0x27B0E`, instruction-parallel) requires the opponent's

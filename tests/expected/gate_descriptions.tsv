@@ -94,6 +94,7 @@ declares	audit_shared_wall_push
 declares	audit_stage_sweep
 declares	audit_stock_emulator_stall
 declares	audit_tech_roll
+declares	audit_tenant_continue_switch
 declares	audit_tenant_downwin
 declares	audit_tenant_throw_geometry
 declares	audit_tenant_throws
@@ -164,6 +165,7 @@ declares	test_classify_hitclass_probe
 declares	test_classify_pool_spawns
 declares	test_close_checks
 declares	test_close_loop_cost
+declares	test_close_standing
 declares	test_close_tools
 declares	test_commit_subject
 declares	test_community_crosscheck
@@ -284,6 +286,7 @@ declares	test_m2b_scroll3
 declares	test_m2b_stage6
 declares	test_m3a_reproducible
 declares	test_mame_bin_pinned
+declares	test_mame_default_bin
 declares	test_mame_determinism
 declares	test_mame_mirror_guard
 declares	test_mame_parity
@@ -418,3 +421,4 @@ declares	test_wheel_bank5
 declares	test_wide_profile
 declares	test_wide_render_content
 declares	test_win_quote_decode
+declares	test_win_stdout_utf8

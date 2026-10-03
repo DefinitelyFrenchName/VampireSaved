@@ -48,14 +48,14 @@
 # here is at the right corner); the resolver's airborne and +0x115 branches; Sitting Attack
 # event 9. read_tap.lua and field_trace.lua share MAME, the rig and the pokes.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged29] [PARTS="legacy_lilith huitzil_3"] [FREEZE=1] tests/audit_shared_wall_push.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged30] [PARTS="legacy_lilith huitzil_3"] [FREEZE=1] tests/audit_shared_wall_push.sh
 #   emulator tier, MAME; ~20 s (4 tap runs and 4 field traces, in parallel)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged29}"
+BUILD="${BUILD:-build/m3b_merged30}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/shared_wall_push.tsv"
 PARTS="${PARTS:-legacy_lilith huitzil_3}"

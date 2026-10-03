@@ -22,11 +22,18 @@ mkdir -p "$SANDBOX"
 # so a patched-build run is directly comparable to a frozen vanilla run.
 ROMPATH="${MAME_ROMPATH:-$ROMDIR}"
 
-# MAME_BIN selects the emulator binary; defaults to whatever `mame` is on PATH
-# (the Homebrew 0.288 the frozen expectations were created with). B5 points it
-# at the pinned source build (tools/setup_mame.sh) and at the WIDE-patched
-# binary. Nothing else about the invocation changes, so the runs stay
-# comparable to every frozen log.
+# MAME_BIN selects the emulator binary. UNSET, it defaults BY SET NAME to a PINNED
+# source build (#196, maintainer-ruled 2026-10-02 "By set name"): `vsavjw` -> the
+# WIDE build ~/.cache/vampire-saved/mame/cps2, every stock set -> the reference
+# build ~/.cache/vampire-saved/mame-ref/cps2 (tools/setup_mame.sh builds both). A
+# missing default is REFUSED, never replaced by whatever `mame` is on PATH: until
+# 14z-189 an unset MAME_BIN ran PATH's `mame` (Homebrew 0.288 on the Mac, a shim
+# on Linux), so a by-hand run's instrument depended on the host. Measured before
+# the change (build/agent189/t196/): the 15 gates that never set MAME_BIN gave
+# the same verdict and output under all three binaries, teardown PIDs aside.
+# Inside a tier tests/run_all_emulator.sh exports MAME_BIN, so nothing changes
+# there. Nothing else about the invocation changes, so the runs stay comparable
+# to every frozen log. Gate: tests/test_mame_default_bin.sh.
 # TRUE HEADLESS (added 14z-59d). MAME's "-video none" still creates an SDL
 # window; SDL_VIDEODRIVER=dummy means SDL creates no window AT ALL, so
 # there is nothing to steal focus and nothing for a stray keystroke to land
@@ -75,7 +82,7 @@ else
     NSANDBOX="$SANDBOX"
 fi
 # THE FALLBACK INVENTORY (14z-188, GitHub #196), opt-in and inert unless asked: with MAME_FALLBACK_LOG set, a run
-# that falls back to `mame` on PATH (MAME_BIN unset) appends one line — the UTC time, the set, and the first
+# that runs with MAME_BIN UNSET (since 14z-189 it takes the pinned default by set name; before, `mame` on PATH) appends one line — the UTC time, the set, and the first
 # tests/<gate>.sh among this process's ancestors (or "-") — so one emulator tier names every gate that depends on
 # what `mame` happens to be. Nothing is printed and nothing else changes; unset, the line below never runs.
 if [ -z "${MAME_BIN:-}" ] && [ -n "${MAME_FALLBACK_LOG:-}" ]; then
@@ -87,7 +94,18 @@ if [ -z "${MAME_BIN:-}" ] && [ -n "${MAME_FALLBACK_LOG:-}" ]; then
     done
     printf '%s\t%s\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$SET" "$_fg" >> "$MAME_FALLBACK_LOG" 2>/dev/null || true
 fi
-exec "${MAME_BIN:-mame}" "$SET" \
+if [ -z "${MAME_BIN:-}" ]; then
+    case "$SET" in
+        vsavjw) MAME_BIN="$HOME/.cache/vampire-saved/mame/cps2" ;;
+        *)      MAME_BIN="$HOME/.cache/vampire-saved/mame-ref/cps2" ;;
+    esac
+    if [ ! -x "$MAME_BIN" ]; then
+        echo "run_mame.sh: MAME_BIN is unset and the pinned default for set '$SET' is absent: $MAME_BIN" >&2
+        echo "  build it with tools/setup_mame.sh, or set MAME_BIN (#196: no fall back to the mame on PATH)" >&2
+        exit 2
+    fi
+fi
+exec "$MAME_BIN" "$SET" \
     -rompath "$ROMPATH" \
     -keyboardprovider none -mouseprovider none \
     -joystickprovider none -lightgunprovider none \

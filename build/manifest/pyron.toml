@@ -859,7 +859,7 @@ march_retarget_mid = true
 # same-source-or-fail names any future collision). Screen position =
 # the empty bottom-right corner (measured on merged-m5 snapshots, 14z-105).
 # THE TEXT NAMES THE FREEZE GENERATION — change it at every freeze.
-version_text = "M21"
+version_text = "M22"
 version_font = "build/manifest/version_font.json"
 version_x = 324
 version_y = 202
@@ -1083,13 +1083,27 @@ new_hex = "0040"
 # downstream compares that field against 81 the move could behave
 # differently; nothing is known to, but it is the one thing this change
 # could plausibly perturb, and only a playtest will show it.
+#
+# 14z-187 (GitHub #194, maintainer-ruled 2026-10-01 "0x44 now, gap as new ticket"): THE CAVEAT CAME TRUE,
+# AND THE CLASS IS NOW 0x44. 0x4F reaches the right STAGER handler but not the right REACTION: the victim's
+# class also indexes the stored-state dispatcher 0x2384E and the property map, and 0x4F is the ES-freeze
+# family (property 0x0F) — Demitri took a plain hit stagger where native is engulfed in fire, carried up and
+# knocked down. 0x44 is the 14z-110b five-consumer equivalent of vs2's 0x51 (donovan.toml, the deity
+# states: the three stagers' copy handler, 0x2384E [0x44] = vs2 [0x51], property 0x19 == 0x19; neither
+# engine stores 0x44 to +0x54 any other way). Measured on probe 194b (one byte from merged-m21 and
+# pyron-m26): equal to native on every traced P2 field +90..+218, the five Cosmo rows of
+# audit_move_parity IDENT, test_pyron_cosmo PASS on the solo track (0x44 is inside vsavj's 80 entries:
+# no machinery needed, on any track). Native 0x51 itself is NOT the fix: kept on the merged build it
+# over-runs 0x2384E (the second hit lost, the victim neutral at +136). THE RESIDUAL, recorded not hidden:
+# vs2 sets the victim's +0x117 for class 0x51 alone (vs2 0x239E6), and Pyron's pursuit after Cosmo needs
+# it — natively it connects, here it never starts (as on every build before) — GitHub #195.
 [[port_patch]]
 stage = 6
 region = "hitbox_proj"
 src_addr = 0x0D0C7E
 old_hex = "0151"
-new_hex = "014f"
-note = "Cosmo Disruption sub-state 81 -> 79: vsavj's dispatch table has 80 entries, so 81 read past its end into the next dispatcher's operand and jumped into the table (watchdog reset). 79's entry is already 0x0224 = the same handler vs2 uses."
+new_hex = "0144"
+note = "Cosmo Disruption reaction class vs2 0x51 -> 0x44 (14z-187, #194; was 0x4F since 14z-75): vsavj's tables end at 0x4F, so 0x51 over-runs them; 0x44 is the 14z-110b five-consumer equivalent of 0x51 (stagers, 0x2384E, property 0x19). Residual: vs2's +0x117 pursuit flag for 0x51 (#195)."
 
 # ── 14z-82c: the hit-class map extension (maintainer-ADOPTED 2026-08-12) ────
 # vsavj's projectile-pool hit sweep (seven dispatchers, PRG:0x1A770-0x1A886)
@@ -1889,3 +1903,42 @@ old_hex = "3b49b48e"
 new_hex = "3b49b43c"
 note = "#157: grab ptr store a1 (site 3)"
 
+
+# ── #195: THE CLASS-0x51 PURSUIT FLAG (14z-188, staged; the maintainer: "for #195 I lean attacker id plus class, using
+# a data address as a backup option should the id+class approach should fail", then "Measure the borrow first",
+# "Close the P2 gap first", "Build it now (Recommended)") ─────────────────────────────────────────────────────────
+# vs2's knockdown tail sets the victim's +0x117 (the pursuit flag the attacker-side pursuit check reads) for class
+# 0x51 alone (vs2 0x239E6). Our tenants' 0x51 records are remapped to 0x44 (Donovan 14z-110b, Pyron's Cosmo #194),
+# whose tail never sets it. Two hooks restore it: at the hit-time class write PRG:0x01868C (every class-0x44 hit
+# lands there, from the ground, air and 0x0185B0 tables alike) the attacker A0 (loaded from -$4BC6(a5) at 0x01842C)
+# is checked by id: Donovan (TT) with class 0x44 — his only class-0x44 records are the six Ifrit Sword (ES) records
+# 33-38, all vs2 0x51 — or Pyron (TT) with class 0x44 and the record's +0x1F == 0x04: his only class-0x44 records are
+# projectile records 21 (Cosmo, vs2 0x51, +0x1F = 0x04) and 4 (0x44 natively, +0x1F = 0x00, stays unmarked), +0x1F
+# a byte copied verbatim from vs2 and read by no hit code (engine_internals.md "attack record" readers); a hit sets the victim's mark +0x293 (measured touched only by the bulk clears, 14z-187b), any other
+# hit through that write clears it. At the knockdown tail PRG:0x024D92 (run once, at the countdown's end) a set mark
+# with the class still 0x44 sets +0x117, as vs2 does. Measurements: build/agent188/t195 (rule-checker 2026-10-02-557).
+[[site_thunk]]
+stage = 6
+name = "pursuit_mark_hit"
+site = 0x01868C
+old_hex = "136b00170054"
+only_variant_slot = true
+thunk_hex = "136b001700540c2800tt0382661e0c2b0044001766100c2b0004001f6608137c000102934e75422902934e75422902934e75"
+note = "#195 (14z-188): mark the victim (+0x293) on this tenant's vs2-class-0x51 hit; any other hit through the class write clears it"
+
+[[site_thunk]]
+stage = 6
+name = "pursuit_mark_tail"
+site = 0x024D92
+old_hex = "2d7cffff8e39"
+only_variant_slot = true
+thunk_hex = "2d7cffff8e39004c4a2e0293670e0c2e0044005466061d7c000101174e75"
+note = "#195 (14z-188): the knockdown tail's move.l, then +0x117 := 1 when the mark is set and the class is still 0x44 (vs2 0x239E6 sets it for class 0x51)"
+
+[[code_word]]
+name = "pursuit_mark_tail_pad"
+addr = 0x024D98
+old_hex = "004c"
+new_hex = "4e71"
+only_variant_slot = true
+note = "#195 (14z-188): the displaced move.l's last word -> nop; pairs with pursuit_mark_tail"

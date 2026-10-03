@@ -7,7 +7,8 @@ the finding cannot be tested (a working-practice lesson, a statement) or nobody 
 homes_tracked.py sees file names and close_findings.py sees addresses; neither sees this. The
 row was promoted from that close's scratch check when the ledger came to name it.
 
-WHAT: reads the row LIVE from a STATE file by its title (default "(11) THE FINDINGS TABLE"),
+WHAT: reads the row LIVE from a STATE file by its title (default "(11) THE FINDINGS TABLE") — in the
+newest `## Session` group when the file has one (14z-189: the same title can recur in an older group),
 prints its sha1 (12 hex, the same fingerprint homes_tracked.py prints), and for every finding
 whose text holds `/ none` requires `/ none (` — a parenthesised reason right after it.
 
@@ -22,8 +23,19 @@ import re
 import sys
 
 
+def newest_group(text):
+    """the newest `## Session` group when the text has one (a row title such as "(12) THE FINDINGS TABLE" can recur in
+    an older group until that group rolls off — 14z-189, #204), else the whole text"""
+    lines = text.split('\n')
+    start = next((i for i, l in enumerate(lines) if l.startswith('## Session ')), None)
+    if start is None:
+        return lines
+    end = next((i for i in range(start + 1, len(lines)) if lines[i].startswith(('## ', '# '))), len(lines))
+    return lines[start:end]
+
+
 def check(text, title, lenient=False):
-    rows = [l for l in text.split('\n') if l.startswith('| **' + title + '**')]
+    rows = [l for l in newest_group(text) if l.startswith('| **' + title + '**')]
     if len(rows) != 1:
         return 2, [f'rows titled {title!r}: {len(rows)} (want 1)']
     s = rows[0]
@@ -45,7 +57,8 @@ def selftest(lenient=False):
     t = '(11) THE FINDINGS TABLE'
     good = f'| **{t}** | (a) x — `a.md` / `t.sh`; (b) y — `b.md` / none (a statement) |'
     bare = f'| **{t}** | (a) x — `a.md` / `t.sh`; (b) y — `b.md` / none; (c) z / none (why) |'
-    cases = [(good, 0), (bare, 1), ('no row here', 2), (good + '\n' + good, 2)]
+    grouped = f'## Session 14z-2 — new\n{good}\n## Session 14z-1 — old\n{bare}\n'
+    cases = [(good, 0), (bare, 1), ('no row here', 2), (good + '\n' + good, 2), (grouped, 0)]
     fails = 0
     for text, want in cases:
         got, _ = check(text, t, lenient)

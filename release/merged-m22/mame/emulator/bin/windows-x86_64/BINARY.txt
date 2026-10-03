@@ -1,0 +1,38 @@
+cps2 — MAME 0.288, CPS-2 subtarget, carrying the CPS-2 WIDE v1 driver patch, prebuilt for windows-x86_64
+========================================================================================================
+
+# Every file in this directory, and its sha256 — verify before running:
+#   awk '/^sha256 /{print $2"  "$3}' BINARY.txt | shasum -a 256 -c     (macOS, or any host with perl)
+#   awk '/^sha256 /{print $2"  "$3}' BINARY.txt | sha256sum -c        (Linux, MSYS2)
+sha256 b01f4a5e7cd7cda6944e0673121f016f932d5e0dd6eaa2034f0b3a37638a9a32 cps2.exe
+
+upstream   https://github.com/mamedev/mame
+pin        27a8d9e85b58058965907d1d8a7a92f8ed039348
+patch      0002-cps2-wide-v1.patch  sha1 1d13c9d80dc61cf39ddba16aaa30d8db0acb1131  (the ONLY patch applied; the project's replay-harness patch is a test instrument and is not in this binary)
+recipe     git clone https://github.com/mamedev/mame mame && cd mame && git checkout 27a8d9e85b58058965907d1d8a7a92f8ed039348 && git apply 0002-cps2-wide-v1.patch && make SUBTARGET=cps2 SOURCES=src/mame/capcom/cps2.cpp NOWERROR=1 REGENIE=1 -j24
+built      2026-09-13 on Windows via MINGW64 (x86_64), cc.exe (Rev3, Built by MSYS2 project) 16.2.0, by tools/build_release_emulators.sh mame
+tree       666b14d9e8dc
+jobs       24
+env        Microsoft Windows [version 10.0.19045.7663]; MSYS2 runtime 3.6.10-da84778c.x86_64; MSYSTEM=MINGW64
+env        pacman git 2.55.0-1
+env        pacman make 4.4.1-3
+env        pacman patch 2.7.6-3
+env        pacman rsync 3.5.0-1
+env        pacman zip 3.0-5
+env        pacman unzip 6.0-3
+env        pacman perl 5.42.3-1
+env        pacman coreutils 8.32-5
+env        pacman diffutils 3.12-1
+env        pacman mingw-w64-x86_64-gcc 16.2.0-3
+env        pacman mingw-w64-x86_64-binutils 2.47-3
+env        pacman mingw-w64-x86_64-python 3.14.7-1
+env        pacman mingw-w64-x86_64-pkgconf 1~3.0.7-1
+env        pacman mingw-w64-x86_64-SDL2 2.32.10-1
+env        pacman mingw-w64-x86_64-SDL2_image 2.8.12-1
+env        pacman mingw-w64-x86_64-sdl3 3.4.16-1
+requires   Windows 10 or later, x86_64. Nothing to install: the DLLs the recipe links from MSYS2 (nothing — the Windows build links -static and uses the native OSD) sit beside the .exe, where the loader looks first. Keep the folder together.
+run        `./cps2.exe vsavjw -rompath "/path/to/your/built/set;/path/to/your/dumps"` (the built vsavjw.zip and the pristine vsav.zip must both be on the rompath). `./cps2.exe -verifyroms vsavjw -rompath ...` says `is bad` BY DESIGN and must list exactly the members inside vsavjw.zip as INCORRECT CHECKSUM (stock CRCs for the members the port rewrites, sentinel CRCs for the new ones) — a NOT FOUND line is the real problem. MAME's own UI (Tab) maps controls.
+first run  Windows SmartScreen warns about an unsigned download: More info > Run anyway. Keep every file in this folder TOGETHER — the .exe finds its DLLs beside itself. The sha256 rows above are the integrity check.
+not works  "Unknown system: vsavjw" means the binary is not this one (no driver patch). A stock emulator fed the set renamed to vsavj.zip STALLS on the legal screen forever (measured 2026-09-11) — renaming is never the fix.
+asset      merged-m19-mame-windows-x86_64.zip attached to the GitHub release on tag freeze/merged-m19 — https://github.com/DefinitelyFrenchName/VampireSaved/releases/tag/freeze/merged-m19 (verify the rows above after unzipping; the previous freeze's assets are deleted at each release)
+provenance a prebuilt is the recipe above run on one host and nothing else; the reviewable trust surface stays the patch (its sha1 above). Rebuild from the recipe to check: the binary is rebuildable, not byte-reproducible (link order, timestamps).

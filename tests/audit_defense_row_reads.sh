@@ -60,14 +60,14 @@
 # <reads> <runs>`. The ours rows follow the build (a freeze can move a tenant's base):
 # re-freeze at every freeze (FREEZE=1), reviewing the diff.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged29] [JOBS=6] [LEGS="victim attacker suite vsavj"] [FREEZE=1] tests/audit_defense_row_reads.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged30] [JOBS=6] [LEGS="victim attacker suite vsavj"] [FREEZE=1] tests/audit_defense_row_reads.sh
 #   emulator tier, MAME; 221 tap runs (14z-183; 218 when measured 14z-169) on this MacBook, solo, JOBS=6: see PROVENANCE
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged29}"
+BUILD="${BUILD:-build/m3b_merged30}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/defense_row_reads.tsv"
 BASES="$REPO/tests/expected/roster_pairings/bases.tsv"

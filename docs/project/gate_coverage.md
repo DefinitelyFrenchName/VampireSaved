@@ -13,24 +13,24 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**415 of 415 gates described.**
+**419 of 419 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
-| [runner](#runner) | 40 | 40 | the suite runners and their own ground truth |
+| [runner](#runner) | 41 | 41 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
-| [platform](#platform) | 39 | 39 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
+| [platform](#platform) | 41 | 41 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 58 | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
-| [tenant](#tenant) | 84 | 84 | tenant content — per-character gates and on-demand audits on the ported characters |
+| [tenant](#tenant) | 85 | 85 | tenant content — per-character gates and on-demand audits on the ported characters |
 | [character-data](#character-data) | 68 | 68 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
 ## runner
 
-the suite runners and their own ground truth. 40 of 40 described.
+the suite runners and their own ground truth. 41 of 41 described.
 
 ### `run_all_emulator.sh` — run, emulator
 
@@ -82,11 +82,11 @@ the suite runners and their own ground truth. 40 of 40 described.
 
 ### `test_agent_extract.sh` — test, ci_portable
 
-**WHAT:** the transcript EXTRACT the procedural checker reads (tools/agent/extract.py) says what the transcript says: statements without private reasoning, each tool call and its result head, tracked launches and completions, DETACHED launches, unsourced figures, and workers' specs, commands and reports.
+**WHAT:** the transcript EXTRACT the procedural checker reads (tools/agent/extract.py) says what the transcript says: statements without private reasoning, each tool call and its result head, tracked launches and completions, DETACHED launches, unsourced figures, and workers' specs, commands and reports — a BACKGROUND worker's report being the hand-back the session received (#208), never its first text, and `NOT DELIVERED` when it had not handed back.
 
-**HOW:** drives the extractor's selftest over a synthetic transcript with known answers (a sourced figure, an invented one, non-figures, an open task, a marker merely quoted); two controls run copies with the launch test loosened and the figure finder blinded and must fail the selftest.
+**HOW:** drives the extractor's selftest over a synthetic transcript with known answers (a sourced figure, an invented one, non-figures, an open task, a marker merely quoted); two controls run copies with the launch test loosened and the figure finder blinded and must fail the selftest; and (since 14z-189, #208) runs the extractor on tests/agent/handback_fixture/, cut from the 14z-188 transcript: rule-checker run 2026-10-02-562's reader B as its transcript stood when that close's extract was made (six seconds before its SubagentHandback) plus the hand-back the session received — and on a copy without that hand-back.
 
-**EXPECTS:** the selftest's checks all pass and both controls fail on their copies; a red names the check, and an extract that lies is a procedure check that cannot see.
+**EXPECTS:** the selftest's checks all pass and the controls fail on their copies; the fixture's WX is the hand-back's verdict (Q1 VIOLATED ... VERDICT VIOLATED), marked as the session's, and never "Let me read all the named files."; without the hand-back it reads NOT DELIVERED; a red names the check, and an extract that lies is a procedure check that cannot see.
 
 ### `test_agent_hooks.sh` — test, ci_portable
 
@@ -151,6 +151,14 @@ the suite runners and their own ground truth. 40 of 40 described.
 **HOW:** builds a SYNTHETIC transcript (no real transcript is committed: one carries the user's identity) holding every shape that has broken the reader — a runner run by python3 with a subcommand, its `status` call and a mere mention (neither a pass), a background pass ended by its task notification, a sh-run runner, a prepare whose output was cut to its last line, a record — and requires the reader's exact lines; then runs the reader's own --plant; three controls run shadow copies with one perturbation each, and each must fail the comparison.
 
 **EXPECTS:** the python3 runner 2 passes / 190 s (70 s foreground EDITS-COUNT, 120 s background), the sh runner 1 pass / 30 s, the span 0.67 h, the figure 1,234, the plant CAUGHT; each control FIRES.
+
+### `test_close_standing.sh` — test, ci_portable
+
+**WHAT:** tools/close_standing.py renders tests/close_standing_checks.tsv for a close from three parameters (key, row, run dir), derives the open-ticket list and the base commit, generates each plant from the live file so it must fail its check, finds a repeated DECISIONS_HISTORY/STATE_HISTORY entry, holds the findings-row copy to the live row, and writes the packet claim only from a FULL all-OK run; tools/findings_add.py appends a finding in the form tools/none_reasons.py and tools/homes_tracked.py read, and refuses an untracked home or a bare `none`.
+
+**HOW:** both tools' self-tests on synthetic trees with known answers; then the REAL template rendered into a temp run dir (no close is needed to render) and linted: every row parses for tools/close_checks.py, every `*_plant` row expects a non-zero exit and its base check is in the set, every standing check declares WHAT and NOT SEEN. Six controls are known-bad variants (each tool's --perturb, and a template copy whose plant expects 0).
+
+**EXPECTS:** both self-tests PASS, the template lint clean, and every control's variant FAILs.
 
 ### `test_controls_contract.sh` — test, ci_portable
 
@@ -276,7 +284,7 @@ the suite runners and their own ground truth. 40 of 40 described.
 
 **WHAT:** the adversarial rule-checker's record (tests/rulecheck/ledger.tsv and the run directories) is sound: every run complete and structured, every planted violation caught, every fixture calibrated by the CURRENT pinned reader, every VIOLATED resolved in writing, every freeze since the checker's birth named by an OK freeze run, and `record` bound to the readers' spawn check.
 
-**HOW:** section 1 runs tools/rulecheck.py's parser selftest; section 2 runs `rulecheck.py check` on the real ledger, fixtures, run dirs and registry; section 3 fires six controls on perturbed copies (a quiet plant, a moved reader, an unchecked freeze, a prose verdict, an unbound recorder, a cross-family plant); the RECORD BINDING section proves a pinned-reader run cannot be recorded without its transcript.
+**HOW:** section 1 runs tools/rulecheck.py's parser selftest; section 2 runs `rulecheck.py check` on the real ledger, fixtures, run dirs and registry; section 3 fires six controls on perturbed copies (a quiet plant, a moved reader, an unchecked freeze, a prose verdict, an unbound recorder, a cross-family plant); the RECORD BINDING section proves a pinned-reader run cannot be recorded without its transcript; the PREPARE SESSION KEY section (#209, 14z-189) proves prepare refuses a run with no --session and one whose --session is a transcript prefix, and writes the key it was given into meta.tsv (the ledger's `session`).
 
 **EXPECTS:** PASS with every control fired; a red names the run or fixture and the shape in which the checker could look alive while asserting nothing.
 
@@ -406,7 +414,7 @@ the documentation locks — docs, skills, indexes, tables follow the tree. 21 of
 
 ### `test_close_tools.sh` — test, ci_portable
 
-**WHAT:** (1) tools/retraction_grep.py over every `tests/rulecheck/retractions/*.tsv` exits 0, ON THE LIVE TREE at every tier (an output file is a snapshot with a tree fingerprint, never the check) — each file's REACH controls (a live heading, a corrected wording in plain AND code-spanned form — a `reach:2` control that fails when either carrier is missed — a carrier line-wrapped across a `#` comment prefix, a sentence that lives only in a ROOT document, README.md — the scan reads every tracked file since rule-checker run 2026-09-25-204) are found in the live tree and every GONE wording reads 0 hits, so the sitting's retracted wordings were searched by a grep that reaches; (2) tools/homes_tracked.py --selftest passes, and (2b) the tool runs on the NEWEST findings-table row of STATE.md (the current sitting's, on the live tree: every home and test it names is tracked) — a planted findings row citing a backticked build/ file, a prose build/ path, a name that resolves nowhere, a gate stem that resolves nowhere, a ticket with no index row, ticket rows citing a build/ file, an untracked file and a § anchor on no line, a prose-cited document that resolves nowhere and a parenthesised test clause saying scratch, and a backticked and a prose name that end two or more tracked files but are none of them exactly (AMBIGUOUS, rule-checker run 2026-09-25-206), are caught on all eleven, and a real gate stem, a clean ticket and a prose-cited README resolve; (1c, since 14z-184) tools/close_findings.py --selftest: its planted-address, suffix-address (the second address a `/NN` suffix form names) and old-home-only controls all fire; (2c, since 14z-188) tools/none_reasons.py --selftest: a findings row whose test is a bare `none` is caught, one that says why passes. NEVER write a self-test's planted address in this header: a gate header is a live home to that tool, and the plant would read homed (paid 14z-184: the suffix control read DEAD until the literal left).
+**WHAT:** (1) tools/retraction_grep.py over every `tests/rulecheck/retractions/*.tsv` exits 0, ON THE LIVE TREE at every tier (an output file is a snapshot with a tree fingerprint, never the check) — each file's REACH controls (a live heading, a corrected wording in plain AND code-spanned form — a `reach:2` control that fails when either carrier is missed — a carrier line-wrapped across a `#` comment prefix, a sentence that lives only in a ROOT document, README.md — the scan reads every tracked file since rule-checker run 2026-09-25-204) are found in the live tree and every GONE wording reads 0 hits, so the sitting's retracted wordings were searched by a grep that reaches; (2) tools/homes_tracked.py --selftest passes, and (2b) the tool runs on the NEWEST findings-table row of STATE.md (the current sitting's, on the live tree: every home and test it names is tracked) — a planted findings row citing a backticked build/ file, a prose build/ path, a name that resolves nowhere, a gate stem that resolves nowhere, a ticket with no index row, ticket rows citing a build/ file, an untracked file and a § anchor on no line, a prose-cited document that resolves nowhere and a parenthesised test clause saying scratch, and a backticked and a prose name that end two or more tracked files but are none of them exactly (AMBIGUOUS, rule-checker run 2026-09-25-206), are caught on all eleven, and a real gate stem, a clean ticket and a prose-cited README resolve; and (since 14z-189, #205) a bare document name that resolves is REPORTED TRACKED (in prose and backticked), one in a home that resolves nowhere FAILs, and every finding letter is judged on its OWN homes — a letter whose homes resolve to no tracked file and no ticket row FAILs, whatever the other letters cite (four such letters in the plant), and an option's `(a)` inside a finding is not a letter; (1c, since 14z-184) tools/close_findings.py --selftest: its planted-address, suffix-address (the second address a `/NN` suffix form names) and old-home-only controls all fire; (2c, since 14z-188) tools/none_reasons.py --selftest: a findings row whose test is a bare `none` is caught, one that says why passes. NEVER write a self-test's planted address in this header: a gate header is a live home to that tool, and the plant would read homed (paid 14z-184: the suffix control read DEAD until the literal left).
 
 **HOW:** both tools run in-process on the tree; the controls run the grep on a copy of a pattern file with an unreachable reach control planted, and the homes tool's self-test on its BLIND variant (--blind, the build/ reads disabled), which must fail it.
 
@@ -526,7 +534,7 @@ the documentation locks — docs, skills, indexes, tables follow the tree. 21 of
 
 ## platform
 
-the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene. 39 of 39 described.
+the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene. 41 of 41 described.
 
 ### `audit_wide_phase_a.sh` — audit, emulator
 
@@ -704,6 +712,14 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 
 **EXPECTS:** silent on clean, the violation at the injected frame; a check that has only ever been silent proves nothing.
 
+### `test_mame_default_bin.sh` — test, ci_portable
+
+**WHAT:** tools/run_mame.sh's binary choice — MAME_BIN when set; unset, the pinned WIDE build for `vsavjw` and the pinned reference build for any stock set (maintainer-ruled 2026-10-02, "By set name"); a missing pinned default is REFUSED (exit 2), never replaced by PATH's `mame`.
+
+**HOW:** runs a copy of the wrapper under a fake HOME holding two stub binaries that print their own name, with a third stub named `mame` first on PATH, and reads which one ran for vsavjw, vsavj and vsav2, with MAME_BIN set, and with the reference stub removed. The control runs a copy whose default is the old `${MAME_BIN:-mame}`.
+
+**EXPECTS:** vsavjw -> wide, vsavj -> ref, vsav2 -> ref, MAME_BIN -> that binary, missing default -> exit 2 naming it, and the PATH stub never runs.
+
 ### `test_mame_determinism.sh` — test, emulator
 
 **WHAT:** MAME's run-to-run determinism RATE on a short boot probe: N runs of the same binary, set and inputs must be identical; a divergence is preserved and classed PHASE SHIFT or TRANSIENT.
@@ -839,6 +855,14 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 **HOW:** FBNeo runs of the corpus on the reference and patched binaries and on the stock and WIDE sets; the reference guard refuses a reference that carries the profile; controls point FBNEO_REF at the WIDE binary and stub `strings` to find nothing.
 
 **EXPECTS:** both invariants hold on both checksums; the superset leg skips LOUDLY without FBNEO_REF; both controls fail at the guard.
+
+### `test_win_stdout_utf8.sh` — test, ci_portable
+
+**WHAT:** every python tool that runs under a NATIVE Windows python (MSYS2 MINGW64) during a release build writes its console output as UTF-8, so an em dash reaches the log as e2 80 94, not as cp1252's single 0x97 byte (which the UTF-8 terminal shows as U+FFFD). The same reconfigure line sets LF newlines; this gate does NOT see that half (PYTHONIOENCODING has no newline setting) — it was measured on ERIS only (0 CR, build/agent189/t130_eris.txt).
+
+**HOW:** runs each listed tool with no arguments (its usage text, which carries an em dash, goes to stderr through sys.exit) under PYTHONIOENCODING=cp1252, the encoding a native Windows python gives a pipe, and counts the bytes: at least one UTF-8 em dash and no 0x97. The control runs a copy of the tool with its reconfigure lines removed, which must write 0x97.
+
+**EXPECTS:** PASS when every listed tool reconfigures its streams; a red names the tool and the counts.
 
 ## pipeline
 
@@ -1750,7 +1774,7 @@ tiles, OBJ records, sprite lists, render-layer verdicts. 25 of 25 described.
 
 ## tenant
 
-tenant content — per-character gates and on-demand audits on the ported characters. 84 of 84 described.
+tenant content — per-character gates and on-demand audits on the ported characters. 85 of 85 described.
 
 ### `audit_continue_ladder.sh` — audit, emulator
 
@@ -1983,6 +2007,14 @@ tenant content — per-character gates and on-demand audits on the ported charac
 **HOW:** the judge/03_down_attack rig on MAME with the victim's held direction+button through the landing; roll state and translation read from dumps; a `tap` control (4-frame tap) must not roll; an all-legacy `ctl` leg checks the instrument.
 
 **EXPECTS:** roller legs fire a roll state and move >= 60px; attacker legs let Victor roll except off Phobos (frozen native-anchored); the pursuit at a rolling victim fires, deals no damage and the victim ends displaced >= 60px; the tap does not roll.
+
+### `audit_tenant_continue_switch.sh` — audit, emulator
+
+**WHAT:** the first-rung pick (PRG:0x00AE7C) re-runs after a continue; on our builds its store (PRG:0x0AEF6) sits in the keep-tenant site_thunk, which skips it while the CPU side's +0x382 holds 0x10/0x11/0x13. After a loss to a tenant the CPU side still holds that tenant, so when the player SWITCHES character on the continue the ladder draws from the new character's row (stage and all) but the tenant loads anyway — a legacy character meets a tenant, which no ladder row can schedule (engine_internals "WHO CAN BE DRAWN AGAINST WHOM"). Later rungs pick through a different store (PRG:0x0AFCE, no thunk) and are not affected; a continue with the SAME character draws the held class anyway.
+
+**HOW:** one rig, two legs, merged build on MAME. tests/replays/don/202_don_continue_switch.rpl picks Donovan on the wheel, the venue byte $FF8121 is pinned to 0x10 (rung 1 Bishamon, rung 2 Phobos), P2's then P1's HP words are poked negative (Bishamon KO'd at f3000, Donovan KO'd by Phobos at f4600), and the replay continues, answers NO and moves the cursor to Aulbath. Leg HELD runs as is; leg RELEASED also pokes P2's +0x382 to 0x03 between the switch and the re-pick, so the store runs and writes the DRAW. Per leg: a non-debug write tap on $FF8B82/$FF8782/$FF8100 (tests/lua/read_tap.lua) and P1/P2 block dumps every 10 frames (tests/lua/replay.lua). Each loaded character is named by its +0x60 against the BUILD's own table (PRG:0x0BD97A, as audit_don_vs_cpu does), names from tests/expected/roster_pairings/bases.tsv.
+
+**EXPECTS:** both legs' setup events happen (else VOID): rung 1 loads Bishamon, P2 KO'd, rung 2 written 0x10 by PRG:0x0AFCE and Phobos loads, P1 KO'd, P1's +0x382 committed 0x09 after the continue, the re-pick's stage write (PRG:0x00AF10) follows it. RELEASED: the store writes $FF8B82 in the re-pick's frame with a class D != 0x10, and P2 loads D with P1 Aulbath. HELD (EXPECT=held, the default, as measured): no write to $FF8B82 between the switch and the re-pick, and P2 loads Phobos with P1 Aulbath. Both legs write the same stage. EXPECT=draw is the form once #202 is fixed: HELD loads D too. Every control fails.
 
 ### `audit_tenant_downwin.sh` — audit, emulator
 
@@ -2872,7 +2904,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **WHAT:** who CAN read the select-confirm latch: the static census of every instruction naming a fighter block's +0x3BC/+0x3BD/+0x3C2/+0x3E0/+0x3E3 on vsav2, vsavj and the ported image, by addressing form, frozen — the whole population the per-leg tap (audit_latch_reads) can ever attribute a read to, with the census's data-region `movep` noise frozen and named.
 
-**HOW:** tools/audit_latch_readers.py over the decrypted opcode views and build/m3b_merged29/verify_op.bin, anchored on the extension word so a data table is not an instruction, its --selftest on both reference views first (an immediate store among its positive controls since #197); controls: a shadow copy of the tool blind to the (d16,An) form, a copy with the pre-#197 nearest-decodable scan, and the frozen inventory minus one vs2 reader row; a PLANTED 44-byte opcode image carries one site of each form (abs.l immediate, abs.l register, (d16,An) immediate), since no abs.l site exists in any real image.
+**HOW:** tools/audit_latch_readers.py over the decrypted opcode views and build/m3b_merged30/verify_op.bin, anchored on the extension word so a data table is not an instruction, its --selftest on both reference views first (an immediate store among its positive controls since #197); controls: a shadow copy of the tool blind to the (d16,An) form, a copy with the pre-#197 nearest-decodable scan, and the frozen inventory minus one vs2 reader row; a PLANTED 44-byte opcode image carries one site of each form (abs.l immediate, abs.l register, (d16,An) immediate), since no abs.l site exists in any real image.
 
 **EXPECTS:** the frozen inventory equal (vs2's confirm writers and clears, the tenants' in-play flavour readers and their relocated copies, the Shadow-flag readers); the blind tool fails its selftest, the planted image gives exactly its three write rows, the pre-#197 copy misses the immediate store vs2 PRG:0x00712A and both planted immediates, the dropped row fails the compare.
 

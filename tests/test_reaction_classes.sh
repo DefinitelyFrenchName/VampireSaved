@@ -15,6 +15,7 @@
 #
 # MUST-FIRE: perturbed-copy: stager-38-copy — a copy of vsavj's opcode image with the ground stager's entry 0x38 re-pointed at the copy handler must move the 0x38 route and the copy count and FAIL the frozen compare, so the route rows are read from the image (in-gate: the planted run must differ on exactly those two rows; mode: the gate runs on the planted copy and FAILs)
 # MUST-FIRE: perturbed-copy: record-06-to-38 — a copy of vsavj's data image with the first reachable class-0x06 legacy record re-classed 0x38 must move the 0x06 and 0x38 census rows and FAIL the frozen compare, so the census reads each record's class byte (in-gate: the planted run must differ on exactly those two rows; mode: the gate runs on the planted copy and FAILs)
+# MUST-FIRE: perturbed-copy: thunk-copy-removed — a copy of OUR opcode image whose copy-handler jsr target (#195's pursuit_mark_hit thunk) has its first instruction, the displaced `move.b $17(a3),$54(a1)`, replaced by nops must turn the ours stager copy counts and FAIL the frozen compare (proves the stager walk follows the jsr, 14z-189)
 #
 # WHY. The 14z-168 design note for the ruled 0x52 fix named class 0x38 as a candidate
 # discriminator: vsavj's reaction table sends 0x06 AND 0x38 to the shock handler
@@ -40,17 +41,17 @@
 # The `ours` rows follow the merged build: re-freeze at every freeze (FREEZE=1), reviewing
 # the diff; the vsavj and vsav2 rows move only if the reference images or the tool do.
 #
-# Usage: ROMDIR=... [BUILD=build/m3b_merged29] [FREEZE=1] tests/test_reaction_classes.sh
+# Usage: ROMDIR=... [BUILD=build/m3b_merged30] [FREEZE=1] tests/test_reaction_classes.sh
 #   static tier (a build dir + the decrypted reference views, no emulator); measured 14z-169 on this MacBook: ~3 s
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
-BUILD="${BUILD:-build/m3b_merged29}"
+BUILD="${BUILD:-build/m3b_merged30}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/reaction_classes.tsv"
 CONTROL="${CONTROL:-}"
 [ -f "$BUILD/verify_op.bin" ] || { echo "SKIP: no verify_op.bin in $BUILD"; exit 0; }
 python3 -c "import capstone" 2>/dev/null || { echo "SKIP: python capstone not installed"; exit 0; }
-case "$CONTROL" in ""|stager-38-copy|record-06-to-38) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
+case "$CONTROL" in ""|stager-38-copy|record-06-to-38|thunk-copy-removed) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
@@ -94,7 +95,7 @@ _n38="$(awk -F'\t' '$1=="ours" && $2=="imm54" && $3=="value" && $4=="38" && $5!=
 [ "$_n38" = 1 ] || bad "our build has $_n38 constant 0x38 writers into +0x54 — the S1 design has exactly one (reaction_hook case_a4)"
 
 echo "== 2. the must-fire controls (in-gate)"
-for c in stager-38-copy record-06-to-38; do
+for c in stager-38-copy record-06-to-38 thunk-copy-removed; do
     [ -n "$CONTROL" ] && break
     census "$W/ctl_$c.tsv" "$c" || { echo "CONTROL DEAD: $c — the planted run failed: $(tail -1 "$W/ctl_$c.tsv.err")"; fail=1; continue; }
     _moved="$(diff "$W/got.tsv" "$W/ctl_$c.tsv" | grep -c '^>' | tr -d ' ')" || true
@@ -104,7 +105,10 @@ for c in stager-38-copy record-06-to-38; do
         _pat="$(echo "$m" | tr '|' '\t')"
         diff "$W/got.tsv" "$W/ctl_$c.tsv" | grep "^> $_pat" > /dev/null || _miss="$_miss $m"
     done
-    if [ "$_moved" = 2 ] && [ -z "$_miss" ]; then echo "CONTROL FIRED: $c — the planted copy moved exactly its two rows"
+    # thunk-copy-removed (14z-189) moves every ours route that reaches the copy handler plus the three copy counts —
+    # at least its three must-move rows; the other two plants move exactly two
+    if [ "$c" = thunk-copy-removed ] && [ "$_moved" -ge 3 ] && [ -z "$_miss" ]; then echo "CONTROL FIRED: $c — the walk read the jsr target: $_moved ours rows moved when its displaced copy was removed"
+    elif [ "$c" != thunk-copy-removed ] && [ "$_moved" = 2 ] && [ -z "$_miss" ]; then echo "CONTROL FIRED: $c — the planted copy moved exactly its two rows"
     else echo "CONTROL DEAD: $c — moved $_moved rows; not moved:${_miss:- none} (wanted: $_want)"; fail=1; fi
 done
 

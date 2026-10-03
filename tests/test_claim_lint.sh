@@ -86,10 +86,10 @@ UNTIED_CLAIM="Every row matches and the gate is green."
 wiring() {  # wiring <rulecheck.py> <root> -> prints REFUSED|PREPARED for the bare packet, then the --untied-ok outcome
     rm -rf "$2"; mkroot "$2" "$1"
     n0="$(ls "$2/tests/rulecheck/runs" | wc -l | tr -d ' ')"
-    ( cd "$2" && python3 tools/rulecheck.py prepare --decision recommendation --subject probe --claim "$UNTIED_CLAIM" --artifact art.txt --id 2099-02-02-01 ) > "$2/bare.log" 2>&1 && bare=PREPARED || bare=REFUSED
+    ( cd "$2" && python3 tools/rulecheck.py prepare --decision recommendation --subject probe --claim "$UNTIED_CLAIM" --artifact art.txt --id 2099-02-02-01 --session 14z-0 ) > "$2/bare.log" 2>&1 && bare=PREPARED || bare=REFUSED
     grep -q "claim_lint (#185 item 3)" "$2/bare.log" || [ "$bare" = PREPARED ] || bare="REFUSED-FOR-ANOTHER-REASON: $(tail -1 "$2/bare.log")"
     n1="$(ls "$2/tests/rulecheck/runs" | wc -l | tr -d ' ')"; [ -d "$2/build/rulecheck/2099-02-02-01" ] && left=yes || left=no
-    ( cd "$2" && python3 tools/rulecheck.py prepare --decision recommendation --subject probe --claim "$UNTIED_CLAIM" --artifact art.txt --id 2099-02-02-02 --untied-ok "a probe" ) > "$2/ok.log" 2>&1 && ok_=PREPARED || ok_="REFUSED: $(tail -1 "$2/ok.log")"
+    ( cd "$2" && python3 tools/rulecheck.py prepare --decision recommendation --subject probe --claim "$UNTIED_CLAIM" --artifact art.txt --id 2099-02-02-02 --session 14z-0 --untied-ok "a probe" ) > "$2/ok.log" 2>&1 && ok_=PREPARED || ok_="REFUSED: $(tail -1 "$2/ok.log")"
     rec="$(grep -h '^untied_ok' "$2"/tests/rulecheck/runs/2099-02-02-02/meta.tsv "$2"/build/rulecheck/2099-02-02-02/meta.tsv 2>/dev/null | head -1)"
     echo "bare=$bare runs_before=$n0 runs_after=$n1 run_dir_left=$left untied_ok=$ok_ meta=[$rec]"
 }

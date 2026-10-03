@@ -123,7 +123,7 @@
 # real picks on both sides; the 27 verdicts were re-frozen on them at 14z-160
 # and the ten Phobos DIVERGES rows of 14z-159 were verdicts on the VH2 branch.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged29] [PARTS="donovan_1 pyron_2"] [ALL=1] [JOBS=6] [FREEZE=1] [GOT_OUT=<path>] [KEEP=<dir>] [RNG_WORD=0100] [RNG_UNTIL=2600] tests/audit_move_parity.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged30] [PARTS="donovan_1 pyron_2"] [ALL=1] [JOBS=6] [FREEZE=1] [GOT_OUT=<path>] [KEEP=<dir>] [RNG_WORD=0100] [RNG_UNTIL=2600] tests/audit_move_parity.sh
 #   RNG_WORD / RNG_UNTIL (#183, 14z-186): a PROBE knob — the word poked into $FF80D4 on every frame from 2363 (default
 #   0000) and the frame the pin stops (default the part's end, i.e. never free); FREEZE=1 refuses either
 #   GOT_OUT (14z-183): also copy this run's computed per-event table to <path> (verdicts unaffected) — how a probe build's
@@ -137,7 +137,7 @@ set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
-BUILD="${BUILD:-build/m3b_merged29}"
+BUILD="${BUILD:-build/m3b_merged30}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN

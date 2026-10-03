@@ -40,7 +40,11 @@ SIGNATURES (each a measured property of the root's own window, never its name al
                  frame or one frame after it (the TRAP-REMAP window, `cl <= f0 + 1`) — Pyron's
                  Cosmo Disruption record remapped 0x51 -> 0x4F at 14z-75 (build/manifest/pyron.toml): the victim
                  takes a plain hit reaction where native takes the fire / knockdown one, the maintainer's read of
-                 the captures "Same reading: defect" (14z-186, #194, OPEN — the remap is the candidate cause)
+                 the captures "Same reading: defect" (14z-186, #194). ON merged-m22 (14z-189) the class reads NOTHING:
+                 #194 took the record to vs2's 0x44 equivalent and its five roots and their surfaced rows read IDENT
+                 at the event level (build/rc189/attr/battery_reds.txt); on screen the maintainer read the M22
+                 captures (build/rc189/cosmo/, native vs ours, M21 beside it) as "M22 matches native" (14z-189) —
+                 the branch stays as the history of the class
   GUARD-REENTRY  the first DIFF is P1's node on, or one frame after, the frame both legs leave the
                  block freeze (seq 0 -> 2) — vsavj re-enters the block animation (tests/audit_guard_reentry.sh)
   DEFENSE-ROW    the first DIFF is P1's HP alone, Phobos the victim, ours taking MORE (measured 11/13 on
@@ -230,8 +234,9 @@ def classify(part, k, trdir, rigdir, row):
         return ("TRAP-REMAP" if tenant == "huitzil" else "COLUMN-SHOCK"), f"P2 class 0x52 native / 0x06 ours at {cl}"
     if cl is not None and (n[cl]["p2cls"], o[cl]["p2cls"]) == (0x51, 0x4F) and cl <= f0 + 1:
         # 14z-186, found under #193: Pyron's Cosmo Disruption record class 0x51 remapped to 0x4F (14z-75) — the victim
-        # takes a plain hit reaction where native takes the fire / knockdown one (#194, open: the remap is the
-        # candidate cause, unmeasured as the cause)
+        # takes a plain hit reaction where native takes the fire / knockdown one (#194; on merged-m22, 14z-189, the
+        # class reads nothing: its rows are IDENT at the event level, and the maintainer read the captures as
+        # "M22 matches native")
         return "REACTION-51-OPEN", f"P2 class 0x51 native / 0x4F ours at {cl} (#194)"
     if fields == ["node"] or fields == ["cnt", "node"]:
         for t in (f0, f0 - 1):   # the node differs on the freeze-end frame or the one after it

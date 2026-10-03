@@ -1,6 +1,6 @@
 # tests/expected/latch_readers.tsv — every instruction operand naming a fighter block's confirm-latch offset,
 # on the two reference opcode views and the ported image (tools/audit_latch_readers.py; test_latch_readers.sh).
-# Evidence class: static (the decrypted opcode views; the ported image is build/m3b_merged29/verify_op.bin).
+# Evidence class: static (the decrypted opcode views; the ported image is build/m3b_merged30/verify_op.bin).
 # Frozen 14z-161 with FREEZE=1; re-freeze after a port stage that relocates a reader, never to absorb a new one unread.
 # Columns: image, addr, offset, what, class, width, mnemonic, operands
 #--
@@ -179,10 +179,10 @@ merged	0x41D2F0	0x3C2	flavor	read	b	tst.b	$3c2(a6)
 merged	0x41D4CC	0x3C2	flavor	read	b	tst.b	$3c2(a6)
 merged	0x41D9F0	0x3C2	flavor	read	b	tst.b	$3c2(a6)
 merged	0x42B8AE	0x3BC	flag	read	b	move.b	$3bc(a4), d1
-merged	0x474A80	0x3C2	flavor	read	b	tst.b	$3c2(a6)
-merged	0x476CD0	0x3C2	flavor	read	b	tst.b	$3c2(a6)
-merged	0x483E2E	0x3BC	flag	read	b	move.b	$3bc(a4), d1
-merged	0x4D488A	0x3C2	flavor	write	b	move.b	#$1, $3c2(a6)
-merged	0x4D48AC	0x3C2	flavor	write	b	move.b	#$0, $3c2(a6)
-merged	0x4D48C0	0x3C2	flavor	write	b	move.b	#$0, $3c2(a6)
-merged	0x4D48E2	0x3C2	flavor	write	b	move.b	#$1, $3c2(a6)
+merged	0x474AA0	0x3C2	flavor	read	b	tst.b	$3c2(a6)
+merged	0x476CF0	0x3C2	flavor	read	b	tst.b	$3c2(a6)
+merged	0x483E4E	0x3BC	flag	read	b	move.b	$3bc(a4), d1
+merged	0x4D48FA	0x3C2	flavor	write	b	move.b	#$1, $3c2(a6)
+merged	0x4D491C	0x3C2	flavor	write	b	move.b	#$0, $3c2(a6)
+merged	0x4D4930	0x3C2	flavor	write	b	move.b	#$0, $3c2(a6)
+merged	0x4D4952	0x3C2	flavor	write	b	move.b	#$1, $3c2(a6)

@@ -38,8 +38,10 @@ STAGING (untracked): build/rulecheck/<id>/{a,b}/ with the prompts.
 Usage:
   python3 tools/rulecheck.py fixtures
   python3 tools/rulecheck.py prepare --decision KIND --subject TEXT --claim "..." \
-          --artifact PATH[:FIRST-LAST] ... [--session 14z-N] [--model NAME] [--id ID]
-  python3 tools/rulecheck.py prepare --calibrate FIXTURE [--session 14z-N] [--model NAME]
+          --artifact PATH[:FIRST-LAST] ... --session 14z-N [--model NAME] [--id ID]
+  python3 tools/rulecheck.py prepare --calibrate FIXTURE --session 14z-N [--model NAME]
+                                       # --session on PREPARE is the sitting's 14z-N key, REQUIRED (#209);
+                                       # on record/spawned/collect it is a TRANSCRIPT PREFIX
   python3 tools/rulecheck.py record ID --session PREFIX      # a pinned-reader run: spawn-checked, reports collected (14z-178)
   python3 tools/rulecheck.py record ID --a FILE --b FILE      # a run from before the pinned reader
   python3 tools/rulecheck.py resolve ID --how "..."           # after a VIOLATED
@@ -302,11 +304,42 @@ def stage_artifacts(root: Path, src_specs, dst: Path):
     return out
 
 
+SESSION_KEY = re.compile(r"14z-\d+[a-z]*")
+
+
+def newest_state_key(root):
+    """the key of STATE.md's newest session group (its first `## Session 14z-N` heading), or None — a HINT
+    only: a new sitting's key is not in STATE.md until its group is written, so it is never used silently"""
+    try:
+        for ln in (root / "STATE.md").read_text(encoding="utf-8").splitlines():
+            m = re.match(r"## Session (14z-\d+[a-z]*)\b", ln)
+            if m:
+                return m.group(1)
+    except OSError:
+        pass
+    return None
+
+
+def session_key(a, root):
+    """#209: the ledger's `session` column is the sitting's 14z-N key. Without --session `prepare` used to write
+    `-` (runs 2026-10-02-563..573 read `-` while 562 read 14z-188, and a per-session count from the column came
+    out 1 for 7), and `record`'s own --session is a transcript PREFIX, so an 8-hex id slipped in on older rows.
+    prepare now REQUIRES the key and refuses anything that is not one."""
+    if not a.session:
+        hint = newest_state_key(root)
+        die("prepare needs --session 14z-N, the sitting's key (the ledger's `session` column, #209)"
+            + (f"; STATE.md's newest group is {hint} — a new sitting's key is not there until its group is written" if hint else ""))
+    if not SESSION_KEY.fullmatch(a.session):
+        die(f"--session {a.session!r} is not a 14z-N session key (#209): prepare's --session is the sitting's key; "
+            "a transcript prefix belongs to record/spawned/collect")
+    return a.session
+
+
 def cmd_prepare(a):
     root = REPO
     ledger_rows = read_ledger(root)
     fixtures = list_fixtures(root)
-    session = a.session or "-"
+    session = session_key(a, root)
     reader = reader_id(root)
     model = a.model or reader
     today = _dt.date.today().isoformat()

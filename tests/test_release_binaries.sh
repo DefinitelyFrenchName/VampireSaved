@@ -84,16 +84,16 @@
 # An OS this gate does not know still FAILS, naming what must be added — never
 # a silent pass.
 #
-# Usage: ROMDIR=... [MERGED=build/m3b_merged29] [RELEASE_EMULATORS=release/emulators]
+# Usage: ROMDIR=... [MERGED=build/m3b_merged30] [RELEASE_EMULATORS=release/emulators]
 #        tests/test_release_binaries.sh
-#   defaults build/m3b_merged29 (M21, the current freeze). SKIPs when no resource
+#   defaults build/m3b_merged30 (M21, the current freeze). SKIPs when no resource
 #   dir exists for this host's os-arch (tools/build_release_emulators.sh builds one).
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="$(cd "$ROMDIR" && pwd)"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
-MERGED="${MERGED:-build/m3b_merged29}"
+MERGED="${MERGED:-build/m3b_merged30}"
 ROOT="${RELEASE_EMULATORS:-release/emulators}"
 # The os-arch spelling MUST match tools/build_release_emulators.sh's, or this
 # gate looks in a directory that builder never wrote (and SKIPs, reading as
@@ -141,6 +141,9 @@ if [ ! -f "$MERGED/rompath/vsavjw.zip" ]; then
     echo "        ROMDIR=... MERGED=build/fromrelease tests/test_release_binaries.sh"
     exit 0
 fi
+# name the romset this run BOOTS, so the log says which build its verdict is about (14z-189, rule-checker run
+# 2026-10-03-578 Q1: the log named only the binaries)
+echo "== the romset booted: $MERGED/rompath/vsavjw.zip  sha1 $(shasum "$MERGED/rompath/vsavjw.zip" 2>/dev/null | cut -c1-12)"
 # the records are tracked, the files are RELEASE ASSETS (ruled 14z-149): a record with no file
 # beside it means this host has neither built nor fetched them — not measured, so SKIP (red
 # under --strict, which is right: a release host must have them)

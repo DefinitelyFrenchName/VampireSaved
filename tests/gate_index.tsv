@@ -424,3 +424,7 @@ tests/test_claim_lint.sh	runner
 tests/audit_demitri_split.sh	character-data
 tests/audit_pursuit_flag.sh	character-data
 tests/audit_ladder_pick_store.sh	character-data
+tests/test_close_standing.sh	runner
+tests/audit_tenant_continue_switch.sh	tenant
+tests/test_win_stdout_utf8.sh	platform
+tests/test_mame_default_bin.sh	platform

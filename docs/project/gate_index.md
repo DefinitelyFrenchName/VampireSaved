@@ -16,17 +16,17 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**415 scripts** — 111 ci_portable, 84 ci_static, 220 emulator-tier (run by name).
+**419 scripts** — 114 ci_portable, 84 ci_static, 221 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 40 | the suite runners and their own ground truth |
+| [runner](#runner) | 41 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
-| [platform](#platform) | 39 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
+| [platform](#platform) | 41 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 58 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
-| [tenant](#tenant) | 84 | tenant content — per-character gates and on-demand audits on the ported characters |
+| [tenant](#tenant) | 85 | tenant content — per-character gates and on-demand audits on the ported characters |
 | [character-data](#character-data) | 68 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
@@ -52,6 +52,7 @@ the suite runners and their own ground truth.
 | `tests/test_claim_lint.sh` | test | ci_portable | — | every universal or definite in a rule-checker claim is tied to a named check or to the claim's NOT TESTED part (tools/claim_lint.py, 14z-187b, GitHub #185 item 3). | 14z-187b |
 | `tests/test_close_checks.sh` | test | ci_portable | — | the close's check runner times every check, re-runs one alone, and never lets a partial run read as the run of record (`tools/close_checks.py`, 14z-185b, GitHub #187). | 14z-185b |
 | `tests/test_close_loop_cost.sh` | test | ci_portable | — | the close-loop cost reader counts every pass of a close's check runner and the packet's span, whatever interpreter ran the runner and however a prepare's output was cut (`tools/agent/close_loop_cost.py`, 14z-187b, GitHub #187). | 14z-187b |
+| `tests/test_close_standing.sh` | test | ci_portable | — | the standing close-check set renders with every list derived and every plant generated, its claim comes from the run of record, and a finding is appended in the table's form (GitHub #204, #206, #207; 14z-189). | 14z-189 |
 | `tests/test_controls_contract.sh` | test | ci_portable | — | ground truth for THE MUST-FIRE CONTRACT'S READER, tests/lib/controls.sh: the four regexes of the R10 grammar, the leading comment block as the header (a bare `#` continues it, a non-comment line ends it), the declared-vs-fired readback the… | 14z-147 |
 | `tests/test_demand_after_trap.sh` | test | ci_portable | — | no gate carries a `${VAR:?msg}` DEMAND after its EXIT trap (14z-134). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-134 |
 | `tests/test_emulator_runner.sh` | test | ci_portable | — | ground truth for tests/run_all_emulator.sh (14z-128). ROM-free, ~26 s (measured 14z-162; the header said ~5 s). | 14z-128 |
@@ -134,6 +135,7 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 | `tests/test_frozen_rompath_guard.sh` | test | ci_static | ROMDIR | tools/build_donovan.sh must refuse to rebuild over a FROZEN REFERENCE rompath (14z-90, GitHub issue #26). | 14z-90 |
 | `tests/test_host_libs.sh` | test | ci_portable | — | tools/check_host_libs.py, the rule a Linux release folder is held to (every file's DIRECT NEEDED sonames are shipped in the folder and resolve there, or are on tests/expected/linux_host_provided.tsv; | 2026-09-13 |
 | `tests/test_input_integrity.sh` | test | emulator | MAME | ground truth for the input-integrity check. | session 14z |
+| `tests/test_mame_default_bin.sh` | test | ci_portable | — | with MAME_BIN unset, tools/run_mame.sh runs the PINNED build for the set, never the `mame` on PATH (14z-189, #196). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-189 |
 | `tests/test_mame_determinism.sh` | test | emulator | MAME | is MAME actually deterministic, run to run? | session 14z |
 | `tests/test_mame_parity.sh` | test | emulator | MAME, FBNeo, ~16 s | B5 PREREQUISITE: the pinned MAME source build must be indistinguishable from the binary that froze the oracle, BEFORE any profile patch is applied to it. | 14z-187b |
 | `tests/test_mame_wide.sh` | test | emulator | MAME, FBNeo, a build dir | CPS-2 WIDE profile gate, MAME side (B5). | session 14z |
@@ -151,6 +153,7 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 | `tests/test_replay_video_selfcheck.sh` | test | emulator | MAME, FBNeo, a build dir | ground truth for replay.lua's VIDEO_OUT, the MAME per-frame framebuffer checksum. | session 14z |
 | `tests/test_romset_identity.sh` | test | ci_static | ROMDIR | ground truth for tools/audit_romset_identity.py. | 14z-60z |
 | `tests/test_wide_profile.sh` | test | emulator | FBNeo, a build dir | CPS-2 WIDE profile gate (Phase B). | 14z-123 |
+| `tests/test_win_stdout_utf8.sh` | test | ci_portable | — | the Windows-run python tools write UTF-8, never cp1252 (14z-189, #130). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-189 |
 
 ## pipeline
 
@@ -320,6 +323,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 | `tests/audit_select_bank_gates.sh` | audit | ci_static | ROMDIR | the merged drawer bank gates must gate EVERY declaring tenant's id (14z-84). | 14z-84 |
 | `tests/audit_stage_sweep.sh` | audit | emulator | MAME, a build dir, ~6 min | EVERY TENANT ON EVERY STAGE (14z-104, the §4 "each stage" cell — no stage sweep existed anywhere before this). | 14z-104 |
 | `tests/audit_tech_roll.sh` | audit | emulator | MAME, a build dir, ~1 min | THE TECH ROLL (moving recovery), both directions per tenant, plus the pursuit-vs-roll counter (14z-104 (3); coverage matrix gap 1, maintainer-described mechanic 2026-08-22). | 14z-104 (3) |
+| `tests/audit_tenant_continue_switch.sh` | audit | emulator | MAME, FBNeo, a build dir, ~1.5 min | A TENANT CPU OPPONENT SURVIVES A CONTINUE-AND-SWITCH (GitHub #202, 14z-189): lose to CPU Phobos as Donovan, continue, answer NO to "same character?" and pick Aulbath, and the ladder's re-pick is SKIPPED by the 14z-87 keep-tenant thunk — Aul… | 14z-189 |
 | `tests/audit_tenant_downwin.sh` | audit | emulator | MAME, a build dir, ~1.5 min | THE LIFE-MARKER TRANSITION (KO-path judge), both directions per tenant (14z-104). | 14z-104 |
 | `tests/audit_tenant_throws.sh` | audit | emulator | MAME, a build dir, ~1 min | NORMAL THROWS, both directions per tenant (14z-104, coverage matrix). | 14z-104 |
 | `tests/audit_tenant_timeout.sh` | audit | emulator | MAME, a build dir, ~2 min | THE TIMEOUT JUDGE, per tenant (14z-104). | 14z-104 |

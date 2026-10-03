@@ -294,6 +294,10 @@ test_run_on_snapshot
 # 14z-185b (#187): the close's check runner (tools/close_checks.py) times every check, re-runs one alone with
 # --only, and never lets a partial run read as the run of record; two controls. ~1 s.
 test_close_checks
+# 14z-189 (#204, #206, #207): the standing close-check set (tests/close_standing_checks.tsv) renders from key, row and
+# run dir with its lists derived and its plants generated; the packet claim comes from the run of record; a finding is
+# appended in the table's form (tools/findings_add.py); six controls. ~3 s.
+test_close_standing
 # 14z-187b (#187): the close-loop cost reader (tools/agent/close_loop_cost.py) counts every pass of a close's
 # check runner whatever interpreter runs it, and finds the packet's span from a tail-cut prepare; three controls. ~1 s.
 test_close_loop_cost
@@ -324,3 +328,9 @@ test_freeze_set_shape
 # #185 item 3: every universal/definite in a rule-checker claim is tied to a named check or the NOT TESTED part
 # (tools/claim_lint.py, wired into rulecheck prepare); a real fixture (run 2026-10-01-518); four controls. ~2 s.
 test_claim_lint
+# #130 (14z-189): the Windows-run python tools write UTF-8, never cp1252 (a PYTHONIOENCODING=cp1252
+# stand-in for MSYS2's native-python pipe, reproduced on ERIS); one control. ~1 s.
+test_win_stdout_utf8
+# #196 (14z-189): an unset MAME_BIN makes tools/run_mame.sh run the PINNED build for the set (WIDE for vsavjw,
+# the reference build for stock sets), never the mame on PATH; a missing default is refused; one control. ~1 s.
+test_mame_default_bin

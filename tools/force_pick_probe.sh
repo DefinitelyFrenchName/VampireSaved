@@ -35,7 +35,9 @@ mkdir -p "$OUT"
 # 14z-128 sweep (`test_pyron_ladder`), where the stage-6 build was in fact
 # perfect — measured: with MAME_BIN set the SAME build reports id-hold, char
 # LOADED and guard clean.
-_BIN="${MAME_BIN:-mame}"
+# #196 (14z-189): the same default by set name as tools/run_mame.sh, never the `mame` on PATH.
+case "${SET:-vsavj}" in vsavjw) _def="$HOME/.cache/vampire-saved/mame/cps2" ;; *) _def="$HOME/.cache/vampire-saved/mame-ref/cps2" ;; esac
+_BIN="${MAME_BIN:-$_def}"
 if ! command -v "$_BIN" >/dev/null 2>&1 && [ ! -x "$_BIN" ]; then
     echo "FAIL: MAME binary '$_BIN' not found — set MAME_BIN" >&2; exit 2
 fi

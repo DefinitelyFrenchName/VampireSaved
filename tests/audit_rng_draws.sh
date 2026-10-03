@@ -40,7 +40,7 @@
 #   longs; what the tracker timeout does to a player's inputs (the seesaawiki cross-check is in
 #   engine_internals.md). The parity gates' 0000 pin, the RNG's fixed point, is #183.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged29] [DON=build/don_m25 HUI=build/hui59 PYR=build/pyron44] [FREEZE=1] [KEEP=<dir>] tests/audit_rng_draws.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged30] [DON=build/don_m26 HUI=build/hui60 PYR=build/pyron45] [FREEZE=1] [KEEP=<dir>] tests/audit_rng_draws.sh
 #   emulator tier, MAME; ~1 min (8 legs in parallel)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
@@ -48,8 +48,8 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged29}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
-DON="${DON:-build/don_m25}"; HUI="${HUI:-build/hui59}"; PYR="${PYR:-build/pyron44}"
+BUILD="${BUILD:-build/m3b_merged30}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
+DON="${DON:-build/don_m26}"; HUI="${HUI:-build/hui60}"; PYR="${PYR:-build/pyron45}"
 EXPECT="$REPO/tests/expected/rng_draws.tsv"
 RIGS="$REPO/tests/replays/chains174"
 TENANTS="huitzil donovan pyron"

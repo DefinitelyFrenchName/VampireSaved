@@ -54,6 +54,7 @@ declares	audit_rng_forms
 declares	audit_shared_wall_push
 declares	audit_stock_emulator_stall
 declares	audit_tech_roll
+declares	audit_tenant_continue_switch
 declares	audit_throw_registration
 declares	audit_tick_cadence
 declares	audit_tick_phase
@@ -86,6 +87,7 @@ declares	test_checkskills
 declares	test_claim_lint
 declares	test_close_checks
 declares	test_close_loop_cost
+declares	test_close_standing
 declares	test_close_tools
 declares	test_commit_subject
 declares	test_community_crosscheck
@@ -123,6 +125,7 @@ declares	test_jtsim_scratch_heal
 declares	test_lane_carry
 declares	test_latch_readers
 declares	test_mame_bin_pinned
+declares	test_mame_default_bin
 declares	test_mame_parity
 declares	test_md_subset
 declares	test_measures_contract
@@ -185,3 +188,4 @@ declares	test_vanilla_aerial_join
 declares	test_vanilla_frame_join
 declares	test_wide_profile
 declares	test_win_quote_decode
+declares	test_win_stdout_utf8

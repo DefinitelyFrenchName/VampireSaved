@@ -36,7 +36,13 @@ report — measured, `tools/agent/probe_agents.sh` A10):
   WM  the model and effort the worker actually RAN at (fields of its assistant records)
   WT  each of the worker's own tool calls (tool, head of its command or path)
   WR  each result the worker got: `ok` or `ERROR`, and its first 160 characters
-  WX  the worker's REPORT, verbatim, line by line (bounded)
+  WX  the worker's REPORT, verbatim, line by line (bounded): its SubagentHandback when its own
+      transcript holds one; else the hand-back the SESSION received from it (an `<agent-message
+      from="<id>">` record, anywhere in the transcript — it can arrive after `--to`), marked as such;
+      else, for a BACKGROUND worker, `NOT DELIVERED` with its last text so far marked as NOT a report
+      (#208: the 14z-188 close's extract was cut six seconds before a checker handed back, and its
+      first text "Let me read all the named files." read as its report — procedure run
+      2026-10-02-566 QP5); a foreground worker's last text, as before
   W#  every figure of the report that no result the WORKER itself got contains (QP3 widened
       to workers, ruled 2026-09-23) — a hint, as A# is; the spec is NOT a source, because a
       figure found only in the spec was handed to the worker, not measured by it
@@ -116,7 +122,26 @@ def workers_of(path):
     return found
 
 
-def worker_lines(tag, block, inp, workers):
+def session_handbacks(path):
+    """-> {agent_id: (record, report)} for every `[Subagent hand-back]` the session received, over the WHOLE
+    transcript (a hand-back can arrive after the span's end). The report is the text after the frame's
+    "The report follows:" line, each line's two-space harness indent removed (#208)."""
+    found = {}
+    for n, r in agentlib.records(path):
+        a = r.get("attachment") or {}
+        hb = str(a.get("prompt", "")) if r.get("type") == "attachment" else ""
+        if not hb.startswith("<agent-message"):
+            continue
+        who = re.search(r'from="([^"]+)"', hb)
+        body = hb.split("The report follows:\n", 1)
+        if not who or len(body) < 2 or "[Subagent hand-back]" not in body[0]:
+            continue
+        text = body[1].rsplit("</agent-message>", 1)[0].rstrip("\n")
+        found.setdefault(who.group(1), (n, "\n".join(ln[2:] if ln.startswith("  ") else ln for ln in text.split("\n"))))
+    return found
+
+
+def worker_lines(tag, block, inp, workers, sess_hb=None):
     """The W block for one Agent call (see the module docstring)."""
     out = []
     over = f" (model override: {inp['model']})" if inp.get("model") else ""
@@ -130,7 +155,7 @@ def worker_lines(tag, block, inp, workers):
     if not w:
         out.append(f"{tag} W  NO WORKER TRANSCRIPT for this call — its commands and report cannot be read")
         return out
-    _, _, recs = w
+    agent_id, meta, recs = w
     # the REPORT is what the worker DELIVERED: its SubagentHandback message when it made one, else
     # its last text. A text written AFTER the hand-back is never delivered and must not override it
     # (14z-178, procedure run 2026-09-24-137 QP5: a worker's trailing prose, written after a
@@ -158,8 +183,20 @@ def worker_lines(tag, block, inp, workers):
             elif t == "text" and r.get("type") == "assistant" and b.get("text", "").strip():
                 report = b["text"].strip()
     out.insert(1 + min(len(spec), SPEC_LINES + 1), f"{tag} WM ran on {','.join(sorted(models))} at effort {','.join(sorted(efforts))}")
+    note = ""
     if handback is not None:
         report = handback
+    elif agent_id in (sess_hb or {}):
+        hn, report = sess_hb[agent_id]
+        note = f"(the hand-back the session received at record {hn}; the worker's own transcript holds no SubagentHandback)"
+    elif (meta or {}).get("requestShape") == "background":
+        last = report
+        report = ""
+        note = ("(NOT DELIVERED when this extract was made: no SubagentHandback in the worker's transcript and no hand-back "
+                "in the session's — the worker may still have been running; its last text so far, NOT a report: "
+                + (" ".join(last.split())[:160] if last else "none") + ")")
+    if note:
+        out.append(f"{tag} WX {note}")
     rep = report.split("\n") if report else ["(no report)"]
     for ln in rep[:REPORT_LINES]:
         out.append(f"{tag} WX | {ln}")
@@ -174,6 +211,7 @@ def worker_lines(tag, block, inp, workers):
 def extract(path, first=0, last=None):
     out, corpus = [], []
     workers = workers_of(path)
+    sess_hb = session_handbacks(path)
     tracked, detached = {}, []
     for n, r in agentlib.records(path):
         if last is not None and n > last:
@@ -231,7 +269,7 @@ def extract(path, first=0, last=None):
                 if inside:
                     out.append(f"[{n} {ts}] T  {b.get('name')}{bg}: {inp.get('description', '')} :: {what}")
                     if b.get("name") in ("Agent", "Task"):
-                        out.extend(worker_lines(f"[{n} {ts}]", b, inp, workers))
+                        out.extend(worker_lines(f"[{n} {ts}]", b, inp, workers, sess_hb))
                 if b.get("name") == "Bash" and not inp.get("run_in_background"):
                     why = agentlib.detach_reason(str(inp.get("command", "")))
                     if why:
@@ -314,6 +352,12 @@ def selftest():
         rec("user", "<task-notification>\n<task-id>tq8</task-id>\n<status>completed</status>\n</task-notification>"),
         rec("user", "why did it print <task-notification><result>4455</result> earlier?"),
         rec("assistant", [{"type": "text", "text": "and 3344 is mine"}]),
+        # #208: two BACKGROUND workers whose own transcripts hold only a first text (cut mid-run):
+        # w3's report reached the session as a hand-back AFTER the call, w4's never did
+        rec("assistant", [{"type": "tool_use", "id": "a3", "name": "Agent", "input": {"subagent_type": "rule-checker", "description": "c3", "prompt": "Q1"}}]),
+        rec("assistant", [{"type": "tool_use", "id": "a4", "name": "Agent", "input": {"subagent_type": "rule-checker", "description": "c4", "prompt": "Q1"}}]),
+        {"type": "attachment", "timestamp": "2026-09-23T10:09:00Z",
+         "attachment": {"type": "queued_command", "prompt": '<agent-message from="w3">\n[Subagent hand-back] The text below is the final report. The report follows:\n  Q1: OK — six lines\n  VERDICT: OK\n</agent-message>'}},
     ]
     with open(main, "w") as g:
         for r in wrows:
@@ -333,7 +377,14 @@ def selftest():
                   {"type": "assistant", "effort": "high", "message": {"model": "mS", "content": [
                       {"type": "text", "text": "Trailing prose written after the hand-back, never delivered."}]}}):
             g.write(json.dumps(r) + "\n")
+    for wid, tu in (("w3", "a3"), ("w4", "a4")):
+        with open(os.path.join(d, "s", "subagents", f"agent-{wid}.meta.json"), "w") as g:
+            json.dump({"agentType": "rule-checker", "toolUseId": tu, "requestShape": "background"}, g)
+        with open(os.path.join(d, "s", "subagents", f"agent-{wid}.jsonl"), "w") as g:
+            g.write(json.dumps({"type": "assistant", "effort": "high", "message": {"model": "mR", "content": [
+                {"type": "text", "text": "Let me read all the named files."}]}}) + "\n")
     wg = extract(main)
+    wg_cut = extract(main, last=len(wrows) - 2)   # the span ends BEFORE w3's hand-back arrives
     shutil.rmtree(d)
     wline = next((ln for ln in wg.split("\n") if " W# " in ln), "")
     checks.update({
@@ -353,6 +404,13 @@ def selftest():
         "a notification with no <result> carries no report": "task tq8 arrived" not in wg,
         "a message QUOTING a notification is not a report": "4455" not in "".join(ln for ln in wg.split("\n") if " H  " in ln),
         "an unsourced figure after them is still flagged": any("A# " in ln and "3344" in ln for ln in wg.split("\n")),
+        # #208
+        "a background worker's report is the hand-back the session received (#208)": "WX | Q1: OK — six lines" in wg
+            and "WX (the hand-back the session received at record" in wg,
+        "...even when the hand-back arrives after the span's end (#208)": "WX | Q1: OK — six lines" in wg_cut,
+        "a background worker's first text is never its report (#208)": not any(" WX | Let me read" in ln for ln in wg.split("\n")),
+        "a background worker with no hand-back anywhere is NOT DELIVERED (#208)": "WX (NOT DELIVERED when this extract was made" in wg
+            and "NOT a report: Let me read all the named files.)" in wg,
     })
     bad = [k for k, v in checks.items() if not v]
     for k in bad:

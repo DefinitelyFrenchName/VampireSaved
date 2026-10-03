@@ -5,7 +5,7 @@ those instruments — rule-checker run 2026-09-28-403; promoted from build/rc185
 close checklist's step 5.)
 
 Usage:
-  ROMDIR=... python3 tools/patch_site_read.py --build build/m3b_merged28 --build build/m3b_merged29 \\
+  ROMDIR=... python3 tools/patch_site_read.py --build build/m3b_merged28 --build build/m3b_merged30 \\
          --site 0x01886C:#159 --site 0x02393A:#182 [--set vsavjw] [--pristine vsavj]
 
 For each build: its program key and whole-set key (tools/build_fingerprint.py, --sha-only and --set-key run

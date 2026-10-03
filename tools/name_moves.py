@@ -115,13 +115,13 @@ FIRST_EVENT = 2600
 # moves are the events) and their P2 is the tenant, so they keep replay 17's
 # routes and pokes unchanged.
 # The chains are decoded from each tenant's vs2 extract (the solo build dir).
-TENANTS = {"donovan": {"id": None, "p2_id": "01", "p2_path": ("R",), "build": "build/don_m25"},
+TENANTS = {"donovan": {"id": None, "p2_id": "01", "p2_path": ("R",), "build": "build/don_m26"},
            # PHASE 3 (reactions): the tenant on the VICTIM side (P2) — P1 is Victor (0x03), both by the early-window pokes
-           "donovan_victim": {"id": "03", "id_p2": "13", "build": "build/don_m25"},
-           "huitzil_victim": {"id": "03", "id_p2": "10", "build": "build/hui59"},
-           "pyron_victim":   {"id": "03", "id_p2": "11", "build": "build/pyron44"},
-           "huitzil": {"id": "10", "path": ("L", "L", "L"), "p2_id": "01", "p2_path": ("R",), "build": "build/hui59"},
-           "pyron":   {"id": "11", "path": ("R", "R", "R"), "p2_id": "01", "p2_path": ("R",), "build": "build/pyron44"}}
+           "donovan_victim": {"id": "03", "id_p2": "13", "build": "build/don_m26"},
+           "huitzil_victim": {"id": "03", "id_p2": "10", "build": "build/hui60"},
+           "pyron_victim":   {"id": "03", "id_p2": "11", "build": "build/pyron45"},
+           "huitzil": {"id": "10", "path": ("L", "L", "L"), "p2_id": "01", "p2_path": ("R",), "build": "build/hui60"},
+           "pyron":   {"id": "11", "path": ("R", "R", "R"), "p2_id": "01", "p2_path": ("R",), "build": "build/pyron45"}}
 P2_NEVER  = ("b:0x71", "b:0x74")   # Demitri's two ATTACK-record chains whose data differs between vsavj and vs2 (tests/expected/same_data_p2.tsv row 0x01): if P2 entered one his compared HP would differ by his own data, so the rigs assert he never does (measured: never entered)
 P2_REPORT = ("b:0x10", "a2:0x04", "a2:0x05", "a2:0x0a")   # 14z-187b (ruled "Declare, ticket forbid"): the three a2 chains P2 ENTERS
                                     # over all 32 parts whose ATTACK RECORDS differ between the games (a2:0x04 his 5HP 14/13, a2:0x05 13/12,

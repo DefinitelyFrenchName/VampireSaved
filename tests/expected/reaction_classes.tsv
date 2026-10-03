@@ -1,6 +1,6 @@
 # tests/expected/reaction_classes.tsv — the route of a hit's class from the attack record (+0x17) through the three stager
 # tables (ground / air / KO: what each writes into the victim's +0x54) to the reaction table, for pristine vsavj, vs2 and
-# our merged build (m3b_merged29); the property bytes; the shock handler's shape on each; the legacy record census by
+# our merged build (m3b_merged30); the property bytes; the shock handler's shape on each; the legacy record census by
 # class; every constant write to +0x54 (tests/test_reaction_classes.sh; tools/audit_reaction_classes.py). Evidence class:
 # static. Frozen 14z-169 with FREEZE=1. Columns: <game> <kind> <where> <class> <value>.
 # The ours rows follow the build: re-freeze at every freeze, reviewing the diff.
@@ -189,8 +189,8 @@ ours	imm54	value	38	0fff50/a1
 ours	imm54	value	39	none
 ours	imm54	value	48	none
 ours	imm54	value	4e	none
-ours	imm54	value	52	47172c/a1
-ours	rec17-cmp	all	-	00,01,02,03,0b,0c,0d,0e,0f,2c,2d,37,38,39,42,48,4a,4d
+ours	imm54	value	52	47174c/a1
+ours	rec17-cmp	all	-	00,01,02,03,0b,0c,0d,0e,0f,2c,2d,37,38,39,42,44,48,4a,4d
 ours	rec17-cmp	class	06	none
 ours	rec17-cmp	class	07	none
 ours	rec17-cmp	class	08	none
@@ -208,4 +208,4 @@ ours	cmp54	class	39	none
 ours	cmp54	class	48	none
 ours	cmp54	class	4e	none
 ours	cmp54	class	52	41bd7c
-ours	build	merged-m21	-	a97d1ace
+ours	build	merged-m22	-	797af4a5

@@ -346,6 +346,20 @@ shows how a file was read; the procedure check's `WT` lines are what see it. An 
 large artifacts the reader only grepped is not a reading of them: hand the reader the script-written
 window the claim rests on as its own artifact, beside the full file.
 
+**An extract cut while a worker is still running shows that worker's LATEST TEXT as its report (paid:
+the 14z-188 close, procedure run `2026-10-02-566` QP5; found and fixed 14z-189, #208).** The close's
+part-4 extract `build/agent188/c1/x188_4.txt` was written at 17:36:01Z; run 562's second reader
+delivered its six-line verdict as a hand-back at 17:36:07Z, six seconds later (records 7371/7379 of
+transcript `74077d05`; `build/agent189/t208_ident.txt`, extract mtime by a measurer). So the extract
+showed that reader's text so far, "Let me read all the named files.", as its `WX` report, and QP5
+ruled VIOLATED on a worker that had not finished. (#208 was filed reading this as "the extract shows a
+hand-back worker's FIRST message"; it was not — `extract.py` already preferred a worker's own hand-back.)
+**Since 14z-189 `WX` takes, in order:** the worker's own hand-back; else the hand-back the SESSION
+received, searched over the whole transcript (it can arrive after `--to`), marked as such; else, for a
+background worker, `NOT DELIVERED`, with its last text marked "NOT a report". Fixture
+`tests/agent/handback_fixture/` (cut from `74077d05`), gate `tests/test_agent_extract.sh`, control
+`handback-ignored`. Rule: cut a procedure extract only after every worker it covers has delivered.
+
 - **Operational slips.** A waiter wedged for hours is not a rule-application
   failure; it was not looking. The checker does not fix that.
 - **A premise nobody wrote down.** It can only ask whether the premise is
@@ -400,3 +414,17 @@ the plant's name and slot, and both verdicts verbatim. The gate reads all of
 it: every row well-formed, every run dir complete, every verdict file
 structured and agreeing with its row, every fixture calibrated, every
 `VIOLATED` resolved, every freeze since the birth named.
+
+**The `session` column, and `--session`'s two meanings (paid: the 14z-188 close; fixed 14z-189, #209).**
+Until 14z-189 `prepare`'s `--session 14z-N` was OPTIONAL: without it the run's `meta.tsv` said
+`session -` and `record` copied that into the ledger. At the 14z-188 close one packet run carried the
+key and the next eleven read `-`, so a count of "this session's runs" by the column was short; the
+column holds three forms for that reason — a `14z-N` key, `-`, and on older rows an 8-hex transcript
+id — and those rows are not rewritten (the ledger is append-only). **Since 14z-189 `prepare`
+REQUIRES `--session 14z-N`** and refuses a value that is not a session key (`14z-` + digits +
+optional letters); an 8-hex transcript prefix, which is what `--session` means on `record`,
+`spawned` and `collect`, is refused by name. Without the flag it stops before creating anything and
+names STATE.md's newest group as a hint, never as a default (a new sitting's key is not in STATE.md
+until its group is written). Count a session's runs from before 14z-189 by run-id range or `date`,
+never by this column alone. The gate is `tests/test_rule_checker.sh` "PREPARE SESSION KEY", control
+`keyless-prepare`.

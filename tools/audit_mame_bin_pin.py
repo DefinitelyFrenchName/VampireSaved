@@ -2,8 +2,10 @@
 """audit_mame_bin_pin.py — every gate that boots `vsavjw` through a MAME
 wrapper must PIN the MAME binary (14z-133).
 
-THE CLASS. tools/run_mame.sh (and run_replay_mame.sh / run_replay_guarded.sh
-above it) falls back to `mame` on PATH when MAME_BIN is unset. On this
+THE CLASS (SINCE 14z-189, #196, tools/run_mame.sh itself defaults an unset MAME_BIN to the pinned
+build for the set, so the failure below can no longer happen through the wrappers; this audit
+stays as the gate-level rule). Until then tools/run_mame.sh (and run_replay_mame.sh /
+run_replay_guarded.sh above it) fell back to `mame` on PATH when MAME_BIN was unset. On this
 machine that is Homebrew's stock MAME, which answers "Unknown system 'vsavjw'"
 and exits — so a leg that boots our WIDE build produces NO DUMPS, and a gate
 with a liveness check reports "held the victim on only 0 frames" while a gate

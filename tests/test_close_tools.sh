@@ -17,7 +17,12 @@
 #   citing a build/ file, an untracked file and a § anchor on no line, a prose-cited document that resolves nowhere and a
 #   parenthesised test clause saying scratch, and a backticked and a prose name that end two or
 #   more tracked files but are none of them exactly (AMBIGUOUS, rule-checker run 2026-09-25-206), are
-#   caught on all eleven, and a real gate stem, a clean ticket and a prose-cited README resolve;
+#   caught on all eleven, and a real gate stem, a clean ticket and a prose-cited README resolve; and
+#   (since 14z-189, #205) a bare document name that resolves is REPORTED TRACKED (in prose and
+#   backticked), one in a home that resolves nowhere FAILs, and every finding letter is judged on its
+#   OWN homes — a letter whose homes resolve to no tracked file and no ticket row FAILs, whatever the
+#   other letters cite (four such letters in the plant), and an option's `(a)` inside a finding is not
+#   a letter;
 #   (1c, since 14z-184) tools/close_findings.py --selftest: its planted-address, suffix-address (the
 #   second address a `/NN` suffix form names) and old-home-only controls all fire; (2c, since
 #   14z-188) tools/none_reasons.py --selftest: a findings row whose test is a bare `none` is caught,
@@ -38,6 +43,8 @@
 # MUST-FIRE: perturbed-copy: gone-reintroduced — a copy of a retraction TSV with a wording KNOWN to be live (a reach control's text minus its first word, so the copy repeats no pattern) marked `gone` must make tools/retraction_grep.py exit 1 naming it, so a retracted wording that comes back is a red (in-gate; mode: the copy replaces the real file and the gate FAILs)
 # MUST-FIRE: known-bad: case-fold-dropped — tools/retraction_grep.py --selftest --nofold: the matcher with its case-folding REMOVED (a known-bad variant) must print SELFTEST FAIL naming the upper-case heading case, while --selftest prints SELFTEST PASS — the self-test matches planted TEXTS (a wording in an UPPER-CASE heading, one wrapped across a `#` prefix, one across a Lua `--` prefix, one code-spanned), not the tree, so no stray carrier elsewhere can mask a matcher defect (rule-checker run 2026-09-25-199 Q4) (in-gate; mode: the no-fold variant is the one checked, so the gate FAILs)
 # MUST-FIRE: known-bad: build-home-planted — tools/homes_tracked.py --selftest --blind: the tool with its build/ reads DISABLED (a known-bad variant) must FAIL its own self-test, whose planted row cites a backticked build/ file and a prose build/ path, an unresolved name, an unresolved gate stem, a ticket with no index row, ticket rows (a planted index) citing a build/ file, an untracked file and a § anchor on no line, a prose-cited document that resolves nowhere and a parenthesised scratch-citing test clause (in-gate: --selftest must print SELFTEST PASS and --selftest --blind must print SELFTEST FAIL naming the two build/ reads as missed — a traceback is DEAD, not fired; mode: the blind variant is the one checked, so the gate FAILs because the plant is not caught)
+# MUST-FIRE: known-bad: bare-name-silent — tools/homes_tracked.py --selftest --nobare: the tool with bare-name resolution REMOVED (the pre-#205 tool, a bare `engine_internals` silent) must print SELFTEST FAIL with bare=False, while --selftest prints SELFTEST PASS (section 2; #205, rule-checker run 2026-10-02-562) (in-gate; mode: the no-bare variant is the one checked, so the gate FAILs)
+# MUST-FIRE: known-bad: letter-unchecked — tools/homes_tracked.py --selftest --noletters: the tool with the PER-LETTER home check removed must print SELFTEST FAIL with letters=False, so a finding whose only home resolves nowhere cannot pass on the other letters' homes (section 2; #205) (in-gate; mode: the no-letters variant is the one checked, so the gate FAILs)
 # MUST-FIRE: known-bad: bare-none-accepted — tools/none_reasons.py --selftest --lenient: the reason check with a bare `none` ACCEPTED (a known-bad variant) must print SELFTEST FAIL on the planted bare-none row, while --selftest prints SELFTEST PASS (section 2c; 14z-188 close, rule-checker run 2026-10-02-563)
 #
 # WHY: at the 14z-181 close the two checks lived in inline scripts recorded nowhere, and the
@@ -104,11 +111,15 @@ else echo "REFUSED: tools/close_findings.py --selftest neither passed nor named 
 echo "== 2. the homes tool catches a planted untracked home"
 blind=""
 if vs_ctl_is build-home-planted; then blind="--blind"; echo "MODE: control build-home-planted — the self-test runs on the BLIND variant (build/ reads disabled): the plant must go uncaught and the gate FAIL"; fi
+if vs_ctl_is bare-name-silent; then blind="--nobare"; echo "MODE: control bare-name-silent — the self-test runs WITHOUT bare-name resolution (the pre-#205 tool): the plant must go uncaught and the gate FAIL"; fi
+if vs_ctl_is letter-unchecked; then blind="--noletters"; echo "MODE: control letter-unchecked — the self-test runs WITHOUT the per-letter home check: the plant must go uncaught and the gate FAIL"; fi
 out="$(python3 tools/homes_tracked.py --selftest $blind 2>&1)"; rc=$?
 if [ "$rc" -eq 0 ] && printf '%s\n' "$out" | grep -q '^SELFTEST PASS'; then ok "$(printf '%s\n' "$out" | tail -1)"
 elif printf '%s\n' "$out" | grep -q '^SELFTEST FAIL'; then
     bad "$(printf '%s\n' "$out" | grep '^SELFTEST FAIL' | cut -c1-160)"
     if vs_ctl_is build-home-planted && ! printf '%s\n' "$out" | grep -q '^SELFTEST FAIL: (False, False'; then echo "REFUSED: mode build-home-planted — the blind self-test failed but NOT on the two build/ reads"; exit 3; fi
+    if vs_ctl_is bare-name-silent && ! printf '%s\n' "$out" | grep -q '^SELFTEST FAIL:.* bare=False'; then echo "REFUSED: mode bare-name-silent — the no-bare self-test failed but NOT on the bare names"; exit 3; fi
+    if vs_ctl_is letter-unchecked && ! printf '%s\n' "$out" | grep -q '^SELFTEST FAIL:.* letters=False'; then echo "REFUSED: mode letter-unchecked — the no-letters self-test failed but NOT on the letters"; exit 3; fi
 else echo "REFUSED: the self-test neither passed nor failed on its own line (exit $rc — a crash, not a verdict): $(printf '%s\n' "$out" | tail -1 | cut -c1-160)"; exit 3; fi
 
 echo "== 2c. the reason check (tools/none_reasons.py --selftest): a finding whose test is none must say why"
@@ -145,6 +156,12 @@ if [ -z "${VS_CTL:-}" ]; then
     if python3 tools/none_reasons.py --selftest --lenient >"$W/c6.out" 2>&1; then vs_ctl_dead bare-none-accepted "the lenient variant passed the self-test — the bare-none plant is not what it catches"; fail=1
     elif grep -q '^SELFTEST FAIL: want 1 got 0' "$W/c6.out"; then vs_ctl_fired bare-none-accepted "the lenient variant FAILS the self-test on the bare-none row ($(grep '^SELFTEST FAIL' "$W/c6.out" | cut -c1-60)) while the real tool passes it (section 2c)"
     else vs_ctl_dead bare-none-accepted "the lenient variant exited non-zero WITHOUT the self-test's own FAIL line: $(tail -1 "$W/c6.out" | cut -c1-120)"; fail=1; fi
+    if python3 tools/homes_tracked.py --selftest --nobare >"$W/c7.out" 2>&1; then vs_ctl_dead bare-name-silent "the no-bare variant passed the self-test — the bare-name plant is not what it catches"; fail=1
+    elif grep -q '^SELFTEST FAIL:.* bare=False' "$W/c7.out"; then vs_ctl_fired bare-name-silent "the no-bare variant FAILS the self-test on the bare names ($(grep '^SELFTEST FAIL' "$W/c7.out" | grep -o 'bare=False letters=[A-Za-z]*')) while the real tool passes it (section 2)"
+    else vs_ctl_dead bare-name-silent "the no-bare variant exited non-zero WITHOUT the self-test's own FAIL line: $(tail -1 "$W/c7.out" | cut -c1-120)"; fail=1; fi
+    if python3 tools/homes_tracked.py --selftest --noletters >"$W/c8.out" 2>&1; then vs_ctl_dead letter-unchecked "the no-letters variant passed the self-test — the per-letter plant is not what it catches"; fail=1
+    elif grep -q '^SELFTEST FAIL:.* letters=False' "$W/c8.out"; then vs_ctl_fired letter-unchecked "the no-letters variant FAILS the self-test on the letters ($(grep '^SELFTEST FAIL' "$W/c8.out" | grep -o 'letters=False')) while the real tool passes it (section 2)"
+    else vs_ctl_dead letter-unchecked "the no-letters variant exited non-zero WITHOUT the self-test's own FAIL line: $(tail -1 "$W/c8.out" | cut -c1-120)"; fail=1; fi
     if python3 tools/homes_tracked.py --selftest --blind >"$W/c2.out" 2>&1; then vs_ctl_dead build-home-planted "the BLIND variant passed the self-test — the plant is not what the self-test catches"; fail=1
     elif grep -q '^SELFTEST FAIL: (False, False' "$W/c2.out"; then vs_ctl_fired build-home-planted "the blind variant FAILS the self-test on the two build/ reads ($(grep '^SELFTEST FAIL' "$W/c2.out" | cut -c1-60)) while the real tool passes it (section 2)"
     else vs_ctl_dead build-home-planted "the blind variant exited non-zero WITHOUT the self-test's own FAIL line: $(tail -1 "$W/c2.out" | cut -c1-120)"; fail=1; fi

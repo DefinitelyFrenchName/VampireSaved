@@ -89,8 +89,16 @@ def entries(img, table, n):
     return t
 
 
-def stager_write(img, a):
-    """what a stager handler stores to the victim's +0x54, up to its rts: 'copy', '#nn', or 'none'"""
+JSR_ABS_RE = re.compile(r"^jsr \$([0-9a-f]+)\.l$")
+
+
+def stager_write(img, a, depth=0):
+    """what a stager handler stores to the victim's +0x54, up to its rts: 'copy', '#nn', or 'none'.
+    A `jsr <abs>.l` is FOLLOWED one level into its target, as the CPU executes it (14z-189, the M22 freeze):
+    #195 replaced the copy handler's `move.b $17(a3),$54(a1)` at PRG:0x01868C with a jsr to a site_thunk whose
+    FIRST instruction is that displaced copy (build/manifest/donovan.toml, pyron.toml `pursuit_mark_hit`), and
+    the unfollowed walk read the ours stagers as 'none' — the instrument's blind spot, not the route. The live
+    half (audit_reaction_class_live) measured the class write executing inside the thunk (W 4d4730)."""
     out = []
     for _, s in disasm(img, a, 0x20):
         if COPY_RE.match(s):
@@ -98,6 +106,11 @@ def stager_write(img, a):
         m = IMM_RE.match(s)
         if m:
             out.append(f"#{int(m.group(1), 16):02x}")
+        j = JSR_ABS_RE.match(s)
+        if j and depth == 0 and int(j.group(1), 16) < len(img):
+            sub = stager_write(img, int(j.group(1), 16), depth + 1)
+            if sub != "none":
+                out.append(sub)
         if s.startswith("rts") or s.startswith("jmp") or s.startswith("bra"):
             break
     return "+".join(out) or "none"
@@ -305,11 +318,29 @@ def plant(kind, jop, jdat):
     raise SystemExit(f"REFUSED: no plant named {kind!r}")
 
 
+def plant_ours(kind, ours):
+    """THE ONE PERTURBATION of the jsr-follow control (14z-189, rule-checker run 2026-10-03-575 Q4): our
+    image's copy-handler site carries `jsr <thunk>.l` (#195's pursuit_mark_hit), and the thunk's FIRST instruction
+    is the displaced copy `move.b $17(a3),$54(a1)` (136b 0017 0054). Replacing that one instruction with nops must
+    turn the ours stager routes that reach the copy handler from 'copy' to 'none' — proof that the walk reads the
+    jsr TARGET, not a constant. Refuses when the site is not that jsr or the target is not that copy."""
+    if kind != "thunk-copy-removed":
+        raise SystemExit(f"REFUSED: no ours plant named {kind!r}")
+    o = bytearray(ours)
+    if o[COPY_HANDLER:COPY_HANDLER + 2] != bytes.fromhex("4eb9"):
+        raise SystemExit(f"REFUSED: our copy handler {COPY_HANDLER:#x} is not a jsr.l (no thunk to plant over)")
+    t = struct.unpack(">I", bytes(o[COPY_HANDLER + 2:COPY_HANDLER + 6]))[0]
+    if o[t:t + 6] != bytes.fromhex("136b00170054"):
+        raise SystemExit(f"REFUSED: the jsr target {t:#x} does not begin with the displaced copy")
+    o[t:t + 6] = bytes.fromhex("4e714e714e71")
+    return bytes(o), ("ours\tcopy-count\tstager_ground\t", "ours\tcopy-count\tstager_air\t", "ours\tcopy-count\tstager_ko\t")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("vsavj_op"); ap.add_argument("vsavj_data"); ap.add_argument("vsav2_op"); ap.add_argument("vsav2_data")
     ap.add_argument("--ours", help="a build's verify_op.bin: its routes and shock handler beside pristine vsavj's")
-    ap.add_argument("--plant", choices=("stager-38-copy", "record-06-to-38"),
+    ap.add_argument("--plant", choices=("stager-38-copy", "record-06-to-38", "thunk-copy-removed"),
                     help="run on a PLANTED copy of vsavj's images (the gate's must-fire controls); prints the rows it must move on stderr")
     ap.add_argument("--tsv", action="store_true")
     a = ap.parse_args()
@@ -319,7 +350,13 @@ def main():
         print(f"# read {p} sha1 {sha1(b)}", file=sys.stderr)
     if ours is not None:
         print(f"# read {a.ours} sha1 {sha1(ours)}", file=sys.stderr)
-    if a.plant:
+    if a.plant == "thunk-copy-removed":
+        if ours is None:
+            raise SystemExit("REFUSED: thunk-copy-removed plants into --ours")
+        ours, moves = plant_ours(a.plant, ours)
+        for m in moves:
+            print(f"# plant {a.plant} must move: {m.strip()}", file=sys.stderr)
+    elif a.plant:
         imgs[0], imgs[1], moves = plant(a.plant, imgs[0], imgs[1])
         for m in moves:
             print(f"# plant {a.plant} must move: {m.strip()}", file=sys.stderr)

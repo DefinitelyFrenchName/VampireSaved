@@ -32,13 +32,27 @@ cited as `#N` must have a row in docs/project/tickets.tsv whose answers cite
 no build/ path and no untracked file, every answer link resolved by the
 index's own grammar (`path` or `path § text`, root documents included) with a §
 anchor's text required on some line of its file (an `../` input is out of tree
-by rule and is listed, never failed). Tokens that name a
+by rule and is listed, never failed). (1c, #205) a BARE document name — a
+snake_case word, backticked or in prose, with no path and no extension, such as
+`engine_internals` — is resolved against the stems of the tracked `.md` files
+and REPORTED: one match is TRACKED, two or more FAIL as ambiguous, and one that
+resolves to nothing FAILs when it stands in a finding's HOME part (elsewhere it
+is listed under OTHER, or not at all in prose). (4, #205) PER LETTER: every
+finding (a), (b), ... must name at least one home — in the text before its
+first ` / ` (the table's home / test separator), or the whole finding when it
+has none — that resolves to a tracked file or to a ticket row; a letter with
+none FAILs, whatever the other letters cite. Tokens that name a
 section, a control mode, a column or a memory note are listed under OTHER. EXIT 1 on any FAIL. `--selftest` plants a row with a
 build/ prose citation, a backticked build/ token, an unresolved name, an
 unresolved gate stem, a ticket with no index row, ticket rows citing a build/
 file and an untracked file (a planted index), a prose-cited document that
-resolves nowhere and a parenthesised clause saying scratch, and must catch each; `--blind` disables every build/ read, the ticket rows' included (a known-bad
-variant that the self-test must FAIL on — test_close_tools' mode).
+resolves nowhere and a parenthesised clause saying scratch, a bare document
+name that resolves (reported TRACKED), one that resolves nowhere in a home part,
+and a letter whose only home resolves nowhere, and must catch each; `--blind` disables every build/ read, the ticket rows' included (a known-bad
+variant that the self-test must FAIL on — test_close_tools' mode); `--nobare`
+drops the bare-name resolution (the pre-#205 tool: a bare name silent) and
+`--noletters` drops the per-letter check — two more known-bad variants the
+self-test must FAIL on.
 """
 import hashlib
 import pathlib
@@ -62,12 +76,80 @@ def find_row(state, prefix):
 DOCS = {"README": "README.md", "NEXT_SESSION": "docs/NEXT_SESSION.md", "STATE": "STATE.md", "STATE_HISTORY": "STATE_HISTORY.md",
         "DECISIONS_HISTORY": "DECISIONS_HISTORY.md", "HANDOFF": "HANDOFF.md", "GOTCHAS": "docs/GOTCHAS.md", "PROVENANCE": "docs/PROVENANCE.md"}
 BLIND = False   # --blind: the build/ reads are disabled — a KNOWN-BAD variant for test_close_tools' mode
+NOBARE = False   # --nobare: bare document names are not resolved (the pre-#205 tool) — a KNOWN-BAD variant
+NOLETTERS = False   # --noletters: the per-letter home check is skipped (the pre-#205 tool) — a KNOWN-BAD variant
+SNAKE = r"[a-z][a-z0-9]*(?:_[a-z0-9]+)+"   # a bare document name's shape: engine_internals, select_screen
+PROSE_SNAKE = r"(?<![\w/.`*#'-])(" + SNAKE + r")(?![\w/`-]|\.[a-z])"
+
+
+def md_stems(tracked):
+    stems = {}
+    for p in tracked:
+        if p.endswith(".md") and not (p.startswith("build/") and not p.startswith("build/manifest")):
+            stems.setdefault(p.rsplit("/", 1)[-1][:-3], []).append(p)
+    return stems
+
+
+def bare_status(name, tracked, stems):
+    """(1c, #205) a bare name: a gate stem resolves to tests/<stem>.sh, anything else to the ONE tracked
+    .md whose stem it is. Returns (status, resolved): status 'TRACKED <path> (...)', 'FAIL ...', or None
+    when it resolves to nothing (the caller decides: a FAIL in a home part, OTHER elsewhere)."""
+    if re.fullmatch(r"(test|audit)_[a-z0-9_]+", name):
+        g = "tests/" + name + ".sh"
+        return ("TRACKED " + g + " (bare gate stem)", True) if g in tracked else (None, False)
+    hits = sorted(stems.get(name, []))
+    if len(hits) == 1:
+        return "TRACKED " + hits[0] + " (bare name)", True
+    if len(hits) > 1:
+        return f"FAIL ambiguous bare name ({len(hits)} tracked .md files have this stem: {', '.join(hits[:3])})", False
+    return None, False
+
+
+LETTERS = [chr(c) for c in range(ord("a"), ord("z") + 1)] + [chr(c) * 2 for c in range(ord("a"), ord("z") + 1)]
+
+
+def letters(row):
+    """(4, #205) the row's findings, in order: [(letter, text)]. A marker `(x)` or `**(x)**` counts only when it is
+    the NEXT letter of the sequence a..z, aa..zz, so a `(a)` inside a finding's prose (an option name) is not a cut."""
+    cells = row.split(" | ", 1)
+    body = cells[1] if len(cells) > 1 else row
+    cuts, want = [], 0
+    for m in re.finditer(r"(?:^|(?<=\s))\**\(([a-z]{1,2})\)\**(?=\s)", body):
+        if want < len(LETTERS) and m.group(1) == LETTERS[want]:
+            cuts.append((m.group(1), m.start(), m.end())); want += 1
+    out = []
+    for i, (l, a, b) in enumerate(cuts):
+        end = cuts[i + 1][1] if i + 1 < len(cuts) else len(body)
+        out.append((l, body[b:end]))
+    return out
+
+
+def home_part(seg):
+    """a finding's HOMES, by the table's form `fact — homes / tests`: the text before the first ` / ` and after
+    the last ` — ` before it, both found outside backticks, quotes and *emphasis* (a section title may hold
+    either); the whole finding when it has neither"""
+    masked = re.sub(r"`[^`]*`|\"[^\"]*\"|\*[^*]+\*", lambda m: "x" * len(m.group(0)), seg)
+    m = re.search(r" / |;\s+tests?\b", masked)   # the older form says `home X; test Y`
+    end = len(seg) if m is None else m.start()
+    j = masked.rfind(" — ", 0, end)
+    return seg[(j + 3 if j >= 0 else 0):end]
+
+
+def qualified(name, home):
+    """a snake_case word right after a file token (`tool.py` `rig_pokes`) or followed by `(` (`air_throw()`) is a
+    SYMBOL of code, not a document name: never a bare-name FAIL"""
+    return bool(re.search(r"`[^`]*(?:/|\.(?:md|py|sh|tsv|toml|txt|lua))[^`]*`[\s,]*`?" + re.escape(name) + r"\b", home)
+                or re.search(r"\b" + re.escape(name) + r"`?\(", home))
 
 
 def check(row, tracked, tickets=None):
     out, fail = [], 0
     toks = sorted(set(re.findall(r"`([^`]+)`", row)))
     paths, other = [], []
+    stems = md_stems(tracked)
+    segs = letters(row)
+    homes_text = " ".join(home_part(seg) for _, seg in segs) if segs else row
+    home_toks = set(re.findall(r"`([^`]+)`", homes_text))
     for t in toks:
         c = t.split(" ")[0].split("§")[0].strip()
         if re.fullmatch(r"(test|audit)_[a-z0-9_]+", c):
@@ -83,9 +165,18 @@ def check(row, tracked, tickets=None):
             else:
                 st, fail = "FAIL not-in-ls-files", fail + 1
             paths.append(f"{st:60s} <- `{t}`")
+        elif not NOBARE and re.fullmatch(SNAKE, t.strip()):
+            st, _ = bare_status(t.strip(), tracked, stems)
+            if st is None and t in home_toks and not qualified(t.strip(), homes_text):
+                st = "FAIL unresolved bare name in a home (no tracked .md has this stem, no gate this name)"
+            if st is None:
+                other.append(t)
+            else:
+                fail += st.startswith("FAIL")
+                paths.append(f"{st:60s} <- `{t}`")
         else:
             other.append(t)
-    out.append(f"# (1) backticked file tokens: {len(paths)}, FAIL: {fail}")
+    out.append(f"# (1) backticked file tokens and bare names: {len(paths)}, FAIL: {fail}")
     out += sorted(paths)
     # (1b) a home cited as a ticket number (**#N** or #N) must have a row in the tracked
     # index whose four answers cite no build/ path (rule-checker run 2026-09-25-189)
@@ -165,6 +256,17 @@ def check(row, tracked, tickets=None):
               else "TRACKED " + hits[0] if hits else "FAIL not-in-ls-files")   # run 206 Q4: a name must resolve to ONE file
         docs_.append(f"{st:60s} <- {name} (prose)")
         fail += st.startswith("FAIL")
+    if not NOBARE:   # (1c, #205) a bare snake_case document name in prose, e.g. engine_internals "The section"
+        bare_homes = re.sub(r"`[^`]*`", " ", homes_text)
+        home_names = set(re.findall(PROSE_SNAKE, bare_homes))
+        for name in sorted(set(re.findall(PROSE_SNAKE, bare))):
+            st, _ = bare_status(name, tracked, stems)
+            if st is None:
+                if name not in home_names or qualified(name, homes_text):
+                    continue   # an identifier in a finding's prose, not a home: listed nowhere (as before)
+                st = "FAIL unresolved bare name in a home (no tracked .md has this stem, no gate this name)"
+            docs_.append(f"{st:60s} <- {name} (prose)")
+            fail += st.startswith("FAIL")
     out.append(f"# (2b) documents cited in prose by bare name: {len(docs_)}, FAIL: {sum(1 for d in docs_ if d.startswith('FAIL'))}")
     out += docs_
     review = []
@@ -174,6 +276,49 @@ def check(row, tracked, tickets=None):
             review.append(clause[:140])
     out.append(f"# (3) test clauses citing an artifact/.txt/.log/scratch with no tracked script: {len(review)} for REVIEW")
     out += ["REVIEW <- " + r for r in review]
+    lrows = []
+    if not NOLETTERS:   # (4, #205) every finding letter names at least one home that resolves
+        bad_tickets = {n for r in trows if r.startswith("FAIL") for n in re.findall(r"#(\d+)", r)}
+        for l, seg in segs:
+            h = home_part(seg)
+            got = []
+            for t in re.findall(r"`([^`]+)`", h):
+                c = t.split(" ")[0].split("§")[0].strip()
+                if re.fullmatch(r"(test|audit)_[a-z0-9_]+", c):
+                    c = "tests/" + c + ".sh"
+                if "/" in c or re.search(EXT, c):
+                    if c.startswith("build/") and not c.startswith("build/manifest") and not BLIND:
+                        continue
+                    hits = [p for p in tracked if p == c or p.endswith("/" + c)]
+                    if c in hits or len(hits) == 1:
+                        got.append(c if c in hits else hits[0])
+                elif not NOBARE and re.fullmatch(SNAKE, t.strip()):
+                    st, ok_ = bare_status(t.strip(), tracked, stems)
+                    if ok_:
+                        got.append(st.split(" ")[1])
+            hb = re.sub(r"`[^`]*`", " ", h)
+            for name in re.findall(r"\b(README|NEXT_SESSION|STATE_HISTORY|DECISIONS_HISTORY|STATE|HANDOFF|GOTCHAS|PROVENANCE)\b", hb):
+                if DOCS[name] in tracked:
+                    got.append(DOCS[name])
+            for name in re.findall(r"(?<![\w/`])([A-Za-z0-9_-]+\.(?:md|py|sh|tsv|toml|txt|log))\b", hb):
+                hits = [p for p in tracked if p == name or p.endswith("/" + name)]
+                if name in hits or len(hits) == 1:
+                    got.append(name if name in hits else hits[0])
+            if not NOBARE:
+                for name in re.findall(PROSE_SNAKE, hb):
+                    st, ok_ = bare_status(name, tracked, stems)
+                    if ok_:
+                        got.append(st.split(" ")[1])
+            for n in re.findall(r"#(\d+)\b", h):
+                if n in tickets and n not in bad_tickets:
+                    got.append("#" + n)
+            if got:
+                lrows.append(f"{'HOMED':60s} <- ({l}) " + ", ".join(sorted(set(got))[:4]))
+            else:
+                lrows.append(f"{'FAIL letter-without-home':60s} <- ({l}) {h.strip()[:100]}")
+                fail += 1
+    out.append(f"# (4) findings by letter: {len(lrows)}, FAIL: {sum(1 for r in lrows if r.startswith('FAIL'))}")
+    out += lrows
     out.append("# OTHER (sections, modes, columns, gate stems, memories): " + " | ".join(other))
     return out, fail
 
@@ -181,11 +326,16 @@ def check(row, tracked, tickets=None):
 def main():
     global BLIND
     a = sys.argv[1:]
+    global NOBARE, NOLETTERS
     if "--blind" in a:
         BLIND = True; a.remove("--blind")
+    if "--nobare" in a:
+        NOBARE = True; a.remove("--nobare")
+    if "--noletters" in a:
+        NOLETTERS = True; a.remove("--noletters")
     tracked = set(subprocess.run(["git", "ls-files"], capture_output=True, text=True).stdout.split("\n"))
     if a and a[0] == "--selftest":
-        row = "| **(0) SELFTEST** | (a) x — home `docs/README.md`; test `test_docshape`. (b) y — home the table in build/agent0/table.txt; test `build/agent0/probe.log`. (c) z — home `nowhere_at_all.md`; test `test_no_such_gate_zq`. (d) w — home **#0**; test: none yet (the probe was scratch, not promoted). (e) v — home README and the note in nowhere_doc_zq.md; test: none. (f) u — home `packet.md` and the page manifest.tsv; test: none. |"
+        row = "| **(0) SELFTEST** | (a) x — home `docs/README.md`; test `test_docshape`. (b) y — home the table in build/agent0/table.txt; test `build/agent0/probe.log`. (c) z — home `nowhere_at_all.md`; test `test_no_such_gate_zq`. (d) w — home **#0**; test: none yet (the probe was scratch, not promoted). (e) v — home README and the note in nowhere_doc_zq.md; test: none. (f) u — home `packet.md` and the page manifest.tsv; test: none. (g) s — home engine_internals \"The class write's registers\" and `select_screen`; test: none. (h) r — home zq_no_such_doc \"a section\"; test: none. (i) q — the maintainer's option (a), home `docs/README.md`; test: none. |"
         row = row.replace("home **#0**", "home **#0**, **#900001**, **#900002**, **#900003** and **#900004**")
         planted = {"900001": "900001\tbug\topen\tclean\ttests/test_docshape.sh\tnone\tdocs/README.md\tnone\t14z-0",
                    "900002": "900002\tbug\topen\tcites build\tbuild/agent0/census.txt\tnone\tdocs/README.md\tnone\t14z-0",
@@ -201,8 +351,16 @@ def main():
                      and any("ticket-row-cites-untracked" in l and "#900004" in l and "anchor on no line" in l for l in out))
         prose_ok = any("TRACKED README.md" in l and "(prose)" in l for l in out) and any("not-in-ls-files" in l and "nowhere_doc_zq.md (prose)" in l for l in out)
         ambig_ok = any("FAIL ambiguous" in l and l.endswith("<- `packet.md`") for l in out) and any("FAIL ambiguous" in l and "manifest.tsv (prose)" in l for l in out)
-        ok = all(want) and stem_ok and ticket_ok and prose_ok and ambig_ok and fail == 11
-        print("SELFTEST " + ("PASS: the backticked build/ token, the prose build/ path, the unresolved name, the unresolved gate stem, the ticket with no index row, the ticket rows citing a build/ file, an untracked file and a § anchor on no line, the prose-cited document that resolves nowhere, the parenthesised scratch-citing test clause and a backticked and a prose name that end two or more tracked files but are none of them exactly are each caught; the real gate stem, the clean ticket and the prose-cited README resolve" if ok else f"FAIL: {want} stem={stem_ok} ticket={ticket_ok} prose={prose_ok} ambiguous={ambig_ok} fail={fail}"))
+        # (#205) the bare names: a prose and a backticked one that resolve are REPORTED, one in a home that resolves
+        # nowhere FAILs; every letter is judged on its own homes, and a `(a)` inside a finding's prose is not a cut
+        bare_ok = (any(l.startswith("TRACKED docs/game/engine_internals.md (bare name)") and "engine_internals (prose)" in l for l in out)
+                   and any(l.startswith("TRACKED docs/game/atlas/select_screen.md (bare name)") for l in out)
+                   and any(l.startswith("FAIL unresolved bare name in a home") and "zq_no_such_doc (prose)" in l for l in out))
+        lt = [l for l in out if l.startswith(("HOMED", "FAIL letter-without-home"))]
+        letters_ok = ([l.split("<- (")[1][:1] for l in lt] == list("abcdefghi")
+                      and [l.split("<- (")[1][:1] for l in lt if l.startswith("FAIL")] == list("bcfh"))
+        ok = all(want) and stem_ok and ticket_ok and prose_ok and ambig_ok and bare_ok and letters_ok and fail == 16
+        print("SELFTEST " + ("PASS: the backticked build/ token, the prose build/ path, the unresolved name, the unresolved gate stem, the ticket with no index row, the ticket rows citing a build/ file, an untracked file and a § anchor on no line, the prose-cited document that resolves nowhere, the parenthesised scratch-citing test clause, a backticked and a prose name that end two or more tracked files but are none of them exactly, a bare name in a home that resolves nowhere and the four letters with no resolving home are each caught; the real gate stem, the clean ticket, the prose-cited README and the two bare document names resolve, and an option's (a) is not a letter" if ok else f"FAIL: {want} stem={stem_ok} ticket={ticket_ok} prose={prose_ok} ambiguous={ambig_ok} bare={bare_ok} letters={letters_ok} fail={fail}"))
         sys.exit(0 if ok else 1)
     state = "STATE.md"
     if "--state" in a:

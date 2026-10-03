@@ -34,7 +34,7 @@
 #   M21 freeze's battery); MAME only; the reading holds at the build under test and each replay's length here (8400,
 #   9000 frames); the variants swap PROGRAM members only (the build's graphics and sound members are copied).
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged29] [SOLO=build/pyron44] [JOBS=5] [FREEZE=1] [KEEP=<dir>] tests/audit_facing_hook_ab.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged30] [SOLO=build/pyron45] [JOBS=5] [FREEZE=1] [KEEP=<dir>] tests/audit_facing_hook_ab.sh
 #   emulator tier, MAME; ~6 min at JOBS=5 (10 runs)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
@@ -42,8 +42,8 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged29}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
-SOLO="${SOLO:-build/pyron44}"; case "$SOLO" in /*) ;; *) SOLO="$REPO/$SOLO" ;; esac
+BUILD="${BUILD:-build/m3b_merged30}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
+SOLO="${SOLO:-build/pyron45}"; case "$SOLO" in /*) ;; *) SOLO="$REPO/$SOLO" ;; esac
 JOBS="${JOBS:-5}"
 EXPECT="$REPO/tests/expected/facing_hook_ab.tsv"
 . "$REPO/tests/lib/controls.sh"

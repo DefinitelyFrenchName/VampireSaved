@@ -1,0 +1,31 @@
+# 202: 1P arcade as DONOVAN; lose at a TENANT CPU opponent, CONTINUE, answer NO
+# to "same character?", and switch to AULBATH (14z-189, GitHub #202). Driven by
+# tests/audit_tenant_continue_switch.sh, which pins the venue byte to 0x10
+# (Donovan's ladder: Bishamon, then Phobos) and pokes the KOs; this script
+# carries only the inputs.
+#   select   36_pick_tenant_cell's measured wheel path to the appended cell
+#            0x13: L -> 0x05, L -> 0x0A, D -> 0x09 (Aulbath), D -> 0x13, confirm
+#   f3000    a coin (the credit the continue spends)
+#   f5520    START during the continue countdown
+#   f5600    R: the "same character?" box from YES to NO; f5660 confirm
+#   f5900    U: on the select screen, the cursor from 0x13 to 0x09 (Aulbath)
+#   f6000    confirm (f6100 again, harmless once committed)
+# P1 stands still otherwise. BUILD-ONLY (the extended wheel and a tenant at 0x13).
+# The frames are the merged build's (measured on build/m3b_merged30); the gate
+# REFUSES to judge a leg whose setup events did not happen, so a timing shift
+# reads VOID, never a verdict.
+300-305 sys=C1
+800-803 sys=S1
+1000-1002 p1=L
+1040-1042 p1=L
+1080-1082 p1=D
+1120-1122 p1=D
+1700-1702 p1=1
+3000-3004 sys=C1
+5520-5523 sys=S1
+5600-5602 p1=R
+5660-5662 p1=1
+5900-5902 p1=U
+6000-6002 p1=1
+6100-6102 p1=1
+7000 wait

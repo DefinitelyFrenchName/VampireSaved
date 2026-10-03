@@ -172,11 +172,11 @@ done
 # huitzil-m25 / pyron-m19, mark M12, 14z-119). Deliberately not the newest
 # built tracks: an UNREGISTERED image makes run_suite.sh refuse, so a sweep
 # against one would report dispatch failures instead of gate verdicts.
-MERGED="${MERGED:-build/m3b_merged29}"
-DON="${DON:-build/don_m25}"
-HUI="${HUI:-build/hui59}"
-PYR="${PYR:-build/pyron44}"
-STOCK="${STOCK:-build/m5_stock20}"
+MERGED="${MERGED:-build/m3b_merged30}"
+DON="${DON:-build/don_m26}"
+HUI="${HUI:-build/hui60}"
+PYR="${PYR:-build/pyron45}"
+STOCK="${STOCK:-build/m5_stock21}"
 
 expand() {  # expand <string> — the %PLACEHOLDER% vocabulary
     printf '%s' "$1" \
@@ -510,6 +510,18 @@ for _l in $LANES; do
             # work in 1.90 h at --jobs 4 — 1.65x, where a queue gives 0.90 h
             # (3.48x). At --jobs 8 it was 2.47x against a queue's 6.05x, so the
             # extra cores were mostly wasted.
+            # MEASURED ON A WIDER HOST (#133, closed 14z-189): ERIS (24 threads,
+            # 48 GB to WSL2), the GREEN tier at ec5f1b88 (PASS 202, SKIP 4,
+            # FAIL 0) at --jobs 12: the mame lane did 32,105 s of work in
+            # 4,499 s, 7.14x, and its wall-clock IS one gate, audit_guard_corpus
+            # (4,498 s) — the queue keeps every slot busy until that gate is the
+            # only one left. The whole tier: 34,220 s in 6,095 s, 5.61x.
+            # Read with tools/emu_lane_gain.py <run dir>, which reproduces the
+            # recorded 2dfbd85c figures exactly (7.13x). WHAT WENT WRONG ON THE
+            # WAY: the 3.48x above was a MODEL quoted as a measurement until
+            # 14z-187b, and the 7.13x was carried as "measured on a green tier"
+            # when its tier (2dfbd85c) held FAIL 1; a reader caught it at
+            # 14z-189 and the green tier was re-read (7.14x).
             #
             # WHY IT WAS A BARRIER, and it was never a trade-off anyone weighed:
             # this script is #!/bin/sh, which on macOS is bash 3.2, where

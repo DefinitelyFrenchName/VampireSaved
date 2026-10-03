@@ -2,11 +2,11 @@
 # columns, frozen so it can only SHRINK. `fact` is deliberately
 # NOT frozen (see FROZEN_COLUMNS in tools/audit_rule5.py) and is
 # reported as a NOTE instead; at this freeze it stood at
-# 7866 baked / 527 derived of 8393.
+# 7948 baked / 539 derived of 8487.
 # Produced by `python3 tools/audit_rule5.py --freeze
 # tests/expected/rule5_baked.tsv`. Provenance: static (the tree
 # itself). Columns: column file kind key value class note.
-# growth allowed: 14z-170: +6 gameplay BAKED — the M19 fixes' four [[data_port]] defense rows (huitzil.toml, donovan.toml: curve row + rally-threshold word each) carry only_variant_slot = true, instances 145-148 of a build-gating flag; and Phobos's two trap [[region_fix]] rows carry the new key unless_composed = "donovan" (the class-0x52 fix scoped S1), a build-gating flag of the same class: it selects which COMPOSITION a row applies to, not a value a player feels. Not migrated, for the 14z-143 reason
+# growth allowed: 14z-189 the M22 freeze: #195's pursuit_mark_hit, pursuit_mark_tail and pursuit_mark_tail_pad carry only_variant_slot = true in donovan.toml and pyron.toml (6 instances, 209 -> 215); a build GATE, not a value a player feels; NOT migrated, for the 14z-143 reason; rule-checker run 2026-10-03-580
 code	tools/build_gfx_donovan.py	(module)	DELTA	0x2750	BAKED	
 code	tools/build_gfx_donovan.py	(module)	DST_BANK	2	BAKED	
 code	tools/build_gfx_donovan.py	(module)	SRC_BANK	3	BAKED	
@@ -62,6 +62,7 @@ gameplay	build/manifest/donovan.toml	code_word	only_variant_slot	true	BAKED
 gameplay	build/manifest/donovan.toml	code_word	only_variant_slot	true	BAKED	
 gameplay	build/manifest/donovan.toml	code_word	only_variant_slot	true	BAKED	
 gameplay	build/manifest/donovan.toml	code_word	only_variant_slot	true	BAKED	
+gameplay	build/manifest/donovan.toml	code_word	only_variant_slot	true	BAKED	
 gameplay	build/manifest/donovan.toml	data_port	only_base_slot	true	BAKED	
 gameplay	build/manifest/donovan.toml	data_port	only_base_slot	true	BAKED	
 gameplay	build/manifest/donovan.toml	data_port	only_base_slot	true	BAKED	
@@ -96,6 +97,8 @@ gameplay	build/manifest/donovan.toml	data_port	only_variant_slot	true	BAKED
 gameplay	build/manifest/donovan.toml	port	dst_slot	0x0F	BAKED	
 gameplay	build/manifest/donovan.toml	port	mirror_variant	true	BAKED	
 gameplay	build/manifest/donovan.toml	select_wheel	layout	"build/manifest/wheel_layout_proposed.json"	BAKED	
+gameplay	build/manifest/donovan.toml	site_thunk	only_variant_slot	true	BAKED	
+gameplay	build/manifest/donovan.toml	site_thunk	only_variant_slot	true	BAKED	
 gameplay	build/manifest/donovan.toml	site_thunk	only_variant_slot	true	BAKED	
 gameplay	build/manifest/donovan.toml	site_thunk	only_variant_slot	true	BAKED	
 gameplay	build/manifest/donovan.toml	site_thunk	only_variant_slot	true	BAKED	
@@ -195,6 +198,7 @@ gameplay	build/manifest/pyron.toml	code_word	only_variant_slot	true	BAKED
 gameplay	build/manifest/pyron.toml	code_word	only_variant_slot	true	BAKED	
 gameplay	build/manifest/pyron.toml	code_word	only_variant_slot	true	BAKED	
 gameplay	build/manifest/pyron.toml	code_word	only_variant_slot	true	BAKED	
+gameplay	build/manifest/pyron.toml	code_word	only_variant_slot	true	BAKED	
 gameplay	build/manifest/pyron.toml	data_port	only_variant_slot	true	BAKED	
 gameplay	build/manifest/pyron.toml	data_port	only_variant_slot	true	BAKED	
 gameplay	build/manifest/pyron.toml	data_port	only_variant_slot	true	BAKED	
@@ -214,6 +218,8 @@ gameplay	build/manifest/pyron.toml	data_port	only_variant_slot	true	BAKED
 gameplay	build/manifest/pyron.toml	data_port	only_variant_slot	true	BAKED	
 gameplay	build/manifest/pyron.toml	data_port	only_variant_slot	true	BAKED	
 gameplay	build/manifest/pyron.toml	select_wheel	layout	"build/manifest/wheel_layout_proposed.json"	BAKED	
+gameplay	build/manifest/pyron.toml	site_thunk	only_variant_slot	true	BAKED	
+gameplay	build/manifest/pyron.toml	site_thunk	only_variant_slot	true	BAKED	
 gameplay	build/manifest/pyron.toml	site_thunk	only_variant_slot	true	BAKED	
 gameplay	build/manifest/pyron.toml	site_thunk	only_variant_slot	true	BAKED	
 gameplay	build/manifest/pyron.toml	site_thunk	only_variant_slot	true	BAKED	

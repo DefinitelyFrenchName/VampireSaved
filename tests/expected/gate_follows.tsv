@@ -90,6 +90,7 @@ declares	audit_shared_wall_push
 declares	audit_stage_sweep
 declares	audit_stock_emulator_stall
 declares	audit_tech_roll
+declares	audit_tenant_continue_switch
 declares	audit_tenant_downwin
 declares	audit_tenant_throw_geometry
 declares	audit_tenant_throws

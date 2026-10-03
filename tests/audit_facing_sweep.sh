@@ -51,7 +51,7 @@
 #   geometries) and checked equal on both legs (check (c)), not assumed; legs whose write sequences
 #   coincide are still distinct geometries when their geom rows differ.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged29] [JOBS=8] [FREEZE=1] [KEEP=<dir>] tests/audit_facing_sweep.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged30] [JOBS=8] [FREEZE=1] [KEEP=<dir>] tests/audit_facing_sweep.sh
 #   emulator tier, MAME; ~41 s (64 legs to frame 4040 at JOBS=8, measured 14z-185 on this MacBook)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
@@ -59,7 +59,7 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged29}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
+BUILD="${BUILD:-build/m3b_merged30}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 JOBS="${JOBS:-8}"
 EXPECT="$REPO/tests/expected/facing_sweep.tsv"
 R="$REPO/tests/replays/naming/donovan_3.rpl"; J="$REPO/tests/replays/naming/donovan_3.json"

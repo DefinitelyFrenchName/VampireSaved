@@ -515,26 +515,26 @@ pyron_4	1	Sol Smasher (ES) [air]	IDENT	-	-	220	-	4
 pyron_4	2	Zodiac Fire (ES)	IDENT	-	-	220	-	2
 pyron_4	3	Orbital Blaze (ES)	IDENT	-	-	220	-	4
 pyron_4	4	Orbital Blaze (ES) late	IDENT	-	-	220	-	2
-pyron_4	5	Cosmo Disruption [PP held]	DIFF	+245	p2white	400	-	4
-pyron_4	6	Cosmo Disruption [KK held]	DIFF	+245	p2white	400	after:5	4
-pyron_4	7	Cosmo Disruption [PP tap]	DIFF	+190	p2white	400	after:5	4
-pyron_4	8	Piled Hell [623KK]	IDENT	-	-	300	after:5	4
-pyron_4	9	Piled Hell [j.623KK]	IDENT	-	-	300	after:5	4
-pyron_4	10	Planet Burning (ES)	IDENT	-	-	420	after:5	4
-pyron_4	11	Sitting Attack (ES) [8PP] off throw	IDENT	-	-	420	after:5	4
-pyron_4	12	Shining Gemini [LP+LK]	DIFF	+0	node,seq,stock,sub	200	after:5	2
-pyron_4	13	5LP in DF	DIFF	+24	p2hp,p2white	200	after:5	4
-pyron_4	14	Sol Smasher [LP] in DF	NOT-IN-DF	-	df native 0/551 ours 0/551	551	after:5	0
+pyron_4	5	Cosmo Disruption [PP held]	IDENT	-	-	400	-	4
+pyron_4	6	Cosmo Disruption [KK held]	IDENT	-	-	400	-	4
+pyron_4	7	Cosmo Disruption [PP tap]	IDENT	-	-	400	-	4
+pyron_4	8	Piled Hell [623KK]	IDENT	-	-	300	-	4
+pyron_4	9	Piled Hell [j.623KK]	IDENT	-	-	300	-	4
+pyron_4	10	Planet Burning (ES)	IDENT	-	-	420	-	4
+pyron_4	11	Sitting Attack (ES) [8PP] off throw	IDENT	-	-	420	-	4
+pyron_4	12	Shining Gemini [LP+LK]	DIFF	+0	node,seq,stock,sub	200	-	2
+pyron_4	13	5LP in DF	DIFF	+24	p2hp,p2white	200	after:12	4
+pyron_4	14	Sol Smasher [LP] in DF	NOT-IN-DF	-	df native 0/551 ours 0/551	551	after:12	0
 pyron_5	0	Planet Burning [MP] step back (control)	IDENT	-	-	420	-	4
 pyron_5	1	Planet Burning (ES) [63214 MP+HP] step back	IDENT	-	-	420	-	4
 pyron_5	2	Planet Burning (ES) [63214 LP+HP] step back	IDENT	-	-	420	-	4
 pyron_5	3	Planet Burning (ES) [63214 LP+MP] step back	IDENT	-	-	420	-	4
 pyron_5	4	Planet Burning (ES) [63214 MP+HP] slow, step back	IDENT	-	-	420	-	4
 pyron_5	5	Planet Burning (ES) [63214 MP+HP] pair AFTER the motion	IDENT	-	-	420	-	4
-pyron_5	6	Cosmo Disruption [41236 PP] far	DIFF	+190	p2white	400	-	4
-pyron_5	7	Cosmo Disruption [63214 PP] far, no dash	IDENT	-	-	400	after:6	4
-pyron_5	8	Cosmo Disruption [63214 MP+HP] far, no dash	IDENT	-	-	400	after:6	4
-pyron_5	9	Cosmo Disruption [41236 MP+HP] far	DIFF	+190	p2white	651	after:6	2
+pyron_5	6	Cosmo Disruption [41236 PP] far	IDENT	-	-	400	-	4
+pyron_5	7	Cosmo Disruption [63214 PP] far, no dash	IDENT	-	-	400	-	4
+pyron_5	8	Cosmo Disruption [63214 MP+HP] far, no dash	IDENT	-	-	400	-	4
+pyron_5	9	Cosmo Disruption [41236 MP+HP] far	IDENT	-	-	651	-	2
 pyron_6	0	j.LP [9]	IDENT	-	-	150	-	1
 pyron_6	1	j.MP [9]	IDENT	-	-	150	-	1
 pyron_6	2	j.HP [9]	IDENT	-	-	150	-	3

@@ -4,7 +4,7 @@
 checklist's step 5.)
 
 Usage:
-  python3 tools/attr_placement_moves.py --old build/m3b_merged28 --new build/m3b_merged29 \
+  python3 tools/attr_placement_moves.py --old build/m3b_merged28 --new build/m3b_merged30 \
           --log build/rc185/tierreds/test_pointer_flow.log [--log ...] [--plant]
 
 Each --log is a gate's output holding its printed diff: OLD lines ('<' or '-') and NEW lines ('>' or '+'),
@@ -25,6 +25,8 @@ import argparse, json, re, subprocess, sys, os
 ap = argparse.ArgumentParser()
 ap.add_argument("--old", required=True); ap.add_argument("--new", required=True)
 ap.add_argument("--log", action="append", required=True); ap.add_argument("--plant", action="store_true")
+ap.add_argument("--plant-index", type=int, default=0, help="plant the K-th moved address instead of the first (1-based; "
+                "14z-189, rule-checker run 2026-10-03-578 Q4: so the ok-HOLE branch has a plant of its own)")
 A = ap.parse_args()
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 P = lambda b: json.load(open(f"{b}/patch/placements.json"))["regions"]
@@ -55,7 +57,8 @@ def addrs(s):
         v = int(m.group(1) or m.group(2), 16)
         if v >= 0x400000: out.append((m.start(), m.group(0), v))
     return out
-plant = A.plant
+plant = A.plant or A.plant_index > 0
+PLANT_AT = max(A.plant_index, 1)   # the K-th moved address (1-based) is the one perturbed
 tot = bad = nonaddr = 0
 for g in A.log:
     L = open(g).read().split("\n")
@@ -65,7 +68,18 @@ for g in A.log:
     if len(o) != len(n): print("   UNPAIRED: old and new line counts differ"); bad += 1
     for a, b in zip(o, n):
         ao, an = addrs(a), addrs(b)
-        if plant and tot == 0 and an: an[0] = (an[0][0], an[0][1], an[0][2] + 2)
+        planted = None
+        if plant and an:
+            # the K-th moved address overall: count this pair's moved addresses until it is reached
+            k = tot
+            for i, ((_, _, vo_), (_, sn_, vn_)) in enumerate(zip(ao, an)):
+                if vo_ == vn_: continue
+                k += 1
+                if k == PLANT_AT and planted is None:
+                    planted = vn_ + 2
+                    # 14z-189 (rule-checker runs 2026-10-03-577/578 Q4): the line must SHOW the perturbation, so
+                    # the plant's address is printed as the value compared, not the logged text
+                    an[i] = (an[i][0], f"0x{planted:x} [PLANTED: the logged {sn_} +2]", planted)
         # the text with every address blanked must agree
         blank = lambda s, xs: re.sub(r"\s+", " ", HEX.sub(lambda m: "@" if int(m.group(1) or m.group(2), 16) >= 0x400000 else m.group(0), s))
         if blank(a, ao) != blank(b, an) or len(ao) != len(an):
@@ -75,17 +89,17 @@ for g in A.log:
             tot += 1
             rn, off = region(vo, old)
             if rn is not None:
-                ok = rn in new and new[rn]["dst"] + off == vn
-                print(f"   {'ok  ' if ok else 'UNATTRIBUTED'} {so} -> {sn}  region {rn} +0x{off:x}  (m20 dst 0x{old[rn]['dst']:x} -> m21 0x{new[rn]['dst']:x})")
+                ok = rn in new and new[rn]['dst'] + off == vn
+                print(f"   {'ok  ' if ok else 'UNATTRIBUTED'} {so} -> {sn}  region {rn} +0x{off:x}  (old dst 0x{old[rn]['dst']:x} -> new 0x{new[rn]['dst']:x})")
             else:
                 on, off, nb = moved_op(vo)
                 if on is not None:
                     ok = nb + off == vn
-                    print(f"   {'ok  ' if ok else 'UNATTRIBUTED'} {so} -> {sn}  MOVED {on} +0x{off:x}  (m20 0x{vo - off:x} -> m21 0x{nb:x})")
+                    print(f"   {'ok  ' if ok else 'UNATTRIBUTED'} {so} -> {sn}  MOVED {on} +0x{off:x}  (old 0x{vo - off:x} -> new 0x{nb:x})")
                 else:
                     hn, off, nb = hole_op(vo)
                     ok = hn is not None and nb + off == vn
-                    print(f"   {'ok-HOLE' if ok else 'UNATTRIBUTED'} {so} -> {sn}  " + (f"in no op: +0x{off:x} past the start of MOVED {hn} (m20 0x{vo - off:x} -> m21 0x{nb:x}), offset preserved" if hn else "(in no placed region, no MOVED op, no MOVED op within 0x1000 below)"))
+                    print(f"   {'ok-HOLE' if ok else 'UNATTRIBUTED'} {so} -> {sn}  " + (f"in no op: +0x{off:x} past the start of MOVED {hn} (old 0x{vo - off:x} -> new 0x{nb:x}), offset preserved" if hn else "(in no placed region, no MOVED op, no MOVED op within 0x1000 below)"))
             if not ok: bad += 1
 print(f"moved addresses {tot}; unattributed {bad}; non-address line pairs {nonaddr}")
 sys.exit(1 if (bad or nonaddr) else 0)

@@ -2,24 +2,25 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 209
+# issues: 210
 number	state	reason	closed	labels	title
-209	OPEN	-	-	bug,severity: low	rulecheck.py prepare leaves the ledger's session column '-' unless --session is given, so per-session counts are wrong
-208	OPEN	-	-	bug,severity: medium,test-integrity	extract.py shows a hand-back worker's first message as its report, so the procedure check can rule a false QP5
+210	OPEN	-	-	architecture,bug	pre_push hook's sample procedure command lacks --session, which rulecheck.py prepare now requires (#209)
+209	CLOSED	COMPLETED	2026-10-03	bug,severity: low	rulecheck.py prepare leaves the ledger's session column '-' unless --session is given, so per-session counts are wrong
+208	CLOSED	COMPLETED	2026-10-03	bug,severity: medium,test-integrity	extract.py showed a still-running worker's latest text as its report (WX) when the extract was cut before its hand-back, so the procedure check ruled a false QP5
 207	OPEN	-	-	architecture,evolution	Close: generate the documentation packet's claim from the run of record's check outputs
 206	OPEN	-	-	architecture,evolution	Close: append each finding to the findings table when it is paid for, not reconstructed at the close
-205	OPEN	-	-	bug,severity: medium,test-integrity	homes_tracked.py drops an unresolved bare document name silently and never checks each finding letter
+205	CLOSED	COMPLETED	2026-10-03	bug,severity: medium,test-integrity	homes_tracked.py drops an unresolved bare document name silently and never checks each finding letter
 204	OPEN	-	-	architecture,evolution	Close: a tracked standing close-check set with derived lists and generated plants, inherited by every close
 203	OPEN	-	-	bug,severity: low	Linux: test_agent_sweep's post-kill check and test_run_on_snapshot's no-self-copy control fail on their own premises (fixed sleep vs zombies; dash reads ahead)
-202	OPEN	-	-	bug,severity: low	1P arcade: the 14z-87 keep-tenant thunk may make a tenant CPU opponent repeat (the ladder's pick skipped when the CPU side already holds a tenant id)
+202	CLOSED	NOT_PLANNED	2026-10-03	bug,severity: low	1P arcade: the 14z-87 keep-tenant thunk may make a tenant CPU opponent repeat (the ladder's pick skipped when the CPU side already holds a tenant id)
 201	CLOSED	COMPLETED	2026-10-01	bug	Linux: per-frame pin lists in POKES exceed the 128 KiB single-environment-string limit, so the parity-style gates' legs never start off macOS
 200	CLOSED	COMPLETED	2026-10-02	bug,severity: high	Donovan's Lightning Sword (ES): native marks the victim pursuit-able at hit (class 0x4E, +0x117); ours (class 0x06 since the 14z-35 remap) does not
 199	CLOSED	COMPLETED	2026-10-02	bug	Merged-image extracts on a fresh host: the reproducibility gate reads INPUTS OK on directories alone, and the tracked regions.json are stale (region data identical)
 198	CLOSED	COMPLETED	2026-10-02	evolution	Parity rigs: P2 Demitri attacks with a chain whose record is equal on both games (forbid the record-differing a2 chains in P2_NEVER)
 197	CLOSED	COMPLETED	2026-10-01	bug	The latch-readers census misses every immediate store (move.b #n,$off(An)): five latch writers unlisted, one a flavor write
-196	OPEN	-	-	evolution	The MAME wrappers default to the pinned source build on every host, not to whatever mame is on PATH
-195	OPEN	-	-	bug	After Cosmo Disruption Pyron cannot pursue on our build: vs2 marks the victim pursuit-able (+0x117) for reaction class 0x51 alone, which vsavj never stores
-194	OPEN	-	-	bug	Pyron's Cosmo Disruption gives the victim a plain hit reaction on ours where native vs2 gives the fire / knockdown reaction (record class 0x51 remapped to 0x4F)
+196	CLOSED	COMPLETED	2026-10-03	evolution	The MAME wrappers default to the pinned source build on every host, not to whatever mame is on PATH
+195	CLOSED	COMPLETED	2026-10-03	bug	After Cosmo Disruption Pyron cannot pursue on our build: vs2 marks the victim pursuit-able (+0x117) for reaction class 0x51 alone, which vsavj never stores
+194	CLOSED	COMPLETED	2026-10-03	bug	Pyron's Cosmo Disruption gives the victim a plain hit reaction on ours where native vs2 gives the fire / knockdown reaction (record class 0x51 remapped to 0x4F)
 193	CLOSED	COMPLETED	2026-09-30	bug	tools/move_parity.py never compares the white HP word +0x52, so the ours-vs-native gates cannot see a white-word-only damage difference
 192	CLOSED	NOT_PLANNED	2026-10-01	bug	Demitri's Chaos Flare differs between vsavj and vsav2: vs2 lengthened its hold node (30 -> 32 ticks) and lowered its fireball's records (12 -> 11); ours runs vsavj's
 191	CLOSED	COMPLETED	2026-10-01	bug	Donovan takes 9 from Demitri's 2HK on ours against 8 on native: vs2 lowered Demitri's 2HK record (10 -> 9); ours runs vsavj's
@@ -80,10 +81,10 @@ number	state	reason	closed	labels	title
 136	CLOSED	COMPLETED	2026-09-25	evolution	Tenant move parity vs native VS2: compare Donovan, Phobos and Pyron's moves on the WIDE merged build against vsav2
 135	CLOSED	COMPLETED	2026-09-15	evolution	The VS-vs-VS2 tick cadence: re-establish its measurement, mechanism and scope, and document it properly
 134	CLOSED	COMPLETED	2026-09-26	bug	The vanilla hit rigs leave 6 legs VOID at contact range (5 LP, 1 LK): those frame-data cells are unmeasured
-133	OPEN	-	-	evolution	Re-measure the emulator runner's pull-queue gain on a wider host
+133	CLOSED	COMPLETED	2026-10-03	evolution	Re-measure the emulator runner's pull-queue gain on a wider host
 132	CLOSED	NOT_PLANNED	2026-09-25	bug	release/merged-m15 was never packaged
 131	CLOSED	NOT_PLANNED	2026-09-29	evolution	audit_mask_window_ff42a2: deprecate it, or keep it as a case-specific gate?
-130	OPEN	-	-	bug	bundle_win_dlls.py prints a broken character for its em dash on MSYS2 (build logs only)
+130	CLOSED	COMPLETED	2026-10-03	bug	bundle_win_dlls.py prints a broken character for its em dash on MSYS2 (build logs only)
 129	OPEN	-	-	bug,evolution,severity: low	Tenant CPU AI looks lackluster (unproven; first question: are the ported script blocks complete?)
 128	OPEN	-	-	evolution,parked	Marionette: parked until further notice
 127	OPEN	-	-	cosmetic,parked	#112 option (B): the Press of Death effect owns its palette row (scope first)

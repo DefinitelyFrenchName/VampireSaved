@@ -1,0 +1,52 @@
+# close_standing_checks.tsv — THE STANDING CLOSE-CHECK SET every close inherits (GitHub #204; claim generation #207).
+#
+# Rendered for one close by `python3 tools/close_standing.py render --key 14z-N --row "(N) THE FINDINGS TABLE"
+# --run build/agentNNN/close`, which writes <run>/checks.tsv (the three columns tools/close_checks.py runs) and
+# <run>/checks_decl.tsv (what each check sees and does not, read by `close_standing.py claim`). A close ADDS only
+# what is new to it (`render --extra FILE`, rows in this same six-column form); nothing below is edited per close.
+#
+# PLACEHOLDERS — the only parameters, and everything else is DERIVED:
+#   {KEY}        the session key, given                   {ROW}   the findings row's title, given
+#   {RUN}        the close's run directory, given          {SESSDIR}  its parent (the session's scratch dir)
+#   {BASE}       the last commit before the first `{KEY}:` commit (derived from git by render)
+#   {TRANSCRIPT} the session transcript (render: the newest top-level .jsonl of the project; --transcript overrides)
+# Per-session DATA (never lists typed here) lives in the run directory: {RUN}/classes.tsv (scratch census),
+# {RUN}/promises.tsv (promise classes), {RUN}/rulings_exempt.tsv, and {RUN}/findings_row.txt (the copy of the
+# findings row handed to the rule-checker, written by `close_standing.py row-copy --write`).
+#
+# PLANTS are GENERATED at run time from the live inputs (`close_standing.py plant`, exit 3 if it cannot build one), so
+# a plant never goes stale against the file it perturbs; each must make its check exit EXACTLY the expected non-zero.
+#
+# Columns (tab-separated): name, expected exit, WHAT it sees, NOT SEEN, figure (a regex: the first output line it
+# matches is quoted in the generated claim; `-` for none), command.
+close_findings	0	lists the addresses the {KEY} group names that no live document carries (GAPS) or only text older than the session carries (REVIEW), and the group's PROMISES	it exits 0 whatever the lists hold, so each GAP and REVIEW is answered by hand; a finding with no address	addresses checked	python3 tools/close_findings.py {KEY}
+homes_tracked	0	every file the findings row names as a home or a test is a tracked file	whether each finding letter has a home of its own (#205), and an unresolved bare document name (#205)	^# \(1\) backticked	python3 tools/homes_tracked.py "{ROW}"
+none_reasons	0	every finding of the findings row whose test is `none` gives its reason in parentheses	whether the reason is true	^none-tests	python3 tools/none_reasons.py --row "{ROW}" STATE.md
+none_reasons_plant	1	the reason check fails on a generated copy of STATE.md whose findings row gains a bare `none`	-	^none-tests	python3 tools/close_standing.py plant bare-none --row "{ROW}" --out {RUN}/plants && python3 tools/none_reasons.py --row "{ROW}" {RUN}/plants/STATE_plant.md
+row_copy	0	the copy of the findings row handed to the rule-checker equals STATE.md's row now	whether the row itself is complete (a hand read)	^row	python3 tools/close_standing.py row-copy --row "{ROW}" --copy {RUN}/findings_row.txt
+row_copy_plant	1	the copy check fails on a generated copy of the row with one character changed	-	^row	python3 tools/close_standing.py plant row-stale --row "{ROW}" --out {RUN}/plants && python3 tools/close_standing.py row-copy --row "{ROW}" --copy {RUN}/plants/findings_row_plant.txt
+open_tickets	0	every ticket NEXT_SESSION's START HERE cites, and every `#N (open)` in the findings row, is open in docs/project/tickets.tsv (the list derived, never typed)	a ticket the row names without `(open)`; whether tickets.tsv agrees with GitHub (that is `tickets`)	^cited	python3 tools/close_standing.py open-tickets --row "{ROW}"
+open_tickets_plant	1	the open-ticket check fails on a generated copy of NEXT_SESSION whose START HERE cites a ticket tickets.tsv lists as not open	-	^cited	python3 tools/close_standing.py plant next-closed --row "{ROW}" --out {RUN}/plants && python3 tools/close_standing.py open-tickets --row "{ROW}" --next {RUN}/plants/NEXT_SESSION_plant.md
+dup_decisions	0	no `## ` heading and no whole entry repeats in DECISIONS_HISTORY.md	an entry recorded twice under two different headings	^headings	python3 tools/close_standing.py dup-entries --headings DECISIONS_HISTORY.md
+dup_decisions_plant	1	the duplicate check fails on a generated copy of DECISIONS_HISTORY.md with its newest entry appended again	-	^headings	python3 tools/close_standing.py plant dup-decisions --row "{ROW}" --out {RUN}/plants && python3 tools/close_standing.py dup-entries --headings {RUN}/plants/DECISIONS_HISTORY_plant.md
+dup_state_history	0	no whole `## ` entry repeats in STATE_HISTORY.md	a repeated heading with differing bodies (the archive holds one such, `## Session 14z-21`, measured 14z-189, and archived entries are never rewritten)	^entries	python3 tools/close_standing.py dup-entries STATE_HISTORY.md
+dup_state_history_plant	1	the duplicate check fails on a generated copy of STATE_HISTORY.md with its newest session group appended again	-	^entries	python3 tools/close_standing.py plant dup-state-history --row "{ROW}" --out {RUN}/plants && python3 tools/close_standing.py dup-entries {RUN}/plants/STATE_HISTORY_plant.md
+retraction_grep	0	every wording the sitting retracted is found only in quoted retractions and records, and every reach control is found	a retracted claim whose wording is not in tests/rulecheck/retractions/{KEY}.tsv	^REACH	python3 tools/retraction_grep.py tests/rulecheck/retractions/{KEY}.tsv
+scratch_census	0	every scratch program under the session's directory is classed PROMOTED, CLOSE-CHECK or NOT PROMOTED and each class holds	whether a NOT PROMOTED reason is true	^scratch programs	python3 tools/scratch_census.py --classes {RUN}/classes.tsv --dir {SESSDIR} --checks {RUN}/checks.tsv
+rulings_verbatim	0	every quote the sitting attributes to the maintainer is the maintainer's own words, and every maintainer message is on record	a ruling paraphrased without quotation marks	^maintainer messages	python3 tools/agent/rulings_verbatim.py --key {KEY} --transcript {TRANSCRIPT} --exempt {RUN}/rulings_exempt.tsv
+promise_check	0	every promise the pattern lists for {KEY} since {BASE} is FULFILLED, CARRIED or NOT A PROMISE, and each class holds	a commitment the promise pattern does not match	^PASS|^FAIL|promise\(s\) listed	python3 tools/promise_check.py --key {KEY} --classes {RUN}/promises.tsv --base {BASE}
+superseded	0	no live line in tests/ or tools/ pins a fingerprint the registry has superseded	the harness's own defaults outside this tree	^superseded keys	python3 tools/superseded_pins.py
+shape	0	every frozen expectation set loses nothing its predecessor held	whether an expectation's VALUES are right	^sets checked	python3 tools/freeze_set_shape.py
+state_lists	0	STATE.md's open lists, size budget and group count, NEXT_SESSION's START HERE and THE LEDGER's keys hold the open-list rule	whether an open item is really open	^PASS|^FAIL	sh tests/test_state_open_lists.sh
+tickets	0	every GitHub issue has a ticket row whose state agrees, after a refresh of the snapshot	whether each ticket's four answers are enough	^PASS|^FAIL	python3 tools/tickets.py refresh && git diff --stat docs/project/tickets_github.tsv && sh tests/test_tickets.sh
+homes_selftest	0	the home check's own self-test	-	^SELFTEST	python3 tools/homes_tracked.py --selftest
+findings_selftest	0	the address check's own self-test	-	CONTROL	python3 tools/close_findings.py --selftest
+census_selftest	0	the scratch census's own self-test	-	^SELFTEST	python3 tools/scratch_census.py --selftest
+rulings_selftest	0	the rulings check's own self-test	-	^SELFTEST	python3 tools/agent/rulings_verbatim.py --selftest
+retraction_selftest	0	the retraction grep's own self-test	-	^SELFTEST	python3 tools/retraction_grep.py --selftest
+promise_selftest	0	the promise check's own self-test	-	^SELFTEST	python3 tools/promise_check.py --selftest
+claim_lint_selftest	0	the claim lint's own self-test	-	^SELFTEST	python3 tools/claim_lint.py --selftest
+superseded_selftest	0	the superseded-pin check's own self-test	-	^SELFTEST	python3 tools/superseded_pins.py --selftest
+shape_selftest	0	the set-shape check's own self-test	-	^SELFTEST	python3 tools/freeze_set_shape.py --selftest
+none_reasons_selftest	0	the reason check's own self-test	-	^SELFTEST	python3 tools/none_reasons.py --selftest
+standing_selftest	0	this set's own tool self-test: rendering, the derived lists, the generated plants, the duplicate check and the claim	-	^SELFTEST	python3 tools/close_standing.py --selftest

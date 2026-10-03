@@ -10,7 +10,9 @@
 #   check` on the real ledger, fixtures, run dirs and registry; section 3 fires six controls
 #   on perturbed copies (a quiet plant, a moved reader, an unchecked freeze, a prose
 #   verdict, an unbound recorder, a cross-family plant); the RECORD BINDING section proves a
-#   pinned-reader run cannot be recorded without its transcript.
+#   pinned-reader run cannot be recorded without its transcript; the PREPARE SESSION KEY section
+#   (#209, 14z-189) proves prepare refuses a run with no --session and one whose --session is a
+#   transcript prefix, and writes the key it was given into meta.tsv (the ledger's `session`).
 # EXPECTS: PASS with every control fired; a red names the run or fixture and the shape in
 #   which the checker could look alive while asserting nothing.
 #
@@ -21,6 +23,7 @@
 # MUST-FIRE: shadow-tool: unbound-record — a copy of rulecheck.py with the spawn binding removed must let a pinned-reader run be recorded without its transcript, and the RECORD BINDING section must FAIL: `record` binds every reader to the spawn check (14z-178, rule-checker run 2026-09-24-134 Q4)
 # MUST-FIRE: shadow-tool: counted-id — a copy of rulecheck.py numbering prepare's auto id by a COUNT (the pre-#160 line) must collide with a run directory that has no ledger row, and the PREPARE IDS section must FAIL: the auto id is the next free number above every run directory and ledger id (GitHub #160, 14z-185)
 # MUST-FIRE: shadow-tool: late-validate — a copy of rulecheck.py with prepare's early artifact check removed must leave a run directory with no ledger row behind when an artifact is missing, and the PREPARE IDS section must FAIL: prepare checks every artifact before it creates anything (GitHub #160, 14z-185)
+# MUST-FIRE: shadow-tool: keyless-prepare — a copy of rulecheck.py whose prepare takes no session key (the pre-#209 line, `session = a.session or "-"`) must prepare a run whose meta.tsv says `session -`, and the PREPARE SESSION KEY section must FAIL: prepare requires the sitting's 14z-N key and refuses a transcript prefix (GitHub #209, 14z-189)
 # MUST-FIRE: perturbed-copy: cross-family-plant — a copy of the record in which a PROCEDURE calibration names an EVIDENCE fixture as its plant must fail: a plant answers its own family's questions, so one from the other checklist proves nothing about the reader (#172 S3, 14z-176)
 #
 # WHY. The rule-checker (docs/project/rule_checker.md, [VSP-183]/[VSP-184]) is a
@@ -112,7 +115,7 @@ expect_msg() {  # expect_msg <name>
 # which no reader was spawned — the tool must refuse both. Prints BOUND or the way it was not.
 record_binding() {  # record_binding <rulecheck.py to test> <root>
     rm -rf "$2"; mkcopy "$2"; cp "$1" "$2/tools/rulecheck.py"
-    ( cd "$2" && python3 tools/rulecheck.py prepare --calibrate proc-planted-spec-14z178 --id 2099-01-01-01 ) > "$2/prep.log" 2>&1 \
+    ( cd "$2" && python3 tools/rulecheck.py prepare --calibrate proc-planted-spec-14z178 --id 2099-01-01-01 --session 14z-0 ) > "$2/prep.log" 2>&1 \
         || { echo "PREPARE-FAILED $(tail -1 "$2/prep.log")"; return; }
     printf 'QP1: N-A — none\nQP2: N-A — none\nQP3: OK — none\nQP4: N-A — none\nQP5: VIOLATED — [1] off-spec\nVERDICT: VIOLATED\n' > "$2/v.txt"
     : > "$2/empty.jsonl"
@@ -142,14 +145,36 @@ prepare_ids() {  # prepare_ids <rulecheck.py to test> <root>
     _orphan="$2/tests/rulecheck/runs/$(date +%Y-%m-%d)-$(printf '%02d' $((_cnt + 1)))"
     [ -e "$_orphan" ] && { echo "ORPHAN-NAME-TAKEN $(basename "$_orphan")"; return; }
     mkdir -p "$_orphan"
-    ( cd "$2" && python3 tools/rulecheck.py prepare --calibrate proc-planted-spec-14z178 ) > "$2/pa.log" 2>&1 \
+    ( cd "$2" && python3 tools/rulecheck.py prepare --calibrate proc-planted-spec-14z178 --session 14z-0 ) > "$2/pa.log" 2>&1 \
         || { echo "COLLIDED: $(tail -1 "$2/pa.log")"; return; }
     _before="$(ls "$2/tests/rulecheck/runs" | wc -l | tr -d ' ')"
-    ( cd "$2" && python3 tools/rulecheck.py prepare --decision recommendation --subject s --claim c --artifact no/such/file ) > "$2/pb.log" 2>&1 \
+    ( cd "$2" && python3 tools/rulecheck.py prepare --decision recommendation --subject s --claim c --artifact no/such/file --session 14z-0 ) > "$2/pb.log" 2>&1 \
         && { echo "PREPARED-WITH-A-MISSING-ARTIFACT"; return; }
     grep -q "artifact not found" "$2/pb.log" || { echo "REFUSED-FOR-ANOTHER-REASON: $(tail -1 "$2/pb.log")"; return; }
     [ "$(ls "$2/tests/rulecheck/runs" | wc -l | tr -d ' ')" = "$_before" ] || { echo "LEFT-A-RUN-DIRECTORY"; return; }
     echo IDS-OK
+}
+# SECTION PREPARE SESSION KEY's probe (GitHub #209, 14z-189): on a throwaway root, prepare with no
+# --session and with a transcript prefix (`74077d05`) must both be refused and leave no run directory;
+# with `--session 14z-0` it must prepare a run whose meta.tsv reads `session 14z-0`. Prints KEY-OK or the way it was not.
+prepare_key() {  # prepare_key <rulecheck.py to test> <root>
+    rm -rf "$2"; mkcopy "$2"; cp "$1" "$2/tools/rulecheck.py"
+    _before="$(ls "$2/tests/rulecheck/runs" | wc -l | tr -d ' ')"
+    if ( cd "$2" && python3 tools/rulecheck.py prepare --calibrate proc-planted-spec-14z178 --id 2099-03-03-01 ) > "$2/k1.log" 2>&1; then
+        echo "PREPARED-WITHOUT-KEY $(grep '^session' "$2/tests/rulecheck/runs/2099-03-03-01/meta.tsv" 2>/dev/null | tr '\t' ' ')"; return; fi
+    grep -q "prepare needs --session 14z-N" "$2/k1.log" || { echo "REFUSED-FOR-ANOTHER-REASON: $(tail -1 "$2/k1.log")"; return; }
+    if ( cd "$2" && python3 tools/rulecheck.py prepare --calibrate proc-planted-spec-14z178 --id 2099-03-03-02 --session 74077d05 ) > "$2/k2.log" 2>&1; then
+        echo "PREPARED-WITH-A-TRANSCRIPT-PREFIX"; return; fi
+    grep -q "is not a 14z-N session key" "$2/k2.log" || { echo "REFUSED-FOR-ANOTHER-REASON: $(tail -1 "$2/k2.log")"; return; }
+    [ "$(ls "$2/tests/rulecheck/runs" | wc -l | tr -d ' ')" = "$_before" ] || { echo "LEFT-A-RUN-DIRECTORY"; return; }
+    ( cd "$2" && python3 tools/rulecheck.py prepare --calibrate proc-planted-spec-14z178 --id 2099-03-03-03 --session 14z-0 ) > "$2/k3.log" 2>&1 \
+        || { echo "REFUSED-WITH-A-KEY: $(tail -1 "$2/k3.log")"; return; }
+    grep -q "^session	14z-0$" "$2/tests/rulecheck/runs/2099-03-03-03/meta.tsv" || { echo "KEY-NOT-WRITTEN"; return; }
+    echo KEY-OK
+}
+keyless() {  # keyless <out> — the shadow tool: prepare's pre-#209 session line
+    sed 's/^    session = session_key(a, root)$/    session = a.session or "-"/' tools/rulecheck.py > "$1"
+    grep -q '^    session = a.session or "-"$' "$1" || { echo "the session-key line was not found to revert" >&2; return 1; }
 }
 counted() {  # counted <out> — the shadow tool: prepare's auto id by the pre-#160 count
     sed 's/^    n = max(taken + \[0\])$/    n = max(len(ledger_rows), len([p for p in (root \/ RUNS).glob(f"{today}-*") if p.is_dir()]) if (root \/ RUNS).exists() else 0)/' tools/rulecheck.py > "$1"
@@ -170,6 +195,14 @@ if [ "${VS_CTL:-}" = unbound-record ]; then
     echo "MODE: control unbound-record — the unbound copy reads: $got"
     case "$got" in RECORDED-*) ;; *) echo "REFUSED: the unbound copy did not record the unchecked run ($got)"; exit 3;; esac
     echo "FAIL: rule-checker record (control mode unbound-record: a pinned-reader run could be recorded unchecked — $got)"; exit 1
+fi
+
+if [ "${VS_CTL:-}" = keyless-prepare ]; then
+    keyless "$W/keyless.py" || exit 3
+    got="$(prepare_key "$W/keyless.py" "$W/pkmode")"
+    echo "MODE: control keyless-prepare — the shadow copy reads: $got"
+    case "$got" in PREPARED-WITHOUT-KEY*) ;; *) echo "REFUSED: the keyless copy did not prepare a keyless run ($got)"; exit 3;; esac
+    echo "FAIL: rule-checker prepare session key (control mode keyless-prepare — $got)"; exit 1
 fi
 
 case "${VS_CTL:-}" in counted-id|late-validate)
@@ -210,6 +243,11 @@ got="$(prepare_ids tools/rulecheck.py "$W/pi")"
 echo "  the real tool: $got"
 [ "$got" = IDS-OK ] || { echo "FAIL: prepare's ids or its refusal left the runs inconsistent ($got)"; fail=1; }
 
+echo "== PREPARE SESSION KEY: prepare requires the sitting's 14z-N key and refuses a transcript prefix (#209) =="
+got="$(prepare_key tools/rulecheck.py "$W/pk")"
+echo "  the real tool: $got"
+[ "$got" = KEY-OK ] || { echo "FAIL: prepare's session key ($got)"; fail=1; }
+
 echo "== 3. MUST-FIRE CONTROLS on a copy =="
 for c in quiet-control moved-reader unchecked-freeze prose-verdict cross-family-plant; do
     rm -rf "$W/c"; mkcopy "$W/c"; perturb "$c" "$W/c"
@@ -231,6 +269,16 @@ else
     vs_ctl_dead unbound-record "the binding line was not found to remove"; fail=1
 fi
 
+if keyless "$W/keyless_c.py"; then
+    got="$(prepare_key "$W/keyless_c.py" "$W/pkc")"
+    case "$got" in
+        PREPARED-WITHOUT-KEY*) vs_ctl_fired keyless-prepare "the copy without the key check: $got";;
+        *) vs_ctl_dead keyless-prepare "the keyless copy read $got"; fail=1;;
+    esac
+else
+    vs_ctl_dead keyless-prepare "the session-key line was not found to revert"; fail=1
+fi
+
 for c in counted-id late-validate; do
     if [ "$c" = counted-id ]; then counted "$W/shadow_$c.py"; else latecheck "$W/shadow_$c.py"; fi || { vs_ctl_dead "$c" "the shadow copy could not be made"; fail=1; continue; }
     got="$(prepare_ids "$W/shadow_$c.py" "$W/pc_$c")"
@@ -241,7 +289,7 @@ for c in counted-id late-validate; do
 done
 
 if [ "$fail" -eq 0 ]; then
-    echo "PASS: the rule-checker's record is sound, record binds the spawn check, prepare's ids hold, and its eight controls fire"
+    echo "PASS: the rule-checker's record is sound, record binds the spawn check, prepare's ids hold, prepare requires the session key, and its nine controls fire"
 else
     echo "FAIL: rule-checker record"
     exit 1

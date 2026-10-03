@@ -267,4 +267,9 @@ def main(argv):
 
 
 if __name__ == "__main__":
+    # A native Windows python (MSYS2 MINGW64) pipes stdout as cp1252 + CRLF, so every em dash above printed as
+    # one 0x97 byte, which the UTF-8 terminal shows as U+FFFD (#130, reproduced on ERIS 2026-10-02). The same
+    # line as tests/test_release_binaries.sh; on macOS and Linux it changes nothing.
+    sys.stdout.reconfigure(encoding="utf-8", newline="\n")
+    sys.stderr.reconfigure(encoding="utf-8", newline="\n")
     main(sys.argv)

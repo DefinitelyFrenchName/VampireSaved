@@ -83,7 +83,7 @@
 # at a fixed call site is a structural property of the call chain. Still,
 # the per-site replay count is printed so the base is visible.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [JOBS=8] [BUILD=build/m3b_merged29] [--freeze] tests/audit_walker_ghost.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [JOBS=8] [BUILD=build/m3b_merged30] [--freeze] tests/audit_walker_ghost.sh
 # ~1.5 min (two corpus-wide debug legs, JOBS-parallel; measured 14z-185 on this MacBook: 83 s).
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
@@ -114,7 +114,7 @@ JOBS="${JOBS:-8}"
 # the `jsr (A0)` of each walker = walker + 0x1E (walker 0x54458 / 0x5E52A)
 SPSITES="54476,5e548"
 FROZEN="build/manifest/walker_ghost.toml"
-BUILD="${BUILD:-build/m3b_merged29}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
+BUILD="${BUILD:-build/m3b_merged30}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 . "$REPO/tests/lib/controls.sh"
 vs_ctl_mode "$0"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
