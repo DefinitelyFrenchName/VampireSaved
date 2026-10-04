@@ -290,11 +290,11 @@ the suite runners and their own ground truth. 41 of 41 described.
 
 ### `test_rulings_verbatim.sh` — test, ci_portable
 
-**WHAT:** tools/agent/rulings_verbatim.py fails on each of its conditions and only then: a quote labelled the maintainer's that none of their messages or answers contains (NOT FOUND — including the session's own question relabelled as the maintainer's), a maintainer message or answer quoted in no record and not exempt (UNHOMED), and an exempt row matching no message or without a reason (STALE); a clean record passes, two questions joined by "and" stay the session's, and an answer introduced by "then, asked X," is checked as the maintainer's.
+**WHAT:** tools/agent/rulings_verbatim.py fails on each of its conditions and only then: a quote labelled the maintainer's that none of their messages or answers contains (NOT FOUND — including the session's own question relabelled as the maintainer's), a maintainer message or answer quoted in no record and not exempt (UNHOMED), and an exempt row matching no message or without a reason (STALE); a clean record passes, two questions joined by "and" stay the session's, and an answer introduced by "then, asked X," is checked as the maintainer's; text the harness injected (an `isMeta` record — a skill load, an agent hand-back) is never the maintainer's, so a quote matching it is NOT FOUND.
 
-**HOW:** drives the tool's selftest (eight cases over a synthetic transcript with a user message, a mid-turn enqueue, a task notification and an AskUserQuestion answer); four controls, one per condition of the verdict (#185 item 5), run copies with it switched off, and each must fail.
+**HOW:** drives the tool's selftest (nine cases over a synthetic transcript with a user message, a mid-turn enqueue, a task notification, a harness-injected skill load and an AskUserQuestion answer); five controls, one per condition of the verdict (#185 item 5) and one for the harness-text skip (14z-189), run copies with it switched off, and each must fail.
 
-**EXPECTS:** the selftest's eight cases read as designed and all four controls fail on their copies.
+**EXPECTS:** the selftest's nine cases read as designed and all five controls fail on their copies.
 
 ### `test_run_on_snapshot.sh` — test, ci_portable
 
