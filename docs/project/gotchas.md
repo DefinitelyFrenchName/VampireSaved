@@ -6400,3 +6400,18 @@ had shown.
 
 **The rule:** run the gate standalone at a non-default cadence with `VS_CADENCE=<cadence>` in front,
 and read the cadence the log's first section prints before quoting its verdict.
+
+## A DOCUMENT A GATE FOLLOWS IS ONE OF ITS INPUTS — a measurement written into it makes the gate stale (paid: 14z-189 close)
+
+Nine emulator-tier MiSTer gates declare `docs/platform/mister.md` in `# FOLLOWS:` (it holds the
+Verilator recipe they build from). At the 14z-189 close a paragraph recording PILOT's Verilator 5.020
+oracle results was added to that file after `test_mister_gfxc_fetch` and `test_mister_sdram_census`
+had been re-run on the committed tree; the release-cadence close tier then failed
+`test_emulator_staleness`, naming both gates stale on `docs/platform/mister.md`. Re-running them was
+1 h 45 min of simulation for a prose paragraph, so the file was restored to its committed content and
+the measurement moved to `docs/platform/mister_history.md`, which no gate follows.
+
+**The rule:** before editing a document, check whether any gate follows it
+(`python3 tools/gate_follows.py --refs <gate>` per gate, or the `covered()` reader over
+`tests/ci_emulator.tsv`); a host measurement or a log entry goes in the history twin, not in a
+document the emulator tier treats as an input.

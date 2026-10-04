@@ -147,7 +147,10 @@ pad_runner() {
     python3 - "$1" <<'PY'
 import sys
 p = sys.argv[1]; L = open(p).read().split("\n")
-i = max(k for k, l in enumerate(L) if '"$@" ) 2>&1; echo $? > "$REC/.runner_exit"; } | tee' in l)
+hits = [k for k, l in enumerate(L) if '"$@" ) 2>&1; echo $? > "$REC/.runner_exit"; } | tee' in l]
+if not hits:   # a control copy that rewrote the command line (in-place): nothing to pad past (14z-189)
+    sys.exit(0)
+i = max(hits)
 j = next(k for k in range(i + 1, len(L)) if L[k].strip() == "fi")
 L[j + 1:j + 1] = ["# test_run_on_snapshot.sh pad_runner: beyond any shell's read-ahead (#203)"] + ["#" * 79] * 205
 open(p, "w").write("\n".join(L))

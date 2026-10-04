@@ -7,21 +7,26 @@
 #   session's own question relabelled as the maintainer's), a maintainer message or answer quoted in no
 #   record and not exempt (UNHOMED), and an exempt row matching no message or without a reason (STALE);
 #   a clean record passes, two questions joined by "and" stay the session's, and an answer introduced
-#   by "then, asked X," is checked as the maintainer's.
-# HOW: drives the tool's selftest (eight cases over a synthetic transcript with a user message, a
-#   mid-turn enqueue, a task notification and an AskUserQuestion answer); four controls, one per
-#   condition of the verdict (#185 item 5), run copies with it switched off, and each must fail.
-# EXPECTS: the selftest's eight cases read as designed and all four controls fail on their copies.
+#   by "then, asked X," is checked as the maintainer's; text the harness injected (an `isMeta` record —
+#   a skill load, an agent hand-back) is never the maintainer's, so a quote matching it is NOT FOUND.
+# HOW: drives the tool's selftest (nine cases over a synthetic transcript with a user message, a
+#   mid-turn enqueue, a task notification, a harness-injected skill load and an AskUserQuestion answer);
+#   five controls, one per condition of the verdict (#185 item 5) and one for the harness-text skip
+#   (14z-189), run copies with it switched off, and each must fail.
+# EXPECTS: the selftest's nine cases read as designed and all five controls fail on their copies.
 #
 # WHY. The 14z-185 close's rule-checker runs 425, 443, 444 and 445 found rulings quoted only from the
 # session's own record, a heading quote the maintainer never wrote, a mid-turn message never recorded
 # and a ruling with no standing line; its first run on 14z-185b found the maintainer's #189/#190
 # instruction quoted only in a scratch file. The maintainer ruled the promotion: "P1+P2, then P4".
+# The 14z-189 close's rule-checker run 658 (Q1/Q4) found the reader counting the harness's skill-load
+# text as a maintainer message, taken out only by a hand exemption: a quote matching it would verify.
 #
 # MUST-FIRE: perturbed-copy: notfound-ignored — a copy that never counts a NOT FOUND quote must pass the altered-quote case, and the selftest must FAIL (mode: that copy's selftest)
 # MUST-FIRE: perturbed-copy: questions-unseen — a copy that never classes a QUESTION must check the session's question as the maintainer's, and the selftest must FAIL (mode: that copy's selftest)
 # MUST-FIRE: perturbed-copy: unhomed-ignored — a copy that never counts an UNHOMED message must pass the unhomed case, and the selftest must FAIL (mode: that copy's selftest)
 # MUST-FIRE: perturbed-copy: stale-ignored — a copy that never counts a STALE exempt row must pass the stale case, and the selftest must FAIL (mode: that copy's selftest)
+# MUST-FIRE: perturbed-copy: meta-counted — a copy that reads isMeta records as the maintainer's must count the skill load (an unhomed message in the clean case, a verified quote in the harness-text case), and the selftest must FAIL (mode: that copy's selftest)
 #
 # Usage: tests/test_rulings_verbatim.sh      # ci_portable, ~1 s
 set -eu
@@ -41,6 +46,7 @@ edits = {
     "unhomed-ignored": ("        print(f\"  UNHOMED    {ts[:16]} {n[:110]}\")\n        bad += 1\n",
                         "        print(f\"  UNHOMED    {ts[:16]} {n[:110]}\")  # CONTROL unhomed-ignored\n"),
     "stale-ignored": ("\"matches no message\"))\n            bad += 1\n", "\"matches no message\"))  # CONTROL stale-ignored\n"),
+    "meta-counted": ("for tx in ([] if r.get(\"isMeta\") else texts_of(content)):", "for tx in texts_of(content):  # CONTROL meta-counted"),
 }
 a, b = edits[name]
 assert s.count(a) == 1, name
@@ -52,13 +58,13 @@ PY
 echo "== test_rulings_verbatim: #190 P2 — the maintainer's words, verbatim, and every message on record =="
 fail=0
 RV=tools/agent/rulings_verbatim.py
-case "${VS_CTL:-}" in notfound-ignored|questions-unseen|unhomed-ignored|stale-ignored) RV="$(make_copy "$VS_CTL")" ;; esac
+case "${VS_CTL:-}" in notfound-ignored|questions-unseen|unhomed-ignored|stale-ignored|meta-counted) RV="$(make_copy "$VS_CTL")" ;; esac
 python3 "$RV" --selftest > "$W/self.txt" 2>&1 || true
 sed 's/^/  /' "$W/self.txt"
 grep -q '^SELFTEST PASS$' "$W/self.txt" || { echo "FAIL: the tool's selftest"; fail=1; }
 
 if [ -z "${VS_CTL:-}" ]; then
-    for c in notfound-ignored questions-unseen unhomed-ignored stale-ignored; do
+    for c in notfound-ignored questions-unseen unhomed-ignored stale-ignored meta-counted; do
         python3 "$(make_copy "$c")" --selftest > "$W/ctl_$c.txt" 2>&1 || true
         if grep -q '^SELFTEST FAIL$' "$W/ctl_$c.txt"; then vs_ctl_fired "$c" "$(grep -m1 '  FAIL:' "$W/ctl_$c.txt" | sed 's/^ *//')"
         else vs_ctl_dead "$c" "the perturbed copy passed its selftest — the selftest cannot see this failure" || fail=1; fi

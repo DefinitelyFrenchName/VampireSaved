@@ -621,3 +621,12 @@ gate table and STATE 14z-108/109. The skill checker (`tools/checkskills.py`,
 which is exactly the gap it was built to find. The figures below are
 quotations from the gates' own outputs as recorded at 14z-108/109; each names
 its gate, and the gate re-produces it.
+
+## [14z-189] The Verilator lane on another host — PILOT, Verilator 5.020
+
+**On the Linux VM PILOT (Ryzen 5700G, 6 vCPU, Ubuntu 24.04, Verilator 5.020 — measured 14z-189,
+2026-10-03, at tree `9f7d9b45`, run uncapped):** `test_mister_tenant_oracle` PASS in 9,158 s and
+`test_mister_obj_oracle` PASS in 9,304 s, each against the frozen expectations the Mac's Verilator
+5.050 produced, each gate's in-run must-fire control firing. Two gates of the lane, not the lane: the
+rest of it has not run on 5.020 (#122). Recorded here rather than in `mister.md`, which nine emulator
+gates declare in FOLLOWS, so a host measurement does not make them stale.

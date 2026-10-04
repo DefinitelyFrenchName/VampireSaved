@@ -97,7 +97,9 @@ def own_words(transcripts, since=None):
                                 y.get("text", "") for y in x["content"] if isinstance(y, dict))
                             for a in re.findall(r'"="(.*?)"(?=[.,]\s|\.\s*You|\s*$)', body, re.S):
                                 answers.append((ts, a))
-                for tx in texts_of(content):
+                # isMeta marks text the HARNESS injected (skill loads, agent hand-backs, caveats, image captions) —
+                # never the maintainer's words, so a quote matching it must not verify (rule-checker 2026-10-04-658 Q4)
+                for tx in ([] if r.get("isMeta") else texts_of(content)):
                     if tx.strip() and not tx.lstrip().startswith(NOISE) and "tool_result" not in tx:
                         msgs.append((ts, tx))
     return msgs, answers, session
@@ -183,6 +185,7 @@ def selftest():
             {"type": "user", "timestamp": "2026-01-01T00:01:00Z", "message": {"content": "what's the status?"}},
             {"type": "queue-operation", "operation": "enqueue", "timestamp": "2026-01-01T00:02:00Z", "content": "Of note, P3 later too"},
             {"type": "user", "timestamp": "2026-01-01T00:02:30Z", "message": {"content": "<task-notification> x </task-notification>"}},
+            {"type": "user", "isMeta": True, "timestamp": "2026-01-01T00:02:40Z", "message": {"content": [{"type": "text", "text": "Base directory for this skill: /x"}]}},
             {"type": "assistant", "timestamp": "2026-01-01T00:03:00Z", "message": {"content": [
                 {"type": "tool_use", "id": "q1", "name": "AskUserQuestion", "input": {"questions": [{"question": "Which route should it take?"}]}}]}},
             {"type": "user", "timestamp": "2026-01-01T00:04:00Z", "message": {"content": [
@@ -207,6 +210,9 @@ def selftest():
             # test_rulings_verbatim's questions-unseen control, 14z-185b: no case needed question detection)
             ("question label naming the maintainer", good.replace("**The question, verbatim:**", "**The question put to the maintainer, verbatim:**"),
              "what's the status\ta status question\n", 0),
+            # text the harness injected (isMeta) quoted as the maintainer's is NOT their words (14z-189, run 658)
+            ("harness text as maintainer", good + '**The maintainer, verbatim:** *"Base directory for this skill: /x"*\n',
+             "what's the status\ta status question\n", 1),
             ("stale exempt", good, "what's the status\ta status question\nnever sent this\tno such message\n", 1),
             # an ANSWER introduced by "then, asked X," is the maintainer's and is checked
             ("answer after 'then, asked'", good.replace(', then, asked which route, *"Route A, backtested"*', ', then, asked which route, *"Route B, untested"*'),

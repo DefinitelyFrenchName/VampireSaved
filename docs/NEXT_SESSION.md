@@ -39,7 +39,7 @@ work there in parallel** (the maintainer, 14z-189, STATE 14z-189 row 10).
    fixed, never dry-run before a `--stale` run without re-reading `python3 tools/audit_emulator_staleness.py
    --names` (`docs/project/gotchas.md`, by a DRY RUN).
 6. **PILOT on Verilator 5.020:** the two MiSTer oracles pass against the 5.050 expectations
-   (`docs/platform/mister.md`, On another host); the rest of the lane has not run there. The known-good
+   (`docs/platform/mister_history.md`, The Verilator lane on another host); the rest of the lane has not run there. The known-good
    environment entry for PILOT (`docs/project/build_environments.md`) needs a real release build and gate
    on it first.
 7. **Smaller open tickets from this sitting:** #215 (the applier's zip `create_system` differs by host),
@@ -56,7 +56,7 @@ work there in parallel** (the maintainer, 14z-189, STATE 14z-189 row 10).
   compares two runners goes red (`docs/project/gotchas.md`).
 - A worktree that holds rule-checker records is never reset or cleaned before they are committed or copied
   out — run 602's record was lost that way (`docs/project/gotchas.md`).
-- A big rule-checker claim draws a new finding every round: 22 rounds for one commit this sitting. Keep the
+- A big rule-checker claim draws a new finding every round: 18 rule-checker runs (17 VIOLATED, then OK) over run ids 621-642 for one commit this sitting. Keep the
   claim to the commit's own facts; split unrelated repairs into their own commits and packets.
 - Read `docs/project/tickets.tsv` before filing: #220 was opened and closed as a duplicate of #214.
 

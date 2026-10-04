@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-461 entries (47 game / 127 platform / 287 project), counted from the buckets at generation.
+465 entries (47 game / 127 platform / 291 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 47 entries
 
@@ -202,7 +202,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - `os.getsid()` ANSWERS FOR A ZOMBIE ON LINUX AND RAISES ESRCH ON macOS — and Linux `ps` keeps the zombie's name (`[sh] <defunct>`) where macOS shows `<defunct>` (measured 2026-10-03, 14z-189, #203)
 - UBUNTU'S `sh` (dash) READS A SCRIPT ~8 KB AHEAD; macOS `sh` (bash 3.2) READS IT AS IT RUNS — a script truncated or edited mid-run is cut short on one and not the other (measured 2026-10-03, 14z-189, #203)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 287 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 291 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -491,3 +491,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A ONE-GATE TEST RUN BECOMES THE RUN OF RECORD — `test_emulator_staleness` judges the NEWEST run under build/ (paid: 14z-185b, #189's wiring test)
 - A COST READER THAT KNOWS ONE RUNNER COUNTS ZERO — check a reader's figure against a close you can count by hand before trusting it (paid: 14z-187b, #187)
 - A RULED FORM IS BUILT AS RULED — a "better" variant found while building goes back to the maintainer first (paid: 14z-188, #195)
+- A WORKTREE RESET TAKES THE RULE-CHECKER RECORDS IT HOLDS — record and resolve are tree writes, and `git reset --hard` + `git clean` erase them (paid: 14z-189, rule-checker run 2026-10-03-602)
+- AN EXPORTED VARIABLE REACHES EVERY GATE THE TIER RUNS — a gate that compares two runners' output must unset what the caller set (paid: 14z-189, `test_bbh_fidelity`)
+- A STANDALONE `test_emulator_staleness` READS ITS CADENCE FROM `VS_CADENCE`, NOT FROM A FLAG — a `--cadence` argument is ignored silently (paid: 14z-189)
+- A DOCUMENT A GATE FOLLOWS IS ONE OF ITS INPUTS — a measurement written into it makes the gate stale (paid: 14z-189 close)

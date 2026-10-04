@@ -1,0 +1,10 @@
+decision	procedure
+subject	one AI agent working session (14z-189), part 10 of 10: transcript 7deb09bb records 13894-end
+session	14z-189
+model	rule-checker
+claim	In this span (transcript 7deb09bb records 13894-end, [13894 22:02] to [15520 06:15], part 10 of 10 of the 14z-189 sitting) the agent did what it told the maintainer it would do, reported as done the steps its tool calls show, quoted figures from tool results, gave the background jobs it started a disposition, and its workers answered their specs. NOT TESTED: this sentence was written from the span's record range and the session's own record (STATE 14z-189 rows 1 to 14), not from a re-read of the span; the session ran across several context compactions, so an intention stated in one part may be carried out in a later part, and a job launched near a part's end may be disposed of in the next.
+checklist	f3ec4d9849f7
+family	procedure
+questions	QP1 QP2 QP3 QP4 QP5
+reader	rule-checker@163e4ce9cf7b
+head	b10f44ad5378b543d218f6778a6150d59829c454
