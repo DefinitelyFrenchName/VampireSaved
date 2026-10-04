@@ -29,8 +29,6 @@ work there in parallel** (the maintainer, 14z-189, STATE 14z-189 row 10).
    for #129; `ff8850` for #117): classify them;
    (d) #216 — Lei-Lei 6HP (one hit measured at 128 px, the workbook says three) and the other #117 gaps,
    to check against the Japanese community wiki.
-   (e) #221 — `--prune` stopped at merged-m21 (never released), so merged-m19's seven zips are still hosted:
-   delete them by hand now, or wait for the fix.
 2. **#188 — `--confirm` CARRIED 31 OF 203 GATES AT THIS CLOSE** (STATE 14z-189 row 14): 75 of its 172 re-runs
    come from R3 "a tool reads the directory `build/`", which every run changes. Decide with the maintainer whether
    to narrow R3 or close #188; no clean wall-time saving was measured (the session's ROMDIR slip, row 14).
@@ -47,7 +45,8 @@ work there in parallel** (the maintainer, 14z-189, STATE 14z-189 row 10).
    environment entry for PILOT (`docs/project/build_environments.md`) needs a real release build and gate
    on it first.
 7. **Smaller open tickets from this sitting:** #215 (the applier's zip `create_system` differs by host),
-   #217 (rule-checker throughput), #218 (`tools/audit_poked_legs.py`'s id map is shifted).
+   #217 (rule-checker throughput), #218 (`tools/audit_poked_legs.py`'s id map is shifted), #221 (`--prune` stops at an
+   unreleased tag; merged-m19's zips stay hosted until it is fixed — ruled, STATE 'Standing rulings').
 8. **SHELVED BY THE MAINTAINER:** the measurer/reader frontmatter change to Sonnet 5.5 at `xhigh`.
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)

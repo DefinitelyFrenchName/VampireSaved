@@ -341,6 +341,16 @@ Yes, Donovan's deity states should be in scope. However, if they would rely on t
 
 ---
 
+## Ruled 2026-10-04 (14z-189, after the close) — #221: merged-m19's assets wait for the fix
+
+**The question, verbatim, after the merged-m22 publish's `--prune` stopped at `freeze/merged-m21` (no release) and left merged-m19's seven zips hosted:** *"whether to delete merged-m19's seven zips by hand now, or wait for the fix to #221."*
+
+**The maintainer:** *"let's wait for #221."*
+
+So: merged-m19's seven zip assets are NOT deleted by hand; they stay hosted until `tools/upload_release_assets.sh --prune` is fixed (#221) and prunes them.
+
+---
+
 ## Ruled 2026-10-03 (14z-189) — #216: Lei-Lei's 6HP hit count is a knowledge gap, checked against the Japanese wiki
 
 **The question (AskUserQuestion), verbatim, after a capture sheet of vsavj's Lei-Lei 6+HP on idle Victor at 128 px (frames 3198-3250, every second frame; #117's gate rig) was sent:** *"#117's merge says Lei-Lei's 6+HP lands ONE hit on vsavj, where the community workbook lists THREE (its values match the move's first three attack records). The sheet I just sent shows the move on idle Victor at 128 px: one spark, and P2's HP field drops once (288 → 276). Does the capture match what you know of the move?"* — options: *"Yes, one hit"*, *"No, it should be three"*, *"Need another capture"*.

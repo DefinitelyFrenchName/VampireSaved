@@ -71,7 +71,7 @@
 # WHAT THE GATE DOES NOT CLAIM: that an answer is ENOUGH. That is judged at the
 # close that closes the ticket.
 issue	kind	status	title	repro	decided	learned	wrong	sessions
-221	bug	open	upload_release_assets.sh --prune checks only the tag just before the published one, so a freeze never released stops it and merged-m19's assets stay hosted	tools/upload_release_assets.sh	none	none	none	14z-189
+221	bug	open	upload_release_assets.sh --prune checks only the tag just before the published one, so a freeze never released stops it and merged-m19's assets stay hosted	tools/upload_release_assets.sh	DECISIONS_HISTORY.md § Ruled 2026-10-04 (14z-189, after the close) — #221: merged-m19's assets wait for the fix	none	none	14z-189
 220	cosmetic	duplicate	The MiSTer release README still says the package contains an emulator (FBNeo or MAME): step 2 and the 'ordinary emulator' paragraph	tools/package_release.py	STATE.md § #220 closed as a duplicate of #214	none	none	14z-189
 219	bug	open	run_all_emulator.sh --dry-run writes a run record that the staleness audit takes as the newest run, so --stale then selects nothing	docs/project/gotchas.md	none	none	none	14z-189
 218	bug	open	tools/audit_poked_legs.py's id→name map is shifted for 0x0A/0x0C/0x0D/0x0E (Lilith at 0x0D, Sasquatch at 0x0E); latent, no frozen label affected yet	tools/audit_poked_legs.py	none	none	none	14z-189
