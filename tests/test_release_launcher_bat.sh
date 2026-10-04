@@ -9,7 +9,8 @@
 #   set's folder>`; the release tree's copy is byte-identical to the generator's (both sha1s
 #   printed). Every shipped text of every package (README.md, MISTER.md, EMULATOR.md,
 #   apply_release.html) names only launchers THAT package ships, and carries no unselected
-#   platform marker. ON A WINDOWS HOST (MSYS2) it also drives BOTH .bat files — the shipped
+#   platform marker; and the README the generator writes NOW claims that its package holds an emulator
+#   only on fbneo and mame, never on mister (#214). ON A WINDOWS HOST (MSYS2) it also drives BOTH .bat files — the shipped
 #   bytes — under cmd with PLAY_DRY_RUN=1: each success path (FBNeo: roms\vsavjw.zip created,
 #   the WOULD RUN line; MAME: the WOULD RUN line with -rompath at the set's folder) and each
 #   refusal (FBNeo: no romset, no binary, no profile, a junctioned roms\; MAME: no romset, no
@@ -28,6 +29,7 @@
 #
 # MUST-FIRE: perturbed-copy: lf-endings — BOTH PLAY.bat files with CRLF turned into LF must FAIL: cmd reads a LF-only batch file in 512-byte blocks and loses `goto` labels across them, so the line-ending rule is the one a working-looking launcher breaks silently
 # MUST-FIRE: perturbed-copy: launch-line-changed — the FBNeo PLAY.bat without `vsavjw` on its launch line, and the MAME PLAY.bat without `-rompath`, must FAIL: those are #145's two failures, an emulator with no game name that flashes shut and a MAME that finds no ROMs
+# MUST-FIRE: perturbed-copy: emu-text-in-mister — the generator's README rendered for the MiSTer package with the EMULATOR selection must FAIL: that is #214, the MiSTer README telling its reader the package already contains an emulator (step 2, the "why" paragraph, the troubleshooting bullet)
 # MUST-FIRE: perturbed-copy: readme-names-absent-launcher — a copy of the release's texts whose mame package no longer ships PLAY.bat while its README still names it must FAIL: that is rule-checker run 2026-10-03-602's finding, the MiSTer README telling its reader to double-click two launchers its package never carried
 #
 # WHY. #145 (maintainer report 2026-09-16, reproduced on ERIS 2026-10-03): double-clicking
@@ -48,7 +50,7 @@ W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail=0
 ok()  { echo "  ok: $*"; }
 bad() { echo "FAIL: $*"; fail=1; }
-case "$VS_CTL" in ""|lf-endings|launch-line-changed|readme-names-absent-launcher) ;;
+case "$VS_CTL" in ""|lf-endings|launch-line-changed|readme-names-absent-launcher|emu-text-in-mister) ;;
 *) echo "REFUSED: CONTROL=$VS_CTL is not a mode of this gate"; exit 3 ;; esac
 sha1() { python3 -c "import hashlib,sys;print(hashlib.sha1(open(sys.argv[1],'rb').read()).hexdigest()[:12])" "$1"; }
 
@@ -179,6 +181,42 @@ case "$rc" in
 *) bad "package texts:"; cat "$W/texts.txt" ;;
 esac
 
+# THE GENERATOR'S EMULATOR CLAIMS (14z-190, GitHub #214): the README the packager writes NOW, rendered
+# for each platform through its own select_platform_text(), may claim that the package holds an emulator
+# only on an emulator platform. The released tree is not checked for this: merged-m22 shipped before the
+# fix (#214 stays open until the next release carries it), so the generator is what is held.
+gen_claims() {  # gen_claims <mister selection: mister|fbneo> -> prints findings; exit 0 clean, 3 findings
+    python3 - "$REL/fbneo/manifest.json" "$W/gen" "$1" <<'PYEOF'
+import json, os, sys
+sys.path.insert(0, "tools")
+import package_release as pr, package_release_platforms as pp
+m = json.load(open(sys.argv[1])); out = sys.argv[2]; mister_sel = sys.argv[3]
+CLAIMS = ("This package already contains one", "The emulator here", "Use the emulator in this package")
+bad = []
+for plat, sel in (("fbneo", "fbneo"), ("mame", "mame"), ("mister", mister_sel)):
+    d = os.path.join(out, plat); os.makedirs(d, exist_ok=True)
+    open(os.path.join(d, "README.md"), "w").write(pr.readme(None, m, 1, 1))
+    pp.select_platform_text(d, sel)
+    body = open(os.path.join(d, "README.md")).read()
+    has = [c for c in CLAIMS if c in body]
+    if plat == "mister" and has:
+        bad.append(f"the generator's MiSTer README claims an emulator it does not ship: {has}")
+    if plat != "mister" and len(has) != len(CLAIMS):
+        bad.append(f"the generator's {plat} README lost an emulator passage (positive control): has {has}")
+for x in bad:
+    print("      " + x)
+sys.exit(3 if bad else 0)
+PYEOF
+}
+echo "-- the generator's README claims an emulator only where its package ships one (#214)"
+_sel=mister; [ "$VS_CTL" = emu-text-in-mister ] && _sel=fbneo
+rc=0; gen_claims "$_sel" > "$W/gen_claims.txt" 2>&1 || rc=$?
+case "$rc" in
+0) ok "generator: the MiSTer README makes none of the emulator claims; the fbneo and mame READMEs keep all three" ;;
+3) bad "generator README claims:"; cat "$W/gen_claims.txt" ;;
+*) bad "the generator check itself failed (rc=$rc):"; sed 's/^/      /' "$W/gen_claims.txt" ;;
+esac
+
 # the must-fire controls, in-gate: each perturbation must be caught on EVERY launcher it touches
 for c in lf-endings launch-line-changed; do
     got=""; dead=""
@@ -194,6 +232,9 @@ textcopy "$W/texts_ctl"; rm -f "$W/texts_ctl/mame/PLAY.bat"
 rc=0; texts "$W/texts_ctl" > "$W/texts_ctl.txt" 2>&1 || rc=$?
 if [ "$rc" = 3 ]; then vs_ctl_fired readme-names-absent-launcher "$(head -1 "$W/texts_ctl.txt" | sed 's/^ *//')"
 else vs_ctl_dead readme-names-absent-launcher "a mame package without PLAY.bat whose README names it passed (rc=$rc)"; fail=1; fi
+rc=0; gen_claims fbneo > "$W/gen_ctl.txt" 2>&1 || rc=$?
+if [ "$rc" = 3 ]; then vs_ctl_fired emu-text-in-mister "$(head -1 "$W/gen_ctl.txt" | sed 's/^ *//')"
+else vs_ctl_dead emu-text-in-mister "the MiSTer README rendered with the emulator selection passed (rc=$rc)"; fail=1; fi
 
 # ── ON WINDOWS: both .bat files driven by cmd, dry run (nothing is launched past the checks) ──
 case "$(uname -s)" in

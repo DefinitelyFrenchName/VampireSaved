@@ -30,8 +30,10 @@ work there in parallel** (the maintainer, 14z-189, STATE 14z-189 row 10).
 3. **#206 — THE 14z-190 CLOSE IS ITS TEST** (ruled 14z-190; #204 and #207 closed `done`): the findings table is
    written as findings are paid (`tools/findings_add.py`); at the close, judge #206's "done when" (the table
    existed before the close; the completeness read was a review).
-4. **#214 — the MiSTer README still says the package holds an emulator.** It shipped in merged-m22; fix the
-   generator, extend `tests/test_release_launcher_bat.sh`'s check, and it goes out with the next release.
+4. **#214 — SHIP THE GENERATOR FIX WITH THE NEXT RELEASE, THEN CLOSE IT** (STATE 14z-190 row (10)): the
+   README generator now selects step 2, the "why" paragraph and the emulator-only troubleshooting per platform, and
+   `tests/test_release_launcher_bat.sh` holds the generator's MiSTer README to no emulator claim; merged-m22's
+   published README still carries them.
 5. **#219 — `tests/run_all_emulator.sh --dry-run` writes a run record that hides staleness.** Until it is
    fixed, never dry-run before a `--stale` run without re-reading `python3 tools/audit_emulator_staleness.py
    --names` (`docs/project/gotchas.md`, by a DRY RUN).

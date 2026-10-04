@@ -365,9 +365,17 @@ cannot help with:
 > `vsavjw.zip`. That file is the modified game.
 > **Double-click `apply_release.html`** and your browser does it, or run one
 > command with Python — whichever you prefer.
+<!--EMU-->
 > **2. Get the emulator** — the program that pretends to be the arcade machine.
 > This package already contains one, prepared for this game. **An ordinary
 > emulator you may already own will not work**; the reason is below.
+<!--/EMU-->
+<!--MISTER-->
+> **2. Get the core** — the program that turns your MiSTer into the arcade board.
+> This package already contains it: `jtcps2w.rbf`, with the `.mra` files that
+> tell the MiSTer which files to load. **Jotego's ordinary CPS-2 core will not
+> run this game**; the reason is below.
+<!--/MISTER-->
 <!--EMU-->
 > **3. Put them together and play.** On **macOS**, double-click
 > **`PLAY.command`** and it does steps 2 and 3 for you. On Linux, run
@@ -388,12 +396,23 @@ byte produced is checked against an expected fingerprint before anything is
 written, so a wrong, renamed or damaged file is reported by name instead of being
 silently used.
 
+<!--EMU-->
 **Why an ordinary emulator will not work.** The three added characters need more
 storage than a real CPS-2 arcade board had, so this version runs on a slightly
 extended board. A normal emulator knows only the original board: it will refuse
 the file, or sit on the startup screen forever. The emulator here is an ordinary
 FBNeo or MAME with one small published change that teaches it the larger board —
 that is the only difference, and you can read the change if you want to.
+<!--/EMU-->
+<!--MISTER-->
+**Why the ordinary CPS-2 core will not work.** The three added characters need
+more storage than a real CPS-2 arcade board had, so this version runs on a
+slightly extended board. Jotego's own `jtcps2.rbf` knows only the original board.
+The core here, `jtcps2w.rbf`, is that core extended to the larger board, kept as
+a separate core so the ordinary one is untouched: stock Vampire Savior keeps
+running on `jtcps2.rbf` as before. `MISTER.md` says where each file goes and how
+to check the core you copied.
+<!--/MISTER-->
 
 ## What is in this package
 <!--EMU-->
@@ -533,7 +552,6 @@ Almost every first-time problem is one of these.
   being told which game to run or where it is. Double-click `PLAY.bat` instead:
   it starts FBNeo as `fbneo.exe vsavjw` with the set in `roms\` beside it, and
   MAME as `cps2.exe vsavjw -rompath rompath`.
-<!--/EMU-->
 - **"Unknown system: vsavjw" / "no such driver"** — the emulator is not the
   prepared one, so it does not know this game. Use the emulator in this package,
   or build one with the recipe in `EMULATOR.md`. Your normal emulator cannot be
@@ -544,6 +562,13 @@ Almost every first-time problem is one of these.
   the QSound extension, so the boot handshake never completes (measured
   2026-09-11: no crash, no gameplay, the legal screen forever). It needs the
   patched emulator; renaming is never the fix.
+<!--/EMU-->
+<!--MISTER-->
+- **The game is not in the MiSTer menu, or the MiSTer reports a missing file** —
+  one of the files is not where the MiSTer looks. `MISTER.md` lists each place:
+  the `.mra` files in `_Arcade/`, `jtcps2w.rbf` in `_Arcade/cores/`, and the
+  game files in `games/mame/`.
+<!--/MISTER-->
 - **"reference dumps do not match the manifest"** — one of your original game
   files is not the exact version expected: a different region, a different
   revision, or altered at some point. The message names the file and the part of
@@ -551,9 +576,11 @@ Almost every first-time problem is one of these.
 - **The game runs but a character looks wrong, or the sound is missing** — almost
   always a game file that is the right size but the wrong contents. Re-run the
   build command; it checks every part and will say which one.
+<!--EMU-->
 - **Playing online against someone** — both of you need the same emulator AND the
   same game file. Compare the key printed under "Identify the build": if they do
   not match, you are not running the same thing.
+<!--/EMU-->
 
 ## What is patched — for the curious, not needed to play
 The finished `vsavjw.zip` has {npatch} parts rebuilt from the differences in
