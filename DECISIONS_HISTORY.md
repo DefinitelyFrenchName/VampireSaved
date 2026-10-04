@@ -351,6 +351,16 @@ So: merged-m19's seven zip assets are NOT deleted by hand; they stay hosted unti
 
 ---
 
+## Ruled 2026-10-04 (14z-190) — #128: Marionette stays parked
+
+**The question, verbatim, at the 14z-190 opener (NEXT_SESSION START HERE 1(b), after 14z-189 measured the port's cost in `tests/audit_marionette_cost.sh`: 28 vs2 sites, 26 vsavj hook points, worst legacy frame 14 executions):** *"**#128, Marionette:** its cost is measured. Do we build it or keep it parked?"*
+
+**The maintainer:** *"#128 : keep it parked for now"*
+
+So: no Marionette port is built; #128 returns to `parked` (it was `open` for the cost measurement authorised 2026-10-03). The measurement and its gate stay as they are.
+
+---
+
 ## Ruled 2026-10-03 (14z-189) — #216: Lei-Lei's 6HP hit count is a knowledge gap, checked against the Japanese wiki
 
 **The question (AskUserQuestion), verbatim, after a capture sheet of vsavj's Lei-Lei 6+HP on idle Victor at 128 px (frames 3198-3250, every second frame; #117's gate rig) was sent:** *"#117's merge says Lei-Lei's 6+HP lands ONE hit on vsavj, where the community workbook lists THREE (its values match the move's first three attack records). The sheet I just sent shows the move on idle Victor at 128 px: one spark, and P2's HP field drops once (288 → 276). Does the capture match what you know of the move?"* — options: *"Yes, one hit"*, *"No, it should be three"*, *"Need another capture"*.
