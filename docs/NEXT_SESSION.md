@@ -29,6 +29,8 @@ work there in parallel** (the maintainer, 14z-189, STATE 14z-189 row 10).
    for #129; `ff8850` for #117): classify them;
    (d) #216 — Lei-Lei 6HP (one hit measured at 128 px, the workbook says three) and the other #117 gaps,
    to check against the Japanese community wiki.
+   (e) #221 — `--prune` stopped at merged-m21 (never released), so merged-m19's seven zips are still hosted:
+   delete them by hand now, or wait for the fix.
 2. **#188 — `--confirm` CARRIED 31 OF 203 GATES AT THIS CLOSE** (STATE 14z-189 row 14): 75 of its 172 re-runs
    come from R3 "a tool reads the directory `build/`", which every run changes. Decide with the maintainer whether
    to narrow R3 or close #188; no clean wall-time saving was measured (the session's ROMDIR slip, row 14).
@@ -61,10 +63,12 @@ work there in parallel** (the maintainer, 14z-189, STATE 14z-189 row 10).
 - A big rule-checker claim draws a new finding every round: 18 rule-checker runs (17 VIOLATED, then OK) over run ids 621-642 for one commit this sitting. Keep the
   claim to the commit's own facts; split unrelated repairs into their own commits and packets.
 - Read `docs/project/tickets.tsv` before filing: #220 was opened and closed as a duplicate of #214.
+- Every static-tier command line starts `ROMDIR=...`: without it the 88-gate ROM tier is NOT RUN (the
+  runner says so in a banner; this close misread it twice, STATE 14z-189 row 14).
 
 ## WHAT CLOSED THIS SITTING (14z-189)
 
 **#130**, **#133**, **#196**, **#203**, **#205**, **#208**, **#209** `done`; **#202** `declined`; **#220**
 `duplicate`; **#145** and **#212** with the merged-m22 release (STATE 14z-189 row 14). Frozen: **M22**
 (donovan-m26, huitzil-m33, pyron-m27, merged-m22). Corrected: the minimum air-attack height (24, Lei-Lei,
-fifteen callers). Filed: #214-#219.
+fifteen callers). Filed: #214-#219, #221.

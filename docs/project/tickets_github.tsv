@@ -2,8 +2,9 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 220
+# issues: 221
 number	state	reason	closed	labels	title
+221	OPEN	-	-	bug	upload_release_assets.sh --prune checks only the tag just before the published one, so a freeze that was never released stops it (merged-m19's assets are still hosted)
 220	CLOSED	NOT_PLANNED	2026-10-04	cosmetic	MiSTer release README still says the package contains an emulator (FBNeo or MAME)
 219	OPEN	-	-	bug	run_all_emulator.sh --dry-run writes a run record that the staleness audit takes as the newest run
 218	OPEN	-	-	bug	tools/audit_poked_legs.py's id→name map is shifted for 0x0A/0x0C/0x0D/0x0E (Lilith at 0x0D, Sasquatch at 0x0E); latent, no frozen label affected yet
@@ -12,7 +13,7 @@ number	state	reason	closed	labels	title
 215	OPEN	-	-	bug	apply_release.py's output zip differs by host (create_system 0 on Windows, 3 on Unix); zip.mjs and test_applier_page assume 3
 214	OPEN	-	-	bug	MiSTer package README tells the player it contains an FBNeo/MAME emulator (shared template wording), which it does not
 213	OPEN	-	-	bug	dispatch_census.lua keys replay input to a frame_done counter while breakpoints are armed ([MFI-5] desync): its frozen dispatch inventory may come from drifted runs
-212	OPEN	-	-	bug	apply_release.py (the end-user applier) exits 1 with UnicodeEncodeError after writing a correct romset when stdout is cp932/cp437/cp850 (redirected on Windows)
+212	CLOSED	COMPLETED	2026-10-04	bug	apply_release.py (the end-user applier) exits 1 with UnicodeEncodeError after writing a correct romset when stdout is cp932/cp437/cp850 (redirected on Windows)
 211	OPEN	-	-	architecture,bug	run_all_emulator.sh --stale that selects 0 gates prints GREEN and becomes the newest run of record, masking every stale gate from the staleness audit
 210	OPEN	-	-	architecture,bug	pre_push hook's sample procedure command lacks --session, which rulecheck.py prepare now requires (#209)
 209	CLOSED	COMPLETED	2026-10-03	bug,severity: low	rulecheck.py prepare leaves the ledger's session column '-' unless --session is given, so per-session counts are wrong
@@ -79,7 +80,7 @@ number	state	reason	closed	labels	title
 148	CLOSED	COMPLETED	2026-09-17	evolution	Review the static tier's contents and when it is applied — a commit currently blocks the tree for ~25 min, a close for ~40
 147	CLOSED	NOT_PLANNED	2026-09-16	bug	Phobos's float runs the VH2 flavor: huitzil.toml flavor_default is 0x00 where native vsav2 seeds 0x01
 146	CLOSED	COMPLETED	2026-09-21	bug	The release packages' player READMEs are not complete or detailed enough (reported)
-145	OPEN	-	-	bug	Windows: the release packages' prebuilt emulators fail to load the game when double-clicked (reproduced 14z-189: no Windows launcher; fbneo.exe needs vsavjw, cps2.exe needs -rompath)
+145	CLOSED	COMPLETED	2026-10-04	bug	Windows: the release packages' prebuilt emulators fail to load the game when double-clicked (reproduced 14z-189: no Windows launcher; fbneo.exe needs vsavjw, cps2.exe needs -rompath)
 144	CLOSED	COMPLETED	2026-09-21	bug	macOS: the release packages' prebuilt emulator binaries cannot be executed — macOS blocks them (reported, not yet reproduced)
 143	CLOSED	COMPLETED	2026-09-28	bug	tests/lua/walker_sp.lua reads the supervisor stack on MAME 0.288 (no A7 state); two walker audits consume its ranges
 142	CLOSED	NOT_PLANNED	2026-09-15	bug	Donovan's 421+MP with no mash lands 5 hits on our build and 4 on native vsav2 at NORMAL speed (equal at TURBO)
