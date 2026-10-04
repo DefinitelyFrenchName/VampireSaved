@@ -90,6 +90,24 @@ on Ubuntu 22.04 or 24.04; published Linux binaries are to come from the
 dedicated server on an older LTS. The WSL2 build also needs a Windows-side WSL
 window open for its whole run.
 
+### linux-x86_64 — FBNeo + MAME, built 2026-10-04 (PILOT, Ubuntu 24.04 VM)
+
+| | |
+|---|---|
+| host | Ubuntu 24.04.5 LTS (x86_64), cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0 |
+| system | Ubuntu 24.04.5 LTS (kernel 7.0.0-38-generic); ldd (Ubuntu GLIBC 2.39-0ubuntu8.9) 2.39 |
+| packages | dpkg `binutils` 2.42-4ubuntu2.10, dpkg `build-essential` 12.10ubuntu1, dpkg `coreutils` 9.4-3ubuntu6.3, dpkg `diffutils` 1:3.10-1ubuntu0.1, dpkg `gcc` 4:13.2.0-7ubuntu1, dpkg `git` 1:2.43.0-1ubuntu7.3, dpkg `libfontconfig-dev` 2.15.0-1.1ubuntu2, dpkg `libsdl2-dev` 2.30.0+dfsg-1ubuntu3.1, dpkg `libsdl2-image-dev` 2.8.2+dfsg-1build2, dpkg `libsdl2-ttf-dev` 2.22.0+dfsg-1, dpkg `make` 4.3-4.1build2, dpkg `patch` 2.7.6-7build3, dpkg `patchelf` 0.18.0-1.1build1, dpkg `perl` 5.38.2-3.2ubuntu0.6, dpkg `pkgconf` 1.8.1-2build1, dpkg `python3` 3.12.3-0ubuntu2.1, dpkg `qmake6` 6.4.2+dfsg-21.1build5, dpkg `rsync` 3.2.7-1ubuntu1.5, dpkg `unzip` 6.0-28ubuntu4.1, dpkg `zip` 3.0-13ubuntu0.2 |
+| emulators | FBNeo `79188379cc84`, patch sha1 `17cd7516`; MAME `27a8d9e85b58`, patch sha1 `1d13c9d8` |
+| built from | FBNeo tree `559194f382d5`, jobs 6; MAME tree `559194f382d5`, jobs 6 |
+| gate | `PASS: test_release_binaries (linux-x86_64)` (`build/agent190/pilot_rel/gate.log`; all four must-fire controls fired) |
+
+Written by `tools/record_build_environment.py` on PILOT (14z-190, a Proxmox VM: Ryzen 5700G, 6 vCPU), from
+`559194f3`, by the page's own recipe (`build/agent190/pilot_release.sh`: preflight READY, both builds, the
+gate, the entry; FBNeo about 2 min, MAME about 8, the gate about 4.5). **This is the older-LTS host the WSL2
+entry above names for published Linux binaries: its glibc is 2.39, the release floor.** Not published: its
+`BINARY.txt` records stay on PILOT (copies in `build/agent190/pilot_rel/`); whether they replace the tree's
+WSL2 records is the maintainer's to rule.
+
 ## Conditions known to break a build
 
 | condition | what you see | cause | fix | paid |

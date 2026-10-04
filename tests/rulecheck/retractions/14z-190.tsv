@@ -1,0 +1,3 @@
+# tests/rulecheck/retractions/14z-190.tsv — the wordings retracted or corrected in 14z-190, and reach controls that must be found live; columns pattern, source, class (retracted | reach:N)
+FOUR runs, against 12, 8 and 7	14z-190: the 14z-189 documentation packet took 6 rule-checker runs, 4 VIOLATED — four to the first OK (643-646), two more after the tier fixes reopened it (658-659); the ledger, counted by a measurer (STATE 14z-190 row (5), finding (d))	retracted
+ANSWERED, 14z-189 (#204 and #207	control: the gotcha paragraph carrying the corrected count, live in docs/project/gotchas.md	reach:1

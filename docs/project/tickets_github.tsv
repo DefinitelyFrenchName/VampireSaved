@@ -2,11 +2,12 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 224
+# issues: 225
 number	state	reason	closed	labels	title
+225	OPEN	-	-	evolution	Promote #188's traced test (strace every static gate, score the predictor, an over-narrowed control) from scratch into tools/
 224	OPEN	-	-	bug	findings_add.py accepts a home anchor containing ' — '; findings_anchors.py then SKIPs that finding and exits 0
 223	OPEN	-	-	cosmetic	Two sound-request sites give Phobos and Donovan each other's +1 on the sound id (char-id mask bits 0x10/0x13 swapped vs vs2) — static only
-222	OPEN	-	-	bug	Phobos's minimum air-attack height: vs2 checks it (row 0x10 = 24), ours reads 0 — static only, not measured in play
+222	OPEN	-	-	bug,severity: medium	Phobos's minimum air-attack height: vs2 checks it (row 0x10 = 24), ours reads 0 — static only, not measured in play
 221	OPEN	-	-	bug	upload_release_assets.sh --prune checks only the tag just before the published one, so a freeze that was never released stops it (merged-m19's assets are still hosted)
 220	CLOSED	NOT_PLANNED	2026-10-04	cosmetic	MiSTer release README still says the package contains an emulator (FBNeo or MAME)
 219	OPEN	-	-	bug	run_all_emulator.sh --dry-run writes a run record that the staleness audit takes as the newest run
@@ -99,7 +100,7 @@ number	state	reason	closed	labels	title
 132	CLOSED	NOT_PLANNED	2026-09-25	bug	release/merged-m15 was never packaged
 131	CLOSED	NOT_PLANNED	2026-09-29	evolution	audit_mask_window_ff42a2: deprecate it, or keep it as a case-specific gate?
 130	CLOSED	COMPLETED	2026-10-03	bug	bundle_win_dlls.py prints a broken character for its em dash on MSYS2 (build logs only)
-129	OPEN	-	-	bug,evolution,severity: low	Tenant CPU AI looks lackluster (unproven; first question: are the ported script blocks complete?)
+129	OPEN	-	-	evolution,severity: low	Tenant CPU AI looks lackluster (unproven; first question: are the ported script blocks complete?)
 128	OPEN	-	-	evolution	Marionette: parked until further notice
 127	OPEN	-	-	cosmetic,parked	#112 option (B): the Press of Death effect owns its palette row (scope first)
 126	CLOSED	COMPLETED	2026-10-01	cosmetic,parked	Select-wheel look-and-feel polish
