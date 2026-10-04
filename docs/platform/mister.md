@@ -963,6 +963,12 @@ Only `test.cpp` includes `defmacros.h`, so changing the dump window rebuilds
 one object and relinks — it does NOT re-verilate the model. A per-window
 rebuild is ~4 s, not minutes.
 
+**On another host (the Linux VM PILOT: Ryzen 5700G, 6 vCPU, Ubuntu 24.04, Verilator 5.020 —
+measured 14z-189, 2026-10-03, at tree `9f7d9b45`, run uncapped):** `test_mister_tenant_oracle`
+PASS in 9,158 s and `test_mister_obj_oracle` PASS in 9,304 s, each against the frozen expectations
+this machine's 5.050 produced, each gate's in-run must-fire control firing. Two gates of the lane, not
+the lane: the rest of it has not run on 5.020 (#122).
+
 ## The pre-D5 boot loop: the WIDE romset reset at core frame ~448 until the decryption range was fixed (measured 14z-107, resolved in slice D5)
 
 Before D5 the WIDE image — `vsavjw.rom`, 66,265,152 B —

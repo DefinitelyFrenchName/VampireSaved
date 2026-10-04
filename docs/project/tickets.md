@@ -11,12 +11,13 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**218 tickets** — status: open 20 · parked 10 · done 163 · declined 8 · not-ours 7 · invalid 9 · duplicate 1 · kind: bug 156 · cosmetic 11 · evolution 51 · **backfill debt: 0 rows**.
+**220 tickets** — status: open 21 · parked 10 · done 163 · declined 8 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 157 · cosmetic 12 · evolution 51 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#219](https://github.com/DefinitelyFrenchName/VampireSaved/issues/219) | bug | open | run_all_emulator.sh --dry-run writes a run record that the staleness audit takes as the newest run, so --stale then selects nothing | `docs/project/gotchas.md` | none | none | none | 14z-189 |
 | [#218](https://github.com/DefinitelyFrenchName/VampireSaved/issues/218) | bug | open | tools/audit_poked_legs.py's id→name map is shifted for 0x0A/0x0C/0x0D/0x0E (Lilith at 0x0D, Sasquatch at 0x0E); latent, no frozen label affected yet | `tools/audit_poked_legs.py` | none | none | none | 14z-189 |
 | [#217](https://github.com/DefinitelyFrenchName/VampireSaved/issues/217) | evolution | open | Rule-checker throughput: check independent decisions in parallel, and split a multi-fork merge into per-fork packets | `tools/rulecheck.py` | none | none | none | 14z-189 |
 | [#216](https://github.com/DefinitelyFrenchName/VampireSaved/issues/216) | evolution | open | Community workbook vs the game: Lei-Lei 6HP three hits (game: one at 128 px) and other #117 gaps, to check against the Japanese wiki | `tests/test_vanilla_command_join.sh` | `DECISIONS_HISTORY.md § Ruled 2026-10-03 (14z-189) — #216` | none | none | 14z-189 |
@@ -52,6 +53,7 @@ backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py pag
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#220](https://github.com/DefinitelyFrenchName/VampireSaved/issues/220) | cosmetic | duplicate | The MiSTer release README still says the package contains an emulator (FBNeo or MAME): step 2 and the 'ordinary emulator' paragraph | `tools/package_release.py` | `STATE.md § #220 closed as a duplicate of #214` | none | none | 14z-189 |
 | [#209](https://github.com/DefinitelyFrenchName/VampireSaved/issues/209) | bug | done | tools/rulecheck.py prepare leaves the ledger's session column '-' unless --session is given, so per-session counts read from the ledger are wrong | `tests/test_rule_checker.sh` | `DECISIONS_HISTORY.md § Ruled 2026-10-02 (14z-188) — the close's unhomed learnings: NEXT_SESSION item 0; #208 and #209 filed` | `docs/project/rule_checker.md § `--session`'s two meanings` | `docs/project/rule_checker.md § so a count of "this session's runs" by the` | 14z-188,14z-189 |
 | [#208](https://github.com/DefinitelyFrenchName/VampireSaved/issues/208) | bug | done | tools/agent/extract.py showed a still-running worker's latest text as its report (WX) when the extract was cut before its hand-back, so the procedure check ruled a false QP5 | `tests/test_agent_extract.sh` · `tests/agent/handback_fixture` | `DECISIONS_HISTORY.md § Ruled 2026-10-02 (14z-188) — the close's unhomed learnings: NEXT_SESSION item 0; #208 and #209 filed` | `docs/project/rule_checker.md § An extract cut while a worker is still running` | `docs/project/rule_checker.md § #208 was filed reading this` | 14z-188,14z-189 |
 | [#205](https://github.com/DefinitelyFrenchName/VampireSaved/issues/205) | bug | done | tools/homes_tracked.py drops a bare document name it cannot resolve without reporting it, and checks the row's names as a whole, never each finding letter's home | `tests/test_close_tools.sh` · `tools/homes_tracked.py` | `DECISIONS_HISTORY.md § Ruled 2026-10-02 (14z-188) — the close's convergence: four tickets, #204-#207` | `tools/homes_tracked.py § a BARE document name` | none | 14z-188,14z-189 |

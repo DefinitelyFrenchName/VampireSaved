@@ -2,8 +2,10 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 218
+# issues: 220
 number	state	reason	closed	labels	title
+220	CLOSED	NOT_PLANNED	2026-10-04	cosmetic	MiSTer release README still says the package contains an emulator (FBNeo or MAME)
+219	OPEN	-	-	bug	run_all_emulator.sh --dry-run writes a run record that the staleness audit takes as the newest run
 218	OPEN	-	-	bug	tools/audit_poked_legs.py's id→name map is shifted for 0x0A/0x0C/0x0D/0x0E (Lilith at 0x0D, Sasquatch at 0x0E); latent, no frozen label affected yet
 217	OPEN	-	-	evolution	Rule-checker throughput: check independent decisions in parallel, and split a multi-fork merge into per-fork packets
 216	OPEN	-	-	evolution	Community workbook vs the game: Lei-Lei 6HP three hits (game: one at 128 px) and other #117 gaps, to check against the Japanese wiki

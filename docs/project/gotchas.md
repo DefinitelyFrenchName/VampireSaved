@@ -3002,6 +3002,10 @@ quotes for the string, or `'...'` around the code sample, or — for anything
 long — write the body to a file and pass `--body-file`. The file route also
 sidesteps `$`, `!` and newline quoting in one move.
 
+**Paid again 14z-189:** a `tools/rulecheck.py resolve --how "..."` text written with backticked
+paths in double quotes had them command-substituted by zsh; every later `--how` used single quotes
+and no backticks.
+
 ### 2. `VAR=value funcname` PERSISTS after a shell function returns
 
 For an external command, `VAR=x cmd` scopes the assignment to that command.
@@ -6327,6 +6331,13 @@ now about the wrong run.
 to confirm it names the battery's run again. Never leave a partial run as the newest one before
 a close or a freeze.
 
+**Paid again 14z-189, by a DRY RUN:** `tests/run_all_emulator.sh --stale --lane mister --dry-run`
+executed nothing but still wrote `build/emu_sweep_<stamp>/` with `commit.txt` and a header-only
+`results.tsv`; the audit took it as the newest run (0 gates passed) and `--names` listed nothing
+stale, so the real `--stale` run that followed would have selected no gate. The folder was removed by
+hand and `--names` again listed both stale MiSTer gates. A dry run is a run as far as the audit can
+tell — remove its directory, or re-read `--names`, before any `--stale` run (the runner fix is #219).
+
 ## A COST READER THAT KNOWS ONE RUNNER COUNTS ZERO — check a reader's figure against a close you can count by hand before trusting it (paid: 14z-187b, #187)
 
 `tools/agent/close_loop_cost.py`, built to measure what a close's checking loop costs, counted **0** of the 14z-186
@@ -6351,3 +6362,41 @@ re-run. **The rule:** when a cheaper or "more robust" form turns up between a ru
 follows the ruling; the new form is a question, asked before any byte moves. Check the built rows against the ruled
 text before running the gates on them.
 
+
+## A WORKTREE RESET TAKES THE RULE-CHECKER RECORDS IT HOLDS — record and resolve are tree writes, and `git reset --hard` + `git clean` erase them (paid: 14z-189, rule-checker run 2026-10-03-602)
+
+Run 602 was recorded in the merge189b worktree, which held its run directory under
+`tests/rulecheck/runs/` and its `ledger.tsv` row uncommitted. To rebase that merge onto the #145
+fork's updated diff, the worktree was cleaned with `git reset --hard` and `git clean` — and the run
+directory and the ledger row went with it, BEFORE `resolve`. What survived: the prompts in the
+untracked staging directory `build/rulecheck/2026-10-03-602/`, and the verbatim verdicts in the
+session transcript (`7deb09bb`); the loss is recorded in `tests/rulecheck/runs/2026-10-03-602/LOST.txt`.
+
+**The rule:** a worktree that holds rule-checker records is never reset or cleaned until those
+records are committed or copied into the main tree; before any `git reset --hard` / `git clean` in a
+worktree, `git status --short tests/rulecheck/` there and move what it lists first.
+
+## AN EXPORTED VARIABLE REACHES EVERY GATE THE TIER RUNS — a gate that compares two runners' output must unset what the caller set (paid: 14z-189, `test_bbh_fidelity`)
+
+The session exported `STATIC_RESULTS_OUT` around a whole-tier run so the tier's results file landed
+in a known place. `tests/test_bbh_fidelity.sh` runs this tree's static runner and the harness's runner
+and compares their output exactly; the tree's runner honours the variable and printed a `results:` line
+the harness runner does not, so the gate went red with no defect in either runner. Shown by running the
+UNFIXED gate from a clean HEAD checkout with the variable exported (red) and without it (PASS). The
+gate now unsets the variable before running the two runners.
+
+**The rule:** do not export a runner's knobs around a tier — pass them on the one command line. A gate
+that compares two runners' output unsets every variable either runner reads, so a caller's environment
+cannot make the two differ.
+
+## A STANDALONE `test_emulator_staleness` READS ITS CADENCE FROM `VS_CADENCE`, NOT FROM A FLAG — a `--cadence` argument is ignored silently (paid: 14z-189)
+
+Captured "at release cadence" with `bash tests/test_emulator_staleness.sh --cadence release`, the log
+said `cadence session`, a NOTE and PASS: the gate takes its cadence only from the environment
+(`CAD="${VS_CADENCE:-session}"`, the variable `tests/run_all_static.sh` exports) and ignores arguments.
+A rule-checker read the mislabelled log (run 2026-10-03-637). Re-captured with
+`VS_CADENCE=release bash tests/test_emulator_staleness.sh`, it reads the release-cadence FAIL the tier
+had shown.
+
+**The rule:** run the gate standalone at a non-default cadence with `VS_CADENCE=<cadence>` in front,
+and read the cadence the log's first section prints before quoting its verdict.
