@@ -11,12 +11,13 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**223 tickets** — status: open 18 · parked 12 · done 167 · declined 8 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 159 · cosmetic 13 · evolution 51 · **backfill debt: 0 rows**.
+**224 tickets** — status: open 19 · parked 12 · done 167 · declined 8 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 160 · cosmetic 13 · evolution 51 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#224](https://github.com/DefinitelyFrenchName/VampireSaved/issues/224) | bug | open | findings_add.py accepts a home anchor containing ' — ' (the table's separator); findings_anchors.py then SKIPs that finding and exits 0, so the anchor check passes without checking it | `tools/findings_anchors.py` | none | none | none | 14z-190 |
 | [#223](https://github.com/DefinitelyFrenchName/VampireSaved/issues/223) | cosmetic | open | Two sound-request sites give Phobos and Donovan each other's +1 on the sound id (char-id mask bits 0x10/0x13 swapped against vs2); static only | `tools/audit_charid_masks.py` | none | `docs/game/engine_internals.md § Wider: the same class elsewhere` | none | 14z-189,14z-190 |
 | [#222](https://github.com/DefinitelyFrenchName/VampireSaved/issues/222) | bug | open | Phobos's minimum air-attack height: vs2 checks it (row 0x10 = 24), ours reads 0; static only, not measured in play | `tools/audit_charid_masks.py` | none | `docs/game/engine_internals.md § Wider: the same class elsewhere` | none | 14z-189,14z-190 |
 | [#221](https://github.com/DefinitelyFrenchName/VampireSaved/issues/221) | bug | open | upload_release_assets.sh --prune checks only the tag just before the published one, so a freeze never released stops it and merged-m19's assets stay hosted | `tools/upload_release_assets.sh` | `DECISIONS_HISTORY.md § Ruled 2026-10-04 (14z-189, after the close) — #221: merged-m19's assets wait for the fix` | none | none | 14z-189 |

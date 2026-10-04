@@ -2,8 +2,9 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 223
+# issues: 224
 number	state	reason	closed	labels	title
+224	OPEN	-	-	bug	findings_add.py accepts a home anchor containing ' — '; findings_anchors.py then SKIPs that finding and exits 0
 223	OPEN	-	-	cosmetic	Two sound-request sites give Phobos and Donovan each other's +1 on the sound id (char-id mask bits 0x10/0x13 swapped vs vs2) — static only
 222	OPEN	-	-	bug	Phobos's minimum air-attack height: vs2 checks it (row 0x10 = 24), ours reads 0 — static only, not measured in play
 221	OPEN	-	-	bug	upload_release_assets.sh --prune checks only the tag just before the published one, so a freeze that was never released stops it (merged-m19's assets are still hosted)
