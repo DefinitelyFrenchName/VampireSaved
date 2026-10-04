@@ -28,6 +28,18 @@ A registered gate (tests/ci_portable.txt, tests/ci_static.txt) is STALE for a ch
      dropped (`build/manifest/charmap_$n.toml`, `"patch/effect_c5*.json"`), matched as a path suffix when it
      holds a `/`, else against c's basename when its literal part is more than an extension;
   R7 c is a `.gitignore` or `.gitattributes` and the reach runs `git` (git reads them on every command).
+TWO NARROWINGS (14z-190, #188 option B, maintainer-ruled 2026-10-04: "Let's go for B"; PROVISIONAL until a fresh
+ERIS trace scores them at 0 misses — until then a close does not lean on them for a saving claim):
+  N-A (R3) a change under `build/` is not STALE for a gate whose reach names only the bare `build` directory:
+     every tier writes untracked files there, so the bare name made ~75 gates stale at every close; a deeper
+     name (`build/m3b_merged30`, a templated `build/$B/...`) still counts, and R6 reads a template ENDING in a
+     placeholder (`"build/$b"`, `f"build/{b}"`) as the whole directory under it — the trace of B as first built
+     found 15 reads in 2 gates that only the bare name had caught (14z-190, maintainer: "Land the fixed B").
+     NARROW_R3_TOP lists the top directories.
+  N-B (R2) for a basename in NARROW_R2 (`STATE.md`), a mention counts only as a quoted literal or a path
+     component (`"STATE.md"`, `'STATE.md'`, `$ROOT/STATE.md`) or where it survives with every PROSE string
+     (quoted text holding a space: messages, echo lines) removed — a bare shell argument still counts. Every close
+     edits STATE.md, and ~63 gates' tools name it only in messages.
 Otherwise the gate is CARRIED. A BINARY file in the reach (a NUL in its first 8 KiB — the FBNeo executable
 is one) has no text: it names nothing, and R1 still covers a change to it (14z-188: read as text, its 42 MB
 made every rule search take seconds and two gates ran past the traced test's 600 s cap).
@@ -98,10 +110,36 @@ def reach(root, gate, files):
     return sorted(seen)
 
 
+NARROW_R3_TOP = ("build",)     # N-A: the bare top directory is not a reader of what changes under it
+NARROW_R2 = ("STATE.md",)      # N-B: R2 for these basenames ignores a mention inside a prose string
+QUOTED = re.compile(r"\"(?:[^\"\\\n]|\\.)*\"|'(?:[^'\\\n]|\\.)*'")   # EVERY quoted string, in order
+_PROSE = {}
+
+
+def deprose(t):
+    """N-B: the text with every prose string (quoted text holding a space) removed, cached per text."""
+    k = hash(t)
+    if k not in _PROSE:
+        # every quoted string is consumed left to right (a short quoted path must close its own quote, or the
+        # next pair is read inside out — run_suite.sh's `"$EXPDIR/$name.diverge" ] && ...` line, 14z-190);
+        # only those holding whitespace (prose) are dropped
+        _PROSE[k] = QUOTED.sub(lambda m: "" if re.search(r"\s", m.group(0)) else m.group(0), t)
+    return _PROSE[k]
+
+
+def narrow_search(base, t):
+    """N-B: does t name `base` as a quoted literal or path component, or outside every prose string?"""
+    e = re.escape(base)
+    lit = re.search(r"(?<=[\"'/])" + e + r"(?![\w-])", t)   # N-B literal clause
+    return bool(lit or re.search(r"(?<![\w.-])" + e + r"(?![\w-])", deprose(t)))
+
+
 def dir_patterns(c):
     parts = c.split("/")[:-1]
     pats = []
     for k in range(1, len(parts) + 1):
+        if k == 1 and parts[0] in NARROW_R3_TOP:   # N-A
+            continue
         d = "/".join(parts[:k])
         pats.append((d, re.compile(r"(?<![\w.-])" + re.escape(d) + r"/?(?=[\"'\s*)\]]|$)", re.M)))
         if k > 1:
@@ -169,7 +207,11 @@ def templates(root, blob):
             if "/" in t:
                 if len(lit.replace("/", "")) < 3:
                     continue
-                out.append((re.compile(r"(?:^|/)" + rx + r"$"), tok, True))
+                # a template ENDING in a placeholder names a directory (`"build/$b"`, `f"build/{b}"`): it covers
+                # everything under it (14z-190: without this, N-A missed 15 traced reads in test_pcrel_escapes and
+                # test_shared_writes, which the bare `build` directory had caught by accident)
+                tail = r"(?:/.*)?$" if PLACE.fullmatch(parts[-1]) else r"$"   # R6 directory template
+                out.append((re.compile(r"(?:^|/)" + rx + tail), tok, True))
             else:
                 stem = re.sub(r"\.[\w]+$", "", lit)
                 if len(stem) < 3:
@@ -185,7 +227,13 @@ def stale_reason(root, rch, blob, c, pats):
     if c in rch:
         return f"R1 {c} is in the reach"
     bpat, dps = pats
-    tests = ([("R2", bpat, os.path.basename(c))] if bpat else []) + [("R3", rx, d) for d, rx in dps]
+    base = os.path.basename(c)
+    if bpat and base in NARROW_R2:   # N-B
+        if narrow_search(base, blob):
+            where = next((p for p in rch if narrow_search(base, text(root, p))), "?")
+            return f"R2 {where} names {base}"
+        bpat = None
+    tests = ([("R2", bpat, base)] if bpat else []) + [("R3", rx, d) for d, rx in dps]
     for rule, rx, what in tests:
         if rx.search(blob):
             where = next((p for p in rch if rx.search(text(root, p))), "?")
@@ -296,7 +344,18 @@ def selftest():
             open(p, "w").write(t)
             if x:
                 os.chmod(p, 0o755)
-        w("tests/ci_portable.txt", "g_named\ng_prog\ng_dir\ng_join\ng_whole\ng_data\ng_tmpl\ng_git\ng_bin\n")
+        w("tests/ci_portable.txt", "g_named\ng_prog\ng_dir\ng_join\ng_whole\ng_data\ng_tmpl\ng_git\ng_bin\n"
+          "g_buildbare\ng_buildsub\ng_buildtmpl\ng_statemsg\ng_stateread\ng_statearg\ng_statepair\n")
+        # N-A: a bare `build` reader and a deeper one; N-B: a message, an inline read and a bare argument
+        w("tests/g_buildbare.sh", "#!/bin/sh\nls build > /dev/null\n", True)
+        w("tests/g_buildsub.sh", "#!/bin/sh\nfor f in build/m1/*; do :; done\n", True)
+        # a directory TEMPLATE: the build name comes from data, the code names only "build/$b"
+        w("tests/g_buildtmpl.sh", "#!/bin/sh\nfor b in m1 m2; do python3 -c \"print(1)\" \"build/$b\"; done\n", True)
+        w("tests/g_statemsg.sh", "#!/bin/sh\necho \"the ruling lives in STATE.md now\"\n", True)
+        w("tests/g_stateread.sh", "#!/bin/sh\npython3 -c \"import sys; print(open('STATE.md').read())\"\n", True)
+        w("tests/g_statearg.sh", "#!/bin/sh\nwc -l STATE.md\n", True)
+        # a short quoted path before the message must close its own quote (the pairing trap)
+        w("tests/g_statepair.sh", "#!/bin/sh\n[ -f \"$D/x.diverge\" ] && echo \"freeze it, as a STATE.md decision\"\n", True)
         w("tests/g_data.sh", "#!/bin/sh\npython3 -c \"print(open('lists/locks.tsv').read())\"\n", True)
         w("lists/locks.tsv", "notes/locked.md\tfirst\n")
         w("notes/locked.md", "x\n")
@@ -318,7 +377,10 @@ def selftest():
             ("tools/helper.py", {"g_prog", "g_whole"}),
             ("docs/game/new.md", {"g_dir", "g_join", "g_whole"}),
             ("docs/project/x.md", {"g_join", "g_whole"}),
-            ("STATE.md", {"g_whole"}),
+            # N-B: the message does not read STATE.md; the inline read and the bare argument do
+            ("STATE.md", {"g_whole", "g_stateread", "g_statearg"}),
+            # N-A: the bare `build` reader is carried, the deeper reader is not
+            ("build/m1/new.log", {"g_buildsub", "g_buildtmpl", "g_whole"}),
             ("tests/g_named.sh", {"g_named", "g_whole"}),
             # R5: g_data reads a data file that names the changed file
             ("notes/locked.md", {"g_data", "g_whole"}),

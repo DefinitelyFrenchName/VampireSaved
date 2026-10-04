@@ -9,11 +9,12 @@
 #   .gitignore/.gitattributes and the reach runs git (R7); a binary in the reach names nothing (14z-188,
 #   the traced test's misses and its two TIMEOUTs; a shell or python line starting `--` is code); any
 #   other gate is CARRIED.
-# HOW: drives the predictor's selftest over a synthetic repo of nine gates, one per reader class,
-#   with known answers; seven controls run copies with one rule removed (directory, whole-tree, data,
-#   template, git), `--` read as a comment outside Lua (battery_reach.is_comment), or binaries read as
-#   text, and each must fail the selftest.
-# EXPECTS: the selftest's twelve cases pass and every control fails on its copy. The HISTORY
+# HOW: drives the predictor's selftest over a synthetic repo of sixteen gates, one per reader class
+#   plus the seven of #188 option B's two narrowings (14z-190), with known answers; twelve controls run copies
+#   with one rule removed (directory, whole-tree, data, template, git), `--` read as a comment outside Lua
+#   (battery_reach.is_comment), binaries read as text, either narrowing switched off, or N-B's quoted-literal
+#   clause dropped, its prose strings paired across code, or R6 directory templates read as one component, and each must fail the selftest.
+# EXPECTS: the selftest's thirteen cases pass and every control fails on its copy. The HISTORY
 #   backtest (tests/expected/static_confirm_backtest.tsv, `static_confirm.py backtest`) takes
 #   minutes of worktrees and is run by hand, not here.
 #
@@ -28,6 +29,11 @@
 # MUST-FIRE: perturbed-copy: no-git-rule — a copy with R7 (git reads .gitignore) removed must carry the git gate on a .gitignore change, and the selftest must FAIL (mode: that copy's selftest)
 # MUST-FIRE: perturbed-copy: dashdash-comment — a copy whose battery_reach.is_comment reads `--` as a comment in every language must drop the shell option continuation that names cfg/base, and the selftest must FAIL (mode: that copy's selftest)
 # MUST-FIRE: perturbed-copy: binary-as-text — a copy that reads binaries as text must mark the binary's gate stale for the names inside it, and the selftest must FAIL (mode: that copy's selftest)
+# MUST-FIRE: perturbed-copy: narrow-build-off — a copy without N-A must mark the gate that names only the bare `build` directory stale for a build/ change, and the selftest must FAIL (mode: that copy's selftest)
+# MUST-FIRE: perturbed-copy: narrow-state-off — a copy without N-B must mark the gate that only echoes STATE.md in a message stale, and the selftest must FAIL (mode: that copy's selftest)
+# MUST-FIRE: perturbed-copy: narrow-literal-blind — a copy of N-B without its quoted-literal clause must carry the gate whose inline script opens 'STATE.md', and the selftest must FAIL (mode: that copy's selftest)
+# MUST-FIRE: perturbed-copy: dir-template-off — a copy whose R6 reads a template ending in a placeholder (`"build/$b"`) as one path component only must carry the gate that names its builds only that way for a change under build/m1/, and the selftest must FAIL (mode: that copy's selftest; the class of the 15 traced misses of 14z-190)
+# MUST-FIRE: perturbed-copy: prose-pairing — a copy of N-B whose prose regex skips short quoted strings (pairing a path's closing quote with the next opening one) must mark the gate stale whose `[ -f "$D/x.diverge" ] && echo "... STATE.md ..."` line names STATE.md only in a message, and the selftest must FAIL (mode: that copy's selftest)
 #
 # Usage: tests/test_static_confirm.sh      # ci_portable, ~1 s
 set -eu
@@ -51,6 +57,12 @@ edits = {
     "no-template-rule": ("    for rx, tok, is_path in templates(root, blob):", "    for rx, tok, is_path in []:  # CONTROL no-template-rule"),
     "no-git-rule": ('    if base in (".gitignore", ".gitattributes") and GIT_RUN.search(blob):', "    if False:  # CONTROL no-git-rule"),
     "binary-as-text": ('t = "" if b"\\0" in raw[:8192] else raw', "t = raw"),
+    "narrow-build-off": ("        if k == 1 and parts[0] in NARROW_R3_TOP:   # N-A", "        if False:  # CONTROL narrow-build-off"),
+    "narrow-state-off": ("    if bpat and base in NARROW_R2:   # N-B", "    if False:  # CONTROL narrow-state-off"),
+    "narrow-literal-blind": ("    lit = re.search(", "    lit = None and re.search("),
+    "dir-template-off": ('tail = r"(?:/.*)?$" if PLACE.fullmatch(parts[-1]) else r"$"   # R6 directory template', 'tail = r"$"   # CONTROL dir-template-off'),
+    "prose-pairing": ('QUOTED.sub(lambda m: "" if re.search(r"\s", m.group(0)) else m.group(0), t)',
+                      're.sub(r"\\"[^\\"\\n]*\\s[^\\"\\n]*\\"|\'[^\'\\n]*\\s[^\'\\n]*\'", "", t)'),
 }
 a, b = edits[name]
 assert s.count(a) == 1, name
@@ -68,12 +80,12 @@ sed 's/^/  /' "$W/self.txt"
 grep -q '^SELFTEST PASS$' "$W/self.txt" || { echo "FAIL: the predictor's selftest"; fail=1; }
 
 if [ -z "${VS_CTL:-}" ]; then
-    for c in no-dir-rule no-whole-rule no-data-rule no-template-rule no-git-rule dashdash-comment binary-as-text; do
+    for c in no-dir-rule no-whole-rule no-data-rule no-template-rule no-git-rule dashdash-comment binary-as-text narrow-build-off narrow-state-off narrow-literal-blind prose-pairing dir-template-off; do
         python3 "$(make_copy "$c")" --selftest > "$W/ctl_$c.txt" 2>&1 || true
         if grep -q '^SELFTEST FAIL$' "$W/ctl_$c.txt"; then vs_ctl_fired "$c" "$(grep -m1 'FAIL:' "$W/ctl_$c.txt" | sed 's/^ *//')"
         else vs_ctl_dead "$c" "the perturbed copy passed its selftest — the selftest cannot see this failure" || fail=1; fi
     done
 fi
 
-if [ "$fail" = 0 ]; then echo "PASS: the predictor marks STALE by each of its seven rules and carries the rest"
+if [ "$fail" = 0 ]; then echo "PASS: the predictor marks STALE by each of its seven rules, narrows as #188 option B rules, and carries the rest"
 else echo "FAIL: test_static_confirm"; exit 1; fi

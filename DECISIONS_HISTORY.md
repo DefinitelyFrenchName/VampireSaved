@@ -351,6 +351,30 @@ So: merged-m19's seven zip assets are NOT deleted by hand; they stay hosted unti
 
 ---
 
+## Ruled 2026-10-04 (14z-190) — #188: the fixed B lands (R6 directory templates), after B as built failed the trace
+
+**What was measured first.** The PILOT trace (`build/agent190/trace190.sh`: 203 of 203 static gates under strace at `bd9c9769`, 40,792 (gate, file read) pairs) scored by `build/agent190/analyse190.py`: the pre-B predictor 0 misses; B as built **15 misses in 2 gates** (`test_pcrel_escapes`: three builds' `extract/regions.json`; `test_shared_writes`: 12 files under `build/hui53/`), all from N-A — both gates name their builds only through a template (`f"build/{b}"`, `"build/$b"`) that R6 matched as one path component, so only the bare `build` directory had caught them; a deliberately over-narrowed control 100 misses in 8 gates (the scorer sees misses). Two candidates scored on the same traces, 0 misses each: N-B alone (no saving: 143 STALE, 384 s carried, as today) and B plus an R6 directory-template rule (92 STALE, 1,035 of 5,449 gate-plus-control seconds carried).
+
+**The question (AskUserQuestion), verbatim:** *"B as built failed the trace (15 misses in 2 gates, all from templates like \"build/$b\"). The fixed B (a template ending in a placeholder also covers everything under it) scores 0 misses and carries 1,035 of 5,449 s at a typical close, against 384 today. Caveat: the fix was written after seeing those misses, so this trace motivated it. Which way?"* — options "Land the fixed B" (*"Commit the fixed predictor with a self-test case and a must-fire control for the directory templates, then re-run the PILOT trace on the committed code itself (it must score 0 again) before any close uses it. About 11 min saved per confirm pass."*) and "Keep today's predictor".
+
+**The maintainer:** *"Land the fixed B"*.
+
+So: `tools/static_confirm.py` carries N-A, N-B and the R6 directory template; `tests/test_static_confirm.sh` gains the case and the control `dir-template-off`; the exact tree committed is re-traced on PILOT and scored with its own predictor, and must read 0 misses before any close leans on it. The caveat stands in the record: the directory rule was written after the 15 misses it answers.
+
+---
+
+## Ruled 2026-10-04 (14z-190) — #188: option B built as ruled, and NOT extended to the data-file route
+
+**The first ruling, verbatim (14z-190, after #188's options were priced from the timing tier's per-control seconds: a typical close carries 384 of 5,449 gate-plus-control seconds today, option A approximately 1,157, option B at most 1,414; `test_close_tools`'s 1,424 s of controls STALE in every case by design):** the maintainer: *"Let's go for B. If the ERIS trace proves I wrongly skips a gate, we can always go back to the current state, right?"* — answered yes: the narrowed predictor is scored by a fresh trace of every static gate's reads before any close leans on it, and a miss means it does not land (or one commit is reverted).
+
+**The second question (AskUserQuestion), verbatim, once B was built and measured (a typical close's change still re-runs 89 of 203 gates, 41 of them only through R5 on `tests/expected/registry.tsv`, which names STATE.md on 20 lines, 17 of them comments, and in no cell as the path):** *"For a typical close's change, B (as you ruled it) still re-runs 89 of 203 gates; 41 of them only because the data file tests/expected/registry.tsv mentions STATE.md in comments and notes (no cell is the path). Extend B to that data-file route, so a data file counts STATE.md only where a whole cell is that path?"* — options "Extend B to the data route" and "Keep B as ruled".
+
+**The maintainer:** *"Keep B as ruled"*.
+
+So: B is the two narrowings of `tools/static_confirm.py` (N-A: the bare `build` directory is not a reader of what changes under it; N-B: R2 on STATE.md ignores a mention inside a prose string), PROVISIONAL until the trace scores 0 misses; R5 is unchanged. As built, B carries 1,157 of 5,449 gate-plus-control seconds at a typical close (a measurer, 14z-190) — the A estimate, not B's upper bound.
+
+---
+
 ## Ruled 2026-10-04 (14z-190) — #204 and #207 closed `done`; #206 stays open, tested by this session's close
 
 **The question, verbatim (14z-190, after a measurer counted the documentation-packet runs per close from the ledger — 14z-186 12 (11 VIOLATED), 14z-187+187b 8 (7), 14z-188 7 (6), 14z-189 6 (4: 643-646 to the first OK, 658-659 after the tier fixes reopened the packet) — and each ticket was read against its own "done when": #204 met as written (34 of the 35 checks rendered from the tracked set, one added by the close; the gate `tests/test_close_standing.sh` with six controls), #207 met (the claim's opening is the generator's, `tools/close_standing.py` line 303; byte-identity not checked), #206 partly (the 14z-189 row held 8 letters in the commits before the close commit and 23 in it)):** *"So close #204 and #207 now and keep #206 open, close all three, or keep all three open for one more close? This session's close could be #206's real test if I add findings to the table as they come up."*

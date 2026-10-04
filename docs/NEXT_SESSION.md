@@ -25,9 +25,10 @@ work there in parallel** (the maintainer, 14z-189, STATE 14z-189 row 10).
    for #129; `ff8850` for #117): classify them;
    (b) #216 — Lei-Lei 6HP (one hit measured at 128 px, the workbook says three) and the other #117 gaps,
    to check against the Japanese community wiki.
-2. **#188 — `--confirm` CARRIED 31 OF 203 GATES AT THIS CLOSE** (STATE 14z-189 row 14): 75 of its 172 re-runs
-   come from R3 "a tool reads the directory `build/`", which every run changes. Decide with the maintainer whether
-   to narrow R3 or close #188; no clean wall-time saving was measured (the session's ROMDIR slip, row 14).
+2. **#188 — READ WHAT `--confirm` CARRIES AT THE CLOSE** (option B in the predictor since 14z-190, STATE 14z-190
+   row (7): two narrowings plus the R6 directory-template rule, 0 misses on a PILOT trace of every static gate; B as
+   first built missed 15): compare the carried seconds with the modelled 1,035 of 5,449, then put #188's closing to
+   the maintainer; `test_close_tools`'s 1,424 s of controls re-run by design.
 3. **#206 — THE 14z-190 CLOSE IS ITS TEST** (ruled 14z-190; #204 and #207 closed `done`): the findings table is
    written as findings are paid (`tools/findings_add.py`); at the close, judge #206's "done when" (the table
    existed before the close; the completeness read was a review).

@@ -332,9 +332,9 @@ the suite runners and their own ground truth. 41 of 41 described.
 
 **WHAT:** tools/static_confirm.py's predictions mean what they say: a changed path makes a gate STALE when it is a program in the gate's reach (R1), is named by basename on a code line of the reach (R2), lies under a directory the reach reads (R3), the reach reads the whole tree (R4), a data file the reach names names it (R5), a templated path in the reach matches it (R6), or it is a .gitignore/.gitattributes and the reach runs git (R7); a binary in the reach names nothing (14z-188, the traced test's misses and its two TIMEOUTs; a shell or python line starting `--` is code); any other gate is CARRIED.
 
-**HOW:** drives the predictor's selftest over a synthetic repo of nine gates, one per reader class, with known answers; seven controls run copies with one rule removed (directory, whole-tree, data, template, git), `--` read as a comment outside Lua (battery_reach.is_comment), or binaries read as text, and each must fail the selftest.
+**HOW:** drives the predictor's selftest over a synthetic repo of sixteen gates, one per reader class plus the seven of #188 option B's two narrowings (14z-190), with known answers; twelve controls run copies with one rule removed (directory, whole-tree, data, template, git), `--` read as a comment outside Lua (battery_reach.is_comment), binaries read as text, either narrowing switched off, or N-B's quoted-literal clause dropped, its prose strings paired across code, or R6 directory templates read as one component, and each must fail the selftest.
 
-**EXPECTS:** the selftest's twelve cases pass and every control fails on its copy. The HISTORY backtest (tests/expected/static_confirm_backtest.tsv, `static_confirm.py backtest`) takes minutes of worktrees and is run by hand, not here.
+**EXPECTS:** the selftest's thirteen cases pass and every control fails on its copy. The HISTORY backtest (tests/expected/static_confirm_backtest.tsv, `static_confirm.py backtest`) takes minutes of worktrees and is run by hand, not here.
 
 ### `test_suite_dispatch.sh` — test, emulator
 
