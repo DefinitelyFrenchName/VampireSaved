@@ -29,7 +29,9 @@ work there in parallel** (the maintainer, 14z-189, STATE 14z-189 row 10).
    for #129; `ff8850` for #117): classify them;
    (d) #216 — Lei-Lei 6HP (one hit measured at 128 px, the workbook says three) and the other #117 gaps,
    to check against the Japanese community wiki.
-2. **#188 — MEASURE WHAT `--confirm` SAVED AT THIS CLOSE** (STATE 14z-189 row 14), then close it or keep it.
+2. **#188 — `--confirm` CARRIED 31 OF 203 GATES AT THIS CLOSE** (STATE 14z-189 row 14): 75 of its 172 re-runs
+   come from R3 "a tool reads the directory `build/`", which every run changes. Decide with the maintainer whether
+   to narrow R3 or close #188; no clean wall-time saving was measured (the session's ROMDIR slip, row 14).
 3. **#204, #206, #207 WERE USED FOR THE FIRST TIME AT THIS CLOSE** (`tools/close_standing.py`,
    `tests/close_standing_checks.tsv`): read how many documentation-packet runs the close took (row 14) against
    12, 8 and 7 before them, and put closing them to the maintainer.
