@@ -72,12 +72,13 @@ How to work with it:
   origin main`; anything red or skipped leaves the commits local and the
   close entry says so.
 
-## Session 14z-190 — **#128 kept parked (the opener's question).** A plain Opus 5.5 session at effort High on the #172 setup (transcript `0740fcb3`). (IN PROGRESS — the close completes this group.)
+## Session 14z-190 — **#128 and #162 kept parked (the opener's questions).** A plain Opus 5.5 session at effort High on the #172 setup (transcript `0740fcb3`). (IN PROGRESS — the close completes this group.)
 
 | | |
 |---|---|
 | opened with | the maintainer: *"read handoff.md, state.md and docs/next_session.md"* (the file is `docs/NEXT_SESSION.md`); `main` level with `origin/main` at `dd3c97bd` (`git rev-list --left-right --count` 0 0 after a fetch); `python3 tools/agent/sweep.py` CLEAN (exit 0). ROMDIR not yet audited this sitting (no ROM read so far). |
 | **(1) #128 KEPT PARKED** | Asked at the opener (NEXT_SESSION START HERE 1(b)), the maintainer: *"#128 : keep it parked for now"* — `DECISIONS_HISTORY.md` "Ruled 2026-10-04 (14z-190) — #128: Marionette stays parked"; the index row back to `parked`, the ruling commented on #128, the question removed from START HERE. |
+| **(2) #162 KEPT PARKED** | Asked at the opener (START HERE 1(a)), the maintainer: *"#162 : let's park it for now."* — `DECISIONS_HISTORY.md` "Ruled 2026-10-04 (14z-190) — #162: the column flash stays parked"; the index row `parked` (it had read `open` since 14z-170 despite the 14z-171 parking and the issue's `parked` label), 14z-189 added to its sessions, the ruling commented on #162, the question removed from START HERE. |
 
 ## Session 14z-189 — **The M22 freeze (#194 + #195) FROZEN; item 0's five learnings homed; #130, #133, #196, #203 closed `done`; #117, #118, #128, #129, #162 measured; the minimum air-attack height corrected (24, Lei-Lei, fifteen callers); merged-m22 PUBLISHED at the close, #145 and #212 closed against it, #221 filed (row 14).** A plain Opus 5.5 session on the #172 setup (transcript `7deb09bb`). (IN PROGRESS — the close completes this group.)
 

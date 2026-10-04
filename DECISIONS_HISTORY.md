@@ -351,6 +351,16 @@ So: merged-m19's seven zip assets are NOT deleted by hand; they stay hosted unti
 
 ---
 
+## Ruled 2026-10-04 (14z-190) — #162: the column flash stays parked
+
+**The question, verbatim, at the 14z-190 opener (NEXT_SESSION START HERE 1(a), after 14z-189 found the cause with `tests/audit_column_flash_cause.sh`):** *"**#162, the column flash:** the cause is the palette reload keeping vsavj's mask without Donovan's bit. The one-bit fix needs a capture before any build."* — restated after the #128 ruling as *"#162 (the column flash fix, which needs a capture first)"*.
+
+**The maintainer:** *"#162 : let's park it for now."*
+
+So: no capture and no build for the one-bit fix; #162 stays open as `parked`. The index row had read `open` since 14z-170 although 14z-171 parked it ("Ruled 2026-09-20 (14z-171) — #162 is parked, not closed") and the issue carries the `parked` label; the row now agrees.
+
+---
+
 ## Ruled 2026-10-04 (14z-190) — #128: Marionette stays parked
 
 **The question, verbatim, at the 14z-190 opener (NEXT_SESSION START HERE 1(b), after 14z-189 measured the port's cost in `tests/audit_marionette_cost.sh`: 28 vs2 sites, 26 vsavj hook points, worst legacy frame 14 executions):** *"**#128, Marionette:** its cost is measured. Do we build it or keep it parked?"*

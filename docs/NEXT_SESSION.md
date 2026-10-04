@@ -21,12 +21,9 @@ work there in parallel** (the maintainer, 14z-189, STATE 14z-189 row 10).
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** What the 14z-189 close found and did is in its
    CLOSE row (STATE 14z-189 row 14).
 1. **QUESTIONS WAITING FOR THE MAINTAINER (none blocks work; ask them early):**
-   (a) #162 — the column flash is the palette reload keeping vsavj's mask without Donovan's bit; the one-bit
-   fix needs a capture before any build (`tests/audit_column_flash_cause.sh`); its census also found Phobos's
-   air-attack height row (`0x10`) and the sound-id sites;
-   (b) #129 and #117 — five `poke_readback` rows are UNCLASSIFIED (`ff8109`, `ff8116`, `ff8450`, `ff8850`
+   (a) #129 and #117 — five `poke_readback` rows are UNCLASSIFIED (`ff8109`, `ff8116`, `ff8450`, `ff8850`
    for #129; `ff8850` for #117): classify them;
-   (c) #216 — Lei-Lei 6HP (one hit measured at 128 px, the workbook says three) and the other #117 gaps,
+   (b) #216 — Lei-Lei 6HP (one hit measured at 128 px, the workbook says three) and the other #117 gaps,
    to check against the Japanese community wiki.
 2. **#188 — `--confirm` CARRIED 31 OF 203 GATES AT THIS CLOSE** (STATE 14z-189 row 14): 75 of its 172 re-runs
    come from R3 "a tool reads the directory `build/`", which every run changes. Decide with the maintainer whether
