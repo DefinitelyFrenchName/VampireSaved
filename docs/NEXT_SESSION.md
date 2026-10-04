@@ -28,9 +28,9 @@ work there in parallel** (the maintainer, 14z-189, STATE 14z-189 row 10).
 2. **#188 — `--confirm` CARRIED 31 OF 203 GATES AT THIS CLOSE** (STATE 14z-189 row 14): 75 of its 172 re-runs
    come from R3 "a tool reads the directory `build/`", which every run changes. Decide with the maintainer whether
    to narrow R3 or close #188; no clean wall-time saving was measured (the session's ROMDIR slip, row 14).
-3. **#204, #206, #207 WERE USED FOR THE FIRST TIME AT THIS CLOSE** (`tools/close_standing.py`,
-   `tests/close_standing_checks.tsv`): read how many documentation-packet runs the close took (row 14) against
-   12, 8 and 7 before them, and put closing them to the maintainer.
+3. **#206 — THE 14z-190 CLOSE IS ITS TEST** (ruled 14z-190; #204 and #207 closed `done`): the findings table is
+   written as findings are paid (`tools/findings_add.py`); at the close, judge #206's "done when" (the table
+   existed before the close; the completeness read was a review).
 4. **#214 — the MiSTer README still says the package holds an emulator.** It shipped in merged-m22; fix the
    generator, extend `tests/test_release_launcher_bat.sh`'s check, and it goes out with the next release.
 5. **#219 — `tests/run_all_emulator.sh --dry-run` writes a run record that hides staleness.** Until it is

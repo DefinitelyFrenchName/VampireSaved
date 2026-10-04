@@ -351,6 +351,16 @@ So: merged-m19's seven zip assets are NOT deleted by hand; they stay hosted unti
 
 ---
 
+## Ruled 2026-10-04 (14z-190) — #204 and #207 closed `done`; #206 stays open, tested by this session's close
+
+**The question, verbatim (14z-190, after a measurer counted the documentation-packet runs per close from the ledger — 14z-186 12 (11 VIOLATED), 14z-187+187b 8 (7), 14z-188 7 (6), 14z-189 6 (4: 643-646 to the first OK, 658-659 after the tier fixes reopened the packet) — and each ticket was read against its own "done when": #204 met as written (34 of the 35 checks rendered from the tracked set, one added by the close; the gate `tests/test_close_standing.sh` with six controls), #207 met (the claim's opening is the generator's, `tools/close_standing.py` line 303; byte-identity not checked), #206 partly (the 14z-189 row held 8 letters in the commits before the close commit and 23 in it)):** *"So close #204 and #207 now and keep #206 open, close all three, or keep all three open for one more close? This session's close could be #206's real test if I add findings to the table as they come up."*
+
+**The maintainer:** *"lose #204 and #207 now and keep #206 open and let's use this session to test #206"*
+
+So: #204 and #207 close `done`; #206 stays open, and the 14z-190 findings table is written as findings are paid (`tools/findings_add.py`), so this close reviews it rather than rebuilding it — #206's "done when" is judged at this close.
+
+---
+
 ## Ruled 2026-10-04 (14z-190) — #188: option D, measure the controls first
 
 **The question, verbatim (14z-190, after the confirm plans of the 14z-189 close and three modelled changed sets were measured: a typical close's change re-runs 143 of 203 gates, carrying 308 of 2,121 gate-seconds; `build/` alone 138, `STATE.md` + `NEXT_SESSION.md` alone 89; the 14z-189 close tier spent 3,446 s in controls against 2,121 s in gates):** four options — *"A. Narrow R3 for `build/`. For example, ignore the runners' own output (`build/static_runs/`, session scratch directories), or require a deeper subdirectory name such as `build/m3b_merged30`. Then re-run the ERIS trace."*; *"B. A, plus narrow R2 for `STATE.md`, where the mentions are in messages rather than reads. This is the bigger lever (63 gates in the model), with the same need for the ERIS trace."*; *"C. Close #188 as `done`. The wiring works and has never wrongly carried a gate. The saving is small because the gates it would carry are cheap and the cost sits in controls."*; *"D. Measure the controls first: per-gate control time, so A and B can be priced in real wall time before you decide."* — no recommendation given.

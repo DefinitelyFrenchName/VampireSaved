@@ -208,7 +208,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
 - A TABLE CHECK OF THE PIPELINE IS NOT A CHECK OF THE ATTACKER'S DATA — before calling a damage difference "the engines", swap the hit's own record (paid: 14z-187b, GitHub #191, #161)
 - ONE LEGACY VICTIM IS NOT A CONTROL FOR A DAMAGE DIFFERENCE — sweep every legacy victim, from both sides (paid: 14z-186/187, GitHub #191)
-- THE CLOSE PACKET'S CHECKS ARE REBUILT AT EVERY CLOSE — start from the last close's checks file, not from the tools (paid: 14z-186, rule-checker runs 2026-09-30-486 to 2026-10-01-497)
+- THE CLOSE PACKET'S CHECKS ARE REBUILT AT EVERY CLOSE — ANSWERED: render the tracked standing set and add only what is new (the old rule: start from the last close's checks file) (paid: 14z-186, rule-checker runs 2026-09-30-486 to 2026-10-01-497)
 - A FROZEN TABLE IS NOT THE CONTROL FOR A VARIANT RUN — run the unchanged form through the same script on the same build (paid: 14z-186, GitHub #183, rule-checker run 2026-09-30-480)
 - `tools/homes_tracked.py`'S SECOND POSITIONAL IS AN OUTPUT FILE — `--newest STATE.md` OVERWRITES STATE.md (paid: 14z-186)
 - ONE CANDIDATE FOR TWO SIDE MOVES OF ONE FIX CAN BE HALF RIGHT — split every hook into its cycles and its logic, per replay (paid: 14z-185b to 14z-186, GitHub #186)

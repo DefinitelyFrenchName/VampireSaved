@@ -20,10 +20,10 @@ number	state	reason	closed	labels	title
 210	OPEN	-	-	architecture,bug	pre_push hook's sample procedure command lacks --session, which rulecheck.py prepare now requires (#209)
 209	CLOSED	COMPLETED	2026-10-03	bug,severity: low	rulecheck.py prepare leaves the ledger's session column '-' unless --session is given, so per-session counts are wrong
 208	CLOSED	COMPLETED	2026-10-03	bug,severity: medium,test-integrity	extract.py showed a still-running worker's latest text as its report (WX) when the extract was cut before its hand-back, so the procedure check ruled a false QP5
-207	OPEN	-	-	architecture,evolution	Close: generate the documentation packet's claim from the run of record's check outputs
+207	CLOSED	COMPLETED	2026-10-04	architecture,evolution	Close: generate the documentation packet's claim from the run of record's check outputs
 206	OPEN	-	-	architecture,evolution	Close: append each finding to the findings table when it is paid for, not reconstructed at the close
 205	CLOSED	COMPLETED	2026-10-03	bug,severity: medium,test-integrity	homes_tracked.py drops an unresolved bare document name silently and never checks each finding letter
-204	OPEN	-	-	architecture,evolution	Close: a tracked standing close-check set with derived lists and generated plants, inherited by every close
+204	CLOSED	COMPLETED	2026-10-04	architecture,evolution	Close: a tracked standing close-check set with derived lists and generated plants, inherited by every close
 203	CLOSED	COMPLETED	2026-10-03	bug,severity: low	Linux: test_agent_sweep's post-kill check and test_run_on_snapshot's no-self-copy control fail on their own premises (fixed sleep vs zombies; dash reads ahead)
 202	CLOSED	NOT_PLANNED	2026-10-03	bug,severity: low	1P arcade: the 14z-87 keep-tenant thunk may make a tenant CPU opponent repeat (the ladder's pick skipped when the CPU side already holds a tenant id)
 201	CLOSED	COMPLETED	2026-10-01	bug	Linux: per-frame pin lists in POKES exceed the 128 KiB single-environment-string limit, so the parity-style gates' legs never start off macOS

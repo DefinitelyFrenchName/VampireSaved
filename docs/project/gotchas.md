@@ -56,7 +56,7 @@ depend on the victim.
 with the same pins, and read the per-victim differences. One agreeing victim proves nothing about the others. The
 gate above is the instrument; it takes about two minutes.
 
-## THE CLOSE PACKET'S CHECKS ARE REBUILT AT EVERY CLOSE — start from the last close's checks file, not from the tools (paid: 14z-186, rule-checker runs 2026-09-30-486 to 2026-10-01-497)
+## THE CLOSE PACKET'S CHECKS ARE REBUILT AT EVERY CLOSE — ANSWERED: render the tracked standing set and add only what is new (the old rule: start from the last close's checks file) (paid: 14z-186, rule-checker runs 2026-09-30-486 to 2026-10-01-497)
 
 **What happened.** The 14z-186 documentation packet took twelve rule-checker rounds: 486 to 496 each VIOLATED
 on a true gap in the CLOSE'S OWN CHECKING, never in a finding or a home. In order: a promised item unchecked; a
@@ -70,7 +70,7 @@ promise check (the flagged promise carried in START HERE), an exemption check (e
 marker, read with `tools/agent/rulings_verbatim.py`'s own reader), and a quote-source check (each maintainer
 quote found with the exempted texts removed from the pool). The 14z-185b close had built its own evidence check.
 
-**The rule.** A close starts its checks file from the previous close's (`build/agent186/close/checks.tsv` and
+**The rule (SUPERSEDED 14z-189 by the standing set — "ANSWERED" below; kept for what it records).** A close starts its checks file from the previous close's (`build/agent186/close/checks.tsv` and
 its four scripts, while they exist), with every plant, and runs the tools' self-tests in the same run of record.
 The tracked close tools do not yet carry these checks; until they do, each close pays to rebuild them.
 
@@ -83,6 +83,19 @@ answered the finding named, and the next round found the next hole in it: fix th
 The structural remedies are tickets: #204 (a tracked standing set, lists derived, plants generated), #205
 (`tools/homes_tracked.py` drops an unresolved bare name silently), #206 (the table written as findings are
 paid), #207 (the packet's claim generated from the run of record).
+
+**ANSWERED, 14z-189 (#204 and #207, closed `done` 14z-190).** The standing set is tracked:
+`tests/close_standing_checks.tsv`, rendered for one close by `python3 tools/close_standing.py render --key 14z-N
+--row "(N) THE FINDINGS TABLE" --run build/agentNNN/close` (lists derived, plants generated at run time, a close
+adds only its new checks with `render --extra`), and the packet's claim is `close_standing.py claim` over the run
+of record; gate `tests/test_close_standing.sh`. Its first close, 14z-189: 6 documentation-packet runs, 4 VIOLATED
+(643-646 to the first OK, 658-659 after the tier fixes reopened the packet), against 7/6, 8/7 and 12/11 at the
+three closes before (the ledger, counted by a measurer 14z-190). **What it does not fix.** A generated claim
+quotes each check's declared WHAT, so an overstated WHAT is overstated at EVERY close until the template is
+corrected — the 14z-189 runs found `retraction_grep`'s and the template was corrected (STATE 14z-189 row 14): a
+finding against a declared WHAT is fixed in `tests/close_standing_checks.tsv`, never in one close's copy. And the
+findings table was still mostly written at the close (8 letters in the commits before the close commit, 23 in it):
+#206, open, its test the 14z-190 close.
 
 ## A FROZEN TABLE IS NOT THE CONTROL FOR A VARIANT RUN — run the unchanged form through the same script on the same build (paid: 14z-186, GitHub #183, rule-checker run 2026-09-30-480)
 
