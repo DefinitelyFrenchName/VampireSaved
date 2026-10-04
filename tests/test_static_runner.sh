@@ -417,7 +417,7 @@ mkx g_xlies 'echo "PASS: nothing changed"; exit 0'
 mkx g_xref  'echo "REFUSED: CONTROL=flip is not a mode of this gate"; exit 3'
 mkx g_xdied 'echo "tests/g_xdied.sh: line 9: FOO: parameter not set"; exit 0'
 printf 'g_xhon\ng_xlies\ng_xref\ng_xdied\n' > "$FR/tests/ci_portable.txt"
-o12="$(cd "$FR" && sh tests/run_all_static.sh --tier portable 2>&1)" && s12=0 || s12=$?
+o12="$(cd "$FR" && STATIC_RESULTS_OUT="$T/r12.tsv" sh tests/run_all_static.sh --tier portable 2>&1)" && s12=0 || s12=$?
 for pair in "g_xlies:LIES" "g_xref:REFUSED" "g_xdied:DIED"; do
     g="${pair%%:*}"; v="${pair##*:}"
     printf '%s' "$o12" | grep -qE "^  $g +CONTROL $v: flip" && echo "  ok: $g -> CONTROL $v" \
@@ -437,8 +437,18 @@ printf '%s' "$o12" | grep -q 'PASS 4 .*SKIP 0 .*FAIL 3' \
 printf '%s' "$o12" | grep -q 'g_xlies(control:flip:LIES)' && echo "  ok: the failure list names the gate, the control and the verdict" \
     || fail "the failure list does not name the lying control: $(printf '%s' "$o12" | grep '^failed:' || echo '(none)')"
 [ "$s12" != 0 ] && echo "  ok: and the runner exits nonzero ($s12)" || fail "a lying control left the runner green"
+# the per-control times are KEPT (14z-190, #188 option D): one row per executed control beside
+# results.tsv — gate, control, verdict, seconds — so a confirm plan can be priced in wall time
+CT12="$T/r12.controls.tsv"
+if [ -f "$CT12" ] && [ "$(grep -vc '^#' "$CT12")" = 4 ] \
+        && grep -qE "^g_xhon	flip	HONOURED	[0-9]+$" "$CT12" && grep -qE "^g_xlies	flip	LIES	[0-9]+$" "$CT12" \
+        && grep -qE "^g_xref	flip	REFUSED	[0-9]+$" "$CT12" && grep -qE "^g_xdied	flip	DIED	[0-9]+$" "$CT12"; then
+    echo "  ok: the run kept its control times beside results.tsv — 4 rows, gate / control / verdict / seconds"
+else fail "no per-control times beside results.tsv ($CT12): $(grep -v '^#' "$CT12" 2>/dev/null | tr '\n' '|' || echo '(no file)')"; fi
 # the MUST-NOT-FIRE half: --exec-controls none runs nothing and the four stubs are all PASS
-o12b="$(cd "$FR" && sh tests/run_all_static.sh --tier portable --exec-controls none 2>&1)" && s12b=0 || s12b=$?
+o12b="$(cd "$FR" && STATIC_RESULTS_OUT="$T/r12b.tsv" sh tests/run_all_static.sh --tier portable --exec-controls none 2>&1)" && s12b=0 || s12b=$?
+[ -f "$T/r12b.controls.tsv" ] && fail "--exec-controls none wrote a control-times file" \
+    || echo "  ok: with --exec-controls none no control-times file is written"
 [ "$s12b" = 0 ] && printf '%s' "$o12b" | grep -q 'PASS 4 .*FAIL 0' && printf '%s' "$o12b" | grep -q 'executed: (off' \
     && echo "  ok: control — with --exec-controls none the same four stubs are PASS 4 and the readout says off" \
     || fail "--exec-controls none still executed or failed something: $(printf '%s' "$o12b" | grep -E '^PASS |executed' || echo '(none)')"

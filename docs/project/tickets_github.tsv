@@ -2,8 +2,10 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 221
+# issues: 223
 number	state	reason	closed	labels	title
+223	OPEN	-	-	cosmetic	Two sound-request sites give Phobos and Donovan each other's +1 on the sound id (char-id mask bits 0x10/0x13 swapped vs vs2) — static only
+222	OPEN	-	-	bug	Phobos's minimum air-attack height: vs2 checks it (row 0x10 = 24), ours reads 0 — static only, not measured in play
 221	OPEN	-	-	bug	upload_release_assets.sh --prune checks only the tag just before the published one, so a freeze that was never released stops it (merged-m19's assets are still hosted)
 220	CLOSED	NOT_PLANNED	2026-10-04	cosmetic	MiSTer release README still says the package contains an emulator (FBNeo or MAME)
 219	OPEN	-	-	bug	run_all_emulator.sh --dry-run writes a run record that the staleness audit takes as the newest run
@@ -63,7 +65,7 @@ number	state	reason	closed	labels	title
 165	CLOSED	COMPLETED	2026-09-19	bug	The tenants' vs2 EX inputs entered Dark Force through a placed copy of vs2's Change entry — a second, longer route into the mode
 164	CLOSED	COMPLETED	2026-09-19	bug	Phobos and Donovan took damage and rallied through their shells' defense rows (vsavj's copies for ids 0x10/0x13), not vs2's own
 163	CLOSED	COMPLETED	2026-09-25	bug	The Killshread Lightning column and the Plasma Trap ran vsavj's shock remap instead of vs2's class-0x52 rule — the victim's freeze and the attacker's hit-freeze differed from native
-162	OPEN	-	-	cosmetic	The deity above Donovan flashes orange as the Killshread Lightning column ends — an extra palette-sequence upload of row 11 native does not make
+162	OPEN	-	-	cosmetic,parked	The deity above Donovan flashes orange as the Killshread Lightning column ends — an extra palette-sequence upload of row 11 native does not make
 161	CLOSED	NOT_PLANNED	2026-09-25	bug	Phobos takes one more HP than native from Demitri's 5HP with his defense rows already vs2's (12 against 11)
 160	CLOSED	COMPLETED	2026-09-28	bug,severity: low	rulecheck.py: prepare's auto id collides with a run directory that has no ledger row
 159	CLOSED	COMPLETED	2026-09-28	bug,needs-maintainer-ruling,severity: medium	Tenant attack records with facing rule 5 are XORed into the victim's facing by vsavj's hit code (Killshread Summon (ES) pushes Demitri away where native drags him in)

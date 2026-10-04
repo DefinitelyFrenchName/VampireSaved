@@ -351,6 +351,16 @@ So: merged-m19's seven zip assets are NOT deleted by hand; they stay hosted unti
 
 ---
 
+## Ruled 2026-10-04 (14z-190) — #188: option D, measure the controls first
+
+**The question, verbatim (14z-190, after the confirm plans of the 14z-189 close and three modelled changed sets were measured: a typical close's change re-runs 143 of 203 gates, carrying 308 of 2,121 gate-seconds; `build/` alone 138, `STATE.md` + `NEXT_SESSION.md` alone 89; the 14z-189 close tier spent 3,446 s in controls against 2,121 s in gates):** four options — *"A. Narrow R3 for `build/`. For example, ignore the runners' own output (`build/static_runs/`, session scratch directories), or require a deeper subdirectory name such as `build/m3b_merged30`. Then re-run the ERIS trace."*; *"B. A, plus narrow R2 for `STATE.md`, where the mentions are in messages rather than reads. This is the bigger lever (63 gates in the model), with the same need for the ERIS trace."*; *"C. Close #188 as `done`. The wiring works and has never wrongly carried a gate. The saving is small because the gates it would carry are cheap and the cost sits in controls."*; *"D. Measure the controls first: per-gate control time, so A and B can be priced in real wall time before you decide."* — no recommendation given.
+
+**The maintainer:** *"for #188 let's go with option D."*
+
+So: the static runner keeps each executed control's seconds (until now deleted at exit, only the three costliest printed), one full tier run supplies them, and A and B are priced in wall time — gate plus control seconds of every gate each would carry — before #188's next ruling.
+
+---
+
 ## Ruled 2026-10-04 (14z-190) — #162: the column flash stays parked
 
 **The question, verbatim, at the 14z-190 opener (NEXT_SESSION START HERE 1(a), after 14z-189 found the cause with `tests/audit_column_flash_cause.sh`):** *"**#162, the column flash:** the cause is the palette reload keeping vsavj's mask without Donovan's bit. The one-bit fix needs a capture before any build."* — restated after the #128 ruling as *"#162 (the column flash fix, which needs a capture first)"*.

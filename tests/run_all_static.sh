@@ -58,7 +58,10 @@
 #                                          gate is CARRIED — counted PASS, named, not re-run,
 #                                          its recorded control counts carried with it. Every run
 #                                          writes results.tsv into its run record (or to
-#                                          $STATIC_RESULTS_OUT), so any run can be confirmed.
+#                                          $STATIC_RESULTS_OUT), so any run can be confirmed —
+#                                          and, when controls were executed, its control times
+#                                          beside it as <results>.controls.tsv (gate, control,
+#                                          verdict, seconds; 14z-190, #188 option D).
 #   ... --cadence session|freeze|release   which CADENCE runs (default session):
 #                                          a gate listed in tests/ci_cadence.tsv
 #                                          above the requested cadence is
@@ -624,6 +627,12 @@ else
             | sort -t "$(printf '\t')" -k1,1nr -k2,2 | head -3 \
             | awk -F'\t' '{printf "%s%s %ds over %d", (NR > 1 ? " · " : ""), $2, $1, $3}')
         echo "  time:     gates ${t_gates}s  controls ${_tc}s  wall $(( $(date +%s) - t_start ))s  (costliest controls: $_top)"
+        # ...and KEEP them (14z-190, #188 option D): the per-control rows beside results.tsv, so a
+        # --confirm plan can be priced in wall time (a carried gate skips its controls too). Silent.
+        if [ -n "$RESULTS_OUT" ]; then
+            { printf '# control times (tests/run_all_static.sh; beside %s)\n' "$(basename "$RESULTS_OUT")"
+              printf '# gate\tcontrol\tverdict\tseconds\n'; cat "$WORK/controls.tsv"; } > "${RESULTS_OUT%.tsv}.controls.tsv"
+        fi
     fi
 fi
 fi
