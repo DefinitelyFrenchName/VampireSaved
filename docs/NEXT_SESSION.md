@@ -21,9 +21,7 @@ work there in parallel** (the maintainer, 14z-189, STATE 14z-189 row 10).
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** What the 14z-189 close found and did is in its
    CLOSE row (STATE 14z-189 row 14).
 1. **QUESTIONS WAITING FOR THE MAINTAINER (none blocks work; ask them early):**
-   (a) #129 and #117 — five `poke_readback` rows are UNCLASSIFIED (`ff8109`, `ff8116`, `ff8450`, `ff8850`
-   for #129; `ff8850` for #117): classify them;
-   (b) #216 — Lei-Lei 6HP (one hit measured at 128 px, the workbook says three) and the other #117 gaps,
+   (a) #216 — Lei-Lei 6HP (one hit measured at 128 px, the workbook says three) and the other #117 gaps,
    to check against the Japanese community wiki.
 2. **#188 — READ WHAT `--confirm` CARRIES AT THE CLOSE** (option B in the predictor since 14z-190, STATE 14z-190
    row (7): two narrowings plus the R6 directory-template rule, 0 misses on a PILOT trace of every static gate; B as

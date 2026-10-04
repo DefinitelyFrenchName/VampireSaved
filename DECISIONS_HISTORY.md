@@ -351,6 +351,16 @@ So: merged-m19's seven zip assets are NOT deleted by hand; they stay hosted unti
 
 ---
 
+## Ruled 2026-10-04 (14z-190) — the five UNCLASSIFIED poke read-back rows (#129, #117): "as read"
+
+**The question, verbatim (14z-190):** each of the five rows of `tests/expected/poke_readback.tsv` put with what its gate does — rows 1–4, `audit_tenant_cpu_soak` (#129), the round timer `$FF8109`, the speed level `$FF8116`, P1 HP `$FF8450` and P2 HP `$FF8850`: *"The rig holds all four every frame so the CPU fight stays one long round. The gate only checks that the holds held, and refuses a leg if they didn't (`tests/audit_tenant_cpu_soak.sh:132-134`). The CPU behaviour it measures comes from other fields."* — the author's reading READS-BACK, already labelled in the gate's header; row 5, `test_vanilla_command_join` (#117), P2 HP `$FF8850`: *"The rig resets P2's HP to 0x120 before each event. The gate counts how many times P2's HP then drops, for example \"Lei-Lei's 6HP: dropped exactly once\"."* — the reading OBSERVES, matching the already-ruled `audit_df_moves` and `audit_column_shock` rows; and the ask: *"rule each row (or all five at once): \"as read\" applies READS-BACK to rows 1–4 and OBSERVES to row 5"*.
+
+**The maintainer:** *"about the unclassified poke rows, I'm ruling \"as read\" as I have no reason to rule differently at this point in time"*
+
+So: rows 1–4 READS-BACK (their header label already in the gate; nothing dropped), row 5 OBSERVES; no gate changes.
+
+---
+
 ## Ruled 2026-10-04 (14z-190) — #188: the fixed B lands (R6 directory templates), after B as built failed the trace
 
 **What was measured first.** The PILOT trace (`build/agent190/trace190.sh`: 203 of 203 static gates under strace at `bd9c9769`, 40,792 (gate, file read) pairs) scored by `build/agent190/analyse190.py`: the pre-B predictor 0 misses; B as built **15 misses in 2 gates** (`test_pcrel_escapes`: three builds' `extract/regions.json`; `test_shared_writes`: 12 files under `build/hui53/`), all from N-A — both gates name their builds only through a template (`f"build/{b}"`, `"build/$b"`) that R6 matched as one path component, so only the bare `build` directory had caught them; a deliberately over-narrowed control 100 misses in 8 gates (the scorer sees misses). Two candidates scored on the same traces, 0 misses each: N-B alone (no saving: 143 STALE, 384 s carried, as today) and B plus an R6 directory-template rule (92 STALE, 1,035 of 5,449 gate-plus-control seconds carried).
