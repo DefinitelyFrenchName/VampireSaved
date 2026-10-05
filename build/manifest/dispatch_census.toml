@@ -19,14 +19,30 @@
 #
 # The census is still worth keeping and still fails on a NEW index: it is
 # the drift detector for which types legacy actually spawns.
+#
+# RE-FROZEN 14z-192 (GitHub #213) ON THE EMULATED CLOCK. The 14z-89
+# observation was taken while tests/lua/dispatch_census.lua keyed replay
+# input and its stop frame to a frame_done counter with two breakpoints
+# armed (the [MFI-5] desync): each replay ran short (26_don_arcade_mash,
+# 4,202 emulated frames of 40,620 counted) with its input landing early.
+# The 14z-89 lists were 0x54470 [4,9,17,19,20,28,37,51,55] and 0x5e542
+# [0,1,2,3,4,7,8,9,10,11,12,15,19,21,25,31,32,37,42,43,44,50,51,52,54,82,
+# 92,96,97,103,110]; the lists below are the corpus run at full emulated
+# length, input aligned with replay.lua (a no-breakpoint reference leg per
+# replay reproduces the frozen vanilla basis checksum). WHAT THEY DESCRIBE:
+# the breakpoint stops move the game on most replays (14z-192: 47 of 56
+# census legs end in a different, legal vanilla game; the game's own frame
+# counter still matches the reference), so these are the types vanilla
+# dispatches in the corpus AS PERTURBED BY THE INSTRUMENT — repeatable run to
+# run, which is what a drift detector needs, and not the basis's exact games.
 schema = 1
 
 [[site]]
 site = 0x54470
 entries = 59
-observed = [4,9,17,19,20,28,37,51,55]
+observed = [0,2,3,4,5,8,9,17,18,19,28,37,40,41,51,53,56]
 
 [[site]]
 site = 0x5e542
 entries = 114
-observed = [0,1,2,3,4,7,8,9,10,11,12,15,19,21,25,31,32,37,42,43,44,50,51,52,54,82,92,96,97,103,110]
+observed = [0,1,2,3,4,5,7,8,9,10,11,12,13,15,19,21,22,25,27,32,35,36,37,46,47,50,51,52,53,54,59,61,62,63,82,83,90,91,92,96,97,99,102,103,108,110]

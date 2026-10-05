@@ -110,9 +110,11 @@ than the crouching one, names that chain. The measurement found **19 such chains
 character and button: BU `6MP`/`6MK`/`3HK`, GA `6MK`, ZA all six (his odd slots,
 `0x01`-`0x0b`), AN `6MK`, BI all six, LE `6MP`/`6HP`. On the other 72 `6x` and 89 `3x`
 presses the game enters the plain far or crouching normal. Bulleta's `3HK` joins by name
-and compares nothing: the workbook calls it a projectile and its chain carries no attack
-window (the hit is a spawned object's), so every column is structurally not the same
-quantity. Specials, supers, EX/ES moves, throws and pursuits are not joined at all.
+and compares nothing: the workbook types it `projectile` (as it types her `5HK`), and the
+chain the rig recorded carries no attack window in its records — the hit is the MINE the
+move spawns, confirmed by the maintainer (2026-10-05, GitHub #216): *"the hit is the mine
+spawned, it is technically a trap/projectile with a disjointed hitbox from the character's
+sprite"*. Specials, supers, EX/ES moves, throws and pursuits are not joined at all.
 
 ## The headline: per-move agreement
 
@@ -198,9 +200,13 @@ hits whose values are those of the first three records to the byte, so its `whit
 Measured on one rig, not inferred: on the idle standing victim at 128 px (the only
 distance measured) the move lands **one** hit (`tests/test_vanilla_command_join.sh`
 section 5, P2's `+0x50` drops once) — consecutive same-id attack nodes land once, the
-rule `tests/test_rehit_ring.sh` measured. Whether the workbook's three hits describe
-another move is OPEN, to be checked against the Japanese wiki: the maintainer, shown
-the capture (2026-10-03), recalls 5HP hitting three times and 6HP once (GitHub #216).
+rule `tests/test_rehit_ring.sh` measured. **The Japanese wiki agrees with the
+measurement (ANSWERED 2026-10-05, 14z-192):** the maintainer, reading seesaawiki
+vswiki, *"Japanese wiki (seesaa) confirms 5HP is multi-hit, while 6HP is a one hit
+up-forward diagonal move"* — so the workbook's three hits are wrong for `6HP`, as
+the maintainer had recalled on seeing the capture (2026-10-03). Which move the
+workbook's three-hit row was taken from is not checked (GitHub #216; its other gaps
+stay open there).
 
 **The hit rig confirms our reading and not theirs.** P1 performs each normal on a
 victim whose HP is re-pinned before every event, and each DROP in P2's `+0x50` is

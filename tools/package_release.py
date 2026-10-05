@@ -562,6 +562,14 @@ Almost every first-time problem is one of these.
   the QSound extension, so the boot handshake never completes (measured
   2026-09-11: no crash, no gameplay, the legal screen forever). It needs the
   patched emulator; renaming is never the fix.
+<!--MAME-->
+- **MAME prints "Errors: Driver is a clone of nonexistent driver megaman"
+  four times every time it starts** (for `mmancp2u`, `mmancp2ur1`, `mmancp2ur2`
+  and `rmancp2j`) — this is expected and harmless. The MAME here is built with
+  only the CPS-2 games, to keep it small, and those four Mega Man games name a
+  parent game that lives outside that set. The game starts and runs normally
+  after these lines.
+<!--/MAME-->
 <!--/EMU-->
 <!--MISTER-->
 - **The game is not in the MiSTer menu, or the MiSTer reports a missing file** —

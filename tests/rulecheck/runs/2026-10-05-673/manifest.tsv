@@ -1,0 +1,11 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent192/c213/pilot_check.log	690f30eddb5ac987a5affa832fecfe873cbc7cce
+build/agent192/c213/pilot_freeze2.log	1555c146e6d12b9c373a6f6466fece5e19f92f0f
+build/agent192/c213/pilot_verify.log	4f4a95cbe7fd56646d9d14d9837babc369f12c10
+build/agent192/c213/dispatch_census.frozen.toml	8776de861e36c836ae562b3c2b43efae021163b7
+build/manifest/dispatch_census.toml	04cd86c16edd4ed8375b850e237ec373c9ca78e3
+build/agent192/c213/26_don_arcade_mash.emu.txt	3dcd6d40a4775b43de705a3cc2c38d8df43d5fd3
+build/agent192/c213/26_don_arcade_mash.frame_done.txt	db69cba8918692caffaa7d95af71ed21991d1cf5
+build/agent192/c213/diff.patch	6b51578a2e5629ed63be141a5cc80faed74f5600
+tests/audit_dispatch_census.sh	cd27b660cf73de30e7aab7370b0cb8bba7806349
+tests/lua/dispatch_census.lua	4321ea21bf203e916977750edfd195aa9c3ab8f4

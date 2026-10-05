@@ -1,0 +1,10 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent192/c213/c213_verify4.log	b9901ffafadca122f9b41eca2be079534b5ac446
+build/agent192/c213/c213_freeze4.log	bb0d2b5ccacf2e2dc2216b2c713dcc88b3dfb102
+build/agent192/c213/c213_mode.log	92551d38d6e4e493e52129235b9fd7e76ea54357
+build/agent192/c213/c213_provenance4.txt	3f27186d481f8477f5eb61c358752d00be135ba2
+build/manifest/dispatch_census.toml	7c16434bbb604da440a769cd846be6e2a27366f5
+build/agent192/c213/diff2.patch	b4eef141a3023af29c64d65f9e9ea165806f9628
+tests/audit_dispatch_census.sh	eaf4c3c1b83171f5ce08b1274d3949d029843733
+tests/lua/dispatch_census.lua	759b456f05958eb179ac9a2b78cfddccbe8a8fcf
+tests/expected/vsavj/masked-v2/MASK	65b77afcdc32b64aa09622dac8451e8484bf8e36

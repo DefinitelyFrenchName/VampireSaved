@@ -585,17 +585,24 @@ def select_platform_text(dest, platform):
     `<!--/MISTER-->`; an emulator package keeps the first, the MiSTer package the second.
     Before this, the MiSTer README told its reader to double-click PLAY.command and
     PLAY.bat, neither of which the MiSTer package carries. A marker left over, or an
-    unbalanced pair, stops the packaging rather than shipping it."""
+    unbalanced pair, stops the packaging rather than shipping it.
+    `<!--MAME-->` / `<!--/MAME-->` (14z-192, GitHub #227) nest inside an EMU block and hold
+    what is true of the MAME build alone (its four validation lines); only the mame package
+    keeps them. They are dropped FIRST, so the EMU pass sees no nested pair."""
     import re
     path = os.path.join(dest, "README.md")
     body = open(path).read()
     keep, drop = ("MISTER", "EMU") if platform == "mister" else ("EMU", "MISTER")
-    for tag in (keep, drop):
+    for tag in (keep, drop, "MAME"):
         if body.count(f"<!--{tag}-->") != body.count(f"<!--/{tag}-->"):
             sys.exit(f"{path}: unbalanced <!--{tag}--> markers")
+    if platform == "mame":
+        body = body.replace("<!--MAME-->\n", "").replace("<!--/MAME-->\n", "")
+    else:
+        body = re.sub(r"<!--MAME-->\n.*?<!--/MAME-->\n", "", body, flags=re.S)
     body = re.sub(rf"<!--{drop}-->\n.*?<!--/{drop}-->\n", "", body, flags=re.S)
     body = body.replace(f"<!--{keep}-->\n", "").replace(f"<!--/{keep}-->\n", "")
-    left = re.findall(r"<!--/?(?:EMU|MISTER)-->", body)
+    left = re.findall(r"<!--/?(?:EMU|MISTER|MAME)-->", body)
     if left:
         sys.exit(f"{path}: platform markers left after selection: {left}")
     open(path, "w").write(body)
@@ -720,6 +727,11 @@ rather than joining it.
   the QSound / CAPCOM legal screen forever (measured 2026-09-11: the stock 4 MB
   driver never loads the program extension, the sound driver or the QSound
   extension; no crash, no gameplay). Renaming is never the fix.
+"""
+    if platform == "mame":      # 14z-192, GitHub #227: the recipe builds the same filtered MAME
+        text += """- Four "Driver is a clone of nonexistent driver megaman" errors at every start
+  (`mmancp2u`, `mmancp2ur1`, `mmancp2ur2`, `rmancp2j`) are expected and harmless:
+  the build is filtered to the CPS-2 drivers and their parent lives outside them.
 """
     open(os.path.join(dest, "EMULATOR.md"), "w").write(text)
 

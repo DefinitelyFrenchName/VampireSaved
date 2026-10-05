@@ -166,7 +166,7 @@ the build pipeline — manifests, patch ops, extraction/reconciliation/generatio
 | gate | kind | tier | needs | locks (the script's own header) | since |
 |---|---|---|---|---|---|
 | `tests/audit_capture_matrix.sh` | audit | ci_static | ROMDIR | THE WHOLE CAPTURE-GEOMETRY MATRIX, ours vs native vsav2, every reachable (ATTACKER, VICTIM) cell (14z-143, maintainer-directed). | 14z-143 |
-| `tests/audit_dispatch_census.sh` | audit | emulator | MAME, a build dir, ~2 min | WHICH type indices does LEGACY ever dispatch at the two obj_hook sites, and is the frozen observation still complete? | 14z-89 |
+| `tests/audit_dispatch_census.sh` | audit | emulator | MAME, a build dir, ~2 min | WHICH type indices does LEGACY ever dispatch at the two obj_hook sites, and is the frozen observation still complete? | 14z-192 |
 | `tests/audit_objhook_owner_census.sh` | audit | emulator | MAME, a build dir, ~6 min | which OWNER does each extended obj_hook type carry at DISPATCH TIME? (14z-81b; the vec3-fix design measurement.) | 14z-81b |
 | `tests/audit_region_movability.sh` | audit | emulator | MAME, a build dir, ~10 min | which regions can actually live in wide_ext? | M3b |
 | `tests/audit_stock_emulator_stall.sh` | audit | emulator | MAME, a build dir, ~1 min | the WIDE romset FORCED into an UNPATCHED MAME (renamed to vsavj.zip) boots, prints WRONG CHECKSUMS, and STALLS on the QSound legal screen without a crash: | 2026-09-11 |

@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-473 entries (47 game / 129 platform / 297 project), counted from the buckets at generation.
+474 entries (47 game / 129 platform / 298 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 47 entries
 
@@ -204,7 +204,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - PYTHON'S ZipInfo STAMPS THE HOST INTO create_system — the same zip code writes a different container on Windows (paid: 14z-189 measured, 14z-191 fixed, GitHub #215)
 - THE CPS-2-ONLY MAME BUILD PRINTS FOUR "clone of nonexistent driver megaman" ERRORS AT EVERY START — harmless, every host, release binaries included (seen: 14z-191, #226)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 297 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 298 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -490,7 +490,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - "NOTHING THE BATTERY RAN READS IT" IS A REACH QUESTION — follow imports and external roots, never paths alone, and prove the finder sees a planted reader (paid: 14z-185, the M21 freeze, rule-checker runs 2026-09-28-398..400)
 - A SEEDED ATTRIBUTION ROOT OUTLIVES THE FIX IT NAMED — the freeze refuses, and the seed is retired WITH the fix's freeze (paid: 14z-185, the M21 freeze, #159; rule-checker runs 2026-09-28-402..404)
 - `--stale` RE-RUNS ONLY GATES THAT PASSED — a freeze that re-freezes a FAILED gate's expectation re-runs that gate itself (paid: 14z-185, the M21 freeze)
-- A ONE-GATE TEST RUN BECOMES THE RUN OF RECORD — `test_emulator_staleness` judges the NEWEST run under build/ (paid: 14z-185b, #189's wiring test)
+- A ONE-GATE TEST RUN BECOMES THE RUN OF RECORD — `test_emulator_staleness` judged the NEWEST run under build/ (paid: 14z-185b, #189's wiring test; FIXED 14z-192, #211: the run of record is now PER GATE)
 - A COST READER THAT KNOWS ONE RUNNER COUNTS ZERO — check a reader's figure against a close you can count by hand before trusting it (paid: 14z-187b, #187)
 - A RULED FORM IS BUILT AS RULED — a "better" variant found while building goes back to the maintainer first (paid: 14z-188, #195)
 - A WORKTREE RESET TAKES THE RULE-CHECKER RECORDS IT HOLDS — record and resolve are tree writes, and `git reset --hard` + `git clean` erase them (paid: 14z-189, rule-checker run 2026-10-03-602)
@@ -503,3 +503,4 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A COMMENT IN AN APPLIER MODULE IS SHIPPED BYTES — the released pages inline the modules verbatim (paid: 14z-191, GitHub #215)
 - A TOOL'S SECOND WORD WAS ITS OUTPUT PATH — `homes_tracked.py --newest STATE.md` wrote its report over STATE.md (paid: 14z-191)
 - A SELF-TEST'S OUTPUT ECHOED INTO A GATE'S LOG IS READ AS THE GATE'S OWN — a per-finding "SKIP" made the gate SKIP (paid: 14z-191)
+- A CONTROL WHOSE PERTURBATION STEP CRASHES CAN STILL READ AS FIRED — `open-agent-gate` never opened the gate (paid: 14z-192)

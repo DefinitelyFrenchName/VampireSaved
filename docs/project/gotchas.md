@@ -6336,7 +6336,7 @@ THAT gate explicitly on the committed tree. Here that is
 `--lane mister --freeze`, which runs all three romset MiSTer gates. Never count
 the `--stale` run as its verification.
 
-## A ONE-GATE TEST RUN BECOMES THE RUN OF RECORD — `test_emulator_staleness` judges the NEWEST run under build/ (paid: 14z-185b, #189's wiring test)
+## A ONE-GATE TEST RUN BECOMES THE RUN OF RECORD — `test_emulator_staleness` judged the NEWEST run under build/ (paid: 14z-185b, #189's wiring test; FIXED 14z-192, #211: the run of record is now PER GATE)
 
 Testing the emulator driver's run record needed one real run, so a single prereq gate was run
 into `build/emu_runrec_14z185b/`. The driver writes `commit.txt` into every run directory, and
@@ -6359,7 +6359,27 @@ tell — remove its directory, or re-read `--names`, before any `--stale` run (t
 **FIXED 14z-191 (#219):** the runner writes `commit.txt` only when it executes (`[ "$DRY" = 0 ]`), so a
 dry run leaves no run of record; `tests/test_emulator_runner.sh` section 15 holds it, with the must-fire
 control `dry-run-records` (a runner copy without the guard must write one). The ONE-GATE half above still
-stands: a real partial run is still a run of record.
+stands: a real partial run is still a run of record. *(→ FIXED 14z-192, below.)*
+
+**Paid a third time, and FIXED 14z-192 (#211): a run that selected NO gate.** `tests/run_all_emulator.sh
+--stale` without `--lane mister` matched 0 gates (both stale ones were mister-lane), printed `GREEN`
+(`PASS 0`), and wrote `commit.txt` and an empty `results.tsv`, which became the newest run: the audit
+then read "0 gate(s) PASSED there" and PASSED at freeze cadence. The same shape had already hidden a
+real red: on this Mac three empty runs written 2026-09-27 (`build/emu_sweep_20260927_113036`,
+`_113038`, `_133129`, 0 rows each) sat newer than that morning's 198-row run, whose
+`audit_sdram_bank_load` row took 3,626 s of a 7,200 s cap — 0.50, the half-cap FAIL — so the
+headroom check never saw it. **The fixes:** the runner refuses, by name and before writing any run
+directory, a `--stale` gate outside `--lane/--scope/--cadence/--only`, and exits 1 on a selection
+that matches no gate (`tests/test_emulator_runner.sh` section 15, control `empty-green`);
+`tools/audit_emulator_staleness.py` takes each gate's NEWEST ROW over every recorded run, judged
+against that run's commit, so neither a partial nor an empty run hides another gate
+(`tests/test_emulator_staleness.sh` section 2b, control `newest-dir`; `--run DIR` still judges one
+run). The cap was re-set from the six recorded runtimes (3,469-3,626 s) to 9,000 s
+(`tests/ci_emulator.tsv`). **What changes for a freeze:** at freeze cadence the audit now judges
+EVERY gate's newest row, so it FAILs until the freeze's own emulator runs (every lane's
+`build/emu_*`, copied home when they ran on another host — `docs/project/snapshot_runs.md` step 4)
+are on this host's `build/` for the committed tree; on 2026-10-05 the Mac's newest rows dated from
+the M21 runs, 189 of 189 passed gates stale.
 
 ## A COST READER THAT KNOWS ONE RUNNER COUNTS ZERO — check a reader's figure against a close you can count by hand before trusting it (paid: 14z-187b, #187)
 
@@ -6511,3 +6531,19 @@ counted the passing gate as SKIP, a red under `--strict`.
 **The rule:** a gate echoes a sub-tool's VERDICT line, never its per-item lines, when those lines can carry a verdict
 word (`SKIP`, `FAIL`, `PASS` at the start of a line); `test_close_standing.sh` now prints only the `SELFTEST` line,
 and the shared classifier reads the result as PASS.
+
+## A CONTROL WHOSE PERTURBATION STEP CRASHES CAN STILL READ AS FIRED — `open-agent-gate` never opened the gate (paid: 14z-192)
+
+`tests/test_agent_hooks.sh` builds each control's perturbed copy of `tools/agent` with a short Python heredoc. The
+`open-agent-gate` one wrote its search string as `'    """-> (decision, reason); decision is 'deny' or None."""\n'` —
+the single quotes around `deny` closed the string, so Python died with a SyntaxError (printed into the gate's log,
+unread), the copy step produced no usable hook, and the call-gate cases, run on that, failed 14 must-deny cases. The
+control printed `CONTROL FIRED: open-agent-gate — 14 must-deny call cases let through` on every run since it was
+written: a crash read as the perturbation working ([VSP-108]'s "a verdict control that CRASHES reads as a control that
+fired", in a control). An unperturbed copy at the same place decides all 27 cases correctly, so the count was the
+crash's, not the open gate's.
+
+**The rule:** a control's evidence line names what the PERTURBATION did, and a perturbation step that cannot apply
+stops the gate (`assert` + a non-zero exit the gate reads), never a silent fall-through into the comparison. Fixed:
+the string escaped; `CONTROL=open-agent-gate` now FAILs the gate with the perturbation applied (14z-192).
+

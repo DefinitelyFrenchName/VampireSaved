@@ -25,14 +25,41 @@
 --   env CENSUS_OUT output path (default dispatch_census.txt)
 --   env REPLAY     input script (replay.lua grammar subset)
 --   env FRAMES     stop after this many frames (default 3600)
+--   env CENSUS_CLOCK  "frame_done" restores the OLD drifting clock (the
+--                  must-fire control of tests/audit_dispatch_census.sh)
+--   env ANCHOR     a frame N: at the end of frame N, BEFORE staging frame N+1's
+--                  input (replay.lua's order), print "ANCHOR <N> <fnv1a64>" — the
+--                  work-RAM checksum replay.lua writes for that frame, under
+--   env MASK_RANGES the same mask (replay.lua's grammar). The gate compares it with
+--                  the frozen vanilla basis log, an anchor OUTSIDE this script's
+--                  clock (14z-192, rule-checker run 2026-10-05-673).
+--
+-- THE FRAME CLOCK IS EMULATED TIME (14z-192, GitHub #213; [MFI-5]): while a
+-- breakpoint holds the CPU, MAME keeps emitting UI frames and frame_done keeps
+-- firing, so a frame_done counter runs ahead of emulated time, replay input
+-- keyed to it lands early, and the run stops before the replay's end. The
+-- screen's own frame number advances only with emulated frames (the clock
+-- tests/lua/pc_count.lua took at 14z-189).
 --
 -- Output, one block per site:
 --   SITE <addr> entries <n> hits <total> seen <count> : <sorted indices>
 --   FREE <addr> <count> : <sorted never-observed indices>
--- then "CENSUSEND <frames>". Needs -debug -debugger none.
+-- then "EMUFRAMES <emulated frames since start> UIFRAMES <frame_done calls
+-- with no emulated frame>", the ANCHOR/GAMECLOCK lines when ANCHOR is set, and
+-- "CENSUSEND <frames>". Needs -debug -debugger none, except with SITES=none (the
+-- REFERENCE leg: no breakpoint, no debugger — replay.lua's own game, 14z-192).
+--
+-- WHY A REFERENCE LEG (14z-192, measured): a breakpoint stop changes how the 68k
+-- and the sound CPU interleave, and on some replays that moves the GAME — on
+-- 03_two_player_vs the breakpoint leg's work RAM leaves the vanilla basis at frame
+-- 469 and differs in fighter and object fields by 5320, while 06_test_mode and
+-- 26_don_arcade_mash stay byte-identical to it. So the breakpoint leg cannot be
+-- anchored byte for byte; the reference leg can, and the breakpoint leg is tied to
+-- it by the game's own vblank counter (GAMECLOCK, RAM:$FF8080).
 local machine = manager.machine
 local debugger = machine.debugger
-assert(debugger, "run mame with -debug")
+local REFERENCE = (os.getenv("SITES") or "") == "none"   -- the reference leg runs without -debug
+assert(debugger or REFERENCE, "run mame with -debug")
 local cpu = machine.devices[":maincpu"]
 
 local out_path = os.getenv("CENSUS_OUT") or "dispatch_census.txt"
@@ -40,11 +67,17 @@ local max_frames = tonumber(os.getenv("FRAMES") or "") or 3600
 
 local sites = {}          -- [addr] = {n = entries, seen = {}, hits = 0}
 for spec in (os.getenv("SITES") or ""):gmatch("[^,]+") do
-    local a, n = spec:match("^%s*(%x+):(%d+)%s*$")
-    assert(a, "SITES entry must be hexaddr:entries — got '" .. spec .. "'")
-    sites[tonumber(a, 16)] = { n = tonumber(n), seen = {}, hits = 0 }
+    if spec ~= "none" then
+        local a, n = spec:match("^%s*(%x+):(%d+)%s*$")
+        assert(a, "SITES entry must be hexaddr:entries — got '" .. spec .. "'")
+        sites[tonumber(a, 16)] = { n = tonumber(n), seen = {}, hits = 0 }
+    end
 end
-assert(next(sites), "set SITES=hexaddr:entries,...")
+-- SITES="none" (14z-192): the REFERENCE leg — no breakpoint is armed, so the CPU never
+-- stops and the run is replay.lua's own game; its ANCHOR must equal the basis exactly.
+local reference = REFERENCE
+if reference then sites = {} end
+assert(reference or next(sites), "set SITES=hexaddr:entries,... (or SITES=none for the reference leg)")
 
 local frame = 0
 local held = {}
@@ -95,14 +128,69 @@ if replay_path then
     end
 end
 
-debugger:command("focus 0")
-for addr, _ in pairs(sites) do
-    debugger:command(string.format("bpset 0x%x", addr))
+if debugger then
+    debugger:command("focus 0")
+    for addr, _ in pairs(sites) do
+        debugger:command(string.format("bpset 0x%x", addr))
+    end
 end
 
+-- THE ANCHOR (replay.lua's checksum, byte for byte: FNV-1a64 over work RAM
+-- $FF0000-$FFFFFF minus MASK_RANGES windows, offsets from $FF0000, end exclusive).
+local anchor_frame = tonumber(os.getenv("ANCHOR") or "")
+local program = cpu.spaces["program"]
+local mask_ranges = {}
+for lo, hi in (os.getenv("MASK_RANGES") or ""):gmatch("(%x+)%-(%x+)") do
+    mask_ranges[#mask_ranges + 1] = { tonumber(lo, 16), tonumber(hi, 16) }
+end
+table.sort(mask_ranges, function(x, y) return x[1] < y[1] end)
+local function read_workram_masked()
+    local parts, pos = {}, 0x0000
+    for _, r in ipairs(mask_ranges) do
+        if r[1] > pos then
+            parts[#parts + 1] = program:read_range(0xff0000 + pos, 0xff0000 + r[1] - 1, 8)
+        end
+        if r[2] > pos then pos = r[2] end
+    end
+    if pos <= 0xFFFF then
+        parts[#parts + 1] = program:read_range(0xff0000 + pos, 0xffffff, 8)
+    end
+    return table.concat(parts)
+end
+local FNV_PRIME = 0x100000001b3
+local function fnv1a64(str)
+    local h = 0xcbf29ce484222325
+    local n = #str - (#str % 8)
+    for i = 1, n, 8 do h = (h ~ string.unpack("<i8", str, i)) * FNV_PRIME end
+    for i = n + 1, #str do h = (h ~ str:byte(i)) * FNV_PRIME end
+    return h
+end
+local anchor_line = nil
+
+local screen = assert(machine.screens[":screen"], "no :screen device")
+local DRIFT = (os.getenv("CENSUS_CLOCK") or "") == "frame_done"
+local fn0 = screen:frame_number()
+local last_fn = fn0
+local ui_frames = 0
 local pressed = {}
+local first_frame = true
 emu.register_frame_done(function()
+    local fn = screen:frame_number()
+    -- The FIRST frame_done counts unconditionally, as replay.lua counts it: the screen's
+    -- frame number has not moved yet at that call, and skipping it put this script one
+    -- frame behind replay.lua — input one frame late, every anchor missed (14z-192,
+    -- measured: the no-breakpoint reference leg showed UIFRAMES 1 and missed the basis).
+    if fn == last_fn and not DRIFT and not first_frame then ui_frames = ui_frames + 1; return end
+    first_frame = false
+    last_fn = fn
     frame = frame + 1
+    if anchor_frame and frame == anchor_frame then
+        -- GAMECLOCK: the game's own vblank frame counter RAM:$FF8080 (a byte), read at the
+        -- anchor — the breakpoint leg's comparison with the reference leg, since a
+        -- breakpoint stop perturbs the CPU interleaving and so the RNG (14z-192)
+        anchor_line = string.format("ANCHOR %d %016x\nGAMECLOCK %d %02x\n", frame,
+            fnv1a64(read_workram_masked()), frame, program:read_u8(0xff8080))
+    end
     if FIELDS_IO then
         local want = {}
         for _, fo in ipairs(held[frame + 1] or {}) do want[fo] = true end
@@ -128,6 +216,9 @@ emu.register_frame_done(function()
                 a, s.n, s.hits, #seen, table.concat(seen, ",")))
             f:write(string.format("FREE %06x %d : %s\n", a, #free, table.concat(free, ",")))
         end
+        -- +1: the first frame_done is counted before the screen's frame number moves
+        f:write(string.format("EMUFRAMES %d UIFRAMES %d\n", fn - fn0 + 1, ui_frames))
+        if anchor_line then f:write(anchor_line) end
         f:write(string.format("CENSUSEND %d\n", frame))
         f:close()
         machine:exit()
@@ -135,7 +226,7 @@ emu.register_frame_done(function()
 end)
 
 emu.register_periodic(function()
-    if debugger.execution_state == "stop" then
+    if debugger and debugger.execution_state == "stop" then
         local st = cpu.state
         local pc = st["CURPC"].value
         local s = sites[pc]

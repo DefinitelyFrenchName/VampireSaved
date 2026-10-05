@@ -35,6 +35,7 @@
 # MUST-FIRE: perturbed-copy: misread-ledger — a copy of the push hook whose ledger column tuple has `control_verdict` and `verdict` swapped must read the REAL ledger differently from the rule-checker's own reader, and the gate must FAIL (rule-checker run 2026-09-23-107: the 18 cases write their own ledger in the hook's assumed layout, so they cannot see a misread of the real one) (mode: the gate drives that copy)
 # MUST-FIRE: perturbed-copy: no-target-check — a copy of the push hook without the this-repository guard must refuse pushes of ANOTHER repository (the defect the proof found before installation, 14z-176b), and the gate must FAIL on those cases (mode: the gate drives that copy)
 # MUST-FIRE: perturbed-copy: open-agent-gate — a copy of the S4 call gate (`pre_agent.py`) whose `decide` allows every call must let an over-cap Agent call through, and the gate must FAIL on the must-deny call cases (mode: the gate drives that copy)
+# MUST-FIRE: perturbed-copy: stale-hint — a copy of the push hook whose refusal hint is the pre-#210 one (no `--session`, a `--model <model>`) must fail the hint check: the sample command must be one `tools/rulecheck.py prepare` accepts as printed (mode: the check reads that copy)
 # MUST-FIRE: perturbed-copy: open-push-hook — a copy of the C1 push hook (`pre_push.py`, slice S3) whose `decide` allows every call must let an unchecked push through, and the gate must FAIL on the must-deny push cases (mode: the gate drives that copy)
 #
 # SLICE S3's BINDING (installed by the maintainer 2026-09-23, 14z-176b): `pre_push.py`
@@ -92,7 +93,10 @@ PY
         open-agent-gate)
             python3 - "$W/$1/agent/hooks/pre_agent.py" <<'PY'
 import sys; p = sys.argv[1]; s = open(p).read()
-a = '    """-> (decision, reason); decision is 'deny' or None."""\n'
+# 14z-192: this line was a SyntaxError (the single quotes around deny closed the string),
+# so the copy step died and the control "fired" on a missing hook file, never on the gate
+# opened; escaped, the perturbation applies.
+a = '    """-> (decision, reason); decision is \'deny\' or None."""\n'
 assert s.count(a) == 1
 s = s.replace(a, a + '    return None, None  # CONTROL open-agent-gate\n', 1)
 open(p, 'w').write(s)
@@ -248,6 +252,48 @@ PY
 sed 's/^/  real ledger: /' "$W/ledger.txt"
 grep -q -- '-> AGREE$' "$W/ledger.txt" || { echo "FAIL: the push hook reads the real ledger differently from the rule-checker"; fail=1; }
 
+# THE REFUSAL HINT (14z-192, GitHub #210): the sample procedure command the push hook prints
+# when it refuses must be one tools/rulecheck.py prepare accepts as printed — `--session`
+# present (required since #209), every flag one `prepare --help` lists, and no `--model`
+# (the reader is the pinned rule-checker since 14z-178). The hook is edit-locked; its
+# 14z-189 hint lacked --session and the maintainer applied the fix.
+stale_hint_copy() {  # stale_hint_copy <out> — the pre-#210 hint planted in a copy of the hook
+    python3 - "$REPO/tools/agent/hooks/pre_push.py" "$1" <<'PY'
+import sys
+s = open(sys.argv[1]).read()
+for a, b in (("procedure --session <14z-N key> --subject", "procedure --subject"),
+             ("--artifact build/agent172/extract_<id>.txt`, ", "--artifact build/agent172/extract_<id>.txt --model <model>`, ")):
+    assert s.count(a) == 1, a
+    s = s.replace(a, b)
+open(sys.argv[2], "w").write(s)
+PY
+}
+check_hint() {  # check_hint <hook.py> -> prints findings; exit 0 clean, 3 findings
+    python3 - "$1" "$(python3 tools/rulecheck.py prepare --help 2>&1)" <<'PY'
+import importlib.util, re, sys
+spec = importlib.util.spec_from_file_location("hook", sys.argv[1]); hook = importlib.util.module_from_spec(spec); spec.loader.exec_module(hook)
+accepted = set(re.findall(r"--[a-z][a-z-]*", sys.argv[2]))
+m = re.search(r"rulecheck\.py prepare ([^`]*)`", hook.HOW)
+bad = []
+if not m:
+    bad.append("the hint names no `rulecheck.py prepare` command")
+else:
+    flags = re.findall(r"--[a-z][a-z-]*", m.group(1))
+    if "--session" not in flags: bad.append("the hint's prepare command lacks --session (required since #209)")
+    if "--model" in flags: bad.append("the hint's prepare command passes --model (the reader is pinned since 14z-178)")
+    unk = sorted(set(flags) - accepted)
+    if unk: bad.append(f"the hint's prepare command uses flags prepare does not accept: {unk}")
+for x in bad: print("      " + x)
+print(f"  hint: prepare command flags {re.findall(r'--[a-z][a-z-]*', m.group(1)) if m else []} -> {'OK' if not bad else 'STALE'}")
+sys.exit(3 if bad else 0)
+PY
+}
+HOOK_FOR_HINT="$REPO/tools/agent/hooks/pre_push.py"
+if vs_ctl_is stale-hint; then stale_hint_copy "$W/pre_push_stale.py"; HOOK_FOR_HINT="$W/pre_push_stale.py"; fi
+rc=0; check_hint "$HOOK_FOR_HINT" > "$W/hint.txt" 2>&1 || rc=$?
+cat "$W/hint.txt"
+[ "$rc" = 0 ] || { echo "FAIL: the push hook's refusal hint is not a command rulecheck.py prepare accepts (#210)"; fail=1; }
+
 # the census shares the classifier and its own selftest must hold
 python3 tools/agent/transcript_gaps.py --selftest | sed 's/^/  /'
 python3 tools/agent/transcript_gaps.py --selftest | grep -q 'PASS$' || { echo "FAIL: transcript_gaps selftest"; fail=1; }
@@ -274,6 +320,10 @@ PY
     k=$(grep -c '^  BAD .*expect deny' "$W/ctl_push.txt" || true)
     if [ "${k:-0}" -gt 0 ]; then vs_ctl_fired open-push-hook "$k must-deny push cases let through by the perturbed copy"
     else vs_ctl_dead open-push-hook "the always-allow copy matched every push case — the cases cannot see an open hook" || fail=1; fi
+    stale_hint_copy "$W/pre_push_stale_ctl.py"
+    rc=0; check_hint "$W/pre_push_stale_ctl.py" > "$W/ctl_hint.txt" 2>&1 || rc=$?
+    if [ "$rc" = 3 ]; then vs_ctl_fired stale-hint "$(head -1 "$W/ctl_hint.txt" | sed 's/^ *//')"
+    else vs_ctl_dead stale-hint "the pre-#210 hint passed the hint check (rc=$rc)" || fail=1; fi
     for c in blind-classifier greedy-heredoc no-heredoc-strip; do
         replay "$(make_copy "$c")" "$W/ctl_$c.txt"
         case "$c" in blind-classifier|greedy-heredoc) side=deny;; no-heredoc-strip) side=allow;; esac

@@ -223,6 +223,15 @@ the rule does:
   different initial-RAM fill pattern (real, but game clears RAM first), and
   NOT a lost frame at the initial debugger halt.
 
+PAID AGAIN 14z-192 (GitHub #213), with BREAKPOINTS, at corpus scale: the dispatch census
+(two hot `bpset` sites, input on the emulated clock) against a no-debugger leg of the same
+script — the no-debugger leg reproduced the frozen basis checksum on 56 of 56 replays, the
+breakpoint leg on 9: on 47 the game itself moved (`03_two_player_vs` from frame 469, by 5320 in
+fighter and object fields, not only the sound work area), while the game's own frame counter
+`RAM:$FF8080` stayed equal at the anchor on all 56. So a breakpoint instrument OBSERVES A
+DIFFERENT (legal, repeatable) game: tie it to a no-debugger reference by an RNG-independent
+clock, and say in its verdict that what it observed is the perturbed game.
+
 Also paid in the same session, worth remembering: in MAME debugger
 expressions, bare hex like `d0` parses as the **register** D0 — always write
 breakpoint/watchpoint addresses with an explicit `0x` prefix
@@ -318,6 +327,22 @@ Read as replay frames, they put the copy inside Donovan's column move, and a mec
 was written into a gate header, an issue draft and STATE. A non-debug write tap
 (`tests/lua/read_tap.lua`, the same row) shows the same 240 writes as 16 words on each of
 15 frames at 2313-2355, the round-start fade. The counter had advanced once per stop.
+
+PAID AGAIN, and MEASURED, 14z-192 (GitHub #213): `tests/lua/dispatch_census.lua`, two breakpoints
+on hot dispatch sites, keyed its replay input AND its stop frame to the frame_done counter. On
+`26_don_arcade_mash` it counted 40,620 frames and stopped after **4,202 emulated** ones (the screen's
+own `frame_number()` delta), so the census had observed a tenth of the replay, with its input
+landing early. The frozen inventory had been taken that way since 14z-89.
+**The fix, reusable — and its own trap:** advance the script's frame counter only when
+`screen:frame_number()` has moved, BUT count the FIRST frame_done unconditionally: at that call the
+number has not moved yet, and skipping it (as `tests/lua/pc_count.lua` still does) puts the script
+one frame behind `replay.lua`, input one frame late. The proof is an anchor outside the script: a leg
+with NO breakpoint and no debugger, on the same script, must reproduce the frozen basis checksum at
+some frame (it did not until the first frame was counted; then 56 of 56 did); print the emulated
+frames covered beside the frames counted (`EMUFRAMES` / `CENSUSEND`); keep the old clock behind an
+env switch (`CENSUS_CLOCK=frame_done`) as the must-fire control (`tests/audit_dispatch_census.sh`,
+control `drift-clock`: 729 emulated frames of 1,800 counted, the game's frame counter `7d` against the
+reference leg's `ab`).
 Inside the move, the row's only writer is the palette-sequence uploader. When the
 question is WHEN a write happens, use the non-debug tap. A `-debug` log gives the WHO,
 and its frame column is not a time. (`tests/lua/bp_regs.lua`'s header says the opposite

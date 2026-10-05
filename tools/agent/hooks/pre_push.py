@@ -32,9 +32,10 @@ _PUSH = re.compile(r"\bgit\b(?:\s+-C\s+\S+|\s+-c\s+\S+)*\s+push\b")
 
 HOW = ("Run the procedure check first: `python3 tools/agent/extract.py --session <this session's id> "
        "--out build/agent172/extract_<id>.txt`, then `python3 tools/rulecheck.py prepare --decision "
-       "procedure --subject ... --claim ... --artifact build/agent172/extract_<id>.txt --model <model> "
-       "--id <id>`, spawn the two fresh readers, `record`, and `resolve` any VIOLATED question by "
-       "question. The rest of the work can go on; only the push waits.")
+       "procedure --session <14z-N key> --subject ... --claim ... --artifact build/agent172/extract_<id>.txt`, "
+       "spawn the two `rule-checker` readers (no model parameter, each prompt file pasted verbatim), "
+       "`python3 tools/rulecheck.py record <run id> --session <this session's id prefix>`, and `resolve` any "
+       "VIOLATED question by question. The rest of the work can go on; only the push waits.")
 
 
 _C_DIR = re.compile(r"\bgit\b(?:\s+-c\s+\S+)*\s+-C\s+(\S+)(?:\s+-c\s+\S+)*\s+push\b")

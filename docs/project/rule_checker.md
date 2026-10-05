@@ -427,4 +427,9 @@ optional letters); an 8-hex transcript prefix, which is what `--session` means o
 names STATE.md's newest group as a hint, never as a default (a new sitting's key is not in STATE.md
 until its group is written). Count a session's runs from before 14z-189 by run-id range or `date`,
 never by this column alone. The gate is `tests/test_rule_checker.sh` "PREPARE SESSION KEY", control
-`keyless-prepare`.
+`keyless-prepare`. **The push hook's refusal hint followed (14z-192, #210):** `tools/agent/hooks/pre_push.py`
+(edit-locked) printed a sample `prepare` without `--session`, and with `--model <model>` and `--id <id>`, obsolete
+since the pinned reader (14z-178) and the automatic run id (#160); the maintainer applied the revised hint
+(`build/agent192/proposals/apply_pre_push_hint.py`), which also names `record`'s `--session` (the transcript
+prefix). `tests/test_agent_hooks.sh` now checks that the hint's `prepare` command carries `--session`, no `--model`,
+and only flags `prepare --help` lists; control `stale-hint` plants the old hint.

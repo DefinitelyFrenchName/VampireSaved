@@ -10,7 +10,9 @@
 #   exit through tests/lib/classify.sh and, under --controls, executing every declared
 #   must-fire control as a CONTROL=<name> mode; writes one results.tsv row per gate and per
 #   control, and the run's commit of record (commit.txt: HEAD, then the dirty tracked
-#   paths); --stale selects exactly the gates tools/audit_emulator_staleness.py names.
+#   paths); --stale selects exactly the gates tools/audit_emulator_staleness.py names, and
+#   REFUSES by name any of them outside the selection; a selection matching no gate exits 1
+#   with no run directory written (14z-192, #211).
 # EXPECTS: a readout PASS / SKIP / FAIL / TIMEOUT / MISSING with SKIP counted apart from
 #   PASS; at release scope (--scope all --lane all --strict --controls) anything but PASS is
 #   a hard fail. It asserts nothing about the romset itself — its verdict logic is what
@@ -232,6 +234,32 @@ if [ "$LIST" = 1 ]; then
     exit 0
 fi
 
+# ── AN EMPTY SELECTION IS NOT A RUN (14z-192, GitHub #211) ─────────────────────
+# A selection that matches no gate printed GREEN (PASS 0) and wrote commit.txt and an
+# empty results.tsv, which the staleness audit then read as the newest run of record:
+# `--stale` without `--lane mister`, whose two stale gates were mister-lane, masked both.
+# So: --stale names that fall outside --lane/--scope/--cadence/--only are REFUSED by
+# name, and an empty selection exits 1 — both before any run directory is written.
+if [ "$STALE" = 1 ]; then
+    _out=""
+    for _n in $STALE_NAMES; do
+        selected | awk -F'\t' -v g="$_n" '$1 == g {f=1} END {exit !f}' && continue
+        _ln="$(rows | awk -F'\t' -v g="$_n" '$1 == g {print $2; exit}')"
+        _out="$_out $_n(lane ${_ln:-unregistered})"
+    done
+    if [ -n "$_out" ]; then
+        echo "REFUSED: --stale names gate(s) outside this selection (lanes=$LANES scope=$SCOPE cadence=$CADENCE only=${ONLY:-*}):"
+        echo "         $_out"
+        echo "         re-run with their lane(s), e.g. --lane mister; nothing was executed."
+        exit 1
+    fi
+fi
+if [ -z "$(selected | head -1)" ]; then
+    echo "NOTHING SELECTED: no registry row matches lanes=$LANES scope=$SCOPE cadence=$CADENCE only=${ONLY:-*}."
+    echo "                  An empty run is not a green one; nothing was executed and no run directory written."
+    exit 1
+fi
+
 # ── PRECONDITIONS ───────────────────────────────────────────────────────────
 : "${ROMDIR:?set ROMDIR — every gate here reads the reference set}"
 python3 tools/audit_roms.py "$ROMDIR" > /dev/null || {
@@ -247,7 +275,8 @@ RESULTS="$LOGDIR/results.tsv"
 # say which passed gates have had a declared input move since. Written once per run
 # directory (a --resume continues the run it records). NOT under --dry-run (14z-191, GitHub
 # #219): a dry run executes nothing, and tools/audit_emulator_staleness.py takes the newest
-# directory carrying commit.txt as the run of record, so a dry run's would hide every stale gate.
+# directory carrying commit.txt as the run of record, so a dry run's would hide every stale gate
+# (since 14z-192, #211, the audit takes each gate's newest ROW instead; the guard stays).
 if [ "$DRY" = 0 ] && [ ! -f "$LOGDIR/commit.txt" ]; then
     if git rev-parse --git-dir >/dev/null 2>&1; then
         { git rev-parse HEAD; git status --porcelain -- . 2>/dev/null | grep -v '^??' | awk '{print $2}'; } > "$LOGDIR/commit.txt"

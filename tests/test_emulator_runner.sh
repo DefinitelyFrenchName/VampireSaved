@@ -18,6 +18,7 @@
 # MUST-FIRE: shadow-tool: export-removed — a copy of the runner without `export MAME_BIN` must leave the gate's MAME_BIN UNSET (mode: that copy is the runner every section drives; section 11 must fail)
 # MUST-FIRE: shadow-tool: reader-unplugged — a copy that hands the classifier no gate script must let a declared-but-unfired control read PASS (mode: section 14 must fail)
 # MUST-FIRE: shadow-tool: dry-run-records — a copy of the runner without the --dry-run guard on commit.txt must write a run of record on a dry run (mode: that copy is the runner every section drives; section 15's dry-run case must fail)
+# MUST-FIRE: shadow-tool: empty-green — a copy of the runner without the empty-selection guard must print GREEN and write a run directory for a selection that matches no gate (mode: that copy is the runner every section drives; section 15's empty-selection case must fail)
 # MUST-FIRE: perturbed-copy: row-not-executable — a farm of symlinks to the REAL scripts named by the REAL tests/ci_emulator.tsv, with ONE replaced by a non-executable copy, must make section 10b report it unrunnable (mode: that farm is what 10b checks; section 10b must fail)
 #
 # WHY A GATE FOR THE RUNNER, again. CLAUDE.md §4: "Verdict logic is itself
@@ -75,8 +76,12 @@ cmp -s "$RUNNER" "$T/runner_unplugged.sh" && fail "could not unplug the reader �
 # the --dry-run guard on commit.txt removed (14z-191, #219)
 sed 's|^if \[ "\$DRY" = 0 \] && \[ ! -f "\$LOGDIR/commit.txt" \]; then$|if [ ! -f "$LOGDIR/commit.txt" ]; then|' "$RUNNER" > "$T/runner_dryrecords.sh"
 cmp -s "$RUNNER" "$T/runner_dryrecords.sh" && fail "could not remove the --dry-run guard — the commit.txt line moved"
-chmod +x "$T/runner_noexport.sh" "$T/runner_unplugged.sh" "$T/runner_dryrecords.sh"
+# the empty-selection guard removed (14z-192, #211)
+sed 's|^if \[ -z "\$(selected \| head -1)" \]; then$|if false; then|' "$RUNNER" > "$T/runner_emptygreen.sh"
+cmp -s "$RUNNER" "$T/runner_emptygreen.sh" && fail "could not remove the empty-selection guard — the line moved"
+chmod +x "$T/runner_noexport.sh" "$T/runner_unplugged.sh" "$T/runner_dryrecords.sh" "$T/runner_emptygreen.sh"
 case "$VS_CTL" in
+empty-green)      ln -s "$T/runner_emptygreen.sh" "$FR/tests/run_all_emulator.sh" ;;
 export-removed)   ln -s "$T/runner_noexport.sh" "$FR/tests/run_all_emulator.sh" ;;
 reader-unplugged) ln -s "$T/runner_unplugged.sh" "$FR/tests/run_all_emulator.sh" ;;
 dry-run-records)  ln -s "$T/runner_dryrecords.sh" "$FR/tests/run_all_emulator.sh" ;;
@@ -567,7 +572,7 @@ c15b="$(head -1 "$T/l15b/commit.txt" 2>/dev/null)"
 [ -n "$head15" ] && [ "$c15b" = "$head15" ] && ok "commit.txt's first line is the HEAD the run measured" \
                                              || fail "commit.txt in git: '$c15b', HEAD '$head15'"
 # a --dry-run executes nothing and writes no commit of record (14z-191, GitHub #219): the
-# staleness audit takes the newest directory carrying commit.txt as the run of record
+# staleness audit took the newest directory carrying commit.txt as the run of record (per gate since #211)
 run --lane mame --dry-run --log "$T/l15e" >/dev/null 2>&1 || true
 [ -d "$T/l15e" ] && [ ! -f "$T/l15e/commit.txt" ] && ok "--dry-run wrote no commit.txt (no run of record)" \
     || fail "--dry-run: commit.txt present (or no run directory) in $T/l15e"
@@ -587,6 +592,30 @@ out15="$(run --lane mame --stale --log "$T/l15d" 2>&1 || true)"
 printf '%s' "$out15" | grep -q 'no emulator gate is stale' && [ ! -d "$T/l15d" ] \
     && ok "--stale with nothing named exits before writing a run directory and says so" \
     || fail "--stale with an empty list: $(printf '%s' "$out15" | head -1)"
+# 14z-192 (GitHub #211): a --stale name outside the selected lanes is REFUSED by name, and a
+# selection matching no gate exits 1 — neither prints GREEN nor writes a run directory, so
+# neither can become the staleness audit's run of record.
+reg "$(row g_pass mame release - '')" "$(row g_mist mister release - '')"
+printf '#!/usr/bin/env python3\nimport sys\nif "--names" in sys.argv: print("g_mist")\n' > "$FR/tools/audit_emulator_staleness.py"
+rc15g=0; out15g="$(run --lane mame --stale --log "$T/l15g" 2>&1)" || rc15g=$?
+printf '%s' "$out15g" | grep -q 'REFUSED: --stale names gate(s) outside' && printf '%s' "$out15g" | grep -q 'g_mist(lane mister)' \
+    && [ "$rc15g" != 0 ] && [ ! -d "$T/l15g" ] \
+    && ok "--stale naming a mister-lane gate under --lane mame is REFUSED by name, exit $rc15g, no run directory" \
+    || fail "--stale outside the lanes: exit $rc15g, $(printf '%s' "$out15g" | head -2 | tr '\n' ' ')"
+printf '%s' "$out15g" | grep -q 'GREEN' && fail "the refused --stale run printed GREEN" || ok "the refused --stale run printed no GREEN"
+rc15h=0; out15h="$(run --lane mame --only g_nosuch --log "$T/l15h" 2>&1)" || rc15h=$?
+if printf '%s' "$out15h" | grep -q 'NOTHING SELECTED' && [ "$rc15h" != 0 ] && [ ! -d "$T/l15h" ]; then
+    ok "a selection matching no gate exits $rc15h with NOTHING SELECTED and no run directory"
+else
+    fail "empty selection: exit $rc15h, run dir $([ -d "$T/l15h" ] && echo present || echo absent), $(printf '%s' "$out15h" | tail -1)"
+fi
+# MUST-FIRE: the same empty selection through the copy without the guard prints GREEN
+ln -s "$T/runner_emptygreen.sh" "$FR/tests/run_all_emulator_emptygreen.sh"
+out15i="$( (cd "$FR" && ROMDIR="$T/roms" MERGED=build/fake_merged sh tests/run_all_emulator_emptygreen.sh --lane mame --only g_nosuch --log "$T/l15i" 2>&1) || true )"
+printf '%s' "$out15i" | grep -q '^GREEN' && [ -f "$T/l15i/commit.txt" ] \
+    && vs_ctl_fired empty-green "without the guard an empty selection prints GREEN and writes $T/l15i/commit.txt" \
+    || { vs_ctl_dead empty-green "the unguarded copy did not print GREEN with a run of record"; fail "empty-green"; }
+rm -f "$FR/tests/run_all_emulator_emptygreen.sh"
 rm -rf "$FR/.git" "$FR/tools/audit_emulator_staleness.py"
 
 echo

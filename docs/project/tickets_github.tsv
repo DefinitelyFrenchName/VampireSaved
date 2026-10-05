@@ -2,26 +2,28 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 227
+# issues: 229
 number	state	reason	closed	labels	title
+229	OPEN	-	-	evolution	Community cross-check: naming rigs on vsavj for specials, supers, EX/ES moves, throws and pursuits (split from #117)
+228	OPEN	-	-	bug	Breakpoint instruments on the frame_done clock, and pc_count.lua's first-frame skip: measure each for drift (#213's class)
 227	OPEN	-	-	cosmetic	MAME README: say the four 'clone of nonexistent driver megaman' lines at every start are expected and harmless
 226	OPEN	-	-	evolution	Test the Linux release end to end: PILOT's linux-x86_64 build as a player gets it (asset, applier, launcher, a real desktop run)
 225	CLOSED	COMPLETED	2026-10-05	evolution	Promote #188's traced test (strace every static gate, score the predictor, an over-narrowed control) from scratch into tools/
 224	CLOSED	COMPLETED	2026-10-04	bug	findings_add.py accepts a home anchor containing ' — '; findings_anchors.py then SKIPs that finding and exits 0
 223	OPEN	-	-	cosmetic	Landing sound: vs2 gives Phobos the big-body landing and Donovan the ordinary one; ours the reverse (measured by ear)
-222	OPEN	-	-	bug,severity: medium	Phobos's air dash minimum height: vs2 refuses it under 24 px, ours allows it (measured in play: height 21)
+222	OPEN	-	-	bug,severity: high	Phobos's air dash minimum height: vs2 refuses it under 24 px, ours allows it (measured in play: height 21)
 221	CLOSED	COMPLETED	2026-10-04	bug	upload_release_assets.sh --prune checks only the tag just before the published one, so a freeze that was never released stops it (merged-m19's assets are still hosted)
 220	CLOSED	NOT_PLANNED	2026-10-04	cosmetic	MiSTer release README still says the package contains an emulator (FBNeo or MAME)
 219	CLOSED	COMPLETED	2026-10-04	bug	run_all_emulator.sh --dry-run writes a run record that the staleness audit takes as the newest run
 218	CLOSED	COMPLETED	2026-10-04	bug	tools/audit_poked_legs.py's id→name map is shifted for 0x0A/0x0C/0x0D/0x0E (Lilith at 0x0D, Sasquatch at 0x0E); latent, no frozen label affected yet
 217	OPEN	-	-	evolution	Rule-checker throughput: check independent decisions in parallel, and split a multi-fork merge into per-fork packets
-216	OPEN	-	-	evolution	Community workbook vs the game: Lei-Lei 6HP three hits (game: one at 128 px) and other #117 gaps, to check against the Japanese wiki
+216	CLOSED	COMPLETED	2026-10-05	evolution	Community workbook vs the game: Lei-Lei 6HP three hits (game: one at 128 px) and other #117 gaps, to check against the Japanese wiki
 215	CLOSED	COMPLETED	2026-10-04	bug	apply_release.py's output zip differs by host (create_system 0 on Windows, 3 on Unix); zip.mjs and test_applier_page assume 3
 214	OPEN	-	-	bug	MiSTer package README tells the player it contains an FBNeo/MAME emulator (shared template wording), which it does not
-213	OPEN	-	-	bug	dispatch_census.lua keys replay input to a frame_done counter while breakpoints are armed ([MFI-5] desync): its frozen dispatch inventory may come from drifted runs
+213	CLOSED	COMPLETED	2026-10-05	bug	dispatch_census.lua keys replay input to a frame_done counter while breakpoints are armed ([MFI-5] desync): its frozen dispatch inventory may come from drifted runs
 212	CLOSED	COMPLETED	2026-10-04	bug	apply_release.py (the end-user applier) exits 1 with UnicodeEncodeError after writing a correct romset when stdout is cp932/cp437/cp850 (redirected on Windows)
-211	OPEN	-	-	architecture,bug	run_all_emulator.sh --stale that selects 0 gates prints GREEN and becomes the newest run of record, masking every stale gate from the staleness audit
-210	OPEN	-	-	architecture,bug	pre_push hook's sample procedure command lacks --session, which rulecheck.py prepare now requires (#209)
+211	CLOSED	COMPLETED	2026-10-05	architecture,bug	run_all_emulator.sh --stale that selects 0 gates prints GREEN and becomes the newest run of record, masking every stale gate from the staleness audit
+210	CLOSED	COMPLETED	2026-10-05	architecture,bug	pre_push hook's sample procedure command lacks --session, which rulecheck.py prepare now requires (#209)
 209	CLOSED	COMPLETED	2026-10-03	bug,severity: low	rulecheck.py prepare leaves the ledger's session column '-' unless --session is given, so per-session counts are wrong
 208	CLOSED	COMPLETED	2026-10-03	bug,severity: medium,test-integrity	extract.py showed a still-running worker's latest text as its report (WX) when the extract was cut before its hand-back, so the procedure check ruled a false QP5
 207	CLOSED	COMPLETED	2026-10-04	architecture,evolution	Close: generate the documentation packet's claim from the run of record's check outputs
@@ -114,7 +116,7 @@ number	state	reason	closed	labels	title
 120	OPEN	-	-	evolution	The rebuild-from-docs option after MiSTer (a possibility to preserve, not a commitment)
 119	OPEN	-	-	evolution	The living-documentation framework as an independent sibling of bbh (ruled at the plan stage, not scheduled)
 118	OPEN	-	-	evolution	Community cross-check: the ~90 unadopted mizuumi player-struct candidates, each adopted only once measured
-117	OPEN	-	-	evolution	Community cross-check: naming rigs on vsavj for specials, supers, throws, the CL. rows and the 6-prefixed rows
+117	CLOSED	COMPLETED	2026-10-05	evolution	Community cross-check: naming rigs on vsavj for specials, supers, throws, the CL. rows and the 6-prefixed rows
 116	OPEN	-	-	evolution	Capture matrix: widen the in-emulator anchors from 3 cells to a sampled row per tenant
 115	OPEN	-	-	contested,evolution,parked	Zabel j.LK proximity guard: a surgical legacy patch for vanilla and WIDE, its own session, recording first
 114	CLOSED	COMPLETED	2026-09-02	bug,correctness,severity: medium	421+P (Lighting Sword): ours lands 3 hits and knocks the victim away; native VS2 lands 6 and holds — measured, and the gate cannot see it
