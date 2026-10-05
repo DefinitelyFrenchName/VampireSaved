@@ -45,7 +45,7 @@
 #   tenant on P2 (the P2 side is held at the mark, not at +0x117 and the pursuit); the three rigs' moves only (the
 #   LP/MP/HP Lightning Swords, other distances and unpinned play are not measured for #200); FBNeo; the solo tracks.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged30] [KEEP=<dir>] tests/audit_pursuit_flag.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged31] [KEEP=<dir>] tests/audit_pursuit_flag.sh
 #   emulator tier, MAME; ~3 min (8 legs in parallel)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
@@ -55,7 +55,7 @@ cd "$REPO"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
 . "$REPO/tests/lib/controls.sh"
 vs_ctl_mode "$0"
-BUILD="${BUILD:-build/m3b_merged30}"
+BUILD="${BUILD:-build/m3b_merged31}"
 [ -d "$BUILD" ] && BUILD="$(cd "$BUILD" && pwd)"
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "FAIL: no $BUILD/rompath/vsavjw.zip"; exit 1; }
 [ -f "$BUILD/verify_op.bin" ] || { echo "FAIL: no $BUILD/verify_op.bin (the build's opcode view: the hooks are read from it)"; exit 1; }

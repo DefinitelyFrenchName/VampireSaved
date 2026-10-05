@@ -35,7 +35,7 @@
 # WHY. docs/game/engine_internals.md and build/manifest/bank_map.toml said "36 for Zabel,
 # Lilith and Jedah" from 14z-121; the table reads 0x0018 = 24 (how 36 was obtained is
 # not recorded), and row 0x0D is Lei-Lei, Lilith being 0x0E. Measured 14z-189 while reviewing #162's census, which found vs2's row 0x10
-# (Phobos) at 0x0018 where ours reads 0.
+# (Phobos) at 0x0018 where ours read 0 (ours takes vs2's row since M23, 14z-192, #222).
 #
 # Usage: ROMDIR=... tests/test_air_attack_height.sh
 set -eu

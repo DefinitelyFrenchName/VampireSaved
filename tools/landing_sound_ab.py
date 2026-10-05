@@ -17,6 +17,11 @@ with the ordinary sound and Donovan with the big-body one: vs2 the other way rou
         to 0.75 s after). PASS when the landing difference is over 4x the control difference and the leg named
         `louder` has the higher landing RMS. `--plant-same` copies native's landing window over ours' (the must-fire
         control: the gap must then fail).
+  python3 tools/landing_sound_ab.py same <native.wav> <ours.wav> <landing frame> <run frames>
+        (14z-192, the M23 build that takes vs2's mask, #223) PASS when the landing window differs from native's by NO
+        MORE than 4x the control window's difference — the complement of the gap criterion: the landing no longer
+        stands out from the two games' background difference. Its control is the build BEFORE the swap, which must
+        FAIL it (tests/audit_landing_sound.sh section 3).
 """
 import array
 import json
@@ -93,7 +98,21 @@ def wav(nat, ours, frame, run_frames, louder, plant=False):
     return 1 if bad else 0
 
 
+def same(nat, ours, frame, run_frames):
+    cn, co = window(nat, frame, run_frames, -1.25), window(ours, frame, run_frames, -1.25)
+    ln, lo = window(nat, frame, run_frames, -0.25), window(ours, frame, run_frames, -0.25)
+    dc, dl = diff(cn, co), diff(ln, lo)
+    print(f"  control window difference rms {dc:.0f}; landing window difference rms {dl:.0f}; "
+          f"landing rms native {rms(ln):.0f}, ours {rms(lo):.0f}")
+    if dl > 4 * max(dc, 1):
+        print(f"  MISMATCH the landing window differs by over 4x the control's difference ({dl:.0f} vs {dc:.0f})")
+        return 1
+    return 0
+
+
 def main(a):
+    if a[:1] == ["same"] and len(a) == 5:
+        return same(a[1], a[2], int(a[3]), int(a[4]))
     if a[:1] == ["hits"] and len(a) == 5:
         rc, land = hits(*a[1:5])
         if land is not None:

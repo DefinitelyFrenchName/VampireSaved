@@ -4,7 +4,7 @@
 checklist's step 5.)
 
 Usage:
-  python3 tools/attr_placement_moves.py --old build/m3b_merged28 --new build/m3b_merged30 \
+  python3 tools/attr_placement_moves.py --old build/m3b_merged28 --new build/m3b_merged31 \
           --log build/rc185/tierreds/test_pointer_flow.log [--log ...] [--plant]
 
 Each --log is a gate's output holding its printed diff: OLD lines ('<' or '-') and NEW lines ('>' or '+'),

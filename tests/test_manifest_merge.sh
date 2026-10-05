@@ -118,9 +118,12 @@ FROZEN = [
     # code_word rows per manifest ({don,pyr,hui}_kernel_voice_e0-e3),
     # deliberately tenant-prefixed so nothing dedupes and the shared
     # count cannot move.
+    # RE-FROZEN 14z-192 (was (10,9,12),26,4): the M23 freeze — #222's air_dash_mask_hi (huitzil.toml, +1) and #223's
+    # landing_bigbody_mask_hi_a/_b, declared identically by donovan.toml and huitzil.toml (+2 each) and deduped to
+    # one shared row each: per-file (12,12,12), merged +3, shared +2. Rule-checker run 2026-10-05-698.
     # RE-FROZEN 14z-189 (was (9,9,11),25,3): #195's pursuit_mark_tail_pad, declared identically by donovan.toml and
     # pyron.toml -> +1 each, merged +1, shared +1.
-    ("code_word",        (10, 9, 12), 26, 4),
+    ("code_word",        (12, 12, 12), 29, 6),
     # RE-FROZEN 14z-87 (was (21,55,14),87,3 — STALE since 14z-85f: the FG
     # damage fix propagated Donovan's six x028122 work-var port_patch rows
     # to huitzil+pyron verbatim (+6 each, +6 shared) and this gate was not

@@ -15,7 +15,7 @@
 # asked is VOID.
 #
 # Usage: ROMDIR=... tools/cpu_soak_sheet.sh <keep dir> <tenant> <cond> <out.png> [N nodes, default 6] [entry k, default 3]
-#   tenant phobos|pyron|donovan, cond passive|active. Env: BUILD (default build/m3b_merged30), SCALE (default 0.5),
+#   tenant phobos|pyron|donovan, cond passive|active. Env: BUILD (default build/m3b_merged31), SCALE (default 0.5),
 #   OFFSETS (frames after the action start, default "2,8,16")
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
@@ -24,7 +24,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 [ $# -ge 4 ] || { sed -n '/^# Usage:/,/^#   OFFSETS/p' "$0"; exit 2; }
 K="$(cd "$1" && pwd)"; T="$2"; C="$3"; OUT="$4"; N="${5:-6}"; KTH="${6:-3}"
 case "$OUT" in /*) ;; *) OUT="$PWD/$OUT" ;; esac
-BUILD="${BUILD:-build/m3b_merged30}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
+BUILD="${BUILD:-build/m3b_merged31}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 case "$T" in
     phobos) V=02; M=00000000; R=anim@huitzil ;;
     pyron) V=04; M=00000002; R=anim@pyron ;;

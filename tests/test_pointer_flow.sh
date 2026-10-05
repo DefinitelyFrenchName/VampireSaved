@@ -56,8 +56,8 @@ echo "$CLEAN" | grep -q "FLAGGED: 0" \
     || { echo "FAIL: clean synthetic produced flags"; fail=1; }
 
 echo "== section 1: frozen baselines on the current freeze artifacts"
-for pair in "build/m3b_merged30:merged-m22" "build/don_m26:donovan-m23" \
-            "build/hui60:huitzil-m26" "build/pyron45:pyron-m22"; do   # 14z-189 (M22): merged-m22 baseline (the same two STRONG findings +0x20, WEAK 1188 -> 1189, both attributed in its header), donovan, huitzil and pyron satisfy theirs unchanged; re-pointed 14z-130 (M13 boot-title freeze) <- 14z-119; 14z-170: merged-m19 + donovan-m23 baselines (the M19 fixes), huitzil and pyron satisfy theirs unchanged; 14z-183 (M20): all four satisfy theirs unchanged; 14z-185 (M21): merged-m21 baseline (the SAME two STRONG findings +0x40, WEAK 1189 -> 1188, both attributed in its header), donovan, huitzil and pyron satisfy theirs unchanged
+for pair in "build/m3b_merged31:merged-m22" "build/don_m27:donovan-m23" \
+            "build/hui61:huitzil-m26" "build/pyron46:pyron-m22"; do   # 14z-189 (M22): merged-m22 baseline (the same two STRONG findings +0x20, WEAK 1188 -> 1189, both attributed in its header), donovan, huitzil and pyron satisfy theirs unchanged; re-pointed 14z-130 (M13 boot-title freeze) <- 14z-119; 14z-170: merged-m19 + donovan-m23 baselines (the M19 fixes), huitzil and pyron satisfy theirs unchanged; 14z-183 (M20): all four satisfy theirs unchanged; 14z-185 (M21): merged-m21 baseline (the SAME two STRONG findings +0x40, WEAK 1189 -> 1188, both attributed in its header), donovan, huitzil and pyron satisfy theirs unchanged
     b="${pair%%:*}"; n="${pair##*:}"
     if [ ! -f "$b/patch/patch.json" ]; then
         echo "   SKIP: $b absent"

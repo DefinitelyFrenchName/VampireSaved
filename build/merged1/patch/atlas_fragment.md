@@ -149,6 +149,8 @@
 | `PRG:0x003C60` | 0x2 | GEN | code_word don_kernel_voice_e1 |
 | `PRG:0x003CCC` | 0x2 | GEN | code_word don_kernel_voice_e2 |
 | `PRG:0x003D36` | 0x2 | GEN | code_word don_kernel_voice_e3 |
+| `PRG:0x003960` | 0x2 | GEN | code_word landing_bigbody_mask_hi_a |
+| `PRG:0x003B38` | 0x2 | GEN | code_word landing_bigbody_mask_hi_b |
 | `PRG:0x024D98` | 0x2 | GEN | code_word pursuit_mark_tail_pad |
 | `PRG:0x414140` | 0x27C6 | VS2 | donovan code (grouped, vsav2 0x054C90) |
 | `PRG:0x416906` | 0x5200 | VS2 | donovan x057456 (grouped, vsav2 0x057456) |
@@ -249,6 +251,7 @@
 | `PRG:0x00BF68` | 0x40 | VS2 | data_port voice_borrow_voicenums_b (vsav2 0xa82a) |
 | `PRG:0x0B8B40` | 0x20 | VS2 | data_port defense_curve_row (vsav2 0xd2cbe) |
 | `PRG:0x0BCC90` | 0x2 | VS2 | data_port defense_rally_threshold (vsav2 0xd6e2e) |
+| `PRG:0x0BE25A` | 0x2 | VS2 | data_port air_dash_height_row (vsav2 0xd83f8) |
 | `PRG:0x470BB0` | 0xC0 | VS2 | sound_table hui_sfx_records (vsav2 0xc742a, id-allowlisted) |
 | `PRG:0x470C70` | 0x1C | VS2 | select_records portrait/p1 coord list |
 | `PRG:0x470C90` | 0x26 | VS2 | select_records portrait/p1 record |
@@ -294,6 +297,7 @@
 | `PRG:0x003C5A` | 0x2 | GEN | code_word hui_kernel_voice_e1 |
 | `PRG:0x003CC6` | 0x2 | GEN | code_word hui_kernel_voice_e2 |
 | `PRG:0x003D30` | 0x2 | GEN | code_word hui_kernel_voice_e3 |
+| `PRG:0x022AF4` | 0x2 | GEN | code_word air_dash_mask_hi |
 | `PRG:0x080AEC` | 0x4 | GEN | code_ptr beam_effect_class16 |
 | `PRG:0x080B28` | 0x4 | GEN | code_ptr beam_effect_class31 |
 | `PRG:0x471910` | 0x5200 | VS2 | donovan code (vsav2 0x0574C0) |

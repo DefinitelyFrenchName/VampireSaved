@@ -1,0 +1,20 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent192/m23/freeze/claim.txt	7e18f54c88f0b938478e87f3ae83709007f7bb10
+build/agent192/m23/freeze/registry.diff	0f922912dcbd52fe8a2aad1ac7002d4f4264d5b0
+build/agent192/m23/opset_delta.txt	f1a9b1dbabc6862fb386d454be70ac764e22c7c0
+build/agent192/m23/member_delta.txt	b26f73e3d8ec76bbd219bbd906677025ffd12da1
+build/agent192/m23/check_built.txt	f1209278ab09bcc9c158b08460f552cbef90c321
+build/agent192/m23/m3a_final.log	80f7ce47996ad284629d7a65fbb1f573a72542b7
+build/agent192/m23/freeze/sets_and_fingerprints.txt	5cfdd1750b6fe90db3856bba6458e607766880da
+build/agent192/m23/freeze_sets.log	c01f101e41e8895ced06e76e82ba4fc4b5663218
+build/agent192/m23/attr/battery_eris_results.tsv	af95896904564a20b710642465103154e51919da
+build/agent192/m23/attr/battery_mister_results.tsv	ddcc5e6eac616bacc7e8a5a5c98bd93cf5bd61a2
+build/agent192/m23/attr/battery_reds.txt	462dd418b622e7d8bd0599ed21df564b1a40e153
+build/agent192/m23/freeze/refreeze_summary.txt	a968054457f6b8f61bb9347e589207460e18619c
+build/agent192/m23/landing_stamp/mac_restored.log	6e5d6d3262e852118c24728d1cc8a07dc6bf593f
+build/agent192/m23/landing_stamp/eris_restored.log	5e6de1713e6d431a94543ef2931b8cc8d883099d
+build/agent192/m23/freeze/jtcores_tail.txt	72fb8c6066ed35cbf207635efba056471d557070
+build/agent192/m23/mra_m23.log	befc5593604c649b91e63841cc76a8b2800fdd9e
+build/agent192/m23/package_m23.log	5139ebacf684535530075ce1f6e9d53953902a32
+build/agent192/m23/freeze/release_tie_partial.txt	f29f88303632463e1253e84b4dfa74f1b66e195d
+tests/expected/registry.tsv	966f6335f9ec569cb90fa428fa2d092245e6a0ed

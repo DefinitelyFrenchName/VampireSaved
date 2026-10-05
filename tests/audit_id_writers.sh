@@ -6,11 +6,13 @@
 #   a variant id superset-safe by construction.
 # HOW: write taps on both id fields ($FF8782 P1, $FF8B82 P2) over 11 legacy replays on MAME
 #   (22 runs), collecting every (writer PC, value) pair; boot RAM-clear PCs excluded.
+# MUST-FIRE: known-bad: word-write-variant — two planted tap logs, each on its own copy of the real logs: (a) a WORD write of 0x1300 to the id field (id 0x13 in the high byte, the field's byte on the 68000's big-endian bus) must FAIL naming id 13, and (b) a byte write of 0x13 to +0x383 alone must leave the verdict PASS — a decoder reading the wrong lane misses (a) and fails (b), so the pair separates the lanes (14z-192, rule-checker runs 2026-10-05-675 and -678) (in-gate; as a mode plant (a) joins the real logs and the gate FAILs)
 # EXPECTS: every written value is a base id 0x00-0x0F from the known writer sites (attract,
 #   init, CPU opponent, challenger, select). Known gap stated in the header: Oboro's 0x18 IS
 #   a vanilla variant id no replay here reaches, so the proof is about THIS corpus.
-# FOLLOWS: docs/game/atlas/id_space.md emu/mame-patches/ tests/lua/tap_writes.lua
-#   tests/replays/ tools/audit_roms.py tools/run_mame.sh tools/setup_mame.sh
+# FOLLOWS: build/manifest/ docs/game/atlas/id_space.md emu/mame-patches/ tests/lib/controls.sh tests/lua/tap_writes.lua
+#   tests/expected/registry.tsv tests/replays/ tools/audit_roms.py tools/build_fingerprint.py tools/run_mame.sh
+#   tools/setup_mame.sh
 #
 # ON-DEMAND (22 MAME runs, ~10 min). Not in the battery; run it when the
 # claim below is load-bearing for a decision, and after any change that
@@ -42,7 +44,15 @@
 # So this audit proves "no legacy replay HERE writes the variant half", not
 # "vanilla cannot". A tenant must still avoid 0x18.
 #
-# Usage: ROMDIR=... tests/audit_id_writers.sh [outdir]
+# Usage: ROMDIR=... [BUILD=build/<merged dir>] tests/audit_id_writers.sh [outdir]
+#   BUILD (14z-192): run the same legacy replays on OUR build (set vsavjw from BUILD/rompath)
+#   instead of pristine vsavj — the "on our builds" half of #223's ruling.
+#
+# THE BYTE LANE (14z-192, rule-checker run 2026-10-05-675): the tap covers the WORD at the
+# even field address, and the id is that word's HIGH byte (big-endian). Until 14z-192 the
+# decoder took the LOW byte whenever the low lane was written, so a word write to +0x382
+# would have reported +0x383's value and a byte write to +0x383 alone would have been read
+# as an id. Now: the high byte when the high lane is written, otherwise not an id write.
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -60,9 +70,28 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 # so a gate that means to SKIP on a missing ROMDIR still does.
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
+MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN   # the pinned WIDE build: BUILD= boots vsavjw (14z-192, test_mame_bin_pinned)
 cd "$REPO"
 OUT="${1:-$(mktemp -d)}"   # GitHub #68: not a predictable default
 mkdir -p "$OUT"
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
+SET=vsavj; RP="$ROMDIR"
+if [ -n "${BUILD:-}" ]; then
+    [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "FAIL: BUILD=$BUILD has no rompath/vsavjw.zip"; exit 1; }
+    BUILD="$(cd "$BUILD" && pwd)"; SET=vsavjw; RP="$BUILD/rompath;$ROMDIR"
+    # WHICH BUILD RAN (14z-192, rule-checker run 2026-10-05-677, [VSP-108]): print the registry row
+    # the opened romset resolves to, its full fingerprint and the zip's sha1 — an image the
+    # registry does not know cannot be called "our build", and stops the gate.
+    REGNAME="$(python3 tools/build_fingerprint.py --set vsavjw --registry tests/expected/registry.tsv "$RP" 2>/dev/null | tail -1)"
+    FULLFP="$(python3 tools/build_fingerprint.py --set vsavjw --sha-only "$RP" 2>/dev/null | tail -1)"
+    ZSHA="$(python3 -c "import hashlib,sys;print(hashlib.sha1(open(sys.argv[1],'rb').read()).hexdigest())" "$BUILD/rompath/vsavjw.zip")"
+    echo "build: registry row '${REGNAME:-?}', program fingerprint ${FULLFP:-?}, vsavjw.zip sha1 $ZSHA"
+    # build_fingerprint.py prints the registry NAME for a registered image and the bare hex otherwise
+    if [ -z "$REGNAME" ] || printf '%s' "$REGNAME" | grep -Eq '^[0-9a-f]{40}$'; then
+        echo "FAIL: BUILD=$BUILD resolves to no registry row — not a registered build"; exit 1
+    fi
+fi
+echo "set $SET (rompath $RP)"
 
 REPLAYS="01_attract_long 02_demitri_vs_cpu 03_two_player_vs 04_select_fuzz
          05_timeout_idle 06_test_mode 07_mash_storm 08_challenger_join
@@ -78,8 +107,8 @@ for r in $REPLAYS; do
         # TEARDOWN after the log is complete (docs/GOTCHAS.md); the END
         # summary line below is the artifact that decides validity.
         REPLAY="tests/replays/$r.rpl" TAP="$addr,2" FRAMES=7000 \
-            TRACE_OUT="$OUT/$r.$tag.txt" MAME_SANDBOX="$OUT/sbx_${r}_$tag" \
-            tools/run_mame.sh vsavj \
+            TRACE_OUT="$OUT/$r.$tag.txt" MAME_SANDBOX="$OUT/sbx_${r}_$tag" MAME_ROMPATH="$RP" \
+            tools/run_mame.sh $SET \
             -autoboot_script tests/lua/tap_writes.lua \
             >"$OUT/$r.$tag.log" 2>&1 || true
         printf '.'
@@ -87,7 +116,14 @@ for r in $REPLAYS; do
 done
 echo
 
-python3 - "$OUT" <<'PY'
+plant() {  # plant <dir> <a|b> — (a) a word write of id 0x13; (b) a byte write of 0x13 to +0x383 alone
+    case "$2" in
+    a) printf 'frame 100 PC 020a80 off ff8782 data 00001300 mask 0000ffff\nEND hits 1\n' > "$1/zz_planted.p1.txt" ;;
+    b) printf 'frame 101 PC 020a80 off ff8782 data 00000013 mask 000000ff\nEND hits 1\n' > "$1/zz_planted.p1.txt" ;;
+    esac
+}
+if vs_ctl_is word-write-variant; then plant "$OUT" a; fi
+cat > "$OUT/analyze.py" <<'PY'
 import glob, os, sys, collections
 out = sys.argv[1]
 BOOT = {0x000D34, 0x000D3A, 0x000DD8, 0x016E4C, 0x016E4E}
@@ -103,8 +139,9 @@ for f in files:
         if not p or p[0] != "frame":
             continue
         pc = int(p[3], 16); data = int(p[7], 16); mask = int(p[9], 16)
-        v = data & 0xFF if mask & 0xFF else (data >> 8) & 0xFF
-        bypc[pc].add(v)
+        if not mask & 0xFF00:
+            continue          # only +0x383 written: not the id byte
+        bypc[pc].add((data >> 8) & 0xFF)
 
 print("tap logs: %d, complete: %d" % (len(files), len(files) - len(incomplete)))
 if incomplete:
@@ -137,3 +174,21 @@ if not fail:
     print("  (caveat in the header: 0x18/Oboro is unexercised by this corpus)")
 sys.exit(fail)
 PY
+rc=0; python3 "$OUT/analyze.py" "$OUT" || rc=$?
+# THE IN-GATE CONTROL: plant (a), on a copy of the real logs, must FAIL naming id 13; plant
+# (b), on another copy, must leave the verdict PASS (the +0x383 byte is not the id).
+if [ -z "${VS_CTL:-}" ]; then
+    for k in a b; do
+        C="$OUT/ctl_$k"; mkdir -p "$C"; cp "$OUT"/*.txt "$C"/ 2>/dev/null || true; plant "$C" $k
+        # the output goes BESIDE the plant directory: a file inside it would be read as a tap log
+        eval "crc_$k=0"; python3 "$OUT/analyze.py" "$C" > "$OUT/ctl_$k.out" 2>&1 || eval "crc_$k=\$?"
+    done
+    if [ "$crc_a" != 0 ] && grep -q 'VARIANT-HALF id: 13$' "$OUT/ctl_a.out" && [ "$crc_b" = 0 ]; then
+        vs_ctl_fired word-write-variant "plant (a), a word write of 0x1300 to +0x382, FAILs naming id 13; plant (b), a byte write of 0x13 to +0x383 alone, leaves the verdict PASS"
+    else
+        vs_ctl_dead word-write-variant "the lanes are not separated (plant a rc=$crc_a, plant b rc=$crc_b)" || rc=1
+    fi
+else
+    vs_ctl_fired word-write-variant "the planted log joined the real ones (mode)"
+fi
+exit $rc

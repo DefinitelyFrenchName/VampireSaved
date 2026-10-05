@@ -1,0 +1,9 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent192/m23/m23_rows_draft.toml	1792c603f9546ce414d3e357242da1e8ba2d00e5
+build/agent192/m23/check_sites.txt	126104e9aa0cc1fa09bd9e4ed469071d5f9960e0
+build/agent192/m23/check_sites.py	b2954f3ce9c4603131d7e1cf205cd3ba12efc881
+build/agent192/m23/idw192.log	cbcb99f65a4d025474018c0390c1f55a2b25f254
+build/agent192/m23/rulings_222_223.txt	191e92c89928cc092cfc14c0baf7fe08651170da
+build/agent192/m23/engine_airdash_excerpt.txt	e28b1cee39f8b60b292254f8a8b9672f405dd238
+build/agent192/m23/engine_landing_excerpt.txt	71b2496bbae5b1b843f7bf8ed32fbf0ff0a7f270
+tests/audit_id_writers.sh	37c4e59729650e12a92e3afb27df587de52629e5

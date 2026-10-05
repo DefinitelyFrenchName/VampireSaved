@@ -40,12 +40,12 @@
 # run 2026-10-03-602 (VIOLATED Q1 Q4): the MiSTer README named PLAY.command and PLAY.bat, and
 # the MAME launcher's refusals had never run anywhere.
 #
-# Usage: tests/test_release_launcher_bat.sh [release/merged-m22]   # ci_portable (no ROMDIR, no emulator, no ROM bytes)
+# Usage: tests/test_release_launcher_bat.sh [release/merged-m23]   # ci_portable (no ROMDIR, no emulator, no ROM bytes)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
-REL="${1:-release/merged-m22}"
+REL="${1:-release/merged-m23}"
 [ -d "$REL" ] || { echo "FAIL: no release tree at $REL (the package-text check needs one)"; exit 1; }
 NAME="$(basename "$REL")"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT

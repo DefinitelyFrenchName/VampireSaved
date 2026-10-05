@@ -37,7 +37,7 @@
 #   joining; a continue reached by the late START (that is a new game: P2's +0x382 is cleared, measured 14z-189); the
 #   FBNeo leg; whether the field ever met it. The rig's KOs are pokes, and its frames are the merged build's.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged30] [EXPECT=held|draw] [KEEP=<dir>]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged31] [EXPECT=held|draw] [KEEP=<dir>]
 #        tests/audit_tenant_continue_switch.sh
 #   emulator tier, MAME; ~1.5 min (two legs, each a tap run and a dump run in parallel)
 set -eu
@@ -45,7 +45,7 @@ set -eu
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-BUILD="${BUILD:-build/m3b_merged30}"
+BUILD="${BUILD:-build/m3b_merged31}"
 EXPECT="${EXPECT:-held}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
 . "$REPO/tests/lib/controls.sh"

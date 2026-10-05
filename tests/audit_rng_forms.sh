@@ -29,7 +29,7 @@
 #   C's IDENT->DIFF rows (not attributed; ours draws in vsavj's motion trackers where native does not, #176); FBNeo;
 #   a second host; run-to-run repeats.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged30] [FREEZE=1] [KEEP=<dir> [REUSE=1]] tests/audit_rng_forms.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged31] [FREEZE=1] [KEEP=<dir> [REUSE=1]] tests/audit_rng_forms.sh
 #   REUSE=1 with KEEP re-reads a work dir an earlier run of THIS audit filled (the control modes on the real tables,
 #   seconds instead of hours); a form whose tables are missing is run
 #   emulator tier, MAME; ~8 min on this MacBook (nine gate runs, each parallel inside; 7 min 30 s measured 14z-186)
@@ -39,7 +39,7 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 export ROMDIR
-BUILD="${BUILD:-build/m3b_merged30}"; export BUILD
+BUILD="${BUILD:-build/m3b_merged31}"; export BUILD
 EXPECT="$REPO/tests/expected/rng_forms.tsv"
 . "$REPO/tests/lib/controls.sh"
 vs_ctl_mode "$0"

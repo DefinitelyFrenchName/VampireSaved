@@ -351,6 +351,24 @@ So: merged-m19's seven zip assets are NOT deleted by hand; they stay hosted unti
 
 ---
 
+## Ruled 2026-10-05 (14z-192) — #115 closed `declined` by the maintainer on GitHub
+
+**The maintainer, on #115 (2026-10-05T12:04:52Z, closing the issue):** *"Given the current state of the competitive play rules, it's ruled best not to touch this unless there's a community-wide request (which is beyond unlikely). Ticket closed"* (their earlier comment, 2026-09-15: *"This ticket is parked potentially forever since the behavior is vanilla. The one thing that makes this ticket acceptable is that it would be a separate surgical patch. Still, this is currently fully out of scope of the project"*).
+
+So: the Zabel j.LK proximity guard (vanilla behaviour) is not patched; the ticket is `declined`, to be reopened only on a community-wide request.
+
+---
+
+## Ruled 2026-10-05 (14z-192) — #116 split, #230 filed
+
+**The question (14z-192, in chat):** the maintainer: *"can you confirm whether or not we've gone through all the scope of #116?"* — answered: the in-emulator widening is done for Phobos's row (`tests/audit_tenant_throw_geometry.sh`, his three throws against all 18 victims) and not for Pyron's (one cell) or Donovan's (none); offered a split like #117's.
+
+**The maintainer:** *"when you can let's split #116 like #117"*
+
+So: #116 closes `done` for Phobos's row; Pyron's and Donovan's throws against the roster victims are #230.
+
+---
+
 ## Ruled 2026-10-05 (14z-192) — #117 split, #229 filed; #118 stays open
 
 **The questions (14z-192, in chat):** the maintainer: *"can you confirm whether or not we've gone through all the scope of #117? If so you can close it."* — answered: the `CL.` rows, the `6`-prefixed rows and the aerials are joined and gated; specials, supers, EX/ES moves, throws and pursuits are not; offered a split or keeping #117 open. Then, for #118: its measured batch (14z-189) against the ~70 remaining candidates, with the recommendation to keep it open rather than split.

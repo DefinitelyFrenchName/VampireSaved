@@ -39,14 +39,14 @@
 # match-start load where native holds another row — measured by palette dumps in this work's scratch, not frozen
 # here); what the census's other DIFF sites do in play (static only); FBNeo and the MiSTer core.
 #
-# Usage: ROMDIR=... [MAME_BIN=~/.cache/vampire-saved/mame/cps2] [BUILD=build/m3b_merged30] [FREEZE=1] tests/audit_column_flash_cause.sh
+# Usage: ROMDIR=... [MAME_BIN=~/.cache/vampire-saved/mame/cps2] [BUILD=build/m3b_merged31] [FREEZE=1] tests/audit_column_flash_cause.sh
 #   emulator tier, MAME; three runs of 2870 frames at once
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged30}"
+BUILD="${BUILD:-build/m3b_merged31}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/column_flash_cause.tsv"
 V2OP="$REPO/build/out/vsav2_opcodes.bin"; VJOP="$REPO/build/out/vsavj_opcodes.bin"

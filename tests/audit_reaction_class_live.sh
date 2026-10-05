@@ -52,14 +52,14 @@
 # and `<leg> runs <n>`. The ours rows follow the build (placed pcs move): re-freeze at every
 # freeze (FREEZE=1), reviewing the diff.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged30] [JOBS=6] [LEGS="vsavj ours native"] [FREEZE=1] tests/audit_reaction_class_live.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged31] [JOBS=6] [LEGS="vsavj ours native"] [FREEZE=1] tests/audit_reaction_class_live.sh
 #   emulator tier, MAME; 153 tap runs (14z-183; 148 when measured 14z-169) on this MacBook, solo, JOBS=6: see the header of the first frozen run (PROVENANCE)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged30}"
+BUILD="${BUILD:-build/m3b_merged31}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="$REPO/tests/expected/reaction_class_live.tsv"
 JOBS="${JOBS:-6}"

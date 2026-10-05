@@ -6547,3 +6547,58 @@ crash's, not the open gate's.
 stops the gate (`assert` + a non-zero exit the gate reads), never a silent fall-through into the comparison. Fixed:
 the string escaped; `CONTROL=open-agent-gate` now FAILs the gate with the perturbation applied (14z-192).
 
+
+## A REMOTE BATTERY STARTED FROM A NON-LOGIN SHELL RUNS WITHOUT THE PATH MAME — two prereq reds that were the PATH, not the build (paid: 14z-192)
+The M23 freeze battery was started on ERIS as `ssh eris 'wsl -e sh -s' < script`, a NON-login shell, so
+`~/.profile`'s `~/.local/bin` was not on PATH and the reference binary `~/.local/bin/mame` (-> `mame-ref/cps2`)
+was invisible. `test_decrypt_oracle` died on `mame: not found` and `test_patch_prg` on a missing `opc.bin`
+(the dump MAME never wrote); both were PASS on ERIS's M22 battery and PASS again after the restart.
+`test_mame_parity` went PARTIAL on both starts and is NOT this gotcha: replay `128_shadow_vs_legacy_vsavj`
+(84f56520, 14z-189) is frozen in neither `tests/expected/vsavj/` nor `mame_parity_ab.tsv` (frozen 14z-187b),
+so it falls to the direct A/B, which needs the Mac's reference binary (`build/agent192/m23/attr/mame_parity_attr.txt`). 24 gates and libraries name `mame` or `MAME_REF_BIN`, so a section
+skipped inside a PASS was possible: the run was stopped 75 rows in, set aside as
+`build/emu_freeze_m23_p1_nologin_path` on ERIS, `build/merged1` (which `audit_merged_legacy` rewrites)
+restored, and the battery restarted with `. "$HOME/.profile"` as the script's first line. `bash -lc` through
+`ssh eris "wsl -e bash -lc '...'"` does not survive Windows' quoting (an unexpected-EOF, nothing started).
+**The rule:** a remote tier script sources the box's profile first and prints `command -v mame` before the
+runner, so the binary it will use is in the log; a prereq red on a box where the same gate was green at the
+last freeze is checked against the environment before the build.
+
+## A RE-POINT SWEEP REWRITES DATED RECORDS AND MISSES RELEASE NAMES (paid: 14z-192, the M23 freeze)
+`build/agent192/m23/sweep_apply.py` (14z-189's rule: every live build-dir default, dated records excluded by
+hand) rewrote `tests/replays/don/202_don_continue_switch.rpl`'s "frames ... measured on build/m3b_merged30"
+to `m3b_merged31`, a measurement it never took; the dry run's REVIEW filter keyed on `->`, `RE-POINTED` and
+`14z-1NN` and did not match the word "measured". Restored by hand. The same sweep cannot see RELEASE names:
+six gates defaulted to `release/merged-m22` (`test_release_roundtrip`, `test_applier_page`,
+`test_applier_page_browser`, `test_applier_vcdiff`, `test_release_launcher`, `test_release_launcher_bat`),
+re-pointed by hand as 14z-189 did in its freeze commit. Worse, it bumped `tests/audit_landing_sound.sh`'s
+`CTL_BUILD` default — PINNED to merged-m22, the build before #223's swap, which the control must hear differ —
+to the build under test: on ERIS's battery the control compared M23 with itself and the gate reported
+`CONTROL DEAD: pre-swap-build` (the Mac's earlier PASS predated the sweep). The gate's own control caught it;
+restored, with the line now saying it is not a current-build default. **The rule:** the dry run flags "measured", "frozen",
+"recorded", "found" and "on build/" in a comment for review alongside the arrows, and the freeze greps
+`merged-m<prev>` in `tests/` and `tools/` for release-name defaults after the build-dir sweep; a default
+named `CTL_*`, `REF`, `--old` or described as "before"/"pre-" is a pinned predecessor and is never swept.
+
+## A MARK-ONLY CHANGE MOVES THE MiSTer PRG PROBE'S PROGRAM-READ COUNTS (paid: 14z-192, the M23 freeze)
+`tests/test_mister_prg_window.sh`'s pos line moved at M23 (`cyc` -621, `rd_lo` -676, every other field identical) on a
+replay that never plays a tenant (`11_pick_donovan` lands on Jedah, slot 0x0F). Four separating controls over (program
+M22|M23) x (graphics M22|M23) plus the two single-fix removals put the whole move on the GRAPHICS members `vsw.33m`/`vsw.37m`,
+which carry the wheel's version mark: M23's program with M22's graphics gives the M22 pair exactly, M22's program
+(byte-identical, `110467a7`) with M23's graphics gives the M23 pair exactly (`build/agent192/m23/attr/prg_window_attr.txt`).
+HOW graphics bytes move a count of program reads was not tested. M22's own unexplained move of the same fields (14z-189)
+also came with a mark change and was not re-run. **The rule:** a moved prg_window pair at a freeze is attributed by a
+control that swaps the graphics members alone before any program change is suspected; each control build needs its own
+catalogue entry spliced into its PRIVATE scratch clones (the fork's `doc/mame.xml` names the freeze's CRCs, and
+`mra_header` refuses a build whose parts do not resolve).
+
+## A CROSS-LEG DELTA FROZEN AS "DOCUMENTED COSMETIC" WAS A DEFECT NOBODY HAD NAMED (paid: 14z-192, #223)
+`tests/audit_trap_parity.sh` (14z-85g, ours' inventory carrying `010a` where native's carries `010b`) and
+`tests/test_hui_electrocute.sh` (14z-95: "the sole delta is the documented 010a/010b cosmetic pair",
+`HANDOFF_HISTORY.md`) froze the same Phobos-vs-native sound delta for over a hundred sessions, and neither named a
+mechanism or a ticket for it. It was the landing sound's big-body +1 (request `0x10a`, `0x10b` big-body;
+`docs/game/engine_internals.md` § Wider: the same class elsewhere), found by ear at 14z-191 as #223 and closed by the
+M23 swap. At the freeze both gates went red because the build now fired native's id, and a separating control
+(the build without #223's two rows) still fired `010a` (`build/agent192/m23/ring223c/`). **The rule:** a frozen
+ours-vs-native delta names its mechanism or its ticket where it is frozen; "documented" with no pointer is an
+unattributed delta, and it is a ticket the day it is frozen.

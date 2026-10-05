@@ -1,6 +1,15 @@
 # tests/test_mister_prg_window.sh — the frozen pair. One line per leg,
 # the probe's own last per-frame report. Regenerate DELIBERATELY (--freeze):
 # a moved count on a deterministic simulation is a finding.
+# RE-FROZEN 14z-192 on merged-m23 (build/m3b_merged31) from the M23 freeze's own MiSTer romset lane
+# (build/emu_freeze_m23_mister/test_mister_prg_window.log, re-analysed with --pos-log/--neg-log from the run's own legs;
+# every structural assertion PASSED, the control leg's line UNCHANGED). WHAT MOVED M22 -> M23: the pos line's `cyc`
+# -621 and `rd_lo` -676, every other field identical. ATTRIBUTED by four separating controls covering every program
+# combination (build/agent192/m23/attr/prg_window_attr.txt): M23's program with M22's graphics members gives the M22 pair,
+# M22's program with M23's graphics gives the M23 pair, and removing #222 or #223 alone moves nothing — the move follows
+# the graphics members that carry the M23 mark (vsw.33m/vsw.37m). HOW graphics bytes move program-read counts is NOT
+# TESTED. Rule-checker runs 2026-10-05-684 (resolved by controls C and D) and -690 (OK).
+#
 # RE-FROZEN 14z-189 on merged-m22 (build/m3b_merged30) from the M22 freeze's own MiSTer romset lane
 # (build/emu_freeze_m22_mister/test_mister_prg_window.log, re-analysed with --pos-log/--neg-log from the run's own legs;
 # every structural assertion PASSED, the control leg's line UNCHANGED). WHAT MOVED M21 -> M22: `first_addr` 4c1440 ->
@@ -60,5 +69,5 @@
 # `blocks`, `first_frame`, `min`): M21's two new thunks are not executed in the frames this replay
 # (11_pick_donovan, 2900 f) reaches, or cost no bus reads there — which of the two is not measured.
 #
-pos frame 2900 wide 1 cyc 97643614 cyc_hi_rd 1211302 cyc_hi_wr 10816 rd_hi 1211302 rd_lo 75765236 blocks 8 first_frame 1119 first_addr 4c1460 min 413c70 max 4d487e
+pos frame 2900 wide 1 cyc 97642993 cyc_hi_rd 1211302 cyc_hi_wr 10816 rd_hi 1211302 rd_lo 75764560 blocks 8 first_frame 1119 first_addr 4c1460 min 413c70 max 4d487e
 neg frame 2900 wide 0 cyc 97337938 cyc_hi_rd 4 cyc_hi_wr 10113 rd_hi 0 rd_lo 75503450 blocks 0 first_frame -1 first_addr 000000 min 7ffffe max 000000

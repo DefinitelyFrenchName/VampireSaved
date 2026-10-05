@@ -29,7 +29,7 @@ WHAT IT REPORTS, each figure derived from the images it is given:
 
 Usage:
   audit_quote_font_window.py <vsavj_op> <vsavj_data> <vs2_op> <vs2_data> <romdir>
-      [--build build/m3b_merged30]
+      [--build build/m3b_merged31]
 Prints the SHA-1 of every image read. Exit 0 always — the gate judges.
 """
 import argparse

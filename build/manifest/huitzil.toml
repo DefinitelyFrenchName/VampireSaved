@@ -892,7 +892,7 @@ march_retarget_mid = true
 # same-source-or-fail names any future collision). Screen position =
 # the empty bottom-right corner (measured on merged-m5 snapshots, 14z-105).
 # THE TEXT NAMES THE FREEZE GENERATION — change it at every freeze.
-version_text = "M22"
+version_text = "M23"
 version_font = "build/manifest/version_font.json"
 version_x = 324
 version_y = 202
@@ -2450,6 +2450,53 @@ dst_old_head = "3830"
 fixes = "0x01:30:30"
 only_variant_slot = true
 note = "14z-170 (ruled 14z-168): vs2's Phobos low-HP rally threshold (40 HP) over vsavj's variant byte 0x10 (56 HP, Bulleta's copy); Pyron's byte 0x11 kept at 0x30"
+
+
+# ── THE M23 ROWS (14z-192; rule-checker runs 2026-10-05-675..683, 683 OK) ──
+# THE AIR-DASH MINIMUM HEIGHT (#222; RULED 2026-10-05, 14z-191: "yes, since Phobos is VS2
+# only, and its air dash is  character-specific, it should abide by VS2 behavior."). vsavj
+# 0x027B80 (vs2 0x026DD2, vh2 0x026E00) refuses the air-dash latch below the per-char word
+# 0x0BE23A[id] (vs2 0x0D83D8, vh2 0x0D7C6A) — but only for the ids its caller's mask sends
+# through it. Two rows: vs2's mask bit 0x10 at the caller, and vs2's row 0x10 (24).
+[[code_word]]
+stage = 6
+name = "air_dash_mask_hi"
+addr = 0x022AF4          # move.l #$28102810,d1 at 0x022AF2; vs2 0x0214E4 $28112810, vh2 0x021512
+old_hex = "2810"
+new_hex = "2811"
+only_variant_slot = true
+
+[[data_port]]
+stage = 6
+name = "air_dash_height_row"
+src = 0xD83F8            # vs2 0xD83D8 + 0x10*2: 0x0018
+len = 2
+orc = 0xD7C8A            # vh2 0xD7C6A + 0x10*2
+dst = 0xBE25A            # vsavj 0xBE23A + 0x10*2 (variant row, 0 — row 0x00's copy)
+dst_end = 0xBE25C
+dst_old_head = "0000"
+only_variant_slot = true
+
+# THE LANDING SOUND'S BIG-BODY MASK (#223; RULED 2026-10-05, 14z-191: "#223 I confirm the sound
+# effects should be swapped to match VS2"): vs2's whole high word 0x0441 (bit 0x10 Phobos set,
+# bit 0x13 clear) for vsavj's 0x0448 (bit 0x13, Victor's +0x10 mirror). No legacy fighter carries
+# 0x10 or 0x13 (tests/audit_id_writers.sh), so legacy reach is nil; in a solo build the other
+# tenant's bit lands on an id nobody carries.
+[[code_word]]
+stage = 6
+name = "landing_bigbody_mask_hi_a"
+addr = 0x003960          # move.l #$04480448,d0 at 0x00395E; vs2/vh2 0x003994 $04410448
+old_hex = "0448"
+new_hex = "0441"
+only_variant_slot = true
+
+[[code_word]]
+stage = 6
+name = "landing_bigbody_mask_hi_b"
+addr = 0x003B38          # move.l #$04480448,d0 at 0x003B36; vs2/vh2 0x003B6C $04410448
+old_hex = "0448"
+new_hex = "0441"
+only_variant_slot = true
 
 # THE VOICE ALIAS THUNK (14z-86, shared by all tenants — identical
 # rows dedupe on merge). A range-gated clone of the per-node sfx

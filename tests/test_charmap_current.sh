@@ -31,7 +31,7 @@
 # (and its unattributed count must rise by one); (b) an override row added to
 # a copy of the overrides file must show up as ours_source override:<id>.
 #
-# Usage: tests/test_charmap_current.sh   [DON=build/don_m26 HUI=build/hui60 PYR=build/pyron45]  # re-pointed 14z-127 (the boot-title freeze; the ONLY leaves that moved were provenance -- /inputs/manifest, /inputs/verify_data.bin, /sources/ours/set -- zero character-data bytes) <- 14z-119 (physics-port freeze) <- 14z-117b
+# Usage: tests/test_charmap_current.sh   [DON=build/don_m27 HUI=build/hui61 PYR=build/pyron46]  # re-pointed 14z-127 (the boot-title freeze; the ONLY leaves that moved were provenance -- /inputs/manifest, /inputs/verify_data.bin, /sources/ours/set -- zero character-data bytes) <- 14z-119 (physics-port freeze) <- 14z-117b
 #
 # HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -53,9 +53,9 @@ set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 PAGES=tests/expected/charmap_pages.sha256
-DON="${DON:-build/don_m26}"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-HUI="${HUI:-build/hui60}"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-PYR="${PYR:-build/pyron45}"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+DON="${DON:-build/don_m27}"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+HUI="${HUI:-build/hui61}"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+PYR="${PYR:-build/pyron46}"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }

@@ -51,11 +51,12 @@
 # fighter loads (ram.md +0x382, 14z-188), so "native fires neither" may mean the native leg is not
 # voicing as Huitzil at all. Until that confound is closed those two ids are a
 # MEASUREMENT, not a finding, and freezing them here would ratify a possible
-# rig artifact. Section 3 freezes only the ELECTROCUTE WINDOW, where the sole
-# delta is the 010a/010b pair audit_trap_parity already records as cosmetic
-# (same content, relocated banks, the defense-rows class).
+# rig artifact. Section 3 freezes only the ELECTROCUTE WINDOW, where the two
+# legs now agree id for id: the one delta it used to carry, the 010a/010b pair
+# (ours 010a, native 010b), was #223's landing sound and closed at the M23
+# freeze (14z-192), so the gate now asserts NO cross-leg delta.
 #
-# Usage: ROMDIR=... [BUILD=build/m3b_merged30] tests/test_hui_electrocute.sh
+# Usage: ROMDIR=... [BUILD=build/m3b_merged31] tests/test_hui_electrocute.sh
 # ~2 min (4 MAME runs, parallel).
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
@@ -70,8 +71,8 @@
 #   press is the QUICK version — the rig's first draft landed a hit (288->275
 #   both legs) and produced an ordinary reaction, so the quick 6+HP is kept as
 #   a standing NEGATIVE control. Section 3 freezes the ring inventory across
-#   the electrocute window only, where the sole delta is the documented
-#   010a/010b cosmetic pair. DELIBERATELY NOT ASSERTED: the two extra Phobos
+#   the electrocute window only, where the sole delta was the documented
+#   010a/010b cosmetic pair (closed by #223, 14z-192 — see above). DELIBERATELY NOT ASSERTED: the two extra Phobos
 #   voices (0x8e/0x91) measured PRE-match — a +0x382 poke confound is open on
 #   the native leg, so freezing them would ratify a possible rig artifact. ~2
 #   min
@@ -86,7 +87,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 # VARIABLE (forks set their own); only made absolute, and only if it exists,
 # so a gate that means to SKIP on a missing ROMDIR still does.
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
-BUILD="${BUILD:-build/m3b_merged30}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${BUILD:-build/m3b_merged31}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 [ -d "$BUILD/rompath" ] || { echo "SKIP: no build at $BUILD"; exit 0; }
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no WIDE MAME binary"; exit 0; }
@@ -165,8 +166,11 @@ LO, HI = 3380, 3700          # widened: ring_tap is a +1 input-staging deviant (
 # by frame: the two games are never on the same frame, and ring_tap's staging
 # differs from replay.lua's, so a frame-indexed compare would be a
 # cross-convention error (docs/GOTCHAS.md).
+# RE-FROZEN 14z-192 (the M23 freeze): ours 010a -> 010b. #223 gave Phobos vs2's big-body landing
+# sound (the landing site's mask word, 0448 -> 0441), the id native already fired here — the
+# documented 010a/010b pair is closed (build/agent192/m23/attr/battery_reds.txt).
 EXPECT = {"native": ["0625","0419","0402","00f3","010b","0415"],
-          "ours":   ["0625","0419","0402","00f3","010a","0415"]}
+          "ours":   ["0625","0419","0402","00f3","010b","0415"]}
 rc = 0
 for leg, want in EXPECT.items():
     got = []
@@ -181,15 +185,16 @@ for leg, want in EXPECT.items():
         rc = 1
     else:
         print(f"  ok: {leg} — {len(got)} ids, matching the frozen inventory")
-# the ONE known delta, asserted by name so it cannot silently become two
+# NO cross-leg delta since the M23 freeze (14z-192: #223 closed the 010a/010b pair), asserted so
+# a delta cannot reappear silently in the frozen expectations
 d_o = set(EXPECT["ours"]) - set(EXPECT["native"])
 d_n = set(EXPECT["native"]) - set(EXPECT["ours"])
-if (d_o, d_n) != ({"010a"}, {"010b"}):
-    print(f"FAIL: the cross-leg delta is no longer the documented 010a/010b "
-          f"cosmetic pair: ours-only {d_o}, native-only {d_n}")
+if d_o or d_n:
+    print(f"FAIL: the frozen legs differ: ours-only {d_o}, native-only {d_n} "
+          f"(none since #223 closed the 010a/010b pair, 14z-192)")
     rc = 1
 else:
-    print("  ok: the only cross-leg delta is the documented 010a/010b pair")
+    print("  ok: no cross-leg delta — the legs' frozen inventories are equal (#223 closed the 010a/010b pair)")
 sys.exit(rc)
 PY
 

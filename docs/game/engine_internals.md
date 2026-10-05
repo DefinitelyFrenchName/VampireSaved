@@ -1458,8 +1458,10 @@ as the height above the floor is 14z-121's, not re-derived (it read 0 on the gro
 `0x04/0x0D/0x0F` + their `+0x10` mirrors `0x14/0x1D/0x1F`, of the table's 32), 0 for everyone else — so the
 tenants (rows 0x10/0x11/0x13 = 0) may air-dash at any height on vsavj's table. **Which characters a caller sends
 through the routine is a second gate, a char-id MASK at the caller** (`0x022AF2`: vsavj `$28102810`, vs2's twin
-`0x0214E4` `$28112810` — vs2 adds id `0x10`, Phobos): on vs2 Phobos's air dash is refused under 24 pixels and on
-ours it is not — measured 14z-191 at height 21, native no dash, ours a dash; identical from height 34 up (#222). (The 14z-121 text said 36 for
+`0x0214E4` `$28112810` — vs2 adds id `0x10`, Phobos): on vs2 Phobos's air dash is refused under 24 pixels, and on
+ours it was not until M23 — measured 14z-191 at height 21, native no dash, ours a dash; identical from height 34 up. **Since
+M23 (14z-192, #222) ours matches vs2**: the caller mask takes bit `0x10` and Phobos's row `0x10` reads 24 in ours
+(Donovan's and Pyron's rows stay 0), and `tests/audit_air_dash_height.sh` holds `same` against native. (The 14z-121 text said 36 for
 "Zabel, Lilith and Jedah": the table reads `0x0018` = 24 — how 36 was obtained is not recorded — and
 `0x0D` is Lei-Lei, Lilith being `0x0E` (`atlas/character_tables.md`); the 14z-121 text said "five
 callers"; measured 14z-189 and locked, routine and callers included, by
@@ -1692,17 +1694,19 @@ not the match-start palette load. **Read this before attributing any
   ours and finds 4 where a TENANT bit differs: this one (`0x02ADB2`, bit `0x13`);
   `0x022AF2` (vs2 `0x0214E4` sets bit `0x10`: Phobos goes through the minimum
   AIR-DASH height check `0x027B80` (the "air-attack" reading CORRECTED 14z-191, above), and vs2's height
-  table row `0x10` reads `0x0018` where ours reads 0 — MEASURED IN PLAY 14z-191: at height 21 native vs2
-  refuses Phobos's air dash and ours performs it, identical from 34 up; `tests/audit_air_dash_height.sh`,
-  #222); `0x00395E` and `0x003B36` (vs2 `0x003994`/`0x003B6C`: masks vsavj `$04480448`, vs2 `$04410448` —
+  table row `0x10` reads `0x0018` where ours read 0 — MEASURED IN PLAY 14z-191: at height 21 native vs2
+  refused Phobos's air dash and ours performed it, identical from 34 up; ours takes vs2's mask bit and row
+  since M23 (14z-192), `tests/audit_air_dash_height.sh` `same`, #222); `0x00395E` and `0x003B36` (vs2 `0x003994`/`0x003B6C`: masks vsavj `$04480448`, vs2 `$04410448` —
   the low half, Victor/Anakaris/Sasquatch, shared; in the high half vsavj sets `0x13`, Victor's `+0x10`
   mirror ON vsavj, and vs2 sets `0x10`, Phobos, in its place, `0x13` being Donovan there — a +1 on the
   sound id handed to `bsr 0x4CE2`, the sound-request helper this section describes below: the BIG-BODY
   variant. `0x00395E` is the LANDING sound (requests `0x10a`, `0x10c` when `+0x11f` is set; reached about 35
   frames after every jump, air attack, air dash and float on the naming rigs, on the same frames on both games),
-  so on vs2 Phobos lands with the big-body sound and Donovan with the ordinary one, ours the reverse — MEASURED
-  14z-191 by ear and by RMS (`tests/audit_landing_sound.sh`, #223); `0x003B36` (request `0x17c`, keyed on the
-  character at `+0x32`) is not reached by those rigs). The other 3 sites agree.
+  so on vs2 Phobos lands with the big-body sound and Donovan with the ordinary one; ours had the reverse — MEASURED
+  14z-191 by ear and by RMS — until M23 (14z-192, #223), which takes vs2's high word `0441` at both reads, so ours
+  now matches vs2 (`tests/audit_landing_sound.sh` `same`, its pre-swap control hearing the old sound); `0x003B36` (request `0x17c`, keyed on the
+  character at `+0x32`) is not reached by those rigs). The other 3 sites agree; since M23 so do the three above, and the census's four differing sites are down to the
+  first (`0x02ADB2`) — measured 14z-192 on merged-m23, the census held by `tests/audit_column_flash_cause.sh`.
   Gates: `tests/audit_column_flash.sh` (the symptom), `tests/audit_column_flash_cause.sh` (the path).
 - **Superseded note (14z-170), kept for the frames it measured:** inside the move's window, palette row 11 (`RAM:$90C160`) is written
   ONLY by this uploader on both games: ours uploads it at frames 2807, 2813 and 2858,

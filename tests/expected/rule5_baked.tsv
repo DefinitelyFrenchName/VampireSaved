@@ -2,11 +2,11 @@
 # columns, frozen so it can only SHRINK. `fact` is deliberately
 # NOT frozen (see FROZEN_COLUMNS in tools/audit_rule5.py) and is
 # reported as a NOTE instead; at this freeze it stood at
-# 7948 baked / 539 derived of 8487.
+# 7973 baked / 541 derived of 8514.
 # Produced by `python3 tools/audit_rule5.py --freeze
 # tests/expected/rule5_baked.tsv`. Provenance: static (the tree
 # itself). Columns: column file kind key value class note.
-# growth allowed: 14z-189 the M22 freeze: #195's pursuit_mark_hit, pursuit_mark_tail and pursuit_mark_tail_pad carry only_variant_slot = true in donovan.toml and pyron.toml (6 instances, 209 -> 215); a build GATE, not a value a player feels; NOT migrated, for the 14z-143 reason; rule-checker run 2026-10-03-580
+# growth allowed: 14z-192 the M23 freeze: #222's air_dash_mask_hi and air_dash_height_row (huitzil.toml) and #223's landing_bigbody_mask_hi_a/_b (donovan.toml and huitzil.toml) carry only_variant_slot = true (6 instances, 215 -> 221); NOT migrated, a build gate, not a value a player feels; rule-checker run 2026-10-05-698
 code	tools/build_gfx_donovan.py	(module)	DELTA	0x2750	BAKED	
 code	tools/build_gfx_donovan.py	(module)	DST_BANK	2	BAKED	
 code	tools/build_gfx_donovan.py	(module)	SRC_BANK	3	BAKED	
@@ -57,6 +57,8 @@ gameplay	build/manifest/donovan.toml	aux_poke	only_variant_slot	true	BAKED
 gameplay	build/manifest/donovan.toml	aux_poke	only_variant_slot	true	BAKED	
 gameplay	build/manifest/donovan.toml	aux_poke	only_variant_slot	true	BAKED	
 gameplay	build/manifest/donovan.toml	aux_poke	only_variant_slot	true	BAKED	
+gameplay	build/manifest/donovan.toml	code_word	only_variant_slot	true	BAKED	
+gameplay	build/manifest/donovan.toml	code_word	only_variant_slot	true	BAKED	
 gameplay	build/manifest/donovan.toml	code_word	only_variant_slot	true	BAKED	
 gameplay	build/manifest/donovan.toml	code_word	only_variant_slot	true	BAKED	
 gameplay	build/manifest/donovan.toml	code_word	only_variant_slot	true	BAKED	
@@ -142,6 +144,10 @@ gameplay	build/manifest/huitzil.toml	code_word	only_variant_slot	true	BAKED
 gameplay	build/manifest/huitzil.toml	code_word	only_variant_slot	true	BAKED	
 gameplay	build/manifest/huitzil.toml	code_word	only_variant_slot	true	BAKED	
 gameplay	build/manifest/huitzil.toml	code_word	only_variant_slot	true	BAKED	
+gameplay	build/manifest/huitzil.toml	code_word	only_variant_slot	true	BAKED	
+gameplay	build/manifest/huitzil.toml	code_word	only_variant_slot	true	BAKED	
+gameplay	build/manifest/huitzil.toml	code_word	only_variant_slot	true	BAKED	
+gameplay	build/manifest/huitzil.toml	data_port	only_variant_slot	true	BAKED	
 gameplay	build/manifest/huitzil.toml	data_port	only_variant_slot	true	BAKED	
 gameplay	build/manifest/huitzil.toml	data_port	only_variant_slot	true	BAKED	
 gameplay	build/manifest/huitzil.toml	data_port	only_variant_slot	true	BAKED	

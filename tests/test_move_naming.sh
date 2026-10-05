@@ -58,7 +58,7 @@
 # grapple, kept as measured) — each on its own extract, forced by the
 # early-window poke; every part pins both fighters' X before each event.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [DON=build/don_m26 HUI=build/hui60 PYR=build/pyron45] [TENANTS="donovan pyron huitzil"] tests/test_move_naming.sh   # emulator tier (MAME, ~3 min)
+# Usage: ROMDIR=... [MAME_BIN=...] [DON=build/don_m27 HUI=build/hui61 PYR=build/pyron46] [TENANTS="donovan pyron huitzil"] tests/test_move_naming.sh   # emulator tier (MAME, ~3 min)
 #
 # HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -88,7 +88,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 # so a gate that means to SKIP on a missing ROMDIR still does.
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-DON="${DON:-build/don_m26}"; HUI="${HUI:-build/hui60}"; PYR="${PYR:-build/pyron45}"   # the vs2 EXTRACTS (anim region + index pointers)
+DON="${DON:-build/don_m27}"; HUI="${HUI:-build/hui61}"; PYR="${PYR:-build/pyron46}"   # the vs2 EXTRACTS (anim region + index pointers)
 TENANTS="${TENANTS:-donovan pyron huitzil}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM

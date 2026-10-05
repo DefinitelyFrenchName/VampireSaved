@@ -1,5 +1,81 @@
 # patch_notes — per-change detail: every byte, and why
 
+## 14z-192 — THE M23 FREEZE (donovan-m27 / huitzil-m34 / pyron-m28 / merged-m23, mark M23): #222 and #223 LANDED
+
+**WHAT THE FREEZE CARRIES.** The two fixes ruled at 14z-191 (2026-10-05), applied directly to the manifests (no staged
+file): #222, Phobos's air-dash minimum height — *"yes, since Phobos is VS2 only, and its air dash is  character-specific,
+it should abide by VS2 behavior."* — and #223, the landing sound — *"#223 I confirm the sound effects should be swapped
+to match VS2"*. The maintainer asked for the small tickets to ride in the same freeze (#214, #227, #210, #211, #213: the
+release README generator and the tooling, not ROM bytes). The mark `M22` -> `M23` (`version_text` in the three tenant
+manifests). Rule-checker runs 2026-10-05-675..683 on the rows before they were built (683 OK).
+
+**#222 — THE AIR-DASH MINIMUM HEIGHT.** vsavj `PRG:0x027B80` (vs2 `0x026DD2`, vh2 `0x026E00`) refuses the air-dash
+latch (`+0x113|+0x114`) while the fighter is airborne below the per-character word `0x0BE23A[id]` (vs2 `0x0D83D8`, vh2
+`0x0D7C6A`) — but only for the ids its caller's mask sends through it. vs2's mask carries bit 0x10 (Phobos) and its row
+0x10 is 24; vsavj's mask lacks the bit and its row 0x10 is 0, so ours dashed at height 21 where vs2 refuses
+(`tests/audit_air_dash_height.sh`, measured 14z-191). Two rows in `huitzil.toml`, both stage 6 and `only_variant_slot`:
+- `air_dash_mask_hi` — `code_word` at `PRG:0x022AF4`, `2810` -> `2811` (the caller mask's high word gains bit 0x10);
+- `air_dash_height_row` — `data_port` of vs2's row 0x10 (`0x0D83F8`, oracle vh2 `0x0D7C8A`) to `0x0BE25A`..`0x0BE25C`,
+  `0000` -> `0018`.
+Donovan (0x13) and Pyron (0x11) are untouched: neither bit is set in vs2's mask for them.
+
+**#223 — THE LANDING SOUND'S BIG-BODY MASK.** The landing site reads a 32-bit id mask twice (`PRG:0x003960`,
+`0x003B38`) to choose the big-body landing sound. vsavj's high word `0x0448` sets bit 0x13 (Victor's `+0x10` mirror),
+so Donovan at 0x13 landed big and Phobos at 0x10 ordinary — the reverse of vs2, whose high word is `0x0441` (bit 0x10 set,
+bit 0x13 clear). Two `code_word` rows `landing_bigbody_mask_hi_a`/`_b`, `0448` -> `0441`, declared identically by
+`donovan.toml` and `huitzil.toml` (both tenants' sound changes) and deduped by the merge to one shared row each. No
+legacy fighter carries 0x10 or 0x13 (`tests/audit_id_writers.sh`, which now decodes word writes and refuses an
+unregistered build), so legacy reach is nil; in a solo build the other tenant's bit lands on an id nobody carries.
+
+**THE DELTA, MEASURED** (`build/agent192/m23/opset_delta.txt`, op sets as multisets of op, address and content;
+`member_delta.txt`):
+- donovan-m27: ops 351 -> 353, +2 (the two landing words), 0 removed; members `vm3j.03d` plus the mark's
+  `vsw.33m`/`vsw.37m`.
+- huitzil-m34: ops 377 -> 381, +4 (`0x022AF4` `2811`, `0x0BE25A` `0018`, the two landing words), 0 removed; members
+  `vm3j.03d`, `vm3j.04d` plus the mark.
+- pyron-m28: ops 317 -> 317, 0 differ; the mark only (program `9d135e7b` UNCHANGED).
+- merged-m23: ops 844 -> 848, +4, 0 removed (the aligner's nine positional EDITs are not deltas); members `vm3j.03d`,
+  `vm3j.04d` plus the mark.
+- the stock twin UNCHANGED (`a3910ded`, 0 members differ) and stage-4 UNCHANGED (`2fa7c2f1`).
+- The built images checked site by site (`check_built.txt`: merged and huitzil carry all four new words, donovan the
+  two landing words only, pyron and the stock twin none). All six program fingerprints reproduced on ERIS from the
+  same tree, byte for byte (`eris_builds.txt`).
+
+**THE TWO GATES TURNED.** `tests/audit_air_dash_height.sh` from `--expect gap` to `--expect same` (eight events, +5..+16,
+native vs2 and ours identical; control `native-dash-planted`), and `tests/audit_landing_sound.sh` from the gap to
+`same` for both tenants (landing-window difference RMS 17 and 16 against controls of 42 and 12; control
+`pre-swap-build`, the M22 build, must still MISMATCH: 427 and 430). **`tests/test_tenant_loop.sh` re-frozen**
+(donovan 351 -> 353, huitzil 377 -> 381; 2-tenant 631 -> 635, sum 690 -> 696; 3-tenant 844 -> 848, sum 964 -> 970).
+
+**THE BATTERY** (ERIS `build/emu_freeze_m23_p1`, prereq/fbneo/mame lanes, `--freeze --jobs 12`: PASS 173, SKIP 2 — the
+Linux release binaries, records only on ERIS — FAIL 10; the Mac `build/emu_freeze_m23_mister`: PASS 2, FAIL 1). The first ERIS
+start ran from a non-login shell without the reference `mame` on PATH and was stopped and set aside
+(`build/emu_freeze_m23_p1_nologin_path` on ERIS; `docs/project/gotchas.md`). **Every red attributed**
+(`build/agent192/m23/attr/battery_reds.txt`):
+- the BUILD-IDENTITY ROW only — `audit_column_flash`, `audit_phobos_dmg_residual`, `audit_dmg_legacy_sweep`;
+- #222/#223 moving what they were built to move — `audit_column_flash_cause` (the census rows at the landing reads and the
+  air-dash caller DIFF -> SAME against vs2), and `test_hui_electrocute` + `audit_trap_parity`, where Phobos's ring now
+  carries `010b`, native's id: the "documented 010a/010b cosmetic pair" both gates had frozen was #223's landing sound
+  and is CLOSED. A separating control (`build/agent192/m23/ring223b/`, six build-stamped legs) shows #223 alone moves it:
+  the build without its two rows still fires `010a`. Both gates EDITED (`build/agent192/m23/gate_edits_010b.py`):
+  `test_hui_electrocute` now asserts NO cross-leg delta where it asserted the pair by name;
+- the CORPUS, not the build — replay `128_shadow_vs_legacy_vsavj` (added at 14z-189 after the M22 freeze, the only replay
+  added since): `audit_defense_row_reads` and `audit_reaction_class_live` give IDENTICAL full tables on M22 and M23 with
+  today's corpus (each leg's build read from its own `mame.log`), and `test_mame_parity` put the replay in its direct A/B,
+  which ERIS cannot run (no reference binary). On our merged build replay 128's vanilla select route lands P1 on Phobos;
+- `test_mister_prg_window` (`cyc` -621, `rd_lo` -676): four controls over (program M22|M23) x (graphics M22|M23) plus the
+  two single-fix removals — the move follows the GRAPHICS members that carry the M23 mark, and no program combination moves
+  it (`build/agent192/m23/attr/prg_window_attr.txt`). How graphics bytes move program-read counts is NOT TESTED; M22's
+  unexplained move (14z-189, also a mark change) was not re-run;
+- OUR RE-POINT SWEEP — `audit_landing_sound`'s `CONTROL DEAD`: the sweep had bumped its pinned `CTL_BUILD` (merged-m22, the
+  build before #223) to the build under test. Restored; the gate PASSes with the control fired on the Mac and ERIS.
+**Re-frozen** under rule-checker runs 2026-10-05-684..690 (684-689 VIOLATED on true findings, each resolved by a new
+measurement; **690 OK**): six gates by their own FREEZE writers, each verified by a re-run without FREEZE;
+`tests/expected/mame_parity_ab.tsv` by `FREEZE=1` on the Mac (the reference host); `tests/expect/mister_prg_window.txt` from
+the lane's own legs (`--pos-log/--neg-log --freeze`), its history kept by hand. `build/merged1` regenerated by
+`audit_merged_legacy` (PASS on the Mac; the 23 tracked files identical to ERIS's; against the committed files exactly the
+four M23 rows and the mark).
+
 ## 14z-189 — THE M22 FREEZE (donovan-m26 / huitzil-m33 / pyron-m27 / merged-m22, mark M22): #194 and #195 LANDED
 
 **WHAT THE FREEZE CARRIES.** The two fixes staged at 14z-187 and 14z-188, the entries below: #194 (Pyron's Cosmo

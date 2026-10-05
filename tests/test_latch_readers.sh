@@ -7,7 +7,7 @@
 #   (audit_latch_reads) can ever attribute a read to, with the census's data-region `movep`
 #   noise frozen and named.
 # HOW: tools/audit_latch_readers.py over the decrypted opcode views and
-#   build/m3b_merged30/verify_op.bin, anchored on the extension word so a data table is not
+#   build/m3b_merged31/verify_op.bin, anchored on the extension word so a data table is not
 #   an instruction, its --selftest on both reference views first (an immediate store among its
 #   positive controls since #197); controls: a shadow copy of the tool blind to the (d16,An) form,
 #   a copy with the pre-#197 nearest-decodable scan, and the frozen inventory minus one vs2 reader row;
@@ -55,7 +55,7 @@
 #     named so nobody chases them.
 #
 # Static tier: needs ROMDIR only on a cold decrypt cache (the views come from
-# tests/lib/decrypt_cache.sh) and build/m3b_merged30/verify_op.bin for the ported image
+# tests/lib/decrypt_cache.sh) and build/m3b_merged31/verify_op.bin for the ported image
 # (SKIP without it, which --strict counts as failure).
 #
 # Usage: ROMDIR=... [FREEZE=1] tests/test_latch_readers.sh
@@ -65,7 +65,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 CONTROL="${CONTROL:-}"
 case "$CONTROL" in ""|blind-census|dropped-reader|nearest-decode) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
-MERGED="${MERGED:-$REPO/build/m3b_merged30/verify_op.bin}"
+MERGED="${MERGED:-$REPO/build/m3b_merged31/verify_op.bin}"
 [ -f "$MERGED" ] || { echo "SKIP: no ported opcode view at $MERGED"; exit 0; }
 EXPECT="$REPO/tests/expected/latch_readers.tsv"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
@@ -115,7 +115,7 @@ ok "positive controls: $(grep -c '^  ok    control' "$W/vs2.log") vs2 + $(grep -
 {
     echo "# tests/expected/latch_readers.tsv — every instruction operand naming a fighter block's confirm-latch offset,"
     echo "# on the two reference opcode views and the ported image (tools/audit_latch_readers.py; test_latch_readers.sh)."
-    echo "# Evidence class: static (the decrypted opcode views; the ported image is build/m3b_merged30/verify_op.bin)."
+    echo "# Evidence class: static (the decrypted opcode views; the ported image is build/m3b_merged31/verify_op.bin)."
     echo "# Frozen 14z-161 with FREEZE=1; re-freeze after a port stage that relocates a reader, never to absorb a new one unread."
     echo "# Columns: image, addr, offset, what, class, width, mnemonic, operands"
     echo "#--"

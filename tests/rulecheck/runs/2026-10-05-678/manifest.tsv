@@ -1,0 +1,16 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent192/m23/m23_rows_draft.toml	1792c603f9546ce414d3e357242da1e8ba2d00e5
+build/agent192/m23/check_sites.txt	3a98b5b1990cea5b729e455cdccbc524ea5f6470
+build/agent192/m23/check_sites.py	a0e11a6a0fe1ad23b9b9c7c79a579a77e5eb5671
+build/agent192/m23/sites_disasm.txt	4f032fa5e2fea23b789fc4b0fe0acecec9631920
+build/agent192/m23/sites_disasm.py	84fa5c56d3b47f22a2962de8247a3b67e1dddd4a
+build/agent192/m23/idw192_vanilla.log	e3bc433f6c197dcfab16d96337cd3e4379314db6
+build/agent192/m23/idw192_merged2.log	9204231d5addc5f216286ea35148d85690b4e875
+build/agent192/m23/idw192_unregistered.log	56ed41948eac2b4cee32c0920d3cc02e17202c9a
+build/agent192/m23/mac_merged_identity.txt	9d288a4621da373c3a43d4133005d0048ce6f4a3
+build/agent192/m23/idw192_mode.log	4b79a7ca7a701fd40adf83cdec65e0490c284892
+build/agent192/m23/audit_id_writers.diff	7b9f7c400bc0076716ab22e95b2153ed8131577c
+tests/audit_id_writers.sh	79eea39cbb786f321082757465c3c502d45e144b
+build/agent192/m23/rulings_222_223.txt	191e92c89928cc092cfc14c0baf7fe08651170da
+build/agent192/m23/engine_airdash_excerpt.txt	e28b1cee39f8b60b292254f8a8b9672f405dd238
+build/agent192/m23/engine_landing_excerpt.txt	71b2496bbae5b1b843f7bf8ed32fbf0ff0a7f270

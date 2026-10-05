@@ -11,21 +11,21 @@
   "relocated_bad": 9
  },
  "inputs": {
-  "bank_map.toml": "989a226c7d9f4263ba39ada2bd8f936206c812d3",
-  "manifest": "a5b89a69babeb1812b67017dc2e9570b4c57e256",
+  "bank_map.toml": "414f66951fee3a2ca94932baeb8d3189c1c03aee",
+  "manifest": "956e32f3ca1898931af8743128a9b581c4c31886",
   "overrides": "be0e9b96c8414532cc7a1d60f7a4a235a7d6362d",
   "placements.json": "913270ce40f1e46e11e9b6daa7ff4346771009c3",
   "reconciliation.toml": "477efcb72d82fcbafe1e4a4f59252385bcb75bac",
   "reconciliation_huitzil.toml": "23a15e51725a81723de8019f1e61bca7b8c62f22",
   "regions.json": "97f76c952701ef0e82b257ef5fe848a86304481f",
-  "verify_data.bin": "ce166b7c79375df70350fe509c5d61313bbf9c94"
+  "verify_data.bin": "dffb7780cc9d6fbfef478dfdc58096b237cab213"
  },
  "overrides": [],
  "schema": 1,
  "sources": {
   "ours": {
    "kind": "built",
-   "set": "build/hui60"
+   "set": "build/hui61"
   },
   "vh": null,
   "vs2": {
@@ -174368,7 +174368,7 @@
       "raw": {
        "diff": false,
        "fmt": "hex",
-       "ours": "0000",
+       "ours": "0018",
        "ours_source": "no-vs2-value",
        "vh": null,
        "vs2": null
@@ -174381,7 +174381,7 @@
       "table_base": "0x0be23a",
       "vsavj_row": "0x0be25a"
      },
-     "note": "REAL per-char WORD table (14z-121): the MINIMUM AIR-DASH HEIGHT (14z-191: 'air-attack' corrected \u2014 every caller of vsavj 0x027B80 enters seq 0x14, the air dash, docs/game/engine_internals.md, #222), vsavj 0x027B80 refuses the air-dash latch +0x113|+0x114 while airborne below +0x14 - +0x3A < word; 24 (0x0018) for Zabel/Lei-Lei/Jedah (0x04/0x0D/0x0F, ids per docs/game/atlas/character_tables.md, and their +0x10 mirrors 0x14/0x1D/0x1F), 0 for the other 26 of the table's 32 rows incl. the tenants \u2014 measured 14z-189, replacing the 14z-121 '36' (how that figure was obtained is not recorded) and correcting 0x0D's name, which 14z-121 gave as Lilith, who is 0x0E (tests/test_air_attack_height.sh)"
+     "note": "REAL per-char WORD table (14z-121): the MINIMUM AIR-DASH HEIGHT (14z-191: 'air-attack' corrected \u2014 every caller of vsavj 0x027B80 enters seq 0x14, the air dash, docs/game/engine_internals.md, #222), vsavj 0x027B80 refuses the air-dash latch +0x113|+0x114 while airborne below +0x14 - +0x3A < word; 24 (0x0018) for Zabel/Lei-Lei/Jedah (0x04/0x0D/0x0F, ids per docs/game/atlas/character_tables.md, and their +0x10 mirrors 0x14/0x1D/0x1F), 0 for the other 26 of the table's 32 rows incl. the tenants \u2014 measured 14z-189, replacing the 14z-121 '36' (how that figure was obtained is not recorded) and correcting 0x0D's name, which 14z-121 gave as Lilith, who is 0x0E (tests/test_air_attack_height.sh); those are vsavj's rows \u2014 since M23 (14z-192, #222) Phobos's row 0x10 carries vs2's 24 (0x0018) in ours, Donovan's and Pyron's stay 0 (tests/audit_air_dash_height.sh)"
     },
     "gap_be37a": {
      "fields": {

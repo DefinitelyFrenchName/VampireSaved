@@ -11,8 +11,8 @@
   "relocated_bad": 11
  },
  "inputs": {
-  "bank_map.toml": "989a226c7d9f4263ba39ada2bd8f936206c812d3",
-  "manifest": "040da5648613c6d2468e05d2ec51b3ca7e4f30e7",
+  "bank_map.toml": "414f66951fee3a2ca94932baeb8d3189c1c03aee",
+  "manifest": "12a551a11b01972b9683efbf77f4b7f6725403b0",
   "overrides": "c9fd380922c8aa18a77ee701da7589f037c25a42",
   "placements.json": "a15a693a9b57f85b73c16b22c2cf027567c1b6c0",
   "reconciliation.toml": "477efcb72d82fcbafe1e4a4f59252385bcb75bac",
@@ -25,7 +25,7 @@
  "sources": {
   "ours": {
    "kind": "built",
-   "set": "build/pyron45"
+   "set": "build/pyron46"
   },
   "vh": null,
   "vs2": {
@@ -143876,7 +143876,7 @@
       "table_base": "0x0be23a",
       "vsavj_row": "0x0be25c"
      },
-     "note": "REAL per-char WORD table (14z-121): the MINIMUM AIR-DASH HEIGHT (14z-191: 'air-attack' corrected \u2014 every caller of vsavj 0x027B80 enters seq 0x14, the air dash, docs/game/engine_internals.md, #222), vsavj 0x027B80 refuses the air-dash latch +0x113|+0x114 while airborne below +0x14 - +0x3A < word; 24 (0x0018) for Zabel/Lei-Lei/Jedah (0x04/0x0D/0x0F, ids per docs/game/atlas/character_tables.md, and their +0x10 mirrors 0x14/0x1D/0x1F), 0 for the other 26 of the table's 32 rows incl. the tenants \u2014 measured 14z-189, replacing the 14z-121 '36' (how that figure was obtained is not recorded) and correcting 0x0D's name, which 14z-121 gave as Lilith, who is 0x0E (tests/test_air_attack_height.sh)"
+     "note": "REAL per-char WORD table (14z-121): the MINIMUM AIR-DASH HEIGHT (14z-191: 'air-attack' corrected \u2014 every caller of vsavj 0x027B80 enters seq 0x14, the air dash, docs/game/engine_internals.md, #222), vsavj 0x027B80 refuses the air-dash latch +0x113|+0x114 while airborne below +0x14 - +0x3A < word; 24 (0x0018) for Zabel/Lei-Lei/Jedah (0x04/0x0D/0x0F, ids per docs/game/atlas/character_tables.md, and their +0x10 mirrors 0x14/0x1D/0x1F), 0 for the other 26 of the table's 32 rows incl. the tenants \u2014 measured 14z-189, replacing the 14z-121 '36' (how that figure was obtained is not recorded) and correcting 0x0D's name, which 14z-121 gave as Lilith, who is 0x0E (tests/test_air_attack_height.sh); those are vsavj's rows \u2014 since M23 (14z-192, #222) Phobos's row 0x10 carries vs2's 24 (0x0018) in ours, Donovan's and Pyron's stay 0 (tests/audit_air_dash_height.sh)"
     },
     "gap_be37a": {
      "fields": {

@@ -48,7 +48,7 @@
 #   window is P2's jump input at +8/+9, Circuit Scrapper's +16/+17 in this rig, Planet Burning's +16 only — measured
 #   14z-186; a schedule change moves them, the double-pass phase of GitHub #168).
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged30] [DON=build/don_m26 HUI=build/hui60 PYR=build/pyron45] [FREEZE=1] [KEEP=<dir>] [RNG_WORD=0100] [RNG_UNTIL=2600] tests/audit_chains184.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged31] [DON=build/don_m27 HUI=build/hui61 PYR=build/pyron46] [FREEZE=1] [KEEP=<dir>] [RNG_WORD=0100] [RNG_UNTIL=2600] tests/audit_chains184.sh
 #   RNG_WORD / RNG_UNTIL (#183, 14z-186): a PROBE knob, as audit_move_parity's; FREEZE=1 refuses either
 #   emulator tier, MAME; ~3 min (9 legs in parallel)
 set -eu
@@ -58,8 +58,8 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 [ -n "${FREEZE:-}" ] && { [ -n "${RNG_WORD:-}" ] || [ -n "${RNG_UNTIL:-}" ]; } && { echo "REFUSED: FREEZE=1 with the RNG_WORD/RNG_UNTIL probe knob (#183) — the expectation is frozen at the 0000 pin only"; exit 3; }
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged30}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
-DON="${DON:-build/don_m26}"; HUI="${HUI:-build/hui60}"; PYR="${PYR:-build/pyron45}"
+BUILD="${BUILD:-build/m3b_merged31}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
+DON="${DON:-build/don_m27}"; HUI="${HUI:-build/hui61}"; PYR="${PYR:-build/pyron46}"
 EXPECT="$REPO/tests/expected/chains184.tsv"
 RIGS="$REPO/tests/replays/chains184"
 TENANTS="donovan huitzil pyron"

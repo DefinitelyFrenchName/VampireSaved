@@ -1,0 +1,58 @@
+THE PACKET
+
+Decision kind: expectation
+Subject: 14z-192 M23 freeze: re-freeze the battery's reds (after runs 685-688)
+Claim (the working agent's sentence): Re-freeze the M23 battery's reds (after rule-checker runs 2026-10-05-685 to -688, resolved) (ERIS build/emu_freeze_m23_p1: PASS 173, SKIP 2, FAIL 10; Mac MiSTer lane: PASS 2, FAIL 1; attr/battery_eris_results.tsv, battery_eris_driver.log, battery_mister_results.tsv), each by its own writer or by a named edit, with every red attributed in attr/battery_reds.txt. (1) BUILD ROW ONLY: audit_column_flash, audit_phobos_dmg_residual and audit_dmg_legacy_sweep, whose one moved row is "ours build merged-m22 797af4a5" -> "ours build merged-m23 f601342d" (eris_reds/audit_column_flash.log, eris_reds/audit_phobos_dmg_residual.log, eris_reds/audit_dmg_legacy_sweep.log), by FREEZE=1. (2) #222/#223: audit_column_flash_cause, whose three census rows at the landing reads (00395e, 003b36) and the air-dash caller (022af2) go DIFF -> SAME against vs2 and nothing else moves (eris_reds/audit_column_flash_cause.log), by FREEZE=1; and an edit to test_hui_electrocute and audit_trap_parity (gate_edits_010b.py) setting our frozen ring id 010a -> 010b, the id the gates' frozen native lists already carry and ERIS measured on ours (eris_reds/test_hui_electrocute.log, eris_reds/audit_trap_parity.log), the move attributed to #223 by a separating control (ring223b/, six logs each stamped by ring_leg.sh with its build path, program fingerprint and the four M23 site words read from that build's own romset by sites_of.py: both gates unedited on merged-m23 and on build/hui61, whose landing words are 0441, fire 010b and fail; on ctl_nolanding, whose landing words are 0448 and whose #222 words are 2811/0018, they fire 010a and pass as frozen), with test_hui_electrocute's by-name assertion of the 010a/010b pair replaced by an assertion of no cross-leg delta. (3) THE CORPUS, replay 128_shadow_vs_legacy_vsavj (84f56520), the only replay added since the freeze/merged-m22 tag (attr/replays_since_m22.txt): audit_defense_row_reads and audit_reaction_class_live by FREEZE=1, their full tables on today's corpus being identical between M23 and M22, each leg's build read from its own mame.log (attr/scratch_runs_build_stamp.txt: the M22 runs loaded only build/m3b_merged30, 110467a7, the M23 runs only m3b_merged31, 6148d0b1; their MAME teardown segfaults the [MFI-12] class, every run's END probe logged, attr/scratch_*.log) (attr/defense_row_reads_m23_vs_m22.txt: 115 rows each, ERIS's M23 table equal to the Mac's; attr/reaction_class_live_m23_vs_m22.txt: 350 rows each, only the vsavj leg differing from the frozen file); and tests/expected/mame_parity_ab.tsv by FREEZE=1 tests/test_mame_parity.sh on the Mac, to freeze replay 128, which ERIS's run put in section 2 and SKIPPED (attr/mame_parity_attr.txt). (4) MiSTer: tests/expect/mister_prg_window.txt by --pos-log/--neg-log --freeze from the lane's own legs, the moved pos line (cyc -621, rd_lo -676) following the graphics members alone in four controls covering every program combination (attr/prg_window_attr.txt, ctl_fingerprints.txt; rule-checker run 2026-10-05-684 resolved). (5) NOT A RE-FREEZE: audit_landing_sound's CONTROL DEAD was our re-point sweep bumping its pinned CTL_BUILD to build/m3b_merged31 (landing_stamp/battery_time_ctl_build.txt, the sync-patch hunk ERIS's battery ran); forcing that CTL_BUILD on the Mac reproduces the CONTROL DEAD with no crash (landing_stamp/mac_ctl_bumped.log, CTL program 6148d0b1 = BUILD's), and with the default restored to build/m3b_merged30 (CTL program 110467a7) the gate PASSes with the control fired on the Mac and on ERIS (landing_stamp/mac_restored.log, eris_restored.log; each run stamped by landing_leg.sh); and build/merged1, which audit_merged_legacy regenerates, is identical between the Mac and ERIS on all 23 tracked files (attr/merged1_mac_vs_eris.txt) and differs from the committed files by exactly the four M23 rows in patch.json (844 -> 848 ops, none removed; attr/merged1_rewrite.txt) and, in the text files, by the fingerprint, the op count, the same four rows, version_text M22 -> M23 and the two program members' sha1 (attr/merged1_text_diff.txt, every changed line). Each writer's freeze is verified by re-running the gate without FREEZE. NOT TESTED: the mechanism by which graphics bytes move the MiSTer probe's program-read counts; the writers' results themselves, which follow this check and are verified by those re-runs; the content of build/merged1's one changed wheel_bank5.json entry, which gen.log ties to the M23 mark's glyphs but which was not decoded byte by byte.
+Artifacts (read every one, in full):
+  - build/agent192/m23/attr/claim_refreeze6.txt
+  - build/agent192/m23/attr/battery_reds.txt
+  - build/agent192/m23/attr/battery_eris_results.tsv
+  - build/agent192/m23/attr/battery_eris_driver.log
+  - build/agent192/m23/attr/battery_mister_results.tsv
+  - build/agent192/m23/eris_reds/audit_column_flash.log
+  - build/agent192/m23/eris_reds/audit_phobos_dmg_residual.log
+  - build/agent192/m23/eris_reds/audit_dmg_legacy_sweep.log
+  - build/agent192/m23/eris_reds/audit_column_flash_cause.log
+  - build/agent192/m23/eris_reds/test_hui_electrocute.log
+  - build/agent192/m23/eris_reds/audit_trap_parity.log
+  - build/agent192/m23/eris_reds/audit_defense_row_reads.log
+  - build/agent192/m23/eris_reds/audit_reaction_class_live.log
+  - build/agent192/m23/eris_reds/audit_landing_sound.log
+  - build/agent192/m23/eris_reds/test_mame_parity.log
+  - build/agent192/m23/gate_edits_010b.py
+  - tests/test_hui_electrocute.sh
+  - tests/audit_trap_parity.sh
+  - build/agent192/m23/ring_leg.sh
+  - build/agent192/m23/sites_of.py
+  - build/agent192/m23/ring223b/electro_m3b_merged31.log
+  - build/agent192/m23/ring223b/electro_hui61.log
+  - build/agent192/m23/ring223b/electro_ctl_nolanding.log
+  - build/agent192/m23/ring223b/trap_m3b_merged31.log
+  - build/agent192/m23/ring223b/trap_hui61.log
+  - build/agent192/m23/ring223b/trap_ctl_nolanding.log
+  - build/agent192/m23/check_built.txt
+  - build/agent192/m23/attr/replays_since_m22.txt
+  - build/agent192/m23/attr/defense_row_reads_m23_vs_m22.txt
+  - build/agent192/m23/attr/reaction_class_live_m23_vs_m22.txt
+  - build/agent192/m23/attr/scratch_runs_build_stamp.txt
+  - build/agent192/m23/attr/scratch_drr_m22.log
+  - build/agent192/m23/attr/scratch_drr_m23.log
+  - build/agent192/m23/attr/scratch_rcl_m22.log
+  - build/agent192/m23/attr/scratch_rcl_m23.log
+  - build/agent192/m23/attr/mame_parity_attr.txt
+  - build/agent192/m23/attr/prg_window_attr.txt
+  - build/agent192/m23/attr/ctl_fingerprints.txt
+  - build/agent192/m23/prgw_ctl_mark.log
+  - build/agent192/m23/prgw_ctl_nolanding.log
+  - build/agent192/m23/prgw_ctl_noairdash.log
+  - build/agent192/m23/prgw_ctl_nocode.log
+  - build/emu_freeze_m23_mister/test_mister_prg_window.log
+  - build/agent192/m23/landing_leg.sh
+  - build/agent192/m23/landing_stamp/battery_time_ctl_build.txt
+  - build/agent192/m23/landing_stamp/mac_ctl_bumped.log
+  - build/agent192/m23/landing_stamp/mac_restored.log
+  - build/agent192/m23/landing_stamp/eris_restored.log
+  - build/agent192/m23/attr/merged1_mac_vs_eris.txt
+  - build/agent192/m23/attr/merged1_rewrite.txt
+  - build/agent192/m23/attr/merged1_text_diff.txt
+  - tests/audit_landing_sound.sh

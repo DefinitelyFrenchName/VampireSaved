@@ -1,6 +1,6 @@
 # tests/expected/dmg_legacy_sweep.tsv — Demitri's 2HK/5HP/623HP on every legacy victim (both sides) on pristine vsavj and
 # pristine vsav2, and on Donovan (P1) on our merged build and native vs2 (tests/audit_dmg_legacy_sweep.sh, GitHub #191).
-# Evidence class: in-emulator, MAME (+ the static table check). Frozen AS MEASURED with FREEZE=1 on m3b_merged30.
+# Evidence class: in-emulator, MAME (+ the static table check). Frozen AS MEASURED with FREEZE=1 on m3b_merged31.
 # Rows: legacy <side> <victim> <game> <hit> <red> <white> <first drop frame> <attacker> <victim class>; donovan p2 13
 # <leg> <event> <red> <white> <+offset> <attacker> <class>; the table lines; one ours build row.
 #--
@@ -207,4 +207,4 @@ donovan	p2	13	ours	0	9	16	+8	0x01	0x49
 donovan	p2	13	ours	1	9	16	+8	0x01	0x49
 donovan	p2	13	ours	2	13	19	+5	0x01	0x01
 donovan	p2	13	ours	3	19	27	+9	0x01	0x05
-ours	build	merged-m22	797af4a5
+ours	build	merged-m23	f601342d

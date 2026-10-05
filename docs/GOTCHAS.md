@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-474 entries (47 game / 129 platform / 298 project), counted from the buckets at generation.
+478 entries (47 game / 129 platform / 302 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 47 entries
 
@@ -204,7 +204,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - PYTHON'S ZipInfo STAMPS THE HOST INTO create_system — the same zip code writes a different container on Windows (paid: 14z-189 measured, 14z-191 fixed, GitHub #215)
 - THE CPS-2-ONLY MAME BUILD PRINTS FOUR "clone of nonexistent driver megaman" ERRORS AT EVERY START — harmless, every host, release binaries included (seen: 14z-191, #226)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 298 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 302 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -504,3 +504,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A TOOL'S SECOND WORD WAS ITS OUTPUT PATH — `homes_tracked.py --newest STATE.md` wrote its report over STATE.md (paid: 14z-191)
 - A SELF-TEST'S OUTPUT ECHOED INTO A GATE'S LOG IS READ AS THE GATE'S OWN — a per-finding "SKIP" made the gate SKIP (paid: 14z-191)
 - A CONTROL WHOSE PERTURBATION STEP CRASHES CAN STILL READ AS FIRED — `open-agent-gate` never opened the gate (paid: 14z-192)
+- A REMOTE BATTERY STARTED FROM A NON-LOGIN SHELL RUNS WITHOUT THE PATH MAME — two prereq reds that were the PATH, not the build (paid: 14z-192)
+- A RE-POINT SWEEP REWRITES DATED RECORDS AND MISSES RELEASE NAMES (paid: 14z-192, the M23 freeze)
+- A MARK-ONLY CHANGE MOVES THE MiSTer PRG PROBE'S PROGRAM-READ COUNTS (paid: 14z-192, the M23 freeze)
+- A CROSS-LEG DELTA FROZEN AS "DOCUMENTED COSMETIC" WAS A DEFECT NOBODY HAD NAMED (paid: 14z-192, #223)

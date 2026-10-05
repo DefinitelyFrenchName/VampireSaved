@@ -2526,11 +2526,11 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 ### `audit_air_dash_height.sh` — audit, emulator
 
-**WHAT:** Phobos jumps straight up and inputs the air dash j.66 with the second R at +5..+16 frames; at +5 (height 21, under vs2's table row 0x10 = 24) native vs2 does not dash and merged-m22 dashes; at every later event (height 34 and up) both dash on the same frame at the same height. That is the frozen expectation (--expect gap) until a build takes vs2's row (#222), when the expectation becomes --expect same.
+**WHAT:** Phobos jumps straight up and inputs the air dash j.66 with the second R at +5..+16 frames; at +5 (height 21, under vs2's table row 0x10 = 24) native vs2 does not dash, and since the M23 build takes vs2's mask bit and row (14z-192, ruled 14z-191: "yes, since Phobos is VS2 only, and its air dash is  character-specific, it should abide by VS2 behavior.") neither does ours; at every later event (height 34 and up) both dash on the same frame at the same height: --expect same. Until M23 the frozen expectation was --expect gap (merged-m22 dashed at height 21), measured 14z-191; EXPECT=gap with BUILD=build/m3b_merged30 reproduces it.
 
 **HOW:** tools/air_dash_rigs.py generates the rig on tools/name_moves.py's machinery (Phobos by his real cursor path on native, the merged wheel's D D D on ours — HANDOFF [VSP-123]); both legs traced by tests/lua/field_trace.lua under the ruled level and RNG pins; the comparer refuses a leg whose low event is not under 24 or whose high events did not dash on native (VOID).
 
-**EXPECTS:** PASS under --expect gap. A red is either the gap gone (a build changed Phobos's air dash — re-read #222) or a difference above the row, which no measurement here has shown.
+**EXPECTS:** PASS under --expect same (the default). A red is the gap back (a build changed Phobos's air dash — re-read #222) or a difference above the row.
 
 ### `audit_air_gc_legacy.sh` — audit, emulator
 
@@ -2782,11 +2782,11 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 ### `audit_landing_sound.sh` — audit, emulator
 
-**WHAT:** the landing-sound site (ours PRG:0x00395E, vs2 0x003994) is reached on the same frames on both games for Phobos (huitzil_1) and Donovan (donovan_1), always for the tenant on P1; and at the first landing (after Jump [8]) the two games' audio differs by over 4x what it differs a second earlier, with native the louder landing for Phobos and ours the louder for Donovan (the +1 big-body id swapped). That is the frozen expectation (the gap) until a build takes vs2's mask (#223).
+**WHAT:** the landing-sound site (ours PRG:0x00395E, vs2 0x003994) is reached on the same frames on both games for Phobos (huitzil_1) and Donovan (donovan_1), always for the tenant on P1; and, since the M23 build takes vs2's mask (14z-192, ruled 14z-191: "#223 I confirm the sound effects should be swapped to match VS2"), at the first landing (after Jump [8]) the two games' audio differs by NO MORE than 4x what it differs a second earlier — the landing no longer stands out. Until M23 the frozen expectation was the GAP (over 4x, native the louder landing for Phobos and ours for Donovan: the +1 big-body id swapped), measured 14z-191; the tool keeps that mode (`wav`).
 
-**HOW:** per tenant, two non-debug read taps (tests/lua/read_tap.lua on both fighters' +0x382, RPCS the site's own read) and two -wavwrite runs to the landing + 120 frames, native vs2 and merged-m22, under the ruled level and RNG pins; tools/landing_sound_ab.py compares the hits and the two one-second windows (control, landing).
+**HOW:** per tenant, two non-debug read taps (tests/lua/read_tap.lua on both fighters' +0x382, RPCS the site's own read) and two -wavwrite runs to the landing + 120 frames, native vs2 and the build under test, under the ruled level and RNG pins; tools/landing_sound_ab.py compares the hits (`hits`) and the two one-second windows (`same`).
 
-**EXPECTS:** PASS. A red is the gap gone (a build changed the mask — re-read #223), a hit-frame difference (the landing moved), or a control window that differs (the two games' audio diverged before the landing: the comparison no longer isolates the landing).
+**EXPECTS:** PASS. A red is the landing standing out again (a build changed the mask — re-read #223), a hit-frame difference (the landing moved), or a control-window problem.
 
 ### `audit_latch_reads.sh` — audit, emulator
 
@@ -3024,7 +3024,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **WHAT:** who CAN read the select-confirm latch: the static census of every instruction naming a fighter block's +0x3BC/+0x3BD/+0x3C2/+0x3E0/+0x3E3 on vsav2, vsavj and the ported image, by addressing form, frozen — the whole population the per-leg tap (audit_latch_reads) can ever attribute a read to, with the census's data-region `movep` noise frozen and named.
 
-**HOW:** tools/audit_latch_readers.py over the decrypted opcode views and build/m3b_merged30/verify_op.bin, anchored on the extension word so a data table is not an instruction, its --selftest on both reference views first (an immediate store among its positive controls since #197); controls: a shadow copy of the tool blind to the (d16,An) form, a copy with the pre-#197 nearest-decodable scan, and the frozen inventory minus one vs2 reader row; a PLANTED 44-byte opcode image carries one site of each form (abs.l immediate, abs.l register, (d16,An) immediate), since no abs.l site exists in any real image.
+**HOW:** tools/audit_latch_readers.py over the decrypted opcode views and build/m3b_merged31/verify_op.bin, anchored on the extension word so a data table is not an instruction, its --selftest on both reference views first (an immediate store among its positive controls since #197); controls: a shadow copy of the tool blind to the (d16,An) form, a copy with the pre-#197 nearest-decodable scan, and the frozen inventory minus one vs2 reader row; a PLANTED 44-byte opcode image carries one site of each form (abs.l immediate, abs.l register, (d16,An) immediate), since no abs.l site exists in any real image.
 
 **EXPECTS:** the frozen inventory equal (vs2's confirm writers and clears, the tenants' in-play flavour readers and their relocated copies, the Shadow-flag readers); the blind tool fails its selftest, the planted image gives exactly its three write rows, the pre-#197 copy misses the immediate store vs2 PRG:0x00712A and both planted immediates, the dropped row fails the compare.
 

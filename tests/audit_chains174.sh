@@ -52,7 +52,7 @@
 # path — the RNG pin 0000 is the routine's fixed point, every draw 0 (#183, kept as the basis 2026-09-30; with
 # RNG_WORD=0100 the 14 parity rows read as at 0000, measured 14z-186 by audit_rng_forms).
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged30] [DON=build/don_m26 HUI=build/hui60 PYR=build/pyron45] [FREEZE=1] [KEEP=<dir>] [RNG_WORD=0100] [RNG_UNTIL=2600] tests/audit_chains174.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged31] [DON=build/don_m27 HUI=build/hui61 PYR=build/pyron46] [FREEZE=1] [KEEP=<dir>] [RNG_WORD=0100] [RNG_UNTIL=2600] tests/audit_chains174.sh
 #   RNG_WORD / RNG_UNTIL (#183, 14z-186): a PROBE knob, as audit_move_parity's; FREEZE=1 refuses either
 #   emulator tier, MAME; ~2 min (6 legs in parallel)
 set -eu
@@ -62,8 +62,8 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 [ -n "${FREEZE:-}" ] && { [ -n "${RNG_WORD:-}" ] || [ -n "${RNG_UNTIL:-}" ]; } && { echo "REFUSED: FREEZE=1 with the RNG_WORD/RNG_UNTIL probe knob (#183) — the expectation is frozen at the 0000 pin only"; exit 3; }
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged30}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
-DON="${DON:-build/don_m26}"; HUI="${HUI:-build/hui60}"; PYR="${PYR:-build/pyron45}"
+BUILD="${BUILD:-build/m3b_merged31}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
+DON="${DON:-build/don_m27}"; HUI="${HUI:-build/hui61}"; PYR="${PYR:-build/pyron46}"
 EXPECT="$REPO/tests/expected/chains174.tsv"
 RIGS="$REPO/tests/replays/chains174"
 TENANTS="huitzil donovan pyron"

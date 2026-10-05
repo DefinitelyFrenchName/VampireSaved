@@ -1,0 +1,30 @@
+THE PACKET
+
+Decision kind: freeze
+Subject: 14z-192: the M23 freeze (after run 691)
+Claim (the working agent's sentence): Freeze M23. REGISTRY: registry.diff adds donovan-m27, huitzil-m34, pyron-m28 and merged-m23 (whole-set keys a4c70276 / 51ee6a00 / 6e782cc8 / f601342d, programs 167d870f / cc9c4b68 / 9d135e7b / 6148d0b1); the stock twin (a3910ded) and the stage-4 image (2fa7c2f1) are unchanged and carry donovan-m25-stock and donovan-m23-stage4. DELTA against M22 as op sets (opset_delta.txt): donovan +2 (the two landing words 0441), huitzil +4 (0x022AF4 2811, 0x0BE25A 0018, the two landing words), pyron 0, stock 0, stage-4 0, merged 844 -> 848 (the same four, the landing pair deduped to one shared row each); members (member_delta.txt); the built images read site by site (check_built.txt). Every track rebuilds bit-exact on the final tree (m3a_final.log: six images reproduced, six whole-artifact manifests match), all six program fingerprints and all four expectation sets reproduced on ERIS, the sets differing between hosts only in one line of the merged README, the build dir its carry note names (sets_and_fingerprints.txt, sets_readme_diff.txt). SUITE: the four sets carried, frozen, verified and shape clean (freeze_sets.log). BATTERY (attr/battery_eris_results.tsv, attr/battery_mister_results.tsv): 10 reds in the emulator lanes and 1 in MiSTer, every one attributed (attr/battery_reds.txt) and re-frozen under rule-checker runs 2026-10-05-684 to -690 (684-689 VIOLATED on true findings, each resolved by a new measurement; 690 OK; every row and its resolution in ledger_684_691.tsv): six by their own FREEZE writers, the parity table by FREEZE=1 on the Mac, the MiSTer probe's frozen pair (one file, its pos and neg lines) from its lane's legs, two gates edited (010a -> 010b, #223 closing their documented pair), each verified by a re-run without FREEZE (refreeze_summary.txt); audit_landing_sound's dead control was our sweep's bump of a pinned CTL_BUILD, restored and PASS on both hosts; every other line the sweep rewrote was blamed to the commit that introduced it, 362 of 375 to the M22 freeze's own sweep and the other 13 each reviewed as a current-build pointer, so no other pinned control was bumped (sweep_provenance.txt). MISTER TAIL: the fork catalogue re-pointed (fork commit 793339da), patch 0039, PINNED bumped, the catalogue check ok against the build, test_jtcores_twin PASS (jtcores_tail.txt); MRAs regenerated and release/merged-m23 packaged (mra_m23.log, package_m23.log), its three manifests and the WIDE MRA's BUILD block naming merged-m23 f601342d (release_tie_partial.txt). NOT TESTED: the freeze-cadence static tier on the final tree, the freeze commit and the tags, which follow this check; a --stale re-run of any MiSTer gate whose followed files the re-freezes moved after the lane ran, which follows the commit; the Linux release binaries on ERIS (records only there, the two gates SKIPPED); FBNeo's full legacy track (accepted-and-deferred); how graphics bytes move the MiSTer probe's program-read counts; whether M22's unexplained probe move was its mark (not re-run).
+Artifacts (read every one, in full):
+  - build/agent192/m23/freeze/claim2.txt
+  - build/agent192/m23/freeze/registry.diff
+  - build/agent192/m23/opset_delta.txt
+  - build/agent192/m23/member_delta.txt
+  - build/agent192/m23/check_built.txt
+  - build/agent192/m23/m3a_final.log
+  - build/agent192/m23/freeze/sets_and_fingerprints.txt
+  - build/agent192/m23/freeze/sets_readme_diff.txt
+  - build/agent192/m23/freeze_sets.log
+  - build/agent192/m23/attr/battery_eris_results.tsv
+  - build/agent192/m23/attr/battery_mister_results.tsv
+  - build/agent192/m23/attr/battery_reds.txt
+  - build/agent192/m23/freeze/refreeze_summary.txt
+  - build/agent192/m23/freeze/ledger_684_691.tsv
+  - build/agent192/m23/freeze/sweep_provenance.py
+  - build/agent192/m23/freeze/sweep_provenance.txt
+  - build/agent192/m23/landing_stamp/battery_time_ctl_build.txt
+  - build/agent192/m23/landing_stamp/mac_restored.log
+  - build/agent192/m23/landing_stamp/eris_restored.log
+  - build/agent192/m23/freeze/jtcores_tail.txt
+  - build/agent192/m23/mra_m23.log
+  - build/agent192/m23/package_m23.log
+  - build/agent192/m23/freeze/release_tie_partial.txt
+  - tests/expected/registry.tsv

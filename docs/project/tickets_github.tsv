@@ -2,16 +2,17 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 229
+# issues: 230
 number	state	reason	closed	labels	title
+230	OPEN	-	-	evolution	Capture geometry in-emulator: Pyron's and Donovan's throws against the roster victims (split from #116)
 229	OPEN	-	-	evolution	Community cross-check: naming rigs on vsavj for specials, supers, EX/ES moves, throws and pursuits (split from #117)
 228	OPEN	-	-	bug	Breakpoint instruments on the frame_done clock, and pc_count.lua's first-frame skip: measure each for drift (#213's class)
 227	OPEN	-	-	cosmetic	MAME README: say the four 'clone of nonexistent driver megaman' lines at every start are expected and harmless
 226	OPEN	-	-	evolution	Test the Linux release end to end: PILOT's linux-x86_64 build as a player gets it (asset, applier, launcher, a real desktop run)
 225	CLOSED	COMPLETED	2026-10-05	evolution	Promote #188's traced test (strace every static gate, score the predictor, an over-narrowed control) from scratch into tools/
 224	CLOSED	COMPLETED	2026-10-04	bug	findings_add.py accepts a home anchor containing ' — '; findings_anchors.py then SKIPs that finding and exits 0
-223	OPEN	-	-	cosmetic	Landing sound: vs2 gives Phobos the big-body landing and Donovan the ordinary one; ours the reverse (measured by ear)
-222	OPEN	-	-	bug,severity: high	Phobos's air dash minimum height: vs2 refuses it under 24 px, ours allows it (measured in play: height 21)
+223	CLOSED	COMPLETED	2026-10-05	cosmetic	Landing sound: vs2 gives Phobos the big-body landing and Donovan the ordinary one; ours the reverse (measured by ear)
+222	CLOSED	COMPLETED	2026-10-05	bug,severity: high	Phobos's air dash minimum height: vs2 refuses it under 24 px, ours allows it (measured in play: height 21)
 221	CLOSED	COMPLETED	2026-10-04	bug	upload_release_assets.sh --prune checks only the tag just before the published one, so a freeze that was never released stops it (merged-m19's assets are still hosted)
 220	CLOSED	NOT_PLANNED	2026-10-04	cosmetic	MiSTer release README still says the package contains an emulator (FBNeo or MAME)
 219	CLOSED	COMPLETED	2026-10-04	bug	run_all_emulator.sh --dry-run writes a run record that the staleness audit takes as the newest run
@@ -117,8 +118,8 @@ number	state	reason	closed	labels	title
 119	OPEN	-	-	evolution	The living-documentation framework as an independent sibling of bbh (ruled at the plan stage, not scheduled)
 118	OPEN	-	-	evolution	Community cross-check: the ~90 unadopted mizuumi player-struct candidates, each adopted only once measured
 117	CLOSED	COMPLETED	2026-10-05	evolution	Community cross-check: naming rigs on vsavj for specials, supers, throws, the CL. rows and the 6-prefixed rows
-116	OPEN	-	-	evolution	Capture matrix: widen the in-emulator anchors from 3 cells to a sampled row per tenant
-115	OPEN	-	-	contested,evolution,parked	Zabel j.LK proximity guard: a surgical legacy patch for vanilla and WIDE, its own session, recording first
+116	CLOSED	COMPLETED	2026-10-05	evolution	Capture matrix: widen the in-emulator anchors from 3 cells to a sampled row per tenant
+115	CLOSED	COMPLETED	2026-10-05	contested,evolution,parked	{}Zabel j.LK proximity guard: a surgical legacy patch for vanilla and WIDE, its own session, recording first
 114	CLOSED	COMPLETED	2026-09-02	bug,correctness,severity: medium	421+P (Lighting Sword): ours lands 3 hits and knocks the victim away; native VS2 lands 6 and holds — measured, and the gate cannot see it
 113	CLOSED	COMPLETED	2026-09-01	cosmetic,severity: low	Whole-screen flash at the first down (photosensitivity) — seen for many builds
 112	CLOSED	COMPLETED	2026-09-04	cosmetic,severity: low	Press of Death (41236+K): blue/black palette about half the time on merged-m9

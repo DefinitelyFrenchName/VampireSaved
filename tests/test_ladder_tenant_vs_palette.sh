@@ -74,7 +74,7 @@
 #      element), 0 px anywhere on the VS frame;
 #   6. the 1P-vs-2P VS-screen A/B: 0 px differ in both portrait regions.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged30] [FREEZE=1]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged31] [FREEZE=1]
 #        tests/test_ladder_tenant_vs_palette.sh      (~4 legs in parallel, ~5 min)
 # EMULATOR tier (MAME -debug, gfx-bearing build required — [VSP-141]).
 #
@@ -97,7 +97,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 # VARIABLE (forks set their own); only made absolute, and only if it exists,
 # so a gate that means to SKIP on a missing ROMDIR still does.
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
-BUILD="${BUILD:-build/m3b_merged30}"
+BUILD="${BUILD:-build/m3b_merged31}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
 EXP="tests/expected/ladder_tenant_vs_palette.txt"
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no $BUILD/rompath/vsavjw.zip"; exit 0; }

@@ -37,6 +37,7 @@ declares	audit_guard_mask_reads
 declares	audit_guard_reentry
 declares	audit_hitbox_parity
 declares	audit_hui_grunt
+declares	audit_id_writers
 declares	audit_kill_poke_shape
 declares	audit_ladder_pick_store
 declares	audit_ladder_selector

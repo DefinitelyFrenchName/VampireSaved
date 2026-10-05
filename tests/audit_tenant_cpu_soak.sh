@@ -39,7 +39,7 @@
 #   conditions; a CPU that is losing (P1 never wins a round here), later ladder rungs, difficulty settings other than
 #   the default; FBNeo; a frame-level comparison (the legs diverge from the first random draw by construction).
 #
-# Usage: ROMDIR=... [MAME_BIN=~/.cache/vampire-saved/mame/cps2] [BUILD=build/m3b_merged30] [FRAMES=22880] [FREEZE=1] [KEEP=<dir>]
+# Usage: ROMDIR=... [MAME_BIN=~/.cache/vampire-saved/mame/cps2] [BUILD=build/m3b_merged31] [FRAMES=22880] [FREEZE=1] [KEEP=<dir>]
 #        tests/audit_tenant_cpu_soak.sh
 #   emulator tier, MAME; 12 legs in parallel, ~20000 match frames each
 set -eu
@@ -48,7 +48,7 @@ set -eu
 export ROMDIR
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-BUILD="${BUILD:-build/m3b_merged30}"
+BUILD="${BUILD:-build/m3b_merged31}"
 FRAMES="${FRAMES:-22880}"
 # MAME_BIN is PINNED (test_mame_bin_pinned, 14z-133): the release runner exports none, and tools/run_mame.sh would
 # fall back to Homebrew's mame, which answers "Unknown system" for vsavjw. The patched binary also runs native vsav2.

@@ -50,9 +50,9 @@
 # 14z-82d misattributed it as the detonation — RETRACTED 14z-85g, its
 # ~144-frame cadence starts pre-trap).
 #
-# The 0x010A-vs-0x010B delta (ours/native) is a shared-library id pair
-# (same content, relocated banks) reached through a per-char engine row
-# — the defense-rows class, cosmetic, recorded not gated.
+# The 0x010A-vs-0x010B delta (ours/native) was a shared-library id pair
+# reached through a per-char engine row — the landing site's big-body mask
+# (#223). CLOSED at the M23 freeze (14z-192): ours fires 0x010B like native.
 #
 # Usage: ROMDIR=... tests/audit_trap_parity.sh [builddir]
 #
@@ -76,7 +76,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-BUILD="${1:-build/hui60}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+BUILD="${1:-build/hui61}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 [ -d "$BUILD/rompath" ] || { echo "SKIP: no build at $BUILD"; exit 0; }
 WIDE_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 [ -x "$WIDE_BIN" ] || { echo "SKIP: no WIDE MAME binary"; exit 0; }
@@ -140,12 +140,12 @@ WINDOWS = [(3400, 3900), (4200, 4700)]
 # equal — ours' attempt 2 also carries an 0117/00f3 pair, an ordinary
 # engine event on that leg's timeline).
 NATIVE_EXPECT = [["0739", "010b", "073a"], ["0739", "010b", "073a"]]
-OURS_EXPECT   = [["00d8", "010a", "0199"],
-                 ["00d8", "010a", "0199", "0117", "00f3", "0621"]]
+OURS_EXPECT   = [["00d8", "010b", "0199"],
+                 ["00d8", "010b", "0199", "0117", "00f3", "0621"]]
 # ours: 00d8 = the RESTORED ejection (14z-86 authored Z80 song, the
 # 0739 slot); 0199 = the RESTORED detonation chirp (vsavj id for
-# 0x73A's content); 010a-vs-010b is the recorded per-char-row
-# cosmetic delta
+# 0x73A's content); 010b since the M23 freeze (14z-192, was 010a: #223
+# gave Phobos vs2's big-body landing sound, native's id)
 FORBIDDEN_OURS = {"0739", "073a"}             # music on vsavj — never
 
 def parse(leg):
@@ -183,7 +183,7 @@ errs += verdict(ours, OURS_EXPECT, "ours")
 if not errs:
     print("  ok: native fires 0739/010b/073a per attempt; ours fires the")
     print("      RESTORED ejection 00d8 (the 0739 slot, authored Z80 song)")
-    print("      + 010a + the RESTORED detonation chirp 0199")
+    print("      + 010b + the RESTORED detonation chirp 0199")
 
 # Verdict-logic control: the checker on a mutated inventory MUST fail.
 mut = [(f, ("0111" if i == "0199" else i)) for f, i in ours]

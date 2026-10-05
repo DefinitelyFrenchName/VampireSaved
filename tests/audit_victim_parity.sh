@@ -89,7 +89,7 @@
 # the contact FRAME (printed), Victor's own reactions (the tenant never attacks here), and
 # WHICH attack made the contact (the event name is the rig's, the class byte the engine's).
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged30] [DON=build/don_m26 HUI=build/hui60 PYR=build/pyron45] [TENANTS="donovan pyron huitzil"] [FREEZE=1] [CONTROL=<name>] [GOT_OUT=<rows.tsv>] [KEEP=<dir>] tests/audit_victim_parity.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged31] [DON=build/don_m27 HUI=build/hui61 PYR=build/pyron46] [TENANTS="donovan pyron huitzil"] [FREEZE=1] [CONTROL=<name>] [GOT_OUT=<rows.tsv>] [KEEP=<dir>] tests/audit_victim_parity.sh
 #   emulator tier, MAME: 15 legs, a tenant's legs in parallel (~2 min per tenant on this MacBook).
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -97,8 +97,8 @@ cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/m3b_merged30}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
-DON="${DON:-build/don_m26}"; HUI="${HUI:-build/hui60}"; PYR="${PYR:-build/pyron45}"
+BUILD="${BUILD:-build/m3b_merged31}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
+DON="${DON:-build/don_m27}"; HUI="${HUI:-build/hui61}"; PYR="${PYR:-build/pyron46}"
 TENANTS="${TENANTS:-donovan pyron huitzil}"
 EXPECT="$REPO/tests/expected/victim_parity.tsv"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

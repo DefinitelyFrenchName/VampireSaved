@@ -1,0 +1,21 @@
+THE PACKET
+
+Decision kind: build
+Subject: 14z-192: the M23 rows for #222 and #223 (fourth packet, after run 677)
+Claim (the working agent's sentence): Add the four M23 rows of build/agent192/m23/m23_rows_draft.toml to the tenant manifests (#222 in huitzil.toml: code_word air_dash_mask_hi at PRG:0x022AF4 2810->2811 and data_port air_dash_height_row writing vs2's row 0x10 at PRG:0x0BE25A; #223 declared identically in huitzil.toml and donovan.toml: code_word landing_bigbody_mask_hi_a/_b at PRG:0x003960 and 0x003B38 0448->0441), every row only_variant_slot, the rulings quoted in build/agent192/m23/rulings_222_223.txt: build/agent192/m23/check_sites.txt shows vs2 and vh2 agreeing on each new value, build/m3b_merged30 named merged-m22 by the HANDOFF registry and holding vsavj's value at each site, and 0 of its 844 patch ops overlapping the sites; tests/audit_id_writers.sh, its byte-lane decoding fixed and its new control word-write-variant fired (build/agent192/m23/audit_id_writers.diff), shows no legacy gameplay path writing an id in 0x10-0x1F on pristine vsavj (idw192_vanilla.log) AND on our merged-m22 (idw192_merged2.log: the gate prints registry row merged-m22, program 110467a7, zip sha1 5439d4ca, the Mac copy reading the same in mac_merged_identity.txt; an unregistered build is refused, idw192_unregistered.log), 22 of 22 tap logs each, union 00 01 02 03 05 06 08 0A 0C 0E 0F, and as CONTROL=word-write-variant the gate FAILs (idw192_mode.log) — each site tests +0x382 of a player block — the fighter itself at 0x022AF2 and 0x00395E, and at 0x003B36 the block that +0x32 points to, which docs/game/atlas/ram.md records as the owner link that sign-extends to the player block (build/agent192/m23/sites_disasm.txt) — so the bits the rows change (id 0x10 set at the three mask sites, id 0x13 cleared at the two landing sites) belong to no legacy fighter in that corpus. NOT TESTED: that +0x32 points at a player block whenever 0x003B36 runs (the atlas row, measured 14z-26/42, not re-measured: the site is not reached by the naming rigs); the M23 built images (the freeze's rebuild, fingerprints and legacy oracle come after this); in play, only the air dash and the landing site PRG:0x00395E were measured at 14z-191 — PRG:0x003B36 is not reached by those rigs; the audit covers its 11-replay corpus only (Oboro 0x18 not exercised; the rows change neither bit 0x18 nor 0x12); writes to the id field by a path the tap does not see (a DMA or a non-CPU master) are not covered; in a solo build the other tenant's bit lands on an id no fighter carries, argued not measured; FBNeo.
+Artifacts (read every one, in full):
+  - build/agent192/m23/m23_rows_draft.toml
+  - build/agent192/m23/check_sites.txt
+  - build/agent192/m23/check_sites.py
+  - build/agent192/m23/sites_disasm.txt
+  - build/agent192/m23/sites_disasm.py
+  - build/agent192/m23/idw192_vanilla.log
+  - build/agent192/m23/idw192_merged2.log
+  - build/agent192/m23/idw192_unregistered.log
+  - build/agent192/m23/mac_merged_identity.txt
+  - build/agent192/m23/idw192_mode.log
+  - build/agent192/m23/audit_id_writers.diff
+  - tests/audit_id_writers.sh
+  - build/agent192/m23/rulings_222_223.txt
+  - build/agent192/m23/engine_airdash_excerpt.txt
+  - build/agent192/m23/engine_landing_excerpt.txt

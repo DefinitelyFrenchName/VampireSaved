@@ -2376,6 +2376,29 @@ fixes = "0x00:30:30"
 only_variant_slot = true
 note = "14z-170 (ruled 14z-168): vs2's Donovan low-HP rally threshold (48 HP) over vsavj's variant byte 0x13 (40 HP, Victor's copy); id 0x12's legacy byte kept at 0x30"
 
+
+# ── THE M23 ROWS (14z-192; rule-checker runs 2026-10-05-675..683, 683 OK) ──
+# THE LANDING SOUND'S BIG-BODY MASK (#223; RULED 2026-10-05, 14z-191: "#223 I confirm the sound
+# effects should be swapped to match VS2"): vs2's whole high word 0x0441 (bit 0x10 Phobos set,
+# bit 0x13 clear) for vsavj's 0x0448 (bit 0x13, Victor's +0x10 mirror). No legacy fighter carries
+# 0x10 or 0x13 (tests/audit_id_writers.sh), so legacy reach is nil; in a solo build the other
+# tenant's bit lands on an id nobody carries.
+[[code_word]]
+stage = 6
+name = "landing_bigbody_mask_hi_a"
+addr = 0x003960          # move.l #$04480448,d0 at 0x00395E; vs2/vh2 0x003994 $04410448
+old_hex = "0448"
+new_hex = "0441"
+only_variant_slot = true
+
+[[code_word]]
+stage = 6
+name = "landing_bigbody_mask_hi_b"
+addr = 0x003B38          # move.l #$04480448,d0 at 0x003B36; vs2/vh2 0x003B6C $04410448
+old_hex = "0448"
+new_hex = "0441"
+only_variant_slot = true
+
 # ── SELECT WHEEL: three appended cells (14z-60s) ────────────────────────────
 # Adds Huitzil/Phobos (0x10), Pyron (0x11) and Donovan (0x13) to the
 # character-select wheel. Profile-gated CONTENT: a stock build skips this
@@ -2456,7 +2479,7 @@ march_retarget_mid = true
 # same-source-or-fail names any future collision). Screen position =
 # the empty bottom-right corner (measured on merged-m5 snapshots, 14z-105).
 # THE TEXT NAMES THE FREEZE GENERATION — change it at every freeze.
-version_text = "M22"
+version_text = "M23"
 version_font = "build/manifest/version_font.json"
 version_x = 324
 version_y = 202

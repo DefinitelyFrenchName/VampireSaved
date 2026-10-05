@@ -32,7 +32,7 @@ TWO NARROWINGS (14z-190, #188 option B, maintainer-ruled 2026-10-04: "Let's go f
 ERIS trace scores them at 0 misses — until then a close does not lean on them for a saving claim):
   N-A (R3) a change under `build/` is not STALE for a gate whose reach names only the bare `build` directory:
      every tier writes untracked files there, so the bare name made ~75 gates stale at every close; a deeper
-     name (`build/m3b_merged30`, a templated `build/$B/...`) still counts, and R6 reads a template ENDING in a
+     name (`build/m3b_merged31`, a templated `build/$B/...`) still counts, and R6 reads a template ENDING in a
      placeholder (`"build/$b"`, `f"build/{b}"`) as the whole directory under it — the trace of B as first built
      found 15 reads in 2 gates that only the bare name had caught (14z-190, maintainer: "Land the fixed B").
      NARROW_R3_TOP lists the top directories.
