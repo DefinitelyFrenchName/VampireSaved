@@ -11,14 +11,13 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**226 tickets** — status: open 15 · parked 12 · done 173 · declined 8 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 160 · cosmetic 13 · evolution 53 · **backfill debt: 0 rows**.
+**226 tickets** — status: open 14 · parked 12 · done 174 · declined 8 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 160 · cosmetic 13 · evolution 53 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
 | [#226](https://github.com/DefinitelyFrenchName/VampireSaved/issues/226) | evolution | open | Test the Linux release end to end: PILOT's linux-x86_64 build as a player gets it (asset, applier, launcher, a real desktop run) | `tests/test_release_binaries.sh` | `DECISIONS_HISTORY.md § Ruled 2026-10-05 (14z-191) — the opener's answers` | none | none | 14z-191 |
-| [#225](https://github.com/DefinitelyFrenchName/VampireSaved/issues/225) | evolution | open | Promote #188's traced test (strace every static gate, score the predictor, an over-narrowed control) from scratch into tools/ | `build/agent190/trace190.sh` | none | none | none | 14z-190 |
 | [#223](https://github.com/DefinitelyFrenchName/VampireSaved/issues/223) | cosmetic | open | Landing sound: vs2 gives Phobos the big-body landing and Donovan the ordinary one; ours the reverse (measured by ear) | `tests/audit_landing_sound.sh` | none | `docs/game/engine_internals.md § Wider: the same class elsewhere` | none | 14z-189,14z-190,14z-191 |
 | [#222](https://github.com/DefinitelyFrenchName/VampireSaved/issues/222) | bug | open | Phobos's air dash minimum height: vs2 refuses it under 24 px, ours allows it (measured in play: height 21) | `tests/audit_air_dash_height.sh` | none | `docs/game/engine_internals.md § Wider: the same class elsewhere` | none | 14z-189,14z-190,14z-191 |
 | [#217](https://github.com/DefinitelyFrenchName/VampireSaved/issues/217) | evolution | open | Rule-checker throughput: check independent decisions in parallel, and split a multi-fork merge into per-fork packets | `tools/rulecheck.py` | none | none | none | 14z-189 |
@@ -49,6 +48,7 @@ backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py pag
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#225](https://github.com/DefinitelyFrenchName/VampireSaved/issues/225) | evolution | done | Promote #188's traced test (strace every static gate, score the predictor, an over-narrowed control) from scratch into tools/ | `tools/trace_static_reads.py` · `tests/test_trace_static_reads.sh` | `DECISIONS_HISTORY.md § Ruled 2026-10-05 (14z-191) — the opener's answers` | `HANDOFF.md § A change to the predictor is scored on a TRACE before it lands` | none | 14z-190,14z-191 |
 | [#224](https://github.com/DefinitelyFrenchName/VampireSaved/issues/224) | bug | done | findings_add.py accepts a home anchor containing ' — ' (the table's separator); findings_anchors.py then SKIPs that finding and exits 0, so the anchor check passes without checking it | `tests/test_close_standing.sh` · `tools/findings_anchors.py` | `DECISIONS_HISTORY.md § Ruled 2026-10-05 (14z-191) — the opener's answers` | `docs/project/gotchas.md § A CHECK THAT SKIPS WHAT IT CANNOT PARSE` | `docs/project/gotchas.md § the anchor check passed without checking that finding` | 14z-190,14z-191 |
 | [#221](https://github.com/DefinitelyFrenchName/VampireSaved/issues/221) | bug | done | upload_release_assets.sh --prune checks only the tag just before the published one, so a freeze never released stops it and merged-m19's assets stay hosted | `tests/test_release_prune.sh` · `tools/upload_release_assets.sh` | `DECISIONS_HISTORY.md § Ruled 2026-10-04 (14z-189, after the close) — #221: merged-m19's assets wait for the fix` · `DECISIONS_HISTORY.md § Ruled 2026-10-05 (14z-191) — the opener's answers` | `docs/project/gotchas.md § A WALK THAT STOPS AT THE FIRST MISS` | `docs/project/gotchas.md § left merged-m19's seven zips hosted` | 14z-189,14z-191 |
 | [#220](https://github.com/DefinitelyFrenchName/VampireSaved/issues/220) | cosmetic | duplicate | The MiSTer release README still says the package contains an emulator (FBNeo or MAME): step 2 and the 'ordinary emulator' paragraph | `tools/package_release.py` | `STATE.md § #220 closed as a duplicate of #214` | none | none | 14z-189 |
