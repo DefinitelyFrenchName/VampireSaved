@@ -1452,7 +1452,7 @@ compare, `bcs`). Every path that reaches the latch test returns 1 ("the
 air dash is taken") exactly when `+0x113|+0x114` is nonzero. **`+0x113` is the air-dash COMMAND latch, not a
 button press** (RETRACTED 14z-191, 14z-121's "button press" reading): on both games it was 1 on exactly the
 frame Phobos's j.66 input completed and 0 on every other frame, while twelve LP presses on the ground and in the
-air never set `+0x113` or `+0x114` (2,351 traced frames per game); `+0x114` was never seen set (a j.44 not traced);
+air never set `+0x113` or `+0x114` (2,351 traced frames per game; P1's latch is `RAM:$FF8513` — P1's block is `RAM:$FF8400` — and a first rig that traced `RAM:$FF8113`, outside the block, read zeros that measured nothing); `+0x114` was never seen set (a j.44 not traced);
 neither byte has an `atlas/ram.md` row. `+0x3A` has no `atlas/ram.md` row: reading `+0x14 − +0x3A`
 as the height above the floor is 14z-121's, not re-derived (it read 0 on the ground and rose through the jump). 24 (`0x0018`) for Zabel, Lei-Lei and Jedah (rows
 `0x04/0x0D/0x0F` + their `+0x10` mirrors `0x14/0x1D/0x1F`, of the table's 32), 0 for everyone else — so the

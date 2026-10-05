@@ -1,0 +1,5 @@
+# tests/rulecheck/retractions/14z-191.tsv — the wordings retracted or corrected in 14z-191, and reach controls that must be found live; columns pattern, source, class (retracted | reach:N)
+MINIMUM AIR-ATTACK HEIGHT	14z-191: vsavj 0x027B80 is the minimum AIR-DASH height — all fifteen callers enter seq 0x14 (STATE 14z-191 row (8), finding (l))	retracted
+as a button press	14z-191: +0x113 is the air-dash command latch — no LP press set it, the j.66 input did (STATE 14z-191 row (8), finding (l))	retracted
+replace the tree's WSL2	14z-191: the tree never tracked a Linux release record; PILOT's were added (STATE 14z-191 row (2), finding (a))	retracted
+MINIMUM AIR-DASH HEIGHT	control: the corrected heading, live in docs/game/engine_internals.md and the gate header	reach:2

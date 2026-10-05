@@ -2,8 +2,9 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 226
+# issues: 227
 number	state	reason	closed	labels	title
+227	OPEN	-	-	cosmetic	MAME README: say the four 'clone of nonexistent driver megaman' lines at every start are expected and harmless
 226	OPEN	-	-	evolution	Test the Linux release end to end: PILOT's linux-x86_64 build as a player gets it (asset, applier, launcher, a real desktop run)
 225	CLOSED	COMPLETED	2026-10-05	evolution	Promote #188's traced test (strace every static gate, score the predictor, an over-narrowed control) from scratch into tools/
 224	CLOSED	COMPLETED	2026-10-04	bug	findings_add.py accepts a home anchor containing ' — '; findings_anchors.py then SKIPs that finding and exits 0
@@ -42,7 +43,7 @@ number	state	reason	closed	labels	title
 191	CLOSED	COMPLETED	2026-10-01	bug	Donovan takes 9 from Demitri's 2HK on ours against 8 on native: vs2 lowered Demitri's 2HK record (10 -> 9); ours runs vsavj's
 190	CLOSED	COMPLETED	2026-10-02	evolution	Promote the recurring close checks into tools/ with gates (#185 item 2)
 189	CLOSED	COMPLETED	2026-10-02	evolution	The emulator driver's run record: full status, submodules, command, environment and reach hashes at start and end (#185 item 1)
-188	OPEN	-	-	evolution,severity: medium	Static tier: carry forward passes after a red (re-run only the failed and stale gates)
+188	CLOSED	COMPLETED	2026-10-05	evolution,severity: medium	Static tier: carry forward passes after a red (re-run only the failed and stale gates)
 187	CLOSED	COMPLETED	2026-10-02	evolution,severity: medium	Close checks: cut the checking loop's re-run cost (fewer full passes, faster passes)
 186	CLOSED	COMPLETED	2026-09-30	evolution	#159's two side moves outside the Summon (Pyron's ring stream, 110_don_arcade_mash's defense reads): their mechanism unmeasured
 185	CLOSED	COMPLETED	2026-10-02	evolution,performance,severity: medium	Addressing the structural causes of many rule-checkers caught gaps

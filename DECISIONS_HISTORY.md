@@ -351,6 +351,32 @@ So: merged-m19's seven zip assets are NOT deleted by hand; they stay hosted unti
 
 ---
 
+## Ruled 2026-10-05 (14z-191) — #223: the landing sounds swap to match vs2 (after the samples)
+
+**The question, verbatim (14z-191, the samples sent as asked — `landing223_phobos_now_after_vs2.wav`, `landing223_donovan_now_after_vs2.wav`, each: ours now, ours after the swap, vs2):** the ruling of the report's item 4 had been *"yes, but provide me with samples to listen to first."*
+
+**The maintainer:** *"#223 I confirm the sound effects should be swapped to match VS2"*
+
+So: the big-body landing +1 moves to vs2's characters — bit `0x10` (Phobos) set and `0x13` (Donovan) cleared in the high half of the char-id mask at ours `PRG:0x00395E` and `PRG:0x003B36` — built with #222 at the next freeze, after checking that no legacy fighter carries id `0x13` on our builds (vsavj's bit was Victor's mirror); `tests/audit_landing_sound.sh` flips with it.
+
+---
+
+## Ruled 2026-10-05 (14z-191) — #188 closed `done`; #222: Phobos takes vs2's air-dash minimum; #223: swap the landing sounds, samples first; a ticket for the MAME validation lines; the close
+
+**The questions, verbatim (14z-191, after the work report):** *"1. #188: close it, or keep it open?"*; *"2. #217: the "independent decisions in parallel" option needs no tool change, because separate run ids already exist. For the "one packet per fork" option: a change to `tools/rulecheck.py`, or only a recorded working practice?"*; *"3. #222: should Phobos take vs2's 24 px minimum for his air dash?"*; *"4. #223: swap the landing sounds to match vs2?"*; *"5. A new finding: the CPS-2-only MAME build prints four "clone of nonexistent driver megaman" errors at every start, on every OS. They're harmless, and documented now in the platform gotchas. Do you want a ticket for a README note so players aren't alarmed?"*; *"6. Close now, or keep going on #226?"*
+
+**The maintainer:**
+- *"the results being positive, I confirm #188 delivers its value and we can close it."*
+- *"I lean option 2, but before deciding how to implement it : what is the risk/benefit analysis for either way of implementing it"*
+- *"yes, since Phobos is VS2 only, and its air dash is  character-specific, it should abide by VS2 behavior."*
+- *"yes, but provide me with samples to listen to first."*
+- *"yes"*
+- *"close"*
+
+So: #188 closes `done`. #217 leans to option 2 (a packet per fork), the HOW not ruled — a risk/benefit analysis of the two implementations (a `tools/rulecheck.py` change, or a recorded working practice) is owed first. #222: Phobos's air dash takes vs2's behaviour (the char-id mask bit `0x10` at the air-dash site and his height row `0x0018`), built at the next freeze. #223: the landing-sound swap to vs2's is ruled, but samples come first and the build waits for the maintainer's listening. A cosmetic ticket for a README note on MAME's four validation lines. This session closes; #226 continues later.
+
+---
+
 ## Ruled 2026-10-05 (14z-191) — the opener's answers: PILOT's Linux records for the next release (and a ticket to test them end to end), #206 closed, ERIS's clone reset; #216 next session; #219 and the smaller tickets worked
 
 **The questions, verbatim (14z-191 opener, from NEXT_SESSION START HERE):** *"**PILOT's Linux release binaries.** These were built and gated on PILOT at the 14z-190 close (glibc 2.39, the release floor) and are not published. **Your call:** should PILOT's `BINARY.txt` records (copies in `build/agent190/pilot_rel/`) replace the tree's WSL2 ones for the next release? The standing #121 ruling says the WSL2 Linux binaries are never published, so PILOT would be the first Linux build we could publish."*; *"**#206: close it?**"* (with the 14z-190 close's figures); *"**#188: compare, then the closing question.** [...] I haven't measured the actual carried seconds yet; that's a measurer job before I put closing #188 to you."*; *"**ERIS's clone:** its 14 uncommitted files hold nothing unique. Whether to reset `~/vampire-saved` there to `main` is your call; its untracked files were not compared."*; *"**#216 (waiting on you, blocks nothing)**"*.

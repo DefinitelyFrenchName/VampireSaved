@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-190 CLOSE, 2026-10-04)
+# NEXT SESSION — orientation (rewritten at the 14z-191 CLOSE, 2026-10-05)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
@@ -18,51 +18,49 @@ work there in parallel.**
 
 ## START HERE
 
-0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** What the 14z-190 close found and did is in its
-   CLOSE row (STATE 14z-190 row (11)).
-1. **PILOT'S LINUX RELEASE BINARIES — THE MAINTAINER'S TO RULE** (STATE 14z-190 row (11)): built and gated on PILOT
-   at the 14z-190 close (glibc 2.39, the release floor; `docs/project/build_environments.md` "PILOT, Ubuntu 24.04
-   VM"), not published. Put to the maintainer whether PILOT's `BINARY.txt` records (copies in
-   `build/agent190/pilot_rel/`) replace the tree's WSL2 ones for the next release.
-2. **#206 — JUDGED AT THE 14z-190 CLOSE** (STATE 14z-190 row (11)): put closing it to the maintainer with the
-   close's own figures (the table existed before the close; how many documentation-packet runs it took).
-3. **#188 — OPTION B IN THE PREDICTOR SINCE 14z-190** (STATE 14z-190 rows (7), (11)): compare what the 14z-190
-   close's `--confirm` carried with the modelled 1,035 of 5,449 s, then put closing #188 to the maintainer;
-   `test_close_tools`'s 1,424 s of controls re-run by design. Promoting the traced test that scored B is #225.
-4. **#214 — SHIP THE GENERATOR FIX WITH THE NEXT RELEASE, THEN CLOSE IT** (STATE 14z-190 row (10)): merged-m22's
-   published MiSTer README still claims an emulator; `tests/test_release_launcher_bat.sh` holds the generator.
-5. **ERIS'S CLONE** (STATE 14z-190 row (9)): its 14 uncommitted files hold nothing unique (the 6 lines found in no
-   commit are early drafts of committed content); resetting `~/vampire-saved` there to `main` is the
-   maintainer's call (untracked files were not compared).
-6. **QUESTION WAITING FOR THE MAINTAINER (it blocks nothing):** #216 — Lei-Lei 6HP (one hit measured at 128 px,
-   the workbook says three) and the other #117 gaps, to check against the Japanese community wiki.
-7. **#219 — `tests/run_all_emulator.sh --dry-run` writes a run record that hides staleness.** Until it is fixed,
-   never dry-run before a `--stale` run without re-reading `python3 tools/audit_emulator_staleness.py --names`.
-8. **Smaller open tickets:** #215 (the applier's zip `create_system` differs by host), #217 (rule-checker
-   throughput), #218 (`tools/audit_poked_legs.py`'s id map is shifted), #221 (`--prune` stops at an unreleased
-   tag; merged-m19's zips stay hosted until it is fixed — ruled), #222 (Phobos's minimum air-attack height,
-   static), #223 (two sound-request sites, static), #224 (an anchor holding the findings table's separator is
-   SKIPped silently), #225 (promote #188's traced test).
-9. **SHELVED BY THE MAINTAINER:** the measurer/reader frontmatter change to Sonnet 5.5 at `xhigh`.
+0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** What the 14z-191 close found and did is in its
+   CLOSE row (STATE 14z-191 row (12)).
+1. **#222 — TO BUILD: Phobos's air dash takes vs2's minimum height (the maintainer's ruling)** (STATE 14z-191 rows (8), (11);
+   `DECISIONS_HISTORY.md`, the 14z-191 report's rulings). vs2's mask at the air-dash
+   site carries bit `0x10` (ours `PRG:0x022AF2` `$28102810`, vs2 `$28112810`) and vs2's height row `0x10` is
+   `0x0018` (ours 0). Before building: whether any legacy fighter carries id `0x10` on our builds (the mask bit
+   would reach it), the superset invariant, and which manifest owns the row. `tests/audit_air_dash_height.sh`
+   flips from `--expect gap` to `--expect same` in the commit that lands it; ships at the next freeze.
+2. **#223 — TO BUILD WITH #222: the landing sounds swap to match vs2** (the maintainer, after the samples:
+   *"#223 I confirm the sound effects should be swapped to match VS2"*; `DECISIONS_HISTORY.md` "Ruled 2026-10-05
+   (14z-191) — #223"): vs2's mask high half (bit `0x10` set, `0x13` clear) at ours `PRG:0x00395E` and `0x003B36`.
+   Check first whether any legacy fighter carries id `0x13` on our builds (vsavj's bit was Victor's mirror).
+   `tests/audit_landing_sound.sh` flips in the commit that lands it.
+3. **#217 — THE MAINTAINER LEANS TO OPTION 2 (a packet per fork); the implementation is his to choose** after the
+   risk/benefit analysis given at the 14z-191 close report: a `tools/rulecheck.py` change (a packet citing another
+   run's verdict, checked by the tool) or a recorded working practice.
+4. **#226 — THE LINUX RELEASE AS A PLAYER GETS IT:** steps 1 and 4 pass headless on PILOT and ERIS WSL2 (STATE
+   14z-191 row (9)); left: step 2 (a desktop session — the maintainer), step 3 (the `-recipe` asset built from
+   `EMULATOR.md` on a clean host), the scripted headless case under `tests/`. Whether the parked ticket for the
+   dedicated server's Linux binaries is now answered by PILOT is a question for the maintainer.
+5. **#214 and #227 ship with the next release** (#214: the MiSTer README's emulator claims, fixed in the generator;
+   #227: a MAME README note that the four "clone of nonexistent driver megaman" lines are harmless).
+6. **#216** — Lei-Lei 6HP and the other #117 gaps against the Japanese community wiki (the maintainer: *"let's keep it
+   for next session"*).
+7. **Smaller open tickets:** #210 (the pre-push hook's sample command lacks `--session`), #211 (`--stale` selecting 0
+   gates prints GREEN and becomes the run of record), #213 (`dispatch_census.lua`'s input clock under breakpoints).
+8. **SHELVED BY THE MAINTAINER:** the measurer/reader frontmatter change to Sonnet 5.5 at `xhigh`.
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
-- The static runner keeps each executed control's seconds as `results.controls.tsv` beside `results.tsv`; a
-  close tier's controls cost more than its gates (3,396 s against 2,053 s), `test_close_tools` alone 1,424 s.
-- Narrowing a predictor rule can remove coverage another rule never gave: B's `build/` narrowing missed 15 reads
-  that only the bare directory had caught (`tools/static_confirm.py`'s docstring, "the trace of B as first
-  built"). A narrowing is scored on a trace of every gate's reads, with an over-narrowed control that must
-  miss, before it lands.
-- `tests/test_tickets.sh` needs every session key in a row to resolve in STATE: open the session's group (rolling
-  the oldest) before indexing a ticket under the new key.
-- `tests/test_state_open_lists.sh` refuses a closed marker (`LANDED`, `DONE`, `FIXED`, `CLOSED`) in START HERE.
-- `tools/findings_add.py` refuses a `(x)` letter form inside a finding; a home anchor must not contain ` — ` (#224);
-  an ambiguous bare document name in a finding fails `tools/homes_tracked.py`.
-- A promise-class key must not start with `#` (the classes file reads it as a comment).
-- A gate header's WHAT/HOW/EXPECTS edit needs `python3 tools/gen_gate_coverage.py` in the same commit (paid twice).
-- PILOT traces all 203 static gates under strace in about 7 minutes at 6 jobs.
+- `tools/homes_tracked.py "<row>" [out]` / `--newest [out]`: the second word is an OUTPUT path — run as
+  `--newest STATE.md` it overwrote STATE.md (it now refuses its state file or any tracked file).
+- A gate that echoes a sub-tool's per-item lines can carry a verdict word (`SKIP  (b) ...`) the static runner's
+  classifier reads as the gate's own: echo the sub-tool's verdict line only.
+- vsavj `0x027B80` is the minimum AIR-DASH height (every caller enters seq `0x14`); `+0x113` is the air-dash latch
+  (P1's block is `$FF8400`: `+0x113` is `$FF8513`, not `$FF8113` — a first rig traced the wrong address).
+- A read tap on `+0x382` with `RPCS` set to a site's own read PC lists every frame an engine site runs, per game.
+- PILOT and ERIS have no `xdelta3` (package releases on the Mac); PILOT has no password-less sudo.
+- `tools/naming_pair_sheet.sh` labels must not contain `:`; it takes `RIG_DIR` for a rig outside the corpus.
+- `tools/trace_static_reads.py all` on PILOT: about 7 minutes for 203 gates at 6 jobs.
+- An edit to `tools/applier/*.mjs`, a comment too, makes every published `apply_release.html` stale.
 
-## WHAT CLOSED THIS SITTING (14z-190)
+## WHAT CLOSED THIS SITTING (14z-191)
 
-**#204** and **#207** `done`; **#128** and **#162** kept parked; the five poke read-back rows ruled "as read";
-**#188** option B landed (0 misses on a PILOT trace); **#214** fixed in the generator. Filed: #222-#225.
+**#188**, **#206**, **#215**, **#218**, **#219**, **#221**, **#224**, **#225** `done`. Filed: #226, #227. Measured in
+play: #222 (air dash at height 21), #223 (the landing sound, by ear). PILOT's Linux records adopted; ERIS's clone reset.
