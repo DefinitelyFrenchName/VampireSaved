@@ -3143,3 +3143,13 @@ as if every host wrote it.
 **The rule:** a zip meant to be byte-reproducible pins `create_system` (here `zi.create_system = 3`). The
 field is testable on any host because ZipInfo reads `sys.platform` at call time: run the writer with
 `sys.platform = "win32"` set first, as `tests/test_applier_page.sh` section 3b does.
+
+## THE CPS-2-ONLY MAME BUILD PRINTS FOUR "clone of nonexistent driver megaman" ERRORS AT EVERY START — harmless, every host, release binaries included (seen: 14z-191, #226)
+
+MAME at the pin (`mame0288`), built `SOURCES=`-filtered to the CPS-2 drivers (`tools/setup_mame.sh`,
+`tools/build_release_emulators.sh`), validates the drivers it compiled at startup and prints, for `mmancp2u`,
+`mmancp2ur1`, `mmancp2ur2` and `rmancp2j`, `Driver is a clone of nonexistent driver megaman` — their parent lives
+in a source file the filtered build leaves out. Measured 14z-191: the development binary on the Mac, the macOS
+release binary and the linux-x86_64 release binary (PILOT, ERIS WSL2) all print the four; `vsavjw` runs
+regardless (`Average speed: 100.00% (19 seconds)`). A player reading the console sees "Errors:" before the game
+starts; nothing tells them it is harmless (#226).
