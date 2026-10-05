@@ -42,6 +42,7 @@
 # MUST-FIRE: perturbed-copy: reach-threshold — a copy of a retraction TSV whose `reach:2` control is raised to `reach:3` (a third carrier does not exist) must make tools/retraction_grep.py exit 1 naming it, so a reach:N control that lost a carrier cannot pass on the ones left (in-gate; mode: the copy replaces the real file and the gate FAILs)
 # MUST-FIRE: perturbed-copy: gone-reintroduced — a copy of a retraction TSV with a wording KNOWN to be live (a reach control's text minus its first word, so the copy repeats no pattern) marked `gone` must make tools/retraction_grep.py exit 1 naming it, so a retracted wording that comes back is a red (in-gate; mode: the copy replaces the real file and the gate FAILs)
 # MUST-FIRE: known-bad: case-fold-dropped — tools/retraction_grep.py --selftest --nofold: the matcher with its case-folding REMOVED (a known-bad variant) must print SELFTEST FAIL naming the upper-case heading case, while --selftest prints SELFTEST PASS — the self-test matches planted TEXTS (a wording in an UPPER-CASE heading, one wrapped across a `#` prefix, one across a Lua `--` prefix, one code-spanned), not the tree, so no stray carrier elsewhere can mask a matcher defect (rule-checker run 2026-09-25-199 Q4) (in-gate; mode: the no-fold variant is the one checked, so the gate FAILs)
+# MUST-FIRE: shadow-tool: output-overwrites — a copy of tools/homes_tracked.py without its output-path guard, given the state copy it reads as its output, must overwrite that copy, and section 2d must FAIL on it (mode: section 2d runs that copy)
 # MUST-FIRE: known-bad: build-home-planted — tools/homes_tracked.py --selftest --blind: the tool with its build/ reads DISABLED (a known-bad variant) must FAIL its own self-test, whose planted row cites a backticked build/ file and a prose build/ path, an unresolved name, an unresolved gate stem, a ticket with no index row, ticket rows (a planted index) citing a build/ file, an untracked file and a § anchor on no line, a prose-cited document that resolves nowhere and a parenthesised scratch-citing test clause (in-gate: --selftest must print SELFTEST PASS and --selftest --blind must print SELFTEST FAIL naming the two build/ reads as missed — a traceback is DEAD, not fired; mode: the blind variant is the one checked, so the gate FAILs because the plant is not caught)
 # MUST-FIRE: known-bad: bare-name-silent — tools/homes_tracked.py --selftest --nobare: the tool with bare-name resolution REMOVED (the pre-#205 tool, a bare `engine_internals` silent) must print SELFTEST FAIL with bare=False, while --selftest prints SELFTEST PASS (section 2; #205, rule-checker run 2026-10-02-562) (in-gate; mode: the no-bare variant is the one checked, so the gate FAILs)
 # MUST-FIRE: known-bad: letter-unchecked — tools/homes_tracked.py --selftest --noletters: the tool with the PER-LETTER home check removed must print SELFTEST FAIL with letters=False, so a finding whose only home resolves nowhere cannot pass on the other letters' homes (section 2; #205) (in-gate; mode: the no-letters variant is the one checked, so the gate FAILs)
@@ -130,13 +131,35 @@ if [ "$rc" -eq 0 ] && printf '%s\n' "$out" | grep -q '^SELFTEST PASS'; then ok "
 elif printf '%s\n' "$out" | grep -q '^SELFTEST FAIL'; then bad "$(printf '%s\n' "$out" | grep '^SELFTEST FAIL' | head -1 | cut -c1-160)"
 else echo "REFUSED: tools/none_reasons.py --selftest neither passed nor failed on its own line (exit $rc — a crash, not a verdict): $(printf '%s\n' "$out" | tail -1 | cut -c1-160)"; exit 3; fi
 
+unguard() {   # a copy of homes_tracked.py without the output-path guard (the control output-overwrites)
+    python3 - tools/homes_tracked.py "$1" <<'PY'
+import sys
+s = open(sys.argv[1]).read()
+a = "        if pathlib.Path(o).resolve() == pathlib.Path(state).resolve() or os.path.normpath(o) in tracked:"
+assert s.count(a) == 1, "the guard moved"
+open(sys.argv[2], "w").write(s.replace(a, "        if False:   # CONTROL output-overwrites"))
+PY
+}
 echo "== 2b. the NEWEST findings table row of STATE.md, on the live tree (the close's own output is a snapshot)"
 if out="$(python3 tools/homes_tracked.py --newest 2>&1)"; then ok "$(printf '%s\n' "$out" | head -1 | cut -c1-200)"
 elif printf '%s\n' "$out" | grep -q '^FAIL'; then bad "$(printf '%s\n' "$out" | grep '^FAIL\|^#' | head -4 | tr '\n' ' ' | cut -c1-300)"
 else echo "REFUSED: tools/homes_tracked.py --newest exited non-zero with no FAIL line (a crash, not a verdict): $(printf '%s\n' "$out" | tail -1 | cut -c1-160)"; exit 3; fi
 
+echo "== 2d. the output path is never an input (14z-191: \`--newest STATE.md\` wrote the report over STATE.md)"
+cp STATE.md "$W/S.md"; H0="$(shasum "$W/S.md" | cut -c1-40)"
+HT=tools/homes_tracked.py
+if vs_ctl_is output-overwrites; then unguard "$W/ht_unguarded.py"; HT="$W/ht_unguarded.py"; fi
+python3 "$HT" --newest --state "$W/S.md" "$W/S.md" > "$W/ow.txt" 2>&1; rc=$?
+if [ "$rc" = 3 ] && grep -q '^REFUSED: the output path' "$W/ow.txt" && [ "$(shasum "$W/S.md" | cut -c1-40)" = "$H0" ]; then
+    ok "the state file given as the output path is REFUSED and left byte-identical"
+else bad "the state file given as the output path was not refused (exit $rc), or it changed"; fi
+
 if [ -z "${VS_CTL:-}" ]; then
     echo "== 3. controls"
+    cp STATE.md "$W/S2.md"; H2="$(shasum "$W/S2.md" | cut -c1-40)"; unguard "$W/ht_unguarded.py"
+    python3 "$W/ht_unguarded.py" --newest --state "$W/S2.md" "$W/S2.md" > /dev/null 2>&1
+    if [ "$(shasum "$W/S2.md" | cut -c1-40)" != "$H2" ]; then vs_ctl_fired output-overwrites "without the guard the report overwrote the state copy it read"
+    else vs_ctl_dead output-overwrites "the unguarded copy left the state copy unchanged"; fail=1; fi
     f="$(ls tests/rulecheck/retractions/*.tsv | head -1)"; cp "$f" "$W/c1.tsv"; printf 'zq-no-such-wording-anywhere-%s\tplanted\treach\n' "$$" >> "$W/c1.tsv"
     if python3 tools/retraction_grep.py "$W/c1.tsv" >"$W/c1.out" 2>&1; then vs_ctl_dead unreachable-control "an unreachable reach pattern did not make the grep exit 1"; fail=1
     elif grep -q "^FAIL: reach control.*zq-no-such-wording-anywhere-$$ (0 < 1)" "$W/c1.out"; then vs_ctl_fired unreachable-control "$(grep '^FAIL' "$W/c1.out" | cut -c1-120)"

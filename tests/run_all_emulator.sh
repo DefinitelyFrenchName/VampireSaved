@@ -245,8 +245,10 @@ RESULTS="$LOGDIR/results.tsv"
 # THE COMMIT OF RECORD (14z-180, GitHub #171 slice Q4): the HEAD this run measures,
 # first line, then every dirty tracked path — so tests/test_emulator_staleness.sh can
 # say which passed gates have had a declared input move since. Written once per run
-# directory (a --resume continues the run it records).
-if [ ! -f "$LOGDIR/commit.txt" ]; then
+# directory (a --resume continues the run it records). NOT under --dry-run (14z-191, GitHub
+# #219): a dry run executes nothing, and tools/audit_emulator_staleness.py takes the newest
+# directory carrying commit.txt as the run of record, so a dry run's would hide every stale gate.
+if [ "$DRY" = 0 ] && [ ! -f "$LOGDIR/commit.txt" ]; then
     if git rev-parse --git-dir >/dev/null 2>&1; then
         { git rev-parse HEAD; git status --porcelain -- . 2>/dev/null | grep -v '^??' | awk '{print $2}'; } > "$LOGDIR/commit.txt"
     else

@@ -1,0 +1,45 @@
+fbneo — FBNeo (SDL2 frontend) carrying the CPS-2 WIDE v1 driver patch, prebuilt for linux-x86_64
+==================================================================================================
+
+# Every file in this directory, and its sha256 — verify before running:
+#   awk '/^sha256 /{print $2"  "$3}' BINARY.txt | shasum -a 256 -c     (macOS, or any host with perl)
+#   awk '/^sha256 /{print $2"  "$3}' BINARY.txt | sha256sum -c        (Linux, MSYS2)
+sha256 be3e13a3e712e5b367f5299ff71b7869f54a3bffd7e7b4104a1a7984151c0c30 fbneo
+sha256 667797fbd464b12c65a2b5c3105118072c5b3a1291d6315ecb84e2b7c1b7d362 libSDL2-2.0.so.0
+sha256 46561f9c9da28d63e1ecd9ae693cc461a6e8f7cf344dce499cef00447b58be99 libdecor-0.so.0
+sha256 95e5391b2a2ed0d85e269f12431363987ac2b2e78f0f8289890e5b1fbcc171ca libsamplerate.so.0
+sha256 e6c04f0b913981ef1b0e5ca93c35c04f31bc1281b6527892bdded22ad2214107 libxkbcommon.so.0
+
+upstream   https://github.com/finalburnneo/FBNeo
+pin        79188379cc8442c54712acbe3b7e73dce157985f
+patch      0002-cps2-wide-v1.patch  sha1 17cd7516a25e6198376bc69b88b3392d85122d0e  and 0003-drop-sdl2-image.patch  sha1 abb4bd0ca9f10e03e5649d1eab35c481071f7ed5  (the ONLY patches applied; the project's replay-harness patch is a test instrument and is not in this binary. 0003 drops the SDL2_image link, which removes 21 transitive image codecs from this directory — 24 files to 4 — and with them 20 of the macOS Gatekeeper approvals a downloaded copy needs)
+recipe     git clone https://github.com/finalburnneo/FBNeo fbneo && cd fbneo && git checkout 79188379cc8442c54712acbe3b7e73dce157985f && git apply 0002-cps2-wide-v1.patch && git apply 0003-drop-sdl2-image.patch && make sdl2 SKIPDEPEND=1 -j6 -k; make sdl2 SKIPDEPEND=1 -j6   (twice on a fresh clone: the first parallel pass dies on burn.o until the driver list is generated)
+built      2026-10-04 on Ubuntu 24.04.5 LTS (x86_64), cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, by tools/build_release_emulators.sh fbneo
+tree       559194f382d5
+jobs       6
+env        Ubuntu 24.04.5 LTS (kernel 7.0.0-38-generic); ldd (Ubuntu GLIBC 2.39-0ubuntu8.9) 2.39
+env        dpkg build-essential 12.10ubuntu1
+env        dpkg gcc 4:13.2.0-7ubuntu1
+env        dpkg make 4.3-4.1build2
+env        dpkg python3 3.12.3-0ubuntu2.1
+env        dpkg git 1:2.43.0-1ubuntu7.3
+env        dpkg rsync 3.2.7-1ubuntu1.5
+env        dpkg patch 2.7.6-7build3
+env        dpkg pkgconf 1.8.1-2build1
+env        dpkg zip 3.0-13ubuntu0.2
+env        dpkg unzip 6.0-28ubuntu4.1
+env        dpkg perl 5.38.2-3.2ubuntu0.6
+env        dpkg patchelf 0.18.0-1.1build1
+env        dpkg binutils 2.42-4ubuntu2.10
+env        dpkg coreutils 9.4-3ubuntu6.3
+env        dpkg diffutils 1:3.10-1ubuntu0.1
+env        dpkg libsdl2-dev 2.30.0+dfsg-1ubuntu3.1
+env        dpkg libsdl2-image-dev 2.8.2+dfsg-1build2
+env        dpkg libsdl2-ttf-dev 2.22.0+dfsg-1
+env        dpkg libfontconfig-dev 2.15.0-1.1ubuntu2
+env        dpkg qmake6 6.4.2+dfsg-21.1build5
+requires   glibc 2.38 or newer, x86_64 (built on Ubuntu 24.04.5 LTS (x86_64), cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0 — glibc is backward compatible, never forward, so an OLDER distribution than the build host will refuse to start). The libraries the recipe links from the package manager (SDL2 (sdl2-compat over SDL3 where the host uses it), SDL2_image and their image codecs) are bundled here and found through RUNPATH=$ORIGIN. DELIBERATELY NOT bundled, because they belong to your machine: glibc itself, the GPU stack (libGL/libEGL/libdrm), the X11/Wayland and udev/dbus clients, and ALSA/PulseAudio — install your distribution's SDL2 runtime dependencies if the binary reports a missing one.
+run        run it from a directory that has a `roms/` subdirectory holding your built vsavjw.zip — that ONE file, since the release set is standalone (FBNeo has no rom-path option: it reads `roms/` relative to the current directory, or the paths set in its config): `./fbneo vsavjw`. Controls: FBNeo's own menu (Tab).
+first run  no signature and no quarantine on Linux: `chmod +x` the executable if your unzip dropped the bit, then run it from this directory. The sha256 rows above are the integrity check.
+not works  "Unknown system: vsavjw" means the binary is not this one (no driver patch). A stock emulator fed the set renamed to vsavj.zip STALLS on the legal screen forever (measured 2026-09-11) — renaming is never the fix.
+provenance a prebuilt is the recipe above run on one host and nothing else; the reviewable trust surface stays the patch (its sha1 above). Rebuild from the recipe to check: the binary is rebuildable, not byte-reproducible (link order, timestamps).

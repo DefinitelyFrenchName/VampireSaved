@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-465 entries (47 game / 127 platform / 291 project), counted from the buckets at generation.
+472 entries (47 game / 128 platform / 297 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 47 entries
 
@@ -72,7 +72,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A RECORD'S CLASS BYTE IS NOT THE VICTIM'S REACTION CLASS — the guard reads it first and the stager rewrites it (paid: 14z-169)
 - A POKED KO NEEDS THE VICTIM ON ITS LAST BAR, AND THE KO MUST COME FROM THE PATH YOU MEAN TO TEST — a low HP alone rallies (paid: 14z-184, GitHub #180)
 
-## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 127 entries
+## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 128 entries
 
 - LINUX CAPS ONE ENVIRONMENT STRING AT 128 KiB; `/bin/sh` IS DASH; THE PINNED MAME'S VERBOSITY IS A BUILD FACT — three macOS facts the first Linux emulator tier paid for (paid: 2026-10-01, ERIS WSL2 Ubuntu, GitHub #201)
 - `spctl -a` REPORTS THE SIGNING-POLICY VERDICT, NOT WHETHER A LAUNCH IS BLOCKED — and `unzip` DOES propagate com.apple.quarantine (measured: 2026-09-20, macOS 26.0 arm64, #144)
@@ -201,8 +201,9 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A BACKGROUND TASK THAT RUNS A JOB OVER SSH IS STOPPED AT THE 2-HOUR LIMIT, BUT THE REMOTE JOB IS NOT — it keeps running on the host, and its verdict arrives nowhere (paid: 14z-188, read 14z-189)
 - `os.getsid()` ANSWERS FOR A ZOMBIE ON LINUX AND RAISES ESRCH ON macOS — and Linux `ps` keeps the zombie's name (`[sh] <defunct>`) where macOS shows `<defunct>` (measured 2026-10-03, 14z-189, #203)
 - UBUNTU'S `sh` (dash) READS A SCRIPT ~8 KB AHEAD; macOS `sh` (bash 3.2) READS IT AS IT RUNS — a script truncated or edited mid-run is cut short on one and not the other (measured 2026-10-03, 14z-189, #203)
+- PYTHON'S ZipInfo STAMPS THE HOST INTO create_system — the same zip code writes a different container on Windows (paid: 14z-189 measured, 14z-191 fixed, GitHub #215)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 291 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 297 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -495,3 +496,9 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - AN EXPORTED VARIABLE REACHES EVERY GATE THE TIER RUNS — a gate that compares two runners' output must unset what the caller set (paid: 14z-189, `test_bbh_fidelity`)
 - A STANDALONE `test_emulator_staleness` READS ITS CADENCE FROM `VS_CADENCE`, NOT FROM A FLAG — a `--cadence` argument is ignored silently (paid: 14z-189)
 - A DOCUMENT A GATE FOLLOWS IS ONE OF ITS INPUTS — a measurement written into it makes the gate stale (paid: 14z-189 close)
+- A LABEL MAP IS NOT A MEASUREMENT — an id->name dict nobody reads back can sit one row off (paid: 14z-189 found, 14z-191 fixed, GitHub #218)
+- A WALK THAT STOPS AT THE FIRST MISS skips everything behind it — the release prune and the never-released freeze (paid: 14z-189 found, 14z-191 fixed, GitHub #221)
+- A CHECK THAT SKIPS WHAT IT CANNOT PARSE passes without checking — the findings table's separator inside an anchor (paid: 14z-190, GitHub #224)
+- A COMMENT IN AN APPLIER MODULE IS SHIPPED BYTES — the released pages inline the modules verbatim (paid: 14z-191, GitHub #215)
+- A TOOL'S SECOND WORD WAS ITS OUTPUT PATH — `homes_tracked.py --newest STATE.md` wrote its report over STATE.md (paid: 14z-191)
+- A SELF-TEST'S OUTPUT ECHOED INTO A GATE'S LOG IS READ AS THE GATE'S OWN — a per-finding "SKIP" made the gate SKIP (paid: 14z-191)

@@ -1,6 +1,6 @@
 #!/bin/sh
 # upload_release_assets.sh — publish the PREBUILT emulator binaries as GitHub
-# RELEASE ASSETS on the freeze tag, and prune the previous freeze's.
+# RELEASE ASSETS on the freeze tag, and prune every earlier freeze's (#221).
 #
 # RULED 2026-09-11 (14z-149, option (b)): the binaries are NEVER git content —
 # a committed binary lives in every clone's history forever (~140 MB per
@@ -8,7 +8,7 @@
 # tree keeps each directory's BINARY.txt (the sha256 rows are what make a
 # downloaded asset verifiable); the files sit under release/emulators/ and
 # release/<name>/*/emulator/bin/ IGNORED; the assets attach to the release on
-# `freeze/<name>` and the previous freeze's assets are DELETED so GitHub hosts
+# `freeze/<name>` and every earlier freeze's zip assets are DELETED so GitHub hosts
 # only the latest ("can we have a release mechanism where we delete the
 # previous existing binaries so that we only host on github the latest ones?").
 # The maintainer's own web storage may mirror them later.
@@ -28,7 +28,7 @@
 # in it can be misapplied. `BINARY.txt` still names the patch's sha1, and the
 # recipe asset is where the patch itself lives.
 #
-# Usage: tools/upload_release_assets.sh freeze/<name> [--prune] [--dry-run]
+# Usage: tools/upload_release_assets.sh freeze/<name> [--prune] [--dry-run] [--prune-plan]
 #   THE ASSETS, cut from release/<name>/<platform>/ (one dir per platform, itself
 #   self-sufficient — [VSP-100]), each holding the README, the romset patch set, the
 #   manifest and the applier, PLUS exactly one emulator route:
@@ -51,16 +51,21 @@
 #   hash the OTHER files, so the record may change). The build resource's copy under
 #   release/emulators/ is kept identical. A record with no files beside it is named and skipped
 #   — this host has neither built nor fetched them.
-#   --prune: the previous `freeze/merged-m*` tag (sort -V) that has a release loses every
-#            `*-*.zip` asset (the release and the tag stay: the record of what shipped is the
-#            tree's BINARY.txt, the tag is the source).
+#   --prune: EVERY earlier `freeze/merged-m*` tag (sort -V) whose release still holds a `.zip`
+#            asset loses them all (the release and the tag stay: the record of what shipped is the
+#            tree's BINARY.txt, the tag is the source). Until 14z-191 (#221) only the tag JUST
+#            before was looked at, so a freeze that was never released (no release) stopped the
+#            prune and merged-m19's assets stayed hosted under merged-m22.
+#   --prune-plan: print the tags --prune would empty, newest first, and exit: nothing is built
+#            and nothing touches GitHub but the read-only probe (`VS_PRUNE_PROBE=<cmd>` replaces
+#            it: `<cmd> <tag>` exits 0 when that tag's release holds a .zip — the gate's stub).
 #   --dry-run: build and refuse locally, nothing touches GitHub.
 # Needs `gh` authenticated for the origin repository. Gate for the artifact on
 # this host: tests/test_release_binaries.sh (before uploading, always).
 set -eu
-TAG="${1:?usage: tools/upload_release_assets.sh freeze/<name> [--prune] [--dry-run]}"; shift
-PRUNE=0; DRY=0
-for a in "$@"; do case "$a" in --prune) PRUNE=1 ;; --dry-run) DRY=1 ;; *) echo "unknown option $a" >&2; exit 2 ;; esac; done
+TAG="${1:?usage: tools/upload_release_assets.sh freeze/<name> [--prune] [--dry-run] [--prune-plan]}"; shift
+PRUNE=0; DRY=0; PLAN=0
+for a in "$@"; do case "$a" in --prune) PRUNE=1 ;; --dry-run) DRY=1 ;; --prune-plan) PLAN=1 ;; *) echo "unknown option $a" >&2; exit 2 ;; esac; done
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 # a file manager's folder metadata (`.DS_Store`) is never shipped — the one definition
 # (maintainer-ruled 2026-09-14); asset_files() pipes its `find` through it
@@ -70,6 +75,21 @@ git rev-parse --verify -q "refs/tags/$TAG" >/dev/null || { echo "no such tag: $T
 NAME="${TAG#freeze/}"
 ORIGIN="$(git remote get-url origin | sed -e 's#\.git$##' -e 's#^git@github.com:#https://github.com/#')"
 URL="$ORIGIN/releases/tag/$TAG"
+
+# THE PRUNE TARGETS (#221, 14z-191): every earlier merged freeze whose release still holds a zip.
+prune_candidates() {  # every freeze/merged-m* tag before $TAG (sort -V), newest first
+    git tag -l 'freeze/merged-m*' | sort -V | awk -v t="$TAG" '$0==t{exit} {print}' | sort -rV
+}
+has_zip_assets() {    # has_zip_assets <tag> — its release holds a .zip asset (a tag with no release holds none)
+    if [ -n "${VS_PRUNE_PROBE:-}" ]; then "$VS_PRUNE_PROBE" "$1"
+    else gh release view "$1" --json assets --jq '.assets[].name' 2>/dev/null | grep -qE '\.zip$'; fi
+}
+prune_targets() { prune_candidates | while read -r p; do if has_zip_assets "$p"; then echo "$p"; fi; done; }
+if [ "$PLAN" = 1 ]; then
+    t="$(prune_targets)"
+    echo "prune plan for $TAG: ${t:-none}" | tr '\n' ' '; echo
+    exit 0
+fi
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 
 verify_rows() {  # verify_rows <dir> — every sha256 row's file present and matching; prints BAD lines
@@ -110,7 +130,7 @@ for bdir in release/"$NAME"/*/emulator/bin/*/; do
 import sys, os, re
 asset, tag, url = sys.argv[1:4]
 line = (f"asset      {asset} attached to the GitHub release on tag {tag} — {url} "
-        "(verify the rows above after unzipping; the previous freeze's assets are deleted at each release)")
+        "(verify the rows above after unzipping; earlier freezes' assets are deleted at each release)")
 for p in sys.argv[4:]:
     if not os.path.exists(p):
         continue
@@ -259,13 +279,12 @@ if [ "$DRY" = 0 ]; then
 fi
 
 if [ "$PRUNE" = 1 ] && [ "$DRY" = 0 ]; then
-    prev="$(git tag -l 'freeze/merged-m*' | sort -V | awk -v t="$TAG" '$0==t{exit} {p=$0} END{print p}')"
-    if [ -n "$prev" ] && gh release view "$prev" >/dev/null 2>&1; then
+    targets="$(prune_targets)"
+    [ -n "$targets" ] || echo "prune: no earlier freeze release holds a zip asset"
+    for prev in $targets; do
         gh release view "$prev" --json assets --jq '.assets[].name' | grep -E '\.zip$' | while read -r a; do
             gh release delete-asset "$prev" "$a" -y >/dev/null && echo "pruned $prev: $a"
         done
-    else
-        echo "prune: no earlier freeze release with assets ($prev)"
-    fi
+    done
 fi
 echo "done: $n asset(s) on $URL"

@@ -312,6 +312,11 @@ def main():
                 # Measured 2026-09-20: setting only the archive argument left the set at
                 # 71 MB, exactly its stored size, with no error and no warning.
                 zi.compress_type = zipfile.ZIP_DEFLATED
+                # THE HOST BYTE IS PINNED (#215, 14z-191): ZipInfo stamps create_system from
+                # sys.platform — 0 (DOS) on Windows, 3 (Unix) elsewhere — so the same dumps gave
+                # two different containers (measured 2026-10-03 on ERIS against the Mac, every
+                # member byte-identical). Pinned to 3, every host writes the same file.
+                zi.create_system = 3
                 zf.writestr(zi, d)
     # THE SET KEY, CHECKED AGAINST THE MANIFEST'S OWN DECLARATION for the variant just
     # written — computed exactly as tools/build_fingerprint.py wholeset_key() does. It is

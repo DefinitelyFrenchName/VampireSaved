@@ -3130,3 +3130,16 @@ code it expects to cut off beyond the shell's read-ahead (the gate's `pad_runner
 of comment right after the command block, in the leg's own copy) — and the reverse holds for
 real work: under dash an edit to a running script reaches it only past ~8 KB, under bash 3.2
 anywhere, so "it survived an edit" proves nothing across hosts.
+
+## PYTHON'S ZipInfo STAMPS THE HOST INTO create_system — the same zip code writes a different container on Windows (paid: 14z-189 measured, 14z-191 fixed, GitHub #215)
+
+`zipfile.ZipInfo()` sets `create_system` from `sys.platform` when it is constructed: 0 (DOS) on Windows, 3
+(Unix) elsewhere. The release applier `apply_release.py`, run on the same dumps, wrote a `vsavjw.zip` whose 32
+members and set key were identical on ERIS's MSYS2 python and on the Mac, but whose container differed
+(`4a92a9ec…` against `313d5429…`, measured 2026-10-03) in that one header field. Harmless to a player (the
+contract is member bytes and the set key), but the browser applier's writer and its fidelity gate asserted 3
+as if every host wrote it.
+
+**The rule:** a zip meant to be byte-reproducible pins `create_system` (here `zi.create_system = 3`). The
+field is testable on any host because ZipInfo reads `sys.platform` at call time: run the writer with
+`sys.platform = "win32"` set first, as `tests/test_applier_page.sh` section 3b does.

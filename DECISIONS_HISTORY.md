@@ -351,6 +351,22 @@ So: merged-m19's seven zip assets are NOT deleted by hand; they stay hosted unti
 
 ---
 
+## Ruled 2026-10-05 (14z-191) — the opener's answers: PILOT's Linux records for the next release (and a ticket to test them end to end), #206 closed, ERIS's clone reset; #216 next session; #219 and the smaller tickets worked
+
+**The questions, verbatim (14z-191 opener, from NEXT_SESSION START HERE):** *"**PILOT's Linux release binaries.** These were built and gated on PILOT at the 14z-190 close (glibc 2.39, the release floor) and are not published. **Your call:** should PILOT's `BINARY.txt` records (copies in `build/agent190/pilot_rel/`) replace the tree's WSL2 ones for the next release? The standing #121 ruling says the WSL2 Linux binaries are never published, so PILOT would be the first Linux build we could publish."*; *"**#206: close it?**"* (with the 14z-190 close's figures); *"**#188: compare, then the closing question.** [...] I haven't measured the actual carried seconds yet; that's a measurer job before I put closing #188 to you."*; *"**ERIS's clone:** its 14 uncommitted files hold nothing unique. Whether to reset `~/vampire-saved` there to `main` is your call; its untracked files were not compared."*; *"**#216 (waiting on you, blocks nothing)**"*.
+
+**The maintainer:**
+- *"Should PILOT's BINARY.txt records (copies in build/agent190/pilot_rel/) replace the tree's WSL2 ones for the next release? -> Yes, also open a ticket for you to test whether the linux build is actually running properly, including when built through the release items"*
+- *"Close #206"*
+- *"#188: do the measurement, then I'll rule"*
+- *"ERIS's clone: its 14 uncommitted files hold nothing unique. Whether to reset ~/vampire-saved there to main is your call; its untracked files were not compared. -> you can reset it to main"*
+- *"#216: let's keep it for next session"*
+- *"you can do #219, and the smaller tickets/"*
+
+So: PILOT's `linux-x86_64` build (FBNeo and MAME, built at `559194f3`, glibc 2.39) is the Linux route of the next release — the tree held no tracked WSL2 Linux record, so its two `BINARY.txt` are ADDED under `release/emulators/` with the binaries beside them (ignored); the WSL2 binaries stay unpublished (#121's line, amended). A ticket is filed for the session to test that the Linux build runs properly, including through the release items (the asset a player downloads, the applier, the launcher). #206 closes `done`. #188's carried seconds are measured and put to the maintainer before a ruling. ERIS's `~/vampire-saved` is reset to `origin/main` (its tracked edits kept as a stash ref first; untracked files left). #216 waits for the next session. #219 and the smaller tickets (#215, #217, #218, #221-#225) are this session's work — where a ticket's own text puts a decision or a capture to the maintainer first (#222 and #223 before any fix, #217's "to decide"), that step stays.
+
+---
+
 ## Ruled 2026-10-04 (14z-190) — the five UNCLASSIFIED poke read-back rows (#129, #117): "as read"
 
 **The question, verbatim (14z-190):** each of the five rows of `tests/expected/poke_readback.tsv` put with what its gate does — rows 1–4, `audit_tenant_cpu_soak` (#129), the round timer `$FF8109`, the speed level `$FF8116`, P1 HP `$FF8450` and P2 HP `$FF8850`: *"The rig holds all four every frame so the CPU fight stays one long round. The gate only checks that the holds held, and refuses a leg if they didn't (`tests/audit_tenant_cpu_soak.sh:132-134`). The CPU behaviour it measures comes from other fields."* — the author's reading READS-BACK, already labelled in the gate's header; row 5, `test_vanilla_command_join` (#117), P2 HP `$FF8850`: *"The rig resets P2's HP to 0x120 before each event. The gate counts how many times P2's HP then drops, for example \"Lei-Lei's 6HP: dropped exactly once\"."* — the reading OBSERVES, matching the already-ruled `audit_df_moves` and `audit_column_shock` rows; and the ask: *"rule each row (or all five at once): \"as read\" applies READS-BACK to rows 1–4 and OBSERVES to row 5"*.

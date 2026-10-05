@@ -132,6 +132,7 @@ tests/test_demand_after_trap.sh	runner
 tests/test_bg_leg_shape.sh	runner
 tests/test_must_fire_census.sh	runner
 tests/test_module_refs.sh	runner
+tests/test_charid_names.sh	character-data
 tests/test_gate_descriptions.sh	docs
 tests/test_gate_follows.sh	runner
 tests/test_lane_carry.sh	runner
@@ -306,6 +307,7 @@ tests/test_applier_vcdiff.sh	platform
 tests/test_applier_page.sh	platform
 tests/test_applier_page_browser.sh	platform
 tests/test_release_asset_shape.sh	platform
+tests/test_release_prune.sh	platform
 tests/test_release_os_metadata.sh	platform
 tests/test_bundle_parsers.sh	platform
 tests/test_fbneo_boot_log.sh	platform
@@ -414,6 +416,8 @@ tests/run_on_snapshot.sh	runner
 tests/test_run_on_snapshot.sh	runner
 tests/test_close_checks.sh	runner
 tests/test_static_confirm.sh	runner
+tests/test_trace_static_reads.sh	runner
+tests/test_py_escapes.sh	runner
 tests/test_run_record.sh	runner
 tests/test_figure_check.sh	runner
 tests/test_rulings_verbatim.sh	runner
@@ -425,6 +429,8 @@ tests/test_promise_check.sh	runner
 tests/test_claim_lint.sh	runner
 tests/audit_demitri_split.sh	character-data
 tests/audit_pursuit_flag.sh	character-data
+tests/audit_air_dash_height.sh	character-data
+tests/audit_landing_sound.sh	character-data
 tests/audit_ladder_pick_store.sh	character-data
 tests/test_close_standing.sh	runner
 tests/audit_tenant_continue_switch.sh	tenant

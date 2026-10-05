@@ -3,6 +3,7 @@
 # do not yet (undeclared SHRINKS only). GitHub #171 slice Q0. Gate:
 # tests/test_gate_descriptions.sh; reader tools/gate_descriptions.py. Regenerate
 # with FREEZE=1 after review. class<TAB>gate
+declares	audit_air_dash_height
 declares	audit_air_gc_legacy
 declares	audit_capture_matrix
 declares	audit_chains174
@@ -61,6 +62,7 @@ declares	audit_kill_poke_shape
 declares	audit_ladder_pick_store
 declares	audit_ladder_selector
 declares	audit_lag_budget
+declares	audit_landing_sound
 declares	audit_latch_reads
 declares	audit_legacy_pairings
 declares	audit_marionette_cost
@@ -160,6 +162,7 @@ declares	test_bundle_parsers
 declares	test_capture_kf_ownership
 declares	test_capture_pose_sources
 declares	test_census_regions
+declares	test_charid_names
 declares	test_charmap_current
 declares	test_charmap_overrides
 declares	test_checkdocs
@@ -348,6 +351,7 @@ declares	test_pokes_ranges
 declares	test_projectile_census
 declares	test_projectile_params
 declares	test_promise_check
+declares	test_py_escapes
 declares	test_pyron_blink
 declares	test_pyron_cosmo
 declares	test_pyron_ladder
@@ -376,6 +380,7 @@ declares	test_release_binaries
 declares	test_release_launcher
 declares	test_release_launcher_bat
 declares	test_release_os_metadata
+declares	test_release_prune
 declares	test_release_roundtrip
 declares	test_replay_stage_census
 declares	test_replay_video_selfcheck
@@ -419,6 +424,7 @@ declares	test_tenant_winpal
 declares	test_thunk_addr_literal
 declares	test_tick_durations
 declares	test_tickets
+declares	test_trace_static_reads
 declares	test_type_stamp_census
 declares	test_unless_composed
 declares	test_vanilla_aerial_join

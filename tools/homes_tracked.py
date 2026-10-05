@@ -9,7 +9,8 @@ lived in no file). Companion of tools/close_findings.py (addresses) — this one
 sees FILE NAMES, not findings.
 
   python3 tools/homes_tracked.py "(12) THE FINDINGS TABLE" [--state STATE.md] [out]
-  python3 tools/homes_tracked.py --newest            # the newest group's findings row
+  python3 tools/homes_tracked.py --newest [out]      # the newest group's findings row (the 2nd word is an OUTPUT
+                                                     #   path: the state file or a tracked file is REFUSED, 14z-191)
 
 The row is the STATE.md table row whose first cell starts with the given text
 (`--newest`: the first `THE FINDINGS TABLE` row in file order, the current
@@ -55,6 +56,7 @@ drops the bare-name resolution (the pre-#205 tool: a bare name silent) and
 self-test must FAIL on.
 """
 import hashlib
+import os
 import pathlib
 import re
 import subprocess
@@ -372,7 +374,15 @@ def main():
     out.insert(0, f"# homes_tracked.py — row '{prefix}' of {state} ({row[:60]!r}...): every file named as a home or test checked against git ls-files; FAIL {fail}; ROW FINGERPRINT {fp} (sha1 of the row's text — an output whose fingerprint differs from a fresh run's was made on another row; the gate re-runs the tool on the newest row at every tier)")
     text = "\n".join(out) + "\n"
     if len(a) > 1:
-        pathlib.Path(a[1]).write_text(text, encoding="utf-8")
+        # THE OUTPUT IS NEVER AN INPUT (14z-191): `--newest STATE.md` reads as "the newest row of STATE.md" and was
+        # run that way — the second word is the OUTPUT path, and the report overwrote STATE.md, every edit of the
+        # sitting with it. A path that is the state file read, or any tracked file, is refused before writing.
+        o = a[1]
+        if pathlib.Path(o).resolve() == pathlib.Path(state).resolve() or os.path.normpath(o) in tracked:
+            sys.stdout.write(f"REFUSED: the output path {o} is " + ("the state file this run reads" if pathlib.Path(o).resolve() == pathlib.Path(state).resolve() else "a tracked file")
+                             + " — the report would overwrite it; give an untracked path (or none: the report is printed)\n")
+            sys.exit(3)
+        pathlib.Path(o).write_text(text, encoding="utf-8")
     sys.stdout.write(text)
     sys.exit(1 if fail else 0)
 

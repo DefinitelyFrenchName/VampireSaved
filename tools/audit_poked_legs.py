@@ -55,9 +55,11 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from select_paths import resolve, START  # noqa: E402
 
+# the atlas slot table (docs/game/atlas/character_tables.md), held by tests/test_charid_names.sh (#218:
+# 0x0A-0x0E were shifted one row until 14z-191)
 NAMES = {0x00: "Bulleta", 0x01: "Demitri", 0x02: "Gallon", 0x03: "Victor", 0x04: "Zabel", 0x05: "Morrigan",
-         0x06: "Anakaris", 0x07: "Felicia", 0x08: "Bishamon", 0x09: "Aulbath", 0x0A: "Q-Bee", 0x0B: "random",
-         0x0C: "Lei-Lei", 0x0D: "Lilith", 0x0E: "Sasquatch", 0x0F: "Jedah", 0x10: "Phobos", 0x11: "Pyron",
+         0x06: "Anakaris", 0x07: "Felicia", 0x08: "Bishamon", 0x09: "Aulbath", 0x0A: "Sasquatch", 0x0B: "random",
+         0x0C: "Q-Bee", 0x0D: "Lei-Lei", 0x0E: "Lilith", 0x0F: "Jedah", 0x10: "Phobos", 0x11: "Pyron",
          0x12: "Marionette", 0x13: "Donovan", 0x18: "Oboro"}
 FLAVOR_CELLS = {0x10: 0x00, 0x13: 0x01}          # what the confirm writes on that cell; others leave 00
 POKE_RE = re.compile(r"(\d+):(ff8782|ff8b82):(\$\{?\w+\}?|[0-9a-fA-F]{2})")

@@ -5,17 +5,19 @@
 # WHAT: tests/run_all_emulator.sh's verdicts mean what they say: PASS / FAIL / SKIP counted
 #   apart, SKIP-in-prose read as PASS, a non-executable registry row MISSING, a timeout
 #   TIMEOUT, the anti-orphan check both ways, --strict, the prereq stop, --scope,
-#   placeholder expansion, the exported MAME_BIN and the controls reader.
+#   placeholder expansion, the exported MAME_BIN, the controls reader, and a --dry-run
+#   writing no commit of record (#219).
 # HOW: a synthetic repository of stub gates with KNOWN verdicts is driven through the REAL
 #   runner by symlink (never a copy of its logic), with stub tools so the runner's own
-#   preconditions run; three controls run copies of the runner with a piece removed (the
-#   export, the reader, an executable row).
+#   preconditions run; four controls run copies of the runner with a piece removed (the
+#   export, the reader, an executable row, the --dry-run guard).
 # EXPECTS: every case reads the verdict it was built to produce and each control's section
 #   fails on its copy; a red names the case — a wrong reading here would turn the release
 #   policy into a rubber stamp.
 #
 # MUST-FIRE: shadow-tool: export-removed — a copy of the runner without `export MAME_BIN` must leave the gate's MAME_BIN UNSET (mode: that copy is the runner every section drives; section 11 must fail)
 # MUST-FIRE: shadow-tool: reader-unplugged — a copy that hands the classifier no gate script must let a declared-but-unfired control read PASS (mode: section 14 must fail)
+# MUST-FIRE: shadow-tool: dry-run-records — a copy of the runner without the --dry-run guard on commit.txt must write a run of record on a dry run (mode: that copy is the runner every section drives; section 15's dry-run case must fail)
 # MUST-FIRE: perturbed-copy: row-not-executable — a farm of symlinks to the REAL scripts named by the REAL tests/ci_emulator.tsv, with ONE replaced by a non-executable copy, must make section 10b report it unrunnable (mode: that farm is what 10b checks; section 10b must fail)
 #
 # WHY A GATE FOR THE RUNNER, again. CLAUDE.md §4: "Verdict logic is itself
@@ -70,10 +72,14 @@ sed '/^export MAME_BIN$/d' "$RUNNER" > "$T/runner_noexport.sh"
 cmp -s "$RUNNER" "$T/runner_noexport.sh" && fail "could not remove the export line — it moved"
 sed 's|vs_classify "$_st" "$_log" 90 "tests/$_g.sh"|vs_classify "$_st" "$_log" 90|' "$RUNNER" > "$T/runner_unplugged.sh"
 cmp -s "$RUNNER" "$T/runner_unplugged.sh" && fail "could not unplug the reader — the vs_classify call moved"
-chmod +x "$T/runner_noexport.sh" "$T/runner_unplugged.sh"
+# the --dry-run guard on commit.txt removed (14z-191, #219)
+sed 's|^if \[ "\$DRY" = 0 \] && \[ ! -f "\$LOGDIR/commit.txt" \]; then$|if [ ! -f "$LOGDIR/commit.txt" ]; then|' "$RUNNER" > "$T/runner_dryrecords.sh"
+cmp -s "$RUNNER" "$T/runner_dryrecords.sh" && fail "could not remove the --dry-run guard — the commit.txt line moved"
+chmod +x "$T/runner_noexport.sh" "$T/runner_unplugged.sh" "$T/runner_dryrecords.sh"
 case "$VS_CTL" in
 export-removed)   ln -s "$T/runner_noexport.sh" "$FR/tests/run_all_emulator.sh" ;;
 reader-unplugged) ln -s "$T/runner_unplugged.sh" "$FR/tests/run_all_emulator.sh" ;;
+dry-run-records)  ln -s "$T/runner_dryrecords.sh" "$FR/tests/run_all_emulator.sh" ;;
 *)                ln -s "$RUNNER" "$FR/tests/run_all_emulator.sh" ;;
 esac
 # the runner sources THE ONE classifier relative to its repo (14z-139), so
@@ -560,6 +566,17 @@ run --lane mame --log "$T/l15b" >/dev/null 2>&1 || true
 c15b="$(head -1 "$T/l15b/commit.txt" 2>/dev/null)"
 [ -n "$head15" ] && [ "$c15b" = "$head15" ] && ok "commit.txt's first line is the HEAD the run measured" \
                                              || fail "commit.txt in git: '$c15b', HEAD '$head15'"
+# a --dry-run executes nothing and writes no commit of record (14z-191, GitHub #219): the
+# staleness audit takes the newest directory carrying commit.txt as the run of record
+run --lane mame --dry-run --log "$T/l15e" >/dev/null 2>&1 || true
+[ -d "$T/l15e" ] && [ ! -f "$T/l15e/commit.txt" ] && ok "--dry-run wrote no commit.txt (no run of record)" \
+    || fail "--dry-run: commit.txt present (or no run directory) in $T/l15e"
+# MUST-FIRE: the same dry run through the copy without the guard writes one
+ln -s "$T/runner_dryrecords.sh" "$FR/tests/run_all_emulator_dryrec.sh"
+(cd "$FR" && ROMDIR="$T/roms" MERGED=build/fake_merged sh tests/run_all_emulator_dryrec.sh --lane mame --dry-run --log "$T/l15f" >/dev/null 2>&1) || true
+[ -f "$T/l15f/commit.txt" ] && vs_ctl_fired dry-run-records "without the guard a dry run writes $T/l15f/commit.txt" \
+                           || { vs_ctl_dead dry-run-records "the unguarded copy wrote no commit.txt on a dry run"; fail "dry-run-records"; }
+rm -f "$FR/tests/run_all_emulator_dryrec.sh"
 # a stub staleness audit naming one gate: --stale runs it and nothing else
 printf '#!/usr/bin/env python3\nimport sys\nif "--names" in sys.argv: print("g_out")\n' > "$FR/tools/audit_emulator_staleness.py"
 run --lane mame --stale --log "$T/l15c" >/dev/null 2>&1 || true

@@ -54,6 +54,10 @@ def tickets(root):
 def cite(root, value, role):
     """one home or test value -> its text in the table's form"""
     v = value.strip()
+    if " — " in v and PERTURB != "form-unchecked":
+        # #224 (14z-191): the table splits a finding at its LAST ` — `, so a separator inside a home or a
+        # test moves the split and tools/findings_anchors.py reads the tail as the home
+        raise Refused(f"{role} {v!r} contains ' — ', the table's own separator: shorten the anchor")
     m = re.fullmatch(r"(?:GitHub )?#(\d+)", v)
     if m:
         st = tickets(root).get(m.group(1))
@@ -175,7 +179,8 @@ def selftest():
                         (dict(finding="x", homes=["a.md"], tests=None, ticket=None, none=""), "reason"),
                         (dict(finding="x", homes=["a.md"], tests=None, ticket=6, none=None), "not open"),
                         (dict(finding="has (q) inside", homes=["a.md"], tests=["tests/t.sh"], ticket=None, none=None), "letter form"),
-                        (dict(finding="x", homes=["a.md"], tests=["tests/t.sh"], ticket=7, none=None), "exactly one")):
+                        (dict(finding="x", homes=["a.md"], tests=["tests/t.sh"], ticket=7, none=None), "exactly one"),
+                        (dict(finding="x", homes=["a.md Ruled — y"], tests=["tests/t.sh"], ticket=None, none=None), "separator")):
             r, why = tryit(**k)
             say(r is None and want in why, f"refused: {want}")
         before = open(os.path.join(d, "STATE.md")).read()

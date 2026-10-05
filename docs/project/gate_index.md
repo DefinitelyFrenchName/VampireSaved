@@ -16,18 +16,18 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**429 scripts** — 115 ci_portable, 88 ci_static, 226 emulator-tier (run by name).
+**435 scripts** — 119 ci_portable, 88 ci_static, 228 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 41 | the suite runners and their own ground truth |
+| [runner](#runner) | 43 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
-| [platform](#platform) | 42 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
+| [platform](#platform) | 43 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 60 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 73 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 76 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -68,6 +68,7 @@ the suite runners and their own ground truth.
 | `tests/test_must_fire_census.sh` | test | ci_portable | — | THE MUST-FIRE DOCTRINE, MACHINE-READ under the R10 grammar: which gates DECLARE a must-fire control (`# MUST-FIRE: <shape>: | 14z-145 |
 | `tests/test_poke_readback.sh` | test | ci_portable | — | EVERY GATE THAT SAMPLES AN ADDRESS ITS OWN RIG POKES IS ON THE TABLE, and the table's classification is the maintainer's, not the tool's (GitHub #171 slice Q6, shape 4 of docs/project/gate_qualification_scope.md). ci_portable: | 14z-180 |
 | `tests/test_promise_check.sh` | test | ci_portable | — | every promise a sitting's record makes is classed FULFILLED, CARRIED or NOT A PROMISE, and each class holds (`tools/promise_check.py`, 14z-187b, GitHub #190 P3). | 14z-187b |
+| `tests/test_py_escapes.sh` | test | ci_portable | — | NO TRACKED PYTHON FILE CARRIES AN INVALID STRING ESCAPE (14z-191). ci_portable: no ROM, ~3 s. | 14z-191 |
 | `tests/test_rule_checker.sh` | test | ci_portable | — | the adversarial RULE-CHECKER's record is sound: every run in tests/rulecheck/ledger.tsv is complete and structured, every planted violation was caught, every fixture is calibrated, every VIOLATED resolved, and every freeze since the checker… | 14z-163 |
 | `tests/test_rulings_verbatim.sh` | test | ci_portable | — | a quote a session attributes to the maintainer is the maintainer's own words, and every message the maintainer sent is on record (`tools/agent/rulings_verbatim.py`, 14z-185b, #190 P2). | 14z-185b |
 | `tests/test_run_on_snapshot.sh` | test | ci_portable | — | S6 OF GitHub #153 (and #181's inputs): a run on a snapshot is IMMUNE to the working tree (ruled 2026-09-26, DECISIONS_HISTORY.md "Ruled 2026-09-26 (14z-183b) — #153"; | 2026-09-26 |
@@ -78,6 +79,7 @@ the suite runners and their own ground truth.
 | `tests/test_suite_dispatch.sh` | test | emulator | MAME, a build dir | ground truth for the auto-detecting runner's dispatch pieces (no emulator needed; the emulator-side behaviors they gate are proven by test_m2_repoint.sh and the suite itself): 1. build_fingerprint: vanilla rompath -> 'vsavj'; | 14z-132 |
 | `tests/test_suite_dispatch_selftest.sh` | test | ci_static | ROMDIR | ground truth for the kind->owner table in tests/test_suite_dispatch.sh (14z-90, GitHub issue #7). | 14z-90 |
 | `tests/test_superseded_pins.sh` | test | ci_portable | — | no live line in tests/ or tools/ pins a fingerprint the registry has SUPERSEDED (`tools/superseded_pins.py`, 14z-185b, GitHub #167). | 14z-185b |
+| `tests/test_trace_static_reads.sh` | test | ci_portable | — | #188's TRACED TEST, PROMOTED: the scorer finds a read the predictor does not flag, and its over-narrowed control must miss (GitHub #225, 14z-191). ci_portable: no ROM, no emulator, no strace, ~3 s. | 14z-191 |
 
 ## docs
 
@@ -149,6 +151,7 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 | `tests/test_release_launcher.sh` | test | ci_portable | — | THE PLAYER'S LAUNCHER, DRIVEN (2026-09-20). | 2026-09-20 |
 | `tests/test_release_launcher_bat.sh` | test | ci_portable | — | THE WINDOWS LAUNCHER, PLAY.bat, and WHAT EACH PACKAGE'S TEXT PROMISES ABOUT LAUNCHERS (14z-189, GitHub #145). | 14z-189 |
 | `tests/test_release_os_metadata.sh` | test | ci_portable | — | a file manager's folder metadata (`.DS_Store`) in a release tree is never shipped and never counted: the real uploader cuts no asset carrying one, and every release listing that can see a dotfile drops it through the one definition, tests/l… | 14z-180 |
+| `tests/test_release_prune.sh` | test | ci_portable | — | `tools/upload_release_assets.sh --prune` EMPTIES EVERY EARLIER MERGED FREEZE RELEASE THAT STILL HOLDS A ZIP, walking past freezes that were never released (GitHub #221, 14z-191). ci_portable: | 14z-191 |
 | `tests/test_release_roundtrip.sh` | test | ci_static | ROMDIR | THE RELEASE PACKAGE GATE (14z-105). | 14z-105 |
 | `tests/test_replay_stage_census.sh` | test | ci_portable | — | FREEZE the input-staging convention of every replay-driving Lua instrument (14z-93, GitHub issue #10). No ROMs, no emulator, ~1s. | 14z-93 |
 | `tests/test_replay_video_selfcheck.sh` | test | emulator | MAME, FBNeo, a build dir | ground truth for replay.lua's VIDEO_OUT, the MAME per-frame framebuffer checksum. | session 14z |
@@ -391,6 +394,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 | gate | kind | tier | needs | locks (the script's own header) | since |
 |---|---|---|---|---|---|
+| `tests/audit_air_dash_height.sh` | audit | emulator | MAME, a build dir, ~2 min | PHOBOS'S AIR DASH UNDER vs2's MINIMUM HEIGHT: native refuses it, ours performs it (GitHub #222, measured in play 14z-191). Emulator tier (MAME), ~2 min. | 14z-191 |
 | `tests/audit_air_gc_legacy.sh` | audit | emulator | MAME, FBNeo, a build dir, ~7 s | THE LEGACY CONTROL FOR #182: no original character's AIR block opens the guard window or commits a guard cancel, on pristine vsavj, native vs2 or ours (14z-185, GitHub #182). | 14z-185 |
 | `tests/audit_chains174.sh` | audit | emulator | MAME, a build dir, ~2 min | THE TENANTS' ONCE NEVER-ENTERED a2 ATTACK CHAINS, ENTERED ON NATIVE AND COMPARED WITH OURS (GitHub #174, 14z-184). | 14z-184 |
 | `tests/audit_chains184.sh` | audit | emulator | MAME, FBNeo, a build dir, ~3 min | THE TENANTS' ONCE NEVER-ENTERED a2 CHAINS WITH NO ATTACK RECORD, ENTERED ON NATIVE AND COMPARED WITH OURS (GitHub #184, 14z-186). | 14z-186 |
@@ -422,6 +426,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/audit_hitbox_parity.sh` | audit | emulator | MAME, a build dir, ~2 min | THE HITBOXES IN PLAY, ours vs native (14z-181, GitHub #136): on every frame where a tenant's naming rig has both legs on the SAME node, the seven resolved hitbox pointers and the node's box-id word are equal — the resolution per node is ide… | 14z-181 |
 | `tests/audit_ladder_pick_store.sh` | audit | emulator | MAME, ~2 min | +0x382 IS THE CHARACTER ID, AND THE 1P ARCADE LADDER WRITES THE CPU SIDE'S BEFORE IT LOADS: the measurements that retracted 14z-87's "voice-class borrow" (GitHub #195, #202; 14z-188), on pristine vsavj. | 14z-87 |
 | `tests/audit_lag_budget.sh` | audit | emulator | MAME, FBNeo, a build dir | A FIX SET ADDS NO FRAME OF LAG: over every #136 naming part (the three tenants' moves, and legacy attackers against each tenant), the build under test has no zero-pass frame that the reference build — the one before the fixes — does not hav… | 14z-170 |
+| `tests/audit_landing_sound.sh` | audit | emulator | MAME, a build dir, ~4 min | THE TENANTS' LANDING SOUND: vs2 gives Phobos the big-body landing and Donovan the ordinary one; ours the other way round (GitHub #223, measured in play and by ear 14z-191). Emulator tier (MAME), ~4 min. | 14z-191 |
 | `tests/audit_latch_reads.sh` | audit | emulator | MAME, a build dir, ~2 min | WHO READS THE SELECT-CONFIRM LATCH IN PLAY, per leg shape, with the VALUE each reader saw: the measured half of the #151 step-3 sweep, frozen (14z-161). | 14z-161 |
 | `tests/audit_marionette_cost.sh` | audit | emulator | MAME, FBNeo, ~4 min | WHAT A MARIONETTE PORT WOULD COST vsavj: every place vs2 touches her flag +0x3C3, the vsavj instruction a port would have to hook there, how often LEGACY content executes each one, and her assets' size (14z-189, GitHub #128 — the maintainer… | 14z-189 |
 | `tests/audit_mizuumi_struct.sh` | audit | emulator | MAME, FBNeo, a build dir, ~4 min | THE MIZUUMI PLAYER-STRUCT CANDIDATES, MEASURED: the offsets adopted into atlas/ram.md from the community's Reverse Engineering page, each held by a check whose CONTROL would disagree (14z-189, GitHub #118) | 14z-189 |
@@ -442,8 +447,9 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/audit_tick_phase.sh` | audit | emulator | MAME, a build dir, ~60 s | THE ENGINE'S DOUBLE-PASS CADENCE IS PERIODIC IN FRAMES, AND ITS PERIOD IS WHAT tools/name_moves.py QUANTISES ITS SCHEDULE SHIFT TO (14z-172, GitHub #168). | 14z-172 |
 | `tests/audit_victim_parity.sh` | audit | emulator | MAME, a build dir, ~2 min | THE TENANT AS THE VICTIM, ours vs native (14z-181, GitHub #136): the `<tenant>_victim` rigs of tools/name_moves.py — Victor attacking the tenant with every contact class — run on BOTH legs as REAL cursor picks, and the victim's reaction per… | 14z-181 |
 | `tests/test_advancing_guard.sh` | test | emulator | MAME, ~2.5 min | THE ADVANCING GUARD (guard push), MEASURED on native vs2 and on vsavj, and frozen (14z-123, the documentation pass's G2). | 14z-123 |
-| `tests/test_air_attack_height.sh` | test | ci_static | ROMDIR | vsavj's MINIMUM AIR-ATTACK HEIGHT table, read where the code reads it (14z-189; the 14z-121 "36" corrected). ci_static: ROMDIR only. | 14z-189 |
+| `tests/test_air_attack_height.sh` | test | ci_static | ROMDIR | vsavj's MINIMUM AIR-DASH HEIGHT table, read where the code reads it (14z-189; the 14z-121 "36" corrected; "air-attack" CORRECTED to AIR-DASH 14z-191 — every caller's taken branch enters seq 0x14, the air dash, docs/game/engine_internals.md;… | 14z-189 |
 | `tests/test_anim_node_walk.sh` | test | emulator | MAME, a build dir, ~2 min | THE ANIMATION-NODE DECODER IS AN INSTRUMENT (character-data map, phase 1; 14z-118). tools/anim_nodes.py reads the per-character anim index tables and walks the 0x18-byte node chains by the rules read off vs2's walker (PRG:0x02713C / 0x0271C… | 14z-118 |
+| `tests/test_charid_names.sh` | test | ci_portable | — | EVERY IN-TREE CHARACTER-ID -> NAME MAP AGREES WITH THE ATLAS SLOT TABLE (GitHub #218, 14z-191). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-191 |
 | `tests/test_community_crosscheck.sh` | test | ci_static | ROMDIR | OUR DERIVED VANILLA FRAME DATA STILL SAYS WHAT THE COMMUNITY WORKBOOK SAYS (14z-125, the community cross-check). | 14z-125 |
 | `tests/test_defense_rows_census.sh` | test | ci_static | ROMDIR | THE DEFENSE CURVE AND RALLY THRESHOLD OF EVERY CHARACTER ID, vsavj against vs2 and our build, frozen (14z-168): the 15 legacy characters are identical between the games but for Sasquatch's row, vsavj's variant ids carry COPIES of their base… | 14z-168 |
 | `tests/test_df_field_readers.sh` | test | ci_static | ROMDIR | EVERY PLACED INSTRUCTION THAT NAMES ONE OF vs2's DARK FORCE POWER FIELDS BY DISPLACEMENT, with the access it makes, frozen (14z-168, GitHub #136 / #157's Dark Force tail): | 14z-168 |

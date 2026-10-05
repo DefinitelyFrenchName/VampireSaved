@@ -1,0 +1,58 @@
+cps2 — MAME 0.288, CPS-2 subtarget, carrying the CPS-2 WIDE v1 driver patch, prebuilt for linux-x86_64
+========================================================================================================
+
+# Every file in this directory, and its sha256 — verify before running:
+#   awk '/^sha256 /{print $2"  "$3}' BINARY.txt | shasum -a 256 -c     (macOS, or any host with perl)
+#   awk '/^sha256 /{print $2"  "$3}' BINARY.txt | sha256sum -c        (Linux, MSYS2)
+sha256 85d3edb448e3d5c52bf6afd8a425f83795389929c33a5bf20fb9b735b50f11c0 cps2
+sha256 667797fbd464b12c65a2b5c3105118072c5b3a1291d6315ecb84e2b7c1b7d362 libSDL2-2.0.so.0
+sha256 7ae63dbc8295e1b1fd1893855237ab37466d223f9dbb056155571603b4f8d1f5 libSDL2_ttf-2.0.so.0
+sha256 0bfea7e41f85346ad911596934a9d25a0a86871dfea83250e7c659ed54d669b5 libbrotlicommon.so.1
+sha256 b42bcbb9fbc051592b5ad56240f7879cf1e2e30da5aa46fc7c1a57c8466f9ad0 libbrotlidec.so.1
+sha256 95905d850bca3b4a80a2d83386c694ea782de6e1129a0a8a13ab743914befdb3 libbz2.so.1.0
+sha256 46561f9c9da28d63e1ecd9ae693cc461a6e8f7cf344dce499cef00447b58be99 libdecor-0.so.0
+sha256 9fc31efc0f11b3174bf783ff08a615c6395e18183f620f050e5542523f90d3aa libexpat.so.1
+sha256 7ecee0ec45cea5419b0bc016bf8a37a1dd0c181a70c200307a2df91cfe37f82e libfontconfig.so.1
+sha256 a68bed3a048566f3b9dd80306580676c372e1aade88f13cf4434c7a3729b50ac libfreetype.so.6
+sha256 4c4a843991d23faad741a33b99bf049bee88b7b0827956ea1cdc563816a5332b libglib-2.0.so.0
+sha256 434fbc8a98c8de97289d73fa94fb8890eba3fba0f18d6a4deae4ff272ffceeaf libgraphite2.so.3
+sha256 883b045162bc0c91935f2c83970fede7fc8f9221e6b9227e88c07e9e84340610 libharfbuzz.so.0
+sha256 69dc057ace937e8c353bf077bd142ec8c55934731b29e66031f3243f3ec73642 libpcre2-8.so.0
+sha256 c12d1d2cced8c74e531705459e1f6b4354f740adf34f840629e6d332b19f638c libpng16.so.16
+sha256 95e5391b2a2ed0d85e269f12431363987ac2b2e78f0f8289890e5b1fbcc171ca libsamplerate.so.0
+sha256 e6c04f0b913981ef1b0e5ca93c35c04f31bc1281b6527892bdded22ad2214107 libxkbcommon.so.0
+sha256 49804fe77e5c8b9f638a4fea110bd4c1a4ad9de41eb7ca0e186204954af5cb07 libz.so.1
+
+upstream   https://github.com/mamedev/mame
+pin        27a8d9e85b58058965907d1d8a7a92f8ed039348
+patch      0002-cps2-wide-v1.patch  sha1 1d13c9d80dc61cf39ddba16aaa30d8db0acb1131  (the ONLY patch applied; the project's replay-harness patch is a test instrument and is not in this binary)
+recipe     git clone https://github.com/mamedev/mame mame && cd mame && git checkout 27a8d9e85b58058965907d1d8a7a92f8ed039348 && git apply 0002-cps2-wide-v1.patch && make SUBTARGET=cps2 SOURCES=src/mame/capcom/cps2.cpp NOWERROR=1 REGENIE=1 USE_QTDEBUG=0 -j6
+built      2026-10-04 on Ubuntu 24.04.5 LTS (x86_64), cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, by tools/build_release_emulators.sh mame
+tree       559194f382d5
+jobs       6
+env        Ubuntu 24.04.5 LTS (kernel 7.0.0-38-generic); ldd (Ubuntu GLIBC 2.39-0ubuntu8.9) 2.39
+env        dpkg build-essential 12.10ubuntu1
+env        dpkg gcc 4:13.2.0-7ubuntu1
+env        dpkg make 4.3-4.1build2
+env        dpkg python3 3.12.3-0ubuntu2.1
+env        dpkg git 1:2.43.0-1ubuntu7.3
+env        dpkg rsync 3.2.7-1ubuntu1.5
+env        dpkg patch 2.7.6-7build3
+env        dpkg pkgconf 1.8.1-2build1
+env        dpkg zip 3.0-13ubuntu0.2
+env        dpkg unzip 6.0-28ubuntu4.1
+env        dpkg perl 5.38.2-3.2ubuntu0.6
+env        dpkg patchelf 0.18.0-1.1build1
+env        dpkg binutils 2.42-4ubuntu2.10
+env        dpkg coreutils 9.4-3ubuntu6.3
+env        dpkg diffutils 1:3.10-1ubuntu0.1
+env        dpkg libsdl2-dev 2.30.0+dfsg-1ubuntu3.1
+env        dpkg libsdl2-image-dev 2.8.2+dfsg-1build2
+env        dpkg libsdl2-ttf-dev 2.22.0+dfsg-1
+env        dpkg libfontconfig-dev 2.15.0-1.1ubuntu2
+env        dpkg qmake6 6.4.2+dfsg-21.1build5
+requires   glibc 2.38 or newer, x86_64 (built on Ubuntu 24.04.5 LTS (x86_64), cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0 — glibc is backward compatible, never forward, so an OLDER distribution than the build host will refuse to start). The libraries the recipe links from the package manager (SDL2, SDL2_ttf and fontconfig (the sdl OSD)) are bundled here and found through RUNPATH=$ORIGIN. DELIBERATELY NOT bundled, because they belong to your machine: glibc itself, the GPU stack (libGL/libEGL/libdrm), the X11/Wayland and udev/dbus clients, and ALSA/PulseAudio — install your distribution's SDL2 runtime dependencies if the binary reports a missing one.
+run        `./cps2 vsavjw -rompath "/path/to/your/built/set"` (the built vsavjw.zip is the only file needed: the release set is standalone). `./cps2 -verifyroms vsavjw -rompath ...` says `is bad` BY DESIGN and must list exactly the members inside vsavjw.zip as INCORRECT CHECKSUM (stock CRCs for the members the port rewrites, sentinel CRCs for the new ones) — a NOT FOUND line is the real problem. MAME's own UI (Tab) maps controls.
+first run  no signature and no quarantine on Linux: `chmod +x` the executable if your unzip dropped the bit, then run it from this directory. The sha256 rows above are the integrity check.
+not works  "Unknown system: vsavjw" means the binary is not this one (no driver patch). A stock emulator fed the set renamed to vsavj.zip STALLS on the legal screen forever (measured 2026-09-11) — renaming is never the fix.
+provenance a prebuilt is the recipe above run on one host and nothing else; the reviewable trust surface stays the patch (its sha1 above). Rebuild from the recipe to check: the binary is rebuildable, not byte-reproducible (link order, timestamps).

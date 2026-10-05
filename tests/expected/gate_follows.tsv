@@ -3,6 +3,7 @@
 # which do not yet (undeclared SHRINKS only). GitHub #171 slice Q3. Gate:
 # tests/test_gate_follows.sh; reader tools/gate_follows.py. Regenerate with FREEZE=1
 # after review. class<TAB>gate
+declares	audit_air_dash_height
 declares	audit_air_gc_legacy
 declares	audit_chains174
 declares	audit_chains184
@@ -59,6 +60,7 @@ declares	audit_kill_poke_shape
 declares	audit_ladder_pick_store
 declares	audit_ladder_selector
 declares	audit_lag_budget
+declares	audit_landing_sound
 declares	audit_latch_reads
 declares	audit_legacy_pairings
 declares	audit_marionette_cost

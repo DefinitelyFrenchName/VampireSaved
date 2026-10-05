@@ -1,0 +1,4 @@
+# tests/expected/charid_name_maps_floor.txt — the fewest character-id -> name maps
+# tests/test_charid_names.sh accepts (rises only; FREEZE=1 after review). Provenance:
+# tests/expected/PROVENANCE.md.
+4

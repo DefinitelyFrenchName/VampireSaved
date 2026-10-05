@@ -550,7 +550,7 @@ Almost every first-time problem is one of these.
 - **On Windows, double-clicking `fbneo.exe` flashes a window shut, or MAME's
   `cps2.exe` says files are "NOT FOUND"** — the emulator was started without
   being told which game to run or where it is. Double-click `PLAY.bat` instead:
-  it starts FBNeo as `fbneo.exe vsavjw` with the set in `roms\` beside it, and
+  it starts FBNeo as `fbneo.exe vsavjw` with the set in `roms\\` beside it, and
   MAME as `cps2.exe vsavjw -rompath rompath`.
 - **"Unknown system: vsavjw" / "no such driver"** — the emulator is not the
   prepared one, so it does not know this game. Use the emulator in this package,

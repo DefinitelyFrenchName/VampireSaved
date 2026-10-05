@@ -8,19 +8,25 @@ cited descriptive anchors ("the ugrep section", "The session column") that no li
 
   python3 tools/findings_anchors.py check ROW_TITLE STATE_FILE
       for every finding (a), (b), ... of the row: the words after the backticked home file, up to ' / ' (and without
-      a trailing ', GitHub #N'), must be found as a fixed string in that file. A home with no file (a GitHub #N home)
-      is listed SKIP. Prints `anchors checked N  not found M`; exit 1 when M > 0.
+      a trailing ', GitHub #N'), must be found as a fixed string in that file. A home that is only a ticket
+      (`GitHub #N`) is listed SKIP; any OTHER home with no backticked file is UNRESOLVED and counts as not found —
+      #224 (14z-191): an anchor holding the table's own separator ` — ` split there, the tail ("#162 is parked")
+      read as a home with no file, and it was SKIPped with exit 0, a check passing without checking.
+      Prints `anchors checked N  not found M`; exit 1 when M > 0.
   python3 tools/findings_anchors.py plant ROW_TITLE STATE_FILE OUT
       writes OUT, a copy of STATE_FILE whose FIRST file-anchored finding has its anchor replaced by one no file holds
       (the check's must-fire plant, generated from the live row so it never goes stale).
-  python3 tools/findings_anchors.py --selftest
-      a synthetic row with a found anchor, a missing anchor and a ticket-only home, each against its known answer.
+  python3 tools/findings_anchors.py --selftest [--perturb skip-unresolved]
+      a synthetic row with a found anchor, a missing anchor and a ticket-only home, each against its known answer,
+      and a home split by the table's separator (#224). `--perturb skip-unresolved` restores the pre-#224 SKIP of
+      an unresolved home — its self-test must FAIL (the must-fire control of tests/test_close_standing.sh).
 
 WHAT IT CANNOT SEE: whether the anchored paragraph STATES the finding (a hand read); a home given only as a ticket.
 """
 import os, re, sys, tempfile
 
 PLANTED = "ZZ-NO-FILE-HOLDS-THIS-ANCHOR"
+PERTURB = ""
 
 def row_of(title, state):
     for line in open(state, encoding="utf-8"):
@@ -44,7 +50,11 @@ def check(title, state, root="."):
     bad = n = 0
     for letter, path, anchor in findings(row_of(title, state)):
         if path is None:
-            print(f"SKIP  ({letter}) home has no file: {anchor[:70]}")
+            if re.fullmatch(r"GitHub #\d+", anchor) or PERTURB == "skip-unresolved":
+                print(f"SKIP  ({letter}) home is a ticket only: {anchor}")
+            else:
+                n += 1; bad += 1
+                print(f"FAIL  ({letter}) home UNRESOLVED (no backticked file, not a GitHub #N): {anchor[:70]}")
             continue
         n += 1
         try:
@@ -78,12 +88,18 @@ def selftest():
     ok = check("(9) T", st, d) == 0
     out = os.path.join(d, "plant.md")
     ok &= plant("(9) T", st, out) == 0 and check("(9) T", out, d) == 1
-    print("SELFTEST " + ("PASS" if ok else "FAIL") + ": a found anchor passes, a ticket home is SKIP, the generated plant fails")
+    # #224: an anchor carrying the table's separator splits there and leaves a home with no file — a FAIL, not a SKIP
+    st2 = os.path.join(d, "STATE2.md")
+    open(st2, "w").write("| **(8) U** | (a) one — `home.md` THE REAL — HEADING / none (r) |\n")
+    ok &= check("(8) U", st2, d) == 1
+    print("SELFTEST " + ("PASS" if ok else "FAIL") + ": a found anchor passes, a ticket home is SKIP, the generated plant fails, "
+          "a home split by the separator fails")
     return 0 if ok else 1
 
 if __name__ == "__main__":
     a = sys.argv[1:]
-    if a == ["--selftest"]:
+    if a[:1] == ["--selftest"] and a[1:] in ([], ["--perturb", "skip-unresolved"]):
+        PERTURB = a[2] if len(a) == 3 else ""
         sys.exit(selftest())
     if len(a) == 3 and a[0] == "check":
         sys.exit(check(a[1], a[2]))

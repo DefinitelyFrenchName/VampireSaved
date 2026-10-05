@@ -13,24 +13,24 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**429 of 429 gates described.**
+**435 of 435 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
-| [runner](#runner) | 41 | 41 | the suite runners and their own ground truth |
+| [runner](#runner) | 43 | 43 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
-| [platform](#platform) | 42 | 42 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
+| [platform](#platform) | 43 | 43 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 60 | 60 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 87 | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 73 | 73 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 76 | 76 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
 ## runner
 
-the suite runners and their own ground truth. 41 of 41 described.
+the suite runners and their own ground truth. 43 of 43 described.
 
 ### `run_all_emulator.sh` — run, emulator
 
@@ -154,11 +154,11 @@ the suite runners and their own ground truth. 41 of 41 described.
 
 ### `test_close_standing.sh` — test, ci_portable
 
-**WHAT:** tools/close_standing.py renders tests/close_standing_checks.tsv for a close from three parameters (key, row, run dir), derives the open-ticket list and the base commit, generates each plant from the live file so it must fail its check, finds a repeated DECISIONS_HISTORY/STATE_HISTORY entry, holds the findings-row copy to the live row, and writes the packet claim only from a FULL all-OK run; tools/findings_add.py appends a finding in the form tools/none_reasons.py and tools/homes_tracked.py read, and refuses an untracked home or a bare `none`.
+**WHAT:** tools/close_standing.py renders tests/close_standing_checks.tsv for a close from three parameters (key, row, run dir), derives the open-ticket list and the base commit, generates each plant from the live file so it must fail its check, finds a repeated DECISIONS_HISTORY/STATE_HISTORY entry, holds the findings-row copy to the live row, and writes the packet claim only from a FULL all-OK run; tools/findings_add.py appends a finding in the form tools/none_reasons.py and tools/homes_tracked.py read, and refuses an untracked home, a bare `none` or a home holding the table's separator; tools/findings_anchors.py FAILs a home it cannot resolve (#224).
 
-**HOW:** both tools' self-tests on synthetic trees with known answers; then the REAL template rendered into a temp run dir (no close is needed to render) and linted: every row parses for tools/close_checks.py, every `*_plant` row expects a non-zero exit and its base check is in the set, every standing check declares WHAT and NOT SEEN. Six controls are known-bad variants (each tool's --perturb, and a template copy whose plant expects 0).
+**HOW:** the three tools' self-tests on synthetic trees with known answers; then the REAL template rendered into a temp run dir (no close is needed to render) and linted: every row parses for tools/close_checks.py, every `*_plant` row expects a non-zero exit and its base check is in the set, every standing check declares WHAT and NOT SEEN. Seven controls are known-bad variants (each tool's --perturb, and a template copy whose plant expects 0).
 
-**EXPECTS:** both self-tests PASS, the template lint clean, and every control's variant FAILs.
+**EXPECTS:** the three self-tests PASS, the template lint clean, and every control's variant FAILs.
 
 ### `test_controls_contract.sh` — test, ci_portable
 
@@ -178,9 +178,9 @@ the suite runners and their own ground truth. 41 of 41 described.
 
 ### `test_emulator_runner.sh` — test, ci_portable
 
-**WHAT:** tests/run_all_emulator.sh's verdicts mean what they say: PASS / FAIL / SKIP counted apart, SKIP-in-prose read as PASS, a non-executable registry row MISSING, a timeout TIMEOUT, the anti-orphan check both ways, --strict, the prereq stop, --scope, placeholder expansion, the exported MAME_BIN and the controls reader.
+**WHAT:** tests/run_all_emulator.sh's verdicts mean what they say: PASS / FAIL / SKIP counted apart, SKIP-in-prose read as PASS, a non-executable registry row MISSING, a timeout TIMEOUT, the anti-orphan check both ways, --strict, the prereq stop, --scope, placeholder expansion, the exported MAME_BIN, the controls reader, and a --dry-run writing no commit of record (#219).
 
-**HOW:** a synthetic repository of stub gates with KNOWN verdicts is driven through the REAL runner by symlink (never a copy of its logic), with stub tools so the runner's own preconditions run; three controls run copies of the runner with a piece removed (the export, the reader, an executable row).
+**HOW:** a synthetic repository of stub gates with KNOWN verdicts is driven through the REAL runner by symlink (never a copy of its logic), with stub tools so the runner's own preconditions run; four controls run copies of the runner with a piece removed (the export, the reader, an executable row, the --dry-run guard).
 
 **EXPECTS:** every case reads the verdict it was built to produce and each control's section fails on its copy; a red names the case — a wrong reading here would turn the release policy into a rubber stamp.
 
@@ -280,6 +280,14 @@ the suite runners and their own ground truth. 41 of 41 described.
 
 **EXPECTS:** SELFTEST PASS (ten cases); each control's copy SELFTEST FAIL.
 
+### `test_py_escapes.sh` — test, ci_portable
+
+**WHAT:** every tracked .py under tools/ and tests/ compiles with invalid-escape warnings turned into errors (DeprecationWarning on Python <= 3.11, SyntaxWarning from 3.12) — so no host's Python warns on it today and none refuses it when the warning becomes an error.
+
+**HOW:** each file compiled, never imported, under `python3 -W error::DeprecationWarning -W error::SyntaxWarning`; a file whose compile raises is named with the message.
+
+**EXPECTS:** every file compiles. A red names the file and the escape — the 14z-191 shape: tools/package_release.py's README text held `roms\` before a backtick, an invalid escape PILOT's Python 3.12 printed as a SyntaxWarning on every packaging run (the Mac's 3.9 stays silent).
+
 ### `test_rule_checker.sh` — test, ci_portable
 
 **WHAT:** the adversarial rule-checker's record (tests/rulecheck/ledger.tsv and the run directories) is sound: every run complete and structured, every planted violation caught, every fixture calibrated by the CURRENT pinned reader, every VIOLATED resolved in writing, every freeze since the checker's birth named by an OK freeze run, and `record` bound to the readers' spawn check.
@@ -359,6 +367,14 @@ the suite runners and their own ground truth. 41 of 41 described.
 **HOW:** runs the tool's selftest (seven cases), then the tool over this tree; two controls plant, in a scratch root built from this tree's own registry, a live pin on a real superseded key, and a rulecheck.py without its birth key — each must be refused.
 
 **EXPECTS:** the selftest PASS, the tree clean (0 live pins, 0 stale exemptions), both controls FAIL their scratch root.
+
+### `test_trace_static_reads.sh` — test, ci_portable
+
+**WHAT:** tools/trace_static_reads.py's score marks every traced read its gate's predictor flags and reports, as a MISS, one it does not; its control scores the same traces with this tree's predictor OVER-NARROWED and must miss; and its trace step refuses to run without strace.
+
+**HOW:** a synthetic git repository carrying the REAL tools/static_confirm.py and tools/battery_reach.py and two gates — g_named (cat docs/named.md) and g_tmpl (a build path named only through the template "build/$b") — with traces in strace's own line format: g_named opening docs/named.md, g_tmpl opening build/m1/out.txt. Scored as written (no miss), with an unnamed read of docs/hidden.md planted (one miss), and through the control (g_tmpl's read is caught only by the rules the control narrows: R6's directory template and N-A below the top level).
+
+**EXPECTS:** clean 0 misses and exit 0; planted exactly `MISS g_named docs/hidden.md` and exit 1; control `CONTROL FIRED` with `MISS g_tmpl build/m1/out.txt`. A red is a scorer that cannot see a miss — the one property that makes a clean trace (14z-190: 0 misses over 40,021 reads) evidence that a predictor change is safe.
 
 ## docs
 
@@ -534,7 +550,7 @@ the documentation locks — docs, skills, indexes, tables follow the tree. 21 of
 
 ## platform
 
-the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene. 42 of 42 described.
+the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene. 43 of 43 described.
 
 ### `audit_wide_phase_a.sh` — audit, emulator
 
@@ -548,7 +564,7 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 
 **WHAT:** the browser applier page EQUALS the tool of record (apply_release.py) member for member on both variants, refuses everything it refuses, is self-contained (a Content-Security-Policy the browser enforces plus a scan for named network primitives), carries its modules verbatim, and stops demanding qsound_hle.zip under --no-qsound-bios.
 
-**HOW:** the shipped apply_release.html of every platform dir compared with a fresh generation; the inlined modules compared with `tools/applier/*.mjs;` the modules run under node against apply_release.py on $ROMDIR for member order, bytes, zip header fields and the set key (container bytes deliberately not compared); six refusals exercised on both tools; four controls (a fetch() in the shell, the CSP removed, the member check removed, a flipped member).
+**HOW:** the shipped apply_release.html of every platform dir compared with a fresh generation; the inlined modules compared with `tools/applier/*.mjs;` the modules run under node against apply_release.py on $ROMDIR for member order, bytes, zip header fields and the set key (container bytes deliberately not compared); the Python applier run under a Windows sys.platform writing the same container as on this host (#215); six refusals exercised on both tools; five controls (a fetch() in the shell, the CSP removed, the member check removed, a flipped member, the create_system pin removed).
 
 **EXPECTS:** every section green and every control failing; a red names the member, refusal or primitive. The page's own WIRING is test_applier_page_browser's half.
 
@@ -823,6 +839,14 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 **HOW:** the filter over a path list (exact basename only); the REAL uploader under --dry-run in a throwaway repo with .DS_Store planted in four places; the three listings' wiring read from the scripts; the control disables the filter in a shadow copy of the lib.
 
 **EXPECTS:** no list and no zip carrying a dotfile, the wiring present; the disabled filter lets the plant into an asset list and fails.
+
+### `test_release_prune.sh` — test, ci_portable
+
+**WHAT:** the uploader's prune targets, read through its own --prune-plan, are every earlier `freeze/merged-m*` tag whose release holds a .zip — newest first, past tags with no release — and nothing when none does.
+
+**HOW:** the REAL uploader run with --prune-plan on the tree's own freeze tags, `VS_PRUNE_PROBE` a stub that says which tags' releases hold a zip: merged-m19 and merged-m16 yes, everything else no (so merged-m20 and merged-m21 between them and merged-m22 play the frozen-never-released freezes of #221); then a stub that says no for every tag.
+
+**EXPECTS:** `freeze/merged-m19 freeze/merged-m16` for freeze/merged-m22, `none` with no zip anywhere. A red is the #221 shape: the prune stopped at the first earlier tag, found no release there, and left an older freeze's binaries hosted (merged-m19's seven zips under merged-m22, 14z-189).
 
 ### `test_release_roundtrip.sh` — test, ci_static
 
@@ -2498,7 +2522,15 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 ## character-data
 
-the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 73 of 73 described.
+the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 76 of 76 described.
+
+### `audit_air_dash_height.sh` — audit, emulator
+
+**WHAT:** Phobos jumps straight up and inputs the air dash j.66 with the second R at +5..+16 frames; at +5 (height 21, under vs2's table row 0x10 = 24) native vs2 does not dash and merged-m22 dashes; at every later event (height 34 and up) both dash on the same frame at the same height. That is the frozen expectation (--expect gap) until a build takes vs2's row (#222), when the expectation becomes --expect same.
+
+**HOW:** tools/air_dash_rigs.py generates the rig on tools/name_moves.py's machinery (Phobos by his real cursor path on native, the merged wheel's D D D on ours — HANDOFF [VSP-123]); both legs traced by tests/lua/field_trace.lua under the ruled level and RNG pins; the comparer refuses a leg whose low event is not under 24 or whose high events did not dash on native (VOID).
+
+**EXPECTS:** PASS under --expect gap. A red is either the gap gone (a build changed Phobos's air dash — re-read #222) or a difference above the row, which no measurement here has shown.
 
 ### `audit_air_gc_legacy.sh` — audit, emulator
 
@@ -2748,6 +2780,14 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **EXPECTS:** no new zero-pass frame on any part; the planted frame is caught. NOT covered: content outside the naming corpus and the idle-time margin short of a lost pass.
 
+### `audit_landing_sound.sh` — audit, emulator
+
+**WHAT:** the landing-sound site (ours PRG:0x00395E, vs2 0x003994) is reached on the same frames on both games for Phobos (huitzil_1) and Donovan (donovan_1), always for the tenant on P1; and at the first landing (after Jump [8]) the two games' audio differs by over 4x what it differs a second earlier, with native the louder landing for Phobos and ours the louder for Donovan (the +1 big-body id swapped). That is the frozen expectation (the gap) until a build takes vs2's mask (#223).
+
+**HOW:** per tenant, two non-debug read taps (tests/lua/read_tap.lua on both fighters' +0x382, RPCS the site's own read) and two -wavwrite runs to the landing + 120 frames, native vs2 and merged-m22, under the ruled level and RNG pins; tools/landing_sound_ab.py compares the hits and the two one-second windows (control, landing).
+
+**EXPECTS:** PASS. A red is the gap gone (a build changed the mask — re-read #223), a hit-frame difference (the landing moved), or a control window that differs (the two games' audio diverged before the landing: the comparison no longer isolates the landing).
+
 ### `audit_latch_reads.sh` — audit, emulator
 
 **WHAT:** who reads the select-confirm latch (+0x3BD/+0x3E0 id copies, +0x3C2 flavour) IN PLAY, per forced-pick leg shape, with the value each reader saw — the dynamic half of the #151 sweep that makes the static reader census's classes evidence (Phobos's flavour readers see 01, Donovan's VH2 flavour, on the #147 shape).
@@ -2910,7 +2950,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 ### `test_air_attack_height.sh` — test, ci_static
 
-**WHAT:** the routine at vsavj PRG:0x027B80 (fifteen bsr.w callers) tests +0x190 first; when it is set neither guard applies. Otherwise it returns 0 when +0x121 is set, and, with +0x38 set, returns 0 when +0x14 - +0x3A < word[+0x382] (unsigned, bcs), the word read from the table it loads with `movea.l #$0BE23A,a0` (PRG:0x027B92). Every path reaching the button test returns 1 exactly when +0x113|+0x114 is nonzero. The meanings of +0x121 (crouch), +0x38 (off the ground) and +0x14 (Y) are ram.md's; +0x3A, +0x113 and +0x114 have no ram.md row, so +0x14 - +0x3A as height above the floor and +0x113|+0x114 as a button press are 14z-121's readings. Its 32 rows read 0x0018 (24) for 0x04, 0x0D, 0x0F (Zabel, Lei-Lei, Jedah per docs/game/atlas/character_tables.md) and their +0x10 mirrors 0x14, 0x1D, 0x1F, and 0 for the other 26, the tenants' 0x10/0x11/0x13 included; the 33rd word on is another table. +0x382 is the character id per docs/game/atlas/ram.md (not re-measured here).
+**WHAT:** the routine at vsavj PRG:0x027B80 (fifteen bsr.w callers) tests +0x190 first; when it is set neither guard applies. Otherwise it returns 0 when +0x121 is set, and, with +0x38 set, returns 0 when +0x14 - +0x3A < word[+0x382] (unsigned, bcs), the word read from the table it loads with `movea.l #$0BE23A,a0` (PRG:0x027B92). Every path reaching the button test returns 1 exactly when +0x113|+0x114 is nonzero. The meanings of +0x121 (crouch), +0x38 (off the ground) and +0x14 (Y) are ram.md's; +0x3A, +0x113 and +0x114 have no ram.md row: +0x14 - +0x3A as height above the floor is 14z-121's reading, and +0x113 as the air-dash command latch is 14z-191's measurement (it was 14z-121's "button press", RETRACTED: no LP press set it; the j.66 input did — tests/audit_air_dash_height.sh, #222). Its 32 rows read 0x0018 (24) for 0x04, 0x0D, 0x0F (Zabel, Lei-Lei, Jedah per docs/game/atlas/character_tables.md) and their +0x10 mirrors 0x14, 0x1D, 0x1F, and 0 for the other 26, the tenants' 0x10/0x11/0x13 included; the 33rd word on is another table. +0x382 is the character id per docs/game/atlas/ram.md (not re-measured here).
 
 **HOW:** static over the decrypted vsavj opcode and data views (tests/lib/decrypt_cache.sh): the table address is taken from the instruction's immediate, which must be the opcode view's only reference to 0x000BE23A; capstone (the disassembler tools/audit_marionette_cost.py uses) decodes the eight instructions after it, which must index the table by the character id +0x382 at WORD stride (ext.w / add.w d1,d1 / move.w (0,a0,d1.w),d1); the 32 words are then read from the data view at that stride. The whole routine (PRG:0x027B80-0x027BC1) is decoded and frozen, so which branch returns 0 and which returns 1 is read from the code; its direct callers are counted over every static transfer form (jsr/jmp abs.l, abs.w and (d16,PC); bra, bsr and every Bcc .b/.w; DBcc) targeting 0x027B80 (indirect and (d8,PC,Xn) transfers are not).
 
@@ -2923,6 +2963,14 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 **HOW:** replay 17 on native vs2 on MAME, P1's node pointer +0x1C and countdown +0x20 sampled every frame (3,638 in-match frames) and mapped onto the five decoded tables; the negative control decodes with the wrong stride (0x17) and must leave most pointers off the graph.
 
 **EXPECTS:** 3638/3638 on-graph, every change an edge or a jump, countdowns exact or dur-1; the wrong-stride decode fails. Run after any change to the decoder or the node-format claims.
+
+### `test_charid_names.sh` — test, ci_portable
+
+**WHAT:** every Python dict under tools/ and tests/ that maps character ids to names (`0x0A: "Sasquatch"` or `"SA": (0x0A, "Sasquatch")`, at least four of its names characters of the table) names each id 0x00-0x0F (the random cell 0x0B excepted) as docs/game/atlas/character_tables.md's slot table does — and the census finds at least the frozen floor of such maps.
+
+**HOW:** tools/audit_charid_names.py reads the atlas table (refusing one that does not yield fifteen ids), parses every tracked .py by AST (never importing it), and judges each (id, name) pair whose name is a character of the table; the floor is tests/expected/charid_name_maps_floor.txt (rises only).
+
+**EXPECTS:** PASS with 0 mismatches and at least the floor's maps. A red names the file, line, id and both names — the #218 shape, where tools/audit_poked_legs.py labelled 0x0A-0x0E one row off (Q-Bee at 0x0A, Lilith at 0x0D) — or a census that found fewer maps than the floor, a tool gone blind.
 
 ### `test_community_crosscheck.sh` — test, ci_static
 

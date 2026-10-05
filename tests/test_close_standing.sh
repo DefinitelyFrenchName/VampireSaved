@@ -7,12 +7,13 @@
 #   run dir), derives the open-ticket list and the base commit, generates each plant from the live file so it must
 #   fail its check, finds a repeated DECISIONS_HISTORY/STATE_HISTORY entry, holds the findings-row copy to the live
 #   row, and writes the packet claim only from a FULL all-OK run; tools/findings_add.py appends a finding in the
-#   form tools/none_reasons.py and tools/homes_tracked.py read, and refuses an untracked home or a bare `none`.
-# HOW: both tools' self-tests on synthetic trees with known answers; then the REAL template rendered into a temp run
+#   form tools/none_reasons.py and tools/homes_tracked.py read, and refuses an untracked home, a bare `none` or a
+#   home holding the table's separator; tools/findings_anchors.py FAILs a home it cannot resolve (#224).
+# HOW: the three tools' self-tests on synthetic trees with known answers; then the REAL template rendered into a temp run
 #   dir (no close is needed to render) and linted: every row parses for tools/close_checks.py, every `*_plant` row
 #   expects a non-zero exit and its base check is in the set, every standing check declares WHAT and NOT SEEN.
-#   Six controls are known-bad variants (each tool's --perturb, and a template copy whose plant expects 0).
-# EXPECTS: both self-tests PASS, the template lint clean, and every control's variant FAILs.
+#   Seven controls are known-bad variants (each tool's --perturb, and a template copy whose plant expects 0).
+# EXPECTS: the three self-tests PASS, the template lint clean, and every control's variant FAILs.
 #
 # WHY. Three closes took 12, 8 and 7 documentation-packet runs, four of 14z-188's six VIOLATED on holes in checks
 # written during that close (#204); the findings table was rebuilt at the close from summaries (#206); the claim was
@@ -24,6 +25,7 @@
 # MUST-FIRE: known-bad: stale-row-accepted — a row-copy check that accepts any copy must fail the self-test (mode: that variant's self-test)
 # MUST-FIRE: known-bad: claim-partial-accepted — a claim written from a partial run must fail the self-test (mode: that variant's self-test)
 # MUST-FIRE: known-bad: form-unchecked — a findings_add.py accepting an untracked home and an empty none reason must fail its self-test (mode: that variant's self-test)
+# MUST-FIRE: known-bad: skip-unresolved — a findings_anchors.py that SKIPs a home it cannot resolve (the #224 shape: an anchor split at the table's separator) must fail its self-test (mode: that variant's self-test)
 # MUST-FIRE: perturbed-copy: unpaired-plant — a copy of the template whose plant row expects exit 0 must fail the lint (mode: the lint on that copy)
 #
 # Usage: tests/test_close_standing.sh      # ci_portable, ~3 s
@@ -70,6 +72,11 @@ python3 tools/findings_add.py --selftest $P > "$W/s2.txt" 2>&1 || true
 sed 's/^/  /' "$W/s2.txt"
 grep -q '^SELFTEST PASS$' "$W/s2.txt" || { echo "FAIL: findings_add.py's self-test"; fail=1; }
 
+P=""; vs_ctl_is skip-unresolved && P="--perturb skip-unresolved"
+python3 tools/findings_anchors.py --selftest $P > "$W/s3.txt" 2>&1 || true
+grep '^SELFTEST' "$W/s3.txt" | sed 's/^/  /'   # the verdict only: its per-finding SKIP lines read as the gate skipping (14z-191)
+grep -q '^SELFTEST PASS' "$W/s3.txt" || { echo "FAIL: findings_anchors.py's self-test"; fail=1; }
+
 T=tests/close_standing_checks.tsv
 if vs_ctl_is unpaired-plant; then
     awk -F'\t' 'BEGIN{OFS="\t"} !done && $1 ~ /_plant$/ {$2="0"; done=1} {print}' "$T" > "$W/tmpl_ctl.tsv"; T="$W/tmpl_ctl.tsv"
@@ -86,6 +93,9 @@ if [ -z "${VS_CTL:-}" ]; then
     python3 tools/findings_add.py --selftest --perturb form-unchecked > "$W/c_fu.txt" 2>&1 || true
     if grep -q '^SELFTEST FAIL$' "$W/c_fu.txt"; then vs_ctl_fired form-unchecked "$(grep -m1 'FAIL:' "$W/c_fu.txt" | sed 's/^ *//')"
     else vs_ctl_dead form-unchecked "the known-bad variant passed the self-test" || fail=1; fi
+    python3 tools/findings_anchors.py --selftest --perturb skip-unresolved > "$W/c_su.txt" 2>&1 || true
+    if grep -q '^SELFTEST FAIL' "$W/c_su.txt"; then vs_ctl_fired skip-unresolved "with an unresolved home SKIPped, the anchor check's self-test fails"
+    else vs_ctl_dead skip-unresolved "the known-bad variant passed the self-test" || fail=1; fi
     awk -F'\t' 'BEGIN{OFS="\t"} !done && $1 ~ /_plant$/ {$2="0"; done=1} {print}' tests/close_standing_checks.tsv > "$W/tmpl_ctl.tsv"
     if lint "$W/tmpl_ctl.tsv" > "$W/c_up.txt" 2>&1; then vs_ctl_dead unpaired-plant "the lint accepted a plant expecting exit 0" || fail=1
     else vs_ctl_fired unpaired-plant "$(grep -m1 'FAIL:' "$W/c_up.txt")"; fi

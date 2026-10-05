@@ -9,9 +9,10 @@
 # HOW: the shipped apply_release.html of every platform dir compared with a fresh
 #   generation; the inlined modules compared with tools/applier/*.mjs; the modules run under
 #   node against apply_release.py on $ROMDIR for member order, bytes, zip header fields and
-#   the set key (container bytes deliberately not compared); six refusals exercised on both
-#   tools; four controls (a fetch() in the shell, the CSP removed, the member check removed,
-#   a flipped member).
+#   the set key (container bytes deliberately not compared); the Python applier run under a
+#   Windows sys.platform writing the same container as on this host (#215); six refusals
+#   exercised on both tools; five controls (a fetch() in the shell, the CSP removed, the
+#   member check removed, a flipped member, the create_system pin removed).
 # EXPECTS: every section green and every control failing; a red names the member, refusal or
 #   primitive. The page's own WIRING is test_applier_page_browser's half.
 #
@@ -46,6 +47,12 @@
 #      boundaries (node 485178 bytes against python 484140 on one real member), and
 #      Firefox's encoder differs again. What no encoder can change is the MEMBER bytes,
 #      which is what every emulator, every fingerprint and the set key read.
+#   3b. THE CONTAINER DOES NOT DEPEND ON THE HOST (#215, 14z-191). Python's ZipInfo stamps
+#      create_system from sys.platform, so the same applier on the same dumps wrote a
+#      different vsavjw.zip on Windows (0) than on the Mac (3), and section 3's header-field
+#      comparison would have failed there. apply_release.py pins 3; this section runs it
+#      with sys.platform set to "win32" (what ZipInfo reads) and requires the container to
+#      be byte-identical to section 3's, every member at create_system 3.
 #   4. THE REFUSALS (A3), which are the deliverable. Every static fragment of every
 #      refusal apply_release.py can print must exist in the page's applier — read out of
 #      the Python file's SYNTAX TREE, so a new refusal there fails this gate until the
@@ -59,6 +66,7 @@
 #
 # MUST-FIRE: shadow-tool: no-member-check — a copy of applier.mjs with the rebuilt-member sha1 check removed must make section 4 fail, because a corrupted patch would then be accepted instead of refused; if the section still passed, it would not be reading the verification at all (mode: the gate runs against that copy)
 # MUST-FIRE: shadow-tool: flipped-member — a copy of applier.mjs that flips one byte of one finished member AND skips the set-key check must make section 3's member-for-member comparison fail; if it still passed, the comparison would not be comparing the bytes (mode: the gate runs against that copy)
+# MUST-FIRE: shadow-tool: windows-host — a copy of apply_release.py without its create_system pin, run under a Windows sys.platform, must write members with create_system 0 and make section 3b fail; if it passed, the gate would not be reading the host byte that made the container differ by host (#215) (mode: section 3b runs that copy)
 # MUST-FIRE: perturbed-copy: page-with-fetch — a copy of the page shell carrying a fetch() call must make section 1 fail; if it passed, the self-containment property would be unchecked and the page's one hard constraint would rest on nothing (mode: the gate generates from that shell)
 # MUST-FIRE: perturbed-copy: page-without-csp — a copy of the page shell with its Content-Security-Policy meta removed must make section 1 fail; the CSP is what makes "no network of any kind" a property the BROWSER enforces rather than one a denylist guesses at, and a denylist cannot prove absence, so a page that lost it must not ship (mode: the gate generates from that shell)
 #
@@ -299,6 +307,49 @@ print(f"  ok: {variant}: {nm} members identical, order and header fields identic
 PY
 done
 
+# ── 3b. the container does not depend on the host (#215) ─────────────────────
+echo "3b. the host byte: apply_release.py under a Windows sys.platform writes the same container"
+unpin_copy() {   # $1 = destination: apply_release.py without its create_system pin (the control)
+    sed '/^ *zi\.create_system = 3$/d' tools/apply_release.py > "$1"
+    cmp -s tools/apply_release.py "$1" && { echo "  the create_system pin is not where this control expects it"; return 1; }
+    return 0
+}
+as_windows() {   # $1 = applier, $2 = out dir: run it with sys.platform = "win32" (what ZipInfo reads)
+    python3 - "$1" --romdir "$ROMDIR" --out "$2" --manifest "$REL/manifest.json" <<'PY'
+import runpy, sys
+sys.platform = "win32"
+path = sys.argv[1]
+sys.argv = [path] + sys.argv[2:]
+runpy.run_path(path, run_name="__main__")
+PY
+}
+host_byte() {    # $1 = a written set dir, $2 = the reference set dir: create_system census + cmp
+    python3 - "$1" "$2" <<'PY'
+import os, sys, zipfile
+a, b = sys.argv[1:3]
+cs = sorted({i.create_system for z in sorted(os.listdir(a)) for i in zipfile.ZipFile(os.path.join(a, z)).infolist()})
+same = all(open(os.path.join(a, z), "rb").read() == open(os.path.join(b, z), "rb").read() for z in sorted(os.listdir(b)))
+print(f"create_system {cs}; container identical to this host's: {same}")
+sys.exit(0 if cs == [3] and same and sorted(os.listdir(a)) == sorted(os.listdir(b)) else 1)
+PY
+}
+WINAPPLY=tools/apply_release.py
+if vs_ctl_is windows-host; then
+    unpin_copy "$W/apply_unpinned.py" || fails=$((fails + 1)); WINAPPLY="$W/apply_unpinned.py"
+    note "CONTROL: apply_release.py copy without the create_system pin"
+fi
+rm -rf "$W/win_standalone"
+if [ -d "$W/py_standalone" ] && as_windows "$WINAPPLY" "$W/win_standalone" > "$W/win_standalone.log" 2>&1; then
+    if hb="$(host_byte "$W/win_standalone" "$W/py_standalone")"; then
+        echo "  ok: under sys.platform win32: $hb"
+    else
+        echo "  the container depends on the host: $hb"; fails=$((fails + 1))
+    fi
+else
+    sed 's/^/    /' "$W/win_standalone.log" 2>/dev/null | tail -5
+    echo "  apply_release.py under a Windows sys.platform failed (or section 3 wrote no reference)"; fails=$((fails + 1))
+fi
+
 # ── 4. the refusals (A3) ─────────────────────────────────────────────────────
 echo "4. the refusals: every message the tool of record can print has a page equivalent"
 python3 - tools/apply_release.py "$MOD/applier.mjs" <<'PY' || fails=1
@@ -501,6 +552,15 @@ if vs_ctl_is no-member-check; then
     echo "FAIL: test_applier_page (control mode: the unverified applier was correctly caught)"
     exit 1
 fi
+if vs_ctl_is windows-host; then
+    if [ "$fails" = 0 ]; then
+        vs_ctl_dead windows-host "an applier without the create_system pin still wrote the host-independent container" || true
+        echo "FAIL: test_applier_page"; exit 1
+    fi
+    vs_ctl_fired windows-host "without the pin, section 3b's Windows run wrote a different container"
+    echo "FAIL: test_applier_page (control mode: the unpinned applier was correctly caught)"
+    exit 1
+fi
 if vs_ctl_is flipped-member; then
     if [ "$fails" = 0 ]; then
         vs_ctl_dead flipped-member "a flipped output member was not caught by the comparison" || true
@@ -535,6 +595,16 @@ then
     vs_ctl_fired flipped-member "a one-byte flip in a finished member makes the member-for-member comparison differ"
 else
     vs_ctl_dead flipped-member "the flipped-member copy produced a set identical to the tool of record's" || true
+    fails=$((fails + 1))
+fi
+
+unpin_copy "$W/ctl_unpinned.py" >/dev/null
+rm -rf "$W/ctl_win"
+as_windows "$W/ctl_unpinned.py" "$W/ctl_win" > "$W/ctl_win.log" 2>&1 || true
+if [ -d "$W/ctl_win" ] && ! hb="$(host_byte "$W/ctl_win" "$W/py_standalone")"; then
+    vs_ctl_fired windows-host "without the pin the Windows run writes $hb"
+else
+    vs_ctl_dead windows-host "the unpinned applier under win32 still wrote the reference container (${hb:-no output})" || true
     fails=$((fails + 1))
 fi
 

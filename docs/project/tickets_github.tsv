@@ -2,19 +2,20 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 225
+# issues: 226
 number	state	reason	closed	labels	title
+226	OPEN	-	-	evolution	Test the Linux release end to end: PILOT's linux-x86_64 build as a player gets it (asset, applier, launcher, a real desktop run)
 225	OPEN	-	-	evolution	Promote #188's traced test (strace every static gate, score the predictor, an over-narrowed control) from scratch into tools/
-224	OPEN	-	-	bug	findings_add.py accepts a home anchor containing ' — '; findings_anchors.py then SKIPs that finding and exits 0
-223	OPEN	-	-	cosmetic	Two sound-request sites give Phobos and Donovan each other's +1 on the sound id (char-id mask bits 0x10/0x13 swapped vs vs2) — static only
-222	OPEN	-	-	bug,severity: medium	Phobos's minimum air-attack height: vs2 checks it (row 0x10 = 24), ours reads 0 — static only, not measured in play
-221	OPEN	-	-	bug	upload_release_assets.sh --prune checks only the tag just before the published one, so a freeze that was never released stops it (merged-m19's assets are still hosted)
+224	CLOSED	COMPLETED	2026-10-04	bug	findings_add.py accepts a home anchor containing ' — '; findings_anchors.py then SKIPs that finding and exits 0
+223	OPEN	-	-	cosmetic	Landing sound: vs2 gives Phobos the big-body landing and Donovan the ordinary one; ours the reverse (measured by ear)
+222	OPEN	-	-	bug,severity: medium	Phobos's air dash minimum height: vs2 refuses it under 24 px, ours allows it (measured in play: height 21)
+221	CLOSED	COMPLETED	2026-10-04	bug	upload_release_assets.sh --prune checks only the tag just before the published one, so a freeze that was never released stops it (merged-m19's assets are still hosted)
 220	CLOSED	NOT_PLANNED	2026-10-04	cosmetic	MiSTer release README still says the package contains an emulator (FBNeo or MAME)
-219	OPEN	-	-	bug	run_all_emulator.sh --dry-run writes a run record that the staleness audit takes as the newest run
-218	OPEN	-	-	bug	tools/audit_poked_legs.py's id→name map is shifted for 0x0A/0x0C/0x0D/0x0E (Lilith at 0x0D, Sasquatch at 0x0E); latent, no frozen label affected yet
+219	CLOSED	COMPLETED	2026-10-04	bug	run_all_emulator.sh --dry-run writes a run record that the staleness audit takes as the newest run
+218	CLOSED	COMPLETED	2026-10-04	bug	tools/audit_poked_legs.py's id→name map is shifted for 0x0A/0x0C/0x0D/0x0E (Lilith at 0x0D, Sasquatch at 0x0E); latent, no frozen label affected yet
 217	OPEN	-	-	evolution	Rule-checker throughput: check independent decisions in parallel, and split a multi-fork merge into per-fork packets
 216	OPEN	-	-	evolution	Community workbook vs the game: Lei-Lei 6HP three hits (game: one at 128 px) and other #117 gaps, to check against the Japanese wiki
-215	OPEN	-	-	bug	apply_release.py's output zip differs by host (create_system 0 on Windows, 3 on Unix); zip.mjs and test_applier_page assume 3
+215	CLOSED	COMPLETED	2026-10-04	bug	apply_release.py's output zip differs by host (create_system 0 on Windows, 3 on Unix); zip.mjs and test_applier_page assume 3
 214	OPEN	-	-	bug	MiSTer package README tells the player it contains an FBNeo/MAME emulator (shared template wording), which it does not
 213	OPEN	-	-	bug	dispatch_census.lua keys replay input to a frame_done counter while breakpoints are armed ([MFI-5] desync): its frozen dispatch inventory may come from drifted runs
 212	CLOSED	COMPLETED	2026-10-04	bug	apply_release.py (the end-user applier) exits 1 with UnicodeEncodeError after writing a correct romset when stdout is cp932/cp437/cp850 (redirected on Windows)
@@ -23,7 +24,7 @@ number	state	reason	closed	labels	title
 209	CLOSED	COMPLETED	2026-10-03	bug,severity: low	rulecheck.py prepare leaves the ledger's session column '-' unless --session is given, so per-session counts are wrong
 208	CLOSED	COMPLETED	2026-10-03	bug,severity: medium,test-integrity	extract.py showed a still-running worker's latest text as its report (WX) when the extract was cut before its hand-back, so the procedure check ruled a false QP5
 207	CLOSED	COMPLETED	2026-10-04	architecture,evolution	Close: generate the documentation packet's claim from the run of record's check outputs
-206	OPEN	-	-	architecture,evolution	Close: append each finding to the findings table when it is paid for, not reconstructed at the close
+206	CLOSED	COMPLETED	2026-10-04	architecture,evolution	Close: append each finding to the findings table when it is paid for, not reconstructed at the close
 205	CLOSED	COMPLETED	2026-10-03	bug,severity: medium,test-integrity	homes_tracked.py drops an unresolved bare document name silently and never checks each finding letter
 204	CLOSED	COMPLETED	2026-10-04	architecture,evolution	Close: a tracked standing close-check set with derived lists and generated plants, inherited by every close
 203	CLOSED	COMPLETED	2026-10-03	bug,severity: low	Linux: test_agent_sweep's post-kill check and test_run_on_snapshot's no-self-copy control fail on their own premises (fixed sleep vs zombies; dash reads ahead)

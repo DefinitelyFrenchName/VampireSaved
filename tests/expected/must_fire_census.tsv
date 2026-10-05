@@ -3,6 +3,7 @@
 # and the RETROFIT DEBT — pre-grammar mentions with no declaration (shrinks only).
 # Gate: tests/test_must_fire_census.sh. Regenerate with FREEZE=1 after review.
 # class<TAB>gate
+declares	audit_air_dash_height
 declares	audit_air_gc_legacy
 declares	audit_capture_matrix
 declares	audit_chains174
@@ -39,6 +40,7 @@ declares	audit_kill_poke_shape
 declares	audit_ladder_pick_store
 declares	audit_ladder_selector
 declares	audit_lag_budget
+declares	audit_landing_sound
 declares	audit_latch_reads
 declares	audit_marionette_cost
 declares	audit_mister_map_fit
@@ -84,6 +86,7 @@ declares	test_bg_leg_shape
 declares	test_build_environment_entry
 declares	test_bundle_parsers
 declares	test_capture_kf_ownership
+declares	test_charid_names
 declares	test_charmap_current
 declares	test_charmap_overrides
 declares	test_checkdocs
@@ -154,6 +157,7 @@ declares	test_poke_readback
 declares	test_poked_legs
 declares	test_pokes_ranges
 declares	test_promise_check
+declares	test_py_escapes
 declares	test_pyron_medallion_2p
 declares	test_quote_font_window
 declares	test_random_select_tenants
@@ -167,6 +171,7 @@ declares	test_release_binaries
 declares	test_release_launcher
 declares	test_release_launcher_bat
 declares	test_release_os_metadata
+declares	test_release_prune
 declares	test_release_roundtrip
 declares	test_rompath_reject
 declares	test_roulette_tag_rows
@@ -192,6 +197,7 @@ declares	test_tenant_anim_relocation
 declares	test_tenant_id
 declares	test_tick_durations
 declares	test_tickets
+declares	test_trace_static_reads
 declares	test_unless_composed
 declares	test_vanilla_aerial_join
 declares	test_vanilla_command_join

@@ -65,6 +65,9 @@ test_demand_after_trap
 # Step one of the ruling on the BBX finding; step two is the run-time contract.
 test_must_fire_census
 test_module_refs
+# test_charid_names.sh — every in-tree character-id -> name map agrees with the atlas slot
+# table (GitHub #218, 14z-191); two must-fire controls. ROM-free, ~1 s.
+test_charid_names
 test_gate_descriptions
 test_gate_follows
 test_lane_carry
@@ -236,6 +239,9 @@ test_build_environment_entry
 # travel together (maintainer-ruled 2026-09-12) — the shape of what
 # upload_release_assets.sh CUTS, over the current release. ROM-free, ~5 s.
 test_release_asset_shape
+# test_release_prune.sh — --prune empties every earlier merged freeze release still holding a zip,
+# past freezes never released (GitHub #221, 14z-191); a stub stands in for gh. ROM-free, ~1 s.
+test_release_prune
 # a file manager's folder metadata (`.DS_Store`) in a release tree is never shipped and
 # never counted (maintainer-ruled 2026-09-14) — the real uploader over a synthetic release
 # planted with them, and the three release listings through tests/lib/os_metadata.sh. ~3 s.
@@ -307,6 +313,11 @@ test_promise_check
 # 14z-185b (#188 route A, PROVISIONAL): the carry-forward predictor (tools/static_confirm.py) marks a gate STALE
 # by each of its four rules; two controls. Not wired into this runner until the traced test. ~1 s.
 test_static_confirm
+# test_trace_static_reads.sh — #188's traced test promoted (GitHub #225, 14z-191): the scorer finds a read the
+# predictor misses and its over-narrowed control must miss, on synthetic traces; two controls. ROM-free, ~3 s.
+test_trace_static_reads
+# test_py_escapes.sh — no tracked Python file carries an invalid string escape (14z-191); one control. ~3 s.
+test_py_escapes
 # 14z-185b (#189): what a run ran on (tools/run_record.py, written by both runners at start and end)
 # — one planted change per recorded field is named; three controls. ~10 s.
 test_run_record

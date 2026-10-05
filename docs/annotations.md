@@ -24,14 +24,14 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | figure | count |
 |---|---|
 | distinct program-space addresses named | 3451 |
-| named by a document or manifest only | 2225 |
-| named by both a document/manifest and code | 823 |
+| named by a document or manifest only | 2218 |
+| named by both a document/manifest and code | 830 |
 | named by CODE ONLY (the gap list below) | 403 |
 | carried by atlas | 643 |
-| carried by engine_internals | 800 |
+| carried by engine_internals | 801 |
 | carried by other docs | 1041 |
 | carried by manifests | 1834 |
-| carried by code | 1226 |
+| carried by code | 1233 |
 
 ## Addresses
 
@@ -53,17 +53,17 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x00362A` | build/manifest/reconciliation.toml — map |
 | `PRG:0x00364A` | build/manifest/reconciliation_huitzil.toml — map; build/manifest/reconciliation_huitzil.toml — map [vs2] |
 | `PRG:0x00393C` | build/manifest/reconciliation.toml — map |
-| `PRG:0x00395E` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) |
+| `PRG:0x00395E` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink); tests/audit_landing_sound.sh; tools/landing_sound_ab.py |
 | `PRG:0x003972` | build/manifest/reconciliation.toml — map [vs2] |
-| `PRG:0x003994` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) [vs2] |
+| `PRG:0x003994` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) [vs2]; tests/audit_landing_sound.sh; tools/landing_sound_ab.py |
 | `PRG:0x0039D6` | build/manifest/reconciliation.toml — map |
 | `PRG:0x003A0C` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x003A8E` | build/manifest/reconciliation.toml — map |
 | `PRG:0x003AC4` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x003AF6` | build/manifest/reconciliation.toml — map |
 | `PRG:0x003B2C` | build/manifest/reconciliation.toml — map [vs2] |
-| `PRG:0x003B36` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) |
-| `PRG:0x003B6C` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) [vs2] |
+| `PRG:0x003B36` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink); tools/landing_sound_ab.py |
+| `PRG:0x003B6C` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) [vs2]; tools/landing_sound_ab.py |
 | `PRG:0x003BEE` | build/manifest/huitzil.toml — hui_kernel_voice_e0; build/manifest/shared_writes.toml — huitzil |
 | `PRG:0x003BF0` | build/manifest/pyron.toml — pyr_kernel_voice_e0; build/manifest/shared_writes.toml — pyron |
 | `PRG:0x003BF4` | build/manifest/donovan.toml — don_kernel_voice_e0; build/manifest/shared_writes.toml — donovan |
@@ -828,7 +828,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x02126C` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
 | `PRG:0x02127C` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
 | `PRG:0x0213F2` | docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port) [vs2]; build/manifest/huitzil.toml — data_in_code [vs2]; build/manifest/reconciliation_huitzil.toml — map [vs2] |
-| `PRG:0x0214E4` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) [vs2] |
+| `PRG:0x0214E4` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) [vs2]; docs/game/engine_internals.md — The physics bank's 'gap_*' rows (14z-121, a reference scan of vsavj's code); tools/air_dash_rigs.py |
 | `PRG:0x021638` | docs/project/patch_notes.md — B. the obj_hook dispatch sites left VANILLA — the WALKER is relocated; build/manifest/donovan.toml — obj_hook; build/manifest/huitzil.toml — obj_hook; build/manifest/pyron.toml — obj_hook |
 | `PRG:0x02163A` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
 | `PRG:0x0216A8` | docs/game/engine_internals.md — The child companion's shadow — a remapped tile never copied (fixed 14z-69o) |
@@ -914,7 +914,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x022A42` | build/manifest/pcrel_escapes.toml — hui60 |
 | `PRG:0x022AAA` | build/manifest/pcrel_escapes.toml — hui60 |
 | `PRG:0x022AD2` | build/manifest/pcrel_escapes.toml — hui60 |
-| `PRG:0x022AF2` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) |
+| `PRG:0x022AF2` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink); docs/game/engine_internals.md — The physics bank's 'gap_*' rows (14z-121, a reference scan of vsavj's code); tools/air_dash_rigs.py |
 | `PRG:0x022AF4` | build/manifest/pcrel_escapes.toml — hui60 |
 | `PRG:0x022B2A` | build/manifest/pcrel_escapes.toml — hui60 |
 | `PRG:0x022B74` | build/manifest/pcrel_escapes.toml — hui60 |
@@ -1071,7 +1071,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x026D36` | docs/project/patch_notes.md — 14z-102 — the #107 row flip — FROZEN in donovan-m10 + every tenant + stock (the shared map), #107 CLOSED; build/manifest/reconciliation.toml — map |
 | `PRG:0x026D60` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) [vs2]; tools/pursuit_rigs.py |
 | `PRG:0x026D64` | build/manifest/reconciliation.toml — map |
-| `PRG:0x026DD2` | build/manifest/reconciliation_huitzil.toml — map [vs2] |
+| `PRG:0x026DD2` | build/manifest/reconciliation_huitzil.toml — map [vs2]; tools/air_dash_rigs.py |
 | `PRG:0x026E14` | docs/project/patch_notes.md — handler clone + the x026142 escape fix [vs2]; build/manifest/reconciliation_huitzil.toml — map [vs2] |
 | `PRG:0x026E16` | docs/project/patch_notes.md — handler clone + the x026142 escape fix; build/manifest/reconciliation_donovan.toml — (top); build/manifest/reconciliation_donovan.toml — map; build/manifest/reconciliation_huitzil.toml — map; build/manifest/reconciliation_pyron.toml — map |
 | `PRG:0x026E30` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) |
@@ -1160,7 +1160,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x027AA8` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x027B0E` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tools/pursuit_rigs.py |
 | `PRG:0x027B80` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink); docs/game/engine_internals.md — The physics bank's 'gap_*' rows (14z-121, a reference scan of vsavj's code); build/manifest/bank_map.toml — gap_be23a; build/manifest/reconciliation_huitzil.toml — map; tests/test_air_attack_height.sh |
-| `PRG:0x027BC2` | build/manifest/reconciliation_huitzil.toml — map; tests/test_air_attack_height.sh |
+| `PRG:0x027BC2` | docs/game/engine_internals.md — The physics bank's 'gap_*' rows (14z-121, a reference scan of vsavj's code); build/manifest/reconciliation_huitzil.toml — map; tests/test_air_attack_height.sh |
 | `PRG:0x027C40` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x027C54` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x027C7C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |

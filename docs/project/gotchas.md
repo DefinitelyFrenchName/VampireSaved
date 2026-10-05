@@ -95,7 +95,13 @@ quotes each check's declared WHAT, so an overstated WHAT is overstated at EVERY 
 corrected — the 14z-189 runs found `retraction_grep`'s and the template was corrected (STATE 14z-189 row 14): a
 finding against a declared WHAT is fixed in `tests/close_standing_checks.tsv`, never in one close's copy. And the
 findings table was still mostly written at the close (8 letters in the commits before the close commit, 23 in it):
-#206, open, its test the 14z-190 close.
+#206, its test the 14z-190 close (ANSWERED below).
+**ANSWERED, 14z-190 (#206, closed `done` 14z-191, the maintainer: *"Close #206"*).** The table is appended as
+each finding is paid, with `tools/findings_add.py` (one finding per call, in the table's form; its self-test in
+`tests/test_close_standing.sh`), and the close's step 1 reviews it (STATE.md's header). Its test, the 14z-190
+close: the table held (a)-(h) before the close began and gained (i) during it, when a result arrived; its
+documentation packet took 4 rule-checker runs, 3 VIOLATED (2026-10-04-661 to -664), against 6/4, 7/6, 8/7 and
+12/11 at the four closes before, and none of the four runs found a finding missing from the table.
 
 ## A FROZEN TABLE IS NOT THE CONTROL FOR A VARIANT RUN — run the unchanged form through the same script on the same build (paid: 14z-186, GitHub #183, rule-checker run 2026-09-30-480)
 
@@ -6350,6 +6356,10 @@ executed nothing but still wrote `build/emu_sweep_<stamp>/` with `commit.txt` an
 stale, so the real `--stale` run that followed would have selected no gate. The folder was removed by
 hand and `--names` again listed both stale MiSTer gates. A dry run is a run as far as the audit can
 tell — remove its directory, or re-read `--names`, before any `--stale` run (the runner fix is #219).
+**FIXED 14z-191 (#219):** the runner writes `commit.txt` only when it executes (`[ "$DRY" = 0 ]`), so a
+dry run leaves no run of record; `tests/test_emulator_runner.sh` section 15 holds it, with the must-fire
+control `dry-run-records` (a runner copy without the guard must write one). The ONE-GATE half above still
+stands: a real partial run is still a run of record.
 
 ## A COST READER THAT KNOWS ONE RUNNER COUNTS ZERO — check a reader's figure against a close you can count by hand before trusting it (paid: 14z-187b, #187)
 
@@ -6428,3 +6438,76 @@ the measurement moved to `docs/platform/mister_history.md`, which no gate follow
 (`python3 tools/gate_follows.py --refs <gate>` per gate, or the `covered()` reader over
 `tests/ci_emulator.tsv`); a host measurement or a log entry goes in the history twin, not in a
 document the emulator tier treats as an input.
+
+## A LABEL MAP IS NOT A MEASUREMENT — an id->name dict nobody reads back can sit one row off (paid: 14z-189 found, 14z-191 fixed, GitHub #218)
+
+`tools/audit_poked_legs.py` carried its own character-id -> name map with 0x0A-0x0E shifted one row
+against the atlas slot table (Q-Bee at 0x0A, Lei-Lei at 0x0C, Lilith at 0x0D, Sasquatch at 0x0E; the
+atlas, pinned by scripted picks: Sasquatch 0x0A, Q-Bee 0x0C, Lei-Lei 0x0D, Lilith 0x0E). Nothing compared
+it with anything: it only labels a column, and no frozen row held one of those ids yet, so every gate stayed
+green. It was found by the retraction grep for an unrelated correction ("0x0D = Lilith").
+
+**The rule:** an id -> name map in the tree is a claim about the atlas, and is held to it —
+`tests/test_charid_names.sh` (`tools/audit_charid_names.py`) judges every such Python map against the slot
+table of `docs/game/atlas/character_tables.md` and fails on a pair that names another row's character.
+A new map is copied from the atlas or from one the gate already holds, never typed from memory.
+
+## A WALK THAT STOPS AT THE FIRST MISS skips everything behind it — the release prune and the never-released freeze (paid: 14z-189 found, 14z-191 fixed, GitHub #221)
+
+`tools/upload_release_assets.sh --prune` looked only at the freeze tag just before the one being published
+and pruned it if it had a release. merged-m20 and merged-m21 were frozen but never released (tags, no
+release), so publishing merged-m22 printed "no earlier freeze release with assets (freeze/merged-m21)" and
+left merged-m19's seven zips hosted, against the 14z-149 ruling that only the latest freeze is hosted.
+
+**The rule:** a cleanup that targets "the previous one" must define previous by the PROPERTY it cleans (a
+release still holding a zip), not by adjacency in a list that can hold entries without it. `--prune` now
+empties every earlier merged freeze release that still holds a `.zip`; `--prune-plan` prints those targets
+without touching GitHub, and `tests/test_release_prune.sh` holds the walk with a stub for `gh`.
+
+## A CHECK THAT SKIPS WHAT IT CANNOT PARSE passes without checking — the findings table's separator inside an anchor (paid: 14z-190, GitHub #224)
+
+`tools/findings_add.py` accepted a home anchor containing ` — `, the findings table's own separator. The
+table is split at its LAST ` — `, so `tools/findings_anchors.py` read the anchor's tail ("#162 is parked") as
+the home, found no file, printed `SKIP` and exited 0: the anchor check passed without checking that finding.
+
+**The rule:** a checker SKIPs only the shape it was told to skip (here a home that is only `GitHub #N`) and
+FAILs anything else it cannot resolve; the writer refuses input carrying the format's separator. Both since
+14z-191: `findings_add.py` refuses a home or test holding ` — `, and `findings_anchors.py` FAILs an
+unresolved home, each with a self-test case run by `tests/test_close_standing.sh` (the anchor check's with the
+must-fire control `skip-unresolved`, the pre-#224 SKIP).
+
+## A COMMENT IN AN APPLIER MODULE IS SHIPPED BYTES — the released pages inline the modules verbatim (paid: 14z-191, GitHub #215)
+
+Correcting a comment in `tools/applier/zip.mjs` (the create_system note #215 made true) turned
+`tests/test_applier_page.sh` section 1 red three times over: every published platform's
+`apply_release.html` inlines `vcdiff.mjs`, `zip.mjs` and `applier.mjs` VERBATIM, comments included, and
+the section requires each shipped page to equal a fresh generation. The comment edit was reverted (the pin
+had made the old comment true anyway).
+
+**The rule:** an edit to `tools/applier/*.mjs` or `page_shell.html` — a comment too — makes every published
+`release/<name>/*/apply_release.html` stale until the next release regenerates it; between releases, fix
+the claim elsewhere (the Python side, a document) or regenerate and re-ship the pages deliberately.
+
+## A TOOL'S SECOND WORD WAS ITS OUTPUT PATH — `homes_tracked.py --newest STATE.md` wrote its report over STATE.md (paid: 14z-191)
+
+`tools/homes_tracked.py` takes `"<row title>" [out]` (or `--newest [out]`), and `[out]` is where its report is WRITTEN.
+Run by hand as `homes_tracked.py --newest STATE.md` — which reads like "the newest row of STATE.md" — it wrote its
+30-line report over STATE.md, taking every edit of the sitting with it (the rollover, the group's rows, the header
+step, two standing lines, the findings table). HEAD's copy was intact; the sitting's edits were replayed from its own
+scripts and `tools/findings_add.py` calls, each re-asserted against its anchor.
+
+**The rule:** a tool that writes a file it is given never writes over the file it reads, nor over any tracked file:
+`homes_tracked.py` now REFUSES (exit 3) an output path that is its state file or tracked, and `tests/test_close_tools.sh`
+section 2d holds it on a temp copy, with the must-fire control `output-overwrites` (a copy without the guard must
+overwrite that copy). Before running a close tool by hand, read its usage line for which argument it writes.
+
+## A SELF-TEST'S OUTPUT ECHOED INTO A GATE'S LOG IS READ AS THE GATE'S OWN — a per-finding "SKIP" made the gate SKIP (paid: 14z-191)
+
+`tests/test_close_standing.sh` began running `tools/findings_anchors.py --selftest` and echoed its whole output into
+the gate's log. That output lists a ticket-only home as `SKIP  (b) home is a ticket only`, and the static runner's
+classifier (`tests/lib/classify.sh`) reads a SKIP marker in a log as the gate declaring a skip: the mid-session tier
+counted the passing gate as SKIP, a red under `--strict`.
+
+**The rule:** a gate echoes a sub-tool's VERDICT line, never its per-item lines, when those lines can carry a verdict
+word (`SKIP`, `FAIL`, `PASS` at the start of a line); `test_close_standing.sh` now prints only the `SELFTEST` line,
+and the shared classifier reads the result as PASS.

@@ -104,9 +104,13 @@ window open for its whole run.
 Written by `tools/record_build_environment.py` on PILOT (14z-190, a Proxmox VM: Ryzen 5700G, 6 vCPU), from
 `559194f3`, by the page's own recipe (`build/agent190/pilot_release.sh`: preflight READY, both builds, the
 gate, the entry; FBNeo about 2 min, MAME about 8, the gate about 4.5). **This is the older-LTS host the WSL2
-entry above names for published Linux binaries: its glibc is 2.39, the release floor.** Not published: its
-`BINARY.txt` records stay on PILOT (copies in `build/agent190/pilot_rel/`); whether they replace the tree's
-WSL2 records is the maintainer's to rule.
+entry above names for published Linux binaries: its glibc is 2.39, the release floor.** **ADOPTED FOR THE
+NEXT RELEASE (maintainer-ruled 2026-10-05, 14z-191; `DECISIONS_HISTORY.md` "Ruled 2026-10-05 (14z-191) — the
+opener's answers"):** its two `BINARY.txt` records are tracked at `release/emulators/{fbneo,mame}/linux-x86_64/`
+with the binaries beside them (git-ignored), every file checked against its record's sha256 on the Mac. (The
+question put at 14z-190 and 14z-191 said they would "replace the tree's WSL2 records"; CORRECTED 14z-191 — the
+tree never tracked a Linux record, so they were added, not swapped.) Whether the build runs properly as a
+player gets it — the asset, the applier, the launcher, a desktop session — is #226.
 
 ## Conditions known to break a build
 

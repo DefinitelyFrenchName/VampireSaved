@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# test_air_attack_height.sh — vsavj's MINIMUM AIR-ATTACK HEIGHT table, read where the code reads it
-# (14z-189; the 14z-121 "36" corrected). ci_static: ROMDIR only.
+# test_air_attack_height.sh — vsavj's MINIMUM AIR-DASH HEIGHT table, read where the code reads it
+# (14z-189; the 14z-121 "36" corrected; "air-attack" CORRECTED to AIR-DASH 14z-191 — every caller's taken
+# branch enters seq 0x14, the air dash, docs/game/engine_internals.md; the gate keeps its name). ci_static: ROMDIR only.
 #
 # WHAT: the routine at vsavj PRG:0x027B80 (fifteen bsr.w callers) tests +0x190 first; when it is
 #   set neither guard applies. Otherwise it returns 0 when +0x121 is set, and, with +0x38 set,
@@ -8,8 +9,9 @@
 #   loads with `movea.l #$0BE23A,a0` (PRG:0x027B92). Every path reaching the button test returns
 #   1 exactly when +0x113|+0x114 is nonzero.
 #   The meanings of +0x121 (crouch), +0x38 (off the ground) and +0x14 (Y) are ram.md's; +0x3A,
-#   +0x113 and +0x114 have no ram.md row, so +0x14 - +0x3A as height above the floor and
-#   +0x113|+0x114 as a button press are 14z-121's readings. Its 32 rows read 0x0018 (24) for 0x04, 0x0D, 0x0F
+#   +0x113 and +0x114 have no ram.md row: +0x14 - +0x3A as height above the floor is 14z-121's reading,
+#   and +0x113 as the air-dash command latch is 14z-191's measurement (it was 14z-121's "button press",
+#   RETRACTED: no LP press set it; the j.66 input did — tests/audit_air_dash_height.sh, #222). Its 32 rows read 0x0018 (24) for 0x04, 0x0D, 0x0F
 #   (Zabel, Lei-Lei, Jedah per docs/game/atlas/character_tables.md) and their +0x10 mirrors
 #   0x14, 0x1D, 0x1F, and 0 for the other 26, the tenants' 0x10/0x11/0x13 included; the 33rd
 #   word on is another table. +0x382 is the character id per docs/game/atlas/ram.md (not

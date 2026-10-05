@@ -339,7 +339,7 @@ name = "gap_be23a"
 vsavj = 0x0BE23A
 kind = "auto"
 stride = 0x40
-note = "REAL per-char WORD table (14z-121): the MINIMUM AIR-ATTACK HEIGHT, vsavj 0x027B80 refuses a button press while airborne below +0x14 - +0x3A < word; 24 (0x0018) for Zabel/Lei-Lei/Jedah (0x04/0x0D/0x0F, ids per docs/game/atlas/character_tables.md, and their +0x10 mirrors 0x14/0x1D/0x1F), 0 for the other 26 of the table's 32 rows incl. the tenants — measured 14z-189, replacing the 14z-121 '36' (how that figure was obtained is not recorded) and correcting 0x0D's name, which 14z-121 gave as Lilith, who is 0x0E (tests/test_air_attack_height.sh)"
+note = "REAL per-char WORD table (14z-121): the MINIMUM AIR-DASH HEIGHT (14z-191: 'air-attack' corrected — every caller of vsavj 0x027B80 enters seq 0x14, the air dash, docs/game/engine_internals.md, #222), vsavj 0x027B80 refuses the air-dash latch +0x113|+0x114 while airborne below +0x14 - +0x3A < word; 24 (0x0018) for Zabel/Lei-Lei/Jedah (0x04/0x0D/0x0F, ids per docs/game/atlas/character_tables.md, and their +0x10 mirrors 0x14/0x1D/0x1F), 0 for the other 26 of the table's 32 rows incl. the tenants — measured 14z-189, replacing the 14z-121 '36' (how that figure was obtained is not recorded) and correcting 0x0D's name, which 14z-121 gave as Lilith, who is 0x0E (tests/test_air_attack_height.sh)"
 
 # capture_kf_ptr: ONE 32-LONGWORD table, corrected 14z-130. It was modelled
 # as TWO `kind = "auto"` rows of `stride = 0x40` — `gap_be27a` + `gap_be2ba`,
