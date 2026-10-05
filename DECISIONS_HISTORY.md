@@ -351,6 +351,16 @@ So: merged-m19's seven zip assets are NOT deleted by hand; they stay hosted unti
 
 ---
 
+## Ruled 2026-10-05 (14z-191, after the close) — #217: a packet per fork, enforced by the tool, built in a future session
+
+**The question (14z-191 close report):** the risk/benefit of the two ways of implementing option 2 (a packet per fork) — a `tools/rulecheck.py` change (a merge packet cites each fork's run, and the tool refuses a cited run that is not OK or resolved, or whose staged artifacts have changed since) against a recorded working practice (nothing mechanical; the merge packet carries the fork runs' verdict files).
+
+**The maintainer:** *"For #217, smaller packetes per fork makes sense only pragramatically to me, not as just a rule which is inherently prone to slippage. But indeed when we tackle it, we'll need to properly implement it and test it. That's work a future session"*
+
+So: #217 is implemented in `tools/rulecheck.py` (a packet citing other runs, checked by the tool), with its own tests and controls in `tests/test_rule_checker.sh`, in a future session; no working-practice-only version.
+
+---
+
 ## Ruled 2026-10-05 (14z-191) — #223: the landing sounds swap to match vs2 (after the samples)
 
 **The question, verbatim (14z-191, the samples sent as asked — `landing223_phobos_now_after_vs2.wav`, `landing223_donovan_now_after_vs2.wav`, each: ours now, ours after the swap, vs2):** the ruling of the report's item 4 had been *"yes, but provide me with samples to listen to first."*

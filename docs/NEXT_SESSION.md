@@ -31,9 +31,11 @@ work there in parallel.**
    (14z-191) — #223"): vs2's mask high half (bit `0x10` set, `0x13` clear) at ours `PRG:0x00395E` and `0x003B36`.
    Check first whether any legacy fighter carries id `0x13` on our builds (vsavj's bit was Victor's mirror).
    `tests/audit_landing_sound.sh` flips in the commit that lands it.
-3. **#217 — THE MAINTAINER LEANS TO OPTION 2 (a packet per fork); the implementation is his to choose** after the
-   risk/benefit analysis given at the 14z-191 close report: a `tools/rulecheck.py` change (a packet citing another
-   run's verdict, checked by the tool) or a recorded working practice.
+3. **#217 — A PACKET PER FORK, IN THE TOOL** (the maintainer, after the close: *"smaller packetes per fork makes sense
+   only pragramatically to me, not as just a rule which is inherently prone to slippage"*; `DECISIONS_HISTORY.md` "Ruled
+   2026-10-05 (14z-191, after the close) — #217"): a `tools/rulecheck.py` change — a merge packet cites each fork's run,
+   and the tool refuses a cited run that is not OK or resolved, or whose staged artifacts changed since — implemented
+   and tested (`tests/test_rule_checker.sh`, with controls) when a session takes it up.
 4. **#226 — THE LINUX RELEASE AS A PLAYER GETS IT:** steps 1 and 4 pass headless on PILOT and ERIS WSL2 (STATE
    14z-191 row (9)); left: step 2 (a desktop session — the maintainer), step 3 (the `-recipe` asset built from
    `EMULATOR.md` on a clean host), the scripted headless case under `tests/`. Whether the parked ticket for the
