@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-191 CLOSE, 2026-10-05)
+# NEXT SESSION — orientation (rewritten at the 14z-192 CLOSE, 2026-10-06)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
@@ -18,51 +18,52 @@ work there in parallel.**
 
 ## START HERE
 
-0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** What the 14z-191 close found and did is in its
-   CLOSE row (STATE 14z-191 row (12)).
-1. **#222 — TO BUILD: Phobos's air dash takes vs2's minimum height (the maintainer's ruling)** (STATE 14z-191 rows (8), (11);
-   `DECISIONS_HISTORY.md`, the 14z-191 report's rulings). vs2's mask at the air-dash
-   site carries bit `0x10` (ours `PRG:0x022AF2` `$28102810`, vs2 `$28112810`) and vs2's height row `0x10` is
-   `0x0018` (ours 0). Before building: whether any legacy fighter carries id `0x10` on our builds (the mask bit
-   would reach it), the superset invariant, and which manifest owns the row. `tests/audit_air_dash_height.sh`
-   flips from `--expect gap` to `--expect same` in the commit that lands it; ships at the next freeze.
-2. **#223 — TO BUILD WITH #222: the landing sounds swap to match vs2** (the maintainer, after the samples:
-   *"#223 I confirm the sound effects should be swapped to match VS2"*; `DECISIONS_HISTORY.md` "Ruled 2026-10-05
-   (14z-191) — #223"): vs2's mask high half (bit `0x10` set, `0x13` clear) at ours `PRG:0x00395E` and `0x003B36`.
-   Check first whether any legacy fighter carries id `0x13` on our builds (vsavj's bit was Victor's mirror).
-   `tests/audit_landing_sound.sh` flips in the commit that lands it.
-3. **#217 — A PACKET PER FORK, IN THE TOOL** (the maintainer, after the close: *"smaller packetes per fork makes sense
-   only pragramatically to me, not as just a rule which is inherently prone to slippage"*; `DECISIONS_HISTORY.md` "Ruled
-   2026-10-05 (14z-191, after the close) — #217"): a `tools/rulecheck.py` change — a merge packet cites each fork's run,
-   and the tool refuses a cited run that is not OK or resolved, or whose staged artifacts changed since — implemented
-   and tested (`tests/test_rule_checker.sh`, with controls) when a session takes it up.
-4. **#226 — THE LINUX RELEASE AS A PLAYER GETS IT:** steps 1 and 4 pass headless on PILOT and ERIS WSL2 (STATE
-   14z-191 row (9)); left: step 2 (a desktop session — the maintainer), step 3 (the `-recipe` asset built from
-   `EMULATOR.md` on a clean host), the scripted headless case under `tests/`. Whether the parked ticket for the
-   dedicated server's Linux binaries is now answered by PILOT is a question for the maintainer.
-5. **#214 and #227 ship with the next release** (#214: the MiSTer README's emulator claims, fixed in the generator;
-   #227: a MAME README note that the four "clone of nonexistent driver megaman" lines are harmless).
-6. **#216** — Lei-Lei 6HP and the other #117 gaps against the Japanese community wiki (the maintainer: *"let's keep it
-   for next session"*).
-7. **Smaller open tickets:** #210 (the pre-push hook's sample command lacks `--session`), #211 (`--stale` selecting 0
-   gates prints GREEN and becomes the run of record), #213 (`dispatch_census.lua`'s input clock under breakpoints).
-8. **SHELVED BY THE MAINTAINER:** the measurer/reader frontmatter change to Sonnet 5.5 at `xhigh`.
+0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** M23 is FROZEN (`c884e6d8`, tags
+   `freeze/donovan-m27`, `huitzil-m34`, `pyron-m28`, `merged-m23`; STATE 14z-192 row (13)) and carries Phobos's air-dash
+   minimum and the vs2 landing sounds, with the small tickets. What the close found and did is in its CLOSE row.
+1. **THE NEXT RELEASE carries M23** with #214 and #227 (both fixed in the generator; `release/merged-m23/` is
+   packaged, and its Windows launcher half PASSed on ERIS). The release itself is the maintainer's call; when it is
+   made, #214 and #227 close with it.
+2. **#129 — RE-CHECK THE WORKER'S REPORT, THEN PUT THE DECISION** (STATE 14z-192 row (10);
+   `build/agent192/r129/REPORT_handback.md`). It names two vs2 CPU-AI behaviours our build lacks: a Phobos-only guard
+   in the in-move continuation check (vs2 `0x2D374`) and a low-attack crouch-guard stance test (vs2 `0x2CD38`, five
+   call sites). The orchestrator has NOT re-checked the report. Re-check it, then measure each behaviour's legacy
+   reach and cost (does it run for legacy CPU fighters, and how many cycles), and only then put the port to the
+   maintainer with options and a recommendation through the rule-checker ([VSP-10]).
+3. **#231 — the freeze's byte-level program diff as a step that cannot be skipped**, and `attribute_patch_delta.py`
+   without a `gen.log` (filed at the M23 close; `tools/program_bytediff.py` is the instrument, its control the
+   M21 -> M22 pair).
+4. **#217 — A PACKET PER FORK, IN THE TOOL** (ruled 14z-191, after the close): a `tools/rulecheck.py` change, tested
+   with controls, when a session takes it up.
+5. **#226 — THE LINUX RELEASE AS A PLAYER GETS IT**, ideally on the next release: step 2 (a desktop session — the
+   maintainer), step 3 (the `-recipe` asset on a clean host), the scripted headless case.
+6. **Open from this sitting:** #228 (breakpoint instruments on the frame_done clock), #229 (community naming rigs),
+   #230 (capture geometry), #118 (the mizuumi candidates, scope commented),
+   #232 (the jtsim scratch heal misses submodules — the reaper broke the MiSTer lane once at this close), #233
+   (`audit_legacy_pairings` deletes a dead leg's log — one leg died in the final ERIS run and its cause is lost).
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
-- `tools/homes_tracked.py "<row>" [out]` / `--newest [out]`: the second word is an OUTPUT path — run as
-  `--newest STATE.md` it overwrote STATE.md (it now refuses its state file or any tracked file).
-- A gate that echoes a sub-tool's per-item lines can carry a verdict word (`SKIP  (b) ...`) the static runner's
-  classifier reads as the gate's own: echo the sub-tool's verdict line only.
-- vsavj `0x027B80` is the minimum AIR-DASH height (every caller enters seq `0x14`); `+0x113` is the air-dash latch
-  (P1's block is `$FF8400`: `+0x113` is `$FF8513`, not `$FF8113` — a first rig traced the wrong address).
-- A read tap on `+0x382` with `RPCS` set to a site's own read PC lists every frame an engine site runs, per game.
-- PILOT and ERIS have no `xdelta3` (package releases on the Mac); PILOT has no password-less sudo.
-- `tools/naming_pair_sheet.sh` labels must not contain `:`; it takes `RIG_DIR` for a rig outside the corpus.
-- `tools/trace_static_reads.py all` on PILOT: about 7 minutes for 203 gates at 6 jobs.
-- An edit to `tools/applier/*.mjs`, a comment too, makes every published `apply_release.html` stale.
+- A remote tier started from a non-login shell runs without the reference `mame` on PATH: every ERIS script begins
+  with `. "$HOME/.profile"` (`ssh eris 'wsl -e sh -s' < script`).
+- ERIS's MINGW64 is MSYS2: `ssh eris 'C:\msys64\usr\bin\env.exe MSYSTEM=MINGW64 CHERE_INVOKING=1 /usr/bin/bash -l
+  /c/Users/chaton/m22logs/<script>.sh'` (there is no Git for Windows bash).
+- A re-point sweep at a freeze must leave pinned predecessors alone (`CTL_*`, `REF`, `--old`, "before"/"pre-"),
+  must not rewrite dated records, and must be followed by a grep for release-name defaults (`merged-m<prev>`).
+- An op-set delta cannot see a byte inside a placed data file: read every track's program change with
+  `tools/program_bytediff.py <old> <new>`.
+- A moved `test_mister_prg_window` pair at a freeze: first swap the graphics members alone (the mark moves it).
+- `tests/run_all_emulator.sh --only` takes ONE shell glob; `|` alternatives select nothing. `--stale` refuses names
+  outside the selection: stale `out`-of-release-scope gates need `--scope all`.
+- A freeze battery run on an uncommitted tree leaves every gate stale at freeze cadence: the `--stale` re-run on the
+  freeze commit is about a whole battery (187 gates at M23). Bring every lane's run dir home and read
+  `tools/audit_emulator_staleness.py --cadence freeze` as soon as the battery ends: the M23 battery's own rows were
+  over half their cap, unseen until its run dir reached the Mac.
+- Since 14z-192 the staleness audit judges a moved path by CONTENT against the run's `run_record_start.json`
+  (the patched `emu/fbneo` included, index-blind), judges a red newest row, and at freeze cadence FAILs only what a
+  freeze selects. Every emulator gate follows `tests/ci_emulator.tsv`, so any registry edit re-stales them all.
 
-## WHAT CLOSED THIS SITTING (14z-191)
+## WHAT CLOSED THIS SITTING (14z-192)
 
-**#188**, **#206**, **#215**, **#218**, **#219**, **#221**, **#224**, **#225** `done`. Filed: #226, #227. Measured in
-play: #222 (air dash at height 21), #223 (the landing sound, by ear). PILOT's Linux records adopted; ERIS's clone reset.
+**#210**, **#211**, **#213**, **#216**, **#222**, **#223** `done`; **#116** and **#117** split and closed `done`.
+Filed: #228, #229, #230, #231, #232, #233. M23 FROZEN; the staleness audit judges by content (ruled).

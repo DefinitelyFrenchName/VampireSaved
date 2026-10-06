@@ -2,8 +2,10 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 231
+# issues: 233
 number	state	reason	closed	labels	title
+233	OPEN	-	-	bug	audit_legacy_pairings deletes a dead leg's MAME log with its temp dir, so a dead leg's cause is never readable
+232	OPEN	-	-	bug	The jtsim scratch heal does not cover submodules: the tmp reaper took their gitdir HEAD and the MiSTer lane failed in 3 s
 231	OPEN	-	-	bug	attribute_patch_delta.py needs a gen.log the solo tracks never write, and the freeze has no byte-level program diff step
 230	OPEN	-	-	evolution	Capture geometry in-emulator: Pyron's and Donovan's throws against the roster victims (split from #116)
 229	OPEN	-	-	evolution	Community cross-check: naming rigs on vsavj for specials, supers, EX/ES moves, throws and pursuits (split from #117)

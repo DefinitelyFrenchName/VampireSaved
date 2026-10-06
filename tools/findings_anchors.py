@@ -8,7 +8,12 @@ cited descriptive anchors ("the ugrep section", "The session column") that no li
 
   python3 tools/findings_anchors.py check ROW_TITLE STATE_FILE
       for every finding (a), (b), ... of the row: the words after the backticked home file, up to ' / ' (and without
-      a trailing ', GitHub #N'), must be found as a fixed string in that file. A home that is only a ticket
+      a trailing ', GitHub #N'), must be found as a fixed string in that file. Several homes (`` `a` X, `b` Y ``, the
+      form tools/findings_add.py writes) are split at each ", `" and EACH is checked (14z-192: until then the
+      first home's anchor ran on through every later home, so no multi-home finding could pass). A home with NO
+      anchor words (a bare `` `path` ``) is listed FILE — its tracking is tools/homes_tracked.py's check — and is
+      NOT counted as an anchor checked (rule-checker run 2026-10-06-701 Q1/Q4: an empty anchor is in every file,
+      so nine such homes had read "ok" without anything being checked). A home that is only a ticket
       (`GitHub #N`) is listed SKIP; any OTHER home with no backticked file is UNRESOLVED and counts as not found —
       #224 (14z-191): an anchor holding the table's own separator ` — ` split there, the tail ("#162 is parked")
       read as a home with no file, and it was SKIPped with exit 0, a check passing without checking.
@@ -27,6 +32,7 @@ import os, re, sys, tempfile
 
 PLANTED = "ZZ-NO-FILE-HOLDS-THIS-ANCHOR"
 PERTURB = ""
+LAST = {}   # the last check's counts: checked, not found, file-only (the self-test reads them)
 
 def row_of(title, state):
     for line in open(state, encoding="utf-8"):
@@ -40,14 +46,15 @@ def findings(row):
     for i in range(1, len(items) - 1, 2):
         letter, text = items[i], items[i + 1]
         home = text.rsplit(" — ", 1)[-1].split(" / ")[0].strip()
-        m = re.match(r"`([^`]+)`\s+(.*)$", home)
-        if not m:
-            yield letter, None, home
-        else:
-            yield letter, m.group(1), re.sub(r",\s*GitHub #\d+\s*$", "", m.group(2)).strip()
+        for part in re.split(r",\s+(?=`)", home):          # several homes: `a` X, `b` Y (14z-192)
+            m = re.match(r"`([^`]+)`\s*(.*)$", part)
+            if not m:
+                yield letter, None, part
+            else:
+                yield letter, m.group(1), re.sub(r",\s*GitHub #\d+\s*$", "", m.group(2)).strip()
 
 def check(title, state, root="."):
-    bad = n = 0
+    bad = n = files = 0
     for letter, path, anchor in findings(row_of(title, state)):
         if path is None:
             if re.fullmatch(r"GitHub #\d+", anchor) or PERTURB == "skip-unresolved":
@@ -56,6 +63,10 @@ def check(title, state, root="."):
                 n += 1; bad += 1
                 print(f"FAIL  ({letter}) home UNRESOLVED (no backticked file, not a GitHub #N): {anchor[:70]}")
             continue
+        if not anchor:
+            files += 1
+            print(f"FILE  ({letter}) {path} (no anchor words: a tracked-file home, homes_tracked's check, not counted here)")
+            continue
         n += 1
         try:
             found = anchor in open(os.path.join(root, path), encoding="utf-8").read()
@@ -63,7 +74,8 @@ def check(title, state, root="."):
             found = False
         print(("ok    " if found else "FAIL  ") + f"({letter}) {path} § {anchor}")
         bad += not found
-    print(f"anchors checked {n}  not found {bad}  ({state})")
+    print(f"anchors checked {n}  not found {bad}  file-only homes {files}  ({state})")
+    LAST.update(checked=n, bad=bad, files=files)
     return 1 if bad else 0
 
 def plant(title, state, out):
@@ -92,8 +104,17 @@ def selftest():
     st2 = os.path.join(d, "STATE2.md")
     open(st2, "w").write("| **(8) U** | (a) one — `home.md` THE REAL — HEADING / none (r) |\n")
     ok &= check("(8) U", st2, d) == 1
+    # 14z-192: several homes, each anchor checked — two found pass, a second home whose anchor no line holds fails
+    st3 = os.path.join(d, "STATE3.md")
+    open(st3, "w").write("| **(7) V** | (a) one — `home.md` THE REAL HEADING, `home.md` is here / none (r) |\n")
+    ok &= check("(7) V", st3, d) == 0
+    open(st3, "w").write("| **(7) V** | (a) one — `home.md` THE REAL HEADING, `home.md` NOT IN THE FILE / none (r) |\n")
+    ok &= check("(7) V", st3, d) == 1
+    # 701: a bare-file home has no anchor to check — listed FILE, never counted as an anchor checked
+    open(st3, "w").write("| **(7) V** | (a) one — `home.md` THE REAL HEADING, `home.md` / none (r) |\n")
+    ok &= check("(7) V", st3, d) == 0 and LAST == {"checked": 1, "bad": 0, "files": 1}
     print("SELFTEST " + ("PASS" if ok else "FAIL") + ": a found anchor passes, a ticket home is SKIP, the generated plant fails, "
-          "a home split by the separator fails")
+          "a home split by the separator fails, several homes are each checked, a bare-file home is not counted")
     return 0 if ok else 1
 
 if __name__ == "__main__":
