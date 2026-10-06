@@ -36,7 +36,7 @@ work there in parallel.**
    match passed on PILOT's desktop (14z-193, STATE row (4)); left are sound and the physical keyboard (PILOT's VM
    has no audio device), step 3 (the `-recipe` asset on a clean host), and the scripted case.
 4. **Open from this sitting:** #228 (breakpoint instruments on the frame_done clock), #229 (community naming rigs),
-   #230 (capture geometry), #118 (the mizuumi candidates, scope commented), #234 (MAME's red bad-ROM box,
+   #235 (the tenants' kick and air throws as throwers, split from #230), #118 (the mizuumi candidates, scope commented), #234 (MAME's red bad-ROM box,
    filed 14z-193).
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)

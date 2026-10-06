@@ -351,6 +351,16 @@ So: merged-m19's seven zip assets are NOT deleted by hand; they stay hosted unti
 
 ---
 
+## Ruled 2026-10-07 (14z-193) — #230 closed `done` on the standard throw; #235 filed for the kick and air throws
+
+**The question (AskUserQuestion, after rule-checker run 2026-10-06-712 OK):** *"#230 now gates Pyron's and Donovan's standard 6+HP throw on all 18 victims, ours vs native, at the matched level (re-frozen under rule-checker run 712, OK; you read the sheets as identical). Their kick and air throws aren't covered. How should #230 end?"* — options "Close; new ticket", "Extend #230 now", "Close; standard is enough".
+
+**The maintainer:** *"Close; new ticket"*
+
+So: #230 closed `done` with its closing comment; #235 filed for Pyron's and Donovan's kick and air throws as throwers (the same gate's method, rigs that produce each throw first).
+
+---
+
 ## Read 2026-10-06 (14z-193) — #230: the tenants' standard throws read identical to native on the capture sheets
 
 **The question (14z-193, for rule-checker run 2026-10-06-709 Q2), with three keyframe-matched capture sheets (`tools/capture_sheet.sh`: Pyron on Victor, Donovan on Victor, Donovan on Phobos; `build/agent193/t230/capture_*.png`):** *"#230, for your read (rule-checker run 709 Q2): the standard throw, ours (green) vs native vs2 (grey), matched by keyframe. Sheets: Pyron throwing Victor; Donovan throwing Victor; Donovan throwing Phobos (a victim whose damage differed when the speed level was unpinned). Do the throws look the same on both sides: where the victim is held, the path, the release?"*
