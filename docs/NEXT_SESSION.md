@@ -32,17 +32,14 @@ work there in parallel.**
    CLAUDE.md and skill reads its spec named. Re-check it, then measure each behaviour's legacy
    reach and cost (does it run for legacy CPU fighters, and how many cycles), and only then put the port to the
    maintainer with options and a recommendation through the rule-checker ([VSP-10]).
-3. **#231 — the freeze's byte-level program diff as a step that cannot be skipped**, and `attribute_patch_delta.py`
-   without a `gen.log` (filed at the M23 close; `tools/program_bytediff.py` is the instrument, its control the
-   M21 -> M22 pair).
-4. **#217 — A PACKET PER FORK, IN THE TOOL** (ruled 14z-191, after the close): a `tools/rulecheck.py` change, tested
-   with controls, when a session takes it up.
-5. **#226 — THE LINUX RELEASE AS A PLAYER GETS IT**, ideally on the next release: step 2 (a desktop session — the
-   maintainer), step 3 (the `-recipe` asset on a clean host), the scripted headless case.
-6. **Open from this sitting:** #228 (breakpoint instruments on the frame_done clock), #229 (community naming rigs),
-   #230 (capture geometry), #118 (the mizuumi candidates, scope commented),
-   #232 (the jtsim scratch heal misses submodules — the reaper broke the MiSTer lane once at this close), #233
-   (`audit_legacy_pairings` deletes a dead leg's log — one leg died in the final ERIS run and its cause is lost).
+3. **#231 — the freeze's byte-level program diff as a step that cannot be skipped** (part 1, `attribute_patch_delta.py`
+   without a `gen.log`, landed 14z-193; `tools/program_bytediff.py` is the instrument, its control the M21 -> M22 pair).
+4. **#226 — THE LINUX RELEASE AS A PLAYER GETS IT**, ideally on the next release: step 2's window, rendering and a
+   match are DONE on PILOT's desktop (14z-193, STATE row (4)); left are sound and the physical keyboard (PILOT's VM
+   has no audio device), step 3 (the `-recipe` asset on a clean host), and the scripted case.
+5. **Open from this sitting:** #228 (breakpoint instruments on the frame_done clock), #229 (community naming rigs),
+   #230 (capture geometry), #118 (the mizuumi candidates, scope commented), #234 (MAME's red bad-ROM box,
+   filed 14z-193).
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
