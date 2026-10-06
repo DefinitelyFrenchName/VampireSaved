@@ -6602,3 +6602,47 @@ M23 swap. At the freeze both gates went red because the build now fired native's
 (the build without #223's two rows) still fired `010a` (`build/agent192/m23/ring223c/`). **The rule:** a frozen
 ours-vs-native delta names its mechanism or its ticket where it is frozen; "documented" with no pointer is an
 unattributed delta, and it is a ticket the day it is frozen.
+
+## AN OP-SET DELTA CANNOT SEE A BYTE INSIDE A PLACED FILE (paid: 14z-192, the M23 freeze; #231)
+The M23 freeze delta was first read as op sets (`patch.json` ops keyed by op, address and content), and
+`tools/attribute_patch_delta.py` ran on the merged pair only: it reads the NEW build's `gen.log`, which the solo
+tracks never write, so on all four it stopped with `FileNotFoundError` (`build/agent192/m23/deltas.txt`). An op-set
+key names a `data_file` op by its file, not its bytes, so a byte that changes INSIDE a placed file whose op is kept
+reads as no change — the class M22's #194 byte was (inside `fixed_hitbox_proj.bin`, `data_file 0x0FDC70`).
+Rule-checker run 2026-10-06-699 caught the gap. `tools/program_bytediff.py` closes it by reading no op list at all:
+it decrypts each build's own romset and lists every differing byte in the opcode and data views. On M22 -> M23 it
+found exactly the designed words (donovan 2, huitzil and merged 4, pyron and stock 0), and its control on M21 -> M22
+shows #194's byte at `0x0FDF69` (`4F` -> `44`). **The rule:** a freeze's program delta is read byte by byte from the
+built romsets on EVERY track, not only from op sets. The ops say what we meant to change; the bytes say what changed.
+(#231 makes it a step the ritual cannot skip and lets `attribute_patch_delta.py` run without a `gen.log`.)
+
+## THE PER-GATE RUN OF RECORD MADE THE FREEZE-CADENCE AUDIT UNSATISFIABLE — three things the newest-directory mask had hidden (paid: 14z-192, the M23 close; maintainer-ruled 2026-10-06 "Fix the audit now, then re-run")
+Once #211's fix judged every gate's newest row (above), the M23 freeze's own runs could not clear
+`test_emulator_staleness` at freeze cadence. ERIS's `--stale` re-run on the freeze commit went PASS 187, and the Mac
+still read 16 stale gates, 10 unjudged reds and 3 over-cap rows (`build/agent192/m23/freeze/stale29_classes.txt`):
+1. **A dirty-by-construction submodule read as moved everywhere.** The FBNeo harness and WIDE patches are applied in
+   `emu/fbneo`'s working tree, so `git diff <commit>` names it on every host, and 13 FBNeo-side gates were stale the
+   moment they passed. Comparing the recorded `diff_sha256` would not have helped: the patched CONTENT was the same
+   on both hosts, but `harness.cpp` was staged on the Mac and untracked on ERIS, so the two `git diff HEAD` hashes
+   differed (`411b98ac` vs `2a269c7a`). **Fixed:** `tools/run_record.py` records an INDEX-BLIND `content_sha256` per
+   submodule (each changed path with its content hash), and the audit exempts a moved path whose content now is
+   exactly what the run's `run_record_start.json` measured. That covers the submodule and a file dirty at the run and
+   committed afterwards unchanged (`tests/test_emulator_staleness.sh` 2c, control `keys-ignored`).
+2. **A red newest row was not judged at all.** The battery's 10 reds were re-frozen and verified by direct re-runs,
+   which leave no runner row, so their newest row stayed FAIL and the audit, judging only PASSED rows, said nothing.
+   **Fixed:** FAIL, TIMEOUT or MISSING as the newest row FAILs at freeze/release, is a NOTE at session, and is
+   listed by `--names`, so `--stale` re-runs it (2e, control `red-newest`).
+3. **A freeze was judged on rows a freeze never runs.** Scope-`out` gates with old rows only, such as
+   `audit_sdram_bank_load` and `test_meter_gain`, FAILed a freeze that does not select them. **Fixed:** at freeze
+   cadence only (cadence `romset`, scope `release`) FAILs, and the rest is a NOTE; release judges every row (2d,
+   control `scope-ignored`).
+**And a control that never ran.** `tests/test_emulator_staleness.sh`'s `newest-dir` shadow copy was given
+`gate_follows.py` alone, which imports `gate_descriptions`. So the copy CRASHED on import, and the control read
+FIRED because a crash names no gate. That is the class of the `open-agent-gate` entry above, here in a gate that
+certifies a freeze. **Fixed:** the shadows run with `tools/` on `PYTHONPATH`, and a control's copy must print its
+verdict (`== emulator staleness` or `NO RUN OF RECORD`, never a traceback) before its silence counts.
+**And the headroom the battery hid:** the battery's own rows were over half their cap (`test_mame_wide` 0.70,
+`audit_guard_corpus` 0.89, `audit_lag_budget` 0.60 at `--jobs 12` on ERIS), but nobody saw it until its run dir
+reached the Mac. **The rule:** bring every lane's run dir home before reading the freeze-cadence verdict, and run
+`tools/audit_emulator_staleness.py --cadence freeze` on the host where the battery ran as soon as the battery
+ends.

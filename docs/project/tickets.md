@@ -11,12 +11,13 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**230 tickets** — status: open 10 · parked 10 · done 183 · declined 9 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 161 · cosmetic 14 · evolution 55 · **backfill debt: 0 rows**.
+**231 tickets** — status: open 11 · parked 10 · done 183 · declined 9 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 162 · cosmetic 14 · evolution 55 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#231](https://github.com/DefinitelyFrenchName/VampireSaved/issues/231) | bug | open | attribute_patch_delta.py needs a gen.log the solo tracks never write, and the freeze has no byte-level program diff step | `tools/attribute_patch_delta.py` · `tools/program_bytediff.py` | none | `docs/project/gotchas.md § AN OP-SET DELTA CANNOT SEE A BYTE INSIDE A PLACED FILE` | `docs/project/gotchas.md § AN OP-SET DELTA CANNOT SEE A BYTE INSIDE A PLACED FILE` | 14z-192 |
 | [#230](https://github.com/DefinitelyFrenchName/VampireSaved/issues/230) | evolution | open | Capture geometry in-emulator: Pyron's and Donovan's throws against the roster victims (split from #116) | `tests/audit_tenant_throw_geometry.sh` | `DECISIONS_HISTORY.md § Ruled 2026-10-05 (14z-192) — #116 split, #230 filed` | none | none | 14z-192 |
 | [#229](https://github.com/DefinitelyFrenchName/VampireSaved/issues/229) | evolution | open | Community cross-check: naming rigs on vsavj for specials, supers, EX/ES moves, throws and pursuits (split from #117) | `tools/vanilla_join_rig.py` | `DECISIONS_HISTORY.md § Ruled 2026-10-05 (14z-192) — #117 split, #229 filed; #118 stays open` | `docs/project/tables/community_crosscheck.md` | none | 14z-192 |
 | [#228](https://github.com/DefinitelyFrenchName/VampireSaved/issues/228) | bug | open | Breakpoint instruments on the frame_done clock, and pc_count.lua's first-frame skip: measure each for drift (#213's class) | `tests/audit_dispatch_census.sh` | none | `docs/platform/gotchas.md § PAID AGAIN, and MEASURED, 14z-192 (GitHub #213)` | none | 14z-192 |

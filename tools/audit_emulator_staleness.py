@@ -32,6 +32,23 @@ that no longer exists. An UNDECLARED gate cannot be judged and is named as such 
 freeze/release cadence that is a FAIL too, because the slice's census makes declaring
 the norm.
 
+A PATH THE RUN ALREADY HAD (14z-192, maintainer-ruled 2026-10-06 "Fix the audit now, then re-run"): a moved
+path whose content NOW is exactly what the run measured is not moved for that run. The run's record
+(`run_record_start.json`, tools/run_record.py) holds the sha256 of every dirty, added or untracked path at the
+start and, per submodule, `content_sha256` — an INDEX-BLIND key over its changed paths' contents. So a tree run
+dirty and committed afterwards unchanged, and the patched `emu/fbneo` (dirty on every host by construction:
+the harness and WIDE patches are applied in its working tree, with the harness file staged on one host and
+untracked on another), are judged by content, not by `git diff`. A path under build/ (outside the record), a
+record without the key, or a run without a record keeps the old rule: moved.
+
+WHAT A FREEZE RUNS (same ruling): at `freeze` cadence only the rows a freeze selects — registry cadence
+`romset`, scope `release` (`run_all_emulator.sh --freeze`) — FAIL; any other row's finding is a NOTE there.
+`release` cadence judges every row.
+
+A RED NEWEST ROW (same ruling): a gate whose newest row is FAIL, TIMEOUT or MISSING has no green to be stale —
+until 14z-192 it was not judged at all. It FAILs at freeze/release cadence (within the scope above) and is a
+NOTE at session; `--names` lists it with the stale gates, so `run_all_emulator.sh --stale` re-runs it.
+
 THE VERDICT BY CADENCE (the ruling): at `session` cadence a stale list is a NOTE — the
 information a session acts on (`run_all_emulator.sh --stale` re-runs exactly those) —
 and the exit is 0; at `freeze` or `release` cadence it is a FAIL (exit 1), because a
@@ -51,9 +68,12 @@ import argparse, bisect, glob, os, subprocess, sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import gate_follows as gf
+import run_record as rr
 
 DEFAULT_CAP = 5400
 HEADROOM = 0.5
+FREEZE_SELECTS = ("romset", "release")       # registry (cadence, scope) a `--freeze` run selects
+RED = ("FAIL", "TIMEOUT", "MISSING")
 
 
 def git(repo, *args):
@@ -82,6 +102,36 @@ def newest_rows(root):
         for r in rows:
             best[r["gate"]] = dict(r, run=d, commit=commit)
     return best, runs
+
+
+def read_record(run):
+    """The run's start record (tools/run_record.py), or None."""
+    p = os.path.join(run, "run_record_start.json")
+    try:
+        import json
+        return json.load(open(p, encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+
+
+def same_as_run(repo, path, rec):
+    """True when `path`, moved since the run's commit, holds NOW exactly what the run measured: a submodule
+    whose index-blind content key equals the record's, or a path dirty at the run's start whose content hash
+    equals the record's (or that was removed then and is absent now). No record, no key: False."""
+    if not rec:
+        return False
+    subs = rec.get("submodules") or {}
+    if path in subs:
+        k = subs[path].get("content_sha256")
+        return bool(k) and rr.submodule_content_key(repo, path) == k
+    dirty = {l[3:].split(" -> ")[-1].strip('"') for l in rec.get("status") or []}
+    if path not in dirty:
+        return False
+    f = os.path.join(repo, path)
+    files = rec.get("files") or {}
+    if path in files:
+        return os.path.isfile(f) and rr.sha_file(f) == files[path]
+    return not os.path.exists(f)
 
 
 def read_run(run):
@@ -122,14 +172,20 @@ def moved_paths(repo, commit):
     return changed | wt, un
 
 
-def stale_gates(root, repo, commit, rows):
-    """-> (stale: {gate: [moved paths]}, undeclared: [gate], passed: [gate], unknown: [gate]).
-    A row carrying its own 'commit' (newest_rows) is judged against it; otherwise against
-    `commit`. `unknown` names passed gates whose recorded commit is not in the repository."""
-    moved, pools = {}, {}
-    stale, undeclared, passed, unknown = {}, [], [], []
+def stale_gates(root, repo, commit, rows, run=None):
+    """-> (stale: {gate: [moved paths]}, undeclared: [gate], passed: [gate], unknown: [gate], red: [gate]).
+    A row carrying its own 'commit' and 'run' (newest_rows) is judged against them; otherwise against
+    `commit` and `run`. `unknown` names passed gates whose recorded commit is not in the repository;
+    `red` the gates whose newest row is FAIL, TIMEOUT or MISSING."""
+    moved, pools, recs = {}, {}, {}
+    stale, undeclared, passed, unknown, red = {}, [], [], [], []
     for r in rows:
-        if "@" in r["gate"] or r["verdict"] != "PASS":
+        if "@" in r["gate"]:
+            continue
+        if r["verdict"] in RED:
+            red.append(r["gate"])
+            continue
+        if r["verdict"] != "PASS":
             continue
         g = r["gate"]
         passed.append(g)
@@ -153,9 +209,13 @@ def stale_gates(root, repo, commit, rows):
             continue
         prefixes = list(toks) + [f"tests/{g}.sh"] + list(gf.IMPLIED)
         hits = sorted(_covered_hits(pools[c], prefixes))
+        d = r.get("run") or run
+        if d not in recs:
+            recs[d] = read_record(d) if d else None
+        hits = [h for h in hits if not same_as_run(repo, h, recs[d])]   # the run already had it (14z-192)
         if hits:
             stale[g] = hits
-    return stale, undeclared, passed, unknown
+    return stale, undeclared, passed, unknown, red
 
 
 def _covered_hits(pool, prefixes):
@@ -233,11 +293,19 @@ def main():
         head = (f"each gate's newest row over {len(runs)} recorded run(s) "
                 f"({nrec} still the newest for some gate; newest {runs[-1]})")
         where = "in their newest run"
-    stale, undeclared, passed, unknown = stale_gates(root, repo, commit, rows)
+    stale, undeclared, passed, unknown, red = stale_gates(root, repo, commit, rows, a.run)
     if a.names:
-        for g in sorted(stale):
+        for g in sorted(set(stale) | set(red)):
             print(g)
         return 0
+    reg_all = gf.registry_rows(root)
+    def judged(g):   # does this row's finding FAIL at this cadence? (14z-192: a freeze judges what it runs)
+        if a.cadence == "session":
+            return False
+        if a.cadence == "release":
+            return True
+        row = reg_all.get(g, {})
+        return (row.get("cadence"), row.get("scope")) == FREEZE_SELECTS
 
     rc = 0
     since = {r["gate"]: (r.get("commit") or commit) for r in rows}
@@ -247,21 +315,33 @@ def main():
         print(f"  FAIL: {len(unknown)} passed gate(s) recorded on a commit not in this repository: "
               + " ".join(f"{g}({since[g][:12]})" for g in sorted(unknown)))
         rc = 1
-    if stale:
-        word = "FAIL" if a.cadence != "session" else "NOTE"
-        print(f"  {word}: {len(stale)} stale gate(s) — a declared path moved since the commit it passed on:")
-        for g in sorted(stale):
-            print(f"      {g}: {' '.join(stale[g][:6])}{' …' if len(stale[g]) > 6 else ''}  (since {since[g][:12]})")
-        if a.cadence != "session":
+    def report(names, what, line):
+        nonlocal rc
+        hard = sorted(g for g in names if judged(g))
+        soft = sorted(g for g in names if not judged(g))
+        for word, grp in (("FAIL", hard), ("NOTE", soft)):
+            if not grp:
+                continue
+            tail = "" if word == "FAIL" or a.cadence == "session" else f" (outside what a {a.cadence} runs)"
+            print(f"  {word}: {len(grp)} {what}{tail}:")
+            for g in grp:
+                print(f"      {line(g)}")
+        if hard:
             rc = 1
-        else:
-            print("      re-run exactly these: tests/run_all_emulator.sh --stale")
-    else:
+        return bool(names)
+    if not report(stale, "stale gate(s) — a declared path moved since the commit it passed on",
+                  lambda g: f"{g}: {' '.join(stale[g][:6])}{' …' if len(stale[g]) > 6 else ''}  (since {since[g][:12]})"):
         print(f"  ok: no passed gate has a moved input since the commit it passed on")
-    if undeclared:
-        word = "FAIL" if a.cadence != "session" else "NOTE"
+    if red:
+        report(red, "gate(s) whose newest row is red (FAIL, TIMEOUT or MISSING) — no green to judge",
+               lambda g: f"{g}: {next(r['verdict'] for r in rows if r['gate'] == g)}  (on {since[g][:12]})")
+    if (stale or red) and a.cadence == "session":
+        print("      re-run exactly these: tests/run_all_emulator.sh --stale")
+    if undeclared:   # one line, as since 14z-180 (readers grep the names beside the words)
+        hard = [g for g in undeclared if judged(g)]
+        word = "FAIL" if hard else "NOTE"
         print(f"  {word}: {len(undeclared)} passed gate(s) without a FOLLOWS declaration cannot be judged: {' '.join(undeclared)}")
-        if a.cadence != "session":
+        if hard:
             rc = 1
     over = headroom(root, rows)
     if over:

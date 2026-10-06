@@ -12,7 +12,10 @@ A RECORD (JSON) holds:
   status      `git status --porcelain --untracked-files=all`, build/ and docs/site/ left out (untracked by
               convention; a run's build products are fingerprinted by the runner itself)
   files       sha256 of every path the status names that exists (dirty, added and untracked alike)
-  submodules  each submodule's checked-out SHA, a sha256 of its `git diff HEAD`, and its untracked files
+  submodules  each submodule's checked-out SHA, a sha256 of its `git diff HEAD`, and its untracked files; and
+              (14z-192) `content_sha256`, a key over every path its status names and that path's content —
+              blind to the INDEX, so a patch tree with a new file staged on one host and untracked on another
+              keys the same (`git diff HEAD` does not); tools/audit_emulator_staleness.py compares it
   argv        the runner's exact command line
   env         the value of every ALLOWED variable that is set (ALLOW below), and the NAMES of all others —
               never a value outside the allow-list, never a name that reads as a secret (SECRETISH). An END
@@ -84,8 +87,26 @@ def submodules(root):
         diff = subprocess.run(["git", "diff", "HEAD"], cwd=d, capture_output=True).stdout
         untracked = git(d, "ls-files", "--others", "--exclude-standard").split()
         out[path] = {"sha": f[0].lstrip("+-U"), "diff_sha256": hashlib.sha256(diff).hexdigest(),
-                     "untracked": sorted(untracked)}
+                     "untracked": sorted(untracked), "content_sha256": submodule_content_key(root, path)}
     return out
+
+
+def submodule_content_key(root, path):
+    """A submodule's working-tree state as one key, INDEX-BLIND (14z-192): sha256 over its checked-out
+    SHA and, for every path its `git status --porcelain --untracked-files=all` names, the path and its
+    content's sha256 (or `deleted`). A file staged on one host and untracked on another keys the same;
+    any content change, a new file or a removed one changes it."""
+    d = os.path.join(root, path)
+    head = git(d, "rev-parse", "HEAD").strip()
+    names = set()
+    for l in git(d, "status", "--untracked-files=all", "--porcelain").split("\n"):   # argument order: the
+        if l.strip():                                    # blind-untracked control edits the other call only
+            names.add(l[3:].split(" -> ")[-1].strip('"'))
+    h = hashlib.sha256(head.encode())
+    for n in sorted(names):
+        f = os.path.join(d, n)
+        h.update(f"\n{n}\t{sha_file(f) if os.path.isfile(f) else 'deleted'}".encode())
+    return h.hexdigest()
 
 
 def env():
@@ -235,6 +256,16 @@ def selftest():
         say(any(x.startswith("argv:") for x in ds), "plant argv: a different command line is named")
         say(any(x == "env: ROMDIR" for x in ds), "plant env: a changed allow-listed variable is named")
         say(compare(b, b) == [], "a record compared with itself has no difference")
+        # the submodule CONTENT key (14z-192): index-blind, content-sensitive
+        sd = os.path.join(repo, "emu/sub")
+        w("added.txt", "a\n", sd)
+        k_untracked = submodule_content_key(repo, "emu/sub")
+        sh(sd, "git", *cfg, "add", "added.txt")
+        k_staged = submodule_content_key(repo, "emu/sub")
+        say(k_untracked == k_staged, "a submodule file staged and the same file untracked key the same (content_sha256)")
+        say(submodules(repo)["emu/sub"]["content_sha256"] == k_staged, "the record's submodule entry carries content_sha256")
+        w("added.txt", "b\n", sd)
+        say(submodule_content_key(repo, "emu/sub") != k_staged, "a content change in a submodule file changes content_sha256")
         os.environ.pop("SELFTEST_API_TOKEN", None)
     print("SELFTEST " + ("PASS" if ok else "FAIL"))
     return 0 if ok else 1

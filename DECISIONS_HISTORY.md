@@ -351,6 +351,16 @@ So: merged-m19's seven zip assets are NOT deleted by hand; they stay hosted unti
 
 ---
 
+## Ruled 2026-10-06 (14z-192) — three emulator caps raised; the staleness audit fixed before the M23 close, then the stale gates re-run
+
+**The questions (AskUserQuestion, 14z-192, after ERIS's `--stale` re-run on `c884e6d8` went PASS 187):** *"Three emulator rows used over half their time cap on ERIS (test_mame_wide 3,800 s of 5,400; audit_guard_corpus 4,784 s of 5,400; audit_lag_budget 544 s of 900), which fails test_emulator_staleness. Raise the caps by HANDOFF's HEADROOM rule? Editing tests/ci_emulator.tsv makes nearly every emulator gate stale again (another ~2.5 h on ERIS + ~1h40 MiSTer on the Mac)."* (options "Raise to 10,800 / 14,400 / 3,600", "Raise, different figures", "Don't raise yet"); *"Apart from the caps, the freeze-cadence staleness check cannot go green on this tree: 13 FBNeo-side gates read stale on every host because the patched emu/fbneo submodule is always 'modified' (exposed by this session's #211 fix, which removed the newest-directory mask), test_don_sound follows docs/project/gotchas.md (any doc commit re-stales it), and two out-of-scope gates have only old Mac rows. The battery's 10 reds also have a FAIL as their newest runner row, which the audit does not judge. How should this close proceed?"* (options "Fix the audit now, then re-run", "Push with the red named", "Keep local, fix next session").
+
+**The maintainer:** *"Raise to 10,800 / 14,400 / 3,600"*; *"Fix the audit now, then re-run"*.
+
+So: `tests/ci_emulator.tsv` caps `test_mame_wide` 10,800 s, `audit_guard_corpus` 14,400 s, `audit_lag_budget` 3,600 s. `tools/audit_emulator_staleness.py` is fixed this session (a content key for paths dirty at run time, the freeze cadence judging what a freeze runs, a FAIL newest row judged), with tests and controls, and the gates still stale are then re-run before the close.
+
+---
+
 ## Ruled 2026-10-05 (14z-192) — #115 closed `declined` by the maintainer on GitHub
 
 **The maintainer, on #115 (2026-10-05T12:04:52Z, closing the issue):** *"Given the current state of the competitive play rules, it's ruled best not to touch this unless there's a community-wide request (which is beyond unlikely). Ticket closed"* (their earlier comment, 2026-09-15: *"This ticket is parked potentially forever since the behavior is vanilla. The one thing that makes this ticket acceptable is that it would be a separate surgical patch. Still, this is currently fully out of scope of the project"*).

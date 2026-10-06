@@ -2376,6 +2376,16 @@ recording replays at every freeze), `tests/audit_don_vs_cpu.sh`.
   state 0x0E — vsavj's generic jump handler (`0x22A24`, 10 sub-states) takes
   it; **Phobos's private vs2 jump handler (`0x2592A`, 5 sub-states) does not**,
   and vs2's own Phobos scripts never issue it.
+- **The command set and two vs2-only behaviours: REPORTED 14z-192, NOT YET RE-CHECKED** (#129; a worker's
+  decode plus non-debug read taps on ERIS, `build/agent192/r129/REPORT_handback.md`, 20 legs). Per the report,
+  the opponent tests are shared code (21 IF conditions, five wait/guard commands), WHICH ones run is per
+  character (each class's own script blocks), the per-id probability and timing tables are identical across all
+  32 classes on both games, and vsavj and vs2 share 84 of 89 command handlers. vs2 has two behaviours vsavj's
+  interpreter lacks: a Phobos-only guard (id `0x10`) inside the in-move continuation check at vs2 `0x2D374`
+  (native refused every check made while Phobos's `+0x1BC` was 1, ours let them through), and a low-attack
+  crouch-guard stance test at vs2 `0x2CD38` (five call sites), which read the opponent's attack record on native
+  and never on ours. These are CPU-AI gameplay differences, so they are the maintainer's to rule ([VSP-10]), and
+  the figures are the worker's until the orchestrator re-checks them.
 - **The #99 crash (RESOLVED 14z-111):** a tenant class read the aliased row
   (Phobos 0x10 -> Demitri's scripts), Demitri's jump command reached Phobos's
   5-entry table at index 7, the displacement read from code landed in

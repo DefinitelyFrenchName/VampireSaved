@@ -2,8 +2,9 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 230
+# issues: 231
 number	state	reason	closed	labels	title
+231	OPEN	-	-	bug	attribute_patch_delta.py needs a gen.log the solo tracks never write, and the freeze has no byte-level program diff step
 230	OPEN	-	-	evolution	Capture geometry in-emulator: Pyron's and Donovan's throws against the roster victims (split from #116)
 229	OPEN	-	-	evolution	Community cross-check: naming rigs on vsavj for specials, supers, EX/ES moves, throws and pursuits (split from #117)
 228	OPEN	-	-	bug	Breakpoint instruments on the frame_done clock, and pc_count.lua's first-frame skip: measure each for drift (#213's class)
