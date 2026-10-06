@@ -1,0 +1,35 @@
+# freeze_bytediff record (tools/freeze_bytediff.py, #231): every program range the newest freeze changed,
+# per track, measured by tools/program_bytediff.py --record from each build's own decrypted romset.
+# Ranges and whole-image sha1s only, never bytes (CLAUDE.md rule 7). Reviewed at the freeze, then FREEZE=1.
+TRACK donovan donovan-m26 -> donovan-m27
+PAIR build/don_m26 build/don_m27 op 2 data 2
+IMAGES op a8ad37616330576e2ce3cb311b4ff24df66de35d -> 21111932599709767a06db0b25270b569814cd2e data a68cdf5da8758b0ef12ea236b906c6b1ff6c55c9 -> fe692129ed03546e69220cc93c0837832508c48f
+RANGE op 0x003961-0x003961 len 1
+RANGE op 0x003b39-0x003b39 len 1
+RANGE data 0x003960-0x003961 len 2
+RANGE data 0x003b38-0x003b39 len 2
+TRACK huitzil huitzil-m33 -> huitzil-m34
+PAIR build/hui60 build/hui61 op 4 data 4
+IMAGES op b344bf428c453e3f9b2f93bccac744b44a675e1d -> 9abcda2cdd15aefef35c53b07712a8f6fd96f198 data ce166b7c79375df70350fe509c5d61313bbf9c94 -> dffb7780cc9d6fbfef478dfdc58096b237cab213
+RANGE op 0x003961-0x003961 len 1
+RANGE op 0x003b39-0x003b39 len 1
+RANGE op 0x022af5-0x022af5 len 1
+RANGE op 0x0be25a-0x0be25b len 2
+RANGE data 0x003960-0x003961 len 2
+RANGE data 0x003b38-0x003b39 len 2
+RANGE data 0x022af4-0x022af5 len 2
+RANGE data 0x0be25b-0x0be25b len 1
+TRACK pyron pyron-m27 -> pyron-m28
+PAIR build/pyron45 build/pyron46 op 0 data 0
+IMAGES op 05014a95f386afee721da7216dea9bd2ff65ed6b -> 05014a95f386afee721da7216dea9bd2ff65ed6b data 3db71fcbebe4a1cdcbd83048e1bb1139a1fd379b -> 3db71fcbebe4a1cdcbd83048e1bb1139a1fd379b
+TRACK merged merged-m22 -> merged-m23
+PAIR build/m3b_merged30 build/m3b_merged31 op 4 data 4
+IMAGES op f17c8036984500c12735d611fe3ca34b42822f8c -> d267496fb531fed6d071ed68d208efc9bf7f1125 data 36964d2ed879887baa49ecd7b421c2efd752c7ea -> a6365f0da575f825cedf31062431c886fddf2d73
+RANGE op 0x003961-0x003961 len 1
+RANGE op 0x003b39-0x003b39 len 1
+RANGE op 0x022af5-0x022af5 len 1
+RANGE op 0x0be25a-0x0be25b len 2
+RANGE data 0x003960-0x003961 len 2
+RANGE data 0x003b38-0x003b39 len 2
+RANGE data 0x022af4-0x022af5 len 2
+RANGE data 0x0be25b-0x0be25b len 1

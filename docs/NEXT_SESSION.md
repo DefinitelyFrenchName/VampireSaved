@@ -35,7 +35,7 @@ work there in parallel.**
 3. **#231 — the freeze's byte-level program diff as a step that cannot be skipped** (part 1, `attribute_patch_delta.py`
    without a `gen.log`, landed 14z-193; `tools/program_bytediff.py` is the instrument, its control the M21 -> M22 pair).
 4. **#226 — THE LINUX RELEASE AS A PLAYER GETS IT**, ideally on the next release: step 2's window, rendering and a
-   match are DONE on PILOT's desktop (14z-193, STATE row (4)); left are sound and the physical keyboard (PILOT's VM
+   match passed on PILOT's desktop (14z-193, STATE row (4)); left are sound and the physical keyboard (PILOT's VM
    has no audio device), step 3 (the `-recipe` asset on a clean host), and the scripted case.
 5. **Open from this sitting:** #228 (breakpoint instruments on the frame_done clock), #229 (community naming rigs),
    #230 (capture geometry), #118 (the mizuumi candidates, scope commented), #234 (MAME's red bad-ROM box,

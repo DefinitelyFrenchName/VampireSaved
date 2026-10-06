@@ -351,6 +351,16 @@ So: merged-m19's seven zip assets are NOT deleted by hand; they stay hosted unti
 
 ---
 
+## Ruled 2026-10-06 (14z-193) — `test_freeze_bytediff` listed at freeze cadence
+
+**The question (14z-193, after #231 part 2 landed the gate):** *"should test_freeze_bytediff (about 85 s) be listed at freeze cadence in ci_cadence.tsv, or stay at session cadence? A new listing is a reviewed event, so it's yours."*
+
+**The maintainer:** *"freeze cadence"*
+
+So: `tests/ci_cadence.tsv` lists `test_freeze_bytediff` as `freeze` (the "THIRD CUT" note in its header), its triggers `tests/expected/registry.tsv tests/expected/freeze_bytediff/ tools/freeze_bytediff tools/program_bytediff tools/cps2_decrypt` — a freeze's own registry rows trigger it in a session tier as well.
+
+---
+
 ## Ruled 2026-10-06 (14z-193) — #122 closed `done`: PILOT's per-gate figure is the answer
 
 **The question (14z-193, after a measurer read PILOT's unrecorded 14z-189 `--controls` run, `build/emu_pilot_14z189_controls` on PILOT, against the Mac's 14z-153 run):** the two runs share 196 rows that both passed, and over those PILOT took 2.04× the Mac's seconds; but PILOT's run was not green (two prereq FAILs on a non-login PATH, the two MiSTer oracles TIMEOUT at the 7,200 s cap), its content differs (387 rows against 211, the M21-era tree against M18) and its Verilator is 5.020 against 5.050, so the wall times do not compare. Options put: (a) accept the per-gate figure as the answer and close; (b) a like-for-like re-run on both hosts at one commit.

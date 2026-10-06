@@ -2602,7 +2602,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0FD5A4` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 |
 | `PRG:0x0FDC70` | docs/project/gotchas.md — AN OP-SET DELTA CANNOT SEE A BYTE INSIDE A PLACED FILE (paid: 14z-192, the M23 freeze; #231); docs/project/patch_notes.md — 14z-189 — THE M22 FREEZE (donovan-m26 / huitzil-m33 / pyron-m27 / merged-m22, mark M22): #194 and #195 LANDED; tools/program_bytediff.py |
 | `PRG:0x0FDF52` | build/manifest/pyron.toml — palette_routine_row_11_c |
-| `PRG:0x0FDF69` | HANDOFF.md — What exists (M0 bench, 2026-07-25); docs/project/gotchas.md — AN OP-SET DELTA CANNOT SEE A BYTE INSIDE A PLACED FILE (paid: 14z-192, the M23 freeze; #231); tools/program_bytediff.py |
+| `PRG:0x0FDF69` | HANDOFF.md — What exists (M0 bench, 2026-07-25); docs/project/gotchas.md — AN OP-SET DELTA CANNOT SEE A BYTE INSIDE A PLACED FILE (paid: 14z-192, the M23 freeze; #231); tests/test_freeze_bytediff.sh; tools/program_bytediff.py |
 | `PRG:0x0FE300` | docs/project/patch_notes.md — 14z-185 — THE M21 FREEZE (donovan-m25 / huitzil-m32 / pyron-m26 / merged-m21, mark M21): #182 and #159 LANDED |
 | `PRG:0x0FEE08` | docs/project/patch_notes.md — 14z-170 — THE M19 FREEZE (donovan-m23 / huitzil-m30 / pyron-m24 / merged-m19, mark M19): the four ruled #136 fixes, and a placeholder corruption that had shipped since merged-m16 [vs2] |
 | `PRG:0x0FFF20` | docs/project/patch_notes.md — 14z-189 — THE M22 FREEZE (donovan-m26 / huitzil-m33 / pyron-m27 / merged-m22, mark M22): #194 and #195 LANDED |

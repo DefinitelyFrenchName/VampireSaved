@@ -6629,8 +6629,11 @@ built romsets on EVERY track, not only from op sets. The ops say what we meant t
 (#231 makes it a step the ritual cannot skip and lets `attribute_patch_delta.py` run without a `gen.log`.)
 **Part 1 FIXED 14z-193:** `attribute_patch_delta.py` reads `gen.log` only when the NEW build has one and otherwise says
 so (`NOTE: no …/gen.log`), so it attributes the solo tracks too — gate `tests/test_attribute_patch_delta.sh` on the pinned
-M22 -> M23 pairs (donovan without a `gen.log`, merged with one; control `gen-log-required`). Part 2, the byte diff as a
-step the freeze cannot skip, is still open.
+M22 -> M23 pairs (donovan without a `gen.log`, merged with one; control `gen-log-required`). **Part 2 FIXED 14z-193:**
+the byte diff is a step the freeze cannot skip — `tools/freeze_bytediff.py` records every range of the newest
+freeze (ranges and whole-image sha1s only: a 1- or 2-byte range's own hash would be its ROM bytes by brute force),
+and `tests/test_freeze_bytediff.sh` is red until that record exists and equals a fresh measurement (HANDOFF
+"AND THE FREEZE'S WHOLE PROGRAM CHANGE"; the M23 record: 20 ranges over four tracks).
 
 ## THE PER-GATE RUN OF RECORD MADE THE FREEZE-CADENCE AUDIT UNSATISFIABLE — three things the newest-directory mask had hidden (paid: 14z-192, the M23 close; maintainer-ruled 2026-10-06 "Fix the audit now, then re-run")
 Once #211's fix judged every gate's newest row (above), the M23 freeze's own runs could not clear

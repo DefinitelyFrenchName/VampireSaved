@@ -229,6 +229,7 @@ declares	test_fbneo_tree_integrity_control
 declares	test_figure_check
 declares	test_freeze_artifacts_current
 declares	test_freeze_basis_sandbox
+declares	test_freeze_bytediff
 declares	test_freeze_retires_diverge
 declares	test_freeze_set_shape
 declares	test_freeze_tag_coverage

@@ -13,14 +13,14 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**437 of 437 gates described.**
+**438 of 438 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
 | [runner](#runner) | 44 | 44 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 43 | 43 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
-| [pipeline](#pipeline) | 61 | 61 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
+| [pipeline](#pipeline) | 62 | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 87 | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
@@ -906,7 +906,7 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 
 ## pipeline
 
-the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses. 61 of 61 described.
+the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses. 62 of 62 described.
 
 ### `audit_capture_matrix.sh` — audit, ci_static
 
@@ -1059,6 +1059,14 @@ the build pipeline — manifests, patch ops, extraction/reconciliation/generatio
 **HOW:** compares each artifact with the current freeze's build set and registry; six controls (a one-value change at an equal op count, a non-current header, a stale dir, a stale fingerprint, an unregistered-but-registered row, a program-key alias).
 
 **EXPECTS:** every artifact current; each control fails its section. Add a row when an artifact is tracked, build-derived and covered by no ci_static gate.
+
+### `test_freeze_bytediff.sh` — test, ci_static
+
+**WHAT:** the record tests/expected/freeze_bytediff/<newest merged set>.txt exists and equals `tools/freeze_bytediff.py render`: the four tracks' newest registry rows against the row before, each set's build dir from its tag, every differing range in the opcode and data views of each build's own decrypted romset (ranges and whole-image sha1s, never bytes).
+
+**HOW:** one render (~66 s: eight romsets decrypted) compared with the committed record; the instrument is shown live on the M21 -> M22 pyron pair (build/pyron44 -> build/pyron45), whose data view must list #194's byte at 0x0FDF69 inside a placed file — the class op sets cannot see; the control drops one RANGE line from a copy of the record, which must differ from the same render.
+
+**EXPECTS:** the record equal, 0x0FDF69 listed, the control's copy unequal. A freeze that adds registry rows without a reviewed record leaves this red: `python3 tools/freeze_bytediff.py render`, review every range against the freeze's design, then `freeze`.
 
 ### `test_freeze_tag_coverage.sh` — test, ci_portable
 

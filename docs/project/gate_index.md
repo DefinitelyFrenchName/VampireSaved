@@ -16,14 +16,14 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**437 scripts** — 120 ci_portable, 89 ci_static, 228 emulator-tier (run by name).
+**438 scripts** — 120 ci_portable, 90 ci_static, 228 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
 | [runner](#runner) | 44 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 43 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
-| [pipeline](#pipeline) | 61 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
+| [pipeline](#pipeline) | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
@@ -185,6 +185,7 @@ the build pipeline — manifests, patch ops, extraction/reconciliation/generatio
 | `tests/test_escape_triage.sh` | test | ci_static | ROMDIR | H3.1's verdicts, frozen (14z-100 hardening). | 14z-100 |
 | `tests/test_extract_hp.sh` | test | ci_static | ROMDIR | the Huitzil/Pyron extraction gate (14z-65, M3b Phase 1). | 14z-65 |
 | `tests/test_freeze_artifacts_current.sh` | test | ci_static | ROMDIR | TRACKED ARTIFACTS THAT FOLLOW THE ROMSET MUST HAVE BEEN REFRESHED AT THE CURRENT FREEZE. (14z-144.) | 14z-144 |
+| `tests/test_freeze_bytediff.sh` | test | ci_static | ROMDIR | the newest freeze's whole program change is RECORDED byte range by byte range, and the record equals a fresh measurement (`tools/freeze_bytediff.py`, 14z-193, GitHub #231 part 2). | 14z-193 |
 | `tests/test_freeze_tag_coverage.sh` | test | ci_portable | — | EVERY FROZEN BUILD IS GIT-TAGGED (14z-126b). ci_portable: no ROM, no build dir, no emulator, ~1 s. Needs git tags. | 14z-126b |
 | `tests/test_fsm_census.sh` | test | ci_static | ROMDIR | the STATIC object-script node-state census gate (14z-110, GitHub #99). Locks tools/audit_fsm_census.py against its frozen inventory (build/manifest/fsm_census.toml) AND proves the checker can fail. | 14z-110 |
 | `tests/test_hitclass_map_thunk.sh` | test | ci_static | ROMDIR | the hit-class map-extension thunk (14z-82b) reconstructs from the two reference ROMs, and any committed row matches the reconstruction byte-for-byte. | 14z-82b |

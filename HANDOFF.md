@@ -1621,6 +1621,16 @@ MAME_ROMPATH="$PWD/build/<dir>/rompath;$ROMDIR" tests/run_suite.sh --freeze vsav
 MAME_ROMPATH="$PWD/build/<dir>/rompath;$ROMDIR" tests/run_suite.sh vsavjw
 ```
 
+**AND THE FREEZE'S WHOLE PROGRAM CHANGE, BYTE BY BYTE (#231, since 14z-193) — a step the gate makes
+unskippable.** Once the registry rows and the `freeze/<set>` tags (with their `build dir` lines) exist:
+`python3 tools/freeze_bytediff.py render` lists, for each of the four tracks, every range that differs between
+the newest set's build and its predecessor's, in the opcode and data views of each build's own decrypted romset
+(ranges and whole-image sha1s, never bytes — CLAUDE.md rule 7). Review every range against the freeze's design (a
+range nobody designed is a finding), then `python3 tools/freeze_bytediff.py freeze` writes
+`tests/expected/freeze_bytediff/<merged set>.txt`. `tests/test_freeze_bytediff.sh` is red from the moment new
+registry rows exist until that record does and equals a fresh measurement. Op sets cannot see a byte inside a
+placed data file (#194's at M22); the bytes can.
+
 The freeze log must print `authored .masked expectation — not self-frozen`
 for ~52 of the 88 replays; if `01_attract_long` reads `frozen <sha>`, the
 carry was missed. Acceptance: `python3 tools/freeze_set_shape.py --set <new>` clean — NOTHING its

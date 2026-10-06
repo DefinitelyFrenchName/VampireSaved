@@ -22,6 +22,9 @@
 # small file set whose property it locks as its triggers (~3 min per session run).
 #
 # Columns: gate<TAB>cadence<TAB>triggers (space-separated PATH PREFIXES, repo-relative)
+# THIRD CUT (maintainer, 2026-10-06, 14z-193 — "freeze cadence"): test_freeze_bytediff (~85 s, eight romsets
+# decrypted) -> freeze; its triggers include tests/expected/registry.tsv, so the commit that adds a freeze's rows
+# runs it in a session tier too.
 # A new listing is a reviewed event: it moves a gate OUT of every session run.
 test_m3a_reproducible	freeze	build/manifest/ tools/build_ tools/gen_ tools/pack_ tools/extract_ tools/reconcile tools/cps2_ tools/patch_prg tools/ensure_merged tools/build_fingerprint tests/expected/registry.tsv tests/lib/
 test_bbh_fidelity	freeze	tests/lib/ tests/run_ tests/ci_ tools/gen_gate_index tools/checkskills tools/gen_skill_guide tools/audit_header_defaults tools/audit_build_ref_rot tools/compare_fields tools/check_wram_dumps tests/expected/ tests/lua/ .claude/skills/ tools/run_replay tools/run_inp tools/run_mame
@@ -40,3 +43,4 @@ test_reconcile_matcher	freeze	tools/find_equiv tools/reconcile_batch build/manif
 test_frozen_rompath_guard	freeze	tools/build_ tests/expected/registry.tsv
 test_accent_census	freeze	build/manifest/ tools/gen_ tools/build_
 test_emulator_runner	freeze	tests/run_all_emulator.sh tests/lib/ tests/ci_emulator.tsv tools/build_fingerprint
+test_freeze_bytediff	freeze	tests/expected/registry.tsv tests/expected/freeze_bytediff/ tools/freeze_bytediff tools/program_bytediff tools/cps2_decrypt
