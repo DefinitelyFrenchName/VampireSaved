@@ -2926,11 +2926,11 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 ### `audit_tenant_throw_geometry.sh` — audit, emulator
 
-**WHAT:** Phobos's three throws (6+HP, Circuit Scrapper, ES Circuit Scrapper), ours vs native vs2, for all 18 roster victims: the held victim traverses the SAME ordered (pose, dx, dy) states in the same order on both legs, the end-of-hold tail is one uniform shape per throw, and damage is compared as (amount, pose) pairs — dwell reported, never asserted.
+**WHAT:** Phobos's three throws (6+HP, Circuit Scrapper, ES Circuit Scrapper) and Pyron's and Donovan's standard throw, ours vs native vs2, for all 18 roster victims, at the MATCHED speed level and a pinned RNG: the held victim traverses the SAME ordered (pose, dx, dy) states in the same order on both legs, the end-of-hold tail is one uniform shape per throw, and damage is compared as totals per victim — dwell reported, never asserted.
 
-**HOW:** the same replay per throw and victim on both legs on MAME (six-way parallel, 54 cells), every frame of the hold collapsed into the ordered state sequence with dwell counts; pose indexes resolved through each game's own anim_index_c (pixels deliberately not compared: two generations of the victim's art).
+**HOW:** the same replay per throw and victim on both legs on MAME (90 cells, JOBS-way parallel), level 06 and RNG word 0000 poked on both legs (the parity gates' ruled equalised input), every frame of the hold collapsed into the ordered state sequence with dwell counts; pose indexes resolved through each game's own anim_index_c (pixels deliberately not compared: two generations of the victim's art).
 
-**EXPECTS:** 18/18 identical ordered states per throw, the frozen tail shape, the ±1 damage residue cells as frozen (the defense-row class, audit_defense_row_residue); a red is a state missing, reordered, or a damage cell moved.
+**EXPECTS:** 18/18 identical ordered states per throw, tail (0,0) on every throw, the Sasquatch damage residue cells as frozen (vanilla's own defense row); a red is a state missing, reordered, a tail or a damage cell moved.
 
 ### `audit_throw_registration.sh` — audit, emulator
 

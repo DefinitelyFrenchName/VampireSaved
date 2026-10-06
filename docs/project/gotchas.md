@@ -6674,3 +6674,20 @@ run one `107_four_directions` leg died, the gate said so, and why was never read
 **The rule:** whatever a gate refuses, it keeps — since 14z-193 a dead leg's sandbox is copied under
 `build/legacy_pairings/dead/<UTC>_<pid>/` before the trap, its `.DEAD` marker names the copy, and the FAIL prints the
 log's tail; section 0b plants a leg with no replay and requires its log to survive and name the cause.
+
+## A CHECK THAT READS BACK ITS OWN POKE PROVES NOTHING — and a set comparison hides a per-cell swap (paid: 14z-193, #230, rule-checker runs 2026-10-06-708..711)
+Widening `tests/audit_tenant_throw_geometry.sh` to Pyron and Donovan as throwers, the first identity check asserted
+"the attacker is 0x13" from `RAM:$FF8782` — the byte the gate itself POKES with the thrower's id on both legs at
+select, so it agreed by construction (run 709 Q3). The thrower is now proved by what the GAME did with that id: the
+`+0x60` character-data base it loaded (`RAM:$FF8460`), checked per leg against each game's own table (ours
+`tests/expected/roster_pairings/bases.tsv`, native vsav2 `PRG:0x0D7B18`), with a control that pokes Victor into
+Donovan's slot and must fail it (`wrong-thrower`: 183 of 183 held frames show Victor's base `0x9769e`). Two more traps
+in the same widening: an "ok" line printed from the SEQ branch read as an identity pass under that control (run 710 —
+each verdict now prints its own line, with the MEASURED values), and the inherited post-release arc check compared
+the two legs' SETS of values, so a victim's arc could differ whenever its value appeared for another victim (run 711 —
+compared victim by victim, control `arc-swap`). **The rules:** a property the gate writes is never evidence of
+itself — read a downstream value the system computed from it; a verdict line is printed by the check it names; a
+per-cell claim is compared per cell. **And the speed level** (the same widening): run unpinned, each game at its
+default (vsav2 TURBO 8, vsavj NORMAL 6), the 14z-131 frozen tails (1,0)/(0,1) and Donovan's divergent hold order on
+all 18 victims were the level, not the port — pinned, every tail is (0,0) and the hold ratio 1.000 (the
+`unpinned-level` control brings the old tails back exactly).

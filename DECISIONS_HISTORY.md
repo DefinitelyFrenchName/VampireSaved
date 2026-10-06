@@ -351,6 +351,16 @@ So: merged-m19's seven zip assets are NOT deleted by hand; they stay hosted unti
 
 ---
 
+## Read 2026-10-06 (14z-193) — #230: the tenants' standard throws read identical to native on the capture sheets
+
+**The question (14z-193, for rule-checker run 2026-10-06-709 Q2), with three keyframe-matched capture sheets (`tools/capture_sheet.sh`: Pyron on Victor, Donovan on Victor, Donovan on Phobos; `build/agent193/t230/capture_*.png`):** *"#230, for your read (rule-checker run 709 Q2): the standard throw, ours (green) vs native vs2 (grey), matched by keyframe. Sheets: Pyron throwing Victor; Donovan throwing Victor; Donovan throwing Phobos (a victim whose damage differed when the speed level was unpinned). Do the throws look the same on both sides: where the victim is held, the path, the release?"*
+
+**The maintainer:** *"yes, they look identical"*
+
+So: the read covers where and how the victim is held (the sheets run each game at its default level, matched by keyframe — not the hold's timing); `tests/audit_tenant_throw_geometry.sh` was re-frozen at the matched level with Pyron and Donovan as throwers under rule-checker run 2026-10-06-712 (OK).
+
+---
+
 ## Ruled 2026-10-06 (14z-193) — `test_freeze_bytediff` listed at freeze cadence
 
 **The question (14z-193, after #231 part 2 landed the gate):** *"should test_freeze_bytediff (about 85 s) be listed at freeze cadence in ci_cadence.tsv, or stay at session cadence? A new listing is a reviewed event, so it's yours."*

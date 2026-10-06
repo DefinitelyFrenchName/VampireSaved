@@ -63,6 +63,7 @@ declares	audit_stock_emulator_stall
 declares	audit_tech_roll
 declares	audit_tenant_continue_switch
 declares	audit_tenant_cpu_soak
+declares	audit_tenant_throw_geometry
 declares	audit_throw_registration
 declares	audit_tick_cadence
 declares	audit_tick_phase

@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-481 entries (47 game / 129 platform / 305 project), counted from the buckets at generation.
+482 entries (47 game / 129 platform / 306 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 47 entries
 
@@ -204,7 +204,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - PYTHON'S ZipInfo STAMPS THE HOST INTO create_system — the same zip code writes a different container on Windows (paid: 14z-189 measured, 14z-191 fixed, GitHub #215)
 - THE CPS-2-ONLY MAME BUILD PRINTS FOUR "clone of nonexistent driver megaman" ERRORS AT EVERY START — harmless, every host, release binaries included (seen: 14z-191, #226)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 305 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 306 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -511,3 +511,4 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - AN OP-SET DELTA CANNOT SEE A BYTE INSIDE A PLACED FILE (paid: 14z-192, the M23 freeze; #231)
 - THE PER-GATE RUN OF RECORD MADE THE FREEZE-CADENCE AUDIT UNSATISFIABLE — three things the newest-directory mask had hidden (paid: 14z-192, the M23 close; maintainer-ruled 2026-10-06 "Fix the audit now, then re-run")
 - A GUARD THAT REFUSES A DEAD LEG BUT DELETES ITS EVIDENCE (paid: 14z-192, the M23 close; fixed 14z-193, #233)
+- A CHECK THAT READS BACK ITS OWN POKE PROVES NOTHING — and a set comparison hides a per-cell swap (paid: 14z-193, #230, rule-checker runs 2026-10-06-708..711)
