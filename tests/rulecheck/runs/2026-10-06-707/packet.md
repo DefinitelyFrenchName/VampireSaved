@@ -1,0 +1,7 @@
+THE PACKET
+
+Decision kind: procedure
+Subject: one AI agent working session (14z-192), part 5 of 5: transcript 9592b550 records 8014-end
+Claim (the working agent's sentence): In this span (transcript 9592b550 records 8014-end, [8014 23:42] to [10584 11:09], part 5 of 5 of the 14z-192 sitting) the agent did what it told the maintainer it would do, reported as done the steps its tool calls show, quoted figures from tool results, gave the background jobs it started a disposition, and its workers answered their specs. NOT TESTED: this sentence was written from the span's record range and the session's own record (STATE 14z-192 rows 1 to 15), not from a re-read of the span; an intention stated in one part may be carried out in another, a job launched near a part's end may be disposed of in the next, the sitting was compacted twice (records 3967 and 8014 open with the continuation summary), and part 5 ends before this procedure check's own records and the push.
+Artifacts (read every one, in full):
+  - build/agent192/close/c1/x192_5.txt

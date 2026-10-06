@@ -27,7 +27,9 @@ work there in parallel.**
 2. **#129 — RE-CHECK THE WORKER'S REPORT, THEN PUT THE DECISION** (STATE 14z-192 row (10);
    `build/agent192/r129/REPORT_handback.md`). It names two vs2 CPU-AI behaviours our build lacks: a Phobos-only guard
    in the in-move continuation check (vs2 `0x2D374`) and a low-attack crouch-guard stance test (vs2 `0x2CD38`, five
-   call sites). The orchestrator has NOT re-checked the report. Re-check it, then measure each behaviour's legacy
+   call sites). The orchestrator has NOT re-checked the report, and the close's procedure check found two faults in it: its "runs 1 and
+   4 match exactly" holds for the stripped W+S/OR hashes only (the full tap hashes differ), and the worker skipped the
+   CLAUDE.md and skill reads its spec named. Re-check it, then measure each behaviour's legacy
    reach and cost (does it run for legacy CPU fighters, and how many cycles), and only then put the port to the
    maintainer with options and a recommendation through the rule-checker ([VSP-10]).
 3. **#231 — the freeze's byte-level program diff as a step that cannot be skipped**, and `attribute_patch_delta.py`
