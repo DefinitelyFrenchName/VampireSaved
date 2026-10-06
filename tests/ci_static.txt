@@ -220,3 +220,6 @@ test_quote_font_window
 test_roulette_tag_rows
 test_copy_flags
 test_air_attack_height
+# 14z-193 (#231 part 1): the freeze's op-by-op attribution runs on a solo track with no gen.log (pinned
+# M22 -> M23 pairs; tools/attribute_patch_delta.py); one control. ~10 s.
+test_attribute_patch_delta

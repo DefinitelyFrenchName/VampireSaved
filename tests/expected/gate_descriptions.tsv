@@ -142,6 +142,7 @@ declares	test_applier_page_browser
 declares	test_applier_vcdiff
 declares	test_attract_determinism
 declares	test_attract_roster
+declares	test_attribute_patch_delta
 declares	test_attribute_ramdiff
 declares	test_audit_merged_dispatch
 declares	test_baseset_mask_invariant
@@ -209,6 +210,7 @@ declares	test_down_flash_vanilla
 declares	test_dualtrack
 declares	test_effect_palette_table
 declares	test_effect_placeholders
+declares	test_emu_run_compare
 declares	test_emulator_runner
 declares	test_emulator_staleness
 declares	test_escape_triage

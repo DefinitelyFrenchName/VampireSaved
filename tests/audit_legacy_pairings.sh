@@ -185,7 +185,22 @@ leg() {          # $1 out.field  $2 set  $3 rompath-or-empty  $4 rpl  $5 frames 
     # GLOB over the .field files this produces (:223), so a leg that died just
     # VANISHED from the sweep and the audit still printed COVERAGE: PASS. A
     # replay that was never measured must not read the same as one that was.
-    [ -s "$1" ] || : > "$1.DEAD"
+    [ -s "$1" ] || keep_dead "$1" "$d"
+}
+# #233 (14z-192): the sandbox above lives in $W, which the EXIT trap deletes, so a
+# dead leg's mame.log went with it and its cause was never readable. A dead leg's
+# sandbox is COPIED to $DEAD_DIR first, and its .DEAD marker names the copy.
+DEAD_DIR="$OUT/dead/$(date -u +%Y%m%dT%H%M%SZ)_$$"
+keep_dead() {    # $1 out.field  $2 sandbox
+    _k="$DEAD_DIR/$(basename "$(dirname "$1")")_$(basename "$1" .field)"
+    mkdir -p "$_k"; cp -R "$2"/. "$_k"/ 2>/dev/null || true
+    echo "$_k" > "$1.DEAD"
+}
+show_dead() {    # $1 .DEAD marker: the kept copy and the tail of its MAME log
+    _k="$(cat "$1")"
+    echo "        $(basename "$1" .field.DEAD): kept $_k"
+    if [ -s "$_k/mame.log" ]; then tail -5 "$_k/mame.log" | sed 's/^/          | /'
+    else echo "          | (no mame.log in the sandbox)"; fi
 }
 pool=0
 sync_pool() { pool=$((pool + 1)); if [ "$pool" -ge "$JOBS" ]; then wait; pool=0; fi; }
@@ -205,6 +220,19 @@ for b in $BUILDS; do
     TAGS="$TAGS $tag"
 done
 mkdir -p "$W/van"
+
+echo "== 0b: a dead leg's MAME log is KEPT and shown (#233; a planted leg with no replay) =="
+mkdir -p "$W/plant"
+leg "$W/plant/PLANT_dead.field" vsavj "" "$W/no_such_replay.rpl" 10
+if [ -f "$W/plant/PLANT_dead.field.DEAD" ] && _pk="$(cat "$W/plant/PLANT_dead.field.DEAD")" \
+   && [ -s "$_pk/mame.log" ] && grep -q "no_such_replay" "$_pk/mame.log"; then
+    echo "  ok plant: the dead leg is DEAD and its mame.log survives the trap, naming the cause:"
+    show_dead "$W/plant/PLANT_dead.field.DEAD"
+    rm -rf "$_pk"; rmdir "$DEAD_DIR" 2>/dev/null || true
+else
+    echo "  FAIL plant: a dead leg's log was not kept (marker: $(cat "$W/plant/PLANT_dead.field.DEAD" 2>/dev/null || echo none))"
+    fail=1
+fi
 
 echo "== 1: sweep — id trajectories, vanilla vs each build (JOBS=$JOBS) =="
 for rpl in "$REPO"/tests/replays/*.rpl; do
@@ -273,8 +301,9 @@ for b in $BUILDS; do
     if [ "${_dead:-0}" != 0 ]; then
         echo "FAIL: $_dead leg(s) produced no field data — those replays were"
         echo "      NOT measured, and a glob-derived corpus cannot see that:"
-        ls "$W/$tag"/*.field.DEAD "$W/van"/*.field.DEAD 2>/dev/null \
-            | sed 's|.*/||; s|\.field\.DEAD$||; s|^|        |'
+        for _dm in "$W/$tag"/*.field.DEAD "$W/van"/*.field.DEAD; do
+            [ -f "$_dm" ] && show_dead "$_dm"
+        done
         fail=1
     fi
     for f in "$W/$tag"/*.field; do

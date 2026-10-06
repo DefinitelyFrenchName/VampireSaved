@@ -699,7 +699,7 @@ tools/run_wide.sh build/m3b_merged31 fbneo # THE 3-TENANT BUILD (all 18
                                            # naked-eye tell, and the first
                                            # thing on screen;
                                            # (1) the select screen shows
-                                           # "M21" bottom-right — THE NAKED-
+                                           # "M23" bottom-right — THE NAKED-
                                            # EYE A/B TELL (CLAUDE.md §5,
                                            # finally implemented; since the
                                            # 14z-132 ruling the text is the
@@ -1384,6 +1384,22 @@ the four Verilator gates**, where each control is a full re-run of its gate; the
 MAME lane's 30 controls cost 15 min in all, because several stop at their first
 perturbed input (`audit_guard_corpus@known-crash` 21 s against its gate's
 1,830 s). Rows: `build/emu_controls_14z153/results.tsv`.
+
+**THE SAME RUN ON PILOT, PER GATE (14z-189 run, read 14z-193, #122; the
+answer ruled "Sounds good enough"):** PILOT (`ssh pilot`, 6 vCPU of a Ryzen 5700G, 40 GiB,
+Ubuntu 24.04) ran the same command at `--jobs 4` on `9f7d9b45` (the M21-era tree),
+2026-10-02 21:08 to 2026-10-03 09:01 UTC — 387 rows (215 gates, 172 control runs), PASS 378 /
+SKIP 5 / FAIL 2 / TIMEOUT 2. **Over the 196 rows both runs ran and both passed, PILOT took
+2.04× the Mac's seconds** (95,859 s against 47,061): fbneo 1.28× (6 gates), mame 1.75× (133),
+mister 2.23× (7; Verilator 5.020 there against the Mac's 5.050, so not the host alone), prereq
+1.32× (18); the controls alike (1.16-2.27×). Reproduce with
+`python3 tools/emu_run_compare.py build/emu_controls_14z153 <PILOT's results.tsv>` (the run dir is
+`~/vampire-saved/build/emu_pilot_14z189_controls` on PILOT). **The wall times do NOT compare**: the
+runs differ in content (183 rows PILOT's alone, the M18 set against M21), the two FAILs are the
+environment (a non-login `ssh` shell without the PATH `mame`, `docs/project/gotchas.md` "A REMOTE
+BATTERY STARTED FROM A NON-LOGIN SHELL"), the two TIMEOUTs are the MiSTer oracles killed at the
+7,200 s cap (uncapped there 9,158 / 9,304 s, `docs/platform/mister_history.md`), and at `--jobs 4`
+a row's seconds include what ran beside it.
 
 **The registry is `tests/ci_emulator.tsv`** — one row per emulator-tier gate:
 `gate / lane / scope / cadence / args / note` (173 rows at 14z-157; 163 when

@@ -23,8 +23,9 @@ Every EDIT is a claim for a human to check against the design; this tool does no
 Usage: python3 tools/attribute_patch_delta.py <OLD build dir> <NEW build dir> [--moved] [--same]   (--moved itemizes
 the MOVED and RELOCATED ops, --same the SAME ops with their old and new indices, so every class the tool counts is one
 its listing can show — rule-checker run 2026-09-19-79 Q1; static; reads
-<dir>/patch/patch.json, placements.json, the op files, and NEW's gen.log)"""
-import json, sys, bisect
+<dir>/patch/patch.json, placements.json, the op files, and NEW's gen.log when it has one — only the merged
+build writes it; #231)"""
+import json, os, sys, bisect
 def load(b):
     ops = json.load(open(f"{b}/patch/patch.json"))["ops"]; out = []
     for o in ops:
@@ -61,7 +62,13 @@ def delta_of(v):
     nz = [d for d in ds if d]
     return nz[0] if len(nz) == 1 else (0 if ds == {0} else (None if not ds else ("AMBIG", sorted(ds))))
 notes = {}
-for line in open(f"{sys.argv[2]}/gen.log"):
+# #231 (14z-192): only the MERGED build writes a gen.log, and the notes are optional where the
+# attribution is not — on a solo track the tool used to stop on FileNotFoundError, so a freeze's
+# solo delta rested on op sets alone. Absent, the EDITs print without their notes, and it says so.
+GEN_LOG = f"{sys.argv[2]}/gen.log"
+if not os.path.exists(GEN_LOG):
+    print(f"NOTE: no {GEN_LOG} (only the merged build writes one): EDITs are listed without generator notes")
+for line in (open(GEN_LOG) if os.path.exists(GEN_LOG) else []):
     t = line.split()
     if len(t) > 1 and t[1].startswith("0x"):
         try: notes.setdefault(int(t[1], 16), line.strip()[:150])

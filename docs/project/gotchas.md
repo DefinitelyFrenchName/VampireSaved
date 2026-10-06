@@ -6563,6 +6563,13 @@ restored, and the battery restarted with `. "$HOME/.profile"` as the script's fi
 **The rule:** a remote tier script sources the box's profile first and prints `command -v mame` before the
 runner, so the binary it will use is in the log; a prereq red on a box where the same gate was green at the
 last freeze is checked against the environment before the build.
+**Paid FIRST on PILOT, and recorded nowhere until 14z-193 (#122):** PILOT's `--controls` release tier
+(`~/vampire-saved/build/emu_pilot_14z189_controls`, `9f7d9b45`, 2026-10-02) failed the same two gates with
+the same text (`test_decrypt_oracle.sh: 34: mame: not found`; `test_patch_prg` on a missing `opc.bin`) and
+SKIPped `audit_df_accumulator` on "no mame on PATH". Measured 14z-193: on PILOT `~/.local/bin/mame` exists,
+`ssh pilot 'command -v mame'` finds nothing, `bash -lc` finds it. So the class is any non-login `ssh` shell,
+not WSL2's; and a run left on a remote box with no line in STATE is a finding nobody reads — the ERIS
+M23 battery paid for it again at 14z-192.
 
 ## A RE-POINT SWEEP REWRITES DATED RECORDS AND MISSES RELEASE NAMES (paid: 14z-192, the M23 freeze)
 `build/agent192/m23/sweep_apply.py` (14z-189's rule: every live build-dir default, dated records excluded by
@@ -6579,6 +6586,11 @@ restored, with the line now saying it is not a current-build default. **The rule
 "recorded", "found" and "on build/" in a comment for review alongside the arrows, and the freeze greps
 `merged-m<prev>` in `tests/` and `tools/` for release-name defaults after the build-dir sweep; a default
 named `CTL_*`, `REF`, `--old` or described as "before"/"pre-" is a pinned predecessor and is never swept.
+**Nor does it see the MARK** (found 14z-193): HANDOFF's playtest block named "M21" as the select screen's
+naked-eye tell through the M22 and M23 freezes, while the manifests' `version_text` read `"M23"` — a sweep keyed
+on build-dir and release names never reads a quoted mark. At a freeze, after the sweep:
+`grep -rn '"M<prev>"' HANDOFF.md README.md docs .claude/skills` (archives and `docs/site/` aside) and set each
+live carrier to the new `version_text`.
 
 ## A MARK-ONLY CHANGE MOVES THE MiSTer PRG PROBE'S PROGRAM-READ COUNTS (paid: 14z-192, the M23 freeze)
 `tests/test_mister_prg_window.sh`'s pos line moved at M23 (`cyc` -621, `rd_lo` -676, every other field identical) on a
@@ -6615,6 +6627,10 @@ found exactly the designed words (donovan 2, huitzil and merged 4, pyron and sto
 shows #194's byte at `0x0FDF69` (`4F` -> `44`). **The rule:** a freeze's program delta is read byte by byte from the
 built romsets on EVERY track, not only from op sets. The ops say what we meant to change; the bytes say what changed.
 (#231 makes it a step the ritual cannot skip and lets `attribute_patch_delta.py` run without a `gen.log`.)
+**Part 1 FIXED 14z-193:** `attribute_patch_delta.py` reads `gen.log` only when the NEW build has one and otherwise says
+so (`NOTE: no …/gen.log`), so it attributes the solo tracks too — gate `tests/test_attribute_patch_delta.sh` on the pinned
+M22 -> M23 pairs (donovan without a `gen.log`, merged with one; control `gen-log-required`). Part 2, the byte diff as a
+step the freeze cannot skip, is still open.
 
 ## THE PER-GATE RUN OF RECORD MADE THE FREEZE-CADENCE AUDIT UNSATISFIABLE — three things the newest-directory mask had hidden (paid: 14z-192, the M23 close; maintainer-ruled 2026-10-06 "Fix the audit now, then re-run")
 Once #211's fix judged every gate's newest row (above), the M23 freeze's own runs could not clear
@@ -6646,3 +6662,12 @@ verdict (`== emulator staleness` or `NO RUN OF RECORD`, never a traceback) befor
 reached the Mac. **The rule:** bring every lane's run dir home before reading the freeze-cadence verdict, and run
 `tools/audit_emulator_staleness.py --cadence freeze` on the host where the battery ran as soon as the battery
 ends.
+
+## A GUARD THAT REFUSES A DEAD LEG BUT DELETES ITS EVIDENCE (paid: 14z-192, the M23 close; fixed 14z-193, #233)
+`tests/audit_legacy_pairings.sh` refuses a leg that produced no field data (the 14z-90 DEAD guard, #23), but each
+leg's sandbox and `mame.log` lived in the gate's `mktemp` dir, which its EXIT trap deletes: in ERIS's final stale
+run one `107_four_directions` leg died, the gate said so, and why was never readable (alone, both legs ran full in
+8 s; the gate alone PASSed). A refusal without its evidence turns a one-off into a mystery nobody can reopen.
+**The rule:** whatever a gate refuses, it keeps — since 14z-193 a dead leg's sandbox is copied under
+`build/legacy_pairings/dead/<UTC>_<pid>/` before the trap, its `.DEAD` marker names the copy, and the FAIL prints the
+log's tail; section 0b plants a leg with no replay and requires its log to survive and name the cause.

@@ -111,6 +111,16 @@ with the binaries beside them (git-ignored), every file checked against its reco
 question put at 14z-190 and 14z-191 said they would "replace the tree's WSL2 records"; CORRECTED 14z-191 — the
 tree never tracked a Linux record, so they were added, not swapped.) Whether the build runs properly as a
 player gets it — the asset, the applier, the launcher, a desktop session — is #226.
+**IN A DESKTOP SESSION, AS A PLAYER GETS IT (14z-193, #226 step 2, on merged-m23):** the two Linux assets cut on
+PILOT by `tools/upload_release_assets.sh freeze/merged-m23 --dry-run`, each unzipped fresh, its binaries checked
+by `BINARY.txt`'s own Linux line (fbneo 5 of 5, mame 18 of 18), the set made by `apply_release.py` (build
+`f601342d`, mark M23), then `sh PLAY.command` into PILOT's logged-in GNOME session (Wayland; the emulators are
+X11 clients under Xwayland `:0`, as SDL2 picks by default). Keys sent through Xwayland's XTEST, the real window
+captured with `xwd -id`: **both open a window, render, and reach a match** — FBNeo Phobos vs Bulleta mid-round,
+MAME Demitri vs Bulleta after the select screen shows the 18 medallions and M23. MAME first stops on its red
+bad-ROM box until a key is pressed — expected by the driver's sentinel CRCs, unexplained in the README: #234.
+**Not covered on this host:** sound (the VM has no audio device; `aplay -l` finds none) and the physical
+keyboard path (XTEST enters at the X server, not through the kernel and libinput).
 
 ## Conditions known to break a build
 

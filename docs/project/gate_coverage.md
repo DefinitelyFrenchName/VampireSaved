@@ -13,14 +13,14 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**435 of 435 gates described.**
+**437 of 437 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
-| [runner](#runner) | 43 | 43 | the suite runners and their own ground truth |
+| [runner](#runner) | 44 | 44 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 43 | 43 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
-| [pipeline](#pipeline) | 60 | 60 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
+| [pipeline](#pipeline) | 61 | 61 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 87 | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
@@ -30,7 +30,7 @@ first sentence) is `gate_index.md`.
 
 ## runner
 
-the suite runners and their own ground truth. 43 of 43 described.
+the suite runners and their own ground truth. 44 of 44 described.
 
 ### `run_all_emulator.sh` — run, emulator
 
@@ -175,6 +175,14 @@ the suite runners and their own ground truth. 43 of 43 described.
 **HOW:** scans every script's non-heredoc text for a parameter-expansion demand positioned after a `trap … EXIT` line; the control adds a synthetic script with the defect to a copy of tests/ and must report it, and the same script with the demand before the trap must pass.
 
 **EXPECTS:** PASS when no script has the shape; a red names the script and line, and the fix is an explicit `[ -n "${X:-}" ] || { echo FAIL; exit 1; }` test.
+
+### `test_emu_run_compare.sh` — test, ci_portable
+
+**WHAT:** tools/emu_run_compare.py sums each side's seconds only over rows present in both runs with verdict PASS on both, per lane and kind (gate / control), and counts the rows each run has alone.
+
+**HOW:** drives the tool's selftest (two synthetic runs with a FAIL, a SKIP, a TIMEOUT, a control row and a row on each side alone, against fixed expected lines); two controls run copies with one rule of the common set switched off, and each must fail the selftest.
+
+**EXPECTS:** the selftest's six lines read as designed and both controls fail on their copies.
 
 ### `test_emulator_runner.sh` — test, ci_portable
 
@@ -898,7 +906,7 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 
 ## pipeline
 
-the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses. 60 of 60 described.
+the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses. 61 of 61 described.
 
 ### `audit_capture_matrix.sh` — audit, ci_static
 
@@ -955,6 +963,14 @@ the build pipeline — manifests, patch ops, extraction/reconciliation/generatio
 **HOW:** static census of the vanilla opcode image for the family base and the slot addresses; the variant build's patch checked for the four jsr routes; the negative control strips one route.
 
 **EXPECTS:** exactly four sites, zero direct slot references, all four routed; the stripped patch fails. A fifth site is a new consumer to audit.
+
+### `test_attribute_patch_delta.sh` — test, ci_static
+
+**WHAT:** tools/attribute_patch_delta.py attributes a solo track's delta (donovan M22 -> M23, no gen.log) to the end and says its generator notes are absent, and still reads the merged build's gen.log.
+
+**HOW:** runs the tool on two PINNED freeze pairs — build/don_m26 -> build/don_m27 (solo, no gen.log) and build/m3b_merged30 -> build/m3b_merged31 (merged, gen.log present); the control runs a copy that opens gen.log unconditionally again, which must stop on the solo pair.
+
+**EXPECTS:** the solo pair exits 0 with its NOTE and its alignment line; the merged pair exits 0 with no NOTE; the control's copy exits non-zero on the solo pair.
 
 ### `test_audit_merged_dispatch.sh` — test, ci_portable
 
@@ -3416,7 +3432,7 @@ the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generatio
 
 **WHAT:** a jtsim scratch clone hollowed by the macOS tmp reaper (tracked files gone, .git intact) is HEALED in place by `mister_mra.sh --ensure-scratch`, a clone whose object store is hollow too is re-cloned at the pin, and a fresh scratch is cloned at the pin with nothing missing.
 
-**HOW:** three local hardlinked clones of emu/jtcores shaped as fresh, reaped, and store-hollowed (ROM-free, ~5 s); the control cuts the heal block from a copy of the tool, which must leave the reaped clone hollow.
+**HOW:** three local hardlinked clones of emu/jtcores shaped as fresh, reaped, and store-hollowed (ROM-free, ~5 s); the control cuts the heal block from a copy of the tool, which must leave the reaped clone hollow. Section 5 (#232): a SUBMODULE initialised from the local emu/jtcores checkout (no network), reaped as the 03:35 maintenance did it — its gitdir HEAD, worktree gitfile and tracked files gone — must be healed back to the commit the superproject records; its control cuts only the submodule heal.
 
 **EXPECTS:** the three shapes handled as stated and the control failing; a red is the 0-second 'Cannot open macros.def' red returning between two static runs.
 

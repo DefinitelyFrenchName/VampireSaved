@@ -2126,6 +2126,21 @@ from the clone's own store, and re-clones only if the store is hollow too.
 Ground truth `tests/test_jtsim_scratch_heal.sh` (ci_portable; the control
 runs a shadow copy with the heal stripped). `tools/setup_jtcores.sh` still
 does NOT touch the scratch.
+**AND THE SUBMODULES, DEEPER (paid 14z-192, fixed 14z-193, #232):** the
+2026-10-06 03:35 maintenance took a SUBMODULE's gitdir `HEAD`
+(`.git/modules/modules/fx68k/` kept `config`, `objects`, `refs`), its worktree
+gitfile and most of its files. The 14z-133b submodule heal asked
+`git ls-files --deleted` inside the module: with the gitfile gone it skipped the
+module (`[ -e .git ]`), and with only `HEAD` gone git could not run, printed
+nothing, and "nothing missing" read as healthy — so all three MiSTer gates died in
+3 s at `submodule update` ("not a git repository"). A heal must judge a checkout
+by what it must BE, never by a count a broken git returns as empty: since
+14z-193 every module with a gitdir must have its own `HEAD` equal to the commit
+the superproject records and nothing deleted; otherwise the lost `HEAD` is
+rewritten from that commit and a forced `submodule update` restores the gitfile
+and files from the store, else the module is removed and re-initialised. Ground
+truth: section 5 of the same gate (a local `fx68k` reaped to that shape; control
+`submodule-heal-removed`).
 
 ## MAME Lua: WRITE taps fire, READ taps do not (14z-112, measured)
 

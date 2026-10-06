@@ -100,6 +100,19 @@ collects the reports itself (`test_rule_checker.sh` RECORD BINDING, control `unb
 `rulecheck.py readers` links every ledger run to the readers its prompt reached (what showed all
 192 linkable readers before the pinned reader had CLAUDE.md and the memory index).
 
+**A MERGE IS CHECKED AS A PACKET PER FORK, AND THE TOOL HOLDS THE CITATIONS (#217, ruled 2026-10-05,
+built 14z-193).** A merge of several forks is not one large packet (merge189c: about 80 artifacts, 5-8 minutes per
+reader, four rounds each failing on a different fork). Each fork's evidence is its own run, checked and resolved on
+its own; the merge's packet carries only the merge itself (the line-presence check with its control, the conflict
+resolutions, the regenerated pages) and CITES the fork runs: `prepare … --cites <run> [--cites <run> …]`. The tool
+refuses, before anything is created, a cited run that has no ledger row, is a calibration, whose plant was not
+CAUGHT, that is neither OK nor a VIOLATED answered by `resolve`, or whose staged artifacts no longer have the sha1
+its manifest recorded (a line range re-cut the same way); the packet names each cited run, its verdict and
+resolution, and `meta.tsv` records them. `record` checks the citations again, so a fork re-touched while the merge
+was being read voids the citation. The ruling's words: *"smaller packetes per fork makes sense only pragramatically
+to me, not as just a rule which is inherently prone to slippage"* — a tool check, not a working convention. Ground
+truth: `tests/test_rule_checker.sh` PREPARE CITES (four hand-made fork runs; control `unchecked-cite`).
+
 **What comes out.** Six lines and nothing else: the five questions, each
 `VIOLATED`, `OK` or `N-A` with evidence as a path and line or a verbatim
 quote, then `VERDICT: VIOLATED|OK`. `tools/rulecheck.py record` refuses

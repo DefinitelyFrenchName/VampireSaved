@@ -24,6 +24,7 @@
 # MUST-FIRE: shadow-tool: counted-id — a copy of rulecheck.py numbering prepare's auto id by a COUNT (the pre-#160 line) must collide with a run directory that has no ledger row, and the PREPARE IDS section must FAIL: the auto id is the next free number above every run directory and ledger id (GitHub #160, 14z-185)
 # MUST-FIRE: shadow-tool: late-validate — a copy of rulecheck.py with prepare's early artifact check removed must leave a run directory with no ledger row behind when an artifact is missing, and the PREPARE IDS section must FAIL: prepare checks every artifact before it creates anything (GitHub #160, 14z-185)
 # MUST-FIRE: shadow-tool: keyless-prepare — a copy of rulecheck.py whose prepare takes no session key (the pre-#209 line, `session = a.session or "-"`) must prepare a run whose meta.tsv says `session -`, and the PREPARE SESSION KEY section must FAIL: prepare requires the sitting's 14z-N key and refuses a transcript prefix (GitHub #209, 14z-189)
+# MUST-FIRE: shadow-tool: unchecked-cite — a copy of rulecheck.py whose prepare takes every --cites at its word must prepare a merge packet citing an unresolved fork run, and the PREPARE CITES section must FAIL: a cited fork run counts only if its plant was caught, it is OK or resolved, and its artifacts are unchanged (#217, 14z-193)
 # MUST-FIRE: perturbed-copy: cross-family-plant — a copy of the record in which a PROCEDURE calibration names an EVIDENCE fixture as its plant must fail: a plant answers its own family's questions, so one from the other checklist proves nothing about the reader (#172 S3, 14z-176)
 #
 # WHY. The rule-checker (docs/project/rule_checker.md, [VSP-183]/[VSP-184]) is a
@@ -184,6 +185,73 @@ latecheck() {  # latecheck <out> — the shadow tool: prepare's early artifact c
     sed 's/^    if missing:$/    if False:/' tools/rulecheck.py > "$1"
     grep -q '^    if False:$' "$1" || { echo "the early artifact check was not found to remove" >&2; return 1; }
 }
+# SECTION PREPARE CITES's probe (#217, 14z-193): on a throwaway root, four hand-made fork runs — OK, VIOLATED
+# and resolved (one of its artifacts a line range), VIOLATED and unresolved, OK with its plant MISSED — then
+# a merge packet citing the first two must prepare (its meta.tsv and packet name them); citing the unresolved
+# one, the missed-plant one or an unrecorded id must be refused leaving no run directory; and once a cited
+# fork's artifact changes, both good citations must be refused at prepare, and the merge run already prepared
+# must be refused at record. Prints CITES-OK or the way it was not.
+prepare_cites() {  # prepare_cites <rulecheck.py to test> <root>
+    rm -rf "$2"; mkcopy "$2"; cp "$1" "$2/tools/rulecheck.py"
+    mkdir -p "$2/art"; printf 'fork line 1\nfork line 2\nfork line 3\n' > "$2/art/fork.txt"; echo merge > "$2/art/merge.txt"
+    python3 - "$2" <<'PY' || { echo "NO-FIXTURE-RUNS"; return; }
+import hashlib, sys
+from pathlib import Path
+root = Path(sys.argv[1]); sys.path.insert(0, str(root / "tools")); import rulecheck as r
+whole = hashlib.sha1((root / "art/fork.txt").read_bytes()).hexdigest()
+rng = hashlib.sha1("fork line 1\nfork line 2\n".encode()).hexdigest()
+rows = {"2099-05-05-01": ("CAUGHT", "OK", "", "-", [("art/fork.txt", whole)]),
+        "2099-05-05-02": ("CAUGHT", "VIOLATED", "Q1", "-", [("art/fork.txt", whole)]),
+        "2099-05-05-03": ("CAUGHT", "VIOLATED", "Q1", "Q1: fixed in the fork", [("art/fork.txt.lines-1-2 (lines 1-2 of art/fork.txt)", rng)]),
+        "2099-05-05-04": ("MISSED", "OK", "", "-", [("art/fork.txt", whole)])}
+for rid, (cv, v, vi, res, man) in rows.items():
+    d = root / r.RUNS / rid; d.mkdir(parents=True)
+    (d / "manifest.tsv").write_text("# artifact\tsha1\n" + "".join(f"{a}\t{h}\n" for a, h in man))
+    r.append_ledger(root, dict(id=rid, date="2099-05-05", session="14z-0", decision="evidence", subject="a fork",
+                               control="fx", control_verdict=cv, verdict=v, violated=vi or "-", resolution=res, model="m"))
+PY
+    ROOT="$2"
+    _runs() { ls "$ROOT/tests/rulecheck/runs" | wc -l | tr -d ' '; }
+    _prep() {  # _prep <id> <cites...>
+        _id="$1"; shift; _c=""; for x in "$@"; do _c="$_c --cites $x"; done
+        ( cd "$ROOT" && python3 tools/rulecheck.py prepare --decision recommendation --subject merge \
+            --claim "merge the forks" --artifact art/merge.txt --session 14z-0 --id "$_id" $_c ) > "$ROOT/c_$_id.log" 2>&1
+    }
+    _prep 2099-05-06-01 2099-05-05-01 2099-05-05-03 || { echo "REFUSED-GOOD-CITES: $(tail -1 "$2/c_2099-05-06-01.log")"; return; }
+    grep -q "^cites	2099-05-05-01 2099-05-05-03$" "$2/tests/rulecheck/runs/2099-05-06-01/meta.tsv" || { echo "CITES-NOT-IN-META"; return; }
+    grep -q "2099-05-05-03: VIOLATED, resolved: Q1: fixed in the fork (1 artifacts unchanged)" "$2/tests/rulecheck/runs/2099-05-06-01/packet.md" \
+        || { echo "CITES-NOT-IN-PACKET"; return; }
+    _before="$(_runs)"
+    for bad in "2099-05-05-02:unresolved" "2099-05-05-04:plant reads MISSED" "2099-05-05-09:no ledger row"; do
+        _bid="${bad%%:*}"; _why="${bad#*:}"
+        if _prep "2099-05-06-1${_bid##*-}" "$_bid"; then echo "PREPARED-CITING-$_bid"; return; fi
+        grep -q -- "$_why" "$2/c_2099-05-06-1${_bid##*-}.log" || { echo "REFUSED-$_bid-FOR-ANOTHER-REASON: $(tail -1 "$2/c_2099-05-06-1${_bid##*-}.log")"; return; }
+    done
+    printf 'fork line 1 EDITED\nfork line 2\nfork line 3\n' > "$2/art/fork.txt"
+    for good in 2099-05-05-01 2099-05-05-03; do
+        if _prep "2099-05-06-2${good##*-}" "$good"; then echo "PREPARED-CITING-CHANGED-$good"; return; fi
+        grep -q "changed since that run was prepared" "$2/c_2099-05-06-2${good##*-}.log" \
+            || { echo "REFUSED-CHANGED-$good-FOR-ANOTHER-REASON: $(tail -1 "$2/c_2099-05-06-2${good##*-}.log")"; return; }
+    done
+    [ "$(_runs)" = "$_before" ] || { echo "LEFT-A-RUN-DIRECTORY"; return; }
+    # and AT RECORD: the merge run prepared above cites a fork that has since changed
+    : > "$2/va.txt"; : > "$2/vb.txt"
+    if ( cd "$ROOT" && python3 tools/rulecheck.py record 2099-05-06-01 --a va.txt --b vb.txt ) > "$2/c_rec.log" 2>&1; then
+        echo "RECORDED-CITING-A-CHANGED-FORK"; return; fi
+    grep -q "changed since that run was prepared" "$2/c_rec.log" || { echo "RECORD-REFUSED-FOR-ANOTHER-REASON: $(tail -1 "$2/c_rec.log")"; return; }
+    echo CITES-OK
+}
+uncite() {  # uncite <out> — the shadow tool: prepare with the citation check switched off
+    python3 - tools/rulecheck.py "$1" <<'PY' || { echo "the citation check was not found to remove" >&2; return 1; }
+import sys
+s = open(sys.argv[1]).read(); a = "        cited = check_cited(root, ledger_rows, a.cites)\n"
+assert s.count(a) == 1
+# the citations are REPORTED from the ledger as the real tool reports them, and never validated
+b = ("        cited = [(c, *next(((r['verdict'], r['resolution']) for r in ledger_rows if r['id'] == c), ('?', '-')), 1)"
+     " for c in a.cites]  # CONTROL unchecked-cite\n")
+open(sys.argv[2], "w").write(s.replace(a, b))
+PY
+}
 unbind() {  # unbind <out> — the shadow tool: rulecheck.py with the spawn binding switched off
     sed 's/^    if meta.get("reader"):$/    if False:/' tools/rulecheck.py > "$1"
     grep -q '^    if False:$' "$1" || { echo "the binding line was not found to remove" >&2; return 1; }
@@ -203,6 +271,14 @@ if [ "${VS_CTL:-}" = keyless-prepare ]; then
     echo "MODE: control keyless-prepare — the shadow copy reads: $got"
     case "$got" in PREPARED-WITHOUT-KEY*) ;; *) echo "REFUSED: the keyless copy did not prepare a keyless run ($got)"; exit 3;; esac
     echo "FAIL: rule-checker prepare session key (control mode keyless-prepare — $got)"; exit 1
+fi
+
+if [ "${VS_CTL:-}" = unchecked-cite ]; then
+    uncite "$W/uncited.py" || exit 3
+    got="$(prepare_cites "$W/uncited.py" "$W/pcmode")"
+    echo "MODE: control unchecked-cite — the shadow copy reads: $got"
+    case "$got" in PREPARED-CITING-*) ;; *) echo "REFUSED: the shadow copy did not prepare a bad citation ($got)"; exit 3;; esac
+    echo "FAIL: rule-checker prepare cites (control mode unchecked-cite — $got)"; exit 1
 fi
 
 case "${VS_CTL:-}" in counted-id|late-validate)
@@ -248,6 +324,11 @@ got="$(prepare_key tools/rulecheck.py "$W/pk")"
 echo "  the real tool: $got"
 [ "$got" = KEY-OK ] || { echo "FAIL: prepare's session key ($got)"; fail=1; }
 
+echo "== PREPARE CITES: a merge packet's fork runs are checked by the tool (#217) =="
+got="$(prepare_cites tools/rulecheck.py "$W/pcites")"
+echo "  $got"
+[ "$got" = CITES-OK ] || { echo "FAIL: prepare's citations ($got)"; fail=1; }
+
 echo "== 3. MUST-FIRE CONTROLS on a copy =="
 for c in quiet-control moved-reader unchecked-freeze prose-verdict cross-family-plant; do
     rm -rf "$W/c"; mkcopy "$W/c"; perturb "$c" "$W/c"
@@ -279,6 +360,16 @@ else
     vs_ctl_dead keyless-prepare "the session-key line was not found to revert"; fail=1
 fi
 
+if uncite "$W/uncited_c.py"; then
+    got="$(prepare_cites "$W/uncited_c.py" "$W/pcc")"
+    case "$got" in
+        PREPARED-CITING-*) vs_ctl_fired unchecked-cite "the copy without the citation check: $got";;
+        *) vs_ctl_dead unchecked-cite "the shadow copy read $got"; fail=1;;
+    esac
+else
+    vs_ctl_dead unchecked-cite "the citation check was not found to remove"; fail=1
+fi
+
 for c in counted-id late-validate; do
     if [ "$c" = counted-id ]; then counted "$W/shadow_$c.py"; else latecheck "$W/shadow_$c.py"; fi || { vs_ctl_dead "$c" "the shadow copy could not be made"; fail=1; continue; }
     got="$(prepare_ids "$W/shadow_$c.py" "$W/pc_$c")"
@@ -289,7 +380,7 @@ for c in counted-id late-validate; do
 done
 
 if [ "$fail" -eq 0 ]; then
-    echo "PASS: the rule-checker's record is sound, record binds the spawn check, prepare's ids hold, prepare requires the session key, and its nine controls fire"
+    echo "PASS: the rule-checker's record is sound, record binds the spawn check, prepare's ids hold, prepare requires the session key, a merge packet's cited fork runs are checked, and its ten controls fire"
 else
     echo "FAIL: rule-checker record"
     exit 1

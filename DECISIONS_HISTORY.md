@@ -351,6 +351,16 @@ So: merged-m19's seven zip assets are NOT deleted by hand; they stay hosted unti
 
 ---
 
+## Ruled 2026-10-06 (14z-193) — #122 closed `done`: PILOT's per-gate figure is the answer
+
+**The question (14z-193, after a measurer read PILOT's unrecorded 14z-189 `--controls` run, `build/emu_pilot_14z189_controls` on PILOT, against the Mac's 14z-153 run):** the two runs share 196 rows that both passed, and over those PILOT took 2.04× the Mac's seconds; but PILOT's run was not green (two prereq FAILs on a non-login PATH, the two MiSTer oracles TIMEOUT at the 7,200 s cap), its content differs (387 rows against 211, the M21-era tree against M18) and its Verilator is 5.020 against 5.050, so the wall times do not compare. Options put: (a) accept the per-gate figure as the answer and close; (b) a like-for-like re-run on both hosts at one commit.
+
+**The maintainer, verbatim:** *"(a) Accept the per-gate figure as the answer. PILOT is about 2× slower per gate at --jobs 4 on its 6 cores. I'd record it on #122 with the caveats above and close it. -> Sounds good enough"*
+
+So: #122 closes `done` on the per-gate figure, recorded with its caveats in HANDOFF "THE SAME RUN ON PILOT, PER GATE" and reproducible by `tools/emu_run_compare.py` (promoted from the scratch script, gate `tests/test_emu_run_compare.sh`); no like-for-like re-run is scheduled. The run's two environment FAILs are homed in `docs/project/gotchas.md` "A REMOTE BATTERY STARTED FROM A NON-LOGIN SHELL".
+
+---
+
 ## Ruled 2026-10-06 (14z-192) — three emulator caps raised; the staleness audit fixed before the M23 close, then the stale gates re-run
 
 **The questions (AskUserQuestion, 14z-192, after ERIS's `--stale` re-run on `c884e6d8` went PASS 187):** *"Three emulator rows used over half their time cap on ERIS (test_mame_wide 3,800 s of 5,400; audit_guard_corpus 4,784 s of 5,400; audit_lag_budget 544 s of 900), which fails test_emulator_staleness. Raise the caps by HANDOFF's HEADROOM rule? Editing tests/ci_emulator.tsv makes nearly every emulator gate stale again (another ~2.5 h on ERIS + ~1h40 MiSTer on the Mac)."* (options "Raise to 10,800 / 14,400 / 3,600", "Raise, different figures", "Don't raise yet"); *"Apart from the caps, the freeze-cadence staleness check cannot go green on this tree: 13 FBNeo-side gates read stale on every host because the patched emu/fbneo submodule is always 'modified' (exposed by this session's #211 fix, which removed the newest-directory mask), test_don_sound follows docs/project/gotchas.md (any doc commit re-stales it), and two out-of-scope gates have only old Mac rows. The battery's 10 reds also have a FAIL as their newest runner row, which the audit does not judge. How should this close proceed?"* (options "Fix the audit now, then re-run", "Push with the red named", "Keep local, fix next session").

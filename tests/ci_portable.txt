@@ -346,3 +346,6 @@ test_win_stdout_utf8
 # the reference build for stock sets), never the mame on PATH; a missing default is refused; one control. ~1 s.
 test_mame_default_bin
 test_release_launcher_bat
+# 14z-193 (#122): two emulator-tier runs' per-row speed over the rows both ran and both passed
+# (tools/emu_run_compare.py); two controls, one per rule of the common set. ~1 s.
+test_emu_run_compare

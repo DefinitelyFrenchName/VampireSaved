@@ -444,3 +444,5 @@ tests/test_release_launcher_bat.sh	platform
 tests/audit_marionette_cost.sh	character-data
 tests/audit_tenant_cpu_soak.sh	tenant
 tests/test_air_attack_height.sh	character-data
+tests/test_emu_run_compare.sh	runner
+tests/test_attribute_patch_delta.sh	pipeline

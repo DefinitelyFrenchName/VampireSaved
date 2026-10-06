@@ -137,16 +137,34 @@ if [ "${_missing:-1}" != 0 ]; then
 fi
 # The scratch's SUBMODULES (modules/*, initialised by run_sim_jtcps2.sh) are
 # separate checkouts the superproject's ls-files cannot see; the reaper hollows
-# them the same way. Same heal per module: restore from its store, else re-init.
-for _m in "$SCRATCH"/modules/*/; do
-    [ -e "$_m/.git" ] || continue
-    _mm="$(git -C "$_m" ls-files --deleted 2>/dev/null | wc -l | tr -d ' ')"
-    [ "${_mm:-0}" != 0 ] || continue
-    say "submodule $(basename "$_m") is HOLLOW ($_mm files missing); restoring"
-    git -C "$_m" checkout --quiet -- . 2>/dev/null || true
-    if [ "$(git -C "$_m" ls-files --deleted 2>/dev/null | wc -l | tr -d ' ')" != 0 ]; then
-        git -C "$SCRATCH" submodule update --init --force "modules/$(basename "$_m")" >/dev/null 2>&1 || true
+# them the same way — and deeper (#232, 14z-192): it took a module's worktree
+# gitfile and its gitdir's HEAD, and a module whose git cannot run read as
+# "nothing missing", so the heal skipped it and every MiSTer gate died in 3 s.
+# So a module is judged by what it must BE: its own HEAD the commit the
+# superproject records, nothing deleted. Every module with a gitdir (one
+# run_sim_jtcps2.sh initialised) that is not is restored from its store (a lost
+# HEAD rewritten from the recorded commit, the gitfile and files by a forced
+# update), else removed and re-initialised.
+sub_ok() {  # sub_ok <path>
+    _want="$(git -C "$SCRATCH" ls-tree HEAD "$1" 2>/dev/null | awk '{print $3}')"
+    [ -n "$_want" ] && [ "$(git -C "$SCRATCH/$1" rev-parse HEAD 2>/dev/null)" = "$_want" ] || return 1
+    _del="$(git -C "$SCRATCH/$1" ls-files --deleted 2>/dev/null)" || return 1
+    [ -z "$_del" ]
+}
+for _kp in $(git -C "$SCRATCH" config -f .gitmodules --get-regexp '^submodule\..*\.path$' 2>/dev/null | awk '{print $1 "=" $2}'); do
+    _n="${_kp%%=*}"; _n="${_n#submodule.}"; _n="${_n%.path}"; _p="${_kp#*=}"
+    _gd="$SCRATCH/.git/modules/$_n"
+    [ -d "$_gd" ] || continue
+    sub_ok "$_p" && continue
+    say "submodule $_p is HOLLOW or BROKEN (the tmp reaper); restoring from its store"
+    [ -f "$_gd/HEAD" ] || git -C "$SCRATCH" ls-tree HEAD "$_p" | awk '{print $3}' > "$_gd/HEAD"
+    git -C "$SCRATCH" submodule update --init --force "$_p" >/dev/null 2>&1 || true
+    if ! sub_ok "$_p"; then
+        say "submodule $_p: its store cannot restore it — re-initialising"
+        rm -rf "$_gd" "${SCRATCH:?}/$_p"
+        git -C "$SCRATCH" submodule update --init --force "$_p" >/dev/null 2>&1 || true
     fi
+    sub_ok "$_p" || { echo "submodule $_p cannot be healed in $SCRATCH" >&2; exit 1; }
 done
 if [ "$ENSURE" = 1 ]; then say "scratch clone ready at $PIN"; exit 0; fi
 

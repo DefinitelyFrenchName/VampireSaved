@@ -16,14 +16,14 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**435 scripts** — 119 ci_portable, 88 ci_static, 228 emulator-tier (run by name).
+**437 scripts** — 120 ci_portable, 89 ci_static, 228 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 43 | the suite runners and their own ground truth |
+| [runner](#runner) | 44 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 43 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
-| [pipeline](#pipeline) | 60 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
+| [pipeline](#pipeline) | 61 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
@@ -55,6 +55,7 @@ the suite runners and their own ground truth.
 | `tests/test_close_standing.sh` | test | ci_portable | — | the standing close-check set renders with every list derived and every plant generated, its claim comes from the run of record, and a finding is appended in the table's form (GitHub #204, #206, #207; 14z-189). | 14z-189 |
 | `tests/test_controls_contract.sh` | test | ci_portable | — | ground truth for THE MUST-FIRE CONTRACT'S READER, tests/lib/controls.sh: the four regexes of the R10 grammar, the leading comment block as the header (a bare `#` continues it, a non-comment line ends it), the declared-vs-fired readback the… | 14z-147 |
 | `tests/test_demand_after_trap.sh` | test | ci_portable | — | no gate carries a `${VAR:?msg}` DEMAND after its EXIT trap (14z-134). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-134 |
+| `tests/test_emu_run_compare.sh` | test | ci_portable | — | two emulator-tier runs are compared per row over what BOTH ran and BOTH passed (`tools/emu_run_compare.py`, 14z-193, GitHub #122). | 14z-193 |
 | `tests/test_emulator_runner.sh` | test | ci_portable | — | ground truth for tests/run_all_emulator.sh (14z-128). ROM-free, ~26 s (measured 14z-162; the header said ~5 s). | 14z-128 |
 | `tests/test_emulator_staleness.sh` | test | ci_portable | — | WHICH EMULATOR GATES' GREEN IS STALE, and is any row eating its cap (GitHub #171 slices Q4 and Q5, ruled 2026-09-24: "NOTE at session, FAIL at freeze/release"; | 2026-09-24 |
 | `tests/test_figure_check.sh` | test | ci_portable | — | a close's stated figures equal their sources, and a claim's figures are each checked or named unchecked (`tools/figure_check.py`, 14z-185b, GitHub #190 P1). | 14z-185b |
@@ -172,6 +173,7 @@ the build pipeline — manifests, patch ops, extraction/reconciliation/generatio
 | `tests/audit_stock_emulator_stall.sh` | audit | emulator | MAME, a build dir, ~1 min | the WIDE romset FORCED into an UNPATCHED MAME (renamed to vsavj.zip) boots, prints WRONG CHECKSUMS, and STALLS on the QSound legal screen without a crash: | 2026-09-11 |
 | `tests/audit_type_writes.sh` | audit | emulator | MAME, a build dir, ~8 min | the DYNAMIC half of the 14z-82 type-stamp census: which PCs actually write extended-family type bytes on the ground-truth single-tenant builds, and do they all map to the FROZEN static inventory? | 14z-82 |
 | `tests/test_accent_census.sh` | test | ci_static | ROMDIR | the accent/march census (14z-63, phase 3 item 6, the 62k-class audit): every path that can resolve a weapon-accent from the march family must be thunked on a variant-id build. | 14z-63 |
+| `tests/test_attribute_patch_delta.sh` | test | ci_static | ROMDIR | the freeze's op-by-op attribution runs on EVERY track, the solo tracks that write no gen.log included (`tools/attribute_patch_delta.py`, 14z-193, GitHub #231 part 1). | 14z-193 |
 | `tests/test_audit_merged_dispatch.sh` | test | ci_portable | — | ground truth for the expectation enumeration that tests/audit_merged_legacy.sh now runs before its leg-(a) glob (14z-90, GitHub issue #17). | 14z-90 |
 | `tests/test_build_gate_status.sh` | test | ci_portable | — | ground truth for "a rejected build must abort the gate" (14z-90, GitHub issue #1). | 14z-90 |
 | `tests/test_build_identity_distinct.sh` | test | ci_static | ROMDIR | a playtest build must be distinguishable from its legacy-only instrument (14z-94). ROM-free, ~2 s. | 14z-94 |

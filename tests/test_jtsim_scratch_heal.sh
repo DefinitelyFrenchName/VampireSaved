@@ -9,11 +9,15 @@
 #   with nothing missing.
 # HOW: three local hardlinked clones of emu/jtcores shaped as fresh, reaped, and
 #   store-hollowed (ROM-free, ~5 s); the control cuts the heal block from a copy of the
-#   tool, which must leave the reaped clone hollow.
+#   tool, which must leave the reaped clone hollow. Section 5 (#232): a SUBMODULE initialised
+#   from the local emu/jtcores checkout (no network), reaped as the 03:35 maintenance did it —
+#   its gitdir HEAD, worktree gitfile and tracked files gone — must be healed back to the
+#   commit the superproject records; its control cuts only the submodule heal.
 # EXPECTS: the three shapes handled as stated and the control failing; a red is the 0-second
 #   'Cannot open macros.def' red returning between two static runs.
 #
 # MUST-FIRE: shadow-tool: heal-removed — a copy of mister_mra.sh with the 1b HEAL block cut must leave a hollowed clone hollow (mode: section 2 runs that copy, and must fail)
+# MUST-FIRE: shadow-tool: submodule-heal-removed — a copy of mister_mra.sh with only the SUBMODULE heal cut must leave a reaped submodule broken (mode: section 5 runs that copy, and must fail)
 #
 # THE CLASS. tools/mister_mra.sh and tools/run_sim_jtcps2.sh keep a clone of
 # the jtcores fork under ${JTSIM_SCRATCH:-$TMPDIR/vampire-saved-jtsim} and
@@ -67,10 +71,23 @@ b = s.index('if [ "$ENSURE" = 1 ]; then', a)
 open(p, "w").write(s[:a] + s[b:])
 PY
 grep -q "1b. HEAL" "$CTL" && { echo "  FAIL: the control still carries the heal"; fail=1; }
+# THE SECOND SHADOW TOOL (#232): only the submodule heal cut, the top-level heal kept
+CTL2="$(shadow_tool "$WORK/ctl2" mister_mra.sh)"
+python3 - "$CTL2" <<'PY'
+import sys
+p = sys.argv[1]; s = open(p).read()
+a = s.index("sub_ok() {  # sub_ok <path>")
+b = s.index('if [ "$ENSURE" = 1 ]; then', a)
+open(p, "w").write(s[:a] + s[b:])
+PY
+grep -q "sub_ok" "$CTL2" && { echo "  FAIL: the submodule control still carries the submodule heal"; fail=1; }
+grep -q "1b. HEAL" "$CTL2" || { echo "  FAIL: the submodule control lost the top-level heal"; fail=1; }
 # THE EXECUTABLE FORM: under CONTROL=heal-removed section 2 runs the shadow
 # tool — and must FAIL (the clone stays hollow).
 TOOL=tools/mister_mra.sh
 vs_ctl_is heal-removed && TOOL="sh $CTL"
+TOOL5=tools/mister_mra.sh
+vs_ctl_is submodule-heal-removed && TOOL5="sh $CTL2"
 
 echo "== 1. a fresh scratch is cloned and pinned =="
 JTSIM_SCRATCH="$S" tools/mister_mra.sh --ensure-scratch --quiet || { echo "  FAIL: ensure on a fresh dir"; fail=1; }
@@ -101,6 +118,33 @@ JTSIM_SCRATCH="$S" sh "$CTL" --ensure-scratch --quiet || true
 [ "$(missing)" = "$n" ] && [ "$n" -gt 100 ] \
     && vs_ctl_fired heal-removed "without the heal, $n files stay missing" \
     || { vs_ctl_dead heal-removed "$(missing) missing after a heal-less ensure"; fail=1; }
+
+echo "== 5. a REAPED SUBMODULE (#232: gitdir HEAD, gitfile and files gone) is HEALED to the recorded commit =="
+JTSIM_SCRATCH="$S" tools/mister_mra.sh --ensure-scratch --quiet || { echo "  FAIL: ensure before the submodule case"; fail=1; }
+SM=modules/fx68k; SG="$S/.git/modules/modules/fx68k"
+WANT="$(git -C "$S" ls-tree HEAD "$SM" | awk '{print $3}')"
+git -C "$S" config submodule.modules/fx68k.url "$REPO/emu/jtcores/modules/fx68k"
+git -C "$S" -c protocol.file.allow=always submodule update --init --quiet "$SM" 2>&1 | sed 's/^/    /'
+sub_good() { [ "$(git -C "$S/$SM" rev-parse HEAD 2>/dev/null)" = "$WANT" ] && [ -z "$(git -C "$S/$SM" ls-files --deleted 2>/dev/null)" ] && [ -f "$S/$SM/.git" ]; }
+reap_sub() {  # the shape the 03:35 maintenance left on 2026-10-06
+    git -C "$S/$SM" ls-files | head -40 > "$WORK/subvictims"
+    (cd "$S/$SM" && xargs rm -f < "$WORK/subvictims")
+    rm -f "$SG/HEAD" "$S/$SM/.git"
+}
+sub_good && echo "  ok: $SM initialised from the local checkout at $WANT" || { echo "  FAIL: could not initialise $SM locally"; fail=1; }
+reap_sub
+sub_good && { echo "  FAIL: could not reap $SM"; fail=1; } || echo "  ok: reaped — HEAD, gitfile and $(wc -l < "$WORK/subvictims" | tr -d ' ') files gone"
+JTSIM_SCRATCH="$S" $TOOL5 --ensure-scratch --quiet || true
+if vs_ctl_is submodule-heal-removed; then
+    sub_good && echo "  ok (mode): healed anyway" || { echo "  FAIL: the reaped submodule stays broken"; fail=1; }
+else
+    sub_good && echo "  ok: healed — at $WANT, gitfile back, nothing deleted" || { echo "  FAIL: $SM not healed"; fail=1; }
+    [ "$(git -C "$S" rev-parse HEAD)" = "$PIN" ] && echo "  ok: the superproject is still at the pin" || { echo "  FAIL: the superproject moved"; fail=1; }
+    reap_sub
+    JTSIM_SCRATCH="$S" sh "$CTL2" --ensure-scratch --quiet >/dev/null 2>&1 || true
+    sub_good && { vs_ctl_dead submodule-heal-removed "the reaped submodule healed without the submodule heal"; fail=1; } \
+             || vs_ctl_fired submodule-heal-removed "without the submodule heal $SM stays broken (HEAD $(git -C "$S/$SM" rev-parse --short HEAD 2>/dev/null || echo none), want ${WANT%%${WANT#???????}})"
+fi
 
 if [ "$fail" -eq 0 ]; then echo "PASS: a hollowed jtsim scratch clone is healed, re-cloned when its store is gone, and the control fires"
 else echo "FAIL: jtsim scratch heal"; exit 1; fi

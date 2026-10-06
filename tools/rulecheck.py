@@ -38,7 +38,10 @@ STAGING (untracked): build/rulecheck/<id>/{a,b}/ with the prompts.
 Usage:
   python3 tools/rulecheck.py fixtures
   python3 tools/rulecheck.py prepare --decision KIND --subject TEXT --claim "..." \
-          --artifact PATH[:FIRST-LAST] ... --session 14z-N [--model NAME] [--id ID]
+          --artifact PATH[:FIRST-LAST] ... --session 14z-N [--model NAME] [--id ID] [--cites RUN-ID ...]
+                                       # --cites (#217, ruled 2026-10-05): a MERGE packet cites each fork's run; prepare
+                                       # (and record again) refuses a cited run whose plant was not caught, that is not OK
+                                       # or resolved, or whose staged artifacts changed since it was prepared
   python3 tools/rulecheck.py prepare --calibrate FIXTURE --session 14z-N [--model NAME]
                                        # --session on PREPARE is the sitting's 14z-N key, REQUIRED (#209);
                                        # on record/spawned/collect it is a TRANSCRIPT PREFIX
@@ -222,6 +225,49 @@ def list_fixtures(root: Path):
     return out
 
 
+def check_cited(root: Path, rows, ids):
+    """#217 (ruled 2026-10-05, 14z-191: "smaller packets per fork ... we'll need to properly implement it and
+    test it"): a MERGE packet cites the runs that checked each fork, and a cited run counts only if its plant
+    was CAUGHT, its verdict is OK or a VIOLATED answered by `resolve`, and every artifact its manifest staged
+    still has the sha1 it had at that run's prepare (a line range re-cut the same way). Returns
+    [(id, verdict, resolution)]; dies on the first citation that does not hold, before anything is created."""
+    out = []
+    for cid in ids:
+        hit = [r for r in rows if r["id"] == cid]
+        if not hit:
+            die(f"--cites {cid}: no ledger row — a cited run must be recorded")
+        r = hit[-1]
+        if r["decision"] == "calibration":
+            die(f"--cites {cid}: a calibration checked a fixture, not a fork")
+        if r["control_verdict"] != "CAUGHT":
+            die(f"--cites {cid}: its plant reads {r['control_verdict']} — a run whose plant was not caught checked nothing")
+        if not (r["verdict"] == "OK" or (r["verdict"] == "VIOLATED" and r["resolution"] != "-")):
+            die(f"--cites {cid}: it is {r['verdict']} and unresolved — a cited run must be OK or resolved")
+        man = root / RUNS / cid / "manifest.tsv"
+        if not man.is_file():
+            die(f"--cites {cid}: no manifest.tsv in its run directory")
+        n = 0
+        for ln in man.read_text().splitlines():
+            if not ln.strip() or ln.startswith("#"):
+                continue
+            disp, _, h = ln.rpartition("\t")
+            m = re.fullmatch(r"(.+) \(lines (\d+)-(\d+) of (.+)\)", disp)
+            if m:
+                src = root / m.group(4)
+                cur = (hashlib.sha1("".join(src.read_text(errors="replace").splitlines(keepends=True)
+                                            [int(m.group(2)) - 1:int(m.group(3))]).encode()).hexdigest()
+                       if src.is_file() else None)
+            else:
+                src = root / disp
+                cur = sha1(src) if src.is_file() else None
+            if cur != h:
+                die(f"--cites {cid}: its artifact {disp} changed since that run was prepared "
+                    f"(sha1 {h[:8]} -> {cur[:8] if cur else 'missing'}) — re-check that fork first")
+            n += 1
+        out.append((cid, r["verdict"], r["resolution"], n))
+    return out
+
+
 def packet_text(decision, subject, claim, artifacts):
     lines = ["THE PACKET", "",
              f"Decision kind: {decision}",
@@ -362,6 +408,11 @@ def cmd_prepare(a):
     missing = [s for s in (a.artifact or []) if not (root / s.partition(":")[0]).is_file()]
     if missing:
         die(f"artifact not found: {missing[0].partition(':')[0]}")
+    cited = []
+    if getattr(a, "cites", None):
+        if a.calibrate:
+            die("--cites is for a merge packet, not a calibration")
+        cited = check_cited(root, ledger_rows, a.cites)
     stage = root / STAGING / rid
     if stage.exists():
         shutil.rmtree(stage)
@@ -431,6 +482,11 @@ def cmd_prepare(a):
     else:
         manifest = stage_artifacts(root, a.artifact, stage / real_slot)
         real_text = packet_text(decision, subject, claim, [d for d, _, _ in manifest])
+        if cited:
+            real_text += ("Cited fork runs (#217; checked by the tool at prepare and again at record: each plant "
+                          "caught, each verdict OK or resolved, each run's artifacts unchanged since it was prepared):\n"
+                          + "".join(f"  - {cid}: {v}" + (f", resolved: {res}" if res != "-" else "") + f" ({k} artifacts unchanged)\n"
+                                    for cid, v, res, k in cited))
     (rdir / "packet.md").write_text(real_text)
     with (rdir / "manifest.tsv").open("w") as f:
         f.write("# artifact\tsha1 (of the staged copy, at prepare time)\n")
@@ -461,7 +517,8 @@ def cmd_prepare(a):
         f"decision\t{decision}\nsubject\t{subject}\nsession\t{session}\nmodel\t{model}\nclaim\t{claim}\n"
         f"checklist\t{checklist_sha1(root, family)}\nfamily\t{family}\n"
         f"questions\t{' '.join(FAMILIES[family][2])}\nreader\t{reader}\n" + (f"head\t{head}\n" if head else "")
-        + (f"untied_ok\t{a.untied_ok}\n" if getattr(a, "untied_ok", None) else ""))
+        + (f"untied_ok\t{a.untied_ok}\n" if getattr(a, "untied_ok", None) else "")
+        + (f"cites\t{' '.join(c for c, _, _, _ in cited)}\n" if cited else ""))
     print(f"prepared run {rid}")
     print(f"  prompts: {stage}/prompt_a.md and {stage}/prompt_b.md")
     print(f"  spawn TWO agents with subagent_type \"rule-checker\" and NO model parameter ({reader}; never a")
@@ -539,6 +596,9 @@ def cmd_record(a):
         die(f"run {a.id} is already recorded")
     meta = read_kv(rdir / "meta.tsv")
     ctl = read_kv(rdir / "control.txt")
+    if meta.get("cites"):
+        # #217: a fork re-touched while its merge packet was being read voids the citation
+        check_cited(root, read_ledger(root), meta["cites"].split())
     # THE SPAWN BINDING (14z-178, rule-checker run 2026-09-24-134 Q4): a run read by the PINNED
     # reader is recorded only with its session transcript, and only when every reader passes the
     # spawn check — the definition's model and effort, no fallback, no instructions attachment,
@@ -1161,6 +1221,7 @@ def main():
     p.add_argument("--decision"); p.add_argument("--subject"); p.add_argument("--claim")
     p.add_argument("--artifact", action="append")
     p.add_argument("--calibrate"); p.add_argument("--session"); p.add_argument("--model"); p.add_argument("--id")
+    p.add_argument("--cites", action="append", metavar="RUN-ID", help="#217: a fork's run this merge packet cites")
     p.add_argument("--untied-ok", help="#185 item 3: why an untied universal/definite stands (recorded in meta.tsv)")
     r = sub.add_parser("record"); r.add_argument("id"); r.add_argument("--a"); r.add_argument("--b")
     r.add_argument("--session"); r.add_argument("--transcript")
