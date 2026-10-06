@@ -23,15 +23,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3461 |
+| distinct program-space addresses named | 3463 |
 | named by a document or manifest only | 2228 |
-| named by both a document/manifest and code | 830 |
+| named by both a document/manifest and code | 832 |
 | named by CODE ONLY (the gap list below) | 403 |
 | carried by atlas | 643 |
-| carried by engine_internals | 801 |
-| carried by other docs | 1054 |
+| carried by engine_internals | 803 |
+| carried by other docs | 1055 |
 | carried by manifests | 1850 |
-| carried by code | 1233 |
+| carried by code | 1235 |
 
 ## Addresses
 
@@ -63,7 +63,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x003AC4` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x003AF6` | build/manifest/reconciliation.toml — map |
 | `PRG:0x003B2C` | build/manifest/reconciliation.toml — map [vs2] |
-| `PRG:0x003B36` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink); build/manifest/donovan.toml — landing_bigbody_mask_hi_b; build/manifest/huitzil.toml — landing_bigbody_mask_hi_b; tools/landing_sound_ab.py |
+| `PRG:0x003B36` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink); docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) [vs2]; build/manifest/donovan.toml — landing_bigbody_mask_hi_b; build/manifest/huitzil.toml — landing_bigbody_mask_hi_b; tools/landing_sound_ab.py |
 | `PRG:0x003B38` | HANDOFF.md — Build registry [vs2]; HANDOFF.md — Running a CPS-2 WIDE build (playtest); docs/project/patch_index.md — Romset patch bundles (program + gfx content) [vs2]; docs/project/patch_notes.md — 14z-192 — THE M23 FREEZE (donovan-m27 / huitzil-m34 / pyron-m28 / merged-m23, mark M23): #222 and #223 LANDED; build/manifest/donovan.toml — landing_bigbody_mask_hi_b; build/manifest/huitzil.toml — landing_bigbody_mask_hi_b |
 | `PRG:0x003B6C` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) [vs2]; build/manifest/donovan.toml — landing_bigbody_mask_hi_b [vh2]; build/manifest/huitzil.toml — landing_bigbody_mask_hi_b [vh2]; tools/landing_sound_ab.py |
 | `PRG:0x003BEE` | build/manifest/huitzil.toml — hui_kernel_voice_e0; build/manifest/shared_writes.toml — huitzil |
@@ -1457,13 +1457,14 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x02CC64` | build/manifest/donovan.toml — pcrel_escape_fix; build/manifest/huitzil.toml — capture_kf_jedah; build/manifest/pyron.toml — pyron_capture_keyframes; tests/test_census_regions.sh |
 | `PRG:0x02CCB6` | docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99); docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/engine_internals.md — The CPU AI action-script system (14z-111, measured on the #99 capture); docs/project/patch_notes.md — 14z-111 — #99 ROOT CAUSE FIX (option A): the CPU AI action-script tables unparked, byte detail; build/manifest/bank_map.toml — ai_script_3; build/manifest/bank_map.toml — dispatch_19 |
 | `PRG:0x02CCF2` | docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99); docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/engine_internals.md — The CPU AI action-script system (14z-111, measured on the #99 capture); docs/project/patch_notes.md — 14z-111 — #99 ROOT CAUSE FIX (option A): the CPU AI action-script tables unparked, byte detail; build/manifest/bank_map.toml — dispatch_19 |
+| `PRG:0x02CD38` | docs/game/engine_internals.md — The CPU AI action-script system (14z-111, measured on the #99 capture) [vs2] |
 | `PRG:0x02CD40` | docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99); docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/engine_internals.md — The CPU AI action-script system (14z-111, measured on the #99 capture); docs/project/patch_notes.md — 14z-111 — #99 ROOT CAUSE FIX (option A): the CPU AI action-script tables unparked, byte detail; build/manifest/bank_map.toml — dispatch_19 |
 | `PRG:0x02CD9C` | docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99); docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/engine_internals.md — The CPU AI action-script system (14z-111, measured on the #99 capture); docs/project/patch_notes.md — 14z-111 — #99 ROOT CAUSE FIX (option A): the CPU AI action-script tables unparked, byte detail; build/manifest/bank_map.toml — dispatch_19 |
 | `PRG:0x02CE0A` | docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122); docs/project/patch_notes.md — 14z-111 — #99 ROOT CAUSE FIX (option A): the CPU AI action-script tables unparked, byte detail; build/manifest/reconciliation_huitzil.toml — map [vs2]; tests/test_tenant_loop.sh |
 | `PRG:0x02CE3E` | docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122); docs/project/patch_notes.md — 14z-111 — #99 ROOT CAUSE FIX (option A): the CPU AI action-script tables unparked, byte detail; build/manifest/reconciliation_huitzil.toml — map [vs2]; tests/test_tenant_loop.sh |
 | `PRG:0x02CE82` | build/manifest/donovan.toml — accent_color_aware_3; build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x02CEB0` | build/manifest/reconciliation.toml — map; build/manifest/reconciliation_huitzil.toml — map |
-| `PRG:0x02D374` | build/manifest/reconciliation.toml — map |
+| `PRG:0x02D374` | docs/game/engine_internals.md — The CPU AI action-script system (14z-111, measured on the #99 capture) [vs2]; build/manifest/reconciliation.toml — map |
 | `PRG:0x02D3F2` | docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122); docs/project/patch_notes.md — 14z-111 — #99 ROOT CAUSE FIX (option A): the CPU AI action-script tables unparked, byte detail; build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x02D43C` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x02D478` | build/manifest/donovan.toml — pcrel_escape_fix; build/manifest/huitzil.toml — capture_kf_jedah; build/manifest/pyron.toml — pyron_capture_keyframes |
@@ -2599,8 +2600,9 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0F8740` | docs/project/patch_notes.md — (playtest round-1 item 1; manifest-data only, no machinery) |
 | `PRG:0x0FCECA` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; tools/gen_anita_bank2.py |
 | `PRG:0x0FD5A4` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 |
-| `PRG:0x0FDC70` | docs/project/patch_notes.md — 14z-189 — THE M22 FREEZE (donovan-m26 / huitzil-m33 / pyron-m27 / merged-m22, mark M22): #194 and #195 LANDED |
+| `PRG:0x0FDC70` | docs/project/gotchas.md — AN OP-SET DELTA CANNOT SEE A BYTE INSIDE A PLACED FILE (paid: 14z-192, the M23 freeze; #231); docs/project/patch_notes.md — 14z-189 — THE M22 FREEZE (donovan-m26 / huitzil-m33 / pyron-m27 / merged-m22, mark M22): #194 and #195 LANDED; tools/program_bytediff.py |
 | `PRG:0x0FDF52` | build/manifest/pyron.toml — palette_routine_row_11_c |
+| `PRG:0x0FDF69` | HANDOFF.md — What exists (M0 bench, 2026-07-25); docs/project/gotchas.md — AN OP-SET DELTA CANNOT SEE A BYTE INSIDE A PLACED FILE (paid: 14z-192, the M23 freeze; #231); tools/program_bytediff.py |
 | `PRG:0x0FE300` | docs/project/patch_notes.md — 14z-185 — THE M21 FREEZE (donovan-m25 / huitzil-m32 / pyron-m26 / merged-m21, mark M21): #182 and #159 LANDED |
 | `PRG:0x0FEE08` | docs/project/patch_notes.md — 14z-170 — THE M19 FREEZE (donovan-m23 / huitzil-m30 / pyron-m24 / merged-m19, mark M19): the four ruled #136 fixes, and a placeholder corruption that had shipped since merged-m16 [vs2] |
 | `PRG:0x0FFF20` | docs/project/patch_notes.md — 14z-189 — THE M22 FREEZE (donovan-m26 / huitzil-m33 / pyron-m27 / merged-m22, mark M22): #194 and #195 LANDED |
