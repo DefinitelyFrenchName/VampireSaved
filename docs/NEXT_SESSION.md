@@ -32,12 +32,10 @@ work there in parallel.**
    CLAUDE.md and skill reads its spec named. Re-check it, then measure each behaviour's legacy
    reach and cost (does it run for legacy CPU fighters, and how many cycles), and only then put the port to the
    maintainer with options and a recommendation through the rule-checker ([VSP-10]).
-3. **#231 — the freeze's byte-level program diff as a step that cannot be skipped** (part 1, `attribute_patch_delta.py`
-   without a `gen.log`, landed 14z-193; `tools/program_bytediff.py` is the instrument, its control the M21 -> M22 pair).
-4. **#226 — THE LINUX RELEASE AS A PLAYER GETS IT**, ideally on the next release: step 2's window, rendering and a
+3. **#226 — THE LINUX RELEASE AS A PLAYER GETS IT**, ideally on the next release: step 2's window, rendering and a
    match passed on PILOT's desktop (14z-193, STATE row (4)); left are sound and the physical keyboard (PILOT's VM
    has no audio device), step 3 (the `-recipe` asset on a clean host), and the scripted case.
-5. **Open from this sitting:** #228 (breakpoint instruments on the frame_done clock), #229 (community naming rigs),
+4. **Open from this sitting:** #228 (breakpoint instruments on the frame_done clock), #229 (community naming rigs),
    #230 (capture geometry), #118 (the mizuumi candidates, scope commented), #234 (MAME's red bad-ROM box,
    filed 14z-193).
 
