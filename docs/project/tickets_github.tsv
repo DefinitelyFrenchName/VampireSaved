@@ -2,8 +2,9 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 241
+# issues: 242
 number	state	reason	closed	labels	title
+242	OPEN	-	-	bug	retraction_grep never lists a retracted wording split across a line break
 241	OPEN	-	-	bug	Cross-check record derivation reads bit 7 of Zabel's pursuit damage bytes as damage (258/130 for a 0/2 hit)
 240	OPEN	-	-	cosmetic	Recipe READMEs: the easy way needs a prebuilt, step 3 cites step 1 for the set, the verifyroms comment overstates, a pointer to a file not shipped
 239	OPEN	-	-	bug	MAME PLAY.command's macOS quarantine message names "fbneo" instead of the MAME binary
