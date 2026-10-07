@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-193 CLOSE, 2026-10-07)
+# NEXT SESSION — orientation (rewritten at the 14z-194 CLOSE, 2026-10-07)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
@@ -10,49 +10,51 @@
 A plain **Opus 5.5 session at effort High** (the ruled orchestrator — STATE 'Standing rulings') on the
 #172 setup: every quoted figure from a `measurer` / `reader` spec (`docs/project/worker_spec.md`, the spec
 text IN the prompt, no model), every freeze and recommendation through the pinned `rule-checker` with the
-prompt files pasted VERBATIM, `record --session`, `resolve` on ONE line with one label per violated question
-(never chained with the next `prepare`). Say so at the opener. Never spawn any agent at `max`.
-A recommendation leans only on the maintainer's OWN words. When no ruling covers it, ask plainly instead.
+prompt files pasted VERBATIM, `record --session <transcript id>`, `resolve` on ONE line with one label per
+violated question, and only AFTER the work it names exists (14z-194 resolved run 718 before its work landed).
+Say so at the opener. Never spawn any agent at `max`. A recommendation leans only on the maintainer's OWN words.
 **Before any long job, check whether PILOT (`ssh pilot`) or ERIS (`ssh eris`) is idle and run independent
-work there in parallel.**
+work there in parallel** — the maintainer's standing wish (14z-194: *"if and only if you don't need ERIS or
+PILOT for the release, please put them to use"*).
 
 ## START HERE
 
-0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** M23 is FROZEN (`c884e6d8`, tags `freeze/donovan-m27`,
-   `huitzil-m34`, `pyron-m28`, `merged-m23`); 14z-193 froze no build. What the close found and did is in STATE 14z-193's
-   CLOSE row.
-1. **THE NEXT RELEASE carries M23** with #214 and #227 (both fixed in the generator; `release/merged-m23/` is
-   packaged). #234 (the MAME README never explains the red bad-ROM box at every start) is the same kind of
-   generator note and could ride along. The release itself is the maintainer's call.
-2. **#129 — RE-CHECK THE WORKER'S REPORT, THEN PUT THE DECISION** (STATE 14z-192 row (10);
-   `build/agent192/r129/REPORT_handback.md`): two vs2 CPU-AI behaviours our build lacks; the report's two faults are
-   named there. Re-check, measure each behaviour's legacy reach and cost, then put the port to the maintainer
-   through the rule-checker ([VSP-10]).
-3. **#226 — THE LINUX RELEASE AS A PLAYER GETS IT**: step 2's window, rendering and a match passed on PILOT's desktop
-   (STATE 14z-193 row (4); the driver `build/agent193/t226/pilot_drive.py`); left are sound and the physical
-   keyboard (PILOT's VM has no audio device), step 3 (the `-recipe` asset on a clean host), and the scripted case.
-4. **Kept for a future session at the maintainer's word** (*"Let's keep them for a future session"*): #229 (naming
-   rigs for vanilla specials, supers, EX/ES, throws and pursuits) and #118 (the remaining mizuumi candidates) —
-   scope each before any rig. Also open: #228 (breakpoint instruments on the frame_done clock), #235 (Pyron's and
-   Donovan's kick and air throws as throwers), #236 (the asset cutter's dry run claims an upload).
+0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** **merged-m23 is PUBLISHED** (Latest on GitHub, nine
+   assets; M22 and M19 emptied). What the close found and did is in STATE 14z-194's CLOSE row.
+1. **#237 FIRST — the staleness audit's whole-file registry dependency.** Every emulator gate declares
+   `tests/ci_emulator.tsv`, so one row edit stales all 214. Two registry edits wait on it:
+   `audit_release_linux_desktop`'s row (#226's scripted case, merged `dbaed3a0`; the proposed row is in that
+   gate's commit message) and `audit_tenant_throw_geometry`'s description (it still names only the standard
+   throws). Fix the audit (judge the registry per gate row), gate it with its control, then add the rows.
+2. **#129 — PUT THE DECISION** (STATE 14z-194 row (3); facts in `docs/game/engine_internals.md` "The CPU AI
+   action-script system"): behaviour A (Phobos's continuation-check guard: a private clone, 0 legacy bytes, at
+   most 92 cycles a frame) and behaviour B (vs2's crouch-guard test in shared engine code: 30 legacy bytes, about
+   80 cycles static estimate). Gameplay feel is the maintainer's ([VSP-10]); captures first, then the options
+   through the rule-checker.
+3. **THE NEXT VERSION** carries #124/#125's map fix (approved, documented on #124: name records, relocated
+   portrait tiles, vs2's pool rows — its two owed checks first: whether the select screen reads the tenant
+   records' `+0x0A`/`+0x0E`, and a reader census of pool rows 0x10/0x11/0x13) and the release-tooling fixes
+   already merged (#236, #238-#240, `5a5205c5`). A freeze, then a release.
+4. **Open, scoped:** #118 (63 of 75 measured and homed in `atlas/ram.md`; 12 left, each naming the state it
+   needs; the six scratch-script promotions proposed in the #118 worktree's `HOMING.md`), #229 (pursuits done for
+   all 15; next families in `families.tsv` order: ground throws, then the rest), #241 (the derivation's bit-7
+   flag on Zabel's pursuit records), #226 (a clean host remains; step 2 complete by the maintainer's own test),
+   #228 (breakpoint instruments on the frame_done clock — deferred by the maintainer: *"we'll do these long
+   tickets later"*).
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
-- PILOT's `mame` too is on the LOGIN PATH only: a plain `ssh pilot 'cmd'` does not see it (`bash -lc` does) — the
-  ERIS gotcha's class (`docs/project/gotchas.md` "A REMOTE BATTERY STARTED FROM A NON-LOGIN SHELL").
-- PILOT's GNOME session can be driven from SSH: `DISPLAY=:0`, `XAUTHORITY=/run/user/1000/.mutter-Xwaylandauth.*`,
-  keys through Xwayland's XTEST (ctypes on `libXtst.so.6`, no install), the window captured with `xwd -id`.
-- MAME runs an `-autoboot_script` only after its startup screens: the release MAME's red bad-ROM box (#234) blocks a
-  scripted run until a key is pressed; the project's own runs use `-video none` and never see it.
-- A check that reads back a byte the gate itself pokes proves nothing; a per-cell claim compared as two sets hides a
-  swap; a cross-game gate without the matched level reads the speed level as a difference
-  (`docs/project/gotchas.md` "A CHECK THAT READS BACK ITS OWN POKE PROVES NOTHING").
-- `tools/upload_release_assets.sh --dry-run` ends with "done: N asset(s) on https://github.com/…" though it publishes
-  nothing; check `gh release view` before believing a line like it.
-- A freeze now records its whole program change: `python3 tools/freeze_bytediff.py render`, review, `freeze`
-  (HANDOFF "AND THE FREEZE'S WHOLE PROGRAM CHANGE"); `tests/test_freeze_bytediff.sh` is red until it does.
+- `ssh eris` lands in Windows `cmd`: it splits on `|` and mangles `\$`. Write scripts on the Mac, `scp` them to
+  `C:\Users\chaton`, run `ssh eris 'wsl.exe -e bash /mnt/c/Users/chaton/<file>'`; `export ROMDIR=/home/koneko/roms`
+  inside WSL (unexported, `tools/run_mame.sh` refuses every leg). `scp eris:` cannot reach WSL home paths: tar
+  into `/mnt/c` first.
+- `rulecheck.py record --session` takes the TRANSCRIPT id (`37644128` this sitting), not the session key.
+- A commit message quoting "close #N" is refused by the hook even inside a quotation: reword.
+- PILOT's desktop runs PipeWire with a null sink; `pw-record -P '{ stream.capture.sink=true }' --target auto_null`
+  records the emulator; gnome-shell's event sounds share the sink, so judge the emulator's own stream.
+- In zsh, `echo ===` fails (`=cmd` expansion).
 
-## WHAT CLOSED THIS SITTING (14z-193)
+## WHAT CLOSED THIS SITTING (14z-194)
 
-**#122**, **#217**, **#230**, **#231**, **#232**, **#233** `done`. Filed: #234, #235, #236. HANDOFF's naked-eye tell set
-to M23; `test_freeze_bytediff` listed at freeze cadence (ruled).
+**#214**, **#227**, **#234** (shipped in merged-m23), **#235** `done`. Filed: #237, #238, #239, #240, #241. Fixed for the
+next version, open until it ships: #236, #238, #239, #240. merged-m23 PUBLISHED.

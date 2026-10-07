@@ -6704,3 +6704,11 @@ landed would read "declared-ok" (now the attempt check: airborne at the press, s
 throw input — the replay's press is now checked statically against the button digits (`press-is-kick`). Rule: a
 "no event" verdict carries an attempt proof, and a liveness check with several clauses needs a control per clause
 (or one control whose perturbations hit each clause past the others).
+
+## STOPPING A RUNNING TIER CAN LEAVE AN EMPTY `.git/index.lock` (paid: 14z-194)
+
+A static tier stopped mid-run (its task killed to start the release-cadence run instead) left a zero-byte
+`.git/index.lock`, and the next `git add` / `git commit` refused: "Another git process seems to be running". The
+tier's gates run git commands; killed in the middle of one, git never removes its lock. Before removing the lock,
+check that no git process holds it (`pgrep -fl '(^|/)git '`): a harness status call run with `--no-optional-locks`
+takes no index lock and is not the holder. Then `rm .git/index.lock`. Never remove a lock a live git process owns.

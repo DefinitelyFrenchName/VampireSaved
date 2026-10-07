@@ -11,12 +11,13 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**240 tickets** — status: open 11 · parked 9 · done 193 · declined 9 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 168 · cosmetic 16 · evolution 56 · **backfill debt: 0 rows**.
+**241 tickets** — status: open 12 · parked 9 · done 193 · declined 9 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 169 · cosmetic 16 · evolution 56 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#241](https://github.com/DefinitelyFrenchName/VampireSaved/issues/241) | bug | open | Cross-check record derivation reads bit 7 of Zabel's pursuit damage bytes as damage (258/130 for a 0/2 hit) | `tools/vanilla_frames.py` | none | none | none | 14z-194 |
 | [#240](https://github.com/DefinitelyFrenchName/VampireSaved/issues/240) | cosmetic | open | Recipe READMEs: the easy way needs a prebuilt, step 3 cites step 1 for the set, the verifyroms comment overstates, a pointer to a file not shipped | `tools/package_release_platforms.py` | `DECISIONS_HISTORY.md § Ruled 2026-10-07 (14z-194) — the merged-m23 release: the 213 stale emulator verdicts approved at release; the recipe and launcher findings ticketed, not fixed first` | none | none | 14z-194 |
 | [#239](https://github.com/DefinitelyFrenchName/VampireSaved/issues/239) | bug | open | MAME PLAY.command's macOS quarantine message names "fbneo" instead of the MAME binary | `tools/package_release_platforms.py` | `DECISIONS_HISTORY.md § Ruled 2026-10-07 (14z-194) — the merged-m23 release: the 213 stale emulator verdicts approved at release; the recipe and launcher findings ticketed, not fixed first` | none | none | 14z-194 |
 | [#238](https://github.com/DefinitelyFrenchName/VampireSaved/issues/238) | bug | open | MAME -recipe asset does not build on Linux as written (USE_QTDEBUG=0, qmake6); neither recipe names its build dependencies | `tools/package_release_platforms.py` | `DECISIONS_HISTORY.md § Ruled 2026-10-07 (14z-194) — the merged-m23 release: the 213 stale emulator verdicts approved at release; the recipe and launcher findings ticketed, not fixed first` | none | none | 14z-194 |
