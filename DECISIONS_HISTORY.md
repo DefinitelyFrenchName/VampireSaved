@@ -351,6 +351,46 @@ So: merged-m19's seven zip assets are NOT deleted by hand; they stay hosted unti
 
 ---
 
+## Ruled 2026-10-07 (14z-194) — the merged-m23 release: the 213 stale emulator verdicts approved at release; the recipe and launcher findings ticketed, not fixed first
+
+**The instruction (14z-194):** *"Then let's release when the tier is finished and well do these long tickets later"*
+
+**The first question (AskUserQuestion), after `tools/audit_emulator_staleness.py --cadence release` on `c05f12ae` read 214 of 214 emulator gates STALE on one input:** *"Every emulator gate (214: 186 release-scope, 28 out-of-scope) reads STALE at release cadence. The only input that moved is tests/ci_emulator.tsv, where 14z-193 (#230) rewrote ONE row's description text, audit_tenant_throw_geometry's. Each gate declares the whole registry as an input, so that text edit stales all of them. How should this release clear it?"* — options "Re-run everything", "Fix the audit first", "Approve at release".
+
+**The maintainer:** *"Approve at release"*
+
+So: `audit_tenant_throw_geometry` re-run through the runner on ERIS at `c05f12ae` (PASS, three controls honoured; `build/emu_194_throwgeo/`, copied to the Mac; the audit then read 213 stale), and the other 213 stale verdicts are APPROVED for the merged-m23 release under the release-scope ruling (*"anything red or skipped is a hard fail unless approved at release time"*). The release-cadence tier's `test_emulator_staleness` red is that approved verdict. The coarse dependency is #237.
+
+**The second question (AskUserQuestion), after #226's PILOT run found the MAME `-recipe` asset does not build on Linux as written:** *"PILOT found the MAME -recipe asset does not build on Linux as written (missing USE_QTDEBUG=0, which our own builds pass), and MAME's PLAY.command names \"fbneo\" in its macOS quarantine message. Fix these in the generator before releasing M23, or release now and ticket them?"* — options "Fix all, then release", "Fix the two defects only", "Release now, ticket all".
+
+**The maintainer:** *"Release now, ticket all"*
+
+So: merged-m23 is published as packaged (with #234's note); filed #238 (the MAME recipe on Linux, both recipes' dependencies), #239 (the MAME launcher names "fbneo"), #240 (the recipe READMEs' wording).
+
+---
+
+## Read 2026-10-07 (14z-194) — #226: the release's sound, by ear
+
+**The files sent (four MP3s from PILOT's PipeWire null sink: the merged-m23 Linux release FBNeo and MAME, and the two binaries built from the `-recipe` assets):** *"#226 sound, recorded on PILOT's desktop from PipeWire's null sink: the merged-m23 Linux release binaries (first two) and the binaries built from the -recipe assets (last two). The first ~5 s of each is boot silence; in MAME a key press first clears the red box (#234)."*
+
+**The maintainer:** *"sound is good"*
+
+So: #226's audio content is confirmed by ear; a real audio device and driver, the physical keyboard, a clean host and the scripted case stay open on #226.
+
+---
+
+## Ruled 2026-10-07 (14z-194) — idle boxes on open tickets; ERIS takes #118
+
+**The instruction:** *"Btw, if and only if you don't need ERIS or PILOT for the release, please put them to use (through any of the other open tickets)"*, then *"Btw, should #129 end fast, #226 should be possible"*. PILOT took #129, then #226; ERIS took #235.
+
+**The question (AskUserQuestion), when ERIS was idle again:** *"ERIS is idle again (#235 done). Which open ticket should it take? (NEXT_SESSION says to scope #229 and #118 before any rig; #228 stays deferred.)"* — options "#118 mizuumi", "#229 naming rigs", "#124 map tags", "Scope only".
+
+**The maintainer:** *"#118 mizuumi"*
+
+So: #118 scoped and measured in scratch on ERIS and PILOT, nothing adopted as a name, no tree edits until the findings are homed.
+
+---
+
 ## Ruled 2026-10-07 (14z-193) — #230 closed `done` on the standard throw; #235 filed for the kick and air throws
 
 **The question (AskUserQuestion, after rule-checker run 2026-10-06-712 OK):** *"#230 now gates Pyron's and Donovan's standard 6+HP throw on all 18 victims, ours vs native, at the matched level (re-frozen under rule-checker run 712, OK; you read the sheets as identical). Their kick and air throws aren't covered. How should #230 end?"* — options "Close; new ticket", "Extend #230 now", "Close; standard is enough".

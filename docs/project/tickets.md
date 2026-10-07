@@ -11,12 +11,16 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**236 tickets** — status: open 11 · parked 9 · done 189 · declined 9 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 165 · cosmetic 15 · evolution 56 · **backfill debt: 0 rows**.
+**240 tickets** — status: open 15 · parked 9 · done 189 · declined 9 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 168 · cosmetic 16 · evolution 56 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#240](https://github.com/DefinitelyFrenchName/VampireSaved/issues/240) | cosmetic | open | Recipe READMEs: the easy way needs a prebuilt, step 3 cites step 1 for the set, the verifyroms comment overstates, a pointer to a file not shipped | `tools/package_release_platforms.py` | `DECISIONS_HISTORY.md § Ruled 2026-10-07 (14z-194) — the merged-m23 release: the 213 stale emulator verdicts approved at release; the recipe and launcher findings ticketed, not fixed first` | none | none | 14z-194 |
+| [#239](https://github.com/DefinitelyFrenchName/VampireSaved/issues/239) | bug | open | MAME PLAY.command's macOS quarantine message names "fbneo" instead of the MAME binary | `tools/package_release_platforms.py` | `DECISIONS_HISTORY.md § Ruled 2026-10-07 (14z-194) — the merged-m23 release: the 213 stale emulator verdicts approved at release; the recipe and launcher findings ticketed, not fixed first` | none | none | 14z-194 |
+| [#238](https://github.com/DefinitelyFrenchName/VampireSaved/issues/238) | bug | open | MAME -recipe asset does not build on Linux as written (USE_QTDEBUG=0, qmake6); neither recipe names its build dependencies | `tools/package_release_platforms.py` | `DECISIONS_HISTORY.md § Ruled 2026-10-07 (14z-194) — the merged-m23 release: the 213 stale emulator verdicts approved at release; the recipe and launcher findings ticketed, not fixed first` | none | none | 14z-194 |
+| [#237](https://github.com/DefinitelyFrenchName/VampireSaved/issues/237) | bug | open | Emulator staleness audit: one edited row of tests/ci_emulator.tsv makes every emulator gate stale | `tools/audit_emulator_staleness.py` | `DECISIONS_HISTORY.md § Ruled 2026-10-07 (14z-194) — the merged-m23 release: the 213 stale emulator verdicts approved at release; the recipe and launcher findings ticketed, not fixed first` | none | none | 14z-194 |
 | [#236](https://github.com/DefinitelyFrenchName/VampireSaved/issues/236) | bug | open | upload_release_assets.sh --dry-run ends with 'done: N asset(s) on ‹release URL›' though it uploads nothing | `tools/upload_release_assets.sh` | none | none | none | 14z-193 |
 | [#235](https://github.com/DefinitelyFrenchName/VampireSaved/issues/235) | evolution | open | Pyron's and Donovan's kick and air throws as throwers: ours vs native vs2 on the roster victims (split from #230) | `tests/audit_tenant_throw_geometry.sh` | `DECISIONS_HISTORY.md § Ruled 2026-10-07 (14z-193) — #230 closed `done` on the standard throw` | none | none | 14z-193 |
 | [#234](https://github.com/DefinitelyFrenchName/VampireSaved/issues/234) | cosmetic | open | MAME release: the red 'ROMs incorrect — press any key' screen at every start is expected but the README never says so | `tools/package_release.py` | none | none | none | 14z-193 |
