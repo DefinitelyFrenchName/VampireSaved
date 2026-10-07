@@ -1,0 +1,15 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_tenant_throw_geometry.sh	86512ca93a0f6c965af3cc9ac9137cc13f41b643
+build/agent193/t230/gate.diff	54028bc6ed91c3a5e44e76ff95fdd8e2ec9ac707
+build/agent193/t230/ttg_new.log	8fc1ac8b92c40b9b89562fcfafad2c4a8784b479
+build/agent193/t230/ttg_new_mode.log	5a5e597f4b4c484d08af78b30e3a5baab6028b3c
+build/agent193/t230/ttg_new_mac.log	3ef0f320b6e75efdc29da0bab3e283fb8673ced8
+build/agent193/t230/ttg_att11.log	f97057249660c1e62f94287a850b9d5207904f5e
+build/agent193/t230/ttg_att13.log	21b950b6027563e58a2cf908e22fc058ac33cccf
+build/agent193/t230/ttg_pin_att11.log	a6581edd09f2e1b132b6a46709b0e545c198da3b
+build/agent193/t230/ttg_pin_att13.log	bd1f108808f2bf0e36dae81d984a9c3755dec246
+build/agent193/t230/ttg_pin3_att10.log	3dc7df87bed75a3ff07ef5d558137b4269afcbf9
+build/agent193/t230/provenance.txt	2c016a694daa1b0fa302a3ebae08371300778306
+build/agent193/t230/ttg_std.sh	8746de7c4facd0d3f4f7157870c0e851c35fa1f4
+build/agent193/t230/ttg_pin3.sh	a58a207caf45fd5d50a74b546e68b9ca1fafc8d9
+DECISIONS_HISTORY.md.lines-1012-1019 (lines 1012-1019 of DECISIONS_HISTORY.md)	41fccfdfbff06e6a9853658447eb381d5fd6c947

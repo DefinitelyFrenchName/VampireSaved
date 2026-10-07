@@ -1,0 +1,25 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_tenant_throw_geometry.sh	c858770d8aa7efc3de6a201dd43acb127f1087a8
+build/agent193/t230/gate.diff	f1a42d102f97ae7d479a4a3f4102900efea0a659
+build/agent193/t230/ttg_v3.log	05f16e6e0686c3339f80e0b862ea923a9c1d58e7
+build/agent193/t230/ttg_v3_mac.log	0c885bd4f1230b98339b9d43108f8ae40399cba8
+build/agent193/t230/ttg_v3_mode_unpinned.log	4304de0555d2455a9367bf394e0103c5730e3013
+build/agent193/t230/ttg_v3_mode_wrong.log	0ac8a45dfc7ec7428df1dd97f8d23fb60b4a86fc
+build/agent193/t230/ttg_seq.log	80a328ff1e9eed9dc85db74394cf805d53493558
+build/agent193/t230/ttg_att11.log	f97057249660c1e62f94287a850b9d5207904f5e
+build/agent193/t230/ttg_att13.log	21b950b6027563e58a2cf908e22fc058ac33cccf
+build/agent193/t230/ttg_pin_att11.log	a6581edd09f2e1b132b6a46709b0e545c198da3b
+build/agent193/t230/ttg_pin_att13.log	bd1f108808f2bf0e36dae81d984a9c3755dec246
+build/agent193/t230/ttg_pin3_att10.log	3dc7df87bed75a3ff07ef5d558137b4269afcbf9
+build/agent193/t230/provenance.sh	b1507064d44d42297774f7af856ae438b5edb981
+build/agent193/t230/provenance3_mac.txt	ab50aa0d4da1d88369296d4aceb54978f5ca0fb8
+build/agent193/t230/provenance3_eris.txt	700aa2c1e544dec091ad8c292dcdf77e51623a7b
+build/agent193/t230/maintainer_read.txt	627a3f76939548a72b4aeb56a0420876c816d4fb
+build/agent193/t230/capture_11_03.png	dfc4f95cbdbdce64cdcada91981621eee8a48f69
+build/agent193/t230/capture_13_03.png	625ecf4c39bd7b4737abc59bd423034d3f709d84
+build/agent193/t230/capture_13_10.png	98a283610fb07dd32efe321262b4a9bc83ff9bb2
+build/agent193/t230/ttg_std.sh	8746de7c4facd0d3f4f7157870c0e851c35fa1f4
+build/agent193/t230/ttg_pin3.sh	a58a207caf45fd5d50a74b546e68b9ca1fafc8d9
+tests/replays/judge/02_throw.rpl	7b44c0f73ea9aab8685c9ed0aa09de9e6e5dba0c
+tests/expected/roster_pairings/bases.tsv	51657c3640dba512a109de4c1762b8f0e6035b54
+DECISIONS_HISTORY.md.lines-1012-1019 (lines 1012-1019 of DECISIONS_HISTORY.md)	41fccfdfbff06e6a9853658447eb381d5fd6c947

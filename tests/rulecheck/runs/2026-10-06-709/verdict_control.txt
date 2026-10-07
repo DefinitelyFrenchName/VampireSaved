@@ -1,0 +1,6 @@
+Q1: VIOLATED — the claim says "Not tested: nothing further", but it rests on an untested premise that the artifacts contradict: that the actor field identifies the maintainer. issue_151_timeline.txt:2 says "At this date the sessions and the maintainer shared ONE GitHub account (DefinitelyFrenchName)".
+Q2: N-A — the claim draws no conclusion about how anything plays for a player; it is about ticket bookkeeping.
+Q3: N-A — no two legs are compared. The packet records one close event.
+Q4: VIOLATED — no control tells a maintainer close apart from a session's own commit auto-closing the issue under the shared account, and the claim does not name this gap. issue_151_timeline.txt:5 shows the close carries "commit=afff693875340868f0aaf63362a6773535ef8a73". That is the 14z-161 session-close commit at git_log.txt:3, "2026-09-17 02:17:05 +0200" (00:17:05Z), three seconds before the 00:17:08Z close.
+Q5: VIOLATED — the closure is credited to the maintainer only from the actor field "actor=DefinitelyFrenchName" (issue_151_timeline.txt:5) and the timing. None of the artifacts quote the maintainer saying anything, and the actor account is shared (issue_151_timeline.txt:2).
+VERDICT: VIOLATED

@@ -1,0 +1,26 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_tenant_throw_geometry.sh	3b4e33017ef2407f907e9cdc8c6847ebf819b9ca
+build/agent193/t230/gate.diff	17a502044c7d3f25a5f60a21a28320219ef82206
+build/agent193/t230/ttg_v6.log	dd3006e29e5cb4c863ced8709efd66b99eb17932
+build/agent193/t230/ttg_v6_mac.log	7245a331544abaa6b3a0780c19b9c7fee2022479
+build/agent193/t230/ttg_v6_mode_unpinned-level.log	b585e2cca7d2d9a819b423d26ce467500f252684
+build/agent193/t230/ttg_v6_mode_wrong-thrower.log	7b3570bf4d5b11222db1b46a91a0ee45bd37477e
+build/agent193/t230/ttg_v6_mode_arc-swap.log	a51894ad94132bd3ca34d9c4f6fe2a00f5f75c76
+build/agent193/t230/ttg_seq.log	80a328ff1e9eed9dc85db74394cf805d53493558
+build/agent193/t230/ttg_att11.log	f97057249660c1e62f94287a850b9d5207904f5e
+build/agent193/t230/ttg_att13.log	21b950b6027563e58a2cf908e22fc058ac33cccf
+build/agent193/t230/ttg_pin_att11.log	a6581edd09f2e1b132b6a46709b0e545c198da3b
+build/agent193/t230/ttg_pin_att13.log	bd1f108808f2bf0e36dae81d984a9c3755dec246
+build/agent193/t230/ttg_pin3_att10.log	3dc7df87bed75a3ff07ef5d558137b4269afcbf9
+build/agent193/t230/provenance.sh	4a50535ab2f70fda0b68360875f7c9dda2544f51
+build/agent193/t230/provenance6_mac.txt	d64aff975a4134b0209c42f361d7f63443ccd593
+build/agent193/t230/provenance6_eris.txt	da369ebce59daa5ab8325be5002beb4dd44d5210
+build/agent193/t230/maintainer_read.txt	627a3f76939548a72b4aeb56a0420876c816d4fb
+build/agent193/t230/capture_11_03.png	dfc4f95cbdbdce64cdcada91981621eee8a48f69
+build/agent193/t230/capture_13_03.png	625ecf4c39bd7b4737abc59bd423034d3f709d84
+build/agent193/t230/capture_13_10.png	98a283610fb07dd32efe321262b4a9bc83ff9bb2
+build/agent193/t230/ttg_std.sh	8746de7c4facd0d3f4f7157870c0e851c35fa1f4
+build/agent193/t230/ttg_pin3.sh	a58a207caf45fd5d50a74b546e68b9ca1fafc8d9
+tests/replays/judge/02_throw.rpl	7b44c0f73ea9aab8685c9ed0aa09de9e6e5dba0c
+tests/expected/roster_pairings/bases.tsv	51657c3640dba512a109de4c1762b8f0e6035b54
+DECISIONS_HISTORY.md.lines-1012-1019 (lines 1012-1019 of DECISIONS_HISTORY.md)	41fccfdfbff06e6a9853658447eb381d5fd6c947
