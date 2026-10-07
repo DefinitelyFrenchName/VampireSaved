@@ -1,23 +1,32 @@
 #!/bin/sh
 # audit_tenant_throw_geometry.sh — THE TENANTS AS THROWERS, OURS vs NATIVE VS2
-# (14z-131, maintainer-directed 2026-09-04; Pyron and Donovan joined and the level pinned 14z-193, #230).
+# (14z-131, maintainer-directed 2026-09-04; Pyron and Donovan joined and the level pinned 14z-193, #230;
+# Pyron's air throw joined 14z-194, #235).
 #
-# WHAT: Phobos's three throws (6+HP, Circuit Scrapper, ES Circuit Scrapper) and Pyron's and Donovan's
-#   standard throw, ours vs native vs2, for all 18 roster victims, at the MATCHED speed level and a
-#   pinned RNG: the held victim traverses the SAME ordered (pose, dx, dy) states in the same order on
-#   both legs, the end-of-hold tail is one uniform shape per throw, and damage is compared as totals per
-#   victim — dwell reported, never asserted.
-# HOW: the same replay per throw and victim on both legs on MAME (90 cells, JOBS-way parallel), level 06
+# WHAT: Phobos's three throws (6+HP, Circuit Scrapper, ES Circuit Scrapper), Pyron's and Donovan's
+#   standard throw and Pyron's air throw (j.6MP, j.6HP), ours vs native vs2, for all 18 roster victims,
+#   at the MATCHED speed level and a pinned RNG: the held victim traverses the SAME ordered (pose, dx, dy)
+#   states in the same order on both legs, the end-of-hold tail is one uniform shape per throw, and damage
+#   is compared as totals per victim — dwell reported, never asserted. A victim the throw never holds on
+#   EITHER game is DECLARED per throw, and the declaration is asserted both ways.
+# HOW: the same replay per throw and victim on both legs on MAME (126 cells, JOBS-way parallel), level 06
 #   and RNG word 0000 poked on both legs (the parity gates' ruled equalised input), every frame of the
 #   hold collapsed into the ordered state sequence with dwell counts; pose indexes resolved through each
 #   game's own anim_index_c (pixels deliberately not compared: two generations of the victim's art).
-# EXPECTS: 18/18 identical ordered states per throw, tail (0,0) on every throw, the Sasquatch damage
-#   residue cells as frozen (vanilla's own defense row); a red is a state missing, reordered, a tail or a
-#   damage cell moved.
+# EXPECTS: identical ordered states per throw on every victim that holds (18/18, or 13/18 on Pyron's air
+#   throw with 00 05 06 0d 0e declared no-hold), tail (0,0) on every throw, the Sasquatch damage residue
+#   cells as frozen (vanilla's own defense row); a red is a state missing, reordered, a tail or a damage
+#   cell moved, a declared victim that holds, or a declared victim's leg not proven live or its throw not attempted.
 #
 # MUST-FIRE: perturbed-copy: arc-swap — Pyron's standard throw with two victims' native post-release arcs exchanged (the legs' arc SETS unchanged) must be flagged by the per-victim arc check, and the gate must FAIL (mode: the exchange is applied to the real measurement)
 # MUST-FIRE: known-bad: wrong-thrower — Victor (0x03) poked into Donovan's slot on the ours leg must hold a +0x60 base other than Donovan's, and the identity check must FAIL (mode: every ours Donovan leg runs Victor)
 # MUST-FIRE: known-bad: unpinned-level — Donovan's standard throw with the NATIVE leg's level pin withheld (vsav2's default TURBO against vsavj's NORMAL) must diverge in hold order from ours, and the gate must FAIL (mode: every native leg runs unpinned)
+# MUST-FIRE: perturbed-copy: nohold-dropped — Pyron's air-throw declaration with one declared no-hold victim removed must read that victim as an undeclared no-hold (VOID), and the gate must FAIL (mode: the first declared victim is dropped from both air rows)
+# MUST-FIRE: perturbed-copy: nohold-overdeclared — Pyron's air-throw declaration with a victim that DOES hold added must read that victim as declared-but-held, and the gate must FAIL (mode: victim 01 is added to both air rows' declaration)
+# MUST-FIRE: perturbed-copy: nohold-dead-leg — a declared no-hold victim's native leg with its last dumped frame removed must read declared-dead (an absent hold on a leg not proven live), and the gate must FAIL (mode: every declared victim's native series loses its last frame)
+# MUST-FIRE: perturbed-copy: nohold-wrong-base — a declared no-hold victim's legs, frame count intact, with ONE frame's victim +0x60 base replaced by another roster victim's (one copy) and ONE frame's thrower base replaced by Donovan's (a second copy), must each read declared-dead, and the gate must FAIL (mode: the first declared victim's ours leg gets the wrong victim base, the second's native leg the wrong thrower base)
+# MUST-FIRE: perturbed-copy: press-is-kick — the declared rows' replay with P1's press swapped from the punch to the matching kick (MP->MK, HP->HK) must fail the press-input check, and the gate must FAIL (mode: the check reads the swapped copy of both air replays)
+# MUST-FIRE: perturbed-copy: nohold-no-attempt — a copy of the air replay with P1's toward+P press removed, run on a declared no-hold victim (both legs), must read declared-noattempt (no attempt, so its absent hold proves nothing), and the gate must FAIL (mode: every declared victim's air legs run the press-less copy)
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua tests/replays/
 #   tools/run_mame.sh tools/setup_mame.sh tests/expected/roster_pairings/bases.tsv tests/lib/controls.sh
 #
@@ -123,7 +132,28 @@
 # this gate to all four victims is a VICTIMS= loop away if ever wanted; it
 # would quadruple a ~12 min run to re-measure an axis already gated.
 #
-# 90 cells x 2 legs + 18 control legs; ~2.5 min on ERIS at JOBS=10 for Phobos's 108 legs alone.
+# PYRON'S AIR THROW (14z-194, #235). Measured first on ERIS (the #235 fork, build/agent194/t235/): neither
+# tenant's 6+MK/6+HK and none of Donovan's air presses ever hold a victim — on both games, on all 36 legs of
+# each, they enter an attack state (seq 0a.xx on the ground, 06.06 in the air) and never a hold; whether that
+# state is a NORMAL by name is not checked (no move-table lookup) — and Pyron's Galactic Throw (j.6MP and j.6HP, replays judge/05 and
+# judge/06: P2 jumps two frames before P1, P1 presses toward+P 14 frames into its jump) holds on 13 victims
+# and on NONE of 00 05 06 0d 0e, on EITHER game (why is not measured). Those five are DECLARED per row
+# (`nohold`): a declared victim must show no captured frame on BOTH legs, and its legs must be LIVE — every
+# frame of the window dumped, Pyron's +0x60 base and the victim's on every frame (a dead leg also shows no
+# hold, so absence alone proves nothing) — AND Pyron must have ATTEMPTED the throw on both legs (rule-checker
+# run 2026-10-07-717 Q4): at the press frame 3034 he is airborne (his height above its value at frame 3000)
+# and his seq goes from the jump state (06.xx the frame before) to 06.06, the jump state's attack sub-state,
+# which is what the toward+P press produces when no throw connects. Measured on the #235 run's main legs
+# (build/agent194/t235b/eris_prov.out): every declared leg on both games enters 06.06 at 3034 from 06.02, at
+# height 106 against 40 on the ground; a holding leg enters 0a.00 at the same frame; no kick-input leg (no
+# jump) enters 06.xx. BECAUSE 06.06 IS ALSO WHAT AN AIR KICK ENTERS (run 2026-10-07-718 Q4(b): 0x11 a6mk, 36 legs,
+# 06.06 at 3034), the declared rows also check STATICALLY that the press the gate runs is the throw input: the
+# p1 line of the spec's own replay covering the press frame must be exactly toward (R; P1 faces right) + the
+# row's punch, by the replay grammar's encoding (tests/lua/replay.lua: tokens `U D L R 1-6`, lines 40-41; digit N
+# = MAME's "P1 Button N", lines 76-78) and the tree's button map (tools/name_moves.py `B`: LP 1, MP 2, HP 3,
+# LK 4, MK 5, HK 6 — imported, not copied). An undeclared victim that never holds is still VOID, as before.
+#
+# 126 cells x 2 legs + 21 control legs; ~2.5 min on ERIS at JOBS=10 for Phobos's 108 legs alone.
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged31] [THROWERS="10 11 13"] [VICTIMS="..."] [JOBS=6]
 #        tests/audit_tenant_throw_geometry.sh
 set -eu
@@ -168,9 +198,27 @@ pokes_for() {  # pokes_for <att> <vic> <meter: m or empty> <leg> <unpinned: 1 or
 }
 specs_for() {  # specs_for <att>: the throws this thrower runs
     if [ "$1" = 10 ]; then echo "std:judge/02_throw.rpl:3000:3260: cs:hui/80_hui_grab_2p.rpl:3145:3375: es:hui/97_hui_grab_es_2p.rpl:3140:3400:m"
+    elif [ "$1" = 11 ]; then echo "std:judge/02_throw.rpl:3000:3260: airm:judge/05_air_throw_mp.rpl:3000:3320: airh:judge/06_air_throw_hp.rpl:3000:3320:"
     else echo "std:judge/02_throw.rpl:3000:3260:"; fi
 }
+# PYRON'S AIR-THROW NO-HOLD VICTIMS (14z-194, #235): the ONE copy of the declaration, read by the verdict
+# (env AIR_NOHOLD) and by the nohold-no-attempt mode below, so both see the same list.
+AIR_NOHOLD="00 05 06 0d 0e"; export AIR_NOHOLD
+# THE PRESS-LESS COPIES of the air replays (control nohold-no-attempt): the real replay minus P1's toward+P
+# press line, so the leg jumps and never attempts the throw.
+air_nopress() {  # air_nopress <spec: airm|airh> -> path of the copy
+    case "$1" in airm) _r=05_air_throw_mp.rpl; _b=R2 ;; *) _r=06_air_throw_hp.rpl; _b=R3 ;; esac
+    grep -v -x "3034-3037 p1=$_b" "$REPO/tests/replays/judge/$_r" > "$W/${1}_nopress.rpl"
+    cmp -s "$W/${1}_nopress.rpl" "$REPO/tests/replays/judge/$_r" && { echo "air_nopress: the press line was not found in $_r" >&2; exit 1; }
+    printf '%s' "$W/${1}_nopress.rpl"
+}
 UNPIN_ALL=""; vs_ctl_is unpinned-level && UNPIN_ALL=1
+NOATT=""; vs_ctl_is nohold-no-attempt && NOATT=1
+# THE REPLAYS AS RUN (718 Q4(b)): every (thrower, spec, replay) the loop below runs, from the same specs_for, so
+# the verdict's press-input check reads the replay the legs actually played
+SPECS_RUN=""
+for _a in $THROWERS; do for _s in $(specs_for "$_a"); do SPECS_RUN="$SPECS_RUN $_a:$_s"; done; done
+export SPECS_RUN
 # CONTROL wrong-thrower (run 2026-10-06-709 Q4): Victor's id (0x03) poked into Donovan's slot on the OURS leg
 WRONG13=""; vs_ctl_is wrong-thrower && WRONG13=1
 JOBS="${JOBS:-6}"
@@ -186,8 +234,10 @@ run_leg() {  # run_leg <dir> <leg> <rpl> <pokes> <lo> <hi>
     mkdir -p "$1/sbx"
     if [ "$2" = ours ]; then _s=vsavjw; _rp="$REPO/$BUILD/rompath;$ROMDIR"
     else                     _s=vsav2;  _rp="$ROMDIR"; fi
-    _df="$(python3 -c "print(';'.join(f'{f}:ff8410-ff8418;{f}:ff8810-ff8818;{f}:ff881c-ff8820;{f}:ff8934-ff8935;{f}:ff8509-ff850a;{f}:ff8850-ff8852;{f}:ff8406-ff8408;{f}:ff8460-ff8464' for f in range($5,$6)))")"
-    ( cd "$1" && REPLAY="$REPO/tests/replays/$3" POKES="$4" DUMPS="$_df" \
+    # + the VICTIM's loaded +0x60 base (RAM:$FF8860, 14z-194): the declared no-hold legs' liveness reads it
+    _df="$(python3 -c "print(';'.join(f'{f}:ff8410-ff8418;{f}:ff8810-ff8818;{f}:ff881c-ff8820;{f}:ff8934-ff8935;{f}:ff8509-ff850a;{f}:ff8850-ff8852;{f}:ff8406-ff8408;{f}:ff8460-ff8464;{f}:ff8860-ff8864' for f in range($5,$6)))")"
+    case "$3" in /*) _rpl="$3" ;; *) _rpl="$REPO/tests/replays/$3" ;; esac   # an absolute path: a control's copy
+    ( cd "$1" && REPLAY="$_rpl" POKES="$4" DUMPS="$_df" \
       CHECKSUM_OUT="$1/out.log" MAME_SANDBOX="$1/sbx" MAME_ROMPATH="$_rp" \
       "$REPO/tools/run_mame.sh" "$_s" \
       -autoboot_script "$REPO/tests/lua/replay.lua" > "$1/mame.log" 2>&1 ) &
@@ -200,6 +250,11 @@ for vic in $VICTIMS; do
     for spec in $(specs_for "$att"); do
         nm=${spec%%:*}; _r=${spec#*:}; rpl=${_r%%:*}; _r=${_r#*:}
         lo=${_r%%:*}; _r=${_r#*:}; hi=${_r%%:*}; mt=${_r#*:}
+        # the nohold-no-attempt MODE: every declared victim's air legs run the press-less copy
+        if [ -n "$NOATT" ] && [ "$att" = 11 ] && case "$nm" in air*) true ;; *) false ;; esac \
+           && echo " $AIR_NOHOLD " | grep -q " $vic "; then
+            rpl="$(air_nopress "$nm")"; [ -n "$rpl" ] || exit 1
+        fi
         for leg in ours native; do
             _pid="$att"; [ -n "$WRONG13" ] && [ "$att" = 13 ] && [ "$leg" = ours ] && _pid=03
             run_leg "$W/${att}_${vic}_${nm}_${leg}" "$leg" "$rpl" "$(pokes_for "$_pid" "$vic" "$mt" "$leg" "$UNPIN_ALL")" "$lo" "$hi"
@@ -216,11 +271,22 @@ if [ -z "${VS_CTL:-}" ] && echo " $THROWERS " | grep -q " 13 "; then
         run_leg "$W/ctl_${vic}_std_native" native judge/02_throw.rpl "$(pokes_for 13 "$vic" "" native 1)" 3000 3260
     done
 fi
+# THE nohold-no-attempt CONTROL's legs (normal runs): the first declared victim, both legs, on the press-less
+# copy of the MP air replay — the same pokes and window as its real air legs.
+if [ -z "${VS_CTL:-}" ] && echo " $THROWERS " | grep -q " 11 "; then
+    _v0="$(echo $AIR_NOHOLD | cut -d' ' -f1)"
+    if echo " $VICTIMS " | grep -q " $_v0 "; then
+        _np="$(air_nopress airm)"; [ -n "$_np" ] || exit 1
+        for leg in ours native; do
+            run_leg "$W/ctln_${_v0}_airm_${leg}" "$leg" "$_np" "$(pokes_for 11 "$_v0" "" "$leg" "")" 3000 3320
+        done
+    fi
+fi
 wait
 echo "== ran $_n legs ($(echo $THROWERS | wc -w | tr -d ' ') throwers x $(echo $VICTIMS | wc -w | tr -d ' ') victims; pinned level 06 and RNG 0000 on both legs$( [ -n "$UNPIN_ALL" ] && echo ' — EXCEPT the native level, CONTROL unpinned-level')), JOBS=$JOBS"
 
 VS_CTL="${VS_CTL:-}" python3 - "$W" "$VICTIMS" "$BUILD" "$THROWERS" <<'PY' > "$W/verdict.txt" || fail=1
-import glob, re, struct, sys, json
+import glob, re, struct, sys, json, os
 W, VICTIMS, BUILD, THROWERS = sys.argv[1], sys.argv[2].split(), sys.argv[3], sys.argv[4].split()
 vj = open('build/out/vsavj_data.bin', 'rb').read()
 v2 = open('build/out/vsav2_data.bin', 'rb').read()
@@ -263,7 +329,13 @@ def series(tag, leg, vic):
         # +0x60 character-data base the GAME loaded for it (RAM:$FF8460), checked against each game's own table
         _b = open(f"{W}/{tag}_{leg}/dump_{fr}_ff8460.bin", 'rb').read()
         abase = struct.unpack_from('>I', _b, 0)[0] if len(_b) >= 4 else None
-        out.append(dict(cap=cap, hp=hp, stk=stk, pose=lut.get(ptr, '?'), abase=abase, seq=(_sq[0], _sq[1]),
+        # THE VICTIM'S loaded +0x60 base (RAM:$FF8860, 14z-194): a declared no-hold leg proves its victim by it
+        try: _vb = open(f"{W}/{tag}_{leg}/dump_{fr}_ff8860.bin", 'rb').read()
+        except OSError: _vb = b''
+        vbase = struct.unpack_from('>I', _vb, 0)[0] if len(_vb) >= 4 else None
+        # fr and the ATTACKER'S height ay (RAM:$FF8414, the dy source): the declared legs' attempt check (717 Q4)
+        out.append(dict(fr=fr, ay=struct.unpack_from('>h', a, 4)[0], cap=cap, hp=hp, stk=stk, pose=lut.get(ptr, '?'),
+                        abase=abase, vbase=vbase, seq=(_sq[0], _sq[1]),
                         dx=struct.unpack_from('>h', v, 0)[0] - struct.unpack_from('>h', a, 0)[0],
                         dy=struct.unpack_from('>h', v, 4)[0] - struct.unpack_from('>h', a, 4)[0]))
     return out
@@ -291,11 +363,23 @@ def states(s):
 # Phobos's circuit scrapper). `seq` is the attacker's seq at the hold's FIRST captured frame (not every frame), the same on all
 # 18 victims and both legs (rule-checker run 2026-10-06-708 Q4); the thrower is proved by its loaded +0x60 base (709 Q3); that it is the move NAMED rests on the replay's input,
 # not a move table. Measured on ERIS (build/agent193/t230/).
+# ADDED 14z-194 (#235): Pyron's air throw, both strengths, at the same pins — measured on ERIS by the #235 fork
+# (build/agent194/t235/eris_out/an_main.txt, merged-m23 zip sha1 c9b86f0d, tree c05f12ae): on the 13 victims
+# that hold, the same states in the same order, tail (0,0), damage equal on every victim (10 or 11), the arc
+# equal victim by victim; `nohold` is the DECLARED set that holds on neither game (its one copy is the shell's
+# AIR_NOHOLD), `frames` the window a declared leg must dump in full (judge/05 and judge/06 run 3000-3320),
+# `press` the frame P1's toward+P press starts and `attempt` the seq it enters there when no throw connects
+# (06.06, the jump state's attack sub-state; rule-checker run 2026-10-07-717 Q4).
+NOHOLD_AIR = set(os.environ['AIR_NOHOLD'].split())
 FROZEN = {
  ('10', 'std'): dict(seq={2}, tail=(0, 0), arc={64}, es=False, dmg={}),
  ('10', 'cs'):  dict(seq={14}, tail=(0, 0), arc={278,284,287,288,290,291,295,296,298,306,311}, es=False, dmg={'0a': (19, 20)}),
  ('10', 'es'):  dict(seq={16}, tail=(0, 0), arc={380,386,389,390,392,393,397,398,400,408,413}, es=True,  dmg={}),
  ('11', 'std'): dict(seq={2}, tail=(0, 0), arc={64,65,68,69,71,72,76,81,82,85,87,101}, es=False, dmg={'0a': (13, 14)}),
+ ('11', 'airm'): dict(seq={10}, tail=(0, 0), arc={73,74,75,76,77,84,93}, es=False, dmg={}, nohold=set(NOHOLD_AIR), frames=320,
+                      press=3034, attempt=(6, 6), press_btn='MP'),
+ ('11', 'airh'): dict(seq={10}, tail=(0, 0), arc={73,74,75,76,77,84,93}, es=False, dmg={}, nohold=set(NOHOLD_AIR), frames=320,
+                      press=3034, attempt=(6, 6), press_btn='HP'),
  ('13', 'std'): dict(seq={4}, tail=(0, 0), arc={64,68}, es=False, dmg={}),
 }
 WHO = {'10': 'Phobos', '11': 'Pyron', '13': 'Donovan'}
@@ -308,21 +392,126 @@ for ln in open('tests/expected/roster_pairings/bases.tsv'):
         BASE['ours'][int(c[0], 16)] = int(c[2], 16)
 for a in (0x10, 0x11, 0x13):
     BASE['native'][a] = struct.unpack_from('>I', v2, 0x0D7B18 + a * 4)[0]
+# THE VICTIMS' bases (14z-194, for the declared no-hold legs): the same two tables, every roster id
+VBASE = {'ours': dict(BASE['ours']), 'native': {}}
+for v in VICTIMS:
+    VBASE['native'][int(v, 16)] = struct.unpack_from('>I', v2, 0x0D7B18 + int(v, 16) * 4)[0]
 NAMES = {'std': 'standard throw 6+HP', 'cs': 'circuit scrapper 63214+MP',
-         'es': 'ES circuit scrapper 63214+2P'}
+         'es': 'ES circuit scrapper 63214+2P',
+         'airm': 'air throw j.6+MP (Galactic Throw)', 'airh': 'air throw j.6+HP (Galactic Throw)'}
 bad = 0
 import os
 CTL, ARCV = os.environ.get('VS_CTL', ''), {}
+# THE DECLARATION'S TWO CONTROLS AS MODES (14z-194): the perturbation is applied to the frozen declaration
+# itself, so the mode runs exactly the classification the gate trusts ([VSP-181]).
+def drop_one(decl):   # nohold-dropped: the first declared victim (in roster order) removed
+    return set(sorted(decl)[1:])
+def add_held(decl):   # nohold-overdeclared: victim 01, which holds on both strengths, declared
+    return set(decl) | {'01'}
+for _k, _f in FROZEN.items():
+    if _f.get('nohold'):
+        if CTL == 'nohold-dropped': _f['nohold'] = drop_one(_f['nohold'])
+        if CTL == 'nohold-overdeclared': _f['nohold'] = add_held(_f['nohold'])
+
+# THE PRESS INPUT (718 Q4(b)): the button map is tools/name_moves.py's `B` (LP 1, MP 2, HP 3, LK 4, MK 5, HK 6),
+# imported so there is one copy; the grammar (tokens U D L R 1-6, "A-B who=TOKENS") is tests/lua/replay.lua's.
+sys.path.insert(0, 'tools')
+from name_moves import B as BTN
+RUNRPL = {}
+for _t in os.environ.get('SPECS_RUN', '').split():
+    _p = _t.split(':'); RUNRPL[(_p[0], _p[1])] = _p[2]
+def press_lines(text, press):   # every p1 token of a replay line whose frame span covers `press`
+    hits = []
+    for ln in text.splitlines():
+        core = ln.split('#')[0].strip()
+        m = re.fullmatch(r'(\d+)(?:-(\d+))?\s+(.*)', core)
+        if not m: continue
+        a, b = int(m.group(1)), int(m.group(2) or m.group(1))
+        hits += [(core, tok[3:]) for tok in m.group(3).split() if tok.startswith('p1=') and a <= press <= b]
+    return hits
+def press_ok(text, press, want):  # -> (ok, evidence): exactly one p1 line covers the press, and it is R + `want`
+    h = press_lines(text, press)
+    if len(h) != 1:
+        return False, f"{len(h)} p1 line(s) cover frame {press}: {h}"
+    dirs = ''.join(c for c in h[0][1] if c in 'UDLR'); btns = ''.join(c for c in h[0][1] if c.isdigit())
+    return (dirs == 'R' and btns == BTN[want],
+            f"{h[0][0]!r}: direction {dirs or 'none'}, button {btns or 'none'} (want R + {want} = {BTN[want]})")
+def kick_swap(text, press):       # the press-is-kick perturbation: the press line's punch digit -> the matching kick
+    out = []
+    for ln in text.splitlines(keepends=True):
+        core = ln.split('#')[0].strip()
+        m = re.fullmatch(r'(\d+)(?:-(\d+))?\s+(.*)', core)
+        if m and int(m.group(1)) <= press <= int(m.group(2) or m.group(1)):
+            ln = re.sub(r'(p1=[UDLR]*)([123])', lambda k: k.group(1) + str(int(k.group(2)) + 3), ln)
+        out.append(ln)
+    return ''.join(out)
+# THE WRONG-BASE PERTURBATION (718 Q4(a)): a COPY of a leg with ONE middle frame's base replaced, frame count intact
+def with_base(s_, key, val):
+    c = [dict(e) for e in s_]
+    if c: c[len(c) // 2][key] = val
+    return c
+def other_victim(vic):            # another roster victim whose base stands in for the real one
+    return 0x03 if int(vic, 16) != 0x03 else 0x01
+
+def attempted(s_, press, attempt):
+    """THE ATTEMPT (rule-checker run 2026-10-07-717 Q4): at the press frame the attacker is airborne (its height
+    above its value at the window's first frame) and its seq goes from the jump state (seq byte 06 the frame
+    before) to `attempt` (06.06, the jump state's attack sub-state: what the toward+P press produces when no
+    throw connects). A leg that never jumped fails the height; one that never pressed stays 06.02."""
+    by = {e['fr']: e for e in s_}
+    ep, eb = by.get(press), by.get(press - 1)
+    return bool(s_ and ep and eb and ep['ay'] > s_[0]['ay'] and eb['seq'][0] == attempt[0] and ep['seq'] == attempt)
+
+def live(att, vic, o, n, so, sn, decl, f):
+    """ONE classification of a victim's two legs, used by the verdict and by every declaration control:
+    'live' (held >= 10 frames on both legs), 'void' (undeclared and not held: the old VOID), 'declared-ok'
+    (declared, no captured frame on either leg, both legs LIVE and the throw ATTEMPTED on both),
+    'declared-held' (declared but held on a leg), 'declared-dead' (declared, no hold, but a leg not proven
+    live: missing frames, or the thrower's or the victim's +0x60 base wrong on some frame),
+    'declared-noattempt' (declared, no hold, legs live, but no air-throw attempt at the press on a leg)."""
+    ho, hn = sum(d for _, d in so), sum(d for _, d in sn)
+    if vic in decl:
+        if ho or hn:
+            return 'declared-held'
+        for leg, s_ in (('ours', o), ('native', n)):
+            if (len(s_) != f.get('frames') or any(e['abase'] != BASE[leg][int(att, 16)] for e in s_)
+                    or any(e['vbase'] != VBASE[leg][int(vic, 16)] for e in s_)):
+                return 'declared-dead'
+        for s_ in (o, n):
+            if not attempted(s_, f['press'], f['attempt']):
+                return 'declared-noattempt'
+        return 'declared-ok'
+    return 'void' if ho < 10 or hn < 10 else 'live'
+
+LIVEDATA = {}
 for att, nm in [k for k in FROZEN if k[0] in THROWERS]:
     f = FROZEN[(att, nm)]
+    decl = set(f.get('nohold', set())) & set(VICTIMS)
     order_bad, unres, tails, dmg_got, nohold, es_dead, cad = [], [], set(), {}, [], [], []
+    decl_ok, decl_held, decl_dead, decl_noatt = [], [], [], []
     who_bad, moves, seen = [], {'ours': set(), 'native': set()}, {'ours': set(), 'native': set()}
     arcs, arc_v = {}, {}
     for vic in VICTIMS:
         o, n = series(f"{att}_{vic}_{nm}", 'ours', int(vic, 16)), series(f"{att}_{vic}_{nm}", 'native', int(vic, 16))
+        if CTL == 'nohold-dead-leg' and vic in decl:
+            n = n[:-1]   # the mode: a declared victim's native leg one frame short, as a dead or cut leg would be
+        if CTL == 'nohold-wrong-base' and vic in decl:   # the mode (718 Q4(a)): frame count intact, a base wrong
+            _dl = sorted(decl)
+            if vic == _dl[0]: o = with_base(o, 'vbase', VBASE['ours'][other_victim(vic)])
+            if len(_dl) > 1 and vic == _dl[1]: n = with_base(n, 'abase', BASE['native'][0x13])
         so, sn = states(o), states(n)
         ko, kn = [k for k, _ in so], [k for k, _ in sn]
-        if sum(d for _, d in so) < 10 or sum(d for _, d in sn) < 10:
+        LIVEDATA.setdefault((att, nm), {})[vic] = (o, n, so, sn)
+        cls = live(att, vic, o, n, so, sn, decl, f)
+        if cls == 'declared-ok':
+            decl_ok.append(vic); continue
+        if cls == 'declared-held':
+            decl_held.append(vic); continue
+        if cls == 'declared-dead':
+            decl_dead.append(vic); continue
+        if cls == 'declared-noattempt':
+            decl_noatt.append(vic); continue
+        if cls == 'void':
             nohold.append(vic); continue
         if f['es'] and (len({e['stk'] for e in o}) < 2 or len({e['stk'] for e in n}) < 2):
             es_dead.append(vic); continue
@@ -351,6 +540,28 @@ for att, nm in [k for k in FROZEN if k[0] in THROWERS]:
             arcs.setdefault(leg, set()).add(_pk)
             arc_v.setdefault(vic, {})[leg] = _pk
     print(f"== {WHO[att]}: {NAMES[nm]} ==")
+    if f.get('press_btn'):   # 718 Q4(b): the press the gate runs is the THROW input (a punch), read from the replay as run
+        _rp = RUNRPL.get((att, nm))
+        _tx = open(f"tests/replays/{_rp}").read() if _rp else ''
+        if CTL == 'press-is-kick': _tx = kick_swap(_tx, f['press'])
+        _ok, _ev = press_ok(_tx, f['press'], f['press_btn']) if _tx else (False, f"no replay recorded for ({att}, {nm})")
+        if _ok:
+            print(f"  ok: press input — tests/replays/{_rp} at frame {f['press']} is toward + {f['press_btn']}: {_ev}")
+        else:
+            print(f"  FAIL: press input — tests/replays/{_rp} at frame {f['press']} is not toward + {f['press_btn']}: {_ev}"); bad += 1
+    if decl:
+        if decl_held:
+            print(f"  FAIL: declared no-hold but HELD on a leg: {decl_held} (the declaration {sorted(decl)} no longer matches the games)"); bad += 1
+        if decl_dead:
+            print(f"  FAIL: declared no-hold victims whose legs are not proven live (frames != {f.get('frames')}, or the thrower's"
+                  f" or the victim's +0x60 base wrong on some frame): {decl_dead}"); bad += 1
+        if decl_noatt:
+            print(f"  FAIL: declared no-hold victims with NO air-throw attempt on a leg (not airborne at the press frame"
+                  f" {f['press']}, or the seq there not {f['attempt'][0]:02x}.{f['attempt'][1]:02x} from the jump state): {decl_noatt}"); bad += 1
+        if not decl_held and not decl_dead and not decl_noatt:
+            print(f"  ok: declared no-hold {sorted(decl_ok)}: no captured frame on either leg; both legs live"
+                  f" ({f.get('frames')} frames each, 0x{att}'s and the victim's +0x60 base on every frame) and the throw"
+                  f" attempted on both (airborne at {f['press']}, seq 06.xx -> {f['attempt'][0]:02x}.{f['attempt'][1]:02x})")
     if nohold or es_dead:
         print(f"  FAIL: no hold for {nohold}; ES never spent a stock for {es_dead} — VOID")
         bad += 1; print(); continue
@@ -375,6 +586,9 @@ for att, nm in [k for k in FROZEN if k[0] in THROWERS]:
         print(f"  ok: seq — the attacker's seq at the hold's first captured frame is {sorted(f['seq'])} on every victim and both legs")
     if order_bad:
         print(f"  FAIL: hold trajectories diverge in ORDER for victims {order_bad}"); bad += 1
+    elif decl:
+        _nc = len(VICTIMS) - len(decl)
+        print(f"  ok: {_nc}/{_nc} holding victims traverse the same states in the same order ({len(decl)} declared no-hold)")
     else:
         print(f"  ok: {len(VICTIMS)}/{len(VICTIMS)} victims traverse the same states in the same order")
     if tails != {f['tail']}:
@@ -445,6 +659,71 @@ if not CTL and ('11', 'std') in ARCV:
         sets_equal = {a.get('ours') for a in sw.values()} == {a.get('native') for a in sw.values()}
         print(f"CTLARC {'fired' if flagged and sets_equal else 'dead'} two native arcs exchanged on Pyron's throw: "
               f"per-victim check flags {sorted(flagged)}, the legs' sets {'still equal' if sets_equal else 'differ'}")
+# THE DECLARATION'S CONTROLS (normal runs, 14z-194, #235): on Pyron's air throw (MP), the SAME live() the verdict
+# uses, over the SAME legs, with the declaration perturbed — no extra legs. A dropped declared victim must read
+# VOID (an undeclared no-hold), and a holding victim added must read declared-but-held.
+if not CTL and ('11', 'airm') in LIVEDATA:
+    ld, fa = LIVEDATA[('11', 'airm')], FROZEN[('11', 'airm')]
+    decl = set(fa['nohold']) & set(VICTIMS)
+    d2 = drop_one(decl); gone = sorted(decl - d2)
+    g2 = {v: live('11', v, *ld[v], d2, fa) for v in gone}
+    ok2 = bool(gone) and all(c == 'void' for c in g2.values())
+    print(f"CTLNHDROP {'fired' if ok2 else 'dead'} declaration without {gone}: classified {g2} (VOID is the gate's FAIL)")
+    d3 = add_held(decl); extra = sorted(d3 - decl)
+    if all(v in ld for v in extra):
+        g3 = {v: live('11', v, *ld[v], d3, fa) for v in extra}
+        ok3 = bool(extra) and all(c == 'declared-held' for c in g3.values())
+        print(f"CTLNHOVER {'fired' if ok3 else 'dead'} declaration plus {extra}: classified {g3} (declared-held is the gate's FAIL)")
+    else:
+        print(f"CTLNHOVER dead the added victim(s) {extra} are not in VICTIMS, nothing to classify")
+    if decl:
+        v0 = sorted(decl)[0]; _o, _n, _so, _sn = ld[v0]
+        g4 = live('11', v0, _o, _n[:-1], _so, _sn, decl, fa)
+        print(f"CTLNHDEAD {'fired' if g4 == 'declared-dead' else 'dead'} declared victim {v0}'s native leg one frame short"
+              f" ({len(_n) - 1} of {fa['frames']}): classified {g4!r} (declared-dead is the gate's FAIL)")
+    else:
+        print("CTLNHDEAD dead no declared victim in VICTIMS to cut")
+    # nohold-no-attempt (717 Q4): the press-less copy's legs on the first declared victim must read declared-noattempt
+    cn = sorted(glob.glob(f"{W}/ctln_*_airm_ours"))
+    if cn:
+        v0 = re.search(r"ctln_(..)_airm_ours", cn[0]).group(1)
+        _o, _n = series(f"ctln_{v0}_airm", 'ours', int(v0, 16)), series(f"ctln_{v0}_airm", 'native', int(v0, 16))
+        g5 = live('11', v0, _o, _n, states(_o), states(_n), decl, fa)
+        _sp = {lg: next((f"{e['seq'][0]:02x}.{e['seq'][1]:02x}@y{e['ay']}" for e in s_ if e['fr'] == fa['press']), 'none')
+               for lg, s_ in (('ours', _o), ('native', _n))}
+        print(f"CTLNHNOATT {'fired' if g5 == 'declared-noattempt' else 'dead'} declared victim {v0} on the press-less copy:"
+              f" classified {g5!r}, the press frame shows ours {_sp['ours']} native {_sp['native']} (declared-noattempt is the gate's FAIL)")
+    else:
+        print("CTLNHNOATT dead no press-less control legs were run")
+    # nohold-wrong-base (718 Q4(a)): with the frame count INTACT, one frame's victim base wrong (copy 1) and one
+    # frame's thrower base wrong (copy 2) must EACH read declared-dead — so each base clause of live() is reached
+    # past the frame-count test, not only the clause that happens to come first
+    if decl:
+        v0 = sorted(decl)[0]; _o, _n, _so, _sn = ld[v0]
+        _ov = with_base(_o, 'vbase', VBASE['ours'][other_victim(v0)])
+        _na = with_base(_n, 'abase', BASE['native'][0x13])
+        ga = live('11', v0, _ov, _n, _so, _sn, decl, fa)
+        gb = live('11', v0, _o, _na, _so, _sn, decl, fa)
+        g0 = live('11', v0, _o, _n, _so, _sn, decl, fa)
+        intact = len(_ov) == len(_o) == fa['frames'] and len(_na) == len(_n) == fa['frames']
+        okw = intact and g0 == 'declared-ok' and ga == 'declared-dead' and gb == 'declared-dead'
+        print(f"CTLNHBASE {'fired' if okw else 'dead'} declared victim {v0}, frames intact ({len(_ov)}/{len(_na)} of"
+              f" {fa['frames']}): unperturbed {g0!r}; one frame's victim base -> 0x{other_victim(v0):02x}'s: {ga!r};"
+              f" one frame's thrower base -> Donovan's: {gb!r} (declared-dead is the gate's FAIL)")
+    else:
+        print("CTLNHBASE dead no declared victim in VICTIMS to perturb")
+# press-is-kick (718 Q4(b), normal runs): the real air replays pass the press check; their kick-swapped copies fail it
+if not CTL and any(k in RUNRPL for k in (('11', 'airm'), ('11', 'airh'))):
+    res = []
+    for k in (('11', 'airm'), ('11', 'airh')):
+        if k not in RUNRPL: continue
+        fr_ = FROZEN[k]; tx = open(f"tests/replays/{RUNRPL[k]}").read()
+        r_ok, _ = press_ok(tx, fr_['press'], fr_['press_btn'])
+        s_ok, s_ev = press_ok(kick_swap(tx, fr_['press']), fr_['press'], fr_['press_btn'])
+        res.append((k[1], r_ok, s_ok, s_ev))
+    okk = all(r and not s for _, r, s, _ in res)
+    print(f"CTLKICK {'fired' if okk else 'dead'} " + "; ".join(
+        f"{nm_}: real {'passes' if r else 'FAILS'}, kick-swapped {'passes' if s else 'fails'} ({ev})" for nm_, r, s, ev in res))
 if glob.glob(f"{W}/ctlw_00_std_ours"):
     held = [e for e in series("ctlw_00_std", 'ours', 0) if e['cap']]
     wrong = [e['abase'] for e in held if e['abase'] != BASE['ours'][0x13]]
@@ -453,7 +732,39 @@ if glob.glob(f"{W}/ctlw_00_std_ours"):
           f"CTLWRONG dead Victor in Donovan's slot: {len(held)} held frames, none with another base")
 sys.exit(1 if bad else 0)
 PY
-cat "$W/verdict.txt" | grep -v -E '^CTL(RESULT|WRONG|ARC)'
+cat "$W/verdict.txt" | grep -v -E '^CTL(RESULT|WRONG|ARC|NHDROP|NHOVER|NHDEAD|NHNOATT|NHBASE|KICK)'
+_nn="$(grep '^CTLNHNOATT' "$W/verdict.txt" || true)"
+_nb="$(grep '^CTLNHBASE' "$W/verdict.txt" || true)"
+_nk="$(grep '^CTLKICK' "$W/verdict.txt" || true)"
+_nd="$(grep '^CTLNHDROP' "$W/verdict.txt" || true)"
+_no="$(grep '^CTLNHOVER' "$W/verdict.txt" || true)"
+_nx="$(grep '^CTLNHDEAD' "$W/verdict.txt" || true)"
+if [ -z "${VS_CTL:-}" ] && echo " $THROWERS " | grep -q " 11 "; then
+    case "$_nx" in
+        "CTLNHDEAD fired "*) vs_ctl_fired nohold-dead-leg "${_nx#CTLNHDEAD fired }" ;;
+        *) vs_ctl_dead nohold-dead-leg "${_nx:-no control verdict}" || fail=1 ;;
+    esac
+    case "$_nn" in
+        "CTLNHNOATT fired "*) vs_ctl_fired nohold-no-attempt "${_nn#CTLNHNOATT fired }" ;;
+        *) vs_ctl_dead nohold-no-attempt "${_nn:-no control verdict}" || fail=1 ;;
+    esac
+    case "$_nb" in
+        "CTLNHBASE fired "*) vs_ctl_fired nohold-wrong-base "${_nb#CTLNHBASE fired }" ;;
+        *) vs_ctl_dead nohold-wrong-base "${_nb:-no control verdict}" || fail=1 ;;
+    esac
+    case "$_nk" in
+        "CTLKICK fired "*) vs_ctl_fired press-is-kick "${_nk#CTLKICK fired }" ;;
+        *) vs_ctl_dead press-is-kick "${_nk:-no control verdict}" || fail=1 ;;
+    esac
+    case "$_nd" in
+        "CTLNHDROP fired "*) vs_ctl_fired nohold-dropped "${_nd#CTLNHDROP fired }" ;;
+        *) vs_ctl_dead nohold-dropped "${_nd:-no control verdict}" || fail=1 ;;
+    esac
+    case "$_no" in
+        "CTLNHOVER fired "*) vs_ctl_fired nohold-overdeclared "${_no#CTLNHOVER fired }" ;;
+        *) vs_ctl_dead nohold-overdeclared "${_no:-no control verdict}" || fail=1 ;;
+    esac
+fi
 _ca="$(grep '^CTLARC' "$W/verdict.txt" || true)"
 _cr="$(grep '^CTLRESULT' "$W/verdict.txt" || true)"
 _cw="$(grep '^CTLWRONG' "$W/verdict.txt" || true)"
@@ -473,4 +784,4 @@ if [ -z "${VS_CTL:-}" ] && echo " $THROWERS " | grep -q " 13 "; then
 fi
 
 [ "$fail" = 0 ] || { echo "FAIL: tenant throw geometry"; exit 1; }
-echo "PASS: the tenants' throws match native VS2 geometry at the matched level (Phobos's three, Pyron's and Donovan's standard; re-frozen 14z-193)"
+echo "PASS: the tenants' throws match native VS2 geometry at the matched level (Phobos's three, Pyron's and Donovan's standard, Pyron's air throw with its declared no-hold victims; re-frozen 14z-193, air rows 14z-194)"

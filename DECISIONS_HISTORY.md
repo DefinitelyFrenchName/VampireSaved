@@ -395,6 +395,14 @@ So: merged-m23 is published as packaged (with #234's note); filed #238 (the MAME
 
 ---
 
+## Read 2026-10-07 (14z-194) — #226: the physical keyboard and real sound, by the maintainer on PILOT's remote desktop
+
+The maintainer, in the session: *"FYI I tried through te remote desktop and confirmed both mame and fbneo have sound and proper keyboard handling. I updated comments in the github issue"*. On #226 (comment of 2026-10-07T19:43:38Z, quoting the session's open list): *"Still open here: the physical keyboard (keys went through XTEST), a real audio device and its driver (PipeWire's null sink only; the maintainer's ear confirmed the audio content) -> tested successfully with FBneo and MAME."* and *"a truly clean host (PILOT's toolchain was installed 2026-10-02), and the scripted case.-> not tested"*.
+
+So: #226's step 2 is complete (window, rendering, a match, sound and the physical keyboard, both emulators, the merged-m23 Linux release launched with `sh PLAY.command` from `~/t193/player/`). Open on #226: a truly clean host, and the scripted case (`tests/audit_release_linux_desktop.sh`, merged locally 14z-194; its registry row waits for #237).
+
+---
+
 ## Read 2026-10-07 (14z-194) — #226: the release's sound, by ear
 
 **The files sent (four MP3s from PILOT's PipeWire null sink: the merged-m23 Linux release FBNeo and MAME, and the two binaries built from the `-recipe` assets):** *"#226 sound, recorded on PILOT's desktop from PipeWire's null sink: the merged-m23 Linux release binaries (first two) and the binaries built from the -recipe assets (last two). The first ~5 s of each is boot silence; in MAME a key press first clears the red box (#234)."*

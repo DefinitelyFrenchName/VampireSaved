@@ -1,0 +1,16 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_tenant_throw_geometry.sh	d8a76b452ab3d7bf720b0d0be4ebc8082657a7b9
+tests/replays/judge/05_air_throw_mp.rpl	04217ab932b6f48fdc7678edea7c06d56640ea5f
+tests/replays/judge/06_air_throw_hp.rpl	40a00497244e52767dbac8c2ba499a88b557be30
+build/agent194/t235b/EXPECTATION_DIFF.md	6948b7908521188a895edb1aad6c65413ebc80e3
+build/agent194/t235b/gate_full.diff	573b3ae0fbd28039ec15bdc8e38c7cbb09ef9a2a
+build/agent194/t235b/an_main.txt	cb6ee3a5454e3b8f33ffb69ed29fae713ae2f80f
+build/agent194/t235b/PROVENANCE.sha1	28dd605eeb2e68286a0056367267805c9cc2af7b
+build/agent194/t235b/cmp_inputs.sh	b6a871ea82587b0fe642fa668b4dc23908998a81
+build/agent194/t235b/gate_normal.log	b3b856d835c26f7f151d1f218c54156b9e9659a6
+build/agent194/t235b/runner.log	53cad0dadcd7f27033e303701d0883ed11467e40
+build/agent194/t235b/emu_235b/results.tsv	bf12bc84a574dd05cc6adc36317ae953747a19fd
+build/agent194/t235b/emu_235b/audit_tenant_throw_geometry@nohold-dropped.log	8689446ead50223bbfc2b5fdc29f89626950fd00
+build/agent194/t235b/emu_235b/audit_tenant_throw_geometry@nohold-overdeclared.log	701ec4f42e9853017d61cf9028868b29827402bc
+build/agent194/t235b/emu_235b/audit_tenant_throw_geometry@nohold-dead-leg.log	16459dfab12b8dfaa8e7ba91ec94353dfa30e492
+build/agent194/t235b/provenance_main_vs_fork.txt	6acfdafea1369872486b3dcd816ac777f8717b19
