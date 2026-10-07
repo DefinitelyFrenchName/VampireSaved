@@ -9,3 +9,6 @@ vs2 `PRG:0x2CB50` returns 0	control: the corrected #129 behaviour A, live in doc
 direction code at obj+0x12A	14z-194: the same, in the input-matching paragraph (#118)	retracted
 `+0x12A` is the direction code	14z-194: the same, in the sequence-command summary (#118)	retracted
 read as a WORD	control: the corrected +0x12A reading, live in docs/game/engine_internals.md	reach:1
+matches a retracted wording within one line only	14z-194: wrong description of #242 (run 723): the grep collapses whitespace; the gap is a Markdown quote prefix on a wrapped line or HTML markup/entities	retracted
+within one line only, so a wording split across a line break	14z-194: the same wrong description, in the close's premises (run 723)	retracted
+broken by a Markdown quote prefix	control: the corrected description of #242, live in STATE.md finding (p)	reach:1
