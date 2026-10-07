@@ -27,7 +27,7 @@
 # MUST-FIRE: perturbed-copy: nohold-wrong-base — a declared no-hold victim's legs, frame count intact, with ONE frame's victim +0x60 base replaced by another roster victim's (one copy) and ONE frame's thrower base replaced by Donovan's (a second copy), must each read declared-dead, and the gate must FAIL (mode: the first declared victim's ours leg gets the wrong victim base, the second's native leg the wrong thrower base)
 # MUST-FIRE: perturbed-copy: press-is-kick — the declared rows' replay with P1's press swapped from the punch to the matching kick (MP->MK, HP->HK) must fail the press-input check, and the gate must FAIL (mode: the check reads the swapped copy of both air replays)
 # MUST-FIRE: perturbed-copy: nohold-no-attempt — a copy of the air replay with P1's toward+P press removed, run on a declared no-hold victim (both legs), must read declared-noattempt (no attempt, so its absent hold proves nothing), and the gate must FAIL (mode: every declared victim's air legs run the press-less copy)
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua tests/replays/
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua tests/replays/ tools/name_moves.py
 #   tools/run_mame.sh tools/setup_mame.sh tests/expected/roster_pairings/bases.tsv tests/lib/controls.sh
 #
 # THE ASK, verbatim in substance: *"there are throws that have been
