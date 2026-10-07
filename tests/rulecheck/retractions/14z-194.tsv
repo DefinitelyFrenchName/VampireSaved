@@ -1,0 +1,4 @@
+# tests/rulecheck/retractions/14z-194.tsv — the wordings retracted or corrected in 14z-194, and reach controls that must be found live; columns pattern, source, class (retracted | reach:N)
+730 data rows	14z-194: the cross-check page's workbook count (14z-125) was never a count; tools/xlsx_read.py returns 820 from the unchanged workbook, then and now (STATE 14z-194)	retracted
+workbook's 730	14z-194: the same miscount in the page's coverage paragraph (STATE 14z-194)	retracted
+820 data rows, every one with an input	control: the corrected count, live in tools/crosscheck_framedata.py and its generated page	reach:2

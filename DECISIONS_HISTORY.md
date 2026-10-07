@@ -351,9 +351,35 @@ So: merged-m19's seven zip assets are NOT deleted by hand; they stay hosted unti
 
 ---
 
+## Ruled 2026-10-07 (14z-194) — #124/#125: the map fix approved for the next version
+
+**After the #124/#125 measurement on ERIS and the two contact sheets** (`sheet_map_tags.png`, `sheet_tenants_ours_vs_vs2.png`: every opponent's tag, ours vs vsavj vs vs2; legacy tags 0 px different, the three tenants' names aliased to rows 0x00/0x01/0x03, the portrait a separate array `PRG:0x26762A` whose vs2 tile indices hold vsavj tiles in our gfx, the palette without vs2's id remap at vs2 `PRG:0x00990C`), and the three-part fix proposed (name records, relocated portrait tiles, vs2's pool rows written into ours):
+
+**The maintainer:** *"I like the proposed fix, document it in detail in the github issue, we'll do it after the release, for the next version"*
+
+So: the fix and its owed checks (whether the select screen reads the tenant records' `+0x0A`/`+0x0E`; a reader census of pool rows 0x10/0x11/0x13) are documented on #124 (and #125 points to it), comments of 2026-10-07; not in merged-m23; built for the next version with the gates the 2026-10-03 ruling requires.
+
+---
+
+## Read 2026-10-07 (14z-194) — #229: the pilot's three pursuits are each character's pursuit and ES pursuit
+
+**The question, with three capture sheets (Demitri, Morrigan, Bishamon; 2HK sweep, then U+button on the downed victim, and the ES version):** *"#229 pilot, vanilla vsavj: Demitri, Morrigan and Bishamon — 2HK sweep, then U+button on the downed victim (the pursuit), and the ES pursuit. Are these each character's pursuit and ES pursuit?"*
+
+**The maintainer:** *"Yes, visually there is no doubt"*
+
+So: the pursuit identity method (chain against the character's table, the no-knockdown control) is confirmed by eye; the family went on to the other twelve characters (their sheets sent for the same read).
+
+**The second read, the other twelve (three sheets: Bulleta, Gallon, Victor, Zabel; Anakaris, Felicia, Aulbath, Sasquatch; Q-Bee, Lei-Lei, Lilith, Jedah — Jedah's knockdown his 5HK):** *"#229, the other 12 vanilla pursuits on vsavj: (1) Bulleta, Gallon, Victor, Zabel; (2) Anakaris, Felicia, Aulbath, Sasquatch; (3) Q-Bee, Lei-Lei, Lilith, Jedah. Two rows each: 8P and the ES 8PP, from the knockdown to press +40. Jedah's knockdown is his 5HK (his 2HK never enables a pursuit). Is each the character's pursuit and ES pursuit?"*
+
+**The maintainer:** *"yes"*
+
+So: the pursuit family's identity is confirmed for all 15 vanilla characters.
+
+---
+
 ## Ruled 2026-10-07 (14z-194) — the merged-m23 release: the 213 stale emulator verdicts approved at release; the recipe and launcher findings ticketed, not fixed first
 
-**The instruction (14z-194):** *"Then let's release when the tier is finished and well do these long tickets later"*
+**The instructions (14z-194):** *"I'd like to prioritize #234 so that we can include it in the release."* (#234 fixed in the generator and `release/merged-m23` re-packaged, `c05f12ae`), then *"Then let's release when the tier is finished and well do these long tickets later"*
 
 **The first question (AskUserQuestion), after `tools/audit_emulator_staleness.py --cadence release` on `c05f12ae` read 214 of 214 emulator gates STALE on one input:** *"Every emulator gate (214: 186 release-scope, 28 out-of-scope) reads STALE at release cadence. The only input that moved is tests/ci_emulator.tsv, where 14z-193 (#230) rewrote ONE row's description text, audit_tenant_throw_geometry's. Each gate declares the whole registry as an input, so that text edit stales all of them. How should this release clear it?"* — options "Re-run everything", "Fix the audit first", "Approve at release".
 

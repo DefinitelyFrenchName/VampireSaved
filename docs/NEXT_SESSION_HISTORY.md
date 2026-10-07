@@ -6519,7 +6519,7 @@ runner's tree check would have flagged mid-run.
 > ##
 > ## **STILL OPEN FROM THE CROSS-CHECK:** Jedah's crouching family above; the
 > ## seven aerial startup/active outliers; and the specials/supers/throws —
-> ## the bulk of the workbook's 730 rows — each needing its own vsavj naming
+> ## the bulk of the workbook's 730 rows **[→ 820: corrected in place 14z-194, the 730 was never a count]** — each needing its own vsavj naming
 > ## rig. **The WIKI half is queued into no session yet:** 146 mizuumi
 > ## player-struct offsets vs `ram.md`, of which four were adopted 14z-126 and
 > ## ~90 remain [C] candidates.
@@ -6620,7 +6620,7 @@ runner's tree check would have flagged mid-run.
 > ##
 > ## **STILL OPEN FROM THE CROSS-CHECK:** Jedah's crouching family above; the
 > ## seven aerial startup/active outliers; and the specials/supers/throws —
-> ## the bulk of the workbook's 730 rows — each needing its own vsavj naming
+> ## the bulk of the workbook's 730 rows **[→ 820: corrected in place 14z-194, the 730 was never a count]** — each needing its own vsavj naming
 > ## rig. **The WIKI half is queued into no session yet:** 146 mizuumi
 > ## player-struct offsets vs `ram.md`, of which four were adopted 14z-126 and
 > ## ~90 remain [C] candidates.
@@ -6868,7 +6868,7 @@ runner's tree check would have flagged mid-run.
 > ## family (and Lilith's `2MK`) reads recovery +3 where everyone else reads +2,
 > ## unexplained; the seven aerial startup/active outliers; and the
 > ## specials/supers/throws, each needing its own vsavj naming rig — the bulk of
-> ## the workbook's 730 rows. A TICK-ACCURATE instrument (a `-debug` trace or a
+> ## the workbook's 730 rows **[→ 820: corrected in place 14z-194, the 730 was never a count]**. A TICK-ACCURATE instrument (a `-debug` trace or a
 > ## Lua hook on the engine tick) is the precondition for the first two.
 > ## (b) **ITEM 1, DF-STARTUP INVINCIBILITY FOR THE TENANTS** — unchanged in
 > ## STATE "Decisions pending"; its lead `+0x1B3 "Dark Force Startup"` sits in

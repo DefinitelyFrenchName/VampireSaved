@@ -30,7 +30,9 @@ the measurement is correctly done or not."*
 ## The sources (both OUTSIDE the tree, cited not committed)
 
 - `../community/vsav-framedata.xlsx` — 15 sheets, one per vanilla character,
-  730 data rows. Read by `tools/xlsx_read.py` (stdlib only; validated cell for
+  820 data rows, every one with an input (counted 14z-194; the "730" this line carried
+  from 14z-125 was never a count: the reader then and now returns 820 from the unchanged
+  workbook). Read by `tools/xlsx_read.py` (stdlib only; validated cell for
   cell against `openpyxl` — 28,234 cells, the only 4 differences being the
   date-corrupted `VI!U43:U46` `Invuln` cells, a column this page does not compare).
 - `../community/mizuumi_reverse_engineering.txt` — the mizuumi wiki's Reverse
@@ -420,7 +422,7 @@ direction); startup 8 (+1 = the sheet's 9), red 16 = 8+8, white 8: EXACT.
   chain per aerial button. Needs a two-direction jump rig.
 - **Specials, supers, EX/ES moves, throws and pursuits are not joined** (the command
   normals are, since 14z-189). Each needs its own measured naming rig on vsavj, the way
-  `tools/name_moves.py` did for the tenants. That is the bulk of the workbook's 730
+  `tools/name_moves.py` did for the tenants. That is the bulk of the workbook's 820
   rows and it is untouched here.
 - **Seven workbook columns have no counterpart in the tree**: `on hit`, `on block`,
   `renda on hit`, `renda on block`, `throw tech`, `cancel`, `Invuln`. Frame advantage

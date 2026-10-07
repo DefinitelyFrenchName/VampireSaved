@@ -3193,3 +3193,17 @@ in a source file the filtered build leaves out. Measured 14z-191: the developmen
 release binary and the linux-x86_64 release binary (PILOT, ERIS WSL2) all print the four; `vsavjw` runs
 regardless (`Average speed: 100.00% (19 seconds)`). A player reading the console sees "Errors:" before the game
 starts; nothing tells them it is harmless (#226).
+
+## MAME OPENS ON A RED "ROMs/disk images ... incorrect" BOX AT EVERY START OF A SET WHOSE CRCs ITS DRIVER DOES NOT CARRY, AND NO OPTION SKIPS IT (seen: 14z-193, #234; source read 14z-194)
+
+A release MAME started on `vsavjw` opens on *"One or more ROMs/disk images for this system are incorrect. The
+system may not run correctly. Press any key to continue"* and waits for a key at every start (PILOT's desktop,
+14z-193). The driver carries the stock CRCs for the members the port rewrites and sentinel CRCs for the new ones
+(by design: the CRCs would otherwise move at every freeze), so the ROM load always reports warnings. At the pin
+(`mame0288`, `src/frontend/mame/ui/ui.cpp`, `display_startup_screens`) `-skip_warnings` skips a warning screen
+only when `!machine().rom_load().warnings()`, so a bad-ROM warning is never skippable; the startup screens are
+suppressed only by `-str` under 300 s, the debugger, `-video none` and the empty driver, none of which a player
+uses. The project's own runs never see it (`-video none`); a scripted run with a window does — MAME runs an
+`-autoboot_script` only after the startup screens, so a script waiting for the game sits on the box (14z-193).
+Shipped answer: the mame README and `EMULATOR.md` say it is expected and harmless (the generator, gated by
+`tests/test_release_launcher_bat.sh`; released with merged-m23).
