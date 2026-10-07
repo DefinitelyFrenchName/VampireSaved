@@ -31,7 +31,7 @@ PILOT for the release, please put them to use"*).
    most 92 cycles a frame) and behaviour B (vs2's crouch-guard test in shared engine code: 30 legacy bytes, about
    80 cycles static estimate). Gameplay feel is the maintainer's ([VSP-10]); captures first, then the options
    through the rule-checker.
-3. **THE NEXT VERSION** carries #124/#125's map fix (approved, documented on #124: name records, relocated
+3. **THE NEXT VERSION** carries #124's map fix, name and portrait (approved, documented on #124: name records, relocated
    portrait tiles, vs2's pool rows — its two owed checks first: whether the select screen reads the tenant
    records' `+0x0A`/`+0x0E`, and a reader census of pool rows 0x10/0x11/0x13) and the release-tooling fixes
    already merged (#236, #238-#240, `5a5205c5`). A freeze, then a release.
@@ -39,7 +39,7 @@ PILOT for the release, please put them to use"*).
    needs; the six scratch-script promotions proposed in the #118 worktree's `HOMING.md`), #229 (pursuits done for
    all 15; next families in `families.tsv` order: ground throws, then the rest), #241 (the derivation's bit-7
    flag on Zabel's pursuit records), #226 (a clean host remains; step 2 complete by the maintainer's own test),
-   #228 (breakpoint instruments on the frame_done clock — deferred by the maintainer: *"we'll do these long
+   #228 (breakpoint instruments on the frame_done clock — deferred by the maintainer: *"well do these long
    tickets later"*).
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
