@@ -13,13 +13,13 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**438 of 438 gates described.**
+**439 of 439 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
 | [runner](#runner) | 44 | 44 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
-| [platform](#platform) | 43 | 43 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
+| [platform](#platform) | 44 | 44 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
@@ -558,7 +558,7 @@ the documentation locks — docs, skills, indexes, tables follow the tree. 21 of
 
 ## platform
 
-the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene. 43 of 43 described.
+the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene. 44 of 44 described.
 
 ### `audit_wide_phase_a.sh` — audit, emulator
 
@@ -812,9 +812,9 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 
 **WHAT:** every published release asset is SELF-SUFFICIENT (README, applier, page, manifest, patch set) and the two emulator routes never travel together: a prebuilt asset carries no driver patch or recipe, a recipe asset no binary, and every file of the platform directory reaches an asset.
 
-**HOW:** the lists the real uploader produces under --dry-run (writes nothing into the tree) checked for the five properties; controls mix the routes, drop the applier, drop the page.
+**HOW:** the lists the real uploader produces under --dry-run (writes nothing into the tree) checked for the five properties; controls mix the routes, drop the applier, drop the page; and the dry run's last line says nothing was uploaded and where the zips are (#236).
 
-**EXPECTS:** every asset self-sufficient and unmixed, completeness both ways; the three controls fail. It does NOT claim the assets on GitHub are these — the uploader's download-back cmp does.
+**EXPECTS:** every asset self-sufficient and unmixed, completeness both ways; the dry run's last line a dry-run line, never an upload claim; the four controls fail. It does NOT claim the assets on GitHub are these — the uploader's download-back cmp does.
 
 ### `test_release_binaries.sh` — test, emulator
 
@@ -834,7 +834,7 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 
 ### `test_release_launcher_bat.sh` — test, ci_portable
 
-**WHAT:** the PLAY.bat every emulator package carries is plain cmd (no PowerShell), CRLF and ASCII only, every `goto` lands on a label and no parenthesised block can be split by a path holding "(x86)", and it runs the ruled invocation: FBNeo `fbneo.exe vsavjw` from its own folder with the set copied into roms\ beside it, MAME `cps2.exe vsavjw -rompath <the set's folder>`; the release tree's copy is byte-identical to the generator's (both sha1s printed). Every shipped text of every package (README.md, MISTER.md, EMULATOR.md, apply_release.html) names only launchers THAT package ships, and carries no unselected platform marker; and the README the generator writes NOW claims that its package holds an emulator only on fbneo and mame, never on mister (#214), and that MAME's four "clone of nonexistent driver megaman" lines, and its red "ROMs/disk images ... incorrect" box at every start, are harmless only in the mame README (#227, #234). ON A WINDOWS HOST (MSYS2) it also drives BOTH .bat files — the shipped bytes — under cmd with PLAY_DRY_RUN=1: each success path (FBNeo: roms\vsavjw.zip created, the WOULD RUN line; MAME: the WOULD RUN line with -rompath at the set's folder) and each refusal (FBNeo: no romset, no binary, no profile, a junctioned roms\; MAME: no romset, no binary, a stock cps2.exe that does not know vsavjw), each non-zero and named.
+**WHAT:** the PLAY.bat every emulator package carries is plain cmd (no PowerShell), CRLF and ASCII only, every `goto` lands on a label and no parenthesised block can be split by a path holding "(x86)", and it runs the ruled invocation: FBNeo `fbneo.exe vsavjw` from its own folder with the set copied into roms\ beside it, MAME `cps2.exe vsavjw -rompath <the set's folder>`; the release tree's copy is byte-identical to the generator's (both sha1s printed). Every shipped text of every package (README.md, MISTER.md, EMULATOR.md, apply_release.html) names only launchers THAT package ships, and carries no unselected platform marker; and the README the generator writes NOW claims that its package holds an emulator only on fbneo and mame, never on mister (#214), and that MAME's four "clone of nonexistent driver megaman" lines, and its red "ROMs/disk images ... incorrect" box at every start, are harmless only in the mame README (#227, #234); and that each generated PLAY.command's macOS quarantine message names that platform's own binary (#239). ON A WINDOWS HOST (MSYS2) it also drives BOTH .bat files — the shipped bytes — under cmd with PLAY_DRY_RUN=1: each success path (FBNeo: roms\vsavjw.zip created, the WOULD RUN line; MAME: the WOULD RUN line with -rompath at the set's folder) and each refusal (FBNeo: no romset, no binary, no profile, a junctioned roms\; MAME: no romset, no binary, a stock cps2.exe that does not know vsavjw), each non-zero and named.
 
 **HOW:** tools/package_release_platforms.py's launcher_bat_bytes() for both platforms (the bytes the packager writes), read as bytes; the package texts grepped for each launcher's name against the package's files; on Windows, staged copies driven by `cmd //c`, with a stub fbneo.exe that is a text file carrying (or lacking) the profile marker (the FBNeo check is findstr over the file) and two stub cps2.exe COMPILED here with the shell's gcc, one answering `-listfull vsavjw` and one refusing it as a stock MAME does (the MAME check RUNS the binary). The dry run stops before either would be launched.
 
@@ -855,6 +855,14 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 **HOW:** the REAL uploader run with --prune-plan on the tree's own freeze tags, `VS_PRUNE_PROBE` a stub that says which tags' releases hold a zip: merged-m19 and merged-m16 yes, everything else no (so merged-m20 and merged-m21 between them and merged-m22 play the frozen-never-released freezes of #221); then a stub that says no for every tag.
 
 **EXPECTS:** `freeze/merged-m19 freeze/merged-m16` for freeze/merged-m22, `none` with no zip anywhere. A red is the #221 shape: the prune stopped at the first earlier tag, found no release there, and left an older freeze's binaries hosted (merged-m19's seven zips under merged-m22, 14z-189).
+
+### `test_release_recipe_text.sh` — test, ci_portable
+
+**WHAT:** the EMULATOR.md the generator writes for each emulator platform carries the Linux MAME build line with the same Qt-debugger switch the project's own Linux builds use, names the build dependencies per OS (qmake6 on Linux for MAME, which tools/setup_mame.sh refuses without), points at no file the asset does not hold, and describes -verifyroms without the "exactly the members inside vsavjw.zip" overstatement; the README's by-hand step no longer says the set was built "in step 1" (step 1 is the emulator) and tells a recipe player that the launchers run only a prebuilt program.
+
+**HOW:** tools/package_release_platforms.py's emulator_side() rendered into a scratch directory for fbneo and mame (binaries_side stubbed out: text only), the switch read from tools/setup_mame.sh (QTFLAG) and tools/build_release_emulators.sh (QTNOTE) and required on the rendered Linux make line; the qmake6 requirement read from setup_mame.sh's refusal; three controls perturb the rendered text the way each defect looked before the fix.
+
+**EXPECTS:** every check ok on both platforms; each control fails its check.
 
 ### `test_release_roundtrip.sh` — test, ci_static
 

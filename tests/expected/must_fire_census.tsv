@@ -178,6 +178,7 @@ declares	test_release_launcher
 declares	test_release_launcher_bat
 declares	test_release_os_metadata
 declares	test_release_prune
+declares	test_release_recipe_text
 declares	test_release_roundtrip
 declares	test_rompath_reject
 declares	test_roulette_tag_rows

@@ -8,13 +8,14 @@
 #   directory reaches an asset.
 # HOW: the lists the real uploader produces under --dry-run (writes nothing into the tree)
 #   checked for the five properties; controls mix the routes, drop the applier, drop the
-#   page.
-# EXPECTS: every asset self-sufficient and unmixed, completeness both ways; the three
-#   controls fail. It does NOT claim the assets on GitHub are these — the uploader's
+#   page; and the dry run's last line says nothing was uploaded and where the zips are (#236).
+# EXPECTS: every asset self-sufficient and unmixed, completeness both ways; the dry run's
+#   last line a dry-run line, never an upload claim; the four controls fail. It does NOT claim the assets on GitHub are these — the uploader's
 #   download-back cmp does.
 #
 # MUST-FIRE: perturbed-copy: route-mixed — a prebuilt asset that also carries EMULATOR.md and the driver patch must FAIL: that is the 14z-149 shape the maintainer ruled out, a player handed a patch their binary already contains
 # MUST-FIRE: perturbed-copy: applier-missing — an asset with no apply_release.py must FAIL: without the applier a download cannot build the romset, which is exactly what "self-sufficient" denies
+# MUST-FIRE: perturbed-copy: dry-run-claims-upload — the dry run's log with its last line put back to the pre-#236 "done: N asset(s) on <release URL>" must FAIL: that line was read as a publish when nothing was uploaded (mode: the gate checks that copy of the log)
 # MUST-FIRE: perturbed-copy: page-missing — an asset with no apply_release.html must FAIL: the browser applier is the route for a player who has no terminal, and an asset that drops it sends that player back to the command line the page exists to replace
 #
 # WHY THIS GATE EXISTS. The maintainer, 2026-09-12, reading the M18 release
@@ -100,6 +101,19 @@ perturb_list() {  # perturb_list <kind> <list-file>
     page-missing)     grep -v '/apply_release\.html$' "$2" > "$2.tmp" && mv "$2.tmp" "$2" ;;
     esac
 }
+# #236 (14z-194): a dry run ended "done: N asset(s) on <release URL>" though it uploaded
+# nothing. ONE perturbation, used by the control and the mode alike.
+claim_upload() {  # claim_upload <log> — put the pre-#236 last line back
+    _n="$(grep -c '^built ' "$1" || true)"
+    sed '$d' "$1" > "$1.tmp" && echo "done: $_n asset(s) on https://github.com/x/y/releases/tag/freeze/$NAME" >> "$1.tmp" && mv "$1.tmp" "$1"
+}
+dry_last_ok() {  # dry_last_ok <log> — exit 0 when the last line is an honest dry-run line
+    _l="$(tail -1 "$1")"
+    case "$_l" in
+    "dry run: "*" built in build/scratch/release_assets/$NAME/, nothing uploaded") return 0 ;;
+    esac
+    return 1
+}
 prebuilt_list() {  # the first list that holds a binary, if any
     grep -l '/emulator/bin/' "$W"/lists/*.list 2>/dev/null | head -1
 }
@@ -111,7 +125,13 @@ applier-missing) t="$(ls "$W"/lists/*.list | head -1)"
                  echo "  mode: $(basename "$t") without its applier"; perturb_list applier-missing "$t" ;;
 page-missing)    t="$(ls "$W"/lists/*.list | head -1)"
                  echo "  mode: $(basename "$t") without its browser applier"; perturb_list page-missing "$t" ;;
+dry-run-claims-upload) echo "  mode: the dry run's log ending with the pre-#236 upload claim"; claim_upload "$W/dry.log" ;;
 esac
+
+# ---- 0. the dry run says it is one (#236) ----------------------------------
+echo "== 0. the dry run's last line says nothing was uploaded, and where the zips are"
+if dry_last_ok "$W/dry.log"; then ok "last line: $(tail -1 "$W/dry.log")"
+else bad "the dry run's last line does not say it uploaded nothing: $(tail -1 "$W/dry.log")"; fi
 
 # ---- 1. self-sufficiency --------------------------------------------------
 echo "== 1. every asset carries the whole romset route"
@@ -216,6 +236,9 @@ ctl_check() {  # ctl_check <name> <list> — the perturbed copy must be REJECTED
 ctl_check route-mixed "$(ls "$W"/lists/*.list | head -1)"
 ctl_check applier-missing "$(ls "$W"/lists/*.list | head -1)"
 ctl_check page-missing "$(ls "$W"/lists/*.list | head -1)"
+cp "$W/dry.log" "$W/dry_ctl.log"; claim_upload "$W/dry_ctl.log"
+if dry_last_ok "$W/dry_ctl.log"; then vs_ctl_dead dry-run-claims-upload "the pre-#236 upload claim read as an honest dry-run line" || true; fail=1
+else vs_ctl_fired dry-run-claims-upload "a dry run ending '$(tail -1 "$W/dry_ctl.log" | cut -c1-40)...' is refused"; fi
 
 if [ "$fail" = 0 ]; then echo "PASS test_release_asset_shape"; exit 0; fi
 echo "FAIL test_release_asset_shape"; exit 1

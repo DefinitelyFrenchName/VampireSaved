@@ -12,7 +12,8 @@
 #   platform marker; and the README the generator writes NOW claims that its package holds an emulator
 #   only on fbneo and mame, never on mister (#214), and that MAME's four "clone of nonexistent driver
 #   megaman" lines, and its red "ROMs/disk images ... incorrect" box at every start, are harmless
-#   only in the mame README (#227, #234). ON A WINDOWS HOST (MSYS2) it also drives BOTH .bat files — the shipped
+#   only in the mame README (#227, #234); and that each generated PLAY.command's macOS
+#   quarantine message names that platform's own binary (#239). ON A WINDOWS HOST (MSYS2) it also drives BOTH .bat files — the shipped
 #   bytes — under cmd with PLAY_DRY_RUN=1: each success path (FBNeo: roms\vsavjw.zip created,
 #   the WOULD RUN line; MAME: the WOULD RUN line with -rompath at the set's folder) and each
 #   refusal (FBNeo: no romset, no binary, no profile, a junctioned roms\; MAME: no romset, no
@@ -33,6 +34,7 @@
 # MUST-FIRE: perturbed-copy: launch-line-changed — the FBNeo PLAY.bat without `vsavjw` on its launch line, and the MAME PLAY.bat without `-rompath`, must FAIL: those are #145's two failures, an emulator with no game name that flashes shut and a MAME that finds no ROMs
 # MUST-FIRE: perturbed-copy: emu-text-in-mister — the generator's README rendered for the MiSTer package with the EMULATOR selection must FAIL: that is #214, the MiSTer README telling its reader the package already contains an emulator (step 2, the "why" paragraph, the troubleshooting bullet)
 # MUST-FIRE: perturbed-copy: megaman-note-in-fbneo — the generator's README rendered for the FBNeo package with the MAME selection must FAIL on BOTH MAME-only notes: the four validation lines (#227) and the red bad-ROM box at every start (#234) belong to the MAME package only
+# MUST-FIRE: perturbed-copy: quarantine-name-wrong — the generator's MAME PLAY.command with its quarantine message put back to the pre-#239 "\"fbneo\" Not Opened" must FAIL: a MAME player told to look for a dialog naming fbneo is told about a program their package does not hold
 # MUST-FIRE: perturbed-copy: readme-names-absent-launcher — a copy of the release's texts whose mame package no longer ships PLAY.bat while its README still names it must FAIL: that is rule-checker run 2026-10-03-602's finding, the MiSTer README telling its reader to double-click two launchers its package never carried
 #
 # WHY. #145 (maintainer report 2026-09-16, reproduced on ERIS 2026-10-03): double-clicking
@@ -53,7 +55,7 @@ W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail=0
 ok()  { echo "  ok: $*"; }
 bad() { echo "FAIL: $*"; fail=1; }
-case "$VS_CTL" in ""|lf-endings|launch-line-changed|readme-names-absent-launcher|emu-text-in-mister|megaman-note-in-fbneo) ;;
+case "$VS_CTL" in ""|lf-endings|launch-line-changed|readme-names-absent-launcher|emu-text-in-mister|megaman-note-in-fbneo|quarantine-name-wrong) ;;
 *) echo "REFUSED: CONTROL=$VS_CTL is not a mode of this gate"; exit 3 ;; esac
 sha1() { python3 -c "import hashlib,sys;print(hashlib.sha1(open(sys.argv[1],'rb').read()).hexdigest()[:12])" "$1"; }
 
@@ -231,6 +233,41 @@ case "$rc" in
 *) bad "the generator check itself failed (rc=$rc):"; sed 's/^/      /' "$W/gen_claims.txt" ;;
 esac
 
+# #239 (14z-194): the generated PLAY.command's quarantine message names the platform's own
+# binary — the dialog macOS shows names the program it blocked (fbneo / cps2).
+launcher_names() {  # launcher_names [quarantine-name-wrong] -> prints findings; exit 0 clean, 3 findings
+    python3 - "${1:-}" <<'PYEOF'
+import sys
+sys.path.insert(0, "tools")
+import package_release_platforms as pp
+perturb = sys.argv[1]
+EXE = {"fbneo": "fbneo", "mame": "cps2"}
+bad = []
+for plat, exe in EXE.items():
+    t = pp.launcher_text(plat, "x")
+    if perturb == "quarantine-name-wrong" and plat == "mame":   # the pre-#239 line
+        t = t.replace('\\"cps2\\" Not Opened', '\\"fbneo\\" Not Opened')
+    lines = [l for l in t.splitlines() if "Not Opened" in l]
+    if len(lines) != 1:
+        bad.append(f"{plat}: {len(lines)} quarantine-message line(s), expected 1")
+        continue
+    other = [o for o in EXE.values() if o != exe]
+    if f'\\"{exe}\\" Not Opened' not in lines[0] or any(f'\\"{o}\\"' in lines[0] for o in other):
+        bad.append(f"{plat}: the quarantine message does not name {exe}: {lines[0].strip()}")
+for x in bad:
+    print("      " + x)
+sys.exit(3 if bad else 0)
+PYEOF
+}
+echo "-- each generated PLAY.command's quarantine message names its own binary (#239)"
+_lsel=""; [ "$VS_CTL" = quarantine-name-wrong ] && _lsel=quarantine-name-wrong
+rc=0; launcher_names "$_lsel" > "$W/lnames.txt" 2>&1 || rc=$?
+case "$rc" in
+0) ok "generator: the fbneo launcher's quarantine message names fbneo, the mame launcher's names cps2" ;;
+3) bad "generator launcher names:"; cat "$W/lnames.txt" ;;
+*) bad "the launcher-name check itself failed (rc=$rc):"; sed 's/^/      /' "$W/lnames.txt" ;;
+esac
+
 # the must-fire controls, in-gate: each perturbation must be caught on EVERY launcher it touches
 for c in lf-endings launch-line-changed; do
     got=""; dead=""
@@ -254,6 +291,10 @@ rc=0; gen_claims mister mame > "$W/gen_ctl2.txt" 2>&1 || rc=$?
 if [ "$rc" = 3 ] && grep -q '(#227)' "$W/gen_ctl2.txt" && grep -q '(#234)' "$W/gen_ctl2.txt"; then
     vs_ctl_fired megaman-note-in-fbneo "$(grep -c 'MAME-only' "$W/gen_ctl2.txt") MAME-only notes caught: $(head -1 "$W/gen_ctl2.txt" | sed 's/^ *//')"
 else vs_ctl_dead megaman-note-in-fbneo "the FBNeo README rendered with the MAME selection was not caught on both notes (rc=$rc): $(tr '\n' ' ' < "$W/gen_ctl2.txt")"; fail=1; fi
+
+rc=0; launcher_names quarantine-name-wrong > "$W/lnames_ctl.txt" 2>&1 || rc=$?
+if [ "$rc" = 3 ] && grep -q '^ *mame:' "$W/lnames_ctl.txt"; then vs_ctl_fired quarantine-name-wrong "$(head -1 "$W/lnames_ctl.txt" | sed 's/^ *//')"
+else vs_ctl_dead quarantine-name-wrong "the MAME launcher naming fbneo passed (rc=$rc)"; fail=1; fi
 
 # ── ON WINDOWS: both .bat files driven by cmd, dry run (nothing is launched past the checks) ──
 case "$(uname -s)" in

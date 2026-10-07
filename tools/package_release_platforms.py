@@ -58,9 +58,21 @@ EMU = {
         recipe="""\
     git clone {upstream} fbneo && cd fbneo && git checkout {pin}
     git apply /path/to/emulator/0002-cps2-wide-v1.patch
-    make sdl2 SKIPDEPEND=1 -j8 -k     # SKIPDEPEND=1 is mandatory (see the project's docs/GOTCHAS.md);
-    make sdl2 SKIPDEPEND=1 -j8        # TWICE on a fresh clone: the parallel first pass stops on burn.o
-                                      # until the driver list is generated (-k lets it finish the rest)
+    make sdl2 SKIPDEPEND=1 -j8 -k     # SKIPDEPEND=1 is mandatory: without it the build tries to
+    make sdl2 SKIPDEPEND=1 -j8        # regenerate dependency files and fails. Run it TWICE on a fresh
+                                      # clone: the parallel first pass can stop on burn.o until the
+                                      # driver list is generated (-k lets it finish the rest); the
+                                      # second pass completes it (a no-op if the first already did)
+""",
+        deps="""\
+Install these first (the packages the project's own build hosts carry; a
+missing one stops the build):
+
+- **Linux (Ubuntu 24.04 / Debian):** `sudo apt install git build-essential libsdl2-dev libsdl2-image-dev`
+- **macOS:** the Command Line Tools (`xcode-select --install`), then Homebrew
+  `brew install sdl2 sdl2_image pkgconf`
+- **Windows:** MSYS2, in its MINGW64 shell:
+  `pacman -S git make patch perl mingw-w64-x86_64-gcc mingw-w64-x86_64-pkgconf mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image`
 """,
         note="""\
 The patch adds the `vsavjw` driver (the CPS-2 WIDE profile: 6 MB program,
@@ -81,12 +93,30 @@ same romset (the patched build's fingerprint is in ../manifest.json).
         recipe="""\
     git clone {upstream} mame && cd mame && git checkout {pin}     # tag mame0288
     git apply /path/to/emulator/0002-cps2-wide-v1.patch
-    make SOURCES=src/mame/capcom/cps2.cpp SUBTARGET=cps2 -j8    # CPS-2-only build, minutes not hours
-    ./cps2 -verifyroms vsavjw -rompath "/your/built/set;/your/dumps"   # says "is bad" BY DESIGN: it lists exactly the
-                                                                 # members inside vsavjw.zip as INCORRECT CHECKSUM (the
-                                                                 # driver carries the stock CRCs for the members the port
-                                                                 # rewrites and sentinel CRCs for the new ones) — nothing
-                                                                 # may be NOT FOUND. "is good" is not reachable on this set.
+    make SOURCES=src/mame/capcom/cps2.cpp SUBTARGET=cps2 -j8                  # macOS, Windows (MSYS2 MINGW64)
+    make SOURCES=src/mame/capcom/cps2.cpp SUBTARGET=cps2 USE_QTDEBUG=0 -j8    # LINUX: MAME turns its Qt debugger
+                                                                 # ON there by default, then stops on a missing `moc`;
+                                                                 # USE_QTDEBUG=0 turns it off (no Qt is linked)
+    ./cps2 -verifyroms vsavjw -rompath "/your/built/set"   # says "is bad" BY DESIGN: it lists every member the
+                                                           # port rewrites or adds as INCORRECT CHECKSUM (the driver
+                                                           # carries the stock CRCs for the members the port rewrites
+                                                           # and sentinel CRCs for the new ones); the members copied
+                                                           # unchanged from your dumps are not listed. Nothing may be
+                                                           # NOT FOUND. "is good" is not reachable on this set.
+    ./cps2 vsavjw -rompath "/your/built/set" -skip_gameinfo   # PLAY: -skip_gameinfo removes one of the two
+                                                              # screens that wait for a key; the red box is the other
+""",
+        deps="""\
+Install these first (the packages the project's own build hosts carry; a
+missing one stops the build):
+
+- **Linux (Ubuntu 24.04 / Debian):** `sudo apt install git build-essential python3 libsdl2-dev libsdl2-ttf-dev libfontconfig-dev qmake6`
+  — `qmake6` is the tool only, no Qt is linked: MAME's Linux build asks it for a
+  folder, and without it the build fails minutes in with `char8_t` errors.
+- **macOS:** the Command Line Tools (`xcode-select --install`), then Homebrew
+  `brew install sdl3 pkgconf`
+- **Windows:** MSYS2, in its MINGW64 shell:
+  `pacman -S git make patch mingw-w64-x86_64-gcc mingw-w64-x86_64-pkgconf mingw-w64-x86_64-python`
 """,
         note="""\
 The patch is 164 lines added and exactly ONE line removed (the sprite
@@ -181,7 +211,7 @@ if [ "$OS" = macos ] && command -v xattr >/dev/null 2>&1; then
             ;;
         *)
             die "not cleared, so macOS will block the emulator." \
-                "macOS shows: \"fbneo\" Not Opened — Apple could not verify ..." \
+                "macOS shows: \"@EXE@\" Not Opened — Apple could not verify ..." \
                 "with only Done and Move to Bin. RIGHT-CLICK > OPEN DOES NOT GET PAST IT" \
                 "on current macOS. What works is clearing the flag:" \
                 "  xattr -dr com.apple.quarantine '$HERE'" \
@@ -660,14 +690,16 @@ You need the prepared emulator, and then the game file next to it.
      in `EMULATOR.md`. Use this if your system is not listed above, or if you
      would rather build it yourself than trust a binary.
    Both routes give the same program.
-2. **The easy way — macOS: double-click `PLAY.command`** (Linux:
+2. **The easy way, with the prebuilt download — macOS: double-click `PLAY.command`** (Linux:
    `sh PLAY.command`). **Windows: double-click `PLAY.bat`.** It picks the right
    program for your machine, checks it is the prepared one and not an ordinary
    copy, handles macOS's "downloaded from the internet" block, puts your
    `vsavjw.zip` where this emulator actually looks for it, and starts the game.
    If anything is missing it names it. Skip to step 4.
    {win_note}
-3. **By hand.** Put the `vsavjw.zip` you built in step 1 {'in a folder called `roms/` next to the emulator program, and start the emulator FROM that folder. This sounds fussy and is: this version of FBNeo has no setting for where games live — it only ever looks in `roms/` beside wherever you started it, so pointing at the file from its menu will not work' if platform == 'fbneo' else 'anywhere you like, and tell the emulator where by starting it with `-rompath "/that/folder"`'}.
+3. **By hand** (the `-recipe` route always starts here: `PLAY.command` and `PLAY.bat` only
+   run a prebuilt program, so with an emulator you built yourself they stop and say so).
+   Put the `vsavjw.zip` you built from your dumps (the README's first part) {'in a folder called `roms/` next to the emulator program, and start the emulator FROM that folder. This sounds fussy and is: this version of FBNeo has no setting for where games live — it only ever looks in `roms/` beside wherever you started it, so pointing at the file from its menu will not work' if platform == 'fbneo' else 'anywhere you like, and tell the emulator where by starting it with `-rompath "/that/folder"`'}.
    It is the **only** file you put there — not `vsav.zip`, not `vsavj.zip`, not
    the sound file. Everything the emulator needs is already inside it{', as long as you built it the normal way (without `--no-qsound-bios`, which is for MiSTer and which MAME will refuse)' if platform == 'mame' else ''}.
 4. Start it. The emulator calls this game `vsavjw`. When it works, the first
@@ -696,6 +728,7 @@ Upstream: {e['upstream']}
 Pinned commit: `{pin}` (the exact tree the patch is known to apply to and
 the project's gates were run against).
 
+{e['deps']}
 {e['recipe'].format(upstream=e['upstream'], pin=pin)}
 {e['note']}
 ## The romset

@@ -287,4 +287,11 @@ if [ "$PRUNE" = 1 ] && [ "$DRY" = 0 ]; then
         done
     done
 fi
-echo "done: $n asset(s) on $URL"
+# A DRY RUN SAYS SO ON ITS LAST LINE (#236, 14z-194): it used to end "done: N asset(s) on
+# <release URL>" though nothing was uploaded, and that line was read as a publish. The
+# zips a dry run keeps are where its last line says; nothing on GitHub changed.
+if [ "$DRY" = 1 ]; then
+    echo "dry run: $n asset(s) built in build/scratch/release_assets/$NAME/, nothing uploaded"
+else
+    echo "done: $n asset(s) on $URL"
+fi

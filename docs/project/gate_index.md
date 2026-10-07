@@ -16,13 +16,13 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**438 scripts** — 120 ci_portable, 90 ci_static, 228 emulator-tier (run by name).
+**439 scripts** — 121 ci_portable, 90 ci_static, 228 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
 | [runner](#runner) | 44 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
-| [platform](#platform) | 43 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
+| [platform](#platform) | 44 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
@@ -153,6 +153,7 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 | `tests/test_release_launcher_bat.sh` | test | ci_portable | — | THE WINDOWS LAUNCHER, PLAY.bat, and WHAT EACH PACKAGE'S TEXT PROMISES ABOUT LAUNCHERS (14z-189, GitHub #145). | 14z-189 |
 | `tests/test_release_os_metadata.sh` | test | ci_portable | — | a file manager's folder metadata (`.DS_Store`) in a release tree is never shipped and never counted: the real uploader cuts no asset carrying one, and every release listing that can see a dotfile drops it through the one definition, tests/l… | 14z-180 |
 | `tests/test_release_prune.sh` | test | ci_portable | — | `tools/upload_release_assets.sh --prune` EMPTIES EVERY EARLIER MERGED FREEZE RELEASE THAT STILL HOLDS A ZIP, walking past freezes that were never released (GitHub #221, 14z-191). ci_portable: | 14z-191 |
+| `tests/test_release_recipe_text.sh` | test | ci_portable | — | THE `-recipe` ASSET'S TEXT CAN BE FOLLOWED AS WRITTEN (14z-194, GitHub #238, #240). | 14z-194 |
 | `tests/test_release_roundtrip.sh` | test | ci_static | ROMDIR | THE RELEASE PACKAGE GATE (14z-105). | 14z-105 |
 | `tests/test_replay_stage_census.sh` | test | ci_portable | — | FREEZE the input-staging convention of every replay-driving Lua instrument (14z-93, GitHub issue #10). No ROMs, no emulator, ~1s. | 14z-93 |
 | `tests/test_replay_video_selfcheck.sh` | test | emulator | MAME, FBNeo, a build dir | ground truth for replay.lua's VIDEO_OUT, the MAME per-frame framebuffer checksum. | session 14z |
