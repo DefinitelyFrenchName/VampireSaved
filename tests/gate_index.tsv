@@ -302,6 +302,7 @@ tests/test_region_overlap.sh	pipeline
 tests/test_region_overlap_control.sh	pipeline
 tests/test_release_roundtrip.sh	platform
 tests/test_release_binaries.sh	platform
+tests/audit_release_linux_desktop.sh	platform
 tests/test_release_launcher.sh	platform
 tests/test_applier_vcdiff.sh	platform
 tests/test_applier_page.sh	platform

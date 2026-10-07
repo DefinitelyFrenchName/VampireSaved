@@ -16,13 +16,13 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**439 scripts** — 121 ci_portable, 90 ci_static, 228 emulator-tier (run by name).
+**440 scripts** — 121 ci_portable, 90 ci_static, 229 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
 | [runner](#runner) | 44 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
-| [platform](#platform) | 44 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
+| [platform](#platform) | 45 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
@@ -116,6 +116,7 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 
 | gate | kind | tier | needs | locks (the script's own header) | since |
 |---|---|---|---|---|---|
+| `tests/audit_release_linux_desktop.sh` | audit | emulator | MAME, FBNeo, a build dir | THE LINUX RELEASE, PLAYED THE PLAYER'S WAY ON A LIVE DESKTOP: the window, the version mark and the SOUND, for both prebuilt emulators (#226, 14z-194). | 14z-194 |
 | `tests/audit_wide_phase_a.sh` | audit | emulator | MAME | CPS-2 WIDE Phase A measurements (no ROM growth, no emulator changes). Each section answers ONE architecture question and prints a decision line. Run on VANILLA vsavj: | 14z-123 |
 | `tests/test_applier_page.sh` | test | ci_static | ROMDIR | SLICES A2-A6 OF THE APPLIER APP: the page must EQUAL the tool of record, refuse everything it refuses, and carry no way to phone home (2026-09-21). | 2026-09-21 |
 | `tests/test_applier_page_browser.sh` | test | ci_static | ROMDIR | THE APPLIER PAGE IN A REAL BROWSER ENGINE (2026-09-21). | 2026-09-21 |

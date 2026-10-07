@@ -13,13 +13,13 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**439 of 439 gates described.**
+**440 of 440 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
 | [runner](#runner) | 44 | 44 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
-| [platform](#platform) | 44 | 44 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
+| [platform](#platform) | 45 | 45 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
@@ -558,7 +558,15 @@ the documentation locks — docs, skills, indexes, tables follow the tree. 21 of
 
 ## platform
 
-the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene. 44 of 44 described.
+the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene. 45 of 45 described.
+
+### `audit_release_linux_desktop.sh` — audit, emulator
+
+**WHAT:** each prebuilt linux-x86_64 asset (FBNeo and MAME), taken as a player gets it (the asset cut by the real uploader, the shipped applier, `sh PLAY.command` in a live GNOME session), opens a window, reaches the select screen showing the release's own version mark, and plays SOUND: its own audio stream is linked to the session's sink, and that stream, recorded for 15 s at the select screen, carries signal in every 5 s window.
+
+**HOW:** tools/upload_release_assets.sh --dry-run cuts the assets (or `ASSETS=<dir>` of zips, e.g. downloaded from the release); apply_release.py builds the set from ROMDIR; tools/desktop_session_play.py records the null sink with pw-record (rec.wav, evidence), launches PLAY.command, sends keys through XTEST, captures the window with xwd, snapshots pw-dump at select and records the emulator's OWN stream node (app.wav); tools/desktop_mark_check.py judges the select capture at font-pixel resolution against the manifests' version font; tools/desktop_audio_check.py reads the links and the WAV levels. About 6 min of desktop time (five runs of ~60-75 s). Linux with a live session ONLY: on any other host it SKIPs and says so; at release it runs on PILOT (see HOW IT REACHES A RELEASE).
+
+**EXPECTS:** per emulator, mark mismatches 0 of 147 font cells, at least one active link from the emulator's node to auto_null and from auto_null to pw-record, and every 5 s window of the emulator's own stream above -45 dBFS RMS (the sink measured 14z-194 at -27 to -36 dBFS after select); each control fails.
 
 ### `audit_wide_phase_a.sh` — audit, emulator
 

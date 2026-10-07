@@ -461,10 +461,14 @@ import glob, os, re, sys
 # run_inp_probe.sh) was reported as an unregistered emulator-free gate every
 # run -- inviting exactly the mis-registration this comment's own two
 # precedents describe: it takes minutes and needs ROMDIR plus a build dir.
+# desktop_session_play.py (14z-194, #226) launches the RELEASE emulators through
+# the player's PLAY.command inside a live Linux desktop session: the same class,
+# and without it audit_release_linux_desktop would read as emulator-free.
 EMU = re.compile(r'run_(replay_)?(mame|fbneo)\.sh|run_replay_guarded\.sh'
                  r'|MAME_BIN|FBNEO_BIN|autoboot_script|emu/fbneo/fbneo'
                  r'|run_battery|run_sim_jtcps2\.sh'
-                 r'|run_inp_probe\.sh|run_inp_guarded\.sh')
+                 r'|run_inp_probe\.sh|run_inp_guarded\.sh'
+                 r'|desktop_session_play\.py')
 SRC = re.compile(r'^\s*\.\s+"?\$(?:REPO|\{REPO\})"?/(tests/lib/[a-z0-9_]+\.sh)',
                  re.M)
 
