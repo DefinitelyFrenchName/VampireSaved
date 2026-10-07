@@ -2376,16 +2376,42 @@ recording replays at every freeze), `tests/audit_don_vs_cpu.sh`.
   state 0x0E — vsavj's generic jump handler (`0x22A24`, 10 sub-states) takes
   it; **Phobos's private vs2 jump handler (`0x2592A`, 5 sub-states) does not**,
   and vs2's own Phobos scripts never issue it.
-- **The command set and two vs2-only behaviours: REPORTED 14z-192, NOT YET RE-CHECKED** (#129; a worker's
-  decode plus non-debug read taps on ERIS, `build/agent192/r129/REPORT_handback.md`, 20 legs). Per the report,
-  the opponent tests are shared code (21 IF conditions, five wait/guard commands), WHICH ones run is per
+- **The command set and two vs2-only behaviours: REPORTED 14z-192, RE-CHECKED AND MEASURED 14z-194** (#129).
+  *The 14z-192 report* (a worker's decode plus non-debug read taps on ERIS, `build/agent192/r129/REPORT_handback.md`,
+  20 legs): the opponent tests are shared code (21 IF conditions, five wait/guard commands), WHICH ones run is per
   character (each class's own script blocks), the per-id probability and timing tables are identical across all
-  32 classes on both games, and vsavj and vs2 share 84 of 89 command handlers. vs2 has two behaviours vsavj's
-  interpreter lacks: a Phobos-only guard (id `0x10`) inside the in-move continuation check at vs2 `0x2D374`
-  (native refused every check made while Phobos's `+0x1BC` was 1, ours let them through), and a low-attack
-  crouch-guard stance test at vs2 `0x2CD38` (five call sites), which read the opponent's attack record on native
-  and never on ours. These are CPU-AI gameplay differences, so they are the maintainer's to rule ([VSP-10]), and
-  the figures are the worker's until the orchestrator re-checks them.
+  32 classes on both games, and vsavj and vs2 share 84 of 89 command handlers. *The 14z-194 re-check* (PILOT, the
+  merged-m23 build, logging breakpoints whose action resumes — `bpset X,1,{printf …; g}`, which never held the CPU:
+  one stop per run, the debugger's initial break — with replay input on the screen clock and the first frame
+  counted; the worker's 20 legs plus four corpus replays; cycle figures STATIC, from the 68000 timing tables,
+  against ~197,858 cycles per frame at MAME's 11.8 MHz and 59.6388 Hz): the report's figures reproduce exactly
+  (native Phobos's refusable calls 297 active / 156 passive; the low-attack test read 34 / 49 / 158 times for
+  Phobos / Pyron / Donovan), the breakpoint counts on M23 equal the worker's tap counts on all 15 equal-length
+  legs, but its "runs 1 and 4 match exactly" does not hold (all 20 tap files differ; run 4 printed a constant
+  return address and cut six legs short; the streams are equal only on the 14 equal-length legs).
+  **Behaviour A, Phobos's guard in the in-move continuation check:** vs2 `PRG:0x2CB50` returns 0 when the
+  fighter's id is `0x10` and `+0x1BC != 0`; vsavj's twin `PRG:0x2D374` has only the id-6 test *(the 14z-192
+  entry called `0x2D374` vs2's — it is vsavj's)*. The check has 43 callers in our build, 32 legacy and 11 ported;
+  on ours Phobos reaches it ONLY through `PRG:0x41D406`, inside his private copy of vs2's `0x02592A` (natively
+  through vs2's engine site `0x025AA0`), and no legacy fighter id reached any ported caller in any leg or replay.
+  Options, measured reach and STATIC cost: **A1** a private clone for Phobos (repoint the `jsr` at `0x41D406`, 4
+  bytes in a vs2-ported region): 0 legacy bytes, 0 legacy executions, Phobos at most ~92 cycles a frame
+  (~0.05%); **A2** the guard inside the shared routine (a 6-byte hook at `PRG:0x2D374`): every caller pays, at
+  most ~76 cycles a frame (~0.04%), legacy timing moves in every 1P-vs-CPU match and the attract demo (calls in
+  184 of 7,200 frames) but in neither 2P replay checked (03, 16). **Behaviour B, vs2's low-attack crouch-guard
+  test** vs2 `PRG:0x2CD38`: vs2 calls it from SHARED engine code, legacy CPUs included (ids `0x00`, `0x0C`, `0x0F`
+  natively), from six call sites *(the 14z-192 entry said five; the sixth is an internal `bsr.w` at vs2
+  `PRG:0x2CD14`)*; vsavj's twins are the five crouch-decision blocks `PRG:0x023068`, `0x02313E`, `0x0231C4`,
+  `0x023998`, `0x024AC8`, which every CPU runs (tenant legs at most 2 a frame, legacy at most 1; the attract demo
+  in 104 of 7,200 frames, the same 316 hits on pristine vsavj and on ours; never in the 2P replays 03, 16 or 105's
+  2P part). Phobos's private copy of vs2 `0x022400` holds two of the call sites, but both are planted ILLEGAL
+  tripwires (`PRG:0x46A840`) never reached, so it is no route. The faithful port hooks the five shared blocks (30
+  legacy bytes) gated on a tenant CPU id plus ~0x64 bytes of new tenant code, legacy paying ~80 cycles a pass (a
+  static estimate of an unbuilt thunk). **Not measured:** what either behaviour changes in play (captures), the
+  real cost of any built hook, whether vsavj opponents' `+0x8C` record and its `+0x17` class byte carry vs2's
+  meaning (the ported test would read them), why Phobos's ported caller `0x416312` is never hit on ours (native
+  reaches its twin 11 times, passive), coverage beyond these legs, FBNeo and MiSTer. These are CPU-AI gameplay
+  differences: the port is the maintainer's to rule ([VSP-10]); nothing is built.
 - **The #99 crash (RESOLVED 14z-111):** a tenant class read the aliased row
   (Phobos 0x10 -> Demitri's scripts), Demitri's jump command reached Phobos's
   5-entry table at index 7, the displacement read from code landed in

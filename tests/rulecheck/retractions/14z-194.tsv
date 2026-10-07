@@ -2,3 +2,6 @@
 730 data rows	14z-194: the cross-check page's workbook count (14z-125) was never a count; tools/xlsx_read.py returns 820 from the unchanged workbook, then and now (STATE 14z-194)	retracted
 workbook's 730	14z-194: the same miscount in the page's coverage paragraph (STATE 14z-194)	retracted
 820 data rows, every one with an input	control: the corrected count, live in tools/crosscheck_framedata.py and its generated page	reach:2
+vs2 `0x2D374`	14z-194: the #129 continuation check is vs2 `PRG:0x2CB50`; `0x2D374` is vsavj's twin (engine_internals "The CPU AI action-script system", re-check 14z-194)	retracted
+five call sites	14z-194: vs2's low-attack test `0x2CD38` has six callers, the sixth an internal bsr.w at vs2 `PRG:0x2CD14` (engine_internals, re-check 14z-194)	retracted
+vs2 `PRG:0x2CB50` returns 0	control: the corrected #129 behaviour A, live in docs/game/engine_internals.md	reach:1

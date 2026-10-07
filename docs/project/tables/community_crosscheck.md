@@ -116,7 +116,7 @@ and compares nothing: the workbook types it `projectile` (as it types her `5HK`)
 chain the rig recorded carries no attack window in its records — the hit is the MINE the
 move spawns, confirmed by the maintainer (2026-10-05, GitHub #216): *"the hit is the mine
 spawned, it is technically a trap/projectile with a disjointed hitbox from the character's
-sprite"*. Specials, supers, EX/ES moves, throws and pursuits are not joined at all.
+sprite"*. Specials, supers, EX/ES moves and throws are not joined at all (the pursuits are measured, 14z-194, in their own section below).
 
 ## The headline: per-move agreement
 
@@ -394,6 +394,42 @@ direction); startup 8 (+1 = the sheet's 9), red 16 = 8+8, white 8: EXACT.
 
 30 move(s) deviate; the per-move table is on the full page.
 
+## The pursuits — named and compared for all 15 characters (14z-194, #229)
+
+Measured on vsavj on ERIS (scratch rigs of the #229 fork, not yet a gate; the per-move
+figures stay out of the tree with the rest of the frame data). **Scope first**: of the
+workbook's rows not joined above, the #229 fork grouped 440 by what each needs that the
+vanilla join rig lacks — motion specials 166, guard-cancel rows 42, command throws and
+grabs 54, ES specials 61, EX supers 50, ground throws 23, air throws 14, and the 30
+pursuit and ES-pursuit rows measured here.
+
+**The rig**: walk in to contact, knock the victim down (2HK, which knocks down for all
+but Jedah, whose 2HK never enables a pursuit — his 5HK does), then one U+button press at a
+swept offset, one leg per offset. **Identity**: on every character the pursuit fires only
+on a downed victim — the same press at the same offset with no knockdown enters the
+standing LP on every leg (the control) — each ES version spends exactly one stock at its
+entry frame, and 8P and 8K enter the same chain, as the sheet's single row says. The
+maintainer confirmed all 15 pursuits and ES pursuits by eye on capture sheets
+(`DECISIONS_HISTORY.md` "Read 2026-10-07 (14z-194) — #229"). Frame data in ENGINE TICKS
+from a write tap over `+0x1C..+0x23` (the chains loop or hold on game logic, so a
+frame-rate trace cannot measure them).
+
+| column | verdict over the 15 |
+|---|---|
+| gauge | **EXACT** on all 15, P and ES: the game pays the sheet's hit gauge over the hits landed (the first hits of a series), measured from the gauge word; ES pays 0, as the sheet says |
+| red / white damage | **EXACT** on 15 of 15 for P and 14 of 15 for ES under this page's rule (red = real + white, first hit; Zabel's compared on the HP the game takes); the one ES miss is Demitri's first hit (the sheet's red above ours) |
+| active | **INCONSISTENT**: the sheet reads ours +1 on 12 of 15 (P) and 11 of 15 (ES); the exceptions (BU, VI, JE; ES also AU) not investigated |
+| startup | **INCONSISTENT, in two families**: the sheet reads ours +1 for DE FE AU SA QB LE and +2 for BU GA VI AN BI LI JE; MO +4 and ZA +9 (both leap chains loop on game logic). OURS re-checked first: Demitri's count equals its duration-byte derivation, every count is the same across P, K and ES and between connecting and whiffing legs, and the hit reader passes its control. What the sheet counts as a pursuit's startup is OPEN |
+| recovery | **UNCOMPARABLE**: the sheet writes prose ("landing 1", "32 + landing 1") |
+
+**The workbook's side, measured:** Gallon's 2HK knocks Victor down though the workbook
+lists it as knockback; Jedah's 2HK never enables a pursuit; 8K opens later than 8P for
+Felicia, Aulbath, Sasquatch and Lilith (an early U+LK enters a kick normal); Morrigan
+lands 2 hits on a downed Victor at every connecting offset where the sheet says 4 (8 for
+ES), and Bulleta and Lei-Lei land fewer hits than their sheet series — the sheet states no
+victim. **Not covered:** the ES pursuits' extra hits compared as records, the hit counts
+on other victims, the active-column exceptions, what the startup offset counts, FBNeo.
+
 ## What is NOT known
 
 - **The startup `+1` and recovery `+2` offsets are NAMED, not adjudicated.** The
@@ -420,10 +456,10 @@ direction); startup 8 (+1 = the sheet's 9), red 16 = 8+8, white 8: EXACT.
   corpus and NOT yet measured:** mizuumi distinguishes NEUTRAL- from FORWARD-jump
   variants of the same button (`8J.LP` vs `9J.LP`) where our slot map carries ONE
   chain per aerial button. Needs a two-direction jump rig.
-- **Specials, supers, EX/ES moves, throws and pursuits are not joined** (the command
-  normals are, since 14z-189). Each needs its own measured naming rig on vsavj, the way
-  `tools/name_moves.py` did for the tenants. That is the bulk of the workbook's 820
-  rows and it is untouched here.
+- **Specials, supers, EX/ES moves and throws are not joined** (the command normals are,
+  since 14z-189; the pursuits are measured, in their own section above, 14z-194). Each
+  needs its own measured naming rig on vsavj, the way `tools/name_moves.py` did for the
+  tenants. That is the bulk of the workbook's 820 rows and it is untouched here.
 - **Seven workbook columns have no counterpart in the tree**: `on hit`, `on block`,
   `renda on hit`, `renda on block`, `throw tech`, `cancel`, `Invuln`. Frame advantage
   needs the victim's stun beside the attacker's recovery; nothing computes it.
