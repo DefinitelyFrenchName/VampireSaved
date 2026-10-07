@@ -1,0 +1,7 @@
+# tests/rulecheck/retractions/14z-193.tsv — the wordings retracted or corrected in 14z-193, and reach controls that must be found live; columns pattern, source, class (retracted | reach:N)
+the ruled host-engine rate (#114)	14z-193: the throw-geometry gate's cadence line read the #114 host-clock reading that #135/14z-158 retracted (it is the play mode); the gate now runs at the matched level (STATE 14z-193 row (8))	retracted
+"M21" bottom-right	14z-193: HANDOFF's naked-eye tell lagged two freezes; the select screen reads M23 (STATE 14z-193 row (3), finding (d))	retracted
+dict(tail=(1, 0)	14z-193: the 14z-131 standard-throw tail (1,0) was the unmatched speed level; pinned, every tail is (0,0) (STATE 14z-193 row (8))	retracted
+dict(tail=(0, 1)	14z-193: the 14z-131 ES tail (0,1) was the unmatched speed level (STATE 14z-193 row (8))	retracted
+at the matched level 1.000 was measured	control: the corrected cadence wording, live in tests/audit_tenant_throw_geometry.sh	reach:1
+"M23" bottom-right	control: the corrected tell, live in HANDOFF.md	reach:1

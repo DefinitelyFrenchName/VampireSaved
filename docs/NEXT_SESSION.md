@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-192 CLOSE, 2026-10-06)
+# NEXT SESSION — orientation (rewritten at the 14z-193 CLOSE, 2026-10-07)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
@@ -18,49 +18,41 @@ work there in parallel.**
 
 ## START HERE
 
-0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** M23 is FROZEN (`c884e6d8`, tags
-   `freeze/donovan-m27`, `huitzil-m34`, `pyron-m28`, `merged-m23`; STATE 14z-192 row (13)) and carries Phobos's air-dash
-   minimum and the vs2 landing sounds, with the small tickets. What the close found and did is in its CLOSE row.
+0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** M23 is FROZEN (`c884e6d8`, tags `freeze/donovan-m27`,
+   `huitzil-m34`, `pyron-m28`, `merged-m23`); 14z-193 froze no build. What the close found and did is in STATE 14z-193's
+   CLOSE row.
 1. **THE NEXT RELEASE carries M23** with #214 and #227 (both fixed in the generator; `release/merged-m23/` is
-   packaged, and its Windows launcher half PASSed on ERIS). The release itself is the maintainer's call; when it is
-   made, #214 and #227 close with it.
+   packaged). #234 (the MAME README never explains the red bad-ROM box at every start) is the same kind of
+   generator note and could ride along. The release itself is the maintainer's call.
 2. **#129 — RE-CHECK THE WORKER'S REPORT, THEN PUT THE DECISION** (STATE 14z-192 row (10);
-   `build/agent192/r129/REPORT_handback.md`). It names two vs2 CPU-AI behaviours our build lacks: a Phobos-only guard
-   in the in-move continuation check (vs2 `0x2D374`) and a low-attack crouch-guard stance test (vs2 `0x2CD38`, five
-   call sites). The orchestrator has NOT re-checked the report, and the close's procedure check found two faults in it: its "runs 1 and
-   4 match exactly" holds for the stripped W+S/OR hashes only (the full tap hashes differ), and the worker skipped the
-   CLAUDE.md and skill reads its spec named. Re-check it, then measure each behaviour's legacy
-   reach and cost (does it run for legacy CPU fighters, and how many cycles), and only then put the port to the
-   maintainer with options and a recommendation through the rule-checker ([VSP-10]).
-3. **#226 — THE LINUX RELEASE AS A PLAYER GETS IT**, ideally on the next release: step 2's window, rendering and a
-   match passed on PILOT's desktop (14z-193, STATE row (4)); left are sound and the physical keyboard (PILOT's VM
-   has no audio device), step 3 (the `-recipe` asset on a clean host), and the scripted case.
-4. **Open from this sitting:** #228 (breakpoint instruments on the frame_done clock), #229 (community naming rigs),
-   #235 (the tenants' kick and air throws as throwers, split from #230), #118 (the mizuumi candidates, scope commented), #234 (MAME's red bad-ROM box,
-   filed 14z-193).
+   `build/agent192/r129/REPORT_handback.md`): two vs2 CPU-AI behaviours our build lacks; the report's two faults are
+   named there. Re-check, measure each behaviour's legacy reach and cost, then put the port to the maintainer
+   through the rule-checker ([VSP-10]).
+3. **#226 — THE LINUX RELEASE AS A PLAYER GETS IT**: step 2's window, rendering and a match passed on PILOT's desktop
+   (STATE 14z-193 row (4); the driver `build/agent193/t226/pilot_drive.py`); left are sound and the physical
+   keyboard (PILOT's VM has no audio device), step 3 (the `-recipe` asset on a clean host), and the scripted case.
+4. **Kept for a future session at the maintainer's word** (*"Let's keep them for a future session"*): #229 (naming
+   rigs for vanilla specials, supers, EX/ES, throws and pursuits) and #118 (the remaining mizuumi candidates) —
+   scope each before any rig. Also open: #228 (breakpoint instruments on the frame_done clock), #235 (Pyron's and
+   Donovan's kick and air throws as throwers), #236 (the asset cutter's dry run claims an upload).
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
-- A remote tier started from a non-login shell runs without the reference `mame` on PATH: every ERIS script begins
-  with `. "$HOME/.profile"` (`ssh eris 'wsl -e sh -s' < script`).
-- ERIS's MINGW64 is MSYS2: `ssh eris 'C:\msys64\usr\bin\env.exe MSYSTEM=MINGW64 CHERE_INVOKING=1 /usr/bin/bash -l
-  /c/Users/chaton/m22logs/<script>.sh'` (there is no Git for Windows bash).
-- A re-point sweep at a freeze must leave pinned predecessors alone (`CTL_*`, `REF`, `--old`, "before"/"pre-"),
-  must not rewrite dated records, and must be followed by a grep for release-name defaults (`merged-m<prev>`).
-- An op-set delta cannot see a byte inside a placed data file: read every track's program change with
-  `tools/program_bytediff.py <old> <new>`.
-- A moved `test_mister_prg_window` pair at a freeze: first swap the graphics members alone (the mark moves it).
-- `tests/run_all_emulator.sh --only` takes ONE shell glob; `|` alternatives select nothing. `--stale` refuses names
-  outside the selection: stale `out`-of-release-scope gates need `--scope all`.
-- A freeze battery run on an uncommitted tree leaves every gate stale at freeze cadence: the `--stale` re-run on the
-  freeze commit is about a whole battery (187 gates at M23). Bring every lane's run dir home and read
-  `tools/audit_emulator_staleness.py --cadence freeze` as soon as the battery ends: the M23 battery's own rows were
-  over half their cap, unseen until its run dir reached the Mac.
-- Since 14z-192 the staleness audit judges a moved path by CONTENT against the run's `run_record_start.json`
-  (the patched `emu/fbneo` included, index-blind), judges a red newest row, and at freeze cadence FAILs only what a
-  freeze selects. Every emulator gate follows `tests/ci_emulator.tsv`, so any registry edit re-stales them all.
+- PILOT's `mame` too is on the LOGIN PATH only: a plain `ssh pilot 'cmd'` does not see it (`bash -lc` does) — the
+  ERIS gotcha's class (`docs/project/gotchas.md` "A REMOTE BATTERY STARTED FROM A NON-LOGIN SHELL").
+- PILOT's GNOME session can be driven from SSH: `DISPLAY=:0`, `XAUTHORITY=/run/user/1000/.mutter-Xwaylandauth.*`,
+  keys through Xwayland's XTEST (ctypes on `libXtst.so.6`, no install), the window captured with `xwd -id`.
+- MAME runs an `-autoboot_script` only after its startup screens: the release MAME's red bad-ROM box (#234) blocks a
+  scripted run until a key is pressed; the project's own runs use `-video none` and never see it.
+- A check that reads back a byte the gate itself pokes proves nothing; a per-cell claim compared as two sets hides a
+  swap; a cross-game gate without the matched level reads the speed level as a difference
+  (`docs/project/gotchas.md` "A CHECK THAT READS BACK ITS OWN POKE PROVES NOTHING").
+- `tools/upload_release_assets.sh --dry-run` ends with "done: N asset(s) on https://github.com/…" though it publishes
+  nothing; check `gh release view` before believing a line like it.
+- A freeze now records its whole program change: `python3 tools/freeze_bytediff.py render`, review, `freeze`
+  (HANDOFF "AND THE FREEZE'S WHOLE PROGRAM CHANGE"); `tests/test_freeze_bytediff.sh` is red until it does.
 
-## WHAT CLOSED THIS SITTING (14z-192)
+## WHAT CLOSED THIS SITTING (14z-193)
 
-**#210**, **#211**, **#213**, **#216**, **#222**, **#223** `done`; **#116** and **#117** split and closed `done`.
-Filed: #228, #229, #230, #231, #232, #233. M23 FROZEN; the staleness audit judges by content (ruled).
+**#122**, **#217**, **#230**, **#231**, **#232**, **#233** `done`. Filed: #234, #235, #236. HANDOFF's naked-eye tell set
+to M23; `test_freeze_bytediff` listed at freeze cadence (ruled).

@@ -11,12 +11,13 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**235 tickets** — status: open 10 · parked 9 · done 189 · declined 9 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 164 · cosmetic 15 · evolution 56 · **backfill debt: 0 rows**.
+**236 tickets** — status: open 11 · parked 9 · done 189 · declined 9 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 165 · cosmetic 15 · evolution 56 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#236](https://github.com/DefinitelyFrenchName/VampireSaved/issues/236) | bug | open | upload_release_assets.sh --dry-run ends with 'done: N asset(s) on ‹release URL›' though it uploads nothing | `tools/upload_release_assets.sh` | none | none | none | 14z-193 |
 | [#235](https://github.com/DefinitelyFrenchName/VampireSaved/issues/235) | evolution | open | Pyron's and Donovan's kick and air throws as throwers: ours vs native vs2 on the roster victims (split from #230) | `tests/audit_tenant_throw_geometry.sh` | `DECISIONS_HISTORY.md § Ruled 2026-10-07 (14z-193) — #230 closed `done` on the standard throw` | none | none | 14z-193 |
 | [#234](https://github.com/DefinitelyFrenchName/VampireSaved/issues/234) | cosmetic | open | MAME release: the red 'ROMs incorrect — press any key' screen at every start is expected but the README never says so | `tools/package_release.py` | none | none | none | 14z-193 |
 | [#229](https://github.com/DefinitelyFrenchName/VampireSaved/issues/229) | evolution | open | Community cross-check: naming rigs on vsavj for specials, supers, EX/ES moves, throws and pursuits (split from #117) | `tools/vanilla_join_rig.py` | `DECISIONS_HISTORY.md § Ruled 2026-10-05 (14z-192) — #117 split, #229 filed; #118 stays open` | `docs/project/tables/community_crosscheck.md` | none | 14z-192 |
