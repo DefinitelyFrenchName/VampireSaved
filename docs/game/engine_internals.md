@@ -710,6 +710,7 @@ compare at a MATCHED speed level AND a PINNED RNG** (the next paragraph; both ru
 the #114 gate) — a duration in video frames is then comparable between the siblings; at each
 game's default it is not. [M: `tests/audit_tick_cadence.sh` section C;
 `tests/test_don_immortal_native.sh` §0 and §4; 14z-158]
+**Re-measured per frame 14z-194 (#118):** the prediction 1 + [`$FF812D` and bit (`$FF8081` & 31) of `PAT[level]`] held on every in-match frame of replays 03 and 37 at pinned levels 0, 6, 8, 14 and unpinned, on pristine vsavj and on merged-m23 alike (66,412 frames, 0 misses; the best other level's pattern loses 103-5,069 frames per leg); the two-pass share is 0.000 at level 0, 0.21-0.22 at 6, 0.30-0.32 at 8, 0.90-0.95 at 14. The fighter's per-run input copies (`atlas/ram.md` `+0x124`, `+0x12A..+0x12D`) follow it — they are written once per PASS, not per video frame. Not yet gated (#118's proposed `tests/audit_extra_pass.sh`).
 
 **A DOUBLE PASS CAN OVERRUN ITS FRAME — one frame then completes NO logic pass (measured 14z-168,
 #136).** Both passes of a double-pass frame run inside one activation of the game task (above); when
@@ -1473,8 +1474,8 @@ row in `bank_map.toml`, rendered in the maps' bank tables.
 ## Command-input / motion-tracker subsystem (session 14z-48, measured both engines)
 
 **Atlas rows this section depends on:** `atlas/ram.md` (fighter `+0x308..+0x338`
-trackers, `+0x12A` direction code, `+0x1AC/+0x1AE` button masks,
-`+0x105/+0x106` trigger latch and command id), `atlas/character_tables.md`
+trackers, `+0x12A.w` read as a WORD — its low byte `+0x12B` the direction code, its high byte `+0x12A` the run's buttons (corrected 14z-194, #118: the tracker's reads are `move.w $12a(a6),d0`; this list said "`+0x12A` direction code"), `+0x1AC/+0x1AE` button masks,
+`+0x105/+0x106` trigger latch and command id; since 14z-194 (#118) the input words the trackers are fed from: `+0x394/+0x395` held buttons/directions, `+0x397` one frame late, `+0x122..+0x12D` and `+0x126/+0x127` the per-run copies and the newly-pressed edge — measured, not yet gated), `atlas/character_tables.md`
 (the per-char eval and trigger dispatch tables).
 **Gates:** `tests/test_move_naming.sh`, `tests/test_hui_ex.sh`,
 `tests/test_pyron_cosmo.sh`.
@@ -1497,7 +1498,8 @@ vsavj and vs2; addresses vs2 / vsavj-twin):
   (+0x308..+0x338, 8 bytes each: +0 state, +1 step index, +4
   timeout counter). A helper's dispatcher advances its tracker:
   state machine with (state 2) exact-direction match — step word
-  low nibble vs the 4-bit direction code at obj+0x12A, flag bit 7
+  low nibble vs the 4-bit direction code in the low byte (+0x12B) of the
+  word read at obj+0x12A (corrected 14z-194, #118), flag bit 7
   = mask-mode — and (state 4) bitmask match — step word & 0x7700
   vs obj+0x1AC|+0x1AE — plus flag bits (bit 4 = advance-and-
   continue same frame, bits B/F = diagonal-leniency classes).
@@ -4368,7 +4370,7 @@ assert `$FF802E` = 1 before measuring anything below.
 
 ~~**The DF effect-channel machine**~~ **— NAME RETRACTED 14z-185: these structs and this dispatcher are
 the command-input MOTION TRACKERS** (the section "Command-input / motion-tracker subsystem": the same
-dispatcher `0x029F4A`, step tables inside its `0x2A610-0x2A780`, and `+0x12A` is the direction code), measured
+dispatcher `0x029F4A`, step tables inside its `0x2A610-0x2A780`, and the word at `+0x12A` carries the direction code in its low byte `+0x12B` — corrected 14z-194, #118), measured
 14z-185 by their `+4` timeout writes. Whether the writers listed below as "only while DF is up" are specific to
 Dark Force was not re-measured. The original text, kept: [M: 14z-68v on the downgrade path, and
 the same machine H's form drives, 14z-69c]: the fighter's effect channels

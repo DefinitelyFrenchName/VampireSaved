@@ -38,7 +38,8 @@ the measurement is correctly done or not."*
 - `../community/mizuumi_reverse_engineering.txt` — the mizuumi wiki's Reverse
   Engineering page (`oldid 416342`, 2025-07-31). It carries **no per-move frame
   data** — it is a RAM/ROM map — so it is not a source for this page. Its
-  player-struct table is a separate, queued comparison against `atlas/ram.md`.
+  player-struct table is compared against `atlas/ram.md` separately (#118: 14z-189 and 14z-194
+  measured its candidates into the atlas, each name adopted only as "consistent with").
 
 ## What is compared, and what is not
 

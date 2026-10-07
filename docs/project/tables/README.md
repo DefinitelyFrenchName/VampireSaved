@@ -84,7 +84,7 @@ Gates: `tests/test_community_crosscheck.sh` (ci_static) and
 cited and never committed: `../community/vsav-framedata.xlsx` and
 `../community/mizuumi_reverse_engineering.txt` (the mizuumi wiki's Reverse
 Engineering page, `oldid 416342`, 2025-07-31 — a RAM/ROM map with no per-move
-frame data; its player-struct table vs `atlas/ram.md` is a queued item).
+frame data; its player-struct table is compared against `atlas/ram.md` under #118 — measured 14z-189 and 14z-194, each name adopted only as "consistent with").
 
 ## The other tables
 
