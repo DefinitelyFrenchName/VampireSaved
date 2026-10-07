@@ -6691,3 +6691,16 @@ per-cell claim is compared per cell. **And the speed level** (the same widening)
 default (vsav2 TURBO 8, vsavj NORMAL 6), the 14z-131 frozen tails (1,0)/(0,1) and Donovan's divergent hold order on
 all 18 victims were the level, not the port — pinned, every tail is (0,0) and the hold ratio 1.000 (the
 `unpinned-level` control brings the old tails back exactly).
+
+## A "NO EVENT" VERDICT NEEDS PROOF THE EVENT WAS ATTEMPTED, AND EACH CLAUSE OF ITS LIVENESS ITS OWN CONTROL (paid: 14z-194, #235, rule-checker runs 2026-10-07-717 and -718)
+
+Declaring that a victim is NEVER held (Pyron's air throw on 00 05 06 0d 0e, `tests/audit_tenant_throw_geometry.sh`)
+turns a missing event into a PASS, so a broken rig reads exactly like the real miss. Three gaps the rule-checker found
+before the expectation landed: (1) the leg's liveness was frame count plus the two `+0x60` bases, but the only control
+CUT A FRAME, so it proved the count clause and never the base clauses (now `nohold-wrong-base`, one frame's base
+replaced with the count intact); (2) nothing showed Pyron jumped or pressed at all — a leg where the input never
+landed would read "declared-ok" (now the attempt check: airborne at the press, seq 06.06 from 06.xx, control
+`nohold-no-attempt`); (3) the attempt state 06.06 is also entered by an AIR KICK, so it proves an air attack, not the
+throw input — the replay's press is now checked statically against the button digits (`press-is-kick`). Rule: a
+"no event" verdict carries an attempt proof, and a liveness check with several clauses needs a control per clause
+(or one control whose perturbations hit each clause past the others).

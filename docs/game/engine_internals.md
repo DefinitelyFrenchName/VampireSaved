@@ -3441,7 +3441,7 @@ Gate: `tests/audit_don_grab_pose.sh` (legacy-victim control in section 0).
 `+0x44` yv, `+0x48` xacc, `+0x4C` gravity, `+0x5A` the arc sub-index),
 `atlas/character_tables.md` (the throw-arc tables).
 **Gates:** `tests/test_hui_grab.sh`, `tests/audit_tenant_throws.sh`,
-`tests/test_don_throw_mirror.sh`, `tests/audit_throw_tech.sh`.
+`tests/test_don_throw_mirror.sh`, `tests/audit_throw_tech.sh`, `tests/audit_tenant_throw_geometry.sh`.
 
 The victim's launch physics come from a per-throw ROW installed by
 vsavj `0x28386` (vs2 `0x275E4` — a unique tail twin pair):
@@ -3464,6 +3464,21 @@ copies of vs2's FULL tables. **Superset proof, static:** map1's prefix
 0x00-0x49 and table2 rows 0x00-0x31 are byte-identical across the
 games, so vanilla content reads identical values through the clone and
 the thunk can be unconditional.
+
+### THE TENANTS AS THROWERS match native vs2 at the matched level; Pyron's air throw never holds five victims ON EITHER GAME; no kick throws, no Donovan air throw (measured 14z-193 #230, 14z-194 #235)
+
+At speed level 06 and RNG 0000 pinned on both legs (the ruled equalised input), `tests/audit_tenant_throw_geometry.sh`
+compares ours (merged-m23) against native vs2 on the 18 roster victims, the thrower and victim identified by the
+`+0x60` base each game loads: Phobos's three throws, Pyron's and Donovan's standard 6+HP, and (since 14z-194)
+Pyron's air throw, j.6MP and j.6HP, traverse the same states in the same order with tail (0,0) and the same arcs,
+victim by victim. **Pyron's air throw holds 13 victims and never holds 00 05 06 0d 0e (Bulleta, Morrigan,
+Anakaris, Lei-Lei, Lilith), on vs2 as on ours**: a declared no-hold in the gate, its legs proven live and the
+attempt proven (airborne at the press, seq 06.06). Why is not measured; the maintainer, reading the capture sheet:
+*"I cannot be 100% sure whether it is truly imposible or if it is because the throw box is positioned high up"*.
+**Neither tenant has a kick throw and Donovan has no air throw**: 6+MK/6+HK and Donovan's air presses enter an
+attack state (seq 0a.xx grounded, 06.06 airborne) and never hold a victim, on both games, on all 36 legs of each;
+whether that state is a normal by name is not checked. Not covered: Donovan's back throw (4+P), other leads and
+press offsets, FBNeo and MiSTer.
 
 ## The DAMAGE pipeline: two appliers, one scaler chain (14z-85e/85f,
 ## measured on Phobos' FINAL GUARDIAN; twins verified in both engines)

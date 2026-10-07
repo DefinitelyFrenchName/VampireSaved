@@ -395,6 +395,16 @@ So: merged-m23 is published as packaged (with #234's note); filed #238 (the MAME
 
 ---
 
+## Ruled 2026-10-07 (14z-194) — #235 closed `done`
+
+**The question (14z-194), after rule-checker run 2026-10-07-720 OK and the merge (`03984055`):** whether to close #235 now (the air throw gated; neither tenant has a kick throw, nor Donovan an air throw) or keep it open for Donovan's back throw or the cause of the five no-hold victims.
+
+**The maintainer:** *"close #235"*
+
+So: #235 closed `done` with its closing comment and index row; Donovan's back throw and the no-hold cause are recorded as not covered in `docs/game/engine_internals.md` "THE TENANTS AS THROWERS".
+
+---
+
 ## Read 2026-10-07 (14z-194) — #226: the physical keyboard and real sound, by the maintainer on PILOT's remote desktop
 
 The maintainer, in the session: *"FYI I tried through te remote desktop and confirmed both mame and fbneo have sound and proper keyboard handling. I updated comments in the github issue"*. On #226 (comment of 2026-10-07T19:43:38Z, quoting the session's open list): *"Still open here: the physical keyboard (keys went through XTEST), a real audio device and its driver (PipeWire's null sink only; the maintainer's ear confirmed the audio content) -> tested successfully with FBneo and MAME."* and *"a truly clean host (PILOT's toolchain was installed 2026-10-02), and the scripted case.-> not tested"*.
