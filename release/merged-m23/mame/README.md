@@ -265,6 +265,14 @@ Almost every first-time problem is one of these.
   only the CPS-2 games, to keep it small, and those four Mega Man games name a
   parent game that lives outside that set. The game starts and runs normally
   after these lines.
+- **MAME opens on a red box, "One or more ROMs/disk images for this system are
+  incorrect. The system may not run correctly. Press any key to continue",
+  every time it starts** — this is expected and harmless: press any key and the
+  game starts and plays normally. MAME checks each game file against the
+  checksums it has on file, and the files this patch rebuilds or adds can never
+  match them. The applier has already checked every file against this
+  release's own checksums before writing the set, so the box says nothing about
+  your files. No MAME option hides it.
 - **"reference dumps do not match the manifest"** — one of your original game
   files is not the exact version expected: a different region, a different
   revision, or altered at some point. The message names the file and the part of

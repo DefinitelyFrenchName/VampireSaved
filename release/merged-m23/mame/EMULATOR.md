@@ -55,3 +55,9 @@ Built so far for: linux-x86_64, macos-arm64, windows-x86_64. Each carries a `BIN
 - Four "Driver is a clone of nonexistent driver megaman" errors at every start
   (`mmancp2u`, `mmancp2ur1`, `mmancp2ur2`, `rmancp2j`) are expected and harmless:
   the build is filtered to the CPS-2 drivers and their parent lives outside them.
+- The red "One or more ROMs/disk images for this system are incorrect" box at every
+  start is expected and harmless: press any key. The driver carries the stock CRCs
+  for the members the port rewrites and sentinel CRCs for the new ones (the
+  `-verifyroms` note above), and MAME 0.288 never lets `-skip_warnings` skip a
+  ROM-load warning (`src/frontend/mame/ui/ui.cpp`, `display_startup_screens`).
+  The applier has already verified every member's sha1 (#234).

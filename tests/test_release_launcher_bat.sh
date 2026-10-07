@@ -11,7 +11,8 @@
 #   apply_release.html) names only launchers THAT package ships, and carries no unselected
 #   platform marker; and the README the generator writes NOW claims that its package holds an emulator
 #   only on fbneo and mame, never on mister (#214), and that MAME's four "clone of nonexistent driver
-#   megaman" lines are harmless only in the mame README (#227). ON A WINDOWS HOST (MSYS2) it also drives BOTH .bat files — the shipped
+#   megaman" lines, and its red "ROMs/disk images ... incorrect" box at every start, are harmless
+#   only in the mame README (#227, #234). ON A WINDOWS HOST (MSYS2) it also drives BOTH .bat files — the shipped
 #   bytes — under cmd with PLAY_DRY_RUN=1: each success path (FBNeo: roms\vsavjw.zip created,
 #   the WOULD RUN line; MAME: the WOULD RUN line with -rompath at the set's folder) and each
 #   refusal (FBNeo: no romset, no binary, no profile, a junctioned roms\; MAME: no romset, no
@@ -31,7 +32,7 @@
 # MUST-FIRE: perturbed-copy: lf-endings — BOTH PLAY.bat files with CRLF turned into LF must FAIL: cmd reads a LF-only batch file in 512-byte blocks and loses `goto` labels across them, so the line-ending rule is the one a working-looking launcher breaks silently
 # MUST-FIRE: perturbed-copy: launch-line-changed — the FBNeo PLAY.bat without `vsavjw` on its launch line, and the MAME PLAY.bat without `-rompath`, must FAIL: those are #145's two failures, an emulator with no game name that flashes shut and a MAME that finds no ROMs
 # MUST-FIRE: perturbed-copy: emu-text-in-mister — the generator's README rendered for the MiSTer package with the EMULATOR selection must FAIL: that is #214, the MiSTer README telling its reader the package already contains an emulator (step 2, the "why" paragraph, the troubleshooting bullet)
-# MUST-FIRE: perturbed-copy: megaman-note-in-fbneo — the generator's README rendered for the FBNeo package with the MAME selection must FAIL: the note about MAME's four validation lines (#227) belongs to the MAME package only
+# MUST-FIRE: perturbed-copy: megaman-note-in-fbneo — the generator's README rendered for the FBNeo package with the MAME selection must FAIL on BOTH MAME-only notes: the four validation lines (#227) and the red bad-ROM box at every start (#234) belong to the MAME package only
 # MUST-FIRE: perturbed-copy: readme-names-absent-launcher — a copy of the release's texts whose mame package no longer ships PLAY.bat while its README still names it must FAIL: that is rule-checker run 2026-10-03-602's finding, the MiSTer README telling its reader to double-click two launchers its package never carried
 #
 # WHY. #145 (maintainer report 2026-09-16, reproduced on ERIS 2026-10-03): double-clicking
@@ -195,6 +196,7 @@ import package_release as pr, package_release_platforms as pp
 m = json.load(open(sys.argv[1])); out = sys.argv[2]; mister_sel = sys.argv[3]; fbneo_sel = sys.argv[4]
 CLAIMS = ("This package already contains one", "The emulator here", "Use the emulator in this package")
 NOTE = "clone of nonexistent driver megaman"     # #227: the MAME build's four validation lines
+BOX = "ROMs/disk images for this system are"     # #234: the red bad-ROM box at every MAME start
 bad = []
 for plat, sel in (("fbneo", fbneo_sel), ("mame", "mame"), ("mister", mister_sel)):
     d = os.path.join(out, plat); os.makedirs(d, exist_ok=True)
@@ -210,17 +212,21 @@ for plat, sel in (("fbneo", fbneo_sel), ("mame", "mame"), ("mister", mister_sel)
         bad.append("the generator's mame README lacks the note on MAME's four validation lines (#227)")
     if plat != "mame" and NOTE in body:
         bad.append(f"the generator's {plat} README carries the MAME-only note on the four validation lines (#227)")
+    if plat == "mame" and BOX not in body:
+        bad.append("the generator's mame README lacks the note on MAME's red bad-ROM box (#234)")
+    if plat != "mame" and BOX in body:
+        bad.append(f"the generator's {plat} README carries the MAME-only note on the red bad-ROM box (#234)")
 for x in bad:
     print("      " + x)
 sys.exit(3 if bad else 0)
 PYEOF
 }
-echo "-- the generator's README claims an emulator only where its package ships one (#214), the MAME note only in mame (#227)"
+echo "-- the generator's README claims an emulator only where its package ships one (#214), the MAME notes only in mame (#227, #234)"
 _sel=mister; [ "$VS_CTL" = emu-text-in-mister ] && _sel=fbneo
 _fsel=fbneo; [ "$VS_CTL" = megaman-note-in-fbneo ] && _fsel=mame
 rc=0; gen_claims "$_sel" "$_fsel" > "$W/gen_claims.txt" 2>&1 || rc=$?
 case "$rc" in
-0) ok "generator: the MiSTer README makes none of the emulator claims; the fbneo and mame READMEs keep all three; only the mame README carries the note on MAME's four validation lines" ;;
+0) ok "generator: the MiSTer README makes none of the emulator claims; the fbneo and mame READMEs keep all three; only the mame README carries the notes on MAME's four validation lines and its red bad-ROM box" ;;
 3) bad "generator README claims:"; cat "$W/gen_claims.txt" ;;
 *) bad "the generator check itself failed (rc=$rc):"; sed 's/^/      /' "$W/gen_claims.txt" ;;
 esac
@@ -244,8 +250,10 @@ rc=0; gen_claims fbneo > "$W/gen_ctl.txt" 2>&1 || rc=$?
 if [ "$rc" = 3 ]; then vs_ctl_fired emu-text-in-mister "$(head -1 "$W/gen_ctl.txt" | sed 's/^ *//')"
 else vs_ctl_dead emu-text-in-mister "the MiSTer README rendered with the emulator selection passed (rc=$rc)"; fail=1; fi
 rc=0; gen_claims mister mame > "$W/gen_ctl2.txt" 2>&1 || rc=$?
-if [ "$rc" = 3 ]; then vs_ctl_fired megaman-note-in-fbneo "$(head -1 "$W/gen_ctl2.txt" | sed 's/^ *//')"
-else vs_ctl_dead megaman-note-in-fbneo "the FBNeo README rendered with the MAME selection passed (rc=$rc)"; fail=1; fi
+# fired only when BOTH MAME-only notes are caught: each check has to be alive on its own (#227, #234)
+if [ "$rc" = 3 ] && grep -q '(#227)' "$W/gen_ctl2.txt" && grep -q '(#234)' "$W/gen_ctl2.txt"; then
+    vs_ctl_fired megaman-note-in-fbneo "$(grep -c 'MAME-only' "$W/gen_ctl2.txt") MAME-only notes caught: $(head -1 "$W/gen_ctl2.txt" | sed 's/^ *//')"
+else vs_ctl_dead megaman-note-in-fbneo "the FBNeo README rendered with the MAME selection was not caught on both notes (rc=$rc): $(tr '\n' ' ' < "$W/gen_ctl2.txt")"; fail=1; fi
 
 # ── ON WINDOWS: both .bat files driven by cmd, dry run (nothing is launched past the checks) ──
 case "$(uname -s)" in
