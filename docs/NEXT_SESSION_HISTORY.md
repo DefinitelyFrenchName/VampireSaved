@@ -87,7 +87,7 @@
 >    made, #214 and #227 close with it.
 > 2. **#129 — RE-CHECK THE WORKER'S REPORT, THEN PUT THE DECISION** (STATE 14z-192 row (10);
 >    `build/agent192/r129/REPORT_handback.md`). It names two vs2 CPU-AI behaviours our build lacks: a Phobos-only guard
->    in the in-move continuation check (vs2 `0x2D374`) and a low-attack crouch-guard stance test (vs2 `0x2CD38`, five
+>    in the in-move continuation check (vs2 `0x2D374`) **[→ vs2 `PRG:0x2CB50`; `0x2D374` is vsavj's twin: corrected in place 14z-194]** and a low-attack crouch-guard stance test (vs2 `0x2CD38`, five
 >    call sites). The orchestrator has NOT re-checked the report, and the close's procedure check found two faults in it: its "runs 1 and
 >    4 match exactly" holds for the stripped W+S/OR hashes only (the full tap hashes differ), and the worker skipped the
 >    CLAUDE.md and skill reads its spec named. Re-check it, then measure each behaviour's legacy
