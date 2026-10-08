@@ -4,12 +4,13 @@
 #
 # WHAT: on pristine vsavj, the mizuumi attack candidates atlas/ram.md records hold as measured:
 #   A1 +0x101 at each NEW button press of a human side reads 2 for a kick and 0 for a punch, on the press frame;
-#   A2 +0x1B8 counts ATTACK STARTS of a human side: every attack start (a write to +0x101 by PRG:0x02757E) comes with
-#      exactly one +0x1B8 write by PRG:0x0274D6, starts that land no hit included — so mizuumi's "whiff counter" is
-#      refuted as a whiff count;
+#   A2 +0x1B8 counts ATTACK STARTS of a human side: every attack start (a write to +0x101 by PRG:0x02757E) is PAIRED
+#      ONE-TO-ONE IN TIME with a +0x1B8 write by PRG:0x0274D6 within 1 frame (every start and every write used once; the
+#      offsets are reported), starts that land no hit included — so mizuumi's "whiff counter" is refuted as a whiff count;
 #   A3 a CPU side never moves +0x1B8 although it attacks and lands hits;
 #   A4 +0x119: PRG:0x028ED0 writes 0xFF only on CHAINED normals — at least three times in 118_chain, each within one frame
-#      of a chained start (+0x101 written by PRG:0x028ED8) — and the per-frame value reads 0xFF there, while on the
+#      of a chained start (+0x101 written by PRG:0x028ED8) — and every rise of the per-frame value to 0xFF lies within one
+#      frame of a chained start (at least three), while on the
 #      isolated presses of 118_input_sweep 0x028ED0 never writes and the value stays 0 (other PCs write 0xFF
 #      transiently, invisible at frame end — measured 14z-195, reported by PC, not asserted);
 #   A5 +0x169 reads 13 or 14 on the frame of each landed hit (+0x1B6 incrementing) and never rises except within one frame
@@ -19,8 +20,10 @@
 #   tests/lua/read_tap.lua (each side's +0x100, +0x118 and +0x1B8 words) for the five; a tap write in tap frame f lands
 #   in trace frame f+1. Human sides are derived from each replay's input script, never assumed.
 # EXPECTS: A1-A5 as stated, each over a nonzero sample. CONTROLS (in-gate, each must make its check fail):
-#   previous-press-key (A1 judged against the previous press's key), hit-vs-start (A2's +0x1B8 writes counted against
-#   LANDED HITS instead of starts), cpu-side (A3 judged on 02's human side), isolated-presses (A4's chained-start rule
+#   previous-press-key (A1 judged against the previous press's key), hit-vs-start (A2's +0x1B8 writes paired with
+#   LANDED HITS instead of starts), writes-shifted (A2's writes moved 20 frames later, beyond the window: a write at
+#   another moment than the start must fail), reads-shifted (A4's 0xFF rises moved 20 frames later, away from the
+#   chained starts), cpu-side (A3 judged on 02's human side), isolated-presses (A4's chained-start rule
 #   judged on the sweep's isolated presses), neighbour-word (A5 judged on +0x168, the next byte: a WRONG WORD read as
 #   +0x169 must fail) and hits-shifted (A5 judged against the landed-hit frames moved 30 frames later: a proximity test
 #   too loose to tell a hit from a non-hit must fail) — rule-checker run 2026-10-08-729 Q4. The log's header names the
@@ -31,6 +34,8 @@
 #
 # MUST-FIRE: perturbed-copy: previous-press-key — A1 judged against each press's PREVIOUS press must fail (in-gate); as a mode A1 uses it and the gate FAILs
 # MUST-FIRE: perturbed-copy: hit-vs-start — A2 counted against landed hits instead of attack starts must fail (in-gate); as a mode A2 uses it and the gate FAILs
+# MUST-FIRE: perturbed-copy: writes-shifted — A2 with every +0x1B8 write moved 20 frames later (beyond the 1-frame pairing window) must fail (in-gate); as a mode A2 uses the moved writes and the gate FAILs
+# MUST-FIRE: perturbed-copy: reads-shifted — A4 with every 0xFF rise of the per-frame value moved 20 frames later must fail (in-gate); as a mode A4 uses the moved rises and the gate FAILs
 # MUST-FIRE: perturbed-copy: cpu-side — A3 judged on replay 02's HUMAN side must fail (in-gate); as a mode A3 judges it and the gate FAILs
 # MUST-FIRE: perturbed-copy: neighbour-word — A5 judged on +0x168 (the neighbouring byte) instead of +0x169 must fail (in-gate); as a mode A5 reads +0x168 and the gate FAILs
 # MUST-FIRE: perturbed-copy: hits-shifted — A5 judged against the landed-hit frames moved 30 frames later must fail (in-gate); as a mode A5 uses the shifted frames and the gate FAILs
@@ -168,7 +173,8 @@ for k in ("03", "37", "sweep"):
             n1 += 1; ok1 += byf[f][f"pk{s}"] == (2 if cls == "K" else 0)
 res(n1 > 0 and ok1 == n1, "A1", f"+0x101 on the press frame is 2 for a kick, 0 for a punch: {ok1}/{n1} presses of the human sides of 03, 37 and the sweep")
 # A2 +0x1B8: one write by 0x0274D6 per attack start (a +0x101 write by 0x02757E), misses included
-n2 = ok2 = miss_starts = 0; per = []
+n2 = ok2 = miss_starts = 0; per = []; offs = collections.Counter()
+W2 = 1   # the pairing window: the tap shows each 0x0274D6 write in the same frame as its start (offsets reported)
 for k in ("03", "37", "sweep", "chain"):
     byf = {d["f"]: d for d in T[k]}
     for s in HUMAN[k]:
@@ -181,12 +187,23 @@ for k in ("03", "37", "sweep", "chain"):
             end = min(starts[i + 1] if i + 1 < len(starts) else st + 60, st + 60)
             landed = any(st <= h <= end for h in hits)
             miss_starts += not landed
-        cmp_n = len(hits) if PERT == "hit-vs-start" else len(starts)
-        n2 += 1; ok2 += sum(w1b8.values()) == cmp_n
-        per.append(f"{k} P{s} starts {len(starts)} writes {sum(w1b8.values())}")
+        # PAIRED IN TIME (rule-checker run 2026-10-08-729/731): each start matched one-to-one with a 0x0274D6 write within
+        # W2 frames, every start and every write used once; the offsets are reported. hit-vs-start pairs the writes with
+        # the LANDED HITS instead; writes-shifted moves every write 20 frames later (beyond the window).
+        wf = sorted(f + (20 if PERT == "writes-shifted" else 0) for f in w1b8.elements())
+        events = hits if PERT == "hit-vs-start" else starts
+        free = list(wf); matched = 0
+        for st in events:
+            cand = [w for w in free if abs(w - st) <= W2]
+            if cand:
+                w = min(cand, key=lambda x: abs(x - st)); free.remove(w); matched += 1; offs[w - st] += 1
+        n2 += 1; ok2 += matched == len(events) == len(wf)
+        per.append(f"{k} P{s} starts {len(starts)} writes {len(wf)} paired {matched}")
 res(n2 > 0 and ok2 == n2 and miss_starts > 0, "A2",
-    f"+0x1B8 written once per attack start on {ok2}/{n2} human sides ({'; '.join(per)}), {miss_starts} of the starts landing no hit — not a whiff count"
-    + (" (mode hit-vs-start: compared with landed hits)" if PERT == "hit-vs-start" else ""))
+    f"each attack start paired one-to-one with a +0x1B8 write within {W2} f on {ok2}/{n2} human sides ({'; '.join(per)}; write-start offsets {dict(sorted(offs.items()))}), "
+    f"{miss_starts} of the starts landing no hit — not a whiff count"
+    + (" (mode hit-vs-start: paired with landed hits)" if PERT == "hit-vs-start" else "")
+    + (" (mode writes-shifted: writes moved 20 f later)" if PERT == "writes-shifted" else ""))
 # A3 a CPU side never moves +0x1B8 (replay 02), while it lands hits
 cpu = [s for s in (1, 2) if s not in HUMAN["02"]]
 if PERT == "cpu-side":
@@ -205,10 +222,14 @@ by28 = [f for f, pc in ff if pc == "028ed0"]
 chained = sorted(f for f, pc, v in wfield(leg4, 1, 0x101) if pc == "028ed8")
 near = sum(1 for f in by28 if any(abs(f - c) <= 1 for c in chained))
 other = collections.Counter(pc for f, pc in ff if pc != "028ed0")
-reads = sum(1 for a, b in zip(T[leg4], T[leg4][1:]) if a["chf1"] != 0xff and b["chf1"] == 0xff)
-res(len(by28) >= 3 and near == len(by28) and reads >= 3, "A4",
+# the per-frame value's rises to 0xFF, each within 1 frame of a chained start (rule-checker run 2026-10-08-731 Q1);
+# reads-shifted moves every rise 20 frames later, away from the starts
+rises4 = [b["f"] + (20 if PERT == "reads-shifted" else 0) for a, b in zip(T[leg4], T[leg4][1:]) if a["chf1"] != 0xff and b["chf1"] == 0xff]
+reads = sum(1 for r in rises4 if any(abs(r - c) <= 1 for c in chained))
+res(len(by28) >= 3 and near == len(by28) and reads >= 3 and reads == len(rises4), "A4",
     f"{leg4}: 0x028ED0 wrote +0x119 = 0xFF {len(by28)} times, {near} within 1 f of a chained start ({len(chained)} by 0x028ED8); "
-    f"the per-frame value rose to 0xFF {reads} times; other 0xFF writers (transient) {dict(other)}")
+    f"the per-frame value rose to 0xFF {len(rises4)} times{' (moved 20 f later)' if PERT == 'reads-shifted' else ''}, {reads} of them within 1 f of a chained start; "
+    f"other 0xFF writers (transient) {dict(other)}")
 swf = [(f, pc) for f, pc, v in wfield("sweep", 1, 0x119) if v == 0xff]
 sw = sorted({d["chf1"] for d in T["sweep"] if inmatch(d)} | {d["chf2"] for d in T["sweep"] if inmatch(d)})
 res(sw == [0] and not [1 for f, pc in swf if pc == "028ed0"], "A4",
@@ -233,7 +254,7 @@ echo "== 2. the checks"
 if [ -n "${VS_CTL:-}" ]; then
     check "$VS_CTL" > "$W/mode.log" 2>&1 && rc=0 || rc=1
     cat "$W/mode.log"
-    case "$VS_CTL" in previous-press-key) tag='A1' ;; hit-vs-start) tag='A2' ;; cpu-side) tag='A3' ;; isolated-presses) tag='A4' ;; neighbour-word|hits-shifted) tag='A5' ;; esac
+    case "$VS_CTL" in previous-press-key) tag='A1' ;; hit-vs-start|writes-shifted) tag='A2' ;; reads-shifted) tag='A4' ;; cpu-side) tag='A3' ;; isolated-presses) tag='A4' ;; neighbour-word|hits-shifted) tag='A5' ;; esac
     if [ "$rc" = 1 ] && grep -q "FAIL  \[$tag\]" "$W/mode.log"; then vs_ctl_fired "$VS_CTL" "the perturbed checks failed $tag (mode)"
     else echo "REFUSED: CONTROL=$VS_CTL — the perturbation did not make the check it targets fail (rc $rc): a dead mode, not a verdict"; exit 3; fi
     echo "FAIL: audit_mizuumi_attack (control mode)"; exit 1
@@ -242,7 +263,7 @@ check none > "$W/checks.log" 2>&1 || fail=1
 cat "$W/checks.log"
 grep -q '\[A5\]' "$W/checks.log" || { echo "  FAIL  the checks did not reach A5 (a crash is not a verdict): $(tail -1 "$W/checks.log")"; exit 1; }
 echo "== 3. the must-fire controls (in-gate)"
-for c in previous-press-key:A1 hit-vs-start:A2 cpu-side:A3 isolated-presses:A4 neighbour-word:A5 hits-shifted:A5; do
+for c in previous-press-key:A1 hit-vs-start:A2 writes-shifted:A2 reads-shifted:A4 cpu-side:A3 isolated-presses:A4 neighbour-word:A5 hits-shifted:A5; do
     name="${c%%:*}"; tag="${c#*:}"
     check "$name" > "$W/ctl_$name.log" 2>&1 && rc=0 || rc=1
     if [ "$rc" = 1 ] && grep -q "FAIL  \[$tag\]" "$W/ctl_$name.log"; then
