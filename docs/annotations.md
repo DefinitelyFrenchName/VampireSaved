@@ -23,15 +23,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3550 |
+| distinct program-space addresses named | 3570 |
 | named by a document or manifest only | 2301 |
 | named by both a document/manifest and code | 840 |
-| named by CODE ONLY (the gap list below) | 409 |
+| named by CODE ONLY (the gap list below) | 429 |
 | carried by atlas | 716 |
 | carried by engine_internals | 816 |
 | carried by other docs | 1056 |
 | carried by manifests | 1850 |
-| carried by code | 1249 |
+| carried by code | 1269 |
 
 ## Addresses
 
@@ -2690,7 +2690,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0FFF50` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) |
 | `PRG:0x0FFF60` | docs/project/patch_notes.md — 14z-189 — THE M22 FREEZE (donovan-m26 / huitzil-m33 / pyron-m27 / merged-m22, mark M22): #194 and #195 LANDED |
 | `PRG:0x0FFFFF` | docs/game/atlas/README.md — The three sets (measured M0; every figure still current); HANDOFF.md — CPS-2 WIDE — the extended hardware profile (2026-08-03, B0-B4 all green); docs/project/cps2_wide.md — B4 prg: PASSED, with the control that made it meaningful; docs/project/gotchas.md — Inside the crypt range the VIEW follows the ACCESS MODE, and the wrong one is plausible garbage (paid again: 14z-142); docs/project/mister_map.md — The minimal, profile-gated proposal — **IMPLEMENTED, slice D4**; tests/test_index_window_thunk.sh; +4 more |
-| `PRG:0x100000` | docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99); docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99) [vh2]; docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99) [vs2]; docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/engine_internals.md — The CPU AI action-script system (14z-111, measured on the #99 capture); docs/platform/gotchas.md — 0x100000 (measured 14z-59k); +37 more |
+| `PRG:0x100000` | docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99); docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99) [vh2]; docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99) [vs2]; docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/engine_internals.md — The CPU AI action-script system (14z-111, measured on the #99 capture); docs/platform/gotchas.md — 0x100000 (measured 14z-59k); +38 more |
 | `PRG:0x100001` | docs/platform/gotchas.md — The CPS-2 encrypted range is INCLUSIVE of its upper word — 0x100001, not; tests/test_crypt_boundary.sh |
 | `PRG:0x100002` | docs/platform/gotchas.md — 0x100000 (measured 14z-59k) |
 | `PRG:0x100E3C` | docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99); docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122); docs/project/patch_notes.md — 14z-111 — #99 ROOT CAUSE FIX (option A): the CPU AI action-script tables unparked, byte detail; tools/build_donovan.sh |
@@ -2836,14 +2836,14 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x2674EA` | build/manifest/shared_writes.toml — huitzil |
 | `PRG:0x2674EE` | build/manifest/shared_writes.toml — pyron |
 | `PRG:0x2674F6` | docs/game/atlas/select_screen.md — The RECORD-POINTER array — what the hovered cell displays (14z-61); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/shared_writes.toml — donovan; tests/test_select_arrays.sh; tools/select_arrays.py |
-| `PRG:0x26752A` | docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven); tests/test_ladder_tenant_vs_palette.sh; tests/test_roulette_tag_rows.sh; tools/audit_roulette_tag_rows.py; tools/overlay_port.py |
+| `PRG:0x26752A` | docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven); tests/audit_ranking_tenant.sh; tests/test_ladder_tenant_vs_palette.sh; tests/test_map_table_readers.sh; tests/test_roulette_tag_rows.sh; tools/audit_roulette_tag_rows.py; +1 more |
 | `PRG:0x267546` | docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven) |
 | `PRG:0x267566` | docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven); tests/test_roulette_tag_rows.sh |
 | `PRG:0x2675AA` | docs/game/atlas/select_screen.md — The RECORD-POINTER array — what the hovered cell displays (14z-61); docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven); build/manifest/donovan.toml — name_banner; build/manifest/huitzil.toml — name_banner; build/manifest/pyron.toml — name_banner; tests/test_roulette_tag_rows.sh; +4 more |
 | `PRG:0x2675EA` | build/manifest/shared_writes.toml — huitzil |
 | `PRG:0x2675EE` | build/manifest/shared_writes.toml — pyron |
 | `PRG:0x2675F6` | docs/game/atlas/select_screen.md — The RECORD-POINTER array — what the hovered cell displays (14z-61); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/shared_writes.toml — donovan; tests/test_select_arrays.sh |
-| `PRG:0x26762A` | docs/game/atlas/select_screen.md — The RECORD-POINTER array — what the hovered cell displays (14z-61); docs/game/atlas/select_screen.md — The tenant move IMPLEMENTED, and vs2's own arrays (14z-62); docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven); build/manifest/donovan.toml — name_banner; build/manifest/huitzil.toml — name_banner; build/manifest/pyron.toml — name_banner; +2 more |
+| `PRG:0x26762A` | docs/game/atlas/select_screen.md — The RECORD-POINTER array — what the hovered cell displays (14z-61); docs/game/atlas/select_screen.md — The tenant move IMPLEMENTED, and vs2's own arrays (14z-62); docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven); build/manifest/donovan.toml — name_banner; build/manifest/huitzil.toml — name_banner; build/manifest/pyron.toml — name_banner; +4 more |
 | `PRG:0x26766A` | build/manifest/shared_writes.toml — huitzil |
 | `PRG:0x26766E` | build/manifest/shared_writes.toml — pyron |
 | `PRG:0x267676` | docs/game/atlas/select_screen.md — The RECORD-POINTER array — what the hovered cell displays (14z-61); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/shared_writes.toml — donovan; tests/test_select_arrays.sh |
@@ -3084,7 +3084,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x3A3B20` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
 | `PRG:0x3A3B40` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
 | `PRG:0x3A3C00` | docs/game/atlas/id_space.md — The arcade-opponent path (a fourth roster work item); docs/game/engine_internals.md — Select wheel (the medallion ring) — canonical: 'atlas/select_screen.md'; docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven) |
-| `PRG:0x3A3CA0` | docs/game/atlas/id_space.md — The arcade-opponent path (a fourth roster work item); docs/game/atlas/id_space.md — What a per-tenant manifest must declare; docs/game/engine_internals.md — Gates from the M2b step that still run; docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven); docs/project/inferred_claims.md — G2/G3 — measurements feeding engine_internals; docs/project/tenant_manifest.md — The schema; +2 more |
+| `PRG:0x3A3CA0` | docs/game/atlas/id_space.md — The arcade-opponent path (a fourth roster work item); docs/game/atlas/id_space.md — What a per-tenant manifest must declare; docs/game/engine_internals.md — Gates from the M2b step that still run; docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven); docs/project/inferred_claims.md — G2/G3 — measurements feeding engine_internals; docs/project/tenant_manifest.md — The schema; +3 more |
 | `PRG:0x3A3CE0` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 |
 | `PRG:0x3A4400` | docs/game/atlas/venue_assets.md — 2. Select / VS-screen palette blocks — FOLDED to 4 bits; tools/audit_palette_block_width.py |
 | `PRG:0x3AB69C` | docs/project/patch_notes.md — where the detail lives [vs2]; build/manifest/huitzil.toml — effect; build/manifest/pyron.toml — obj_bank_word_slot |
@@ -3198,7 +3198,10 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x009910` | tests/test_roulette_tag_rows.sh |
 | `PRG:0x009B2A` | tests/audit_tenant_cpu_soak.sh |
 | `PRG:0x00AEE2` | tests/test_voice_row_range.sh |
+| `PRG:0x00B090` | tests/test_map_table_readers.sh |
 | `PRG:0x00B0A0` | tests/test_roulette_tag_rows.sh |
+| `PRG:0x00B0A2` | tests/test_map_table_readers.sh |
+| `PRG:0x00B0B8` | tests/test_map_table_readers.sh |
 | `PRG:0x00B140` | tools/decode_win_quotes.py |
 | `PRG:0x00B1BA` | tools/decode_win_quotes.py |
 | `PRG:0x00B1EA` | tools/decode_win_quotes.py |
@@ -3385,6 +3388,10 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x05FABC` | tools/overlay_port.py |
 | `PRG:0x05FBD0` | tools/overlay_port.py |
 | `PRG:0x05FC1C` | tests/test_roulette_tag_rows.sh |
+| `PRG:0x05FC30` | tests/test_map_table_readers.sh |
+| `PRG:0x05FC36` | tests/test_map_table_readers.sh |
+| `PRG:0x05FC76` | tests/test_map_table_readers.sh |
+| `PRG:0x05FC90` | tests/test_map_table_readers.sh |
 | `PRG:0x05FDDA` | tools/overlay_port.py |
 | `PRG:0x05FE4C` | tools/overlay_port.py |
 | `PRG:0x05FF5A` | tools/overlay_port.py |
@@ -3430,6 +3437,12 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x06D7E8` | tools/verify_pcrel_data.py |
 | `PRG:0x06D91C` | tools/gen_donovan_patch.py; tools/verify_pcrel_data.py |
 | `PRG:0x06E78A` | tests/test_capture_pose_sources.sh |
+| `PRG:0x07D180` | tests/test_map_table_readers.sh |
+| `PRG:0x07D182` | tests/test_map_table_readers.sh |
+| `PRG:0x07D18E` | tests/test_map_table_readers.sh |
+| `PRG:0x07D18F` | tests/test_map_table_readers.sh |
+| `PRG:0x07D190` | tests/test_map_table_readers.sh |
+| `PRG:0x07D196` | tests/test_map_table_readers.sh |
 | `PRG:0x07F000` | tests/test_rpl2siminputs.sh |
 | `PRG:0x080B40` | tests/audit_effect_class_rows.sh |
 | `PRG:0x0837D4` | tools/overlay_port.py |
@@ -3449,9 +3462,15 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x08B156` | tools/build_donovan.sh |
 | `PRG:0x08B382` | tests/test_m2a_stage4_code.sh |
 | `PRG:0x08C0AA` | tools/build_donovan.sh |
+| `PRG:0x08C5C0` | tests/test_map_table_readers.sh |
+| `PRG:0x08C5D6` | tests/audit_ranking_tenant.sh |
+| `PRG:0x08C5E0` | tests/test_map_table_readers.sh |
 | `PRG:0x08C5E2` | tools/overlay_port.py |
+| `PRG:0x08C5F6` | tests/test_map_table_readers.sh |
 | `PRG:0x08C5F8` | tools/overlay_port.py |
+| `PRG:0x08C612` | tests/audit_ranking_tenant.sh |
 | `PRG:0x08C678` | tools/overlay_port.py |
+| `PRG:0x08C740` | tests/test_map_table_readers.sh |
 | `PRG:0x0905AE` | tools/build_donovan.sh |
 | `PRG:0x0926F4` | tools/build_donovan.sh |
 | `PRG:0x092750` | tools/build_donovan.sh |
@@ -3508,6 +3527,7 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x0F4000` | tests/audit_don_ko_writer.sh |
 | `PRG:0x0FC6AC` | tests/test_pyron_blink.sh |
 | `PRG:0x0FD180` | tests/test_index_window_thunk.sh |
+| `PRG:0x0FFF00` | tests/test_map_table_readers.sh |
 | `PRG:0x102436` | tests/test_biased_list_inventory.sh |
 | `PRG:0x1201D0` | tests/audit_demitri_split.sh |
 | `PRG:0x123456` | tests/test_effect_placeholders.sh; tests/test_manifest_merge.sh; tests/test_rule5_census.sh; tests/test_type_stamp_census.sh; tools/audit_rule5.py; tools/checkskills.py |

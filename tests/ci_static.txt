@@ -230,3 +230,7 @@ test_freeze_bytediff
 # bit 5 nostat, bit 7 nokill — read from both games' opcode words and held on Zabel's pursuit (0 red / 2 white);
 # two controls. ~3 s.
 test_power_decode
+# 14z-195 (#124): every absolute reference to the map's name/portrait/pool tables is one of six frozen sites
+# (the map, the attract SCORE RANKING, two pool copies), the fixed pool copy moves rows 0x00-0x0F only, and
+# the readers are unpatched on the merged build; two controls. ~2 s.
+test_map_table_readers

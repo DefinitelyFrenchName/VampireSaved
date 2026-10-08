@@ -84,6 +84,7 @@ declares	audit_pyron_capture_block
 declares	audit_pyron_ring
 declares	audit_qs_voice_batch
 declares	audit_qs_voice_wav
+declares	audit_ranking_tenant
 declares	audit_reaction_class_live
 declares	audit_region_movability
 declares	audit_release_linux_desktop

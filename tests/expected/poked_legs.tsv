@@ -203,6 +203,7 @@ tests/audit_pyron_capture_block.sh	native	replays/judge/02_throw.rpl	P2	R R	03 V
 tests/audit_pyron_capture_block.sh	ours	replays/judge/02_throw.rpl	P1	-	01 Demitri	$a	PARAM	no id is CROSS-FLAVOR here
 tests/audit_pyron_capture_block.sh	ours	replays/judge/02_throw.rpl	P2	R R	03 Victor	$VICTIM	PARAM	no id is CROSS-FLAVOR here
 tests/audit_pyron_ring.sh	ours	(replay not named in the script)	P1	-	-	11	?	
+tests/audit_ranking_tenant.sh	ours	replays/26_don_arcade_mash.rpl	P1	U U R	0f Jedah	13	CROSS-INERT	
 tests/audit_region_movability.sh	ours	replays/12_donovan_vs_cpu.rpl	P1	U U R	0f Jedah	$tid	PARAM	no id is CROSS-FLAVOR here
 tests/audit_region_movability.sh	ours	replays/12_donovan_vs_cpu.rpl	P1	U U R	0f Jedah	13	CROSS-INERT	
 tests/audit_stage_sweep.sh	ours	replays/judge/02_throw.rpl	P1	-	01 Demitri	$id	PARAM	no id is CROSS-FLAVOR here

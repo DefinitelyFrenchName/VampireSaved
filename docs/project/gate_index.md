@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**441 scripts** — 121 ci_portable, 91 ci_static, 229 emulator-tier (run by name).
+**443 scripts** — 121 ci_portable, 92 ci_static, 230 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -27,7 +27,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 77 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 79 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -441,6 +441,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/audit_phobos_dmg_residual.sh` | audit | emulator | MAME, FBNeo, a build dir, ~4 min | PHOBOS TAKES ONE MORE HP THAN NATIVE FROM DEMITRI'S 5HP, WITH HIS DEFENSE ROW ALREADY VS2'S, frozen AS MEASURED (14z-170): | 14z-170 |
 | `tests/audit_pursuit_flag.sh` | audit | emulator | MAME, FBNeo, a build dir, ~3 min | THE CLASS-0x51 PURSUIT FLAG: after Cosmo Disruption and Ifrit Sword (ES), the tenant's pursuit starts and connects as on native vs2 (GitHub #195, 14z-188). | 14z-188 |
 | `tests/audit_pyron_capture_block.sh` | audit | emulator | MAME, a build dir, ~4 min | PYRON THROWS WITH DEMITRI'S CAPTURE GEOMETRY (measured 14z-131, maintainer-ruled "measure against native vs2 first"). | 14z-131 |
+| `tests/audit_ranking_tenant.sh` | audit | emulator | MAME, a build dir, ~15 min | A TENANT PLAYER'S SCORE REACHES THE ATTRACT SCORE RANKING (14z-195, GitHub #124). Emulator tier, MAME lane: two -debug legs of the 40,620-frame 1P marathon in parallel, ~15 min. | 14z-195 |
 | `tests/audit_reaction_class_live.sh` | audit | emulator | MAME, a build dir | EVERY WRITE AND READ OF THE VICTIM'S REACTION CLASS (+0x54) OVER THE CORPUS, on pristine vsavj (the whole legacy suite), on our merged build and on native vs2 (the #136 naming parts), frozen (14z-169, the analysis before the class-0x52 fix… | 14z-169 |
 | `tests/audit_rig_opening.sh` | audit | emulator | MAME, a build dir, ~5 s | THE NAMING RIGS' OPENING: the two legs draw DIFFERENT round-start entrances, and the rig no longer samples across the difference (14z-167, rewritten 14z-172 for GitHub #168). | 14z-167 |
 | `tests/audit_rng_draws.sh` | audit | emulator | MAME, FBNeo, a build dir, ~1 min | THE ENGINE RNG'S DRAWS, BY CALLER: ours against native vs2 for the three tenants, and legacy content on ours against pristine vsavj (GitHub #176, 14z-185). | 14z-185 |
@@ -462,6 +463,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/test_hitbox_encoding.sh` | test | emulator | MAME, a build dir, ~4 min | THE HITBOX ENCODING AND THE ATTACK RECORD ARE WHAT THE ENGINE USES (character-data map, PHASE 2; measured 14z-120 (5)). | 14z-120 (5) |
 | `tests/test_killshread_es.sh` | test | emulator | MAME, ~2 min | KILLSHREAD (ES): the maintainer's ruling (14z-121) that the ES stance change's effect plays out DURING THE SUMMON — the returning Killshread attacks going away AND coming back, where the plain summon attacks one way — MEASURED on native vs2… | 14z-121 |
 | `tests/test_latch_readers.sh` | test | ci_static | ROMDIR | WHO CAN READ THE SELECT-CONFIRM LATCH: the static census of every instruction naming a fighter block's +0x3BC/+0x3BD/+0x3C2/+0x3E0/+0x3E3 on vsav2, vsavj and the ported image, frozen (GitHub #151 step 3, 14z-161). | 14z-161 |
+| `tests/test_map_table_readers.sh` | test | ci_static | ROMDIR | WHO READS THE MAP'S NAME, PORTRAIT AND POOL TABLES (14z-195, GitHub #124). ci_static: needs the vsavj decrypted views (the build/out cache, else ROMDIR) and, for section 3, the merged build's verify_op.bin; no emulator, ~2 s. | 14z-195 |
 | `tests/test_meter_gain.sh` | test | emulator | MAME, ~4 min | THE GAUGE COLUMN ARBITRATED: what a vanilla normal pays its attacker in METER, read off the engine on a CONNECT (14z-146). | 14z-146 |
 | `tests/test_move_naming.sh` | test | emulator | MAME, a build dir, ~1 min | THE MOVE LIST'S CHAIN IDS ARE WHAT NATIVE VS2 ENTERS (character-data map, phase 1 naming step; 14z-120). | 14z-120 |
 | `tests/test_poked_legs.sh` | test | ci_static | ROMDIR | THE CENSUS OF EVERY FORCED-PICK LEG in tests/ and tools/, classified by what the poke leaves latched, frozen shrink-only; a new CROSS-FLAVOR pairing fails until it is measured and accepted (GitHub #151 step 3, 14z-161). | 14z-161 |

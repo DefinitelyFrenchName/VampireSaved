@@ -13,7 +13,7 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**441 of 441 gates described.**
+**443 of 443 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
@@ -24,7 +24,7 @@ first sentence) is `gate_index.md`.
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 87 | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 77 | 77 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 79 | 79 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -2562,7 +2562,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 ## character-data
 
-the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 77 of 77 described.
+the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 79 of 79 described.
 
 ### `audit_air_dash_height.sh` — audit, emulator
 
@@ -2900,6 +2900,14 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **EXPECTS:** ours matches native through the hold with the control identical; a red is the alias back. The gate locks the observed difference; the one-mechanism reading (position and pose from one keyframe stream) is in the header.
 
+### `audit_ranking_tenant.sh` — audit, emulator
+
+**WHAT:** the SCORE RANKING (the attract screen after a 1P run) draws each entry's name tag and small portrait from the same name array PRG:0x26752A and portrait array PRG:0x26762A the arcade map reads, indexed by the entry's character id (the reader at PRG:0x08C5D6-0x08C612, unpatched on the merged build — tests/test_map_table_readers.sh). With P1 forced to Donovan (0x13) the player's run enters the ranking's 1st entry with id 0x13, so #124's tenant rows are read there too: on merged-m23 it draws "VICTOR" and a blank portrait where native Vampire Savior 2 draws "DONOVAN" (14z-195, capture sheet on #124). This gate holds the REACH — the id the ranking is handed — not the look, which #124's fix will gate.
+
+**HOW:** tests/replays/26_don_arcade_mash.rpl on the merged build under tools/run_replay_guarded.sh with a logging breakpoint at the ranking's portrait read (GUARD_PROBE=08c5e0: D0 = the entry's id) and a dump of P1's id at frame 2000; leg `don13` pokes RAM:$FF8782 = 0x13 at 1400/1450/1500 (the forced pick, through select only — the ranking id is the committed character), leg `none` does not. Each leg in its own directory and sandbox.
+
+**EXPECTS:** leg don13 — P1's id 0x13 at frame 2000 and the ranking's first probe id 0x13; leg none — the ranking's first probe id 0x0F (Jedah, the replay's real pick on the merged wheel): the entry follows the player. Every leg ends END 40620 with at least 25 ranking probes.
+
 ### `audit_reaction_class_live.sh` — audit, emulator
 
 **WHAT:** every write and read of the victim's reaction class (+0x54) over the corpus — pristine vsavj's whole legacy suite, our merged build's and native vs2's #136 parts — attributed by PC with the values, frozen: the live half of the reaction-class analysis, seeing what a static scan cannot (a class written from a register, code outside the scanned range), and naming the consumers of +0x54.
@@ -3067,6 +3075,14 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 **HOW:** tools/audit_latch_readers.py over the decrypted opcode views and build/m3b_merged31/verify_op.bin, anchored on the extension word so a data table is not an instruction, its --selftest on both reference views first (an immediate store among its positive controls since #197); controls: a shadow copy of the tool blind to the (d16,An) form, a copy with the pre-#197 nearest-decodable scan, and the frozen inventory minus one vs2 reader row; a PLANTED 44-byte opcode image carries one site of each form (abs.l immediate, abs.l register, (d16,An) immediate), since no abs.l site exists in any real image.
 
 **EXPECTS:** the frozen inventory equal (vs2's confirm writers and clears, the tenants' in-play flavour readers and their relocated copies, the Shadow-flag readers); the blind tool fails its selftest, the planted image gives exactly its three write rows, the pre-#197 copy misses the immediate store vs2 PRG:0x00712A and both planted immediates, the dropped row fails the compare.
+
+### `test_map_table_readers.sh` — test, ci_static
+
+**WHAT:** #124's fix replaces the tenant rows of the name array PRG:0x26752A and the portrait array PRG:0x26762A and authors pool rows 0x10/0x11/0x13 (PRG:0x3A3CA0 + `id*32).` Its two owed checks are held here: every absolute reference to the three tables in the vsavj program is one of six frozen sites — the map (0x05FC36 / 0x05FC76), the attract SCORE RANKING (0x08C5F6 / 0x08C5E0), the map's per-opponent pool copy (0x00B0A2) and a fixed pool copy (0x07D182) — and that fixed copy moves rows 0x00-0x0F only (`moveq #$f,d7`), so pool rows 0x10/0x11/0x13 have one reader, the map's per-id copy. No data longword points at any of the three tables.
+
+**HOW:** section 1 scans the vsavj opcode view for every even-aligned 32-bit occurrence of the three base addresses (an abs.l or immediate operand carries the value itself) and the data view for the same values as longwords; section 2 reads the fixed copy's count word; section 3 compares the six readers' code bytes between pristine vsavj and the merged build (they must be unpatched, or a measurement on one says nothing about the other).
+
+**EXPECTS:** exactly the six operand sites, zero data longwords, the count 0x0F, byte-identical readers. NOT covered: a PC-RELATIVE reference (its displacement does not carry the address; a capstone census found none at 14z-195) or an address formed by arithmetic — what the engine READS at run time is tests/audit_ranking_tenant.sh's question for the ranking.
 
 ### `test_meter_gain.sh` — test, emulator
 

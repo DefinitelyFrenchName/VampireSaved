@@ -54,6 +54,7 @@ declares	audit_phobos_dmg_residual
 declares	audit_pursuit_flag
 declares	audit_pyron_ring
 declares	audit_qs_voice_wav
+declares	audit_ranking_tenant
 declares	audit_reaction_class_live
 declares	audit_release_linux_desktop
 declares	audit_rig_opening
@@ -143,6 +144,7 @@ declares	test_latch_readers
 declares	test_mame_bin_pinned
 declares	test_mame_default_bin
 declares	test_mame_parity
+declares	test_map_table_readers
 declares	test_md_subset
 declares	test_measures_contract
 declares	test_meter_gain

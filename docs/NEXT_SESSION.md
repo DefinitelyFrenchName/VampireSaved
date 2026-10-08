@@ -27,8 +27,8 @@ PILOT for the release, please put them to use"*).
    80 cycles static estimate). Gameplay feel is the maintainer's ([VSP-10]); captures first, then the options
    through the rule-checker.
 3. **THE NEXT VERSION** carries #124's map fix, name and portrait (approved, documented on #124: name records, relocated
-   portrait tiles, vs2's pool rows — its two owed checks first: whether the select screen reads the tenant
-   records' `+0x0A`/`+0x0E`, and a reader census of pool rows 0x10/0x11/0x13) and the release-tooling fixes
+   portrait tiles, vs2's pool rows — its two owed checks ANSWERED 14z-195 (the select screen reads neither array; pool rows 0x10/0x11/0x13 have one reader, the map's): the fix's gates must also cover the attract SCORE RANKING, which reads the same arrays and which a tenant player enters (`tests/audit_ranking_tenant.sh`; its palette and the byte table `0x8C724` at the tenant ids unmeasured — STATE 14z-195 row (5))
+   and the release-tooling fixes
    already merged (#236, #238-#240, `5a5205c5`). A freeze, then a release.
 4. **Open, scoped:** #118 (63 of 75 measured and homed in `atlas/ram.md`; 12 left, each naming the state it
    needs; the six scratch-script promotions proposed in the #118 worktree's `HOMING.md`), #229 (pursuits done for

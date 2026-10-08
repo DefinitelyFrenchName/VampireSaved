@@ -87,6 +87,7 @@ declares	audit_pyron_capture_block
 declares	audit_pyron_ring
 declares	audit_qs_voice_batch
 declares	audit_qs_voice_wav
+declares	audit_ranking_tenant
 declares	audit_reaction_class_live
 declares	audit_region_movability
 declares	audit_release_linux_desktop
@@ -305,6 +306,7 @@ declares	test_mame_mirror_guard
 declares	test_mame_parity
 declares	test_mame_wide
 declares	test_manifest_merge
+declares	test_map_table_readers
 declares	test_mask_ranges_reader
 declares	test_masked_compare
 declares	test_md_subset
