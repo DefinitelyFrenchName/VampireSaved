@@ -278,6 +278,11 @@ legacy behavior is a failed change.
   went wrong live in a live document — a subject doc, a gotchas bucket or a
   skill — never only in an archive. Only the conversation, and a third
   party's report text, may exist on GitHub alone.
+  **DONE, AWAITING RELEASE (maintainer-ruled 2026-10-08, 14z-195):** when a
+  ticket's implementation is complete but it stays open until a release
+  ships it, its issue gets a comment saying so — the commit, the gate that
+  holds it, and that it closes with the release that carries it — so an
+  open ticket with work remaining is never confused with one waiting to ship.
   **CLOSING A TICKET**, in one commit: its facts go where they belong; the
   issue and the tree are checked against each other, the side that is behind
   is updated, a closing comment states the resolution, and the issue is

@@ -435,6 +435,14 @@ So: #118 scoped and measured in scratch on ERIS and PILOT, nothing adopted as a 
 
 ---
 
+## Ruled 2026-10-08 (14z-195) — a done-but-unreleased ticket gets a comment saying so
+
+**After the session commented on #236, #238, #239 and #240 at the maintainer's request** (*"First, can you comment on the tickets where the fixes are done but not yet shipped that they are so I know they are open but the implementation is done?"*), **the maintainer:** *"This can wait but can you add to the ways of working the bit about adding a comment when the issue is basically done but not closed because not released."*
+
+So: CLAUDE.md [VSP-182] gains the rule ("DONE, AWAITING RELEASE"): when a ticket's implementation is complete but the issue stays open until a release ships it, its GitHub issue gets a comment in the commit's sitting saying so — the commit, the gate that holds it, and that it closes with the release that carries it. The `vampire-saved-port` skill's [VSP-182] line carries it too.
+
+---
+
 ## Ruled 2026-10-07 (14z-193) — #230 closed `done` on the standard throw; #235 filed for the kick and air throws
 
 **The question (AskUserQuestion, after rule-checker run 2026-10-06-712 OK):** *"#230 now gates Pyron's and Donovan's standard 6+HP throw on all 18 victims, ours vs native, at the matched level (re-frozen under rule-checker run 712, OK; you read the sheets as identical). Their kick and air throws aren't covered. How should #230 end?"* — options "Close; new ticket", "Extend #230 now", "Close; standard is enough".
