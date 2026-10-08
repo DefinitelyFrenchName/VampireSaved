@@ -85,6 +85,10 @@ def group_bounds(lines):
 def add(root, state, finding, homes, tests, ticket, none, create=False, dry=False):
     if not finding.strip() or re.search(r"\([a-z]\) |\||\n", finding):
         raise Refused("the finding text is empty, or holds `|`, a newline or a `(x) ` letter form that would split the row")
+    if " / " in finding and PERTURB != "form-unchecked":
+        # the row's own home/test separator: tools/homes_tracked.py then reads the finding as having no home
+        # (14z-195: "0 red / 2 white" in a finding read FAIL letter-without-home and turned test_close_tools red)
+        raise Refused("the finding text holds ' / ', the table's home/test separator: reword it")
     if not homes:
         raise Refused("a finding needs at least one --home")
     if sum(bool(x) for x in (tests, ticket, none is not None)) != 1:
@@ -180,7 +184,8 @@ def selftest():
                         (dict(finding="x", homes=["a.md"], tests=None, ticket=6, none=None), "not open"),
                         (dict(finding="has (q) inside", homes=["a.md"], tests=["tests/t.sh"], ticket=None, none=None), "letter form"),
                         (dict(finding="x", homes=["a.md"], tests=["tests/t.sh"], ticket=7, none=None), "exactly one"),
-                        (dict(finding="x", homes=["a.md Ruled — y"], tests=["tests/t.sh"], ticket=None, none=None), "separator")):
+                        (dict(finding="x", homes=["a.md Ruled — y"], tests=["tests/t.sh"], ticket=None, none=None), "separator"),
+                        (dict(finding="0 red / 2 white", homes=["a.md"], tests=["tests/t.sh"], ticket=None, none=None), "home/test separator")):
             r, why = tryit(**k)
             say(r is None and want in why, f"refused: {want}")
         before = open(os.path.join(d, "STATE.md")).read()

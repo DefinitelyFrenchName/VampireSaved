@@ -6723,3 +6723,15 @@ and a gate's run only its own, so the audit now judges the registry per row: sta
 changed. The whole file stays the input where a gate's code reads it, or where the run recorded it dirty. Rule: an
 input every gate shares is judged at the grain each gate actually reads. A file-level dependency on a shared table is
 a dependency on every row of it. The same breadth survives in 79 gates' `tests/replays/` declarations (#243).
+
+## A RECORD BYTE CALLED "POWER" WAS READ AS A DAMAGE AMOUNT, AND THE MISMATCH WAS PATCHED WHERE IT SHOWED (paid: 14z-194, #229; fixed 14z-195, #241)
+
+The cross-check's derivation (`tools/vanilla_frames.py`) reported an attack record's +8 and +9 bytes as damage, so
+Zabel's pursuit read 258 red and 130 white for a hit the game scores 0 and 2. The decode had been documented since
+14z-85e (`docs/game/engine_internals.md` "The DAMAGE pipeline": the scaler takes `power & 0x1F`; [VSE-41]: bit 7 is
+the no-kill clamp). It held for most moves only because their flag bits are clear. When #229's measurement disagreed,
+the page gained a hand rule ("Zabel's compared on the HP the game takes") instead of the decode. The same page also
+called the +9 "the dealt white damage, unscaled", contradicting the comparator's own comment two screens up. Rule: a
+field's NAME is not its encoding. Before deriving a quantity from a record byte, read the engine instruction that
+consumes it. A special case added at the point of use is a sign the reader is wrong, and its other consumers share
+the error (#244: the tenant pages).

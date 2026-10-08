@@ -32,8 +32,7 @@ PILOT for the release, please put them to use"*).
    already merged (#236, #238-#240, `5a5205c5`). A freeze, then a release.
 4. **Open, scoped:** #118 (63 of 75 measured and homed in `atlas/ram.md`; 12 left, each naming the state it
    needs; the six scratch-script promotions proposed in the #118 worktree's `HOMING.md`), #229 (pursuits done for
-   all 15; next families in `families.tsv` order: ground throws, then the rest), #241 (the derivation's bit-7
-   flag on Zabel's pursuit records), #226 (a clean host remains; step 2 complete by the maintainer's own test),
+   all 15; next families in `families.tsv` order: ground throws, then the rest), #226 (a clean host remains; step 2 complete by the maintainer's own test),
    #228 (breakpoint instruments on the frame_done clock — deferred by the maintainer: *"well do these long
    tickets later"*).
 
