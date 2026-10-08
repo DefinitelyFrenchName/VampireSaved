@@ -3,7 +3,10 @@
 # of 14z-194, GitHub #118; HOMING item 3, in part — see NOT COVERED)
 #
 # WHAT: on pristine vsavj, the mizuumi attack candidates atlas/ram.md records hold as measured:
-#   A1 +0x101 at each NEW button press of a human side reads 2 for a kick and 0 for a punch, on the press frame;
+#   A1 +0x101 at each NEW button press of a human side reads 2 for a kick and 0 for a punch, on the press frame — on the
+#      presses that start a FRESH normal: every human side of 03, 37, 118_input_sweep and 02, tallied per leg. NOT on
+#      118_chain's CHAINED presses: there the press frame still holds the previous attack's value (measured 14z-195:
+#      12/20, misses kick-read-0 5 and punch-read-2 3) — reported per press, not asserted;
 #   A2 +0x1B8 counts ATTACK STARTS of a human side: every FRESH attack start (a write to +0x101 by PRG:0x02757E) is
 #      PAIRED ONE-TO-ONE IN TIME with a +0x1B8 write by PRG:0x0274D6 within 1 frame (every start and every write used
 #      once; the offsets are reported; every write by 0x0274D6 or 0x028F18 RAISES the word by exactly 1 over its previous
@@ -19,7 +22,8 @@
 #      isolated presses of 118_input_sweep, on EACH side, 0x028ED0 never writes and the value stays 0 (other PCs write 0xFF
 #      transiently, invisible at frame end — measured 14z-195, reported by PC, not asserted);
 #   A5 +0x169 reads 13 or 14 on the frame of each landed hit (+0x1B6 incrementing) and never rises except within one frame
-#      of one, on the 2P legs.
+#      of one, on the 2P legs — 03, 37, 118_chain and 118_input_sweep (per-leg hits and rises reported; the sweep's isolated
+#      presses land no hit and +0x169 never rises there).
 # HOW: on MAME (the reference binary), FIELD legs under tests/lua/field_trace.lua for 03_two_player_vs, 37_victor_ko_vsavj,
 #   118_input_sweep, 118_chain and 02_demitri_vs_cpu (1P: a CPU side that fights), and WRITE-TAP legs under
 #   tests/lua/read_tap.lua (each side's +0x100, +0x118 and +0x1B8 words) for the five; a tap write in tap frame f lands
@@ -170,8 +174,10 @@ T = {k: load(f"{W}/{k}.fields") for k in LEGS}
 S = {k: staged(f"{REPO}/{v}") for k, v in LEGS.items()}
 HUMAN = {k: sorted({s for fr in S[k].values() for s in (1, 2) if fr[s]}) for k in LEGS}
 # A1 +0x101 at each new press of a human side, on the press frame: 2 kick, 0 punch
-n1 = ok1 = 0
-for k in ("03", "37", "sweep"):
+n1 = ok1 = 0; per1 = {}
+# the legs whose presses each start a FRESH normal; 118_chain's chained presses do NOT follow the rule on their press frame
+# (measured 14z-195: 12/20) — reported below, not asserted (rule-checker run 2026-10-08-735)
+for k in ("03", "37", "sweep", "02", "chain"):
     byf = {d["f"]: d for d in T[k]}
     for s in HUMAN[k]:
         presses = []
@@ -187,8 +193,20 @@ for k in ("03", "37", "sweep"):
                 if not i:
                     continue
                 cls = presses[i - 1][1]
-            n1 += 1; ok1 += byf[f][f"pk{s}"] == (2 if cls == "K" else 0)
-res(n1 > 0 and ok1 == n1, "A1", f"+0x101 on the press frame is 2 for a kick, 0 for a punch: {ok1}/{n1} presses of the human sides of 03, 37 and the sweep")
+            good = byf[f][f"pk{s}"] == (2 if cls == "K" else 0)
+            if k != "chain":
+                n1 += 1; ok1 += good
+            t = per1.setdefault(f"{k} P{s}", [0, 0, collections.Counter(), 0]); t[0] += good; t[1] += 1
+            if not good:
+                t[2][f"{cls}:{byf[f][f'pk{s}']}"] += 1
+                if i and byf[f][f"pk{s}"] == (2 if presses[i - 1][1] == "K" else 0):
+                    t[3] += 1   # the miss reads the PREVIOUS press's class
+res(n1 > 0 and ok1 == n1, "A1", f"+0x101 on the press frame is 2 for a kick, 0 for a punch: {ok1}/{n1} presses of the human sides of 03, 37, the sweep and 02 — "
+    + "; ".join(f"{k} {a}/{b}" + (f" misses {dict(c)}" if c else "") for k, (a, b, c, _) in per1.items() if not k.startswith("chain")))
+for k, (a, b, c, prevm) in per1.items():
+    if k.startswith("chain"):
+        print(f"  info  [A1] 118_chain {k[6:]} (not asserted): {a}/{b} presses read their own class on the press frame; misses {dict(c)}, "
+              f"{prevm} of them reading the PREVIOUS press's class (a chained press: +0x101 is written at the chained start, PRG:0x028ED8)")
 # A2 +0x1B8: one write by 0x0274D6 per attack start (a +0x101 write by 0x02757E), misses included
 n2 = ok2 = miss_starts = 0; per = []; offs = collections.Counter()
 chain_bad = ok2c = 0; chained_by = {}; per2c = []; inc_n = inc_ok = 0
@@ -288,15 +306,18 @@ for s in (1, 2):   # the sweep's isolated presses, EACH side (both sides press i
 at = collections.Counter(); rises = nearhit = nhits = 0
 fld5 = "exw" if PERT == "neighbour-word" else "cht"
 sh5 = 30 if PERT == "hits-shifted" else 0
-for k in ("03", "37", "chain"):
+per5 = {}
+for k in ("03", "37", "chain", "sweep"):   # every 2P leg (rule-checker run 2026-10-08-735)
     byf = {d["f"]: d for d in T[k]}
     for s in (1, 2):
         hitf = [b["f"] + sh5 for a, b in zip(T[k], T[k][1:]) if b[f"hits{s}"] > a[f"hits{s}"]]
         hitf = [f for f in hitf if f in byf]
         rf = [b["f"] for a, b in zip(T[k], T[k][1:]) if b[f"{fld5}{s}"] > a[f"{fld5}{s}"]]
         nhits += len(hitf); at.update(byf[f][f"{fld5}{s}"] for f in hitf)
-        rises += len(rf); nearhit += sum(1 for r in rf if any(abs(r - h) <= 1 for h in hitf))
-res(nhits > 0 and set(at) <= {13, 14} and nearhit == rises, "A5", f"{'+0x168 (mode neighbour-word)' if fld5 == 'exw' else '+0x169'} at {nhits} landed hits{' (moved 30 f later)' if sh5 else ''} {dict(at)}; {nearhit}/{rises} rises within 1 f of a hit (03, 37, chain)")
+        nh = sum(1 for r in rf if any(abs(r - h) <= 1 for h in hitf))
+        rises += len(rf); nearhit += nh
+        t = per5.setdefault(k, [0, 0, 0]); t[0] += len(hitf); t[1] += len(rf); t[2] += nh
+res(nhits > 0 and set(at) <= {13, 14} and nearhit == rises, "A5", f"{'+0x168 (mode neighbour-word)' if fld5 == 'exw' else '+0x169'} at {nhits} landed hits{' (moved 30 f later)' if sh5 else ''} {dict(at)}; {nearhit}/{rises} rises within 1 f of a hit per leg (hits, rises, rises near a hit): {per5}")
 sys.exit(1 if bad else 0)
 PY
 }
@@ -304,6 +325,7 @@ echo "== 2. the checks"
 if [ -n "${VS_CTL:-}" ]; then
     check "$VS_CTL" > "$W/mode.log" 2>&1 && rc=0 || rc=1
     cat "$W/mode.log"
+    tag=""
     case "$VS_CTL" in previous-press-key) tag='A1' ;; hit-vs-start|writes-shifted|chained-counted) tag='A2' ;; chained-writes-shifted) tag='A2c' ;; reads-shifted) tag='A4' ;; cpu-side) tag='A3' ;; isolated-presses) tag='A4' ;; neighbour-word|hits-shifted) tag='A5' ;; esac
     if [ "$rc" = 1 ] && grep -q "FAIL  \[$tag\]" "$W/mode.log"; then vs_ctl_fired "$VS_CTL" "the perturbed checks failed $tag (mode)"
     else echo "REFUSED: CONTROL=$VS_CTL — the perturbation did not make the check it targets fail (rc $rc): a dead mode, not a verdict"; exit 3; fi

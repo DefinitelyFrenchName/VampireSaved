@@ -172,6 +172,7 @@ echo "== 2. the checks"
 if [ -n "${VS_CTL:-}" ]; then
     check "$VS_CTL" > "$W/mode.log" 2>&1 && rc=0 || rc=1
     grep -v '^CTL ' "$W/mode.log"
+    tag=""
     case "$VS_CTL" in other-level) tag='E1' ;; unpinned-equals-6) tag='E3' ;; esac
     if [ "$rc" = 1 ] && grep -q "FAIL  \[$tag " "$W/mode.log"; then vs_ctl_fired "$VS_CTL" "the perturbed checks failed $tag (mode)"
     else echo "REFUSED: CONTROL=$VS_CTL — the perturbation did not make the check it targets fail (rc $rc): a dead mode, not a verdict"; exit 3; fi
