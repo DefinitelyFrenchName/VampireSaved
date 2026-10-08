@@ -19,13 +19,16 @@
 #   the turbo and extra-pass flags, HP and X) and a WRITE-TAP leg (tests/lua/read_tap.lua: the pass-counter word,
 #   written by PRG:0x008E10 once per pass, and the $FF8118 word, whose SET marks an extra pass in the same activation). PAT is read from the vsavj OPCODE view at run time (the table is read
 #   PC-relative at PRG:0x008E6C) — never stored in the tree.
-# EXPECTS: E1 exact on every judged frame of all ten legs, with frames judged on each; E2 and E3 as stated. The log's
+# EXPECTS: the header names the ROM — every reference member verified against docs/checksums.txt, the vsavj program
+#   fingerprint equal to the registry's vsavj row, each loaded zip's sha1 — or the gate FAILs before any leg.
+#    E1 exact on every judged frame of all ten legs, with frames judged on each; E2 and E3 as stated. The log's
 #   header names the commit and the host. CONTROL
 #   other-level: each leg's frames predicted with every OTHER level's pattern must lose frames for the best of them;
 #   CONTROL unpinned-equals-6: the same distribution comparison against the level-8 leg must differ.
 # FOLLOWS: emu/mame-patches/ tests/lib/controls.sh tests/lib/decrypt_cache.sh tests/lua/field_trace.lua
 #   tests/lua/pokes_spec.lua tests/lua/read_tap.lua tests/replays/03_two_player_vs.rpl
 #   tests/replays/37_victor_ko_vsavj.rpl tools/cps2_decrypt.py tools/run_mame.sh tools/setup_mame.sh
+#   tools/audit_roms.py docs/checksums.txt tools/build_fingerprint.py tests/expected/registry.tsv
 #
 # MUST-FIRE: perturbed-copy: other-level — every leg predicted with the best OTHER level's pattern must lose frames (in-gate); as a mode E1 is judged with that pattern and the gate FAILs
 # MUST-FIRE: perturbed-copy: unpinned-equals-6 — the unpinned leg's distribution compared with the LEVEL-8 leg's must differ (in-gate); as a mode E3 compares against level 8 and the gate FAILs
@@ -45,6 +48,15 @@ JOBS="${JOBS:-10}"
 . "$REPO/tests/lib/controls.sh"
 vs_ctl_mode "$0"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no reference MAME binary at $MAME_BIN"; exit 0; }
+# WHICH ROM RAN (rule-checker run 2026-10-08-736 Q1): every member of every reference zip verified against
+# docs/checksums.txt (tools/audit_roms.py), the vsavj program fingerprint equal to tests/expected/registry.tsv's vsavj row,
+# and each loaded zip's sha1 printed — a ROMDIR that is not the pristine set FAILs here, before any leg runs.
+romchk="$(python3 "$REPO/tools/audit_roms.py" "$ROMDIR" 2>&1)" || true   # set -e: a failing audit must reach the FAIL line, not kill the shell
+echo "$romchk" | grep -q 'all match' || { echo "FAIL: ROMDIR is not the pristine reference set (tools/audit_roms.py against docs/checksums.txt):"; echo "$romchk" | tail -5; exit 1; }
+romfp="$(python3 "$REPO/tools/build_fingerprint.py" "$ROMDIR" --set vsavj --sha-only 2>/dev/null)" || true
+regfp="$(awk -F'\t' '$2 == "vsavj" && $1 !~ /^#/ {print $1}' "$REPO/tests/expected/registry.tsv")"
+[ -n "$romfp" ] && [ "$romfp" = "$regfp" ] || { echo "FAIL: vsavj program fingerprint '$romfp' is not the registry's vsavj row '$regfp'"; exit 1; }
+echo "  rom   $(echo "$romchk" | grep 'all match' | head -1); vsavj program fingerprint $romfp = registry vsavj row; zips $(python3 -c 'import hashlib,sys; print(" ".join(f"{z}.zip=" + hashlib.sha1(open(f"{sys.argv[1]}/{z}.zip","rb").read()).hexdigest() for z in ("vsavj","vsav","qsound_hle")))' "$ROMDIR")"
 if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM; fi
 W="$(cd "$W" && pwd)"
 echo "  head  $(git -C "$REPO" describe --always --dirty --abbrev=40 2>/dev/null || echo no git); tracked files modified $(git -C "$REPO" status --porcelain --untracked-files=no 2>/dev/null | wc -l | tr -d ' '); host $(hostname) $(uname -sm); MAME_BIN $MAME_BIN"

@@ -35,12 +35,15 @@
 #   SIDE on the sides that CAN discriminate — those whose active frames carry at least two distinct +0x394 values — each
 #   below 0.9; a side pressing a single button all match (replay 37's P2: toward+HP) maps its one value to any lagged key
 #   alike, so it cannot fail that control and is named, not judged (rule-checker run 2026-10-08-729 Q4).
-# EXPECTS: every judged frame of I1-I5, I7, I8 and I10 predicted, with at least one judged frame per leg and side; I6 1.000 on
+# EXPECTS: the header names the ROM — every reference member verified against docs/checksums.txt, the vsavj program
+#   fingerprint equal to the registry's vsavj row, each loaded zip's sha1 — or the gate FAILs before any leg.
+#    every judged frame of I1-I5, I7, I8 and I10 predicted, with at least one judged frame per leg and side; I6 1.000 on
 #   every human side with active frames; each pooled control strictly below its check's total; I6's control below 0.9 on
 #   every discriminating side, with at least one such side. The log's header names the commit and the host.
 # FOLLOWS: emu/mame-patches/ tests/lib/controls.sh tests/lua/field_trace.lua tests/lua/pokes_spec.lua tests/lua/read_tap.lua
 #   tests/replays/03_two_player_vs.rpl tests/replays/37_victor_ko_vsavj.rpl tests/replays/118_input_sweep.rpl
 #   tools/run_mame.sh tools/setup_mame.sh
+#   tools/audit_roms.py docs/checksums.txt tools/build_fingerprint.py tests/expected/registry.tsv
 #
 # MUST-FIRE: perturbed-copy: opposite-flip — I2 and I7's +0x123 judged with the L/R swap applied on the OPPOSITE flip source must lose frames (pooled), and as a mode the gate FAILs them
 # MUST-FIRE: perturbed-copy: never-swap — I2, I4 and I7 predicted with NO L/R swap by +0x0B at all must each lose frames (pooled; the frames with +0x0B set and L or R held are counted per side), and as a mode the gate FAILs all three
@@ -72,6 +75,15 @@ MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame-ref/cps2}"; export MAME_BI
 . "$REPO/tests/lib/controls.sh"
 vs_ctl_mode "$0"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no reference MAME binary at $MAME_BIN"; exit 0; }
+# WHICH ROM RAN (rule-checker run 2026-10-08-736 Q1): every member of every reference zip verified against
+# docs/checksums.txt (tools/audit_roms.py), the vsavj program fingerprint equal to tests/expected/registry.tsv's vsavj row,
+# and each loaded zip's sha1 printed — a ROMDIR that is not the pristine set FAILs here, before any leg runs.
+romchk="$(python3 "$REPO/tools/audit_roms.py" "$ROMDIR" 2>&1)" || true   # set -e: a failing audit must reach the FAIL line, not kill the shell
+echo "$romchk" | grep -q 'all match' || { echo "FAIL: ROMDIR is not the pristine reference set (tools/audit_roms.py against docs/checksums.txt):"; echo "$romchk" | tail -5; exit 1; }
+romfp="$(python3 "$REPO/tools/build_fingerprint.py" "$ROMDIR" --set vsavj --sha-only 2>/dev/null)" || true
+regfp="$(awk -F'\t' '$2 == "vsavj" && $1 !~ /^#/ {print $1}' "$REPO/tests/expected/registry.tsv")"
+[ -n "$romfp" ] && [ "$romfp" = "$regfp" ] || { echo "FAIL: vsavj program fingerprint '$romfp' is not the registry's vsavj row '$regfp'"; exit 1; }
+echo "  rom   $(echo "$romchk" | grep 'all match' | head -1); vsavj program fingerprint $romfp = registry vsavj row; zips $(python3 -c 'import hashlib,sys; print(" ".join(f"{z}.zip=" + hashlib.sha1(open(f"{sys.argv[1]}/{z}.zip","rb").read()).hexdigest() for z in ("vsavj","vsav","qsound_hle")))' "$ROMDIR")"
 if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM; fi
 W="$(cd "$W" && pwd)"
 echo "  head  $(git -C "$REPO" describe --always --dirty --abbrev=40 2>/dev/null || echo no git); tracked files modified $(git -C "$REPO" status --porcelain --untracked-files=no 2>/dev/null | wc -l | tr -d ' '); host $(hostname) $(uname -sm); MAME_BIN $MAME_BIN"

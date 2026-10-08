@@ -3,10 +3,10 @@
 # of 14z-194, GitHub #118; HOMING item 3, in part — see NOT COVERED)
 #
 # WHAT: on pristine vsavj, the mizuumi attack candidates atlas/ram.md records hold as measured:
-#   A1 +0x101 at each NEW button press of a human side reads 2 for a kick and 0 for a punch, on the press frame — on the
-#      presses that start a FRESH normal: every human side of 03, 37, 118_input_sweep and 02, tallied per leg. NOT on
-#      118_chain's CHAINED presses: there the press frame still holds the previous attack's value (measured 14z-195:
-#      12/20, misses kick-read-0 5 and punch-read-2 3) — reported per press, not asserted;
+#   A1 +0x101 reads 2 for a kick and 0 for a punch — on the press frame and in the value written — on each new press
+#      PAIRED with a fresh attack start (a +0x101 write by PRG:0x02757E within 2 frames), on every human side of all five
+#      legs; presses with no such start (118_chain's chained presses, whose start is 0x028ED8's, and presses that start
+#      nothing, e.g. replay 37's P2 holding one button) are counted per side and judged on nothing;
 #   A2 +0x1B8 counts ATTACK STARTS of a human side: every FRESH attack start (a write to +0x101 by PRG:0x02757E) is
 #      PAIRED ONE-TO-ONE IN TIME with a +0x1B8 write by PRG:0x0274D6 within 1 frame (every start and every write used
 #      once; the offsets are reported; every write by 0x0274D6 or 0x028F18 RAISES the word by exactly 1 over its previous
@@ -28,7 +28,9 @@
 #   118_input_sweep, 118_chain and 02_demitri_vs_cpu (1P: a CPU side that fights), and WRITE-TAP legs under
 #   tests/lua/read_tap.lua (each side's +0x100, +0x118 and +0x1B8 words) for the five; a tap write in tap frame f lands
 #   in trace frame f+1. Human sides are derived from each replay's input script, never assumed.
-# EXPECTS: A1-A5 as stated, each over a nonzero sample. CONTROLS (in-gate, each must make its check fail):
+# EXPECTS: the header names the ROM — every reference member verified against docs/checksums.txt, the vsavj program
+#   fingerprint equal to the registry's vsavj row, each loaded zip's sha1 — or the gate FAILs before any leg.
+#    A1-A5 as stated, each over a nonzero sample. CONTROLS (in-gate, each must make its check fail):
 #   previous-press-key (A1 judged against the previous press's key), hit-vs-start (A2's +0x1B8 writes paired with
 #   LANDED HITS instead of starts), writes-shifted (A2's writes moved 20 frames later, beyond the window: a write at
 #   another moment than the start must fail), reads-shifted (A4's 0xFF rises moved 20 frames later, away from the
@@ -40,6 +42,7 @@
 # FOLLOWS: emu/mame-patches/ tests/lib/controls.sh tests/lua/field_trace.lua tests/lua/pokes_spec.lua tests/lua/read_tap.lua
 #   tests/replays/02_demitri_vs_cpu.rpl tests/replays/03_two_player_vs.rpl tests/replays/37_victor_ko_vsavj.rpl
 #   tests/replays/118_chain.rpl tests/replays/118_input_sweep.rpl tools/run_mame.sh tools/setup_mame.sh
+#   tools/audit_roms.py docs/checksums.txt tools/build_fingerprint.py tests/expected/registry.tsv
 #
 # MUST-FIRE: perturbed-copy: previous-press-key — A1 judged against each press's PREVIOUS press must fail (in-gate); as a mode A1 uses it and the gate FAILs
 # MUST-FIRE: perturbed-copy: hit-vs-start — A2 counted against landed hits instead of attack starts must fail (in-gate); as a mode A2 uses it and the gate FAILs
@@ -70,6 +73,15 @@ MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame-ref/cps2}"; export MAME_BI
 . "$REPO/tests/lib/controls.sh"
 vs_ctl_mode "$0"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no reference MAME binary at $MAME_BIN"; exit 0; }
+# WHICH ROM RAN (rule-checker run 2026-10-08-736 Q1): every member of every reference zip verified against
+# docs/checksums.txt (tools/audit_roms.py), the vsavj program fingerprint equal to tests/expected/registry.tsv's vsavj row,
+# and each loaded zip's sha1 printed — a ROMDIR that is not the pristine set FAILs here, before any leg runs.
+romchk="$(python3 "$REPO/tools/audit_roms.py" "$ROMDIR" 2>&1)" || true   # set -e: a failing audit must reach the FAIL line, not kill the shell
+echo "$romchk" | grep -q 'all match' || { echo "FAIL: ROMDIR is not the pristine reference set (tools/audit_roms.py against docs/checksums.txt):"; echo "$romchk" | tail -5; exit 1; }
+romfp="$(python3 "$REPO/tools/build_fingerprint.py" "$ROMDIR" --set vsavj --sha-only 2>/dev/null)" || true
+regfp="$(awk -F'\t' '$2 == "vsavj" && $1 !~ /^#/ {print $1}' "$REPO/tests/expected/registry.tsv")"
+[ -n "$romfp" ] && [ "$romfp" = "$regfp" ] || { echo "FAIL: vsavj program fingerprint '$romfp' is not the registry's vsavj row '$regfp'"; exit 1; }
+echo "  rom   $(echo "$romchk" | grep 'all match' | head -1); vsavj program fingerprint $romfp = registry vsavj row; zips $(python3 -c 'import hashlib,sys; print(" ".join(f"{z}.zip=" + hashlib.sha1(open(f"{sys.argv[1]}/{z}.zip","rb").read()).hexdigest() for z in ("vsavj","vsav","qsound_hle")))' "$ROMDIR")"
 if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM; fi
 W="$(cd "$W" && pwd)"
 echo "  head  $(git -C "$REPO" describe --always --dirty --abbrev=40 2>/dev/null || echo no git); tracked files modified $(git -C "$REPO" status --porcelain --untracked-files=no 2>/dev/null | wc -l | tr -d ' '); host $(hostname) $(uname -sm); MAME_BIN $MAME_BIN"
@@ -173,10 +185,14 @@ def wfield(leg, s, off):
 T = {k: load(f"{W}/{k}.fields") for k in LEGS}
 S = {k: staged(f"{REPO}/{v}") for k, v in LEGS.items()}
 HUMAN = {k: sorted({s for fr in S[k].values() for s in (1, 2) if fr[s]}) for k in LEGS}
-# A1 +0x101 at each new press of a human side, on the press frame: 2 kick, 0 punch
-n1 = ok1 = 0; per1 = {}
-# the legs whose presses each start a FRESH normal; 118_chain's chained presses do NOT follow the rule on their press frame
-# (measured 14z-195: 12/20) — reported below, not asserted (rule-checker run 2026-10-08-735)
+# A1 +0x101 on each new press that STARTS A FRESH NORMAL: the press is paired with a +0x101 write by 0x02757E within W1
+# frames (offsets reported); a paired press reads 2 for a kick, 0 for a punch, on its press frame AND in the value written.
+# Presses with no such start (a chained press — its start is 0x028ED8's — or a press that starts nothing) are COUNTED per
+# side and judged on nothing (rule-checker run 2026-10-08-736 Q4). previous-press-key judges the paired presses against
+# the previous paired press's class, on the sides whose paired presses hold both a kick and a punch (a side pressing one
+# class only cannot fail it, and is named).
+W1 = 2
+n1 = ok1 = 0; per1 = {}; offs1 = collections.Counter(); ndisc1 = 0; pkfail = []; pknon = []
 for k in ("03", "37", "sweep", "02", "chain"):
     byf = {d["f"]: d for d in T[k]}
     for s in HUMAN[k]:
@@ -188,25 +204,41 @@ for k in ("03", "37", "sweep", "02", "chain"):
             new = (S[k].get(f, {1: set(), 2: set()})[s] & BTN) - (S[k].get(f - 1, {1: set(), 2: set()})[s] & BTN)
             if new:
                 presses.append((f, "K" if min(new) in "456" else "P"))
-        for i, (f, cls) in enumerate(presses):
+        starts1 = [(f, v) for f, pc, v in wfield(k, s, 0x101) if pc == "02757e"]
+        free = list(starts1); paired = []
+        for f, cls in presses:
+            cand = [(sf, v) for sf, v in free if abs(sf - f) <= W1]
+            if cand:
+                sf, v = min(cand, key=lambda x: abs(x[0] - f)); free.remove((sf, v)); paired.append((f, cls, v)); offs1[sf - f] += 1
+        classes = {c for _, c, _ in paired}
+        disc = len(classes) == 2
+        good_n = prev_lost = 0
+        for i, (f, cls, v) in enumerate(paired):
+            want = cls
             if PERT == "previous-press-key":
                 if not i:
                     continue
-                cls = presses[i - 1][1]
-            good = byf[f][f"pk{s}"] == (2 if cls == "K" else 0)
-            if k != "chain":
-                n1 += 1; ok1 += good
-            t = per1.setdefault(f"{k} P{s}", [0, 0, collections.Counter(), 0]); t[0] += good; t[1] += 1
-            if not good:
-                t[2][f"{cls}:{byf[f][f'pk{s}']}"] += 1
-                if i and byf[f][f"pk{s}"] == (2 if presses[i - 1][1] == "K" else 0):
-                    t[3] += 1   # the miss reads the PREVIOUS press's class
-res(n1 > 0 and ok1 == n1, "A1", f"+0x101 on the press frame is 2 for a kick, 0 for a punch: {ok1}/{n1} presses of the human sides of 03, 37, the sweep and 02 — "
-    + "; ".join(f"{k} {a}/{b}" + (f" misses {dict(c)}" if c else "") for k, (a, b, c, _) in per1.items() if not k.startswith("chain")))
-for k, (a, b, c, prevm) in per1.items():
-    if k.startswith("chain"):
-        print(f"  info  [A1] 118_chain {k[6:]} (not asserted): {a}/{b} presses read their own class on the press frame; misses {dict(c)}, "
-              f"{prevm} of them reading the PREVIOUS press's class (a chained press: +0x101 is written at the chained start, PRG:0x028ED8)")
+                want = paired[i - 1][1]
+            enc = 2 if want == "K" else 0
+            good = byf[f][f"pk{s}"] == enc and v == enc
+            n1 += 1; ok1 += good; good_n += good
+            if i:   # the control, judged in every run: the previous paired press's class
+                penc = 2 if paired[i - 1][1] == "K" else 0
+                prev_lost += not (byf[f][f"pk{s}"] == penc and v == penc)
+        per1[f"{k} P{s}"] = (len(presses), len(paired), good_n)
+        if disc:
+            ndisc1 += 1
+            if prev_lost == 0:
+                pkfail.append(f"{k}P{s}")
+        else:
+            pknon.append(f"{k}P{s}")
+res(n1 > 0 and ok1 == n1, "A1", f"+0x101 is 2 for a kick, 0 for a punch, on the press frame and in the 0x02757E write, on {ok1}/{n1} presses PAIRED with a "
+    f"fresh start within {W1} f (start-press offsets {dict(sorted(offs1.items()))}) — per side (presses, paired, judged ok): "
+    + "; ".join(f"{k} {a}/{b}/{c}" for k, (a, b, c) in per1.items())
+    + (" (mode previous-press-key: the previous paired press's class)" if PERT == "previous-press-key" else ""))
+print(f"  info  [A1] unpaired presses (no 0x02757E start within {W1} f, judged on nothing): "
+      + "; ".join(f"{k} {a - b}" for k, (a, b, c) in per1.items()))
+print(f"CTLA1 {ndisc1} {len(pkfail)} {','.join(pknon) or '-'} {','.join(sorted(set(per1) - {k.replace('P', ' P') for k in pknon})).replace(' ', '') or '-'}")
 # A2 +0x1B8: one write by 0x0274D6 per attack start (a +0x101 write by 0x02757E), misses included
 n2 = ok2 = miss_starts = 0; per = []; offs = collections.Counter()
 chain_bad = ok2c = 0; chained_by = {}; per2c = []; inc_n = inc_ok = 0
@@ -332,10 +364,15 @@ if [ -n "${VS_CTL:-}" ]; then
     echo "FAIL: audit_mizuumi_attack (control mode)"; exit 1
 fi
 check none > "$W/checks.log" 2>&1 || fail=1
-cat "$W/checks.log"
+grep -v '^CTLA1 ' "$W/checks.log"
 grep -q '\[A5\]' "$W/checks.log" || { echo "  FAIL  the checks did not reach A5 (a crash is not a verdict): $(tail -1 "$W/checks.log")"; exit 1; }
 echo "== 3. the must-fire controls (in-gate)"
-for c in previous-press-key:A1 hit-vs-start:A2 writes-shifted:A2 chained-counted:A2 chained-writes-shifted:A2c reads-shifted:A4 cpu-side:A3 isolated-presses:A4 neighbour-word:A5 hits-shifted:A5; do
+set -- $(sed -n 's/^CTLA1 //p' "$W/checks.log")
+# CTLA1 <discriminating sides> <sides where the previous class did NOT lose> <non-discriminating sides,> <judged sides,>
+[ "${1:-0}" -gt 0 ] && [ "${2:-1}" = 0 ] \
+    && vs_ctl_fired previous-press-key "on each of the $1 sides whose paired presses hold a kick and a punch ($4), the previous press's class loses (not judged, one class or no press: $3)" \
+    || { vs_ctl_dead previous-press-key "discriminating sides ${1:-0}, of them not losing ${2:-?}" || true; fail=1; }
+for c in hit-vs-start:A2 writes-shifted:A2 chained-counted:A2 chained-writes-shifted:A2c reads-shifted:A4 cpu-side:A3 isolated-presses:A4 neighbour-word:A5 hits-shifted:A5; do
     name="${c%%:*}"; tag="${c#*:}"
     check "$name" > "$W/ctl_$name.log" 2>&1 && rc=0 || rc=1
     if [ "$rc" = 1 ] && grep -q "FAIL  \[$tag\]" "$W/ctl_$name.log"; then
