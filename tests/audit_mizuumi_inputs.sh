@@ -28,7 +28,8 @@
 #   COUNT of the routine (the writes by PRG:0x022114 and PRG:0x022126). A tap write in tap frame f lands in trace frame
 #   f+1. Each check is EXACT (every judged frame), and each carries the control HOMING named, pooled over legs and
 #   sides (per leg a side that never moves can tie): the same prediction with the opposite flip (I2), the wrong
-#   frame's run count (I3, I5, I10), no `& ~previous` edge mask (I4, I8) and the opposite flip for +0x123 (I7) must each
+#   frame's run count (I3, I5, I10), no `& ~previous` edge mask (I4, I8), the opposite flip for +0x123 (I7) and the
+#   OTHER side's +0x394 for I1 must each
 #   LOSE frames. I6's control, the staged input 120 frames late, is judged PER
 #   SIDE on the sides that CAN discriminate — those whose active frames carry at least two distinct +0x394 values — each
 #   below 0.9; a side pressing a single button all match (replay 37's P2: toward+HP) maps its one value to any lagged key
@@ -41,6 +42,7 @@
 #   tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: opposite-flip — I2 and I7's +0x123 judged with the L/R swap applied on the OPPOSITE flip source must lose frames (pooled), and as a mode the gate FAILs them
+# MUST-FIRE: perturbed-copy: other-side — I1 judged against the OTHER side's +0x394 must lose frames (pooled), and as a mode the gate FAILs I1
 # MUST-FIRE: perturbed-copy: wrong-run — I3 and I5 judged with the WRONG frame's run count must lose frames (pooled), and as a mode the gate FAILs them
 # MUST-FIRE: perturbed-copy: no-edge-mask — I4 and I8 judged without their `& ~previous` / `& ~current` masks must lose frames (pooled), and as a mode the gate FAILs them
 # MUST-FIRE: perturbed-copy: lag-120 — I6 judged against the staged input 120 frames late must fall below 0.9 on every discriminating side, and as a mode the gate FAILs I6
@@ -70,7 +72,7 @@ vs_ctl_mode "$0"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no reference MAME binary at $MAME_BIN"; exit 0; }
 if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM; fi
 W="$(cd "$W" && pwd)"
-echo "  head  $(git -C "$REPO" rev-parse HEAD 2>/dev/null || echo no git); host $(hostname) $(uname -sm); MAME_BIN $MAME_BIN"
+echo "  head  $(git -C "$REPO" describe --always --dirty --abbrev=40 2>/dev/null || echo no git); tracked files modified $(git -C "$REPO" status --porcelain --untracked-files=no 2>/dev/null | wc -l | tr -d ' '); host $(hostname) $(uname -sm); MAME_BIN $MAME_BIN"
 
 # ADDRESSES ARE COMPUTED from the block base, never concatenated (14z-189: "ff84"+"39f" read a wrong address as 0).
 F="ff8109:b:timer"; RT=""
@@ -182,7 +184,8 @@ for leg, rpl in LEGS.items():
             k = r12a[s][f - 1]          # the routine's runs that produced trace frame f
             if k:
                 c["n"] += 1
-                c["I1"] += d[f"b12a{s}"] == d[f"ibtn{s}"]
+                c["I1"] += d[f"b12a{s}"] == d[f"ibtn{3 - s if PERT == 'other-side' else s}"]
+                ctl["I1"] += d[f"b12a{s}"] == d[f"ibtn{3 - s}"]   # control other-side: the OTHER side's +0x394
                 src = d[f"face{s}"] if (d[f"s38{s}"] or d[f"s115{s}"]) else d[f"p120{s}"]
                 flip = (not src) if PERT == "opposite-flip" else bool(src)
                 c["I2"] += d[f"b12b{s}"] == rel(d[f"idir{s}"], flip)
@@ -271,7 +274,7 @@ for leg, rpl in LEGS.items():
             + (f"the set 120 frames earlier {cl:.3f} (judged)" if disc else f"ONE +0x394 value on its active frames {sorted(vals)}: the lag control cannot discriminate here, not judged ({cl:.3f})"))
 res(judged6 > 0, "I6", f"{judged6} human sides judged on active frames; the lag control applies to {ndisc} of them (not to {' '.join(nondisc) or 'none'})")
 print(f"CTL I2 {ctl['I2']} {tot['n']} I3 {ctl['I3']} {tot['n']} I4 {ctl['I4']} {tot['n4']} I5 {ctl['I5']} {ctl['n5']} I6 {lagworst:.3f} {ndisc} "
-      f"I7 {ctl['I7']} {tot['n']} I8 {ctl['I8']} {tot['n4']} I10 {ctl['I10']} {ctl['n5']} RULEDIFF {tot['rulediff']} {tot['n']} RULESEP {tot['rulesep']}")
+      f"I7 {ctl['I7']} {tot['n']} I8 {ctl['I8']} {tot['n4']} I10 {ctl['I10']} {ctl['n5']} RULEDIFF {tot['rulediff']} {tot['n']} RULESEP {tot['rulesep']} I1X {ctl['I1']} {tot['n']}")
 sys.exit(1 if bad else 0)
 PY
 }
@@ -281,7 +284,7 @@ if [ -n "${VS_CTL:-}" ]; then
     check "$VS_CTL" > "$W/mode.log" 2>&1 && rc=0 || rc=1
     grep -v '^CTL ' "$W/mode.log"
     tag=""
-    case "$VS_CTL" in opposite-flip) tag='I1-I3|I7' ;; wrong-run) tag='I1-I3|I5|I10' ;; no-edge-mask) tag='I4|I8' ;; lag-120) tag='I6' ;; esac
+    case "$VS_CTL" in opposite-flip) tag='I1-I3|I7' ;; other-side) tag='I1-I3' ;; wrong-run) tag='I1-I3|I5|I10' ;; no-edge-mask) tag='I4|I8' ;; lag-120) tag='I6' ;; esac
     if [ "$rc" = 1 ] && grep -Eq "FAIL  \[($tag) " "$W/mode.log"; then vs_ctl_fired "$VS_CTL" "the checks judged with the perturbation failed (mode)"
     else echo "REFUSED: CONTROL=$VS_CTL — the perturbation did not make the check it targets fail (rc $rc): a dead mode, not a verdict"; exit 3; fi
     echo "FAIL: audit_mizuumi_inputs (control mode)"; exit 1
@@ -292,12 +295,13 @@ grep -q '^CTL ' "$W/checks.log" || { echo "  FAIL  the checks produced no contro
 
 echo "== 3. the must-fire controls (pooled over legs and sides)"
 set -- $(sed -n 's/^CTL //p' "$W/checks.log")
-# CTL I2 <hits> <n> I3 <hits> <n> I4 <hits> <n> I5 <hits> <n> I6 <worst discriminating side> <sides> I7 <hits> <n> I8 <hits> <n> I10 <hits> <n> RULEDIFF <frames> <n> RULESEP <frames>
+# CTL I2 <hits> <n> I3 <hits> <n> I4 <hits> <n> I5 <hits> <n> I6 <worst discriminating side> <sides> I7 <hits> <n> I8 <hits> <n> I10 <hits> <n> RULEDIFF <frames> <n> RULESEP <frames> I1X <hits> <n>
 [ "$3" -gt 0 ] && [ "$2" -lt "$3" ] && [ "${18}" -gt 0 ] && [ "${17}" -lt "${18}" ] \
     && vs_ctl_fired opposite-flip "the opposite flip predicts +0x12B on $2 of $3 frames and +0x123 on ${17} of ${18}" || { vs_ctl_dead opposite-flip "I2 $2/$3, I7 ${17}/${18}" || true; fail=1; }
 [ "$6" -gt 0 ] && [ "$5" -lt "$6" ] && [ "${12}" -gt 0 ] && [ "${11}" -lt "${12}" ] && [ "${23}" -lt "${24}" ] \
     && vs_ctl_fired wrong-run "the wrong run count predicts I3 on $5 of $6 frames, I5 on ${11} of ${12}, I10 on ${23} of ${24}" || { vs_ctl_dead wrong-run "I3 $5/$6, I5 ${11}/${12}, I10 ${23}/${24}" || true; fail=1; }
 echo "  info  I2's flip-source rule vs plain +0x0B: they differ on ${26} of ${27} frames with a run, ${29} of them with L or R held — the rule is NOT separated from +0x0B on these legs (see NOT COVERED)"
+[ "${32}" -gt 0 ] && [ "${31}" -lt "${32}" ] && vs_ctl_fired other-side "the OTHER side's +0x394 matches +0x12A on ${31} of ${32} frames" || { vs_ctl_dead other-side "${31} of ${32}" || true; fail=1; }
 [ "$9" -gt 0 ] && [ "$8" -lt "$9" ] && [ "${21}" -gt 0 ] && [ "${20}" -lt "${21}" ] \
     && vs_ctl_fired no-edge-mask "without the edge masks +0x127 matches $8 of $9 frames and +0x126/+0x128/+0x129 ${20} of ${21}" || { vs_ctl_dead no-edge-mask "I4 $8/$9, I8 ${20}/${21}" || true; fail=1; }
 python3 -c "import sys; sys.exit(0 if float(sys.argv[1]) < 0.9 and int(sys.argv[2]) > 0 else 1)" "${14}" "${15}" \

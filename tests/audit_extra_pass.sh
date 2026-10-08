@@ -47,7 +47,7 @@ vs_ctl_mode "$0"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no reference MAME binary at $MAME_BIN"; exit 0; }
 if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM; fi
 W="$(cd "$W" && pwd)"
-echo "  head  $(git -C "$REPO" rev-parse HEAD 2>/dev/null || echo no git); host $(hostname) $(uname -sm); MAME_BIN $MAME_BIN"
+echo "  head  $(git -C "$REPO" describe --always --dirty --abbrev=40 2>/dev/null || echo no git); tracked files modified $(git -C "$REPO" status --porcelain --untracked-files=no 2>/dev/null | wc -l | tr -d ' '); host $(hostname) $(uname -sm); MAME_BIN $MAME_BIN"
 . "$REPO/tests/lib/decrypt_cache.sh"
 decrypt_view vsavj "$W/vsavj_op.bin" "$W/vsavj_data.bin" >/dev/null 2>&1 || { echo "FAIL: no vsavj opcode view (decrypt cache)"; exit 1; }
 

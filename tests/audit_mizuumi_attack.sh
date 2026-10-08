@@ -27,7 +27,7 @@
 #   previous-press-key (A1 judged against the previous press's key), hit-vs-start (A2's +0x1B8 writes paired with
 #   LANDED HITS instead of starts), writes-shifted (A2's writes moved 20 frames later, beyond the window: a write at
 #   another moment than the start must fail), reads-shifted (A4's 0xFF rises moved 20 frames later, away from the
-#   chained starts), cpu-side (A3 judged on 02's human side), isolated-presses (A4's chained-start rule
+#   chained starts), chained-writes-shifted (A2c's 0x028F18 writes moved 20 frames later), cpu-side (A3 judged on 02's human side), isolated-presses (A4's chained-start rule
 #   judged on the sweep's isolated presses), neighbour-word (A5 judged on +0x168, the next byte: a WRONG WORD read as
 #   +0x169 must fail) and hits-shifted (A5 judged against the landed-hit frames moved 30 frames later: a proximity test
 #   too loose to tell a hit from a non-hit must fail) — rule-checker run 2026-10-08-729 Q4. The log's header names the
@@ -41,6 +41,7 @@
 # MUST-FIRE: perturbed-copy: writes-shifted — A2 with every +0x1B8 write moved 20 frames later (beyond the 1-frame pairing window) must fail (in-gate); as a mode A2 uses the moved writes and the gate FAILs
 # MUST-FIRE: perturbed-copy: reads-shifted — A4 with every 0xFF rise of the per-frame value moved 20 frames later must fail (in-gate); as a mode A4 uses the moved rises and the gate FAILs
 # MUST-FIRE: perturbed-copy: chained-counted — A2 with the 0x028ED8 chained starts treated as starts to pair with 0x0274D6 writes must fail (in-gate); as a mode A2 pairs them and the gate FAILs
+# MUST-FIRE: perturbed-copy: chained-writes-shifted — A2c with every 0x028F18 +0x1B8 write moved 20 frames later (beyond the 1-frame window) must fail (in-gate); as a mode A2c uses the moved writes and the gate FAILs
 # MUST-FIRE: perturbed-copy: cpu-side — A3 judged on replay 02's HUMAN side must fail (in-gate); as a mode A3 judges it and the gate FAILs
 # MUST-FIRE: perturbed-copy: neighbour-word — A5 judged on +0x168 (the neighbouring byte) instead of +0x169 must fail (in-gate); as a mode A5 reads +0x168 and the gate FAILs
 # MUST-FIRE: perturbed-copy: hits-shifted — A5 judged against the landed-hit frames moved 30 frames later must fail (in-gate); as a mode A5 uses the shifted frames and the gate FAILs
@@ -66,7 +67,7 @@ vs_ctl_mode "$0"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no reference MAME binary at $MAME_BIN"; exit 0; }
 if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM; fi
 W="$(cd "$W" && pwd)"
-echo "  head  $(git -C "$REPO" rev-parse HEAD 2>/dev/null || echo no git); host $(hostname) $(uname -sm); MAME_BIN $MAME_BIN"
+echo "  head  $(git -C "$REPO" describe --always --dirty --abbrev=40 2>/dev/null || echo no git); tracked files modified $(git -C "$REPO" status --porcelain --untracked-files=no 2>/dev/null | wc -l | tr -d ' '); host $(hostname) $(uname -sm); MAME_BIN $MAME_BIN"
 
 F="ff8109:b:timer"; RT=""
 for s in 1 2; do
@@ -200,7 +201,7 @@ for k in ("03", "37", "sweep", "chain"):
         # CHAINED starts (+0x101 written by 0x028ED8) are NOT 0x0274D6's (rule-checker run 2026-10-08-732): none may have a
         # 0x0274D6 write within W2; they pair one-to-one with +0x1B8 writes by 0x028F18 instead (A2c, measured 14z-195)
         chained2 = sorted(f for f, pc, v in wfield(k, s, 0x101) if pc == "028ed8")
-        wf18 = sorted(f for f, pc, v in wfield(k, s, 0x1B9) if pc == "028f18")
+        wf18 = sorted(f + (20 if PERT == "chained-writes-shifted" else 0) for f, pc, v in wfield(k, s, 0x1B9) if pc == "028f18")
         chain_bad += sum(1 for c in chained2 if any(abs(w - c) <= W2 for w in wf))
         free18 = list(wf18); m18 = 0
         for c in chained2:
@@ -279,7 +280,7 @@ echo "== 2. the checks"
 if [ -n "${VS_CTL:-}" ]; then
     check "$VS_CTL" > "$W/mode.log" 2>&1 && rc=0 || rc=1
     cat "$W/mode.log"
-    case "$VS_CTL" in previous-press-key) tag='A1' ;; hit-vs-start|writes-shifted|chained-counted) tag='A2' ;; reads-shifted) tag='A4' ;; cpu-side) tag='A3' ;; isolated-presses) tag='A4' ;; neighbour-word|hits-shifted) tag='A5' ;; esac
+    case "$VS_CTL" in previous-press-key) tag='A1' ;; hit-vs-start|writes-shifted|chained-counted) tag='A2' ;; chained-writes-shifted) tag='A2c' ;; reads-shifted) tag='A4' ;; cpu-side) tag='A3' ;; isolated-presses) tag='A4' ;; neighbour-word|hits-shifted) tag='A5' ;; esac
     if [ "$rc" = 1 ] && grep -q "FAIL  \[$tag\]" "$W/mode.log"; then vs_ctl_fired "$VS_CTL" "the perturbed checks failed $tag (mode)"
     else echo "REFUSED: CONTROL=$VS_CTL — the perturbation did not make the check it targets fail (rc $rc): a dead mode, not a verdict"; exit 3; fi
     echo "FAIL: audit_mizuumi_attack (control mode)"; exit 1
@@ -288,7 +289,7 @@ check none > "$W/checks.log" 2>&1 || fail=1
 cat "$W/checks.log"
 grep -q '\[A5\]' "$W/checks.log" || { echo "  FAIL  the checks did not reach A5 (a crash is not a verdict): $(tail -1 "$W/checks.log")"; exit 1; }
 echo "== 3. the must-fire controls (in-gate)"
-for c in previous-press-key:A1 hit-vs-start:A2 writes-shifted:A2 chained-counted:A2 reads-shifted:A4 cpu-side:A3 isolated-presses:A4 neighbour-word:A5 hits-shifted:A5; do
+for c in previous-press-key:A1 hit-vs-start:A2 writes-shifted:A2 chained-counted:A2 chained-writes-shifted:A2c reads-shifted:A4 cpu-side:A3 isolated-presses:A4 neighbour-word:A5 hits-shifted:A5; do
     name="${c%%:*}"; tag="${c#*:}"
     check "$name" > "$W/ctl_$name.log" 2>&1 && rc=0 || rc=1
     if [ "$rc" = 1 ] && grep -q "FAIL  \[$tag\]" "$W/ctl_$name.log"; then
