@@ -4,9 +4,13 @@
 #
 # WHAT: on pristine vsavj, the mizuumi attack candidates atlas/ram.md records hold as measured:
 #   A1 +0x101 at each NEW button press of a human side reads 2 for a kick and 0 for a punch, on the press frame;
-#   A2 +0x1B8 counts ATTACK STARTS of a human side: every attack start (a write to +0x101 by PRG:0x02757E) is PAIRED
-#      ONE-TO-ONE IN TIME with a +0x1B8 write by PRG:0x0274D6 within 1 frame (every start and every write used once; the
-#      offsets are reported), starts that land no hit included — so mizuumi's "whiff counter" is refuted as a whiff count;
+#   A2 +0x1B8 counts ATTACK STARTS of a human side: every FRESH attack start (a write to +0x101 by PRG:0x02757E) is
+#      PAIRED ONE-TO-ONE IN TIME with a +0x1B8 write by PRG:0x0274D6 within 1 frame (every start and every write used
+#      once; the offsets are reported), starts that land no hit included — so mizuumi's "whiff counter" is refuted as a
+#      whiff count; A2b no CHAINED start (+0x101 written by PRG:0x028ED8) has a 0x0274D6 write within that window (the
+#      chained count per leg reported, nonzero on 118_chain); A2c each chained start pairs one-to-one with a +0x1B8 write
+#      by PRG:0x028F18 instead — so +0x1B8 counts chained starts too, through a second writer (the 14z-194 pilot's
+#      census already listed 0x028F18 on the chain leg; rule-checker run 2026-10-08-732);
 #   A3 a CPU side never moves +0x1B8 although it attacks and lands hits;
 #   A4 +0x119: PRG:0x028ED0 writes 0xFF only on CHAINED normals — at least three times in 118_chain, each within one frame
 #      of a chained start (+0x101 written by PRG:0x028ED8) — and every rise of the per-frame value to 0xFF lies within one
@@ -36,6 +40,7 @@
 # MUST-FIRE: perturbed-copy: hit-vs-start — A2 counted against landed hits instead of attack starts must fail (in-gate); as a mode A2 uses it and the gate FAILs
 # MUST-FIRE: perturbed-copy: writes-shifted — A2 with every +0x1B8 write moved 20 frames later (beyond the 1-frame pairing window) must fail (in-gate); as a mode A2 uses the moved writes and the gate FAILs
 # MUST-FIRE: perturbed-copy: reads-shifted — A4 with every 0xFF rise of the per-frame value moved 20 frames later must fail (in-gate); as a mode A4 uses the moved rises and the gate FAILs
+# MUST-FIRE: perturbed-copy: chained-counted — A2 with the 0x028ED8 chained starts treated as starts to pair with 0x0274D6 writes must fail (in-gate); as a mode A2 pairs them and the gate FAILs
 # MUST-FIRE: perturbed-copy: cpu-side — A3 judged on replay 02's HUMAN side must fail (in-gate); as a mode A3 judges it and the gate FAILs
 # MUST-FIRE: perturbed-copy: neighbour-word — A5 judged on +0x168 (the neighbouring byte) instead of +0x169 must fail (in-gate); as a mode A5 reads +0x168 and the gate FAILs
 # MUST-FIRE: perturbed-copy: hits-shifted — A5 judged against the landed-hit frames moved 30 frames later must fail (in-gate); as a mode A5 uses the shifted frames and the gate FAILs
@@ -174,6 +179,7 @@ for k in ("03", "37", "sweep"):
 res(n1 > 0 and ok1 == n1, "A1", f"+0x101 on the press frame is 2 for a kick, 0 for a punch: {ok1}/{n1} presses of the human sides of 03, 37 and the sweep")
 # A2 +0x1B8: one write by 0x0274D6 per attack start (a +0x101 write by 0x02757E), misses included
 n2 = ok2 = miss_starts = 0; per = []; offs = collections.Counter()
+chain_bad = ok2c = 0; chained_by = {}; per2c = []
 W2 = 1   # the pairing window: the tap shows each 0x0274D6 write in the same frame as its start (offsets reported)
 for k in ("03", "37", "sweep", "chain"):
     byf = {d["f"]: d for d in T[k]}
@@ -191,7 +197,20 @@ for k in ("03", "37", "sweep", "chain"):
         # W2 frames, every start and every write used once; the offsets are reported. hit-vs-start pairs the writes with
         # the LANDED HITS instead; writes-shifted moves every write 20 frames later (beyond the window).
         wf = sorted(f + (20 if PERT == "writes-shifted" else 0) for f in w1b8.elements())
-        events = hits if PERT == "hit-vs-start" else starts
+        # CHAINED starts (+0x101 written by 0x028ED8) are NOT 0x0274D6's (rule-checker run 2026-10-08-732): none may have a
+        # 0x0274D6 write within W2; they pair one-to-one with +0x1B8 writes by 0x028F18 instead (A2c, measured 14z-195)
+        chained2 = sorted(f for f, pc, v in wfield(k, s, 0x101) if pc == "028ed8")
+        wf18 = sorted(f for f, pc, v in wfield(k, s, 0x1B9) if pc == "028f18")
+        chain_bad += sum(1 for c in chained2 if any(abs(w - c) <= W2 for w in wf))
+        free18 = list(wf18); m18 = 0
+        for c in chained2:
+            cand = [w for w in free18 if abs(w - c) <= W2]
+            if cand:
+                w = min(cand, key=lambda x: abs(x - c)); free18.remove(w); m18 += 1
+        ok2c += m18 == len(chained2) == len(wf18)
+        chained_by[k] = chained_by.get(k, 0) + len(chained2)
+        per2c.append(f"{k} P{s} chained {len(chained2)} by-0x028F18 {len(wf18)} paired {m18}")
+        events = hits if PERT == "hit-vs-start" else sorted(starts + chained2) if PERT == "chained-counted" else starts
         free = list(wf); matched = 0
         for st in events:
             cand = [w for w in free if abs(w - st) <= W2]
@@ -203,7 +222,13 @@ res(n2 > 0 and ok2 == n2 and miss_starts > 0, "A2",
     f"each attack start paired one-to-one with a +0x1B8 write within {W2} f on {ok2}/{n2} human sides ({'; '.join(per)}; write-start offsets {dict(sorted(offs.items()))}), "
     f"{miss_starts} of the starts landing no hit — not a whiff count"
     + (" (mode hit-vs-start: paired with landed hits)" if PERT == "hit-vs-start" else "")
-    + (" (mode writes-shifted: writes moved 20 f later)" if PERT == "writes-shifted" else ""))
+    + (" (mode writes-shifted: writes moved 20 f later)" if PERT == "writes-shifted" else "")
+    + (" (mode chained-counted: the 0x028ED8 chained starts paired too)" if PERT == "chained-counted" else ""))
+res(chain_bad == 0 and chained_by.get("chain", 0) > 0, "A2b",
+    f"no 0x028ED8 chained start has a 0x0274D6 +0x1B8 write within {W2} f ({chain_bad} do); chained starts per leg {chained_by} (nonzero on 118_chain required)")
+res(ok2c == n2 and chained_by.get("chain", 0) > 0, "A2c",
+    f"each chained start paired one-to-one with a +0x1B8 write by 0x028F18 within {W2} f on {ok2c}/{n2} human sides ({'; '.join(per2c)}) — "
+    f"+0x1B8 counts chained starts too, through another writer")
 # A3 a CPU side never moves +0x1B8 (replay 02), while it lands hits
 cpu = [s for s in (1, 2) if s not in HUMAN["02"]]
 if PERT == "cpu-side":
@@ -254,7 +279,7 @@ echo "== 2. the checks"
 if [ -n "${VS_CTL:-}" ]; then
     check "$VS_CTL" > "$W/mode.log" 2>&1 && rc=0 || rc=1
     cat "$W/mode.log"
-    case "$VS_CTL" in previous-press-key) tag='A1' ;; hit-vs-start|writes-shifted) tag='A2' ;; reads-shifted) tag='A4' ;; cpu-side) tag='A3' ;; isolated-presses) tag='A4' ;; neighbour-word|hits-shifted) tag='A5' ;; esac
+    case "$VS_CTL" in previous-press-key) tag='A1' ;; hit-vs-start|writes-shifted|chained-counted) tag='A2' ;; reads-shifted) tag='A4' ;; cpu-side) tag='A3' ;; isolated-presses) tag='A4' ;; neighbour-word|hits-shifted) tag='A5' ;; esac
     if [ "$rc" = 1 ] && grep -q "FAIL  \[$tag\]" "$W/mode.log"; then vs_ctl_fired "$VS_CTL" "the perturbed checks failed $tag (mode)"
     else echo "REFUSED: CONTROL=$VS_CTL — the perturbation did not make the check it targets fail (rc $rc): a dead mode, not a verdict"; exit 3; fi
     echo "FAIL: audit_mizuumi_attack (control mode)"; exit 1
@@ -263,7 +288,7 @@ check none > "$W/checks.log" 2>&1 || fail=1
 cat "$W/checks.log"
 grep -q '\[A5\]' "$W/checks.log" || { echo "  FAIL  the checks did not reach A5 (a crash is not a verdict): $(tail -1 "$W/checks.log")"; exit 1; }
 echo "== 3. the must-fire controls (in-gate)"
-for c in previous-press-key:A1 hit-vs-start:A2 writes-shifted:A2 reads-shifted:A4 cpu-side:A3 isolated-presses:A4 neighbour-word:A5 hits-shifted:A5; do
+for c in previous-press-key:A1 hit-vs-start:A2 writes-shifted:A2 chained-counted:A2 reads-shifted:A4 cpu-side:A3 isolated-presses:A4 neighbour-word:A5 hits-shifted:A5; do
     name="${c%%:*}"; tag="${c#*:}"
     check "$name" > "$W/ctl_$name.log" 2>&1 && rc=0 || rc=1
     if [ "$rc" = 1 ] && grep -q "FAIL  \[$tag\]" "$W/ctl_$name.log"; then
