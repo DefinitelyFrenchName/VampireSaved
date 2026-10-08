@@ -10,7 +10,7 @@ number	state	reason	closed	labels	title
 240	OPEN	-	-	cosmetic	Recipe READMEs: the easy way needs a prebuilt, step 3 cites step 1 for the set, the verifyroms comment overstates, a pointer to a file not shipped
 239	OPEN	-	-	bug	MAME PLAY.command's macOS quarantine message names "fbneo" instead of the MAME binary
 238	OPEN	-	-	bug	MAME -recipe asset does not build on Linux as written (USE_QTDEBUG=0, qmake6); neither recipe names its build dependencies
-237	OPEN	-	-	bug	Emulator staleness audit: one edited row of tests/ci_emulator.tsv makes every emulator gate stale
+237	CLOSED	COMPLETED	2026-10-08	bug	Emulator staleness audit: one edited row of tests/ci_emulator.tsv makes every emulator gate stale
 236	OPEN	-	-	bug	upload_release_assets.sh --dry-run ends with 'done: N asset(s) on <release URL>' though it uploads nothing
 235	CLOSED	COMPLETED	2026-10-07	evolution	Pyron's and Donovan's kick and air throws as throwers: ours vs native vs2 on the roster victims (split from #230)
 234	CLOSED	COMPLETED	2026-10-07	cosmetic	MAME release: the red 'ROMs incorrect — press any key' screen at every start is expected but the README never says so

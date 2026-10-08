@@ -21,11 +21,6 @@ PILOT for the release, please put them to use"*).
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** **merged-m23 is PUBLISHED** (Latest on GitHub, nine
    assets; M22 and M19 emptied). What the close found and did is in STATE 14z-194's CLOSE row.
-1. **#237 FIRST — the staleness audit's whole-file registry dependency.** Every emulator gate declares
-   `tests/ci_emulator.tsv`, so one row edit stales all 214. Two registry edits wait on it:
-   `audit_release_linux_desktop`'s row (#226's scripted case, merged `dbaed3a0`; the proposed row is in that
-   gate's commit message) and `audit_tenant_throw_geometry`'s description (it still names only the standard
-   throws). Fix the audit (judge the registry per gate row), gate it with its control, then add the rows.
 2. **#129 — PUT THE DECISION** (STATE 14z-194 row (3); facts in `docs/game/engine_internals.md` "The CPU AI
    action-script system"): behaviour A (Phobos's continuation-check guard: a private clone, 0 legacy bytes, at
    most 92 cycles a frame) and behaviour B (vs2's crouch-guard test in shared engine code: 30 legacy bytes, about
