@@ -6712,3 +6712,14 @@ A static tier stopped mid-run (its task killed to start the release-cadence run 
 tier's gates run git commands; killed in the middle of one, git never removes its lock. Before removing the lock,
 check that no git process holds it (`pgrep -fl '(^|/)git '`): a harness status call run with `--no-optional-locks`
 takes no index lock and is not the holder. Then `rm .git/index.lock`. Never remove a lock a live git process owns.
+
+## AN IMPLIED WHOLE-FILE INPUT STALES EVERY GATE ON ONE ROW'S EDIT (paid: 14z-194, the M23 release; fixed 14z-195, #237)
+
+Every emulator gate follows `tests/ci_emulator.tsv` implicitly (`IMPLIED` in `tools/gate_follows.py`: the registry
+carries each gate's args and timeout), and `tools/audit_emulator_staleness.py` judged it as one file. So one
+description edit (#230's, `0ad79730`) read 214 of 214 emulator gates STALE at the release cadence, and the M23 release
+had to approve 213 stale verdicts by hand. The runner reads only the ROWS (`rows()` in `tests/run_all_emulator.sh`)
+and a gate's run only its own, so the audit now judges the registry per row: stale only when the gate's own row
+changed. The whole file stays the input where a gate's code reads it, or where the run recorded it dirty. Rule: an
+input every gate shares is judged at the grain each gate actually reads. A file-level dependency on a shared table is
+a dependency on every row of it. The same breadth survives in 79 gates' `tests/replays/` declarations (#243).

@@ -41,6 +41,14 @@ the harness and WIDE patches are applied in its working tree, with the harness f
 untracked on another), are judged by content, not by `git diff`. A path under build/ (outside the record), a
 record without the key, or a run without a record keeps the old rule: moved.
 
+THE REGISTRY IS JUDGED PER ROW (14z-195, GitHub #237). Every gate follows tests/ci_emulator.tsv
+(IMPLIED), so until 14z-195 any edit to any row — one description, at 0ad79730 — staled all 214
+emulator gates at the M23 release. The runner reads only the rows (`rows()` in run_all_emulator.sh)
+and a gate's run only its own, so the registry now counts as moved for a gate only when ITS row's
+lines changed since the commit it passed on; another gate's row, an added or removed row, or a
+comment does not stale it. The whole file stays the input when the gate's code reads the registry
+itself, when the run recorded the registry dirty, or when either version cannot be read.
+
 WHAT A FREEZE RUNS (same ruling): at `freeze` cadence only the rows a freeze selects — registry cadence
 `romset`, scope `release` (`run_all_emulator.sh --freeze`) — FAIL; any other row's finding is a NOTE there.
 `release` cadence judges every row.
@@ -213,9 +221,81 @@ def stale_gates(root, repo, commit, rows, run=None):
         if d not in recs:
             recs[d] = read_record(d) if d else None
         hits = [h for h in hits if not same_as_run(repo, h, recs[d])]   # the run already had it (14z-192)
+        if gf.REGISTRY in hits and not registry_row_moved(root, repo, c, g, d, recs[d]):
+            hits.remove(gf.REGISTRY)   # only another gate's row, or a comment, moved (#237)
         if hits:
             stale[g] = hits
     return stale, undeclared, passed, unknown, red
+
+
+_REG_AT = {}      # (repo, commit or None) -> {gate: [row lines]} or None
+_READS_REG = {}   # (root, gate) -> does the gate's own code read the registry?
+
+
+def registry_rows_at(repo, commit):
+    """The registry's ROWS as tests/run_all_emulator.sh reads them (`rows()`: \\r dropped, `#`
+    lines dropped, at least three tab fields, a non-empty first) -> {gate: [whole lines]}, at
+    <commit>, or in the working tree when commit is None; None when the file is absent."""
+    key = (repo, commit)
+    if key not in _REG_AT:
+        if commit is None:
+            p = os.path.join(repo, gf.REGISTRY)
+            text = open(p, encoding="utf-8", errors="replace").read() if os.path.isfile(p) else None
+        else:
+            r = subprocess.run(["git", "-C", repo, "show", f"{commit}:{gf.REGISTRY}"],
+                               capture_output=True, text=True)
+            text = r.stdout if r.returncode == 0 else None
+        rows = None
+        if text is not None:
+            rows = {}
+            for line in text.splitlines():
+                line = line.rstrip("\r")
+                f = line.split("\t")
+                if line.startswith("#") or len(f) < 3 or not f[0]:
+                    continue
+                rows.setdefault(f[0], []).append(line)
+        _REG_AT[key] = rows
+    return _REG_AT[key]
+
+
+def reads_registry(root, gate):
+    """True when the gate's own code — its script, or a tests/lib/ or tools/ file it reaches
+    (gate_follows.references) — names the registry outside a comment: then the whole file is
+    an input, not just the gate's row. None of the 223 registry gates did at 14z-195."""
+    key = (root, gate)
+    if key not in _READS_REG:
+        files = [f"tests/{gate}.sh"] + [r for r in gf.references(root, gate)
+                                        if r.startswith(("tests/lib/", "tools/"))]
+        hit = False
+        for rel in files:
+            p = os.path.join(root, rel)
+            if os.path.isfile(p) and any(os.path.basename(gf.REGISTRY) in l for l in
+                                         gf._body_lines(open(p, encoding="utf-8", errors="replace").read())):
+                hit = True
+                break
+        _READS_REG[key] = hit
+    return _READS_REG[key]
+
+
+def registry_row_moved(root, repo, commit, gate, run, rec):
+    """#237: tests/ci_emulator.tsv moved since <commit> — did it move FOR THIS GATE? The runner
+    reads only the rows, and a gate's run reads only its own row, so the gate is stale on the
+    registry when its own row's lines (every column, the description included) differ between
+    <commit> and the working tree. The whole file stays the input — True on any change — when
+    the gate's code reads the registry itself, when the run recorded the registry DIRTY (the
+    commit is then not what the run read: commit.txt's dirty list or the record's status), or
+    when either side cannot be read."""
+    if reads_registry(root, gate):
+        return True
+    dirty = set(read_run(run)[1]) if run and os.path.isfile(os.path.join(run, "commit.txt")) else set()
+    if rec:
+        dirty |= {l[3:].split(" -> ")[-1].strip('"') for l in rec.get("status") or []}
+    if gf.REGISTRY in dirty:
+        return True
+    old, new = registry_rows_at(repo, commit), registry_rows_at(repo, None)
+    if old is None or new is None:
+        return True
+    return old.get(gate) != new.get(gate)
 
 
 def _covered_hits(pool, prefixes):

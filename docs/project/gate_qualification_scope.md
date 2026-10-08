@@ -238,6 +238,14 @@ should have been). And the actionable half: `run_all_emulator.sh --stale` runs
 exactly the gates that gate names, so a session can retire its staleness in minutes
 instead of carrying it to the release. Shape 2 at 14z-174 would have read: "3 gates
 stale since 14z-171" at the 14z-171 close.
+**The registry is judged per row (14z-195, #237).** Every gate follows
+`tests/ci_emulator.tsv` implicitly, and the first audit judged it as one file, so one
+description edit (#230's, `0ad79730`) staled all 214 emulator gates at the M23 release.
+The runner reads only the rows and a gate's run only its own, so the audit now counts the
+registry as moved for a gate only when that gate's row changed; the whole file stays the
+input for a gate whose code reads it (none at 14z-195), for a run that recorded it dirty,
+and when either version cannot be read. Section 2f of `tests/test_emulator_staleness.sh`,
+control `whole-registry`.
 
 ### Q5 — headroom is checked, not assumed (shape 3)
 

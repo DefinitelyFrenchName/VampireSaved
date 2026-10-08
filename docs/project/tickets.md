@@ -11,12 +11,13 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**242 tickets** — status: open 13 · parked 9 · done 193 · declined 9 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 170 · cosmetic 16 · evolution 56 · **backfill debt: 0 rows**.
+**243 tickets** — status: open 14 · parked 9 · done 193 · declined 9 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 171 · cosmetic 16 · evolution 56 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#243](https://github.com/DefinitelyFrenchName/VampireSaved/issues/243) | bug | open | Staleness audit: 79 emulator gates declare the whole tests/replays/ directory, so any new replay stales them all | `tools/audit_emulator_staleness.py` | none | none | none | 14z-195 |
 | [#242](https://github.com/DefinitelyFrenchName/VampireSaved/issues/242) | bug | open | retraction_grep never lists a retracted wording broken by a quote prefix or HTML markup | `tools/retraction_grep.py` | none | none | none | 14z-194 |
 | [#241](https://github.com/DefinitelyFrenchName/VampireSaved/issues/241) | bug | open | Cross-check record derivation reads bit 7 of Zabel's pursuit damage bytes as damage (258/130 for a 0/2 hit) | `tools/vanilla_frames.py` | none | none | none | 14z-194 |
 | [#240](https://github.com/DefinitelyFrenchName/VampireSaved/issues/240) | cosmetic | open | Recipe READMEs: the easy way needs a prebuilt, step 3 cites step 1 for the set, the verifyroms comment overstates, a pointer to a file not shipped | `tools/package_release_platforms.py` | `DECISIONS_HISTORY.md § Ruled 2026-10-07 (14z-194) — the merged-m23 release: the 213 stale emulator verdicts approved at release; the recipe and launcher findings ticketed, not fixed first` | none | none | 14z-194 |

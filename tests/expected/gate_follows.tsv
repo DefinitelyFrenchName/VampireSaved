@@ -86,6 +86,7 @@ declares	audit_qs_voice_batch
 declares	audit_qs_voice_wav
 declares	audit_reaction_class_live
 declares	audit_region_movability
+declares	audit_release_linux_desktop
 declares	audit_rig_opening
 declares	audit_rng_draws
 declares	audit_rng_forms

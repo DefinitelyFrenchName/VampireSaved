@@ -29,6 +29,10 @@
 #   content is; 2d at freeze cadence a stale row outside what a freeze selects (scope `out`) is a NOTE,
 #   and at release cadence a FAIL; 2e a gate whose newest row is FAIL fails at freeze cadence, is a
 #   NOTE at session, and is listed by --names.
+#   Section 2f (14z-195, #237), on a fourth scratch repository: the registry is judged PER ROW — a gate
+#   whose own row changed (its description) is stale on tests/ci_emulator.tsv, a gate for which only
+#   another row and a comment changed is not, a gate whose code reads the registry is stale on any
+#   change, and a run that recorded the registry dirty keeps the whole-file rule.
 # EXPECTS: at session cadence a PASS whatever is stale (the stale list is a NOTE and the
 #   command to retire it: tests/run_all_emulator.sh --stale); at freeze or release cadence
 #   a stale or undeclared passed gate is a FAIL; a row at or above half its cap is a FAIL
@@ -39,6 +43,7 @@
 # MUST-FIRE: shadow-tool: keys-ignored — a copy of the tool that never consults the run's record (every moved path moved, the pre-14z-192 rule) must name the unchanged dirty file and submodule stale (mode: that copy is the tool section 2c runs; section 2c must fail)
 # MUST-FIRE: shadow-tool: scope-ignored — a copy of the tool whose freeze cadence judges every row must FAIL the out-of-scope plant (mode: that copy is the tool section 2d runs; section 2d must fail)
 # MUST-FIRE: known-bad: red-newest — the scratch run whose newest row for g_red is FAIL, judged at freeze cadence, must FAIL naming it (mode: that verdict is this gate's)
+# MUST-FIRE: shadow-tool: whole-registry — a copy of the tool that judges tests/ci_emulator.tsv as one file again (the pre-#237 rule) must name g_other stale though only g_own's row and a comment moved (mode: that copy is the tool section 2f runs; section 2f must fail)
 # MUST-FIRE: shadow-tool: newest-dir — a copy of the tool that reads only the NEWEST run directory (the pre-#211 run of record) must miss g_follows behind a newer partial run and a newer empty one (mode: that copy is the tool section 2b runs; section 2b must fail)
 #
 # WHY: at the 14z-174 release tier the MiSTer lane's green was carried on inputs checked
@@ -146,7 +151,28 @@ TOOL3S="$TOOL"; vs_ctl_is scope-ignored && TOOL3S="$W/tool_scopeignored.py"
 on3() {  # on3 <tool> <run dir> <cadence> <out> — exit code
     python3 "$1" --root "$R3" --repo "$R3" --run "$R3/build/$2" --cadence "$3" > "$4" 2>&1; echo $?; }
 
-if [ -n "$VS_CTL" ] && [ "$VS_CTL" != newest-dir ] && [ "$VS_CTL" != keys-ignored ] && [ "$VS_CTL" != scope-ignored ]; then
+# THE REGISTRY ROOT (section 2f, 14z-195, #237): three gates, one of which reads the registry in its code;
+# a run recorded on the base commit, then g_own's description and a comment change; a second run whose
+# commit.txt names the registry dirty.
+R4="$W/repo4"; mkdir -p "$R4/tests" "$R4/tools"
+for g in g_own g_other g_reads; do printf '#!/bin/sh\n# %s.sh — a stub\n# FOLLOWS: tools/%s.py\n: "${MAME_BIN:-}"\n' "$g" "$g" > "$R4/tests/$g.sh"; echo "print(0)" > "$R4/tools/$g.py"; done
+echo 'cut -f1 tests/ci_emulator.tsv > /dev/null' >> "$R4/tests/g_reads.sh"
+printf '# a registry\ng_own\tmame\trelease\tromset\t-\tfirst description\ng_other\tmame\trelease\tromset\t-\tstub\ng_reads\tmame\trelease\tromset\t-\tstub\n' > "$R4/tests/ci_emulator.tsv"
+( cd "$R4" && git init -q && git $CFG add -A && git $CFG commit -q -m base ) || { echo "FAIL: scratch registry repository"; exit 1; }
+B4="$(cd "$R4" && git rev-parse HEAD)"
+for run in emu_reg emu_regdirty; do
+    mkdir -p "$R4/build/$run"; echo "$B4" > "$R4/build/$run/commit.txt"
+    printf 'gate\tlane\tscope\tverdict\tseconds\tdetail\ng_own\tmame\trelease\tPASS\t10\t\ng_other\tmame\trelease\tPASS\t10\t\ng_reads\tmame\trelease\tPASS\t10\t\n' > "$R4/build/$run/results.tsv"
+done
+echo "tests/ci_emulator.tsv" >> "$R4/build/emu_regdirty/commit.txt"
+sed -i.bak -e 's/first description/second description/' -e 's/^# a registry$/# a registry, re-commented/' "$R4/tests/ci_emulator.tsv"; rm -f "$R4/tests/ci_emulator.tsv.bak"
+sed 's|^        if gf.REGISTRY in hits and not registry_row_moved(root, repo, c, g, d, recs\[d\]):$|        if False:  # CONTROL whole-registry|' "$TOOL" > "$W/tool_wholereg.py"
+cmp -s "$TOOL" "$W/tool_wholereg.py" && { echo "FAIL: could not build the whole-registry shadow — the line moved"; exit 1; }
+TOOL4="$TOOL"; vs_ctl_is whole-registry && TOOL4="$W/tool_wholereg.py"
+on4() {  # on4 <tool> <run dir> <out> — exit code, at release cadence
+    python3 "$1" --root "$R4" --repo "$R4" --run "$R4/build/$2" --cadence release > "$3" 2>&1; echo $?; }
+
+if [ -n "$VS_CTL" ] && [ "$VS_CTL" != newest-dir ] && [ "$VS_CTL" != keys-ignored ] && [ "$VS_CTL" != scope-ignored ] && [ "$VS_CTL" != whole-registry ]; then
     case "$VS_CTL" in
         moved-input)    rc="$(tool_on emu_plant freeze)";   f="$W/o_emu_plant_freeze.txt" ;;
         headroom-eaten) rc="$(tool_on emu_headroom session)"; f="$W/o_emu_headroom_session.txt" ;;
@@ -226,7 +252,27 @@ grep -q 'NOTE: 1 gate(s) whose newest row is red' "$W/o_red_s.txt" && [ "$rc" = 
 names3="$(python3 "$TOOL" --root "$R3" --repo "$R3" --run "$R3/build/emu_red" --names | tr '\n' ' ')"
 case " $names3 " in *" g_red "*) ok "--names lists the red gate, so --stale re-runs it ($names3)" ;; *) bad "--names printed '$names3'" ;; esac
 
+echo "== 2f. the registry is judged per row (14z-195, #237)"
+rc="$(on4 "$TOOL4" emu_reg "$W/o_reg.txt")"
+grep -q 'g_own: tests/ci_emulator.tsv' "$W/o_reg.txt" && ok "a gate whose own row changed (its description) is stale on the registry (g_own)" \
+    || { bad "g_own not named for its changed row"; sed 's/^/        /' "$W/o_reg.txt"; }
+grep -q 'g_other' "$W/o_reg.txt" && { bad "g_other named stale though only g_own's row and a comment moved"; sed 's/^/        /' "$W/o_reg.txt"; } \
+    || ok "a gate for which only another row and a comment moved is not stale (g_other)"
+grep -q 'g_reads: tests/ci_emulator.tsv' "$W/o_reg.txt" && ok "a gate whose code reads the registry is stale on any change (g_reads)" \
+    || { bad "g_reads not named"; sed 's/^/        /' "$W/o_reg.txt"; }
+[ "$rc" = 1 ] && ok "release cadence FAILs on the two stale gates (exit 1)" || bad "the registry plant exited $rc at release cadence"
+rc="$(on4 "$TOOL" emu_regdirty "$W/o_regdirty.txt")"
+grep -q 'g_other: tests/ci_emulator.tsv' "$W/o_regdirty.txt" && ok "a run that recorded the registry dirty keeps the whole-file rule (g_other stale)" \
+    || { bad "g_other not stale on the dirty-registry run (exit $rc)"; sed 's/^/        /' "$W/o_regdirty.txt"; }
+
 echo "== 3. controls"
+if [ "$VS_CTL" = whole-registry ]; then
+    vs_ctl_fired whole-registry "section 2f ran the whole-registry copy (mode)"
+else
+    on4 "$W/tool_wholereg.py" emu_reg "$W/o_wholereg.txt" > /dev/null
+    grep -q '^== emulator staleness' "$W/o_wholereg.txt" && grep -q 'g_other: tests/ci_emulator.tsv' "$W/o_wholereg.txt" \
+        && vs_ctl_fired whole-registry "the copy judging the registry as one file names g_other stale" || { vs_ctl_dead whole-registry "the whole-file copy did not name g_other"; fail=1; }
+fi
 if [ "$VS_CTL" = keys-ignored ] || [ "$VS_CTL" = scope-ignored ]; then
     vs_ctl_fired "$VS_CTL" "section 2c/2d ran the $VS_CTL copy (mode)"
 else
