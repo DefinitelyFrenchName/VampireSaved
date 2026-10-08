@@ -10,7 +10,7 @@
 #   A2 +0x1B8 counts ATTACK STARTS of a human side: every FRESH attack start (a write to +0x101 by PRG:0x02757E) is
 #      PAIRED ONE-TO-ONE IN TIME with a +0x1B8 write by PRG:0x0274D6 within 1 frame (every start and every write used
 #      once; the offsets are reported; every write by 0x0274D6 or 0x028F18 RAISES the word by exactly 1 over its previous
-#      value), starts that land no hit included — so mizuumi's "whiff counter" is refuted as a
+#      value), on every human side of all five legs, starts that land no hit included — so mizuumi's "whiff counter" is refuted as a
 #      whiff count; A2b no CHAINED start (+0x101 written by PRG:0x028ED8) has a 0x0274D6 write within that window (the
 #      chained count per leg reported, nonzero on 118_chain); A2c each chained start pairs one-to-one with a +0x1B8 write
 #      by PRG:0x028F18 instead — so +0x1B8 counts chained starts too, through a second writer (the 14z-194 pilot's
@@ -20,10 +20,15 @@
 #      of a chained start (+0x101 written by PRG:0x028ED8) — and every rise of the per-frame value to 0xFF lies within one
 #      frame of a chained start (at least three), on either side, while on the
 #      isolated presses of 118_input_sweep, on EACH side, 0x028ED0 never writes and the value stays 0 (other PCs write 0xFF
-#      transiently, invisible at frame end — measured 14z-195, reported by PC, not asserted);
+#      transiently, invisible at frame end — measured 14z-195, reported by PC, not asserted); and on all five legs, both
+#      sides, every 0x028ED0 0xFF write and every rise of the per-frame value to 0xFF lies within one frame of a chained
+#      start on that side;
 #   A5 +0x169 reads 13 or 14 on the frame of each landed hit (+0x1B6 incrementing) and never rises except within one frame
-#      of one, on the 2P legs — 03, 37, 118_chain and 118_input_sweep (per-leg hits and rises reported; the sweep's isolated
-#      presses land no hit and +0x169 never rises there).
+#      of one, on both sides of the 2P legs — 03, 37, 118_chain and 118_input_sweep (per-leg hits and rises reported; the
+#      sweep's isolated presses land no hit and +0x169 never rises there). 02 (1P vs CPU) is NOT judged: there the claim
+#      does not hold as stated (rule-checker run 2026-10-08-738, measured 14z-195 on ERIS: the CPU side's landed hit at
+#      trace frame 3553 reads 0, and 6 of 48 rises lie farther than 1 f from a hit — three paired events, P2 rising to 14
+#      at 4288/4411/4617 and P1 to 255 one frame later, mechanism not measured); its per-side values are printed as info.
 # HOW: on MAME (the reference binary), FIELD legs under tests/lua/field_trace.lua for 03_two_player_vs, 37_victor_ko_vsavj,
 #   118_input_sweep, 118_chain and 02_demitri_vs_cpu (1P: a CPU side that fights), and WRITE-TAP legs under
 #   tests/lua/read_tap.lua (each side's +0x100, +0x118 and +0x1B8 words) for the five; a tap write in tap frame f lands
@@ -243,7 +248,7 @@ print(f"CTLA1 {ndisc1} {len(pkfail)} {','.join(pknon) or '-'} {','.join(sorted(s
 n2 = ok2 = miss_starts = 0; per = []; offs = collections.Counter()
 chain_bad = ok2c = 0; chained_by = {}; per2c = []; inc_n = inc_ok = 0
 W2 = 1   # the pairing window: the tap shows each 0x0274D6 write in the same frame as its start (offsets reported)
-for k in ("03", "37", "sweep", "chain"):
+for k in ("03", "37", "sweep", "02", "chain"):   # every leg (rule-checker run 2026-10-08-738: 02 had been left out)
     byf = {d["f"]: d for d in T[k]}
     for s in HUMAN[k]:
         starts = sorted(f for f, pc, v in wfield(k, s, 0x101) if pc == "02757e")
@@ -326,6 +331,21 @@ res(len(by28) >= 3 and near == len(by28) and reads >= 3 and reads == len(rises4)
     f"the per-frame value rose to 0xFF {len(rises4)} times{' (moved 20 f later)' if PERT == 'reads-shifted' else ''}, {reads} of them within 1 f of a chained start "
     f"(P1 {sum(1 for s, f in by28 if s == 1)} writes / {len(chained_s[1])} chained, P2 {sum(1 for s, f in by28 if s == 2)} / {len(chained_s[2])}); "
     f"other 0xFF writers (transient) {dict(other)}")
+# ... and on EVERY leg, both sides (rule-checker run 2026-10-08-738): each 0x028ED0 0xFF write and each rise of the
+# per-frame value to 0xFF lies within 1 frame of a same-side chained start (reads-shifted moves the rises 20 f later)
+allw = allwn = allr = allrn = 0; per4 = {}
+for k in ("03", "37", "sweep", "02", "chain"):
+    t = per4.setdefault(k, [0, 0, 0, 0, 0])
+    for s in (1, 2):
+        ch = sorted(f for f, pc, v in wfield(k, s, 0x101) if pc == "028ed8")
+        w28 = [f for f, pc, v in wfield(k, s, 0x119) if v == 0xff and pc == "028ed0"]
+        rr = [b["f"] + (20 if PERT == "reads-shifted" else 0) for a, b in zip(T[k], T[k][1:]) if a[f"chf{s}"] != 0xff and b[f"chf{s}"] == 0xff]
+        wn = sum(1 for f in w28 if any(abs(f - c) <= 1 for c in ch)); rn = sum(1 for f in rr if any(abs(f - c) <= 1 for c in ch))
+        allw += len(w28); allwn += wn; allr += len(rr); allrn += rn
+        t[0] += len(ch); t[1] += len(w28); t[2] += wn; t[3] += len(rr); t[4] += rn
+res(allw > 0 and allwn == allw and allrn == allr, "A4",
+    f"every leg, both sides: {allwn}/{allw} 0x028ED0 0xFF writes and {allrn}/{allr} per-frame rises to 0xFF within 1 f of a chained start"
+    f"{' (rises moved 20 f later)' if PERT == 'reads-shifted' else ''} — per leg (chained starts, writes, writes near, rises, rises near): {per4}")
 for s in (1, 2):   # the sweep's isolated presses, EACH side (both sides press in 118_input_sweep)
     swf = [(f, pc) for f, pc, v in wfield("sweep", s, 0x119) if v == 0xff]
     sw = sorted({d[f"chf{s}"] for d in T["sweep"] if inmatch(d)})
@@ -339,7 +359,7 @@ at = collections.Counter(); rises = nearhit = nhits = 0
 fld5 = "exw" if PERT == "neighbour-word" else "cht"
 sh5 = 30 if PERT == "hits-shifted" else 0
 per5 = {}
-for k in ("03", "37", "chain", "sweep"):   # every 2P leg (rule-checker run 2026-10-08-735)
+for k in ("03", "37", "chain", "sweep"):   # every 2P leg (rule-checker run 2026-10-08-735); 02 is reported below, not judged
     byf = {d["f"]: d for d in T[k]}
     for s in (1, 2):
         hitf = [b["f"] + sh5 for a, b in zip(T[k], T[k][1:]) if b[f"hits{s}"] > a[f"hits{s}"]]
@@ -350,6 +370,18 @@ for k in ("03", "37", "chain", "sweep"):   # every 2P leg (rule-checker run 2026
         rises += len(rf); nearhit += nh
         t = per5.setdefault(k, [0, 0, 0]); t[0] += len(hitf); t[1] += len(rf); t[2] += nh
 res(nhits > 0 and set(at) <= {13, 14} and nearhit == rises, "A5", f"{'+0x168 (mode neighbour-word)' if fld5 == 'exw' else '+0x169'} at {nhits} landed hits{' (moved 30 f later)' if sh5 else ''} {dict(at)}; {nearhit}/{rises} rises within 1 f of a hit per leg (hits, rises, rises near a hit): {per5}")
+# 02 (1P vs CPU) is NOT judged (rule-checker run 2026-10-08-738 asked for every leg; measured 14z-195 on ERIS: 43 landed
+# hits, one reading 0, and 42/48 rises near a hit — the claim does not hold there as stated; see the WHAT). Reported per side.
+byf = {d["f"]: d for d in T["02"]}
+for s in (1, 2):
+    hitf = [b["f"] for a, b in zip(T["02"], T["02"][1:]) if b[f"hits{s}"] > a[f"hits{s}"]]
+    hitf = [f for f in hitf if f in byf]
+    rf = [b["f"] for a, b in zip(T["02"], T["02"][1:]) if b[f"cht{s}"] > a[f"cht{s}"]]
+    far = [r for r in rf if not any(abs(r - h) <= 1 for h in hitf)]
+    odd = [(f, byf[f][f"cht{s}"]) for f in hitf if byf[f][f"cht{s}"] not in (13, 14)]
+    print(f"  info  [A5] 02 P{s} ({'human' if s in HUMAN['02'] else 'CPU'}, not judged): +0x169 at {len(hitf)} landed hits "
+          f"{dict(collections.Counter(byf[f][f'cht{s}'] for f in hitf))}; {len(rf) - len(far)}/{len(rf)} rises within 1 f of a hit; "
+          f"hits reading neither 13 nor 14 (frame, value) {odd[:8]}; rises far from a hit (frame, value) {[(r, byf[r][f'cht{s}']) for r in far][:8]}")
 sys.exit(1 if bad else 0)
 PY
 }
