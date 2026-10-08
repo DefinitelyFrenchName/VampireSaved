@@ -269,6 +269,13 @@ excluded the rendered `docs/site/`, which still carried the old text. The
 tool, run over the sitting's pattern file, found both. **The rule does not
 wait for the close:** use the tool for any retraction, whenever it happens.
 
+**Paid again 14z-194, fixed 14z-195 (#242):** the collapse covered whitespace, backticks and comment prefixes,
+but a wording split by a Markdown quote prefix on a wrapped line (an archived opener in `docs/NEXT_SESSION_HISTORY.md`),
+by a rendered page's tags and entities (`docs/site/`), by a code string join or by `**` emphasis was never listed.
+The close found one only through its rendered page. The ticket's first description then named the wrong mechanism
+("one line only") until rule-checker run 2026-10-07-723: read the matcher before describing its gap. Each of those
+four shapes now has a self-test plant (`tools/retraction_grep.py --selftest`; `--nomarkup` is the known-bad variant).
+
 ## AN AIR-THROW RIG IS DECIDED BY THE VICTIM'S JUMP LEAD, NOT BY THE PAIR'S SPACING — with both jumps on one frame the pair is bistable across schedule shifts (paid: 14z-120 to 14z-181, GitHub #169)
 
 **What happened.** `pyron_3`'s two Galactic Throw events (`air_throw("MP")` /

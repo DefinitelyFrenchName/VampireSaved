@@ -6,7 +6,7 @@
 number	state	reason	closed	labels	title
 244	OPEN	-	-	bug	Tenant charmap pages print the raw +8/+9 power byte as damage (the #241 decode not applied to charmap_html/charmap_md)
 243	OPEN	-	-	bug	Staleness audit: 79 emulator gates declare the whole tests/replays/ directory, so any new replay stales them all
-242	OPEN	-	-	bug	retraction_grep never lists a retracted wording broken by a quote prefix or HTML markup
+242	CLOSED	COMPLETED	2026-10-08	bug	retraction_grep never lists a retracted wording broken by a quote prefix or HTML markup
 241	CLOSED	COMPLETED	2026-10-08	bug	Cross-check record derivation reads bit 7 of Zabel's pursuit damage bytes as damage (258/130 for a 0/2 hit)
 240	OPEN	-	-	cosmetic	Recipe READMEs: the easy way needs a prebuilt, step 3 cites step 1 for the set, the verifyroms comment overstates, a pointer to a file not shipped
 239	OPEN	-	-	bug	MAME PLAY.command's macOS quarantine message names "fbneo" instead of the MAME binary

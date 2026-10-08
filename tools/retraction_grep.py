@@ -18,7 +18,10 @@ wording in its plain and code-spanned carriers; a carrier line-wrapped across a
 known carriers (plain and code-spanned) fails when either is missed. Each file under the roots is read WHOLE, with runs of
 whitespace, backticks and `#` or `--` comment prefixes at line starts collapsed to one
 space (`--` since 14z-184: a wording wrapped across Lua comment lines was invisible, rule-checker run 2026-09-25-317) and the text CASE-FOLDED, and each pattern is matched the same way — so a wrapped, code-spanned or
-comment-wrapped carrier is found. Every hit is printed with its file and the
+comment-wrapped carrier is found. Since 14z-195 (#242) also a Markdown quote prefix (`> `) on a wrapped line,
+a code string join (`...")` then `A("...` on the next line), `**` emphasis, and — in a rendered `.html`
+page — the tags and entities are collapsed, each with a self-test plant (`--nomarkup` is the known-bad
+variant without them). Every hit is printed with its file and the
 matched text; the CLASSING of retracted hits is the working agent's, written
 in the artifact by hand below the tool's output. EXIT 1 when any reach control
 reads fewer hits than it demands (0, or N for `reach:N`) or any `gone` wording
@@ -49,10 +52,22 @@ EXCLUDE = ("tests/rulecheck/runs", "tools/retraction_grep.py", "tests/rulecheck/
 
 
 NOFOLD = False   # --nofold: case-folding disabled — a KNOWN-BAD variant for test_close_tools' case-fold-dropped mode
+NOMARKUP = False   # --nomarkup: the #242 collapses disabled — a KNOWN-BAD variant for test_close_tools' markup-dropped mode
+
+
+def unhtml(t):
+    """A rendered page (docs/site/*.html) carries a wording through tags and entities (`<code>…</code>`,
+    `&quot;`): strip the tags and unescape the entities before matching (#242, 14z-195)."""
+    import html
+    return html.unescape(re.sub(r"<[^>]+>", " ", t))
 
 
 def norm(t):
     t = re.sub(r"(^|\n)[ \t]*(?:#+|--)[ \t]*", " ", t)   # shell/python `#` and Lua `--` (14z-184, run 317)
+    if not NOMARKUP:   # #242 (14z-195): carriers the collapse above did not reach
+        t = re.sub(r"(^|\n)[ \t]*(?:>[ \t]*)+", " ", t)   # a Markdown quote prefix on a wrapped line
+        t = re.sub(r"[\"']\)?[ \t]*\n[ \t]*(?:[A-Za-z_][\w.]*\()?[\"']", " ", t)   # a code string join: `...")` / `A("...` or `"` / `"`
+        t = t.replace("**", "")   # Markdown emphasis inside a wording
     t = re.sub(r"\s+", " ", t.replace("`", ""))
     return t if NOFOLD else t.lower()   # case-folded: a HEADING carries a wording too (run 196)
 
@@ -63,19 +78,28 @@ def selftest():
     cases = [("upper-case heading", "## THE GROUND IS Y = 40 — a heading\n", "the ground is y = 40"),
              ("comment-wrapped", "# first half of the\n# wrapped wording here\n", "of the wrapped wording"),
              ("lua-comment-wrapped", "-- first half of the\n-- lua wrapped wording\n", "of the lua wrapped wording"),
-             ("code-spanned", "the `LEAD=0` for the walk\n", "LEAD=0 for the walk")]
-    bad = [name for name, text, pat in cases if norm(pat).strip() not in norm(text)]
+             ("code-spanned", "the `LEAD=0` for the walk\n", "LEAD=0 for the walk"),
+             # #242 (14z-195): the four carriers the collapse did not reach
+             ("quote-wrapped", "> the old claim had five\n>    call sites in all\n", "five call sites"),
+             ("html-rendered", "<p>it read &quot;the <code>+9</code> is dealt&quot; once</p>", '"the +9 is dealt"'),
+             ("string-joined", '    A("the wording runs on ")\n    A("into the next line")\n', "runs on into the next"),
+             ("emphasis-split", "the **ground** is y = 40\n", "the ground is y = 40")]
+    bad = [name for name, text, pat in cases
+           if norm(pat).strip() not in norm(unhtml(text) if name == "html-rendered" and not NOMARKUP else text)]
     if bad:
-        print("SELFTEST FAIL: the matcher missed the planted " + ", ".join(bad) + " case(s)" + (" (no-fold variant)" if NOFOLD else ""))
+        print("SELFTEST FAIL: the matcher missed the planted " + ", ".join(bad) + " case(s)" + (" (no-fold variant)" if NOFOLD else "") + (" (no-markup variant)" if NOMARKUP else ""))
         sys.exit(1)
-    print("SELFTEST PASS: the upper-case heading, comment-wrapped (`#` and Lua `--`) and code-spanned plants are each matched")
+    print("SELFTEST PASS: the upper-case heading, comment-wrapped (`#` and Lua `--`), code-spanned, quote-wrapped, html-rendered, string-joined and emphasis-split plants are each matched")
     sys.exit(0)
 
 
 def main():
     global NOFOLD
+    global NOMARKUP
     if "--nofold" in sys.argv:
         NOFOLD = True; sys.argv.remove("--nofold")
+    if "--nomarkup" in sys.argv:
+        NOMARKUP = True; sys.argv.remove("--nomarkup")
     if len(sys.argv) > 1 and sys.argv[1] == "--selftest":
         selftest()
     if len(sys.argv) < 2:
@@ -108,7 +132,8 @@ def main():
             continue
         if b"\0" in b:
             continue   # binary
-        texts[f] = norm(b.decode("utf-8", errors="ignore"))
+        t = b.decode("utf-8", errors="ignore")
+        texts[f] = norm(unhtml(t) if f.suffix == ".html" and not NOMARKUP else t)
     import hashlib
     # the fingerprint leaves out tests/rulecheck/ledger.tsv: `rulecheck record`, `resolve` and
     # `prepare` append to it AFTER every snapshot by construction, so a fingerprint that
