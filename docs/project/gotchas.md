@@ -6742,3 +6742,15 @@ called the +9 "the dealt white damage, unscaled", contradicting the comparator's
 field's NAME is not its encoding. Before deriving a quantity from a record byte, read the engine instruction that
 consumes it. A special case added at the point of use is a sign the reader is wrong, and its other consumers share
 the error (#244: the tenant pages).
+
+## A READER CENSUS BY BASE ADDRESS, OR A BREAKPOINT ON THE KNOWN READERS, CANNOT SHOW A SCREEN DOES NOT READ A TABLE (paid: 14z-195, #124, rule-checker run 2026-10-08-743)
+
+#124's owed check asked whether the select screen reads the map's portrait array `0x26762A`. Two instruments answered
+"no": a static census of every ABSOLUTE operand and data longword equal to the array's base (`tests/test_map_table_readers.sh`),
+and logging breakpoints on the two reader PCs the census found (map `0x05FC76`, ranking `0x08C5E0`) during a 2P replay
+that reaches select. Both were blind to the reader that exists: `0x26762A` is the select screen's name-banner P2 array,
+reached through `movea.l #$2675AA` plus a 0x80 player bias (`docs/game/atlas/select_screen.md`, measured 14z-61). The
+answer was posted on #124 and corrected the same session. Rule: "X does not read table T" needs an instrument on the
+TABLE's bytes (a read watch over T's range during the screen in question, with a positive control the screen is known to
+read), or a census that also follows base+offset arithmetic into T. A census keyed on T's base and breakpoints on its
+known readers can only find more of the readers they already know.

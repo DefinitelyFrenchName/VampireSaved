@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-194 CLOSE, 2026-10-07)
+# NEXT SESSION — orientation (rewritten at the 14z-195 CLOSE, 2026-10-08)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
@@ -8,49 +8,52 @@
 ## THE SETUP, RESTATED
 
 A plain **Opus 5.5 session at effort High** (the ruled orchestrator — STATE 'Standing rulings') on the
-#172 setup: every quoted figure from a `measurer` / `reader` spec (`docs/project/worker_spec.md`, the spec
-text IN the prompt, no model), every freeze and recommendation through the pinned `rule-checker` with the
-prompt files pasted VERBATIM, `record --session <transcript id>`, `resolve` on ONE line with one label per
-violated question, and only AFTER the work it names exists (14z-194 resolved run 718 before its work landed).
+#172 setup:
+- Every quoted figure comes from a `measurer` / `reader` spec (`docs/project/worker_spec.md`, the spec text IN the prompt, no model).
+- Every freeze and recommendation goes through the pinned `rule-checker`, with the prompt files pasted VERBATIM.
+- Then `record --session <transcript id>`, and `resolve` on ONE line with one label per violated question, only AFTER the work it names exists.
+
 Say so at the opener. Never spawn any agent at `max`. A recommendation leans only on the maintainer's OWN words.
-**Before any long job, check whether PILOT (`ssh pilot`) or ERIS (`ssh eris`) is idle and run independent
-work there in parallel** — the maintainer's standing wish (14z-194: *"if and only if you don't need ERIS or
-PILOT for the release, please put them to use"*).
+**Before any long job, check whether PILOT (`ssh pilot`) or ERIS (`ssh eris`) is idle, and run independent work
+there in parallel.**
 
 ## START HERE
 
-0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** **merged-m23 is PUBLISHED** (Latest on GitHub, nine
-   assets; M22 and M19 emptied). What the close found and did is in STATE 14z-194's CLOSE row.
-2. **#129 — PUT THE DECISION** (STATE 14z-194 row (3); facts in `docs/game/engine_internals.md` "The CPU AI
-   action-script system"): behaviour A (Phobos's continuation-check guard: a private clone, 0 legacy bytes, at
-   most 92 cycles a frame) and behaviour B (vs2's crouch-guard test in shared engine code: 30 legacy bytes, about
-   80 cycles static estimate). Gameplay feel is the maintainer's ([VSP-10]); captures first, then the options
-   through the rule-checker.
-3. **THE NEXT VERSION** carries #124's map fix, name and portrait (approved, documented on #124: name records, relocated
-   portrait tiles, vs2's pool rows — its two owed checks ANSWERED 14z-195 (the select screen reads neither array; pool rows 0x10/0x11/0x13 have one reader, the map's): the fix's gates must also cover the attract SCORE RANKING, which reads the same arrays and which a tenant player enters (`tests/audit_ranking_tenant.sh`; its palette and the byte table `0x8C724` at the tenant ids unmeasured — STATE 14z-195 row (5))
-   and the release-tooling fixes
-   already merged (#236, #238-#240, `5a5205c5`). A freeze, then a release.
-4. **Open, scoped:** #118 (63 of 75 measured and homed in `atlas/ram.md`; 12 left, each naming the state it
-   needs; the six scratch-script promotions proposed in the #118 worktree's `HOMING.md`), #229 (pursuits done for
-   all 15; next families in `families.tsv` order: ground throws, then the rest), #226 (a clean host remains; step 2 complete by the maintainer's own test),
-   #228 (breakpoint instruments on the frame_done clock — deferred by the maintainer: *"well do these long
-   tickets later"*).
+0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** What the close found and did is in STATE 14z-195's CLOSE row.
+1. **#124 — THE BUILD** (the maintainer: *"Scope #124, build next"*). The plan is the #124 comment "The build plan (14z-195)", rule-checker run 2026-10-08-749 OK.
+   - **Step 0 FIRST, before any byte changes:** debugger read watchpoints over every row the build rewrites, with the select screen's read of `0x26762A`'s P2 rows as the positive control.
+   - Then: a `native_c5` `select_records` row for `0x26752A`, and two `site_thunk` bank gates at `0x05FC36`/`0x05FC76`. These replace the approved tile relocation, because the select screen draws the same rows.
+   - Then vs2's width words and pool rows, the score ranking's own bank gate (its bank bits measured first), and the gates.
+2. **#245-#255 — eleven code-review findings**, filed 2026-10-08 as `mechanyaa-ai` against `d1759b33` and indexed as open bugs at this close.
+   - #245 (P1): the WIDE builder overwrites a source zip through its own symlink.
+   - The rest are P2/P3: release packaging and appliers, CI, the staleness audit, the replay wrapper, the control classifier.
+   - Triage them with the maintainer: bug archaeology first ([VSP-14]).
+3. **#129 — PUT THE DECISION** (STATE_HISTORY 14z-194; facts in `docs/game/engine_internals.md` "The CPU AI action-script system"). The maintainer's last priority.
+4. **Open, scoped:**
+   - #118: three emulator gates landed, now scope `out`; HOMING items 4 and 5 remain.
+   - #229: ground throws gated and on the cross-check page; specials, supers and EX/ES moves next.
+   - #226: the desktop and clean-host gates are both green on PILOT. Close it, or keep it open until a release runs both? The maintainer's call.
+   - #228, deferred.
+   - #243, #244.
+   - Done, awaiting release: #236, #238-#240.
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
-- `ssh eris` lands in Windows `cmd`: it splits on `|` and mangles `\$`. Write scripts on the Mac, `scp` them to
-  `C:\Users\chaton`, run `ssh eris 'wsl.exe -e bash /mnt/c/Users/chaton/<file>'`; `export ROMDIR=/home/koneko/roms`
-  inside WSL (unexported, `tools/run_mame.sh` refuses every leg). `scp eris:` cannot reach WSL home paths: tar
-  into `/mnt/c` first.
-- `rulecheck.py record --session` takes the TRANSCRIPT id (`37644128` this sitting), not the session key.
-- A commit message quoting "close #N" is refused by the hook even inside a quotation: reword.
-- PILOT's desktop runs PipeWire with a null sink; `pw-record -P '{ stream.capture.sink=true }' --target auto_null`
-  records the emulator; gnome-shell's event sounds share the sink, so judge the emulator's own stream.
-- In zsh, `echo ===` fails (`=cmd` expansion).
-- A FORK skips its spec's READ FIRST files (14z-194 procedure runs 725-727: five forks did): before merging a fork's result, check its
-  transcript read what its spec named, or name the gap in the merge.
+- **A census of absolute references to a table, plus breakpoints on its known readers, cannot show a screen does NOT read it.** `0x26762A` is reached through `0x2675AA + 0x80`. Use a read watch over the table's bytes, with a positive control (`docs/project/gotchas.md`).
+- **podman on PILOT runs rootless.** `docker.io/library/ubuntu:24.04` is pulled. glibc 2.39's `LD_DEBUG=libs` prints `find library=X [0]; searching`, then `(RUNPATH from file Y)` and `trying file=` lines, and no `needed by` lines (`tools/cleanhost_libs.py`).
+- **`rulecheck.py` arguments:** `prepare --session` takes the 14z key; `record --session` takes the transcript id (`d93d8edb` this sitting).
+- **`claim_lint` refuses an untied "every".** Tie it to an artifact path in the same sentence.
+- **zsh does not split a command held in a variable** (`$F args` fails). Write the command out.
+- **`ldconfig -p` lines start with a TAB.** Match `^[[:space:]]soname `.
 
-## WHAT CLOSED THIS SITTING (14z-194)
+## WHAT CLOSED THIS SITTING (14z-195)
 
-**#214**, **#227**, **#234** (shipped in merged-m23), **#235** `done`. Filed: #237, #238, #239, #240, #241. Fixed for the
-next version, open until it ships: #236, #238, #239, #240. merged-m23 PUBLISHED.
+- **Closed `done`:** #237, #241, #242.
+- **Filed:** #243, #244.
+- **Indexed:** #245-#255.
+- **Ruled:**
+  - a done-but-unreleased ticket gets a comment saying so;
+  - `libudev.so.1` is host-provided;
+  - #229's captures confirmed;
+  - the four mizuumi gates leave release scope;
+  - #124 scoped this sitting, built the next.

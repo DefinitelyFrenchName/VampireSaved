@@ -443,6 +443,26 @@ So: CLAUDE.md [VSP-182] gains the rule ("DONE, AWAITING RELEASE"): when a ticket
 
 ---
 
+## Ruled 2026-10-08 (14z-195) — #124: scope the build this session, build it the next
+
+**The question (AskUserQuestion):** *"#124's approved fix (names, portrait tiles, portrait palette for the three tenants on the map and now also the score ranking) is a session-sized build change: new select-record rows for the map's name array, tile relocation (plus a measurement of which gfx bank the map and ranking drawers use, since the select screen's bank gate does not cover them), the three pool rows, and its release-scope gate against native vs2 and vsavj. #118's gates and #226's clean host are done; #229's cross-check section is being homed by its fork. How should I use the rest of this session?"* — options "Scope #124, build next", "Start the #124 build now", "Other tickets first".
+
+**The maintainer:** *"Scope #124, build next"*
+
+So: this session measures the drawer-bank question and posts a concrete build plan on #124, lands #229's section, and closes; the build opens the next session.
+
+---
+
+## Ruled 2026-10-08 (14z-195) — #229's capture sheet shows the throws; the four mizuumi gates leave release scope
+
+**The questions (AskUserQuestion):** *"#229: I sent the capture sheet of the 42 vsavj ground throws, each shown at its first-damage frame. Do the tiles show the real throws? Bulleta's two tiles show only the dog and Victor (she is out of frame)."* — options "They are the throws", "Re-shoot Bulleta", "Something is wrong"; and *"Scope of the four mizuumi gates (audit_mizuumi_struct, audit_mizuumi_inputs, audit_extra_pass, audit_mizuumi_attack). They measure pristine vsavj only and never run the merged build, so a release does not change their verdict. Should they leave release scope?"* — options "Move to out (Recommended)", "Keep at release".
+
+**The maintainer:** *"They are the throws and Buletta is actually in frame but barely visible as her sprite goes behind her target's during the throw"*; *"Move to out (Recommended)"*.
+
+So: the capture sheet (`build/agent195/t229g/v3/normal/capture.png`, rule-checker run 2026-10-08-728 Q2) confirms the rigs produce the real ground throws, Bulleta's included (her sprite is behind Victor's, not out of frame — the question's wording was wrong), and #229's cross-check section may be homed. The four rows in `tests/ci_emulator.tsv` go to scope `out` with a `romset:` reason.
+
+---
+
 ## Ruled 2026-10-08 (14z-195) — #226: libudev.so.1 is host-provided
 
 **The question (AskUserQuestion, after the first clean-host run on PILOT, build/agent195/cleanhost1):** *"#226 clean-host result: on a stock Ubuntu 24.04 container holding only the ruled host libraries' packages (+ python3, + Xvfb as the display), both Linux assets apply, resolve fully (ldd 0 missing) and run. MAME exits 0 after 30 s; FBNeo was still running at its 30 s cut-off. The packaged files asked the host for 20 libraries. 19 are on the ruled list; the 20th, libudev.so.1, is not. The bundled SDL loads it at run time (device hotplug: joysticks), so the static DT_NEEDED check never sees it. It is the systemd device-manager client, present on every systemd desktop. How should it be treated?"* — options "Rule it host-provided (Recommended)", "Bundle it", "Leave optional, name it".

@@ -11,12 +11,23 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**244 tickets** — status: open 12 · parked 9 · done 196 · declined 9 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 172 · cosmetic 16 · evolution 56 · **backfill debt: 0 rows**.
+**255 tickets** — status: open 23 · parked 9 · done 196 · declined 9 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 183 · cosmetic 16 · evolution 56 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#255](https://github.com/DefinitelyFrenchName/VampireSaved/issues/255) | bug | open | [P3] Python release applier publishes output before rejecting an incorrect aggregate set key | `tools/apply_release.py` | none | none | none | 14z-195 |
+| [#254](https://github.com/DefinitelyFrenchName/VampireSaved/issues/254) | bug | open | [P2] Executable shell-crash controls are classified HONOURED on nonzero exits | `tests/lib/classify.sh` | none | none | none | 14z-195 |
+| [#253](https://github.com/DefinitelyFrenchName/VampireSaved/issues/253) | bug | open | [P2] MAME replay wrapper accepts an old checksum log when a zero-exit invocation writes nothing | `tools/run_replay_mame.sh` | none | none | none | 14z-195 |
+| [#252](https://github.com/DefinitelyFrenchName/VampireSaved/issues/252) | bug | open | [P2] A newer SKIP row hides stale emulator gates from freeze audit and rerun selection | `tools/audit_emulator_staleness.py` | none | none | none | 14z-195 |
+| [#251](https://github.com/DefinitelyFrenchName/VampireSaved/issues/251) | bug | open | [P2] Emulator staleness audit misses followed inputs reverted after a dirty successful run | `tools/audit_emulator_staleness.py` | none | none | none | 14z-195 |
+| [#250](https://github.com/DefinitelyFrenchName/VampireSaved/issues/250) | bug | open | [P2] Relative ROMDIR creates dangling overlay links while the builder reports success | `tools/build_wide_romset.py` | none | none | none | 14z-195 |
+| [#249](https://github.com/DefinitelyFrenchName/VampireSaved/issues/249) | bug | open | [P2] CI entropy guard scans only untracked files and misses committed binary additions | `.github/workflows/ci.yml` | none | none | none | 14z-195 |
+| [#248](https://github.com/DefinitelyFrenchName/VampireSaved/issues/248) | bug | open | [P2] Launchers silently choose conflicting older ROM sets and retain stale Windows copies | `tools/package_release_platforms.py` | none | none | none | 14z-195 |
+| [#247](https://github.com/DefinitelyFrenchName/VampireSaved/issues/247) | bug | open | [P2] Direct release packager deletes the previous package before replacement validation | `tools/package_release.py` | none | none | none | 14z-195 |
+| [#246](https://github.com/DefinitelyFrenchName/VampireSaved/issues/246) | bug | open | [P2] Release name can escape the output root and recursively delete a sibling directory | `tools/package_release.py` | none | none | none | 14z-195 |
+| [#245](https://github.com/DefinitelyFrenchName/VampireSaved/issues/245) | bug | open | [P1] WIDE overlay builder overwrites a source vsavjw.zip through its own symlink | `tools/build_wide_romset.py` | none | none | none | 14z-195 |
 | [#244](https://github.com/DefinitelyFrenchName/VampireSaved/issues/244) | bug | open | Tenant charmap pages print the raw +8/+9 power byte as damage (the #241 decode not applied to charmap_html/charmap_md) | `tests/test_power_decode.sh` | none | none | none | 14z-195 |
 | [#243](https://github.com/DefinitelyFrenchName/VampireSaved/issues/243) | bug | open | Staleness audit: 79 emulator gates declare the whole tests/replays/ directory, so any new replay stales them all | `tools/audit_emulator_staleness.py` | none | none | none | 14z-195 |
 | [#240](https://github.com/DefinitelyFrenchName/VampireSaved/issues/240) | cosmetic | open | Recipe READMEs: the easy way needs a prebuilt, step 3 cites step 1 for the set, the verifyroms comment overstates, a pointer to a file not shipped | `tools/package_release_platforms.py` | `DECISIONS_HISTORY.md § Ruled 2026-10-07 (14z-194) — the merged-m23 release: the 213 stale emulator verdicts approved at release; the recipe and launcher findings ticketed, not fixed first` | none | none | 14z-194 |
