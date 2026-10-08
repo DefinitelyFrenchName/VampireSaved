@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**443 scripts** — 121 ci_portable, 92 ci_static, 230 emulator-tier (run by name).
+**446 scripts** — 121 ci_portable, 92 ci_static, 233 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -27,7 +27,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 79 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 82 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -420,6 +420,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/audit_dmg_legacy_sweep.sh` | audit | emulator | MAME, FBNeo, a build dir, ~10 min | DEMITRI'S 2HK/5HP/623HP TAKE MORE HP ON VSAVJ THAN ON VSAV2 FROM ALMOST EVERY LEGACY VICTIM, with no port in the loop, BECAUSE VS2 LOWERED HIS OWN ATTACK RECORDS (10/14/20 -> 9/13/18) — each game given the other's records takes the other's… | 14z-187b |
 | `tests/audit_entrance_draw.sh` | audit | emulator | MAME, a build dir, ~15 s | PHOBOS'S ROUND-START ENTRANCE IS DRAWN FROM THE SAME THREE VARIANTS ON OUR BUILD AS ON vsav2 (14z-168, GitHub #136): the legs of #136's guard-cancel rigs drew different entrances because the draw follows each game's RNG state at character l… | 14z-168 |
 | `tests/audit_ex_refused.sh` | audit | emulator | MAME, a build dir | WHAT THE TENANTS' vs2 EX INPUT DOES WHEN THE MODE IS REFUSED, on native vsav2 and on our merged build, frozen AS MEASURED (14z-169; since 14z-170 the ruled EX-route fix's gate): | 14z-169 |
+| `tests/audit_extra_pass.sh` | audit | emulator | MAME, FBNeo, ~3 min | THE SPEED LEVEL'S EXTRA LOGIC PASS, PREDICTED PER FRAME (14z-195, promoted from the #118 pilot of 14z-194, GitHub #118; HOMING item 2) | 14z-195 |
 | `tests/audit_facing_hook_ab.sh` | audit | emulator | MAME, a build dir, ~6 min | #159'S FACING HOOK SPLIT INTO ITS CYCLES AND ITS LOGIC: which of the two moved each of its side moves (GitHub #186, 14z-186). | 14z-186 |
 | `tests/audit_facing_rule.sh` | audit | emulator | MAME, a build dir, ~5 s | THE VICTIM FACING RULE 5 ON OUR ENGINE, ours vs native, frozen AS MEASURED (GitHub #159, 14z-167; FIXED at the M21 freeze, 14z-185): vs2's facing-rule resolver knows rule 5 and vsavj's does not; | 14z-167 |
 | `tests/audit_facing_sweep.sh` | audit | emulator | MAME, FBNeo, a build dir, ~41 s | THE VICTIM FACING RULE 5 AT 32 GEOMETRIES: Killshread Summon (ES)'s facing writes on native vs2 against the build under test, and which vsavj facing rule could reproduce native's value per anim node (GitHub #159, 14z-185). | 14z-185 |
@@ -434,6 +435,8 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/audit_landing_sound.sh` | audit | emulator | MAME, a build dir, ~5 min | THE TENANTS' LANDING SOUND, ours against native vs2 (GitHub #223). Emulator tier (MAME), ~5 min. | 14z-192 |
 | `tests/audit_latch_reads.sh` | audit | emulator | MAME, a build dir, ~2 min | WHO READS THE SELECT-CONFIRM LATCH IN PLAY, per leg shape, with the VALUE each reader saw: the measured half of the #151 step-3 sweep, frozen (14z-161). | 14z-161 |
 | `tests/audit_marionette_cost.sh` | audit | emulator | MAME, FBNeo, ~4 min | WHAT A MARIONETTE PORT WOULD COST vsavj: every place vs2 touches her flag +0x3C3, the vsavj instruction a port would have to hook there, how often LEGACY content executes each one, and her assets' size (14z-189, GitHub #128 — the maintainer… | 14z-189 |
+| `tests/audit_mizuumi_attack.sh` | audit | emulator | MAME, FBNeo, ~2 min | THE ATTACK-START FIELDS OF THE FIGHTER BLOCK, MEASURED (14z-195, promoted from the #118 pilot of 14z-194, GitHub #118; HOMING item 3, in part — see NOT COVERED) | 14z-195 |
+| `tests/audit_mizuumi_inputs.sh` | audit | emulator | MAME, FBNeo, ~2 min | THE INPUT WORDS OF THE FIGHTER BLOCK, PREDICTED EXACTLY FROM THEIR STATIC MECHANISM (14z-195, promoted from the #118 pilot of 14z-194, GitHub #118; HOMING item 1) | 14z-195 |
 | `tests/audit_mizuumi_struct.sh` | audit | emulator | MAME, FBNeo, a build dir, ~4 min | THE MIZUUMI PLAYER-STRUCT CANDIDATES, MEASURED: the offsets adopted into atlas/ram.md from the community's Reverse Engineering page, each held by a check whose CONTROL would disagree (14z-189, GitHub #118) | 14z-189 |
 | `tests/audit_move_parity.sh` | audit | emulator | MAME, a build dir | EVERY TENANT MOVE, OURS vs NATIVE vsav2, AT A MATCHED SPEED LEVEL AND A PINNED RNG (GitHub #136, 14z-159). | 14z-159 |
 | `tests/audit_move_parity_attribution.sh` | audit | emulator | MAME, a build dir, ~5 min | EVERY DIFF ROW OF THE #136 MOVE-PARITY TABLE HAS A MEASURED CAUSE, frozen (14z-168, GitHub #136): each root found by ablation (its event's inputs removed, both legs re-run, the rows that vanish are its) and named by a measured signature; | 14z-168 |

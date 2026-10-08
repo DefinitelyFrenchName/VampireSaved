@@ -27,6 +27,7 @@ declares	audit_dispatch_census
 declares	audit_dmg_legacy_sweep
 declares	audit_entrance_draw
 declares	audit_ex_refused
+declares	audit_extra_pass
 declares	audit_facing_hook_ab
 declares	audit_facing_rule
 declares	audit_facing_sweep
@@ -46,6 +47,8 @@ declares	audit_landing_sound
 declares	audit_latch_reads
 declares	audit_marionette_cost
 declares	audit_mister_map_fit
+declares	audit_mizuumi_attack
+declares	audit_mizuumi_inputs
 declares	audit_mizuumi_struct
 declares	audit_move_parity
 declares	audit_move_parity_attribution

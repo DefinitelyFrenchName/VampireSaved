@@ -13,7 +13,7 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**443 of 443 gates described.**
+**446 of 446 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
@@ -24,7 +24,7 @@ first sentence) is `gate_index.md`.
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 87 | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 79 | 79 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 82 | 82 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -2562,7 +2562,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 ## character-data
 
-the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 79 of 79 described.
+the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 82 of 82 described.
 
 ### `audit_air_dash_height.sh` — audit, emulator
 
@@ -2732,6 +2732,14 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **EXPECTS:** no leg of ours enters the mode, vs2's stock-3 legs enter, our stocked paths equal vs2's refused paths (Pyron's the ES move); the stock-kept control fails. Which move a path IS is for the captures, not frozen here.
 
+### `audit_extra_pass.sh` — audit, emulator
+
+**WHAT:** on pristine vsavj, how many logic passes the game runs in a video frame (1 or 2 — the "two-tick frames" every frame-rate trace meets) is decided by the static rule at PRG:0x008E0C-0x008E6A: each activation increments the pass counter RAM:$FF8081; if RAM:$FF8118 is set (this pass IS the extra one) it is cleared, else if the turbo-pass flag RAM:$FF812D is set and bit ($FF8081 & 31) of PAT[$FF8116 & 15] is 1, $FF8118 is set and a second pass runs in the same activation. E1: that prediction, made from the counter's first value in the frame and the previous frame's turbo flag, equals the passes counted on EVERY in-match frame with one activation, at the speed level pinned to 0, 6, 8 and 14 and unpinned, on two replays. E2: the pin took — every in-match frame of a pinned leg reads its level, and the unpinned leg reads 6 (vsavj's NORMAL). E3: the unpinned leg's passes-per-frame distribution equals the level-6 leg's, count for count.
+
+**HOW:** on MAME (the reference binary), for each of 03_two_player_vs and 37_victor_ko_vsavj and each level (00, 06, 08, 0e — pinned by POKES on every frame — and free), a FIELD leg (tests/lua/field_trace.lua: level, the pass counter, the turbo and extra-pass flags, HP and X) and a WRITE-TAP leg (tests/lua/read_tap.lua: the pass-counter word, written by PRG:0x008E10 once per pass). PAT is read from the vsavj OPCODE view at run time (the table is read PC-relative at PRG:0x008E6C) — never stored in the tree.
+
+**EXPECTS:** E1 exact on every judged frame of all ten legs, with frames judged on each; E2 and E3 as stated. CONTROL other-level: each leg's frames predicted with every OTHER level's pattern must lose frames for the best of them; CONTROL unpinned-equals-6: the same distribution comparison against the level-8 leg must differ.
+
 ### `audit_facing_hook_ab.sh` — audit, emulator
 
 **WHAT:** #159 routes vsavj's facing resolver's fall-through (CPU:$01886C) through a `jmp` to a thunk that adds vs2's rule 5. The M21 freeze that landed it moved two things outside the Summon it fixes: Pyron's mash ring stream on the merged build (tests/audit_pyron_ring.sh: it diverged from solo at f4742, and now agrees for the whole run) and 110_don_arcade_mash's defense reads (tests/audit_defense_row_reads.sh's suite leg, from f8394). This gate says WHICH PART of the hook moves each: executing the hook (its cycles) or the rule-5 branch (its logic).
@@ -2843,6 +2851,22 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 **HOW:** the static and asset censuses on decrypted views (tests/lib/decrypt_cache.sh); MAME -debug breakpoints, one per hook point plus two WITNESSES (vsavj PRG:0x020AB4 `st.b $3bc(a6)` — Shadow's setter — and PRG:0x009BB2, the round-end morph test), JOBS legs in parallel. The cycle figure is a MODEL, stated: the cheapest hook that keeps vanilla's own instructions is `jsr abs.l` to a thunk that tests the flag, branches and returns — JSR abs.L 20 + TST.B d16(An) 12 + Bcc.B 10 (taken; 8 not) + RTS 16 = 58 cycles per execution (MC68000 user manual execution times); the displaced vanilla instructions run in the thunk at their own cost. The frame budget is MAME's model of the board: maincpu clock 16,000,000 / refresh 59.637405 = 268,288 cycles (`-listxml vsavj`).
 
 **EXPECTS:** the static table, the asset lines and every per-site count (hits, replays, frames, max-per-frame), the worst frame's combined hook executions and its modelled cycles, all equal to tests/expected/marionette_cost.tsv; every leg complete; the Shadow setter executed exactly once on the witness replay (the replay really armed Shadow under the instrument); each control FAILs.
+
+### `audit_mizuumi_attack.sh` — audit, emulator
+
+**WHAT:** on pristine vsavj, the mizuumi attack candidates atlas/ram.md records hold as measured: A1 +0x101 at each NEW button press of a human side reads 2 for a kick and 0 for a punch, on the press frame; A2 +0x1B8 counts ATTACK STARTS of a human side: every attack start (a write to +0x101 by PRG:0x02757E) comes with exactly one +0x1B8 write by PRG:0x0274D6, starts that land no hit included — so mizuumi's "whiff counter" is refuted as a whiff count; A3 a CPU side never moves +0x1B8 although it attacks and lands hits; A4 +0x119: PRG:0x028ED0 writes 0xFF only on CHAINED normals — at least three times in 118_chain, each within one frame of a chained start (+0x101 written by PRG:0x028ED8) — and the per-frame value reads 0xFF there, while on the isolated presses of 118_input_sweep 0x028ED0 never writes and the value stays 0 (other PCs write 0xFF transiently, invisible at frame end — measured 14z-195, reported by PC, not asserted); A5 +0x169 reads 13 or 14 on the frame of each landed hit (+0x1B6 incrementing) and never rises except within one frame of one, on the 2P legs.
+
+**HOW:** on MAME (the reference binary), FIELD legs under tests/lua/field_trace.lua for 03_two_player_vs, 37_victor_ko_vsavj, 118_input_sweep, 118_chain and 02_demitri_vs_cpu (1P: a CPU side that fights), and WRITE-TAP legs under tests/lua/read_tap.lua (each side's +0x100, +0x118 and +0x1B8 words) for the five; a tap write in tap frame f lands in trace frame f+1. Human sides are derived from each replay's input script, never assumed.
+
+**EXPECTS:** A1-A5 as stated, each over a nonzero sample. CONTROLS (in-gate, each must make its check fail): previous-press-key (A1 judged against the previous press's key), hit-vs-start (A2's +0x1B8 writes counted against LANDED HITS instead of starts), cpu-side (A3 judged on 02's human side), isolated-presses (A4's chained-start rule judged on the sweep's isolated presses).
+
+### `audit_mizuumi_inputs.sh` — audit, emulator
+
+**WHAT:** on pristine vsavj, the mizuumi input candidates adopted into atlas/ram.md hold on EVERY in-match frame of three replays, both sides, as the static routine PRG:0x022114-0x0221F6 predicts them — not as a statistical fit: I1 +0x12A == +0x394 (the held buttons) on every frame the routine ran (a write by PRG:0x022126); I2 +0x12B == +0x395 (the held directions, ABSOLUTE) with its L/R bits swapped when the flip source is set (+0x0B if +0x38 or +0x115, else +0x120 — PRG:0x0221CC-0x0221F6); I3 (+0x12C, +0x12D) == the PREVIOUS RUN's (+0x12A, +0x12B) (PRG:0x022120): the frame before when the routine ran once, the same frame when it ran twice; I4 +0x127 == swap(+0x395 by +0x0B) & ~+0x125 (newly pressed facing-relative directions, PRG:0x02218E-0x0221B4); I5 +0x124 == +0x394 as it stood one RUN earlier (+0x124 <- +0x122 <- +0x394 at PRG:0x022114, 1-3 runs per frame); I6 +0x394 is the held-button set of the side's own staged input (one value per set, consistency 1.000 at the best lag 0-6, over the ACTIVE frames — those with a button staged).
+
+**HOW:** on MAME (the reference binary, pristine vsavj), three FIELD legs under tests/lua/field_trace.lua — 03_two_player_vs, 37_victor_ko_vsavj and 118_input_sweep (a one-side-at-a-time input sweep, promoted from the pilot) — and three WRITE-TAP legs under tests/lua/read_tap.lua over each side's +0x124 and +0x12A words, which give each frame's RUN COUNT of the routine (the writes by PRG:0x022114 and PRG:0x022126). A tap write in tap frame f lands in trace frame f+1. Each check is EXACT (every judged frame), and each carries the control HOMING named, pooled over legs and sides (per leg a side that never moves can tie): the same prediction with the opposite flip (I2), the wrong frame's run count (I3, I5), no `& ~previous` edge mask (I4), and the staged input 120 frames late (I6, its consistency pooled over the active frames of every judged side) must each LOSE frames.
+
+**EXPECTS:** every judged frame of I1-I5 predicted, with at least one judged frame per leg and side; I6 1.000 on every human side with active frames; each pooled control strictly below its check's total (I6's below 0.9).
 
 ### `audit_mizuumi_struct.sh` — audit, emulator
 

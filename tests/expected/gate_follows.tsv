@@ -38,6 +38,7 @@ declares	audit_effect_class_rows
 declares	audit_empty_tiles
 declares	audit_entrance_draw
 declares	audit_ex_refused
+declares	audit_extra_pass
 declares	audit_facing_hook_ab
 declares	audit_facing_rule
 declares	audit_facing_sweep
@@ -68,6 +69,8 @@ declares	audit_mask_window_ff4182
 declares	audit_mask_window_ff42a2
 declares	audit_merged_legacy
 declares	audit_merged_vec3
+declares	audit_mizuumi_attack
+declares	audit_mizuumi_inputs
 declares	audit_mizuumi_struct
 declares	audit_move_parity
 declares	audit_move_parity_attribution
