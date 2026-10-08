@@ -6,7 +6,8 @@
 #   A1 +0x101 at each NEW button press of a human side reads 2 for a kick and 0 for a punch, on the press frame;
 #   A2 +0x1B8 counts ATTACK STARTS of a human side: every FRESH attack start (a write to +0x101 by PRG:0x02757E) is
 #      PAIRED ONE-TO-ONE IN TIME with a +0x1B8 write by PRG:0x0274D6 within 1 frame (every start and every write used
-#      once; the offsets are reported), starts that land no hit included — so mizuumi's "whiff counter" is refuted as a
+#      once; the offsets are reported; every write by 0x0274D6 or 0x028F18 RAISES the word by exactly 1 over its previous
+#      value), starts that land no hit included — so mizuumi's "whiff counter" is refuted as a
 #      whiff count; A2b no CHAINED start (+0x101 written by PRG:0x028ED8) has a 0x0274D6 write within that window (the
 #      chained count per leg reported, nonzero on 118_chain); A2c each chained start pairs one-to-one with a +0x1B8 write
 #      by PRG:0x028F18 instead — so +0x1B8 counts chained starts too, through a second writer (the 14z-194 pilot's
@@ -14,8 +15,8 @@
 #   A3 a CPU side never moves +0x1B8 although it attacks and lands hits;
 #   A4 +0x119: PRG:0x028ED0 writes 0xFF only on CHAINED normals — at least three times in 118_chain, each within one frame
 #      of a chained start (+0x101 written by PRG:0x028ED8) — and every rise of the per-frame value to 0xFF lies within one
-#      frame of a chained start (at least three), while on the
-#      isolated presses of 118_input_sweep 0x028ED0 never writes and the value stays 0 (other PCs write 0xFF
+#      frame of a chained start (at least three), on either side, while on the
+#      isolated presses of 118_input_sweep, on EACH side, 0x028ED0 never writes and the value stays 0 (other PCs write 0xFF
 #      transiently, invisible at frame end — measured 14z-195, reported by PC, not asserted);
 #   A5 +0x169 reads 13 or 14 on the frame of each landed hit (+0x1B6 incrementing) and never rises except within one frame
 #      of one, on the 2P legs.
@@ -145,6 +146,16 @@ def staged(rpl):
                 for fr in range(a, b + 1):
                     S[fr][int(m.group(1))] |= set(m.group(2))
     return S
+def wword(leg, s, off):
+    """[(trace frame, pc, new word, previous word or None)] for every write to the WORD at block offset `off`, in tap
+    order; the previous value is the last write's (any PC) — None before the first."""
+    a = BASE[s] + off; out = []; prev = None
+    for l in open(f"{W}/tap{leg}.tap"):
+        if l.startswith("W "):
+            q = l.split(); f, pc, w, data, mask = int(q[1]), q[3], int(q[5], 16), int(q[7], 16), int(q[9], 16)
+            if w == a and mask == 0xffff:
+                out.append((f + 1, pc, data, prev)); prev = data
+    return out
 def wfield(leg, s, off):
     """[(trace frame, pc, byte value)] for the byte at block offset `off` (a tap write in tap frame f lands in f+1)."""
     a = BASE[s] + off; out = []
@@ -180,13 +191,17 @@ for k in ("03", "37", "sweep"):
 res(n1 > 0 and ok1 == n1, "A1", f"+0x101 on the press frame is 2 for a kick, 0 for a punch: {ok1}/{n1} presses of the human sides of 03, 37 and the sweep")
 # A2 +0x1B8: one write by 0x0274D6 per attack start (a +0x101 write by 0x02757E), misses included
 n2 = ok2 = miss_starts = 0; per = []; offs = collections.Counter()
-chain_bad = ok2c = 0; chained_by = {}; per2c = []
+chain_bad = ok2c = 0; chained_by = {}; per2c = []; inc_n = inc_ok = 0
 W2 = 1   # the pairing window: the tap shows each 0x0274D6 write in the same frame as its start (offsets reported)
 for k in ("03", "37", "sweep", "chain"):
     byf = {d["f"]: d for d in T[k]}
     for s in HUMAN[k]:
         starts = sorted(f for f, pc, v in wfield(k, s, 0x101) if pc == "02757e")
         w1b8 = collections.Counter(f for f, pc, v in wfield(k, s, 0x1B9) if pc == "0274d6")
+        # every 0x0274D6 / 0x028F18 write must RAISE the word by exactly 1 (rule-checker run 2026-10-08-734 Q1a)
+        for f, pc, new, prev in wword(k, s, 0x1B8):
+            if pc in ("0274d6", "028f18"):
+                inc_n += 1; inc_ok += prev is not None and new == (prev + 1) & 0xffff
         if not starts:
             continue
         hits = sorted(b["f"] for a, b in zip(T[k], T[k][1:]) if b[f"hits{s}"] > a[f"hits{s}"])
@@ -225,6 +240,7 @@ res(n2 > 0 and ok2 == n2 and miss_starts > 0, "A2",
     + (" (mode hit-vs-start: paired with landed hits)" if PERT == "hit-vs-start" else "")
     + (" (mode writes-shifted: writes moved 20 f later)" if PERT == "writes-shifted" else "")
     + (" (mode chained-counted: the 0x028ED8 chained starts paired too)" if PERT == "chained-counted" else ""))
+res(inc_n > 0 and inc_ok == inc_n, "A2", f"every +0x1B8 write by 0x0274D6 or 0x028F18 raises the word by exactly 1 over its previous value: {inc_ok}/{inc_n}")
 res(chain_bad == 0 and chained_by.get("chain", 0) > 0, "A2b",
     f"no 0x028ED8 chained start has a 0x0274D6 +0x1B8 write within {W2} f ({chain_bad} do); chained starts per leg {chained_by} (nonzero on 118_chain required)")
 res(ok2c == n2 and chained_by.get("chain", 0) > 0, "A2c",
@@ -243,23 +259,31 @@ for s in cpu:
 # (14z-195: other PCs also write 0xFF transiently — one on the sweep's isolated presses — and the frame-end value never
 # shows it; those writes are REPORTED by PC, not asserted away.)
 leg4 = "sweep" if PERT == "isolated-presses" else "chain"
-ff = [(f, pc) for f, pc, v in wfield(leg4, 1, 0x119) if v == 0xff]
-by28 = [f for f, pc in ff if pc == "028ed0"]
-chained = sorted(f for f, pc, v in wfield(leg4, 1, 0x101) if pc == "028ed8")
-near = sum(1 for f in by28 if any(abs(f - c) <= 1 for c in chained))
-other = collections.Counter(pc for f, pc in ff if pc != "028ed0")
+# BOTH sides (rule-checker run 2026-10-08-734 Q1b): writes, chained starts and the per-frame rises are taken per side
+ff = [(s, f, pc) for s in (1, 2) for f, pc, v in wfield(leg4, s, 0x119) if v == 0xff]
+by28 = [(s, f) for s, f, pc in ff if pc == "028ed0"]
+chained_s = {s: sorted(f for f, pc, v in wfield(leg4, s, 0x101) if pc == "028ed8") for s in (1, 2)}
+chained = sorted(chained_s[1] + chained_s[2])
+near = sum(1 for s, f in by28 if any(abs(f - c) <= 1 for c in chained_s[s]))
+other = collections.Counter(pc for s, f, pc in ff if pc != "028ed0")
 # the per-frame value's rises to 0xFF, each within 1 frame of a chained start (rule-checker run 2026-10-08-731 Q1);
 # reads-shifted moves every rise 20 frames later, away from the starts
-rises4 = [b["f"] + (20 if PERT == "reads-shifted" else 0) for a, b in zip(T[leg4], T[leg4][1:]) if a["chf1"] != 0xff and b["chf1"] == 0xff]
-reads = sum(1 for r in rises4 if any(abs(r - c) <= 1 for c in chained))
+rises4 = [(s, b["f"] + (20 if PERT == "reads-shifted" else 0)) for s in (1, 2)
+          for a, b in zip(T[leg4], T[leg4][1:]) if a[f"chf{s}"] != 0xff and b[f"chf{s}"] == 0xff]
+reads = sum(1 for s, r in rises4 if any(abs(r - c) <= 1 for c in chained_s[s]))
 res(len(by28) >= 3 and near == len(by28) and reads >= 3 and reads == len(rises4), "A4",
     f"{leg4}: 0x028ED0 wrote +0x119 = 0xFF {len(by28)} times, {near} within 1 f of a chained start ({len(chained)} by 0x028ED8); "
-    f"the per-frame value rose to 0xFF {len(rises4)} times{' (moved 20 f later)' if PERT == 'reads-shifted' else ''}, {reads} of them within 1 f of a chained start; "
+    f"the per-frame value rose to 0xFF {len(rises4)} times{' (moved 20 f later)' if PERT == 'reads-shifted' else ''}, {reads} of them within 1 f of a chained start "
+    f"(P1 {sum(1 for s, f in by28 if s == 1)} writes / {len(chained_s[1])} chained, P2 {sum(1 for s, f in by28 if s == 2)} / {len(chained_s[2])}); "
     f"other 0xFF writers (transient) {dict(other)}")
-swf = [(f, pc) for f, pc, v in wfield("sweep", 1, 0x119) if v == 0xff]
-sw = sorted({d["chf1"] for d in T["sweep"] if inmatch(d)} | {d["chf2"] for d in T["sweep"] if inmatch(d)})
-res(sw == [0] and not [1 for f, pc in swf if pc == "028ed0"], "A4",
-    f"118_input_sweep's isolated presses: +0x119 per-frame value in match {sw}, 0x028ED0 writes 0; other 0xFF writes {dict(collections.Counter(pc for f, pc in swf))}")
+for s in (1, 2):   # the sweep's isolated presses, EACH side (both sides press in 118_input_sweep)
+    swf = [(f, pc) for f, pc, v in wfield("sweep", s, 0x119) if v == 0xff]
+    sw = sorted({d[f"chf{s}"] for d in T["sweep"] if inmatch(d)})
+    pr = sum(1 for f in S["sweep"] if (S["sweep"][f][s] & BTN) and not (S["sweep"].get(f - 1, {1: set(), 2: set()})[s] & BTN)
+             and f in {d["f"] for d in T["sweep"] if inmatch(d)})
+    res(sw == [0] and not [1 for f, pc in swf if pc == "028ed0"] and pr > 0, "A4",
+        f"118_input_sweep's isolated presses, P{s} ({pr} presses in match): +0x119 per-frame value {sw}, 0x028ED0 writes "
+        f"{sum(1 for f, pc in swf if pc == '028ed0')}; other 0xFF writes {dict(collections.Counter(pc for f, pc in swf))}")
 # A5 +0x169 at landed hits on the 2P legs (controls: neighbour-word reads +0x168; hits-shifted moves the hit frames 30 later)
 at = collections.Counter(); rises = nearhit = nhits = 0
 fld5 = "exw" if PERT == "neighbour-word" else "cht"

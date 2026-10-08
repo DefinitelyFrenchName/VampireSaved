@@ -29,7 +29,8 @@
 #   f+1. Each check is EXACT (every judged frame), and each carries the control HOMING named, pooled over legs and
 #   sides (per leg a side that never moves can tie): the same prediction with the opposite flip (I2), the wrong
 #   frame's run count (I3, I5, I10), no `& ~previous` edge mask (I4, I8), the opposite flip for +0x123 (I7) and the
-#   OTHER side's +0x394 for I1 must each
+#   OTHER side's +0x394 for I1, and NO L/R swap at all for I2, I4 and I7 (never-swap — the swap is what opposite-flip cannot
+#   isolate: it differs from the truth on every L/R frame whatever +0x0B is) must each
 #   LOSE frames. I6's control, the staged input 120 frames late, is judged PER
 #   SIDE on the sides that CAN discriminate — those whose active frames carry at least two distinct +0x394 values — each
 #   below 0.9; a side pressing a single button all match (replay 37's P2: toward+HP) maps its one value to any lagged key
@@ -42,6 +43,7 @@
 #   tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: opposite-flip — I2 and I7's +0x123 judged with the L/R swap applied on the OPPOSITE flip source must lose frames (pooled), and as a mode the gate FAILs them
+# MUST-FIRE: perturbed-copy: never-swap — I2, I4 and I7 predicted with NO L/R swap by +0x0B at all must each lose frames (pooled; the frames with +0x0B set and L or R held are counted per side), and as a mode the gate FAILs all three
 # MUST-FIRE: perturbed-copy: other-side — I1 judged against the OTHER side's +0x394 must lose frames (pooled), and as a mode the gate FAILs I1
 # MUST-FIRE: perturbed-copy: wrong-run — I3 and I5 judged with the WRONG frame's run count must lose frames (pooled), and as a mode the gate FAILs them
 # MUST-FIRE: perturbed-copy: no-edge-mask — I4 and I8 judged without their `& ~previous` / `& ~current` masks must lose frames (pooled), and as a mode the gate FAILs them
@@ -187,7 +189,9 @@ for leg, rpl in LEGS.items():
                 c["I1"] += d[f"b12a{s}"] == d[f"ibtn{3 - s if PERT == 'other-side' else s}"]
                 ctl["I1"] += d[f"b12a{s}"] == d[f"ibtn{3 - s}"]   # control other-side: the OTHER side's +0x394
                 src = d[f"face{s}"] if (d[f"s38{s}"] or d[f"s115{s}"]) else d[f"p120{s}"]
-                flip = (not src) if PERT == "opposite-flip" else bool(src)
+                flip = (not src) if PERT == "opposite-flip" else False if PERT == "never-swap" else bool(src)
+                ctl["I2ns"] += d[f"b12b{s}"] == d[f"idir{s}"]   # control never-swap: no L/R swap at all
+                c["swapfr"] += bool(d[f"face{s}"]) and (d[f"idir{s}"] & 3) in (1, 2)   # +0x0B SET with L or R held
                 c["I2"] += d[f"b12b{s}"] == rel(d[f"idir{s}"], flip)
                 ctl["I2"] += d[f"b12b{s}"] == rel(d[f"idir{s}"], not src)
                 good = byf[f - 1] if k == 1 else d
@@ -198,11 +202,13 @@ for leg, rpl in LEGS.items():
                 c["rulediff"] += bool(src) != bool(d[f"face{s}"])   # frames where the flip-source rule and plain +0x0B differ
                 c["rulesep"] += bool(src) != bool(d[f"face{s}"]) and (d[f"idir{s}"] & 3) in (1, 2)   # ... with L or R held: the
                                                                                                      # only frames that can tell them apart
-                fl7 = (not d[f"face{s}"]) if PERT == "opposite-flip" else bool(d[f"face{s}"])
+                fl7 = (not d[f"face{s}"]) if PERT == "opposite-flip" else False if PERT == "never-swap" else bool(d[f"face{s}"])
+                ctl["I7ns"] += d[f"b122{s}"] == d[f"ibtn{s}"] and d[f"b123{s}"] == d[f"idir{s}"]
                 c["I7"] += d[f"b122{s}"] == d[f"ibtn{s}"] and d[f"b123{s}"] == rel(d[f"idir{s}"], fl7)
                 ctl["I7"] += d[f"b122{s}"] == d[f"ibtn{s}"] and d[f"b123{s}"] == rel(d[f"idir{s}"], not d[f"face{s}"])
             c["n4"] += 1
-            cur = rel(d[f"idir{s}"], bool(d[f"face{s}"]))
+            cur = rel(d[f"idir{s}"], bool(d[f"face{s}"]) and PERT != "never-swap")
+            ctl["I4ns"] += d[f"mdir{s}"] == (d[f"idir{s}"] & ~d[f"dir{s}"] & 0xff)
             pred4 = cur if PERT == "no-edge-mask" else (cur & ~d[f"dir{s}"] & 0xff)
             c["I4"] += d[f"mdir{s}"] == pred4
             ctl["I4"] += d[f"mdir{s}"] == cur
@@ -226,7 +232,7 @@ for leg, rpl in LEGS.items():
                         srcc = byf[f - 1] if kc == 1 else d
                         ctl["I5"] += d[f"btn{s}"] == srcc[f"ibtn{s}"]
                         ctl["I10"] += d[f"dir{s}"] == srcc[f"b123{s}"]
-        for key in ("n", "I1", "I2", "I3", "n4", "I4", "n5", "I5", "I7", "I8", "I10", "rulediff", "rulesep"):
+        for key in ("n", "I1", "I2", "I3", "n4", "I4", "n5", "I5", "I7", "I8", "I10", "rulediff", "rulesep", "swapfr"):
             tot[key] += c[key]
         per.append((leg, s, c))
         res(c["n"] > 0 and c["I1"] == c["n"] and c["I2"] == c["n"] and c["I3"] == c["n"], f"I1-I3 {leg} P{s}",
@@ -235,6 +241,7 @@ for leg, rpl in LEGS.items():
         res(c["n4"] > 0 and c["I4"] == c["n4"], f"I4 {leg} P{s}", f"+0x127 == swap(+0x395 by +0x0B) & ~+0x125 on {c['I4']}/{c['n4']} in-match frames")
         res(c["n5"] > 0 and c["I5"] == c["n5"], f"I5 {leg} P{s}", f"+0x124 == +0x394 one run earlier on {c['I5']}/{c['n5']} judged frames")
         res(c["n5"] > 0 and c["I10"] == c["n5"], f"I10 {leg} P{s}", f"+0x125 == the previous run's +0x123 on {c['I10']}/{c['n5']} judged frames")
+        print(f"  info  [swap {leg} P{s}] +0x0B set with L or R held on {c['swapfr']} of {c['n']} frames with a run (the frames never-swap can lose)")
         print(f"  info  [flip-rule {leg} P{s}] the flip-source rule and plain +0x0B differ on {c['rulediff']} of {c['n']} frames with a run, "
               f"{c['rulesep']} of them with L or R held (the only frames that could separate them)")
         res(c["n"] > 0 and c["I7"] == c["n"], f"I7 {leg} P{s}", f"+0x122 == +0x394 and +0x123 == swap(+0x395 by +0x0B) on {c['I7']}/{c['n']} frames with a run")
@@ -274,7 +281,7 @@ for leg, rpl in LEGS.items():
             + (f"the set 120 frames earlier {cl:.3f} (judged)" if disc else f"ONE +0x394 value on its active frames {sorted(vals)}: the lag control cannot discriminate here, not judged ({cl:.3f})"))
 res(judged6 > 0, "I6", f"{judged6} human sides judged on active frames; the lag control applies to {ndisc} of them (not to {' '.join(nondisc) or 'none'})")
 print(f"CTL I2 {ctl['I2']} {tot['n']} I3 {ctl['I3']} {tot['n']} I4 {ctl['I4']} {tot['n4']} I5 {ctl['I5']} {ctl['n5']} I6 {lagworst:.3f} {ndisc} "
-      f"I7 {ctl['I7']} {tot['n']} I8 {ctl['I8']} {tot['n4']} I10 {ctl['I10']} {ctl['n5']} RULEDIFF {tot['rulediff']} {tot['n']} RULESEP {tot['rulesep']} I1X {ctl['I1']} {tot['n']}")
+      f"I7 {ctl['I7']} {tot['n']} I8 {ctl['I8']} {tot['n4']} I10 {ctl['I10']} {ctl['n5']} RULEDIFF {tot['rulediff']} {tot['n']} RULESEP {tot['rulesep']} I1X {ctl['I1']} {tot['n']} NS {ctl['I2ns']} {tot['n']} {ctl['I4ns']} {tot['n4']} {ctl['I7ns']} {tot['n']} SWAP {tot['swapfr']}")
 sys.exit(1 if bad else 0)
 PY
 }
@@ -284,8 +291,10 @@ if [ -n "${VS_CTL:-}" ]; then
     check "$VS_CTL" > "$W/mode.log" 2>&1 && rc=0 || rc=1
     grep -v '^CTL ' "$W/mode.log"
     tag=""
-    case "$VS_CTL" in opposite-flip) tag='I1-I3|I7' ;; other-side) tag='I1-I3' ;; wrong-run) tag='I1-I3|I5|I10' ;; no-edge-mask) tag='I4|I8' ;; lag-120) tag='I6' ;; esac
-    if [ "$rc" = 1 ] && grep -Eq "FAIL  \[($tag) " "$W/mode.log"; then vs_ctl_fired "$VS_CTL" "the checks judged with the perturbation failed (mode)"
+    case "$VS_CTL" in opposite-flip) tag='I1-I3|I7' ;; other-side) tag='I1-I3' ;; never-swap) tag='I1-I3|I4|I7' ;; wrong-run) tag='I1-I3|I5|I10' ;; no-edge-mask) tag='I4|I8' ;; lag-120) tag='I6' ;; esac
+    allthree=1
+    if [ "$VS_CTL" = never-swap ]; then for t in I1-I3 I4 I7; do grep -q "FAIL  \[$t " "$W/mode.log" || allthree=0; done; fi
+    if [ "$rc" = 1 ] && [ "$allthree" = 1 ] && grep -Eq "FAIL  \[($tag) " "$W/mode.log"; then vs_ctl_fired "$VS_CTL" "the checks judged with the perturbation failed (mode)"
     else echo "REFUSED: CONTROL=$VS_CTL — the perturbation did not make the check it targets fail (rc $rc): a dead mode, not a verdict"; exit 3; fi
     echo "FAIL: audit_mizuumi_inputs (control mode)"; exit 1
 fi
@@ -295,12 +304,15 @@ grep -q '^CTL ' "$W/checks.log" || { echo "  FAIL  the checks produced no contro
 
 echo "== 3. the must-fire controls (pooled over legs and sides)"
 set -- $(sed -n 's/^CTL //p' "$W/checks.log")
-# CTL I2 <hits> <n> I3 <hits> <n> I4 <hits> <n> I5 <hits> <n> I6 <worst discriminating side> <sides> I7 <hits> <n> I8 <hits> <n> I10 <hits> <n> RULEDIFF <frames> <n> RULESEP <frames> I1X <hits> <n>
+# CTL I2 <hits> <n> I3 <hits> <n> I4 <hits> <n> I5 <hits> <n> I6 <worst discriminating side> <sides> I7 <hits> <n> I8 <hits> <n> I10 <hits> <n> RULEDIFF <frames> <n> RULESEP <frames> I1X <hits> <n> NS <I2> <n> <I4> <n4> <I7> <n> SWAP <frames>
 [ "$3" -gt 0 ] && [ "$2" -lt "$3" ] && [ "${18}" -gt 0 ] && [ "${17}" -lt "${18}" ] \
     && vs_ctl_fired opposite-flip "the opposite flip predicts +0x12B on $2 of $3 frames and +0x123 on ${17} of ${18}" || { vs_ctl_dead opposite-flip "I2 $2/$3, I7 ${17}/${18}" || true; fail=1; }
 [ "$6" -gt 0 ] && [ "$5" -lt "$6" ] && [ "${12}" -gt 0 ] && [ "${11}" -lt "${12}" ] && [ "${23}" -lt "${24}" ] \
     && vs_ctl_fired wrong-run "the wrong run count predicts I3 on $5 of $6 frames, I5 on ${11} of ${12}, I10 on ${23} of ${24}" || { vs_ctl_dead wrong-run "I3 $5/$6, I5 ${11}/${12}, I10 ${23}/${24}" || true; fail=1; }
 echo "  info  I2's flip-source rule vs plain +0x0B: they differ on ${26} of ${27} frames with a run, ${29} of them with L or R held — the rule is NOT separated from +0x0B on these legs (see NOT COVERED)"
+[ "${34}" -lt "${35}" ] && [ "${36}" -lt "${37}" ] && [ "${38}" -lt "${39}" ] \
+    && vs_ctl_fired never-swap "with no L/R swap at all I2 matches ${34}/${35}, I4 ${36}/${37}, I7 ${38}/${39} (+0x0B set with L or R held on ${41} frames)" \
+    || { vs_ctl_dead never-swap "I2 ${34}/${35}, I4 ${36}/${37}, I7 ${38}/${39}; +0x0B set with L or R held on ${41} frames" || true; fail=1; }
 [ "${32}" -gt 0 ] && [ "${31}" -lt "${32}" ] && vs_ctl_fired other-side "the OTHER side's +0x394 matches +0x12A on ${31} of ${32} frames" || { vs_ctl_dead other-side "${31} of ${32}" || true; fail=1; }
 [ "$9" -gt 0 ] && [ "$8" -lt "$9" ] && [ "${21}" -gt 0 ] && [ "${20}" -lt "${21}" ] \
     && vs_ctl_fired no-edge-mask "without the edge masks +0x127 matches $8 of $9 frames and +0x126/+0x128/+0x129 ${20} of ${21}" || { vs_ctl_dead no-edge-mask "I4 $8/$9, I8 ${20}/${21}" || true; fail=1; }
