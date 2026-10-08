@@ -16,7 +16,8 @@
 #   the turbo and extra-pass flags, HP and X) and a WRITE-TAP leg (tests/lua/read_tap.lua: the pass-counter word,
 #   written by PRG:0x008E10 once per pass). PAT is read from the vsavj OPCODE view at run time (the table is read
 #   PC-relative at PRG:0x008E6C) — never stored in the tree.
-# EXPECTS: E1 exact on every judged frame of all ten legs, with frames judged on each; E2 and E3 as stated. CONTROL
+# EXPECTS: E1 exact on every judged frame of all ten legs, with frames judged on each; E2 and E3 as stated. The log's
+#   header names the commit and the host. CONTROL
 #   other-level: each leg's frames predicted with every OTHER level's pattern must lose frames for the best of them;
 #   CONTROL unpinned-equals-6: the same distribution comparison against the level-8 leg must differ.
 # FOLLOWS: emu/mame-patches/ tests/lib/controls.sh tests/lib/decrypt_cache.sh tests/lua/field_trace.lua
@@ -43,7 +44,7 @@ vs_ctl_mode "$0"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no reference MAME binary at $MAME_BIN"; exit 0; }
 if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM; fi
 W="$(cd "$W" && pwd)"
-echo "  host  $(uname -sm); MAME_BIN $MAME_BIN"
+echo "  head  $(git -C "$REPO" rev-parse HEAD 2>/dev/null || echo no git); host $(hostname) $(uname -sm); MAME_BIN $MAME_BIN"
 . "$REPO/tests/lib/decrypt_cache.sh"
 decrypt_view vsavj "$W/vsavj_op.bin" "$W/vsavj_data.bin" >/dev/null 2>&1 || { echo "FAIL: no vsavj opcode view (decrypt cache)"; exit 1; }
 

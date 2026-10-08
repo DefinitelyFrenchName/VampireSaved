@@ -21,7 +21,10 @@
 # EXPECTS: A1-A5 as stated, each over a nonzero sample. CONTROLS (in-gate, each must make its check fail):
 #   previous-press-key (A1 judged against the previous press's key), hit-vs-start (A2's +0x1B8 writes counted against
 #   LANDED HITS instead of starts), cpu-side (A3 judged on 02's human side), isolated-presses (A4's chained-start rule
-#   judged on the sweep's isolated presses).
+#   judged on the sweep's isolated presses), neighbour-word (A5 judged on +0x168, the next byte: a WRONG WORD read as
+#   +0x169 must fail) and hits-shifted (A5 judged against the landed-hit frames moved 30 frames later: a proximity test
+#   too loose to tell a hit from a non-hit must fail) — rule-checker run 2026-10-08-729 Q4. The log's header names the
+#   commit and the host.
 # FOLLOWS: emu/mame-patches/ tests/lib/controls.sh tests/lua/field_trace.lua tests/lua/pokes_spec.lua tests/lua/read_tap.lua
 #   tests/replays/02_demitri_vs_cpu.rpl tests/replays/03_two_player_vs.rpl tests/replays/37_victor_ko_vsavj.rpl
 #   tests/replays/118_chain.rpl tests/replays/118_input_sweep.rpl tools/run_mame.sh tools/setup_mame.sh
@@ -29,6 +32,8 @@
 # MUST-FIRE: perturbed-copy: previous-press-key — A1 judged against each press's PREVIOUS press must fail (in-gate); as a mode A1 uses it and the gate FAILs
 # MUST-FIRE: perturbed-copy: hit-vs-start — A2 counted against landed hits instead of attack starts must fail (in-gate); as a mode A2 uses it and the gate FAILs
 # MUST-FIRE: perturbed-copy: cpu-side — A3 judged on replay 02's HUMAN side must fail (in-gate); as a mode A3 judges it and the gate FAILs
+# MUST-FIRE: perturbed-copy: neighbour-word — A5 judged on +0x168 (the neighbouring byte) instead of +0x169 must fail (in-gate); as a mode A5 reads +0x168 and the gate FAILs
+# MUST-FIRE: perturbed-copy: hits-shifted — A5 judged against the landed-hit frames moved 30 frames later must fail (in-gate); as a mode A5 uses the shifted frames and the gate FAILs
 # MUST-FIRE: perturbed-copy: isolated-presses — A4's chained-start rule judged on 118_input_sweep's isolated presses must fail (in-gate); as a mode A4 judges the sweep and the gate FAILs
 #
 # NOT COVERED (HOMING item 3's other rows, not promoted at 14z-195): +0x103 (2 toward / 1 back / 0 neither, docs/game/atlas/
@@ -51,12 +56,12 @@ vs_ctl_mode "$0"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no reference MAME binary at $MAME_BIN"; exit 0; }
 if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM; fi
 W="$(cd "$W" && pwd)"
-echo "  host  $(uname -sm); MAME_BIN $MAME_BIN"
+echo "  head  $(git -C "$REPO" rev-parse HEAD 2>/dev/null || echo no git); host $(hostname) $(uname -sm); MAME_BIN $MAME_BIN"
 
 F="ff8109:b:timer"; RT=""
 for s in 1 2; do
     base=$([ "$s" = 1 ] && echo $((0xff8400)) || echo $((0xff8800)))
-    for spec in 00b:b:face 010:w:x 050:w:hp 101:b:pk 119:b:chf 169:b:cht 1b6:w:hits 1b8:w:whiff; do
+    for spec in 00b:b:face 010:w:x 050:w:hp 101:b:pk 119:b:chf 168:b:exw 169:b:cht 1b6:w:hits 1b8:w:whiff; do
         F="$F,$(printf '%06x' $((base + 0x${spec%%:*}))):${spec#*:}$s"
     done
     for o in 100 118 1b8; do RT="$RT${RT:+;}$(printf '%06x' $((base + 0x$o))),2"; done
@@ -208,16 +213,19 @@ swf = [(f, pc) for f, pc, v in wfield("sweep", 1, 0x119) if v == 0xff]
 sw = sorted({d["chf1"] for d in T["sweep"] if inmatch(d)} | {d["chf2"] for d in T["sweep"] if inmatch(d)})
 res(sw == [0] and not [1 for f, pc in swf if pc == "028ed0"], "A4",
     f"118_input_sweep's isolated presses: +0x119 per-frame value in match {sw}, 0x028ED0 writes 0; other 0xFF writes {dict(collections.Counter(pc for f, pc in swf))}")
-# A5 +0x169 at landed hits on the 2P legs
+# A5 +0x169 at landed hits on the 2P legs (controls: neighbour-word reads +0x168; hits-shifted moves the hit frames 30 later)
 at = collections.Counter(); rises = nearhit = nhits = 0
+fld5 = "exw" if PERT == "neighbour-word" else "cht"
+sh5 = 30 if PERT == "hits-shifted" else 0
 for k in ("03", "37", "chain"):
     byf = {d["f"]: d for d in T[k]}
     for s in (1, 2):
-        hitf = [b["f"] for a, b in zip(T[k], T[k][1:]) if b[f"hits{s}"] > a[f"hits{s}"]]
-        rf = [b["f"] for a, b in zip(T[k], T[k][1:]) if b[f"cht{s}"] > a[f"cht{s}"]]
-        nhits += len(hitf); at.update(byf[f][f"cht{s}"] for f in hitf)
+        hitf = [b["f"] + sh5 for a, b in zip(T[k], T[k][1:]) if b[f"hits{s}"] > a[f"hits{s}"]]
+        hitf = [f for f in hitf if f in byf]
+        rf = [b["f"] for a, b in zip(T[k], T[k][1:]) if b[f"{fld5}{s}"] > a[f"{fld5}{s}"]]
+        nhits += len(hitf); at.update(byf[f][f"{fld5}{s}"] for f in hitf)
         rises += len(rf); nearhit += sum(1 for r in rf if any(abs(r - h) <= 1 for h in hitf))
-res(nhits > 0 and set(at) <= {13, 14} and nearhit == rises, "A5", f"+0x169 at {nhits} landed hits {dict(at)}; {nearhit}/{rises} rises within 1 f of a hit (03, 37, chain)")
+res(nhits > 0 and set(at) <= {13, 14} and nearhit == rises, "A5", f"{'+0x168 (mode neighbour-word)' if fld5 == 'exw' else '+0x169'} at {nhits} landed hits{' (moved 30 f later)' if sh5 else ''} {dict(at)}; {nearhit}/{rises} rises within 1 f of a hit (03, 37, chain)")
 sys.exit(1 if bad else 0)
 PY
 }
@@ -225,7 +233,7 @@ echo "== 2. the checks"
 if [ -n "${VS_CTL:-}" ]; then
     check "$VS_CTL" > "$W/mode.log" 2>&1 && rc=0 || rc=1
     cat "$W/mode.log"
-    case "$VS_CTL" in previous-press-key) tag='A1' ;; hit-vs-start) tag='A2' ;; cpu-side) tag='A3' ;; isolated-presses) tag='A4' ;; esac
+    case "$VS_CTL" in previous-press-key) tag='A1' ;; hit-vs-start) tag='A2' ;; cpu-side) tag='A3' ;; isolated-presses) tag='A4' ;; neighbour-word|hits-shifted) tag='A5' ;; esac
     if [ "$rc" = 1 ] && grep -q "FAIL  \[$tag\]" "$W/mode.log"; then vs_ctl_fired "$VS_CTL" "the perturbed checks failed $tag (mode)"
     else vs_ctl_dead "$VS_CTL" "the perturbed checks did not fail $tag (rc $rc)" || true; fi
     echo "FAIL: audit_mizuumi_attack (control mode)"; exit 1
@@ -234,7 +242,7 @@ check none > "$W/checks.log" 2>&1 || fail=1
 cat "$W/checks.log"
 grep -q '\[A5\]' "$W/checks.log" || { echo "  FAIL  the checks did not reach A5 (a crash is not a verdict): $(tail -1 "$W/checks.log")"; exit 1; }
 echo "== 3. the must-fire controls (in-gate)"
-for c in previous-press-key:A1 hit-vs-start:A2 cpu-side:A3 isolated-presses:A4; do
+for c in previous-press-key:A1 hit-vs-start:A2 cpu-side:A3 isolated-presses:A4 neighbour-word:A5 hits-shifted:A5; do
     name="${c%%:*}"; tag="${c#*:}"
     check "$name" > "$W/ctl_$name.log" 2>&1 && rc=0 || rc=1
     if [ "$rc" = 1 ] && grep -q "FAIL  \[$tag\]" "$W/ctl_$name.log"; then
