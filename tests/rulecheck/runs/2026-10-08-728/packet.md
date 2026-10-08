@@ -1,0 +1,13 @@
+THE PACKET
+
+Decision kind: expectation
+Subject: #229: the vsavj ground-throw expectation tests/expected/ground_throws.tsv, frozen from a fork's PILOT run and merged at c4466c51
+Claim (the working agent's sentence): CLAIM: the 42 rows of tests/expected/ground_throws.tsv are the vsavj ground throws of the workbook's ground-throw rows as measured by tests/audit_ground_throws.sh on pristine vsavj: each event is counted only when the hold is proven (P1 +0x134 = 01 and P2 +0x134 = FF from the press frame), its damage is the power class (#241) of each record the two appliers staged at PRG:0x0189EA and PRG:0x02979A, each record inside the thrower's own attack table, and the gate re-run at the merged commit c4466c51 on PILOT reads PASS with 42 events and 0 bad (build/agent195/pilot_229m/gt_normal.log), its controls lp-no-throw, foreign-record and class-raw firing and each FAILing as a mode (gt_*.log). NOT TESTED: Graviton Knuckle, mashed hit counts, throw techs, victims other than the rig's, FBNeo, merged-m23 (the subject is vanilla vsavj); the expectation was frozen from the fork's own run, so its numbers rest on the gate's measurement, not on the workbook.
+Artifacts (read every one, in full):
+  - tests/audit_ground_throws.sh
+  - tests/expected/ground_throws.tsv
+  - tools/ground_throw_rigs.py
+  - build/agent195/pilot_229m/gt_normal.log
+  - build/agent195/pilot_229m/gt_lp-no-throw.log
+  - build/agent195/pilot_229m/gt_foreign-record.log
+  - build/agent195/pilot_229m/gt_class-raw.log

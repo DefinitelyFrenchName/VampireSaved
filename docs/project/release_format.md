@@ -277,6 +277,18 @@ release/emulators/<platform>/<os-arch>/                         <- THE BINARY BU
   gets it under #226).** `tests/test_bundle_parsers.sh` still
   proves the bundlers' parsers and their refusal of an empty closure against
   stub tools.
+  **THE LINUX RELEASE AS A PLAYER GETS IT (#226, 14z-193 to 14z-195):** two release-scope gates
+  run on PILOT. `tests/audit_release_linux_desktop.sh` plays both prebuilt assets in a live GNOME
+  session the player's way (cut by the real uploader, the shipped applier, `sh PLAY.command`): the
+  select screen carries the release's mark, and the emulator's OWN audio stream is linked to the sink
+  and carries signal (sound quality judged once by ear, 14z-194: *"sound is good"*).
+  `tests/audit_release_linux_cleanhost.sh` runs both in a stock `ubuntu:24.04` container (podman)
+  holding ONLY the packages that provide this list's sonames, python3 and Xvfb: they apply, resolve
+  (`ldd`: nothing not found) and run, and every library a package file asks the host for AT RUN TIME
+  — the dlopen'd ones `tools/check_host_libs.py` cannot see — is on the list
+  (`tools/cleanhost_libs.py`, from `LD_DEBUG=libs`). Its first run found exactly one such library
+  off the list, `libudev.so.1` (SDL's device hotplug), ruled host-provided 2026-10-08.
+  Not covered by either: a real GPU and display server, a real audio device, other distributions.
   **WHERE THE FILES LIVE (ruled 2026-09-11, the maintainer's three questions
   answered by measurement):** a committed binary lives in every clone's
   history forever — ~140 MB per release, tripled by three OSes, against a

@@ -23,13 +23,13 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3587 |
-| named by a document or manifest only | 2291 |
-| named by both a document/manifest and code | 851 |
-| named by CODE ONLY (the gap list below) | 445 |
+| distinct program-space addresses named | 3591 |
+| named by a document or manifest only | 2295 |
+| named by both a document/manifest and code | 858 |
+| named by CODE ONLY (the gap list below) | 438 |
 | carried by atlas | 717 |
-| carried by engine_internals | 816 |
-| carried by other docs | 1056 |
+| carried by engine_internals | 826 |
+| carried by other docs | 1059 |
 | carried by manifests | 1850 |
 | carried by code | 1296 |
 
@@ -466,6 +466,8 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x01745E` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; tests/test_power_decode.sh; tools/hitbox_records.py |
 | `PRG:0x017480` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; tests/test_power_decode.sh; tools/hitbox_records.py |
 | `PRG:0x017522` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; docs/project/patch_notes.md — donovan-m2 stage 4 — damage-pipeline R1 rows; BOTH GATES GREEN (2026-07-27, session 10) [vs2]; docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/reconciliation.toml — map [vs2]; tools/hitbox_records.py |
+| `PRG:0x017524` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; tests/test_power_decode.sh |
+| `PRG:0x01752C` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; tests/test_power_decode.sh |
 | `PRG:0x017532` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2] |
 | `PRG:0x0175AE` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) [vs2]; docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f) |
 | `PRG:0x0175F6` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) [vs2]; tools/charmap_gen.py |
@@ -570,6 +572,8 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x018B30` | docs/project/gotchas.md — and the engines RENUMBERED families between games (14z-109, the #99 crash); build/manifest/donovan.toml — ls_freeze_vs2_attacker |
 | `PRG:0x018B34` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x018B8C` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/patch_notes.md — (huitzil-m8 / pyron-m5: the FINAL GUARDIAN zero-damage fix); docs/project/patch_notes.md — donovan-m2 stage 4 — damage-pipeline R1 rows; BOTH GATES GREEN (2026-07-27, session 10); docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/huitzil.toml — port_patch; build/manifest/reconciliation.toml — map; +1 more |
+| `PRG:0x018B8E` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); tests/test_power_decode.sh |
+| `PRG:0x018B96` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); tests/test_power_decode.sh; tools/hitbox_records.py |
 | `PRG:0x018B9C` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) |
 | `PRG:0x018C08` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f) |
 | `PRG:0x018C10` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); tests/audit_defense_row_reads.sh |
@@ -2059,6 +2063,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x05FB2E` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
 | `PRG:0x05FBC0` | build/manifest/type_stamps.toml — reader |
 | `PRG:0x05FBE6` | docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven); tools/audit_roulette_tag_rows.py |
+| `PRG:0x05FC76` | docs/project/gotchas.md — A READER CENSUS BY BASE ADDRESS, OR A BREAKPOINT ON THE KNOWN READERS, CANNOT SHOW A SCREEN DOES NOT READ A TABLE (paid: 14z-195, #124, rule-checker run 2026-10-08-743); tests/test_map_table_readers.sh |
 | `PRG:0x05FCC0` | build/manifest/donovan.toml — med_pal_row14_a |
 | `PRG:0x05FCD6` | build/manifest/donovan.toml — med_pal_row14_a |
 | `PRG:0x05FCE0` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/donovan.toml — name_bank_variant_id; build/manifest/huitzil.toml — name_bank_variant_id; build/manifest/pyron.toml — name_bank_variant_id; build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; +1 more |
@@ -2305,7 +2310,11 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x08C08A` | docs/project/patch_index.md — Mechanism inventory (generator vocabulary); docs/project/patch_notes.md — 14z-70 — the ground explosion, and one inert repair; build/manifest/pcrel_escapes.toml — pyron46; tools/extract_char.py |
 | `PRG:0x08C09A` | build/manifest/pcrel_escapes.toml — pyron46 |
 | `PRG:0x08C0A2` | build/manifest/pcrel_escapes.toml — pyron46; tests/test_census_regions.sh |
+| `PRG:0x08C5E0` | docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven); docs/project/gotchas.md — A READER CENSUS BY BASE ADDRESS, OR A BREAKPOINT ON THE KNOWN READERS, CANNOT SHOW A SCREEN DOES NOT READ A TABLE (paid: 14z-195, #124, rule-checker run 2026-10-08-743); tests/test_map_table_readers.sh |
+| `PRG:0x08C5F6` | docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven); tests/test_map_table_readers.sh |
+| `PRG:0x08C688` | docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven) |
 | `PRG:0x08C6E2` | docs/game/gotchas.md — "Slot-indexed cell" does not mean "slot-exclusive data" — three surgery traps; tools/select_port.py |
+| `PRG:0x08C724` | docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven) |
 | `PRG:0x08E336` | docs/game/atlas/ram.md — System / match globals; docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100); tests/audit_ff8130_writers.sh |
 | `PRG:0x08E342` | docs/game/atlas/ram.md — System / match globals; docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100); tests/audit_ff8130_writers.sh |
 | `PRG:0x08EDE2` | build/manifest/huitzil.toml — grab_hold_keyframes |
@@ -2341,6 +2350,8 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x09910E` | docs/game/engine_internals.md — In-fight HUD top strip (mugshot beside the timer, name under the bar) [vs2]; docs/project/patch_notes.md — where the detail lives [vs2]; build/manifest/donovan.toml — obj_hook [vs2]; build/manifest/pyron.toml — select_pal_variant_id [vs2] |
 | `PRG:0x09BAEA` | build/manifest/donovan.toml — capture_kf_zabel; build/manifest/huitzil.toml — capture_kf_zabel; build/manifest/pyron.toml — capture_kf_zabel |
 | `PRG:0x09BB2A` | build/manifest/donovan.toml — capture_kf_zabel; build/manifest/huitzil.toml — capture_kf_zabel; build/manifest/pyron.toml — capture_kf_zabel |
+| `PRG:0x09BE34` | docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven) [vs2] |
+| `PRG:0x09BE4A` | docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven) [vs2] |
 | `PRG:0x09C4D6` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x09C4F6` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x09CA24` | docs/game/engine_internals.md — The WIN-QUOTE TEXT SYSTEM — fully decoded (14z-76); docs/project/patch_index.md — DEFERRED BY MAINTAINER DECISION (14z-76) — the win-quote bank relocation [vs2]; tests/test_win_quote_decode.sh |
@@ -2844,7 +2855,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x2675EA` | build/manifest/shared_writes.toml — huitzil |
 | `PRG:0x2675EE` | build/manifest/shared_writes.toml — pyron |
 | `PRG:0x2675F6` | docs/game/atlas/select_screen.md — The RECORD-POINTER array — what the hovered cell displays (14z-61); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/shared_writes.toml — donovan; tests/test_select_arrays.sh |
-| `PRG:0x26762A` | docs/game/atlas/select_screen.md — The RECORD-POINTER array — what the hovered cell displays (14z-61); docs/game/atlas/select_screen.md — The tenant move IMPLEMENTED, and vs2's own arrays (14z-62); docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven); build/manifest/donovan.toml — name_banner; build/manifest/huitzil.toml — name_banner; build/manifest/pyron.toml — name_banner; +4 more |
+| `PRG:0x26762A` | docs/game/atlas/select_screen.md — The RECORD-POINTER array — what the hovered cell displays (14z-61); docs/game/atlas/select_screen.md — The tenant move IMPLEMENTED, and vs2's own arrays (14z-62); docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven); docs/project/gotchas.md — A READER CENSUS BY BASE ADDRESS, OR A BREAKPOINT ON THE KNOWN READERS, CANNOT SHOW A SCREEN DOES NOT READ A TABLE (paid: 14z-195, #124, rule-checker run 2026-10-08-743); build/manifest/donovan.toml — name_banner; build/manifest/huitzil.toml — name_banner; +5 more |
 | `PRG:0x26766A` | build/manifest/shared_writes.toml — huitzil |
 | `PRG:0x26766E` | build/manifest/shared_writes.toml — pyron |
 | `PRG:0x267676` | docs/game/atlas/select_screen.md — The RECORD-POINTER array — what the hovered cell displays (14z-61); docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; build/manifest/shared_writes.toml — donovan; tests/test_select_arrays.sh |
@@ -3228,8 +3239,6 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x0170D6` | tests/test_mister_gfxc_fetch.sh |
 | `PRG:0x017452` | tests/test_hitbox_encoding.sh |
 | `PRG:0x017456` | tests/test_hitbox_encoding.sh |
-| `PRG:0x017524` | tests/test_power_decode.sh |
-| `PRG:0x01752C` | tests/test_power_decode.sh |
 | `PRG:0x0175C6` | tests/audit_defense_row_residue.sh |
 | `PRG:0x0175CC` | tests/audit_defense_row_residue.sh |
 | `PRG:0x0175D0` | tests/audit_defense_row_residue.sh |
@@ -3248,11 +3257,9 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x0185D6` | tests/lua/index_watch.lua |
 | `PRG:0x018692` | tests/audit_pursuit_flag.sh |
 | `PRG:0x0186D5` | tests/audit_reaction_class_live.sh |
-| `PRG:0x0189EA` | tests/audit_ground_throws.sh; tools/ground_throw_rigs.py |
-| `PRG:0x018B8E` | tests/test_power_decode.sh |
+| `PRG:0x0189EA` | tests/audit_ground_throws.sh; tools/crosscheck_framedata.py; tools/ground_throw_rigs.py |
 | `PRG:0x018B91` | tests/test_power_decode.sh |
 | `PRG:0x018B92` | tests/test_power_decode.sh |
-| `PRG:0x018B96` | tests/test_power_decode.sh; tools/hitbox_records.py |
 | `PRG:0x018C2A` | tests/audit_defense_row_residue.sh |
 | `PRG:0x018C40` | tests/audit_defense_row_reads.sh |
 | `PRG:0x018C86` | tests/audit_defense_row_residue.sh |
@@ -3356,7 +3363,7 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x028DDE` | tools/checkdocs_rom.py |
 | `PRG:0x028DEA` | tools/checkdocs_rom.py |
 | `PRG:0x028DEC` | tools/checkdocs_rom.py |
-| `PRG:0x02979A` | tests/audit_ground_throws.sh |
+| `PRG:0x02979A` | tests/audit_ground_throws.sh; tools/crosscheck_framedata.py |
 | `PRG:0x029AB2` | tests/test_qs_songs.sh |
 | `PRG:0x02B674` | tests/test_variant_dispatch.sh |
 | `PRG:0x02EEBB` | tests/lua/scroll3_watch.lua; tests/test_m2b_scroll3.sh |
@@ -3407,7 +3414,6 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x05FC1C` | tests/test_roulette_tag_rows.sh |
 | `PRG:0x05FC30` | tests/test_map_table_readers.sh |
 | `PRG:0x05FC36` | tests/test_map_table_readers.sh |
-| `PRG:0x05FC76` | tests/test_map_table_readers.sh |
 | `PRG:0x05FC90` | tests/test_map_table_readers.sh |
 | `PRG:0x05FDDA` | tools/overlay_port.py |
 | `PRG:0x05FE4C` | tools/overlay_port.py |
@@ -3481,9 +3487,7 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x08C0AA` | tools/build_donovan.sh |
 | `PRG:0x08C5C0` | tests/test_map_table_readers.sh |
 | `PRG:0x08C5D6` | tests/audit_ranking_tenant.sh |
-| `PRG:0x08C5E0` | tests/test_map_table_readers.sh |
 | `PRG:0x08C5E2` | tools/overlay_port.py |
-| `PRG:0x08C5F6` | tests/test_map_table_readers.sh |
 | `PRG:0x08C5F8` | tools/overlay_port.py |
 | `PRG:0x08C612` | tests/audit_ranking_tenant.sh |
 | `PRG:0x08C678` | tools/overlay_port.py |

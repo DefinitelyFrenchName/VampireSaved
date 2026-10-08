@@ -1,0 +1,11 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent195/scope124/plan.md	ec6d8365838c4950aee308f501951f2bdb05fc78
+build/agent195/scope124/vsavj_map_children.txt	960334aa0a8bea75d6b51c5579d23ae21ccde22d
+build/agent195/scope124/vsavj_ranking_reader.txt	e7a76d0d7fdd792caa1028f29922f29969a702cf
+build/agent195/scope124/vsavj_ranking_drawer.txt	e17fca57b5ab5962aa191e0cf0daf8b5bec358fa
+build/agent195/scope124/vs2_map_children.txt	18d2585c7360b30c241babad42b3e4b5122747b6
+build/agent195/scope124/vs2_ranking_reader.txt	570373b9f65c021f15fb7ce917d8a3466f920bfe
+build/agent195/scope124/vs2_array_refs.txt	67ec5390f909d2f34574087247dab4799cf0089e
+build/agent195/scope124/splash_thunk_excerpt.txt	993d5a7f68f627f0a854041d7868476083357c7d
+build/agent195/scope124/name_banner_records_excerpt.txt	a6747555fc8784d8d66f819a0733dd7ee256684b
+tools/overlay_port.py	c2b1ecca86baa4169ca6cdd16dac1a443f274b22

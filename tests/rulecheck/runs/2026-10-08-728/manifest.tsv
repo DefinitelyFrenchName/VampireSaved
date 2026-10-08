@@ -1,0 +1,8 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_ground_throws.sh	138fe125436c707a03c36744db069ab9692fcd5d
+tests/expected/ground_throws.tsv	2f3dc1c4346c6082577abf5e3014a2a5feedc06b
+tools/ground_throw_rigs.py	77cd0ff2caa45afe7080b7f5ec170c52840360f1
+build/agent195/pilot_229m/gt_normal.log	0ed8d52a4cfd048f2f232a1ba3ec08a7819fc4fd
+build/agent195/pilot_229m/gt_lp-no-throw.log	83197d0686387061c6200bee138e6a4f2e8e555a
+build/agent195/pilot_229m/gt_foreign-record.log	fe376fc5ff339571494ce2d0f537fff9118ecb45
+build/agent195/pilot_229m/gt_class-raw.log	b3aaab2151b3f6b180db0383b9aab7e6a709cb57

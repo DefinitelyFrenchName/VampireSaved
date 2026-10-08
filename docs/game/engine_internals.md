@@ -271,7 +271,17 @@ Phobos's second word and both of Donovan's), and Donovan's pool row `0x13`.
 Rows `0x10`/`0x11`/`0x13` have no legacy reader — vanilla never holds those
 ids (`tests/audit_id_writers.sh`); rows `0x12`/`0x18` (Dark Gallon, Oboro)
 are not touched. The sibling sub-`0x0A` child reads `0x26762A` row id, the
-array the port already repoints (VS-splash P2).
+array the port already repoints (the select screen's name-banner P2 array,
+`atlas/select_screen.md` — **[corrected 14z-195, #124: this read "VS-splash P2"]**).
+**The attract SCORE RANKING reads the same two arrays (14z-195, #124):** per
+entry, by the entry's id at `$8(a1)` (`movea.l #$26762a` at `PRG:0x08C5E0`, `#$26752a` at
+`0x08C5F6`; vs2's twin at `0x09BE34`/`0x09BE4A`), and draws through its OWN routine
+`PRG:0x08C688`, which writes the OBJ entries itself — tile = the record's code − `0x3800`,
+attribute = the record's word + d6 (d6 from the per-id byte table `0x08C724` for the
+portrait, `#$19` for the name). It has no `$18` bank word, so a bank gate on the map's
+children does not reach it. The readers' census is `tests/test_map_table_readers.sh` —
+absolute references only: the select screen reaches `0x26762A` through `0x2675AA + 0x80`,
+which that census cannot see (`../project/gotchas.md` "A READER CENSUS BY BASE ADDRESS").
 
 ### Gates from the M2b step that still run
 
@@ -3550,8 +3560,9 @@ parallel):
   `0x0BB240`/vs2 `0x0D53DE`), and **the minimum floor: d2==0 → 1,
   cap 0x7F**. Class 2 rows cap at 2 — small-tick beams are 1-2
   HP/tick BY DESIGN in both games.
-  **The power byte, whole (14z-195, #241):** bits 0-4 the class, bit 5
-  the stat skip, **bit 7 the NO-KILL clamp** — the post-process reads it
+  **The power byte, whole (14z-195, #241):** bits 0-4 the class (the
+  scaler's `andi.w #$1f,d2` at `PRG:0x18B8E`, vs2 `0x17524`), bit 5
+  the stat skip (`btst #5,d0` at `PRG:0x18B96`, vs2 `0x1752C`), **bit 7 the NO-KILL clamp** — the post-process reads it
   after the subtract (`tst.b $8(a3)` / `tst.b $9(a3)` + `bpl` at
   `PRG:0x18ACC` / `0x18AEE`, vs2 `0x1745E` / `0x17480`) and holds the
   HP word at the victim's floor `+0x138` ([VSE-41]). Bit 6 has no reader

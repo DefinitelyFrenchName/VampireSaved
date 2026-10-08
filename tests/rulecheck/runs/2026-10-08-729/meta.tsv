@@ -1,0 +1,9 @@
+decision	expectation
+subject	#118: three emulator gates promoted from the 14z-194 pilot (audit_mizuumi_inputs, audit_extra_pass, audit_mizuumi_attack), their asserted figures frozen in the scripts, merged at 4aa52ade and 42bb2e9d
+session	14z-195
+model	rule-checker@163e4ce9cf7b
+claim	CLAIM: tests/audit_mizuumi_inputs.sh, tests/audit_extra_pass.sh and tests/audit_mizuumi_attack.sh assert, on pristine vsavj under MAME, the fighter-block behaviours their EXPECTS lines state (the input words +0x394/+0x395/+0x397 and +0x122..+0x12D predicted from the static mechanism; the speed level's extra logic pass predicted per frame at pinned levels and unpinned; the attack-start fields +0x101, +0x1B8, +0x119 measured with write taps), and each re-run from a clone of the merged main at c4466c51 on ERIS reads PASS (build/agent195/eris_118m/<gate>.log) with every declared control firing and each control run as a mode exiting 1 (the __<control>.log files). NOT TESTED: +0x103 (not promoted: to be judged at the writes by PRG:0x02758C, the gate header says why), +0x167/+0x168 (the marathon re-runs), HOMING items 4 and 5, merged-m23 (no merged leg in any of the three), FBNeo; the figures are the pilot's measurements re-asserted, not compared with the mizuumi wiki beyond the names.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b

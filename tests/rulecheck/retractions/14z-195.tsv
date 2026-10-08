@@ -2,3 +2,4 @@
 the select screen reads neither array	14z-195: #124 owed check 1 answered from breakpoints on the map and ranking reader PCs; 0x26762A IS the select screen's name-banner P2 array, read through 0x2675AA + 0x80 (rule-checker run 2026-10-08-743; corrected on #124, STATE 14z-195 rows 3 and 5 marked in place)	retracted
 dealt white damage, unscaled	14z-195: the cross-check page called the record's +9 the dealt white damage; it is the ROM power class (#241)	retracted
 is the select screen's name-banner P2 array	control: the corrected #124 reading, live in docs/project/gotchas.md	reach:1
+the port already repoints (VS-splash P2)	14z-189 wording in engine_internals.md: 0x26762A is the select screen's name-banner P2 array, not the VS splash's (corrected in place 14z-195, #124)	retracted

@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-488 entries (47 game / 130 platform / 311 project), counted from the buckets at generation.
+489 entries (47 game / 131 platform / 311 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 47 entries
 
@@ -72,7 +72,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A RECORD'S CLASS BYTE IS NOT THE VICTIM'S REACTION CLASS — the guard reads it first and the stager rewrites it (paid: 14z-169)
 - A POKED KO NEEDS THE VICTIM ON ITS LAST BAR, AND THE KO MUST COME FROM THE PATH YOU MEAN TO TEST — a low HP alone rallies (paid: 14z-184, GitHub #180)
 
-## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 130 entries
+## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 131 entries
 
 - LINUX CAPS ONE ENVIRONMENT STRING AT 128 KiB; `/bin/sh` IS DASH; THE PINNED MAME'S VERBOSITY IS A BUILD FACT — three macOS facts the first Linux emulator tier paid for (paid: 2026-10-01, ERIS WSL2 Ubuntu, GitHub #201)
 - `spctl -a` REPORTS THE SIGNING-POLICY VERDICT, NOT WHETHER A LAUNCH IS BLOCKED — and `unzip` DOES propagate com.apple.quarantine (measured: 2026-09-20, macOS 26.0 arm64, #144)
@@ -204,6 +204,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - PYTHON'S ZipInfo STAMPS THE HOST INTO create_system — the same zip code writes a different container on Windows (paid: 14z-189 measured, 14z-191 fixed, GitHub #215)
 - THE CPS-2-ONLY MAME BUILD PRINTS FOUR "clone of nonexistent driver megaman" ERRORS AT EVERY START — harmless, every host, release binaries included (seen: 14z-191, #226)
 - MAME OPENS ON A RED "ROMs/disk images ... incorrect" BOX AT EVERY START OF A SET WHOSE CRCs ITS DRIVER DOES NOT CARRY, AND NO OPTION SKIPS IT (seen: 14z-193, #234; source read 14z-194)
+- A DT_NEEDED SELF-CONTAINMENT CHECK CANNOT SEE WHAT SDL LOADS AT RUN TIME (paid: 14z-195, #226)
 
 ## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 311 entries
 

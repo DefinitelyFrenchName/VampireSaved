@@ -1,0 +1,16 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: #124: the build plan for the next session — map name records, two drawer-bank gates in place of the approved portrait-tile relocation, width words, pool rows, the gate; the score ranking split to its own ticket
+Claim (the working agent's sentence): The map's two tag children set $18 = 0x2000 and draw rows of 0x26752A (name) and 0x26762A (mini-portrait) by the id at $A(a6), as vs2's map does with its own arrays; 0x26762A is the select screen's name_banner P2 array, whose tenant rows already hold vs2's native tile codes drawn from WIDE bank 5 with bank 0x3000, so the map, at bank 0x2000, draws vsavj tiles at those codes; relocating the portrait tiles (the approved part 2) cannot fix that without breaking the select banner or overwriting tiles legacy content draws, so the plan replaces it with two site_thunks in the established splash form at 0x05FC36 and 0x05FC76, adds a native_c5 select_records row for 0x26752A, takes vs2's width words and pool rows, ships a release-scope gate (tenants against native vs2, 16 legacy opponents sprite-identical to vsavj, the masked corpus and legacy pairings for the thunks' cycles), and splits the score ranking (its drawer writes OBJ entries with no bank word) to its own ticket. Not tested: the ranking's bank bits, vs2's ranking table rows for the tenant ids, the thunks' cycle cost on arcade replays, a capture comparing the name_banner P2 sprites with vs2's map mini-portrait, the merged composition of three single-id gates at one site — all listed under Not measured in plan.md; the plan is a recommendation for the maintainer, built in the next session.
+Artifacts (read every one, in full):
+  - build/agent195/scope124/plan.md
+  - build/agent195/scope124/vsavj_map_children.txt
+  - build/agent195/scope124/vsavj_ranking_reader.txt
+  - build/agent195/scope124/vsavj_ranking_drawer.txt
+  - build/agent195/scope124/vs2_map_children.txt
+  - build/agent195/scope124/vs2_ranking_reader.txt
+  - build/agent195/scope124/vs2_array_refs.txt
+  - build/agent195/scope124/splash_thunk_excerpt.txt
+  - build/agent195/scope124/name_banner_records_excerpt.txt
+  - tools/overlay_port.py

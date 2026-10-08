@@ -20,40 +20,42 @@ there in parallel.**
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** What the close found and did is in STATE 14z-195's CLOSE row.
-1. **#124 — THE BUILD** (the maintainer: *"Scope #124, build next"*). The plan is the #124 comment "The build plan (14z-195)", rule-checker run 2026-10-08-749 OK.
+1. **#124 — THE BUILD** (ruled: `DECISIONS_HISTORY.md` "Ruled 2026-10-08 (14z-195) — #124: scope the build this session, build it the next"). The plan is the #124 comment "The build plan (14z-195)", rule-checker run 2026-10-08-749 OK.
    - **Step 0 FIRST, before any byte changes:** debugger read watchpoints over every row the build rewrites, with the select screen's read of `0x26762A`'s P2 rows as the positive control.
    - Then: a `native_c5` `select_records` row for `0x26752A`, and two `site_thunk` bank gates at `0x05FC36`/`0x05FC76`. These replace the approved tile relocation, because the select screen draws the same rows.
    - Then vs2's width words and pool rows, the score ranking's own bank gate (its bank bits measured first), and the gates.
-2. **#245-#255 — eleven code-review findings**, filed 2026-10-08 as `mechanyaa-ai` against `d1759b33` and indexed as open bugs at this close.
+2. **#245, #246, #247, #248, #249, #250, #251, #252, #253, #254, #255 — eleven code-review findings**, filed 2026-10-08 as `mechanyaa-ai` against `d1759b33` and indexed as open bugs at this close.
    - #245 (P1): the WIDE builder overwrites a source zip through its own symlink.
    - The rest are P2/P3: release packaging and appliers, CI, the staleness audit, the replay wrapper, the control classifier.
    - Triage them with the maintainer: bug archaeology first ([VSP-14]).
-3. **#129 — PUT THE DECISION** (STATE_HISTORY 14z-194; facts in `docs/game/engine_internals.md` "The CPU AI action-script system"). The maintainer's last priority.
+3. **#129 — PUT THE DECISION** (STATE 14z-194 row (3); facts in `docs/game/engine_internals.md` "The CPU AI action-script system").
 4. **Open, scoped:**
-   - #118: three emulator gates landed, now scope `out`; HOMING items 4 and 5 remain.
+   - #118: three emulator gates landed; with `audit_mizuumi_struct`, the four mizuumi gates are now scope `out`. Promotions 4 and 5 of `build/agent194/t118/HOMING.md` (untracked 14z-194 scratch: extend `tests/audit_mizuumi_struct.sh`; a new `tests/audit_mizuumi_chars.sh`) remain.
    - #229: ground throws gated and on the cross-check page; specials, supers and EX/ES moves next.
-   - #226: the desktop and clean-host gates are both green on PILOT. Close it, or keep it open until a release runs both? The maintainer's call.
    - #228, deferred.
    - #243, #244.
-   - Done, awaiting release: #236, #238-#240.
+   - Done, awaiting release: #236, #238, #239, #240.
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
 - **A census of absolute references to a table, plus breakpoints on its known readers, cannot show a screen does NOT read it.** `0x26762A` is reached through `0x2675AA + 0x80`. Use a read watch over the table's bytes, with a positive control (`docs/project/gotchas.md`).
 - **podman on PILOT runs rootless.** `docker.io/library/ubuntu:24.04` is pulled. glibc 2.39's `LD_DEBUG=libs` prints `find library=X [0]; searching`, then `(RUNPATH from file Y)` and `trying file=` lines, and no `needed by` lines (`tools/cleanhost_libs.py`).
-- **`rulecheck.py` arguments:** `prepare --session` takes the 14z key; `record --session` takes the transcript id (`d93d8edb` this sitting).
+- **`tools/rulecheck.py` arguments:** `prepare --session` takes the 14z key; `record --session` takes the transcript id (`d93d8edb` this sitting).
 - **`claim_lint` refuses an untied "every".** Tie it to an artifact path in the same sentence.
 - **zsh does not split a command held in a variable** (`$F args` fails). Write the command out.
 - **`ldconfig -p` lines start with a TAB.** Match `^[[:space:]]soname `.
 
 ## WHAT CLOSED THIS SITTING (14z-195)
 
-- **Closed `done`:** #237, #241, #242.
-- **Filed:** #243, #244.
+- **Closed `done`:** #237, #241, #242, #226.
+- **Filed:** #243, #244, #256, #257.
 - **Indexed:** #245-#255.
 - **Ruled:**
   - a done-but-unreleased ticket gets a comment saying so;
   - `libudev.so.1` is host-provided;
   - #229's captures confirmed;
   - the four mizuumi gates leave release scope;
-  - #124 scoped this sitting, built the next.
+  - #124 scoped this sitting, built the next;
+  - #226 closed on the clean-host measurements.
+
+  Each ruling, in the maintainer's own words, is its `DECISIONS_HISTORY.md` entry "Ruled 2026-10-08 (14z-195) — ..."; `tools/agent/rulings_verbatim.py` checks those quotes.

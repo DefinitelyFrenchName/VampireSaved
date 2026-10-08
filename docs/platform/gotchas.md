@@ -3207,3 +3207,15 @@ uses. The project's own runs never see it (`-video none`); a scripted run with a
 `-autoboot_script` only after the startup screens, so a script waiting for the game sits on the box (14z-193).
 Shipped answer: the mame README and `EMULATOR.md` say it is expected and harmless (the generator, gated by
 `tests/test_release_launcher_bat.sh`; released with merged-m23).
+
+## A DT_NEEDED SELF-CONTAINMENT CHECK CANNOT SEE WHAT SDL LOADS AT RUN TIME (paid: 14z-195, #226)
+
+`tools/check_host_libs.py` judges a Linux release folder by each file's own dynamic section (`readelf -d`): every
+NEEDED soname shipped and resolving in the folder, or on `tests/expected/linux_host_provided.tsv`. SDL2 loads its
+video, audio and input back ends with `dlopen` at run time, so those libraries never appear as NEEDED. On a stock
+`ubuntu:24.04` container holding only the list's packages (`tests/audit_release_linux_cleanhost.sh`), the bundled SDL
+asked the host for `libudev.so.1` (device hotplug), which the list did not carry and the static check had passed for
+every release. Rule: the run-time half is judged from the loader's own trace (`LD_DEBUG=libs`, glibc 2.39 form: `find
+library=X [0]; searching`, then `(RUNPATH from file Y)` naming the requester and the `trying file=` lines, no `needed
+by` lines), attributed to the package by the RUNPATH line, on a host that has nothing else installed — a build host
+resolves everything and proves nothing.
