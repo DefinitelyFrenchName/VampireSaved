@@ -13,7 +13,7 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**440 of 440 gates described.**
+**441 of 441 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
@@ -24,7 +24,7 @@ first sentence) is `gate_index.md`.
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 87 | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 76 | 76 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 77 | 77 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -2562,7 +2562,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 ## character-data
 
-the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 76 of 76 described.
+the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 77 of 77 described.
 
 ### `audit_air_dash_height.sh` — audit, emulator
 
@@ -3091,6 +3091,14 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 **HOW:** tools/audit_poked_legs.py statically pairs every poke of the id fields in a script with the replays it names, resolves the confirm's cell through tools/select_wheel.py on the decrypted data view and our wheel from the build, and classes each; controls feed a fixture that pokes Phobos over Donovan's cell and drop a frozen row.
 
 **EXPECTS:** the census equal to the frozen file, every CROSS-FLAVOR row carrying its accepted measurement; the new-flavour fixture is reported NEW and the dropped row fails.
+
+### `test_power_decode.sh` — test, ci_static
+
+**WHAT:** a record's +8 (real) and +9 (white) are POWER bytes, not damage amounts: bits 0-4 the class the scaler indexes, bit 5 skips the attacker's stat row, bit 7 is the no-kill clamp. The engine side is read from both games' own instruction words, and the derivation's side (tools/vanilla_frames.py through tools/hitbox_records.power) is held on the case that found it: Zabel's pursuit, which read 258 red / 130 white undecoded for a hit the game scores 0 red / 2 white.
+
+**HOW:** section 1 compares the opcode words at the decode sites on vsavj and vsav2 (the scaler's `andi.w #$1f,d2` and `btst #5,d0`; the post-process's `tst.b $8(a3)` / `tst.b $9(a3)` each followed by `bpl`), from each game's own opcode view. Section 2 derives vsavj and reads Zabel's P pursuit chain a2:0x56 (named by the #229 measurement, 14z-194: the chain a2:0x40>a2:0x56; the maintainer confirmed the identity on capture sheets) and its records' flags; section 3 prints the flag census over every record the derivation reaches (NOTE).
+
+**EXPECTS:** section 1 every word as listed; section 2 red 0 / white 2 with bit 7 set on both bytes of the pursuit records (0x80 / 0x82 raw); a red is a site whose words moved or a derivation that reports the raw byte.
 
 ### `test_projectile_census.sh` — test, emulator
 

@@ -3550,6 +3550,20 @@ parallel):
   `0x0BB240`/vs2 `0x0D53DE`), and **the minimum floor: d2==0 → 1,
   cap 0x7F**. Class 2 rows cap at 2 — small-tick beams are 1-2
   HP/tick BY DESIGN in both games.
+  **The power byte, whole (14z-195, #241):** bits 0-4 the class, bit 5
+  the stat skip, **bit 7 the NO-KILL clamp** — the post-process reads it
+  after the subtract (`tst.b $8(a3)` / `tst.b $9(a3)` + `bpl` at
+  `PRG:0x18ACC` / `0x18AEE`, vs2 `0x1745E` / `0x17480`) and holds the
+  HP word at the victim's floor `+0x138` ([VSE-41]). Bit 6 has no reader
+  among vsavj's record accesses through a3 (the two appliers, the two
+  spark lookups at `0x19072-0x190CA` — all mask `& 0x1F`); a reader
+  through another register is not excluded. So the byte is never a
+  damage amount: Zabel's pursuit records read `0x80` / `0x82` = class
+  0 real, class 2 white, no-kill on both — the game takes 0 red / 2
+  white. Over the 1,158 records the vsavj derivation reaches, bit 7 is
+  set on 115 real and 116 white bytes. Locked by
+  `tests/test_power_decode.sh` (both games' words, the derivation's
+  decode via `tools/hitbox_records.py` `power()`).
 - `PRG:0x18C08` (vs2 `0x175AE`) defense/apply: defender-side d3 from
   defense table `0x0B8940` (vs2 `0x0D2ABE`; 32B per char id — rows
   0x0A/0x10/0x13/0x19/0x1A differ between the games = the roster id

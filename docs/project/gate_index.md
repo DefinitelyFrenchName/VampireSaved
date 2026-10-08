@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**440 scripts** — 121 ci_portable, 90 ci_static, 229 emulator-tier (run by name).
+**441 scripts** — 121 ci_portable, 91 ci_static, 229 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -27,7 +27,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 76 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 77 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -465,6 +465,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/test_meter_gain.sh` | test | emulator | MAME, ~4 min | THE GAUGE COLUMN ARBITRATED: what a vanilla normal pays its attacker in METER, read off the engine on a CONNECT (14z-146). | 14z-146 |
 | `tests/test_move_naming.sh` | test | emulator | MAME, a build dir, ~1 min | THE MOVE LIST'S CHAIN IDS ARE WHAT NATIVE VS2 ENTERS (character-data map, phase 1 naming step; 14z-120). | 14z-120 |
 | `tests/test_poked_legs.sh` | test | ci_static | ROMDIR | THE CENSUS OF EVERY FORCED-PICK LEG in tests/ and tools/, classified by what the poke leaves latched, frozen shrink-only; a new CROSS-FLAVOR pairing fails until it is measured and accepted (GitHub #151 step 3, 14z-161). | 14z-161 |
+| `tests/test_power_decode.sh` | test | ci_static | ROMDIR | AN ATTACK RECORD'S POWER BYTE IS DECODED AS THE ENGINE DECODES IT (14z-195, GitHub #241). ci_static: needs the vsavj and vsav2 decrypted views (the build/out cache, else ROMDIR); no emulator, ~3 s. | 14z-195 |
 | `tests/test_projectile_census.sh` | test | emulator | MAME, ~2 min | WHICH PROJECTILE-POOL TYPES EACH TENANT'S MOVES SPAWN (character-data map phase 3, 14z-120 (11)). The naming rigs' specials and meter parts (donovan/pyron/huitzil parts 2 and 4) replayed on native vs2 with the 32 pool slots' type bytes samp… | 14z-120 (11) |
 | `tests/test_projectile_params.sh` | test | emulator | MAME, a build dir, ~3 min | THE PROJECTILE PARAMETERS (character-data map phase 3, 14z-121): every $FF9400-pool projectile type's inline parameter tables, decoded from the type HANDLER (tools/projectile_params.py) and MEASURED on the live spawn. | 14z-121 |
 | `tests/test_reaction_classes.sh` | test | ci_static | ROMDIR | THE ROUTE OF A HIT'S CLASS FROM THE RECORD TO THE REACTION, re-derived from the decrypted images for pristine vsavj, vs2 and our merged build, with the legacy record census by class and every constant writer of the victim's +0x54, frozen (1… | 14z-169 |

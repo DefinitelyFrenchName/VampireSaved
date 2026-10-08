@@ -352,6 +352,7 @@ declares	test_pointer_flow
 declares	test_poke_readback
 declares	test_poked_legs
 declares	test_pokes_ranges
+declares	test_power_decode
 declares	test_projectile_census
 declares	test_projectile_params
 declares	test_promise_check

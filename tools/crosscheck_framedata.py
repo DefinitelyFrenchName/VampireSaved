@@ -51,9 +51,9 @@ COLUMNS = [
     ("startup",   ["startup"],                    "frames before the first active frame"),
     ("active",    ["active"],                     "frames the attack box exists"),
     ("recovery",  ["recovery"],                   "frames after the last active frame"),
-    ("white",     ["white damage"],               "the attack record's +9 white power"),
+    ("white",     ["white damage"],               "the attack record's +9 white power CLASS (bits 0-4; bits 5-7 are flags, #241)"),
     ("gauge_hit", ["guage hit", "gauge hit"],     "the attack record's +0x14 attacker meter gain"),
-    ("red",       ["red damage"],                 "the attack record's +8 real power PLUS its +9 white — the move's total"),
+    ("red",       ["red damage"],                 "the attack record's +8 real power class PLUS its +9 white class — the move's total"),
 ]
 
 # `gauge hit` is not our quantity: the workbook's on-hit gauge INCLUDES the meter the
@@ -434,7 +434,7 @@ def render_md(vanilla, cmp_, full=False):
     conv = {"startup": (1, "the sheet counts the first active frame as startup; ours counts the frames before it"),
             "active": (0, "identical"),
             "recovery": (2, "a 2-frame tail the sheet counts and our last node does not"),
-            "white": (0, "identical — the record's +9 is the dealt white damage, unscaled"),
+            "white": (0, "identical — the record's +9 power class, the ROM value the workbook quotes (not the damage dealt, which the scaler chain produces)"),
             "gauge_hit": (0, "identical once the sheet's own `gauge whiff` is subtracted")}
     for key, _, _ in COLUMNS:
         if key not in conv:
@@ -644,7 +644,7 @@ def render_md(vanilla, cmp_, full=False):
     A("| column | verdict over the 15 |")
     A("|---|---|")
     A("| gauge | **EXACT** on all 15, P and ES: the game pays the sheet's hit gauge over the hits landed (the first hits of a series), measured from the gauge word; ES pays 0, as the sheet says |")
-    A("| red / white damage | **EXACT** on 15 of 15 for P and 14 of 15 for ES under this page's rule (red = real + white, first hit; Zabel's compared on the HP the game takes); the one ES miss is Demitri's first hit (the sheet's red above ours) |")
+    A("| red / white damage | **EXACT** on 15 of 15 for P and 14 of 15 for ES under this page's rule (red = real + white, first hit; each record's power CLASS — Zabel's pursuit records carry the no-kill flag in bit 7, decoded since 14z-195, #241); the one ES miss is Demitri's first hit (the sheet's red above ours) |")
     A("| active | **INCONSISTENT**: the sheet reads ours +1 on 12 of 15 (P) and 11 of 15 (ES); the exceptions (BU, VI, JE; ES also AU) not investigated |")
     A("| startup | **INCONSISTENT, in two families**: the sheet reads ours +1 for DE FE AU SA QB LE and +2 for BU GA VI AN BI LI JE; MO +4 and ZA +9 (both leap chains loop on game logic). OURS re-checked first: Demitri's count equals its duration-byte derivation, every count is the same across P, K and ES and between connecting and whiffing legs, and the hit reader passes its control. What the sheet counts as a pursuit's startup is OPEN |")
     A("| recovery | **UNCOMPARABLE**: the sheet writes prose (\"landing 1\", \"32 + landing 1\") |")

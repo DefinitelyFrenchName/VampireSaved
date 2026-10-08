@@ -35,7 +35,8 @@ THE ENCODING, MEASURED (every claim below is what the engine did, not a reading)
 
   A node's hbA word (+0xA) >> 8 is the ATTACK RECORD index (0 = not
   attacking; a chain's ACTIVE frames are its nodes with hbA != 0). Record
-  (0x20 bytes): +0 box (4 words), +8 real power, +9 white power, +0x10
+  (0x20 bytes): +0 box (4 words), +8 real power, +9 white power (each a
+  POWER BYTE, not an amount — power() below, 14z-195, #241), +0x10
   hit id (the multi-hit dedup key), +0x14 the ATTACKER'S METER GAIN on a
   hit (measured: 6/12/18 on L/M/H normals, 3 per Lightning Sword tick, 9
   Ifrit, 2 the column — a fraction of it on block; the VICTIM gains 8 per
@@ -61,6 +62,22 @@ import sys
 from pathlib import Path
 
 REC = 0x20
+
+
+def power(b):
+    """Decode a record's +8 (real) or +9 (white) POWER BYTE as the engine reads it (14z-195, #241;
+    docs/game/engine_internals.md "The DAMAGE pipeline: two appliers, one scaler chain"). The byte is NOT a damage amount:
+      bits 0-4  the CLASS: the scaler 0x18B8C (vs2 0x17522) takes `power & 0x1F`, x32, plus the
+                attacker's +0x3B3 row, into the table PRG:0x0B8140 — class 0 deals nothing;
+      bit 5     NOSTAT: the scaler skips the attacker's +0x3B3 add (`btst #5` at 0x18B96);
+      bit 6     no reader among the engine's record accesses through a3 on vsavj (the two damage
+                readers and the two spark lookups at 0x19072-0x190CA all mask it away);
+      bit 7     NOKILL: after the subtract, the post-process (0x18ACC real / 0x18AEE white; vs2
+                0x1745E / 0x17480) clamps the victim's HP word at its floor `+0x138` instead of
+                letting it reach the kill.
+    The record readers keep the raw byte in `real` / `white` (tools key on it and on its address);
+    a consumer that wants damage reads `real_class` / `white_class`."""
+    return {"class": b & 0x1F, "nostat": bool(b & 0x20), "bit6": bool(b & 0x40), "nokill": bool(b & 0x80)}
 
 
 def s16(x):
@@ -134,6 +151,8 @@ class HitboxSet:
         a = (self.proj_attack() if proj else self.tables["attack"]) + idx * REC
         b = self.rd(a, REC)
         return {"addr": f"{a:#x}", "box": self.box(a), "real": b[8], "white": b[9], "hit_id": b[0x10],
+                "real_class": b[8] & 0x1F, "white_class": b[9] & 0x1F,   # power() — the damage class (#241)
+                "real_flags": b[8] & 0xE0, "white_flags": b[9] & 0xE0,   # bit 5 nostat, bit 7 nokill
                 "meter": b[0x14], "strength": b[0x12], "special": b[0x16],
                 "cls": b[0x17], "b1c": b[0x1c], "b1d": b[0x1d],
                 # 14z-121 (3), from the record's READERS (engine_internals "The attack record's fields, by their readers"):

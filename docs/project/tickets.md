@@ -11,12 +11,13 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**243 tickets** — status: open 13 · parked 9 · done 194 · declined 9 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 171 · cosmetic 16 · evolution 56 · **backfill debt: 0 rows**.
+**244 tickets** — status: open 14 · parked 9 · done 194 · declined 9 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 172 · cosmetic 16 · evolution 56 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#244](https://github.com/DefinitelyFrenchName/VampireSaved/issues/244) | bug | open | Tenant charmap pages print the raw +8/+9 power byte as damage (the #241 decode not applied to charmap_html/charmap_md) | `tests/test_power_decode.sh` | none | none | none | 14z-195 |
 | [#243](https://github.com/DefinitelyFrenchName/VampireSaved/issues/243) | bug | open | Staleness audit: 79 emulator gates declare the whole tests/replays/ directory, so any new replay stales them all | `tools/audit_emulator_staleness.py` | none | none | none | 14z-195 |
 | [#242](https://github.com/DefinitelyFrenchName/VampireSaved/issues/242) | bug | open | retraction_grep never lists a retracted wording broken by a quote prefix or HTML markup | `tools/retraction_grep.py` | none | none | none | 14z-194 |
 | [#241](https://github.com/DefinitelyFrenchName/VampireSaved/issues/241) | bug | open | Cross-check record derivation reads bit 7 of Zabel's pursuit damage bytes as damage (258/130 for a 0/2 hit) | `tools/vanilla_frames.py` | none | none | none | 14z-194 |

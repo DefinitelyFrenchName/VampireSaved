@@ -48,9 +48,9 @@ the measurement is correctly done or not."*
 | `startup` | `startup` | frames before the first active frame |
 | `active` | `active` | frames the attack box exists |
 | `recovery` | `recovery` | frames after the last active frame |
-| `white damage` | `white` | the attack record's +9 white power |
+| `white damage` | `white` | the attack record's +9 white power CLASS (bits 0-4; bits 5-7 are flags, #241) |
 | `guage hit` | `gauge_hit` | the attack record's +0x14 attacker meter gain |
-| `red damage` | `red` | the attack record's +8 real power PLUS its +9 white — the move's total |
+| `red damage` | `red` | the attack record's +8 real power class PLUS its +9 white class — the move's total |
 
 Not compared, because nothing in the tree derives them yet: `on hit`,
 `renda on hit`, `on block`, `renda on block`, `throw tech`, `cancel`, `guard`,
@@ -130,7 +130,7 @@ per MOVE, over all 15 characters:
 | `startup` | sheet = ours +1 — the sheet counts the first active frame as startup; ours counts the frames before it | **311/314** (99%) |
 | `active` | sheet = ours +0 — identical | **306/309** (99%) |
 | `recovery` | sheet = ours +2 — a 2-frame tail the sheet counts and our last node does not | **213/220** (96%) |
-| `white` | sheet = ours +0 — identical — the record's +9 is the dealt white damage, unscaled | **302/314** (96%) |
+| `white` | sheet = ours +0 — identical — the record's +9 power class, the ROM value the workbook quotes (not the damage dealt, which the scaler chain produces) | **302/314** (96%) |
 | `gauge_hit` | sheet = ours +0 — identical once the sheet's own `gauge whiff` is subtracted | **308/314** (98%) |
 
 So the two measurements corroborate each other on ~96% of every column we can
@@ -418,7 +418,7 @@ frame-rate trace cannot measure them).
 | column | verdict over the 15 |
 |---|---|
 | gauge | **EXACT** on all 15, P and ES: the game pays the sheet's hit gauge over the hits landed (the first hits of a series), measured from the gauge word; ES pays 0, as the sheet says |
-| red / white damage | **EXACT** on 15 of 15 for P and 14 of 15 for ES under this page's rule (red = real + white, first hit; Zabel's compared on the HP the game takes); the one ES miss is Demitri's first hit (the sheet's red above ours) |
+| red / white damage | **EXACT** on 15 of 15 for P and 14 of 15 for ES under this page's rule (red = real + white, first hit; each record's power CLASS — Zabel's pursuit records carry the no-kill flag in bit 7, decoded since 14z-195, #241); the one ES miss is Demitri's first hit (the sheet's red above ours) |
 | active | **INCONSISTENT**: the sheet reads ours +1 on 12 of 15 (P) and 11 of 15 (ES); the exceptions (BU, VI, JE; ES also AU) not investigated |
 | startup | **INCONSISTENT, in two families**: the sheet reads ours +1 for DE FE AU SA QB LE and +2 for BU GA VI AN BI LI JE; MO +4 and ZA +9 (both leap chains loop on game logic). OURS re-checked first: Demitri's count equals its duration-byte derivation, every count is the same across P, K and ES and between connecting and whiffing legs, and the hit reader passes its control. What the sheet counts as a pursuit's startup is OPEN |
 | recovery | **UNCOMPARABLE**: the sheet writes prose ("landing 1", "32 + landing 1") |

@@ -163,6 +163,7 @@ declares	test_pod_black_foot_palette
 declares	test_poke_readback
 declares	test_poked_legs
 declares	test_pokes_ranges
+declares	test_power_decode
 declares	test_promise_check
 declares	test_py_escapes
 declares	test_pyron_medallion_2p

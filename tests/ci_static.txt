@@ -226,3 +226,7 @@ test_attribute_patch_delta
 # 14z-193 (#231 part 2): the newest freeze's whole program change recorded range by range (no bytes) and
 # re-measured from each build's own romset (tools/freeze_bytediff.py); one control. ~85 s.
 test_freeze_bytediff
+# 14z-195 (#241): a record's +8/+9 POWER byte decoded as the engine decodes it — bits 0-4 the class,
+# bit 5 nostat, bit 7 nokill — read from both games' opcode words and held on Zabel's pursuit (0 red / 2 white);
+# two controls. ~3 s.
+test_power_decode

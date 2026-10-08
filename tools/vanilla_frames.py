@@ -226,7 +226,10 @@ def derive_char(img, rows, cid, names=None):
                 except IndexError:
                     continue
                 hids[a] = r["hit_id"]
-                recs[a] = {"real": r["real"], "white": r["white"], "meter": r["meter"],
+                # real/white are the power CLASS (bits 0-4), never the raw byte: bits 5-7 are flags
+                # (hitbox_records.power(); 14z-195, #241 — Zabel's pursuit read 258/130 for a 0/2 hit)
+                recs[a] = {"real": r["real_class"], "white": r["white_class"], "meter": r["meter"],
+                           "real_flags": r["real_flags"], "white_flags": r["white_flags"],
                            "cls": r["cls"], "hit_id": r["hit_id"], "strength": r["strength"],
                            "pb_hit": r["pb_hit"], "pb_blk": r["pb_blk"], "freeze": r["freeze"]}
             fd = frame_data.derive(durs, atk, hids)
