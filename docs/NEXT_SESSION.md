@@ -53,6 +53,8 @@ PILOT for the release, please put them to use"*).
 - PILOT's desktop runs PipeWire with a null sink; `pw-record -P '{ stream.capture.sink=true }' --target auto_null`
   records the emulator; gnome-shell's event sounds share the sink, so judge the emulator's own stream.
 - In zsh, `echo ===` fails (`=cmd` expansion).
+- A FORK skips its spec's READ FIRST files (14z-194 procedure runs 725-727: five forks did): before merging a fork's result, check its
+  transcript read what its spec named, or name the gap in the merge.
 
 ## WHAT CLOSED THIS SITTING (14z-194)
 
