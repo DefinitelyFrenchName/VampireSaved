@@ -2,8 +2,10 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 257
+# issues: 259
 number	state	reason	closed	labels	title
+259	OPEN	-	-	bug	static_confirm plan took 20 min at the 14z-195 close (228 changed files, 194 rule-checker run files)
+258	OPEN	-	-	bug	rulecheck: a packet artifact above the Read limit gets a partial read
 257	OPEN	-	-	bug	rulings_verbatim leaves a second maintainer quote on the same line unchecked
 256	OPEN	-	-	bug	Close check open-tickets reads a cited ticket range as its two ends only
 255	OPEN	-	-	bug	[P3] Python release applier publishes output before rejecting an incorrect aggregate set key

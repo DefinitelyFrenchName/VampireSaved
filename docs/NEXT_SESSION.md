@@ -34,6 +34,7 @@ there in parallel.**
    - #229: ground throws gated and on the cross-check page; specials, supers and EX/ES moves next.
    - #228, deferred.
    - #243, #244.
+   - The close's own tools: #256, #257, #258, #259 (#259: the `--confirm` planner took 20 min at this close).
    - Done, awaiting release: #236, #238, #239, #240.
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
@@ -48,7 +49,7 @@ there in parallel.**
 ## WHAT CLOSED THIS SITTING (14z-195)
 
 - **Closed `done`:** #237, #241, #242, #226.
-- **Filed:** #243, #244, #256, #257.
+- **Filed:** #243, #244, #256, #257, #258, #259.
 - **Indexed:** #245-#255.
 - **Ruled:**
   - a done-but-unreleased ticket gets a comment saying so;

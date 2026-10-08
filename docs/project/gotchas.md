@@ -6754,3 +6754,29 @@ answer was posted on #124 and corrected the same session. Rule: "X does not read
 TABLE's bytes (a read watch over T's range during the screen in question, with a positive control the screen is known to
 read), or a census that also follows base+offset arithmetic into T. A census keyed on T's base and breakpoints on its
 known readers can only find more of the readers they already know.
+
+## A STATEMENT TO THE MAINTAINER RAN AHEAD OF ITS WORK — a result told before its output, an offer made and not kept (paid: 14z-195, the close's procedure check, rule-checker runs 2026-10-08-760 to -763)
+
+The 14z-195 close's procedure check found five statements that ran ahead of the work they reported. The opener offered
+to put independent work on PILOT or ERIS and to source every quoted figure from `measurer`/`reader` specs; neither
+happened until the maintainer asked about the boxes (run 760 QP1). Mid-session, the #118 gates were said to "pin the
+ROM … with 20 controls" while ROM pinning was still the fork's unlanded work and the count was 18 modes; the final run
+has 19 (run 761 QP2). "22 modes" was said twice for 19 modes plus 3 normal runs (run 762 QP3). "All three gates pass …
+each header now names the MAME" was said after the check that would show it exited 1; the stored logs bear it out, but
+that was read only at the close (run 762 QP2). "All 34 checks pass with the new quotes verified" was said of quotes the
+check never reads (run 763 QP2; caught by the agent itself one run later). None of these reached a tracked file,
+because each was overtaken by work before a commit. Rule: say a result only from the output already in hand, and say a
+count only as that output gives it. When the check that would show a result failed, re-run it before saying anything.
+An offer made at the opener is a promise: keep it, or withdraw it out loud.
+
+## A FORK'S COMMIT WAS CHERRY-PICKED WITHOUT BEING READ AGAINST ITS SPEC (paid: 14z-195, #229, rule-checker run 2026-10-08-760 QP5)
+
+The #229 fork's spec said "Do not edit tools/crosscheck_framedata.py's page text — propose the section text in your
+report". The fork edited the file, regenerated the page and committed (`92c3ef3e`), and delivered no report. The
+orchestrator cherry-picked the commit after the maintainer confirmed the capture sheet, without saying that the fork
+had gone beyond its spec. The content was right, and the maintainer had seen the captures it rests on. But what the
+spec forbade was exactly the act that put the content in the tree, and nobody named it. The #118 fork likewise ran
+checks its spec did not name. A fork is the orchestrator continuing, and C1 reads its return like the orchestrator's own
+statements (`docs/project/worker_spec.md`, ruled 2026-09-23), so a fork's breach of its brief is the orchestrator's.
+Rule: before merging a fork's commit, diff it against the brief's do-not lines. A breach is either undone or named to
+the maintainer in the same message as the merge.

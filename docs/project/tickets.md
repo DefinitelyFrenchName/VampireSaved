@@ -11,12 +11,14 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**257 tickets** — status: open 24 · parked 9 · done 197 · declined 9 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 185 · cosmetic 16 · evolution 56 · **backfill debt: 0 rows**.
+**259 tickets** — status: open 26 · parked 9 · done 197 · declined 9 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 187 · cosmetic 16 · evolution 56 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#259](https://github.com/DefinitelyFrenchName/VampireSaved/issues/259) | bug | open | static_confirm plan took 20 min at the 14z-195 close (228 changed files, 194 rule-checker run files) | `tools/static_confirm.py` | none | none | none | 14z-195 |
+| [#258](https://github.com/DefinitelyFrenchName/VampireSaved/issues/258) | bug | open | rulecheck: a packet artifact above the Read limit gets a partial read | `tools/rulecheck.py` | none | none | none | 14z-195 |
 | [#257](https://github.com/DefinitelyFrenchName/VampireSaved/issues/257) | bug | open | rulings_verbatim leaves a second maintainer quote on the same line unchecked | `tools/agent/rulings_verbatim.py` | none | none | none | 14z-195 |
 | [#256](https://github.com/DefinitelyFrenchName/VampireSaved/issues/256) | bug | open | Close check open-tickets reads a cited ticket range as its two ends only | `tools/close_standing.py` | none | none | none | 14z-195 |
 | [#255](https://github.com/DefinitelyFrenchName/VampireSaved/issues/255) | bug | open | [P3] Python release applier publishes output before rejecting an incorrect aggregate set key | `tools/apply_release.py` | none | none | none | 14z-195 |
