@@ -52,6 +52,7 @@ declares	audit_forced_pick_fidelity
 declares	audit_front_comparator
 declares	audit_gfx_merged_census
 declares	audit_grenade_ground_tiles
+declares	audit_ground_throws
 declares	audit_guard_corpus
 declares	audit_guard_mask_reads
 declares	audit_guard_reentry

@@ -13,7 +13,7 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**446 of 446 gates described.**
+**447 of 447 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
@@ -24,7 +24,7 @@ first sentence) is `gate_index.md`.
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 87 | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 82 | 82 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 83 | 83 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -2562,7 +2562,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 ## character-data
 
-the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 82 of 82 described.
+the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 83 of 83 described.
 
 ### `audit_air_dash_height.sh` — audit, emulator
 
@@ -2787,6 +2787,14 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 **HOW:** one MAME run of replay 37 (2P Jedah vs Victor to a KO) on pristine vsavj, the two node pointers and $FF8127 traced per frame, the node bytes read from the ROM, the identity checked on every non-capture frame (the capture flag widened by ±8 frames), the vocabulary compared with tests/expected/front_comparator.txt.
 
 **EXPECTS:** the tap live (front toggles thousands of times), zero violations outside captures, every observed byte in the frozen vocabulary. A violation means the input is not node+0x10 — re-measure, never widen; vocabulary growth is a new pose class to extend deliberately.
+
+### `audit_ground_throws.sh` — audit, emulator
+
+**WHAT:** for each of the 14 vanilla characters the workbook lists with a ground throw (Anakaris has none), every ground-throw input of the workbook (each "6MP or 6HP" row run with BOTH buttons, so the sheet's one-row claim is measured; Aulbath's 4+P back throw; Victor's MP, HP and K throws), 42 events: the throw HOLDS from the press frame (P1's +0x134 = 0x01 and P2's = 0xFF, RAM:$FF8534/$FF8934), its damage is staged from records of the THROWER'S OWN attack table, and the event's frozen signature — press-to-hold, the side P2 ends on, the meter paid, the damage records in frame order (applier site, record index, real/white power CLASS, flags, the record's meter) — is unchanged. The workbook comparison lives on the cross-check page (tools/crosscheck_framedata.py); this gate holds the measurement it rests on.
+
+**HOW:** tools/ground_throw_rigs.py gen builds the rigs (tests/replays/ground_throws/, committed; a fresh gen must equal them); each rig runs twice under tools/run_replay_guarded.sh (-debug): a logging breakpoint at the fighter applier's record read PRG:0x0189EA with the hold/end dumps, and one at the object-hit applier's PRG:0x02979A (Felicia's, Demitri's K, Victor's MP/HP, Zabel's P, Q-Bee's second hit and Aulbath's and Morrigan's P damage go through it); `rows` joins the legs per event, `expect` holds them to tests/expected/ground_throws.tsv. 28 legs, JOBS at a time.
+
+**EXPECTS:** 42 events, each holding, every dump frame present, every damage record inside the thrower's own table, and every signature equal to its frozen line.
 
 ### `audit_guard_mask_reads.sh` — audit, emulator
 

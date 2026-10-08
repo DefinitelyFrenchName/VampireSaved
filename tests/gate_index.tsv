@@ -119,6 +119,7 @@ tests/test_checkskills.sh	docs
 tests/test_classify_hitclass_probe.sh	oracle
 tests/test_classify_pool_spawns.sh	oracle
 tests/test_community_crosscheck.sh	character-data
+tests/audit_ground_throws.sh	character-data
 tests/test_power_decode.sh	character-data
 tests/test_map_table_readers.sh	character-data
 tests/audit_ranking_tenant.sh	character-data
