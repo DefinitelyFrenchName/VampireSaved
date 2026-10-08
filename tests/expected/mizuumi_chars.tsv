@@ -1,0 +1,57 @@
+# tests/expected/mizuumi_chars.tsv — the counts tests/audit_mizuumi_chars.sh measured on pristine vsavj (GitHub #118, HOMING item 5).
+# Evidence class: in-emulator. Frozen 14z-196 with FREEZE=1; counts, spans, value sets, writer and reader PCs only, no ROM bytes.
+pick_mokt	05
+pick_anak	06
+pact_spawns	Anakaris:6 Aulbath:1 Bishamon:1 Bulleta:28 Demitri:3 Jedah:104 Q-Bee:1
+pact_writers	05475a=1:140 05475a=2:1 05475a=3:2 054770=0:137 054770=2:1 05ae00=1:1 05b25c=0:1
+c14b_nonzero_by_char	Q-Bee:1614
+c14b_max	5
+pind_writers	02e224:Bulleta 02e33a:Bulleta 02ea8e:Bulleta 02f2c8:Bulleta 03018a:Demitri 0302e2:Demitri 0303ca:Demitri 03091a:Demitri 039d9c:Morrigan 03bc56:Anakaris 03be76:Anakaris 041f18:Bishamon 044e3c:Aulbath 044ed2:Aulbath 046f02:Sasquatch 047146:Sasquatch 047230:Sasquatch 047302:Sasquatch 04a3ea:Q-Bee 04e26c:Lilith 04e45c:Lilith 04e51c:Lilith
+pind_flare_lead	10:1 11:2
+cfl_proj_P2	spans [(3442, 3478), (3760, 3796), (4078, 4114)] flare-hit falls [3441, 3760, 4077]
+cfl_writers_proj	0243c2=1:3
+dash_write_dash_P1_f2905	value 2 x 566 opponent x 728 face 1
+dash_write_dash_P1_f3005	value 2 x 742 opponent x 785 face 1
+dash_write_dash_P1_f3105	value 3 x 982 opponent x 785 face 0
+dash_write_dash_P1_f3205	value 3 x 997 opponent x 785 face 0
+dash_write_dash_P1_f3305	value 3 x 794 opponent x 751 face 0
+dash_write_c26_P1_f37293	value 3 x 880 opponent x 603 face 0
+dash_write_c07_P1_f2980	value 3 x 847 opponent x 1000 face 1
+dash_writes	030ef4 writes 7, not 2 or 3 0; (value, opponent side) {(2, 'right'): 2, (3, 'left'): 4, (3, 'right'): 1}; 118_dash P1 script dashes 5 writes 5; nonzero on non-Demitri side-frames 0
+c15c_proj_P2	span 3461-3475 start 18 Victor; frames falling less than the passes 0; hp falls 0; attack starts 0
+c15c_proj_P2	span 3780-3794 start 18 Victor; frames falling less than the passes 0; hp falls 0; attack starts 0
+c15c_proj_P2	span 4098-4111 start 17 Victor; frames falling less than the passes 0; hp falls 0; attack starts 0
+c15c_c128_P2	span 10134-10273 start 180 Zabel; frames falling less than the passes 0; hp falls 0; attack starts 0
+c15c_writers	0248ca:3 026100:57 02610a:3 02994c:1 02996e:7 029974:173 02997e:1 0365d6:1
+c1a2	Gallon Dark Force side-frames 215, other Dark Force side-frames 1288, mismatches 0
+c154_writers	044ecc:Aulbath 046f08:Sasquatch 047086:Sasquatch 0472fc:Sasquatch
+c154_frames	Aulbath:216 Sasquatch:618
+c136_writers	0373bc:Zabel 03b37a:Morrigan 04ecd8:Lilith 051194:Jedah; nonzero side-frames outside 118_mo_kthrow 5791
+c19a_writers	03b2da:Victor; nonzero side-frames outside 118_mo_kthrow 0
+readers_proj	+0x0AC@000d32:4 +0x0AC@000d36:4 +0x154@000d32:4 +0x154@000d36:4
+readers_c128	+0x0AC@000d32:4 +0x0AC@000d36:4 +0x0AC@0182fe:30 +0x0AC@0276f8:656 +0x154@000d32:4 +0x154@000d36:4 +0x154@0276e2:3176 +0x154@02d482:141
+kthrow	+0x19A spans [(3017, 3065), (3217, 3256)] with a P2 hp fall [1, 1]; +0x136 spans [(3066, 3110), (3257, 3301)] (lengths [45, 45]); +0x136 rise - +0x19A end [0, 0]
+kthrow_writers	03b2da=255:2 03b37a=1:2 03b3b0=0:2 03b3b4=0:2
+taunt	presses [2900, 3100, 3300] +0x1BB spans [(2900, 3361)] (lengths [462]); nonzero side-frames on other legs 0
+taunt_writers	03d912=1:1
+random_flag	rnd P1 confirm f1120 first 1 f1120; c128 P1 confirm f1521 first 1 f1521
+random_writers	000d34=0:1 000d34=255:1 000d3a=0:2 000dd8=0:1 016e4c=0:4 020a94=0:1 020aa0=1:1
+slot_034	Lilith WRITES NONZERO; writers Aulbath:043d94,043daa,043fe8,044398,044540,04454c; Jedah:052330; Lilith:04e2ac,04e3b4,04e696; Morrigan:038baa,03b2b2; Q-Bee:048c7a,04a202; Sasquatch:046618
+slot_035	Morrigan WRITES NONZERO; writers Aulbath:044390,044554; Jedah:052330; Lilith:04e262; Morrigan:038bb0; Q-Bee:048c7a,04a202; Sasquatch:046618
+slot_036	no named owner; writers Aulbath:044394,04439e,044632,044640,04464e; Jedah:052330; Q-Bee:048c7a,04a202; Sasquatch:046618
+slot_360	Gallon WRITES NONZERO; writers Aulbath:043d9a; Demitri:030ee8,030fde; Gallon:03207a,032e7e; Jedah:0510ca; Q-Bee:0494ca,04958a,04a3fe,04a4c6; Zabel:03721c,03758a,037708,03773c,037790
+slot_364	Gallon WRITES NONZERO | Morrigan WRITES NONZERO; writers Demitri:030e9c,030fcc; Gallon:03207e,032e62,032ec0; Morrigan:038b52,038fca; Q-Bee:04a420; Sasquatch:047e5a; Zabel:037220,0372ba,0374e2,0375f8,037650,0376ba,070008
+slot_366	Gallon WRITES ZERO ONLY; writers Aulbath:0444ce; Demitri:030eec,030fd2; Gallon:03207e,032e62,032ec0; Morrigan:038fba,038fea; Zabel:037224,0372a0,0376c6
+slot_368	Gallon WRITES NONZERO; writers Aulbath:0444ce; Demitri:030ea0,030ec8,030fc0; Gallon:032082,032cf2,032d68; Zabel:0376c6
+slot_369	Gallon WRITES NONZERO; writers Aulbath:0444ce; Demitri:030ea0,030fc0; Gallon:032082,032d64; Zabel:0376c6
+slot_36a	Gallon WRITES NONZERO; writers Aulbath:0443a4; Demitri:030ea0,030fc0; Gallon:032086,032d60; Morrigan:03b3e8; Sasquatch:047e80,048080
+slot_36b	Gallon WRITES NONZERO; writers Aulbath:0443a4; Demitri:030ea0,030fc0; Gallon:032cde,032d74; Sasquatch:047e80,048080
+slot_36c	Sasquatch PLAYED 6162 NEVER WROTE; writers Aulbath:0443a4; Demitri:030ef0,030fc6; Gallon:032418,0327a2,032958,032ef4
+slot_36e	no named owner; writers Demitri:030ea4,030ecc,030fb4
+slot_370	Anakaris WRITES NONZERO; writers Anakaris:03bc62,03bd26; Demitri:030ea4,030fb4; Jedah:05158a,0530b8; Q-Bee:04a3f6,04a5c6
+slot_371	Q-Bee WRITES NONZERO; writers Demitri:030ea4,030fb4; Jedah:05158a,0530b8; Q-Bee:04a402,05af6c
+slot_373	no named owner; writers Demitri:030ef4,030fba; Jedah:05158a,0530b8
+slot_374	Anakaris PLAYED 3265 NEVER WROTE; writers Demitri:030ea8,030ed0,030fa8; Jedah:051592,0530c8
+slot_378	Bishamon WRITES NONZERO; writers Bishamon:05889e,058bae; Demitri:030ef8,030fae; Jedah:05158e
+slot_37f	Felicia WRITES ZERO ONLY; writers Demitri:030efc,030fa2; Felicia:041040; Jedah:05159a
+played	Anakaris:3265 Aulbath:4555 Bishamon:1207 Bulleta:18424 Demitri:16164 Felicia:3982 Gallon:3668 Jedah:55219 Lilith:7032 Morrigan:11601 Q-Bee:9282 Sasquatch:6162 Victor:46635 Zabel:10796

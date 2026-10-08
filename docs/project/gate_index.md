@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**449 scripts** — 121 ci_portable, 93 ci_static, 235 emulator-tier (run by name).
+**450 scripts** — 121 ci_portable, 93 ci_static, 236 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -27,7 +27,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 83 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 84 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -439,6 +439,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/audit_latch_reads.sh` | audit | emulator | MAME, a build dir, ~2 min | WHO READS THE SELECT-CONFIRM LATCH IN PLAY, per leg shape, with the VALUE each reader saw: the measured half of the #151 step-3 sweep, frozen (14z-161). | 14z-161 |
 | `tests/audit_marionette_cost.sh` | audit | emulator | MAME, FBNeo, ~4 min | WHAT A MARIONETTE PORT WOULD COST vsavj: every place vs2 touches her flag +0x3C3, the vsavj instruction a port would have to hook there, how often LEGACY content executes each one, and her assets' size (14z-189, GitHub #128 — the maintainer… | 14z-189 |
 | `tests/audit_mizuumi_attack.sh` | audit | emulator | MAME, FBNeo, ~2 min | THE ATTACK-START FIELDS OF THE FIGHTER BLOCK, MEASURED (14z-195, promoted from the #118 pilot of 14z-194, GitHub #118; HOMING item 3, in part — see NOT COVERED) | 14z-195 |
+| `tests/audit_mizuumi_chars.sh` | audit | emulator | MAME, FBNeo, a build dir, ~5 min | THE CHARACTER-SPECIFIC FIELDS OF THE FIGHTER BLOCK, MEASURED (14z-196, promoted from the #118 pilot of 14z-194, GitHub #118; HOMING item 5 of build/agent194/t118/HOMING.md) | 14z-196 |
 | `tests/audit_mizuumi_inputs.sh` | audit | emulator | MAME, FBNeo, ~2 min | THE INPUT WORDS OF THE FIGHTER BLOCK, PREDICTED EXACTLY FROM THEIR STATIC MECHANISM (14z-195, promoted from the #118 pilot of 14z-194, GitHub #118; HOMING item 1) | 14z-195 |
 | `tests/audit_mizuumi_struct.sh` | audit | emulator | MAME, FBNeo, a build dir, ~4 min | THE MIZUUMI PLAYER-STRUCT CANDIDATES, MEASURED: the offsets adopted into atlas/ram.md from the community's Reverse Engineering page, each held by a check whose CONTROL would disagree (14z-189, GitHub #118) | 14z-189 |
 | `tests/audit_move_parity.sh` | audit | emulator | MAME, a build dir | EVERY TENANT MOVE, OURS vs NATIVE vsav2, AT A MATCHED SPEED LEVEL AND A PINNED RNG (GitHub #136, 14z-159). | 14z-159 |

@@ -49,6 +49,7 @@ declares	audit_latch_reads
 declares	audit_marionette_cost
 declares	audit_mister_map_fit
 declares	audit_mizuumi_attack
+declares	audit_mizuumi_chars
 declares	audit_mizuumi_inputs
 declares	audit_mizuumi_struct
 declares	audit_move_parity

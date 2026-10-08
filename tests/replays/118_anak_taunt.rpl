@@ -1,0 +1,14 @@
+# 118_anak_taunt (14z-194, GitHub #118; promoted 14z-196 for tests/audit_mizuumi_chars.sh): replay 03's lead-in
+# verbatim, then START+LP+MP+HP x3 in the match. P1 is FORCED to Anakaris (0x06) by the gate's POKES
+# ($FF8782 = 06 around the select) — made by the 14z-194 pilot's mk_rigs.py (the +0x1BB leg).
+300-305 sys=C1
+330-335 sys=C2
+800-803 sys=S1
+830-833 sys=S2
+1000-1002 p2=R
+1060-1062 p2=R
+1120-1122 p1=1
+1140-1142 p2=1
+2900-2902 sys=S1 p1=123
+3100-3102 sys=S1 p1=123
+3300-3302 sys=S1 p1=123

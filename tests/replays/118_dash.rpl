@@ -1,0 +1,33 @@
+# 118_dash (14z-194, GitHub #118; promoted 14z-196 for tests/audit_mizuumi_chars.sh): replay 03's lead-in (<2800)
+# verbatim, then P1 Demitri: forward dashes R,R (2-frame taps, 3-frame gap) x3, back dashes L,L x2, a 30-frame walk R;
+# then P2 the mirror (L,L forward; R,R back; walk L) — made by the 14z-194 pilot's mk_b_replays.py (the +0x372 leg).
+300-305 sys=C1
+330-335 sys=C2
+800-803 sys=S1
+830-833 sys=S2
+1000-1002 p2=R
+1060-1062 p2=R
+1120-1122 p1=1
+1140-1142 p2=1
+2900-2901 p1=R
+2905-2906 p1=R
+3000-3001 p1=R
+3005-3006 p1=R
+3100-3101 p1=R
+3105-3106 p1=R
+3200-3201 p1=L
+3205-3206 p1=L
+3300-3301 p1=L
+3305-3306 p1=L
+3400-3429 p1=R
+3500-3501 p2=L
+3505-3506 p2=L
+3600-3601 p2=L
+3605-3606 p2=L
+3700-3701 p2=L
+3705-3706 p2=L
+3800-3801 p2=R
+3805-3806 p2=R
+3900-3901 p2=R
+3905-3906 p2=R
+4000-4029 p2=L

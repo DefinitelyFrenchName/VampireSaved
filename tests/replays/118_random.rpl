@@ -1,0 +1,14 @@
+# 118_random (14z-194, GitHub #118; promoted 14z-196 for tests/audit_mizuumi_chars.sh): replay 03's lead-in with
+# P1's cursor moved D,D,D (replay 128's path to the '?' cell) before its LP confirm at 1120 — made by the 14z-194
+# pilot's mk_rigs.py (the +0x3C1 leg).
+300-305 sys=C1
+330-335 sys=C2
+800-803 sys=S1
+830-833 sys=S2
+1000-1002 p2=R
+1000-1002 p1=D
+1040-1042 p1=D
+1060-1062 p2=R
+1080-1082 p1=D
+1120-1122 p1=1
+1140-1142 p2=1

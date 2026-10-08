@@ -1,0 +1,19 @@
+# 118_mo_kthrow (14z-194, GitHub #118; promoted 14z-196 for tests/audit_mizuumi_chars.sh): replay 03's lead-in
+# verbatim, then P1 walks in and presses toward+HK x4 at close range. P1 is FORCED to Morrigan (0x05) by the gate's
+# POKES ($FF8782 = 05 around the select), not by this script — made by the 14z-194 pilot's mk_rigs.py.
+300-305 sys=C1
+330-335 sys=C2
+800-803 sys=S1
+830-833 sys=S2
+1000-1002 p2=R
+1060-1062 p2=R
+1120-1122 p1=1
+1140-1142 p2=1
+2900-2999 p1=R
+3005-3007 p1=R6
+3040-3099 p1=R
+3105-3107 p1=R6
+3140-3199 p1=R
+3205-3207 p1=R6
+3240-3299 p1=R
+3305-3307 p1=R6
