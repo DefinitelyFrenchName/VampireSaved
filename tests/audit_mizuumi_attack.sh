@@ -31,8 +31,10 @@
 # MUST-FIRE: perturbed-copy: cpu-side — A3 judged on replay 02's HUMAN side must fail (in-gate); as a mode A3 judges it and the gate FAILs
 # MUST-FIRE: perturbed-copy: isolated-presses — A4's chained-start rule judged on 118_input_sweep's isolated presses must fail (in-gate); as a mode A4 judges the sweep and the gate FAILs
 #
-# NOT COVERED (HOMING item 3's other rows, not promoted at 14z-195): +0x103 (the pilot's own sweep leg maps a plain Down
-#   press to 2, so "2 toward / 1 back / 0 neither" does not reproduce as written — re-measure before asserting);
+# NOT COVERED (HOMING item 3's other rows, not promoted at 14z-195): +0x103 (2 toward / 1 back / 0 neither, docs/game/atlas/
+#   ram.md — measured at the WRITES by PRG:0x02758C, sweep 28/28; a value read at a press FRAME is not that: replay 37's P2
+#   down+HP presses read 2 because neither writer runs there and the earlier toward press's 2 is carried. To be gated
+#   at the writes from a tap, not from the field at the press frame — corrected at the merge, 14z-195);
 #   +0x167 / +0x168 (the cancel-window tables, measured on the 26/128 marathon re-runs — not promoted); merged-m23;
 #   FBNeo (one emulator).
 #
