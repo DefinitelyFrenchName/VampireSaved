@@ -60,6 +60,7 @@ declares	audit_pyron_ring
 declares	audit_qs_voice_wav
 declares	audit_ranking_tenant
 declares	audit_reaction_class_live
+declares	audit_release_linux_cleanhost
 declares	audit_release_linux_desktop
 declares	audit_rig_opening
 declares	audit_rng_draws
@@ -147,6 +148,7 @@ declares	test_lane_carry
 declares	test_latch_readers
 declares	test_mame_bin_pinned
 declares	test_mame_default_bin
+declares	test_mame_ident
 declares	test_mame_parity
 declares	test_map_table_readers
 declares	test_md_subset

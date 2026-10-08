@@ -94,6 +94,7 @@ declares	audit_qs_voice_wav
 declares	audit_ranking_tenant
 declares	audit_reaction_class_live
 declares	audit_region_movability
+declares	audit_release_linux_cleanhost
 declares	audit_release_linux_desktop
 declares	audit_rig_opening
 declares	audit_rng_draws
@@ -306,6 +307,7 @@ declares	test_m3a_reproducible
 declares	test_mame_bin_pinned
 declares	test_mame_default_bin
 declares	test_mame_determinism
+declares	test_mame_ident
 declares	test_mame_mirror_guard
 declares	test_mame_parity
 declares	test_mame_wide

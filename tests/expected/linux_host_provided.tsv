@@ -3,7 +3,8 @@
 # PROVENANCE, never the project's own bundler list ([VSP-166]):
 #   manylinux  = manylinux_2_39 lib_whitelist, auditwheel 6.4.2, auditwheel/policy/manylinux-policy.json
 #                (wheel sha256 4302ae79dcff242e799a37173cfeeae727d0924843eca4b3f622d3bcb28de2db)
-#   ruled      = exceptions RULED by the maintainer 2026-09-13 (14z-152), one reason each
+#   ruled      = exceptions RULED by the maintainer 2026-09-13 (14z-152), one reason each; libudev.so.1 RULED
+#                2026-10-08 (14z-195, #226: the clean-host run found SDL dlopening it, invisible to DT_NEEDED)
 # soname	source	reason
 libGL.so.1	manylinux	-
 libICE.so.6	manylinux	-
@@ -41,3 +42,4 @@ libdrm.so.2	ruled	graphics driver entry point: a bundled copy breaks the player'
 libgbm.so.1	ruled	graphics driver entry point: a bundled copy breaks the player's GPU driver
 libasound.so.2	ruled	audio client: loads host plugins and talks to the host sound service
 libpulse.so.0	ruled	audio client: loads host plugins and talks to the host sound service
+libudev.so.1	ruled	system device-manager client (udev): SDL loads it for device hotplug; it talks to the host udevd, whose protocol a bundled copy must match

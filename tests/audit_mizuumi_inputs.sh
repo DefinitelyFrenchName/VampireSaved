@@ -36,11 +36,13 @@
 #   below 0.9; a side pressing a single button all match (replay 37's P2: toward+HP) maps its one value to any lagged key
 #   alike, so it cannot fail that control and is named, not judged (rule-checker run 2026-10-08-729 Q4).
 # EXPECTS: the header names the ROM — every reference member verified against docs/checksums.txt, the vsavj program
-#   fingerprint equal to the registry's vsavj row, each loaded zip's sha1 — or the gate FAILs before any leg.
+#   fingerprint equal to the registry's vsavj row, each loaded zip's sha1 — or the gate FAILs before any leg; and it
+#   names the MAME (tests/lib/mame_ident.sh: -version the pin's release, which pinned build, the binary's sha1 —
+#   rule-checker run 2026-10-08-740), or the gate FAILs; that the binary was built from the pinned COMMIT is not proven.
 #    every judged frame of I1-I5, I7, I8 and I10 predicted, with at least one judged frame per leg and side; I6 1.000 on
 #   every human side with active frames; each pooled control strictly below its check's total; I6's control below 0.9 on
 #   every discriminating side, with at least one such side. The log's header names the commit and the host.
-# FOLLOWS: emu/mame-patches/ tests/lib/controls.sh tests/lua/field_trace.lua tests/lua/pokes_spec.lua tests/lua/read_tap.lua
+# FOLLOWS: emu/mame-patches/ tests/lib/controls.sh tests/lib/mame_ident.sh tests/lua/field_trace.lua tests/lua/pokes_spec.lua tests/lua/read_tap.lua
 #   tests/replays/03_two_player_vs.rpl tests/replays/37_victor_ko_vsavj.rpl tests/replays/118_input_sweep.rpl
 #   tools/run_mame.sh tools/setup_mame.sh
 #   tools/audit_roms.py docs/checksums.txt tools/build_fingerprint.py tests/expected/registry.tsv
@@ -87,6 +89,7 @@ echo "  rom   $(echo "$romchk" | grep 'all match' | head -1); vsavj program fing
 if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM; fi
 W="$(cd "$W" && pwd)"
 echo "  head  $(git -C "$REPO" describe --always --dirty --abbrev=40 2>/dev/null || echo no git); tracked files modified $(git -C "$REPO" status --porcelain --untracked-files=no 2>/dev/null | wc -l | tr -d ' '); host $(hostname) $(uname -sm); MAME_BIN $MAME_BIN"
+. "$REPO/tests/lib/mame_ident.sh"; vs_mame_ident "$MAME_BIN" || { echo "FAIL: the MAME binary is not the pinned release (above)"; exit 1; }
 
 # ADDRESSES ARE COMPUTED from the block base, never concatenated (14z-189: "ff84"+"39f" read a wrong address as 0).
 F="ff8109:b:timer"; RT=""

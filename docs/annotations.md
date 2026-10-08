@@ -23,15 +23,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3570 |
-| named by a document or manifest only | 2301 |
-| named by both a document/manifest and code | 840 |
-| named by CODE ONLY (the gap list below) | 429 |
-| carried by atlas | 716 |
+| distinct program-space addresses named | 3587 |
+| named by a document or manifest only | 2291 |
+| named by both a document/manifest and code | 851 |
+| named by CODE ONLY (the gap list below) | 445 |
+| carried by atlas | 717 |
 | carried by engine_internals | 816 |
 | carried by other docs | 1056 |
 | carried by manifests | 1850 |
-| carried by code | 1269 |
+| carried by code | 1296 |
 
 ## Addresses
 
@@ -178,13 +178,13 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x008A56` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x008A5C` | docs/game/atlas/select_screen.md — SHADOW vs A TENANT — the static pass (14z-116, the maintainer's question) |
 | `PRG:0x008A86` | docs/game/atlas/id_space.md — The arcade-opponent path (a fourth roster work item); docs/game/atlas/id_space.md — Which ids vanilla ever assigns (measured over the corpus); docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; tests/audit_latch_reads.sh |
-| `PRG:0x008E0C` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/audit_tick_cadence.sh |
-| `PRG:0x008E10` | docs/game/atlas/ram.md — System / match globals |
+| `PRG:0x008E0C` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/audit_extra_pass.sh; tests/audit_tick_cadence.sh |
+| `PRG:0x008E10` | docs/game/atlas/ram.md — System / match globals; tests/audit_extra_pass.sh |
 | `PRG:0x008E30` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) |
 | `PRG:0x008E32` | docs/game/atlas/ram.md — System / match globals; tests/audit_tick_cadence.sh |
 | `PRG:0x008E3C` | docs/game/atlas/ram.md — System / match globals |
 | `PRG:0x008E66` | docs/game/atlas/ram.md — System / match globals |
-| `PRG:0x008E6C` | docs/game/atlas/ram.md — System / match globals; docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/audit_tick_cadence.sh; tests/test_don_immortal_native.sh |
+| `PRG:0x008E6C` | docs/game/atlas/ram.md — System / match globals; docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/audit_extra_pass.sh; tests/audit_tick_cadence.sh; tests/test_don_immortal_native.sh |
 | `PRG:0x008EB2` | docs/game/atlas/ram.md — System / match globals |
 | `PRG:0x008FC2` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] [vs2]; tests/test_latch_readers.sh |
 | `PRG:0x009008` | docs/game/atlas/id_space.md — Which ids vanilla ever assigns (measured over the corpus) |
@@ -352,7 +352,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x014A9A` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] [vs2] |
 | `PRG:0x014D62` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 |
 | `PRG:0x014D72` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 |
-| `PRG:0x014E52` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] |
+| `PRG:0x014E52` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; tests/audit_mizuumi_inputs.sh |
 | `PRG:0x014E8A` | docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99); docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); docs/game/engine_internals.md — The CPU AI action-script system (14z-111, measured on the #99 capture); docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); docs/project/patch_notes.md — 14z-111 — #99 ROOT CAUSE FIX (option A): the CPU AI action-script tables unparked, byte detail; +8 more |
 | `PRG:0x014ED0` | build/manifest/huitzil.toml — beam_effect_class16 [vs2]; tools/build_donovan.sh |
 | `PRG:0x014F90` | build/manifest/reconciliation.toml — map [vs2] |
@@ -863,9 +863,9 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0220A0` | docs/platform/gotchas.md — IN A MAME LUA TAP, 'cpu.state["SP"]' IS THE SUPERVISOR STACK — THIS GAME RUNS IN USER MODE, SO A CALLER'S RETURN ADDRESS SITS AT 'USP' — A REPEAT of the entry "MAME 0.288'S 68000 CORE HAS NO 'A7' STATE" above (paid: 2026-09-28, 14z-185, #176; that 14z-158 entry already held the rule — what went wrong is that the archaeology grep, [VSP-14], was not run before writing the tap); tools/rng_draws.py |
 | `PRG:0x0220AA` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) |
 | `PRG:0x0220AE` | docs/platform/gotchas.md — IN A MAME LUA TAP, 'cpu.state["SP"]' IS THE SUPERVISOR STACK — THIS GAME RUNS IN USER MODE, SO A CALLER'S RETURN ADDRESS SITS AT 'USP' — A REPEAT of the entry "MAME 0.288'S 68000 CORE HAS NO 'A7' STATE" above (paid: 2026-09-28, 14z-185, #176; that 14z-158 entry already held the rule — what went wrong is that the archaeology grep, [VSP-14], was not run before writing the tap) |
-| `PRG:0x022114` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
+| `PRG:0x022114` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; tests/audit_mizuumi_inputs.sh |
 | `PRG:0x022174` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
-| `PRG:0x0221B4` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
+| `PRG:0x0221B4` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; tests/audit_mizuumi_inputs.sh |
 | `PRG:0x02221C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x022262` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x022268` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); tests/test_rehit_ring.sh; tools/rehit_ring.py |
@@ -1177,7 +1177,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x02749C` | build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x0274BA` | build/manifest/reconciliation.toml — map; build/manifest/reconciliation_huitzil.toml — map |
 | `PRG:0x0274CE` | build/manifest/reconciliation_huitzil.toml — map |
-| `PRG:0x0274D6` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
+| `PRG:0x0274D6` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; tests/audit_mizuumi_attack.sh |
 | `PRG:0x0274EC` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x0274F0` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x02751C` | build/manifest/donovan.toml — port_patch [vs2] |
@@ -1185,9 +1185,9 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x027530` | docs/game/atlas/character_tables.md — Sprites / tiles / sound — pipelines mapped, addresses sprite-bound [vs2]; docs/game/engine_internals.md — OBJ (sprite) pipeline — the R2 answer (session 14, static decode) [vs2]; HANDOFF.md — MiSTer — the jtcps2w core + the simulation oracle (opened 14z-106/107) [vs2]; docs/project/doc_audit_14z118.md — 2. Cross-document numbers to lock (candidates for the script) [vs2]; docs/project/gotchas.md — THE NAMING RIGS RUN ON NATIVE vs2 — THERE, THE TENANT'S ART IS NOT IN GROUP C, AND ITS TILE CODES SHARE A BANK WITH THE HUD AND THE OPPONENT (14z-121 (6)); build/manifest/donovan.toml — port_patch [vs2]; +5 more |
 | `PRG:0x027542` | docs/project/patch_notes.md — handler clone + the x026142 escape fix; build/manifest/reconciliation_donovan.toml — map [vs2]; build/manifest/reconciliation_huitzil.toml — map [vs2]; build/manifest/reconciliation_pyron.toml — map [vs2] |
 | `PRG:0x027576` | build/manifest/reconciliation.toml — map |
-| `PRG:0x02757E` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
+| `PRG:0x02757E` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; tests/audit_mizuumi_attack.sh |
 | `PRG:0x027582` | docs/game/engine_internals.md — Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured) [vs2] |
-| `PRG:0x02758C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
+| `PRG:0x02758C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; tests/audit_mizuumi_attack.sh |
 | `PRG:0x0275CE` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); docs/game/engine_internals.md — The anim index a2's TWO aerial slot sets — neutral and forward jump (14z-145, MEASURED on all 15 vanilla characters); tests/test_advancing_guard.sh |
 | `PRG:0x0275E4` | docs/game/engine_internals.md — The per-char effect system (14z-67, decoded on the H ping rounds) [vs2]; docs/game/engine_internals.md — Throw / physics-arc tables (14z-67, measured on the command grab) [vs2]; build/manifest/huitzil.toml — effect_map_5253 [vs2] |
 | `PRG:0x027616` | docs/game/engine_internals.md — Reactions as the victim — the per-character reaction SETS (phase 3, 14z-120 (7), MEASURED); build/manifest/donovan.toml — select_companion_resolve_s2; build/manifest/huitzil.toml — port_patch; tests/audit_guard_mask_reads.sh |
@@ -1337,9 +1337,10 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x028D6C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — Dark Force POWER, Dark Force CHANGE, and the newcomers' personal Dark Force (measured 14z-168) [vs2]; docs/project/patch_notes.md — 14z-170 — THE M19 FREEZE (donovan-m23 / huitzil-m30 / pyron-m24 / merged-m19, mark M19): the four ruled #136 fixes, and a placeholder corruption that had shipped since merged-m16 [vs2]; build/manifest/donovan.toml — port_patch; build/manifest/huitzil.toml — port_patch; build/manifest/pyron.toml — port_patch; +1 more |
 | `PRG:0x028DD8` | docs/game/atlas/character_tables.md — The full per-character table BANK — layout identical in all three sets; docs/game/atlas/character_tables.md — The loader (per-character struct fill); docs/game/atlas/select_screen.md — SHADOW vs A TENANT — the static pass (14z-116, the maintainer's question); docs/project/doc_audit_14z118.md — 1.1 'docs/game/' — the game itself (surveyed 14z-118); docs/project/doc_audit_14z118.md — 2. Cross-document numbers to lock (candidates for the script); docs/project/living_docs_scope.md — 11.5 The seed set (~15, revised by the census); +2 more |
 | `PRG:0x028E42` | docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122); docs/project/patch_notes.md — 14z-99 — the window (#43(b) + #103 + #104 + #105): byte detail; build/manifest/reconciliation.toml — map |
-| `PRG:0x028ED0` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
-| `PRG:0x028ED8` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
+| `PRG:0x028ED0` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; tests/audit_mizuumi_attack.sh |
+| `PRG:0x028ED8` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; tests/audit_mizuumi_attack.sh |
 | `PRG:0x028EE6` | docs/game/atlas/ram.md — Fighter + effect-pool fields (14z-67, measured on the H effect arc); build/manifest/reconciliation.toml — map [vs2] |
+| `PRG:0x028F18` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; tests/audit_mizuumi_attack.sh |
 | `PRG:0x028F5C` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x028FA0` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] [vs2]; docs/game/engine_internals.md — THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174) [vs2]; build/manifest/reconciliation.toml — map [vs2]; tests/audit_air_gc_legacy.sh; tools/build_donovan.sh |
 | `PRG:0x028FF4` | build/manifest/pcrel_escapes.toml — don_m27; build/manifest/pcrel_escapes.toml — hui61; build/manifest/pcrel_escapes.toml — pyron46 |
@@ -1391,7 +1392,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x02984C` | build/manifest/reconciliation.toml — map |
 | `PRG:0x02987E` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) [vs2] |
 | `PRG:0x029898` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) [vs2] |
-| `PRG:0x029930` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
+| `PRG:0x029930` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; tests/audit_mizuumi_inputs.sh |
 | `PRG:0x029950` | build/manifest/reconciliation.toml — map [vs2]; tools/build_donovan.sh |
 | `PRG:0x029974` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) [vs2] |
 | `PRG:0x02997E` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
@@ -2690,7 +2691,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0FFF50` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines) |
 | `PRG:0x0FFF60` | docs/project/patch_notes.md — 14z-189 — THE M22 FREEZE (donovan-m26 / huitzil-m33 / pyron-m27 / merged-m22, mark M22): #194 and #195 LANDED |
 | `PRG:0x0FFFFF` | docs/game/atlas/README.md — The three sets (measured M0; every figure still current); HANDOFF.md — CPS-2 WIDE — the extended hardware profile (2026-08-03, B0-B4 all green); docs/project/cps2_wide.md — B4 prg: PASSED, with the control that made it meaningful; docs/project/gotchas.md — Inside the crypt range the VIEW follows the ACCESS MODE, and the wrong one is plausible garbage (paid again: 14z-142); docs/project/mister_map.md — The minimal, profile-gated proposal — **IMPLEMENTED, slice D4**; tests/test_index_window_thunk.sh; +4 more |
-| `PRG:0x100000` | docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99); docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99) [vh2]; docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99) [vs2]; docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/engine_internals.md — The CPU AI action-script system (14z-111, measured on the #99 capture); docs/platform/gotchas.md — 0x100000 (measured 14z-59k); +38 more |
+| `PRG:0x100000` | docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99); docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99) [vh2]; docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99) [vs2]; docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/game/engine_internals.md — The CPU AI action-script system (14z-111, measured on the #99 capture); docs/platform/gotchas.md — 0x100000 (measured 14z-59k); +39 more |
 | `PRG:0x100001` | docs/platform/gotchas.md — The CPS-2 encrypted range is INCLUSIVE of its upper word — 0x100001, not; tests/test_crypt_boundary.sh |
 | `PRG:0x100002` | docs/platform/gotchas.md — 0x100000 (measured 14z-59k) |
 | `PRG:0x100E3C` | docs/game/atlas/character_tables.md — The CPU AI action-script tables 'PRG:0xBF01A / 0xBF09A / 0xBF11A / 0xBF19A' (14z-111, #99); docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122); docs/project/patch_notes.md — 14z-111 — #99 ROOT CAUSE FIX (option A): the CPU AI action-script tables unparked, byte detail; tools/build_donovan.sh |
@@ -3194,6 +3195,7 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x007600` | tests/audit_tick_cadence.sh |
 | `PRG:0x007C1E` | tests/audit_tick_cadence.sh |
 | `PRG:0x008E26` | tests/audit_tick_cadence.sh |
+| `PRG:0x008E6A` | tests/audit_extra_pass.sh |
 | `PRG:0x00941E` | tests/audit_tick_cadence.sh |
 | `PRG:0x009910` | tests/test_roulette_tag_rows.sh |
 | `PRG:0x009B2A` | tests/audit_tenant_cpu_soak.sh |
@@ -3246,6 +3248,7 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x0185D6` | tests/lua/index_watch.lua |
 | `PRG:0x018692` | tests/audit_pursuit_flag.sh |
 | `PRG:0x0186D5` | tests/audit_reaction_class_live.sh |
+| `PRG:0x0189EA` | tests/audit_ground_throws.sh; tools/ground_throw_rigs.py |
 | `PRG:0x018B8E` | tests/test_power_decode.sh |
 | `PRG:0x018B91` | tests/test_power_decode.sh |
 | `PRG:0x018B92` | tests/test_power_decode.sh |
@@ -3286,6 +3289,19 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x020E24` | tests/test_advancing_guard.sh |
 | `PRG:0x021AD1` | tools/audit_effect_rects.py |
 | `PRG:0x021ADF` | tools/audit_effect_rects.py |
+| `PRG:0x022110` | tests/audit_mizuumi_inputs.sh |
+| `PRG:0x02211A` | tests/audit_mizuumi_inputs.sh |
+| `PRG:0x022120` | tests/audit_mizuumi_inputs.sh |
+| `PRG:0x022126` | tests/audit_mizuumi_inputs.sh |
+| `PRG:0x02218E` | tests/audit_mizuumi_inputs.sh |
+| `PRG:0x0221A6` | tests/audit_mizuumi_inputs.sh |
+| `PRG:0x0221AA` | tests/audit_mizuumi_inputs.sh |
+| `PRG:0x0221B8` | tests/audit_mizuumi_inputs.sh |
+| `PRG:0x0221C2` | tests/audit_mizuumi_inputs.sh |
+| `PRG:0x0221CC` | tests/audit_mizuumi_inputs.sh |
+| `PRG:0x0221F6` | tests/audit_mizuumi_inputs.sh |
+| `PRG:0x0221FA` | tests/audit_mizuumi_inputs.sh |
+| `PRG:0x022200` | tests/audit_mizuumi_inputs.sh |
 | `PRG:0x022276` | tests/test_rehit_ring.sh |
 | `PRG:0x022496` | tests/test_advancing_guard.sh |
 | `PRG:0x02249C` | tests/test_advancing_guard.sh |
@@ -3340,6 +3356,7 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x028DDE` | tools/checkdocs_rom.py |
 | `PRG:0x028DEA` | tools/checkdocs_rom.py |
 | `PRG:0x028DEC` | tools/checkdocs_rom.py |
+| `PRG:0x02979A` | tests/audit_ground_throws.sh |
 | `PRG:0x029AB2` | tests/test_qs_songs.sh |
 | `PRG:0x02B674` | tests/test_variant_dispatch.sh |
 | `PRG:0x02EEBB` | tests/lua/scroll3_watch.lua; tests/test_m2b_scroll3.sh |

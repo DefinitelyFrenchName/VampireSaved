@@ -123,12 +123,12 @@ bad = [r for r in rows if len(r) != 3 or r[1] not in ("manylinux", "ruled")]
 by = collections.Counter(r[1] for r in rows if len(r) == 3)
 dups = [s for s, n in collections.Counter(r[0] for r in rows).items() if n > 1]
 unreasoned = [r[0] for r in rows if len(r) == 3 and r[1] == "ruled" and r[2].strip() in ("", "-")]
-ok = not bad and not dups and not unreasoned and by["manylinux"] == 23 and by["ruled"] == 13
+ok = not bad and not dups and not unreasoned and by["manylinux"] == 23 and by["ruled"] == 14
 if not ok:
     print(f"FAIL: section 5 — the list: malformed {bad[:2]}, duplicates {dups}, ruled without a reason {unreasoned}, "
-          f"counts manylinux {by['manylinux']} (want 23) ruled {by['ruled']} (want 13)")
+          f"counts manylinux {by['manylinux']} (want 23) ruled {by['ruled']} (want 14: 13 ruled 2026-09-13, libudev.so.1 2026-10-08)")
     sys.exit(1)
-print("  5 ok: the list — 23 manylinux_2_39 + 13 ruled, each ruled row with its reason, no duplicate")
+print("  5 ok: the list — 23 manylinux_2_39 + 14 ruled, each ruled row with its reason, no duplicate")
 PY
 
 # ---- must-fire controls: each perturbation of the fixture must FAIL, for its stated reason

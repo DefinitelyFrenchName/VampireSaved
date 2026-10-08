@@ -20,12 +20,14 @@
 #   written by PRG:0x008E10 once per pass, and the $FF8118 word, whose SET marks an extra pass in the same activation). PAT is read from the vsavj OPCODE view at run time (the table is read
 #   PC-relative at PRG:0x008E6C) — never stored in the tree.
 # EXPECTS: the header names the ROM — every reference member verified against docs/checksums.txt, the vsavj program
-#   fingerprint equal to the registry's vsavj row, each loaded zip's sha1 — or the gate FAILs before any leg.
+#   fingerprint equal to the registry's vsavj row, each loaded zip's sha1 — or the gate FAILs before any leg; and it
+#   names the MAME (tests/lib/mame_ident.sh: -version the pin's release, which pinned build, the binary's sha1 —
+#   rule-checker run 2026-10-08-740), or the gate FAILs; that the binary was built from the pinned COMMIT is not proven.
 #    E1 exact on every judged frame of all ten legs, with frames judged on each; E2 and E3 as stated. The log's
 #   header names the commit and the host. CONTROL
 #   other-level: each leg's frames predicted with every OTHER level's pattern must lose frames for the best of them;
 #   CONTROL unpinned-equals-6: the same distribution comparison against the level-8 leg must differ.
-# FOLLOWS: emu/mame-patches/ tests/lib/controls.sh tests/lib/decrypt_cache.sh tests/lua/field_trace.lua
+# FOLLOWS: emu/mame-patches/ tests/lib/controls.sh tests/lib/mame_ident.sh tests/lib/decrypt_cache.sh tests/lua/field_trace.lua
 #   tests/lua/pokes_spec.lua tests/lua/read_tap.lua tests/replays/03_two_player_vs.rpl
 #   tests/replays/37_victor_ko_vsavj.rpl tools/cps2_decrypt.py tools/run_mame.sh tools/setup_mame.sh
 #   tools/audit_roms.py docs/checksums.txt tools/build_fingerprint.py tests/expected/registry.tsv
@@ -60,6 +62,7 @@ echo "  rom   $(echo "$romchk" | grep 'all match' | head -1); vsavj program fing
 if [ -n "${KEEP:-}" ]; then W="$KEEP"; mkdir -p "$W"; else W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM; fi
 W="$(cd "$W" && pwd)"
 echo "  head  $(git -C "$REPO" describe --always --dirty --abbrev=40 2>/dev/null || echo no git); tracked files modified $(git -C "$REPO" status --porcelain --untracked-files=no 2>/dev/null | wc -l | tr -d ' '); host $(hostname) $(uname -sm); MAME_BIN $MAME_BIN"
+. "$REPO/tests/lib/mame_ident.sh"; vs_mame_ident "$MAME_BIN" || { echo "FAIL: the MAME binary is not the pinned release (above)"; exit 1; }
 . "$REPO/tests/lib/decrypt_cache.sh"
 decrypt_view vsavj "$W/vsavj_op.bin" "$W/vsavj_data.bin" >/dev/null 2>&1 || { echo "FAIL: no vsavj opcode view (decrypt cache)"; exit 1; }
 

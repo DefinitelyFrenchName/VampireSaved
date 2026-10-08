@@ -13,13 +13,13 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**447 of 447 gates described.**
+**449 of 449 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
 | [runner](#runner) | 44 | 44 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
-| [platform](#platform) | 45 | 45 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
+| [platform](#platform) | 47 | 47 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
@@ -558,7 +558,15 @@ the documentation locks — docs, skills, indexes, tables follow the tree. 21 of
 
 ## platform
 
-the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene. 45 of 45 described.
+the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene. 47 of 47 described.
+
+### `audit_release_linux_cleanhost.sh` — audit, emulator
+
+**WHAT:** each prebuilt linux-x86_64 asset (FBNeo and MAME), in a stock ubuntu:24.04 container (podman) with ONLY the packages that provide tests/expected/linux_host_provided.tsv's sonames, python3 (the README's one prerequisite) and Xvfb (a display server: the stand-in for a desktop's), is applied with the shipped applier, every binary and bundled library resolves (ldd: nothing "not found"), and `sh PLAY.command` runs the emulator under LD_DEBUG=libs: MAME for 30 emulated seconds to exit 0, FBNeo still running at its 30 s cut-off; and every library a PACKAGE file asked the host for at run time — the dlopen'd ones included, which tools/check_host_libs.py (DT_NEEDED only) cannot see — is on the list (tools/cleanhost_libs.py C1), every search resolved (C2).
+
+**HOW:** tools/upload_release_assets.sh --dry-run cuts the assets (or `ASSETS=<dir>` of zips); a container run per emulator mounts the assets and ROMDIR read-only; the per-process LD_DEBUG logs come back to build/cleanhost_release/ and tools/cleanhost_libs.py judges each. The list of packages is THIS file's PKGS, checked in the container: every listed soname must then be known to ldconfig (C0), so a list row with no package fails rather than going untested. About 4 min on PILOT (two containers of ~2 min, the apt install dominating). Linux with podman ONLY; elsewhere it SKIPs and says so.
+
+**EXPECTS:** C0 every listed soname present; per emulator: apply OK, ldd 0 not found (binary and every bundled .so), the run's exit as above, C1 0 unlisted, C2 0 unresolved, and at least one process that asked the host for a library (the emulator itself ran); each control fails.
 
 ### `audit_release_linux_desktop.sh` — audit, emulator
 
@@ -759,6 +767,14 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 **HOW:** RUNS repetitions of the probe on MAME (JOBS parallel), the checksum logs compared pairwise, a divergent pair analysed by tools/analyze_divergence.py.
 
 **EXPECTS:** every run identical. Coverage limit stated in the header: the 520-frame probe bounds the boot window only, not a full replay (PROBE= a replay measures that).
+
+### `test_mame_ident.sh` — test, ci_static
+
+**WHAT:** tests/lib/mame_ident.sh's vs_mame_ident accepts a binary whose `-version` is the release of the pin tools/setup_mame.sh holds and names which pinned build it is (stock reference: `-listfull vsavjw` finds no system; CPS-2 WIDE: it knows vsavjw), and refuses one of another release or one that answers neither.
+
+**HOW:** four stub executables written here answer -version and -listfull as each case needs; the pin is read from the real tools/setup_mame.sh, so a moved pin moves the expectation with it.
+
+**EXPECTS:** stock 0.288 accepted as "the stock reference build"; WIDE 0.288 accepted as "the CPS-2 WIDE build"; 0.287 REFUSED (not the pin's release); an executable that is not MAME REFUSED (neither answer).
 
 ### `test_mame_parity.sh` — test, emulator
 
@@ -2738,7 +2754,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **HOW:** on MAME (the reference binary), for each of 03_two_player_vs and 37_victor_ko_vsavj and each level (00, 06, 08, 0e — pinned by POKES on every frame — and free), a FIELD leg (tests/lua/field_trace.lua: level, the pass counter, the turbo and extra-pass flags, HP and X) and a WRITE-TAP leg (tests/lua/read_tap.lua: the pass-counter word, written by PRG:0x008E10 once per pass, and the $FF8118 word, whose SET marks an extra pass in the same activation). PAT is read from the vsavj OPCODE view at run time (the table is read PC-relative at PRG:0x008E6C) — never stored in the tree.
 
-**EXPECTS:** the header names the ROM — every reference member verified against docs/checksums.txt, the vsavj program fingerprint equal to the registry's vsavj row, each loaded zip's sha1 — or the gate FAILs before any leg. E1 exact on every judged frame of all ten legs, with frames judged on each; E2 and E3 as stated. The log's header names the commit and the host. CONTROL other-level: each leg's frames predicted with every OTHER level's pattern must lose frames for the best of them; CONTROL unpinned-equals-6: the same distribution comparison against the level-8 leg must differ.
+**EXPECTS:** the header names the ROM — every reference member verified against docs/checksums.txt, the vsavj program fingerprint equal to the registry's vsavj row, each loaded zip's sha1 — or the gate FAILs before any leg; and it names the MAME (tests/lib/mame_ident.sh: -version the pin's release, which pinned build, the binary's sha1 — rule-checker run 2026-10-08-740), or the gate FAILs; that the binary was built from the pinned COMMIT is not proven. E1 exact on every judged frame of all ten legs, with frames judged on each; E2 and E3 as stated. The log's header names the commit and the host. CONTROL other-level: each leg's frames predicted with every OTHER level's pattern must lose frames for the best of them; CONTROL unpinned-equals-6: the same distribution comparison against the level-8 leg must differ.
 
 ### `audit_facing_hook_ab.sh` — audit, emulator
 
@@ -2866,7 +2882,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **HOW:** on MAME (the reference binary), FIELD legs under tests/lua/field_trace.lua for 03_two_player_vs, 37_victor_ko_vsavj, 118_input_sweep, 118_chain and 02_demitri_vs_cpu (1P: a CPU side that fights), and WRITE-TAP legs under tests/lua/read_tap.lua (each side's +0x100, +0x118 and +0x1B8 words) for the five; a tap write in tap frame f lands in trace frame f+1. Human sides are derived from each replay's input script, never assumed.
 
-**EXPECTS:** the header names the ROM — every reference member verified against docs/checksums.txt, the vsavj program fingerprint equal to the registry's vsavj row, each loaded zip's sha1 — or the gate FAILs before any leg. A1-A5 as stated, each over a nonzero sample. CONTROLS (in-gate, each must make its check fail): previous-press-key (A1 judged against the previous press's key), hit-vs-start (A2's +0x1B8 writes paired with LANDED HITS instead of starts), writes-shifted (A2's writes moved 20 frames later, beyond the window: a write at another moment than the start must fail), reads-shifted (A4's 0xFF rises moved 20 frames later, away from the chained starts), chained-writes-shifted (A2c's 0x028F18 writes moved 20 frames later), unstarted-write (a phantom 0x0274D6 write on each side with no fresh start), cpu-side (A3 judged on 02's human side), isolated-presses (A4's chained-start rule judged on the sweep's isolated presses), neighbour-word (A5 judged on +0x168, the next byte: a WRONG WORD read as +0x169 must fail) and hits-shifted (A5 judged against the landed-hit frames moved 30 frames later: a proximity test too loose to tell a hit from a non-hit must fail) — rule-checker run 2026-10-08-729 Q4. The log's header names the commit and the host.
+**EXPECTS:** the header names the ROM — every reference member verified against docs/checksums.txt, the vsavj program fingerprint equal to the registry's vsavj row, each loaded zip's sha1 — or the gate FAILs before any leg; and it names the MAME (tests/lib/mame_ident.sh: -version the pin's release, which pinned build, the binary's sha1 — rule-checker run 2026-10-08-740), or the gate FAILs; that the binary was built from the pinned COMMIT is not proven. A1-A5 as stated, each over a nonzero sample. CONTROLS (in-gate, each must make its check fail): previous-press-key (A1 judged against the previous press's key), hit-vs-start (A2's +0x1B8 writes paired with LANDED HITS instead of starts), writes-shifted (A2's writes moved 20 frames later, beyond the window: a write at another moment than the start must fail), reads-shifted (A4's 0xFF rises moved 20 frames later, away from the chained starts), chained-writes-shifted (A2c's 0x028F18 writes moved 20 frames later), unstarted-write (a phantom 0x0274D6 write on each side with no fresh start), cpu-side (A3 judged on 02's human side), isolated-presses (A4's chained-start rule judged on the sweep's isolated presses), neighbour-word (A5 judged on +0x168, the next byte: a WRONG WORD read as +0x169 must fail) and hits-shifted (A5 judged against the landed-hit frames moved 30 frames later: a proximity test too loose to tell a hit from a non-hit must fail) — rule-checker run 2026-10-08-729 Q4. The log's header names the commit and the host.
 
 ### `audit_mizuumi_inputs.sh` — audit, emulator
 
@@ -2874,7 +2890,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **HOW:** on MAME (the reference binary, pristine vsavj), three FIELD legs under tests/lua/field_trace.lua — 03_two_player_vs, 37_victor_ko_vsavj and 118_input_sweep (a one-side-at-a-time input sweep, promoted from the pilot) — and three WRITE-TAP legs under tests/lua/read_tap.lua over each side's +0x124 and +0x12A words, which give each frame's RUN COUNT of the routine (the writes by PRG:0x022114 and PRG:0x022126). A tap write in tap frame f lands in trace frame f+1. Each check is EXACT (every judged frame), and each carries the control HOMING named, pooled over legs and sides (per leg a side that never moves can tie): the same prediction with the opposite flip (I2), the wrong frame's run count (I3, I5, I10), no `& ~previous` edge mask (I4, I8), the opposite flip for +0x123 (I7) and the OTHER side's +0x394 for I1, and NO L/R swap at all for I2, I4 and I7 (never-swap — the swap is what opposite-flip cannot isolate: it differs from the truth on every L/R frame whatever +0x0B is) must each LOSE frames. I6's control, the staged input 120 frames late, is judged PER SIDE on the sides that CAN discriminate — those whose active frames carry at least two distinct +0x394 values — each below 0.9; a side pressing a single button all match (replay 37's P2: toward+HP) maps its one value to any lagged key alike, so it cannot fail that control and is named, not judged (rule-checker run 2026-10-08-729 Q4).
 
-**EXPECTS:** the header names the ROM — every reference member verified against docs/checksums.txt, the vsavj program fingerprint equal to the registry's vsavj row, each loaded zip's sha1 — or the gate FAILs before any leg. every judged frame of I1-I5, I7, I8 and I10 predicted, with at least one judged frame per leg and side; I6 1.000 on every human side with active frames; each pooled control strictly below its check's total; I6's control below 0.9 on every discriminating side, with at least one such side. The log's header names the commit and the host.
+**EXPECTS:** the header names the ROM — every reference member verified against docs/checksums.txt, the vsavj program fingerprint equal to the registry's vsavj row, each loaded zip's sha1 — or the gate FAILs before any leg; and it names the MAME (tests/lib/mame_ident.sh: -version the pin's release, which pinned build, the binary's sha1 — rule-checker run 2026-10-08-740), or the gate FAILs; that the binary was built from the pinned COMMIT is not proven. every judged frame of I1-I5, I7, I8 and I10 predicted, with at least one judged frame per leg and side; I6 1.000 on every human side with active frames; each pooled control strictly below its check's total; I6's control below 0.9 on every discriminating side, with at least one such side. The log's header names the commit and the host.
 
 ### `audit_mizuumi_struct.sh` — audit, emulator
 

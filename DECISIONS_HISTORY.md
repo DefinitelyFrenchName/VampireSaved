@@ -443,6 +443,16 @@ So: CLAUDE.md [VSP-182] gains the rule ("DONE, AWAITING RELEASE"): when a ticket
 
 ---
 
+## Ruled 2026-10-08 (14z-195) — #226: libudev.so.1 is host-provided
+
+**The question (AskUserQuestion, after the first clean-host run on PILOT, build/agent195/cleanhost1):** *"#226 clean-host result: on a stock Ubuntu 24.04 container holding only the ruled host libraries' packages (+ python3, + Xvfb as the display), both Linux assets apply, resolve fully (ldd 0 missing) and run. MAME exits 0 after 30 s; FBNeo was still running at its 30 s cut-off. The packaged files asked the host for 20 libraries. 19 are on the ruled list; the 20th, libudev.so.1, is not. The bundled SDL loads it at run time (device hotplug: joysticks), so the static DT_NEEDED check never sees it. It is the systemd device-manager client, present on every systemd desktop. How should it be treated?"* — options "Rule it host-provided (Recommended)", "Bundle it", "Leave optional, name it".
+
+**The maintainer:** *"Rule it host-provided (Recommended)"*
+
+So: `tests/expected/linux_host_provided.tsv` gains `libudev.so.1` as `ruled` (system device-manager client; a bundled copy must match the host udevd), and `tests/audit_release_linux_cleanhost.sh` fails on any further run-time-loaded library the list does not carry.
+
+---
+
 ## Ruled 2026-10-07 (14z-193) — #230 closed `done` on the standard throw; #235 filed for the kick and air throws
 
 **The question (AskUserQuestion, after rule-checker run 2026-10-06-712 OK):** *"#230 now gates Pyron's and Donovan's standard 6+HP throw on all 18 victims, ours vs native, at the matched level (re-frozen under rule-checker run 712, OK; you read the sheets as identical). Their kick and air throws aren't covered. How should #230 end?"* — options "Close; new ticket", "Extend #230 now", "Close; standard is enough".

@@ -234,3 +234,7 @@ test_power_decode
 # (the map, the attract SCORE RANKING, two pool copies), the fixed pool copy moves rows 0x00-0x0F only, and
 # the readers are unpatched on the merged build; two controls. ~2 s.
 test_map_table_readers
+# 14z-195 (rule-checker run 2026-10-08-740): tests/lib/mame_ident.sh names which MAME a gate ran — the pin's
+# release from -version, the stock or WIDE build, the sha1 — and refuses another release or a non-MAME; stubs only,
+# one control. <1 s.
+test_mame_ident
