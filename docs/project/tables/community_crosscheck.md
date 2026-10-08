@@ -117,7 +117,7 @@ and compares nothing: the workbook types it `projectile` (as it types her `5HK`)
 chain the rig recorded carries no attack window in its records — the hit is the MINE the
 move spawns, confirmed by the maintainer (2026-10-05, GitHub #216): *"the hit is the mine
 spawned, it is technically a trap/projectile with a disjointed hitbox from the character's
-sprite"*. Specials, supers, EX/ES moves and throws are not joined at all (the pursuits are measured, 14z-194, in their own section below).
+sprite"*. Specials, supers, EX/ES moves and throws are not joined at all (the pursuits, 14z-194, and the ground throws, 14z-195, are measured in their own sections below).
 
 ## The headline: per-move agreement
 
@@ -431,6 +431,41 @@ ES), and Bulleta and Lei-Lei land fewer hits than their sheet series — the she
 victim. **Not covered:** the ES pursuits' extra hits compared as records, the hit counts
 on other victims, the active-column exceptions, what the startup offset counts, FBNeo.
 
+## The ground throws (14z-195, #229)
+
+Measured on vsavj on PILOT; the gate is `tests/audit_ground_throws.sh` (its frozen figures
+`tests/expected/ground_throws.tsv`; the rigs `tools/ground_throw_rigs.py`). **Scope**: the
+workbook's 23 ground-throw rows — 22 measured on the 14 characters that have one (Anakaris
+has none), each "6MP or 6HP" row run with both buttons (42 events); Victor's Graviton
+Knuckle (a follow-up input during his MP throw) is not measured. The rigs' row set is checked
+against the workbook's own `type` column (`ground_throw_rigs.py rowset`).
+
+**The rig**: walk in to pushbox contact, one toward or back + button, the victim Victor
+(Demitri for Victor). **Identity**: every throw HOLDS from its press frame and not on the
+frame before (P1's `+0x134` = 0x01 with P2's = 0xFF); every damage record is the one the
+GAME staged, read at the fighter applier (`PRG:0x0189EA`) and the object-hit applier
+(`PRG:0x02979A`), lies in the thrower's own attack table, and LANDS (P2's HP falls within 2
+frames, read from the dumps, not from the record). The maintainer confirmed all 42 throws on a
+capture sheet of each throw at its first damage frame: *"They are the throws and Buletta is
+actually in frame but barely visible as her sprite goes behind her target's during the
+throw"* (2026-10-08). Damage is each record's power CLASS (#241), red = real + white as above.
+
+| column | verdict over the 22 |
+|---|---|
+| gauge | **EXACT** on all 22: 9 for every throw, 0 for Zabel's two, as the sheet says |
+| red / white damage | single-hit throws with a number in the sheet: red **EXACT** on 13 of 15 — Victor's 6K and Zabel's 6K read the sheet one ABOVE ours (25 against 24, 28 against 27); white **EXACT** on 13 of 15 — Lei-Lei's and Lilith's read 9 where ours is 7 and 6. Multi-hit throws (DE 6K, FE 6P, VI 6MP/6HP, ZA 6P): every hit equals the sheet's per-hit value and the unmashed hit count lies inside its range; Q-Bee's two hits are the sheet's `14+9` / `5+3` in order |
+| startup | **CONSTANT OFFSET**: the hold starts ON the press frame for all 42 events and the sheet writes 1 for every throw — the sheet counts the hold frame as frame 1 |
+| recovery, throw tech, invuln | not measured |
+
+**The workbook's side, measured:** every "6MP or 6HP" row is one throw (the two buttons stage
+the same records, pay the same gauge and land the victim on the same side). Aulbath's back
+throw (`4P`) stages ONE hit, 17 red / 6 white — the sheet's second part — where the sheet
+writes `10+17` / `4+6`; the victim lands behind him, as it does after Bulleta's P throw and
+Demitri's and Gallon's K throws. The multi-hit throws' single white cell (VI 4, ZA 7, DE `4+2`,
+FE `2+2`) does not decompose into our per-hit whites (2, 2, 2, 1) and is left UNCOMPARABLE.
+**Not covered:** Graviton Knuckle, mashed hit counts, throw techs, other victims, the
+characters picked by the cursor (they are forced by poke), FBNeo.
+
 ## What is NOT known
 
 - **The startup `+1` and recovery `+2` offsets are NAMED, not adjudicated.** The
@@ -458,7 +493,8 @@ on other victims, the active-column exceptions, what the startup offset counts, 
   variants of the same button (`8J.LP` vs `9J.LP`) where our slot map carries ONE
   chain per aerial button. Needs a two-direction jump rig.
 - **Specials, supers, EX/ES moves and throws are not joined** (the command normals are,
-  since 14z-189; the pursuits are measured, in their own section above, 14z-194). Each
+  since 14z-189; the pursuits, 14z-194, and the ground throws, 14z-195, are measured in their
+  own sections above). Each
   needs its own measured naming rig on vsavj, the way `tools/name_moves.py` did for the
   tenants. That is the bulk of the workbook's 820 rows and it is untouched here.
 - **Seven workbook columns have no counterpart in the tree**: `on hit`, `on block`,
