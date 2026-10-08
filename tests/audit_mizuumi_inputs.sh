@@ -17,7 +17,9 @@
 #      word, PRG:0x02218E-0x0221A6 swaps its L/R bits when +0x0B is set);
 #   I8 the edge words on every in-match frame: +0x126 == +0x122 & ~+0x124 (newly pressed buttons, PRG:0x0221AA-0x0221B4,
 #      the word whose low byte is I4's +0x127) and +0x128/+0x129 == +0x124/+0x125 & ~+0x122/+0x123 (newly RELEASED,
-#      PRG:0x0221B8-0x0221C2).
+#      PRG:0x0221B8-0x0221C2);
+#   I10 +0x125 == the previous RUN's +0x123 (+0x124.w <- +0x122.w at PRG:0x022114: the previous frame's when the routine
+#      ran once, the same frame's when it ran twice).
 #   The routine was listed at 14z-195 with tools/m68k_list.py (PRG:0x022110-0x022200); I7 and I8 are this gate's own
 #   measurement — the 14z-194 pilot named +0x122/+0x126 only in its mechanism and +0x128/+0x129 not at all.
 # HOW: on MAME (the reference binary, pristine vsavj), three FIELD legs under tests/lua/field_trace.lua — 03_two_player_vs,
@@ -26,12 +28,12 @@
 #   COUNT of the routine (the writes by PRG:0x022114 and PRG:0x022126). A tap write in tap frame f lands in trace frame
 #   f+1. Each check is EXACT (every judged frame), and each carries the control HOMING named, pooled over legs and
 #   sides (per leg a side that never moves can tie): the same prediction with the opposite flip (I2), the wrong
-#   frame's run count (I3, I5), no `& ~previous` edge mask (I4, I8) and the opposite flip for +0x123 (I7) must each
+#   frame's run count (I3, I5, I10), no `& ~previous` edge mask (I4, I8) and the opposite flip for +0x123 (I7) must each
 #   LOSE frames. I6's control, the staged input 120 frames late, is judged PER
 #   SIDE on the sides that CAN discriminate — those whose active frames carry at least two distinct +0x394 values — each
 #   below 0.9; a side pressing a single button all match (replay 37's P2: toward+HP) maps its one value to any lagged key
 #   alike, so it cannot fail that control and is named, not judged (rule-checker run 2026-10-08-729 Q4).
-# EXPECTS: every judged frame of I1-I5, I7 and I8 predicted, with at least one judged frame per leg and side; I6 1.000 on
+# EXPECTS: every judged frame of I1-I5, I7, I8 and I10 predicted, with at least one judged frame per leg and side; I6 1.000 on
 #   every human side with active frames; each pooled control strictly below its check's total; I6's control below 0.9 on
 #   every discriminating side, with at least one such side. The log's header names the commit and the host.
 # FOLLOWS: emu/mame-patches/ tests/lib/controls.sh tests/lua/field_trace.lua tests/lua/pokes_spec.lua tests/lua/read_tap.lua
@@ -43,7 +45,12 @@
 # MUST-FIRE: perturbed-copy: no-edge-mask — I4 and I8 judged without their `& ~previous` / `& ~current` masks must lose frames (pooled), and as a mode the gate FAILs them
 # MUST-FIRE: perturbed-copy: lag-120 — I6 judged against the staged input 120 frames late must fall below 0.9 on every discriminating side, and as a mode the gate FAILs I6
 #
-# NOT COVERED: +0x397 — the pilot's "+0x395 one frame late" does NOT hold exactly: measured 14z-195 on ERIS (c4466c51 +
+# NOT COVERED: I2's FLIP-SOURCE RULE against plain +0x0B — the +0x120 branch is reached (replay 03's P1: the rule and
+#   +0x0B differ on 472 frames with a run, measured 14z-195 on ERIS; 0 on the other five sides) but on NONE of those
+#   frames is a left or right direction held, so +0x12B reads the same under either rule (plain +0x0B predicted
+#   33360/33360): a control replacing the rule by +0x0B was DEAD and was removed; separating them needs a leg holding
+#   L or R while +0x38 and +0x115 are clear and +0x120 != +0x0B (the readout prints that count, RULESEP).
+#   +0x397 — the pilot's "+0x395 one frame late" does NOT hold exactly: measured 14z-195 on ERIS (c4466c51 +
 #   these checks), it equals the PREVIOUS frame's +0x395 on 9531/9537 in-match frames (03 P1 and P2), 4106/4125 (37 P2),
 #   3050/3058 and 3051/3058 (sweep P1/P2), the SAME frame's on 33304/33440 pooled; the rule for the misses (its writer
 #   PRG:0x014E52/58 against the frame boundary) is not determined, so it is not asserted; +0x12E/+0x12F (the routine goes on past PRG:0x0221FA into its own edge words — not traced); merged-m23 (the pilot measured it identical on these legs; a legacy oracle covers the merged build's
@@ -185,6 +192,9 @@ for leg, rpl in LEGS.items():
                 pick = wrong if PERT == "wrong-run" else good
                 c["I3"] += (d[f"b12c{s}"], d[f"b12d{s}"]) == (pick[f"b12a{s}"], pick[f"b12b{s}"])
                 ctl["I3"] += (d[f"b12c{s}"], d[f"b12d{s}"]) == (wrong[f"b12a{s}"], wrong[f"b12b{s}"])
+                c["rulediff"] += bool(src) != bool(d[f"face{s}"])   # frames where the flip-source rule and plain +0x0B differ
+                c["rulesep"] += bool(src) != bool(d[f"face{s}"]) and (d[f"idir{s}"] & 3) in (1, 2)   # ... with L or R held: the
+                                                                                                     # only frames that can tell them apart
                 fl7 = (not d[f"face{s}"]) if PERT == "opposite-flip" else bool(d[f"face{s}"])
                 c["I7"] += d[f"b122{s}"] == d[f"ibtn{s}"] and d[f"b123{s}"] == rel(d[f"idir{s}"], fl7)
                 ctl["I7"] += d[f"b122{s}"] == d[f"ibtn{s}"] and d[f"b123{s}"] == rel(d[f"idir{s}"], not d[f"face{s}"])
@@ -207,11 +217,13 @@ for leg, rpl in LEGS.items():
                         c["n5"] += 1
                         src5 = byf[f - 1] if use == 1 else d
                         c["I5"] += d[f"btn{s}"] == src5[f"ibtn{s}"]
+                        c["I10"] += d[f"dir{s}"] == src5[f"b123{s}"]   # +0x125 <- the previous run's +0x123 (PRG:0x022114, the word)
                     if kc:
                         ctl["n5"] += 1
                         srcc = byf[f - 1] if kc == 1 else d
                         ctl["I5"] += d[f"btn{s}"] == srcc[f"ibtn{s}"]
-        for key in ("n", "I1", "I2", "I3", "n4", "I4", "n5", "I5", "I7", "I8"):
+                        ctl["I10"] += d[f"dir{s}"] == srcc[f"b123{s}"]
+        for key in ("n", "I1", "I2", "I3", "n4", "I4", "n5", "I5", "I7", "I8", "I10", "rulediff", "rulesep"):
             tot[key] += c[key]
         per.append((leg, s, c))
         res(c["n"] > 0 and c["I1"] == c["n"] and c["I2"] == c["n"] and c["I3"] == c["n"], f"I1-I3 {leg} P{s}",
@@ -219,6 +231,9 @@ for leg, rpl in LEGS.items():
             f"(+0x12C,+0x12D)==the previous run's {c['I3']}")
         res(c["n4"] > 0 and c["I4"] == c["n4"], f"I4 {leg} P{s}", f"+0x127 == swap(+0x395 by +0x0B) & ~+0x125 on {c['I4']}/{c['n4']} in-match frames")
         res(c["n5"] > 0 and c["I5"] == c["n5"], f"I5 {leg} P{s}", f"+0x124 == +0x394 one run earlier on {c['I5']}/{c['n5']} judged frames")
+        res(c["n5"] > 0 and c["I10"] == c["n5"], f"I10 {leg} P{s}", f"+0x125 == the previous run's +0x123 on {c['I10']}/{c['n5']} judged frames")
+        print(f"  info  [flip-rule {leg} P{s}] the flip-source rule and plain +0x0B differ on {c['rulediff']} of {c['n']} frames with a run, "
+              f"{c['rulesep']} of them with L or R held (the only frames that could separate them)")
         res(c["n"] > 0 and c["I7"] == c["n"], f"I7 {leg} P{s}", f"+0x122 == +0x394 and +0x123 == swap(+0x395 by +0x0B) on {c['I7']}/{c['n']} frames with a run")
         res(c["n4"] > 0 and c["I8"] == c["n4"], f"I8 {leg} P{s}", f"+0x126 == +0x122 & ~+0x124, +0x128/+0x129 == +0x124/+0x125 & ~+0x122/+0x123 on {c['I8']}/{c['n4']} in-match frames")
     # I6: +0x394 is the held-button set of the side's own staged input — consistency at the best lag 0-6, both human sides
@@ -256,7 +271,7 @@ for leg, rpl in LEGS.items():
             + (f"the set 120 frames earlier {cl:.3f} (judged)" if disc else f"ONE +0x394 value on its active frames {sorted(vals)}: the lag control cannot discriminate here, not judged ({cl:.3f})"))
 res(judged6 > 0, "I6", f"{judged6} human sides judged on active frames; the lag control applies to {ndisc} of them (not to {' '.join(nondisc) or 'none'})")
 print(f"CTL I2 {ctl['I2']} {tot['n']} I3 {ctl['I3']} {tot['n']} I4 {ctl['I4']} {tot['n4']} I5 {ctl['I5']} {ctl['n5']} I6 {lagworst:.3f} {ndisc} "
-      f"I7 {ctl['I7']} {tot['n']} I8 {ctl['I8']} {tot['n4']}")
+      f"I7 {ctl['I7']} {tot['n']} I8 {ctl['I8']} {tot['n4']} I10 {ctl['I10']} {ctl['n5']} RULEDIFF {tot['rulediff']} {tot['n']} RULESEP {tot['rulesep']}")
 sys.exit(1 if bad else 0)
 PY
 }
@@ -266,9 +281,9 @@ if [ -n "${VS_CTL:-}" ]; then
     check "$VS_CTL" > "$W/mode.log" 2>&1 && rc=0 || rc=1
     grep -v '^CTL ' "$W/mode.log"
     tag=""
-    case "$VS_CTL" in opposite-flip) tag='I1-I3|I7' ;; wrong-run) tag='I1-I3|I5' ;; no-edge-mask) tag='I4|I8' ;; lag-120) tag='I6' ;; esac
+    case "$VS_CTL" in opposite-flip) tag='I1-I3|I7' ;; wrong-run) tag='I1-I3|I5|I10' ;; no-edge-mask) tag='I4|I8' ;; lag-120) tag='I6' ;; esac
     if [ "$rc" = 1 ] && grep -Eq "FAIL  \[($tag) " "$W/mode.log"; then vs_ctl_fired "$VS_CTL" "the checks judged with the perturbation failed (mode)"
-    else vs_ctl_dead "$VS_CTL" "the perturbed checks did not fail where they must (rc $rc)" || true; fi
+    else echo "REFUSED: CONTROL=$VS_CTL — the perturbation did not make the check it targets fail (rc $rc): a dead mode, not a verdict"; exit 3; fi
     echo "FAIL: audit_mizuumi_inputs (control mode)"; exit 1
 fi
 check none > "$W/checks.log" 2>&1 || fail=1
@@ -277,11 +292,12 @@ grep -q '^CTL ' "$W/checks.log" || { echo "  FAIL  the checks produced no contro
 
 echo "== 3. the must-fire controls (pooled over legs and sides)"
 set -- $(sed -n 's/^CTL //p' "$W/checks.log")
-# CTL I2 <hits> <n> I3 <hits> <n> I4 <hits> <n> I5 <hits> <n> I6 <worst discriminating side> <sides> I7 <hits> <n> I8 <hits> <n>
+# CTL I2 <hits> <n> I3 <hits> <n> I4 <hits> <n> I5 <hits> <n> I6 <worst discriminating side> <sides> I7 <hits> <n> I8 <hits> <n> I10 <hits> <n> RULEDIFF <frames> <n> RULESEP <frames>
 [ "$3" -gt 0 ] && [ "$2" -lt "$3" ] && [ "${18}" -gt 0 ] && [ "${17}" -lt "${18}" ] \
     && vs_ctl_fired opposite-flip "the opposite flip predicts +0x12B on $2 of $3 frames and +0x123 on ${17} of ${18}" || { vs_ctl_dead opposite-flip "I2 $2/$3, I7 ${17}/${18}" || true; fail=1; }
-[ "$6" -gt 0 ] && [ "$5" -lt "$6" ] && [ "${12}" -gt 0 ] && [ "${11}" -lt "${12}" ] \
-    && vs_ctl_fired wrong-run "the wrong run count predicts I3 on $5 of $6 frames and I5 on ${11} of ${12}" || { vs_ctl_dead wrong-run "I3 $5/$6, I5 ${11}/${12}" || true; fail=1; }
+[ "$6" -gt 0 ] && [ "$5" -lt "$6" ] && [ "${12}" -gt 0 ] && [ "${11}" -lt "${12}" ] && [ "${23}" -lt "${24}" ] \
+    && vs_ctl_fired wrong-run "the wrong run count predicts I3 on $5 of $6 frames, I5 on ${11} of ${12}, I10 on ${23} of ${24}" || { vs_ctl_dead wrong-run "I3 $5/$6, I5 ${11}/${12}, I10 ${23}/${24}" || true; fail=1; }
+echo "  info  I2's flip-source rule vs plain +0x0B: they differ on ${26} of ${27} frames with a run, ${29} of them with L or R held — the rule is NOT separated from +0x0B on these legs (see NOT COVERED)"
 [ "$9" -gt 0 ] && [ "$8" -lt "$9" ] && [ "${21}" -gt 0 ] && [ "${20}" -lt "${21}" ] \
     && vs_ctl_fired no-edge-mask "without the edge masks +0x127 matches $8 of $9 frames and +0x126/+0x128/+0x129 ${20} of ${21}" || { vs_ctl_dead no-edge-mask "I4 $8/$9, I8 ${20}/${21}" || true; fail=1; }
 python3 -c "import sys; sys.exit(0 if float(sys.argv[1]) < 0.9 and int(sys.argv[2]) > 0 else 1)" "${14}" "${15}" \

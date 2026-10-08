@@ -235,7 +235,7 @@ if [ -n "${VS_CTL:-}" ]; then
     cat "$W/mode.log"
     case "$VS_CTL" in previous-press-key) tag='A1' ;; hit-vs-start) tag='A2' ;; cpu-side) tag='A3' ;; isolated-presses) tag='A4' ;; neighbour-word|hits-shifted) tag='A5' ;; esac
     if [ "$rc" = 1 ] && grep -q "FAIL  \[$tag\]" "$W/mode.log"; then vs_ctl_fired "$VS_CTL" "the perturbed checks failed $tag (mode)"
-    else vs_ctl_dead "$VS_CTL" "the perturbed checks did not fail $tag (rc $rc)" || true; fi
+    else echo "REFUSED: CONTROL=$VS_CTL — the perturbation did not make the check it targets fail (rc $rc): a dead mode, not a verdict"; exit 3; fi
     echo "FAIL: audit_mizuumi_attack (control mode)"; exit 1
 fi
 check none > "$W/checks.log" 2>&1 || fail=1

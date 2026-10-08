@@ -7,14 +7,17 @@
 #   counter RAM:$FF8081; if RAM:$FF8118 is set (this pass IS the extra one) it is cleared, else if the turbo-pass flag
 #   RAM:$FF812D is set and bit ($FF8081 & 31) of PAT[$FF8116 & 15] is 1, $FF8118 is set and a second pass runs in the
 #   same activation. E1: that prediction, made from the counter's first value in the frame and the previous frame's
-#   turbo flag, equals the passes counted on EVERY in-match frame with one activation, at the speed level pinned to
+#   turbo flag, equals the passes counted on EVERY in-match frame with ONE activation — one pass, or two passes with
+#   exactly one write SETTING $FF8118 between them; two passes with no set are two one-pass activations and, like a
+#   frame with no pass or three or more, are excluded and COUNTED per leg in the readout (rule-checker run
+#   2026-10-08-730 Q4) — at the speed level pinned to
 #   0, 6, 8 and 14 and unpinned, on two replays. E2: the pin took — every in-match frame of a pinned leg reads its
 #   level, and the unpinned leg reads 6 (vsavj's NORMAL). E3: the unpinned leg's passes-per-frame distribution equals
 #   the level-6 leg's, count for count.
 # HOW: on MAME (the reference binary), for each of 03_two_player_vs and 37_victor_ko_vsavj and each level (00, 06, 08,
 #   0e — pinned by POKES on every frame — and free), a FIELD leg (tests/lua/field_trace.lua: level, the pass counter,
 #   the turbo and extra-pass flags, HP and X) and a WRITE-TAP leg (tests/lua/read_tap.lua: the pass-counter word,
-#   written by PRG:0x008E10 once per pass). PAT is read from the vsavj OPCODE view at run time (the table is read
+#   written by PRG:0x008E10 once per pass, and the $FF8118 word, whose SET marks an extra pass in the same activation). PAT is read from the vsavj OPCODE view at run time (the table is read
 #   PC-relative at PRG:0x008E6C) — never stored in the tree.
 # EXPECTS: E1 exact on every judged frame of all ten legs, with frames judged on each; E2 and E3 as stated. The log's
 #   header names the commit and the host. CONTROL
@@ -53,7 +56,7 @@ for s in 1 2; do
     base=$([ "$s" = 1 ] && echo $((0xff8400)) || echo $((0xff8800)))
     for spec in 010:w:x 050:w:hp; do F="$F,$(printf '%06x' $((base + 0x${spec%%:*}))):${spec#*:}$s"; done
 done
-RT="ff8080,2"
+RT="ff8080,2;ff8118,2"   # the pass counter and the extra-pass flag (its SET tells one two-pass activation)
 : > "$W/legs.txt"
 for r in "03 tests/replays/03_two_player_vs.rpl 12000" "37 tests/replays/37_victor_ko_vsavj.rpl 7000"; do
     set -- $r
@@ -115,13 +118,23 @@ def inmatch(d): return d["hp1"] > 0 and d["hp2"] > 0 and d["x1"] and d["x2"]
 dists, ctl_lost = {}, []
 for tag, rpl, fr, lv in legs:
     T = load(f"{W}/{tag}.fields"); byf = {d["f"]: d for d in T}
-    passes = collections.defaultdict(list)
+    passes = collections.defaultdict(list); xsets = collections.Counter()
     for l in open(f"{W}/{tag}.tap"):
         if l.startswith("W "):
             q = l.split()
             f, pc, off, data, mask = int(q[1]) + 1, q[3], q[5], int(q[7], 16), int(q[9], 16)
             if pc == "008e10" and off == "ff8080" and mask & 0xff:
                 passes[f].append(data & 0xff)
+            if off == "ff8118" and mask & 0xff00 and (data >> 8) & 0xff:
+                xsets[f] += 1   # the decider SETS $FF8118 when the next pass is the extra one, in the same activation
+    # ONE ACTIVATION, judged: one pass, or two passes with exactly one $FF8118 set between them. TWO ACTIVATIONS: two
+    # passes and no set (each a one-pass activation). Anything else (no pass, three or more) is excluded — all counted.
+    def kind(f):
+        n, x = len(passes[f]), xsets[f]
+        if n == 1 and x == 0: return "one-1pass"
+        if n == 2 and x == 1: return "one-2pass"
+        if n == 2 and x == 0: return "two-activations"
+        return f"other-{n}p{x}s"
     M = [d for d in T if inmatch(d) and (d["f"] - 1) in byf]
     levels = collections.Counter(d["speed"] for d in M)
     want = 6 if lv == "-" else int(lv, 16)
@@ -129,11 +142,12 @@ for tag, rpl, fr, lv in legs:
     L = want & 15
     dist = collections.Counter(len(passes[d["f"]]) for d in M)
     dists[tag] = dist
+    kinds = collections.Counter(kind(d["f"]) for d in M)
     def predict(pat):
         ok = n = 0
         for d in M:
             ps = passes[d["f"]]
-            if len(ps) not in (1, 2):
+            if kind(d["f"]) not in ("one-1pass", "one-2pass"):
                 continue
             tf = byf[d["f"] - 1]["tflag"]
             n += 1; ok += (1 + (1 if tf and (pat >> (ps[0] & 31)) & 1 else 0)) == len(ps)
@@ -143,7 +157,8 @@ for tag, rpl, fr, lv in legs:
     ok, n = predict(PAT[best_o] if PERT == "other-level" else PAT[L])
     res(n > 0 and ok == n, f"E1 {tag}", f"{'(mode other-level: level ' + str(best_o) + ') ' if PERT == 'other-level' else ''}"
         f"passes/frame {dict(sorted(dist.items()))}, the prediction holds on {ok}/{n} frames with one activation "
-        f"(PAT[{L}] has {bin(PAT[L]).count('1')}/32 bits); the best other level's pattern {others[best_o][0]}/{n}")
+        f"(PAT[{L}] has {bin(PAT[L]).count('1')}/32 bits); the best other level's pattern {others[best_o][0]}/{n}; "
+        f"frames by kind {dict(sorted(kinds.items()))} — excluded {len(M) - n}")
     ctl_lost.append(others[best_o][0] < n)
 for r in ("03", "37"):
     ref = f"{r}_L08" if PERT == "unpinned-equals-6" else f"{r}_L06"
@@ -159,7 +174,7 @@ if [ -n "${VS_CTL:-}" ]; then
     grep -v '^CTL ' "$W/mode.log"
     case "$VS_CTL" in other-level) tag='E1' ;; unpinned-equals-6) tag='E3' ;; esac
     if [ "$rc" = 1 ] && grep -q "FAIL  \[$tag " "$W/mode.log"; then vs_ctl_fired "$VS_CTL" "the perturbed checks failed $tag (mode)"
-    else vs_ctl_dead "$VS_CTL" "the perturbed checks did not fail $tag (rc $rc)" || true; fi
+    else echo "REFUSED: CONTROL=$VS_CTL — the perturbation did not make the check it targets fail (rc $rc): a dead mode, not a verdict"; exit 3; fi
     echo "FAIL: audit_extra_pass (control mode)"; exit 1
 fi
 check none > "$W/checks.log" 2>&1 || fail=1
