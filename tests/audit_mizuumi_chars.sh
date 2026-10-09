@@ -21,8 +21,9 @@
 #      ends and lasts a frozen length; K10 on 118_anak_taunt (P1 forced to Anakaris) +0x1BB rises once, 0-2 frames after
 #      the first START+LP+MP+HP press in the match, holds a frozen length, and on every other leg stays 0; K11 +0x3C1 reads
 #      1 only on the side whose script moves D,D,D before its select confirm (118_random's P1), from that confirm; K12 THE
-#      SLOT OWNERSHIP CENSUS over the whole tapped range +0x34..+0x37 and +0x360..+0x37F: every non-clear writer PC
-#      writes only into blocks holding ONE character (per-character scratch), every written byte's writers and the named
+#      SLOT OWNERSHIP CENSUS over the whole tapped range +0x34..+0x37 and +0x360..+0x37F: every writer PC outside the
+#      CLEAR set (PRG:0x000Dxx, 0x016E4C/E, 0x0222DA, 0x026Exx/0x026Fxx — which write only 0 there, but the boot RAM test
+#      0x000D34's 0xFF before any character loads: checked) writes only into blocks holding ONE character (per-character scratch), every written byte's writers and the named
 #      slots' owner lines atlas/ram.md quotes are frozen. A WRITE IS CREDITED TO THE BLOCK IT LANDS IN, never to the code
 #      that ran (Morrigan's kick throw 0x03B2DA writes the victim's +0x19A and is credited to the victim) — K8 and K12
 #      measure which characters' blocks a PC writes, not whose routine it is. A block's CHARACTER is read from its loaded +0x60 character-data base against
@@ -65,6 +66,7 @@
 # MUST-FIRE: perturbed-copy: tap-misaligned — KA comparing the tap run's RAM:$FF8080 writes with the field run's samples one frame later than they land must fail, so the two logs are proved FRAME-ALIGNED (the vblank counter cannot tell two games apart: that is KS) (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: known-bad: tap-other-game — KS with the flare leg's tap run replaced by a tap run of a DIFFERENT game (the replay with P1's inputs from f3000 two frames later, run in-gate) must fail, so the two runs of a leg are proved to have played the same game (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: known-bad: read-other-game — KR with the flare leg's READ run replaced by a read run of a DIFFERENT game (the same shifted replay, run in-gate) must fail, so the reader census's third run is proved to have played the field run's game (in-gate; as a mode the gate FAILs)
+# MUST-FIRE: perturbed-copy: clear-nonzero — the census's CLEAR-writer check with one non-zero write planted from a CLEAR PC must fail K12, so the PCs the ownership census skips are held to writing only 0 (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: perturbed-copy: next-load-wrong — K0b with each waived span judged against the id after the one the side loads next must fail, so the waiver's "loads next" test is applied (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: perturbed-copy: wrong-base — K0 with each forced pick judged against ANOTHER character's +0x60 table row (id ^ 1) must fail, so the pick is proved by the base the game loaded, not by the poked +0x382 (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: perturbed-copy: pool-miscount — K2 with every side's type-41 count shifted by one must fail, so +0x14B is compared with the count, not merely with itself (in-gate; as a mode the gate FAILs)
@@ -212,7 +214,7 @@ if [ -n "${VS_CTL:-}" ]; then
     cat "$W/mode.log"
     case "$VS_CTL" in absent-move) want='K1 K3 K4 K7 K10 K11' ;; wrong-owner) want='K12' ;; pool-miscount) want='K2' ;;
         passes-inflated) want='K6' ;; fall-shifted) want='K9' ;; taps-as-dashes) want='K5' ;; other-side-credit) want='K8' ;; wrong-base) want='K0' ;; prewrite-human) want='K0b' ;; tap-misaligned) want='KA' ;;
-        tap-other-game) want='KS' ;; next-load-wrong) want='K0b' ;; read-other-game) want='KR' ;; esac
+        tap-other-game) want='KS' ;; next-load-wrong) want='K0b' ;; read-other-game) want='KR' ;; clear-nonzero) want='K12' ;; esac
     ok=1; for k in $want; do grep -q "FAIL  \[$k\]" "$W/mode.log" || ok=0; done
     if [ "$rc" = 1 ] && [ "$ok" = 1 ]; then vs_ctl_fired "$VS_CTL" "the perturbed checks failed $want (mode)"
     else echo "REFUSED: CONTROL=$VS_CTL — the perturbation did not make every check it targets fail (rc $rc; wanted $want): a dead mode, not a verdict"; exit 3; fi
@@ -225,7 +227,7 @@ grep -q '\[K12\]' "$W/checks.log" || { echo "  FAIL  the checks did not reach K1
 echo "== 3. the must-fire controls (in-gate)"
 for c in "absent-move:K1 K3 K4 K7 K10 K11" "wrong-owner:K12" "pool-miscount:K2" "passes-inflated:K6" "fall-shifted:K9" \
          "taps-as-dashes:K5" "other-side-credit:K8" "wrong-base:K0" "prewrite-human:K0b" "tap-misaligned:KA" \
-         "tap-other-game:KS" "next-load-wrong:K0b" "read-other-game:KR"; do
+         "tap-other-game:KS" "next-load-wrong:K0b" "read-other-game:KR" "clear-nonzero:K12"; do
     name="${c%%:*}"; want="${c#*:}"
     an "$name" "$W/ctl_$name.tsv" > "$W/ctl_$name.log" 2>&1 && rc=0 || rc=1
     miss=""; for k in $want; do grep -q "FAIL  \[$k\]" "$W/ctl_$name.log" || miss="$miss $k"; done

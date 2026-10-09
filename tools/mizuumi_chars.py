@@ -26,7 +26,8 @@ names come from tools/vanilla_frames.py's CHARS (held to the atlas by tools/audi
   tap-other-game    the flare leg's TAP run replaced by one that played a DIFFERENT game (projshift.tap: the same replay with
                     P1's inputs from f3000 two frames later) — KS must fail;
   next-load-wrong   K0b's waived spans judged against the id AFTER the one the side loads next (id ^ 1) — K0b must fail;
-  read-other-game   the flare leg's READ run replaced by one that played a DIFFERENT game (read_projshift.tap) — KR must fail.
+  read-other-game   the flare leg's READ run replaced by one that played a DIFFERENT game (read_projshift.tap) — KR must fail;
+  clear-nonzero     one CLEAR writer's write into the census range planted as non-zero — K12 must fail.
 (wrong-base: rule-checker run 2026-10-08-904 Q3/Q4 — the picks were read back from the poked byte itself.)
 
 THE CHARACTER OF A BLOCK is read from its loaded character-data base +0x60.l against the game's own table at
@@ -91,7 +92,7 @@ ap.add_argument("--legs", required=True)
 ap.add_argument("--pert", default="none", choices=("none", "absent-move", "wrong-owner", "pool-miscount", "passes-inflated",
                                                    "fall-shifted", "taps-as-dashes", "other-side-credit", "wrong-base",
                                                    "prewrite-human", "tap-misaligned", "tap-other-game",
-                                                   "next-load-wrong", "read-other-game"))
+                                                   "next-load-wrong", "read-other-game", "clear-nonzero"))
 ap.add_argument("--data", required=True, help="the vsavj DATA view (tools/cps2_decrypt.py --data-out): the +0x60 table")
 ap.add_argument("--out", required=True)
 A = ap.parse_args()
@@ -310,9 +311,11 @@ for tag in ("proj", "c128"):
             m_ += 1
             if first_bad is None: first_bad = f
     nkr += n_; badkr += m_ + (n_ == 0)
-    perkr.append(f"{tag}:{n_ - m_}/{n_}from@{f0}" + (f"(first@{first_bad})" if first_bad else ""))
+    chg = sum(1 for a_, b_ in zip(T[tag], T[tag][1:]) if b_["f"] > f0 and tuple(a_[f"{k_}{s_}"] for s_, k_, off in RB) != tuple(b_[f"{k_}{s_}"] for s_, k_, off in RB))
+    badkr += chg == 0   # a leg whose compared bytes never change could not show a different game
+    perkr.append(f"{tag}:{n_ - m_}/{n_}from@{f0}:changes{chg}" + (f"(first@{first_bad},{m_}differ)" if first_bad else ""))
 cnt("read_field_state", " ".join(perkr))
-res(nkr > 0 and badkr == 0, "KR", f"both sides' +0x0AC and +0x154 rebuilt from each READ run's own writes equal the field run's samples on every frame from the first at which all four were written (equal/compared from@frame): {' '.join(perkr)}"
+res(nkr > 0 and badkr == 0, "KR", f"both sides' +0x0AC and +0x154 rebuilt from each READ run's own writes equal the field run's samples on every frame from the first at which all four were written, and those bytes change on every read leg (equal/compared from@frame:changes): {' '.join(perkr)}"
     + (" — mode read-other-game: the flare leg's read run played a different game" if PERT == "read-other-game" else ""))
 # K0b +0x382 agrees with the loaded base on every in-match side-frame (so the checks that read +0x382 read the character)
 # — except on a CPU side (+0x380 0) after the round timer reaches 0, where the arcade ladder has already written the
@@ -700,8 +703,27 @@ for off in TAPPED:
 cnt("played", " ".join(f"{k}:{v}" for k, v in sorted(played.items())))
 cnt("unloaded_lookups", f"P1 {FALLBACK[1]} P2 {FALLBACK[2]} (character lookups that met a base in no table row: read as 'unloaded', never as +0x382)")
 unnamed = sorted(pc for pc in pcchars if pcoffs[pc] and not (pcoffs[pc] & NAMEDB))
+# K12b THE CLEAR WRITERS the census skips (the 14z-194 pilot's set: PRG:0x000Dxx, 0x016E4C/E, 0x0222DA, 0x026Exx/0x026Fxx;
+# rule-checker run 2026-10-08-911 Q1/Q4) write only 0 into the census range — except the boot RAM test PRG:0x000D34, which
+# writes 0xFF and 0x00 before the run has loaded any character (before its first +0x60 base write); every such write
+# counted per PC, frozen; clear-nonzero plants one non-zero CLEAR write and must fail
+clr = collections.defaultdict(collections.Counter); badclr = []
+for tag in T:
+    first_load = next((f for i, (f, pc, b, v) in enumerate(TW[tag]) if any(c is not None for c in TC[tag][i])), 10**9)
+    for f, pc, b, v in TW[tag]:
+        if not clear(pc):
+            continue
+        for s in (1, 2):
+            if b - BASE[s] in TAPPED:
+                clr[pc][v] += 1
+                if v and not (pc == "000d34" and f < first_load):
+                    badclr.append(f"{tag}:{pc}@{f}={v:02x}")
+if PERT == "clear-nonzero":
+    badclr.append("planted:016e4c=01")
+cnt("census_clear_writers", " ".join(f"{pc}=" + "/".join(f"{v:02x}:{n}" for v, n in sorted(c.items())) for pc, c in sorted(clr.items())))
+res(not badclr, "K12", f"the CLEAR writers the census skips write only 0 into the census range, but the boot RAM test 0x000D34 before the first character load: {dict((pc, dict(c)) for pc, c in sorted(clr.items()))}; violations {badclr[:4]}")
 res(pcchars and not shared and (PERT != "wrong-owner" or planted), "K12",
-    f"the ownership census over {len(TAPPED)} tapped bytes: {len(pcchars)} non-clear writer PCs ({len(unnamed)} writing only unnamed bytes), each writing only into blocks that held one character (the block written, not the code that ran); shared {shared}"
+    f"the ownership census over {len(TAPPED)} tapped bytes (the CLEAR writers excluded, held above to writing 0): {len(pcchars)} non-clear writer PCs ({len(unnamed)} writing only unnamed bytes), each writing only into blocks that held one character (the block written, not the code that ran); shared {shared}"
     + (f" (planted {planted})" if PERT == "wrong-owner" else ""))
 
 open(A.out, "w").write("\n".join(counts) + "\n")

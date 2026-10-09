@@ -4,7 +4,7 @@ pick_mokt	forced 05: in-match +0x60 bases 0009efe6; table row 0009efe6
 pick_anak	forced 06: in-match +0x60 bases 000a1254; table row 000a1254
 tap_field_alignment	proj:5510/5510 dash:4110/4110 mokt:4110/4110 anak:4110/4110 rnd:4110/4110 c01:7110/7110 c10:5910/5910 c26:40510/40510 c07:4110/4110 c08:6710/6710 c29:4110/4110 c128:20910/20910 c19:5720/5720 c21:13910/13910 c22:13710/13710 c24:18310/18310 c30:4510/4510 c50:3310/3310
 tap_field_state	proj:5593/5593from@8 dash:4193/4193from@8 mokt:4193/4193from@8 anak:4193/4193from@8 rnd:4193/4193from@8 c01:7193/7193from@8 c10:5993/5993from@8 c26:40593/40593from@8 c07:4193/4193from@8 c08:6793/6793from@8 c29:4193/4193from@8 c128:20993/20993from@8 c19:5803/5803from@8 c21:13993/13993from@8 c22:13793/13793from@8 c24:18393/18393from@8 c30:4593/4593from@8 c50:3393/3393from@8
-read_field_state	proj:5593/5593from@8 c128:20993/20993from@8
+read_field_state	proj:5593/5593from@8:changes6 c128:20993/20993from@8:changes14
 prewrite_spans	c21:P2:11698-11722:+0x382=00:next-loaded=00@11888 c22:P2:11781-11805:+0x382=00:next-loaded=00@11968 c24:P2:11875-11899:+0x382=00:next-loaded=00@12783
 char_vs_base	in-match side-frames 197992: +0x382 agrees with the base on 197917, differs as the ladder's pre-write on a CPU side after the timer reached 0 on 75 (allowed), differs otherwise on 0
 pact_spawns	Anakaris:6 Aulbath:1 Bishamon:1 Bulleta:28 Demitri:3 Jedah:104 Q-Bee:1
@@ -105,3 +105,4 @@ slotw_37e	Demitri:030efc,030fa2; Jedah:05159a
 slotw_37f	Demitri:030efc,030fa2; Felicia:041040; Jedah:05159a
 played	Anakaris:3265 Aulbath:4555 Bishamon:1207 Bulleta:18349 Demitri:16164 Felicia:3982 Gallon:3668 Jedah:55219 Lilith:7032 Morrigan:11601 Q-Bee:9282 Sasquatch:6162 Victor:46710 Zabel:10796
 unloaded_lookups	P1 285794 P2 285794 (character lookups that met a base in no table row: read as 'unloaded', never as +0x382)
+census_clear_writers	000d34=00:1296/ff:1296 000d3a=00:2592 000dd8=00:576 000dda=00:720 016e4c=00:11268 016e4e=00:11268 0222da=00:2048
