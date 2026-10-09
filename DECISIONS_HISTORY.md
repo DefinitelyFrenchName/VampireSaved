@@ -485,7 +485,10 @@ So: `tests/expected/linux_host_provided.tsv` gains `libudev.so.1` as `ruled` (sy
 
 ## Ruled 2026-10-08 (14z-196) — #129: captures first; the ticket stays the lowest priority of the open tickets
 
-**The question (in chat, at the opener):** the maintainer asked *"can it be put to me now? what are we missing?"*; the answer named the decision (`docs/game/engine_internals.md` "The CPU AI action-script system", the 14z-194 re-check: Behaviour A — A1 a private clone for Phobos, A2 the guard in the shared routine, or not ported; Behaviour B — the faithful port through five shared vsavj blocks, or not ported), what was missing (the rule-checker pass on the recommendation; captures of what A or B changes in play, listed there as not measured; B's own unknowns; the unexplained `0x416312` gap), and asked: *"(a) Now, without captures"* or *"(b) Captures first"*.
+**The maintainer's question (in chat, at the opener):**
+- the maintainer: *"can it be put to me now? what are we missing?"*
+
+The answer named the decision (`docs/game/engine_internals.md` "The CPU AI action-script system", the 14z-194 re-check: Behaviour A — A1 a private clone for Phobos, A2 the guard in the shared routine, or not ported; Behaviour B — the faithful port through five shared vsavj blocks, or not ported), what was missing (the rule-checker pass on the recommendation; captures of what A or B changes in play, listed there as not measured; B's own unknowns; the unexplained `0x416312` gap), and asked: *"(a) Now, without captures"* or *"(b) Captures first"*.
 
 **The maintainer:** *"we shall do captures first but this ticket stays lowest priority of open tickets"*
 
@@ -558,9 +561,9 @@ So: #254 is committed mid-session and closed `done` at the 14z-196 close if the 
 **The context given (in chat):** #118's gates (`audit_mizuumi_struct`, `audit_mizuumi_inputs`, `audit_extra_pass`, `audit_mizuumi_attack`, and the new `audit_mizuumi_chars`) measure pristine vsavj only, never a Vampire Saved build; since 14z-195 they are scope `out`, which keeps them out of the static tier, the close and `--freeze`, but the release run (`--scope all`) still runs them and fails on anything but PASS. The maintainer: *"Also I should note that #118 is basically covering native vsavj characters, which is great but is in 99.99% of cases a scope we just don't touch in Vampire Saved. As such I think it would be best to have all the related tests run only on-demand, not on any static or close tier, nor even on freeze or release (though maybe having it as an option for releases has merit). Keen to have your opinion on this."* The session agreed and asked: an `ondemand` scope with an opt-in release flag; a census of the other pristine-only gates; the chars gate's round ten now or parked.
 
 **The maintainer:**
-- *"let's make it purely ondemand scope and document how this ondemand scope can be run."*
-- *"yes. The only potential exception I can imagine of pristine-only gates that shouldn't be ondemand scope are for cases that are known to have been broken in the past (e.g. maybe we made a change for a VS2 tenant that affected vsavj characters: that would qualify for being at least on release)"*
-- *"park for next session"*
+- the maintainer: *"let's make it purely ondemand scope and document how this ondemand scope can be run."*
+- the maintainer: *"yes. The only potential exception I can imagine of pristine-only gates that shouldn't be ondemand scope are for cases that are known to have been broken in the past (e.g. maybe we made a change for a VS2 tenant that affected vsavj characters: that would qualify for being at least on release)"*
+- the maintainer: *"park for next session"*
 
 So: a registry scope `ondemand` that no tier selects — not the static tier, the close, `--freeze` or the release run (`--scope all`); it runs only when asked for by name or by `--scope ondemand`, documented where the runner's scopes are; no release flag. The #118 gates take it. The other gates whose subject is pristine only are censused and proposed for the same scope, except those guarding a case known to have broken before (a tenant change that once moved vsavj characters), which stay at least at release. `audit_mizuumi_chars` (rule-checker runs 902-914, 914 open on Q1) is parked on branch `t118-196` for the next session; the struct gate, OK at run 2026-10-08-907, merges alone.
 
@@ -575,7 +578,11 @@ So: a registry scope `ondemand` that no tier selects — not the static tier, th
 3. *"audit_palette_seq_ids is `out` today, and both readings find it was broken by our change: 1369cd0c "the DF-palette row is withdrawn because it broke Bulleta" [...] Promote it out -> release?"* — "Promote to release (Recommended)" / "Leave it out".
 4. *"Three borderline gates: which (if any) go ondemand? Unticked ones stay where they are."* — test_select_arrays, audit_ff0460_writer, audit_sdram_bank_load (multi-select).
 
-**The maintainer (the selections, verbatim):** *"Only our changes (Recommended)"*; *"Ondemand"*; *"Promote to release (Recommended)"*; *"test_select_arrays,audit_ff0460_writer,audit_sdram_bank_load"*.
+**The maintainer (the selections, verbatim):**
+- the maintainer: *"Only our changes (Recommended)"*
+- the maintainer: *"Ondemand"*
+- the maintainer: *"Promote to release (Recommended)"*
+- the maintainer: *"test_select_arrays,audit_ff0460_writer,audit_sdram_bank_load"*
 
 So: "broken in the past" means a change of OURS broke the game behaviour the gate covers — a gate's own red (a stale expectation, a dead rig, clock drift) does not count. 23 gates move to `ondemand` in `tests/ci_emulator.tsv` with the `pristine:` reason: the 18 (from release: audit_demitri_split, audit_ladder_pick_store, audit_marionette_cost, test_projectile_census; from out: audit_df_dead_family, audit_ff8130_writers, audit_front_comparator, audit_ground_throws, audit_tick_cadence, audit_wide_phase_a, test_advancing_guard, test_killshread_es, test_meter_gain, test_rehit_ring, test_tick_durations, test_vanilla_aerial_join, test_vanilla_command_join, test_vanilla_frame_join), the two #113 gates (superseding the 2026-09-03 ruling (a), marked in place in the registry header), and test_select_arrays, audit_ff0460_writer and audit_sdram_bank_load. audit_palette_seq_ids moves out -> release. audit_dispatch_census and test_select_wheel stay at release. With the four #118 gates, 27 rows are `ondemand`.
 ---

@@ -23,12 +23,16 @@ there in parallel.**
 1. **#245-#255 — the code-review findings, P2 first, then P3** (ruled: `DECISIONS_HISTORY.md` "Ruled 2026-10-09 (14z-196) — #245-#255: the triage's revised severities; worked next session, P1 to P3"). All eleven were re-checked VALID at `2979890c` (the triage report was untracked scratch, `build/agent196/triage245/REPORT.md`). Bug archaeology first ([VSP-14]); each fix gets its ground-truth test.
    - P2: #245 (the WIDE builder writes a source zip through its own symlink), #249, #251, #252, #253.
    - P3: #246, #247, #248, #250, #255.
-2. **#228 — ASSESS FIRST, THEN STEP 4** (ruled: "Ruled 2026-10-09 (14z-196) — #228: step 4 does not start this session; whether it runs once or recurring is assessed first"). Steps 1-3 landed 14z-196: `pc_count.lua` counts the first frame, `tests/lua/clock_check.lua` measures drift per run, 24 at-risk gates drift and still PASS (`build/agent196/t228/step3/SUMMARY.txt`, untracked). Put the once-or-recurring question to the maintainer with its clock cost; a recurring run may be release-only or a scheduled night run.
-   - **Carried to step 4 by decision:** six code comments still state the retracted "timeslicing" theory — `tests/lua/replay_guard.lua`, `tests/lua/inp_guard.lua`, `tools/run_replay_guarded.sh`, `tools/run_inp_guarded.sh`, `tools/run_inp_probe.sh`, `tests/test_crash_guard.sh` (`tests/rulecheck/retractions/14z-196.tsv` names them). Correct them with the clock fix.
-3. **#118 — the chars gate, PARKED on branch `t118-196`** (ruled "park for next session"). `audit_mizuumi_chars` went through rule-checker runs 902-914 in the worktree `../wt_t118_196`; **914 is VIOLATED on Q1 and unresolved** (two facts frozen only in pooled lines). The struct gate merged 14z-196 (`8904dde2`, run 772 OK). The chars gate lands as `ondemand` (27 rows are `ondemand` since 14z-196: `tests/run_all_emulator.sh --scope ondemand`, HANDOFF [VSP-164]).
+2. **#228 — ASSESS FIRST, THEN STEP 4** (ruled: `DECISIONS_HISTORY.md` "Ruled 2026-10-09 (14z-196) — #228: step 4 does not start this session; whether it runs once or recurs is assessed first"). Steps 1-3 landed 14z-196: `tests/lua/pc_count.lua` counts the first frame, `tests/lua/clock_check.lua` measures drift per run, 24 at-risk gates drift and still PASS (`build/agent196/t228/step3/SUMMARY.txt`, untracked). Put the once-or-recurring question to the maintainer with its clock cost; a recurring run may be release-only or a scheduled night run.
+   - **Carried to step 4 by decision:** seven code comments in six files still state the retracted "timeslicing" theory — `tests/lua/replay_guard.lua`, `tests/lua/inp_guard.lua`, `tools/run_replay_guarded.sh`, `tools/run_inp_guarded.sh`, `tools/run_inp_probe.sh`, `tests/test_crash_guard.sh` (`tests/rulecheck/retractions/14z-196.tsv` names them). Correct them with the clock fix.
+3. **#118 — the chars gate, PARKED on branch `t118-196`** (ruled: `DECISIONS_HISTORY.md` "Ruled 2026-10-09 (14z-196) — #118's gates and every pristine-only gate move to an ONDEMAND scope; the chars gate parked"). `audit_mizuumi_chars` went through rule-checker runs 902-914 in the worktree `../wt_t118_196`; **914 is VIOLATED on Q1 and unresolved** (two facts frozen only in pooled lines). The struct gate merged 14z-196 (`8904dde2`, run 772 OK). The chars gate lands as `ondemand` (27 rows are `ondemand` since 14z-196: `tests/run_all_emulator.sh --scope ondemand`, HANDOFF [VSP-164]).
 4. **#260** — a check that every submodule pin exists on its remote before a push (filed 14z-196, the 14z-192 jtcores pin).
-5. **Parked or lowest:** #124 PARKED (*"let's park #124 for now"*); #129 is the LOWEST PRIORITY of the open tickets, captures first (*"we shall do captures first but this ticket stays lowest priority of open tickets"*).
+5. **Lowest priority:** #129, captures first (`DECISIONS_HISTORY.md` "Ruled 2026-10-08 (14z-196) — #129: captures first; the ticket stays the lowest priority of the open tickets").
 6. **Open, scoped:** #229 (specials, supers and EX/ES moves next); #243, #244; the close's own tools #256, #257, #258, #259. Done, awaiting release: #236, #238, #239, #240.
+
+## PARKED (not open work)
+
+- #124, parked by the maintainer (`DECISIONS_HISTORY.md` "Ruled 2026-10-09 (14z-196) — #124 parked").
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
@@ -40,7 +44,7 @@ there in parallel.**
 
 ## WHAT CLOSED THIS SITTING (14z-196)
 
-- **Closed `done`:** #254 (a control mode's own shell error is DIED at any exit).
+- **Closing `done` at this close:** #254 (a control mode's own shell error is DIED at any exit), once the close tier's executed controls hold its rule (STATE 14z-196 row (8)).
 - **Filed:** #260.
 - **Parked:** #124.
-- **Ruled:** #129 lowest priority, captures first; the order of work (#228 first); #228 step 4 waits for its once-or-recurring assessment; #124 parked; #260 filed; #245-#255's revised severities; #254 closed at the close; the ONDEMAND scope for pristine-only gates, the chars gate parked; the pristine-only gates' scopes ("broken in the past" = a change of ours; 23 rows to `ondemand`, audit_palette_seq_ids to release). Each in the maintainer's own words is its `DECISIONS_HISTORY.md` entry "Ruled 2026-10-09 (14z-196) — ..."; `tools/agent/rulings_verbatim.py` checks those quotes.
+- **Ruled:** #129 lowest priority, captures first; the order of work (#228 first); #228 step 4 waits for its once-or-recurring assessment; #124 parked; #260 filed; #245-#255's revised severities; #254 closed at the close; the ONDEMAND scope for pristine-only gates, the chars gate parked; the pristine-only gates' scopes (a past break by a change of ours keeps a gate at release, a gate's own red does not; 23 rows to `ondemand`, audit_palette_seq_ids to release). Each in the maintainer's own words is its `DECISIONS_HISTORY.md` entry "Ruled 2026-10-08 (14z-196) — ..." (#129, the order of work) or "Ruled 2026-10-09 (14z-196) — ..." (the rest); `tools/agent/rulings_verbatim.py` checks those quotes.

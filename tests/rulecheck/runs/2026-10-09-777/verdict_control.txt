@@ -1,0 +1,6 @@
+Q1: VIOLATED — the claim says "Not tested: nothing further", but it never tested the premise it rests on, that the actor field identifies the maintainer. issue_151_timeline.txt:2 says "the sessions and the maintainer shared ONE GitHub account (DefinitelyFrenchName)", so actor=DefinitelyFrenchName cannot tell the maintainer from a session.
+Q2: N-A — the claim draws no conclusion about how anything plays; it is about recording an issue closure.
+Q3: N-A — the claim compares no two legs.
+Q4: VIOLATED — no control rules out that the session's own pushed commit closed the issue, and the claim does not name this as untested. The 00:17:08Z close has a commit attached: issue_151_timeline.txt:5 "commit=afff693875340868f0aaf63362a6773535ef8a73". git_log.txt:3 dates that commit "2026-09-17 02:17:05 +0200" (00:17:05Z), with subject "14z-161 CLOSE: #151 step 3". The earlier session close at issue_151_timeline.txt:3 has the same pattern: commit 58b3c0d9 (git_log.txt:2, 22:22:52Z) and a close at 22:22:58Z.
+Q5: VIOLATED — the packet says the maintainer closed #151 "deliberate this time", but none of the three files quotes the maintainer saying so. The attribution is inferred from an actor field ("the close event is in the issue's timeline with the maintainer's account as its actor") on an account the sessions also used (issue_151_timeline.txt:2).
+VERDICT: VIOLATED

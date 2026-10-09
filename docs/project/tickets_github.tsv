@@ -140,7 +140,7 @@ number	state	reason	closed	labels	title
 127	OPEN	-	-	cosmetic,parked	#112 option (B): the Press of Death effect owns its palette row (scope first)
 126	CLOSED	COMPLETED	2026-10-01	cosmetic,parked	Select-wheel look-and-feel polish
 125	OPEN	-	-	cosmetic,parked	Arcade-ladder map: for the three tenants the next opponent's name and small portrait are wrong (the VS screen that follows is correct)
-124	OPEN	-	-	cosmetic	Arcade-ladder roulette tag shows the base/shell character for a tenant opponent on the arcade ladder map screen
+124	OPEN	-	-	cosmetic,parked	Arcade-ladder roulette tag shows the base/shell character for a tenant opponent on the arcade ladder map screen
 123	OPEN	-	-	cosmetic,parked	Win-quote text for the three tenants (forgone for now; only the clean way, vanilla untouched)
 122	CLOSED	COMPLETED	2026-10-06	evolution	Run the --controls release tier on the dedicated Linux server and compare its speed with the m2 pro (load balancing potential)
 121	OPEN	-	-	evolution	Linux release binaries built on dedicated server, plus clean-machine check at release (option 3)
