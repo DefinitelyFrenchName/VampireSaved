@@ -21,13 +21,16 @@
 #      ends and lasts a frozen length; K10 on 118_anak_taunt (P1 forced to Anakaris) +0x1BB rises once, 0-2 frames after
 #      the first START+LP+MP+HP press in the match, holds a frozen length, and on every other leg stays 0; K11 +0x3C1 reads
 #      1 only on the side whose script moves D,D,D before its select confirm (118_random's P1), from that confirm; K12 THE
-#      SLOT OWNERSHIP CENSUS: every non-clear writer PC of +0x34..+0x36 and +0x360..+0x37F is seen with exactly ONE
-#      character (per-character scratch), and the per-offset owner lines atlas/ram.md quotes are frozen. Every writer set,
+#      SLOT OWNERSHIP CENSUS over the whole tapped range +0x34..+0x37 and +0x360..+0x37F: every non-clear writer PC is
+#      seen with exactly ONE character (per-character scratch), every written byte's writers and the named slots' owner
+#      lines atlas/ram.md quotes are frozen. A block's CHARACTER is read from its loaded +0x60 character-data base against
+#      vsavj's own table PRG:0x0BD97A (the data view, decrypted at run time), never from the poked +0x382: K0 proves each
+#      forced pick by it, K0b holds +0x382 to it on every in-match side-frame, and K8/K12 credit their writers by it. Every writer set,
 #      reader set (the read legs: +0x154 and +0x0AC words on 128 and the flare leg), span and count is frozen in
 #      tests/expected/mizuumi_chars.tsv.
 # HOW: on MAME (the reference binary), FIELD legs under tests/lua/field_trace.lua — the side fields above plus all 32
 #   pool slots — and WRITE-TAP legs under tests/lua/read_tap.lua, on 105_projectile_clash_ctl (P1 Demitri's flares),
-#   118_dash, 118_mo_kthrow and 118_anak_taunt (forced picks by POKES, the pick read back from +0x382), 118_random, and
+#   118_dash, 118_mo_kthrow and 118_anak_taunt (forced picks by POKES, each proved by its loaded +0x60 base), 118_random, and
 #   the 13 census replays of the 14z-194 pilot (01 10 26 07 08 29 128 19 21 22 24 30 50 — the corpus replays that play
 #   OTHER characters); two READ-TAP legs (WINDOW the whole run) over both blocks' +0x154 and +0x0AC words on 128 and the
 #   flare leg. The analysis is tools/mizuumi_chars.py (its --pert modes are the controls). A tap write in tap frame f
@@ -35,15 +38,16 @@
 #   so the [MFI-5] input-drift class (#228) does not apply.
 # EXPECTS: the header names the ROM — every reference member verified against docs/checksums.txt, the vsavj program
 #   fingerprint equal to the registry's vsavj row, each loaded zip's sha1 — and the MAME (tests/lib/mame_ident.sh), or the
-#   gate FAILs before any leg; each forced pick read back; K1-K12 as stated, each over a nonzero sample; every count equal
+#   gate FAILs before any leg; K0, K0b and K1-K12 as stated, each over a nonzero sample; every count equal
 #   to the frozen file; each control FAILs.
-# FOLLOWS: emu/mame-patches/ tests/expected/mizuumi_chars.tsv tests/lib/controls.sh tests/lib/mame_ident.sh
+# FOLLOWS: emu/mame-patches/ tests/expected/mizuumi_chars.tsv tests/lib/controls.sh tests/lib/mame_ident.sh tests/lib/decrypt_cache.sh tools/cps2_decrypt.py
 #   tests/lua/field_trace.lua tests/lua/pokes_spec.lua tests/lua/read_tap.lua tests/replays/ tools/mizuumi_chars.py
 #   tools/run_mame.sh tools/setup_mame.sh tools/audit_roms.py docs/checksums.txt tools/build_fingerprint.py
 #   tests/expected/registry.tsv
 #
 # MUST-FIRE: perturbed-copy: absent-move — the checks run with every leg's move detector emptied (no own flare, no opponent flare, no Gallon Dark Force, no taunt press, no D,D,D) must fail K1, K3, K4, K7, K10 and K11, so each flag would be seen set where its move is absent (in-gate; as a mode the gate FAILs)
-# MUST-FIRE: perturbed-copy: wrong-owner — the ownership census with one non-clear writer PC of the census credited to a second character must fail K12, so a shared-code writer would be caught (in-gate; as a mode the gate FAILs)
+# MUST-FIRE: perturbed-copy: wrong-owner — the ownership census with one non-clear writer PC that writes ONLY UNNAMED bytes of the tapped range credited to a second character must fail K12, so a shared-code writer anywhere in +0x34..+0x37 / +0x360..+0x37F would be caught (in-gate; as a mode the gate FAILs)
+# MUST-FIRE: perturbed-copy: wrong-base — K0 with each forced pick judged against ANOTHER character's +0x60 table row (id ^ 1) must fail, so the pick is proved by the base the game loaded, not by the poked +0x382 (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: perturbed-copy: pool-miscount — K2 with every side's type-41 count shifted by one must fail, so +0x14B is compared with the count, not merely with itself (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: perturbed-copy: passes-inflated — K6 judged against each frame's engine passes ($FF8081) plus one must fail, so the "falls by at least the passes" check reads the pass counter (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: perturbed-copy: fall-shifted — K9 with P2's HP falls moved 30 frames later must fail, so the throw's fall is paired with the +0x19A span it ends (in-gate; as a mode the gate FAILs)
@@ -70,6 +74,7 @@ MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame-ref/cps2}"; export MAME_BI
 JOBS="${JOBS:-12}"
 . "$REPO/tests/lib/controls.sh"
 vs_ctl_mode "$0"
+. "$REPO/tests/lib/decrypt_cache.sh"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no reference MAME binary at $MAME_BIN"; exit 0; }
 romchk="$(python3 "$REPO/tools/audit_roms.py" "$ROMDIR" 2>&1)" || true
 echo "$romchk" | grep -q 'all match' || { echo "FAIL: ROMDIR is not the pristine reference set (tools/audit_roms.py against docs/checksums.txt):"; echo "$romchk" | tail -5; exit 1; }
@@ -87,7 +92,7 @@ echo "  head  $(git -C "$REPO" describe --always --dirty --abbrev=40 2>/dev/null
 F="ff8109:b:timer,ff8081:b:pass"; RT=""
 for s in 1 2; do
     base=$([ "$s" = 1 ] && echo $((0xff8400)) || echo $((0xff8800)))
-    for spec in 00b:b:face 010:w:x 050:w:hp 0ac:b:pind 110:b:dfm 136:b:c136 149:b:pact 14b:b:c14b 154:b:c154 15c:w:c15c \
+    for spec in 00b:b:face 010:w:x 050:w:hp 060:l:base 380:b:playing 0ac:b:pind 110:b:dfm 136:b:c136 149:b:pact 14b:b:c14b 154:b:c154 15c:w:c15c \
                 192:b:cfl 19a:b:c19a 1a2:b:c1a2 1b8:w:atk 1bb:b:c1bb 372:b:dash 382:b:char 3c1:b:c3c1; do
         F="$F,$(printf '%06x' $((base + 0x${spec%%:*}))):${spec#*:}$s"
     done
@@ -137,6 +142,8 @@ one() {  # one <kind f|t|r> <tag> <replay> <frames> <pokes|->
            -autoboot_script "$REPO/tests/lua/read_tap.lua" > "$d/mame.log" 2>&1; rm -rf "$d/sb" ) </dev/null 2>/dev/null || true ;;
     esac
 }
+# the vsavj DATA view: the +0x60 character-data base table PRG:0x0BD97A the analysis reads every block's character from
+decrypt_view vsavj "$W/vj_op.bin" "$W/vj_data.bin"
 echo "== 1. the legs (pristine vsavj, MAME)"
 : > "$W/jobs.txt"
 while read -r tag r fr pk; do
@@ -162,14 +169,14 @@ done < "$W/jobs.txt"
 echo "  ok    $nl legs complete"
 
 an() {  # an <pert> <out.tsv> — the analysis; prints [K] ok/FAIL lines, writes the counts, exits 1 on any FAIL
-    python3 "$REPO/tools/mizuumi_chars.py" --work "$W" --replays "$REPO/tests/replays" --legs "$W/legs.txt" --pert "$1" --out "$2"
+    python3 "$REPO/tools/mizuumi_chars.py" --work "$W" --replays "$REPO/tests/replays" --legs "$W/legs.txt" --data "$W/vj_data.bin" --pert "$1" --out "$2"
 }
 echo "== 2. the checks"
 if [ -n "${VS_CTL:-}" ]; then
     an "$VS_CTL" "$W/mode.tsv" > "$W/mode.log" 2>&1 && rc=0 || rc=1
     cat "$W/mode.log"
     case "$VS_CTL" in absent-move) want='K1 K3 K4 K7 K10 K11' ;; wrong-owner) want='K12' ;; pool-miscount) want='K2' ;;
-        passes-inflated) want='K6' ;; fall-shifted) want='K9' ;; taps-as-dashes) want='K5' ;; other-side-credit) want='K8' ;; esac
+        passes-inflated) want='K6' ;; fall-shifted) want='K9' ;; taps-as-dashes) want='K5' ;; other-side-credit) want='K8' ;; wrong-base) want='K0' ;; esac
     ok=1; for k in $want; do grep -q "FAIL  \[$k\]" "$W/mode.log" || ok=0; done
     if [ "$rc" = 1 ] && [ "$ok" = 1 ]; then vs_ctl_fired "$VS_CTL" "the perturbed checks failed $want (mode)"
     else echo "REFUSED: CONTROL=$VS_CTL — the perturbation did not make every check it targets fail (rc $rc; wanted $want): a dead mode, not a verdict"; exit 3; fi
@@ -181,7 +188,7 @@ grep -q '\[K12\]' "$W/checks.log" || { echo "  FAIL  the checks did not reach K1
 
 echo "== 3. the must-fire controls (in-gate)"
 for c in "absent-move:K1 K3 K4 K7 K10 K11" "wrong-owner:K12" "pool-miscount:K2" "passes-inflated:K6" "fall-shifted:K9" \
-         "taps-as-dashes:K5" "other-side-credit:K8"; do
+         "taps-as-dashes:K5" "other-side-credit:K8" "wrong-base:K0"; do
     name="${c%%:*}"; want="${c#*:}"
     an "$name" "$W/ctl_$name.tsv" > "$W/ctl_$name.log" 2>&1 && rc=0 || rc=1
     miss=""; for k in $want; do grep -q "FAIL  \[$k\]" "$W/ctl_$name.log" || miss="$miss $k"; done

@@ -17,7 +17,8 @@
 #   Type" not adopted) reads 0 on the loser at EVERY KO and 0 through the time-overs of 03 and 104, the WINNER's value at
 #   each KO frozen, not judged (0, 1 and 3 seen) — 14z-196 withdrew the 14z-194 "3 on a CPU KO winner" as a claim: CPU
 #   winners read 3 on every KO here, but the static writer PRG:0x019128-0x019152 has no CPU test (7/6/5 under three flags,
-#   else the KO hit's attack-record byte +0x1F) (C10); +0x3B2/+0x3E2 (consistent with "Auto-Guard Flag") read 1 from a side's AUTO press (D,D,button after its select
+#   else the KO hit's attack-record byte +0x1F) (C10); at every KO each side's human/CPU control is the game's own +0x380
+#   on the KO frame, and every side the script drives in that match reads human (C10b); +0x3B2/+0x3E2 (consistent with "Auto-Guard Flag") read 1 from a side's AUTO press (D,D,button after its select
 #   confirm, derived from the script) through the match's end and 0 on every side that did not choose AUTO (C11); +0x3E1
 #   (consistent with "Character Palette") is K-1 for a side that confirmed with button K (C12) and 8 for a side that chose
 #   AUTO (C12b: both such sides confirm with button 1 — whether AUTO adds 8 or replaces K-1 is not measured); +0x390
@@ -40,7 +41,7 @@
 #   14z-196: nine more FIELD legs — 104_1p_auto_ko_win (1P, P1 AUTO, a time-over), 05_timeout_idle (1P idle, a CPU KO),
 #   105_legacy_2pwin_auto (2P, P1 AUTO, a human KO) and 118_sel_b1..6 (replay 03 with P1 confirming with button 1..6) —
 #   five more WRITE-TAP legs (02, 104, 05, 105, 118_sel_b4), every tap leg also over +0x3B0/+0x3B2/+0x3B6/+0x3E0/+0x3E2,
-#   two multi-KO 1P legs for C10 and C14, field and tap (128_shadow_vs_legacy_vsavj, 26_don_arcade_mash),
+#   two multi-KO legs for C10, C10b and C14, field and tap (128_shadow_vs_legacy_vsavj, a 2P game; 26_don_arcade_mash, 1P),
 #   and a POKE leg: replay 03 with the time-over WINNER's +0x3B6 poked to 0x5A on 41 frames around 03's time-over (side
 #   and frames derived from the real 03 leg). Roles are derived, never assumed: the outcome and its winner from both HP
 #   words and the round timer, a side's human/CPU control from the replay's own input script, the AUTO choice and the
@@ -55,14 +56,15 @@
 #
 # MUST-FIRE: perturbed-copy: sides-swapped — the checks run with each side's candidate fields read against the other side's HP and X must fail the hit-flag, hit-counter and streak checks, so the checks see which side is which (in-gate on the real traces; as a mode the gate FAILs)
 # MUST-FIRE: known-bad: refutation-pokes — the checks run with the poked 03 leg in place of the real one must fail the +0x15A refutation, and every value poked into +0x130 must read back, so the trace reads both addresses and the refutation could have come out the other way (in-gate; as a mode the gate FAILs)
-# MUST-FIRE: perturbed-copy: roles-inverted — C8 run with each tapped replay's winner and loser swapped, replay 02's checks run with its human and CPU sides swapped, and C9-C14 run with every derived role swapped (winner/loser, human/CPU, AUTO chooser), must fail (C8, C8b, C4, C9, C10, C11 and C14), so every role statement — 0x027CCC on the winner, 0x031206 on 03's winner only, the +0x39F/+0x3F0/+0x05 writers ram.md attributes to a winner or a loser (C8b), +0x380 2 on the human side, +0x3B0's 0xFF on the KO loser, +0x3B6's 0 on the KO loser and its 0x019152 write on the winner, +0x3B2/+0x3E2 on the AUTO chooser and their writers — is derived (human sides from the input scripts, winners from HP at the first decisive outcome, the AUTO choice from the script), not assumed (in-gate; as a mode the gate FAILs)
+# MUST-FIRE: perturbed-copy: roles-inverted — C8 run with each tapped replay's winner and loser swapped, replay 02's checks run with its human and CPU sides swapped, and C9-C14 run with every derived role swapped (winner/loser, human/CPU, AUTO chooser), must fail (C8, C8b, C4, C9, C10, C10b, C11 and C14), so every role statement — 0x027CCC on the winner, 0x031206 on 03's winner only, the +0x39F/+0x3F0/+0x05 writers ram.md attributes to a winner or a loser (C8b), +0x380 2 on the human side, +0x3B0's 0xFF on the KO loser, +0x3B6's 0 on the KO loser and its 0x019152 write on the winner, +0x3B2/+0x3E2 on the AUTO chooser and their writers — is derived (human sides from the input scripts, winners from HP at the first decisive outcome, the AUTO choice from the script), not assumed (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: known-bad: poke-3b6 — C10 run with the +0x3B6 poke leg in place of the real 03 leg must fail at 03's time-over, and every poked frame must read the poked 0x5A back, so the field read is +0x3B6 and "0 at a time-over" could have come out the other way (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: perturbed-copy: p2-confirm — C12 run with each side's +0x3E1 judged against the OTHER side's confirm button must fail (P1 confirms with 2..6 on 118_sel_b2..6, P2 with 1), so the check sees which button confirmed (in-gate; as a mode the gate FAILs)
 #
 # NOT COVERED: the ~70 other unadopted candidates (build-dir record of 14z-189: build/t118/; GitHub #118); what
 #   +0x130's per-fighter offset is (a box width is the guess, not measured); what +0x15A and +0x18D ARE; the finish TYPE behind +0x3BE/+0x3BF; character-specific slots (+0x34-+0x36,
-#   +0x360-+0x37F) for the characters this corpus does not play; a 1P match a human wins for C1-C9 and C11-C13 (C10
-#   and C14 judge 128's three human KO wins); FBNeo (one emulator).
+#   +0x360-+0x37F) for the characters this corpus does not play; a 1P match a human wins for C1-C9 and C11-C13 (C10,
+#   C10b and C14's 0x019152 check judge 26's human KO win and 128's four 2P KOs); C14's AUTO and palette writers on the
+#   multi-match legs 128 and 26 (judged on the single-match legs only); FBNeo (one emulator).
 #   14z-196: what +0x3B0 and +0x3B6 MEAN — the bat loss is not identified, and +0x3B6's VALUE at a KO is frozen, not
 #   judged (its static derivation from the KO hit's record byte +0x1F is not measured per hit); whether AUTO's 8 in
 #   +0x3E1 adds to K-1 (no AUTO leg confirms with a button other than 1); +0x390 beyond replay 02 (one 1P match, four
@@ -125,7 +127,9 @@ echo "== 1. the legs (pristine vsavj, MAME)"
 # the 14z-189 legs, then (14z-196, HOMING item 4) the outcome, AUTO and palette legs: 104 (1P, AUTO, time-over), 05 (1P
 # idle, a CPU KO), 105_legacy_2pwin_auto (2P, P1 AUTO, a human KO) and 118_sel_b1..6 (replay 03 with P1 confirming with
 # button 1..6), with write taps on 02, 104, 05, 105 and 118_sel_b4; and (rule-checker run 2026-10-08-901 Q1/Q4) two multi-KO
-# 1P legs for C10 — 128_shadow_vs_legacy_vsavj (three human KO wins, one CPU KO win) and 26_don_arcade_mash — field and tap
+# legs for C10 — 128_shadow_vs_legacy_vsavj (it starts as 2P — both STARTs pressed, P2 confirms at 1500 then idles — and
+# after P2 loses its first match the game clears P2's +0x380 and P1 plays the CPU: four KOs, the last a CPU win; measured
+# 14z-196 after run 903) and 26_don_arcade_mash (1P) — field and tap; every KO's roles are the game's +0x380 (C10b)
 FLEGS="02_demitri_vs_cpu:02_demitri_vs_cpu:12000 03_two_player_vs:03_two_player_vs:12000 37_victor_ko_vsavj:37_victor_ko_vsavj:7000
        104:104_1p_auto_ko_win:13600 05:05_timeout_idle:12000 105auto:105_legacy_2pwin_auto:9600
        selb1:118_sel_b1:3200 selb2:118_sel_b2:3200 selb3:118_sel_b3:3200 selb4:118_sel_b4:3200 selb5:118_sel_b5:3200 selb6:118_sel_b6:3200
@@ -488,9 +492,11 @@ for k in ("02", "03", "37", "104", "05", "105auto"):
 res(n9 > 0, "C9", f"{n9} in-match 1->0 transitions of +0x3B0 judged in all (nonzero sample)")
 # C10 +0x3B6, RECORDED ("Deathblow Type Notification" not adopted): at EVERY KO (a side's HP falling below 0 while the
 # other's holds — DERIVED from both HP words) the LOSER's value reads 0 on the KO frame and the WINNER's value there is
-# frozen per KO with the winner's character and control; at a time-over (03, 104: the first outcome) both read 0 through
-# the whole leg. NOT a CPU-ness claim (rule-checker run 2026-10-08-901 Q4): measured 14z-196, the CPU KO winners read 3 on
-# every KO here (two characters) and the human ones 0 or 1 (26's Jedah reads 1), but the static writer has no CPU test —
+# frozen per KO with the winner's character and control — the control is the GAME'S own +0x380 on the KO frame (2 human,
+# 0 CPU; C4), never the script's (rule-checker run 2026-10-08-903: 128 starts as 2P, and after P2 loses its first match
+# the game clears P2's +0x380 and P1 plays the CPU) — and at a time-over (03, 104: the first outcome) both read 0 through
+# the whole leg. NOT a CPU-ness claim (runs 901, 903): measured, the CPU KO winners read 3, 3, 3 and 0 (128's Aulbath)
+# and the human ones 0 or 1 (26's Jedah reads 1), and the static writer has no CPU test —
 # PRG:0x019128-0x019152 stores into the attacker's (the winner's) +0x3B6 7 if -$4B8F(a5) is set, else 6 if its +0x111,
 # else 5 if its +0x19F, else the KO hit's attack-record byte +0x1F (a3) — so the cause of the values is not established
 # and the winner's value is reported, not judged.
@@ -502,6 +508,10 @@ def kos(Tl):
                 out.append((3 - sd, sd, b["f"]) if not inv else (sd, 3 - sd, b["f"]))
     return out
 KOS = {k: kos(T[k]) for k in ("02", "37", "05", "105auto", "c128", "c26")}
+def role(k, s, f0):
+    """the side's control at frame f0 by the GAME: +0x380 == 2 human, else CPU (roles-inverted swaps it)"""
+    h = {d["f"]: d for d in T[k]}[f0][f"playing{s}"] == 2
+    return (not h) if inv else h
 nko = 0; vals10 = collections.Counter()
 for k, ks in KOS.items():
     B = {d["f"]: d for d in T[k]}
@@ -509,13 +519,36 @@ for k, ks in KOS.items():
         nko += 1
         vw, vl = B[f0][f"dblow{w}"], B[f0][f"dblow{l}"]
         vals10[vw] += 1
-        cnt(f"dblow_{k}_f{f0}", f"KO winner P{w} ({'human' if w in HUMAN[k] else 'CPU'}, char {B[f0].get(f'char{w}', '-')}) {vw}; loser P{l} {vl}")
-        res(vl == 0, "C10", f"replay {k}: KO at f{f0}, winner P{w} ({'human' if w in HUMAN[k] else 'CPU'}) +0x3B6 {vw}, the loser P{l}'s {vl}")
+        cnt(f"dblow_{k}_f{f0}", f"KO winner P{w} ({'human' if role(k, w, f0) else 'CPU'}, char {B[f0].get(f'char{w}', '-')}) {vw}; loser P{l} {vl}")
+        res(vl == 0, "C10", f"replay {k}: KO at f{f0}, winner P{w} ({'human' if role(k, w, f0) else 'CPU'}) +0x3B6 {vw}, the loser P{l}'s {vl}")
 for k in ("03", "104"):
     o = OUT[k]; mx = {s: max(d[f"dblow{s}"] for d in T[k]) for s in (1, 2)}
     cnt(f"dblow_{k}", f"TIME both max {mx[1]}/{mx[2]}")
     res(o and o[3] == "TIME" and mx[1] == 0 and mx[2] == 0, "C10", f"replay {k}: time-over at f{o[2] if o else '-'} — +0x3B6 max P1 {mx[1]} P2 {mx[2]} over the whole leg")
 res(nko >= 6 and len(vals10) >= 2, "C10", f"{nko} KOs judged, winners' values {dict(sorted(vals10.items()))} (nonzero sample, two values or more)")
+# C10b THE ROLES AT EVERY KO, MEASURED (rule-checker runs 2026-10-08-903 Q1/Q4): C10's human/CPU label is the game's
+# +0x380 on the KO frame; it must agree with the script wherever the script decides it — a side the script DRIVES during
+# that match (any input entry between the match's first in-match frame and the KO) must read human, and every KO must
+# have at least one human side (a match the script drives). The script cannot decide an IDLE side (128's P2, 2P, never
+# touched after its confirm), which is why the game's byte is the label. roles-inverted swaps the label and must fail
+# here on every leg with a driven side (all six).
+n10b = bad10b = 0; per10b = []
+for k, ks in KOS.items():
+    B = {d["f"]: d for d in T[k]}; Tk = T[k]
+    for w, l, f0 in ks:
+        m0 = f0
+        while m0 - 1 in B and inmatch(B[m0 - 1]):
+            m0 -= 1
+        drv = {s: any(S[k].get(f, {1: set(), 2: set()})[s] for f in range(m0, f0 + 1)) for s in (1, 2)}
+        for s in (w, l):
+            n10b += 1
+            h = role(k, s, f0)
+            ok = h or not drv[s]
+            bad10b += not ok
+            per10b.append(f"{k}@{f0}:P{s}:{'human' if h else 'CPU'}{'/driven' if drv[s] else '/idle'}")
+        bad10b += not (role(k, w, f0) or role(k, l, f0))
+cnt("roles_at_ko", " ".join(per10b))
+res(n10b > 0 and bad10b == 0, "C10b", f"at {n10b // 2} KOs, every side the script drives in that match reads human (+0x380 2) and every KO has a human side: {bad10b} violations")
 # C11 +0x3B2 / +0x3E2 (consistent with mizuumi's "Auto-Guard Flag"): the side whose script, after its select confirm (its
 # first button press), presses D twice then a button before the match starts CHOSE AUTO — that side's two bytes read 0
 # before that button press and 1 on every frame from it through the last in-match frame (what follows the match is
@@ -755,7 +788,7 @@ if vs_ctl_is roles-inverted; then
     cat "$W/c8inv.log" "$W/inv02.log" "$W/inv2.log"
     if [ "$c8r" = 0 ] || ! grep -q 'FAIL  \[C8b\]' "$W/c8inv.log" || ! grep -q 'FAIL  \[C4\]' "$W/inv02.log" \
        || ! grep -q 'FAIL  \[C9\]' "$W/inv2.log" || ! grep -q 'FAIL  \[C10\]' "$W/inv2.log" || ! grep -q 'FAIL  \[C11\]' "$W/inv2.log" \
-       || ! grep -q 'FAIL  \[C14\]' "$W/inv2.log"; then
+       || ! grep -q 'FAIL  \[C14\]' "$W/inv2.log" || ! grep -q 'FAIL  \[C10b\]' "$W/inv2.log"; then
         vs_ctl_dead roles-inverted "with the roles swapped C8 rc=$c8r and replay 02's C4 $(grep -q 'FAIL  \[C4\]' "$W/inv02.log" && echo failed || echo PASSED)" || true
     else
         echo "CONTROL FIRED: roles-inverted — the gate ran C8 and replay 02's checks with the roles swapped and they failed"
@@ -772,10 +805,10 @@ check 0 03_two_player_vs "$W/inv02.tsv" 1 > "$W/inv02.log" 2>&1 || true
 check2 03_two_player_vs 1 none "$W/inv2.tsv" > "$W/inv2.log" 2>&1 || true
 if [ "$c8r" = 0 ] || ! grep -q 'FAIL  \[C8b\]' "$W/c8inv.log" || ! grep -q 'FAIL  \[C4\]' "$W/inv02.log" \
    || ! grep -q 'FAIL  \[C9\]' "$W/inv2.log" || ! grep -q 'FAIL  \[C10\]' "$W/inv2.log" || ! grep -q 'FAIL  \[C11\]' "$W/inv2.log" \
-   || ! grep -q 'FAIL  \[C14\]' "$W/inv2.log"; then
+   || ! grep -q 'FAIL  \[C14\]' "$W/inv2.log" || ! grep -q 'FAIL  \[C10b\]' "$W/inv2.log"; then
     vs_ctl_dead roles-inverted "with the roles swapped C8 rc=$c8r, replay 02's checks failed on: $(grep -o 'FAIL  \[C[0-9a-z]*\]' "$W/inv02.log" | tr '\n' ' '), C9-C14 failed on: $(grep -o 'FAIL  \[C[0-9a-z]*\]' "$W/inv2.log" | sort -u | tr '\n' ' ') — some role statement does not see which side is which" || fail=1
 else
-    vs_ctl_fired roles-inverted "$(grep -c 'FAIL  \[C8\]' "$W/c8inv.log") of 2 C8 rows, $(grep -c 'FAIL  \[C8b\]' "$W/c8inv.log") of 2 C8b rows, replay 02's C4, and C9 ($(grep -c 'FAIL  \[C9\]' "$W/inv2.log")), C10 ($(grep -c 'FAIL  \[C10\]' "$W/inv2.log")), C11 ($(grep -c 'FAIL  \[C11\]' "$W/inv2.log")), C14 failed with the roles swapped"
+    vs_ctl_fired roles-inverted "$(grep -c 'FAIL  \[C8\]' "$W/c8inv.log") of 2 C8 rows, $(grep -c 'FAIL  \[C8b\]' "$W/c8inv.log") of 2 C8b rows, replay 02's C4, and C9 ($(grep -c 'FAIL  \[C9\]' "$W/inv2.log")), C10 ($(grep -c 'FAIL  \[C10\]' "$W/inv2.log")), C10b, C11 ($(grep -c 'FAIL  \[C11\]' "$W/inv2.log")), C14 failed with the roles swapped"
 fi
 cat "$W/writers.tsv" >> "$W/got.tsv"
 
