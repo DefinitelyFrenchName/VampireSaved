@@ -3,26 +3,31 @@
 pick_mokt	05
 pick_anak	06
 pact_spawns	Anakaris:6 Aulbath:1 Bishamon:1 Bulleta:28 Demitri:3 Jedah:104 Q-Bee:1
+pact_demitri_flare_outlives	proj:P1:3419-3513:37 proj:P1:3720-3832:38 proj:P1:4020-4149:37
+pact_max_by_char	Anakaris:3 Aulbath:1 Bishamon:1 Bulleta:1 Demitri:1 Jedah:1 Q-Bee:1
 pact_writers	05475a=1:140 05475a=2:1 05475a=3:2 054770=0:137 054770=2:1 05ae00=1:1 05b25c=0:1
 c14b_nonzero_by_char	Q-Bee:1614
 c14b_max	5
 pind_writers	02e224:Bulleta 02e33a:Bulleta 02ea8e:Bulleta 02f2c8:Bulleta 03018a:Demitri 0302e2:Demitri 0303ca:Demitri 03091a:Demitri 039d9c:Morrigan 03bc56:Anakaris 03be76:Anakaris 041f18:Bishamon 044e3c:Aulbath 044ed2:Aulbath 046f02:Sasquatch 047146:Sasquatch 047230:Sasquatch 047302:Sasquatch 04a3ea:Q-Bee 04e26c:Lilith 04e45c:Lilith 04e51c:Lilith
 pind_flare_lead	10:1 11:2
+pind_demitri_spans	proj:P1:3409:46:026f1e proj:P1:3709:47:026f1e proj:P1:4009:46:026f1e
 cfl_proj_P2	spans [(3442, 3478), (3760, 3796), (4078, 4114)] flare-hit falls [3441, 3760, 4077]
 cfl_writers_proj	0243c2=1:3
-dash_write_dash_P1_f2905	value 2 x 566 opponent x 728 face 1
-dash_write_dash_P1_f3005	value 2 x 742 opponent x 785 face 1
-dash_write_dash_P1_f3105	value 3 x 982 opponent x 785 face 0
-dash_write_dash_P1_f3205	value 3 x 997 opponent x 785 face 0
-dash_write_dash_P1_f3305	value 3 x 794 opponent x 751 face 0
-dash_write_c26_P1_f37293	value 3 x 880 opponent x 603 face 0
-dash_write_c07_P1_f2980	value 3 x 847 opponent x 1000 face 1
+dash_write_dash_P1_f2905	value 2 x 566 opponent x 728 face 1 dx30 170
+dash_write_dash_P1_f3005	value 2 x 742 opponent x 785 face 1 dx30 223
+dash_write_dash_P1_f3105	value 3 x 982 opponent x 785 face 0 dx30 18
+dash_write_dash_P1_f3205	value 3 x 997 opponent x 785 face 0 dx30 -196
+dash_write_dash_P1_f3305	value 3 x 794 opponent x 751 face 0 dx30 -223
+dash_write_c26_P1_f37293	value 3 x 880 opponent x 603 face 0 dx30 -181
+dash_write_c07_P1_f2980	value 3 x 847 opponent x 1000 face 1 dx30 121
+dash_writers	030ef4=2:2 030ef4=3:5 030fba=2:90 030fba=3:185 05158a=0:20 0530b8=0:380
 dash_writes	030ef4 writes 7, not 2 or 3 0; (value, opponent side) {(2, 'right'): 2, (3, 'left'): 4, (3, 'right'): 1}; 118_dash P1 script dashes 5 writes 5; nonzero on non-Demitri side-frames 0
 c15c_proj_P2	span 3461-3475 start 18 Victor; frames falling less than the passes 0; hp falls 0; attack starts 0
 c15c_proj_P2	span 3780-3794 start 18 Victor; frames falling less than the passes 0; hp falls 0; attack starts 0
 c15c_proj_P2	span 4098-4111 start 17 Victor; frames falling less than the passes 0; hp falls 0; attack starts 0
 c15c_c128_P2	span 10134-10273 start 180 Zabel; frames falling less than the passes 0; hp falls 0; attack starts 0
 c15c_writers	0248ca:3 026100:57 02610a:3 02994c:1 02996e:7 029974:173 02997e:1 0365d6:1
+c1a2_spans	c26:P1:22059-22273
 c1a2	Gallon Dark Force side-frames 215, other Dark Force side-frames 1288, mismatches 0
 c154_writers	044ecc:Aulbath 046f08:Sasquatch 047086:Sasquatch 0472fc:Sasquatch
 c154_frames	Aulbath:216 Sasquatch:618

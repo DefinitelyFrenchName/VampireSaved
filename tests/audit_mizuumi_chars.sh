@@ -45,6 +45,10 @@
 # MUST-FIRE: perturbed-copy: absent-move — the checks run with every leg's move detector emptied (no own flare, no opponent flare, no Gallon Dark Force, no taunt press, no D,D,D) must fail K1, K3, K4, K7, K10 and K11, so each flag would be seen set where its move is absent (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: perturbed-copy: wrong-owner — the ownership census with one non-clear writer PC of the census credited to a second character must fail K12, so a shared-code writer would be caught (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: perturbed-copy: pool-miscount — K2 with every side's type-41 count shifted by one must fail, so +0x14B is compared with the count, not merely with itself (in-gate; as a mode the gate FAILs)
+# MUST-FIRE: perturbed-copy: passes-inflated — K6 judged against each frame's engine passes ($FF8081) plus one must fail, so the "falls by at least the passes" check reads the pass counter (in-gate; as a mode the gate FAILs)
+# MUST-FIRE: perturbed-copy: fall-shifted — K9 with P2's HP falls moved 30 frames later must fail, so the throw's fall is paired with the +0x19A span it ends (in-gate; as a mode the gate FAILs)
+# MUST-FIRE: perturbed-copy: taps-as-dashes — K5 with 118_dash's script count taking every tap for a dash must fail, so the write count is held to the dashes, not the taps (in-gate; as a mode the gate FAILs)
+# MUST-FIRE: perturbed-copy: other-side-credit — K8 with every write credited to the OPPOSITE block's character must fail, so the one-character crediting reads the writing side (in-gate; as a mode the gate FAILs)
 #
 # NOT COVERED: that +0x154 and +0x0AC are read ON THE OPPONENT through the +0x32 link (static, not measured here — the
 #   read tap sees the PC and the block, not which fighter's code runs); +0x15C's dizzy-vs-hold distinction and its
@@ -164,7 +168,8 @@ echo "== 2. the checks"
 if [ -n "${VS_CTL:-}" ]; then
     an "$VS_CTL" "$W/mode.tsv" > "$W/mode.log" 2>&1 && rc=0 || rc=1
     cat "$W/mode.log"
-    case "$VS_CTL" in absent-move) want='K1 K3 K4 K7 K10 K11' ;; wrong-owner) want='K12' ;; pool-miscount) want='K2' ;; esac
+    case "$VS_CTL" in absent-move) want='K1 K3 K4 K7 K10 K11' ;; wrong-owner) want='K12' ;; pool-miscount) want='K2' ;;
+        passes-inflated) want='K6' ;; fall-shifted) want='K9' ;; taps-as-dashes) want='K5' ;; other-side-credit) want='K8' ;; esac
     ok=1; for k in $want; do grep -q "FAIL  \[$k\]" "$W/mode.log" || ok=0; done
     if [ "$rc" = 1 ] && [ "$ok" = 1 ]; then vs_ctl_fired "$VS_CTL" "the perturbed checks failed $want (mode)"
     else echo "REFUSED: CONTROL=$VS_CTL — the perturbation did not make every check it targets fail (rc $rc; wanted $want): a dead mode, not a verdict"; exit 3; fi
@@ -175,12 +180,13 @@ cat "$W/checks.log"
 grep -q '\[K12\]' "$W/checks.log" || { echo "  FAIL  the checks did not reach K12 (a crash is not a verdict): $(tail -1 "$W/checks.log")"; exit 1; }
 
 echo "== 3. the must-fire controls (in-gate)"
-for c in "absent-move:K1 K3 K4 K7 K10 K11" "wrong-owner:K12" "pool-miscount:K2"; do
+for c in "absent-move:K1 K3 K4 K7 K10 K11" "wrong-owner:K12" "pool-miscount:K2" "passes-inflated:K6" "fall-shifted:K9" \
+         "taps-as-dashes:K5" "other-side-credit:K8"; do
     name="${c%%:*}"; want="${c#*:}"
     an "$name" "$W/ctl_$name.tsv" > "$W/ctl_$name.log" 2>&1 && rc=0 || rc=1
     miss=""; for k in $want; do grep -q "FAIL  \[$k\]" "$W/ctl_$name.log" || miss="$miss $k"; done
     if [ "$rc" = 1 ] && [ -z "$miss" ]; then
-        vs_ctl_fired "$name" "$want failed: $(grep -c '  FAIL' "$W/ctl_$name.log") row(s), e.g. $(grep '  FAIL' "$W/ctl_$name.log" | head -1 | sed 's/^ *//' | cut -c1-140)"
+        vs_ctl_fired "$name" "$want failed: $(grep -c '  FAIL' "$W/ctl_$name.log") row(s), e.g. $(grep "FAIL  \[${want%% *}\]" "$W/ctl_$name.log" | head -1 | sed 's/^ *//' | cut -c1-140)"
     else
         vs_ctl_dead "$name" "the perturbed run did not fail$miss (rc $rc): $(tail -1 "$W/ctl_$name.log" | cut -c1-120)" || fail=1
     fi

@@ -15,7 +15,12 @@ names come from tools/vanilla_frames.py's CHARS (held to the atlas by tools/audi
   absent-move    every move detector emptied (no own/opponent type-4 projectile, no Gallon Dark Force, no taunt press,
                  no D,D,D before a confirm) — K1 K3 K4 K7 K10 K11 must fail;
   wrong-owner    one non-clear writer PC of the ownership census credited to a second character — K12 must fail;
-  pool-miscount  K2's type-41 count shifted by one — K2 must fail.
+  pool-miscount  K2's type-41 count shifted by one — K2 must fail;
+  passes-inflated   K6 judged against each frame's engine passes + 1 — K6 must fail;
+  fall-shifted      K9's P2 HP falls moved 30 frames later — K9 must fail;
+  taps-as-dashes    K5's script count taking every tap for a dash — K5 must fail;
+  other-side-credit K8's writes credited to the OPPOSITE block's character — K8 must fail.
+(rule-checker run 2026-10-08-902 Q4: the last four, each judged check passed unchanged under the first three.)
 """
 import argparse
 import collections
@@ -54,7 +59,8 @@ ap = argparse.ArgumentParser()
 ap.add_argument("--work", required=True)
 ap.add_argument("--replays", required=True)
 ap.add_argument("--legs", required=True)
-ap.add_argument("--pert", default="none", choices=("none", "absent-move", "wrong-owner", "pool-miscount"))
+ap.add_argument("--pert", default="none", choices=("none", "absent-move", "wrong-owner", "pool-miscount", "passes-inflated",
+                                                   "fall-shifted", "taps-as-dashes", "other-side-credit"))
 ap.add_argument("--out", required=True)
 A = ap.parse_args()
 W, PERT = A.work, A.pert
@@ -168,6 +174,21 @@ for tag in T:
 res(n1 > 0 and viol1 == 0 and set(offs1) == {"rise"}, "K1",
     f"+0x149: {n1} new objects of the counted type {dict(per1)}, +0x149 rising on the same frame {dict(offs1)}; side-frames where it exceeds the live count: {viol1}")
 cnt("pact_spawns", " ".join(f"{k}:{v}" for k, v in sorted(per1.items())))
+# how long each Demitri flare outlives his +0x149 (frames from +0x149's last nonzero frame to the flare's last live frame)
+outl = []
+for tag in T:
+    for s in (1, 2):
+        Tl = T[tag]
+        for a, b in spans(Tl, lambda d: d[f"char{s}"] == DEMITRI and own_types(d, s, {FLARE}) > 0):
+            last = max((d["f"] for d in Tl if a <= d["f"] <= b and d[f"pact{s}"]), default=None)
+            outl.append(f"{tag}:P{s}:{a}-{b}:{b - last if last is not None else '-'}")
+cnt("pact_demitri_flare_outlives", " ".join(outl))
+mx1 = collections.Counter()
+for tag in T:
+    for s in (1, 2):
+        for d in T[tag]:
+            c = name(d[f"char{s}"]); mx1[c] = max(mx1[c], d[f"pact{s}"])
+cnt("pact_max_by_char", " ".join(f"{k}:{v}" for k, v in sorted(mx1.items()) if v))
 w149 = collections.Counter((pc, v) for tag in T for s in (1, 2) for f, pc, v in wfield(TW[tag], s, 0x149) if not clear(pc))
 cnt("pact_writers", " ".join(f"{pc}={v}:{n}" for (pc, v), n in sorted(w149.items())))
 
@@ -210,6 +231,15 @@ for tag in T:
                 miss3 += 1
 cnt("pind_writers", " ".join(f"{pc}:{'/'.join(sorted(c))}" for pc, c in sorted(by0ac.items())))
 cnt("pind_flare_lead", " ".join(f"{k}:{v}" for k, v in sorted(lead3.items())))
+dem3 = []   # each span Demitri's 0x03018A opens: its length and the PC that clears it
+for tag in T:
+    for s in (1, 2):
+        ws = wfield(TW[tag], s, 0xAC)
+        for f, pc, v in ws:
+            if pc == "03018a" and v:
+                end = next(((g, p) for g, p, u in ws if g > f and u == 0), (None, None))
+                dem3.append(f"{tag}:P{s}:{f}:{(end[0] - f) if end[0] else '-'}:{end[1]}")
+cnt("pind_demitri_spans", " ".join(dem3))
 res(by0ac and all(len(c) == 1 for c in by0ac.values()) and n3 > 0 and miss3 == 0, "K3",
     f"+0x0AC: {len(by0ac)} nonzero writer PCs, each with one character: {sorted({next(iter(c)) for c in by0ac.values() if len(c) == 1})}; "
     f"shared {sorted(pc for pc, c in by0ac.items() if len(c) > 1)}; Demitri's 0x03018A writes {n3} -> flare {dict(lead3)} (frames), unpaired {miss3}")
@@ -249,10 +279,13 @@ for tag in T:
             if pc == "030ef4" and f in BYF[tag]:
                 d = BYF[tag][f]; n5 += 1
                 bad5 += v not in (2, 3); side5[(v, "right" if d[f"x{3 - s}"] > d[f"x{s}"] else "left")] += 1
-                cnt(f"dash_write_{tag}_P{s}_f{f}", f"value {v} x {d[f'x{s}']} opponent x {d[f'x{3 - s}']} face {d[f'face{s}']}")
+                x30 = BYF[tag].get(f + 30, d)[f"x{s}"]
+                cnt(f"dash_write_{tag}_P{s}_f{f}", f"value {v} x {d[f'x{s}']} opponent x {d[f'x{3 - s}']} face {d[f'face{s}']} dx30 {x30 - d[f'x{s}']}")
         nondem += sum(1 for d in T[tag] if d[f"dash{s}"] and d[f"char{s}"] != DEMITRI)
 def dashes(Sd, s):
     taps_ = [f for f in sorted(Sd) if (Sd[f][s] & set("LR")) and not (Sd.get(f - 1, {s: set()})[s] & set("LR"))]
+    if PERT == "taps-as-dashes":
+        return len(taps_)
     n, i = 0, 0
     while i + 1 < len(taps_):
         a, b = taps_[i], taps_[i + 1]
@@ -262,6 +295,8 @@ def dashes(Sd, s):
             i += 1
     return n
 dd = dashes(S["dash"], 1); dw = sum(1 for f, pc, v in wfield(TW["dash"], 1, 0x372) if pc == "030ef4")
+w372 = collections.Counter((pc, v) for tag in T for s in (1, 2) for f, pc, v in wfield(TW[tag], s, 0x372) if not clear(pc))
+cnt("dash_writers", " ".join(f"{pc}={v}:{n}" for (pc, v), n in sorted(w372.items())))
 cnt("dash_writes", f"030ef4 writes {n5}, not 2 or 3 {bad5}; (value, opponent side) {dict(sorted(side5.items()))}; 118_dash P1 script dashes {dd} writes {dw}; nonzero on non-Demitri side-frames {nondem}")
 res(n5 > 0 and bad5 == 0 and nondem == 0 and dd == dw and dd > 0, "K5",
     f"+0x372: {n5} 0x030EF4 writes, {bad5} neither 2 nor 3 — (value, opponent side) {dict(sorted(side5.items()))}, reported; nonzero on {nondem} non-Demitri side-frames; 118_dash P1 dashes in the script {dd}, writes {dw}")
@@ -273,7 +308,8 @@ for tag in T:
         Tl = T[tag]
         for a, b in spans([d for d in Tl if inmatch(d)], lambda d: d[f"c15c{s}"] > 0):
             n6 += 1; B = BYF[tag]; frames = [f for f in range(a + 1, b + 1) if f in B and f - 1 in B]
-            short = sum(1 for f in frames if (B[f - 1][f"c15c{s}"] - B[f][f"c15c{s}"]) < ((B[f]["pass"] - B[f - 1]["pass"]) & 0xff))
+            pinc = 1 if PERT == "passes-inflated" else 0
+            short = sum(1 for f in frames if (B[f - 1][f"c15c{s}"] - B[f][f"c15c{s}"]) < ((B[f]["pass"] - B[f - 1]["pass"]) & 0xff) + pinc)
             hpl = sum(1 for f in frames if B[f][f"hp{s}"] < B[f - 1][f"hp{s}"])
             atk = sum(1 for f in frames if B[f][f"atk{s}"] > B[f - 1][f"atk{s}"])
             bad6 += short + hpl + atk
@@ -292,16 +328,21 @@ for tag in T:
             g = d[f"dfm{s}"] != 0 and d[f"char{s}"] == GALLON and not ABSENT
             gal += g; oth += d[f"dfm{s}"] != 0 and d[f"char{s}"] != GALLON
             mism7 += (d[f"c1a2{s}"] != 0) != g
+gsp = [f"{tag}:P{s}:{a}-{b}" for tag in T for s in (1, 2)
+       for a, b in spans([d for d in T[tag] if inmatch(d)], lambda d: d[f"c1a2{s}"] != 0)]
+cnt("c1a2_spans", " ".join(gsp))
 cnt("c1a2", f"Gallon Dark Force side-frames {gal}, other Dark Force side-frames {oth}, mismatches {mism7}")
 res(gal > 0 and oth > 0 and mism7 == 0, "K7", f"+0x1A2: nonzero on exactly the {gal} Gallon Dark Force side-frames; {oth} other characters' Dark Force side-frames read 0; mismatches {mism7}")
 
 # K8 +0x154: every nonzero write is by a writer PC credited to ONE character; the read legs' reader PCs
+def credit(s):   # the block whose character a write is credited to (other-side-credit: the opposite one)
+    return 3 - s if PERT == "other-side-credit" else s
 by154 = collections.defaultdict(set); fr154 = collections.Counter()
 for tag in T:
     for s in (1, 2):
         for f, pc, v in wfield(TW[tag], s, 0x154):
             if v and not clear(pc) and f in BYF[tag]:
-                by154[pc].add(name(BYF[tag][f][f"char{s}"]))
+                by154[pc].add(name(BYF[tag][f][f"char{credit(s)}"]))
         for d in T[tag]:
             if d[f"c154{s}"]:
                 fr154[name(d[f"char{s}"])] += 1
@@ -317,7 +358,7 @@ for off, fld in ((0x136, "c136"), (0x19A, "c19a")):
         for s in (1, 2):
             for f, pc, v in wfield(TW[tag], s, off):
                 if v and not clear(pc) and f in BYF[tag]:
-                    byw[pc].add(name(BYF[tag][f][f"char{s}"]))
+                    byw[pc].add(name(BYF[tag][f][f"char{credit(s)}"]))
     elsewhere = sum(1 for tag in T if tag != "mokt" for s in (1, 2) for d in T[tag] if d[f"{fld}{s}"])
     cnt(f"{fld}_writers", " ".join(f"{pc}:{'/'.join(sorted(c))}" for pc, c in sorted(byw.items())) + f"; nonzero side-frames outside 118_mo_kthrow {elsewhere}")
     res(byw and all(len(c) == 1 for c in byw.values()), "K8",
@@ -335,7 +376,8 @@ for tag in ("proj", "c128"):
 Tl = T["mokt"]
 s19a = spans(Tl, lambda d: d["c19a2"] == 0xff)
 s136 = spans(Tl, lambda d: d["c1361"] == 1)
-hit9 = [next((f - b for f in drops(Tl, 2) if b <= f <= b + 1), None) for a, b in s19a]   # the throw's damage lands as the flag clears
+fsh = 30 if PERT == "fall-shifted" else 0
+hit9 = [next((f + fsh - b for f in drops(Tl, 2) if b <= f + fsh <= b + 1), None) for a, b in s19a]   # the throw's damage lands as the flag clears
 link9 = [next((p - (b + 1) for p, q in s136 if p >= b), None) for a, b in s19a]
 cnt("kthrow", f"+0x19A spans {s19a} with a P2 hp fall {hit9}; +0x136 spans {s136} (lengths {[q - p + 1 for p, q in s136]}); +0x136 rise - +0x19A end {link9}")
 w9 = collections.Counter((pc, v) for s in (1, 2) for off in (0x136, 0x19A) for f, pc, v in wfield(TW["mokt"], s, off) if not clear(pc))

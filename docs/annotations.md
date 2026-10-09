@@ -23,15 +23,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3596 |
-| named by a document or manifest only | 2290 |
-| named by both a document/manifest and code | 868 |
+| distinct program-space addresses named | 3595 |
+| named by a document or manifest only | 2288 |
+| named by both a document/manifest and code | 869 |
 | named by CODE ONLY (the gap list below) | 438 |
 | carried by atlas | 722 |
 | carried by engine_internals | 826 |
 | carried by other docs | 1059 |
 | carried by manifests | 1850 |
-| carried by code | 1306 |
+| carried by code | 1307 |
 
 ## Addresses
 
@@ -599,7 +599,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x01904E` | build/manifest/reconciliation.toml — map |
 | `PRG:0x019072` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); tools/hitbox_records.py |
 | `PRG:0x0190CA` | docs/game/engine_internals.md — measured on Phobos' FINAL GUARDIAN; twins verified in both engines); tools/hitbox_records.py |
-| `PRG:0x019128` | docs/project/patch_notes.md — donovan-m2 stage 4 — damage-pipeline R1 rows; BOTH GATES GREEN (2026-07-27, session 10); docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/reconciliation.toml — map |
+| `PRG:0x019128` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; docs/project/patch_notes.md — donovan-m2 stage 4 — damage-pipeline R1 rows; BOTH GATES GREEN (2026-07-27, session 10); docs/project/tables/reconciliation.md — The damage pipeline twins (measured, session 10 + 14z-85f); build/manifest/reconciliation.toml — map; tests/audit_mizuumi_struct.sh |
 | `PRG:0x019138` | docs/project/gotchas.md — A ROLLED-BACK RECONCILIATION IS A LIVE DEFECT WITH A NAMED PRICE, NOT A SETTLED STATE — the 14x grab-pointer rollback pays every tenant throw's meter to the wrong fighter (paid: 14z-166, GitHub #136) |
 | `PRG:0x019144` | docs/project/hardening_register.md — 5. Known-uncovered DYNAMIC surfaces (H4) [vs2]; tests/audit_projectile_clash.sh |
 | `PRG:0x019152` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; tests/audit_mizuumi_struct.sh |
@@ -1775,7 +1775,6 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x04E650` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] [vs2] |
 | `PRG:0x04ECD8` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x04ECDA` | docs/platform/mister.md — The tenant-content measurements: the tenant anchor, both group-C fetches, bank 1 under load, the QSound extension, the OBJ-list oracle, the synthesis fit (measured 14z-108/109, entered 14z-114); docs/project/mister_core.md — 12. The holes — what has never been tried; tests/test_mister_obj_oracle.sh |
-| `PRG:0x04ED84` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x04FAC4` | docs/game/atlas/id_space.md — The seven vsavj folding sites; docs/game/atlas/id_space.md — What a per-tenant manifest must declare; docs/game/gotchas.md — SLOT used, and reading it that way deferred a fix for two sessions (14z-76); docs/project/doc_audit_14z118.md — 2. Cross-document numbers to lock (candidates for the script); docs/project/inferred_claims.md — G1 (9) — the atlas commits; docs/project/tenant_manifest.md — The schema; +1 more |
 | `PRG:0x04FFA8` | docs/game/atlas/id_space.md — The seven vsavj folding sites; docs/project/doc_audit_14z118.md — 2. Cross-document numbers to lock (candidates for the script); docs/project/living_docs_scope.md — 11. L3 — ROM RE-DERIVATION: scope (the plan before the work); docs/project/living_docs_scope.md — 11.5 The seed set (~15, revised by the census); tests/test_id_space.sh; tools/audit_id_space.py; +1 more |
 | `PRG:0x0502A8` | docs/game/atlas/id_space.md — The seven vsavj folding sites; tests/test_checkdocs_rom.sh; tools/checkdocs_rom.py |

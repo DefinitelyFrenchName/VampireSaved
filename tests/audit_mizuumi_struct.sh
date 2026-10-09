@@ -14,14 +14,16 @@
 #   EXTENDED 14z-196 (HOMING item 4 of the 14z-194 pilot, build/agent194/t118/HOMING.md): +0x3B0 (RECORDED, "Lose a bat
 #   Flag" not adopted) reads 1 first, goes 1->0 0-1 frames after the side's HP falls to 144 or below and reads 144 there,
 #   and becomes 0xFF on the KO loser on the KO frame or the next, never on the winner (C9); +0x3B6 (RECORDED, "Deathblow
-#   Type" not adopted) is 3 on a CPU KO winner from the KO frame, 0 on a human KO winner, the loser and at time-overs
-#   (C10); +0x3B2/+0x3E2 (consistent with "Auto-Guard Flag") read 1 from a side's AUTO press (D,D,button after its select
+#   Type" not adopted) reads 0 on the loser at EVERY KO and 0 through the time-overs of 03 and 104, the WINNER's value at
+#   each KO frozen, not judged (0, 1 and 3 seen) — 14z-196 withdrew the 14z-194 "3 on a CPU KO winner" as a claim: CPU
+#   winners read 3 on every KO here, but the static writer PRG:0x019128-0x019152 has no CPU test (7/6/5 under three flags,
+#   else the KO hit's attack-record byte +0x1F) (C10); +0x3B2/+0x3E2 (consistent with "Auto-Guard Flag") read 1 from a side's AUTO press (D,D,button after its select
 #   confirm, derived from the script) through the match's end and 0 on every side that did not choose AUTO (C11); +0x3E1
 #   (consistent with "Character Palette") is K-1 for a side that confirmed with button K (C12) and 8 for a side that chose
 #   AUTO (C12b: both such sides confirm with button 1 — whether AUTO adds 8 or replaces K-1 is not measured); +0x390
 #   (consistent with "LONGWORD Player Score", 1P only) rises only within 3 frames of an opponent HP drop on the human side
 #   of the 1P replay 02, never on its CPU side, every value BCD, and reads 1 throughout the 2P matches 03 and 37 (C13);
-#   and the role-attributed writers 0x019152 (+0x3B6, KO winner, on the KO frame), 0x00A6A0 (+0x3B0's in-match 1->0 and
+#   and the role-attributed writers 0x019152 (+0x3B6, once per KO, on the KO frame, on the winner, its value), 0x00A6A0 (+0x3B0's in-match 1->0 and
 #   the loser's 0xFF), 0x020FB6/0x020FBA (+0x3B2/+0x3E2, once per human side, 1 on the AUTO press) and 0x02101A (+0x3E1,
 #   once per human side, its in-match value) sit on the derived side with the derived value (C14).
 # HOW: on MAME, three FIELD legs under tests/lua/field_trace.lua (per frame, addresses computed from the block bases) —
@@ -38,6 +40,7 @@
 #   14z-196: nine more FIELD legs — 104_1p_auto_ko_win (1P, P1 AUTO, a time-over), 05_timeout_idle (1P idle, a CPU KO),
 #   105_legacy_2pwin_auto (2P, P1 AUTO, a human KO) and 118_sel_b1..6 (replay 03 with P1 confirming with button 1..6) —
 #   five more WRITE-TAP legs (02, 104, 05, 105, 118_sel_b4), every tap leg also over +0x3B0/+0x3B2/+0x3B6/+0x3E0/+0x3E2,
+#   two multi-KO 1P legs for C10 and C14, field and tap (128_shadow_vs_legacy_vsavj, 26_don_arcade_mash),
 #   and a POKE leg: replay 03 with the time-over WINNER's +0x3B6 poked to 0x5A on 41 frames around 03's time-over (side
 #   and frames derived from the real 03 leg). Roles are derived, never assumed: the outcome and its winner from both HP
 #   words and the round timer, a side's human/CPU control from the replay's own input script, the AUTO choice and the
@@ -52,19 +55,21 @@
 #
 # MUST-FIRE: perturbed-copy: sides-swapped — the checks run with each side's candidate fields read against the other side's HP and X must fail the hit-flag, hit-counter and streak checks, so the checks see which side is which (in-gate on the real traces; as a mode the gate FAILs)
 # MUST-FIRE: known-bad: refutation-pokes — the checks run with the poked 03 leg in place of the real one must fail the +0x15A refutation, and every value poked into +0x130 must read back, so the trace reads both addresses and the refutation could have come out the other way (in-gate; as a mode the gate FAILs)
-# MUST-FIRE: perturbed-copy: roles-inverted — C8 run with each tapped replay's winner and loser swapped, replay 02's checks run with its human and CPU sides swapped, and C9-C14 run with every derived role swapped (winner/loser, human/CPU, AUTO chooser), must fail (C8, C8b, C4, C9, C10, C11 and C14), so every role statement — 0x027CCC on the winner, 0x031206 on 03's winner only, the +0x39F/+0x3F0/+0x05 writers ram.md attributes to a winner or a loser (C8b), +0x380 2 on the human side, +0x3B0's 0xFF on the KO loser, +0x3B6's 3 on a CPU KO winner, +0x3B2/+0x3E2 on the AUTO chooser and their writers — is derived (human sides from the input scripts, winners from HP at the first decisive outcome, the AUTO choice from the script), not assumed (in-gate; as a mode the gate FAILs)
+# MUST-FIRE: perturbed-copy: roles-inverted — C8 run with each tapped replay's winner and loser swapped, replay 02's checks run with its human and CPU sides swapped, and C9-C14 run with every derived role swapped (winner/loser, human/CPU, AUTO chooser), must fail (C8, C8b, C4, C9, C10, C11 and C14), so every role statement — 0x027CCC on the winner, 0x031206 on 03's winner only, the +0x39F/+0x3F0/+0x05 writers ram.md attributes to a winner or a loser (C8b), +0x380 2 on the human side, +0x3B0's 0xFF on the KO loser, +0x3B6's 0 on the KO loser and its 0x019152 write on the winner, +0x3B2/+0x3E2 on the AUTO chooser and their writers — is derived (human sides from the input scripts, winners from HP at the first decisive outcome, the AUTO choice from the script), not assumed (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: known-bad: poke-3b6 — C10 run with the +0x3B6 poke leg in place of the real 03 leg must fail at 03's time-over, and every poked frame must read the poked 0x5A back, so the field read is +0x3B6 and "0 at a time-over" could have come out the other way (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: perturbed-copy: p2-confirm — C12 run with each side's +0x3E1 judged against the OTHER side's confirm button must fail (P1 confirms with 2..6 on 118_sel_b2..6, P2 with 1), so the check sees which button confirmed (in-gate; as a mode the gate FAILs)
 #
 # NOT COVERED: the ~70 other unadopted candidates (build-dir record of 14z-189: build/t118/; GitHub #118); what
 #   +0x130's per-fighter offset is (a box width is the guess, not measured); what +0x15A and +0x18D ARE; the finish TYPE behind +0x3BE/+0x3BF; character-specific slots (+0x34-+0x36,
-#   +0x360-+0x37F) for the characters this corpus does not play; a 1P match a human wins; FBNeo (one emulator).
-#   14z-196: what +0x3B0 and +0x3B6 MEAN (the bat loss and the KO kind behind the 3 are not identified); whether AUTO's 8 in
-#   +0x3E1 adds to K-1 (no AUTO leg confirms with a button other than 1); +0x390 beyond replay 02 (one 1P match, four rises);
-#   +0x3B6 on a CPU KO winner of another character or KO kind (02 and 05: Demitri's opponent, one kind each).
+#   +0x360-+0x37F) for the characters this corpus does not play; a 1P match a human wins for C1-C9 and C11-C13 (C10
+#   and C14 judge 128's three human KO wins); FBNeo (one emulator).
+#   14z-196: what +0x3B0 and +0x3B6 MEAN — the bat loss is not identified, and +0x3B6's VALUE at a KO is frozen, not
+#   judged (its static derivation from the KO hit's record byte +0x1F is not measured per hit); whether AUTO's 8 in
+#   +0x3E1 adds to K-1 (no AUTO leg confirms with a button other than 1); +0x390 beyond replay 02 (one 1P match, four
+#   rises); C9's +0x3B0 claims on the six single-outcome legs only; merged-m23.
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [KEEP=<dir>] [FREEZE=1] tests/audit_mizuumi_struct.sh
-#   emulator tier, MAME; ~4 min (19 legs in parallel, then the two poked legs)
+#   emulator tier, MAME; ~4 min (23 legs in parallel, then the two poked legs)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
@@ -95,7 +100,7 @@ for s in 1 2; do
     base=$([ "$s" = 1 ] && echo $((0xff8400)) || echo $((0xff8800)))
     for spec in 005:b:status 010:w:x 050:w:hp 06d:b:hitflag 11d:b:throwrange 130:w:dist 15a:b:timeover \
                 18d:b:winpose 1b6:w:hits 380:b:playing 39f:b:streak 3f0:b:streakm \
-                390:l:score 3b0:b:lbat 3b2:b:ag3b 3b6:b:dblow 3e1:b:pal 3e2:b:ag3e; do
+                390:l:score 3b0:b:lbat 3b2:b:ag3b 3b6:b:dblow 3e1:b:pal 3e2:b:ag3e 382:b:char; do
         F="$F,$(printf '%06x' $((base + 0x${spec%%:*}))):${spec#*:}$s"
     done
     for o in 004 06c 11c 130 15a 18c 1b6 380 39e 3f0 3b0 3b2 3b6 3e0 3e2; do   # the write tap: the word holding each field, decimal length
@@ -119,12 +124,15 @@ tapleg() {  # tapleg <name> <replay> <frames>
 echo "== 1. the legs (pristine vsavj, MAME)"
 # the 14z-189 legs, then (14z-196, HOMING item 4) the outcome, AUTO and palette legs: 104 (1P, AUTO, time-over), 05 (1P
 # idle, a CPU KO), 105_legacy_2pwin_auto (2P, P1 AUTO, a human KO) and 118_sel_b1..6 (replay 03 with P1 confirming with
-# button 1..6), with write taps on 02, 104, 05, 105 and 118_sel_b4
+# button 1..6), with write taps on 02, 104, 05, 105 and 118_sel_b4; and (rule-checker run 2026-10-08-901 Q1/Q4) two multi-KO
+# 1P legs for C10 — 128_shadow_vs_legacy_vsavj (three human KO wins, one CPU KO win) and 26_don_arcade_mash — field and tap
 FLEGS="02_demitri_vs_cpu:02_demitri_vs_cpu:12000 03_two_player_vs:03_two_player_vs:12000 37_victor_ko_vsavj:37_victor_ko_vsavj:7000
        104:104_1p_auto_ko_win:13600 05:05_timeout_idle:12000 105auto:105_legacy_2pwin_auto:9600
-       selb1:118_sel_b1:3200 selb2:118_sel_b2:3200 selb3:118_sel_b3:3200 selb4:118_sel_b4:3200 selb5:118_sel_b5:3200 selb6:118_sel_b6:3200"
+       selb1:118_sel_b1:3200 selb2:118_sel_b2:3200 selb3:118_sel_b3:3200 selb4:118_sel_b4:3200 selb5:118_sel_b5:3200 selb6:118_sel_b6:3200
+       c128:128_shadow_vs_legacy_vsavj:21000 c26:26_don_arcade_mash:40600"
 TLEGS="tap03:03_two_player_vs:12000 tap37:37_victor_ko_vsavj:7000 tap02:02_demitri_vs_cpu:12000 tap104:104_1p_auto_ko_win:13600
-       tap05:05_timeout_idle:12000 tap105auto:105_legacy_2pwin_auto:9600 tapselb4:118_sel_b4:3200"
+       tap05:05_timeout_idle:12000 tap105auto:105_legacy_2pwin_auto:9600 tapselb4:118_sel_b4:3200
+       tapc128:128_shadow_vs_legacy_vsavj:21000 tapc26:26_don_arcade_mash:40600"
 for l in $FLEGS; do n="${l%%:*}"; r="${l#*:}"; leg "$n" "${r%%:*}" "${r#*:}" & done
 for l in $TLEGS; do n="${l%%:*}"; r="${l#*:}"; tapleg "$n" "${r%%:*}" "${r#*:}" & done
 wait
@@ -383,7 +391,8 @@ import collections, re, sys
 # check2 <W> <REPO> <the 03 leg's name> <invert roles 0|1> <perturbation none|p2-confirm> <out.tsv>
 W, REPO, leg03, inv, PERT, out = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4] == "1", sys.argv[5], sys.argv[6]
 RPL = {"02": "02_demitri_vs_cpu", "03": "03_two_player_vs", "37": "37_victor_ko_vsavj", "104": "104_1p_auto_ko_win",
-       "05": "05_timeout_idle", "105auto": "105_legacy_2pwin_auto", **{f"selb{k}": f"118_sel_b{k}" for k in "123456"}}
+       "05": "05_timeout_idle", "105auto": "105_legacy_2pwin_auto", **{f"selb{k}": f"118_sel_b{k}" for k in "123456"},
+       "c128": "128_shadow_vs_legacy_vsavj", "c26": "26_don_arcade_mash"}
 FIELDS = {"02": "02_demitri_vs_cpu", "03": leg03, "37": "37_victor_ko_vsavj", **{k: k for k in RPL if k not in ("02", "03", "37")}}
 BTN = set("123456")
 bad, counts = [], []
@@ -477,27 +486,36 @@ for k in ("02", "03", "37", "104", "05", "105auto"):
         res(ff is not None and ff - f0 in (0, 1) and wff == 0, "C9",
             f"replay {k}: KO at f{f0} — the loser P{l}'s +0x3B0 reads 0xFF from f{ff} (KO+{ff - f0 if ff is not None else '-'}); the winner P{w}'s reads 0xFF on {wff} frames")
 res(n9 > 0, "C9", f"{n9} in-match 1->0 transitions of +0x3B0 judged in all (nonzero sample)")
-# C10 +0x3B6, RECORDED ("Deathblow Type Notification" not adopted): at a KO the winner's value is 3 from the KO frame when
-# the winner is a CPU side (no input in the replay's script) and stays 0 when it is a human side; the loser's stays 0;
-# at a time-over both stay 0 for the whole leg. Independent: the KO from HP, the controlling side from the script.
-nko = 0
-for k in ("02", "03", "37", "104", "05", "105auto"):
-    Tl = T[k]; o = OUT[k]
-    if not o:
-        continue
-    w, l, f0, kind = o
-    mx = {s: max(d[f"dblow{s}"] for d in Tl) for s in (1, 2)}
-    if kind == "KO":
+# C10 +0x3B6, RECORDED ("Deathblow Type Notification" not adopted): at EVERY KO (a side's HP falling below 0 while the
+# other's holds — DERIVED from both HP words) the LOSER's value reads 0 on the KO frame and the WINNER's value there is
+# frozen per KO with the winner's character and control; at a time-over (03, 104: the first outcome) both read 0 through
+# the whole leg. NOT a CPU-ness claim (rule-checker run 2026-10-08-901 Q4): measured 14z-196, the CPU KO winners read 3 on
+# every KO here (two characters) and the human ones 0 or 1 (26's Jedah reads 1), but the static writer has no CPU test —
+# PRG:0x019128-0x019152 stores into the attacker's (the winner's) +0x3B6 7 if -$4B8F(a5) is set, else 6 if its +0x111,
+# else 5 if its +0x19F, else the KO hit's attack-record byte +0x1F (a3) — so the cause of the values is not established
+# and the winner's value is reported, not judged.
+def kos(Tl):
+    out = []
+    for a, b in zip(Tl, Tl[1:]):
+        for sd in (1, 2):
+            if a[f"hp{sd}"] >= 0 and b[f"hp{sd}"] < 0 and b[f"hp{3 - sd}"] >= 0:
+                out.append((3 - sd, sd, b["f"]) if not inv else (sd, 3 - sd, b["f"]))
+    return out
+KOS = {k: kos(T[k]) for k in ("02", "37", "05", "105auto", "c128", "c26")}
+nko = 0; vals10 = collections.Counter()
+for k, ks in KOS.items():
+    B = {d["f"]: d for d in T[k]}
+    for w, l, f0 in ks:
         nko += 1
-        want = 0 if w in HUMAN[k] else 3
-        at = next((d[f"dblow{w}"] for d in Tl if d["f"] == f0), None)
-        cnt(f"dblow_{k}", f"KO winner P{w} ({'human' if w in HUMAN[k] else 'CPU'}) {at}@KO max {mx[w]}; loser P{l} max {mx[l]}")
-        res(at == want and mx[w] == want and mx[l] == 0, "C10",
-            f"replay {k}: KO at f{f0}, winner P{w} {'human' if w in HUMAN[k] else 'CPU'} — +0x3B6 {at} at the KO frame (max {mx[w]}, wanted {want}); the loser P{l}'s max {mx[l]}")
-    else:
-        cnt(f"dblow_{k}", f"TIME both max {mx[1]}/{mx[2]}")
-        res(mx[1] == 0 and mx[2] == 0, "C10", f"replay {k}: time-over at f{f0} — +0x3B6 max P1 {mx[1]} P2 {mx[2]} over the whole leg")
-res(nko >= 2, "C10", f"{nko} KO legs judged (nonzero sample, a CPU and a human winner among them required: CPU {sum(1 for k in OUT if OUT[k] and OUT[k][3] == 'KO' and OUT[k][0] not in HUMAN[k])}, human {sum(1 for k in OUT if OUT[k] and OUT[k][3] == 'KO' and OUT[k][0] in HUMAN[k])})")
+        vw, vl = B[f0][f"dblow{w}"], B[f0][f"dblow{l}"]
+        vals10[vw] += 1
+        cnt(f"dblow_{k}_f{f0}", f"KO winner P{w} ({'human' if w in HUMAN[k] else 'CPU'}, char {B[f0].get(f'char{w}', '-')}) {vw}; loser P{l} {vl}")
+        res(vl == 0, "C10", f"replay {k}: KO at f{f0}, winner P{w} ({'human' if w in HUMAN[k] else 'CPU'}) +0x3B6 {vw}, the loser P{l}'s {vl}")
+for k in ("03", "104"):
+    o = OUT[k]; mx = {s: max(d[f"dblow{s}"] for d in T[k]) for s in (1, 2)}
+    cnt(f"dblow_{k}", f"TIME both max {mx[1]}/{mx[2]}")
+    res(o and o[3] == "TIME" and mx[1] == 0 and mx[2] == 0, "C10", f"replay {k}: time-over at f{o[2] if o else '-'} — +0x3B6 max P1 {mx[1]} P2 {mx[2]} over the whole leg")
+res(nko >= 6 and len(vals10) >= 2, "C10", f"{nko} KOs judged, winners' values {dict(sorted(vals10.items()))} (nonzero sample, two values or more)")
 # C11 +0x3B2 / +0x3E2 (consistent with mizuumi's "Auto-Guard Flag"): the side whose script, after its select confirm (its
 # first button press), presses D twice then a button before the match starts CHOSE AUTO — that side's two bytes read 0
 # before that button press and 1 on every frame from it through the last in-match frame (what follows the match is
@@ -590,13 +608,14 @@ for k in ("03", "37"):
         cnt(f"score_{k}_P{s}", f"{v}")
         res(v == [1], "C13", f"replay {k} (2P) P{s}: in-match +0x390 values {v}")
 # C14 THE ROLE-ATTRIBUTED WRITERS of the new fields, DERIVED per tapped leg (the C8b pattern): 0x019152 writes the KO
-# WINNER's +0x3B6 exactly once, on the KO frame, 3 for a CPU winner and 0 for a human one, and never the loser's nor at a
+# WINNER's +0x3B6 exactly once per KO (C10's KOs, every tapped leg), on the KO frame, with the value the field reads there, and never the loser's nor at a
 # time-over; 0x00A6A0's +0x3B0 writes are exactly C9's in-match 1->0 transitions (value 0) plus the KO loser's 0xFF frame;
 # 0x020FB6 / 0x020FBA write each HUMAN side's +0x3B2 / +0x3E2 exactly once — 1 on the AUTO chooser, on its press frame,
 # else 0 — and no CPU side's; 0x02101A writes each human side's +0x3E1 exactly once with its in-match value and no CPU
 # side's. A write in tap frame f lands in trace frame f+1.
 BASE = {1: 0xff8400, 2: 0xff8800}
-TAPS = {"03": "tap03", "37": "tap37", "02": "tap02", "104": "tap104", "05": "tap05", "105auto": "tap105auto", "selb4": "tapselb4"}
+TAPS = {"03": "tap03", "37": "tap37", "02": "tap02", "104": "tap104", "05": "tap05", "105auto": "tap105auto", "selb4": "tapselb4",
+        "c128": "tapc128", "c26": "tapc26"}
 FIELD2 = {0x3b0: "lbat", 0x3b2: "ag3b", 0x3b6: "dblow", 0x3e1: "pal", 0x3e2: "ag3e"}
 def taps(t):
     out = collections.defaultdict(list)   # (side, fld) -> [(trace frame, pc, value)]
@@ -624,14 +643,13 @@ for k, t in TAPS.items():
         cnt(f"writers2_{t}_P{side}_{fld}", " ".join(f"{pc}:{len(v)}=" + "/".join(f"{x:02x}" for x in sorted(set(v))) for pc, v in sorted(byp.items())))
     def by(side, fld, pc): return [(f, v) for f, p, v in tw[(side, fld)] if p == pc]
     o = OUT.get(k)
+    BB = {d["f"]: d for d in T[k]}
+    for s in (1, 2):   # 0x019152: exactly one write per KO, on the KO frame, on the WINNER, with its +0x3B6 value there
+        w019 = by(s, "dblow", "019152")
+        want = [(f0, BB[f0][f"dblow{s}"]) for w, l, f0 in KOS.get(k, []) if w == s]
+        if w019 != want: miss14.append(f"{k} P{s} 0x019152 {w019} wanted {want}")
     if k in OUT:
         for s in (1, 2):
-            w019 = by(s, "dblow", "019152")
-            if o and o[3] == "KO" and s == o[0]:
-                want = [(o[2], 0 if s in HUMAN[k] else 3)]
-            else:
-                want = []
-            if w019 != want: miss14.append(f"{k} P{s} 0x019152 {w019} wanted {want}")
             Tl = T[k]
             tr = sorted(b["f"] for a, b in zip(Tl, Tl[1:]) if a[f"lbat{s}"] == 1 and b[f"lbat{s}"] == 0 and inmatch(b))
             if o and o[3] == "KO" and s == o[1]:
@@ -640,7 +658,7 @@ for k, t in TAPS.items():
             wv = [(f, v) for f, v in by(s, "lbat", "00a6a0")]
             wantv = [(f, 0xff if (o and o[3] == "KO" and s == o[1] and f >= o[2]) else 0) for f in sorted(tr)]
             if wv != wantv: miss14.append(f"{k} P{s} 0x00A6A0 {wv} wanted {wantv}")
-    for s in (1, 2):
+    for s in ((1, 2) if k in OUT or k == "selb4" else ()):   # the AUTO/palette writers: the single-match legs only
         human = s in HUMAN[k]
         auto = AUTOS.get((k, s))
         for fld, pc in (("ag3b", "020fb6"), ("ag3e", "020fba")):
