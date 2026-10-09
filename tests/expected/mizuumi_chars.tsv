@@ -1,5 +1,6 @@
 # tests/expected/mizuumi_chars.tsv — the counts tests/audit_mizuumi_chars.sh measured on pristine vsavj (GitHub #118, HOMING item 5).
 # Evidence class: in-emulator. Frozen 14z-196 with FREEZE=1; counts, spans, value sets, writer and reader PCs only, no ROM bytes.
+base_rows_distinct	16 of 16
 pick_mokt	forced 05: in-match +0x60 bases 0009efe6; table row 0009efe6
 pick_anak	forced 06: in-match +0x60 bases 000a1254; table row 000a1254
 tap_field_alignment	proj:5510/5510 dash:4110/4110 mokt:4110/4110 anak:4110/4110 rnd:4110/4110 c01:7110/7110 c10:5910/5910 c26:40510/40510 c07:4110/4110 c08:6710/6710 c29:4110/4110 c128:20910/20910 c19:5720/5720 c21:13910/13910 c22:13710/13710 c24:18310/18310 c30:4510/4510 c50:3310/3310

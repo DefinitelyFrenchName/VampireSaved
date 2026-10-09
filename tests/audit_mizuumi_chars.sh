@@ -28,7 +28,7 @@
 #      that ran (Morrigan's kick throw 0x03B2DA writes the victim's +0x19A and is credited to the victim) — K8 and K12
 #      measure which characters' blocks a PC writes, not whose routine it is. A block's CHARACTER is read from its loaded +0x60 character-data base against
 #      vsavj's own table PRG:0x0BD97A (the data view, decrypted at run time), never from the poked +0x382 (every check reads
-#      the character through it; +0x382 only where a base is in no row, counted): K0 proves each forced pick by it, K0b
+#      the character through it; +0x382 never: a base in no row reads as unloaded, counted): K0 proves each forced pick by it, K0b
 #      holds +0x382 to it on every in-match side-frame but the arcade ladder's pre-write on a CPU side after the round
 #      timer reached 0 (counted, allowed; control prewrite-human), and K8/K12 credit their writers by it. Every writer set,
 #      reader set (the read legs: +0x154 and +0x0AC words on 128 and the flare leg), span and count is frozen in
@@ -68,6 +68,7 @@
 # MUST-FIRE: known-bad: read-other-game — KR with the flare leg's READ run replaced by a read run of a DIFFERENT game (the same shifted replay, run in-gate) must fail, so the reader census's third run is proved to have played the field run's game (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: perturbed-copy: clear-nonzero — the census's CLEAR-writer check run on the flare leg's tap trace with one non-zero write (PC 0x016E4C, value 0x01, P1 +0x360) inserted after that leg's first character load must fail K12, so the PCs the ownership census skips are held to writing only 0 by the detector itself (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: perturbed-copy: next-load-wrong — K0b with each waived span judged against the id after the one the side loads next must fail, so the waiver's "loads next" test is applied (in-gate; as a mode the gate FAILs)
+# MUST-FIRE: perturbed-copy: dup-base — K0c with row 0x01 of the +0x60 table overwritten by row 0x00 must fail, so the 16 legacy rows are held to naming 16 different characters (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: perturbed-copy: wrong-base — K0 with each forced pick judged against ANOTHER character's +0x60 table row (id ^ 1) must fail, so the pick is proved by the base the game loaded, not by the poked +0x382 (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: perturbed-copy: pool-miscount — K2 with every side's type-41 count shifted by one must fail, so +0x14B is compared with the count, not merely with itself (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: perturbed-copy: passes-inflated — K6 judged against each frame's engine passes ($FF8081) plus one must fail, so the "falls by at least the passes" check reads the pass counter (in-gate; as a mode the gate FAILs)
@@ -214,7 +215,7 @@ if [ -n "${VS_CTL:-}" ]; then
     cat "$W/mode.log"
     case "$VS_CTL" in absent-move) want='K1 K3 K4 K7 K10 K11' ;; wrong-owner) want='K12' ;; pool-miscount) want='K2' ;;
         passes-inflated) want='K6' ;; fall-shifted) want='K9' ;; taps-as-dashes) want='K5' ;; other-side-credit) want='K8' ;; wrong-base) want='K0' ;; prewrite-human) want='K0b' ;; tap-misaligned) want='KA' ;;
-        tap-other-game) want='KS' ;; next-load-wrong) want='K0b' ;; read-other-game) want='KR' ;; clear-nonzero) want='K12' ;; esac
+        tap-other-game) want='KS' ;; next-load-wrong) want='K0b' ;; read-other-game) want='KR' ;; clear-nonzero) want='K12' ;; dup-base) want='K0c' ;; esac
     ok=1; for k in $want; do grep -q "FAIL  \[$k\]" "$W/mode.log" || ok=0; done
     if [ "$rc" = 1 ] && [ "$ok" = 1 ]; then vs_ctl_fired "$VS_CTL" "the perturbed checks failed $want (mode)"
     else echo "REFUSED: CONTROL=$VS_CTL — the perturbation did not make every check it targets fail (rc $rc; wanted $want): a dead mode, not a verdict"; exit 3; fi
@@ -227,7 +228,7 @@ grep -q '\[K12\]' "$W/checks.log" || { echo "  FAIL  the checks did not reach K1
 echo "== 3. the must-fire controls (in-gate)"
 for c in "absent-move:K1 K3 K4 K7 K10 K11" "wrong-owner:K12" "pool-miscount:K2" "passes-inflated:K6" "fall-shifted:K9" \
          "taps-as-dashes:K5" "other-side-credit:K8" "wrong-base:K0" "prewrite-human:K0b" "tap-misaligned:KA" \
-         "tap-other-game:KS" "next-load-wrong:K0b" "read-other-game:KR" "clear-nonzero:K12"; do
+         "tap-other-game:KS" "next-load-wrong:K0b" "read-other-game:KR" "clear-nonzero:K12" "dup-base:K0c"; do
     name="${c%%:*}"; want="${c#*:}"
     an "$name" "$W/ctl_$name.tsv" > "$W/ctl_$name.log" 2>&1 && rc=0 || rc=1
     miss=""; for k in $want; do grep -q "FAIL  \[$k\]" "$W/ctl_$name.log" || miss="$miss $k"; done

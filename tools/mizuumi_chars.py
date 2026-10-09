@@ -27,6 +27,7 @@ names come from tools/vanilla_frames.py's CHARS (held to the atlas by tools/audi
                     P1's inputs from f3000 two frames later) — KS must fail;
   next-load-wrong   K0b's waived spans judged against the id AFTER the one the side loads next (id ^ 1) — K0b must fail;
   read-other-game   the flare leg's READ run replaced by one that played a DIFFERENT game (read_projshift.tap) — KR must fail;
+  dup-base          K0c with row 0x01 of the base table overwritten by row 0x00 — K0c must fail;
   clear-nonzero     a CLEAR writer's write of 0x01 (PC 0x016E4C, P1 +0x360) inserted into the flare leg's tap trace after its
                     first character load, before the CLEAR detector reads it — K12 must fail.
 (wrong-base: rule-checker run 2026-10-08-904 Q3/Q4 — the picks were read back from the poked byte itself.)
@@ -34,7 +35,7 @@ names come from tools/vanilla_frames.py's CHARS (held to the atlas by tools/audi
 THE CHARACTER OF A BLOCK is read from its loaded character-data base +0x60.l against the game's own table at
 PRG:0x0BD97A (docs/game/atlas/character_tables.md; --data, the vsavj data view, read at run time), never from the
 +0x382 byte the forced picks poke: K0 proves each pick by it, K0b holds +0x382 to it on every in-match side-frame, and
-the writer crediting of K8 and K12 uses it (a frame whose base is in no row falls back to +0x382, counted).
+the writer crediting of K8 and K12 uses it (a base in no row reads as UNLOADED, counted — never +0x382).
 THE CREDITING OF K8 AND K12 IS FROM THE SAME RUN THAT OBSERVED THE WRITE (rule-checker run 2026-10-08-908): the tap run
 also logs each block's +0x60 base words, so the base in force at a write is the last base the SAME run wrote before it,
 in the tap's own line order — no second MAME process is consulted. Where a check still joins the tap run with the field
@@ -93,7 +94,7 @@ ap.add_argument("--legs", required=True)
 ap.add_argument("--pert", default="none", choices=("none", "absent-move", "wrong-owner", "pool-miscount", "passes-inflated",
                                                    "fall-shifted", "taps-as-dashes", "other-side-credit", "wrong-base",
                                                    "prewrite-human", "tap-misaligned", "tap-other-game",
-                                                   "next-load-wrong", "read-other-game", "clear-nonzero"))
+                                                   "next-load-wrong", "read-other-game", "clear-nonzero", "dup-base"))
 ap.add_argument("--data", required=True, help="the vsavj DATA view (tools/cps2_decrypt.py --data-out): the +0x60 table")
 ap.add_argument("--out", required=True)
 A = ap.parse_args()
@@ -178,6 +179,11 @@ def wfield(tw, s, off):
 import struct
 _dv = open(A.data, "rb").read()
 BASES = [struct.unpack_from(">I", _dv, 0x0BD97A + i * 4)[0] for i in range(32)]   # PRG:0x0BD97A, ids 0x00-0x1F
+if PERT == "dup-base":
+    BASES[1] = BASES[0]             # two ids sharing a row: K0c must fail
+# K0c (rule-checker run 2026-10-08-913 Q1): the 16 rows 0x00-0x0F name 16 DIFFERENT bases, or a base could not name one
+# character and INV would merge two (judged below, after res() exists)
+DISTINCT16 = len(set(BASES[:16])) == 16
 INV = {}
 for i, b in enumerate(BASES):
     INV.setdefault(b, i)            # 0x10-0x1F alias 0x00-0x0F (Oboro 0x18 excepted), so the base names the 0x0N id
@@ -214,6 +220,8 @@ def wfieldc(tag, s, off):
 BYF = {tag: {d["f"]: d for d in T[tag]} for tag in T}
 
 # K0 the forced picks of the two rigs read back from +0x382 in the match (POKES, never the cursor)
+res(DISTINCT16, "K0c", f"rows 0x00-0x0F of PRG:0x0BD97A hold {len(set(BASES[:16]))} distinct bases of 16{' (mode dup-base: row 0x01 overwritten by row 0x00)' if PERT == 'dup-base' else ''}")
+cnt("base_rows_distinct", f"{len(set(BASES[:16]))} of 16")
 # K0 the forced picks PROVED by the +0x60 base the game loaded (the poke writes +0x382 only): P1's base on every
 # in-match frame equals vsavj's table row for the forced id (wrong-base: the row of id ^ 1)
 for tag, want in (("mokt", 0x05), ("anak", 0x06)):

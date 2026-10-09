@@ -23,11 +23,11 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3595 |
-| named by a document or manifest only | 2287 |
+| distinct program-space addresses named | 3596 |
+| named by a document or manifest only | 2288 |
 | named by both a document/manifest and code | 870 |
 | named by CODE ONLY (the gap list below) | 438 |
-| carried by atlas | 722 |
+| carried by atlas | 723 |
 | carried by engine_internals | 826 |
 | carried by other docs | 1059 |
 | carried by manifests | 1850 |
@@ -1556,6 +1556,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x031132` | docs/game/atlas/select_screen.md — THE RANDOM CELL '0x0B' — the cycling draw, decoded (14z-116) |
 | `PRG:0x03113E` | docs/game/atlas/select_screen.md — THE RANDOM CELL '0x0B' — the cycling draw, decoded (14z-116) |
 | `PRG:0x031206` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; tests/audit_mizuumi_struct.sh |
+| `PRG:0x03207E` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] |
 | `PRG:0x032E62` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] |
 | `PRG:0x032EC0` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] |
 | `PRG:0x0336A7` | build/manifest/qs_songs.toml — don_kernel_v0 |
