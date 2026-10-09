@@ -6802,3 +6802,14 @@ no `--cached`) over the gate's WHOLE `# FOLLOWS:` header, read from that line to
 those load, with a per-path same/DIFF table. A mode is shown failing by its own FAIL check lines and the absence of
 `CONTROL DEAD:`, never by its rc (`build/agent196/t118/mergecheck/worktree_follows.txt`, `.../mainrun/modes_fired.txt`;
 run 2026-10-09-772 OK).
+
+## A CONTROL MODE THAT CRASHED WAS COUNTED AS ITS CONTROL FIRING (paid: 14z-195's code review, GitHub #254; fixed 14z-196)
+
+A must-fire control is run as a mode (`CONTROL=<name>`) and must FAIL; the classifier read any non-zero exit with no
+traceback as HONOURED. A mode that died in the shell itself — `command not found` (exit 127), a syntax or parameter
+abort (exit 2 or 1) — therefore certified the control as firing when nothing had been perturbed or detected. The
+classifier (`tests/lib/classify.sh` `vs_classify_control`, given the gate script as invoked by both runners) now reads
+the shell's own error line about the gate script as DIED at any exit status, on bash and dash; a child script's error
+quoted inside a real FAIL, and MAME's teardown segfault line, are still honoured. Ground truth: `tests/test_static_runner.sh`
+§12b and `tests/test_emulator_runner.sh` §14b, each with the control `crash-unread`. Rule: an exit status says only
+that something stopped; a control is honoured by its own detection lines, never by a non-zero code alone.

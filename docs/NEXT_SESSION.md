@@ -44,7 +44,7 @@ there in parallel.**
 
 ## WHAT CLOSED THIS SITTING (14z-196)
 
-- **Closing `done` at this close:** #254 (a control mode's own shell error is DIED at any exit), once the close tier's executed controls hold its rule (STATE 14z-196 row (8)).
+- **Closed `done`:** #254 (a control mode's own shell error is DIED at any exit; the close tier executed 350 controls, 0 died).
 - **Filed:** #260.
 - **Parked:** #124.
 - **Ruled:** #129 lowest priority, captures first; the order of work (#228 first); #228 step 4 waits for its once-or-recurring assessment; #124 parked; #260 filed; #245-#255's revised severities; #254 closed at the close; the ONDEMAND scope for pristine-only gates, the chars gate parked; the pristine-only gates' scopes (a past break by a change of ours keeps a gate at release, a gate's own red does not; 23 rows to `ondemand`, audit_palette_seq_ids to release). Each in the maintainer's own words is its `DECISIONS_HISTORY.md` entry "Ruled 2026-10-08 (14z-196) — ..." (#129, the order of work) or "Ruled 2026-10-09 (14z-196) — ..." (the rest); `tools/agent/rulings_verbatim.py` checks those quotes.

@@ -11,7 +11,7 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**260 tickets** — status: open 26 · parked 10 · done 197 · declined 9 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 187 · cosmetic 16 · evolution 57 · **backfill debt: 0 rows**.
+**260 tickets** — status: open 25 · parked 10 · done 198 · declined 9 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 187 · cosmetic 16 · evolution 57 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
@@ -23,7 +23,6 @@ backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py pag
 | [#257](https://github.com/DefinitelyFrenchName/VampireSaved/issues/257) | bug | open | rulings_verbatim leaves a second maintainer quote on the same line unchecked | `tools/agent/rulings_verbatim.py` | none | none | none | 14z-195 |
 | [#256](https://github.com/DefinitelyFrenchName/VampireSaved/issues/256) | bug | open | Close check open-tickets reads a cited ticket range as its two ends only | `tools/close_standing.py` | none | none | none | 14z-195 |
 | [#255](https://github.com/DefinitelyFrenchName/VampireSaved/issues/255) | bug | open | [P3] Python release applier publishes output before rejecting an incorrect aggregate set key | `tools/apply_release.py` | none | none | none | 14z-195 |
-| [#254](https://github.com/DefinitelyFrenchName/VampireSaved/issues/254) | bug | open | [P2] Executable shell-crash controls are classified HONOURED on nonzero exits | `tests/lib/classify.sh` | none | none | none | 14z-195 |
 | [#253](https://github.com/DefinitelyFrenchName/VampireSaved/issues/253) | bug | open | [P2] MAME replay wrapper accepts an old checksum log when a zero-exit invocation writes nothing | `tools/run_replay_mame.sh` | none | none | none | 14z-195 |
 | [#252](https://github.com/DefinitelyFrenchName/VampireSaved/issues/252) | bug | open | [P2] A newer SKIP row hides stale emulator gates from freeze audit and rerun selection | `tools/audit_emulator_staleness.py` | none | none | none | 14z-195 |
 | [#251](https://github.com/DefinitelyFrenchName/VampireSaved/issues/251) | bug | open | [P2] Emulator staleness audit misses followed inputs reverted after a dirty successful run | `tools/audit_emulator_staleness.py` | none | none | none | 14z-195 |
@@ -58,6 +57,7 @@ backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py pag
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#254](https://github.com/DefinitelyFrenchName/VampireSaved/issues/254) | bug | done | [P2] Executable shell-crash controls are classified HONOURED on nonzero exits | `tests/test_static_runner.sh § crash-unread` · `tests/test_emulator_runner.sh § crash-unread` | `DECISIONS_HISTORY.md § Ruled 2026-10-09 (14z-196) — #254 committed now, closed at the session close` | `docs/project/gotchas.md § A CONTROL MODE THAT CRASHED WAS COUNTED AS ITS CONTROL FIRING` | `docs/project/gotchas.md § A CONTROL MODE THAT CRASHED WAS COUNTED AS ITS CONTROL FIRING` | 14z-196 |
 | [#242](https://github.com/DefinitelyFrenchName/VampireSaved/issues/242) | bug | done | retraction_grep never lists a retracted wording broken by a quote prefix or HTML markup | `tests/test_close_tools.sh` | none | `tools/retraction_grep.py § a Markdown quote prefix` | `docs/project/gotchas.md § Paid again 14z-194, fixed 14z-195 (#242)` | 14z-194,14z-195 |
 | [#241](https://github.com/DefinitelyFrenchName/VampireSaved/issues/241) | bug | done | Cross-check record derivation reads bit 7 of Zabel's pursuit damage bytes as damage (258/130 for a 0/2 hit) | `tests/test_power_decode.sh` | none | `docs/game/engine_internals.md § The power byte, whole` | `docs/project/gotchas.md § A RECORD BYTE CALLED "POWER" WAS READ AS A DAMAGE AMOUNT` | 14z-194,14z-195 |
 | [#237](https://github.com/DefinitelyFrenchName/VampireSaved/issues/237) | bug | done | Emulator staleness audit: one edited row of tests/ci_emulator.tsv makes every emulator gate stale | `tests/test_emulator_staleness.sh` | `DECISIONS_HISTORY.md § Ruled 2026-10-07 (14z-194) — the merged-m23 release: the 213 stale emulator verdicts approved at release; the recipe and launcher findings ticketed, not fixed first` | `docs/project/gate_qualification_scope.md § The registry is judged per row` | `docs/project/gotchas.md § AN IMPLIED WHOLE-FILE INPUT STALES EVERY GATE` | 14z-194,14z-195 |

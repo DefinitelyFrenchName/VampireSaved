@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-492 entries (47 game / 131 platform / 314 project), counted from the buckets at generation.
+493 entries (47 game / 131 platform / 315 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 47 entries
 
@@ -206,7 +206,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - MAME OPENS ON A RED "ROMs/disk images ... incorrect" BOX AT EVERY START OF A SET WHOSE CRCs ITS DRIVER DOES NOT CARRY, AND NO OPTION SKIPS IT (seen: 14z-193, #234; source read 14z-194)
 - A DT_NEEDED SELF-CONTAINMENT CHECK CANNOT SEE WHAT SDL LOADS AT RUN TIME (paid: 14z-195, #226)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 314 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 315 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -522,3 +522,4 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A STATEMENT TO THE MAINTAINER RAN AHEAD OF ITS WORK — a result told before its output, an offer made and not kept (paid: 14z-195, the close's procedure check, rule-checker runs 2026-10-08-760 to -763)
 - A FORK'S COMMIT WAS CHERRY-PICKED WITHOUT BEING READ AGAINST ITS SPEC (paid: 14z-195, #229, rule-checker run 2026-10-08-760 QP5)
 - A MERGE PACKET COMPARED THE INDEX, AND READ ONE LINE OF A WRAPPED FOLLOWS HEADER (paid: 14z-196, #118, rule-checker runs 2026-10-08-768, -769 and 2026-10-09-771)
+- A CONTROL MODE THAT CRASHED WAS COUNTED AS ITS CONTROL FIRING (paid: 14z-195's code review, GitHub #254; fixed 14z-196)
