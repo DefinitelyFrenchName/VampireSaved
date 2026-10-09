@@ -105,4 +105,5 @@ slotw_37e	Demitri:030efc,030fa2; Jedah:05159a
 slotw_37f	Demitri:030efc,030fa2; Felicia:041040; Jedah:05159a
 played	Anakaris:3265 Aulbath:4555 Bishamon:1207 Bulleta:18349 Demitri:16164 Felicia:3982 Gallon:3668 Jedah:55219 Lilith:7032 Morrigan:11601 Q-Bee:9282 Sasquatch:6162 Victor:46710 Zabel:10796
 unloaded_lookups	P1 285794 P2 285794 (character lookups that met a base in no table row: read as 'unloaded', never as +0x382)
+census_clear_000d34_ff	before the first character load 1296, after it 0
 census_clear_writers	000d34=00:1296/ff:1296 000d3a=00:2592 000dd8=00:576 000dda=00:720 016e4c=00:11268 016e4e=00:11268 0222da=00:2048

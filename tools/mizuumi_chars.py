@@ -27,7 +27,8 @@ names come from tools/vanilla_frames.py's CHARS (held to the atlas by tools/audi
                     P1's inputs from f3000 two frames later) — KS must fail;
   next-load-wrong   K0b's waived spans judged against the id AFTER the one the side loads next (id ^ 1) — K0b must fail;
   read-other-game   the flare leg's READ run replaced by one that played a DIFFERENT game (read_projshift.tap) — KR must fail;
-  clear-nonzero     one CLEAR writer's write into the census range planted as non-zero — K12 must fail.
+  clear-nonzero     a CLEAR writer's write of 0x01 (PC 0x016E4C, P1 +0x360) inserted into the flare leg's tap trace after its
+                    first character load, before the CLEAR detector reads it — K12 must fail.
 (wrong-base: rule-checker run 2026-10-08-904 Q3/Q4 — the picks were read back from the poked byte itself.)
 
 THE CHARACTER OF A BLOCK is read from its loaded character-data base +0x60.l against the game's own table at
@@ -707,21 +708,28 @@ unnamed = sorted(pc for pc in pcchars if pcoffs[pc] and not (pcoffs[pc] & NAMEDB
 # rule-checker run 2026-10-08-911 Q1/Q4) write only 0 into the census range — except the boot RAM test PRG:0x000D34, which
 # writes 0xFF and 0x00 before the run has loaded any character (before its first +0x60 base write); every such write
 # counted per PC, frozen; clear-nonzero plants one non-zero CLEAR write and must fail
-clr = collections.defaultdict(collections.Counter); badclr = []
+clr = collections.defaultdict(collections.Counter); badclr = []; boot_ff = {"before": 0, "after": 0}; planted_at = None
 for tag in T:
     first_load = next((f for i, (f, pc, b, v) in enumerate(TW[tag]) if any(c is not None for c in TC[tag][i])), 10**9)
-    for f, pc, b, v in TW[tag]:
+    trace = list(TW[tag])   # the detector's input; clear-nonzero plants INTO it (rule-checker run 2026-10-08-912 Q4)
+    if PERT == "clear-nonzero" and tag == "proj":
+        at = next(i for i, e in enumerate(trace) if e[0] > first_load)   # after the first character load
+        trace.insert(at, (trace[at][0], "016e4c", BASE[1] + 0x360, 0x01))
+        planted_at = trace[at][0]
+    for f, pc, b, v in trace:
         if not clear(pc):
             continue
         for s in (1, 2):
             if b - BASE[s] in TAPPED:
                 clr[pc][v] += 1
+                if pc == "000d34" and v == 0xff:
+                    boot_ff["before" if f < first_load else "after"] += 1
                 if v and not (pc == "000d34" and f < first_load):
                     badclr.append(f"{tag}:{pc}@{f}={v:02x}")
-if PERT == "clear-nonzero":
-    badclr.append("planted:016e4c=01")
+cnt("census_clear_000d34_ff", f"before the first character load {boot_ff['before']}, after it {boot_ff['after']}")
 cnt("census_clear_writers", " ".join(f"{pc}=" + "/".join(f"{v:02x}:{n}" for v, n in sorted(c.items())) for pc, c in sorted(clr.items())))
-res(not badclr, "K12", f"the CLEAR writers the census skips write only 0 into the census range, but the boot RAM test 0x000D34 before the first character load: {dict((pc, dict(c)) for pc, c in sorted(clr.items()))}; violations {badclr[:4]}")
+res(not badclr and boot_ff["after"] == 0, "K12", f"the CLEAR writers the census skips write only 0 into the census range, but the boot RAM test 0x000D34 before the first character load ({boot_ff['before']} 0xFF before, {boot_ff['after']} after): {dict((pc, dict(c)) for pc, c in sorted(clr.items()))}; violations {badclr[:4]}"
+    + (f" — mode clear-nonzero: a 0x016E4C write of 0x01 planted into the flare leg's trace at f{planted_at}" if PERT == "clear-nonzero" else ""))
 res(pcchars and not shared and (PERT != "wrong-owner" or planted), "K12",
     f"the ownership census over {len(TAPPED)} tapped bytes (the CLEAR writers excluded, held above to writing 0): {len(pcchars)} non-clear writer PCs ({len(unnamed)} writing only unnamed bytes), each writing only into blocks that held one character (the block written, not the code that ran); shared {shared}"
     + (f" (planted {planted})" if PERT == "wrong-owner" else ""))
