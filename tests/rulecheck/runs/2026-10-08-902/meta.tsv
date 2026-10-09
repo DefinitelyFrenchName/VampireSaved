@@ -1,0 +1,9 @@
+decision	expectation
+subject	tests/expected/mizuumi_chars.tsv first frozen (GitHub #118, HOMING item 5), branch t118-196 at f7ca2fa1
+session	14z-196
+model	rule-checker@163e4ce9cf7b
+claim	On pristine vsavj under the pinned reference MAME over 18 legs (the five rigs with the two forced picks read back, and the 14z-194 pilot's 13 census replays), tests/expected/mizuumi_chars.tsv is what tests/audit_mizuumi_chars.sh and tools/mizuumi_chars.py measured for K0-K12, each judged against the projectile pool, both HP words, the character id, the engine pass counter or the replay's own input script, with the run of record PASS from a clean clone of f7ca2fa1 on ERIS and controls absent-move, wrong-owner and pool-miscount firing in-gate and failing as modes; the +0x149 type map TYPE149 in tools/mizuumi_chars.py was read off these same legs (so K1 holds the map on them, not on new data), +0x372's 2-right/3-left reading is refuted on one write and reported only, and the docs/game/atlas/ram.md rows were corrected to match; NOT tested: that +0x154 and +0x0AC are read on the opponent through +0x32, the meanings of +0x372, +0x15C's dizzy-versus-hold and the slots, the poked picks' id copies +0x3BD/+0x3E0, merged-m23 and FBNeo.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
