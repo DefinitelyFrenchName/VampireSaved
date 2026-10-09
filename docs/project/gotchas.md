@@ -6788,3 +6788,17 @@ checks its spec did not name. A fork is the orchestrator continuing, and C1 read
 statements (`docs/project/worker_spec.md`, ruled 2026-09-23), so a fork's breach of its brief is the orchestrator's.
 Rule: before merging a fork's commit, diff it against the brief's do-not lines. A breach is either undone or named to
 the maintainer in the same message as the merge.
+
+## A MERGE PACKET COMPARED THE INDEX, AND READ ONE LINE OF A WRAPPED FOLLOWS HEADER (paid: 14z-196, #118, rule-checker runs 2026-10-08-768, -769 and 2026-10-09-771)
+
+Merging the #118 struct gate from its fork, the packet said "every path the gate FOLLOWS is identical to the fork's
+verified commit". It was wrong three ways, one per run. Run 768: the gate's other inputs were not compared at all,
+and the gate had never run on main. Run 769: the comparison was `git diff --cached`, the INDEX, while the gate ran on
+the dirty WORKING TREE. That run also rested "each control fails as a mode" on exit status alone, though a mode exits 1
+whether its control fired or was dead. Run 771: the path list came from `grep '^# FOLLOWS'`, which reads only the
+header's FIRST line, but the header wraps across three comment lines, so `docs/checksums.txt` and
+`tests/expected/registry.tsv` were left out. Rule: a merge packet diffs the working tree (`git diff <base> -- <paths>`,
+no `--cached`) over the gate's WHOLE `# FOLLOWS:` header, read from that line to the next bare `#`, plus the files
+those load, with a per-path same/DIFF table. A mode is shown failing by its own FAIL check lines and the absence of
+`CONTROL DEAD:`, never by its rc (`build/agent196/t118/mergecheck/worktree_follows.txt`, `.../mainrun/modes_fired.txt`;
+run 2026-10-09-772 OK).

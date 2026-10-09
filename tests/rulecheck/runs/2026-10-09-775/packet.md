@@ -1,0 +1,16 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: the pristine-only emulator gates: which move to the ondemand scope — re-check after run 774 (the broad count withdrawn)
+Claim (the working agent's sentence): Under the maintainer's ruling (DECISIONS_HISTORY.md lines 556-566: pristine-only gates go ondemand except cases 'known to have been broken in the past', which stay at least at release), the recommendation put to the maintainer (build/agent196/pristine_census/RECOMMENDATION.md) asks FIRST what 'broken in the past' covers, since that decides most of the list: under the narrow reading (only a project change breaking the behaviour a gate covers counts) 18 gates move to ondemand — 4 from release, 14 from out, its section A; under the broad reading (a gate's own red counts too) fewer move, a number NOT counted because both readings record own reds as free-text notes, to be classed only if the maintainer rules that reading. The working agent recommends the narrow reading, because the maintainer's example is a change of ours moving vsavj characters. The narrow set is computed by compare.py from the two independent readings' class and record columns (the first CLASSIFY.md's class and proposal, the blind second second.tsv's class and broken_project_change), never from wording, and its two plants (a class flip, a written project-change record) each change that set by one gate (compare_plant.txt). Five cases are put to the maintainer under either reading (section B: the test_down_flash pair against ruling (a), quoted verbatim in tests/ci_emulator.tsv lines 80-86; audit_palette_seq_ids, out in the registry today, which the ruling would promote to release; test_select_arrays, whose only record is a scratch build; audit_ff0460_writer; audit_sdram_bank_load); audit_dispatch_census and test_select_wheel stay at release (section C). NOT tested: gates outside the 69 (the filter is a named-token regex, filter.txt); that each search for a record is complete (two independent searches over the same kinds of source, not exhaustive); which of the 18 pin the stock reference MAME rather than the runner's exported WIDE MAME (a change to our emulator patch is guarded by the emulator superset invariant, not by these gates).
+Artifacts (read every one, in full):
+  - build/agent196/pristine_census/RECOMMENDATION.md
+  - build/agent196/pristine_census/filter.txt
+  - build/agent196/pristine_census/CLASSIFY.md
+  - build/agent196/pristine_census_second/second.tsv
+  - build/agent196/pristine_census_second/compare.py
+  - build/agent196/pristine_census_second/compare.txt
+  - build/agent196/pristine_census_second/compare_plant.txt
+  - build/agent196/pristine_census/census_hits.tsv
+  - DECISIONS_HISTORY.md.lines-556-566 (lines 556-566 of DECISIONS_HISTORY.md)
+  - tests/ci_emulator.tsv.lines-72-90 (lines 72-90 of tests/ci_emulator.tsv)

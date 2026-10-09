@@ -564,6 +564,20 @@ So: #254 is committed mid-session and closed `done` at the 14z-196 close if the 
 
 So: a registry scope `ondemand` that no tier selects — not the static tier, the close, `--freeze` or the release run (`--scope all`); it runs only when asked for by name or by `--scope ondemand`, documented where the runner's scopes are; no release flag. The #118 gates take it. The other gates whose subject is pristine only are censused and proposed for the same scope, except those guarding a case known to have broken before (a tenant change that once moved vsavj characters), which stay at least at release. `audit_mizuumi_chars` (rule-checker runs 902-914, 914 open on Q1) is parked on branch `t118-196` for the next session; the struct gate, OK at run 2026-10-08-907, merges alone.
 
+
+---
+
+## Ruled 2026-10-09 (14z-196) — the pristine-only gates' scopes
+
+**The questions (AskUserQuestion, after rule-checker run 2026-10-09-775 OK on `build/agent196/pristine_census/RECOMMENDATION.md`; runs 770, 773 and 774 VIOLATED and resolved):**
+1. *"Your exception was 'cases that are known to have been broken in the past'. Two independent readings of the 69 pristine-only candidates agree on 18 gates (4 at release today, 14 out) with no record of a change of ours breaking what they cover. Several of those 18 have gone red for their OWN reasons (a stale expectation after a rig change, a dead rig 14z-165..174). Does that count as 'broken in the past'?"* — options "Only our changes (Recommended)" / "Own reds count too".
+2. *"test_down_flash_vanilla and test_down_flash_mechanism are pristine-only with no breakage record, but your 2026-09-03 ruling (a) kept them at release [...] Which wins?"* — "Keep at release" / "Ondemand".
+3. *"audit_palette_seq_ids is `out` today, and both readings find it was broken by our change: 1369cd0c "the DF-palette row is withdrawn because it broke Bulleta" [...] Promote it out -> release?"* — "Promote to release (Recommended)" / "Leave it out".
+4. *"Three borderline gates: which (if any) go ondemand? Unticked ones stay where they are."* — test_select_arrays, audit_ff0460_writer, audit_sdram_bank_load (multi-select).
+
+**The maintainer (the selections, verbatim):** *"Only our changes (Recommended)"*; *"Ondemand"*; *"Promote to release (Recommended)"*; *"test_select_arrays,audit_ff0460_writer,audit_sdram_bank_load"*.
+
+So: "broken in the past" means a change of OURS broke the game behaviour the gate covers — a gate's own red (a stale expectation, a dead rig, clock drift) does not count. 23 gates move to `ondemand` in `tests/ci_emulator.tsv` with the `pristine:` reason: the 18 (from release: audit_demitri_split, audit_ladder_pick_store, audit_marionette_cost, test_projectile_census; from out: audit_df_dead_family, audit_ff8130_writers, audit_front_comparator, audit_ground_throws, audit_tick_cadence, audit_wide_phase_a, test_advancing_guard, test_killshread_es, test_meter_gain, test_rehit_ring, test_tick_durations, test_vanilla_aerial_join, test_vanilla_command_join, test_vanilla_frame_join), the two #113 gates (superseding the 2026-09-03 ruling (a), marked in place in the registry header), and test_select_arrays, audit_ff0460_writer and audit_sdram_bank_load. audit_palette_seq_ids moves out -> release. audit_dispatch_census and test_select_wheel stay at release. With the four #118 gates, 27 rows are `ondemand`.
 ---
 
 ## Ruled 2026-10-07 (14z-193) — #230 closed `done` on the standard throw; #235 filed for the kick and air throws

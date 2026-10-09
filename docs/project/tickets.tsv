@@ -81,12 +81,12 @@ issue	kind	status	title	repro	decided	learned	wrong	sessions
 253	bug	open	[P2] MAME replay wrapper accepts an old checksum log when a zero-exit invocation writes nothing	tools/run_replay_mame.sh	none	none	none	14z-195
 252	bug	open	[P2] A newer SKIP row hides stale emulator gates from freeze audit and rerun selection	tools/audit_emulator_staleness.py	none	none	none	14z-195
 251	bug	open	[P2] Emulator staleness audit misses followed inputs reverted after a dirty successful run	tools/audit_emulator_staleness.py	none	none	none	14z-195
-250	bug	open	[P2] Relative ROMDIR creates dangling overlay links while the builder reports success	tools/build_wide_romset.py	none	none	none	14z-195
+250	bug	open	[P3] Relative ROMDIR creates dangling overlay links while the builder reports success	tools/build_wide_romset.py	none	none	none	14z-195
 249	bug	open	[P2] CI entropy guard scans only untracked files and misses committed binary additions	.github/workflows/ci.yml	none	none	none	14z-195
-248	bug	open	[P2] Launchers silently choose conflicting older ROM sets and retain stale Windows copies	tools/package_release_platforms.py	none	none	none	14z-195
-247	bug	open	[P2] Direct release packager deletes the previous package before replacement validation	tools/package_release.py	none	none	none	14z-195
-246	bug	open	[P2] Release name can escape the output root and recursively delete a sibling directory	tools/package_release.py	none	none	none	14z-195
-245	bug	open	[P1] WIDE overlay builder overwrites a source vsavjw.zip through its own symlink	tools/build_wide_romset.py	none	none	none	14z-195
+248	bug	open	[P3] Launchers silently choose conflicting older ROM sets and retain stale Windows copies	tools/package_release_platforms.py	none	none	none	14z-195
+247	bug	open	[P3] Direct release packager deletes the previous package before replacement validation	tools/package_release.py	none	none	none	14z-195
+246	bug	open	[P3] Release name can escape the output root and recursively delete a sibling directory	tools/package_release.py	none	none	none	14z-195
+245	bug	open	[P2] WIDE overlay builder overwrites a source vsavjw.zip through its own symlink	tools/build_wide_romset.py	none	none	none	14z-195
 244	bug	open	Tenant charmap pages print the raw +8/+9 power byte as damage (the #241 decode not applied to charmap_html/charmap_md)	tests/test_power_decode.sh	none	none	none	14z-195
 243	bug	open	Staleness audit: 79 emulator gates declare the whole tests/replays/ directory, so any new replay stales them all	tools/audit_emulator_staleness.py	none	none	none	14z-195
 242	bug	done	retraction_grep never lists a retracted wording broken by a quote prefix or HTML markup	tests/test_close_tools.sh	none	tools/retraction_grep.py § a Markdown quote prefix	docs/project/gotchas.md § Paid again 14z-194, fixed 14z-195 (#242)	14z-194,14z-195

@@ -1,0 +1,12 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent196/pristine_census/RECOMMENDATION.md	75baf031d85c1c178e2f56b0aa8e2190af1079fe
+build/agent196/pristine_census/filter.txt	9ad0247e158081ce2bb83e30aa6eaf96d9798ecb
+build/agent196/pristine_census/CLASSIFY.md	8bc07328df448c4fb1d27571fb997a01102c39fe
+build/agent196/pristine_census_second/second.tsv	5bf2cfde5b6417985cd76a07f3f851d32ba0d5b8
+build/agent196/pristine_census_second/compare.py	7c28bf0b7e5ce8a1097382737b8339d9c14393c4
+build/agent196/pristine_census_second/compare.txt	2de9b5708617557b5b1501985ac4332d0a5fa729
+build/agent196/pristine_census_second/compare_plant.txt	cbf150fde4514e4a321aa006f8159d7337ab3139
+build/agent196/pristine_census/census_hits.tsv	2cf339436c58206fe7e74ccb05c06297ef0de44c
+DECISIONS_HISTORY.md.lines-556-566 (lines 556-566 of DECISIONS_HISTORY.md)	2859874c97ff0e9fbbba6ee39ca9ea6a1f8057e0
+tests/ci_emulator.tsv.lines-72-90 (lines 72-90 of tests/ci_emulator.tsv)	75a2304817c047179e03037fce5d8bf22a9a490d
+DECISIONS_HISTORY.md.lines-5459-5476 (lines 5459-5476 of DECISIONS_HISTORY.md)	03afae9f6470a62779d1358d2169e5910936000a

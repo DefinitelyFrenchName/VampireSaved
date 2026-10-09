@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-195 CLOSE, 2026-10-08)
+# NEXT SESSION — orientation (rewritten at the 14z-196 CLOSE, 2026-10-09)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
@@ -19,44 +19,28 @@ there in parallel.**
 
 ## START HERE
 
-0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** What the close found and did is in STATE 14z-195's CLOSE row.
-1. **#124 — THE BUILD** (ruled: `DECISIONS_HISTORY.md` "Ruled 2026-10-08 (14z-195) — #124: scope the build this session, build it the next"). The plan is the #124 comment "The build plan (14z-195)", rule-checker run 2026-10-08-749 OK.
-   - **Step 0 FIRST, before any byte changes:** debugger read watchpoints over every row the build rewrites, with the select screen's read of `0x26762A`'s P2 rows as the positive control.
-   - Then: a `native_c5` `select_records` row for `0x26752A`, and two `site_thunk` bank gates at `0x05FC36`/`0x05FC76`. These replace the approved tile relocation, because the select screen draws the same rows. **[→ its premise refuted 14z-196: the select screen does not read `0x26762A` (an aligned read watch, `build/agent196/t124/REPORT.md`; atlas 14z-62); the plan goes back to the maintainer.]**
-   - Then vs2's width words and pool rows, the score ranking's own bank gate (its bank bits measured first), and the gates.
-2. **#245, #246, #247, #248, #249, #250, #251, #252, #253, #254, #255 — eleven code-review findings**, filed 2026-10-08 as `mechanyaa-ai` against `d1759b33` and indexed as open bugs at this close.
-   - #245 (P1): the WIDE builder overwrites a source zip through its own symlink.
-   - The rest are P2/P3: release packaging and appliers, CI, the staleness audit, the replay wrapper, the control classifier.
-   - Triage them with the maintainer: bug archaeology first ([VSP-14]).
-3. **#129 — PUT THE DECISION** (STATE 14z-194 row (3); facts in `docs/game/engine_internals.md` "The CPU AI action-script system").
-4. **Open, scoped:**
-   - #118: three emulator gates landed; with `audit_mizuumi_struct`, the four mizuumi gates are now scope `out`. Promotions 4 and 5 of `build/agent194/t118/HOMING.md` (untracked 14z-194 scratch: extend `tests/audit_mizuumi_struct.sh`; a new `tests/audit_mizuumi_chars.sh`) remain.
-   - #229: ground throws gated and on the cross-check page; specials, supers and EX/ES moves next.
-   - #228, deferred.
-   - #243, #244.
-   - The close's own tools: #256, #257, #258, #259 (#259: the `--confirm` planner took 20 min at this close).
-   - Done, awaiting release: #236, #238, #239, #240.
+0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** What the close found and did is in STATE 14z-196's CLOSE row.
+1. **#245-#255 — the code-review findings, P2 first, then P3** (ruled: `DECISIONS_HISTORY.md` "Ruled 2026-10-09 (14z-196) — #245-#255: the triage's revised severities; worked next session, P1 to P3"). All eleven were re-checked VALID at `2979890c` (the triage report was untracked scratch, `build/agent196/triage245/REPORT.md`). Bug archaeology first ([VSP-14]); each fix gets its ground-truth test.
+   - P2: #245 (the WIDE builder writes a source zip through its own symlink), #249, #251, #252, #253.
+   - P3: #246, #247, #248, #250, #255.
+2. **#228 — ASSESS FIRST, THEN STEP 4** (ruled: "Ruled 2026-10-09 (14z-196) — #228: step 4 does not start this session; whether it runs once or recurring is assessed first"). Steps 1-3 landed 14z-196: `pc_count.lua` counts the first frame, `tests/lua/clock_check.lua` measures drift per run, 24 at-risk gates drift and still PASS (`build/agent196/t228/step3/SUMMARY.txt`, untracked). Put the once-or-recurring question to the maintainer with its clock cost; a recurring run may be release-only or a scheduled night run.
+   - **Carried to step 4 by decision:** six code comments still state the retracted "timeslicing" theory — `tests/lua/replay_guard.lua`, `tests/lua/inp_guard.lua`, `tools/run_replay_guarded.sh`, `tools/run_inp_guarded.sh`, `tools/run_inp_probe.sh`, `tests/test_crash_guard.sh` (`tests/rulecheck/retractions/14z-196.tsv` names them). Correct them with the clock fix.
+3. **#118 — the chars gate, PARKED on branch `t118-196`** (ruled "park for next session"). `audit_mizuumi_chars` went through rule-checker runs 902-914 in the worktree `../wt_t118_196`; **914 is VIOLATED on Q1 and unresolved** (two facts frozen only in pooled lines). The struct gate merged 14z-196 (`8904dde2`, run 772 OK). The chars gate lands as `ondemand` (27 rows are `ondemand` since 14z-196: `tests/run_all_emulator.sh --scope ondemand`, HANDOFF [VSP-164]).
+4. **#260** — a check that every submodule pin exists on its remote before a push (filed 14z-196, the 14z-192 jtcores pin).
+5. **Parked or lowest:** #124 PARKED (*"let's park #124 for now"*); #129 is the LOWEST PRIORITY of the open tickets, captures first (*"we shall do captures first but this ticket stays lowest priority of open tickets"*).
+6. **Open, scoped:** #229 (specials, supers and EX/ES moves next); #243, #244; the close's own tools #256, #257, #258, #259. Done, awaiting release: #236, #238, #239, #240.
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
-- **A census of absolute references to a table, plus breakpoints on its known readers, cannot show a screen does NOT read it.** **[The 14z-195 instance — "`0x26762A` is reached through `0x2675AA + 0x80`" — RETRACTED 14z-196: the select screen does not read `0x26762A`; the rule stands.]** Use a read watch over the table's bytes, with a positive control (`docs/project/gotchas.md`).
-- **podman on PILOT runs rootless.** `docker.io/library/ubuntu:24.04` is pulled. glibc 2.39's `LD_DEBUG=libs` prints `find library=X [0]; searching`, then `(RUNPATH from file Y)` and `trying file=` lines, and no `needed by` lines (`tools/cleanhost_libs.py`).
-- **`tools/rulecheck.py` arguments:** `prepare --session` takes the 14z key; `record --session` takes the transcript id (`d93d8edb` this sitting).
-- **`claim_lint` refuses an untied "every".** Tie it to an artifact path in the same sentence.
-- **zsh does not split a command held in a variable** (`$F args` fails). Write the command out.
-- **`ldconfig -p` lines start with a TAB.** Match `^[[:space:]]soname `.
+- **A `-debug` run's divergence was the debugger's boot-halt UI frame, not timeslicing.** A script counting `frame_done` calls runs one frame ahead; count emulated frames (`screen:frame_number()`). `tests/lua/clock_check.lua` (`CLOCK_OUT=<file>`) reports `uiframes` per run ([MFI-2], `docs/platform/gotchas.md`).
+- **A merge packet compares the WORKING TREE the gate ran on, over the gate's WHOLE `# FOLLOWS:` header** (it wraps over several comment lines), never `git diff --cached` nor its first line (rule-checker runs 769 and 771).
+- **"Failing as a mode" is shown by the mode's own FAIL lines and no `CONTROL DEAD:` line**, never by its exit status: a mode exits 1 whether its control fired or was dead (run 769).
+- **`rulecheck prepare` picks the next free id after the ledger's highest**, which a fork's 901+ ids push up; pass `--id` to keep main's sequence (this sitting: 771, 772).
+- **`tests/rulecheck/retractions/<session>.tsv` scans `docs/site/` too:** regenerate it (`python3 tools/mk_docs_site.py`) before the grep, or stale pages read as live carriers.
 
-## WHAT CLOSED THIS SITTING (14z-195)
+## WHAT CLOSED THIS SITTING (14z-196)
 
-- **Closed `done`:** #237, #241, #242, #226.
-- **Filed:** #243, #244, #256, #257, #258, #259.
-- **Indexed:** #245-#255.
-- **Ruled:**
-  - a done-but-unreleased ticket gets a comment saying so;
-  - `libudev.so.1` is host-provided;
-  - #229's captures confirmed;
-  - the four mizuumi gates leave release scope;
-  - #124 scoped this sitting, built the next;
-  - #226 closed on the clean-host measurements.
-
-  Each ruling, in the maintainer's own words, is its `DECISIONS_HISTORY.md` entry "Ruled 2026-10-08 (14z-195) — ..."; `tools/agent/rulings_verbatim.py` checks those quotes.
+- **Closed `done`:** #254 (a control mode's own shell error is DIED at any exit).
+- **Filed:** #260.
+- **Parked:** #124.
+- **Ruled:** #129 lowest priority, captures first; the order of work (#228 first); #228 step 4 waits for its once-or-recurring assessment; #124 parked; #260 filed; #245-#255's revised severities; #254 closed at the close; the ONDEMAND scope for pristine-only gates, the chars gate parked; the pristine-only gates' scopes ("broken in the past" = a change of ours; 23 rows to `ondemand`, audit_palette_seq_ids to release). Each in the maintainer's own words is its `DECISIONS_HISTORY.md` entry "Ruled 2026-10-09 (14z-196) — ..."; `tools/agent/rulings_verbatim.py` checks those quotes.

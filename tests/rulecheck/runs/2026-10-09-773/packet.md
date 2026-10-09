@@ -1,0 +1,17 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: the pristine-only emulator gates: which move to the ondemand scope — re-check after run 770 (a blind second reading; the narrowed set)
+Claim (the working agent's sentence): Under the maintainer's ruling (DECISIONS_HISTORY.md lines 556-566: pristine-only gates go ondemand except cases 'known to have been broken in the past', which stay at least at release), the recommendation (build/agent196/pristine_census/RECOMMENDATION.md) is: move to ondemand the 18 gates that BOTH readings of the 69 census gates (the first CLASSIFY.md, the blind second second.tsv, compared row by row in compare.txt, whose planted class flip compare_plant.txt reads 7 disagreements against 6) class pristine-subject with no record of a project change breaking the behaviour they cover — 4 from release and 14 from out, listed in its section A; put five cases to the maintainer instead of moving them (section B: the test_down_flash pair against ruling (a) in tests/ci_emulator.tsv lines 80-86; audit_palette_seq_ids, out today under the 2026-09-03 ruling, which the new ruling would PROMOTE to release; test_select_arrays, whose only record is a scratch build; audit_ff0460_writer, built for a ratified merged-build divergence; audit_sdram_bank_load, classed instrument by one reading and pristine-subject by the other); keep audit_dispatch_census at release and test_select_wheel at release (section C). The line between a project-change record and a gate's own red is the working agent's reading, not the maintainer's, and the cases it decides are the ones put to the maintainer. NOT tested: gates outside the 69 (the filter is a named-token regex, filter.txt); that each search for a record is complete (two independent searches, not exhaustive); which of the 18 pin the stock reference MAME rather than the runner's exported WIDE MAME (a change to our emulator patch is guarded by the emulator superset invariant, not by these gates).
+Artifacts (read every one, in full):
+  - build/agent196/pristine_census/RECOMMENDATION.md
+  - build/agent196/pristine_census/filter.txt
+  - build/agent196/pristine_census/CLASSIFY.md
+  - build/agent196/pristine_census_second/second.tsv
+  - build/agent196/pristine_census_second/compare.py
+  - build/agent196/pristine_census_second/compare.txt
+  - build/agent196/pristine_census_second/compare_plant.txt
+  - build/agent196/pristine_census/census_hits.tsv
+  - DECISIONS_HISTORY.md.lines-556-566 (lines 556-566 of DECISIONS_HISTORY.md)
+  - tests/ci_emulator.tsv.lines-72-90 (lines 72-90 of tests/ci_emulator.tsv)
+  - DECISIONS_HISTORY.md.lines-5459-5476 (lines 5459-5476 of DECISIONS_HISTORY.md)
