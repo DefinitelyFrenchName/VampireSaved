@@ -1,5 +1,5 @@
 # tests/expected/marionette_cost.tsv — frozen by tests/audit_marionette_cost.sh (GitHub #128).
-# Evidence class: static census of the decrypted views + in-emulator counts on pristine vsavj. Frozen 14z-189 with FREEZE=1; addresses, counts and tile-cell totals only, no ROM bytes.
+# Evidence class: static census of the decrypted views + in-emulator counts on pristine vsavj. Frozen 14z-189 with FREEZE=1; re-frozen 14z-196 (GitHub #228: pc_count.lua counts the first frame; #213's alignment checked) from build/agent196/t228/marionette_aligned under rule-checker run 2026-10-08-767; addresses, counts and tile-cell totals only, no ROM bytes.
 SITE 00525a tst.b$3c3(a4) | INSERT 3 0x8 | hook 004dda move.b$382(a4),d1
 SITE 007122 move.bd0,$3c3(a6) | INSERT 2 0x8 | hook 00895c move.b#$1,$3e0(a6)
 SITE 007862 move.bd1,$3c3(a6) | INSERT 1 0x4 | hook 009094 move.bd1,$3c0(a6)
@@ -35,28 +35,28 @@ ASSET select table 2a04fa idx 0x10 nodes 1 node_bytes 0x10 records 1 not_records
 ASSET vs table 2b7ef4 idx 0xb3 nodes 1 node_bytes 0x10 records 1 not_records 0 entries 17 tile_cells 52 | vs2 0x0933EA: the VS/sprite record, index 0xB3 (else 0xAA)
 ASSET palette base 3cb7dc block 3cb91c+ 0x140 bytes (10 rows) | vs2 0x02ACCA: `lea $140(a0)` past the palette base, + id($3AE)*32
 ASSET total_tile_cells 58 (7424 bytes of 16x16 4bpp art)
-HIT 004dda replays 12 hits 13 frames 13 max 1
+HIT 004dda replays 15 hits 17 frames 17 max 1
 HIT 00895c replays 43 hits 43 frames 43 max 1
 HIT 009094 replays 56 hits 126 frames 63 max 2
 HIT 00a494 replays 0 hits 0 frames 0 max 0
-HIT 00aefa replays 55 hits 88 frames 88 max 1
-HIT 00af20 replays 23 hits 24 frames 24 max 1
-HIT 00afd2 replays 13 hits 14 frames 14 max 1
-HIT 00c8a0 replays 11 hits 11 frames 11 max 1
-HIT 014a98 replays 11 hits 12 frames 12 max 1
+HIT 00aefa replays 55 hits 92 frames 92 max 1
+HIT 00af20 replays 25 hits 26 frames 26 max 1
+HIT 00afd2 replays 16 hits 18 frames 18 max 1
+HIT 00c8a0 replays 13 hits 13 frames 13 max 1
+HIT 014a98 replays 14 hits 15 frames 15 max 1
 HIT 0209e4 replays 55 hits 98 frames 94 max 2
 HIT 020aae replays 55 hits 98 frames 98 max 1
 HIT 020abe replays 0 hits 0 frames 0 max 0
 HIT 020ace replays 55 hits 98 frames 98 max 1
 HIT 020cbe replays 55 hits 43484 frames 28546 max 2
-HIT 026244 replays 54 hits 15563 frames 9008 max 3
-HIT 02b640 replays 55 hits 120520 frames 69704 max 4
-HIT 05f17e replays 13 hits 14 frames 14 max 1
-HIT 05f1b6 replays 13 hits 14 frames 14 max 1
+HIT 026244 replays 54 hits 15261 frames 9101 max 3
+HIT 02b640 replays 55 hits 121041 frames 70225 max 4
+HIT 05f17e replays 16 hits 18 frames 18 max 1
+HIT 05f1b6 replays 16 hits 18 frames 18 max 1
 HIT 05f408 replays 55 hits 112262 frames 64703 max 2
-HIT 060002 replays 55 hits 120520 frames 69704 max 4
-HIT 060188 replays 55 hits 120520 frames 69704 max 4
-HIT 06b75a replays 4 hits 4 frames 4 max 1
+HIT 060002 replays 55 hits 121041 frames 70225 max 4
+HIT 060188 replays 55 hits 121041 frames 70225 max 4
+HIT 06b75a replays 13 hits 14 frames 14 max 1
 HIT 08464e replays 1 hits 2 frames 2 max 1
 HIT 08466e replays 1 hits 2 frames 2 max 1
 HIT 084698 replays 1 hits 722 frames 703 max 2

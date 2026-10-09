@@ -6748,9 +6748,16 @@ the error (#244: the tenant pages).
 #124's owed check asked whether the select screen reads the map's portrait array `0x26762A`. Two instruments answered
 "no": a static census of every ABSOLUTE operand and data longword equal to the array's base (`tests/test_map_table_readers.sh`),
 and logging breakpoints on the two reader PCs the census found (map `0x05FC76`, ranking `0x08C5E0`) during a 2P replay
-that reaches select. Both were blind to the reader that exists: `0x26762A` is the select screen's name-banner P2 array,
-reached through `movea.l #$2675AA` plus a 0x80 player bias (`docs/game/atlas/select_screen.md`, measured 14z-61). The
-answer was posted on #124 and corrected the same session. Rule: "X does not read table T" needs an instrument on the
+that reaches select. **[CORRECTED 14z-196: the instance below is WRONG and the instruments' "no" was RIGHT.]** The
+14z-195 session ruled both instruments blind, on the reading that `0x26762A` is the select screen's name-banner P2 array,
+reached through `movea.l #$2675AA` plus a 0x80 player bias — read from the atlas's structural table, against the measured
+note beneath it (`docs/game/atlas/select_screen.md` "The NAME piece is asymmetric", 14z-62: both banners read the P1
+array; `0x26762A` has no select consumer). An aligned read watch over the table's bytes (14z-196,
+`build/agent196/t124/REPORT.md`) found zero select-screen reads of `0x26762A` in every leg, with the watch shown live on
+it by the map and the ranking. The answer posted on #124 was "corrected" the same session; that correction is withdrawn.
+The RULE stands, and the 14z-196 watch is it applied: it also found a POOL reader the census had missed (the ranking's
+palette-page load, `PRG:0x01C21E`). And a second rule, paid here: a structural table in an atlas is not a measurement —
+before citing it as a reader, read the measured note beside it. Rule: "X does not read table T" needs an instrument on the
 TABLE's bytes (a read watch over T's range during the screen in question, with a positive control the screen is known to
 read), or a census that also follows base+offset arithmetic into T. A census keyed on T's base and breakpoints on its
 known readers can only find more of the readers they already know.

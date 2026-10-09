@@ -78,7 +78,7 @@
 # drifted figures, kept as history; the run prints the current ones.
 # TWO MORE FINDINGS OF THE SAME SITTING (rule-checker run 2026-10-05-673 asked
 # for an anchor outside the script's clock): (1) the screen-frame clock, as
-# first written (and as tests/lua/pc_count.lua still has it), skipped the
+# first written (and as tests/lua/pc_count.lua had it until 14z-196, #228), skipped the
 # FIRST frame_done, so the census ran one frame behind replay.lua with its
 # input one frame late — a no-breakpoint leg missed the basis checksum until
 # that frame was counted; (2) a breakpoint stop can move the game itself (the

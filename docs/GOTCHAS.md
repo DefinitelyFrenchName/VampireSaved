@@ -84,7 +84,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - FBNeo fresh builds need `SKIPDEPEND=1` (paid: 2026-07-25)
 - Homebrew dylibs name their siblings through `@rpath` — a closure walk over absolute paths misses them (paid: 14z-149)
 - FBNeo shared EEPROM breaks run-to-run determinism (paid: 2026-07-25, ~45min)
-- MAME `-debug` perturbs multi-CPU timing — never compare its checksums to non-debug runs (paid: 2026-07-25, ~1.5h)
+- MAME `-debug` runs diverge from non-debug runs — through a frame_done counter that counts the debugger's boot halt, NOT the scheduler (paid: 2026-07-25, ~1.5h; CORRECTED 14z-196, GitHub #228)
 - PC-relative reads are DECRYPTED reads on CPS-2 (paid: 2026-07-25, ~45min)
 - CPS-2 gfx simms are not tile-contiguous — naive slicing silently "works" on siblings only
 - MAME breakpoint logging is a SAMPLER, not an inventory

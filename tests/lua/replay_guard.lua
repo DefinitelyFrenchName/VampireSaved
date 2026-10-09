@@ -542,6 +542,7 @@ local function expected_ports(frame_held)
     return exp
 end
 
+dofile((debug.getinfo(1, "S").source:match("^@(.*/)") or "./") .. "clock_check.lua")("replay_guard", replay_path)   -- #228: CLOCK_OUT=<file> records frame_done calls against emulated frames
 emu.register_frame_done(function()
     if crashed then return end
     frame = frame + 1

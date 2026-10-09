@@ -23,13 +23,13 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3591 |
-| named by a document or manifest only | 2295 |
+| distinct program-space addresses named | 3592 |
+| named by a document or manifest only | 2296 |
 | named by both a document/manifest and code | 858 |
 | named by CODE ONLY (the gap list below) | 438 |
 | carried by atlas | 717 |
-| carried by engine_internals | 826 |
-| carried by other docs | 1059 |
+| carried by engine_internals | 827 |
+| carried by other docs | 1060 |
 | carried by manifests | 1850 |
 | carried by code | 1296 |
 
@@ -701,6 +701,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x01C0E4` | docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100) |
 | `PRG:0x01C1B6` | build/manifest/donovan.toml — weapon_accent_rowd_slot |
 | `PRG:0x01C1FA` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; tools/gen_donovan_patch.py; tools/select_port.py |
+| `PRG:0x01C21E` | docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven); docs/project/gotchas.md — A READER CENSUS BY BASE ADDRESS, OR A BREAKPOINT ON THE KNOWN READERS, CANNOT SHOW A SCREEN DOES NOT READ A TABLE (paid: 14z-195, #124, rule-checker run 2026-10-08-743) |
 | `PRG:0x01C238` | docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100) |
 | `PRG:0x01C292` | docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100) |
 | `PRG:0x01C31A` | docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100) |

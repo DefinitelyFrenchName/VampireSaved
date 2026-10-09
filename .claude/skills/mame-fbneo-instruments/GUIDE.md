@@ -23,19 +23,21 @@ into `~/.claude/skills/mame-fbneo-instruments/`. Nothing in it depends on the or
 > working directory only when `-log` is passed. That line is the fastest way to
 > get the authoritative key/range for a set.
 
-**[MFI-2]** **`-debug` perturbs multi-CPU timing**: a debug run diverges from the identical non-debug run within frames (a latch phase-shifted by one frame, ±1 knock-on counters), deterministic within debug mode. Checksum-exact gates run WITHOUT `-debug`; a frozen expectation for a debug run is frozen FROM a debug run. In debugger expressions bare hex parses as a REGISTER — write `0x` prefixes.
+**[MFI-2]** **A `-debug` run's frame_done counter counts the debugger's boot halt** (corrected 14z-196): the halt emits one `frame_done` with no emulated frame, so a script counting `frame_done` calls stages every input one frame early and its log diverges within frames; counted on the EMULATED clock (`screen:frame_number()` moving, the first call counted) a `-debug` run reproduces the non-debug log frame for frame (4 of 4 replays). Breakpoint STOPS can still move the game for some instruments — tie a breakpoint leg to a no-debugger reference. Checksum-exact gates run WITHOUT `-debug` unless their clock is the emulated one; a frozen expectation for a debug run is frozen FROM a debug run. In debugger expressions bare hex parses as a REGISTER — write `0x` prefixes.
 
-> **Incident** (`docs/platform/gotchas.md` › *MAME `-debug` perturbs multi-CPU timing — never compare its checksums to non-debug runs (paid: 2026-07-25, ~1.5h)*):
+> **Incident** (`docs/platform/gotchas.md` › *MAME `-debug` runs diverge from non-debug runs — through a frame_done counter that counts the debugger's boot halt, NOT the scheduler (paid: 2026-07-25, ~1.5h; CORRECTED 14z-196, GitHub #228)*):
 >
-> A vsavj replay run under `-debug -debugger none` produces a checksum log that
-> diverges from the identical non-debug run at frame 12: `RAM:$FF1CF0.l` (a
-> latch toggling 0x00000000/0xFFFFFFFF) is phase-shifted by one frame, with
-> ±1 knock-on counters later ($FF8080, $FFE420...). It is fully deterministic
-> *within* debug mode (two -debug runs are bit-identical) and unaffected by how
-> the initial debugger halt is resumed (`-debugscript go` vs Lua periodic —
-> identical output). Working theory: the debugger forces finer scheduler
-> timeslices, shifting 68k↔Z80/QSound interleave; the mechanism doesn't matter,
-> the rule does:
+> **CORRECTED 14z-196 (#228) — the mechanism below was wrong, the symptom right.** The debugger's
+> initial halt emits ONE `frame_done` with no emulated frame (`tests/lua/clock_check.lua` measures it: `uiframes 1`
+> on every crash-guard `-debug` run), so a script that counts `frame_done` calls as frames — `replay_guard.lua`'s
+> authoritative mode — runs one frame ahead of emulated time from the start and stages every input one frame early.
+> Count emulated frames instead (`screen:frame_number()` moving, the FIRST `frame_done` counted, as
+> `tests/lua/dispatch_census.lua` and `tests/lua/pc_count.lua` do) and a `-debug` crash-guard run reproduces
+> `replay.lua`'s checksum log on EVERY frame: 4 of 4 replays, full length — `01_attract_long` 7,320/7,320,
+> `02_demitri_vs_cpu` 5,520/5,520, `03_two_player_vs` 5,320/5,320, `04_select_fuzz` 3,520/3,520, against 0 frames
+> past frame 11 for the frame_done-counting guard (`build/agent196/t228/screenclock/`, `uiframe1/`). So `-debug` by
+> itself does NOT perturb multi-CPU timing on these replays; the "finer scheduler timeslices" theory and the "NOT a
+> lost frame at the initial debugger halt" elimination below are RETRACTED. What still holds: breakpoint … *(the paragraph continues in the origin doc)*
 
 **[MFI-3]** **Every `-debug` watch configuration is its own TIMELINE** — two debug trace runs are not comparable to each other either. A run carries its own dumps so it can be attributed without a second run.
 

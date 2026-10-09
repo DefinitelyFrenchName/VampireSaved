@@ -22,13 +22,23 @@
 # EXPECTS: the static table, the asset lines and every per-site count (hits, replays, frames, max-per-frame), the worst
 #   frame's combined hook executions and its modelled cycles, all equal to tests/expected/marionette_cost.tsv; every
 #   leg complete; the Shadow setter executed exactly once on the witness replay (the replay really armed Shadow under
-#   the instrument); each control FAILs.
-# FOLLOWS: emu/mame-patches/ tests/expected/marionette_cost.tsv tests/expected/vsavj/masked-v2/logs/
-#   tests/lib/controls.sh tests/lib/decrypt_cache.sh tests/lua/pc_count.lua tests/replays/ tools/audit_marionette_cost.py
+#   the instrument); each control FAILs. THE INSTRUMENT'S ALIGNMENT (14z-196, GitHub #228 — #213's method, as
+#   tests/audit_dispatch_census.sh): every breakpoint leg covered its counted frames in EMULATED frames (EMUFRAMES ==
+#   PCEND); a REFERENCE leg per replay (the same script, SITES=none: no breakpoint, no debugger) reproduces the frozen
+#   vanilla basis checksum (masked-v2, its MASK) at the basis log's last frame, so the script's frame index and input
+#   staging are replay.lua's; and each breakpoint leg's game frame counter RAM:$FF8080 equals its reference leg's at
+#   that frame. The witness replay has no frozen basis log, so the gate runs replay.lua ITSELF on it (tools/
+#   run_replay_mame.sh, the same mask) and holds the witness reference leg to that live log at its last frame — the
+#   worst frame comes from that leg (rule-checker run 2026-10-08-766 Q1). How many breakpoint legs also equal the
+#   basis byte for byte is PRINTED, not asserted: a stop can move the game ([MFI-2]).
+# FOLLOWS: emu/mame-patches/ tests/expected/marionette_cost.tsv tests/expected/vsavj/masked-v2/
+#   tests/lib/controls.sh tests/lib/decrypt_cache.sh tests/lua/pc_count.lua tests/lua/replay.lua tests/replays/
+#   tools/audit_marionette_cost.py tools/run_replay_mame.sh
 #   tools/find_equiv.py tools/gfx_tiles.py tools/run_mame.sh tools/scan_code_refs.py tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: site-removed — a copy of vs2's opcode view with the +0x3C3 store at PRG:0x007122 re-encoded as +0x3C4 must change the static census (28 -> 27 sites), so the hook list is read from the image, not echoed (in-gate; as a mode the gate FAILs)
-# MUST-FIRE: known-bad: drift-clock — the witness replay re-run with every site armed under pc_count.lua's OLD frame_done clock (PC_CLOCK=frame_done, the [MFI-5] desync) must miss Shadow's arming (PRG:0x020AB4 never executes), so the witness can see a replay whose input drifted under the instrument (in-gate on 1800 frames; as a mode every leg runs the old clock and the gate FAILs)
+# MUST-FIRE: known-bad: drift-clock — the witness replay re-run with every site armed under pc_count.lua's OLD frame_done clock (PC_CLOCK=frame_done, the [MFI-5] desync) must miss Shadow's arming (PRG:0x020AB4 never executes), cover fewer emulated frames than it counted, and read a game frame counter at its last frame unlike its reference leg's, so the witness, the coverage check and the game-clock anchor each see a replay whose input drifted under the instrument (in-gate on 1800 frames; as a mode every leg runs the old clock and the gate FAILs)
+# MUST-FIRE: known-bad: first-frame-skip — a reference leg of 03_two_player_vs under pc_count.lua's first-frame skip (PC_CLOCK=skip_first, the defect #228 fixed) must miss the frozen basis checksum at its anchor, so the anchor sees an instrument one frame behind replay.lua (in-gate; as a mode every reference leg runs the skip and the gate FAILs)
 #
 # NOT COVERED: vs2 code that is hers but never names +0x3C3 (a NEW routine is counted once, by its twin); cycles on
 #   paths the corpus never runs (a hook point with 0 hits is "not observed in this corpus", a bound, not deadness —
@@ -37,7 +47,8 @@
 #   FBNeo; vh2's 3 extra sites (vh2 31 vs vs2 28, tests/test_copy_flags.sh) — vs2 is the measured source.
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [JOBS=4] [KEEP=<dir>] [FREEZE=1] tests/audit_marionette_cost.sh
-#   emulator tier, MAME; ~4 min at JOBS=4 (static census ~40 s twice, 57 legs, the control leg)
+#   emulator tier, MAME; ~8 min at JOBS=4 (static census ~40 s twice, 57 legs and their 57 reference legs, the
+#   control legs)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
@@ -81,36 +92,74 @@ HOOKS="$(sed -n 's/^HOOKLIST //p' "$W/static.txt")"
 echo "== 2. the legacy corpus on pristine vsavj: every hook point's executions per emulated frame"
 CLOCK=""
 vs_ctl_is drift-clock && CLOCK=frame_done
+REFCLOCK=""
+vs_ctl_is first-frame-skip && REFCLOCK=skip_first
 SITES="$WITNESS_SET,$WITNESS_MORPH,$HOOKS"
-run_leg() { # name rpl frames out clock
+BASIS=tests/expected/vsavj/masked-v2
+MASK="$(cat "$BASIS/MASK")"   # the basis's own record (#213's anchor, tests/audit_dispatch_census.sh)
+run_leg() { # name rpl frames out clock anchor — the breakpoint leg
     MAME_SANDBOX="$W/sb_$1" REPLAY="$REPO/$2" SITES="$SITES" OUT="$4" FRAMES="$3" PC_CLOCK="$5" \
-        MAME_ROMPATH="$ROMDIR" tools/run_mame.sh vsavj -debug -debugger none \
+        ANCHOR="$6" MASK_RANGES="$MASK" MAME_ROMPATH="$ROMDIR" tools/run_mame.sh vsavj -debug -debugger none \
+        -autoboot_script "$REPO/tests/lua/pc_count.lua" > "$4.log" 2>&1 || true
+}
+ref_leg() { # name rpl frames out clock anchor — the REFERENCE leg: no breakpoint, no debugger (#228)
+    MAME_SANDBOX="$W/sbr_$1" REPLAY="$REPO/$2" SITES=none OUT="$4" FRAMES="$3" PC_CLOCK="$5" \
+        ANCHOR="$6" MASK_RANGES="$MASK" MAME_ROMPATH="$ROMDIR" tools/run_mame.sh vsavj \
         -autoboot_script "$REPO/tests/lua/pc_count.lua" > "$4.log" 2>&1 || true
 }
 : > "$W/legs.txt"
-for lf in tests/expected/vsavj/masked-v2/logs/*.log; do
+for lf in "$BASIS"/logs/*.log; do
     n="$(basename "$lf" .log)"
     [ -f "tests/replays/$n.rpl" ] || continue
-    printf '%s %s %s\n' "$n" "tests/replays/$n.rpl" "$(tail -1 "$lf" | awk '{print $2}')" >> "$W/legs.txt"
+    fr="$(tail -1 "$lf" | awk '{print $2}')"
+    an="$(awk '$1 ~ /^[0-9]+$/ {l=$1} END {print l+0}' "$lf")"   # the basis log's last frame
+    [ "$an" -gt "$fr" ] && an="$fr"
+    printf '%s %s %s %s\n' "$n" "tests/replays/$n.rpl" "$fr" "$an" >> "$W/legs.txt"
 done
-printf '%s %s %s\n' "$WREPLAY" "tests/replays/$WREPLAY.rpl" "$WFRAMES" >> "$W/legs.txt"
-echo "  legs: $(wc -l < "$W/legs.txt" | tr -d ' ') (the corpus with a vanilla basis log, plus $WREPLAY)"
-pool=0
-while read -r n rpl fr; do
-    run_leg "$n" "$rpl" "$fr" "$W/pc_$n.txt" "$CLOCK" &
-    pool=$((pool + 1)); if [ "$pool" -ge "$JOBS" ]; then wait; pool=0; fi
+printf '%s %s %s %s\n' "$WREPLAY" "tests/replays/$WREPLAY.rpl" "$WFRAMES" "$WFRAMES" >> "$W/legs.txt"
+echo "  legs: $(wc -l < "$W/legs.txt" | tr -d ' ') (the corpus with a vanilla basis log, plus $WREPLAY), each with a reference leg"
+# the witness replay's live basis: replay.lua itself, the same mask (run 2026-10-08-766 Q1)
+( MASK_RANGES="$MASK" MAME_ROMPATH="$ROMDIR" tools/run_replay_mame.sh vsavj "tests/replays/$WREPLAY.rpl" \
+    "$W/rl_$WREPLAY.log" "$W/sbrl_$WREPLAY" > "$W/rl_$WREPLAY.run" 2>&1 || true ) &
+pool=1
+while read -r n rpl fr an; do
+    run_leg "$n" "$rpl" "$fr" "$W/pc_$n.txt" "$CLOCK" "$an" &
+    ref_leg "$n" "$rpl" "$fr" "$W/ref_$n.txt" "$REFCLOCK" "$an" &
+    pool=$((pool + 2)); if [ "$pool" -ge "$JOBS" ]; then wait; pool=0; fi
 done < "$W/legs.txt"
 wait
 
-echo "== 3. the in-gate control: the witness leg under the OLD clock (1800 frames)"
-run_leg "ctl" "tests/replays/$WREPLAY.rpl" 1800 "$W/ctl_drift.txt" frame_done
+echo "== 3. the in-gate controls: the witness leg under the OLD clock (1800 frames); a reference leg under the first-frame skip"
+run_leg "ctl" "tests/replays/$WREPLAY.rpl" 1800 "$W/ctl_drift.txt" frame_done 1800 &
+ref_leg "ctl" "tests/replays/$WREPLAY.rpl" 1800 "$W/ctl_ref.txt" "" 1800 &
+wait
 ctl_set="$(awk -v a="$(printf '%06x' 0x$WITNESS_SET)" '$1=="SITE" && $2==a {print $4}' "$W/ctl_drift.txt")"
-if ! grep -q '^PCEND 1800' "$W/ctl_drift.txt"; then
-    vs_ctl_dead drift-clock "the control leg did not complete" || fail=1
-elif [ "$ctl_set" = 0 ]; then
-    vs_ctl_fired drift-clock "under the frame_done clock (debugger-stop UI frames counted as frames) the Shadow setter PRG:0x020AB4 executed 0 times in 1800 counted frames"
+ce="$(awk '$1=="EMUFRAMES" {print $2}' "$W/ctl_drift.txt")"
+cg="$(awk '$1=="GAMECLOCK" {print $3}' "$W/ctl_drift.txt")"
+rg="$(awk '$1=="GAMECLOCK" {print $3}' "$W/ctl_ref.txt")"
+if ! grep -q '^PCEND 1800' "$W/ctl_drift.txt" || [ -z "$ce" ] || [ -z "$cg" ] || [ -z "$rg" ]; then
+    vs_ctl_dead drift-clock "the control legs did not complete" || fail=1
+elif [ "$ctl_set" = 0 ] && [ "$ce" -lt 1800 ] && [ "$cg" != "$rg" ]; then
+    vs_ctl_fired drift-clock "under the frame_done clock (debugger-stop UI frames counted as frames) the Shadow setter PRG:0x020AB4 executed 0 times in 1800 counted frames, which covered $ce emulated frames, and the game frame counter at frame 1800 reads $cg where the reference leg's reads $rg"
 else
-    vs_ctl_dead drift-clock "the Shadow setter still executed $ctl_set time(s) under the drifting clock — the witness cannot see the desync" || fail=1
+    vs_ctl_dead drift-clock "under the drifting clock: setter $ctl_set, $ce emulated of 1800 counted, game clock $cg vs reference $rg — a check cannot see the desync" || fail=1
+fi
+SKN=03_two_player_vs
+SKA="$(awk -v n="$SKN" '$1==n {print $4}' "$W/legs.txt")"
+SKF="$(awk -v n="$SKN" '$1==n {print $3}' "$W/legs.txt")"
+if vs_ctl_is first-frame-skip; then
+    vs_ctl_fired first-frame-skip "every reference leg is running the first-frame skip (mode)"
+else
+    ref_leg "skip" "tests/replays/$SKN.rpl" "$SKF" "$W/ctl_skip.txt" skip_first "$SKA"
+    sk="$(awk '$1=="ANCHOR" {print $3}' "$W/ctl_skip.txt")"
+    bs="$(awk -v a="$SKA" '$1==a {print $2}' "$BASIS/logs/$SKN.log")"
+    if [ -z "$sk" ] || [ -z "$bs" ]; then
+        vs_ctl_dead first-frame-skip "the skip leg or the basis gave no checksum at frame $SKA" || fail=1
+    elif [ "$sk" != "$bs" ]; then
+        vs_ctl_fired first-frame-skip "under the first-frame skip the reference leg of $SKN reads $sk at frame $SKA where the frozen basis reads $bs"
+    else
+        vs_ctl_dead first-frame-skip "the skipped reference leg still matched the basis at frame $SKA — the anchor cannot see a one-frame lag" || fail=1
+    fi
 fi
 
 echo "== 4. the in-gate control: the static census on a planted vs2 copy"
@@ -125,6 +174,65 @@ else
     fi
 fi
 
+echo "== 5a. the instrument's alignment (#228, #213's method)"
+W="$W" BASIS="$BASIS" python3 - > "$W/align.txt" <<'PY' || fail=1
+import os, re
+W, BASIS = os.environ["W"], os.environ["BASIS"]
+short, unanchored, clockoff, moved, anchored, exact, n = [], [], [], [], 0, 0, 0
+for ln in open(f"{W}/legs.txt"):
+    name, _, fr, an = ln.split()
+    txt = open(f"{W}/pc_{name}.txt").read() if os.path.exists(f"{W}/pc_{name}.txt") else ""
+    rtxt = open(f"{W}/ref_{name}.txt").read() if os.path.exists(f"{W}/ref_{name}.txt") else ""
+    n += 1
+    me, mc = re.search(r"^EMUFRAMES (\d+)$", txt, re.M), re.search(r"^PCEND (\d+)$", txt, re.M)
+    if not me or not mc or me.group(1) != mc.group(1):
+        short.append(f"{name} ({me.group(1) if me else 'no EMUFRAMES'} of {mc.group(1) if mc else 'no PCEND'})")
+    basis = {}
+    lp = os.path.join(BASIS, "logs", name + ".log")
+    if not os.path.exists(lp):
+        lp = f"{W}/rl_{name}.log"      # the witness: replay.lua's live log (run 2026-10-08-766 Q1)
+        if not os.path.exists(lp):
+            unanchored.append(f"{name} (no frozen basis and no live replay.lua log)")
+    if os.path.exists(lp):
+        for l in open(lp):
+            p = l.split()
+            if len(p) == 2 and p[0].isdigit():
+                basis[int(p[0])] = p[1]
+    ra = re.search(r"^ANCHOR (\d+) ([0-9a-f]{16})$", rtxt, re.M)
+    ca = re.search(r"^ANCHOR (\d+) ([0-9a-f]{16})$", txt, re.M)
+    rg = re.search(r"^GAMECLOCK \d+ ([0-9a-f]{2})$", rtxt, re.M)
+    cg = re.search(r"^GAMECLOCK \d+ ([0-9a-f]{2})$", txt, re.M)
+    if basis:
+        if not ra:
+            unanchored.append(f"{name} (reference leg: no ANCHOR line)")
+        elif basis.get(int(ra.group(1))) != ra.group(2):
+            unanchored.append(f"{name} (reference leg, frame {ra.group(1)}: {ra.group(2)} vs basis {basis.get(int(ra.group(1)), 'absent')})")
+        else:
+            anchored += 1
+        if ca and basis.get(int(ca.group(1))) == ca.group(2):
+            exact += 1
+        else:
+            moved.append(name)
+    if not cg or not rg or cg.group(1) != rg.group(1):
+        clockoff.append(f"{name} (game clock {cg.group(1) if cg else 'none'} vs reference {rg.group(1) if rg else 'none'})")
+bad = 0
+if short:
+    print(f"FAIL {len(short)} breakpoint leg(s) covered fewer emulated frames than they counted: " + ", ".join(short)); bad = 1
+else:
+    print(f"ok   all {n} breakpoint legs covered exactly their counted frames in emulated time")
+if unanchored:
+    print(f"FAIL {len(unanchored)} reference leg(s) missed the frozen vanilla basis checksum at their anchor: " + ", ".join(unanchored)); bad = 1
+else:
+    print(f"ok   {anchored} reference leg(s) reproduced the frozen vanilla basis checksum at the basis log's last frame")
+if clockoff:
+    print(f"FAIL {len(clockoff)} breakpoint leg(s) whose game frame counter RAM:$FF8080 at the anchor is not their reference leg's: " + ", ".join(clockoff)); bad = 1
+else:
+    print(f"ok   every breakpoint leg's game frame counter at the anchor equals its reference leg's ({n} legs)")
+print(f"info {exact} breakpoint leg(s) also equal the basis byte for byte; {len(moved)} moved under the breakpoint stops: " + (", ".join(moved) if moved else "none"))
+raise SystemExit(bad)
+PY
+sed 's/^/    /' "$W/align.txt"
+
 echo "== 5. aggregate"
 W="$W" WITNESS_SET="$WITNESS_SET" WITNESS_MORPH="$WITNESS_MORPH" WREPLAY="$WREPLAY" python3 - > "$W/dyn.txt" <<'PY' || fail=1
 import glob, os, re, sys
@@ -135,7 +243,7 @@ hooks = [int(h, 16) for h in open(f"{W}/static.txt").read().split("HOOKLIST ")[1
 tot = {h: [0, 0, 0, 0] for h in hooks}        # hits, replays, frames, max
 worst, worst_at, bad = 0, "-", []
 wit = {}
-for n, _, fr in legs:
+for n, _, fr, *_ in legs:
     p = f"{W}/pc_{n}.txt"
     txt = open(p).read() if os.path.exists(p) else ""
     if f"PCEND {fr}\n" not in txt:

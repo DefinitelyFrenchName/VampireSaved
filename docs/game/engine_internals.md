@@ -271,8 +271,12 @@ Phobos's second word and both of Donovan's), and Donovan's pool row `0x13`.
 Rows `0x10`/`0x11`/`0x13` have no legacy reader — vanilla never holds those
 ids (`tests/audit_id_writers.sh`); rows `0x12`/`0x18` (Dark Gallon, Oboro)
 are not touched. The sibling sub-`0x0A` child reads `0x26762A` row id, the
-array the port already repoints (the select screen's name-banner P2 array,
-`atlas/select_screen.md` — **[corrected 14z-195, #124: this read "VS-splash P2"]**).
+array the port already repoints — the map's tag mini-portrait array, whose only
+measured readers are the map and the score ranking (`atlas/select_screen.md` "The
+NAME piece is asymmetric": no select-screen consumer, measured 14z-62) —
+**[CORRECTED 14z-196, #124: 14z-189 called it "VS-splash P2" and 14z-195 "the select
+screen's name-banner P2 array"; both are wrong — the VS screen and BOTH select name
+banners read the P1 array `0x2675AA`, measured 14z-196 by an aligned read watch, build/agent196/t124/REPORT.md]**.
 **The attract SCORE RANKING reads the same two arrays (14z-195, #124):** per
 entry, by the entry's id at `$8(a1)` (`movea.l #$26762a` at `PRG:0x08C5E0`, `#$26752a` at
 `0x08C5F6`; vs2's twin at `0x09BE34`/`0x09BE4A`), and draws through its OWN routine
@@ -280,8 +284,14 @@ entry, by the entry's id at `$8(a1)` (`movea.l #$26762a` at `PRG:0x08C5E0`, `#$2
 attribute = the record's word + d6 (d6 from the per-id byte table `0x08C724` for the
 portrait, `#$19` for the name). It has no `$18` bank word, so a bank gate on the map's
 children does not reach it. The readers' census is `tests/test_map_table_readers.sh` —
-absolute references only: the select screen reaches `0x26762A` through `0x2675AA + 0x80`,
-which that census cannot see (`../project/gotchas.md` "A READER CENSUS BY BASE ADDRESS").
+absolute references only, so it cannot by itself show a screen does not read a table
+(`../project/gotchas.md` "A READER CENSUS BY BASE ADDRESS"); the aligned read watch of
+14z-196 over every row #124 rewrites found no reader of `0x26762A` beyond the map and the
+ranking **[the sentence here said the select screen reaches `0x26762A` through
+`0x2675AA + 0x80` — RETRACTED 14z-196: measured 14z-196 by an aligned read watch, build/agent196/t124/REPORT.md]**. It found one reader of the POOL
+the census missed: the score ranking's palette-page load at `PRG:0x01C21E` copies 32 rows
+from `0x3A3C00` (pool rows `0x00`-`0x1A`, the tenants' included) into palette RAM
+`0x90C000`, on pristine vsavj too (#124).
 
 ### Gates from the M2b step that still run
 

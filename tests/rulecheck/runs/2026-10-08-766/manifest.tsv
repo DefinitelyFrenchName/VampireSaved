@@ -1,0 +1,8 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_marionette_cost.sh	fa0311f5c8c1f4f9e62070cc40055a6208382843
+tests/lua/pc_count.lua	e8d2536c50a0a5830d421e5fc6dc9b0cd805ecc6
+tests/expected/marionette_cost.tsv	1774a72f365a581b0707dd93178f8790a9d66d03
+build/agent196/t228/marionette_aligned/got.tsv	17b75cb715c242b3943f0b4ad561ca2d003804db
+build/agent196/t228/marionette_freeze_diff.txt	45058fa6b00d11c76693c9e155e71eb696601489
+build/agent196/t228/marionette_aligned.log	4085cfcefdc5aa93bc9eb175f56b8a90cfc4829e
+build/agent196/t228/marionette_fixed.log	0a67728a33027c785641f819590c05035d2729e1

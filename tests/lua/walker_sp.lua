@@ -126,6 +126,7 @@ for addr, _ in pairs(sites) do
 end
 
 local pressed = {}
+dofile((debug.getinfo(1, "S").source:match("^@(.*/)") or "./") .. "clock_check.lua")("walker_sp", replay_path)   -- #228: CLOCK_OUT=<file> records frame_done calls against emulated frames
 emu.register_frame_done(function()
     frame = frame + 1
     if FIELDS_IO then

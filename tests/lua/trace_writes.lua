@@ -172,6 +172,7 @@ local pokes = {}
 dofile((debug.getinfo(1, "S").source:match("^@(.*/)") or "./") .. "pokes_spec.lua").append(pokes, os.getenv("POKES"))   -- #201: F and F1-F2 entries
 
 local pressed = {}
+dofile((debug.getinfo(1, "S").source:match("^@(.*/)") or "./") .. "clock_check.lua")("trace_writes", replay_path)   -- #228: CLOCK_OUT=<file> records frame_done calls against emulated frames
 emu.register_frame_done(function()
     frame = frame + 1
     if watch_from and frame == watch_from then arm(); f:write(string.format("ARMED %d\n", frame)) end

@@ -483,6 +483,26 @@ So: `tests/expected/linux_host_provided.tsv` gains `libudev.so.1` as `ruled` (sy
 
 ---
 
+## Ruled 2026-10-08 (14z-196) — #129: captures first; the ticket stays the lowest priority of the open tickets
+
+**The question (in chat, at the opener):** the maintainer asked *"can it be put to me now? what are we missing?"*; the answer named the decision (`docs/game/engine_internals.md` "The CPU AI action-script system", the 14z-194 re-check: Behaviour A — A1 a private clone for Phobos, A2 the guard in the shared routine, or not ported; Behaviour B — the faithful port through five shared vsavj blocks, or not ported), what was missing (the rule-checker pass on the recommendation; captures of what A or B changes in play, listed there as not measured; B's own unknowns; the unexplained `0x416312` gap), and asked: *"(a) Now, without captures"* or *"(b) Captures first"*.
+
+**The maintainer:** *"we shall do captures first but this ticket stays lowest priority of open tickets"*
+
+So: no recommendation is put on #129 until native-vs2-against-ours captures of each behaviour (a Phobos CPU at the refused-continuation moments; a tenant CPU facing low attacks) have been shown to the maintainer; the captures, the rule-checker pass and the decision then follow in that order. #129 is worked after every other open ticket.
+
+---
+
+## Ruled 2026-10-08 (14z-196) — the order of work: #228 first; #245-#255 triaged for validity and relevance before any is worked; the rest in the proposed order; the idle boxes used
+
+**The question (in chat):** after #228's first steps were set out (fix `pc_count.lua`'s first-frame skip and re-measure `audit_marionette_cost`; a census sorting each breakpoint instrument's callers into at-risk and safe; #213's alignment method on the at-risk set; and #124's step 0 read watch run with that alignment check), the session asked: *"Do you want #228's first two steps now, with the census on PILOT, or should it stay deferred and I build the alignment check into #124's step 0 only?"*
+
+**The maintainer:** *"yes, I'd like to start with #228. All the other open tickets you listed can be worked on, in the order you proposed. However #245-#255 should be triaged and their validity and relevance checked first. I'll let you choose how to parallelize . You don't have to but it would be best instead of letting machines idle"*
+
+So: #228 opens the work; the opener's order follows (#124's build, then #118, #229, #243, #244 and the close's tools #256-#259; #129 last, by the ruling above); the eleven code-review findings #245-#255 are each checked for validity and relevance at HEAD, bug archaeology first ([VSP-14]), before any of them is worked; the session runs independent work on PILOT and ERIS in parallel.
+
+---
+
 ## Ruled 2026-10-07 (14z-193) — #230 closed `done` on the standard throw; #235 filed for the kick and air throws
 
 **The question (AskUserQuestion, after rule-checker run 2026-10-06-712 OK):** *"#230 now gates Pyron's and Donovan's standard 6+HP throw on all 18 victims, ours vs native, at the matched level (re-frozen under rule-checker run 712, OK; you read the sheets as identical). Their kick and air throws aren't covered. How should #230 end?"* — options "Close; new ticket", "Extend #230 now", "Close; standard is enough".

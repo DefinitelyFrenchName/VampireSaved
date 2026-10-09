@@ -636,7 +636,7 @@ EMU = re.compile(r'run_(replay_)?(mame|fbneo)\.sh|run_replay_guarded\.sh'
                  r'|MAME_BIN|FBNEO_BIN|autoboot_script|emu/fbneo/fbneo'
                  r'|run_battery|run_sim_jtcps2\.sh'
                  r'|run_inp_probe\.sh|run_inp_guarded\.sh'
-                 r'|desktop_session_play\.py')
+                 r'|desktop_session_play\.py|cleanhost_libs\.py')
 SRC = re.compile(r'^\s*\.\s+"?\$(?:REPO|\{REPO\})"?/(tests/lib/[a-z0-9_]+\.sh)', re.M)
 def uncomment(path):
     try:

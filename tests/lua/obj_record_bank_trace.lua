@@ -84,6 +84,7 @@ debugger:command(string.format("bpset 1b234,%s", cond))  -- fmt 2 handler
 debugger:command(string.format("bpset 1afc6,%s", cond))  -- fmt 0 handler
 
 local pressed = {}
+dofile((debug.getinfo(1, "S").source:match("^@(.*/)") or "./") .. "clock_check.lua")("obj_record_bank_trace", replay_path)   -- #228: CLOCK_OUT=<file> records frame_done calls against emulated frames
 emu.register_frame_done(function()
     frame = frame + 1
     if FIELDS then

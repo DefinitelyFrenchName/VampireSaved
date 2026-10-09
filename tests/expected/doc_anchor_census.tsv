@@ -3,7 +3,7 @@
 # A changed row is a MOVED anchor: review it, then --freeze in the same commit.
 # id	file	section	status
 CPE-1	docs/platform/gotchas.md	MAME `logerror` output needs `-log`, not `-verbose` (paid: 2026-07-25)	IN-LIST
-CPE-2	docs/platform/gotchas.md	MAME `-debug` perturbs multi-CPU timing — never compare its checksums to non-debug runs (paid: 2026-	IN-LIST
+CPE-2	docs/platform/gotchas.md	MAME `-debug` runs diverge from non-debug runs — through a frame_done counter that counts the debugg	IN-LIST
 CPE-3	STATE_HISTORY.md	14z-108/109 measurements it never had; the field test got an in-tree carrier.**	OUT-OF-LIST
 CPE-3	docs/platform/gotchas.md	two -debug INSTRUMENT-grammar traps from the #103 close — both misread a measurement for a full roun	IN-LIST
 CPE-4	docs/platform/gotchas.md	MAME breakpoint logging is a SAMPLER, not an inventory	IN-LIST
@@ -77,7 +77,7 @@ CPH-28	docs/project/cps2_wide.md	Phase B progress (proving the profile inert, on
 CPH-29	docs/project/cps2_wide.md	Governance (Rule 1 v2)	IN-LIST
 CPH-30	docs/project/cps2_wide.md	Emulator change budget (measured, not estimated)	IN-LIST
 MFI-1	docs/platform/gotchas.md	MAME `logerror` output needs `-log`, not `-verbose` (paid: 2026-07-25)	IN-LIST
-MFI-2	docs/platform/gotchas.md	MAME `-debug` perturbs multi-CPU timing — never compare its checksums to non-debug runs (paid: 2026-	IN-LIST
+MFI-2	docs/platform/gotchas.md	MAME `-debug` runs diverge from non-debug runs — through a frame_done counter that counts the debugg	IN-LIST
 MFI-3	docs/platform/gotchas.md	two -debug INSTRUMENT-grammar traps from the #103 close — both misread a measurement for a full roun	IN-LIST
 MFI-4	docs/platform/gotchas.md	MAME breakpoint logging is a SAMPLER, not an inventory	IN-LIST
 MFI-5	docs/platform/gotchas.md	Debugger stops DESYNC replay frame counting	IN-LIST

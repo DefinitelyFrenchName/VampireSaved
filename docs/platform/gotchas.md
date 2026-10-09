@@ -201,9 +201,23 @@ looked deterministic, which disguised the cause. Fix: the harness forces
 full work-RAM dumps from two runs, diffed → first divergent frame + address
 (the standard bug-report format works for emulator bugs too).
 
-## MAME `-debug` perturbs multi-CPU timing — never compare its checksums to non-debug runs (paid: 2026-07-25, ~1.5h)
+## MAME `-debug` runs diverge from non-debug runs — through a frame_done counter that counts the debugger's boot halt, NOT the scheduler (paid: 2026-07-25, ~1.5h; CORRECTED 14z-196, GitHub #228)
 
-**[CPE-2]** **[MFI-2]** A vsavj replay run under `-debug -debugger none` produces a checksum log that
+**[CPE-2]** **[MFI-2]** **CORRECTED 14z-196 (#228) — the mechanism below was wrong, the symptom right.** The debugger's
+initial halt emits ONE `frame_done` with no emulated frame (`tests/lua/clock_check.lua` measures it: `uiframes 1`
+on every crash-guard `-debug` run), so a script that counts `frame_done` calls as frames — `replay_guard.lua`'s
+authoritative mode — runs one frame ahead of emulated time from the start and stages every input one frame early.
+Count emulated frames instead (`screen:frame_number()` moving, the FIRST `frame_done` counted, as
+`tests/lua/dispatch_census.lua` and `tests/lua/pc_count.lua` do) and a `-debug` crash-guard run reproduces
+`replay.lua`'s checksum log on EVERY frame: 4 of 4 replays, full length — `01_attract_long` 7,320/7,320,
+`02_demitri_vs_cpu` 5,520/5,520, `03_two_player_vs` 5,320/5,320, `04_select_fuzz` 3,520/3,520, against 0 frames
+past frame 11 for the frame_done-counting guard (`build/agent196/t228/screenclock/`, `uiframe1/`). So `-debug` by
+itself does NOT perturb multi-CPU timing on these replays; the "finer scheduler timeslices" theory and the "NOT a
+lost frame at the initial debugger halt" elimination below are RETRACTED. What still holds: breakpoint STOPS can
+move the game for some instruments (the 14z-192 paragraph below — re-measured 14z-196: the dispatch census 47 of
+56 legs moved), while `pc_count.lua`'s legs under 26 armed hook points moved on 0 of 57 (`tests/audit_marionette_cost.sh`)
+— why the two differ is not measured (#228). The original analysis, kept:
+A vsavj replay run under `-debug -debugger none` produces a checksum log that
 diverges from the identical non-debug run at frame 12: `RAM:$FF1CF0.l` (a
 latch toggling 0x00000000/0xFFFFFFFF) is phase-shifted by one frame, with
 ±1 knock-on counters later ($FF8080, $FFE420...). It is fully deterministic
@@ -221,7 +235,8 @@ the rule does:
   must be frozen from a -debug run.
 - Two misleading dead ends already explored: it is NOT the debugger's
   different initial-RAM fill pattern (real, but game clears RAM first), and
-  NOT a lost frame at the initial debugger halt.
+  NOT a lost frame at the initial debugger halt **[→ RETRACTED 14z-196: it IS one — an extra frame_done at the
+  halt, which a frame_done counter takes for a frame; see the correction above]**.
 
 PAID AGAIN 14z-192 (GitHub #213), with BREAKPOINTS, at corpus scale: the dispatch census
 (two hot `bpset` sites, input on the emulated clock) against a no-debugger leg of the same
@@ -335,7 +350,7 @@ own `frame_number()` delta), so the census had observed a tenth of the replay, w
 landing early. The frozen inventory had been taken that way since 14z-89.
 **The fix, reusable — and its own trap:** advance the script's frame counter only when
 `screen:frame_number()` has moved, BUT count the FIRST frame_done unconditionally: at that call the
-number has not moved yet, and skipping it (as `tests/lua/pc_count.lua` still does) puts the script
+number has not moved yet, and skipping it (as `tests/lua/pc_count.lua` did until 14z-196, #228) puts the script
 one frame behind `replay.lua`, input one frame late. The proof is an anchor outside the script: a leg
 with NO breakpoint and no debugger, on the same script, must reproduce the frozen basis checksum at
 some frame (it did not until the first frame was counted; then 56 of 56 did); print the emulated

@@ -22,7 +22,7 @@ there in parallel.**
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** What the close found and did is in STATE 14z-195's CLOSE row.
 1. **#124 — THE BUILD** (ruled: `DECISIONS_HISTORY.md` "Ruled 2026-10-08 (14z-195) — #124: scope the build this session, build it the next"). The plan is the #124 comment "The build plan (14z-195)", rule-checker run 2026-10-08-749 OK.
    - **Step 0 FIRST, before any byte changes:** debugger read watchpoints over every row the build rewrites, with the select screen's read of `0x26762A`'s P2 rows as the positive control.
-   - Then: a `native_c5` `select_records` row for `0x26752A`, and two `site_thunk` bank gates at `0x05FC36`/`0x05FC76`. These replace the approved tile relocation, because the select screen draws the same rows.
+   - Then: a `native_c5` `select_records` row for `0x26752A`, and two `site_thunk` bank gates at `0x05FC36`/`0x05FC76`. These replace the approved tile relocation, because the select screen draws the same rows. **[→ its premise refuted 14z-196: the select screen does not read `0x26762A` (an aligned read watch, `build/agent196/t124/REPORT.md`; atlas 14z-62); the plan goes back to the maintainer.]**
    - Then vs2's width words and pool rows, the score ranking's own bank gate (its bank bits measured first), and the gates.
 2. **#245, #246, #247, #248, #249, #250, #251, #252, #253, #254, #255 — eleven code-review findings**, filed 2026-10-08 as `mechanyaa-ai` against `d1759b33` and indexed as open bugs at this close.
    - #245 (P1): the WIDE builder overwrites a source zip through its own symlink.
@@ -39,7 +39,7 @@ there in parallel.**
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
-- **A census of absolute references to a table, plus breakpoints on its known readers, cannot show a screen does NOT read it.** `0x26762A` is reached through `0x2675AA + 0x80`. Use a read watch over the table's bytes, with a positive control (`docs/project/gotchas.md`).
+- **A census of absolute references to a table, plus breakpoints on its known readers, cannot show a screen does NOT read it.** **[The 14z-195 instance — "`0x26762A` is reached through `0x2675AA + 0x80`" — RETRACTED 14z-196: the select screen does not read `0x26762A`; the rule stands.]** Use a read watch over the table's bytes, with a positive control (`docs/project/gotchas.md`).
 - **podman on PILOT runs rootless.** `docker.io/library/ubuntu:24.04` is pulled. glibc 2.39's `LD_DEBUG=libs` prints `find library=X [0]; searching`, then `(RUNPATH from file Y)` and `trying file=` lines, and no `needed by` lines (`tools/cleanhost_libs.py`).
 - **`tools/rulecheck.py` arguments:** `prepare --session` takes the 14z key; `record --session` takes the transcript id (`d93d8edb` this sitting).
 - **`claim_lint` refuses an untied "every".** Tie it to an artifact path in the same sentence.
