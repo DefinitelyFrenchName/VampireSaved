@@ -26,8 +26,12 @@
 # decrypted) -> freeze; its triggers include tests/expected/registry.tsv, so the commit that adds a freeze's rows
 # runs it in a session tier too.
 # A new listing is a reviewed event: it moves a gate OUT of every session run.
+# FOURTH CUT (maintainer, 2026-10-09, 14z-196 — bbh is its own project now, "should not be a target or what we do in
+# vampire saved"; asked how to treat its fidelity gate: "Drop now, and move test_bbh_fidelity out of the static tier
+# until settled"): cadence `ondemand` — deferred and named at every cadence, freeze and release included, never pulled
+# back by a changed path; it runs only with --cadence ondemand or sh tests/<gate>.sh. Triggers `-`.
 test_m3a_reproducible	freeze	build/manifest/ tools/build_ tools/gen_ tools/pack_ tools/extract_ tools/reconcile tools/cps2_ tools/patch_prg tools/ensure_merged tools/build_fingerprint tests/expected/registry.tsv tests/lib/
-test_bbh_fidelity	freeze	tests/lib/ tests/run_ tests/ci_ tools/gen_gate_index tools/checkskills tools/gen_skill_guide tools/audit_header_defaults tools/audit_build_ref_rot tools/compare_fields tools/check_wram_dumps tests/expected/ tests/lua/ .claude/skills/ tools/run_replay tools/run_inp tools/run_mame
+test_bbh_fidelity	ondemand	-
 test_merged_inputs	freeze	build/manifest/ tools/build_ tools/gen_ tools/ensure_merged tools/extract_ tools/build_wide_romset
 test_phasec_spaces	freeze	build/manifest/ tools/gen_ tools/build_ tools/patch_prg
 test_census_regions	freeze	build/manifest/ tools/census_regions tools/gen_

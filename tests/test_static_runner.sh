@@ -18,6 +18,7 @@
 #
 # MUST-FIRE: shadow-tool: reader-unplugged — a copy of run_all_static.sh that hands the classifier no gate script must let a stub with a declared-but-unfired control read PASS (mode: that copy is the runner every section drives, and section 11 must fail)
 # MUST-FIRE: shadow-tool: trigger-blind — a copy of run_all_static.sh with its cadence TRIGGER match disabled must leave a freeze-cadence gate deferred although a path it depends on changed; section 14's triggered case must FAIL under it
+# MUST-FIRE: shadow-tool: ondemand-triggered — a copy of run_all_static.sh whose ONDEMAND-NO-TRIGGER line is disabled must let a change to an ondemand gate's own script pull it into a session run; section 14i must catch it (in-gate in section 16; as a mode the gate FAILs)
 # MUST-FIRE: shadow-tool: order-ignored — a copy of run_all_static.sh whose `# ORDER: last` test is disabled must run the marked stub FIRST, and section 16 must FAIL (mode: that copy drives every section; section 17 fires it in-run; 14z-185b, #188)
 # MUST-FIRE: shadow-tool: crash-unread — a copy of run_all_static.sh that hands the CONTROL classifier no gate script must read a control mode that dies of `command not found` (exit 127) as HONOURED, and section 12b must FAIL (mode: that copy drives every section; section 12b fires it in-run; 14z-196, #254)
 # MUST-FIRE: shadow-tool: prediction-off — a copy of tools/static_confirm.py whose plan marks nothing STALE must CARRY the stub whose input changed, and section 18 must FAIL (mode: that copy in the confirm repo)
@@ -69,6 +70,12 @@ SHADOW_T="$T/run_all_static_triggerblind.sh"
 sed 's|case "$_pth" in "$_t"\*) _hit="$_pth"; break 2 ;; esac   # TRIGGER-MATCH|: # TRIGGER-MATCH disabled|' "$RUNNER" > "$SHADOW_T"
 cmp -s "$RUNNER" "$SHADOW_T" && fail "could not blind the trigger — the TRIGGER-MATCH line moved"
 chmod +x "$SHADOW_T"
+# THE FIFTH SHADOW (14z-196, maintainer-ruled 2026-10-09): the runner with its ONDEMAND-NO-TRIGGER
+# line disabled — a changed path pulls an ondemand gate back in like any other listed gate.
+SHADOW_D="$T/run_all_static_ondemandtriggered.sh"
+sed 's|        if \[ "$_c" = ondemand \]; then echo "$_c $_g" >> "$WORK/deferred.txt"; continue; fi   # ONDEMAND-NO-TRIGGER|        : # ONDEMAND-NO-TRIGGER disabled|' "$RUNNER" > "$SHADOW_D"
+cmp -s "$RUNNER" "$SHADOW_D" && fail "could not disable ONDEMAND-NO-TRIGGER — the line moved"
+chmod +x "$SHADOW_D"
 # THE THIRD SHADOW (14z-185b, #188): the runner with its `# ORDER: last` test disabled —
 # a marked gate keeps its registry place.
 SHADOW_O="$T/run_all_static_orderignored.sh"
@@ -84,6 +91,7 @@ chmod +x "$SHADOW_C"
 if vs_ctl_is reader-unplugged; then ln -s "$SHADOW" "$FR/tests/run_all_static.sh"
 elif vs_ctl_is crash-unread; then ln -s "$SHADOW_C" "$FR/tests/run_all_static.sh"
 elif vs_ctl_is trigger-blind; then ln -s "$SHADOW_T" "$FR/tests/run_all_static.sh"
+elif vs_ctl_is ondemand-triggered; then ln -s "$SHADOW_D" "$FR/tests/run_all_static.sh"
 elif vs_ctl_is order-ignored; then ln -s "$SHADOW_O" "$FR/tests/run_all_static.sh"
 else ln -s "$RUNNER" "$FR/tests/run_all_static.sh"; fi
 # the runner sources THE ONE classifier relative to its repo (14z-139), so
@@ -538,17 +546,34 @@ o14f="$(cd "$FR" && STATIC_CHANGED_PATHS='tests/g_fail.sh' sh tests/run_all_stat
 # (g) --list tags the listed gate
 o14g="$(cd "$FR" && sh tests/run_all_static.sh --list 2>&1)"
 printf '%s' "$o14g" | grep -q 'g_fail  \[freeze\]' && echo "  ok: --list tags g_fail [freeze]" || fail "14g: --list lacks the tag"
-# (h) the real cadence file: every listed gate is registered, cadence is freeze|release, triggers non-empty
+# (i) ONDEMAND (14z-196, maintainer-ruled 2026-10-09): deferred and named at EVERY cadence below
+#     ondemand, never pulled back by a changed path — its own script included — and run by --cadence ondemand
+printf 'g_fail\tondemand\t-\n' > "$FR/tests/ci_cadence.tsv"
+o14i1="$(cd "$FR" && STATIC_CHANGED_PATHS= sh tests/run_all_static.sh --tier portable --exec-controls none 2>&1)" && s14i1=0 || s14i1=$?
+if [ "$s14i1" = 0 ] && printf '%s' "$o14i1" | grep -q 'deferred (ondemand cadence): g_fail' \
+   && printf '%s' "$o14i1" | grep -q 'an ondemand gate runs only when asked for'; then echo "  ok: a session run defers the ondemand g_fail, names it and says how to run it"
+else fail "14i: session run with g_fail ondemand: exit $s14i1"; fi
+o14i2="$(cd "$FR" && STATIC_CHANGED_PATHS= sh tests/run_all_static.sh --tier portable --exec-controls none --cadence release 2>&1)" && s14i2=0 || s14i2=$?
+[ "$s14i2" = 0 ] && printf '%s' "$o14i2" | grep -q 'deferred (ondemand cadence): g_fail' && echo "  ok: --cadence release still defers it" \
+    || fail "14i: --cadence release ran the ondemand gate (exit $s14i2)"
+o14i3="$(cd "$FR" && STATIC_CHANGED_PATHS='tests/g_fail.sh' sh tests/run_all_static.sh --tier portable --exec-controls none 2>&1)" && s14i3=0 || s14i3=$?
+[ "$s14i3" = 0 ] && ! printf '%s' "$o14i3" | grep -q 'g_fail <- ' && echo "  ok: a change to its own script does not pull it in" \
+    || fail "14i: a changed own script pulled the ondemand gate in (exit $s14i3)"
+o14i4="$(cd "$FR" && STATIC_CHANGED_PATHS= sh tests/run_all_static.sh --tier portable --exec-controls none --cadence ondemand 2>&1)" && s14i4=0 || s14i4=$?
+[ "$s14i4" = 1 ] && printf '%s' "$o14i4" | grep -qE '^  g_fail +FAIL' && echo "  ok: --cadence ondemand runs it and goes red" \
+    || fail "14i: --cadence ondemand: exit $s14i4"
+printf 'g_fail\tfreeze\tsrc/\n' > "$FR/tests/ci_cadence.tsv"   # back to section 14's freeze listing: section 15 runs on it
+# (h) the real cadence file: every listed gate is registered, cadence is freeze|release|ondemand, triggers non-empty
 o14h="$(awk -F'\t' '!/^#/ && NF {print $1, $2, ($3 == "" ? "EMPTY" : "ok")}' "$REPO/tests/ci_cadence.tsv")"
 while read -r g c t; do
     [ -n "$g" ] || continue
     grep -qx "$g" "$REPO/tests/ci_portable.txt" "$REPO/tests/ci_static.txt" || fail "14h: $g is in ci_cadence.tsv but in no registry"
-    case "$c" in freeze|release) ;; *) fail "14h: $g has cadence '$c'" ;; esac
+    case "$c" in freeze|release|ondemand) ;; *) fail "14h: $g has cadence '$c'" ;; esac
     [ "$t" = ok ] || fail "14h: $g has no triggers"
 done <<EOF14
 $o14h
 EOF14
-echo "  ok: the real tests/ci_cadence.tsv lists $(printf '%s\n' "$o14h" | awk 'NF' | wc -l | tr -d ' ') registered gates, each freeze|release with triggers"
+echo "  ok: the real tests/ci_cadence.tsv lists $(printf '%s\n' "$o14h" | awk 'NF' | wc -l | tr -d ' ') registered gates, each freeze|release|ondemand with triggers"
 
 echo "== 15. MUST-FIRE: with the trigger match blinded, section 14(d)'s changed path leaves g_fail deferred =="
 ln -s "$SHADOW_T" "$FR/tests/run_all_static_triggerblind.sh"
@@ -559,6 +584,17 @@ else
     vs_ctl_dead trigger-blind "the blinded runner still triggered g_fail (exit $s15)"; rc=1
 fi
 rm -f "$FR/tests/run_all_static_triggerblind.sh" "$FR/tests/ci_cadence.tsv"
+
+echo "== 16. MUST-FIRE: with ONDEMAND-NO-TRIGGER disabled, section 14i's own-script change pulls the ondemand g_fail in =="
+printf 'g_fail\tondemand\t-\n' > "$FR/tests/ci_cadence.tsv"
+ln -s "$SHADOW_D" "$FR/tests/run_all_static_ondemandtriggered.sh"
+o16="$(cd "$FR" && STATIC_CHANGED_PATHS='tests/g_fail.sh' sh tests/run_all_static_ondemandtriggered.sh --tier portable --exec-controls none 2>&1)" && s16=0 || s16=$?
+if [ "$s16" = 1 ] && printf '%s' "$o16" | grep -q 'g_fail <- tests/g_fail.sh'; then
+    vs_ctl_fired ondemand-triggered "with ONDEMAND-NO-TRIGGER disabled, a change to tests/g_fail.sh pulls the ondemand g_fail into a session run (exit 1)"
+else
+    vs_ctl_dead ondemand-triggered "the copy still deferred the ondemand g_fail (exit $s16)"; rc=1
+fi
+rm -f "$FR/tests/run_all_static_ondemandtriggered.sh" "$FR/tests/ci_cadence.tsv"
 
 echo "== 16. ORDER: last (14z-185b, #188): a marked gate runs after every other gate of its tier, registry order kept otherwise =="
 mk g_pass 0 "PASS: fine"; mk g_two 0 "PASS: two"

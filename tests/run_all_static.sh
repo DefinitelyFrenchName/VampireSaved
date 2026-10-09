@@ -70,6 +70,14 @@
 #                                          A freeze runs --cadence freeze, a
 #                                          release --cadence release: the full
 #                                          tier on the commit they build from.
+#   ... --cadence ondemand                 also the `ondemand` gates (maintainer-ruled
+#                                          2026-10-09, 14z-196): a gate listed
+#                                          `ondemand` is deferred and named at
+#                                          EVERY other cadence, freeze and release
+#                                          included, and no changed path pulls it
+#                                          back in — not even its own script. It
+#                                          runs only when asked for: this flag,
+#                                          or `sh tests/<gate>.sh` directly.
 #
 # THE MUST-FIRE CONTROLS ARE READ AND EXECUTED (14z-147, step two of the
 # maintainer's ruling, STATE 14z-145). Two things, both through
@@ -124,7 +132,7 @@ while [ $# -gt 0 ]; do
     --list)   LIST=1 ;;
     --tier)   shift; TIER="${1:?--tier needs portable|static|all}" ;;
     --exec-controls) shift; EXEC_CTL="${1:?--exec-controls needs all|portable|none}" ;;
-    --cadence) shift; CADENCE="${1:?--cadence needs session|freeze|release}" ;;
+    --cadence) shift; CADENCE="${1:?--cadence needs session|freeze|release|ondemand}" ;;
     --confirm) shift; CONFIRM="${1:?--confirm needs the results.tsv of a previous run}" ;;
     -h|--help) sed -n '2,40p' "$0"; exit 0 ;;
     *) echo "unknown argument '$1' (try --help)" >&2; exit 2 ;;
@@ -162,7 +170,7 @@ STATIC="$(order_last "$STATIC")"
 # depends on. Absent file = every gate is session = the pre-#148 behaviour,
 # byte-for-byte (bbh's fidelity test drives this runner in a root without it).
 CAD_FILE=tests/ci_cadence.tsv
-cad_rank() { case "$1" in session) echo 0 ;; freeze) echo 1 ;; release) echo 2 ;; *) echo 9 ;; esac; }
+cad_rank() { case "$1" in session) echo 0 ;; freeze) echo 1 ;; release) echo 2 ;; ondemand) echo 3 ;; *) echo 9 ;; esac; }
 [ "$(cad_rank "$CADENCE")" != 9 ] || { echo "bad --cadence '$CADENCE'" >&2; exit 2; }
 # The gates that judge BY cadence read it from here (tests/test_emulator_staleness.sh:
 # a stale emulator gate is a NOTE at session, a FAIL at freeze/release — ruled 2026-09-24).
@@ -195,6 +203,8 @@ cad_select() {  # cad_select <names> -> the names to run; deferred/triggered rec
     for _g in $1; do
         _c="$(cad_of "$_g")"
         if [ "$(cad_rank "$_c")" -le "$_want" ]; then echo "$_g"; continue; fi
+        # an ondemand gate is never pulled back in by a changed path (14z-196, maintainer-ruled 2026-10-09)
+        if [ "$_c" = ondemand ]; then echo "$_c $_g" >> "$WORK/deferred.txt"; continue; fi   # ONDEMAND-NO-TRIGGER
         [ -n "$CAD_CHANGED" ] || CAD_CHANGED="$(cad_changed)"
         _hit=""
         if [ "$CAD_NO_BASE" = 1 ]; then _hit="(no origin/main to diff against)"; else
@@ -654,11 +664,12 @@ if [ -s "$WORK/deferred.txt" ] || [ -s "$WORK/triggered.txt" ]; then
     echo "== cadence: $CADENCE =="
     if [ -s "$WORK/deferred.txt" ]; then
         n_defer=$(wc -l < "$WORK/deferred.txt" | tr -d ' ')
-        for _c in freeze release; do
+        for _c in freeze release ondemand; do
             _l="$(awk -v c="$_c" '$1 == c {printf "%s%s", (n++ ? " " : ""), $2}' "$WORK/deferred.txt")"
             [ -n "$_l" ] && echo "  deferred ($_c cadence): $_l"
         done
         echo "  run --cadence freeze|release to include them; a freeze and a release ALWAYS run the full tier on the commit they build from"
+        grep -q '^ondemand ' "$WORK/deferred.txt" && echo "  an ondemand gate runs only when asked for: --cadence ondemand, or sh tests/<gate>.sh"
     fi
     if [ -s "$WORK/triggered.txt" ]; then
         echo "  triggered ($(wc -l < "$WORK/triggered.txt" | tr -d ' ') above-cadence gates ran because a path they depend on changed):"

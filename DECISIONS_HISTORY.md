@@ -587,6 +587,19 @@ So: a registry scope `ondemand` that no tier selects — not the static tier, th
 So: "broken in the past" means a change of OURS broke the game behaviour the gate covers — a gate's own red (a stale expectation, a dead rig, clock drift) does not count. 23 gates move to `ondemand` in `tests/ci_emulator.tsv` with the `pristine:` reason: the 18 (from release: audit_demitri_split, audit_ladder_pick_store, audit_marionette_cost, test_projectile_census; from out: audit_df_dead_family, audit_ff8130_writers, audit_front_comparator, audit_ground_throws, audit_tick_cadence, audit_wide_phase_a, test_advancing_guard, test_killshread_es, test_meter_gain, test_rehit_ring, test_tick_durations, test_vanilla_aerial_join, test_vanilla_command_join, test_vanilla_frame_join), the two #113 gates (superseding the 2026-09-03 ruling (a), marked in place in the registry header), and test_select_arrays, audit_ff0460_writer and audit_sdram_bank_load. audit_palette_seq_ids moves out -> release. audit_dispatch_census and test_select_wheel stay at release. With the four #118 gates, 27 rows are `ondemand`.
 ---
 
+## Ruled 2026-10-09 (14z-196) — bbh is its own project: this session's three bbh commits dropped; test_bbh_fidelity ondemand until who-does-what is settled
+
+**The context (in chat, during the close):** this session had lifted three changes into the harness repository (`a4b2929` the consumer config's tier tokens, `72a5931` the #254 classifier rule, `50f3aeb` the ondemand sweep scope), all unpushed; the session said it would not push them at this close and asked whether to keep them local or drop them, then laid out that dropping them turns this tree's `tests/test_bbh_fidelity.sh` red (F1, F3/F4) and offered three ways to treat it.
+
+**The maintainer:**
+- the maintainer: *"Don't interrupt or alter anything running but as far as bbh goes we will need to address who does what because it is it's own project now and should not be a target or what we do in vampire saved"*
+- the maintainer: *"Drop them"*
+- the maintainer: *"Drop now, and move test_bbh_fidelity out of the static tier until settled"*
+
+So: bbh (`~/Developer/blackbox-harness`) is its own project; a Vampire Saved session makes no change there, and who does what between the two is to be settled. The three commits were dropped (`git reset --hard 4fcbe95` after the close's confirm tier finished; the earlier unpushed `4fcbe95` and `9e55d61` are untouched). `test_bbh_fidelity` takes a new static cadence `ondemand` (`tests/ci_cadence.tsv` "FOURTH CUT"; `tests/run_all_static.sh`, ground truth `tests/test_static_runner.sh` section 14i, control `ondemand-triggered`): deferred and named at every cadence, freeze and release included, never pulled back by a changed path, run only with `--cadence ondemand` or directly. Until the ownership is settled it is not expected to pass: this tree carries the #254 classifier rule and the cleanhost token, bbh no longer does.
+
+---
+
 ## Ruled 2026-10-07 (14z-193) — #230 closed `done` on the standard throw; #235 filed for the kick and air throws
 
 **The question (AskUserQuestion, after rule-checker run 2026-10-06-712 OK):** *"#230 now gates Pyron's and Donovan's standard 6+HP throw on all 18 victims, ours vs native, at the matched level (re-frozen under rule-checker run 712, OK; you read the sheets as identical). Their kick and air throws aren't covered. How should #230 end?"* — options "Close; new ticket", "Extend #230 now", "Close; standard is enough".

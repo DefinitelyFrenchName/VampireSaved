@@ -7,3 +7,4 @@ timeslice GOTCHA	14z-196: docs/project/gotchas.md called the sound-latch phase s
 timeslicing	14z-196 (#228): the same retracted theory in six code comments (replay_guard.lua, run_replay_guarded.sh, test_crash_guard.sh, inp_guard.lua, run_inp_guarded.sh, run_inp_probe.sh) — KNOWN LIVE, carried to #228 step 4 (the clock fix) by decision, named in NEXT_SESSION	retracted
 uiframes 1	control: the corrected [MFI-2] wording, live in docs/platform/gotchas.md	reach:1
 has no select consumer	control: the corrected #124 reading, live in docs/project/gotchas.md	reach:1
+lifted into the harness copy	14z-196: the #254 rule's harness lift (bbh 72a5931) was dropped on the maintainer's ruling that bbh is its own project; carriers marked DROPPED in place	retracted
