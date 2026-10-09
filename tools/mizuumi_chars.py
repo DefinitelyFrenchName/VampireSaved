@@ -742,5 +742,19 @@ res(pcchars and not shared and (PERT != "wrong-owner" or planted), "K12",
     f"the ownership census over {len(TAPPED)} tapped bytes (the CLEAR writers excluded, held above to writing 0): {len(pcchars)} non-clear writer PCs ({len(unnamed)} writing only unnamed bytes), each writing only into blocks that held one character (the block written, not the code that ran); shared {shared}"
     + (f" (planted {planted})" if PERT == "wrong-owner" else ""))
 
+# PER-OFFSET WRITER LINES (rule-checker run 2026-10-08-914 Q1): for every byte the gate's ram.md rows cite writers for,
+# every non-CLEAR writer PC over all legs with every value it wrote there (zeros included), so a row's PCs are held to
+# ITS byte and not to a pooled line
+WOFF = {0x0AC: (0x0AC,), 0x136: (0x136,), 0x149: (0x149,), 0x14B: (0x14B,), 0x154: (0x154,), 0x15C: (0x15C, 0x15D),
+        0x192: (0x192,), 0x19A: (0x19A,), 0x1BB: (0x1BB,), 0x372: (0x372,), 0x3C1: (0x3C1,)}
+for key, offs in WOFF.items():
+    wv = collections.defaultdict(collections.Counter)
+    for tag in T:
+        for s in (1, 2):
+            for off in offs:
+                for f, pc, v in wfield(TW[tag], s, off):
+                    if not clear(pc):
+                        wv[pc][v] += 1
+    cnt(f"writers_{key:03x}", " ".join(f"{pc}=" + "/".join(f"{v:02x}:{n}" for v, n in sorted(c.items())) for pc, c in sorted(wv.items())) or "none")
 open(A.out, "w").write("\n".join(counts) + "\n")
 sys.exit(1 if bad else 0)

@@ -1,0 +1,25 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_mizuumi_chars.sh	6a6a076321fefc9451c0b28d2b6b048b13b22cde
+tools/mizuumi_chars.py	f485d5c124cf4912d12ade03ab42bb553f00fd63
+tests/expected/mizuumi_chars.tsv	207d236b7f78cbc705784af0e2485f426d001764
+docs/game/atlas/ram.md.lines-144-159 (lines 144-159 of docs/game/atlas/ram.md)	62125e5c3dbc9c2674ebe2f9ba39921f06547ee9
+docs/game/atlas/ram.md.lines-167-167 (lines 167-167 of docs/game/atlas/ram.md)	eb00263361f2f4550d2de8417add558cfe7b84d1
+docs/game/atlas/ram.md.lines-242-277 (lines 242-277 of docs/game/atlas/ram.md)	303d4509c61a25088c5fee13495d6e5bd1117c37
+docs/game/atlas/character_tables.md.lines-25-32 (lines 25-32 of docs/game/atlas/character_tables.md)	e94c57f26dbaf4f31f45031b8892fe78e84f82b4
+build/agent196/t118/rec10/clone_clean.txt	6df76e2271e676a4b474b9087db01221f826db33
+build/agent196/t118/rec10/audit_mizuumi_chars.log	cdc4a0e8006eaee43ba396a113cefe7b919e80d2
+build/agent196/t118/rec10/audit_mizuumi_chars__dup-base.log	22d9f5e3bac67548411b7921a35538b4d9287893
+build/agent196/t118/rec10/audit_mizuumi_chars__clear-nonzero.log	4f4e06d8d7ff001270dfaa4b129d7b1301ba2920
+build/agent196/t118/rec10/audit_mizuumi_chars__read-other-game.log	ea4a1d5ed93f41628e23e8c7215fbd56d4f4c5da
+build/agent196/t118/rec10/audit_mizuumi_chars__tap-other-game.log	75bcd1d864ceda1e2663b3f00d2e4d5fcda132c1
+build/agent196/t118/rec10/audit_mizuumi_chars__tap-misaligned.log	4a190c25f6b48e6014fe6f830ff96c03923df870
+build/agent196/t118/rec10/audit_mizuumi_chars__next-load-wrong.log	a8f4c68638bf1f38bfd5c26a3d94c413ed9ebc51
+build/agent196/t118/rec10/audit_mizuumi_chars__prewrite-human.log	783a0d87261e63468663da4d3394725233881d00
+build/agent196/t118/rec10/audit_mizuumi_chars__wrong-owner.log	3b66d7cd4eefffb6d3fcc6bfb0824b13719830d5
+build/agent196/t118/rec10/audit_mizuumi_chars__wrong-base.log	c67c60ad8f41fd69e9216b9a8b864c94175a4466
+build/agent196/t118/rec10/audit_mizuumi_chars__absent-move.log	7d83347d0bd4dde95b7fa18de1f755a8caac46a0
+build/agent196/t118/rec10/audit_mizuumi_chars__pool-miscount.log	019de8b35cb91fd1454362dbae6adc9d3d022159
+build/agent196/t118/rec10/audit_mizuumi_chars__passes-inflated.log	16fffbd75b740dce6a1534908569114d1e4cdfc2
+build/agent196/t118/rec10/audit_mizuumi_chars__fall-shifted.log	af1264e2f65b739800bd5b4d494ae852a31abd46
+build/agent196/t118/rec10/audit_mizuumi_chars__taps-as-dashes.log	eb8dba7ad70ccd0ca2eafe7e654346b22b6f99b2
+build/agent196/t118/rec10/audit_mizuumi_chars__other-side-credit.log	9adfd3642f5c3d2cec5165399747a7cf5ad50c24
