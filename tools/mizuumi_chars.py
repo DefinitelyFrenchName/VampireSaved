@@ -25,7 +25,8 @@ names come from tools/vanilla_frames.py's CHARS (held to the atlas by tools/audi
   tap-misaligned    KA comparing the tap run's $FF8080 one frame later than it lands — KA must fail;
   tap-other-game    the flare leg's TAP run replaced by one that played a DIFFERENT game (projshift.tap: the same replay with
                     P1's inputs from f3000 two frames later) — KS must fail;
-  next-load-wrong   K0b's waived spans judged against the id AFTER the one the side loads next (id ^ 1) — K0b must fail.
+  next-load-wrong   K0b's waived spans judged against the id AFTER the one the side loads next (id ^ 1) — K0b must fail;
+  read-other-game   the flare leg's READ run replaced by one that played a DIFFERENT game (read_projshift.tap) — KR must fail.
 (wrong-base: rule-checker run 2026-10-08-904 Q3/Q4 — the picks were read back from the poked byte itself.)
 
 THE CHARACTER OF A BLOCK is read from its loaded character-data base +0x60.l against the game's own table at
@@ -41,6 +42,10 @@ RAM:$FF8080 in tap frame f equals the field run's sample at f+1 (the counter adv
 tell two games apart; control tap-misaligned) — and KS, THE SAME GAME — both sides' X (+0x10) and HP (+0x50) words,
 rebuilt at the end of every frame from the tap run's OWN writes, equal the field run's samples on every frame of every
 leg once all four words have been written (control tap-other-game: a tap run that played a different game fails it).
+The READER census (the third run per read leg, read_<tag>.tap) is tied the same way by KR: both sides' +0x0AC and +0x154
+bytes, rebuilt from the read run's own writes, equal the field run's samples on every frame from the first at which all
+four have been written (control read-other-game; rule-checker run 2026-10-08-910). KS and KR state their first compared
+frame per leg.
 A WRITE IS CREDITED TO THE CHARACTER OF THE BLOCK IT LANDS IN, not to the code that ran: "PC X with one character" means
 every write PC X made landed in blocks holding that one character. It is not code ownership — Morrigan's kick-throw code
 at PRG:0x03B2DA writes the VICTIM's +0x19A and is credited to the victim (rule-checker run 2026-10-08-906 Q4).
@@ -86,7 +91,7 @@ ap.add_argument("--legs", required=True)
 ap.add_argument("--pert", default="none", choices=("none", "absent-move", "wrong-owner", "pool-miscount", "passes-inflated",
                                                    "fall-shifted", "taps-as-dashes", "other-side-credit", "wrong-base",
                                                    "prewrite-human", "tap-misaligned", "tap-other-game",
-                                                   "next-load-wrong"))
+                                                   "next-load-wrong", "read-other-game"))
 ap.add_argument("--data", required=True, help="the vsavj DATA view (tools/cps2_decrypt.py --data-out): the +0x60 table")
 ap.add_argument("--out", required=True)
 A = ap.parse_args()
@@ -268,10 +273,47 @@ for tag in T:
             m_ += 1
             if first_bad is None: first_bad = f
     nks += n_; badks += m_ + (n_ == 0)
-    perks.append(f"{tag}:{n_ - m_}/{n_}" + (f"(first@{first_bad})" if first_bad else ""))
+    perks.append(f"{tag}:{n_ - m_}/{n_}from@{f0}" + (f"(first@{first_bad})" if first_bad else ""))
 cnt("tap_field_state", " ".join(perks))
-res(nks > 0 and badks == 0, "KS", f"both sides' X and HP rebuilt from the tap run's own writes equal the field run's samples on every frame, per leg (equal/compared): {' '.join(perks)}"
+res(nks > 0 and badks == 0, "KS", f"both sides' X and HP rebuilt from the tap run's own writes equal the field run's samples on every frame from the first at which all four words were written, per leg (equal/compared from@frame): {' '.join(perks)}"
     + (" — mode tap-other-game: the flare leg's tap run played a different game" if PERT == "tap-other-game" else ""))
+# KR THE READ RUNS PLAYED THE SAME GAME (rule-checker run 2026-10-08-910 Q1/Q4): the reader census comes from a THIRD
+# run per read leg; both sides' +0x0AC and +0x154 bytes, rebuilt at the end of each frame from that run's OWN writes,
+# equal the field run's samples (pind, c154) on every frame from the first at which all four were written
+RB = [(1, "pind", 0xAC), (1, "c154", 0x154), (2, "pind", 0xAC), (2, "c154", 0x154)]
+perkr = []; badkr = nkr = 0
+for tag in ("proj", "c128"):
+    src = "projshift" if (PERT == "read-other-game" and tag == "proj") else tag
+    cur = {}; state = {}
+    for l in open(f"{W}/read_{src}.tap"):
+        if not l.startswith("W "):
+            continue
+        q = l.split(); f, a, data, mask = int(q[1]) + 1, int(q[5], 16), int(q[7], 16), int(q[9], 16)
+        for b, v, on in ((a, (data >> 8) & 0xff, mask & 0xff00), (a + 1, data & 0xff, mask & 0x00ff)):
+            if not on:
+                continue
+            for s_, k_, off in RB:
+                if b == BASE[s_] + off:
+                    cur[(s_, k_)] = v
+        if len(cur) == 4:
+            state[f] = tuple(cur[(s_, k_)] for s_, k_, off in RB)
+    if not state:
+        badkr += 1; perkr.append(f"{tag}:0/0"); continue
+    f0 = min(state); last = None; n_ = m_ = 0; first_bad = None
+    for d in T[tag]:
+        f = d["f"]
+        if f < f0:
+            continue
+        last = state.get(f, last)
+        n_ += 1
+        if tuple(d[f"{k_}{s_}"] for s_, k_, off in RB) != last:
+            m_ += 1
+            if first_bad is None: first_bad = f
+    nkr += n_; badkr += m_ + (n_ == 0)
+    perkr.append(f"{tag}:{n_ - m_}/{n_}from@{f0}" + (f"(first@{first_bad})" if first_bad else ""))
+cnt("read_field_state", " ".join(perkr))
+res(nkr > 0 and badkr == 0, "KR", f"both sides' +0x0AC and +0x154 rebuilt from each READ run's own writes equal the field run's samples on every frame from the first at which all four were written (equal/compared from@frame): {' '.join(perkr)}"
+    + (" — mode read-other-game: the flare leg's read run played a different game" if PERT == "read-other-game" else ""))
 # K0b +0x382 agrees with the loaded base on every in-match side-frame (so the checks that read +0x382 read the character)
 # — except on a CPU side (+0x380 0) after the round timer reaches 0, where the arcade ladder has already written the
 # next opponent into +0x382 before it loads (ram.md +0x382, 14z-188; measured 14z-196 on 21, 22 and 24's P2): counted

@@ -43,7 +43,11 @@
 #   still joins the two runs, two checks MEASURE the pairing on every leg: KA, frame alignment only (the tap run's write
 #   of the vblank counter RAM:$FF8080 in tap frame f equals the field run's sample at f+1 — the counter advances whatever
 #   the input; control tap-misaligned) and KS, the same game (both sides' X and HP words rebuilt from the tap run's own
-#   writes equal the field run's samples on every frame; control tap-other-game, a tap run of a different game). No leg
+#   writes equal the field run's samples on every frame from the first at which all four were written, the start frame
+#   frozen per leg; control tap-other-game, a tap run of a different game). The READER census is a THIRD run per read
+#   leg (read_<tag>.tap, 128 and the flare leg): KR ties it the same way, both sides' +0x0AC and +0x154 bytes rebuilt
+#   from its own writes equal to the field run's samples on every frame from its start frame (control read-other-game,
+#   a read run of the shifted replay). No leg
 #   arms a debugger breakpoint or watchpoint (both scripts are memory taps); that their input stayed aligned (#228's
 #   class) is KS's measurement, not an assumption.
 # EXPECTS: the header names the ROM — every reference member verified against docs/checksums.txt, the vsavj program
@@ -60,6 +64,7 @@
 # MUST-FIRE: perturbed-copy: prewrite-human — K0b with the side of the arcade ladder's pre-write frames read as HUMAN must fail, so the 75 allowed frames are allowed only on a CPU side (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: perturbed-copy: tap-misaligned — KA comparing the tap run's RAM:$FF8080 writes with the field run's samples one frame later than they land must fail, so the two logs are proved FRAME-ALIGNED (the vblank counter cannot tell two games apart: that is KS) (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: known-bad: tap-other-game — KS with the flare leg's tap run replaced by a tap run of a DIFFERENT game (the replay with P1's inputs from f3000 two frames later, run in-gate) must fail, so the two runs of a leg are proved to have played the same game (in-gate; as a mode the gate FAILs)
+# MUST-FIRE: known-bad: read-other-game — KR with the flare leg's READ run replaced by a read run of a DIFFERENT game (the same shifted replay, run in-gate) must fail, so the reader census's third run is proved to have played the field run's game (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: perturbed-copy: next-load-wrong — K0b with each waived span judged against the id after the one the side loads next must fail, so the waiver's "loads next" test is applied (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: perturbed-copy: wrong-base — K0 with each forced pick judged against ANOTHER character's +0x60 table row (id ^ 1) must fail, so the pick is proved by the base the game loaded, not by the poked +0x382 (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: perturbed-copy: pool-miscount — K2 with every side's type-41 count shifted by one must fail, so +0x14B is compared with the count, not merely with itself (in-gate; as a mode the gate FAILs)
@@ -179,7 +184,7 @@ for line in open(sys.argv[1]):
     out.append(line)
 open(sys.argv[2], "w").write("".join(out))
 PY
-echo "t projshift $W/projshift.rpl 5600 -" >> "$W/jobs.txt"
+echo "t projshift $W/projshift.rpl 5600 -" >> "$W/jobs.txt"; echo "r projshift $W/projshift.rpl 5600 -" >> "$W/jobs.txt"   # KS's and KR's controls
 pool=0
 while read -r k tag r fr pk; do
     one "$k" "$tag" "$r" "$fr" "$pk" &
@@ -207,7 +212,7 @@ if [ -n "${VS_CTL:-}" ]; then
     cat "$W/mode.log"
     case "$VS_CTL" in absent-move) want='K1 K3 K4 K7 K10 K11' ;; wrong-owner) want='K12' ;; pool-miscount) want='K2' ;;
         passes-inflated) want='K6' ;; fall-shifted) want='K9' ;; taps-as-dashes) want='K5' ;; other-side-credit) want='K8' ;; wrong-base) want='K0' ;; prewrite-human) want='K0b' ;; tap-misaligned) want='KA' ;;
-        tap-other-game) want='KS' ;; next-load-wrong) want='K0b' ;; esac
+        tap-other-game) want='KS' ;; next-load-wrong) want='K0b' ;; read-other-game) want='KR' ;; esac
     ok=1; for k in $want; do grep -q "FAIL  \[$k\]" "$W/mode.log" || ok=0; done
     if [ "$rc" = 1 ] && [ "$ok" = 1 ]; then vs_ctl_fired "$VS_CTL" "the perturbed checks failed $want (mode)"
     else echo "REFUSED: CONTROL=$VS_CTL — the perturbation did not make every check it targets fail (rc $rc; wanted $want): a dead mode, not a verdict"; exit 3; fi
@@ -220,7 +225,7 @@ grep -q '\[K12\]' "$W/checks.log" || { echo "  FAIL  the checks did not reach K1
 echo "== 3. the must-fire controls (in-gate)"
 for c in "absent-move:K1 K3 K4 K7 K10 K11" "wrong-owner:K12" "pool-miscount:K2" "passes-inflated:K6" "fall-shifted:K9" \
          "taps-as-dashes:K5" "other-side-credit:K8" "wrong-base:K0" "prewrite-human:K0b" "tap-misaligned:KA" \
-         "tap-other-game:KS" "next-load-wrong:K0b"; do
+         "tap-other-game:KS" "next-load-wrong:K0b" "read-other-game:KR"; do
     name="${c%%:*}"; want="${c#*:}"
     an "$name" "$W/ctl_$name.tsv" > "$W/ctl_$name.log" 2>&1 && rc=0 || rc=1
     miss=""; for k in $want; do grep -q "FAIL  \[$k\]" "$W/ctl_$name.log" || miss="$miss $k"; done
