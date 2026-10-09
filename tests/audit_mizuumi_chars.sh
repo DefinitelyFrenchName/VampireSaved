@@ -37,9 +37,13 @@
 #   118_dash, 118_mo_kthrow and 118_anak_taunt (forced picks by POKES, each proved by its loaded +0x60 base), 118_random, and
 #   the 13 census replays of the 14z-194 pilot (01 10 26 07 08 29 128 19 21 22 24 30 50 — the corpus replays that play
 #   OTHER characters); two READ-TAP legs (WINDOW the whole run) over both blocks' +0x154 and +0x0AC words on 128 and the
-#   flare leg. The analysis is tools/mizuumi_chars.py (its --pert modes are the controls). A tap write in tap frame f
-#   lands in trace frame f+1. No leg arms a debugger breakpoint or watchpoint (field_trace and read_tap are memory taps),
-#   so the [MFI-5] input-drift class (#228) does not apply.
+#   flare leg. The analysis is tools/mizuumi_chars.py (its --pert modes are the controls). TWO MAME PROCESSES PER LEG
+#   (field and tap): K8 and K12 credit each write from the SAME tap run — it logs both blocks' +0x60 base words, so the
+#   base in force at a write is the one that run last wrote (rule-checker run 2026-10-08-908) — and wherever a check
+#   still joins the two runs, KA MEASURES that they played the same game: the tap run's write of the vblank counter
+#   RAM:$FF8080 in tap frame f equals the field run's sample at trace frame f+1, on every frame of every leg (control
+#   tap-misaligned). No leg arms a debugger breakpoint or watchpoint (both scripts are memory taps); the alignment of
+#   their input (#228's class) is KA's measurement, not an assumption.
 # EXPECTS: the header names the ROM — every reference member verified against docs/checksums.txt, the vsavj program
 #   fingerprint equal to the registry's vsavj row, each loaded zip's sha1 — and the MAME (tests/lib/mame_ident.sh), or the
 #   gate FAILs before any leg; K0, K0b and K1-K12 as stated, each over a nonzero sample; every count equal
@@ -52,6 +56,7 @@
 # MUST-FIRE: perturbed-copy: absent-move — the checks run with every leg's move detector emptied (no own flare, no opponent flare, no Gallon Dark Force, no taunt press, no D,D,D) must fail K1, K3, K4, K7, K10 and K11, so each flag would be seen set where its move is absent (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: perturbed-copy: wrong-owner — the ownership census with one non-clear writer PC that writes ONLY UNNAMED bytes of the tapped range credited to a second character must fail K12, so a shared-code writer anywhere in +0x34..+0x37 / +0x360..+0x37F would be caught (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: perturbed-copy: prewrite-human — K0b with the side of the arcade ladder's pre-write frames read as HUMAN must fail, so the 75 allowed frames are allowed only on a CPU side (in-gate; as a mode the gate FAILs)
+# MUST-FIRE: perturbed-copy: tap-misaligned — KA comparing the tap run's RAM:$FF8080 writes with the field run's samples one frame later than they land must fail, so the two runs of a leg are proved to have played the same game, frame for frame (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: perturbed-copy: wrong-base — K0 with each forced pick judged against ANOTHER character's +0x60 table row (id ^ 1) must fail, so the pick is proved by the base the game loaded, not by the poked +0x382 (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: perturbed-copy: pool-miscount — K2 with every side's type-41 count shifted by one must fail, so +0x14B is compared with the count, not merely with itself (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: perturbed-copy: passes-inflated — K6 judged against each frame's engine passes ($FF8081) plus one must fail, so the "falls by at least the passes" check reads the pass counter (in-gate; as a mode the gate FAILs)
@@ -95,14 +100,14 @@ echo "  head  $(git -C "$REPO" describe --always --dirty --abbrev=40 2>/dev/null
 . "$REPO/tests/lib/mame_ident.sh"; vs_mame_ident "$MAME_BIN" || { echo "FAIL: the MAME binary is not the pinned release (above)"; exit 1; }
 
 # ADDRESSES ARE COMPUTED from the block base, never concatenated (the 14z-189 lesson of audit_mizuumi_struct.sh)
-F="ff8109:b:timer,ff8081:b:pass"; RT=""
+F="ff8109:b:timer,ff8081:b:pass,ff8080:b:gclock"; RT="ff8080,2"   # the vblank counter, in both runs (KA)
 for s in 1 2; do
     base=$([ "$s" = 1 ] && echo $((0xff8400)) || echo $((0xff8800)))
     for spec in 00b:b:face 010:w:x 050:w:hp 060:l:base 380:b:playing 0ac:b:pind 110:b:dfm 136:b:c136 149:b:pact 14b:b:c14b 154:b:c154 15c:w:c15c \
                 192:b:cfl 19a:b:c19a 1a2:b:c1a2 1b8:w:atk 1bb:b:c1bb 372:b:dash 382:b:char 3c1:b:c3c1; do
         F="$F,$(printf '%06x' $((base + 0x${spec%%:*}))):${spec#*:}$s"
     done
-    for o in 034:4 0ac:2 110:2 136:2 148:4 154:2 15c:2 192:2 19a:2 1a2:2 1ba:2 360:32 3c0:2; do   # +0x372 is inside 360:32 (an overlapping word logs each write twice)
+    for o in 034:4 060:4 0ac:2 110:2 136:2 148:4 154:2 15c:2 192:2 19a:2 1a2:2 1ba:2 360:32 3c0:2; do   # +0x372 is inside 360:32 (an overlapping word logs each write twice)
         RT="$RT${RT:+;}$(printf '%06x' $((base + 0x${o%%:*}))),${o#*:}"
     done
 done
@@ -182,7 +187,7 @@ if [ -n "${VS_CTL:-}" ]; then
     an "$VS_CTL" "$W/mode.tsv" > "$W/mode.log" 2>&1 && rc=0 || rc=1
     cat "$W/mode.log"
     case "$VS_CTL" in absent-move) want='K1 K3 K4 K7 K10 K11' ;; wrong-owner) want='K12' ;; pool-miscount) want='K2' ;;
-        passes-inflated) want='K6' ;; fall-shifted) want='K9' ;; taps-as-dashes) want='K5' ;; other-side-credit) want='K8' ;; wrong-base) want='K0' ;; prewrite-human) want='K0b' ;; esac
+        passes-inflated) want='K6' ;; fall-shifted) want='K9' ;; taps-as-dashes) want='K5' ;; other-side-credit) want='K8' ;; wrong-base) want='K0' ;; prewrite-human) want='K0b' ;; tap-misaligned) want='KA' ;; esac
     ok=1; for k in $want; do grep -q "FAIL  \[$k\]" "$W/mode.log" || ok=0; done
     if [ "$rc" = 1 ] && [ "$ok" = 1 ]; then vs_ctl_fired "$VS_CTL" "the perturbed checks failed $want (mode)"
     else echo "REFUSED: CONTROL=$VS_CTL — the perturbation did not make every check it targets fail (rc $rc; wanted $want): a dead mode, not a verdict"; exit 3; fi
@@ -194,7 +199,7 @@ grep -q '\[K12\]' "$W/checks.log" || { echo "  FAIL  the checks did not reach K1
 
 echo "== 3. the must-fire controls (in-gate)"
 for c in "absent-move:K1 K3 K4 K7 K10 K11" "wrong-owner:K12" "pool-miscount:K2" "passes-inflated:K6" "fall-shifted:K9" \
-         "taps-as-dashes:K5" "other-side-credit:K8" "wrong-base:K0" "prewrite-human:K0b"; do
+         "taps-as-dashes:K5" "other-side-credit:K8" "wrong-base:K0" "prewrite-human:K0b" "tap-misaligned:KA"; do
     name="${c%%:*}"; want="${c#*:}"
     an "$name" "$W/ctl_$name.tsv" > "$W/ctl_$name.log" 2>&1 && rc=0 || rc=1
     miss=""; for k in $want; do grep -q "FAIL  \[$k\]" "$W/ctl_$name.log" || miss="$miss $k"; done

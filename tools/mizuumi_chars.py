@@ -21,13 +21,20 @@ names come from tools/vanilla_frames.py's CHARS (held to the atlas by tools/audi
   taps-as-dashes    K5's script count taking every tap for a dash — K5 must fail;
   other-side-credit K8's writes credited to the OPPOSITE block's character — K8 must fail;
   wrong-base        K0's forced picks judged against ANOTHER character's +0x60 base (id ^ 1) — K0 must fail;
-  prewrite-human    K0b with the ladder pre-write frames' side read as HUMAN — K0b must fail (the exception is CPU-only).
+  prewrite-human    K0b with the ladder pre-write frames' side read as HUMAN — K0b must fail (the exception is CPU-only);
+  tap-misaligned    KA comparing the tap run's $FF8080 one frame later than it lands — KA must fail.
 (wrong-base: rule-checker run 2026-10-08-904 Q3/Q4 — the picks were read back from the poked byte itself.)
 
 THE CHARACTER OF A BLOCK is read from its loaded character-data base +0x60.l against the game's own table at
 PRG:0x0BD97A (docs/game/atlas/character_tables.md; --data, the vsavj data view, read at run time), never from the
 +0x382 byte the forced picks poke: K0 proves each pick by it, K0b holds +0x382 to it on every in-match side-frame, and
 the writer crediting of K8 and K12 uses it (a frame whose base is in no row falls back to +0x382, counted).
+THE CREDITING OF K8 AND K12 IS FROM THE SAME RUN THAT OBSERVED THE WRITE (rule-checker run 2026-10-08-908): the tap run
+also logs each block's +0x60 base words, so the base in force at a write is the last base the SAME run wrote before it,
+in the tap's own line order — no second MAME process is consulted. Where a check still joins the tap run with the field
+run (K1's writers, K3, K5, K9's and K10's writers, the reader census), KA proves the two runs played the same game on
+every leg: the tap run's write of the game's vblank counter RAM:$FF8080 in tap frame f equals the field run's sample of
+it at trace frame f+1, on every frame of every leg (control tap-misaligned).
 A WRITE IS CREDITED TO THE CHARACTER OF THE BLOCK IT LANDS IN, not to the code that ran: "PC X with one character" means
 every write PC X made landed in blocks holding that one character. It is not code ownership — Morrigan's kick-throw code
 at PRG:0x03B2DA writes the VICTIM's +0x19A and is credited to the victim (rule-checker run 2026-10-08-906 Q4).
@@ -72,7 +79,7 @@ ap.add_argument("--replays", required=True)
 ap.add_argument("--legs", required=True)
 ap.add_argument("--pert", default="none", choices=("none", "absent-move", "wrong-owner", "pool-miscount", "passes-inflated",
                                                    "fall-shifted", "taps-as-dashes", "other-side-credit", "wrong-base",
-                                                   "prewrite-human"))
+                                                   "prewrite-human", "tap-misaligned"))
 ap.add_argument("--data", required=True, help="the vsavj DATA view (tools/cps2_decrypt.py --data-out): the +0x60 table")
 ap.add_argument("--out", required=True)
 A = ap.parse_args()
@@ -172,6 +179,22 @@ def charof(d, s):
 T = {tag: load(tag) for tag, _, _ in LEGS}
 S = {tag: staged(rpl) for tag, rpl, _ in LEGS}
 TW = {tag: taps(tag) for tag, _, _ in LEGS}
+def tapchars(tag):
+    """per tap entry, in the tap's own line order: (side-1 character, side-2 character) by the +0x60 base THIS run had
+    written before that entry (None = unloaded); the base's four bytes are tracked from the run's own writes"""
+    cur = {1: [0, 0, 0, 0], 2: [0, 0, 0, 0]}; out = []
+    for f, pc, b, v in TW[tag]:
+        for s_ in (1, 2):
+            a0 = BASE[s_] + 0x60
+            if a0 <= b < a0 + 4:
+                cur[s_][b - a0] = v
+        out.append(tuple(INV.get(int.from_bytes(bytes(cur[s_]), "big")) for s_ in (1, 2)))
+    return out
+TC = {tag: tapchars(tag) for tag in TW}
+def wfieldc(tag, s, off):
+    """[(trace frame, pc, value, the character of the block written, the other block's)] — both from the SAME run"""
+    a = BASE[s] + off
+    return [(f, pc, v, TC[tag][i][s - 1], TC[tag][i][2 - s]) for i, (f, pc, b, v) in enumerate(TW[tag]) if b == a]
 BYF = {tag: {d["f"]: d for d in T[tag]} for tag in T}
 
 # K0 the forced picks of the two rigs read back from +0x382 in the match (POKES, never the cursor)
@@ -183,6 +206,25 @@ for tag, want in (("mokt", 0x05), ("anak", 0x06)):
     cnt(f"pick_{tag}", f"forced {want:02x}: in-match +0x60 bases {','.join(f'{b:08x}' for b in got)}; table row {BASES[want]:08x}")
     res(got == [row], "K0", f"{tag}: P1's in-match +0x60 bases {[f'{b:08x}' for b in got]} against the table row {row:08x} of id "
         f"{(want ^ 1) if PERT == 'wrong-base' else want:02x}{' (mode wrong-base)' if PERT == 'wrong-base' else ''}")
+# KA THE TWO RUNS OF A LEG PLAYED THE SAME GAME (rule-checker run 2026-10-08-908 Q1/Q4, #228's class): the tap run's
+# last write of the vblank counter RAM:$FF8080 in each tap frame equals the field run's sample of it one frame later
+# (the "+1" the joins assume), on EVERY frame of EVERY leg; tap-misaligned compares one frame further and must fail
+shka = 1 if PERT == "tap-misaligned" else 0
+perka = []; badka = nka = 0
+for tag in T:
+    lastw = {}
+    for f, pc, b, v in TW[tag]:
+        if b == 0xFF8080:
+            lastw[f] = v            # f is already the trace frame (tap frame + 1)
+    n_ = m_ = 0
+    for f, v in lastw.items():
+        d = BYF[tag].get(f + shka)
+        if d is not None:
+            n_ += 1; m_ += (d["gclock"] & 0xff) != v
+    nka += n_; badka += m_ + (n_ == 0)
+    perka.append(f"{tag}:{n_ - m_}/{n_}")
+cnt("tap_field_alignment", " ".join(perka))
+res(nka > 0 and badka == 0, "KA", f"$FF8080 written by the tap run equals the field run's sample{' one frame later (mode tap-misaligned)' if shka else ''}, per leg (equal/compared): {' '.join(perka)}")
 # K0b +0x382 agrees with the loaded base on every in-match side-frame (so the checks that read +0x382 read the character)
 # — except on a CPU side (+0x380 0) after the round timer reaches 0, where the arcade ladder has already written the
 # next opponent into +0x382 before it loads (ram.md +0x382, 14z-188; measured 14z-196 on 21, 22 and 24's P2): counted
@@ -198,10 +240,31 @@ for tag in T:
                         pre0b += 1; continue
                     bad0b += 1
                     if len(ex0b) < 4: ex0b.append(f"{tag} P{s} f{d['f']} +0x382 {d[f'char{s}']:02x} base {d[f'base{s}'] & 0xffffffff:08x}")
+# the waived frames ARE the ladder's pre-write only if the waived +0x382 is the character that side loads next: for each
+# waived span, the first later frame whose base resolves must hold the table row of the waived id
+waived = collections.defaultdict(list)
+for tag in T:
+    for s in (1, 2):
+        for d in T[tag]:
+            if inmatch(d) and (d[f"base{s}"] & 0xffffffff) != BASES[d[f"char{s}"] & 0x1f] and d[f"playing{s}"] == 0 and d["timer"] == 0:
+                waived[(tag, s)].append(d)
+nxt0b = []
+for (tag, s), ds in waived.items():
+    spans_ = []
+    for d in ds:
+        if spans_ and d["f"] == spans_[-1][-1]["f"] + 1: spans_[-1].append(d)
+        else: spans_.append([d])
+    for sp in spans_:
+        want = sp[0][f"char{s}"] & 0x1f
+        nb = next((e for e in T[tag] if e["f"] > sp[-1]["f"] and (e[f"base{s}"] & 0xffffffff) in INV and (e[f"base{s}"] & 0xffffffff) != (sp[0][f"base{s}"] & 0xffffffff)), None)
+        got = INV.get(nb[f"base{s}"] & 0xffffffff) if nb else None
+        nxt0b.append((tag, s, sp[0]["f"], sp[-1]["f"], want, got, nb["f"] if nb else None))
+bad_nxt = sum(1 for t in nxt0b if t[5] != (t[4] & 0x0f))
+cnt("prewrite_spans", " ".join(f"{t[0]}:P{t[1]}:{t[2]}-{t[3]}:+0x382={t[4]:02x}:next-loaded={'-' if t[5] is None else f'{t[5]:02x}'}@{t[6]}" for t in nxt0b))
 cnt("char_vs_base", f"in-match side-frames {n0b}: +0x382 agrees with the base on {n0b - bad0b - pre0b}, differs as the ladder's pre-write on a CPU side after the timer reached 0 on {pre0b} (allowed), differs otherwise on {bad0b}")
-res(n0b > 0 and bad0b == 0, "K0b", f"+0x382 equals the table id of the loaded +0x60 base on {n0b - bad0b - pre0b}/{n0b} in-match side-frames; "
+res(n0b > 0 and bad0b == 0 and bad_nxt == 0, "K0b", f"+0x382 equals the table id of the loaded +0x60 base on {n0b - bad0b - pre0b}/{n0b} in-match side-frames; "
     f"{pre0b} differ as the ladder's pre-write on a CPU side after the timer reached 0 (allowed){' — mode prewrite-human: those sides read as human' if PERT == 'prewrite-human' else ''}; "
-    f"{bad0b} differ otherwise {ex0b}")
+    f"{bad0b} differ otherwise {ex0b}; the waived spans' +0x382 is the character the side loads next on {len(nxt0b) - bad_nxt}/{len(nxt0b)} spans")
 
 # K1 +0x149: never above the side's live count of its character's counted type (TYPE149; 0 for a character not in the
 # map), and it rises on the frame each object of that type appears (offset frozen)
@@ -275,9 +338,10 @@ res(n2 > 0 and mism == 0 and sum(nz2.values()) > 0, "K2",
 by0ac = collections.defaultdict(set); n3 = miss3 = 0; lead3 = collections.Counter()
 for tag in T:
     for s in (1, 2):
-        ws = [(f, pc, v) for f, pc, v in wfield(TW[tag], s, 0xAC) if v and not clear(pc) and f in BYF[tag]]
-        for f, pc, v in ws:
-            by0ac[pc].add(name(charof(BYF[tag][f], s)))
+        ws = [(f, pc, v) for f, pc, v, own, oth in wfieldc(tag, s, 0xAC) if v and not clear(pc)]
+        for f, pc, v, own, oth in wfieldc(tag, s, 0xAC):
+            if v and not clear(pc):
+                by0ac[pc].add(name(own))
         dem = [f for f, pc, v in ws if pc == "03018a"]
         fl = [a for a, b in spans(T[tag], lambda d: own_live(d, s, FLARE) > 0)]
         for f in dem:
@@ -410,9 +474,9 @@ def credit(s):   # the block whose character a write is credited to (other-side-
 by154 = collections.defaultdict(set); fr154 = collections.Counter()
 for tag in T:
     for s in (1, 2):
-        for f, pc, v in wfield(TW[tag], s, 0x154):
-            if v and not clear(pc) and f in BYF[tag]:
-                by154[pc].add(name(charof(BYF[tag][f], credit(s))))
+        for f, pc, v, own, oth in wfieldc(tag, s, 0x154):
+            if v and not clear(pc):
+                by154[pc].add(name(oth if PERT == "other-side-credit" else own))
         for d in T[tag]:
             if d[f"c154{s}"]:
                 fr154[name(charof(d, s))] += 1
@@ -426,9 +490,9 @@ for off, fld in ((0x136, "c136"), (0x19A, "c19a")):
     byw = collections.defaultdict(set)
     for tag in T:
         for s in (1, 2):
-            for f, pc, v in wfield(TW[tag], s, off):
-                if v and not clear(pc) and f in BYF[tag]:
-                    byw[pc].add(name(charof(BYF[tag][f], credit(s))))
+            for f, pc, v, own, oth in wfieldc(tag, s, off):
+                if v and not clear(pc):
+                    byw[pc].add(name(oth if PERT == "other-side-credit" else own))
     elsewhere = sum(1 for tag in T if tag != "mokt" for s in (1, 2) for d in T[tag] if d[f"{fld}{s}"])
     vv = collections.defaultdict(set)
     for tag in T:
@@ -511,13 +575,13 @@ for tag in T:
         if inmatch(d):
             for s in (1, 2):
                 played[name(charof(d, s))] += 1
-    for f, pc, b, v in TW[tag]:
-        if clear(pc) or f not in BYF[tag]:
+    for i, (f, pc, b, v) in enumerate(TW[tag]):
+        if clear(pc):
             continue
         for s in (1, 2):
             off = b - BASE[s]
             if off in TAPPED:
-                ch = name(charof(BYF[tag][f], s))
+                ch = name(TC[tag][i][s - 1])   # the block's character by THIS run's own +0x60 writes
                 owners[off][ch][pc] += 1; pcchars[pc].add(ch); vals[off][ch].add(v); pcoffs[pc].add(off)
 NAMEDB = {o + i for o in NAMED for i in range(SIZE.get(o, 1))}
 planted = None
