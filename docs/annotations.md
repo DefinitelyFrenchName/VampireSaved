@@ -24,14 +24,14 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | figure | count |
 |---|---|
 | distinct program-space addresses named | 3595 |
-| named by a document or manifest only | 2288 |
-| named by both a document/manifest and code | 869 |
+| named by a document or manifest only | 2287 |
+| named by both a document/manifest and code | 870 |
 | named by CODE ONLY (the gap list below) | 438 |
 | carried by atlas | 722 |
 | carried by engine_internals | 826 |
 | carried by other docs | 1059 |
 | carried by manifests | 1850 |
-| carried by code | 1307 |
+| carried by code | 1308 |
 
 ## Addresses
 
@@ -1581,7 +1581,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0373BC` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x03844E` | docs/project/patch_notes.md — 14z-65 (4) — Huitzil stage 4 BUILDS; the R1 frontier enumerated (2026-08-07); build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x03975E` | HANDOFF.md — THE OUT-OF-RANGE INDEX TOOLKIT — three instruments, one class (measured 14z-78); tests/lua/index_watch.lua; tools/gen_index_window_thunk.py |
-| `PRG:0x03B2DA` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
+| `PRG:0x03B2DA` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; tests/audit_mizuumi_chars.sh; tools/mizuumi_chars.py |
 | `PRG:0x03B37A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x03B3B0` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x03B77C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |

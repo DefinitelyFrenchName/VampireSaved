@@ -20,13 +20,17 @@ names come from tools/vanilla_frames.py's CHARS (held to the atlas by tools/audi
   fall-shifted      K9's P2 HP falls moved 30 frames later — K9 must fail;
   taps-as-dashes    K5's script count taking every tap for a dash — K5 must fail;
   other-side-credit K8's writes credited to the OPPOSITE block's character — K8 must fail;
-  wrong-base        K0's forced picks judged against ANOTHER character's +0x60 base (id ^ 1) — K0 must fail.
+  wrong-base        K0's forced picks judged against ANOTHER character's +0x60 base (id ^ 1) — K0 must fail;
+  prewrite-human    K0b with the ladder pre-write frames' side read as HUMAN — K0b must fail (the exception is CPU-only).
 (wrong-base: rule-checker run 2026-10-08-904 Q3/Q4 — the picks were read back from the poked byte itself.)
 
 THE CHARACTER OF A BLOCK is read from its loaded character-data base +0x60.l against the game's own table at
 PRG:0x0BD97A (docs/game/atlas/character_tables.md; --data, the vsavj data view, read at run time), never from the
 +0x382 byte the forced picks poke: K0 proves each pick by it, K0b holds +0x382 to it on every in-match side-frame, and
 the writer crediting of K8 and K12 uses it (a frame whose base is in no row falls back to +0x382, counted).
+A WRITE IS CREDITED TO THE CHARACTER OF THE BLOCK IT LANDS IN, not to the code that ran: "PC X with one character" means
+every write PC X made landed in blocks holding that one character. It is not code ownership — Morrigan's kick-throw code
+at PRG:0x03B2DA writes the VICTIM's +0x19A and is credited to the victim (rule-checker run 2026-10-08-906 Q4).
 (rule-checker run 2026-10-08-902 Q4: the last four, each judged check passed unchanged under the first three.)
 """
 import argparse
@@ -67,7 +71,8 @@ ap.add_argument("--work", required=True)
 ap.add_argument("--replays", required=True)
 ap.add_argument("--legs", required=True)
 ap.add_argument("--pert", default="none", choices=("none", "absent-move", "wrong-owner", "pool-miscount", "passes-inflated",
-                                                   "fall-shifted", "taps-as-dashes", "other-side-credit", "wrong-base"))
+                                                   "fall-shifted", "taps-as-dashes", "other-side-credit", "wrong-base",
+                                                   "prewrite-human"))
 ap.add_argument("--data", required=True, help="the vsavj DATA view (tools/cps2_decrypt.py --data-out): the +0x60 table")
 ap.add_argument("--out", required=True)
 A = ap.parse_args()
@@ -81,7 +86,7 @@ def res(c, t, m):
 def cnt(k, v):
     counts.append(f"{k}\t{v}")
 def name(c):
-    return NAMES.get(c, f"id{c:02x}")
+    return "unloaded" if c is None else NAMES.get(c, f"id{c:02x}")
 
 LEGS = []
 for l in open(A.legs):
@@ -157,12 +162,13 @@ for i, b in enumerate(BASES):
     INV.setdefault(b, i)            # 0x10-0x1F alias 0x00-0x0F (Oboro 0x18 excepted), so the base names the 0x0N id
 FALLBACK = collections.Counter()
 def charof(d, s):
-    """the block's character by its loaded +0x60 base; +0x382 only when the base is in no row (counted)"""
+    """the block's character by its loaded +0x60 base, or None (UNLOADED: the base is in no row of the table — between
+    matches, at boot) — never +0x382; the frames and writes that meet an unloaded block are counted, not credited"""
     b = d.get(f"base{s}", 0) & 0xffffffff
     if b in INV:
         return INV[b]
     FALLBACK[s] += 1
-    return d[f"char{s}"]
+    return None
 T = {tag: load(tag) for tag, _, _ in LEGS}
 S = {tag: staged(rpl) for tag, rpl, _ in LEGS}
 TW = {tag: taps(tag) for tag, _, _ in LEGS}
@@ -187,12 +193,15 @@ for tag in T:
             if inmatch(d):
                 n0b += 1
                 if (d[f"base{s}"] & 0xffffffff) != BASES[d[f"char{s}"] & 0x1f]:
-                    if d[f"playing{s}"] == 0 and d["timer"] == 0:   # the ladder's pre-write (ram.md +0x382): counted, allowed
+                    cpu = d[f"playing{s}"] == 0 and PERT != "prewrite-human"   # prewrite-human: the side read as human
+                    if cpu and d["timer"] == 0:   # the ladder's pre-write (ram.md +0x382): counted, allowed
                         pre0b += 1; continue
                     bad0b += 1
                     if len(ex0b) < 4: ex0b.append(f"{tag} P{s} f{d['f']} +0x382 {d[f'char{s}']:02x} base {d[f'base{s}'] & 0xffffffff:08x}")
-cnt("char_vs_base", f"in-match side-frames {n0b}, +0x382 disagreeing with the base {bad0b}, of them the ladder's pre-write on a CPU side after the timer reached 0 {pre0b} (allowed)")
-res(n0b > 0 and bad0b == 0, "K0b", f"+0x382 equals the table id of the loaded +0x60 base on {n0b - bad0b}/{n0b} in-match side-frames {ex0b}")
+cnt("char_vs_base", f"in-match side-frames {n0b}: +0x382 agrees with the base on {n0b - bad0b - pre0b}, differs as the ladder's pre-write on a CPU side after the timer reached 0 on {pre0b} (allowed), differs otherwise on {bad0b}")
+res(n0b > 0 and bad0b == 0, "K0b", f"+0x382 equals the table id of the loaded +0x60 base on {n0b - bad0b - pre0b}/{n0b} in-match side-frames; "
+    f"{pre0b} differ as the ladder's pre-write on a CPU side after the timer reached 0 (allowed){' — mode prewrite-human: those sides read as human' if PERT == 'prewrite-human' else ''}; "
+    f"{bad0b} differ otherwise {ex0b}")
 
 # K1 +0x149: never above the side's live count of its character's counted type (TYPE149; 0 for a character not in the
 # map), and it rises on the frame each object of that type appears (offset frozen)
@@ -205,13 +214,13 @@ for tag in T:
     for s in (1, 2):
         Tl = T[tag]
         for d in Tl:
-            ty = TYPE149.get(name(d[f"char{s}"]), set())
+            ty = TYPE149.get(name(charof(d, s)), set())
             if d[f"pact{s}"] > own_types(d, s, ty):
                 viol1 += 1
         for a, b in zip(Tl, Tl[1:]):
-            ty = TYPE149.get(name(b[f"char{s}"]), set())
+            ty = TYPE149.get(name(charof(b, s)), set())
             if ty and own_types(b, s, ty) > own_types(a, s, ty):
-                n1 += 1; per1[name(b[f"char{s}"])] += 1
+                n1 += 1; per1[name(charof(b, s))] += 1
                 offs1["rise" if b[f"pact{s}"] > a[f"pact{s}"] else "no rise"] += 1
 res(n1 > 0 and viol1 == 0 and set(offs1) == {"rise"}, "K1",
     f"+0x149: {n1} new objects of the counted type {dict(per1)}, +0x149 rising on the same frame {dict(offs1)}; side-frames where it exceeds the live count: {viol1}")
@@ -221,7 +230,7 @@ outl = []
 for tag in T:
     for s in (1, 2):
         Tl = T[tag]
-        for a, b in spans(Tl, lambda d: d[f"char{s}"] == DEMITRI and own_types(d, s, {FLARE}) > 0):
+        for a, b in spans(Tl, lambda d: charof(d, s) == DEMITRI and own_types(d, s, {FLARE}) > 0):
             last = max((d["f"] for d in Tl if a <= d["f"] <= b and d[f"pact{s}"]), default=None)
             outl.append(f"{tag}:P{s}:{a}-{b}:{b - last if last is not None else '-'}")
 cnt("pact_demitri_flare_outlives", " ".join(outl))
@@ -229,7 +238,7 @@ mx1 = collections.Counter()
 for tag in T:
     for s in (1, 2):
         for d in T[tag]:
-            c = name(d[f"char{s}"]); mx1[c] = max(mx1[c], d[f"pact{s}"])
+            c = name(charof(d, s)); mx1[c] = max(mx1[c], d[f"pact{s}"])
 cnt("pact_max_by_char", " ".join(f"{k}:{v}" for k, v in sorted(mx1.items()) if v))
 w149 = collections.Counter((pc, v) for tag in T for s in (1, 2) for f, pc, v in wfield(TW[tag], s, 0x149) if not clear(pc))
 cnt("pact_writers", " ".join(f"{pc}={v}:{n}" for (pc, v), n in sorted(w149.items())))
@@ -245,7 +254,7 @@ for tag in T:
             q = own_live(d, s, QBEE) + sh
             n2 += 1; mism += d[f"c14b{s}"] != q
             if d[f"c14b{s}"]:
-                nz2[name(d[f"char{s}"])] += 1; hi2 = max(hi2, d[f"c14b{s}"])
+                nz2[name(charof(d, s))] += 1; hi2 = max(hi2, d[f"c14b{s}"])
 cnt("c14b_nonzero_by_char", " ".join(f"{k}:{v}" for k, v in sorted(nz2.items())))
 cnt("c14b_side_frames", f"in-match {n2}, equal {n2 - mism}")
 oth2 = collections.Counter()   # the side's OTHER live projectile types on in-match frames (K2's equality spans them)
@@ -268,7 +277,7 @@ for tag in T:
     for s in (1, 2):
         ws = [(f, pc, v) for f, pc, v in wfield(TW[tag], s, 0xAC) if v and not clear(pc) and f in BYF[tag]]
         for f, pc, v in ws:
-            by0ac[pc].add(name(BYF[tag][f][f"char{s}"]))
+            by0ac[pc].add(name(charof(BYF[tag][f], s)))
         dem = [f for f, pc, v in ws if pc == "03018a"]
         fl = [a for a, b in spans(T[tag], lambda d: own_live(d, s, FLARE) > 0)]
         for f in dem:
@@ -342,7 +351,7 @@ for tag in T:
                 bad5 += v not in (2, 3); side5[(v, "right" if d[f"x{3 - s}"] > d[f"x{s}"] else "left")] += 1
                 x30 = BYF[tag].get(f + 30, d)[f"x{s}"]
                 cnt(f"dash_write_{tag}_P{s}_f{f}", f"value {v} x {d[f'x{s}']} opponent x {d[f'x{3 - s}']} face {d[f'face{s}']} dx30 {x30 - d[f'x{s}']}")
-        nondem += sum(1 for d in T[tag] if d[f"dash{s}"] and d[f"char{s}"] != DEMITRI)
+        nondem += sum(1 for d in T[tag] if d[f"dash{s}"] and charof(d, s) != DEMITRI)
 def dashes(Sd, s):
     taps_ = [f for f in sorted(Sd) if (Sd[f][s] & set("LR")) and not (Sd.get(f - 1, {s: set()})[s] & set("LR"))]
     if PERT == "taps-as-dashes":
@@ -374,7 +383,7 @@ for tag in T:
             hpl = sum(1 for f in frames if B[f][f"hp{s}"] < B[f - 1][f"hp{s}"])
             atk = sum(1 for f in frames if B[f][f"atk{s}"] > B[f - 1][f"atk{s}"])
             bad6 += short + hpl + atk
-            cnt(f"c15c_{tag}_P{s}", f"span {a}-{b} start {B[a][f'c15c{s}']} {name(B[a][f'char{s}'])}; frames falling less than the passes {short}; hp falls {hpl}; attack starts {atk}")
+            cnt(f"c15c_{tag}_P{s}", f"span {a}-{b} start {B[a][f'c15c{s}']} {name(charof(B[a], s))}; frames falling less than the passes {short}; hp falls {hpl}; attack starts {atk}")
 w15c = collections.Counter(pc for tag in T for s in (1, 2) for f, pc, v in wfield(TW[tag], s, 0x15D) if not clear(pc))
 cnt("c15c_writers", " ".join(f"{pc}:{n}" for pc, n in sorted(w15c.items())))
 res(n6 > 0 and bad6 == 0, "K6", f"+0x15C: {n6} nonzero spans; frames that fall less than the passes, HP falls and attack starts inside: {bad6}")
@@ -386,8 +395,8 @@ for tag in T:
         for d in T[tag]:
             if not inmatch(d):
                 continue
-            g = d[f"dfm{s}"] != 0 and d[f"char{s}"] == GALLON and not ABSENT
-            gal += g; oth += d[f"dfm{s}"] != 0 and d[f"char{s}"] != GALLON
+            g = d[f"dfm{s}"] != 0 and charof(d, s) == GALLON and not ABSENT
+            gal += g; oth += d[f"dfm{s}"] != 0 and charof(d, s) != GALLON
             mism7 += (d[f"c1a2{s}"] != 0) != g
 gsp = [f"{tag}:P{s}:{a}-{b}" for tag in T for s in (1, 2)
        for a, b in spans([d for d in T[tag] if inmatch(d)], lambda d: d[f"c1a2{s}"] != 0)]
@@ -406,7 +415,7 @@ for tag in T:
                 by154[pc].add(name(charof(BYF[tag][f], credit(s))))
         for d in T[tag]:
             if d[f"c154{s}"]:
-                fr154[name(d[f"char{s}"])] += 1
+                fr154[name(charof(d, s))] += 1
 cnt("c154_writers", " ".join(f"{pc}:{'/'.join(sorted(c))}" for pc, c in sorted(by154.items())))
 cnt("c154_frames", " ".join(f"{k}:{v}" for k, v in sorted(fr154.items())))
 res(by154 and all(len(c) == 1 for c in by154.values()), "K8", f"+0x154 nonzero writers {dict((k, sorted(v)) for k, v in by154.items())}; nonzero side-frames {dict(fr154)}")
@@ -536,10 +545,10 @@ for off in TAPPED:
     if owners[off]:
         cnt(f"slotw_{off:03x}", "; ".join(f"{ch}:" + ",".join(sorted(c)) for ch, c in sorted(owners[off].items())))
 cnt("played", " ".join(f"{k}:{v}" for k, v in sorted(played.items())))
-cnt("credit_fallbacks", f"P1 {FALLBACK[1]} P2 {FALLBACK[2]} (writes or frames credited by +0x382, their base in no table row)")
+cnt("unloaded_lookups", f"P1 {FALLBACK[1]} P2 {FALLBACK[2]} (character lookups that met a base in no table row: read as 'unloaded', never as +0x382)")
 unnamed = sorted(pc for pc in pcchars if pcoffs[pc] and not (pcoffs[pc] & NAMEDB))
 res(pcchars and not shared and (PERT != "wrong-owner" or planted), "K12",
-    f"the ownership census over {len(TAPPED)} tapped bytes: {len(pcchars)} non-clear writer PCs ({len(unnamed)} writing only unnamed bytes), each with one character; shared {shared}"
+    f"the ownership census over {len(TAPPED)} tapped bytes: {len(pcchars)} non-clear writer PCs ({len(unnamed)} writing only unnamed bytes), each writing only into blocks that held one character (the block written, not the code that ran); shared {shared}"
     + (f" (planted {planted})" if PERT == "wrong-owner" else ""))
 
 open(A.out, "w").write("\n".join(counts) + "\n")

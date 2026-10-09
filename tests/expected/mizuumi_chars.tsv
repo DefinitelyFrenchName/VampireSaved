@@ -2,7 +2,7 @@
 # Evidence class: in-emulator. Frozen 14z-196 with FREEZE=1; counts, spans, value sets, writer and reader PCs only, no ROM bytes.
 pick_mokt	forced 05: in-match +0x60 bases 0009efe6; table row 0009efe6
 pick_anak	forced 06: in-match +0x60 bases 000a1254; table row 000a1254
-char_vs_base	in-match side-frames 197992, +0x382 disagreeing with the base 0, of them the ladder's pre-write on a CPU side after the timer reached 0 75 (allowed)
+char_vs_base	in-match side-frames 197992: +0x382 agrees with the base on 197917, differs as the ladder's pre-write on a CPU side after the timer reached 0 on 75 (allowed), differs otherwise on 0
 pact_spawns	Anakaris:6 Aulbath:1 Bishamon:1 Bulleta:28 Demitri:3 Jedah:104 Q-Bee:1
 pact_demitri_flare_outlives	proj:P1:3419-3513:37 proj:P1:3720-3832:38 proj:P1:4020-4149:37
 pact_max_by_char	Anakaris:3 Aulbath:1 Bishamon:1 Bulleta:1 Demitri:1 Jedah:1 Q-Bee:1
@@ -100,4 +100,4 @@ slotw_37d	Demitri:030eac,030f9c; Jedah:05159a
 slotw_37e	Demitri:030efc,030fa2; Jedah:05159a
 slotw_37f	Demitri:030efc,030fa2; Felicia:041040; Jedah:05159a
 played	Anakaris:3265 Aulbath:4555 Bishamon:1207 Bulleta:18349 Demitri:16164 Felicia:3982 Gallon:3668 Jedah:55219 Lilith:7032 Morrigan:11601 Q-Bee:9282 Sasquatch:6162 Victor:46710 Zabel:10796
-credit_fallbacks	P1 0 P2 0 (writes or frames credited by +0x382, their base in no table row)
+unloaded_lookups	P1 285794 P2 285794 (character lookups that met a base in no table row: read as 'unloaded', never as +0x382)

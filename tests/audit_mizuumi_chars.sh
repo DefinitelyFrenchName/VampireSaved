@@ -21,11 +21,15 @@
 #      ends and lasts a frozen length; K10 on 118_anak_taunt (P1 forced to Anakaris) +0x1BB rises once, 0-2 frames after
 #      the first START+LP+MP+HP press in the match, holds a frozen length, and on every other leg stays 0; K11 +0x3C1 reads
 #      1 only on the side whose script moves D,D,D before its select confirm (118_random's P1), from that confirm; K12 THE
-#      SLOT OWNERSHIP CENSUS over the whole tapped range +0x34..+0x37 and +0x360..+0x37F: every non-clear writer PC is
-#      seen with exactly ONE character (per-character scratch), every written byte's writers and the named slots' owner
-#      lines atlas/ram.md quotes are frozen. A block's CHARACTER is read from its loaded +0x60 character-data base against
-#      vsavj's own table PRG:0x0BD97A (the data view, decrypted at run time), never from the poked +0x382: K0 proves each
-#      forced pick by it, K0b holds +0x382 to it on every in-match side-frame, and K8/K12 credit their writers by it. Every writer set,
+#      SLOT OWNERSHIP CENSUS over the whole tapped range +0x34..+0x37 and +0x360..+0x37F: every non-clear writer PC
+#      writes only into blocks holding ONE character (per-character scratch), every written byte's writers and the named
+#      slots' owner lines atlas/ram.md quotes are frozen. A WRITE IS CREDITED TO THE BLOCK IT LANDS IN, never to the code
+#      that ran (Morrigan's kick throw 0x03B2DA writes the victim's +0x19A and is credited to the victim) — K8 and K12
+#      measure which characters' blocks a PC writes, not whose routine it is. A block's CHARACTER is read from its loaded +0x60 character-data base against
+#      vsavj's own table PRG:0x0BD97A (the data view, decrypted at run time), never from the poked +0x382 (every check reads
+#      the character through it; +0x382 only where a base is in no row, counted): K0 proves each forced pick by it, K0b
+#      holds +0x382 to it on every in-match side-frame but the arcade ladder's pre-write on a CPU side after the round
+#      timer reached 0 (counted, allowed; control prewrite-human), and K8/K12 credit their writers by it. Every writer set,
 #      reader set (the read legs: +0x154 and +0x0AC words on 128 and the flare leg), span and count is frozen in
 #      tests/expected/mizuumi_chars.tsv.
 # HOW: on MAME (the reference binary), FIELD legs under tests/lua/field_trace.lua — the side fields above plus all 32
@@ -47,6 +51,7 @@
 #
 # MUST-FIRE: perturbed-copy: absent-move — the checks run with every leg's move detector emptied (no own flare, no opponent flare, no Gallon Dark Force, no taunt press, no D,D,D) must fail K1, K3, K4, K7, K10 and K11, so each flag would be seen set where its move is absent (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: perturbed-copy: wrong-owner — the ownership census with one non-clear writer PC that writes ONLY UNNAMED bytes of the tapped range credited to a second character must fail K12, so a shared-code writer anywhere in +0x34..+0x37 / +0x360..+0x37F would be caught (in-gate; as a mode the gate FAILs)
+# MUST-FIRE: perturbed-copy: prewrite-human — K0b with the side of the arcade ladder's pre-write frames read as HUMAN must fail, so the 75 allowed frames are allowed only on a CPU side (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: perturbed-copy: wrong-base — K0 with each forced pick judged against ANOTHER character's +0x60 table row (id ^ 1) must fail, so the pick is proved by the base the game loaded, not by the poked +0x382 (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: perturbed-copy: pool-miscount — K2 with every side's type-41 count shifted by one must fail, so +0x14B is compared with the count, not merely with itself (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: perturbed-copy: passes-inflated — K6 judged against each frame's engine passes ($FF8081) plus one must fail, so the "falls by at least the passes" check reads the pass counter (in-gate; as a mode the gate FAILs)
@@ -58,7 +63,8 @@
 #   read tap sees the PC and the block, not which fighter's code runs); +0x15C's dizzy-vs-hold distinction and its
 #   random amounts; +0x14B for Sasquatch / Lei-Lei / Aqua Spread (not observed); +0x1A2 for Lilith's and Demitri's Dark
 #   Force (not observed); +0x136's camera effect and its Jedah / Zabel / Lilith writers' moves (the census credits them);
-#   +0x3C1's random pick itself; the per-character slots' MEANINGS (ownership only); that the two FORCED picks (POKES at
+#   +0x3C1's random pick itself; the per-character slots' MEANINGS (ownership only); which character's CODE writes a
+#   byte (the census credits the block written, so a writer into the opponent's block is credited to the opponent); that the two FORCED picks (POKES at
 #   $FF8782 over P1's default cell) carry nothing of that cell their subjects read — the confirm writes the cell's id
 #   copies +0x3BD/+0x3E0 ([VSP-123], #151), unread in play on every leg tapped at 14z-161, not re-tapped here, and
 #   tools/audit_poked_legs.py scans native vs2 and WIDE legs only, not pristine vsavj; merged-m23; FBNeo (one emulator).
@@ -176,7 +182,7 @@ if [ -n "${VS_CTL:-}" ]; then
     an "$VS_CTL" "$W/mode.tsv" > "$W/mode.log" 2>&1 && rc=0 || rc=1
     cat "$W/mode.log"
     case "$VS_CTL" in absent-move) want='K1 K3 K4 K7 K10 K11' ;; wrong-owner) want='K12' ;; pool-miscount) want='K2' ;;
-        passes-inflated) want='K6' ;; fall-shifted) want='K9' ;; taps-as-dashes) want='K5' ;; other-side-credit) want='K8' ;; wrong-base) want='K0' ;; esac
+        passes-inflated) want='K6' ;; fall-shifted) want='K9' ;; taps-as-dashes) want='K5' ;; other-side-credit) want='K8' ;; wrong-base) want='K0' ;; prewrite-human) want='K0b' ;; esac
     ok=1; for k in $want; do grep -q "FAIL  \[$k\]" "$W/mode.log" || ok=0; done
     if [ "$rc" = 1 ] && [ "$ok" = 1 ]; then vs_ctl_fired "$VS_CTL" "the perturbed checks failed $want (mode)"
     else echo "REFUSED: CONTROL=$VS_CTL — the perturbation did not make every check it targets fail (rc $rc; wanted $want): a dead mode, not a verdict"; exit 3; fi
@@ -188,7 +194,7 @@ grep -q '\[K12\]' "$W/checks.log" || { echo "  FAIL  the checks did not reach K1
 
 echo "== 3. the must-fire controls (in-gate)"
 for c in "absent-move:K1 K3 K4 K7 K10 K11" "wrong-owner:K12" "pool-miscount:K2" "passes-inflated:K6" "fall-shifted:K9" \
-         "taps-as-dashes:K5" "other-side-credit:K8" "wrong-base:K0"; do
+         "taps-as-dashes:K5" "other-side-credit:K8" "wrong-base:K0" "prewrite-human:K0b"; do
     name="${c%%:*}"; want="${c#*:}"
     an "$name" "$W/ctl_$name.tsv" > "$W/ctl_$name.log" 2>&1 && rc=0 || rc=1
     miss=""; for k in $want; do grep -q "FAIL  \[$k\]" "$W/ctl_$name.log" || miss="$miss $k"; done

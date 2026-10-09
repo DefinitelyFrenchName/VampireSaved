@@ -118,7 +118,7 @@ dblow_c26_f8346	KO winner P1 (human, char 15) 1; loser P2 0
 dblow_c26_f13805	KO winner P2 (CPU, char 10) 3; loser P1 0
 dblow_03	TIME both max 0/0
 dblow_104	TIME both max 0/0
-roles_at_ko	02@9299:P2:CPU/idle 02@9299:P1:human/driven 37@6488:P2:human/driven 37@6488:P1:human/idle 05@8702:P2:CPU/idle 05@8702:P1:human/idle 105auto@4936:P1:human/driven 105auto@4936:P2:human/idle c128@4791:P1:human/driven c128@4791:P2:human/idle c128@11448:P1:human/driven c128@11448:P2:CPU/idle c128@15463:P1:human/driven c128@15463:P2:CPU/idle c128@20598:P2:CPU/idle c128@20598:P1:human/driven c26@8346:P1:human/driven c26@8346:P2:CPU/idle c26@13805:P2:CPU/idle c26@13805:P1:human/driven
+roles_at_ko	02@9299:P2:CPU/not-started/idle 02@9299:P1:human/started/driven 37@6488:P2:human/started/driven 37@6488:P1:human/started/idle 05@8702:P2:CPU/not-started/idle 05@8702:P1:human/started/idle 105auto@4936:P1:human/started/driven 105auto@4936:P2:human/started/idle c128@4791:P1:human/started/driven c128@4791:P2:human/started/idle c128@11448:P1:human/started/driven c128@11448:P2:CPU/not-started/idle c128@15463:P1:human/started/driven c128@15463:P2:CPU/not-started/idle c128@20598:P2:CPU/not-started/idle c128@20598:P1:human/started/driven c26@8346:P1:human/started/driven c26@8346:P2:CPU/not-started/idle c26@13805:P2:CPU/not-started/idle c26@13805:P1:human/started/driven
 auto_104_P1	chose AUTO at f1440: first nonzero f1440; values from the press to the match's end [(1, 1)]; changes after it [13441]
 auto_104_P2	no AUTO: nonzero frames 0
 auto_105auto_P1	chose AUTO at f2120: first nonzero f2120; values from the press to the match's end [(1, 1)]; changes after it []

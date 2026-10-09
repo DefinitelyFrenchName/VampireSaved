@@ -18,7 +18,8 @@
 #   each KO frozen, not judged (0, 1 and 3 seen) — 14z-196 withdrew the 14z-194 "3 on a CPU KO winner" as a claim: CPU
 #   winners read 3 on every KO here, but the static writer PRG:0x019128-0x019152 has no CPU test (7/6/5 under three flags,
 #   else the KO hit's attack-record byte +0x1F) (C10); at every KO each side's human/CPU control is the game's own +0x380
-#   on the KO frame, and every side the script drives in that match reads human (C10b); +0x3B2/+0x3E2 (consistent with "Auto-Guard Flag") read 1 from a side's AUTO press (D,D,button after its select
+#   on the KO frame, equal per leg to the script's START derivation (human only if started after its last loss) and
+#   human wherever the script drives the side (C10b); +0x3B2/+0x3E2 (consistent with "Auto-Guard Flag") read 1 from a side's AUTO press (D,D,button after its select
 #   confirm, derived from the script) through the match's end and 0 on every side that did not choose AUTO (C11); +0x3E1
 #   (consistent with "Character Palette") is K-1 for a side that confirmed with button K (C12) and 8 for a side that chose
 #   AUTO (C12b: both such sides confirm with button 1 — whether AUTO adds 8 or replaces K-1 is not measured); +0x390
@@ -56,7 +57,7 @@
 #
 # MUST-FIRE: perturbed-copy: sides-swapped — the checks run with each side's candidate fields read against the other side's HP and X must fail the hit-flag, hit-counter and streak checks, so the checks see which side is which (in-gate on the real traces; as a mode the gate FAILs)
 # MUST-FIRE: known-bad: refutation-pokes — the checks run with the poked 03 leg in place of the real one must fail the +0x15A refutation, and every value poked into +0x130 must read back, so the trace reads both addresses and the refutation could have come out the other way (in-gate; as a mode the gate FAILs)
-# MUST-FIRE: perturbed-copy: roles-inverted — C8 run with each tapped replay's winner and loser swapped, replay 02's checks run with its human and CPU sides swapped, and C9-C14 run with every derived role swapped (winner/loser, human/CPU, AUTO chooser), must fail (C8, C8b, C4, C9, C10, C10b, C11 and C14), so every role statement — 0x027CCC on the winner, 0x031206 on 03's winner only, the +0x39F/+0x3F0/+0x05 writers ram.md attributes to a winner or a loser (C8b), +0x380 2 on the human side, +0x3B0's 0xFF on the KO loser, +0x3B6's 0 on the KO loser and its 0x019152 write on the winner, +0x3B2/+0x3E2 on the AUTO chooser and their writers — is derived (human sides from the input scripts, winners from HP at the first decisive outcome, the AUTO choice from the script), not assumed (in-gate; as a mode the gate FAILs)
+# MUST-FIRE: perturbed-copy: roles-inverted — C8 run with each tapped replay's winner and loser swapped, replay 02's checks run with its human and CPU sides swapped, and C9-C14 run with every derived role swapped (winner/loser, human/CPU, AUTO chooser), must fail (C8, C8b, C4, C9, C10, C10b on each of the six KO legs, C11 and C14), so every role statement — 0x027CCC on the winner, 0x031206 on 03's winner only, the +0x39F/+0x3F0/+0x05 writers ram.md attributes to a winner or a loser (C8b), +0x380 2 on the human side, +0x3B0's 0xFF on the KO loser, +0x3B6's 0 on the KO loser and its 0x019152 write on the winner, +0x3B2/+0x3E2 on the AUTO chooser and their writers — is derived (human sides from the input scripts, winners from HP at the first decisive outcome, the AUTO choice from the script), not assumed (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: known-bad: poke-3b6 — C10 run with the +0x3B6 poke leg in place of the real 03 leg must fail at 03's time-over, and every poked frame must read the poked 0x5A back, so the field read is +0x3B6 and "0 at a time-over" could have come out the other way (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: perturbed-copy: p2-confirm — C12 run with each side's +0x3E1 judged against the OTHER side's confirm button must fail (P1 confirms with 2..6 on 118_sel_b2..6, P2 with 1), so the check sees which button confirmed (in-gate; as a mode the gate FAILs)
 #
@@ -526,16 +527,36 @@ for k in ("03", "104"):
     cnt(f"dblow_{k}", f"TIME both max {mx[1]}/{mx[2]}")
     res(o and o[3] == "TIME" and mx[1] == 0 and mx[2] == 0, "C10", f"replay {k}: time-over at f{o[2] if o else '-'} — +0x3B6 max P1 {mx[1]} P2 {mx[2]} over the whole leg")
 res(nko >= 6 and len(vals10) >= 2, "C10", f"{nko} KOs judged, winners' values {dict(sorted(vals10.items()))} (nonzero sample, two values or more)")
-# C10b THE ROLES AT EVERY KO, MEASURED (rule-checker runs 2026-10-08-903 Q1/Q4): C10's human/CPU label is the game's
-# +0x380 on the KO frame; it must agree with the script wherever the script decides it — a side the script DRIVES during
-# that match (any input entry between the match's first in-match frame and the KO) must read human, and every KO must
-# have at least one human side (a match the script drives). The script cannot decide an IDLE side (128's P2, 2P, never
-# touched after its confirm), which is why the game's byte is the label. roles-inverted swaps the label and must fail
-# here on every leg with a driven side (all six).
-n10b = bad10b = 0; per10b = []
+# C10b THE ROLES AT EVERY KO, MEASURED TWICE (rule-checker runs 2026-10-08-903 and -905): C10's human/CPU label is the
+# game's own +0x380 on the KO frame, and each side's label must agree, per leg, with two derivations from the replay's
+# script that never read +0x380: (i) STARTED — a side can be human at a KO only if its own START (sys=S1 / sys=S2) was
+# pressed at or before the KO and after that side's last KO loss before it, so a side never started, or not restarted
+# after losing (128's P2 after f4791), must read CPU and a started one human; this decides IDLE sides too (02 and 05's
+# P2, 26's P2, 128's P2 in its later matches); (ii) DRIVEN — a side the script drives during that match (any input entry
+# between the match's first in-match frame and the KO) must read human. roles-inverted swaps the label and must fail
+# C10b on EVERY KO leg, 05 included (by (i): its KO has no driven side).
+def starts(rpl):
+    out = {1: [], 2: []}
+    for line in open(rpl):
+        body = line.split("#")[0].strip()
+        if not body:
+            continue
+        rng, *specs = body.split()
+        a_ = int(rng.partition("-")[0])
+        for sp in specs:
+            m = re.match(r"^sys=(\S+)$", sp)
+            if m:
+                toks = [m.group(1)[i:i + 2] for i in range(0, len(m.group(1)), 2)]
+                for s_ in (1, 2):
+                    if f"S{s_}" in toks:
+                        out[s_].append(a_)
+    return out
+n10b = 0; per10b = []
 for k, ks in KOS.items():
-    B = {d["f"]: d for d in T[k]}; Tk = T[k]
-    for w, l, f0 in ks:
+    B = {d["f"]: d for d in T[k]}; st = starts(f"{REPO}/tests/replays/{RPL[k]}.rpl")
+    lost = {1: [], 2: []}
+    bad_k = 0; lines_k = []
+    for w, l, f0 in sorted(ks, key=lambda x: x[2]):
         m0 = f0
         while m0 - 1 in B and inmatch(B[m0 - 1]):
             m0 -= 1
@@ -543,12 +564,16 @@ for k, ks in KOS.items():
         for s in (w, l):
             n10b += 1
             h = role(k, s, f0)
-            ok = h or not drv[s]
-            bad10b += not ok
-            per10b.append(f"{k}@{f0}:P{s}:{'human' if h else 'CPU'}{'/driven' if drv[s] else '/idle'}")
-        bad10b += not (role(k, w, f0) or role(k, l, f0))
+            last_loss = max(lost[s], default=-1)
+            started = any(last_loss < f <= f0 for f in st[s])
+            ok = (h == started) and (h or not drv[s])
+            bad_k += not ok
+            lines_k.append(f"{k}@{f0}:P{s}:{'human' if h else 'CPU'}/{'started' if started else 'not-started'}/{'driven' if drv[s] else 'idle'}")
+        lost[w if inv else l].append(f0)   # the TRUE loser (kos() swaps winner and loser under roles-inverted)
+    per10b += lines_k
+    res(bad_k == 0, "C10b", f"replay {k}: at {len(ks)} KO(s) every side's +0x380 label equals its START derivation and every driven side reads human ({bad_k} violations): {' '.join(lines_k)}")
 cnt("roles_at_ko", " ".join(per10b))
-res(n10b > 0 and bad10b == 0, "C10b", f"at {n10b // 2} KOs, every side the script drives in that match reads human (+0x380 2) and every KO has a human side: {bad10b} violations")
+res(n10b > 0, "C10b", f"{n10b // 2} KOs over {len(KOS)} legs judged by both derivations")
 # C11 +0x3B2 / +0x3E2 (consistent with mizuumi's "Auto-Guard Flag"): the side whose script, after its select confirm (its
 # first button press), presses D twice then a button before the match starts CHOSE AUTO — that side's two bytes read 0
 # before that button press and 1 on every frame from it through the last in-match frame (what follows the match is
@@ -788,7 +813,7 @@ if vs_ctl_is roles-inverted; then
     cat "$W/c8inv.log" "$W/inv02.log" "$W/inv2.log"
     if [ "$c8r" = 0 ] || ! grep -q 'FAIL  \[C8b\]' "$W/c8inv.log" || ! grep -q 'FAIL  \[C4\]' "$W/inv02.log" \
        || ! grep -q 'FAIL  \[C9\]' "$W/inv2.log" || ! grep -q 'FAIL  \[C10\]' "$W/inv2.log" || ! grep -q 'FAIL  \[C11\]' "$W/inv2.log" \
-       || ! grep -q 'FAIL  \[C14\]' "$W/inv2.log" || ! grep -q 'FAIL  \[C10b\]' "$W/inv2.log"; then
+       || ! grep -q 'FAIL  \[C14\]' "$W/inv2.log" || [ "$(grep -c 'FAIL  \[C10b\] replay ' "$W/inv2.log")" -lt 6 ]; then
         vs_ctl_dead roles-inverted "with the roles swapped C8 rc=$c8r and replay 02's C4 $(grep -q 'FAIL  \[C4\]' "$W/inv02.log" && echo failed || echo PASSED)" || true
     else
         echo "CONTROL FIRED: roles-inverted — the gate ran C8 and replay 02's checks with the roles swapped and they failed"
@@ -805,10 +830,10 @@ check 0 03_two_player_vs "$W/inv02.tsv" 1 > "$W/inv02.log" 2>&1 || true
 check2 03_two_player_vs 1 none "$W/inv2.tsv" > "$W/inv2.log" 2>&1 || true
 if [ "$c8r" = 0 ] || ! grep -q 'FAIL  \[C8b\]' "$W/c8inv.log" || ! grep -q 'FAIL  \[C4\]' "$W/inv02.log" \
    || ! grep -q 'FAIL  \[C9\]' "$W/inv2.log" || ! grep -q 'FAIL  \[C10\]' "$W/inv2.log" || ! grep -q 'FAIL  \[C11\]' "$W/inv2.log" \
-   || ! grep -q 'FAIL  \[C14\]' "$W/inv2.log" || ! grep -q 'FAIL  \[C10b\]' "$W/inv2.log"; then
+   || ! grep -q 'FAIL  \[C14\]' "$W/inv2.log" || [ "$(grep -c 'FAIL  \[C10b\] replay ' "$W/inv2.log")" -lt 6 ]; then
     vs_ctl_dead roles-inverted "with the roles swapped C8 rc=$c8r, replay 02's checks failed on: $(grep -o 'FAIL  \[C[0-9a-z]*\]' "$W/inv02.log" | tr '\n' ' '), C9-C14 failed on: $(grep -o 'FAIL  \[C[0-9a-z]*\]' "$W/inv2.log" | sort -u | tr '\n' ' ') — some role statement does not see which side is which" || fail=1
 else
-    vs_ctl_fired roles-inverted "$(grep -c 'FAIL  \[C8\]' "$W/c8inv.log") of 2 C8 rows, $(grep -c 'FAIL  \[C8b\]' "$W/c8inv.log") of 2 C8b rows, replay 02's C4, and C9 ($(grep -c 'FAIL  \[C9\]' "$W/inv2.log")), C10 ($(grep -c 'FAIL  \[C10\]' "$W/inv2.log")), C10b, C11 ($(grep -c 'FAIL  \[C11\]' "$W/inv2.log")), C14 failed with the roles swapped"
+    vs_ctl_fired roles-inverted "$(grep -c 'FAIL  \[C8\]' "$W/c8inv.log") of 2 C8 rows, $(grep -c 'FAIL  \[C8b\]' "$W/c8inv.log") of 2 C8b rows, replay 02's C4, and C9 ($(grep -c 'FAIL  \[C9\]' "$W/inv2.log")), C10 ($(grep -c 'FAIL  \[C10\]' "$W/inv2.log")), C10b on $(grep -c 'FAIL  \[C10b\] replay ' "$W/inv2.log") of 6 KO legs, C11 ($(grep -c 'FAIL  \[C11\]' "$W/inv2.log")), C14 failed with the roles swapped"
 fi
 cat "$W/writers.tsv" >> "$W/got.tsv"
 
