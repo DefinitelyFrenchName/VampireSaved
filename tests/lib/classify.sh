@@ -101,19 +101,34 @@ vs_classify() {
 #   LIES      exit 0 (or a SKIP) — the perturbation left the gate green
 #   REFUSED   the gate printed `REFUSED: CONTROL=` — a declared name it never reads
 #   DIED      the shell's own error line or a Python traceback — a crash is
-#             not a verdict ([VSP-108])
+#             not a verdict ([VSP-108]). WITH ANY EXIT STATUS (GitHub #254, 14z-196): a
+#             mode that dies of `command not found` (127), a syntax or parameter abort
+#             (2, 1) exits NON-zero, and that used to read HONOURED — the shell error
+#             certified as the negative control reaching its predicate. Given the gate
+#             script (the optional 3rd argument, as the runners invoke it), a line the
+#             SHELL wrote about THAT script — bash `<gate>: line N: <word>…`, dash
+#             `<gate>: N: <word>…` — is DIED; a child script's error quoted in a real FAIL
+#             is not the gate's own, and a teardown segfault's job line has digits where
+#             the word would be (`line 64:  2444 Segmentation fault`), so neither matches.
 #   TIMEOUT   the wrapper's exits, as for any gate
-vs_classify_control() {  # vs_classify_control <exit-status> <logfile>
-    _cst="$1"; _clog="$2"
+vs_classify_control() {  # vs_classify_control <exit-status> <logfile> [<gate script as invoked>]
+    _cst="$1"; _clog="$2"; _cgate="${3:-}"
     if grep -qa '^REFUSED: CONTROL=' "$_clog"; then
         VS_CTL_EXEC=REFUSED; VS_CTL_EXEC_DETAIL="declared in the header, not a mode of the gate"; return 0
     fi
     _vs_classify_base "$_cst" "$_clog" 90
+    _cself=""
+    if [ -n "$_cgate" ]; then
+        _cre="^$(printf '%s' "$_cgate" | sed 's/[.[\*^$/]/\\&/g'): (line )?[0-9]+: [^0-9 ]"
+        _cself="$(grep -aE "$_cre" "$_clog" | head -1 | cut -c1-90)"
+    fi
     case "$VS_VERDICT" in
     TIMEOUT) VS_CTL_EXEC=TIMEOUT; VS_CTL_EXEC_DETAIL="$VS_DETAIL" ;;
     PASS|SKIP) VS_CTL_EXEC=LIES; VS_CTL_EXEC_DETAIL="exit $_cst under its own perturbation — the control tests nothing" ;;
     FAIL)
-        if [ "$_cst" = 0 ] || grep -qa '^Traceback' "$_clog"; then
+        if [ -n "$_cself" ]; then
+            VS_CTL_EXEC=DIED; VS_CTL_EXEC_DETAIL="a crash is not a verdict (exit $_cst): $_cself"
+        elif [ "$_cst" = 0 ] || grep -qa '^Traceback' "$_clog"; then
             VS_CTL_EXEC=DIED; VS_CTL_EXEC_DETAIL="a crash is not a verdict: $(grep -aE '\.sh: line [0-9]+: [A-Za-z_][A-Za-z0-9_]*: |^Traceback|Error' "$_clog" | head -1 | cut -c1-90)"
         else
             VS_CTL_EXEC=HONOURED; VS_CTL_EXEC_DETAIL="reached the gate's own FAIL (exit $_cst)"

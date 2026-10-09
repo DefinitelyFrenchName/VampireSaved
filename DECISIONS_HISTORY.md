@@ -503,6 +503,56 @@ So: #228 opens the work; the opener's order follows (#124's build, then #118, #2
 
 ---
 
+## Ruled 2026-10-09 (14z-196) — #228: step 4 does not start this session; whether it runs once or recurs is assessed first
+
+**The question (in chat):** after #228's steps 1-3 (committed `d1d90167`), step 4 was set out — the at-risk instruments (`walker_sp`, `obj_record_bank_trace`, `trace_writes`, then `replay_guard`) moved onto one emulated clock, each at-risk gate given #213's reference-leg checks, every moved expectation re-frozen through the rule-checker — and the session asked: *"Shall I go ahead in that order, starting with `walker_sp`?"*
+
+**The maintainer:** *"For #228, unless you've done it already, let's not start in this session. Furthermore, we'll need to assess if we run it once or recurring. If recurring, given the clock time it likely will be necessary to only run it at releases or scheduled, during nights."*
+
+So: step 4 is not started; its next step is the assessment — a one-off conversion or a recurring run — and a recurring run is held to release cadence or a scheduled night run. Recorded on #228.
+
+---
+
+## Ruled 2026-10-09 (14z-196) — #124 parked
+
+**The question (in chat):** after step 0's read watch showed the select screen does not read `0x26762A` (the plan's reason for replacing the approved tile relocation withdrawn) and found the score ranking's palette-page load reading the pool rows, the session asked whether to re-scope the build into a rule-checked plan before any byte changes.
+
+**The maintainer:** *"let's park #124 for now"*
+
+So: #124 is `parked` in the index; its step-0 measurement and the withdrawn premise stay on the issue for when it is taken up.
+
+---
+
+## Ruled 2026-10-09 (14z-196) — a ticket for the submodule-pin check (#260)
+
+**The question (in chat):** the 14z-192 jtcores pin reached `main` unpushed (fixed 14z-196 by pushing the fork commit); options: a ticket for a check (close-check line or pre-push hook), no check but watch CI, or nothing.
+
+**The maintainer:** *"A ticket for the check (close-check line or pre-push hook)."*
+
+So: #260 filed (evolution).
+
+---
+
+## Ruled 2026-10-09 (14z-196) — #245-#255: the triage's revised severities; worked next session, P1 to P3
+
+**The question (in chat):** keep the filed severities of the eleven code-review tickets or take the triage's lowerings, and in what order to fix them.
+
+**The maintainer:** *"let's follow your revised severities if you have any, otherwise let's do them next session from P1 to P3"*
+
+So: #245 P1 -> P2; #246, #247, #248, #250 P2 -> P3; the rest unchanged (titles and a comment on each issue). The tickets are worked next session, P2 before P3 (no P1 remains). #254 is the exception, already fixed this session (the ruling below).
+
+---
+
+## Ruled 2026-10-09 (14z-196) — #254 committed now, closed at the session close
+
+**The question (in chat):** #254 (a control mode that crashes with a non-zero exit classed HONOURED) was fixed in code this session; the session explained it is runner tooling no release carries, so it closes when committed and verified — the close tier's full controls run being the first run of the new rule over the real controls — and asked whether it should instead get the done-awaiting-release comment.
+
+**The maintainer:** *"About #254, yes commit and close at the session close"*
+
+So: #254 is committed mid-session and closed `done` at the 14z-196 close if the close tier's executed controls are green (any new DIED is a finding first).
+
+---
+
 ## Ruled 2026-10-07 (14z-193) — #230 closed `done` on the standard throw; #235 filed for the kick and air throws
 
 **The question (AskUserQuestion, after rule-checker run 2026-10-06-712 OK):** *"#230 now gates Pyron's and Donovan's standard 6+HP throw on all 18 victims, ours vs native, at the matched level (re-frozen under rule-checker run 712, OK; you read the sheets as identical). Their kick and air throws aren't covered. How should #230 end?"* — options "Close; new ticket", "Extend #230 now", "Close; standard is enough".

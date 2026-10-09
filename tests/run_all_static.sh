@@ -402,7 +402,7 @@ exec_controls() {  # exec_controls <gate> <tier-label>
         _c0=$(date +%s)
         CONTROL="$_n" tests/"$1".sh </dev/null > "$WORK/$1.ctl.$_n.out" 2>&1 && _cs=0 || _cs=$?
         _c1=$(date +%s); _cd=$((_c1 - _c0))
-        vs_classify_control "$_cs" "$WORK/$1.ctl.$_n.out"; _cv="$VS_CTL_EXEC"
+        vs_classify_control "$_cs" "$WORK/$1.ctl.$_n.out" "tests/$1.sh"; _cv="$VS_CTL_EXEC"
         printf '%s\t%s\t%s\t%s\n' "$1" "$_n" "$_cv" "$_cd" >> "$WORK/controls.tsv"
         case "$_cv" in
         HONOURED) x_ok=$((x_ok + 1)) ;;

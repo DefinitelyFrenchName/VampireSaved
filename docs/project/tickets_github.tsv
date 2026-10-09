@@ -2,8 +2,9 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 259
+# issues: 260
 number	state	reason	closed	labels	title
+260	OPEN	-	-	evolution	Check that every submodule pin exists on its remote before a push (the 14z-192 jtcores pin was unpushed)
 259	OPEN	-	-	bug	static_confirm plan took 20 min at the 14z-195 close (228 changed files, 194 rule-checker run files)
 258	OPEN	-	-	bug	rulecheck: a packet artifact above the Read limit gets a partial read
 257	OPEN	-	-	bug	rulings_verbatim leaves a second maintainer quote on the same line unchecked
@@ -13,12 +14,12 @@ number	state	reason	closed	labels	title
 253	OPEN	-	-	bug	[P2] MAME replay wrapper accepts an old checksum log when a zero-exit invocation writes nothing
 252	OPEN	-	-	bug	[P2] A newer SKIP row hides stale emulator gates from freeze audit and rerun selection
 251	OPEN	-	-	bug	[P2] Emulator staleness audit misses followed inputs reverted after a dirty successful run
-250	OPEN	-	-	bug	[P2] Relative ROMDIR creates dangling overlay links while the builder reports success
+250	OPEN	-	-	bug	[P3] Relative ROMDIR creates dangling overlay links while the builder reports success
 249	OPEN	-	-	bug	[P2] CI entropy guard scans only untracked files and misses committed binary additions
-248	OPEN	-	-	bug	[P2] Launchers silently choose conflicting older ROM sets and retain stale Windows copies
-247	OPEN	-	-	bug	[P2] Direct release packager deletes the previous package before replacement validation
-246	OPEN	-	-	bug	[P2] Release name can escape the output root and recursively delete a sibling directory
-245	OPEN	-	-	bug	[P1] WIDE overlay builder overwrites a source vsavjw.zip through its own symlink
+248	OPEN	-	-	bug	[P3] Launchers silently choose conflicting older ROM sets and retain stale Windows copies
+247	OPEN	-	-	bug	[P3] Direct release packager deletes the previous package before replacement validation
+246	OPEN	-	-	bug	[P3] Release name can escape the output root and recursively delete a sibling directory
+245	OPEN	-	-	bug	[P2] WIDE overlay builder overwrites a source vsavjw.zip through its own symlink
 244	OPEN	-	-	bug	Tenant charmap pages print the raw +8/+9 power byte as damage (the #241 decode not applied to charmap_html/charmap_md)
 243	OPEN	-	-	bug	Staleness audit: 79 emulator gates declare the whole tests/replays/ directory, so any new replay stales them all
 242	CLOSED	COMPLETED	2026-10-08	bug	retraction_grep never lists a retracted wording broken by a quote prefix or HTML markup

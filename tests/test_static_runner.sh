@@ -19,6 +19,7 @@
 # MUST-FIRE: shadow-tool: reader-unplugged — a copy of run_all_static.sh that hands the classifier no gate script must let a stub with a declared-but-unfired control read PASS (mode: that copy is the runner every section drives, and section 11 must fail)
 # MUST-FIRE: shadow-tool: trigger-blind — a copy of run_all_static.sh with its cadence TRIGGER match disabled must leave a freeze-cadence gate deferred although a path it depends on changed; section 14's triggered case must FAIL under it
 # MUST-FIRE: shadow-tool: order-ignored — a copy of run_all_static.sh whose `# ORDER: last` test is disabled must run the marked stub FIRST, and section 16 must FAIL (mode: that copy drives every section; section 17 fires it in-run; 14z-185b, #188)
+# MUST-FIRE: shadow-tool: crash-unread — a copy of run_all_static.sh that hands the CONTROL classifier no gate script must read a control mode that dies of `command not found` (exit 127) as HONOURED, and section 12b must FAIL (mode: that copy drives every section; section 12b fires it in-run; 14z-196, #254)
 # MUST-FIRE: shadow-tool: prediction-off — a copy of tools/static_confirm.py whose plan marks nothing STALE must CARRY the stub whose input changed, and section 18 must FAIL (mode: that copy in the confirm repo)
 #
 # WHY A GATE FOR THE RUNNER. CLAUDE.md §4: "Verdict logic is itself tested. A
@@ -74,7 +75,14 @@ SHADOW_O="$T/run_all_static_orderignored.sh"
 sed 's|_last="$_last $_g"   # ORDER-LAST|_first="$_first $_g"   # ORDER-LAST disabled|' "$RUNNER" > "$SHADOW_O"
 cmp -s "$RUNNER" "$SHADOW_O" && fail "could not disable ORDER: last — the ORDER-LAST line moved"
 chmod +x "$SHADOW_O"
+# THE FOURTH SHADOW (14z-196, #254): the runner with the control classifier's 3rd argument
+# (the gate script) removed — a mode's own shell error is no longer recognised as a crash.
+SHADOW_C="$T/run_all_static_crashunread.sh"
+sed 's|vs_classify_control "$_cs" "$WORK/$1.ctl.$_n.out" "tests/$1.sh"|vs_classify_control "$_cs" "$WORK/$1.ctl.$_n.out"|' "$RUNNER" > "$SHADOW_C"
+cmp -s "$RUNNER" "$SHADOW_C" && fail "could not unplug the crash reader — the vs_classify_control call moved"
+chmod +x "$SHADOW_C"
 if vs_ctl_is reader-unplugged; then ln -s "$SHADOW" "$FR/tests/run_all_static.sh"
+elif vs_ctl_is crash-unread; then ln -s "$SHADOW_C" "$FR/tests/run_all_static.sh"
 elif vs_ctl_is trigger-blind; then ln -s "$SHADOW_T" "$FR/tests/run_all_static.sh"
 elif vs_ctl_is order-ignored; then ln -s "$SHADOW_O" "$FR/tests/run_all_static.sh"
 else ln -s "$RUNNER" "$FR/tests/run_all_static.sh"; fi
@@ -460,6 +468,27 @@ o12c="$(cd "$FR" && ROMDIR="$T" sh tests/run_all_static.sh --tier static --exec-
 [ "$s12c" = 0 ] && echo "  ok: --exec-controls portable does not execute a static-tier gate's controls" \
     || fail "--exec-controls portable executed a static gate's control: $(printf '%s' "$o12c" | grep 'CONTROL' || echo '(none)')"
 : > "$FR/tests/ci_static.txt"
+
+echo "== 12b. a control mode that CRASHES with a non-zero exit is DIED, not HONOURED (14z-196, #254) =="
+# A missing command exits 127 and a set -u abort exits 1: both FAIL the gate's run, and the
+# classifier used to read that as the negative control reaching its predicate. The shell's
+# own line about the gate script is the evidence; a real FAIL that QUOTES another script's
+# error must stay honoured.
+mkx g_xdie127 'no_such_helper_254; exit 1'
+mkx g_xquote  'echo "tests/other.sh: line 3: x: command not found"; echo "FAIL: the flipped input was caught"; exit 1'
+printf 'g_xdie127\ng_xquote\n' > "$FR/tests/ci_portable.txt"
+o12c="$(cd "$FR" && STATIC_RESULTS_OUT="$T/r12c.tsv" sh tests/run_all_static.sh --tier portable 2>&1)" || true
+printf '%s' "$o12c" | grep -qE "^  g_xdie127 +CONTROL DIED: flip" && echo "  ok: a mode dying of command-not-found (exit 127) -> CONTROL DIED" \
+    || { fail "a crashing mode was not DIED:"; printf '%s' "$o12c" | grep -E '^  g_xdie127' | sed 's/^/        /'; }
+printf '%s' "$o12c" | grep -qE "^  g_xquote +CONTROL" && fail "a real FAIL quoting another script's error read as a crash" \
+    || echo "  ok: a real FAIL quoting another script's shell error stays honoured"
+o12d="$(cd "$FR" && STATIC_RESULTS_OUT="$T/r12d.tsv" sh "$SHADOW_C" --tier portable 2>&1)" || true
+if printf '%s' "$o12d" | grep -qE "^  g_xdie127 +CONTROL"; then
+    vs_ctl_dead crash-unread "the copy with no gate script still flagged g_xdie127: $(printf '%s' "$o12d" | grep -E '^  g_xdie127')"; rc=1
+else
+    vs_ctl_fired crash-unread "with no gate script handed to the control classifier, a mode dying of command-not-found (exit 127) reads HONOURED"
+fi
+rm -f "$FR/tests/g_xdie127.sh" "$FR/tests/g_xquote.sh"
 
 echo "== 13. MUST-FIRE: with the controls reader unplugged, section 11's dead-control stub reads PASS =="
 # The shadow runner (built at the top) beside the real one in the fakerepo;

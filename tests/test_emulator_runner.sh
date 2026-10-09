@@ -17,6 +17,7 @@
 #
 # MUST-FIRE: shadow-tool: export-removed — a copy of the runner without `export MAME_BIN` must leave the gate's MAME_BIN UNSET (mode: that copy is the runner every section drives; section 11 must fail)
 # MUST-FIRE: shadow-tool: reader-unplugged — a copy that hands the classifier no gate script must let a declared-but-unfired control read PASS (mode: section 14 must fail)
+# MUST-FIRE: shadow-tool: crash-unread — a copy that hands the CONTROL classifier no gate script must read a control mode dying of `command not found` (exit 127) as an honoured PASS row (mode: that copy is the runner every section drives; section 14b must fail; 14z-196, #254)
 # MUST-FIRE: shadow-tool: dry-run-records — a copy of the runner without the --dry-run guard on commit.txt must write a run of record on a dry run (mode: that copy is the runner every section drives; section 15's dry-run case must fail)
 # MUST-FIRE: shadow-tool: empty-green — a copy of the runner without the empty-selection guard must print GREEN and write a run directory for a selection that matches no gate (mode: that copy is the runner every section drives; section 15's empty-selection case must fail)
 # MUST-FIRE: perturbed-copy: row-not-executable — a farm of symlinks to the REAL scripts named by the REAL tests/ci_emulator.tsv, with ONE replaced by a non-executable copy, must make section 10b report it unrunnable (mode: that farm is what 10b checks; section 10b must fail)
@@ -79,12 +80,16 @@ cmp -s "$RUNNER" "$T/runner_dryrecords.sh" && fail "could not remove the --dry-r
 # the empty-selection guard removed (14z-192, #211)
 sed 's|^if \[ -z "\$(selected \| head -1)" \]; then$|if false; then|' "$RUNNER" > "$T/runner_emptygreen.sh"
 cmp -s "$RUNNER" "$T/runner_emptygreen.sh" && fail "could not remove the empty-selection guard — the line moved"
-chmod +x "$T/runner_noexport.sh" "$T/runner_unplugged.sh" "$T/runner_dryrecords.sh" "$T/runner_emptygreen.sh"
+# the control classifier's gate-script argument removed (14z-196, #254)
+sed 's|vs_classify_control "$_cs" "$_clog" "tests/$_g.sh"|vs_classify_control "$_cs" "$_clog"|' "$RUNNER" > "$T/runner_crashunread.sh"
+cmp -s "$RUNNER" "$T/runner_crashunread.sh" && fail "could not unplug the crash reader — the vs_classify_control call moved"
+chmod +x "$T/runner_noexport.sh" "$T/runner_unplugged.sh" "$T/runner_dryrecords.sh" "$T/runner_emptygreen.sh" "$T/runner_crashunread.sh"
 case "$VS_CTL" in
 empty-green)      ln -s "$T/runner_emptygreen.sh" "$FR/tests/run_all_emulator.sh" ;;
 export-removed)   ln -s "$T/runner_noexport.sh" "$FR/tests/run_all_emulator.sh" ;;
 reader-unplugged) ln -s "$T/runner_unplugged.sh" "$FR/tests/run_all_emulator.sh" ;;
 dry-run-records)  ln -s "$T/runner_dryrecords.sh" "$FR/tests/run_all_emulator.sh" ;;
+crash-unread)     ln -s "$T/runner_crashunread.sh" "$FR/tests/run_all_emulator.sh" ;;
 *)                ln -s "$RUNNER" "$FR/tests/run_all_emulator.sh" ;;
 esac
 # the runner sources THE ONE classifier relative to its repo (14z-139), so
@@ -556,6 +561,22 @@ v14c="$(awk -F'\t' '$1=="g_cmissing"{print $4}' "$T/l14c/results.tsv" 2>/dev/nul
                    || { vs_ctl_dead reader-unplugged "the unplugged runner classified g_cmissing '$v14c'"; fail "reader-unplugged"; }
 rm -f "$FR/tests/run_all_emulator_unplugged.sh"
 rm -f "$FR/tests/g_cfired.sh" "$FR/tests/g_cmissing.sh" "$FR/tests/g_clies.sh" "$FR/tests/g_cref.sh"
+
+echo "14b. a control mode that CRASHES with a non-zero exit is DIED, not honoured (14z-196, #254)"
+mkc g_cdie127 'no_such_helper_254; exit 1' "PASS: fine" "CONTROL FIRED: flip — caught"
+mkc g_cquote  'echo "tests/other.sh: line 3: x: command not found"; echo "FAIL: caught"; exit 1' "PASS: fine" "CONTROL FIRED: flip — caught"
+reg "$(row g_cdie127 mame release - '')" "$(row g_cquote mame release - '')"
+run --lane mame --controls --log "$T/l14d" >/dev/null 2>&1 || true
+v14d="$(awk -F'\t' '$1=="g_cdie127@flip"{print $4"|"$6}' "$T/l14d/results.tsv")"
+case "$v14d" in FAIL\|*DIED*) ok "g_cdie127@flip -> FAIL (DIED: exit 127, its own shell error)" ;; *) fail "g_cdie127@flip -> '$v14d', expected FAIL / DIED" ;; esac
+v14e="$(awk -F'\t' '$1=="g_cquote@flip"{print $4}' "$T/l14d/results.tsv")"
+[ "$v14e" = PASS ] && ok "g_cquote@flip -> PASS (a real FAIL quoting another script's error stays honoured)" || fail "g_cquote@flip -> '$v14e', expected PASS"
+ln -s "$T/runner_crashunread.sh" "$FR/tests/run_all_emulator_crashunread.sh"
+(cd "$FR" && ROMDIR="$T/roms" MERGED=build/fake_merged sh tests/run_all_emulator_crashunread.sh --lane mame --controls --log "$T/l14f" >/dev/null 2>&1) || true
+v14f="$(awk -F'\t' '$1=="g_cdie127@flip"{print $4}' "$T/l14f/results.tsv" 2>/dev/null)"
+[ "$v14f" = PASS ] && vs_ctl_fired crash-unread "with no gate script handed to the control classifier, a mode dying of command-not-found (exit 127) reads an honoured PASS" \
+                   || { vs_ctl_dead crash-unread "the copy with no gate script classified g_cdie127@flip '$v14f'"; fail "crash-unread"; }
+rm -f "$FR/tests/run_all_emulator_crashunread.sh" "$FR/tests/g_cdie127.sh" "$FR/tests/g_cquote.sh"
 
 echo "15. the commit of record and --stale (14z-180, GitHub #171 slice Q4)"
 # commit.txt: HEAD on its first line when the tree is a git checkout, `no-git` otherwise;
