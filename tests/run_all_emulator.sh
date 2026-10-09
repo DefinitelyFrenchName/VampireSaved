@@ -48,10 +48,20 @@
 # exist.
 #
 # SCOPE, and it is the maintainer's call, not this script's. Every row of the
-# registry carries `release` or `out`, and every `out` row carries its reason.
-# `out` means OUT OF RELEASE SCOPE — never "do not run": --scope all runs
-# everything, and that is the mode the sweep uses, because a gate nobody runs
-# rots whether or not it gates a release.
+# registry carries `release`, `out` or `ondemand`, and every `out` and `ondemand`
+# row carries its reason. `out` means OUT OF RELEASE SCOPE — never "do not run":
+# --scope all runs it, and that is the mode the release sweep uses, because a gate
+# nobody runs rots whether or not it gates a release.
+# `ondemand` (maintainer-ruled 2026-10-09, 14z-196: "let's make it purely ondemand
+# scope and document how this ondemand scope can be run") is a gate whose subject is
+# PRISTINE content only (vsavj, vsav2) — no Vampire Saved build can move its verdict —
+# and no tier selects it: not the static tier, the close, --freeze, nor the release
+# run (--scope all). It runs only when asked for:
+#     ROMDIR=... tests/run_all_emulator.sh --scope ondemand                  every ondemand row
+#     ROMDIR=... tests/run_all_emulator.sh --scope ondemand --only 'audit_mizuumi_*'   a subset
+# (with --lane, --controls, --strict and --jobs as for any run). Its reason keyword is
+# `pristine:`. A pristine-only gate guarding a case KNOWN to have broken before (a
+# tenant change that once moved vsavj characters) stays `release`.
 #
 # ORDER IS NOT DECORATION. The `prereq` lane — the instrument and verdict-logic
 # ground truths — runs FIRST and, by default, a failure there STOPS the run.
@@ -61,7 +71,8 @@
 # Usage:
 #   ROMDIR=... tests/run_all_emulator.sh                 prereq+fbneo+mame, release scope
 #   MAME_BIN=... tests/run_all_emulator.sh              override the exported MAME default (else the WIDE build)
-#   ROMDIR=... tests/run_all_emulator.sh --scope all     + the out-of-scope rows
+#   ROMDIR=... tests/run_all_emulator.sh --scope all     + the out-of-scope rows (never the ondemand ones)
+#   ROMDIR=... tests/run_all_emulator.sh --scope ondemand   ONLY the ondemand rows (pristine-only gates, 14z-196)
 #   ... --lane prereq|mame|fbneo|mister|all              default: all but mister
 #   ... --cadence romset|bitstream|all                   default: all
 #   ... --freeze                                         = --cadence romset (see below)
@@ -134,7 +145,8 @@ _ORIG_ARGS="$*"   # the command line as given, for the run record (#189) — the
 LOGDIR=""; RESUME=0; STRICT=0; KEEPGOING=0; DRY=0; LIST=0; CONTROLS=0; STALE=0
 while [ $# -gt 0 ]; do
     case "$1" in
-    --scope)   shift; SCOPE="${1:?--scope needs release|all}" ;;
+    --scope)   shift; SCOPE="${1:?--scope needs release|all|ondemand}"
+               case "$SCOPE" in release|all|ondemand) ;; *) echo "--scope must be release, all or ondemand, got '$SCOPE'" >&2; exit 2 ;; esac ;;
     --cadence) shift; CADENCE="${1:?--cadence needs romset|bitstream|all}" ;;
     --freeze)  CADENCE=romset ;;
     # --lane ACCUMULATES. It used to assign, so `--lane fbneo --lane mame`
@@ -209,7 +221,7 @@ fi
 selected() {  # rows matching --lane / --scope / --cadence / --only / --stale, in lane order
     for _l in $LANES; do
         rows | awk -F'\t' -v lane="$_l" -v scope="$SCOPE" -v cad="$CADENCE" '
-            $2 == lane && (scope == "all" || $3 == "release") \
+            $2 == lane && ((scope == "all" && $3 != "ondemand") || (scope != "all" && $3 == scope)) \
                        && (cad == "all"   || $4 == cad)'
     done | while IFS= read -r line; do
         _g="${line%%	*}"

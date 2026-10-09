@@ -1,0 +1,10 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_mizuumi_struct.sh	9bada3b3e76a3d6b9374179f07df718493c39945
+tests/expected/mizuumi_struct.tsv	e0e0506f056c3b0db7ab601db2a2aff4010642c3
+docs/game/atlas/ram.md.lines-160-169 (lines 160-169 of docs/game/atlas/ram.md)	b711ffc004c5afd874ee60b4dfb75c340e69cc4d
+build/agent196/t118/mainrun/summary.txt	4b163e703be1ccdfe07e7ea17fd133915238d7db
+build/agent196/t118/mainrun/audit_mizuumi_struct.log	67e9b8589f2455592a06fcff24f57d3b1245c9a3
+build/agent196/t118/mainrun/modes_fired.txt	92ef3e7d10ab14d655d036c86401c281261e38bf
+build/agent196/t118/mergecheck/worktree_follows.txt	3ce137f3226a2af7992a27d5f6776e71a9622017
+build/agent196/t118/mergecheck/check.txt	058d0434dd6a797baa48d5cee3a2938a8d4b6185
+build/agent196/t118/rec4/struct_first84_vs_34c84efe.txt	89ff2b9240ee43c82a5513562680e32db4359c42

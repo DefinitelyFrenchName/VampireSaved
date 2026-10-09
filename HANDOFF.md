@@ -1366,6 +1366,8 @@ control claims.
 ```sh
 ROMDIR=... tests/run_all_emulator.sh                  # prereq + fbneo + mame, release scope
 ROMDIR=... tests/run_all_emulator.sh --scope all      # + the out-of-release-scope rows
+ROMDIR=... tests/run_all_emulator.sh --scope ondemand # ONLY the `ondemand` rows (pristine-only gates, 14z-196); no tier, close, freeze or release run selects them
+ROMDIR=... tests/run_all_emulator.sh --scope ondemand --only 'audit_mizuumi_*'   # a subset of them (--lane, --controls, --strict, --jobs as for any run)
 ROMDIR=... tests/run_all_emulator.sh --lane all       # + the Verilator lane (--lane mister ALONE selects only that lane)
 ROMDIR=... tests/run_all_emulator.sh --lane all --jobs 4   # 14z-134: N Verilator runs at once, one scratch clone per slot
 ROMDIR=... tests/run_all_emulator.sh --strict         # SKIP and UNREGISTERED are failures too
@@ -1426,6 +1428,27 @@ scope, and every `out` row leads with its reason keyword — `romset:`,
 means NEITHER "resolved" NOR "quietly green"** (both affirmed by the maintainer
 at the ruling): `audit_hitclass_map_cost` is `out` AND is one of the two dead
 must-fire controls, and two `out` rows are red right now with exact diagnoses.
+
+**`ondemand` is the third scope (maintainer-ruled 2026-10-09, 14z-196: *"let's
+make it purely ondemand scope and document how this ondemand scope can be
+run"*).** A row is `ondemand` when its subject is PRISTINE content only —
+`vsavj`, `vsav2` from `$ROMDIR`, no Vampire Saved build on any leg — so no
+change of ours can move its verdict. No tier selects it: not the static tier,
+not the close, not `--freeze`, not the release run (`--scope all` skips it).
+It runs only when named: `--scope ondemand`, alone or with `--only '<glob>'`,
+and every other flag works as for any run. Its reason keyword is `pristine:`
+(`tests/test_emulator_runner.sh` §6a holds both rules, control
+`ondemand-in-all`), and the staleness audit never judges an `ondemand` row
+(`tests/test_emulator_staleness.sh` §2d2, control `ondemand-judged`). **The
+exception, in the maintainer's words:** *"The only potential exception I can
+imagine of pristine-only gates that shouldn't be ondemand scope are for cases
+that are known to have been broken in the past (e.g. maybe we made a change
+for a VS2 tenant that affected vsavj characters: that would qualify for being
+at least on release)"* — such a gate stays `release`. Which rows are
+`ondemand` is the registry's to say (`awk -F'\t' '$3=="ondemand"'
+tests/ci_emulator.tsv`), not this page's. The ruling of record is
+DECISIONS_HISTORY.md "Ruled 2026-10-09 (14z-196) — #118's gates and every
+pristine-only gate move to an ONDEMAND scope".
 
 **`cadence` is a DIFFERENT question from scope — what moving thing the gate
 FOLLOWS** (ruled 2026-09-03). `romset` (158 rows at the ruling, 168 at 14z-157) = runs at every freeze and

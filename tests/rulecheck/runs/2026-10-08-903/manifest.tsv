@@ -1,0 +1,12 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_mizuumi_struct.sh	c906b1201d4807337f34fc595c1cce97a0f989ac
+tests/expected/mizuumi_struct.tsv	f3ebb064a881b36f95c62b1e4eb56fe4b9a786fa
+docs/game/atlas/ram.md.lines-160-169 (lines 160-169 of docs/game/atlas/ram.md)	fc3a2ef1c48656d2c0c0624047bcf2dfbe5c796f
+build/agent196/t118/rec2/struct_first84_vs_34c84efe.txt	0c64afe11bdb77d37462e0ffced09a9b235cc23c
+build/agent196/t118/rec2/clone_clean.txt	958cae358eae633967bc51c23c95cae8e7df4bb7
+build/agent196/t118/rec2/audit_mizuumi_struct.log	e59c56c888737a90cbf8547abe2d8a725fc61568
+build/agent196/t118/rec2/audit_mizuumi_struct__roles-inverted.log	e626c12b01335f21a164d267a5529c5c5fc2f6a7
+build/agent196/t118/rec2/audit_mizuumi_struct__poke-3b6.log	a6a523381a3bc7ba949c371556214fff7b464732
+build/agent196/t118/rec2/audit_mizuumi_struct__p2-confirm.log	f3cf3a5bbb06d3d93891ce175353c1378a93bc04
+build/agent196/t118/rec2/audit_mizuumi_struct__sides-swapped.log	06a375a5f5805dc4798ae4c74cadc9fa9e820b77
+build/agent196/t118/rec2/audit_mizuumi_struct__refutation-pokes.log	d6841cfff01671f3e2267a62d8e193cfbf13225f

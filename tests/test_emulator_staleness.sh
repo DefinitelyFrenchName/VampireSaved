@@ -43,6 +43,7 @@
 # MUST-FIRE: shadow-tool: keys-ignored — a copy of the tool that never consults the run's record (every moved path moved, the pre-14z-192 rule) must name the unchanged dirty file and submodule stale (mode: that copy is the tool section 2c runs; section 2c must fail)
 # MUST-FIRE: shadow-tool: scope-ignored — a copy of the tool whose freeze cadence judges every row must FAIL the out-of-scope plant (mode: that copy is the tool section 2d runs; section 2d must fail)
 # MUST-FIRE: known-bad: red-newest — the scratch run whose newest row for g_red is FAIL, judged at freeze cadence, must FAIL naming it (mode: that verdict is this gate's)
+# MUST-FIRE: shadow-tool: ondemand-judged — a copy of the tool without the ondemand exemption must FAIL the ondemand g_out at release cadence (mode: that copy is the tool section 2d2 runs; section 2d2 must fail; 14z-196)
 # MUST-FIRE: shadow-tool: whole-registry — a copy of the tool that judges tests/ci_emulator.tsv as one file again (the pre-#237 rule) must name g_other stale though only g_own's row and a comment moved (mode: that copy is the tool section 2f runs; section 2f must fail)
 # MUST-FIRE: shadow-tool: newest-dir — a copy of the tool that reads only the NEWEST run directory (the pre-#211 run of record) must miss g_follows behind a newer partial run and a newer empty one (mode: that copy is the tool section 2b runs; section 2b must fail)
 #
@@ -169,10 +170,13 @@ sed -i.bak -e 's/first description/second description/' -e 's/^# a registry$/# a
 sed 's|^        if gf.REGISTRY in hits and not registry_row_moved(root, repo, c, g, d, recs\[d\]):$|        if False:  # CONTROL whole-registry|' "$TOOL" > "$W/tool_wholereg.py"
 cmp -s "$TOOL" "$W/tool_wholereg.py" && { echo "FAIL: could not build the whole-registry shadow — the line moved"; exit 1; }
 TOOL4="$TOOL"; vs_ctl_is whole-registry && TOOL4="$W/tool_wholereg.py"
+sed 's|^        if reg_all.get(g, {}).get("scope") == "ondemand":$|        if False:  # CONTROL ondemand-judged|' "$TOOL" > "$W/tool_ondjudged.py"
+cmp -s "$TOOL" "$W/tool_ondjudged.py" && { echo "FAIL: could not build the ondemand-judged shadow — the line moved"; exit 1; }
+TOOL3O="$TOOL"; vs_ctl_is ondemand-judged && TOOL3O="$W/tool_ondjudged.py"
 on4() {  # on4 <tool> <run dir> <out> — exit code, at release cadence
     python3 "$1" --root "$R4" --repo "$R4" --run "$R4/build/$2" --cadence release > "$3" 2>&1; echo $?; }
 
-if [ -n "$VS_CTL" ] && [ "$VS_CTL" != newest-dir ] && [ "$VS_CTL" != keys-ignored ] && [ "$VS_CTL" != scope-ignored ] && [ "$VS_CTL" != whole-registry ]; then
+if [ -n "$VS_CTL" ] && [ "$VS_CTL" != newest-dir ] && [ "$VS_CTL" != keys-ignored ] && [ "$VS_CTL" != scope-ignored ] && [ "$VS_CTL" != whole-registry ] && [ "$VS_CTL" != ondemand-judged ]; then
     case "$VS_CTL" in
         moved-input)    rc="$(tool_on emu_plant freeze)";   f="$W/o_emu_plant_freeze.txt" ;;
         headroom-eaten) rc="$(tool_on emu_headroom session)"; f="$W/o_emu_headroom_session.txt" ;;
@@ -243,6 +247,15 @@ fi
 rc="$(on3 "$TOOL" emu_red release "$W/o_scope_rel.txt")"
 grep -q 'FAIL: .*stale' "$W/o_scope_rel.txt" && grep -q 'g_out: tools/o.py' "$W/o_scope_rel.txt" && [ "$rc" = 1 ] \
     && ok "at release cadence the same row FAILs" || { bad "g_out at release cadence (exit $rc)"; sed 's/^/        /' "$W/o_scope_rel.txt"; }
+echo "== 2d2. an ONDEMAND row is never judged, even at release cadence (14z-196)"
+R3o="$W/repo3o"; cp -R "$R3" "$R3o"
+sed -i.bak 's/^g_out\tmame\tout\t/g_out\tmame\tondemand\t/' "$R3o/tests/ci_emulator.tsv"; rm -f "$R3o/tests/ci_emulator.tsv.bak"
+grep -q "^g_out	mame	ondemand	" "$R3o/tests/ci_emulator.tsv" || bad "could not plant the ondemand row"
+python3 "$TOOL3O" --root "$R3o" --repo "$R3o" --run "$R3o/build/emu_red" --cadence release > "$W/o_ond.txt" 2>&1 || true
+if grep -A3 '^  NOTE: .*stale gate' "$W/o_ond.txt" | grep -q 'g_out: '; then
+    if grep -A3 '^  FAIL: .*stale gate' "$W/o_ond.txt" | grep -q 'g_out: '; then bad "g_out (ondemand) FAILed at release"; else ok "at release cadence the ondemand g_out is a NOTE, never a FAIL"; fi
+else bad "the ondemand g_out was not reported as a NOTE"; sed 's/^/        /' "$W/o_ond.txt"; fi
+
 echo "== 2e. a red newest row is judged (14z-192)"
 rc="$(on3 "$TOOL" emu_red freeze "$W/o_red.txt")"
 grep -q 'FAIL: 1 gate(s) whose newest row is red' "$W/o_red.txt" && grep -q 'g_red: FAIL' "$W/o_red.txt" && [ "$rc" = 1 ] \
@@ -266,6 +279,13 @@ grep -q 'g_other: tests/ci_emulator.tsv' "$W/o_regdirty.txt" && ok "a run that r
     || { bad "g_other not stale on the dirty-registry run (exit $rc)"; sed 's/^/        /' "$W/o_regdirty.txt"; }
 
 echo "== 3. controls"
+if [ "$VS_CTL" = ondemand-judged ]; then
+    vs_ctl_fired ondemand-judged "section 2d2 ran the copy without the ondemand exemption (mode)"
+else
+    python3 "$W/tool_ondjudged.py" --root "$R3o" --repo "$R3o" --run "$R3o/build/emu_red" --cadence release > "$W/o_ondjudged.txt" 2>&1 || true
+    grep -A3 '^  FAIL: .*stale gate' "$W/o_ondjudged.txt" | grep -q 'g_out: ' \
+        && vs_ctl_fired ondemand-judged "the copy without the exemption FAILs the ondemand g_out at release" || { vs_ctl_dead ondemand-judged "the exemption-free copy did not FAIL g_out"; fail=1; }
+fi
 if [ "$VS_CTL" = whole-registry ]; then
     vs_ctl_fired whole-registry "section 2f ran the whole-registry copy (mode)"
 else

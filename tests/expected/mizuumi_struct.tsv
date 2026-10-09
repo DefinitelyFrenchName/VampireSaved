@@ -1,5 +1,5 @@
 # tests/expected/mizuumi_struct.tsv — the counts tests/audit_mizuumi_struct.sh measured on pristine vsavj (GitHub #118).
-# Evidence class: in-emulator. Frozen 14z-189 with FREEZE=1; counts, value sets and writer PCs only, no ROM bytes.
+# Evidence class: in-emulator. Frozen 14z-189 with FREEZE=1, re-frozen 14z-196 with C9-C14 appended (HOMING item 4); counts, value sets and writer PCs only, no ROM bytes.
 hitflag_rises_p1	48
 hitflag_near_own_drop_p1	44
 hitflag_near_opp_drop_p1	2
@@ -84,3 +84,166 @@ writers_tap37_P2_winpose	000d34:2=00/ff 000d3a:2=00 000dda:1=00 016e4e:11=00 022
 poke_dist_readback	3000/3000
 poke_timeover_frames	758
 poke_timeover_readback	300/300
+outcome_02	KO P2 over P1 at f9299
+outcome_03	TIME P1 over P2 at f11093
+outcome_37	KO P2 over P1 at f6488
+outcome_104	TIME P2 over P1 at f11010
+outcome_05	KO P2 over P1 at f8702
+outcome_105auto	KO P1 over P2 at f4936
+lbat_02_P1	first 1@1857 in-match 1->0 [5565] after the hp fall by [1] other changes off-match 2
+lbat_02_P2	first 1@1857 in-match 1->0 [] after the hp fall by [] other changes off-match 2
+lbat_ko_02	loser P1 0xFF at KO+1; winner P2 0xFF frames 0
+lbat_03_P1	first 1@1854 in-match 1->0 [] after the hp fall by [] other changes off-match 1
+lbat_03_P2	first 1@1854 in-match 1->0 [] after the hp fall by [] other changes off-match 1
+lbat_37_P1	first 1@2074 in-match 1->0 [4416] after the hp fall by [1] other changes off-match 1
+lbat_37_P2	first 1@2074 in-match 1->0 [] after the hp fall by [] other changes off-match 1
+lbat_ko_37	loser P1 0xFF at KO+1; winner P2 0xFF frames 0
+lbat_104_P1	first 1@1676 in-match 1->0 [6551] after the hp fall by [1] other changes off-match 1
+lbat_104_P2	first 1@1676 in-match 1->0 [] after the hp fall by [] other changes off-match 2
+lbat_05_P1	first 1@1857 in-match 1->0 [5325] after the hp fall by [1] other changes off-match 2
+lbat_05_P2	first 1@1857 in-match 1->0 [] after the hp fall by [] other changes off-match 2
+lbat_ko_05	loser P1 0xFF at KO+1; winner P2 0xFF frames 0
+lbat_105auto_P1	first 1@2474 in-match 1->0 [] after the hp fall by [] other changes off-match 1
+lbat_105auto_P2	first 1@2474 in-match 1->0 [3896] after the hp fall by [0] other changes off-match 2
+lbat_ko_105auto	loser P2 0xFF at KO+0; winner P1 0xFF frames 0
+dblow_02_f9299	KO winner P2 (CPU, char 14) 3; loser P1 0
+dblow_37_f6488	KO winner P2 (human, char 3) 0; loser P1 0
+dblow_05_f8702	KO winner P2 (CPU, char 14) 3; loser P1 0
+dblow_105auto_f4936	KO winner P1 (human, char 1) 0; loser P2 0
+dblow_c128_f4791	KO winner P1 (human, char 7) 0; loser P2 0
+dblow_c128_f11448	KO winner P1 (human, char 5) 0; loser P2 0
+dblow_c128_f15463	KO winner P1 (human, char 4) 0; loser P2 0
+dblow_c128_f20598	KO winner P2 (CPU, char 9) 0; loser P1 0
+dblow_c26_f8346	KO winner P1 (human, char 15) 1; loser P2 0
+dblow_c26_f13805	KO winner P2 (CPU, char 10) 3; loser P1 0
+dblow_03	TIME both max 0/0
+dblow_104	TIME both max 0/0
+roles_at_ko	02@9299:P2:CPU/not-started/idle 02@9299:P1:human/started/driven 37@6488:P2:human/started/driven 37@6488:P1:human/started/idle 05@8702:P2:CPU/not-started/idle 05@8702:P1:human/started/idle 105auto@4936:P1:human/started/driven 105auto@4936:P2:human/started/idle c128@4791:P1:human/started/driven c128@4791:P2:human/started/idle c128@11448:P1:human/started/driven c128@11448:P2:CPU/not-started/idle c128@15463:P1:human/started/driven c128@15463:P2:CPU/not-started/idle c128@20598:P2:CPU/not-started/idle c128@20598:P1:human/started/driven c26@8346:P1:human/started/driven c26@8346:P2:CPU/not-started/idle c26@13805:P2:CPU/not-started/idle c26@13805:P1:human/started/driven
+auto_104_P1	chose AUTO at f1440: first nonzero f1440; values from the press to the match's end [(1, 1)]; changes after it [13441]
+auto_104_P2	no AUTO: nonzero frames 0
+auto_105auto_P1	chose AUTO at f2120: first nonzero f2120; values from the press to the match's end [(1, 1)]; changes after it []
+auto_105auto_P2	no AUTO: nonzero frames 0
+auto_02_P1	no AUTO: nonzero frames 0
+auto_02_P2	no AUTO: nonzero frames 0
+auto_03_P1	no AUTO: nonzero frames 0
+auto_03_P2	no AUTO: nonzero frames 0
+auto_05_P1	no AUTO: nonzero frames 0
+auto_05_P2	no AUTO: nonzero frames 0
+auto_37_P1	no AUTO: nonzero frames 0
+auto_37_P2	no AUTO: nonzero frames 0
+auto_selb1_P1	no AUTO: nonzero frames 0
+auto_selb1_P2	no AUTO: nonzero frames 0
+pal_selb1_P1	confirm 1 -> [0]
+pal_selb1_P2	confirm 1 -> [0]
+pal_selb2_P1	confirm 2 -> [1]
+pal_selb2_P2	confirm 1 -> [0]
+pal_selb3_P1	confirm 3 -> [2]
+pal_selb3_P2	confirm 1 -> [0]
+pal_selb4_P1	confirm 4 -> [3]
+pal_selb4_P2	confirm 1 -> [0]
+pal_selb5_P1	confirm 5 -> [4]
+pal_selb5_P2	confirm 1 -> [0]
+pal_selb6_P1	confirm 6 -> [5]
+pal_selb6_P2	confirm 1 -> [0]
+pal_03_P1	confirm 1 -> [0]
+pal_03_P2	confirm 1 -> [0]
+pal_104_P1	confirm 1 AUTO f1440 -> [8]
+pal_105auto_P1	confirm 1 AUTO f2120 -> [8]
+pal_105auto_P2	confirm 1 AUTO - -> [0]
+score_02_P1	human rises 4 near an opponent hp drop 4 bcd True
+score_02_P2	CPU rises 0 near an opponent hp drop 0 bcd True
+score_03_P1	[1]
+score_03_P2	[1]
+score_37_P1	[1]
+score_37_P2	[1]
+writers2_tap03_P1_ag3b	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 009078:1=00 016e4c:4=00 020fb6:1=00
+writers2_tap03_P1_ag3e	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 00907c:1=00 016e4c:4=00 020fba:1=00
+writers2_tap03_P1_dblow	000d34:2=00/ff 000d3a:2=00 000dda:1=00 00926e:1=00 016e4c:4=00
+writers2_tap03_P1_lbat	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 00925e:1=01 016e4c:4=00
+writers2_tap03_P1_pal	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 016e4c:4=00 02101a:1=00
+writers2_tap03_P2_ag3b	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 009078:1=00 016e4e:4=00 020fb6:1=00
+writers2_tap03_P2_ag3e	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 00907c:1=00 016e4e:4=00 020fba:1=00
+writers2_tap03_P2_dblow	000d34:2=00/ff 000d3a:2=00 000dda:1=00 00926e:1=00 016e4e:4=00
+writers2_tap03_P2_lbat	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 008a60:1=00 00925e:1=01 016e4e:4=00
+writers2_tap03_P2_pal	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 016e4e:4=00 02101a:1=00
+writers2_tap37_P1_ag3b	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 009078:1=00 016e4c:4=00 020fb6:1=00
+writers2_tap37_P1_ag3e	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 00907c:1=00 016e4c:4=00 020fba:1=00
+writers2_tap37_P1_dblow	000d34:2=00/ff 000d3a:2=00 000dda:1=00 00926e:1=00 016e4c:4=00
+writers2_tap37_P1_lbat	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 00925e:1=01 00a6a0:2=00/ff 016e4c:4=00
+writers2_tap37_P1_pal	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 016e4c:4=00 02101a:1=00
+writers2_tap37_P2_ag3b	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 009078:1=00 016e4e:4=00 020fb6:1=00
+writers2_tap37_P2_ag3e	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 00907c:1=00 016e4e:4=00 020fba:1=00
+writers2_tap37_P2_dblow	000d34:2=00/ff 000d3a:2=00 000dda:1=00 00926e:1=00 009a2c:1=80 016e4e:4=00 019152:1=00 05dd0e:1=00
+writers2_tap37_P2_lbat	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 008a60:1=00 00925e:1=01 016e4e:4=00
+writers2_tap37_P2_pal	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 016e4e:4=00 02101a:1=00
+writers2_tap02_P1_ag3b	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 009078:1=00 016e4c:7=00 020fb6:1=00
+writers2_tap02_P1_ag3e	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 00907c:1=00 016e4c:7=00 020fba:1=00
+writers2_tap02_P1_dblow	000d34:2=00/ff 000d3a:2=00 000dda:1=00 00926e:1=00 016e4c:7=00
+writers2_tap02_P1_lbat	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 00925e:1=01 00a6a0:2=00/ff 016e4c:7=00
+writers2_tap02_P1_pal	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 016e4c:7=00 02101a:1=00
+writers2_tap02_P2_ag3b	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 009078:1=00 009278:1=00 016e4e:7=00
+writers2_tap02_P2_ag3e	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 00907c:1=00 016e4e:7=00
+writers2_tap02_P2_dblow	000d34:2=00/ff 000d3a:2=00 000dda:1=00 00926e:1=00 009a2c:1=83 016e4e:7=00 019152:1=03 05dd0e:1=03
+writers2_tap02_P2_lbat	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 00925e:1=01 016e4e:7=00
+writers2_tap02_P2_pal	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 016e4e:7=00
+writers2_tap104_P1_ag3b	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 009078:1=00 016e4c:7=00 020fb6:1=01
+writers2_tap104_P1_ag3e	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 00907c:1=00 016e4c:7=00 020fba:1=01
+writers2_tap104_P1_dblow	000d34:2=00/ff 000d3a:2=00 000dda:1=00 00926e:1=00 016e4c:7=00
+writers2_tap104_P1_lbat	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 00925e:1=01 00a6a0:1=00 016e4c:7=00
+writers2_tap104_P1_pal	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 016e4c:7=00 02101a:1=08
+writers2_tap104_P2_ag3b	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 009078:1=00 009278:1=00 016e4e:7=00
+writers2_tap104_P2_ag3e	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 00907c:1=00 016e4e:7=00
+writers2_tap104_P2_dblow	000d34:2=00/ff 000d3a:2=00 000dda:1=00 00926e:1=00 016e4e:7=00
+writers2_tap104_P2_lbat	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 00925e:1=01 016e4e:7=00
+writers2_tap104_P2_pal	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 016e4e:7=00
+writers2_tap05_P1_ag3b	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 009078:1=00 016e4c:10=00 020fb6:1=00
+writers2_tap05_P1_ag3e	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 00907c:1=00 016e4c:10=00 020fba:1=00
+writers2_tap05_P1_dblow	000d34:2=00/ff 000d3a:2=00 000dda:1=00 00926e:1=00 016e4c:10=00
+writers2_tap05_P1_lbat	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 00925e:1=01 00a6a0:2=00/ff 016e4c:10=00
+writers2_tap05_P1_pal	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 016e4c:10=00 02101a:1=00
+writers2_tap05_P2_ag3b	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 009078:1=00 009278:1=00 016e4e:10=00
+writers2_tap05_P2_ag3e	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 00907c:1=00 016e4e:10=00
+writers2_tap05_P2_dblow	000d34:2=00/ff 000d3a:2=00 000dda:1=00 00926e:1=00 009a2c:1=83 016e4e:10=00 019152:1=03 05dd0e:1=03
+writers2_tap05_P2_lbat	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 00925e:1=01 016e4e:10=00
+writers2_tap05_P2_pal	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 016e4e:10=00
+writers2_tap105auto_P1_ag3b	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 009078:1=00 016e4c:4=00 020fb6:1=01
+writers2_tap105auto_P1_ag3e	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 00907c:1=00 016e4c:4=00 020fba:1=01
+writers2_tap105auto_P1_dblow	000d34:2=00/ff 000d3a:2=00 000dda:1=00 00926e:2=00 009a2c:1=80 016e4c:4=00 019152:1=00 05dd0e:1=00
+writers2_tap105auto_P1_lbat	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 00925e:2=01 016e4c:4=00
+writers2_tap105auto_P1_pal	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 016e4c:4=00 02101a:1=08
+writers2_tap105auto_P2_ag3b	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 009078:1=00 009278:1=00 016e4e:4=00 020fb6:1=00
+writers2_tap105auto_P2_ag3e	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 00907c:1=00 016e4e:4=00 020fba:1=00
+writers2_tap105auto_P2_dblow	000d34:2=00/ff 000d3a:2=00 000dda:1=00 00926e:2=00 016e4e:4=00
+writers2_tap105auto_P2_lbat	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 008a60:1=00 00925e:2=01 00a6a0:2=00/ff 016e4e:4=00
+writers2_tap105auto_P2_pal	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 016e4e:4=00 02101a:1=00
+writers2_tapselb4_P1_ag3b	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 009078:1=00 016e4c:4=00 020fb6:1=00
+writers2_tapselb4_P1_ag3e	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 00907c:1=00 016e4c:4=00 020fba:1=00
+writers2_tapselb4_P1_dblow	000d34:2=00/ff 000d3a:2=00 000dda:1=00 00926e:1=00 016e4c:4=00
+writers2_tapselb4_P1_lbat	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 00925e:1=01 016e4c:4=00
+writers2_tapselb4_P1_pal	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 016e4c:4=00 02101a:1=03
+writers2_tapselb4_P2_ag3b	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 009078:1=00 016e4e:4=00 020fb6:1=00
+writers2_tapselb4_P2_ag3e	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 00907c:1=00 016e4e:4=00 020fba:1=00
+writers2_tapselb4_P2_dblow	000d34:2=00/ff 000d3a:2=00 000dda:1=00 00926e:1=00 016e4e:4=00
+writers2_tapselb4_P2_lbat	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 008a60:1=00 00925e:1=01 016e4e:4=00
+writers2_tapselb4_P2_pal	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 016e4e:4=00 02101a:1=00
+writers2_tapc128_P1_ag3b	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 009078:1=00 016e4c:4=00 020fb6:1=00
+writers2_tapc128_P1_ag3e	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 00907c:1=00 016e4c:4=00 020fba:1=00
+writers2_tapc128_P1_dblow	000d34:2=00/ff 000d3a:2=00 000dda:1=00 00926e:4=00 009a2c:3=80 016e4c:4=00 019152:3=00 05dd0e:3=00
+writers2_tapc128_P1_lbat	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 00925e:4=01 00a6a0:3=00/ff 016e4c:4=00
+writers2_tapc128_P1_pal	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 009bd0:3=00 016e4c:4=00 02101a:1=00
+writers2_tapc128_P2_ag3b	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 009078:1=00 009278:3=00 016e4e:4=00 020fb6:1=00
+writers2_tapc128_P2_ag3e	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 00907c:1=00 016e4e:4=00 020fba:1=00
+writers2_tapc128_P2_dblow	000d34:2=00/ff 000d3a:2=00 000dda:1=00 00926e:4=00 009a2c:1=80 016e4e:4=00 019152:1=00 05dd0e:1=00
+writers2_tapc128_P2_lbat	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 008a60:1=00 00925e:4=01 00a6a0:6=00/ff 016e4e:4=00
+writers2_tapc128_P2_pal	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 016e4e:4=00 02101a:1=00
+writers2_tapc26_P1_ag3b	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 009078:7=00 009278:6=00 016e4c:72=00 020fb6:1=00
+writers2_tapc26_P1_ag3e	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 00907c:7=00 016e4c:72=00 020fba:1=00
+writers2_tapc26_P1_dblow	000d34:2=00/ff 000d3a:2=00 000dda:1=00 00926e:8=00 009a2c:1=81 016e4c:72=00 019152:1=01 05dd0e:1=01
+writers2_tapc26_P1_lbat	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 00925e:8=00/01 00a6a0:2=00/ff 016e4c:72=00
+writers2_tapc26_P1_pal	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 016e4c:72=00 02101a:1=00
+writers2_tapc26_P2_ag3b	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 009078:7=00 009278:8=00 016e4e:72=00
+writers2_tapc26_P2_ag3e	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 00907c:7=00 016e4e:72=00
+writers2_tapc26_P2_dblow	000d34:2=00/ff 000d3a:2=00 000dda:1=00 00926e:8=00 009a2c:1=83 016e4e:72=00 019152:1=03 05dd0e:1=03
+writers2_tapc26_P2_lbat	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 00925e:8=00/01 00a6a0:3=00/ff 016e4e:72=00
+writers2_tapc26_P2_pal	000d34:2=00/ff 000d3a:2=00 000dd8:1=00 016e4e:72=00
+poke_3b6_readback	41/41

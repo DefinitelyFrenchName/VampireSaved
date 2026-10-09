@@ -553,6 +553,19 @@ So: #254 is committed mid-session and closed `done` at the 14z-196 close if the 
 
 ---
 
+## Ruled 2026-10-09 (14z-196) — #118's gates and every pristine-only gate move to an ONDEMAND scope; the chars gate parked
+
+**The context given (in chat):** #118's gates (`audit_mizuumi_struct`, `audit_mizuumi_inputs`, `audit_extra_pass`, `audit_mizuumi_attack`, and the new `audit_mizuumi_chars`) measure pristine vsavj only, never a Vampire Saved build; since 14z-195 they are scope `out`, which keeps them out of the static tier, the close and `--freeze`, but the release run (`--scope all`) still runs them and fails on anything but PASS. The maintainer: *"Also I should note that #118 is basically covering native vsavj characters, which is great but is in 99.99% of cases a scope we just don't touch in Vampire Saved. As such I think it would be best to have all the related tests run only on-demand, not on any static or close tier, nor even on freeze or release (though maybe having it as an option for releases has merit). Keen to have your opinion on this."* The session agreed and asked: an `ondemand` scope with an opt-in release flag; a census of the other pristine-only gates; the chars gate's round ten now or parked.
+
+**The maintainer:**
+- *"let's make it purely ondemand scope and document how this ondemand scope can be run."*
+- *"yes. The only potential exception I can imagine of pristine-only gates that shouldn't be ondemand scope are for cases that are known to have been broken in the past (e.g. maybe we made a change for a VS2 tenant that affected vsavj characters: that would qualify for being at least on release)"*
+- *"park for next session"*
+
+So: a registry scope `ondemand` that no tier selects — not the static tier, the close, `--freeze` or the release run (`--scope all`); it runs only when asked for by name or by `--scope ondemand`, documented where the runner's scopes are; no release flag. The #118 gates take it. The other gates whose subject is pristine only are censused and proposed for the same scope, except those guarding a case known to have broken before (a tenant change that once moved vsavj characters), which stay at least at release. `audit_mizuumi_chars` (rule-checker runs 902-914, 914 open on Q1) is parked on branch `t118-196` for the next session; the struct gate, OK at run 2026-10-08-907, merges alone.
+
+---
+
 ## Ruled 2026-10-07 (14z-193) — #230 closed `done` on the standard throw; #235 filed for the kick and air throws
 
 **The question (AskUserQuestion, after rule-checker run 2026-10-06-712 OK):** *"#230 now gates Pyron's and Donovan's standard 6+HP throw on all 18 victims, ours vs native, at the matched level (re-frozen under rule-checker run 712, OK; you read the sheets as identical). Their kick and air throws aren't covered. How should #230 end?"* — options "Close; new ticket", "Extend #230 now", "Close; standard is enough".

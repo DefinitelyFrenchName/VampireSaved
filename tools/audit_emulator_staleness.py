@@ -51,7 +51,8 @@ itself, when the run recorded the registry dirty, or when either version cannot 
 
 WHAT A FREEZE RUNS (same ruling): at `freeze` cadence only the rows a freeze selects — registry cadence
 `romset`, scope `release` (`run_all_emulator.sh --freeze`) — FAIL; any other row's finding is a NOTE there.
-`release` cadence judges every row.
+`release` cadence judges every row — but an `ondemand` row (14z-196, maintainer-ruled: its subject is pristine
+content only and no tier runs it) is never judged at any cadence: its findings are NOTEs.
 
 A RED NEWEST ROW (same ruling): a gate whose newest row is FAIL, TIMEOUT or MISSING has no green to be stale —
 until 14z-192 it was not judged at all. It FAILs at freeze/release cadence (within the scope above) and is a
@@ -382,6 +383,8 @@ def main():
     def judged(g):   # does this row's finding FAIL at this cadence? (14z-192: a freeze judges what it runs)
         if a.cadence == "session":
             return False
+        if reg_all.get(g, {}).get("scope") == "ondemand":
+            return False   # 14z-196: no tier runs an ondemand row, so none judges it
         if a.cadence == "release":
             return True
         row = reg_all.get(g, {})

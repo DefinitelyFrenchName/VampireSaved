@@ -1,0 +1,9 @@
+# tests/rulecheck/retractions/14z-196.tsv — the wordings retracted or corrected in 14z-196, and reach controls that must be found live; columns pattern, source, class (retracted | reach:N)
+pc_count.lua still does	14z-196 (#228 step 1, d1d90167): pc_count.lua counts the FIRST frame_done since 14z-196 (SITES=none reference mode, PC_CLOCK=skip_first the known-bad); a wording saying it still skips it is retracted	retracted
+is the select screen's name-banner P2 array	14z-196 (#124, build/agent196/t124/REPORT.md): an aligned read watch found zero select-screen reads of 0x26762A; the 14z-195 reading is withdrawn and kept only as a marked retraction (docs/project/gotchas.md "[CORRECTED 14z-196 ...]")	retracted
+through 0x2675AA + 0x80	14z-196 (#124): the select screen reads the P1 array 0x2675AA for both banners; the "+ 0x80 player bias" reading is withdrawn	retracted
+finer scheduler timeslices	14z-196 (#228, [MFI-2]): a -debug run's divergence was a frame_done-counting clock (the boot-halt UI frame), not a scheduler timeslice effect; retracted in docs/platform/gotchas.md	retracted
+timeslice GOTCHA	14z-196: docs/project/gotchas.md called the sound-latch phase shift "the same mechanism as the -debug timeslice GOTCHA"; corrected in place	retracted
+timeslicing	14z-196 (#228): the same retracted theory in six code comments (replay_guard.lua, run_replay_guarded.sh, test_crash_guard.sh, inp_guard.lua, run_inp_guarded.sh, run_inp_probe.sh) — KNOWN LIVE, carried to #228 step 4 (the clock fix) by decision, named in NEXT_SESSION	retracted
+uiframes 1	control: the corrected [MFI-2] wording, live in docs/platform/gotchas.md	reach:1
+has no select consumer	control: the corrected #124 reading, live in docs/project/gotchas.md	reach:1

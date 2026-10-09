@@ -1,0 +1,5 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent196/pristine_census/CLASSIFY.md	8bc07328df448c4fb1d27571fb997a01102c39fe
+build/agent196/pristine_census/census_hits.tsv	2cf339436c58206fe7e74ccb05c06297ef0de44c
+DECISIONS_HISTORY.md.lines-556-566 (lines 556-566 of DECISIONS_HISTORY.md)	2859874c97ff0e9fbbba6ee39ca9ea6a1f8057e0
+tests/ci_emulator.tsv.lines-72-90 (lines 72-90 of tests/ci_emulator.tsv)	75a2304817c047179e03037fce5d8bf22a9a490d

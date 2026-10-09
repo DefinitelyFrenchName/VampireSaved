@@ -837,8 +837,9 @@ otherwise-vanilla content, both invisible to gameplay:
    ($FF8000 at frame-done) — dead, but inside the whole-RAM checksum.
    Observed window: `RAM:$FF7F00-$FF7FFF`.
 2. **Sound-handshake phase:** the 68k↔QSound latch byte `RAM:$FF043C`
-   (values 04/08) can phase-shift by one frame — the same mechanism as the
-   `-debug` timeslice GOTCHA's $FF1CF0 latch.
+   (values 04/08) can phase-shift by one frame. (This once read "the same
+   mechanism as the `-debug` GOTCHA's $FF1CF0 latch"; that latch's shift was a
+   frame_done-counting clock, not a scheduler effect — [MFI-2], corrected 14z-196.)
 With BOTH masked (`MASK_RANGES="043c-043d,7f00-8000"` on replay.lua), the
 patched stage-4 build is bit-identical to vanilla for the full 02 replay.
 Note the dispatch pump also runs for MENU-time objects (cursor sparkles,
