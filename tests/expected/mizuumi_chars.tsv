@@ -3,6 +3,7 @@
 pick_mokt	forced 05: in-match +0x60 bases 0009efe6; table row 0009efe6
 pick_anak	forced 06: in-match +0x60 bases 000a1254; table row 000a1254
 tap_field_alignment	proj:5510/5510 dash:4110/4110 mokt:4110/4110 anak:4110/4110 rnd:4110/4110 c01:7110/7110 c10:5910/5910 c26:40510/40510 c07:4110/4110 c08:6710/6710 c29:4110/4110 c128:20910/20910 c19:5720/5720 c21:13910/13910 c22:13710/13710 c24:18310/18310 c30:4510/4510 c50:3310/3310
+tap_field_state	proj:5593/5593 dash:4193/4193 mokt:4193/4193 anak:4193/4193 rnd:4193/4193 c01:7193/7193 c10:5993/5993 c26:40593/40593 c07:4193/4193 c08:6793/6793 c29:4193/4193 c128:20993/20993 c19:5803/5803 c21:13993/13993 c22:13793/13793 c24:18393/18393 c30:4593/4593 c50:3393/3393
 prewrite_spans	c21:P2:11698-11722:+0x382=00:next-loaded=00@11888 c22:P2:11781-11805:+0x382=00:next-loaded=00@11968 c24:P2:11875-11899:+0x382=00:next-loaded=00@12783
 char_vs_base	in-match side-frames 197992: +0x382 agrees with the base on 197917, differs as the ladder's pre-write on a CPU side after the timer reached 0 on 75 (allowed), differs otherwise on 0
 pact_spawns	Anakaris:6 Aulbath:1 Bishamon:1 Bulleta:28 Demitri:3 Jedah:104 Q-Bee:1

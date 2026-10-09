@@ -22,7 +22,10 @@ names come from tools/vanilla_frames.py's CHARS (held to the atlas by tools/audi
   other-side-credit K8's writes credited to the OPPOSITE block's character — K8 must fail;
   wrong-base        K0's forced picks judged against ANOTHER character's +0x60 base (id ^ 1) — K0 must fail;
   prewrite-human    K0b with the ladder pre-write frames' side read as HUMAN — K0b must fail (the exception is CPU-only);
-  tap-misaligned    KA comparing the tap run's $FF8080 one frame later than it lands — KA must fail.
+  tap-misaligned    KA comparing the tap run's $FF8080 one frame later than it lands — KA must fail;
+  tap-other-game    the flare leg's TAP run replaced by one that played a DIFFERENT game (projshift.tap: the same replay with
+                    P1's inputs from f3000 two frames later) — KS must fail;
+  next-load-wrong   K0b's waived spans judged against the id AFTER the one the side loads next (id ^ 1) — K0b must fail.
 (wrong-base: rule-checker run 2026-10-08-904 Q3/Q4 — the picks were read back from the poked byte itself.)
 
 THE CHARACTER OF A BLOCK is read from its loaded character-data base +0x60.l against the game's own table at
@@ -32,9 +35,12 @@ the writer crediting of K8 and K12 uses it (a frame whose base is in no row fall
 THE CREDITING OF K8 AND K12 IS FROM THE SAME RUN THAT OBSERVED THE WRITE (rule-checker run 2026-10-08-908): the tap run
 also logs each block's +0x60 base words, so the base in force at a write is the last base the SAME run wrote before it,
 in the tap's own line order — no second MAME process is consulted. Where a check still joins the tap run with the field
-run (K1's writers, K3, K5, K9's and K10's writers, the reader census), KA proves the two runs played the same game on
-every leg: the tap run's write of the game's vblank counter RAM:$FF8080 in tap frame f equals the field run's sample of
-it at trace frame f+1, on every frame of every leg (control tap-misaligned).
+run (K1's writers, K3, K5, K9's and K10's writers, the reader census), two checks measure the pairing on every leg
+(rule-checker runs 2026-10-08-908 and -909): KA, FRAME ALIGNMENT only — the tap run's write of the vblank counter
+RAM:$FF8080 in tap frame f equals the field run's sample at f+1 (the counter advances whatever the input, so KA cannot
+tell two games apart; control tap-misaligned) — and KS, THE SAME GAME — both sides' X (+0x10) and HP (+0x50) words,
+rebuilt at the end of every frame from the tap run's OWN writes, equal the field run's samples on every frame of every
+leg once all four words have been written (control tap-other-game: a tap run that played a different game fails it).
 A WRITE IS CREDITED TO THE CHARACTER OF THE BLOCK IT LANDS IN, not to the code that ran: "PC X with one character" means
 every write PC X made landed in blocks holding that one character. It is not code ownership — Morrigan's kick-throw code
 at PRG:0x03B2DA writes the VICTIM's +0x19A and is credited to the victim (rule-checker run 2026-10-08-906 Q4).
@@ -79,7 +85,8 @@ ap.add_argument("--replays", required=True)
 ap.add_argument("--legs", required=True)
 ap.add_argument("--pert", default="none", choices=("none", "absent-move", "wrong-owner", "pool-miscount", "passes-inflated",
                                                    "fall-shifted", "taps-as-dashes", "other-side-credit", "wrong-base",
-                                                   "prewrite-human", "tap-misaligned"))
+                                                   "prewrite-human", "tap-misaligned", "tap-other-game",
+                                                   "next-load-wrong"))
 ap.add_argument("--data", required=True, help="the vsavj DATA view (tools/cps2_decrypt.py --data-out): the +0x60 table")
 ap.add_argument("--out", required=True)
 A = ap.parse_args()
@@ -179,6 +186,8 @@ def charof(d, s):
 T = {tag: load(tag) for tag, _, _ in LEGS}
 S = {tag: staged(rpl) for tag, rpl, _ in LEGS}
 TW = {tag: taps(tag) for tag, _, _ in LEGS}
+if PERT == "tap-other-game":
+    TW["proj"] = taps("projshift")   # a tap run of a DIFFERENT game (P1's inputs from f3000 two frames later)
 def tapchars(tag):
     """per tap entry, in the tap's own line order: (side-1 character, side-2 character) by the +0x60 base THIS run had
     written before that entry (None = unloaded); the base's four bytes are tracked from the run's own writes"""
@@ -225,6 +234,44 @@ for tag in T:
     perka.append(f"{tag}:{n_ - m_}/{n_}")
 cnt("tap_field_alignment", " ".join(perka))
 res(nka > 0 and badka == 0, "KA", f"$FF8080 written by the tap run equals the field run's sample{' one frame later (mode tap-misaligned)' if shka else ''}, per leg (equal/compared): {' '.join(perka)}")
+# KS THE TWO RUNS OF A LEG PLAYED THE SAME GAME (rule-checker run 2026-10-08-909 Q1/Q3/Q4): state that depends on the
+# input — both sides' X (+0x10.w) and HP (+0x50.w) — rebuilt at the end of each frame from the tap run's OWN writes (the
+# value of every byte as last written, carried across frames without a write) equals the field run's sample at that
+# trace frame, on every frame from the first at which all four words have been written; tap-other-game must fail it
+WORDS = [(1, "x", 0x10), (1, "hp", 0x50), (2, "x", 0x10), (2, "hp", 0x50)]
+perks = []; badks = nks = 0
+for tag in T:
+    cur = {}; seen = set(); state = {}
+    for f, pc, b, v in TW[tag]:
+        for s_, k_, off in WORDS:
+            a0 = BASE[s_] + off
+            if a0 <= b < a0 + 2:
+                cur[(s_, k_, b - a0)] = v; seen.add((s_, k_, b - a0))
+        if len(seen) == 8:
+            vals = []
+            for s_, k_, off in WORDS:
+                w = (cur[(s_, k_, 0)] << 8) | cur[(s_, k_, 1)]
+                vals.append(w - 0x10000 if w & 0x8000 else w)
+            state[f] = tuple(vals)
+    if not state:
+        badks += 1; perks.append(f"{tag}:0/0"); continue
+    f0 = min(state); last = None; n_ = m_ = 0; first_bad = None
+    for d in T[tag]:
+        f = d["f"]
+        if f < f0:
+            continue
+        last = state.get(f, last)
+        if last is None:
+            continue
+        n_ += 1
+        if (d["x1"], d["hp1"], d["x2"], d["hp2"]) != last:
+            m_ += 1
+            if first_bad is None: first_bad = f
+    nks += n_; badks += m_ + (n_ == 0)
+    perks.append(f"{tag}:{n_ - m_}/{n_}" + (f"(first@{first_bad})" if first_bad else ""))
+cnt("tap_field_state", " ".join(perks))
+res(nks > 0 and badks == 0, "KS", f"both sides' X and HP rebuilt from the tap run's own writes equal the field run's samples on every frame, per leg (equal/compared): {' '.join(perks)}"
+    + (" — mode tap-other-game: the flare leg's tap run played a different game" if PERT == "tap-other-game" else ""))
 # K0b +0x382 agrees with the loaded base on every in-match side-frame (so the checks that read +0x382 read the character)
 # — except on a CPU side (+0x380 0) after the round timer reaches 0, where the arcade ladder has already written the
 # next opponent into +0x382 before it loads (ram.md +0x382, 14z-188; measured 14z-196 on 21, 22 and 24's P2): counted
@@ -259,7 +306,7 @@ for (tag, s), ds in waived.items():
         nb = next((e for e in T[tag] if e["f"] > sp[-1]["f"] and (e[f"base{s}"] & 0xffffffff) in INV and (e[f"base{s}"] & 0xffffffff) != (sp[0][f"base{s}"] & 0xffffffff)), None)
         got = INV.get(nb[f"base{s}"] & 0xffffffff) if nb else None
         nxt0b.append((tag, s, sp[0]["f"], sp[-1]["f"], want, got, nb["f"] if nb else None))
-bad_nxt = sum(1 for t in nxt0b if t[5] != (t[4] & 0x0f))
+bad_nxt = sum(1 for t in nxt0b if t[5] != ((t[4] & 0x0f) ^ (1 if PERT == "next-load-wrong" else 0)))
 cnt("prewrite_spans", " ".join(f"{t[0]}:P{t[1]}:{t[2]}-{t[3]}:+0x382={t[4]:02x}:next-loaded={'-' if t[5] is None else f'{t[5]:02x}'}@{t[6]}" for t in nxt0b))
 cnt("char_vs_base", f"in-match side-frames {n0b}: +0x382 agrees with the base on {n0b - bad0b - pre0b}, differs as the ladder's pre-write on a CPU side after the timer reached 0 on {pre0b} (allowed), differs otherwise on {bad0b}")
 res(n0b > 0 and bad0b == 0 and bad_nxt == 0, "K0b", f"+0x382 equals the table id of the loaded +0x60 base on {n0b - bad0b - pre0b}/{n0b} in-match side-frames; "

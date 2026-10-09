@@ -1,0 +1,20 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_mizuumi_chars.sh	32b64d71ba520ffaaa1669c5819ff8f1f5f13d65
+tools/mizuumi_chars.py	11b095cb1eecda373d560e28fda7f2878f15e876
+tests/expected/mizuumi_chars.tsv	d864a78b66f0aa26ca111b7e5f0a8f2c4e01f3bc
+docs/game/atlas/ram.md.lines-144-158 (lines 144-158 of docs/game/atlas/ram.md)	d9c6a357b6500c23dc69d79aa5c0d1c413d75c51
+docs/game/atlas/ram.md.lines-167-167 (lines 167-167 of docs/game/atlas/ram.md)	eb00263361f2f4550d2de8417add558cfe7b84d1
+docs/game/atlas/ram.md.lines-242-277 (lines 242-277 of docs/game/atlas/ram.md)	37886a9222d9d05483683d4f40ea7a9a0ac2ec49
+docs/game/atlas/character_tables.md.lines-25-32 (lines 25-32 of docs/game/atlas/character_tables.md)	e94c57f26dbaf4f31f45031b8892fe78e84f82b4
+build/agent196/t118/rec5/clone_clean.txt	b24427e9d317f6c5c5d11db47a13160f7a7bdd30
+build/agent196/t118/rec5/audit_mizuumi_chars.log	483a747dd4bb168ce174ab2a1c823f6734e57759
+build/agent196/t118/rec5/audit_mizuumi_chars__tap-misaligned.log	1b66b051c38bd0dde1ed08379bb2f3356f245489
+build/agent196/t118/rec5/audit_mizuumi_chars__prewrite-human.log	b9542f820a443169fd80ad233145b39dc414a665
+build/agent196/t118/rec5/audit_mizuumi_chars__wrong-owner.log	8e35b877dd44e03d281a7de7818c0f0bedf5c688
+build/agent196/t118/rec5/audit_mizuumi_chars__wrong-base.log	bc198a00e72513662c2e7a33af5cf0a79134b189
+build/agent196/t118/rec5/audit_mizuumi_chars__absent-move.log	795a825c0ff1d7ad628282573cab69fd5a8db804
+build/agent196/t118/rec5/audit_mizuumi_chars__pool-miscount.log	16337ad6c6edaad0e8c45e906c8eb09d6959e76f
+build/agent196/t118/rec5/audit_mizuumi_chars__passes-inflated.log	e11df5491e6c5f425c711da2eb78e36320468137
+build/agent196/t118/rec5/audit_mizuumi_chars__fall-shifted.log	92517016b6e9fafda0bdbf3b4a42daa7a727afc5
+build/agent196/t118/rec5/audit_mizuumi_chars__taps-as-dashes.log	e4eed817133f90304e4f81939ac4d6bc6481a694
+build/agent196/t118/rec5/audit_mizuumi_chars__other-side-credit.log	60d1b0a3caf6e1546104c75f9243919ac9ec9ab7
