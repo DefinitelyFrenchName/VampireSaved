@@ -35,6 +35,8 @@ retraction_grep	0	every hit of each wording the sitting retracted is listed with
 scratch_census	0	every scratch program under the session's directory is classed PROMOTED, CLOSE-CHECK or NOT PROMOTED and each class holds	whether a NOT PROMOTED reason is true	^scratch programs	python3 tools/scratch_census.py --classes {RUN}/classes.tsv --dir {SESSDIR} --checks {RUN}/checks.tsv
 rulings_verbatim	0	every quote the sitting attributes to the maintainer is the maintainer's own words, and every maintainer message is on record	a ruling paraphrased without quotation marks; a quote with no attribution the reader parses (it is then neither verified nor failed); whether an exemption's reason is true (a hand read)	^maintainer messages	python3 tools/agent/rulings_verbatim.py --key {KEY} --transcript {TRANSCRIPT} --exempt {RUN}/rulings_exempt.tsv
 promise_check	0	every promise the pattern lists for {KEY} since {BASE} is FULFILLED, CARRIED or NOT A PROMISE, and each class holds	a commitment the promise pattern does not match; whether a NOT-A-PROMISE reason is true (a hand read)	^PASS|^FAIL|promise\(s\) listed	python3 tools/promise_check.py --key {KEY} --classes {RUN}/promises.tsv --base {BASE}
+submodule_pins	0	every submodule pin in HEAD (the commit the close pushes) is served by the remote its .gitmodules names — a fetch by sha into an empty repository, what a fresh clone's `git submodule update` does (#260)	a pin in a commit before HEAD (only HEAD is what a fresh clone of main checks out); whether the pinned commit is on the branch .gitmodules names, rather than anywhere the remote can reach	^pins checked	python3 tools/submodule_pins.py
+submodule_pins_plant	1	the pin check fails when emu/jtcores's pin is replaced by a commit made at run time, which no remote holds (the 14z-192 shape: a pin only the local clone had)	-	^pins checked	python3 tools/submodule_pins.py --plant emu/jtcores
 superseded	0	no live line in tests/ or tools/ pins a fingerprint the registry has superseded	the harness's own defaults outside this tree	^superseded keys	python3 tools/superseded_pins.py
 shape	0	every frozen expectation set loses nothing its predecessor held	whether an expectation's VALUES are right	^sets checked	python3 tools/freeze_set_shape.py
 state_lists	0	STATE.md's open lists, size budget and group count, NEXT_SESSION's START HERE and THE LEDGER's keys hold the open-list rule	whether an open item is really open	^PASS|^FAIL	sh tests/test_state_open_lists.sh
@@ -46,6 +48,7 @@ rulings_selftest	0	the rulings check's own self-test	-	^SELFTEST	python3 tools/a
 retraction_selftest	0	the retraction grep's own self-test	-	^SELFTEST	python3 tools/retraction_grep.py --selftest
 promise_selftest	0	the promise check's own self-test	-	^SELFTEST	python3 tools/promise_check.py --selftest
 claim_lint_selftest	0	the claim lint's own self-test	-	^SELFTEST	python3 tools/claim_lint.py --selftest
+submodule_pins_selftest	0	the pin check's own self-test	-	^SELFTEST	python3 tools/submodule_pins.py --selftest
 superseded_selftest	0	the superseded-pin check's own self-test	-	^SELFTEST	python3 tools/superseded_pins.py --selftest
 shape_selftest	0	the set-shape check's own self-test	-	^SELFTEST	python3 tools/freeze_set_shape.py --selftest
 none_reasons_selftest	0	the reason check's own self-test	-	^SELFTEST	python3 tools/none_reasons.py --selftest
