@@ -5,7 +5,9 @@ tree declares its must-fire controls, how it reports them, how a runner reads
 them, and what the executable form proves. It is the tree's COPY of BBX's R10
 grammar (plus R29, the executable form, and R30, the header rule) — a copy
 kept by hand, never a dependency, under the maintainer's ruling that the two
-are *independent but compatible* (2026-09-08). The law it serves is
+are *independent but compatible* (2026-09-08). **Since 2026-10-10 (14z-197, maintainer-ruled:
+bbh is its own project) the copy evolves on its own**, kept while it delivers value to this
+project; nothing here is held to bbh's text any more. The law it serves is
 CLAUDE.md §4 "Verdict logic is itself tested" ([VSP-19]); the rule it distils
 is [VSP-181] in `HANDOFF.md` "How to test". The reader is
 `tests/lib/controls.sh`, the classifier that turns a red block into FAIL is
@@ -97,13 +99,13 @@ declared control after a PASS — `--exec-controls all|portable|none`, default
 `all` — and prints a readout: `fired N / declared N`, the none and undeclared
 counts, and `executed N honoured N lies N refused N died N` and, when controls ran, `time: gates Ns controls Ns wall Ns (costliest
 controls: …)` (2026-09-14) — printed only when
-the tier declared or executed anything, so over a declaration-free tree the
-runner's output is byte-identical to bbh's. **The reader was LIFTED into bbh
-14z-148 as a copy** (`lib/sh/controls.sh` there, rules [BBH-88..91]): fidelity
-F1 now diffs both runners over nine declaring stubs and F2 over this tree's
-real portable tier, both EXACT (F2 at 70 rows, `--exec-controls none` on both
-sides). The readout's header is the generic `== must-fire controls ==` on both
-sides, and a controls-red FAIL row reads `(controls RED: …)`. Its ground truth
+the tier declared or executed anything (so over a declaration-free tree the
+runner's output stayed byte-identical to bbh's, which bbh's fidelity test F1
+compared until 14z-197; the reader was lifted into bbh at 14z-148 as a copy).
+**That comparison is no longer a constraint** (maintainer-ruled 2026-10-10:
+`test_bbh_fidelity` deleted, the runners' output this project's own). The
+readout's header is `== must-fire controls ==`, and a controls-red FAIL row
+reads `(controls RED: …)`. Its ground truth
 is `tests/test_static_runner.sh` sections 11-13. **WHEN (maintainer-ruled
 2026-09-14):** a mid-session commit runs `--exec-controls none` plus
 `CONTROL=<name> tests/<gate>.sh` for every declared control of a gate the

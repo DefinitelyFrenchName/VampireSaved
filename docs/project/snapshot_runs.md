@@ -38,9 +38,9 @@ and traceability"* — so session cadence stays in the working tree.
    file diverges): all of `build/` with the commit's own tracked `build/` files restored over it;
    each initialised submodule's checkout with its `.git/modules` dir (refused unless its `HEAD` is
    the commit's gitlink; the applied patches travel with it and `test_fbneo_tree_integrity` checks
-   them against `emu/fbneo-patches/` inside the run); the siblings the gates read — `../community`
-   and the bbh checkout (`$BBH_HOME`, else `../../blackbox-harness`), exported to the run as
-   `BBH_HOME`. `ROMDIR` is read in place and checksum-verified by `tools/audit_roms.py` at start and
+   them against `emu/fbneo-patches/` inside the run); the sibling the gates read, `../community`
+   (until 14z-197 the bbh checkout too, exported as `BBH_HOME` for `test_bbh_fidelity`; removed with
+   that gate, maintainer-ruled 2026-10-10: bbh is its own project). `ROMDIR` is read in place and checksum-verified by `tools/audit_roms.py` at start and
    at end. The git-IGNORED inputs inside the tree are copied file by file too: `release/emulators/`
    (the prebuilt release binaries `test_release_binaries` and `test_readme_recording` read), which a
    clone never carries.
@@ -67,7 +67,7 @@ and traceability"* — so session cadence stays in the working tree.
    `tools/audit_emulator_staleness.py` reads the newest one; a name already taken there is never
    overwritten (the run's exit turns to 2). Its `commit.txt` names the snapshot's commit.
 5. **The record**, `build/snapshot_runs/<stamp>-<commit>/` in the working tree: `record.txt` (the
-   commit, the runner and its arguments, its exit, the submodule and bbh commits, the ROMDIR
+   commit, the runner and its arguments, its exit, the submodule commits, the ROMDIR
    verdicts), `tree_porcelain_start.txt` (what the run did NOT test: the tree's uncommitted changes),
    `listing.tsv` (every snapshotted file outside git: path, size, mtime — with `--emulator-inputs` the
    copied cache and scratch clones too), `fingerprints.tsv` (every `build/*/rompath` through the
@@ -86,7 +86,8 @@ and 76 fingerprints; measured 14z-183b on this Mac).
   record must be complete,
   and the record's commit must be the one taken before the perturbation. The same perturbation must
   reach the same probe run in place (the positive leg). Four controls — `build/` linked instead of
-  snapshotted, the command run in the working tree, `BBH_HOME` left on the working checkout, the
+  snapshotted, the command run in the working tree, `BBH_HOME` left on the working checkout (control
+  `shared-bbh`, removed 14z-197 with the bbh copy, which leaves the probe EIGHT readings), the
   runner run from its own file — must each let the perturbation through and turn the gate red.
   **Since 14z-184 (#181)** the probe runs with `--emulator-inputs` and reads three more inputs — a
   file of a fake `~/.cache/vampire-saved`, a scratch clone, the fake instrument `fbneo_ref` — that

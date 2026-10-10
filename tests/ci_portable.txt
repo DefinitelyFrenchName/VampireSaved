@@ -65,6 +65,7 @@ test_demand_after_trap
 # test_must_fire_census.sh — the must-fire doctrine MACHINE-READ (14z-145): the
 # declaring inventory (grows only) and the header-only debt (shrinks only).
 # Step one of the ruling on the BBX finding; step two is the run-time contract.
+test_launcher_newest
 test_mame_runner_hygiene
 test_must_fire_census
 test_module_refs

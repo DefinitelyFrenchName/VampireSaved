@@ -29,13 +29,13 @@
 #      copy elsewhere) at the start, so nothing the working tree does afterwards reaches the
 #      run: all of build/ (then the commit's own tracked build/ files restored over it), each
 #      initialised submodule's checkout with its .git/modules dir (refused unless its HEAD is
-#      the commit's gitlink), and the declared siblings — ../community beside the tree, and the
-#      bbh checkout ($BBH_HOME, else ../../blackbox-harness) exported as BBH_HOME;
+#      the commit's gitlink), and the declared sibling ../community beside the tree (the bbh
+#      checkout is no longer copied: bbh is its own project, 14z-197);
 #      ROMDIR is read in place and checksum-verified (tools/audit_roms.py) at start AND end;
 #   S3 the snapshot lives under $SNAPSHOT_ROOT (default ~/.cache/vampire-saved/snapshots),
 #      outside $TMPDIR, whose macOS reaper hollowed this project's scratch clones twice;
 #   S4 THE RECORD, build/snapshot_runs/<stamp>-<commit>/ in the working tree: record.txt (the
-#      commit, the stamp, the runner and its arguments, its exit, the submodule and bbh commits,
+#      commit, the stamp, the runner and its arguments, its exit, the submodule commits,
 #      the ROMDIR verdicts), tree_porcelain_start.txt (what was NOT tested: uncommitted changes),
 #      listing.tsv (every snapshotted file outside git: path, size, mtime), fingerprints.tsv
 #      (every build/*/rompath through the commit's tools/build_fingerprint.py), runner.log;
@@ -148,15 +148,6 @@ for sm in $SUBS; do
     say "submodule   $sm  $want  ($(git -C "$C/$sm" status --porcelain | wc -l | tr -d ' ') changed paths — the tracked patches, checked in the run)"
 done
 if [ -d "$REPO/../community" ]; then cow "$REPO/../community" "$SNAP/community"; say "sibling     community  snapshotted"; else say "sibling     community  absent"; fi
-BBH_SRC="${BBH_HOME:-$REPO/../../blackbox-harness}"
-if [ -d "$BBH_SRC" ]; then
-    cow "$BBH_SRC" "$SNAP/blackbox-harness"
-    BBH_HOME="$SNAP/blackbox-harness"; export BBH_HOME
-    say "sibling     bbh  $(git -C "$BBH_HOME" rev-parse HEAD 2>/dev/null || echo not-a-git-checkout)  ($(git -C "$BBH_HOME" status --porcelain 2>/dev/null | grep -vc '^??' || true) tracked changes)"
-else
-    unset BBH_HOME || true
-    say "sibling     bbh  absent"
-fi
 
 # ---- S1 check: the clone is whole — the commit's file count, and no tracked change but the submodules
 want_n="$(git -C "$C" ls-tree -r --name-only "$SHA" | wc -l | tr -d ' ')"
@@ -284,7 +275,7 @@ romcheck start || refuse "ROMDIR does not verify against docs/checksums.txt at s
 python3 - "$SNAP" > "$REC/listing.tsv" <<'PY'
 import os, sys
 root = sys.argv[1]
-tops = ["repo/build", "community", "blackbox-harness", "home/.cache/vampire-saved"]
+tops = ["repo/build", "community", "home/.cache/vampire-saved"]
 tops += sorted(e for e in os.listdir(root) if e.startswith("jtsim"))
 for top in tops:
     for d, dirs, files in os.walk(os.path.join(root, top)):

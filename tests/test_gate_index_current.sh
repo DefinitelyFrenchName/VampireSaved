@@ -10,8 +10,8 @@
 # HOW: tools/gen_gate_index.py --check over the tree (~1 s); controls on a copy: a script
 #   with no family row, a dead TSV row, a hand-edited index.
 # EXPECTS: current and complete; each control fails --check or the cmp. The index the
-#   generic harness renders byte-identically (bbh F9), which is why the descriptions live on
-#   their own page.
+#   generic harness rendered byte-identically (bbh F9, no longer a constraint since 14z-197),
+#   which is why the descriptions live on their own page.
 #
 # MUST-FIRE: perturbed-copy: no-family-row — a script with no tests/gate_index.tsv row must fail --check, or a new gate goes unclassified
 # MUST-FIRE: perturbed-copy: dead-tsv-row — a TSV row whose script is gone must fail --check

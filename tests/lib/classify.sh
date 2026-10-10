@@ -14,7 +14,9 @@
 # PASS under the pre-commit command and PASS in the battery. The generic
 # harness resolved it by lifting the STRONGER copy as its one classifier
 # (blackbox-harness lib/sh/classify.sh); this file is the same resolution in
-# this tree. The lines below are the sweep's, moved, not rewritten.
+# this tree. The lines below are the sweep's, moved, not rewritten. Since 14z-197 this file
+# evolves on its own (maintainer-ruled 2026-10-10: bbh is its own project; kept while it
+# delivers value to Vampire Saved — every runner sources it).
 #
 # EXIT STATUS DECIDES FIRST. A gate that prints `SKIP:` AND exits non-zero is
 # a FAILURE, not a skip: it ran, could not complete, and said so. The case is

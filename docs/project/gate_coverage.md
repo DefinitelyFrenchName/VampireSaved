@@ -17,7 +17,7 @@ first sentence) is `gate_index.md`.
 
 | family | described | of | what the family is |
 |---|---|---|---|
-| [runner](#runner) | 44 | 44 | the suite runners and their own ground truth |
+| [runner](#runner) | 43 | 43 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 47 | 47 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -25,12 +25,12 @@ first sentence) is `gate_index.md`.
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 87 | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
 | [character-data](#character-data) | 83 | 83 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
-| [review-triage](#review-triage) | 35 | 35 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
+| [review-triage](#review-triage) | 36 | 36 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
 ## runner
 
-the suite runners and their own ground truth. 44 of 44 described.
+the suite runners and their own ground truth. 43 of 43 described.
 
 ### `run_all_emulator.sh` — run, emulator
 
@@ -111,14 +111,6 @@ the suite runners and their own ground truth. 44 of 44 described.
 **HOW:** tools/agent/extract.py reads the cut fixture tests/agent/worker_fixture/ (the raw transcript carried the maintainer's e-mail; the cut keeps only what the extract reads); only pinned `git show <sha>:<path> | wc -l | shasum` shapes are re-executed; three controls perturb a copy (a changed figure, a missing worker transcript, an off-spec command).
 
 **EXPECTS:** every figure re-derives and conformance holds; each control fails on its copy; a red names the figure or the command.
-
-### `test_bbh_fidelity.sh` — test, ci_static
-
-**WHAT:** the generic black-box harness (`bbh`, the separate repository extracted from this tree) still reproduces THIS tree's verdicts — the classifier, the tier classifier, the sweep registry, the masked vocabulary, the fingerprint, the suite dispatch, the hygiene tools, the field comparator — so the extraction has not drifted from its lineage.
-
-**HOW:** finds the harness ($BBH_HOME or beside the tree's parent) and runs its own fidelity selftest against this tree with a stub driver, ROM-free except the fingerprint over $ROMDIR; BBH_MAME_FIDELITY=1 adds F8 on the real emulators, never beside another gate run.
-
-**EXPECTS:** the harness's fidelity gate green (F1..F10 exact or identical as each contract states); SKIP when the harness is absent, which is why the gate is ci_static. A red names the fidelity check that differs and is a question about which side moved.
 
 ### `test_bg_leg_shape.sh` — test, ci_portable
 
@@ -314,11 +306,11 @@ the suite runners and their own ground truth. 44 of 44 described.
 
 ### `test_run_on_snapshot.sh` — test, ci_portable
 
-**WHAT:** tests/run_on_snapshot.sh runs its command on a snapshot that nothing done to the working tree during the run can reach — a tracked file edited and committed, a build/ output rewritten, a tracked build/ file, a submodule file, the ../community sibling, the bbh checkout, a file of the ~/.cache/vampire-saved instrument cache, a Verilator scratch clone, and the runner's own file — and its record names the commit the run was taken at; a tracked file carries its last commit's time, a `build/emu_*` the run writes comes back to the working tree, and an instrument binary changed in the LIVE cache during a run is reported.
+**WHAT:** tests/run_on_snapshot.sh runs its command on a snapshot that nothing done to the working tree during the run can reach — a tracked file edited and committed, a build/ output rewritten, a tracked build/ file, a submodule file, the ../community sibling, a file of the ~/.cache/vampire-saved instrument cache, a Verilator scratch clone, and the runner's own file — and its record names the commit the run was taken at; a tracked file carries its last commit's time, a `build/emu_*` the run writes comes back to the working tree, and an instrument binary changed in the LIVE cache during a run is reported.
 
-**HOW:** builds a throwaway world (a repo with a submodule, a build/ output, a community sibling, a bbh checkout, a HOME holding an instrument cache, a scratch clone), starts a probe under run_on_snapshot.sh --emulator-inputs that reads all nine inputs, pauses it, perturbs them in the working tree, releases it and has it read them again (its runner file truncated too, the leg's copy padded past any shell's read-ahead so that truncation reaches a dash run as well — #203); then runs the SAME probe IN PLACE with the same perturbation (the positive leg: the perturbation must reach an unsnapshotted run, or the immunity leg proves nothing); section 4 changes an instrument binary mid-run.
+**HOW:** builds a throwaway world (a repo with a submodule, a build/ output, a community sibling, a HOME holding an instrument cache, a scratch clone), starts a probe under run_on_snapshot.sh --emulator-inputs that reads all eight inputs, pauses it, perturbs them in the working tree, releases it and has it read them again (its runner file truncated too, the leg's copy padded past any shell's read-ahead so that truncation reaches a dash run as well — #203); then runs the SAME probe IN PLACE with the same perturbation (the positive leg: the perturbation must reach an unsnapshotted run, or the immunity leg proves nothing); section 4 changes an instrument binary mid-run.
 
-**EXPECTS:** the snapshot run reads every input unchanged, records the commit taken before the perturbation, sees t.txt at its commit's time, reaches the real HOME's other entries, and returns its build/emu_probe to the tree; the in-place run sees nine readings change; a mid-run instrument change reads unchanged inside the run and turns the run's exit to 2 with its AFTER line; each control makes the gate FAIL.
+**EXPECTS:** the snapshot run reads every input unchanged, records the commit taken before the perturbation, sees t.txt at its commit's time, reaches the real HOME's other entries, and returns its build/emu_probe to the tree; the in-place run sees eight readings change; a mid-run instrument change reads unchanged inside the run and turns the run's exit to 2 with its AFTER line; each control makes the gate FAIL.
 
 ### `test_run_record.sh` — test, ci_portable
 
@@ -506,7 +498,7 @@ the documentation locks — docs, skills, indexes, tables follow the tree. 21 of
 
 **HOW:** tools/gen_gate_index.py --check over the tree (~1 s); controls on a copy: a script with no family row, a dead TSV row, a hand-edited index.
 
-**EXPECTS:** current and complete; each control fails --check or the cmp. The index the generic harness renders byte-identically (bbh F9), which is why the descriptions live on their own page.
+**EXPECTS:** current and complete; each control fails --check or the cmp. The index the generic harness rendered byte-identically (bbh F9, no longer a constraint since 14z-197), which is why the descriptions live on their own page.
 
 ### `test_gotchas_index_current.sh` — test, ci_portable
 
@@ -3246,7 +3238,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 ## review-triage
 
-the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for. 35 of 35 described.
+the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for. 36 of 36 described.
 
 ### `test_applier_key_first.sh` — test, ci_portable
 
@@ -3359,6 +3351,14 @@ the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guar
 **HOW:** the checker over the real manifests and over synthetic mismatches (ROM-free, ~1 s).
 
 **EXPECTS:** the tree clean, the mismatch caught; a checker that passes everything is indistinguishable from a clean tree.
+
+### `test_launcher_newest.sh` — test, ci_portable
+
+**WHAT:** PLAY.command as tools/package_release_platforms.py renders it NOW (launcher_text, the template the next release ships — tests/test_release_launcher.sh drives the COMMITTED release's copy) picks the most recently modified of its candidate sets, so an old roms/vsavjw.zip left from an earlier launch never shadows a newer rompath/vsavjw.zip; FBNeo's roms/vsavjw.zip is replaced by the chosen set; with roms/ the newer, roms/ wins.
+
+**HOW:** both platforms' launchers rendered into staged directories with a stub emulator carrying the profile marker, two placeholder sets with explicit mtimes (no ROM bytes), driven under PLAY_DRY_RUN=1.
+
+**EXPECTS:** the reported romset is the newer file in both orders, on both platforms; FBNeo's roms/vsavjw.zip reads the newer bytes afterwards. The 14z-197 shape (#248): `PLAY_DRY_RUN=1 sh PLAY.command` printed `romset: .../roms/vsavjw.zip` and kept the old bytes with a newer set in rompath/ (maintainer-ruled 2026-10-10: "prefer the newest one, always"). The Windows PLAY.bat is NOT covered here (it needs cmd).
 
 ### `test_mame_mirror_guard.sh` — test, ci_portable
 

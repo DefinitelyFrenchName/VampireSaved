@@ -16,9 +16,9 @@
 # MUST-FIRE: perturbed-copy: description-dropped — a described gate's `# WHAT:` field removed in a copy of the tree must make the regeneration differ from the committed page and fail (mode: the check runs on that copy)
 #
 # WHY ITS OWN GATE and not test_gate_index_current: the generic harness renders the index
-# with a lifted copy of gen_gate_index.py and its fidelity gate F9 requires byte-identity
-# (tests/test_bbh_fidelity.sh), so the description rendering lives beside the index, not
-# in it (the generator's docstring).
+# with a lifted copy of gen_gate_index.py and its fidelity gate F9 required byte-identity
+# (the deleted tests/test_bbh_fidelity.sh; no longer a constraint, 14z-197), so the
+# description rendering lives beside the index, not in it (the generator's docstring).
 #
 # Usage: tests/test_gate_coverage_current.sh
 set -u

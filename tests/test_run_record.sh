@@ -16,7 +16,7 @@
 # WHY. tests/run_all_emulator.sh's commit.txt recorded HEAD and the paths of dirty TRACKED files
 # only, and the 14z-185 close's rule-checker runs 429-431, 434, 435 and 441 each rebuilt, after the
 # fact, what a run had executed. The record is written by both runners at a run's start and end
-# (silently: bbh's fidelity test compares their output exactly).
+# (silently: first because bbh's fidelity test compared their output exactly — no longer a constraint: bbh is its own project and this tree's output is its own, maintainer-ruled 2026-10-10, 14z-197).
 #
 # MUST-FIRE: perturbed-copy: blind-untracked — a copy whose status leaves out untracked files must miss the planted stray file, and the selftest must FAIL (mode: that copy's selftest)
 # MUST-FIRE: perturbed-copy: blind-reach — a copy whose compare never reports the reach must miss the edited program, and the selftest must FAIL (mode: that copy's selftest)

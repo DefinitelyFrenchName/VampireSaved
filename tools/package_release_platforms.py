@@ -226,10 +226,14 @@ fi
 @PROFILE_CHECK@
 
 # ── 4. find the romset the applier built ──────────────────────────────────
-# Looked for in the places a player plausibly puts it, nearest first.
+# Looked for in the places a player plausibly puts it, and THE NEWEST WINS (#248,
+# maintainer-ruled 2026-10-10: "prefer the newest one, always"): an old set left in
+# roms/ from an earlier release must never shadow the one just built. On a tie (a
+# link to the same file) the first in this list is kept.
 ZIP=""
 for _c in "$HERE/roms/vsavjw.zip" "$HERE/vsavjw.zip" "$HERE/rompath/vsavjw.zip"; do
-    [ -f "$_c" ] && { ZIP="$_c"; break; }
+    [ -f "$_c" ] || continue
+    if [ -z "$ZIP" ] || [ "$_c" -nt "$ZIP" ]; then ZIP="$_c"; fi
 done
 if [ -z "$ZIP" ]; then
     die "vsavjw.zip not found." \
@@ -265,8 +269,11 @@ FBNEO_LAUNCH = r'''if [ -L "$HERE/roms" ]; then
         "This launcher will not write through it. Remove the link and start again."
 fi
 mkdir -p "$HERE/roms"
-if [ ! -f "$HERE/roms/vsavjw.zip" ]; then
-    ln -sf "$ZIP" "$HERE/roms/vsavjw.zip" 2>/dev/null || cp "$ZIP" "$HERE/roms/vsavjw.zip"
+# FBNeo reads roms/vsavjw.zip only, so the chosen set goes THERE, replacing an older
+# one (#248: a stale copy left in place was what the emulator ran)
+if [ "$ZIP" != "$HERE/roms/vsavjw.zip" ]; then
+    rm -f "$HERE/roms/vsavjw.zip"
+    ln -s "$ZIP" "$HERE/roms/vsavjw.zip" 2>/dev/null || cp "$ZIP" "$HERE/roms/vsavjw.zip"
 fi
 cd "$HERE"
 # PLAY_DRY_RUN is how the project's own gate drives this script without starting

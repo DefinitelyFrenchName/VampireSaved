@@ -1,5 +1,13 @@
 # HARNESS SCOPE — extracting the generic black-box harness (`blackbox-harness`) from this project
 
+> **SUPERSEDED AS A PLAN FOR THIS TREE (14z-196/14z-197, maintainer-ruled 2026-10-09 and
+> 2026-10-10):** bbh is its own project. A Vampire Saved session makes no change there and runs
+> none of its tests; the one read-only fidelity gate this document gave the project,
+> `tests/test_bbh_fidelity.sh`, is DELETED (14z-197), the snapshot runner no longer copies the
+> harness, and this tree's runners, `tests/lib/classify.sh` and `tests/lib/controls.sh` evolve on
+> their own (`DECISIONS_HISTORY.md` "Ruled 2026-10-10 (14z-197) — bbh's remaining links"). What
+> follows is the extraction's record, kept as it was written.
+
 > **STATUS (written 14z-135, 2026-09-06): THE PLAN BEFORE THE WORK — scope,
 > the four bins, the slices and the fidelity contract. H1 LANDED the same
 > session** (`~/Developer/blackbox-harness` at `803f372`: the classifier,

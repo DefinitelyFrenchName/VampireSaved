@@ -16,7 +16,8 @@ functional coverage and the retrofit's remainder are on one page.
 
 WHY A SEPARATE GENERATOR and not a second table in gate_index.md: the generic
 harness (bbh) carries a lifted COPY of tools/gen_gate_index.py and its fidelity gate
-F9 requires the two to render the index byte-identically (tests/test_bbh_fidelity.sh).
+F9 required the two to render the index byte-identically (the deleted tests/test_bbh_fidelity.sh;
+no longer a constraint: bbh is its own project and this tree's output is its own, maintainer-ruled 2026-10-10, 14z-197).
 A description table added to the index broke F9 at 14z-180; the index stays what the
 harness renders, and this page is the tree's own. The rows (family, kind, tier) come
 from gen_gate_index.collect(), so the two pages cannot disagree about a gate.

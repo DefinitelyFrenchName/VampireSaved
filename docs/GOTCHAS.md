@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-499 entries (47 game / 131 platform / 321 project), counted from the buckets at generation.
+500 entries (47 game / 131 platform / 322 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 47 entries
 
@@ -206,7 +206,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - MAME OPENS ON A RED "ROMs/disk images ... incorrect" BOX AT EVERY START OF A SET WHOSE CRCs ITS DRIVER DOES NOT CARRY, AND NO OPTION SKIPS IT (seen: 14z-193, #234; source read 14z-194)
 - A DT_NEEDED SELF-CONTAINMENT CHECK CANNOT SEE WHAT SDL LOADS AT RUN TIME (paid: 14z-195, #226)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 321 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 322 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -225,7 +225,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - THE GROUND IS y = 40 — "AIRBORNE" IS y > 40, AND A HIT ON THE LANDING FRAME READS 40 (paid: 14z-181, caught by rule-checker run 2026-09-25-164, GitHub #163)
 - MOVING A RIG'S SCHEDULE MOVES EVERY EVENT'S DOUBLE-PASS PHASE — a shift is a MEASURED QUANTITY, not a spacing choice (paid: 14z-171 to 14z-172, GitHub #168)
 - A POSITIVE CONTROL DEFINED IN THE INSTRUMENT'S OWN COORDINATES CANNOT SHOW THAT THOSE COORDINATES ARE WRONG (paid: 14z-156, found 14z-172, GitHub #168)
-- A NEW ANCHOR DOCUMENT FOR A SKILL IS A TWO-REPO EDIT — the harness's consumer config carries its own copy of the skills lock's document list (paid: 14z-163, GitHub #152)
+- A NEW ANCHOR DOCUMENT FOR A SKILL IS A TWO-REPO EDIT — the harness's consumer config carries its own copy of the skills lock's document list (paid: 14z-163, GitHub #152; WITHDRAWN 14z-197, maintainer-ruled 2026-10-10: bbh is its own project)
 - A COMMIT SUBJECT THAT NAMES AN ISSUE AFTER A CLOSING KEYWORD CLOSES IT ON PUSH — and the close is attributed to the PUSHING account, not measured (paid: 14z-162, GitHub #151)
 - TWO SYMPTOMS ARE ONE DEFECT ONLY IF THE MECHANISM PREDICTS BOTH (paid: 14z-95 to 14z-96, #93 and #101)
 - A gate that prints `SKIP:` AND exits NON-ZERO is a FAILURE, not a skip (paid: 14z-128)
@@ -471,7 +471,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A CONTROL THAT "FIRES" BECAUSE ITS COPY CRASHED PROVES NOTHING — count a control only when its perturbation reaches the measured state (paid: 14z-183b, GitHub #153)
 - A SCRIPT THAT RE-IMPLEMENTS THE RUNNER IS NOT THE RUNNER — it dropped `VS_CADENCE` and read a freeze-cadence red as PASS (paid: 14z-183b, GitHub #153)
 - A CAPTURE LABELLED WITH THE TRACE'S VALUES IS NOT INDEPENDENT OF THE TRACE — and a sheet too short to show the reaction settles nothing (paid: 14z-183, GitHub #134)
-- THE RE-POINT SWEEP SEES BUILD NAMES IN THIS TREE — A PINNED FINGERPRINT AND THE HARNESS'S DEFAULTS ARE OUTSIDE IT (paid: 14z-170)
+- THE RE-POINT SWEEP SEES BUILD NAMES IN THIS TREE — A PINNED FINGERPRINT IS OUTSIDE IT (paid: 14z-170; the harness half WITHDRAWN 14z-197)
 - A DOCUMENT WRITTEN BY THE EXPERT READS AS COMPLETE TO THE EXPERT — the tell is FIRST USE against FIRST NEED, and you will write a fresh instance of the bug while fixing it (paid: 14z-173/14z-174, GitHub #146)
 - WHEN A RULE-CHECKER PACKET ATTRIBUTES A DECISION, THE DECISION RECORD IS AN ARTIFACT — otherwise Q5 is VIOLATED and it is right to be (paid: 14z-174, run 2026-09-21-90)
 - A SESSION TRANSCRIPT EMBEDS THE SYSTEM PROMPT, AND A TASK'S COMPLETION IS RECORDED IN TWO FORMS — parse records by type, never grep (paid: 14z-175, GitHub #172)
@@ -529,3 +529,4 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A SYMLINK'S TARGET RESOLVES AGAINST THE LINK'S DIRECTORY, NOT THE CWD — a relative ROMDIR built an overlay of dangling links that exited 0 (paid: 14z-196's code review, GitHub #250; fixed 14z-197)
 - THE RELEASE PACKAGER DELETED ITS TARGET FIRST — a typed name could reach a sibling, and a failed rebuild left nothing (paid: 14z-196's code review, GitHub #246 and #247; fixed 14z-197)
 - THE PYTHON APPLIER CHECKED THE SET KEY AFTER WRITING THE SET — a failure that leaves its output is not a failure to a launcher (paid: 14z-196's code review, GitHub #255; fixed 14z-197)
+- THE LAUNCHER TOOK THE FIRST SET IT FOUND, AND FBNEO KEPT A STALE COPY — an upgrade ran the old game under the new version's banner (paid: 14z-196's code review, GitHub #248; the Unix launcher fixed 14z-197, the Windows one pending)

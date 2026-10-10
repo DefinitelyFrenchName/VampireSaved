@@ -600,6 +600,55 @@ So: bbh (`~/Developer/blackbox-harness`) is its own project; a Vampire Saved ses
 
 ---
 
+## Ruled 2026-10-10 (14z-197) — the order of work: #245-#255, P2 first; nothing bbh-related runs here
+
+**The context (the opener):** the session read HANDOFF, STATE and NEXT_SESSION and listed START HERE.
+
+**The maintainer:**
+- the maintainer: *"Start with #245 to #255, P2 first."*
+- the maintainer: *"Regarding bbh, you should not be doing changes to the projects and if you are currently running any tests or checks actually anything that is related to bbh, you should stop : bbh runs its own tests and checks. I any area of interaction or dependency remains, I'm happy to answer questions"*
+
+So: #245-#255 are worked P2 before P3; nothing bbh-related was running (the opener's sweep was clean, no job started), and the remaining read-only links were put to the maintainer as questions (the entry below).
+
+---
+
+## Ruled 2026-10-10 (14z-197) — a fixed ticket is commented and labelled `done unshipped`, not closed
+
+**The question (in chat):** whether the issues fixed this session (#245, #249, #251, #252, #253, then #250, #246, #247, #255) close at the session close after the close tier is green, as #254 did.
+
+**The maintainer:**
+- the maintainer: *"comment the issuein github with what has been done, tag the issue in github as done unshipped"*
+
+So: each fixed issue gets a comment saying what was done (the commit, the gate and its control, the gotcha) and the existing GitHub label `done unshipped`; it stays open. Applied to the nine issues of 14z-197.
+
+---
+
+## Ruled 2026-10-10 (14z-197) — #248: the launcher prefers the newest set, always
+
+**The question (in chat):** when an old `roms/vsavjw.zip` and a newly built `rompath/vsavjw.zip` both exist, should the launcher prefer the new one, check each against the release's set key, or refuse and name what it found?
+
+**The maintainer:**
+- the maintainer: *"prefer the newest one, always."*
+
+So: the launchers choose the most recently modified candidate set, and a stale copy at the emulator's destination is replaced by it.
+
+---
+
+## Ruled 2026-10-10 (14z-197) — bbh's remaining links: the snapshot copy removed, the runners' output ours, the bbh instructions dropped, the shared copies ours
+
+**The questions (in chat):** four read-only links between this tree and `~/Developer/blackbox-harness`: (1) `tests/run_on_snapshot.sh` copies the bbh checkout into every snapshot (`BBH_HOME`), and `test_run_on_snapshot.sh` has a `shared-bbh` control for it; (2) both runners keep their output byte-identical to bbh's for its fidelity test; (3) the freeze rule [VSP-185] directs re-pointing bbh's lineage defaults, and a gotcha calls a new skill anchor document a two-repo edit; (4) `tests/lib/classify.sh` and `tests/lib/controls.sh` are hand-kept copies of bbh's code. Then whether `test_bbh_fidelity`, which compares the runners' output with bbh's, is deleted.
+
+**The maintainer:**
+- the maintainer, on (1): *"yes"*
+- the maintainer, on (2): *"not a constraint anymore, we are the masters of everything Vampire Saved: nothing more but nothing less"*
+- the maintainer, on (3): *"drop them both. If the drop has consequences on Vampire Saved, then ask for a new ruling from me."*
+- the maintainer, on (4): *"yes, if we use them and they actually deliver value to Vampire Saved, otherwise raise the option to drop them"*
+- the maintainer, on `test_bbh_fidelity`: *"yest delete it"*
+
+So: the snapshot no longer copies bbh; the runners' output is this project's to change; the two bbh-directed instructions are dropped (a consequence for this tree goes back to the maintainer); `classify.sh` and `controls.sh` evolve on their own while they deliver value (every runner sources both); `test_bbh_fidelity` is deleted.
+
+---
+
 ## Ruled 2026-10-07 (14z-193) — #230 closed `done` on the standard throw; #235 filed for the kick and air throws
 
 **The question (AskUserQuestion, after rule-checker run 2026-10-06-712 OK):** *"#230 now gates Pyron's and Donovan's standard 6+HP throw on all 18 victims, ours vs native, at the matched level (re-frozen under rule-checker run 712, OK; you read the sheets as identical). Their kick and air throws aren't covered. How should #230 end?"* — options "Close; new ticket", "Extend #230 now", "Close; standard is enough".

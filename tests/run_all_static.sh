@@ -168,7 +168,7 @@ STATIC="$(order_last "$STATIC")"
 # THE CADENCE (14z-162, GitHub #148, maintainer-ruled 2026-09-17). tests/ci_cadence.tsv
 # lists the gates that are NOT session cadence, each with the path prefixes it
 # depends on. Absent file = every gate is session = the pre-#148 behaviour,
-# byte-for-byte (bbh's fidelity test drives this runner in a root without it).
+# byte-for-byte (kept for bbh's fidelity test until 14z-197 — no longer a constraint: bbh is its own project and this tree's output is its own, maintainer-ruled 2026-10-10, 14z-197).
 CAD_FILE=tests/ci_cadence.tsv
 cad_rank() { case "$1" in session) echo 0 ;; freeze) echo 1 ;; release) echo 2 ;; ondemand) echo 3 ;; *) echo 9 ;; esac; }
 [ "$(cad_rank "$CADENCE")" != 9 ] || { echo "bad --cadence '$CADENCE'" >&2; exit 2; }
@@ -247,9 +247,9 @@ rm -f "$KEEP"/*.log 2>/dev/null || true
 # tools/run_record.py writes what this run ran on — HEAD, the status with untracked files and their
 # hashes, the submodules, the command line, an allow-listed environment and a sha256 of every
 # program the registered gates can reach — at the START here and at the END in the exit trap, so a
-# red run has one too. SILENT: bbh's fidelity test compares this runner's output with bbh's own
-# exactly, so the record prints nothing unless it fails. A root without the tool (the runner test's
-# fake root, bbh's) writes none. `python3 tools/run_record.py compare <start> <end|--now>` reads it.
+# red run has one too. SILENT: it prints nothing unless it fails (first so that bbh's fidelity test
+# could compare this runner's output with bbh's — no longer a constraint: bbh is its own project and this tree's output is its own, maintainer-ruled 2026-10-10, 14z-197). A root without the tool (the runner
+# test's fake root) writes none. `python3 tools/run_record.py compare <start> <end|--now>` reads it.
 RUNREC=""
 if [ -f tools/run_record.py ] && git rev-parse --git-dir >/dev/null 2>&1; then
     RUNREC="${STATIC_RUN_RECORDS:-build/static_runs}/$(date -u +%Y%m%dT%H%M%SZ)_$$"
@@ -616,10 +616,10 @@ done
 # self-report. Undeclared gates are a NOTE-class count (the grammar postdates
 # most of the suite); a red control is already in the tally above.
 # Printed only when the tier DECLARED or EXECUTED anything: a tree with no
-# `# MUST-FIRE:` line prints nothing here, which keeps this runner's output
+# `# MUST-FIRE:` line prints nothing here, which kept this runner's output
 # byte-identical to the generic harness's over its declaration-free fake repo
-# (bbh fidelity F1, `tests/test_bbh_fidelity.sh` — red on the first strict run
-# after this block landed, 14z-147). The reader was LIFTED into bbh 14z-148
+# (bbh fidelity F1, the deleted `tests/test_bbh_fidelity.sh` — red on the first
+# strict run after this block landed, 14z-147; no longer a constraint: bbh is its own project and this tree's output is its own, maintainer-ruled 2026-10-10, 14z-197). The reader was LIFTED into bbh 14z-148
 # (its lib/sh/controls.sh, a copy), so F1 now covers declaring gates too and
 # F2 (opt-in, the real tier) is exact again; the header line below is generic
 # on both sides by construction — it named this file until the lift.

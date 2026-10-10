@@ -423,7 +423,7 @@ a clamped index are the three that have bitten here. The negative itself was
 sound and stays; what needed correcting was the sentence drawn from it
 ([VSP-13]).
 
-## A NEW ANCHOR DOCUMENT FOR A SKILL IS A TWO-REPO EDIT — the harness's consumer config carries its own copy of the skills lock's document list (paid: 14z-163, GitHub #152)
+## A NEW ANCHOR DOCUMENT FOR A SKILL IS A TWO-REPO EDIT — the harness's consumer config carries its own copy of the skills lock's document list (paid: 14z-163, GitHub #152; WITHDRAWN 14z-197, maintainer-ruled 2026-10-10: bbh is its own project)
 
 `tools/checkskills.py` names the documents a skill's anchors may live in
 (`_PORT_DOCS` and the rest), and the generic harness's `check-skills` is the
@@ -435,9 +435,12 @@ harness report every rule anchored in it as ANCHORED NOWHERE — one red gate,
 127 s, on the first strict tier after the edit (the row working as intended,
 as its own re-baseline page says of F9).
 
-**RULE: when a document joins a skill's anchor list in `checkskills.py`, the
-same path joins the consumer config in the harness, in a harness commit that
-names the lineage session; then re-run `test_bbh_fidelity` before the tier.**
+**RULE (WITHDRAWN 14z-197 — a Vampire Saved session makes no change in the
+harness, and `test_bbh_fidelity` is deleted; a new anchor document is a
+`checkskills.py` edit in this tree only):** ~~when a document joins a skill's
+anchor list in `checkskills.py`, the same path joins the consumer config in the
+harness, in a harness commit that names the lineage session; then re-run
+`test_bbh_fidelity` before the tier.~~
 The fidelity gate is the guard; nothing in this tree can see the harness's
 list.
 
@@ -5872,7 +5875,7 @@ confirm a trace carries NO value read from that trace, spans the event through t
 reaction (or its absence) on both sides, and its description states only what a frame shows.
 Record the maintainer's reading as given.
 
-## **[VSP-185]** THE RE-POINT SWEEP SEES BUILD NAMES IN THIS TREE — A PINNED FINGERPRINT AND THE HARNESS'S DEFAULTS ARE OUTSIDE IT (paid: 14z-170)
+## **[VSP-185]** THE RE-POINT SWEEP SEES BUILD NAMES IN THIS TREE — A PINNED FINGERPRINT IS OUTSIDE IT (paid: 14z-170; the harness half WITHDRAWN 14z-197)
 
 The M19 freeze re-pointed 304 live build references in 153 files and re-froze every static gate it
 ran, and still two gates held M18 at the close. `test_phasec_spaces` pins the stock twin's
@@ -5885,11 +5888,13 @@ are FREEZE-cadence gates, and neither ran in the freeze's own static pass. The f
 ran without `ROMDIR`, and 81 gates SKIPPED, these two among them. `--strict` read that as red, which
 is what it is for. Rule: at a freeze, run `tests/run_all_static.sh --strict --cadence freeze` with
 `ROMDIR` set BEFORE the tags ([VSP-101], [VSP-103]). Grep for the OLD FINGERPRINTS as well as the
-old build names, and re-point the harness's defaults in the same sitting. The phasec re-freeze is
+old build names. *(Until 14z-197 the rule also said "and re-point the harness's defaults in the same
+sitting"; WITHDRAWN, maintainer-ruled 2026-10-10: bbh is its own project, a Vampire Saved session
+makes no change there, and `test_bbh_fidelity`, which read them, is deleted.)* The phasec re-freeze is
 attributed by the freeze's own op-by-op delta of the stock twin (`attr2_m5_stock18.txt`). A gate for the
 fingerprint half — a live pin on a SUPERSEDED registry row's key, with the rule-checker's birth anchor
 exempt and a planted pin as its control — is `tests/test_superseded_pins.sh` since 14z-185b (#167; portable, so
-every tier runs it). It sees this tree only: the grep stays the guard for the harness's defaults.
+every tier runs it).
 
 ## A DOCUMENT WRITTEN BY THE EXPERT READS AS COMPLETE TO THE EXPERT — the tell is FIRST USE against FIRST NEED, and you will write a fresh instance of the bug while fixing it (paid: 14z-173/14z-174, GitHub #146)
 
@@ -6892,3 +6897,16 @@ zip is complete. A failure leaves an empty output empty and an earlier output by
 file: the fix reaches players with the next release. Ground truth: `tests/test_applier_key_first.sh` (a synthetic
 release from the real packager), control `write-first`. **The rule:** an applier verifies everything it can before
 its first write, and publishes by rename.
+
+## THE LAUNCHER TOOK THE FIRST SET IT FOUND, AND FBNEO KEPT A STALE COPY — an upgrade ran the old game under the new version's banner (paid: 14z-196's code review, GitHub #248; the Unix launcher fixed 14z-197, the Windows one pending)
+
+`PLAY.command` looked for `vsavjw.zip` in `roms/`, beside itself, then `rompath/`, and took the FIRST one present.
+The FBNeo launcher also linked or copied the chosen set into `roms/` only when nothing was already there. So a set
+left in `roms/` by an earlier launch shadowed a newly built `rompath/vsavjw.zip` for good: the launcher printed the
+new package's version and ran old content. The maintainer ruled the policy: *"prefer the newest one, always."* The
+template now chooses the most recently modified candidate (the first on a tie) and replaces FBNeo's `roms/vsavjw.zip`
+with the chosen set. `PLAY.bat` has the same first-found loop and copy-if-absent, and stays unchanged until a
+Windows host can test it. **A trap in the testing:** `tests/test_release_launcher.sh` drives the COMMITTED release's
+`PLAY.command`, so it cannot see a template change before the next packaging. `tests/test_launcher_newest.sh`
+renders the launcher from the current template (`launcher_text`), control `first-found`. **The rule:** a
+generator's change is tested on what the generator emits now, never on the last artifact it emitted.

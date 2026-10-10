@@ -303,8 +303,8 @@ fi
 # program the registry's gates can reach — at the START (once per run directory: a --resume
 # continues the run it records) and at the END of every invocation (the exit trap), so "the tree
 # then against the tree now" and "what changed during the run" are one
-# `python3 tools/run_record.py compare`. Not under --dry-run; SILENT unless it fails (bbh's
-# fidelity compares --list and --dry-run output with bbh's own).
+# `python3 tools/run_record.py compare`. Not under --dry-run; SILENT unless it fails (first for bbh's
+# fidelity test, which compared --list and --dry-run output with bbh's own — no longer a constraint: bbh is its own project and this tree's output is its own, maintainer-ruled 2026-10-10, 14z-197).
 if [ "$DRY" = 0 ] && [ -f tools/run_record.py ] && git rev-parse --git-dir >/dev/null 2>&1; then
     if [ ! -f "$LOGDIR/run_record_start.json" ]; then
         python3 tools/run_record.py write "$LOGDIR/run_record_start.json" --phase start \

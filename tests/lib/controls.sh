@@ -5,7 +5,8 @@
 #
 # THE GRAMMAR is BBX's R10 (docs/project/must_fire_contract.md is the copy of
 # record in this tree). It is a COPY, never a dependency: "independent but
-# compatible" (maintainer, 2026-09-08). Four regexes, and the header is the
+# compatible" (maintainer, 2026-09-08); since 14z-197 it evolves on its own (maintainer-ruled
+# 2026-10-10: bbh is its own project; kept while it delivers value here). Four regexes, and the header is the
 # LEADING COMMENT BLOCK — every `#` line after the shebang up to the first
 # non-comment line; a bare `#` does NOT end it (BBX R30, 2026-09-10 — the
 # STATE entry's "compatibility trap" about bare `#` separators is resolved by

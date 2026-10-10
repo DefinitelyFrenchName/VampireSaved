@@ -156,7 +156,6 @@ declares	test_audit_merged_dispatch
 declares	test_baseset_mask_invariant
 declares	test_basis_publish_atomic
 declares	test_battery_accounting
-declares	test_bbh_fidelity
 declares	test_beam_anim_walk
 declares	test_beam_list_type6
 declares	test_beam_variants
@@ -291,6 +290,7 @@ declares	test_killshread_es
 declares	test_ladder_tenant_vs_palette
 declares	test_lane_carry
 declares	test_latch_readers
+declares	test_launcher_newest
 declares	test_list_type_census
 declares	test_m2_repoint
 declares	test_m2a_flavor_selector

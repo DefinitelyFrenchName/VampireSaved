@@ -5,14 +5,14 @@
 #
 # WHAT: tests/run_on_snapshot.sh runs its command on a snapshot that nothing done to the
 #   working tree during the run can reach — a tracked file edited and committed, a build/
-#   output rewritten, a tracked build/ file, a submodule file, the ../community sibling, the
-#   bbh checkout, a file of the ~/.cache/vampire-saved instrument cache, a Verilator scratch
+#   output rewritten, a tracked build/ file, a submodule file, the ../community sibling, a file
+#   of the ~/.cache/vampire-saved instrument cache, a Verilator scratch
 #   clone, and the runner's own file — and its record names the commit the run was taken at;
 #   a tracked file carries its last commit's time, a build/emu_* the run writes comes back to
 #   the working tree, and an instrument binary changed in the LIVE cache during a run is reported.
 # HOW: builds a throwaway world (a repo with a submodule, a build/ output, a community sibling,
-#   a bbh checkout, a HOME holding an instrument cache, a scratch clone), starts a probe under
-#   run_on_snapshot.sh --emulator-inputs that reads all nine inputs, pauses it, perturbs them in
+#   a HOME holding an instrument cache, a scratch clone), starts a probe under
+#   run_on_snapshot.sh --emulator-inputs that reads all eight inputs, pauses it, perturbs them in
 #   the working tree, releases it and has it read them again (its runner file truncated too, the
 #   leg's copy padded past any shell's read-ahead so that truncation reaches a dash run as well —
 #   #203); then runs the SAME probe IN PLACE
@@ -20,14 +20,13 @@
 #   run, or the immunity leg proves nothing); section 4 changes an instrument binary mid-run.
 # EXPECTS: the snapshot run reads every input unchanged, records the commit taken before the
 #   perturbation, sees t.txt at its commit's time, reaches the real HOME's other entries, and
-#   returns its build/emu_probe to the tree; the in-place run sees nine readings change; a
+#   returns its build/emu_probe to the tree; the in-place run sees eight readings change; a
 #   mid-run instrument change reads unchanged inside the run and turns the run's exit to 2
 #   with its AFTER line; each control makes the gate FAIL.
 #
 # MUST-FIRE: perturbed-copy: link-build — a copy of run_on_snapshot.sh that SYMLINKS each entry of build/ instead of snapshotting it must let the build/ perturbation reach the run, and the gate must FAIL (mode: the gate runs against that copy)
 # MUST-FIRE: perturbed-copy: in-place — a copy that runs the command in the working tree instead of the clone must let every perturbation reach the run, and the gate must FAIL (mode: the gate runs against that copy)
 # MUST-FIRE: perturbed-copy: no-self-copy — a copy that runs from its own file instead of a private copy must be cut short when that file is truncated mid-run (the record never gets its end), and the gate must FAIL (mode: the gate runs against that copy)
-# MUST-FIRE: perturbed-copy: shared-bbh — a copy that points BBH_HOME at the working checkout instead of its snapshot must let the bbh perturbation reach the run, and the gate must FAIL (mode: the gate runs against that copy)
 # MUST-FIRE: perturbed-copy: shared-home — a copy that runs the command under the caller's HOME instead of the private one must let the instrument-cache perturbation reach the run, and the gate must FAIL (mode: the gate runs against that copy)
 # MUST-FIRE: perturbed-copy: shared-scratch — a copy that leaves JTSIM_SCRATCH on the caller's scratch clone must let the scratch perturbation reach the run, and the gate must FAIL (mode: the gate runs against that copy)
 # MUST-FIRE: perturbed-copy: checkout-mtime — a copy that skips S1b leaves t.txt at its checkout time instead of its commit's, and the gate must FAIL (mode: the gate runs against that copy)
@@ -59,8 +58,6 @@ edits = {
     "in-place":   [('{ ( cd "$C" && "$@" ) 2>&1;', '{ ( cd "$REPO" && "$@" ) 2>&1;  # CONTROL in-place\n'),
                    ('{ ( cd "$C" && HOME="$SNAP_HOME" JTSIM_SCRATCH="$JT_SNAP" "$@" ) 2>&1;',
                     '{ ( cd "$REPO" && "$@" ) 2>&1;  # CONTROL in-place\n')],
-    "shared-bbh": ('    BBH_HOME="$SNAP/blackbox-harness"; export BBH_HOME\n',
-                   '    BBH_HOME="$BBH_SRC"; export BBH_HOME  # CONTROL shared-bbh\n'),
     "no-self-copy": ('if [ -z "${RUN_ON_SNAPSHOT_SELF:-}" ]; then\n',
                      'if false; then  # CONTROL no-self-copy\n'),
     "shared-home": ('{ ( cd "$C" && HOME="$SNAP_HOME" JTSIM_SCRATCH="$JT_SNAP" "$@" ) 2>&1;',
@@ -89,8 +86,6 @@ world() {
     D="$1"; [ -n "$D" ] || { echo "FAIL: world() needs a dir"; exit 1; }; rm -rf "$D"; mkdir -p "$D"
     mkdir -p "$D/sub" && git -C "$D/sub" init -q && echo sub-v1 > "$D/sub/s.txt"
     git -C "$D/sub" add s.txt && git -C "$D/sub" -c user.email=t@t -c user.name=t commit -qm sub
-    mkdir -p "$D/bbh" && git -C "$D/bbh" init -q && echo bbh-v1 > "$D/bbh/b.txt"
-    git -C "$D/bbh" add b.txt && git -C "$D/bbh" -c user.email=t@t -c user.name=t commit -qm bbh
     mkdir -p "$D/community" && echo comm-v1 > "$D/community/c.txt"
     mkdir -p "$D/home/.cache/vampire-saved/inp" "$D/home/.cache/vampire-saved/mame" "$D/home/Library"
     echo cache-v1 > "$D/home/.cache/vampire-saved/inp/rec.txt"; echo inst-v1 > "$D/home/.cache/vampire-saved/fbneo_ref"
@@ -101,10 +96,10 @@ world() {
     printf 'build/out.bin\n' > "$D/tree/.gitignore"; echo build-v1 > "$D/tree/build/out.bin"
     cat > "$D/tree/probe.sh" <<'EOF'
 #!/bin/sh
-# read the six inputs, pause until released, read them again
-rd() { printf 'tracked=%s build=%s manifest=%s sub=%s community=%s bbh=%s head=%s cache=%s jtsim=%s inst=%s\n' \
+# read the inputs, pause until released, read them again
+rd() { printf 'tracked=%s build=%s manifest=%s sub=%s community=%s head=%s cache=%s jtsim=%s inst=%s\n' \
     "$(cat t.txt)" "$(cat build/out.bin)" "$(cat build/manifest.txt)" "$(cat mod/s.txt)" \
-    "$(cat ../community/c.txt)" "$(cat "$BBH_HOME/b.txt")" "$(git rev-parse --short HEAD)" \
+    "$(cat ../community/c.txt)" "$(git rev-parse --short HEAD)" \
     "$(cat "$HOME/.cache/vampire-saved/inp/rec.txt")" "$(cat "$JTSIM_SCRATCH/j.txt")" \
     "$(cat "$HOME/.cache/vampire-saved/fbneo_ref")"; }
 rd > "$PROBE_OUT.t0"
@@ -130,7 +125,7 @@ perturb() {
     D="$1"
     echo tracked-v2 > "$D/tree/t.txt"; git -C "$D/tree" -c user.email=t@t -c user.name=t commit -qam perturb
     echo build-v2 > "$D/tree/build/out.bin"; echo man-v2 > "$D/tree/build/manifest.txt"
-    echo sub-v2 > "$D/tree/mod/s.txt"; echo comm-v2 > "$D/community/c.txt"; echo bbh-v2 > "$D/bbh/b.txt"
+    echo sub-v2 > "$D/tree/mod/s.txt"; echo comm-v2 > "$D/community/c.txt"
     echo cache-v2 > "$D/home/.cache/vampire-saved/inp/rec.txt"; echo jt-v2 > "$D/jtsim/j.txt"
     if [ "${INST:-0}" = 1 ]; then echo inst-v2 > "$D/home/.cache/vampire-saved/fbneo_ref"; fi
 }
@@ -164,11 +159,11 @@ leg() {
     FL="$W/$L.flags"; mkdir -p "$FL"; rm -f "$FL/ready" "$FL/go"
     before="$(git -C "$D/tree" rev-parse HEAD)"; echo "$before" > "$W/$L.before"
     if [ "$R" = - ]; then
-        ( cd "$D/tree" && HOME="$D/home" JTSIM_SCRATCH="$D/jtsim" BBH_HOME="$D/bbh" PROBE_OUT="$W/$L" PROBE_FLAGS="$FL" sh probe.sh ) > "$W/$L.log" 2>&1 &
+        ( cd "$D/tree" && HOME="$D/home" JTSIM_SCRATCH="$D/jtsim" PROBE_OUT="$W/$L" PROBE_FLAGS="$FL" sh probe.sh ) > "$W/$L.log" 2>&1 &
     else
         cp "$R" "$W/$L.runner.sh"; R="$W/$L.runner.sh"   # the leg's own copy: truncated mid-run below
         pad_runner "$R"
-        ( HOME="$D/home" JTSIM_SCRATCH="$D/jtsim" BBH_HOME="$D/bbh" PROBE_OUT="$W/$L" PROBE_FLAGS="$FL" \
+        ( HOME="$D/home" JTSIM_SCRATCH="$D/jtsim" PROBE_OUT="$W/$L" PROBE_FLAGS="$FL" \
           SNAPSHOT_ROOT="$SROOT" sh "$R" --repo "$D/tree" --no-romdir --emulator-inputs -- sh probe.sh ) > "$W/$L.log" 2>&1 &
     fi
     pid=$!
@@ -202,18 +197,18 @@ immune() {
     [ "$(cat "$W/$2.mtime")" = 1609459200 ] || { echo "  $2: MTIME: t.txt read $(cat "$W/$2.mtime") inside the run, not its commit's time 1609459200 (S1b)"; return 1; }
     [ "$(cat "$W/$2.lib")" = lib-v1 ] || { echo "  $2: the private HOME lost the real HOME's other entries (Library/l.txt read: $(cat "$W/$2.lib"))"; return 1; }
     [ "$(cat "$W/$2/tree/build/emu_probe/commit.txt" 2>/dev/null)" = "$rc" ] || { echo "  $2: the run's build/emu_probe was NOT COPIED BACK to the working tree with the start commit"; return 1; }
-    echo "  $2: all nine inputs unchanged across the perturbation and the runner's own file truncated mid-run; record complete, commit $(printf %.12s "$rc") = the start commit; t.txt at its commit's time; build/emu_probe copied back"
+    echo "  $2: all eight inputs unchanged across the perturbation and the runner's own file truncated mid-run; record complete, commit $(printf %.12s "$rc") = the start commit; t.txt at its commit's time; build/emu_probe copied back"
 }
 
 RUNNER="$REPO/tests/run_on_snapshot.sh"
-CONTROLS="link-build in-place shared-bbh no-self-copy shared-home shared-scratch checkout-mtime no-copy-back no-instrument-check"
+CONTROLS="link-build in-place no-self-copy shared-home shared-scratch checkout-mtime no-copy-back no-instrument-check"
 for c in $CONTROLS; do if vs_ctl_is "$c"; then RUNNER="$(make_copy "$VS_CTL")"; fi; done
 
 echo "== 1. the positive leg: the perturbation reaches an IN-PLACE run"
 if leg inplace -; then
     c="$(changed "$W/inplace")"
     n=$(echo "$c" | wc -w | tr -d ' ')
-    if [ "$n" = 9 ]; then echo "  ok: all nine readings changed in place ($c)"
+    if [ "$n" = 8 ]; then echo "  ok: all eight readings changed in place ($c)"
     else echo "  FAIL: in place, only [$c] changed — the perturbation does not reach a run, so section 2 would prove nothing"; fail=1; fi
 else fail=1; fi
 

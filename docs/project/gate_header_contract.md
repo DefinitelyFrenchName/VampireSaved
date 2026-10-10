@@ -53,7 +53,7 @@ them.
 GENERATED `gate_coverage.md`, "What each gate tests", the functional-coverage view (one entry per
 gate; gates without them named at the family's end so the remainder is on the page; the site
 renders it as `docs/site/project/gate_coverage.html`). The technical index `gate_index.md` is left
-exactly as the generic harness renders it (bbh's fidelity gate F9 requires byte-identity). `tests/test_gate_descriptions.sh` freezes the census
+exactly as the generic harness rendered it (bbh's fidelity gate F9 required byte-identity until 14z-197; no longer a constraint, maintainer-ruled 2026-10-10). `tests/test_gate_descriptions.sh` freezes the census
 in `tests/expected/gate_descriptions.tsv` — `declares` grows only, `undeclared` shrinks only —
 with two controls (a dropped field; the fields moved outside the block). The retrofit lands by
 FAMILY, each family's rendered page put to the maintainer as it lands.

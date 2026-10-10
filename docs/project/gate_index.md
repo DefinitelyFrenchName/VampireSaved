@@ -16,11 +16,11 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**453 scripts** — 125 ci_portable, 93 ci_static, 235 emulator-tier (run by name).
+**453 scripts** — 126 ci_portable, 92 ci_static, 235 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 44 | the suite runners and their own ground truth |
+| [runner](#runner) | 43 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 47 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -28,7 +28,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
 | [character-data](#character-data) | 83 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
-| [review-triage](#review-triage) | 35 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
+| [review-triage](#review-triage) | 36 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
 ## runner
@@ -47,7 +47,6 @@ the suite runners and their own ground truth.
 | `tests/test_agent_hooks.sh` | test | ci_portable | — | SLICE S1 OF GitHub #172: the agent-discipline hooks decide what the evidence says they should (docs/project/agent_architecture_scope.md, 2026-09-23). | 2026-09-23 |
 | `tests/test_agent_sweep.sh` | test | ci_portable | — | SLICE S2 OF GitHub #172: C0.3, the close-time process sweep (`tools/agent/sweep.py`), names every survivor it must and nothing it must not (docs/project/agent_architecture_scope.md §4 C0.3, 2026-09-23). | 2026-09-23 |
 | `tests/test_agent_worker.sh` | test | ci_portable | — | SLICE S4 OF GitHub #172, step 2: "a worker run on a known task returns figures each traceable to a command" (docs/project/agent_architecture_scope.md §5), over a FROZEN real run — ruled 2026-09-23 (14z-177, DECISIONS_HISTORY.md "Ruled 2026-… | 2026-09-23 |
-| `tests/test_bbh_fidelity.sh` | test | ci_static | ROMDIR | the generic black-box harness (`bbh`, the SEPARATE repository extracted from this tree, docs/project/harness_scope.md) reproduces THIS tree's verdicts: its fidelity gate is run against this tree and must be green. | 2026-09-06 |
 | `tests/test_bg_leg_shape.sh` | test | ci_portable | — | NO GATE MAY BACKGROUND AN EMULATOR LEG THAT WRITES ITS EXIT STATUS UNDER `set -e` WITHOUT `set +e` INSIDE THE GROUP (14z-171). ROM-free, ~2 s. Tool: tools/audit_bg_leg_shape.py (its docstring is the WHY). | 14z-171 |
 | `tests/test_claim_lint.sh` | test | ci_portable | — | every universal or definite in a rule-checker claim is tied to a named check or to the claim's NOT TESTED part (tools/claim_lint.py, 14z-187b, GitHub #185 item 3). | 14z-187b |
 | `tests/test_close_checks.sh` | test | ci_portable | — | the close's check runner times every check, re-runs one alone, and never lets a partial run read as the run of record (`tools/close_checks.py`, 14z-185b, GitHub #187). | 14z-185b |
@@ -505,6 +504,7 @@ the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guar
 | `tests/test_guard_integrity.sh` | test | emulator | MAME, a build dir, ~2 min | the crash guard must carry the input-integrity assertion, and must refuse env vars it does not implement (14z-94, GitHub #31). Needs ROMDIR + a WIDE build; ~2 min. | 14z-94 |
 | `tests/test_harness_frame_bound.sh` | test | ci_static | ROMDIR | the FBNeo harness must bound replay frame numbers (14z-94, GitHub #77). ROM-free structurally; the functional half runs only if a built binary and ROMDIR are present. ~5 s. | 14z-94 |
 | `tests/test_hex_lengths.sh` | test | ci_portable | — | ground truth for tools/audit_hex_lengths.py, the balanced-byte-edit check (14z-94, GitHub #20). ROM-free, ~1 s. | 14z-94 |
+| `tests/test_launcher_newest.sh` | test | ci_portable | — | THE UNIX LAUNCHER RUNS THE NEWEST SET, NOT THE FIRST ONE IT FINDS (14z-197, GitHub #248). ci_portable: no ROM, no emulator, ~2 s. | 14z-197 |
 | `tests/test_mame_mirror_guard.sh` | test | ci_portable | — | setup_mame.sh must never run `rsync --delete` into a directory it does not own (14z-94, GitHub #80). ROM-free, ~3 s. | 14z-94 |
 | `tests/test_mame_runner_hygiene.sh` | test | ci_portable | — | A MAME REPLAY THAT WRITES NOTHING CANNOT PASS ON THE LAST RUN'S LOG (14z-197, GitHub #253). ci_portable: no ROM, no MAME, ~2 s. | 14z-197 |
 | `tests/test_mask_ranges_reader.sh` | test | emulator | MAME, a build dir, ~1 min | the MASK_RANGES reader must mask exactly what the spec says (14z-94, GitHub #61). ~1 min, needs ROMDIR + a WIDE build. | 14z-94 |

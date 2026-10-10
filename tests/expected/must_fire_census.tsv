@@ -148,6 +148,7 @@ declares	test_jtcores_twin
 declares	test_jtsim_scratch_heal
 declares	test_lane_carry
 declares	test_latch_readers
+declares	test_launcher_newest
 declares	test_mame_bin_pinned
 declares	test_mame_default_bin
 declares	test_mame_ident
