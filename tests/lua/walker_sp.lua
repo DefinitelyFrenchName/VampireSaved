@@ -36,8 +36,9 @@
 --
 --   env SPSITES   "54476,5e548" — hex PCs to breakpoint (the `jsr (A0)`)
 --   env SP_OUT    output path (default walker_sp.txt)
---   env REPLAY    input script (replay.lua grammar subset)
---   env FRAMES    stop after this many frames (default 3600)
+--   env REPLAY, FRAMES (default 3600), INSTR_REFERENCE, INSTR_CLOCK, ANCHOR, MASK_RANGES, ALIGN_OUT:
+--       tests/lua/emu_clock.lua — the frame is an EMULATED frame since 14z-197 (GitHub #228 step 4); until
+--       then this script counted frame_done calls, so each stop's UI frames moved its input early ([MFI-5])
 --
 -- THE LIVE STACK (14z-185, GitHub #143). MAME 0.288's 68000 core has no A7 state and its SP is the
 -- SUPERVISOR stack (docs/platform/gotchas.md "MAME 0.288'S 68000 CORE HAS NO `A7` STATE"); this game's code
@@ -53,15 +54,17 @@
 --   PAGES <addr> : <page>=<count> ...          (A7 >> 8, hex)
 --   MODE <addr> super <n> user <n>             (SR's S bit at each hit)
 --   RET <addr> : <long>=<count> ...            (the long on top of the live stack)
--- then "SPEND <frames>". Needs -debug -debugger none.
+-- then "SPEND <frames>". Needs -debug -debugger none, except with INSTR_REFERENCE=1 (the reference leg: no
+-- breakpoint, so every SP line reads hits 0).
+local C = dofile((debug.getinfo(1, "S").source:match("^@(.*/)") or "./") .. "emu_clock.lua"){
+    name = "walker_sp", frames = 3600 }
 local machine = manager.machine
 local debugger = machine.debugger
-assert(debugger, "run mame with -debug")
+assert(debugger or C.reference, "run mame with -debug (or INSTR_REFERENCE=1 for the reference leg)")
 local cpu = machine.devices[":maincpu"]
 
 local out_path = os.getenv("SP_OUT") or "walker_sp.txt"
 local FORCE_SP = os.getenv("WALKER_SP_READ") == "sp"   -- control only (see the header)
-local max_frames = tonumber(os.getenv("FRAMES") or "") or 3600
 
 local sites = {}          -- [addr] = {hits, min, max, pages = {}}
 for spec in (os.getenv("SPSITES") or ""):gmatch("[^,]+") do
@@ -71,108 +74,45 @@ for spec in (os.getenv("SPSITES") or ""):gmatch("[^,]+") do
 end
 assert(next(sites), "set SPSITES=hexpc,...")
 
-local frame = 0
-local held = {}
-local FIELDS_IO = nil
-local replay_path = os.getenv("REPLAY")
-if replay_path then
-    local ioport = machine.ioport
-    local function fld(port, name) return ioport.ports[port].fields[name] end
-    FIELDS_IO = {
-        p1 = { U = fld(":IN0", "P1 Up"), D = fld(":IN0", "P1 Down"),
-               L = fld(":IN0", "P1 Left"), R = fld(":IN0", "P1 Right"),
-               ["1"] = fld(":IN0", "P1 Button 1"), ["2"] = fld(":IN0", "P1 Button 2"),
-               ["3"] = fld(":IN0", "P1 Button 3"), ["4"] = fld(":IN1", "P1 Button 4"),
-               ["5"] = fld(":IN1", "P1 Button 5"), ["6"] = fld(":IN1", "P1 Button 6") },
-        p2 = { U = fld(":IN0", "P2 Up"), D = fld(":IN0", "P2 Down"),
-               L = fld(":IN0", "P2 Left"), R = fld(":IN0", "P2 Right"),
-               ["1"] = fld(":IN0", "P2 Button 1"), ["2"] = fld(":IN0", "P2 Button 2"),
-               ["3"] = fld(":IN0", "P2 Button 3"), ["4"] = fld(":IN1", "P2 Button 4"),
-               ["5"] = fld(":IN1", "P2 Button 5"), ["6"] = fld(":IN2", "P2 Button 6") },
-        sys = { S1 = fld(":IN2", "1 Player Start"), S2 = fld(":IN2", "2 Players Start"),
-                C1 = fld(":IN2", "Coin 1"), C2 = fld(":IN2", "Coin 2"),
-                SV = fld(":IN2", "Service 1"), TS = fld(":IN2", "Service Mode") },
-    }
-    for line in io.lines(replay_path) do
-        local body = line:gsub("#.*", "")
-        local range, rest = body:match("^%s*(%S+)%s+(.-)%s*$")
-        if range then
-            local a, b = range:match("^(%d+)%-(%d+)$")
-            if not a then a = range:match("^(%d+)$"); b = a end
-            if a then
-                for spec in rest:gmatch("%S+") do
-                    local who, toks = spec:match("^(%a+%d?)=(%S+)$")
-                    if who and FIELDS_IO[who] then
-                        local step = (who == "sys") and 2 or 1
-                        for i = 1, #toks, step do
-                            local fo = FIELDS_IO[who][toks:sub(i, i + step - 1)]
-                            if fo then
-                                for fr = tonumber(a), tonumber(b) do
-                                    held[fr] = held[fr] or {}
-                                    held[fr][#held[fr] + 1] = fo
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
+if not C.reference then
+    debugger:command("focus 0")
+    for addr, _ in pairs(sites) do
+        debugger:command(string.format("bpset 0x%x", addr))
     end
 end
 
-debugger:command("focus 0")
-for addr, _ in pairs(sites) do
-    debugger:command(string.format("bpset 0x%x", addr))
-end
-
-local pressed = {}
-dofile((debug.getinfo(1, "S").source:match("^@(.*/)") or "./") .. "clock_check.lua")("walker_sp", replay_path)   -- #228: CLOCK_OUT=<file> records frame_done calls against emulated frames
-emu.register_frame_done(function()
-    frame = frame + 1
-    if FIELDS_IO then
-        local want = {}
-        for _, fo in ipairs(held[frame + 1] or {}) do want[fo] = true end
-        for _, group in pairs(FIELDS_IO) do
-            for _, fo in pairs(group) do
-                if want[fo] and not pressed[fo] then fo:set_value(1); pressed[fo] = true
-                elseif not want[fo] and pressed[fo] then fo:clear_value(); pressed[fo] = nil end
-            end
+C.run{ on_end = function(frame)
+    local f = assert(io.open(out_path, "wb"))
+    local addrs = {}
+    for a, _ in pairs(sites) do addrs[#addrs + 1] = a end
+    table.sort(addrs)
+    for _, a in ipairs(addrs) do
+        local s = sites[a]
+        f:write(string.format("SP %06x hits %d min %s max %s\n", a, s.hits,
+                s.min and string.format("%08x", s.min) or "-",
+                s.max and string.format("%08x", s.max) or "-"))
+        local pg = {}
+        for p, _ in pairs(s.pages) do pg[#pg + 1] = p end
+        table.sort(pg)
+        local parts = {}
+        for _, p in ipairs(pg) do
+            parts[#parts + 1] = string.format("%06x=%d", p << 8, s.pages[p])
         end
+        f:write(string.format("PAGES %06x : %s\n", a, table.concat(parts, " ")))
+        f:write(string.format("MODE %06x super %d user %d\n", a, s.super, s.user))
+        local rk = {}
+        for r, _ in pairs(s.rets) do rk[#rk + 1] = r end
+        table.sort(rk)
+        local rp = {}
+        for _, r in ipairs(rk) do rp[#rp + 1] = string.format("%06x=%d", r, s.rets[r]) end
+        f:write(string.format("RET %06x : %s\n", a, table.concat(rp, " ")))
     end
-    if frame >= max_frames then
-        local f = assert(io.open(out_path, "wb"))
-        local addrs = {}
-        for a, _ in pairs(sites) do addrs[#addrs + 1] = a end
-        table.sort(addrs)
-        for _, a in ipairs(addrs) do
-            local s = sites[a]
-            f:write(string.format("SP %06x hits %d min %s max %s\n", a, s.hits,
-                    s.min and string.format("%08x", s.min) or "-",
-                    s.max and string.format("%08x", s.max) or "-"))
-            local pg = {}
-            for p, _ in pairs(s.pages) do pg[#pg + 1] = p end
-            table.sort(pg)
-            local parts = {}
-            for _, p in ipairs(pg) do
-                parts[#parts + 1] = string.format("%06x=%d", p << 8, s.pages[p])
-            end
-            f:write(string.format("PAGES %06x : %s\n", a, table.concat(parts, " ")))
-            f:write(string.format("MODE %06x super %d user %d\n", a, s.super, s.user))
-            local rk = {}
-            for r, _ in pairs(s.rets) do rk[#rk + 1] = r end
-            table.sort(rk)
-            local rp = {}
-            for _, r in ipairs(rk) do rp[#rp + 1] = string.format("%06x=%d", r, s.rets[r]) end
-            f:write(string.format("RET %06x : %s\n", a, table.concat(rp, " ")))
-        end
-        f:write(string.format("SPEND %d\n", frame))
-        f:close()
-        machine:exit()
-    end
-end)
+    f:write(string.format("SPEND %d\n", frame))
+    f:close()
+end }
 
 emu.register_periodic(function()
-    if debugger.execution_state == "stop" then
+    if debugger and debugger.execution_state == "stop" then
         local st = cpu.state
         local pc = st["CURPC"].value & 0xFFFFFF
         local s = sites[pc]

@@ -12,14 +12,23 @@
 #   walker; the build's own image for the relocated leg), checks the push against the union of
 #   tests/expected/**/mask, and compares the live ranges with build/manifest/walker_ghost.toml —
 #   the relocated sites with the vanilla sites' frozen ranges (the relocation pushes at the same depth).
+#   THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): walker_sp.lua counts
+#   EMULATED frames (tests/lua/emu_clock.lua); every run's game clock RAM:$FF8080 at its last frame is held to
+#   tests/expected/instr_gameclock/audit_walker_ghost.tsv, frozen by `--freeze-clock` from REFERENCE legs (the
+#   same script, no breakpoint, no debugger — each pristine one reproducing the frozen basis checksum, each
+#   breakpoint run's game clock equal to its reference leg's); one STAGING reference leg (21_don_mash, pristine)
+#   is held to the basis on every run.
 # EXPECTS: the reader's PASS: every long on top of the read stack a genuine return address, the
-#   push outside every mask, the live ranges as frozen; the three controls fail.
+#   push outside every mask, the live ranges as frozen; every run on emulated time at its frozen game clock and
+#   the staging leg on the basis; the five controls fail.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/lib/controls.sh
-#   tests/lib/decrypt_cache.sh tests/lua/walker_sp.lua tests/replays/ tools/run_mame.sh
-#   tools/setup_mame.sh tools/walker_ghost.py
+#   tests/lib/decrypt_cache.sh tests/lib/instr_align.sh tests/lua/emu_clock.lua tests/lua/replay.lua tests/lua/walker_sp.lua
+#   tests/replays/ tools/run_mame.sh tools/setup_mame.sh tools/walker_ghost.py
 #
 # MUST-FIRE: known-bad: supervisor-read — the instrument forced to read MAME's SP (the idle supervisor stack, the pre-14z-185 read) must fail the ground-truth check: the longs on top of that stack end no call to the walker (in-gate: one extra run of 21_don_mash with WALKER_SP_READ=sp must fail GROUND; mode: every corpus run of BOTH legs reads SP and the gate FAILs on each) (GitHub #143, 14z-185)
 # MUST-FIRE: perturbed-copy: range-moved — the frozen sp_min shifted by 2 must fail the frozen compare, so a moved live range is re-frozen deliberately (in-gate: the reader run with --frozen-shift 2 must fail FROZEN; mode: the gate's own read carries the shift and FAILs)
+# MUST-FIRE: known-bad: drift-clock — a breakpoint run under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 4,203 emulated frames of 40,620 counted on 26_don_arcade_mash) must miss its frozen game clock (in-gate: one extra run of 21_don_mash; mode: every breakpoint run of both legs runs the old clock and the gate FAILs)
+# MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss the frozen basis checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs)
 # MUST-FIRE: perturbed-copy: mask-covers — one extra mask range over the push must fail the visibility check, so a mask hiding the relocated return address is caught (in-gate: the reader run with --extra-mask over the push must fail VISIBLE; mode: the gate's own read carries the mask and FAILs)
 #
 # THE PREMISE THIS GATE WAS BUILT ON IS RETRACTED (14z-185, GitHub #143, the maintainer's ruling
@@ -76,15 +85,20 @@
 # more than one region holding return addresses. The per-page histogram is
 # part of the verdict, not decoration: it says where the stack actually is.
 #
-# COVERAGE. Site 0x54470 fires in only 5 of ~50 corpus replays (the long
+# COVERAGE. [RETRACTED 14z-197, GitHub #228 step 4: "fires in only 5 of ~50 corpus replays" was the
+# frame_done clock's artefact — each run stopped after a fraction of its replay (26_don_arcade_mash: 4,203
+# emulated frames of 40,620 counted). On emulated time the walker's `jsr (A0)` at 0x54476 fires in 50 of 56
+# replays, 380,413 times, over the same live range as the other walker; walker_ghost.toml re-frozen.] Was:
+# Site 0x54470 fires in only 5 of ~50 corpus replays (the long
 # mash/arcade rigs) — the same thin base the dispatch census reports. That
 # matters much less here than it does for a deadness claim: this measures
 # where the stack IS, not that something never happens, and the stack depth
 # at a fixed call site is a structural property of the call chain. Still,
 # the per-site replay count is printed so the base is visible.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [JOBS=8] [BUILD=build/m3b_merged31] [--freeze] tests/audit_walker_ghost.sh
-# ~1.5 min (two corpus-wide debug legs, JOBS-parallel; measured 14z-185 on this MacBook: 83 s).
+# Usage: ROMDIR=... [MAME_BIN=...] [JOBS=8] [BUILD=build/m3b_merged31] [--freeze | --freeze-clock] tests/audit_walker_ghost.sh
+# ~6 min (two corpus-wide debug legs, JOBS-parallel; 83 s on this MacBook at 14z-185 while the frame_done clock
+# cut the long replays short; 320 s at 14z-197 on emulated time, the whole replays played).
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -117,31 +131,47 @@ FROZEN="build/manifest/walker_ghost.toml"
 BUILD="${BUILD:-build/m3b_merged31}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 . "$REPO/tests/lib/controls.sh"
 vs_ctl_mode "$0"
+. "$REPO/tests/lib/instr_align.sh"
+CLOCKS="tests/expected/instr_gameclock/audit_walker_ghost.tsv"
+BASIS=tests/expected/vsavj/masked-v2; MASK="$(cat "$BASIS/MASK")"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 . "$REPO/tests/lib/decrypt_cache.sh"
 decrypt_view vsavj "$W/vj_op.bin" "$W/vj_da.bin" || { echo "FAIL: vsavj views not delivered"; exit 1; }
 
-run1() {  # run1 <replay> <out dir> [sp] [set rompath sites]  — one walker_sp.lua run (background)
+run1() {  # run1 <replay> <out dir> [sp] [set] [rompath] [sites] [env...] — one walker_sp.lua run (background);
+          # its ALIGN line to <out dir>/<replay>.align; INSTR_REFERENCE=1 among the env makes it a reference leg
     _n="$1"; _o="$2"; _rpl="tests/replays/$_n.rpl"; mkdir -p "$_o"
-    _set="${4:-vsavj}"; _rp="${5:-$ROMDIR}"; _sites="${6:-$SPSITES}"
+    _set="${4:-vsavj}"; _rp="${5:-$ROMDIR}"; _sites="${6:-$SPSITES}"; _x="${7:-}"
     _lf=$(sed 's/#.*//' "$_rpl" | awk 'NF { split($1, r, "-"); f=(r[2]?r[2]:r[1]);
          if (f + 0 > m) m = f + 0 } END { print m + 0 }')
-    ( MAME_SANDBOX="$_o/sb_$_n" REPLAY="$PWD/$_rpl" SPSITES="$_sites" SP_OUT="$_o/$_n.txt" \
-      WALKER_SP_READ="${3:-}" FRAMES=$((_lf + 120)) MAME_ROMPATH="$_rp" \
-      tools/run_mame.sh "$_set" -debug -debugger none \
+    _fr=$((_lf + 120)); _an="$_fr"
+    if [ -f "$BASIS/logs/$_n.log" ]; then
+        _an="$(awk '$1 ~ /^[0-9]+$/ {l=$1} END {print l+0}' "$BASIS/logs/$_n.log")"; [ "$_an" -gt "$_fr" ] && _an="$_fr"
+    fi
+    _dbg="-debug -debugger none"; case "$_x" in *INSTR_REFERENCE=1*) _dbg="" ;; esac
+    # shellcheck disable=SC2086
+    ( env $_x MAME_SANDBOX="$_o/sb_$_n" REPLAY="$PWD/$_rpl" SPSITES="$_sites" SP_OUT="$_o/$_n.txt" \
+      WALKER_SP_READ="${3:-}" FRAMES=$_fr ANCHOR=$_an MASK_RANGES="$MASK" ALIGN_OUT="$_o/$_n.align" \
+      MAME_ROMPATH="$_rp" tools/run_mame.sh "$_set" $_dbg \
       -autoboot_script "$PWD/tests/lua/walker_sp.lua" >"$_o/$_n.log" 2>&1; rm -rf "$_o/sb_$_n" ) </dev/null &
 }
+basis_at() { awk -v n="$2" '$1 == n {print $2}' "$BASIS/logs/$1.log"; }   # basis_at <replay> <frame>
 names="$(ls tests/expected/vsavj/masked-v2/logs/*.log | xargs -n1 basename | sed 's/\.log$//')"
 echo "corpus: $(echo "$names" | wc -w | tr -d ' ') legacy replays (every replay with a vanilla basis log)"
 _sp=""; vs_ctl_is supervisor-read && _sp=sp
+_clk=""; vs_ctl_is drift-clock && _clk="INSTR_CLOCK=frame_done"
+_skip=""; vs_ctl_is first-frame-skip && _skip="INSTR_CLOCK=skip_first"
 pool=0
 for n in $names; do
     [ -f "tests/replays/$n.rpl" ] || continue
-    run1 "$n" "$W/runs" "$_sp"
+    run1 "$n" "$W/runs" "$_sp" vsavj "$ROMDIR" "$SPSITES" "$_clk"
     pool=$((pool + 1)); if [ "$pool" -ge "$JOBS" ]; then wait; pool=0; fi
 done
 run1 21_don_mash "$W/ctl_sp" sp      # the supervisor-read control's one run
+run1 21_don_mash "$W/stage" "" vsavj "$ROMDIR" "$SPSITES" "INSTR_REFERENCE=1 $_skip"   # the staging reference leg (#228)
+run1 21_don_mash "$W/ctl_drift" "" vsavj "$ROMDIR" "$SPSITES" "INSTR_CLOCK=frame_done" # the drift-clock control's run
+run1 21_don_mash "$W/ctl_skip" "" vsavj "$ROMDIR" "$SPSITES" "INSTR_REFERENCE=1 INSTR_CLOCK=skip_first"
 wait
 # THE RELOCATED LEG (rule-checker 2026-09-28-383 Q4): the ghost IS the relocated walker's push, so the same corpus
 # runs on the build under test at its RELOCATED `jsr (A0)` sites, derived from the build's own image: the call sites
@@ -162,13 +192,68 @@ print(' '.join(out))")" || { echo "FAIL: the relocated walker sites could not be
     pool=0
     for n in $names; do
         [ -f "tests/replays/$n.rpl" ] || continue
-        run1 "$n" "$W/reloc" "$_sp" vsavjw "$BUILD/rompath;$ROMDIR" "$_rsites"   # the supervisor-read mode forces SP here too
+        run1 "$n" "$W/reloc" "$_sp" vsavjw "$BUILD/rompath;$ROMDIR" "$_rsites" "$_clk"   # the supervisor-read and drift-clock modes reach this leg too
         pool=$((pool + 1)); if [ "$pool" -ge "$JOBS" ]; then wait; pool=0; fi
     done
     wait
 else
     echo "FAIL: no build (verify_op.bin, rompath/vsavjw.zip) at $BUILD for the relocated leg"; exit 1
 fi
+
+# THE ONE-TIME ALIGNMENT (#228 step 4, option A): reference legs for every replay of both legs; each pristine one
+# must reproduce the frozen basis, each breakpoint run must have covered its frames on emulated time with the game
+# clock of its reference leg; only then are the reference legs' game clocks frozen. Every reference leg is held to
+# a yardstick outside the instrument: the pristine leg's to the frozen basis, the relocated leg's to replay.lua run
+# live on the build under the same mask (rule-checker run 2026-10-10-798 Q1).
+if [ "${1:-}" = "--freeze-clock" ]; then
+    [ -z "${VS_CTL:-}" ] || { echo "REFUSED: --freeze-clock in control mode"; exit 3; }
+    pool=0
+    for n in $names; do
+        [ -f "tests/replays/$n.rpl" ] || continue
+        run1 "$n" "$W/ref_runs" "" vsavj "$ROMDIR" "$SPSITES" "INSTR_REFERENCE=1"
+        run1 "$n" "$W/ref_reloc" "" vsavjw "$BUILD/rompath;$ROMDIR" "$_rsites" "INSTR_REFERENCE=1"
+        # the build has no basis: its reference leg is held to replay.lua run live, under the same mask (#213's method)
+        ( ia_replaylua_run vsavjw "$BUILD/rompath;$ROMDIR" "$PWD/tests/replays/$n.rpl" "$W/rl_reloc/$n" "$MASK" ) </dev/null &
+        pool=$((pool + 3)); if [ "$pool" -ge "$JOBS" ]; then wait; pool=0; fi
+    done
+    wait
+    bad=0; : > "$W/clocks.tsv"
+    for n in $names; do
+        [ -f "tests/replays/$n.rpl" ] || continue
+        for lg in vsavj:runs:ref_runs reloc:reloc:ref_reloc; do
+            leg="${lg%%:*}"; rest="${lg#*:}"; bp="$W/${rest%%:*}/$n.align"; ref="$W/${rest#*:}/$n.align"
+            [ -s "$ref" ] || { echo "  $leg/$n: the reference leg wrote no ALIGN line"; bad=1; continue; }
+            a="$(ia_anchor "$ref")"; af="$(ia_anchor_frame "$ref")"
+            if [ "$leg" = vsavj ]; then want="$(basis_at "$n" "$af")"; yard="the basis"
+            else want="$(ia_replaylua_read "$W/rl_reloc/$n" "$af")"; yard="replay.lua live"; fi
+            [ -n "$a" ] && [ "$a" = "$want" ] || { echo "  $leg/$n: the reference leg reads ${a:-nothing} at frame ${af:-?}, $yard ${want:-nothing}"; bad=1; }
+            [ "$(ia_field "$bp" frames)" = "$(ia_field "$bp" emulated)" ] || { echo "  $leg/$n: the breakpoint run counted $(ia_field "$bp" frames) over $(ia_field "$bp" emulated) emulated"; bad=1; }
+            [ "$(ia_field "$bp" gameclock)" = "$(ia_field "$ref" gameclock)" ] || { echo "  $leg/$n: the breakpoint run's game clock $(ia_field "$bp" gameclock), its reference leg's $(ia_field "$ref" gameclock)"; bad=1; }
+            ia_row "$leg" "$n" "$ref" >> "$W/clocks.tsv"
+        done
+    done
+    [ "$bad" = 0 ] || { echo "REFUSED: the alignment does not hold — nothing frozen"; exit 1; }
+    mkdir -p "$(dirname "$CLOCKS")"
+    { echo "# $CLOCKS — the game clock RAM:\$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,"
+      echo "# option A) by \`tests/audit_walker_ghost.sh --freeze-clock\` at $(git rev-parse --short=8 HEAD), BUILD $(basename "$BUILD")."
+      echo "# leg<TAB>replay<TAB>frames<TAB>gameclock"
+      cat "$W/clocks.tsv"; } > "$CLOCKS"
+    echo "froze $(wc -l < "$W/clocks.tsv" | tr -d ' ') game clocks into $CLOCKS (every pristine reference leg on the basis, every breakpoint run on its reference leg's clock)"
+    exit 0
+fi
+fail=0
+echo "== the instrument's alignment (#228)"
+: > "$W/align_bad.txt"
+for n in $names; do
+    [ -f "tests/replays/$n.rpl" ] || continue
+    ia_check "$CLOCKS" vsavj "$n" "$W/runs/$n.align" >> "$W/align_bad.txt" || true
+    ia_check "$CLOCKS" reloc "$n" "$W/reloc/$n.align" >> "$W/align_bad.txt" || true
+done
+if [ -s "$W/align_bad.txt" ]; then echo "  FAIL  $(wc -l < "$W/align_bad.txt" | tr -d ' ') run(s) off their frozen alignment:"; head -8 "$W/align_bad.txt" | sed 's/^/        /'; fail=1
+else echo "  ok    every run of both legs on emulated time, at its frozen game clock"; fi
+sa="$(ia_anchor "$W/stage/21_don_mash.align")"; saf="$(ia_anchor_frame "$W/stage/21_don_mash.align")"
+if [ -n "$sa" ] && [ "$sa" = "$(basis_at 21_don_mash "$saf")" ]; then echo "  ok    the staging reference leg reproduces the basis at frame $saf"
+else echo "  FAIL  the staging reference leg reads ${sa:-nothing} at frame ${saf:-?}, the basis $(basis_at 21_don_mash "${saf:-0}")"; fail=1; fi
 
 _flags=""
 vs_ctl_is range-moved && _flags="--frozen-shift 2"
@@ -177,7 +262,6 @@ if [ "${1:-}" = "--freeze" ]; then
     [ -z "${VS_CTL:-}" ] || { echo "REFUSED: --freeze in control mode"; exit 3; }
     python3 tools/walker_ghost.py "$W/runs" "$FROZEN" "$W/vj_op.bin" --freeze; exit $?
 fi
-fail=0
 python3 tools/walker_ghost.py "$W/runs" "$FROZEN" "$W/vj_op.bin" ${_flags} > "$W/read.txt" || fail=1
 cat "$W/read.txt"
 _map=""; for m in $RELOC; do _map="$_map --map $m"; done
@@ -198,6 +282,16 @@ if python3 tools/walker_ghost.py "$W/ctl_sp" "$FROZEN" "$W/vj_op.bin" --no-froze
 elif command grep -q "GROUND" "$W/ctl_sp.txt"; then
     vs_ctl_fired supervisor-read "the SP read fails the ground truth: $(command grep -m1 '^    ground truth' "$W/ctl_sp.txt" | cut -c19-110)"
 else vs_ctl_dead supervisor-read "failed, but not on the ground truth" || fail=1; fi
+# drift-clock: 21_don_mash under the frame_done clock must miss its frozen game clock
+if ia_check "$CLOCKS" vsavj 21_don_mash "$W/ctl_drift/21_don_mash.align" > "$W/ctl_drift.txt"; then
+    vs_ctl_dead drift-clock "the frame_done clock still met the frozen game clock" || fail=1
+elif command grep -q "game clock\|emulated" "$W/ctl_drift.txt"; then vs_ctl_fired drift-clock "$(head -1 "$W/ctl_drift.txt")"
+else vs_ctl_dead drift-clock "failed, but not on the clock: $(head -1 "$W/ctl_drift.txt")" || fail=1; fi
+# first-frame-skip: the staging leg under the skip must miss the basis
+ka="$(ia_anchor "$W/ctl_skip/21_don_mash.align")"; kaf="$(ia_anchor_frame "$W/ctl_skip/21_don_mash.align")"
+if [ -z "$ka" ]; then vs_ctl_dead first-frame-skip "the skip leg wrote no anchor" || fail=1
+elif [ "$ka" != "$(basis_at 21_don_mash "$kaf")" ]; then vs_ctl_fired first-frame-skip "under the first-frame skip the staging leg reads $ka at frame $kaf where the basis reads $(basis_at 21_don_mash "$kaf")"
+else vs_ctl_dead first-frame-skip "the skipped clock still reproduced the basis" || fail=1; fi
 for c in "range-moved:--frozen-shift 2:FROZEN" "mask-covers:--extra-mask ff0550-ff06e0:VISIBLE"; do
     n="${c%%:*}"; rest="${c#*:}"; fl="${rest%%:*}"; want="${rest##*:}"
     if python3 tools/walker_ghost.py "$W/runs" "$FROZEN" "$W/vj_op.bin" $fl > "$W/ctl_$n.txt"; then

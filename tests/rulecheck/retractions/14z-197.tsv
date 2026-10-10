@@ -1,0 +1,4 @@
+# tests/rulecheck/retractions/14z-197.tsv — the wordings retracted or corrected in 14z-197, and reach controls that must be found live; columns pattern, source, class (retracted | reach:N)
+fires in only 5 of	14z-197 (#228 step 4): the 14z-89 replay count for the object-pool walker 0x54458 was measured on the frame_done clock that cut each run short; on emulated time its jsr (A0) fires in 50 of 56 replays (tests/audit_walker_ghost.sh, build/manifest/walker_ghost.toml re-frozen); carriers marked RETRACTED in place	retracted
+in only 5 of 49	14z-197 (#228 step 4): the same count in docs/game/engine_internals.md, marked RETRACTED in place	retracted
+fires in 50 of 56	control: the corrected count, live in tests/audit_walker_ghost.sh	reach:1

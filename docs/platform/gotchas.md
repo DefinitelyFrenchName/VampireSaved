@@ -216,7 +216,10 @@ itself does NOT perturb multi-CPU timing on these replays; the "finer scheduler 
 lost frame at the initial debugger halt" elimination below are RETRACTED. What still holds: breakpoint STOPS can
 move the game for some instruments (the 14z-192 paragraph below — re-measured 14z-196: the dispatch census 47 of
 56 legs moved), while `pc_count.lua`'s legs under 26 armed hook points moved on 0 of 57 (`tests/audit_marionette_cost.sh`)
-— why the two differ is not measured (#228). The original analysis, kept:
+— why the two differ is not measured (#228). Measured again 14z-197 (`tests/test_emu_clock.sh`): a breakpoint leg
+stopped 12,029 times kept `$FF8080` equal to its reference leg's while its work-RAM checksum at frame 1,500 was NOT
+the basis's — a stop can move the game without moving the frame counter, so a `$FF8080` comparison alone cannot see
+that movement. The original analysis, kept:
 A vsavj replay run under `-debug -debugger none` produces a checksum log that
 diverges from the identical non-debug run at frame 12: `RAM:$FF1CF0.l` (a
 latch toggling 0x00000000/0xFFFFFFFF) is phase-shifted by one frame, with
@@ -358,6 +361,13 @@ frames covered beside the frames counted (`EMUFRAMES` / `CENSUSEND`); keep the o
 env switch (`CENSUS_CLOCK=frame_done`) as the must-fire control (`tests/audit_dispatch_census.sh`,
 control `drift-clock`: 729 emulated frames of 1,800 counted, the game's frame counter `7d` against the
 reference leg's `ab`).
+**ONE SHARED CLOCK SINCE 14z-197 (GitHub #228 step 4, maintainer-ruled "option A"):** the fix lives in
+`tests/lua/emu_clock.lua` — the clock above, `replay.lua`'s input staging, the anchor and the game clock
+(`ALIGN_OUT` lines), and the two control clocks (`INSTR_CLOCK=frame_done`, `skip_first`) — and each breakpoint
+instrument loads it instead of carrying a copy. Its ground truth is `tests/test_emu_clock.sh` (prereq lane): on
+pristine vsavj, `03_two_player_vs`, 1,500 frames, `obj_record_bank_trace.lua` with its window opened to the whole
+address space stopped the CPU for 12,029 UI frames and still counted 1,500 frames over 1,500 emulated ones with
+`$FF8080` at `7f`, the reference leg's; under `frame_done` the same leg covered 615 and read `0b`.
 Inside the move, the row's only writer is the palette-sequence uploader. When the
 question is WHEN a write happens, use the non-debug tap. A `-debug` log gives the WHO,
 and its frame column is not a time. (`tests/lua/bp_regs.lua`'s header says the opposite

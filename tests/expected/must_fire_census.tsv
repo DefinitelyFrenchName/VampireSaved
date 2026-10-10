@@ -125,6 +125,7 @@ declares	test_don_reactions
 declares	test_down_flash_mechanism
 declares	test_dualtrack
 declares	test_effect_placeholders
+declares	test_emu_clock
 declares	test_emu_run_compare
 declares	test_emulator_runner
 declares	test_emulator_staleness
@@ -225,6 +226,7 @@ declares	test_unless_composed
 declares	test_vanilla_aerial_join
 declares	test_vanilla_command_join
 declares	test_vanilla_frame_join
+declares	test_wheel_bank5
 declares	test_wide_profile
 declares	test_win_quote_decode
 declares	test_win_stdout_utf8

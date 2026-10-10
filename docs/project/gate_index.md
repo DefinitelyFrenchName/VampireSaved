@@ -16,13 +16,13 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**453 scripts** — 126 ci_portable, 92 ci_static, 235 emulator-tier (run by name).
+**454 scripts** — 126 ci_portable, 92 ci_static, 236 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
 | [runner](#runner) | 43 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
-| [platform](#platform) | 47 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
+| [platform](#platform) | 48 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
@@ -127,6 +127,7 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 | `tests/test_crash_guard.sh` | test | emulator | MAME, a build dir | ground truth for the crash guard (verdict-logic doctrine, CLAUDE.md §4: a detector is trusted only after it classifies known-good and known-bad scenarios correctly). | — |
 | `tests/test_crypt_boundary.sh` | test | ci_static | ROMDIR | code in the WIDE extension must be stored RAW. | 14z-123 |
 | `tests/test_decrypt_oracle.sh` | test | emulator | MAME | verify tools/cps2_decrypt.py against MAME's own cps2crypt implementation (dual-implementation agreement). | — |
+| `tests/test_emu_clock.sh` | test | emulator | MAME, ~4 min | THE SHARED INSTRUMENT CLOCK STAYS ON EMULATED TIME UNDER BREAKPOINTS (14z-197, GitHub #228 step 4). | 14z-197 |
 | `tests/test_fbneo_boot_log.sh` | test | ci_portable | — | the verdict logic of tests/lib/fbneo_boot_log.sh (what a healthy FBNeo WIDE boot log must show) against RECORDED boot logs from two real hosts: | 2026-09-13 |
 | `tests/test_fbneo_instruments.sh` | test | emulator | MAME, FBNeo | ground truth for the B5b FBNeo instruments. | 14z-123 |
 | `tests/test_fbneo_overlay_hygiene.sh` | test | ci_portable | — | a non-overlay FBNeo run must not inherit a previous run's overlay (14z-94, GitHub #38). ~2 s, no emulator, no ROMs. | 14z-94 |
@@ -348,8 +349,8 @@ tenant content — per-character gates and on-demand audits on the ported charac
 | `tests/audit_trap_sound.sh` | audit | emulator | MAME, a build dir, ~10 min | the MK Plasma Trap fires, ring live (14z-82d lock, RE-SCOPED 14z-85g). | 14z-82d |
 | `tests/audit_tripwire_reach.sh` | audit | emulator | MAME, a build dir, ~15 min | DO ANY PLANTED TRIPWIRES FIRE IN EXTENDED PLAY? (14z-93, on-demand, ~15 min at JOBS=3.) | 14z-93 |
 | `tests/audit_voice_borrow.sh` | audit | emulator | MAME, a build dir, ~6 min | THE VOICE-CLASS BORROW mechanism gate (14z-87). | 14z-87 |
-| `tests/audit_walker_ghost.sh` | audit | emulator | MAME, a build dir, ~1.5 min | WHERE ON THE LIVE STACK does each object-pool walker's `jsr (A0)` push its return address, and does that longword lie outside every legacy-oracle mask? (14z-91; re-stated on the live stack 14z-185, GitHub #143) | 14z-91 |
-| `tests/audit_walker_repoint.sh` | audit | emulator | MAME, a build dir, ~5 min | after the relocation, does ANYTHING still reach the vanilla object-pool walkers? | 14z-91 |
+| `tests/audit_walker_ghost.sh` | audit | emulator | MAME, a build dir, ~6 min | WHERE ON THE LIVE STACK does each object-pool walker's `jsr (A0)` push its return address, and does that longword lie outside every legacy-oracle mask? (14z-91; re-stated on the live stack 14z-185, GitHub #143) | 14z-91 |
+| `tests/audit_walker_repoint.sh` | audit | emulator | MAME, a build dir, ~5 min | after the relocation, does ANYTHING still reach the vanilla object-pool walkers? | 2026-10-10 |
 | `tests/audit_win_pal_auto.sh` | audit | emulator | MAME, a build dir, ~8 min | THE #105 LOCK (14z-99): with AUTO selected by the WINNER, the 2P victory portrait screen draws a TENANT winner's portrait WHITE (correct shapes, white fill — the maintainer's captured surface). On-demand, ~8 min (3 MAME runs, 2 at a time). | 14z-99 |
 | `tests/test_attract_roster.sh` | test | ci_static | ROMDIR | THE ATTRACT-DEMO ROSTER, decoded from the ROM and frozen (14z-118, the ram.md audit). ci_static: needs ROMDIR (the decrypt cache), no build dir, no emulator, ~2 s. | 14z-118 |
 | `tests/test_don_accent.sh` | test | emulator | MAME, a build dir | weapon-accent steadiness + Victor-accent legacy guard (session 14z-19, rounds 34-35). | session 14z |

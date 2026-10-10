@@ -3,18 +3,20 @@
 # supervisor stack, a constant 0xff7ff6). Regenerate with tests/audit_walker_ghost.sh --freeze.
 # The relocated walker pushes a different return address at [sp_min-4, sp_max-1]; the gate asserts
 # that range lies OUTSIDE every legacy-oracle mask (no mask hides it from the oracle's checksum).
+# RE-FROZEN 14z-197 (GitHub #228 step 4, emulated time): site 0x54476 sp_min 0xff055e, 50 replays (was 0xff06de,
+# 5 replays — the frame_done clock had cut each run to a fraction of its replay).
 schema = 2
 
 [[site]]
 site = 0x54476
-sp_min = 0xff06de
+sp_min = 0xff055e
 sp_max = 0xff06de
-hits = 8586
-replays = 5
+hits = 380413
+replays = 50
 
 [[site]]
 site = 0x5e548
 sp_min = 0xff055e
 sp_max = 0xff06de
-hits = 315008
+hits = 1883034
 replays = 56

@@ -13,13 +13,13 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**453 of 453 gates described.**
+**454 of 454 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
 | [runner](#runner) | 43 | 43 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
-| [platform](#platform) | 47 | 47 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
+| [platform](#platform) | 48 | 48 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
@@ -550,7 +550,7 @@ the documentation locks — docs, skills, indexes, tables follow the tree. 21 of
 
 ## platform
 
-the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene. 47 of 47 described.
+the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene. 48 of 48 described.
 
 ### `audit_release_linux_cleanhost.sh` — audit, emulator
 
@@ -647,6 +647,14 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 **HOW:** decrypts the reference set with our tool and dumps MAME's opcode space, then compares byte for byte.
 
 **EXPECTS:** byte-identical; a difference is a defect in one implementation's reading of the CPS-2 encryption.
+
+### `test_emu_clock.sh` — test, emulator
+
+**WHAT:** tests/lua/emu_clock.lua, the frame clock every breakpoint instrument now shares, counts EMULATED frames and stages replay input in replay.lua's order: its reference leg (no debugger) reproduces the frozen vanilla basis checksum, and a leg whose breakpoints stop the CPU thousands of times still covers every frame it counts and reads the game's own frame counter RAM:$FF8080 equal to the reference leg's.
+
+**HOW:** tests/lua/obj_record_bank_trace.lua (the first instrument converted) on pristine vsavj, replay 03_two_player_vs, 1500 frames: a REFERENCE leg (INSTR_REFERENCE=1, no -debug) whose ANCHOR is compared with tests/expected/vsavj/masked-v2's checksum at frame 1500 under its MASK, and a BREAKPOINT leg with the A0 window opened to the whole address space (REC_LO=0 REC_HI=ffffff), so the format handlers stop the CPU on every object drawn; each leg's ALIGN line (emu_clock.lua's ALIGN_OUT) is read.
+
+**EXPECTS:** the reference anchor equals the basis; the breakpoint leg counted 1500 frames over 1500 emulated ones with stops' UI frames skipped (uiframes > 0), and its game clock equals the reference's. Whether the breakpoint leg's own checksum equals the basis is PRINTED, not asserted: a stop can move the game without moving $FF8080 ([MFI-2]; measured 14z-197: it differs here). A red means instruments' input lands on the wrong frame again — every gate built on them describes a game the replay never played.
 
 ### `test_fbneo_boot_log.sh` — test, ci_portable
 
@@ -1858,7 +1866,7 @@ tiles, OBJ records, sprite lists, render-layer verdicts. 25 of 25 described.
 
 **HOW:** tools/check_wheel_bank5.py re-derives the whole move from the ROM record, the layout and both source zips against the built image; negative controls corrupt a tile byte and strip the code op; runtime on WIDE MAME with replay 36.
 
-**EXPECTS:** static equal, both controls failing, the engine's bank-5 walk observed.
+**EXPECTS:** static equal, both controls failing, the engine's bank-5 walk observed — on an instrument whose input lands on replay.lua's frames (#228 step 4, maintainer-ruled 2026-10-10 "option A"): the trace leg runs on tests/lua/emu_clock.lua's emulated clock, a REFERENCE leg of the same replay (no debugger) reproduces replay.lua's checksum at the trace's last frame, and the trace leg's game clock RAM:$FF8080 equals the reference leg's. One replay, so the staging reference leg IS that replay's reference: the trace leg is held to it live rather than to a frozen value.
 
 ### `test_wide_render_content.sh` — test, emulator
 
@@ -2212,17 +2220,17 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 **WHAT:** where each object-pool walker's `jsr (A0)` pushes its return address — the one longword of state the walker relocation changes — measured on the LIVE stack, and that it lands outside every legacy-oracle mask, so no mask hides it from the per-frame oracle's checksum (whether the oracle's verdicts catch a differing byte there: see NOT covered below).
 
-**HOW:** corpus-wide MAME -debug runs of tests/lua/walker_sp.lua (the live stack chosen by SR's S bit, and the long on top of it) at both walker sites on pristine vsavj, and at the RELOCATED walkers' sites on the build under test (derived from its own call sites); tools/walker_ghost.py proves the pointer against the vsavj opcode image (each long on top ends a `jsr abs.l` to the walker; the build's own image for the relocated leg), checks the push against the union of `tests/expected/**/mask,` and compares the live ranges with build/manifest/walker_ghost.toml — the relocated sites with the vanilla sites' frozen ranges (the relocation pushes at the same depth).
+**HOW:** corpus-wide MAME -debug runs of tests/lua/walker_sp.lua (the live stack chosen by SR's S bit, and the long on top of it) at both walker sites on pristine vsavj, and at the RELOCATED walkers' sites on the build under test (derived from its own call sites); tools/walker_ghost.py proves the pointer against the vsavj opcode image (each long on top ends a `jsr abs.l` to the walker; the build's own image for the relocated leg), checks the push against the union of `tests/expected/**/mask,` and compares the live ranges with build/manifest/walker_ghost.toml — the relocated sites with the vanilla sites' frozen ranges (the relocation pushes at the same depth). THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): walker_sp.lua counts EMULATED frames (tests/lua/emu_clock.lua); every run's game clock RAM:$FF8080 at its last frame is held to tests/expected/instr_gameclock/audit_walker_ghost.tsv, frozen by `--freeze-clock` from REFERENCE legs (the same script, no breakpoint, no debugger — each pristine one reproducing the frozen basis checksum, each breakpoint run's game clock equal to its reference leg's); one STAGING reference leg (21_don_mash, pristine) is held to the basis on every run.
 
-**EXPECTS:** the reader's PASS: every long on top of the read stack a genuine return address, the push outside every mask, the live ranges as frozen; the three controls fail.
+**EXPECTS:** the reader's PASS: every long on top of the read stack a genuine return address, the push outside every mask, the live ranges as frozen; every run on emulated time at its frozen game clock and the staging leg on the basis; the five controls fail.
 
 ### `audit_walker_repoint.sh` — audit, emulator
 
 **WHAT:** after the walker relocation nothing still reaches the VANILLA object-pool walkers at run time — the residual a static caller scan cannot close (a target computed at run time).
 
-**HOW:** breakpoints on the vanilla and relocated walker entries over the replay corpus on MAME against the build, AND the same instrument on an un-relocated REF_BUILD where the vanilla entries must fire (the negative control that makes a zero readable); the control forces a vanilla hit count non-zero.
+**HOW:** breakpoints on the vanilla and relocated walker entries over the replay corpus on MAME against the build, AND the same instrument on an un-relocated REF_BUILD where the vanilla entries must fire (the negative control that makes a zero readable); the control forces a vanilla hit count non-zero. THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): walker_sp.lua counts EMULATED frames (tests/lua/emu_clock.lua); every run's game clock RAM:$FF8080 at its last frame is held to tests/expected/instr_gameclock/audit_walker_repoint.tsv, frozen by `--freeze-clock` from REFERENCE legs (no breakpoint, no debugger; each breakpoint run's game clock equal to its reference leg's); one STAGING reference leg (21_don_mash on the build) is held on every run to replay.lua run live on the same build (no basis exists for a hacked build).
 
-**EXPECTS:** vanilla entries silent and relocated entries firing on the build; vanilla entries firing on the reference build. Zero everywhere is a dead breakpoint, not a pass.
+**EXPECTS:** vanilla entries silent and relocated entries firing on the build; vanilla entries firing on the reference build. Zero everywhere is a dead breakpoint, not a pass. Every run on emulated time at its frozen game clock, the staging leg on replay.lua's checksum.
 
 ### `audit_win_pal_auto.sh` — audit, emulator
 

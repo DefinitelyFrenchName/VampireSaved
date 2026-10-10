@@ -144,6 +144,7 @@ declares	test_don_throw_mirror
 declares	test_down_flash_mechanism
 declares	test_down_flash_vanilla
 declares	test_dualtrack
+declares	test_emu_clock
 declares	test_fbneo_instruments
 declares	test_fbneo_legacy_oracle
 declares	test_fbneo_replay_determinism

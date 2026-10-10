@@ -462,3 +462,4 @@ tests/test_emu_run_compare.sh	runner
 tests/test_attribute_patch_delta.sh	pipeline
 tests/test_freeze_bytediff.sh	pipeline
 tests/test_release_recipe_text.sh	platform
+tests/test_emu_clock.sh	platform

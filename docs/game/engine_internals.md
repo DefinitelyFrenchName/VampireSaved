@@ -2960,7 +2960,9 @@ replace the 6 vanilla bytes at the dispatch site with `jmp thunk`.
 **That hook is a legacy-cycle cost and it was a superset-invariant
 regression.** Site `0x05E542` dispatches **270,991 times** across the
 49-replay legacy corpus (`0x054470` 8,586 times, in only 5 of 49
-replays). The added jumps tipped frames already sitting at the VBL edge,
+replays — [RETRACTED 14z-197, GitHub #228: those counts were taken on the debugger's frame_done clock, which
+cut each run to a fraction of its replay; on emulated time the walker's `jsr (A0)` fires in 50 of 56 replays,
+380,413 times, `tests/audit_walker_ghost.sh`]). The added jumps tipped frames already sitting at the VBL edge,
 the main loop lost or gained one iteration, and because replay inputs are
 scheduled by FRAME the streams never re-converged — reaching HP and
 position differences. Attributed by removal experiment

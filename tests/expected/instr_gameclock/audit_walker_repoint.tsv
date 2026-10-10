@@ -1,0 +1,13 @@
+# tests/expected/instr_gameclock/audit_walker_repoint.tsv — the game clock RAM:$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,
+# option A) by `tests/audit_walker_repoint.sh <build> --freeze-clock` at 980ec0d8: new = build/m3b_merged31, ref = build/don_m5.
+# leg<TAB>replay<TAB>frames<TAB>gameclock
+new	02_demitri_vs_cpu	5520	33
+ref	02_demitri_vs_cpu	5520	33
+new	21_don_mash	14120	cb
+ref	21_don_mash	14120	cb
+new	24_don_winmash	18520	fb
+ref	24_don_winmash	18520	fb
+new	36_pick_tenant_cell	3720	2b
+ref	36_pick_tenant_cell	3720	2b
+new	12_donovan_vs_cpu	9320	0b
+ref	12_donovan_vs_cpu	9320	0b

@@ -9,103 +9,45 @@
 -- records stop the CPU. Each unique (record, bank) pair is logged once:
 --   REC <a0 hex> BANK <word hex> OBJ <a6 hex> FRAME <n>
 --
---   env REPLAY     input script (replay.lua format)
 --   env TRACE_OUT  log path (default obj_record_bank.txt)
---   env FRAMES     stop after this many frames (default 4200)
 --   env REC_LO/REC_HI  A0 window (hex, default bf6a0/100000)
+--   env REPLAY, FRAMES (default 4200), INSTR_REFERENCE, INSTR_CLOCK, ANCHOR, MASK_RANGES, ALIGN_OUT:
+--       tests/lua/emu_clock.lua (the frame is an EMULATED frame since 14z-197, GitHub #228)
 
 local out_path = os.getenv("TRACE_OUT") or "obj_record_bank.txt"
-local max_frames = tonumber(os.getenv("FRAMES") or "") or 4200
 local rec_lo = os.getenv("REC_LO") or "bf6a0"
 local rec_hi = os.getenv("REC_HI") or "100000"
 
+-- THE FRAME CLOCK, THE REPLAY AND THE ALIGNMENT READINGS (14z-197, GitHub #228 step 4): emulated
+-- frames, not frame_done calls — tests/lua/emu_clock.lua (REPLAY, FRAMES, INSTR_REFERENCE,
+-- INSTR_CLOCK, ANCHOR, MASK_RANGES, ALIGN_OUT). Until 14z-197 this script counted frame_done calls,
+-- so every stop's UI frames moved its input early ([MFI-5]).
+local C = dofile((debug.getinfo(1, "S").source:match("^@(.*/)") or "./") .. "emu_clock.lua"){
+    name = "obj_record_bank_trace", frames = 4200 }
+
 local machine = manager.machine
 local debugger = machine.debugger
-assert(debugger, "run mame with -debug")
+assert(debugger or C.reference, "run mame with -debug (or INSTR_REFERENCE=1 for the reference leg)")
 local cpu = machine.devices[":maincpu"]
 local prog = cpu.spaces["program"]
 
 local f = assert(io.open(out_path, "wb"))
-local frame = 0
 local seen = {}
 
--- input playback (same subset as trace_writes.lua)
-local held = {}
-local replay_path = os.getenv("REPLAY")
-local FIELDS = nil
-if replay_path then
-    local ioport = machine.ioport
-    local function fld(port, name) return ioport.ports[port].fields[name] end
-    FIELDS = {
-        p1 = { U = fld(":IN0", "P1 Up"), D = fld(":IN0", "P1 Down"),
-               L = fld(":IN0", "P1 Left"), R = fld(":IN0", "P1 Right"),
-               ["1"] = fld(":IN0", "P1 Button 1"), ["2"] = fld(":IN0", "P1 Button 2"),
-               ["3"] = fld(":IN0", "P1 Button 3"), ["4"] = fld(":IN1", "P1 Button 4"),
-               ["5"] = fld(":IN1", "P1 Button 5"), ["6"] = fld(":IN1", "P1 Button 6") },
-        p2 = { U = fld(":IN0", "P2 Up"), D = fld(":IN0", "P2 Down"),
-               L = fld(":IN0", "P2 Left"), R = fld(":IN0", "P2 Right"),
-               ["1"] = fld(":IN0", "P2 Button 1"), ["2"] = fld(":IN0", "P2 Button 2"),
-               ["3"] = fld(":IN0", "P2 Button 3"), ["4"] = fld(":IN1", "P2 Button 4"),
-               ["5"] = fld(":IN1", "P2 Button 5"), ["6"] = fld(":IN2", "P2 Button 6") },
-        sys = { S1 = fld(":IN2", "1 Player Start"), S2 = fld(":IN2", "2 Players Start"),
-                C1 = fld(":IN2", "Coin 1"), C2 = fld(":IN2", "Coin 2"),
-                SV = fld(":IN2", "Service 1"), TS = fld(":IN2", "Service Mode") },
-    }
-    for line in io.lines(replay_path) do
-        local body = line:gsub("#.*", "")
-        local range, rest = body:match("^%s*(%S+)%s+(.-)%s*$")
-        if range then
-            local a, b = range:match("^(%d+)%-(%d+)$")
-            if not a then a = range:match("^(%d+)$"); b = a end
-            if a then
-                for spec in rest:gmatch("%S+") do
-                    local who, toks = spec:match("^(%a+%d?)=(%S+)$")
-                    if who and FIELDS[who] then
-                        local step = (who == "sys") and 2 or 1
-                        for i = 1, #toks, step do
-                            local fldo = FIELDS[who][toks:sub(i, i + step - 1)]
-                            if fldo then
-                                for fr = tonumber(a), tonumber(b) do
-                                    held[fr] = held[fr] or {}
-                                    held[fr][#held[fr] + 1] = fldo
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
+if not C.reference then
+    debugger:command("focus 0")
+    local cond = string.format("(a0 >= %s) && (a0 < %s)", rec_lo, rec_hi)
+    debugger:command(string.format("bpset 1b234,%s", cond))  -- fmt 2 handler
+    debugger:command(string.format("bpset 1afc6,%s", cond))  -- fmt 0 handler
 end
 
-debugger:command("focus 0")
-local cond = string.format("(a0 >= %s) && (a0 < %s)", rec_lo, rec_hi)
-debugger:command(string.format("bpset 1b234,%s", cond))  -- fmt 2 handler
-debugger:command(string.format("bpset 1afc6,%s", cond))  -- fmt 0 handler
-
-local pressed = {}
-dofile((debug.getinfo(1, "S").source:match("^@(.*/)") or "./") .. "clock_check.lua")("obj_record_bank_trace", replay_path)   -- #228: CLOCK_OUT=<file> records frame_done calls against emulated frames
-emu.register_frame_done(function()
-    frame = frame + 1
-    if FIELDS then
-        local want = {}
-        for _, fldo in ipairs(held[frame + 1] or {}) do want[fldo] = true end
-        for _, group in pairs(FIELDS) do
-            for _, fldo in pairs(group) do
-                if want[fldo] and not pressed[fldo] then fldo:set_value(1); pressed[fldo] = true
-                elseif not want[fldo] and pressed[fldo] then fldo:clear_value(); pressed[fldo] = nil end
-            end
-        end
-    end
-    if frame >= max_frames then
-        f:write(string.format("END %d\n", frame))
-        f:close()
-        manager.machine:exit()
-    end
-end)
+C.run{ on_end = function(frame)
+    f:write(string.format("END %d\n", frame))
+    f:close()
+end }
 
 emu.register_periodic(function()
-    if debugger.execution_state == "stop" then
+    if debugger and debugger.execution_state == "stop" then
         local st = cpu.state
         local a0 = st["A0"].value & 0xffffff
         local a6 = st["A6"].value & 0xffffff
@@ -114,7 +56,7 @@ emu.register_periodic(function()
         if not seen[key] then
             seen[key] = true
             f:write(string.format("REC %06x BANK %04x OBJ %06x FMT_PC %06x FRAME %d\n",
-                a0, bank, a6, st["CURPC"].value, frame))
+                a0, bank, a6, st["CURPC"].value, C.frame()))
             f:flush()
         end
         debugger.execution_state = "run"

@@ -217,6 +217,7 @@ declares	test_down_flash_vanilla
 declares	test_dualtrack
 declares	test_effect_palette_table
 declares	test_effect_placeholders
+declares	test_emu_clock
 declares	test_emu_run_compare
 declares	test_emulator_runner
 declares	test_emulator_staleness

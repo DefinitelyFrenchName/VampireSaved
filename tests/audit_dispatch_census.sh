@@ -54,7 +54,9 @@
 # dispatch site vanilla, so tenant types stay above the vanilla entry count
 # where a vanilla object cannot reach them BY CONSTRUCTION.
 #
-# COVERAGE IS THE WEAK PART, AND IT IS STATED RATHER THAN HIDDEN. Measured
+# COVERAGE IS THE WEAK PART, AND IT IS STATED RATHER THAN HIDDEN. [The replay count below is RETRACTED
+# 14z-197, GitHub #228 step 4: it was measured on the frame_done clock that cut each run short; on emulated
+# time the same walker's `jsr (A0)` (0x54476, tests/audit_walker_ghost.sh) fires in 50 of 56 replays.] Measured
 # 14z-89: site 0x054470 fires in only 5 of 50 replays — 21/22/23/24/26, the
 # long mash + arcade rigs — and the observation curve has NOT converged
 # (26_don_arcade_mash alone contributed types 51 and 55 that nothing else

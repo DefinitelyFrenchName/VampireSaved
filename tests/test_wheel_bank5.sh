@@ -10,11 +10,19 @@
 # HOW: tools/check_wheel_bank5.py re-derives the whole move from the ROM record, the layout
 #   and both source zips against the built image; negative controls corrupt a tile byte and
 #   strip the code op; runtime on WIDE MAME with replay 36.
-# EXPECTS: static equal, both controls failing, the engine's bank-5 walk observed.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/decrypt_cache.sh
+# EXPECTS: static equal, both controls failing, the engine's bank-5 walk observed — on an instrument whose input
+#   lands on replay.lua's frames (#228 step 4, maintainer-ruled 2026-10-10 "option A"): the trace leg runs on
+#   tests/lua/emu_clock.lua's emulated clock, a REFERENCE leg of the same replay (no debugger) reproduces
+#   replay.lua's checksum at the trace's last frame, and the trace leg's game clock RAM:$FF8080 equals the
+#   reference leg's. One replay, so the staging reference leg IS that replay's reference: the trace leg is held
+#   to it live rather than to a frozen value.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lib/decrypt_cache.sh
 #   tests/lib/tenant_build.sh tests/lua/obj_record_bank_trace.lua tests/lua/replay.lua
 #   tests/replays/ tools/build_donovan.sh tools/check_wheel_bank5.py tools/gfx_tiles.py
-#   tools/run_mame.sh tools/setup_mame.sh
+#   tools/run_mame.sh tools/setup_mame.sh tests/lua/emu_clock.lua
+#
+# MUST-FIRE: known-bad: drift-clock — the trace leg under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync the gate ran on until 14z-197) must cover fewer emulated frames than it counts or read a game clock unlike the reference leg's (in-gate; as a mode the trace leg runs the old clock and the gate FAILs)
+# MUST-FIRE: known-bad: first-frame-skip — the reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum at the trace's last frame (in-gate; as a mode the reference leg runs the skip and the gate FAILs)
 #
 # MECHANISM (measured 14z-63; docs/game/atlas/select_screen.md). The wheel is
 # ONE record drawn by ONE object ($FFB800) whose select-screen anim chain
@@ -61,6 +69,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 # so a gate that means to SKIP on a missing ROMDIR still does.
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 . "$REPO/tests/lib/tenant_build.sh"    # GitHub #71
 . "$REPO/tests/lib/decrypt_cache.sh"   # GitHub #69
 cd "$REPO"
@@ -168,14 +177,58 @@ for o in ops:
 PY
 )"
     [ -n "$REC" ] || { echo "FAIL: no wheel repoint op in patch.json"; exit 1; }
-    REPLAY="$REPO/tests/replays/36_pick_tenant_cell.rpl" FRAMES=1000 \
-    REC_LO="$REC" REC_HI="$(printf '%x' $((0x$REC + 0x10)))" \
-    TRACE_OUT="$WORK/trace.txt" \
-    MAME_SANDBOX="$WORK/sbx" MAME_BIN="$WIDE_BIN" \
-    MAME_ROMPATH="$OUTBASE/rompath;$ROMDIR" \
-        tools/run_mame.sh vsavjw -debug -debugger none \
-        -autoboot_script tests/lua/obj_record_bank_trace.lua \
+    # THE TRACE LEG, ITS REFERENCE LEG, AND replay.lua (#228 step 4, option A): the trace counts EMULATED frames
+    # (tests/lua/emu_clock.lua); the reference leg is the same script without the debugger, anchored at the last
+    # frame; replay.lua's own checksum at that frame is the yardstick the reference leg must reproduce.
+    T=1000
+    trace_leg() {  # trace_leg <tag> <extra env...>
+        tag="$1"; shift
+        env "$@" REPLAY="$REPO/tests/replays/36_pick_tenant_cell.rpl" FRAMES=$T \
+        REC_LO="$REC" REC_HI="$(printf '%x' $((0x$REC + 0x10)))" \
+        TRACE_OUT="$WORK/$tag.txt" ALIGN_OUT="$WORK/$tag.align" \
+        MAME_SANDBOX="$WORK/sbx_$tag" MAME_BIN="$WIDE_BIN" \
+        MAME_ROMPATH="$OUTBASE/rompath;$ROMDIR" \
+            tools/run_mame.sh vsavjw -debug -debugger none \
+            -autoboot_script tests/lua/obj_record_bank_trace.lua \
+            > /dev/null 2>&1 || true
+    }
+    ref_leg() {  # ref_leg <tag> <extra env...>
+        tag="$1"; shift
+        env "$@" INSTR_REFERENCE=1 ANCHOR=$T REPLAY="$REPO/tests/replays/36_pick_tenant_cell.rpl" FRAMES=$T \
+        TRACE_OUT="$WORK/$tag.txt" ALIGN_OUT="$WORK/$tag.align" \
+        MAME_SANDBOX="$WORK/sbx_$tag" MAME_BIN="$WIDE_BIN" \
+        MAME_ROMPATH="$OUTBASE/rompath;$ROMDIR" \
+            tools/run_mame.sh vsavjw \
+            -autoboot_script tests/lua/obj_record_bank_trace.lua \
+            > /dev/null 2>&1 || true
+    }
+    al() { awk -v k="$2" '{for (i = 1; i < NF; i++) if ($i == k) {print $(i + 1); exit}}' "$WORK/$1.align" 2>/dev/null; }
+    anc() { awk '{for (i = 1; i < NF; i++) if ($i == "anchor") {print $(i + 2); exit}}' "$WORK/$1.align" 2>/dev/null; }
+    TCLOCK=""; vs_ctl_is drift-clock && TCLOCK="INSTR_CLOCK=frame_done"
+    RCLOCK=""; vs_ctl_is first-frame-skip && RCLOCK="INSTR_CLOCK=skip_first"
+    # shellcheck disable=SC2086
+    trace_leg trace $TCLOCK
+    # shellcheck disable=SC2086
+    ref_leg ref $RCLOCK
+    CHECKSUM_OUT="$WORK/rl/cks.log" REPLAY="$REPO/tests/replays/36_pick_tenant_cell.rpl" \
+    MAME_SANDBOX="$WORK/sbx_rl" MAME_BIN="$WIDE_BIN" MAME_ROMPATH="$OUTBASE/rompath;$ROMDIR" \
+        sh -c 'mkdir -p "$(dirname "$CHECKSUM_OUT")" && tools/run_mame.sh vsavjw -autoboot_script tests/lua/replay.lua' \
         > /dev/null 2>&1 || true
+    RL="$(awk -v n=$T '$1==n {print $2}' "$WORK/rl/cks.log" 2>/dev/null)"
+    ra="$(anc ref)"; rg="$(al ref gameclock)"
+    tf="$(al trace frames)"; te="$(al trace emulated)"; tg="$(al trace gameclock)"
+    if [ -n "$RL" ] && [ "$ra" = "$RL" ]; then
+        echo "  ok: the reference leg reproduces replay.lua at frame $T ($ra)"
+    else
+        echo "  FAIL: the reference leg reads ${ra:-nothing} at frame $T, replay.lua ${RL:-nothing}: the instrument's input staging is off replay.lua's"
+        fail=1
+    fi
+    if [ "$tf" = "$T" ] && [ "$te" = "$T" ] && [ -n "$tg" ] && [ "$tg" = "$rg" ]; then
+        echo "  ok: the trace leg covered $te emulated frames of $tf counted; game clock $tg = the reference leg's"
+    else
+        echo "  FAIL: the trace leg counted ${tf:-?} frames over ${te:-?} emulated, game clock ${tg:-?} (reference ${rg:-?}): its input drifted from the replay"
+        fail=1
+    fi
     # the fmt-2 handler's A0 is record+2 (past the format word)
     REC2="$(printf '%06x' $((0x$REC + 2)))"
     if grep -q "REC ${REC2} BANK 3000 OBJ ffb800" "$WORK/trace.txt"; then
@@ -185,6 +238,21 @@ PY
         sed 's/^/        /' "$WORK/trace.txt"
         fail=1
     fi
+    if vs_ctl_is drift-clock || vs_ctl_is first-frame-skip; then
+        [ "$fail" -ne 0 ] && { echo "FAIL: wheel bank-5 gate (control mode: $VS_CTL)"; exit 1; }
+        echo "FAIL: wheel bank-5 gate — control mode $VS_CTL left it green"; exit 1
+    fi
+    trace_leg ctl_drift INSTR_CLOCK=frame_done
+    de="$(al ctl_drift emulated)"; dg="$(al ctl_drift gameclock)"
+    if [ -z "$de" ]; then vs_ctl_dead drift-clock "the drift leg wrote no ALIGN line" || fail=1
+    elif [ "$de" -lt "$T" ] || [ "$dg" != "$rg" ]; then
+        vs_ctl_fired drift-clock "under the frame_done clock the trace leg covered $de emulated frames of $T counted, game clock $dg where the reference leg's reads $rg"
+    else vs_ctl_dead drift-clock "the frame_done clock covered $de of $T frames with game clock $dg (reference $rg)" || fail=1; fi
+    ref_leg ctl_skip INSTR_CLOCK=skip_first
+    sa="$(anc ctl_skip)"
+    if [ -z "$sa" ]; then vs_ctl_dead first-frame-skip "the skip leg wrote no anchor" || fail=1
+    elif [ "$sa" != "$RL" ]; then vs_ctl_fired first-frame-skip "under the first-frame skip the reference leg reads $sa at frame $T where replay.lua reads $RL"
+    else vs_ctl_dead first-frame-skip "the skipped clock still reproduced replay.lua at frame $T" || fail=1; fi
 
     # 3b. medallion palette stability (14z-63 r10-11 / 14z-64). ALL
     # THREE medallion rows must hold the vs2 palettes through BOTH
