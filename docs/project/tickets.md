@@ -11,12 +11,13 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**260 tickets** — status: open 25 · parked 10 · done 198 · declined 9 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 187 · cosmetic 16 · evolution 57 · **backfill debt: 0 rows**.
+**261 tickets** — status: open 26 · parked 10 · done 198 · declined 9 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 188 · cosmetic 16 · evolution 57 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#261](https://github.com/DefinitelyFrenchName/VampireSaved/issues/261) | bug | open | audit_effect_class_rows section 4 checks a type-6 fallback inventory that was never frozen | `tests/audit_effect_class_rows.sh § fallback-execution check` | none | none | none | 14z-197 |
 | [#260](https://github.com/DefinitelyFrenchName/VampireSaved/issues/260) | evolution | open | check that every submodule pin exists on its remote before a push (the 14z-192 jtcores pin was unpushed) | none | `DECISIONS_HISTORY.md § Ruled 2026-10-09 (14z-196) — a ticket for the submodule-pin check` | `HANDOFF.md § Keep the ORDER in mind` | none | 14z-196 |
 | [#259](https://github.com/DefinitelyFrenchName/VampireSaved/issues/259) | bug | open | static_confirm plan took 20 min at the 14z-195 close (228 changed files, 194 rule-checker run files) | `tools/static_confirm.py` | none | none | none | 14z-195 |
 | [#258](https://github.com/DefinitelyFrenchName/VampireSaved/issues/258) | bug | open | rulecheck: a packet artifact above the Read limit gets a partial read | `tools/rulecheck.py` | none | none | none | 14z-195 |

@@ -71,6 +71,7 @@
 # WHAT THE GATE DOES NOT CLAIM: that an answer is ENOUGH. That is judged at the
 # close that closes the ticket.
 issue	kind	status	title	repro	decided	learned	wrong	sessions
+261	bug	open	audit_effect_class_rows section 4 checks a type-6 fallback inventory that was never frozen	tests/audit_effect_class_rows.sh § fallback-execution check	none	none	none	14z-197
 260	evolution	open	check that every submodule pin exists on its remote before a push (the 14z-192 jtcores pin was unpushed)	none	DECISIONS_HISTORY.md § Ruled 2026-10-09 (14z-196) — a ticket for the submodule-pin check	HANDOFF.md § Keep the ORDER in mind	none	14z-196
 259	bug	open	static_confirm plan took 20 min at the 14z-195 close (228 changed files, 194 rule-checker run files)	tools/static_confirm.py	none	none	none	14z-195
 258	bug	open	rulecheck: a packet artifact above the Read limit gets a partial read	tools/rulecheck.py	none	none	none	14z-195
