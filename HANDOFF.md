@@ -1541,7 +1541,7 @@ their controls executed (79 gates, measured 2026-09-15) — `tests/run_all_stati
 14z-94; if you loop `tests/ci_portable.txt` by hand, **close stdin** — a gate that reads it
 swallows the rest of the list, which is how a 32-entry run silently became 28.
 
-The 30 gates are family `review-triage` in `docs/project/gate_index.md`
+These gates are family `review-triage` in `docs/project/gate_index.md` (its count is the generated page's, not this one's)
 (each row's header now carries its issue and what it locks); the table as
 of 14z-123 is in `HANDOFF_HISTORY.md`.
 

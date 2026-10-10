@@ -46,6 +46,7 @@ test_compare_flicker
 test_compare_window
 test_describe_masked_shape
 test_emulator_runner
+test_entropy_tripwire
 test_expectation_provenance
 test_fbneo_overlay_hygiene
 test_fbneo_overlay_hygiene_control
@@ -63,6 +64,7 @@ test_demand_after_trap
 # test_must_fire_census.sh — the must-fire doctrine MACHINE-READ (14z-145): the
 # declaring inventory (grows only) and the header-only debt (shrinks only).
 # Step one of the ruling on the BBX finding; step two is the run-time contract.
+test_mame_runner_hygiene
 test_must_fire_census
 test_module_refs
 # test_charid_names.sh — every in-tree character-id -> name map agrees with the atlas slot

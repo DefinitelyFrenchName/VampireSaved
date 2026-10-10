@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**449 scripts** — 121 ci_portable, 93 ci_static, 235 emulator-tier (run by name).
+**451 scripts** — 123 ci_portable, 93 ci_static, 235 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -28,7 +28,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
 | [character-data](#character-data) | 83 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
-| [review-triage](#review-triage) | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
+| [review-triage](#review-triage) | 33 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
 ## runner
@@ -498,12 +498,14 @@ the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guar
 | `tests/test_builder_rom_audit.sh` | test | ci_static | ROMDIR | every builder that reads $ROMDIR must run the mandatory checksum gate first (14z-94, GitHub #28). ~5 s, no emulator. | 14z-94 |
 | `tests/test_decode_stage_banners.sh` | test | ci_static | ROMDIR | ground truth for tools/decode_stage_banners.py, the decoder that turns the #92 value space into NAMES (14z-94, GitHub #92). | 14z-94 |
 | `tests/test_decrypt_cache.sh` | test | ci_static | ROMDIR | ground truth for tests/lib/decrypt_cache.sh (14z-94, GitHub #69). ~1 s warm; no ROMDIR needed when the cache is present. | 14z-94 |
+| `tests/test_entropy_tripwire.sh` | test | ci_portable | — | RULE 7'S TRIPWIRE READS THE INDEX, NOT `??` LINES (14z-197, GitHub #249). ci_portable: no ROM, ~10 s. | 14z-197 |
 | `tests/test_freeze_retires_diverge.sh` | test | ci_portable | — | freezing a replay must actually govern it (14z-94, GitHub #88). ROM-free, no MAME, ~2 s. | 14z-94 |
 | `tests/test_gfx_layout_fields_live.sh` | test | ci_portable | — | gfx_layout3.toml's profile and scatter fields must MEAN something (14z-94, GitHub #87). ROM-free, ~2 s. | 14z-94 |
 | `tests/test_guard_integrity.sh` | test | emulator | MAME, a build dir, ~2 min | the crash guard must carry the input-integrity assertion, and must refuse env vars it does not implement (14z-94, GitHub #31). Needs ROMDIR + a WIDE build; ~2 min. | 14z-94 |
 | `tests/test_harness_frame_bound.sh` | test | ci_static | ROMDIR | the FBNeo harness must bound replay frame numbers (14z-94, GitHub #77). ROM-free structurally; the functional half runs only if a built binary and ROMDIR are present. ~5 s. | 14z-94 |
 | `tests/test_hex_lengths.sh` | test | ci_portable | — | ground truth for tools/audit_hex_lengths.py, the balanced-byte-edit check (14z-94, GitHub #20). ROM-free, ~1 s. | 14z-94 |
 | `tests/test_mame_mirror_guard.sh` | test | ci_portable | — | setup_mame.sh must never run `rsync --delete` into a directory it does not own (14z-94, GitHub #80). ROM-free, ~3 s. | 14z-94 |
+| `tests/test_mame_runner_hygiene.sh` | test | ci_portable | — | A MAME REPLAY THAT WRITES NOTHING CANNOT PASS ON THE LAST RUN'S LOG (14z-197, GitHub #253). ci_portable: no ROM, no MAME, ~2 s. | 14z-197 |
 | `tests/test_mask_ranges_reader.sh` | test | emulator | MAME, a build dir, ~1 min | the MASK_RANGES reader must mask exactly what the spec says (14z-94, GitHub #61). ~1 min, needs ROMDIR + a WIDE build. | 14z-94 |
 | `tests/test_member_classify.sh` | test | ci_static | ROMDIR | PROGRAM and GFX members must never be confused, and the three classifiers must agree (14z-94, GitHub #19). ~2 s. | 14z-94 |
 | `tests/test_merged_inputs.sh` | test | ci_static | ROMDIR | ground truth for tools/ensure_merged_inputs.sh, the helper that makes rule 3 ONE COMMAND for the merged build (14z-95, GitHub #27, maintainer-ruled 2026-08-18: "it should be one command; | 14z-95 |

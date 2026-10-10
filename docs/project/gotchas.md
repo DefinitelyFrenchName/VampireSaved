@@ -6813,3 +6813,44 @@ the shell's own error line about the gate script as DIED at any exit status, on 
 quoted inside a real FAIL, and MAME's teardown segfault line, are still honoured. Ground truth: `tests/test_static_runner.sh`
 §12b and `tests/test_emulator_runner.sh` §14b, each with the control `crash-unread`. Rule: an exit status says only
 that something stopped; a control is honoured by its own detection lines, never by a non-zero code alone.
+
+## A DIRECTORY GUARD CANNOT SEE A LINK THROUGH ONE FILE — opening the output path for writing follows a symlink already there (paid: 14z-196's code review, GitHub #245; fixed 14z-197)
+
+`tools/build_wide_romset.py` links every `*.zip` of ROMDIR into the output directory, then opened `<out>/vsavjw.zip`
+with `zipfile.ZipFile(..., "w")`. A generated `vsavjw.zip` kept beside the reference dumps was mirrored like any zip,
+so the output path became a link back into ROMDIR and the write truncated the file it pointed at; a link already at the
+output path to anywhere else was written through the same way. `check_disjoint()` (#76) compares the two DIRECTORIES
+and is right to pass them: they were disjoint. The tool now skips ROMDIR's `vsavjw.zip` (it is not an input) and writes
+to a fresh `mkstemp` file in the output directory, then `os.replace()`s it over the directory entry, which replaces a
+link rather than following it. Ground truth: `tests/test_romset_path_guard.sh` §7, control `old-write` (the pre-#245
+write overwrites both sentinels). Rule: a tool that promises not to modify its inputs writes each output through a new
+file and a rename, never by opening a path that may already be a link.
+
+## THE STALENESS AUDIT JUDGED ONLY WHAT `git diff` AND THE NEWEST VERDICT SHOWED IT — a SKIP hid a moved input, a reverted input was never a candidate (paid: 14z-196's code review, GitHub #251 and #252; fixed 14z-197)
+
+Two escapes from `tools/audit_emulator_staleness.py`, both found by synthetic repositories, neither by a real run.
+**#252:** each gate keeps its NEWEST row, and a SKIP row was neither red nor PASS, so it replaced an older PASS and
+was then ignored: with the gate's input moved since that PASS, freeze cadence printed PASS and `--names` was empty,
+so `run_all_emulator.sh --stale` could never re-run it. A newest row that is not PASS is now judged with the red
+ones (FAIL at freeze/release within what that cadence runs, a NOTE at session, listed by `--names`); on this tree
+that names `audit_mask_window_ff42a2` and `test_readme_recording`, both SKIP as their newest row. **#251:** the
+candidates were `git diff` since the run's commit plus today's untracked files, and the run's record was consulted
+only for paths already in that pool. A file the run measured DIRTY and that was later REVERTED to the commit, or an
+untracked input since DELETED, was in neither, so the green described content that no longer exists and the audit
+said nothing had moved. Every path the run recorded as dirty (the record's status lines, `commit.txt`'s dirty list)
+now joins the candidates of the gates judged on THAT run, per run and never per commit, and is judged by content:
+unchanged or committed unchanged is not moved, while reverted, deleted, edited, or dirty with no record to compare
+is moved. Ground truth: `tests/test_emulator_staleness.sh` 2g (control `skip-ignored`) and 2h (control
+`dirt-ignored`). **The rule:** a verdict that is not PASS is not evidence, and the candidates for "moved" include
+everything the run itself measured, not only what differs now.
+
+## THE MAME REPLAY WRAPPER READ ITS VERDICT FROM A FILE IT HAD NOT CLEARED — a run that wrote nothing passed on the last run's log (paid: 14z-196's code review, GitHub #253; fixed 14z-197)
+
+`tools/run_replay_mame.sh` decides success by an ARTIFACT, `^END` in the checksum log, and never removed that log
+first. A MAME invocation that exits 0 without writing (the autoboot script never started, a frontend wrapper
+returned) therefore passed on whatever an earlier run left at the same path. A non-zero exit already failed. The
+FBNeo sibling had been fixed for the same class at 14z-90 (#12) and the MAME one never was. The wrapper now removes
+the log, `INPUT_OUT`, `VIDEO_OUT` and each file a `DUMPS` spec names before the run. It removes them by name, never
+by glob, so another leg's dumps in a shared directory survive. Ground truth: `tests/test_mame_runner_hygiene.sh`, a
+stub MAME (silent / failing / good) and control `no-clear`. **The rule:** a check that reads success from an output
+file clears that file before the run, and a sibling's fix is applied to every sibling.

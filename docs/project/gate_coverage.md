@@ -13,7 +13,7 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**449 of 449 gates described.**
+**451 of 451 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
@@ -25,7 +25,7 @@ first sentence) is `gate_index.md`.
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 87 | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
 | [character-data](#character-data) | 83 | 83 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
-| [review-triage](#review-triage) | 31 | 31 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
+| [review-triage](#review-triage) | 33 | 33 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
 ## runner
@@ -3246,7 +3246,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 ## review-triage
 
-the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for. 31 of 31 described.
+the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for. 33 of 33 described.
 
 ### `test_baseset_mask_invariant.sh` — test, ci_portable
 
@@ -3304,6 +3304,14 @@ the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guar
 
 **EXPECTS:** correct bytes and length, the truncated image refused; a wrong image here would make eighteen gates assert against garbage and pass.
 
+### `test_entropy_tripwire.sh` — test, ci_portable
+
+**WHAT:** tools/entropy_tripwire.py, the check CI runs, flags a high-entropy file that is COMMITTED or STAGED as well as one left untracked, passes the tree's four allowed compressed formats only when path AND magic match, and the tracked tree itself carries no high-entropy file outside them.
+
+**HOW:** (1) the tool over this tree's index; (2) a scratch git repository: 64 KiB of random bytes staged, then committed, then left untracked, a real-magic PNG, the same random bytes renamed .png, and plain text — each judged by the tool in the mode CI uses.
+
+**EXPECTS:** (1) exit 0; (2) the staged, committed and untracked blobs and the renamed blob each FAIL, the PNG and the text pass. The 14z-197 shape: CI's old selector `awk '$1=="??"'` returned nothing for a staged (`A`) or committed blob, so the step printed "ok" over the case its own comment said it caught.
+
 ### `test_freeze_retires_diverge.sh` — test, ci_portable
 
 **WHAT:** `run_suite.sh --freeze` on a replay still carrying a `.diverge` RETIRES that marker (loudly, keeping it as evidence) so the new `.sha1` governs, instead of writing an expectation the dispatch order can never reach.
@@ -3351,6 +3359,14 @@ the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guar
 **HOW:** the guard block EXTRACTED from the shipped script between its markers (never copied) and run in a harness; section 0 fails if the extraction is empty (~3 s, ROM-free).
 
 **EXPECTS:** every dangerous target refused, the legitimate initialisation still one command.
+
+### `test_mame_runner_hygiene.sh` — test, ci_portable
+
+**WHAT:** tools/run_replay_mame.sh clears what the run must write — the checksum log, INPUT_OUT, VIDEO_OUT and each file a DUMPS spec names — before the emulator starts, so a run that exits 0 without writing fails on its own missing log instead of passing on the previous one; a dump in the same directory that no spec names is kept; a run that writes a complete log still passes.
+
+**HOW:** the wrapper as shipped, its MAME_BIN a stub: `silent` exits 0 and writes nothing, `fail` exits 1, `good` writes a fresh log ending `END`. Stale outputs are planted before each run.
+
+**EXPECTS:** silent and fail -> non-zero exit and every planted output gone; the unnamed dump kept; good -> exit 0 on its own fresh log. The 14z-197 shape: a seeded `END 1` log and a no-output exit 0 returned success with the stale log in place (the FBNeo sibling has cleared its outputs since 14z-90, #12, tests/test_fbneo_runner_hygiene.sh).
 
 ### `test_mask_ranges_reader.sh` — test, emulator
 
@@ -3478,7 +3494,7 @@ the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guar
 
 **HOW:** a fake romdir fixture (no real dump at risk) through the tool's guard with each alias shape, then a real separate-directory build (~2 s).
 
-**EXPECTS:** every alias refused with the sources untouched, the legitimate build working.
+**EXPECTS:** every alias refused with the sources untouched, the legitimate build working. Section 7 (14z-197, GitHub #245): a generated vsavjw.zip kept in romdir, and a symlink already at the output path, are never written through — the output is a fresh regular file and both link targets are byte-identical afterwards.
 
 ### `test_select_port_hygiene.sh` — test, ci_portable
 

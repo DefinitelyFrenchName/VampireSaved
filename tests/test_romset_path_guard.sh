@@ -10,6 +10,11 @@
 # HOW: a fake romdir fixture (no real dump at risk) through the tool's guard with each alias
 #   shape, then a real separate-directory build (~2 s).
 # EXPECTS: every alias refused with the sources untouched, the legitimate build working.
+#   Section 7 (14z-197, GitHub #245): a generated vsavjw.zip kept in romdir, and a symlink
+#   already at the output path, are never written through — the output is a fresh regular
+#   file and both link targets are byte-identical afterwards.
+#
+# MUST-FIRE: shadow-tool: old-write — a copy of the tool that mirrors romdir's vsavjw.zip and opens the output path in place (the pre-#245 write) must clobber a link target and FAIL section 7 (mode: the copy is the tool under test)
 #
 # THE DEFECT. The tool's docstring promises "the reference set in ROMDIR is
 # never modified". Nothing enforced it. With outdir == romdir the overlay
@@ -39,12 +44,36 @@
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 rc=0
 fail() { echo "  FAIL: $*"; rc=1; }
 
 T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
 FAKE="$T/romdir"
 mkdir -p "$FAKE"
+
+# old_write <copy> — the pre-#245 tool: romdir's vsavjw.zip mirrored like any
+# zip, and the output opened IN PLACE (O_TRUNC follows a link at that path).
+# Each substitution must apply exactly once, or the control tests nothing.
+old_write() {
+    python3 - "$REPO/tools/build_wide_romset.py" "$1" <<'PY2'
+import sys
+s = open(sys.argv[1]).read()
+for old, new in (
+        ("        if z == GENERATED:\n", "        if False:\n"),
+        ('    fd, tmp = tempfile.mkstemp(dir=a.outdir, prefix=".vsavjw.", suffix=".tmp")\n',
+         "    fd, tmp = os.open(out_path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC), out_path\n")):
+    if s.count(old) != 1:
+        sys.exit(f"old_write: {old.strip()!r} found {s.count(old)} times, not once")
+    s = s.replace(old, new)
+open(sys.argv[2], "w").write(s)
+PY2
+}
+TOOL="$REPO/tools/build_wide_romset.py"
+if vs_ctl_is old-write; then
+    old_write "$T/old_write.py" || { echo "REFUSED: CONTROL=old-write could not build its copy"; exit 3; }
+    TOOL="$T/old_write.py"
+fi
 
 # A fake reference set: real zips (so the tool gets far enough to be
 # destructive) with contents it never inspects before the overlay loop.
@@ -63,7 +92,7 @@ hashes() { (cd "$FAKE" && for f in *.zip; do
 BEFORE="$(hashes)"
 
 # `run <outdir>` — returns the tool's exit status, output in $T/out
-run() { python3 tools/build_wide_romset.py "$FAKE" "$1" > "$T/out" 2>&1; }
+run() { python3 "$TOOL" "$FAKE" "$1" > "$T/out" 2>&1; }
 
 must_reject() { # must_reject <label> <outdir>
     if run "$2"; then
@@ -99,7 +128,7 @@ NEST="$T/outer/inner_romdir"
 mkdir -p "$NEST"
 cp "$FAKE"/*.zip "$NEST/"
 NEST_BEFORE="$(cd "$NEST" && shasum -a 1 ./*.zip)"
-if python3 tools/build_wide_romset.py "$NEST" "$T/outer" > "$T/out" 2>&1; then
+if python3 "$TOOL" "$NEST" "$T/outer" > "$T/out" 2>&1; then
     fail "romdir inside outdir: ACCEPTED"
 elif grep -qi "refusing to build" "$T/out"; then
     echo "  ok: romdir inside outdir refused"
@@ -136,6 +165,60 @@ else
     printf '%s\n' "$BEFORE" > "$T/before.txt"
     printf '%s\n' "$AFTER"  > "$T/after.txt"
     diff "$T/before.txt" "$T/after.txt" | sed 's/^/        /'
+fi
+
+echo "== 7. NO WRITE THROUGH A LINK AT THE OUTPUT PATH (GitHub #245) =="
+# section7 <tool> <dir> — prints one line per breach, exit 1 if any.
+# (a) a generated vsavjw.zip kept in romdir (a player keeping sets together);
+# (b) a symlink already at the output path, to a file outside both trees, with
+#     a romdir holding no vsavjw.zip (so (a)'s mechanism cannot reach it).
+# Both targets are sentinels; each must be byte-identical afterwards, the new
+# output a REGULAR zip carrying the fake vsavj member, and no staging file left.
+section7() {
+    D="$2"; mkdir -p "$D/romdir" "$D/romdir_b" "$D/out_b" "$D/elsewhere"
+    cp "$FAKE"/vsavj.zip "$FAKE"/vsav.zip "$D/romdir/"
+    cp "$FAKE"/vsavj.zip "$FAKE"/vsav.zip "$D/romdir_b/"
+    python3 - "$D/romdir/vsavjw.zip" "$D/elsewhere/keep.zip" <<'PY2'
+import sys, zipfile
+for p in sys.argv[1:]:
+    with zipfile.ZipFile(p, "w") as z:
+        z.writestr("precious.bin", b"previous compiled game")
+PY2
+    ln -s "$D/elsewhere/keep.zip" "$D/out_b/vsavjw.zip"
+    A0="$(shasum -a 1 < "$D/romdir/vsavjw.zip")"; B0="$(shasum -a 1 < "$D/elsewhere/keep.zip")"
+    bad=0
+    python3 "$1" "$D/romdir" "$D/out_a" --qsound 0 > "$D/a.log" 2>&1 || { echo "    (a) the build failed: $(tail -1 "$D/a.log")"; bad=1; }
+    python3 "$1" "$D/romdir_b" "$D/out_b" --qsound 0 > "$D/b.log" 2>&1 || { echo "    (b) the build failed: $(tail -1 "$D/b.log")"; bad=1; }
+    [ "$(shasum -a 1 < "$D/romdir/vsavjw.zip")" = "$A0" ] || { echo "    (a) romdir's vsavjw.zip WAS OVERWRITTEN"; bad=1; }
+    [ "$(shasum -a 1 < "$D/elsewhere/keep.zip")" = "$B0" ] || { echo "    (b) the output link's target WAS OVERWRITTEN"; bad=1; }
+    for o in out_a out_b; do
+        f="$D/$o/vsavjw.zip"
+        if [ -L "$f" ] || [ ! -f "$f" ]; then echo "    $o: vsavjw.zip is not a regular file"; bad=1; continue; fi
+        python3 -c 'import sys,zipfile; n=zipfile.ZipFile(sys.argv[1]).namelist(); sys.exit(0 if "vm3.03" in n and "precious.bin" not in n else 1)' "$f" \
+            || { echo "    $o: vsavjw.zip does not hold the built members"; bad=1; }
+        [ -z "$(ls -A "$D/$o" | grep '\.tmp$' || true)" ] || { echo "    $o: a staging file was left behind"; bad=1; }
+    done
+    grep -q 'skipped .*vsavjw.zip: a generated set' "$D/a.log" || { echo "    (a) romdir's vsavjw.zip was not reported skipped"; bad=1; }
+    return $bad
+}
+if section7 "$TOOL" "$T/s7" > "$T/s7.txt" 2>&1; then
+    echo "  ok: (a) romdir's generated vsavjw.zip and (b) an outside link target both unchanged; outputs are regular zips"
+else
+    fail "a link at the output path was written through:"; sed 's/^/    /' "$T/s7.txt"
+fi
+
+if ! vs_ctl_is old-write; then
+    echo "== 8. control =="
+    if ! old_write "$T/ctl.py" > "$T/ctl_build.txt" 2>&1; then
+        vs_ctl_dead old-write "the copy could not be built: $(tail -1 "$T/ctl_build.txt")" || rc=1
+    elif section7 "$T/ctl.py" "$T/s8" > "$T/s8.txt" 2>&1; then
+        vs_ctl_dead old-write "the pre-#245 write passed section 7" || rc=1
+    elif grep -q "(a) romdir's vsavjw.zip WAS OVERWRITTEN" "$T/s8.txt" \
+            && grep -q "(b) the output link's target WAS OVERWRITTEN" "$T/s8.txt"; then
+        vs_ctl_fired old-write "both link targets overwritten by the pre-#245 write ((a) romdir's vsavjw.zip, (b) the outside target)"
+    else
+        vs_ctl_dead old-write "section 7 failed for another reason: $(head -1 "$T/s8.txt")" || rc=1
+    fi
 fi
 
 echo

@@ -127,6 +127,7 @@ declares	test_effect_placeholders
 declares	test_emu_run_compare
 declares	test_emulator_runner
 declares	test_emulator_staleness
+declares	test_entropy_tripwire
 declares	test_escape_triage
 declares	test_expectation_provenance
 declares	test_fbneo_boot_log
@@ -150,6 +151,7 @@ declares	test_mame_bin_pinned
 declares	test_mame_default_bin
 declares	test_mame_ident
 declares	test_mame_parity
+declares	test_mame_runner_hygiene
 declares	test_map_table_readers
 declares	test_md_subset
 declares	test_measures_contract
@@ -191,6 +193,7 @@ declares	test_release_prune
 declares	test_release_recipe_text
 declares	test_release_roundtrip
 declares	test_rompath_reject
+declares	test_romset_path_guard
 declares	test_roulette_tag_rows
 declares	test_rpl2siminputs
 declares	test_rule5_census

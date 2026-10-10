@@ -136,47 +136,22 @@ jobs:
             *) echo "FAIL: unexpected output from the build driver"; exit 1 ;;
           esac
 
-      # Rule 7 tripwire (L7-03): no non-ignored file may look like ROM
-      # content. Entropy is a proxy, not a proof — but a committed binary
-      # blob is exactly what it catches, and rule 7 is the one rule whose
-      # violation is not recoverable by a later commit.
+      # Rule 7 tripwire (L7-03): no file may look like ROM content. Entropy
+      # is a proxy, not a proof — but a committed binary blob is exactly what
+      # it catches, and rule 7 is the one rule whose violation is not
+      # recoverable by a later commit.
       #
-      # THRESHOLD 6.0, MEASURED, not the 3.0 the issue suggested — 3.0 would
-      # flag every text file in the repo and the check would be noise.
-      # Measured on this tree (bits/byte): ci_portable.txt 4.72,
-      # gen_donovan_patch.py 4.76, STATE.md 5.15, a placed code blob 5.60,
-      # and a DECRYPTED ROM IMAGE 6.56. 6.0 sits above everything the repo
-      # legitimately holds and below ROM content, which is the separation
-      # the rule actually needs.
-      - name: rule-7 entropy tripwire on untracked, non-ignored files
-        run: |
-          set -eu
-          git status --porcelain --untracked-files=all | awk '$1=="??"{print $2}' > /tmp/untracked.txt
-          if [ -s /tmp/untracked.txt ]; then
-            python3 - <<'PY'
-          import math, sys
-          bad = []
-          for path in open("/tmp/untracked.txt").read().split():
-              try:
-                  b = open(path, "rb").read(65536)
-              except OSError:
-                  continue
-              if len(b) < 512:
-                  continue
-              freq = [0]*256
-              for x in b: freq[x] += 1
-              h = -sum((c/len(b))*math.log2(c/len(b)) for c in freq if c)
-              if h > 6.0:
-                  bad.append((path, round(h, 2)))
-          if bad:
-              print("FAIL: high-entropy untracked files (rule 7 — no ROM content):")
-              for p, h in bad: print(f"  {p}  {h} bits/byte (limit 6.0)")
-              sys.exit(1)
-          print("ok: no high-entropy untracked files")
-          PY
-          else
-            echo "ok: no untracked files"
-          fi
+      # THE INDEX, NOT `??` LINES (14z-197, GitHub #249): this step used to
+      # select `git status` lines marked `??`, untracked files only — on this
+      # checkout every file is committed and clean, so it printed "ok" over
+      # the committed blob it existed to catch. tools/entropy_tripwire.py
+      # reads `git ls-files` (committed and staged) AND the untracked,
+      # non-ignored files; the threshold (6.0 bits/byte, measured 14z-93:
+      # text 4.7-5.2, a placed code blob 5.60, a decrypted ROM image 6.56)
+      # and the four allowed formats (path AND magic) are in its docstring;
+      # tests/test_entropy_tripwire.sh is its ground truth.
+      - name: rule-7 entropy tripwire on every tracked and untracked file
+        run: python3 tools/entropy_tripwire.py
 
       # ---- the ROM-free gates -----------------------------------------
       # The list is tests/ci_portable.txt, which also records WHICH gates

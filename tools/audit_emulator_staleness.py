@@ -58,6 +58,20 @@ A RED NEWEST ROW (same ruling): a gate whose newest row is FAIL, TIMEOUT or MISS
 until 14z-192 it was not judged at all. It FAILs at freeze/release cadence (within the scope above) and is a
 NOTE at session; `--names` lists it with the stale gates, so `run_all_emulator.sh --stale` re-runs it.
 
+A SKIPPED NEWEST ROW (14z-197, GitHub #252) is judged the same way: a SKIP is no evidence, so it cannot clear an
+older PASS whose inputs have moved since, nor an older FAIL. Until 14z-197 a SKIP row was neither red nor PASS,
+replaced the gate's older row and was then ignored — the gate vanished from the audit and from `--names`, so
+`--stale` could never re-run it. Any newest gate row that is not PASS and not red is in this class.
+
+THE RUN'S OWN DIRT IS A CANDIDATE (14z-197, GitHub #251). The candidates are the paths `git diff` reports since
+the run's commit plus today's untracked files — so a path the run measured DIRTY and that was since REVERTED to
+that commit, or an untracked input since DELETED, was never a candidate, and `same_as_run` never compared it:
+the green described content that no longer exists, and the audit said nothing had moved. Every path the run
+recorded as dirty — the record's status lines and `commit.txt`'s dirty list — now joins the candidates of the
+gates judged on THAT run (per run, never per commit: two runs at one commit can carry different dirt), and is
+judged by content like any other: unchanged measured dirt is not moved; reverted, deleted or edited dirt is;
+dirt with no record to compare is moved.
+
 THE VERDICT BY CADENCE (the ruling): at `session` cadence a stale list is a NOTE — the
 information a session acts on (`run_all_emulator.sh --stale` re-runs exactly those) —
 and the exit is 0; at `freeze` or `release` cadence it is a FAIL (exit 1), because a
@@ -143,6 +157,17 @@ def same_as_run(repo, path, rec):
     return not os.path.exists(f)
 
 
+def run_dirt(run, rec):
+    """Every path the run recorded as dirty, added, deleted or untracked at its start: the record's
+    status lines and commit.txt's dirty list (#251)."""
+    out = set()
+    if rec:
+        out |= {l[3:].split(" -> ")[-1].strip('"') for l in rec.get("status") or [] if len(l) > 3}
+    if run and os.path.isfile(os.path.join(run, "commit.txt")):
+        out |= set(read_run(run)[1])
+    return out
+
+
 def read_run(run):
     commit_lines = open(os.path.join(run, "commit.txt"), encoding="utf-8").read().splitlines()
     commit = commit_lines[0].split()[0] if commit_lines and commit_lines[0].strip() else ""
@@ -185,16 +210,14 @@ def stale_gates(root, repo, commit, rows, run=None):
     """-> (stale: {gate: [moved paths]}, undeclared: [gate], passed: [gate], unknown: [gate], red: [gate]).
     A row carrying its own 'commit' and 'run' (newest_rows) is judged against them; otherwise against
     `commit` and `run`. `unknown` names passed gates whose recorded commit is not in the repository;
-    `red` the gates whose newest row is FAIL, TIMEOUT or MISSING."""
-    moved, pools, recs = {}, {}, {}
+    `red` the gates whose newest row is FAIL, TIMEOUT, MISSING or SKIP (any verdict but PASS, #252)."""
+    moved, pools, recs, dirt = {}, {}, {}, {}
     stale, undeclared, passed, unknown, red = {}, [], [], [], []
     for r in rows:
         if "@" in r["gate"]:
             continue
-        if r["verdict"] in RED:
-            red.append(r["gate"])
-            continue
-        if r["verdict"] != "PASS":
+        if r["verdict"] in RED or r["verdict"] != "PASS":
+            red.append(r["gate"])   # red, or SKIP: no green to judge (#252)
             continue
         g = r["gate"]
         passed.append(g)
@@ -217,10 +240,13 @@ def stale_gates(root, repo, commit, rows, run=None):
             undeclared.append(g)
             continue
         prefixes = list(toks) + [f"tests/{g}.sh"] + list(gf.IMPLIED)
-        hits = sorted(_covered_hits(pools[c], prefixes))
         d = r.get("run") or run
         if d not in recs:
             recs[d] = read_record(d) if d else None
+        if d not in dirt:   # this run's own recorded dirt (#251), as a pool of its own
+            dp = run_dirt(d, recs[d])
+            dirt[d] = (sorted(dp), dp, {})
+        hits = sorted(_covered_hits(pools[c], prefixes) | _covered_hits(dirt[d], prefixes))
         hits = [h for h in hits if not same_as_run(repo, h, recs[d])]   # the run already had it (14z-192)
         if gf.REGISTRY in hits and not registry_row_moved(root, repo, c, g, d, recs[d]):
             hits.remove(gf.REGISTRY)   # only another gate's row, or a comment, moved (#237)
@@ -416,7 +442,7 @@ def main():
                   lambda g: f"{g}: {' '.join(stale[g][:6])}{' …' if len(stale[g]) > 6 else ''}  (since {since[g][:12]})"):
         print(f"  ok: no passed gate has a moved input since the commit it passed on")
     if red:
-        report(red, "gate(s) whose newest row is red (FAIL, TIMEOUT or MISSING) — no green to judge",
+        report(red, "gate(s) whose newest row is red or SKIP (FAIL, TIMEOUT, MISSING, SKIP) — no green to judge",
                lambda g: f"{g}: {next(r['verdict'] for r in rows if r['gate'] == g)}  (on {since[g][:12]})")
     if (stale or red) and a.cadence == "session":
         print("      re-run exactly these: tests/run_all_emulator.sh --stale")

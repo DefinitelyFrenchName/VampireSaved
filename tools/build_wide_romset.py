@@ -18,8 +18,10 @@ import argparse
 import binascii
 import hashlib
 import os
+import tempfile
 import zipfile
 
+GENERATED = "vsavjw.zip"  # the one file this tool writes; never mirrored in
 MEMBER = 0x400000  # every appended member is exactly one 4MB unit: the gfx
                    # loader consumes members 4 at a time and mis-sizes if
                    # they differ, and QSound's mask needs a power of two.
@@ -95,6 +97,14 @@ def main():
 
     os.makedirs(a.outdir, exist_ok=True)
     for z in sorted(os.listdir(a.romdir)):
+        if z == GENERATED:
+            # A generated set kept beside the reference dumps (14z-197, GitHub
+            # #245): mirroring it would make the output path a link back into
+            # ROMDIR. It is not an input — this tool reads vsavj.zip and
+            # vsav.zip only — so it is left where it is and not linked.
+            print(f"  skipped {os.path.join(a.romdir, z)}: a generated set, "
+                  f"not a reference dump (left untouched)")
+            continue
         if z.endswith(".zip"):
             dst = os.path.join(a.outdir, z)
             if os.path.islink(dst) or os.path.exists(dst):
@@ -106,30 +116,27 @@ def main():
     print(f"  read {src_path} sha1 "
           f"{hashlib.sha1(open(src_path,'rb').read()).hexdigest()}")
 
-    out_path = os.path.join(a.outdir, "vsavjw.zip")
+    out_path = os.path.join(a.outdir, GENERATED)
     blank = b"\x00" * MEMBER
-    with zipfile.ZipFile(out_path, "w", zipfile.ZIP_DEFLATED) as zf:
-        for n in sorted(src.namelist()):
-            zf.writestr(n, src.read(n))
-        for i in range(a.qsound):
-            zf.writestr(f"vsw.{21+i}m", blank)
-        GROUP_B = ["vm3.14m", "vm3.16m", "vm3.18m", "vm3.20m"]
-        parent = zipfile.ZipFile(os.path.join(a.romdir, "vsav.zip"))
-        # WIDE v1.1 (14z-86): the Z80 driver members are CONTENT members
-        # named vsw.z01/z02 (sentinel CRCs 0xdec0de38/39 in both
-        # descriptors) so builds can patch the sound driver (M5 songs)
-        # without hash-shadowing to vsav.zip's pristine vm3.01/02 (the
-        # 14z-60z class). The canonical overlay carries stock bytes.
-        for zn, pn in (("vsw.z01", "vm3.01"), ("vsw.z02", "vm3.02")):
-            zf.writestr(zn, parent.read(pn))
-        for i in range(a.gfx):
-            name = f"vsw.{31+2*i}m"   # odd names mirror the stock interleave
-            if a.gfx_copy_group_b and i < len(GROUP_B):
-                zf.writestr(name, parent.read(GROUP_B[i]))
-            else:
-                zf.writestr(name, blank)
-        for i in range(a.prg):
-            zf.writestr(f"vsw.{41+i}", b"\x00" * 0x80000)
+    # STAGED THROUGH A FRESH REGULAR FILE (14z-197, GitHub #245). Opening
+    # out_path with mode "w" FOLLOWS a symlink already sitting there — a link
+    # into ROMDIR from an earlier overlay, or one to anywhere else — and
+    # truncates its target; check_disjoint() compares the two directories and
+    # cannot see a link through one file. mkstemp creates a NEW file (O_EXCL)
+    # and os.replace() renames over the directory ENTRY, so a link at out_path
+    # is replaced, never written through.
+    fd, tmp = tempfile.mkstemp(dir=a.outdir, prefix=".vsavjw.", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "wb") as fh:
+            write_overlay(fh, src, a, blank)
+        umask = os.umask(0)
+        os.umask(umask)
+        os.chmod(tmp, 0o666 & ~umask)   # the mode a plain open() would give
+        os.replace(tmp, out_path)
+    except BaseException:
+        if os.path.lexists(tmp):
+            os.remove(tmp)
+        raise
     print(f"  wrote {out_path}: vsavj members + {a.qsound} QSound + {a.gfx} GFX "
           f"+ {a.prg} PRG appended "
           f"({(MEMBER*(a.qsound+a.gfx) + 0x80000*a.prg)//(1024*1024)} MB of zero fill)")
@@ -153,6 +160,32 @@ def main():
         print("  its own directory (build/wide_canary/rompath) and never pass")
         print("  it to pack_build.sh --merge. tools/audit_romset_identity.py")
         print("  fails any build that does.")
+
+
+def write_overlay(fh, src, a, blank):
+    """The clone zip's members, written to an open file (main stages it)."""
+    with zipfile.ZipFile(fh, "w", zipfile.ZIP_DEFLATED) as zf:
+        for n in sorted(src.namelist()):
+            zf.writestr(n, src.read(n))
+        for i in range(a.qsound):
+            zf.writestr(f"vsw.{21+i}m", blank)
+        GROUP_B = ["vm3.14m", "vm3.16m", "vm3.18m", "vm3.20m"]
+        parent = zipfile.ZipFile(os.path.join(a.romdir, "vsav.zip"))
+        # WIDE v1.1 (14z-86): the Z80 driver members are CONTENT members
+        # named vsw.z01/z02 (sentinel CRCs 0xdec0de38/39 in both
+        # descriptors) so builds can patch the sound driver (M5 songs)
+        # without hash-shadowing to vsav.zip's pristine vm3.01/02 (the
+        # 14z-60z class). The canonical overlay carries stock bytes.
+        for zn, pn in (("vsw.z01", "vm3.01"), ("vsw.z02", "vm3.02")):
+            zf.writestr(zn, parent.read(pn))
+        for i in range(a.gfx):
+            name = f"vsw.{31+2*i}m"   # odd names mirror the stock interleave
+            if a.gfx_copy_group_b and i < len(GROUP_B):
+                zf.writestr(name, parent.read(GROUP_B[i]))
+            else:
+                zf.writestr(name, blank)
+        for i in range(a.prg):
+            zf.writestr(f"vsw.{41+i}", b"\x00" * 0x80000)
 
 
 if __name__ == "__main__":

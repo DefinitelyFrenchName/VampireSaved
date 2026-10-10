@@ -46,6 +46,8 @@
 # MUST-FIRE: shadow-tool: ondemand-judged — a copy of the tool without the ondemand exemption must FAIL the ondemand g_out at release cadence (mode: that copy is the tool section 2d2 runs; section 2d2 must fail; 14z-196)
 # MUST-FIRE: shadow-tool: whole-registry — a copy of the tool that judges tests/ci_emulator.tsv as one file again (the pre-#237 rule) must name g_other stale though only g_own's row and a comment moved (mode: that copy is the tool section 2f runs; section 2f must fail)
 # MUST-FIRE: shadow-tool: newest-dir — a copy of the tool that reads only the NEWEST run directory (the pre-#211 run of record) must miss g_follows behind a newer partial run and a newer empty one (mode: that copy is the tool section 2b runs; section 2b must fail)
+# MUST-FIRE: shadow-tool: skip-ignored — a copy of the tool that drops a SKIP newest row (the pre-#252 rule) must let g_follows vanish behind a newer SKIP though its input moved (mode: that copy is the tool section 2g runs; section 2g must fail)
+# MUST-FIRE: shadow-tool: dirt-ignored — a copy of the tool whose candidates are only `git diff` and today's untracked files (the pre-#251 rule) must pass the run whose measured dirt was reverted and deleted (mode: that copy is the tool section 2h runs; section 2h must fail)
 #
 # WHY: at the 14z-174 release tier the MiSTer lane's green was carried on inputs checked
 # by hand; shape 2 of docs/project/gate_qualification_scope.md is "a gate whose input moved
@@ -173,10 +175,68 @@ TOOL4="$TOOL"; vs_ctl_is whole-registry && TOOL4="$W/tool_wholereg.py"
 sed 's|^        if reg_all.get(g, {}).get("scope") == "ondemand":$|        if False:  # CONTROL ondemand-judged|' "$TOOL" > "$W/tool_ondjudged.py"
 cmp -s "$TOOL" "$W/tool_ondjudged.py" && { echo "FAIL: could not build the ondemand-judged shadow — the line moved"; exit 1; }
 TOOL3O="$TOOL"; vs_ctl_is ondemand-judged && TOOL3O="$W/tool_ondjudged.py"
+# THE SKIP ROOT (section 2g, 14z-197, #252): R2's gates, an older run where both PASSED, then the
+# declared replay moves, then a NEWER run whose g_follows row is SKIP (and g_still PASS).
+R5="$W/repo5"; cp -R "$R" "$R5"; rm -rf "$R5/build"/emu_*
+plant "$R5/build/emu_a_pass" 100
+mkdir -p "$R5/build/emu_b_skip"; echo "$BASE" > "$R5/build/emu_b_skip/commit.txt"
+printf 'gate\tlane\tscope\tverdict\tseconds\tdetail\ng_follows\tmame\trelease\tSKIP\t1\tno emulator\ng_still\tmame\trelease\tPASS\t12\t\n' > "$R5/build/emu_b_skip/results.tsv"
+python3 - "$R5/build" <<'PY2'
+import os, sys
+for i, d in enumerate(("emu_a_pass", "emu_b_skip")):
+    t = 1700000000 + 100 * i
+    os.utime(os.path.join(sys.argv[1], d, "results.tsv"), (t, t))
+PY2
+python3 - "$TOOL" "$W/tool_skipignored.py" <<'PY2'
+import sys
+s = open(sys.argv[1]).read()
+old = '        if r["verdict"] in RED or r["verdict"] != "PASS":\n'
+new = '        if r["verdict"] != "PASS" and r["verdict"] not in RED:\n            continue  # CONTROL skip-ignored\n        if r["verdict"] in RED:\n'
+if s.count(old) != 1:
+    sys.exit("could not build the skip-ignored shadow — the line moved")
+open(sys.argv[2], "w").write(s.replace(old, new))
+PY2
+[ $? = 0 ] || { echo "FAIL: could not build the skip-ignored shadow"; exit 1; }
+TOOL5="$TOOL"; vs_ctl_is skip-ignored && TOOL5="$W/tool_skipignored.py"
+on5() {  # on5 <tool> <cadence> <out> [--names] — exit code, each gate's newest row over R5's runs
+    t="$1"; c="$2"; o="$3"; shift 3
+    python3 "$t" --root "$R5" --repo "$R5" --cadence "$c" "$@" > "$o" 2>&1; echo $?; }
+
+# THE DIRT ROOT (section 2h, 14z-197, #251): one gate following tools/input.txt and tools/extra.txt; records
+# taken by tools/run_record.py itself — emu_clean on the clean base, emu_dirt with input.txt edited and
+# extra.txt untracked, emu_norec naming input.txt dirty in commit.txt with no record. Then the dirt is
+# REVERTED (input.txt back to the commit) and extra.txt DELETED, so `git diff` reports nothing.
+R6="$W/repo6"; mkdir -p "$R6/tests" "$R6/tools"
+printf '#!/bin/sh\n# g_dirt.sh — a stub\n# FOLLOWS: tools/input.txt tools/extra.txt\n: "${MAME_BIN:-}"\n' > "$R6/tests/g_dirt.sh"
+printf 'g_dirt\tmame\trelease\tromset\t-\tstub\n' > "$R6/tests/ci_emulator.tsv"
+echo committed > "$R6/tools/input.txt"
+( cd "$R6" && git init -q && git $CFG add -A && git $CFG commit -q -m base ) || { echo "FAIL: scratch dirt repository"; exit 1; }
+B6="$(cd "$R6" && git rev-parse HEAD)"
+rec6() {  # rec6 <dir> — a run on B6 that PASSED g_dirt, its record taken NOW
+    mkdir -p "$R6/build/$1"; echo "$B6" > "$R6/build/$1/commit.txt"
+    printf 'gate\tlane\tscope\tverdict\tseconds\tdetail\ng_dirt\tmame\trelease\tPASS\t10\t\n' > "$R6/build/$1/results.tsv"
+    python3 - "$R6" "$R6/build/$1/run_record_start.json" <<'PY2'
+import json, sys; sys.path.insert(0, "tools"); import run_record as rr
+json.dump(rr.build(sys.argv[1], phase="start"), open(sys.argv[2], "w"))
+PY2
+}
+rec6 emu_clean
+echo "dirty measured" > "$R6/tools/input.txt"; echo "untracked measured" > "$R6/tools/extra.txt"
+rec6 emu_dirt
+mkdir -p "$R6/build/emu_norec"; printf '%s\ntools/input.txt\n' "$B6" > "$R6/build/emu_norec/commit.txt"
+cp "$R6/build/emu_clean/results.tsv" "$R6/build/emu_norec/results.tsv"
+sed 's|^        hits = sorted(_covered_hits(pools\[c\], prefixes) \| _covered_hits(dirt\[d\], prefixes))$|        hits = sorted(_covered_hits(pools[c], prefixes))  # CONTROL dirt-ignored|' "$TOOL" > "$W/tool_dirtignored.py"
+cmp -s "$TOOL" "$W/tool_dirtignored.py" && { echo "FAIL: could not build the dirt-ignored shadow — the line moved"; exit 1; }
+TOOL6="$TOOL"; vs_ctl_is dirt-ignored && TOOL6="$W/tool_dirtignored.py"
+on6() {  # on6 <tool> <run dir> <cadence> <out> [--names] — exit code
+    t="$1"; d="$2"; c="$3"; o="$4"; shift 4
+    python3 "$t" --root "$R6" --repo "$R6" --run "$R6/build/$d" --cadence "$c" "$@" > "$o" 2>&1; echo $?; }
+
 on4() {  # on4 <tool> <run dir> <out> — exit code, at release cadence
     python3 "$1" --root "$R4" --repo "$R4" --run "$R4/build/$2" --cadence release > "$3" 2>&1; echo $?; }
 
-if [ -n "$VS_CTL" ] && [ "$VS_CTL" != newest-dir ] && [ "$VS_CTL" != keys-ignored ] && [ "$VS_CTL" != scope-ignored ] && [ "$VS_CTL" != whole-registry ] && [ "$VS_CTL" != ondemand-judged ]; then
+if [ -n "$VS_CTL" ] && [ "$VS_CTL" != newest-dir ] && [ "$VS_CTL" != keys-ignored ] && [ "$VS_CTL" != scope-ignored ] && [ "$VS_CTL" != whole-registry ] && [ "$VS_CTL" != ondemand-judged ] \
+   && [ "$VS_CTL" != skip-ignored ] && [ "$VS_CTL" != dirt-ignored ]; then
     case "$VS_CTL" in
         moved-input)    rc="$(tool_on emu_plant freeze)";   f="$W/o_emu_plant_freeze.txt" ;;
         headroom-eaten) rc="$(tool_on emu_headroom session)"; f="$W/o_emu_headroom_session.txt" ;;
@@ -278,7 +338,60 @@ rc="$(on4 "$TOOL" emu_regdirty "$W/o_regdirty.txt")"
 grep -q 'g_other: tests/ci_emulator.tsv' "$W/o_regdirty.txt" && ok "a run that recorded the registry dirty keeps the whole-file rule (g_other stale)" \
     || { bad "g_other not stale on the dirty-registry run (exit $rc)"; sed 's/^/        /' "$W/o_regdirty.txt"; }
 
+echo "== 2g. a newer SKIP row does not hide a moved input (14z-197, #252)"
+rc="$(on5 "$TOOL5" freeze "$W/o_skip.txt")"
+if [ "$rc" = 1 ] && grep -q 'g_follows: SKIP' "$W/o_skip.txt"; then
+    ok "behind a newer SKIP, g_follows (its older PASS's input moved) is named and freeze cadence FAILs"
+else
+    bad "the newer SKIP hid g_follows (exit $rc)"; sed 's/^/        /' "$W/o_skip.txt"
+fi
+rc="$(on5 "$TOOL5" session "$W/o_skip_s.txt")"
+grep -q 'NOTE: .*newest row is red or SKIP' "$W/o_skip_s.txt" && [ "$rc" = 0 ] && ok "at session cadence it is a NOTE (exit 0)" \
+    || { bad "SKIP newest row at session (exit $rc)"; sed 's/^/        /' "$W/o_skip_s.txt"; }
+on5 "$TOOL5" session "$W/o_skip_n.txt" --names > /dev/null
+grep -qx 'g_follows' "$W/o_skip_n.txt" && ok "--names lists it, so --stale re-runs it" || bad "--names printed '$(tr '\n' ' ' < "$W/o_skip_n.txt")'"
+grep -qx 'g_still' "$W/o_skip_n.txt" && bad "--names listed g_still (PASS, nothing moved)" || ok "g_still (newest row PASS, nothing moved) is not listed"
+
+echo "== 2h. dirt the run measured is a candidate, judged by content (14z-197, #251)"
+echo committed > "$R6/tools/input.txt"; rm -f "$R6/tools/extra.txt"      # reverted and deleted: git diff is empty
+rc="$(on6 "$TOOL6" emu_dirt freeze "$W/o_dirt.txt")"
+if [ "$rc" = 1 ] && grep -q 'g_dirt: .*tools/extra.txt' "$W/o_dirt.txt" && grep -q 'g_dirt: .*tools/input.txt' "$W/o_dirt.txt"; then
+    ok "measured dirt REVERTED (input.txt) and an untracked input DELETED (extra.txt) are stale; freeze cadence FAILs"
+else
+    bad "reverted/deleted dirt not named (exit $rc)"; sed 's/^/        /' "$W/o_dirt.txt"
+fi
+on6 "$TOOL6" emu_dirt session "$W/o_dirt_n.txt" --names > /dev/null
+grep -qx 'g_dirt' "$W/o_dirt_n.txt" && ok "--names lists g_dirt" || bad "--names printed '$(tr '\n' ' ' < "$W/o_dirt_n.txt")'"
+rc="$(on6 "$TOOL6" emu_clean freeze "$W/o_clean.txt")"
+[ "$rc" = 0 ] && ! grep -q 'g_dirt:' "$W/o_clean.txt" && ok "a clean run at the SAME commit is judged on its own record: not stale (exit 0)" \
+    || { bad "the clean run at the same commit (exit $rc)"; sed 's/^/        /' "$W/o_clean.txt"; }
+rc="$(on6 "$TOOL6" emu_norec freeze "$W/o_norec.txt")"
+[ "$rc" = 1 ] && grep -q 'g_dirt: tools/input.txt' "$W/o_norec.txt" && ok "dirt in commit.txt with no record to compare is stale (exit 1)" \
+    || { bad "dirt with no record (exit $rc)"; sed 's/^/        /' "$W/o_norec.txt"; }
+echo "dirty measured" > "$R6/tools/input.txt"; echo "untracked measured" > "$R6/tools/extra.txt"
+rc="$(on6 "$TOOL6" emu_dirt freeze "$W/o_kept.txt")"
+[ "$rc" = 0 ] && ! grep -q 'g_dirt:' "$W/o_kept.txt" && ok "the same dirt, unchanged since the run, is not stale (exit 0)" \
+    || { bad "unchanged measured dirt (exit $rc)"; sed 's/^/        /' "$W/o_kept.txt"; }
+( cd "$R6" && git $CFG add -A tools && git $CFG commit -q -m "commit the measured dirt" )
+rc="$(on6 "$TOOL6" emu_dirt freeze "$W/o_committed.txt")"
+[ "$rc" = 0 ] && ! grep -q 'g_dirt:' "$W/o_committed.txt" && ok "the measured dirt COMMITTED unchanged is not stale (exit 0)" \
+    || { bad "committed measured dirt (exit $rc)"; sed 's/^/        /' "$W/o_committed.txt"; }
+( cd "$R6" && git $CFG reset -q --hard "$B6" ) && rm -f "$R6/tools/extra.txt"
+
 echo "== 3. controls"
+if [ "$VS_CTL" = skip-ignored ] || [ "$VS_CTL" = dirt-ignored ]; then
+    vs_ctl_fired "$VS_CTL" "section 2g/2h ran the $VS_CTL copy (mode)"
+else
+    rc="$(on5 "$W/tool_skipignored.py" freeze "$W/o_skipignored.txt")"
+    # (exit status is not the evidence: R5 inherits R's g_undeclared, a freeze-cadence FAIL of its own)
+    grep -q '^== emulator staleness' "$W/o_skipignored.txt" && ! grep -q 'g_follows' "$W/o_skipignored.txt" \
+        && vs_ctl_fired skip-ignored "the copy that drops a SKIP row never names g_follows, whose input moved (exit $rc)" \
+        || { vs_ctl_dead skip-ignored "exit $rc"; fail=1; }
+    rc="$(on6 "$W/tool_dirtignored.py" emu_dirt freeze "$W/o_dirtignored.txt")"
+    grep -q '^== emulator staleness' "$W/o_dirtignored.txt" && ! grep -q 'g_dirt:' "$W/o_dirtignored.txt" && [ "$rc" = 0 ] \
+        && vs_ctl_fired dirt-ignored "the copy without the run's dirt passes the reverted-and-deleted run (exit 0)" \
+        || { vs_ctl_dead dirt-ignored "exit $rc"; fail=1; }
+fi
 if [ "$VS_CTL" = ondemand-judged ]; then
     vs_ctl_fired ondemand-judged "section 2d2 ran the copy without the ondemand exemption (mode)"
 else
