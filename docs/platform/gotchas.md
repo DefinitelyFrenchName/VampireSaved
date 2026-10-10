@@ -3234,3 +3234,16 @@ every release. Rule: the run-time half is judged from the loader's own trace (`L
 library=X [0]; searching`, then `(RUNPATH from file Y)` naming the requester and the `trying file=` lines, no `needed
 by` lines), attributed to the package by the RUNPATH line, on a host that has nothing else installed — a build host
 resolves everything and proves nothing.
+
+## `find` IN A .BAT RUN FROM MSYS2 (OR WITH GIT'S usr\bin ON PATH) IS THE UNIX find — `find /c /v ""` walked the whole C: drive for hours (paid: 14z-197, GitHub #248)
+
+A batch file resolves bare tool names through `PATH`, and MSYS2's shell (MINGW64), which is how this project's
+gates drive `cmd //c PLAY.bat`, puts `/usr/bin` ahead of `C:\Windows\System32`. `PLAY.bat`'s `xcopy ... | find /c
+/v ""` (the newest-set test for #248) therefore ran MSYS2's `find`. That `find` read `/c` as a directory to walk and
+spent about three hours per call crawling `C:\`. The gate had no time bound, so ERIS ran it for 4 h 30 min before
+the maintainer asked. The same probe run from plain `cmd`, where `System32` comes first, had worked, so the
+measurement before the change did not see it. A player whose `PATH` carries Git for Windows' `usr\bin` is exposed
+the same way. Fixed: `PLAY.bat` calls `%SystemRoot%\System32\xcopy.exe` and `...\find.exe` by full path, and
+`tests/test_release_launcher_bat.sh` drives every `cmd` run under `timeout 120`. **The rule:** a `.bat` names
+Windows tools by full path whenever a same-named Unix tool exists (`find`, `sort`, `timeout`), and every remote or
+emulated run carries a time bound, so a hang turns into a FAIL in minutes.

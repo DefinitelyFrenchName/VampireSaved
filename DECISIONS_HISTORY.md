@@ -634,6 +634,17 @@ So: the launchers choose the most recently modified candidate set, and a stale c
 
 ---
 
+## Ruled 2026-10-10 (14z-197) — #248's Windows half: the shipped PLAY.bat equals the generator at release only
+
+**The question (AskUserQuestion):** *"#248's Windows half: test_release_launcher_bat requires release/merged-m23's shipped PLAY.bat to be byte-identical to what the generator emits NOW, and on Windows it drives only the shipped bytes. Changing PLAY.bat for 'newest wins' turns that gate red until a re-package, and the new logic would never be driven. How should the Windows half land?"* — options "Equality at release only", "Re-package merged-m23's .bat", "Hold until next release".
+
+**The maintainer:**
+- the maintainer: *"Equality at release only"*
+
+So: the PLAY.bat generator changes now (plain cmd; the newer of two sets by `xcopy /d /y /l`'s line count, measured on ERIS); `tests/test_release_launcher_bat.sh` drives the GENERATOR's bytes on Windows, and its shipped == generator check FAILs only at release cadence (a NOTE otherwise), when the release is re-packaged — the position PLAY.command is already in (#239).
+
+---
+
 ## Ruled 2026-10-10 (14z-197) — bbh's remaining links: the snapshot copy removed, the runners' output ours, the bbh instructions dropped, the shared copies ours
 
 **The questions (in chat):** four read-only links between this tree and `~/Developer/blackbox-harness`: (1) `tests/run_on_snapshot.sh` copies the bbh checkout into every snapshot (`BBH_HOME`), and `test_run_on_snapshot.sh` has a `shared-bbh` control for it; (2) both runners keep their output byte-identical to bbh's for its fidelity test; (3) the freeze rule [VSP-185] directs re-pointing bbh's lineage defaults, and a gotcha calls a new skill anchor document a two-repo edit; (4) `tests/lib/classify.sh` and `tests/lib/controls.sh` are hand-kept copies of bbh's code. Then whether `test_bbh_fidelity`, which compares the runners' output with bbh's, is deleted.

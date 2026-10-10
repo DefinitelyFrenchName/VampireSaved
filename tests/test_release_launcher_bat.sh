@@ -7,7 +7,8 @@
 #   path holding "(x86)", and it runs the ruled invocation: FBNeo `fbneo.exe vsavjw` from its
 #   own folder with the set copied into roms\ beside it, MAME `cps2.exe vsavjw -rompath <the
 #   set's folder>`; the release tree's copy is byte-identical to the generator's (both sha1s
-#   printed). Every shipped text of every package (README.md, MISTER.md, EMULATOR.md,
+#   printed) — checked at RELEASE cadence only, a NOTE otherwise (maintainer-ruled 2026-10-10,
+#   "Equality at release only": the generator moves ahead of the shipped copy between releases). Every shipped text of every package (README.md, MISTER.md, EMULATOR.md,
 #   apply_release.html) names only launchers THAT package ships, and carries no unselected
 #   platform marker; and the README the generator writes NOW claims that its package holds an emulator
 #   only on fbneo and mame, never on mister (#214), and that MAME's four "clone of nonexistent driver
@@ -17,7 +18,10 @@
 #   bytes — under cmd with PLAY_DRY_RUN=1: each success path (FBNeo: roms\vsavjw.zip created,
 #   the WOULD RUN line; MAME: the WOULD RUN line with -rompath at the set's folder) and each
 #   refusal (FBNeo: no romset, no binary, no profile, a junctioned roms\; MAME: no romset, no
-#   binary, a stock cps2.exe that does not know vsavjw), each non-zero and named.
+#   binary, a stock cps2.exe that does not know vsavjw), each non-zero and named — and, since
+#   14z-197 (#248, "prefer the newest one, always"), the NEWEST set wins over an older one in
+#   both orders on both launchers, under a folder whose name holds "(x86)". On Windows the
+#   bytes driven are the GENERATOR's (what the next release ships).
 # HOW: tools/package_release_platforms.py's launcher_bat_bytes() for both platforms (the
 #   bytes the packager writes), read as bytes; the package texts grepped for each launcher's
 #   name against the package's files; on Windows, staged copies driven by `cmd //c`, with a
@@ -36,6 +40,7 @@
 # MUST-FIRE: perturbed-copy: megaman-note-in-fbneo — the generator's README rendered for the FBNeo package with the MAME selection must FAIL on BOTH MAME-only notes: the four validation lines (#227) and the red bad-ROM box at every start (#234) belong to the MAME package only
 # MUST-FIRE: perturbed-copy: quarantine-name-wrong — the generator's MAME PLAY.command with its quarantine message put back to the pre-#239 "\"fbneo\" Not Opened" must FAIL: a MAME player told to look for a dialog naming fbneo is told about a program their package does not hold
 # MUST-FIRE: perturbed-copy: readme-names-absent-launcher — a copy of the release's texts whose mame package no longer ships PLAY.bat while its README still names it must FAIL: that is rule-checker run 2026-10-03-602's finding, the MiSTer README telling its reader to double-click two launchers its package never carried
+# MUST-FIRE: perturbed-copy: first-found — the generator's PLAY.bat with its candidate loop put back to first-found (the pre-#248 launcher) must run the older roms\ set over a newer rompath\ one and FAIL the Windows newest section; it runs only on Windows (REFUSED elsewhere)
 #
 # WHY. #145 (maintainer report 2026-09-16, reproduced on ERIS 2026-10-03): double-clicking
 # fbneo.exe exits at once and cps2.exe finds no ROMs; ruled 2026-10-03 "PLAY.bat launcher".
@@ -55,7 +60,7 @@ W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail=0
 ok()  { echo "  ok: $*"; }
 bad() { echo "FAIL: $*"; fail=1; }
-case "$VS_CTL" in ""|lf-endings|launch-line-changed|readme-names-absent-launcher|emu-text-in-mister|megaman-note-in-fbneo|quarantine-name-wrong) ;;
+case "$VS_CTL" in ""|lf-endings|launch-line-changed|readme-names-absent-launcher|emu-text-in-mister|megaman-note-in-fbneo|quarantine-name-wrong|first-found) ;;
 *) echo "REFUSED: CONTROL=$VS_CTL is not a mode of this gate"; exit 3 ;; esac
 sha1() { python3 -c "import hashlib,sys;print(hashlib.sha1(open(sys.argv[1],'rb').read()).hexdigest()[:12])" "$1"; }
 
@@ -74,6 +79,18 @@ for p in ("fbneo", "mame"):
     old, new = LINE[p]
     assert b.count(old) == 1, f"the {p} launch line is not where the control expects it"
     open(os.path.join(w, f"ctl_launch-line-changed_{p}.bat"), "wb").write(b.replace(old, new))
+    # first-found (#248's control): the candidate loop as it was before the newest rule
+    lines = b.split(b"\r\n")
+    hit = [i for i, l in enumerate(lines) if l.startswith(b"for %%C in (") and l.endswith(b' call :consider "%%~C"')]
+    assert len(hit) == 1, f"the {p} candidate loop is not where the first-found control expects it"
+    l = lines[hit[0]]
+    lines[hit[0]] = l.replace(b' if exist "%%~C" call :consider "%%~C"', b' if not defined ZIP if exist "%%~C" set "ZIP=%%~C"')
+    ff = b"\r\n".join(lines)
+    if p == "fbneo":
+        old2 = b'if /i "%ZIP%"=="%ROMS%\\vsavjw.zip" goto roms_has'
+        assert ff.count(old2) == 1, "the fbneo roms\\ copy test is not where the first-found control expects it"
+        ff = ff.replace(old2, b'if exist "%ROMS%\\vsavjw.zip" goto roms_has')
+    open(os.path.join(w, f"ctl_first-found_{p}.bat"), "wb").write(ff)
 PYEOF
 
 # check <file> <platform> -> prints the failures; exit 0 clean, 3 findings, anything else a
@@ -169,7 +186,8 @@ for p in fbneo mame; do
     shipped="$REL/$p/PLAY.bat"
     if [ -f "$shipped" ]; then
         if cmp -s "$shipped" "$W/$p.bat"; then ok "$p: $shipped is the generator's bytes (sha1 shipped $(sha1 "$shipped") = generator $(sha1 "$W/$p.bat"))"
-        else bad "$p: $shipped (sha1 $(sha1 "$shipped")) differs from the generator's output (sha1 $(sha1 "$W/$p.bat")) — re-package the release"; fi
+        elif [ "${VS_CADENCE:-session}" = release ]; then bad "$p: $shipped (sha1 $(sha1 "$shipped")) differs from the generator's output (sha1 $(sha1 "$W/$p.bat")) — re-package the release"
+        else echo "  NOTE: $p: $shipped (sha1 $(sha1 "$shipped")) is behind the generator (sha1 $(sha1 "$W/$p.bat")); equality is checked at release cadence (ruled 2026-10-10), when the release is re-packaged"; fi
     else
         bad "$p: $shipped absent — the release predates #145; re-package it"
     fi
@@ -302,14 +320,20 @@ MINGW*|MSYS*|CYGWIN*) ON_WIN=1 ;;
 *) ON_WIN=0 ;;
 esac
 if [ "$ON_WIN" = 0 ] || ! command -v cmd >/dev/null 2>&1; then
+    [ "$VS_CTL" = first-found ] && { echo "REFUSED: CONTROL=first-found drives cmd, which runs only on a Windows host (MSYS2)"; exit 3; }
     echo "  SKIP (said): the cmd-driven paths run only on a Windows host (MSYS2); this is $(uname -s)"
 else
-    # the bytes driven are the SHIPPED ones (asserted equal to the generator's above)
-    DRV_fbneo="$REL/fbneo/PLAY.bat"; DRV_mame="$REL/mame/PLAY.bat"
+    # the bytes driven are the GENERATOR's (what the next release ships; equal to the shipped copy at
+    # release cadence, above); under CONTROL=first-found, the pre-#248 copy
+    DRV_fbneo="$W/fbneo.bat"; DRV_mame="$W/mame.bat"
+    [ "$VS_CTL" = first-found ] && { DRV_fbneo="$W/ctl_first-found_fbneo.bat"; DRV_mame="$W/ctl_first-found_mame.bat"; }
     echo "  driving: fbneo PLAY.bat sha1 $(sha1 "$DRV_fbneo") ($DRV_fbneo), mame PLAY.bat sha1 $(sha1 "$DRV_mame") ($DRV_mame)"
     drive() {  # drive <dir> -> $OUT, $RC
         OUT="$W/drive.txt"; RC=0
-        ( cd "$1" && PLAY_DRY_RUN=1 cmd //c PLAY.bat </dev/null ) > "$OUT" 2>&1 || RC=$?
+        # BOUNDED (14z-197): a launcher that hangs is a FAIL in minutes, not a run that never ends —
+        # PLAY.bat's `find` once resolved to MSYS2's Unix find and walked C:\ for hours
+        ( cd "$1" && PLAY_DRY_RUN=1 timeout 120 cmd //c PLAY.bat </dev/null ) > "$OUT" 2>&1 || RC=$?
+        [ "$RC" = 124 ] && echo "  (the launcher was still running after 120 s and was stopped)" >> "$OUT"
     }
     refuse() {  # refuse <label> <dir> <expected message fragment>
         drive "$2"
@@ -384,6 +408,42 @@ CEOF
             D="$W/mm_nozip"; stage_mm "$D" wide no; refuse "mame, no romset" "$D" "vsavjw.zip not found"
             D="$W/mm_nobin"; stage_mm "$D" none yes; refuse "mame, no binary" "$D" "no prebuilt mame for windows-x86_64"
             D="$W/mm_stock"; stage_mm "$D" stock yes; refuse "mame, a stock cps2.exe that does not know vsavjw" "$D" "does not know the vsavjw driver"
+
+            # NEWEST WINS (#248): an older set in roms\ against a newer one in rompath\, and the
+            # reverse, under a folder whose name holds "(x86)"; one line per wrong choice
+            newest() {  # newest <fbneo bat> <mame bat> <dir>
+                # the stagers read DRV_*: set here and restored at the end, never as a `VAR=x func`
+                # prefix, which PERSISTS after a shell function returns ([VSP-110])
+                _nw_f="$DRV_fbneo"; _nw_m="$DRV_mame"; DRV_fbneo="$1"; DRV_mame="$2"
+                for older in roms rompath; do
+                    newer=rompath; [ "$older" = rompath ] && newer=roms
+                    D="$3/fb $older (x86)"; stage_fb "$D" yes no yes
+                    R="$D/emulator/bin/windows-x86_64/roms"; mkdir -p "$R"
+                    printf 'roms set' > "$R/vsavjw.zip"; printf 'rompath set' > "$D/rompath/vsavjw.zip"
+                    if [ "$older" = roms ]; then touch -t 202001010000 "$R/vsavjw.zip"; touch -t 202501010000 "$D/rompath/vsavjw.zip"
+                    else touch -t 202501010000 "$R/vsavjw.zip"; touch -t 202001010000 "$D/rompath/vsavjw.zip"; fi
+                    drive "$D"
+                    [ "$RC" = 0 ] || { echo "    fbneo/$older older: rc=$RC: $(head -2 "$OUT" | tr '\n' ' ')"; continue; }
+                    [ "$(cat "$R/vsavjw.zip")" = "$newer set" ] || echo "    fbneo/$older older: roms\\vsavjw.zip reads '$(cat "$R/vsavjw.zip")', not the newer $newer set"
+                    D="$3/mm $older (x86)"; stage_mm "$D" wide no
+                    mkdir -p "$D/roms"; printf 'roms set' > "$D/roms/vsavjw.zip"; printf 'rompath set' > "$D/rompath/vsavjw.zip"
+                    if [ "$older" = roms ]; then touch -t 202001010000 "$D/roms/vsavjw.zip"; touch -t 202501010000 "$D/rompath/vsavjw.zip"
+                    else touch -t 202501010000 "$D/roms/vsavjw.zip"; touch -t 202001010000 "$D/rompath/vsavjw.zip"; fi
+                    drive "$D"; DW="$(cygpath -w "$D")"
+                    grep -qF "cps2.exe\" vsavjw -rompath \"$DW\\$newer\" -skip_gameinfo" "$OUT" \
+                        || echo "    mame/$older older: not run on the newer $newer set (rc=$RC): $(grep -m1 'WOULD RUN' "$OUT" || head -1 "$OUT")"
+                done
+                DRV_fbneo="$_nw_f"; DRV_mame="$_nw_m"
+            }
+            newest "$DRV_fbneo" "$DRV_mame" "$W/nw" > "$W/nw.txt" 2>&1
+            if [ -s "$W/nw.txt" ]; then bad "windows: a launcher chose an older set (#248):"; cat "$W/nw.txt"
+            else ok "windows: fbneo and mame run the NEWER set in both orders under a folder holding (x86); FBNeo's roms\\ carries it"; fi
+            if [ -z "$VS_CTL" ]; then
+                newest "$W/ctl_first-found_fbneo.bat" "$W/ctl_first-found_mame.bat" "$W/nwc" > "$W/nwc.txt" 2>&1
+                if grep -q "fbneo/roms older: roms.*reads 'roms set'" "$W/nwc.txt" && grep -q 'mame/roms older: not run on the newer rompath set' "$W/nwc.txt"; then
+                    vs_ctl_fired first-found "the first-found launchers ran the older roms\\ set on both platforms"
+                else vs_ctl_dead first-found "the first-found launchers passed the newest section: $(head -1 "$W/nwc.txt")"; fail=1; fi
+            fi
         fi
     fi
 fi
