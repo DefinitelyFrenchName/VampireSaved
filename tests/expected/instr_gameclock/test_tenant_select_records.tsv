@@ -1,0 +1,8 @@
+# tests/expected/instr_gameclock/test_tenant_select_records.tsv — the game clock RAM:$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,
+# option A) by `tests/test_tenant_select_records.sh --freeze-clock` at 9f59c3cb: t13 = the variant-id
+# build (tests/lib/tenant_build.sh tenant_build_13, built fresh), t13_2800 its 2,800-frame splash run; every reference leg
+# held to replay.lua run live, every tap run to its reference leg's game clock.
+# leg<TAB>replay<TAB>frames<TAB>gameclock
+t13	36_pick_tenant_cell	1400	1b
+t13	37_p2_pick_tenant	1400	1b
+t13_2800	36_pick_tenant_cell	2800	93

@@ -9,11 +9,21 @@
 # HOW: static model against the reference data view with a one-byte corruption control;
 #   runtime on MAME reading $1C(a6)+4 at the record walker while the cursor hovers the
 #   cells.
+#   THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): trace_writes.lua counts
+#   EMULATED frames (tests/lua/emu_clock.lua); every tap run's game clock RAM:$FF8080 at its last frame is held to
+#   tests/expected/instr_gameclock/test_select_arrays.tsv, frozen by `--freeze-clock` from REFERENCE legs (no
+#   watch, no debugger), each held to replay.lua run live; one STAGING reference leg is held to replay.lua on every
+#   run (tests/lib/instr_align.sh).
 # EXPECTS: the model holds, the corruption fails, the engine fetches the predicted rows. A
-#   tenant at 0x13 costs six longs.
-# FOLLOWS: emu/mame-patches/ tests/lib/decrypt_cache.sh tests/lua/trace_writes.lua
+#   tenant at 0x13 costs six longs. Every tap run on emulated time at its frozen game clock, the staging leg on
+#   replay.lua's checksum.
+# FOLLOWS: emu/mame-patches/ tests/expected/instr_gameclock/ tests/lib/controls.sh tests/lib/decrypt_cache.sh
+#   tests/lib/instr_align.sh tests/lua/emu_clock.lua tests/lua/replay.lua tests/lua/trace_writes.lua
 #   tests/replays/11_pick_donovan.rpl tools/run_mame.sh tools/select_arrays.py
 #   tools/setup_mame.sh
+#
+# MUST-FIRE: known-bad: drift-clock — a tap run under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 992 emulated frames of 1,200 counted) must miss its frozen game clock (in-gate: one extra run; mode: every tap run runs the old clock and the gate FAILs)
+# MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs)
 #
 # WHY (14z-61). The port displays the tenant's select portrait today by
 # IN-PLACE record surgery on Jedah's records (tools/select_port.py), which
@@ -33,7 +43,7 @@
 #      $1C(a6)+4 at the record walker PRG:0x01AFA6. Static row arithmetic is
 #      a claim until the engine agrees with it (the house lesson).
 #
-# Usage: ROMDIR=... tests/test_select_arrays.sh
+# Usage: ROMDIR=... tests/test_select_arrays.sh [--freeze-clock]
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -57,6 +67,13 @@ cd "$REPO"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 fail=0
+FREEZE_CLOCK=0; [ "${1:-}" = "--freeze-clock" ] && FREEZE_CLOCK=1
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+. "$REPO/tests/lib/instr_align.sh"
+CLOCKS="tests/expected/instr_gameclock/test_select_arrays.tsv"
+[ "$FREEZE_CLOCK" = 1 ] && [ -n "$MODE" ] && { echo "REFUSED: --freeze-clock in control mode"; exit 3; }
+_clk=""; [ "$MODE" = drift-clock ] && _clk="INSTR_CLOCK=frame_done"
+REFBIN="${MAME_REF_BIN:-$HOME/.cache/vampire-saved/mame-ref/cps2}"
 
 DATA="$WORK/vsavj_data.bin"
 decrypt_view vsavj "$WORK/vsavj_op.bin" "$DATA"
@@ -120,9 +137,12 @@ echo "== 3. runtime: the engine fetches the rows the model predicts =="
 # record pointer at PRG:0x2689FE sits immediately before that array. Filter
 # it rather than pretend it is not there.
 runtime() {  # runtime <tag> <watch> <expected sequence> [filter]
-    WATCH="$2" TRACE_OUT="$WORK/$1.txt" FRAMES=1200 \
+    ia_note "$WORK/manifest.tsv" vsavj 11_pick_donovan vsavj - "$REPO/tests/replays/11_pick_donovan.rpl" 1200 \
+        "MAME_BIN=$REFBIN WATCH=$2" "$WORK/$1.align"
+    # shellcheck disable=SC2086
+    env $_clk WATCH="$2" TRACE_OUT="$WORK/$1.txt" FRAMES=1200 ALIGN_OUT="$WORK/$1.align" \
     REPLAY="$REPO/tests/replays/11_pick_donovan.rpl" MAME_SANDBOX="$WORK/sbx_$1" \
-    MAME_BIN="${MAME_REF_BIN:-$HOME/.cache/vampire-saved/mame-ref/cps2}" \
+    MAME_BIN="$REFBIN" \
         tools/run_mame.sh vsavj -debug -debugger none \
         -autoboot_script "$REPO/tests/lua/trace_writes.lua" \
         > "$WORK/$1.log" 2>&1 || {
@@ -147,6 +167,31 @@ runtime name_banner  "2675a0,100,r" "00272156 00272172 002721aa 0027221a "
 # wheel record (PRG:0x2689FE), constant across the whole select screen.
 runtime highlight    "268a00,120,r" "002725dc 00272594 00272532 002724a2 " \
                      "00272a68"
+
+echo "== 4. the instrument's alignment (#228 step 4, option A) =="
+if [ "$FREEZE_CLOCK" = 1 ]; then
+    [ "$fail" = 0 ] || { echo "REFUSED: sections 1-3 failed — nothing frozen"; exit 1; }
+    ia_freeze "$REPO/tests/lua/trace_writes.lua" "$WORK/manifest.tsv" "$WORK/fz" "${JOBS:-4}" "$WORK/clocks.tsv" \
+        > "$WORK/fz.txt" || { sed 's/^/  /' "$WORK/fz.txt"; echo "REFUSED: the alignment does not hold — nothing frozen"; exit 1; }
+    mkdir -p "$(dirname "$CLOCKS")"
+    { echo "# $CLOCKS — the game clock RAM:\$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,"
+      echo "# option A) by \`tests/test_select_arrays.sh --freeze-clock\` at $(git rev-parse --short=8 HEAD); every reference leg"
+      echo "# held to replay.lua run live, every tap run to its reference leg's game clock (tests/lib/instr_align.sh ia_freeze)."
+      echo "# leg<TAB>replay<TAB>frames<TAB>gameclock"
+      cat "$WORK/clocks.tsv"; } > "$CLOCKS"
+    echo "froze $(wc -l < "$WORK/clocks.tsv" | tr -d ' ') game clocks into $CLOCKS"
+    exit 0
+fi
+if ia_check_manifest "$CLOCKS" "$WORK/manifest.tsv" > "$WORK/align_bad.txt"; then
+    echo "  ok: every tap run on emulated time, at its frozen game clock"
+else echo "  FAIL: $(wc -l < "$WORK/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$WORK/align_bad.txt" | sed 's/^/        /'; fail=1; fi
+ia_stage test_select_arrays "$CLOCKS" "$REPO/tests/lua/trace_writes.lua" "$WORK/manifest.tsv" 1 "$WORK/st" "$MODE" || fail=1
+if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
+    [ "$fail" = 1 ] && { echo "FAIL: select record-array gate (control mode: $MODE)"; exit 1; }
+    echo "FAIL: select record-array gate — control mode $MODE left the gate green"; exit 1
+fi
+if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || fail=1; fi
+if [ "$IA_SKIP" = fired ]; then vs_ctl_fired first-frame-skip "$IA_SKIP_MSG"; else vs_ctl_dead first-frame-skip "$IA_SKIP_MSG" || fail=1; fi
 
 [ "$fail" = 0 ] || { echo "FAIL: select record-array gate"; exit 1; }
 echo "PASS: select record-array gate (static model + negative control +"

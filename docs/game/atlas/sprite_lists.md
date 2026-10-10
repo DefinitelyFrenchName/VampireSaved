@@ -73,15 +73,23 @@ past the end and jumps into unrelated data.
 | 10 | `0x01B7CC` | `0x01A236` | bare `rts` (a no-op list type) |
 | 12 | — (absent) | `0x01A1FC` | **composite / group list** |
 
-Legacy usage, measured on vanilla vsavj over replay 02
-(`tests/audit_effect_class_rows.sh`, opcodes-space read watch on each
-table slot):
+Legacy usage, measured on vanilla vsavj over the whole of replay 02 (5,520
+frames, 14z-197; `tests/audit_effect_class_rows.sh` section 3 prints every
+slot, opcodes-space read watch on each):
 
 | type | 0 | 2 | 4 | 6 | 8 | 10 |
 |---|---|---|---|---|---|---|
-| reads | 2260 | 4329 | 321 | **0** | **0** | 2702 |
+| reads | 6362 | 20664 | 487 | **0** | **0** | 13508 |
 
-Types 6 and 8 are dead in vanilla. Type 10 is a no-op handler but is
+(Until 14z-197 this table read 2260 / 4329 / 321 / 0 / 0 / 2702, all taken
+on the instrument's old frame_done clock: the type-10 run covered 2,817
+emulated frames of the replay's 5,520 (#228 step 3); the other columns came
+from 14z-71 runs whose coverage was not recorded — GitHub #228,
+`../../platform/gotchas.md` [MFI-5].)
+
+Types 6 and 8 read zero on replay 02. Type 6 is NOT dead in vanilla: legacy
+reaches it on other content (measured 14z-89, `../../project/patch_index.md`
+`beam_list_type6`). Type 10 is a no-op handler but is
 dispatched constantly — a bare `rts` is *not* evidence of a spare slot.
 
 ---

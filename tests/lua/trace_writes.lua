@@ -23,13 +23,18 @@
 --   env WATCH_FROM   opt-in "<frame>" (14z-170): arm the watchpoints at that frame, not at load
 --                    (an `ARMED <frame>` line marks it) — past the boot sweep
 --   env SAMPLE       opt-in "hexaddr,declen" (14z-170): log `S <frame> <hex>` whenever those bytes
---                    change — a run's OWN liveness trace. EVERY DEBUGGER STOP ADVANCES THE FRAME
---                    COUNTER ([CPE-5]): a "never read" is sound only from a run with no stop before
---                    its question, checked by its SAMPLE trajectory against a non-debug run's
---                    (tests/audit_x2b7ef4_reach_m18.sh, retired 14z-184; at commit 206ff15b). Frame 1 always logs the debugger's own
+--                    change — a run's OWN liveness trace. Until 14z-197 EVERY DEBUGGER STOP ADVANCED THE
+--                    FRAME COUNTER ([CPE-5]); the frame is an EMULATED frame since (below), but a stop can
+--                    still move the GAME ([MFI-2]), so a "never read" is still judged from a run's own
+--                    SAMPLE trajectory against a non-debug run's (tests/audit_x2b7ef4_reach_m18.sh,
+--                    retired 14z-184; at commit 206ff15b). Frame 1 always logs the debugger's own
 --                    initial break.
 --   env TRACE_OUT    log path (default trace_writes.txt)
---   env FRAMES       stop after this many frames (default 3600)
+--   env REPLAY, FRAMES (default 3600), INSTR_REFERENCE, INSTR_CLOCK, ANCHOR, MASK_RANGES, ALIGN_OUT:
+--                    tests/lua/emu_clock.lua — the frame is an EMULATED frame since 14z-197 (GitHub #228
+--                    step 4); until then this script counted frame_done calls, so each stop's UI frames
+--                    moved its input, its POKES, DUMPS and WATCH_FROM early ([MFI-5]). INSTR_REFERENCE=1 is
+--                    the reference leg: nothing is armed and no -debug is needed (WATCH is then not read).
 --   env DUMPS        "frame:lo-hi;..." (replay.lua grammar) — RAM dumps
 --                    written next to TRACE_OUT as dump_<frame>_<lo>.bin.
 --                    ADDED 14z-98: every -debug watch configuration is
@@ -43,7 +48,9 @@
 -- identify the source table pointer for table-copy loops without a full
 -- instruction trace.
 
-local watch = assert(os.getenv("WATCH"), "set WATCH=start,len")
+local C = dofile((debug.getinfo(1, "S").source:match("^@(.*/)") or "./") .. "emu_clock.lua"){
+    name = "trace_writes", frames = 3600 }
+local watch = C.reference and (os.getenv("WATCH") or "") or assert(os.getenv("WATCH"), "set WATCH=start,len")
 -- REGS_EXTRA (14z-170, opt-in): "D5,D2" appends those registers to every hit line, AFTER the
 -- fixed fields, so an unset REGS_EXTRA writes exactly the old line (every existing user unaffected).
 -- Added for the rally-threshold read, which indexes with D5 (audit_defense_row_residue.sh).
@@ -53,65 +60,14 @@ for r in (os.getenv("REGS_EXTRA") or ""):gmatch("[^,]+") do
     regs_extra[#regs_extra + 1] = r
 end
 local out_path = os.getenv("TRACE_OUT") or "trace_writes.txt"
-local max_frames = tonumber(os.getenv("FRAMES") or "") or 3600
 
 local machine = manager.machine
 local debugger = machine.debugger
-assert(debugger, "run mame with -debug")
+assert(debugger or C.reference, "run mame with -debug (or INSTR_REFERENCE=1 for the reference leg)")
 local cpu = machine.devices[":maincpu"]
 
 local f = assert(io.open(out_path, "wb"))
-local frame = 0
 local hits = 0
-
--- input playback (subset of replay.lua: apply held tokens per frame)
-local held = {}
-local replay_path = os.getenv("REPLAY")
-local FIELDS = nil
-if replay_path then
-    local ioport = machine.ioport
-    local function fld(port, name) return ioport.ports[port].fields[name] end
-    FIELDS = {
-        p1 = { U = fld(":IN0", "P1 Up"), D = fld(":IN0", "P1 Down"),
-               L = fld(":IN0", "P1 Left"), R = fld(":IN0", "P1 Right"),
-               ["1"] = fld(":IN0", "P1 Button 1"), ["2"] = fld(":IN0", "P1 Button 2"),
-               ["3"] = fld(":IN0", "P1 Button 3"), ["4"] = fld(":IN1", "P1 Button 4"),
-               ["5"] = fld(":IN1", "P1 Button 5"), ["6"] = fld(":IN1", "P1 Button 6") },
-        p2 = { U = fld(":IN0", "P2 Up"), D = fld(":IN0", "P2 Down"),
-               L = fld(":IN0", "P2 Left"), R = fld(":IN0", "P2 Right"),
-               ["1"] = fld(":IN0", "P2 Button 1"), ["2"] = fld(":IN0", "P2 Button 2"),
-               ["3"] = fld(":IN0", "P2 Button 3"), ["4"] = fld(":IN1", "P2 Button 4"),
-               ["5"] = fld(":IN1", "P2 Button 5"), ["6"] = fld(":IN2", "P2 Button 6") },
-        sys = { S1 = fld(":IN2", "1 Player Start"), S2 = fld(":IN2", "2 Players Start"),
-                C1 = fld(":IN2", "Coin 1"), C2 = fld(":IN2", "Coin 2"),
-                SV = fld(":IN2", "Service 1"), TS = fld(":IN2", "Service Mode") },
-    }
-    for line in io.lines(replay_path) do
-        local body = line:gsub("#.*", "")
-        local range, rest = body:match("^%s*(%S+)%s+(.-)%s*$")
-        if range then
-            local a, b = range:match("^(%d+)%-(%d+)$")
-            if not a then a = range:match("^(%d+)$"); b = a end
-            if a then
-                for spec in rest:gmatch("%S+") do
-                    local who, toks = spec:match("^(%a+%d?)=(%S+)$")
-                    if who and FIELDS[who] then
-                        local step = (who == "sys") and 2 or 1
-                        for i = 1, #toks, step do
-                            local fldo = FIELDS[who][toks:sub(i, i + step - 1)]
-                            if fldo then
-                                for fr = tonumber(a), tonumber(b) do
-                                    held[fr] = held[fr] or {}
-                                    held[fr][#held[fr] + 1] = fldo
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-end
 
 -- LENGTH IS HEX, and it must be matched as hex (14z-71). MAME's debugger
 -- parses `wpset addr,len,...` numbers as HEX, so a length of "a" means ten
@@ -130,6 +86,8 @@ end
 -- counting"): a watch that stops on the boot sweep or on hot records shifts every later input,
 -- so a "never read" answer is sound only from a run with NO stops before its question — the
 -- 14z-170 reachability re-measurement (tests/audit_x2b7ef4_reach_m18.sh, retired 14z-184; at commit 206ff15b).
+-- (The frame counter no longer moves with a stop since 14z-197, #228 step 4; a stop can still move the game,
+-- [MFI-2], so the rule above stands for the game's state.)
 local WPCMD = { p = "wpset", d = "wpdset", o = "wposet" }
 local cmds = {}
 for one in watch:gmatch("[^;]+") do
@@ -150,7 +108,8 @@ local sample_a, sample_n = (os.getenv("SAMPLE") or ""):match("^(%x+),(%d+)$")
 sample_a, sample_n = tonumber(sample_a or "", 16), tonumber(sample_n or "")
 local sample_prev = nil
 local function arm()
-    -- register the watchpoints (or breakpoints, mode "b") on the maincpu
+    -- register the watchpoints (or breakpoints, mode "b") on the maincpu; the reference leg arms nothing
+    if C.reference then return end
     debugger:command(string.format("focus 0"))
     for _, c in ipairs(cmds) do debugger:command(c) end
 end
@@ -171,62 +130,54 @@ local dump_dir = out_path:match("^(.*)/") or "."
 local pokes = {}
 dofile((debug.getinfo(1, "S").source:match("^@(.*/)") or "./") .. "pokes_spec.lua").append(pokes, os.getenv("POKES"))   -- #201: F and F1-F2 entries
 
-local pressed = {}
-dofile((debug.getinfo(1, "S").source:match("^@(.*/)") or "./") .. "clock_check.lua")("trace_writes", replay_path)   -- #228: CLOCK_OUT=<file> records frame_done calls against emulated frames
-emu.register_frame_done(function()
-    frame = frame + 1
-    if watch_from and frame == watch_from then arm(); f:write(string.format("ARMED %d\n", frame)) end
-    if sample_a then
-        local hx = {}
-        for a = sample_a, sample_a + sample_n - 1 do hx[#hx + 1] = string.format("%02x", poke_space:read_u8(a)) end
-        local v = table.concat(hx)
-        if v ~= sample_prev then f:write(string.format("S %d %s\n", frame, v)); sample_prev = v end
-    end
-    for _, pk in ipairs(pokes) do
-        if pk[1] == frame then
-            local a = pk[2]
-            for b in pk[3]:gmatch("%x%x") do
-                poke_space:write_u8(a, tonumber(b, 16))
-                a = a + 1
+-- THE ORDER WITHIN A FRAME is this script's before 14z-197: arming, the sample, the pokes, the dumps — and
+-- emu_clock.lua's ANCHOR sits between the pokes and the dumps, where replay.lua takes its checksum.
+C.run{
+    on_pokes = function(frame)
+        if watch_from and frame == watch_from then arm(); f:write(string.format("ARMED %d\n", frame)) end
+        if sample_a then
+            local hx = {}
+            for a = sample_a, sample_a + sample_n - 1 do hx[#hx + 1] = string.format("%02x", poke_space:read_u8(a)) end
+            local v = table.concat(hx)
+            if v ~= sample_prev then f:write(string.format("S %d %s\n", frame, v)); sample_prev = v end
+        end
+        for _, pk in ipairs(pokes) do
+            if pk[1] == frame then
+                local a = pk[2]
+                for b in pk[3]:gmatch("%x%x") do
+                    poke_space:write_u8(a, tonumber(b, 16))
+                    a = a + 1
+                end
             end
         end
-    end
-    for _, dm in ipairs(dumps) do
-        if dm[1] == frame then
-            local df = assert(io.open(string.format("%s/dump_%d_%x.bin",
-                                                    dump_dir, frame, dm[2]), "wb"))
-            local bytes = {}
-            for a = dm[2], dm[3] - 1 do
-                bytes[#bytes + 1] = string.char(poke_space:read_u8(a))
-            end
-            df:write(table.concat(bytes)); df:close()
-        end
-    end
-    if FIELDS then
-        local want = {}
-        for _, fldo in ipairs(held[frame + 1] or {}) do want[fldo] = true end
-        for _, group in pairs(FIELDS) do
-            for _, fldo in pairs(group) do
-                if want[fldo] and not pressed[fldo] then fldo:set_value(1); pressed[fldo] = true
-                elseif not want[fldo] and pressed[fldo] then fldo:clear_value(); pressed[fldo] = nil end
+    end,
+    on_frame = function(frame)
+        for _, dm in ipairs(dumps) do
+            if dm[1] == frame then
+                local df = assert(io.open(string.format("%s/dump_%d_%x.bin",
+                                                        dump_dir, frame, dm[2]), "wb"))
+                local bytes = {}
+                for a = dm[2], dm[3] - 1 do
+                    bytes[#bytes + 1] = string.char(poke_space:read_u8(a))
+                end
+                df:write(table.concat(bytes)); df:close()
             end
         end
-    end
-    if frame >= max_frames then
+    end,
+    on_end = function(frame)
         f:write(string.format("END %d hits %d\n", frame, hits))
         f:close()
-        manager.machine:exit()
-    end
-end)
+    end,
+}
 
 emu.register_periodic(function()
-    if debugger.execution_state == "stop" then
+    if debugger and debugger.execution_state == "stop" then
         local st = cpu.state
         local extra = ""
         for _, r in ipairs(regs_extra) do extra = extra .. string.format(" %s %08x", r, st[r].value) end
         f:write(string.format(
             "frame %d PC %06x D0 %08x D1 %08x A0 %08x A1 %08x A2 %08x A3 %08x A4 %08x A6 %08x%s\n",
-            frame, st["CURPC"].value, st["D0"].value, st["D1"].value,
+            C.frame(), st["CURPC"].value, st["D0"].value, st["D1"].value,
             st["A0"].value, st["A1"].value, st["A2"].value, st["A3"].value,
             st["A4"].value, st["A6"].value, extra))
         hits = hits + 1

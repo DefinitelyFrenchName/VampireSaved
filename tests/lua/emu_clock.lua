@@ -19,7 +19,9 @@
 --   local clock = dofile((debug.getinfo(1, "S").source:match("^@(.*/)") or "./") .. "emu_clock.lua")
 --   local C = clock{ name = "<instrument>", frames = <default max frames> }
 --   if not C.reference then ...arm breakpoints/watchpoints... end
---   C.run{ on_frame = function(frame) ... end,   -- optional: the instrument's per-frame work
+--   C.run{ on_pokes = function(frame) ... end,   -- optional: the frame's scheduled RAM writes (POKES), applied
+--                                                --   BEFORE the anchor, as replay.lua applies them before its checksum
+--          on_frame = function(frame) ... end,   -- optional: the instrument's per-frame work
 --          on_end   = function(frame) ... end }  -- optional: write the trailer; the module exits after
 --   C.frame()  -- the current frame (for a periodic handler that tags what it sees)
 --
@@ -146,6 +148,7 @@ return function(opts)
             first = false
             last_fn = fn
             frame = frame + 1
+            if cb.on_pokes then cb.on_pokes(frame) end
             if anchor_frame and frame == anchor_frame then
                 anchor_text = string.format(" anchor %d %016x", frame, fnv1a64(workram_masked()))
             end

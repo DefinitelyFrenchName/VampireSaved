@@ -1,0 +1,6 @@
+# tests/expected/instr_gameclock/test_beam_anim_walk.tsv — the game clock RAM:$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,
+# option A) by `tests/test_beam_anim_walk.sh --freeze-clock` at 9f59c3cb: native = vsav2,
+# ours = build/hui61; every reference leg held to replay.lua run live, every watch run to its reference leg's game clock.
+# leg<TAB>replay<TAB>frames<TAB>gameclock
+native	83b_hui_ray_2p	3230	41
+ours	83b_hui_ray_2p	3230	41

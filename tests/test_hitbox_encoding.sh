@@ -13,10 +13,21 @@
 #   the un-mirrored convention is the negative control.
 # EXPECTS: pointers as decoded, A3 the node's record on every write, 8/8 hits on the first
 #   overlap frame with no whiff overlap, +0x54 = record +0x17 (or the forced generic 1); the
-#   un-mirrored convention fails most hits.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/field_trace.lua
+#   un-mirrored convention fails most hits. Both tap runs on emulated time at their frozen game clocks, the staging
+#   leg on replay.lua's checksum.
+#   THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): trace_writes.lua counts
+#   EMULATED frames (tests/lua/emu_clock.lua) — so a tap frame names the same emulated frame as field_trace's
+#   since 14z-197 (until then each tap stop's UI frames moved the tap's frame number and its input ahead); both tap
+#   runs' game clock RAM:$FF8080 at the last frame is held to tests/expected/instr_gameclock/test_hitbox_encoding.tsv,
+#   frozen by `--freeze-clock` from REFERENCE legs (no watch, no debugger) each held to replay.lua run live; one
+#   STAGING reference leg is held to replay.lua on every run (tests/lib/instr_align.sh).
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/instr_gameclock/ tests/lib/controls.sh
+#   tests/lib/instr_align.sh tests/lua/emu_clock.lua tests/lua/field_trace.lua tests/lua/replay.lua
 #   tests/lua/trace_writes.lua tools/anim_nodes.py tools/name_moves.py tools/run_mame.sh
 #   tools/setup_mame.sh
+#
+# MUST-FIRE: known-bad: drift-clock — a tap run under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 5,520 emulated frames of 5,620 counted) must miss its frozen game clock (in-gate: one extra run; mode: both tap runs run the old clock and the gate FAILs)
+# MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs)
 #
 # WHAT IT HOLDS. tools/hitbox_records.py's reading of a tenant's hitbox data
 # (the five tables behind +0x80..+0x90, 8-byte (x,y,hw,hh) boxes authored
@@ -46,7 +57,7 @@
 #      0x0A / 0x52) — the "+0x1D class byte" is never what the engine used.
 # Emulator tier (MAME, ~4 min: two field legs + two -debug legs, parallel).
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/don_m27] tests/test_hitbox_encoding.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/don_m27] tests/test_hitbox_encoding.sh [--freeze-clock]
 #
 # HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -80,6 +91,12 @@ EX="$BUILD/extract"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+. "$REPO/tests/lib/instr_align.sh"
+FREEZE_CLOCK=0; [ "${1:-}" = "--freeze-clock" ] && FREEZE_CLOCK=1
+CLOCKS="tests/expected/instr_gameclock/test_hitbox_encoding.tsv"
+[ "$FREEZE_CLOCK" = 1 ] && [ -n "$MODE" ] && { echo "REFUSED: --freeze-clock in control mode"; exit 3; }
+_clk=""; [ "$MODE" = drift-clock ] && _clk="INSTR_CLOCK=frame_done"
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
 FIELDS="ff8410:w:x,ff8414:w:y,ff840b:b:face,ff841c:l:node,ff8494:l:boxes,ff8480:l:t0,ff8484:l:t1,ff8488:l:t2,ff848c:l:t3,ff8490:l:t4,ff8460:l:hbase,ff8464:l:hcomp,ff8810:w:p2x,ff8814:w:p2y,ff880b:b:p2face,ff8894:l:p2boxes,ff8854:b:p2cls,ff8850:w:p2hp,ff885c:b:p2frz"
@@ -104,7 +121,10 @@ for p in 9 10; do
     rm -rf "$W/sbf$p" "$W/sbw$p"; mkdir -p "$W/sbf$p" "$W/sbw$p"
     ( cd "$W" && MAME_SANDBOX="$W/sbf$p" REPLAY="$W/r_$p.rpl" FIELDS="$FIELDS" FIELD_OUT="$W/field_$p.txt" FIELD_FROM=2300 FIELD_TO="$FR" FRAMES="$FR" \
       "$REPO/tools/run_mame.sh" vsav2 -autoboot_script "$REPO/tests/lua/field_trace.lua" > "$W/field_$p.log" 2>&1 ) </dev/null &
-    ( cd "$W" && MAME_SANDBOX="$W/sbw$p" REPLAY="$W/r_$p.rpl" WATCH="ff8850,6" TRACE_OUT="$W/writes_$p.txt" FRAMES="$FR" \
+    ia_note "$W/manifest.tsv" vsav2 "r_$p" vsav2 - "$W/r_$p.rpl" "$FR" "MAME_BIN=$MAME_BIN WATCH=ff8850,6" "$W/writes_$p.align"
+    # shellcheck disable=SC2086
+    ( cd "$W" && env $_clk MAME_SANDBOX="$W/sbw$p" REPLAY="$W/r_$p.rpl" WATCH="ff8850,6" TRACE_OUT="$W/writes_$p.txt" FRAMES="$FR" \
+      ALIGN_OUT="$W/writes_$p.align" \
       "$REPO/tools/run_mame.sh" vsav2 -debug -debugger none -autoboot_script "$REPO/tests/lua/trace_writes.lua" > "$W/writes_$p.log" 2>&1 ) </dev/null &
 done
 wait
@@ -147,13 +167,26 @@ check(u(v["hbase"]) == H.base and u(v["hcomp"]) == H.comp, f"+0x60/+0x64 = hitbo
 check([u(v[k]) for k in ("t0", "t1", "t2")] == [H.tables["vuln0"], H.tables["vuln1"], H.tables["vuln2"]], "+0x80/84/88 = base+base[0..2]")
 check(u(v["t3"]) == H.tables["attack"] and u(v["t4"]) == H.tables["push"], f"+0x8C = ATTACK = base+base[4] ({H.tables['attack']:#x}), +0x90 = PUSH = base+base[3] ({H.tables['push']:#x})")
 # 2. HP writes: A3 = attack table + idx*0x20, idx = attacker's hbA>>8 at that frame (post-process write at vs2 0x17452 -> logged PC 0x17456)
+# THE FRAME IS THE WRITE'S OWN (14z-197, #228 step 4): the tap counts emulated frames, so a write logged at frame F is
+# the field run's frame F — measured on part 9, the 8 HP writes at exactly the 8 frames the field run's HP drops
+# (2693 ... 5098). Until then the tap counted frame_done calls and logged each write 1-2 frames LATE (2695 2847 3000
+# ...), which this lookup absorbed by reading frame fr - 1; under the emulated clock fr - 1 is the frame BEFORE the hit,
+# the attacker's startup node, and the check reads 0/8.
 hp_writes = [(fr, regs) for fr, pc, regs in T9 if pc == 0x17456]
 good = 0
 for fr, regs in hp_writes:
-    a3 = int(regs["A3"], 16); r = R9.get(fr - 1) or R9.get(fr)
+    a3 = int(regs["A3"], 16); r = R9.get(fr)
+    if r is None: continue
     idx = hbA.get(u(r["node"]), 0) >> 8
     if a3 == H.tables["attack"] + idx * 0x20: good += 1
 check(good == len(hp_writes) and len(hp_writes) >= 8, f"{good}/{len(hp_writes)} HP writes carried A3 = attack record of the attacker's node (hbA>>8)")
+# THE FRAMES ARE ALIGNED, checked directly (rule-checker run 2026-10-10-802 Q4): the node lookup above passes on labels
+# 1-2 frames LATE too (the node persists), so it cannot show the tap names the field run's frame. Every HP write must
+# fall on a frame where the field run's HP drops, and every such drop must have its write: measured equal on emulated
+# time, off by 1-2 under the frame_done clock (this check is what the drift-clock mode's labels fail).
+drops = sorted(fr for fr in R9 if (fr - 1) in R9 and R9[fr]["p2hp"] < R9[fr - 1]["p2hp"])
+wfr = sorted(fr for fr, _ in hp_writes)
+check(wfr == drops, f"the {len(wfr)} HP writes fall on exactly the field run's {len(drops)} HP-drop frames (writes {wfr[:3]}..., drops {drops[:3]}...)")
 # 3. overlap: for every active frame, mirrored vs unmirrored convention
 def first_overlap_runs(mirror):
     runs = []
@@ -191,7 +224,7 @@ def cls_after(R, fr):
 n_ok = 0
 for fr, regs in hp_writes:
     rec = H.record((int(regs["A3"], 16) - H.tables["attack"]) // 0x20)
-    if cls_after(R9, fr - 1) in (rec["cls"], 1): n_ok += 1
+    if cls_after(R9, fr) in (rec["cls"], 1): n_ok += 1
 check(n_ok == len(hp_writes), f"fighter path: victim +0x54 = record +0x17 or the forced 1 on {n_ok}/{len(hp_writes)} hits")
 R10 = rows(10); T10 = taps(10)
 seen = []
@@ -200,10 +233,35 @@ for fr, pc, regs in T10:
     a3 = int(regs["A3"], 16)
     if H.tables["attack"] <= a3 < H.tables["attack"] + 0x20 * 4096 and a3 < H.end: rec = H.record((a3 - H.tables["attack"]) // 0x20)
     else: rec = H.record((a3 - H.proj_attack()) // 0x20, proj=True)
-    seen.append((fr, rec["cls"], cls_after(R10, fr - 1)))
+    seen.append((fr, rec["cls"], cls_after(R10, fr)))
 special = [(fr, c, got) for fr, c, got in seen if c not in (0, 1)]
 check(len(special) >= 3 and all(c == got for fr, c, got in special), f"projectile / multi-hit / column: victim +0x54 == record +0x17 on {sum(1 for _, c, g in special if c == g)}/{len(special)} hits {sorted({c for _, c, _ in special})}")
 sys.exit(1 if fails else 0)
 PY
+echo "== 4. the instrument's alignment (#228 step 4, option A)"
+if [ "$FREEZE_CLOCK" = 1 ]; then
+    [ "$fail" = 0 ] || { echo "REFUSED: sections 1-3 failed — nothing frozen"; exit 1; }
+    ia_freeze "$REPO/tests/lua/trace_writes.lua" "$W/manifest.tsv" "$W/fz" "${JOBS:-4}" "$W/clocks.tsv" \
+        > "$W/fz.txt" || { sed 's/^/  /' "$W/fz.txt"; echo "REFUSED: the alignment does not hold — nothing frozen"; exit 1; }
+    mkdir -p "$(dirname "$CLOCKS")"
+    { echo "# $CLOCKS — the game clock RAM:\$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,"
+      echo "# option A) by \`tests/test_hitbox_encoding.sh --freeze-clock\` at $(git rev-parse --short=8 HEAD): native vs2, the rigs"
+      echo "# r_9 and r_10, Donovan's name_moves parts nine and ten; every reference leg held to replay.lua run live, every tap run to"
+      echo "# its reference leg's game clock."
+      echo "# leg<TAB>replay<TAB>frames<TAB>gameclock"
+      cat "$W/clocks.tsv"; } > "$CLOCKS"
+    echo "froze $(wc -l < "$W/clocks.tsv" | tr -d ' ') game clocks into $CLOCKS"
+    exit 0
+fi
+if ia_check_manifest "$CLOCKS" "$W/manifest.tsv" > "$W/align_bad.txt"; then ok "both tap runs on emulated time, at their frozen game clocks"
+else bad "$(wc -l < "$W/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$W/align_bad.txt" | sed 's/^/        /'; fi
+ia_stage test_hitbox_encoding "$CLOCKS" "$REPO/tests/lua/trace_writes.lua" "$W/manifest.tsv" 1 "$W/st" "$MODE" || fail=1
+if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
+    [ "$fail" = 1 ] && { echo "FAIL (control mode: $MODE)"; exit 1; }
+    echo "FAIL — control mode $MODE left the gate green"; exit 1
+fi
+if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || fail=1; fi
+if [ "$IA_SKIP" = fired ]; then vs_ctl_fired first-frame-skip "$IA_SKIP_MSG"; else vs_ctl_dead first-frame-skip "$IA_SKIP_MSG" || fail=1; fi
+
 [ $fail = 0 ] && echo PASS || echo FAIL
 exit $fail

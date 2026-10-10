@@ -12,13 +12,23 @@
 #   select_port.PLACEMENTS and compares the built image; negative controls (a pristine
 #   image, a flipped composed byte, a flipped host byte) must fail; runtime on WIDE MAME
 #   with replay 36 reads the record walker.
+#   THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): trace_writes.lua counts
+#   EMULATED frames (tests/lua/emu_clock.lua); every tap run's game clock RAM:$FF8080 at its last frame is held to
+#   tests/expected/instr_gameclock/test_tenant_select_records.tsv, frozen by `--freeze-clock` from REFERENCE legs
+#   (no watch, no debugger) each held to replay.lua run live; one STAGING reference leg is held to replay.lua on
+#   every run (tests/lib/instr_align.sh).
 # EXPECTS: static equal, the three controls failing, the engine's rows as predicted;
-#   SKIP_RUNTIME=1 skips section 3.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/donovan-m5/mask
-#   tests/expected/vsavj/masked-v2/logs/11_pick_donovan.log tests/lib/decrypt_cache.sh
-#   tests/lib/tenant_build.sh tests/lua/replay.lua tests/lua/trace_writes.lua tests/replays/
+#   SKIP_RUNTIME=1 skips section 3. Every tap run on emulated time at its frozen game clock, the staging leg on
+#   replay.lua's checksum.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/donovan-m5/mask tests/expected/instr_gameclock/
+#   tests/expected/vsavj/masked-v2/logs/11_pick_donovan.log tests/lib/controls.sh tests/lib/decrypt_cache.sh
+#   tests/lib/instr_align.sh tests/lib/tenant_build.sh tests/lua/emu_clock.lua tests/lua/replay.lua
+#   tests/lua/trace_writes.lua tests/replays/
 #   tools/build_donovan.sh tools/check_tenant_select.py tools/compare_window.py
 #   tools/run_mame.sh tools/run_replay_mame.sh tools/setup_mame.sh
+#
+# MUST-FIRE: known-bad: drift-clock — a tap run under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 1,059 emulated frames of 1,400 counted) must miss its frozen game clock (in-gate: one extra run of the highlight tap — two other taps lose exactly 256 frames, which the byte cannot see; mode: every tap run runs the old clock and the gate FAILs)
+# MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs)
 #
 # WHY (14z-62/62e). The slot-0x0F port displays the tenant's select UI by
 # in-place surgery on Jedah's records (tools/select_port.py). De-substituting
@@ -43,7 +53,7 @@
 #      for all three UI pieces, ending on the tenant's composed records —
 #      read through $1C(a6)+4 at the record walker, the 14z-61 method.
 #
-# Usage: ROMDIR=... tests/test_tenant_select_records.sh [outbase]
+# Usage: ROMDIR=... tests/test_tenant_select_records.sh [outbase] [--freeze-clock]
 #   outbase: an existing variant-id build (default: builds one fresh into a
 #   temp dir with --tenant-id 0x13 --profile cps2-wide-v1).
 # Env: MAME_WIDE_BIN overrides the WIDE MAME binary
@@ -76,6 +86,14 @@ cd "$REPO"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 fail=0
+FREEZE_CLOCK=0
+for a in "$@"; do [ "$a" = "--freeze-clock" ] && FREEZE_CLOCK=1; done
+[ "${1:-}" = "--freeze-clock" ] && shift
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+. "$REPO/tests/lib/instr_align.sh"
+CLOCKS="tests/expected/instr_gameclock/test_tenant_select_records.tsv"
+[ "$FREEZE_CLOCK" = 1 ] && [ -n "$MODE" ] && { echo "REFUSED: --freeze-clock in control mode"; exit 3; }
+_clk=""; [ "$MODE" = drift-clock ] && _clk="INSTR_CLOCK=frame_done"
 
 # The build shape lives in tests/lib/tenant_build.sh (GitHub #71): stage,
 # profile and tenant id were inline in five gates and all three have moved
@@ -152,7 +170,11 @@ else
         | sed 's/0x/00/'; }
     WHEEL="$(awk '$1=="WHEELPTR"{print $2}' "$WORK/static.txt" | sed 's/0x/00/')"
     runtime() {  # runtime <tag> <replay> <watch> <expected sequence> [filter]
-        WATCH="$3" TRACE_OUT="$WORK/$1.txt" FRAMES="${RT_FRAMES:-1400}" \
+        _leg=t13; [ "${RT_FRAMES:-1400}" = 1400 ] || _leg="t13_${RT_FRAMES}"
+        ia_note "$WORK/manifest.tsv" "$_leg" "${2%.rpl}" vsavjw "$OUTBASE/rompath;$ROMDIR" "$REPO/tests/replays/$2" \
+            "${RT_FRAMES:-1400}" "MAME_BIN=$WIDE_BIN WATCH=$3" "$WORK/$1.align"
+        # shellcheck disable=SC2086
+        env $_clk WATCH="$3" TRACE_OUT="$WORK/$1.txt" FRAMES="${RT_FRAMES:-1400}" ALIGN_OUT="$WORK/$1.align" \
         REPLAY="$REPO/tests/replays/$2" \
         MAME_SANDBOX="$WORK/sbx_$1" MAME_BIN="$WIDE_BIN" \
         MAME_ROMPATH="$OUTBASE/rompath;$ROMDIR" \
@@ -242,7 +264,10 @@ else
     # (0 reads through 2P select, confirm, splash, match start). The
     # composed row is kept for safety; this asserts the measured negative
     # so the gate speaks up if some path DOES start reading it.
-    WATCH="26762a,80,r" TRACE_OUT="$WORK/p2name_neg.txt" FRAMES=1400 \
+    ia_note "$WORK/manifest.tsv" t13 37_p2_pick_tenant vsavjw "$OUTBASE/rompath;$ROMDIR" \
+        "$REPO/tests/replays/37_p2_pick_tenant.rpl" 1400 "MAME_BIN=$WIDE_BIN WATCH=26762a,80,r" "$WORK/p2name_neg.align"
+    # shellcheck disable=SC2086
+    env $_clk WATCH="26762a,80,r" TRACE_OUT="$WORK/p2name_neg.txt" FRAMES=1400 ALIGN_OUT="$WORK/p2name_neg.align" \
     REPLAY="$REPO/tests/replays/37_p2_pick_tenant.rpl" \
     MAME_SANDBOX="$WORK/sbx_p2name_neg" MAME_BIN="$WIDE_BIN" \
     MAME_ROMPATH="$OUTBASE/rompath;$ROMDIR" \
@@ -317,6 +342,37 @@ else
             fail=1
         fi
     fi
+fi
+
+if [ "${SKIP_RUNTIME:-0}" != 1 ]; then
+    echo "== 5. the instrument's alignment (#228 step 4, option A) =="
+    if [ "$FREEZE_CLOCK" = 1 ]; then
+        [ "$fail" = 0 ] || { echo "REFUSED: sections 1-4 failed — nothing frozen"; exit 1; }
+        ia_freeze "$REPO/tests/lua/trace_writes.lua" "$WORK/manifest.tsv" "$WORK/fz" "${JOBS:-4}" "$WORK/clocks.tsv" \
+            > "$WORK/fz.txt" || { sed 's/^/  /' "$WORK/fz.txt"; echo "REFUSED: the alignment does not hold — nothing frozen"; exit 1; }
+        mkdir -p "$(dirname "$CLOCKS")"
+        { echo "# $CLOCKS — the game clock RAM:\$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,"
+          echo "# option A) by \`tests/test_tenant_select_records.sh --freeze-clock\` at $(git rev-parse --short=8 HEAD): t13 = the variant-id"
+          echo "# build (tests/lib/tenant_build.sh tenant_build_13, built fresh), t13_2800 its 2,800-frame splash run; every reference leg"
+          echo "# held to replay.lua run live, every tap run to its reference leg's game clock."
+          echo "# leg<TAB>replay<TAB>frames<TAB>gameclock"
+          cat "$WORK/clocks.tsv"; } > "$CLOCKS"
+        echo "froze $(wc -l < "$WORK/clocks.tsv" | tr -d ' ') game clocks into $CLOCKS"
+        exit 0
+    fi
+    if ia_check_manifest "$CLOCKS" "$WORK/manifest.tsv" > "$WORK/align_bad.txt"; then
+        echo "  ok: every tap run on emulated time, at its frozen game clock"
+    else echo "  FAIL: $(wc -l < "$WORK/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$WORK/align_bad.txt" | sed 's/^/        /'; fail=1; fi
+    # THE DRIFT CONTROL RUNS ON THE THIRD TAP RUN (highlight), not the staging leg's first (measured 14z-197): under the
+    # old clock big_portrait and name_banner each lose EXACTLY 256 frames (1,144 emulated of 1,400), so their one-byte
+    # game clock wraps back to the frozen value and only frames == emulated sees them; highlight loses 341 (1,059).
+    ia_stage test_tenant_select_records "$CLOCKS" "$REPO/tests/lua/trace_writes.lua" "$WORK/manifest.tsv" 1 "$WORK/st" "$MODE" 3 || fail=1
+    if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
+        [ "$fail" = 1 ] && { echo "FAIL: tenant select-records gate (control mode: $MODE)"; exit 1; }
+        echo "FAIL: tenant select-records gate — control mode $MODE left the gate green"; exit 1
+    fi
+    if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || fail=1; fi
+    if [ "$IA_SKIP" = fired ]; then vs_ctl_fired first-frame-skip "$IA_SKIP_MSG"; else vs_ctl_dead first-frame-skip "$IA_SKIP_MSG" || fail=1; fi
 fi
 
 [ "$fail" = 0 ] || { echo "FAIL: tenant select-records gate"; exit 1; }

@@ -13,11 +13,19 @@
 #   on a residue victim, an empty trace.
 # EXPECTS: the read fires on every leg from the one reader, the indices equal, the bytes
 #   differ on residue victims only; the equal-bytes control fails section 3, the empty trace
-#   fails liveness.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh
+#   fails liveness. Every leg on emulated time at its frozen game clock, the staging leg on replay.lua's checksum.
+#   THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): trace_writes.lua counts
+#   EMULATED frames (tests/lua/emu_clock.lua); every watch run's game clock RAM:$FF8080 at the last frame is held to
+#   tests/expected/instr_gameclock/audit_defense_row_residue.tsv (one row per leg and victim: both tables' runs share
+#   it), frozen by `--freeze-clock` from REFERENCE legs (no watch, no debugger, the same POKES) each held to
+#   replay.lua run live; one STAGING reference leg is held to replay.lua on every run (tests/lib/instr_align.sh).
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/instr_gameclock/ tests/lib/controls.sh
+#   tests/lib/instr_align.sh tests/lua/emu_clock.lua tests/lua/replay.lua
 #   tests/lua/trace_writes.lua tests/replays/hui/80_hui_grab_2p.rpl
 #   tools/build_fingerprint.py tools/run_mame.sh tools/setup_mame.sh
 #
+# MUST-FIRE: known-bad: drift-clock — a watch run under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 3,397 emulated frames of 3,400 counted) must miss its frozen game clock (in-gate: one extra run; mode: every watch run runs the old clock and the gate FAILs)
+# MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs)
 # MUST-FIRE: known-bad: residue-answers-equal — a residue victim answering the SAME defense byte on both legs must fail section 3 (mode: the real native leg's bytes of the first residue victim — the first whose row differs between the BUILD and vs2 — are forced equal to ours and the section-3 verdict must fail)
 #
 # WHY. tests/audit_tenant_throw_geometry.sh froze 5 of 54 (victim, throw) cells
@@ -75,7 +83,7 @@
 #
 # Emulator tier (MAME -debug, 16 legs in parallel — curve and threshold per victim and game — ~6 min). Usage:
 #   ROMDIR=... [MAME_BIN=$HOME/.cache/vampire-saved/mame/cps2] \
-#     [MERGED=build/m3b_merged31] [VICTIMS="10 13 0a 03"] [KEEP=dir] tests/audit_defense_row_residue.sh
+#     [MERGED=build/m3b_merged31] [VICTIMS="10 13 0a 03"] [KEEP=dir] tests/audit_defense_row_residue.sh [--freeze-clock]
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 : "${ROMDIR:?set ROMDIR}"
@@ -85,6 +93,11 @@ MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
 [ -f "$MERGED/rompath/vsavjw.zip" ] || { echo "FAIL: no $MERGED/rompath/vsavjw.zip"; exit 1; }
 [ -f "$MERGED/verify_data.bin" ] || { echo "FAIL: no $MERGED/verify_data.bin (the build's data view, where ours' bytes are read)"; exit 1; }
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+. "$REPO/tests/lib/instr_align.sh"
+FREEZE_CLOCK=0; [ "${1:-}" = "--freeze-clock" ] && FREEZE_CLOCK=1
+CLOCKS="tests/expected/instr_gameclock/audit_defense_row_residue.tsv"
+[ "$FREEZE_CLOCK" = 1 ] && [ -n "$MODE" ] && { echo "REFUSED: --freeze-clock in control mode"; exit 3; }
+_clk=""; [ "$MODE" = drift-clock ] && _clk="INSTR_CLOCK=frame_done"
 VICTIMS="${VICTIMS:-10 13 0a 03}"     # the three residue victims + Victor (row identical in both games)
 ATT=10                                # Phobos, the attacker of the geometry gate
 W="$(mktemp -d "${TMPDIR:-/tmp}/defrow.XXXXXX")"
@@ -103,8 +116,11 @@ for vic in $VICTIMS; do
         if [ "$leg" = ours ]; then _s=vsavjw; _rp="$REPO/$MERGED/rompath;$ROMDIR"; _w="b8940,400,r"; [ "$tab" = thr ] && _w="bcc80,20,r"
         else                      _s=vsav2;  _rp="$ROMDIR";                       _w="d2abe,400,r"; [ "$tab" = thr ] && _w="d6e1e,20,r"; fi
         pk="1400:ff8782:$ATT;1450:ff8782:$ATT;1500:ff8782:$ATT;1400:ff8b82:$vic;1450:ff8b82:$vic;1500:ff8b82:$vic"
-        ( cd "$d" && WATCH="$_w" REGS_EXTRA=D5 TRACE_OUT="$d/t.txt" FRAMES=3400 REPLAY="$REPO/$RPL" POKES="$pk" \
-            MAME_SANDBOX="$d/sb" MAME_ROMPATH="$_rp" \
+        ia_note "$W/manifest.tsv" "${leg}_$vic" 80_hui_grab_2p "$_s" "$_rp" "$REPO/$RPL" 3400 \
+            "MAME_BIN=$MAME_BIN POKES=$pk WATCH=$_w REGS_EXTRA=D5" "$d/align"
+        # shellcheck disable=SC2086
+        ( cd "$d" && env $_clk WATCH="$_w" REGS_EXTRA=D5 TRACE_OUT="$d/t.txt" FRAMES=3400 REPLAY="$REPO/$RPL" POKES="$pk" \
+            MAME_SANDBOX="$d/sb" MAME_ROMPATH="$_rp" ALIGN_OUT="$d/align" \
             "$REPO/tools/run_mame.sh" "$_s" -debug -debugger none -autoboot_script "$REPO/tests/lua/trace_writes.lua" \
             > "$d/l.log" 2>&1 ) </dev/null &
     done; done
@@ -213,6 +229,30 @@ ok_, _ = verdict3(0x03, [2, 2], [0, 0]); chk(not ok_, "control: a control victim
 ok_, _ = verdict3(0x03, [0x28], [0x30], "thr"); chk(not ok_, "control: a threshold whose bytes are identical in the build and vs2, answered DIFFERENT, FAILS")
 sys.exit(bad)
 PY
+
+echo "== 5. the instrument's alignment (#228 step 4, option A)"
+if [ "$FREEZE_CLOCK" = 1 ]; then
+    [ "$fail" = 0 ] || { echo "REFUSED: sections 1-4 failed — nothing frozen"; exit 1; }
+    ia_freeze "$REPO/tests/lua/trace_writes.lua" "$W/manifest.tsv" "$W/fz" "${JOBS:-4}" "$W/clocks.tsv" \
+        > "$W/fz.txt" || { sed 's/^/  /' "$W/fz.txt"; echo "REFUSED: the alignment does not hold — nothing frozen"; exit 1; }
+    mkdir -p "$(dirname "$CLOCKS")"
+    { echo "# $CLOCKS — the game clock RAM:\$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,"
+      echo "# option A) by \`tests/audit_defense_row_residue.sh --freeze-clock\` at $(git rev-parse --short=8 HEAD): ours_<victim> = $MERGED,"
+      echo "# native_<victim> = vsav2; every reference leg held to replay.lua run live, every watch run to its reference leg's game clock."
+      echo "# leg<TAB>replay<TAB>frames<TAB>gameclock"
+      cat "$W/clocks.tsv"; } > "$CLOCKS"
+    echo "froze $(wc -l < "$W/clocks.tsv" | tr -d ' ') game clocks into $CLOCKS"
+    exit 0
+fi
+if ia_check_manifest "$CLOCKS" "$W/manifest.tsv" > "$W/align_bad.txt"; then ok "every watch run on emulated time, at its frozen game clock"
+else bad "$(wc -l < "$W/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$W/align_bad.txt" | sed 's/^/        /'; fi
+ia_stage audit_defense_row_residue "$CLOCKS" "$REPO/tests/lua/trace_writes.lua" "$W/manifest.tsv" 1 "$W/st" "$MODE" || fail=1
+if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
+    [ "$fail" = 1 ] && { echo "FAIL: audit_defense_row_residue (control mode: $MODE)"; exit 1; }
+    echo "FAIL: audit_defense_row_residue — control mode $MODE left the gate green"; exit 1
+fi
+if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || fail=1; fi
+if [ "$IA_SKIP" = fired ]; then vs_ctl_fired first-frame-skip "$IA_SKIP_MSG"; else vs_ctl_dead first-frame-skip "$IA_SKIP_MSG" || fail=1; fi
 
 [ "$fail" = 0 ] && { echo "PASS: audit_defense_row_residue — the defense and rally-threshold bytes answered are the victim's own row: they differ from native exactly where the build's differ from vs2's"; exit 0; }
 echo "FAIL: audit_defense_row_residue"; exit 1

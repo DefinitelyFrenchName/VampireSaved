@@ -1,0 +1,7 @@
+# tests/expected/instr_gameclock/test_hitbox_encoding.tsv — the game clock RAM:$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,
+# option A) by `tests/test_hitbox_encoding.sh --freeze-clock` at 9f59c3cb: native vs2, the rigs
+# tools/name_moves.py gen donovan 9 / 10 (r_9, r_10); every reference leg held to replay.lua run live, every tap run to
+# its reference leg's game clock.
+# leg<TAB>replay<TAB>frames<TAB>gameclock
+vsav2	r_9	5620	97
+vsav2	r_10	5160	cb

@@ -13,11 +13,19 @@
 #   a match frame; the control injects an offset-0 read into the ours leg.
 # EXPECTS: reads present on both legs (liveness), every in-play hit the mash check with A0 =
 #   the table, no D0 of 0, the per-offset inventories identical; the injected offset-0 read
-#   fails section 3.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh
+#   fails section 3. Both legs on emulated time at their frozen game clocks, the staging leg on replay.lua's checksum.
+#   THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): trace_writes.lua counts
+#   EMULATED frames (tests/lua/emu_clock.lua); both legs' game clock RAM:$FF8080 at the last frame is held to
+#   tests/expected/instr_gameclock/audit_guard_mask_reads.tsv, frozen by `--freeze-clock` from REFERENCE legs (no
+#   watch, no debugger, the same POKES) each held to replay.lua run live; one STAGING reference leg (ours) is held to
+#   replay.lua on every run (tests/lib/instr_align.sh).
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/instr_gameclock/ tests/lib/controls.sh
+#   tests/lib/instr_align.sh tests/lua/emu_clock.lua tests/lua/replay.lua
 #   tests/lua/trace_writes.lua tests/replays/ tools/build_fingerprint.py tools/name_moves.py
 #   tools/run_mame.sh tools/setup_mame.sh
 #
+# MUST-FIRE: known-bad: drift-clock — a watch run under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 6,808 emulated frames of 6,830 counted) must miss its frozen game clock (in-gate: one extra run of the ours leg; mode: both legs run the old clock and the gate FAILs)
+# MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs)
 # MUST-FIRE: known-bad: offset-0-read — a read at table offset 0 (mask[0], where the port's bytes sit) must be caught by section 3 (mode: an offset-0 read is injected into the REAL ours leg and the section-3 verdict must fail)
 #
 # WHY: `PRG:0x028D50` carried THREE names — `effect_map_5051` (huitzil.toml),
@@ -72,7 +80,7 @@
 #
 # Emulator tier (MAME -debug, two ~4 min legs in parallel). Usage:
 #   ROMDIR=... [MAME_BIN=$HOME/.cache/vampire-saved/mame/cps2] \
-#     [MERGED=build/m3b_merged31] [KEEP=dir] tests/audit_guard_mask_reads.sh
+#     [MERGED=build/m3b_merged31] [KEEP=dir] tests/audit_guard_mask_reads.sh [--freeze-clock]
 #   (KEEP copies the traces and dumps out before the workdir is removed.)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
@@ -85,6 +93,11 @@ W="$(mktemp -d "${TMPDIR:-/tmp}/gmask.XXXXXX")"
 if [ -n "${KEEP:-}" ]; then mkdir -p "$KEEP"; trap 'cp -R "$W"/. "$KEEP"/ 2>/dev/null; rm -rf "$W"' EXIT; else trap 'rm -rf "$W"' EXIT; fi
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+. "$REPO/tests/lib/instr_align.sh"
+FREEZE_CLOCK=0; [ "${1:-}" = "--freeze-clock" ] && FREEZE_CLOCK=1
+CLOCKS="tests/expected/instr_gameclock/audit_guard_mask_reads.tsv"
+[ "$FREEZE_CLOCK" = 1 ] && [ -n "$MODE" ] && { echo "REFUSED: --freeze-clock in control mode"; exit 3; }
+_clk=""; [ "$MODE" = drift-clock ] && _clk="INSTR_CLOCK=frame_done"
 RIG=tests/replays/naming/donovan_victim_4
 echo "== build under test: $MERGED  $(python3 tools/build_fingerprint.py "$MERGED/rompath" --set vsavjw --sha-only | cut -c1-8)"
 
@@ -96,7 +109,11 @@ ok "replay $RIG.rpl, $FR frames, $(echo "$POKES" | tr ';' '\n' | grep -c '^') po
 echo "== 1. the two legs under the read watch (parallel)"
 leg() {  # name set rompath
     mkdir -p "$W/$1"
-    ( cd "$W/$1" && WATCH="28d50,20,r" TRACE_OUT="$W/$1/t.txt" FRAMES="$FR" REPLAY="$REPO/$RIG.rpl" POKES="$POKES" \
+    ia_note "$W/manifest.tsv" "$1" donovan_victim_4 "$2" "$3" "$REPO/$RIG.rpl" "$FR" \
+        "MAME_BIN=$MAME_BIN POKES=$POKES WATCH=28d50,20,r" "$W/$1/align"
+    # shellcheck disable=SC2086
+    ( cd "$W/$1" && env $_clk WATCH="28d50,20,r" TRACE_OUT="$W/$1/t.txt" FRAMES="$FR" REPLAY="$REPO/$RIG.rpl" POKES="$POKES" \
+        ALIGN_OUT="$W/$1/align" \
         DUMPS="1200:28d50-28d70" MAME_SANDBOX="$W/$1/sb" MAME_ROMPATH="$3" \
         "$REPO/tools/run_mame.sh" "$2" -debug -debugger none -autoboot_script "$REPO/tests/lua/trace_writes.lua" \
         > "$W/$1/l.log" 2>&1 ) </dev/null &
@@ -183,6 +200,30 @@ fs, _, _ = reduce([(3000, 0x000926, 0x000000, 0x1234)])
 chk(any("IN PLAY" in f for f in fs), "control: a foreign reader during the match is caught")
 sys.exit(bad)
 PY
+
+echo "== 4. the instrument's alignment (#228 step 4, option A)"
+if [ "$FREEZE_CLOCK" = 1 ]; then
+    [ "$fail" = 0 ] || { echo "REFUSED: sections 1-3 failed — nothing frozen"; exit 1; }
+    ia_freeze "$REPO/tests/lua/trace_writes.lua" "$W/manifest.tsv" "$W/fz" "${JOBS:-4}" "$W/clocks.tsv" \
+        > "$W/fz.txt" || { sed 's/^/  /' "$W/fz.txt"; echo "REFUSED: the alignment does not hold — nothing frozen"; exit 1; }
+    mkdir -p "$(dirname "$CLOCKS")"
+    { echo "# $CLOCKS — the game clock RAM:\$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,"
+      echo "# option A) by \`tests/audit_guard_mask_reads.sh --freeze-clock\` at $(git rev-parse --short=8 HEAD): vanilla = vsavj,"
+      echo "# ours = $MERGED; every reference leg held to replay.lua run live, every watch run to its reference leg's game clock."
+      echo "# leg<TAB>replay<TAB>frames<TAB>gameclock"
+      cat "$W/clocks.tsv"; } > "$CLOCKS"
+    echo "froze $(wc -l < "$W/clocks.tsv" | tr -d ' ') game clocks into $CLOCKS"
+    exit 0
+fi
+if ia_check_manifest "$CLOCKS" "$W/manifest.tsv" > "$W/align_bad.txt"; then ok "both legs on emulated time, at their frozen game clocks"
+else bad "$(wc -l < "$W/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$W/align_bad.txt" | sed 's/^/        /'; fi
+ia_stage audit_guard_mask_reads "$CLOCKS" "$REPO/tests/lua/trace_writes.lua" "$W/manifest.tsv" 2 "$W/st" "$MODE" || fail=1
+if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
+    [ "$fail" = 1 ] && { echo "FAIL: audit_guard_mask_reads (control mode: $MODE)"; exit 1; }
+    echo "FAIL: audit_guard_mask_reads — control mode $MODE left the gate green"; exit 1
+fi
+if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || fail=1; fi
+if [ "$IA_SKIP" = fired ]; then vs_ctl_fired first-frame-skip "$IA_SKIP_MSG"; else vs_ctl_dead first-frame-skip "$IA_SKIP_MSG" || fail=1; fi
 
 if [ "$fail" = 0 ]; then echo "PASS: audit_guard_mask_reads — mask[0] is unreachable on both legs; the port's bytes there are inert on the legacy path"; exit 0; fi
 echo "FAIL: audit_guard_mask_reads"; exit 1

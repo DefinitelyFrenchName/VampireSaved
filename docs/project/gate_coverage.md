@@ -654,7 +654,7 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 
 **HOW:** tests/lua/obj_record_bank_trace.lua (the first instrument converted) on pristine vsavj, replay 03_two_player_vs, 1500 frames: a REFERENCE leg (INSTR_REFERENCE=1, no -debug) whose ANCHOR is compared with tests/expected/vsavj/masked-v2's checksum at frame 1500 under its MASK, and a BREAKPOINT leg with the A0 window opened to the whole address space (REC_LO=0 REC_HI=ffffff), so the format handlers stop the CPU on every object drawn; each leg's ALIGN line (emu_clock.lua's ALIGN_OUT) is read.
 
-**EXPECTS:** the reference anchor equals the basis; the breakpoint leg counted 1500 frames over 1500 emulated ones with stops' UI frames skipped (uiframes > 0), and its game clock equals the reference's. Whether the breakpoint leg's own checksum equals the basis is PRINTED, not asserted: a stop can move the game without moving $FF8080 ([MFI-2]; measured 14z-197: it differs here). A red means instruments' input lands on the wrong frame again — every gate built on them describes a game the replay never played.
+**EXPECTS:** the reference anchor equals the basis; the breakpoint leg counted 1500 frames over 1500 emulated ones with stops' UI frames skipped (uiframes > 0), and its game clock equals the reference's. Whether the breakpoint leg's own checksum equals the basis is PRINTED, not asserted: a stop can move the game without moving $FF8080 ([MFI-2]; measured 14z-197: it differs here). A red means instruments' input lands on the wrong frame again — every gate built on them describes a game the replay never played. SECTION 4 (14z-197, slice 2) is the ground truth of tests/lib/instr_align.sh's RUN MANIFEST verdicts, on tests/lua/trace_writes.lua (the instrument with POKES): ia_freeze accepts an aligned write-watch run and its rows pass ia_check_manifest; it REFUSES a run under the frame_done clock and two runs under one key that disagree on POKES; and a POKE on the anchor frame — which moves replay.lua's checksum there (shown) — still leaves the reference leg's anchor equal to replay.lua's (emu_clock.lua's on_pokes runs before the anchor, as replay.lua pokes before its checksum).
 
 ### `test_fbneo_boot_log.sh` — test, ci_portable
 
@@ -1344,9 +1344,9 @@ the build pipeline — manifests, patch ops, extraction/reconciliation/generatio
 
 **WHAT:** the select-screen record-pointer arrays (portrait, name, highlight; 32 rows per player, P2 at +0x80, indexed by cell/id with no 4-bit fold, rows 0x10-0x1F variant aliases) as modelled against the reference image, and the ENGINE's own row fetch agreeing: hovering four known cells fetches exactly the four frozen records.
 
-**HOW:** static model against the reference data view with a one-byte corruption control; runtime on MAME reading $1C(a6)+4 at the record walker while the cursor hovers the cells.
+**HOW:** static model against the reference data view with a one-byte corruption control; runtime on MAME reading $1C(a6)+4 at the record walker while the cursor hovers the cells. THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): trace_writes.lua counts EMULATED frames (tests/lua/emu_clock.lua); every tap run's game clock RAM:$FF8080 at its last frame is held to tests/expected/instr_gameclock/test_select_arrays.tsv, frozen by `--freeze-clock` from REFERENCE legs (no watch, no debugger), each held to replay.lua run live; one STAGING reference leg is held to replay.lua on every run (tests/lib/instr_align.sh).
 
-**EXPECTS:** the model holds, the corruption fails, the engine fetches the predicted rows. A tenant at 0x13 costs six longs.
+**EXPECTS:** the model holds, the corruption fails, the engine fetches the predicted rows. A tenant at 0x13 costs six longs. Every tap run on emulated time at its frozen game clock, the staging leg on replay.lua's checksum.
 
 ### `test_shared_writes.sh` — test, ci_static
 
@@ -1384,9 +1384,9 @@ the build pipeline — manifests, patch ops, extraction/reconciliation/generatio
 
 **WHAT:** at a variant-half tenant id the build carries the tenant's OWN select records (six array rows repointed, records composed from the vs2 image) and the host's select-record block, palette-grid column and shared coord list return to VANILLA bytes; the engine walking onto cell 0x13 fetches exactly the predicted row sequence for all three UI pieces.
 
-**HOW:** tools/check_tenant_select.py re-derives the composition from the vs2 image and select_port.PLACEMENTS and compares the built image; negative controls (a pristine image, a flipped composed byte, a flipped host byte) must fail; runtime on WIDE MAME with replay 36 reads the record walker.
+**HOW:** tools/check_tenant_select.py re-derives the composition from the vs2 image and select_port.PLACEMENTS and compares the built image; negative controls (a pristine image, a flipped composed byte, a flipped host byte) must fail; runtime on WIDE MAME with replay 36 reads the record walker. THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): trace_writes.lua counts EMULATED frames (tests/lua/emu_clock.lua); every tap run's game clock RAM:$FF8080 at its last frame is held to tests/expected/instr_gameclock/test_tenant_select_records.tsv, frozen by `--freeze-clock` from REFERENCE legs (no watch, no debugger) each held to replay.lua run live; one STAGING reference leg is held to replay.lua on every run (tests/lib/instr_align.sh).
 
-**EXPECTS:** static equal, the three controls failing, the engine's rows as predicted; SKIP_RUNTIME=1 skips section 3.
+**EXPECTS:** static equal, the three controls failing, the engine's rows as predicted; SKIP_RUNTIME=1 skips section 3. Every tap run on emulated time at its frozen game clock, the staging leg on replay.lua's checksum.
 
 ### `test_thunk_addr_literal.sh` — test, ci_static
 
@@ -1688,9 +1688,9 @@ tiles, OBJ records, sprite lists, render-layer verdicts. 25 of 25 described.
 
 **WHAT:** the three deadness measurements the beam port rests on: vanilla never dispatches effect-class row 16 (0 reads against a live control on row 37), the composite handler's A5 scratch $FF3578-$FF3581 IS used by vsavj (so vs2's displacements cannot be kept), and drawer list-type 10 is NOT a spare slot (thousands of legacy reads) — plus since 14z-91 the type-6 fallback's EXECUTION against a frozen per-replay inventory.
 
-**HOW:** MAME -debug watches on the OPCODES space (the tables are read pc-relatively; a plain watchpoint is silently blind), every section with a positive control on the same instrument and leg.
+**HOW:** MAME -debug watches on the OPCODES space (the tables are read pc-relatively; a plain watchpoint is silently blind), every section with a positive control on the same instrument and leg. THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): trace_writes.lua counts EMULATED frames (tests/lua/emu_clock.lua), so every watch run of sections 1-3 plays its whole replay since 14z-197 (until then the type-10 run of 02_demitri_vs_cpu covered 2,817 emulated frames of 5,520 counted); each run's game clock RAM:$FF8080 at its last frame is held to tests/expected/instr_gameclock/audit_effect_class_rows.tsv, frozen by `--freeze-clock` from REFERENCE legs (no watch, no debugger) each held to replay.lua run live; one STAGING reference leg is held to replay.lua on every run (tests/lib/instr_align.sh). Section 4 (BUILD set) is not in the frozen file.
 
-**EXPECTS:** 0 / used / used as measured, the fallback inventory exact; a blind instrument cannot pass as a clean result.
+**EXPECTS:** 0 / used / used as measured, the fallback inventory exact; a blind instrument cannot pass as a clean result. Every section 1-3 run on emulated time at its frozen game clock, the staging leg on replay.lua's checksum.
 
 ### `audit_empty_tiles.sh` — audit, emulator
 
@@ -1720,9 +1720,9 @@ tiles, OBJ records, sprite lists, render-layer verdicts. 25 of 25 described.
 
 **WHAT:** the build WALKS the anim nodes that carry Phobos's beam sprite lists: the placed twin is read inside the beam window (BEAM_WALK_EXPECT=walks since the row-16 fix), the nodes are correctly ported (every differing byte a relocated 3-byte pointer), native reads its node inside the window (rig liveness), and the watchpoint's arming line is excluded from every count.
 
-**HOW:** static node comparison, then MAME -debug read watches on both legs over the beam window, comparing leg-independent quantities only (read or not, how often — never a PC).
+**HOW:** static node comparison, then MAME -debug read watches on both legs over the beam window, comparing leg-independent quantities only (read or not, how often — never a PC). THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): trace_writes.lua counts EMULATED frames (tests/lua/emu_clock.lua), so the beam window is in emulated frames since 14z-197; both legs' game clock RAM:$FF8080 at the last frame is held to tests/expected/instr_gameclock/test_beam_anim_walk.tsv, frozen by `--freeze-clock` from REFERENCE legs (no watch, no debugger) each held to replay.lua run live; one STAGING reference leg (ours) is held to replay.lua on every run (tests/lib/instr_align.sh).
 
-**EXPECTS:** ported nodes, native walked, ours walked; =absent reproduces the pre-fix state on an older build.
+**EXPECTS:** ported nodes, native walked, ours walked; =absent reproduces the pre-fix state on an older build. Both legs on emulated time at their frozen game clocks, the staging leg on replay.lua's checksum.
 
 ### `test_beam_list_type6.sh` — test, ci_static
 
@@ -2308,9 +2308,9 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 **WHAT:** in a base-slot mirror match (both players on slot 0x0F) the thrown victim uses the DONOVAN-victim keyframe block, not Jedah's — the two-byte fix at PRG:0x0B1A16.
 
-**HOW:** static: the built image holds 0x0D88 at the blob's entry [0x0F]; runtime: replay 65 on MAME with the victim keyframe walker tapped for reads of the fixed block versus the old one (206/0 on the candidate, 0/206 pre-fix).
+**HOW:** static: the built image holds 0x0D88 at the blob's entry [0x0F]; runtime: replay 65 on MAME with the victim keyframe walker tapped for reads of the fixed block versus the old one (206/0 on the candidate, 0/206 pre-fix). THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): trace_writes.lua counts EMULATED frames (tests/lua/emu_clock.lua); both tap runs' game clock RAM:$FF8080 at the last frame is held to tests/expected/instr_gameclock/test_don_throw_mirror.tsv, frozen by `--freeze-clock` from a REFERENCE leg (no watch, no debugger) held to replay.lua run live; one STAGING reference leg is held to replay.lua on every run (tests/lib/instr_align.sh).
 
-**EXPECTS:** the word present and the walker reading only the fixed block. SKIPs on variant-id builds, where the mirror is tenant-vs-tenant at 0x13 and correct by construction.
+**EXPECTS:** the word present and the walker reading only the fixed block. SKIPs on variant-id builds, where the mirror is tenant-vs-tenant at 0x13 and correct by construction. Both tap runs on emulated time at the frozen game clock, the staging leg on replay.lua's checksum.
 
 ### `test_hui_air.sh` — test, emulator
 
@@ -2658,7 +2658,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **HOW:** the Circuit Scrapper rig on ours and native vs2 under a -debug READ watch over the defense table (and the rally threshold's read, whose D5 is the byte answered), for the residue victims and a control victim; the byte at each index is taken from each leg's OWN data view (the build's verify_data.bin, vs2's image); controls: equal bytes forced on a residue victim, an empty trace.
 
-**EXPECTS:** the read fires on every leg from the one reader, the indices equal, the bytes differ on residue victims only; the equal-bytes control fails section 3, the empty trace fails liveness.
+**EXPECTS:** the read fires on every leg from the one reader, the indices equal, the bytes differ on residue victims only; the equal-bytes control fails section 3, the empty trace fails liveness. Every leg on emulated time at its frozen game clock, the staging leg on replay.lua's checksum. THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): trace_writes.lua counts EMULATED frames (tests/lua/emu_clock.lua); every watch run's game clock RAM:$FF8080 at the last frame is held to tests/expected/instr_gameclock/audit_defense_row_residue.tsv (one row per leg and victim: both tables' runs share it), frozen by `--freeze-clock` from REFERENCE legs (no watch, no debugger, the same POKES) each held to replay.lua run live; one STAGING reference leg is held to replay.lua on every run (tests/lib/instr_align.sh).
 
 ### `audit_demitri_split.sh` — audit, emulator
 
@@ -2818,7 +2818,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **HOW:** the advancing-guard rig (donovan_victim_4) on pristine vsavj and on the merged build on MAME under a -debug READ watch over 0x028D50-0x028D6F; every in-play hit's PC, A0 and D0 read; the gate's own DUMPS read is taken inside the boot window so it never lands on a match frame; the control injects an offset-0 read into the ours leg.
 
-**EXPECTS:** reads present on both legs (liveness), every in-play hit the mash check with A0 = the table, no D0 of 0, the per-offset inventories identical; the injected offset-0 read fails section 3.
+**EXPECTS:** reads present on both legs (liveness), every in-play hit the mash check with A0 = the table, no D0 of 0, the per-offset inventories identical; the injected offset-0 read fails section 3. Both legs on emulated time at their frozen game clocks, the staging leg on replay.lua's checksum. THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): trace_writes.lua counts EMULATED frames (tests/lua/emu_clock.lua); both legs' game clock RAM:$FF8080 at the last frame is held to tests/expected/instr_gameclock/audit_guard_mask_reads.tsv, frozen by `--freeze-clock` from REFERENCE legs (no watch, no debugger, the same POKES) each held to replay.lua run live; one STAGING reference leg (ours) is held to replay.lua on every run (tests/lib/instr_align.sh).
 
 ### `audit_guard_reentry.sh` — audit, emulator
 
@@ -3106,7 +3106,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **HOW:** Donovan on native vs2 on MAME with name_moves parts 9 and 10 under two instruments — field_trace (positions, facing, nodes, box ids, table pointers, the victim's HP and class) and the -debug write tap on the victim's +0x50..+0x55 (PC and A3 at every write); the un-mirrored convention is the negative control.
 
-**EXPECTS:** pointers as decoded, A3 the node's record on every write, 8/8 hits on the first overlap frame with no whiff overlap, +0x54 = record +0x17 (or the forced generic 1); the un-mirrored convention fails most hits.
+**EXPECTS:** pointers as decoded, A3 the node's record on every write, 8/8 hits on the first overlap frame with no whiff overlap, +0x54 = record +0x17 (or the forced generic 1); the un-mirrored convention fails most hits. Both tap runs on emulated time at their frozen game clocks, the staging leg on replay.lua's checksum. THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): trace_writes.lua counts EMULATED frames (tests/lua/emu_clock.lua) — so a tap frame names the same emulated frame as field_trace's since 14z-197 (until then each tap stop's UI frames moved the tap's frame number and its input ahead); both tap runs' game clock RAM:$FF8080 at the last frame is held to tests/expected/instr_gameclock/test_hitbox_encoding.tsv, frozen by `--freeze-clock` from REFERENCE legs (no watch, no debugger) each held to replay.lua run live; one STAGING reference leg is held to replay.lua on every run (tests/lib/instr_align.sh).
 
 ### `test_killshread_es.sh` — test, emulator
 

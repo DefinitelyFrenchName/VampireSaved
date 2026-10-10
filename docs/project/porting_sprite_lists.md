@@ -42,12 +42,17 @@ A ported list of a missing type jumps off the end of the table.
 
 *Mechanism:* take over a list type that vsav does not use. Types **6 and 8
 are dead in vanilla** (0 reads across the legacy suite, against controls of
-4329/2702/2260/321 on types 2/10/0/4). Write a 6-byte `jmp` over the dead
+4329/2702/2260/321 on types 2/10/0/4 — RETRACTED for type 6 by 14z-89, which
+measured legacy reaching it (`patch_index.md` `beam_list_type6`); and those
+counts were taken on the frame_done clock, type 10's over 2,817 of replay 02's
+5,520 frames — over the whole replay 20664/13508/6362/487, 14z-197,
+`../game/atlas/sprite_lists.md`). Write a 6-byte `jmp` over the dead
 handler's head and retype the tenant's own lists with `[[port_patch]]`
 rows.
 
 *Do NOT* repoint type 10 because its handler is a bare `rts` — legacy
-dispatches it 2702 times per replay. A no-op handler is not a spare slot.
+dispatches it 13,508 times over replay 02 (14z-197; 2,702 on the old clock's
+half replay). A no-op handler is not a spare slot.
 
 *Safety:* make the assumption non-load-bearing. The ported handler
 discriminates on an **address range** (is this list inside our own placed

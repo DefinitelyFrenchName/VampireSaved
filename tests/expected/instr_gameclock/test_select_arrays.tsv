@@ -1,0 +1,5 @@
+# tests/expected/instr_gameclock/test_select_arrays.tsv — the game clock RAM:$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,
+# option A) by `tests/test_select_arrays.sh --freeze-clock` at 9f59c3cb; every reference leg
+# held to replay.lua run live, every tap run to its reference leg's game clock (tests/lib/instr_align.sh ia_freeze).
+# leg<TAB>replay<TAB>frames<TAB>gameclock
+vsavj	11_pick_donovan	1200	53

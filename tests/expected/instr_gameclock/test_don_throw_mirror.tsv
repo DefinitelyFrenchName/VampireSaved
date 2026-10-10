@@ -1,0 +1,5 @@
+# tests/expected/instr_gameclock/test_don_throw_mirror.tsv — the game clock RAM:$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,
+# option A) by `tests/test_don_throw_mirror.sh --freeze-clock` at 9f59c3cb (base = the base-slot
+# track built fresh); every reference leg held to replay.lua run live, every tap run to its reference leg's game clock.
+# leg<TAB>replay<TAB>frames<TAB>gameclock
+base	65_don_mirror_throw	4400	d3

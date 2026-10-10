@@ -1495,7 +1495,9 @@ note = "grab-hold victim keyframes: row 0x10 <- H's own block (vs2 0x0C56AA), wa
 # WHY IT IS SUPERSET-SAFE. Row 16 is DEAD in vanilla, measured, not argued:
 # 0 reads across the whole frozen legacy suite (01-10) plus the walljump
 # and throw replays, against a 1760-hit positive control on row 37 taken
-# with the same instrument on the same leg. Committed as
+# with the same instrument on the same leg. (14z-197, #228: those runs counted
+# frame_done calls and covered part of each replay; over every frame of the
+# gate's six replays row 16 still reads 0, and the control 3,872.) Committed as
 # tests/audit_effect_class_rows.sh so the claim stays re-checkable.
 # `old_hex` pins the slot to the stub, so a table that ever moves fails the
 # build loudly rather than silently repointing someone else's row.
@@ -1654,7 +1656,10 @@ note = "effect-class row 31 -> the ported vs2 row-31 handler family (the clone-m
 # THE MECHANISM. vsav ships TWO list types nothing uses. Types 6 and 8 measure
 # ZERO reads across six legacy replays, against same-instrument controls of
 # 4329 / 2702 / 2260 / 321 reads on types 2 / 10 / 0 / 4
-# (tests/audit_effect_class_rows.sh). Nothing else points into the type-6
+# (tests/audit_effect_class_rows.sh). (Over the whole of replay 02, 14z-197:
+# 20664 / 13508 / 6362 / 487, types 6 and 8 still 0 there — the old counts
+# were the frame_done clock's, type 10's over 2,817 of its 5,520 frames, #228;
+# type 6 IS reached by legacy elsewhere, 14z-89.) Nothing else points into the type-6
 # handler, the two bytes before it are type-4's `rts` skip target (so there is
 # no fall-through into it), and H's own content uses neither type. So: write a
 # 6-byte `jmp` over the dead type-6 handler head and change the type word on

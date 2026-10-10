@@ -345,6 +345,22 @@ Read as replay frames, they put the copy inside Donovan's column move, and a mec
 was written into a gate header, an issue draft and STATE. A non-debug write tap
 (`tests/lua/read_tap.lua`, the same row) shows the same 240 writes as 16 words on each of
 15 frames at 2313-2355, the round-start fade. The counter had advanced once per stop.
+Inside the move, the row's only writer is the palette-sequence uploader. When the
+question is WHEN a write happens, use the non-debug tap. A `-debug` log gives the WHO,
+and its frame column is not a time. (`tests/lua/bp_regs.lua`'s header says the opposite
+— "the debugger pauses emulated time during a stop, so frame-counted input playback
+stays aligned" — and this measurement contradicts it.)
+The same sitting paid it a second time, worse. A reachability read watch over Donovan's whole
+x2b7ef4 copy stopped on a block the match reads thousands of times, so its replays desynced by
+up to ~5,700 frames and a "never read" was reported from runs that never played the moves.
+The sound form is `tests/audit_x2b7ef4_reach_m18.sh` (RETIRED 14z-184, maintainer-ruled 2026-09-27 "Retire it": its merged-m18 subject is out of release scope and its rows predated the 14z-181 `pyron_3` rig change; the script and its rows remain at commit `206ff15b`). It watches only the bytes in question,
+arms after boot (`WATCH_FROM`, several ranges in one `WATCH`, both added to
+`trace_writes.lua` 14z-170), and compares each run's P1 anim-node trajectory (`SAMPLE`) with a
+non-debug run's. That comparison is the check a zero-hit debug run needs: with no stop, 18 of
+20 runs were frame-exact; two skewed by one frame mid-move with no stop at all, so a debug run
+remains its own timeline even when silent.
+(Since 14z-197 `trace_writes.lua` counts EMULATED frames, #228 step 4 below, so its frame column is an emulated
+frame; a stop can still move the game, [MFI-2], so a debug run stays its own timeline for the game's state.)
 
 PAID AGAIN, and MEASURED, 14z-192 (GitHub #213): `tests/lua/dispatch_census.lua`, two breakpoints
 on hot dispatch sites, keyed its replay input AND its stop frame to the frame_done counter. On
@@ -368,20 +384,10 @@ instrument loads it instead of carrying a copy. Its ground truth is `tests/test_
 pristine vsavj, `03_two_player_vs`, 1,500 frames, `obj_record_bank_trace.lua` with its window opened to the whole
 address space stopped the CPU for 12,029 UI frames and still counted 1,500 frames over 1,500 emulated ones with
 `$FF8080` at `7f`, the reference leg's; under `frame_done` the same leg covered 615 and read `0b`.
-Inside the move, the row's only writer is the palette-sequence uploader. When the
-question is WHEN a write happens, use the non-debug tap. A `-debug` log gives the WHO,
-and its frame column is not a time. (`tests/lua/bp_regs.lua`'s header says the opposite
-— "the debugger pauses emulated time during a stop, so frame-counted input playback
-stays aligned" — and this measurement contradicts it.)
-The same sitting paid it a second time, worse. A reachability read watch over Donovan's whole
-x2b7ef4 copy stopped on a block the match reads thousands of times, so its replays desynced by
-up to ~5,700 frames and a "never read" was reported from runs that never played the moves.
-The sound form is `tests/audit_x2b7ef4_reach_m18.sh` (RETIRED 14z-184, maintainer-ruled 2026-09-27 "Retire it": its merged-m18 subject is out of release scope and its rows predated the 14z-181 `pyron_3` rig change; the script and its rows remain at commit `206ff15b`). It watches only the bytes in question,
-arms after boot (`WATCH_FROM`, several ranges in one `WATCH`, both added to
-`trace_writes.lua` 14z-170), and compares each run's P1 anim-node trajectory (`SAMPLE`) with a
-non-debug run's. That comparison is the check a zero-hit debug run needs: with no stop, 18 of
-20 runs were frame-exact; two skewed by one frame mid-move with no stop at all, so a debug run
-remains its own timeline even when silent.
+`trace_writes.lua` followed in slice 2: its POKES run before the anchor as `replay.lua`'s run before its checksum
+(`emu_clock.lua`'s `on_pokes`; the ground truth pokes the anchor frame itself), and on Donovan's part-9 rig the 8 HP
+writes its tap logs fall on exactly the 8 frames a non-debug `field_trace.lua` run sees the HP drop, where the old clock
+logged each 1-2 frames late (`tests/test_hitbox_encoding.sh`, whose lookup had absorbed that lag).
 
 ## CPS-2 program zips store CODE encrypted — static byte reads of code are noise
 **[CPH-2]** Paid for in session 14z-2 (an hour of "why does the ported region disassemble

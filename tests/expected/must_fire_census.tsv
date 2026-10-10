@@ -25,6 +25,7 @@ declares	audit_df_moves
 declares	audit_df_startup_invuln
 declares	audit_dispatch_census
 declares	audit_dmg_legacy_sweep
+declares	audit_effect_class_rows
 declares	audit_entrance_draw
 declares	audit_ex_refused
 declares	audit_extra_pass
@@ -94,6 +95,7 @@ declares	test_applier_page_browser
 declares	test_applier_vcdiff
 declares	test_attribute_patch_delta
 declares	test_battery_accounting
+declares	test_beam_anim_walk
 declares	test_bg_leg_shape
 declares	test_build_environment_entry
 declares	test_bundle_parsers
@@ -122,6 +124,7 @@ declares	test_docs_site
 declares	test_docshape
 declares	test_don_immortal_native
 declares	test_don_reactions
+declares	test_don_throw_mirror
 declares	test_down_flash_mechanism
 declares	test_dualtrack
 declares	test_effect_placeholders
@@ -144,6 +147,7 @@ declares	test_gate_follows
 declares	test_gate_index_current
 declares	test_gotchas_index_current
 declares	test_header_defaults
+declares	test_hitbox_encoding
 declares	test_host_libs
 declares	test_jtcores_twin
 declares	test_jtsim_scratch_heal
@@ -207,6 +211,7 @@ declares	test_run_on_snapshot
 declares	test_run_record
 declares	test_same_data_p2
 declares	test_scratch_census
+declares	test_select_arrays
 declares	test_shadow_tenant
 declares	test_shell_portability
 declares	test_sim_wram_contract
@@ -219,6 +224,7 @@ declares	test_superseded_pins
 declares	test_tables_current
 declares	test_tenant_anim_relocation
 declares	test_tenant_id
+declares	test_tenant_select_records
 declares	test_tick_durations
 declares	test_tickets
 declares	test_trace_static_reads

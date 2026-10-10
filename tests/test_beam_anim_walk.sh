@@ -9,10 +9,19 @@
 #   excluded from every count.
 # HOW: static node comparison, then MAME -debug read watches on both legs over the beam
 #   window, comparing leg-independent quantities only (read or not, how often — never a PC).
+#   THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): trace_writes.lua counts
+#   EMULATED frames (tests/lua/emu_clock.lua), so the beam window is in emulated frames since 14z-197; both legs'
+#   game clock RAM:$FF8080 at the last frame is held to tests/expected/instr_gameclock/test_beam_anim_walk.tsv,
+#   frozen by `--freeze-clock` from REFERENCE legs (no watch, no debugger) each held to replay.lua run live; one
+#   STAGING reference leg (ours) is held to replay.lua on every run (tests/lib/instr_align.sh).
 # EXPECTS: ported nodes, native walked, ours walked; =absent reproduces the pre-fix state on
-#   an older build.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/trace_writes.lua
+#   an older build. Both legs on emulated time at their frozen game clocks, the staging leg on replay.lua's checksum.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/instr_gameclock/ tests/lib/controls.sh
+#   tests/lib/instr_align.sh tests/lua/emu_clock.lua tests/lua/replay.lua tests/lua/trace_writes.lua
 #   tests/replays/hui/83b_hui_ray_2p.rpl tools/run_mame.sh tools/setup_mame.sh
+#
+# MUST-FIRE: known-bad: drift-clock — a watch run under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 3,227 emulated frames of 3,230 counted) must miss its frozen game clock (in-gate: one extra run of our leg; mode: both legs run the old clock and the gate FAILs)
+# MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs)
 #
 # WHY IT EXISTS. The effect family (beam / grab lightning / ES big beam /
 # 214 explosion) has been chased for several sessions from the emitter
@@ -70,7 +79,7 @@
 # reproduces the pre-fix state on an older build (build/hui17).
 #
 # Usage: ROMDIR=... [BEAM_WALK_EXPECT=absent|walks] \
-#            tests/test_beam_anim_walk.sh [wide-builddir]
+#            tests/test_beam_anim_walk.sh [wide-builddir] [--freeze-clock]
 #        (defaults to build/hui61; needs a build carrying H's real art)
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
@@ -101,6 +110,14 @@ trap 'rm -rf "$WORK"' EXIT
    # Its frozen inventory may still describe the OLD build: run it
    # before trusting a green, and re-measure rather than absorb.
 
+FREEZE_CLOCK=0
+for a in "$@"; do [ "$a" = "--freeze-clock" ] && FREEZE_CLOCK=1; done
+[ "${1:-}" = "--freeze-clock" ] && shift
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+. "$REPO/tests/lib/instr_align.sh"
+CLOCKS="tests/expected/instr_gameclock/test_beam_anim_walk.tsv"
+[ "$FREEZE_CLOCK" = 1 ] && [ -n "$MODE" ] && { echo "REFUSED: --freeze-clock in control mode"; exit 3; }
+_clk=""; [ "$MODE" = drift-clock ] && _clk="INSTR_CLOCK=frame_done"
 BUILD="${1:-build/hui61}"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 EXPECT="${BEAM_WALK_EXPECT:-walks}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
@@ -191,7 +208,10 @@ run_leg() {  # run_leg <tag> <set> <watch> <mamebin> [rompath]
     _tag=$1; _set=$2; _watch=$3; _bin=$4; _rp=${5:-}
     if [ -n "$_rp" ]; then MAME_ROMPATH="$_rp"; export MAME_ROMPATH
     else unset MAME_ROMPATH || true; fi
-    WATCH="$_watch,2,r" TRACE_OUT="$WORK/$_tag.txt" FRAMES="$FRAMES" \
+    ia_note "$WORK/manifest.tsv" "$_tag" 83b_hui_ray_2p "$_set" "${_rp:--}" "$RPL" "$FRAMES" \
+        "MAME_BIN=$_bin POKES=$PK WATCH=$_watch,2,r" "$WORK/$_tag.align"
+    # shellcheck disable=SC2086
+    env $_clk WATCH="$_watch,2,r" TRACE_OUT="$WORK/$_tag.txt" FRAMES="$FRAMES" ALIGN_OUT="$WORK/$_tag.align" \
     REPLAY="$RPL" POKES="$PK" MAME_SANDBOX="$WORK/sbx_$_tag" \
     MAME_BIN="$_bin" \
         tools/run_mame.sh "$_set" -debug -debugger none \
@@ -260,6 +280,33 @@ ctl() {  # ctl <file> <want> <label>
 ctl "$WORK/c_arming.txt"  0 "the frame-1 arming artefact is not counted"
 ctl "$WORK/c_real.txt"    1 "a real in-window read IS counted"
 ctl "$WORK/c_outside.txt" 0 "an out-of-window read is not counted"
+
+# --- 5. the instrument's alignment (#228 step 4, option A) ---------------
+echo "5. the instrument's alignment (#228 step 4, option A)"
+unset MAME_ROMPATH || true
+if [ "$FREEZE_CLOCK" = 1 ]; then
+    [ "$fail" = 0 ] || { echo "REFUSED: sections 1-4 failed — nothing frozen"; exit 1; }
+    ia_freeze "$REPO/tests/lua/trace_writes.lua" "$WORK/manifest.tsv" "$WORK/fz" "${JOBS:-4}" "$WORK/clocks.tsv" \
+        > "$WORK/fz.txt" || { sed 's/^/  /' "$WORK/fz.txt"; echo "REFUSED: the alignment does not hold — nothing frozen"; exit 1; }
+    mkdir -p "$(dirname "$CLOCKS")"
+    { echo "# $CLOCKS — the game clock RAM:\$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,"
+      echo "# option A) by \`tests/test_beam_anim_walk.sh --freeze-clock\` at $(git rev-parse --short=8 HEAD): native = vsav2,"
+      echo "# ours = ${BUILD#"$REPO"/}; every reference leg held to replay.lua run live, every watch run to its reference leg's game clock."
+      echo "# leg<TAB>replay<TAB>frames<TAB>gameclock"
+      cat "$WORK/clocks.tsv"; } > "$CLOCKS"
+    echo "froze $(wc -l < "$WORK/clocks.tsv" | tr -d ' ') game clocks into $CLOCKS"
+    exit 0
+fi
+if ia_check_manifest "$CLOCKS" "$WORK/manifest.tsv" > "$WORK/align_bad.txt"; then
+    echo "  ok: both legs on emulated time, at their frozen game clocks"
+else echo "  FAIL: $(wc -l < "$WORK/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$WORK/align_bad.txt" | sed 's/^/        /'; fail=1; fi
+ia_stage test_beam_anim_walk "$CLOCKS" "$REPO/tests/lua/trace_writes.lua" "$WORK/manifest.tsv" 2 "$WORK/st" "$MODE" || fail=1
+if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
+    [ "$fail" = 1 ] && { echo "FAIL test_beam_anim_walk.sh (control mode: $MODE)"; exit 1; }
+    echo "FAIL test_beam_anim_walk.sh — control mode $MODE left the gate green"; exit 1
+fi
+if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || fail=1; fi
+if [ "$IA_SKIP" = fired ]; then vs_ctl_fired first-frame-skip "$IA_SKIP_MSG"; else vs_ctl_dead first-frame-skip "$IA_SKIP_MSG" || fail=1; fi
 
 echo
 if [ "$fail" -eq 0 ]; then echo "PASS test_beam_anim_walk.sh"; exit 0

@@ -1,6 +1,8 @@
 -- tap_writes.lua — log writes hitting a RAM range via a memory tap (no
--- debugger: frame counting stays replay-exact, unlike trace_writes.lua —
--- see docs/GOTCHAS.md on debugger stops desyncing replays). The tool for
+-- debugger, so no stop: frame counting stays replay-exact and nothing moves
+-- the game — see docs/GOTCHAS.md on debugger stops desyncing replays;
+-- trace_writes.lua counts emulated frames since 14z-197, #228 step 4, but
+-- its stops can still move the game, [MFI-2]). The tool for
 -- "who writes this field DURING these frames?" on hot fields written
 -- every frame (positions), where watchpoint stops would melt the replay.
 --

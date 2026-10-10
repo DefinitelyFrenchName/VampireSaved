@@ -9,11 +9,21 @@
 # HOW: static: the built image holds 0x0D88 at the blob's entry [0x0F]; runtime: replay 65
 #   on MAME with the victim keyframe walker tapped for reads of the fixed block versus the
 #   old one (206/0 on the candidate, 0/206 pre-fix).
+#   THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): trace_writes.lua counts
+#   EMULATED frames (tests/lua/emu_clock.lua); both tap runs' game clock RAM:$FF8080 at the last frame is held to
+#   tests/expected/instr_gameclock/test_don_throw_mirror.tsv, frozen by `--freeze-clock` from a REFERENCE leg (no
+#   watch, no debugger) held to replay.lua run live; one STAGING reference leg is held to replay.lua on every run
+#   (tests/lib/instr_align.sh).
 # EXPECTS: the word present and the walker reading only the fixed block. SKIPs on variant-id
-#   builds, where the mirror is tenant-vs-tenant at 0x13 and correct by construction.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/trace_writes.lua
+#   builds, where the mirror is tenant-vs-tenant at 0x13 and correct by construction. Both tap runs on emulated
+#   time at the frozen game clock, the staging leg on replay.lua's checksum.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/instr_gameclock/ tests/lib/controls.sh
+#   tests/lib/instr_align.sh tests/lua/emu_clock.lua tests/lua/replay.lua tests/lua/trace_writes.lua
 #   tests/replays/65_don_mirror_throw.rpl tools/build_donovan.sh tools/run_mame.sh
 #   tools/setup_mame.sh
+#
+# MUST-FIRE: known-bad: drift-clock — a tap run under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 4,193 emulated frames of 4,400 counted) must miss its frozen game clock (in-gate: one extra run; mode: both tap runs run the old clock and the gate FAILs)
+# MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs)
 #
 # MECHANISM. The throw victim-keyframe blob (data_port
 # throw_victim_keyframes, dst 0x0B19F8) carries a victim-id offset table;
@@ -33,7 +43,7 @@
 # vanilla and the mirror flavor is tenant-vs-tenant at 0x13, correct by
 # construction — the gate SKIPs on those builds).
 #
-# Usage: ROMDIR=... tests/test_don_throw_mirror.sh [outbase]
+# Usage: ROMDIR=... tests/test_don_throw_mirror.sh [outbase] [--freeze-clock]
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -55,6 +65,14 @@ cd "$REPO"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 fail=0
+FREEZE_CLOCK=0
+for a in "$@"; do [ "$a" = "--freeze-clock" ] && FREEZE_CLOCK=1; done
+[ "${1:-}" = "--freeze-clock" ] && shift
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+. "$REPO/tests/lib/instr_align.sh"
+CLOCKS="tests/expected/instr_gameclock/test_don_throw_mirror.tsv"
+[ "$FREEZE_CLOCK" = 1 ] && [ -n "$MODE" ] && { echo "REFUSED: --freeze-clock in control mode"; exit 3; }
+_clk=""; [ "$MODE" = drift-clock ] && _clk="INSTR_CLOCK=frame_done"
 
 OUTBASE="${1:-}"
 if [ -z "$OUTBASE" ]; then
@@ -99,7 +117,10 @@ if [ "${SKIP_RUNTIME:-0}" = 1 ]; then
     echo "  SKIPPED (SKIP_RUNTIME=1)"
 else
     for w in b2780 b2528; do
-        WATCH="$w,32,r" TRACE_OUT="$WORK/w_$w.txt" FRAMES=4400 \
+        ia_note "$WORK/manifest.tsv" base 65_don_mirror_throw vsavj "$OUTBASE/rompath;$ROMDIR" \
+            "$REPO/tests/replays/65_don_mirror_throw.rpl" 4400 "WATCH=$w,32,r" "$WORK/w_$w.align"
+        # shellcheck disable=SC2086
+        env $_clk WATCH="$w,32,r" TRACE_OUT="$WORK/w_$w.txt" FRAMES=4400 ALIGN_OUT="$WORK/w_$w.align" \
         REPLAY="$REPO/tests/replays/65_don_mirror_throw.rpl" \
         MAME_SANDBOX="$WORK/sbx_$w" \
         MAME_ROMPATH="$OUTBASE/rompath;$ROMDIR" \
@@ -115,6 +136,31 @@ else
         echo "  FAIL: fixed-block reads=$NEW (want >=50), old-block reads=$OLD (want 0)"
         fail=1
     fi
+
+    echo "== 3. the instrument's alignment (#228 step 4, option A) =="
+    if [ "$FREEZE_CLOCK" = 1 ]; then
+        [ "$fail" = 0 ] || { echo "REFUSED: sections 1-2 failed — nothing frozen"; exit 1; }
+        ia_freeze "$REPO/tests/lua/trace_writes.lua" "$WORK/manifest.tsv" "$WORK/fz" "${JOBS:-4}" "$WORK/clocks.tsv" \
+            > "$WORK/fz.txt" || { sed 's/^/  /' "$WORK/fz.txt"; echo "REFUSED: the alignment does not hold — nothing frozen"; exit 1; }
+        mkdir -p "$(dirname "$CLOCKS")"
+        { echo "# $CLOCKS — the game clock RAM:\$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,"
+          echo "# option A) by \`tests/test_don_throw_mirror.sh --freeze-clock\` at $(git rev-parse --short=8 HEAD) (base = the base-slot"
+          echo "# track built fresh); every reference leg held to replay.lua run live, every tap run to its reference leg's game clock."
+          echo "# leg<TAB>replay<TAB>frames<TAB>gameclock"
+          cat "$WORK/clocks.tsv"; } > "$CLOCKS"
+        echo "froze $(wc -l < "$WORK/clocks.tsv" | tr -d ' ') game clocks into $CLOCKS"
+        exit 0
+    fi
+    if ia_check_manifest "$CLOCKS" "$WORK/manifest.tsv" > "$WORK/align_bad.txt"; then
+        echo "  ok: both tap runs on emulated time, at the frozen game clock"
+    else echo "  FAIL: $(wc -l < "$WORK/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$WORK/align_bad.txt" | sed 's/^/        /'; fail=1; fi
+    ia_stage test_don_throw_mirror "$CLOCKS" "$REPO/tests/lua/trace_writes.lua" "$WORK/manifest.tsv" 1 "$WORK/st" "$MODE" || fail=1
+    if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
+        [ "$fail" = 1 ] && { echo "FAIL: mirror-victim gate (control mode: $MODE)"; exit 1; }
+        echo "FAIL: mirror-victim gate — control mode $MODE left the gate green"; exit 1
+    fi
+    if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || fail=1; fi
+    if [ "$IA_SKIP" = fired ]; then vs_ctl_fired first-frame-skip "$IA_SKIP_MSG"; else vs_ctl_dead first-frame-skip "$IA_SKIP_MSG" || fail=1; fi
 fi
 
 if [ "$fail" -ne 0 ]; then

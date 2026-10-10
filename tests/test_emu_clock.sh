@@ -15,8 +15,15 @@
 #   breakpoint leg's own checksum equals the basis is PRINTED, not asserted: a stop can move the game without
 #   moving $FF8080 ([MFI-2]; measured 14z-197: it differs here). A red means instruments' input lands on the
 #   wrong frame again — every gate built on them describes a game the replay never played.
-# FOLLOWS: emu/mame-patches/ tests/expected/vsavj/masked-v2/ tests/lib/controls.sh tests/lua/emu_clock.lua
-#   tests/lua/obj_record_bank_trace.lua tests/replays/ tools/run_mame.sh tools/setup_mame.sh
+#   SECTION 4 (14z-197, slice 2) is the ground truth of tests/lib/instr_align.sh's RUN MANIFEST verdicts, on
+#   tests/lua/trace_writes.lua (the instrument with POKES): ia_freeze accepts an aligned write-watch run and its
+#   rows pass ia_check_manifest; it REFUSES a run under the frame_done clock and two runs under one key that
+#   disagree on POKES; and a POKE on the anchor frame — which moves replay.lua's checksum there (shown) — still
+#   leaves the reference leg's anchor equal to replay.lua's (emu_clock.lua's on_pokes runs before the anchor, as
+#   replay.lua pokes before its checksum).
+# FOLLOWS: emu/mame-patches/ tests/expected/vsavj/masked-v2/ tests/lib/controls.sh tests/lib/instr_align.sh
+#   tests/lua/emu_clock.lua tests/lua/obj_record_bank_trace.lua tests/lua/replay.lua tests/lua/trace_writes.lua
+#   tests/replays/ tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: known-bad: first-frame-skip — a reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss the basis checksum at frame 1500 (in-gate; as a mode the reference leg runs the skip and the gate FAILs)
 # MUST-FIRE: known-bad: drift-clock — the breakpoint leg under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync) must cover fewer emulated frames than it counts and read a game clock unlike the reference's (in-gate; as a mode the breakpoint leg runs the old clock and the gate FAILs)
@@ -87,6 +94,39 @@ if [ -z "$de" ]; then vs_ctl_dead drift-clock "the drift leg wrote no ALIGN line
 elif [ "$de" -lt "$N" ] && [ "$dg" != "$rg" ]; then
     vs_ctl_fired drift-clock "under the frame_done clock the breakpoint leg covered $de emulated frames of $N counted and reads game clock $dg where the reference's reads $rg"
 else vs_ctl_dead drift-clock "the frame_done clock covered $de of $N frames, game clock $dg (reference $rg)" || rc=1; fi
+
+echo "== 4. the run manifest's verdicts (tests/lib/instr_align.sh, on trace_writes.lua with POKES)"
+. "$REPO/tests/lib/instr_align.sh"
+TW="$REPO/tests/lua/trace_writes.lua"; N4=600; R4="$REPO/tests/replays/$RPL.rpl"
+PK4="$N4:ff8100:a55a"       # a write ON the anchor frame
+mk() {  # mk <tag> <extra env> — one write-watch run of trace_writes (P1's x word: a stop on most frames)
+    mkdir -p "$W/m_$1"
+    # shellcheck disable=SC2086
+    ( cd "$W/m_$1" && env $2 WATCH=ff8410,2 POKES="$PK4" REPLAY="$R4" FRAMES=$N4 ALIGN_OUT="$W/m_$1/align" \
+        TRACE_OUT="$W/m_$1/t.txt" MAME_SANDBOX="$W/m_$1/sb" MAME_ROMPATH="$ROMDIR" \
+        timeout 900 "$REPO/tools/run_mame.sh" vsavj -debug -debugger none -autoboot_script "$TW" > "$W/m_$1/l.log" 2>&1 ) </dev/null || true
+}
+mk good ""; mk drift INSTR_CLOCK=frame_done
+ia_note "$W/good.tsv" vsavj "$RPL" vsavj - "$R4" $N4 "POKES=$PK4 WATCH=ff8410,2" "$W/m_good/align"
+if ia_freeze "$TW" "$W/good.tsv" "$W/fz_good" 2 "$W/good_rows.tsv" > "$W/fz_good.txt"; then
+    ok "ia_freeze accepts an aligned run ($(ia_field "$W/m_good/align" uiframes) stop frames skipped): $(cut -f3,4 "$W/good_rows.tsv" | tr '\t' ' ')"
+else bad "ia_freeze refused an aligned run: $(head -2 "$W/fz_good.txt" | tr '\n' ' ')"; fi
+[ "$(ia_field "$W/m_good/align" uiframes)" -gt 0 ] 2>/dev/null || bad "the write watch never stopped the CPU — this section tested nothing"
+ia_check_manifest "$W/good_rows.tsv" "$W/good.tsv" > "$W/cm.txt" && ok "ia_check_manifest passes the run against its own frozen row" \
+    || bad "ia_check_manifest failed the run it was frozen from: $(head -1 "$W/cm.txt")"
+ia_note "$W/drift.tsv" vsavj "$RPL" vsavj - "$R4" $N4 "POKES=$PK4 WATCH=ff8410,2" "$W/m_drift/align"
+if ia_freeze "$TW" "$W/drift.tsv" "$W/fz_drift" 2 "$W/drift_rows.tsv" > "$W/fz_drift.txt"; then bad "ia_freeze ACCEPTED a run under the frame_done clock"
+else ok "ia_freeze refuses a run under the frame_done clock: $(grep "game clock" "$W/fz_drift.txt" | head -1)"; fi
+cp "$W/good.tsv" "$W/conflict.tsv"
+ia_note "$W/conflict.tsv" vsavj "$RPL" vsavj - "$R4" $N4 "POKES=1:ff8100:00 WATCH=ff8410,2" "$W/m_good/align"
+if ia_freeze "$TW" "$W/conflict.tsv" "$W/fz_c" 2 "$W/c_rows.tsv" > "$W/fz_c.txt" 2>&1; then bad "ia_freeze ACCEPTED two runs under one key with different POKES"
+else ok "ia_freeze refuses two runs under one key that disagree on POKES"; fi
+# the anchor frame's POKE moves replay.lua's checksum there, so the equality above is an ordering test
+_ia_rl vsavj - "$R4" "" "$W/rl_nopoke"
+p1="$(ia_replaylua_read "$W/fz_good/k1/rl" $N4)"; p0="$(ia_replaylua_read "$W/rl_nopoke" $N4)"
+if [ -n "$p1" ] && [ -n "$p0" ] && [ "$p1" != "$p0" ]; then
+    ok "the anchor-frame POKE moves replay.lua's checksum ($p0 -> $p1), and the reference leg's anchor matched it"
+else bad "the anchor-frame POKE did not move replay.lua's checksum ($p0 / $p1): the ordering is untested"; fi
 
 [ "$rc" = 0 ] && echo "PASS: test_emu_clock" || echo "FAIL: test_emu_clock"
 exit "$rc"

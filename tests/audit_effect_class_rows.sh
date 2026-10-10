@@ -11,10 +11,22 @@
 # HOW: MAME -debug watches on the OPCODES space (the tables are read pc-relatively; a plain
 #   watchpoint is silently blind), every section with a positive control on the same
 #   instrument and leg.
+#   THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): trace_writes.lua counts
+#   EMULATED frames (tests/lua/emu_clock.lua), so every watch run of sections 1-3 plays its whole replay since
+#   14z-197 (until then the type-10 run of 02_demitri_vs_cpu covered 2,817 emulated frames of 5,520 counted); each run's game clock
+#   RAM:$FF8080 at its last frame is held to tests/expected/instr_gameclock/audit_effect_class_rows.tsv, frozen by
+#   `--freeze-clock` from REFERENCE legs (no watch, no debugger) each held to replay.lua run live; one STAGING
+#   reference leg is held to replay.lua on every run (tests/lib/instr_align.sh). Section 4 (BUILD set) is not in
+#   the frozen file.
 # EXPECTS: 0 / used / used as measured, the fallback inventory exact; a blind instrument
-#   cannot pass as a clean result.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/trace_writes.lua tests/replays/
+#   cannot pass as a clean result. Every section 1-3 run on emulated time at its frozen game clock, the staging leg
+#   on replay.lua's checksum.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/instr_gameclock/ tests/lib/controls.sh
+#   tests/lib/instr_align.sh tests/lua/emu_clock.lua tests/lua/replay.lua tests/lua/trace_writes.lua tests/replays/
 #   tools/run_mame.sh tools/setup_mame.sh
+#
+# MUST-FIRE: known-bad: drift-clock — a watch run under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 2,817 emulated frames of 5,520 counted on 02_demitri_vs_cpu) must miss its frozen game clock (in-gate: one extra run; mode: every section 1-3 watch run runs the old clock and the gate FAILs)
+# MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs)
 #
 # WHY THIS EXISTS. Two of the beam port's rows are justified by "legacy
 # never reaches this", which is a measurement, not an argument:
@@ -48,7 +60,7 @@
 # blind instrument cannot pass as a clean result.
 #
 # Usage: ROMDIR=... [REPLAYS="02_demitri_vs_cpu 07_mash_storm ..."] \
-#            tests/audit_effect_class_rows.sh
+#            tests/audit_effect_class_rows.sh [--freeze-clock | --freeze]
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -60,6 +72,10 @@
 #   section carries a same-instrument positive control: this file exists
 #   because a blind watchpoint and a real zero look identical, and both traps
 #   bit here (GOTCHAS)
+#   (THOSE COUNTS ARE THE frame_done CLOCK'S, 14z-197: on replay 02's 5,520 frames the row-37 control's run covered
+#   3,759 emulated frames and type 10's 2,817 (#228 step 3); over the whole replay the control reads 3,872 and type 10
+#   13,508 — sections 1 and 3 print them.
+#   The zeros of row 16 hold over every frame of all six replays.)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"
@@ -74,6 +90,12 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
+FREEZE_CLOCK=0; [ "${1:-}" = "--freeze-clock" ] && FREEZE_CLOCK=1
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+. "$REPO/tests/lib/instr_align.sh"
+CLOCKS="tests/expected/instr_gameclock/audit_effect_class_rows.tsv"
+[ "$FREEZE_CLOCK" = 1 ] && [ -n "$MODE" ] && { echo "REFUSED: --freeze-clock in control mode"; exit 3; }
+_clk=""; [ "$MODE" = drift-clock ] && _clk="INSTR_CLOCK=frame_done"
 
 MAME_REF="${MAME_REF_BIN:-$HOME/.cache/vampire-saved/mame-ref/cps2}"
 # WIDENED 14z-91. The four short rigs were the default for ten sessions and
@@ -94,7 +116,10 @@ frames_for() {
 watch() {
     _r=$1; _a=$2; _l=$3; _ms=$4; _tag=$5
     unset MAME_ROMPATH || true
-    WATCH="$_a,$_l,$_ms" TRACE_OUT="$WORK/$_tag.txt" FRAMES="$(frames_for "$_r")" \
+    ia_note "$WORK/manifest.tsv" vsavj "$_r" vsavj - "$REPO/tests/replays/$_r.rpl" "$(frames_for "$_r")" \
+        "MAME_BIN=$MAME_REF WATCH=$_a,$_l,$_ms" "$WORK/$_tag.align"
+    # shellcheck disable=SC2086
+    env $_clk WATCH="$_a,$_l,$_ms" TRACE_OUT="$WORK/$_tag.txt" FRAMES="$(frames_for "$_r")" ALIGN_OUT="$WORK/$_tag.align" \
     REPLAY="$REPO/tests/replays/$_r.rpl" MAME_SANDBOX="$WORK/sbx_$_tag" \
     MAME_BIN="$MAME_REF" \
         tools/run_mame.sh vsavj -debug -debugger none \
@@ -149,7 +174,13 @@ done
 # 0x000C -> 6 entries, types 0..10).  Type 10's handler is a bare `rts`,
 # which invites repointing it instead of hooking the drawer.
 echo "3. drawer list-type 10 is USED by legacy (so it is not a spare slot)"
+# every slot of the six-entry table (PRG:0x01AFBA, entry 0 = its 12-byte length) on the same replay, PRINTED: the
+# per-type reads docs/game/atlas/sprite_lists.md quotes (14z-197: over the whole replay; only type 10 is asserted)
+for ts in 0:1afba 2:1afbc 4:1afbe 6:1afc0 8:1afc2; do
+    echo "  type ${ts%%:*}: $(watch 02_demitri_vs_cpu "${ts#*:}" 2 r,o "type${ts%%:*}") reads"
+done
 n=$(watch 02_demitri_vs_cpu 1afc4 2 r,o type10)
+echo "  type 10: $n reads"
 if [ "$n" -gt 100 ] 2>/dev/null; then
     echo "  ok: $n reads of the type-10 entry — repointing it would change"
     echo "      legacy rendering; the shortcut is closed, measured not assumed"
@@ -198,6 +229,31 @@ fi
 # blind-instrument shape this whole file exists to prevent), and the
 # fallback's offset inside the body is decoded from the manifest's two entry
 # branches, which must agree with each other.
+echo "5. the instrument's alignment, sections 1-3 (#228 step 4, option A)"
+if [ "$FREEZE_CLOCK" = 1 ]; then
+    [ "$fail" = 0 ] || { echo "REFUSED: sections 1-3 failed — nothing frozen"; exit 1; }
+    ia_freeze "$REPO/tests/lua/trace_writes.lua" "$WORK/manifest.tsv" "$WORK/fz" "${JOBS:-4}" "$WORK/clocks.tsv" \
+        > "$WORK/fz.txt" || { sed 's/^/  /' "$WORK/fz.txt"; echo "REFUSED: the alignment does not hold — nothing frozen"; exit 1; }
+    mkdir -p "$(dirname "$CLOCKS")"
+    { echo "# $CLOCKS — the game clock RAM:\$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,"
+      echo "# option A) by \`tests/audit_effect_class_rows.sh --freeze-clock\` at $(git rev-parse --short=8 HEAD): pristine vsavj, sections"
+      echo "# 1-3; every reference leg held to replay.lua run live, every watch run to its reference leg's game clock."
+      echo "# leg<TAB>replay<TAB>frames<TAB>gameclock"
+      cat "$WORK/clocks.tsv"; } > "$CLOCKS"
+    echo "froze $(wc -l < "$WORK/clocks.tsv" | tr -d ' ') game clocks into $CLOCKS"
+    exit 0
+fi
+if ia_check_manifest "$CLOCKS" "$WORK/manifest.tsv" > "$WORK/align_bad.txt"; then
+    echo "  ok: every section 1-3 run on emulated time, at its frozen game clock"
+else echo "  FAIL: $(wc -l < "$WORK/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$WORK/align_bad.txt" | sed 's/^/        /'; fail=1; fi
+ia_stage audit_effect_class_rows "$CLOCKS" "$REPO/tests/lua/trace_writes.lua" "$WORK/manifest.tsv" 1 "$WORK/st" "$MODE" || fail=1
+if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
+    [ "$fail" = 1 ] && { echo "FAIL audit_effect_class_rows.sh (control mode: $MODE)"; exit 1; }
+    echo "FAIL audit_effect_class_rows.sh — control mode $MODE left the gate green"; exit 1
+fi
+if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || fail=1; fi
+if [ "$IA_SKIP" = fired ]; then vs_ctl_fired first-frame-skip "$IA_SKIP_MSG"; else vs_ctl_dead first-frame-skip "$IA_SKIP_MSG" || fail=1; fi
+
 FB_FROZEN="build/manifest/type6_fallback.toml"
 if [ -n "${BUILD:-}" ]; then
     echo "4. the type-6 fallback's EXECUTION matches its frozen inventory"
