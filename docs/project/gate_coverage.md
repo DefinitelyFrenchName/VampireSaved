@@ -13,7 +13,7 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**451 of 451 gates described.**
+**453 of 453 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
@@ -25,7 +25,7 @@ first sentence) is `gate_index.md`.
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 87 | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
 | [character-data](#character-data) | 83 | 83 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
-| [review-triage](#review-triage) | 33 | 33 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
+| [review-triage](#review-triage) | 35 | 35 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
 ## runner
@@ -3246,7 +3246,15 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 ## review-triage
 
-the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for. 33 of 33 described.
+the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for. 35 of 35 described.
+
+### `test_applier_key_first.sh` — test, ci_portable
+
+**WHAT:** tools/apply_release.py checks the built set's key against the manifest BEFORE writing, and writes each zip through a temporary file renamed into place, so a key mismatch leaves an empty output directory empty and an earlier output byte-identical, with no temporary file behind; a release whose key matches still writes its set.
+
+**HOW:** a synthetic release packaged by tools/package_release.py from synthetic dumps (every member a pristine copy, so no patch is needed; a stub `xdelta3` on PATH satisfies its check), then the applier run as shipped against that manifest and against a copy whose `applied_set_key` is wrong.
+
+**EXPECTS:** the true manifest -> exit 0 and the set written; the wrong key -> non-zero exit naming the key, the empty output still empty, the earlier output unchanged. The 14z-197 shape: the key was checked after the zips were written, so the command failed while a playable-looking set sat in the output for a launcher to pick.
 
 ### `test_baseset_mask_invariant.sh` — test, ci_portable
 
@@ -3424,6 +3432,14 @@ the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guar
 
 **EXPECTS:** six tools refuse, no unguarded assert-using tool in a builder's path; the systemic section found four of the six.
 
+### `test_package_release_safety.sh` — test, ci_portable
+
+**WHAT:** tools/package_release.py refuses a --name that is not one safe path component (`../victim`, an absolute path, a separator, `.`/`..`, a leading dot) before touching anything, and so does tools/package_release_platforms.py; a run that fails early (a missing reference dump) or late (a corrupt build zip) leaves the previous package at `<out>/<name>` byte-identical and no staging directory behind; a run that succeeds replaces the previous package whole.
+
+**HOW:** synthetic reference and build zips (no ROM bytes) and a stub `xdelta3` on PATH that writes a placeholder patch, the packager run as shipped; a sentinel file planted in the previous package and in a sibling `victim` directory.
+
+**EXPECTS:** every unsafe name refused with `victim/sentinel` intact; both failures keep `good/sentinel`; the successful run leaves a manifest and no sentinel. The 14z-197 shapes: `--name ../victim` deleted the sibling, and the previous package was deleted before the first dump was opened.
+
 ### `test_patch_source_identity.sh` — test, ci_static
 
 **WHAT:** a patch applies only to the source set it was generated against: the generator records `src_program_identity` (a sha1 over the program members in load order) and patch_prg refuses a mismatch; an absent identity is a warning (inline synthetic patches are legitimate), pinned as deliberate.
@@ -3494,7 +3510,7 @@ the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guar
 
 **HOW:** a fake romdir fixture (no real dump at risk) through the tool's guard with each alias shape, then a real separate-directory build (~2 s).
 
-**EXPECTS:** every alias refused with the sources untouched, the legitimate build working. Section 7 (14z-197, GitHub #245): a generated vsavjw.zip kept in romdir, and a symlink already at the output path, are never written through — the output is a fresh regular file and both link targets are byte-identical afterwards.
+**EXPECTS:** every alias refused with the sources untouched, the legitimate build working. Section 7 (14z-197, GitHub #245): a generated vsavjw.zip kept in romdir, and a symlink already at the output path, are never written through — the output is a fresh regular file and both link targets are byte-identical afterwards. Section 8 (14z-197, GitHub #250): a RELATIVE romdir and outdir, run from another cwd, build an overlay whose every link resolves to its source member.
 
 ### `test_select_port_hygiene.sh` — test, ci_portable
 

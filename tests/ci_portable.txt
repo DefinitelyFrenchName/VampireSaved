@@ -31,6 +31,7 @@
 #   test_guard_integrity        drives MAME
 # Every one of those is derived from ROM content, which rule 7 keeps out of
 # the repo. They stay local-only by design, not by oversight.
+test_applier_key_first
 test_attribute_ramdiff
 test_audit_merged_dispatch
 test_baseset_mask_invariant
@@ -75,6 +76,7 @@ test_gate_follows
 test_lane_carry
 test_emulator_staleness
 test_measures_contract
+test_package_release_safety
 test_poke_readback
 test_gate_coverage_current
 test_hex_lengths

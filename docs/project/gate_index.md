@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**451 scripts** — 123 ci_portable, 93 ci_static, 235 emulator-tier (run by name).
+**453 scripts** — 125 ci_portable, 93 ci_static, 235 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -28,7 +28,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
 | [character-data](#character-data) | 83 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
-| [review-triage](#review-triage) | 33 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
+| [review-triage](#review-triage) | 35 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
 ## runner
@@ -491,6 +491,7 @@ the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guar
 
 | gate | kind | tier | needs | locks (the script's own header) | since |
 |---|---|---|---|---|---|
+| `tests/test_applier_key_first.sh` | test | ci_portable | — | THE PYTHON APPLIER WRITES NOTHING IT HAS NOT VERIFIED, THE SET KEY INCLUDED (14z-197, GitHub #255). ci_portable: no ROM, ~5 s. | 14z-197 |
 | `tests/test_baseset_mask_invariant.sh` | test | ci_portable | — | a .masked spec's baseset must be frozen under the same mask the set runs (14z-94, GitHub #62). ROM-free, ~1 s. | 14z-94 |
 | `tests/test_basis_publish_atomic.sh` | test | ci_portable | — | freezing a masked basis is all-or-nothing (14z-94, GitHub #86). ROM-free, no MAME, ~3 s. | 14z-94 |
 | `tests/test_battery_accounting.sh` | test | ci_portable | — | "BATTERY GREEN" must not be printable when gates self-skipped (14z-94, GitHub #24). ROM-free, ~1 s. | 14z-94 |
@@ -513,6 +514,7 @@ the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guar
 | `tests/test_minitoml_subset.sh` | test | ci_portable | — | the manifest parser must mean the SAME THING on every host (14z-94, GitHub #42). ROM-free, ~1 s. | 14z-94 |
 | `tests/test_no_tracked_mutation.sh` | test | ci_portable | — | test instrumentation must not write tracked source (14z-94, GitHub #81). ROM-free, ~2 s. | 14z-94 |
 | `tests/test_optimize_guard.sh` | test | ci_portable | — | a safety check that an environment variable can switch off is not a safety check (14z-94, GitHub #79). ROM-free, ~2 s. | 14z-94 |
+| `tests/test_package_release_safety.sh` | test | ci_portable | — | THE PACKAGER TOUCHES NOTHING OUTSIDE ITS RELEASE, AND A FAILED RUN KEEPS THE OLD ONE (14z-197, GitHub #246, #247). ci_portable: no ROM, ~10 s. | 14z-197 |
 | `tests/test_patch_source_identity.sh` | test | ci_static | ROMDIR | a patch may only be applied to the source set it was generated against (14z-94, GitHub #18). ~5 s, no emulator. | 14z-94 |
 | `tests/test_pcrel_escapes.sh` | test | ci_static | ROMDIR | the pc-relative DATA-escape set must be UNCHANGED SINCE REVIEWED (14z-94, GitHub #22). Needs ROMDIR + the three tenant builds and build/out/vsav2_data.bin; ~2 min. | 14z-94 |
 | `tests/test_phasea_a3_liveness.sh` | test | ci_portable | — | ground truth that audit_wide_phase_a's A3 cannot publish its permissive decision on a DEAD measurement (14z-94, GitHub #25). ROM-free, no emulator, ~2 s. | 14z-94 |

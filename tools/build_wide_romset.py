@@ -109,7 +109,15 @@ def main():
             dst = os.path.join(a.outdir, z)
             if os.path.islink(dst) or os.path.exists(dst):
                 os.remove(dst)
-            os.symlink(os.path.join(a.romdir, z), dst)
+            # ABSOLUTE targets (14z-197, GitHub #250): a link's target resolves
+            # against the LINK's directory, so `romdir=dumps` made
+            # `<out>/vsavj.zip -> dumps/vsavj.zip`, dangling inside <out> while
+            # this tool read dumps/ from the cwd and exited 0. abspath, not
+            # realpath, keeps a ROMDIR reached through a link in its own form.
+            os.symlink(os.path.join(os.path.abspath(a.romdir), z), dst)
+            if not os.path.exists(dst):
+                raise SystemExit(f"refusing to finish: the overlay link {dst} does "
+                                 f"not resolve (-> {os.readlink(dst)})")
 
     src_path = os.path.join(a.romdir, "vsavj.zip")
     src = zipfile.ZipFile(src_path)

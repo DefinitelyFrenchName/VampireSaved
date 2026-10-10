@@ -6854,3 +6854,41 @@ the log, `INPUT_OUT`, `VIDEO_OUT` and each file a `DUMPS` spec names before the 
 by glob, so another leg's dumps in a shared directory survive. Ground truth: `tests/test_mame_runner_hygiene.sh`, a
 stub MAME (silent / failing / good) and control `no-clear`. **The rule:** a check that reads success from an output
 file clears that file before the run, and a sibling's fix is applied to every sibling.
+
+## A SYMLINK'S TARGET RESOLVES AGAINST THE LINK'S DIRECTORY, NOT THE CWD — a relative ROMDIR built an overlay of dangling links that exited 0 (paid: 14z-196's code review, GitHub #250; fixed 14z-197)
+
+`tools/build_wide_romset.py` canonicalised its paths for the #76 directory guard but linked each reference zip to
+`os.path.join(romdir, z)` as typed. With `romdir=dumps` and `outdir=build/rompath`, `build/rompath/vsavj.zip ->
+dumps/vsavj.zip` resolves inside `build/rompath/` and dangles, while the tool itself read `dumps/` from the cwd and
+exited 0. The emulator then found no parent set. The links are now absolute (`os.path.abspath`, which keeps a
+ROMDIR that is itself reached through a link), and each one must resolve or the tool refuses. Ground truth:
+`tests/test_romset_path_guard.sh` §8, control `relative-link`. **The rule:** a path normalised for a CHECK is
+not the path the tool USES unless the code passes the same value; write link targets absolute, and assert that
+they resolve.
+
+## THE RELEASE PACKAGER DELETED ITS TARGET FIRST — a typed name could reach a sibling, and a failed rebuild left nothing (paid: 14z-196's code review, GitHub #246 and #247; fixed 14z-197)
+
+`tools/package_release.py` joined `--name` into `<out>/<name>`, `rmtree`d that path, and only then opened the first
+reference dump. **#246:** `--name ../victim` (or an absolute name, which `os.path.join` lets override `<out>`)
+deleted a directory outside the release root, and `tools/package_release_platforms.py` joined the same name the
+same way. **#247:** any failure after the delete (a missing dump, a bad build zip, xdelta, the applier page) left
+no package where a good one had been. A name is now one component, `[A-Za-z0-9][A-Za-z0-9._-]*`, resolved inside
+`<out>`, checked first by both scripts. The package is built in a `mkdtemp` sibling and renamed into place only
+after the last step; a failure removes the stage and the work directory. One trap the control paid for: the
+staging prefix embeds the name, and `mkdtemp` refuses a `/`, which makes an unchecked `../victim` CRASH
+harmlessly. A control that removes only the name check is therefore DEAD; it has to remove that accidental guard
+too. Ground truth: `tests/test_package_release_safety.sh`, controls `name-unchecked` and `delete-first`.
+**The rule:** validate a path argument before the first mutation, and build a replacement beside the original;
+never build it in the original's place.
+
+## THE PYTHON APPLIER CHECKED THE SET KEY AFTER WRITING THE SET — a failure that leaves its output is not a failure to a launcher (paid: 14z-196's code review, GitHub #255; fixed 14z-197)
+
+`tools/apply_release.py` verified every member, wrote the zips, and only then compared the whole-set key with the
+manifest's `applied_set_key`. On a mismatch it exited 1 saying the output was not what the release declares, but
+left that output in place, and the launchers choose a set because it exists. The browser applier checked the key
+before handing anything back, so the two routes differed. The key is now computed from the built members and
+checked before any file is opened, and each zip goes through a temporary file renamed into place only when every
+zip is complete. A failure leaves an empty output empty and an earlier output byte-identical. This is a shipped
+file: the fix reaches players with the next release. Ground truth: `tests/test_applier_key_first.sh` (a synthetic
+release from the real packager), control `write-first`. **The rule:** an applier verifies everything it can before
+its first write, and publishes by rename.

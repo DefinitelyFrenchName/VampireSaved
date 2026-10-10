@@ -43,7 +43,7 @@ the manifest records everything the applier needs. Run it under
 tests/test_release_roundtrip.sh, which applies the result to pristine dumps
 and requires byte-identity with the build.
 """
-import argparse, hashlib, json, os, shutil, subprocess, sys, zipfile
+import argparse, hashlib, json, os, re, shutil, subprocess, sys, tempfile, zipfile
 
 SOURCE_ORDER = ["vsavj.zip", "vsav.zip", "vsav2.zip"]   # three since 14z-149; vhunt2 is the oracle, not a source
 XDELTA_FLAGS = ["-e", "-S", "none", "-B", str(1 << 28), "-W", str(1 << 23), "-f"]
@@ -142,6 +142,25 @@ def applied_set_key(zips):
     return h.hexdigest()
 
 
+SAFE_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
+
+
+def safe_release_name(out, name):
+    """<out>/<name>, or SystemExit before anything is touched (14z-197, GitHub #246). The name is
+    joined into a path that is then DELETED and rewritten, so `--name ../victim` (or an absolute
+    name, which os.path.join lets override <out>) removed a directory outside the release root.
+    One path component of letters, digits, `.`, `_`, `-`, not starting with `.` or `-`, and the
+    resolved result inside <out>. package_release_platforms.py calls this too."""
+    if not SAFE_NAME.fullmatch(name or ""):
+        raise SystemExit(f"refusing --name {name!r}: a release name is one path component "
+                         f"([A-Za-z0-9][A-Za-z0-9._-]*), never a path")
+    rel = os.path.join(out, name)
+    root = os.path.realpath(out)
+    if os.path.dirname(os.path.realpath(rel)) != root:
+        raise SystemExit(f"refusing --name {name!r}: {rel} resolves outside {root}")
+    return rel
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("rompath")
@@ -150,12 +169,35 @@ def main():
     ap.add_argument("--name", required=True, help="release name, e.g. merged-m6")
     ap.add_argument("--version", default="", help="the in-game version string")
     a = ap.parse_args()
+    final = safe_release_name(a.out, a.name)     # before anything else, a check included
     if not shutil.which("xdelta3"):
         sys.exit("xdelta3 not found on PATH (brew install xdelta)")
 
-    rel = os.path.join(a.out, a.name)
-    if os.path.exists(rel):
-        shutil.rmtree(rel)
+    os.makedirs(a.out, exist_ok=True)
+    # STAGED, THEN SWAPPED IN (14z-197, GitHub #247). The previous package at <out>/<name> was
+    # deleted HERE, before the first reference dump was opened, so any later failure (a missing
+    # dump, a bad build zip, xdelta, the applier page) left nothing where a good release had
+    # been. Everything is now written to a fresh sibling and moved into place only after the
+    # last step; a failure removes the stage and leaves the old package byte-identical.
+    rel = tempfile.mkdtemp(dir=a.out, prefix=f".stage-{a.name}-")
+    try:
+        package(a, rel)
+    except BaseException:
+        shutil.rmtree(rel, ignore_errors=True)
+        shutil.rmtree(os.path.join(a.out, f".work-{a.name}"), ignore_errors=True)
+        raise
+    old = None
+    if os.path.lexists(final):
+        old = tempfile.mkdtemp(dir=a.out, prefix=f".old-{a.name}-")
+        os.rename(final, os.path.join(old, a.name))
+    os.chmod(rel, 0o755)        # mkdtemp is 0700; a package directory is not private
+    os.rename(rel, final)
+    if old:
+        shutil.rmtree(old)
+
+
+def package(a, rel):
+    """Write the whole package into <rel> (main stages it and swaps it in)."""
     os.makedirs(os.path.join(rel, "patches"))
     work = os.path.join(a.out, f".work-{a.name}")
     os.makedirs(work, exist_ok=True)
@@ -307,7 +349,7 @@ def main():
                     rel, "--platform", "fbneo", "-o", os.path.join(rel, "apply_release.html")],
                    check=True, stdout=subprocess.DEVNULL)
     shutil.rmtree(work)
-    print(f"packaged {a.name}: {npatch} patched members, {ncopy} pristine copies -> {rel}")
+    print(f"packaged {a.name}: {npatch} patched members, {ncopy} pristine copies -> {os.path.join(a.out, a.name)}")
     if nfill:
         print(f"  standalone completion ({len(nfill)}): " + ", ".join(sorted(nfill)))
         print(f"  applied set key: {manifest['applied_set_key'][:8]}")

@@ -13,8 +13,11 @@
 #   Section 7 (14z-197, GitHub #245): a generated vsavjw.zip kept in romdir, and a symlink
 #   already at the output path, are never written through — the output is a fresh regular
 #   file and both link targets are byte-identical afterwards.
+#   Section 8 (14z-197, GitHub #250): a RELATIVE romdir and outdir, run from another cwd, build an overlay
+#   whose every link resolves to its source member.
 #
 # MUST-FIRE: shadow-tool: old-write — a copy of the tool that mirrors romdir's vsavjw.zip and opens the output path in place (the pre-#245 write) must clobber a link target and FAIL section 7 (mode: the copy is the tool under test)
+# MUST-FIRE: shadow-tool: relative-link — a copy of the tool that links to romdir as given and never checks the link (the pre-#250 overlay) must leave dangling links under a relative romdir and FAIL section 8 (mode: the copy is the tool under test)
 #
 # THE DEFECT. The tool's docstring promises "the reference set in ROMDIR is
 # never modified". Nothing enforced it. With outdir == romdir the overlay
@@ -69,7 +72,25 @@ for old, new in (
 open(sys.argv[2], "w").write(s)
 PY2
 }
+# relative_link <copy> — the pre-#250 tool: the link target is romdir as given, and nothing checks it resolves
+relative_link() {
+    python3 - "$REPO/tools/build_wide_romset.py" "$1" <<'PY2'
+import sys
+s = open(sys.argv[1]).read()
+for old, new in (
+        ("os.symlink(os.path.join(os.path.abspath(a.romdir), z), dst)", "os.symlink(os.path.join(a.romdir, z), dst)"),
+        ("            if not os.path.exists(dst):\n", "            if False:\n")):
+    if s.count(old) != 1:
+        sys.exit(f"relative_link: {old.strip()!r} found {s.count(old)} times, not once")
+    s = s.replace(old, new)
+open(sys.argv[2], "w").write(s)
+PY2
+}
 TOOL="$REPO/tools/build_wide_romset.py"
+if vs_ctl_is relative-link; then
+    relative_link "$T/relative_link.py" || { echo "REFUSED: CONTROL=relative-link could not build its copy"; exit 3; }
+    TOOL="$T/relative_link.py"
+fi
 if vs_ctl_is old-write; then
     old_write "$T/old_write.py" || { echo "REFUSED: CONTROL=old-write could not build its copy"; exit 3; }
     TOOL="$T/old_write.py"
@@ -207,8 +228,32 @@ else
     fail "a link at the output path was written through:"; sed 's/^/    /' "$T/s7.txt"
 fi
 
+echo "== 8. A RELATIVE ROMDIR STILL GIVES LINKS THAT RESOLVE (GitHub #250) =="
+# section9 <tool> <dir> — from <dir>/cwd, romdir `dumps` and outdir `build/rompath`, both relative;
+# one line per breach, exit 1 if any.
+section9() {
+    D="$2"; mkdir -p "$D/cwd/dumps"; cp "$FAKE"/vsavj.zip "$FAKE"/vsav.zip "$D/cwd/dumps/"
+    bad=0
+    ( cd "$D/cwd" && python3 "$1" dumps build/rompath --qsound 0 ) > "$D/r.log" 2>&1 || { echo "    the build failed: $(tail -1 "$D/r.log")"; bad=1; }
+    for z in vsavj.zip vsav.zip; do
+        l="$D/cwd/build/rompath/$z"
+        if [ ! -L "$l" ]; then echo "    $z: no overlay link"; bad=1
+        elif [ ! -e "$l" ]; then echo "    $z: the link DANGLES (-> $(readlink "$l"))"; bad=1
+        elif ! cmp -s "$l" "$D/cwd/dumps/$z"; then echo "    $z: the link resolves to another file"; bad=1; fi
+    done
+    return $bad
+}
+if section9 "$TOOL" "$T/s9" > "$T/s9.txt" 2>&1; then
+    echo "  ok: relative romdir and outdir from another cwd: every overlay link resolves to its source member"
+else
+    fail "a relative romdir gave an unusable overlay:"; sed 's/^/    /' "$T/s9.txt"
+fi
+
+if vs_ctl_is relative-link; then
+    echo; echo "FAIL: control mode relative-link (see above)"; exit 1
+fi
 if ! vs_ctl_is old-write; then
-    echo "== 8. control =="
+    echo "== 9. controls =="
     if ! old_write "$T/ctl.py" > "$T/ctl_build.txt" 2>&1; then
         vs_ctl_dead old-write "the copy could not be built: $(tail -1 "$T/ctl_build.txt")" || rc=1
     elif section7 "$T/ctl.py" "$T/s8" > "$T/s8.txt" 2>&1; then
@@ -218,6 +263,15 @@ if ! vs_ctl_is old-write; then
         vs_ctl_fired old-write "both link targets overwritten by the pre-#245 write ((a) romdir's vsavjw.zip, (b) the outside target)"
     else
         vs_ctl_dead old-write "section 7 failed for another reason: $(head -1 "$T/s8.txt")" || rc=1
+    fi
+    if ! relative_link "$T/ctl_rel.py" > "$T/ctl_rel_build.txt" 2>&1; then
+        vs_ctl_dead relative-link "the copy could not be built: $(tail -1 "$T/ctl_rel_build.txt")" || rc=1
+    elif section9 "$T/ctl_rel.py" "$T/s10" > "$T/s10.txt" 2>&1; then
+        vs_ctl_dead relative-link "the pre-#250 overlay passed section 8" || rc=1
+    elif grep -q 'the link DANGLES' "$T/s10.txt"; then
+        vs_ctl_fired relative-link "$(grep -m1 'DANGLES' "$T/s10.txt" | sed 's/^ *//')"
+    else
+        vs_ctl_dead relative-link "section 8 failed for another reason: $(head -1 "$T/s10.txt")" || rc=1
     fi
 fi
 

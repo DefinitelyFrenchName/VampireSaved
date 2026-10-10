@@ -908,7 +908,11 @@ def main():
     bad = [p for p in plats if p not in PLATFORMS]
     if bad:
         sys.exit(f"unknown platform(s): {bad}")
-    root = os.path.join(a.release_root, a.name)
+    # the name is joined into a path whose platform dirs are deleted and rewritten: one safe
+    # component inside release_root, or nothing is touched (14z-197, GitHub #246)
+    sys.path.insert(0, HERE)
+    from package_release import safe_release_name
+    root = safe_release_name(a.release_root, a.name)
     os.makedirs(root, exist_ok=True)
     for p in plats:
         dest = os.path.join(root, p)

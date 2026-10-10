@@ -144,6 +144,7 @@ declares	test_agent_worker
 declares	test_air_attack_height
 declares	test_anim_node_walk
 declares	test_annotations_current
+declares	test_applier_key_first
 declares	test_applier_page
 declares	test_applier_page_browser
 declares	test_applier_vcdiff
@@ -350,6 +351,7 @@ declares	test_obj_records
 declares	test_obj_walker_relocation
 declares	test_oboro_select
 declares	test_optimize_guard
+declares	test_package_release_safety
 declares	test_patch_overlap
 declares	test_patch_prg
 declares	test_patch_source_identity
