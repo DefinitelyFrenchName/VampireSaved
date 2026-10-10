@@ -645,6 +645,17 @@ So: the PLAY.bat generator changes now (plain cmd; the newer of two sets by `xco
 
 ---
 
+## Ruled 2026-10-10 (14z-197) — #228 step 4: the per-replay alignment check runs ONCE, at the conversion (option A)
+
+**The question (in chat):** step 4 converts `walker_sp`, `obj_record_bank_trace`, `trace_writes` and `replay_guard` to the emulated clock; #213's alignment check (a reference leg per replay) is the part that costs clock time. Options, from `build/agent197/t228/assessment.md` (rule-checker run 2026-10-10-797 OK, after runs 794-796): **A** — the per-replay check once, at the conversion, then on every run a frozen per-replay `RAM:$FF8080` value and ONE staging reference leg per gate, with a staging control and a frozen-comparison drift control per converted instrument; **B** — reference legs per replay at every freeze and release; **C** — reference legs per replay at release or a scheduled night run. Measured: `audit_marionette_cost` 227 s without reference legs, 339 s with them (Mac, JOBS 4).
+
+**The maintainer:**
+- the maintainer: *"option A"*
+
+So: step 4 converts the four instruments, runs the at-risk gates once with a reference leg per replay and re-freezes what moved (each re-freeze through the rule-checker), and each gate then keeps the frozen per-replay `$FF8080` comparison and one staging reference leg; each converted instrument gets a staging control (`first-frame-skip` shape) and a drift control aimed at the frozen comparison (`drift-clock` shape). The per-replay reference legs run again only when a frozen value moves.
+
+---
+
 ## Ruled 2026-10-10 (14z-197) — bbh's remaining links: the snapshot copy removed, the runners' output ours, the bbh instructions dropped, the shared copies ours
 
 **The questions (in chat):** four read-only links between this tree and `~/Developer/blackbox-harness`: (1) `tests/run_on_snapshot.sh` copies the bbh checkout into every snapshot (`BBH_HOME`), and `test_run_on_snapshot.sh` has a `shared-bbh` control for it; (2) both runners keep their output byte-identical to bbh's for its fidelity test; (3) the freeze rule [VSP-185] directs re-pointing bbh's lineage defaults, and a gotcha calls a new skill anchor document a two-repo edit; (4) `tests/lib/classify.sh` and `tests/lib/controls.sh` are hand-kept copies of bbh's code. Then whether `test_bbh_fidelity`, which compares the runners' output with bbh's, is deleted.

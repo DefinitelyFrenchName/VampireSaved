@@ -1,0 +1,10 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent197/t228/assessment.md	b6c20057e9786e5c8c2fee9230c4c619efd07f4d
+build/agent197/t228/measurer_costs_return.txt	86e68c11ae5bf467b955252366670791466e30e7
+build/agent197/t228/marionette_pre.log	fa02c7fd7dd40595ddebdfc86e0cd672d6a19a24
+build/agent197/t228/marionette_post.log	f56cc5c458b3df6f5687431737de68edc7a662bd
+tests/audit_marionette_cost.sh.lines-20-50 (lines 20-50 of tests/audit_marionette_cost.sh)	902cc150b0c30dc6f1c4b3d09dc9669cddeb41ea
+tests/audit_marionette_cost.sh.lines-95-130 (lines 95-130 of tests/audit_marionette_cost.sh)	ab0efb8a7d83a3478dc455e8042531389c583fa5
+tests/ci_emulator.tsv.lines-14-60 (lines 14-60 of tests/ci_emulator.tsv)	2f63a3f7740db3d26432001148ea9a07423e7403
+DECISIONS_HISTORY.md.lines-509-515 (lines 509-515 of DECISIONS_HISTORY.md)	1a4c3a7d230cdde0a1dcb23a42951054084dda27
+build/agent196/t228/step3/SUMMARY.txt	3162a23646b8d62aadba43a0665cc46f5fe2d22e
