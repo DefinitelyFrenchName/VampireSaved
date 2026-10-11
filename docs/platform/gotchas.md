@@ -349,9 +349,10 @@ was written into a gate header, an issue draft and STATE. A non-debug write tap
 15 frames at 2313-2355, the round-start fade. The counter had advanced once per stop.
 Inside the move, the row's only writer is the palette-sequence uploader. When the
 question is WHEN a write happens, use the non-debug tap. A `-debug` log gives the WHO,
-and its frame column is not a time. (`tests/lua/bp_regs.lua`'s header says the opposite
+and its frame column is not a time. (`tests/lua/bp_regs.lua`'s header said the opposite
 — "the debugger pauses emulated time during a stop, so frame-counted input playback
-stays aligned" — and this measurement contradicts it.)
+stays aligned" — and this measurement contradicts it; the claim is struck through
+there, and since 14z-197 the instrument counts emulated frames, the shared clock below.)
 The same sitting paid it a second time, worse. A reachability read watch over Donovan's whole
 x2b7ef4 copy stopped on a block the match reads thousands of times, so its replays desynced by
 up to ~5,700 frames and a "never read" was reported from runs that never played the moves.
@@ -392,7 +393,12 @@ writes its tap logs fall on exactly the 8 frames a non-debug `field_trace.lua` r
 logged each 1-2 frames late (`tests/test_hitbox_encoding.sh`, whose lookup had absorbed that lag).
 `replay_guard.lua` followed in slice 3 (its own replay parse handed to the clock, its integrity check after staging):
 a `-debug` crash-guard run with no stop now reproduces the frozen vanilla log byte for byte (`tests/test_crash_guard.sh`
-1b, control `drift-clock`). **A STOP IS LABELLED WITH THE LAST COMPLETED FRAME**: an event during frame N logs N-1 on
+1b, control `drift-clock`). The three that no gate runs followed (maintainer-ruled "Convert all three now"):
+`bp_regs.lua`, `fsm_census.lua` and `obj_record_full_trace.lua` each reach frame 3,000 of `03_two_player_vs` at 3,000
+emulated frames on the reference leg's game clock (`5b`), skipping 26,131, 3 and 26,132 UI frames (`uiframes`;
+`fsm_census`'s 2 dispatcher hits stop rarely, and a leg of it with no hit still reads 1)
+(`tests/test_emu_clock.sh` section 5); the 14z-110 corpus census `fsm_census.lua` took ran on the old clock
+(`tools/audit_fsm_census.py` BOUND). **A STOP IS LABELLED WITH THE LAST COMPLETED FRAME**: an event during frame N logs N-1 on
 the emulated clock — the old clock's count included the boot halt, so it logged N, and frozen frames moved by one
 (`tests/audit_df_dead_family.sh` control 3260 -> 3259, `tests/test_ladder_tenant_vs_palette.sh` probe 2416 -> 2415).
 **And rigs tuned on the old clock can stop working**: every input the old clock staged landed a frame (or more) early,
@@ -852,6 +858,10 @@ Rules:
   frame N contains, believe the tap — its frames are emulated frames.
 - Cross-check any stop-based finding against a screen-identifying fact
   (an init PC, a known object base) before attributing it to a screen.
+FIXED 14z-197 (GitHub #228): `obj_record_full_trace.lua` counts emulated frames
+through `tests/lua/emu_clock.lua` — 26,132 UI frames skipped over 3,000 frames
+on the reference leg's game clock (`tests/test_emu_clock.sh` section 5). A stop
+can still move the game itself ([MFI-2]), so the rules above stand.
 
 ## In-code pc-rel WORD JUMP TABLES read through the OPCODE view;
 ## byte/data tables through the DATA view — both live inside the

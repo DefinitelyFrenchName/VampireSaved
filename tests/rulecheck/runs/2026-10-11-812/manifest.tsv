@@ -1,0 +1,19 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent197/t228/rest/diffs/DECISIONS_HISTORY.md.diff	33b592ff50641d03b0fcb577b46c7f16cf555329
+build/agent197/t228/rest/diffs/docs_platform_gotchas.md.diff	9eea765b5cc063c2c2ed76e7264e2e2d495a0ae4
+build/agent197/t228/rest/diffs/tests_lua_bp_regs.lua.diff	08669dddf5ec30144417cf601f98825950288f2a
+build/agent197/t228/rest/diffs/tests_lua_emu_clock.lua.diff	e86846bc5db582f9178a37a97c5d35a1f86a0fff
+build/agent197/t228/rest/diffs/tests_lua_fsm_census.lua.diff	54372f1650fca3e48e6c970e1df2eaa00a0dc68a
+build/agent197/t228/rest/diffs/tests_lua_obj_record_full_trace.lua.diff	2a76dfc5fb7e291c3bfb81706bc352403f2ca4fd
+build/agent197/t228/rest/diffs/tests_test_emu_clock.sh.diff	b3f6e369df2c2b0bc4a96a43d4428e24f14ca0b3
+build/agent197/t228/rest/diffs/tools_audit_fsm_census.py.diff	43096577371cd4e5bcb5b2c61dd9aff854e61676
+build/agent197/t228/rest/diffs/tools_audit_poked_legs.py.diff	aacbb5acea9154ff652af5c3d6ac47e784534c16
+build/agent197/t228/rest/state_excerpt.txt	bcd024ff7bfd2e90e1e1b0fa489e77b8852c46ea
+build/agent197/t228/rest/gate_emu_clock.log	d2ad2be92a1525cd7ab5b5a761b89fb6fc21d92e
+build/agent197/t228/rest/gate_emu_clock3.log	86d14d2120c70e069335dc570cd0793a70aa34da
+build/agent197/t228/rest/scratch_aligns.txt	ce707d66d03b794d83f8ecec7cd7b856a484889a
+build/agent197/t228/rest/scratch_outputs.txt	17729289e598ed9c415af42f5133a5e9cf4b40f3
+build/agent197/t228/rest/poked_legs.log	bf43827151d211b605204da5aa70bf155351c826
+build/agent197/t228/rest/issue228_body.txt	c5d0bfc40640991c66c2678251435be5317895be
+build/agent197/t228/rest/t228_commits.txt	465ea8c18125aa09bfccfe361b7db7cbcd270b49
+build/agent197/t228/rest/rc811_b.txt	8f71a358188a941f592da9d74dd59d96edb4e3a5

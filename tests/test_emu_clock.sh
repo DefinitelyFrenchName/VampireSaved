@@ -21,8 +21,13 @@
 #   disagree on POKES; and a POKE on the anchor frame — which moves replay.lua's checksum there (shown) — still
 #   leaves the reference leg's anchor equal to replay.lua's (emu_clock.lua's on_pokes runs before the anchor, as
 #   replay.lua pokes before its checksum).
+#   SECTION 5 (14z-197, #228's last three instruments — maintainer-ruled "Convert all three now"): bp_regs.lua,
+#   fsm_census.lua and obj_record_full_trace.lua, which no gate runs, each to frame 3000 of the same replay: a
+#   reference leg whose anchor equals the basis there, and a breakpoint leg counting 3000 over 3000 emulated
+#   frames on the reference's game clock with its own breakpoints live (its output's hits, records or END line).
 # FOLLOWS: emu/mame-patches/ tests/expected/vsavj/masked-v2/ tests/lib/controls.sh tests/lib/instr_align.sh
-#   tests/lua/emu_clock.lua tests/lua/obj_record_bank_trace.lua tests/lua/replay.lua tests/lua/trace_writes.lua
+#   tests/lua/bp_regs.lua tests/lua/emu_clock.lua tests/lua/fsm_census.lua tests/lua/obj_record_bank_trace.lua
+#   tests/lua/obj_record_full_trace.lua tests/lua/pokes_spec.lua tests/lua/replay.lua tests/lua/trace_writes.lua
 #   tests/replays/ tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: known-bad: first-frame-skip — a reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss the basis checksum at frame 1500 (in-gate; as a mode the reference leg runs the skip and the gate FAILs)
@@ -39,7 +44,7 @@ rc=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; rc=1; }
 
 BASIS=tests/expected/vsavj/masked-v2
 MASK="$(cat "$BASIS/MASK")"
-RPL=03_two_player_vs; N=1500
+RPL=03_two_player_vs; N=1500; N5=3000
 WANT="$(awk -v n=$N '$1==n {print $2}' "$BASIS/logs/$RPL.log")"
 [ -n "$WANT" ] || { echo "FAIL: $BASIS/logs/$RPL.log has no frame $N"; exit 1; }
 
@@ -127,6 +132,53 @@ p1="$(ia_replaylua_read "$W/fz_good/k1/rl" $N4)"; p0="$(ia_replaylua_read "$W/rl
 if [ -n "$p1" ] && [ -n "$p0" ] && [ "$p1" != "$p0" ]; then
     ok "the anchor-frame POKE moves replay.lua's checksum ($p0 -> $p1), and the reference leg's anchor matched it"
 else bad "the anchor-frame POKE did not move replay.lua's checksum ($p0 / $p1): the ordering is untested"; fi
+
+echo "== 5. the three instruments no gate runs (bp_regs, fsm_census, obj_record_full_trace), frame $N5"
+# Each runs on its own breakpoints over replay 03 to frame N5 = 3000 (the dispatcher family first fires at
+# f2922 there; 8 hits in 4000 frames, measured 14z-197): a REFERENCE leg (no -debug) whose anchor must equal
+# the basis, and a BREAKPOINT leg that must count N5 frames over N5 emulated ones on the reference's game clock,
+# its breakpoints live (the instrument's own output says so — fsm_census's few stops cannot be told from the
+# boot halt by uiframes alone). bp_regs breaks on the six OBJ format handlers obj_record_full_trace uses: on the
+# format-0 handler alone it skipped 1,275 UI frames (uiframes) and logged none inside 2990-3000 (measured 14z-197;
+# uiframes counts the UI frames the clock skipped, not stops — a leg with no stop can read 1).
+leg5() {  # leg5 <tag> <lua> <debug: 0|1> <env...>
+    t5="$1"; l5="$2"; d5="$3"; shift 3; mkdir -p "$W/i5_$t5"
+    if [ "$d5" = 1 ]; then x5="-debug -debugger none"; else x5=""; fi
+    # shellcheck disable=SC2086
+    ( cd "$W/i5_$t5" && env "$@" REPLAY="$REPO/tests/replays/$RPL.rpl" FRAMES=$N5 ANCHOR=$N5 MASK_RANGES="$MASK" \
+        ALIGN_OUT="$W/i5_$t5/align" TRACE_OUT="$W/i5_$t5/out.txt" CENSUS_OUT="$W/i5_$t5/out.txt" MAME_SANDBOX="$W/i5_$t5/sb" MAME_ROMPATH="$ROMDIR" \
+        timeout 1800 "$REPO/tools/run_mame.sh" vsavj $x5 -autoboot_script "$REPO/$l5" > "$W/i5_$t5/log" 2>&1 ) </dev/null || true
+}
+f5() { awk -v k="$2" '{for (i = 1; i < NF; i++) if ($i == k) {print $(i + 1); exit}}' "$W/i5_$1/align" 2>/dev/null; }
+a5() { awk '{for (i = 1; i < NF; i++) if ($i == "anchor") {print $(i + 2); exit}}' "$W/i5_$1/align" 2>/dev/null; }
+WANT5="$(awk -v n=$N5 '$1==n {print $2}' "$BASIS/logs/$RPL.log")"
+for s5 in "bp:tests/lua/bp_regs.lua:BPS=1afc6,1b234,1b61a,1b6aa,1b73e,1b7cc WINDOW=2990,3000" \
+          "fsm:tests/lua/fsm_census.lua:SITES=18440:80:2,18508:80:2,185d2:80:2" \
+          "full:tests/lua/obj_record_full_trace.lua:WIN_LO=2990 WIN_HI=3000"; do
+    t5="${s5%%:*}"; r5="${s5#*:}"; l5="${r5%%:*}"; e5="${r5#*:}"
+    # shellcheck disable=SC2086
+    leg5 "${t5}_ref" "$l5" 0 INSTR_REFERENCE=1 $e5 &
+    # shellcheck disable=SC2086
+    leg5 "${t5}_bp" "$l5" 1 $e5 &
+done
+wait
+for s5 in bp:bp_regs fsm:fsm_census full:obj_record_full_trace; do
+    t5="${s5%%:*}"; n5="${s5#*:}"
+    ra5="$(a5 "${t5}_ref")"; rg5="$(f5 "${t5}_ref" gameclock)"
+    bf5="$(f5 "${t5}_bp" frames)"; be5="$(f5 "${t5}_bp" emulated)"; bg5="$(f5 "${t5}_bp" gameclock)"
+    [ -n "$ra5" ] && [ "$ra5" = "$WANT5" ] && ok "$n5 reference leg: anchor $ra5 = the frozen basis at frame $N5 (game clock $rg5)" \
+        || bad "$n5 reference leg: anchor ${ra5:-none}, the basis reads $WANT5 ($(tail -1 "$W/i5_${t5}_ref/log"))"
+    [ "$bf5" = "$N5" ] && [ "$be5" = "$N5" ] && [ -n "$bg5" ] && [ "$bg5" = "$rg5" ] \
+        && ok "$n5 breakpoint leg: counted $bf5 over $be5 emulated, game clock $bg5 = its reference's (uiframes $(f5 "${t5}_bp" uiframes))" \
+        || bad "$n5 breakpoint leg: counted ${bf5:-?} over ${be5:-?} emulated, game clock ${bg5:-?} (reference ${rg5:-?})"
+    case "$t5" in
+        bp)   h5="$(awk '$1=="END" {print $4}' "$W/i5_bp_bp/out.txt" 2>/dev/null)"; w5="END hits ${h5:-none} in the window";;
+        fsm)  h5="$(awk '$1=="SITE" {s += $8} END {print s + 0}' "$W/i5_fsm_bp/out.txt" 2>/dev/null)"; w5="$h5 dispatcher hits";;
+        full) h5="$(grep -c '^F ' "$W/i5_full_bp/out.txt" 2>/dev/null)"; w5="$h5 record lines in the window";;
+    esac
+    [ "${h5:-0}" -gt 0 ] 2>/dev/null && ok "$n5 breakpoints live: $w5" \
+        || bad "$n5 breakpoints never fired ($w5): this leg tested nothing"
+done
 
 [ "$rc" = 0 ] && echo "PASS: test_emu_clock" || echo "FAIL: test_emu_clock"
 exit "$rc"

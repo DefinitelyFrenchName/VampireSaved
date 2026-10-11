@@ -116,6 +116,10 @@ into `~/.claude/skills/mame-fbneo-instruments/`. Nothing in it depends on the or
 >   frame N contains, believe the tap — its frames are emulated frames.
 > - Cross-check any stop-based finding against a screen-identifying fact
 >   (an init PC, a known object base) before attributing it to a screen.
+> FIXED 14z-197 (GitHub #228): `obj_record_full_trace.lua` counts emulated frames
+> through `tests/lua/emu_clock.lua` — 26,132 UI frames skipped over 3,000 frames
+> on the reference leg's game clock (`tests/test_emu_clock.sh` section 5). A stop
+> can still move the game itself ([MFI-2]), so the rules above stand.
 
 **[MFI-7]** **An ARMED breakpoint delays input application by a beat** whenever it stops inside the frame the replay layer was about to write — deterministic INPUT-VIOLATIONs that look like host keystrokes (the tell: the SAME frame on two legs). Arm forcing/probing breakpoints LAZILY, just before their window, and `bpclear` the moment they have served.
 

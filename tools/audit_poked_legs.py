@@ -40,6 +40,12 @@ That over-approximation is deliberate (a static census cannot follow the shell)
 and is why the accepted list carries a reason per row; the dynamic half,
 tests/audit_latch_reads.sh, is what turns a class into a measured verdict.
 
+THE GAMES A SCRIPT BOOTS are read from its whole text, COMMENTS INCLUDED: the
+bare word vsav2 beside a MAME runner makes a native leg. A gate comment that
+said "native vsav2" gave tests/test_hui_air.sh two native rows it has no leg
+for (14z-197; the census gate FAILed on them, the comment was reworded). In a
+poked script's prose, name the native game another way.
+
 The wheel is the leg's game's: vsav2's TABLE B for a native leg, the WIDE
 build's for an ours leg (solo and merged wheels are identical, measured).
 P1 starts on cell 0x01, P2 on 0x05 (tools/select_paths.py --check); cell IS id.

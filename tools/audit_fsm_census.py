@@ -35,7 +35,14 @@ BOUND (RH-19/60). The signature encodes THIS node family's structure. A
 state-node array with a different record layout carrying 0x50-0x53 would not be
 reported here; the dynamic census (fsm_census.lua over the corpus) is the
 reachability complement, and it found no >=0x50 dispatch in a full match. State
-this bound; do not read a clean census as a proof of universal absence.
+this bound; do not read a clean census as a proof of universal absence. That
+corpus census (14z-110, merged-m7) ran on fsm_census.lua's old frame_done clock:
+its replay input landed one frame early from the boot halt on, plus one frame per
+breakpoint stop ([MFI-5]; measured 14z-197 on the pre-conversion script itself,
+03_two_player_vs: 1499 emulated of 1500 counted with no stop, 2997 of 3000 with
+two dispatcher hits, game clock 58 where the emulated clock reads 5b), so it
+played a slightly different game than the replays. The instrument counts emulated frames since 14z-197 (GitHub #228,
+tests/test_emu_clock.sh section 5); the census has not been re-run on it.
 
 CLASSIFICATION per hit (the maintainer's ruling, 2026-08-26): DEFAULT-ALIAS if
 vs2's handler for the index is byte-identical to vsavj's copy/default handler

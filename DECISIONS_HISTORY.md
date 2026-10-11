@@ -6539,3 +6539,14 @@ open) and the Zabel j.LK session (ruled, not started).
 So: the four gates default to `build/hui61` (a stage-4 build can still be passed by hand); replay 75 moves every input from f3050 on by +5 frames (for its float: unshifted it never hovers, +5 hovers at Y=121.125 over f3335-3385; its first jump stays eaten at both timings and on native vsav2 too — corrected in the same session, before commit, rule-checker run 2026-10-11-807); replay 79 is unchanged and its gate reads the rig's second attempt, an air dash, at f3322/f3337 — the same +5 shift was tried on 79 and gave a GROUND dash, which the dash check (no height in it then) passed, found while making the captures; the check now requires the body airborne and carries a ground-dash control (corrected in the same session, before commit); the soak reads its pods at f6000 (round 1) and at f9000 with the match live (round 2). The stage-4 reset is recorded as a fact about that intermediate build, not fixed.
 
 **Correction to the question as asked (same session, before commit; rule-checker run 2026-10-11-807 Q1):** the soak rig DOES reset on the stage-4 build — both pods are set over f2900-4650, then the state words zero between f4650 and f4700 and the match never returns (`build/agent197/t228/s3/soak/hui4/`); the measurement behind the question sampled only to f4400. So on stage 4 three of the four rigs reset (grab, pairs, soak) and only the float's check missed on timing. The correction removes a reason to keep stage 4 and adds none, so it leaves the choice as ruled; `test_hui_soak` now asserts the match live at f6000 as well as f9000, so a reset reads as a dead rig, not dead pods.
+
+---
+
+## Ruled 2026-10-11 (14z-197) — #228: the three instruments no gate runs are converted too
+
+**The question (in chat, AskUserQuestion), after slice 3 (`ce64cb0e`):** the four instruments step 4 named are converted. #228 also lists three that no gate runs: `bp_regs.lua`, `fsm_census.lua` (its 14z-110 corpus census ran on the drifting clock) and `obj_record_full_trace.lua` (no users). How should #228 finish? Options: convert all three now (the `walker_sp` change plus a new alignment check per instrument, since none has a gate); done when the gates are (record that the three have no gate, each header warning it is on the frame_done clock); or a new ticket for the three.
+
+**The maintainer:**
+- the maintainer chose: *"Convert all three now"*
+
+So: the three move onto `tests/lua/emu_clock.lua`, and `tests/test_emu_clock.sh` section 5 is their alignment check (a reference leg on the basis and a breakpoint leg on the reference's game clock, each to frame 3000 of `03_two_player_vs`).

@@ -9,77 +9,30 @@
 -- fmt8 0x1B73E, fmtA 0x1B7CC. Dispatch is `movea.l 4(a0),a0;
 -- move.w (a0)+,d0` — at every handler A0 = record+2.
 --
---   env REPLAY      input script
 --   env TRACE_OUT   log path (default obj_record_full.txt)
 --   env WIN_LO/WIN_HI  frame window to log (default 2590/2615)
---   env FRAMES      hard stop (default WIN_HI+5)
+--   env REPLAY, FRAMES (default WIN_HI+5), INSTR_REFERENCE, INSTR_CLOCK, ANCHOR, MASK_RANGES, ALIGN_OUT:
+--       tests/lua/emu_clock.lua — the frame is an EMULATED frame since 14z-197 (GitHub #228 step 4); until
+--       then this script counted frame_done calls, so each stop's UI frames moved its input early and its
+--       window early ([MFI-5])
 --   env HANDLERS    override handler map "fmt:hexpc,..." (default the
 --                   vsavj addresses; vsav2 sibling:
 --                   "0:199f6,2:19c64,4:1a04a,6:1a0da,8:1a16e,10:1a236")
 
-local out_path = os.getenv("TRACE_OUT") or "obj_record_full.txt"
 local win_lo = tonumber(os.getenv("WIN_LO") or "") or 2590
 local win_hi = tonumber(os.getenv("WIN_HI") or "") or 2615
-local max_frames = tonumber(os.getenv("FRAMES") or "") or (win_hi + 5)
+local C = dofile((debug.getinfo(1, "S").source:match("^@(.*/)") or "./") .. "emu_clock.lua"){
+    name = "obj_record_full_trace", frames = win_hi + 5 }
+local out_path = os.getenv("TRACE_OUT") or "obj_record_full.txt"
 
 local machine = manager.machine
 local debugger = machine.debugger
-assert(debugger, "run mame with -debug")
+assert(debugger or C.reference, "run mame with -debug (or INSTR_REFERENCE=1 for the reference leg)")
 local cpu = machine.devices[":maincpu"]
 local prog = cpu.spaces["program"]
 
 local f = assert(io.open(out_path, "wb"))
-local frame = 0
 
-local held = {}
-local replay_path = os.getenv("REPLAY")
-local FIELDS = nil
-if replay_path then
-    local ioport = machine.ioport
-    local function fld(port, name) return ioport.ports[port].fields[name] end
-    FIELDS = {
-        p1 = { U = fld(":IN0", "P1 Up"), D = fld(":IN0", "P1 Down"),
-               L = fld(":IN0", "P1 Left"), R = fld(":IN0", "P1 Right"),
-               ["1"] = fld(":IN0", "P1 Button 1"), ["2"] = fld(":IN0", "P1 Button 2"),
-               ["3"] = fld(":IN0", "P1 Button 3"), ["4"] = fld(":IN1", "P1 Button 4"),
-               ["5"] = fld(":IN1", "P1 Button 5"), ["6"] = fld(":IN1", "P1 Button 6") },
-        p2 = { U = fld(":IN0", "P2 Up"), D = fld(":IN0", "P2 Down"),
-               L = fld(":IN0", "P2 Left"), R = fld(":IN0", "P2 Right"),
-               ["1"] = fld(":IN0", "P2 Button 1"), ["2"] = fld(":IN0", "P2 Button 2"),
-               ["3"] = fld(":IN0", "P2 Button 3"), ["4"] = fld(":IN1", "P2 Button 4"),
-               ["5"] = fld(":IN1", "P2 Button 5"), ["6"] = fld(":IN2", "P2 Button 6") },
-        sys = { S1 = fld(":IN2", "1 Player Start"), S2 = fld(":IN2", "2 Players Start"),
-                C1 = fld(":IN2", "Coin 1"), C2 = fld(":IN2", "Coin 2"),
-                SV = fld(":IN2", "Service 1"), TS = fld(":IN2", "Service Mode") },
-    }
-    for line in io.lines(replay_path) do
-        local body = line:gsub("#.*", "")
-        local range, rest = body:match("^%s*(%S+)%s+(.-)%s*$")
-        if range then
-            local a, b = range:match("^(%d+)%-(%d+)$")
-            if not a then a = range:match("^(%d+)$"); b = a end
-            if a then
-                for spec in rest:gmatch("%S+") do
-                    local who, toks = spec:match("^(%a+%d?)=(%S+)$")
-                    if who and FIELDS[who] then
-                        local step = (who == "sys") and 2 or 1
-                        for i = 1, #toks, step do
-                            local fldo = FIELDS[who][toks:sub(i, i + step - 1)]
-                            if fldo then
-                                for fr = tonumber(a), tonumber(b) do
-                                    held[fr] = held[fr] or {}
-                                    held[fr][#held[fr] + 1] = fldo
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-end
-
-debugger:command("focus 0")
 local HANDLERS = { [0x1afc6]=0, [0x1b234]=2, [0x1b61a]=4,
                    [0x1b6aa]=6, [0x1b73e]=8, [0x1b7cc]=10 }
 local hspec = os.getenv("HANDLERS")
@@ -89,32 +42,21 @@ if hspec then
         HANDLERS[tonumber(pc, 16)] = tonumber(fmt)
     end
 end
-for pc in pairs(HANDLERS) do
-    debugger:command(string.format("bpset %x", pc))
+if not C.reference then
+    debugger:command("focus 0")
+    for pc in pairs(HANDLERS) do
+        debugger:command(string.format("bpset %x", pc))
+    end
 end
 
-local pressed = {}
-emu.register_frame_done(function()
-    frame = frame + 1
-    if FIELDS then
-        local want = {}
-        for _, fldo in ipairs(held[frame + 1] or {}) do want[fldo] = true end
-        for _, group in pairs(FIELDS) do
-            for _, fldo in pairs(group) do
-                if want[fldo] and not pressed[fldo] then fldo:set_value(1); pressed[fldo] = true
-                elseif not want[fldo] and pressed[fldo] then fldo:clear_value(); pressed[fldo] = nil end
-            end
-        end
-    end
-    if frame >= max_frames then
-        f:write(string.format("END %d\n", frame))
-        f:close()
-        manager.machine:exit()
-    end
-end)
+C.run{ on_end = function(frame)
+    f:write(string.format("END %d\n", frame))
+    f:close()
+end }
 
 emu.register_periodic(function()
-    if debugger.execution_state == "stop" then
+    if debugger and debugger.execution_state == "stop" then
+        local frame = C.frame()
         if frame >= win_lo and frame <= win_hi then
             local st = cpu.state
             local a0 = st["A0"].value & 0xffffff

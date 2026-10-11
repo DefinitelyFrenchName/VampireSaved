@@ -7,7 +7,8 @@
 -- calls as frames stages its replay input early and stops before the replay ends: #228 step 3
 -- measured it on all 24 gates whose instruments arm breakpoints (audit_walker_ghost covered 4,203
 -- emulated frames of 40,620 counted). tests/lua/pc_count.lua was converted first (14z-196); this is
--- that conversion as a shared module, so the four other instruments do not each carry a copy.
+-- that conversion as a shared module, so the other instruments do not each carry a copy (seven by 14z-197:
+-- walker_sp, obj_record_bank_trace, trace_writes, replay_guard, bp_regs, fsm_census, obj_record_full_trace).
 --
 -- THE CLOCK. A frame counts when the screen's frame number has moved since the last counted one,
 -- and the FIRST frame_done counts unconditionally, as replay.lua counts it (the number has not moved
