@@ -10,10 +10,21 @@
 #   is frozen in tests/expected/df_palette_seq_census.txt.
 # EXPECTS: the measured inventory equals the frozen census; a DF-on character with 0 calls
 #   is reported as having no palette-seq path. Growth is the signal: re-derive before
-#   trusting that any row is free.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/palette_seq_ids_corpus.txt
+#   trusting that any row is free. Every probe run on emulated time at its frozen game clock, the staging leg on
+#   replay.lua's checksum (the default replay set; REPLAYS=all is the census run and is not frozen).
+#   THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): replay_guard.lua counts
+#   EMULATED frames (tests/lua/emu_clock.lua), so every run plays its whole replay since 14z-197 (05_timeout_idle
+#   covered 8,354 emulated frames of 12,120 counted); each run's game clock RAM:$FF8080 at its last frame is held to
+#   tests/expected/instr_gameclock/audit_palette_seq_ids.tsv, frozen by `--freeze-clock` from REFERENCE legs (the guard
+#   without -debug, the same POKES) each held to replay.lua run live; one STAGING reference leg is held to replay.lua
+#   on every run (tests/lib/instr_align.sh).
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/instr_gameclock/ tests/expected/palette_seq_ids_corpus.txt
+#   tests/lib/controls.sh tests/lib/instr_align.sh tests/lua/emu_clock.lua tests/lua/replay.lua
 #   tests/lua/replay_guard.lua tests/replays/ tools/run_mame.sh tools/run_replay_guarded.sh
 #   tools/setup_mame.sh
+#
+# MUST-FIRE: known-bad: drift-clock — a probe run under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 8,354 emulated frames of 12,120 counted on 05_timeout_idle) must miss its frozen game clock (in-gate: one extra run; mode: every probe run runs the old clock and the gate FAILs)
+# MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs)
 #
 # *** THIS AUDIT RETURNED A FALSE PASS FOR TEN SESSIONS (retracted 14z-79). ***
 # It guarded the 14z-69p DF-palette rewrite of rows 0x1E-0x21, and reported
@@ -51,7 +62,7 @@
 # claim that a palette-seq row is free.
 #
 # On-demand (not in the battery): ~10 MAME runs, several minutes.
-# Usage: ROMDIR=... tests/audit_palette_seq_ids.sh
+# Usage: ROMDIR=... tests/audit_palette_seq_ids.sh [--freeze-clock]
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -75,6 +86,12 @@ if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
+FREEZE_CLOCK=0; [ "${1:-}" = "--freeze-clock" ] && FREEZE_CLOCK=1
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+. "$REPO/tests/lib/instr_align.sh"
+CLOCKS="tests/expected/instr_gameclock/audit_palette_seq_ids.tsv"
+[ "$FREEZE_CLOCK" = 1 ] && [ -n "$MODE" ] && { echo "REFUSED: --freeze-clock in control mode"; exit 3; }
+_clk=""; [ "$MODE" = drift-clock ] && _clk="INSTR_CLOCK=frame_done"
 export MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 
 # REPLAYS: the phase-A set. Default = the cheap eight. `REPLAYS=all` sweeps
@@ -99,7 +116,8 @@ _i=0
 for r in $REPLAYS; do
     [ -f "tests/replays/$r.rpl" ] || continue
     d="$W/$r"; mkdir -p "$d"
-    ( cd "$d" && GUARD_PROBE=2ad82 GUARD_PROBE_MAX=400000 \
+    # shellcheck disable=SC2086
+    ( cd "$d" && env $_clk GUARD_PROBE=2ad82 GUARD_PROBE_MAX=400000 ALIGN_OUT="$d/align" \
       "$REPO/tools/run_replay_guarded.sh" vsavj "$REPO/tests/replays/$r.rpl" \
       "$d/g.log" "$d/box" > "$d/out" 2>&1 ) &
     _i=$((_i + 1)); [ $((_i % 4)) = 0 ] && wait
@@ -108,6 +126,7 @@ wait
 for r in $REPLAYS; do
     [ -f "tests/replays/$r.rpl" ] || continue
     d="$W/$r"
+    ia_note_run "$W/manifest.tsv" vsavj "$r" vsavj - "$REPO/tests/replays/$r.rpl" "GUARD_PROBE=2ad82 GUARD_PROBE_MAX=400000" "$d/align"
     n=$(grep -c '^PROBE' "$d/g.log" 2>/dev/null || true)
     [ -n "$n" ] || n=0
     ids=$(grep '^PROBE' "$d/g.log" 2>/dev/null \
@@ -159,10 +178,13 @@ for ch in ${CHARS:-00 01 03 04}; do
     [ -f "$DFRPL" ] || break
     d="$W/df$ch"; mkdir -p "$d"
     PKD="1400:ff8782:$ch;1450:ff8782:$ch;1500:ff8782:$ch;1400:ff8b82:03;1450:ff8b82:03;1500:ff8b82:03;3100:ff8509:03;3120:ff8509:03"
-    ( cd "$d" && POKES="$PKD" GUARD_PROBE=2ad82 GUARD_PROBE_MAX=200000 \
+    # shellcheck disable=SC2086
+    ( cd "$d" && env $_clk POKES="$PKD" GUARD_PROBE=2ad82 GUARD_PROBE_MAX=200000 ALIGN_OUT="$d/align" \
       DUMPS="3300:ff8020-ff805f;3400:ff8020-ff805f;3500:ff8020-ff805f" \
       "$REPO/tools/run_replay_guarded.sh" vsavj "$REPO/$DFRPL" \
       "$d/g.log" "$d/box" > "$d/out" 2>&1 ) || true
+    ia_note_run "$W/manifest.tsv" "df$ch" "$(basename "$DFRPL" .rpl)" vsavj - "$REPO/$DFRPL" \
+        "POKES=$PKD GUARD_PROBE=2ad82 GUARD_PROBE_MAX=200000 DUMPS=3300:ff8020-ff805f;3400:ff8020-ff805f;3500:ff8020-ff805f" "$d/align"
     # SAMPLE SEVERAL FRAMES, accept DF at ANY of them. The first version
     # sampled f3300 only and reported "never in Dark Force" for a run that
     # entered it between f3300 and f3400 — the control was wrong, not the
@@ -234,6 +256,32 @@ if [ -n "$NODF" ]; then
     echo "  simply belong to one of them — do NOT treat this census as a"
     echo "  free-block proof until every character is accounted for."
     exit 1
+fi
+if [ "$CORPUS" = 0 ]; then
+    echo "  -- the instrument's alignment (#228 step 4, option A) --"
+    if [ "$FREEZE_CLOCK" = 1 ]; then
+        ia_freeze "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" "$W/fz" "${JOBS:-4}" "$W/clocks.tsv" \
+            > "$W/fz.txt" || { sed 's/^/  /' "$W/fz.txt"; echo "REFUSED: the alignment does not hold — nothing frozen"; exit 1; }
+        mkdir -p "$(dirname "$CLOCKS")"
+        { echo "# $CLOCKS — the game clock RAM:\$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,"
+          echo "# option A) by \`tests/audit_palette_seq_ids.sh --freeze-clock\` at $(git rev-parse --short=8 HEAD): pristine vsavj, the default"
+          echo "# replays (vsavj) and the Dark Force legs (df<char>); every reference leg held to replay.lua run live."
+          echo "# leg<TAB>replay<TAB>frames<TAB>gameclock"
+          cat "$W/clocks.tsv"; } > "$CLOCKS"
+        echo "froze $(wc -l < "$W/clocks.tsv" | tr -d ' ') game clocks into $CLOCKS"
+        exit 0
+    fi
+    afail=0
+    if ia_check_manifest "$CLOCKS" "$W/manifest.tsv" > "$W/align_bad.txt"; then echo "  ok: every probe run on emulated time, at its frozen game clock"
+    else echo "  FAIL: $(wc -l < "$W/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$W/align_bad.txt" | sed 's/^/        /'; afail=1; fi
+    ia_stage audit_palette_seq_ids "$CLOCKS" "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" 1 "$W/st" "$MODE" || afail=1
+    if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
+        [ "$afail" = 1 ] && { echo "FAIL: audit_palette_seq_ids (control mode: $MODE)"; exit 1; }
+        echo "FAIL: audit_palette_seq_ids — control mode $MODE left the gate green"; exit 1
+    fi
+    if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || afail=1; fi
+    if [ "$IA_SKIP" = fired ]; then vs_ctl_fired first-frame-skip "$IA_SKIP_MSG"; else vs_ctl_dead first-frame-skip "$IA_SKIP_MSG" || afail=1; fi
+    [ "$afail" = 0 ] || { echo "FAIL: audit_palette_seq_ids — the instrument's alignment"; exit 1; }
 fi
 echo "PASS: palette-seq id inventory taken WITH Dark Force (phase B controlled"
 echo "      on \$FF802E). Union: $UNION"

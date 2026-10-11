@@ -6526,3 +6526,16 @@ open) and the Zabel j.LK session (ruled, not started).
   already sketched for the skills. Raw material exists and is large:
   `docs/platform/mister.md` (core, lane, profile gate, SDRAM ceilings) and
   `docs/project/mister_fit.md` (what this port needs vs what jtcps2 offers).
+
+---
+
+## Ruled 2026-10-11 (14z-197) — #228 step 4: the four Huitzil stage gates move to build/hui61; float and soak re-timed
+
+**The question (in chat, AskUserQuestion):** with `replay_guard.lua` on the emulated clock, `test_hui_grab`, `test_hui_pairs`, `test_hui_air` and `test_hui_soak` FAIL. They had passed only because the frame_done clock fed every input a frame early. On the replays' own timing (replay.lua, no debugger) the 2P-dummy grab and Reflect Wall rigs make the fresh STAGE-4 build reset just after match start (state word and both ids zero by f2500), while the current Huitzil build `build/hui61` does not reset and passes grab and pairs with the native figures; the float and soak rigs do not reset on either build but their fixed-frame checks miss. Options: **move to hui61 and re-time the two** (recommended); keep stage 4 and root-cause the reset; retire the four gates.
+
+**The maintainer:**
+- the maintainer chose: *"Move to hui61, re-time 2 (Recommended)"*
+
+So: the four gates default to `build/hui61` (a stage-4 build can still be passed by hand); replay 75 moves every input from f3050 on by +5 frames (for its float: unshifted it never hovers, +5 hovers at Y=121.125 over f3335-3385; its first jump stays eaten at both timings and on native vsav2 too — corrected in the same session, before commit, rule-checker run 2026-10-11-807); replay 79 is unchanged and its gate reads the rig's second attempt, an air dash, at f3322/f3337 — the same +5 shift was tried on 79 and gave a GROUND dash, which the dash check (no height in it then) passed, found while making the captures; the check now requires the body airborne and carries a ground-dash control (corrected in the same session, before commit); the soak reads its pods at f6000 (round 1) and at f9000 with the match live (round 2). The stage-4 reset is recorded as a fact about that intermediate build, not fixed.
+
+**Correction to the question as asked (same session, before commit; rule-checker run 2026-10-11-807 Q1):** the soak rig DOES reset on the stage-4 build — both pods are set over f2900-4650, then the state words zero between f4650 and f4700 and the match never returns (`build/agent197/t228/s3/soak/hui4/`); the measurement behind the question sampled only to f4400. So on stage 4 three of the four rigs reset (grab, pairs, soak) and only the float's check missed on timing. The correction removes a reason to keep stage 4 and adds none, so it leaves the choice as ruled; `test_hui_soak` now asserts the match live at f6000 as well as f9000, so a reset reads as a dead rig, not dead pods.

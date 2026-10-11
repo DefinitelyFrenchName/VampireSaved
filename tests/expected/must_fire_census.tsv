@@ -39,6 +39,7 @@ declares	audit_guard_corpus
 declares	audit_guard_mask_reads
 declares	audit_guard_reentry
 declares	audit_hitbox_parity
+declares	audit_hitclass_map_cost
 declares	audit_hui_grunt
 declares	audit_id_writers
 declares	audit_kill_poke_shape
@@ -48,14 +49,20 @@ declares	audit_lag_budget
 declares	audit_landing_sound
 declares	audit_latch_reads
 declares	audit_marionette_cost
+declares	audit_merged_legacy
+declares	audit_merged_vec3
 declares	audit_mister_map_fit
 declares	audit_mizuumi_attack
 declares	audit_mizuumi_inputs
 declares	audit_mizuumi_struct
 declares	audit_move_parity
 declares	audit_move_parity_attribution
+declares	audit_objhook_owner_census
+declares	audit_palette_seq_ids
 declares	audit_pass_overrun
+declares	audit_phase_mode_cost
 declares	audit_phobos_dmg_residual
+declares	audit_projectile_clash
 declares	audit_pursuit_flag
 declares	audit_pyron_ring
 declares	audit_qs_voice_wav
@@ -115,6 +122,7 @@ declares	test_commit_subject
 declares	test_community_crosscheck
 declares	test_controls_contract
 declares	test_copy_flags
+declares	test_crash_guard
 declares	test_defense_rows_census
 declares	test_demand_after_trap
 declares	test_df_field_readers
@@ -149,8 +157,11 @@ declares	test_gotchas_index_current
 declares	test_header_defaults
 declares	test_hitbox_encoding
 declares	test_host_libs
+declares	test_hui_air
+declares	test_hui_boot
 declares	test_jtcores_twin
 declares	test_jtsim_scratch_heal
+declares	test_ladder_tenant_vs_palette
 declares	test_lane_carry
 declares	test_latch_readers
 declares	test_launcher_newest
@@ -214,6 +225,7 @@ declares	test_scratch_census
 declares	test_select_arrays
 declares	test_shadow_tenant
 declares	test_shell_portability
+declares	test_shim_charid
 declares	test_sim_wram_contract
 declares	test_skill_guides
 declares	test_state_open_lists

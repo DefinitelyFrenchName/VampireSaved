@@ -1,0 +1,6 @@
+# tests/expected/instr_gameclock/audit_ranking_tenant.tsv — the game clock RAM:$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,
+# option A) by `tests/audit_ranking_tenant.sh --freeze-clock` at 4980bd96: build = build/m3b_merged31;
+# every reference leg held to replay.lua run live, every guarded leg to its reference leg's game clock.
+# leg<TAB>replay<TAB>frames<TAB>gameclock
+don13	26_don_arcade_mash	40620	5b
+none	26_don_arcade_mash	40620	b9

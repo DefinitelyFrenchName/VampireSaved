@@ -124,7 +124,7 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 | `tests/test_attract_determinism.sh` | test | emulator | MAME | M0 acceptance: a 60-second scripted attract-mode run checksums work RAM identically across two fresh runs. | M0 |
 | `tests/test_build_environment_entry.sh` | test | ci_portable | — | tools/record_build_environment.py, which composes an entry of docs/project/build_environments.md from a host's BINARY.txt records and the log of a PASSING tests/test_release_binaries.sh, against SYNTHETIC records and logs: | 2026-09-13 |
 | `tests/test_bundle_parsers.sh` | test | ci_portable | — | the LINUX and WINDOWS library bundlers (tools/bundle_elf_libs.py, tools/bundle_win_dlls.py) read real `ldd`, `readelf -d` and `objdump -p` output, walk a closure, and tell a closure the tools said NOTHING about (refused) from one they descr… | 14z-149 |
-| `tests/test_crash_guard.sh` | test | emulator | MAME, a build dir | ground truth for the crash guard (verdict-logic doctrine, CLAUDE.md §4: a detector is trusted only after it classifies known-good and known-bad scenarios correctly). | — |
+| `tests/test_crash_guard.sh` | test | emulator | MAME, a build dir | ground truth for the crash guard (verdict-logic doctrine, CLAUDE.md §4: a detector is trusted only after it classifies known-good and known-bad scenarios correctly). | 14z-197 |
 | `tests/test_crypt_boundary.sh` | test | ci_static | ROMDIR | code in the WIDE extension must be stored RAW. | 14z-123 |
 | `tests/test_decrypt_oracle.sh` | test | emulator | MAME | verify tools/cps2_decrypt.py against MAME's own cps2crypt implementation (dual-implementation agreement). | — |
 | `tests/test_emu_clock.sh` | test | emulator | MAME, ~4 min | THE SHARED INSTRUMENT CLOCK STAYS ON EMULATED TIME UNDER BREAKPOINTS (14z-197, GitHub #228 step 4). | 14z-197 |
@@ -222,7 +222,7 @@ the build pipeline — manifests, patch ops, extraction/reconciliation/generatio
 | `tests/test_s4_thresholds.sh` | test | ci_portable | — | the ratified CLAUDE.md §4 thresholds are declared ONCE and every consumer resolves to that one declaration (14z-93, GitHub #44). No ROMs, no emulator, ~1s. | 14z-93 |
 | `tests/test_select_arrays.sh` | test | emulator | MAME, ~13 s | freeze the select-screen record-pointer array, the table M3a's tenant move depends on. | M3a |
 | `tests/test_shared_writes.sh` | test | ci_static | ROMDIR | the frozen shared-surface write inventory (14z-79). | 14z-79 |
-| `tests/test_shim_charid.sh` | test | emulator | MAME, a build dir, ~44 s | the init shim can identify WHICH tenant it is running for, because (0x382,A6) already holds the character id when it runs. | M3b |
+| `tests/test_shim_charid.sh` | test | emulator | MAME, a build dir, ~44 s | the init shim can identify WHICH tenant it is running for, because (0x382,A6) already holds the character id when it runs. | 2026-10-10 |
 | `tests/test_tenant_anim_relocation.sh` | test | ci_static | ROMDIR | EVERY SPRITE-RECORD POINTER IN A TENANT'S PLACED ANIM CHAINS IS RELOCATED (14z-126b). ci_static: needs the tenant build dirs, no ROMDIR, no emulator, ~5 s. | 14z-126b |
 | `tests/test_tenant_row_owner.sh` | test | ci_static | ROMDIR | the row-OWNER threading is LIVE, not decoration. | M3b |
 | `tests/test_tenant_select_records.sh` | test | emulator | MAME, a build dir | the M3a select-records half: at a variant-half tenant id the build must carry the tenant's OWN select records and the host's records must return to VANILLA bytes. | M3a |
@@ -325,8 +325,8 @@ tenant content — per-character gates and on-demand audits on the ported charac
 | `tests/audit_id_writers.sh` | audit | emulator | MAME, a build dir, ~10 min | which character ids does VANILLA ever assign? | 14z-192 |
 | `tests/audit_kill_poke_shape.sh` | audit | emulator | MAME, a build dir, ~7 min | A 2-BYTE HP KILL POKE MANUFACTURES #103's UNJUDGEABLE STATE ON ANY CHARACTER (14z-98). On-demand, ~7 min (2 MAME runs, parallel). GROUND TRUTH FOR RIG AUTHORS, frozen both ways. | 14z-98 |
 | `tests/audit_ladder_selector.sh` | audit | emulator | MAME, a build dir, ~12 min | THE ARCADE-LADDER SELECTOR, made rerunnable (14z-95, GitHub #99). On-demand, ~12 min (2 marathon runs, parallel). | 14z-95 |
-| `tests/audit_palette_seq_ids.sh` | audit | emulator | MAME, a build dir | which palette-seq ids does LEGACY ever request? | 14z-79 |
-| `tests/audit_phase_mode_cost.sh` | audit | emulator | MAME, a build dir, ~15 min | what does Phobos' phase-gated latch cost Donovan? | M3b |
+| `tests/audit_palette_seq_ids.sh` | audit | emulator | MAME, a build dir | which palette-seq ids does LEGACY ever request? | 2026-10-10 |
+| `tests/audit_phase_mode_cost.sh` | audit | emulator | MAME, a build dir, ~15 min | what does Phobos' phase-gated latch cost Donovan? | 2026-10-10 |
 | `tests/audit_pool_free_byte.sh` | audit | emulator | MAME, a build dir, ~20 min | the owner-tag byte (+0x7F of an object-pool slot) audit, BOTH pools. On-demand, ~20 min (3 legs x census + tap on the merged build). | 14z-85 |
 | `tests/audit_projectile_clash.sh` | audit | emulator | MAME, FBNeo, a build dir, ~5 min | the pool-vs-pool projectile-contact surface (14z-100 hardening H4; the census gap the hitclass KEEP ruling named). RE-FRAMED 14z-101: | 14z-100 |
 | `tests/audit_pursuit_leap.sh` | audit | emulator | MAME, a build dir, ~1 min | THE LEAPING PURSUIT ATTACK, both directions per tenant (14z-104; the §4 "pursuit attacks" cell's SECOND instrument, beside audit_down_attack's grounded OTG surface). | 14z-104 |

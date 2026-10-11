@@ -2166,7 +2166,8 @@ note = "(b') 14z-79: entries 80-83 run vs2's handlers inline; every other index 
 # BIT-IDENTICAL over 30,284 frames; fire census = legacy never enters the
 # map. >>> THAT CENSUS FIGURE IS RETRACTED (14z-92, M4): it was two
 # replays, both of which score zero. Corpus-wide (46) legacy enters the map
-# 230 times, all at indices 0x02/0x04/0x09/0x0b — far below 64 — so legacy
+# 230 times (the frame_done clock's count; 6 on emulated time, 14z-197, #228 —
+# indices 0x02/0x25/0x38), all at indices 0x02/0x04/0x09/0x0b — far below 64 — so legacy
 # reads vanilla's own bytes out of the thunk. The row stays; the argument is
 # "legacy enters and gets vanilla answers", not "legacy never enters".
 # Reconstruction gate: tests/test_hitclass_map_thunk.sh. Declared by

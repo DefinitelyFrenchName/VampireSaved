@@ -1,0 +1,16 @@
+# tests/expected/instr_gameclock/audit_palette_seq_ids.tsv — the game clock RAM:$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,
+# option A) by `tests/audit_palette_seq_ids.sh --freeze-clock` at 4980bd96: pristine vsavj, the default
+# replays (vsavj) and the Dark Force legs (df<char>); every reference leg held to replay.lua run live.
+# leg<TAB>replay<TAB>frames<TAB>gameclock
+vsavj	02_demitri_vs_cpu	5520	33
+vsavj	03_two_player_vs	5320	6b
+vsavj	05_timeout_idle	12120	fb
+vsavj	07_mash_storm	4320	83
+vsavj	08_challenger_join	6920	ab
+vsavj	09_mirror_pick	4720	13
+vsavj	30_demitri_throw	4720	13
+vsavj	20_don_round2	12120	fb
+df00	85_hui_df_vs2	3920	f3
+df01	85_hui_df_vs2	3920	f3
+df03	85_hui_df_vs2	3920	f3
+df04	85_hui_df_vs2	3920	f3

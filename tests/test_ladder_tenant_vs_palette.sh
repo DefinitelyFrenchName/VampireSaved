@@ -13,12 +13,23 @@
 #   diff of the portrait regions; frozen in tests/expected/ladder_tenant_vs_palette.txt.
 # EXPECTS: one probe hit per 1P leg with the right addresses, zero on the 2P leg, the row
 #   equal to pool | 0xF000, only the tag box changing under the red poke, 0 px differing on
-#   the VS screen. The cosmetic roulette tag (base name and colours) is recorded, not fixed.
+#   the VS screen. The cosmetic roulette tag (base name and colours) is recorded, not fixed. Every leg on emulated
+#   time at its frozen game clock, the staging leg on replay.lua's checksum.
+#   THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): replay_guard.lua counts
+#   EMULATED frames (tests/lua/emu_clock.lua), so ROUL/VS1P/VS2P and every poke are emulated frames since 14z-197
+#   (they were measured on the frame_done "-debug timeline", 2 frames off by 3,721); each leg's game clock RAM:$FF8080
+#   at its last frame is held to tests/expected/instr_gameclock/test_ladder_tenant_vs_palette.tsv, frozen by
+#   `--freeze-clock` from REFERENCE legs (the guard without -debug, the same POKES) each held to replay.lua run live;
+#   one STAGING reference leg is held to replay.lua on every run (tests/lib/instr_align.sh).
 # POKE READ-BACK (ruled 2026-09-25 (14z-181), tests/expected/poke_readback.tsv): the ROUL:90c140 dump is never read (READS-BACK, a rig record; VS1P is the read that asserts the red poke was overwritten — OBSERVES); the VS2P:90c140 dump is the p2_ctl leg's, which runs with no poke — the census joins another leg's poke to it (CROSS-LEG).
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ladder_tenant_vs_palette.txt
-#   tests/lua/replay_guard.lua tests/replays/109_2p_don_vs_phobos.rpl
+#   tests/expected/instr_gameclock/ tests/lib/controls.sh tests/lib/instr_align.sh tests/lua/emu_clock.lua
+#   tests/lua/replay.lua tests/lua/replay_guard.lua tests/replays/109_2p_don_vs_phobos.rpl
 #   tests/replays/111_don_arcade_vs_screen.rpl tools/run_mame.sh tools/run_replay_guarded.sh
 #   tools/setup_mame.sh
+#
+# MUST-FIRE: known-bad: drift-clock — a leg under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 3,719 emulated frames of 3,721 counted) must miss its frozen game clock (in-gate: one extra run; mode: every leg runs the old clock and the gate FAILs)
+# MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs)
 #
 # WHY. Since M2b engine_internals carried "0x90C140 writers (vsavj 0xB0AC
 # attract path, table 0x3A3CA0 keyed by $114(a5)) not yet repointed — if the
@@ -33,7 +44,8 @@
 #     reads the picked opponent's id from the ladder order list (a5-0x61B8)
 #     at $114(a5), copies pool row `0x3A3CA0 + id*32` (32 bytes, the copy
 #     helper 0x1C3A4 with d7=0, words OR'd with 0xF000) into palette RAM
-#     0x90C140 = OBJ palette row 0x0A. Probe at 0xB0B4: frame 2416,
+#     0x90C140 = OBJ palette row 0x0A. Probe at 0xB0B4: frame 2416 (2415 on
+#     emulated time since 14z-197, #228: the old count included the boot halt),
 #     A0 = 0x3A3EA0 for CPU Phobos (id 0x10), 0x3A3DA0 for CPU Bishamon
 #     (0x08). The 2P path (replay 109) never executes it (0 hits).
 #   * WHAT ROW 0x0A COLOURS: the roulette tag's MINI CHARACTER ART beside
@@ -75,7 +87,7 @@
 #   6. the 1P-vs-2P VS-screen A/B: 0 px differ in both portrait regions.
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged31] [FREEZE=1]
-#        tests/test_ladder_tenant_vs_palette.sh      (~4 legs in parallel, ~5 min)
+#        tests/test_ladder_tenant_vs_palette.sh [--freeze-clock]     (~4 legs in parallel, ~5 min)
 # EMULATOR tier (MAME -debug, gfx-bearing build required — [VSP-141]).
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
@@ -106,9 +118,15 @@ EXP="tests/expected/ladder_tenant_vs_palette.txt"
 python3 -c "import PIL" 2>/dev/null || { echo "SKIP: python3 PIL not available"; exit 0; }
 
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+FREEZE_CLOCK=0; [ "${1:-}" = "--freeze-clock" ] && FREEZE_CLOCK=1
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+. "$REPO/tests/lib/instr_align.sh"
+CLOCKS="tests/expected/instr_gameclock/test_ladder_tenant_vs_palette.tsv"
+[ "$FREEZE_CLOCK" = 1 ] && [ -n "$MODE" ] && { echo "REFUSED: --freeze-clock in control mode"; exit 3; }
+_clk=""; [ "$MODE" = drift-clock ] && _clk="INSTR_CLOCK=frame_done"
 R111=tests/replays/111_don_arcade_vs_screen.rpl
 R109=tests/replays/109_2p_don_vs_phobos.rpl
-ROUL=2520; VS1P=2700; VS2P=2550          # frames on the -debug timeline (measured 14z-123)
+ROUL=2520; VS1P=2700; VS2P=2550          # measured 14z-123 on the frame_done "-debug timeline"; emulated frames since 14z-197
 PK="1704:ff8782:13;1760:ff8782:13;1900:ff8782:13;2100:ff8782:13;2400:ff8782:13"
 RED="$(python3 -c "print('0f00'*16)")"
 venue_pokes() { python3 -c "print(';'.join(f'{f}:ff8121:$1' for f in range(1750,2860,20)))"; }
@@ -116,7 +134,9 @@ LIVE="$(python3 -c "print(';'.join(f'{f}:ff8800-ff8870' for f in range(2900,3400
 
 leg() { # name replay pokes snap_frames dumps
     d="$W/$1"; mkdir -p "$d/sbx"
-    GUARD_DEBUG=1 GUARD_PROBE=b0b4 POKES="$3" SNAP_FRAMES="$4" DUMPS="$5" \
+    printf '%s' "MAME_BIN=$MAME_BIN GUARD_PROBE=b0b4 POKES=$3 SNAP_FRAMES=$4 DUMPS=$5" > "$d/env"
+    # shellcheck disable=SC2086
+    env $_clk GUARD_DEBUG=1 GUARD_PROBE=b0b4 POKES="$3" SNAP_FRAMES="$4" DUMPS="$5" ALIGN_OUT="$d/align" \
       MAME_ROMPATH="$REPO/$BUILD/rompath;$ROMDIR" \
       tools/run_replay_guarded.sh vsavjw "$2" "$d/out.log" "$d/sbx" > "$d/g.log" 2>&1
     echo $? > "$d/rc"
@@ -127,6 +147,11 @@ leg phobos_red   "$R111" "$PK;$(venue_pokes 02);2450:90c140:$RED;2650:90c140:$RE
 leg bishamon_ctl "$R111" "$PK;$(venue_pokes 10)"                                     "$ROUL,$VS1P" "$D1P" &
 leg p2_ctl       "$R109" ""                                                          "$VS2P"       "$VS2P:ff8000-ff8010;$VS2P:90c140-90c160" &
 wait
+for l in phobos_ctl phobos_red bishamon_ctl p2_ctl; do
+    case "$l" in p2_ctl) _r="$R109" ;; *) _r="$R111" ;; esac
+    _e="$(cat "$W/$l/env")"; [ -n "$(echo "$_e" | sed -n 's/.*POKES= .*/x/p')" ] && _e="$(echo "$_e" | sed 's/POKES= //')"
+    ia_note_run "$W/manifest.tsv" "$l" "$(basename "$_r" .rpl)" vsavjw "$REPO/$BUILD/rompath;$ROMDIR" "$REPO/$_r" "$_e" "$W/$l/align"
+done
 for l in phobos_ctl phobos_red bishamon_ctl p2_ctl; do
     rc="$(cat "$W/$l/rc" 2>/dev/null || echo 99)"
     [ "$rc" = 0 ] || { echo "FAIL: leg $l rc=$rc"; tail -5 "$W/$l/g.log"; echo "FAIL test_ladder_tenant_vs_palette"; exit 1; }
@@ -221,4 +246,30 @@ fi
 sed 's/px_inside=[0-9]*/px_inside=0/' "$EXP" > "$W/perturbed.txt"
 if diff -q "$W/perturbed.txt" "$W/got.txt" >/dev/null; then echo "FAIL: perturbed expectation matched"; exit 1; fi
 echo "  ok    control: a perturbed expectation is rejected"
+
+echo "== the instrument's alignment (#228 step 4, option A)"
+if [ "$FREEZE_CLOCK" = 1 ]; then
+    ia_freeze "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" "$W/fz" "${JOBS:-4}" "$W/clocks.tsv" \
+        > "$W/fz.txt" || { sed 's/^/  /' "$W/fz.txt"; echo "REFUSED: the alignment does not hold — nothing frozen"; exit 1; }
+    mkdir -p "$(dirname "$CLOCKS")"
+    { echo "# $CLOCKS — the game clock RAM:\$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,"
+      echo "# option A) by \`tests/test_ladder_tenant_vs_palette.sh --freeze-clock\` at $(git rev-parse --short=8 HEAD): build = $BUILD;"
+      echo "# every reference leg held to replay.lua run live, every guarded leg to its reference leg's game clock."
+      echo "# leg<TAB>replay<TAB>frames<TAB>gameclock"
+      cat "$W/clocks.tsv"; } > "$CLOCKS"
+    echo "froze $(wc -l < "$W/clocks.tsv" | tr -d ' ') game clocks into $CLOCKS"
+    exit 0
+fi
+afail=0
+if ia_check_manifest "$CLOCKS" "$W/manifest.tsv" > "$W/align_bad.txt"; then
+    echo "  ok    every leg on emulated time, at its frozen game clock"
+else echo "FAIL: $(wc -l < "$W/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$W/align_bad.txt" | sed 's/^/        /'; afail=1; fi
+ia_stage test_ladder_tenant_vs_palette "$CLOCKS" "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" 1 "$W/st" "$MODE" || afail=1
+if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
+    [ "$afail" = 1 ] && { echo "FAIL test_ladder_tenant_vs_palette (control mode: $MODE)"; exit 1; }
+    echo "FAIL test_ladder_tenant_vs_palette — control mode $MODE left the gate green"; exit 1
+fi
+if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || afail=1; fi
+if [ "$IA_SKIP" = fired ]; then vs_ctl_fired first-frame-skip "$IA_SKIP_MSG"; else vs_ctl_dead first-frame-skip "$IA_SKIP_MSG" || afail=1; fi
+[ "$afail" = 0 ] || { echo "FAIL test_ladder_tenant_vs_palette"; exit 1; }
 echo "PASS test_ladder_tenant_vs_palette"

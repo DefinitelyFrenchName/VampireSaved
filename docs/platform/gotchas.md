@@ -219,7 +219,9 @@ move the game for some instruments (the 14z-192 paragraph below — re-measured 
 — why the two differ is not measured (#228). Measured again 14z-197 (`tests/test_emu_clock.sh`): a breakpoint leg
 stopped 12,029 times kept `$FF8080` equal to its reference leg's while its work-RAM checksum at frame 1,500 was NOT
 the basis's — a stop can move the game without moving the frame counter, so a `$FF8080` comparison alone cannot see
-that movement. The original analysis, kept:
+that movement. Since 14z-197 `replay_guard.lua` itself counts emulated frames (#228 step 4, `tests/lua/emu_clock.lua`):
+a `-debug` crash-guard run of `02_demitri_vs_cpu` reproduces the frozen vanilla log byte for byte, and under the old
+`frame_done` clock it does not (`tests/test_crash_guard.sh` section 1b, control `drift-clock`). The original analysis, kept:
 A vsavj replay run under `-debug -debugger none` produces a checksum log that
 diverges from the identical non-debug run at frame 12: `RAM:$FF1CF0.l` (a
 latch toggling 0x00000000/0xFFFFFFFF) is phase-shifted by one frame, with
@@ -388,6 +390,17 @@ address space stopped the CPU for 12,029 UI frames and still counted 1,500 frame
 (`emu_clock.lua`'s `on_pokes`; the ground truth pokes the anchor frame itself), and on Donovan's part-9 rig the 8 HP
 writes its tap logs fall on exactly the 8 frames a non-debug `field_trace.lua` run sees the HP drop, where the old clock
 logged each 1-2 frames late (`tests/test_hitbox_encoding.sh`, whose lookup had absorbed that lag).
+`replay_guard.lua` followed in slice 3 (its own replay parse handed to the clock, its integrity check after staging):
+a `-debug` crash-guard run with no stop now reproduces the frozen vanilla log byte for byte (`tests/test_crash_guard.sh`
+1b, control `drift-clock`). **A STOP IS LABELLED WITH THE LAST COMPLETED FRAME**: an event during frame N logs N-1 on
+the emulated clock — the old clock's count included the boot halt, so it logged N, and frozen frames moved by one
+(`tests/audit_df_dead_family.sh` control 3260 -> 3259, `tests/test_ladder_tenant_vs_palette.sh` probe 2416 -> 2415).
+**And rigs tuned on the old clock can stop working**: every input the old clock staged landed a frame (or more) early,
+so a press at the edge of an actionable window, or a mash against the game's own timers, played differently —
+`test_hui_air`'s float stopped hovering (replay 75 re-timed +5 for it; its first jump is eaten at both timings and on native vsav2 too; on replay 79 the same shift gave a GROUND dash that the height-blind check passed, so it now reads the rig's second attempt and requires the body airborne), the hit-class census on the true timeline enters
+the map 6 times, not 230 (`tests/audit_hitclass_map_cost.sh`), the ground throws' first-fall offsets moved on 27 of 42
+(a no-stop leg now carries them, `tools/ground_throw_rigs.py`), and the fresh stage-4 Huitzil build resets after match
+start on the 2P rigs and at ~f4700 on the soak rig (the stage gates moved to `build/hui61`, maintainer-ruled 2026-10-11).
 
 ## CPS-2 program zips store CODE encrypted — static byte reads of code are noise
 **[CPH-2]** Paid for in session 14z-2 (an hour of "why does the ported region disassemble
@@ -961,7 +974,9 @@ keep MAME's for "which code ran".
 ## FBNeo/MAME frame indices and object slots do not transfer — a slot-keyed tap chases a different object (14z-81)
 
 **[CPE-34]** **[MFI-34]** The merged Huitzil crash is deterministic on MAME at frame 2886, object
-`$FFB800`. An `FBNEO_HTAP` on that slot showed healthy writes on BOTH builds
+`$FFB800`. (That frame is the crash guard's `frame_done` count, its clock until 14z-197 (#228 step 4), on a game
+that had diverged from the replay at frame 12. On emulated time, with the probe kept from stopping the CPU before it,
+the satellite's first anim walk on the healthy build is at frame 7962 — `tests/audit_merged_vec3.sh`.) An `FBNEO_HTAP` on that slot showed healthy writes on BOTH builds
 — and the merged build survived the whole 11,017-frame replay on FBNeo. Not
 a contradiction: the emulators traverse the same states on different frame
 indices (documented since session 2), the RAM state at pick time therefore

@@ -2754,7 +2754,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x1E744E` | build/manifest/reconciliation.toml — map; build/manifest/reconciliation.toml — map [vs2]; tools/reconcile_batch.py |
 | `PRG:0x1F3FD2` | docs/project/patch_notes.md — donovan-m2 stage 5 — shared-table remap: mash/time crash fix (2026-07-27, session 11b); build/manifest/reconciliation.toml — map |
 | `PRG:0x1FB0F0` | docs/project/patch_index.md — DEFERRED BY MAINTAINER DECISION (14z-76) — the win-quote bank relocation |
-| `PRG:0x200000` | docs/game/engine_internals.md — GFX ROM (sprite/tile) subsystem; docs/platform/mister.md — The Verilator SDRAM model dropped the TOP address bit — 'addr[22]' rides on 'sdram_a[9]' (measured and fixed 14z-107, fork commit 3); tests/audit_mister_map_fit.sh; tests/test_obj_record_walk.sh; tests/test_wheel_bank5.sh; tools/audit_pointer_flow.py; +1 more |
+| `PRG:0x200000` | docs/game/engine_internals.md — GFX ROM (sprite/tile) subsystem; docs/platform/mister.md — The Verilator SDRAM model dropped the TOP address bit — 'addr[22]' rides on 'sdram_a[9]' (measured and fixed 14z-107, fork commit 3); tests/audit_merged_vec3.sh; tests/audit_mister_map_fit.sh; tests/test_obj_record_walk.sh; tests/test_wheel_bank5.sh; +2 more |
 | `PRG:0x2083BC` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — Shadow / reflection servants (14z-66; premise CORRECTED 14z-68f); docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port); docs/project/patch_notes.md — (round-2 report; the capture-anim shadow over-index); build/manifest/donovan.toml — obj_bank_word_slot; build/manifest/huitzil.toml — obj_hook; +1 more |
 | `PRG:0x2087CA` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/game/engine_internals.md — Shadow / reflection servants (14z-66; premise CORRECTED 14z-68f); docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port); docs/project/patch_notes.md — (round-2 report; the capture-anim shadow over-index); build/manifest/donovan.toml — obj_bank_word_slot; build/manifest/huitzil.toml — obj_hook |
 | `PRG:0x208BD8` | docs/game/atlas/ram.md — Object physics, air system, servants [D] (measured 14z-66); docs/project/patch_notes.md — (round-2 report; the capture-anim shadow over-index) |
@@ -3191,7 +3191,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x3FFFC0` | docs/project/patch_notes.md — 14z-170 — THE M19 FREEZE (donovan-m23 / huitzil-m30 / pyron-m24 / merged-m19, mark M19): the four ruled #136 fixes, and a placeholder corruption that had shipped since merged-m16 |
 | `PRG:0x3FFFD6` | docs/game/atlas/ram.md — Fighter + effect-pool fields (14z-67, measured on the H effect arc); tests/audit_pool_free_byte.sh |
 | `PRG:0x3FFFF0` | docs/project/patch_notes.md — 14z-117 (2) — RANDOM SELECT INCLUDES THE TENANTS (maintainer-directed, freeze donovan-m17 / huitzil-m24 / pyron-m18 / merged-m13, mark M11; field-validated on the board 2026-08-29, 14z-118): byte detail |
-| `PRG:0x3FFFFF` | docs/project/living_docs_scope.md — 11.3 The findings that change the design — six, each measured; docs/project/mister_map.md — 4. Why vanilla's 32 MB stays put, verified against the placement code; tests/test_checkdocs_rom.sh; tests/test_ladder_tenant_vs_palette.sh; tools/checkdocs_rom.py; tools/diff_sets.py; +1 more |
+| `PRG:0x3FFFFF` | docs/project/living_docs_scope.md — 11.3 The findings that change the design — six, each measured; docs/project/mister_map.md — 4. Why vanilla's 32 MB stays put, verified against the placement code; tests/audit_merged_vec3.sh; tests/test_checkdocs_rom.sh; tests/test_ladder_tenant_vs_palette.sh; tools/checkdocs_rom.py; +2 more |
 
 ## Code-only addresses (the documentation gap)
 
@@ -3539,7 +3539,7 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x0D7980` | tests/test_don_reactions.sh |
 | `PRG:0x0D8340` | tests/test_don_reactions.sh |
 | `PRG:0x0D89B0` | tests/test_beam_anim_walk.sh |
-| `PRG:0x0D8CC0` | tests/test_beam_anim_walk.sh |
+| `PRG:0x0D8CC0` | tests/audit_merged_vec3.sh; tests/test_beam_anim_walk.sh |
 | `PRG:0x0DB6D0` | tests/audit_don_lilith_ko.sh |
 | `PRG:0x0DF000` | tests/test_don_reactions.sh |
 | `PRG:0x0E11AC` | tests/audit_region_movability.sh |

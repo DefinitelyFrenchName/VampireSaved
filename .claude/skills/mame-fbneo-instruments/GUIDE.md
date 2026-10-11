@@ -503,7 +503,9 @@ into `~/.claude/skills/mame-fbneo-instruments/`. Nothing in it depends on the or
 > **Incident** (`docs/platform/gotchas.md` › *FBNeo/MAME frame indices and object slots do not transfer — a slot-keyed tap chases a different object (14z-81)*):
 >
 > The merged Huitzil crash is deterministic on MAME at frame 2886, object
-> `$FFB800`. An `FBNEO_HTAP` on that slot showed healthy writes on BOTH builds
+> `$FFB800`. (That frame is the crash guard's `frame_done` count, its clock until 14z-197 (#228 step 4), on a game
+> that had diverged from the replay at frame 12. On emulated time, with the probe kept from stopping the CPU before it,
+> the satellite's first anim walk on the healthy build is at frame 7962 — `tests/audit_merged_vec3.sh`.) An `FBNEO_HTAP` on that slot showed healthy writes on BOTH builds
 > — and the merged build survived the whole 11,017-frame replay on FBNeo. Not
 > a contradiction: the emulators traverse the same states on different frame
 > indices (documented since session 2), the RAM state at pick time therefore

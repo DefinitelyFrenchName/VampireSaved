@@ -1,0 +1,13 @@
+# tests/expected/instr_gameclock/audit_merged_legacy.tsv — the game clock RAM:$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,
+# option A) by `tests/audit_merged_legacy.sh --freeze-clock` at 4980bd96: the merged image build/merged1; section 0's
+# probe legs per tenant, leg b's guarded runs (merged); every reference leg held to replay.lua run live.
+# leg<TAB>replay<TAB>frames<TAB>gameclock
+donovan	03_two_player_vs	5320	6b
+huitzil	03_two_player_vs	5320	6b
+pyron	03_two_player_vs	5320	6b
+merged	12_donovan_vs_cpu	9320	0b
+merged	20_don_round2	12120	fb
+merged	70_hui_mash	11017	ac
+merged	83_hui_fx	3820	8f
+merged	70_pyron_mash	11017	ac
+merged	72_pyron_cosmo_2p	5120	a3

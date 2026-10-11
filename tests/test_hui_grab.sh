@@ -27,7 +27,14 @@
 # progression + damage on the native A/B of record): P1 enters the
 # 0x0E grab seq and the victim takes the 0x13 damage.
 #
-# Usage: ROMDIR=... tests/test_hui_grab.sh [existing-stage4-builddir]
+# Usage: ROMDIR=... tests/test_hui_grab.sh [builddir]   (default build/hui61)
+#
+# THE BUILD IS build/hui61 BY DEFAULT since 14z-197 (maintainer-ruled 2026-10-11, the four Huitzil stage gates "Move to
+# hui61, re-time 2"; DECISIONS_HISTORY.md). Until then it self-built STAGE 4. Once replay_guard.lua counts emulated
+# frames (#228 step 4) a rig plays on its own timing, and on that timing the fresh stage-4 build RESETS just after the
+# match starts on the 2P-dummy rigs (80, 81: the state word and both ids zero by f2500; measured with replay.lua, no
+# debugger), where the frame_done clock's one-frame lead had masked it; build/hui61 runs them with the native
+# signatures. A stage-4 build can still be passed by hand.
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -47,6 +54,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
+set -- "${1:-build/hui61}"   # re-pointed 14z-197 (was: a fresh stage-4 build) — see THE BUILD above
 if [ $# -ge 1 ]; then BUILD="$1"; echo "== using existing build $BUILD"; else
     echo "== stage 4 build"
     TENANT_MANIFEST=build/manifest/huitzil.toml TENANT_CHAR=0x10 \

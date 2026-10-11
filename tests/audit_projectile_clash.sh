@@ -13,11 +13,21 @@
 # EXPECTS: the control fires (a quiet control voids everything), the tenant leg shows bank
 #   word 0x1000, satellite +0x94 == 0 and zero probe fires, the native leg +0x94 == 0 and
 #   bank word 0x6000. A hit-active native satellite reopens #108; EXPECT_SAT_SWEEP=1 is
-#   refused.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua tests/lua/replay_guard.lua
+#   refused. Both guarded legs on emulated time at their frozen game clocks, the staging leg on replay.lua's checksum.
+#   THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): replay_guard.lua counts
+#   EMULATED frames (tests/lua/emu_clock.lua), so the tenant leg's f3520 dump is the native leg's f3520 since 14z-197;
+#   both guarded legs' game clock RAM:$FF8080 at the last frame is held to
+#   tests/expected/instr_gameclock/audit_projectile_clash.tsv, frozen by `--freeze-clock` from REFERENCE legs (the
+#   guard without -debug, the same POKES) each held to replay.lua run live; one STAGING reference leg (the control) is
+#   held to replay.lua on every run (tests/lib/instr_align.sh).
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/instr_gameclock/ tests/lib/controls.sh
+#   tests/lib/instr_align.sh tests/lua/emu_clock.lua tests/lua/replay.lua tests/lua/replay_guard.lua
 #   tests/replays/105_projectile_clash_ctl.rpl tests/replays/106_pyron_cosmo_clash.rpl
 #   tools/run_mame.sh tools/run_replay_guarded.sh tools/run_replay_mame.sh
 #   tools/setup_mame.sh
+#
+# MUST-FIRE: known-bad: drift-clock — a guarded leg under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 5,151 emulated frames of 5,620 counted on the control) must miss its frozen game clock (in-gate: one extra run; mode: both guarded legs run the old clock and the gate FAILs)
+# MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs)
 #
 # What 14z-101's writer hunt established (FBNEO_HTAP, both legs, whole-run):
 #   - fighter/satellite +0x18 is the per-char OBJ BANK WORD (table
@@ -52,7 +62,7 @@
 # NOT-A-DEFECT, and the "fix" it described (word := 0x6000) would be a
 # real regression (the 14z-62c grey-block garble) with no collision gain.
 #
-# ~5 min (3 MAME runs, parallel). On-demand.
+# ~5 min (3 MAME runs, parallel). On-demand. Usage: ROMDIR=... [BUILD=...] tests/audit_projectile_clash.sh [--freeze-clock]
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
@@ -83,15 +93,23 @@ BODY="$(sed -n 's/^code *0x0*\([0-9a-f]*\) .*site_thunk hitclass_map_extend.*/\1
 
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 mkdir -p "$W/ctl" "$W/ten" "$W/nat"
+FREEZE_CLOCK=0; [ "${1:-}" = "--freeze-clock" ] && FREEZE_CLOCK=1
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+. "$REPO/tests/lib/instr_align.sh"
+CLOCKS="tests/expected/instr_gameclock/audit_projectile_clash.tsv"
+[ "$FREEZE_CLOCK" = 1 ] && [ -n "$MODE" ] && { echo "REFUSED: --freeze-clock in control mode"; exit 3; }
+_clk=""; [ "$MODE" = drift-clock ] && _clk="INSTR_CLOCK=frame_done"
 CTL_PK="1400:ff8782:01;1450:ff8782:01;1500:ff8782:01;1400:ff8b82:01;1450:ff8b82:01;1500:ff8b82:01"
 TEN_PK="1400:ff8782:11;1450:ff8782:11;1500:ff8782:11;1400:ff8b82:01;1450:ff8b82:01;1500:ff8b82:01;3300:ff8509:03"
 TEN_DF="3520:ff9400-ff9c00"
 
-( GUARD_PROBE="$BODY" GUARD_PROBE_MAX=20000 POKES="$CTL_PK" \
+# shellcheck disable=SC2086
+( env $_clk GUARD_PROBE="$BODY" GUARD_PROBE_MAX=20000 POKES="$CTL_PK" ALIGN_OUT="$W/ctl/align" \
   MAME_ROMPATH="$REPO/$BUILD/rompath;$ROMDIR" \
   tools/run_replay_guarded.sh vsavjw tests/replays/105_projectile_clash_ctl.rpl \
   "$W/ctl/out.log" "$W/ctl/sbx" >/dev/null 2>&1 || true ) &
-( GUARD_PROBE="$BODY" GUARD_PROBE_MAX=20000 POKES="$TEN_PK" DUMPS="$TEN_DF" \
+# shellcheck disable=SC2086
+( env $_clk GUARD_PROBE="$BODY" GUARD_PROBE_MAX=20000 POKES="$TEN_PK" DUMPS="$TEN_DF" ALIGN_OUT="$W/ten/align" \
   MAME_ROMPATH="$REPO/$BUILD/rompath;$ROMDIR" \
   tools/run_replay_guarded.sh vsavjw tests/replays/106_pyron_cosmo_clash.rpl \
   "$W/ten/out.log" "$W/ten/sbx" >/dev/null 2>&1 || true ) &
@@ -100,6 +118,10 @@ TEN_DF="3520:ff9400-ff9c00"
   "$W/nat/out.log" "$W/nat/sbx" >/dev/null 2>&1 || true ) &
 wait
 fail=0
+ia_note_run "$W/manifest.tsv" build 105_projectile_clash_ctl vsavjw "$REPO/$BUILD/rompath;$ROMDIR" \
+    "$REPO/tests/replays/105_projectile_clash_ctl.rpl" "MAME_BIN=$MAME_BIN POKES=$CTL_PK GUARD_PROBE=$BODY GUARD_PROBE_MAX=20000" "$W/ctl/align"
+ia_note_run "$W/manifest.tsv" build 106_pyron_cosmo_clash vsavjw "$REPO/$BUILD/rompath;$ROMDIR" \
+    "$REPO/tests/replays/106_pyron_cosmo_clash.rpl" "MAME_BIN=$MAME_BIN POKES=$TEN_PK DUMPS=$TEN_DF GUARD_PROBE=$BODY GUARD_PROBE_MAX=20000" "$W/ten/align"
 
 NC="$(grep -c '^PROBE' "$W/ctl/out.log" 2>/dev/null)" || true
 NC="${NC:-0}"
@@ -152,5 +174,30 @@ else
     echo "FAIL: native anchor moved (word 0x$NSAT / +0x94=$N94) — the parity claim is dead; #108 reopens"
     fail=1
 fi
+
+echo "== the instrument's alignment (#228 step 4, option A)"
+if [ "$FREEZE_CLOCK" = 1 ]; then
+    [ "$fail" = 0 ] || { echo "REFUSED: the audit failed — nothing frozen"; exit 1; }
+    ia_freeze "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" "$W/fz" "${JOBS:-4}" "$W/clocks.tsv" \
+        > "$W/fz.txt" || { sed 's/^/  /' "$W/fz.txt"; echo "REFUSED: the alignment does not hold — nothing frozen"; exit 1; }
+    mkdir -p "$(dirname "$CLOCKS")"
+    { echo "# $CLOCKS — the game clock RAM:\$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,"
+      echo "# option A) by \`tests/audit_projectile_clash.sh --freeze-clock\` at $(git rev-parse --short=8 HEAD): build = $BUILD;"
+      echo "# every reference leg held to replay.lua run live, every guarded leg to its reference leg's game clock."
+      echo "# leg<TAB>replay<TAB>frames<TAB>gameclock"
+      cat "$W/clocks.tsv"; } > "$CLOCKS"
+    echo "froze $(wc -l < "$W/clocks.tsv" | tr -d ' ') game clocks into $CLOCKS"
+    exit 0
+fi
+if ia_check_manifest "$CLOCKS" "$W/manifest.tsv" > "$W/align_bad.txt"; then
+    echo "   ok: both guarded legs on emulated time, at their frozen game clocks"
+else echo "FAIL: $(wc -l < "$W/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$W/align_bad.txt" | sed 's/^/        /'; fail=1; fi
+ia_stage audit_projectile_clash "$CLOCKS" "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" 1 "$W/st" "$MODE" || fail=1
+if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
+    [ "$fail" = 1 ] && { echo "AUDIT FAIL (control mode: $MODE)"; exit 1; }
+    echo "AUDIT FAIL — control mode $MODE left the gate green"; exit 1
+fi
+if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || fail=1; fi
+if [ "$IA_SKIP" = fired ]; then vs_ctl_fired first-frame-skip "$IA_SKIP_MSG"; else vs_ctl_dead first-frame-skip "$IA_SKIP_MSG" || fail=1; fi
 
 [ "$fail" = 0 ] && echo "AUDIT PASS" || { echo "AUDIT FAIL"; exit 1; }

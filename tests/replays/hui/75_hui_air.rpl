@@ -11,12 +11,19 @@
 800-803 sys=S1
 1700-1702 p1=1
 # jump (actionable window), then 66 while airborne
-3060-3062 p1=U
-3075-3077 p1=R
-3081-3083 p1=R
+# RE-TIMED 14z-197 (#228 step 4, maintainer-ruled 2026-10-11 "Move to hui61, re-time 2"): every input from
+# f3050 on moved +5 frames, for the FLOAT: on build/hui61, on the replay's own timing (replay.lua, no
+# debugger), the unshifted rig never hovers and the +5 rig hovers at Y=121.125 over f3335-3385
+# (build/agent197/t228/s3/air/summary.txt). The first jump below is EATEN at both timings, and on native
+# vsav2 too (a real cursor pick, build/agent197/t228/s3/vs2/): the 66 after it is a GROUND dash, so this
+# rig measures the float only (test_hui_air reads the air dash on replay 79). Corrected 14z-197 before
+# commit: this note first said the +5 cured an eaten jump and named f3186-3196, replay 79's ground dash.
+3065-3067 p1=U
+3080-3082 p1=R
+3086-3088 p1=R
 # jump, then hold up-forward
-3160-3162 p1=U
-3170-3240 p1=UR
+3165-3167 p1=U
+3175-3245 p1=UR
 # ground float attempt: plain up held long
-3300-3380 p1=U
-3500 wait
+3305-3385 p1=U
+3505 wait

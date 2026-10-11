@@ -1,0 +1,5 @@
+# tests/expected/instr_gameclock/audit_phase_mode_cost.tsv — the game clock RAM:$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,
+# option A) by `tests/audit_phase_mode_cost.sh --freeze-clock` at 4980bd96: phase = the phase-mode probe
+# build, built fresh; the reference leg held to replay.lua run live, the probe run to its game clock.
+# leg<TAB>replay<TAB>frames<TAB>gameclock
+phase	03_two_player_vs	5320	6b

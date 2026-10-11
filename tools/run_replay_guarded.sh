@@ -28,9 +28,13 @@ mkdir -p "$WORK"
 # Build the MAME argument list. With -debug the debugger halts at the first
 # instruction; the -debugscript "go" resumes it at emulated time zero (the
 # guard's periodic callback would also resume it, but this is deterministic
-# insurance). NOTE: -debug runs are deterministic but NOT checksum-comparable
-# to non-debug runs (scheduler timeslicing differs — docs/GOTCHAS.md); use
-# GUARD_DEBUG=0 when the checksum log must match frozen expectations.
+# insurance). Since 14z-197 the guard counts EMULATED frames (#228 step 4), and
+# a -debug run with no stop reproduces the non-debug checksum log
+# (tests/test_crash_guard.sh section 1b); a GUARD_PROBE or GUARD_BREAK stop can
+# still move the game ([MFI-2]), so use GUARD_DEBUG=0 when a log must match
+# frozen expectations and the run arms a probe. (This note used to say -debug
+# logs are never comparable because "scheduler timeslicing differs":
+# RETRACTED 14z-196, #228.)
 set -- "$SET" -autoboot_script "$REPO/tests/lua/replay_guard.lua"
 if [ "${GUARD_DEBUG:-1}" = "1" ]; then
     printf 'go\n' > "$WORK/guard_go.dbs"

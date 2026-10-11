@@ -3,12 +3,19 @@
 # (14z-66, playtest round-1 items 6/7 — the coverage half of item 5).
 # Both sections assert the NATIVE-MATCHED signatures measured on the
 # A/B of record (replay headers), not just no-crash.
-# Usage: ROMDIR=... tests/test_hui_pairs.sh [existing-stage4-builddir]
+# Usage: ROMDIR=... tests/test_hui_pairs.sh [builddir]   (default build/hui61)
+#
+# THE BUILD IS build/hui61 BY DEFAULT since 14z-197 (maintainer-ruled 2026-10-11, the four Huitzil stage gates "Move to
+# hui61, re-time 2"; DECISIONS_HISTORY.md). Until then it self-built STAGE 4. Once replay_guard.lua counts emulated
+# frames (#228 step 4) a rig plays on its own timing, and on that timing the fresh stage-4 build RESETS just after the
+# match starts on the 2P-dummy rigs (80, 81: the state word and both ids zero by f2500; measured with replay.lua, no
+# debugger), where the frame_done clock's one-frame lead had masked it; build/hui61 runs them with the native
+# signatures. A stage-4 build can still be passed by hand.
 #
 # WHAT: Phobos's Reflect Wall guard-cancel and his pair-press Dark Force both come out with
 #   their native-matched signatures (GC seq 0x0E with blowback; DF seq 0x0A at both
 #   activations).
-# HOW: the two rigs on MAME against a stage-4 build (self-built unless given), the sequence
+# HOW: the two rigs on MAME against build/hui61 (a self-built stage-4 build until 14z-197; one can be given), the sequence
 #   bytes read from dumps at the measured frames.
 # EXPECTS: both signatures present; a red is either mechanism dead or changed, not merely a
 #   crash.
@@ -34,6 +41,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
+set -- "${1:-build/hui61}"   # re-pointed 14z-197 (was: a fresh stage-4 build) — see THE BUILD above
 if [ $# -ge 1 ]; then BUILD="$1"; echo "== using existing build $BUILD"; else
     echo "== stage 4 build"
     TENANT_MANIFEST=build/manifest/huitzil.toml TENANT_CHAR=0x10 \

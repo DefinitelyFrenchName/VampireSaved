@@ -57,9 +57,15 @@ cat > "$OUT/pick.rpl" <<'RPL'
 1700-1702 p1=1
 RPL
 
-if POKES="1704:ff8782:$ID;1760:ff8782:$ID;1900:ff8782:$ID;2100:ff8782:$ID;2400:ff8782:$ID" \
-   DUMPS="2600:ff8780-ff8788;3600:ff8460-ff8468" \
-   SNAP_FRAMES="2900,3400" \
+# the guard run's own environment, as space-separated words, for a caller that notes the run in a #228 run manifest
+# (tests/lib/instr_align.sh ia_note_run; test_hui_boot): one source for the POKES, DUMPS and SNAP_FRAMES below
+_PK="1704:ff8782:$ID;1760:ff8782:$ID;1900:ff8782:$ID;2100:ff8782:$ID;2400:ff8782:$ID"
+_DU="2600:ff8780-ff8788;3600:ff8460-ff8468"
+_SN="2900,3400"
+printf '%s' "MAME_BIN=$_BIN POKES=$_PK DUMPS=$_DU SNAP_FRAMES=$_SN" > "$OUT/guard_env"
+if POKES="$_PK" \
+   DUMPS="$_DU" \
+   SNAP_FRAMES="$_SN" \
    MAME_ROMPATH="$(cd "$RP" && pwd);$ROMDIR" \
    "$REPO/tools/run_replay_guarded.sh" "${SET:-vsavj}" "$OUT/pick.rpl" \
        "$OUT/out.log" "$OUT/box" > "$OUT/run.out" 2>&1; then

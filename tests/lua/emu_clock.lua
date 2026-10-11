@@ -22,7 +22,14 @@
 --   C.run{ on_pokes = function(frame) ... end,   -- optional: the frame's scheduled RAM writes (POKES), applied
 --                                                --   BEFORE the anchor, as replay.lua applies them before its checksum
 --          on_frame = function(frame) ... end,   -- optional: the instrument's per-frame work
+--          after_staging = function(frame) ... end,  -- optional: work after N+1's input is staged (an input-integrity
+--                                                --   check reads the ports there, as replay_guard.lua always has)
+--          halted   = function() return bool end,  -- optional: true once the instrument stopped (a crash report):
+--                                                --   frames are then neither counted nor staged
 --          on_end   = function(frame) ... end }  -- optional: write the trailer; the module exits after
+--   OPTIONS (14z-197, replay_guard.lua): `held` + `fields` hand the module the instrument's OWN parsed replay (frame ->
+--   fields, and every controllable field) so staging and the instrument's integrity check read one parse; `fixed =
+--   true` makes `frames` the run's length whatever FRAMES says (replay_guard derives it from the replay).
 --   C.frame()  -- the current frame (for a periodic handler that tags what it sees)
 --
 -- ENV (read here, the same names for every instrument):
@@ -53,7 +60,7 @@ return function(opts)
     local program = machine.devices[":maincpu"].spaces["program"]
     local M = {}
     M.reference = (os.getenv("INSTR_REFERENCE") or "") == "1"
-    local max_frames = tonumber(os.getenv("FRAMES") or "") or opts.frames or 3600
+    local max_frames = (not opts.fixed and tonumber(os.getenv("FRAMES") or "")) or opts.frames or 3600
     local mode = os.getenv("INSTR_CLOCK") or ""
     assert(mode == "" or mode == "frame_done" or mode == "skip_first",
         "emu_clock: INSTR_CLOCK must be frame_done or skip_first, got '" .. mode .. "'")
@@ -62,7 +69,9 @@ return function(opts)
 
     -- the replay (replay.lua's grammar subset every instrument here carried)
     local held, fields = {}, {}
-    if replay_path then
+    if opts.held then
+        held, fields = opts.held, assert(opts.fields, "emu_clock: held without fields")
+    elseif replay_path then
         local ioport = machine.ioport
         local function fld(port, n) return ioport.ports[port].fields[n] end
         local F = {
@@ -143,6 +152,7 @@ return function(opts)
     function M.run(cb)
         cb = cb or {}
         emu.register_frame_done(function()
+            if cb.halted and cb.halted() then return end
             local fn = screen:frame_number()
             if fn == last_fn and mode ~= "frame_done" and not first then ui = ui + 1; return end
             first = false
@@ -159,6 +169,7 @@ return function(opts)
                 if want[fo] and not pressed[fo] then fo:set_value(1); pressed[fo] = true
                 elseif not want[fo] and pressed[fo] then fo:clear_value(); pressed[fo] = nil end
             end
+            if cb.after_staging then cb.after_staging(frame) end
             if frame >= max_frames then
                 if cb.on_end then cb.on_end(frame) end
                 local out = os.getenv("ALIGN_OUT")

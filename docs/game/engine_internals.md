@@ -3173,9 +3173,15 @@ Fix — SHIPPED: the `hitclass_map_extend` site_thunk (`huitzil.toml`,
 on it).
 
 **It is a live hook on a SHARED engine site, and legacy content ENTERS it**
-[M: `tests/audit_hitclass_map_cost.sh`, 14z-92]: over the 46-replay legacy
-corpus legacy enters the map **230 times** (`24_don_winmash` 2,
-`26_don_arcade_mash` 228), every observed index `0x02/0x04/0x09/0x0b` —
+[M: `tests/audit_hitclass_map_cost.sh`, 14z-92; re-measured 14z-197]: over the
+legacy corpus legacy enters the map — **6 times on emulated time** (14z-197, #228
+step 4: `21_don_mash`, `22_don_dualmash` and `26_don_arcade_mash` 2 each, indices
+`0x02/0x25/0x38`, and each of those three replays' legacy divergence between the
+builds with and without the thunk begins 1, 1 and 4 frames after its first entry
+(12493/12494, 13208/13209, 11247/11251) — the thunk's transit cost on all three;
+the gate attributes 'transit' only within 1-8 frames of the first entry); **230 times** was the frame_done clock's
+drifted timeline (`24_don_winmash` 2, `26_don_arcade_mash` 228), every observed
+index there `0x02/0x04/0x09/0x0b` —
 far below 64 — so legacy reads VANILLA's own bytes out of the thunk:
 "legacy enters constantly and receives vanilla answers", never "legacy
 never enters" (43/46 bit-identical in the same run). The hook is a `jmp`

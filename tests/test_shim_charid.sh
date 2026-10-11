@@ -9,10 +9,20 @@
 #   forced-pick pokes (without them the shim never runs and the gate measures nothing —
 #   section 0 proves the probe armed); the verdict control reads offset +0x000, which must
 #   NOT hold the id.
+#   THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): replay_guard.lua counts
+#   EMULATED frames (tests/lua/emu_clock.lua); every probe run's game clock RAM:$FF8080 at its last frame is held to
+#   tests/expected/instr_gameclock/test_shim_charid.tsv, frozen by `--freeze-clock` from REFERENCE legs (the guard
+#   without -debug, the same POKES) each held to replay.lua run live; one STAGING reference leg is held to replay.lua
+#   on every run (tests/lib/instr_align.sh).
 # EXPECTS: 0x13 read at +0x382 on both structs, the control offset not; a quiet leg without
-#   section 0 is a dead rig.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay_guard.lua tests/replays/
+#   section 0 is a dead rig. Every probe run on emulated time at its frozen game clock, the staging leg on
+#   replay.lua's checksum.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/instr_gameclock/ tests/lib/controls.sh
+#   tests/lib/instr_align.sh tests/lua/emu_clock.lua tests/lua/replay.lua tests/lua/replay_guard.lua tests/replays/
 #   tools/run_mame.sh tools/run_replay_guarded.sh tools/setup_mame.sh
+#
+# MUST-FIRE: known-bad: drift-clock — a probe run under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 5,315 emulated frames of 5,320 counted) must miss its frozen game clock (in-gate: one extra run; mode: every probe run runs the old clock and the gate FAILs)
+# MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs)
 #
 # WHY (M3b slice G, 14z-77). A merged build has ONE init shim serving N
 # tenants, and each needs a different VS2/VH2 flavor byte. `flavor_tail()`
@@ -37,7 +47,7 @@
 # negative result from a rig is a fact about the RIG until proven otherwise).
 # Section 0 is that proof, on this instrument, every run.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] tests/test_shim_charid.sh [build] [id]
+# Usage: ROMDIR=... [MAME_BIN=...] tests/test_shim_charid.sh [build] [id] [--freeze-clock]
 #   build defaults to build/m5_wide, id to 0x13 (donovan-m3a).
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
@@ -65,6 +75,15 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 # VARIABLE (forks set their own); only made absolute, and only if it exists,
 # so a gate that means to SKIP on a missing ROMDIR still does.
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
+FREEZE_CLOCK=0; _pos=""
+for a in "$@"; do if [ "$a" = "--freeze-clock" ]; then FREEZE_CLOCK=1; else _pos="$_pos $a"; fi; done
+# shellcheck disable=SC2086
+set -- $_pos
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+. "$REPO/tests/lib/instr_align.sh"
+CLOCKS="tests/expected/instr_gameclock/test_shim_charid.tsv"
+[ "$FREEZE_CLOCK" = 1 ] && [ -n "$MODE" ] && { echo "REFUSED: --freeze-clock in control mode"; exit 3; }
+_clk=""; [ "$MODE" = drift-clock ] && _clk="INSTR_CLOCK=frame_done"
 BUILD="${1:-build/m5_wide}"
 TID="${2:-13}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
@@ -96,9 +115,12 @@ export POKES="1400:ff8782:$TID;1450:ff8782:$TID;1500:ff8782:$TID;\
 fail=0
 
 probe() {  # probe <addr> <memspec> <replay> -> log path on stdout
-    GUARD_PROBE="$1" GUARD_PROBE_MEM="$2" \
+    # shellcheck disable=SC2086
+    env $_clk GUARD_PROBE="$1" GUARD_PROBE_MEM="$2" ALIGN_OUT="$WORK/$1_$2_$3.align" \
     tools/run_replay_guarded.sh vsavjw "tests/replays/$3.rpl" \
         "$WORK/$1_$2_$3.log" "$WORK/box_$1_$2_$3" >/dev/null 2>&1 || true
+    ia_note_run "$WORK/manifest.tsv" build "$3" vsavjw "$MAME_ROMPATH" "$REPO/tests/replays/$3.rpl" \
+        "MAME_BIN=$MAME_BIN POKES=$POKES GUARD_PROBE=$1 GUARD_PROBE_MEM=$2" "$WORK/$1_$2_$3.align"
     echo "$WORK/$1_$2_$3.log"
 }
 
@@ -147,6 +169,31 @@ if grep '^PROBE ' "$L" | grep -q "=$TID\$"; then
 else
     echo "  ok: (0x000,A6) does not read 0x$TID, so +0x382 is doing the work"
 fi
+
+echo "== 3: the instrument's alignment (#228 step 4, option A) =="
+if [ "$FREEZE_CLOCK" = 1 ]; then
+    [ "$fail" = 0 ] || { echo "REFUSED: sections 0-2 failed — nothing frozen"; exit 1; }
+    ia_freeze "$REPO/tests/lua/replay_guard.lua" "$WORK/manifest.tsv" "$WORK/fz" "${JOBS:-4}" "$WORK/clocks.tsv" \
+        > "$WORK/fz.txt" || { sed 's/^/  /' "$WORK/fz.txt"; echo "REFUSED: the alignment does not hold — nothing frozen"; exit 1; }
+    mkdir -p "$(dirname "$CLOCKS")"
+    { echo "# $CLOCKS — the game clock RAM:\$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,"
+      echo "# option A) by \`tests/test_shim_charid.sh --freeze-clock\` at $(git rev-parse --short=8 HEAD): build = $BUILD, tenant 0x$TID;"
+      echo "# every reference leg held to replay.lua run live, every probe run to its reference leg's game clock."
+      echo "# leg<TAB>replay<TAB>frames<TAB>gameclock"
+      cat "$WORK/clocks.tsv"; } > "$CLOCKS"
+    echo "froze $(wc -l < "$WORK/clocks.tsv" | tr -d ' ') game clocks into $CLOCKS"
+    exit 0
+fi
+if ia_check_manifest "$CLOCKS" "$WORK/manifest.tsv" > "$WORK/align_bad.txt"; then
+    echo "  ok: every probe run on emulated time, at its frozen game clock"
+else echo "  FAIL: $(wc -l < "$WORK/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$WORK/align_bad.txt" | sed 's/^/        /'; fail=1; fi
+ia_stage test_shim_charid "$CLOCKS" "$REPO/tests/lua/replay_guard.lua" "$WORK/manifest.tsv" 1 "$WORK/st" "$MODE" || fail=1
+if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
+    [ "$fail" = 1 ] && { echo "FAIL: init-shim char-id gate (control mode: $MODE)"; exit 1; }
+    echo "FAIL: init-shim char-id gate — control mode $MODE left the gate green"; exit 1
+fi
+if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || fail=1; fi
+if [ "$IA_SKIP" = fired ]; then vs_ctl_fired first-frame-skip "$IA_SKIP_MSG"; else vs_ctl_dead first-frame-skip "$IA_SKIP_MSG" || fail=1; fi
 
 [ "$fail" = 0 ] || { echo "FAIL: init-shim char-id gate"; exit 1; }
 echo "PASS: the init shim can identify its tenant — (0x382,A6) holds the"

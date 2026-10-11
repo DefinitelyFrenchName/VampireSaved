@@ -12,8 +12,16 @@
 #   FAILED, never absorbed; leg (b) covers the tenant content's crash-freedom.
 # EXPECTS: every legacy replay on its ratified class; a deviation is mechanism-attributed
 #   and maintainer-signed or it stays red. It proves NOTHING about tenant correctness (gfx
-#   pristine by design).
+#   pristine by design). Every guarded run (section 0's probes, leg b) on emulated time at its frozen game clock, the
+#   staging leg on replay.lua's checksum.
+#   THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): replay_guard.lua counts
+#   EMULATED frames (tests/lua/emu_clock.lua); each guarded run's game clock RAM:$FF8080 at its last frame is held to
+#   tests/expected/instr_gameclock/audit_merged_legacy.tsv, frozen by `--freeze-clock` from REFERENCE legs (the guard
+#   without -debug, the same POKES) each held to replay.lua run live; one STAGING reference leg is held to replay.lua
+#   on every run (tests/lib/instr_align.sh). The merged image is built by the gate, so a manifest change that moves a
+#   game clock FAILs it until re-frozen.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/audit_merged_vec3.sh tests/expected/
+#   tests/lib/controls.sh tests/lib/instr_align.sh tests/lua/emu_clock.lua
 #   tests/lib/enumerate_expectations.sh tests/lua/replay.lua tests/lua/replay_guard.lua
 #   tests/replays/ tests/test_tenant_loop.sh tools/analyze_divergence.py
 #   tools/audit_romset_identity.py tools/build_fingerprint.py tools/check_diverge.py
@@ -21,6 +29,9 @@
 #   tools/describe_masked_shape.py tools/ensure_merged_inputs.sh tools/gen_donovan_patch.py
 #   tools/pack_build.sh tools/patch_prg.py tools/run_mame.sh tools/run_replay_guarded.sh
 #   tools/run_replay_mame.sh tools/setup_mame.sh
+#
+# MUST-FIRE: known-bad: drift-clock — a guarded run under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 5,317 emulated frames of 5,320 counted) must miss its frozen game clock (in-gate: one extra run; mode: every guarded run runs the old clock and the gate FAILs)
+# MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs)
 #
 # WHY (14z-80 close, maintainer-ordered FIRST priority; counts re-frozen
 # since — see the op-count gate below). The 3-tenant merged patch APPLIES but
@@ -75,7 +86,7 @@
 # deviation from that table still fails loudly with a measured shape and
 # a proposed line, and is a RATIFICATION question, never a re-freeze.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [MERGED_OUT=build/merged1] [MERGED_PREBUILT=0] [MERGED_EXPECT=tests/expected/merged1] tests/audit_merged_legacy.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [MERGED_OUT=build/merged1] [MERGED_PREBUILT=0] [MERGED_EXPECT=tests/expected/merged1] tests/audit_merged_legacy.sh [--freeze-clock]
 # On-demand: builds build/merged1 and runs the legs below (~2 h since
 # 14z-89 — leg (a) is a GLOB over tests/expected/merged1/*.masked and
 # that set grew 14 -> 45 .masked with the legacy-pairing promotion; it was
@@ -169,6 +180,12 @@ fi
 
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail=0
+FREEZE_CLOCK=0; [ "${1:-}" = "--freeze-clock" ] && FREEZE_CLOCK=1
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+. "$REPO/tests/lib/instr_align.sh"
+CLOCKS="tests/expected/instr_gameclock/audit_merged_legacy.tsv"
+[ "$FREEZE_CLOCK" = 1 ] && [ -n "$MODE" ] && { echo "REFUSED: --freeze-clock in control mode"; exit 3; }
+_clk=""; [ "$MODE" = drift-clock ] && _clk="INSTR_CLOCK=frame_done"
 
 # Build dirs arrive both relative and absolute; never blindly prepend $PWD
 # (the audit_phase_mode_cost lesson — a wrong rompath fails SILENTLY and
@@ -312,10 +329,13 @@ echo "== 0: the rig FORMS all three tenants' matches (else every verdict"
 echo "      below is vacuous). Guarded runs — never checksum-compared. =="
 for t in "donovan:13:$SHIM" "huitzil:10:$HENT" "pyron:11:$PENT"; do
     name="${t%%:*}"; rest="${t#*:}"; id="${rest%%:*}"; probe="${rest#*:}"
-    POKES="$(pokes_for "$id")" MAME_ROMPATH="$MERGED_RP" \
+    # shellcheck disable=SC2086
+    env $_clk POKES="$(pokes_for "$id")" MAME_ROMPATH="$MERGED_RP" ALIGN_OUT="$W/probe_$name.align" \
     GUARD_PROBE="$probe" GUARD_PROBE_MEM=A6+382 \
         tools/run_replay_guarded.sh vsavjw tests/replays/03_two_player_vs.rpl \
         "$W/probe_$name.log" "$W/pbox_$name" >/dev/null 2>&1 || true
+    ia_note_run "$W/manifest.tsv" "$name" 03_two_player_vs vsavjw "$MERGED_RP" "$REPO/tests/replays/03_two_player_vs.rpl" \
+        "MAME_BIN=${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2} POKES=$(pokes_for "$id") GUARD_PROBE=$probe GUARD_PROBE_MEM=A6+382" "$W/probe_$name.align"
     HITS="$(grep -c '^PROBE ' "$W/probe_$name.log" || true)"
     if [ "${HITS:-0}" -ge 1 ]; then
         echo "  ok: $name char-init entry (0x$probe) executed $HITS time(s)"
@@ -475,9 +495,13 @@ legb() {  # legb <replay-rel> <refbuild> <pokes> <label>
     rpl="$1"; ref="$2"; pk="$3"; label="$4"
     nm="$(basename "$rpl")"
     printf '%-28s ' "$label"
-    if ! POKES="$pk" MAME_ROMPATH="$MERGED_RP" \
+    # shellcheck disable=SC2086
+    env $_clk POKES="$pk" MAME_ROMPATH="$MERGED_RP" ALIGN_OUT="$W/g_$nm.align" \
          tools/run_replay_guarded.sh vsavjw "tests/replays/$rpl.rpl" \
-         "$W/g_$nm.log" "$W/gbox_$nm" > "$W/g_$nm.out" 2>&1; then
+         "$W/g_$nm.log" "$W/gbox_$nm" > "$W/g_$nm.out" 2>&1; _grc=$?
+    ia_note_run "$W/manifest.tsv" merged "$nm" vsavjw "$MERGED_RP" "$REPO/tests/replays/$rpl.rpl" \
+        "MAME_BIN=${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2} POKES=$pk" "$W/g_$nm.align"
+    if [ "$_grc" != 0 ]; then
         echo "FAIL: guard tripped on the MERGED build:"
         grep -m2 -E "CRASH|SOFTRESET|PCWEEDS|REGS" "$W/g_$nm.log" \
             || tail -5 "$W/g_$nm.out"
@@ -569,6 +593,30 @@ legb hui/70_hui_mash        "$LEGB_HUI"  "$HUI_SOAK"  "huitzil/70_mash"
 legb hui/83_hui_fx          "$LEGB_HUI"  "$HUI_FX"    "huitzil/83_fx"
 legb pyron/70_pyron_mash    "$LEGB_PYR"  "$PYR_SOAK"  "pyron/70_mash"
 legb pyron/72_pyron_cosmo_2p "$LEGB_PYR" "$PYR_COSMO" "pyron/72_cosmo_2p"
+
+echo "== the instrument's alignment (#228 step 4, option A) =="
+if [ "$FREEZE_CLOCK" = 1 ]; then
+    [ "$fail" = 0 ] || { echo "REFUSED: the audit failed — nothing frozen"; exit 1; }
+    ia_freeze "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" "$W/fz" "${JOBS:-4}" "$W/clocks.tsv" \
+        > "$W/fz.txt" || { sed 's/^/  /' "$W/fz.txt"; echo "REFUSED: the alignment does not hold — nothing frozen"; exit 1; }
+    mkdir -p "$(dirname "$CLOCKS")"
+    { echo "# $CLOCKS — the game clock RAM:\$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,"
+      echo "# option A) by \`tests/audit_merged_legacy.sh --freeze-clock\` at $(git rev-parse --short=8 HEAD): the merged image $OUT; section 0's"
+      echo "# probe legs per tenant, leg b's guarded runs (merged); every reference leg held to replay.lua run live."
+      echo "# leg<TAB>replay<TAB>frames<TAB>gameclock"
+      cat "$W/clocks.tsv"; } > "$CLOCKS"
+    echo "froze $(wc -l < "$W/clocks.tsv" | tr -d ' ') game clocks into $CLOCKS"
+    exit 0
+fi
+if ia_check_manifest "$CLOCKS" "$W/manifest.tsv" > "$W/align_bad.txt"; then echo "  ok: every guarded run on emulated time, at its frozen game clock"
+else echo "  FAIL: $(wc -l < "$W/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$W/align_bad.txt" | sed 's/^/        /'; fail=1; fi
+ia_stage audit_merged_legacy "$CLOCKS" "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" 1 "$W/st" "$MODE" || fail=1
+if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
+    [ "$fail" = 1 ] && { echo "FAIL: merged-legacy audit (control mode: $MODE)"; exit 1; }
+    echo "FAIL: merged-legacy audit — control mode $MODE left the gate green"; exit 1
+fi
+if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || fail=1; fi
+if [ "$IA_SKIP" = fired ]; then vs_ctl_fired first-frame-skip "$IA_SKIP_MSG"; else vs_ctl_dead first-frame-skip "$IA_SKIP_MSG" || fail=1; fi
 
 echo
 if [ "$fail" != 0 ]; then

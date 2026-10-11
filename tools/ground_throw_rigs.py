@@ -193,13 +193,21 @@ def rows(sched_path, rig_legs, img_path, probe_extra=""):
     judged on its OWN dumps (run 728 Q1a): its hold, its pre-press frame, its drops; each record a leg's probe saw is
     LANDED only if that same leg's P2 HP fell within LAND frames after the probe frame (run 728 Q4); the two legs
     must agree on the hold frame and on every drop. `probe_extra` (the phantom-record control) appends PROBE lines
-    to every leg's log as read."""
+    to every leg's log as read.
+    THE NO-STOP LEG (14z-197, #228 step 4): when <rig_legs>/nostop exists — the same rig, POKES and dumps run WITHOUT
+    the debugger, so nothing stops the CPU — the event's falls (amounts, count, first-fall frame) are read from IT,
+    and both probe legs must agree with it on the hold frame and on the falls' amounts. Measured 14z-197: a probe
+    leg's breakpoint stop moved the first fall one frame late on 3 of 42 events (DE 6HP, GA 6HK, LE 6HP) against
+    the no-stop run, which is the game's own timing; each probe leg still judges its own records against its own
+    falls (LANDED)."""
     sched = json.loads(Path(sched_path).read_text())
     img = Path(img_path).read_bytes()
     cid = int(sched["char"], 16)
     bank = vf.bank_rows(Path(__file__).resolve().parent.parent / "build/manifest/bank_map.toml")
     lo_tab, hi_tab = own_bounds(img, bank, cid)
     legs = {s: os.path.join(rig_legs, s) for s in ("0189ea", "02979a")}
+    ns_dir = os.path.join(rig_legs, "nostop")
+    nostop = os.path.isdir(ns_dir)
     probes = {s: _probes(os.path.join(d, "run.log")) for s, d in legs.items()}
     if probe_extra:   # `+<off>:<a3 hex>` or `+<off>:auto` (the rig's own first damaging record, planted where no fall is)
         off, a3s = probe_extra.split(":")
@@ -221,6 +229,9 @@ def rows(sched_path, rig_legs, img_path, probe_extra=""):
         # apart, the gap growing inside a long throw (DE 6MK 4009/4011 ... 4111/4117) — a breakpoint stop skews the
         # timeline ([VSP-129]), so a join by frame is wrong. Each leg's records are judged on its own falls.
         agree = a["hold"] == b["hold"] and [d[1:] for d in a["drops"]] == [d[1:] for d in b["drops"]]
+        n = leg_event(ns_dir, e, end_f) if nostop else None
+        if n is not None:
+            agree = agree and n["hold"] == a["hold"] and [d[1:] for d in n["drops"]] == [d[1:] for d in a["drops"]]
         recs = []
         for s in ("0189ea", "02979a"):
             dframes = {f for f, _, _ in lv[s]["drops"]}
@@ -239,10 +250,10 @@ def rows(sched_path, rig_legs, img_path, probe_extra=""):
         xs = (struct.unpack(">h", x1[:2])[0], struct.unpack(">h", x2[:2])[0]) if len(x1) >= 2 and len(x2) >= 2 else None
         out.append({"sheet": sched["sheet"], "key": e["key"], "input": e["input"], "press": e["press"],
                     "legs": {s: {"hold": v["hold"], "pre_hold": v["pre_hold"], "dumped": v["dumped"], "need": v["need"],
-                                 "drops": v["drops"]} for s, v in lv.items()},
+                                 "drops": v["drops"]} for s, v in (list(lv.items()) + ([("nostop", n)] if n else []))},
                     "legs_agree": agree, "hold": a["hold"], "pre_hold": a["pre_hold"] or b["pre_hold"],
                     "press_to_hold": (a["hold"] - e["press"]) if a["hold"] is not None else None,
-                    "drops": a["drops"], "records": recs, "meter_end": m_end, "x_end": xs})
+                    "drops": n["drops"] if n is not None else a["drops"], "records": recs, "meter_end": m_end, "x_end": xs})
     for r in out:
         print(json.dumps(r))
 
@@ -341,14 +352,16 @@ def snaps(sched_path, exp_path):
 
 
 def sheet(out_png, legs_root, rigs_dir, exp_path):
-    """The capture sheet: every rig's snapshots (taken by the 0x0189EA leg at its events' first-fall frames), one
-    row per character, labelled with the event and the frame."""
+    """The capture sheet: every rig's snapshots (taken by the no-stop leg at its events' first-fall frames — by the
+    0x0189EA leg when a rig has no no-stop leg, as before 14z-197), one row per character, labelled with the event
+    and the frame."""
     from PIL import Image, ImageDraw
     tiles = []
     for j in sorted(Path(rigs_dir).glob("gt_*.json")):
         sched = json.loads(j.read_text())
         frames = [int(x) for x in os.popen(f"python3 {__file__} snaps {j} {exp_path}").read().strip().split(",") if x]
-        shots = sorted(Path(legs_root, j.stem, "0189ea", "sb", "snap").rglob("*.png"))
+        _src = "nostop" if Path(legs_root, j.stem, "nostop").is_dir() else "0189ea"
+        shots = sorted(Path(legs_root, j.stem, _src, "sb", "snap").rglob("*.png"))
         evs = {e["press"]: e for e in sched["events"]}
         for fr, p in zip(frames, shots):
             e = next(ev for pr, ev in evs.items() if pr <= fr < pr + GAP)

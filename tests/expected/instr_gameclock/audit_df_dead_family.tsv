@@ -1,0 +1,6 @@
+# tests/expected/instr_gameclock/audit_df_dead_family.tsv — the game clock RAM:$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,
+# option A) by `tests/audit_df_dead_family.sh --freeze-clock` at 4980bd96: native vsav2, don and dem
+# legs; every reference leg held to replay.lua run live, every probe run to its reference leg's game clock.
+# leg<TAB>replay<TAB>frames<TAB>gameclock
+don	97_df_mech	7010	05
+dem	97_df_mech	7010	05

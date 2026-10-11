@@ -10,10 +10,20 @@
 # EXPECTS: legacy replays bit-identical; Donovan's own replays diverge from the exact frame
 #   the shim runs, for 24-135 frames in 13-16 runs, then re-converge for thousands of
 #   frames. An IDENTICAL result on his own content FAILS — the rig stopped forming the
-#   match.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua tests/lua/replay_guard.lua
+#   match. Section 0's probe run on emulated time at its frozen game clock, the staging leg on replay.lua's checksum.
+#   THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): replay_guard.lua counts
+#   EMULATED frames (tests/lua/emu_clock.lua); section 0's probe run's game clock RAM:$FF8080 at its last frame is held
+#   to tests/expected/instr_gameclock/audit_phase_mode_cost.tsv, frozen by `--freeze-clock` from a REFERENCE leg (the
+#   guard without -debug, the same POKES) held to replay.lua run live; one STAGING reference leg is held to replay.lua
+#   on every run (tests/lib/instr_align.sh). The phase build is built fresh, so a manifest change that moves its game
+#   clock FAILs the gate until re-frozen.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/instr_gameclock/ tests/lib/controls.sh
+#   tests/lib/instr_align.sh tests/lua/emu_clock.lua tests/lua/replay.lua tests/lua/replay_guard.lua
 #   tests/replays/ tools/build_donovan.sh tools/build_wide_romset.py tools/run_mame.sh
 #   tools/run_replay_guarded.sh tools/run_replay_mame.sh tools/setup_mame.sh
+#
+# MUST-FIRE: known-bad: drift-clock — the probe run under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 5,317 emulated frames of 5,320 counted) must miss its frozen game clock (in-gate: one extra run; mode: the probe run runs the old clock and the gate FAILs)
+# MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs)
 #
 # WHY (M3b, 14z-77, the maintainer's ratified condition). A merged build has
 # ONE init shim and therefore ONE seeder. Phobos NEEDS `latch_mode = "phase"`
@@ -53,7 +63,7 @@
 # runs at all and every replay compares identical — a green that measures
 # nothing. Section 0 proves the shim executed before any verdict is read.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] tests/audit_phase_mode_cost.sh
+# Usage: ROMDIR=... [MAME_BIN=...] tests/audit_phase_mode_cost.sh [--freeze-clock]
 # On-demand: builds a probe variant and runs 14 replay legs (~15 min).
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
@@ -100,6 +110,12 @@ fi
 
 WORK="$(mktemp -d)"; trap 'rm -rf "$WORK" build/manifest/_phase_probe.toml' EXIT
 fail=0
+FREEZE_CLOCK=0; [ "${1:-}" = "--freeze-clock" ] && FREEZE_CLOCK=1
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+. "$REPO/tests/lib/instr_align.sh"
+CLOCKS="tests/expected/instr_gameclock/audit_phase_mode_cost.tsv"
+[ "$FREEZE_CLOCK" = 1 ] && [ -n "$MODE" ] && { echo "REFUSED: --freeze-clock in control mode"; exit 3; }
+_clk=""; [ "$MODE" = drift-clock ] && _clk="INSTR_CLOCK=frame_done"
 
 echo "== build a phase-mode Donovan (MEASUREMENT ONLY — never freeze it) =="
 python3 - <<'PY'
@@ -146,10 +162,13 @@ run() {  # run <build> <replay> <out> [pokes]
 }
 
 echo "== 0: the rig FORMS the match (else every verdict below is vacuous) =="
-POKES="$POK" MAME_ROMPATH="$(abspath "$WORK/phase")/rompath;$ROMDIR" \
+# shellcheck disable=SC2086
+env $_clk POKES="$POK" MAME_ROMPATH="$(abspath "$WORK/phase")/rompath;$ROMDIR" ALIGN_OUT="$WORK/probe.align" \
 GUARD_PROBE="$SHIM" GUARD_PROBE_MEM=A6+382 \
     tools/run_replay_guarded.sh vsavjw tests/replays/03_two_player_vs.rpl \
     "$WORK/probe.log" "$WORK/pbox" >/dev/null 2>&1 || true
+ia_note_run "$WORK/manifest.tsv" phase 03_two_player_vs vsavjw "$(abspath "$WORK/phase")/rompath;$ROMDIR" \
+    "$REPO/tests/replays/03_two_player_vs.rpl" "MAME_BIN=${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2} POKES=$POK GUARD_PROBE=$SHIM GUARD_PROBE_MEM=A6+382" "$WORK/probe.align"
 H="$(grep -c '^PROBE ' "$WORK/probe.log" || true)"
 if [ "${H:-0}" -ge 1 ]; then
     echo "  ok: the shim executed $H time(s) on the phase build"
@@ -205,6 +224,31 @@ if not ok:
 sys.exit(0 if ok else 1)
 PY
 done
+
+echo "== 3: the instrument's alignment (#228 step 4, option A) =="
+if [ "$FREEZE_CLOCK" = 1 ]; then
+    [ "$fail" = 0 ] || { echo "REFUSED: sections 0-2 failed — nothing frozen"; exit 1; }
+    ia_freeze "$REPO/tests/lua/replay_guard.lua" "$WORK/manifest.tsv" "$WORK/fz" "${JOBS:-4}" "$WORK/clocks.tsv" \
+        > "$WORK/fz.txt" || { sed 's/^/  /' "$WORK/fz.txt"; echo "REFUSED: the alignment does not hold — nothing frozen"; exit 1; }
+    mkdir -p "$(dirname "$CLOCKS")"
+    { echo "# $CLOCKS — the game clock RAM:\$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,"
+      echo "# option A) by \`tests/audit_phase_mode_cost.sh --freeze-clock\` at $(git rev-parse --short=8 HEAD): phase = the phase-mode probe"
+      echo "# build, built fresh; the reference leg held to replay.lua run live, the probe run to its game clock."
+      echo "# leg<TAB>replay<TAB>frames<TAB>gameclock"
+      cat "$WORK/clocks.tsv"; } > "$CLOCKS"
+    echo "froze $(wc -l < "$WORK/clocks.tsv" | tr -d ' ') game clocks into $CLOCKS"
+    exit 0
+fi
+if ia_check_manifest "$CLOCKS" "$WORK/manifest.tsv" > "$WORK/align_bad.txt"; then
+    echo "  ok: the probe run on emulated time, at its frozen game clock"
+else echo "  FAIL: $(wc -l < "$WORK/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$WORK/align_bad.txt" | sed 's/^/        /'; fail=1; fi
+ia_stage audit_phase_mode_cost "$CLOCKS" "$REPO/tests/lua/replay_guard.lua" "$WORK/manifest.tsv" 1 "$WORK/st" "$MODE" || fail=1
+if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
+    [ "$fail" = 1 ] && { echo "FAIL: phase-mode cost audit (control mode: $MODE)"; exit 1; }
+    echo "FAIL: phase-mode cost audit — control mode $MODE left the gate green"; exit 1
+fi
+if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || fail=1; fi
+if [ "$IA_SKIP" = fired ]; then vs_ctl_fired first-frame-skip "$IA_SKIP_MSG"; else vs_ctl_dead first-frame-skip "$IA_SKIP_MSG" || fail=1; fi
 
 [ "$fail" = 0 ] || { echo "FAIL: phase-mode cost audit"; exit 1; }
 echo "PASS: phase mode costs LEGACY nothing (bit-identical) and costs Donovan"

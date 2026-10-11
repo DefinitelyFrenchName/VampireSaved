@@ -1,0 +1,5 @@
+# tests/expected/instr_gameclock/test_hui_boot.tsv — the game clock RAM:$FF8080 at the probe run's last frame, frozen from a REFERENCE leg (#228 step 4,
+# option A) by `tests/test_hui_boot.sh --freeze-clock` at 4980bd96: hui4 = the stage-4 build, built fresh;
+# the reference leg held to replay.lua run live, the probe run to its game clock.
+# leg<TAB>replay<TAB>frames<TAB>gameclock
+hui4	pick	3601	b4

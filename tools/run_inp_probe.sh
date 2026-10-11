@@ -38,8 +38,11 @@ EXITFLAG="-exit_after_playback"
 DBG=""
 if [ -n "${INP_DEBUG:-}" ]; then
     # debugger mode: -debug halts at the first instruction; the debugscript
-    # resumes it (tools/run_replay_guarded.sh pattern). Timeslicing differs
-    # from cheap mode — compare crash frames before trusting a trace.
+    # resumes it (tools/run_replay_guarded.sh pattern). tests/lua/inp_guard.lua
+    # counts frame_done calls, so under -debug its frame labels also count the
+    # boot halt and any stop, and a stop can move the game ([MFI-2]) — compare
+    # crash frames with cheap mode before trusting a trace. (Was "timeslicing
+    # differs": RETRACTED 14z-196, #228.)
     printf 'go\n' > "$SB/go.dbg"; DBG="-debug -debugger none -debugscript $SB/go.dbg"
 fi
 CHECKSUM_OUT="$OUT/inp_probe.log" "$BIN" vsavjw -rompath "$RP;$ROMDIR" $DBG \

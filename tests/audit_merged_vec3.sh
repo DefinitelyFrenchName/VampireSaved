@@ -9,13 +9,38 @@
 #   anim), not tenant 0's planted tripwire address — the regression gate for the per-tenant
 #   type-number renumbering that fixed the 14z-81 vec3.
 # HOW: two guarded MAME runs of hui/70_hui_mash on the merged build with GUARD_PROBE on the
-#   walker entry, A0 read at the satellite's first tick.
+#   walker entry, A0 read at the satellite's first tick — the first hit on the satellite's slot
+#   whose A0 lies outside vsavj's own anims at 0x200000-0x3FFFFF (see WHERE THE SATELLITE FIRST WALKS).
+#   THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): replay_guard.lua counts
+#   EMULATED frames (tests/lua/emu_clock.lua); both probe runs' game clock RAM:$FF8080 at the last frame is held to
+#   tests/expected/instr_gameclock/audit_merged_vec3.tsv, frozen by `--freeze-clock` from REFERENCE legs (the guard
+#   without -debug, the same POKES) each held to replay.lua run live; one STAGING reference leg is held to replay.lua
+#   on every run (tests/lib/instr_align.sh).
 # EXPECTS: A0 the healthy value on the merged build; a FAIL is a regression of the
-#   renumbering (pair any change with donovan/12_vs_cpu staying guard-clean).
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/audit_merged_legacy.sh
+#   renumbering (pair any change with donovan/12_vs_cpu staying guard-clean). Both probe runs on emulated time at
+#   their frozen game clocks, the staging leg on replay.lua's checksum.
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/audit_merged_legacy.sh tests/expected/instr_gameclock/
+#   tests/lib/controls.sh tests/lib/instr_align.sh tests/lua/emu_clock.lua tests/lua/replay.lua
 #   tests/lua/replay_guard.lua tests/replays/hui/70_hui_mash.rpl
 #   tests/test_type_stamp_census.sh tools/run_mame.sh tools/run_replay_guarded.sh
 #   tools/setup_mame.sh
+#
+# MUST-FIRE: known-bad: drift-clock — a probe run under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 10,892 emulated frames of 11,017 counted) must miss its frozen game clock (in-gate: one extra run; mode: both probe runs run the old clock and the gate FAILs)
+# MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs)
+#
+# WHERE THE SATELLITE FIRST WALKS — FRAME 2886 WAS THE OLD CLOCK'S (measured 14z-197, #228 step 4). Until then
+# this gate read "the PROBE at frame 2886". That frame was replay_guard.lua's frame_done count on a run whose game
+# had diverged from the replay at frame 12 (the debugger's boot halt counted as a frame, so every input landed
+# early). On emulated time the probe (A6 = the satellite's slot) first stops at frames 469 and 889 on OTHER objects in
+# that slot (A0 0x2671xx, vsavj's own anims), and those stops move the game ([MFI-2]: both builds' probe runs leave
+# their no-debugger reference at 469). Where the satellite then first walks depends on the build: frame 7962 on hui30
+# (A0=0x000E456C), 2886 on merged1 (A0=0x00438F4C = anim@huitzil 0x42D6A0 + 0xB8AC). On hui30 a probe that cannot stop
+# before the satellite (A0 < 0x200000 added to its condition) equals the reference until 7962, so 7962 is the replay's
+# own first walk there (build/agent197/t228/s3/vec3/). THE VERDICT IS THE VALUE, not the frame: the gate takes the FIRST
+# hit whose A0 is below 0x200000 or at or above 0x400000 — a tenant's anim is placed in low-ROM holes (hui30 0xD8CC0)
+# or the WIDE extension (merged 0x42D6A0), the defect's base was 0x000CB9C0 — and skips vsavj's own anims at
+# 0x2xxxxx. A tenant anim ever placed at 0x200000-0x3FFFFF would be skipped: the gate then finds no satellite walk and
+# FAILs as a dead rig, never passes.
 #
 # THE MEASURED DEFECT (14z-81, deterministic, 3/3 MAME runs): on a 3-tenant
 # merged build, Huitzil's satellite (object $FFB800 at char-init, MAME frame
@@ -52,7 +77,7 @@
 # donovan/12_vs_cpu staying guard-clean — the replay that caught the
 # withdrawn design.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] tests/audit_merged_vec3.sh [merged_build]
+# Usage: ROMDIR=... [MAME_BIN=...] tests/audit_merged_vec3.sh [merged_build] [--freeze-clock]
 # Default merged build: build/merged1 (rebuild it with
 # tests/audit_merged_legacy.sh). ~4 min: two guarded MAME runs.
 #
@@ -79,6 +104,13 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
+FREEZE_CLOCK=0; [ "${1:-}" = "--freeze-clock" ] && { FREEZE_CLOCK=1; shift; }
+[ "${2:-}" = "--freeze-clock" ] && FREEZE_CLOCK=1
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+. "$REPO/tests/lib/instr_align.sh"
+CLOCKS="tests/expected/instr_gameclock/audit_merged_vec3.tsv"
+[ "$FREEZE_CLOCK" = 1 ] && [ -n "$MODE" ] && { echo "REFUSED: --freeze-clock in control mode"; exit 3; }
+_clk=""; [ "$MODE" = drift-clock ] && _clk="INSTR_CLOCK=frame_done"
 MERGED="${1:-build/merged1}"
 REF=build/hui30
 
@@ -96,11 +128,16 @@ HUI_POKES="1704:ff8782:10;1760:ff8782:10;1900:ff8782:10;2100:ff8782:10;2400:ff87
 # error pushes a PC INSIDE the faulting instruction (0x15098), which never
 # matches an instruction start, so a bp there reads as a clean zero — the
 # dead-instrument trap, measured 14z-81.
-probe() {  # probe <build> <out>
-    POKES="$HUI_POKES" MAME_ROMPATH="$(abspath "$1")/rompath;$ROMDIR" \
-    GUARD_PROBE=15084 GUARD_PROBE_COND="a6==0xffb800" GUARD_PROBE_MAX=20000 \
+COND="a6==0xffb800"
+probe() {  # probe <build> <out> <leg>
+    # shellcheck disable=SC2086
+    env $_clk POKES="$HUI_POKES" MAME_ROMPATH="$(abspath "$1")/rompath;$ROMDIR" ALIGN_OUT="$2.align" \
+    GUARD_PROBE=15084 GUARD_PROBE_COND="$COND" GUARD_PROBE_MAX=20000 \
         tools/run_replay_guarded.sh vsavjw tests/replays/hui/70_hui_mash.rpl \
         "$2" "$W/box_$(basename "$2")" >/dev/null 2>&1 || true
+    ia_note_run "$W/manifest.tsv" "$3" 70_hui_mash vsavjw "$(abspath "$1")/rompath;$ROMDIR" \
+        "$REPO/tests/replays/hui/70_hui_mash.rpl" \
+        "MAME_BIN=$MAME_BIN POKES=$HUI_POKES GUARD_PROBE=15084 GUARD_PROBE_COND=$COND GUARD_PROBE_MAX=20000" "$2.align"
 }
 # Parse BY FIELD NAME, never by position (corrected 14z-128). This read
 #   sed 's/^PROBE 2886 .*A0=\(...\) A6=00ffb800.*/\1/p'
@@ -113,23 +150,24 @@ probe() {  # probe <build> <out>
 # own parser, and the message's guess at the cause was WRONG — which is why
 # a failure message may carry a hypothesis but the verdict must carry what
 # was measured ([VSP-116]).
-a0_at_2886() {   # A0 of the first frame-2886 PROBE whose A6 is the satellite
-    awk '$1=="PROBE" && $2==2886 {
+a0_first() {   # "<frame> <A0>" of the FIRST PROBE on the satellite's slot whose A0 is not a vsavj anim (see the header)
+    awk '$1=="PROBE" {
             a0 = ""; want = 0
             for (i = 3; i <= NF; i++) {
                 if ($i ~ /^A0=/)          a0 = substr($i, 4)
                 if ($i == "A6=00ffb800")  want = 1
             }
-            if (want && a0 != "") { print a0; exit }
+            lo = substr(a0, 3)                      # 6 hex digits, lowercase, fixed width: compared as strings
+            if (want && a0 != "" && (lo < "200000" || lo >= "400000")) { print $2, a0; exit }
          }' "$1"
 }
 
 echo "== the healthy reference (hui29) =="
-probe "$REF" "$W/ref.log"
-R="$(a0_at_2886 "$W/ref.log")"
-[ -n "$R" ] || { echo "FAIL: rig dead — no PROBE at 2886 on hui29 (the replay"; \
+probe "$REF" "$W/ref.log" ref
+RF="$(a0_first "$W/ref.log")"; R="${RF#* }"
+[ -n "$RF" ] || { echo "FAIL: rig dead — no satellite walk on $REF (the replay"; \
                  echo "      or pokes moved; fix the rig before reading verdicts)"; exit 1; }
-echo "  ok: hui29 satellite anim base A0=0x$R at frame 2886"
+echo "  ok: $REF satellite anim base A0=0x$R at its first walk, frame ${RF% *}"
 
 # the healthy merged expectation, computed from the placements (never baked)
 EXP="$(python3 - "$MERGED" "$REF" "0x$R" <<'PY'
@@ -143,17 +181,46 @@ PY
 )"
 
 echo "== the build under test ($MERGED) =="
-probe "$MERGED" "$W/new.log"
-M="$(a0_at_2886 "$W/new.log")"
+probe "$MERGED" "$W/new.log" merged
+MF="$(a0_first "$W/new.log")"; M="${MF#* }"
 CRASH="$(grep -m1 '^CRASH' "$W/new.log" || true)"
-[ -n "$M" ] || { echo "FAIL: rig dead on $MERGED — no PROBE at 2886"; exit 1; }
-echo "  measured A0=0x$M (healthy would be 0x$EXP); ${CRASH:-no crash}"
+[ -n "$MF" ] || { echo "FAIL: rig dead on $MERGED — no satellite walk"; exit 1; }
+echo "  measured A0=0x$M at its first walk, frame ${MF% *} (healthy would be 0x$EXP); ${CRASH:-no crash}"
 
 # numeric compare — the probe prints A0 zero-padded to 8 digits, the
 # placements-derived expectation does not, and the FIRST live PASS of this
 # gate (14z-81b, the fix build) was mis-verdicted by that string mismatch
 M="$(printf '%d' "0x$M")"; EXP="$(printf '%d' "0x$EXP")"
-if [ "$M" = "$EXP" ] && [ -z "$CRASH" ]; then
+vfail=0; { [ "$M" = "$EXP" ] && [ -z "$CRASH" ]; } || vfail=1
+
+echo "== the instrument's alignment (#228 step 4, option A) =="
+afail=0
+if [ "$FREEZE_CLOCK" = 1 ]; then
+    [ "$vfail" = 0 ] || { echo "REFUSED: the verdict failed — nothing frozen"; exit 1; }
+    ia_freeze "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" "$W/fz" "${JOBS:-4}" "$W/clocks.tsv" \
+        > "$W/fz.txt" || { sed 's/^/  /' "$W/fz.txt"; echo "REFUSED: the alignment does not hold — nothing frozen"; exit 1; }
+    mkdir -p "$(dirname "$CLOCKS")"
+    { echo "# $CLOCKS — the game clock RAM:\$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,"
+      echo "# option A) by \`tests/audit_merged_vec3.sh --freeze-clock\` at $(git rev-parse --short=8 HEAD): ref = $REF, merged = $MERGED;"
+      echo "# every reference leg held to replay.lua run live, every probe run to its reference leg's game clock."
+      echo "# leg<TAB>replay<TAB>frames<TAB>gameclock"
+      cat "$W/clocks.tsv"; } > "$CLOCKS"
+    echo "froze $(wc -l < "$W/clocks.tsv" | tr -d ' ') game clocks into $CLOCKS"
+    exit 0
+fi
+if ia_check_manifest "$CLOCKS" "$W/manifest.tsv" > "$W/align_bad.txt"; then
+    echo "  ok: both probe runs on emulated time, at their frozen game clocks"
+else echo "  FAIL: $(wc -l < "$W/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$W/align_bad.txt" | sed 's/^/        /'; afail=1; fi
+ia_stage audit_merged_vec3 "$CLOCKS" "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" 1 "$W/st" "$MODE" || afail=1
+if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
+    [ "$afail" = 1 ] && { echo "FAIL: audit_merged_vec3 (control mode: $MODE)"; exit 1; }
+    echo "FAIL: audit_merged_vec3 — control mode $MODE left the gate green"; exit 1
+fi
+if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || afail=1; fi
+if [ "$IA_SKIP" = fired ]; then vs_ctl_fired first-frame-skip "$IA_SKIP_MSG"; else vs_ctl_dead first-frame-skip "$IA_SKIP_MSG" || afail=1; fi
+[ "$afail" = 0 ] || { echo "FAIL: audit_merged_vec3 — the instrument's alignment"; exit 1; }
+
+if [ "$vfail" = 0 ]; then
     echo "PASS: the merged satellite reads its anim base from anim@huitzil"
     echo "      and the run is crash-free — the 14z-81 defect is FIXED;"
     echo "      re-run tests/audit_merged_legacy.sh before trusting more"

@@ -628,9 +628,9 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 
 **WHAT:** the crash guard classifies known-good and known-bad correctly: a clean vanilla run is CLEAN (and, in cheap mode, checksum-identical to the frozen expectation), a planted ILLEGAL opcode trips vec4, a planted odd jump address trips vec3.
 
-**HOW:** four MAME runs: the negative control in cheap and -debug modes (the latter compared run-to-run, never to vanilla — -debug shifts the scheduler), then the 14 dispatch tables' slot-0x0F entries pointed at a planted ILLEGAL and at an odd address.
+**HOW:** four MAME runs: the negative control in cheap and -debug modes (each compared with the frozen vanilla log; the -debug one also run-to-run), then the 14 dispatch tables' slot-0x0F entries pointed at a planted ILLEGAL and at an odd address.
 
-**EXPECTS:** CLEAN on the negatives, CRASH vec4 and vec3 on the positives; a guard that misses either plant is not trusted.
+**EXPECTS:** CLEAN on the negatives, both checksum-identical to frozen vanilla, CRASH vec4 and vec3 on the positives; a guard that misses either plant is not trusted.
 
 ### `test_crypt_boundary.sh` — test, ci_static
 
@@ -962,7 +962,7 @@ the build pipeline — manifests, patch ops, extraction/reconciliation/generatio
 
 **HOW:** two guarded MAME runs on a Huitzil build probing the dispatch's +0x30 word per type; REPORT-ONLY (exit 0 unless the rig is dead).
 
-**EXPECTS:** a per-type owner report, 114/116/118/120 stated as not observed. STALE since 14z-91 (the header says so): the probe points at a thunk that no longer exists and must be re-pointed at the relocated walker before it is trusted.
+**EXPECTS:** a per-type owner report, 114/116/118/120 stated as not observed. STALE since 14z-91 (the header says so): the probe points at a thunk that no longer exists and must be re-pointed at the relocated walker before it is trusted. Both runs on emulated time at their frozen game clocks, the staging leg on replay.lua's checksum. THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): replay_guard.lua counts EMULATED frames (tests/lua/emu_clock.lua); both runs' game clock RAM:$FF8080 at the last frame is held to tests/expected/instr_gameclock/audit_objhook_owner_census.tsv, frozen by `--freeze-clock` from REFERENCE legs (the guard without -debug, the same POKES) each held to replay.lua run live; one STAGING reference leg is held to replay.lua on every run (tests/lib/instr_align.sh).
 
 ### `audit_region_movability.sh` — audit, emulator
 
@@ -1360,9 +1360,9 @@ the build pipeline — manifests, patch ops, extraction/reconciliation/generatio
 
 **WHAT:** the init shim can identify WHICH tenant it runs for: at char-init (0x382,A6) already holds the character id, on BOTH player structs — the premise the merged shim's per-id flavour chain rests on.
 
-**HOW:** GUARD_PROBE_MEM reads memory at the shim's hit on two 2P replays on MAME with the forced-pick pokes (without them the shim never runs and the gate measures nothing — section 0 proves the probe armed); the verdict control reads offset +0x000, which must NOT hold the id.
+**HOW:** GUARD_PROBE_MEM reads memory at the shim's hit on two 2P replays on MAME with the forced-pick pokes (without them the shim never runs and the gate measures nothing — section 0 proves the probe armed); the verdict control reads offset +0x000, which must NOT hold the id. THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): replay_guard.lua counts EMULATED frames (tests/lua/emu_clock.lua); every probe run's game clock RAM:$FF8080 at its last frame is held to tests/expected/instr_gameclock/test_shim_charid.tsv, frozen by `--freeze-clock` from REFERENCE legs (the guard without -debug, the same POKES) each held to replay.lua run live; one STAGING reference leg is held to replay.lua on every run (tests/lib/instr_align.sh).
 
-**EXPECTS:** 0x13 read at +0x382 on both structs, the control offset not; a quiet leg without section 0 is a dead rig.
+**EXPECTS:** 0x13 read at +0x382 on both structs, the control offset not; a quiet leg without section 0 is a dead rig. Every probe run on emulated time at its frozen game clock, the staging leg on replay.lua's checksum.
 
 ### `test_tenant_anim_relocation.sh` — test, ci_static
 
@@ -1486,15 +1486,15 @@ the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, du
 
 **HOW:** the merged image packed against the zero-filled WIDE overlay (build/merged1, a legacy-only instrument with no registry row on purpose) run over the legacy corpus on MAME against vanilla, every class deviation printed with a proposed expectation line and FAILED, never absorbed; leg (b) covers the tenant content's crash-freedom.
 
-**EXPECTS:** every legacy replay on its ratified class; a deviation is mechanism-attributed and maintainer-signed or it stays red. It proves NOTHING about tenant correctness (gfx pristine by design).
+**EXPECTS:** every legacy replay on its ratified class; a deviation is mechanism-attributed and maintainer-signed or it stays red. It proves NOTHING about tenant correctness (gfx pristine by design). Every guarded run (section 0's probes, leg b) on emulated time at its frozen game clock, the staging leg on replay.lua's checksum. THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): replay_guard.lua counts EMULATED frames (tests/lua/emu_clock.lua); each guarded run's game clock RAM:$FF8080 at its last frame is held to tests/expected/instr_gameclock/audit_merged_legacy.tsv, frozen by `--freeze-clock` from REFERENCE legs (the guard without -debug, the same POKES) each held to replay.lua run live; one STAGING reference leg is held to replay.lua on every run (tests/lib/instr_align.sh). The merged image is built by the gate, so a manifest change that moves a game clock FAILs it until re-frozen.
 
 ### `audit_merged_vec3.sh` — audit, emulator
 
 **WHAT:** the merged-build Huitzil satellite anim-base probe: on the merged build the satellite enters the anim walker with base A0 = anim@huitzil + 0xB8AC (its own placed anim), not tenant 0's planted tripwire address — the regression gate for the per-tenant type-number renumbering that fixed the 14z-81 vec3.
 
-**HOW:** two guarded MAME runs of hui/70_hui_mash on the merged build with GUARD_PROBE on the walker entry, A0 read at the satellite's first tick.
+**HOW:** two guarded MAME runs of hui/70_hui_mash on the merged build with GUARD_PROBE on the walker entry, A0 read at the satellite's first tick — the first hit on the satellite's slot whose A0 lies outside vsavj's own anims at 0x200000-0x3FFFFF (see WHERE THE SATELLITE FIRST WALKS). THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): replay_guard.lua counts EMULATED frames (tests/lua/emu_clock.lua); both probe runs' game clock RAM:$FF8080 at the last frame is held to tests/expected/instr_gameclock/audit_merged_vec3.tsv, frozen by `--freeze-clock` from REFERENCE legs (the guard without -debug, the same POKES) each held to replay.lua run live; one STAGING reference leg is held to replay.lua on every run (tests/lib/instr_align.sh).
 
-**EXPECTS:** A0 the healthy value on the merged build; a FAIL is a regression of the renumbering (pair any change with donovan/12_vs_cpu staying guard-clean).
+**EXPECTS:** A0 the healthy value on the merged build; a FAIL is a regression of the renumbering (pair any change with donovan/12_vs_cpu staying guard-clean). Both probe runs on emulated time at their frozen game clocks, the staging leg on replay.lua's checksum.
 
 ### `audit_roster_pairings.sh` — audit, emulator
 
@@ -1990,7 +1990,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 **HOW:** builds the current Pyron vertical and a no-thunk twin from the same manifest, runs the type-64 clash rig on both (the crash half is the positive control), then a live whole-RAM A/B of the two builds over the legacy corpus, plus fire censuses at the placed map body binned in-domain / extension / trap.
 
-**EXPECTS:** the fix leg ends clean and the twin crashes; every legacy replay identical between the builds; the fire censuses give the denominators. A twin that does not crash means the rig stopped reaching the map, and the gate refuses a verdict.
+**EXPECTS:** the fix leg ends clean and the twin crashes; every legacy replay identical between the builds; the fire censuses give the denominators. A twin that does not crash means the rig stopped reaching the map, and the gate refuses a verdict. Every guarded run (the twin's crashing clash leg excepted: it has no last frame) on emulated time at its frozen game clock, the staging leg on replay.lua's checksum. THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): replay_guard.lua counts EMULATED frames (tests/lua/emu_clock.lua), so every guarded run plays its whole replay since 14z-197; each one's game clock RAM:$FF8080 at its last frame is held to tests/expected/instr_gameclock/audit_hitclass_map_cost.tsv, frozen by `--freeze-clock` from REFERENCE legs (the guard without -debug, the same POKES) each held to replay.lua run live; one STAGING reference leg is held to replay.lua on every run (tests/lib/instr_align.sh). The builds are made by the gate, so a manifest change that moves a game clock FAILs it until re-frozen.
 
 ### `audit_hui_grunt.sh` — audit, emulator
 
@@ -2030,7 +2030,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 **HOW:** an uncapped logging breakpoint on the resolver PRG:0x02AD82 over vanilla replays on MAME, phase A ordinary play and phase B with DF on per character; the full-roster result is frozen in tests/expected/df_palette_seq_census.txt.
 
-**EXPECTS:** the measured inventory equals the frozen census; a DF-on character with 0 calls is reported as having no palette-seq path. Growth is the signal: re-derive before trusting that any row is free.
+**EXPECTS:** the measured inventory equals the frozen census; a DF-on character with 0 calls is reported as having no palette-seq path. Growth is the signal: re-derive before trusting that any row is free. Every probe run on emulated time at its frozen game clock, the staging leg on replay.lua's checksum (the default replay set; REPLAYS=all is the census run and is not frozen). THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): replay_guard.lua counts EMULATED frames (tests/lua/emu_clock.lua), so every run plays its whole replay since 14z-197 (05_timeout_idle covered 8,354 emulated frames of 12,120 counted); each run's game clock RAM:$FF8080 at its last frame is held to tests/expected/instr_gameclock/audit_palette_seq_ids.tsv, frozen by `--freeze-clock` from REFERENCE legs (the guard without -debug, the same POKES) each held to replay.lua run live; one STAGING reference leg is held to replay.lua on every run (tests/lib/instr_align.sh).
 
 ### `audit_phase_mode_cost.sh` — audit, emulator
 
@@ -2038,7 +2038,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 **HOW:** builds a phase-mode Donovan probe variant and A/Bs it LIVE against donovan-m3a on MAME over 14 replay legs (no registry row exists for a probe, so no frozen set); section 0 proves the shim executed (GUARD_PROBE) before any verdict.
 
-**EXPECTS:** legacy replays bit-identical; Donovan's own replays diverge from the exact frame the shim runs, for 24-135 frames in 13-16 runs, then re-converge for thousands of frames. An IDENTICAL result on his own content FAILS — the rig stopped forming the match.
+**EXPECTS:** legacy replays bit-identical; Donovan's own replays diverge from the exact frame the shim runs, for 24-135 frames in 13-16 runs, then re-converge for thousands of frames. An IDENTICAL result on his own content FAILS — the rig stopped forming the match. Section 0's probe run on emulated time at its frozen game clock, the staging leg on replay.lua's checksum. THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): replay_guard.lua counts EMULATED frames (tests/lua/emu_clock.lua); section 0's probe run's game clock RAM:$FF8080 at its last frame is held to tests/expected/instr_gameclock/audit_phase_mode_cost.tsv, frozen by `--freeze-clock` from a REFERENCE leg (the guard without -debug, the same POKES) held to replay.lua run live; one STAGING reference leg is held to replay.lua on every run (tests/lib/instr_align.sh). The phase build is built fresh, so a manifest change that moves its game clock FAILs the gate until re-frozen.
 
 ### `audit_pool_free_byte.sh` — audit, emulator
 
@@ -2054,7 +2054,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 **HOW:** three parallel MAME legs probing the hit-class thunk body: a Demitri-vs-Demitri flare control that must show the sweep path ALIVE, the tenant rig on the build, and the same rig on pristine vsav2 as the parity anchor.
 
-**EXPECTS:** the control fires (a quiet control voids everything), the tenant leg shows bank word 0x1000, satellite +0x94 == 0 and zero probe fires, the native leg +0x94 == 0 and bank word 0x6000. A hit-active native satellite reopens #108; EXPECT_SAT_SWEEP=1 is refused.
+**EXPECTS:** the control fires (a quiet control voids everything), the tenant leg shows bank word 0x1000, satellite +0x94 == 0 and zero probe fires, the native leg +0x94 == 0 and bank word 0x6000. A hit-active native satellite reopens #108; EXPECT_SAT_SWEEP=1 is refused. Both guarded legs on emulated time at their frozen game clocks, the staging leg on replay.lua's checksum. THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): replay_guard.lua counts EMULATED frames (tests/lua/emu_clock.lua), so the tenant leg's f3520 dump is the native leg's f3520 since 14z-197; both guarded legs' game clock RAM:$FF8080 at the last frame is held to tests/expected/instr_gameclock/audit_projectile_clash.tsv, frozen by `--freeze-clock` from REFERENCE legs (the guard without -debug, the same POKES) each held to replay.lua run live; one STAGING reference leg (the control) is held to replay.lua on every run (tests/lib/instr_align.sh).
 
 ### `audit_pursuit_leap.sh` — audit, emulator
 
@@ -2314,11 +2314,11 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 ### `test_hui_air.sh` — test, emulator
 
-**WHAT:** Phobos's air movement is alive with its measured mode signatures: hold-8 rises then HOVERS at a pinned height, and 66 during the float engages the air dash (seq 0x14) with a flat advance — not merely no crash.
+**WHAT:** Phobos's air movement is alive with its measured mode signatures: hold-8 rises then HOVERS at a pinned height, and a dash input in the air engages the air dash (seq 0x14, airborne) with a flat advance — not merely no crash.
 
-**HOW:** replay 75 (float) and replay 79 (air dash) on MAME against a stage-4 build (self-built unless given), Y and X and the seq byte read from dumps at the frames after the rise completes.
+**HOW:** replay 75 (float) and replay 79 (air dash) on MAME against build/hui61 (another build can be given; a stage-4 build until 14z-197), Y and X and the seq byte read from dumps at the frames after the rise completes.
 
-**EXPECTS:** Y pinned >= 100px over f3350-f3370; seq 0x14 with X advancing >= 30px at near-constant height over f3185-f3200. A red is the float or dash dead again, or a rise-speed change moving the sample window.
+**EXPECTS:** Y pinned >= 100px over f3350-f3370; seq 0x14 AIRBORNE (Y >= 100px) with X moving >= 30px at near-constant height over f3322-f3337. A red is the float or dash dead again, the dash on the ground, or a rise-speed change moving the sample window.
 
 ### `test_hui_boot.sh` — test, emulator
 
@@ -2326,7 +2326,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 **HOW:** builds stage 4 from the huitzil manifest, runs the forced-pick boot probe and the crash guard on MAME, and a legacy replay against the frozen vanilla expectation.
 
-**EXPECTS:** his base loaded, guard clean (a watchdog reboot would read as zeros, which the base check subsumes), legacy bit-identical.
+**EXPECTS:** his base loaded, guard clean (a watchdog reboot would read as zeros, which the base check subsumes), legacy bit-identical. The probe's guarded run on emulated time at its frozen game clock, the staging leg on replay.lua's checksum. THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): replay_guard.lua counts EMULATED frames (tests/lua/emu_clock.lua); the forced-pick probe's guarded run (tools/force_pick_probe.sh, its environment from `<probe>/guard_env)` has its game clock RAM:$FF8080 at the last frame held to tests/expected/instr_gameclock/test_hui_boot.tsv, frozen by `--freeze-clock` from a REFERENCE leg (the guard without -debug, the same POKES) held to replay.lua run live; one STAGING reference leg is held to replay.lua on every run (tests/lib/instr_align.sh). The stage-4 build is built fresh, so a manifest change that moves its game clock FAILs the gate until re-frozen.
 
 ### `test_hui_df_style.sh` — test, emulator
 
@@ -2396,7 +2396,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 **WHAT:** Phobos's Reflect Wall guard-cancel and his pair-press Dark Force both come out with their native-matched signatures (GC seq 0x0E with blowback; DF seq 0x0A at both activations).
 
-**HOW:** the two rigs on MAME against a stage-4 build (self-built unless given), the sequence bytes read from dumps at the measured frames.
+**HOW:** the two rigs on MAME against build/hui61 (a self-built stage-4 build until 14z-197; one can be given), the sequence bytes read from dumps at the measured frames.
 
 **EXPECTS:** both signatures present; a red is either mechanism dead or changed, not merely a crash.
 
@@ -2404,9 +2404,9 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 **WHAT:** Phobos survives an 11,000-frame input-chaos soak across round transitions on the REAL packed set, with both satellites alive in round 2 (the pod-lifecycle regression tripwire).
 
-**HOW:** builds stage 4, forces id 0x10 through the vanilla select flow and runs 70_hui_mash guarded on MAME on the set the build packed (a vsavj-set run against a WIDE build is the pristine ROM: false green).
+**HOW:** on build/hui61 (a self-built stage-4 build until 14z-197; one can be given), forces id 0x10 through the vanilla select flow and runs 70_hui_mash guarded on MAME on the set the build packed (a vsavj-set run against a WIDE build is the pristine ROM: false green).
 
-**EXPECTS:** guard clean end to end and both satellite pointers non-zero at f6000; a red is a crash or a pod lost across the round.
+**EXPECTS:** guard clean end to end and both satellite pointers non-zero at f6000 (round 1) and at f9000 with the match live (round 2); a red is a crash or a pod lost across the round.
 
 ### `test_hui_walk.sh` — test, emulator
 
@@ -2430,7 +2430,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 **HOW:** four parallel MAME -debug legs on the merged build: the copy helper probed at 0xB0B4 with A0/A1 read, screen identity from the state words, palette RAM at the VS frame, opponent liveness from the base table, a red-poke A/B on row 0x0A and a 1P-vs-2P pixel diff of the portrait regions; frozen in tests/expected/ladder_tenant_vs_palette.txt.
 
-**EXPECTS:** one probe hit per 1P leg with the right addresses, zero on the 2P leg, the row equal to pool | 0xF000, only the tag box changing under the red poke, 0 px differing on the VS screen. The cosmetic roulette tag (base name and colours) is recorded, not fixed.
+**EXPECTS:** one probe hit per 1P leg with the right addresses, zero on the 2P leg, the row equal to pool | 0xF000, only the tag box changing under the red poke, 0 px differing on the VS screen. The cosmetic roulette tag (base name and colours) is recorded, not fixed. Every leg on emulated time at its frozen game clock, the staging leg on replay.lua's checksum. THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): replay_guard.lua counts EMULATED frames (tests/lua/emu_clock.lua), so ROUL/VS1P/VS2P and every poke are emulated frames since 14z-197 (they were measured on the frame_done "-debug timeline", 2 frames off by 3,721); each leg's game clock RAM:$FF8080 at its last frame is held to tests/expected/instr_gameclock/test_ladder_tenant_vs_palette.tsv, frozen by `--freeze-clock` from REFERENCE legs (the guard without -debug, the same POKES) each held to replay.lua run live; one STAGING reference leg is held to replay.lua on every run (tests/lib/instr_align.sh).
 
 ### `test_m2a_flavor_selector.sh` — test, emulator
 
@@ -2682,7 +2682,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **HOW:** four -debug runs on native vsav2 of the df/97 rig (HP+HK at f3260, stocks poked) with GUARD_PROBE breakpoints on the candidate and the control, for a newcomer (Donovan) and a vanilla character (Demitri); the must-fire asserts the candidate fired, which it never does.
 
-**EXPECTS:** 0 probe lines on the candidate and exactly 1 on the control at frame 3260 on both legs.
+**EXPECTS:** 0 probe lines on the candidate and exactly 1 on the control, logged at frame 3259, on both legs. Every run on emulated time at its frozen game clock, the staging leg on replay.lua's checksum. THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): replay_guard.lua counts EMULATED frames (tests/lua/emu_clock.lua); every run's game clock RAM:$FF8080 at its last frame is held to tests/expected/instr_gameclock/audit_df_dead_family.tsv, frozen by `--freeze-clock` from REFERENCE legs (the guard without -debug, the same POKES) each held to replay.lua run live; one STAGING reference leg is held to replay.lua on every run (tests/lib/instr_align.sh).
 
 ### `audit_df_field_readers_live.sh` — audit, emulator
 
@@ -2808,9 +2808,9 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **WHAT:** for each of the 14 vanilla characters the workbook lists with a ground throw (Anakaris has none), every ground-throw input of the workbook (each "6MP or 6HP" row run with BOTH buttons, so the sheet's one-row claim is measured; Aulbath's 4+P back throw; Victor's MP, HP and K throws), 42 events: the throw HOLDS from the press frame and NOT before it (P1's +0x134 = 0x01 and P2's = 0xFF, RAM:$FF8534/$FF8934); the victim's red and white HP words FALL (read from the dumps, never from the record reader); every record the appliers staged lies in the THROWER'S OWN attack table and LANDS (a fall within 2 frames after its probe frame, in the same run); the event's frozen signature — press-to-hold, the side P2 ends on, the meter paid, the measured falls (red, white, count, the first fall's offset), the staged records in frame order (applier site, record index, real/white power CLASS, flags, the record's meter) — is unchanged. Also: the rigs' row set equals the workbook's ground-throw rows.
 
-**HOW:** tools/ground_throw_rigs.py gen builds the rigs (tests/replays/ground_throws/, committed; a fresh gen must equal them); each rig runs twice under tools/run_replay_guarded.sh (-debug, one logging breakpoint per run): at the fighter applier's record read PRG:0x0189EA and at the object-hit applier's PRG:0x02979A. BOTH legs carry the dumps; each leg's records are judged on its OWN dumps; the two legs must agree on the hold frame and on the falls' amounts in order (run 728 Q1a) — NOT on their frames: measured 14z-195, the two -debug legs land the same falls 1-2 frames apart (a breakpoint stop skews the timeline, [VSP-129]), so a join by frame is wrong. The 0x0189EA leg also takes SNAP_FRAMES at each event's frozen first-fall frame; a PASS means each snapshot is the frame that run's own first fall landed on, drawn into the CAPTURE SHEET `<OUT>/capture.png` (tools/ground_throw_rigs.py sheet). The header prints the tree's commit (`git describe --dirty`) and the host.
+**HOW:** tools/ground_throw_rigs.py gen builds the rigs (tests/replays/ground_throws/, committed; a fresh gen must equal them); each rig runs twice under tools/run_replay_guarded.sh (-debug, one logging breakpoint per run): at the fighter applier's record read PRG:0x0189EA and at the object-hit applier's PRG:0x02979A. BOTH legs carry the dumps; each leg's records are judged on its OWN dumps; the two legs must agree on the hold frame and on the falls' amounts in order (run 728 Q1a) — NOT on their frames; since 14z-197 a third, NO-STOP leg per rig (the guard without -debug) carries the falls the event is frozen with (amounts, count, first-fall offset) and the snapshots, and both probe legs must agree with it (a probe leg's stop moved a first fall one frame on 3 of 42 events): measured 14z-195, the two -debug legs land the same falls 1-2 frames apart (a breakpoint stop skews the timeline, [VSP-129]), so a join by frame is wrong. The no-stop leg (the 0x0189EA leg until 14z-197) also takes SNAP_FRAMES at each event's frozen first-fall frame; a PASS means each snapshot is the frame that run's own first fall landed on, drawn into the CAPTURE SHEET `<OUT>/capture.png` (tools/ground_throw_rigs.py sheet). The header prints the tree's commit (`git describe --dirty`) and the host.
 
-**EXPECTS:** 42 events, each holding from the press and not on the frame before, every dump frame present on both legs, the legs agreeing, every damage record own and landed, falls exactly when damage is staged, and every signature equal to its frozen line; the row set equal to the workbook's (22 rows, Graviton Knuckle declared not measured) where the workbook is present.
+**EXPECTS:** 42 events, each holding from the press and not on the frame before, every dump frame present on both legs, the legs agreeing, every damage record own and landed, falls exactly when damage is staged, and every signature equal to its frozen line; the row set equal to the workbook's (22 rows, Graviton Knuckle declared not measured) where the workbook is present. Every leg on emulated time at its frozen game clock, the staging leg on replay.lua's checksum. THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): replay_guard.lua counts EMULATED frames (tests/lua/emu_clock.lua), so every press, dump and snapshot frame is an emulated frame since 14z-197; each leg's game clock RAM:$FF8080 at its last frame is held to tests/expected/instr_gameclock/audit_ground_throws.tsv (one row per rig and leg: each applier, and the no-stop leg, which joined the manifest 14z-197 under rule-checker run 2026-10-11-806 Q1), frozen by `--freeze-clock` from REFERENCE legs (the guard without -debug, the same POKES) each held to replay.lua run live; one STAGING reference leg is held to replay.lua on every run (tests/lib/instr_align.sh).
 
 ### `audit_guard_mask_reads.sh` — audit, emulator
 
@@ -2954,7 +2954,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **HOW:** tests/replays/26_don_arcade_mash.rpl on the merged build under tools/run_replay_guarded.sh with a logging breakpoint at the ranking's portrait read (GUARD_PROBE=08c5e0: D0 = the entry's id) and a dump of P1's id at frame 2000; leg `don13` pokes RAM:$FF8782 = 0x13 at 1400/1450/1500 (the forced pick, through select only — the ranking id is the committed character), leg `none` does not. Each leg in its own directory and sandbox.
 
-**EXPECTS:** leg don13 — P1's id 0x13 at frame 2000 and the ranking's first probe id 0x13; leg none — the ranking's first probe id 0x0F (Jedah, the replay's real pick on the merged wheel): the entry follows the player. Every leg ends END 40620 with at least 25 ranking probes.
+**EXPECTS:** leg don13 — P1's id 0x13 at frame 2000 and the ranking's first probe id 0x13; leg none — the ranking's first probe id 0x0F (Jedah, the replay's real pick on the merged wheel): the entry follows the player. Every leg ends END 40620 with at least 25 ranking probes; both legs on emulated time at their frozen game clocks, the staging leg on replay.lua's checksum. THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): replay_guard.lua counts EMULATED frames (tests/lua/emu_clock.lua); both legs' game clock RAM:$FF8080 at the last frame is held to tests/expected/instr_gameclock/audit_ranking_tenant.tsv, frozen by `--freeze-clock` from REFERENCE legs (the guard without -debug, the same POKES) each held to replay.lua run live; one STAGING reference leg (`none`) is held to replay.lua on every run (tests/lib/instr_align.sh). Each of those is a 40,620-frame run: ~30 min with them.
 
 ### `audit_reaction_class_live.sh` — audit, emulator
 

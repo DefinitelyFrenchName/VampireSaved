@@ -1,0 +1,6 @@
+# tests/expected/instr_gameclock/test_shim_charid.tsv — the game clock RAM:$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,
+# option A) by `tests/test_shim_charid.sh --freeze-clock` at 4980bd96: build = build/m5_wide, tenant 0x13;
+# every reference leg held to replay.lua run live, every probe run to its reference leg's game clock.
+# leg<TAB>replay<TAB>frames<TAB>gameclock
+build	03_two_player_vs	5320	6b
+build	16_xemu_2p	4320	83

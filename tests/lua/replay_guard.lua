@@ -21,10 +21,15 @@
 --     per-frame CURPC classified against CODE_RANGES; match-active flag
 --     watched over GUARD_MATCH. Logs PCWEEDS/SOFTRESET, keeps running.
 --
--- CAVEAT (docs/GOTCHAS.md): -debug runs are deterministic but their checksum
--- logs are NOT comparable to non-debug expectations — the debugger changes
--- MAME's scheduler timeslicing, phase-shifting 68k<->sound-CPU interaction.
--- Cheap mode produces canonical (non-debug) checksums.
+-- THE FRAME IS AN EMULATED FRAME (14z-197, GitHub #228 step 4; tests/lua/emu_clock.lua): a frame counts when the
+-- screen's frame number moves (the first frame_done unconditionally), and replay input, POKES, DUMPS, SNAP_FRAMES,
+-- GUARD_MATCH and every frame in a log line are on that clock. Until 14z-197 this script counted frame_done calls,
+-- so the debugger's boot halt and every probe stop counted as frames: a -debug log ran ahead of a non-debug one and
+-- its input landed early. This header used to blame that on "the debugger changes MAME's scheduler timeslicing" —
+-- RETRACTED 14z-196 (#228, [MFI-2] in docs/platform/gotchas.md): on the emulated clock a -debug crash-guard run
+-- equals replay.lua on 4 of 4 replays. A breakpoint STOP can still move the game ([MFI-2]), so a log from a run whose
+-- probe stops the CPU is its own timeline; exception breakpoints stop only on a crash.
+-- INSTR_REFERENCE / INSTR_CLOCK / ANCHOR / ALIGN_OUT: emu_clock.lua's (a reference leg is a run without -debug).
 --
 -- Usage: mame <set> [-debug -debugger none] -autoboot_script replay_guard.lua
 --   env REPLAY / CHECKSUM_OUT / TAIL_FRAMES / SNAP_FRAMES / DUMPS
@@ -204,7 +209,7 @@ do
 end
 
 local f = assert(io.open(out_path, "wb"))
-local frame = 0
+local frame = 0   -- the current emulated frame, set from emu_clock.lua each frame (read by the stop handler)
 local crashed = false
 local weeds_logged = 0
 
@@ -542,108 +547,104 @@ local function expected_ports(frame_held)
     return exp
 end
 
-dofile((debug.getinfo(1, "S").source:match("^@(.*/)") or "./") .. "clock_check.lua")("replay_guard", replay_path)   -- #228: CLOCK_OUT=<file> records frame_done calls against emulated frames
-emu.register_frame_done(function()
-    if crashed then return end
-    frame = frame + 1
-    for _, pk in ipairs(pokes) do
-        if pk[1] == frame then
-            local a = pk[2]
-            for b in pk[3]:gmatch("%x%x") do
-                program:write_u8(a, tonumber(b, 16))
-                a = a + 1
-            end
-        end
-    end
-
-    if force_addr and not force_armed and not force_done
-       and frame >= force_minframe - 1 and debugger then
-        debugger:command(string.format("bpset 0x%x", force_addr))
-        local cl = debugger.consolelog
-        local last = tostring(cl[#cl] or "")
-        force_bpnum = last:match("Breakpoint (%d+) set")
-        force_armed = true
-    end
-    f:write(string.format("%d %016x\n", frame, fnv1a64(program:read_range(0xff0000, 0xffffff, 8))))
-    if snap_at[frame] then machine.video:snapshot() end
-    for _, range in ipairs(dump_at[frame] or {}) do
-        local df = assert(io.open(string.format("%s/dump_%d_%06x.bin", out_dir, frame, range[1]), "wb"))
-        df:write(program:read_range(range[1], range[2], 8))
-        df:close()
-    end
-
-    if trace_a and frame == trace_a then
-        debugger:command(string.format("trace %s.trace,0", out_path))
-    end
-    if trace_a and frame == trace_b then
-        debugger:command("trace off,0")
-    end
-    if pclog_a and frame >= pclog_a and frame <= pclog_b then
-        f:write(string.format("PC %d %06x\n", frame,
-                              cpu.state["CURPC"].value & 0xFFFFFF))
-    end
-
-    -- cheap-mode PC classification (also harmless under -debug)
-    if #code_ranges > 0 then
-        local pc = cpu.state["CURPC"].value & 0xFFFFFF
-        local ok = false
-        for _, r in ipairs(code_ranges) do
-            if pc >= r[1] and pc < r[2] then ok = true; break end
-        end
-        if not ok and weeds_logged < 10 then
-            f:write(string.format("PCWEEDS %d %06x\n", frame, pc))
-            weeds_logged = weeds_logged + 1
-            if weeds_logged == 10 then f:write("PCWEEDS suppressed\n") end
-        end
-    end
-    if match_a and frame >= match_a and frame <= match_b then
-        local v = program:read_u32(0xff8004)
-        if v ~= 0x40000 then
-            f:write(string.format("SOFTRESET %d %08x\n", frame, v))
-        end
-    end
-
-    local want = {}
-    for _, field in ipairs(held[frame + 1] or {}) do want[field] = true end
-    for _, field in ipairs(all_fields) do
-        if want[field] and not pressed[field] then
-            field:set_value(1); pressed[field] = true
-        elseif not want[field] and pressed[field] then
-            field:clear_value(); pressed[field] = nil
-        end
-    end
-
-    -- integrity: frame 1 captures the idle baseline (nothing staged yet);
-    -- afterwards the live ports must equal what THIS script staged.
-    if not baseline[PORT_TAGS[1]] then
-        for _, tag in ipairs(PORT_TAGS) do
-            baseline[tag] = integ_ports[tag]:read() & controlled[tag]
-        end
-    else
-        local exp = expected_ports(held[frame])
-        for _, tag in ipairs(PORT_TAGS) do
-            local live = integ_ports[tag]:read() & controlled[tag]
-            if inject_frame and frame == inject_frame and tag == ":IN0" then
-                live = live & ~0x01          -- ground truth: a phantom press
-            end
-            if exp and live ~= (exp[tag] & controlled[tag]) then
-                violations = violations + 1
-                if not first_violation then
-                    first_violation = string.format(
-                        "INPUT-VIOLATION %d %s live %04x expected %04x",
-                        frame, tag, live, exp[tag] & controlled[tag])
-                    f:write(first_violation .. "\n")
+local C = dofile((debug.getinfo(1, "S").source:match("^@(.*/)") or "./") .. "emu_clock.lua"){
+    name = "replay_guard", frames = total_frames, fixed = true, held = held, fields = all_fields }
+-- THE ORDER WITHIN A FRAME is this script's before 14z-197: the pokes (and GUARD_FORCE's arming), the checksum line,
+-- snapshots, dumps, traces and the cheap-mode checks, then N+1's input staged, then the integrity check — with
+-- emu_clock.lua's ANCHOR, when set, between the pokes and the checksum, where replay.lua takes its checksum.
+C.run{
+    halted = function() return crashed end,
+    on_pokes = function(fr)
+        frame = fr
+        for _, pk in ipairs(pokes) do
+            if pk[1] == frame then
+                local a = pk[2]
+                for b in pk[3]:gmatch("%x%x") do
+                    program:write_u8(a, tonumber(b, 16))
+                    a = a + 1
                 end
             end
         end
-    end
+        if force_addr and not force_armed and not force_done
+           and frame >= force_minframe - 1 and debugger then
+            debugger:command(string.format("bpset 0x%x", force_addr))
+            local cl = debugger.consolelog
+            local last = tostring(cl[#cl] or "")
+            force_bpnum = last:match("Breakpoint (%d+) set")
+            force_armed = true
+        end
+    end,
+    on_frame = function()
+        f:write(string.format("%d %016x\n", frame, fnv1a64(program:read_range(0xff0000, 0xffffff, 8))))
+        if snap_at[frame] then machine.video:snapshot() end
+        for _, range in ipairs(dump_at[frame] or {}) do
+            local df = assert(io.open(string.format("%s/dump_%d_%06x.bin", out_dir, frame, range[1]), "wb"))
+            df:write(program:read_range(range[1], range[2], 8))
+            df:close()
+        end
 
-    if frame >= total_frames then
+        if trace_a and frame == trace_a then
+            debugger:command(string.format("trace %s.trace,0", out_path))
+        end
+        if trace_a and frame == trace_b then
+            debugger:command("trace off,0")
+        end
+        if pclog_a and frame >= pclog_a and frame <= pclog_b then
+            f:write(string.format("PC %d %06x\n", frame,
+                                  cpu.state["CURPC"].value & 0xFFFFFF))
+        end
+
+        -- cheap-mode PC classification (also harmless under -debug)
+        if #code_ranges > 0 then
+            local pc = cpu.state["CURPC"].value & 0xFFFFFF
+            local ok = false
+            for _, r in ipairs(code_ranges) do
+                if pc >= r[1] and pc < r[2] then ok = true; break end
+            end
+            if not ok and weeds_logged < 10 then
+                f:write(string.format("PCWEEDS %d %06x\n", frame, pc))
+                weeds_logged = weeds_logged + 1
+                if weeds_logged == 10 then f:write("PCWEEDS suppressed\n") end
+            end
+        end
+        if match_a and frame >= match_a and frame <= match_b then
+            local v = program:read_u32(0xff8004)
+            if v ~= 0x40000 then
+                f:write(string.format("SOFTRESET %d %08x\n", frame, v))
+            end
+        end
+    end,
+    -- integrity: frame 1 captures the idle baseline (nothing staged yet);
+    -- afterwards the live ports must equal what THIS script staged.
+    after_staging = function()
+        if not baseline[PORT_TAGS[1]] then
+            for _, tag in ipairs(PORT_TAGS) do
+                baseline[tag] = integ_ports[tag]:read() & controlled[tag]
+            end
+        else
+            local exp = expected_ports(held[frame])
+            for _, tag in ipairs(PORT_TAGS) do
+                local live = integ_ports[tag]:read() & controlled[tag]
+                if inject_frame and frame == inject_frame and tag == ":IN0" then
+                    live = live & ~0x01          -- ground truth: a phantom press
+                end
+                if exp and live ~= (exp[tag] & controlled[tag]) then
+                    violations = violations + 1
+                    if not first_violation then
+                        first_violation = string.format(
+                            "INPUT-VIOLATION %d %s live %04x expected %04x",
+                            frame, tag, live, exp[tag] & controlled[tag])
+                        f:write(first_violation .. "\n")
+                    end
+                end
+            end
+        end
+    end,
+    on_end = function()
         if violations > 0 then
             f:write(string.format("INPUT-VIOLATIONS %d\n", violations))
         end
         f:write(string.format("END %d\n", frame))
         f:close()
-        machine:exit()
-    end
-end)
+    end,
+}

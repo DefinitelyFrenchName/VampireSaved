@@ -1,6 +1,7 @@
 -- inp_guard.lua — crash capture for a MAME .inp PLAYBACK, cheap mode (no
--- -debug, so the playback stays faithful to the recording — GOTCHAS: -debug
--- changes scheduler timeslicing). 14z-111, written for the first natural-path
+-- -debug: no debugger stop can move the game, [MFI-2] in
+-- docs/platform/gotchas.md; this header's old reason, "-debug changes scheduler
+-- timeslicing", was RETRACTED 14z-196, #228). 14z-111, written for the first natural-path
 -- capture of #99 (the maintainer reproduces the crash BY HAND on merged15;
 -- every scripted rig ran clean).
 --
@@ -31,9 +32,14 @@ local selftest = tonumber(os.getenv("SELFTEST_FRAME") or "")
 -- env TRACE_FROM   (needs -debug -debugger none): start a 68k instruction
 --                  trace at this frame, stop at the first crash. The trace is
 --                  the path INTO a computed jump; cheap mode cannot see it
---                  (opcode fetches are blind to taps, RH-15). NOTE -debug
---                  perturbs timeslicing (GOTCHAS) — confirm the crash frame
---                  matches the cheap-mode capture before trusting the trace.
+--                  (opcode fetches are blind to taps, RH-15). NOTE under
+--                  -debug this script's frame counter (frame_done calls) also
+--                  counts the debugger's boot-halt UI frame and any stop, so
+--                  its frame labels run ahead of the cheap-mode capture's, and
+--                  a stop can move the game ([MFI-2]; the .inp playback itself
+--                  is MAME's, on emulated time) — confirm the crash matches the
+--                  cheap-mode capture before trusting the trace. (Was "perturbs
+--                  timeslicing": RETRACTED 14z-196, #228.)
 local trace_from = tonumber(os.getenv("TRACE_FROM") or "")
 -- env WATCH  "lo-hi[,lo-hi]" hex work-RAM ranges: every WRITE is logged with
 --            the writing PC into a ring (last WATCH_KEEP, default 60), flushed

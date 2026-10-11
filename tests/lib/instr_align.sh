@@ -78,6 +78,10 @@ ia_replaylua_at() { ia_replaylua_run "$1" "$2" "$3" "$5" "${6:-}"; ia_replaylua_
 #           replayed as is by the reference and control legs. One (leg, replay) is ONE frozen row, so two runs under
 #           one key must agree on set, rompath, replay, frames, POKES and MAME_BIN (ia_freeze refuses otherwise:
 #           give them different legs).
+#   ia_note_run <manifest> <leg> <replay> <set> <rompath|-> <replay .rpl> <env|-> <align file>
+#           ia_note AFTER the run, its frames taken from the run's own ALIGN line — for an instrument that fixes its
+#           own length (tests/lua/replay_guard.lua: the replay's last frame + TAIL_FRAMES, SNAP_FRAMES, DUMPS); a run
+#           with no ALIGN line is noted with frames `-`, and ia_check then reports it as missing
 #   ia_check_manifest <tsv> <manifest>          ia_check on every noted run; prints the problems, returns 1 on any
 #   ia_freeze <instrument .lua> <manifest> <dir> <jobs> <out rows>
 #           per (leg, replay): a REFERENCE leg (the instrument, INSTR_REFERENCE=1, no -debug, ANCHOR at its last
@@ -102,6 +106,10 @@ ia_note() {
     for _ia_w in $8; do case "$_ia_w" in *=*) ;; -) ;; *) echo "ia_note: env word '$_ia_w' is not NAME=value" >&2; return 1 ;; esac; done
     printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$2" "$3" "$4" "$5" "$6" "$7" "$8" "$9" >> "$1"
 }
+ia_note_run() {
+    _inr_f="$(ia_field "$8" frames)"
+    ia_note "$1" "$2" "$3" "$4" "$5" "$6" "${_inr_f:--}" "$7" "$8"
+}
 ia_check_manifest() {
     _icm_bad=0
     while IFS="$(printf '\t')" read -r _l _r _s _p _f _n _e _a; do
@@ -121,10 +129,14 @@ _ia_leg() {   # <instrument> <set> <rompath> <rpl> <frames> <env> <dir> <debug: 
         > "$7/run.log" 2>&1 ) </dev/null || true
     rm -rf "$7/sb"
 }
-_ia_rl() {   # <set> <rompath> <rpl> <env> <dir>: replay.lua live, with the env's POKES and MAME_BIN
+_ia_rl() {   # <set> <rompath> <rpl> <env> <dir>: replay.lua live, with the env's POKES and MAME_BIN — and its DUMPS,
+            # SNAP_FRAMES and TAIL_FRAMES, which set a run's LENGTH in replay.lua as in replay_guard.lua (a guard run
+            # dumping past the replay's end runs longer; its yardstick must reach the same last frame)
     mkdir -p "$5"; _rp="$2"; [ "$_rp" = - ] && _rp="$ROMDIR"
     _bin="$(_ia_word "$4" MAME_BIN)"; [ -n "$_bin" ] || _bin="${MAME_BIN:-}"
-    ( cd "$5" && env POKES="$(_ia_word "$4" POKES)" CHECKSUM_OUT="$5/cks.log" REPLAY="$3" MAME_SANDBOX="$5/sb" \
+    _tail="$(_ia_word "$4" TAIL_FRAMES)"
+    ( cd "$5" && env POKES="$(_ia_word "$4" POKES)" DUMPS="$(_ia_word "$4" DUMPS)" SNAP_FRAMES="$(_ia_word "$4" SNAP_FRAMES)" \
+        ${_tail:+"TAIL_FRAMES=$_tail"} CHECKSUM_OUT="$5/cks.log" REPLAY="$3" MAME_SANDBOX="$5/sb" \
         MAME_ROMPATH="$_rp" ${_bin:+"MAME_BIN=$_bin"} \
         "$REPO/tools/run_mame.sh" "$1" -autoboot_script "$REPO/tests/lua/replay.lua" > "$5/run.log" 2>&1 ) </dev/null || true
     rm -rf "$5/sb"
@@ -185,7 +197,9 @@ $(sed -n "${_dln}p" "$_m")
 EOT
     _ia_leg "$_i" "$_ds" "$_dp" "$_df" "$_dn" "$_de" "$_d/cdrift" 1 INSTR_CLOCK=frame_done
     ia_check "$_t" "$_dl" "$_dr" "$_d/cdrift/align" > "$_d/cdrift.txt" || true
-    if grep -q "game clock" "$_d/cdrift.txt"; then IA_DRIFT=fired; IA_DRIFT_MSG="$(grep "game clock" "$_d/cdrift.txt" | head -1) (under the frame_done clock: $(grep -v "game clock" "$_d/cdrift.txt" | head -1))"
+    # fired = the FROZEN comparison caught it: ia_check's "game clock <x> at frame <n>, frozen <y>" line (a missing row
+    # or a missing ALIGN line is not that comparison firing)
+    if grep -q "game clock [0-9a-f]* at frame [0-9]*, frozen" "$_d/cdrift.txt"; then IA_DRIFT=fired; IA_DRIFT_MSG="$(grep "game clock [0-9a-f]* at frame" "$_d/cdrift.txt" | head -1) (under the frame_done clock: $(grep -v "game clock [0-9a-f]* at frame" "$_d/cdrift.txt" | head -1))"
     else IA_DRIFT_MSG="the frame_done clock still met the frozen game clock on $_dl/$_dr ($(head -1 "$_d/cdrift.txt"))"; fi
     _ia_leg "$_i" "$_s" "$_p" "$_f" "$_n" "$_e" "$_d/cskip" 0 "INSTR_REFERENCE=1 INSTR_CLOCK=skip_first"
     _ka="$(ia_anchor "$_d/cskip/align")"

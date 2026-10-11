@@ -11,8 +11,21 @@
 #   map body binned in-domain / extension / trap.
 # EXPECTS: the fix leg ends clean and the twin crashes; every legacy replay identical
 #   between the builds; the fire censuses give the denominators. A twin that does not crash
-#   means the rig stopped reaching the map, and the gate refuses a verdict.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/lua/replay.lua
+#   means the rig stopped reaching the map, and the gate refuses a verdict. Every guarded run (the twin's crashing
+#   clash leg excepted: it has no last frame) on emulated time at its frozen game clock, the staging leg on
+#   replay.lua's checksum.
+#   THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): replay_guard.lua counts
+#   EMULATED frames (tests/lua/emu_clock.lua), so every guarded run plays its whole replay since 14z-197; each one's
+#   game clock RAM:$FF8080 at its last frame is held to tests/expected/instr_gameclock/audit_hitclass_map_cost.tsv,
+#   frozen by `--freeze-clock` from REFERENCE legs (the guard without -debug, the same POKES) each held to replay.lua
+#   run live; one STAGING reference leg is held to replay.lua on every run (tests/lib/instr_align.sh). The builds
+#   are made by the gate, so a manifest change that moves a game clock FAILs it until re-frozen.
+#
+# MUST-FIRE: known-bad: drift-clock — a guarded run under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 40,391 emulated frames of 40,620 counted on 26_don_arcade_mash) must miss its frozen game clock (in-gate: one extra run; mode: every guarded run runs the old clock and the gate FAILs)
+# MUST-FIRE: known-bad: far-onset — a divergence that begins 500 frames after a replay's first map entry is not that entry's transit cost, and section 2's attribution must read it 'far', not 'transit' (rule-checker run 2026-10-11-806 Q4; in-gate: each frozen transit member re-read with onset = first entry + 500; mode: the real attribution reads that onset and the gate FAILs)
+# MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs)
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/lib/controls.sh tests/lib/instr_align.sh
+#   tests/lua/emu_clock.lua tests/lua/replay.lua
 #   tests/lua/replay_guard.lua tests/lua/type_write_census.lua tests/replays/
 #   tools/analyze_divergence.py tools/build_donovan.sh tools/classify_hitclass_probe.py
 #   tools/classify_pool_spawns.py tools/run_mame.sh tools/run_replay_guarded.sh
@@ -122,7 +135,7 @@
 # Usage: ROMDIR=... [MAME_BIN=...] [JOBS=6] [HITCLASS_SET=pyron-mN]
 #        [HITCLASS_REPLAYS="a b c"] [HITCLASS_TENANT_ONLY=1]
 #        [HITCLASS_TENANT_REPLAYS="hui/70_hui_mash ..."]
-#        tests/audit_hitclass_map_cost.sh
+#        tests/audit_hitclass_map_cost.sh [--freeze-clock]
 # On-demand: 3 builds + 2 soaks + 2*N checksum runs + N legacy probe runs
 # + 37 tenant probe runs + 2 armed-probe controls + 1 soak probe,
 # JOBS-parallel. NO WALL-CLOCK FIGURE IS QUOTED HERE ON PURPOSE — the one
@@ -206,6 +219,12 @@ fi
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 fail=0
+FREEZE_CLOCK=0; [ "${1:-}" = "--freeze-clock" ] && FREEZE_CLOCK=1
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+. "$REPO/tests/lib/instr_align.sh"
+CLOCKS="tests/expected/instr_gameclock/audit_hitclass_map_cost.tsv"
+[ "$FREEZE_CLOCK" = 1 ] && [ -n "$MODE" ] && { echo "REFUSED: --freeze-clock in control mode"; exit 3; }
+_clk=""; [ "$MODE" = drift-clock ] && _clk="INSTR_CLOCK=frame_done"
 abspath() { case "$1" in /*) echo "$1";; *) echo "$PWD/$1";; esac; }
 
 JOBS="${JOBS:-6}"
@@ -345,7 +364,8 @@ HUI_CLASH="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10;1400:ff8b82:01;1450:ff8b
 clash() {  # clash <build> <out> — GUARD_DEBUG=1 is LOAD-BEARING: cheap mode
            # installs no exception breakpoints, so the twin's vec3 is
            # INVISIBLE there and both legs report END 5020 (measured 14z-129).
-    GUARD_DEBUG=1 POKES="$CLASH_POKES" \
+    # shellcheck disable=SC2086
+    env $_clk GUARD_DEBUG=1 POKES="$CLASH_POKES" ALIGN_OUT="$2.align" \
         MAME_ROMPATH="$(abspath "$1")/rompath;$ROMDIR" \
         tools/run_replay_guarded.sh vsavjw \
         tests/replays/pyron/84_pyron_clash_type64.rpl \
@@ -353,6 +373,9 @@ clash() {  # clash <build> <out> — GUARD_DEBUG=1 is LOAD-BEARING: cheap mode
 }
 clash "$WORK/fix"     "$WORK/clash.log"
 clash "$WORK/nothunk" "$WORK/clash_nothunk.log"
+# the fix leg only: the twin's leg is meant to CRASH (no last frame, no ALIGN line)
+ia_note_run "$WORK/manifest.tsv" clash_fix 84_pyron_clash_type64 vsavjw "$(abspath "$WORK/fix")/rompath;$ROMDIR" \
+    "$REPO/tests/replays/pyron/84_pyron_clash_type64.rpl" "MAME_BIN=$MAME_BIN POKES=$CLASH_POKES" "$WORK/clash.log.align"
 # THE POSITIVE CONTROL IS NOT OPTIONAL: an END-clean run proves nothing
 # unless the same rig CRASHES without the thunk. Otherwise "no crash" may
 # mean the rig stopped firing the move (the downgrade class, paid for
@@ -432,6 +455,11 @@ for R in $CORPUS; do
         python3 tools/analyze_divergence.py "$WORK/l_${R}_ref" \
             "$WORK/l_${R}_new" 2>&1 | sed 's/^/        /' | head -8
         n_div=$((n_div + 1)); DIV_SET="$DIV_SET $R"
+        # the ONSET (first frame whose checksum differs), for section 2's
+        # attribution: a map entry only explains a divergence that follows it
+        printf '%s %s\n' "$R" "$(awk 'NR == FNR { if ($1 ~ /^[0-9]+$/) a[$1] = $2; next }
+            $1 ~ /^[0-9]+$/ && ($1 in a) && a[$1] != $2 { print $1; exit }' \
+            "$WORK/l_${R}_ref" "$WORK/l_${R}_new")" >> "$WORK/onset.tsv"
     fi
 done
 echo "  $n_ok/$NCORP bit-identical, $n_div divergent, $n_dead dead"
@@ -439,10 +467,14 @@ echo "  $n_ok/$NCORP bit-identical, $n_div divergent, $n_dead dead"
 # pattern for a measured, attributed set ([VSP-31]): until now ANY divergence
 # exited 1 and printed the 14z-92 explanation instead of a verdict, so the
 # gate was red at every run that reproduced its own measurement — and at a
-# release that is a hard fail every time. Frozen: 26_don_arcade_mash diverges
-# WITH map entries (the thunk's transit cycles), 21_don_mash and
-# 22_don_dualmash diverge with ZERO entries (the allocator shift the row's
-# absence causes, not the map). GROWTH, SHRINK or a changed attribution
+# release that is a hard fail every time. Frozen: all three diverge WITH map
+# entries — the thunk's transit cycles (RE-ATTRIBUTED 14z-197, #228 step 4: on
+# emulated time each one's divergence begins 1-4 frames after its first map
+# entry — 21_don_mash entry 12493 / divergence 12494, 22_don_dualmash 13208 /
+# 13209, 26_don_arcade_mash 11247 / 11251. Until then the census ran on the
+# frame_done clock, whose drifted timeline had 21 and 22 enter the map ZERO
+# times and so read them as "the allocator shift the row's absence causes, not
+# the map"; that attribution is RETRACTED). GROWTH, SHRINK or a changed attribution
 # (section 2 checks the census classes) is the failure. EXPECT_DIVERGE=
 # overrides after a re-measure the maintainer has ruled on.
 EXPECT_DIVERGE="${EXPECT_DIVERGE:-21_don_mash 22_don_dualmash 26_don_arcade_mash}"
@@ -462,13 +494,18 @@ if [ "${HITCLASS_TENANT_ONLY:-0}" = 1 ]; then
 else
 echo "== 2: FIRE CENSUS — how often legacy content enters the map =="
 for R in $CORPUS; do
-    ( POKES="" MAME_ROMPATH="$(abspath "$WORK/fix")/rompath;$ROMDIR" \
+    # shellcheck disable=SC2086
+    ( env $_clk POKES="" MAME_ROMPATH="$(abspath "$WORK/fix")/rompath;$ROMDIR" ALIGN_OUT="$WORK/f_$R.align" \
       GUARD_PROBE="$BODY" GUARD_PROBE_MAX=20000 \
         tools/run_replay_guarded.sh vsavjw "tests/replays/$R.rpl" \
         "$WORK/f_$R.log" "$WORK/fbox_$R" >/dev/null 2>&1 || true ) &
     sync_pool
 done
 wait
+for R in $CORPUS; do
+    ia_note_run "$WORK/manifest.tsv" fix "$(basename "$R")" vsavjw "$(abspath "$WORK/fix")/rompath;$ROMDIR" \
+        "$REPO/tests/replays/$R.rpl" "MAME_BIN=$MAME_BIN POKES= GUARD_PROBE=$BODY GUARD_PROBE_MAX=20000" "$WORK/f_$R.align"
+done
 tot=0; tot_ext=0; tot_trap=0; c_dead=0; seen_vals=""
 for R in $CORPUS; do
     # A guarded run that never started logs nothing, and "0 map entries"
@@ -495,9 +532,9 @@ for R in $CORPUS; do
     # every COMPLETED run is recorded, zeros included, so the attribution check
     # below can tell "diverges with ZERO entries" (a real class) from "not run"
     # (a DEAD/CRASH run `continue`s above and never lands here)
-    printf '%s %s\n' "$R" "$n_total" >> "$WORK/census.tsv"
+    printf '%s %s %s\n' "$R" "$n_total" "$(awk '$1=="PROBE"{print $2; exit}' "$WORK/f_$R.log")" >> "$WORK/census.tsv"
     if [ "$n_total" -gt 0 ]; then
-        echo "  $R: $n_total map entries ($n_ext ext >=0x40, $n_trap trap >=0x50); D0: $vals"
+        echo "  $R: $n_total map entries ($n_ext ext >=0x40, $n_trap trap >=0x50); D0: $vals; first at frame $(awk '$1=="PROBE"{print $2; exit}' "$WORK/f_$R.log")"
         seen_vals="$seen_vals $vals"
     fi
 done
@@ -505,22 +542,61 @@ echo "  corpus total: $tot map entries over $NCORP replays ($c_dead dead)"
 # THE ATTRIBUTION IS PART OF THE FROZEN INVENTORY: a divergent replay's class
 # is "map transit" (entries > 0) or "allocator shift" (entries = 0), measured
 # 14z-92. A member changing class is a finding even if the set of names holds.
-EXPECT_ATTR="${EXPECT_ATTR:-26_don_arcade_mash:transit 21_don_mash:shift 22_don_dualmash:shift}"
+# 14z-197 (rule-checker run 2026-10-11-806 Q4): "transit" also needs the
+# divergence to FOLLOW the first map entry closely — onset - first entry in
+# 1..ATTR_NEAR frames (measured 1, 1, 4 on 21/22/26). A replay that enters the
+# map but diverges far from that entry is NOT explained by it, and reads 'far',
+# which no frozen class accepts. The count alone could not tell those apart.
+EXPECT_ATTR="${EXPECT_ATTR:-26_don_arcade_mash:transit 21_don_mash:transit 22_don_dualmash:transit}"   # 14z-197: 21/22 were 'shift' on the frame_done clock
+ATTR_NEAR="${ATTR_NEAR:-8}"
+attr_class() {  # attr_class <entries> <first entry frame> <onset frame>
+    if [ "$1" -le 0 ]; then echo shift; return; fi
+    case "$2:$3" in *[!0-9:]*|:*|*:) echo unknown; return ;; esac
+    _gap=$(( $3 - $2 ))
+    if [ "$_gap" -ge 1 ] && [ "$_gap" -le "$ATTR_NEAR" ]; then echo transit; else echo far; fi
+}
+# the classifier's own ground truth ([VSP-19]), both directions, before its verdicts count
+_gt="$(attr_class 2 12493 12494) $(attr_class 2 11247 11251) $(attr_class 0 '' 12494) $(attr_class 2 12493 12993) $(attr_class 2 12493 12493)"
+if [ "$_gt" = "transit transit shift far far" ]; then
+    echo "  ok: the attribution classifier reads its ground truth (near: transit; none: shift; 500 frames after, or the same frame: far)"
+else
+    echo "  FAIL: the attribution classifier misreads its ground truth: [$_gt]"; fail=1
+fi
 for _pair in $EXPECT_ATTR; do
     _r="${_pair%%:*}"; _want="${_pair#*:}"
     _n="$(awk -v r="$_r" '$1==r{print $2; exit}' "$WORK/census.tsv" 2>/dev/null)"
     case "$_n" in "") echo "  ATTR: $_r not in the census (not run) — cannot check its class"; continue ;; esac
-    if [ "$_n" -gt 0 ]; then _is=transit; else _is=shift; fi
-    if [ "$_is" = "$_want" ]; then echo "  ok: $_r diverges as '$_want' ($_n map entries), as frozen"
-    else echo "  FAIL: $_r now diverges as '$_is' ($_n map entries), frozen as '$_want'"; fail=1; fi
+    _f="$(awk -v r="$_r" '$1==r{print $3; exit}' "$WORK/census.tsv" 2>/dev/null)"
+    _o="$(awk -v r="$_r" '$1==r{print $2; exit}' "$WORK/onset.tsv" 2>/dev/null)"
+    if vs_ctl_is far-onset && [ -n "$_f" ]; then
+        _o=$((_f + 500)); echo "  CONTROL MODE: $_r's onset read as first entry + 500 = $_o"
+    fi
+    _is="$(attr_class "$_n" "$_f" "$_o")"
+    if [ "$_is" = "$_want" ]; then echo "  ok: $_r diverges as '$_want' ($_n map entries, first at $_f, onset $_o), as frozen"
+    else echo "  FAIL: $_r now diverges as '$_is' ($_n map entries, first at ${_f:-none}, onset ${_o:-none}), frozen as '$_want'"; fail=1; fi
 done
+# the in-gate control: the same members with a FAR onset must not read as transit
+_far_ok=1
+for _pair in $EXPECT_ATTR; do
+    _r="${_pair%%:*}"; [ "${_pair#*:}" = transit ] || continue
+    _n="$(awk -v r="$_r" '$1==r{print $2; exit}' "$WORK/census.tsv" 2>/dev/null)"
+    _f="$(awk -v r="$_r" '$1==r{print $3; exit}' "$WORK/census.tsv" 2>/dev/null)"
+    [ -n "$_n" ] && [ -n "$_f" ] || { _far_ok=0; continue; }
+    [ "$(attr_class "$_n" "$_f" $((_f + 500)))" = far ] || _far_ok=0
+done
+if [ "$_far_ok" = 1 ]; then
+    vs_ctl_fired far-onset "every frozen transit member, its onset moved to first entry + 500, reads 'far'"
+else
+    vs_ctl_dead far-onset "a frozen transit member with a far onset did not read 'far' (or had no census row)" || fail=1
+fi
 echo "                $tot_ext at index >=0x40, $tot_trap at index >=0x50"
 if [ "$tot" = 0 ]; then
     echo "  => legacy content NEVER enters the map on this corpus"
 elif [ "$tot_ext" = 0 ] && [ "$tot_trap" = 0 ]; then
     # THE ADOPTED FIX'S ACTUAL SAFETY ARGUMENT, stated by the instrument
     # rather than by prose. Retracted 14z-92: it is NOT "legacy never
-    # enters" (it enters 230 times) — it is "legacy enters constantly and
+    # enters" (it entered 230 times on the frame_done clock; 6 on emulated
+    # time, 14z-197 — 2 each on 21/22/26) — it is "legacy enters and
     # receives VANILLA's own bytes", because the thunk body is vanilla's 64
     # entries verbatim below 0x40.
     echo "  => legacy ENTERS ($tot times) but stays inside vanilla's 64"
@@ -699,7 +775,10 @@ tleg() {   # tleg <build> <body> <replay> <pokes> <tag>
     lf="$(last_frame "$rpl")"
     d1=$(( lf * 55 / 100 )); d2=$(( lf * 70 / 100 )); d3=$(( lf * 85 / 100 ))
     mkdir -p "$WORK/tl_$5"
-    ( POKES="$4" MAME_ROMPATH="$(abspath "$1")/rompath;$ROMDIR" \
+    printf '%s\t%s\t%s\t%s\n' "tl_$5" "$(abspath "$1")/rompath;$ROMDIR" "$REPO/$rpl" \
+        "MAME_BIN=$MAME_BIN POKES=$4 GUARD_PROBE=$2 GUARD_PROBE_MAX=20000 DUMPS=$d1:ff8460-ff8463;$d2:ff8460-ff8463;$d3:ff8460-ff8463" > "$WORK/tl_$5/note"
+    # shellcheck disable=SC2086
+    ( env $_clk POKES="$4" MAME_ROMPATH="$(abspath "$1")/rompath;$ROMDIR" ALIGN_OUT="$WORK/tl_$5/align" \
       GUARD_PROBE="$2" GUARD_PROBE_MAX=20000 \
       DUMPS="$d1:ff8460-ff8463;$d2:ff8460-ff8463;$d3:ff8460-ff8463" \
         tools/run_replay_guarded.sh vsavjw "$rpl" \
@@ -727,17 +806,29 @@ wait
 
 # THE ARMED-PROBE CONTROL. Every number below is a count of breakpoint hits;
 # if the breakpoint is not actually armed on these builds, every zero is
-# vacuous. 26_don_arcade_mash is the replay section 2 measures at 228 entries,
+# vacuous. 26_don_arcade_mash is the replay section 2 measures with entries (2 on emulated time since 14z-197; 228 on
+# the frame_done clock's drifted timeline),
 # so it is the one leg whose non-zero is already known independently.
 for tk in h p; do
     if [ "$tk" = h ]; then bd="$WORK/hfix"; bb="$HBODY"; else bd="$WORK/fix"; bb="$BODY"; fi
-    ( POKES="" MAME_ROMPATH="$(abspath "$bd")/rompath;$ROMDIR" \
+    # shellcheck disable=SC2086
+    ( env $_clk POKES="" MAME_ROMPATH="$(abspath "$bd")/rompath;$ROMDIR" ALIGN_OUT="$WORK/armed_$tk.align" \
       GUARD_PROBE="$bb" GUARD_PROBE_MAX=20000 \
         tools/run_replay_guarded.sh vsavjw tests/replays/26_don_arcade_mash.rpl \
         "$WORK/armed_$tk.log" "$WORK/armedbox_$tk" >/dev/null 2>&1 || true ) &
     sync_pool
 done
 wait
+for tk in h p; do
+    if [ "$tk" = h ]; then bd="$WORK/hfix"; bb="$HBODY"; else bd="$WORK/fix"; bb="$BODY"; fi
+    ia_note_run "$WORK/manifest.tsv" "armed_$tk" 26_don_arcade_mash vsavjw "$(abspath "$bd")/rompath;$ROMDIR" \
+        "$REPO/tests/replays/26_don_arcade_mash.rpl" "MAME_BIN=$MAME_BIN POKES= GUARD_PROBE=$bb GUARD_PROBE_MAX=20000" "$WORK/armed_$tk.align"
+done
+for n in "$WORK"/tl_*/note; do
+    [ -f "$n" ] || continue
+    IFS="$(printf '\t')" read -r _tl _trp _trl _tenv < "$n"
+    ia_note_run "$WORK/manifest.tsv" "$_tl" "$(basename "$_trl" .rpl)" vsavjw "$_trp" "$_trl" "$_tenv" "$(dirname "$n")/align"
+done
 armed_ok=1
 for tk in h p; do
     classify "$WORK/armed_$tk.log"
@@ -745,7 +836,7 @@ for tk in h p; do
         echo "  ok armed[$tk]: 26_don_arcade_mash fires the probe $c_total times"
     else
         echo "  FAIL armed[$tk]: the probe did not fire on a replay measured at"
-        echo "        228 entries in section 2 ($c_st total=$c_total) — every"
+        echo "        entries in section 2 ($c_st total=$c_total) — every"
         echo "        tenant zero below is VACUOUS, not a finding."
         armed_ok=0; fail=1
     fi
@@ -919,10 +1010,13 @@ fi
 # two candidate explanations instead of leaving "check the rig".
 echo
 echo "== 4: the dead crash control, diagnosed with the probe =="
-( POKES="$PYR_SOAK" MAME_ROMPATH="$(abspath "$WORK/fix")/rompath;$ROMDIR" \
+# shellcheck disable=SC2086
+( env $_clk POKES="$PYR_SOAK" MAME_ROMPATH="$(abspath "$WORK/fix")/rompath;$ROMDIR" ALIGN_OUT="$WORK/soak_probe.align" \
   GUARD_PROBE="$BODY" GUARD_PROBE_MAX=20000 \
     tools/run_replay_guarded.sh vsavjw tests/replays/pyron/70_pyron_mash.rpl \
     "$WORK/soak_probe.log" "$WORK/soakprobe_box" >/dev/null 2>&1 || true )
+ia_note_run "$WORK/manifest.tsv" fixsoak 70_pyron_mash vsavjw "$(abspath "$WORK/fix")/rompath;$ROMDIR" \
+    "$REPO/tests/replays/pyron/70_pyron_mash.rpl" "MAME_BIN=$MAME_BIN POKES=$PYR_SOAK GUARD_PROBE=$BODY GUARD_PROBE_MAX=20000" "$WORK/soak_probe.align"
 classify "$WORK/soak_probe.log"
 echo "  soak rig on the FIX build: $c_st total=$c_total ext=$c_ext trap=$c_trap D0: $c_vals"
 if [ "$crc" = 1 ]; then
@@ -948,6 +1042,31 @@ else
 fi
 
 echo
+echo "== 5: the instrument's alignment (#228 step 4, option A) =="
+if [ "$FREEZE_CLOCK" = 1 ]; then
+    [ "$fail" = 0 ] || { echo "REFUSED: sections 0-4 failed — nothing frozen"; exit 1; }
+    ia_freeze "$REPO/tests/lua/replay_guard.lua" "$WORK/manifest.tsv" "$WORK/fz" "$JOBS" "$WORK/clocks.tsv" \
+        > "$WORK/fz.txt" || { sed 's/^/  /' "$WORK/fz.txt"; echo "REFUSED: the alignment does not hold — nothing frozen"; exit 1; }
+    mkdir -p "$(dirname "$CLOCKS")"
+    { echo "# $CLOCKS — the game clock RAM:\$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,"
+      echo "# option A) by \`tests/audit_hitclass_map_cost.sh --freeze-clock\` at $(git rev-parse --short=8 HEAD): the builds the gate makes"
+      echo "# (fix, hfix); every reference leg held to replay.lua run live, every guarded run to its reference leg's game clock."
+      echo "# leg<TAB>replay<TAB>frames<TAB>gameclock"
+      cat "$WORK/clocks.tsv"; } > "$CLOCKS"
+    echo "froze $(wc -l < "$WORK/clocks.tsv" | tr -d ' ') game clocks into $CLOCKS"
+    exit 0
+fi
+if ia_check_manifest "$CLOCKS" "$WORK/manifest.tsv" > "$WORK/align_bad.txt"; then echo "  ok: every guarded run on emulated time, at its frozen game clock"
+else echo "  FAIL: $(wc -l < "$WORK/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$WORK/align_bad.txt" | sed 's/^/        /'; fail=1; fi
+ia_stage audit_hitclass_map_cost "$CLOCKS" "$REPO/tests/lua/replay_guard.lua" "$WORK/manifest.tsv" 1 "$WORK/st" "$MODE" || fail=1
+if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
+    [ "$fail" = 1 ] && { echo "FAIL: audit_hitclass_map_cost (control mode: $MODE)"; exit 1; }
+    echo "FAIL: audit_hitclass_map_cost — control mode $MODE left the gate green"; exit 1
+fi
+if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || fail=1; fi
+if [ "$IA_SKIP" = fired ]; then vs_ctl_fired first-frame-skip "$IA_SKIP_MSG"; else vs_ctl_dead first-frame-skip "$IA_SKIP_MSG" || fail=1; fi
+
+echo
 if [ "$fail" = 0 ]; then
     echo "PASS: the fix holds and legacy content is bit-identical on the"
     echo "      measured replays (the 14z-82c adoption numbers reproduce)."
@@ -957,10 +1076,11 @@ else
     echo "        cost: stripping the row also moves the ALLOCATOR, so the"
     echo "        twin differs by the thunk AND by the placement shift its"
     echo "        absence causes. Cross-check each divergent replay against"
-    echo "        its census count. Measured 14z-92: 26_don_arcade_mash"
-    echo "        diverges WITH 228 map entries (map-transit cycles), while"
-    echo "        21_don_mash and 22_don_dualmash diverge with ZERO entries"
-    echo "        (placement shift, not the map). Only the first is a cost"
-    echo "        the thunk itself imposes."
+    echo "        its census count. Measured 14z-197 on emulated time: the"
+    echo "        three diverge 1, 1 and 4 frames after their first map entry"
+    echo "        (the thunk's transit cycles; section 2 attributes 'transit'"
+    echo "        within 1-8 frames); the 14z-92 reading that 21_don_mash"
+    echo "        and 22_don_dualmash never enter the map was the frame_done"
+    echo "        clock's (#228)."
 fi
 exit "$fail"

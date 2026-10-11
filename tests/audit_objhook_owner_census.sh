@@ -10,9 +10,19 @@
 #   REPORT-ONLY (exit 0 unless the rig is dead).
 # EXPECTS: a per-type owner report, 114/116/118/120 stated as not observed. STALE since
 #   14z-91 (the header says so): the probe points at a thunk that no longer exists and must
-#   be re-pointed at the relocated walker before it is trusted.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay_guard.lua tests/replays/
+#   be re-pointed at the relocated walker before it is trusted. Both runs on emulated time at their frozen game
+#   clocks, the staging leg on replay.lua's checksum.
+#   THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): replay_guard.lua counts
+#   EMULATED frames (tests/lua/emu_clock.lua); both runs' game clock RAM:$FF8080 at the last frame is held to
+#   tests/expected/instr_gameclock/audit_objhook_owner_census.tsv, frozen by `--freeze-clock` from REFERENCE legs (the
+#   guard without -debug, the same POKES) each held to replay.lua run live; one STAGING reference leg is held to
+#   replay.lua on every run (tests/lib/instr_align.sh).
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/instr_gameclock/ tests/lib/controls.sh
+#   tests/lib/instr_align.sh tests/lua/emu_clock.lua tests/lua/replay.lua tests/lua/replay_guard.lua tests/replays/
 #   tools/run_mame.sh tools/run_replay_guarded.sh tools/setup_mame.sh
+#
+# MUST-FIRE: known-bad: drift-clock — a probe run under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 5,154 emulated frames of 11,017 counted) must miss its frozen game clock (in-gate: one extra run; mode: both probe runs run the old clock and the gate FAILs)
+# MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs)
 #
 # WHY. The merged obj_hook union gives a MULTI-OWNER type (114-120, the
 # x088512 pool family — all three tenants port it) ONE extended-table entry,
@@ -33,7 +43,7 @@
 #             that assumes their shape is guessing; extend the replay list
 #             when one of them matters.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] tests/audit_objhook_owner_census.sh [build]
+# Usage: ROMDIR=... [MAME_BIN=...] tests/audit_objhook_owner_census.sh [build] [--freeze-clock]
 # Default build: build/hui30. ~6 min: two guarded runs. REPORT-ONLY (exit 0
 # unless the rig is dead): this is a measurement, not a gate.
 #
@@ -63,6 +73,13 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
+FREEZE_CLOCK=0; [ "${1:-}" = "--freeze-clock" ] && { FREEZE_CLOCK=1; shift; }
+[ "${2:-}" = "--freeze-clock" ] && FREEZE_CLOCK=1
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+. "$REPO/tests/lib/instr_align.sh"
+CLOCKS="tests/expected/instr_gameclock/audit_objhook_owner_census.tsv"
+[ "$FREEZE_CLOCK" = 1 ] && [ -n "$MODE" ] && { echo "REFUSED: --freeze-clock in control mode"; exit 3; }
+_clk=""; [ "$MODE" = drift-clock ] && _clk="INSTR_CLOCK=frame_done"
 BUILD="${1:-build/hui30}"
 
 [ -d "$BUILD/rompath" ] || { echo "SKIP: no $BUILD/rompath"; exit 0; }
@@ -80,11 +97,14 @@ W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 abspath() { case "$1" in /*) echo "$1";; *) echo "$PWD/$1";; esac; }
 
 run() {  # run <replay-rel> <pokes> <out>
-    POKES="$2" MAME_ROMPATH="$(abspath "$BUILD")/rompath;$ROMDIR" \
-    GUARD_PROBE="$THUNK" GUARD_PROBE_COND="d0 >= 0x1c8" \
+    # shellcheck disable=SC2086
+    env $_clk POKES="$2" MAME_ROMPATH="$(abspath "$BUILD")/rompath;$ROMDIR" ALIGN_OUT="$3.align" \
+    GUARD_PROBE="$THUNK" GUARD_PROBE_COND="d0>=0x1c8" \
     GUARD_PROBE_MAX=20000 GUARD_PROBE_MEM=A6+30 \
         tools/run_replay_guarded.sh vsavjw "tests/replays/$1.rpl" \
         "$3" "$W/box_$(basename "$3")" >/dev/null 2>&1 || true
+    ia_note_run "$W/manifest.tsv" build "$(basename "$1")" vsavjw "$(abspath "$BUILD")/rompath;$ROMDIR" "$REPO/tests/replays/$1.rpl" \
+        "MAME_BIN=$MAME_BIN POKES=$2 GUARD_PROBE=$THUNK GUARD_PROBE_COND=d0>=0x1c8 GUARD_PROBE_MAX=20000 GUARD_PROBE_MEM=A6+30" "$3.align"
 }
 run hui/70_hui_mash "1704:ff8782:10;1760:ff8782:10;1900:ff8782:10;2100:ff8782:10;2400:ff8782:10" "$W/mash.log"
 run hui/83_hui_fx   "1400:ff8782:10;1450:ff8782:10;1500:ff8782:10" "$W/fx.log"
@@ -116,4 +136,29 @@ if total == 0:
           "(wrong thunk address, or the pokes stopped forming the match)")
     sys.exit(1)
 PY
+echo "== the instrument's alignment (#228 step 4, option A)"
+if [ "$FREEZE_CLOCK" = 1 ]; then
+    ia_freeze "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" "$W/fz" "${JOBS:-4}" "$W/clocks.tsv" \
+        > "$W/fz.txt" || { sed 's/^/  /' "$W/fz.txt"; echo "REFUSED: the alignment does not hold — nothing frozen"; exit 1; }
+    mkdir -p "$(dirname "$CLOCKS")"
+    { echo "# $CLOCKS — the game clock RAM:\$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,"
+      echo "# option A) by \`tests/audit_objhook_owner_census.sh --freeze-clock\` at $(git rev-parse --short=8 HEAD): build = $BUILD;"
+      echo "# every reference leg held to replay.lua run live, every probe run to its reference leg's game clock."
+      echo "# leg<TAB>replay<TAB>frames<TAB>gameclock"
+      cat "$W/clocks.tsv"; } > "$CLOCKS"
+    echo "froze $(wc -l < "$W/clocks.tsv" | tr -d ' ') game clocks into $CLOCKS"
+    exit 0
+fi
+afail=0
+if ia_check_manifest "$CLOCKS" "$W/manifest.tsv" > "$W/align_bad.txt"; then
+    echo "  ok: both probe runs on emulated time, at their frozen game clocks"
+else echo "  FAIL: $(wc -l < "$W/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$W/align_bad.txt" | sed 's/^/        /'; afail=1; fi
+ia_stage audit_objhook_owner_census "$CLOCKS" "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" 1 "$W/st" "$MODE" || afail=1
+if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
+    [ "$afail" = 1 ] && { echo "FAIL: audit_objhook_owner_census (control mode: $MODE)"; exit 1; }
+    echo "FAIL: audit_objhook_owner_census — control mode $MODE left the gate green"; exit 1
+fi
+if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || afail=1; fi
+if [ "$IA_SKIP" = fired ]; then vs_ctl_fired first-frame-skip "$IA_SKIP_MSG"; else vs_ctl_dead first-frame-skip "$IA_SKIP_MSG" || afail=1; fi
+[ "$afail" = 0 ] || { echo "FAIL: audit_objhook_owner_census — the instrument's alignment"; exit 1; }
 echo "census complete (REPORT-ONLY — the fix design consumes this, no gate here)"

@@ -17,20 +17,31 @@
 #   equal them); each rig runs twice under tools/run_replay_guarded.sh (-debug, one logging breakpoint per run): at
 #   the fighter applier's record read PRG:0x0189EA and at the object-hit applier's PRG:0x02979A. BOTH legs carry the
 #   dumps; each leg's records are judged on its OWN dumps; the two legs must agree on the hold frame and on the falls'
-#   amounts in order (run 728 Q1a) — NOT on their frames: measured 14z-195, the two -debug legs land the same falls
-#   1-2 frames apart (a breakpoint stop skews the timeline, [VSP-129]), so a join by frame is wrong. The 0x0189EA leg
-#   also takes SNAP_FRAMES at each event's frozen first-fall frame; a PASS means each snapshot is the frame that run's
+#   amounts in order (run 728 Q1a) — NOT on their frames; since 14z-197 a third, NO-STOP leg per rig (the guard
+#   without -debug) carries the falls the event is frozen with (amounts, count, first-fall offset) and the snapshots,
+#   and both probe legs must agree with it (a probe leg's stop moved a first fall one frame on 3 of 42 events): measured 14z-195, the two -debug legs land the same falls
+#   1-2 frames apart (a breakpoint stop skews the timeline, [VSP-129]), so a join by frame is wrong. The no-stop leg
+#   (the 0x0189EA leg until 14z-197) also takes SNAP_FRAMES at each event's frozen first-fall frame; a PASS means each snapshot is the frame that run's
 #   own first fall landed on, drawn into the CAPTURE SHEET <OUT>/capture.png (tools/ground_throw_rigs.py sheet). The
 #   header prints the tree's commit (`git describe --dirty`) and the host.
 # EXPECTS: 42 events, each holding from the press and not on the frame before, every dump frame present on both
 #   legs, the legs agreeing, every damage record own and landed, falls exactly when damage is staged, and every
 #   signature equal to its frozen line; the row set equal to the workbook's (22 rows, Graviton Knuckle declared not
-#   measured) where the workbook is present.
+#   measured) where the workbook is present. Every leg on emulated time at its frozen game clock, the staging leg on
+#   replay.lua's checksum.
+#   THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): replay_guard.lua counts
+#   EMULATED frames (tests/lua/emu_clock.lua), so every press, dump and snapshot frame is an emulated frame since
+#   14z-197; each leg's game clock RAM:$FF8080 at its last frame is held to
+#   tests/expected/instr_gameclock/audit_ground_throws.tsv (one row per rig and leg: each applier, and the no-stop leg, which joined the manifest 14z-197 under rule-checker run 2026-10-11-806 Q1), frozen by `--freeze-clock` from
+#   REFERENCE legs (the guard without -debug, the same POKES) each held to replay.lua run live; one STAGING reference
+#   leg is held to replay.lua on every run (tests/lib/instr_align.sh).
 # NOT TESTED: the characters are FORCED by the early-window poke (the cursor path is not the subject); positions,
 #   P2's HP and P1's meter are re-pinned before each event — the ROM is pristine, the RAM is not. The row set is
 #   hand-coded (THROWS) and checked against the workbook only where the workbook is present (section 1 and the
 #   cross-check page). Graviton Knuckle, mashed hit counts, throw techs, other victims, FBNeo.
 #
+# MUST-FIRE: known-bad: drift-clock — a leg under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 5,399 emulated frames of 5,420 counted on gt_FE) must miss its frozen game clock (in-gate: one extra run; mode: every leg runs the old clock and the gate FAILs on the alignment)
+# MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs on the alignment)
 # MUST-FIRE: known-bad: lp-no-throw — Bulleta's rig with both throw presses changed to toward+LP (no throw) must read NO HOLD on both events, and the gate must FAIL (mode: the BU rig runs with LP)
 # MUST-FIRE: perturbed-copy: foreign-record — every probe line's A3 moved past the end of its thrower's attack table must fail the identity clause on every event (mode: the rows are built from the shifted probe logs)
 # MUST-FIRE: perturbed-copy: class-raw — the rows built from each record's RAW power byte (the pre-#241 reader) must differ from the frozen lines on the flagged records, and the gate must FAIL (mode: the rows read the raw bytes)
@@ -42,16 +53,22 @@
 # FOLLOWS: build/manifest/bank_map.toml tests/expected/ground_throws.tsv tests/lib/controls.sh tests/lib/decrypt_cache.sh
 #   tests/lua/replay_guard.lua tests/replays/ground_throws/ tools/ground_throw_rigs.py tools/hitbox_records.py
 #   tools/name_moves.py tools/run_mame.sh tools/run_replay_guarded.sh tools/setup_mame.sh tools/vanilla_frames.py
-#   tools/vanilla_join_rig.py tools/xlsx_read.py emu/mame-patches/
+#   tools/vanilla_join_rig.py tools/xlsx_read.py emu/mame-patches/ tests/expected/instr_gameclock/
+#   tests/lib/instr_align.sh tests/lua/emu_clock.lua tests/lua/replay.lua
 #
 # WHY: #229's ground-throw family, promoted the sitting it was measured ([VSP-18]). The damage figure is the
 # record's power CLASS (#241), the record found by what the GAME staged (the applier's A3) and held to the fall it
 # caused, never by a table lookup of our own.
 #
-# Usage: ROMDIR=... [JOBS=5] [OUT=<dir>] [SHEET=<workbook.xlsx>] tests/audit_ground_throws.sh
+# Usage: ROMDIR=... [JOBS=5] [OUT=<dir>] [SHEET=<workbook.xlsx>] tests/audit_ground_throws.sh [--freeze-clock]
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
-. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
+. "$REPO/tests/lib/instr_align.sh"
+FREEZE_CLOCK=0; [ "${1:-}" = "--freeze-clock" ] && FREEZE_CLOCK=1
+CLOCKS="tests/expected/instr_gameclock/audit_ground_throws.tsv"
+[ "$FREEZE_CLOCK" = 1 ] && [ -n "$MODE" ] && { echo "REFUSED: --freeze-clock in control mode"; exit 3; }
+_clk=""; [ "$MODE" = drift-clock ] && _clk="INSTR_CLOCK=frame_done"
 [ -n "${ROMDIR:-}" ] || { echo "SKIP: ROMDIR not set"; exit 0; }
 ROMDIR="$(cd "$ROMDIR" && pwd)"; export ROMDIR
 JOBS="${JOBS:-5}"
@@ -106,6 +123,9 @@ for rig in sorted(os.listdir(src)):
                 b[0:2] = v.to_bytes(2, "big", signed=True)
                 open(os.path.join(d, f), "wb").write(bytes(b)); continue
             os.symlink(p, os.path.join(d, f))
+    ns = os.path.join(src, rig, "nostop")                 # the no-stop leg is not perturbed: the view keeps it as is
+    if os.path.isdir(ns):
+        os.symlink(ns, os.path.join(dst, rig, "nostop"))
 PY
 }
 late_rigs() {  # late_rigs <out dir>: every rig schedule with each event's press moved 5 frames later
@@ -162,10 +182,22 @@ run_rig() {  # run_rig <rig dir> <name> <legs dir>
     _p="$(python3 -c "import json,sys;print(';'.join(json.load(open(sys.argv[1]))['pokes']))" "$_j")"
     _d="$(python3 tools/ground_throw_rigs.py dumps "$_j")"
     _s=""; [ -f "$EXP" ] && _s="$(python3 tools/ground_throw_rigs.py snaps "$_j" "$EXP")"
+    # THE NO-STOP LEG (14z-197, #228 step 4): the same rig without the debugger — the falls' frames and the snapshots
+    # are the game's own there (tools/ground_throw_rigs.py rows); a probe leg's stop moved a first fall on 3 of 42.
+    # It is on the alignment manifest too (leg `nostop`, rule-checker run 2026-10-11-806 Q1): its game clock frozen,
+    # and its reference leg — with its DUMPS and SNAP_FRAMES — held to replay.lua run live with the same ones.
+    mkdir -p "$3/$2/nostop"
+    printf '%s' "POKES=$_p DUMPS=$_d SNAP_FRAMES=$_s GUARD_DEBUG=0" > "$3/$2/nostop/env"
+    # shellcheck disable=SC2086
+    ( env $_clk GUARD_DEBUG=0 POKES="$_p" DUMPS="$_d" SNAP_FRAMES="$_s" ALIGN_OUT="$3/$2/nostop/align" \
+        tools/run_replay_guarded.sh vsavj "$1/$2.rpl" "$3/$2/nostop/run.log" "$3/$2/nostop/sb" > "$3/$2/nostop/run.out" 2>&1 ) &
+    _n=$((_n + 1)); [ $((_n % JOBS)) -eq 0 ] && wait
     for _pc in 0189ea 02979a; do
         mkdir -p "$3/$2/$_pc"
-        _ss=""; [ "$_pc" = 0189ea ] && _ss="$_s"
-        ( POKES="$_p" GUARD_PROBE=$_pc DUMPS="$_d" SNAP_FRAMES="$_ss" \
+        _ss=""
+        printf '%s' "POKES=$_p GUARD_PROBE=$_pc DUMPS=$_d SNAP_FRAMES=$_ss" > "$3/$2/$_pc/env"
+        # shellcheck disable=SC2086
+        ( env $_clk POKES="$_p" GUARD_PROBE=$_pc DUMPS="$_d" SNAP_FRAMES="$_ss" ALIGN_OUT="$3/$2/$_pc/align" \
             tools/run_replay_guarded.sh vsavj "$1/$2.rpl" "$3/$2/$_pc/run.log" "$3/$2/$_pc/sb" > "$3/$2/$_pc/run.out" 2>&1 ) &
         _n=$((_n + 1)); [ $((_n % JOBS)) -eq 0 ] && wait
     done
@@ -177,10 +209,17 @@ for j in "$G"/gt_*.json; do run_rig "$G" "$(basename "$j" .json)" "$W/legs"; don
 wait
 dead=0
 for j in "$G"/gt_*.json; do b=$(basename "$j" .json)
-    for pc in 0189ea 02979a; do grep -q '^END ' "$W/legs/$b/$pc/run.log" 2>/dev/null || { bad "leg $b/$pc did not end: $(tail -1 "$W/legs/$b/$pc/run.out" 2>/dev/null | cut -c1-120)"; dead=1; }
+    for pc in nostop 0189ea 02979a; do grep -q '^END ' "$W/legs/$b/$pc/run.log" 2>/dev/null || { bad "leg $b/$pc did not end: $(tail -1 "$W/legs/$b/$pc/run.out" 2>/dev/null | cut -c1-120)"; dead=1; }
         grep -qE '^(CRASH|PCWEEDS|SOFTRESET)' "$W/legs/$b/$pc/run.log" 2>/dev/null && { bad "leg $b/$pc CRASHED"; dead=1; }; done
 done
 [ "$dead" = 0 ] && ok "$((_n)) legs ended clean in $(( $(date +%s) - t0 )) s"
+for j in "$G"/gt_*.json; do b=$(basename "$j" .json)
+    for pc in 0189ea 02979a nostop; do
+        _e="$(sed 's/SNAP_FRAMES=$//; s/SNAP_FRAMES= / /' "$W/legs/$b/$pc/env")"
+        _lg="p$pc"; [ "$pc" = nostop ] && _lg=nostop
+        ia_note_run "$W/manifest.tsv" "$_lg" "$b" vsavj - "$REPO/$G/$b.rpl" "$_e" "$W/legs/$b/$pc/align"
+    done
+done
 
 echo "== 3. every event against its frozen line"
 TOOL="$REPO/tools/ground_throw_rigs.py"; vs_ctl_is class-raw && { raw_tool "$W/tool_raw.py" || exit 1; TOOL="$W/tool_raw.py"; }
@@ -196,7 +235,7 @@ else
 fi
 [ -n "${FREEZE:-}" ] && [ -z "${VS_CTL:-}" ] && { python3 tools/ground_throw_rigs.py freeze "$W/rows.jsonl" > "$EXP"; echo "  FROZE $EXP ($(grep -vc '^#' "$EXP") events)"; }
 
-if [ -n "${VS_CTL:-}" ]; then   # THE MODE: exit 1 only if ITS clause failed under ITS perturbation, else REFUSED (3)
+if [ -n "${VS_CTL:-}" ] && [ "$MODE" != drift-clock ] && [ "$MODE" != first-frame-skip ]; then   # THE MODE: exit 1 only if ITS clause failed under ITS perturbation, else REFUSED (3)
     if _ev="$(ctl_judge "$VS_CTL" "$W/expect.txt" "$W/rows.jsonl")"; then
         vs_ctl_fired "$VS_CTL" "$_ev (mode)"; echo "FAIL"; exit 1
     fi
@@ -204,8 +243,32 @@ if [ -n "${VS_CTL:-}" ]; then   # THE MODE: exit 1 only if ITS clause failed und
     exit 3
 fi
 
-echo "== 4. the capture sheet (snapshots at each event's first fall, in the 0x0189EA legs above)"
-if ls "$W"/legs/*/0189ea/sb/snap/*/*.png > /dev/null 2>&1; then
+echo "== 3b. the instrument's alignment (#228 step 4, option A)"
+if [ "$FREEZE_CLOCK" = 1 ]; then
+    [ "$fail" = 0 ] || { echo "REFUSED: sections 1-3 failed — nothing frozen"; exit 1; }
+    ia_freeze "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" "$W/fz" "$JOBS" "$W/clocks.tsv" \
+        > "$W/fz.txt" || { sed 's/^/  /' "$W/fz.txt"; echo "REFUSED: the alignment does not hold — nothing frozen"; exit 1; }
+    mkdir -p "$(dirname "$CLOCKS")"
+    { echo "# $CLOCKS — the game clock RAM:\$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,"
+      echo "# option A) by \`tests/audit_ground_throws.sh --freeze-clock\` at $(git rev-parse --short=8 HEAD): pristine vsavj; leg p<applier>, and nostop"
+      echo "# per rig; every reference leg held to replay.lua run live, every probe leg to its reference leg's game clock."
+      echo "# leg<TAB>replay<TAB>frames<TAB>gameclock"
+      cat "$W/clocks.tsv"; } > "$CLOCKS"
+    echo "froze $(wc -l < "$W/clocks.tsv" | tr -d ' ') game clocks into $CLOCKS"
+    exit 0
+fi
+if ia_check_manifest "$CLOCKS" "$W/manifest.tsv" > "$W/align_bad.txt"; then ok "every leg on emulated time, at its frozen game clock"
+else bad "$(wc -l < "$W/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$W/align_bad.txt" | sed 's/^/        /'; fi
+ia_stage audit_ground_throws "$CLOCKS" "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" 1 "$W/st" "$MODE" || fail=1
+if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
+    [ "$fail" = 1 ] && { echo "FAIL (control mode: $MODE)"; exit 1; }
+    echo "FAIL — control mode $MODE left the gate green"; exit 1
+fi
+if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || fail=1; fi
+if [ "$IA_SKIP" = fired ]; then vs_ctl_fired first-frame-skip "$IA_SKIP_MSG"; else vs_ctl_dead first-frame-skip "$IA_SKIP_MSG" || fail=1; fi
+
+echo "== 4. the capture sheet (snapshots at each event's first fall, in the no-stop legs above)"
+if ls "$W"/legs/*/nostop/sb/snap/*/*.png > /dev/null 2>&1; then
     python3 tools/ground_throw_rigs.py sheet "$W/capture.png" "$W/legs" "$G" "$EXP" > "$W/sheet.txt" 2>&1 \
         && ok "$(cat "$W/sheet.txt")" || echo "  NOTE  no capture sheet: $(tail -1 "$W/sheet.txt")"
 else

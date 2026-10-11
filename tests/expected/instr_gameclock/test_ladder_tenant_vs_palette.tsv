@@ -1,0 +1,8 @@
+# tests/expected/instr_gameclock/test_ladder_tenant_vs_palette.tsv — the game clock RAM:$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,
+# option A) by `tests/test_ladder_tenant_vs_palette.sh --freeze-clock` at 4980bd96: build = build/m3b_merged31;
+# every reference leg held to replay.lua run live, every guarded leg to its reference leg's game clock.
+# leg<TAB>replay<TAB>frames<TAB>gameclock
+phobos_ctl	111_don_arcade_vs_screen	3721	2c
+phobos_red	111_don_arcade_vs_screen	3721	2c
+bishamon_ctl	111_don_arcade_vs_screen	3721	2c
+p2_ctl	109_2p_don_vs_phobos	7120	73
