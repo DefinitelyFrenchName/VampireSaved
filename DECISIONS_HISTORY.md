@@ -6564,6 +6564,7 @@ So: the three move onto `tests/lua/emu_clock.lua`, and `tests/test_emu_clock.sh`
 - the maintainer chose: *"No, reopen #260"*
 
 So: #228 closes `done` in the 14z-197 close — its index row with its four answers, a closing comment, the issue closed. #260 was closed on GitHub on the session's reading and REOPENED on the maintainer's answer, with a comment saying why; its index row stays `open`, and it closes later on the maintainer's word.
+
 ---
 
 ## Ruled 2026-10-11 (14z-197) — #119 closed by the maintainer: declined, no new ticket

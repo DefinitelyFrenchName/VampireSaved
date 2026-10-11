@@ -6040,6 +6040,12 @@ should be there — here the human-readable description the same header carries 
 Q0 made Q3 checkable). A count that looks complete ("199 declares, 0 uncovered") says
 nothing about reach.
 
+PAID AGAIN 14z-197 (the other direction): `tests/test_emu_clock.sh` section 5 built its instrument paths as
+`"$REPO/tests/lua/$l5"`, and the extractor, cutting the token at the variable, read `tests/lua/` — the whole directory —
+as a reference the gate's FOLLOWS did not cover, so `test_gate_follows` went red on the confirm tier. Widening FOLLOWS to
+the directory would make the gate re-run on every Lua change; the list now names the three files literally (STATE
+14z-197 row (13)). Spell a path the extractor must see as a literal, not as a stem plus a variable.
+
 ## A RIG'S SHARED PIN INSIDE A COMPARED WINDOW ERASES A HIT ON BOTH LEGS — and the frozen row then agrees with itself (paid: 14z-181, GitHub #136, rule-checker run 2026-09-25-148)
 
 `tests/audit_df_moves.sh` compares ours against native by the hits it reads as DROPS of P2's
@@ -6781,6 +6787,31 @@ check never reads (run 763 QP2; caught by the agent itself one run later). None 
 because each was overtaken by work before a commit. Rule: say a result only from the output already in hand, and say a
 count only as that output gives it. When the check that would show a result failed, re-run it before saying anything.
 An offer made at the opener is a promise: keep it, or withdraw it out loud.
+
+PAID AGAIN 14z-197 (the close's procedure check, rule-checker runs 2026-10-11-816, -818 and -819; the documentation
+packet's run -814). "`test_hui_boot` has frozen" was said before its log was read, and the log said REFUSED; the re-run
+followed without a word of correction (818 QP2). "7 of 13" were counted frozen while the seventh freeze was still
+running (818 QP2). "The header and the other places carrying the old wording are corrected" was said before the
+rule-checker's readers found two more live carriers (819 QP2). "All eleven tickets in #245-#255 … labelled `done
+unshipped`" counted #254, closed the session before: ten were labelled (816 QP2). "2.5–5× higher" stood for ratios of
+2.2 and 5.0 (818 QP3). An ERIS run went unchecked after "waiting for the run to finish" until the maintainer asked ("It's been
+almost 4h and a half running on ERIS"; 816 QP1; the hang itself is 14z-197 finding (j)). And a ruling was carried past its words: the answer "Close #228 at
+this close" was applied to #260 too, from the option's description, until run 814 Q5 and the maintainer's "No, reopen
+#260". Workers slipped the same way: a reader read DECISIONS_HISTORY.md entries and a STATE row outside the INPUTS its spec
+named, and read two files in full where its spec allowed their header comments only (816 QP5), two measurers added lines their specs had excluded — a "(note: …)" line and an unrequested FIG line (816 QP5) —
+and a rule-checker reader read two cited logs from their middle lines only (819 QP5; #258). The rule above holds;
+add one: a ruling binds exactly what the maintainer's own words name.
+THE CHECK'S OWN EXTRACT HAS A GAP (found at the same close, run 819's reader): a maintainer message sent mid-turn can
+reach the transcript as a `queue-operation` enqueue plus an `attachment` record, with no user record, and
+`tools/agent/extract.py` draws no M line for that form — the maintainer's "Congratulations, identical Phobos confirmed"
+(14z-197) is absent from its extract, so C1's QP1 cannot see an intention answered by it. `tools/agent/rulings_verbatim.py`
+counts enqueues and does see it. Until the extractor reads that form, read the enqueue records by hand when a C1 reader
+says a maintainer message is missing. Not filed as a ticket: left for the maintainer to decide.
+A SECOND LIMIT, of its W# hint: it lists a worker's figure that no result the worker got contains, and cannot see a
+figure DERIVED from a file the worker read — the plant readers' 2550 and 2560 (`name_moves.py` line 77, FIRST_EVENT =
+2600, minus 40 and 50) drew four QP3 VIOLATEDs (816 to 819) until run 820's reader did the arithmetic. Judged not slips
+at this close: those two figures, and a measurer's "24 gate names were listed", a count of its own spec's list as its
+report said (816 QP3). A W# line is a hint to check, never a verdict; no test, not filed.
 
 ## A FORK'S COMMIT WAS CHERRY-PICKED WITHOUT BEING READ AGAINST ITS SPEC (paid: 14z-195, #229, rule-checker run 2026-10-08-760 QP5)
 
