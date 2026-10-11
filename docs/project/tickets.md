@@ -11,12 +11,15 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**261 tickets** — status: open 25 · parked 9 · done 199 · declined 10 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 188 · cosmetic 16 · evolution 57 · **backfill debt: 0 rows**.
+**264 tickets** — status: open 28 · parked 9 · done 199 · declined 10 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 190 · cosmetic 16 · evolution 58 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#264](https://github.com/DefinitelyFrenchName/VampireSaved/issues/264) | evolution | open | A session dashboard: time per activity, checks and re-checks and why, tier cost and quality signals, each figure labelled by class (measured, derived, estimated, inferred, extrapolated) | none | none | none | none | 14z-197 |
+| [#263](https://github.com/DefinitelyFrenchName/VampireSaved/issues/263) | bug | open | C1 extract's W# hint flags a worker figure derived from a file it read as unsourced | `tools/agent/extract.py` | none | `docs/project/gotchas.md § A SECOND LIMIT, of its W# hint` | none | 14z-197 |
+| [#262](https://github.com/DefinitelyFrenchName/VampireSaved/issues/262) | bug | open | C1 extract drops a maintainer message stored as a queue enqueue plus an attachment record | `tools/agent/extract.py` | none | `docs/project/gotchas.md § THE CHECK'S OWN EXTRACT HAS A GAP` | none | 14z-197 |
 | [#261](https://github.com/DefinitelyFrenchName/VampireSaved/issues/261) | bug | open | audit_effect_class_rows section 4 checks a type-6 fallback inventory that was never frozen | `tests/audit_effect_class_rows.sh § fallback-execution check` | none | none | none | 14z-197 |
 | [#260](https://github.com/DefinitelyFrenchName/VampireSaved/issues/260) | evolution | open | check that every submodule pin exists on its remote before a push (the 14z-192 jtcores pin was unpushed) | `tools/submodule_pins.py § --selftest` | `DECISIONS_HISTORY.md § Ruled 2026-10-09 (14z-196) — a ticket for the submodule-pin check` · `DECISIONS_HISTORY.md § Ruled 2026-10-11 (14z-197) — #228 closes at this session's close; #260 stays open` | `tools/submodule_pins.py § The remote answers `not our ref`` | `tools/submodule_pins.py § committed on the Mac and never pushed, while `main` was` | 14z-196,14z-197 |
 | [#259](https://github.com/DefinitelyFrenchName/VampireSaved/issues/259) | bug | open | static_confirm plan took 20 min at the 14z-195 close (228 changed files, 194 rule-checker run files) | `tools/static_confirm.py` | none | none | none | 14z-195 |

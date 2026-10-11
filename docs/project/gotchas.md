@@ -6806,12 +6806,12 @@ reach the transcript as a `queue-operation` enqueue plus an `attachment` record,
 `tools/agent/extract.py` draws no M line for that form — the maintainer's "Congratulations, identical Phobos confirmed"
 (14z-197) is absent from its extract, so C1's QP1 cannot see an intention answered by it. `tools/agent/rulings_verbatim.py`
 counts enqueues and does see it. Until the extractor reads that form, read the enqueue records by hand when a C1 reader
-says a maintainer message is missing. Not filed as a ticket: left for the maintainer to decide.
+says a maintainer message is missing. Filed after the close on the maintainer's word ("file the ticket(s) for the two gaps"): #262.
 A SECOND LIMIT, of its W# hint: it lists a worker's figure that no result the worker got contains, and cannot see a
 figure DERIVED from a file the worker read — the plant readers' 2550 and 2560 (`name_moves.py` line 77, FIRST_EVENT =
 2600, minus 40 and 50) drew four QP3 VIOLATEDs (816 to 819) until run 820's reader did the arithmetic. Judged not slips
 at this close: those two figures, and a measurer's "24 gate names were listed", a count of its own spec's list as its
-report said (816 QP3). A W# line is a hint to check, never a verdict; no test, not filed.
+report said (816 QP3). A W# line is a hint to check, never a verdict; no test; filed after the close: #263.
 
 ## A FORK'S COMMIT WAS CHERRY-PICKED WITHOUT BEING READ AGAINST ITS SPEC (paid: 14z-195, #229, rule-checker run 2026-10-08-760 QP5)
 
