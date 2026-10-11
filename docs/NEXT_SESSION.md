@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-196 CLOSE, 2026-10-09)
+# NEXT SESSION — orientation (rewritten at the 14z-197 CLOSE, 2026-10-11)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
@@ -19,17 +19,15 @@ there in parallel.**
 
 ## START HERE
 
-0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** What the close found and did is in STATE 14z-196's CLOSE row.
-1. **#245-#255 — the code-review findings, P2 first, then P3** (ruled: `DECISIONS_HISTORY.md` "Ruled 2026-10-09 (14z-196) — #245-#255: the triage's revised severities; worked next session, P1 to P3"). All eleven were re-checked VALID at `2979890c` (the triage report was untracked scratch, `build/agent196/triage245/REPORT.md`). Bug archaeology first ([VSP-14]); each fix gets its ground-truth test.
-   - P2: #245 (the WIDE builder writes a source zip through its own symlink), #249, #251, #252, #253.
-   - P3: #246, #247, #248, #250, #255.
-2. **#228 — ASSESS FIRST, THEN STEP 4** (ruled: `DECISIONS_HISTORY.md` "Ruled 2026-10-09 (14z-196) — #228: step 4 does not start this session; whether it runs once or recurs is assessed first"). Steps 1-3 landed 14z-196: `tests/lua/pc_count.lua` counts the first frame, `tests/lua/clock_check.lua` measures drift per run, 24 at-risk gates drift and still PASS (`build/agent196/t228/step3/SUMMARY.txt`, untracked). Put the once-or-recurring question to the maintainer with its clock cost; a recurring run may be release-only or a scheduled night run.
-   - **Carried to step 4 by decision:** seven code comments in six files still state the retracted "timeslicing" theory — `tests/lua/replay_guard.lua`, `tests/lua/inp_guard.lua`, `tools/run_replay_guarded.sh`, `tools/run_inp_guarded.sh`, `tools/run_inp_probe.sh`, `tests/test_crash_guard.sh` (`tests/rulecheck/retractions/14z-196.tsv` names them). Correct them with the clock fix.
-3. **#118 — the chars gate, PARKED on branch `t118-196`** (ruled: `DECISIONS_HISTORY.md` "Ruled 2026-10-09 (14z-196) — #118's gates and every pristine-only gate move to an ONDEMAND scope; the chars gate parked"). `audit_mizuumi_chars` went through rule-checker runs 902-914 in the worktree `../wt_t118_196`; **914 is VIOLATED on Q1 and unresolved** (two facts frozen only in pooled lines). The struct gate merged 14z-196 (`8904dde2`, run 772 OK). The chars gate lands as `ondemand` (27 rows are `ondemand` since 14z-196: `tests/run_all_emulator.sh --scope ondemand`, HANDOFF [VSP-164]).
-4. **bbh — settle who does what** (ruled: `DECISIONS_HISTORY.md` "Ruled 2026-10-09 (14z-196) — bbh is its own project: this session's three bbh commits dropped; test_bbh_fidelity ondemand until who-does-what is settled"). bbh (`~/Developer/blackbox-harness`) is its own project: make no change there from a Vampire Saved session. `tests/test_bbh_fidelity.sh` is static cadence `ondemand` until this is settled, and red if run: this tree has the control-mode crash rule of `tests/lib/classify.sh` and the cleanhost token, bbh no longer does.
-5. **#260** — a check that every submodule pin exists on its remote before a push (filed 14z-196, the 14z-192 jtcores pin).
-6. **Lowest priority:** #129, captures first (`DECISIONS_HISTORY.md` "Ruled 2026-10-08 (14z-196) — #129: captures first; the ticket stays the lowest priority of the open tickets").
-7. **Open, scoped:** #229 (specials, supers and EX/ES moves next); #243, #244; the close's own tools #256, #257, #258, #259. Done, awaiting release: #236, #238, #239, #240.
+0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** What the close found and did is in STATE 14z-197's CLOSE row.
+1. **Ask the maintainer for the order of work.** The ruled order of work is finished (STATE 14z-197; its fixed tickets are in item 4). The open tickets, by their GitHub severity label:
+   - high: #261 (`audit_effect_class_rows` section 4 checks a type-6 fallback inventory that was never frozen), #256 (the close's open-tickets check reads a cited ticket range as its two ends);
+   - medium: #243, #257, #258, #259;
+   - low: #118, #129, #229, #244;
+   - no severity label: #260 — the submodule-pin check is implemented and runs at every close (`tools/submodule_pins.py`); the maintainer chose to keep it open at the 14z-197 close (`DECISIONS_HISTORY.md`, the 2026-10-11 entry whose heading ends "#260 stays open").
+2. **#118 — the chars gate, PARKED on branch `t118-196`** (ruled: `DECISIONS_HISTORY.md` "Ruled 2026-10-09 (14z-196) — #118's gates and every pristine-only gate move to an ONDEMAND scope; the chars gate parked"). `audit_mizuumi_chars` went through rule-checker runs 902-914 in the worktree `../wt_t118_196`; **914 is VIOLATED on Q1 and unresolved** (two facts frozen only in pooled lines). It lands as `ondemand`.
+3. **#129 stays the lowest priority**, captures first (`DECISIONS_HISTORY.md` "Ruled 2026-10-08 (14z-196) — #129: captures first; the ticket stays the lowest priority of the open tickets").
+4. **Done, awaiting release** (each closes with the release that carries it): #236, #238, #239, #240, #245, #246, #247, #248, #249, #250, #251, #252, #253, #255. `test_release_launcher_bat`'s Windows half runs on ERIS; the shipped `PLAY.bat` must equal the generator at release (`DECISIONS_HISTORY.md` "Ruled 2026-10-10 (14z-197) — #248's Windows half: the shipped PLAY.bat equals the generator at release only").
 
 ## PARKED (not open work)
 
@@ -37,15 +35,17 @@ there in parallel.**
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
-- **A `-debug` run's divergence was the debugger's boot-halt UI frame, not timeslicing.** A script counting `frame_done` calls runs one frame ahead; count emulated frames (`screen:frame_number()`). `tests/lua/clock_check.lua` (`CLOCK_OUT=<file>`) reports `uiframes` per run ([MFI-2], `docs/platform/gotchas.md`).
-- **A merge packet compares the WORKING TREE the gate ran on, over the gate's WHOLE `# FOLLOWS:` header** (it wraps over several comment lines), never `git diff --cached` nor its first line (rule-checker runs 769 and 771).
-- **"Failing as a mode" is shown by the mode's own FAIL lines and no `CONTROL DEAD:` line**, never by its exit status: a mode exits 1 whether its control fired or was dead (run 769).
-- **`rulecheck prepare` picks the next free id after the ledger's highest**, which a fork's 901+ ids push up; pass `--id` to keep main's sequence (this sitting: 771, 772).
-- **`tests/rulecheck/retractions/<session>.tsv` scans `docs/site/` too:** regenerate it (`python3 tools/mk_docs_site.py`) before the grep, or stale pages read as live carriers.
+- **Every breakpoint instrument counts EMULATED frames through `tests/lua/emu_clock.lua`.** A new instrument loads it and never keeps its own `frame_done` counter. Its `ALIGN` line's `uiframes` is the UI frames the clock skipped, not a count of stops: a leg with no stop can read 1. Ground truth: `tests/test_emu_clock.sh` ([MFI-5], `docs/platform/gotchas.md` "ONE SHARED CLOCK SINCE 14z-197").
+- **A stop is labelled with the last COMPLETED frame.** An event during frame N logs N-1 on the emulated clock.
+- **Rigs tuned on the old clock can stop working.** Its inputs landed early. The fresh stage-4 Huitzil build resets on the 2P-dummy rigs and at ~f4700 on the soak rig (not root-caused); the four Huitzil stage gates run on `build/hui61` (ruled).
+- **`tools/audit_poked_legs.py` reads a script's comments when deciding which games it boots.** The bare word for the native game beside a MAME runner in a poked script's prose counts as a native leg.
+- **`test_gate_follows` reads a path built as `tests/lua/$x` as a reference to all of `tests/lua/`.** Name the files literally.
+- **The confirm tier's planner runs ~20 min with no output** (#259). Prove the run alive from its processes, then wait.
 
-## WHAT CLOSED THIS SITTING (14z-196)
+## WHAT CLOSED THIS SITTING (14z-197)
 
-- **Closed `done`:** #254 (a control mode's own shell error is DIED at any exit; the close tier executed 350 controls, 0 died).
-- **Filed:** #260.
-- **Parked:** #124.
-- **Ruled:** #129 lowest priority, captures first; the order of work (#228 first); #228 step 4 waits for its once-or-recurring assessment; #124 parked; #260 filed; #245-#255's revised severities; #254 closed at the close; the ONDEMAND scope for pristine-only gates, the chars gate parked; the pristine-only gates' scopes (a past break by a change of ours keeps a gate at release, a gate's own red does not; 23 rows to `ondemand`, audit_palette_seq_ids to release). Each in the maintainer's own words is its `DECISIONS_HISTORY.md` entry "Ruled 2026-10-08 (14z-196) — ..." (#129, the order of work) or "Ruled 2026-10-09 (14z-196) — ..." (the rest); `tools/agent/rulings_verbatim.py` checks those quotes.
+- **Closed `done`:** #228 (all seven breakpoint instruments and `pc_count` on the emulated clock). #260 was closed on a misread of the ruling and reopened on the maintainer's word.
+- **Closed by the maintainer:** #119, recorded `declined` with no new ticket.
+- **Fixed, labelled `done unshipped`:** #245, #246, #247, #248, #249, #250, #251, #252, #253, #255.
+- **Filed:** #261.
+- **Ruled:** the order of work (#245-#255, P2 first; nothing bbh-related runs here); a fixed ticket is commented and labelled `done unshipped`; #248's newest set, always, and `PLAY.bat` equality at release only; bbh's remaining links; #228's option A; the four Huitzil stage gates on `build/hui61`; the three gate-less instruments converted; #228 closed at this close and #260 kept open; #119 declined. Each, in the maintainer's own words, is its `DECISIONS_HISTORY.md` entry "Ruled 2026-10-10 (14z-197) — ..." or "Ruled 2026-10-11 (14z-197) — ..."; `tools/agent/rulings_verbatim.py` checks those quotes.

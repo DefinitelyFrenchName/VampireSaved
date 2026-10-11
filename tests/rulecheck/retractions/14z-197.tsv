@@ -2,3 +2,13 @@
 fires in only 5 of	14z-197 (#228 step 4): the 14z-89 replay count for the object-pool walker 0x54458 was measured on the frame_done clock that cut each run short; on emulated time its jsr (A0) fires in 50 of 56 replays (tests/audit_walker_ghost.sh, build/manifest/walker_ghost.toml re-frozen); carriers marked RETRACTED in place	retracted
 in only 5 of 49	14z-197 (#228 step 4): the same count in docs/game/engine_internals.md, marked RETRACTED in place	retracted
 fires in 50 of 56	control: the corrected count, live in tests/audit_walker_ghost.sh	reach:1
+timeslicing	14z-197 (#228 slice 3): the 14z-196 timeslicing theory corrected in its seven code carriers (replay_guard.lua and the guard family); a -debug guard run with no stop reproduces frozen vanilla on the emulated clock	retracted
+the allocator shift the row's absence causes	14z-197 (#228 slice 3, finding (u)): the 14z-92 allocator-shift attribution for 21_don_mash and 22_don_dualmash was the frame_done clock's drifted timeline; all three divergences are the thunk's transit	retracted
+PROBE at frame 2886	14z-197 (#228 slice 3, finding (v)): audit_merged_vec3's probe frame was the old clock's; the gate judges the first satellite walk's value	retracted
+landed one frame before the character could act	14z-197 (rule-checker run 808): test_hui_air's first note on the eaten first jumps; they stay eaten at +0 and +5 and on native	retracted
+stopped 1,275 times	14z-197 (rule-checker run 811): bp_regs's 1,275 was uiframes, not a count of stops	gone
+pauses emulated time during a stop	14z-170 contradicted, 14z-197 fixed: bp_regs.lua's header claim, struck through there; the instrument counts emulated frames since 14z-197	retracted
+6 times on emulated time	control: the corrected hit-class census, live in docs/game/engine_internals.md	reach:1
+LEAVES THE MATCH	control: the corrected soak-rig reading, live in tests/test_hui_soak.sh	reach:1
+not a count of stops	control: the corrected uiframes reading, live in STATE.md row (12)	reach:1
+and #260 close at this session's close	14z-197 (rule-checker run 2026-10-11-814 Q5): the closing ruling named #228 only; #260 was reopened on the maintainer's answer and the entry retitled '#228 closes at this session's close; #260 stays open'	retracted

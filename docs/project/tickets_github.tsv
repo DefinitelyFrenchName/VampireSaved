@@ -4,12 +4,12 @@
 # repo: DefinitelyFrenchName/VampireSaved
 # issues: 261
 number	state	reason	closed	labels	title
-261	OPEN	-	-	bug	audit_effect_class_rows section 4 checks a type-6 fallback inventory that was never frozen
-260	OPEN	-	-	evolution	Check that every submodule pin exists on its remote before a push (the 14z-192 jtcores pin was unpushed)
-259	OPEN	-	-	bug	static_confirm plan took 20 min at the 14z-195 close (228 changed files, 194 rule-checker run files)
-258	OPEN	-	-	bug	rulecheck: a packet artifact above the Read limit gets a partial read
-257	OPEN	-	-	bug	rulings_verbatim leaves a second maintainer quote on the same line unchecked
-256	OPEN	-	-	bug	Close check open-tickets reads a cited ticket range as its two ends only
+261	OPEN	-	-	bug,severity: high	audit_effect_class_rows section 4 checks a type-6 fallback inventory that was never frozen
+260	OPEN	REOPENED	-	evolution	Check that every submodule pin exists on its remote before a push (the 14z-192 jtcores pin was unpushed)
+259	OPEN	-	-	bug,severity: medium	static_confirm plan took 20 min at the 14z-195 close (228 changed files, 194 rule-checker run files)
+258	OPEN	-	-	bug,severity: medium	rulecheck: a packet artifact above the Read limit gets a partial read
+257	OPEN	-	-	bug,severity: medium	rulings_verbatim leaves a second maintainer quote on the same line unchecked
+256	OPEN	-	-	bug,severity: high	Close check open-tickets reads a cited ticket range as its two ends only
 255	OPEN	-	-	bug,done unshipped	[P3] Python release applier publishes output before rejecting an incorrect aggregate set key
 254	CLOSED	COMPLETED	2026-10-09	bug	[P2] Executable shell-crash controls are classified HONOURED on nonzero exits
 253	OPEN	-	-	bug,done unshipped	[P2] MAME replay wrapper accepts an old checksum log when a zero-exit invocation writes nothing
@@ -21,8 +21,8 @@ number	state	reason	closed	labels	title
 247	OPEN	-	-	bug,done unshipped	[P3] Direct release packager deletes the previous package before replacement validation
 246	OPEN	-	-	bug,done unshipped	[P3] Release name can escape the output root and recursively delete a sibling directory
 245	OPEN	-	-	bug,done unshipped	[P2] WIDE overlay builder overwrites a source vsavjw.zip through its own symlink
-244	OPEN	-	-	bug	Tenant charmap pages print the raw +8/+9 power byte as damage (the #241 decode not applied to charmap_html/charmap_md)
-243	OPEN	-	-	bug	Staleness audit: 79 emulator gates declare the whole tests/replays/ directory, so any new replay stales them all
+244	OPEN	-	-	bug,severity: low	Tenant charmap pages print the raw +8/+9 power byte as damage (the #241 decode not applied to charmap_html/charmap_md)
+243	OPEN	-	-	bug,severity: medium	Staleness audit: 79 emulator gates declare the whole tests/replays/ directory, so any new replay stales them all
 242	CLOSED	COMPLETED	2026-10-08	bug	retraction_grep never lists a retracted wording broken by a quote prefix or HTML markup
 241	CLOSED	COMPLETED	2026-10-08	bug	Cross-check record derivation reads bit 7 of Zabel's pursuit damage bytes as damage (258/130 for a 0/2 hit)
 240	OPEN	-	-	cosmetic,done unshipped	Recipe READMEs: the easy way needs a prebuilt, step 3 cites step 1 for the set, the verifyroms comment overstates, a pointer to a file not shipped
@@ -36,8 +36,8 @@ number	state	reason	closed	labels	title
 232	CLOSED	COMPLETED	2026-10-06	bug	The jtsim scratch heal does not cover submodules: the tmp reaper took their gitdir HEAD and the MiSTer lane failed in 3 s
 231	CLOSED	COMPLETED	2026-10-06	bug	attribute_patch_delta.py needs a gen.log the solo tracks never write, and the freeze has no byte-level program diff step
 230	CLOSED	COMPLETED	2026-10-06	evolution	Capture geometry in-emulator: Pyron's and Donovan's throws against the roster victims (split from #116)
-229	OPEN	-	-	evolution	Community cross-check: naming rigs on vsavj for specials, supers, EX/ES moves, throws and pursuits (split from #117)
-228	OPEN	-	-	bug	Breakpoint instruments on the frame_done clock, and pc_count.lua's first-frame skip: measure each for drift (#213's class)
+229	OPEN	-	-	evolution,severity: low	Community cross-check: naming rigs on vsavj for specials, supers, EX/ES moves, throws and pursuits (split from #117)
+228	CLOSED	COMPLETED	2026-10-11	bug,severity: medium	Breakpoint instruments on the frame_done clock, and pc_count.lua's first-frame skip: measure each for drift (#213's class)
 227	CLOSED	COMPLETED	2026-10-07	cosmetic	MAME README: say the four 'clone of nonexistent driver megaman' lines at every start are expected and harmless
 226	CLOSED	COMPLETED	2026-10-08	done unshipped,evolution	Test the Linux release end to end: PILOT's linux-x86_64 build as a player gets it (asset, applier, launcher, a real desktop run)
 225	CLOSED	COMPLETED	2026-10-05	evolution	Promote #188's traced test (strace every static gate, score the predictor, an over-narrowed control) from scratch into tools/
@@ -137,7 +137,7 @@ number	state	reason	closed	labels	title
 131	CLOSED	NOT_PLANNED	2026-09-29	evolution	audit_mask_window_ff42a2: deprecate it, or keep it as a case-specific gate?
 130	CLOSED	COMPLETED	2026-10-03	bug	bundle_win_dlls.py prints a broken character for its em dash on MSYS2 (build logs only)
 129	OPEN	-	-	evolution,severity: low	Tenant CPU AI looks lackluster (unproven; first question: are the ported script blocks complete?)
-128	OPEN	-	-	evolution	Marionette: parked until further notice
+128	OPEN	-	-	evolution,parked	Marionette: parked until further notice
 127	OPEN	-	-	cosmetic,parked	#112 option (B): the Press of Death effect owns its palette row (scope first)
 126	CLOSED	COMPLETED	2026-10-01	cosmetic,parked	Select-wheel look-and-feel polish
 125	OPEN	-	-	cosmetic,parked	Arcade-ladder map: for the three tenants the next opponent's name and small portrait are wrong (the VS screen that follows is correct)
@@ -146,8 +146,8 @@ number	state	reason	closed	labels	title
 122	CLOSED	COMPLETED	2026-10-06	evolution	Run the --controls release tier on the dedicated Linux server and compare its speed with the m2 pro (load balancing potential)
 121	OPEN	-	-	evolution	Linux release binaries built on dedicated server, plus clean-machine check at release (option 3)
 120	OPEN	-	-	evolution	The rebuild-from-docs option after MiSTer (a possibility to preserve, not a commitment)
-119	OPEN	-	-	evolution	The living-documentation framework as an independent sibling of bbh (ruled at the plan stage, not scheduled)
-118	OPEN	-	-	evolution	Community cross-check: the ~90 unadopted mizuumi player-struct candidates, each adopted only once measured
+119	CLOSED	COMPLETED	2026-10-11	contested,evolution	The living-documentation framework as an independent sibling of bbh (ruled at the plan stage, not scheduled)
+118	OPEN	-	-	evolution,severity: low	Community cross-check: the ~90 unadopted mizuumi player-struct candidates, each adopted only once measured
 117	CLOSED	COMPLETED	2026-10-05	evolution	Community cross-check: naming rigs on vsavj for specials, supers, throws, the CL. rows and the 6-prefixed rows
 116	CLOSED	COMPLETED	2026-10-05	evolution	Capture matrix: widen the in-emulator anchors from 3 cells to a sampled row per tenant
 115	CLOSED	COMPLETED	2026-10-05	contested,evolution,parked	{}Zabel j.LK proximity guard: a surgical legacy patch for vanilla and WIDE, its own session, recording first

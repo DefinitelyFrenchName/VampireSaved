@@ -6550,3 +6550,31 @@ So: the four gates default to `build/hui61` (a stage-4 build can still be passed
 - the maintainer chose: *"Convert all three now"*
 
 So: the three move onto `tests/lua/emu_clock.lua`, and `tests/test_emu_clock.sh` section 5 is their alignment check (a reference leg on the basis and a breakpoint leg on the reference's game clock, each to frame 3000 of `03_two_player_vs`).
+
+---
+
+## Ruled 2026-10-11 (14z-197) — #228 closes at this session's close; #260 stays open
+
+**The question (in chat, AskUserQuestion), once the last three instruments were committed (`27ddb346`):** #228's implementation is complete (all seven instruments plus `pc_count` on the emulated clock), and its changes are test instruments only — nothing ships to players. How should it end? (#260, also tooling, is in the same position.) Options: close #228 at this close, `done`, with the full ticket-closing ritual, as #254 was (its description added "#260 likewise"); the done-unshipped label, closing with the next release as #248 does; or the implemented comment only, the close decided later.
+
+**The maintainer:**
+- the maintainer chose: *"Close #228 at this close"*
+
+**#260, asked directly (AskUserQuestion, at the close, after rule-checker run 2026-10-11-814 Q5 found that the answer above named #228 only while the session had closed #260 on the option description's "#260 likewise"):** do you want #260 closed `done` at this close?
+- the maintainer chose: *"No, reopen #260"*
+
+So: #228 closes `done` in the 14z-197 close — its index row with its four answers, a closing comment, the issue closed. #260 was closed on GitHub on the session's reading and REOPENED on the maintainer's answer, with a comment saying why; its index row stays `open`, and it closes later on the maintainer's word.
+---
+
+## Ruled 2026-10-11 (14z-197) — #119 closed by the maintainer: declined, no new ticket
+
+**What happened (on GitHub):** the maintainer closed #119 (the living-documentation framework as an independent sibling of bbh) at 2026-10-11T11:54:33Z from their own account, adding the label `contested`, with this comment:
+- the maintainer, on #119: *"While the need and concept are both good and still present, the approach was flawed. Ticket closed"*
+
+**The questions (in chat, AskUserQuestion), when the close's ticket refresh found it:** which closed status fits the index (declined / invalid / done), and whether the need the comment calls still present gets its own new ticket.
+
+**The maintainer:**
+- the maintainer chose: *"declined"*
+- the maintainer chose: *"No new ticket"*
+
+So: #119's index row reads `declined`, its ruling links here, and nothing is filed for the need; the approach's flaw is not described in the tree beyond the maintainer's words above.
