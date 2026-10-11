@@ -63,7 +63,7 @@ if [ "$OS" = macos ] && command -v xattr >/dev/null 2>&1; then
             ;;
         *)
             die "not cleared, so macOS will block the emulator." \
-                "macOS shows: \"fbneo\" Not Opened — Apple could not verify ..." \
+                "macOS shows: \"cps2\" Not Opened — Apple could not verify ..." \
                 "with only Done and Move to Bin. RIGHT-CLICK > OPEN DOES NOT GET PAST IT" \
                 "on current macOS. What works is clearing the flag:" \
                 "  xattr -dr com.apple.quarantine '$HERE'" \
@@ -81,10 +81,14 @@ fi
         "or build one with emulator/0002-cps2-wide-v1.patch per EMULATOR.md."
 
 # ── 4. find the romset the applier built ──────────────────────────────────
-# Looked for in the places a player plausibly puts it, nearest first.
+# Looked for in the places a player plausibly puts it, and THE NEWEST WINS (#248,
+# maintainer-ruled 2026-10-10: "prefer the newest one, always"): an old set left in
+# roms/ from an earlier release must never shadow the one just built. On a tie (a
+# link to the same file) the first in this list is kept.
 ZIP=""
 for _c in "$HERE/roms/vsavjw.zip" "$HERE/vsavjw.zip" "$HERE/rompath/vsavjw.zip"; do
-    [ -f "$_c" ] && { ZIP="$_c"; break; }
+    [ -f "$_c" ] || continue
+    if [ -z "$ZIP" ] || [ "$_c" -nt "$ZIP" ]; then ZIP="$_c"; fi
 done
 if [ -z "$ZIP" ]; then
     die "vsavjw.zip not found." \

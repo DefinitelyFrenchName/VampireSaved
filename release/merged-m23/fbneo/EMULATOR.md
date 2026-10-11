@@ -10,11 +10,22 @@ Upstream: https://github.com/finalburnneo/FBNeo
 Pinned commit: `79188379cc8442c54712acbe3b7e73dce157985f` (the exact tree the patch is known to apply to and
 the project's gates were run against).
 
+Install these first (the packages the project's own build hosts carry; a
+missing one stops the build):
+
+- **Linux (Ubuntu 24.04 / Debian):** `sudo apt install git build-essential libsdl2-dev libsdl2-image-dev`
+- **macOS:** the Command Line Tools (`xcode-select --install`), then Homebrew
+  `brew install sdl2 sdl2_image pkgconf`
+- **Windows:** MSYS2, in its MINGW64 shell:
+  `pacman -S git make patch perl mingw-w64-x86_64-gcc mingw-w64-x86_64-pkgconf mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image`
+
     git clone https://github.com/finalburnneo/FBNeo fbneo && cd fbneo && git checkout 79188379cc8442c54712acbe3b7e73dce157985f
     git apply /path/to/emulator/0002-cps2-wide-v1.patch
-    make sdl2 SKIPDEPEND=1 -j8 -k     # SKIPDEPEND=1 is mandatory (see the project's docs/GOTCHAS.md);
-    make sdl2 SKIPDEPEND=1 -j8        # TWICE on a fresh clone: the parallel first pass stops on burn.o
-                                      # until the driver list is generated (-k lets it finish the rest)
+    make sdl2 SKIPDEPEND=1 -j8 -k     # SKIPDEPEND=1 is mandatory: without it the build tries to
+    make sdl2 SKIPDEPEND=1 -j8        # regenerate dependency files and fails. Run it TWICE on a fresh
+                                      # clone: the parallel first pass can stop on burn.o until the
+                                      # driver list is generated (-k lets it finish the rest); the
+                                      # second pass completes it (a no-op if the first already did)
 
 The patch adds the `vsavjw` driver (the CPS-2 WIDE profile: 6 MB program,
 48 MB GFX via the CPS-2 Turbo bit-12 tile promote, 16 MB QSound) as a new

@@ -20,7 +20,7 @@ What it does, in order, failing loudly at the first problem:
   4. only then writes the output zips (stored, deterministic order).
 Nothing is written unless every member verified.
 """
-import argparse, hashlib, json, os, shutil, sys, zipfile
+import argparse, hashlib, json, os, shutil, sys, tempfile, zipfile
 
 # ── a VCDIFF (RFC 3284) decoder: the default code table, no secondary
 # compression, no custom table — exactly what the packager produces with
@@ -294,32 +294,8 @@ def main():
         print(f"  {zname}: {len(built[zname])} members verified"
               + (f" ({nskip} optional member(s) omitted)" if nskip else ""))
 
-    # 4. write
-    # DEFLATED since 2026-09-20 (maintainer: "If it is identical content, I see no reason
-    # not to go for the smaller size"). The standalone completion added 24 MB of pristine
-    # members, and STORED made the set 73.7 MB where deflate gives 28.0 MB for byte-for-byte
-    # identical MEMBERS — which is what every check here compares (per-member SHA-1), so
-    # compression is outside the comparison and cannot make a set pass that would not.
-    # It also matches the build's own zips, which have always been deflated.
-    os.makedirs(a.out, exist_ok=True)
-    for zname, ms in built.items():
-        with zipfile.ZipFile(os.path.join(a.out, zname), "w", zipfile.ZIP_DEFLATED) as zf:
-            for n, d in ms:
-                zi = zipfile.ZipInfo(n, date_time=(1997, 5, 19, 0, 0, 0))
-                # THE COMPRESS TYPE LIVES ON THE ZipInfo, NOT ON THE ARCHIVE: writestr with
-                # an explicit ZipInfo uses ITS compress_type, which defaults to STORED, so
-                # the ZipFile(..., ZIP_DEFLATED) argument above is silently ignored here.
-                # Measured 2026-09-20: setting only the archive argument left the set at
-                # 71 MB, exactly its stored size, with no error and no warning.
-                zi.compress_type = zipfile.ZIP_DEFLATED
-                # THE HOST BYTE IS PINNED (#215, 14z-191): ZipInfo stamps create_system from
-                # sys.platform — 0 (DOS) on Windows, 3 (Unix) elsewhere — so the same dumps gave
-                # two different containers (measured 2026-10-03 on ERIS against the Mac, every
-                # member byte-identical). Pinned to 3, every host writes the same file.
-                zi.create_system = 3
-                zf.writestr(zi, d)
-    # THE SET KEY, CHECKED AGAINST THE MANIFEST'S OWN DECLARATION for the variant just
-    # written — computed exactly as tools/build_fingerprint.py wholeset_key() does. It is
+    # 4. THE SET KEY, CHECKED AGAINST THE MANIFEST'S OWN DECLARATION for the variant about
+    # to be written — computed exactly as tools/build_fingerprint.py wholeset_key() does. It is
     # the player's one-line confirmation that they hold the same romset everyone else does
     # (netplay needs it identical), and it fails loudly rather than reporting a set that
     # is subtly not what the release promised.
@@ -332,8 +308,53 @@ def main():
             h.update(member.encode()); h.update(data)
     got = h.hexdigest()
     if want and got != want:
+        # the page's wording, kept identical (test_applier_page section 4): "written" there
+        # means built — neither applier has written anything when this refuses
         sys.exit(f"the written set's key {got[:8]} does not match the manifest's "
                  f"{key_field} {want[:8]} — the output is NOT what this release declares")
+    # 5. write — only now, and STAGED (14z-197, GitHub #255). The key above was checked AFTER
+    # the zips were written until 14z-197, so a key mismatch exited 1 saying the output was not
+    # what the release declares while leaving that output in place, where a launcher picks a
+    # set up because it exists. Each zip is written to a fresh temporary file beside its
+    # target and renamed over it only when every zip is complete; a failure removes the
+    # temporaries and leaves any earlier output byte-identical.
+    # DEFLATED since 2026-09-20 (maintainer: "If it is identical content, I see no reason
+    # not to go for the smaller size"). The standalone completion added 24 MB of pristine
+    # members, and STORED made the set 73.7 MB where deflate gives 28.0 MB for byte-for-byte
+    # identical MEMBERS — which is what every check here compares (per-member SHA-1), so
+    # compression is outside the comparison and cannot make a set pass that would not.
+    # It also matches the build's own zips, which have always been deflated.
+    os.makedirs(a.out, exist_ok=True)
+    staged = []
+    try:
+        for zname, ms in built.items():
+            fd, tmp = tempfile.mkstemp(dir=a.out, prefix=f".{zname}.", suffix=".tmp")
+            staged.append((tmp, os.path.join(a.out, zname)))
+            with os.fdopen(fd, "wb") as fh, zipfile.ZipFile(fh, "w", zipfile.ZIP_DEFLATED) as zf:
+                for n, d in ms:
+                    zi = zipfile.ZipInfo(n, date_time=(1997, 5, 19, 0, 0, 0))
+                    # THE COMPRESS TYPE LIVES ON THE ZipInfo, NOT ON THE ARCHIVE: writestr with
+                    # an explicit ZipInfo uses ITS compress_type, which defaults to STORED, so
+                    # the ZipFile(..., ZIP_DEFLATED) argument above is silently ignored here.
+                    # Measured 2026-09-20: setting only the archive argument left the set at
+                    # 71 MB, exactly its stored size, with no error and no warning.
+                    zi.compress_type = zipfile.ZIP_DEFLATED
+                    # THE HOST BYTE IS PINNED (#215, 14z-191): ZipInfo stamps create_system from
+                    # sys.platform — 0 (DOS) on Windows, 3 (Unix) elsewhere — so the same dumps gave
+                    # two different containers (measured 2026-10-03 on ERIS against the Mac, every
+                    # member byte-identical). Pinned to 3, every host writes the same file.
+                    zi.create_system = 3
+                    zf.writestr(zi, d)
+        umask = os.umask(0)
+        os.umask(umask)
+        for tmp, final in staged:
+            os.chmod(tmp, 0o666 & ~umask)   # the mode a plain open() would give
+            os.replace(tmp, final)
+    except BaseException:
+        for tmp, _ in staged:
+            if os.path.lexists(tmp):
+                os.remove(tmp)
+        raise
     variant = "without the optional QSound BIOS member" if a.no_qsound_bios else "standalone (every member the emulator asks for)"
     print(f"OK: wrote {', '.join(sorted(built))} to {a.out} — every member verified "
           f"(build {m.get('build_fingerprint') or '?'}, mark {m.get('version_string')!r})")

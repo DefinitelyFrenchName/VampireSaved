@@ -10,14 +10,31 @@ Upstream: https://github.com/mamedev/mame
 Pinned commit: `27a8d9e85b58058965907d1d8a7a92f8ed039348` (the exact tree the patch is known to apply to and
 the project's gates were run against).
 
+Install these first (the packages the project's own build hosts carry; a
+missing one stops the build):
+
+- **Linux (Ubuntu 24.04 / Debian):** `sudo apt install git build-essential python3 libsdl2-dev libsdl2-ttf-dev libfontconfig-dev qmake6`
+  — `qmake6` is the tool only, no Qt is linked: MAME's Linux build asks it for a
+  folder, and without it the build fails minutes in with `char8_t` errors.
+- **macOS:** the Command Line Tools (`xcode-select --install`), then Homebrew
+  `brew install sdl3 pkgconf`
+- **Windows:** MSYS2, in its MINGW64 shell:
+  `pacman -S git make patch mingw-w64-x86_64-gcc mingw-w64-x86_64-pkgconf mingw-w64-x86_64-python`
+
     git clone https://github.com/mamedev/mame mame && cd mame && git checkout 27a8d9e85b58058965907d1d8a7a92f8ed039348     # tag mame0288
     git apply /path/to/emulator/0002-cps2-wide-v1.patch
-    make SOURCES=src/mame/capcom/cps2.cpp SUBTARGET=cps2 -j8    # CPS-2-only build, minutes not hours
-    ./cps2 -verifyroms vsavjw -rompath "/your/built/set;/your/dumps"   # says "is bad" BY DESIGN: it lists exactly the
-                                                                 # members inside vsavjw.zip as INCORRECT CHECKSUM (the
-                                                                 # driver carries the stock CRCs for the members the port
-                                                                 # rewrites and sentinel CRCs for the new ones) — nothing
-                                                                 # may be NOT FOUND. "is good" is not reachable on this set.
+    make SOURCES=src/mame/capcom/cps2.cpp SUBTARGET=cps2 -j8                  # macOS, Windows (MSYS2 MINGW64)
+    make SOURCES=src/mame/capcom/cps2.cpp SUBTARGET=cps2 USE_QTDEBUG=0 -j8    # LINUX: MAME turns its Qt debugger
+                                                                 # ON there by default, then stops on a missing `moc`;
+                                                                 # USE_QTDEBUG=0 turns it off (no Qt is linked)
+    ./cps2 -verifyroms vsavjw -rompath "/your/built/set"   # says "is bad" BY DESIGN: it lists every member the
+                                                           # port rewrites or adds as INCORRECT CHECKSUM (the driver
+                                                           # carries the stock CRCs for the members the port rewrites
+                                                           # and sentinel CRCs for the new ones); the members copied
+                                                           # unchanged from your dumps are not listed. Nothing may be
+                                                           # NOT FOUND. "is good" is not reachable on this set.
+    ./cps2 vsavjw -rompath "/your/built/set" -skip_gameinfo   # PLAY: -skip_gameinfo removes one of the two
+                                                              # screens that wait for a key; the red box is the other
 
 The patch is 164 lines added and exactly ONE line removed (the sprite
 tile-code composition, gated on `m_cps2_wide`, a driver member only the

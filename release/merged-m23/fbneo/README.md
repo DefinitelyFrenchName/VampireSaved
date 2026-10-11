@@ -178,14 +178,16 @@ You need the prepared emulator, and then the game file next to it.
      in `EMULATOR.md`. Use this if your system is not listed above, or if you
      would rather build it yourself than trust a binary.
    Both routes give the same program.
-2. **The easy way — macOS: double-click `PLAY.command`** (Linux:
+2. **The easy way, with the prebuilt download — macOS: double-click `PLAY.command`** (Linux:
    `sh PLAY.command`). **Windows: double-click `PLAY.bat`.** It picks the right
    program for your machine, checks it is the prepared one and not an ordinary
    copy, handles macOS's "downloaded from the internet" block, puts your
    `vsavjw.zip` where this emulator actually looks for it, and starts the game.
    If anything is missing it names it. Skip to step 4.
    On Windows, double-clicking `fbneo.exe` itself only flashes a window shut: it needs the game name, which `PLAY.bat` gives it (`fbneo.exe vsavjw`, started from its own folder with the set in `roms\` beside it).
-3. **By hand.** Put the `vsavjw.zip` you built in step 1 in a folder called `roms/` next to the emulator program, and start the emulator FROM that folder. This sounds fussy and is: this version of FBNeo has no setting for where games live — it only ever looks in `roms/` beside wherever you started it, so pointing at the file from its menu will not work.
+3. **By hand** (the `-recipe` route always starts here: `PLAY.command` and `PLAY.bat` only
+   run a prebuilt program, so with an emulator you built yourself they stop and say so).
+   Put the `vsavjw.zip` you built from your dumps (the README's first part) in a folder called `roms/` next to the emulator program, and start the emulator FROM that folder. This sounds fussy and is: this version of FBNeo has no setting for where games live — it only ever looks in `roms/` beside wherever you started it, so pointing at the file from its menu will not work.
    It is the **only** file you put there — not `vsav.zip`, not `vsavj.zip`, not
    the sound file. Everything the emulator needs is already inside it.
 4. Start it. The emulator calls this game `vsavjw`. When it works, the first

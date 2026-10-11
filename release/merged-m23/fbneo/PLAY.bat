@@ -31,9 +31,10 @@ echo    or build one with emulator\0002-cps2-wide-v1.patch per EMULATOR.md.
 goto fail
 :profile_ok
 
-rem -- 3. find the romset the applier built, nearest first
+rem -- 3. find the romset the applier built: the NEWEST of the places a player puts it
+rem    (GitHub 248, ruled 2026-10-10: an old set left from an earlier launch never wins)
 set "ZIP="
-for %%C in ("%BINDIR%\roms\vsavjw.zip" "%HERE%\roms\vsavjw.zip" "%HERE%\vsavjw.zip" "%HERE%\rompath\vsavjw.zip") do if not defined ZIP if exist "%%~C" set "ZIP=%%~C"
+for %%C in ("%BINDIR%\roms\vsavjw.zip" "%HERE%\roms\vsavjw.zip" "%HERE%\vsavjw.zip" "%HERE%\rompath\vsavjw.zip") do if exist "%%~C" call :consider "%%~C"
 if defined ZIP goto have_zip
 echo !! vsavjw.zip not found.
 echo    Build it from YOUR OWN dumps first - see README.md. The easy way:
@@ -63,7 +64,8 @@ goto fail
 mkdir "%ROMS%"
 if errorlevel 1 goto fail
 :roms_ok
-if exist "%ROMS%\vsavjw.zip" goto roms_has
+rem the chosen set goes into roms\, replacing an older copy (GitHub 248)
+if /i "%ZIP%"=="%ROMS%\vsavjw.zip" goto roms_has
 copy /y "%ZIP%" "%ROMS%\vsavjw.zip" >nul
 if errorlevel 1 goto copy_failed
 goto roms_has
@@ -92,3 +94,19 @@ exit /b %RC%
 echo.
 pause
 exit /b 1
+
+rem -- consider one candidate: kept when it is the first, or NEWER than the one held.
+rem    xcopy /d /l lists the source only when it is newer than the destination, so its
+rem    output is two lines (the file, the count) when newer and one line otherwise; the
+rem    count of lines does not depend on the language Windows speaks (measured on ERIS).
+rem    Both tools by their FULL path: a PATH holding Git's or MSYS2's usr\bin finds a Unix
+rem    find first, which reads /c as a folder and walks the whole C: drive (paid on ERIS).
+:consider
+if defined ZIP goto consider_cmp
+set "ZIP=%~1"
+exit /b 0
+:consider_cmp
+set "NEWER="
+for /f %%L in ('%SystemRoot%\System32\xcopy.exe /d /y /l "%~1" "%ZIP%" ^| %SystemRoot%\System32\find.exe /c /v ""') do set "NEWER=%%L"
+if "%NEWER%"=="2" set "ZIP=%~1"
+exit /b 0
