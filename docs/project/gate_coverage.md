@@ -13,11 +13,11 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**454 of 454 gates described.**
+**455 of 455 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
-| [runner](#runner) | 43 | 43 | the suite runners and their own ground truth |
+| [runner](#runner) | 44 | 44 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 48 | 48 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -30,7 +30,7 @@ first sentence) is `gate_index.md`.
 
 ## runner
 
-the suite runners and their own ground truth. 43 of 43 described.
+the suite runners and their own ground truth. 44 of 44 described.
 
 ### `run_all_emulator.sh` — run, emulator
 
@@ -327,6 +327,14 @@ the suite runners and their own ground truth. 43 of 43 described.
 **HOW:** drives the tool's selftest (eight cases in a synthetic git repository); seven controls — one per failure condition (#185 item 5) — run copies with that condition's failure turned into a print, and each must fail the selftest.
 
 **EXPECTS:** the selftest's eight cases read as designed and all seven controls fail on their copies.
+
+### `test_session_metrics.sh` — test, ci_portable
+
+**WHAT:** tools/session_metrics.py reads the rule-checker ledger, the static tier's run records, git log, STATE's session headings and findings rows, the retraction files, the ticket index and the session transcripts, and emits the dashboard's datasets, each figure carrying {value, class, source, rule}.
+
+**HOW:** builds a SYNTHETIC repository and project directory (no real transcript is committed: one carries the user's identity) holding every shape the collector must read right — a session key and its letter continuation (14z-9 / 14z-9b), a ledger row keyed by the transcript id instead of the key, an assistant message spread over two records (one usage), a mid-turn message recorded as a queue enqueue AND a user record (one message), harness noise, a transcript id on one STATE heading and none on the other (mapped by its commits), a tier run inside the span and one outside it — and requires the collector's exact figures; then `check` must pass, a PLANTED ledger row must move the run count by exactly one, and three controls run shadow copies with one perturbation each, each of which must fail the comparison for its own reason.
+
+**EXPECTS:** 14z-9: 4 rule-checker runs (one keyed by its transcript id), 2 VIOLATED, Q1/Q4/QP3 1 each, 3 packets, 1 re-check, longest 2; 1 commit (14z-9b's not counted); 3 findings; 2 retracted wordings; 2 tickets; 2 maintainer messages; reply median 10.0 min; 700 output tokens; 1 worker; 1 tier run, 0.03 h, 1 FAIL. 14z-10: its transcript found by its commit (DERIVED). check: 0 bad. The plant: 5 runs. Each control FIRES.
 
 ### `test_shell_portability.sh` — test, ci_portable
 

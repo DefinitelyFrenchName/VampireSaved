@@ -419,6 +419,7 @@ declares	test_scratch_census
 declares	test_select_arrays
 declares	test_select_port_hygiene
 declares	test_select_wheel
+declares	test_session_metrics
 declares	test_shadow_tenant
 declares	test_shared_writes
 declares	test_shell_portability

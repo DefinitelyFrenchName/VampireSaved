@@ -16,11 +16,11 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**454 scripts** — 126 ci_portable, 92 ci_static, 236 emulator-tier (run by name).
+**455 scripts** — 127 ci_portable, 92 ci_static, 236 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 43 | the suite runners and their own ground truth |
+| [runner](#runner) | 44 | the suite runners and their own ground truth |
 | [docs](#docs) | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 48 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -74,6 +74,7 @@ the suite runners and their own ground truth.
 | `tests/test_run_on_snapshot.sh` | test | ci_portable | — | S6 OF GitHub #153 (and #181's inputs): a run on a snapshot is IMMUNE to the working tree (ruled 2026-09-26, DECISIONS_HISTORY.md "Ruled 2026-09-26 (14z-183b) — #153"; | 2026-09-26 |
 | `tests/test_run_record.sh` | test | ci_portable | — | a runner's record of what it ran on names every change to what it recorded (`tools/run_record.py`, 14z-185b, GitHub #189: "R-reach, both runners"). | 14z-185b |
 | `tests/test_scratch_census.sh` | test | ci_portable | — | every scratch program a session wrote is classed, and each class holds (`tools/scratch_census.py`, 14z-185b, GitHub #190 P4). | 14z-185b |
+| `tests/test_session_metrics.sh` | test | ci_portable | — | the session dashboard's collector reads every source as its rule says and labels every figure with its class (`tools/session_metrics.py`, 14z-198, GitHub #264). | 14z-198 |
 | `tests/test_shell_portability.sh` | test | ci_portable | — | a `#!/bin/sh` script must actually be POSIX sh (14z-90, GitHub issue #15). | 14z-90 |
 | `tests/test_static_confirm.sh` | test | ci_portable | — | the static tier's carry-forward predictor marks a gate STALE by every rule it states (`tools/static_confirm.py`, 14z-185b, GitHub #188 route A — wired 14z-188). | 14z-185b |
 | `tests/test_suite_dispatch.sh` | test | emulator | MAME, a build dir | ground truth for the auto-detecting runner's dispatch pieces (no emulator needed; the emulator-side behaviors they gate are proven by test_m2_repoint.sh and the suite itself): 1. build_fingerprint: vanilla rompath -> 'vsavj'; | 14z-132 |

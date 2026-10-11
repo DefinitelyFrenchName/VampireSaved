@@ -6579,3 +6579,16 @@ So: #228 closes `done` in the 14z-197 close — its index row with its four answ
 - the maintainer chose: *"No new ticket"*
 
 So: #119's index row reads `declined`, its ruling links here, and nothing is filed for the need; the approach's flaw is not described in the tree beyond the maintainer's words above.
+
+---
+
+## Ruled 2026-10-11 (14z-198) — the release: merged-m23 is re-released, not frozen anew
+
+**The ask:** the maintainer: *"Then I'd like to release, which will also close all the done unshippped tickets"*.
+
+**The question (in chat, AskUserQuestion):** which form the release takes. Since the M23 freeze the romset inputs changed only in comments and one audit expectation, and everything the done-unshipped tickets fixed is release tooling (the applier, the launchers, the packager, the uploader); either way the staleness audit names 188 release-scope emulator gates stale, plus 2 whose newest row is a SKIP, and all of them re-run. The options: re-release merged-m23 (same romset and in-game "M23", release/merged-m23 regenerated with the current tools, the release-cadence tiers, the nine assets on freeze/merged-m23 replaced; no freeze battery) or a new freeze M24 (the full freeze ritual, then freeze/merged-m24).
+
+**The maintainer:**
+- the maintainer chose: *"Re-release merged-m23"*
+
+So: no new freeze and no version-string change; release/merged-m23 is regenerated from build/m3b_merged31 with the current tools and the regenerated files replace the committed ones after review; the release-cadence static tier and the emulator release run (`--scope all --lane all --strict --controls`, stale gates re-run) gate it; `tools/upload_release_assets.sh freeze/merged-m23` replaces the nine assets (`--clobber`, each verified by download); the done-unshipped tickets close against it.
