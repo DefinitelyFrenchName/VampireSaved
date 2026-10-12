@@ -1,5 +1,5 @@
 # tests/expected/instr_gameclock/audit_walker_ghost.tsv — the game clock RAM:$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,
-# option A) by `tests/audit_walker_ghost.sh --freeze-clock` at 980ec0d8, BUILD m3b_merged31.
+# option A) by `tests/audit_walker_ghost.sh --freeze-clock` at 58302669, BUILD m3b_merged31.
 # leg<TAB>replay<TAB>frames<TAB>gameclock
 vsavj	01_attract_long	7320	0c
 reloc	01_attract_long	7320	0c
@@ -31,6 +31,22 @@ vsavj	106_pyron_cosmo_clash	6120	8b
 reloc	106_pyron_cosmo_clash	6120	8b
 vsavj	10_midattract_start	6120	8b
 reloc	10_midattract_start	6120	8b
+vsavj	118_chain	3608	bb
+reloc	118_chain	3608	bb
+vsavj	118_input_sweep	4928	e3
+reloc	118_input_sweep	4928	e3
+vsavj	118_sel_b1	5320	6b
+reloc	118_sel_b1	5320	6b
+vsavj	118_sel_b2	5320	6b
+reloc	118_sel_b2	5320	6b
+vsavj	118_sel_b3	5320	6b
+reloc	118_sel_b3	5320	6b
+vsavj	118_sel_b4	5320	6b
+reloc	118_sel_b4	5320	6b
+vsavj	118_sel_b5	5320	6b
+reloc	118_sel_b5	5320	6b
+vsavj	118_sel_b6	5320	6b
+reloc	118_sel_b6	5320	6b
 vsavj	11_pick_donovan	3720	2b
 reloc	11_pick_donovan	3720	2b
 vsavj	12_donovan_vs_cpu	9320	0b
