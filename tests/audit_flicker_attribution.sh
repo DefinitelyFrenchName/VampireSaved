@@ -4,8 +4,9 @@
 # commit message that first made it.
 #
 # WHAT: why each flicker frame of the frozen composite expectations is there: every
-#   differing byte at the attributed frames (41_don_altcolor +2313, 37_victor_ko +7168,
-#   105_legacy_2pwin_auto +2713/+5868) falls inside a NAMED window — the palette-fade
+#   differing byte at the attributed frames (37_victor_ko +7168,
+#   105_legacy_2pwin_auto +2713/+5868, and +2093 of 03_two_player_vs and the five #118 replays whose
+#   merged-m23 spec carries it) falls inside a NAMED window — the palette-fade
 #   staging buffer rows or the OBJ-builder secondary stack — re-derived rather than trusted
 #   from the commit that first wrote it.
 # HOW: ours-vs-vanilla work-RAM dumps at the attributed frames on MAME, every differing byte
@@ -15,6 +16,7 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/lua/replay.lua
 #   tests/replays/ tools/attribute_ramdiff.py tools/build_fingerprint.py tools/run_mame.sh
 #   tools/run_replay_mame.sh tools/setup_mame.sh
+# MUST-FIRE: perturbed-copy: wrong-window — every case expects `qsound-handshake-latch`, a window none of the cases' bytes reach, so the count-aware check must FAIL each case (mode: the real cases with that expectation)
 #
 # WHY (14z-91). The legacy-regression fix re-measured 139 specs, and two of
 # them GAINED a flicker frame:
@@ -54,6 +56,23 @@
 #            and cannot reclassify a byte in the two older cases.
 # Cost: 105 is 9,620 frames, so the gate goes from seconds to a few minutes.
 #
+# EXTENDED 14z-198 with frame 2093, the flicker 03_two_player_vs has carried
+# since the first masked basis: the merged-m23 re-release's audit_legacy_pairings
+# found the #118 replays (landed after the freeze, all built on 03) with no
+# expectation, and five of their eight specs carry +2093. Dump-diffed at 2093
+# on merged-m23 before the specs were written: 03, 118_sel_b1 (03's inputs
+# verbatim), 118_chain, 118_input_sweep and 118_sel_b3 -> 8 bytes in staging row 0x0C (plus masked dead-stack bytes),
+# 118_sel_b2 -> 4 bytes there; 118_sel_b4, whose spec is window-only, differs
+# only in the masked dead stack. Staging row 0x0C again — not a new mechanism.
+# FIXED IN THE SAME CHANGE: the "is $want among the windows hit" test was
+# `grep -q "$want"` over a summary line that names EVERY window with its count,
+# so it could not fail; it now demands a non-zero count in $want (control
+# `wrong-window`). Corrected, it showed 41_don_altcolor_vsavj +2313 had nothing
+# in staging row 0x0C — its differing bytes are the masked dead stack only — and
+# merged-m23 specifies 41 as `window vsavj/masked-v2 889 2091`, with no 2313: the
+# case asserted a donovan-m7 frame the build under test no longer flickers on,
+# so it is retired rather than kept green by the vacuous match.
+#
 # THE WINDOWS ARE NAMED, WHICH IS THE POINT. "The two builds differ, and
 # that's expected" is the absence of a verdict. Every differing byte must
 # fall in a window someone can name, and tools/attribute_ramdiff.py prints
@@ -78,6 +97,7 @@
 #   MAME runs
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that
 # still contain $ROMDIR (e.g. MAME_ROMPATH="...;$ROMDIR"); a RELATIVE value —
@@ -115,13 +135,19 @@ WINDOWS="--window 043C-043D:qsound-handshake-latch
          --window 06D0-06EF:obj-builder-stack"
 
 # frozen (replay, frame, which row it must land in)
-CASES="41_don_altcolor_vsavj:2313:staging-row-0x0C
-       37_victor_ko_vsavj:7168:staging-row-0x0A
+CASES="37_victor_ko_vsavj:7168:staging-row-0x0A
        105_legacy_2pwin_auto:2713:staging-row-0x0C
-       105_legacy_2pwin_auto:5868:obj-builder-stack"
+       105_legacy_2pwin_auto:5868:obj-builder-stack
+       03_two_player_vs:2093:staging-row-0x0C
+       118_sel_b1:2093:staging-row-0x0C
+       118_chain:2093:staging-row-0x0C
+       118_input_sweep:2093:staging-row-0x0C
+       118_sel_b2:2093:staging-row-0x0C
+       118_sel_b3:2093:staging-row-0x0C"
 
 for c in $CASES; do
     rpl="${c%%:*}"; rest="${c#*:}"; frame="${rest%%:*}"; want="${rest##*:}"
+    if vs_ctl_is wrong-window; then want=qsound-handshake-latch; fi
     echo "== $rpl frame $frame — expect the unmasked diff in $want =="
     mkdir -p "$W/van_$rpl" "$W/new_$rpl"
     DUMPS="$frame:ff0000-ffffff" MASK_RANGES="$MASK" MAME_ROMPATH="$ROMDIR" \
@@ -155,7 +181,7 @@ for c in $CASES; do
         fail=1
         continue
     fi
-    if printf '%s' "$out" | grep -q "$want"; then
+    if printf '%s' "$out" | grep -Eq "[;,] [1-9][0-9]* $want(,|\$)"; then
         echo "  ok: attributed, and $want is among the windows hit"
     else
         echo "  FAIL: nothing landed in $want — the mechanism moved rows."
@@ -163,6 +189,10 @@ for c in $CASES; do
     fi
 done
 
+if vs_ctl_is wrong-window; then
+    if [ "$fail" = 1 ]; then vs_ctl_fired wrong-window "every case expecting qsound-handshake-latch read nothing in it"
+    else vs_ctl_dead wrong-window "a case expecting qsound-handshake-latch passed — the window check cannot fail" || fail=1; fi
+fi
 echo
 [ "$fail" = 0 ] && echo "FLICKER ATTRIBUTION: PASS" || echo "FLICKER ATTRIBUTION: FAIL"
 exit "$fail"

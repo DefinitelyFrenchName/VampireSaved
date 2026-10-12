@@ -1450,7 +1450,7 @@ the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, du
 
 ### `audit_flicker_attribution.sh` — audit, emulator
 
-**WHAT:** why each flicker frame of the frozen composite expectations is there: every differing byte at the attributed frames (41_don_altcolor +2313, 37_victor_ko +7168, 105_legacy_2pwin_auto +2713/+5868) falls inside a NAMED window — the palette-fade staging buffer rows or the OBJ-builder secondary stack — re-derived rather than trusted from the commit that first wrote it.
+**WHAT:** why each flicker frame of the frozen composite expectations is there: every differing byte at the attributed frames (37_victor_ko +7168, 105_legacy_2pwin_auto +2713/+5868, and +2093 of 03_two_player_vs and the five #118 replays whose merged-m23 spec carries it) falls inside a NAMED window — the palette-fade staging buffer rows or the OBJ-builder secondary stack — re-derived rather than trusted from the commit that first wrote it.
 
 **HOW:** ours-vs-vanilla work-RAM dumps at the attributed frames on MAME, every differing byte classified by tools/attribute_ramdiff.py against the named windows.
 

@@ -1,5 +1,7 @@
 # `merged-m23`
 
+*(EXTENDED 2026-10-12, 14z-198, at the merged-m23 re-release: eight `.masked` specs for the #118 replays that landed after the freeze (`118_chain`, `118_input_sweep`, `118_sel_b1`..`b6`), which `audit_legacy_pairings` read LEGACY with no expectation. Their vanilla logs extend `tests/expected/vsavj/masked-v2` (instrument control `03_two_player_vs` reproduced); the shapes are `03_two_player_vs`'s own on this build — the select window 889-1871, and frame 2093 where the confirm button is 1-3, attributed to the palette-fade staging row 0x0C by `audit_flicker_attribution`. No other file of the set changed.)*
+
 *(CARRIED 2026-10-05 from `merged-m22` by tools/freeze_expectation_set.py: the authored `.masked` specs, the `.skip` markers and the mask copied verbatim, then frozen and verified on `build/m3b_merged31`. The body below is the carried README; the fingerprints it names are its history.)*
 
 # `merged-m22`
