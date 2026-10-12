@@ -1,0 +1,9 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent198/skip118/audit_walker_ghost.eris_s.log	89097acb7c86899734cc41fc4766c302d7625e1e
+build/agent198/skip118/wg_freeze.log	1a660c57516e13b796546943a62bc74b31d66d63
+build/agent198/skip118/wg_keys.py	3f6a830f32538afb0e5651bca8479f7b5dd694ca
+build/agent198/skip118/wg_keys.txt	94645aa3e6f0abdd32d4db0811288baddffbdd1e
+build/agent198/skip118/wg_runner.log	4c7289aaf23df80a8229298ef1b2b34e5925b6da
+build/agent198/skip118/wg_runner_cmd.txt	6ba0268572a8147ab2ed9db8cd30658a6d716331
+tests/audit_walker_ghost.sh.lines-1-40 (lines 1-40 of tests/audit_walker_ghost.sh)	0b98eec516e76b0e2f5cc19be6d37308590cf37f
+tests/audit_walker_ghost.sh.lines-200-245 (lines 200-245 of tests/audit_walker_ghost.sh)	4421625718bebcb2934b6314e842fbfce2be99ef

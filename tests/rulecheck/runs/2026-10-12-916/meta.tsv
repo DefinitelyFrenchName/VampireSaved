@@ -1,0 +1,9 @@
+decision	expectation
+subject	freeze the #118 replays' game clocks into tests/expected/instr_gameclock/audit_walker_ghost.tsv after their vanilla basis logs entered the walker gate's corpus (re-check after run 915)
+session	14z-198
+model	rule-checker@163e4ce9cf7b
+claim	Freeze 16 new rows into tests/expected/instr_gameclock/audit_walker_ghost.tsv, because the release rerun's audit_walker_ghost FAIL on ERIS (audit_walker_ghost.eris_s.log) is runs with no frozen game clock in a corpus of every replay with a vanilla basis log, which the #118 replays joined: tests/audit_walker_ghost.sh --freeze-clock at 58302669 froze 128 clocks from reference legs (wg_freeze.log); against HEAD the 112 existing rows came back unchanged, none changed or gone, and the 16 added rows are exactly 118_chain, 118_input_sweep and 118_sel_b1..b6 on vsavj and reloc, each pair agreeing, the six 118_sel_b* at 5320 frames reading 6b as 03_two_player_vs's own rows do, and of the header, printed whole on both sides, one line differs: the commit stamp 980ec0d8 -> 58302669, BUILD m3b_merged31 on both (wg_keys.txt from wg_keys.py); the gate then PASSes through the runner with all five controls honoured (wg_runner.log, invocation in wg_runner_cmd.txt). NOT TESTED: the freeze and its verification ran on one host (MacBook-Pro.local at 58302669), not ERIS; the 16 clocks are each reference leg's own reading with no independent clock source compared; ERIS's log lists 8 of its 16 failing runs, so the 16 are identified from the freeze diff; the runner's log does not echo --strict, which only wg_runner_cmd.txt states.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
