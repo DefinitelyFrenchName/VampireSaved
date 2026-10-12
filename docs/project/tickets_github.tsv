@@ -2,8 +2,14 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 267
+# issues: 273
 number	state	reason	closed	labels	title
+273	OPEN	-	-	evolution	Measure a bounded Q1 on past rule-checker packets before any rewording
+272	OPEN	-	-	evolution	A pre-prepare check for rule-checker packets: figures staged, attributions quoted, absolutes flagged, small packets
+271	OPEN	-	-	evolution	Rule-checker readers exempt from the unsourced-figure hint, a recurrence alarm over the ledger, and resolve refuses unticketed instrument-blame
+270	OPEN	-	-	evolution	The close's documentation packet asks only what the deterministic close checks do not cover; presentation fixes re-checked deterministically
+269	OPEN	-	-	evolution	Static tier turned around: a session runs the gates whose followed paths changed plus a core, controls only for changed gates; freeze and release run everything
+268	OPEN	-	-	evolution	test_close_tools cut back: session runs self-tests only, one-pass retraction scan at freeze/release, section-scoped control modes, retraction-file audit
 267	OPEN	-	-	evolution	Session ledger as a static page generated into docs/site/ at each close (hosting and what to publish are the maintainer's calls)
 266	OPEN	-	-	bug	PILOT's GNOME Shell segfaults under Wayland since 2026-10-09, so audit_release_linux_desktop cannot run
 265	OPEN	-	-	evolution	audit_mask_window_ff42a2 at a release: an instrument with no default subject SKIPs, and the staleness audit now FAILs that SKIP
