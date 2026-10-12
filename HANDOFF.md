@@ -1388,6 +1388,8 @@ MAME lane's 30 controls cost 15 min in all, because several stop at their first
 perturbed input (`audit_guard_corpus@known-crash` 21 s against its gate's
 1,830 s). Rows: `build/emu_controls_14z153/results.tsv`.
 
+**AND ON ERIS, SPLIT BY HOST (14z-198, the merged-m23 re-release):** the MiSTer lane on this Mac (`--lane mister --jobs 4`, PASS 12, longest `test_mister_gfxc_fetch` 5,857 s) and prereq/fbneo/mame on ERIS's WSL2 (`--jobs 12`): 413 rows, 404 PASS. **`--jobs 12` there is too many for the headroom rule:** four rows crossed half their cap under the load (`audit_guard_corpus` 10,184 s of 14,400 against its usual ~4,500-5,200; `audit_hitclass_map_cost` and a control 0.51-0.52; `audit_merged_legacy@first-frame-skip` 0.58); re-run one gate per runner, six at a time (`xargs -P 6`), they came back at 0.29-0.32. Start an ERIS tier script headless (`docs/platform/gotchas.md` "ON A WSL2 BOX REACHED ONLY OVER SSH"). Three gates are host-bound at a release: `test_mame_parity` needs a reference MAME distinct from the build under test (this Mac's Homebrew one), `test_release_binaries` and `test_readme_recording` the host's own release binaries; the Linux-release pair runs on PILOT (`podman`, a GNOME Wayland session).
+
 **THE SAME RUN ON PILOT, PER GATE (14z-189 run, read 14z-193, #122; the
 answer ruled "Sounds good enough"):** PILOT (`ssh pilot`, 6 vCPU of a Ryzen 5700G, 40 GiB,
 Ubuntu 24.04) ran the same command at `--jobs 4` on `9f7d9b45` (the M21-era tree),

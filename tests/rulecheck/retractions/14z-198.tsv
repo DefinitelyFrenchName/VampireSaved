@@ -1,0 +1,3 @@
+# tests/rulecheck/retractions/14z-198.tsv — the wordings retracted or corrected in 14z-198, and reach controls that must be found live; columns pattern, source, class (retracted | reach:N)
+41_don_altcolor_vsavj:2313:staging-row-0x0C	14z-198 (the merged-m23 re-release): audit_flicker_attribution's case asserting 41 +2313 in staging row 0x0C was green only through a window check that could not fail; on merged-m23 the frame shows 0 bytes there and the set specifies 41 as window 889 2091 — the case retired in tests/audit_flicker_attribution.sh	retracted
++2313 had nothing	control: the correction, live in tests/audit_flicker_attribution.sh's header	reach:1
