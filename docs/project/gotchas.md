@@ -6581,7 +6581,8 @@ restored, and the battery restarted with `. "$HOME/.profile"` as the script's fi
 `ssh eris "wsl -e bash -lc '...'"` does not survive Windows' quoting (an unexpected-EOF, nothing started).
 **The rule:** a remote tier script sources the box's profile first and prints `command -v mame` before the
 runner, so the binary it will use is in the log; a prereq red on a box where the same gate was green at the
-last freeze is checked against the environment before the build.
+last freeze is checked against the environment before the build. On a WSL2 box the script also clears
+WSLg's display and sound environment (`docs/platform/gotchas.md` "ON A WSL2 BOX REACHED ONLY OVER SSH", 14z-198).
 **Paid FIRST on PILOT, and recorded nowhere until 14z-193 (#122):** PILOT's `--controls` release tier
 (`~/vampire-saved/build/emu_pilot_14z189_controls`, `9f7d9b45`, 2026-10-02) failed the same two gates with
 the same text (`test_decrypt_oracle.sh: 34: mame: not found`; `test_patch_prg` on a missing `opc.bin`) and

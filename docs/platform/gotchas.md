@@ -3288,3 +3288,23 @@ the same way. Fixed: `PLAY.bat` calls `%SystemRoot%\System32\xcopy.exe` and `...
 `tests/test_release_launcher_bat.sh` drives every `cmd` run under `timeout 120`. **The rule:** a `.bat` names
 Windows tools by full path whenever a same-named Unix tool exists (`find`, `sort`, `timeout`), and every remote or
 emulated run carries a time bound, so a hang turns into a FAIL in minutes.
+
+## ON A WSL2 BOX REACHED ONLY OVER SSH, WSLg COMES UP WITH NO DESKTOP BEHIND IT AND EVERY MAME PROCESS WAITS 100-180 s ON ITS SOCKETS — a release run's two prereq TIMEOUTs were the environment, not the build (paid: 14z-198)
+
+The merged-m23 release run was started on ERIS as `ssh eris 'wsl -e sh -s' < script` with the WSL VM stopped, so
+the SSH cold-started it (the VM's uptime equals the run's start). WSLg's PulseAudio logged `module-rdp-sink.c:
+Connected failed` every 5 s: no Windows desktop session was attached. The run's environment still carried WSLg's
+`DISPLAY=:0`, `WAYLAND_DISPLAY=wayland-0`, `PULSE_SERVER=unix:/mnt/wslg/PulseServer` and `XDG_RUNTIME_DIR`. A
+gate's MAME (already under `SDL_VIDEODRIVER=dummy` from `tools/run_mame.sh`) sat in `poll` at 20 MB RSS with one
+connected Unix socket whose peer was outside the distro and 768 bytes unsent. `test_mame_parity` and
+`test_mame_determinism` were killed at the 5400 s row timeout (their usual times: ~1600-2500 s and ~80-96 s).
+Measured on the same box in the same state, MAME `vsavj -video none -sound none -str 3`: as-is, without
+`DISPLAY`/`WAYLAND_DISPLAY`, without `PULSE_SERVER`, and without all three, each ran its 3 s of emulation at
+~2200 % and then took 102-179 s to exit (the 90 s `timeout` fired). With those three AND `XDG_RUNTIME_DIR`
+unset and `SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy` exported, it exited 0 in 1 s. Which single variable does
+it was not isolated. The run was stopped, set aside on ERIS as `build/emu_rel198_eris.wslg_stalled`, and
+restarted with that environment; its MAME then ran at 99 % CPU. **The rule:** a remote tier script on a WSL2
+box unsets `DISPLAY WAYLAND_DISPLAY PULSE_SERVER XDG_RUNTIME_DIR` and exports `SDL_VIDEODRIVER=dummy
+SDL_AUDIODRIVER=dummy` after sourcing the profile (`docs/project/gotchas.md` "A REMOTE BATTERY STARTED FROM A
+NON-LOGIN SHELL"), and polls its first prereq rows early. A gate many times slower than its own history is the
+environment's until shown otherwise.
