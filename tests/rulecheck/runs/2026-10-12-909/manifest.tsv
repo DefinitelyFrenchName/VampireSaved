@@ -1,0 +1,13 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent198/skip118/b_change.txt	f5c4f60dbce89445a818d22ec07f0532d9167984
+build/agent198/skip118/b_run.log	f08048e5909c347c98927d4be3df9e09359343eb
+build/agent198/skip118/attr2093.log	635a65d35805f08312b6c93440dbd885f3cee05d
+build/agent198/skip118/suite.log	03b87776a57b09457c6782597092c907f6d31c8a
+build/agent198/skip118/accept.log	c8994c176f7b4abe818314325607a291e7a81a18
+build/agent198/skip118/accept2.log	957813d9b0c666a93376cba68be1361951617683
+build/agent198/skip118/audit_flicker_attribution.wt.sh	414938dca8ed67941134b34f6a234a62d3302673
+build/agent198/skip118/audit_legacy_pairings.eris.log	377b512302c717fd3f9968ab609813fa5f33fdfa
+tests/expected/merged-m23/03_two_player_vs.masked	df82a56289adcf00d5497c56c1eb6bd12b2b4aa1
+tests/expected/merged-m23/41_don_altcolor_vsavj.masked	2c5e24f2610fadd3d5cd97550e0950ba191c84e2
+tests/expected/merged-m23/37_victor_ko_vsavj.masked	2d2bd7668ca6a1f01ed21ead14d8f4fc76f22ff7
+docs/project/oracle_classes.md.lines-21-67 (lines 21-67 of docs/project/oracle_classes.md)	19333a88006ebbc7d6a45b78d845375fbc5dd427

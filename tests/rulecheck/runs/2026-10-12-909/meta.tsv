@@ -1,0 +1,9 @@
+decision	expectation
+subject	merged-m23: eight .masked expectations for the #118 replays audit_legacy_pairings found with none; audit_flicker_attribution's window check fixed and extended with frame 2093
+session	14z-198
+model	rule-checker@163e4ce9cf7b
+claim	Freeze composite vsavj/masked-v2 2093 889-1871 for 118_chain, 118_input_sweep and 118_sel_b1..b3 and window vsavj/masked-v2 889 1871 for 118_sel_b4..b6 in tests/expected/merged-m23 (build/agent198/skip118/b_change.txt), resting on vanilla logs added to masked-v2 under the instrument control that re-derived 03_two_player_vs bit-for-bit (b_run.log), the proposer's measured shapes (b_run.log), run_suite's two-run acceptance (suite.log: 8 PASS, SUITE GREEN), the frame-2093 dump diff landing in staging row 0x0C with 118_sel_b4 as the separating case (attr2093.log), and audit_flicker_attribution extended with those cases after its window check was made count-aware with control wrong-window FIRED (accept2.log) and its 41_don_altcolor_vsavj +2313 case retired because that frame shows 0 bytes in staging row 0x0C (accept.log) while merged-m23 specifies 41 as window 889 2091; NOT TESTED: the 889-1871 window is taken as 03_two_player_vs's ratified select window and not re-attributed byte by byte, and 37_victor_ko_vsavj's spec frame 6962 is not a case of the gate.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b

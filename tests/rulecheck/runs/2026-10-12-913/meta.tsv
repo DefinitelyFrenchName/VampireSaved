@@ -1,0 +1,9 @@
+decision	expectation
+subject	re-freeze tests/expected/defense_row_reads.tsv after the #118 replays joined the corpus its suite and vsavj legs glob
+session	14z-198
+model	rule-checker@163e4ce9cf7b
+claim	Re-freeze tests/expected/defense_row_reads.tsv (drr_diff.txt): the release run's audit_defense_row_reads FAIL on ERIS (audit_defense_row_reads.eris.log) is its suite and vsavj legs' corpus growing from 89 to 97 top-level replays (drr_inputs.txt; the glob at gate line 130), shown by a separating control — with the eight #118 replays moved out, the gate at d9dce79b PASSes every row as frozen against the c884e6d8 rows (drr_old89.log), so the older 89 replays and every other current input (drr_inputs.txt: outside tests/replays only two manifests' measurement records moved) reproduce the old counts exactly; with the eight in, the re-frozen file keeps all 115 row keys in order with the two count columns ignored, 12 rows change, all in the suite and vsavj legs, all demitri:01 or victor:03, all rising, and the attacker and victim legs are unchanged (drr_keys.txt from drr_keys.py), and a plain re-run PASSes with range-silent and planted-flavor FIRED (drr_freeze.log). NOT TESTED: the regeneration, its verification and the control ran on one host at d9dce79b (MacBook-Pro.local, drr_freeze.log and drr_old89.log), not a second host; MAME segfaulted at teardown on some runs of both, the known class these gates judge by the tap's END line, and the runs were not counted one by one.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b

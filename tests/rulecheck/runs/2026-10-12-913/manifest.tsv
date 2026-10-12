@@ -1,0 +1,11 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent198/skip118/drr_diff.txt	3a014e7f19f394b3fb065f1b57f42844d14d8fcc
+build/agent198/skip118/audit_defense_row_reads.eris.log	d8523c6c8870d136e17032ecf1d1d402b96b790a
+build/agent198/skip118/drr_inputs.txt	1b6f237cff199f1d0c0fce4f9ab67ee7a54c5130
+build/agent198/skip118/drr_keys.py	81f5f3d383c274a3bdbccc3cd1980b1e129f70c2
+build/agent198/skip118/drr_keys.txt	a1826e15f31b2c67a86397fbbcafda728e73061e
+build/agent198/skip118/drr_freeze.sh	4eaeb765bb60a3696b9d82e89d32f665a8199d3d
+build/agent198/skip118/drr_freeze.log	dc246e4e3fafe0f4217eb8794c5c445e42c3a443
+build/agent198/skip118/drr_old89.sh	0e952b1e132562be5445e3544a04c85628748b11
+build/agent198/skip118/drr_old89.log	e9adcbf99f444464a68336ac5c05106847d54439
+tests/audit_defense_row_reads.sh.lines-1-140 (lines 1-140 of tests/audit_defense_row_reads.sh)	40eddbbe92100c96db95b085e39a4cb081bc8e47

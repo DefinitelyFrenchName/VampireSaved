@@ -1,0 +1,19 @@
+THE PACKET
+
+Decision kind: expectation
+Subject: merged-m23: eight .masked expectations for the #118 replays audit_legacy_pairings found with none; audit_flicker_attribution's window check fixed and extended with frame 2093 (re-check after run 909)
+Claim (the working agent's sentence): Freeze composite vsavj/masked-v2 2093 889-1871 for 118_chain, 118_input_sweep and 118_sel_b1..b3 and window vsavj/masked-v2 889 1871 for 118_sel_b4..b6 in tests/expected/merged-m23 (build/agent198/skip118/b_change.txt), on vanilla logs added to masked-v2 under the instrument control that re-derived 03_two_player_vs bit-for-bit (b_run.log) and ONE measurement of merged-m23 against that basis — the proposer's shapes (b_run.log), reproduced by a filtered run_suite whose own header says it is not a suite verdict (suite.log) — with frame 2093 dump-diffed into staging row 0x0C for 03, 118_sel_b1, 118_chain, 118_input_sweep, 118_sel_b2 and 118_sel_b3 and 118_sel_b4 as the separating case (attr2093.log), 118_sel_b1's inputs equal to 03's (b1_vs_03.txt), and audit_flicker_attribution carrying those six frames as cases after its window check was made count-aware, green with control wrong-window FIRED (accept3.log), its 41_don_altcolor_vsavj +2313 case retired because that frame shows 0 bytes in staging row 0x0C (accept.log) while merged-m23 specifies 41 as window 889 2091. NOT TESTED: no leg independent of the build exists, since each spec freezes merged-m23's own divergence against the basis, so a legacy defect inside 889-1871 or at 2093 in these replays would be frozen in; the 889-1871 window is taken from 03_two_player_vs's frozen merged-m23 spec and not re-attributed byte by byte; the full suite verdict on merged-m23 is owed by audit_merged_legacy on the rerun after the commit; 37_victor_ko_vsavj's spec frame 6962 is not a case of the gate.
+Artifacts (read every one, in full):
+  - build/agent198/skip118/b_change.txt
+  - build/agent198/skip118/b_run.log
+  - build/agent198/skip118/attr2093.log
+  - build/agent198/skip118/suite.log
+  - build/agent198/skip118/accept.log
+  - build/agent198/skip118/accept3.log
+  - build/agent198/skip118/b1_vs_03.txt
+  - build/agent198/skip118/audit_flicker_attribution.wt.sh
+  - build/agent198/skip118/audit_legacy_pairings.eris.log
+  - tests/expected/merged-m23/03_two_player_vs.masked
+  - tests/expected/merged-m23/41_don_altcolor_vsavj.masked
+  - tests/expected/merged-m23/37_victor_ko_vsavj.masked
+  - docs/project/oracle_classes.md.lines-21-67 (lines 21-67 of docs/project/oracle_classes.md)

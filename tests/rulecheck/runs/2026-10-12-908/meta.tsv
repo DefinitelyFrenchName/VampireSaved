@@ -1,0 +1,9 @@
+decision	recommendation
+subject	the merged-m23 release run: audit_legacy_pairings FAIL on eight #118 replays with no merged-m23 expectation — .skip them (A) or make them legacy oracles (B)
+session	14z-198
+model	rule-checker@163e4ce9cf7b
+claim	Recommend option A, a .skip with a stated reason in tests/expected/merged-m23 for 118_chain, 118_input_sweep and 118_sel_b1..b6, put to the maintainer beside option B, resting on the ERIS audit log (build/agent198/skip118/audit_legacy_pairings.eris.log), the replay facts (build/agent198/skip118/replays_118.txt: added 2026-10-08/09 after the c884e6d8 freeze, named by ondemand #118 gates), the 14z-196 ondemand ruling and the post-freeze .skip precedent (27_don_throw_vsavj, 37_pick_huitzil_cell, 40_pick_pyron_cell); NOT TESTED: whether another merged-m23 .masked replay already covers select confirms with buttons 2-6, and whether the eight would pass a masked comparison on merged-m23.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b

@@ -1,0 +1,11 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent198/skip118/RECOMMENDATION.md	11afa560688c5ea0decb5e1a895f083329345a10
+build/agent198/skip118/replays_118.txt	b899a008dd1d86f0a832baf917d2cc6650d1599c
+build/agent198/skip118/audit_legacy_pairings.eris.log	377b512302c717fd3f9968ab609813fa5f33fdfa
+tests/audit_legacy_pairings.sh.lines-1-60 (lines 1-60 of tests/audit_legacy_pairings.sh)	83326ef0c3c5d081ce0d20bfa05d89b280f6c1b8
+DECISIONS_HISTORY.md.lines-559-590 (lines 559-590 of DECISIONS_HISTORY.md)	37fb6b3d8cee1c694056e88fb704129a44d811a9
+tests/expected/merged-m23/27_don_throw_vsavj.skip	9fabf736ca579433115f092cbe4edf080b8302e8
+tests/expected/merged-m23/37_pick_huitzil_cell.skip	938184fb8a2a67392060477bc382273c43a2fb58
+tests/expected/merged-m23/40_pick_pyron_cell.skip	5e608df51cb7ef8d0c9b3b52851b86a28230aa14
+tests/expected/merged-m23/03_two_player_vs.masked	df82a56289adcf00d5497c56c1eb6bd12b2b4aa1
+tests/ci_emulator.tsv.lines-325-340 (lines 325-340 of tests/ci_emulator.tsv)	dbf6937603b233d4a671e673d9fccc5106a300d1

@@ -1,0 +1,9 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent198/skip118/rcl_diff.txt	b8273e0999a94ae95cabba0b9c2bcb57609789ad
+build/agent198/skip118/audit_reaction_class_live.eris.log	9d894fefd96ae408ddcb2e60589011daa36c917f
+build/agent198/skip118/rcl_corpus.txt	a727e46de5f1bb9dbd79c7ff3284057ff18b0799
+build/agent198/skip118/rcl_keys.py	79c8cc6bbaee50197ce809115eb3c6f910279273
+build/agent198/skip118/rcl_keys.txt	fd090b1515b22d5bc7bd2c8c044f9271dbadc603
+build/agent198/skip118/rcl_freeze.log	cf530a9b85332ddd4a7f6b210e4e035550f81765
+build/agent198/skip118/rcl_verify.log	cbdcc55d8e6b6858ee8eef686b95a0b6f72c014c
+tests/audit_reaction_class_live.sh.lines-1-120 (lines 1-120 of tests/audit_reaction_class_live.sh)	fad33525e6c36232191a9ea461a47d6db67fe5d4

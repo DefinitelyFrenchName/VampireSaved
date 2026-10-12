@@ -1,0 +1,9 @@
+decision	expectation
+subject	re-freeze tests/expected/reaction_class_live.tsv after the #118 replays joined the corpus its vsavj leg globs (re-check after run 911)
+session	14z-198
+model	rule-checker@163e4ce9cf7b
+claim	Re-freeze tests/expected/reaction_class_live.tsv (rcl_diff.txt): the release run's audit_reaction_class_live FAIL on ERIS (audit_reaction_class_live.eris.log) is the vsavj leg's corpus growing from 89 to 97 top-level replays (rcl_corpus.txt), shown by a separating control — with the eight #118 replays moved out and the c884e6d8 rows restored, the gate at 7c757b12 PASSes with every row as frozen (rcl_old89.log), so the older 89 replays and every other current input (rcl_inputs.txt: outside tests/replays only two manifests' measurement records moved) reproduce the old counts exactly; with the eight in, the re-frozen file keeps all 350 row keys in order with counts ignored, 44 vsavj counts rise by 1, 6, 7 or 8, the runs row reads 89 to 97 and the ours and native legs are unchanged (rcl_keys.txt from rcl_keys.py), and a plain re-run PASSes with range-silent and planted-38 FIRED (rcl_verify.log). NOT TESTED: the regeneration, its verification and the control ran on one host at 7c757b12 (MacBook-Pro.local, rcl_old89.log), not a second host; whether the eight replays deserve a dedicated case is not judged.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b

@@ -1,0 +1,14 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent198/skip118/b_change.txt	9866a781e5664060bd161479f6ac797b56e0dae9
+build/agent198/skip118/b_run.log	f08048e5909c347c98927d4be3df9e09359343eb
+build/agent198/skip118/attr2093.log	ee2ddd89ef0e249f06a961161f58f846f8a5ed44
+build/agent198/skip118/suite.log	03b87776a57b09457c6782597092c907f6d31c8a
+build/agent198/skip118/accept.log	c8994c176f7b4abe818314325607a291e7a81a18
+build/agent198/skip118/accept3.log	10234b28e85eefe7f4a4f032b41a5fcb8eca45ed
+build/agent198/skip118/b1_vs_03.txt	17933613c534a7c3a4a164e3bac079375291de56
+build/agent198/skip118/audit_flicker_attribution.wt.sh	7012e90a83a33242ae5e8fc3160bbf24482a6642
+build/agent198/skip118/audit_legacy_pairings.eris.log	377b512302c717fd3f9968ab609813fa5f33fdfa
+tests/expected/merged-m23/03_two_player_vs.masked	df82a56289adcf00d5497c56c1eb6bd12b2b4aa1
+tests/expected/merged-m23/41_don_altcolor_vsavj.masked	2c5e24f2610fadd3d5cd97550e0950ba191c84e2
+tests/expected/merged-m23/37_victor_ko_vsavj.masked	2d2bd7668ca6a1f01ed21ead14d8f4fc76f22ff7
+docs/project/oracle_classes.md.lines-21-67 (lines 21-67 of docs/project/oracle_classes.md)	19333a88006ebbc7d6a45b78d845375fbc5dd427
