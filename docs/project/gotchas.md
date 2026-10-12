@@ -6942,3 +6942,28 @@ Windows host can test it. **A trap in the testing:** `tests/test_release_launche
 `PLAY.command`, so it cannot see a template change before the next packaging. `tests/test_launcher_newest.sh`
 renders the launcher from the current template (`launcher_text`), control `first-found`. **The rule:** a
 generator's change is tested on what the generator emits now, never on the last artifact it emitted.
+
+## A REPLAY ADDED TO THE CORPUS IS AN INPUT TO EVERY GATE THAT GLOBS IT — eight #118 replays landed after the merged-m23 freeze and four release gates met them only at the next release (paid: 14z-198)
+
+`118_chain`, `118_input_sweep` and `118_sel_b1`..`b6` were added to `tests/replays/` in 14z-195/196 for three pristine
+#118 gates (scope `ondemand`). Release-scope gates glob `tests/replays/*.rpl` too, and none ran between the additions
+and the merged-m23 re-release: `audit_legacy_pairings` read the eight LEGACY with no merged-m23 expectation, and the
+frozen run counts of `audit_reaction_class_live` (vsavj runs 89 -> 97) and `audit_defense_row_reads` moved with them.
+Freezing their vanilla bases (`tests/expected/vsavj/masked-v2`) then put them in `audit_walker_ghost`'s corpus of
+"every replay with a vanilla basis log", which had no frozen game clock for them. Each was fixed by its gate's own
+remedy, rule-checked (runs 2026-10-12-908 to -916), with a separating control where counts moved: the eight moved out,
+the old rows reproduce exactly. A first proposal, `.skip` them as pristine-only instruments, did not survive: the
+precedents skipped replays NOT APPLICABLE to a build, and these are LEGACY content on it. **The rule:** a session
+that adds a replay runs the gates that glob the corpus (`grep -l 'replays/\*' tests/*.sh`) before it closes, and a
+session that freezes a basis for one runs the gates whose corpus is "every replay with a basis" — the staleness audit
+names them, but only a run judges them.
+
+## A DECLARED CONTROL THAT FIRES ONLY AS A `CONTROL=` MODE READS "NOT FIRED" TO THE RUNNER — and a direct run of the gate cannot show it (paid: 14z-198)
+
+`audit_flicker_attribution` gained control `wrong-window` with its window-check fix (the old `grep -q "$want"` read a
+summary line naming every window, so it could not fail). Run directly, the gate PASSed and `CONTROL=wrong-window`
+FAILed as it should. Through `tests/run_all_emulator.sh` on ERIS it read `controls RED: wrong-window(not fired)`:
+the runner reads every declared control's `CONTROL FIRED` line from the NORMAL run (`tests/lib/controls.sh`
+`vs_ctl_read`), and the executable mode is a second, separate check. The control now also fires inline, through
+`hit_in()`, the one copy of the count-aware test. **The rule:** a gate that gains a control is run through the
+runner with `--controls` before it is committed, never only by hand.

@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-502 entries (47 game / 133 platform / 322 project), counted from the buckets at generation.
+504 entries (47 game / 133 platform / 324 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 47 entries
 
@@ -208,7 +208,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - `find` IN A .BAT RUN FROM MSYS2 (OR WITH GIT'S usr\bin ON PATH) IS THE UNIX find — `find /c /v ""` walked the whole C: drive for hours (paid: 14z-197, GitHub #248)
 - ON A WSL2 BOX REACHED ONLY OVER SSH, WSLg COMES UP WITH NO DESKTOP BEHIND IT AND EVERY MAME PROCESS WAITS 100-180 s ON ITS SOCKETS — a release run's two prereq TIMEOUTs were the environment, not the build (paid: 14z-198)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 322 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 324 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -532,3 +532,5 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - THE RELEASE PACKAGER DELETED ITS TARGET FIRST — a typed name could reach a sibling, and a failed rebuild left nothing (paid: 14z-196's code review, GitHub #246 and #247; fixed 14z-197)
 - THE PYTHON APPLIER CHECKED THE SET KEY AFTER WRITING THE SET — a failure that leaves its output is not a failure to a launcher (paid: 14z-196's code review, GitHub #255; fixed 14z-197)
 - THE LAUNCHER TOOK THE FIRST SET IT FOUND, AND FBNEO KEPT A STALE COPY — an upgrade ran the old game under the new version's banner (paid: 14z-196's code review, GitHub #248; the Unix launcher fixed 14z-197, the Windows one pending)
+- A REPLAY ADDED TO THE CORPUS IS AN INPUT TO EVERY GATE THAT GLOBS IT — eight #118 replays landed after the merged-m23 freeze and four release gates met them only at the next release (paid: 14z-198)
+- A DECLARED CONTROL THAT FIRES ONLY AS A `CONTROL=` MODE READS "NOT FIRED" TO THE RUNNER — and a direct run of the gate cannot show it (paid: 14z-198)
