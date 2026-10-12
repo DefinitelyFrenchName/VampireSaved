@@ -1,0 +1,9 @@
+# tests/rulecheck/recurrence.tsv — the ACKNOWLEDGEMENTS of tools/recurrence_alarm.py (#271, 14z-199; the rot rule the maintainer adopted):
+# a rule-checker finding that recurs (a question plus a pair of cited tokens, in 3 or more subjects across 2 or more
+# sessions) fails the close's standing check `recurrence_alarm` until a row here names the ticket that owns its cause.
+# A row covers the occurrences in runs up to and including its through-run-id; later ones count afresh, so a fix that
+# does not hold raises the alarm again. The ticket must have a row in docs/project/tickets.tsv. Rows are added, never
+# widened silently: a new through-run-id is a new judgement, written with its reason.
+# Columns: question<TAB>tokens (space-separated; the row covers every pair of them)<TAB>#N<TAB>through-run-id<TAB>note
+QP3	2550 2560 2600 6630 6851 699 9230 name_moves.py.txt:687 name_moves.py.txt:699	#271	2026-10-12-945	the calibration plants' readers (forced-pick-fidelity, fidelity-14z160, forced-pick-14z159) quoting their planted claims' figures, flagged by the extract's W# hint and failed QP3 from 14z-179 to 14z-198; #271 makes a rule-checker's prompt a source
+Q1	findings_row.txt:1 none_reasons.out:2 premises.txt:2	#270	2026-10-12-945	the close's documentation packet failing Q1 on the findings row and its premises at 14z-190, 195, 196, 197 and 198; #270 narrows what the packet asks

@@ -6813,6 +6813,13 @@ figure DERIVED from a file the worker read — the plant readers' 2550 and 2560 
 2600, minus 40 and 50) drew four QP3 VIOLATEDs (816 to 819) until run 820's reader did the arithmetic. Judged not slips
 at this close: those two figures, and a measurer's "24 gate names were listed", a count of its own spec's list as its
 report said (816 QP3). A W# line is a hint to check, never a verdict; no test; filed after the close: #263.
+STATUS (14z-199, #271): for RULE-CHECKER readers the case is closed at its source — their 2550/2560 are also in the
+planted claim their PROMPT carries, and `tools/agent/extract.py` now counts a rule-checker's prompt as a source (a judge
+quoting the claim, not a measurer); a measurer's spec is still not one. The pair 2550 + 2560 had drawn QP3 VIOLATEDs in 43
+non-calibration runs from 14z-179 to 14z-198, resolved run by run; `tools/recurrence_alarm.py` (gate
+`tests/test_recurrence_alarm.sh`) now makes a finding that recurs across subjects and sessions a red until a ticket owns
+it, and `rulecheck resolve` refuses an instrument-blaming answer that names no open ticket. #263 (a derived figure) stays
+open for workers.
 
 ## A FORK'S COMMIT WAS CHERRY-PICKED WITHOUT BEING READ AGAINST ITS SPEC (paid: 14z-195, #229, rule-checker run 2026-10-08-760 QP5)
 

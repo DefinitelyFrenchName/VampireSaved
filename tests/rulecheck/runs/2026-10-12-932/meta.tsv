@@ -1,0 +1,9 @@
+decision	recommendation
+subject	14z-199 item 1: where session time goes and why rule-checker runs fail — four options put to the maintainer
+session	14z-199
+model	rule-checker@163e4ce9cf7b
+claim	The four options in build/agent199/t1/report.md section C (test_close_tools' control modes made cheap; what the close's documentation packet is for; the procedure check's own instruments, #263 and the 160-character R lines; bounding Q1) are put to the maintainer as OPTIONS, none applied, on the figures of sections A and B, each of which is printed by a command whose output is staged under build/agent199/t1/out/ (or, for the single-file retraction timings, a measurer's return saved verbatim there) and by the read-only scripts under build/agent199/t1/. NOT TESTED: no option has been built or run, so every saving named is an estimate; the classification of section B rests on two blind readers who both read the same extract, including the working agent's own resolution texts and claims cut at 900 characters, so a resolution that overstated its fix, or a claim's cut tail, would mislead both alike; the 20 retraction files' per-file cost is two timings (oldest and newest) that may have overlapped, not twenty; the static tier figures are three close tiers and the dashboard's tier dataset for 14z-188..14z-197 only; the emulator tier's cost, and time a session spends waiting on rule-checker loops, are not measured; the classification covers 14z-196..14z-198 only, not the 14z-188..14z-198 ledger counts it is set beside.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b

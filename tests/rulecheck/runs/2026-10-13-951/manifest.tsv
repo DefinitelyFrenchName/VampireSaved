@@ -1,0 +1,28 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent199/t268/out/close_tools_run.txt	10e76960311e713d1ab918be0a50687af6af4d6b
+build/agent199/t268/out/retraction_reach_run.txt	1ab285aa480c3adf1b1c5bc323a632390e20ea75
+build/agent199/t268/out/modes.txt	49f97564114ed9e1f8277d0f17244bce6cb73858
+build/agent199/t268/out/single_identical.txt	187ee5d658fcfd13b941b59fcecdf00d0eca0961
+build/agent199/t268/out/per_file_old.txt	a5b37f79f8feae79b948a8ccf70580490f8cf6bb
+build/agent199/t268/out/each_run.txt	336d6d81922dd4b0470ecb559004c4381555c597
+build/agent199/t268/out/data_hits.txt	4c37d0639f6dab3bae854de2e45604ecd8b02951
+build/agent199/t268/out/patterns_audit.txt	dace25ebb1145fcc4fad1e76782dc9f97db31082
+build/agent199/t268/out/override_run.txt	37343c63e24a3fdae6287d9cebffbbd40f11bd63
+build/agent199/t268/out/nobase_run.txt	ea782a8b113774b835c83dc1e3da6a82820bab54
+build/agent199/t268/out/gates/summary.txt	605481c7447d6956ede4adbea62c8b033779b46f
+build/agent199/t268/out/diff.txt	ade487cc8bb6ebf108bb87c9dfbbf3891ffc37a4
+build/agent199/t268/make_out.sh	f1338379bb39429861c65cb075aada09c3b3da8a
+build/agent199/t268/data_hits.py	5a01a5887443e58c2614a90350860936ea5ad675
+build/agent199/t268/fallbacks.sh	fb2b90f62f874c4518ccf21e8055ed83ce51d8c6
+build/agent199/t1/out/close_tools_time.txt	bf8eeda1c0f1646387447879c48dd63544b58c5b
+build/agent199/t1/out/close_tools_controls_14z198.tsv	1e0ab038cbc8b17a78fe9c0a4a62dca38f5c0d78
+build/agent199/t268/out/verdicts_diff.txt	f44829b561eeb300129e1513758f7de9d62c9977
+build/agent199/t268/out/standing_retraction_row.txt	ef63894cfe93856e77df88a4007506ff1af74b3c
+build/agent199/t268/out/runner_cad_changed.txt	b46d912de6acc0a709c792f726884e9c05b64aa2
+build/agent199/t268/make_out2.sh	8c6c023053806cd205b914e83a275941e74c6f10
+DECISIONS_HISTORY.md.lines-6637-6649 (lines 6637-6649 of DECISIONS_HISTORY.md)	a672b8d004c3386ed43cbd05f1045f6c9dccc60d
+build/agent199/t1/report.md.lines-161-166 (lines 161-166 of build/agent199/t1/report.md)	a05982afb1edc5e549ac73057108582c1adce011
+tests/test_close_tools.sh	de37bced0a7d1a3dfce26958d61ed75c138fb030
+tests/test_retraction_reach.sh	20c4e3b3865671b901f222a8f4728fe78c1e4496
+tools/retraction_grep.py	91c70f26b029d23c53b1af2750e21c97d2ad1bb3
+tests/ci_cadence.tsv	e5e5720862e2b1f78249fa0923235b937a4f562a

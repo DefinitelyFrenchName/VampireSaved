@@ -202,6 +202,7 @@ declares	test_random_select_tenants
 declares	test_reaction_classes
 declares	test_readme_recording
 declares	test_reconcile_matcher
+declares	test_recurrence_alarm
 declares	test_ref_rot_image_pick
 declares	test_rehit_ring
 declares	test_release_asset_shape
@@ -212,6 +213,7 @@ declares	test_release_os_metadata
 declares	test_release_prune
 declares	test_release_recipe_text
 declares	test_release_roundtrip
+declares	test_retraction_reach
 declares	test_rompath_reject
 declares	test_romset_path_guard
 declares	test_roulette_tag_rows

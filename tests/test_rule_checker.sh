@@ -25,6 +25,7 @@
 # MUST-FIRE: shadow-tool: late-validate — a copy of rulecheck.py with prepare's early artifact check removed must leave a run directory with no ledger row behind when an artifact is missing, and the PREPARE IDS section must FAIL: prepare checks every artifact before it creates anything (GitHub #160, 14z-185)
 # MUST-FIRE: shadow-tool: keyless-prepare — a copy of rulecheck.py whose prepare takes no session key (the pre-#209 line, `session = a.session or "-"`) must prepare a run whose meta.tsv says `session -`, and the PREPARE SESSION KEY section must FAIL: prepare requires the sitting's 14z-N key and refuses a transcript prefix (GitHub #209, 14z-189)
 # MUST-FIRE: shadow-tool: unchecked-cite — a copy of rulecheck.py whose prepare takes every --cites at its word must prepare a merge packet citing an unresolved fork run, and the PREPARE CITES section must FAIL: a cited fork run counts only if its plant was caught, it is OK or resolved, and its artifacts are unchanged (#217, 14z-193)
+# MUST-FIRE: shadow-tool: blame-unticketed — a copy of rulecheck.py whose resolve takes an instrument-blaming answer ("no slip", "the plant's reader", "W# hint", a reader's misreading) with no open ticket named (the pre-#271 resolve, BLAME_CHECKED off) must record it, and the RESOLVE BLAME section must FAIL: an instrument defect answered run by run is how the plant readers' 2550/2560 recurred from 14z-179 to 14z-198 unaggregated (#271, 14z-199; mode: the section runs that copy)
 # MUST-FIRE: perturbed-copy: cross-family-plant — a copy of the record in which a PROCEDURE calibration names an EVIDENCE fixture as its plant must fail: a plant answers its own family's questions, so one from the other checklist proves nothing about the reader (#172 S3, 14z-176)
 #
 # WHY. The rule-checker (docs/project/rule_checker.md, [VSP-183]/[VSP-184]) is a
@@ -108,6 +109,16 @@ expect_msg() {  # expect_msg <name>
     prose-verdict)    echo "not a structured verdict" ;;
     cross-family-plant) echo "is from the evidence family, but the run was read under the procedure checklist" ;;
     esac
+}
+
+# THE MODE'S VERDICT, one function (rule-checker runs 2026-10-13-952 and -953): a copy whose check stays green is a
+# mode that LIES (exit 0); one that fails ON ITS OWN finding is honoured (exit 1); one that fails only on ANOTHER
+# finding — an unresolved run in the real ledger, say — is REFUSED (exit 3): both of the last two exited 1 before,
+# so a mode read HONOURED on a finding it never produced. The MODE VERDICT section runs it on three logs.
+mode_judge() {  # mode_judge <check exit> <log> <the mode's own finding> — prints GREEN|OWN|OTHER, returns 0|1|3
+    [ "$1" = 0 ] && { echo GREEN; return 0; }
+    grep -qF -- "$3" "$2" && { echo OWN; return 1; }
+    echo OTHER; return 3
 }
 
 # SECTION 4's probe: on a throwaway root carrying its own copy of the tool (prepare and record
@@ -241,6 +252,39 @@ PY
     grep -q "changed since that run was prepared" "$2/c_rec.log" || { echo "RECORD-REFUSED-FOR-ANOTHER-REASON: $(tail -1 "$2/c_rec.log")"; return; }
     echo CITES-OK
 }
+# SECTION RESOLVE BLAME's probe (#271, 14z-199): on a throwaway root with a two-row ticket index (#9001 open, #9002
+# done) and four VIOLATED runs, resolve must REFUSE an instrument-blaming answer naming no ticket, and one naming
+# only the done ticket; it must accept the same blame naming the open #9001, and a plain answer by work; and an
+# answer by work that only QUOTES a blame phrase is refused until it names the ticket (the rule's documented
+# cost). Prints BLAME-OK or the way it was not.
+resolve_blame() {  # resolve_blame <rulecheck.py to test> <root>
+    rm -rf "$2"; mkcopy "$2"; cp "$1" "$2/tools/rulecheck.py"
+    printf '# index\n9001\tevolution\topen\tan instrument defect\n9002\tevolution\tdone\ta fixed one\n' > "$2/docs/project/tickets.tsv"
+    python3 - "$2" <<'PY2' || { echo "NO-FIXTURE-RUNS"; return; }
+import sys
+from pathlib import Path
+root = Path(sys.argv[1]); sys.path.insert(0, str(root / "tools")); import rulecheck as r
+for n in range(1, 5):
+    r.append_ledger(root, dict(id=f"2099-07-07-0{n}", date="2099-07-07", session="14z-0", decision="procedure", subject=f"part {n}",
+                               control="fx", control_verdict="CAUGHT", verdict="VIOLATED", violated="QP3", resolution="-", model="m"))
+PY2
+    _res() { ( cd "$2" && python3 tools/rulecheck.py resolve "$1" --how "$3" ) > "$2/res.log" 2>&1; }
+    BL="QP3: no slip — the plant's reader quoted its claim's 2550/2560, which the W# hint cannot source"
+    if _res 2099-07-07-01 "$2" "$BL"; then echo "RESOLVED-BLAME-UNTICKETED"; return; fi
+    grep -q "blames the instrument" "$2/res.log" || { echo "REFUSED-FOR-ANOTHER-REASON: $(tail -1 "$2/res.log")"; return; }
+    if _res 2099-07-07-01 "$2" "$BL; the cause is #9002"; then echo "RESOLVED-BLAME-NAMING-A-DONE-TICKET"; return; fi
+    _res 2099-07-07-02 "$2" "$BL; the cause is #9001" || { echo "REFUSED-BLAME-NAMING-AN-OPEN-TICKET: $(tail -1 "$2/res.log")"; return; }
+    _res 2099-07-07-03 "$2" "QP3: fixed — the figure's source is now quoted beside it" || { echo "REFUSED-A-PLAIN-ANSWER: $(tail -1 "$2/res.log")"; return; }
+    # the documented cost (rule-checker run 2026-10-13-950 Q4): an answer BY WORK that only quotes a phrase is refused
+    # too until it names the ticket that owned the case — 5 of the 19 past matches (runs 825, 932, 933, 938, 939) were such
+    if _res 2099-07-07-04 "$2" "QP3: fixed — report.md no longer says the case was no slip"; then echo "RESOLVED-A-QUOTED-PHRASE-UNTICKETED"; return; fi
+    _res 2099-07-07-04 "$2" "QP3: fixed — report.md no longer says the case was no slip (#9001)" || { echo "REFUSED-A-QUOTED-PHRASE-WITH-ITS-TICKET: $(tail -1 "$2/res.log")"; return; }
+    echo BLAME-OK
+}
+unblame() {  # unblame <out> — the shadow tool: resolve without the instrument-blame check
+    sed 's/^BLAME_CHECKED = True /BLAME_CHECKED = False /' tools/rulecheck.py > "$1"
+    grep -q '^BLAME_CHECKED = False ' "$1" || { echo "the blame check's switch was not found" >&2; return 1; }
+}
 uncite() {  # uncite <out> — the shadow tool: prepare with the citation check switched off
     python3 - tools/rulecheck.py "$1" <<'PY' || { echo "the citation check was not found to remove" >&2; return 1; }
 import sys
@@ -281,6 +325,14 @@ if [ "${VS_CTL:-}" = unchecked-cite ]; then
     echo "FAIL: rule-checker prepare cites (control mode unchecked-cite — $got)"; exit 1
 fi
 
+if [ "${VS_CTL:-}" = blame-unticketed ]; then
+    unblame "$W/unblamed.py" || exit 3
+    got="$(resolve_blame "$W/unblamed.py" "$W/rbl_mode")"
+    echo "MODE: control blame-unticketed — the shadow copy reads: $got"
+    case "$got" in RESOLVED-BLAME-*) ;; *) echo "REFUSED: the shadow copy did not record an unticketed blame ($got)"; exit 3;; esac
+    echo "FAIL: rule-checker resolve blame (control mode blame-unticketed — $got)"; exit 1
+fi
+
 case "${VS_CTL:-}" in counted-id|late-validate)
     if [ "$VS_CTL" = counted-id ]; then counted "$W/shadow.py" || exit 3; else latecheck "$W/shadow.py" || exit 3; fi
     got="$(prepare_ids "$W/shadow.py" "$W/pimode")"
@@ -293,14 +345,14 @@ if [ -n "${VS_CTL:-}" ]; then
     # THE EXECUTABLE FORM: the real record, copied, perturbed, checked — must FAIL
     # on the control's own finding
     mkcopy "$W/mode"; perturb "$VS_CTL" "$W/mode"
-    if python3 tools/rulecheck.py check --root "$W/mode" > "$W/mode.log" 2>&1; then
-        cat "$W/mode.log"; echo "FAIL: CONTROL=$VS_CTL left the check green"; exit 1
-    fi
+    crc=0; python3 tools/rulecheck.py check --root "$W/mode" > "$W/mode.log" 2>&1 || crc=$?
     cat "$W/mode.log"
-    if ! grep -qF -- "$(expect_msg "$VS_CTL")" "$W/mode.log"; then
-        echo "FAIL: CONTROL=$VS_CTL failed the check, but not on its own finding ($(expect_msg "$VS_CTL"))"; exit 1
-    fi
-    echo "FAIL: rule-checker record (control mode $VS_CTL reached the gate's own FAIL on its own finding)"; exit 1
+    mrc=0; mode_judge "$crc" "$W/mode.log" "$(expect_msg "$VS_CTL")" > /dev/null || mrc=$?
+    case "$mrc" in
+        0) echo "PASS: CONTROL=$VS_CTL left the check green — the perturbation is not caught (this mode LIES)"; exit 0 ;;
+        1) echo "FAIL: rule-checker record (control mode $VS_CTL reached the gate's own FAIL on its own finding)"; exit 1 ;;
+        *) echo "REFUSED: CONTROL=$VS_CTL failed the check, but not on its own finding ($(expect_msg "$VS_CTL"))"; exit 3 ;;
+    esac
 fi
 
 echo "== 1. the recorder's parser: structured verdicts accepted, prose refused =="
@@ -328,6 +380,31 @@ echo "== PREPARE CITES: a merge packet's fork runs are checked by the tool (#217
 got="$(prepare_cites tools/rulecheck.py "$W/pcites")"
 echo "  $got"
 [ "$got" = CITES-OK ] || { echo "FAIL: prepare's citations ($got)"; fail=1; }
+
+echo "== MODE VERDICT: a mode is honoured only on its own finding (runs 2026-10-13-952/953) =="
+printf '  FAIL: 2026-10-13-950: VIOLATED with no resolution — the action it stopped is still stopped\n' > "$W/mv_other.log"
+{ cat "$W/mv_other.log"; printf '  FAIL: 2026-09-17-01: %s (reads VIOLATED)\n' "$(expect_msg quiet-control)"; } > "$W/mv_own.log"
+# set -e: each judgement's exit is captured with `||` so a non-zero verdict does not end the gate
+r1=0; mv1="$(mode_judge 1 "$W/mv_other.log" "$(expect_msg quiet-control)")" || r1=$?
+r2=0; mv2="$(mode_judge 1 "$W/mv_own.log" "$(expect_msg quiet-control)")" || r2=$?
+r3=0; mv3="$(mode_judge 0 "$W/mv_own.log" "$(expect_msg quiet-control)")" || r3=$?
+echo "  another finding only: $mv1 ($r1); its own finding beside another: $mv2 ($r2); the check green: $mv3 ($r3)"
+[ "$r1/$r2/$r3" = "3/1/0" ] || { echo "FAIL: the mode verdict reads $r1/$r2/$r3, not 3/1/0 (REFUSED / honoured / lies)"; fail=1; }
+
+echo "== RESOLVE BLAME: resolve refuses an instrument-blaming answer that names no open ticket (#271) =="
+got="$(resolve_blame tools/rulecheck.py "$W/rbl")"
+echo "  the real tool: $got"
+[ "$got" = BLAME-OK ] || { echo "FAIL: resolve's instrument-blame rule ($got)"; fail=1; }
+
+echo "== RESOLVE BLAME on the REAL index: open_tickets reads docs/project/tickets.tsv's status column (run 2026-10-13-955) =="
+# an independent reader — awk on the column the index's own header names `status` — against the tool's set
+col="$(awk -F'\t' '/^#/ {next} {for (i = 1; i <= NF; i++) if ($i == "status") {print i; exit}}' docs/project/tickets.tsv)"
+[ -n "$col" ] || { echo "FAIL: docs/project/tickets.tsv has no header row naming a status column"; col=0; fail=1; }
+indep="$(awk -F'\t' -v c="$col" '!/^#/ && ($c == "open" || $c == "parked") {print $1}' docs/project/tickets.tsv | sort -n | tr '\n' ' ')"
+tool="$(python3 -c "import sys; sys.path.insert(0, 'tools'); import rulecheck; from pathlib import Path; print(' '.join(sorted(rulecheck.open_tickets(Path('.')), key=int)))") "
+n_open="$(printf '%s' "$indep" | wc -w | tr -d ' ')"; n_done="$(awk -F'\t' -v c="$col" '!/^#/ && $c == "done"' docs/project/tickets.tsv | wc -l | tr -d ' ')"
+if [ "$indep" = "$tool" ] && [ "$n_open" -gt 0 ] && [ "$n_done" -gt 0 ]; then echo "  ok    the tool's open set equals the index's status column (column $col): $n_open open or parked, $n_done done left out"
+else echo "FAIL: open_tickets disagrees with the index's status column $col — tool: $tool | index: $indep"; fail=1; fi
 
 echo "== 3. MUST-FIRE CONTROLS on a copy =="
 for c in quiet-control moved-reader unchecked-freeze prose-verdict cross-family-plant; do
@@ -370,6 +447,16 @@ else
     vs_ctl_dead unchecked-cite "the citation check was not found to remove"; fail=1
 fi
 
+if unblame "$W/unblamed_c.py"; then
+    got="$(resolve_blame "$W/unblamed_c.py" "$W/rblc")"
+    case "$got" in
+        RESOLVED-BLAME-*) vs_ctl_fired blame-unticketed "the copy without the blame check: $got";;
+        *) vs_ctl_dead blame-unticketed "the shadow copy read $got"; fail=1;;
+    esac
+else
+    vs_ctl_dead blame-unticketed "the blame check's switch was not found"; fail=1
+fi
+
 for c in counted-id late-validate; do
     if [ "$c" = counted-id ]; then counted "$W/shadow_$c.py"; else latecheck "$W/shadow_$c.py"; fi || { vs_ctl_dead "$c" "the shadow copy could not be made"; fail=1; continue; }
     got="$(prepare_ids "$W/shadow_$c.py" "$W/pc_$c")"
@@ -380,7 +467,7 @@ for c in counted-id late-validate; do
 done
 
 if [ "$fail" -eq 0 ]; then
-    echo "PASS: the rule-checker's record is sound, record binds the spawn check, prepare's ids hold, prepare requires the session key, a merge packet's cited fork runs are checked, and its ten controls fire"
+    echo "PASS: the rule-checker's record is sound, record binds the spawn check, prepare's ids hold, prepare requires the session key, a merge packet's cited fork runs are checked, resolve refuses unticketed instrument blame, and its eleven controls fire"
 else
     echo "FAIL: rule-checker record"
     exit 1

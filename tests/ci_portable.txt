@@ -297,8 +297,15 @@ test_agent_defs
 # #172 slice S4 step 2 (14z-177): a frozen real measurer run (tests/agent/worker_fixture/, CUT — no e-mail)
 # returns figures each traceable to a spec command it ran, re-derived here; conformance; three controls. ~1 s.
 test_agent_worker
-# 14z-181: the close ritual's two file-level checks (retraction grep reach, tracked homes) run and can fail. ~3 s.
+# 14z-181: the close ritual's file-level checks run and can fail — since #268 (14z-199) the retraction grep's gone
+# wordings on the files the sitting touched, and the four tools' self-tests; eight controls. ~12 s.
 test_close_tools
+# #268 (14z-199): every sitting's retraction file judged on ONE scan of the live tree (reach controls and gone
+# wordings), split out of test_close_tools; FREEZE cadence (tests/ci_cadence.tsv); three controls in the same scan. ~35 s.
+test_retraction_reach
+# #271 (14z-199): a rule-checker finding that recurs (a question and a pair of cited tokens, 3 subjects across 2
+# sessions) is a red until tests/rulecheck/recurrence.tsv names the ticket owning its cause; two controls. ~1 s.
+test_recurrence_alarm
 # 14z-183b (#153 S6): a run on a snapshot (tests/run_on_snapshot.sh) is immune to the working tree — a tracked
 # edit and commit, build/, a submodule, both siblings perturbed mid-run reach nothing; three controls. ~5 s.
 test_run_on_snapshot

@@ -6,7 +6,9 @@
 #   what the transcript says: statements without private reasoning, each tool call and its
 #   result head, tracked launches and completions, DETACHED launches, unsourced figures, and
 #   workers' specs, commands and reports — a BACKGROUND worker's report being the hand-back the
-#   session received (#208), never its first text, and `NOT DELIVERED` when it had not handed back.
+#   session received (#208), never its first text, and `NOT DELIVERED` when it had not handed back;
+#   and (since #271, 14z-199) a RULE-CHECKER reader's figure quoted from its own prompt is not
+#   flagged, while one in neither its prompt nor its results still is.
 # HOW: drives the extractor's selftest over a synthetic transcript with known answers (a
 #   sourced figure, an invented one, non-figures, an open task, a marker merely quoted); two
 #   controls run copies with the launch test loosened and the figure finder blinded and must
@@ -33,6 +35,7 @@
 #
 # MUST-FIRE: perturbed-copy: loose-launch — a copy whose launch test (agentlib.tracked_launch) accepts the marker ANYWHERE in a result (the pre-14z-176 test) must invent the quoted task, and the selftest must FAIL (mode: the gate runs against that copy)
 # MUST-FIRE: perturbed-copy: handback-ignored — a copy whose extractor ignores the hand-backs the SESSION received (session_handbacks' result dropped) must stop showing the fixture's delivered verdict, and the gate must FAIL (#208; mode: the gate runs against that copy)
+# MUST-FIRE: perturbed-copy: judge-prompt-unsourced — a copy whose extractor does not count a RULE-CHECKER reader's prompt as a source (the pre-#271 extractor, JUDGE_PROMPT_SOURCED off) must flag the selftest reader's quoted claim figure 2560, and the selftest must FAIL (#271, 14z-199: a calibration plant's reader quoting its claim's frames 2550/2560 failed procedure runs from 14z-179 to 14z-198; mode: the gate runs against that copy)
 # MUST-FIRE: perturbed-copy: blind-figures — a copy whose figure finder returns nothing must stop flagging the invented figure, and the selftest must FAIL (mode: the gate runs against that copy)
 #
 # Usage: tests/test_agent_extract.sh      # ci_portable, ~1 s
@@ -50,11 +53,13 @@ import os, sys; d, name = sys.argv[1:3]
 # loose-launch perturbs agentlib (the ONE launch test, since the maintainer applied it
 # 14z-176); blind-figures perturbs the extractor itself
 p = os.path.join(d, "agentlib.py" if name == "loose-launch" else "extract.py"); s = open(p).read()
+# judge-prompt-unsourced (#271) turns the rule-checker prompt source off
 edits = {
     "loose-launch": ("    if not s.startswith(_LAUNCH_HEADS):\n        return None\n",
                      "    if not any(k in s for k in TRACKED_RESULT):  # CONTROL loose-launch\n        return None\n"),
     "blind-figures": ('    """-> the figures a statement reports, normalised (thousands separators dropped)."""\n',
                       '    """-> the figures a statement reports, normalised (thousands separators dropped)."""\n    return []  # CONTROL blind-figures\n'),
+    "judge-prompt-unsourced": ("JUDGE_PROMPT_SOURCED = True", "JUDGE_PROMPT_SOURCED = False  # CONTROL judge-prompt-unsourced"),
     "handback-ignored": ("    sess_hb = session_handbacks(path)\n",
                          "    sess_hb = {}  # CONTROL handback-ignored\n"),
 }
@@ -68,7 +73,7 @@ PY
 echo "== test_agent_extract: #172 slice S3 — the extract C1 reads =="
 fail=0
 EX=tools/agent/extract.py
-if vs_ctl_is loose-launch || vs_ctl_is blind-figures || vs_ctl_is handback-ignored; then EX="$(make_copy "$VS_CTL")"; fi
+if vs_ctl_is loose-launch || vs_ctl_is blind-figures || vs_ctl_is handback-ignored || vs_ctl_is judge-prompt-unsourced; then EX="$(make_copy "$VS_CTL")"; fi
 python3 "$EX" --selftest > "$W/self.txt" 2>&1 || true
 sed 's/^/  /' "$W/self.txt"
 grep -q -- '-> PASS$' "$W/self.txt" || { echo "FAIL: the extractor's selftest"; fail=1; }
@@ -90,7 +95,7 @@ echo "  $(echo "$r" | tr '\n' ' ')"
 case "$r" in *WRONG*) echo "FAIL: the hand-back fixture: $(echo "$r" | tr '\n' ' ')"; grep -E ' (WX|W ) ' "$W/fx.full" | head -3 | cut -c1-140; fail=1 ;; esac
 
 if [ -z "${VS_CTL:-}" ]; then
-    for c in loose-launch blind-figures; do
+    for c in loose-launch blind-figures judge-prompt-unsourced; do
         python3 "$(make_copy "$c")" --selftest > "$W/ctl_$c.txt" 2>&1 || true
         if grep -q -- '-> FAIL$' "$W/ctl_$c.txt"; then vs_ctl_fired "$c" "$(grep -m1 'WRONG' "$W/ctl_$c.txt" | sed 's/^ *//')"
         else vs_ctl_dead "$c" "the perturbed copy passed its selftest — the selftest cannot see this failure" || fail=1; fi

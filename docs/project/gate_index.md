@@ -16,12 +16,12 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**455 scripts** — 127 ci_portable, 92 ci_static, 236 emulator-tier (run by name).
+**457 scripts** — 129 ci_portable, 92 ci_static, 236 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
 | [runner](#runner) | 44 | the suite runners and their own ground truth |
-| [docs](#docs) | 21 | the documentation locks — docs, skills, indexes, tables follow the tree |
+| [docs](#docs) | 23 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 48 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
@@ -94,7 +94,7 @@ the documentation locks — docs, skills, indexes, tables follow the tree.
 | `tests/test_checkdocs.sh` | test | ci_portable | — | the load-bearing numbers the docs share are LOCKED across documents (14z-118, the documentation audit). ci_portable: no ROM, no build dir, no emulator, ~0.2 s. | 14z-118 |
 | `tests/test_checkdocs_rom.sh` | test | ci_static | ROMDIR | the atlas's ROM-shaped claims are re-derived from the decrypted images, and the checker is proven falsifiable (14z-142, living-docs slice L3). ci_static: | 14z-142 |
 | `tests/test_checkskills.sh` | test | ci_portable | — | the eight skills are locked to the docs they distil (14z-114; level 0 added 14z-134). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-114 |
-| `tests/test_close_tools.sh` | test | ci_portable | — | THE CLOSE RITUAL'S TWO FILE-LEVEL CHECKS RUN AND CAN FAIL: the retraction grep reaches the tree (tools/retraction_grep.py) and the findings table's homes and tests are tracked files (tools/homes_tracked.py). ci_portable: | 14z-181 |
+| `tests/test_close_tools.sh` | test | ci_portable | — | THE CLOSE RITUAL'S FILE-LEVEL CHECKS RUN AND CAN FAIL: the retraction grep's gone wordings stay gone in what the sitting touched, and the matcher, the homes tool, the address scan and the reason check each pass their own self-test (tools/re… | 14z-199 |
 | `tests/test_commit_subject.sh` | test | ci_portable | — | no unpushed commit message may carry a GitHub CLOSING keyword before an issue reference (14z-162, GitHub #151). ROM-free, ~1 s. | 14z-162 |
 | `tests/test_doc_anchor_census.sh` | test | ci_portable | — | every skill anchor's FILE and SECTION are frozen (14z-122, the documentation rationalization pass). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-122 |
 | `tests/test_docs_site.sh` | test | ci_portable | — | the documentation site renders, resolves and is deterministic (14z-140, living-docs slice L4). ci_portable: no ROM, no build dir, no emulator, ~25 s. | 14z-140 |
@@ -105,6 +105,8 @@ the documentation locks — docs, skills, indexes, tables follow the tree.
 | `tests/test_gate_index_current.sh` | test | ci_portable | — | docs/project/gate_index.md FOLLOWS the tree (14z-123, the documentation rationalization pass, G6). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-123 |
 | `tests/test_gotchas_index_current.sh` | test | ci_portable | — | docs/GOTCHAS.md FOLLOWS the three bucket files (14z-122, the documentation rationalization pass). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-122 |
 | `tests/test_md_subset.sh` | test | ci_portable | — | the markdown SUBSET the corpus writes is parsed strictly, and every construct outside it FAILS (14z-140, living-docs slice L4). ci_portable: no ROM, no build dir, no emulator, ~3 s. | 14z-140 |
+| `tests/test_recurrence_alarm.sh` | test | ci_portable | — | A RULE-CHECKER FINDING THAT KEEPS COMING BACK IS A RED until a ticket owns its cause (tools/recurrence_alarm.py; #271, 14z-199: the rot rule "a recurring violation opens a ticket", adopted by the maintainer — "8. | 14z-199 |
+| `tests/test_retraction_reach.sh` | test | ci_portable | — | EVERY SITTING'S RETRACTION GREP STILL REACHES THE TREE: every tests/rulecheck/retractions/*.tsv judged on ONE scan of the live tree (tools/retraction_grep.py --each). ci_portable: no ROM, no emulator, ~30 s; | 14z-199 |
 | `tests/test_skill_guides.sh` | test | ci_portable | — | the level-0 skills' GUIDE.md files are CURRENT against SKILL.md and the docs they quote (14z-134). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-134 |
 | `tests/test_state_open_lists.sh` | test | ci_portable | — | AN OPEN LIST HOLDS ONLY WHAT IS OPEN: STATE.md's open lists, its size budget and session-group count, NEXT_SESSION's START HERE, and THE LEDGER's keys (14z-154; maintainer-ruled 2026-09-14, CLAUDE.md [VSP-17]). ci_portable: | 14z-154 |
 | `tests/test_tables_current.sh` | test | ci_static | ROMDIR | the community-facing behavioral tables (docs/project/tables/{donovan,huitzil,pyron}.md, CLAUDE.md §2 rule 5) are GENERATED from the CURRENT builds' extracts and must match what is committed. ci_static: | 14z-118 |

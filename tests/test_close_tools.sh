@@ -1,16 +1,28 @@
 #!/bin/sh
-# test_close_tools.sh — THE CLOSE RITUAL'S TWO FILE-LEVEL CHECKS RUN AND CAN FAIL: the retraction
-# grep reaches the tree (tools/retraction_grep.py) and the findings table's homes and tests are
-# tracked files (tools/homes_tracked.py). ci_portable: no ROM, no emulator, ~3 s (14z-181).
+# test_close_tools.sh — THE CLOSE RITUAL'S FILE-LEVEL CHECKS RUN AND CAN FAIL: the retraction grep's
+# gone wordings stay gone in what the sitting touched, and the matcher, the homes tool, the address
+# scan and the reason check each pass their own self-test (tools/retraction_grep.py,
+# tools/homes_tracked.py, tools/close_findings.py, tools/none_reasons.py). ci_portable: no ROM, no
+# emulator, ~10 s (measured 14z-199; it read "~3 s" while one full scan per retraction file made it
+# 565 s — #268).
 #
-# WHAT: (1) tools/retraction_grep.py over every tests/rulecheck/retractions/*.tsv exits 0, ON THE LIVE
-#   TREE at every tier (an output file is a snapshot with a tree fingerprint, never the check) — each
-#   file's REACH controls (a live heading, a corrected wording in plain AND code-spanned form — a
-#   `reach:2` control that fails when either carrier is missed — a carrier line-wrapped across a
-#   `#` comment prefix, a sentence that lives only in a ROOT document, README.md — the scan reads
-#   every tracked file since rule-checker run 2026-09-25-204) are found in the live tree and every
-#   GONE wording reads 0 hits, so the sitting's
-#   retracted wordings were searched by a grep that reaches; (2) tools/homes_tracked.py --selftest
+# WHAT: (1) since #268 (maintainer-ruled 2026-10-12, 14z-199) EVERY tests/rulecheck/retractions/*.tsv's
+#   GONE wordings read 0 hits in the files the sitting TOUCHED — the paths changed since origin/main,
+#   committed or not, plus every untracked file under the scan's roots — read by ONE touched scan
+#   (tools/retraction_grep.py --touched LIST --each). The matcher judges each file's text alone
+#   (retraction_grep.py judge: a pattern is found in one file's normalised text or not), so an
+#   OLD gone wording can come back only in a file that changed; a pattern file the sitting CHANGED —
+#   a new one, or a new gone wording added to an old one — is judged on the WHOLE tree instead,
+#   since its new wordings were never scanned (rule-checker run 2026-10-13-946 Q4). REACH controls of
+#   unchanged pattern files need the whole tree and are judged by
+#   tests/test_retraction_reach.sh at every freeze and release (and the sitting's OWN file on the whole
+#   tree by the close's standing check `retraction_grep`). The touched list is the static runner's
+#   (tests/run_all_static.sh cad_changed: STATIC_CHANGED_PATHS when set, else git), with the same
+#   limit: in a snapshot clone (tests/run_on_snapshot.sh) origin/main is the source tree's own branch,
+#   so the list holds only what the snapshot itself changed — a freeze runs the whole-tree gate anyway.
+#   With no origin/main at all the section runs the FULL scan, reach judged too (the safe side);
+#   (1b) the matcher's self-test;
+#   (2) tools/homes_tracked.py --selftest
 #   passes, and (2b) the tool runs on the NEWEST findings-table row of STATE.md (the current
 #   sitting's, on the live tree: every home and test it names is tracked) — a planted findings row citing a backticked build/ file, a prose build/ path, a name
 #   that resolves nowhere, a gate stem that resolves nowhere, a ticket with no index row, ticket rows
@@ -29,18 +41,18 @@
 #   one that says why passes. NEVER write a
 #   self-test's planted address in this header: a gate header is a live home to that tool, and the
 #   plant would read homed (paid 14z-184: the suffix control read DEAD until the literal left).
-# HOW: both tools run in-process on the tree; the controls run the grep on a copy of a pattern
-#   file with an unreachable reach control planted, and the homes tool's self-test on its BLIND
-#   variant (--blind, the build/ reads disabled), which must fail it.
-# EXPECTS: PASS when every reach control of every retraction file is found, every gone wording is
-#   absent, the self-test passes and the newest findings row is clean. A tool that exits non-zero
+# HOW: the tools run in-process on the tree; the controls run the touched scan on a copy of a pattern
+#   file with a wording of this gate's own text planted as gone, and each self-test on its known-bad
+#   variant, which must fail it. Under a mode only the section the control perturbs runs (#268): the
+#   other sections read inputs the perturbation does not touch, and each cost a full run per mode.
+# EXPECTS: PASS when every gone wording is absent from the touched files, every self-test passes and
+#   the newest findings row is clean. A tool that exits non-zero
 #   WITHOUT its own FAIL line (a crash, a refused pattern file) is REFUSED (exit 3, dead), never a
-#   red — in a MODE too: a mode passes only on the plant's own FAIL text. A red names the pattern file and the dead control (the tree lost a carrier the
-#   sitting's close depended on, or a pattern was written narrower than its carrier).
+#   red — in a MODE too: a mode passes only on the plant's own FAIL text. A red names the pattern file and the gone wording
+#   that came back in a touched file (a retracted claim reintroduced), or the self-test that failed.
 #
-# MUST-FIRE: perturbed-copy: unreachable-control — a copy of a retraction TSV with a reach pattern that exists nowhere must make tools/retraction_grep.py exit 1 with a FAIL line naming it (in-gate; mode: the copy replaces the real file and the gate FAILs)
-# MUST-FIRE: perturbed-copy: reach-threshold — a copy of a retraction TSV whose `reach:2` control is raised to `reach:9` (more carriers than exist — since 14z-195 the rendered docs/site copy is a carrier too, so the count varies with what is rendered locally) must make tools/retraction_grep.py exit 1 naming it, so a reach:N control that lost a carrier cannot pass on the ones left (in-gate; mode: the copy replaces the real file and the gate FAILs)
-# MUST-FIRE: perturbed-copy: gone-reintroduced — a copy of a retraction TSV with a wording KNOWN to be live (a reach control's text minus its first word, so the copy repeats no pattern) marked `gone` must make tools/retraction_grep.py exit 1 naming it, so a retracted wording that comes back is a red (in-gate; mode: the copy replaces the real file and the gate FAILs)
+# MUST-FIRE: perturbed-copy: gone-new-untouched — a CHANGED copy of a retraction TSV (listed as touched) with a NEW gone wording that only an UNTOUCHED file carries (this gate's own header, the gate not listed) must get the WHOLE-TREE scan and fail naming the wording (in-gate on a two-file stand-in for the tree, RETRACTION_GREP_UNIVERSE, which proves the routing in ~1 s; the mode on the real tree), so a gone wording added this sitting cannot hide in a file nobody touched (rule-checker run 2026-10-13-946 Q4) (in-gate: the copy and a list naming only it; mode: the copy replaces the newest real pattern file in the real list, the gate's script removed from it, and the gate FAILs)
+# MUST-FIRE: perturbed-copy: gone-touched — a copy of a retraction TSV with a wording of THIS gate's own text marked `gone`, the gate's script listed as touched, must make the touched scan (tools/retraction_grep.py --touched LIST --each) fail that file naming the wording, so the touched scan reads the files it is given and judges their gone wordings (in-gate: the copy and a one-file list; mode: the copy replaces the newest real pattern file and the script joins the real touched list, and the gate FAILs) — the three whole-tree controls (unreachable-control, reach-threshold, gone-reintroduced) moved with the whole-tree scan to tests/test_retraction_reach.sh (#268)
 # MUST-FIRE: known-bad: case-fold-dropped — tools/retraction_grep.py --selftest --nofold: the matcher with its case-folding REMOVED (a known-bad variant) must print SELFTEST FAIL naming the upper-case heading case, while --selftest prints SELFTEST PASS — the self-test matches planted TEXTS (a wording in an UPPER-CASE heading, one wrapped across a `#` prefix, one across a Lua `--` prefix, one code-spanned), not the tree, so no stray carrier elsewhere can mask a matcher defect (rule-checker run 2026-09-25-199 Q4) (in-gate; mode: the no-fold variant is the one checked, so the gate FAILs)
 # MUST-FIRE: known-bad: markup-dropped — tools/retraction_grep.py --selftest --nomarkup: the matcher without its #242 collapses (14z-195: a Markdown quote prefix on a wrapped line, a rendered page's tags and entities, a code string join, `**` emphasis) must print SELFTEST FAIL naming the quote-wrapped case, while --selftest passes (mode: the matcher self-test runs with --nomarkup)
 # MUST-FIRE: shadow-tool: output-overwrites — a copy of tools/homes_tracked.py without its output-path guard, given the state copy it reads as its output, must overwrite that copy, and section 2d must FAIL on it (mode: section 2d runs that copy)
@@ -59,38 +71,72 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 W="$(mktemp -d "${TMPDIR:-/tmp}/closetools.XXXXXX")"; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
+unset RETRACTION_GREP_UNIVERSE   # a test harness's stand-in for the tree, set below for ONE control only (#268)
 
-echo "== 1. the retraction grep reaches the tree (every tests/rulecheck/retractions/*.tsv)"
-n=0
-for f in tests/rulecheck/retractions/*.tsv; do
-    [ -f "$f" ] || continue; n=$((n+1)); src="$f"
-    if vs_ctl_is unreachable-control; then
-        cp "$f" "$W/planted.tsv"; printf 'zq-no-such-wording-anywhere-%s\tplanted unreachable control\treach\n' "$$" >> "$W/planted.tsv"; src="$W/planted.tsv"
-        echo "MODE: control unreachable-control — $f replaced by a copy with an unreachable reach pattern"
-    elif vs_ctl_is reach-threshold; then
-        sed 's/\treach:2$/\treach:9/' "$f" > "$W/planted.tsv"; src="$W/planted.tsv"
-        grep -q '	reach:9$' "$W/planted.tsv" || { echo "FAIL: $f has no reach:2 control to raise"; exit 1; }
-        echo "MODE: control reach-threshold — $f replaced by a copy whose reach:2 control demands 3 carriers"
-    elif vs_ctl_is gone-reintroduced; then
-        awk -F'\t' 'BEGIN{OFS="\t"} $3 ~ /^reach/ && !done {p=$1; sub(/^[^ ]+ /, "", p); print p, "planted: a live wording (a reach control minus its first word) marked gone", "gone"; done=1} {print}' "$f" > "$W/planted.tsv"; src="$W/planted.tsv"
-        echo "MODE: control gone-reintroduced — $f replaced by a copy where a live reach wording is also marked gone"
+runs_for() {   # runs_for <control>... — true outside a mode, or when the mode is one of this section's controls (#268)
+    [ -z "${VS_CTL:-}" ] && return 0
+    for _c in "$@"; do [ "$VS_CTL" = "$_c" ] && return 0; done
+    return 1
+}
+NEWEST="$(ls tests/rulecheck/retractions/*.tsv | tail -1)"
+plant_gone() {   # plant_gone <copy> — $NEWEST plus a wording of this gate's own text marked gone; sets EXPECT
+    PW="$(sed -n 's/^# WHAT: \((1) since #268 (maintainer-ruled [^)]*) EVERY\) .*$/\1/p' tests/test_close_tools.sh | head -1)"
+    [ -n "$PW" ] || { echo "REFUSED: the planted wording's line moved out of this gate's header"; exit 3; }
+    cp "$NEWEST" "$1"; printf '%s\tplanted: a wording of tests/test_close_tools.sh marked gone (the control gone-touched)\tgone\n' "$PW" >> "$1"
+    EXPECT="marked GONE is back in the tree: $PW"
+}
+judge_split() {   # judge_split <list|-> <out> <tsv>... — a pattern file the sitting CHANGED (in the list) is judged on the
+    # WHOLE tree: its gone wordings may be new, and a new one already in an untouched file is a red (rule-checker run
+    # 2026-10-13-946 Q4); every other file's gone wordings on the listed (touched) files only. `-`: everything whole.
+    _l="$1"; _o="$2"; shift 2; _full=""; _rest=""
+    for _t in "$@"; do
+        if [ "$_l" = - ] || grep -qxF "$_t" "$_l"; then _full="$_full $_t"; else _rest="$_rest $_t"; fi
+    done
+    : > "$_o"; _rc=0
+    # shellcheck disable=SC2086
+    if [ -n "$_full" ]; then python3 tools/retraction_grep.py --each $_full >> "$_o" 2>&1; _r=$?; [ "$_r" -gt "$_rc" ] && _rc=$_r; fi
+    # shellcheck disable=SC2086
+    if [ -n "$_rest" ]; then python3 tools/retraction_grep.py --touched "$_l" --each $_rest >> "$_o" 2>&1; _r=$?; [ "$_r" -gt "$_rc" ] && _rc=$_r; fi
+    _want=0; [ -n "$_full" ] && _want=$((_want + 1)); [ -n "$_rest" ] && _want=$((_want + 1))
+    [ "$(grep -c '^EACH: ' "$_o")" = "$_want" ] || _rc=3
+    return "$_rc"
+}
+if runs_for gone-touched gone-new-untouched; then
+echo "== 1. every retraction file's GONE wordings in the files the sitting touched; a CHANGED retraction file on the whole tree"
+set -- tests/rulecheck/retractions/*.tsv
+real="$*"; list="$W/touched.txt"
+if [ -n "${STATIC_CHANGED_PATHS+x}" ]; then   # the runner's override (tests/run_all_static.sh cad_changed)
+    printf '%s\n' "$STATIC_CHANGED_PATHS" | awk 'NF' | sort -u > "$list"
+elif git rev-parse -q --verify origin/main >/dev/null 2>&1; then
+    { git diff --name-only origin/main; git ls-files --others -- docs tests tools build/manifest; } | sort -u > "$list"
+else
+    list=-; echo "  note  no origin/main to diff against: every pattern file is judged on the WHOLE tree (reach too) — the safe side"
+fi
+if vs_ctl_is gone-touched; then
+    plant_gone "$W/mode.tsv"; MODE_EXPECT="$EXPECT"
+    real="$(printf '%s\n' "$@" | sed "s#^$NEWEST\$#$W/mode.tsv#" | tr '\n' ' ')"
+    echo tests/test_close_tools.sh >> "$list"
+    echo "MODE: control gone-touched — $NEWEST replaced by a copy where a wording of this gate's header is marked gone, and this gate listed as touched"
+elif vs_ctl_is gone-new-untouched; then
+    plant_gone "$W/mode.tsv"; MODE_EXPECT="$EXPECT"
+    real="$(printf '%s\n' "$@" | sed "s#^$NEWEST\$#$W/mode.tsv#" | tr '\n' ' ')"
+    [ "$list" = - ] || { grep -vxF tests/test_close_tools.sh "$list" > "$W/l2"; echo "$W/mode.tsv" >> "$W/l2"; list="$W/l2"; }
+    echo "MODE: control gone-new-untouched — $NEWEST replaced by a CHANGED copy with a new gone wording of this gate's header, this gate NOT listed as touched"
+fi
+judge_split "$list" "$W/each.out" $real; rc=$?
+if [ "$rc" -ge 2 ]; then
+    echo "REFUSED: tools/retraction_grep.py --each printed no EACH line, or exited $rc (a crash or a refusal, not a verdict): $(grep -v '^FILE' "$W/each.out" | tail -1 | cut -c1-160)"; exit 3
+fi
+if [ "$rc" -eq 0 ]; then ok "$(grep '^# retraction_grep.py --each' "$W/each.out" | sed 's/^# retraction_grep.py --each: //' | cut -c1-110 | tr '\n' '|'): $(grep '^EACH' "$W/each.out" | tr '\n' ' ')"
+else
+    bad "$(grep '^FILE .*: FAIL' "$W/each.out" | cut -c1-220 | tr '\n' ' ')"
+    if [ -n "${VS_CTL:-}" ] && ! grep -F "FILE $W/mode.tsv: " "$W/each.out" | grep -qF "$MODE_EXPECT"; then
+        echo "REFUSED: mode $VS_CTL — the scan failed WITHOUT naming the plant ($MODE_EXPECT)"; exit 3
     fi
-    if out="$(python3 tools/retraction_grep.py "$src" 2>&1)"; then ok "$f: $(printf '%s\n' "$out" | tail -1)"
-    elif printf '%s\n' "$out" | grep -q '^FAIL: '; then
-        bad "$f: $(printf '%s\n' "$out" | grep '^FAIL' | cut -c1-160)"
-        if [ -n "${VS_CTL:-}" ]; then   # a MODE must fail on the PLANT's own FAIL line, never on a crash
-            case "$VS_CTL" in
-                unreachable-control) want="zq-no-such-wording-anywhere-$$ (0 < 1)" ;;
-                reach-threshold) want="< 9)" ;;
-                gone-reintroduced) want="marked GONE is back in the tree" ;;
-                *) want="" ;;
-            esac
-            if [ -n "$want" ] && ! printf '%s\n' "$out" | grep -qF "$want"; then echo "REFUSED: mode $VS_CTL — the grep failed WITHOUT naming the plant ($want): $(printf '%s\n' "$out" | grep '^FAIL' | cut -c1-120)"; exit 3; fi
-        fi
-    else echo "REFUSED: $f — tools/retraction_grep.py exited non-zero with no FAIL line (a crash or a refusal, not a verdict): $(printf '%s\n' "$out" | tail -1 | cut -c1-160)"; exit 3; fi
-done
-[ "$n" -gt 0 ] || bad "no retraction file under tests/rulecheck/retractions/"
+fi
+fi
 
+if runs_for case-fold-dropped markup-dropped; then
 echo "== 1b. the matcher itself: case-folding, comment-prefix and backtick collapsing on planted texts"
 nofold=""
 if vs_ctl_is case-fold-dropped; then nofold="--nofold"; echo "MODE: control case-fold-dropped — the matcher self-test runs WITHOUT case-folding"; fi
@@ -102,7 +148,9 @@ elif printf '%s\n' "$out" | grep -q '^SELFTEST FAIL'; then
     if vs_ctl_is case-fold-dropped && ! printf '%s\n' "$out" | grep -q '^SELFTEST FAIL:.*upper-case'; then echo "REFUSED: mode case-fold-dropped — the no-fold self-test failed but NOT on the upper-case case"; exit 3; fi
     if vs_ctl_is markup-dropped && ! printf '%s\n' "$out" | grep -q '^SELFTEST FAIL:.*quote-wrapped'; then echo "REFUSED: mode markup-dropped — the no-markup self-test failed but NOT on the quote-wrapped case"; exit 3; fi
 else echo "REFUSED: the matcher self-test neither passed nor failed on its own line (exit $rc — a crash, not a verdict): $(printf '%s\n' "$out" | tail -1 | cut -c1-160)"; exit 3; fi
+fi
 
+if [ -z "${VS_CTL:-}" ]; then
 echo "== 1c. the address scan (tools/close_findings.py --selftest): a planted address, a suffix-form address and an old-only home"
 # its three control lines are the tool's own, reported here as one verdict (not as this gate's CONTROL lines): no gate ran
 # the self-test until 14z-184, when the documentation packet (rule-checker run 2026-09-25-322) found `0x028B5A/5E`'s second
@@ -111,7 +159,9 @@ out="$(python3 tools/close_findings.py --selftest 2>&1)"; rc=$?
 if [ "$rc" -eq 0 ] && [ "$(printf '%s\n' "$out" | grep -c '^CONTROL FIRED:')" -eq 3 ]; then ok "close_findings self-test: planted-address, suffix-address and old-home-only all fire"
 elif printf '%s\n' "$out" | grep -q '^CONTROL DEAD:'; then bad "close_findings self-test: $(printf '%s\n' "$out" | grep '^CONTROL DEAD:' | cut -c1-140 | tr '\n' ' ')"
 else echo "REFUSED: tools/close_findings.py --selftest neither passed nor named a dead control (exit $rc — a crash, not a verdict): $(printf '%s\n' "$out" | tail -1 | cut -c1-160)"; exit 3; fi
+fi
 
+if runs_for build-home-planted bare-name-silent letter-unchecked; then
 echo "== 2. the homes tool catches a planted untracked home"
 blind=""
 if vs_ctl_is build-home-planted; then blind="--blind"; echo "MODE: control build-home-planted — the self-test runs on the BLIND variant (build/ reads disabled): the plant must go uncaught and the gate FAIL"; fi
@@ -125,7 +175,9 @@ elif printf '%s\n' "$out" | grep -q '^SELFTEST FAIL'; then
     if vs_ctl_is bare-name-silent && ! printf '%s\n' "$out" | grep -q '^SELFTEST FAIL:.* bare=False'; then echo "REFUSED: mode bare-name-silent — the no-bare self-test failed but NOT on the bare names"; exit 3; fi
     if vs_ctl_is letter-unchecked && ! printf '%s\n' "$out" | grep -q '^SELFTEST FAIL:.* letters=False'; then echo "REFUSED: mode letter-unchecked — the no-letters self-test failed but NOT on the letters"; exit 3; fi
 else echo "REFUSED: the self-test neither passed nor failed on its own line (exit $rc — a crash, not a verdict): $(printf '%s\n' "$out" | tail -1 | cut -c1-160)"; exit 3; fi
+fi
 
+if runs_for bare-none-accepted; then
 echo "== 2c. the reason check (tools/none_reasons.py --selftest): a finding whose test is none must say why"
 lenient=""
 if vs_ctl_is bare-none-accepted; then lenient="--lenient"; echo "MODE: control bare-none-accepted — the self-test runs on the LENIENT variant (a bare none accepted): the plant must go uncaught and the gate FAIL"; fi
@@ -133,6 +185,7 @@ out="$(python3 tools/none_reasons.py --selftest $lenient 2>&1)"; rc=$?
 if [ "$rc" -eq 0 ] && printf '%s\n' "$out" | grep -q '^SELFTEST PASS'; then ok "$(printf '%s\n' "$out" | tail -1)"
 elif printf '%s\n' "$out" | grep -q '^SELFTEST FAIL'; then bad "$(printf '%s\n' "$out" | grep '^SELFTEST FAIL' | head -1 | cut -c1-160)"
 else echo "REFUSED: tools/none_reasons.py --selftest neither passed nor failed on its own line (exit $rc — a crash, not a verdict): $(printf '%s\n' "$out" | tail -1 | cut -c1-160)"; exit 3; fi
+fi
 
 unguard() {   # a copy of homes_tracked.py without the output-path guard (the control output-overwrites)
     python3 - tools/homes_tracked.py "$1" <<'PY'
@@ -143,11 +196,14 @@ assert s.count(a) == 1, "the guard moved"
 open(sys.argv[2], "w").write(s.replace(a, "        if False:   # CONTROL output-overwrites"))
 PY
 }
+if [ -z "${VS_CTL:-}" ]; then
 echo "== 2b. the NEWEST findings table row of STATE.md, on the live tree (the close's own output is a snapshot)"
 if out="$(python3 tools/homes_tracked.py --newest 2>&1)"; then ok "$(printf '%s\n' "$out" | head -1 | cut -c1-200)"
 elif printf '%s\n' "$out" | grep -q '^FAIL'; then bad "$(printf '%s\n' "$out" | grep '^FAIL\|^#' | head -4 | tr '\n' ' ' | cut -c1-300)"
 else echo "REFUSED: tools/homes_tracked.py --newest exited non-zero with no FAIL line (a crash, not a verdict): $(printf '%s\n' "$out" | tail -1 | cut -c1-160)"; exit 3; fi
+fi
 
+if runs_for output-overwrites; then
 echo "== 2d. the output path is never an input (14z-191: \`--newest STATE.md\` wrote the report over STATE.md)"
 cp STATE.md "$W/S.md"; H0="$(shasum "$W/S.md" | cut -c1-40)"
 HT=tools/homes_tracked.py
@@ -156,6 +212,7 @@ python3 "$HT" --newest --state "$W/S.md" "$W/S.md" > "$W/ow.txt" 2>&1; rc=$?
 if [ "$rc" = 3 ] && grep -q '^REFUSED: the output path' "$W/ow.txt" && [ "$(shasum "$W/S.md" | cut -c1-40)" = "$H0" ]; then
     ok "the state file given as the output path is REFUSED and left byte-identical"
 else bad "the state file given as the output path was not refused (exit $rc), or it changed"; fi
+fi
 
 if [ -z "${VS_CTL:-}" ]; then
     echo "== 3. controls"
@@ -163,19 +220,19 @@ if [ -z "${VS_CTL:-}" ]; then
     python3 "$W/ht_unguarded.py" --newest --state "$W/S2.md" "$W/S2.md" > /dev/null 2>&1
     if [ "$(shasum "$W/S2.md" | cut -c1-40)" != "$H2" ]; then vs_ctl_fired output-overwrites "without the guard the report overwrote the state copy it read"
     else vs_ctl_dead output-overwrites "the unguarded copy left the state copy unchanged"; fail=1; fi
-    f="$(ls tests/rulecheck/retractions/*.tsv | head -1)"; cp "$f" "$W/c1.tsv"; printf 'zq-no-such-wording-anywhere-%s\tplanted\treach\n' "$$" >> "$W/c1.tsv"
-    if python3 tools/retraction_grep.py "$W/c1.tsv" >"$W/c1.out" 2>&1; then vs_ctl_dead unreachable-control "an unreachable reach pattern did not make the grep exit 1"; fail=1
-    elif grep -q "^FAIL: reach control.*zq-no-such-wording-anywhere-$$ (0 < 1)" "$W/c1.out"; then vs_ctl_fired unreachable-control "$(grep '^FAIL' "$W/c1.out" | cut -c1-120)"
-    else vs_ctl_dead unreachable-control "the grep exited non-zero WITHOUT naming the planted control: $(tail -1 "$W/c1.out" | cut -c1-120)"; fail=1; fi
-    sed 's/\treach:2$/\treach:9/' "$f" > "$W/c3.tsv"
-    if ! grep -q '	reach:9$' "$W/c3.tsv"; then vs_ctl_dead reach-threshold "$f has no reach:2 control to raise"; fail=1
-    elif python3 tools/retraction_grep.py "$W/c3.tsv" >"$W/c3.out" 2>&1; then vs_ctl_dead reach-threshold "a reach:9 control did not make the grep exit 1"; fail=1
-    elif grep -q "^FAIL: reach control.*< 9)" "$W/c3.out"; then vs_ctl_fired reach-threshold "$(grep '^FAIL' "$W/c3.out" | cut -c1-120)"
-    else vs_ctl_dead reach-threshold "the grep exited non-zero WITHOUT naming the raised threshold: $(tail -1 "$W/c3.out" | cut -c1-120)"; fail=1; fi
-    awk -F'\t' 'BEGIN{OFS="\t"} $3 ~ /^reach/ && !done {p=$1; sub(/^[^ ]+ /, "", p); print p, "planted: a live wording (a reach control minus its first word) marked gone", "gone"; done=1} {print}' "$f" > "$W/c4.tsv"
-    if python3 tools/retraction_grep.py "$W/c4.tsv" >"$W/c4.out" 2>&1; then vs_ctl_dead gone-reintroduced "a live wording marked gone did not make the grep exit 1"; fail=1
-    elif grep -q "^FAIL: a wording marked GONE is back" "$W/c4.out"; then vs_ctl_fired gone-reintroduced "$(grep '^FAIL' "$W/c4.out" | cut -c1-120)"
-    else vs_ctl_dead gone-reintroduced "the grep exited non-zero WITHOUT naming the gone wording: $(tail -1 "$W/c4.out" | cut -c1-120)"; fail=1; fi
+    plant_gone "$W/c1.tsv"; echo tests/test_close_tools.sh > "$W/c1.list"
+    judge_split "$W/c1.list" "$W/c1.out" "$W/c1.tsv"; rc=$?
+    if [ "$rc" -eq 0 ]; then vs_ctl_dead gone-touched "a wording of this gate's text marked gone did not fail the touched scan of this gate"; fail=1
+    elif [ "$rc" = 1 ] && grep -qF "$EXPECT" "$W/c1.out"; then vs_ctl_fired gone-touched "the touched scan of tests/test_close_tools.sh FAILS the planted copy of $NEWEST: $(grep '^FILE' "$W/c1.out" | grep -F "$EXPECT" | head -1 | sed 's/^FILE [^ ]*: //' | cut -c1-120)"
+    else vs_ctl_dead gone-touched "the touched scan exited $rc WITHOUT naming the planted wording: $(tail -1 "$W/c1.out" | cut -c1-120)"; fail=1; fi
+    plant_gone "$W/c9.tsv"; echo "$W/c9.tsv" > "$W/c9.list"   # the pattern file CHANGED; the file carrying the wording NOT touched
+    printf 'tests/test_close_tools.sh\ntests/lib/controls.sh\n' > "$W/c9.universe"   # the tree's stand-in: this gate and the library it sources, not in the list
+    RETRACTION_GREP_UNIVERSE="$W/c9.universe"; export RETRACTION_GREP_UNIVERSE
+    judge_split "$W/c9.list" "$W/c9.out" "$W/c9.tsv"; rc=$?
+    unset RETRACTION_GREP_UNIVERSE
+    if [ "$rc" -eq 0 ]; then vs_ctl_dead gone-new-untouched "a new gone wording in a changed pattern file, carried by an untouched file, did not fail"; fail=1
+    elif [ "$rc" = 1 ] && grep -qF "$EXPECT" "$W/c9.out" && grep -q 'ONE scan over [0-9]* files (every tracked' "$W/c9.out"; then vs_ctl_fired gone-new-untouched "the CHANGED copy of $NEWEST gets the whole-tree scan (on a two-file stand-in for the tree, this gate among them, the list naming only the copy) and FAILS on a wording only the untouched gate carries: $(grep '^FILE' "$W/c9.out" | grep -F "$EXPECT" | head -1 | sed 's/^FILE [^ ]*: //' | cut -c1-110)"
+    else vs_ctl_dead gone-new-untouched "the changed pattern file exited $rc WITHOUT a whole-tree FAIL naming the wording: $(tail -1 "$W/c9.out" | cut -c1-120)"; fail=1; fi
     if python3 tools/retraction_grep.py --selftest --nofold >"$W/c5.out" 2>&1; then vs_ctl_dead case-fold-dropped "the no-fold matcher passed the self-test — the upper-case plant is not what it catches"; fail=1
     elif grep -q '^SELFTEST FAIL:.*upper-case' "$W/c5.out"; then vs_ctl_fired case-fold-dropped "$(grep '^SELFTEST FAIL' "$W/c5.out" | cut -c1-120)"
     else vs_ctl_dead case-fold-dropped "the no-fold matcher exited non-zero WITHOUT its self-test FAIL line: $(tail -1 "$W/c5.out" | cut -c1-120)"; fail=1; fi

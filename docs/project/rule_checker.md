@@ -205,7 +205,20 @@ accepted — and the tool refuses one that does not (never chain `resolve` and t
 then prepared before its predecessor is resolved — paid TWICE in 14z-185: runs 374/375, where `Q1 and Q4:`
 was refused, and runs 399/400, where `Q1+Q4:` was) (maintainer-ruled, option
 C: the questions are bounded AND what they still find is answered in
-writing). The checker's output is reported to the
+writing). **An answer that blames the instrument is a ticket** (#271 part 3, 14z-199: filed on
+the maintainer's "yes file them on github" as the session's answer to their "how can we improve ?" about
+the 2550/2560 case; the rule is the session's, put to them at the close): `resolve` refuses one that says "no slip", "the plant's reader", "W# hint", a
+reader's misreading and the like unless it names an OPEN ticket (`#N`, open or parked in
+`docs/project/tickets.tsv`) — answered run by run, the calibration plants' readers' 2550/2560 drew
+QP3 VIOLATEDs from 14z-179 to 14z-198 and nothing aggregated them. It refuses an answer by work that
+only quotes such a phrase too (5 of the 19 past matches: runs 825, 932, 933, 938, 939): name the ticket that owned the case, or reword.
+**And a finding that keeps
+coming back is a red** (C3, and the rot rule "a recurring violation opens a ticket", both adopted by the
+maintainer: "I agree with your proposals for C1, C2, C3, C4", "8. Rot -> I agree with your proposals"):
+`tools/recurrence_alarm.py` (gate `tests/test_recurrence_alarm.sh`, so every
+close) groups the VIOLATED lines of the ledger by a question and a pair of cited tokens and fails when
+one recurs in three subjects across two sessions, until `tests/rulecheck/recurrence.tsv` names the
+ticket that owns its cause. The checker's output is reported to the
 maintainer VERBATIM, never summarised — paraphrase is where softening
 happens — and the run dir keeps it verbatim.
 

@@ -1,0 +1,20 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent199/t271/out/extract198_wsharp.txt	8689d31f8a11b2c3fec55b5d95b114c6d2eb76bc
+build/agent199/t271/out/alarm_noack.txt	736fb9a70eb296cb2e59936aef5dcdb628abefdf
+build/agent199/t271/out/alarm_ack.txt	393599ffa1370cef427d9d41c15f0bc6da2ff423
+build/agent199/t271/out/alarm_selftest.txt	da45330efea5bb7e1f1ff314b5772cbe983d4965
+build/agent199/t271/out/thresholds.txt	c6868f530e9417acd19ec4816f4bb3754ed61362
+build/agent199/t271/out/blame_matches.txt	be73e34568488f2a8ab2ba6eddd3305d8ba53465
+build/agent199/t271/out/gate_test_agent_extract.txt	f06f40d4bfabf5bc34b68632b2923f4e1438d455
+build/agent199/t271/out/gate_test_recurrence_alarm.txt	2aa4001124feff51dc57c5ceb082989b929a7697
+build/agent199/t271/out/gate_test_rule_checker.txt	2567db8a062ec77f940591c3ce695ad90ebacde0
+build/agent199/t271/out/modes.txt	8404aea38569b0446c3aab02f9623b8acb136e18
+build/agent199/t271/out/diff_271.txt	cb16ce72613af3f44090acd56f9a898905d210ba
+build/agent199/t271/make_out.sh	0ac3ed1072d52b441242c3ab31a3f50063f1b896
+build/agent199/t271/thresholds.py	833c2139bc50148b78eb21f99a5f18f8999718e5
+tools/recurrence_alarm.py	b06b375075e3d456edfc1b7842f74b40d55b648f
+tests/test_recurrence_alarm.sh	f9bc2674670a0b2bb6884d514dab16ef06d2a28f
+tests/rulecheck/recurrence.tsv	46dd2f7a79e7674666efb4562a6b7652e1c0e435
+build/agent199/t271/out/registration.txt	1722216cc31982a2cf40547203d71f2d105e7467
+DECISIONS_HISTORY.md.lines-6637-6649 (lines 6637-6649 of DECISIONS_HISTORY.md)	a672b8d004c3386ed43cbd05f1045f6c9dccc60d
+STATE.md.lines-82-82 (lines 82-82 of STATE.md)	8842b82de6800144df0a26f95e363f85f223351c

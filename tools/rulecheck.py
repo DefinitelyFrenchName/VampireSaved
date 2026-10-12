@@ -947,6 +947,32 @@ def cmd_spawned(a):
         sys.exit(1)
 
 
+# #271 part 3 (14z-199; filed on the maintainer's "yes file them on github", STATE 14z-199 row (3), as the session's
+# answer to their "The 2550/2560 case: cause found, and you're right it should have been loud -> how can we improve ?"
+# — the rule itself is the session's, put to the maintainer at the close): a resolution that BLAMES THE INSTRUMENT — the plant's reader, the
+# extract's hint, a checker's misreading — is an instrument defect, and an instrument defect is a ticket. Without an
+# OPEN one named in the line, the blame is how a recurring case got answered run by run and never aggregated (the
+# plant readers' 2550/2560: "no slip" at 14z-197, "accepted" at 14z-198). Measured on the 686 resolutions the
+# ledger held when the rule was written (build/agent199/t271/out/blame_matches.txt lists them, with the ledger's count
+# when it was last made): these wordings catch 19, read as blaming
+# the plant's reader, the extract's hint or a reader's misreading ("false positive" was dropped: its one match was
+# about a hook). The rule also refuses an answer BY WORK that merely quotes a phrase ("report.md no longer says no
+# slip", runs 825, 932, 933, 938 and 939 of the 19): such an answer names the ticket that owned the case, or is reworded.
+BLAME = re.compile(r"\bno slip\b|\bnot a slip\b|\bartefact\b|\bartifact of the (?:checker|reader|extract|hint|instrument)\b"
+                   r"|\bplant'?s? readers?\b|\bplant reader\b|\b[AW]# hint\b|\breader error\b"
+                   r"|\bthe (?:reader|checker)s?(?:'s?)? (?:misread|misreading|erred|was wrong)", re.I)
+BLAME_CHECKED = True   # False: the pre-#271 resolve (test_rule_checker's blame-unticketed control)
+
+
+def open_tickets(root: Path):
+    """The issue numbers docs/project/tickets.tsv lists as OPEN on GitHub (status open or parked)."""
+    p = root / "docs/project/tickets.tsv"
+    if not p.is_file():
+        return set()
+    return {c[0] for c in (ln.split("\t") for ln in p.read_text().splitlines() if ln and not ln.startswith("#"))
+            if len(c) > 2 and c[2] in ("open", "parked")}
+
+
 def cmd_resolve(a):
     root = REPO
     rows = read_ledger(root)
@@ -963,6 +989,11 @@ def cmd_resolve(a):
     missing = [q for q in r["violated"].split() if f"{q}:" not in a.how]
     if missing:
         die(f"the resolution must answer each violated question by its label ({', '.join(q + ':' for q in missing)} missing) — what changed, or why the finding is accepted")
+    blame = BLAME.search(a.how) if BLAME_CHECKED else None
+    if blame and not set(re.findall(r"#(\d+)", a.how)) & open_tickets(root):
+        die(f"the resolution blames the instrument (\"{blame.group(0)}\") but names no OPEN ticket in docs/project/tickets.tsv"
+            " — an instrument defect is a ticket (#271): open one and name it as #N, or answer the finding by work (an answer"
+            " by work that only QUOTES such a phrase names the ticket that owned the case, or is reworded)")
     p = root / LEDGER
     lines = p.read_text().splitlines(keepends=True)
     out = []

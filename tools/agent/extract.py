@@ -45,7 +45,11 @@ report — measured, `tools/agent/probe_agents.sh` A10):
       2026-10-02-566 QP5); a foreground worker's last text, as before
   W#  every figure of the report that no result the WORKER itself got contains (QP3 widened
       to workers, ruled 2026-09-23) — a hint, as A# is; the spec is NOT a source, because a
-      figure found only in the spec was handed to the worker, not measured by it
+      figure found only in the spec was handed to the worker, not measured by it — EXCEPT for a
+      RULE-CHECKER reader (#271, maintainer-ruled 2026-10-12, 14z-199): it judges the claim its
+      prompt carries and quotes it, so its prompt is a source. A calibration plant's reader
+      quoting its planted claim's frames 2550/2560 raised W# in procedure runs from 14z-179 to
+      14z-198 (tools/recurrence_alarm.py names the family)
   W   `NO WORKER TRANSCRIPT` when a call has none, so a missing worker cannot read as a quiet one
 
 and a closing TASKS block: every tracked task with no notification in the span, and
@@ -107,6 +111,12 @@ def _text(content):
 
 
 SPEC_LINES, REPORT_LINES = 80, 60
+JUDGE_PROMPT_SOURCED = True   # #271: False is the pre-#271 extractor (test_agent_extract's judge-prompt-unsourced control)
+
+
+def is_judge(inp, meta):
+    """A rule-checker reader: by the call's subagent_type, or by the worker's own meta.json agentType."""
+    return inp.get("subagent_type") == "rule-checker" or (meta or {}).get("agentType") == "rule-checker"
 
 
 def workers_of(path):
@@ -202,7 +212,9 @@ def worker_lines(tag, block, inp, workers, sess_hb=None):
         out.append(f"{tag} WX | {ln}")
     if len(rep) > REPORT_LINES:
         out.append(f"{tag} WX | … {len(rep) - REPORT_LINES} more report lines not shown")
-    miss = [f for f in figures(report) if not sourced(f, results)]
+    # a rule-checker reader judges the claim its prompt carries: quoting it is not an unsourced figure (#271)
+    sources = results + ([str(inp.get("prompt", ""))] if JUDGE_PROMPT_SOURCED and is_judge(inp, meta) else [])
+    miss = [f for f in figures(report) if not sourced(f, sources)]
     if miss:
         out.append(f"{tag} W# figures in the report that no result the worker got contains: {', '.join(miss[:40])}")
     return out
@@ -356,6 +368,10 @@ def selftest():
         # w3's report reached the session as a hand-back AFTER the call, w4's never did
         rec("assistant", [{"type": "tool_use", "id": "a3", "name": "Agent", "input": {"subagent_type": "rule-checker", "description": "c3", "prompt": "Q1"}}]),
         rec("assistant", [{"type": "tool_use", "id": "a4", "name": "Agent", "input": {"subagent_type": "rule-checker", "description": "c4", "prompt": "Q1"}}]),
+        # #271: a rule-checker reader quotes its prompt's claim (2560) and states a figure in neither (4242); a
+        # measurer whose spec names 555 is still flagged for it (above)
+        rec("assistant", [{"type": "tool_use", "id": "a5", "name": "Agent", "input": {"subagent_type": "rule-checker", "description": "c5",
+                           "prompt": "Claim: the pins start from frame 2560 at the earliest"}}]),
         {"type": "attachment", "timestamp": "2026-09-23T10:09:00Z",
          "attachment": {"type": "queued_command", "prompt": '<agent-message from="w3">\n[Subagent hand-back] The text below is the final report. The report follows:\n  Q1: OK — six lines\n  VERDICT: OK\n</agent-message>'}},
     ]
@@ -377,6 +393,16 @@ def selftest():
                   {"type": "assistant", "effort": "high", "message": {"model": "mS", "content": [
                       {"type": "text", "text": "Trailing prose written after the hand-back, never delivered."}]}}):
             g.write(json.dumps(r) + "\n")
+    with open(os.path.join(d, "s", "subagents", "agent-w5.meta.json"), "w") as g:
+        json.dump({"agentType": "rule-checker", "toolUseId": "a5"}, g)
+    with open(os.path.join(d, "s", "subagents", "agent-w5.jsonl"), "w") as g:
+        for r in ({"type": "assistant", "effort": "high", "message": {"model": "mR", "content": [
+                      {"type": "tool_use", "id": "r5", "name": "Read", "input": {"file_path": "a.txt"}}]}},
+                  {"type": "user", "message": {"content": [{"type": "tool_result", "tool_use_id": "r5", "content": "pins at t - 40"}]}},
+                  {"type": "assistant", "effort": "high", "message": {"model": "mR", "content": [
+                      {"type": "tool_use", "id": "h5", "name": "SubagentHandback",
+                       "input": {"message": "Q1: VIOLATED — the pins from 2560 rest on 4242"}}]}}):
+            g.write(json.dumps(r) + "\n")
     for wid, tu in (("w3", "a3"), ("w4", "a4")):
         with open(os.path.join(d, "s", "subagents", f"agent-{wid}.meta.json"), "w") as g:
             json.dump({"agentType": "rule-checker", "toolUseId": tu, "requestShape": "background"}, g)
@@ -387,6 +413,8 @@ def selftest():
     wg_cut = extract(main, last=len(wrows) - 2)   # the span ends BEFORE w3's hand-back arrives
     shutil.rmtree(d)
     wline = next((ln for ln in wg.split("\n") if " W# " in ln), "")
+    w5 = wg.split("worker rule-checker — c5", 1)[-1].split(" W  worker ", 1)[0]   # the c5 worker's block
+    w5line = next((ln for ln in w5.split("\n") if " W# " in ln), "")
     checks.update({
         "worker spec shown": "WS | TASK: x" in wg,
         "worker caps shown": "WM ran on mS at effort high" in wg,
@@ -396,6 +424,8 @@ def selftest():
         "worker figure sourced in its own result not flagged": "1234" not in wline,
         "worker figure in no result flagged": "9876" in wline,
         "worker figure found only in the SPEC flagged": "555" in wline,
+        "a rule-checker's figure found only in its PROMPT not flagged (#271)": "worker rule-checker — c5" in wg and "2560" not in w5line,
+        "a rule-checker's figure in neither its prompt nor its results flagged (#271)": "4242" in w5line,
         "a call without a worker transcript is loud": "NO WORKER TRANSCRIPT" in wg,
         "a hand-back is shown and sources the orchestrator": "H  report of worker w9 arrived" in wg
             and not any("A# " in ln and "8642" in ln for ln in wg.split("\n")),

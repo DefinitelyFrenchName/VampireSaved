@@ -1,0 +1,22 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent199/t268/out/close_tools_run.txt	30e8ce3fabaec509511951357560bca0f66f8663
+build/agent199/t268/out/retraction_reach_run.txt	f9fd2b5130480d97fe843939bb83ce5d9bdff90e
+build/agent199/t268/out/modes.txt	e8b7406444a703641a70aa25ac36d62910695ca8
+build/agent199/t268/out/single_identical.txt	2fa14de2c875a38e15ade1bf23010a3e9d13a3de
+build/agent199/t268/out/per_file_old.txt	a5b37f79f8feae79b948a8ccf70580490f8cf6bb
+build/agent199/t268/out/each_run.txt	64e8a3c1a8049726d5278dfb43af9f6f5d0d0ed3
+build/agent199/t268/out/data_hits.txt	4c37d0639f6dab3bae854de2e45604ecd8b02951
+build/agent199/t268/out/patterns_audit.txt	dace25ebb1145fcc4fad1e76782dc9f97db31082
+build/agent199/t268/out/override_run.txt	b68e307b8d4e968285c45e6b28ece9d0a7c482e5
+build/agent199/t268/out/nobase_run.txt	f1473df16c6caac4fa3b3a48d4c57115db8f7feb
+build/agent199/t268/out/gates/summary.txt	605481c7447d6956ede4adbea62c8b033779b46f
+build/agent199/t268/out/diff.txt	1825156c97b6849a54c2edef95980e2bb51fa52b
+build/agent199/t268/make_out.sh	f1338379bb39429861c65cb075aada09c3b3da8a
+build/agent199/t268/data_hits.py	5a01a5887443e58c2614a90350860936ea5ad675
+build/agent199/t268/fallbacks.sh	2840cb0610ac1827f173dee6895ed00b0a750128
+build/agent199/t1/out/close_tools_time.txt	bf8eeda1c0f1646387447879c48dd63544b58c5b
+build/agent199/t1/out/close_tools_controls_14z198.tsv	1e0ab038cbc8b17a78fe9c0a4a62dca38f5c0d78
+tests/test_close_tools.sh	ee8a5b0cec233d79baa4fe1335184c57f1500118
+tests/test_retraction_reach.sh	081900df2801d405fec63743d38fcd012cbf87e3
+tools/retraction_grep.py	4ff79c4d70e9e6251328658116173c556214cf67
+tests/ci_cadence.tsv	5358f9794b6e9ea4bb8416cef817131800855b46

@@ -389,6 +389,7 @@ declares	test_readme_recording
 declares	test_reconcile_matcher
 declares	test_record_walk_bounds
 declares	test_record_window
+declares	test_recurrence_alarm
 declares	test_ref_rot_image_pick
 declares	test_region_overlap
 declares	test_region_overlap_control
@@ -403,6 +404,7 @@ declares	test_release_recipe_text
 declares	test_release_roundtrip
 declares	test_replay_stage_census
 declares	test_replay_video_selfcheck
+declares	test_retraction_reach
 declares	test_rompath_reject
 declares	test_romset_identity
 declares	test_romset_path_guard

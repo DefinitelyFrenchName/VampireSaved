@@ -1,0 +1,45 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent199/t1/report.md	0c1653d35288a7ea9cedabf91ac341341fe39703
+build/agent199/t1/classify_rubric.md	71bc82f52eb945d78e77d6abad38deb59e9f0a51
+build/agent199/t1/classifier_spec_A.md	6ffca9b70b3c4fd150a35d46dd4bb8a2147ad84b
+build/agent199/t1/classifier_spec_B.md	38e1a518f0193e8e0aa5916aa62b414e34f96069
+build/agent199/t1/violations_196_198.md	2739e3fe581fd6ab4b01b5ccdf2e3431dc85bb1d
+build/agent199/t1/class_A.tsv	74dedd4f79bf36c200316699391116fdc5542129
+build/agent199/t1/class_B.tsv	a32c43186dd47f7266a4fdfbb83df8ecdceb7db1
+build/agent199/t1/tier_costs.py	f74935949ec51e568166c45e4e432bc386808521
+build/agent199/t1/tiers_by_session.py	ea7dbc859fc702fc624f38039c3430bbce9a7159
+build/agent199/t1/ledger_counts.py	563c87cfe542ce47264cb0fce8e16f2cc5823ea6
+build/agent199/t1/session_figs.py	110dd7515094ebcdd77ba95bea966d4984bef6be
+build/agent199/t1/violations_extract.py	768db7b58ab0d3e4528c710929a85429a870e11e
+build/agent199/t1/class_compare.py	02aa9608f9f01e0ecda501ab02ae970509fcb9e5
+build/agent199/t1/class_breakdown.py	da1fbfd454df6a64bf4151c51cf32e679dc7f962
+build/agent199/t1/plant_case.py	f04abdcd2652ac8589ba0fab847aca7d6f5155e3
+build/agent199/t1/make_out.sh	42d8204a6ed5e8013a4074263523a6344017b1e5
+build/agent199/t1/worker_calls.py	468fd89fea9147bad01cec33f5597ea2a186b35b
+build/agent199/t1/out/breakdown.txt	1426ef8bfaf89188827989bb8b4e4023b427d0fe
+build/agent199/t1/out/close_tools_time.txt	bf8eeda1c0f1646387447879c48dd63544b58c5b
+build/agent199/t1/out/compare.txt	7f741d15ed6a60a213babe3fc389b99414c8b8e5
+build/agent199/t1/out/compare_plant.txt	0937bc233a5b14e45ce6b8fb563946cd4d85df22
+build/agent199/t1/out/ledger_163_198.txt	854cad376aa2a25a9cbec500d3b95577873519b2
+build/agent199/t1/out/ledger_188_198.txt	bb78d2cfa50c10aa35840f13ed1cffe704ba3f84
+build/agent199/t1/out/plant_case.txt	99d73096cd1da14310536827adc5253ba03fee8f
+build/agent199/t1/out/retraction_files.txt	43a18a68567db67cb6e9aa79f680f4d2b0bed73f
+build/agent199/t1/out/retraction_timing_return.txt	9810bacd09268785f6fb57f0295b77b717459ded
+build/agent199/t1/out/session_figs.txt	fa94daa968dc2af42133d61b089b0d1536a9d039
+build/agent199/t1/out/tier_costs_20261009T131425Z_51412.txt	af4f79ade5aed16bf273f9da683f00896747ceef
+build/agent199/t1/out/tier_costs_20261011T144301Z_97486.txt	bbf3a07cacd5a30317950b29df6789cad12fb0f2
+build/agent199/t1/out/tier_costs_20261012T124446Z_16164.txt	82ec00124c1981cddc6bc85479585e929502f00f
+build/agent199/t1/out/tiers_by_session.txt	62149fa27499eec8228003d41ffe493bb030c653
+build/agent199/t1/out/tiers_by_session_close198.txt	957376ad75187b28ad6ff8d44f5ecf5232a12566
+build/agent199/t1/out/worker_calls.txt	fab1b82abd94246c83ea2944a6374f297f5fd480
+build/agent199/t1/out/worker_calls_plant.txt	30089bf6a85b29e5d97d518793fc143c4d86dbab
+build/agent199/t1/out/agreed_rubric.tsv	650fddd7bef8f059b7c9cfd9d218e33fa4d50875
+build/agent199/t1/out/close_tools_controls_14z198.tsv	1e0ab038cbc8b17a78fe9c0a4a62dca38f5c0d78
+tests/test_close_tools.sh	1dcdca4cf06fe3b23723df62e66fb7b16409a6d9
+docs/project/must_fire_contract.md	40624d8bcc17ea864f3fdec30b7bb541e79492d0
+docs/project/rule_checker.md.lines-128-194 (lines 128-194 of docs/project/rule_checker.md)	e193939b468d5d0040b2352edbd19ab39fb81137
+DECISIONS_HISTORY.md.lines-6630-6636 (lines 6630-6636 of DECISIONS_HISTORY.md)	bd2bd31916b1ee61f7f5f2284c20478c5a22008e
+STATE.md.lines-157-157 (lines 157-157 of STATE.md)	5df9e1cdf495dfa93aaa77a3b4806c2dee3c2ea4
+DECISIONS_HISTORY.md.lines-2443-2458 (lines 2443-2458 of DECISIONS_HISTORY.md)	dc0ad6fe99d3ea832cb59b013ad7e42978ee0c30
+docs/project/tickets.tsv.lines-78-78 (lines 78-78 of docs/project/tickets.tsv)	c50ee5a9eb607e2ff17e47f8ade5967cf9ef082d
+tests/ci_cadence.tsv	a75441fdeaadbf00c080778f237e65174d72f07b

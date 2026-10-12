@@ -89,7 +89,12 @@ carry). Under the mode the perturbed copy becomes the INPUT the main check
 reads (`ROOT`, `MANIFEST`, `REGISTRY`, `PAGE`, `SIDE_B`, the tool path for a
 shadow tool); the control section still builds its own copy and prints the
 FIRED/DEAD line. What the mode proves is then exactly what the control claims,
-and the two cannot drift. A gate whose control cannot run on a machine (a
+and the two cannot drift. A mode may run ONLY the section its perturbation
+reaches (`tests/test_close_tools.sh` since #268, 14z-199, where eight of its ten
+modes each re-ran a ~8-minute section none of them perturbed, 482-495 s a mode
+at the 14z-198 close): the verdict is still the
+gate's own, and a section reading inputs the perturbation does not touch adds
+only time. A gate whose control cannot run on a machine (a
 bench needing Verilator) REFUSES the mode there rather than passing it.
 
 ## The runners
