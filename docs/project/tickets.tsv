@@ -71,6 +71,7 @@
 # WHAT THE GATE DOES NOT CLAIM: that an answer is ENOUGH. That is judged at the
 # close that closes the ticket.
 issue	kind	status	title	repro	decided	learned	wrong	sessions
+267	evolution	open	Session ledger as a static page generated into docs/site/ at each close (hosting and what to publish are the maintainer's calls)	none	none	none	none	14z-198
 266	bug	open	PILOT's GNOME Shell segfaults under Wayland since 2026-10-09, so audit_release_linux_desktop cannot run	tests/audit_release_linux_desktop.sh	DECISIONS_HISTORY.md § Approved 2026-10-12 (14z-198) — the merged-m23 re-release carries the `audit_release_linux_desktop` SKIP; PILOT's Wayland crash is a ticket (#266)	none	none	14z-198
 265	evolution	open	audit_mask_window_ff42a2 at a release: an instrument with no default subject SKIPs, and the staleness audit now FAILs that SKIP	tests/audit_mask_window_ff42a2.sh	DECISIONS_HISTORY.md § Approved 2026-10-12 (14z-198) — the merged-m23 re-release carries the `audit_mask_window_ff42a2` SKIP; a ticket to deep-dive it (#265)	none	none	14z-198
 264	evolution	done	A session dashboard: time per activity, checks and re-checks and why, tier cost and quality signals, each figure labelled by class (measured, derived, estimated, inferred, extrapolated)	tests/test_session_metrics.sh	DECISIONS_HISTORY.md § Ruled 2026-10-11 (14z-198) — #264: how the session dashboard is built is the session's choice	tools/session_metrics.py § This tool emits NO INFERRED and NO EXTRAPOLATED figure	none	14z-197,14z-198
