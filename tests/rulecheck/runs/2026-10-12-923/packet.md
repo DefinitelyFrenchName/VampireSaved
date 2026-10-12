@@ -1,0 +1,70 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: the 14z-198 close: the documentation packet (rows (1)-(9); every finding's home; the release and its tickets) — re-check after runs 917, 920, 921 and 922
+Claim (the working agent's sentence): claim REFUSED — not a run of record: # run: full 2026-10-12T12:33:51Z 7b28c1d5 c9cb1ab740957a8b | status: NOT A RUN OF RECORD — not as expected: tickets
+Artifacts (read every one, in full):
+  - build/agent198/close/findings_row.txt
+  - build/agent198/close/out/exits.tsv
+  - build/agent198/close/checks.tsv
+  - build/agent198/close/checks_decl.tsv
+  - build/agent198/close/classes.tsv
+  - build/agent198/close/promises.tsv
+  - build/agent198/close/rulings_exempt.tsv
+  - build/agent198/close/premises.txt
+  - tests/rulecheck/retractions/14z-198.tsv
+  - docs/NEXT_SESSION.md
+  - STATE.md.lines-75-89 (lines 75-89 of STATE.md)
+  - DECISIONS_HISTORY.md.lines-6585-6619 (lines 6585-6619 of DECISIONS_HISTORY.md)
+  - docs/project/gotchas.md.lines-6946-6969 (lines 6946-6969 of docs/project/gotchas.md)
+  - docs/platform/gotchas.md.lines-3292-3310 (lines 3292-3310 of docs/platform/gotchas.md)
+  - HANDOFF.md.lines-1391-1401 (lines 1391-1401 of HANDOFF.md)
+  - build/agent198/upload.log
+  - build/agent198/stale_release_final.txt
+  - build/agent198/close/tickets_closed_state.txt
+  - build/agent198/close/pilot_cleanhost_results.tsv
+  - build/agent198/close/pilot_cleanhost_commit.txt
+  - DECISIONS_HISTORY.md.lines-519-528 (lines 519-528 of DECISIONS_HISTORY.md)
+  - DECISIONS_HISTORY.md.lines-6556-6572 (lines 6556-6572 of DECISIONS_HISTORY.md)
+  - STATE_HISTORY.md.lines-268-268 (lines 268-268 of STATE_HISTORY.md)
+  - build/agent198/close/release_assets_state.txt
+  - build/agent198/close/retraction_positive.txt
+  - DECISIONS_HISTORY.md.lines-559-572 (lines 559-572 of DECISIONS_HISTORY.md)
+  - build/agent198/close/out/runs/anchors_selftest.out
+  - build/agent198/close/out/runs/census_selftest.out
+  - build/agent198/close/out/runs/claim_lint_selftest.out
+  - build/agent198/close/out/runs/close_findings.out
+  - build/agent198/close/out/runs/dup_decisions.out
+  - build/agent198/close/out/runs/dup_decisions_plant.out
+  - build/agent198/close/out/runs/dup_state_history.out
+  - build/agent198/close/out/runs/dup_state_history_plant.out
+  - build/agent198/close/out/runs/findings_anchors.out
+  - build/agent198/close/out/runs/findings_anchors_plant.out
+  - build/agent198/close/out/runs/findings_selftest.out
+  - build/agent198/close/out/runs/homes_selftest.out
+  - build/agent198/close/out/runs/homes_tracked.out
+  - build/agent198/close/out/runs/none_reasons.out
+  - build/agent198/close/out/runs/none_reasons_plant.out
+  - build/agent198/close/out/runs/none_reasons_selftest.out
+  - build/agent198/close/out/runs/open_tickets.out
+  - build/agent198/close/out/runs/open_tickets_plant.out
+  - build/agent198/close/out/runs/promise_check.out
+  - build/agent198/close/out/runs/promise_selftest.out
+  - build/agent198/close/out/runs/retraction_grep.out
+  - build/agent198/close/out/runs/retraction_selftest.out
+  - build/agent198/close/out/runs/row_copy.out
+  - build/agent198/close/out/runs/row_copy_plant.out
+  - build/agent198/close/out/runs/rulings_selftest.out
+  - build/agent198/close/out/runs/rulings_verbatim.out
+  - build/agent198/close/out/runs/scratch_census.out
+  - build/agent198/close/out/runs/session_metrics.out
+  - build/agent198/close/out/runs/shape.out
+  - build/agent198/close/out/runs/shape_selftest.out
+  - build/agent198/close/out/runs/standing_selftest.out
+  - build/agent198/close/out/runs/state_lists.out
+  - build/agent198/close/out/runs/submodule_pins.out
+  - build/agent198/close/out/runs/submodule_pins_plant.out
+  - build/agent198/close/out/runs/submodule_pins_selftest.out
+  - build/agent198/close/out/runs/superseded.out
+  - build/agent198/close/out/runs/superseded_selftest.out
+  - build/agent198/close/out/runs/tickets.out

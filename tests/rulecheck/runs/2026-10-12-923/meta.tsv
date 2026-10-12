@@ -1,0 +1,9 @@
+decision	recommendation
+subject	the 14z-198 close: the documentation packet (rows (1)-(9); every finding's home; the release and its tickets) — re-check after runs 917, 920, 921 and 922
+session	14z-198
+model	rule-checker@163e4ce9cf7b
+claim	claim REFUSED — not a run of record: # run: full 2026-10-12T12:33:51Z 7b28c1d5 c9cb1ab740957a8b | status: NOT A RUN OF RECORD — not as expected: tickets
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
