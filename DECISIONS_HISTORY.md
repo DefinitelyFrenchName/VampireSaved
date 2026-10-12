@@ -6610,3 +6610,10 @@ So: this release's emulator run carries the instrument's SKIP, and the staleness
 - the maintainer chose: *"Carry the SKIP + ticket"*
 
 So: this release's emulator run carries the desktop gate's SKIP; #266 holds PILOT's crash, and the gate runs again once PILOT's Wayland session is restored.
+
+## Ruled 2026-10-11 (14z-198) — #264: how the session dashboard is built is the session's choice
+
+**The maintainer, opening the order of work:**
+- the maintainer: *"First, the dashboard. I'll let you decide how to implement it (typically Claude Dashboards or not)."*
+
+So: the session chose a Claude Dashboard artifact fed by `tools/session_metrics.py`'s four datasets, every figure classed (MEASURED / DERIVED / ESTIMATED) with its source and rule; gate `tests/test_session_metrics.sh`, close row `session_metrics`; refreshed by hand at each close (HANDOFF's routing row).
