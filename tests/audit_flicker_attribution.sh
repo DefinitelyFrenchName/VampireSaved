@@ -15,7 +15,7 @@
 #   else and must be re-opened, never widened.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/lua/replay.lua
 #   tests/replays/ tools/attribute_ramdiff.py tools/build_fingerprint.py tools/run_mame.sh
-#   tools/run_replay_mame.sh tools/setup_mame.sh
+#   tools/run_replay_mame.sh tools/setup_mame.sh tests/lib/controls.sh
 # MUST-FIRE: perturbed-copy: wrong-window — every case expects `qsound-handshake-latch`, a window none of the cases' bytes reach, so the count-aware check must FAIL each case (mode: the real cases with that expectation)
 #
 # WHY (14z-91). The legacy-regression fix re-measured 139 specs, and two of

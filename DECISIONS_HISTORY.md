@@ -6617,3 +6617,19 @@ So: this release's emulator run carries the desktop gate's SKIP; #266 holds PILO
 - the maintainer: *"First, the dashboard. I'll let you decide how to implement it (typically Claude Dashboards or not)."*
 
 So: the session chose a Claude Dashboard artifact fed by `tools/session_metrics.py`'s four datasets, every figure classed (MEASURED / DERIVED / ESTIMATED) with its source and rule; gate `tests/test_session_metrics.sh`, close row `session_metrics`; refreshed by hand at each close (HANDOFF's routing row).
+
+## Ruled 2026-10-12 (14z-198) — the close pushes with the release-cadence staleness red; #265 is addressed in the near future
+
+**The question (in chat, at the 14z-198 close):** at release cadence `test_emulator_staleness` FAILs by construction on the two SKIPs approved for this release (`audit_mask_window_ff42a2`, #265; `audit_release_linux_desktop`, #266), and the close's rule leaves a red's commits local — *"So I'll ask you whether that attributed red may go out with the push, or whether the commits stay local until #265 is resolved."*
+
+**The maintainer:**
+- the maintainer: *"the push is fine but we need to address #265 in the near future"*
+
+So: the 14z-198 close pushes with that one attributed red; #265 heads the next session's START HERE.
+
+## Ruled 2026-10-12 (14z-198) — next session: where session time goes, and why rule-checker runs fail
+
+**The maintainer, at the 14z-198 close:**
+- the maintainer: *"Also, for next session, we need to take a deep look at how much time we spend on what: I have a feeling we are running each session checks and tests that really are release-only scope. More importantly, the number of violations we encounter make me wonder if it's the agents being unreliable or the instructions/checks/wording that is facilitating these failing."*
+
+So: the next session opens with that look, from the session dashboard's figures (#264) and the rule-checker ledger.

@@ -21,15 +21,17 @@ there in parallel.** An ERIS tier script starts headless (HANDOFF "AND ON ERIS, 
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** What the close found and did is in STATE 14z-198's CLOSE row.
    merged-m23 is RE-RELEASED (2026-10-12): the nine assets on `freeze/merged-m23` replaced, the 15 done tickets closed.
-1. **Ask the maintainer for the order of work.** The open tickets, by their GitHub severity label:
+1. **FIRST — WHERE SESSION TIME GOES, AND WHY RULE-CHECKER RUNS FAIL** (the maintainer, at the 14z-198 close: *"Also, for next session, we need to take a deep look at how much time we spend on what: I have a feeling we are running each session checks and tests that really are release-only scope. More importantly, the number of violations we encounter make me wonder if it's the agents being unreliable or the instructions/checks/wording that is facilitating these failing."* — `DECISIONS_HISTORY.md` "Ruled 2026-10-12 (14z-198) — next session: where session time goes, and why rule-checker runs fail"). Data: the session dashboard (#264) and `tests/rulecheck/ledger.tsv`. A figure to start from: the 14z-198 close tier ran 8,636 s wall, its controls 6,375 s, `test_close_tools`'s ten controls 4,065 s of that (`build/static_runs/20261012T124446Z_16164`).
+2. **#265 in the near future** (the maintainer: *"the push is fine but we need to address #265 in the near future"*).
+3. **Then ask the maintainer for the order of work.** The open tickets, by their GitHub severity label:
    - high: #261 (`audit_effect_class_rows` section 4 checks a type-6 fallback inventory that was never frozen), #256 (the close's open-tickets check reads a cited ticket range as its two ends);
    - medium: #243, #257, #258, #259;
    - low: #118, #129, #229, #244;
    - no severity label: #262, #263 (the C1 extract's two gaps); #265 and #266, filed at the release on the maintainer's word (below); #260 (the submodule-pin check is implemented and runs at every close; kept open by the maintainer).
-2. **#265 — the maintainer asked for a deep dive after the release** (*"carry the skip, open a ticket about it so we can deep dive after the release"*): `audit_mask_window_ff42a2` SKIPs at every release and the staleness audit has FAILed that SKIP at release cadence since 14z-197 (a SKIP newest row has no green).
-3. **#266 — PILOT's GNOME Shell segfaults under Wayland at every boot since 2026-10-09**, so `audit_release_linux_desktop` cannot run; the crash report is root-only on PILOT (`/var/crash/_usr_bin_gnome-shell.120.crash`). The release carried the gate's SKIP on the maintainer's word.
-4. **`tests/replays/118_chain.rpl`'s header names a leg of `audit_mizuumi_inputs` that gate never ran** (STATE 14z-198 finding (i)). The one-line correction stales the 76 emulator gates that follow `tests/replays/`, so make it in a session that runs those gates anyway.
-5. **#118 — the chars gate, PARKED on branch `t118-196`** (`DECISIONS_HISTORY.md` "Ruled 2026-10-09 (14z-196) — #118's gates and every pristine-only gate move to an ONDEMAND scope; the chars gate parked"); rule-checker run 914 of that worktree is VIOLATED on Q1 and unresolved. **#129 stays the lowest priority**, captures first.
+   **#265 — the maintainer asked for a deep dive after the release** (*"carry the skip, open a ticket about it so we can deep dive after the release"*): `audit_mask_window_ff42a2` SKIPs at every release and the staleness audit has FAILed that SKIP at release cadence since 14z-197 (a SKIP newest row has no green).
+4. **#266 — PILOT's GNOME Shell segfaults under Wayland at every boot since 2026-10-09**, so `audit_release_linux_desktop` cannot run; the crash report is root-only on PILOT (`/var/crash/_usr_bin_gnome-shell.120.crash`). The release carried the gate's SKIP on the maintainer's word.
+5. **`tests/replays/118_chain.rpl`'s header names a leg of `audit_mizuumi_inputs` that gate never ran** (STATE 14z-198 finding (i)). The one-line correction stales the 76 emulator gates that follow `tests/replays/`, so make it in a session that runs those gates anyway.
+6. **#118 — the chars gate, PARKED on branch `t118-196`** (`DECISIONS_HISTORY.md` "Ruled 2026-10-09 (14z-196) — #118's gates and every pristine-only gate move to an ONDEMAND scope; the chars gate parked"); rule-checker run 914 of that worktree is VIOLATED on Q1 and unresolved. **#129 stays the lowest priority**, captures first.
 
 ## PARKED (not open work)
 
