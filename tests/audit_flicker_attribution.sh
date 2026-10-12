@@ -145,6 +145,10 @@ CASES="37_victor_ko_vsavj:7168:staging-row-0x0A
        118_sel_b2:2093:staging-row-0x0C
        118_sel_b3:2093:staging-row-0x0C"
 
+# hit_in <summary> <window>: true when attribute_ramdiff's summary counts at least one byte in <window> —
+# the one copy of the count-aware test (the case verdict and the inline wrong-window control both call it)
+hit_in() { printf '%s' "$1" | grep -Eq "[;,] [1-9][0-9]* $2(,|\$)"; }
+
 for c in $CASES; do
     rpl="${c%%:*}"; rest="${c#*:}"; frame="${rest%%:*}"; want="${rest##*:}"
     if vs_ctl_is wrong-window; then want=qsound-handshake-latch; fi
@@ -181,7 +185,7 @@ for c in $CASES; do
         fail=1
         continue
     fi
-    if printf '%s' "$out" | grep -Eq "[;,] [1-9][0-9]* $want(,|\$)"; then
+    if hit_in "$out" "$want"; then
         echo "  ok: attributed, and $want is among the windows hit"
     else
         echo "  FAIL: nothing landed in $want — the mechanism moved rows."
@@ -189,6 +193,13 @@ for c in $CASES; do
     fi
 done
 
+# THE wrong-window CONTROL, INLINE (the runner reads every declared control from every run): on the last
+# real case's summary the count-aware test must say NO for qsound-handshake-latch, a window no case reaches;
+# the pre-14z-198 `grep -q "$want"` would say yes, which is the vacuity this control exists to catch.
+if ! vs_ctl_is wrong-window && [ -n "${out:-}" ]; then
+    if hit_in "$out" qsound-handshake-latch; then vs_ctl_dead wrong-window "the window test said yes for qsound-handshake-latch on $rpl f$frame, which no byte reached" || fail=1
+    else vs_ctl_fired wrong-window "the window test says no for qsound-handshake-latch on $rpl f$frame"; fi
+fi
 if vs_ctl_is wrong-window; then
     if [ "$fail" = 1 ]; then vs_ctl_fired wrong-window "every case expecting qsound-handshake-latch read nothing in it"
     else vs_ctl_dead wrong-window "a case expecting qsound-handshake-latch passed — the window check cannot fail" || fail=1; fi
