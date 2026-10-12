@@ -21,7 +21,7 @@ there in parallel.** An ERIS tier script starts headless (HANDOFF "AND ON ERIS, 
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** What the close found and did is in STATE 14z-198's CLOSE row.
    merged-m23 is RE-RELEASED (2026-10-12): the nine assets on `freeze/merged-m23` replaced, the 15 done tickets closed.
-1. **FIRST — WHERE SESSION TIME GOES, AND WHY RULE-CHECKER RUNS FAIL** (the maintainer, at the 14z-198 close: *"Also, for next session, we need to take a deep look at how much time we spend on what: I have a feeling we are running each session checks and tests that really are release-only scope. More importantly, the number of violations we encounter make me wonder if it's the agents being unreliable or the instructions/checks/wording that is facilitating these failing."* — `DECISIONS_HISTORY.md` "Ruled 2026-10-12 (14z-198) — next session: where session time goes, and why rule-checker runs fail"). Data: the session dashboard (#264) and `tests/rulecheck/ledger.tsv`. A figure to start from: the 14z-198 close tier ran 8,636 s wall, its controls 6,375 s, `test_close_tools`'s ten controls 4,065 s of that (`build/static_runs/20261012T124446Z_16164`).
+1. **FIRST — WHERE SESSION TIME GOES, AND WHY RULE-CHECKER RUNS FAIL** (the maintainer, at the 14z-198 close: *"Also, for next session, we need to take a deep look at how much time we spend on what: I have a feeling we are running each session checks and tests that really are release-only scope. More importantly, the number of violations we encounter make me wonder if it's the agents being unreliable or the instructions/checks/wording that is facilitating these failing."* — `DECISIONS_HISTORY.md` "Ruled 2026-10-12 (14z-198) — next session: where session time goes, and why rule-checker runs fail"). Data: the session dashboard (`tools/session_metrics.py`, HANDOFF's routing row) and `tests/rulecheck/ledger.tsv`. A figure to start from: the 14z-198 close tier ran 8,636 s wall, its controls 6,375 s, `test_close_tools`'s ten controls 4,065 s of that (`build/static_runs/20261012T124446Z_16164`).
 2. **#265 in the near future** (the maintainer: *"the push is fine but we need to address #265 in the near future"*).
 3. **Then ask the maintainer for the order of work.** The open tickets, by their GitHub severity label:
    - high: #261 (`audit_effect_class_rows` section 4 checks a type-6 fallback inventory that was never frozen), #256 (the close's open-tickets check reads a cited ticket range as its two ends);
@@ -45,7 +45,7 @@ there in parallel.** An ERIS tier script starts headless (HANDOFF "AND ON ERIS, 
 - **A replay added to `tests/replays/` is an input to every gate that globs the corpus, and a frozen basis widens more corpora** (`docs/project/gotchas.md` "A REPLAY ADDED TO THE CORPUS IS AN INPUT TO EVERY GATE THAT GLOBS IT").
 - **A gate that gains a control is run through `tests/run_all_emulator.sh --controls` before it is committed**: the runner reads every declared control from the normal run (`docs/project/gotchas.md` "A DECLARED CONTROL THAT FIRES ONLY AS A").
 - **The audit orders runs by the mtime of `results.tsv`**: a row copied from another host keeps its time, so the last-written row of a gate is its run of record.
-- **The session dashboard** (#264) is refreshed by hand at each close (HANDOFF's routing row).
+- **The session dashboard** (`tools/session_metrics.py`) is refreshed by hand at each close (HANDOFF's routing row).
 
 ## WHAT CLOSED THIS SITTING (14z-198)
 
