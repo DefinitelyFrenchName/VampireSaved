@@ -2,8 +2,10 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 264
+# issues: 266
 number	state	reason	closed	labels	title
+266	OPEN	-	-	bug	PILOT's GNOME Shell segfaults under Wayland since 2026-10-09, so audit_release_linux_desktop cannot run
+265	OPEN	-	-	evolution	audit_mask_window_ff42a2 at a release: an instrument with no default subject SKIPs, and the staleness audit now FAILs that SKIP
 264	OPEN	-	-	evolution	A session dashboard: time per activity, checks and re-checks and why, tier cost and quality signals, each figure labelled measured, derived, estimated, inferred or extrapolated
 263	OPEN	-	-	bug	C1 extract's W# hint flags a worker figure derived from a file it read as unsourced
 262	OPEN	-	-	bug	C1 extract drops a maintainer message stored as a queue enqueue plus an attachment record

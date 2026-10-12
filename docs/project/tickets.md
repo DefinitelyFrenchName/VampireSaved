@@ -11,12 +11,14 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**264 tickets** — status: open 28 · parked 9 · done 199 · declined 10 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 190 · cosmetic 16 · evolution 58 · **backfill debt: 0 rows**.
+**266 tickets** — status: open 30 · parked 9 · done 199 · declined 10 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 191 · cosmetic 16 · evolution 59 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#266](https://github.com/DefinitelyFrenchName/VampireSaved/issues/266) | bug | open | PILOT's GNOME Shell segfaults under Wayland since 2026-10-09, so audit_release_linux_desktop cannot run | `tests/audit_release_linux_desktop.sh` | `DECISIONS_HISTORY.md § Approved 2026-10-12 (14z-198) — the merged-m23 re-release carries the `audit_release_linux_desktop` SKIP; PILOT's Wayland crash is a ticket (#266)` | none | none | 14z-198 |
+| [#265](https://github.com/DefinitelyFrenchName/VampireSaved/issues/265) | evolution | open | audit_mask_window_ff42a2 at a release: an instrument with no default subject SKIPs, and the staleness audit now FAILs that SKIP | `tests/audit_mask_window_ff42a2.sh` | `DECISIONS_HISTORY.md § Approved 2026-10-12 (14z-198) — the merged-m23 re-release carries the `audit_mask_window_ff42a2` SKIP; a ticket to deep-dive it (#265)` | none | none | 14z-198 |
 | [#264](https://github.com/DefinitelyFrenchName/VampireSaved/issues/264) | evolution | open | A session dashboard: time per activity, checks and re-checks and why, tier cost and quality signals, each figure labelled by class (measured, derived, estimated, inferred, extrapolated) | none | none | none | none | 14z-197 |
 | [#263](https://github.com/DefinitelyFrenchName/VampireSaved/issues/263) | bug | open | C1 extract's W# hint flags a worker figure derived from a file it read as unsourced | `tools/agent/extract.py` | none | `docs/project/gotchas.md § A SECOND LIMIT, of its W# hint` | none | 14z-197 |
 | [#262](https://github.com/DefinitelyFrenchName/VampireSaved/issues/262) | bug | open | C1 extract drops a maintainer message stored as a queue enqueue plus an attachment record | `tools/agent/extract.py` | none | `docs/project/gotchas.md § THE CHECK'S OWN EXTRACT HAS A GAP` | none | 14z-197 |

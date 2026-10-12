@@ -6592,3 +6592,21 @@ So: #119's index row reads `declined`, its ruling links here, and nothing is fil
 - the maintainer chose: *"Re-release merged-m23"*
 
 So: no new freeze and no version-string change; release/merged-m23 is regenerated from build/m3b_merged31 with the current tools and the regenerated files replace the committed ones after review; the release-cadence static tier and the emulator release run (`--scope all --lane all --strict --controls`, stale gates re-run) gate it; `tools/upload_release_assets.sh freeze/merged-m23` replaces the nine assets (`--clobber`, each verified by download); the done-unshipped tickets close against it.
+
+## Approved 2026-10-12 (14z-198) — the merged-m23 re-release carries the `audit_mask_window_ff42a2` SKIP; a ticket to deep-dive it (#265)
+
+**The question (AskUserQuestion, with its facts: the pre/post attribution instrument kept case-specific on 2026-09-29; run bare it SKIPs with "no operands" because this release moves no select palette row; approved at M19 and at 14z-153; each release asks again):** *"Does this release carry that SKIP?"* — "Carry the SKIP" / "Don't carry it".
+
+**The maintainer:**
+- the maintainer: *"carry the skip, open a ticket about it so we can deep dive after the release"*
+
+So: this release's emulator run carries the instrument's SKIP, and the staleness audit's release-cadence FAIL on it (since #252 a SKIP newest row has no green) is attributed to this approval; #265 holds the deep dive.
+
+## Approved 2026-10-12 (14z-198) — the merged-m23 re-release carries the `audit_release_linux_desktop` SKIP; PILOT's Wayland crash is a ticket (#266)
+
+**The question (AskUserQuestion, with its facts: PILOT's GNOME Shell segfaults under Wayland at every boot since 2026-10-09 and GDM falls back to Xorg, which the gate does not cover; it PASSed on PILOT on 2026-10-08 for the previous launchers; this release's Linux PLAY.command changed under #248):** *"How do you want this gate handled for the release?"* — "Diagnose PILOT first" / "Carry the SKIP + ticket".
+
+**The maintainer:**
+- the maintainer chose: *"Carry the SKIP + ticket"*
+
+So: this release's emulator run carries the desktop gate's SKIP; #266 holds PILOT's crash, and the gate runs again once PILOT's Wayland session is restored.
