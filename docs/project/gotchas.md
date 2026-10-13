@@ -7046,3 +7046,13 @@ replacement failed and wrote nothing, and `tools/rulecheck.py prepare` ran anywa
 (`tests/rulecheck/runs/2026-10-13-948/WITHDRAWN.txt`). It was caught before any reader was spawned, withdrawn, and
 re-prepared as run 949. **The rule:** never chain `prepare` after an edit in one command; check the edit landed (its
 assert, or a grep for the new text) and only then prepare.
+
+## A REBASE AT THE PUSH ORPHANS EVERY HASH THE SITTING CITES — merge a remote commit into a sitting that records its commits (paid: 14z-199)
+
+The 14z-199 close recommended rebasing the sitting's 31 local commits on the maintainer's README commit, and ran it.
+The sitting's records — STATE's tier rows, DECISIONS_HISTORY, the rule-checker ledger and run records, the snapshot run
+records — name the commits the checks ran at (the green close tier's `a6dcc9a5` among them); a rebase gives every one a
+new hash, so a rebased push leaves each citation naming a commit that exists nowhere on GitHub. Caught before the push;
+the maintainer ruled a merge (`DECISIONS_HISTORY.md` "Ruled 2026-10-13 (14z-199) — the push merges the README commit").
+**The rule:** in this repository, take a remote commit into local work with `git merge --no-ff`, never a rebase,
+whenever the local commits are cited anywhere — and they always are once a tier or a rule-checker run has named one.

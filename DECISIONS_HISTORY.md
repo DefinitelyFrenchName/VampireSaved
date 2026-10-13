@@ -6705,4 +6705,12 @@ So: Q1 of the checklist of record is unchanged. #273 stays open for the replicat
 
 **The maintainer:** *"Close done (Recommended)"*; *"Rebase on it (Recommended)"*.
 
-So: #270 closes `done` with its measurement in the closing comment — no saving at this close, every finding being on an item no deterministic check covers; whether the `--recheck` route pays off shows at later closes. The push rebases this sitting's local commits on 8e17c6b9 (README.md only), re-checks the submodule pins on the rebased HEAD, and pushes.
+So: #270 closes `done` with its measurement in the closing comment — no saving at this close, every finding being on an item no deterministic check covers; whether the `--recheck` route pays off shows at later closes. The push rebases this sitting's local commits on 8e17c6b9 (README.md only), re-checks the submodule pins on the rebased HEAD, and pushes. [SUPERSEDED at the push, 14z-199: the rebase rewrote every local hash this sitting cites; the maintainer then ruled a merge — the entry "Ruled 2026-10-13 (14z-199) — the push merges the README commit"]
+
+## Ruled 2026-10-13 (14z-199) — the push merges the README commit instead of rebasing on it
+
+**The question (AskUserQuestion), verbatim**, put after the rebase the maintainer had chosen ran locally and rewrote all 31 local commits, nothing pushed: *"The rebase rewrote all 31 local commits. This sitting's records cite pre-rebase hashes, including a6dcc9a5 where the green tier ran (STATE.md, DECISIONS_HISTORY, the rule-checker ledger and run records), and after a rebased push those commits would not exist on GitHub. I should have flagged this when I recommended rebasing. Nothing is pushed yet. Which way?"* — options "Merge instead (Recommended)" and "Keep the rebase".
+
+**The maintainer:** *"Merge instead (Recommended)"*.
+
+So: the rebase was undone (back to 948ca9ae) and origin/main merged with `--no-ff` (README.md only), so every commit the sitting's records cite is in the pushed history.
