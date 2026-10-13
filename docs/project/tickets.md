@@ -11,12 +11,13 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**275 tickets** — status: open 20 · parked 9 · done 218 · declined 10 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 191 · cosmetic 16 · evolution 68 · **backfill debt: 0 rows**.
+**276 tickets** — status: open 21 · parked 9 · done 218 · declined 10 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 192 · cosmetic 16 · evolution 68 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#276](https://github.com/DefinitelyFrenchName/VampireSaved/issues/276) | bug | open | The session dashboard misses every static tier run on a snapshot: its results stay in the removed clone | `tools/session_metrics.py` | none | none | none | 14z-199 |
 | [#275](https://github.com/DefinitelyFrenchName/VampireSaved/issues/275) | evolution | open | Negative fixture fidelity-14z160: its packet's gate carries the FREEZE gap fixed as #154 — does EXPECT OK still stand? | `tests/rulecheck/fixtures/fidelity-14z160` | `DECISIONS_HISTORY.md § Ruled 2026-10-13 (14z-199) — #273: replicate before deciding` | none | none | 14z-199 |
 | [#274](https://github.com/DefinitelyFrenchName/VampireSaved/issues/274) | evolution | open | Narrow tools/static_confirm.py's directory-read rule (R3) and its change set, scored on a fresh trace, before #269 is built | none | `DECISIONS_HISTORY.md § Ruled 2026-10-13 (14z-199) — #269: narrow the predictor first` | none | none | 14z-199 |
 | [#273](https://github.com/DefinitelyFrenchName/VampireSaved/issues/273) | evolution | open | Measure a bounded Q1 on past rule-checker packets before any rewording | none | `DECISIONS_HISTORY.md § Ruled 2026-10-12 (14z-199) — where session time goes and why rule-checker runs fail` · `DECISIONS_HISTORY.md § Ruled 2026-10-13 (14z-199) — #273: replicate before deciding` | none | none | 14z-199 |

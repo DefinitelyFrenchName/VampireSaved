@@ -2,8 +2,9 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 275
+# issues: 276
 number	state	reason	closed	labels	title
+276	OPEN	-	-	bug	The session dashboard misses every static tier run on a snapshot: its results stay in the removed clone
 275	OPEN	-	-	-	Negative fixture fidelity-14z160: its packet's gate carries the FREEZE gap fixed as #154 — does EXPECT OK still stand?
 274	OPEN	-	-	evolution	Narrow tools/static_confirm.py's directory-read rule (R3) and its change set, scored on a fresh trace, before #269 is built
 273	OPEN	-	-	evolution	Measure a bounded Q1 on past rule-checker packets before any rewording

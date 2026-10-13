@@ -71,6 +71,7 @@
 # WHAT THE GATE DOES NOT CLAIM: that an answer is ENOUGH. That is judged at the
 # close that closes the ticket.
 issue	kind	status	title	repro	decided	learned	wrong	sessions
+276	bug	open	The session dashboard misses every static tier run on a snapshot: its results stay in the removed clone	tools/session_metrics.py	none	none	none	14z-199
 275	evolution	open	Negative fixture fidelity-14z160: its packet's gate carries the FREEZE gap fixed as #154 — does EXPECT OK still stand?	tests/rulecheck/fixtures/fidelity-14z160	DECISIONS_HISTORY.md § Ruled 2026-10-13 (14z-199) — #273: replicate before deciding	none	none	14z-199
 274	evolution	open	Narrow tools/static_confirm.py's directory-read rule (R3) and its change set, scored on a fresh trace, before #269 is built	none	DECISIONS_HISTORY.md § Ruled 2026-10-13 (14z-199) — #269: narrow the predictor first	none	none	14z-199
 273	evolution	open	Measure a bounded Q1 on past rule-checker packets before any rewording	none	DECISIONS_HISTORY.md § Ruled 2026-10-12 (14z-199) — where session time goes and why rule-checker runs fail ; DECISIONS_HISTORY.md § Ruled 2026-10-13 (14z-199) — #273: replicate before deciding	none	none	14z-199
