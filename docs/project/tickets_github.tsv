@@ -2,8 +2,9 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 274
+# issues: 275
 number	state	reason	closed	labels	title
+275	OPEN	-	-	-	Negative fixture fidelity-14z160: its packet's gate carries the FREEZE gap fixed as #154 — does EXPECT OK still stand?
 274	OPEN	-	-	evolution	Narrow tools/static_confirm.py's directory-read rule (R3) and its change set, scored on a fresh trace, before #269 is built
 273	OPEN	-	-	evolution	Measure a bounded Q1 on past rule-checker packets before any rewording
 272	CLOSED	COMPLETED	2026-10-13	evolution	A pre-prepare check for rule-checker packets: figures staged, attributions quoted, absolutes flagged, small packets

@@ -1,0 +1,1 @@
+WITHDRAWN 2026-10-13 (14z-199), never spawned: its pre-prepare flags showed an unmeasured frequency in build/agent199/t273/report.md ("An original line often names several"); reworded to "can name several gaps" and re-prepared as the next run.
