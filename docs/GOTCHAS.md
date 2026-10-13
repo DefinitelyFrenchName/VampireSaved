@@ -537,4 +537,4 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A DECLARED CONTROL THAT FIRES ONLY AS A `CONTROL=` MODE READS "NOT FIRED" TO THE RUNNER — and a direct run of the gate cannot show it (paid: 14z-198)
 - A CLASSIFICATION BY TWO READERS OF ONE RUBRIC IS ONE CLASSIFICATION — the rubric that defined "mattered" came from the working agent that wanted the answer (paid: 14z-199, the session-time report; carried into GitHub #273)
 - A BLIND JUDGING IS ONLY AS RIGHT AS THE SCRIPT THAT BUILDS ITS ITEMS — two builder bugs, and a judge's false alarm (paid: 14z-199, GitHub #273's same-premise judging)
-- A MEASUREMENT PUT TO THE RULE-CHECKER NEEDS EVERY CHECK'S OUTPUT SAVED, NOT RUN AND REMEMBERED — fourteen rounds for one report (paid: 14z-199, GitHub #273)
+- A MEASUREMENT PUT TO THE RULE-CHECKER NEEDS EVERY CHECK'S OUTPUT SAVED, NOT RUN AND REMEMBERED — thirteen rule-checker runs for one report (paid: 14z-199, GitHub #273)

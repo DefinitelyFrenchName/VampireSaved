@@ -23,7 +23,7 @@ there in parallel.** A long tier runs on a snapshot (`tests/run_on_snapshot.sh`)
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** What the close found and did is in STATE 14z-199's CLOSE row.
 1. **#273 — THE REPLICATION THE MAINTAINER CHOSE** (`DECISIONS_HISTORY.md` "Ruled 2026-10-13 (14z-199) — #273: replicate before deciding; …").
    - Pre-registered in `build/agent199/t273/plan_replication.md`: two more readers per arm on the 15 that mattered and the 4 fixtures (76 pinned spawns, the same staged copies and prompts in `build/agent199/t273/stage/`), judged blind like `judge4/` beside a re-judging of the first readers, with the reading rule fixed there.
-   - Write every check as a script whose output is an artifact BEFORE the rule-checker sees the report (`docs/project/gotchas.md` "A MEASUREMENT PUT TO THE RULE-CHECKER NEEDS EVERY CHECK'S OUTPUT SAVED"). The first report took fourteen rounds.
+   - Write every check as a script whose output is an artifact BEFORE the rule-checker sees the report (`docs/project/gotchas.md` "A MEASUREMENT PUT TO THE RULE-CHECKER NEEDS EVERY CHECK'S OUTPUT SAVED"). The first report took thirteen spawned rule-checker runs.
    - Q1 of the checklist of record stays as it is until the maintainer rules on the replicated result.
 2. **#275 — the negative fixture fidelity-14z160** (the maintainer: look into it first). Its packet's gate carries the FREEZE gap the live gate has since fixed; whether its EXPECT OK stands is the maintainer's call, and #273's replication includes it.
 3. **#269 waits on #274** (narrow `tools/static_confirm.py`'s R3 and its change set, scored on a fresh trace). Until then a session close runs the static tier as before: every gate, every control executed.

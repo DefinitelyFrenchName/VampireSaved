@@ -7021,7 +7021,7 @@ byte-equal to the clean file on disk, and the quoted text nowhere but its own re
 (`build/agent199/t273/judge/injection_search.py`). Its twin was stopped before it could act, both were replaced, and no
 credential file was read by anyone.
 
-## A MEASUREMENT PUT TO THE RULE-CHECKER NEEDS EVERY CHECK'S OUTPUT SAVED, NOT RUN AND REMEMBERED — fourteen rounds for one report (paid: 14z-199, GitHub #273)
+## A MEASUREMENT PUT TO THE RULE-CHECKER NEEDS EVERY CHECK'S OUTPUT SAVED, NOT RUN AND REMEMBERED — thirteen rule-checker runs for one report (paid: 14z-199, GitHub #273)
 
 #273's report went through rule-checker runs 983 to 999 before one came back OK. Each round named something the working
 agent had checked but left in its chat or its head:

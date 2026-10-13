@@ -3,3 +3,5 @@ mostly figures not staged	14z-199 (#272): the ticket's premise that the 14z-199 
 The ticket's premise, that the 14z-199 report's rounds	control: the correction, live in docs/project/rule_checker.md	reach:1
 approved at 14z-153	14z-199 (#265's deep dive): 14z-153 was a cost run that carried the 2026-09-06 standing approval, not a release that re-asked it; the re-asks were M19 (14z-174) and 14z-198	retracted
 re-asked at M19 and at 14z-198	control: the correction, live in STATE.md 14z-199 row (11)	reach:1
+fourteen rounds for one report	14z-199 (run 1004): #273's report had thirteen spawned rule-checker runs (983, 986, 988-991, 993-999), not fourteen rounds; corrected in STATE row (12), NEXT_SESSION and the gotcha heading	retracted
+thirteen rule-checker runs for one report	control: the correction, live in docs/project/gotchas.md's heading	reach:1
