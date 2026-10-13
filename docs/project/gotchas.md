@@ -7038,3 +7038,11 @@ recommendation itself rested on an untested fixture (the fixture's gate had a re
 recommendation changed. **The rule:** for a measurement that will go to the rule-checker, write each check as a script
 whose output file is an artifact from the start: spawn, manifest, provenance, transcript reads and writes, plan order.
 A check run in the shell and quoted from memory costs a round each.
+
+## A PREPARE CHAINED AFTER AN EDIT PACKS WHATEVER THE EDIT LEFT — run 948 prepared on a stale claim (paid: 14z-199, GitHub #268)
+
+Rule-checker run 2026-10-13-948 was prepared in the same command as the claim edit meant to precede it. The edit's last
+replacement failed and wrote nothing, and `tools/rulecheck.py prepare` ran anyway on the unchanged claim
+(`tests/rulecheck/runs/2026-10-13-948/WITHDRAWN.txt`). It was caught before any reader was spawned, withdrawn, and
+re-prepared as run 949. **The rule:** never chain `prepare` after an edit in one command; check the edit landed (its
+assert, or a grep for the new text) and only then prepare.
