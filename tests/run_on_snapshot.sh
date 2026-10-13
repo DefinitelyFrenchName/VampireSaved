@@ -57,7 +57,12 @@ set -eu
 # THE RUNNER ITSELF IS SNAPSHOTTED TOO: sh reads a script AS IT RUNS, so an edit to this file in the
 # working tree during a run would reach the run mid-way (paid 14z-183b: the first real run died at a
 # syntax error after the tier, the header having been edited under it). Re-exec from a private copy.
-if [ -z "${RUN_ON_SNAPSHOT_SELF:-}" ]; then
+# The variable is honoured only when THIS script is that copy ($0): a run started from inside
+# another run's snapshot (a tier on a snapshot running tests/test_run_on_snapshot.sh) inherits the
+# outer run's RUN_ON_SNAPSHOT_SELF, and testing it for emptiness made the inner run skip its own
+# copy, take the outer run's repo as its own, and delete the outer run's copy at its exit (paid
+# 14z-199: the close tier on a snapshot turned test_run_on_snapshot red).
+if [ "${RUN_ON_SNAPSHOT_SELF:-}" != "$0" ]; then
     RUN_ON_SNAPSHOT_HOME="$(cd "$(dirname "$0")/.." && pwd)"
     RUN_ON_SNAPSHOT_SELF="$(mktemp "${TMPDIR:-/tmp}/run_on_snapshot.XXXXXX")"
     cp "$0" "$RUN_ON_SNAPSHOT_SELF"

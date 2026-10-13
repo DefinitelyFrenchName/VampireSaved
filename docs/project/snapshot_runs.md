@@ -23,7 +23,14 @@ and traceability"* — so session cadence stays in the working tree.
 0. **The runner itself.** `sh` reads a script as it runs, so the runner first re-executes from a
    private copy of itself: an edit to `tests/run_on_snapshot.sh` in the tree during a run cannot reach
    the run. Paid 14z-183b: the first real run's tier finished (PASS 177 / FAIL 1) and then the runner
-   died at a syntax error, its header having been edited under it.
+   died at a syntax error, its header having been edited under it. **A run started inside another
+   run's snapshot copies itself too:** the copy is named in `RUN_ON_SNAPSHOT_SELF`, which a nested run
+   inherits, so the runner honours it only when the running script IS that copy (`$0`). Paid 14z-199:
+   the close tier on a snapshot ran `tests/test_run_on_snapshot.sh`, whose runner legs inherited the
+   outer run's variable, skipped their own copies and died when their files were truncated (three
+   controls DEAD, the gate red); a nested leg would also have taken the outer run's repo as its own
+   and deleted the outer run's copy at its exit. The gate's section 2b now starts a leg under an
+   outer run's variables (control `inherited-self`), and the gate clears them for its other legs.
 1. **The commit's files.** A plain local clone of the tree (its own object store: hardlinked,
    immutable object files — never `--shared`, whose borrowed objects a gc in the tree could remove),
    checked out at `<commit>` (default `HEAD`), and verified whole: the commit's tracked-file count,
@@ -73,7 +80,11 @@ and traceability"* — so session cadence stays in the working tree.
    copied cache and scratch clones too), `fingerprints.tsv` (every `build/*/rompath` through the
    commit's `tools/build_fingerprint.py`), `runner.log`; with `--emulator-inputs` also
    `instruments_start.tsv` / `instruments_copy.tsv` / `instruments_end.tsv` and `jtsim_copies.tsv`. The record is
-   a listing plus fingerprints by ruling; full content hashes were not chosen.
+   a listing plus fingerprints by ruling; full content hashes were not chosen. **A static tier's
+   `results.tsv` is NOT in it:** `tests/run_all_static.sh` writes it under the clone's
+   `build/static_runs/`, which the clone's removal deletes, though the tier prints that path as the
+   one to `--confirm` a red from (paid 14z-199). Give the tier `STATIC_RESULTS_OUT=<absolute path in
+   the working tree>` — the environment reaches the runner — to keep it.
 
 A run costs about 50 s of setup before the runner starts (the clone, the snapshot, the listing
 and 76 fingerprints; measured 14z-183b on this Mac).

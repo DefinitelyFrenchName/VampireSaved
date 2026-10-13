@@ -9,7 +9,9 @@
 #   of the ~/.cache/vampire-saved instrument cache, a Verilator scratch
 #   clone, and the runner's own file — and its record names the commit the run was taken at;
 #   a tracked file carries its last commit's time, a build/emu_* the run writes comes back to
-#   the working tree, and an instrument binary changed in the LIVE cache during a run is reported.
+#   the working tree, and an instrument binary changed in the LIVE cache during a run is reported;
+#   a run started inside another run's snapshot (the outer run's RUN_ON_SNAPSHOT_SELF inherited,
+#   as when a tier on a snapshot runs this gate) still makes its own copy and leaves the outer's.
 # HOW: builds a throwaway world (a repo with a submodule, a build/ output, a community sibling,
 #   a HOME holding an instrument cache, a scratch clone), starts a probe under
 #   run_on_snapshot.sh --emulator-inputs that reads all eight inputs, pauses it, perturbs them in
@@ -32,6 +34,7 @@
 # MUST-FIRE: perturbed-copy: checkout-mtime — a copy that skips S1b leaves t.txt at its checkout time instead of its commit's, and the gate must FAIL (mode: the gate runs against that copy)
 # MUST-FIRE: perturbed-copy: no-copy-back — a copy that never copies the run's build/emu_* back leaves the working tree without the run of record, and the gate must FAIL (mode: the gate runs against that copy)
 # MUST-FIRE: perturbed-copy: no-instrument-check — a copy that never compares the live instruments at the end exits 0 after an instrument changed mid-run, and the gate must FAIL (mode: the gate runs against that copy)
+# MUST-FIRE: perturbed-copy: inherited-self — a copy that skips its own copy whenever RUN_ON_SNAPSHOT_SELF is set (the pre-14z-199 test for emptiness) must be cut short in section 2b's nested leg, which inherits an outer run's copy, and the gate must FAIL (mode: the gate runs against that copy)
 #
 # The world lives in a scratch dir; the snapshots go under ~/.cache/vampire-saved (the runner
 # refuses a temporary directory, the macOS reaper's hunting ground) and are removed on exit.
@@ -41,6 +44,10 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
+# the legs are this gate's own world: a run of this gate inside a snapshot (a tier on a snapshot)
+# must not hand them the OUTER run's copy — the no-self-copy leg, which never copies itself, would
+# delete it at its exit (14z-199). Section 2b sets an outer run's variables on purpose.
+unset RUN_ON_SNAPSHOT_SELF RUN_ON_SNAPSHOT_HOME
 W="$(mktemp -d)"
 SROOT="$HOME/.cache/vampire-saved/test-snapshots-$$"
 cleanup() { rm -rf "${W:?}" "${SROOT:?}"; }
@@ -58,8 +65,10 @@ edits = {
     "in-place":   [('{ ( cd "$C" && "$@" ) 2>&1;', '{ ( cd "$REPO" && "$@" ) 2>&1;  # CONTROL in-place\n'),
                    ('{ ( cd "$C" && HOME="$SNAP_HOME" JTSIM_SCRATCH="$JT_SNAP" "$@" ) 2>&1;',
                     '{ ( cd "$REPO" && "$@" ) 2>&1;  # CONTROL in-place\n')],
-    "no-self-copy": ('if [ -z "${RUN_ON_SNAPSHOT_SELF:-}" ]; then\n',
+    "no-self-copy": ('if [ "${RUN_ON_SNAPSHOT_SELF:-}" != "$0" ]; then\n',
                      'if false; then  # CONTROL no-self-copy\n'),
+    "inherited-self": ('if [ "${RUN_ON_SNAPSHOT_SELF:-}" != "$0" ]; then\n',
+                       'if [ -z "${RUN_ON_SNAPSHOT_SELF:-}" ]; then  # CONTROL inherited-self\n'),
     "shared-home": ('{ ( cd "$C" && HOME="$SNAP_HOME" JTSIM_SCRATCH="$JT_SNAP" "$@" ) 2>&1;',
                     '{ ( cd "$C" && JTSIM_SCRATCH="$JT_SNAP" "$@" ) 2>&1;  # CONTROL shared-home\n'),
     "shared-scratch": ('{ ( cd "$C" && HOME="$SNAP_HOME" JTSIM_SCRATCH="$JT_SNAP" "$@" ) 2>&1;',
@@ -201,7 +210,7 @@ immune() {
 }
 
 RUNNER="$REPO/tests/run_on_snapshot.sh"
-CONTROLS="link-build in-place no-self-copy shared-home shared-scratch checkout-mtime no-copy-back no-instrument-check"
+CONTROLS="link-build in-place no-self-copy shared-home shared-scratch checkout-mtime no-copy-back no-instrument-check inherited-self"
 for c in $CONTROLS; do if vs_ctl_is "$c"; then RUNNER="$(make_copy "$VS_CTL")"; fi; done
 
 echo "== 1. the positive leg: the perturbation reaches an IN-PLACE run"
@@ -214,6 +223,20 @@ else fail=1; fi
 
 echo "== 2. the snapshot leg: nothing reaches a run on a snapshot"
 if ! immune "$RUNNER" snap; then fail=1; fi
+
+# nested <runner> <label> — section 2b: the run is started with an OUTER run's RUN_ON_SNAPSHOT_SELF
+# and RUN_ON_SNAPSHOT_HOME in its environment (a tier on a snapshot running this gate); it must
+# still copy itself (immune) and must leave the outer run's copy in place
+nested() {
+    outer="$W/$2.outer_self.sh"; echo '# the outer run'"'"'s private copy (section 2b)' > "$outer"
+    ( RUN_ON_SNAPSHOT_SELF="$outer"; RUN_ON_SNAPSHOT_HOME="$W/$2.outer_home"
+      export RUN_ON_SNAPSHOT_SELF RUN_ON_SNAPSHOT_HOME; immune "$1" "$2" ) || return 1
+    [ -f "$outer" ] || { echo "  $2: the inner run DELETED the outer run's private copy"; return 1; }
+    echo "  $2: started under an outer run's RUN_ON_SNAPSHOT_SELF, it made its own copy, and the outer run's copy is still there"
+}
+
+echo "== 2b. a run started inside another run's snapshot copies itself and leaves the outer run's copy"
+if ! nested "$RUNNER" nested; then fail=1; fi
 
 # instrument <runner> <label> — section 4: an instrument binary changed in the LIVE cache mid-run
 # reads unchanged inside the run, and the runner reports it and exits 2
@@ -252,6 +275,7 @@ if [ -z "${VS_CTL:-}" ]; then
             vs_ctl_dead "$ctl" "the perturbed copy does not parse: $(head -1 "$W/leg_$ctl.parse" | cut -c1-90)" || fail=1; continue
         fi
         if [ "$ctl" = no-instrument-check ]; then instrument "$copy" "leg_$ctl" > "$W/leg_$ctl.txt" 2>&1 && ok=1 || ok=0
+        elif [ "$ctl" = inherited-self ]; then nested "$copy" "leg_$ctl" > "$W/leg_$ctl.txt" 2>&1 && ok=1 || ok=0
         else immune "$copy" "leg_$ctl" > "$W/leg_$ctl.txt" 2>&1 && ok=1 || ok=0; fi
         if [ "$ok" = 1 ]; then
             vs_ctl_dead "$ctl" "the perturbed copy still passed — the gate cannot see this failure" || fail=1
