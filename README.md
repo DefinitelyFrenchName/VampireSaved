@@ -20,8 +20,8 @@ A forever true statement. But the FGC loves what ifs and this project attempts t
 | **Base game**                           | Vampire Savior, Japan, 1997-05-19                            |
 | **Roster**                              | The original Vampire Savior cast, plus Donovan, Phobos (Huitzil outside Japan) and Pyron from Vampire Savior 2. All characters run the Vampire Savior engine. |
 | **Original characters and game engine** | Both unchanged. In 2-player versus their game state is checked frame by frame against the unmodified game, and matches it within a few small, measured tolerances. |
-| **Plays on**                            | a patched FBNeo or MAME (ready-made for Windows 10+ and Apple-silicon Macs on macOS 26+, or build it yourself on anything else), and MiSTer |
-| **Current release**                     | `merged-m19` — the character-select screen shows **M19** in its bottom-right corner |
+| **Plays on**                            | MiSTer, or a patched FBNeo or MAME (ready-made for Windows 10+ and Apple-silicon Macs on macOS 26+, or build it yourself on anything else) |
+| **Current release**                     | `merged-m23` — the character-select screen shows **M23** in its bottom-right corner |
 | **Made for**                            | 2-player versus. Arcade mode can be played to the end but    |
 | **Tournaments**                         | **not** a tournament build. Tournaments run original releases; this is for casuals, labs and locals |
 
@@ -36,14 +36,7 @@ every byte before it writes anything.
 
 1. **Download ONE package** from the [release page](https://github.com/DefinitelyFrenchName/VampireSaved/releases/tag/freeze/merged-m19). 
    Each one is complete.
-   
-   | package                                                      | pick it if you play on                                       |
-   | ------------------------------------------------------------ | ------------------------------------------------------------ |
-   | `merged-m19-fbneo-windows-x86_64.zip` or `merged-m19-fbneo-macos-arm64.zip` | FBNeo — the patched emulator is inside, ready to run         |
-   | `merged-m19-mame-windows-x86_64.zip` or `merged-m19-mame-macos-arm64.zip` | MAME — the patched emulator is inside, ready to run          |
-   | `merged-m19-fbneo-recipe.zip` or `merged-m19-mame-recipe.zip` | any other system — the emulator patch and the steps to build it once |
-   | `merged-m19-mister.zip`                                      | MiSTer — the core and its menu entries                       |
-   
+     
 2. **Gather your dumps** in one folder, unmodified, with these exact names: `vsavj.zip` (Vampire
    Savior, Japan 970519), `vsav.zip` (Europe 970519) and `vsav2.zip` (Vampire Savior 2, Japan 970913).
    You also need Python 3.8 or newer — nothing else.
