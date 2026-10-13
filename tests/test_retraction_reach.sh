@@ -2,8 +2,8 @@
 # test_retraction_reach.sh — EVERY SITTING'S RETRACTION GREP STILL REACHES THE TREE: every
 # tests/rulecheck/retractions/*.tsv judged on ONE scan of the live tree (tools/retraction_grep.py
 # --each). ci_portable: no ROM, no emulator, ~30 s; FREEZE cadence (tests/ci_cadence.tsv; #268,
-# 14z-199: built on the maintainer's C1 ruling of 2026-10-12; the freeze cadence is the session's application of
-# that entry's turned-around tier, put to the maintainer at the close). Split out of tests/test_close_tools.sh, which ran one full
+# 14z-199: built on the maintainer's C1 ruling of 2026-10-12; the freeze cadence, the session's application of
+# that entry's turned-around tier, validated by the maintainer — DECISIONS_HISTORY.md "Ruled 2026-10-13 (14z-199)"). Split out of tests/test_close_tools.sh, which ran one full
 # scan PER FILE at every session tier (twenty scans: 565 s a run measured 14z-199; its controls 3,647-4,065 s a close at
 # 14z-196..198, build/agent199/t1/report.md A2).
 #

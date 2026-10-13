@@ -6647,3 +6647,13 @@ So: the next session opens with that look, from the session dashboard's figures 
 - the maintainer: *"I agree with your proposals for C1, C2, C3, C4."*
 
 So: the static tier is turned around (a session close runs the gates whose followed paths changed plus a small always-run core, and executes controls only for gates that changed; a freeze and a release run the full tier with every control) — this supersedes the rulings of 2026-09-14 (14z-154) and 2026-09-17 (14z-161b) that the close executes every control, and the session half of 2026-09-17 (14z-162) lever A, once built; `test_close_tools` is cut back (C1, plus an audit of the retraction files' indexing and duplicates and a scope limited to what a sitting touched); C2, C3 and C4 as proposed; the pre-prepare check is tried and iterated on measured data; per-session growth must cost about the same whatever the session count, and a recurring violation opens a ticket. None was rule-checked before the ruling; each build goes through the rule-checker.
+
+## Ruled 2026-10-13 (14z-199) — #268 and #271's three open points: the freeze cadence, the alarm's threshold, the resolve rule
+
+**The question:** three things the session built on its own application, put to the maintainer after #268 and #271 were built (commit `0f1de68b`, rule-checker runs 2026-10-13-951 and -956 OK): (1) the whole-tree retraction scan, `tests/test_retraction_reach.sh`, at FREEZE cadence — the session's application of the 2026-10-12 turned-around tier; (2) the recurrence alarm's threshold, 3 subjects AND 2 sessions instead of #271's "3 or more runs or 2 or more sessions" (on the whole ledger the ticket's form named 91 signatures, 58 outside the plant-reader family; the built form 31, all of them real); (3) `rulecheck resolve` refusing an instrument-blaming answer that names no open ticket — filed with #271 on *"yes file them on github"*, the rule itself the session's.
+
+**The maintainer:**
+- the maintainer: *"Points 1 and 2 I validated. Point 3 is fine as well unless we have a better place to file the rule"*
+
+So: the freeze cadence and the threshold stand as built, and so does the resolve rule. Its home is `docs/project/rule_checker.md` § [VSP-184] "THE BINDING AND THE MUST-FIRE", the spec of record for `resolve`; the session added it to that section's distillation in `.claude/skills/vampire-saved-port/SKILL.md` [VSP-184], which every session loads before the work.
+

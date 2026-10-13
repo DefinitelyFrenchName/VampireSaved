@@ -207,7 +207,8 @@ was refused, and runs 399/400, where `Q1+Q4:` was) (maintainer-ruled, option
 C: the questions are bounded AND what they still find is answered in
 writing). **An answer that blames the instrument is a ticket** (#271 part 3, 14z-199: filed on
 the maintainer's "yes file them on github" as the session's answer to their "how can we improve ?" about
-the 2550/2560 case; the rule is the session's, put to them at the close): `resolve` refuses one that says "no slip", "the plant's reader", "W# hint", a
+the 2550/2560 case; the rule is the session's, accepted by the maintainer: "Point 3 is fine as well",
+`DECISIONS_HISTORY.md` "Ruled 2026-10-13 (14z-199)"): `resolve` refuses one that says "no slip", "the plant's reader", "W# hint", a
 reader's misreading and the like unless it names an OPEN ticket (`#N`, open or parked in
 `docs/project/tickets.tsv`) — answered run by run, the calibration plants' readers' 2550/2560 drew
 QP3 VIOLATEDs from 14z-179 to 14z-198 and nothing aggregated them. It refuses an answer by work that

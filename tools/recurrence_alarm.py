@@ -18,7 +18,8 @@ Counted over every VIOLATED run of tests/rulecheck/ledger.tsv except calibration
 IS a planted fixture, VIOLATED by design): the distinct SUBJECTS (a subject's ` — re-check after …` tail
 removed, so a sitting's own fix loop counts once) and the distinct SESSIONS (the 14z-N key; a run recorded
 before #209 gives its key in its subject, its session column holding a transcript prefix). A signature RECURS when it is
-in 3 or more subjects across 2 or more sessions. (Measured 14z-199, build/agent199/t271: over the whole
+in 3 or more subjects across 2 or more sessions (validated by the maintainer, DECISIONS_HISTORY.md "Ruled 2026-10-13
+(14z-199)": "Points 1 and 2 I validated"). (Measured 14z-199, build/agent199/t271: over the whole
 ledger this names only the calibration-plant reader family and the close's documentation packet Q1 — the
 ticket's first form, "3 or more runs or 2 or more sessions", also named a sitting's own re-check loop and
 coincidences.)

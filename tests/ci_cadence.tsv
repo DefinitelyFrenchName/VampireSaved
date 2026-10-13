@@ -34,8 +34,9 @@
 # bbh's, no longer a constraint. The `ondemand` cadence stays, with no member.
 # FIFTH CUT (14z-199, #268 — on the maintainer's C1 ruling, DECISIONS_HISTORY.md "Ruled 2026-10-12 (14z-199)": "I agree
 # with your proposals for C1, C2, C3, C4" and "maybe we could limit what we need to check, for instance parts/paperwork
-# we didn't touch would not need checking"; the FREEZE cadence is the session's application of the same entry's turned-
-# around tier, not words of the maintainer's, and is put to them at the close): test_retraction_reach — every retraction file on one scan of the whole tree, split out
+# we didn't touch would not need checking"; the FREEZE cadence, the session's application of the same entry's turned-
+# around tier, the maintainer then validated — DECISIONS_HISTORY.md "Ruled 2026-10-13 (14z-199)": "Points 1 and 2 I
+# validated"): test_retraction_reach — every retraction file on one scan of the whole tree, split out
 # of test_close_tools, which ran one scan per file at every session (565 s) — -> freeze, triggered by the matcher only:
 # a new tests/rulecheck/retractions/{KEY}.tsv is judged on the whole tree by the close's own standing check, and every
 # file's gone wordings on the touched files by test_close_tools, so the directory is not a trigger.

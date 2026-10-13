@@ -949,7 +949,8 @@ def cmd_spawned(a):
 
 # #271 part 3 (14z-199; filed on the maintainer's "yes file them on github", STATE 14z-199 row (3), as the session's
 # answer to their "The 2550/2560 case: cause found, and you're right it should have been loud -> how can we improve ?"
-# — the rule itself is the session's, put to the maintainer at the close): a resolution that BLAMES THE INSTRUMENT — the plant's reader, the
+# — the rule the session's, then accepted by the maintainer: "Point 3 is fine as well", DECISIONS_HISTORY.md "Ruled 2026-10-13 (14z-199)"): a resolution
+# that BLAMES THE INSTRUMENT — the plant's reader, the
 # extract's hint, a checker's misreading — is an instrument defect, and an instrument defect is a ticket. Without an
 # OPEN one named in the line, the blame is how a recurring case got answered run by run and never aggregated (the
 # plant readers' 2550/2560: "no slip" at 14z-197, "accepted" at 14z-198). Measured on the 686 resolutions the
