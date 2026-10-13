@@ -68,7 +68,9 @@ def subject(s):
 def sitting(r):
     """The run's 14z-N key: the session column, or — for a run recorded before #209 made prepare require the key,
     whose column holds a transcript prefix or `-` — the first key its subject names (a sitting compacted across two
-    transcripts is ONE session; measured 14z-199: 14z-181's documentation-packet loop read as two)."""
+    transcripts is ONE session; measured 14z-199: 14z-181's documentation-packet loop read as two). Agreed by the
+    maintainer: DECISIONS_HISTORY.md "Ruled 2026-10-13 (14z-199) — the resolve rule's home, and #271's pre-#209 session
+    rule"."""
     if re.fullmatch(r"14z-\d+[a-z]?", r["session"]):
         return r["session"]
     m = re.search(r"14z-\d+[a-z]?", r["subject"])

@@ -6657,3 +6657,12 @@ So: the static tier is turned around (a session close runs the gates whose follo
 
 So: the freeze cadence and the threshold stand as built, and so does the resolve rule. Its home is `docs/project/rule_checker.md` § [VSP-184] "THE BINDING AND THE MUST-FIRE", the spec of record for `resolve`; the session added it to that section's distillation in `.claude/skills/vampire-saved-port/SKILL.md` [VSP-184], which every session loads before the work.
 
+## Ruled 2026-10-13 (14z-199) — the resolve rule's home, and #271's pre-#209 session rule
+
+**The question:** two points the session had settled on its own, put to the maintainer after `f2d1639b`: (1) where the `resolve` instrument-blame rule is filed — the maintainer's *"unless we have a better place to file the rule"* read by the session as `docs/project/rule_checker.md` § [VSP-184] (the spec of record for `resolve`) plus that section's line in `.claude/skills/vampire-saved-port/SKILL.md`; (2) #271's other departure from the ticket's text, never put to them before: a run recorded before #209, whose session column holds a transcript prefix, takes its session from the 14z-N key its subject names (without it, 14z-181's packet loop over two transcripts read as two sessions and raised a false recurrence).
+
+**The maintainer:**
+- the maintainer: *"I agree with both proposals"*
+
+So: the rule stays in § [VSP-184] and the skill's [VSP-184] line, and `tools/recurrence_alarm.py` keeps taking a pre-#209 run's session from its subject.
+
