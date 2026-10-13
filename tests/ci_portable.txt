@@ -271,7 +271,9 @@ test_commit_subject
 # test_rule_checker — the adversarial rule-checker's record (14z-163, GitHub #152):
 # every run's plant caught, every fixture calibrated, every VIOLATED resolved, every
 # freeze since the birth checked, every plant from its own family (evidence | procedure), every
-# calibration read by the current pinned reader (14z-178). tools/rulecheck.py; five controls. ~2 s.
+# calibration read by the current pinned reader (14z-178); since #271/#270 (14z-199) resolve refuses unticketed
+# instrument blame and takes a re-check only from a full run of the standing close checks after the verdict. tools/rulecheck.py;
+# seventeen controls. ~70 s.
 test_rule_checker
 test_rompath_reject
 # 14z-170: the `unless_composed` manifest row key (the S1 scope of the class-0x52 fix) —
@@ -317,7 +319,7 @@ test_run_on_snapshot
 test_close_checks
 # 14z-189 (#204, #206, #207): the standing close-check set (tests/close_standing_checks.tsv) renders from key, row and
 # run dir with its lists derived and its plants generated; the packet claim comes from the run of record; a finding is
-# appended in the table's form (tools/findings_add.py); six controls. ~3 s.
+# appended in the table's form (tools/findings_add.py); since #270 (14z-199) the claim opens with its scope; eight controls. ~3 s.
 test_close_standing
 # 14z-187b (#187): the close-loop cost reader (tools/agent/close_loop_cost.py) counts every pass of a close's
 # check runner whatever interpreter runs it, and finds the packet's span from a tail-cut prepare; three controls. ~1 s.

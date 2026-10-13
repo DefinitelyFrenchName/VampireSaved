@@ -24,6 +24,7 @@
 # MUST-FIRE: known-bad: dup-blind — a duplicate check that never counts a repeat must fail the self-test (mode: that variant's self-test)
 # MUST-FIRE: known-bad: stale-row-accepted — a row-copy check that accepts any copy must fail the self-test (mode: that variant's self-test)
 # MUST-FIRE: known-bad: claim-partial-accepted — a claim written from a partial run must fail the self-test (mode: that variant's self-test)
+# MUST-FIRE: known-bad: claim-unscoped — a claim that does not open with its scope (what the deterministic checks cover, what the readers are asked, how a presentation finding is re-checked) must fail the self-test (#270, 14z-199; mode: that variant's self-test)
 # MUST-FIRE: known-bad: form-unchecked — a findings_add.py accepting an untracked home and an empty none reason must fail its self-test (mode: that variant's self-test)
 # MUST-FIRE: known-bad: skip-unresolved — a findings_anchors.py that SKIPs a home it cannot resolve (the #224 shape: an anchor split at the table's separator) must fail its self-test (mode: that variant's self-test)
 # MUST-FIRE: perturbed-copy: unpaired-plant — a copy of the template whose plant row expects exit 0 must fail the lint (mode: the lint on that copy)
@@ -62,7 +63,7 @@ PY
 echo "== test_close_standing: #204/#206/#207 — the standing close-check set =="
 fail=0
 P=""
-case "${VS_CTL:-}" in plant-is-live|dup-blind|stale-row-accepted|claim-partial-accepted) P="--perturb $VS_CTL";; esac
+case "${VS_CTL:-}" in plant-is-live|dup-blind|stale-row-accepted|claim-partial-accepted|claim-unscoped) P="--perturb $VS_CTL";; esac
 python3 tools/close_standing.py --selftest $P > "$W/s1.txt" 2>&1 || true
 sed 's/^/  /' "$W/s1.txt"
 grep -q '^SELFTEST PASS$' "$W/s1.txt" || { echo "FAIL: close_standing.py's self-test"; fail=1; }
@@ -85,7 +86,7 @@ if lint "$T" > "$W/lint.txt" 2>&1; then sed 's/^/  /' "$W/lint.txt"
 else sed 's/^/  /' "$W/lint.txt"; echo "FAIL: the template lint"; fail=1; fi
 
 if [ -z "${VS_CTL:-}" ]; then
-    for c in plant-is-live dup-blind stale-row-accepted claim-partial-accepted; do
+    for c in plant-is-live dup-blind stale-row-accepted claim-partial-accepted claim-unscoped; do
         python3 tools/close_standing.py --selftest --perturb "$c" > "$W/c_$c.txt" 2>&1 || true
         if grep -q '^SELFTEST FAIL$' "$W/c_$c.txt"; then vs_ctl_fired "$c" "$(grep -m1 'FAIL:' "$W/c_$c.txt" | sed 's/^ *//')"
         else vs_ctl_dead "$c" "the known-bad variant passed the self-test" || fail=1; fi

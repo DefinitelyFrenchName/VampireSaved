@@ -40,7 +40,7 @@ session key, the findings row's title and the run directory, and everything else
       tools/claim_lint.py (exit 1 on an untied universal).
   --selftest [--perturb NAME]
       every subcommand on a synthetic tree with known answers. --perturb is the gate's must-fire hook
-      (tests/test_close_standing.sh): plant-is-live, dup-blind, stale-row-accepted, claim-partial-accepted — each
+      (tests/test_close_standing.sh): plant-is-live, dup-blind, stale-row-accepted, claim-partial-accepted, claim-unscoped — each
       known-bad variant must FAIL the self-test.
 
 WHAT IT CANNOT SEE: whether the findings table is complete (a hand read, #206 makes it a review), whether a check's
@@ -91,6 +91,12 @@ def derive_base(root, key):
     if oldest is None:
         return git(root, "rev-parse", "--short=8", "HEAD").strip()
     return git(root, "rev-parse", "--short=8", oldest + "^").strip()
+
+
+def repo_root():
+    """the root render derives from: the git top level, else the working directory (tools/rulecheck.py's --recheck
+    derives the same transcript and base from it, #270)"""
+    return subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip() or os.getcwd()
 
 
 def derive_transcript(root):
@@ -319,12 +325,19 @@ def claim(root, run, premises=None):
         parts.append(f"`{n}`: {d[2]} — exit {r[2]} as expected, {r[4]} s, `{run}/out/runs/{n}.out`{fig}.")
         if d[3] != "-":
             gaps.append(f"`{n}`: {d[3]}")
-    tail = "NOT TESTED by these checks: " + "; ".join(gaps) + "."
+    tail = "NOT TESTED by these checks, and so what this packet asks of its readers: " + "; ".join(gaps) + "."
     if premises:
         lines = [l.strip() for l in open(premises, encoding="utf-8") if l.strip() and not l.startswith("#")]
         if lines:
             tail += " This close's own premises, NOT TESTED: " + "; ".join(lines) + "."
-    text = " ".join(parts + [tail])
+    # #270 (C2, ruled 2026-10-12, 14z-199): the claim says what the deterministic checks cover and what is left to the
+    # readers, and how a presentation finding on a covered item is answered — fixed, then re-checked by a full run of
+    # these checks (`tools/rulecheck.py resolve --recheck`), not by a new rule-checker run
+    scope = ("SCOPE (#270): the deterministic checks below cover what each states; the readers are asked what they do "
+             "not cover, named after NOT TESTED. A presentation finding (a figure, a quote, a wording) on a covered item "
+             "is fixed and re-checked by a full run of these checks (`tools/rulecheck.py resolve --recheck`), not by a "
+             "new rule-checker run.")
+    text = " ".join(([] if PERTURB == "claim-unscoped" else [scope]) + parts + [tail])
     untied = claim_lint.lint(text)
     if untied:
         print("claim REFUSED — claim_lint finds untied universals: " + " | ".join(str(u) for u in untied))
@@ -422,6 +435,9 @@ def selftest():
         r, o = quiet(claim, d, run, os.path.join(d, "prem.txt"))
         say(r == 0 and "`nr`: every row is seen" in o and 'output: "every row x"' in o and "NOT TESTED" in o
             and "the tier ran on HEAD only" in o and o.count("\n") == 1, "claim: one line, a sentence per check with its figure, NOT TESTED from NOT SEEN and the premises")
+        say(r == 0 and o.startswith("SCOPE (#270): the deterministic checks below cover what each states")
+            and "what this packet asks of its readers: `nr`: whether all rows are true" in o,
+            "claim: opens with its scope (#270) — what the checks cover, what the readers are asked, how a presentation finding is re-checked")
         quiet(close_checks.run, os.path.join(d, run, "checks.tsv"), os.path.join(d, run, "out"), ["nr"], d)
         r, o = quiet(claim, d, run, None)
         say(r == 1 and "REFUSED" in o, "claim refuses a partial run")
@@ -437,7 +453,7 @@ def main():
     global PERTURB
     a = sys.argv[1:]
     PERTURB = opt(a, "--perturb", "")
-    root = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip() or os.getcwd()
+    root = repo_root()
     if a[:1] == ["--selftest"]:
         return selftest()
     if not a:

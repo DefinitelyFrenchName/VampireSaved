@@ -51,6 +51,10 @@ Usage:
   python3 tools/rulecheck.py record ID --session PREFIX      # a pinned-reader run: spawn-checked, reports collected (14z-178)
   python3 tools/rulecheck.py record ID --a FILE --b FILE      # a run from before the pinned reader
   python3 tools/rulecheck.py resolve ID --how "..."           # after a VIOLATED
+          [--recheck CLOSE_RUN_DIR --checks NAME[,NAME]]       # #270: a PRESENTATION finding (a figure, a quote, a
+                                       # wording) fixed, then re-checked: resolve RUNS the close's rendered standing
+                                       # checks in full itself, instead of a new full rule-checker run; the ledger
+                                       # records the re-check
   python3 tools/rulecheck.py spawned ID --session PREFIX      # the readers were the pinned definition, no model, each prompt verbatim,
                                                               # on the definition's model with no fallback (or --transcript PATH)
   python3 tools/rulecheck.py readers                          # every ledger run's readers: type, model, effort, fallback, context
@@ -996,6 +1000,132 @@ def open_tickets(root: Path):
             if len(c) > 2 and c[2] in ("open", "parked")}
 
 
+STANDING = "tests/close_standing_checks.tsv"
+STANDING_BOUND = True    # False: --recheck takes any checks file (test_rule_checker's recheck-own-checks control, run 968 Q4)
+RECHECK_CHECKED = True   # False: resolve takes any --recheck at its word (test_rule_checker's recheck-unchecked control)
+
+
+# what a standing command's placeholders may be filled with (run 2026-10-13-969 Q4: a bare wildcard let shell text into
+# a filled span): KEY, RUN and SESSDIR are KNOWN for a run directory and must equal it; ROW sits inside double quotes in
+# every standing command, and tools/close_standing.py refuses a title holding a quote, $, a backtick, a backslash or a
+# tab (BAD_TITLE), so nothing it may hold leaves the quotes; BASE is a commit hash; TRANSCRIPT a path
+FILL_STRICT = True       # False: a placeholder matches anything (test_rule_checker's recheck-porous-fill control, run 969 Q4)
+PLACEHOLDER_FILL = {"ROW": r'[^"$`\\\t\n]+', "BASE": r"[0-9a-f]{7,40}", "TRANSCRIPT": r"[\w./~+-]+"}
+
+
+def standing_pattern(cmd, known):
+    """-> the regex a rendered standing command must fullmatch, or None for a placeholder it cannot fill"""
+    out, pos = [], 0
+    for m in re.finditer(r"\{([A-Z]+)\}", cmd):
+        out.append(re.escape(cmd[pos:m.start()]))
+        k = m.group(1)
+        if not FILL_STRICT:
+            out.append(".+?")
+        elif k in known:
+            if not known[k]:
+                return None   # a value that must be known and is not (BASE outside a git tree): refuse the row
+            out.append(re.escape(known[k]))
+        elif k in PLACEHOLDER_FILL:
+            out.append(PLACEHOLDER_FILL[k])
+        else:
+            return None
+        pos = m.end()
+    out.append(re.escape(cmd[pos:]))
+    return "".join(out)
+
+
+def recheck_problem(root: Path, rid: str, rundir: str, names, session=None):
+    """#270 (C2, ruled 2026-10-12, 14z-199): a PRESENTATION finding (a figure, a quote, a wording) of the close's
+    documentation packet is fixed and re-checked by the close's deterministic checks, not by a new full rule-checker
+    run — and the working agent does not certify the fix itself. RUNDIR is a close run directory rendered from the
+    tracked standing set; `resolve` RUNS its checks itself, in full, now — after the verdict, by construction — and a
+    run record already on disk is never read as the re-check (run 2026-10-13-970 Q4: a hand-written out/exits.tsv
+    passed `status`). -> (None, the run's UTC start) when every check comes out as expected and the named checks are
+    unedited standing rows; else what is wrong."""
+    rd = root / rundir
+    checks, out = rd / "checks.tsv", rd / "out"
+    if not checks.is_file():
+        return f"{rundir} holds no checks.tsv (a close run directory)"
+    if not (root / RUNS / rid / "verdict_real.txt").is_file():
+        return f"run {rid} has no recorded verdict"
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import io, contextlib, close_checks
+    have = {n: (e, c) for n, e, c in close_checks.read_checks(str(checks))}
+    if not names:
+        return "--recheck needs --checks NAME[,NAME]: the deterministic checks that re-verify the fixed finding"
+    unknown = [n for n in names if n not in have]
+    if unknown:
+        return f"{rundir}/checks.tsv has no check {unknown[0]}"
+    # THE CHECKS ARE THE TRACKED STANDING SET'S, not the working agent's (run 2026-10-13-968 Q4): the checks file is
+    # rendered by tools/close_standing.py from tests/close_standing_checks.tsv AT ITS CURRENT sha256, and each named
+    # check is a STANDING row whose expected exit and command are the template's (its {PLACEHOLDERS} filled) — a
+    # close's own `--extra` row, a hand-written file or a hand-edited command does not certify a fix
+    if not STANDING_BOUND:
+        return run_recheck(root, rundir, checks, out, close_checks)
+    m = re.match(r"# rendered by tools/close_standing.py from (\S+) \((\w+)\)", checks.read_text().split("\n", 1)[0])
+    if not m or m.group(1) != STANDING:
+        return f"{rundir}/checks.tsv was not rendered from {STANDING} by tools/close_standing.py (no render line naming it)"
+    tpl = root / STANDING
+    if not tpl.is_file() or hashlib.sha256(tpl.read_bytes()).hexdigest()[:16] != m.group(2):
+        return f"{rundir}/checks.tsv was rendered from another version of {STANDING} ({m.group(2)}): re-render it"
+    # THE RENDER IS THIS RUN'S SESSION'S (run 2026-10-13-972 Q4: KEY was read from the file itself, TRANSCRIPT only by
+    # its shape, so a genuine render for another sitting passed): KEY must be the VIOLATED run's own session, and
+    # TRANSCRIPT and BASE what tools/close_standing.py itself derives for it now
+    km = re.search(r" for (14z-\d+[a-z]?);", checks.read_text().split("\n", 1)[0])
+    if SESSION_BOUND and (not km or km.group(1) != session):
+        return (f"{rundir}/checks.tsv was rendered for {km.group(1) if km else 'no session key'}, not for run {rid}'s "
+                f"session {session}: re-render it for {session}")
+    import close_standing
+    csroot = close_standing.repo_root()
+    known = {"KEY": km.group(1) if km else None, "RUN": rundir.rstrip("/"),
+             "SESSDIR": os.path.dirname(rundir.rstrip("/")) or "."}
+    if SESSION_BOUND:
+        known["TRANSCRIPT"] = close_standing.derive_transcript(csroot)
+        if not known["TRANSCRIPT"]:
+            return "no transcript of this project to bind the render's TRANSCRIPT to (tools/close_standing.py derive_transcript)"
+        if BASE_PINNED:
+            known["BASE"] = close_standing.derive_base(csroot, session).strip()
+    std = {}
+    for ln in tpl.read_text().splitlines():
+        f = ln.split("\t")
+        if ln.strip() and not ln.lstrip().startswith("#") and len(f) == 6:
+            std[f[0]] = (int(f[1]), f[5])
+    for n in names:
+        if n not in std:
+            return f"{n} is not a standing check of {STANDING} (a close's own --extra row does not certify a fix)"
+    # EVERY standing row is there, unedited — not only the named ones (run 2026-10-13-971 Q4: a render with other
+    # standing rows deleted would have passed, and its "full" run would have run only what was left)
+    for n, (e, cmd) in (std.items() if EVERY_ROW else [(n, std[n]) for n in names]):
+        if n not in have:
+            return f"{rundir}/checks.tsv lacks the standing check {n} (a render holds every standing row)"
+        pat = standing_pattern(cmd, known)
+        if pat is None or have[n][0] != e or not re.fullmatch(pat, have[n][1]):
+            return f"{rundir}/checks.tsv's {n} is not the standing row (its exit or command differs from {STANDING})"
+    return run_recheck(root, rundir, checks, out, close_checks)
+
+
+SESSION_BOUND = True      # False: KEY from the file, TRANSCRIPT by shape (test_rule_checker's recheck-other-session control, run 972 Q4)
+BASE_PINNED = True        # False: BASE matches any hash (test_rule_checker's recheck-unpinned-base control, run 973 Q4)
+EVERY_ROW = True          # False: only the named rows are bound (test_rule_checker's recheck-pruned-render control, run 971 Q4)
+RECHECK_RUN = True        # False: recheck_problem stops after the binding (an evidence script's dry run; never set by resolve)
+
+
+def run_recheck(root, rundir, checks, out, close_checks):
+    """the re-check itself: a FULL close-checks run made by `resolve`, its record read back with `status`"""
+    import io, contextlib
+    if not RECHECK_RUN:
+        return None, None
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        rc = close_checks.run(str(checks), str(out), [], str(root))
+        st = close_checks.status(str(checks), str(out))
+    if rc != 0 or st != 0:
+        bad = [l.strip() for l in buf.getvalue().splitlines() if "NOT AS EXPECTED" in l]
+        return f"the re-check of {rundir} is not clean: {bad[:3] or buf.getvalue().strip().splitlines()[-1:]}"
+    first, _ = close_checks.read_exits(str(out / "exits.tsv"))
+    return None, _dt.datetime.strptime(first.split()[3], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=_dt.timezone.utc)
+
+
 def cmd_resolve(a):
     root = REPO
     rows = read_ledger(root)
@@ -1017,17 +1147,27 @@ def cmd_resolve(a):
         die(f"the resolution blames the instrument (\"{blame.group(0)}\") but names no OPEN ticket in docs/project/tickets.tsv"
             " — an instrument defect is a ticket (#271): open one and name it as #N, or answer the finding by work (an answer"
             " by work that only QUOTES such a phrase names the ticket that owned the case, or is reworded)")
+    how = a.how.strip()
+    if getattr(a, "recheck", None):
+        names = [n for n in (a.checks or "").split(",") if n]
+        got = recheck_problem(root, a.id, a.recheck, names, r["session"]) if RECHECK_CHECKED else (None, None)
+        if not isinstance(got, tuple):
+            die("--recheck refused (#270): " + got)
+        when = f"full run {got[1]:%Y-%m-%dT%H:%M:%SZ}; " if got[1] else ""
+        how = f"RECHECKED by {a.recheck} ({when}checks {', '.join(names) or '-'}) — " + how
+    elif getattr(a, "checks", None):
+        die("--checks goes with --recheck")
     p = root / LEDGER
     lines = p.read_text().splitlines(keepends=True)
     out = []
     for ln in lines:
         if not ln.startswith("#") and ln.split("\t")[0] == a.id:
             cols = ln.rstrip("\n").split("\t")
-            cols[LEDGER_COLS.index("resolution")] = a.how.strip()
+            cols[LEDGER_COLS.index("resolution")] = how
             ln = "\t".join(cols) + "\n"
         out.append(ln)
     p.write_text("".join(out))
-    print(f"resolved {a.id}: {a.how.strip()}")
+    print(f"resolved {a.id}: {how}")
 
 
 # ---------------------------------------------------------------- the check
@@ -1282,6 +1422,8 @@ def main():
     r = sub.add_parser("record"); r.add_argument("id"); r.add_argument("--a"); r.add_argument("--b")
     r.add_argument("--session"); r.add_argument("--transcript")
     s = sub.add_parser("resolve"); s.add_argument("id"); s.add_argument("--how", required=True)
+    s.add_argument("--recheck", metavar="CLOSE_RUN_DIR", help="#270: a presentation finding re-checked: resolve runs this close run directory's standing checks in full")
+    s.add_argument("--checks", metavar="NAME[,NAME]", help="#270: with --recheck, the checks that re-verify the fixed finding")
     sp = sub.add_parser("spawned"); sp.add_argument("id")
     g = sp.add_mutually_exclusive_group(required=True); g.add_argument("--session"); g.add_argument("--transcript")
     sub.add_parser("readers")

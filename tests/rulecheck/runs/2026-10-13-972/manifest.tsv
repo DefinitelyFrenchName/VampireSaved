@@ -1,0 +1,24 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent199/t270/issue270.md	733b398b383503bc13b11795419e857630eb3390
+DECISIONS_HISTORY.md.lines-6637-6650 (lines 6637-6650 of DECISIONS_HISTORY.md)	38377dfcd8869090d6a57614cd792abe3d8113af
+tools/rulecheck.py.lines-1000-1153 (lines 1000-1153 of tools/rulecheck.py)	e0fe3c6353e251c080dda4f9c6f3aa613018e71d
+tests/test_rule_checker.sh.lines-290-375 (lines 290-375 of tests/test_rule_checker.sh)	062e6695d37a3bf2d39295de17c618ea60c6d819
+tests/test_rule_checker.sh.lines-519-526 (lines 519-526 of tests/test_rule_checker.sh)	6c83b0b35e213a9918b6582baaff757cf6a1fb85
+tests/test_rule_checker.sh.lines-575-625 (lines 575-625 of tests/test_rule_checker.sh)	a6b013bdc22b579d1712a132bc4b9aea7d23b8d4
+tools/close_standing.py.lines-50-60 (lines 50-60 of tools/close_standing.py)	97d80c6ae5d51cf7b37cd0448d2130613250049a
+tools/close_standing.py.lines-102-143 (lines 102-143 of tools/close_standing.py)	68879dfc5748d2718b062053fb81310b9db5f441
+tools/close_standing.py.lines-282-345 (lines 282-345 of tools/close_standing.py)	2a384ce2ba6e8e78647196e762d13d227ba5d96e
+tools/close_standing.py.lines-410-435 (lines 410-435 of tools/close_standing.py)	1808de44f5bde5f4c8f24205c916ea0fc63ca038
+tests/test_close_standing.sh.lines-20-32 (lines 20-32 of tests/test_close_standing.sh)	ecb94019555ac14f4fd60dc6df71c368b41a2786
+tools/close_checks.py.lines-1-130 (lines 1-130 of tools/close_checks.py)	14ea364087c067ee9fac4703ee6158e6477c06a5
+tests/close_standing_checks.tsv	bb7c6715b4ae30f5e6c6bf401a06411e2e9f3db8
+build/agent199/t270/gates.sh	3ac1ef46d0125e001e21de9d97d9fd21e0a57826
+build/agent199/t270/gates.log	25809fa57421c51030ed0e99fc18d80a8f42bf84
+build/agent199/t270/real_render_match.py	f89e8172f01d0fc18ff2dcb6b7aaeced6dc4091c
+build/agent199/t270/real_render_match.out	03eda443d93068d48379c72fa8cd1f8d6f16d4a3
+build/agent199/t270/full_run_cost.sh	3ac5a319d53b86b8caa6f2ed3f4664d7864dda6c
+build/agent199/t270/full_run_cost.out	388fdbe69e899fb836fe49954bde984c93070971
+docs/project/rule_checker.md.lines-244-268 (lines 244-268 of docs/project/rule_checker.md)	14f42fe4df9b8082b2f84c1b2958b52e407c0d2e
+STATE.md.lines-58-61 (lines 58-61 of STATE.md)	efde5e207b26eb477478ecea6a90267f41be06be
+STATE.md.lines-89-89 (lines 89-89 of STATE.md)	54ab7ab9d7fc6e2edbaf4c0dd7f048cd601eee2b
+.claude/skills/vampire-saved-port/SKILL.md.lines-138-138 (lines 138-138 of .claude/skills/vampire-saved-port/SKILL.md)	679c3c062b603e89806e90c6914d3797237dd531

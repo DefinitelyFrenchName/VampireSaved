@@ -26,6 +26,12 @@
 # MUST-FIRE: shadow-tool: keyless-prepare — a copy of rulecheck.py whose prepare takes no session key (the pre-#209 line, `session = a.session or "-"`) must prepare a run whose meta.tsv says `session -`, and the PREPARE SESSION KEY section must FAIL: prepare requires the sitting's 14z-N key and refuses a transcript prefix (GitHub #209, 14z-189)
 # MUST-FIRE: shadow-tool: unchecked-cite — a copy of rulecheck.py whose prepare takes every --cites at its word must prepare a merge packet citing an unresolved fork run, and the PREPARE CITES section must FAIL: a cited fork run counts only if its plant was caught, it is OK or resolved, and its artifacts are unchanged (#217, 14z-193)
 # MUST-FIRE: shadow-tool: blame-unticketed — a copy of rulecheck.py whose resolve takes an instrument-blaming answer ("no slip", "the plant's reader", "W# hint", a reader's misreading) with no open ticket named (the pre-#271 resolve, BLAME_CHECKED off) must record it, and the RESOLVE BLAME section must FAIL: an instrument defect answered run by run is how the plant readers' 2550/2560 recurred from 14z-179 to 14z-198 unaggregated (#271, 14z-199; mode: the section runs that copy)
+# MUST-FIRE: shadow-tool: recheck-unchecked — a copy of rulecheck.py whose resolve takes any --recheck at its word (RECHECK_CHECKED off: no checks run) must resolve a documentation-packet finding whose fix was never made, beside a forged all-OK run record, and the RESOLVE RECHECK section must FAIL: resolve runs the close's standing checks itself and a presentation finding is never certified by the working agent alone (#270, 14z-199, runs 968-970 Q4; mode: the section runs that copy)
+# MUST-FIRE: shadow-tool: recheck-own-checks — a copy of rulecheck.py whose --recheck takes any checks file (STANDING_BOUND off) must resolve a finding on the close's own --extra check, and the RESOLVE RECHECK section must FAIL: the checks that certify a fix are the tracked standing set's, rendered at its current sha, never a file or a row the working agent wrote (#270, rule-checker run 2026-10-13-968 Q4; mode: the section runs that copy)
+# MUST-FIRE: shadow-tool: recheck-porous-fill — a copy of rulecheck.py whose standing-command match lets a placeholder hold anything (FILL_STRICT off) must resolve a finding on a standing row with shell text inside its filled {ROW}, and the RESOLVE RECHECK section must FAIL: a placeholder's fill is pinned — KEY, RUN and SESSDIR to their known values, ROW to text that cannot leave its quotes (#270, rule-checker run 2026-10-13-969 Q4; mode: the section runs that copy)
+# MUST-FIRE: shadow-tool: recheck-pruned-render — a copy of rulecheck.py that binds only the NAMED standing rows (EVERY_ROW off) must resolve a finding on a render with another standing row deleted, and the RESOLVE RECHECK section must FAIL: a re-check runs the whole standing set, every row present and unedited (#270, rule-checker run 2026-10-13-971 Q4; mode: the section runs that copy)
+# MUST-FIRE: shadow-tool: recheck-other-session — a copy of rulecheck.py whose re-check binds KEY from the checks file itself and TRANSCRIPT by its shape only (SESSION_BOUND off) must resolve a finding of one sitting on a genuine render made for another, and the RESOLVE RECHECK section must FAIL: the re-check reads THIS run's session — its key, the transcript and base close_standing.py derives (#270, rule-checker run 2026-10-13-972 Q4; mode: the section runs that copy)
+# MUST-FIRE: shadow-tool: recheck-unpinned-base — a copy of rulecheck.py whose re-check lets BASE be any hash (BASE_PINNED off) must resolve a finding on a render whose BASE fill was edited to another commit, and the RESOLVE RECHECK section must FAIL: BASE is what close_standing.py derives for the run's session (#270, rule-checker run 2026-10-13-973 Q4; mode: the section runs that copy)
 # MUST-FIRE: perturbed-copy: cross-family-plant — a copy of the record in which a PROCEDURE calibration names an EVIDENCE fixture as its plant must fail: a plant answers its own family's questions, so one from the other checklist proves nothing about the reader (#172 S3, 14z-176)
 #
 # WHY. The rule-checker (docs/project/rule_checker.md, [VSP-183]/[VSP-184]) is a
@@ -55,6 +61,7 @@ mkcopy() {  # mkcopy <root>
     mkdir -p "$1/docs/project" "$1/tests/expected" "$1/tools"
     cp tools/claim_lint.py "$1/tools/"   # prepare imports it beside itself (#185 item 3)
     cp tools/packet_check.py "$1/tools/"; cp -R tools/agent "$1/tools/agent"   # and the pre-prepare check (#272)
+    cp tools/close_checks.py tools/close_standing.py "$1/tools/"   # resolve --recheck runs a close render with them (#270)
     _doc=docs/project/rule_checker.md; cp "$_doc" "$1"/docs/project/
     cp tests/expected/registry.tsv "$1/tests/expected/"
     cp -R tests/rulecheck "$1/tests/rulecheck"
@@ -286,6 +293,105 @@ unblame() {  # unblame <out> — the shadow tool: resolve without the instrument
     sed 's/^BLAME_CHECKED = True /BLAME_CHECKED = False /' tools/rulecheck.py > "$1"
     grep -q '^BLAME_CHECKED = False ' "$1" || { echo "the blame check's switch was not found" >&2; return 1; }
 }
+# SECTION RESOLVE RECHECK's probe (#270, 14z-199): on a throwaway GIT root (a `14z-0:` commit, so BASE derives), a
+# two-row standing set using every placeholder, RENDERED by the real tools/close_standing.py (plus one --extra row);
+# `figs` passes only once the fix exists ({RUN}/fixed), and `resolve --recheck` RUNS the checks itself (run 970 Q4).
+# EVERY case runs, each on its own VIOLATED run, and the probe prints RECHECK-OK or the list of what was wrongly
+# accepted (RESOLVED-ON-*) or refused for the wrong reason (WRONG-REFUSAL-*), so each control proves ITS case (run 973):
+# accepted — the fix made; refused — the fix not made (a red re-check) beside a forged all-OK record, no or an unknown
+# check, the close's own --extra check, a pruned render, a hand-edited command, shell text in a filled {ROW} or {RUN},
+# another sitting's render, another transcript, another BASE, another SESSDIR, and a file with no render line
+resolve_recheck() {  # resolve_recheck <rulecheck.py to test> <root>
+    _R="$2"; rm -rf "$2"; mkcopy "$2"; cp "$1" "$2/tools/rulecheck.py"
+    ( cd "$2" && git init -q . && git -c user.name=t -c user.email=t@t commit -q --allow-empty -m init \
+        && git -c user.name=t -c user.email=t@t commit -q --allow-empty -m "14z-0: probe" ) || { echo "NO-GIT-ROOT"; return; }
+    printf '# standing\nfigs\t0\tthe figures\t-\t-\ttest -f {RUN}/fixed && echo figures ok --row "{ROW}"\nquotes\t0\tthe quotes\t-\t-\techo quotes ok {KEY} {TRANSCRIPT} {BASE} {SESSDIR}\n' > "$2/tests/close_standing_checks.tsv"
+    printf 'mine\t0\tmine\t-\t-\techo mine ok\n' > "$2/extra.tsv"
+    # a fake HOME holding this project's transcript, under the name close_standing.py derives it by (run 972 Q4)
+    _H="$2.home"; rm -rf "$_H"; _tdir="$_H/.claude/projects/$(cd "$2" && git rev-parse --show-toplevel | python3 -c "import re,sys; print(re.sub(r'[^A-Za-z0-9]', '-', sys.stdin.read().strip()))")"
+    mkdir -p "$_tdir"; : > "$_tdir/t.jsonl"
+    _render() { ( cd "$_R" && HOME="$_H" python3 tools/close_standing.py render --key "${1:-14z-0}" --row "(2) THE FINDINGS TABLE" --run build/cr --extra extra.tsv ${2:-} ) > "$_R/render.log" 2>&1; }
+    _edit() { python3 - "$_R/build/cr/checks.tsv" "$1" "$2" "${3:-}" <<'PYE'
+import re, sys
+p, name, a, b = sys.argv[1:]
+out = []
+for ln in open(p):
+    f = ln.rstrip("\n").split("\t")
+    if not ln.startswith("#") and f[0] == name:
+        if a == "DELETE":
+            continue
+        cmd = re.sub(a, b, f[2]) if b else a       # with a replacement: a regex substitution; alone: the new command
+        ln = f"{f[0]}\t{f[1]}\t{cmd}\n"
+    out.append(ln)
+open(p, "w").write("".join(out))
+PYE
+    }
+    _render || { echo "NO-RENDER: $(tail -1 "$2/render.log")"; return; }
+    python3 - "$2" <<'PY3' || { echo "NO-FIXTURE-RUNS"; return; }
+import sys
+from pathlib import Path
+root = Path(sys.argv[1]); sys.path.insert(0, str(root / "tools")); import rulecheck as r
+for n in range(1, 17):
+    rid = f"2099-08-08-{n:02d}"
+    r.append_ledger(root, dict(id=rid, date="2099-08-08", session="14z-1" if n == 10 else "14z-0", decision="recommendation",
+                               subject=f"the close: the documentation packet {n}", control="fx", control_verdict="CAUGHT",
+                               verdict="VIOLATED", violated="Q1", resolution="-", model="m"))
+    d = root / r.RUNS / rid; d.mkdir(parents=True, exist_ok=True)
+    (d / "verdict_real.txt").write_text("Q1: VIOLATED — a figure\n")
+PY3
+    _out=""
+    _rr() { ( cd "$_R" && HOME="$_H" python3 tools/rulecheck.py resolve "$1" --how "Q1: fixed — the figure now equals its source" $2 ) > "$_R/res.log" 2>&1; }
+    _no() {  # _no <run> <case> <expected refusal text> <resolve args>
+        if _rr "$1" "$4"; then _out="$_out RESOLVED-ON-$2"
+        elif ! grep -q -- "$3" "$_R/res.log"; then _out="$_out WRONG-REFUSAL-$2[$(tail -1 "$_R/res.log" | cut -c1-80)]"; fi; }
+    # the fix NOT made: the re-check is red, and a forged all-OK run record beside it changes nothing
+    mkdir -p "$2/build/cr/out"; printf '# run: full 2099-12-31T00:00:00Z deadbeef %s\nname\texpect\texit\tverdict\tseconds\tcommand\nfigs\t0\t0\tOK\t0\tx\nquotes\t0\t0\tOK\t0\tx\nmine\t0\t0\tOK\t0\tx\n' \
+        "$(python3 -c "import hashlib,sys; print(hashlib.sha256(open(sys.argv[1],'rb').read()).hexdigest()[:16])" "$2/build/cr/checks.tsv")" > "$2/build/cr/out/exits.tsv"
+    _no 2099-08-08-02 A-RED-RECHECK "is not clean" "--recheck build/cr --checks figs"
+    : > "$2/build/cr/fixed"   # the fix made
+    if _rr 2099-08-08-01 "--recheck build/cr --checks figs"; then
+        grep -q "^2099-08-08-01	.*RECHECKED by build/cr (.*checks figs) — Q1: fixed" "$2/tests/rulecheck/ledger.tsv" || _out="$_out RECHECK-NOT-RECORDED"
+    else _out="$_out REFUSED-A-GOOD-RECHECK[$(tail -1 "$2/res.log" | cut -c1-80)]"; fi
+    _no 2099-08-08-03 AN-UNKNOWN-CHECK "has no check nosuch" "--recheck build/cr --checks nosuch"
+    _no 2099-08-08-04 NO-CHECK "needs --checks" "--recheck build/cr"
+    _no 2099-08-08-05 THE-CLOSES-OWN-CHECK "is not a standing check" "--recheck build/cr --checks mine"
+    _edit quotes DELETE;                                         _no 2099-08-08-06 A-PRUNED-RENDER "lacks the standing check quotes" "--recheck build/cr --checks figs"
+    _render; _edit quotes "true";                                _no 2099-08-08-07 A-HAND-EDITED-CHECK "is not the standing row" "--recheck build/cr --checks quotes"
+    _render; _edit figs '--row "[^"]*"' '--row "x" || true; echo ""'; _no 2099-08-08-08 A-SHELL-FILLED-ROW "is not the standing row" "--recheck build/cr --checks figs"
+    _render; _edit figs 'build/cr/fixed' 'build/cr; true/fixed';  _no 2099-08-08-09 A-SHELL-FILLED-RUN "is not the standing row" "--recheck build/cr --checks figs"
+    _render;                                                     _no 2099-08-08-10 ANOTHER-SESSIONS-RENDER "not for run 2099-08-08-10's session 14z-1" "--recheck build/cr --checks figs"
+    _render 14z-0 "--transcript /x/other.jsonl";                 _no 2099-08-08-11 ANOTHER-TRANSCRIPT "is not the standing row" "--recheck build/cr --checks figs"
+    _render; _edit quotes ' [0-9a-f]{7,40} build$' ' 0123abcd build'; _no 2099-08-08-12 ANOTHER-BASE "is not the standing row" "--recheck build/cr --checks figs"
+    _render; _edit quotes ' build$' ' elsewhere';                _no 2099-08-08-13 ANOTHER-SESSDIR "is not the standing row" "--recheck build/cr --checks figs"
+    _render; sed '1d' "$2/build/cr/checks.tsv" > "$2/build/cr/c.tmp" && mv "$2/build/cr/c.tmp" "$2/build/cr/checks.tsv"
+    _no 2099-08-08-14 A-HAND-WRITTEN-FILE "was not rendered from" "--recheck build/cr --checks figs"
+    _rr 2099-08-08-15 "" || _out="$_out REFUSED-A-PLAIN-RESOLVE"
+    echo "${_out# }" | grep -q . && echo "${_out# }" || echo RECHECK-OK
+}
+unrecheck() {  # unrecheck <out> — the shadow tool: resolve takes any --recheck at its word
+    sed 's/^RECHECK_CHECKED = True /RECHECK_CHECKED = False /' tools/rulecheck.py > "$1"
+    grep -q '^RECHECK_CHECKED = False ' "$1" || { echo "the recheck switch was not found" >&2; return 1; }
+}
+unpinnedbase() {  # unpinnedbase <out> — the shadow tool: BASE matches any hash
+    sed 's/^BASE_PINNED = True /BASE_PINNED = False /' tools/rulecheck.py > "$1"
+    grep -q '^BASE_PINNED = False ' "$1" || { echo "the base switch was not found" >&2; return 1; }
+}
+othersession() {  # othersession <out> — the shadow tool: KEY and TRANSCRIPT not bound to the run's session
+    sed 's/^SESSION_BOUND = True /SESSION_BOUND = False /' tools/rulecheck.py > "$1"
+    grep -q '^SESSION_BOUND = False ' "$1" || { echo "the session switch was not found" >&2; return 1; }
+}
+prunedrender() {  # prunedrender <out> — the shadow tool: only the named standing rows are bound
+    sed 's/^EVERY_ROW = True /EVERY_ROW = False /' tools/rulecheck.py > "$1"
+    grep -q '^EVERY_ROW = False ' "$1" || { echo "the every-row switch was not found" >&2; return 1; }
+}
+porousfill() {  # porousfill <out> — the shadow tool: a placeholder matches anything
+    sed 's/^FILL_STRICT = True /FILL_STRICT = False /' tools/rulecheck.py > "$1"
+    grep -q '^FILL_STRICT = False ' "$1" || { echo "the fill switch was not found" >&2; return 1; }
+}
+ownchecks() {  # ownchecks <out> — the shadow tool: --recheck takes any checks file
+    sed 's/^STANDING_BOUND = True /STANDING_BOUND = False /' tools/rulecheck.py > "$1"
+    grep -q '^STANDING_BOUND = False ' "$1" || { echo "the standing switch was not found" >&2; return 1; }
+}
 uncite() {  # uncite <out> — the shadow tool: prepare with the citation check switched off
     python3 - tools/rulecheck.py "$1" <<'PY' || { echo "the citation check was not found to remove" >&2; return 1; }
 import sys
@@ -332,6 +438,54 @@ if [ "${VS_CTL:-}" = blame-unticketed ]; then
     echo "MODE: control blame-unticketed — the shadow copy reads: $got"
     case "$got" in RESOLVED-BLAME-*) ;; *) echo "REFUSED: the shadow copy did not record an unticketed blame ($got)"; exit 3;; esac
     echo "FAIL: rule-checker resolve blame (control mode blame-unticketed — $got)"; exit 1
+fi
+
+if [ "${VS_CTL:-}" = recheck-unpinned-base ]; then
+    unpinnedbase "$W/unpinnedbase.py" || exit 3
+    got="$(resolve_recheck "$W/unpinnedbase.py" "$W/rub_mode")"
+    echo "MODE: control recheck-unpinned-base — the shadow copy reads: $got"
+    case "$got" in *RESOLVED-ON-ANOTHER-BASE*) ;; *) echo "REFUSED: the shadow copy did not accept another BASE ($got)"; exit 3;; esac
+    echo "FAIL: rule-checker resolve recheck (control mode recheck-unpinned-base — $got)"; exit 1
+fi
+
+if [ "${VS_CTL:-}" = recheck-other-session ]; then
+    othersession "$W/othersess.py" || exit 3
+    got="$(resolve_recheck "$W/othersess.py" "$W/ros_mode")"
+    echo "MODE: control recheck-other-session — the shadow copy reads: $got"
+    case "$got" in *RESOLVED-ON-ANOTHER-SESSIONS-RENDER*) ;; *) echo "REFUSED: the shadow copy did not accept another session's render ($got)"; exit 3;; esac
+    echo "FAIL: rule-checker resolve recheck (control mode recheck-other-session — $got)"; exit 1
+fi
+
+if [ "${VS_CTL:-}" = recheck-pruned-render ]; then
+    prunedrender "$W/pruned.py" || exit 3
+    got="$(resolve_recheck "$W/pruned.py" "$W/rpr_mode")"
+    echo "MODE: control recheck-pruned-render — the shadow copy reads: $got"
+    case "$got" in *RESOLVED-ON-A-PRUNED-RENDER*) ;; *) echo "REFUSED: the shadow copy did not accept a pruned render ($got)"; exit 3;; esac
+    echo "FAIL: rule-checker resolve recheck (control mode recheck-pruned-render — $got)"; exit 1
+fi
+
+if [ "${VS_CTL:-}" = recheck-porous-fill ]; then
+    porousfill "$W/porous.py" || exit 3
+    got="$(resolve_recheck "$W/porous.py" "$W/rpf_mode")"
+    echo "MODE: control recheck-porous-fill — the shadow copy reads: $got"
+    case "$got" in *RESOLVED-ON-A-SHELL-FILLED-ROW*RESOLVED-ON-ANOTHER-SESSDIR*) ;; *) echo "REFUSED: the shadow copy did not accept a shell-filled row ($got)"; exit 3;; esac
+    echo "FAIL: rule-checker resolve recheck (control mode recheck-porous-fill — $got)"; exit 1
+fi
+
+if [ "${VS_CTL:-}" = recheck-own-checks ]; then
+    ownchecks "$W/ownchecks.py" || exit 3
+    got="$(resolve_recheck "$W/ownchecks.py" "$W/roc_mode")"
+    echo "MODE: control recheck-own-checks — the shadow copy reads: $got"
+    case "$got" in *RESOLVED-ON-THE-CLOSES-OWN-CHECK*) ;; *) echo "REFUSED: the shadow copy did not accept the close's own check ($got)"; exit 3;; esac
+    echo "FAIL: rule-checker resolve recheck (control mode recheck-own-checks — $got)"; exit 1
+fi
+
+if [ "${VS_CTL:-}" = recheck-unchecked ]; then
+    unrecheck "$W/unrechecked.py" || exit 3
+    got="$(resolve_recheck "$W/unrechecked.py" "$W/rrc_mode")"
+    echo "MODE: control recheck-unchecked — the shadow copy reads: $got"
+    case "$got" in *RESOLVED-ON-A-RED-RECHECK*) ;; *) echo "REFUSED: the shadow copy did not accept a red re-check ($got)"; exit 3;; esac
+    echo "FAIL: rule-checker resolve recheck (control mode recheck-unchecked — $got)"; exit 1
 fi
 
 case "${VS_CTL:-}" in counted-id|late-validate)
@@ -397,6 +551,11 @@ got="$(resolve_blame tools/rulecheck.py "$W/rbl")"
 echo "  the real tool: $got"
 [ "$got" = BLAME-OK ] || { echo "FAIL: resolve's instrument-blame rule ($got)"; fail=1; }
 
+echo "== RESOLVE RECHECK: a presentation finding is resolved only on a full run of the standing close checks that resolve makes itself (#270) =="
+got="$(resolve_recheck tools/rulecheck.py "$W/rrc")"
+echo "  the real tool: $got"
+[ "$got" = RECHECK-OK ] || { echo "FAIL: resolve's re-check route ($got)"; fail=1; }
+
 echo "== RESOLVE BLAME on the REAL index: open_tickets reads docs/project/tickets.tsv's status column (run 2026-10-13-955) =="
 # an independent reader — awk on the column the index's own header names `status` — against the tool's set
 col="$(awk -F'\t' '/^#/ {next} {for (i = 1; i <= NF; i++) if ($i == "status") {print i; exit}}' docs/project/tickets.tsv)"
@@ -458,6 +617,66 @@ else
     vs_ctl_dead blame-unticketed "the blame check's switch was not found"; fail=1
 fi
 
+if unpinnedbase "$W/unpinnedbase_c.py"; then
+    got="$(resolve_recheck "$W/unpinnedbase_c.py" "$W/rubc")"
+    case "$got" in
+        *RESOLVED-ON-ANOTHER-BASE*) vs_ctl_fired recheck-unpinned-base "the copy letting BASE be any hash: $got";;
+        *) vs_ctl_dead recheck-unpinned-base "the shadow copy read $got"; fail=1;;
+    esac
+else
+    vs_ctl_dead recheck-unpinned-base "the base switch was not found"; fail=1
+fi
+
+if othersession "$W/othersess_c.py"; then
+    got="$(resolve_recheck "$W/othersess_c.py" "$W/rosc")"
+    case "$got" in
+        *RESOLVED-ON-ANOTHER-SESSIONS-RENDER*) vs_ctl_fired recheck-other-session "the copy not bound to the run's session: $got";;
+        *) vs_ctl_dead recheck-other-session "the shadow copy read $got"; fail=1;;
+    esac
+else
+    vs_ctl_dead recheck-other-session "the session switch was not found"; fail=1
+fi
+
+if prunedrender "$W/pruned_c.py"; then
+    got="$(resolve_recheck "$W/pruned_c.py" "$W/rprc")"
+    case "$got" in
+        *RESOLVED-ON-A-PRUNED-RENDER*) vs_ctl_fired recheck-pruned-render "the copy binding only the named rows: $got";;
+        *) vs_ctl_dead recheck-pruned-render "the shadow copy read $got"; fail=1;;
+    esac
+else
+    vs_ctl_dead recheck-pruned-render "the every-row switch was not found"; fail=1
+fi
+
+if porousfill "$W/porous_c.py"; then
+    got="$(resolve_recheck "$W/porous_c.py" "$W/rpfc")"
+    case "$got" in
+        *RESOLVED-ON-A-SHELL-FILLED-ROW*RESOLVED-ON-ANOTHER-SESSDIR*) vs_ctl_fired recheck-porous-fill "the copy with a porous fill: $got";;
+        *) vs_ctl_dead recheck-porous-fill "the shadow copy read $got"; fail=1;;
+    esac
+else
+    vs_ctl_dead recheck-porous-fill "the fill switch was not found"; fail=1
+fi
+
+if ownchecks "$W/ownchecks_c.py"; then
+    got="$(resolve_recheck "$W/ownchecks_c.py" "$W/rocc")"
+    case "$got" in
+        *RESOLVED-ON-THE-CLOSES-OWN-CHECK*) vs_ctl_fired recheck-own-checks "the copy without the standing binding: $got";;
+        *) vs_ctl_dead recheck-own-checks "the shadow copy read $got"; fail=1;;
+    esac
+else
+    vs_ctl_dead recheck-own-checks "the standing switch was not found"; fail=1
+fi
+
+if unrecheck "$W/unrechecked_c.py"; then
+    got="$(resolve_recheck "$W/unrechecked_c.py" "$W/rrcc")"
+    case "$got" in
+        *RESOLVED-ON-A-RED-RECHECK*) vs_ctl_fired recheck-unchecked "the copy without the re-check binding: $got";;
+        *) vs_ctl_dead recheck-unchecked "the shadow copy read $got"; fail=1;;
+    esac
+else
+    vs_ctl_dead recheck-unchecked "the recheck switch was not found"; fail=1
+fi
+
 for c in counted-id late-validate; do
     if [ "$c" = counted-id ]; then counted "$W/shadow_$c.py"; else latecheck "$W/shadow_$c.py"; fi || { vs_ctl_dead "$c" "the shadow copy could not be made"; fail=1; continue; }
     got="$(prepare_ids "$W/shadow_$c.py" "$W/pc_$c")"
@@ -468,7 +687,7 @@ for c in counted-id late-validate; do
 done
 
 if [ "$fail" -eq 0 ]; then
-    echo "PASS: the rule-checker's record is sound, record binds the spawn check, prepare's ids hold, prepare requires the session key, a merge packet's cited fork runs are checked, resolve refuses unticketed instrument blame, and its eleven controls fire"
+    echo "PASS: the rule-checker's record is sound, record binds the spawn check, prepare's ids hold, prepare requires the session key, a merge packet's cited fork runs are checked, resolve refuses unticketed instrument blame and takes a re-check only from a full run of the standing close checks it makes itself, and its seventeen controls fire"
 else
     echo "FAIL: rule-checker record"
     exit 1

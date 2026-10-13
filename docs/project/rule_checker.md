@@ -243,8 +243,27 @@ maintainer: "I agree with your proposals for C1, C2, C3, C4", "8. Rot -> I agree
 `tools/recurrence_alarm.py` (gate `tests/test_recurrence_alarm.sh`, so every
 close) groups the VIOLATED lines of the ledger by a question and a pair of cited tokens and fails when
 one recurs in three subjects across two sessions, until `tests/rulecheck/recurrence.tsv` names the
-ticket that owns its cause. The checker's output is reported to the
-maintainer VERBATIM, never summarised — paraphrase is where softening
+ticket that owns its cause. **A presentation finding of the close's documentation packet is re-checked, not
+re-run** (#270, C2 — "I agree with your proposals for C1, C2, C3, C4"): a finding that is a figure, a quote or a
+wording on an item the close's deterministic checks cover is fixed, then re-checked by a FULL run of those checks
+(`tools/close_checks.py run`), and the run is resolved with `resolve <id> --recheck <close run dir> --checks
+<names> --how "..."` — no new rule-checker run for it. `resolve` RUNS the re-check itself — a FULL
+`tools/close_checks.py` run of that directory, every check as expected — so no run record on disk is trusted (run
+2026-10-13-970 Q4: a hand-written `out/exits.tsv` passed `status`); it takes the directory only when its `checks.tsv`
+was rendered by `tools/close_standing.py` from `tests/close_standing_checks.tsv` at its current sha256, holds EVERY
+standing row with the template's exit and command (run 2026-10-13-971 Q4: a pruned render), names only standing
+checks, and has each placeholder's fill pinned — KEY to the VIOLATED run's own session, TRANSCRIPT and BASE to what
+`close_standing.py` derives for it now (run 2026-10-13-972 Q4: a genuine render for another sitting passed; a BASE
+that cannot be derived refuses the row), RUN and SESSDIR to the directory, ROW to text that cannot leave its quotes, BASE to a hash, TRANSCRIPT to a path (a close's own
+`--extra` row, a hand-written file, a hand-edited command or shell text inside a filled span is refused — runs
+2026-10-13-968 and -969 Q4); it writes `RECHECKED by <dir> (full run <UTC>; checks <names>)` into the ledger. A full
+run took 83-101 s at the 14z-196..198 closes. The tracked checks certify the fix, not the working agent. A finding that is not presentation (a premise, a missing check, a home) still gets a
+new run. The packet's claim (`tools/close_standing.py claim`) opens with that SCOPE: what the checks cover, what is
+asked of the readers (the items after NOT TESTED), and this route. Gates: `tests/test_rule_checker.sh` (RESOLVE
+RECHECK, controls `recheck-unchecked`, `recheck-own-checks`, `recheck-porous-fill`, `recheck-pruned-render`,
+`recheck-other-session` and `recheck-unpinned-base`, each proven on its own case), `tests/test_close_standing.sh`
+(control `claim-unscoped`). The checker's
+output is reported to the maintainer VERBATIM, never summarised — paraphrase is where softening
 happens — and the run dir keeps it verbatim.
 
 **The must-fire half, like every control in this tree ([VSP-181]).** A
