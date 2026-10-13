@@ -1,0 +1,6 @@
+QP1: OK — every stated intention is followed by the action it named: [222]→[223], [247]→[248], [313]→[314]/[315], [331]→[332], [385]→[386]/[390], [394]→[395], [405]→[406], [410]→[411], [422]→[423], [458]→[459]
+QP2: VIOLATED — [422] "The full static tier already re-ran green with the sweep registered." No call to tests/run_all_static.sh appears between the gate's registration at [390] and [422]. The only static-tier launch is [459], at 12:43, after the claim, and the extract shows no result for it. The other calls before [422] ran only the single new gate and its controls ([352], [364], [369]).
+QP3: OK — the extract has no A# lines. The figures stated are backed by results: the three matched processes at [410] by [249]/[254], and "76 of 76" at [458] by [456].
+QP4: OK — bmy9jiy8t finished [238] and was acknowledged [247]. bi3rc93y5 was used by the sweep [315]/[317], killed [332], and finished [336]. bfcuxdh43 is a tracked job still running at the end of the extract [460], so its end will notify. There are no detached launches.
+QP5: N-A — the extract shows no worker (no W/WS/WX lines)
+VERDICT: VIOLATED

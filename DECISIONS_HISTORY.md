@@ -6709,7 +6709,7 @@ So: #270 closes `done` with its measurement in the closing comment — no saving
 
 ## Ruled 2026-10-13 (14z-199) — the push merges the README commit instead of rebasing on it
 
-**The question (AskUserQuestion), verbatim**, put after the rebase the maintainer had chosen ran locally and rewrote all 31 local commits, nothing pushed: *"The rebase rewrote all 31 local commits. This sitting's records cite pre-rebase hashes, including a6dcc9a5 where the green tier ran (STATE.md, DECISIONS_HISTORY, the rule-checker ledger and run records), and after a rebased push those commits would not exist on GitHub. I should have flagged this when I recommended rebasing. Nothing is pushed yet. Which way?"* — options "Merge instead (Recommended)" and "Keep the rebase".
+**The question (AskUserQuestion), verbatim**, put after the rebase the maintainer had chosen ran locally and rewrote all 31 local commits, nothing pushed: *"The rebase rewrote all 31 local commits. This sitting's records cite pre-rebase hashes, including a6dcc9a5 where the green tier ran (STATE.md, DECISIONS_HISTORY, the rule-checker ledger and run records), and after a rebased push those commits would not exist on GitHub. I should have flagged this when I recommended rebasing. Nothing is pushed yet. Which way?"* — options "Merge instead (Recommended)" and "Keep the rebase". [CORRECTED at the 14z-199 close, rule-checker run 2026-10-13-1028: the tier at a6dcc9a5 was NOT GREEN under --strict — PASS 203 SKIP 1 FAIL 0, the SKIP the Windows-only gate, which passed on ERIS at that commit — so "the green tier" in this question was wrong]
 
 **The maintainer:** *"Merge instead (Recommended)"*.
 

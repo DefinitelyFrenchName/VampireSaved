@@ -7051,8 +7051,18 @@ assert, or a grep for the new text) and only then prepare.
 
 The 14z-199 close recommended rebasing the sitting's 31 local commits on the maintainer's README commit, and ran it.
 The sitting's records — STATE's tier rows, DECISIONS_HISTORY, the rule-checker ledger and run records, the snapshot run
-records — name the commits the checks ran at (the green close tier's `a6dcc9a5` among them); a rebase gives every one a
+records — name the commits the checks ran at (the close tier's `a6dcc9a5` among them); a rebase gives every one a
 new hash, so a rebased push leaves each citation naming a commit that exists nowhere on GitHub. Caught before the push;
 the maintainer ruled a merge (`DECISIONS_HISTORY.md` "Ruled 2026-10-13 (14z-199) — the push merges the README commit").
 **The rule:** in this repository, take a remote commit into local work with `git merge --no-ff`, never a rebase,
 whenever the local commits are cited anywhere — and they always are once a tier or a rule-checker run has named one.
+
+## A STRICT TIER WITH A SKIP IS NOT GREEN, EVEN WHEN THE SKIP PASSES ELSEWHERE — say the tally and where the SKIP passed (paid twice: 14z-199)
+
+Under `--strict` a SKIP counts as a failure: the runner prints `NOT GREEN` and exits 1. Twice in 14z-199 the agent called
+such a tier "green" — the mid-session tier at `0f1de68b` ("the static tier is green: 204 passed, 0 failed", committed on
+it, with no run of the skipped gate behind it) and the close tier at `a6dcc9a5` ("read against the green `a6dcc9a5`
+results", while its own resolution recorded it NOT GREEN) — both found by the procedure check (rule-checker runs
+2026-10-13-1016 and -1028). The one SKIP, `test_release_launcher_bat`, is Windows-only; at the close it passed on ERIS at
+that commit, which settles the gate, not the word. **The rule:** report a strict tier as its tally (`PASS 203 SKIP 1
+FAIL 0`) and name where each SKIP was run instead and with what verdict; "green" only for a tier whose runner said so.

@@ -31,7 +31,7 @@ there in parallel.** A long tier runs on a snapshot (`tests/run_on_snapshot.sh`)
    - high: #261 (`audit_effect_class_rows` section 4 checks a type-6 fallback inventory that was never frozen), #256 (the close's open-tickets check reads a cited ticket range as its two ends);
    - medium: #243, #257, #258, #259;
    - low: #118, #129, #229, #244;
-   - no severity label: #260, #262, #263, #266, #267, #269, #273, #274, #275, #276 (the session dashboard misses every tier run on a snapshot).
+   - no severity label: #260, #262, #263, #266, #267, #269, #273, #274, #275, #276 (the session dashboard misses every tier run on a snapshot), #277 (the procedure check's extract: a figure written to fewer decimals reads unsourced; a part cut hides a step's evidence).
 5. **#266 — PILOT's GNOME Shell segfaults under Wayland at every boot since 2026-10-09**, so `audit_release_linux_desktop` cannot run. It is now the one red/SKIP row of the release-cadence staleness audit (`audit_mask_window_ff42a2` moved to `ondemand` this sitting).
 6. **`tests/replays/118_chain.rpl`'s header names a leg of `audit_mizuumi_inputs` that gate never ran** (STATE 14z-198 finding (i)). The one-line correction stales the 76 emulator gates that follow `tests/replays/`, so make it in a session that runs those gates anyway.
 7. **#118 — the chars gate, PARKED on branch `t118-196`.** **#129 stays the lowest priority**, captures first.
