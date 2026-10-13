@@ -1,0 +1,1 @@
+WITHDRAWN 2026-10-13 (14z-199), never spawned: its pre-prepare flags showed an overstated sentence in build/agent199/t273/report.md ("The working agent already answers each finding in writing"; tools/rulecheck.py resolve answers each violated question, not each finding). Corrected and re-prepared as the next run.

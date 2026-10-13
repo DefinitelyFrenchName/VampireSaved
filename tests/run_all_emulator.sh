@@ -60,7 +60,10 @@
 #     ROMDIR=... tests/run_all_emulator.sh --scope ondemand                  every ondemand row
 #     ROMDIR=... tests/run_all_emulator.sh --scope ondemand --only 'audit_mizuumi_*'   a subset
 # (with --lane, --controls, --strict and --jobs as for any run). Its reason keyword is
-# `pristine:`. A pristine-only gate guarding a case KNOWN to have broken before (a
+# `pristine:`. Since 14z-199 (maintainer-ruled, #265) the scope also holds an INSTRUMENT
+# with no default subject — reason keyword `instrument:` — which run bare only SKIPs and
+# is run by hand with its operands (audit_mask_window_ff42a2, [VSP-35]).
+# A pristine-only gate guarding a case KNOWN to have broken before (a
 # tenant change that once moved vsavj characters) stays `release`.
 #
 # ORDER IS NOT DECORATION. The `prereq` lane — the instrument and verdict-logic
@@ -72,7 +75,7 @@
 #   ROMDIR=... tests/run_all_emulator.sh                 prereq+fbneo+mame, release scope
 #   MAME_BIN=... tests/run_all_emulator.sh              override the exported MAME default (else the WIDE build)
 #   ROMDIR=... tests/run_all_emulator.sh --scope all     + the out-of-scope rows (never the ondemand ones)
-#   ROMDIR=... tests/run_all_emulator.sh --scope ondemand   ONLY the ondemand rows (pristine-only gates, 14z-196)
+#   ROMDIR=... tests/run_all_emulator.sh --scope ondemand   ONLY the ondemand rows (pristine-only gates, 14z-196; instruments, 14z-199)
 #   ... --lane prereq|mame|fbneo|mister|all              default: all but mister
 #   ... --cadence romset|bitstream|all                   default: all
 #   ... --freeze                                         = --cadence romset (see below)

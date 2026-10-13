@@ -1,0 +1,34 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent199/t273/report.md	b5423b8dd092ef129128cc3bcfc992394d002091
+build/agent199/t273/plan.md	053647d5eb309211dd7c224e7f7ac4f6321fbc03
+build/agent199/t273/inventory.py	a6f896f31ac8bdf188d9f623c8a713c02eca9973
+build/agent199/t273/inventory.tsv	9eb1ea312c2863f761ceb9be43bd934774e525a3
+build/agent199/t273/build_stage.py	452b0c156668c88ff850eff1c5f45fe33e848cf4
+build/agent199/t273/build_stage.out	bf806a22af2e1776a5b90beb93573585c0feb270
+build/agent199/t273/collect.py	c2e0c1bda317366fd3e21ff2d744aea7ee85d914
+build/agent199/t273/collect.out	4b5c9eff481047508b867d2fd4dfcd5ca1513296
+build/agent199/t273/manifest_check.py	ef084d85cc362988fdb5334957fc8216156fa47b
+build/agent199/t273/manifest_check.out	cf919cc8d86494999b50d093f9b07121faee66bc
+build/agent199/t273/checklist_diff.txt	bddb42149e28cd9161080e287ab238e75abaaaa1
+build/agent199/t273/concat_verdicts.sh	4f725123782904460790a37099ae5203c543e51a
+build/agent199/t273/verdicts_all.txt	3fa7a1a23e6074b418457e322ac2a056c0e2ff0f
+build/agent199/t273/tally.py	7004394da9517c19f4443b9f6660092f2c639853
+build/agent199/t273/tally.tsv	30e4832f19edb375017d45448e319aab58c05e6a
+build/agent199/t273/tally.out	ddd8e28d0906a68520437808f03b468e8ec252d5
+build/agent199/t273/judge/instructions.md	2b126a3a4b2fc9296513ee14ed5e8cfe8063ec99
+build/agent199/t273/judge/items.tsv	f2e863fa7f302e0e228acd55b674507806dd324d
+build/agent199/t273/judge/key.tsv	6f4d6a4851dbc3a20adc24ed627e960292ed1d3f
+build/agent199/t273/judge/judge_1.tsv	62009ed798c13c3f154701faadda366fef151102
+build/agent199/t273/judge/judge_2.tsv	2389ef60e8509d4726e25b5bf376e3a595aef7ec
+build/agent199/t273/judge/merge.py	eb0ae434b5232beb5acb9e0add745948ff7c1a27
+build/agent199/t273/judge/merged.tsv	423a611278337502929b1792a5c454b8d892a403
+build/agent199/t273/judge/merge.out	2815093ce655782f597dd19b016e1b9423d42cb5
+build/agent199/t273/judge/judge_check.py	2b9c3eb6cc4e5c02ae092d927e37bd46cc885921
+build/agent199/t273/judge/judge_check.out	3c13a03ae7fab1c7306e2383429b450230e8854b
+build/agent199/t273/plan_order.py	e896cdd774e6662b4a79d7d91be6aa0a21f9cb2e
+build/agent199/t273/plan_order.out	5dd9cfa2e0a0ac09a3eaeec0f5d4d946b60d1340
+build/agent199/t1/violations_196_198.md	2739e3fe581fd6ab4b01b5ccdf2e3431dc85bb1d
+build/agent199/tickets/T6.md	0e9ecdc55c27fc6c686ce854bdb50a95c41d61d7
+docs/project/rule_checker.md.lines-150-170 (lines 150-170 of docs/project/rule_checker.md)	bfeff2096ee8d51a544e9df83ae9676175b1563c
+DECISIONS_HISTORY.md.lines-6637-6649 (lines 6637-6649 of DECISIONS_HISTORY.md)	a672b8d004c3386ed43cbd05f1045f6c9dccc60d
+build/agent199/t273/stage/2026-09-24-131/a/audit_forced_pick_fidelity.sh.txt	c621b3d2f46f20bec7847c50a9ae8b31f087252d

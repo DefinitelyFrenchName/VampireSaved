@@ -6682,3 +6682,11 @@ So: `tools/packet_check.py` flags and never refuses (`docs/project/rule_checker.
 **The maintainer:** *"Narrow the predictor first (Recommended)"*.
 
 So: #274 is filed (narrow `tools/static_confirm.py`'s R3 and its change set, each narrowing scored on a fresh trace); #269 stays open and is built on it; until then a session close runs the static tier as before (every gate, every control executed). The 2026-10-12 ruling's turnaround stands as the direction.
+
+## Ruled 2026-10-13 (14z-199) — #265: audit_mask_window_ff42a2 moves to ondemand
+
+**The question (AskUserQuestion), verbatim**, put after the deep dive (rule-checker run 2026-10-13-987 OK after runs 984 withdrawn and 985; `build/agent199/t265/report.md`): *"#265 — audit_mask_window_ff42a2 SKIPs bare at every release. Measured: it exits at its operand check before any MAME call, so the release run of it asserts nothing; since #252 the release-cadence audit FAILs on that SKIP whatever is approved; and the 2026-09-06 standing exception, kept in prose, was still re-asked at M19 and at 14z-198. Which way? (report: build/agent199/t265/report.md, rule-checked OK run 987)"* — "A: ondemand scope (Recommended)" / "B: readable exception" / "C: move out of tests/".
+
+**The maintainer:** *"A: ondemand scope (Recommended)"*.
+
+So: the row's scope is `ondemand` with the reason keyword `instrument:` — an instrument with no default subject, run by hand with its three operands for a select-palette row move ([VSP-35]); no tier selects it and the staleness audit never judges it. `ondemand` now holds two reasons, `pristine:` (14z-196) and `instrument:`, and `tests/test_emulator_runner.sh`'s registry check accepts either. The 2026-09-06 standing exception and the per-release approval of this SKIP end with it; #131's *"Keep, case-specific"* stands.

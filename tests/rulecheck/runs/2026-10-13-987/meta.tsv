@@ -1,0 +1,11 @@
+decision	recommendation
+subject	#265: put to the maintainer — audit_mask_window_ff42a2's release SKIP; three options, A recommended — re-check after run 985
+session	14z-199
+model	rule-checker@163e4ce9cf7b
+claim	Recommend to the maintainer (build/agent199/t265/report.md) that audit_mask_window_ff42a2 move from scope `out` to `ondemand` with a new reason keyword (option A), with option B (an approved exception the audit and the runner can read) and option C (an instrument outside tests/) offered; nothing is decided. Measured at the HEAD in head.txt: run bare, the instrument prints its SKIP and exits 0 at tests/audit_mask_window_ff42a2.sh:106-112, before its first MAME call (tools/run_replay_mame.sh, line 131); `--scope all` selects every row but `ondemand` (tests/run_all_emulator.sh:224); `python3 tools/audit_emulator_staleness.py --cadence release` at HEAD b7d654ea84ed exits 1 (stale_release.txt records the command, HEAD and exit status) listing this SKIP and audit_release_linux_desktop's and never judges an `ondemand` row (tools/audit_emulator_staleness.py:412-413); the `ondemand` reason keyword is enforced as `pristine:` only (tests/test_emulator_runner.sh:378-379); the 2026-09-06 standing exception was recorded in prose, carried without asking at the M17 sweep and M18 release (14z-144, STATE_HISTORY.md:1863, :1871) and the 14z-153 cost run (HANDOFF.md:1384), then asked again at M19 (14z-174, the maintainer's "yes", DECISIONS_HISTORY.md:1747-1765) and at 14z-198 ("carry the skip, open a ticket about it so we can deep dive after the release", DECISIONS_HISTORY.md:6598-6601); #265's own "approved at 14z-153" overstates a measurement run, and the report says so. NOT TESTED: no option is built — each cost is read from the files named, not measured on an edit; the other five `momentary:` rows were not read for whether they run bare to a verdict; audit_release_linux_desktop's SKIP is outside the ticket, so A alone does not make the release-cadence audit green; whether `ondemand`'s meaning should widen to an instrument with no default subject is the maintainer's call.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	9 flag(s): ATTRIB 1, D-ABSOLUTE 8
+deliverables	build/agent199/t265/report.md

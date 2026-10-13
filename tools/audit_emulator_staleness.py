@@ -52,7 +52,8 @@ itself, when the run recorded the registry dirty, or when either version cannot 
 WHAT A FREEZE RUNS (same ruling): at `freeze` cadence only the rows a freeze selects — registry cadence
 `romset`, scope `release` (`run_all_emulator.sh --freeze`) — FAIL; any other row's finding is a NOTE there.
 `release` cadence judges every row — but an `ondemand` row (14z-196, maintainer-ruled: its subject is pristine
-content only and no tier runs it) is never judged at any cadence: its findings are NOTEs.
+content only and no tier runs it; since 14z-199, #265, also an instrument with no default subject) is never judged
+at any cadence: its findings are NOTEs.
 
 A RED NEWEST ROW (same ruling): a gate whose newest row is FAIL, TIMEOUT or MISSING has no green to be stale —
 until 14z-192 it was not judged at all. It FAILs at freeze/release cadence (within the scope above) and is a

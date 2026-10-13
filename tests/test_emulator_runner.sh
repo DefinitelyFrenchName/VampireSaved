@@ -374,9 +374,10 @@ for line in open("tests/ci_emulator.tsv"):
     if c[2] == "out" and c[5].split(":")[0] not in ("romset", "platform", "momentary", "dev-ladder"):
         print(f"  FAIL: out-of-scope row {c[0]} needs a reason keyword, got {c[5][:40]!r}")
         sys.exit(1)
-    # 14z-196 (ruled): an ondemand row's subject is pristine content only, and says so
-    if c[2] == "ondemand" and c[5].split(":")[0] != "pristine":
-        print(f"  FAIL: ondemand row {c[0]} needs the reason keyword pristine:, got {c[5][:40]!r}")
+    # 14z-196 (ruled): an ondemand row's subject is pristine content only, and says so; 14z-199 (ruled, #265): or it
+    # is an instrument with no default subject, run by hand with its operands
+    if c[2] == "ondemand" and c[5].split(":")[0] not in ("pristine", "instrument"):
+        print(f"  FAIL: ondemand row {c[0]} needs the reason keyword pristine: or instrument:, got {c[5][:40]!r}")
         sys.exit(1)
     if c[0] in rows:
         print(f"  FAIL: duplicate row {c[0]}"); sys.exit(1)

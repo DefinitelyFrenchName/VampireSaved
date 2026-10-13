@@ -1,0 +1,13 @@
+  FLAG ATTRIB: Recommend to the maintainer (build/agent199/t265/report.md) that audit_mask_window_ff42a2 move from scope `out` to `ondemand` with a new reason keyword (opti...
+  FLAG D-FIGURE: 16.6  [build/agent199/t265/report.md]
+  FLAG D-FIGURE: 30  [build/agent199/t265/report.md]
+  FLAG D-ABSOLUTE: Nothing is decided here.  [build/agent199/t265/report.md]
+  FLAG D-ABSOLUTE: The release sweep therefore runs it, and the run asserts nothing about the artifact.  [build/agent199/t265/report.md]
+  FLAG D-ABSOLUTE: - What is lost: the bare run at each release, which by fact 1 measures nothing.  [build/agent199/t265/report.md]
+  FLAG D-ABSOLUTE: They accept a SKIP only on that row, and only when the SKIP's detail matches the approved reason.  [build/agent199/t265/report.md]
+  FLAG D-ABSOLUTE: - What is kept: the bare run at each release, which measures nothing (fact 1).  [build/agent199/t265/report.md]
+  FLAG D-ABSOLUTE: - Cost: every pointer moves.  [build/agent199/t265/report.md]
+  FLAG D-ABSOLUTE: - Not recommended: it costs the most and gains nothing over A.  [build/agent199/t265/report.md]
+  FLAG D-ABSOLUTE: Each cost above is read from the files named, not measured on an edit.  [build/agent199/t265/report.md]
+  FLAG D-ABSOLUTE: - Whether any other row would want A's new reason keyword is not surveyed.  [build/agent199/t265/report.md]
+packet_check: 12 flag(s): ATTRIB 1, D-ABSOLUTE 9, D-FIGURE 2

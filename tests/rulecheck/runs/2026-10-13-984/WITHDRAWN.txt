@@ -1,0 +1,1 @@
+WITHDRAWN 2026-10-13 (14z-199), never spawned: its pre-prepare flags showed two figures in build/agent199/t265/report.md that no artifact held (the audit runtime 16.6 s, from the shell, and the 30-file pointer count, from git grep). The runtime was dropped, the count saved as build/agent199/t265/pointers.txt, and the packet re-prepared as the next run.

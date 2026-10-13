@@ -1,0 +1,11 @@
+decision	recommendation
+subject	#273: put to the maintainer — the bounded Q1 measured; keep Q1 as it is
+session	14z-199
+model	rule-checker@163e4ce9cf7b
+claim	Recommend to the maintainer (build/agent199/t273/report.md) that Q1 of the checklist of record stay as it is and the bounded wording of #273 not be adopted, with two alternatives offered: adopt it anyway with fidelity-14z160 recalibrated, or triage at resolution instead (not measured). Measured per the pre-registered build/agent199/t273/plan.md on 50 packets (the 46 agreed Q1 lines of 14z-196..198 and the 4 fixtures), each read once under the unchanged Q1 (arm C) and once under the bounded Q1 (arm V), 100 pinned rule-checker spawns each checked prompt IDENTICAL by tools/rulecheck.py's spawn check (collect.py), every handback in verdicts_all.txt; the checklist of record is unedited (git diff HEAD of docs/project/rule_checker.md empty). Of the 15 that mattered, C caught 12 and V 9 on the same premise (two blind judges, 0 of 30 disagreements, judge/merge.out), V losing 774, 807 and 908 and catching none C missed; of the 30 that did not matter, Q1 VIOLATED C 26 and V 16 (dropped under V only 11, under C only 1, under both 3; tally.out); the negative fixture fidelity-14z160 is OK under C and Q1 VIOLATED under V. NOT TESTED: one reader per arm, no replicates — C itself missed 3 of the 15, so the 3-of-12 difference is within what two readers of one wording could show; only packets where Q1 fired; the mattered split is the 14z-199 rubric's; the two judges are one model kind; four runs answered in more than six lines and are counted as read, while plan.md says to leave them out (the six-line-only counts are in tally.out, same direction); that each of V's Q1 lines names what would change is the working agent's own reading; option (c) is not measured.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	19 flag(s): D-ABSOLUTE 19
+deliverables	build/agent199/t273/report.md

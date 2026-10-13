@@ -102,7 +102,8 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 # caller, not a verdict about the build). Its operands DESCRIBE A CHANGE UNDER
 # INVESTIGATION — a pre-move and a post-move rompath and the replays a
 # select-palette row move shifted — so there is no standing pair to sweep it
-# with. `tests/ci_emulator.tsv` marks it out of release scope for that reason.
+# with. `tests/ci_emulator.tsv` marks it `ondemand` (`instrument:`) for that reason, so no
+# tier runs it bare (maintainer-ruled 2026-10-13, 14z-199, #265).
 if [ $# -lt 3 ]; then
     echo "  SKIP: no operands — this is the pre/post attribution INSTRUMENT for a"
     echo "        select-palette row move ([VSP-35]), not a standing gate. It needs"
