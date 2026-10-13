@@ -1,0 +1,11 @@
+decision	recommendation
+subject	the 14z-199 close: the documentation packet (rows (1)-(12); every finding's home; #273, #265, #275) — re-check after run 1002
+session	14z-199
+model	rule-checker@163e4ce9cf7b
+claim	claim REFUSED — not a run of record: # run: full 2026-10-13T15:42:21Z af5db240 d5ee29f4bc6d5c9b | status: NOT A RUN OF RECORD — not as expected: scratch_census
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	33 flag(s): D-ABSOLUTE 14, D-FIGURE 19
+deliverables	STATE.md:77-94 docs/NEXT_SESSION.md

@@ -1,0 +1,1 @@
+WITHDRAWN 2026-10-13 (14z-199), never spawned: prepared over a claim the generator had refused (the run of record had one check not as expected: build/agent199/close/prepare_packet.sh unclassed in the scratch census), so its claim was the previous run's. Re-prepared as the next run after the census was fixed and the run of record retaken.

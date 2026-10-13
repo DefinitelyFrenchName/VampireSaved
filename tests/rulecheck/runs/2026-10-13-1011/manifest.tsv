@@ -1,0 +1,13 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent199/t270/close270.md	f8a909e521788b3ce08c90c924736be345ab76c0
+build/agent199/t270/loop_cost/report.md	7c1911a87895966548ef33d39fb8b74b295d845d
+build/agent199/t270/loop_cost/measure.out	df8bb67352427bc8dcaf339a03385e24e32f8546
+build/agent199/t270/loop_cost/runs199.out	9d32a08bcf8a8362a77fbd58a5e2c90997098171
+build/agent199/t270/loop_cost/measure.sh	c274d1866038dcdac95fecf3eb4b056dfff2f9e2
+docs/project/tickets.tsv.lines-80-80 (lines 80-80 of docs/project/tickets.tsv)	34bb7229a7cb462b524bc72ec70baa0eeeb39382
+DECISIONS_HISTORY.md.lines-6702-6708 (lines 6702-6708 of DECISIONS_HISTORY.md)	d159662040767969c6ffb183a041e06d0175e372
+docs/project/rule_checker.md.lines-246-268 (lines 246-268 of docs/project/rule_checker.md)	b9c73099a733c31e4293212017e1f7403291bb17
+docs/NEXT_SESSION.md	6b373427771df4b0302fd7e5d122d8fbee8339d1
+build/agent199/t270/gates_a6dcc9a5.tsv	66cc9eef84567d5c6e5606fe8fbb6da2b4e7241f
+build/agent199/t270/tier_head.txt	d27d06fa504f38162c649f3d5a7062b65beda75f
+build/agent199/t270/tier_tail.txt	7dde754a60893c8749b719e53b251c83d040663a

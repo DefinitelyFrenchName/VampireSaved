@@ -1,0 +1,62 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: the 14z-199 close: the documentation packet (rows (1)-(12); every finding's home; #273, #265, #275) — re-check after run 1002
+Claim (the working agent's sentence): claim REFUSED — not a run of record: # run: full 2026-10-13T15:42:21Z af5db240 d5ee29f4bc6d5c9b | status: NOT A RUN OF RECORD — not as expected: scratch_census
+Artifacts (read every one, in full):
+  - build/agent199/close/findings_row.txt
+  - build/agent199/close/out/exits.tsv
+  - build/agent199/close/checks.tsv
+  - build/agent199/close/checks_decl.tsv
+  - build/agent199/close/classes.tsv
+  - build/agent199/close/promises.tsv
+  - build/agent199/close/rulings_exempt.tsv
+  - build/agent199/close/premises.txt
+  - tests/rulecheck/retractions/14z-199.tsv
+  - docs/NEXT_SESSION.md
+  - STATE.md.lines-77-94 (lines 77-94 of STATE.md)
+  - DECISIONS_HISTORY.md.lines-6637-6700 (lines 6637-6700 of DECISIONS_HISTORY.md)
+  - docs/project/gotchas.md.lines-6891-6906 (lines 6891-6906 of docs/project/gotchas.md)
+  - docs/project/gotchas.md.lines-6994-7040 (lines 6994-7040 of docs/project/gotchas.md)
+  - build/agent199/NOTES_273_265.md
+  - DECISIONS_HISTORY.md.lines-519-526 (lines 519-526 of DECISIONS_HISTORY.md)
+  - DECISIONS_HISTORY.md.lines-6630-6636 (lines 6630-6636 of DECISIONS_HISTORY.md)
+  - tests/test_session_metrics.sh.lines-175-190 (lines 175-190 of tests/test_session_metrics.sh)
+  - build/agent199/close/out/runs/anchors_selftest.out
+  - build/agent199/close/out/runs/census_selftest.out
+  - build/agent199/close/out/runs/claim_lint_selftest.out
+  - build/agent199/close/out/runs/close_findings.out
+  - build/agent199/close/out/runs/dup_decisions.out
+  - build/agent199/close/out/runs/dup_decisions_plant.out
+  - build/agent199/close/out/runs/dup_state_history.out
+  - build/agent199/close/out/runs/dup_state_history_plant.out
+  - build/agent199/close/out/runs/findings_anchors.out
+  - build/agent199/close/out/runs/findings_anchors_plant.out
+  - build/agent199/close/out/runs/findings_selftest.out
+  - build/agent199/close/out/runs/homes_selftest.out
+  - build/agent199/close/out/runs/homes_tracked.out
+  - build/agent199/close/out/runs/none_reasons.out
+  - build/agent199/close/out/runs/none_reasons_plant.out
+  - build/agent199/close/out/runs/none_reasons_selftest.out
+  - build/agent199/close/out/runs/open_tickets.out
+  - build/agent199/close/out/runs/open_tickets_plant.out
+  - build/agent199/close/out/runs/promise_check.out
+  - build/agent199/close/out/runs/promise_selftest.out
+  - build/agent199/close/out/runs/retraction_grep.out
+  - build/agent199/close/out/runs/retraction_selftest.out
+  - build/agent199/close/out/runs/row_copy.out
+  - build/agent199/close/out/runs/row_copy_plant.out
+  - build/agent199/close/out/runs/rulings_selftest.out
+  - build/agent199/close/out/runs/rulings_verbatim.out
+  - build/agent199/close/out/runs/scratch_census.out
+  - build/agent199/close/out/runs/session_metrics.out
+  - build/agent199/close/out/runs/shape.out
+  - build/agent199/close/out/runs/shape_selftest.out
+  - build/agent199/close/out/runs/standing_selftest.out
+  - build/agent199/close/out/runs/state_lists.out
+  - build/agent199/close/out/runs/submodule_pins.out
+  - build/agent199/close/out/runs/submodule_pins_plant.out
+  - build/agent199/close/out/runs/submodule_pins_selftest.out
+  - build/agent199/close/out/runs/superseded.out
+  - build/agent199/close/out/runs/superseded_selftest.out
+  - build/agent199/close/out/runs/tickets.out

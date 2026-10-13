@@ -1,0 +1,2 @@
+  FLAG D-ABSOLUTE: So this close shows no saving; what the route saves depends on how many findings are presentation-only on a covered item, which later closes will show.  [build/agent199/t270/close270.md]
+packet_check: 1 flag(s): D-ABSOLUTE 1

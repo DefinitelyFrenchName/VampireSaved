@@ -1,0 +1,60 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent199/close/findings_row.txt	f0b68cb645020d38ba67f9f21f06b1c2d5f0721c
+build/agent199/close/out/exits.tsv	59d3aa074226f4e972a5f083054657c77b169ff0
+build/agent199/close/checks.tsv	198f29b6b1d0fd453f87d103f45db43dd3059f2e
+build/agent199/close/checks_decl.tsv	c45fb53605be97e0329e30b20ed71ba0f0dbf974
+build/agent199/close/classes.tsv	152f80fb49594bd6989c1e3711bb2660e7f84a19
+build/agent199/close/promises.tsv	3d108cac90eea9a514dcc90335e08f195ce0bd99
+build/agent199/close/rulings_exempt.tsv	daff0c4d84fdb5875b1fd6d6595ed4e45d26bbd1
+build/agent199/close/premises.txt	52a637160d0850f940ad0211c97d25b3d42f81b8
+build/agent199/close/retraction_classes.tsv	cfd4f16a6cbe1d262285fd3f2613b0a07d8e6774
+tests/rulecheck/retractions/14z-199.tsv	4efce5a148e8bf655af2dbd265b6ea5c6c87086f
+docs/NEXT_SESSION.md	2c797dbcd9d1ef4a0acb58e86c2748f17d0e0451
+STATE.md.lines-77-94 (lines 77-94 of STATE.md)	6886ab738afedd47af65398ae88d09c534135424
+DECISIONS_HISTORY.md.lines-6637-6700 (lines 6637-6700 of DECISIONS_HISTORY.md)	9c0439f8c25138f98590a1f521cce81137d787ce
+docs/project/gotchas.md.lines-6891-6906 (lines 6891-6906 of docs/project/gotchas.md)	0c09c58ebe34960324a02c05cf37d25f32f8143a
+docs/project/gotchas.md.lines-6994-7048 (lines 6994-7048 of docs/project/gotchas.md)	d5cd8d4ba2bcf5cc5cd2d70ebfd3cf3faba225d1
+docs/project/snapshot_runs.md.lines-22-34 (lines 22-34 of docs/project/snapshot_runs.md)	50c63716813773334ea62a306d18dd196bfca2f6
+docs/project/snapshot_runs.md.lines-82-93 (lines 82-93 of docs/project/snapshot_runs.md)	555c4c7d3399938cdc7aa22a80d5c0f99c4db6b2
+build/agent199/NOTES_273_265.md	585910880024294e46f3c2a82bdf35b2754db75d
+DECISIONS_HISTORY.md.lines-519-526 (lines 519-526 of DECISIONS_HISTORY.md)	903f4f417c2446bf928d9e01d0fbdfc586f81a1d
+DECISIONS_HISTORY.md.lines-6630-6636 (lines 6630-6636 of DECISIONS_HISTORY.md)	ee2465d6763c44636445c6362157ed6b37cde73e
+tests/test_session_metrics.sh.lines-175-190 (lines 175-190 of tests/test_session_metrics.sh)	19a8af23ab7d884b0b3177b63a8325b7f83c4069
+build/agent199/close/out/runs/anchors_selftest.out	44a753e3638c3f808175b2e2dee0c7ec169586a1
+build/agent199/close/out/runs/census_selftest.out	009348f58e29edf51a76220602648f088da05f44
+build/agent199/close/out/runs/claim_lint_selftest.out	8e043d70fface9ba2a123c34fab881c495559429
+build/agent199/close/out/runs/close_findings.out	3ea9a456794008f7b15552a941a15d56152aefb4
+build/agent199/close/out/runs/dup_decisions.out	5ae8a0d8134ab426a3b21da257c12ebe89fe89af
+build/agent199/close/out/runs/dup_decisions_plant.out	caf276cae44e7314c869e6b2b0914a869403fcb6
+build/agent199/close/out/runs/dup_state_history.out	73759ce1fba2159f8d862b6b5d8d8525991c5893
+build/agent199/close/out/runs/dup_state_history_plant.out	27e76076ca4cb37a32ad5d3fb37956ed97ceb569
+build/agent199/close/out/runs/findings_anchors.out	0d9c4f06b373b573a6adcb968a0abe264cb1a7cd
+build/agent199/close/out/runs/findings_anchors_plant.out	47658400d7e2f35d4dd4dd82467e269517cd5a1b
+build/agent199/close/out/runs/findings_selftest.out	1a6e2233fcbd559188b75487172c4bfd1448f7ab
+build/agent199/close/out/runs/homes_selftest.out	e4bf8332c6380c2210962f242f5317322698ac21
+build/agent199/close/out/runs/homes_tracked.out	c1b1cad47f70aecb23ee32d7e6ae299860e9ffb6
+build/agent199/close/out/runs/none_reasons.out	ff7a64d733aa7f78b3ff630b1a03aee1338d1457
+build/agent199/close/out/runs/none_reasons_plant.out	e5a657305d84527b118d3f95900d6d2d1c316fd8
+build/agent199/close/out/runs/none_reasons_selftest.out	856233dffc4ac231dd63e2955987681a22064acc
+build/agent199/close/out/runs/open_tickets.out	2d28f567e3805be5a7de11f54ef38307dd32245c
+build/agent199/close/out/runs/open_tickets_plant.out	3d55b01e9fda9efe10a68c9d1cfd8ac31d465861
+build/agent199/close/out/runs/promise_check.out	bb6d76922b163cca5b9f1a424d698a234e427133
+build/agent199/close/out/runs/promise_selftest.out	6c30dd58cf24ec93c94f8e4141d0b21e04a6b556
+build/agent199/close/out/runs/retraction_grep.out	f0f42bf64eea08d412097754c5ff09afb9c0edbb
+build/agent199/close/out/runs/retraction_selftest.out	12b5583ab0e4a71a9e73aaacc3ef06300e86258c
+build/agent199/close/out/runs/row_copy.out	1e7664011cbbf34eb426809971411deda45c9564
+build/agent199/close/out/runs/row_copy_plant.out	49a8e466f633b1e86e4617cba41ee4c9c7e7232b
+build/agent199/close/out/runs/rulings_selftest.out	b58e4344466e154c2a4fa056d1a324fb08214b77
+build/agent199/close/out/runs/rulings_verbatim.out	3e7345dc561de1e106ee6f29b442d61f70b17f89
+build/agent199/close/out/runs/scratch_census.out	30867c2ed6dce0b8afe8357585650996d7420c2a
+build/agent199/close/out/runs/session_metrics.out	33f2e7c53b018335c040f81f0247e81cc2b5a0b5
+build/agent199/close/out/runs/shape.out	ce90b9f1dc4479ea8a79ab3f8d6e4f2137145304
+build/agent199/close/out/runs/shape_selftest.out	a122ae8197de8a15bea4c80a3de7ea7788aacfc4
+build/agent199/close/out/runs/standing_selftest.out	4760fd2ecdf7f02159eeb6fa4c0760d77981e076
+build/agent199/close/out/runs/state_lists.out	9501893adf15cf061316593f2910c602e9844aa1
+build/agent199/close/out/runs/submodule_pins.out	ddd48d2c384d62133d4d3e0b2c27114205bd06b8
+build/agent199/close/out/runs/submodule_pins_plant.out	74ad5c0cad733625ef9abd9ffefb05fa051f50d2
+build/agent199/close/out/runs/submodule_pins_selftest.out	cbb312b29495f24c21e2c9e81d3b032250e36c24
+build/agent199/close/out/runs/superseded.out	8bd1ce9faf362f7ec8d2f7bc3b1a2548977ec691
+build/agent199/close/out/runs/superseded_selftest.out	788cc539de952d645a86a5077ca6437654a6de80
+build/agent199/close/out/runs/tickets.out	8c6d02a014601a94b4d9f5a83da644f8644f5618

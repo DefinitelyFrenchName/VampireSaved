@@ -1,0 +1,1 @@
+WITHDRAWN 2026-10-13 (14z-199), never spawned: its pre-prepare flag showed the closing comment saying the route's saving is something "later closes will show", a forecast no artifact carries. Reworded to say it is not measured here, and re-prepared as the next run.

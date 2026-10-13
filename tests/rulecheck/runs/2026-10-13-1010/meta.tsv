@@ -1,0 +1,11 @@
+decision	recommendation
+subject	#270: close done on the maintainer's word, with its done-when measured at the 14z-199 close
+session	14z-199
+model	rule-checker@163e4ce9cf7b
+claim	Close #270 `done`: the maintainer, asked with the measurement, answered "Close done (Recommended)" (DECISIONS_HISTORY.md:6702-6708). Its done-when has two halves: the packet's claim names what it covers and what the deterministic checks cover (the SCOPE sentence, built and gated in tests/test_rule_checker.sh and tests/test_close_standing.sh, both PASS in the strict tier at a6dcc9a5, gates_a6dcc9a5.tsv and tier_tail.txt); and a close's packet loop measured against 14z-196..198 — measure.out: 13, 9, 5 and 7 runs, 9.54, 3.70, 0.61 and 2.02 h, from tests/rulecheck/ledger.tsv and each close's transcript (measure.sh). The closing comment (close270.md), the index row (tickets.tsv:80, status done, its four answers), rule_checker.md's MEASURED sentence and NEXT_SESSION's closed list say the same. NOT TESTED: the 14z-196..198 transcripts are identified by which one holds each close's first prepare and last record (measure.sh names them; close_loop_cost.py finds NOT FOUND in the others), not by a session key inside them; the 14z-199 span includes the fixes of two red close tiers made between packet runs, so it is not packet work alone; the run counts count ledger rows whose subject names the close's documentation packet, so a withdrawn run (1003) is not counted; that every VIOLATED run was on an item no deterministic check covers is the working agent's reading of each run's resolution (runs199.out lists the verdicts, the ledger the resolutions); whether the route saves runs at later closes is not measured; the GitHub issue is closed and the comment posted only after this run, and read back then.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	1 flag(s): D-ABSOLUTE 1
+deliverables	build/agent199/t270/close270.md docs/project/tickets.tsv:80-80
