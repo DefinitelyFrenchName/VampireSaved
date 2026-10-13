@@ -1,0 +1,13 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+DECISIONS_HISTORY.md.lines-6651-6668 (lines 6651-6668 of DECISIONS_HISTORY.md)	dd891a77be25e1411218f5307e3f42521d820993
+STATE.md.lines-84-85 (lines 84-85 of STATE.md)	99cdc0092d19391a0298ee3a3b2ff0c8f5eff971
+build/agent199/close268_271/ticket_rows.tsv	16920edba40a55894145f6de99a8be1b9fd7f39c
+build/agent199/close268_271/ticket_rows.sh	f73951e6a3c1d3b8a955410a7a12fee9284fdfa9
+build/agent199/close268_271/posted_check.txt	d2d36f534b9e6b57ed5a56b4b3ac526262b23c9c
+build/agent199/close268_271/posted_check.sh	231108c0a2b90282ccaaa1f24ebba86f7f7980df
+build/agent199/close268_271/close268.md	4f2914d08ab2ba5627a8b58e01176abb9329c381
+build/agent199/close268_271/close271.md	79245c0f9b9d63d266f3bae8d450d02b14537958
+build/agent199/close268_271/ledger_951_956.tsv	3c2f3b4656dea0a6110adac3aa32852347c496ac
+build/agent199/close268_271/git_log.txt	64973dbb694d149ec821e593883933448551cc0e
+.claude/skills/vampire-saved-port/SKILL.md.lines-138-138 (lines 138-138 of .claude/skills/vampire-saved-port/SKILL.md)	c419da87c2f487c4e726ea50a6b0ec5651f83922
+docs/project/rule_checker.md.lines-196-218 (lines 196-218 of docs/project/rule_checker.md)	1ab5b4afc45dd2860d36e1d5509440df9ce8d7e3
