@@ -1,0 +1,1 @@
+WITHDRAWN 2026-10-13 (14z-199), never spawned: its pre-prepare flags showed three derived figures in build/agent199/t269/report.md not marked as derived (2213, 209, 2212) and an overstated sentence ("none of them is at risk"). Corrected and re-prepared as the next run.

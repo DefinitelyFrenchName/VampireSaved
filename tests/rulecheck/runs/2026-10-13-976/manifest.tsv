@@ -1,0 +1,16 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent199/t269/report.md	da0ed67453b0561012ab724d02a24ad2931cd1e1
+DECISIONS_HISTORY.md.lines-6637-6650 (lines 6637-6650 of DECISIONS_HISTORY.md)	38377dfcd8869090d6a57614cd792abe3d8113af
+build/agent199/tickets/T2.md	b072c4345808a5cf098911f40ed0930cb95952f0
+build/agent199/t269/t269_plan_rel.tsv	d7a40c77a1455f6c56ce6666e8c98726190c53ec
+build/agent199/t269/t269_plan_rel.time	62cb64a4706a9d7a3662cb94a9976a9c981faead
+build/agent199/t269/price_plan.py	d12a23886f200e2d9d27454ba351766917b9cbe6
+build/agent199/t269/price_plan.out	1247b8b35a171a5d9f0acd46823d9c55a3c91da7
+build/agent199/t269/code_changed.py	3b74ef5224261eb242fc3d2b8b45c5968a1b9b5a
+build/agent199/t269/code_changed.out	13d71acc4399fca1ca6ea6695dfcb3cf3955a9f4
+build/agent199/t269/offtree_search_note.md	5f12d85d7fa78082f5ea8dc4341c39fec0f15cf4
+tools/static_confirm.py.lines-1-75 (lines 1-75 of tools/static_confirm.py)	53218380e581e2299e4ed02c8b2edb735e0a8bbc
+tests/test_commit_subject.sh.lines-1-40 (lines 1-40 of tests/test_commit_subject.sh)	652bb4885c22ef12aa5d8bb0b3b57384ed091fe6
+tests/test_close_tools.sh.lines-104-114 (lines 104-114 of tests/test_close_tools.sh)	f6b9a4a4ae00a619a70189fa1e1a5c55a162a662
+tests/test_rule_checker.sh.lines-155-170 (lines 155-170 of tests/test_rule_checker.sh)	607c5e582b914de4b5a87fb236e0d439bd22073e
+build/static_runs/20261012T151552Z_59126/results.tsv	12deca7a90fca5343ce36ab8d951c295a02ab619

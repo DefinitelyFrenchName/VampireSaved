@@ -1,0 +1,25 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent199/t269/report.md	edbf4fcf16076eb6bead7d14c989d95f0f9c7906
+DECISIONS_HISTORY.md.lines-6637-6650 (lines 6637-6650 of DECISIONS_HISTORY.md)	38377dfcd8869090d6a57614cd792abe3d8113af
+build/agent199/tickets/T2.md	b072c4345808a5cf098911f40ed0930cb95952f0
+build/agent199/t269/t269_plan_rel.tsv	d7a40c77a1455f6c56ce6666e8c98726190c53ec
+build/agent199/t269/t269_plan_rel.time	62cb64a4706a9d7a3662cb94a9976a9c981faead
+build/agent199/t269/price_plan.py	d12a23886f200e2d9d27454ba351766917b9cbe6
+build/agent199/t269/price_plan.out	1247b8b35a171a5d9f0acd46823d9c55a3c91da7
+build/agent199/t269/code_changed.py	14f2c1909c5936f6ee1aa378d55688ef302bd4d9
+build/agent199/t269/code_changed.out	287f89302a318b7d369d0bbc61e103e8875647af
+build/agent199/t269/code_predict.py	8bd2ca293e8830f112e7922c0535de5b90c65fc8
+build/agent199/t269/code_predict.out	6acd9a5b7e26608afe5dfc53f6ef5d6c1e5e2403
+build/agent199/t269/code_predict_alluntracked.out	9820b093c59223132dfc8f7126a76cf900d26b4e
+build/agent199/t269/score_r1.py	583c98c3954482aaeefb3fba4c98c7b2f73328db
+build/agent199/t269/score_r1.out	359e0f10562d0c7ee665fd2026ba4a1e07f5c09e
+build/agent199/t269/score_r1_control.out	da69fd7b495f92b3aded7af55fcfff1dfff629b0
+build/agent199/t269/score_full_positive.out	a2332ea0caf371dc49556222e671ff2f43cc0dc8
+build/agent199/t269/offtree_search_note.md	5f12d85d7fa78082f5ea8dc4341c39fec0f15cf4
+tools/static_confirm.py.lines-1-120 (lines 1-120 of tools/static_confirm.py)	e9c542f83ba151008d2d599da5ca2da9e3759f2d
+tools/static_confirm.py.lines-280-305 (lines 280-305 of tools/static_confirm.py)	c6c3c0323524bdc1e582b0c29defed1fd6cb0834
+tools/trace_static_reads.py.lines-1-140 (lines 1-140 of tools/trace_static_reads.py)	0a1b44cda04123d87953a1460436855b5302e2c6
+tests/test_commit_subject.sh.lines-1-40 (lines 1-40 of tests/test_commit_subject.sh)	652bb4885c22ef12aa5d8bb0b3b57384ed091fe6
+tests/test_close_tools.sh.lines-104-114 (lines 104-114 of tests/test_close_tools.sh)	f6b9a4a4ae00a619a70189fa1e1a5c55a162a662
+tests/test_rule_checker.sh.lines-155-170 (lines 155-170 of tests/test_rule_checker.sh)	607c5e582b914de4b5a87fb236e0d439bd22073e
+build/static_runs/20261012T151552Z_59126/results.tsv	12deca7a90fca5343ce36ab8d951c295a02ab619

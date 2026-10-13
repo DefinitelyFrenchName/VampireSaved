@@ -1,0 +1,5 @@
+  FLAG ATTRIB: Recommend to the maintainer (build/agent199/t269/report.md) that #269 wait for a new, trace-scored narrowing of tools/static_confirm.py, the close running as...
+  FLAG D-ABSOLUTE: Re-written after rule-checker run 2026-10-13-976 found the control trigger first proposed here (the predictor's rule R1 alone) unmeasured; it is now measured...  [build/agent199/t269/report.md]
+  FLAG D-ABSOLUTE: Controls only for gates whose inputs changed — three triggers, measured  [build/agent199/t269/report.md]
+  FLAG D-ABSOLUTE: **Or build #269 now with the safe trigger**: every gate runs, controls only for gates the full predictor marks stale for changed code — about 600 s saved thi...  [build/agent199/t269/report.md]
+packet_check: 4 flag(s): ATTRIB 1, D-ABSOLUTE 3

@@ -1,0 +1,10 @@
+  FLAG D-FIGURE: 2213  [build/agent199/t269/report.md]
+  FLAG D-FIGURE: 209  [build/agent199/t269/report.md]
+  FLAG D-FIGURE: 2212  [build/agent199/t269/report.md]
+  FLAG D-ABSOLUTE: In a session that touches no gate's code, none would.  [build/agent199/t269/report.md]
+  FLAG D-ABSOLUTE: Under the proposal below every gate's verdict is run at each session, not carried, so a change in those inputs reaches the verdict.  [build/agent199/t269/report.md]
+  FLAG D-ABSOLUTE: **Proposed instead of the path selection:** a session (mid-session and close) runs EVERY static gate, and executes controls only for the gates whose code cha...  [build/agent199/t269/report.md]
+  FLAG D-ABSOLUTE: A freeze and a release run everything with every control, as today.  [build/agent199/t269/report.md]
+  FLAG D-ABSOLUTE: No always-run core is needed, since no verdict is carried.  [build/agent199/t269/report.md]
+  FLAG D-ABSOLUTE: It keeps every gate's verdict, cuts the larger cost, and is cheap to decide.  [build/agent199/t269/report.md]
+packet_check: 9 flag(s): D-ABSOLUTE 6, D-FIGURE 3

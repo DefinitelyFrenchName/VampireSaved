@@ -1,0 +1,1 @@
+WITHDRAWN 2026-10-13 (14z-199), never spawned: the deliverable report.md still cited score_full_positive.out, which this packet does not stage; the report now cites provenance.out (the positive control with its provenance). Re-prepared as the next run.
