@@ -7,7 +7,8 @@
 #   registry check both ways, --strict, the controls readout, and the cadence triggers (a
 #   freeze-cadence gate runs when a path it follows changed), and a gate marked `# ORDER: last`
 #   runs after every other gate of its tier (14z-185b, #188); and --confirm re-runs a red, the reader of
-#   a changed input and nothing else, CARRYING the rest (14z-188, #188 route A wired).
+#   a changed input and nothing else, CARRYING the rest (14z-188, #188 route A wired); and the
+#   gates a run starts do not inherit its STATIC_RESULTS_OUT (section 12c, 14z-199).
 # HOW: a synthetic repo of stub gates with known verdicts run through the REAL runner via
 #   its registry files (never a copy of its logic); two shadow-tool controls unplug the
 #   controls reader and blind the cadence trigger match.
@@ -21,6 +22,7 @@
 # MUST-FIRE: shadow-tool: ondemand-triggered — a copy of run_all_static.sh whose ONDEMAND-NO-TRIGGER line is disabled must let a change to an ondemand gate's own script pull it into a session run; section 14i must catch it (in-gate in section 16; as a mode the gate FAILs)
 # MUST-FIRE: shadow-tool: order-ignored — a copy of run_all_static.sh whose `# ORDER: last` test is disabled must run the marked stub FIRST, and section 16 must FAIL (mode: that copy drives every section; section 17 fires it in-run; 14z-185b, #188)
 # MUST-FIRE: shadow-tool: crash-unread — a copy of run_all_static.sh that hands the CONTROL classifier no gate script must read a control mode that dies of `command not found` (exit 127) as HONOURED, and section 12b must FAIL (mode: that copy drives every section; section 12b fires it in-run; 14z-196, #254)
+# MUST-FIRE: shadow-tool: results-inherited — a copy of run_all_static.sh whose RESULTS-OUT-PRIVATE unset is disabled must hand its STATIC_RESULTS_OUT to the gates it runs, and section 12c must FAIL (mode: that copy drives every section; section 12c fires it in-run; 14z-199)
 # MUST-FIRE: shadow-tool: prediction-off — a copy of tools/static_confirm.py whose plan marks nothing STALE must CARRY the stub whose input changed, and section 18 must FAIL (mode: that copy in the confirm repo)
 #
 # WHY A GATE FOR THE RUNNER. CLAUDE.md §4: "Verdict logic is itself tested. A
@@ -88,7 +90,14 @@ SHADOW_C="$T/run_all_static_crashunread.sh"
 sed 's|vs_classify_control "$_cs" "$WORK/$1.ctl.$_n.out" "tests/$1.sh"|vs_classify_control "$_cs" "$WORK/$1.ctl.$_n.out"|' "$RUNNER" > "$SHADOW_C"
 cmp -s "$RUNNER" "$SHADOW_C" && fail "could not unplug the crash reader — the vs_classify_control call moved"
 chmod +x "$SHADOW_C"
+# THE SIXTH SHADOW (14z-199): the runner with its RESULTS-OUT-PRIVATE unset disabled — the gates it
+# runs inherit its results path.
+SHADOW_R="$T/run_all_static_resultsinherited.sh"
+sed 's|^unset STATIC_RESULTS_OUT   # RESULTS-OUT-PRIVATE|: # RESULTS-OUT-PRIVATE disabled|' "$RUNNER" > "$SHADOW_R"
+cmp -s "$RUNNER" "$SHADOW_R" && fail "could not disable RESULTS-OUT-PRIVATE — the unset line moved"
+chmod +x "$SHADOW_R"
 if vs_ctl_is reader-unplugged; then ln -s "$SHADOW" "$FR/tests/run_all_static.sh"
+elif vs_ctl_is results-inherited; then ln -s "$SHADOW_R" "$FR/tests/run_all_static.sh"
 elif vs_ctl_is crash-unread; then ln -s "$SHADOW_C" "$FR/tests/run_all_static.sh"
 elif vs_ctl_is trigger-blind; then ln -s "$SHADOW_T" "$FR/tests/run_all_static.sh"
 elif vs_ctl_is ondemand-triggered; then ln -s "$SHADOW_D" "$FR/tests/run_all_static.sh"
@@ -490,13 +499,40 @@ printf '%s' "$o12c" | grep -qE "^  g_xdie127 +CONTROL DIED: flip" && echo "  ok:
     || { fail "a crashing mode was not DIED:"; printf '%s' "$o12c" | grep -E '^  g_xdie127' | sed 's/^/        /'; }
 printf '%s' "$o12c" | grep -qE "^  g_xquote +CONTROL" && fail "a real FAIL quoting another script's error read as a crash" \
     || echo "  ok: a real FAIL quoting another script's shell error stays honoured"
-o12d="$(cd "$FR" && STATIC_RESULTS_OUT="$T/r12d.tsv" sh "$SHADOW_C" --tier portable 2>&1)" || true
-if printf '%s' "$o12d" | grep -qE "^  g_xdie127 +CONTROL"; then
-    vs_ctl_dead crash-unread "the copy with no gate script still flagged g_xdie127: $(printf '%s' "$o12d" | grep -E '^  g_xdie127')"; rc=1
+# the copy runs INSIDE the synthetic repo (the runner takes its repo from its own path; run from $T it
+# judged nothing, and the absence of a red row read as a firing — 14z-199), and the firing needs the
+# positive reading: both modes HONOURED
+cp "$SHADOW_C" "$FR/tests/run_all_static_cu"
+o12d="$(cd "$FR" && STATIC_RESULTS_OUT="$T/r12d.tsv" sh tests/run_all_static_cu --tier portable 2>&1)" || true
+rm -f "$FR/tests/run_all_static_cu"
+if printf '%s' "$o12d" | grep -qE "^  g_xdie127 +CONTROL" || ! printf '%s' "$o12d" | grep -q 'executed: 2  honoured 2'; then
+    vs_ctl_dead crash-unread "the copy with no gate script did not read g_xdie127's crash as HONOURED: $(printf '%s' "$o12d" | grep -E '^  g_xdie127|executed:' | tr '\n' ' ')"; rc=1
 else
     vs_ctl_fired crash-unread "with no gate script handed to the control classifier, a mode dying of command-not-found (exit 127) reads HONOURED"
 fi
 rm -f "$FR/tests/g_xdie127.sh" "$FR/tests/g_xquote.sh"
+
+echo "== 12c. the results path is the run's own: the gates it runs do not inherit STATIC_RESULTS_OUT (14z-199) =="
+# A gate that starts the runner itself would otherwise truncate the outer run's results file. The
+# stub records what it sees; the runner's own file must hold its own header and the stub's row.
+{ echo "#!/bin/sh"; echo "# g_xenv.sh — a stub that records the results path it inherited"
+  echo "printf '%s' \"\${STATIC_RESULTS_OUT:-unset}\" > '$T/g_xenv.seen'"; echo "echo 'PASS: recorded'"; } > "$FR/tests/g_xenv.sh"
+chmod +x "$FR/tests/g_xenv.sh"; printf 'g_xenv\n' > "$FR/tests/ci_portable.txt"
+rm -f "$T/g_xenv.seen"
+(cd "$FR" && STATIC_RESULTS_OUT="$T/r12e.tsv" sh tests/run_all_static.sh --tier portable --exec-controls none >/dev/null 2>&1) || true
+if [ "$(cat "$T/g_xenv.seen" 2>/dev/null)" = unset ] && grep -q "^g_xenv	" "$T/r12e.tsv" 2>/dev/null; then
+    echo "  ok: the gate saw no STATIC_RESULTS_OUT, and the run's own results file holds its row"
+else fail "the gate inherited the results path [$(cat "$T/g_xenv.seen" 2>/dev/null || echo 'no record')] or the run's file lacks its row"; fi
+rm -f "$T/g_xenv.seen"
+cp "$SHADOW_R" "$FR/tests/run_all_static_ri"   # inside the repo: the runner takes its repo from its own path
+(cd "$FR" && STATIC_RESULTS_OUT="$T/r12f.tsv" sh tests/run_all_static_ri --tier portable --exec-controls none >/dev/null 2>&1) || true
+rm -f "$FR/tests/run_all_static_ri"
+if [ "$(cat "$T/g_xenv.seen" 2>/dev/null)" = "$T/r12f.tsv" ]; then
+    vs_ctl_fired results-inherited "with the unset disabled, the gate inherited the run's results path"
+else
+    vs_ctl_dead results-inherited "the copy without the unset still kept the path from the gate: [$(cat "$T/g_xenv.seen" 2>/dev/null || echo 'no record')]"; rc=1
+fi
+rm -f "$FR/tests/g_xenv.sh"
 
 echo "== 13. MUST-FIRE: with the controls reader unplugged, section 11's dead-control stub reads PASS =="
 # The shadow runner (built at the top) beside the real one in the fakerepo;

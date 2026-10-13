@@ -3562,7 +3562,7 @@ the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guar
 
 ### `test_static_runner.sh` — test, ci_portable
 
-**WHAT:** tests/run_all_static.sh's verdicts mean what they say: PASS / SKIP / FAIL counted apart with SKIP in PROSE still PASS, an exit-0 shell crash FAIL, the anti-orphan registry check both ways, --strict, the controls readout, and the cadence triggers (a freeze-cadence gate runs when a path it follows changed), and a gate marked `# ORDER: last` runs after every other gate of its tier (14z-185b, #188); and --confirm re-runs a red, the reader of a changed input and nothing else, CARRYING the rest (14z-188, #188 route A wired).
+**WHAT:** tests/run_all_static.sh's verdicts mean what they say: PASS / SKIP / FAIL counted apart with SKIP in PROSE still PASS, an exit-0 shell crash FAIL, the anti-orphan registry check both ways, --strict, the controls readout, and the cadence triggers (a freeze-cadence gate runs when a path it follows changed), and a gate marked `# ORDER: last` runs after every other gate of its tier (14z-185b, #188); and --confirm re-runs a red, the reader of a changed input and nothing else, CARRYING the rest (14z-188, #188 route A wired); and the gates a run starts do not inherit its STATIC_RESULTS_OUT (section 12c, 14z-199).
 
 **HOW:** a synthetic repo of stub gates with known verdicts run through the REAL runner via its registry files (never a copy of its logic); two shadow-tool controls unplug the controls reader and blind the cadence trigger match.
 

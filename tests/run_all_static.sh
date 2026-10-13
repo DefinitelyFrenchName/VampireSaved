@@ -262,6 +262,10 @@ fi
 trap 'rm -rf "$WORK"; [ -z "$RUNREC" ] || python3 tools/run_record.py write "$RUNREC/run_record_end.json" --phase end --start "$RUNREC/run_record_start.json" -- tests/run_all_static.sh $_ORIG_ARGS > "$RUNREC/end.log" 2>&1 || echo "run record: the END record FAILED — see $RUNREC/end.log"' EXIT INT TERM
 # THE RESULTS FILE (14z-188, #188): one row per gate this run judged, what --confirm reads back.
 RESULTS_OUT="${STATIC_RESULTS_OUT:-}"
+# The path is THIS run's: a gate that starts the runner itself (a synthetic repo's tier) must not
+# inherit it, or that inner run truncates this run's file and this run appends to the inner one's
+# (paid 14z-199: a tier on a snapshot given an absolute path ended with another run's header).
+unset STATIC_RESULTS_OUT   # RESULTS-OUT-PRIVATE
 [ -z "$RESULTS_OUT" ] && [ -n "$RUNREC" ] && RESULTS_OUT="$RUNREC/results.tsv"
 if [ -n "$RESULTS_OUT" ]; then
     mkdir -p "$(dirname "$RESULTS_OUT")"

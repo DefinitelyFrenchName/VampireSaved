@@ -84,7 +84,11 @@ and traceability"* — so session cadence stays in the working tree.
    `results.tsv` is NOT in it:** `tests/run_all_static.sh` writes it under the clone's
    `build/static_runs/`, which the clone's removal deletes, though the tier prints that path as the
    one to `--confirm` a red from (paid 14z-199). Give the tier `STATIC_RESULTS_OUT=<absolute path in
-   the working tree>` — the environment reaches the runner — to keep it.
+   the working tree>` — the environment reaches the runner — to keep it. The runner keeps that path to
+   itself (`RESULTS-OUT-PRIVATE`, 14z-199): the first tier given one handed it to every gate, and a
+   gate that starts the runner in a synthetic repo truncated the file mid-tier, so the tier ended
+   appending its rows under another run's header (`tests/test_static_runner.sh` section 12c, control
+   `results-inherited`).
 
 A run costs about 50 s of setup before the runner starts (the clone, the snapshot, the listing
 and 76 fingerprints; measured 14z-183b on this Mac).
