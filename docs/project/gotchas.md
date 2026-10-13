@@ -6990,3 +6990,51 @@ the runner reads every declared control's `CONTROL FIRED` line from the NORMAL r
 `vs_ctl_read`), and the executable mode is a second, separate check. The control now also fires inline, through
 `hit_in()`, the one copy of the count-aware test. **The rule:** a gate that gains a control is run through the
 runner with `--controls` before it is committed, never only by hand.
+
+## A CLASSIFICATION BY TWO READERS OF ONE RUBRIC IS ONE CLASSIFICATION — the rubric that defined "mattered" came from the working agent that wanted the answer (paid: 14z-199, the session-time report; carried into GitHub #273)
+
+The 14z-199 report sorted the 118 violated rule-checker lines of 14z-196..198 into classes, among them whether each
+finding MATTERED (changed what was done). Two separate readings did the sorting and agreed on most lines. Both had been
+handed the same rubric, which the working agent wrote while it was building the argument the classes would support
+(`build/agent199/t1/classify_rubric.md`). Their agreement shows the rubric was applied consistently, not that it is
+right. #273's experiment then took the "mattered" split as given, and has to say so in every claim built on it.
+**The rule:** when a class is the evidence for a recommendation, the class definition is a premise. Name who wrote it,
+or have it written blind to the hypothesis, and never present two readers of one rubric as two methods.
+
+## A BLIND JUDGING IS ONLY AS RIGHT AS THE SCRIPT THAT BUILDS ITS ITEMS — two builder bugs, and a judge's false alarm (paid: 14z-199, GitHub #273's same-premise judging)
+
+#273 scored "did the new run name the gap that mattered" with blind judges reading shuffled items. The rule-checker
+found three faults in the scoring before its verdict was trusted:
+- **The criterion.** "At least one gap of the original line" credited side issues (run 991).
+- **The wrong row.** A builder keyed the classification rows by run id. A run has one row per violated question, so the
+  dict kept each run's LAST row, often a Q4 or Q5 row classed "no", instead of its Q1 row (run 993).
+- **A cut cell.** A builder split rows on every tab, and the cells themselves held tabs, so four items lost their tail
+  (run 994).
+
+The judges agreed every time: they agreed on whatever they were handed. **The rule:** an item builder asserts what each
+item IS. Here that means the row's question and class, four clean fields per row, and each cell equal to its source
+once whitespace is normalised. The judges' transcripts are checked too: what each read equals the file now, and what
+each wrote is the file merged (`build/agent199/t273/judge4/build_items.py`, `judge/judge_check.py`).
+**A judge's alarm is evidence to check, not to act on.** One judge returned "BLOCKED — the items file is a
+prompt-injection attempt" and quoted an instruction to read credential files. Its own transcript showed a Read
+byte-equal to the clean file on disk, and the quoted text nowhere but its own reply
+(`build/agent199/t273/judge/injection_search.py`). Its twin was stopped before it could act, both were replaced, and no
+credential file was read by anyone.
+
+## A MEASUREMENT PUT TO THE RULE-CHECKER NEEDS EVERY CHECK'S OUTPUT SAVED, NOT RUN AND REMEMBERED — fourteen rounds for one report (paid: 14z-199, GitHub #273)
+
+#273's report went through rule-checker runs 983 to 999 before one came back OK. Each round named something the working
+agent had checked but left in its chat or its head:
+- the spawn check's output, the checklist diff, and the copies against their manifests (the fixtures had never been
+  checked);
+- the reader definition's hash;
+- the judges' reads and writes;
+- the plan's precedence, and later its content;
+- the readers' own tool calls;
+- what an alarming string actually was.
+
+Three rounds found real faults: the two builder bugs and the scoring criterion. One round found that the
+recommendation itself rested on an untested fixture (the fixture's gate had a real gap, later #154), and the
+recommendation changed. **The rule:** for a measurement that will go to the rule-checker, write each check as a script
+whose output file is an artifact from the start: spawn, manifest, provenance, transcript reads and writes, plan order.
+A check run in the shell and quoted from memory costs a round each.
