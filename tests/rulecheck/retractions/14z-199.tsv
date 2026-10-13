@@ -5,3 +5,5 @@ approved at 14z-153	14z-199 (#265's deep dive): 14z-153 was a cost run that carr
 re-asked at M19 and at 14z-198	control: the correction, live in STATE.md 14z-199 row (11)	reach:1
 fourteen rounds for one report	14z-199 (run 1004): #273's report had thirteen spawned rule-checker runs (983, 986, 988-991, 993-999), not fourteen rounds; corrected in STATE row (12), NEXT_SESSION and the gotcha heading	retracted
 thirteen rule-checker runs for one report	control: the correction, live in docs/project/gotchas.md's heading	reach:1
+982, -984 and -992 withdrawn	14z-199 (run 1005): run 984 was #265's withdrawn packet, not #273's; #273's withdrawn runs were 982 and 992 (STATE row (10) corrected; the DECISIONS_HISTORY entry marked in place)	retracted
+-982 and -992 withdrawn unspawned	control: the correction, live in STATE.md row (10)	reach:1
