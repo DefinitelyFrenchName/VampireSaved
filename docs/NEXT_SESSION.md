@@ -31,7 +31,7 @@ there in parallel.** A long tier runs on a snapshot (`tests/run_on_snapshot.sh`)
    - high: #261 (`audit_effect_class_rows` section 4 checks a type-6 fallback inventory that was never frozen), #256 (the close's open-tickets check reads a cited ticket range as its two ends);
    - medium: #243, #257, #258, #259;
    - low: #118, #129, #229, #244;
-   - no severity label: #260, #262, #263, #266, #267, #269, #270, #273, #274, #275, #276 (the session dashboard misses every tier run on a snapshot).
+   - no severity label: #260, #262, #263, #266, #267, #269, #273, #274, #275, #276 (the session dashboard misses every tier run on a snapshot).
 5. **#266 — PILOT's GNOME Shell segfaults under Wayland at every boot since 2026-10-09**, so `audit_release_linux_desktop` cannot run. It is now the one red/SKIP row of the release-cadence staleness audit (`audit_mask_window_ff42a2` moved to `ondemand` this sitting).
 6. **`tests/replays/118_chain.rpl`'s header names a leg of `audit_mizuumi_inputs` that gate never ran** (STATE 14z-198 finding (i)). The one-line correction stales the 76 emulator gates that follow `tests/replays/`, so make it in a session that runs those gates anyway.
 7. **#118 — the chars gate, PARKED on branch `t118-196`.** **#129 stays the lowest priority**, captures first.
@@ -49,7 +49,6 @@ there in parallel.** A long tier runs on a snapshot (`tests/run_on_snapshot.sh`)
 
 ## WHAT CLOSED THIS SITTING (14z-199)
 
-- **Built and closed:** #268 (`test_close_tools` cut back), #271 (readers, the recurrence alarm, `resolve`), #272 (the pre-prepare check, flags only), #265 (`audit_mask_window_ff42a2` to `ondemand`, `instrument:`).
-- **Built:** #270 (`resolve --recheck`); its "done when" is this close's own packet loop, measured after the packet and recorded, with #270's closure or not, in STATE 14z-199's CLOSE row.
+- **Built and closed:** #268 (`test_close_tools` cut back), #271 (readers, the recurrence alarm, `resolve`), #272 (the pre-prepare check, flags only), #265 (`audit_mask_window_ff42a2` to `ondemand`, `instrument:`), #270 (`resolve --recheck`; measured at this close: 7 packet runs, the route used 0 times — `docs/project/rule_checker.md` [VSP-184]).
 - **Measured and ruled:** #269 (narrow the predictor first; #274 filed); #273 (replicate first; #275 filed).
 - **Ruled:** each in the maintainer's own words in `DECISIONS_HISTORY.md` "Ruled 2026-10-12 (14z-199) — …" and "Ruled 2026-10-13 (14z-199) — …".

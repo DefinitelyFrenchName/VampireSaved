@@ -6698,3 +6698,11 @@ So: the row's scope is `ondemand` with the reason keyword `instrument:` — an i
 **The maintainer:** *"Replicate first (Recommended)"*; *"Look into it first (Recommended)"*.
 
 So: Q1 of the checklist of record is unchanged. #273 stays open for the replication its report describes (two more readers per arm on the 15 that mattered and the 4 fixtures, judged blind by two fresh judges beside a re-judging of the first readers' lines). fidelity-14z160 keeps EXPECT OK until its gate's FREEZE path is looked into, filed as its own ticket.
+
+## Ruled 2026-10-13 (14z-199) — #270 closes done on its measured packet loop; the push rebases on the maintainer's README commit
+
+**The questions (AskUserQuestion), verbatim**, put at the 14z-199 close after its documentation packet passed (rule-checker run 2026-10-13-1009 OK; the measurement `build/agent199/t270/loop_cost/report.md`): (1) *"#270's done-when is met: the packet's claim names what it covers, and this close's packet loop is measured. It took 7 runs and 2.02 h, against 13/9.54 h, 9/3.70 h and 5/0.61 h for 14z-196..198. But `resolve --recheck` was used 0 times: all six VIOLATED runs were on items no deterministic check covers (prose figures, findings completeness, row text, START HERE, dashboard values). Close #270?"* — options "Close done (Recommended)" and "Keep open"; (2) *"Your README commit 8e17c6b9 is on origin and main is not. How should the push take it in?"* — options "Rebase on it (Recommended)", "Merge it" and "Leave for later".
+
+**The maintainer:** *"Close done (Recommended)"*; *"Rebase on it (Recommended)"*.
+
+So: #270 closes `done` with its measurement in the closing comment — no saving at this close, every finding being on an item no deterministic check covers; whether the `--recheck` route pays off shows at later closes. The push rebases this sitting's local commits on 8e17c6b9 (README.md only), re-checks the submodule pins on the rebased HEAD, and pushes.

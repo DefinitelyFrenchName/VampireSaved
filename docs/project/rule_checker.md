@@ -257,7 +257,7 @@ checks, and has each placeholder's fill pinned — KEY to the VIOLATED run's own
 that cannot be derived refuses the row), RUN and SESSDIR to the directory, ROW to text that cannot leave its quotes, BASE to a hash, TRANSCRIPT to a path (a close's own
 `--extra` row, a hand-written file, a hand-edited command or shell text inside a filled span is refused — runs
 2026-10-13-968 and -969 Q4); it writes `RECHECKED by <dir> (full run <UTC>; checks <names>)` into the ledger. A full
-run took 83-101 s at the 14z-196..198 closes. The tracked checks certify the fix, not the working agent. A finding that is not presentation (a premise, a missing check, a home) still gets a
+run took 83-101 s at the 14z-196..198 closes. MEASURED at its first close (14z-199, `build/agent199/t270/loop_cost/report.md`): 7 documentation-packet runs over 2.02 h, against 13, 9 and 5 runs (9.54, 3.70 and 0.61 h) at 14z-196..198, and the route used 0 times — every VIOLATED run was on an item no deterministic check covers (a premise, prose figures, the table's completeness, row text, START HERE, the dashboard's values), so what the route saves depends on how many findings are presentation-only on a covered item. The tracked checks certify the fix, not the working agent. A finding that is not presentation (a premise, a missing check, a home) still gets a
 new run. The packet's claim (`tools/close_standing.py claim`) opens with that SCOPE: what the checks cover, what is
 asked of the readers (the items after NOT TESTED), and this route. Gates: `tests/test_rule_checker.sh` (RESOLVE
 RECHECK, controls `recheck-unchecked`, `recheck-own-checks`, `recheck-porous-fill`, `recheck-pruned-render`,
