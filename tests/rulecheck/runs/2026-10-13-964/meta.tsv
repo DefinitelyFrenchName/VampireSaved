@@ -1,0 +1,11 @@
+decision	recommendation
+subject	#272 built as a flags-only pre-prepare check; recommend flags only and closing #272 on the replay — re-check after run 962
+session	14z-199
+model	rule-checker@163e4ce9cf7b
+claim	Recommend to the maintainer that #272's pre-prepare check stays FLAGS ONLY and that #272 closes on this replay (build/agent199/t272/report.md). Built: tools/packet_check.py, run by tools/rulecheck.py prepare (rulecheck.py lines 462-476 and 536-543), flags a claim figure, quotation or attribution no artifact holds and, in a --deliverable, unsourced figures and untied absolute sentences; prepare has no refusal path for it; its replay reads each run's real slot from control.txt and skips a run whose staged copy differs from its manifest.tsv; gate tests/test_packet_check.sh PASSes with its three controls FIRED in-gate and FAILing the gate as modes (gates.log). Measured by a measurer spec (spec_measure_r2.md, measurer_r2_return.txt; the docstring edit made during it changed no output, r2_recheck.txt): as filed, refusing on a claim figure or an unquoted attribution, the check would have refused 3 of the 17 packets the readers passed in 14z-196..14z-198, and its refusing flags sat on 4 VIOLATED runs; a first iteration that also refused unstaged files refused 9 of the 17; the VIOLATED share by packet size rises in 14z-196..14z-198 and falls in 14z-184..14z-195, so no threshold is built. The maintainer's ruling is quoted in DECISIONS_HISTORY.md: "let's try your proposal and iterate on it, based on measured data". NOT TESTED: whether a flag sits on the reader's own finding is the working agent's reading of each match (matches_read.tsv: one of the 4 refusing matches, 908; 7 of the 13 VIOLATED rounds of the 14z-199 report; 5 of 49 VIOLATED runs of 14z-196..14z-198), a judgement no second reader checked; the matches are co-occurrences, an upper bound; whether the flags save rounds in live use; the replay's deliverable is a stand-in (a staged markdown document the claim names), since past packets named none; whether the size trend in either window is more than noise; the full static tier has not run on this change, only the gates in gates.log.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	4 flag(s): D-ABSOLUTE 4
+deliverables	build/agent199/t272/report.md

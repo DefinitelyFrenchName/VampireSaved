@@ -16,7 +16,7 @@
 # EXPECTS: SELFTEST PASS; run 518's first sentence UNTIED; each control's copy SELFTEST FAIL on its own case; prepare
 #   REFUSED (no run directory) without --untied-ok, PREPARED with it (an untied_ok row); a copy of rulecheck.py with
 #   the lint call removed PREPARES the untied packet, so the refusal is the lint's.
-# FOLLOWS: tools/claim_lint.py tools/rulecheck.py tests/rulecheck/ tests/expected/registry.tsv docs/project/rule_checker.md
+# FOLLOWS: tools/claim_lint.py tools/packet_check.py tools/rulecheck.py tests/rulecheck/ tests/expected/registry.tsv docs/project/rule_checker.md
 #   .claude/agents/rule-checker.md tests/lib/controls.sh
 #
 # MUST-FIRE: shadow-tool: gap-ignored — a copy that reads the NOT TESTED part as claims must flag a named gap, and the selftest must FAIL (mode: that copy's selftest)
@@ -72,6 +72,7 @@ mkroot() {  # mkroot <root> <rulecheck.py to install>
     _doc=docs/project/rule_checker.md; cp "$_doc" "$1"/docs/project/; cp tests/expected/registry.tsv "$1/tests/expected/"
     cp -R tests/rulecheck "$1/tests/rulecheck"; cp .claude/agents/rule-checker.md "$1/.claude/agents/"
     cp "$2" "$1/tools/rulecheck.py"; cp tools/claim_lint.py "$1/tools/"
+    cp tools/packet_check.py "$1/tools/"; cp -R tools/agent "$1/tools/agent"   # prepare's pre-prepare check (#272)
     echo "an artifact" > "$1/art.txt"
 }
 unwired() {  # unwired <out> — a copy of rulecheck.py whose prepare never calls the lint

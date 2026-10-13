@@ -1,0 +1,19 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent199/t272/report.md	0c608ced99288332b9d00936d5bf33a96e1767a1
+build/agent199/t272/issue272.md	0726755cb696efe160554b22d4a821f90a18e627
+DECISIONS_HISTORY.md.lines-6637-6650 (lines 6637-6650 of DECISIONS_HISTORY.md)	38377dfcd8869090d6a57614cd792abe3d8113af
+tools/packet_check.py	36fc143e05916e9277b5d7d861a651d99aa416d9
+tools/rulecheck.py.lines-455-545 (lines 455-545 of tools/rulecheck.py)	f66072f2c007ef320b6a2245a8bef90d0ded8a45
+tests/test_packet_check.sh	f7e92bfc1e49677a78ceece47d86206c706f8e38
+build/agent199/t272/gates.sh	a7add021a0cae63171a8f40c5c3c924afc7bef34
+build/agent199/t272/gates.log	d84e705c68bfd52f09ae3f8ced6b8082286f0c6c
+build/agent199/t272/spec_measure_r2.md	41970138592e32d6dd72d2fb85826ab7b338193b
+build/agent199/t272/measurer_r2_return.txt	46347e5d94d682e210be9c78f863b48d53a83093
+build/agent199/t272/r2_recheck.txt	05e018c78e2c9f383a3aeb5ec52b4c1bc326d636
+build/agent199/t272/matches.py	37eb6545bc1c164b67d511bc264fbc2bf86076cb
+build/agent199/t272/matches_held.txt	ef97bc1a7bfef27e7a69f40a2390c4f63ab9a9df
+build/agent199/t272/matches_199.txt	69db1ddbdb175e430fc24377ff75ec9c57508b99
+build/agent199/t272/matches_read.tsv	c058c225830ef5cfee79d5a293f5ecd7510ee8eb
+build/agent199/t272/packet_check_v4_run.py	76767a45721f4d15d5d5bde8ce00abd79f9edf0a
+docs/project/rule_checker.md.lines-65-83 (lines 65-83 of docs/project/rule_checker.md)	dbfe0ea1e004376c24799d1abd89a802c9dfb9c6
+STATE.md.lines-86-86 (lines 86-86 of STATE.md)	f2f2b9e98e2c7436106964367052e5992aae49b4

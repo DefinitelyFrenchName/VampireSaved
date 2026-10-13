@@ -54,6 +54,7 @@ W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 mkcopy() {  # mkcopy <root>
     mkdir -p "$1/docs/project" "$1/tests/expected" "$1/tools"
     cp tools/claim_lint.py "$1/tools/"   # prepare imports it beside itself (#185 item 3)
+    cp tools/packet_check.py "$1/tools/"; cp -R tools/agent "$1/tools/agent"   # and the pre-prepare check (#272)
     _doc=docs/project/rule_checker.md; cp "$_doc" "$1"/docs/project/
     cp tests/expected/registry.tsv "$1/tests/expected/"
     cp -R tests/rulecheck "$1/tests/rulecheck"

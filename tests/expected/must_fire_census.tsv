@@ -188,6 +188,7 @@ declares	test_mra_parts
 declares	test_must_fire_census
 declares	test_obj_records
 declares	test_package_release_safety
+declares	test_packet_check
 declares	test_pcrel_escapes
 declares	test_pod_black_foot_palette
 declares	test_poke_readback

@@ -427,6 +427,7 @@ tests/audit_trap_air_hit.sh	tenant
 tests/test_close_tools.sh	docs
 tests/test_retraction_reach.sh	docs
 tests/test_recurrence_alarm.sh	docs
+tests/test_packet_check.sh	docs
 tests/run_on_snapshot.sh	runner
 tests/test_run_on_snapshot.sh	runner
 tests/test_close_checks.sh	runner

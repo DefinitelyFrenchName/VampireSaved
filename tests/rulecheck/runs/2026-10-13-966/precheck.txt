@@ -1,0 +1,5 @@
+  FLAG D-ABSOLUTE: Re-written after rule-checker runs 2026-10-13-962, -964 and -965 (VIOLATED Q1 Q4): the refusal figure was my first iteration's, which added a file check the ...  [build/agent199/t272/report.md]
+  FLAG D-ABSOLUTE: Whether the flags save rounds in live use is NOT measured: the replay can only say where a flag sat on a past finding, not whether a writer would have fixed it.  [build/agent199/t272/report.md]
+  FLAG D-ABSOLUTE: **Flags only, never a refusal.** Recommended: as filed, a refusal would have stopped 3 of 17 sound packets, each on a false flag, to catch one finding in 49 ...  [build/agent199/t272/report.md]
+  FLAG D-ABSOLUTE: Recommended: close it — the ticket's "done when" (built with tests and controls; rounds per packet and the share of violations it would have caught, measured...  [build/agent199/t272/report.md]
+packet_check: 4 flag(s): D-ABSOLUTE 4

@@ -16,12 +16,12 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**457 scripts** — 129 ci_portable, 92 ci_static, 236 emulator-tier (run by name).
+**458 scripts** — 130 ci_portable, 92 ci_static, 236 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
 | [runner](#runner) | 44 | the suite runners and their own ground truth |
-| [docs](#docs) | 23 | the documentation locks — docs, skills, indexes, tables follow the tree |
+| [docs](#docs) | 24 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 48 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
@@ -105,6 +105,7 @@ the documentation locks — docs, skills, indexes, tables follow the tree.
 | `tests/test_gate_index_current.sh` | test | ci_portable | — | docs/project/gate_index.md FOLLOWS the tree (14z-123, the documentation rationalization pass, G6). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-123 |
 | `tests/test_gotchas_index_current.sh` | test | ci_portable | — | docs/GOTCHAS.md FOLLOWS the three bucket files (14z-122, the documentation rationalization pass). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-122 |
 | `tests/test_md_subset.sh` | test | ci_portable | — | the markdown SUBSET the corpus writes is parsed strictly, and every construct outside it FAILS (14z-140, living-docs slice L4). ci_portable: no ROM, no build dir, no emulator, ~3 s. | 14z-140 |
+| `tests/test_packet_check.sh` | test | ci_portable | — | THE PRE-PREPARE CHECK POINTS AT WHAT A SCRIPT CAN SEE BEFORE THE READERS ARE SPAWNED (tools/packet_check.py, run by `tools/rulecheck.py prepare`; #272, ruled 2026-10-12 (14z-199): | 2026-10-12 |
 | `tests/test_recurrence_alarm.sh` | test | ci_portable | — | A RULE-CHECKER FINDING THAT KEEPS COMING BACK IS A RED until a ticket owns its cause (tools/recurrence_alarm.py; #271, 14z-199: the rot rule "a recurring violation opens a ticket", adopted by the maintainer — "8. | 14z-199 |
 | `tests/test_retraction_reach.sh` | test | ci_portable | — | EVERY SITTING'S RETRACTION GREP STILL REACHES THE TREE: every tests/rulecheck/retractions/*.tsv judged on ONE scan of the live tree (tools/retraction_grep.py --each). ci_portable: no ROM, no emulator, ~30 s; | 14z-199 |
 | `tests/test_skill_guides.sh` | test | ci_portable | — | the level-0 skills' GUIDE.md files are CURRENT against SKILL.md and the docs they quote (14z-134). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-134 |

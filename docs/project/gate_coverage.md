@@ -13,12 +13,12 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**457 of 457 gates described.**
+**458 of 458 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
 | [runner](#runner) | 44 | 44 | the suite runners and their own ground truth |
-| [docs](#docs) | 23 | 23 | the documentation locks — docs, skills, indexes, tables follow the tree |
+| [docs](#docs) | 24 | 24 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 48 | 48 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
@@ -386,7 +386,7 @@ the suite runners and their own ground truth. 44 of 44 described.
 
 ## docs
 
-the documentation locks — docs, skills, indexes, tables follow the tree. 23 of 23 described.
+the documentation locks — docs, skills, indexes, tables follow the tree. 24 of 24 described.
 
 ### `test_annotations_current.sh` — test, ci_portable
 
@@ -523,6 +523,14 @@ the documentation locks — docs, skills, indexes, tables follow the tree. 23 of
 **HOW:** the parser over the corpus and over fixtures (~3 s); nine known-bad controls each appended to a copy of a corpus file.
 
 **EXPECTS:** the corpus parses, every excluded construct raises, every accepted shape passes; a construct mis-read here renders wrong somewhere no reader would notice.
+
+### `test_packet_check.sh` — test, ci_portable
+
+**WHAT:** (1) the check's logic on known answers (its --selftest): a claim figure, a double-quoted span and an attribution to the maintainer that no artifact holds are flagged, and a run or line number, a thousands separator, a quote held across an ellipsis, a single-quoted held attribution and a "not put to the maintainer" are not; a deliverable is read only when named, and then its untied absolute sentence and its unsourced figure are flagged while a sentence tied to a `name` and a figure another artifact holds are not; the replay's matcher pairs each kind with the evidence that names it; the replay reads a synthetic ledger's REAL slot (the one control.txt does not name), refuses a run with no recorded slot or a staged copy that differs from its manifest, and stops at --through; its AS FILED tally refuses only on the filed kinds and buckets each run once by size; (2) PREPARE on a throwaway copy: a packet with an unsourced figure and a deliverable holding an untied absolute sentence is PREPARED (the check never refuses), prints its flags, and keeps them as the run's precheck.txt and its meta.tsv `precheck` line; a --deliverable that is not one of the --artifact paths is refused.
+
+**HOW:** section 1 runs tools/packet_check.py --selftest; section 2 builds a throwaway copy of what prepare reads (the tools, tools/agent/, the rule-checker spec, the ledger and its fixtures, the pinned reader) and prepares two packets on it with the tool under test.
+
+**EXPECTS:** SELFTEST PASS and PRECHECK-OK. A run with neither verdict is REFUSED.
 
 ### `test_recurrence_alarm.sh` — test, ci_portable
 

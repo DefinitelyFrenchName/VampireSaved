@@ -353,6 +353,7 @@ declares	test_obj_walker_relocation
 declares	test_oboro_select
 declares	test_optimize_guard
 declares	test_package_release_safety
+declares	test_packet_check
 declares	test_patch_overlap
 declares	test_patch_prg
 declares	test_patch_source_identity

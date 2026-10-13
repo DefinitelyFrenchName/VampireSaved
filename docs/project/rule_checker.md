@@ -62,6 +62,27 @@ violated — but by that sentence's undisputed "every byte write verified"; the 
 inert" is carried by `each`, which is not one of the five words (nor are `no`, `never`, `always`). Only a number or
 "other" after "every" makes a frequency; a quotation opens and closes at a word edge. Gate: `tests/test_claim_lint.sh`.
 
+**The pre-prepare check (#272), flags only (ruled 2026-10-12, 14z-199: "let's try your proposal and iterate on it,
+based on measured data").** `prepare` runs `tools/packet_check.py` on every evidence packet and prints its FLAGS
+before the readers are spawned; the run keeps them as `precheck.txt` and a `precheck` line in `meta.tsv`. It flags a
+claim figure, a claim quotation of four or more words, or an attribution to the maintainer that no artifact holds;
+and, in each artifact named `--deliverable` (the document the packet puts forward: a report, a row, a closing
+comment), every figure no other artifact holds and every sentence with an absolute or definite word that names no
+check. It never refuses. MEASURED (14z-199, `packet_check.py --replay` over the ledger's real runs — the REAL slot of
+each, skipping a run whose staged copy differs from its manifest; tuned on 14z-184..14z-195, then replayed on
+14z-196..14z-198 and on 14z-199 through run 961; `build/agent199/t272/`): as filed — refusing a claim figure no
+artifact holds or an unquoted attribution — the check would have refused 3 of the 17 packets the readers passed in
+14z-196..14z-198 — all three, read in their claims (`matches_read.tsv`), false: a figure counting a staged file's
+rows, and a sentence putting cases TO the maintainer — and by the working agent's reading of each match its refusing
+flags sat on one reader finding in 49 VIOLATED runs. Packet size shows no consistent trend (the VIOLATED share rises with size in one window and falls in the
+other), so no threshold was built. The flags pointed at a reader's own finding in 7 of the 13 VIOLATED rounds of the
+14z-199 report (runs 932-944, each a flag on the report itself: an untied "every", "only", "alone", or a figure in no
+staged output) and in 5 of the 49 VIOLATED runs of 14z-196..14z-198, at a cost of about ten to fourteen flags a
+packet. Rounds per packet (a sitting plus a subject without its re-check tail) were 1.63 in 14z-196..14z-198 and
+4.14 in 14z-199 through run 961; without the rounds whose every violated question a flag sat on, 1.60 and 3.71 by
+the working agent's reading (1.44 and 3.71 by co-occurrence, an upper bound). Most findings are about meaning — a premise not named, a failure mode no control covers, an artifact
+misread — which no script sees. Gate: `tests/test_packet_check.sh`.
+
 **What goes in.** The packet is the decision kind, a SUBJECT, ONE claim
 sentence written by the working agent — what is claimed, what it rests on,
 and what was NOT tested — and the ARTIFACTS by repo-relative path: the diff,

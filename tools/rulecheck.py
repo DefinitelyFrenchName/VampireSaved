@@ -39,6 +39,9 @@ Usage:
   python3 tools/rulecheck.py fixtures
   python3 tools/rulecheck.py prepare --decision KIND --subject TEXT --claim "..." \
           --artifact PATH[:FIRST-LAST] ... --session 14z-N [--model NAME] [--id ID] [--cites RUN-ID ...]
+          [--deliverable PATH[:FIRST-LAST] ...]
+                                       # every evidence packet is run through tools/packet_check.py first (#272): its
+                                       # FLAGS are printed and kept as the run's precheck.txt; it never refuses
                                        # --cites (#217, ruled 2026-10-05): a MERGE packet cites each fork's run; prepare
                                        # (and record again) refuses a cited run whose plant was not caught, that is not OK
                                        # or resolved, or whose staged artifacts changed since it was prepared
@@ -456,6 +459,21 @@ def cmd_prepare(a):
                 + "\n".join(f"  UNTIED [{w}]: {c}" for w, c in untied)
                 + "\n  tie each to a check in its sentence (an artifact path, a `name`, a control's verdict), move it under"
                   " NOT TESTED, or pass --untied-ok \"<why>\" (recorded in the run's meta.tsv)")
+        # #272 (ruled 2026-10-12, 14z-199): the pre-prepare check FLAGS, for a second look, what a script can point at
+        # (tools/packet_check.py: a claim figure, quote or attribution no artifact holds; an untied absolute word or an
+        # unsourced figure in a --deliverable) — it never refuses: measured, refusals would have stopped packets the
+        # readers passed while matching almost none of their findings. The flags are kept with the run (precheck.txt).
+        bad_dl = [d for d in (a.deliverable or []) if d not in a.artifact]
+        if bad_dl:
+            die(f"--deliverable must be one of the --artifact paths, as given: {bad_dl[0]}")
+        try:
+            import packet_check
+        except ImportError:
+            die("tools/packet_check.py is missing beside rulecheck.py (#272)")
+        pc_lines, pc_summary = packet_check.render(packet_check.check(
+            claim, packet_check.corpus_from_specs(root, a.artifact), a.deliverable or []))
+        print("PACKET CHECK (#272) — flags for a second look before the readers are spawned; prepare does not refuse on them:")
+        print("\n".join(pc_lines + [f"  packet_check: {pc_summary}"]))
         family = decision_family(decision)
         real_packet = None
         # the plant, by rotation over the calibrated fixtures of THIS family, positive ones only
@@ -518,7 +536,11 @@ def cmd_prepare(a):
         f"checklist\t{checklist_sha1(root, family)}\nfamily\t{family}\n"
         f"questions\t{' '.join(FAMILIES[family][2])}\nreader\t{reader}\n" + (f"head\t{head}\n" if head else "")
         + (f"untied_ok\t{a.untied_ok}\n" if getattr(a, "untied_ok", None) else "")
+        + ("" if a.calibrate else f"precheck\t{pc_summary}\n")
+        + (f"deliverables\t{' '.join(a.deliverable)}\n" if getattr(a, "deliverable", None) else "")
         + (f"cites\t{' '.join(c for c, _, _, _ in cited)}\n" if cited else ""))
+    if not a.calibrate:
+        (rdir / "precheck.txt").write_text("\n".join(pc_lines + [f"packet_check: {pc_summary}"]) + "\n")
     print(f"prepared run {rid}")
     print(f"  prompts: {stage}/prompt_a.md and {stage}/prompt_b.md")
     print(f"  spawn TWO agents with subagent_type \"rule-checker\" and NO model parameter ({reader}; never a")
@@ -1255,6 +1277,8 @@ def main():
     p.add_argument("--calibrate"); p.add_argument("--session"); p.add_argument("--model"); p.add_argument("--id")
     p.add_argument("--cites", action="append", metavar="RUN-ID", help="#217: a fork's run this merge packet cites")
     p.add_argument("--untied-ok", help="#185 item 3: why an untied universal/definite stands (recorded in meta.tsv)")
+    p.add_argument("--deliverable", action="append", metavar="PATH[:A-B]",
+                   help="#272: an --artifact that IS what the packet puts forward (a report, a row, a comment): packet_check reads it too")
     r = sub.add_parser("record"); r.add_argument("id"); r.add_argument("--a"); r.add_argument("--b")
     r.add_argument("--session"); r.add_argument("--transcript")
     s = sub.add_parser("resolve"); s.add_argument("id"); s.add_argument("--how", required=True)

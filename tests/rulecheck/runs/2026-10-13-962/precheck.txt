@@ -1,0 +1,4 @@
+  FLAG D-ABSOLUTE: Whether the flags save rounds in live use is NOT measured: the replay can only say where a flag sat on a past finding, not whether a writer would have fixed it.  [build/agent199/t272/report.md]
+  FLAG D-ABSOLUTE: **Flags only, never a refusal** — the measured reason above.  [build/agent199/t272/report.md]
+  FLAG D-ABSOLUTE: Recommended: close it — the ticket's "done when" (built, tested, measured against 14z-196..14z-198, iterated) is met, and the flags are kept with every evide...  [build/agent199/t272/report.md]
+packet_check: 3 flag(s): D-ABSOLUTE 3

@@ -306,6 +306,9 @@ test_retraction_reach
 # #271 (14z-199): a rule-checker finding that recurs (a question and a pair of cited tokens, 3 subjects across 2
 # sessions) is a red until tests/rulecheck/recurrence.tsv names the ticket owning its cause; two controls. ~1 s.
 test_recurrence_alarm
+# #272 (14z-199): the pre-prepare check — tools/packet_check.py's logic, and rulecheck prepare printing its flags and
+# keeping them with the run (it never refuses), and its replay bound to the real slot and the manifest; four controls. ~4 s.
+test_packet_check
 # 14z-183b (#153 S6): a run on a snapshot (tests/run_on_snapshot.sh) is immune to the working tree — a tracked
 # edit and commit, build/, a submodule, both siblings perturbed mid-run reach nothing; three controls. ~5 s.
 test_run_on_snapshot
