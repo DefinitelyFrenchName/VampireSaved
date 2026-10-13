@@ -6674,3 +6674,11 @@ So: the rule stays in § [VSP-184] and the skill's [VSP-184] line, and `tools/re
 **The maintainer:** *"Flags only (Recommended)"*; *"Close on the replay (Recommended)"*.
 
 So: `tools/packet_check.py` flags and never refuses (`docs/project/rule_checker.md` § "The pre-prepare check (#272)"), and #272 closes `done` on the replay's measurement; the flags kept with every evidence run (`precheck.txt`) are there for a live count if one is ever wanted — no ticket holds it.
+
+## Ruled 2026-10-13 (14z-199) — #269: narrow the predictor first
+
+**The question (AskUserQuestion), verbatim**, put after #269 was measured before building (rule-checker run 2026-10-13-981 OK after runs 976-979; `build/agent199/t269/report.md`): *"#269: measured, the path selection would carry only 45 of 222 gates (about 6 min) and takes 15 min to plan. The narrow control trigger misses most of what gates actually run, and the full predictor's own trigger marks 146 gates and saves about 600 s. How do you want to proceed?"* The options were "Narrow the predictor first (Recommended)": "File a new ticket to narrow the predictor's directory-read rule (and drop untracked build/ copies from its change set), each narrowing scored on a fresh trace of every gate. #269 stays open and is built on that; the close runs as today until then."; "Build now, code-change trigger": "Every gate runs at the close; controls only for gates the full predictor marks stale for changed code. About 600 s saved this session; its safety is unmeasured (no trace of control runs), so a control-run trace would come first."; and "Build as ruled": "Path selection plus a core of the three predictor-blind gates (test_commit_subject, test_close_tools, test_rule_checker), knowing the measured cost."
+
+**The maintainer:** *"Narrow the predictor first (Recommended)"*.
+
+So: #274 is filed (narrow `tools/static_confirm.py`'s R3 and its change set, each narrowing scored on a fresh trace); #269 stays open and is built on it; until then a session close runs the static tier as before (every gate, every control executed). The 2026-10-12 ruling's turnaround stands as the direction.
