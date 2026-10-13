@@ -6888,6 +6888,22 @@ is moved. Ground truth: `tests/test_emulator_staleness.sh` 2g (control `skip-ign
 `dirt-ignored`). **The rule:** a verdict that is not PASS is not evidence, and the candidates for "moved" include
 everything the run itself measured, not only what differs now.
 
+## AN APPROVAL KEPT IN PROSE IS ASKED AGAIN, AND THE AUDIT CANNOT READ IT — an instrument with no default subject SKIPped at every release run (paid: 14z-198's re-release, GitHub #265; fixed 14z-199)
+
+`audit_mask_window_ff42a2` attributes a select-palette row move from three operands (a pre-move and a post-move rompath and
+the replays that moved). Run bare, it prints its SKIP and exits 0 at its operand check, before any MAME call, so the release
+sweep (`run_all_emulator.sh --scope all`) ran it at every release and the run asserted nothing. On 2026-09-06 the maintainer
+approved that SKIP as a standing exception *"so the next release run does not re-ask"*, but the approval was written as
+prose in the registry note. A session at M19 asked again ("a previous approval is not a standing one"), and so did the 14z-198
+re-release. And since #252 the release-cadence staleness audit FAILs any SKIP newest row: it cannot read a note.
+**What the measurement showed:** the bare run measures nothing, so the cure is not a readable approval but not running it.
+The row is `ondemand` with the reason keyword `instrument:` (maintainer-ruled 2026-10-13): no tier selects it, the audit
+never judges it, and the runner selects an `instrument:` row in NO scope — `--scope ondemand` included, since it
+would pass the bare args and only SKIP — so it runs by hand with its operands ([VSP-35]). **The lesson, wider than this gate:** an exception the
+runner and the audit cannot read is re-asked at every release, and a tool added later will fail it. Put such a decision in
+a column or a scope the tools read, or make the run not happen. Prose in a note is read only by the next session, and
+only if it trusts it.
+
 ## THE MAME REPLAY WRAPPER READ ITS VERDICT FROM A FILE IT HAD NOT CLEARED — a run that wrote nothing passed on the last run's log (paid: 14z-196's code review, GitHub #253; fixed 14z-197)
 
 `tools/run_replay_mame.sh` decides success by an ARTIFACT, `^END` in the checksum log, and never removed that log

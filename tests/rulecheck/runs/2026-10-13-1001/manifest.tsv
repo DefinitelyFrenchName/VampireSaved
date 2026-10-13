@@ -1,0 +1,24 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent199/t265/report.md	6baad7555771094d26e81fc53b140f0799567db1
+build/agent199/t265/commit_a81d0044.txt	7d05cb25963b929534962eae23df3323accc2b3b
+build/agent199/t265/stale_release.txt	ec462d9e1b87b0a193a608f4c21f97217279d081
+build/agent199/t265/stale_release_after.txt	3bf81678c9d142a299294600c8bf0bcaa4224359
+build/agent199/t265/gates/test_emulator_runner.log	ac5e3e4063dd35b2789a2462de9b6fc30653b877
+build/agent199/t265/gates/test_emulator_staleness.log	fb0051adef9c6718148d844d935231a62220d051
+build/agent199/t265/gates/test_gate_follows.log	e1a61e4f19be22b496f3ebec3a3551294ff1bf5b
+build/agent199/t265/gates/test_gate_descriptions.log	accef0d12a489f51af8fe68e6e1464afe0b8d3d0
+build/agent199/t265/gates/test_state_open_lists.log	9a67cfab20c03c1785d7973b5a34a77391966d80
+tests/ci_emulator.tsv.lines-70-82 (lines 70-82 of tests/ci_emulator.tsv)	5359a7a46410a8022de0aef309f0e34187596a14
+tests/ci_emulator.tsv.lines-154-154 (lines 154-154 of tests/ci_emulator.tsv)	e7fd2e2a8bc8f1f7535257e82c392555bb16a428
+tests/test_emulator_runner.sh.lines-370-385 (lines 370-385 of tests/test_emulator_runner.sh)	931b8246bce176f8b36fc218c09de93cc921498d
+tests/run_all_emulator.sh.lines-50-72 (lines 50-72 of tests/run_all_emulator.sh)	823c1b7760ad684039c658bad3177597262ec96f
+tests/run_all_emulator.sh.lines-226-243 (lines 226-243 of tests/run_all_emulator.sh)	dcad11b6d68504f705631190675c6ab0dc1688c8
+tests/test_emulator_runner.sh.lines-255-290 (lines 255-290 of tests/test_emulator_runner.sh)	0b38d4323f2489c1faa3949205c75dbf2d3c4adf
+build/agent199/t265/gates/test_emulator_runner_ctl_instrument-run.log	555b61f205e648b45007f46aeaea627a926ed731
+build/agent199/t265/gates/test_must_fire_census.log	7db364e7f353fa8c069c4ec408cbb456e4a635e1
+build/agent199/t265/ondemand_list.txt	84a81877a0ba9907c83f382bcee9272cb7605320
+tools/audit_emulator_staleness.py.lines-50-58 (lines 50-58 of tools/audit_emulator_staleness.py)	e289f9606d5b957de6d7dc6316251b53a375f7ee
+tests/audit_mask_window_ff42a2.sh.lines-95-115 (lines 95-115 of tests/audit_mask_window_ff42a2.sh)	a4014b0a47483000c54407533d3fe826e1a1aee7
+DECISIONS_HISTORY.md.lines-6686-6692 (lines 6686-6692 of DECISIONS_HISTORY.md)	70abb83532bd5b137f4927ff71d933beb4de59ce
+docs/project/gotchas.md.lines-6891-6906 (lines 6891-6906 of docs/project/gotchas.md)	0c09c58ebe34960324a02c05cf37d25f32f8143a
+docs/project/tickets.tsv.lines-84-84 (lines 84-84 of docs/project/tickets.tsv)	60eef56c21a30bbe84b6647c761980b214c30bb4

@@ -1,0 +1,24 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: #265: close done — audit_mask_window_ff42a2 moved to ondemand on the maintainer's choice A
+Claim (the working agent's sentence): Close #265 `done`: the maintainer chose "A: ondemand scope (Recommended)" (DECISIONS_HISTORY.md "Ruled 2026-10-13 (14z-199) — #265: audit_mask_window_ff42a2 moves to ondemand"), built in a81d0044 (commit_a81d0044.txt): the registry row tests/ci_emulator.tsv is `ondemand` with reason `instrument:`, tests/test_emulator_runner.sh accepts `pristine:` or `instrument:`, and tests/run_all_emulator.sh, tools/audit_emulator_staleness.py and the instrument's own header say what an instrument row in ondemand is; the five gates that read these files PASS (gates/*.log); and the release-cadence staleness audit at HEAD no longer FAILs on this instrument — it is listed as a NOTE "outside what a release runs" (stale_release_after.txt), where before the change it was a FAIL (stale_release.txt). What was learned and what went wrong are homed in docs/project/gotchas.md "AN APPROVAL KEPT IN PROSE IS ASKED AGAIN"; the index row goes to `done` with that home for both, the ruling added to `decided`, and session 14z-199. NOT TESTED: the full static tier with every control has not run on this change (it runs at this close); no release run has yet run with the new scope; the release-cadence audit still exits 1 on audit_release_linux_desktop's host SKIP, which is outside #265, so a release is not green by this change alone; the other five `momentary:` rows were not read for whether they run bare to a verdict.
+Artifacts (read every one, in full):
+  - build/agent199/t265/report.md
+  - build/agent199/t265/commit_a81d0044.txt
+  - build/agent199/t265/stale_release.txt
+  - build/agent199/t265/stale_release_after.txt
+  - build/agent199/t265/gates/test_emulator_runner.log
+  - build/agent199/t265/gates/test_emulator_staleness.log
+  - build/agent199/t265/gates/test_gate_follows.log
+  - build/agent199/t265/gates/test_gate_descriptions.log
+  - build/agent199/t265/gates/test_state_open_lists.log
+  - tests/ci_emulator.tsv.lines-70-82 (lines 70-82 of tests/ci_emulator.tsv)
+  - tests/ci_emulator.tsv.lines-154-154 (lines 154-154 of tests/ci_emulator.tsv)
+  - tests/test_emulator_runner.sh.lines-370-385 (lines 370-385 of tests/test_emulator_runner.sh)
+  - tests/run_all_emulator.sh.lines-50-70 (lines 50-70 of tests/run_all_emulator.sh)
+  - tools/audit_emulator_staleness.py.lines-50-58 (lines 50-58 of tools/audit_emulator_staleness.py)
+  - tests/audit_mask_window_ff42a2.sh.lines-95-115 (lines 95-115 of tests/audit_mask_window_ff42a2.sh)
+  - DECISIONS_HISTORY.md.lines-6686-6692 (lines 6686-6692 of DECISIONS_HISTORY.md)
+  - docs/project/gotchas.md.lines-6891-6906 (lines 6891-6906 of docs/project/gotchas.md)
+  - docs/project/tickets.tsv.lines-84-84 (lines 84-84 of docs/project/tickets.tsv)

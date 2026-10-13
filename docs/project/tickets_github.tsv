@@ -14,7 +14,7 @@ number	state	reason	closed	labels	title
 268	CLOSED	COMPLETED	2026-10-13	evolution	test_close_tools cut back: session runs self-tests only, one-pass retraction scan at freeze/release, section-scoped control modes, retraction-file audit
 267	OPEN	-	-	evolution	Session ledger as a static page generated into docs/site/ at each close (hosting and what to publish are the maintainer's calls)
 266	OPEN	-	-	bug	PILOT's GNOME Shell segfaults under Wayland since 2026-10-09, so audit_release_linux_desktop cannot run
-265	OPEN	-	-	evolution	audit_mask_window_ff42a2 at a release: an instrument with no default subject SKIPs, and the staleness audit now FAILs that SKIP
+265	CLOSED	COMPLETED	2026-10-13	evolution	audit_mask_window_ff42a2 at a release: an instrument with no default subject SKIPs, and the staleness audit now FAILs that SKIP
 264	CLOSED	COMPLETED	2026-10-12	evolution	A session dashboard: time per activity, checks and re-checks and why, tier cost and quality signals, each figure labelled measured, derived, estimated, inferred or extrapolated
 263	OPEN	-	-	bug	C1 extract's W# hint flags a worker figure derived from a file it read as unsourced
 262	OPEN	-	-	bug	C1 extract drops a maintainer message stored as a queue enqueue plus an attachment record

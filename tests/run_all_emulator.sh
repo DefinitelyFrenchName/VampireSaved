@@ -62,7 +62,9 @@
 # (with --lane, --controls, --strict and --jobs as for any run). Its reason keyword is
 # `pristine:`. Since 14z-199 (maintainer-ruled, #265) the scope also holds an INSTRUMENT
 # with no default subject — reason keyword `instrument:` — which run bare only SKIPs and
-# is run by hand with its operands (audit_mask_window_ff42a2, [VSP-35]).
+# is run by hand with its operands (audit_mask_window_ff42a2, [VSP-35]). This runner
+# selects an instrument row in NO scope, `--scope ondemand` included: it would pass the
+# registry's bare args and only SKIP.
 # A pristine-only gate guarding a case KNOWN to have broken before (a
 # tenant change that once moved vsavj characters) stays `release`.
 #
@@ -222,10 +224,12 @@ if [ "$STALE" = 1 ]; then
 fi
 
 selected() {  # rows matching --lane / --scope / --cadence / --only / --stale, in lane order
+    # An `instrument:` row (14z-199, #265) is never selected, in any scope: run bare it only SKIPs at its operand
+    # check, and the runner passes it the registry's bare args, so it is run by hand with its operands instead.
     for _l in $LANES; do
         rows | awk -F'\t' -v lane="$_l" -v scope="$SCOPE" -v cad="$CADENCE" '
             $2 == lane && ((scope == "all" && $3 != "ondemand") || (scope != "all" && $3 == scope)) \
-                       && (cad == "all"   || $4 == cad)'
+                       && (cad == "all"   || $4 == cad) && $6 !~ /^instrument:/'
     done | while IFS= read -r line; do
         _g="${line%%	*}"
         if [ -n "$ONLY" ]; then

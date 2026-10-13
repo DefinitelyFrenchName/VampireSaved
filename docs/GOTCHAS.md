@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-504 entries (47 game / 133 platform / 324 project), counted from the buckets at generation.
+505 entries (47 game / 133 platform / 325 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 47 entries
 
@@ -208,7 +208,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - `find` IN A .BAT RUN FROM MSYS2 (OR WITH GIT'S usr\bin ON PATH) IS THE UNIX find — `find /c /v ""` walked the whole C: drive for hours (paid: 14z-197, GitHub #248)
 - ON A WSL2 BOX REACHED ONLY OVER SSH, WSLg COMES UP WITH NO DESKTOP BEHIND IT AND EVERY MAME PROCESS WAITS 100-180 s ON ITS SOCKETS — a release run's two prereq TIMEOUTs were the environment, not the build (paid: 14z-198)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 324 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 325 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -527,6 +527,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A CONTROL MODE THAT CRASHED WAS COUNTED AS ITS CONTROL FIRING (paid: 14z-195's code review, GitHub #254; fixed 14z-196)
 - A DIRECTORY GUARD CANNOT SEE A LINK THROUGH ONE FILE — opening the output path for writing follows a symlink already there (paid: 14z-196's code review, GitHub #245; fixed 14z-197)
 - THE STALENESS AUDIT JUDGED ONLY WHAT `git diff` AND THE NEWEST VERDICT SHOWED IT — a SKIP hid a moved input, a reverted input was never a candidate (paid: 14z-196's code review, GitHub #251 and #252; fixed 14z-197)
+- AN APPROVAL KEPT IN PROSE IS ASKED AGAIN, AND THE AUDIT CANNOT READ IT — an instrument with no default subject SKIPped at every release run (paid: 14z-198's re-release, GitHub #265; fixed 14z-199)
 - THE MAME REPLAY WRAPPER READ ITS VERDICT FROM A FILE IT HAD NOT CLEARED — a run that wrote nothing passed on the last run's log (paid: 14z-196's code review, GitHub #253; fixed 14z-197)
 - A SYMLINK'S TARGET RESOLVES AGAINST THE LINK'S DIRECTORY, NOT THE CWD — a relative ROMDIR built an overlay of dangling links that exited 0 (paid: 14z-196's code review, GitHub #250; fixed 14z-197)
 - THE RELEASE PACKAGER DELETED ITS TARGET FIRST — a typed name could reach a sibling, and a failed rebuild left nothing (paid: 14z-196's code review, GitHub #246 and #247; fixed 14z-197)

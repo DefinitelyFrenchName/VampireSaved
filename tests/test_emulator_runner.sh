@@ -19,6 +19,7 @@
 # MUST-FIRE: shadow-tool: reader-unplugged — a copy that hands the classifier no gate script must let a declared-but-unfired control read PASS (mode: section 14 must fail)
 # MUST-FIRE: shadow-tool: crash-unread — a copy that hands the CONTROL classifier no gate script must read a control mode dying of `command not found` (exit 127) as an honoured PASS row (mode: that copy is the runner every section drives; section 14b must fail; 14z-196, #254)
 # MUST-FIRE: shadow-tool: ondemand-in-all — a copy whose scope selection lets --scope all take an `ondemand` row must run it there (mode: that copy is the runner every section drives; section 6a must fail; 14z-196, the ondemand scope)
+# MUST-FIRE: shadow-tool: instrument-run — a copy whose selection keeps `instrument:` rows must run one under --scope ondemand (mode: that copy is the runner every section drives; section 6a must fail; 14z-199, #265)
 # MUST-FIRE: shadow-tool: dry-run-records — a copy of the runner without the --dry-run guard on commit.txt must write a run of record on a dry run (mode: that copy is the runner every section drives; section 15's dry-run case must fail)
 # MUST-FIRE: shadow-tool: empty-green — a copy of the runner without the empty-selection guard must print GREEN and write a run directory for a selection that matches no gate (mode: that copy is the runner every section drives; section 15's empty-selection case must fail)
 # MUST-FIRE: perturbed-copy: row-not-executable — a farm of symlinks to the REAL scripts named by the REAL tests/ci_emulator.tsv, with ONE replaced by a non-executable copy, must make section 10b report it unrunnable (mode: that farm is what 10b checks; section 10b must fail)
@@ -85,6 +86,10 @@ cmp -s "$RUNNER" "$T/runner_emptygreen.sh" && fail "could not remove the empty-s
 sed 's|((scope == "all" \&\& $3 != "ondemand") \|\| (scope != "all" \&\& $3 == scope))|(scope == "all" \|\| $3 == scope)|' "$RUNNER" > "$T/runner_ondemandinall.sh"
 cmp -s "$RUNNER" "$T/runner_ondemandinall.sh" && fail "could not remove the ondemand exclusion — the selection line moved"
 chmod +x "$T/runner_ondemandinall.sh"
+# the instrument exclusion removed from every scope (14z-199, #265)
+sed 's| \&\& $6 !~ /^instrument:/||' "$RUNNER" > "$T/runner_instrumentrun.sh"
+cmp -s "$RUNNER" "$T/runner_instrumentrun.sh" && fail "could not remove the instrument exclusion — the selection line moved"
+chmod +x "$T/runner_instrumentrun.sh"
 # the control classifier's gate-script argument removed (14z-196, #254)
 sed 's|vs_classify_control "$_cs" "$_clog" "tests/$_g.sh"|vs_classify_control "$_cs" "$_clog"|' "$RUNNER" > "$T/runner_crashunread.sh"
 cmp -s "$RUNNER" "$T/runner_crashunread.sh" && fail "could not unplug the crash reader — the vs_classify_control call moved"
@@ -96,6 +101,7 @@ reader-unplugged) ln -s "$T/runner_unplugged.sh" "$FR/tests/run_all_emulator.sh"
 dry-run-records)  ln -s "$T/runner_dryrecords.sh" "$FR/tests/run_all_emulator.sh" ;;
 crash-unread)     ln -s "$T/runner_crashunread.sh" "$FR/tests/run_all_emulator.sh" ;;
 ondemand-in-all)  ln -s "$T/runner_ondemandinall.sh" "$FR/tests/run_all_emulator.sh" ;;
+instrument-run)   ln -s "$T/runner_instrumentrun.sh" "$FR/tests/run_all_emulator.sh" ;;
 *)                ln -s "$RUNNER" "$FR/tests/run_all_emulator.sh" ;;
 esac
 # the runner sources THE ONE classifier relative to its repo (14z-139), so
@@ -135,6 +141,7 @@ mk g_prose   0 "checked 3 things, none had to be skipped"
 mk g_skipfail 2 "  SKIPPED: no reference binary" "PARTIAL: the invariant was NOT run"
 mk g_out     0 "an out-of-release-scope gate ran"
 mk g_ond     0 "an ondemand gate ran"
+mk g_inst    0 "an instrument ran bare"
 mk g_args    0 "argument check"
 mk g_prereq  0 "the instrument is sound"
 mk g_slow    0 "this one overruns"
@@ -252,7 +259,7 @@ printf '%s\n' "$out8" | grep -q "g_out .*PASS" \
     || fail "--scope all did not run the out-of-scope row"
 
 echo "6a. an ONDEMAND row runs only under --scope ondemand — never by default, never under --scope all (14z-196)"
-reg "$(row g_pass mame release - '')" "$(row g_out mame out - 'momentary: a stub')" "$(row g_ond mame ondemand - 'pristine: a stub')"
+reg "$(row g_pass mame release - '')" "$(row g_out mame out - 'momentary: a stub')" "$(row g_ond mame ondemand - 'pristine: a stub')" "$(row g_inst mame ondemand - 'instrument: a stub')"
 o6a="$(run --log "$T/l6a1" || true)"; o6b="$(run --scope all --log "$T/l6a2" || true)"; o6c="$(run --scope ondemand --log "$T/l6a3" || true)"
 printf '%s\n' "$o6a" | grep -q "g_ond " && fail "the default (release) run ran the ondemand row" || ok "the default run skips the ondemand row"
 printf '%s\n' "$o6b" | grep -q "g_ond " && fail "--scope all ran the ondemand row" || ok "--scope all skips the ondemand row (and still runs g_out: $(printf '%s\n' "$o6b" | grep -c 'g_out .*PASS'))"
@@ -266,6 +273,16 @@ printf '%s\n' "$o6d" | grep -q "g_ond .*PASS" \
     && vs_ctl_fired ondemand-in-all "with the exclusion removed, --scope all ran the ondemand row" \
     || { vs_ctl_dead ondemand-in-all "the copy without the exclusion still skipped g_ond"; fail "ondemand-in-all"; }
 rm -f "$FR/tests/run_all_emulator_ondemandinall.sh"
+# an `instrument:` row (14z-199, #265) is selected by NO scope: run bare it only SKIPs, so it is run by hand
+_ran=0; for _o in "$o6a" "$o6b" "$o6c"; do printf '%s\n' "$_o" | grep -q "g_inst " && _ran=1; done
+[ "$_ran" = 0 ] && ok "no scope (default, --scope all, --scope ondemand) runs the instrument row" \
+                || fail "a scope ran the instrument row"
+ln -s "$T/runner_instrumentrun.sh" "$FR/tests/run_all_emulator_instrumentrun.sh"
+o6e="$( (cd "$FR" && ROMDIR="$T/roms" MERGED=build/fake_merged sh tests/run_all_emulator_instrumentrun.sh --scope ondemand --log "$T/l6a5" 2>&1) || true)"
+printf '%s\n' "$o6e" | grep -q "g_inst .*PASS" \
+    && vs_ctl_fired instrument-run "with the exclusion removed, --scope ondemand ran the instrument row" \
+    || { vs_ctl_dead instrument-run "the copy without the exclusion still skipped g_inst"; fail "instrument-run"; }
+rm -f "$FR/tests/run_all_emulator_instrumentrun.sh"
 
 echo "6b. CADENCE selects independently of scope, and --freeze ASKS the question"
 # The maintainer's 2026-09-03 ruling: the bitstream gates are RELEASE-scope but
