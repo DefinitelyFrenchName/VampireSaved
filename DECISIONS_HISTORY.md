@@ -6666,3 +6666,11 @@ So: the freeze cadence and the threshold stand as built, and so does the resolve
 
 So: the rule stays in § [VSP-184] and the skill's [VSP-184] line, and `tools/recurrence_alarm.py` keeps taking a pre-#209 run's session from its subject.
 
+
+## Ruled 2026-10-13 (14z-199) — #272: the pre-prepare check stays flags only, and #272 closes on the replay
+
+**The questions (AskUserQuestion), verbatim**, put after #272 was built (commit `8f41cab6`, rule-checker run 2026-10-13-966 OK after runs 962, 964 and 965; `build/agent199/t272/report.md`): (1) *"Should the pre-prepare check stay flags-only, with no refusals? As approved (refuse on an unsourced claim figure or an unquoted maintainer attribution), it would have refused 3 of 17 good packets on false flags, to catch one finding in 49 that the same flag already shows the writer."* The options were "Flags only (Recommended)": "prepare prints the flags and keeps them with the run; it never refuses. This is what's built and committed." and "Refuse as filed": "Refuse on an unsourced claim figure or an unquoted attribution, with an override reason recorded, like claim_lint's --untied-ok." (2) *"Close #272 on this replay, or keep it open until the kept flags can be counted against live verdicts over a few sittings?"* The options were "Close on the replay (Recommended)": "The done-when is met: built with tests and controls, measured against 14z-196..198 (rounds per packet and the share caught), iterated. The flags are kept with every run, so a live count can be made whenever it's wanted." and "Keep open for a live count": "Leave #272 open and count the kept flags against verdicts after a few more sittings before closing."
+
+**The maintainer:** *"Flags only (Recommended)"*; *"Close on the replay (Recommended)"*.
+
+So: `tools/packet_check.py` flags and never refuses (`docs/project/rule_checker.md` § "The pre-prepare check (#272)"), and #272 closes `done` on the replay's measurement; the flags kept with every evidence run (`precheck.txt`) are there for a live count if one is ever wanted — no ticket holds it.

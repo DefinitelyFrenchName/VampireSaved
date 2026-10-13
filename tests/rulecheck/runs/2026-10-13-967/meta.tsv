@@ -1,0 +1,11 @@
+decision	recommendation
+subject	close #272 done on the maintainer's two answers
+session	14z-199
+model	rule-checker@163e4ce9cf7b
+claim	#272 closes done: it was built (commit 8f41cab6, git_log.txt) and rule-checked OK on run 2026-10-13-966 after runs 962, 964 and 965 were each resolved by work (ledger_962_966.tsv; 963 withdrawn unspawned, WITHDRAWN.txt), and the maintainer answered the two questions put after it: "Flags only (Recommended)" and "Close on the replay (Recommended)" (DECISIONS_HISTORY.md, the 14z-199 #272 entry, which quotes both questions verbatim with their options). The closing comment (close272.md) states the resolution, the measurement and that the issue's own premise did not hold; the index row (tickets.tsv line 75) records done with its four answers; docs/project/rule_checker.md records the measurement, the premise and the ruling; STATE row (7) records the same. NOT TESTED: the issue is still OPEN on GitHub (issue_state_before.txt) — the comment is posted and the issue closed only after this run, and the posted text and closed state are checked after that against close272.md; the commit 8f41cab6 is local and reaches origin only with the 14z-199 close's push, so until then the comment cites a commit GitHub does not have; that no option is left to do rests on the maintainer's second answer, the kept flags being there for a live count that no ticket holds.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	0 flag(s)
+deliverables	build/agent199/close272/close272.md

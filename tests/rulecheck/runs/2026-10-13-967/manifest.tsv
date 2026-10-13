@@ -1,0 +1,11 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent199/close272/close272.md	9870d802a196726840c325296407001cb4219355
+build/agent199/close272/git_log.txt	46789ddd73a815703a8440f6f700df2b2fdf9249
+build/agent199/close272/ledger_962_966.tsv	44b513d9b848fe2e70ffd4769a1e09c3856aa1db
+tests/rulecheck/runs/2026-10-13-963/WITHDRAWN.txt	fadc33d4c55e17121401c3ea91b6ee9c7103cf82
+build/agent199/close272/issue_state_before.txt	e861741310df817931c57d0afa4a161d209c7bf2
+build/agent199/t272/issue272.md	0726755cb696efe160554b22d4a821f90a18e627
+DECISIONS_HISTORY.md.lines-6670-6676 (lines 6670-6676 of DECISIONS_HISTORY.md)	e3285be7712a4e947c40c78e8390a1827a978031
+docs/project/tickets.tsv.lines-75-75 (lines 75-75 of docs/project/tickets.tsv)	ec890f871639d8b4cfabe37602f7b84b6b16a0fc
+docs/project/rule_checker.md.lines-65-87 (lines 65-87 of docs/project/rule_checker.md)	ab310601c93057fb0834c16c6b176bd8e521ad7d
+STATE.md.lines-86-86 (lines 86-86 of STATE.md)	10fd39b01f81e4671f109b13edad15571f8165e9

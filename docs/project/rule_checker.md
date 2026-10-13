@@ -81,7 +81,10 @@ staged output) and in 5 of the 49 VIOLATED runs of 14z-196..14z-198, at a cost o
 packet. Rounds per packet (a sitting plus a subject without its re-check tail) were 1.63 in 14z-196..14z-198 and
 4.14 in 14z-199 through run 961; without the rounds whose every violated question a flag sat on, 1.60 and 3.71 by
 the working agent's reading (1.44 and 3.71 by co-occurrence, an upper bound). Most findings are about meaning — a premise not named, a failure mode no control covers, an artifact
-misread — which no script sees. Gate: `tests/test_packet_check.sh`.
+misread — which no script sees. The ticket's premise, that the 14z-199 report's rounds were mostly figures not staged,
+did not hold: a flagged figure sat on a reader's finding in one of those thirteen rounds; its absolute words did. Kept
+flags only and closed on this replay by the maintainer (`DECISIONS_HISTORY.md` "Ruled 2026-10-13 (14z-199) — #272").
+Gate: `tests/test_packet_check.sh`.
 
 **What goes in.** The packet is the decision kind, a SUBJECT, ONE claim
 sentence written by the working agent — what is claimed, what it rests on,
