@@ -162,26 +162,11 @@ hand-played recordings of reported problems, and 181 tracked tickets.
 
 **What all that green does not prove.** It does not prove that the new characters *feel* right —
 only players can judge that. The frame-by-frame guarantee covers the scripted replays, not every match
-anyone could play. And a few original sequences are allowed small, measured and frozen tolerances,
+anyone could play. And a few original sequences are allowed small, measured and frozen tolerances (e.g. sub 1-frame impact),
 because code added to reach the new characters costs the processor time. A move-by-move comparison of the three
 new characters with Vampire Savior 2 has been done ([#136](https://github.com/DefinitelyFrenchName/VampireSaved/issues/136)),
 and the differences it found are tracked as their own tickets.
 
-**Lineage.** The working discipline began in a Super Nintendo romhack project,
-[Sailor Moon S — FrenchName edition](https://github.com/DefinitelyFrenchName/SMS-FrenchName-edition),
-and was scaled up here. The test harness was then extracted into its own project,
-[BBH](https://github.com/DefinitelyFrenchName/BBH-frame-based), for anything that can be driven frame by frame, and generalised again as [BBX](https://github.com/DefinitelyFrenchName/BBX), for any work whose
-result has to be proven to someone who cannot read how it was made.
-
-## Find your way around
-
-| file                                                 | what it is                                                   |
-| ---------------------------------------------------- | ------------------------------------------------------------ |
-| [`docs/README.md`](docs/README.md)                   | the map of the documentation, in three halves: the game itself, the CPS-2 board and its emulators, and this port |
-| [`HANDOFF.md`](HANDOFF.md)                           | how to build everything from source, run the tests and play a development build |
-| [`CLAUDE.md`](CLAUDE.md)                             | the rules every change follows, whoever writes it            |
-| [`STATE.md`](STATE.md)                               | what the latest working sessions did, and the rulings in force |
-| [`docs/project/tickets.md`](docs/project/tickets.md) | every known bug, cosmetic item and planned evolution, each with its GitHub issue |
 
 ## Licence and legal
 
