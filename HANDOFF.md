@@ -296,56 +296,7 @@ ROMDIR=... [SNAP_FRAMES=a,b DUMP_FRAMES=..] tools/run_inp_probe.sh <build> <inp>
 python3 tools/audit_effect_rects.py --ours <hashes> --stock <hashes> --donor n=<hashes> --blocks <log>  # multi-tile OBJ blocks vs the donor rectangle (14z-112). INSTRUMENT, NOT A GATE — read its header first; hash maps come from run_inp_probe's GFXRANGE, block lists from RECT_AUDIT
 ```
 
-**One command, every gate that does not need an emulator.** Until 14z-94 there
-was no CI and no aggregator, and 101 of 130 test scripts had no shell caller —
-so running the reproducibility gate depended on somebody remembering its
-filename. What that cost, measured: `test_dualtrack.sh` sat RED for 11 days
-(GitHub #95) while CLAUDE.md §4 cited it as one of FBNeo's three guarantees.
-
-It reports **PASS / SKIP / FAIL separately, because SKIP is not PASS**
-(GitHub #29): a gate whose build dir is absent prints `SKIP:` and exits 0, and
-counting that as a pass is how a fresh checkout reports green while asserting
-nothing. `--strict` makes skips fatal.
-
-It also prints a **registry-coverage check** — any emulator-free gate in
-neither `tests/ci_portable.txt` nor `tests/ci_static.txt` is named. That check
-is the anti-orphan mechanism; without it the runner would just become a
-smaller thing to forget to update. Its classifier is TRANSITIVE (follows
-`tests/lib/*.sh` sources), because two gates reach an emulator indirectly and
-were mis-registered on the first pass.
-
-Emulator gates, soaks and one-off rigs are deliberately NOT here — they have
-their own runner since 14z-128 (below). This is also not `run_battery_m2.sh`,
-which builds a ROM and is the stage-6 dev-build chain.
-
-Ground truth for the runner itself: `tests/test_static_runner.sh`. **Its
-verdict classifier is `tests/lib/classify.sh` (14z-139), THE ONE copy that
-`run_all_emulator.sh` and `run_battery_m2.sh` source too** — until then the
-static runner and the battery read an exit-0 shell crash ([VSP-176]) as PASS
-while the sweep read it as FAIL.
-
-**[VSP-181]** **THE MUST-FIRE CONTRACT (14z-147, step two of the maintainer's
-ruling on the BBX finding — spec of record `docs/project/must_fire_contract.md`,
-the tree's COPY of BBX's R10/R29/R30, independent but compatible): a control is
-DECLARED in the gate's leading comment block as `# MUST-FIRE: <shape>: <name> —
-<what must fail>` (shape `perturbed-copy` | `shadow-tool` | `known-bad`, a bare
-`#` continues the block; `# MUST-FIRE: none — <why>` for a gate that asserts no
-property); FIRED at run time as `CONTROL FIRED: <name> — <evidence>` or
-`CONTROL DEAD: <name> — <what happened>` at column 0; and EXECUTABLE as a
-mode — `CONTROL=<name> tests/<gate>.sh` applies the perturbation to the REAL
-input and must reach the gate's own FAIL (exit 0 is LIES, a `REFUSED:` line
-with exit 3 is a dead mode, a crash is DIED).** Every runner hands
-`vs_classify` the gate script, and a declared control that did not fire, a
-DEAD line or a firing no header declares is plain FAIL — no fourth verdict.
-`tests/run_all_static.sh` executes every declared control after a PASS
-(`--exec-controls all|portable|none`) and prints `fired N / declared N` plus
-the executed tally; `run_all_emulator.sh` reads every block and executes under
-`--controls` (rows `<gate>@<name>`). The reader is `tests/lib/controls.sh`
-(ground truth `tests/test_controls_contract.sh`); the retrofit's status is the
-census's three frozen classes (`declares` grows only, `header-only` and
-`retrofit-debt` shrink only). Write each perturbation as ONE function the
-control section and the mode both call, so what the mode proves is what the
-control claims.
+*(Moved 2026-10-14, #282 item B: THE PRE-COMMIT COMMAND — what the runner reports, and THE MUST-FIRE CONTRACT ([VSP-181]) → `docs/project/operations.md`.)*
 
 ### **[VSP-164]** THE EMULATOR-TIER COMMAND — `tests/run_all_emulator.sh` (since 14z-128)
 
@@ -363,105 +314,7 @@ tests/run_all_emulator.sh --list                      # the registry, as selecte
 ROMDIR=... tests/run_all_emulator.sh --dry-run        # the resolved command per gate
 ```
 
-**WHAT THE RELEASE RUN COSTS, MEASURED (14z-153, 2026-09-14, this MacBook,
-`--jobs 4`, the M18 build set):** `--scope all --lane all --strict --controls`
-took **5 h 37 min** wall — 172 gates and 39 control runs, PASS 210 / SKIP 1 (the
-approved `audit_mask_window_ff42a2`) / FAIL 0. Serially that is 13.6 h of gate
-time plus **4.5 h for the controls (+33%)**, and **90% of the controls' cost is
-the four Verilator gates**, where each control is a full re-run of its gate; the
-MAME lane's 30 controls cost 15 min in all, because several stop at their first
-perturbed input (`audit_guard_corpus@known-crash` 21 s against its gate's
-1,830 s). Rows: `build/emu_controls_14z153/results.tsv`.
-
-*(Moved 2026-10-14, #282 item B: THE EMULATOR-TIER COMMAND — measured runs on ERIS and PILOT → `docs/project/operations.md`.)*
-
-**The registry is `tests/ci_emulator.tsv`** — one row per emulator-tier gate:
-`gate / lane / scope / cadence / args / note` (173 rows at 14z-157; 163 when
-`audit_type_dispatch_range` was dropped 14z-129). Completeness is enforced BOTH WAYS on
-every run (an emulator-tier script with no row is UNREGISTERED, a row whose
-script is gone is DEAD), with the same transitive classifier
-`run_all_static.sh` uses, so a gate cannot fall between the two runners.
-
-**Why it exists, measured at the 14z-127 close and re-derived by the runner
-itself: 164 emulator-tier gates, 32 reachable from any runner, 132 reachable
-only by typing a filename.** That was survivable while the tier was a
-development instrument; it stopped being survivable when the maintainer ruled
-that at release ALL tests run and *"anything red, anything skipped is a hard
-fail"* (STATE "RELEASE-TIME TEST SCOPE"). A policy of "all tests" cannot
-operate over a set nobody enumerates.
-
-**`scope` is the release decision and the CLASSIFICATION IS RULED
-(maintainer, 2026-09-03) — 141 release, 23 out** at the ruling (145 / 28 at 14z-157): `release` = the gate's subject is the
-released artifact, legacy content inside it included (an oracle leg on `vsav2`
-or pristine `vsavj` is a REFERENCE, not the subject); `out` = out of release
-scope, and every `out` row leads with its reason keyword — `romset:`,
-`platform:`, `momentary:` or `dev-ladder:`. **`out` never means "do not run":**
-`--scope all` runs them, and the sweep is how they are kept honest. **And `out`
-means NEITHER "resolved" NOR "quietly green"** (both affirmed by the maintainer
-at the ruling): `audit_hitclass_map_cost` is `out` AND is one of the two dead
-must-fire controls, and two `out` rows are red right now with exact diagnoses.
-
-**`ondemand` is the third scope (maintainer-ruled 2026-10-09, 14z-196: *"let's
-make it purely ondemand scope and document how this ondemand scope can be
-run"*).** A row is `ondemand` when its subject is PRISTINE content only —
-`vsavj`, `vsav2` from `$ROMDIR`, no Vampire Saved build on any leg — so no
-change of ours can move its verdict. No tier selects it: not the static tier,
-not the close, not `--freeze`, not the release run (`--scope all` skips it).
-It runs only when named: `--scope ondemand`, alone or with `--only '<glob>'`,
-and every other flag works as for any run. Its reason keyword is `pristine:`
-(`tests/test_emulator_runner.sh` §6a holds both rules, control
-`ondemand-in-all`), and the staleness audit never judges an `ondemand` row
-(`tests/test_emulator_staleness.sh` §2d2, control `ondemand-judged`). **The
-exception, in the maintainer's words:** *"The only potential exception I can
-imagine of pristine-only gates that shouldn't be ondemand scope are for cases
-that are known to have been broken in the past (e.g. maybe we made a change
-for a VS2 tenant that affected vsavj characters: that would qualify for being
-at least on release)"* — such a gate stays `release`. Which rows are
-`ondemand` is the registry's to say (`awk -F'\t' '$3=="ondemand"'
-tests/ci_emulator.tsv`), not this page's. The ruling of record is
-DECISIONS_HISTORY.md "Ruled 2026-10-09 (14z-196) — #118's gates and every
-pristine-only gate move to an ONDEMAND scope".
-
-**`cadence` is a DIFFERENT question from scope — what moving thing the gate
-FOLLOWS** (ruled 2026-09-03). `romset` (158 rows at the ruling, 168 at 14z-157) = runs at every freeze and
-every release. `bitstream` (6 rows at the ruling, 5 at 14z-157, all MiSTer) = its subject is the core, which
-moves on its own cadence — the `.rbf` has not moved since 14z-108 while the
-romset moved many times — so it runs at every RELEASE and at a freeze ONLY when
-the freeze targets MiSTer. **`--freeze` (= `--cadence romset`) drops them and
-NAMES them**, so the "should this freeze include them?" question is asked by the
-runner instead of remembered. `test_mister_sdram_census` and
-`test_mister_gfxc_fetch` are deliberate exceptions: they measure where THIS
-ROMSET lands in SDRAM, so they follow the romset. Only a `mister` row may be
-`bitstream`, enforced, so the concept cannot spread by column edit.
-
-**A row's optional 7th column is the gate's OWN timeout in seconds (14z-134)**,
-overriding `--timeout` (default 90 min): the M16 release run killed two
-3-hour Verilator gates at the one-size cap while their notes said "~93 min a
-leg" in prose. Set it from a MEASURED runtime × MORE THAN 2, rounded up to the hour (the HEADROOM rule: a row at half its cap FAILS `test_emulator_staleness`; × ~1.5 until 14z-185). **And the MiSTer lane is
-PARALLEL by scratch clone**: `--jobs N` hands slot 0 the base `JTSIM_SCRATCH`
-and slot N `<base>-slotN` (provisioned at the pin on first use, ~3 min for the
-Verilator build); the three two-leg gates run their legs at once on
-`<scratch>` and `<scratch>-b` (`MISTER_LEGS=serial` for one clone). One
-simulation is one core and ~100 MB; the lane that took ~11 h serial fits in
-~3 h at four jobs. Ground truth: `test_emulator_runner.sh` §13.
-
-**The `prereq` lane runs first, sequentially, and a red there STOPS the run.**
-Those gates measure the INSTRUMENTS, and a measurement taken after a moved
-instrument is not evidence ([CPE-24] — `test_mame_parity.sh` is the case that
-named the rule). `--keep-going` overrides.
-
-**`args` defaults to `-`, the gate's OWN defaults, deliberately.** What a
-release run would actually hit is what the sweep must measure — a path-named
-default is a dated assertion with no expiry ([VSP-95]). A row is given explicit
-arguments only once a triage has established what the gate should measure, and
-the `%MERGED% %MERGED_RP% %DON% %HUI% %PYR% %STOCK%` placeholders expand to the
-build set under test (env-overridable; the run prints each build's FINGERPRINT,
-never just its name).
-
-Ground truth for this runner: `tests/test_emulator_runner.sh` (ROM-free, in
-`ci_portable`) — the three verdicts counted separately, SKIP-in-prose,
-MISSING, TIMEOUT, both anti-orphan directions, `--strict`, the prereq stop,
-scope selection, lane accumulation and placeholder expansion.
+*(Moved 2026-10-14, #282 item B: THE EMULATOR-TIER COMMAND — what it costs, and the registry's columns (scope, ondemand, cadence, timeout, prereq, args) → `docs/project/operations.md`.)*
 
 ### **[VSP-165]** WHERE A FROZEN EXPECTATION'S NUMBERS CAME FROM (since 14z-128)
 
@@ -582,28 +435,7 @@ well as the old build names. The gotcha is
 `docs/project/gotchas.md` [VSP-185]; the fingerprint half is caught by
 `tests/test_superseded_pins.sh` since 14z-185b (#167).
 
-**TWO REGISTRY ROWS ARE NOT BUILDS** (14z-97, GitHub #96; RATIFIED by the
-maintainer 2026-09-15): the M2 battery's two legs, the stock twin
-(`donovan-mN-stock`) and the stage-4 image (`donovan-mN-stage4`) — today
-`donovan-m24-stock` (`67fdc4de`, MOVED by the 14z-183 M20 freeze) and
-`donovan-m23-stage4` (`2fa7c2f1`, UNCHANGED since the 14z-170 M19 freeze,
-which moved both — the `donovan-m19-*` pair, `e86e1d04` / `108f7523`, had
-carried unchanged by rebuild through the 14z-132, 14z-143 and 14z-144
-freezes). They are
-registered so the battery can dispatch on the fingerprint instead of a pinned
-set name — an unregistered image there means the pipeline no longer reproduces
-the current freeze, which is the rule-6 signal the maintainer's ruling asks
-for. Neither is playtested, neither is a shipping artifact, neither is tagged;
-each freeze rebuilds both and records whether they MOVED (superseded rows stay
-in the TSV as history, annotated). Until 14z-157 this paragraph named the m9
-rows as current and called the practice unratified in effect; the ruling is
-`DECISIONS_HISTORY.md` "Ruled 2026-09-15 (14z-157)".
-Their expectation sets are BATTERY-SCOPED and say so in their own READMEs.
-
-**The registry is a TABLE; each row's narrative (what the freeze changed,
-how it was measured, what it superseded) is verbatim in `HANDOFF_HISTORY.md`
-"Build registry narratives" and in the matching `docs/project/patch_notes.md`
-entry and STATE close. Newest first; the top row is the CURRENT freeze.**
+*(Moved 2026-10-14, #282 item B: Build registry — the two rows that are not builds, and the table's narratives → `docs/project/operations.md`.)*
 
 | build (mark) | fingerprint(s) | dir · tag | what changed | detail |
 |---|---|---|---|---|
