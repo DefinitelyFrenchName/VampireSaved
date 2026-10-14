@@ -294,6 +294,7 @@ declares	test_lane_carry
 declares	test_latch_readers
 declares	test_launcher_newest
 declares	test_list_type_census
+declares	test_live_budget
 declares	test_m2_repoint
 declares	test_m2a_flavor_selector
 declares	test_m2a_flicker_gate

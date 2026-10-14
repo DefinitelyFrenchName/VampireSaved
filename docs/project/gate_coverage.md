@@ -13,12 +13,12 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**459 of 459 gates described.**
+**460 of 460 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
 | [runner](#runner) | 44 | 44 | the suite runners and their own ground truth |
-| [docs](#docs) | 25 | 25 | the documentation locks — docs, skills, indexes, tables follow the tree |
+| [docs](#docs) | 26 | 26 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 48 | 48 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
@@ -386,7 +386,7 @@ the suite runners and their own ground truth. 44 of 44 described.
 
 ## docs
 
-the documentation locks — docs, skills, indexes, tables follow the tree. 25 of 25 described.
+the documentation locks — docs, skills, indexes, tables follow the tree. 26 of 26 described.
 
 ### `test_annotations_current.sh` — test, ci_portable
 
@@ -523,6 +523,14 @@ the documentation locks — docs, skills, indexes, tables follow the tree. 25 of
 **HOW:** tools/gen_history_index.py --check over the tree (~2 s); controls on a copy of the archives append an entry, hand-edit the block, and add an unconfigured archive.
 
 **EXPECTS:** the tree passes; each perturbed copy fails --check and the failure names what moved.
+
+### `test_live_budget.sh` — test, ci_portable
+
+**WHAT:** CLAUDE.md, STATE.md, HANDOFF.md and docs/NEXT_SESSION.md each exist, have at most 500 lines and at most 50,000 bytes; a document above 200 lines is printed as a WARN (the aim), not failed. The numbers live in one place, tools/check_live_budget.py (tools/check_state_lists.py takes STATE.md's byte cap from there).
+
+**HOW:** tools/check_live_budget.py over the tree; controls on a copy of the four documents push one past each limit.
+
+**EXPECTS:** the tree passes; each perturbed copy fails and the failure names the document and the limit it broke.
 
 ### `test_md_subset.sh` — test, ci_portable
 

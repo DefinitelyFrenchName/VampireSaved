@@ -3,7 +3,7 @@
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` (then `python3 tools/gen_history_index.py`
 > regenerates its index, #282) — this file holds ONLY
-> the live orientation. Session state, not knowledge: facts belong in the docs,
+> the live orientation, within 500 lines and 50,000 bytes (`tests/test_live_budget.sh`, #282). Session state, not knowledge: facts belong in the docs,
 > status in STATE.md.
 
 ## THE SETUP, RESTATED

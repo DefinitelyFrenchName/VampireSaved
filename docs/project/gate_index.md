@@ -16,12 +16,12 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**459 scripts** — 131 ci_portable, 92 ci_static, 236 emulator-tier (run by name).
+**460 scripts** — 132 ci_portable, 92 ci_static, 236 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
 | [runner](#runner) | 44 | the suite runners and their own ground truth |
-| [docs](#docs) | 25 | the documentation locks — docs, skills, indexes, tables follow the tree |
+| [docs](#docs) | 26 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 48 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
@@ -105,6 +105,7 @@ the documentation locks — docs, skills, indexes, tables follow the tree.
 | `tests/test_gate_index_current.sh` | test | ci_portable | — | docs/project/gate_index.md FOLLOWS the tree (14z-123, the documentation rationalization pass, G6). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-123 |
 | `tests/test_gotchas_index_current.sh` | test | ci_portable | — | docs/GOTCHAS.md FOLLOWS the three bucket files (14z-122, the documentation rationalization pass). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-122 |
 | `tests/test_history_index.sh` | test | ci_portable | — | every archive opens with a CURRENT generated index (GitHub #282 item E, 14z-201). ci_portable: no ROM, no build dir, no emulator, ~2 s. | 14z-201 |
+| `tests/test_live_budget.sh` | test | ci_portable | — | the four live documents stay within their size budget (GitHub #282 item F, 14z-201). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-201 |
 | `tests/test_md_subset.sh` | test | ci_portable | — | the markdown SUBSET the corpus writes is parsed strictly, and every construct outside it FAILS (14z-140, living-docs slice L4). ci_portable: no ROM, no build dir, no emulator, ~3 s. | 14z-140 |
 | `tests/test_packet_check.sh` | test | ci_portable | — | THE PRE-PREPARE CHECK POINTS AT WHAT A SCRIPT CAN SEE BEFORE THE READERS ARE SPAWNED (tools/packet_check.py, run by `tools/rulecheck.py prepare`; #272, ruled 2026-10-12 (14z-199): | 2026-10-12 |
 | `tests/test_recurrence_alarm.sh` | test | ci_portable | — | A RULE-CHECKER FINDING THAT KEEPS COMING BACK IS A RED until a ticket owns its cause (tools/recurrence_alarm.py; #271, 14z-199: the rot rule "a recurring violation opens a ticket", adopted by the maintainer — "8. | 14z-199 |

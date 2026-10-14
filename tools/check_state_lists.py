@@ -9,13 +9,13 @@
 WHY THIS EXISTS (14z-154; maintainer-ruled 2026-09-14). STATE.md's open lists
 had filled with items marked closed IN PLACE — struck through, "DONE", "FIXED" —
 because STATE.md's own header prescribed that, the port skill repeated it, and
-nothing read the lists, the ~150 KB budget or the three-group rule. The
+nothing read the lists, the ~150 KB budget (since #282 item F: 50,000 bytes) or the three-group rule. The
 maintainer: the discipline must be "documented and enforced", not "just a
 mention somewhere that never sees any systematic action". The law is now
 CLAUDE.md [VSP-17] and [VSP-182]; this is the enforcement.
 
 WHAT IT CHECKS, each violation named by a stable KEY:
-  size          STATE.md is at most 150 KiB
+  size          STATE.md is at most MAX_BYTES bytes (tools/check_live_budget.py holds the number, #282 item F)
   groups        at most two session groups above `# STANDING SECTIONS` (the previous session and the one being
                 written; the close rolls all but its own — ruled 2026-10-14, #282 item A; three until then)
   structure     exactly one `# STANDING SECTIONS` heading in STATE.md
@@ -56,7 +56,8 @@ STATE = "STATE.md"
 HISTORY = "STATE_HISTORY.md"
 NEXT = "docs/NEXT_SESSION.md"
 DEBT = "tests/expected/state_open_lists_debt.txt"
-BUDGET_KIB = 150
+sys.path.insert(0, str(REPO / "tools"))
+from check_live_budget import MAX_BYTES   # the one copy of the live documents' byte cap (#282 item F)
 MAX_GROUPS = 2   # #282 item A, ruled 2026-10-14 (DECISIONS_HISTORY.md "Ruled 2026-10-14 (14z-201) — #282 item A")
 ALLOWED_SECTIONS = ["Standing rulings", "STANDING PRINCIPLE", "Decisions pending", "THE DEADNESS REGISTER"]
 TICKET_WORDS = re.compile(r"\b(bugs?|backlog|tickets?)\b", re.I)
@@ -154,9 +155,9 @@ def violations(root):
     s = s_text.splitlines()
     hdrs = headings(s)
 
-    kib = len(s_text.encode()) / 1024
-    if kib > BUDGET_KIB:
-        v["size"] = f"STATE.md is {kib:.1f} KiB, over the {BUDGET_KIB} KiB budget — roll the oldest group"
+    size = len(s_text.encode())
+    if size > MAX_BYTES:
+        v["size"] = f"STATE.md is {size:,} bytes, over the {MAX_BYTES:,}-byte budget — roll the oldest group"
     standing = [h for h in hdrs if h[0] == 1 and h[1].startswith("STANDING SECTIONS")]
     if len(standing) != 1:
         v["structure"] = f"STATE.md has {len(standing)} `# STANDING SECTIONS` headings, where exactly one is expected"

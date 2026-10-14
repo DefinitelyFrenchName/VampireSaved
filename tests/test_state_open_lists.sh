@@ -20,7 +20,7 @@
 # MUST-FIRE: perturbed-copy: closed-start-here — a DONE entry added to docs/NEXT_SESSION.md "START HERE" must fail as a start-here violation; this branch parsed ZERO entries from 2026-09-18 (when the section became a NUMBERED list and the parser knew only bullets) until 14z-172, and no control exercised it
 # MUST-FIRE: perturbed-copy: ticket-section — an "Open bugs" section added under the standing sections must fail (tickets are never listed in STATE)
 # MUST-FIRE: perturbed-copy: fourth-group — session group headings added above the standing sections must fail the group count
-# MUST-FIRE: perturbed-copy: over-budget — STATE.md padded past 150 KiB must fail the size budget
+# MUST-FIRE: perturbed-copy: over-budget — STATE.md padded past its byte budget (50,000 bytes, tools/check_live_budget.py) must fail the size budget
 # MUST-FIRE: perturbed-copy: unresolved-ledger-key — a ledger line naming a session with no record in STATE_HISTORY.md must fail
 # MUST-FIRE: perturbed-copy: unresolved-ledger-key-bold — the same in the ledger's SECOND line form, `- **KEY** (date) — …`, which the checker did not match until 14z-179 (four real lines went unchecked)
 #
@@ -106,7 +106,7 @@ PY
     closed-start-here)     EXPECT="start-here" ;;
     ticket-section)        EXPECT="Open bugs (synthetic" ;;
     fourth-group)          EXPECT="session groups above" ;;
-    over-budget)           EXPECT="KiB budget" ;;
+    over-budget)           EXPECT="byte budget — roll" ;;
     unresolved-ledger-key) EXPECT="ledger key 14z-999" ;;
     unresolved-ledger-key-bold) EXPECT="ledger key 14z-998" ;;
     esac

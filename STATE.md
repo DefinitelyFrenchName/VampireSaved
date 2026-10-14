@@ -35,8 +35,8 @@ How to work with it:
   archived `## Session` heading OLDER than the group)
   and add their one-line entries at the top of THE LEDGER there, composed from
   the group's own banner headers, then regenerate the archives' indexes
-  (`python3 tools/gen_history_index.py`; `tests/test_history_index.sh` fails a stale one, #282). If this file still exceeds ~150 KB, roll the
-  oldest kept group early. The standing sections never roll.
+  (`python3 tools/gen_history_index.py`; `tests/test_history_index.sh` fails a stale one, #282). If this file still exceeds its budget (500 lines, 50,000 bytes:
+  `tests/test_live_budget.sh`, #282 item F), roll the oldest kept group early. The standing sections never roll.
   **THEN RE-POINT WHAT CITED THE ROLLED GROUP (added 14z-173, after it bit):**
   a rollover silently breaks every `STATE.md § <section>` citation into the group
   it moved, and `tests/test_tickets.sh` is what notices — at 14z-173 it went red on
@@ -75,7 +75,7 @@ How to work with it:
   origin main`; anything red or skipped leaves the commits local and the
   close entry says so.
 
-## Session 14z-201 — **#282 filed and ordered; #269 measured and closed; #282 item E built.** A plain Opus 5.5 session on the #172 setup (transcript `979461fd`).
+## Session 14z-201 — **#282 filed and ordered; #269 measured and closed; #282 items E, A, B and F built.** A plain Opus 5.5 session on the #172 setup (transcript `979461fd`).
 
 | | |
 |---|---|
@@ -83,6 +83,9 @@ How to work with it:
 | **(1) #282 FILED, ITS SCOPE AND ORDER RULED** | The maintainer's ticket on the size of CLAUDE.md, STATE.md, HANDOFF.md and the close ritual, filed as #282 from a `measurer` census. Scope ruled: budgets of ideally 200 lines, at most 500, on the four live documents, bytes or width capped too; STATE.md keeps only the latest session in full; the archives get an index, not a budget (`DECISIONS_HISTORY.md` "Ruled 2026-10-14 (14z-201) — #282's scope"). Order ruled E, A, B, F, C, D ("— #282's order of work"). |
 | **(2) #269 MEASURED AND CLOSED `done`** | The last clause of its done-when, the miss rate on the new selection: the 14z-200 close tiers' carried gates traced on PILOT and checked for any read of a changed file — 0 of 56 and 0 of 80 — through five readers, each added after a rule-checker run found a read form the last one dropped (runs 2026-10-14-1073 to -1081, each resolved by work; 1072, 1074, 1076, 1078 and 1080 withdrawn unspawned; **1082 OK**). Report `build/agent201/t269/report.md` (local). The maintainer: *"Close done (Recommended)"*. The trace tool's split-line defect filed as #283, its other gaps added there; gotcha "A STRACE TRACE SCORED BY OPENED PATH MISSES FIVE READ FORMS". |
 | **(3) #282 ITEM E BUILT** | Every archive opens with a generated, line-exact index: `tools/gen_history_index.py`, gate `tests/test_history_index.sh` (three controls), `dfbf47bf`. |
+| **(4) #282 ITEM A BUILT** | Ruled *"At most 2"*, *"Now, as part of A"*, *"Defer to item C"* (`DECISIONS_HISTORY.md` "Ruled 2026-10-14 (14z-201) — #282 item A"): `tools/check_state_lists.py` allows two session groups; [VSP-17] and the port skill's copy amended; 14z-198 and 14z-199 rolled verbatim to STATE_HISTORY; the standing rulings cut to rule plus pointer (a `reader` found 4 drifts, restored). STATE.md 91,033 -> 39,554 bytes (112,327 at the opener). `2f962b42`. |
+| **(5) #282 ITEM B BUILT** | HANDOFF.md 1,811 -> 484 lines, 216,718 -> 46,130 bytes: its detail moved VERBATIM to the new `docs/project/operations.md`, `cps2_wide.md`, `release_format.md`, `mister_core.md` and `HANDOFF_HISTORY.md`, each moved heading leaving a stub; 12 ticket anchors re-pointed, the anchor census refrozen on the moved anchors only. `1da23b43`, `1c000561`. |
+| **(6) #282 ITEM F BUILT** | Ruled *"50kB sounds like a good targer"* (`DECISIONS_HISTORY.md` "Ruled 2026-10-15 (14z-201) — #282 item F"): `tools/check_live_budget.py` holds the one copy of the budget (500 lines, 50,000 bytes, WARN above 200 lines); gate `tests/test_live_budget.sh` (ci_portable; controls over-lines, long-lines, missing-document); `check_state_lists.py` takes STATE's cap from it (150 KiB -> 50,000 bytes). |
 
 ## Session 14z-200 — **The 14z-199 packet re-run; #274 built and closed; #269 built on the maintainer's "C first".** A plain Opus 5.5 session at effort High on the #172 setup (transcript `e4e310c7`).
 
@@ -102,6 +105,7 @@ How to work with it:
 
 One line per ruling that still constrains work: the rule and where its full entry lives. A line is deleted when its ruling stops constraining work (CLAUDE.md [VSP-17]). Shortened to the rule plus its pointer 2026-10-14 (#282 item A); the longer lines are in git history at `44a09f7f`.
 
+- **The live documents' budget (#282, 2026-10-14/15, 14z-201):** CLAUDE.md, STATE.md, HANDOFF.md and docs/NEXT_SESSION.md at most 500 lines and 50,000 bytes each, the aim 200 lines; the archives are indexed, not budgeted — `DECISIONS_HISTORY.md` "Ruled 2026-10-14 (14z-201) — #282's scope" and "Ruled 2026-10-15 (14z-201) — #282 item F"; gate `tests/test_live_budget.sh`.
 - **No swarm model at max effort, ever (2026-09-29, 14z-185);** the Sonnet 5.5 `xhigh` worker preference was dropped (14z-192) — `DECISIONS_HISTORY.md` 2026-09-29 and "Ruled 2026-10-05 (14z-192) — the opener's answers".
 - **The parity gates' per-frame level and RNG pins are their equalised input (2026-09-25, 14z-182):** they may write `RAM:$FF8116` and `RAM:$FF80D4` every frame on both legs; the rule-checker's Q3 reads that as a ruled premise — `DECISIONS_HISTORY.md` "Ruled 2026-09-25 (14z-182) — the parity gates' per-frame level and RNG pins".
 - **The opener's sweep survivor is killed before the push only on the maintainer's command (2026-09-25, 14z-182):** the close puts the no-adverse-effect evidence to the maintainer and waits — `DECISIONS_HISTORY.md` "Ruled 2026-09-25 (14z-182) — the opener's sweep survivor".
