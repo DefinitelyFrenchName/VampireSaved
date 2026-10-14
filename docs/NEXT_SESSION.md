@@ -33,7 +33,7 @@ whose controls the base did not execute, and carries the rest by name. A freeze 
    - Pre-registered in `build/agent199/t273/plan_replication.md`: two more readers per arm on the 15 that mattered and the 4 fixtures (76 pinned spawns, the same staged copies and prompts in `build/agent199/t273/stage/`), judged blind like `judge4/` beside a re-judging of the first readers' lines.
    - Write every check as a script whose output is an artifact BEFORE the rule-checker sees the report (`docs/project/gotchas.md` "A MEASUREMENT PUT TO THE RULE-CHECKER NEEDS EVERY CHECK'S OUTPUT SAVED" — paid again at 14z-200, twelve runs for one report).
    - Q1 of the checklist of record stays as it is until the maintainer rules on the replicated result.
-2. **#275 — the negative fixture fidelity-14z160** (the maintainer: look into it first). Its packet's gate carries the FREEZE gap the live gate has since fixed; whether its EXPECT OK stands is the maintainer's call, and #273's replication includes it.
+2. **#275 — the negative fixture fidelity-14z160** (the maintainer: *"Look into it first (Recommended)"*, `DECISIONS_HISTORY.md` "Ruled 2026-10-13 (14z-199) — #273: replicate before deciding; …"). Its packet's gate carries the FREEZE gap the live gate has since fixed; whether its EXPECT OK stands is the maintainer's call, and #273's replication includes it.
 3. **Then ask the maintainer for the order of work.** The open tickets, by their GitHub severity label:
    - high: #261 (`audit_effect_class_rows` section 4 checks a type-6 fallback inventory that was never frozen), #256 (the close's open-tickets check reads a cited ticket range as its two ends);
    - medium: #243, #257, #258, #259;
