@@ -6714,3 +6714,12 @@ So: #270 closes `done` with its measurement in the closing comment — no saving
 **The maintainer:** *"Merge instead (Recommended)"*.
 
 So: the rebase was undone (back to 948ca9ae) and origin/main merged with `--no-ff` (README.md only), so every commit the sitting's records cite is in the pushed history.
+
+## Ruled 2026-10-14 (14z-199) — the push rests on the Windows gate's ERIS run at a6dcc9a5
+
+**The question (AskUserQuestion), verbatim**, put at the 14z-199 close with ERIS unreachable: *"The push needs a green strict tier. Each close tier here reads PASS with one SKIP: test_release_launcher_bat, which runs only on Windows. It PASSed on ERIS at a6dcc9a5, with its control mode failing as it should. Since then, the only changes are docs, ticket and rule-checker records, and your README.md. The predictor marks the gate stale only because its text names README.md; by its code it reads release/<package>/README.md, not the root one. ERIS is unreachable now (SSH timeout). Once the final confirm tier on 352eeaa8 is green apart from that SKIP, push?"* — options "Push on the ERIS run at a6dcc9a5", "Wait for ERIS" and "Leave local for now".
+
+**The maintainer:** *"Push on the ERIS run at a6dcc9a5"*.
+
+So: the 14z-199 close pushes with the final confirm tier at 352eeaa8 PASS 203 SKIP 1 FAIL 0 (controls 383/383 honoured), its one SKIP the Windows-only `test_release_launcher_bat`, whose last run is the ERIS PASS at a6dcc9a5 (`build/agent199/bat/bat199.log`, its header naming the host and the archive's commit); the next session runs it on ERIS at the pushed commit.
+
