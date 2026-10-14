@@ -7068,7 +7068,7 @@ results", while its own resolution recorded it NOT GREEN) — both found by the 
 that commit, which settles the gate, not the word. **The rule:** report a strict tier as its tally (`PASS 203 SKIP 1
 FAIL 0`) and name where each SKIP was run instead and with what verdict; "green" only for a tier whose runner said so.
 
-## A COMMAND MOVED TO THE BACKGROUND AT ITS TIMEOUT IS STILL A JOB — read its output, or say it is superseded (paid: 14z-198, 14z-199, 14z-200)
+## A COMMAND MOVED TO THE BACKGROUND AT ITS TIMEOUT IS STILL A JOB — read its output, or say in writing why it no longer counts (paid: 14z-198, 14z-199, 14z-200)
 
 The Bash tool moves a command that passes its 120 s timeout into the background and goes on; the job keeps running
 and finishes later, and nothing makes the agent look at it. The procedure check counts each one under QP4

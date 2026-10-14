@@ -541,4 +541,4 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A PREPARE CHAINED AFTER AN EDIT PACKS WHATEVER THE EDIT LEFT — run 948 prepared on a stale claim (paid: 14z-199, GitHub #268)
 - A REBASE AT THE PUSH ORPHANS EVERY HASH THE SITTING CITES — merge a remote commit into a sitting that records its commits (paid: 14z-199)
 - A STRICT TIER WITH A SKIP IS NOT GREEN, EVEN WHEN THE SKIP PASSES ELSEWHERE — say the tally and where the SKIP passed (paid twice: 14z-199)
-- A COMMAND MOVED TO THE BACKGROUND AT ITS TIMEOUT IS STILL A JOB — read its output, or say it is superseded (paid: 14z-198, 14z-199, 14z-200)
+- A COMMAND MOVED TO THE BACKGROUND AT ITS TIMEOUT IS STILL A JOB — read its output, or say in writing why it no longer counts (paid: 14z-198, 14z-199, 14z-200)
