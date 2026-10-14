@@ -54,7 +54,10 @@ STOP:
   order, is to rely on exactly that).
 - **COMMANDS** are numbered so each figure can name its source. The worker runs them as written;
   a worker that improvises a better command has answered a different question, and says so under
-  STOP instead.
+  STOP instead. A command that may run past the Bash tool's 120 s default says so in the spec
+  ("run C2 with the Bash tool's timeout at 600000 ms"): otherwise the tool moves it to the
+  background, and the worker either polls for it with commands no spec named or stops with
+  nothing (two measurers polled, 14z-200: rule-checker runs 2026-10-14-1068 and -1071 QP5).
 - **RETURN** is one line per figure, `FIG <name> = <value> <- C<n>`, because a figure without its
   command cannot be re-derived and a figure QP3 cannot find in the worker's own tool results will be
   VIOLATED once QP3 is widened to workers (ruled 2026-09-23; not yet in the checklist). `NOT MEASURED` lines are how a worker says what it could not do without guessing.

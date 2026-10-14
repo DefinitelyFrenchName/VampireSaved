@@ -7084,7 +7084,8 @@ and finishes later, and nothing makes the agent look at it. The procedure check 
 14z-199: a grep moved to the background at its timeout (`bg13h00r0`) was replaced by a `git grep`, finished, and was
 never read; its result was superseded, but nothing said so (rule-checker run 2026-10-13-1015 QP4; finding (z) of
 14z-199). 14z-200: a `grep -r` over `build/` for carried gates went to the background the same way (task `bjxy36v7q`) while
-this entry was being written. **The rule:** when a command goes to the background,
+this entry was being written, and a wait for the 8e1e4bbc tier's tally (task `b89gkl713`) finished unread after
+the tally had been read by another command (the close's procedure check, rule-checker run 2026-10-14-1070 QP4). **The rule:** when a command goes to the background,
 either read its output when it finishes or say in the next message that it is superseded and by what; and give a
 search over `build/` (hundreds of MB of scratch) a narrower root or a `timeout` before it is started.
 
