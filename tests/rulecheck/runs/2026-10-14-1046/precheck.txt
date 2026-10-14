@@ -1,0 +1,4 @@
+  FLAG D-ABSOLUTE: The fresh trace found today's predictor missing reads before any narrowing  [build/agent200/t274/report.md]
+  FLAG D-ABSOLUTE: Causes (read from the code, then each fixed and held by a control):  [build/agent200/t274/report.md]
+  FLAG D-ABSOLUTE: - The R3 narrowing rests on the trace showing no read it would miss; a gate added later is scored only by the next trace (the gap that let the two missing ga...  [build/agent200/t274/report.md]
+packet_check: 3 flag(s): D-ABSOLUTE 3

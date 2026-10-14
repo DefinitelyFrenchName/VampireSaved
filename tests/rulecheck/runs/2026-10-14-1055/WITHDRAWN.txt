@@ -1,0 +1,1 @@
+WITHDRAWN 2026-10-14 (14z-200), never spawned: its pre-prepare flags showed the claim citing PILOT facts no artifact carried (Python 3.12's shutil importing _winapi, node 18 lacking deflate-raw, the snap Chromium failing under strace, xdelta3 3.0.11); those gate outputs and tool versions were captured as artifacts and the packet re-prepared as the next run.

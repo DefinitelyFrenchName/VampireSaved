@@ -1,0 +1,1 @@
+WITHDRAWN 2026-10-14 (14z-200), never spawned: its pre-prepare flags showed the report attributing 'a directory listing is not a read' to the trace tool's docstring, which says reads are judged by path only; reworded and re-prepared as the next run.

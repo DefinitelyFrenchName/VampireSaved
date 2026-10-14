@@ -1,0 +1,22 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent200/t274/report.md	4dfe144662cf2354f6b1a2f8c75090458caa1725
+build/agent200/t274/measure_return.txt	a9247fcaec72abd87801e590473617c809cc654f
+build/agent200/t274/spec_measure.md	b654dc7371a030b4082a8e471158555284514568
+build/agent200/t274/diff_static_confirm.txt	0c030ca8a7833d5058c951f2ff7cbcfdc5c95ec2
+build/agent200/t274/diff_trace_static_reads.txt	ff187e983178d44b56b1cf53dfbe2eb1ff8734e8
+build/agent200/t274/diff_test_static_confirm.txt	bf424de7fc141935e25c5ad69ffe7f296038cdfe
+build/agent200/t274/test_static_confirm.log	671e4e65ff737ba268a21a10bff80115943f81ad
+build/agent200/t274/modes.log	46659275da1a87f030c68efa34ca3256e28dcadd
+build/agent200/t274/backtest.out	caafec9d4242e79312723327f7e5f60f7a5b2a3d
+build/agent200/t274/pilot/base_tr2_summary.log	4b0235bbb43e6afebc21ecf88329ffc57f8bddd2
+build/agent200/t274/pilot/final_tr2.log	d6edd83c1c2454f41758b38a5c227185cfb53d74
+build/agent200/t274/pilot/tr2.log	0aa5d4932c986559e41aba95abd27fe43cd81b08
+build/agent200/t274/pilot/done.tsv	c77db584d4db084e386a974ae404b398554c5721
+build/agent200/t274/pilot/head.txt	96759ea203b01409a3795f7aa9d941c6a1d2d653
+build/agent200/t274/pilot/pilot_state.txt	15573e2bd599e0a93d811b8d24535106c3629dc0
+build/agent200/t274/entropy_head.log	3f0f9bd68c5838e0908d9c19c489a51e10456d56
+build/agent200/t274/applier_head.log	70b1dbff9717763299566a58706daea66ed11b57
+build/agent200/t274/bench.sh	2e61ab993413f4600a9619ccc25d924efd55e306
+STATE.md.lines-119-120 (lines 119-120 of STATE.md)	f1a6e5161815a4d1d6929b3e632f073442a45eaf
+STATE_HISTORY.md.lines-363-363 (lines 363-363 of STATE_HISTORY.md)	16f460c19a63c8a300c8ecd6525b3ea04634ef5b
+build/agent199/close/tier_352eeaa8_confirm.log	f8a24280c8d5b14dea713d224d41c49eaaa817e0

@@ -1,0 +1,66 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: #274: land the narrowed --confirm predictor (a4c246f7..24c548fe, N-C fixed after the #269 C-first re-trace) and close #274
+Claim (the working agent's sentence): Recommendation: land #274 as the five local commits a4c246f7..24c548fe — a4c246f7 (the narrowed --confirm predictor: R4 in list form, the sibling closure, R3c, N-C, N-D; the scorer's N-D clause; six controls in test_static_confirm and scratch-unscored in test_trace_static_reads, whose mode exit now lets a dead control read LIES), 8e1e4bbc (N-C fixed: R3 also reads a directory named as a shell default or assignment value; control shdef-off, which fires in test_static_confirm at HEAD, 19 fired 0 dead, and exits 1 as a mode, measure_return11.txt), and three gate fixes found on the way (23987296 and 24c548fe: test_escape_triage and test_jtcores_twin compare in byte order; 5884128a: a gotcha header test_docshape read as session-shaped) — and close #274 on build/agent200/t274/report.md. On the full 222-gate trace (PILOT, 6e329411, scratch present) today's predictor misses 15,017 reads in 2 gates and the landing predictor (static_confirm.py 6120360f) misses 0, its over-narrowed control 59 in 6 gates; on the #269 "C first" re-traces of the nine gates the first trace could not score (node, Chromium, xdelta3, the community workbook present), the predictor as first committed (8474887b) misses 9 reads in test_applier_vcdiff on both (tr3, tr4) and the pre-#274 one 0 on both, while the landing one is scored on tr4 only, 0; on the 14z-199 change set the landing predictor marks 154 of 222 stale and carries 68 in 524 s (against 1,789 s for HEAD's, measured earlier beside its twin); the strict tier on a snapshot of 8e1e4bbc reads PASS 203, SKIP 1, FAIL 0 with 391 of 391 executed controls honoured, the confirm tier on 24c548fe PASS 203, SKIP 1, FAIL 0, and the SKIP (test_release_launcher_bat) passes on ERIS at 24c548fe. Every figure is a FIG line of build/agent200/t274/measure_return.txt through measure_return11.txt (the PILOT tool versions and gate-output lines in measure_return10.txt). NOT TESTED: whether a directory LISTING changes a gate's verdict (the trace sees reads by path only, so N-D keeps every whole-tree reader stale on scratch); four gates still not clean under the trace on PILOT — test_applier_page section 3b (Python 3.12's shutil imports _winapi under a faked Windows platform; this Mac runs 3.9), test_applier_page_browser (its control's browser run does not finish under strace), test_release_roundtrip (PILOT's xdelta3 3.0.11 makes patches with verbatim reference-ROM runs, which the gate refuses) and test_emulator_staleness (red on PILOT's own emulator ledger) — so their reads may be short of a passing run's; the traces ran on PILOT (Linux) while the predictor decides on this Mac; on the second nine-gate trace (tr4) the fixed predictor's over-narrowed control misses nothing, so the discriminating comparison there is the unfixed predictor's 9 misses against 0; the 524 s benchmark ran beside a strict tier, so its time is not comparable to the earlier 403 s; the confirm tier on 24c548fe chose its 99 carried gates with the predictor under test (the strict tier on 8e1e4bbc, one commit earlier, re-ran every gate); a gate added after a trace is scored only by the next one, and test_static_confirm.sh and test_trace_static_reads.sh, which this change edits, were traced only in their 6e329411 form on the full trace and not at all on tr4, so their edited forms' reads are not traced (test_escape_triage.sh and test_jtcores_twin.sh were re-traced in their fixed form on tr4); what the 13 newly carried gates' executed controls cost; a quieter session's change set.
+Artifacts (read every one, in full):
+  - build/agent200/t274/report.md
+  - build/agent200/t274/measure_return.txt
+  - build/agent200/t274/spec_measure.md
+  - build/agent200/t274/diff_static_confirm.txt
+  - build/agent200/t274/diff_trace_static_reads.txt
+  - build/agent200/t274/diff_test_static_confirm.txt
+  - build/agent200/t274/diff_test_trace_static_reads.txt
+  - build/agent200/t274/test_static_confirm.log
+  - build/agent200/t274/measure_return2.txt
+  - build/agent200/t274/spec_measure2.md
+  - build/agent200/t274/backtest_code.txt
+  - build/agent200/t274/pilot/base_tr2_summary.log
+  - build/agent200/t274/pilot/final_tr2.log
+  - build/agent200/t274/pilot/tr2.log
+  - build/agent200/t274/pilot/done.tsv
+  - build/agent200/t274/pilot/head.txt
+  - build/agent200/t274/pilot/pilot_state.txt
+  - build/agent200/t274/entropy_head.log
+  - build/agent200/t274/applier_head.log
+  - build/agent200/t274/bench.sh
+  - build/agent200/t274/bench2.sh
+  - build/agent200/t274/measure_return3.txt
+  - build/agent200/t274/spec_measure3.md
+  - build/agent200/t274/measure_return4.txt
+  - build/agent200/t274/spec_measure4.md
+  - build/agent200/t274/measure_return5.txt
+  - build/agent200/t274/spec_measure5.md
+  - build/agent200/t274/measure_return6.txt
+  - build/agent200/t274/spec_measure6.md
+  - build/agent200/t274/pilot/score_cand.sh
+  - build/agent200/t274/pilot/scorer_identity.txt
+  - build/agent200/t274/measure_return7.txt
+  - build/agent200/t274/spec_measure7.md
+  - build/agent200/t274/dead_mode_check.sh
+  - build/agent200/t274/diff_269_on_274.txt
+  - build/agent200/t274/measure_return8.txt
+  - build/agent200/t274/spec_measure8.md
+  - build/agent200/t274/measure_return9.txt
+  - build/agent200/t274/spec_measure9.md
+  - build/agent200/trace3/trace9.log
+  - build/agent200/trace3/trace9b.log
+  - build/agent200/trace3/old_predictors_on_tr3_tr4.log
+  - build/agent200/trace3/tr2_committed_score.log
+  - build/agent200/t274/bench2/final_fix.out
+  - build/agent200/trace3/trace9.sh
+  - build/agent200/t274/measure_return10.txt
+  - build/agent200/t274/spec_measure10.md
+  - build/agent200/t274/measure_return11.txt
+  - build/agent200/t274/spec_measure11.md
+  - build/agent200/trace3/pilot_versions.txt
+  - build/agent200/trace3/mac_versions.txt
+  - build/agent200/trace3/tr3_out/test_applier_page.out
+  - build/agent200/trace3/tr3_out/test_applier_page_browser.out
+  - build/agent200/trace3/tr4_out/test_applier_page.out
+  - build/agent200/trace3/tr4_out/test_applier_page_browser.out
+  - build/agent200/trace3/tr4_out/test_release_roundtrip.out
+  - build/agent200/trace3/tr4_out/test_emulator_staleness.out
+  - STATE.md.lines-119-120 (lines 119-120 of STATE.md)
+  - STATE_HISTORY.md.lines-363-363 (lines 363-363 of STATE_HISTORY.md)
+  - build/agent199/close/tier_352eeaa8_confirm.log

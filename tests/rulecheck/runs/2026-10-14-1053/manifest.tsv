@@ -1,0 +1,16 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent200/t269/report.md	24d71d8bca9aaf4be6bdbea81a2a805d77f3da8d
+build/agent200/t269/measure_return.txt	9da0ff5da3aa2a891570babed411b17241001abf
+build/agent200/t269/spec_measure.md	83b56d51660a72d4628dc38195c05ea04f45b416
+build/agent200/t269/diff_static_confirm_vs_274.txt	a22b1145d4bbf3f95a3808d5de1aae8f68f43fa8
+build/agent200/t269/diff_run_all_static.txt	834407ac8bde276e99371460575d2a64a10db79e
+build/agent200/t269/diff_test_static_runner.txt	b56e72c4f9b2f69931a1f84e68647b25f40248c0
+build/agent200/t269/diff_core_gates.txt	ab0cdc98740ec3d399466e4f076dbc94faac84a6
+build/agent200/t269/diff_docs.txt	86d9407ffd535f8287bda948f6f1093df8e22a19
+build/agent200/t269/plan_real.tsv	b9e59f9938d9181d676fae00f26ba799c284be6c
+build/agent200/t269/plan_real.time	41042380c53e228970c3de26330a845df56f381d
+build/agent200/t269/measure_return2.txt	7e8072d5f8395e4472fd43c0ae4ba66819172ecc
+build/agent200/t269/spec_measure2.md	b072e3b8f2b9162a8745cad9565a156387b49a84
+build/agent200/t269/measure_return3.txt	7142f35327a456832d96e565fe9d2c07b362dc55
+build/agent200/t269/spec_measure3.md	fa032477df410d0aa8ca84bf1a634522295f2fe0
+build/agent199/t269/report.md	4e4ef8027cdfdaac13d2fa20cc7522beec2cba89

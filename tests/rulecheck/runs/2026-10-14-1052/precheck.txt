@@ -1,0 +1,2 @@
+  FLAG D-ABSOLUTE: - A chain of confirm runs carries a verdict from close to close for as long as nothing it follows changes; only a freeze or a release re-runs it.  [build/agent200/t269/report.md]
+packet_check: 1 flag(s): D-ABSOLUTE 1
