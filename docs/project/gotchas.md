@@ -6802,7 +6802,7 @@ this close" was applied to #260 too, from the option's description, until run 81
 named, and read two files in full where its spec allowed their header comments only (816 QP5), two measurers added lines their specs had excluded — a "(note: …)" line and an unrequested FIG line (816 QP5) —
 and a rule-checker reader read two cited logs from their middle lines only (819 QP5; #258). The rule above holds;
 add one: a ruling binds exactly what the maintainer's own words name.
-PAID AGAIN 14z-199 (the close's procedure check, rule-checker runs 2026-10-13-1015, -1019 and -1026; lettered as 14z-199 finding (y) in 14z-200, after the documentation packet's run 2026-10-14-1031 found it unlettered). The order the agent stated for the C1-C4 proposals — "put whatever you pick through it before it's built" — was not kept: #268 and #271 were built first and rule-checked only as builds (1015 QP1). "17 of 50 packets dispatched so far, all spawns checked as verbatim" was said when only the first 14 and one slot had been checked (1019 QP2). "The original 46 runs and today's runs record the same reader" was said when only the 46 originals had been read (1026 QP2). "The flagged absolutes all hold against the artifacts" rested on a grep of the flags cut to 170 characters, with no flag checked against an artifact (1026 QP2). Each held or was conceded and measured later, and none reached a tracked file as said. A strict tier called green on its one SKIP is the same lapse at a close, with its own entry (14z-199 finding (w)).
+PAID AGAIN 14z-199 (the close's procedure check, rule-checker runs 2026-10-13-1015, -1019 and -1026; lettered as 14z-199 finding (y) in 14z-200, after the documentation packet's run 2026-10-14-1031 found it unlettered). The order the agent stated for the C1-C4 proposals — "put whatever you pick through it before it's built" — was not kept: #268 and #271 were built first and rule-checked only as builds (1015 QP1). "17 of 50 packets dispatched so far, all spawns checked as verbatim" was said when only the first 14 and one slot had been checked (1019 QP2). "The original 46 runs and today's runs record the same reader" was said when only the 46 originals had been read (1026 QP2). "The flagged absolutes all hold against the artifacts" rested on a grep of the flags cut to 170 characters, with no flag checked against an artifact (1026 QP2). And "Getting it through the rule-checker took 14 rounds" was told to the maintainer for 13 spawned runs (1027 QP3; corrected by run 1004 in every carrier). Each held or was conceded and measured later, and none reached a tracked file as said. A strict tier called green on its one SKIP is the same lapse at a close, with its own entry (14z-199 finding (w)).
 THE CHECK'S OWN EXTRACT HAS A GAP (found at the same close, run 819's reader): a maintainer message sent mid-turn can
 reach the transcript as a `queue-operation` enqueue plus an `attachment` record, with no user record, and
 `tools/agent/extract.py` draws no M line for that form — the maintainer's "Congratulations, identical Phobos confirmed"
@@ -7067,3 +7067,16 @@ results", while its own resolution recorded it NOT GREEN) — both found by the 
 2026-10-13-1016 and -1028). The one SKIP, `test_release_launcher_bat`, is Windows-only; at the close it passed on ERIS at
 that commit, which settles the gate, not the word. **The rule:** report a strict tier as its tally (`PASS 203 SKIP 1
 FAIL 0`) and name where each SKIP was run instead and with what verdict; "green" only for a tier whose runner said so.
+
+## A COMMAND MOVED TO THE BACKGROUND AT ITS TIMEOUT IS STILL A JOB — read its output, or say it is superseded (paid: 14z-198, 14z-199, 14z-200)
+
+The Bash tool moves a command that passes its 120 s timeout into the background and goes on; the job keeps running
+and finishes later, and nothing makes the agent look at it. The procedure check counts each one under QP4
+(ACCOUNTED). 14z-198: a background poll, `bo0xl5qfn`, finished unread (the close's procedure check, part 1).
+14z-199: a grep moved to the background at its timeout (`bg13h00r0`) was replaced by a `git grep`, finished, and was
+never read; its result was superseded, but nothing said so (rule-checker run 2026-10-13-1015 QP4; finding (z) of
+14z-199). 14z-200: a `grep -r` over `build/` for carried gates went to the background the same way (task `bjxy36v7q`) while
+this entry was being written. **The rule:** when a command goes to the background,
+either read its output when it finishes or say in the next message that it is superseded and by what; and give a
+search over `build/` (hundreds of MB of scratch) a narrower root or a `timeout` before it is started.
+
