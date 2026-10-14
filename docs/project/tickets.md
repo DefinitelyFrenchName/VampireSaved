@@ -11,12 +11,13 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**281 tickets** — status: open 24 · parked 9 · done 220 · declined 10 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 197 · cosmetic 16 · evolution 68 · **backfill debt: 0 rows**.
+**282 tickets** — status: open 25 · parked 9 · done 220 · declined 10 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 197 · cosmetic 16 · evolution 69 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#282](https://github.com/DefinitelyFrenchName/VampireSaved/issues/282) | evolution | open | The session documents and the close ritual are too large to follow: shrink, index and streamline them | none | none | none | none | - |
 | [#281](https://github.com/DefinitelyFrenchName/VampireSaved/issues/281) | bug | open | Release-only: test_applier_page_browser's control run does not finish under strace | `tests/test_applier_page_browser.sh` · `tools/trace_static_reads.py` | `DECISIONS_HISTORY.md § Ruled 2026-10-14 (14z-200) — #274 closes done; four release-only tickets filed; the close is run` | none | none | 14z-200 |
 | [#280](https://github.com/DefinitelyFrenchName/VampireSaved/issues/280) | bug | open | Release-only: test_applier_page section 3b fails on Python 3.12 (a faked win32 makes shutil import _winapi) | `tests/test_applier_page.sh` | `DECISIONS_HISTORY.md § Ruled 2026-10-14 (14z-200) — #274 closes done; four release-only tickets filed; the close is run` | none | none | 14z-200 |
 | [#279](https://github.com/DefinitelyFrenchName/VampireSaved/issues/279) | bug | open | Release-only: release patches built with xdelta3 3.0.11 (PILOT's apt) carry verbatim reference-ROM runs | `tests/test_release_roundtrip.sh` | `DECISIONS_HISTORY.md § Ruled 2026-10-14 (14z-200) — #274 closes done; four release-only tickets filed; the close is run` | none | none | 14z-200 |

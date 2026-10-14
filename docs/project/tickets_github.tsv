@@ -2,8 +2,9 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 281
+# issues: 282
 number	state	reason	closed	labels	title
+282	OPEN	-	-	evolution	The session documents and the close ritual are too large to follow: shrink, index and streamline them
 281	OPEN	-	-	bug	Release-only: test_applier_page_browser's control run does not finish under strace
 280	OPEN	-	-	bug	Release-only: test_applier_page section 3b fails on Python 3.12 (a faked win32 makes shutil import _winapi)
 279	OPEN	-	-	bug	Release-only: release patches built with xdelta3 3.0.11 (PILOT's apt) carry verbatim reference-ROM runs
