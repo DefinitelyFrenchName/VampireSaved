@@ -114,7 +114,7 @@ reads `(controls RED: …)`. Its ground truth
 is `tests/test_static_runner.sh` sections 11-13. **WHEN (maintainer-ruled
 2026-09-14):** a mid-session commit runs `--exec-controls none` plus
 `CONTROL=<name> tests/<gate>.sh` for every declared control of a gate the
-commit adds or changes; the session close runs the default `all`. The
+commit adds or changes; the session close ran the default `all` until #269 (below). The
 condition, the cost and the revisit clause: `DECISIONS_HISTORY.md` "Ruled
 2026-09-14 (14z-154)". **Since #269 (14z-200; ruled 2026-10-12, the tier
 turned around)** the session close runs `--strict --confirm <the previous

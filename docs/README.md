@@ -165,6 +165,7 @@ history twins and are listed last. Level-0 files are the entry points above.
 - [`porting_code_regions.md`](project/porting_code_regions.md) — **REFERENCE** · how to root a block of vs2/vh2 CODE so it still works after we move it: bounds, pc-relative data tables, branch escapes, and crypt placement
 - [`porting_sprite_lists.md`](project/porting_sprite_lists.md) — **REFERENCE** · what a tenant port must do so ported effects DRAW: the class row, the missing list type, the per-game code bias, and which gfx bank the art comes f…
 - [`operations.md`](project/operations.md) — **REFERENCE** · OPERATIONS — the tool catalogue ("What exists"), the native-leg recipe and the method sections, moved verbatim out of HANDOFF.md (#282 item B, 14z-201)
+- [`session_close.md`](project/session_close.md) — **REFERENCE** · THE SESSION CLOSE — the one copy of the ritual: its step table, in order, which `tools/close.py` runs (#282 item C, 14z-201)
 - [`release_format.md`](project/release_format.md) — **REFERENCE** · the release format (ruled 2026-08-28): one release, one SELF-SUFFICIENT directory per platform (`fbneo/`, `mame/`, `mister/`), the patch set copied…
 - [`tenant_manifest.md`](project/tenant_manifest.md) — **REFERENCE** · Per-tenant manifests — proposed schema · history: `project/tenant_manifest_history.md`
 - [`tickets.md`](project/tickets.md) — **GENERATED** · The ticket index (GENERATED) · generated (do not edit)

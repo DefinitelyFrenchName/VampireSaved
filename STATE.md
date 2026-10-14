@@ -34,53 +34,12 @@ How to work with it:
     anchors and stay; the register keeps its withdrawn rows by [VSP-23].
   `tests/test_state_open_lists.sh` enforces it, with the size budget and the
   group count below.
-- **ROLLOVER RULE (part of the session-close ritual)**: after writing the
-  close entry, move every session group but the newest (this sitting's own) to the TOP of
-  STATE_HISTORY.md's body in newest-first order (below THE LEDGER, above the first
-  archived `## Session` heading OLDER than the group)
-  and add their one-line entries at the top of THE LEDGER there, composed from
-  the group's own banner headers, then regenerate the archives' indexes
-  (`python3 tools/gen_history_index.py`; `tests/test_history_index.sh` fails a stale one, #282). If this file still exceeds its budget (500 lines, 50,000 bytes:
-  `tests/test_live_budget.sh`, #282 item F), roll the oldest kept group early. The standing sections never roll.
-  **THEN RE-POINT WHAT CITED THE ROLLED GROUP (added 14z-173, after it bit):**
-  a rollover silently breaks every `STATE.md § <section>` citation into the group
-  it moved, and `tests/test_tickets.sh` is what notices — at 14z-173 it went red on
-  #167's `decided` link anchoring "THE CLOSE TIER", which had just left STATE.md for
-  the archive. After moving a group, re-point those citations to
-  `STATE_HISTORY.md § <section>` (the convention 20 rows already use) and regenerate
-  the page with `python3 tools/tickets.py page`. The sweep is one command:
-  `python3 -c "..."` over `docs/project/tickets.tsv` comparing every `STATE.md §`
-  anchor against STATE.md's current text — do it for ALL rows, not just the one the
-  gate stops at.
-- **THE CLOSE CHECKLIST (ruled 2026-09-18, 14z-167b; `DECISIONS_HISTORY.md` "Ruled 2026-09-18 (14z-167b)")**, after the close entry
-  and before the tier: (1) a FINDINGS TABLE — every finding of the group, its live home and the test that
-  reproduces it, APPENDED AS EACH FINDING IS PAID (`tools/findings_add.py`, #206 closed 14z-191), so the close reviews it rather than reconstructing it; (2) `python3 tools/close_findings.py <session>` — every GAP homed, every REVIEW answered
-  by a home or an open item — and, since 14z-181, `python3 tools/homes_tracked.py "(N) THE FINDINGS TABLE"`
-  (every file the table names as a home or test is tracked; exit 0) and `python3 tools/retraction_grep.py
-  tests/rulecheck/retractions/<key>.tsv` (the sitting's retracted wordings, its reach controls found) (never by reclassifying the finding), every PROMISE fulfilled or made an open
-  item; its clean result is never cited as completeness; (3) a pointer on every earlier row the sitting
-  resolves; (4) the promises (the tool's PROMISES section); (5) scratch scripts whose figures a document
-  or STATE row quotes are promoted into `tools/` or `tests/` — ON TRIAL: record how many and how many
-  were promoted; (6) the DOCUMENTATION PACKET through the rule-checker (`recommendation`, the table as
-  the claim), its verdict resolved like any run — a finding that is only a figure, a quote or a wording on an item the
-  close's checks cover is fixed and re-checked by a FULL close-checks run, then resolved with `resolve --recheck`, no
-  new packet run for it (#270, `docs/project/rule_checker.md` [VSP-184]).
-- **THE CLOSE LOOP'S OWN COST (maintainer-ruled 2026-09-29, 14z-185b, #187/#188 "D + E + F now"; `DECISIONS_HISTORY.md` "Ruled 2026-09-29 (14z-185b) — #187/#188: D + E + F now, carry-forward by route A"):** (E) a close's checks run through `tools/close_checks.py` from a checks TSV under `build/` (rendered since 14z-189 from the standing set `tests/close_standing_checks.tsv` by `tools/close_standing.py render`, #204; the packet's claim by `close_standing.py claim`, #207): a fix is iterated with `--only <check>` (plus its plant and the figure check), and a rule-checker `prepare` cites a FULL run whose `status` exits 0; (F) a count a close states never includes `tests/rulecheck/runs/` (each `record` adds a 6-file run directory): exclude it, or read the count at `prepare` and say so; (D) doc edits are batched BEFORE a confirmation tier and no heavy job runs beside a tier; the browser-driving gate runs last in its tier (`# ORDER: last`, read by `tests/run_all_static.sh`).
-- **THE LAST STEP OF THE CLOSE IS THE PUSH (maintainer-ruled 2026-09-10):**
-  static tier strict green — since #269 (14z-200) a session close runs `--strict --confirm` on the previous close's run of record (every gate it re-runs has its controls executed; the rest are carried and named; HANDOFF "How to test"), a freeze or release every gate WITH every control executed (the default `all`) — the doc checks green, **the process
-  sweep CLEAN** (C0.3, #172 slice S2, since 2026-09-23: `python3 tools/agent/sweep.py`
-  run AFTER the tier, which spawns processes of its own, exits 0 — every survivor
-  killed leaves first, as its hint lists them, or declared in writing with
-  `--declare PID "REASON"` and named in the close entry), **the procedure check (C1, #172
-  slice S3, since 2026-09-23) passed or resolved** — `tools/agent/extract.py` over the session's
-  transcript, a `procedure` run of `tools/rulecheck.py` on it, every VIOLATED question answered by
-  `resolve`, and — ruled 2026-09-24 (14z-179, *"Standing step"*) — `python3 tools/agent/transcript_gaps.py --subagents <session> --cap` exit 0
-  (every worker at most Opus-class, none fallen back); BOUND to the push by `tools/agent/hooks/pre_push.py` since 14z-176b, which refuses a
-  push of this repository until such a run covers a commit in the pushed range — nothing pending -> `git push
-  origin main`; anything red or skipped leaves the commits local and the
-  close entry says so.
+- **THE SESSION CLOSE — ROLLOVER, CHECKLIST, TIER, SWEEP, PROCEDURE CHECK, PUSH — is `docs/project/session_close.md`**
+  (#282 item C, ruled 2026-10-15): its step table is the one copy, in order, and `python3 tools/close.py` runs it.
+  The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
+  moved there on 2026-10-15.
 
-## Session 14z-201 — **#282 filed and ordered; #269 measured and closed; #282 items E, A, B and F built.** A plain Opus 5.5 session on the #172 setup (transcript `979461fd`).
+## Session 14z-201 — **#282 filed and ordered; #269 measured and closed; #282 items E, A, B, F and C built.** A plain Opus 5.5 session on the #172 setup (transcript `979461fd`).
 
 ### opened with
 the maintainer: *"read handoff.md, state.md and docs/next_session.md"*; `python3 tools/agent/sweep.py` CLEAN; `main`
@@ -123,7 +82,20 @@ Ruled *"50kB sounds like a good targer"* (`DECISIONS_HISTORY.md` "Ruled 2026-10-
 `tests/test_live_budget.sh` (ci_portable; controls over-lines, long-lines, missing-document); `check_state_lists.py`
 takes STATE's cap from it (150 KiB -> 50,000 bytes).
 
-### (7) THE FINDINGS TABLE
+### (7) #282 ITEM C BUILT: THE CLOSE IS ONE TABLE, ITS DRIVER, AND THE FINDINGS TSV
+A `reader` census at `de82c957` found the close ritual in 58 places across 30 files, none of them the whole procedure,
+8 sets disagreeing. Ruled *"Doc + driver (Recommended)"* and *"Sections, findings TSV (Recommended)"*
+(`DECISIONS_HISTORY.md` "Ruled 2026-10-15 (14z-201) — #282 item C"). `docs/project/session_close.md` holds the close as
+one 20-step table, the 8 disagreements settled there from the rulings, and STATE's four close paragraphs moved there;
+`tools/close.py` reads that table and runs it (`start`, `next`, `done`, `status`), gate `tests/test_session_close.sh`
+(four controls). Every live place that restated the close now points to it, CLAUDE.md [VSP-17]'s rollover sentence
+among them. The findings table became `docs/project/findings/<key>.tsv`, read through `tools/findings_table.py` by
+every close tool; this group's rows became these sections. A driver trial on `build/agent201/close_trial` (local)
+ran `indexes` and `live-docs` green and stopped RED at `inputs`, naming the four close-time files; it found that a
+step calling the driver again could not find a run directory outside the default, fixed by `CLOSE_RUN`.
+`a47e7fe4` (the TSV part).
+
+### (8) THE FINDINGS TABLE
 `docs/project/findings/14z-201.tsv` — every finding, its live home, the test that reproduces it (checklist step 1).
 
 ## Session 14z-200 — **The 14z-199 packet re-run; #274 built and closed; #269 built on the maintainer's "C first".** A plain Opus 5.5 session at effort High on the #172 setup (transcript `e4e310c7`).
@@ -166,7 +138,7 @@ One line per ruling that still constrains work: the rule and where its full entr
 - **The tenants' defense rows become vs2's (2026-09-18, 14z-168)** — `DECISIONS_HISTORY.md` "Ruled 2026-09-18 (14z-168) — the tenants' DEFENSE rows become vs2's".
 - **The column shock and the Plasma Trap take vs2's class-0x52 rule (2026-09-18, 14z-168)** — `DECISIONS_HISTORY.md` "Ruled 2026-09-18 (14z-168) — the column shock and the Plasma Trap".
 - **No gauge is built during Dark Force (2026-09-18, 14z-168)** — `DECISIONS_HISTORY.md` "Ruled 2026-09-18 (14z-168) — no gauge is built during Dark Force".
-- **The close checklist, six steps (2026-09-18, 14z-167b)** — the steps live in this file's header; `DECISIONS_HISTORY.md` "Ruled 2026-09-18 (14z-167b)".
+- **The close checklist, six steps (2026-09-18, 14z-167b)** — the steps live in `docs/project/session_close.md` (since 2026-10-15, #282 item C); `DECISIONS_HISTORY.md` "Ruled 2026-09-18 (14z-167b)".
 - **#136 goes over again by the 14z-164 census (2026-09-17):** per-event verdicts with stock, meter fraction and P2's HP, every "in DF" event asserted in DF, a same-data P2, the 13 rows re-labelled — `DECISIONS_HISTORY.md` "Ruled 2026-09-17 (14z-164)".
 - **The rule-checker's Q3 and Q4 are BOUNDED, and a VIOLATED is resolved question by question in writing (2026-09-17, 14z-163)** — `DECISIONS_HISTORY.md` "Ruled 2026-09-17 (14z-163) — the rule-checker's questions".
 - **#136 is gone over again IN FULL, not only through its faithfulness control (2026-09-16)** — `DECISIONS_HISTORY.md` "Ruled 2026-09-16 (14z-160)".

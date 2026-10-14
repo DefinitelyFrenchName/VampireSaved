@@ -19,11 +19,9 @@ Say so at the opener. Never spawn any agent at `max`. A recommendation leans onl
 **Before any long job, check whether PILOT (`ssh pilot`) or ERIS (`ssh eris`) is idle, and run independent work
 there in parallel.** A long tier runs on a snapshot (`tests/run_on_snapshot.sh`), so the tree can be edited meanwhile.
 
-**THE SESSION CLOSE CHANGED (14z-200):** a session close runs `ROMDIR=... tests/run_all_static.sh --strict
---confirm <the previous close's results.tsv>` (HANDOFF "How to test"). It re-runs the gates whose followed paths
-changed, the `# CONFIRM: always` core (`test_commit_subject`, `test_close_tools`, `test_rule_checker`) and any gate
-whose controls the base did not execute, and carries the rest by name. A freeze and a release still run everything;
-`--confirm` is refused there. The 14z-200 close's run of record is named in STATE 14z-200's CLOSE row.
+**THE SESSION CLOSE IS ONE TABLE (#282 item C, 2026-10-15):** `docs/project/session_close.md` holds every step in
+order and `python3 tools/close.py` runs it (`start`, then `next`). The tier step is `--strict --confirm` on the
+previous close's results; the 14z-200 close's run of record is named in STATE 14z-200's CLOSE row.
 
 ## START HERE
 

@@ -16,12 +16,12 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**460 scripts** — 132 ci_portable, 92 ci_static, 236 emulator-tier (run by name).
+**461 scripts** — 133 ci_portable, 92 ci_static, 236 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
 | [runner](#runner) | 44 | the suite runners and their own ground truth |
-| [docs](#docs) | 26 | the documentation locks — docs, skills, indexes, tables follow the tree |
+| [docs](#docs) | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 48 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
@@ -110,6 +110,7 @@ the documentation locks — docs, skills, indexes, tables follow the tree.
 | `tests/test_packet_check.sh` | test | ci_portable | — | THE PRE-PREPARE CHECK POINTS AT WHAT A SCRIPT CAN SEE BEFORE THE READERS ARE SPAWNED (tools/packet_check.py, run by `tools/rulecheck.py prepare`; #272, ruled 2026-10-12 (14z-199): | 2026-10-12 |
 | `tests/test_recurrence_alarm.sh` | test | ci_portable | — | A RULE-CHECKER FINDING THAT KEEPS COMING BACK IS A RED until a ticket owns its cause (tools/recurrence_alarm.py; #271, 14z-199: the rot rule "a recurring violation opens a ticket", adopted by the maintainer — "8. | 14z-199 |
 | `tests/test_retraction_reach.sh` | test | ci_portable | — | EVERY SITTING'S RETRACTION GREP STILL REACHES THE TREE: every tests/rulecheck/retractions/*.tsv judged on ONE scan of the live tree (tools/retraction_grep.py --each). ci_portable: no ROM, no emulator, ~30 s; | 14z-199 |
+| `tests/test_session_close.sh` | test | ci_portable | — | the session close has ONE copy, a step table its driver runs (GitHub #282 item C, 14z-201). ci_portable: no ROM, no build dir, no emulator, ~2 s. | 14z-201 |
 | `tests/test_skill_guides.sh` | test | ci_portable | — | the level-0 skills' GUIDE.md files are CURRENT against SKILL.md and the docs they quote (14z-134). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-134 |
 | `tests/test_state_open_lists.sh` | test | ci_portable | — | AN OPEN LIST HOLDS ONLY WHAT IS OPEN: STATE.md's open lists, its size budget and session-group count, NEXT_SESSION's START HERE, and THE LEDGER's keys (14z-154; maintainer-ruled 2026-09-14, CLAUDE.md [VSP-17]). ci_portable: | 14z-154 |
 | `tests/test_tables_current.sh` | test | ci_static | ROMDIR | the community-facing behavioral tables (docs/project/tables/{donovan,huitzil,pyron}.md, CLAUDE.md §2 rule 5) are GENERATED from the CURRENT builds' extracts and must match what is committed. ci_static: | 14z-118 |

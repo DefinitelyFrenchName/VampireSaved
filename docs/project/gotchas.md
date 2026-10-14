@@ -98,7 +98,7 @@ findings table was still mostly written at the close (8 letters in the commits b
 #206, its test the 14z-190 close (ANSWERED below).
 **ANSWERED, 14z-190 (#206, closed `done` 14z-191, the maintainer: *"Close #206"*).** The table is appended as
 each finding is paid, with `tools/findings_add.py` (one finding per call, in the table's form; its self-test in
-`tests/test_close_standing.sh`), and the close's step 1 reviews it (STATE.md's header). Its test, the 14z-190
+`tests/test_close_standing.sh`), and the close's step 1 reviews it (`docs/project/session_close.md`). Its test, the 14z-190
 close: the table held (a)-(h) before the close began and gained (i) during it, when a result arrived; its
 documentation packet took 4 rule-checker runs, 3 VIOLATED (2026-10-04-661 to -664), against 6/4, 7/6, 8/7 and
 12/11 at the four closes before, and none of the four runs found a finding missing from the table.

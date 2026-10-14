@@ -240,8 +240,8 @@ legacy behavior is a failed change.
   (maintainer-approved), amended 2026-09-14 and 2026-10-14 (#282: *"At most 2"*): STATE.md
   holds the latest session group — two while a sitting writes its own — and the standing sections; `STATE_HISTORY.md` holds every
   older session record VERBATIM, under THE LEDGER (one line per archived
-  session) at its head.** The rollover procedure lives in STATE.md's own
-  header and is part of the session-close ritual. "STATE 14z-XX" references
+  session) at its head.** The rollover procedure is a step of the session
+  close, whose one copy is `docs/project/session_close.md` (#282 item C, 2026-10-15). "STATE 14z-XX" references
   resolve in STATE.md first, then STATE_HISTORY.md — section names are
   preserved in the archive, and archived entries are never rewritten
   (corrections to them are marked in place).

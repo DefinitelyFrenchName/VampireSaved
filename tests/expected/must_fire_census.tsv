@@ -229,6 +229,7 @@ declares	test_run_record
 declares	test_same_data_p2
 declares	test_scratch_census
 declares	test_select_arrays
+declares	test_session_close
 declares	test_session_metrics
 declares	test_shadow_tenant
 declares	test_shell_portability

@@ -382,3 +382,7 @@ test_history_index
 # 14z-201 (#282 item F): the four live documents within 500 lines and 50,000 bytes (WARN above 200 lines,
 # tools/check_live_budget.py); three controls. ~1 s.
 test_live_budget
+#
+# 14z-201 (#282 item C): the session close's one step table (docs/project/session_close.md) parses, names only real
+# tools and known placeholders, the live documents point to it, and its driver tools/close.py is self-tested; four controls. ~2 s.
+test_session_close
