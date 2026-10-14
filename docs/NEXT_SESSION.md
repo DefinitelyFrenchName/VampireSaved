@@ -19,7 +19,7 @@ Say so at the opener. Never spawn any agent at `max`. A recommendation leans onl
 **Before any long job, check whether PILOT (`ssh pilot`) or ERIS (`ssh eris`) is idle, and run independent work
 there in parallel.** A long tier runs on a snapshot (`tests/run_on_snapshot.sh`), so the tree can be edited meanwhile.
 
-**THE SESSION CLOSE CHANGED (#269, 14z-200):** a session close runs `ROMDIR=... tests/run_all_static.sh --strict
+**THE SESSION CLOSE CHANGED (14z-200):** a session close runs `ROMDIR=... tests/run_all_static.sh --strict
 --confirm <the previous close's results.tsv>` (HANDOFF "How to test"). It re-runs the gates whose followed paths
 changed, the `# CONFIRM: always` core (`test_commit_subject`, `test_close_tools`, `test_rule_checker`) and any gate
 whose controls the base did not execute, and carries the rest by name. A freeze and a release still run everything;
@@ -37,7 +37,7 @@ whose controls the base did not execute, and carries the rest by name. A freeze 
    - high: #261 (`audit_effect_class_rows` section 4 checks a type-6 fallback inventory that was never frozen), #256 (the close's open-tickets check reads a cited ticket range as its two ends);
    - medium: #243, #257, #258, #259;
    - low: #118, #129, #229, #244;
-   - no severity label: #260, #262, #263, #266, #267, #269, #273, #275, #276 (the session dashboard misses every tier run on a snapshot), #277 (the procedure check's extract: a figure written to fewer decimals reads unsourced; a part cut hides a step's evidence);
+   - no severity label: #260, #262, #263, #266, #267, #273, #275, #276 (the session dashboard misses every tier run on a snapshot), #277 (the procedure check's extract: a figure written to fewer decimals reads unsourced; a part cut hides a step's evidence);
    - **release-only** (maintainer, 2026-10-14 — worked at a release, not in a session): #278 (a census of locale-sorted compares), #279 (xdelta3 3.0.11 release patches carry verbatim reference-ROM runs; PILOT is the Linux release builder), #280 (`test_applier_page` 3b on Python 3.12), #281 (`test_applier_page_browser`'s control under strace).
 4. **#266 — PILOT's GNOME Shell segfaults under Wayland at every boot since 2026-10-09**, so `audit_release_linux_desktop` cannot run. At 14z-199 it was the one red/SKIP row of the release-cadence staleness audit (not re-read at 14z-200).
 5. **`tests/replays/118_chain.rpl`'s header names a leg of `audit_mizuumi_inputs` that gate never ran** (STATE_HISTORY 14z-198 finding (i)). The one-line correction stales the 76 emulator gates that follow `tests/replays/`, so make it in a session that runs those gates.

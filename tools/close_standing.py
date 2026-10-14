@@ -51,6 +51,7 @@ from contextlib import redirect_stdout
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
+from findings_table import read_state   # a TSV-backed findings section reads as its row (#282 item C)
 PERTURB = ""
 TEMPLATE = "tests/close_standing_checks.tsv"
 PLACE = ("KEY", "ROW", "RUN", "SESSDIR", "BASE", "TRANSCRIPT")
@@ -182,7 +183,7 @@ def ticket_status(path):
 
 def open_tickets(title, nxt, state, tickets):
     try:
-        nt, stt, st = open(nxt, encoding="utf-8").read(), open(state, encoding="utf-8").read(), ticket_status(tickets)
+        nt, stt, st = open(nxt, encoding="utf-8").read(), read_state(state), ticket_status(tickets)
     except OSError as e:
         print(f"missing input: {e}")
         return 2
@@ -221,7 +222,7 @@ def dup_entries(path, headings):
 
 
 def row_copy(title, copy, state, write=False):
-    row, why = newest_row(open(state, encoding="utf-8").read(), title)
+    row, why = newest_row(read_state(state), title)
     if row is None:
         print(f"row: {why}")
         return 2
@@ -247,14 +248,14 @@ def plant(kind, title, out, root="."):
     os.makedirs(out, exist_ok=True)
     try:
         if kind == "bare-none":
-            s = open(p("STATE.md"), encoding="utf-8").read()
+            s = read_state(p("STATE.md"), root)
             row, why = newest_row(s, title)
             if row is None:
                 die(f"plant bare-none: {why}", 3)
             new = row if PERTURB == "plant-is-live" else re.sub(r"\s*\|\s*$", "", row) + "; (z) PLANTED finding — `STATE.md` / none |"
             dst, body = "STATE_plant.md", s.replace(row, new, 1)
         elif kind == "row-stale":
-            row, why = newest_row(open(p("STATE.md"), encoding="utf-8").read(), title)
+            row, why = newest_row(read_state(p("STATE.md"), root), title)
             if row is None:
                 die(f"plant row-stale: {why}", 3)
             k = len(row) // 2

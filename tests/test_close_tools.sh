@@ -38,7 +38,8 @@
 #   (1c, since 14z-184) tools/close_findings.py --selftest: its planted-address, suffix-address (the
 #   second address a `/NN` suffix form names) and old-home-only controls all fire; (2c, since
 #   14z-188) tools/none_reasons.py --selftest: a findings row whose test is a bare `none` is caught,
-#   one that says why passes. NEVER write a
+#   one that says why passes; (2e, since 14z-201, #282 item C) tools/findings_table.py --selftest: a
+#   findings section naming a TSV reads as the one-line row the tools parse, a missing TSV as MISSING. NEVER write a
 #   self-test's planted address in this header: a gate header is a live home to that tool, and the
 #   plant would read homed (paid 14z-184: the suffix control read DEAD until the literal left).
 # HOW: the tools run in-process on the tree; the controls run the touched scan on a copy of a pattern
@@ -190,6 +191,14 @@ elif printf '%s\n' "$out" | grep -q '^SELFTEST FAIL'; then bad "$(printf '%s\n' 
 else echo "REFUSED: tools/none_reasons.py --selftest neither passed nor failed on its own line (exit $rc — a crash, not a verdict): $(printf '%s\n' "$out" | tail -1 | cut -c1-160)"; exit 3; fi
 fi
 
+if [ -z "${VS_CTL:-}" ]; then
+echo "== 2e. the findings TSV reader (tools/findings_table.py --selftest, #282 item C): a pointer section reads as its row"
+out="$(python3 tools/findings_table.py --selftest 2>&1)"; rc=$?
+if [ "$rc" -eq 0 ] && printf '%s\n' "$out" | grep -q '^SELFTEST PASS'; then ok "$(printf '%s\n' "$out" | tail -1)"
+elif printf '%s\n' "$out" | grep -q '^SELFTEST FAIL'; then bad "$(printf '%s\n' "$out" | grep 'FAIL' | head -1 | cut -c1-160)"
+else echo "REFUSED: tools/findings_table.py --selftest neither passed nor failed on its own line (exit $rc — a crash, not a verdict): $(printf '%s\n' "$out" | tail -1 | cut -c1-160)"; exit 3; fi
+fi
+
 unguard() {   # a copy of homes_tracked.py without the output-path guard (the control output-overwrites)
     python3 - tools/homes_tracked.py "$1" <<'PY'
 import sys
@@ -198,6 +207,7 @@ a = "        if pathlib.Path(o).resolve() == pathlib.Path(state).resolve() or os
 assert s.count(a) == 1, "the guard moved"
 open(sys.argv[2], "w").write(s.replace(a, "        if False:   # CONTROL output-overwrites"))
 PY
+    cp tools/findings_table.py "$(dirname "$1")/"   # the copy's sibling module (#282 item C)
 }
 if [ -z "${VS_CTL:-}" ]; then
 echo "== 2b. the NEWEST findings table row of STATE.md, on the live tree (the close's own output is a snapshot)"

@@ -61,12 +61,14 @@ import pathlib
 import re
 import subprocess
 import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from findings_table import read_state   # a TSV-backed findings section reads as its row (#282 item C)
 
 EXT = r"\.(md|py|sh|tsv|toml|txt|log|json|rpl)$"
 
 
 def find_row(state, prefix):
-    for line in pathlib.Path(state).read_text(encoding="utf-8").splitlines():
+    for line in read_state(state).splitlines():
         if prefix == "--newest":
             if re.match(r"\| \*\*\(\d+\) THE FINDINGS TABLE\*\*", line):
                 return line   # the first findings row in file order — the newest session group's

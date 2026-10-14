@@ -113,7 +113,7 @@ w(os.path.join(P, "ccccdddd-0000.jsonl"), [
 PY
 
 shadow() {  # shadow <control> — a copy of the collector with ONE perturbation, beside the real tools/agent
-    mkdir -p "$W/$1/tools"; cp "$TOOL" "$W/$1/tools/session_metrics.py"; ln -s "$REPO/tools/agent" "$W/$1/tools/agent"
+    mkdir -p "$W/$1/tools"; cp "$TOOL" "$W/$1/tools/session_metrics.py"; cp tools/findings_table.py "$W/$1/tools/"; ln -s "$REPO/tools/agent" "$W/$1/tools/agent"
     python3 - "$W/$1/tools/session_metrics.py" "$1" <<'PY'
 import sys; p, name = sys.argv[1:3]; s = open(p).read()
 edits = {

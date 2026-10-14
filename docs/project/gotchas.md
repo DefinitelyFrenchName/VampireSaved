@@ -7135,3 +7135,21 @@ then measured on the carried traces (all clean) by a scratch reader with its own
 (`build/agent201/t269/`, local). **The rule:** a trace's 0 holds only for the read forms its reader parses; before a
 score rests on it, list the forms the trace holds that the reader drops, and give each a reader and a control.
 #283 owns the tool's fix.
+
+## A RULING'S "SO" LINE STATES WHAT THE ANSWER DECIDES, NOTHING THE MAINTAINER DID NOT SAY (paid: 14z-201)
+
+A `DECISIONS_HISTORY.md` entry quotes the question and the maintainer's answer verbatim, then closes with a "So:" line.
+The 14z-201 entry on #282's order of work closed with a sentence of the session's own: *"Each item's design is put to
+the maintainer before it changes a live document where it has a choice in it"*. The maintainer had not said it. It
+was removed in `44bf30af`. `tools/agent/rulings_verbatim.py` checks every quote attributed to the maintainer, but not
+what the "So:" line adds around the quotes. **The rule:** the "So:" line restates the answer in the question's terms.
+Anything the session would add is a proposal, put to the maintainer separately.
+
+## `git add -u` STAGES NO NEW FILE — a commit that adds files names each one (paid: 14z-201)
+
+`git add -u` stages changes to tracked files only. Rule-checker runs 2026-10-14-1073, -1075 and -1077 were recorded
+in `tests/rulecheck/ledger.tsv`, a tracked file, but their run directories were new and not staged. A clean clone then
+held ledger rows with no runs, and the snapshot confirm tier at `dfbf47bf` failed `test_rule_checker` (fixed in
+`20c622c9`). The tree being worked in still had the directories, so nothing there showed it. **The rule:** stage
+`git add -u` plus every new path by name, and check `git status --short | grep '^??'` for the commit's own new files.
+`build/` stays out.

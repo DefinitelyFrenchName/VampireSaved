@@ -29,13 +29,15 @@ cited descriptive anchors ("the ugrep section", "The session column") that no li
 WHAT IT CANNOT SEE: whether the anchored paragraph STATES the finding (a hand read); a home given only as a ticket.
 """
 import os, re, sys, tempfile
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from findings_table import read_state   # a TSV-backed findings section reads as its row (#282 item C)
 
 PLANTED = "ZZ-NO-FILE-HOLDS-THIS-ANCHOR"
 PERTURB = ""
 LAST = {}   # the last check's counts: checked, not found, file-only (the self-test reads them)
 
 def row_of(title, state):
-    for line in open(state, encoding="utf-8"):
+    for line in read_state(state).splitlines(keepends=True):
         if line.startswith("| **" + title):
             return line
     sys.exit(f"no row starting with '| **{title}' in {state}")
@@ -84,7 +86,7 @@ def plant(title, state, out):
         if path:
             new = row.replace(f"`{path}` {anchor}", f"`{path}` {PLANTED}", 1)
             if new != row:
-                text = open(state, encoding="utf-8").read().replace(row, new, 1)
+                text = read_state(state).replace(row, new, 1)
                 os.makedirs(os.path.dirname(out) or ".", exist_ok=True)
                 open(out, "w", encoding="utf-8").write(text)
                 print(f"planted: finding ({letter}) anchor -> {PLANTED} in {out}")

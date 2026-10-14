@@ -10,6 +10,11 @@ How to work with it:
   in the archive. A reference to `STATE "Decisions pending"` for an entry no
   longer here resolves in `DECISIONS_HISTORY.md` (entries move there verbatim
   when ruled — since 2026-09-14; before that, once they stopped shaping work).
+- **A SESSION GROUP'S FORM (since 14z-201, #282 item C; `DECISIONS_HISTORY.md` "Ruled 2026-10-15 (14z-201) — #282 item C"):**
+  `## Session KEY — banner`, then `### opened with` and one `### (N) TITLE` section per piece of work, wrapped at
+  about 120 characters. The findings table is the section `### (N) THE FINDINGS TABLE`, naming
+  `docs/project/findings/<key>.tsv`, which `tools/findings_add.py` appends to (`--create` the first time) and
+  `tools/findings_table.py` reads. Groups archived before 14z-201 keep their one-line table rows.
 - **Claim-greps MUST include STATE_HISTORY.md** (the CLAUDE.md §5
   retraction-discipline command names it).
 - **AN OPEN LIST HOLDS ONLY WHAT IS OPEN (maintainer-ruled 2026-09-14).**
@@ -77,15 +82,49 @@ How to work with it:
 
 ## Session 14z-201 — **#282 filed and ordered; #269 measured and closed; #282 items E, A, B and F built.** A plain Opus 5.5 session on the #172 setup (transcript `979461fd`).
 
-| | |
-|---|---|
-| opened with | the maintainer: *"read handoff.md, state.md and docs/next_session.md"*; `python3 tools/agent/sweep.py` CLEAN; `main` even with `origin/main` after a fetch. |
-| **(1) #282 FILED, ITS SCOPE AND ORDER RULED** | The maintainer's ticket on the size of CLAUDE.md, STATE.md, HANDOFF.md and the close ritual, filed as #282 from a `measurer` census. Scope ruled: budgets of ideally 200 lines, at most 500, on the four live documents, bytes or width capped too; STATE.md keeps only the latest session in full; the archives get an index, not a budget (`DECISIONS_HISTORY.md` "Ruled 2026-10-14 (14z-201) — #282's scope"). Order ruled E, A, B, F, C, D ("— #282's order of work"). |
-| **(2) #269 MEASURED AND CLOSED `done`** | The last clause of its done-when, the miss rate on the new selection: the 14z-200 close tiers' carried gates traced on PILOT and checked for any read of a changed file — 0 of 56 and 0 of 80 — through five readers, each added after a rule-checker run found a read form the last one dropped (runs 2026-10-14-1073 to -1081, each resolved by work; 1072, 1074, 1076, 1078 and 1080 withdrawn unspawned; **1082 OK**). Report `build/agent201/t269/report.md` (local). The maintainer: *"Close done (Recommended)"*. The trace tool's split-line defect filed as #283, its other gaps added there; gotcha "A STRACE TRACE SCORED BY OPENED PATH MISSES FIVE READ FORMS". |
-| **(3) #282 ITEM E BUILT** | Every archive opens with a generated, line-exact index: `tools/gen_history_index.py`, gate `tests/test_history_index.sh` (three controls), `dfbf47bf`. |
-| **(4) #282 ITEM A BUILT** | Ruled *"At most 2"*, *"Now, as part of A"*, *"Defer to item C"* (`DECISIONS_HISTORY.md` "Ruled 2026-10-14 (14z-201) — #282 item A"): `tools/check_state_lists.py` allows two session groups; [VSP-17] and the port skill's copy amended; 14z-198 and 14z-199 rolled verbatim to STATE_HISTORY; the standing rulings cut to rule plus pointer (a `reader` found 4 drifts, restored). STATE.md 91,033 -> 39,554 bytes (112,327 at the opener). `2f962b42`. |
-| **(5) #282 ITEM B BUILT** | HANDOFF.md 1,811 -> 484 lines, 216,718 -> 46,130 bytes: its detail moved VERBATIM to the new `docs/project/operations.md`, `cps2_wide.md`, `release_format.md`, `mister_core.md` and `HANDOFF_HISTORY.md`, each moved heading leaving a stub; 12 ticket anchors re-pointed, the anchor census refrozen on the moved anchors only. `1da23b43`, `1c000561`. |
-| **(6) #282 ITEM F BUILT** | Ruled *"50kB sounds like a good targer"* (`DECISIONS_HISTORY.md` "Ruled 2026-10-15 (14z-201) — #282 item F"): `tools/check_live_budget.py` holds the one copy of the budget (500 lines, 50,000 bytes, WARN above 200 lines); gate `tests/test_live_budget.sh` (ci_portable; controls over-lines, long-lines, missing-document); `check_state_lists.py` takes STATE's cap from it (150 KiB -> 50,000 bytes). |
+### opened with
+the maintainer: *"read handoff.md, state.md and docs/next_session.md"*; `python3 tools/agent/sweep.py` CLEAN; `main`
+even with `origin/main` after a fetch.
+
+### (1) #282 FILED, ITS SCOPE AND ORDER RULED
+The maintainer's ticket on the size of CLAUDE.md, STATE.md, HANDOFF.md and the close ritual, filed as #282 from a
+`measurer` census. Scope ruled: budgets of ideally 200 lines, at most 500, on the four live documents, bytes or width
+capped too; STATE.md keeps only the latest session in full; the archives get an index, not a budget
+(`DECISIONS_HISTORY.md` "Ruled 2026-10-14 (14z-201) — #282's scope"). Order ruled E, A, B, F, C, D ("— #282's order of
+work").
+
+### (2) #269 MEASURED AND CLOSED `done`
+The last clause of its done-when, the miss rate on the new selection: the 14z-200 close tiers' carried gates traced on
+PILOT and checked for any read of a changed file — 0 of 56 and 0 of 80 — through five readers, each added after a
+rule-checker run found a read form the last one dropped (runs 2026-10-14-1073 to -1081, each resolved by work; 1072,
+1074, 1076, 1078 and 1080 withdrawn unspawned; **1082 OK**). Report `build/agent201/t269/report.md`
+(local). The maintainer: *"Close done (Recommended)"*. The trace tool's split-line defect filed as #283, its other gaps
+added there; gotcha "A STRACE TRACE SCORED BY OPENED PATH MISSES FIVE READ FORMS".
+
+### (3) #282 ITEM E BUILT
+Every archive opens with a generated, line-exact index: `tools/gen_history_index.py`, gate `tests/test_history_index.sh`
+(three controls), `dfbf47bf`.
+
+### (4) #282 ITEM A BUILT
+Ruled *"At most 2"*, *"Now, as part of A"*, *"Defer to item C"* (`DECISIONS_HISTORY.md` "Ruled 2026-10-14 (14z-201) —
+#282 item A"): `tools/check_state_lists.py` allows two session groups; [VSP-17] and the port skill's copy amended;
+14z-198 and 14z-199 rolled verbatim to STATE_HISTORY; the standing rulings cut to rule plus pointer (a `reader` found 4
+drifts, restored). STATE.md 91,033 -> 39,554 bytes (112,327 at the opener). `2f962b42`.
+
+### (5) #282 ITEM B BUILT
+HANDOFF.md 1,811 -> 484 lines, 216,718 -> 46,130 bytes: its detail moved VERBATIM to the new
+`docs/project/operations.md`, `cps2_wide.md`, `release_format.md`, `mister_core.md` and `HANDOFF_HISTORY.md`, each moved
+heading leaving a stub; 12 ticket anchors re-pointed, the anchor census refrozen on the moved anchors only. `1da23b43`,
+`1c000561`.
+
+### (6) #282 ITEM F BUILT
+Ruled *"50kB sounds like a good targer"* (`DECISIONS_HISTORY.md` "Ruled 2026-10-15 (14z-201) — #282 item F"):
+`tools/check_live_budget.py` holds the one copy of the budget (500 lines, 50,000 bytes, WARN above 200 lines); gate
+`tests/test_live_budget.sh` (ci_portable; controls over-lines, long-lines, missing-document); `check_state_lists.py`
+takes STATE's cap from it (150 KiB -> 50,000 bytes).
+
+### (7) THE FINDINGS TABLE
+`docs/project/findings/14z-201.tsv` — every finding, its live home, the test that reproduces it (checklist step 1).
 
 ## Session 14z-200 — **The 14z-199 packet re-run; #274 built and closed; #269 built on the maintainer's "C first".** A plain Opus 5.5 session at effort High on the #172 setup (transcript `e4e310c7`).
 

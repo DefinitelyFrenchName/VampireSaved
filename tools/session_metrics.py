@@ -51,6 +51,8 @@ from datetime import datetime, timezone
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "agent"))
+sys.path.insert(0, HERE)
+from findings_table import read_state   # a TSV-backed findings section reads as its row (#282 item C)
 from rulings_verbatim import own_words  # noqa: E402  the maintainer-message reader the close already trusts
 from transcript_gaps import subagents  # noqa: E402  the worker reader the close's --cap already trusts
 
@@ -130,7 +132,7 @@ def state_sections(repo):
         p = os.path.join(repo, name)
         if not os.path.exists(p):
             continue
-        lines = open(p, encoding="utf-8").read().split("\n")
+        lines = read_state(p, repo).split("\n")
         starts = [(i, re.match(r"## Session (14z-\d+[a-z]?)\b", l)) for i, l in enumerate(lines)]
         starts = [(i, m.group(1)) for i, m in starts if m]
         for j, (i, k) in enumerate(starts):

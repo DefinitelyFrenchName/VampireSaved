@@ -64,7 +64,7 @@ mkcopy() {  # mkcopy <root>
     mkdir -p "$1/docs/project" "$1/tests/expected" "$1/tools"
     cp tools/claim_lint.py "$1/tools/"   # prepare imports it beside itself (#185 item 3)
     cp tools/packet_check.py "$1/tools/"; cp -R tools/agent "$1/tools/agent"   # and the pre-prepare check (#272)
-    cp tools/close_checks.py tools/close_standing.py "$1/tools/"   # resolve --recheck runs a close render with them (#270)
+    cp tools/close_checks.py tools/close_standing.py tools/findings_table.py "$1/tools/"   # resolve --recheck runs a close render with them (#270; findings_table, #282 item C)
     _doc=docs/project/rule_checker.md; cp "$_doc" "$1"/docs/project/
     cp tests/expected/registry.tsv "$1/tests/expected/"
     cp -R tests/rulecheck "$1/tests/rulecheck"

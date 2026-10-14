@@ -19,8 +19,11 @@ whose text holds `/ none` requires `/ none (` — a parenthesised reason right a
 control `bare-none-accepted` of tests/test_close_tools.sh.
 """
 import hashlib
+import os
 import re
 import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from findings_table import read_state   # a TSV-backed findings section reads as its row (#282 item C)
 
 
 def newest_group(text):
@@ -77,7 +80,7 @@ def main(argv):
     if argv[:1] == ['--row']:
         title, argv = argv[1], argv[2:]
     path = argv[0] if argv else 'STATE.md'
-    code, lines = check(open(path, encoding='utf-8').read(), title)
+    code, lines = check(read_state(path), title)
     print('\n'.join(lines) + f'  ({path})')
     return code
 
