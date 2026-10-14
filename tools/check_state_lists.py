@@ -16,7 +16,8 @@ CLAUDE.md [VSP-17] and [VSP-182]; this is the enforcement.
 
 WHAT IT CHECKS, each violation named by a stable KEY:
   size          STATE.md is at most 150 KiB
-  groups        at most three session groups above `# STANDING SECTIONS`
+  groups        at most two session groups above `# STANDING SECTIONS` (the previous session and the one being
+                written; the close rolls all but its own — ruled 2026-10-14, #282 item A; three until then)
   structure     exactly one `# STANDING SECTIONS` heading in STATE.md
   section:<h>   a `## ` heading under the standing sections that is not one of
                 Standing rulings / STANDING PRINCIPLE / Decisions pending /
@@ -56,7 +57,7 @@ HISTORY = "STATE_HISTORY.md"
 NEXT = "docs/NEXT_SESSION.md"
 DEBT = "tests/expected/state_open_lists_debt.txt"
 BUDGET_KIB = 150
-MAX_GROUPS = 3
+MAX_GROUPS = 2   # #282 item A, ruled 2026-10-14 (DECISIONS_HISTORY.md "Ruled 2026-10-14 (14z-201) — #282 item A")
 ALLOWED_SECTIONS = ["Standing rulings", "STANDING PRINCIPLE", "Decisions pending", "THE DEADNESS REGISTER"]
 TICKET_WORDS = re.compile(r"\b(bugs?|backlog|tickets?)\b", re.I)
 MARKERS = ["DECIDED", "DONE", "FIXED", "CLOSED", "RESOLVED", "SETTLED", "RULED", "IMPLEMENTED",

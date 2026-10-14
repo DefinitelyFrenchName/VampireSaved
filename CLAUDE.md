@@ -237,8 +237,8 @@ legacy behavior is a failed change.
 - **[VSP-17]** Sessions begin by reading `STATE.md` (current milestone, open decisions,
   standing rulings) and end by updating it. STATE.md is the single source of
   truth for progress; do not rely on chat memory. **SPLIT 2026-08-20
-  (maintainer-approved), amended 2026-09-14: STATE.md holds the newest ~3
-  session groups and the standing sections; `STATE_HISTORY.md` holds every
+  (maintainer-approved), amended 2026-09-14 and 2026-10-14 (#282: *"At most 2"*): STATE.md
+  holds the latest session group — two while a sitting writes its own — and the standing sections; `STATE_HISTORY.md` holds every
   older session record VERBATIM, under THE LEDGER (one line per archived
   session) at its head.** The rollover procedure lives in STATE.md's own
   header and is part of the session-close ritual. "STATE 14z-XX" references
