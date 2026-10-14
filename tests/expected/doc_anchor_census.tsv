@@ -27,7 +27,7 @@ CPE-20	docs/platform/gotchas.md	Pre-seeded from the ROM-audit round (2026-07-25,
 CPE-21	docs/platform/gotchas.md	`git submodule add` stages the DEFAULT BRANCH, not the tag you check out	IN-LIST
 CPE-22	docs/platform/gotchas.md	MAME's build system cannot handle a SPACE anywhere in the source path	IN-LIST
 CPE-23	docs/platform/gotchas.md	MAME's OSD is a DIFFERENT ONE PER PLATFORM, and it is found ONLY through pkg-config	IN-LIST
-CPE-24	HANDOFF.md	MAME from source — the oracle follows the profile (B5, 2026-08-03)	IN-LIST
+CPE-24	docs/project/cps2_wide.md	From HANDOFF.md: «MAME from source — the oracle follows the profile»	IN-LIST
 CPE-25	docs/platform/gotchas.md	repo's working tree — and exits 0 (paid: 2026-08-03, B5)	IN-LIST
 CPE-26	docs/platform/gotchas.md	FBNeo fresh builds need `SKIPDEPEND=1` (paid: 2026-07-25)	IN-LIST
 CPE-27	docs/platform/gotchas.md	FBNeo shared EEPROM breaks run-to-run determinism (paid: 2026-07-25, ~45min)	IN-LIST
@@ -35,7 +35,7 @@ CPE-28	docs/platform/gotchas.md	still prints "(OK)"	IN-LIST
 CPE-29	docs/platform/gotchas.md	FBNeo's SDL frontend has NO `-rompath` — the flag is silently ignored	IN-LIST
 CPE-30	docs/platform/gotchas.md	is captured to the sandbox log	IN-LIST
 CPE-31	docs/platform/gotchas.md	SKIPPED applying the profile patch, never reverted it	IN-LIST
-CPE-32	HANDOFF.md	What exists (M0 bench, 2026-07-25)	IN-LIST
+CPE-32	docs/project/operations.md	From HANDOFF.md: «What exists» — the tool catalogue	IN-LIST
 CPE-33	docs/platform/gotchas.md	Cross-emulator replays: same inputs ≠ same content (paid: 2026-07-25, ~2h)	IN-LIST
 CPE-34	docs/platform/gotchas.md	FBNeo/MAME frame indices and object slots do not transfer — a slot-keyed tap chases a different obje	IN-LIST
 CPE-35	docs/platform/gotchas.md	The FBNeo gate never rendered a pixel — RAM checksums are blind to video	IN-LIST
@@ -44,7 +44,7 @@ CPE-37	docs/platform/gotchas.md	A state-dependent value may not be correlated AC
 CPE-38	docs/platform/gotchas.md	A canary must change exactly ONE thing, or it cannot answer anything	IN-LIST
 CPE-39	docs/platform/gotchas.md	A relocation test with no negative control proves nothing	IN-LIST
 CPE-40	HANDOFF.md	If it still will not start, in order	IN-LIST
-CPE-41	HANDOFF.md	Platform / migration notes (14z-59d)	IN-LIST
+CPE-41	docs/project/operations.md	Platform / migration notes (14z-59d)	IN-LIST
 CPE-42	docs/platform/gotchas.md	TWO BUILDS CAN SHARE A PROGRAM FINGERPRINT — the merged build and its legacy-only instrument do, del	IN-LIST
 CPH-1	docs/platform/gotchas.md	CPS-2 ROM file byte order is NOT 68k logical order (paid: 2026-07-25, ~1h)	IN-LIST
 CPH-2	docs/platform/gotchas.md	CPS-2 program zips store CODE encrypted — static byte reads of code are noise	IN-LIST
@@ -99,7 +99,7 @@ MFI-20	docs/platform/gotchas.md	Pre-seeded from the ROM-audit round (2026-07-25,
 MFI-21	docs/platform/gotchas.md	`git submodule add` stages the DEFAULT BRANCH, not the tag you check out	IN-LIST
 MFI-22	docs/platform/gotchas.md	MAME's build system cannot handle a SPACE anywhere in the source path	IN-LIST
 MFI-23	docs/platform/gotchas.md	MAME's OSD is a DIFFERENT ONE PER PLATFORM, and it is found ONLY through pkg-config	IN-LIST
-MFI-24	HANDOFF.md	MAME from source — the oracle follows the profile (B5, 2026-08-03)	IN-LIST
+MFI-24	docs/project/cps2_wide.md	From HANDOFF.md: «MAME from source — the oracle follows the profile»	IN-LIST
 MFI-25	docs/platform/gotchas.md	repo's working tree — and exits 0 (paid: 2026-08-03, B5)	IN-LIST
 MFI-26	docs/platform/gotchas.md	FBNeo fresh builds need `SKIPDEPEND=1` (paid: 2026-07-25)	IN-LIST
 MFI-27	docs/platform/gotchas.md	FBNeo shared EEPROM breaks run-to-run determinism (paid: 2026-07-25, ~45min)	IN-LIST
@@ -107,7 +107,7 @@ MFI-28	docs/platform/gotchas.md	still prints "(OK)"	IN-LIST
 MFI-29	docs/platform/gotchas.md	FBNeo's SDL frontend has NO `-rompath` — the flag is silently ignored	IN-LIST
 MFI-30	docs/platform/gotchas.md	is captured to the sandbox log	IN-LIST
 MFI-31	docs/platform/gotchas.md	SKIPPED applying the profile patch, never reverted it	IN-LIST
-MFI-32	HANDOFF.md	What exists (M0 bench, 2026-07-25)	IN-LIST
+MFI-32	docs/project/operations.md	From HANDOFF.md: «What exists» — the tool catalogue	IN-LIST
 MFI-33	docs/platform/gotchas.md	Cross-emulator replays: same inputs ≠ same content (paid: 2026-07-25, ~2h)	IN-LIST
 MFI-34	docs/platform/gotchas.md	FBNeo/MAME frame indices and object slots do not transfer — a slot-keyed tap chases a different obje	IN-LIST
 MFI-35	docs/platform/gotchas.md	The FBNeo gate never rendered a pixel — RAM checksums are blind to video	IN-LIST
@@ -116,7 +116,7 @@ MFI-37	docs/platform/gotchas.md	A state-dependent value may not be correlated AC
 MFI-38	docs/platform/gotchas.md	A canary must change exactly ONE thing, or it cannot answer anything	IN-LIST
 MFI-39	docs/platform/gotchas.md	A relocation test with no negative control proves nothing	IN-LIST
 MFI-40	HANDOFF.md	If it still will not start, in order	IN-LIST
-MFI-41	HANDOFF.md	Platform / migration notes (14z-59d)	IN-LIST
+MFI-41	docs/project/operations.md	Platform / migration notes (14z-59d)	IN-LIST
 MFI-42	docs/platform/gotchas.md	TWO BUILDS CAN SHARE A PROGRAM FINGERPRINT — the merged build and its legacy-only instrument do, del	IN-LIST
 MFI-43	docs/platform/gotchas.md	CPS-2 ROM file byte order is NOT 68k logical order (paid: 2026-07-25, ~1h)	IN-LIST
 MFI-44	docs/platform/gotchas.md	emulators resolve a ROM entry by HASH before NAME	IN-LIST
@@ -284,7 +284,7 @@ MSV-23	docs/platform/mister.md	The work-RAM oracle: `JTFRAME_SIM_WRAMDUMP` (meas
 MSV-24	docs/platform/mister.md	The work-RAM oracle: `JTFRAME_SIM_WRAMDUMP` (measured 14z-107)	IN-LIST
 MSV-25	docs/platform/mister.md	The tenant-content measurements: the tenant anchor, both group-C fetches, bank 1 under load, the QSo	IN-LIST
 MSV-26	docs/platform/mister.md	The tenant-content measurements: the tenant anchor, both group-C fetches, bank 1 under load, the QSo	IN-LIST
-MSV-27	HANDOFF.md	upstream's behaviour and `collect` also gathers <outdir>/frames	IN-LIST
+MSV-27	docs/project/mister_core.md	upstream's behaviour and `collect` also gathers <outdir>/frames	IN-LIST
 MSV-28	docs/project/gotchas.md	A REPLAY'S NAME IS A CLAIM ABOUT THE BUILD (paid: 2026-08-24, 14z-107)	IN-LIST
 MSV-29	docs/platform/mister.md	The tenant-content measurements: the tenant anchor, both group-C fetches, bank 1 under load, the QSo	IN-LIST
 MSV-30	docs/project/mister_core.md	9. How any of this is known to be true	IN-LIST
@@ -478,9 +478,9 @@ VSP-96	docs/project/build_dir_triage.md	BEFORE DELETING A BUILD DIR, GREP FOUR P
 VSP-97	docs/project/build_dir_triage.md	THE DEEPER FLAW THE SWEEP EXPOSED: "tracked" build dirs are only PARTLY tracked	IN-LIST
 VSP-98	docs/project/build_dir_triage.md	Recordings under `tests/inp/` and the cache (maintainer-ruled 14z-111)	IN-LIST
 VSP-99	docs/project/patch_index.md	patch_index — one-page registry of every patch	IN-LIST
-VSP-100	HANDOFF.md	RELEASE PACKAGING — `release/<name>/`, no ROM bytes (since 14z-105)	IN-LIST
+VSP-100	docs/project/release_format.md	From HANDOFF.md: «RELEASE PACKAGING»	IN-LIST
 VSP-101	HANDOFF.md	THE PRE-COMMIT COMMAND — run this, not a filename (since 14z-94, GitHub #30)	IN-LIST
-VSP-102	HANDOFF.md	THE REVIEW-TRIAGE GATES (14z-94, GitHub #74's index)	IN-LIST
+VSP-102	docs/project/operations.md	THE REVIEW-TRIAGE GATES (14z-94, GitHub #74's index)	IN-LIST
 VSP-103	docs/project/gotchas.md	A gate that is not in the battery can sit FAILING for sessions —	IN-LIST
 VSP-104	docs/project/gotchas.md	A self-test that drives a gate through DELIBERATE failures litters the gate's evidence directory (14	IN-LIST
 VSP-105	docs/project/gotchas.md	Pipe a build tool through tail and a crash packs STALE artifacts	IN-LIST
@@ -501,7 +501,7 @@ VSP-119	HANDOFF.md	Running a CPS-2 WIDE build (playtest)	IN-LIST
 VSP-120	docs/project/gotchas.md	2P forced-pick pokes must end by ~frame 1500 — later pokes leak	IN-LIST
 VSP-121	docs/project/gotchas.md	Forced-pick pokes do NOT populate the HUD index field — HUD	IN-LIST
 VSP-122	docs/project/gotchas.md	Forced-pick pokes hold through SELECT only — a vs-CPU P2 carries the CPU's REAL pick at match time (	IN-LIST
-VSP-123	HANDOFF.md	THE NATIVE LEG IS REACHABLE FOR ANY TENANT SCREEN (14z-69)	IN-LIST
+VSP-123	docs/project/operations.md	THE NATIVE LEG IS REACHABLE FOR ANY TENANT SCREEN (14z-69)	IN-LIST
 VSP-124	docs/project/gotchas.md	five traps from the #103 hunt — four are RIG grammar, one is a classifier lying by omission (paid: 1	IN-LIST
 VSP-125	docs/project/gotchas.md	the kill/heal POKE SHAPE trap from the #103 close (paid: 14z-98; the instrument-grammar half of this	IN-LIST
 VSP-126	docs/project/gotchas.md	The pushed group-0 exception PC is mid-instruction — probing it reads a clean zero (14z-81)	IN-LIST
@@ -528,12 +528,12 @@ VSP-146	docs/project/gotchas.md	A same-slot "vanilla control" controls nothing �
 VSP-147	docs/project/gotchas.md	The -debug write-trace and non-debug dumps can DISAGREE about one write (14z-100; RESOLVED 14z-101 —	IN-LIST
 VSP-148	docs/project/gotchas.md	capstone m68k mnemonics carry a SIZE SUFFIX — equality tests match	IN-LIST
 VSP-149	docs/project/gotchas.md	Half the Lua instruments stage inputs one frame off replay.lua — a frame number from one is not a fr	IN-LIST
-VSP-150	HANDOFF.md	THE OUT-OF-RANGE INDEX TOOLKIT — three instruments, one class (measured 14z-78)	IN-LIST
-VSP-151	HANDOFF.md	THE DF PALETTE-SEQ BLOCK CENSUS — measured, and it had to be (measured 14z-79b)	IN-LIST
+VSP-150	docs/project/operations.md	THE OUT-OF-RANGE INDEX TOOLKIT — three instruments, one class (measured 14z-78)	IN-LIST
+VSP-151	docs/project/operations.md	THE DF PALETTE-SEQ BLOCK CENSUS — measured, and it had to be (measured 14z-79b)	IN-LIST
 VSP-152	HANDOFF.md	The port pipeline — its tools, and the guarded-replay debug environment (M2a, 2026-07-25)	IN-LIST
 VSP-153	docs/project/gotchas.md	A symptom grouping is a HYPOTHESIS — test it member by member, cheapest	IN-LIST
 VSP-154	docs/project/gotchas.md	Cross-build A/B is the cheapest attribution we have, and it is	IN-LIST
-VSP-155	HANDOFF.md	PRIOR ART FIRST — check the subsystem doc before re-deriving (14z-68m)	IN-LIST
+VSP-155	docs/project/operations.md	PRIOR ART FIRST — check the subsystem doc before re-deriving (14z-68m)	IN-LIST
 VSP-156	docs/project/gotchas.md	A REPLAY'S NAME IS A CLAIM ABOUT THE BUILD (paid: 2026-08-24, 14z-107)	IN-LIST
 VSP-157	docs/project/gotchas.md	Root-causing a stochastic hardware crash: make ANY repro deterministic	IN-LIST
 VSP-158	docs/project/gotchas.md	"16 + the same 16 repeated": an aliasing guard is a silent tenant trap; and a rig that wins fast can	IN-LIST

@@ -371,7 +371,7 @@ into `~/.claude/skills/mame-fbneo-instruments/`. Nothing in it depends on the or
 
 **[MFI-24]** **Parity BEFORE the patch.** Swapping a binary changes the INSTRUMENT, not the subject: prove the UNPATCHED source build reproduces every frozen oracle log bit for bit first, and make that gate refuse to run against a binary that already knows the extended driver. Whether a filtered build changes emulation is not argued, it is measured.
 
-> **Incident** (`HANDOFF.md` › *MAME from source — the oracle follows the profile (B5, 2026-08-03)*):
+> **Incident** (`docs/project/cps2_wide.md` › *From HANDOFF.md: «MAME from source — the oracle follows the profile»*):
 >
 > **Order is not optional.** `test_mame_parity.sh` proves the UNPATCHED
 > source build reproduces every frozen oracle log bit-for-bit before the
@@ -488,7 +488,7 @@ into `~/.claude/skills/mame-fbneo-instruments/`. Nothing in it depends on the or
 
 **[MFI-32]** **Instrument extensions to a frontend are frontend-only and opt-in**: scripted input/output/frame count/dumps, a per-frame framebuffer checksum, gfx-buffer dumps, a value-logging write tap with PC attribution, frame-scheduled pokes, address-resolved dumps reaching OBJ/palette RAM — all inert when unset, so the patched emulator on stock content is the stock emulator by construction. That is the emulator-superset shape in the harness's own edition.
 
-> **Incident** (`HANDOFF.md` › *What exists (M0 bench, 2026-07-25)*):
+> **Incident** (`docs/project/operations.md` › *From HANDOFF.md: «What exists» — the tool catalogue*):
 >
 > | FBNeo | `emu/fbneo` submodule + `tools/setup_fbneo.sh` | built (SDL2); THREE patches, only TWO of which are ever in a DEVELOPMENT binary: `0001` harness (frontend-only: `-hinput/-hout/-hframes/-hdump`, plus `FBNEO_HVIDEO` framebuffer checksums, `FBNEO_HGFX` gfx-buffer dumps, and the B5b set — `FBNEO_HTAP` write tap with PC attribution, `FBNEO_HPOKE` frame-scheduled pokes, address-resolved dumps reaching OBJ/palette RAM) and `0002` the CPS-2 WIDE profile (driver descriptor + TWO gated blocks in `Cps2ObjDraw` — the promote and the canary control; "one gated core line" until 14z-114, corrected per 14z-90). **AND `0003` drop-sdl2-image, RELEASE-ONLY (ratified by the maintainer 2026-09-21):** `tools/build_release_emulators.sh` applies it and `setup_fbneo.sh` does NOT, so the dev binary you measure with still links SDL2_image. It stops FBNeo linking that library — whose only use is an optional per-game preview PNG in FBNeo's own game-browser menu, a path that already did nothing here — which removes 21 transitive image codecs: a shipped macOS bundle is **4 files instead of 24**, and the System Settings route should then cost 4 Gatekeeper approvals instead of 24 — INFERRED from MAME's measured 2-file/2-approval case, exercised at neither count (#144). Proven inert: 12,120 frames of `05_timeout_idle` with and without it are BIT-IDENTICAL in work RAM AND framebuffer. **CRC WARNING:** FBNeo matches zip members by CRC — a mismatched gfx/QSound member is silently replaced by 0xFF fill while still logging `(OK)` (docs/GOTCHAS.md) |
 
@@ -611,7 +611,7 @@ into `~/.claude/skills/mame-fbneo-instruments/`. Nothing in it depends on the or
 
 **[MFI-41]** **What a machine migration puts at risk is only the frozen MAME expectations** (absolute values; every FBNeo gate written as a live A/B is machine-independent by construction), so the parity gate IS the migration gate — run it on the target before trusting anything, and if it fails do NOT re-freeze to make it green: that silently redefines the baseline every invariant rests on. CPU architecture should not matter for interpreted cores with endian-pinned checksums — an argument, not a measurement; the gate is the measurement.
 
-> **Incident** (`HANDOFF.md` › *Platform / migration notes (14z-59d)*):
+> **Incident** (`docs/project/operations.md` › *Platform / migration notes (14z-59d)*):
 >
 > **What is actually at risk in a move: only the MAME expectations.**
 > - `tests/expected/**` are ABSOLUTE frozen values, and they are **MAME-only**

@@ -881,3 +881,326 @@ slice reveals a new hole.
 | the profile itself, in all three implementations | `docs/project/cps2_wide.md` |
 | the traps this arc has already paid for | `docs/platform/gotchas.md`, `docs/project/gotchas.md` |
 | the drawn version of §5, §6, §7 and §10 | `python3 tools/mk_mister_page.py` — a standalone HTML page. **[MSV-14]** **Generated, never committed**: a hand-copied artifact goes stale silently, and this one draws a map whose slack is 0.2% of the tier. `--check` re-derives everything it draws, and `tests/test_mister_page.sh` runs that on every `tests/run_all_static.sh` |
+
+## From HANDOFF.md: «MiSTer — the jtcps2w core + the simulation oracle»
+
+*(Moved verbatim from HANDOFF.md 2026-10-14, #282 item B.)*
+
+
+**THE MiSTer SKILLS (14z-114): load `mister-cps2-wide-core` (level 1,
+game-independent) and `mister-vampire-saved` (level 2, this romset) before
+any MiSTer work — they are the distilled discipline, ID-locked to the docs by
+`tests/test_checkskills.sh`; the field test and triage live in-tree at
+`docs/project/mister_field.md`.** **Read `docs/project/mister_core.md` FIRST** — the synthesis: what is TRUE
+about this core, in CAUSAL order, with the logs it quotes named as its
+provenance (`mister_fit.md`, `mister_map.md`, `docs/platform/mister.md`), and
+the standing rule that where it and one of them disagree, THE LOG WINS. Its
+diagrams are drawn by `tools/mk_mister_page.py` — a committed GENERATOR whose
+`--check` mode re-derives every figure in the document (17 of them) from the
+same constants the gates freeze, so the page cannot go stale silently; the
+rendered page is never committed. Then `docs/platform/mister.md` for the
+platform detail. The deliverable is a SEPARATE core
+`jtcps2w` in a public GPL-3.0 fork of jotego/jtcores
+(https://github.com/DefinitelyFrenchName/jtcores, branch `vampire-saved`
+from v1.7.3), pinned as submodule `emu/jtcores` with the delta mirrored
+in `emu/jtcores-patches/` as a PATCH SERIES, one file per fork commit.
+`tools/setup_jtcores.sh` checks the pin, inits the five modules the cps2
+yaml chain pulls, builds jtframe's Go tool and regenerates the series;
+`tests/test_jtcores_twin.sh` (ci_portable) locks pin, twin and series.
+**SINCE SLICE D1 (14z-107 (6)) cps2w CARRIES RTL; D2 CARRIES THE PLACEMENT;
+D3+D4 (14z-107 (10)) MAKE A TENANT FETCH POSSIBLE; AND SINCE D5 (14z-107 (11))
+THE WIDE ROMSET BOOTS ON THE CORE, REACHES THE SELECT SCREEN AND FETCHES THE
+TENANT WHEEL ART** — 105 distinct group-C tile codes out of obj bank 5, with
+the control leg at zero, and a rendered select screen showing the extended
+wheel and the authored "M6" mark
+(`docs/project/images/mister_select_cps2w_f2400.jpg`, beside MAME's
+`mister_select_mame_f1741.png`). **AND SINCE 14z-108 A TENANT HAS FOUGHT ON THE CORE**: with the input path
+fixed, `36_pick_tenant_cell` over 4,400 frames fetches **obj bank 4 — the
+FIGHTER art — 9,388,928 reads over 1,735 distinct tile codes, 843 frames of
+them AFTER match start**, every code inside the frozen extent, with the
+control leg at zero on both group-C windows. `test_mister_gfxc_fetch` PASSES
+in full, and the same run answered bank 1 under load (peak 15,496 acc/frame,
+12.5% of ceiling, ZERO clashes). **AND SINCE 14z-108 IT SYNTHESISES**: Quartus 20.1.1 Lite, Cyclone V
+`5CSEBA6U23I7`, target mister, with `cps2` built FIRST as the reference leg —
+`cps2w` costs **+206 ALMs (+1.1%)** and +2,048 memory bits with RAM blocks,
+DSPs and PLLs unchanged — **that half is settled and good**. **TIMING IS
+NOT: it is a SEED LOTTERY.** Twelve `cps2w` seeds span **-0.545 .. +0.396**, four of them
+FAILING, while five `cps2` control seeds span **+0.144 .. +0.665**, none
+failing. `cps2w` straddles zero; the control does not. The
+FAILs are jtframe's OWN gate on runs Quartus called "successful, 0 errors".
+**AND `xjtcore.sh` CALLS `jtseed 4`, WHICH RETRIES `--seed $RANDOM` AND
+BREAKS ON FIRST SUCCESS.** Precisely: that does NOT ship failing bitstreams
+(~99% of invocations produce a gate-passing `.rbf`) — **it hides FRAGILITY.
+A green build certifies "one placement was found that closes", never "this
+design closes with margin".** At n=12 `cps2w` fails **4/12** with median
+**+0.038 ns** (two passes under 10 ps) against `cps2`'s **0/5**, median
+**+0.431 ns**; the BEST cps2w seed is worse than the MEDIAN cps2 seed. Every failing path is
+inside `jtframe_sdram64` at an SDRAM address pin and RESHUFFLES between
+seeds, so what is marginal is that controller's ADDRESS-GENERATION CONE as a
+whole — shared infrastructure the fork does not touch, NOT WIDE's own logic.
+**Consequence: +0.066 is not headroom a future slice may assume.** Spending
+margin back is a Rule 1 v2 design decision for the maintainer, not a
+seed-hunt. **A FAILING SEED STILL EMITS AN `.rbf` — verify the hash before
+flashing; the passing baseline is `46fc74af…`.** **RELEASE POLICY (ruled
+2026-08-25): a shipped bitstream is built from a NAMED SEED — currently
+**18269** — with its slack and sha256 recorded and verified, never from an
+`xjtcore.sh` random draw. `jtcore cps2w -mister --nodbg --seed 18269`.** ~~**What is still never: HARDWARE — no `.rbf` has been
+loaded onto a DE10-Nano, no MRA has run on real silicon, and no analog
+output has been seen.**~~ **CORRECTED 14z-157 — that sentence had stood since
+14z-108: the core has run on a real DE10-Nano since 14z-109 (a Jammix card
+into a CRT), re-confirmed through the M12 freeze; what is still never is a
+MEASURED comparison off the board** (`docs/project/mister_core.md`, the "Any
+of this on HARDWARE" row). **An `.rbf` existing is not a field test.** The reason
+bank 4 is still zero is the HARNESS, not the RTL: the simulator's direction
+bits were **REVERSED end for end** — measured in full 14z-108 against the
+game's own `$FF8058` mirror, all four directions, on a four-direction probe
+replay (`tests/replays/107_four_directions.rpl`): Up arrived as Right, Down as
+Left, Left as Down, Right as Up. So the tenant-picking replay moved the cursor
+onto Victor. **FIXED 14z-108** — one dict in `tools/rpl2siminputs.py`
+(jtframe's joystick nibble is MSB-first: file bit4=Right … bit7=Up), no fork
+commit and no RTL. 14z-107 (12) had seen only the Left/Down half and inferred a
+two-bit swap that would have fixed half of it. See `docs/platform/mister.md`
+"The simulated joystick's direction nibble is MSB-FIRST — the translator had it reversed end for end". The EIGHTEEN fork commits are `b9d0565` (the `cps2w` cfg scaffold), nine
+Verilator-TESTBENCH changes (`553dd56` `JTFRAME_SIM_WRAMDUMP`, `6c32be8` the
+SDRAM model's dropped top address bit, `4f25cc7` the model clock, `74ed17d`
+raw SDRAM stats, `692ba4d6` the optional frame writer, `7cf1eedb` the child's
+`_exit`, `519aff8b` the joystick top bits, `17a5dc2b` the SDRAM READ PROBE,
+`fd454393` the frame writer's frame window), `38acc638` (**slice D0**: the
+`vsavjw` machine entry in `doc/mame.xml` + the QSound trim in
+`cores/cps2w/cfg/mame2mra.toml`), `4840df8a` (**slice D1**, THE FIRST RTL
+COMMIT: the QSound sample-bank width, gated at RUNTIME by a spare MRA header
+byte), `0df6f000` (**slice D2**: THE SDRAM PLACEMENT — the bank-0 re-pack,
+the group-C GFX redirect, the QSound split across two banks, two new slot
+counts, and ONE new jtframe file `hdl/sdram/jtframe_ram1_7slots.v`),
+`b9899fa8` (**slice D3**: THE CPS-2 TURBO OBJECT PROMOTE — a 3-bit GFX bank,
+`rom0_bank[2]` untied, four override files for one gated expression) and
+`dd242a65` (**slice D4**: the 6 MB PROGRAM WINDOW — a read-only decode into
+`CPU:$400000-$5FFFFF` plus the `one_wait` boundary), `72738d51` (the
+SIM-ONLY 68k PROGRAM-ROM READ PROBE, 14z-107 (11) — compiled out unless
+`JTCPS2W_PRGPROBE` is defined; it is what D4 and D5 are measured with) and
+`c00d7ce7` (**slice D5**: THE DECRYPTION RANGE — the CPS-2 key's
+encrypted-opcode range word is stored COMPLEMENTED and `jtcps2_dec_ctrl`
+reads it straight, so the reference core decrypts opcode fetches to
+`CPU:$F03FFF` where MAME/FBNeo stop at `$0FFFFF`; one profile-gated
+expression in a new `jtcps2_decrypt.v` override, with `jtcps2_dec_ctrl`
+itself untouched) and `7b9a0d2d` (a COMMENT-ONLY retraction in the
+`jtcps2_main.v` override header — it still claimed the extension is not
+decrypted, which D5 proved false of this core). **THE PIN IS `7b9a0d2d`.**
+**`cores/cps1`,
+`cores/cps2` and `cores/cps15` are still BYTE-UNTOUCHED** — that is a
+`git diff` assertion (`test_jtcores_twin` 2e), the fork's WHOLE-TREE delta is
+held to a declared 25 paths (2f), and the THIRTEEN files in `cores/cps2w/hdl`
+are enumerated with a frozen line-by-line delta (`test_mister_wide_gate` 1).
+**Fork pushes are STANDING-AUTHORISED by the maintainer (2026-08-24); the
+MAIN repo's push state is NOT a standing 'never' — RE-CHECKED 14z-109 AFTER PUSHING: `origin/main` holds `10cf9ce` and NOTHING is local, confirmed by `git ls-remote`. The fork is at `c97e3d14` (the README brought to D0-D5). **The earlier 14z-109 state where one commit was held back because it bumped the pin to an unpushed fork commit is RESOLVED** — the fork was pushed first, then the pin bump. Keep the ORDER in mind if it ever recurs: pushing a pin bump ahead of the fork commit it names breaks a fresh clone's `git submodule update` (it recurred 14z-192: the jtcores pin reached `main` unpushed). Check the remote, not this sentence: `python3 tools/submodule_pins.py` asks each remote for HEAD's pins by sha (the close's `submodule_pins` row since 14z-197, #260). **SINCE 2026-09-10 (maintainer-ruled) the session close ENDS WITH A PUSH when everything is green and nothing is pending** (CLAUDE.md §5 [VSP-17]); a red leaves the commits local and the close says so.**
+The RTL benches live in **`tests/rtl/*.v`** (this repo, not the fork) and the
+frozen override delta in **`tests/expect/cps2w_rtl_delta.txt`**;
+`tests/test_mister_wide_gate.sh` compiles the benches against the fork's real
+module sources with Verilator and skips that half cleanly when Verilator is
+absent. The MiSTer edition of Rule 1 v2 — what "bounded / profile-gated /
+superset / mirrored / ratified" each mean on FPGA, and which check enforces
+each — is `docs/project/cps2_wide.md` "THE MiSTer EDITION OF THE SAME RULE". The stock-vsavj reference-leg MRA is
+produced by `jtframe mra cps2w` (byte-identical to stock cps2's except
+`<rbf>` — now gated, not just measured). The fit numbers are in
+`docs/project/mister_fit.md`; the placement map is
+`docs/project/mister_map.md`.
+
+**RUNNING THE WIDE ROMSET ON THE CORE — ROOT-CAUSED 14z-107 (11), FIXED IN
+SLICE D5.** The boot failure below is the state BEFORE D5; its eliminations
+stand and its trace is still the best description of the symptom. **What it
+did not know:** the 68k EXECUTES from the program extension (ten opcode
+fetches at `CPU:$4BE7C0-$4BE7C8`, simulated frame 1119 — the 14z-107 layout's address; it is the relocated OBJ walker, whose placement moves with each freeze, `$4C13D0` on merged-m16 per 14z-134) and receives the
+CPS-2 DECRYPTOR'S OUTPUT, because the key's encrypted-opcode range word is
+stored COMPLEMENTED and `jtcps2_dec_ctrl` reads it straight — the reference
+core decrypts to `CPU:$F03FFF` where MAME and FBNeo stop at `$0FFFFF`. Every
+stock CPS-2 game hides it; CPS-2 WIDE is the first thing to put executable
+content above the window. Fork commit `c00d7ce7` complements the word,
+profile-gated, in `cores/cps2w/hdl/jtcps2_decrypt.v`. **One claim below is
+CORRECTED IN PLACE: the two profile states are NOT frame-for-frame
+identical** — profile-ON completes ten reads above `$400000` and profile-CLEAR
+zero. Measurement, instruments and the byte comparison:
+`docs/platform/mister.md` "CAN THE 68k READ ABOVE 4 MB?".
+
+**THE PRE-D5 TRACE, KEPT (slices D3+D4, 14z-107 (10)).** The core carries
+everything the profile needs: the object promote, the 6 MB program window, the
+placement and the QSound width. **It did not BOOT the WIDE romset.** Measured on `11_pick_donovan`,
+`cps2w`, the real `vsavjw.rom`: reset at simulated frame 659, the CPS-2 RAM
+test draws 660-925, the QSound/Capcom legal screen stands from 1578, and at
+**2242 the machine RESETS and the RAM test starts over** — a ~1,580-frame
+cycle. No sprite is ever drawn (the SDRAM read probe sees ZERO reads in
+vanilla obj bank 2 as well as in both group-C windows), so no tenant tile is
+fetched. **The same run with the profile bit CLEAR behaves identically, frame
+for frame**, so the cause is NOT any of the eight `wide_en`-gated sites — it
+is shared, and it is the next thing to root-cause. `docs/platform/mister.md`
+"The pre-D5 boot loop: the WIDE romset reset at core frame ~448 until the decryption range was fixed" has the full trace and the
+eliminations.
+
+    ROMDIR=... JTSIM_SCRATCH=/tmp/vampire-saved-jtsim \
+      tools/run_sim_jtcps2.sh tests/replays/11_pick_donovan.rpl /tmp/out \
+        --core cps2w --wide build/m3b_merged21 --frames 4000 \
+        --frame-output fork --frame-window 0 999999 30 \
+        --rdprobe 1 0x800000 0x1000000 --rdprobe 0 0x7E0000 0xFE0000 \
+        --rdprobe 2 0 0x1000000 --rdprobe 3 0 0x1000000
+
+**THE WIDE TRANSFER IS 659 FRAMES, NOT 462**, and every absolute frame number
+in the lane moves with it — `run_sim_jtcps2.sh` picks the constant from
+`--wide` and prints it, and `audit_sdram_bank_load.sh` asserts it from the
+run's own log before labelling a phase.
+
+**BUILDING THE MRAs AND THE `.rom` (slice D0, 14z-107 (5)):**
+
+```sh
+export ROMDIR=/path/to/reference/sets
+tools/mister_mra.sh --core cps2w --wide build/m3b_merged21 --out /tmp/mra107   # re-pointed 14z-119 <- m3b_merged20 <- 14z-118 <- m3b_merged18 (the example figures below are the 14z-107 run's)
+#   -> /tmp/mra107/vsavjw.rom  66,265,152 B  (the WIDE download image)
+tools/mister_mra.sh --core cps2w --out /tmp/mra107stock   # the stock leg
+#   -> /tmp/mra107stock/vsavj.rom  46,407,744 B
+tools/mister_mra.sh --core cps2w --no-rom --out /tmp/mraonly   # MRAs only
+```
+
+`--wide` is not cosmetic: the WIDE romset is a CLONE set. **CORRECTED
+14z-112: its parent is now the PRISTINE dump, not the build's own
+`vsav.zip`.** Builds no longer pack a parent at all — the four patched
+members `vm3.13m/15m/17m/19m` live INSIDE `vsavjw.zip`, so both legs share
+one `vsav.zip` and a MiSTer SD card can carry this profile AND stock
+Vampire Savior (before, `games/mame/vsav.zip` could only be one file and a
+stock MRA got wrong art SILENTLY). `jtframe mra` still reads a hard-coded
+`$HOME/.mame/roms/<name>.zip`, so the tool stages a PRIVATE `$HOME` per run.
+`.rom` files are ROM content: `--out` inside the repo is refused (rule 7).
+**And the MiSTer MRA is pinned to ONE romset build's CRCs** — jtframe
+resolves zip members by CRC32 alone, unlike FBNeo/MAME which resolve by name
+and only warn (which is why the WIDE members carry sentinel hashes there).
+`tools/gen_vsavjw_xml.py <zip> --check emu/jtcores/doc/mame.xml` says whether
+the fork's entry is the current build's; a rebuild that moves a CRC needs a
+new fork commit.
+**And since 14z-133b the WIDE MRA NAMES ITS FREEZE**: with `--wide` the comment
+header ends with a BUILD block (registry row, mark, `vsavjw.zip` sha1, both
+keys), written only after the MRA's CRC parts resolve against that build —
+`tests/test_mra_build_line.sh`. Not in the `<name>`, by ruling.
+
+**THE MEMORY MAP, corrected 14z-107 (2) — read this before sizing any RTL.**
+The PROFILE ruling (WIDE v1 verbatim, one romset) stands; the implementation
+assumption that went with it does not. **"MiSTer work = width plumbing only"
+is RETRACTED.** At our pin `v1.7.3` **64 MB is PHYSICAL** (jtframe's table
+stops at `AW 23`, the bank geometry has no AW=24 arm and would leave
+`addr[9]` undriven, and only 13 A / 2 BA / 1 nCS pins are assigned);
+`JTFRAME_SDRAM_XL` (128 MB) exists **upstream only**, 3057 commits away, as
+TWO CHIPS on one module with chip select on nCS polarity, and only inside the
+`JTFRAME_SDRAM_CACHE` branch — setting it on `cps2w` as it stands would
+silently alias (platform gotcha). Independently, the CPS-2 core caps GFX at
+32 MB in the OBJECT FORMAT, the 68k at a flat 4 MB `rom_cs`, scroll at 8 MB
+and QSound at a 7-bit latch — **no SDRAM tier lifts any of those**. And the
+roster's total is **~56.1 MB against a 64 MB tier**: PRG 6 MB fits bank 0
+today, QSound 16 MB fits bank 1 today, only GFX overflows. **THE ROUTE IS
+DECIDED (maintainer, 2026-08-23): the BANK REPACK at our pin, measuring
+first; `JTFRAME_SDRAM_XL` is the FALLBACK if it fails.** The measurement the
+ruling required returned **GO** the same day
+(`tests/audit_sdram_bank_load.sh` — bank 1's PCM is already at a 98.8%
+in-match row-miss rate, so it has no locality left to lose, and the worst
+case runs at 26.3% of one bank against the 32.9% bank 0 already sustains in
+stock shipping configuration), and D2 SHIPPED the repack. **Beware "how big
+is the art": it has THREE sizes and this project has published a wrong figure
+from two of them** — live bytes **6.39 MB**, address footprint **15.45 MB**
+(a CPS-2 tile code IS its SDRAM address), declared region **16 MB** (the MRA
+downloads the whole region, so each group-C obj bank reserves its full 8 MB).
+The last one is what SDRAM actually spends, which is why the fit has 0.125 MB
+of slack and not 0.708. Full argument with every
+file:line: `docs/platform/mister.md`; the arithmetic: `mister_fit.md` §6;
+the synthesis: `docs/project/mister_core.md`.
+
+**Running the simulation lane** (14z-107; needs `brew install go coreutils
+gnu-sed xmlstarlet verilator imagemagick`, ~1.0-1.2 s per simulated frame):
+
+```sh
+export ROMDIR=/path/to/reference/sets
+export JTSIM_SCRATCH=/tmp/vampire-saved-jtsim   # NEVER inside the repo; one clone = ONE simulation at a time
+                                                 # (it writes inputs, dumps, probes and obj_dir/ into the core dir) —
+                                                 # the runner's --jobs N uses <base>-slotN per slot (14z-134)
+tools/run_sim_jtcps2.sh tests/replays/05_timeout_idle.rpl /tmp/out107 \
+    --frames 2880 --wram 2540 2880     # ~47 min; run it detached, poll the PID
+#   host frame output is OFF by default (--frame-output off); `fork` is
+#   upstream's behaviour and `collect` also gathers <outdir>/frames
+python3 tools/compare_fields.py <mame_dumps> /tmp/out107/wram \
+    --fields tests/fields_m2a.tsv --follow 0,60,180 --label-a mame --label-b jtcps2
+```
+
+**AND SINCE SLICE D2 (14z-107 (9)) THE SAME TOOL RUNS THE WIDE ROMSET AND
+HANDS BACK THE SDRAM IMAGE:**
+
+```sh
+tools/run_sim_jtcps2.sh tests/replays/05_timeout_idle.rpl /tmp/census \
+    --core cps2w --wide build/m3b_merged21 \
+    --post-frames 2 --keep-banks       # ~12 min: the download and nothing else
+python3 tools/mister_sdram_census.py /tmp/census/sdram \
+    --rom "$JTSIM_SCRATCH/rom/vsavjw.rom" --map wide
+```
+
+`--wide BUILD` delegates the `.rom` to `tools/mister_mra.sh` (the WIDE set is
+a clone whose parent is the PRISTINE `vsav.zip` since 14z-112 — see above)
+and **always generates the
+image with `cps2w` whatever `--core` says** — the reference core parses
+`sourcefile=["cps2.cpp"]` and cannot see the WIDE machine entry at all, which
+is slice D0's profile gate working; `--post-frames N` counts from the END of
+the transfer, unlike `--frames`, which assumes the 462-frame stock download
+and is wrong for the 66 MB WIDE image (it takes 659); `--keep-banks` collects
+the four 16 MB `sdram_bank?.bin` that `test.cpp` writes the instant a FULL
+download completes. **A census run therefore costs the download and nothing
+more.**
+
+**AND SINCE D2 THE RAM-DUMP OFFSET IS PER CORE — this is the one constant
+that will silently invalidate a measurement.** `--wram` dumps an SDRAM
+ADDRESS, and D2 re-packed bank 0: `RAM:$FF0000` is bank 0 byte `0x600000` on
+`cps2` and **`0x648000` on `cps2w`**, where `0x600000` is now VRAM.
+`run_sim_jtcps2.sh` picks it from `--core` and PRINTS it, so the run's own log
+says what it dumped. It cost a red `test_mister_wide_inert` (101 frames of
+101, RTL innocent) to learn — `docs/platform/gotchas.md`. `tools/mister_sdram_census.py` replays the whole download
+mapping — regions, the QSound split, the group-C redirect and the CPS-2 GFX
+address scramble — and compares all 67 MB byte for byte, with `--perturb
+<region>` as its must-fire control. Gate: `tests/test_mister_sdram_census.sh`.
+
+**Every run pays the ROM download** — 462 simulated frames, ~7-8 min. It is
+not skippable on CPS-2: the transfer also latches the decryption key into
+core registers, so a run with the SDRAM banks preloaded boots into ciphertext
+and work RAM stays all zeros (measured 14z-107). Because the download is
+simulated, it also consumes `sim_inputs.hex` lines, so `--frames`, `--wram`
+and the dump file names are ABSOLUTE (download included) and the `.rpl` is
+shifted by `--offset` (default 462): **a MAME frame `f` sits NEAR simulated
+frame `f + 462`** — but the offset is not constant across the boot: it is
++460 at the RAM-test onset and **+463 by the round-1 match start**
+(re-measured 14z-107 (7); it read +361 and then +356 on runs whose input
+script the harness's frame writer was replaying), which is why the oracle
+compares at §4 ANCHORS and not at fixed indices. `--wram FIRST LAST` writes `wram/dump_<frame>_ff0000.bin`,
+64 KB of 68k work RAM in 68k byte order — the same files the MAME harness's
+`DUMPS=` produces. Nothing ROM-derived may land in the tree: the tool REFUSES
+an out-dir inside the repo (rule 7).
+
+~~**CAVEAT (14z-107 (2)): the Verilator SDRAM model is an 8 MB-per-bank,
+32 MB module**~~ — **FIXED 14z-107 (3)** (fork commit 3). The model dropped
+`addr[22]`, which `jtframe_sdram64_bank.v:219` puts on `sdram_a[9]` as the
+tenth COLUMN bit; it is NOT `addr[9]` (a row bit), so the "~3 constants,
+widen the column to `0x3ff`" fix this row used to name would have produced a
+different wrong map. Video from this lane is now trustworthy for GFX; the
+anchor oracle never moved (bank 0 is entirely below WORD address `0x400000`)
+and `test_mister_sim_anchor.sh` is still green — with the anchor RE-MEASURED
+to MAME 2146 / sim **2502** / skew **356** (was 2507/361 on the broken model;
+the band is unchanged at +/- 30). **BOTH SUPERSEDED 14z-107 (7): the clean
+anchor is 2609 / skew 463** — 2507 and 2502 were measured while jtframe's
+frame writer was rewinding `sim_inputs.hex`. **Re-measured a second time
+14z-107 (8), after fork commit 10 stopped `SimInputs` holding P1's and P2's
+buttons 5 and 6 down: 2609 / 463, UNCHANGED** — the first reading of this
+anchor taken on inputs that match the MAME leg's. The object-timing MECHANISM in
+this paragraph still stands; the absolutes do not. The five frames are real:
+`jtcps1_obj_draw.v:137` skips a tile whose fetched GFX word is all-ones, so
+OBJECT TIMING IS A FUNCTION OF GFX ROM CONTENT. Two further harness bugs had to be fixed to measure SDRAM load at all —
+see `docs/platform/gotchas.md` "`jtsim -verilator -stats` reports nothing".
+
+The gates this table listed — this lane's (family `mister` in
+`docs/project/gate_index.md`, 18 scripts) and the later additions it had
+accreted (the `docs`, `character-data` and `gfx` families) — are rows of the
+gate index, each script's header now carrying its slice, runtime and verdict;
+the table as of 14z-123 is in `HANDOFF_HISTORY.md`. Two rows kept here as
+prose:
+
+**[MSV-27]** **THE FPGA SUPERSET INVARIANT, MEASURED DIRECTLY**: `cps2` and `cps2w` run the SAME stock `vsavj` download under Verilator and their 68k work RAM must be BIT-IDENTICAL at every frame of the window (default 540-640, `WINDOW_FIRST`/`WINDOW_LAST` to move it). Asserts the window is NON-CONSTANT first; control = the same dumps compared against themselves SHIFTED BY ONE FRAME, which must FAIL, proving the comparison would catch a one-frame timing skew. Both legs run with host frame output OFF (the default since 14z-107 (7)) and their dump sets are asserted complete by the producer. This is the inertness instrument; the anchor gate below is a cross-IMPLEMENTATION oracle and is a poor substitute for it (`tests/test_mister_wide_inert.sh`, **manual/emulator (~22 min)**.)
+
+ `tools/charpages_internal.sh` + `tests/lua/sprite_capture.lua` + `tools/sprite_render.py` — **manual (~15 min, 48 MAME legs)**: THE INTERNAL CHARACTER PAGES WITH SPRITES (14z-121 (6)): A. `field_trace` P1's node on every naming part; B. `tools/charpages_frames.py pick` (the first frame the node is an attack node of the move's chain, else the chain's first + probes to +120 f) and `choose` (a chain without an attack node renders at the first probe where an OWNED pool object — the foot, the sword, a projectile — carries a record with real power; the page draws that object's `hitbox_proj` box at the object); C. `sprite_capture.lua` at those frames (the OBJ list + the `$90C000` palette page); D. `sprite_render.py` — the tenant's entries = its records' within-bank tile set (`obj_records.walk`) in bank 3 (vs2's id-indexed OBJ bank table `0x27530`, `0x6000` for all three tenants), mid-screen (the HUD strips are bank 1 at the top and bottom), the LEFT x-cluster (the rigs pin P1 left of P2) → PNG per move from `vsav2.zip`'s tiles; E. `charmap_html.py --sprites` — the sprite and its boxes OUTLINED in one drawing (`KX=64, KY=262`, calibrated 14z-121 (7)). Output `../charpages/` — ABOVE the working tree (unaddable, uncommittable, unpushable from this repo), NOT published; step 0 of the script builds every prerequisite from the user's own dumps, so anyone owning the ROMs regenerates the pages. Not a gate: a currency check would be a re-run

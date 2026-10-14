@@ -599,3 +599,143 @@ bank-1 codes (374 codes as of m3a) — not a constraint.
   setting MAME aside — no path reduces total test coverage) was never
   needed and stays as the rule for any future descriptor change. *(Status
   updated 14z-114.)*
+
+## From HANDOFF.md: «CPS-2 WIDE — the extended hardware profile»
+
+*(Moved verbatim from HANDOFF.md 2026-10-14, #282 item B.)*
+
+
+**Why it exists:** all 18 characters do not fit a stock CPS-2 (measured
+deficit ~886 KiB program, ~6-7 MB tiles). WIDE is the named, versioned
+profile that makes the roster physically possible. Spec + all measurements:
+**`docs/project/cps2_wide.md`** (read it before touching any of this).
+
+```
+CPS-2 WIDE v1   PRG 6 MB | GFX 48 MB (19-bit tiles) | QSound 16 MB
+```
+Emulator cost: **two gated blocks** in `cps_obj.cpp` (the promote + the
+`CPS2_WIDE_CANARY` positive control; this line said "one widened
+condition" until 14z-114 — the 14z-90 correction is in `cps2_wide.md`
+"Emulator change budget") plus the `Cps2Wide` flag lifecycle. Everything
+else is descriptor table data.
+Governed by **Rule 1 v2** (profile-gated + emulator superset invariant);
+the profile runs under a separate driver entry `vsavjw`, so stock `vsavj`
+and every other CPS-2 game are untouched by construction.
+
+Status: **demonstrated, not just declared.** B0-B3 inert (24/24 RAM AND
+framebuffer); B4 proves the space usable on both axes, each with a
+negative control — sprites render pixel-perfect from the appended banks
+(9/9), and relocated data is genuinely read from `CPU:$400000+`.
+
+```sh
+WIDE=0 tools/setup_fbneo.sh && cp emu/fbneo/fbneo /somewhere/fbneo_ref  # reference binary
+tools/setup_fbneo.sh                                                    # the WIDE binary
+# THE SHIPPABLE overlay (group C zero-filled). This is what content builds merge.
+python3 tools/build_wide_romset.py "$ROMDIR" build/wide0/rompath \
+        --qsound 2 --gfx 4 --prg 4                                      # prints the descriptor
+                                                                        # rows incl. CRCs - paste them in
+# THE B4 CANARY romset, separate directory, NEVER merged into a build:
+python3 tools/build_wide_romset.py "$ROMDIR" build/wide_canary/rompath \
+        --qsound 2 --gfx 4 --prg 4 --gfx-copy-group-b
+ROMDIR=... FBNEO_REF=/somewhere/fbneo_ref tests/test_wide_profile.sh    # 36 checks, 3 sections
+```
+
+**Group C descriptor CRCs are SENTINELS (14z-62d):** 0xdec0de31..37 —
+content members resolve by NAME on both emulators. Never set them to a
+real member's CRC (hash-shadowing: pristine-B was the 60z garble, and the
+zero-fill CRC collides with the zero QSound members in the same zip).
+On variant-id builds `build_gfx_donovan` writes the band+shelf into
+`vsw.31m/33m/35m/37m` (injected into `vsavjw.zip`) and vsav's group B
+stays PRISTINE — the visual core of de-substitution.
+
+**The two romsets must stay separate (14z-60z/61, cost two sessions).**
+`--gfx-copy-group-b` writes byte copies of the stock group B members, so
+they carry group B's CRCs. Both emulators resolve a ROM entry by HASH
+before falling back to its NAME, so in a content build — whose group B
+holds the ported tiles — the loader matches group B's declared CRC against
+those copies and serves **pristine** tiles instead. That is exactly how the
+WIDE track rendered Donovan and Anita with vanilla art while every gate
+stayed green. `tools/audit_romset_identity.py` now fails any build that
+carries the shape; it runs inside `build_donovan.sh`.
+The reference binary MUST differ from the build under test by ONLY patch
+0002 — build it from the same tree state or the comparison measures noise.
+**Rebuild the reference whenever the harness changes**, and always in the
+order above: `WIDE=0` now REVERTS the profile patch (it used to merely skip
+applying it, so a "reference" built from a tree that already carried the
+patch came out WITH the profile, and section 1 compared WIDE against WIDE —
+a vacuous pass on the one invariant that justifies emulator changes at all,
+14z-59e). Both the build and the gate now assert on the binary itself, so
+this cannot recur silently.
+
+Authoring into the extension: raw (no encryption above `PRG:0x0FFFFF`),
+FILE byte order (`words_to_file_bytes(words_from_logical_bytes(...))`),
+and `$400000-$40000F` reserved (CpsFrg registers, read-shadowed by ROM).
+Descriptor CRCs: PRG/QSound extension rows carry the FILL members' real
+CRCs (fixed content); gfx group C rows carry SENTINELS (variable
+content — see above).
+
+## From HANDOFF.md: «MAME from source — the oracle follows the profile»
+
+*(Moved verbatim from HANDOFF.md 2026-10-14, #282 item B.)*
+
+
+MAME is pinned as a submodule: `emu/mame`, tag **mame0288**, commit
+`27a8d9e8`. A Homebrew binary cannot follow a descriptor change, so the
+WIDE profile needs a source build.
+
+Status: parity **62/62** at B5 (**88/88** since 14z-187b: the replays with no frozen vsavj log are now frozen as the REFERENCE binary's logs in
+`tests/expected/mame_parity_ab.tsv`, so the gate passes on a host without Homebrew's MAME — WSL2_SETUP.md §7), MAME WIDE gate **36/36** (superset invariant +
+inertness + B4 canary, work RAM AND framebuffer). `-verifyroms vsavjw`
+reports the romset good ON THE ZERO-FILLED `wide0` OVERLAY, so both emulators
+load byte-identical members. **On a CONTENT build it says "is bad" BY DESIGN**
+(measured 14z-149): the descriptor carries the stock CRCs for the members the
+port rewrites and sentinels for the new ones ([VSP-75]), so exactly the
+rewritten/new members are flagged — `tests/test_release_binaries.sh` asserts
+that set; the shipped recipe said "must say good" until 14z-149 and was wrong.
+
+```sh
+WIDE=0 tools/setup_mame.sh     # reference binary -> ~/.cache/vampire-saved/mame-ref/cps2
+tools/setup_mame.sh            # WIDE binary      -> ~/.cache/vampire-saved/mame/cps2
+ROMDIR=... tests/test_mame_parity.sh          # RUN THIS FIRST (see below)
+ROMDIR=... tests/test_mame_wide.sh            # superset invariant + inertness + B4 canary
+```
+
+**[CPE-24]** **[MFI-24]** **Order is not optional.** `test_mame_parity.sh` proves the UNPATCHED
+source build reproduces every frozen oracle log bit-for-bit before the
+profile patch is allowed near it — swapping the binary changes the
+INSTRUMENT, and an instrument that moved invalidates every MAME finding
+since session 1. The gate refuses to run against a binary that knows
+`vsavjw`.
+
+Three things about the build that will bite otherwise (all in GOTCHAS):
+- it builds from an **rsync'd mirror under `~/.cache/vampire-saved/`**
+  because MAME's GENie cannot handle the **space** in this repo's path,
+  and a symlink does not help (`getcwd()` resolves through it);
+- prerequisites are `brew install sdl3 pkgconf` — MAME's OSD **on macOS** is
+  `sdl3` and is found ONLY via pkg-config, otherwise the build dies minutes in
+  (per platform: Linux takes the `sdl` OSD — SDL2 + SDL2_ttf + fontconfig, plus
+  the `qmake6` TOOL its config queries on every build: no Qt is linked, and
+  without it `-std=c++20` is swallowed, 2026-09-13 — and Windows the native one,
+  needing no SDL; corrected 2026-09-12);
+- it is a `SOURCES=`-filtered CPS-2-only build (minutes, not hours), the
+  binary is named `cps2`, and **a driver missing from `src/mame/mame.lst`
+  is silently absent from it**.
+
+Patch: `emu/mame-patches/0002-cps2-wide-v1.patch` — 164 lines added, exactly
+**one** line removed (the sprite tile-code composition). Everything else is
+additive. Keep it member-for-member identical to the FBNeo descriptor: one
+romset zip feeds both emulators.
+
+Two MAME-only facts that constrain the profile:
+- **16 MB QSound is MAME's ceiling** — `qsound_device` is a
+  `device_rom_interface<24>`. WIDE v1 fits exactly; growing further would
+  mean widening a SHARED device, which is outside Rule 1 v2.
+- **`$400000-$40000F` reads differ between the emulators** (FBNeo
+  ROM-shadows the CPS2 output registers, MAME keeps them readable). Only the
+  profile's reservation makes that unobservable — never allocate there.
+
+`tests/lua/replay.lua` gained **`VIDEO_OUT=<path>`**, the MAME twin of
+`FBNEO_HVIDEO` (per-frame framebuffer checksum, opt-in, written to a
+separate file so no frozen RAM expectation moves). MAME's harness had the
+same video blind spot FBNeo did, and the WIDE change is entirely a
+rendering change. Ground truth: `tests/test_replay_video_selfcheck.sh`.

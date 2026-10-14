@@ -62,10 +62,11 @@ _MISTER_LOGS = ["docs/platform/mister.md", "docs/platform/mister_history.md",  #
                 "docs/project/gotchas.md", "release/bitstreams/18269/BITSTREAM.txt",
                 "HANDOFF_HISTORY.md"]
 _PLATFORM_DOCS = ["docs/platform/gotchas.md", "docs/project/gotchas.md",
-                  "docs/project/cps2_wide.md", "HANDOFF.md", "docs/game/atlas/ram.md"]
+                  "docs/project/cps2_wide.md", "HANDOFF.md", "docs/game/atlas/ram.md",
+                  "docs/project/operations.md"]   # HANDOFF's reference moved there (#282, 14z-201)
 _PLATFORM_LOGS = ["docs/platform/gotchas.md", "docs/project/gotchas.md",
                   "docs/project/cps2_wide.md", "HANDOFF.md", "docs/checksums.txt",
-                  "HANDOFF_HISTORY.md"]
+                  "HANDOFF_HISTORY.md", "docs/project/operations.md"]
 _GAME_DOCS = ["docs/game/engine_internals.md", "docs/game/gotchas.md",
               "docs/game/atlas/README.md", "docs/game/atlas/ram.md",
               "docs/game/atlas/character_tables.md", "docs/game/atlas/id_space.md",
@@ -80,14 +81,16 @@ _PORT_DOCS = ["CLAUDE.md", "HANDOFF.md", "STATE.md", "docs/project/gotchas.md",
               "docs/project/patch_index.md", "docs/project/cps2_wide.md",
               "docs/project/oracle_classes.md",   # CLAUDE.md §4's spec of record (pass 2, 14z-124)
               "docs/project/gate_scoping_method.md",  # the comparison-gate method (14z-131)
-              "docs/project/rule_checker.md"]  # the adversarial rule-checker (14z-163, #152)
+              "docs/project/rule_checker.md",  # the adversarial rule-checker (14z-163, #152)
+              "docs/project/operations.md", "docs/project/release_format.md"]  # HANDOFF's reference moved there (#282, 14z-201)
 _PORT_LOGS = ["docs/project/gotchas.md", "docs/project/patch_notes.md",
               "docs/project/patch_index.md", "HANDOFF.md", "CLAUDE.md",
               "docs/project/oracle_classes.md",   # the ratified figures moved with the spec (14z-124)
               "STATE.md", "STATE_HISTORY.md",
               # history twins join the LOG lists as they are created
               # (14z-122, the documentation pass): a log is a log.
-              "docs/project/build_dir_triage_history.md", "HANDOFF_HISTORY.md"]
+              "docs/project/build_dir_triage_history.md", "HANDOFF_HISTORY.md",
+              "docs/project/operations.md", "docs/project/release_format.md"]
 SKILLS = {
     "VSP": dict(path=".claude/skills/vampire-saved-port/SKILL.md",
                 docs=_PORT_DOCS, logs=_PORT_LOGS, forbid=[],

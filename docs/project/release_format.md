@@ -376,3 +376,73 @@ exercised by hand at 14z-113.
 The registry row in `HANDOFF.md` "Build registry", the annotated tag
 `freeze/<name>`, and STATE's freeze entry. `release/<name>/` is the
 distributable; the registry is the provenance.
+
+## From HANDOFF.md: «RELEASE PACKAGING»
+
+*(Moved verbatim from HANDOFF.md 2026-10-14, #282 item B.)*
+
+
+`tools/package_release.py <rompath> <out> --romdir $ROMDIR --name merged-m6
+--version M6` turns a frozen build's two zips into a distributable package:
+xdelta3 deltas per modified/new member against ONE source blob (the four
+reference dumps' members concatenated in a fixed order — so a new WIDE
+member is expressed as copies out of vsav2 (the blob is THREE dumps since 14z-149 — vhunt2 is the oracle, not a source) and only the bytes the
+port GENERATES or AUTHORS are literal), `manifest.json` (every target
+member's sha1/size, which members are copied pristine and from where, the
+source recipe + sha1, the fingerprint, the version string), the community
+applier `apply_release.py` (PURE PYTHON since 14z-148 — its own VCDIFF
+decoder, no xdelta3 on the user's side; verifies every reference member,
+rebuilds the source blob, applies, and refuses to write unless EVERY
+member's sha1 matches), **the BROWSER applier `apply_release.html` (14z-174 —
+the same work with no Python and no terminal: one self-contained GENERATED
+file, "What exists" above)**, and the END-USER README (the ruled inventory and the
+six sections it must carry, the first being THE DELIVERABLES table:
+`release_format.md` "WHAT A RELEASE IS", 2026-09-11). Secondary compression is OFF so the rule-7 scan sees the
+payload (and `xdelta3 printhdr` LIES about it — `docs/project/gotchas.md`). **Deterministic** (two runs byte-identical).
+**`release/merged-m6/`** is the shipped package for the 14z-105 freeze
+(20 patched + 22 pristine members, 2.5 MB, fingerprint 64426955).
+**Gate: `tests/test_release_roundtrip.sh`** (ci_static) — package -> apply to
+pristine dumps -> all 42 members byte-identical + fingerprint + whole-
+artifact manifest; the applier refuses a corrupted patch / wrong target
+sha1 / one-bit-wrong dump WITHOUT writing; rule 7: no 64-byte-aligned
+reference-ROM chunk appears verbatim anywhere in the patches (rolling scan,
+must-fire control). Needs `xdelta3` (`brew install xdelta`).
+MiSTer later adds a DISTRIBUTION layer (MRA/core) over the SAME members —
+the patch artifact does not change shape for it.
+
+**[VSP-100]** **SINCE merged-m10 (14z-113, maintainer-ruled 2026-08-28) A RELEASE IS ONE
+DIRECTORY PER PLATFORM, EACH SELF-SUFFICIENT** — `release/<name>/{fbneo,
+mame,mister}/`, the patch set above COPIED into each (produced by the same
+`package_release.py`, manifests asserted identical), `emulator/0002-*.patch`
++ `EMULATOR.md` (pin + recipe) plus, since the 2026-09-11 ruling, prebuilt
+binaries per OS under `emulator/bin/<os-arch>/` as hosts build them (the
+build resource `release/emulators/`; `macos-arm64` built 14z-149 by
+`tools/build_release_emulators.sh`, gate `tests/test_release_binaries.sh`;
+**the files are GitHub RELEASE ASSETS on `freeze/<name>`, never git content
+— ruled 2026-09-11 — the records tracked, the files ignored, published by
+`tools/upload_release_assets.sh freeze/<name> --prune` AFTER the gate is
+green, which also deletes every earlier freeze's still-hosted zip assets — #221, 14z-191**) on
+the emulator side, the
+`.mra` files + `jtcps2w.rbf` + `BITSTREAM.txt` + `MISTER.md` on the MiSTer
+side; every version releases every platform even if only one changed.
+**AND SINCE 2026-09-12 (14z-151) THE PUBLISHED ASSETS HOLD THE SAME
+PROPERTY, which for one release they did not:** each asset carries the
+README, the patch set, the manifest and the applier PLUS exactly one
+emulator route — `<name>-<platform>-<os-arch>.zip` the prebuilt binary and
+its record with NO patch and NO `EMULATOR.md`, `<name>-<platform>-recipe.zip`
+the patch and the recipe with no binary, `<name>-mister.zip` the whole MiSTer
+directory. ONE download plus the user's own dumps is playable, and nothing
+in a download can be misapplied. Gate:
+`tests/test_release_asset_shape.sh`; the ruling and the seam it replaced are
+`release_format.md` "THE SEAM".
+**The bitstream is a BUILD RESOURCE: canonical at
+`release/bitstreams/<seed>/{jtcps2w.rbf, BITSTREAM.txt}`, `CURRENT` names
+the seed (18269 today), the packager hash-verifies it into every release
+and refuses a mismatch — a new bitstream is a new seed dir + a `CURRENT`
+bump, never an overwrite and never a copy from another release.** Producer:
+`ROMDIR=... python3 tools/package_release_platforms.py build/<dir>/rompath
+release --name <name> --version <mark> --mister-src <dir with the .mra
+files> [--bitstream release/bitstreams/<seed>]`. Spec: `docs/project/release_format.md`. Gate: section 4 of
+`test_release_roundtrip.sh` (layout + no cross-platform leakage + a
+must-fire control). `release/merged-m6..m9/` keep the old single-package
+layout as history.
