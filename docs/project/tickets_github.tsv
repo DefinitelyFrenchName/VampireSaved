@@ -160,8 +160,8 @@ number	state	reason	closed	labels	title
 124	OPEN	-	-	cosmetic,parked	Arcade-ladder roulette tag shows the base/shell character for a tenant opponent on the arcade ladder map screen
 123	OPEN	-	-	cosmetic,parked	Win-quote text for the three tenants (forgone for now; only the clean way, vanilla untouched)
 122	CLOSED	COMPLETED	2026-10-06	evolution	Run the --controls release tier on the dedicated Linux server and compare its speed with the m2 pro (load balancing potential)
-121	OPEN	-	-	evolution	Linux release binaries built on dedicated server, plus clean-machine check at release (option 3)
-120	OPEN	-	-	evolution	The rebuild-from-docs option after MiSTer (a possibility to preserve, not a commitment)
+121	OPEN	-	-	evolution,parked	Linux release binaries built on dedicated server, plus clean-machine check at release
+120	OPEN	-	-	evolution,parked	The rebuild-from-docs option after MiSTer (a possibility to preserve, not a commitment)
 119	CLOSED	COMPLETED	2026-10-11	contested,evolution	The living-documentation framework as an independent sibling of bbh (ruled at the plan stage, not scheduled)
 118	OPEN	-	-	evolution,severity: low	Community cross-check: the ~90 unadopted mizuumi player-struct candidates, each adopted only once measured
 117	CLOSED	COMPLETED	2026-10-05	evolution	Community cross-check: naming rigs on vsavj for specials, supers, throws, the CL. rows and the 6-prefixed rows

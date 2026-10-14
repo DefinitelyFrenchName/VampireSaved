@@ -1,0 +1,65 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent199/close_rerun/findings_row.txt	cc92b24db273ea6fc5c965b48e8be847a12e1587
+build/agent199/close_rerun/out/exits.tsv	37987b1d3ed7fe9d60e11d234162145ab705a4fe
+build/agent199/close_rerun/checks.tsv	8d987b9930357db9f86ac33acb18d87a01526883
+build/agent199/close_rerun/checks_decl.tsv	c45fb53605be97e0329e30b20ed71ba0f0dbf974
+build/agent199/close_rerun/classes.tsv	760e001d82349efd3c5a12c159b919cd47ec4055
+build/agent199/close_rerun/promises.tsv	cc1d4a290703c59e3a7b7d323ff51c49d9a02502
+build/agent199/close_rerun/rulings_exempt.tsv	7ae5040c66c5d2d932eebf34fb7cb4f3b3b505e0
+build/agent199/close_rerun/premises.txt	aa886082b6f3060007e7852309049d15ed0e377f
+build/agent199/close_rerun/retraction_classes.tsv	7720998b8691bf0ba72fc17959f631777c5034eb
+tests/rulecheck/retractions/14z-199.tsv	f70f1e35a292cba7e7f727708d61dde9ee5596b7
+docs/NEXT_SESSION.md	c60249dd32ea6bf2384e4a8be6afcb92939aba94
+STATE.md.lines-77-94 (lines 77-94 of STATE.md)	e968704cb4cbc6b1e421aedd28080a7e90d336ff
+DECISIONS_HISTORY.md.lines-6637-6725 (lines 6637-6725 of DECISIONS_HISTORY.md)	0bc0c52f23539ee611b301dcafad3f0544a50385
+docs/project/gotchas.md.lines-6891-6906 (lines 6891-6906 of docs/project/gotchas.md)	0c09c58ebe34960324a02c05cf37d25f32f8143a
+docs/project/gotchas.md.lines-6994-7068 (lines 6994-7068 of docs/project/gotchas.md)	fd4864c49ff1caf351d3e439a1f151d2362193ae
+docs/project/snapshot_runs.md.lines-22-34 (lines 22-34 of docs/project/snapshot_runs.md)	50c63716813773334ea62a306d18dd196bfca2f6
+docs/project/snapshot_runs.md.lines-82-93 (lines 82-93 of docs/project/snapshot_runs.md)	555c4c7d3399938cdc7aa22a80d5c0f99c4db6b2
+build/agent199/NOTES_273_265.md	585910880024294e46f3c2a82bdf35b2754db75d
+DECISIONS_HISTORY.md.lines-519-526 (lines 519-526 of DECISIONS_HISTORY.md)	903f4f417c2446bf928d9e01d0fbdfc586f81a1d
+DECISIONS_HISTORY.md.lines-6630-6636 (lines 6630-6636 of DECISIONS_HISTORY.md)	ee2465d6763c44636445c6362157ed6b37cde73e
+tests/test_session_metrics.sh.lines-175-190 (lines 175-190 of tests/test_session_metrics.sh)	19a8af23ab7d884b0b3177b63a8325b7f83c4069
+build/agent199/c1/findings.md	e6bd1cc8a79f2612d71378a05820a88935fc8418
+tests/rulecheck/recurrence.tsv	143aab57854bf27c8e61c464e09fd11256bd4ab9
+build/agent200/bat/bat200.log	f1a8ecb7769e0c29b2b35f7a37b95fe322149af2
+build/agent200/bat/bat200_ff.log	25291be35f582b91d8734ef619092066bf82c4a9
+build/agent200/bat/tree200.sha256	2e956e25243c537d0421d7ab70aa199d65809e60
+build/agent199/close_rerun/out/runs/anchors_selftest.out	865957966abeaeb4c67490fa2481e1c8a9f3dadd
+build/agent199/close_rerun/out/runs/census_selftest.out	009348f58e29edf51a76220602648f088da05f44
+build/agent199/close_rerun/out/runs/claim_lint_selftest.out	8e043d70fface9ba2a123c34fab881c495559429
+build/agent199/close_rerun/out/runs/close_findings.out	d186e73bf984f25968f3b9b322f3be2e73c5678a
+build/agent199/close_rerun/out/runs/dup_decisions.out	fb530332df72561df45f2a2b61e4980d115434d4
+build/agent199/close_rerun/out/runs/dup_decisions_plant.out	0cb54741520a62c6600caae72957ba6f08fd60d8
+build/agent199/close_rerun/out/runs/dup_state_history.out	73759ce1fba2159f8d862b6b5d8d8525991c5893
+build/agent199/close_rerun/out/runs/dup_state_history_plant.out	fc98205c78938014f05cb289b3616beeb4d5e92d
+build/agent199/close_rerun/out/runs/findings_anchors.out	f18e00c254cf913361aa18f209de1bc6befdbcc4
+build/agent199/close_rerun/out/runs/findings_anchors_plant.out	a2dddedd972f3ffef806705fd8a4170767b66a33
+build/agent199/close_rerun/out/runs/findings_selftest.out	1a6e2233fcbd559188b75487172c4bfd1448f7ab
+build/agent199/close_rerun/out/runs/homes_selftest.out	4a1693ab2a6c65a700b1fbfe2c709fe1cbfb6bbd
+build/agent199/close_rerun/out/runs/homes_tracked.out	e4e108fd7272e1f019cb579a3704fe65b62a616a
+build/agent199/close_rerun/out/runs/none_reasons.out	2c16cf55b782c3b35dbda0f92390bb49fac001a1
+build/agent199/close_rerun/out/runs/none_reasons_plant.out	489ca15807becc7dc9c2335af36b6760011b2e17
+build/agent199/close_rerun/out/runs/none_reasons_selftest.out	856233dffc4ac231dd63e2955987681a22064acc
+build/agent199/close_rerun/out/runs/open_tickets.out	32f419825c7538a7f50ce2dfd61a0c6ef4603b28
+build/agent199/close_rerun/out/runs/open_tickets_plant.out	935e704140cd676c0178bd74a80be3a6cd96fe86
+build/agent199/close_rerun/out/runs/promise_check.out	e0bef599596c31cd2d9820f0ac0a49a0bd53ea96
+build/agent199/close_rerun/out/runs/promise_selftest.out	6c30dd58cf24ec93c94f8e4141d0b21e04a6b556
+build/agent199/close_rerun/out/runs/retraction_grep.out	b1df4e37df4d0a901bf4ea25dd48dc1d720676bf
+build/agent199/close_rerun/out/runs/retraction_selftest.out	12b5583ab0e4a71a9e73aaacc3ef06300e86258c
+build/agent199/close_rerun/out/runs/row_copy.out	932ccc65c3378f8eb8fe3360a5e13f0d2a842986
+build/agent199/close_rerun/out/runs/row_copy_plant.out	289dc1f24ac632dbdb349f8a03466459e76c0f0b
+build/agent199/close_rerun/out/runs/rulings_selftest.out	b58e4344466e154c2a4fa056d1a324fb08214b77
+build/agent199/close_rerun/out/runs/rulings_verbatim.out	c1bfad0b070e2200620b36f496414aa1b96664e3
+build/agent199/close_rerun/out/runs/scratch_census.out	d41015952d9e97101db719ce91c42b773b4f78f0
+build/agent199/close_rerun/out/runs/session_metrics.out	9e453886dbe28415c1d97e8d22f33f0c6a1bf9a7
+build/agent199/close_rerun/out/runs/shape.out	ce90b9f1dc4479ea8a79ab3f8d6e4f2137145304
+build/agent199/close_rerun/out/runs/shape_selftest.out	a122ae8197de8a15bea4c80a3de7ea7788aacfc4
+build/agent199/close_rerun/out/runs/standing_selftest.out	4760fd2ecdf7f02159eeb6fa4c0760d77981e076
+build/agent199/close_rerun/out/runs/state_lists.out	92d765be4b6b35a4ffc92fc54b814c82dadb8fd7
+build/agent199/close_rerun/out/runs/submodule_pins.out	ddd48d2c384d62133d4d3e0b2c27114205bd06b8
+build/agent199/close_rerun/out/runs/submodule_pins_plant.out	67dc233b204ffb8d87012223dc454adc74ae0f7b
+build/agent199/close_rerun/out/runs/submodule_pins_selftest.out	5b821de6e9271bb5d5e767b25db68123957fcc26
+build/agent199/close_rerun/out/runs/superseded.out	8bd1ce9faf362f7ec8d2f7bc3b1a2548977ec691
+build/agent199/close_rerun/out/runs/superseded_selftest.out	788cc539de952d645a86a5077ca6437654a6de80
+build/agent199/close_rerun/out/runs/tickets.out	0fbc2c24a6b981a6fd36952ddde500c59830a9b9
