@@ -7121,3 +7121,17 @@ the newest. So a presentation finding there cannot be resolved by `--recheck`. T
 (runs 2026-10-14-1029..1042) resolved each finding by work and a fresh packet run instead. **The rule:** a packet
 re-run in a later sitting resolves its findings by work and a new run; `--recheck` serves the sitting that rendered
 the packet.
+
+## A STRACE TRACE SCORED BY OPENED PATH MISSES FIVE READ FORMS — split lines, cwd-relative paths, directory fds, changed listings, reads through git (paid: 14z-201, #269, #283)
+
+`tools/trace_static_reads.py` scores a gate's reads as the repo paths its complete `open`/`openat`/`execve` lines name.
+Measuring #269's miss rate on the 14z-200 close tiers' carried gates, five rule-checker rounds (runs 2026-10-14-1073 to
+-1081) each found a read form that scoring cannot see: (1) strace `-f` into one file splits a call another process
+interrupts into `<unfinished ...>` / `<... resumed>` lines, and the `= rc` the regex needs is on the second (2,513 of
+66,463 open lines at `5648e530`); (2) a relative path opened from a cwd other than the repo root; (3) `openat(N, "name")`
+relative to a directory fd; (4) a directory LISTING whose entries changed — a file, or a whole subdirectory, added or
+removed — which no file path names; (5) a gate that learns of a file through git (its index or object store). Each was
+then measured on the carried traces (all clean) by a scratch reader with its own synthetic control
+(`build/agent201/t269/`, local). **The rule:** a trace's 0 holds only for the read forms its reader parses; before a
+score rests on it, list the forms the trace holds that the reader drops, and give each a reader and a control.
+#283 owns the tool's fix.

@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-515 entries (47 game / 133 platform / 335 project), counted from the buckets at generation.
+516 entries (47 game / 133 platform / 336 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 47 entries
 
@@ -208,7 +208,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - `find` IN A .BAT RUN FROM MSYS2 (OR WITH GIT'S usr\bin ON PATH) IS THE UNIX find — `find /c /v ""` walked the whole C: drive for hours (paid: 14z-197, GitHub #248)
 - ON A WSL2 BOX REACHED ONLY OVER SSH, WSLg COMES UP WITH NO DESKTOP BEHIND IT AND EVERY MAME PROCESS WAITS 100-180 s ON ITS SOCKETS — a release run's two prereq TIMEOUTs were the environment, not the build (paid: 14z-198)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 335 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 336 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -545,3 +545,4 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A TRACE SCORES ONLY THE GATES IT COULD RUN — a SKIP or an early exit under the trace hides the reads a narrowing drops (paid: 14z-200, #274)
 - A CONTROL MODE THAT CATCHES NOTHING MUST EXIT 0 — the runner reads exit 0 as LIES; a mode that exits 1 either way can never show a dead control (paid: 14z-200, `tests/test_trace_static_reads.sh` since 14z-191)
 - A DOCUMENTATION PACKET RE-RUN IN A LATER SITTING CANNOT USE `resolve --recheck` — its render binds the newest transcript (paid: 14z-200)
+- A STRACE TRACE SCORED BY OPENED PATH MISSES FIVE READ FORMS — split lines, cwd-relative paths, directory fds, changed listings, reads through git (paid: 14z-201, #269, #283)

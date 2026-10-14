@@ -18,7 +18,7 @@ number	state	reason	closed	labels	title
 272	CLOSED	COMPLETED	2026-10-13	evolution	A pre-prepare check for rule-checker packets: figures staged, attributions quoted, absolutes flagged, small packets
 271	CLOSED	COMPLETED	2026-10-13	evolution	Rule-checker readers exempt from the unsourced-figure hint, a recurrence alarm over the ledger, and resolve refuses unticketed instrument-blame
 270	CLOSED	COMPLETED	2026-10-13	evolution	The close's documentation packet asks only what the deterministic close checks do not cover; presentation fixes re-checked deterministically
-269	OPEN	-	-	evolution	Static tier turned around: a session runs the gates whose followed paths changed plus a core, controls only for changed gates; freeze and release run everything
+269	CLOSED	COMPLETED	2026-10-14	evolution	Static tier turned around: a session runs the gates whose followed paths changed plus a core, controls only for changed gates; freeze and release run everything
 268	CLOSED	COMPLETED	2026-10-13	evolution	test_close_tools cut back: session runs self-tests only, one-pass retraction scan at freeze/release, section-scoped control modes, retraction-file audit
 267	OPEN	-	-	evolution	Session ledger as a static page generated into docs/site/ at each close (hosting and what to publish are the maintainer's calls)
 266	OPEN	-	-	bug	PILOT's GNOME Shell segfaults under Wayland since 2026-10-09, so audit_release_linux_desktop cannot run

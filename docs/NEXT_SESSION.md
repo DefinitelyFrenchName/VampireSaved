@@ -27,9 +27,7 @@ whose controls the base did not execute, and carries the rest by name. A freeze 
 
 ## START HERE
 
-0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** Then put #269's closing to the maintainer: its done-when
-   (a session close ran the predicted set and the core, its readout names what it carried, a freeze/release run is
-   unchanged, the predictor's miss rate measured) — STATE 14z-200's CLOSE row says what the first confirm close showed.
+0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
 1. **#273 — THE REPLICATION THE MAINTAINER CHOSE** (`DECISIONS_HISTORY.md` "Ruled 2026-10-13 (14z-199) — #273: replicate before deciding; …").
    - Pre-registered in `build/agent199/t273/plan_replication.md`: two more readers per arm on the 15 that mattered and the 4 fixtures (76 pinned spawns, the same staged copies and prompts in `build/agent199/t273/stage/`), judged blind like `judge4/` beside a re-judging of the first readers' lines.
    - Write every check as a script whose output is an artifact BEFORE the rule-checker sees the report (`docs/project/gotchas.md` "A MEASUREMENT PUT TO THE RULE-CHECKER NEEDS EVERY CHECK'S OUTPUT SAVED" — paid again at 14z-200, twelve runs for one report).
