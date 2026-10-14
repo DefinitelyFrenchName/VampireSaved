@@ -1,0 +1,72 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent200/close/findings_row.txt	6e05305f0b99b240549e6968586cdaaa36f687e8
+build/agent200/close/out/exits.tsv	e7d84a3c65f28f8468407053aac8e439260d3931
+build/agent200/close/checks.tsv	782a93551c4893ff0bb574c288b91905ae296f50
+build/agent200/close/checks_decl.tsv	ffb00bcfbcc72bd5697e463cb045d1a865cc2380
+build/agent200/close/classes.tsv	4b34abf2d7a824d86b983c4471bea8a633016185
+build/agent200/close/promises.tsv	0e29af9fed50ab1d63cf3ec2c8392b2681f79b4a
+build/agent200/close/rulings_exempt.tsv	859f6a947796d8a624204d4156847f10995a0de0
+build/agent200/close/premises.txt	defdbfed1444be9ec3212cd145208baccc5da2a4
+build/agent200/close/retraction_14z200.out	92fbd979cf6aa236a5f867671d1aa00f22827a82
+tests/rulecheck/retractions/14z-200.tsv	89bf74080eaedc42d0762402331d522b2a44f2f2
+docs/NEXT_SESSION.md	87838bc42d7c186f817af91d62cd7558da7eaeca
+STATE.md.lines-77-88 (lines 77-88 of STATE.md)	3279b86320abc12b7fdd9bb4da174ec153ecbaaf
+DECISIONS_HISTORY.md.lines-6718-6733 (lines 6718-6733 of DECISIONS_HISTORY.md)	d4c4172cb71b36262f5acbba67bfd278069850e6
+DECISIONS_HISTORY.md.lines-2520-2527 (lines 2520-2527 of DECISIONS_HISTORY.md)	4b04c42b42f859db577119110cc55036f20d191d
+DECISIONS_HISTORY.md.lines-2780-2787 (lines 2780-2787 of DECISIONS_HISTORY.md)	886b4b7026190aa82af9b4de33588a4f977d7408
+docs/project/gotchas.md.lines-7025-7052 (lines 7025-7052 of docs/project/gotchas.md)	a4fa064b14079fe1fb0faabc6dbf288dcf4c1229
+docs/project/gotchas.md.lines-7071-7122 (lines 7071-7122 of docs/project/gotchas.md)	449b472e9072d4a12c8d329877a46a3313e15f68
+docs/project/tickets.tsv.lines-74-86 (lines 74-86 of docs/project/tickets.tsv)	2fd293ebd37469385a71dc3f25e031ce690b0188
+build/agent200/rc/comment269.md	cb4a007820b807d19ab90fe720d5dc62c8adf9c3
+build/agent200/rc/close274.md	9133d62ae86cc5370ac3dc1cf2a381bf2aa4a30d
+build/agent200/tickets/t1.md	587d5fba771c851de8234d0b24903b601b3332eb
+build/agent200/tickets/t2.md	4a6d1f75931a3ccf71c41f5f94a7f28398dd940f
+build/agent200/tickets/t3.md	e304e93b5bce86dd0a1766306313c5f5587caaa7
+build/agent200/tickets/t4.md	6243779039cd4f5be4e100d40c90cb91336fe19e
+build/agent200/bat/bat200.log	f1a8ecb7769e0c29b2b35f7a37b95fe322149af2
+build/agent200/bat/bat200c.log	92e7c529ff5df3d7f9820ebc971e7cee818d6e71
+build/agent200/t274/measure_return9.txt	1eeb006ab40a464df6095d59eef7965d486f4ea2
+tests/rulecheck/ledger.tsv.lines-941-969 (lines 941-969 of tests/rulecheck/ledger.tsv)	a2d4b3b19481687d790cf697d4a7fea4e3af363d
+tests/rulecheck/runs/2026-10-14-1029/WITHDRAWN.txt	d5535a5235e98cc713b28c191506f93dcbb82a67
+tests/rulecheck/runs/2026-10-14-1032/WITHDRAWN.txt	052b9c6f62e984b979fe3adc93c0242731df56a8
+tests/rulecheck/runs/2026-10-14-1043/WITHDRAWN.txt	be5a62919c5000cb49ad3d17e34053dd367c92e4
+tests/rulecheck/runs/2026-10-14-1055/WITHDRAWN.txt	27fb509a306c508d42a1ecb9f6f1dd64480bc9dd
+tests/rulecheck/runs/2026-10-14-1058/WITHDRAWN.txt	b79a719424e903ca62c205c1e9d7c843759c3c27
+build/agent200/close/out/runs/anchors_selftest.out	7eb8a9b834da4ba48db891c83c0d122d446ff04f
+build/agent200/close/out/runs/census_selftest.out	009348f58e29edf51a76220602648f088da05f44
+build/agent200/close/out/runs/claim_lint_selftest.out	8e043d70fface9ba2a123c34fab881c495559429
+build/agent200/close/out/runs/close_findings.out	9761d78f91a2765a4d4be88ead0748addd11b90a
+build/agent200/close/out/runs/dup_decisions.out	17ace0934a12581894b16001fb88fc8b52263258
+build/agent200/close/out/runs/dup_decisions_plant.out	c732122390190c32ae200f791f9e62ef4cce3b39
+build/agent200/close/out/runs/dup_state_history.out	02c3955f1ef4fa1df9643739da25462f73246900
+build/agent200/close/out/runs/dup_state_history_plant.out	462b034e842b12c53f26554ba4ad4976b321e521
+build/agent200/close/out/runs/findings_anchors.out	19f61d3642b683bf3745aaddac0c8509b8e7d309
+build/agent200/close/out/runs/findings_anchors_plant.out	4aec96b432426ff4e6e28771188a3231526727f3
+build/agent200/close/out/runs/findings_selftest.out	1a6e2233fcbd559188b75487172c4bfd1448f7ab
+build/agent200/close/out/runs/homes_selftest.out	1a72b03628480242d4d5e56f80b9a02e0b524b05
+build/agent200/close/out/runs/homes_tracked.out	9917d7784c97cad76a0900924c9b42428e7f170e
+build/agent200/close/out/runs/none_reasons.out	1be40860114444b7e7038860d55a6a4cf21d61a6
+build/agent200/close/out/runs/none_reasons_plant.out	88254248a3202f62ba2032439239aa1edf319d1b
+build/agent200/close/out/runs/none_reasons_selftest.out	856233dffc4ac231dd63e2955987681a22064acc
+build/agent200/close/out/runs/open_tickets.out	43fecbb222f092ce74a8bd581b3dd0d72194cfff
+build/agent200/close/out/runs/open_tickets_plant.out	961cc52bb75e4f5bf3d1c4d268c2f32f8455991d
+build/agent200/close/out/runs/promise_check.out	a54883d3111f66a10299ae3989578d2243fd2c01
+build/agent200/close/out/runs/promise_selftest.out	6c30dd58cf24ec93c94f8e4141d0b21e04a6b556
+build/agent200/close/out/runs/retraction_grep.out	be9d653fbde4af07083c56f68c0d639635568c3b
+build/agent200/close/out/runs/retraction_selftest.out	12b5583ab0e4a71a9e73aaacc3ef06300e86258c
+build/agent200/close/out/runs/row_copy.out	fd3edcf4317aab0bf87f1515c4f7f38833bd3df9
+build/agent200/close/out/runs/row_copy_plant.out	8dda0c1a8f10dace61a9a59f00541aa17307a1f3
+build/agent200/close/out/runs/rulings_selftest.out	b58e4344466e154c2a4fa056d1a324fb08214b77
+build/agent200/close/out/runs/rulings_verbatim.out	b9d463ed355893e95a58e06cca855fc8550efae8
+build/agent200/close/out/runs/scratch_census.out	0fbba499bbf0a4c37514c11e4336fdd4689a2d79
+build/agent200/close/out/runs/session_metrics.out	321412a9c5a746a6c10e03f9f6e0ea1cfa5632d4
+build/agent200/close/out/runs/shape.out	ce90b9f1dc4479ea8a79ab3f8d6e4f2137145304
+build/agent200/close/out/runs/shape_selftest.out	a122ae8197de8a15bea4c80a3de7ea7788aacfc4
+build/agent200/close/out/runs/standing_selftest.out	4760fd2ecdf7f02159eeb6fa4c0760d77981e076
+build/agent200/close/out/runs/state_lists.out	a7522abee74c9af5b54c878e621072a1d3493df3
+build/agent200/close/out/runs/submodule_pins.out	ddd48d2c384d62133d4d3e0b2c27114205bd06b8
+build/agent200/close/out/runs/submodule_pins_plant.out	e75b1c5240488d0134c3a048d629e4b25bb71ac4
+build/agent200/close/out/runs/submodule_pins_selftest.out	fc1fbb847957fae52c9601e763cced1ea6cb4fe6
+build/agent200/close/out/runs/superseded.out	8bd1ce9faf362f7ec8d2f7bc3b1a2548977ec691
+build/agent200/close/out/runs/superseded_selftest.out	788cc539de952d645a86a5077ca6437654a6de80
+build/agent200/close/out/runs/tickets.out	011f8d77275608529dc21835b653ee895e834620

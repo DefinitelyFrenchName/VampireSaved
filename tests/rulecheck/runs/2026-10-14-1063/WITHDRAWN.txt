@@ -1,0 +1,1 @@
+WITHDRAWN 2026-10-14 (14z-200), never spawned: its pre-prepare flags showed figures no artifact carried (run ids 1032 and 1058, the tier's 391 executed controls) and a NEXT_SESSION statement carried from 14z-199 undated; the ledger lines, the tier's FIG file and the dated wording added, re-prepared as the next run.

@@ -1,0 +1,9 @@
+  FLAG D-ABSOLUTE: > Rewritten at every session close ([VSP-17]).  [docs/NEXT_SESSION.md]
+  FLAG D-ABSOLUTE: A recommendation leans only on the maintainer's OWN words.  [docs/NEXT_SESSION.md]
+  FLAG D-ABSOLUTE: - no severity label: #260, #262, #263, #266, #267, #269, #273, #275, #276 (the session dashboard misses every tier run on a snapshot), #277 (the procedure ch...  [docs/NEXT_SESSION.md]
+  FLAG D-ABSOLUTE: It is the one red/SKIP row of the release-cadence staleness audit.  [docs/NEXT_SESSION.md]
+  FLAG D-ABSOLUTE: - **Filed, release-only:** #278, #279, #280, #281.  [docs/NEXT_SESSION.md]
+  FLAG D-FIGURE: 1032  [STATE.md.lines-77-88 (lines 77-88 of STATE.md)]
+  FLAG D-FIGURE: 391  [STATE.md.lines-77-88 (lines 77-88 of STATE.md)]
+  FLAG D-FIGURE: 1058  [STATE.md.lines-77-88 (lines 77-88 of STATE.md)]
+packet_check: 8 flag(s): D-ABSOLUTE 5, D-FIGURE 3
