@@ -53,6 +53,10 @@ ERIS trace scores them at 0 misses — until then a close does not lean on them 
      prose ("the control tests nothing"), a case-pattern glob (`*tests/*.sh*`), or a directory joined to a
      further LITERAL component (`"docs" / "checksums.txt"`, `"tools", "x.py"`: that names a file, R2's);
      `,`- or `/`-joined quoted components still name the deeper directory;
+  N-C also counts a directory named as a shell default or assignment value (`${1:-release/x}`, `REL=release/x`):
+     the trace of the nine gates the first #274 trace could not score (node, Chromium, xdelta3 and the community
+     workbook present on PILOT, #269 "C first", 14z-200) found 9 reads of release/merged-m23/mame in
+     test_applier_vcdiff that N-C as first built missed and the predictor before #274 caught;
   N-D the session tooling's untracked scratch — build/agent<N>*/, build/rulecheck/, build/static_runs/,
      build/snapshot_runs/ (SCRATCH) — leaves every gate's change set but the whole-tree readers' (R4): the trace
      shows no gate opening a file under them, and three list them through git's untracked walk
@@ -208,6 +212,9 @@ def dir_patterns(c):
         e = re.escape(d)
         pats.append((d, "bare", re.compile(r"(?<![\w.*-])" + e + r"/?(?=[\"'\s*)\]]|$)" + JOINED_LIT, re.M)))
         pats.append((d, "lit", re.compile(r"(?<=[\"'/])" + e + r"/?(?=[\"'\s*)\]]|$)" + JOINED_LIT, re.M)))
+        # a path as a shell default or assignment value: `${1:-release/x/y}`, `REL=release/x` (14z-200, the
+        # #269 "C first" trace: test_applier_vcdiff's `REL="${1:-release/merged-m23/mame}"`, 9 reads N-C missed)
+        pats.append((d, "lit", re.compile(r"(?:(?<=:[-=+?])|(?<==))" + e + r"/?(?=[\"'\s*)\]}]|$)", re.M)))   # SHELL-DEFAULT
         if k > 1:
             joined = r"[\"']\s*[,/]\s*[\"']".join(re.escape(x) for x in parts[:k])
             pats.append((d, "join", re.compile(r"[\"']" + joined + r"[\"']")))
@@ -427,7 +434,9 @@ def selftest():
                 os.chmod(p, 0o755)
         w("tests/ci_portable.txt", "g_named\ng_prog\ng_dir\ng_join\ng_whole\ng_data\ng_tmpl\ng_git\ng_bin\n"
           "g_buildbare\ng_buildsub\ng_buildtmpl\ng_statemsg\ng_stateread\ng_statearg\ng_statepair\n"
-          "g_prose\ng_pyident\ng_pyfile\ng_casepat\ng_pylist\ng_pydeep\ng_gitlist\ng_sib\n")
+          "g_prose\ng_pyident\ng_pyfile\ng_casepat\ng_pylist\ng_pydeep\ng_gitlist\ng_sib\ng_shdef\n")
+        # 14z-200 (#269 "C first"): a directory named only as a shell parameter default
+        w("tests/g_shdef.sh", "#!/bin/sh\nREL=\"${1:-rel/m23/mame}\"\n[ -f \"$REL/manifest.json\" ] && ls \"$REL\"\n", True)
         # 14z-200 (#274): R4 in list form; a sibling program run by a path beside its caller, which reads a
         # directory it names by its last component (R3c)
         w("tests/g_gitlist.sh", "#!/bin/sh\npython3 tools/gitlist.py\n", True)
@@ -513,6 +522,8 @@ def selftest():
             ("build/m2/x.log", {"g_buildtmpl", "g_whole"}),
             # R3c through the sibling closure: tools/sibchild.py (run by tools/sibmain.py beside it) lists sibdata/
             ("tools/sibdata/b.mjs", {"g_sib", "g_whole"}),
+            # the shell default `${1:-rel/m23/mame}` names the directory every file under it is read from
+            ("rel/m23/mame/README.md", {"g_shdef", "g_whole"}),
         ]
         subprocess.run(["git", "init", "-q"], cwd=root, check=True)
         subprocess.run(["git", "add", "-A"], cwd=root, check=True)

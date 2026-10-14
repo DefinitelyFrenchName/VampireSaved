@@ -12,12 +12,12 @@
 #   directory named beside its caller, R4 reads git in list form, R3 skips prose, python identifiers,
 #   case globs and a directory joined to a literal file (N-C), and the session's build/ scratch leaves
 #   every change set but a whole-tree reader's (N-D).
-# HOW: drives the predictor's selftest over a synthetic repo of twenty-four gates (since #274), one per reader class
+# HOW: drives the predictor's selftest over a synthetic repo of twenty-five gates (since 14z-200), one per reader class
 #   plus the seven of #188 option B's two narrowings (14z-190), with known answers; twelve controls run copies
 #   with one rule removed (directory, whole-tree, data, template, git), `--` read as a comment outside Lua
 #   (battery_reach.is_comment), binaries read as text, either narrowing switched off, or N-B's quoted-literal
 #   clause dropped, its prose strings paired across code, or R6 directory templates read as one component, and each must fail the selftest.
-# EXPECTS: the selftest's cases pass (twenty-four since #274, plus the eight drop_scratch cases) and every control fails on its copy. The HISTORY
+# EXPECTS: the selftest's cases pass (twenty-three changed paths since 14z-200, plus the eight drop_scratch cases) and every control fails on its copy. The HISTORY
 #   backtest (tests/expected/static_confirm_backtest.tsv, `static_confirm.py backtest`) takes
 #   minutes of worktrees and is run by hand, not here.
 #
@@ -40,6 +40,7 @@
 # MUST-FIRE: perturbed-copy: r3-joined-off — a copy whose R3 reads a directory joined to a further literal (`"docs" / "sums.txt"`) as the directory must mark that gate stale for docs/other.md, and the selftest must FAIL (mode: that copy's selftest)
 # MUST-FIRE: perturbed-copy: r3c-off — a copy without R3c must carry the gate whose sibling program lists `os.path.join(HERE, "sibdata")` for a change under tools/sibdata, and the selftest must FAIL (mode: that copy's selftest)
 # MUST-FIRE: perturbed-copy: sibling-off — a copy whose reach does not close over sibling programs must carry that same gate, and the selftest must FAIL (mode: that copy's selftest)
+# MUST-FIRE: perturbed-copy: shdef-off — a copy whose R3 does not read a directory named as a shell default (`${1:-rel/m23/mame}`) must carry that gate for a change under rel/m23/mame, and the selftest must FAIL (mode: that copy's selftest; the 9 reads the #269 "C first" trace found N-C missing, 14z-200)
 # MUST-FIRE: perturbed-copy: list-git-off — a copy without R4's list form must carry the gate whose python runs ["git", "-C", ".", "ls-files"], and the selftest must FAIL (mode: that copy's selftest)
 # MUST-FIRE: perturbed-copy: scratch-off — a copy whose change set keeps build/agent<N>/ scratch must mark the `"build/$b"` template gate stale for it, and the selftest must FAIL (mode: that copy's selftest)
 # MUST-FIRE: perturbed-copy: prose-pairing — a copy of N-B whose prose regex skips short quoted strings (pairing a path's closing quote with the next opening one) must mark the gate stale whose `[ -f "$D/x.diverge" ] && echo "... STATE.md ..."` line names STATE.md only in a message, and the selftest must FAIL (mode: that copy's selftest)
@@ -65,6 +66,7 @@ edits = {
     "r3-joined-off": ('JOINED_LIT = r"', 'JOINED_LIT = "" and r"'),
     "r3c-off": ('    for d in [x for x, _, _ in dps if "/" in x]:', "    for d in []:  # CONTROL r3c-off"),
     "sibling-off": ("            for m in SIBLING_PROG.finditer(text(root, p)):", "            for m in []:  # CONTROL sibling-off"),
+    "shdef-off": ("        pats.append((d, \"lit\", re.compile(r\"(?:(?<=:[-=+?])", "        None and pats.append((d, \"lit\", re.compile(r\"(?:(?<=:[-=+?])"),   # CONTROL shdef-off: never appended
     "list-git-off": ('r"|[\\"\']git', 'r"|NEVER[\\"\']git'),
     "scratch-off": ("    return bool(SCRATCH.match(c))", "    return False  # CONTROL scratch-off"),
     "no-whole-rule": ("        if not why and changed and WHOLE.search(blob):", "        if False:  # CONTROL no-whole-rule"),
@@ -95,7 +97,7 @@ sed 's/^/  /' "$W/self.txt"
 grep -q '^SELFTEST PASS$' "$W/self.txt" || { echo "FAIL: the predictor's selftest"; fail=1; }
 
 if [ -z "${VS_CTL:-}" ]; then
-    for c in no-dir-rule no-whole-rule no-data-rule no-template-rule no-git-rule dashdash-comment binary-as-text narrow-build-off narrow-state-off narrow-literal-blind prose-pairing dir-template-off r3-prose-off r3-joined-off r3c-off sibling-off list-git-off scratch-off; do
+    for c in no-dir-rule no-whole-rule no-data-rule no-template-rule no-git-rule dashdash-comment binary-as-text narrow-build-off narrow-state-off narrow-literal-blind prose-pairing dir-template-off r3-prose-off r3-joined-off r3c-off sibling-off shdef-off list-git-off scratch-off; do
         python3 "$(make_copy "$c")" --selftest > "$W/ctl_$c.txt" 2>&1 || true
         if grep -q '^SELFTEST FAIL$' "$W/ctl_$c.txt"; then vs_ctl_fired "$c" "$(grep -m1 'FAIL:' "$W/ctl_$c.txt" | sed 's/^ *//')"
         else vs_ctl_dead "$c" "the perturbed copy passed its selftest — the selftest cannot see this failure" || fail=1; fi
