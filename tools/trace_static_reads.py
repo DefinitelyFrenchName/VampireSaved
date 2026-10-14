@@ -19,7 +19,8 @@ WHAT EACH STEP DOES.
            commit whose predictor is to be scored, with ROMDIR set (a gate that SKIPs reads less).
   score    for every traced gate, every repo file it OPENED for reading — tracked, or untracked and not ignored (the
            predictor's input is the change set, never an ignored file) — must make the predictor mark the gate STALE
-           (its `stale_reason`, or R4, the whole-tree reader). A read it does not flag is a MISS. The predictor is
+           (its `stale_reason`, or R4, the whole-tree reader). A read it does not flag is a MISS, and so is a read the
+           predictor's change set drops (`drop_scratch`, N-D, #274) in a gate that is not a whole-tree reader. The predictor is
            imported from --tools (default: this tree's tools/), so the same traces score any version of it. Exit 1 on
            a miss. The gates that exited non-zero under the trace are NAMED: their reads may be short of a passing run's.
   control  the same traces scored by a deliberately OVER-NARROWED copy of this tree's predictor (N-A at every depth
@@ -110,7 +111,8 @@ def _score_one(g):
     rch = sc.reach(root, g, _W["idx"])
     blob = "\n".join(sc.text(root, p) for p in rch)
     whole = bool(sc.WHOLE.search(blob))
-    miss = [c for c in sorted(reads) if not (whole or sc.stale_reason(root, rch, blob, c, sc.patterns(c)))]
+    dropped = getattr(sc, "drop_scratch", lambda c: False)   # N-D: a read the change set drops is a miss
+    miss = [c for c in sorted(reads) if not (whole or (not dropped(c) and sc.stale_reason(root, rch, blob, c, sc.patterns(c))))]
     return g, len(reads), miss, rel
 
 

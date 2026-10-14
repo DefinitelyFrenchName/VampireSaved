@@ -40,6 +40,23 @@ ERIS trace scores them at 0 misses — until then a close does not lean on them 
      component (`"STATE.md"`, `'STATE.md'`, `$ROOT/STATE.md`) or where it survives with every PROSE string
      (quoted text holding a space: messages, echo lines) removed — a bare shell argument still counts. Every close
      edits STATE.md, and ~63 gates' tools name it only in messages.
+#274 (14z-200; scored on a fresh trace of all 222 gates at 6e329411, PILOT, with the session scratch present):
+  R1 the reach is closed again over SIBLING programs — a quoted `name.py`/`.sh`/`.lua` in a reach file that exists
+     beside that file (`os.path.join(os.path.dirname(__file__), "gen_applier_page.py")`, which battery_reach does
+     not follow);
+  R3c a quoted last component of a directory, in a reach file that sits in that directory's parent
+     (`os.path.join(HERE, "applier")`, tools/applier/);
+  R4 also in LIST form (`["git", "-C", root, "ls-files", ...]`); the two misses the trace found at HEAD before
+     this change, 15,013 reads in test_entropy_tripwire and 4 in test_applier_key_first, are these three;
+  N-C (R3) a directory counts as read where it is named as a path: a token that follows a quote or `/` anywhere,
+     or a bare token in non-python code once every prose string is removed; NOT a python identifier (`docs`),
+     prose ("the control tests nothing"), a case-pattern glob (`*tests/*.sh*`), or a directory joined to a
+     further LITERAL component (`"docs" / "checksums.txt"`, `"tools", "x.py"`: that names a file, R2's);
+     `,`- or `/`-joined quoted components still name the deeper directory;
+  N-D the session tooling's untracked scratch — build/agent<N>*/, build/rulecheck/, build/static_runs/,
+     build/snapshot_runs/ (SCRATCH) — leaves every gate's change set but the whole-tree readers' (R4): the trace
+     shows no gate opening a file under them, and three list them through git's untracked walk
+     (test_emulator_staleness, test_run_on_snapshot, test_session_metrics), which a path trace cannot score.
 Otherwise the gate is CARRIED. A BINARY file in the reach (a NUL in its first 8 KiB — the FBNeo executable
 is one) has no text: it names nothing, and R1 still covers a change to it (14z-188: read as text, its 42 MB
 made every rule search take seconds and two gates ran past the traced test's 600 s cap).
@@ -70,7 +87,10 @@ import os, re, subprocess, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import battery_reach as br   # noqa: E402
 
-WHOLE = re.compile(r"git\s+(?:ls-files|grep|status)\b|os\.walk\(|\.rglob\(|\bfind\s+\.(?:\s|$)|glob\.glob\([^)]*\*\*")
+WHOLE = re.compile(r"git\s+(?:ls-files|grep|status)\b|os\.walk\(|\.rglob\(|\bfind\s+\.(?:\s|$)|glob\.glob\([^)]*\*\*"
+                   # R4 in LIST form (14z-200, #274: tools/entropy_tripwire.py's ["git", "-C", root, "ls-files", ...] was
+                   # unseen, 15,013 traced reads missed in test_entropy_tripwire)
+                   r"|[\"']git[\"']\s*,\s*(?:[\"']-C[\"']\s*,\s*[^,\n]+,\s*)?[\"'](?:ls-files|grep|status)[\"']")
 _TEXT = {}
 
 
@@ -103,11 +123,31 @@ def registry(root):
     return names
 
 
+SIBLING_PROG = re.compile(r"[\"']([\w.-]+\.(?:py|sh|lua))[\"']")
+
+
 def reach(root, gate, files):
+    """the STRICT closure from the gate script, closed again over SIBLING programs: a quoted `name.py`/`.sh`/`.lua`
+    in a reach file that exists beside that file (14z-200, #274: tools/package_release.py runs
+    os.path.join(os.path.dirname(__file__), "gen_applier_page.py"), which battery_reach does not follow, and the
+    four tools/applier/ reads that script makes were missed in test_applier_key_first)"""
     br.STRICT[0] = True
     br.EXTRA[:] = []
-    seen, _ = br.closure(root, [f"tests/{gate}.sh"], files)
-    return sorted(seen)
+    seeds = [f"tests/{gate}.sh"]
+    while True:
+        seen, _ = br.closure(root, seeds, files)
+        add = set()
+        for p in seen:
+            if not p.endswith((".py", ".sh", ".lua")):
+                continue
+            d = os.path.dirname(p)
+            for m in SIBLING_PROG.finditer(text(root, p)):
+                q = os.path.join(d, m.group(1)) if d else m.group(1)
+                if q not in seen and os.path.isfile(os.path.join(root, q)):
+                    add.add(q)
+        if not add:
+            return sorted(seen)
+        seeds = sorted(set(seen) | add)
 
 
 NARROW_R3_TOP = ("build",)     # N-A: the bare top directory is not a reader of what changes under it
@@ -127,6 +167,25 @@ def deprose(t):
     return _PROSE[k]
 
 
+_R3B = {}
+
+
+def r3_blob(root, rch, blob):
+    """N-C: the reach's non-python code with every prose string removed — where a BARE directory token counts"""
+    k = (root, hash(blob))
+    if k not in _R3B:
+        _R3B[k] = "\n".join(deprose(text(root, p)) for p in rch if not p.endswith(".py"))
+    return _R3B[k]
+
+
+# N-D: untracked scratch the session tooling writes under build/ is not an input of any static gate
+SCRATCH = re.compile(r"^build/(?:agent\d+\w*|rulecheck|static_runs|snapshot_runs)/")
+
+
+def drop_scratch(c):
+    return bool(SCRATCH.match(c))
+
+
 def narrow_search(base, t):
     """N-B: does t name `base` as a quoted literal or path component, or outside every prose string?"""
     e = re.escape(base)
@@ -134,17 +193,24 @@ def narrow_search(base, t):
     return bool(lit or re.search(r"(?<![\w.-])" + e + r"(?![\w-])", deprose(t)))
 
 
+JOINED_LIT = r"(?![\"']\s*[,/]\s*[\"'][^\"'{}$*%\n]*[\"'])"   # N-C: `"tools", "x.py"` / `"docs" / "a.txt"` name a FILE
+
+
 def dir_patterns(c):
+    """-> [(dir, kind, regex)]: kind `bare` (searched on deprosed non-python text), `lit` (a quoted or `/`-led
+    token, searched on every text) or `join` (quoted components joined by `,` or `/`, every text)."""
     parts = c.split("/")[:-1]
     pats = []
     for k in range(1, len(parts) + 1):
         if k == 1 and parts[0] in NARROW_R3_TOP:   # N-A
             continue
         d = "/".join(parts[:k])
-        pats.append((d, re.compile(r"(?<![\w.-])" + re.escape(d) + r"/?(?=[\"'\s*)\]]|$)", re.M)))
+        e = re.escape(d)
+        pats.append((d, "bare", re.compile(r"(?<![\w.*-])" + e + r"/?(?=[\"'\s*)\]]|$)" + JOINED_LIT, re.M)))
+        pats.append((d, "lit", re.compile(r"(?<=[\"'/])" + e + r"/?(?=[\"'\s*)\]]|$)" + JOINED_LIT, re.M)))
         if k > 1:
-            joined = r"[\"']\s*,\s*[\"']".join(re.escape(x) for x in parts[:k])
-            pats.append((d, re.compile(r"[\"']" + joined + r"[\"']")))
+            joined = r"[\"']\s*[,/]\s*[\"']".join(re.escape(x) for x in parts[:k])
+            pats.append((d, "join", re.compile(r"[\"']" + joined + r"[\"']")))
     return pats
 
 
@@ -233,11 +299,23 @@ def stale_reason(root, rch, blob, c, pats):
             where = next((p for p in rch if narrow_search(base, text(root, p))), "?")
             return f"R2 {where} names {base}"
         bpat = None
-    tests = ([("R2", bpat, base)] if bpat else []) + [("R3", rx, d) for d, rx in dps]
-    for rule, rx, what in tests:
-        if rx.search(blob):
-            where = next((p for p in rch if rx.search(text(root, p))), "?")
-            return f"R2 {where} names {what}" if rule == "R2" else f"R3 {where} reads directory {what}"
+    if bpat and bpat.search(blob):
+        where = next((p for p in rch if bpat.search(text(root, p))), "?")
+        return f"R2 {where} names {base}"
+    for d in [x for x, _, _ in dps if "/" in x]:   # R3c (14z-200, #274): os.path.join(HERE, "applier") beside it
+        par, name = d.rsplit("/", 1)
+        sib = re.compile(r"(?<=[\"'])" + re.escape(name) + r"/?(?=[\"'])" + JOINED_LIT)
+        for p in rch:
+            if os.path.dirname(p) == par and sib.search(text(root, p)):
+                return f"R3 {p} reads its sibling directory {d}"
+    for d, kind, rx in dps:   # N-C: R3 by kind; a bare token counts only outside python and outside prose
+        hay = r3_blob(root, rch, blob) if kind == "bare" else blob
+        if rx.search(hay):
+            if kind == "bare":
+                where = next((p for p in rch if not p.endswith(".py") and rx.search(deprose(text(root, p)))), "?")
+            else:
+                where = next((p for p in rch if rx.search(text(root, p))), "?")
+            return f"R3 {where} reads directory {d}"
     base = os.path.basename(c)
     for d in data_files(root, blob):
         if d == c:
@@ -284,11 +362,14 @@ def predict(root, changed):
     gates = registry(root)
     pats = {c: patterns(c) for c in changed}
     stale, carried = {}, []
+    # N-D: the session tooling's scratch under build/ is judged by R4 alone (a whole-tree reader lists it); measured
+    # 14z-200 on the trace at 6e329411 with the scratch present: no gate opened a file under it
+    eff = [c for c in changed if not drop_scratch(c)]
     for g in gates:
         rch = reach(root, g, files)
         blob = "\n".join(text(root, p) for p in rch)
         why = None
-        for c in changed:
+        for c in eff:
             why = stale_reason(root, rch, blob, c, pats[c])
             if why:
                 break
@@ -345,7 +426,28 @@ def selftest():
             if x:
                 os.chmod(p, 0o755)
         w("tests/ci_portable.txt", "g_named\ng_prog\ng_dir\ng_join\ng_whole\ng_data\ng_tmpl\ng_git\ng_bin\n"
-          "g_buildbare\ng_buildsub\ng_buildtmpl\ng_statemsg\ng_stateread\ng_statearg\ng_statepair\n")
+          "g_buildbare\ng_buildsub\ng_buildtmpl\ng_statemsg\ng_stateread\ng_statearg\ng_statepair\n"
+          "g_prose\ng_pyident\ng_pyfile\ng_casepat\ng_pylist\ng_pydeep\ng_gitlist\ng_sib\n")
+        # 14z-200 (#274): R4 in list form; a sibling program run by a path beside its caller, which reads a
+        # directory it names by its last component (R3c)
+        w("tests/g_gitlist.sh", "#!/bin/sh\npython3 tools/gitlist.py\n", True)
+        w("tools/gitlist.py", "import subprocess\nsubprocess.run([\"git\", \"-C\", \".\", \"ls-files\", \"-z\"])\n")
+        w("tests/g_sib.sh", "#!/bin/sh\npython3 tools/sibmain.py\n", True)
+        w("tools/sibmain.py", "import os, subprocess, sys\nsubprocess.run([sys.executable, os.path.join(os.path.dirname(__file__), \"sibchild.py\")])\n")
+        w("tools/sibchild.py", "import os\nHERE = os.path.dirname(__file__)\nprint(os.listdir(os.path.join(HERE, \"sibdata\")))\n")
+        w("tools/sibdata/a.mjs", "x\n")
+        # N-C: prose naming a directory, a python identifier, a joined literal FILE, a case-pattern glob — none
+        # reads the directory; a quoted directory listed in python, and a joined pair listed, do
+        w("tests/g_prose.sh", "#!/bin/sh\necho \"the control tests nothing; outside tools/ and docs\"\n", True)
+        w("tests/g_pyident.sh", "#!/bin/sh\npython3 tools/pyident.py\n", True)
+        w("tools/pyident.py", "docs = []\nprint(len(docs), [t for t in docs])\n")
+        w("tests/g_pyfile.sh", "#!/bin/sh\npython3 tools/pyfile.py\n", True)
+        w("tools/pyfile.py", "import os, pathlib\nR = pathlib.Path('.')\nm = R / \"docs\" / \"sums.txt\"\nn = os.path.join('.', \"tests\", \"one.sh\")\n")
+        w("tests/g_casepat.sh", "#!/bin/sh\ncase \"$1\" in *tests/*.sh*) : ;; esac\n", True)
+        w("tests/g_pylist.sh", "#!/bin/sh\npython3 tools/pylist.py\n", True)
+        w("tools/pylist.py", "import os\nprint(os.listdir(os.path.join('.', \"tests\")))\n")
+        w("tests/g_pydeep.sh", "#!/bin/sh\npython3 tools/pydeep.py\n", True)
+        w("tools/pydeep.py", "import pathlib\nprint(list((pathlib.Path('.') / \"tests\" / \"expected\").glob('*')))\n")
         # N-A: a bare `build` reader and a deeper one; N-B: a message, an inline read and a bare argument
         w("tests/g_buildbare.sh", "#!/bin/sh\nls build > /dev/null\n", True)
         w("tests/g_buildsub.sh", "#!/bin/sh\nfor f in build/m1/*; do :; done\n", True)
@@ -373,15 +475,25 @@ def selftest():
         cases = [
             # g_join names 'docs' as a bare quoted directory: every change under docs/ is STALE for it
             # (over-approximate by design, R3 at depth 1)
-            ("docs/data/table.tsv", {"g_named", "g_join", "g_whole"}),
+            # N-C: g_join's 'docs' is joined to the literal 'project', so it names docs/project, not docs
+            ("docs/data/table.tsv", {"g_named", "g_whole"}),
             ("tools/helper.py", {"g_prog", "g_whole"}),
-            ("docs/game/new.md", {"g_dir", "g_join", "g_whole"}),
+            ("docs/game/new.md", {"g_dir", "g_whole"}),
+            # N-C: prose, a python identifier, a joined literal file and a case-pattern glob read no directory;
+            # the python listing of the quoted directory does (tests/new.sh), and the joined pair's listing
+            # reads tests/expected/ (and only it)
+            ("docs/other.md", {"g_whole"}),
+            # (g_casepat's `*tests/*.sh*` is still an R6 TEMPLATE for a tests/*.sh name; N-C's `*` rule is only R3's)
+            ("tests/new.sh", {"g_casepat", "g_pylist", "g_whole"}),
+            ("tests/data/new.txt", {"g_pylist", "g_whole"}),
+            ("tests/expected/new.txt", {"g_pylist", "g_pydeep", "g_whole"}),
+            ("docs/sums.txt", {"g_pyfile", "g_whole"}),
             ("docs/project/x.md", {"g_join", "g_whole"}),
             # N-B: the message does not read STATE.md; the inline read and the bare argument do
             ("STATE.md", {"g_whole", "g_stateread", "g_statearg"}),
             # N-A: the bare `build` reader is carried, the deeper reader is not
             ("build/m1/new.log", {"g_buildsub", "g_buildtmpl", "g_whole"}),
-            ("tests/g_named.sh", {"g_named", "g_whole"}),
+            ("tests/g_named.sh", {"g_casepat", "g_named", "g_pylist", "g_whole"}),
             # R5: g_data reads a data file that names the changed file
             ("notes/locked.md", {"g_data", "g_whole"}),
             # R6: g_tmpl's templated path matches; `$W/$n.out` is too generic to count (no stem)
@@ -394,6 +506,13 @@ def selftest():
             # a binary in the reach names nothing (R1 still covers the binary itself): read as text, the
             # names inside it would make g_bin stale for notes/locked.md above
             ("emu/tool", {"g_bin", "g_whole"}),
+            # N-D: scratch under build/agent<N>/ is out of every gate's change set but the whole-tree reader's,
+            # even for g_buildtmpl, whose "build/$b" template would match it; a build directory is not scratch
+            ("build/agent9/t1/x.sh", {"g_whole"}),
+            ("build/rulecheck/2026-01-01-01/a/p.md", {"g_whole"}),
+            ("build/m2/x.log", {"g_buildtmpl", "g_whole"}),
+            # R3c through the sibling closure: tools/sibchild.py (run by tools/sibmain.py beside it) lists sibdata/
+            ("tools/sibdata/b.mjs", {"g_sib", "g_whole"}),
         ]
         subprocess.run(["git", "init", "-q"], cwd=root, check=True)
         subprocess.run(["git", "add", "-A"], cwd=root, check=True)
@@ -401,9 +520,18 @@ def selftest():
             _TEXT.clear(); _REFS.clear(); _DATA.clear(); _TMPL.clear(); _TRACKED.clear()
             _, stale, _ = predict(root, [c])
             got = set(stale)
+            want = want | {"g_gitlist"}   # the list-form whole-tree reader is stale for every change, as g_whole
             good = got == want
             ok = ok and good
             print(f"  {'ok' if good else 'FAIL'}: {c} -> stale {sorted(got)}" + ("" if good else f", expected {sorted(want)}"))
+    # N-D: the session tooling's untracked scratch under build/ is out of the change set, a build is not
+    for c, want in (("build/agent200/t1/x.sh", True), ("build/rulecheck/2026-01-01-01/a/p.md", True),
+                    ("build/static_runs/x/results.tsv", True), ("build/snapshot_runs/x/y", True),
+                    ("build/m3b_merged31/rompath/vsavjw.zip", False), ("build/agentless/x", False),
+                    ("build/manifest/donovan.toml", False), ("tools/agent200.py", False)):
+        good = drop_scratch(c) == want
+        ok = ok and good
+        print(f"  {'ok' if good else 'FAIL'}: drop_scratch({c}) = {drop_scratch(c)}")
     print("SELFTEST " + ("PASS" if ok else "FAIL"))
     return 0 if ok else 1
 
