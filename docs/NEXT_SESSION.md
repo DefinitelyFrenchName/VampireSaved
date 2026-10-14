@@ -40,7 +40,7 @@ whose controls the base did not execute, and carries the rest by name. A freeze 
    - low: #118, #129, #229, #244;
    - no severity label: #260, #262, #263, #266, #267, #269, #273, #275, #276 (the session dashboard misses every tier run on a snapshot), #277 (the procedure check's extract: a figure written to fewer decimals reads unsourced; a part cut hides a step's evidence);
    - **release-only** (maintainer, 2026-10-14 — worked at a release, not in a session): #278 (a census of locale-sorted compares), #279 (xdelta3 3.0.11 release patches carry verbatim reference-ROM runs; PILOT is the Linux release builder), #280 (`test_applier_page` 3b on Python 3.12), #281 (`test_applier_page_browser`'s control under strace).
-4. **#266 — PILOT's GNOME Shell segfaults under Wayland at every boot since 2026-10-09**, so `audit_release_linux_desktop` cannot run. It is the one red/SKIP row of the release-cadence staleness audit.
+4. **#266 — PILOT's GNOME Shell segfaults under Wayland at every boot since 2026-10-09**, so `audit_release_linux_desktop` cannot run. At 14z-199 it was the one red/SKIP row of the release-cadence staleness audit (not re-read at 14z-200).
 5. **`tests/replays/118_chain.rpl`'s header names a leg of `audit_mizuumi_inputs` that gate never ran** (STATE_HISTORY 14z-198 finding (i)). The one-line correction stales the 76 emulator gates that follow `tests/replays/`, so make it in a session that runs those gates.
 6. **#118 — the chars gate, PARKED on branch `t118-196`.** **#129 stays the lowest priority**, captures first.
 
