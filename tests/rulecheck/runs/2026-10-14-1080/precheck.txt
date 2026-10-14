@@ -1,0 +1,3 @@
+  FLAG D-ABSOLUTE: Three carried gates run git, and in each the argv names what git reads:  [build/agent201/t269/report.md]
+  FLAG D-ABSOLUTE: - A relative path that the repo root holds is taken as opened from the root (the trace tool's own premise, its LIMITS); a dirfd open whose fd was inherited i...  [build/agent201/t269/report.md]
+packet_check: 2 flag(s): D-ABSOLUTE 2

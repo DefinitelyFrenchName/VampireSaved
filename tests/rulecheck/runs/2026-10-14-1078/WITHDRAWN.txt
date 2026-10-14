@@ -1,0 +1,1 @@
+WITHDRAWN before any reader was spawned (14z-201): its packet check flagged D-ABSOLUTE on a NOT-TESTED limitation line of report.md; re-prepared with --untied-ok stating why it stands.

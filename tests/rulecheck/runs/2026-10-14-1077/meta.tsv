@@ -1,0 +1,11 @@
+decision	recommendation
+subject	#269: close done on its done-when, the last clause measured as the miss rate of the 14z-200 close tiers' carried selections
+session	14z-201
+model	rule-checker@163e4ce9cf7b
+claim	#269's done-when is met and #269 can be put to the maintainer for closing `done`: the 14z-200 close ran the predicted set and the three-gate core, named every gate it carried, and left freeze/release runs unchanged (STATE 14z-200 row (6)); and the last clause, the predictor's miss rate on the new selection, is measured as 0 misses among the 56 gates carried at 5648e530 and 0 among the 80 carried at 344ebc5e — each carried gate's normal run traced under strace on PILOT at its tier's head, its opened repo files intersected with that tier's tracked change set by the trace tool's own reader and, after rule-checker run 2026-10-14-1073, by a reader that also keeps strace's split open lines and failed opens; and, after run 2026-10-14-1075, every relative path the carried gates opened that the repo root does not hold censused (37 and 53 distinct, none matching a changed path with its `..` segments dropped, none beginning `../`) — with four controls: a planted read that fired on both tiers, a synthetic split-line read only the new reader finds, a synthetic pair of cwd-relative reads (one `../`) the census matches, and a real-read control in which the gates each tier re-ran under rule R2 show changed-file reads (15 of 33, 11 of 36); every carried gate exited 0 and printed a verdict line. NOT TESTED: the traces ran on PILOT (Linux) while the tiers ran on the Mac; only each carried gate's normal run was traced, not its control modes, whose verdicts the confirm tier also carries; a process strace did not follow is unseen; reads outside the repo, stat-only checks and the environment are not scored; untracked changes are not in the change set (the tiers ran on snapshots); two selections from one sitting are not a rate over many closes.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	0 flag(s)
+deliverables	build/agent201/t269/report.md

@@ -1,0 +1,2 @@
+  FLAG D-ABSOLUTE: STATE 14z-200 row (6) records that this was not measured at the 14z-200 close; the predictor's misses had been scored only on #274's whole-registry traces.  [build/agent201/t269/report.md]
+packet_check: 1 flag(s): D-ABSOLUTE 1

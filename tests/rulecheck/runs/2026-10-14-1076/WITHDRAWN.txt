@@ -1,0 +1,1 @@
+WITHDRAWN before any reader was spawned (14z-201): its packet check flagged D-ABSOLUTE on report.md's 'Only each carried gate's NORMAL run was traced' with no source tied; the line now cites the trace tool's invocation; re-prepared.

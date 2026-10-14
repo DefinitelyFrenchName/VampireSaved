@@ -1,0 +1,2 @@
+  FLAG D-ABSOLUTE: - A relative path that the repo root holds is taken as opened from the root (the trace tool's own premise, its LIMITS); a dirfd open whose fd was inherited i...  [build/agent201/t269/report.md]
+packet_check: 1 flag(s): D-ABSOLUTE 1

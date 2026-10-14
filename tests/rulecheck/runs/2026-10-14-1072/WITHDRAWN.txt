@@ -1,0 +1,1 @@
+WITHDRAWN before any reader was spawned (14z-201): its packet check flagged D-ABSOLUTE on report.md's 'scored only on #274's whole-registry traces' — STATE 14z-200 row (6) says 'the predictor's misses were scored on #274's traces'; reworded and re-prepared.
