@@ -55,7 +55,9 @@ echo "== section 1: the frozen verdict set"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 # under CONTROL=covered-regions-raw the raw --all-regions set IS the verdict set: it must not match the freeze
 TRIAGE_ARGS=""; vs_ctl_is covered-regions-raw && TRIAGE_ARGS="--all-regions"
-python3 tools/triage_pcrel_escapes.py $TRIAGE_ARGS | sort > "$W/got.txt"
+# byte order (LC_ALL=C), the order the freeze was written in: a locale-aware sort (Linux, en_US.UTF-8) ignores the
+# `:` and puts `+0x9aa:` before `+0x9a:`, a drift that is only the host's collation (PILOT trace, 14z-200)
+python3 tools/triage_pcrel_escapes.py $TRIAGE_ARGS | LC_ALL=C sort > "$W/got.txt"
 if diff -u tests/expected/escape_triage.txt "$W/got.txt" > "$W/diff.txt"; then
     echo "   ok: 25 verdicts unchanged since reviewed (22 ADJACENT-OK + 3 reviewed-FP)"
 else
