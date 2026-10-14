@@ -34,33 +34,16 @@ MAME and a MiSTer core. Stock emulators cannot run the game.
 No ROM data is distributed. You rebuild the game from your own dumps with a small script that checks
 every byte before it writes anything.
 
-1. **Download ONE package** from the [release page](https://github.com/DefinitelyFrenchName/VampireSaved/releases/tag/freeze/merged-m19). 
+**Download ONE package** from the [release page](https://github.com/DefinitelyFrenchName/VampireSaved/releases/tag/freeze/merged-m19). 
    Each one is complete.
-     
-2. **Gather your dumps** in one folder, unmodified, with these exact names: `vsavj.zip` (Vampire
+   Follow the documentation included in the zip file. 
+   You'll need you own dumps, unmodified, with these exact names: `vsavj.zip` (Vampire
    Savior, Japan 970519), `vsav.zip` (Europe 970519) and `vsav2.zip` (Vampire Savior 2, Japan 970913).
    You also need Python 3.8 or newer — nothing else.
 
-3. **Build the game:**
-
-       python3 apply_release.py --romdir /path/to/your/dumps --out ./rompath
-
-   This writes `rompath/vsavjw.zip`. A wrong or modified dump is refused by name.
-
-4. **Play:**
-
-   - **FBNeo:** put `vsavjw.zip` and your untouched `vsav.zip` in the `roms/` folder next to the
-     emulator, and start `vsavjw`.
-   - **MAME:** point the rom path at both the same way, and start `vsavjw`.
-   - **MiSTer:** copy the core and the two `.mra` files as the package's README says, put
-     `vsavjw.zip`, `vsav.zip`, `vsavj.zip` and `qsound.zip` in `games/mame/`, and launch
-     *Vampire Saved - CPS-2 WIDE*.
-
-   The boot screen reads **VAMPIRE SAVED**.
-
 **If it does not start:** "unknown system" means the emulator is not the patched one. A game frozen on
 the QSound/CAPCOM screen means the set was renamed to force it into a stock emulator — renaming is
-never the fix. Netplay has never been tested but in theory is possible however every player would need the same emulator build and the same romset.
+never the fix.
 
 ## What to expect
 
