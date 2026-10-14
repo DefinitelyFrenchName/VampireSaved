@@ -374,3 +374,7 @@ test_emu_run_compare
 # it — the Linux MAME switch the project's builds use, per-OS dependencies, recipe-player wording;
 # three controls. ~1 s.
 test_release_recipe_text
+#
+# 14z-201 (#282 item E): every archive opens with a current generated index (tools/gen_history_index.py); three
+# controls. ~2 s.
+test_history_index

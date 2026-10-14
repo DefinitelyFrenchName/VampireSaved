@@ -13,12 +13,12 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**458 of 458 gates described.**
+**459 of 459 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
 | [runner](#runner) | 44 | 44 | the suite runners and their own ground truth |
-| [docs](#docs) | 24 | 24 | the documentation locks — docs, skills, indexes, tables follow the tree |
+| [docs](#docs) | 25 | 25 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 48 | 48 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
@@ -386,7 +386,7 @@ the suite runners and their own ground truth. 44 of 44 described.
 
 ## docs
 
-the documentation locks — docs, skills, indexes, tables follow the tree. 24 of 24 described.
+the documentation locks — docs, skills, indexes, tables follow the tree. 25 of 25 described.
 
 ### `test_annotations_current.sh` — test, ci_portable
 
@@ -515,6 +515,14 @@ the documentation locks — docs, skills, indexes, tables follow the tree. 24 of
 **HOW:** tools/gen_gotchas_index.py --check (~1 s); controls append an entry to a bucket and hand-add a bullet to the index.
 
 **EXPECTS:** committed equals regenerated; a new entry fails and is NAMED in the diff, a hand edit fails the cmp.
+
+### `test_history_index.sh` — test, ci_portable
+
+**WHAT:** each `*_HISTORY.md` at the root and each `*_history.md` / `*_HISTORY.md` under docs/ carries, after its title, the block tools/gen_history_index.py generates — one `- L<line> <heading>` line per entry, the line number exact in the file as written — and the block equals a fresh regeneration; no archive exists that the tool does not configure.
+
+**HOW:** tools/gen_history_index.py --check over the tree (~2 s); controls on a copy of the archives append an entry, hand-edit the block, and add an unconfigured archive.
+
+**EXPECTS:** the tree passes; each perturbed copy fails --check and the failure names what moved.
 
 ### `test_md_subset.sh` — test, ci_portable
 

@@ -156,6 +156,7 @@ declares	test_gate_follows
 declares	test_gate_index_current
 declares	test_gotchas_index_current
 declares	test_header_defaults
+declares	test_history_index
 declares	test_hitbox_encoding
 declares	test_host_libs
 declares	test_hui_air

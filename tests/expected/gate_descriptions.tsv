@@ -261,6 +261,7 @@ declares	test_guard_integrity
 declares	test_harness_frame_bound
 declares	test_header_defaults
 declares	test_hex_lengths
+declares	test_history_index
 declares	test_hitbox_encoding
 declares	test_hitclass_map_thunk
 declares	test_host_libs

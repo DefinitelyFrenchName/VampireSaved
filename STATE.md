@@ -34,7 +34,8 @@ How to work with it:
   STATE_HISTORY.md's body in newest-first order (below THE LEDGER, above the first
   archived `## Session` heading OLDER than the group)
   and add their one-line entries at the top of THE LEDGER there, composed from
-  the group's own banner headers. If this file still exceeds ~150 KB, roll the
+  the group's own banner headers, then regenerate the archives' indexes
+  (`python3 tools/gen_history_index.py`; `tests/test_history_index.sh` fails a stale one, #282). If this file still exceeds ~150 KB, roll the
   oldest kept group early. The standing sections never roll.
   **THEN RE-POINT WHAT CITED THE ROLLED GROUP (added 14z-173, after it bit):**
   a rollover silently breaks every `STATE.md § <section>` citation into the group

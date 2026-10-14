@@ -1,7 +1,8 @@
 # NEXT SESSION — orientation (rewritten at the 14z-200 CLOSE, 2026-10-14)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
-> moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
+> moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` (then `python3 tools/gen_history_index.py`
+> regenerates its index, #282) — this file holds ONLY
 > the live orientation. Session state, not knowledge: facts belong in the docs,
 > status in STATE.md.
 
