@@ -1,0 +1,3 @@
+  FLAG D-ABSOLUTE: **The core, put to the maintainer only on 2026-10-14** (rule-checker run 2026-10-14-1054 found that the option chosen on 2026-10-13 named none, though anothe...  [build/agent200/t269/report.md]
+  FLAG D-ABSOLUTE: - A chain of confirm runs carries a verdict from close to close for as long as nothing it follows changes; only a freeze or a release re-runs it.  [build/agent200/t269/report.md]
+packet_check: 2 flag(s): D-ABSOLUTE 2
