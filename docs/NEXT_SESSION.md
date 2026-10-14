@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-199 CLOSE, 2026-10-13)
+# NEXT SESSION — orientation (rewritten at the 14z-200 CLOSE, 2026-10-14)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` — this file holds ONLY
@@ -18,37 +18,47 @@ Say so at the opener. Never spawn any agent at `max`. A recommendation leans onl
 **Before any long job, check whether PILOT (`ssh pilot`) or ERIS (`ssh eris`) is idle, and run independent work
 there in parallel.** A long tier runs on a snapshot (`tests/run_on_snapshot.sh`), so the tree can be edited meanwhile.
 
+**THE SESSION CLOSE CHANGED (#269, 14z-200):** a session close runs `ROMDIR=... tests/run_all_static.sh --strict
+--confirm <the previous close's results.tsv>` (HANDOFF "How to test"). It re-runs the gates whose followed paths
+changed, the `# CONFIRM: always` core (`test_commit_subject`, `test_close_tools`, `test_rule_checker`) and any gate
+whose controls the base did not execute, and carries the rest by name. A freeze and a release still run everything;
+`--confirm` is refused there. The 14z-200 close's run of record is named in STATE 14z-200's CLOSE row.
+
 ## START HERE
 
-0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`; re-run the 14z-199 close's DOCUMENTATION PACKET through the rule-checker** (it passed at run 2026-10-13-1009, before findings (v)-(x), their gotchas, the merge and push rulings, #277 and STATE row (12)'s C1 summary were added; the maintainer, after the push: *"this can wait next session"*; `build/agent199/close/prepare_packet.sh` and its premises are the starting point); **and run `test_release_launcher_bat` on ERIS at the pushed commit** (the 14z-199 push rested on its ERIS run at `a6dcc9a5`, ERIS being unreachable — the maintainer's ruling, `DECISIONS_HISTORY.md` "Ruled 2026-10-14 (14z-199)"). What the close found and did is in STATE 14z-199's CLOSE row.
+0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** Then put #269's closing to the maintainer: its done-when
+   (a session close ran the predicted set and the core, its readout names what it carried, a freeze/release run is
+   unchanged, the predictor's miss rate measured) — STATE 14z-200's CLOSE row says what the first confirm close showed.
 1. **#273 — THE REPLICATION THE MAINTAINER CHOSE** (`DECISIONS_HISTORY.md` "Ruled 2026-10-13 (14z-199) — #273: replicate before deciding; …").
-   - Pre-registered in `build/agent199/t273/plan_replication.md`: two more readers per arm on the 15 that mattered and the 4 fixtures (76 pinned spawns, the same staged copies and prompts in `build/agent199/t273/stage/`), judged blind like `judge4/` beside a re-judging of the first readers, with the reading rule fixed there.
-   - Write every check as a script whose output is an artifact BEFORE the rule-checker sees the report (`docs/project/gotchas.md` "A MEASUREMENT PUT TO THE RULE-CHECKER NEEDS EVERY CHECK'S OUTPUT SAVED"). The first report took thirteen spawned rule-checker runs.
+   - Pre-registered in `build/agent199/t273/plan_replication.md`: two more readers per arm on the 15 that mattered and the 4 fixtures (76 pinned spawns, the same staged copies and prompts in `build/agent199/t273/stage/`), judged blind like `judge4/` beside a re-judging of the first readers' lines.
+   - Write every check as a script whose output is an artifact BEFORE the rule-checker sees the report (`docs/project/gotchas.md` "A MEASUREMENT PUT TO THE RULE-CHECKER NEEDS EVERY CHECK'S OUTPUT SAVED" — paid again at 14z-200, twelve runs for one report).
    - Q1 of the checklist of record stays as it is until the maintainer rules on the replicated result.
 2. **#275 — the negative fixture fidelity-14z160** (the maintainer: look into it first). Its packet's gate carries the FREEZE gap the live gate has since fixed; whether its EXPECT OK stands is the maintainer's call, and #273's replication includes it.
-3. **#269 waits on #274** (narrow `tools/static_confirm.py`'s R3 and its change set, scored on a fresh trace). Until then a session close runs the static tier as before: every gate, every control executed.
-4. **Then ask the maintainer for the order of work.** The open tickets, by their GitHub severity label:
+3. **Then ask the maintainer for the order of work.** The open tickets, by their GitHub severity label:
    - high: #261 (`audit_effect_class_rows` section 4 checks a type-6 fallback inventory that was never frozen), #256 (the close's open-tickets check reads a cited ticket range as its two ends);
    - medium: #243, #257, #258, #259;
    - low: #118, #129, #229, #244;
-   - no severity label: #260, #262, #263, #266, #267, #269, #273, #274, #275, #276 (the session dashboard misses every tier run on a snapshot), #277 (the procedure check's extract: a figure written to fewer decimals reads unsourced; a part cut hides a step's evidence).
-5. **#266 — PILOT's GNOME Shell segfaults under Wayland at every boot since 2026-10-09**, so `audit_release_linux_desktop` cannot run. It is now the one red/SKIP row of the release-cadence staleness audit (`audit_mask_window_ff42a2` moved to `ondemand` this sitting).
-6. **`tests/replays/118_chain.rpl`'s header names a leg of `audit_mizuumi_inputs` that gate never ran** (STATE 14z-198 finding (i)). The one-line correction stales the 76 emulator gates that follow `tests/replays/`, so make it in a session that runs those gates anyway.
-7. **#118 — the chars gate, PARKED on branch `t118-196`.** **#129 stays the lowest priority**, captures first.
+   - no severity label: #260, #262, #263, #266, #267, #269, #273, #275, #276 (the session dashboard misses every tier run on a snapshot), #277 (the procedure check's extract: a figure written to fewer decimals reads unsourced; a part cut hides a step's evidence);
+   - **release-only** (maintainer, 2026-10-14 — worked at a release, not in a session): #278 (a census of locale-sorted compares), #279 (xdelta3 3.0.11 release patches carry verbatim reference-ROM runs; PILOT is the Linux release builder), #280 (`test_applier_page` 3b on Python 3.12), #281 (`test_applier_page_browser`'s control under strace).
+4. **#266 — PILOT's GNOME Shell segfaults under Wayland at every boot since 2026-10-09**, so `audit_release_linux_desktop` cannot run. It is the one red/SKIP row of the release-cadence staleness audit.
+5. **`tests/replays/118_chain.rpl`'s header names a leg of `audit_mizuumi_inputs` that gate never ran** (STATE_HISTORY 14z-198 finding (i)). The one-line correction stales the 76 emulator gates that follow `tests/replays/`, so make it in a session that runs those gates.
+6. **#118 — the chars gate, PARKED on branch `t118-196`.** **#129 stays the lowest priority**, captures first.
 
 ## PARKED (not open work)
 
-- #124, parked by the maintainer (`DECISIONS_HISTORY.md` "Ruled 2026-10-09 (14z-196) — #124 parked").
+- #124, parked by the maintainer (`DECISIONS_HISTORY.md` "Ruled 2026-10-09 (14z-196) — #124 parked"); #120 and #121 carry `parked` in the index and on GitHub.
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
-- **Two readers of one rubric are one classification** (`docs/project/gotchas.md` "A CLASSIFICATION BY TWO READERS OF ONE RUBRIC").
-- **A blind judging is only as right as the script that builds its items.** Assert each item's row, class and cells. Check a judge's alarming report against its own transcript before acting on it (`docs/project/gotchas.md` "A BLIND JUDGING IS ONLY AS RIGHT").
-- **An approval kept in prose is asked again, and no tool can read it.** Put such a decision in a column or scope the tools read (`docs/project/gotchas.md` "AN APPROVAL KEPT IN PROSE IS ASKED AGAIN"). The runner now selects an `instrument:` row in no scope.
-- **`tools/rulecheck.py resolve --recheck`** (#270): a documentation-packet finding that is only a figure, a quote or a wording on a checked item is re-checked by a FULL close-checks run, not by a new packet run (`docs/project/rule_checker.md` [VSP-184]).
+- **A trace scores only the gates it could run** (`docs/project/gotchas.md` "A TRACE SCORES ONLY THE GATES IT COULD RUN"): before a predictor narrowing rests on a trace's 0, re-trace the gates that SKIPped or exited non-zero under it with their tools, and re-trace after gates are added.
+- **A control mode that catches nothing must exit 0** (`docs/project/gotchas.md` "A CONTROL MODE THAT CATCHES NOTHING MUST EXIT 0"); check it with a dead copy through the runner.
+- **A packet re-run in a later sitting cannot use `resolve --recheck`** (`docs/project/gotchas.md` "A DOCUMENTATION PACKET RE-RUN IN A LATER SITTING CANNOT USE").
+- **PILOT's state after 14z-200:** its clone is detached at `24c548fe` with `emu/jtcores` on its pin; node, Chromium and xdelta3 from apt (the snap Chromium cannot run under strace); node 22 and Chrome for Testing in `~/opt` (the trace script sets `PATH` and `CHROME_BIN`, `build/agent200/trace3/trace9.sh`); the community workbook copied to `~/community`; `ROMDIR` is `/home/koneko/roms` and `.profile` does not set it. Copied scratch (`build/rulecheck`, `build/agent199`) sits in its clone beside PILOT's own `build/static_runs` and `build/snapshot_runs`.
 
-## WHAT CLOSED THIS SITTING (14z-199)
+## WHAT CLOSED THIS SITTING (14z-200)
 
-- **Built and closed:** #268 (`test_close_tools` cut back), #271 (readers, the recurrence alarm, `resolve`), #272 (the pre-prepare check, flags only), #265 (`audit_mask_window_ff42a2` to `ondemand`, `instrument:`), #270 (`resolve --recheck`; measured at this close: 7 packet runs, the route used 0 times — `docs/project/rule_checker.md` [VSP-184]).
-- **Measured and ruled:** #269 (narrow the predictor first; #274 filed); #273 (replicate first; #275 filed).
-- **Ruled:** each in the maintainer's own words in `DECISIONS_HISTORY.md` "Ruled 2026-10-12 (14z-199) — …" and "Ruled 2026-10-13 (14z-199) — …".
+- **The 14z-199 documentation packet** passed over the final state (rule-checker run 2026-10-14-1042).
+- **#274 built and closed `done`:** the narrowed predictor, its N-C fix found by the #269 re-trace, and three gate fixes on the way.
+- **#269 built** on the maintainer's *"C first"*, with the three-gate core; open until its done-when is put to the maintainer.
+- **Filed, release-only:** #278, #279, #280, #281.
+- **Ruled:** each in the maintainer's own words in `DECISIONS_HISTORY.md` "Ruled 2026-10-14 (14z-200) — …".

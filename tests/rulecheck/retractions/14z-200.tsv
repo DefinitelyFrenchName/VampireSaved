@@ -1,0 +1,8 @@
+# tests/rulecheck/retractions/14z-200.tsv — the wordings retracted or corrected in 14z-200, and reach controls that must be found live; columns pattern, source, class (retracted | gone | reach:N)
+is built on it, with the three-gate core	14z-200 (run 2026-10-14-1054 Q5): the 2026-10-13 ruling record's "#269 is built on it, with the three-gate core" was a session's gloss, the option chosen named no core; quoted only in its corrections (since the maintainer's "C first", #269 does land with the three-gate core, so only this attribution is retracted)	retracted
+and was not chosen	control: the correction, live in DECISIONS_HISTORY.md's 2026-10-14 entry	reach:1
+options did not name one	14z-200 (before run 1059): the 2026-10-13 options did name a core ("Build as ruled"); the option chosen named none	gone
+or say it is superseded	14z-200 (the strict tier on a4c246f7, test_docshape): the gotcha header's session-shaped tail, reworded in 5884128a; quoted only in finding (e)	retracted
+or say in writing why it no longer counts	control: the reworded header, live in docs/project/gotchas.md and the generated docs/GOTCHAS.md	reach:2
+took fourteen rule-checker rounds	14z-200 (the close's findings): #274's packet took twelve runs (1043-1051 and 1055-1057), not fourteen rounds	gone
+took twelve rule-checker runs	control: the correction, live in STATE.md 14z-200 finding (g)	reach:1

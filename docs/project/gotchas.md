@@ -7040,6 +7040,14 @@ recommendation changed. **The rule:** for a measurement that will go to the rule
 whose output file is an artifact from the start: spawn, manifest, provenance, transcript reads and writes, plan order.
 A check run in the shell and quoted from memory costs a round each.
 
+**Paid again, 14z-200 (#274, rule-checker runs 2026-10-14-1044..1051):** eight VIOLATED rounds, each resolved by
+saving or measuring something the claim had stated. The control modes' exits were not FIG lines. The backtest printed
+no predictor identity. The benchmark legs recorded no imported sha1. Gate changes since the trace, and the trace's
+SKIPs, were not counted. The scorer that ran on PILOT was not shown. The commit's own tier had not run. Two rounds
+found real defects: an uncontrolled scorer clause, and a gate whose control modes could never read LIES. One figure
+quoted to the maintainer, the pre-#274 predictor's 0 misses on the nine-gate re-trace, had only been printed, and
+was re-run to a file before the packet could cite it.
+
 ## A PREPARE CHAINED AFTER AN EDIT PACKS WHATEVER THE EDIT LEFT — run 948 prepared on a stale claim (paid: 14z-199, GitHub #268)
 
 Rule-checker run 2026-10-13-948 was prepared in the same command as the claim edit meant to precede it. The edit's last
@@ -7080,3 +7088,35 @@ this entry was being written. **The rule:** when a command goes to the backgroun
 either read its output when it finishes or say in the next message that it is superseded and by what; and give a
 search over `build/` (hundreds of MB of scratch) a narrower root or a `timeout` before it is started.
 
+## A TRACE SCORES ONLY THE GATES IT COULD RUN — a SKIP or an early exit under the trace hides the reads a narrowing drops (paid: 14z-200, #274)
+
+`tools/trace_static_reads.py` scores a predictor against what each gate OPENED under strace. A gate that SKIPs
+for a missing tool, or exits early, opens less, and a narrowing that drops its real reads still scores 0. The
+fresh trace of #274 (222 gates on PILOT) scored the narrowed predictor at 0 misses, with five gates SKIPped and
+five exiting non-zero. The #269 "C first" re-trace of those gates, with node, Chromium, xdelta3 and the community
+workbook present, found 9 reads in `test_applier_vcdiff` that the narrowed rule missed. The gate names its
+directory only as `REL="${1:-release/merged-m23/mame}"`. The predictor before #274 missed none; the fix is
+`8e1e4bbc`, held by `tests/test_static_confirm.sh` control `shdef-off`. The same trace also showed the predictor
+of the day missing 15,013 + 4 reads in two gates added after the previous trace (14z-191). A confirm tier at the
+14z-199 push had carried one of them. **The rule:** before a narrowing rests on a trace's 0, list the gates that
+SKIPped or exited non-zero under it and re-trace them with their tools; and re-trace after gates are added.
+
+## A CONTROL MODE THAT CATCHES NOTHING MUST EXIT 0 — the runner reads exit 0 as LIES; a mode that exits 1 either way can never show a dead control (paid: 14z-200, `tests/test_trace_static_reads.sh` since 14z-191)
+
+The must-fire contract runs `CONTROL=<name> tests/<gate>.sh` and reads exit 0 as LIES (the control tests
+nothing). From 14z-191, `test_trace_static_reads.sh` printed FAIL and exited 1 in a control mode whether or not
+its perturbation was caught, so its three controls could never read LIES. A rule-checker reader found it
+(run 2026-10-14-1048). The gate now prints PASS and exits 0 when the mode caught nothing. A copy whose mode
+perturbs nothing, run through the real runner, reads "CONTROL LIES" and fails the run. **The rule:** in a gate's
+control-mode exit, the not-caught branch exits 0; check it by running a dead copy through the runner, not by
+reading the code.
+
+## A DOCUMENTATION PACKET RE-RUN IN A LATER SITTING CANNOT USE `resolve --recheck` — its render binds the newest transcript (paid: 14z-200)
+
+`resolve --recheck` re-runs a close's standing checks on a render. The render's TRANSCRIPT must be what
+`tools/close_standing.py` derives *now*, and that is the newest transcript of the project (`tools/rulecheck.py`, the
+SESSION_BOUND block). A packet of 14z-199 re-run in 14z-200 renders against 14z-199's transcript, which is no longer
+the newest. So a presentation finding there cannot be resolved by `--recheck`. The re-run of 14z-199's packet
+(runs 2026-10-14-1029..1042) resolved each finding by work and a fresh packet run instead. **The rule:** a packet
+re-run in a later sitting resolves its findings by work and a new run; `--recheck` serves the sitting that rendered
+the packet.
