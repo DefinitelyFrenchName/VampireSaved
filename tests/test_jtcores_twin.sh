@@ -76,7 +76,9 @@ A="$SRC/cores/cps2/cfg"; B="$SRC/cores/cps2w/cfg"
 # when it MUST differ (docs/platform/mister.md "How the CPS-2 core is put
 # together"), and the two halves below have to agree: what is on disk, and
 # what game.yaml pulls. An undeclared file in either place fails here.
-hdl="$(ls "$SRC/cores/cps2w/hdl" 2>/dev/null | tr '\n' ' ')"
+# byte order (LC_ALL=C) for the listing and the sort below: a UTF-8 locale (Linux) collates `_` and `.` away and
+# reorders both against the frozen lists (PILOT trace, 14z-200)
+hdl="$(LC_ALL=C ls "$SRC/cores/cps2w/hdl" 2>/dev/null | tr '\n' ' ')"
 B_YAML="$B/game.yaml"
 # THE EXECUTABLE FORM: under CONTROL=<name> the perturbed listing / yaml copy
 # IS what 2a / 2a2 read — and this run must FAIL.
@@ -118,7 +120,7 @@ if [ "$d" = "$want" ]; then ok "2c mame2mra.toml delta is exactly the declared D
 else bad "2c mame2mra.toml delta drifted:"; printf '%s\n' "$d" | sed 's/^/       /'; fi
 [ -f "$B/msg" ] && ok "2d msg present" || bad "2d msg missing"
 # 2f nothing undeclared landed ANYWHERE in the fork — including outside cores/
-git -C "$SRC" diff --name-status "$UP..$PIN" | sort | tr '\t' ' ' > "$W/tree_got.txt"
+git -C "$SRC" diff --name-status "$UP..$PIN" | LC_ALL=C sort | tr '\t' ' ' > "$W/tree_got.txt"
 cat > "$W/tree_want.txt" <<'TREE'
 A cores/cps2w/README.md
 A cores/cps2w/cfg/game.yaml
