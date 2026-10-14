@@ -62,6 +62,15 @@
 #                                          and, when controls were executed, its control times
 #                                          beside it as <results>.controls.tsv (gate, control,
 #                                          verdict, seconds; 14z-190, #188 option D).
+#                                          THE SESSION RUN (#269, 14z-200): a session close runs
+#                                          --confirm on the previous close's run of record, so it
+#                                          re-runs the gates whose followed paths changed, plus the
+#                                          CORE — a gate whose header carries `# CONFIRM: always`
+#                                          (its inputs move outside the tracked tree) — and executes
+#                                          controls only for the gates it re-runs. A gate the base
+#                                          run judged without executing all its controls re-runs.
+#                                          Refused at --cadence freeze|release|ondemand (exit 2):
+#                                          those run everything.
 #   ... --cadence session|freeze|release   which CADENCE runs (default session):
 #                                          a gate listed in tests/ci_cadence.tsv
 #                                          above the requested cadence is
@@ -172,6 +181,11 @@ STATIC="$(order_last "$STATIC")"
 CAD_FILE=tests/ci_cadence.tsv
 cad_rank() { case "$1" in session) echo 0 ;; freeze) echo 1 ;; release) echo 2 ;; ondemand) echo 3 ;; *) echo 9 ;; esac; }
 [ "$(cad_rank "$CADENCE")" != 9 ] || { echo "bad --cadence '$CADENCE'" >&2; exit 2; }
+# A FREEZE AND A RELEASE RUN EVERYTHING (#269, 14z-200, ruled 2026-10-12): a carried verdict stands only in a
+# session run, so --confirm at any other cadence is refused rather than quietly carrying gates past a freeze.
+if [ -n "$CONFIRM" ] && [ "$CADENCE" != session ]; then   # CONFIRM-SESSION-ONLY
+    echo "--confirm: a $CADENCE run runs every gate and executes every control — nothing is carried (#269)" >&2; exit 2
+fi
 # The gates that judge BY cadence read it from here (tests/test_emulator_staleness.sh:
 # a stale emulator gate is a NOTE at session, a FAIL at freeze/release — ruled 2026-09-24).
 VS_CADENCE="$CADENCE"; export VS_CADENCE

@@ -82,7 +82,12 @@ Usage:
       above — or `CARRY<TAB>gate<TAB>declared<TAB>fired<TAB>honoured`. The changed set: `git diff --name-only
       <head>` (tracked, working tree) + every path dirty at that run + every untracked, unignored file modified
       after the run's start (an untracked file older than the run cannot have changed since). An unknown head
-      re-runs everything.
+      re-runs everything. THE SESSION RUN (#269, 14z-200; ruled 2026-10-12, *"I agree with your proposal to turn the
+      static tier around"*, and 2026-10-14, the three-gate core after the maintainer's *"C first"*): two more reasons re-run a gate that is PASS and
+      not STALE — the CORE, a gate whose script carries the line `# CONFIRM: always` (test_commit_subject,
+      test_close_tools, test_rule_checker: their inputs move outside the tracked tree), and a gate whose recorded
+      controls were not all executed and honoured in FILE (`honoured` below `declared`: a base run made with
+      --exec-controls none or portable), so a carried gate's controls were executed in the run it is carried from.
   python3 tools/static_confirm.py --selftest
       a synthetic repo of five gates, one per reader class, with known answers.
 """
@@ -547,6 +552,15 @@ def selftest():
     return 0 if ok else 1
 
 
+def core(root, g):
+    """#269: a gate whose script carries `# CONFIRM: always` re-runs at every confirm (its inputs move off-tree)."""
+    try:
+        return any(l.rstrip() == "# CONFIRM: always" or l.startswith("# CONFIRM: always ")
+                   for l in open(os.path.join(root, "tests", g + ".sh"), encoding="utf-8", errors="replace"))
+    except OSError:
+        return False
+
+
 def plan(root, results):
     import time, calendar
     head, utc, dirty, rows = None, None, [], {}
@@ -584,6 +598,10 @@ def plan(root, results):
             out.append(("RERUN", g, "absent from the previous run"))
         elif r[1] != "PASS":
             out.append(("RERUN", g, f"{r[1]} in the previous run"))
+        elif core(root, g):   # CORE-ALWAYS
+            out.append(("RERUN", g, "the core: its script carries `# CONFIRM: always` (#269)"))
+        elif len(r) > 5 and r[3].isdigit() and r[5].isdigit() and int(r[5]) < int(r[3]):   # CONTROLS-UNEXECUTED
+            out.append(("RERUN", g, f"{r[5]} of its {r[3]} declared controls executed and honoured in the previous run"))
         elif g in stale:
             out.append(("RERUN", g, "STALE: " + stale[g]))
         else:

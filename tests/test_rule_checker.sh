@@ -49,6 +49,9 @@
 # unbound-record since 14z-178); the RECORD BINDING section (14z-178) proves `record` binds a pinned-reader run to the spawn check.
 #
 # Usage: tests/test_rule_checker.sh
+#
+# CONFIRM: always — the CORE of a session run (#269, 14z-200): its prepare sections depend on today's date (prepare numbers a run by it),
+# none of which a changed tracked path shows, so tests/run_all_static.sh --confirm never carries it.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

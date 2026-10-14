@@ -34,6 +34,9 @@
 # shape must report it and return non-zero.
 #
 # Usage: tests/test_commit_subject.sh
+#
+# CONFIRM: always — the CORE of a session run (#269, 14z-200): it reads the commits in origin/main..HEAD, which move with every commit and fetch,
+# none of which a changed tracked path shows, so tests/run_all_static.sh --confirm never carries it.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

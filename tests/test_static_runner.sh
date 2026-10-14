@@ -8,14 +8,17 @@
 #   freeze-cadence gate runs when a path it follows changed), and a gate marked `# ORDER: last`
 #   runs after every other gate of its tier (14z-185b, #188); and --confirm re-runs a red, the reader of
 #   a changed input and nothing else, CARRYING the rest (14z-188, #188 route A wired); and the
-#   gates a run starts do not inherit its STATIC_RESULTS_OUT (section 12c, 14z-199).
+#   gates a run starts do not inherit its STATIC_RESULTS_OUT (section 12c, 14z-199); and, the session run of #269
+#   (14z-200, section 20), --confirm never carries a `# CONFIRM: always` core gate nor a gate whose controls the base
+#   run did not execute, and is refused at a freeze.
 # HOW: a synthetic repo of stub gates with known verdicts run through the REAL runner via
 #   its registry files (never a copy of its logic); two shadow-tool controls unplug the
 #   controls reader and blind the cadence trigger match.
 # EXPECTS: every case reads its designed verdict; the unplugged reader lets a dead control
 #   pass and fails section 11, the blind trigger leaves a triggered gate deferred and fails
 #   section 14, and a planner with its prediction off carries a changed input's reader and
-#   fails section 18.
+#   fails section 18; a planner blind to `# CONFIRM: always` or to a base's unexecuted
+#   controls, and a runner taking --confirm at a freeze, each fail section 20 (#269).
 #
 # MUST-FIRE: shadow-tool: reader-unplugged — a copy of run_all_static.sh that hands the classifier no gate script must let a stub with a declared-but-unfired control read PASS (mode: that copy is the runner every section drives, and section 11 must fail)
 # MUST-FIRE: shadow-tool: trigger-blind — a copy of run_all_static.sh with its cadence TRIGGER match disabled must leave a freeze-cadence gate deferred although a path it depends on changed; section 14's triggered case must FAIL under it
@@ -23,6 +26,9 @@
 # MUST-FIRE: shadow-tool: order-ignored — a copy of run_all_static.sh whose `# ORDER: last` test is disabled must run the marked stub FIRST, and section 16 must FAIL (mode: that copy drives every section; section 17 fires it in-run; 14z-185b, #188)
 # MUST-FIRE: shadow-tool: crash-unread — a copy of run_all_static.sh that hands the CONTROL classifier no gate script must read a control mode that dies of `command not found` (exit 127) as HONOURED, and section 12b must FAIL (mode: that copy drives every section; section 12b fires it in-run; 14z-196, #254)
 # MUST-FIRE: shadow-tool: results-inherited — a copy of run_all_static.sh whose RESULTS-OUT-PRIVATE unset is disabled must hand its STATIC_RESULTS_OUT to the gates it runs, and section 12c must FAIL (mode: that copy drives every section; section 12c fires it in-run; 14z-199)
+# MUST-FIRE: shadow-tool: core-carried — a copy of tools/static_confirm.py whose plan ignores `# CONFIRM: always` (its CORE-ALWAYS line disabled) must CARRY the unchanged core stub g_e, and section 20 must FAIL (mode: that copy in the confirm repo; section 21 fires it in-run; #269, 14z-200)
+# MUST-FIRE: shadow-tool: controls-carried — a copy of tools/static_confirm.py whose plan ignores a base row's unexecuted controls (its CONTROLS-UNEXECUTED line disabled) must CARRY g_d from a run made with --exec-controls none, and section 20 must FAIL (mode: that copy in the confirm repo; section 21 fires it in-run; #269, 14z-200)
+# MUST-FIRE: shadow-tool: confirm-at-freeze — a copy of run_all_static.sh whose CONFIRM-SESSION-ONLY refusal is disabled must accept --confirm at --cadence freeze, and section 20 must FAIL (mode: that copy drives section 20; section 21 fires it in-run; #269, 14z-200)
 # MUST-FIRE: shadow-tool: prediction-off — a copy of tools/static_confirm.py whose plan marks nothing STALE must CARRY the stub whose input changed, and section 18 must FAIL (mode: that copy in the confirm repo)
 #
 # WHY A GATE FOR THE RUNNER. CLAUDE.md §4: "Verdict logic is itself tested. A
@@ -674,8 +680,10 @@ printf '#!/bin/sh\nif grep -q good data/c.txt; then echo "PASS: c"; else echo "F
   echo "# MUST-FIRE: perturbed-copy: flip — a flipped byte must fail"
   echo 'if [ "${CONTROL:-}" = flip ]; then echo "FAIL: the flipped input was caught"; exit 1; fi'
   echo "echo 'PASS: d'"; echo "echo 'CONTROL FIRED: flip — caught'"; echo "exit 0"; } > "$FC/tests/g_d.sh"
+{ echo "#!/bin/sh"; echo "# g_e.sh — a CORE stub (#269): its inputs move outside the tracked tree"; echo "# CONFIRM: always"
+  echo "echo 'PASS: e'"; } > "$FC/tests/g_e.sh"
 chmod +x "$FC/tests/"g_*.sh
-printf 'g_a\ng_b\ng_c\ng_d\n' > "$FC/tests/ci_portable.txt"; : > "$FC/tests/ci_static.txt"
+printf 'g_a\ng_b\ng_c\ng_d\ng_e\n' > "$FC/tests/ci_portable.txt"; : > "$FC/tests/ci_static.txt"
 echo one > "$FC/data/a.txt"; echo bad > "$FC/data/c.txt"
 (cd "$FC" && git init -q && git add -A && git -c user.name=t -c user.email=t@t commit -qm base)
 r1="$(cd "$FC" && STATIC_RESULTS_OUT="$T/r1.tsv" sh tests/run_all_static.sh --tier portable 2>&1)" || true
@@ -687,8 +695,8 @@ echo good > "$FC/data/c.txt"; sleep 1
 r2="$(cd "$FC" && STATIC_RESULTS_OUT="$T/r2.tsv" sh tests/run_all_static.sh --tier portable --confirm "$T/r1.tsv" 2>&1)" && s2c=0 || s2c=$?
 if [ "$s2c" = 0 ] && printf '%s' "$r2" | grep -qE "^  g_a +PASS  carried" && printf '%s' "$r2" | grep -qE "^  g_b +PASS  carried" \
         && printf '%s' "$r2" | grep -qE "^  g_c +PASS +[0-9]+s" && printf '%s' "$r2" | grep -qE "^  g_d +PASS  carried" \
-        && printf '%s' "$r2" | grep -q "carried: 3 of the PASS"; then
-    echo "  ok: confirming the red re-runs g_c (now PASS) and carries g_a, g_b and g_d — GREEN, 'carried: 3'"
+        && printf '%s' "$r2" | grep -q "carried: 3 of the PASS" && printf '%s' "$r2" | grep -qE "^  re-run g_e +the core"; then
+    echo "  ok: confirming the red re-runs g_c (now PASS) and the core g_e, and carries g_a, g_b and g_d — GREEN, 'carried: 3'"
 else fail "the confirm run (exit $s2c): $(printf '%s' "$r2" | grep -E '^  g_|^carried|^  re-run' | tr '\n' '|')"; fi
 echo two > "$FC/data/a.txt"; sleep 1
 r3="$(cd "$FC" && STATIC_RESULTS_OUT="$T/r3.tsv" sh tests/run_all_static.sh --tier portable --confirm "$T/r2.tsv" 2>&1)" && s3c=0 || s3c=$?
@@ -708,6 +716,59 @@ if ! vs_ctl_is prediction-off; then
     if printf '%s' "$r5" | grep -qE "^  g_a +PASS  carried"; then
         vs_ctl_fired prediction-off "with nothing marked STALE, g_a is carried although data/a.txt changed — section 18's check is what catches it"
     else vs_ctl_dead prediction-off "the prediction-off copy still re-ran g_a: $(printf '%s' "$r5" | grep -E '^  g_a')"; rc=1; fi
+fi
+
+echo "== 20. the session run (#269, 14z-200): the core and a base's unexecuted controls re-run; a freeze refuses --confirm =="
+CORE_OFF="$T/static_confirm_coreoff.py"; CTL_OFF="$T/static_confirm_ctloff.py"; FREEZE_SHADOW="$T/run_all_static_confirmfreeze.sh"
+python3 - "$REPO/tools/static_confirm.py" "$CORE_OFF" "$CTL_OFF" "$RUNNER" "$FREEZE_SHADOW" <<'PYX'
+import sys
+src, core_off, ctl_off, runner, shadow = sys.argv[1:]
+s = open(src).read()
+for tag, out in (("# CORE-ALWAYS", core_off), ("# CONTROLS-UNEXECUTED", ctl_off)):
+    lines = s.split("\n"); hit = [i for i, l in enumerate(lines) if l.rstrip().endswith(tag)]
+    assert len(hit) == 1, tag + " moved"
+    lines[hit[0]] = lines[hit[0]].replace("elif ", "elif False and ", 1)
+    open(out, "w").write("\n".join(lines))
+r = open(runner).read(); a = 'if [ -n "$CONFIRM" ] && [ "$CADENCE" != session ]; then   # CONFIRM-SESSION-ONLY'
+assert r.count(a) == 1, "the CONFIRM-SESSION-ONLY line moved"
+open(shadow, "w").write(r.replace(a, 'if false; then   # CONTROL confirm-at-freeze'))
+PYX
+chmod +x "$FREEZE_SHADOW"
+# one directory below the confirm repo, as the runner finds its root from its own path ($FC/shadow/.. = $FC)
+mkdir -p "$FC/shadow"; ln -s "$FREEZE_SHADOW" "$FC/shadow/run_all_static.sh"
+s20() {   # s20 <static_confirm.py to plan with> <runner> -> sets S20a S20b S20c (ok|bad), prints what it saw
+    cp "$1" "$FC/tools/static_confirm.py"
+    _r="$(cd "$FC" && sh tests/run_all_static.sh --tier portable --confirm "$T/r3.tsv" 2>&1)" || true
+    if printf '%s' "$_r" | grep -qE "^  re-run g_e +the core" && printf '%s' "$_r" | grep -qE "^  g_e +PASS +[0-9]+s"; then S20a=ok
+    else S20a=bad; echo "    g_e (unchanged core) was not re-run: $(printf '%s' "$_r" | grep -E '^  g_e|^  re-run g_e' | tr '\n' '|')"; fi
+    (cd "$FC" && STATIC_RESULTS_OUT="$T/r6.tsv" sh tests/run_all_static.sh --tier portable --exec-controls none > /dev/null 2>&1) || true
+    _r="$(cd "$FC" && sh tests/run_all_static.sh --tier portable --confirm "$T/r6.tsv" 2>&1)" || true
+    if grep -q "^g_d	PASS	[0-9]*	1	1	0$" "$T/r6.tsv" && printf '%s' "$_r" | grep -qE "^  re-run g_d +0 of its 1 declared controls"; then S20b=ok
+    else S20b=bad; echo "    g_d (controls not executed in the base) was not re-run: $(grep '^g_d' "$T/r6.tsv" 2>/dev/null) / $(printf '%s' "$_r" | grep -E '^  g_d|^  re-run g_d' | tr '\n' '|')"; fi
+    _st=0; (cd "$FC" && sh "$2" --tier portable --cadence freeze --confirm "$T/r3.tsv" > "$T/r7.out" 2>&1) || _st=$?
+    if [ "$_st" = 2 ] && grep -q "nothing is carried (#269)" "$T/r7.out"; then S20c=ok
+    else S20c=bad; echo "    --confirm at --cadence freeze exited $_st: $(grep -E 'carried|confirm' "$T/r7.out" | head -2 | tr '\n' '|')"; fi
+    cp "$REPO/tools/static_confirm.py" "$FC/tools/static_confirm.py"
+}
+SC20="$REPO/tools/static_confirm.py"; RN20="tests/run_all_static.sh"
+vs_ctl_is core-carried && SC20="$CORE_OFF"; vs_ctl_is controls-carried && SC20="$CTL_OFF"
+vs_ctl_is confirm-at-freeze && RN20="shadow/run_all_static.sh"
+s20 "$SC20" "$RN20"
+[ "$S20a" = ok ] && echo "  ok: the core stub g_e, unchanged, re-runs (# CONFIRM: always)" || fail "section 20: the core was carried"
+[ "$S20b" = ok ] && echo "  ok: g_d, PASS in a base run made with --exec-controls none, re-runs ('0 of its 1 declared controls')" || fail "section 20: a base with unexecuted controls was carried"
+[ "$S20c" = ok ] && echo "  ok: --confirm at --cadence freeze refuses (exit 2) — a freeze runs everything" || fail "section 20: --confirm at a freeze was not refused"
+
+echo "== 21. MUST-FIRE: section 20's three properties, each broken by its shadow =="
+if ! vs_ctl_is core-carried && ! vs_ctl_is controls-carried && ! vs_ctl_is confirm-at-freeze; then
+    s20 "$CORE_OFF" tests/run_all_static.sh > /dev/null
+    [ "$S20a" = bad ] && vs_ctl_fired core-carried "a plan ignoring # CONFIRM: always carries the unchanged core g_e — section 20 catches it" \
+        || { vs_ctl_dead core-carried "the core-off plan still re-ran g_e"; rc=1; }
+    s20 "$CTL_OFF" tests/run_all_static.sh > /dev/null
+    [ "$S20b" = bad ] && vs_ctl_fired controls-carried "a plan ignoring a base's unexecuted controls carries g_d — section 20 catches it" \
+        || { vs_ctl_dead controls-carried "the controls-off plan still re-ran g_d"; rc=1; }
+    s20 "$REPO/tools/static_confirm.py" shadow/run_all_static.sh > /dev/null
+    [ "$S20c" = bad ] && vs_ctl_fired confirm-at-freeze "a runner without the refusal accepts --confirm at a freeze — section 20 catches it" \
+        || { vs_ctl_dead confirm-at-freeze "the shadow runner still refused --confirm at a freeze"; rc=1; }
 fi
 
 [ "$rc" = 0 ] && echo "PASS: the runner's verdicts mean what they say." \

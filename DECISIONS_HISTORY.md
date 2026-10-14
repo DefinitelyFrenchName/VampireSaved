@@ -2489,7 +2489,7 @@ one of its trigger paths or its own script changed since origin/main or in the
 working tree; a freeze runs `--cadence freeze` and a release `--cadence release`,
 each on the commit it builds from, which is the safety net. Ground truth:
 `tests/test_static_runner.sh` §14-15 (control `trigger-blind`). Lever B is not
-built. The three ≤2 s gates among the release set (`test_release_asset_shape`,
+built. [The SESSION half SUPERSEDED at 14z-200 by #269: within the session cadence, a close re-runs only the gates whose followed paths changed plus the core, carrying the rest from the previous close's run; the freeze and release halves stand] The three ≤2 s gates among the release set (`test_release_asset_shape`,
 `test_release_os_metadata`, `test_mister_page` — the last a docs-consistency
 check) are listed as ruled; deferring them saves nothing, and pulling any back to
 session is the maintainer's call, raised on #148.
@@ -2522,7 +2522,7 @@ apparatus only; the 13 defects remain #136's open work and are NOT assumed fixed
 
 **Context.** The 14z-161 close pushed `main` on the mid-session static-tier form (`--strict --exec-controls none`, ~20 min) instead of the close form with every control executed (~40 min). The maintainer asked "closing ritual done?"; it was not. The close tier was then run in full and came out green (PASS 156 / SKIP 0 / FAIL 0, executed 176 honoured 176, wall 2,489 s).
 
-**Ruling 1 (verbatim):** *"To be clear, this is very time consuming and why #148 exists but until we tackle #148 we should not compromise on what we decided in terms of safeguards."* — the 2026-09-14 ruling (14z-154) stands exactly as written: the close runs every control and only then pushes; the cost is #148's business, not a reason to shorten the close.
+**Ruling 1 (verbatim):** *"To be clear, this is very time consuming and why #148 exists but until we tackle #148 we should not compromise on what we decided in terms of safeguards."* — the 2026-09-14 ruling (14z-154) stands exactly as written: the close runs every control and only then pushes; the cost is #148's business, not a reason to shorten the close. [SUPERSEDED for the SESSION close at 14z-200 by #269, built per the 2026-10-12 ruling ("Ruled 2026-10-12 (14z-199) — where session time goes…") and the three-gate core, put to the maintainer only on 2026-10-14 ("Ruled 2026-10-14 (14z-200) — #269's core: C first"): a session close runs `--strict --confirm` on the previous close's run of record — the gates whose followed paths changed, the `# CONFIRM: always` core, and any gate not PASS or not fully controlled there, every control of a re-run gate executed — and carries the rest by name; a freeze and a release still run every gate with every control (HANDOFF "How to test", `docs/project/must_fire_contract.md` WHEN)]
 
 **Ruling 2 (verbatim):** *"as soon as we are in a state we know to be stable and reliable we should tackle #148, there is much time to gain there"*, refined the same hour to *"the ideal order should be stable state then #148 then #152 then everything else."* — NEXT_SESSION's START HERE carries that order; the #136 divergence families follow #152.
 
@@ -2782,7 +2782,7 @@ apparatus only; the 13 defects remain #136's open work and are NOT assumed fixed
   tests/<gate>.sh` for every declared control of a gate the commit ADDS or CHANGES; the
   session close runs the default, `--exec-controls all`. Unchanged: the emulator tier's
   `--controls` at release runs (ruled 14z-148) and CI's portable run. **REVISIT** if a
-  close ever finds a control dead that a mid-session run would have caught.
+  close ever finds a control dead that a mid-session run would have caught. [SUPERSEDED for the SESSION close at 14z-200 by #269, built per the 2026-10-12 ruling ("Ruled 2026-10-12 (14z-199) — where session time goes…") and the three-gate core, put to the maintainer only on 2026-10-14 ("Ruled 2026-10-14 (14z-200) — #269's core: C first"): a session close runs `--strict --confirm` on the previous close's run of record — the gates whose followed paths changed, the `# CONFIRM: always` core, and any gate not PASS or not fully controlled there, every control of a re-run gate executed — and carries the rest by name; a freeze and a release still run every gate with every control (HANDOFF "How to test", `docs/project/must_fire_contract.md` WHEN)]
 
 ## Moved 2026-09-14 (14z-154) — the open-list clean-up, verbatim
 
@@ -6714,6 +6714,14 @@ So: #270 closes `done` with its measurement in the closing comment — no saving
 **The maintainer:** *"Merge instead (Recommended)"*.
 
 So: the rebase was undone (back to 948ca9ae) and origin/main merged with `--no-ff` (README.md only), so every commit the sitting's records cite is in the pushed history.
+
+## Ruled 2026-10-14 (14z-200) — #269's core: C first, and the parked index rows
+
+**The question (AskUserQuestion), verbatim**, put after rule-checker run 2026-10-14-1054 found the core of #269 never put to the maintainer (the option the maintainer chose on 2026-10-13, "Narrow the predictor first (Recommended)", named none — another option, "Build as ruled", named "a core of the three predictor-blind gates" and was not chosen; "with the three-gate core" was a session's gloss, in #269's GitHub comment of 14z-199 and repeated by 14z-200 in this file and in tools/static_confirm.py before this entry corrected them): *"#269's always-run core: the ticket says it is "to be designed and put to the maintainer", and the rule-checker (run 1054) found it never was. [...] Which core should a session close always re-run?"* — "Three gates (Recommended)" / "Three + the 10 trace-short" / "Something else". **The maintainer:** *"give me cost/benefit/risk analysis of the options"*. The analysis (`build/agent200/t269/core_cost_return.txt`; nine trace-short gates, not ten — test_release_roundtrip is in both lists) was put with the question *"Which core should a session close always re-run? (figures above; A = 80 s gates + 90 s controls per close; B adds at most 98 s + 254 s, 13 s on a sitting like 14z-199)"* — "A: three gates" / "B: three + 7 trace-short" / "B now, C as a ticket" / "C first" ("Hold #269 until PILOT is re-traced with the missing tools; then land with A."). **The maintainer:** *"C first"*; then, after installing node, Chromium and xdelta3 on PILOT, *"the install is done on PILOT"*.
+
+**On the same question set:** *"#120 and #121 now carry the `parked` label on GitHub, but docs/project/tickets.tsv still lists them as before. Should the index follow GitHub?"* — **the maintainer:** *"Index follows GitHub (Recommended)"*. The question was misframed: the index already read `parked` for both, so nothing changes.
+
+So: PILOT was re-traced on the nine gates (build/agent200/t274/report.md section 6): the narrowed predictor as first committed missed 9 reads in test_applier_vcdiff (fixed, 8e1e4bbc), two gates' locale-ordered compares were fixed (23987296, 24c548fe), and four gates stay not clean on PILOT for named reasons; #269 lands with the three-gate core (test_commit_subject, test_close_tools, test_rule_checker).
 
 ## Ruled 2026-10-14 (14z-199) — the push rests on the Windows gate's ERIS run at a6dcc9a5
 

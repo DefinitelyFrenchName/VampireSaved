@@ -116,7 +116,15 @@ is `tests/test_static_runner.sh` sections 11-13. **WHEN (maintainer-ruled
 `CONTROL=<name> tests/<gate>.sh` for every declared control of a gate the
 commit adds or changes; the session close runs the default `all`. The
 condition, the cost and the revisit clause: `DECISIONS_HISTORY.md` "Ruled
-2026-09-14 (14z-154)".
+2026-09-14 (14z-154)". **Since #269 (14z-200; ruled 2026-10-12, the tier
+turned around)** the session close runs `--strict --confirm <the previous
+close's results.tsv>`: every control of every gate it RE-RUNS is executed —
+the gates whose followed paths changed (`tools/static_confirm.py`), the
+`# CONFIRM: always` core, any gate not PASS in the base, and any gate whose
+controls the base did not execute — while a CARRIED gate keeps the control
+counts of the run it is carried from. A freeze and a release still run every
+gate and every control (`--confirm` is refused at their cadence). Ground
+truth: `tests/test_static_runner.sh` sections 18-21.
 
 `tests/run_all_emulator.sh` reads every block on every run and executes the
 controls only under `--controls` (one more run per declared name; its rows are
