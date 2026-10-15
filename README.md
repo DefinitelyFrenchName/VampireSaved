@@ -11,7 +11,7 @@ A forever true statement. But the FGC loves what ifs and this project attempts t
 ***Disclaimer:** From its inception, this project has been an experiment in black-box agentic engineering, as in "regardless of the internals, can a demonstrably accurate result be obtained through guidance and an extensive testing harness. It just so happens that it's been applied to making a "Vampire Savior that could not be" instead of applying it to a more boring undocumented legacy program. As such the use of AI is intrinsically central and the main deliverable to its creator is not even the game but the work discipline and the test harness. But just because the ultimate goal isn't the game doesn't retract from the potential value of the game itself to anyone who values accuracy.*
 
 [Play it](#play-it) · [What to expect](#what-to-expect) · [Report a problem](#report-a-problem) ·
-[How it was made](#how-it-was-made) · [Find your way around](#find-your-way-around)
+[How it was made](#how-it-was-made)
 
 ## At a glance
 
@@ -21,9 +21,8 @@ A forever true statement. But the FGC loves what ifs and this project attempts t
 | **Roster**                              | The original Vampire Savior cast, plus Donovan, Phobos and Pyron from Vampire Savior 2. All characters run the Vampire Savior engine. |
 | **Original characters and game engine** | Both unchanged. In 2-player versus their game state is checked frame by frame against the unmodified game, and matches it within a few small, measured tolerances (no frame of lag introduced, match is guaranteed at same speed with same RNG). |
 | **Plays on**                            | MiSTer (it can run a provided patched FBNeo or MAME but it's an involved process) |
-| **Current release**                     | `merged-m23` — the character-select screen shows **M23** in its bottom-right corner |
 | **Made for**                            | 2-player versus. Arcade mode can be played to the end but    |
-| **Tournaments**                         | **not** a tournament build. Tournaments run the community's choice which in this case is the original CPS-2 release. Even at perfect accuracy, this is for casuals and locals|
+| **Tournaments**                         | **not** a tournament build. Tournaments run the community's choice which in this case is the original CPS-2 release. Even at perfect accuracy, this is aimed at casuals and locals|
 
 **Why the emulator has to be patched:** the 18 characters do not fit in a stock CPS-2. The project
 defines a larger CPS-2 (more room for program, graphics and sound) and adds it to FBNeo,
@@ -34,10 +33,10 @@ MAME and a MiSTer core. Stock emulators cannot run the game.
 No ROM data is distributed. You rebuild the game from your own dumps with a small script that checks
 every byte before it writes anything.
 
-**Download ONE package** from the [release page](https://github.com/DefinitelyFrenchName/VampireSaved/releases/tag/freeze/merged-m19). 
+**Download ONE package** from the [release page](https://github.com/DefinitelyFrenchName/VampireSaved/releases/). 
    (Make your life easier and play on MiSTer unless you *really* need emulation)
    Follow the documentation included in the zip file. 
-   You'll need you own dumps, unmodified, with these exact names: `vsavj.zip` (Vampire
+   You'll need your own dumps, unmodified, with these exact names: `vsavj.zip` (Vampire
    Savior, Japan 970519), `vsav.zip` (Europe 970519) and `vsav2.zip` (Vampire Savior 2, Japan 970913).
    You also need Python 3.8 or newer — nothing else.
 
@@ -53,8 +52,8 @@ is. Each line points to where it is tracked or explained — follow the link for
 - **Which rules they follow:** Vampire Savior's. Internally each new character is loaded into the slot
   of an existing one — its *shell* — so everything that is not specific to the character runs on
   Vampire Savior's engine.
-- **Dark Force**: : Dark Force is Savior's version: costs one bar and brings Vampire Savior's background change.
-  The invunerability for VS2 characters is lifted from their unreacheable VS2 code and the behavior is their personal DF from VS2.
+- **Dark Force:** Dark Force is Savior's version: costs one bar and brings Vampire Savior's background change.
+  The invulnerability for VS2 characters is lifted from their unreacheable VS2 code and the behavior is their personal DF from VS2.
 - **Timing:** they run at Vampire Savior's game speeds. At factory settings NORMAL is the same speed as
   in Vampire Savior 2 and TURBO is one step slower. Compared at the same speed and with the same random
   draws, moves from Phobos, Donovan and Pyron match Vampire Savior 2 hit for hit and frame for frame. 
