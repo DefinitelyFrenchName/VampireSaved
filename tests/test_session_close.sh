@@ -39,14 +39,14 @@ perturb() {  # perturb <name> <dir>; EXPECT = the failure's substring
     unknown-placeholder) python3 - "$2/$DOC" <<'PY'
 import sys
 p = sys.argv[1]; s = open(p).read()
-s = s.replace("python3 tools/close.py inputs", "python3 tools/close.py inputs {NOPE}", 1)
+s = s.replace("python3 tools/gen_history_index.py", "python3 tools/gen_history_index.py {NOPE}", 1)
 open(p, "w").write(s)
 PY
                          EXPECT="UNKNOWN placeholder {NOPE}" ;;
     missing-tool)        python3 - "$2/$DOC" <<'PY'
 import sys
 p = sys.argv[1]; s = open(p).read()
-s = s.replace("python3 tools/close.py inputs", "python3 tools/no_such_tool.py", 1)
+s = s.replace("python3 tools/gen_history_index.py", "python3 tools/no_such_tool.py", 1)
 open(p, "w").write(s)
 PY
                          EXPECT="tools/no_such_tool.py, which does not exist" ;;

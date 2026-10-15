@@ -7,6 +7,17 @@ the procedure, in order, and `tools/close.py` reads that same table. Every other
 here, and a step changes here and nowhere else. A freeze or a release runs its own tier (HANDOFF "How to test"); the
 rest of this table still applies to the sitting that makes it.
 
+**CUT TO WHAT CHECKS THE WORK (#288, ruled 2026-10-15 — `DECISIONS_HISTORY.md` "Ruled 2026-10-15 (14z-202) — #288:
+everything but the before-an-action check is cut; …").** #288 classed 360 VIOLATED rule-checker runs: the checks before an
+action caught a real error in 24 of 57, the close's documentation packet in 21 of 192 (1 of 78 in its last two weeks), the
+procedure check in 9 of 111. The maintainer: *"Then for now let's cut everything except the "before an action" and let's
+open a ticket to revisit in the future when we have more data"* (#289). Cut from the close: the findings table, the
+live-docs step (the tier runs those gates), the close checks with their inputs and render, the documentation packet, the
+procedure check, the `--cap` read, and the final tier (the records are committed before the one tier now). Their tools stay
+in the tree and their gates are `ondemand` (`tests/ci_cadence.tsv`). A rule-checker run is made only before an action
+(`docs/project/rule_checker.md`). The one recurring real catch of the procedure check, a commit or close on a tier that
+was not green, is #290's deterministic guard.
+
 ## How to run it
 
     python3 tools/close.py start --key 14z-N --prev <the previous close's tier results.tsv>   # once
@@ -32,25 +43,15 @@ Placeholders: `{KEY}` the session key; `{RUN}` the run directory (absolute); `{R
 <!-- CLOSE STEPS: tools/close.py reads this table; one row per step, in order. Columns: step | kind | command | verdict | done when | from -->
 | step | kind | command | verdict | done when | from |
 |---|---|---|---|---|---|
-| findings | manual | `python3 tools/findings_add.py` (as each finding is paid) | - | the TSV holds every finding of the sitting, each with a live home and a test, `#N (open)` or `none (<reason>)` | checklist step 1, #206 |
-| sections | manual | - | - | every piece of work has its `### (N)` section; each earlier row the sitting resolves carries a pointer to where it was resolved; a `### CLOSE ({KEY}, <date>)` section is opened | checklist step 3 |
+| sections | manual | - | - | every piece of work has its `### (N)` section; each earlier section the sitting resolves carries a pointer to where it was resolved; a `### CLOSE ({KEY}, <date>)` section is opened | [VSP-17] |
 | next-session | manual | - | - | the previous opener moved VERBATIM to the top of `docs/NEXT_SESSION_HISTORY.md`; `docs/NEXT_SESSION.md` rewritten as the next opener, START HERE holding only open items | [VSP-17] |
 | rollover | manual | - | - | every session group but this sitting's own moved VERBATIM to `STATE_HISTORY.md` with its ledger line (the rollover rule below); `STATE.md §` citations into it re-pointed | the rollover rule below |
 | indexes | auto | `python3 tools/gen_history_index.py && python3 tools/tickets.py page && python3 tools/gen_gotchas_index.py` | exit 0 | the archives' indexes, the ticket page and the gotchas index regenerated | #282 item E, [VSP-12] |
-| live-docs | auto | `sh tests/test_state_open_lists.sh && sh tests/test_live_budget.sh && sh tests/test_history_index.sh && sh tests/test_tickets.sh` | exit 0 | the open lists, the budgets, the indexes and the ticket anchors hold | [VSP-17], #282 item F |
-| inputs | auto | `python3 tools/close.py inputs` | exit 0 | the four close-time files exist: `{RUN}/classes.tsv` (every scratch program classed, step 5), `{RUN}/promises.tsv` (every promise classed, step 4), `{RUN}/rulings_exempt.tsv`, `tests/rulecheck/retractions/{KEY}.tsv` | checklist steps 4-5, #190 |
-| render | auto | `python3 tools/close_standing.py render --key {KEY} --row "{ROW}" --run {RUN} && python3 tools/close_standing.py row-copy --row "{ROW}" --copy {RUN}/findings_row.txt --write` | exit 0 | the standing checks rendered for this close; the row copy the packet reads written | #204, #207 |
-| checks | auto | `python3 tools/close_checks.py run {RUN}/checks.tsv --out {RUN}/out && python3 tools/close_checks.py status {RUN}/checks.tsv --out {RUN}/out` | exit 0 | a FULL run with every check as expected (step 2: missing homes, tracked homes, anchors, none reasons, retractions, promises, scratch classes, rulings verbatim, open tickets) | checklist step 2, close-loop rule E |
-| packet | manual | `python3 tools/close_standing.py claim ...`, then `python3 tools/rulecheck.py prepare --decision recommendation --deliverable ...` | - | the documentation packet's run OK, or every VIOLATED question resolved in writing; a presentation-only finding fixed, the checks re-run FULL, then `resolve --recheck` | checklist step 6, #270 |
-| commit | manual | `git add -u` plus every new path by name | - | committed; no `build/` path staged; `git status` shows none of the sitting's own new files untracked | gotcha "`git add -u` STAGES NO NEW FILE" |
-| tier | auto | `ROMDIR={ROMDIR} STATIC_RESULTS_OUT={RUN}/tier_results.tsv tests/run_on_snapshot.sh -- tests/run_all_static.sh --strict --confirm {PREV}` | line ^GREEN | the tier on a snapshot of HEAD reads GREEN; a SKIP of a gate only another host can run is passed by hand with that host's PASS at the same commit | #269 (ruled 2026-10-12), [VSP-181] |
-| sweep | auto | `python3 tools/agent/sweep.py` | exit 0 | CLEAN: every survivor killed, leaves first, or declared with `--declare PID "REASON"` and named in the CLOSE section | C0.3, #172 S2 |
-| procedure | manual | `python3 tools/agent/extract.py`, then `python3 tools/rulecheck.py prepare --decision procedure` per part | - | every part's run OK or resolved; `tools/agent/hooks/pre_push.py` refuses the push until one covers a commit in the pushed range | C1, #172 S3 |
-| cap | auto | `python3 tools/agent/transcript_gaps.py --subagents {TRANSCRIPT} --cap` | exit 0 | no worker above Opus-class, none without a model, none fallen back (a /btw fork is exempt and named) | ruled 2026-09-24 *"Standing step"* |
-| dashboard | manual | `python3 tools/session_metrics.py collect`, then `check`; upload the four JSON files | - | the four datasets re-collected and uploaded to the dashboard, each `datasets/<id>` pointed at its new asset | #264 |
-| record | manual | - | - | the CLOSE section records every step's result; committed | [VSP-17] |
-| final-tier | auto | `ROMDIR={ROMDIR} STATIC_RESULTS_OUT={RUN}/tier2_results.tsv tests/run_on_snapshot.sh -- tests/run_all_static.sh --strict --confirm {RUN}/tier_results.tsv` | line ^GREEN | the tier over the commits made since step `tier` reads GREEN | the push rule below |
-| sweep-last | auto | `python3 tools/agent/sweep.py` | exit 0 | CLEAN, as the last command before the push | the push rule below |
+| dashboard | manual | `python3 tools/session_metrics.py collect`, then `check`; upload the four JSON files | - | the four datasets re-collected and uploaded to the dashboard, each `datasets/<id>` pointed at its new asset | #264; kept 2026-10-15 (#288) |
+| record | manual | - | - | the CLOSE section records every step's result up to here and names the tier's results file `{RUN}/tier_results.tsv`, the next close's `--prev` | [VSP-17] |
+| commit | manual | `git add -u` plus every new path by name | - | committed, the records included; no `build/` path staged; `git status` shows none of the sitting's own new files untracked | gotcha "`git add -u` STAGES NO NEW FILE" |
+| tier | auto | `ROMDIR={ROMDIR} STATIC_RESULTS_OUT={RUN}/tier_results.tsv tests/run_on_snapshot.sh -- tests/run_all_static.sh --strict --confirm {PREV}` | line ^GREEN | the tier on a snapshot of HEAD reads GREEN; a SKIP of a gate only another host can run is passed by hand with that host's PASS at the same commit; a red is fixed in a new commit and the tier re-run with `--confirm` on this run's results | #269, #286, [VSP-181] |
+| sweep | auto | `python3 tools/agent/sweep.py` | exit 0 | CLEAN, as the last command before the push: every survivor killed, leaves first, or declared with `--declare PID "REASON"` and named in the CLOSE section | C0.3, #172 S2 |
 | push | manual | `git push origin main` | - | pushed; anything red, skipped or unresolved leaves the commits local and the CLOSE section says so | ruled 2026-09-10, [VSP-17] |
 <!-- /CLOSE STEPS -->
 
@@ -60,16 +61,14 @@ The eight disagreements the census found (2026-10-15), each settled by the rulin
 1. **Which tier a close runs:** `--strict --confirm` on the previous close's results (#269, ruled 2026-10-12). A
    freeze or release runs every gate with every control. The "CLOSE runs all (the default)" wording elsewhere predates
    #269.
-2. **The checklist's steps 2, 4 and 5:** step 2 is the FULL close-check run, which includes the promise and scratch
-   checks. Steps 4 and 5 write those checks' inputs (`inputs`). The promises are classed in `promises.tsv` and the
-   scratch programs in `classes.tsv`.
-3. **Where the sweep sits:** after each tier, and again as the last command before the push.
-4. **The dashboard:** a step, `dashboard`, after the procedure check.
+2. ~~**The checklist's steps 2, 4 and 5**~~ — CUT 2026-10-15 (#288): the close checks and their inputs are no longer
+   close steps.
+3. **Where the sweep sits:** once, as the last command before the push (since #288 the close has one tier).
+4. **The dashboard:** a step, `dashboard`, before the record and the commit (kept by the maintainer, 2026-10-15).
 5. **The rollover:** every group but this sitting's own (#282 item A). The indexes are regenerated after it.
-6. **The checks file:** rendered from the standing set `tests/close_standing_checks.tsv`, never copied from an
-   earlier close (#204).
-7. **The rule-checker at the close:** the documentation packet and the procedure check are the two runs a close
-   makes. "Never at the session end" in `docs/project/rule_checker.md` concerns decisions, not these two.
+6. ~~**The checks file**~~ — CUT 2026-10-15 (#288) with the close checks.
+7. **The rule-checker at the close:** none since #288 (2026-10-15). The documentation packet and the procedure check are
+   cut; a rule-checker run is made only before an action.
 8. **Pushing:** only at the close, and only when everything is green ([VSP-17]). A mid-session push needs the
    maintainer's word.
 
@@ -90,6 +89,9 @@ group, re-point those citations to `STATE_HISTORY.md § <section>` and regenerat
 
 ### The close checklist (ruled 2026-09-18, 14z-167b)
 
+**CUT 2026-10-15 (#288).** Kept below for the record; no step runs it since #288. Each finding's fact is still homed in its document when it is
+paid for ([VSP-12]); the table of them, the checks over it and the packet are cut.
+
 Moved from STATE.md's header 2026-10-15. Six steps, between the close entry and the tier: (1) the findings table,
 appended as each finding is paid (`tools/findings_add.py`, #206), so the close reviews it rather than reconstructing it;
 (2) the close checks — every GAP homed, every REVIEW answered by a home or an open item, never by reclassifying the
@@ -102,6 +104,8 @@ a FULL close-checks run, then resolved with `resolve --recheck` (#270, `docs/pro
 
 ### The close loop's own cost (ruled 2026-09-29, 14z-185b, #187/#188)
 
+**(E) and (F) CUT 2026-10-15 (#288)** with the close checks; (D) stands.
+
 Moved from STATE.md's header 2026-10-15. (E) a close's checks run through `tools/close_checks.py` from the rendered
 checks file: a fix is iterated with `--only <check>`, and a rule-checker `prepare` cites a FULL run whose `status` exits
 0; (F) a count a close states never includes `tests/rulecheck/runs/`: exclude it, or read the count at `prepare` and
@@ -111,6 +115,6 @@ gate runs last in its tier (`# ORDER: last`).
 ### The push rule (ruled 2026-09-10)
 
 Moved from STATE.md's header 2026-10-15. The last step of the close is the push, and only when every step above is
-done: the tier GREEN, the sweep CLEAN, the procedure check passed or resolved and the `--cap` read clean. Anything red
-or skipped leaves the commits local, and the close entry says so. The opener's sweep survivor is killed before the push
+done: the tier GREEN at the commit being pushed and the sweep CLEAN (the procedure check and the `--cap` read were cut
+2026-10-15, #288). Anything red or skipped leaves the commits local, and the close entry says so. The opener's sweep survivor is killed before the push
 only on the maintainer's command (ruled 2026-09-25).

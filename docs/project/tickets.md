@@ -11,12 +11,14 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**288 tickets** — status: open 28 · parked 9 · done 223 · declined 10 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 199 · cosmetic 16 · evolution 73 · **backfill debt: 0 rows**.
+**290 tickets** — status: open 30 · parked 9 · done 223 · declined 10 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 199 · cosmetic 16 · evolution 75 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#290](https://github.com/DefinitelyFrenchName/VampireSaved/issues/290) | evolution | open | A deterministic guard: no commit or push on a tier that did not read GREEN (replaces the procedure check's one recurring catch) | none | `DECISIONS_HISTORY.md § Ruled 2026-10-15 (14z-202) — #288: everything but the before-an-action check is cut` | none | none | 14z-202 |
+| [#289](https://github.com/DefinitelyFrenchName/VampireSaved/issues/289) | evolution | open | Revisit the cut of the close's audit layer (documentation packet, procedure check) when there is more data | none | `DECISIONS_HISTORY.md § Ruled 2026-10-15 (14z-202) — #288: everything but the before-an-action check is cut` | none | none | 14z-202 |
 | [#288](https://github.com/DefinitelyFrenchName/VampireSaved/issues/288) | evolution | open | Measure what each step of the close's audit layer has caught and cost, then cut it down (possibly entirely) | `docs/project/session_close.md` | `DECISIONS_HISTORY.md § Ruled 2026-10-15 (14z-202) — the close's cost must follow the change` | none | none | 14z-202 |
 | [#287](https://github.com/DefinitelyFrenchName/VampireSaved/issues/287) | evolution | open | The procedure check runs at the close; run it right after each piece of work, scoped to that work | `tools/agent/extract.py` · `docs/project/session_close.md` | `DECISIONS_HISTORY.md § Ruled 2026-10-15 (14z-202) — the close's cost must follow the change` | none | none | 14z-202 |
 | [#286](https://github.com/DefinitelyFrenchName/VampireSaved/issues/286) | evolution | open | The close tier's cost follows the session, not the change: false re-runs, the dirty fbneo submodule, controls on every re-run gate | `tools/static_confirm.py` · `tests/test_static_runner.sh` | `DECISIONS_HISTORY.md § Ruled 2026-10-15 (14z-202) — the close's cost must follow the change` | none | none | 14z-202 |

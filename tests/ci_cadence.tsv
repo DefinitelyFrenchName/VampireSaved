@@ -57,4 +57,17 @@ test_frozen_rompath_guard	freeze	tools/build_ tests/expected/registry.tsv
 test_accent_census	freeze	build/manifest/ tools/gen_ tools/build_
 test_emulator_runner	freeze	tests/run_all_emulator.sh tests/lib/ tests/ci_emulator.tsv tools/build_fingerprint
 test_freeze_bytediff	freeze	tests/expected/registry.tsv tests/expected/freeze_bytediff/ tools/freeze_bytediff tools/program_bytediff tools/cps2_decrypt
-test_retraction_reach	freeze	tools/retraction_grep
+# FIFTH CUT (maintainer, 2026-10-15, 14z-202, #288 — "Then for now let's cut everything except the "before an action""; the
+# step list: "Go as proposed"): the close's documentation packet, procedure check and close checks are cut, so the gates of
+# their tools go ondemand (kept in the tree for #289's revisit, run only with --cadence ondemand or by hand).
+# test_retraction_reach moves here from freeze.
+test_close_tools	ondemand	-
+test_retraction_reach	ondemand	-
+test_close_checks	ondemand	-
+test_close_standing	ondemand	-
+test_close_loop_cost	ondemand	-
+test_promise_check	ondemand	-
+test_figure_check	ondemand	-
+test_rulings_verbatim	ondemand	-
+test_scratch_census	ondemand	-
+test_agent_extract	ondemand	-

@@ -12,9 +12,8 @@ How to work with it:
   when ruled — since 2026-09-14; before that, once they stopped shaping work).
 - **A SESSION GROUP'S FORM (since 14z-201, #282 item C; `DECISIONS_HISTORY.md` "Ruled 2026-10-15 (14z-201) — #282 item C"):**
   `## Session KEY — banner`, then `### opened with` and one `### (N) TITLE` section per piece of work, wrapped at
-  about 120 characters. The findings table is the section `### (N) THE FINDINGS TABLE`, naming
-  `docs/project/findings/<key>.tsv`, which `tools/findings_add.py` appends to (`--create` the first time) and
-  `tools/findings_table.py` reads. Groups archived before 14z-201 keep their one-line table rows.
+  about 120 characters. Since #288 (2026-10-15) a group has no findings-table section: a finding's fact is homed in its
+  document when it is paid for ([VSP-12]). Groups up to 14z-202 keep theirs (`docs/project/findings/<key>.tsv`).
 - **Claim-greps MUST include STATE_HISTORY.md** (the CLAUDE.md §5
   retraction-discipline command names it).
 - **AN OPEN LIST HOLDS ONLY WHAT IS OPEN (maintainer-ruled 2026-09-14).**
@@ -63,6 +62,16 @@ Five narrowings in `tools/static_confirm.py` ("#286 (a)": N-B on every `.md`, N-
 at `1c59a7cd` on PILOT caught a first cut missing real reads (`test_docshape`'s `rglob` of `tests`, `.gitmodules`); the
 landed version scores 0 misses, and the change set of the 14z-201 final pass goes from 112 stale gates to 56. Figures
 and their sources: the "SCORED" paragraph of `tools/static_confirm.py`.
+
+### (5) #288 MEASURED AND THE AUDIT LAYER CUT — #287 superseded; #289 and #290 filed
+360 VIOLATED rule-checker runs classed by what each caught (`build/agent202/t288/summary.md`, local): before an action 24
+of 57 a real error in the work, the close's documentation packet 21 of 192 (1 of 78 in its last two weeks), the
+procedure check 9 of 111. The maintainer cut everything but the before-an-action check and kept the dashboard
+(`DECISIONS_HISTORY.md` "Ruled 2026-10-15 (14z-202) — #288: everything but the before-an-action check is cut; …").
+Built: the close table cut to ten steps (`docs/project/session_close.md`; records committed before the one tier), the
+cut steps' ten gates `ondemand` (`tests/ci_cadence.tsv`), `docs/project/rule_checker.md` and HANDOFF marked, STATE's
+group form without a findings section. Drafted for the maintainer to install: the push hook unwired
+(`build/agent202/hook_change/`). Filed: #289 (revisit with more data), #290 (the deterministic green guard).
 
 ## Session 14z-201b — **#285: the Windows launcher gate's cmd-driven half moves to release cadence or on demand.** A continuation of 14z-201 after its close, on the same transcript (`979461fd`).
 

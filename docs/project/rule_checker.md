@@ -12,6 +12,14 @@ the ledger is `tests/rulecheck/ledger.tsv`, the gate is
 `tests/test_rule_checker.sh`, and the checklist below is read by the tool
 from THIS file between its markers, so the prompt cannot drift from the spec.
 
+**SINCE 2026-10-15 (#288): BEFORE AN ACTION ONLY.** The maintainer, on #288's measurement of 360 VIOLATED runs (before an
+action 24 of 57 a real error in the work; the close's documentation packet 21 of 192; the procedure check 9 of 111): *"Then
+for now let's cut everything except the "before an action" and let's open a ticket to revisit in the future when we have
+more data"* (`DECISIONS_HISTORY.md` "Ruled 2026-10-15 (14z-202) — #288: everything but the before-an-action check is cut;
+…"; the revisit is #289). A run is made before a freeze, a build, an expectation, a recommendation or a ticket closure.
+The procedure family below and the close's documentation packet are CUT: kept as the record of what they were, no step runs
+them, and the push hook's procedure requirement is unwired (`build/agent202/hook_change/`, installed by the maintainer).
+
 ## The failure it exists to catch
 
 Rules are applied reliably when they are procedural and cue-triggered, and
@@ -172,6 +180,10 @@ VERDICT: <VIOLATED if any question is VIOLATED, otherwise OK>
 <!-- CHECKLIST END -->
 
 ## THE PROCEDURE FAMILY — C1 of #172, the checker of HOW the work was done (slice S3, ruled 2026-09-23)
+
+**CUT 2026-10-15 (#288).** Cut by the ruling quoted at the head of this document: no close or push runs it. Its one recurring real catch, a commit or
+close on a tier that was not green, is #290's deterministic guard. The text below is the record of what it was.
+
 
 The five questions above ask whether a CLAIM is supported. The procedure family asks
 whether the WORKING METHOD was followed: what the agent said it would do against what

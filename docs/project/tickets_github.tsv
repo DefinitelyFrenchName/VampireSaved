@@ -2,8 +2,10 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 288
+# issues: 290
 number	state	reason	closed	labels	title
+290	OPEN	-	-	evolution,severity: high	A deterministic guard: no commit or push on a tier that did not read GREEN (replaces the procedure check's one recurring catch)
+289	OPEN	-	-	evolution	Revisit the cut of the close's audit layer (documentation packet, procedure check) when there is more data
 288	OPEN	-	-	evolution,severity: high	Measure what each step of the close's audit layer has caught and cost, then cut it down (possibly entirely)
 287	OPEN	-	-	evolution,severity: high	The procedure check runs at the close; run it right after each piece of work, scoped to that work
 286	OPEN	-	-	evolution,performance,severity: high	The close tier's cost follows the session, not the change: false re-runs, the dirty fbneo submodule, controls on every re-run gate
