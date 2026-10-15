@@ -2,7 +2,7 @@
 
 *"Worst of all, though, is that Vampire Savior never did get an all-in-one perfect competitive version that has all the characters together" -GuileWinQuote*
 
-A forever true statement. But the FGC loves what ifs and this project attempts to answer the question: "But if we had, how would it be then?"
+A forever true statement. But what ifs are tantalizing and this project attempts to answer the question: "But if we had, how would it be then?"
 
 ### Vampire Saved is Donovan, Phobos and Pyron, brought over from Vampire Savior 2 into the arcade Vampire Savior that competitive players use — with every original character left exactly as it was and everyone running the original engine.
 
@@ -37,8 +37,8 @@ every byte before it writes anything.
    (Make your life easier and play on MiSTer unless you *really* need emulation)
    Follow the documentation included in the zip file. 
    You'll need your own dumps, unmodified, with these exact names: `vsavj.zip` (Vampire
-   Savior, Japan 970519), `vsav.zip` (Europe 970519) and `vsav2.zip` (Vampire Savior 2, Japan 970913).
-   You also need Python 3.8 or newer — nothing else.
+   Savior, Japan 970519), `vsav.zip` (Europe 970519) and `vsav2.zip` (Vampire Savior 2, Japan 970913) and `qsound_hle.zip`.
+   You also need Python 3.8 or newer.
 
 ## What to expect
 
@@ -80,20 +80,6 @@ Not included:
 - **Marionette** is not brought over.
 - **1-player arcade mode:** Out of scope. Has many known issues but shouldn't crash.
   
-
-## Report a problem
-
-Open an [issue](https://github.com/DefinitelyFrenchName/VampireSaved/issues) and say which package you
-used and which mark the select screen shows (e.g. M23).
-
-**If you can make it happen again, it would be ideal if you could record it on MAME.** A recording lets the project replay your exact
-session, frame for frame. Create two empty folders, `nvram_fresh` and `recordings`, then run the MAME
-from your package (`cps2`, or `cps2.exe` on Windows):
-
-    cps2 vsavjw -rompath "./rompath;/path/to/your/dumps" -nvram_directory <path_to_nvram_fresh_folder> -input_directory <path_to_recordings_folder> -record my_session.inp
-
-Play until it happens, quit, and attach `recordings/my_session.inp` to the issue.
-
 ## How it was made
 
 Vampire Saved is actually an experiment. It started as a work-adjacent project about **black-box agentic
