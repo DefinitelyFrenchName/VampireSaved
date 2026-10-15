@@ -19,7 +19,7 @@ A forever true statement. But the FGC loves what ifs and this project attempts t
 | --------------------------------------- | ------------------------------------------------------------ |
 | **Base game**                           | Vampire Savior, Japan, 1997-05-19                            |
 | **Roster**                              | The original Vampire Savior cast, plus Donovan, Phobos and Pyron from Vampire Savior 2. All characters run the Vampire Savior engine. |
-| **Original characters and game engine** | Both unchanged. In 2-player versus their game state is checked frame by frame against the unmodified game, and matches it within a few small, measured tolerances (no frame of lag introduced, match is guaranteed at same speed with same RNG). |
+| **Original characters and game engine** | Both unchanged. In 2-player versus their game state is checked frame by frame against the unmodified game, and matches it within a few small, measured tolerances (no frame of lag introduced, matching with the original games is guaranteed at same speed with same RNG). |
 | **Plays on**                            | MiSTer (it also runs on a patched FBNeo or MAME but it's a more involved process) |
 | **Made for**                            | 2-player versus. Arcade mode can be played to the end but    |
 | **Tournaments**                         | **not** a tournament build. Tournaments run the community's choice which in this case is the original CPS-2 release. Even at perfect accuracy, this is aimed at casuals and locals|
