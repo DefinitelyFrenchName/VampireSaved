@@ -60,7 +60,7 @@ every byte before it writes anything.
 ### Features and original behaviour you might take for bugs
 
 - **Oboro Bishamon** is selectable (but impractical) : put the cursor on Bishamon, hold Start and confirm. His long intro
-  is kept on purpose to not alter original assets, so you only get control after the round begins.
+  is kept on purpose to not alter original assets, so you only get control long after the round begins.
 - **Dark Gallon and Shadow**, the original game's hidden characters, still work — and Shadow, who
   copies the opponent, copies the three new characters too.
 - **Random select** can land on the three new characters.
@@ -75,24 +75,22 @@ In versus:
 - On the select screen, **player 2's Donovan has an orange sword** — an accepted trade-off (palette limitations).
 - The three new characters **use their shell's win quotes**.
 
-In arcade mode (1 player) — never this project's scope; it plays to the end without crashing, and
-that is all it promises.
-
-Not included, or not planned:
+Not included:
 
 - **Marionette** is not brought over.
+- **1-player arcade mode:** Out of scope. Has many known issues but shouldn't crash.
   
 
 ## Report a problem
 
 Open an [issue](https://github.com/DefinitelyFrenchName/VampireSaved/issues) and say which package you
-used and which mark the select screen shows.
+used and which mark the select screen shows (e.g. M23).
 
-**If you can make it happen again, record it on MAME.** A recording lets the project replay your exact
+**If you can make it happen again, it would be ideal if you could record it on MAME.** A recording lets the project replay your exact
 session, frame for frame. Create two empty folders, `nvram_fresh` and `recordings`, then run the MAME
 from your package (`cps2`, or `cps2.exe` on Windows):
 
-    cps2 vsavjw -rompath "./rompath;/path/to/your/dumps" -nvram_directory ./nvram_fresh -input_directory ./recordings -record my_session.inp
+    cps2 vsavjw -rompath "./rompath;/path/to/your/dumps" -nvram_directory <path_to_nvram_fresh_folder> -input_directory <path_to_recordings_folder> -record my_session.inp
 
 Play until it happens, quit, and attach `recordings/my_session.inp` to the issue.
 
