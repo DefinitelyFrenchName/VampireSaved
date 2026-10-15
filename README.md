@@ -8,7 +8,7 @@ A forever true statement. But the FGC loves what ifs and this project attempts t
 
 ### This project stands on the shoulders of the Vampire Savior community and of the CPS-2 wizards who came before it. Support them, and support MAME, FBNeo and Jotego — without Jotego's CPS-2 core, the MiSTer version of the larger board this needs would have been close to impossible.
 
-***Disclaimer:** From its inception, this project has been an experiment in black-box agentic engineering, as in "regardless of the internals, can a demonstrably accurate result be obtained through guidance and an extensive testing harness. It just so happens that it's been applied to making a "Vampire Savior that could not be" instead of applying it to a more boring undocumented legacy program. As such the use of AI is intrinsically central and the main deliverable to its creator is not even the game but the work discipline and the test harness. But just because the ultimate goal isn't the game doesn't retract from the potential value of the game itself to anyone who values accuracy.*
+***Disclaimer:** From its inception, this project has been an experiment in black-box agentic engineering, as in "regardless of the code inside the box" can a demonstrably accurate result be obtained through guidance and an extensive testing harness. It just so happens that it's been applied to making a "Vampire Savior that could not be" instead of applying it to a more boring undocumented legacy program. As such the use of AI is intrinsically central and the main deliverable to me is not even the game but the work discipline and the test harness. But just because the ultimate goal isn't the game doesn't retract from the potential value of the game itself to anyone who values accuracy.*
 
 [Play it](#play-it) · [What to expect](#what-to-expect) · [Report a problem](#report-a-problem) ·
 [How it was made](#how-it-was-made)
@@ -19,10 +19,10 @@ A forever true statement. But the FGC loves what ifs and this project attempts t
 | --------------------------------------- | ------------------------------------------------------------ |
 | **Base game**                           | Vampire Savior, Japan, 1997-05-19                            |
 | **Roster**                              | The original Vampire Savior cast, plus Donovan, Phobos and Pyron from Vampire Savior 2. All characters run the Vampire Savior engine. |
-| **Original characters and game engine** | Both unchanged. In 2-player versus their game state is checked frame by frame against the unmodified game, and matches it within a few small, measured tolerances (no frame of lag introduced, matching with the original games is guaranteed at same speed with same RNG). |
+| **Original characters and game engine** | Both unchanged. In 2-player versus their game state is checked frame by frame against the unmodified game, and matches it within a few small, measured tolerances (no frame of lag introduced, matching with the original games is met if set at same speed with same RNG). |
 | **Plays on**                            | MiSTer (it also runs on a patched FBNeo or MAME but it's a more involved process) |
-| **Made for**                            | 2-player versus. Arcade mode can be played to the end but    |
-| **Tournaments**                         | **not** a tournament build. Tournaments run the community's choice which in this case is the original CPS-2 release. Even at perfect accuracy, this is aimed at casuals and locals|
+| **Made for**                            | 2-player versus. (solo play is possible but there are many known issues and it's out of the project's scope) |
+| **Tournaments**                         | **not** a tournament build. Tournaments run the community's choice, which in this case is the original CPS-2 release. Even at perfect accuracy, this is aimed at casuals and locals|
 
 **Why the emulator has to be patched:** the 18 characters do not fit in a stock CPS-2. The project
 defines a larger CPS-2 (more room for program, graphics and sound) and adds it to FBNeo,
@@ -42,9 +42,6 @@ every byte before it writes anything.
 
 ## What to expect
 
-Everything in this build that differs from what you might expect is listed below, sorted by what it
-is. Each line points to where it is tracked or explained — follow the link for the current details.
-
 ### How the three new characters work (by design)
 
 - **Where their data comes from:** Vampire Savior 2 — their moves, damage and animation, including
@@ -53,7 +50,7 @@ is. Each line points to where it is tracked or explained — follow the link for
   of an existing one — its *shell* — so everything that is not specific to the character runs on
   Vampire Savior's engine.
 - **Dark Force:** Dark Force is Savior's version: costs one bar and brings Vampire Savior's background change.
-  The invulnerability for VS2 characters is lifted from their unreacheable VS2 code and the behavior is their personal DF from VS2.
+  The invulnerability for VS2 characters is lifted from their unreachable VS2 code and the behavior is their personal DF from VS2.
 - **Timing:** they run at Vampire Savior's game speeds. At factory settings NORMAL is the same speed as
   in Vampire Savior 2 and TURBO is one step slower. Compared at the same speed and with the same random
   draws, moves from Phobos, Donovan and Pyron match Vampire Savior 2 hit for hit and frame for frame. 
