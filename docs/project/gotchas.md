@@ -7180,3 +7180,12 @@ empty folders, `nvram_fresh` and `recordings`" — never where; the `./` was the
 (the folder the command runs from) was written nowhere. The maintainer caught it. **The rule:** a statement of what a
 document says is a quote from it, read at the moment of saying it; what its command implies is a separate claim and is
 named as one.
+
+## A GATE WITH NO CADENCE ROW RUNS AT EVERY CLOSE — a host-bound half then blocks every push (paid: 14z-201b, #285)
+
+`tests/test_release_launcher_bat.sh` entered `tests/ci_portable.txt` at 14z-189 and was never listed in
+`tests/ci_cadence.tsv`, so by default it ran at every session close. Its Windows-only half printed `SKIP (said)` on the
+Mac; `--strict` counts a SKIP as a failure and the confirm runner never carries one, so every close waited on an ERIS
+run (two at 14z-201). No ruling had chosen that; the maintainer ruled cross-platform checks on demand or at release.
+**The rule:** a gate that cannot run on the session's host says so as a NOTE below the cadence that must run it, and
+a new gate's cadence is decided when it is registered, not left to the default.

@@ -1,0 +1,3 @@
+# the findings table of session 14z-201b — written by tools/findings_add.py, read through tools/findings_table.py (#282 item C)
+# letter	finding	homes	test
+a	test_release_launcher_bat entered ci_portable at 14z-189 and was never given a cadence, so its Windows-only half ran at every session close by default and made each Mac close wait on an ERIS run; no ruling had chosen that	`docs/project/gotchas.md` A GATE WITH NO CADENCE ROW RUNS AT EVERY CLOSE	`tests/test_release_launcher_bat.sh`

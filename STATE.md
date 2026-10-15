@@ -39,137 +39,27 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
-## Session 14z-201 — **#282 filed and ordered; #269 measured and closed; #282 items E, A, B, F, C and D built, #282 closed; the root README's scale re-measured, the recording procedure ruled into the package README (#284).** A plain Opus 5.5 session on the #172 setup (transcript `979461fd`).
+## Session 14z-201b — **#285: the Windows launcher gate's cmd-driven half moves to release cadence or on demand.** A continuation of 14z-201 after its close, on the same transcript (`979461fd`).
 
 ### opened with
-the maintainer: *"read handoff.md, state.md and docs/next_session.md"*; `python3 tools/agent/sweep.py` CLEAN; `main`
-even with `origin/main` after a fetch.
+The maintainer: *"Why do we have a windows only gate outside of release?"* Then, on the answer: *"I agree with your rationale in a vacuum but
+practically, we always worked on one environment and check cross compatibility either on demand or at release. I'm not
+saying there is no value intrinsically but the cost seems disproportionately high"*; then *"Now, as 14z-201b"*.
 
-### (1) #282 FILED, ITS SCOPE AND ORDER RULED
-The maintainer's ticket on the size of CLAUDE.md, STATE.md, HANDOFF.md and the close ritual, filed as #282 from a
-`measurer` census. Scope ruled: budgets of ideally 200 lines, at most 500, on the four live documents, bytes or width
-capped too; STATE.md keeps only the latest session in full; the archives get an index, not a budget
-(`DECISIONS_HISTORY.md` "Ruled 2026-10-14 (14z-201) — #282's scope"). Order ruled E, A, B, F, C, D ("— #282's order of
-work").
+### (1) #285 BUILT
+`tests/test_release_launcher_bat.sh`: off a Windows host the cmd-driven half prints a NOTE naming #285 at session and
+freeze cadence and keeps its `SKIP (said)` at release cadence; on a Windows host it runs at any cadence. Measured on
+this Mac with the runner's own classifier (`tests/lib/classify.sh`): session PASS, freeze PASS, release SKIP. No
+`tests/ci_cadence.tsv` row (the option text named one): listing the gate there would defer its static half too, which
+the ruling keeps at every close. `docs/project/gate_coverage.md` regenerated. Ruling: `DECISIONS_HISTORY.md` "Ruled
+2026-10-15 (14z-201b) — #285".
 
-### (2) #269 MEASURED AND CLOSED `done`
-The last clause of its done-when, the miss rate on the new selection: the 14z-200 close tiers' carried gates traced on
-PILOT and checked for any read of a changed file — 0 of 56 and 0 of 80 — through five readers, each added after a
-rule-checker run found a read form the last one dropped (runs 2026-10-14-1073 to -1081, each resolved by work; 1072,
-1074, 1076, 1078 and 1080 withdrawn unspawned; **1082 OK**). Report `build/agent201/t269/report.md`
-(local). The maintainer: *"Close done (Recommended)"*. The trace tool's split-line defect filed as #283, its other gaps
-added there; gotcha "A STRACE TRACE SCORED BY OPENED PATH MISSES FIVE READ FORMS".
+### (2) THE FINDINGS TABLE
+`docs/project/findings/14z-201b.tsv` — every finding, its live home, the test that reproduces it (checklist step 1).
 
-### (3) #282 ITEM E BUILT
-Every archive opens with a generated, line-exact index: `tools/gen_history_index.py`, gate `tests/test_history_index.sh`
-(three controls), `dfbf47bf`.
-
-### (4) #282 ITEM A BUILT
-Ruled *"At most 2"*, *"Now, as part of A"*, *"Defer to item C"* (`DECISIONS_HISTORY.md` "Ruled 2026-10-14 (14z-201) —
-#282 item A"): `tools/check_state_lists.py` allows two session groups; [VSP-17] and the port skill's copy amended;
-14z-198 and 14z-199 rolled verbatim to STATE_HISTORY; the standing rulings cut to rule plus pointer (a `reader` found 4
-drifts, restored). STATE.md 91,033 -> 39,554 bytes (112,327 at the opener). `2f962b42`.
-
-### (5) #282 ITEM B BUILT
-The maintainer, on the split plan: *"yes this looks right"*. HANDOFF.md 1,811 -> 484 lines, 216,718 -> 46,130 bytes: its detail moved VERBATIM to the new
-`docs/project/operations.md`, `cps2_wide.md`, `release_format.md`, `mister_core.md` and `HANDOFF_HISTORY.md`, each moved
-heading leaving a stub; 12 ticket anchors re-pointed, the anchor census refrozen on the moved anchors only. `1da23b43`,
-`1c000561`.
-
-### (6) #282 ITEM F BUILT
-Ruled *"50kB sounds like a good targer"* (`DECISIONS_HISTORY.md` "Ruled 2026-10-15 (14z-201) — #282 item F"):
-`tools/check_live_budget.py` holds the one copy of the budget (500 lines, 50,000 bytes, WARN above 200 lines); gate
-`tests/test_live_budget.sh` (ci_portable; controls over-lines, long-lines, missing-document); `check_state_lists.py`
-takes STATE's cap from it (150 KiB -> 50,000 bytes).
-
-### (7) #282 ITEM C BUILT: THE CLOSE IS ONE TABLE, ITS DRIVER, AND THE FINDINGS TSV
-A `reader` census at `de82c957` found the close ritual in 58 places across 30 files, none of them the whole procedure,
-8 sets disagreeing. Ruled *"Doc + driver (Recommended)"* and *"Sections, findings TSV (Recommended)"*
-(`DECISIONS_HISTORY.md` "Ruled 2026-10-15 (14z-201) — #282 item C"). `docs/project/session_close.md` holds the close as
-one 20-step table, the 8 disagreements settled there from the rulings, and STATE's four close paragraphs moved there;
-`tools/close.py` reads that table and runs it (`start`, `next`, `done`, `status`), gate `tests/test_session_close.sh`
-(four controls). Every live place that restated the close now points to it, CLAUDE.md [VSP-17]'s rollover sentence
-among them. The findings table became `docs/project/findings/<key>.tsv`, read through `tools/findings_table.py` by
-every close tool; this group's rows became these sections. A driver trial on `build/agent201/close_trial` (local)
-ran `indexes` and `live-docs` green and stopped RED at `inputs`, naming the four close-time files; it found that a
-step calling the driver again could not find a run directory outside the default, fixed by `CLOSE_RUN`.
-`a47e7fe4` (the TSV part).
-
-### (8) #282 ITEM D LANDED: CLAUDE.MD AS RULE PLUS POINTER
-Ruled *"Rule + pointer (Recommended)"* and *"Draft first (Recommended)"* (`DECISIONS_HISTORY.md` "Ruled 2026-10-15
-(14z-201) — #282 item D"). The draft, built by `build/agent201/t282/claude_draft.py` (local), was compared clause by
-clause by two `reader`s (10 of 13 drifted in the first, 3 wording changes in the second, all restored) and approved by
-the maintainer: *"the CLAUDE.md draft looks good."* CLAUDE.md 448 -> 244 lines, 30,203 -> 18,557 bytes; every
-`**[VSP-N]**` stays in it with its rule, the long paragraphs moving verbatim to `docs/project/oracle_classes.md`
-(VSP-24/25/26/31/32), the new `docs/project/working_methods.md` (VSP-20/13/14, the runner) and
-`docs/project/session_records.md` (VSP-17/182/162), and `docs/README.md` (VSP-12, the condensing history). Four ticket
-links re-pointed in `docs/project/tickets.tsv`. 17 doc gates pass on the tree.
-
-### (9) THE ROOT README: THE MAINTAINER'S EDITS MERGED, THE SCALE RE-MEASURED
-The maintainer edited `README.md` on GitHub (12 commits, merged, never rebased). The edit removed the
-`apply_release.py --out ./rompath` build step, which `tests/test_readme_recording.sh` read to check the "Report a
-problem" command's rompath; the maintainer: *"this had no business being there as it should be in the delverables
-README.md, which it is"*. The gate now reads that `--out` from the package README's source, `tools/package_release.py`
-(PASS on macos-arm64, both controls fired). At the maintainer's ask (*"I'd welcome update numbers for this
-paragraph"*), "The scale" was re-measured by `measurer`s on the 14z-183b definitions, calibrated at `22c56655`
-(all seven 2026-09-26 figures reproduced) and read at `edd1b323`: 461 test scripts, 225 emulator-free checks (133
-portable + 92 static), 394 controls executed at the 14z-200 close, 231 emulator/FPGA checks, 233 replays, 10
-recordings, 283 tickets. Only the paragraph's date and numbers changed; the maintainer's text is untouched.
-The maintainer then corrected the README on GitHub and trimmed the paragraph (no tickets or cadence clause); the
-merge conflicted on it and kept their version whole (`9e65edea`). It read 203 emulator/FPGA checks where the
-measurement at `edd1b323` gave 231; raised with the maintainer, whose next commits (*"more corrections done, can you
-recheck"*) made it 231. As merged at `1989d119` (`README.md:117-119`) it carries 461, 225, 394, 231, 233 and 10, each
-equal to the `edd1b323` measurement (`build/agent201/readme_scale_figs.txt`, local), compared by hand at the close.
-
-### (10) THE RECORDING PROCEDURE MOVES TO THE PACKAGE README (#284)
-On ERIS, with the published m23 Windows MAME package, the root README's recording command failed in cmd and PowerShell
-(`cps2.exe` is under `emulator\bin\windows-x86_64\`; `<…>` placeholders are redirections); by its path, with
-`-rompath rompath` alone, it records (exit 0); the MAME applier needs `qsound_hle.zip`, which the root README omits.
-The maintainer: *"I think we should put the "how to report a problem" details into the README.md of the release
-zips"*, then *"I'll trim it, add the instructions needs to #284"* (`DECISIONS_HISTORY.md` "Ruled 2026-10-15 (14z-201)
-— the recording procedure moves to the release package README"). #284 got its index row and the requirements. On the root README's dump list, the maintainer: *"qsound is needed for
-evertything but MiSTer, but might as well set it as necessary as you can decide in the applier to apply it or not."*
-The maintainer trimmed the root README (merged); `test_readme_recording` (release cadence) now fails: the command it reads
-is gone; the ruling's So line makes its move to the package README #284's work, and its header says so; the reach control 4 of `tests/rulecheck/retractions/14z-181.tsv` was re-pointed to the
-reworded opening sentence ("what ifs are tantalizing"), `test_retraction_reach` PASS.
-
-### (11) THE FINDINGS TABLE
-`docs/project/findings/14z-201.tsv` — every finding, its live home, the test that reproduces it (checklist step 1).
-
-### (12) CLOSE (14z-201, 2026-10-15)
-The maintainer: *"then let's close. That'll also be a good moment to see how much time it takes."* The first close run
-by the step table and its driver (`docs/project/session_close.md`, `tools/close.py`; run dir `build/agent201/close`,
-local), started 15:21:53. Step by step:
-- **findings:** (a)-(t) in `docs/project/findings/14z-201.tsv`; (p)-(t) paid during the close itself, two of them
-  defects in the close's own tools — the claim tool dropped a premise starting `#282` (s), the scratch census never
-  counted `.bat`/`.ps1` (t); both fixed with self-test cases that fail on the old code.
-- **sections / next-session / rollover:** this section opened; 14z-200's #269 section points here; the 14z-200 opener
-  moved verbatim to `docs/NEXT_SESSION_HISTORY.md`, `docs/NEXT_SESSION.md` rewritten; the 14z-200 group (11 lines)
-  moved verbatim to `STATE_HISTORY.md` with its ledger line. #282 closed `done` (*"Close it done (Recommended)"*).
-- **inputs / render / checks:** 21 then 25 scratch programs classed, 1 promise carried by #284, 11 maintainer messages
-  exempted with reasons, `tests/rulecheck/retractions/14z-201.tsv` (2 reach controls, 1 gone); 38 checks, the last
-  full run every exit as expected.
-- **packet:** runs 2026-10-15-1083 to -1085 withdrawn unspawned (a premise lost to (s); a claim prepared beside a red
-  check; a stale subject); 1086, 1087 and 1088 VIOLATED on the real packet, every fixture caught, each resolved by work:
-  the stale README "203" sentence, unnamed gaps (the README figures, the GitHub comment bodies — fetched back, each
-  equal to its draft, `build/agent201/close/gh_posted.txt`, local — and #276's undercount), the census (t), and two
-  attributions without the maintainer's words. `resolve --recheck` was refused once because the run directory was
-  passed relative while the render holds it absolute; that resolution is in writing.
-- **commit:** `6544c713`. **tier:** strict `--confirm` on a snapshot of `6544c713`: PASS 206 SKIP 1 FAIL 0, controls
-  404 of 404, wall 2,371 s; the SKIP `test_release_launcher_bat` PASS on ERIS at `6544c713` (its first-found mode exits
-  1), `build/agent201/bat/bat201.log` (local). **sweep:** CLEAN.
-- **procedure (C1):** the extract in five parts, runs 2026-10-15-1089 to -1093, every fixture caught; 1090 and 1093 OK.
-  Confirmed against the extract (`build/agent201/c1/findings.md`, local) and resolved: the agent filed #282 without the
-  maintainer's go after promising to wait for it (1089); reported item B "every doc gate is green" after edits no gate
-  re-ran (1091, as finding (j)); told the maintainer HANDOFF went from "1,811 lines and 216,324 bytes" — the pair is
-  1,811 lines and 216,718 bytes (1091); said "Every gate these changes touch passes" while `test_close_tools` was red
-  (1092, as finding (k)). Workers: the census reader ran grep patterns its spec did not name (1091); a measurer ran on
-  past a failed command against its STOP rule (1092); a rule-checker could not read the 878 KB ledger in full (#258).
-  The saved copy of one reader's answer first dropped its last sentence; corrected to the reader's text.
-- **cap:** 0 breaches over 46 workers, no fallback. **dashboard:** 14z-163..14z-201 re-collected (1,621 figures, each
-  classed) and uploaded (`datasets/*`: figures, rc_runs and costly version 5, tiers 6); tier runs on a snapshot are
-  still uncounted (#276).
-- **Not mine, named:** two scratch worktrees from 14z-200 (`wt274`, `wt_bench` under its scratchpad) remain.
+### (3) CLOSE (14z-201b, 2026-10-15)
+Run by the step table and its driver (`docs/project/session_close.md`, `tools/close.py`; run dir
+`build/agent201b/close`, local).
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings
@@ -177,6 +67,7 @@ local), started 15:21:53. Step by step:
 
 One line per ruling that still constrains work: the rule and where its full entry lives. A line is deleted when its ruling stops constraining work (CLAUDE.md [VSP-17]). Shortened to the rule plus its pointer 2026-10-14 (#282 item A); the longer lines are in git history at `44a09f7f`.
 
+- **Cross-platform checks run on demand or at release (#285, 2026-10-15, 14z-201b):** `test_release_launcher_bat`'s Windows half is a NOTE off Windows below release cadence, so a session close needs no ERIS — `DECISIONS_HISTORY.md` "Ruled 2026-10-15 (14z-201b) — #285".
 - **The recording procedure lives in the release package README (#284, 2026-10-15, 14z-201):** the root README's "Report a problem" was trimmed by the maintainer (2026-10-15); #284's work moves `test_readme_recording` to the generated MAME package README — `DECISIONS_HISTORY.md` "Ruled 2026-10-15 (14z-201) — the recording procedure moves to the release package README".
 - **The live documents' budget (#282, 2026-10-14/15, 14z-201):** CLAUDE.md, STATE.md, HANDOFF.md and docs/NEXT_SESSION.md at most 500 lines and 50,000 bytes each, the aim 200 lines; the archives are indexed, not budgeted — `DECISIONS_HISTORY.md` "Ruled 2026-10-14 (14z-201) — #282's scope" and "Ruled 2026-10-15 (14z-201) — #282 item F"; gate `tests/test_live_budget.sh`.
 - **No swarm model at max effort, ever (2026-09-29, 14z-185);** the Sonnet 5.5 `xhigh` worker preference was dropped (14z-192) — `DECISIONS_HISTORY.md` 2026-09-29 and "Ruled 2026-10-05 (14z-192) — the opener's answers".

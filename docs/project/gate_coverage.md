@@ -918,7 +918,7 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 
 **HOW:** tools/package_release_platforms.py's launcher_bat_bytes() for both platforms (the bytes the packager writes), read as bytes; the package texts grepped for each launcher's name against the package's files; on Windows, staged copies driven by `cmd //c`, with a stub fbneo.exe that is a text file carrying (or lacking) the profile marker (the FBNeo check is findstr over the file) and two stub cps2.exe COMPILED here with the shell's gcc, one answering `-listfull vsavjw` and one refusing it as a stock MAME does (the MAME check RUNS the binary). The dry run stops before either would be launched.
 
-**EXPECTS:** every static property on both launchers and every package text; on Windows every path's exit code and message (a Windows host without gcc is a FAIL, never a skip: these paths went unrun once); elsewhere the Windows section SKIPs and says so. The real launch (the emulator staying up) is not this gate's: measured on ERIS 2026-10-03 (STATE 14z-189).
+**EXPECTS:** every static property on both launchers and every package text; on Windows every path's exit code and message (a Windows host without gcc is a FAIL, never a skip: these paths went unrun once); elsewhere the Windows section SKIPs and says so at RELEASE cadence, and is a NOTE at session or freeze cadence (#285, ruled 2026-10-15: cross-platform checks run on demand or at release, so a session close needs no Windows host). The real launch (the emulator staying up) is not this gate's: measured on ERIS 2026-10-03 (STATE 14z-189).
 
 ### `test_release_os_metadata.sh` — test, ci_portable
 

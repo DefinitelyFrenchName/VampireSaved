@@ -2,8 +2,9 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 284
+# issues: 285
 number	state	reason	closed	labels	title
+285	CLOSED	COMPLETED	2026-10-15	evolution	test_release_launcher_bat: its Windows half at release cadence or on demand, never a session-close SKIP
 284	OPEN	-	-	bug,severity: medium	[regression] m23-merged README.md file is currently a mess
 283	OPEN	-	-	bug	trace_static_reads.py drops every open strace splits into <unfinished>/<resumed> lines, so the predictor's miss scores never saw them
 282	CLOSED	COMPLETED	2026-10-15	evolution	The session documents and the close ritual are too large to follow: shrink, index and streamline them

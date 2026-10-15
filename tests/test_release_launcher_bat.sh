@@ -31,7 +31,9 @@
 #   RUNS the binary). The dry run stops before either would be launched.
 # EXPECTS: every static property on both launchers and every package text; on Windows every
 #   path's exit code and message (a Windows host without gcc is a FAIL, never a skip: these
-#   paths went unrun once); elsewhere the Windows section SKIPs and says so. The real launch
+#   paths went unrun once); elsewhere the Windows section SKIPs and says so at RELEASE cadence, and is a
+#   NOTE at session or freeze cadence (#285, ruled 2026-10-15: cross-platform checks run on demand or at
+#   release, so a session close needs no Windows host). The real launch
 #   (the emulator staying up) is not this gate's: measured on ERIS 2026-10-03 (STATE 14z-189).
 #
 # MUST-FIRE: perturbed-copy: lf-endings — BOTH PLAY.bat files with CRLF turned into LF must FAIL: cmd reads a LF-only batch file in 512-byte blocks and loses `goto` labels across them, so the line-ending rule is the one a working-looking launcher breaks silently
@@ -321,7 +323,14 @@ MINGW*|MSYS*|CYGWIN*) ON_WIN=1 ;;
 esac
 if [ "$ON_WIN" = 0 ] || ! command -v cmd >/dev/null 2>&1; then
     [ "$VS_CTL" = first-found ] && { echo "REFUSED: CONTROL=first-found drives cmd, which runs only on a Windows host (MSYS2)"; exit 3; }
-    echo "  SKIP (said): the cmd-driven paths run only on a Windows host (MSYS2); this is $(uname -s)"
+    # #285 (maintainer-ruled 2026-10-15, "we always worked on one environment and check cross compatibility either
+    # on demand or at release"): off Windows the cmd-driven half is a SKIP only at release cadence, where a release
+    # must have run it on a Windows host; at session or freeze cadence it is a NOTE, so a session close needs no ERIS
+    if [ "${VS_CADENCE:-session}" = release ]; then
+        echo "  SKIP (said): the cmd-driven paths run only on a Windows host (MSYS2); this is $(uname -s)"
+    else
+        echo "  NOTE: the cmd-driven paths run on a Windows host (MSYS2) at release cadence or on demand (#285); this is $(uname -s), cadence ${VS_CADENCE:-session}"
+    fi
 else
     # the bytes driven are the GENERATOR's (what the next release ships; equal to the shipped copy at
     # release cadence, above); under CONTROL=first-found, the pre-#248 copy

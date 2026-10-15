@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-201 CLOSE, 2026-10-15)
+# NEXT SESSION — orientation (rewritten at the 14z-201b CLOSE, 2026-10-15)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` (then `python3 tools/gen_history_index.py`
@@ -21,8 +21,8 @@ there in parallel.** A long tier runs on a snapshot (`tests/run_on_snapshot.sh`)
 
 **THE SESSION CLOSE IS ONE TABLE (#282, closed 2026-10-15):** `docs/project/session_close.md` holds every step in
 order and `python3 tools/close.py` runs it (`start`, then `next`, `done`, `status`). The tier step is
-`--strict --confirm` on the previous close's results; the 14z-201 close's run of record is named in STATE 14z-201's
-CLOSE section. **CLAUDE.md is now rule plus pointer (244 lines):** the long paragraphs live in
+`--strict --confirm` on the previous close's results; the last run of record is `build/agent201b/close/tier2_results.tsv` (STATE 14z-201b's CLOSE section). **A session
+close needs no ERIS since #285:** `test_release_launcher_bat`'s Windows half is a NOTE off Windows below release cadence. **CLAUDE.md is now rule plus pointer (244 lines):** the long paragraphs live in
 `docs/project/oracle_classes.md`, `docs/project/working_methods.md`, `docs/project/session_records.md` and
 `docs/README.md` — read the one a rule points to before acting on it.
 
@@ -55,10 +55,11 @@ CLOSE section. **CLAUDE.md is now rule plus pointer (244 lines):** the long para
 - **ERIS for a player's-eye run:** its SSH shell is `cmd.exe`; there is no Windows Python (MSYS2's is `C:\msys64\mingw64\bin\python3.exe`); the dumps are in WSL at `/home/koneko/roms`. The 14z-201 run of the m23 Windows MAME package sits in `C:\Users\chaton\readme201`, its scripts in `C:\Users\chaton\m22logs\readme201_*`.
 - **PILOT's state after 14z-201:** its clone is detached at `344ebc5e`; scratch in `~/t201`. `ROMDIR` is `/home/koneko/roms` and `.profile` does not set it.
 
-## WHAT CLOSED THIS SITTING (14z-201)
+## WHAT CLOSED THIS SITTING (14z-201, and 14z-201b after its close)
 
 - **#282 closed `done`:** every history file indexed (E), STATE at most two groups (A), HANDOFF a map (B), the live budget gate (F), the close as one table and a driver (C), CLAUDE.md rule plus pointer (D).
 - **#269 closed `done`** on its measured done-when.
 - **Filed:** #283. **#284** (the maintainer's) got its index row and the recording procedure.
 - **The root README** edited by the maintainer on GitHub (merged, never rebased); "The scale" re-measured.
-- **Ruled:** each in the maintainer's own words in `DECISIONS_HISTORY.md` "Ruled 2026-10-14/15 (14z-201) — …".
+- **#285 closed `done` (14z-201b):** cross-platform checks on demand or at release.
+- **Ruled:** each in the maintainer's own words in `DECISIONS_HISTORY.md` "Ruled 2026-10-14/15 (14z-201, 14z-201b) — …".

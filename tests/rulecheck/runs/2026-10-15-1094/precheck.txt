@@ -1,0 +1,10 @@
+  FLAG QUOTE: row copy /Users/koneko/Developer/Vampire_Saved/VampireSaved/build/agent201b/close/findings_row.txt equals the newest group's row [2] THE FINDINGS TABLE [row sha
+  FLAG D-FIGURE: 500  [docs/NEXT_SESSION.md]
+  FLAG D-FIGURE: 50000  [docs/NEXT_SESSION.md]
+  FLAG D-FIGURE: 5.5  [docs/NEXT_SESSION.md]
+  FLAG D-FIGURE: 76  [docs/NEXT_SESSION.md]
+  FLAG D-ABSOLUTE: > Rewritten at every session close ([VSP-17]).  [docs/NEXT_SESSION.md]
+  FLAG D-ABSOLUTE: A recommendation leans only on the maintainer's OWN words.  [docs/NEXT_SESSION.md]
+  FLAG D-ABSOLUTE: - **The root README** edited by the maintainer on GitHub (merged, never rebased); "The scale" re-measured.  [docs/NEXT_SESSION.md]
+  FLAG D-ABSOLUTE: ### opened with The maintainer: *"Why do we have a windows only gate outside of release?"* Then, on the answer: *"I agree with your rationale in a vacuum but...  [STATE.md.lines-42-63 (lines 42-63 of STATE.md)]
+packet_check: 9 flag(s): D-ABSOLUTE 4, D-FIGURE 4, QUOTE 1

@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-521 entries (47 game / 134 platform / 340 project), counted from the buckets at generation.
+522 entries (47 game / 134 platform / 341 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 47 entries
 
@@ -209,7 +209,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - ON A WSL2 BOX REACHED ONLY OVER SSH, WSLg COMES UP WITH NO DESKTOP BEHIND IT AND EVERY MAME PROCESS WAITS 100-180 s ON ITS SOCKETS — a release run's two prereq TIMEOUTs were the environment, not the build (paid: 14z-198)
 - MAME `-playback` DOES NOT EXIT AT THE END OF THE RECORDING — `-exit_after_playback` does (paid: 14z-201)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 340 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 341 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -551,3 +551,4 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - `git add -u` STAGES NO NEW FILE — a commit that adds files names each one (paid: 14z-201)
 - A CONDENSED RULE DRIFTS — build the short form from the original's own sentences, then have a reader compare (paid: 14z-201)
 - WHAT A TEXT TELLS ITS READER IS READ, NOT INFERRED FROM THE COMMAND BESIDE IT (paid: 14z-201)
+- A GATE WITH NO CADENCE ROW RUNS AT EVERY CLOSE — a host-bound half then blocks every push (paid: 14z-201b, #285)
