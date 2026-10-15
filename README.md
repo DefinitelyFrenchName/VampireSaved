@@ -133,10 +133,10 @@ behaviour is a failed change, not a trade-off.
   writing before the step goes ahead. At the end of every working session, the same kind of checker reads
   the session's transcript to confirm the agent did what it said and ran what it claimed.
 
-**The scale, on 2026-09-26** (re-derive these rather than trusting this page): 392 test scripts, 184 checks that need no emulator (run at
-every session's close, the slowest few only at a freeze or a release) with 254 planted-defect controls
-executed at the last close, 203 emulator and FPGA simulation checks, 194 scripted replays, 10
-hand-played recordings of reported problems, and 181 tracked tickets.
+**The scale, on 2026-10-15** (re-derive these rather than trusting this page): 461 test scripts, 225 checks that need no emulator (run at
+every session's close, the slowest few only at a freeze or a release) with 394 planted-defect controls
+executed at the last close, 231 emulator and FPGA simulation checks, 233 scripted replays, 10
+hand-played recordings of reported problems, and 283 tracked tickets.
 
 
 ## Licence and legal

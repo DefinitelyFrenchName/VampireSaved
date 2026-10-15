@@ -15,7 +15,7 @@
 #   the truncated recording fail.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lib/native_path.sh
 #   tests/lua/ tests/replays/03_two_player_vs.rpl tools/build_release_emulators.sh
-#   tools/setup_mame.sh
+#   tools/setup_mame.sh tools/package_release.py
 #
 # MUST-FIRE: perturbed-copy: used-nvram — a playback started from the nvram directory the recording run left behind (what a player's `nvram_fresh` holds once their session is over) must diverge from the recording and fail, so the comparison is proven able to fail and the README's EMPTY folder proven load-bearing
 # MUST-FIRE: perturbed-copy: truncated-inp — the recording cut to half its input stream must fail the frame-count check, so a playback that stops early can never pass as the whole session
@@ -31,7 +31,8 @@
 # WHAT IS RUN. The indented `cps2 vsavjw … -record …` line is read OUT OF
 # README.md and run token for token from a player folder the gate builds the
 # way the README says (`rompath/` holding the merged romset's `vsavjw.zip`,
-# where apply_release.py writes it; the two named folders, empty). The only
+# where apply_release.py writes it — its --out read from the package README's
+# source, tools/package_release.py; the two named folders, empty). The only
 # substitutions: `cps2` becomes this host's release binary
 # (release/emulators/mame/<os-arch>/), and the rompath's
 # `/path/to/your/dumps` becomes $ROMDIR. APPENDED to every leg, never
@@ -112,10 +113,10 @@ PLAY="$W/player"
 echo "== the README recording route on $OSARCH: release $REL, playback also on $SRC, romset $MERGED"
 
 # ---- 0. the command, read out of README.md and checked against its own prose
-python3 - "$REPO/README.md" "$(native_path "$ROMDIR")" "$W/readme.env" "$W/argv.txt" <<'PY'
+python3 - "$REPO/README.md" "$(native_path "$ROMDIR")" "$W/readme.env" "$W/argv.txt" "$REPO/tools/package_release.py" <<'PY'
 import re, shlex, sys
 sys.stdout.reconfigure(encoding="utf-8", newline="\n")  # a native Windows python writes CRLF (docs/platform/gotchas.md)
-readme, romdir, envp, argvp = sys.argv[1:]
+readme, romdir, envp, argvp, pkg = sys.argv[1:]
 t = open(readme, encoding="utf-8").read()
 cands = [l for l in t.splitlines() if re.match(r"^(?: {4}|\t)\s*cps2(?:\.exe)?\s", l) and " -record " in l]
 if len(cands) != 1:
@@ -145,9 +146,11 @@ norm = lambda p: p[2:] if p.startswith("./") else p
 elems = opts["-rompath"].split(";")
 ph = [e for e in elems if "path/to/your/dumps" in e]
 need(len(ph) == 1, "the rompath carries one `/path/to/your/dumps` placeholder (got %r)" % elems)
-m = re.search(r"apply_release\.py\b[^\n]*--out\s+(\S+)", t)
+# the build step lives in the package's README, written by tools/package_release.py, not in the root one
+# (maintainer, 2026-10-15: "this had no business being there as it should be in the delverables README.md")
+m = re.search(r"apply_release\.py\b[^\n]*--out\s+(\S+)", open(pkg, encoding="utf-8").read())
 need(bool(m) and norm(m.group(1)) == norm(elems[0]),
-     "the rompath's first element is apply_release.py's --out (%r vs %r)" % (m and m.group(1), elems[0]))
+     "the rompath's first element is apply_release.py's --out in the package README (%r vs %r)" % (m and m.group(1), elems[0]))
 m = re.search(r"empty folders?,\s*`([^`]+)`\s+and\s+`([^`]+)`", t)
 need(bool(m) and {norm(m.group(1)), norm(m.group(2))} == {norm(opts["-nvram_directory"]), norm(opts["-input_directory"])},
      "the two empty folders the prose names are the command's nvram and input directories (%r vs %r)"

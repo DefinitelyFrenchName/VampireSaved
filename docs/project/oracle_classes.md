@@ -138,3 +138,98 @@ specs live under `tests/expected/<set>/`; the comparator-vs-text trap ([VSP-37]:
 three artifacts agreeing with each other is not ratification — check the
 comparator against THIS text) is the reason every checker has a ground-truth
 test that exercises PASS and FAIL.
+
+## [VSP-24] Which emulator runs which oracle
+
+*(Moved verbatim from CLAUDE.md 2026-10-15, #282 item D. Its anchor marker stays on CLAUDE.md's statement of the rule, so here the marker reads [VSP-24], unbolded.)*
+
+  [VSP-24] **Which emulator runs which oracle** (corrected 2026-08-16,
+  GitHub #78): the per-frame whole-corpus legacy oracle is **MAME**
+  (`tests/lib/m2a_common.sh`, the frozen `.masked` classes below). FBNeo
+  carries the **emulator superset invariant** on pristine `vsavj`
+  (`test_wide_profile.sh`, reference vs patched binary), **dual-track**
+  inertness on one binary (`test_dualtrack.sh`), and a **sampled**
+  hacked-vs-vanilla legacy check (`test_fbneo_legacy_oracle.sh`: 4 replays ×
+  5 frames, each frame a measured-clean override chosen clear of every
+  ratified divergence — 14z-92/110b). The **full** FBNeo legacy track is
+  ACCEPTED-AND-DEFERRED: every FBNeo gate is a live A/B by design (no frozen
+  corpus), which is what makes them machine-independent. Its revisit point,
+  MiSTer, has passed: the MiSTer lane answered with its own oracles (the
+  simulator anchor, FPGA inertness, the tenant oracle), and #141, which held
+  the track, is closed `declined` (2026-09-29, maintainer-ruled): a measured
+  FBNeo-vs-MAME disagreement on legacy content opens a new ticket (restated
+  2026-09-15, maintainer-agreed).
+
+## [VSP-25] Dual-track inertness
+
+*(Moved verbatim from CLAUDE.md 2026-10-15, #282 item D. Its anchor marker stays on CLAUDE.md's statement of the rule, so here the marker reads [VSP-25], unbolded.)*
+
+  [VSP-25] **Dual-track "inertness" means bit-identical UP TO SELECT
+  ENTRY, not for the whole replay** (ratified 2026-08-17, GitHub #95). The
+  stock and WIDE builds carry DIFFERENT ROSTERS by construction — a
+  stock-size ROM can only hold Donovan by substituting over someone, which is
+  why WIDE exists — so every select-reaching replay must differ. Onsets are
+  frozen per replay; an onset moving EARLIER is the failure. **Amended
+  2026-09-05 (14z-133b, maintainer-ruled): "bit-identical" is measured
+  OUTSIDE six frozen execution-position offsets — `$FF055B-$FF055D`, the
+  [VSP-26] sound-driver phase inventory, and `$FF7FF3-$FF7FF5`, the
+  dead-stack return address every ratified masked basis already ignores —
+  never outside a window; the STATE onset, the first frame with any other
+  byte, is what must equal the frozen onset. Class v6,
+  `docs/project/oracle_classes.md`.**
+
+## [VSP-26] The two FBNeo-only phase classes
+
+*(Moved verbatim from CLAUDE.md 2026-10-15, #282 item D. Its anchor marker stays on CLAUDE.md's statement of the rule, so here the marker reads [VSP-26], unbolded.)*
+
+  [VSP-26] **The two FBNeo-only phase classes** (ratified 2026-08-16,
+  GitHub #78): the sound-driver work area `$FF0500-$FF05FF` and the
+  OBJ-builder secondary stack `$FF06D0-$FF06EF` may differ on FBNeo where MAME
+  shows none — execution POSITION, not state (`atlas/ram.md`), on legacy as
+  well as tenant content. **The window is NOT the tolerance:** the
+  expectation is FROZEN as the measured offset inventory
+  (`$FF055B-$FF055D`, `$FF06D1/D4/DB`, in `test_fbneo_legacy_oracle.sh`) and
+  a byte differing inside a window but OUTSIDE it FAILS as GROWTH — stop and
+  root-cause, never widen. `FBNEO_ORACLE_EXPECT=exact` demands bit-identity.
+
+## The hooked-build legacy comparison classes and [VSP-31]
+
+*(Moved verbatim from CLAUDE.md 2026-10-15, #282 item D; the same for [VSP-31].)*
+
+- **The hooked-build legacy comparison classes** — the ratified vocabulary
+  every `.masked` expectation uses: **exact** (default), **flicker-tolerated**
+  (v2), **frozen first-divergence constant**, the **bounded re-convergent
+  window** (v3), **composite** (v4 — the strict conjunction of flicker and
+  window, no added tolerance), and the v5 ruling that the ≥60-frame rule is
+  INTRA-MECHANISM. **The spec of record is `docs/project/oracle_classes.md`**
+  — every definition with its date, frozen figures, named exemptions,
+  checker and ground-truth test; NOT copied here on purpose (the Rule 1 v2
+  principle: two copies drift). Every non-exact class must be
+  mechanism-attributed and its expectation frozen; a replay may not be
+  reclassified to a looser class without a new measured mechanism and
+  maintainer sign-off. [VSP-31] **Standing watch
+  (maintainer, 2026-07-27): if flickers grow beyond the frozen inventory or
+  divergences turn systematic, stop and root-cause — that pattern would
+  indicate a deeper issue, not tolerance noise.** Rationale (measured,
+  session 7, `docs/GOTCHAS.md`): hooks cost cycles; interrupts land at skewed
+  instruction boundaries in otherwise-vanilla frames; zero-cycle hooking is
+  impossible on this engine. Whole-RAM frame-exact remains the standard for
+  vanilla oracles, run-to-run determinism, and hook-free builds.
+
+## [VSP-32] Dual-emulator agreement
+
+*(Moved verbatim from CLAUDE.md 2026-10-15, #282 item D. Its anchor marker stays on CLAUDE.md's statement of the rule, so here the marker reads [VSP-32], unbolded.)*
+
+- [VSP-32] **Dual-emulator agreement** (amended 2026-07-25,
+  maintainer-approved): for new-character content (no vanilla oracle exists),
+  the same replay is run on patched FBNeo and patched MAME and the two must
+  agree on **mapped gameplay state compared at sync anchors** (match start,
+  round transitions): character IDs, HP, positions, timer, meter, and the
+  other fields in `docs/game/atlas/ram.md` — not whole-work-RAM checksums
+  frame-by-frame. Rationale (measured, session 2): the emulators traverse
+  identical states on slightly different frame indices after boot, so
+  frame-exact whole-RAM equality is unachievable between codebases;
+  field-level agreement at anchors preserves the original intent — a bug
+  would still have to manifest identically in two unrelated codebases to slip
+  through. Whole-RAM frame-exact checksums remain the standard **within**
+  each emulator (vanilla-vs-patched superset oracle, run-to-run determinism).

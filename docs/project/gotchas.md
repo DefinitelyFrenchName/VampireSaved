@@ -3322,6 +3322,9 @@ generated command lines. **Sibling (14z-115, paid for twice in one evening): an 
 the whole string, so a dump spec built from it was one malformed entry and
 the FBNeo harness silently wrote NO dumps (rc 0, logs complete). Write
 `for f in ${=frames}` in the Bash tool's zsh, or run the loop under `sh`.
+**Third sibling (14z-201): `$c:path` is a history modifier in zsh** — `git show $c:tests/ci_static.txt` read
+`$c:t` (the tail modifier), so git got `HEADests/ci_static.txt` and every count printed 0 beside the error. A
+`measurer` spec for the README's scale figures lost two commands to it. Write `"${c}:path"`.
 
 ## **[VSP-131]** A scripted motion input is NOT the move you named — the buffer FOLDS leading directions, so identify by effects, never by the script (14z-101)
 The #109 native-reference hunt scripted "6236+2P" and confidently called

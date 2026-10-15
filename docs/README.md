@@ -166,6 +166,8 @@ history twins and are listed last. Level-0 files are the entry points above.
 - [`porting_sprite_lists.md`](project/porting_sprite_lists.md) — **REFERENCE** · what a tenant port must do so ported effects DRAW: the class row, the missing list type, the per-game code bias, and which gfx bank the art comes f…
 - [`operations.md`](project/operations.md) — **REFERENCE** · OPERATIONS — the tool catalogue ("What exists"), the native-leg recipe and the method sections, moved verbatim out of HANDOFF.md (#282 item B, 14z-201)
 - [`session_close.md`](project/session_close.md) — **REFERENCE** · THE SESSION CLOSE — the one copy of the ritual: its step table, in order, which `tools/close.py` runs (#282 item C, 14z-201)
+- [`session_records.md`](project/session_records.md) — **REFERENCE** · SESSION RECORDS — the full text of CLAUDE.md [VSP-17], [VSP-182] and [VSP-162]: STATE.md, the ticket rules, the session key (#282 item D)
+- [`working_methods.md`](project/working_methods.md) — **REFERENCE** · WORKING METHODS — the full text of CLAUDE.md [VSP-13], [VSP-14], [VSP-20] and the regression runner (#282 item D)
 - [`release_format.md`](project/release_format.md) — **REFERENCE** · the release format (ruled 2026-08-28): one release, one SELF-SUFFICIENT directory per platform (`fbneo/`, `mame/`, `mister/`), the patch set copied…
 - [`tenant_manifest.md`](project/tenant_manifest.md) — **REFERENCE** · Per-tenant manifests — proposed schema · history: `project/tenant_manifest_history.md`
 - [`tickets.md`](project/tickets.md) — **GENERATED** · The ticket index (GENERATED) · generated (do not edit)
@@ -220,3 +222,50 @@ means "pair downgraded (no stock)" — exactly the fact needed to notice
 that Dark Force was never activating. Three sessions of DF work missed
 it because the Dark Force section of `engine_internals.md` never pointed
 at those rows. Cross-link, or the fact may as well not be written down.
+
+## How CLAUDE.md was condensed
+
+*(Moved verbatim from CLAUDE.md 2026-10-15, #282 item D.)*
+
+Condensed 14z-123 at the maintainer's direction ("more concise and to the
+point, without losing precious information, especially on the work style and
+discipline"). The LAW is verbatim; the correction narratives that had
+accreted inside rules are now a rule plus a dated citation — the stories
+live in STATE_HISTORY and the documents named. Pass 2 (14z-124,
+maintainer-ruled 2026-08-31) made the structural cut: the oracle-class
+definitions live in `docs/project/oracle_classes.md` and the document roster
+in `docs/README.md`; §4 and §5 keep the law and point. Every `**[VSP-N]**`
+marker stays on the paragraph it anchors, wherever that paragraph lives
+(`tools/checkskills.py` and `tests/test_doc_anchor_census.sh` lock them).
+
+## [VSP-12] Documentation taxonomy
+
+*(Moved verbatim from CLAUDE.md 2026-10-15, #282 item D. Its anchor marker stays on CLAUDE.md's statement of the rule, so here the marker reads [VSP-12], unbolded.)*
+
+- [VSP-12] **Documentation taxonomy (SMS-proven; respect the splits, don't merge).**
+  `docs/` is divided by ONE question — **would this still be true if we
+  abandoned the roster hack tomorrow?** — into `docs/game/` (Vampire
+  Savior itself), `docs/platform/` (CPS-2, MAME, FBNeo) and
+  `docs/project/` (this port). Read `docs/README.md`; file by the FACT,
+  not by the task you were doing when you learned it. Every hand-written
+  document declares its SHAPE in `docs/doc_shape.tsv` (REFERENCE / REGISTER
+  / LOG / HIST / INDEX / GENERATED); chronology lives in `<name>_history.md`
+  twins, never re-accreting into a reference document
+  (`tests/test_docshape.sh`).
+  The documents themselves — what each is for, which are GENERATED, and
+  the entry points — are the routing table and "The documents, by role" of
+  `docs/README.md`: read it first, it is the map. Three disciplines that
+  roster carries stay law here: every synthesis section of
+  `docs/game/engine_internals.md` names the `atlas/` rows it depends on and
+  the gates that lock it (a section that did not is how 14z-69 spent three
+  sessions measuring a mode it had never entered); the GENERATED indexes
+  (`docs/annotations.md`, `docs/project/gate_index.md`, `docs/GOTCHAS.md`)
+  are regenerated in the commit that changes what they index, never
+  hand-edited; and the skills (`.claude/skills/<name>/SKILL.md`, the
+  DISTILLED DISCIPLINE loaded before the work) are anchored `**[PFX-N]**` in
+  the doc paragraph each rule distils and locked by `tools/checkskills.py` —
+  a skill quotes a number only from a LOG, and editing an anchored paragraph
+  means keeping the marker with the fact or moving the rule. Gotchas are
+  appended the moment one is paid for, to the bucket its FACT belongs to.
+  Findings land in the right document *at discovery time*, not at milestone
+  end. An undocumented discovery is a discovery we will pay for twice.

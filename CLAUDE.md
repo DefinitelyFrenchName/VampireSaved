@@ -5,16 +5,10 @@ Full-roster Vampire Savior on the real CPS-2 engine. Emulator-target romhack
 This file governs how Claude Code operates inside this repository. Read it fully
 at the start of every session. Read `STATE.md` immediately after.
 
-Condensed 14z-123 at the maintainer's direction ("more concise and to the
-point, without losing precious information, especially on the work style and
-discipline"). The LAW is verbatim; the correction narratives that had
-accreted inside rules are now a rule plus a dated citation — the stories
-live in STATE_HISTORY and the documents named. Pass 2 (14z-124,
-maintainer-ruled 2026-08-31) made the structural cut: the oracle-class
-definitions live in `docs/project/oracle_classes.md` and the document roster
-in `docs/README.md`; §4 and §5 keep the law and point. Every `**[VSP-N]**`
-marker stays on the paragraph it anchors, wherever that paragraph lives
-(`tools/checkskills.py` and `tests/test_doc_anchor_census.sh` lock them).
+Condensed 14z-123 and 14z-124; cut to RULE PLUS POINTER 2026-10-15 (#282 item D, the maintainer: *"Rule +
+pointer (Recommended)"*). The LAW (§1, §2) is verbatim. Every other rule keeps its `**[VSP-N]**` anchor and its
+statement here; its reasons, history and steps live, verbatim, in the document it names. `tools/checkskills.py` and
+`tests/test_doc_anchor_census.sh` lock the anchors.
 
 ## 1. Mission and prime constraint
 
@@ -110,78 +104,37 @@ legacy behavior is a failed change.
   match for the full script length. First divergent frame + RAM diff is the
   standard bug report format.
 
-  **[VSP-24]** **Which emulator runs which oracle** (corrected 2026-08-16,
-  GitHub #78): the per-frame whole-corpus legacy oracle is **MAME**
-  (`tests/lib/m2a_common.sh`, the frozen `.masked` classes below). FBNeo
-  carries the **emulator superset invariant** on pristine `vsavj`
-  (`test_wide_profile.sh`, reference vs patched binary), **dual-track**
-  inertness on one binary (`test_dualtrack.sh`), and a **sampled**
-  hacked-vs-vanilla legacy check (`test_fbneo_legacy_oracle.sh`: 4 replays ×
-  5 frames, each frame a measured-clean override chosen clear of every
-  ratified divergence — 14z-92/110b). The **full** FBNeo legacy track is
-  ACCEPTED-AND-DEFERRED: every FBNeo gate is a live A/B by design (no frozen
-  corpus), which is what makes them machine-independent. Its revisit point,
-  MiSTer, has passed: the MiSTer lane answered with its own oracles (the
-  simulator anchor, FPGA inertness, the tenant oracle), and #141, which held
-  the track, is closed `declined` (2026-09-29, maintainer-ruled): a measured
-  FBNeo-vs-MAME disagreement on legacy content opens a new ticket (restated
-  2026-09-15, maintainer-agreed).
+  **[VSP-24]** **Which emulator runs which oracle** (corrected 2026-08-16, GitHub #78): the per-frame whole-corpus
+  legacy oracle is **MAME** (`tests/lib/m2a_common.sh`, the frozen `.masked` classes below). FBNeo carries the
+  **emulator superset invariant** on pristine `vsavj`, **dual-track** inertness on one binary, and a **sampled**
+  hacked-vs-vanilla legacy check; a measured FBNeo-vs-MAME disagreement on legacy content opens a new ticket
+  (restated 2026-09-15, maintainer-agreed). The full rule: `docs/project/oracle_classes.md` § [VSP-24].
 
-  **[VSP-25]** **Dual-track "inertness" means bit-identical UP TO SELECT
-  ENTRY, not for the whole replay** (ratified 2026-08-17, GitHub #95). The
-  stock and WIDE builds carry DIFFERENT ROSTERS by construction — a
-  stock-size ROM can only hold Donovan by substituting over someone, which is
-  why WIDE exists — so every select-reaching replay must differ. Onsets are
-  frozen per replay; an onset moving EARLIER is the failure. **Amended
-  2026-09-05 (14z-133b, maintainer-ruled): "bit-identical" is measured
-  OUTSIDE six frozen execution-position offsets — `$FF055B-$FF055D`, the
-  [VSP-26] sound-driver phase inventory, and `$FF7FF3-$FF7FF5`, the
-  dead-stack return address every ratified masked basis already ignores —
-  never outside a window; the STATE onset, the first frame with any other
-  byte, is what must equal the frozen onset. Class v6,
-  `docs/project/oracle_classes.md`.**
+  **[VSP-25]** **Dual-track "inertness" means bit-identical UP TO SELECT ENTRY, not for the whole replay**
+  (ratified 2026-08-17, GitHub #95; amended 2026-09-05, 14z-133b, maintainer-ruled). Onsets are frozen per replay;
+  an onset moving EARLIER is the failure. "Bit-identical" is measured OUTSIDE six frozen execution-position offsets,
+  never outside a window; the STATE onset, the first frame with any other byte, is what must equal the frozen
+  onset. The full rule: `docs/project/oracle_classes.md` § [VSP-25] (class v6).
 
-  **[VSP-26]** **The two FBNeo-only phase classes** (ratified 2026-08-16,
-  GitHub #78): the sound-driver work area `$FF0500-$FF05FF` and the
-  OBJ-builder secondary stack `$FF06D0-$FF06EF` may differ on FBNeo where MAME
-  shows none — execution POSITION, not state (`atlas/ram.md`), on legacy as
-  well as tenant content. **The window is NOT the tolerance:** the
-  expectation is FROZEN as the measured offset inventory
-  (`$FF055B-$FF055D`, `$FF06D1/D4/DB`, in `test_fbneo_legacy_oracle.sh`) and
-  a byte differing inside a window but OUTSIDE it FAILS as GROWTH — stop and
-  root-cause, never widen. `FBNEO_ORACLE_EXPECT=exact` demands bit-identity.
-- **The hooked-build legacy comparison classes** — the ratified vocabulary
-  every `.masked` expectation uses: **exact** (default), **flicker-tolerated**
-  (v2), **frozen first-divergence constant**, the **bounded re-convergent
-  window** (v3), **composite** (v4 — the strict conjunction of flicker and
-  window, no added tolerance), and the v5 ruling that the ≥60-frame rule is
-  INTRA-MECHANISM. **The spec of record is `docs/project/oracle_classes.md`**
-  — every definition with its date, frozen figures, named exemptions,
-  checker and ground-truth test; NOT copied here on purpose (the Rule 1 v2
-  principle: two copies drift). Every non-exact class must be
-  mechanism-attributed and its expectation frozen; a replay may not be
-  reclassified to a looser class without a new measured mechanism and
-  maintainer sign-off. **[VSP-31]** **Standing watch
-  (maintainer, 2026-07-27): if flickers grow beyond the frozen inventory or
-  divergences turn systematic, stop and root-cause — that pattern would
-  indicate a deeper issue, not tolerance noise.** Rationale (measured,
-  session 7, `docs/GOTCHAS.md`): hooks cost cycles; interrupts land at skewed
-  instruction boundaries in otherwise-vanilla frames; zero-cycle hooking is
-  impossible on this engine. Whole-RAM frame-exact remains the standard for
-  vanilla oracles, run-to-run determinism, and hook-free builds.
-- **[VSP-32]** **Dual-emulator agreement** (amended 2026-07-25,
-  maintainer-approved): for new-character content (no vanilla oracle exists),
-  the same replay is run on patched FBNeo and patched MAME and the two must
-  agree on **mapped gameplay state compared at sync anchors** (match start,
-  round transitions): character IDs, HP, positions, timer, meter, and the
-  other fields in `docs/game/atlas/ram.md` — not whole-work-RAM checksums
-  frame-by-frame. Rationale (measured, session 2): the emulators traverse
-  identical states on slightly different frame indices after boot, so
-  frame-exact whole-RAM equality is unachievable between codebases;
-  field-level agreement at anchors preserves the original intent — a bug
-  would still have to manifest identically in two unrelated codebases to slip
-  through. Whole-RAM frame-exact checksums remain the standard **within**
-  each emulator (vanilla-vs-patched superset oracle, run-to-run determinism).
+  **[VSP-26]** **The two FBNeo-only phase classes** (ratified 2026-08-16, GitHub #78): the sound-driver work area
+  `RAM:$FF0500-$FF05FF` and the OBJ-builder secondary stack `RAM:$FF06D0-$FF06EF` may differ on FBNeo where MAME
+  shows none — execution POSITION, not state. **The window is NOT the tolerance:** the expectation is FROZEN as the
+  measured offset inventory (in `test_fbneo_legacy_oracle.sh`), and a byte differing inside a window but OUTSIDE it
+  FAILS as GROWTH — stop and root-cause, never widen. The full rule: `docs/project/oracle_classes.md` § [VSP-26].
+- **The hooked-build legacy comparison classes** — the ratified vocabulary every `.masked` expectation uses;
+  **the spec of record is `docs/project/oracle_classes.md`**. Every non-exact class must be mechanism-attributed
+  and its expectation frozen; a replay may not be reclassified to a looser class without a new measured mechanism
+  and maintainer sign-off. **[VSP-31]** **Standing watch (maintainer, 2026-07-27): if flickers grow beyond the
+  frozen inventory or divergences turn systematic, stop and root-cause — that pattern would indicate a deeper
+  issue, not tolerance noise.** Whole-RAM frame-exact remains the standard for vanilla oracles, run-to-run
+  determinism, and hook-free builds. Why hooks skew: `docs/project/oracle_classes.md` § The hooked-build legacy
+  comparison classes.
+- **[VSP-32]** **Dual-emulator agreement** (amended 2026-07-25, maintainer-approved): for new-character content
+  (no vanilla oracle exists), the same replay is run on patched FBNeo and patched MAME and the two must agree on
+  **mapped gameplay state compared at sync anchors** (match start, round transitions): character IDs, HP,
+  positions, timer, meter, and the other fields in `docs/game/atlas/ram.md` — not whole-work-RAM checksums
+  frame-by-frame. Whole-RAM frame-exact checksums remain the
+  standard **within** each emulator. Why: `docs/project/oracle_classes.md` § [VSP-32].
 - **Test matrix growth:** every new capability adds replays. Minimum coverage
   for a ported character: vs each of the 18 (both sides), each stage, Dark
   Force activation/expiry, life-marker transition, timeout, throw/tech
@@ -190,40 +143,22 @@ legacy behavior is a failed change.
   (simultaneous presses, frame-1 actions, corner interactions, KO-frame
   events). The SMS experience: bugs live at state transitions, not in the
   middle of matches.
-- **[VSP-20]** **FIELD REPORTS ARE RECORDINGS (maintainer-ruled 2026-08-27, 14z-111).**
-  Every reproducible crash or misbehaviour a human can produce — on the
-  board or on MAME — is captured FIRST as a hand-played MAME recording
-  (the commands: HANDOFF, [VSP-119]), BEFORE any mechanism theory, and
-  tracked under `tests/inp/<name>/` (force-added,
-  with a one-line `NOTE`). **NAMING: `<what>-<freeze set>-NN`** — the
-  freeze the recording was PLAYED on, never the mark or the session
-  (`crash-merged-m8-01`; a mark can cover two freezes and a session two
-  freezes). **CLEANUP:** the `~/.cache/vampire-saved/inp/<name>/` copy is
-  deleted once tracked; a recording neither tracked nor named by any gate or
-  doc (grep first) is deleted, not kept. `tools/run_inp_guarded.sh` plays a
-  recording back with a write tap on the game's OWN exception-code store
-  (`RAM:$FF0000`) — no debugger, faithful playback — and yields the vector,
-  fault PC, registers and stack. **`tests/test_inp_corpus.sh`
-  replays EVERY tracked recording on the current merged build at every
-  freeze and fails on the first exception** (a captured-but-unfixed defect is
-  declared by a `DEFECT` file so the capture cannot rot). The cost that made
-  this law: 14z-109..111 spent three sessions and two shipped fixes on a
-  rig-derived mechanism that was never the field crash; the first recording
-  found the real one (#99) in an evening — win-fast rigs never give a CPU
-  opponent's AI time to reach its rarer scripts.
+- **[VSP-20]** **FIELD REPORTS ARE RECORDINGS (maintainer-ruled 2026-08-27, 14z-111).** Every reproducible
+  crash or misbehaviour a human can produce — on the board or on MAME — is captured FIRST as a hand-played MAME
+  recording, BEFORE any mechanism theory, and tracked under `tests/inp/<name>/`, named `<what>-<freeze set>-NN`
+  (the freeze it was PLAYED on, never the mark or the session). **`tests/test_inp_corpus.sh` replays EVERY tracked
+  recording on the current merged build at every freeze and fails on the first exception.** Naming, cleanup and
+  playback: `docs/project/working_methods.md` § [VSP-20].
 - **[VSP-18]** **THE PERSISTENT SUITE DOCTRINE (SMS lesson, promoted to law):** every
   in-emulator test executed during development — measurement, probe, or
   verification — is captured as a scripted, rerunnable case in `tests/` before
   the session ends. No throwaway manual checks. These behavioral tests are the
   project's most valuable artifact, above unit/integration tests; the suite
   only grows. Budget the time; it is time well spent.
-- **Auto-detecting regression runner:** the suite runner fingerprints the
-  build under test (which features/patches are present) and selects
-  expectations accordingly, so one command validates any build variant
-  (SMS `test_regression.lua` pattern). Engine-invariant "rule locks" for
-  vanilla behavior run on every build. The index of every gate is
-  `docs/project/gate_index.md` (generated); the pre-commit command is
-  `tests/run_all_static.sh` (HANDOFF "How to test").
+- **Auto-detecting regression runner:** the suite runner fingerprints the build under test and selects
+  expectations accordingly, so one command validates any build variant; engine-invariant "rule locks" for vanilla
+  behavior run on every build. The index of every gate is `docs/project/gate_index.md` (generated); the pre-commit
+  command is `tests/run_all_static.sh` (HANDOFF "How to test").
 - **[VSP-19]** **Verdict logic is itself tested.** A test's classification code
   (HIT/BLOCK/TECH/etc.) must be validated against known ground-truth
   scenarios before its verdicts are trusted — SMS shipped a wrong conclusion
@@ -234,189 +169,50 @@ legacy behavior is a failed change.
 
 ## 5. Working style
 
-- **[VSP-17]** Sessions begin by reading `STATE.md` (current milestone, open decisions,
-  standing rulings) and end by updating it. STATE.md is the single source of
-  truth for progress; do not rely on chat memory. **SPLIT 2026-08-20
-  (maintainer-approved), amended 2026-09-14 and 2026-10-14 (#282: *"At most 2"*): STATE.md
-  holds the latest session group — two while a sitting writes its own — and the standing sections; `STATE_HISTORY.md` holds every
-  older session record VERBATIM, under THE LEDGER (one line per archived
-  session) at its head.** The rollover procedure is a step of the session
-  close, whose one copy is `docs/project/session_close.md` (#282 item C, 2026-10-15). "STATE 14z-XX" references
-  resolve in STATE.md first, then STATE_HISTORY.md — section names are
-  preserved in the archive, and archived entries are never rewritten
-  (corrections to them are marked in place).
-  **AN OPEN LIST HOLDS ONLY WHAT IS OPEN (maintainer-ruled 2026-09-14).**
-  STATE.md's "Decisions pending" and NEXT_SESSION's START HERE never carry a
-  closed item, however it is marked — struck through, DONE, FIXED or CLOSED
-  alike. A ruled decision moves VERBATIM to `DECISIONS_HISTORY.md` in the
-  commit that records the ruling, leaving a one-line statement of the rule
-  under STATE.md's "Standing rulings" for as long as it constrains work; the
-  line is deleted when it stops. Bugs, cosmetic items and evolutions are
-  tickets, listed only in the ticket index ([VSP-182]).
-  `tests/test_state_open_lists.sh` enforces this, together with STATE.md's
-  size budget and session-group count.
-  **THE CLOSE ENDS WITH A PUSH (maintainer-ruled 2026-09-10):** when every
-  check of the close is green and nothing is pending, push `main` to GitHub
-  as the ritual's last step; a red, a SKIP or an unresolved item leaves the
-  commits local and the close says so. Pushing bbh follows the same rule
-  under its standing authorisation.
-- **[VSP-182]** **TICKETS HAVE STRICT SOURCES OF TRUTH (maintainer-ruled
-  2026-09-14).** Every bug, cosmetic item and evolution is a ticket, and each
-  question about one has exactly one source of truth. **The list** — which
-  tickets exist, their kind and status — is `docs/project/tickets.tsv` (its
-  header is the spec of record; the page is generated). **The story** —
-  report, discussion, rulings as given, resolution — is the ticket's GitHub
-  issue whatever its kind, so a change of kind is a label edit, never a
-  move. **The facts** it established live in the subject documents
-  ([VSP-12]); what a session did lives in STATE ([VSP-17]). Live documents
-  name a ticket by its issue number and never restate its status or
-  content.
-  **ENOUGH STAYS LOCAL.** Without GitHub, the tree must answer four questions
-  about every ticket: what it was and how to reproduce it, what was decided,
-  what was learned, and what went wrong. Rulings are decisions, so they are
-  recorded locally whichever channel gave them. What was learned and what
-  went wrong live in a live document — a subject doc, a gotchas bucket or a
-  skill — never only in an archive. Only the conversation, and a third
-  party's report text, may exist on GitHub alone.
-  **DONE, AWAITING RELEASE (maintainer-ruled 2026-10-08, 14z-195):** when a
-  ticket's implementation is complete but it stays open until a release
-  ships it, its issue gets a comment saying so — the commit, the gate that
-  holds it, and that it closes with the release that carries it — so an
-  open ticket with work remaining is never confused with one waiting to ship.
-  **CLOSING A TICKET**, in one commit: its facts go where they belong; the
-  issue and the tree are checked against each other, the side that is behind
-  is updated, a closing comment states the resolution, and the issue is
-  closed; its index row records the status and the four answers; any STATE
-  entry for it moves VERBATIM to `STATE_HISTORY.md` under the closing
-  session's key. **Closed means nothing is left to do** — an option kept open
-  becomes its own ticket. **A copy** of past content names its origin and
-  date, and goes only into a source of truth or an archive.
-  `tests/test_tickets.sh` enforces the form: every issue has a row whose
-  state agrees with GitHub's, and each answer is a resolving link or an
-  explicit `none`. Whether an answer is enough is judged at close.
-- **[VSP-162]** **THE `14z-N` SESSION KEY — a naming convention AND the
-  archive's INDEX, which is why it is never re-based.** A tag names ONE
-  SITTING (a working session, several per day at times — not a calendar day,
-  not a milestone, not a build). **Three namespaces, never conflated:**
-  sessions `14z-N`; milestones `M0`..`M12`; freeze marks `donovan-m18` /
-  `merged-m14`. **Shape:** letter suffixes mark CONTINUATIONS, same-day or
-  after a close (`14z-82c`, `14z-110b`, `14z-117b`, `14z-125b`, `14z-126b`);
-  parenthetical numbers are PHASES within one sitting (`14z-107 (11)`,
-  `14z-118 (14)`).
-  **It is a LOOKUP KEY, and that is the load-bearing part.** "STATE 14z-XX"
-  resolves in STATE.md, then STATE_HISTORY.md, then DECISIONS_HISTORY.md —
-  section names are preserved verbatim across every rollover *precisely so
-  the key keeps resolving*. Hundreds of pointers into it live in gate
-  headers, annotated tag messages, `patch_notes.md`, gotcha datelines and
-  THE LEDGER's lines. **So a tag is never renamed, renumbered or tidied**:
-  renaming one silently breaks every citation, and a citation that cannot
-  resolve cannot be corrected ([VSP-13]).
-  **`14z-` IS A FOSSILISED PREFIX — READ IT AS ONE OPAQUE TOKEN. THE LIVE
-  COUNTER IS `-N`.** We are NOT "in session 14" and never have been since
-  2026-07-30: `14z-126` is the 126th session of the `14z-` series, nothing
-  more. Session 14 itself was ONE sitting, 2026-07-28, the M2a freeze — for
-  scale, the MiSTer arc did not open until `14z-106`, 2026-08-22, 104
-  sessions later. Anyone reading the prefix as a live continuation of
-  session 14 has been misled by its ETYMOLOGY, which is only this:
-  **ORIGIN — RECONSTRUCTED FROM THE ARCHIVE 2026-09-01, not lost.** The name
-  is a CHAIN OF EXHAUSTED COUNTERS, each continued by suffix rather than
-  re-based: plain integers (`Session 3`, `4`, `5-6`, `7`, `9`, `13`) →
-  `Session 14` continued through the alphabet (`14b`…`14x`, `14z`, with
-  `14w-b`/`14w-c`/`14k-b` where a letter itself continued) → the letters
-  exhausted at **`14z`**, so continuation moved to a NUMBER (`14z-2`,
-  `14z-3`, … `14z-126`) → and letters resumed one level down (`14z-126b`).
-  Each stage FOSSILISED the one before it instead of restarting, which is
-  why the head of the name stopped carrying meaning. Dates (pickaxed from
-  the archive): Session 14 2026-07-28, `14b` 2026-07-28, `14z` 2026-07-30,
-  `14z-2` 2026-07-30, `14z-59` 2026-08-03. **They are also what show a
-  "session" is a CONTEXT WINDOW rather than a day** — 25 letter sessions
-  inside three days, ~8/day.
-  **WHAT IS STILL NOT RECORDED, stated as unverified rather than theorised:**
-  why session 14 alone began taking letter continuations, and whether the
-  practice was inherited with the SMS working discipline. **THE SEARCH THAT
-  BACKS THAT: THIS REPOSITORY ONLY** — the archive, every doc, and the git
-  history to the first commit (2026-07-25). No commit or document defines
-  the convention; it is only ever used. The answer may exist in the SMS
-  material or predate the first commit, neither of which was searched.
+- **[VSP-17]** Sessions begin by reading `STATE.md` (current milestone, open decisions, standing rulings) and end by
+  updating it. STATE.md is the single source of truth for progress; do not rely on chat memory. It holds the latest
+  session group — two while a sitting writes its own — and the standing sections; `STATE_HISTORY.md` holds every
+  older session record VERBATIM (split 2026-08-20, maintainer-approved; amended 2026-09-14 and 2026-10-14, #282:
+  *"At most 2"*). **AN OPEN LIST HOLDS ONLY WHAT IS OPEN (maintainer-ruled 2026-09-14):** STATE.md's "Decisions
+  pending" and NEXT_SESSION's START HERE never carry a closed item, however it is marked. **THE CLOSE ENDS WITH A
+  PUSH (maintainer-ruled 2026-09-10):** when every check of the close is green and nothing is pending, push `main`
+  to GitHub as the ritual's last step; a red, a SKIP or an unresolved item leaves the commits local and the close
+  says so. The close's steps: `docs/project/session_close.md`; the full rule: `docs/project/session_records.md`
+  § [VSP-17].
+- **[VSP-182]** **TICKETS HAVE STRICT SOURCES OF TRUTH (maintainer-ruled 2026-09-14).** Every bug, cosmetic
+  item and evolution is a ticket, and each question about one has exactly one source of truth: the list is
+  `docs/project/tickets.tsv`, the story its GitHub issue, the facts the subject documents. Live documents name a
+  ticket by its issue number and never restate its status or content. **ENOUGH STAYS LOCAL:** without GitHub, the
+  tree must answer four questions about every ticket — what it was and how to reproduce it, what was decided, what
+  was learned, and what went wrong. **Closed means nothing is left to do.** Done-awaiting-release, closing a ticket
+  and copies: `docs/project/session_records.md` § [VSP-182]; `tests/test_tickets.sh` enforces the form.
+- **[VSP-162]** **THE `14z-N` SESSION KEY** names ONE SITTING and is the archive's LOOKUP KEY, so a tag is never
+  renamed, renumbered or tidied: renaming one silently breaks every citation. Sessions `14z-N`, milestones and
+  freeze marks are three namespaces, never conflated. **`14z-` is a fossilised prefix — read it as one opaque token;
+  the live counter is `-N`.** Its shape and reconstructed origin: `docs/project/session_records.md` § [VSP-162].
 - **[VSP-11]** Address notation: 68k addresses as `PRG:0x0F1234` (program ROM offset) or
   `CPU:$0F1234` (address-space); tiles as `GFX:tile 0x1A2B3`; RAM as
   `RAM:$FF8000`. Never bare hex without a namespace.
-- **[VSP-12]** **Documentation taxonomy (SMS-proven; respect the splits, don't merge).**
-  `docs/` is divided by ONE question — **would this still be true if we
-  abandoned the roster hack tomorrow?** — into `docs/game/` (Vampire
-  Savior itself), `docs/platform/` (CPS-2, MAME, FBNeo) and
-  `docs/project/` (this port). Read `docs/README.md`; file by the FACT,
-  not by the task you were doing when you learned it. Every hand-written
-  document declares its SHAPE in `docs/doc_shape.tsv` (REFERENCE / REGISTER
-  / LOG / HIST / INDEX / GENERATED); chronology lives in `<name>_history.md`
-  twins, never re-accreting into a reference document
-  (`tests/test_docshape.sh`).
-  The documents themselves — what each is for, which are GENERATED, and
-  the entry points — are the routing table and "The documents, by role" of
-  `docs/README.md`: read it first, it is the map. Three disciplines that
-  roster carries stay law here: every synthesis section of
-  `docs/game/engine_internals.md` names the `atlas/` rows it depends on and
-  the gates that lock it (a section that did not is how 14z-69 spent three
-  sessions measuring a mode it had never entered); the GENERATED indexes
-  (`docs/annotations.md`, `docs/project/gate_index.md`, `docs/GOTCHAS.md`)
-  are regenerated in the commit that changes what they index, never
-  hand-edited; and the skills (`.claude/skills/<name>/SKILL.md`, the
-  DISTILLED DISCIPLINE loaded before the work) are anchored `**[PFX-N]**` in
-  the doc paragraph each rule distils and locked by `tools/checkskills.py` —
-  a skill quotes a number only from a LOG, and editing an anchored paragraph
-  means keeping the marker with the fact or moving the rule. Gotchas are
-  appended the moment one is paid for, to the bucket its FACT belongs to.
-  Findings land in the right document *at discovery time*, not at milestone
-  end. An undocumented discovery is a discovery we will pay for twice.
-- **[VSP-13]** **RETRACTION DISCIPLINE (standing order, 14z-71): when a claim changes,
-  GREP FOR THE CLAIM — not for the files you remember writing it in.**
-  A finding does not live in one place. It propagates into section
-  HEADERS, summary lines, registry rows, gate comments, the GOTCHAS index
-  and `NEXT_SESSION`, and the copies outlive the correction. Fixing "where
-  I remember writing it" is how a document ends up asserting the opposite
-  of the subsection directly beneath it (measured twice in one session:
-  `engine_internals.md` carried "the 214+P explosion is NOT a tile-inventory
-  defect" as a HEADER above the subsection proving it was, and a corrected
-  effect-family finding survived in five other places). The procedure, in
-  order:
-  1. `grep -rn "<the old claim>" docs HANDOFF.md STATE.md STATE_HISTORY.md DECISIONS_HISTORY.md tests build/manifest`
-     — search the assertion's WORDING, and its paraphrases, across the repo.
-     The archives are in the list on purpose: archived entries are not
-     rewritten, but a claim that ONLY survives there must still be found so
-     its live carriers can be traced. (DECISIONS_HISTORY.md: resolved
-     decisions move there verbatim from STATE.md once they stop shaping
-     active work.)
-  2. Fix the **HEADER and the summary line** first. A skimmer reads those;
-     an appended "actually, it turned out…" subsection does not reach them.
-  3. Re-grep afterwards and show the empty result. The pass is not done
-     because it feels done.
-  4. Keep the superseded analysis, marked RESOLVED/RETRACTED with what
-     replaced it — the eliminations usually stay valid even when the
-     conclusion does not. **Status headers track reality; historical
-     entries are not rewritten.**
-  A claim that cannot be found cannot be corrected, and a stale claim in a
-  header is worse than no documentation: it is confidently wrong, and it
-  is what a future session will act on.
+- **[VSP-12]** **Documentation taxonomy (SMS-proven; respect the splits, don't merge).** `docs/` is divided by ONE
+  question — would this still be true if we abandoned the roster hack tomorrow? — into `docs/game/`,
+  `docs/platform/` and `docs/project/`; file by the FACT, not by the task you were doing when you learned it. Every
+  hand-written document declares its SHAPE in `docs/doc_shape.tsv`; chronology lives in `<name>_history.md` twins,
+  never re-accreting into a reference document. The GENERATED indexes (`docs/annotations.md`,
+  `docs/project/gate_index.md`, `docs/GOTCHAS.md`) are regenerated in the commit that changes what they index, never
+  hand-edited. Gotchas are appended the moment one is paid for, to the bucket its FACT belongs to. Findings land in
+  the right document *at discovery time*: an undocumented discovery is a discovery we will pay for twice. The full
+  rule and the roster: `docs/README.md` § [VSP-12].
+- **[VSP-13]** **RETRACTION DISCIPLINE (standing order, 14z-71): when a claim changes, GREP FOR THE CLAIM —
+  not for the files you remember writing it in.** Search the assertion's wording and its paraphrases across the
+  repo, the archives included; fix the HEADER and the summary line first; re-grep afterwards and show the empty
+  result; keep the superseded analysis, marked RESOLVED/RETRACTED with what replaced it. **Status headers track
+  reality; historical entries are not rewritten.** The procedure: `docs/project/working_methods.md` § [VSP-13].
 
-- **[VSP-14]** **BUG ARCHAEOLOGY FIRST (standing order, 14z-75): before fixing a bug,
-  check whether it has already been fixed once — and if you are unsure, ASK
-  THE MAINTAINER.** They were there and will usually remember.
-  1. `git log --oneline --grep="<symptom>"`, `git log -S "<manifest row>"`,
-     and `grep STATE_HISTORY.md` for the symptom's wording
-     BEFORE forming a theory. A defect the maintainer reports may be a
-     REGRESSION of something already solved, and the old fix (or its
-     withdrawal) is the fastest route to the mechanism.
-  2. Find the build where it was last known good and **diff it against its
-     predecessor.** The delta is the answer, and it is cheap.
-  3. **If the record is ambiguous about whether it was ever fixed, ask before
-     measuring.** One sentence from the maintainer beats an afternoon of
-     rigs, and a wrong assumption here is expensive in both directions:
-     re-fixing something already fixed, or declaring "never fixed" about
-     something that was.
-  Paid for in 14z-75: a "never fixed" conclusion published from rigs that
-  never fired the move, corrected by the maintainer who remembered the fix
-  working; the archaeology took two commands, the wrong conclusion took
-  hours and reintroduced the crash.
+- **[VSP-14]** **BUG ARCHAEOLOGY FIRST (standing order, 14z-75): before fixing a bug, check whether it has
+  already been fixed once — and if you are unsure, ASK THE MAINTAINER.** `git log --grep`, `git log -S` and a grep
+  of STATE_HISTORY.md BEFORE forming a theory; find the build where it was last known good and diff it against its
+  predecessor; **if the record is ambiguous about whether it was ever fixed, ask before measuring.** The steps:
+  `docs/project/working_methods.md` § [VSP-14].
 
 - **[VSP-15]** **Anti-hyperfocus checkpoint (standing order):** deep-dive focus is the
   project's engine but also its failure mode. At natural boundaries — a

@@ -39,7 +39,7 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
-## Session 14z-201 — **#282 filed and ordered; #269 measured and closed; #282 items E, A, B, F and C built.** A plain Opus 5.5 session on the #172 setup (transcript `979461fd`).
+## Session 14z-201 — **#282 filed and ordered; #269 measured and closed; #282 items E, A, B, F, C and D built; the root README's scale re-measured.** A plain Opus 5.5 session on the #172 setup (transcript `979461fd`).
 
 ### opened with
 the maintainer: *"read handoff.md, state.md and docs/next_session.md"*; `python3 tools/agent/sweep.py` CLEAN; `main`
@@ -95,7 +95,28 @@ ran `indexes` and `live-docs` green and stopped RED at `inputs`, naming the four
 step calling the driver again could not find a run directory outside the default, fixed by `CLOSE_RUN`.
 `a47e7fe4` (the TSV part).
 
-### (8) THE FINDINGS TABLE
+### (8) #282 ITEM D LANDED: CLAUDE.MD AS RULE PLUS POINTER
+Ruled *"Rule + pointer (Recommended)"* and *"Draft first (Recommended)"* (`DECISIONS_HISTORY.md` "Ruled 2026-10-15
+(14z-201) — #282 item D"). The draft, built by `build/agent201/t282/claude_draft.py` (local), was compared clause by
+clause by two `reader`s (10 of 13 drifted in the first, 3 wording changes in the second, all restored) and approved by
+the maintainer: *"the CLAUDE.md draft looks good."* CLAUDE.md 448 -> 244 lines, 30,203 -> 18,557 bytes; every
+`**[VSP-N]**` stays in it with its rule, the long paragraphs moving verbatim to `docs/project/oracle_classes.md`
+(VSP-24/25/26/31/32), the new `docs/project/working_methods.md` (VSP-20/13/14, the runner) and
+`docs/project/session_records.md` (VSP-17/182/162), and `docs/README.md` (VSP-12, the condensing history). Four ticket
+links re-pointed in `docs/project/tickets.tsv`. 17 doc gates pass on the tree.
+
+### (9) THE ROOT README: THE MAINTAINER'S EDITS MERGED, THE SCALE RE-MEASURED
+The maintainer edited `README.md` on GitHub (12 commits, merged, never rebased). The edit removed the
+`apply_release.py --out ./rompath` build step, which `tests/test_readme_recording.sh` read to check the "Report a
+problem" command's rompath; the maintainer: *"this had no business being there as it should be in the delverables
+README.md, which it is"*. The gate now reads that `--out` from the package README's source, `tools/package_release.py`
+(PASS on macos-arm64, both controls fired). At the maintainer's ask (*"I'd welcome update numbers for this
+paragraph"*), "The scale" was re-measured by `measurer`s on the 14z-183b definitions, calibrated at `22c56655`
+(all seven 2026-09-26 figures reproduced) and read at `edd1b323`: 461 test scripts, 225 emulator-free checks (133
+portable + 92 static), 394 controls executed at the 14z-200 close, 231 emulator/FPGA checks, 233 replays, 10
+recordings, 283 tickets. Only the paragraph's date and numbers changed; the maintainer's text is untouched.
+
+### (10) THE FINDINGS TABLE
 `docs/project/findings/14z-201.tsv` — every finding, its live home, the test that reproduces it (checklist step 1).
 
 ## Session 14z-200 — **The 14z-199 packet re-run; #274 built and closed; #269 built on the maintainer's "C first".** A plain Opus 5.5 session at effort High on the #172 setup (transcript `e4e310c7`).
