@@ -59,23 +59,19 @@ is. Each line points to where it is tracked or explained — follow the link for
   of an existing one — its *shell* — so everything that is not specific to the character runs on
   Vampire Savior's engine: Dark Force costs one bar and brings Vampire Savior's background change.
 - **Timing:** they run at Vampire Savior's game speeds. At factory settings NORMAL is the same speed as
-  in Vampire Savior 2 and TURBO is one step slower, and Vampire Savior 2 starts player 1's speed menu on
-  TURBO where Vampire Savior starts it on NORMAL. Compared at the same speed and with the same random
-  draws, Donovan's Lightning Sword matches Vampire Savior 2 hit for hit and frame for frame
-  ([#135](https://github.com/DefinitelyFrenchName/VampireSaved/issues/135)); the rest of their moves are
-  being compared in [#136](https://github.com/DefinitelyFrenchName/VampireSaved/issues/136).
-
+  in Vampire Savior 2 and TURBO is one step slower. Compared at the same speed and with the same random
+  draws, moves from Phobos, Donovan and Pyron match Vampire Savior 2 hit for hit and frame for frame. 
+- while the movelists have been thoroughly tested , there still is the possibility of gaps in reactions or interactions (e.g. some DF interactions, some reactions to 
+  
 ### Features and original behaviour you might take for bugs
 
 - **Oboro Bishamon** is selectable: put the cursor on Bishamon, hold Start and confirm. His long intro
-  is kept on purpose, so you get control after the round begins ([standing rulings](STATE.md#standing-rulings)).
+  is kept on purpose to not alter original assets, so you only get control after the round begins.
 - **Dark Gallon and Shadow**, the original game's hidden characters, still work — and Shadow, who
   copies the opponent, copies the three new characters too ([select screen notes](docs/game/atlas/select_screen.md)).
 - **Random select** can land on the three new characters ([port registry](docs/project/patch_index.md)).
-- **The one-frame white flash at the first knockdown** is the original game's, not this project's
-  ([#113](https://github.com/DefinitelyFrenchName/VampireSaved/issues/113)).
-- **Pyron's Cosmo satellites do not collide with other projectiles** — the same as in Vampire Savior 2
-  ([#108](https://github.com/DefinitelyFrenchName/VampireSaved/issues/108)).
+- **The one-frame white flash at the first knockdown** is the original game's (if anyone can tell me why this exists...)
+- **Pyron's Cosmo satellites do not collide with other projectiles** — the same as in Vampire Savior 2.
 
 ### Known limits and cosmetic issues
 
@@ -86,26 +82,15 @@ In versus:
 - On the select screen, **player 2's Donovan has an orange sword** — an accepted trade-off
   ([port registry](docs/project/patch_index.md)).
 - The **extended character wheel** works but its look is not polished ([#126](https://github.com/DefinitelyFrenchName/VampireSaved/issues/126)).
-- The three new characters **use their shell's win quotes** ([#123](https://github.com/DefinitelyFrenchName/VampireSaved/issues/123)).
+- The three new characters **use their shell's win quotes**.
 
 In arcade mode (1 player) — never this project's scope; it plays to the end without crashing, and
-that is all it promises:
-
-- The **stage names and pictures** on the arcade map are the shell characters' ([#125](https://github.com/DefinitelyFrenchName/VampireSaved/issues/125)).
-- The **opponent roulette** shows the shell instead of the new character ([#124](https://github.com/DefinitelyFrenchName/VampireSaved/issues/124)).
-- The **next-stage screen** shows Donovan as Victor, with a blank portrait ([#100](https://github.com/DefinitelyFrenchName/VampireSaved/issues/100)).
-- The three new characters' **CPU AI** feels weaker than the rest of the cast ([#129](https://github.com/DefinitelyFrenchName/VampireSaved/issues/129)).
-- Playing an original character, **you never face one of the three** — not built, by choice
-  ([standing rulings](STATE.md#standing-rulings)).
+that is all it promises.
 
 Not included, or not planned:
 
-- **Marionette** is a Vampire Savior 2 character and is not brought over ([#128](https://github.com/DefinitelyFrenchName/VampireSaved/issues/128)).
-- **Not planned:** real CPS-2 hardware (the board's limits would make that a hardware project),
-  balance changes, new moves, characters beyond the official 18, or a training mode.
-
-The full, current list of tracked bugs, cosmetic items and planned work is
-[`docs/project/tickets.md`](docs/project/tickets.md).
+- **Marionette** is not brought over.
+  
 
 ## Report a problem
 
@@ -126,6 +111,8 @@ Vampire Saved is actually an experiment. It started as a work-adjacent project a
 engineering**: can AI agents, run the way you would run evolutive maintenance on a large system nobody can read
 in full, deliver a result that is *demonstrably* correct?
 
+The focus is purely accuracy of the end product and reliability of the harness..
+
 **Who did what.** All of the code was written by AI — Anthropic's Claude, through Claude Code.
 All of the decisions, the design of the test harness, part of the memory analysis and a very large
 amount of hands-on testing were done by a human brain. Work was accepted only on evidence, never on the agent's word.
@@ -139,7 +126,7 @@ behaviour is a failed change, not a trade-off.
 
 - Scripted input replays are played on the original game and on the modified one, and the game's
   memory is compared every frame (in MAME). FBNeo cross-checks on samples, and the MiSTer core is
-  tested in simulation and on real hardware.
+  tested in simulation and on a real MiSTer.
 - The new characters have no "original" to compare against in Vampire Savior, so they are compared
   with themselves in Vampire Savior 2, and between the two emulators.
 - Every check carries a deliberate defect it must catch. A check that can no longer fail turns the run
@@ -154,16 +141,15 @@ behaviour is a failed change, not a trade-off.
 - Freeze and release test runs play out on a snapshot of a named commit, so nothing changed in the
   working copy while they run can reach them, and each run records exactly what it tested.
 
-**The scale, on 2026-09-26** (re-derive these rather than trusting this page): 1,731 commits over
-nine weeks, more than 180 working sessions, 392 test scripts, 184 checks that need no emulator (run at
+**The scale, on 2026-09-26** (re-derive these rather than trusting this page): 392 test scripts, 184 checks that need no emulator (run at
 every session's close, the slowest few only at a freeze or a release) with 254 planted-defect controls
 executed at the last close, 203 emulator and FPGA simulation checks, 194 scripted replays, 10
 hand-played recordings of reported problems, and 181 tracked tickets.
 
 **What all that green does not prove.** It does not prove that the new characters *feel* right —
 only players can judge that. The frame-by-frame guarantee covers the scripted replays, not every match
-anyone could play. And a few original sequences are allowed small, measured and frozen tolerances (e.g. sub 1-frame impact),
-because code added to reach the new characters costs the processor time. A move-by-move comparison of the three
+anyone could play. And a few original sequences are allowed small, measured and frozen tolerances because 
+code added to reach the new characters costs the processor time. A move-by-move comparison of the three 
 new characters with Vampire Savior 2 has been done ([#136](https://github.com/DefinitelyFrenchName/VampireSaved/issues/136)),
 and the differences it found are tracked as their own tickets.
 
