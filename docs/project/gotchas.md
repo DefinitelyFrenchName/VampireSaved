@@ -7153,3 +7153,14 @@ held ledger rows with no runs, and the snapshot confirm tier at `dfbf47bf` faile
 `20c622c9`). The tree being worked in still had the directories, so nothing there showed it. **The rule:** stage
 `git add -u` plus every new path by name, and check `git status --short | grep '^??'` for the commit's own new files.
 `build/` stays out.
+
+## A CONDENSED RULE DRIFTS — build the short form from the original's own sentences, then have a reader compare (paid: 14z-201)
+
+Condensing CLAUDE.md for #282 item D, the first draft wrote each rule's short statement in fresh words. A `reader`
+put the 13 statements beside their originals: 10 changed something — "must be" had become "is", "Every
+reproducible crash … a human can produce" had lost "Every" and its scope, "a byte differing inside a window but
+OUTSIDE it" had lost its qualifier, and an obligation ("a red, a SKIP or an unresolved item leaves the commits
+local") had vanished. A paraphrase reads as faithful to the one who wrote it. Rebuilt from the originals' own
+sentences, a second reader found 3 wording changes, all restored. **The rule:** a short form of a rule quotes the
+original's clauses and drops whole clauses only; then an independent reader compares them clause by clause before
+anyone is asked to approve it.
