@@ -3590,7 +3590,7 @@ the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guar
 
 **HOW:** a synthetic repo of stub gates with known verdicts run through the REAL runner via its registry files (never a copy of its logic); two shadow-tool controls unplug the controls reader and blind the cadence trigger match.
 
-**EXPECTS:** every case reads its designed verdict; the unplugged reader lets a dead control pass and fails section 11, the blind trigger leaves a triggered gate deferred and fails section 14, and a planner with its prediction off carries a changed input's reader and fails section 18; a planner blind to `# CONFIRM: always` or to a base's unexecuted controls, and a runner taking --confirm at a freeze, each fail section 20 (#269).
+**EXPECTS:** every case reads its designed verdict; the unplugged reader lets a dead control pass and fails section 11, the blind trigger leaves a triggered gate deferred and fails section 14, and a planner with its prediction off carries a changed input's reader and fails section 18; a planner blind to `# CONFIRM: always` or to a base's unexecuted controls, and a runner taking --confirm at a freeze, each fail section 20 (#269). Since #286 (14z-202, section 22): a dirty submodule whose fingerprint equals the base run's does not re-run its reader, a changed one does; a gate re-run for a mention (R5) carries its controls, a gate whose code reads the changed file directly (R1, R2, R6) executes them.
 
 ## mister
 

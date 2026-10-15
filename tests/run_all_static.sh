@@ -288,6 +288,8 @@ if [ -n "$RESULTS_OUT" ]; then
       echo "# utc $(date -u +%Y-%m-%dT%H:%M:%SZ)"
       echo "# args $_ORIG_ARGS"
       git status --porcelain 2>/dev/null | grep -v '^??' | awk '{print "# dirty " $NF}' || true
+      # each submodule's state, so the next --confirm drops a dirty submodule that did not change (#286 (b))
+      if [ -f tools/static_confirm.py ]; then python3 tools/static_confirm.py subfp --root . 2>/dev/null | sed 's/^/# subfp /' || true; fi
       printf '# gate\tverdict\tseconds\tdeclared\tfired\thonoured\n'
     } > "$RESULTS_OUT"
 fi
@@ -339,6 +341,11 @@ run_tier() {  # run_tier <label> <names>
                 record_row "$g" PASS 0 "$1" "$2" "$3"
                 continue
             fi
+        fi
+        # #286 (c): a re-run gate whose reach did not change carries its base run's controls (`carry-controls`)
+        _cc=""
+        if [ -n "$CONFIRM" ]; then
+            _cc="$(awk -F'\t' -v g="$g" '$1 == "RERUN" && $2 == g && $4 == "carry-controls" {print $5 " " $6 " " $7}' "$WORK/plan.tsv")"
         fi
         if [ ! -x "tests/$g.sh" ]; then
             printf '  %-34s %s\n' "$g" "MISSING (registered but not executable)"
@@ -399,7 +406,13 @@ run_tier() {  # run_tier <label> <names>
             n_pass=$((n_pass + 1))
             # an `if`, not `[ ] &&`: this is the loop's last command and the
             # runner is set -e — a false test here would end the tier
-            if [ "${VS_CTL_DECLARED:-0}" != 0 ]; then exec_controls "$g" "$_label"; fi ;;
+            if [ "${VS_CTL_DECLARED:-0}" != 0 ]; then
+                # CONTROLS-CARRY (#286 (c)): the same declared count as the base row, and nothing in the reach changed
+                if [ -n "$_cc" ] && [ "${_cc%% *}" = "$VS_CTL_DECLARED" ]; then
+                    _cch="${_cc##* }"; x_ok=$((x_ok + _cch))
+                    printf '        | controls carried: %s honoured in the confirmed run; no path in the gate'"'"'s reach changed (#286)\n' "$_cch"
+                else exec_controls "$g" "$_label"; _cc=""; fi
+            else _cc=""; fi ;;
         esac
         # the results row (14z-188, #188): the verdict as the tally counts it — a control that is not HONOURED makes it FAIL
         _hon=$(awk -F'\t' -v g="$g" '$1 == g && $3 == "HONOURED"' "$WORK/controls.tsv" | wc -l | tr -d ' ')
@@ -407,6 +420,7 @@ run_tier() {  # run_tier <label> <names>
         _rv="$_gv"
         case "$_rv" in PASS|SKIP|TIMEOUT) ;; *) _rv=FAIL ;; esac
         if [ "$_bad" != 0 ]; then _rv=FAIL; fi
+        if [ -n "$_cc" ] && [ "$_rv" = PASS ]; then _hon="${_cc##* }"; fi   # the carried controls' count (#286 (c))
         record_row "$g" "$_rv" "$_dur" "$_gdecl" "$_gfired" "$_hon"
     done
 }

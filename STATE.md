@@ -39,6 +39,14 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
+## Session 14z-202 — **The close's cost must follow the change: #286, #287, #288 filed and made the direct priority.** Opened 2026-10-15 on Opus 5.5 (the ruled orchestrator); transcript `b5306e71`.
+
+### opened with
+The maintainer: *"read handoff.md, state.md and docs/next_session.md"*. The opener's sweep read CLEAN. START HERE 0c (a cheaper final tier) was put to the maintainer, who asked why the final tier went from about 20 to over 90 minutes.
+
+### (1) WHERE THE CLOSE TIER'S TIME GOES — measured, three tickets filed
+The 14z-201 close's two passes re-ran 176 and 135 of 206 gates. The second pass followed a commit of record files only, and most of its re-runs came from rule R5 of `tools/static_confirm.py` (a data file naming a record file), `tests/rulecheck/runs/` under `tests/`, and the always-dirty `emu/fbneo`. Every re-run gate executed every control. The figures are on #286, from a `measurer` spec. Filed: #286 (the tier: false matches, the submodule, controls only on a real change), #287 (the procedure check right after each piece of work), #288 (measure the close's audit layer, then cut it down). Ruling: `DECISIONS_HISTORY.md` "Ruled 2026-10-15 (14z-202) — the close's cost must follow the change"; START HERE 0c is superseded by #286.
+
 ## Session 14z-201b — **#285: the Windows launcher gate's cmd-driven half moves to release cadence or on demand.** A continuation of 14z-201 after its close, on the same transcript (`979461fd`).
 
 ### opened with
@@ -82,6 +90,7 @@ Where it stopped:
 
 One line per ruling that still constrains work: the rule and where its full entry lives. A line is deleted when its ruling stops constraining work (CLAUDE.md [VSP-17]). Shortened to the rule plus its pointer 2026-10-14 (#282 item A); the longer lines are in git history at `44a09f7f`.
 
+- **The close's cost must follow the change; #286, #287, #288 are the direct priority (2026-10-15, 14z-202):** controls only on a real change, the procedure check right after each piece of work, the audit layer measured before it is cut — `DECISIONS_HISTORY.md` "Ruled 2026-10-15 (14z-202) — the close's cost must follow the change".
 - **Cross-platform checks run on demand or at release (#285, 2026-10-15, 14z-201b):** `test_release_launcher_bat`'s Windows half is a NOTE off Windows below release cadence, so a session close needs no ERIS — `DECISIONS_HISTORY.md` "Ruled 2026-10-15 (14z-201b) — #285".
 - **The recording procedure lives in the release package README (#284, 2026-10-15, 14z-201):** the root README's "Report a problem" was trimmed by the maintainer (2026-10-15); #284's work moves `test_readme_recording` to the generated MAME package README — `DECISIONS_HISTORY.md` "Ruled 2026-10-15 (14z-201) — the recording procedure moves to the release package README".
 - **The live documents' budget (#282, 2026-10-14/15, 14z-201):** CLAUDE.md, STATE.md, HANDOFF.md and docs/NEXT_SESSION.md at most 500 lines and 50,000 bytes each, the aim 200 lines; the archives are indexed, not budgeted — `DECISIONS_HISTORY.md` "Ruled 2026-10-14 (14z-201) — #282's scope" and "Ruled 2026-10-15 (14z-201) — #282 item F"; gate `tests/test_live_budget.sh`.

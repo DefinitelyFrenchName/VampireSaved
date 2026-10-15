@@ -19,6 +19,9 @@
 #   section 14, and a planner with its prediction off carries a changed input's reader and
 #   fails section 18; a planner blind to `# CONFIRM: always` or to a base's unexecuted
 #   controls, and a runner taking --confirm at a freeze, each fail section 20 (#269).
+#   Since #286 (14z-202, section 22): a dirty submodule whose fingerprint equals the base run's does not re-run
+#   its reader, a changed one does; a gate re-run for a mention (R5) carries its controls, a gate whose code
+#   reads the changed file directly (R1, R2, R6) executes them.
 #
 # MUST-FIRE: shadow-tool: reader-unplugged — a copy of run_all_static.sh that hands the classifier no gate script must let a stub with a declared-but-unfired control read PASS (mode: that copy is the runner every section drives, and section 11 must fail)
 # MUST-FIRE: shadow-tool: trigger-blind — a copy of run_all_static.sh with its cadence TRIGGER match disabled must leave a freeze-cadence gate deferred although a path it depends on changed; section 14's triggered case must FAIL under it
@@ -29,6 +32,9 @@
 # MUST-FIRE: shadow-tool: core-carried — a copy of tools/static_confirm.py whose plan ignores `# CONFIRM: always` (its CORE-ALWAYS line disabled) must CARRY the unchanged core stub g_e, and section 20 must FAIL (mode: that copy in the confirm repo; section 21 fires it in-run; #269, 14z-200)
 # MUST-FIRE: shadow-tool: controls-carried — a copy of tools/static_confirm.py whose plan ignores a base row's unexecuted controls (its CONTROLS-UNEXECUTED line disabled) must CARRY g_d from a run made with --exec-controls none, and section 20 must FAIL (mode: that copy in the confirm repo; section 21 fires it in-run; #269, 14z-200)
 # MUST-FIRE: shadow-tool: confirm-at-freeze — a copy of run_all_static.sh whose CONFIRM-SESSION-ONLY refusal is disabled must accept --confirm at --cadence freeze, and section 20 must FAIL (mode: that copy drives section 20; section 21 fires it in-run; #269, 14z-200)
+# MUST-FIRE: shadow-tool: subfp-off — a copy of tools/static_confirm.py whose SUBMODULE-UNCHANGED drop is disabled must re-run the reader of an unchanged dirty submodule, and section 22 must FAIL (mode: that copy in the #286 repo; section 23 fires it in-run; #286, 14z-202)
+# MUST-FIRE: shadow-tool: controls-always — a copy of tools/static_confirm.py whose plan never carries controls must execute g_f's control when only a file its data MENTIONS changed, and section 22 must FAIL (mode: that copy in the #286 repo; section 23 fires it in-run; #286, 14z-202)
+# MUST-FIRE: shadow-tool: controls-never — a copy of tools/static_confirm.py whose CONTROLS-ON-REACH test is disabled must carry g_f's control when a data file its code reads directly changed, and section 22 must FAIL (mode: that copy in the #286 repo; section 23 fires it in-run; #286, 14z-202)
 # MUST-FIRE: shadow-tool: prediction-off — a copy of tools/static_confirm.py whose plan marks nothing STALE must CARRY the stub whose input changed, and section 18 must FAIL (mode: that copy in the confirm repo)
 #
 # WHY A GATE FOR THE RUNNER. CLAUDE.md §4: "Verdict logic is itself tested. A
@@ -668,7 +674,7 @@ cp "$REPO/tools/static_confirm.py" "$REPO/tools/battery_reach.py" "$FC/tools/"
 cp "$FC/tools/static_confirm.py" "$T/static_confirm_off.py"
 python3 - "$T/static_confirm_off.py" <<'PYX'
 import sys; p = sys.argv[1]; s = open(p).read()
-a = "    _, stale, _ = predict(root, sorted(changed)) if changed else (gates, {}, gates)"
+a = "    _, stale, _ = predict(root, sorted(changed), r1) if changed else (gates, {}, gates)"
 assert s.count(a) == 1, "the plan's predict line moved"
 open(p, "w").write(s.replace(a, "    stale = {}  # CONTROL prediction-off"))
 PYX
@@ -769,6 +775,80 @@ if ! vs_ctl_is core-carried && ! vs_ctl_is controls-carried && ! vs_ctl_is confi
     s20 "$REPO/tools/static_confirm.py" shadow/run_all_static.sh > /dev/null
     [ "$S20c" = bad ] && vs_ctl_fired confirm-at-freeze "a runner without the refusal accepts --confirm at a freeze — section 20 catches it" \
         || { vs_ctl_dead confirm-at-freeze "the shadow runner still refused --confirm at a freeze"; rc=1; }
+fi
+
+echo "== 22. #286 (14z-202): an unchanged dirty submodule is not a change; a mention re-runs a gate without its controls =="
+FS="$T/repo286"; mkdir -p "$FS/tests/lib" "$FS/tools" "$FS/data"
+ln -s "$RUNNER" "$FS/tests/run_all_static.sh"
+for _l in classify controls measures; do ln -s "$REPO/tests/lib/$_l.sh" "$FS/tests/lib/$_l.sh"; done
+SUBOFF="$T/static_confirm_suboff.py"; CTLALW="$T/static_confirm_ctlalways.py"; CTLNEV="$T/static_confirm_ctlnever.py"
+python3 - "$REPO/tools/static_confirm.py" "$SUBOFF" "$CTLALW" "$CTLNEV" <<'PYX'
+import sys
+src, suboff, ctlalw, ctlnev = sys.argv[1:]
+s = open(src).read()
+for a, b, out in (
+        ("    for p in [p for p in fps if p in changed]:   # SUBMODULE-UNCHANGED (#286 (b))",
+         "    for p in []:   # CONTROL subfp-off", suboff),
+        ("        if r1.get(r[0]) or len(r) < 6:   # CONTROLS-ON-REACH", "        if True:   # CONTROL controls-always", ctlalw),
+        ("        if r1.get(r[0]) or len(r) < 6:   # CONTROLS-ON-REACH", "        if len(r) < 6:   # CONTROL controls-never", ctlnev)):
+    assert s.count(a) == 1, out + ": its line moved"
+    open(out, "w").write(s.replace(a, b, 1))
+PYX
+mkdir -p "$T/subsrc"; echo one > "$T/subsrc/x.txt"
+(cd "$T/subsrc" && git init -q && git add -A && git -c user.name=t -c user.email=t@t commit -qm sub)
+printf '#!/bin/sh\ncat sub/x.txt > /dev/null\necho "PASS: s"\n' > "$FS/tests/g_s.sh"
+{ echo "#!/bin/sh"; echo "# g_f.sh — a stub with a declared control, reading a data file that MENTIONS data/notes.md"
+  echo "# MUST-FIRE: perturbed-copy: flip — a flipped byte must fail"
+  echo 'if [ "${CONTROL:-}" = flip ]; then echo "FAIL: the flipped input was caught"; exit 1; fi'
+  echo "cat data/list.tsv > /dev/null"; echo "echo 'PASS: f'"; echo "echo 'CONTROL FIRED: flip — caught'"; echo "exit 0"; } > "$FS/tests/g_f.sh"
+chmod +x "$FS/tests/"g_*.sh
+printf 'g_s\ng_f\n' > "$FS/tests/ci_portable.txt"; : > "$FS/tests/ci_static.txt"
+printf 'name\tnote\nf\tsee data/notes.md\n' > "$FS/data/list.tsv"; echo first > "$FS/data/notes.md"
+(cd "$FS" && git init -q && git -c protocol.file.allow=always submodule add -q "$T/subsrc" sub > /dev/null 2>&1 \
+    && git add -A && git -c user.name=t -c user.email=t@t commit -qm base)
+echo dirty > "$FS/sub/x.txt"   # the submodule is dirty in every run, as emu/fbneo is
+s22() {   # s22 <static_confirm.py> -> sets S22a S22b S22c S22d (ok|bad)
+    cp "$1" "$FS/tools/static_confirm.py"; cp "$REPO/tools/battery_reach.py" "$FS/tools/"
+    (cd "$FS" && STATIC_RESULTS_OUT="$T/s1.tsv" sh tests/run_all_static.sh --tier portable > /dev/null 2>&1) || true
+    sleep 1
+    _r="$(cd "$FS" && STATIC_RESULTS_OUT="$T/s2.tsv" sh tests/run_all_static.sh --tier portable --confirm "$T/s1.tsv" 2>&1)" || true
+    if grep -q '^# subfp sub ' "$T/s1.tsv" && printf '%s' "$_r" | grep -qE "^  g_s +PASS  carried"; then S22a=ok
+    else S22a=bad; echo "    the unchanged dirty submodule re-ran g_s: $(grep -c '^# subfp' "$T/s1.tsv") subfp line(s); $(printf '%s' "$_r" | grep -E '^  g_s|^  re-run g_s' | tr '\n' '|')"; fi
+    echo dirtier > "$FS/sub/x.txt"; sleep 1
+    _r="$(cd "$FS" && STATIC_RESULTS_OUT="$T/s3.tsv" sh tests/run_all_static.sh --tier portable --confirm "$T/s2.tsv" 2>&1)" || true
+    if printf '%s' "$_r" | grep -qE "^  g_s +PASS +[0-9]+s"; then S22b=ok
+    else S22b=bad; echo "    the changed submodule did not re-run g_s: $(printf '%s' "$_r" | grep -E '^  g_s' | tr '\n' '|')"; fi
+    echo second > "$FS/data/notes.md"; sleep 1
+    _r="$(cd "$FS" && STATIC_RESULTS_OUT="$T/s4.tsv" sh tests/run_all_static.sh --tier portable --confirm "$T/s3.tsv" 2>&1)" || true
+    if printf '%s' "$_r" | grep -qE "^  re-run g_f +STALE: R5" && printf '%s' "$_r" | grep -qE "^  g_f +PASS +[0-9]+s" \
+            && printf '%s' "$_r" | grep -q "controls carried: 1 honoured" && grep -q "^g_f	PASS	[0-9]*	1	1	1$" "$T/s4.tsv"; then S22c=ok
+    else S22c=bad; echo "    a mention (R5) did not re-run g_f with its control carried: $(printf '%s' "$_r" | grep -E 'g_f|controls carried' | tr '\n' '|') / $(grep '^g_f' "$T/s4.tsv")"; fi
+    printf 'name\tnote\nf\tsee data/notes.md again\n' > "$FS/data/list.tsv"; sleep 1
+    _r="$(cd "$FS" && STATIC_RESULTS_OUT="$T/s5.tsv" sh tests/run_all_static.sh --tier portable --confirm "$T/s4.tsv" 2>&1)" || true
+    if printf '%s' "$_r" | grep -qE "^  re-run g_f +STALE: R2" && ! printf '%s' "$_r" | grep -q "controls carried" \
+            && grep -q "^g_f	PASS	[0-9]*	1	1	1$" "$T/s5.tsv"; then S22d=ok
+    else S22d=bad; echo "    a change in g_f's reach did not execute its control: $(printf '%s' "$_r" | grep -E 'g_f|controls carried' | tr '\n' '|')"; fi
+    (cd "$FS" && git checkout -q -- data && echo dirty > sub/x.txt)
+}
+SC22="$REPO/tools/static_confirm.py"
+vs_ctl_is subfp-off && SC22="$SUBOFF"; vs_ctl_is controls-always && SC22="$CTLALW"; vs_ctl_is controls-never && SC22="$CTLNEV"
+s22 "$SC22"
+[ "$S22a" = ok ] && echo "  ok: the dirty submodule, unchanged since the base run (its # subfp equal), leaves g_s carried" || fail "section 22: an unchanged dirty submodule re-ran its reader"
+[ "$S22b" = ok ] && echo "  ok: the submodule changed again: g_s re-runs" || fail "section 22: a changed submodule was carried"
+[ "$S22c" = ok ] && echo "  ok: data/notes.md, only MENTIONED by g_f's data file, re-runs g_f (R5) with its control carried (honoured 1 recorded)" || fail "section 22: a mention executed the control"
+[ "$S22d" = ok ] && echo "  ok: data/list.tsv, which g_f's code reads directly, re-runs g_f (R2, a direct read) and executes its control" || fail "section 22: a direct read carried the control"
+
+echo "== 23. MUST-FIRE: section 22's properties, each broken by its shadow =="
+if ! vs_ctl_is subfp-off && ! vs_ctl_is controls-always && ! vs_ctl_is controls-never; then
+    s22 "$SUBOFF" > /dev/null
+    [ "$S22a" = bad ] && vs_ctl_fired subfp-off "a plan that keeps every dirty submodule re-runs g_s although sub/ did not change — section 22 catches it" \
+        || { vs_ctl_dead subfp-off "the subfp-off plan still carried g_s"; rc=1; }
+    s22 "$CTLALW" > /dev/null
+    [ "$S22c" = bad ] && vs_ctl_fired controls-always "a plan that never carries controls executes g_f's control for a mention — section 22 catches it" \
+        || { vs_ctl_dead controls-always "the controls-always plan still carried g_f's control"; rc=1; }
+    s22 "$CTLNEV" > /dev/null
+    [ "$S22d" = bad ] && vs_ctl_fired controls-never "a plan blind to direct reads carries g_f's control when the data its code reads changed — section 22 catches it" \
+        || { vs_ctl_dead controls-never "the controls-never plan still executed g_f's control"; rc=1; }
 fi
 
 [ "$rc" = 0 ] && echo "PASS: the runner's verdicts mean what they say." \

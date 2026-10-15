@@ -2,8 +2,11 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 285
+# issues: 288
 number	state	reason	closed	labels	title
+288	OPEN	-	-	evolution,severity: high	Measure what each step of the close's audit layer has caught and cost, then cut it down (possibly entirely)
+287	OPEN	-	-	evolution,severity: high	The procedure check runs at the close; run it right after each piece of work, scoped to that work
+286	OPEN	-	-	evolution,performance,severity: high	The close tier's cost follows the session, not the change: false re-runs, the dirty fbneo submodule, controls on every re-run gate
 285	CLOSED	COMPLETED	2026-10-15	evolution	test_release_launcher_bat: its Windows half at release cadence or on demand, never a session-close SKIP
 284	OPEN	-	-	bug,severity: medium	[regression] m23-merged README.md file is currently a mess
 283	OPEN	-	-	bug	trace_static_reads.py drops every open strace splits into <unfinished>/<resumed> lines, so the predictor's miss scores never saw them

@@ -88,6 +88,25 @@ Usage:
       test_close_tools, test_rule_checker: their inputs move outside the tracked tree), and a gate whose recorded
       controls were not all executed and honoured in FILE (`honoured` below `declared`: a base run made with
       --exec-controls none or portable), so a carried gate's controls were executed in the run it is carried from.
+  THE DIRTY SUBMODULE (#286 (b), 14z-202, maintainer-ruled 2026-10-15): `emu/fbneo` carries our applied patches, so it
+      is dirty at every run and `git diff --name-only` names it at every confirm (21 gates re-ran for it in each of the
+      14z-201 close's passes). The runner records `# subfp <path> <fingerprint>` for every initialised submodule (the
+      `subfp` command below); a changed submodule path whose fingerprint equals the base run's is dropped from the
+      changed set. A base run without the line keeps the path changed.
+      The fingerprint: the submodule's HEAD, its `git diff --binary HEAD` (staged and unstaged) and every untracked,
+      unignored file's name and content.
+  CONTROLS ONLY ON A REAL CHANGE (#286 (c), 14z-202, maintainer-ruled 2026-10-15: *"with controls only when a gate or
+      its real inputs changed"*): a RERUN row carries a 4th field. `controls` when the gate's controls must execute:
+      the gate is absent from the base, not PASS there, its base controls were not all executed, or the gate's CODE
+      names a changed path directly (`direct_read`: R1 a program in its reach, R2 a code line naming the file, R6 a
+      templated path matching it). Otherwise — STALE only by an indirect rule (R3 a directory it lists, R4 the whole
+      tree, R5 a data file that mentions the path, R7 git's own files), or the core with nothing it names changed —
+      `carry-controls<TAB>declared<TAB>fired<TAB>honoured` from the base row: the gate re-runs and its controls are
+      carried, as a carried gate's are. Measured 14z-202 (section 22 of tests/test_static_runner.sh): a data file a
+      gate reads with `cat` is R2, not R1 — the reach holds programs only. A freeze and a release execute every
+      control (--confirm is refused there).
+  python3 tools/static_confirm.py subfp --root DIR
+      one line `<path> <fingerprint>` per initialised submodule of DIR (#286 (b)).
   python3 tools/static_confirm.py --selftest
       a synthetic repo of five gates, one per reader class, with known answers.
 """
@@ -343,6 +362,22 @@ def stale_reason(root, rch, blob, c, pats):
     return None
 
 
+def direct_read(root, rch, blob, c, pats):
+    """#286 (c): does the gate's CODE name c directly — R1 (a program in the reach), R2 (a code line names its
+    basename, N-B applied) or R6 (a templated path matches it)? The indirect rules (R3 a directory, R4 the whole tree,
+    R5 a data file's mention, R7 git's own files) are not a direct read."""
+    if c in rch:
+        return True
+    bpat, _ = pats
+    base = os.path.basename(c)
+    if bpat and base in NARROW_R2:
+        if narrow_search(base, blob):
+            return True
+    elif bpat and bpat.search(blob):
+        return True
+    return any(rx.search(c if is_path else base) for rx, _, is_path in templates(root, blob))
+
+
 def changed_set(root, base, head, extra):
     out = set(extra)
     if base:
@@ -369,7 +404,9 @@ def _cached_refs(orig):
 br.refs = _cached_refs(br.refs)   # one reference scan per file, shared by every gate's closure
 
 
-def predict(root, changed):
+def predict(root, changed, r1=None):
+    """the STALE map; when `r1` is a dict, r1[gate] is set, for a STALE gate, to whether its code names a changed path
+    DIRECTLY (direct_read: R1, R2 or R6; #286 (c))"""
     files = br.index(root, [])
     gates = registry(root)
     pats = {c: patterns(c) for c in changed}
@@ -390,6 +427,8 @@ def predict(root, changed):
             why = f"R4 {where} reads the whole tree"
         if why:
             stale[g] = why
+            if r1 is not None:
+                r1[g] = any(direct_read(root, rch, blob, c, pats[c]) for c in eff)
         else:
             carried.append(g)
     return gates, stale, carried
@@ -552,6 +591,42 @@ def selftest():
     return 0 if ok else 1
 
 
+def submodules(root):
+    """the initialised submodules' paths, from .gitmodules (#286 (b))"""
+    r = subprocess.run(["git", "config", "-f", ".gitmodules", "--get-regexp", r"submodule\..*\.path"], cwd=root,
+                       capture_output=True, text=True)
+    out = []
+    for line in r.stdout.splitlines():
+        p = line.split(None, 1)[1] if " " in line else ""
+        if p and os.path.exists(os.path.join(root, p, ".git")):
+            out.append(p)
+    return out
+
+
+def subfp(root, p):
+    """#286 (b): a submodule's state — HEAD, `git diff --binary HEAD`, and each untracked unignored file's name and
+    content. Equal fingerprints mean the submodule's checkout did not change between two runs."""
+    import hashlib
+    d = os.path.join(root, p)
+    h = hashlib.sha1()
+    for args in (["rev-parse", "HEAD"], ["diff", "--binary", "HEAD"]):
+        r = subprocess.run(["git", "-C", d] + args, capture_output=True)
+        if r.returncode != 0:
+            return None
+        h.update(r.stdout + b"\0")
+    r = subprocess.run(["git", "-C", d, "ls-files", "-z", "--others", "--exclude-standard"], capture_output=True)
+    if r.returncode != 0:
+        return None
+    for f in sorted(x for x in r.stdout.split(b"\0") if x):
+        h.update(f + b"\0")
+        try:
+            with open(os.path.join(d, f.decode("utf-8", "surrogateescape")), "rb") as fh:
+                h.update(hashlib.sha1(fh.read()).digest())
+        except OSError:
+            h.update(b"?")
+    return h.hexdigest()
+
+
 def core(root, g):
     """#269: a gate whose script carries `# CONFIRM: always` re-runs at every confirm (its inputs move off-tree)."""
     try:
@@ -563,7 +638,7 @@ def core(root, g):
 
 def plan(root, results):
     import time, calendar
-    head, utc, dirty, rows = None, None, [], {}
+    head, utc, dirty, rows, fps = None, None, [], {}, {}
     for line in open(results, encoding="utf-8"):
         line = line.rstrip("\n")
         if line.startswith("# head "):
@@ -572,6 +647,10 @@ def plan(root, results):
             utc = line.split()[2]
         elif line.startswith("# dirty "):
             dirty.append(line[len("# dirty "):])
+        elif line.startswith("# subfp "):
+            _p = line[len("# subfp "):].rsplit(" ", 1)
+            if len(_p) == 2:
+                fps[_p[0]] = _p[1]
         elif line and not line.startswith("#"):
             c = line.split("\t")
             rows[c[0]] = c
@@ -590,20 +669,30 @@ def plan(root, results):
                 changed.add(f)
         except OSError:
             changed.add(f)
-    _, stale, _ = predict(root, sorted(changed)) if changed else (gates, {}, gates)
+    for p in [p for p in fps if p in changed]:   # SUBMODULE-UNCHANGED (#286 (b))
+        if subfp(root, p) == fps[p]:
+            changed.discard(p)
+    r1 = {}
+    _, stale, _ = predict(root, sorted(changed), r1) if changed else (gates, {}, gates)
+
+    def ctl(r):   # #286 (c): carry the base row's controls unless a path in the reach changed
+        if r1.get(r[0]) or len(r) < 6:   # CONTROLS-ON-REACH
+            return ("controls",)
+        return ("carry-controls", r[3], r[4], r[5])
     out = []
     for g in gates:
         r = rows.get(g)
         if r is None:
-            out.append(("RERUN", g, "absent from the previous run"))
+            out.append(("RERUN", g, "absent from the previous run", "controls"))
         elif r[1] != "PASS":
-            out.append(("RERUN", g, f"{r[1]} in the previous run"))
-        elif core(root, g):   # CORE-ALWAYS
-            out.append(("RERUN", g, "the core: its script carries `# CONFIRM: always` (#269)"))
+            out.append(("RERUN", g, f"{r[1]} in the previous run", "controls"))
         elif len(r) > 5 and r[3].isdigit() and r[5].isdigit() and int(r[5]) < int(r[3]):   # CONTROLS-UNEXECUTED
-            out.append(("RERUN", g, f"{r[5]} of its {r[3]} declared controls executed and honoured in the previous run"))
+            out.append(("RERUN", g, f"{r[5]} of its {r[3]} declared controls executed and honoured in the previous run",
+                        "controls"))
+        elif core(root, g):   # CORE-ALWAYS
+            out.append(("RERUN", g, "the core: its script carries `# CONFIRM: always` (#269)") + ctl(r))
         elif g in stale:
-            out.append(("RERUN", g, "STALE: " + stale[g]))
+            out.append(("RERUN", g, "STALE: " + stale[g]) + ctl(r))
         else:
             out.append(("CARRY", g, r[3] if len(r) > 3 else "0", r[4] if len(r) > 4 else "0", r[5] if len(r) > 5 else "0"))
     return out
@@ -619,6 +708,13 @@ def main():
     if a[:1] == ["plan"] and opt("--root") and opt("--results"):
         for row in plan(os.path.abspath(opt("--root")), opt("--results")):
             print("\t".join(row))
+        return 0
+    if a[:1] == ["subfp"] and opt("--root"):
+        root = os.path.abspath(opt("--root"))
+        for p in submodules(root):
+            fp = subfp(root, p)
+            if fp:
+                print(f"{p} {fp}")
         return 0
     if a[:1] == ["predict"] and opt("--root"):
         root = os.path.abspath(opt("--root"))

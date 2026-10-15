@@ -11,12 +11,15 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**285 tickets** — status: open 25 · parked 9 · done 223 · declined 10 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 199 · cosmetic 16 · evolution 70 · **backfill debt: 0 rows**.
+**288 tickets** — status: open 28 · parked 9 · done 223 · declined 10 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 199 · cosmetic 16 · evolution 73 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#288](https://github.com/DefinitelyFrenchName/VampireSaved/issues/288) | evolution | open | Measure what each step of the close's audit layer has caught and cost, then cut it down (possibly entirely) | `docs/project/session_close.md` | `DECISIONS_HISTORY.md § Ruled 2026-10-15 (14z-202) — the close's cost must follow the change` | none | none | 14z-202 |
+| [#287](https://github.com/DefinitelyFrenchName/VampireSaved/issues/287) | evolution | open | The procedure check runs at the close; run it right after each piece of work, scoped to that work | `tools/agent/extract.py` · `docs/project/session_close.md` | `DECISIONS_HISTORY.md § Ruled 2026-10-15 (14z-202) — the close's cost must follow the change` | none | none | 14z-202 |
+| [#286](https://github.com/DefinitelyFrenchName/VampireSaved/issues/286) | evolution | open | The close tier's cost follows the session, not the change: false re-runs, the dirty fbneo submodule, controls on every re-run gate | `tools/static_confirm.py` · `tests/test_static_runner.sh` | `DECISIONS_HISTORY.md § Ruled 2026-10-15 (14z-202) — the close's cost must follow the change` | none | none | 14z-202 |
 | [#284](https://github.com/DefinitelyFrenchName/VampireSaved/issues/284) | bug | open | [regression] m23-merged README.md file is currently a mess | `release/merged-m23/mame/README.md` · `tools/package_release.py` | `DECISIONS_HISTORY.md § Ruled 2026-10-15 (14z-201) — the recording procedure moves to the release package README, under #284; the maintainer trims the root README` | none | none | 14z-201 |
 | [#283](https://github.com/DefinitelyFrenchName/VampireSaved/issues/283) | bug | open | trace_static_reads.py drops every open strace splits into ‹unfinished›/‹resumed› lines, so the predictor's miss scores never saw them | `tools/trace_static_reads.py` · `tests/test_trace_static_reads.sh` | none | none | none | - |
 | [#281](https://github.com/DefinitelyFrenchName/VampireSaved/issues/281) | bug | open | Release-only: test_applier_page_browser's control run does not finish under strace | `tests/test_applier_page_browser.sh` · `tools/trace_static_reads.py` | `DECISIONS_HISTORY.md § Ruled 2026-10-14 (14z-200) — #274 closes done; four release-only tickets filed; the close is run` | none | none | 14z-200 |
