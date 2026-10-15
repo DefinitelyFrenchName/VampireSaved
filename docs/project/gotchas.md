@@ -7194,3 +7194,11 @@ every declared control FIRED: `first-found`, which only the Windows run fired, r
 red. A SKIP had been hiding a control that could not fire on the host. The fix gave the control a real static leg
 (the candidate loop must send every candidate through `:consider`), so it fires on every host. **The rule:** before a
 host-bound section stops skipping, check that every control it fires has a leg on the other hosts.
+
+## A COMMIT CHAINED BEHIND `grep` OF A CHECK'S OUTPUT RUNS ON A RED (paid: 14z-201b)
+
+`python3 tools/close.py run checks | grep -E 'DONE|RED' && git commit ...` committed `4eb066b0` while the checks were
+RED: the pipeline's status is grep's, and grep matched the word RED. The commit's content was sound (the reds were an
+unclassed scratch script and an unrecorded status question), but the close's order — checks green, then commit — was
+broken. **The rule:** gate a commit on the verdict itself (`close.py run checks` exits non-zero on a red; test it
+directly, or grep for `^DONE`), never on a grep that matches both outcomes.

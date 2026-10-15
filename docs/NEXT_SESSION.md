@@ -29,6 +29,8 @@ close needs no ERIS since #285:** `test_release_launcher_bat`'s Windows half is 
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
+0b. **14z-201b's commits are LOCAL, not pushed** (the maintainer: *"honestly, stop here leave the commits local and the next session will push"*). Its close stopped before its tier went green (STATE 14z-201b (3) CLOSE): this session's own close runs the tier over them and pushes them with its own work.
+0c. **Put to the maintainer (proposed at 14z-201b, not yet answered):** a cheaper final tier — when the only commits since a green close tier are the close's own record files (STATE, NEXT_SESSION, the rule-checker records), run only the gates that read them, without their controls. The 14z-201 close's final tier re-ran those with every control (costliest `test_static_runner` 202 s, `test_state_open_lists` 166 s, `test_tickets` 152 s). It loosens a standing rule, so it is the maintainer's; file it as a ticket if asked.
 1. **#273 — THE REPLICATION THE MAINTAINER CHOSE** (`DECISIONS_HISTORY.md` "Ruled 2026-10-13 (14z-199) — #273: replicate before deciding; …").
    - Pre-registered in `build/agent199/t273/plan_replication.md`: two more readers per arm on the 15 that mattered and the 4 fixtures (76 pinned spawns, the same staged copies and prompts in `build/agent199/t273/stage/`), judged blind like `judge4/` beside a re-judging of the first readers' lines.
    - Write every check as a script whose output is an artifact BEFORE the rule-checker sees the report (`docs/project/gotchas.md` "A MEASUREMENT PUT TO THE RULE-CHECKER NEEDS EVERY CHECK'S OUTPUT SAVED").

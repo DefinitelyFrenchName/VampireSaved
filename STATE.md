@@ -63,7 +63,18 @@ Ruling: `DECISIONS_HISTORY.md` "Ruled
 
 ### (3) CLOSE (14z-201b, 2026-10-15)
 Run by the step table and its driver (`docs/project/session_close.md`, `tools/close.py`; run dir
-`build/agent201b/close`, local).
+`build/agent201b/close`, local). **STOPPED before the push, on the maintainer's word:** asked whether to finish (about
+1.5 hours more) or stop, the maintainer: *"honestly, stop here leave the commits local and the next session will push"*.
+Where it stopped:
+- findings (a)-(c); sections; NEXT_SESSION rewritten; the 14z-201 group rolled; checks green;
+- documentation packet: run 2026-10-15-1094, fixture caught, VIOLATED Q1 Q4 on the real packet (the checks ran before
+  the commit; a 41/38 count), verified and resolved; STATE and the findings changed after it, so it predates (b) and (c);
+- procedure check: runs 2026-10-15-1095 (the end of the 14z-201 close; one slip: "the last sweep was clean" dropped the
+  sweep's OPEN TASK line) and -1096 (OK), both fixtures caught;
+- tier at `ab89682d`: RED, PASS 206 FAIL 1 (`test_release_launcher_bat`'s `first-found` not fired, finding (b)), fixed
+  in `4eb066b0`; the re-run at `b29b90c3` was stopped with the close, its snapshot removed;
+- dashboard re-collected through 14z-201b and uploaded (figures, rc_runs and costly version 6, tiers 7);
+- not run: the record, the final tier, the push. The commits since `c81dc932` are local.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings
