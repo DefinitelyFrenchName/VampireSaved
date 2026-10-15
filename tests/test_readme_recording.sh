@@ -20,6 +20,10 @@
 # MUST-FIRE: perturbed-copy: used-nvram — a playback started from the nvram directory the recording run left behind (what a player's `nvram_fresh` holds once their session is over) must diverge from the recording and fail, so the comparison is proven able to fail and the README's EMPTY folder proven load-bearing
 # MUST-FIRE: perturbed-copy: truncated-inp — the recording cut to half its input stream must fail the frame-count check, so a playback that stops early can never pass as the whole session
 #
+# SINCE 2026-10-15 (14z-201) the root README carries no recording command: the maintainer moved the procedure to the
+# release package README (DECISIONS_HISTORY.md "Ruled 2026-10-15 (14z-201) — the recording procedure moves to the
+# release package README"), and this gate fails until #284's work reads the command from there.
+#
 # WHY IT EXISTS. README.md "Report a problem" tells a player to create two
 # empty folders, run the release MAME with `-record`, and attach the `.inp`.
 # That route was smoke-tested BY HAND at 14z-155 (record and playback exit 0),

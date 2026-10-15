@@ -28,7 +28,7 @@ inline script recorded in that close's artifact	run 187 — the script was in no
 THE GROUND IS y = 40	REACH CONTROL 1: a known live heading in docs/project/gotchas.md	reach
 LEAD=0 for the walk	REACH CONTROL 2: the known live CORRECTED wording, in tools/name_moves.py (plain) and docs/project/gotchas.md (code-spanned) — BOTH must be found	reach:2
 read y > 0 as airborne and called the landing-frame hit	REACH CONTROL 3: a carrier line-wrapped across a '#' comment prefix in tests/audit_trap_airborne.sh	reach
-the FGC loves what ifs	REACH CONTROL 4: a known live sentence found ONLY in README.md, a root document — a scan that stopped reaching the root documents reads 0 (run 204: README.md was outside the old root list)	reach
+what ifs are tantalizing	REACH CONTROL 4: a known live sentence found ONLY in README.md, a root document — a scan that stopped reaching the root documents reads 0 (run 204: README.md was outside the old root list); re-pointed 2026-10-15 (14z-201) when the maintainer reworded the sentence it used, "the FGC loves what ifs"	reach
 
 at height 40 on the way down	run 164 — the trap sheet's caption; corrected on #163, the opener's carrier removed at the 14z-181 close	gone
 the 35 never-entered a2 chains	run 192/193 — the count is 36 since the 14z-181 re-run (a stale carrier in tools/chain_census.py's docstring)	gone

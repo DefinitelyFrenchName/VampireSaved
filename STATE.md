@@ -126,6 +126,9 @@ On ERIS, with the published m23 Windows MAME package, the root README's recordin
 The maintainer: *"I think we should put the "how to report a problem" details into the README.md of the release
 zips"*, then *"I'll trim it, add the instructions needs to #284"* (`DECISIONS_HISTORY.md` "Ruled 2026-10-15 (14z-201)
 — the recording procedure moves to the release package README"). #284 got its index row and the requirements.
+The maintainer trimmed the root README (merged); `test_readme_recording` (release cadence) now fails as ruled until
+#284, its header says so; the reach control 4 of `tests/rulecheck/retractions/14z-181.tsv` was re-pointed to the
+reworded opening sentence ("what ifs are tantalizing"), `test_retraction_reach` PASS.
 
 ### (11) THE FINDINGS TABLE
 `docs/project/findings/14z-201.tsv` — every finding, its live home, the test that reproduces it (checklist step 1).
