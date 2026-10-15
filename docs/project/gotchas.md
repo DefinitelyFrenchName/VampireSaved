@@ -7202,3 +7202,31 @@ RED: the pipeline's status is grep's, and grep matched the word RED. The commit'
 unclassed scratch script and an unrecorded status question), but the close's order — checks green, then commit — was
 broken. **The rule:** gate a commit on the verdict itself (`close.py run checks` exits non-zero on a red; test it
 directly, or grep for `^DONE`), never on a grep that matches both outcomes.
+
+## A STALENESS PREDICTOR SCORED ONLY ON ITS MISSES GROWS ITS OVER-RUNS UNSEEN (paid: 14z-202, #286)
+
+`tools/static_confirm.py` was scored on traces for MISSES only (a read it does not flag): 0 misses over 40,035 reads
+(14z-191), and every later narrowing the same way. Nobody scored the other side, a gate it re-runs for no read. The
+14z-201 close's second tier pass followed a commit of `STATE.md` and 35 rule-checker run files only, and re-ran 135 of
+206 gates, every one with all its controls, for about 40 minutes. The re-runs were mentions, not reads:
+- a data file's prose naming a record file (the notes column of `tests/expected/registry.tsv`: "frozen 2026-07-28,
+  STATE.md");
+- a BASENAME collision: one tool's message names `manifest.tsv`, so all 1,014 rule-checker run manifests became its
+  gates' data;
+- the run records landing under `tests/`, which every bare `tests` lister reads;
+- `os.walk(src)` / `cd "$1" && find .` counted as whole-tree reads.
+On that change set the planner went from 112 stale gates to 56 (`#286`'s N-B on `.md`, N-E, N-F, N-G, N-H). The
+first cut reached 40 and the PILOT trace at `1c59a7cd` found it missing 2,226 real reads: `test_docshape` walks `tests`
+with `rglob` and reads the run records, and `test_release_recipe_text` reads `.gitmodules`, which only the coarse R4
+had covered. The version that landed scored 0 misses over 84,378 traced reads.
+**The rule:** an over-approximating instrument is scored both ways — its misses on a trace, and its over-runs on a
+real change set whose true readers are known (a record-only commit is the cheapest such set) — and the over-run figure
+is watched like the miss figure.
+
+## A DATA FILE A GATE READS WITH `cat` IS NOT IN ITS REACH — the reach holds programs (paid: 14z-202, #286)
+
+`battery_reach.py`'s strict closure, which `static_confirm.py` calls the reach, follows PROGRAMS (scripts, imports,
+executables). A file a gate reads (`cat data/list.tsv`) is not in it; a change to that file is STALE by R2 (a code
+line names its basename), not R1. Building #286 (c) on "a changed path in the reach" would have carried a gate's
+controls when its own data changed; `tests/test_static_runner.sh` section 22 caught it on its first run. **The rule:**
+the control trigger is `direct_read` (R1, R2 or R6: the gate's code names the file), never R1 alone.

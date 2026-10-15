@@ -40,6 +40,35 @@ ERIS trace scores them at 0 misses — until then a close does not lean on them 
      component (`"STATE.md"`, `'STATE.md'`, `$ROOT/STATE.md`) or where it survives with every PROSE string
      (quoted text holding a space: messages, echo lines) removed — a bare shell argument still counts. Every close
      edits STATE.md, and ~63 gates' tools name it only in messages.
+#286 (a) (14z-202, maintainer-ruled 2026-10-15: "(a) is good too"): THE RECORD FILES STOP RE-RUNNING CODE GATES. The
+14z-201 close's second tier pass followed a commit of STATE.md and 35 rule-checker run files only and re-ran 135 of
+206 gates; most by a MENTION, not a read. Four narrowings, scored on a trace before they land (#225):
+  N-B is widened from STATE.md to every `.md` basename (NARROW_R2): `CLAUDE.md`, `DECISIONS_HISTORY.md` and the rest
+     are named in messages by dozens of tools (R2 `tests/lib/masked_compare.sh names CLAUDE.md`, 12 gates at 6544c713);
+  N-E (R5) a data file names c only where c stands as a PATH: at the start of the text, a line or a field (after a
+     tab), after a quote, a backtick, `/`, `,` with no space, `[`, `;` or `; ` — not inside prose (the notes column of
+     tests/expected/registry.tsv: "frozen 2026-07-28, STATE.md", 34 gates at c81dc932; tests/ci_emulator.tsv's
+     "(maintainer-ruled 2026-10-09, DECISIONS_HISTORY.md ...", 11 at ab89682d); docs/project/tickets.tsv's
+     `DECISIONS_HISTORY.md § ...` links stand at a field start and still count;
+  N-F a file under tests/rulecheck/runs/ concerns only a reach that names `rulecheck/runs` (every reader of the run
+     records does, through its `RUNS` constant): as DATA (R5), the basename `manifest.tsv` in a message made all 1,014
+     run manifests data of 15 to 21 gates per pass, and the manifests list STATE.md and DECISIONS_HISTORY.md; as a
+     CHANGED path (any rule; N-F-CHANGE), a new run's `manifest.tsv` re-ran every gate whose code names that basename
+     (19 gates on the c81dc932 change set);
+  N-G (R3) a change under tests/rulecheck/ is not STALE for a gate whose reach names only the bare `tests` directory
+     (N-A's form; NARROW_R3_UNDER): the run records and the ledger land there at every close (12 gates, 326 s with
+     their controls, at c81dc932); `tests/rulecheck` and deeper still count, and so does the bare `tests` in a reach
+     that walks recursively (RECURSIVE: the PILOT trace at 1c59a7cd found test_docshape reading 2,225 files there
+     through an `rglob` of `tests`);
+  N-H (R4) a walk (`os.walk`, `.rglob`, `glob('**')`, `find .`) is whole-tree only from the repo root (ROOTISH);
+     a walk of a named directory is R3's. R7 gains `.gitmodules` (git reads it for every submodule-aware command):
+     the trace found test_release_recipe_text reading it, which only the coarse R4 had covered.
+  SCORED (14z-202, PILOT, the traces of all 225 gates at 1c59a7cd, the scorer with #283's split lines re-joined): this
+     version 0 misses over 84,378 (gate, file read) pairs; the version before #286 (a) 0; the over-narrowed control 59
+     misses in 6 gates (fired); a first cut of N-G and N-H 2,226 misses in 2 gates (corrected above). Four gates exited
+     non-zero under the trace: test_applier_page and test_applier_page_browser (#280, #281), test_release_roundtrip
+     (#279) and test_emulator_staleness (PILOT's own emulator run records are stale). On the 14z-201 close's final-pass
+     change set (37 paths): 112 stale gates before, 56 after.
 #274 (14z-200; scored on a fresh trace of all 222 gates at 6e329411, PILOT, with the session scratch present):
   R1 the reach is closed again over SIBLING programs — a quoted `name.py`/`.sh`/`.lua` in a reach file that exists
      beside that file (`os.path.join(os.path.dirname(__file__), "gen_applier_page.py")`, which battery_reach does
@@ -115,10 +144,46 @@ import os, re, subprocess, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import battery_reach as br   # noqa: E402
 
-WHOLE = re.compile(r"git\s+(?:ls-files|grep|status)\b|os\.walk\(|\.rglob\(|\bfind\s+\.(?:\s|$)|glob\.glob\([^)]*\*\*"
+_WHOLE_COARSE = re.compile(r"git\s+(?:ls-files|grep|status)\b|os\.walk\(|\.rglob\(|\bfind\s+\.(?:\s|$)|glob\.glob\([^)]*\*\*"
                    # R4 in LIST form (14z-200, #274: tools/entropy_tripwire.py's ["git", "-C", root, "ls-files", ...] was
                    # unseen, 15,013 traced reads missed in test_entropy_tripwire)
                    r"|[\"']git[\"']\s*,\s*(?:[\"']-C[\"']\s*,\s*[^,\n]+,\s*)?[\"'](?:ls-files|grep|status)[\"']")
+# N-H (#286 (a), 14z-202): a walk counts as the WHOLE tree only when it starts at the repo root. `os.walk(src)`,
+# `(root / "docs").rglob(`, `Path(args[0]).rglob(` and `cd "$1" && find .` read one directory, which R3 covers when the
+# code names it; 38 of the 68 gates the c81dc932 change set left stale were R4 hits of this kind. The git forms
+# (`git ls-files|grep|status`) stay whole-tree readers.
+ROOTISH = (r"(?<![\w.])(?:root|ROOT|REPO|repo|REPO_ROOT|\"\.\"|'\.'|(?:pathlib\.)?Path\(\s*[\"']\.[\"']\s*\)"
+           r"|(?:pathlib\.)?Path\.cwd\(\)|os\.getcwd\(\)|os\.curdir)")
+
+
+class _Whole:
+    """R4's test: `search(text)` is truthy when the text reads the whole tree (N-H applied)."""
+    def search(self, t):
+        for m in _WHOLE_COARSE.finditer(t):
+            hit = m.group(0)
+            if hit.startswith("os.walk("):   # N-H
+                if re.match(r"\s*" + ROOTISH + r"\s*[,)]", t[m.end():]):
+                    return True
+            elif hit == ".rglob(":
+                if re.search(ROOTISH + r"\s*\)?\s*$", t[max(0, m.start() - 60):m.start()]):
+                    return True
+            elif hit.startswith("find"):
+                if not re.search(r"\bcd\s", t[t.rfind("\n", 0, m.start()) + 1:m.start()]):
+                    return True
+            elif hit.startswith("glob.glob("):
+                if re.match(r"glob\.glob\(\s*(?:os\.path\.join\(\s*" + ROOTISH + r"\s*,\s*)?[\"']\*\*", hit):
+                    return True
+            else:
+                return True   # the git forms
+        return False
+
+
+WHOLE = _Whole()
+# N-G's exception (14z-202, the PILOT trace at 1c59a7cd: test_docshape's citation check walks `tests` with `rglob` and
+# reads 2,225 files under tests/rulecheck/): a reach that walks a directory recursively reads what lies under it
+# (a `find` with a path or option after it, not the English word; `**` inside a quoted glob, not markdown bold)
+RECURSIVE = re.compile(r"os\.walk\(|\.rglob\(|\bfind\s+(?:[.\"'$/~]|[\w./-]+\s+-(?:type|name|path|maxdepth|print))"
+                       r"|[\"'/]\*\*(?:[/\"']|$)|recursive\s*=\s*True|\bls\s+-[a-zA-Z]*R")
 _TEXT = {}
 
 
@@ -179,7 +244,16 @@ def reach(root, gate, files):
 
 
 NARROW_R3_TOP = ("build",)     # N-A: the bare top directory is not a reader of what changes under it
-NARROW_R2 = ("STATE.md",)      # N-B: R2 for these basenames ignores a mention inside a prose string
+class _NarrowR2(tuple):
+    """N-B's basenames: STATE.md (14z-190) and, since #286 (a), every `.md` basename."""
+    def __contains__(self, b):
+        return tuple.__contains__(self, b) or str(b).endswith(".md")   # N-B-MD
+
+
+NARROW_R2 = _NarrowR2(("STATE.md",))   # N-B: R2 for these basenames ignores a mention inside a prose string
+NARROW_R3_UNDER = (("tests/rulecheck/", 1),)   # N-G: under this prefix, directory depths <= 1 (bare `tests`) do not count
+RUNS_DATA = "tests/rulecheck/runs/"   # N-F: data files here count only for a reach that names `rulecheck/runs`
+DATA_PATH_PRE = "\t\n\"'`/,[;"   # N-E: the characters a PATH mention may follow in a data file
 QUOTED = re.compile(r"\"(?:[^\"\\\n]|\\.)*\"|'(?:[^'\\\n]|\\.)*'")   # EVERY quoted string, in order
 _PROSE = {}
 
@@ -259,6 +333,18 @@ TOKEN = re.compile(r"[\w./${}*%<>-]+")
 PLACE = re.compile(r"\$\{\w+\}|\$\w+|\{[^{}/]*\}|%[sd]|\*")
 
 
+def data_names(t, c, bpat):
+    """N-E (#286 (a)): does the data text t name c as a PATH — by path or by basename, at the start of t, a line or a
+    field, or after one of DATA_PATH_PRE or `; ` — rather than inside prose?"""
+    hits = [m.start() for m in re.finditer(re.escape(c), t)]
+    if bpat:
+        hits += [m.start() for m in bpat.finditer(t)]
+    for i in hits:
+        if i == 0 or t[i - 1] in DATA_PATH_PRE or (t[i - 1] == " " and i > 1 and t[i - 2] == ";"):
+            return True
+    return False
+
+
 def data_files(root, blob):
     """R5: the tracked data files the reach's code names, by path or basename (one scan per blob)."""
     k = (root, hash(blob))
@@ -267,6 +353,8 @@ def data_files(root, blob):
         out = []
         for f in tracked:
             if f.endswith(DATA_EXT):
+                if f.startswith(RUNS_DATA) and "rulecheck/runs" not in blob:   # N-F
+                    continue
                 b = os.path.basename(f)
                 if b in blob and re.search(r"(?<![\w.-])" + re.escape(b) + r"(?![\w-])", blob):
                     out.append(f)
@@ -340,6 +428,9 @@ def stale_reason(root, rch, blob, c, pats):
             if os.path.dirname(p) == par and sib.search(text(root, p)):
                 return f"R3 {p} reads its sibling directory {d}"
     for d, kind, rx in dps:   # N-C: R3 by kind; a bare token counts only outside python and outside prose
+        if (any(c.startswith(pre) and d.count("/") + 1 <= n for pre, n in NARROW_R3_UNDER)
+                and not RECURSIVE.search(blob)):   # N-G
+            continue
         hay = r3_blob(root, rch, blob) if kind == "bare" else blob
         if rx.search(hay):
             if kind == "bare":
@@ -352,12 +443,12 @@ def stale_reason(root, rch, blob, c, pats):
         if d == c:
             continue
         t = text(root, d)
-        if c in t or (bpat and base in t and bpat.search(t)):
+        if (c in t or (bpat and base in t)) and data_names(t, c, bpat):   # N-E
             return f"R5 the data file {d} names {c}"
     for rx, tok, is_path in templates(root, blob):
         if rx.search(c if is_path else base):
             return f"R6 the template {tok} matches {c}"
-    if base in (".gitignore", ".gitattributes") and GIT_RUN.search(blob):
+    if base in (".gitignore", ".gitattributes", ".gitmodules") and GIT_RUN.search(blob):
         return f"R7 the reach runs git, which reads {c}"
     return None
 
@@ -419,6 +510,8 @@ def predict(root, changed, r1=None):
         blob = "\n".join(text(root, p) for p in rch)
         why = None
         for c in eff:
+            if c.startswith(RUNS_DATA) and "rulecheck/runs" not in blob:   # N-F-CHANGE
+                continue
             why = stale_reason(root, rch, blob, c, pats[c])
             if why:
                 break
@@ -428,7 +521,8 @@ def predict(root, changed, r1=None):
         if why:
             stale[g] = why
             if r1 is not None:
-                r1[g] = any(direct_read(root, rch, blob, c, pats[c]) for c in eff)
+                r1[g] = any(direct_read(root, rch, blob, c, pats[c]) for c in eff
+                            if not (c.startswith(RUNS_DATA) and "rulecheck/runs" not in blob))
         else:
             carried.append(g)
     return gates, stale, carried
@@ -478,7 +572,28 @@ def selftest():
                 os.chmod(p, 0o755)
         w("tests/ci_portable.txt", "g_named\ng_prog\ng_dir\ng_join\ng_whole\ng_data\ng_tmpl\ng_git\ng_bin\n"
           "g_buildbare\ng_buildsub\ng_buildtmpl\ng_statemsg\ng_stateread\ng_statearg\ng_statepair\n"
-          "g_prose\ng_pyident\ng_pyfile\ng_casepat\ng_pylist\ng_pydeep\ng_gitlist\ng_sib\ng_shdef\n")
+          "g_prose\ng_pyident\ng_pyfile\ng_casepat\ng_pylist\ng_pydeep\ng_gitlist\ng_sib\ng_shdef\n"
+          "g_mdmsg\ng_mdread\ng_reg\ng_mani\ng_maniruns\ng_cdfind\ng_walksub\ng_walkroot\ng_testswalk\ng_testslink\n")
+        w("tests/g_testswalk.sh", "#!/bin/sh\npython3 tools/testswalk.py\n", True)
+        w("tests/g_testslink.sh", "#!/bin/sh\necho \"a copy would **not** find the tests otherwise\"\nls tests > /dev/null\n", True)
+        w("tools/testswalk.py", "import pathlib\nfor d in (\"tests\",):\n    for p in sorted((pathlib.Path('.') / d).rglob('*')):\n        pass\n")
+        # N-H: a find after a cd, and a walk of a named subdirectory, are not whole-tree reads; a walk of root is
+        w("tests/g_cdfind.sh", "#!/bin/sh\n( cd \"$1\" && find . -type f | sort ) > /dev/null\n", True)
+        w("tests/g_walksub.sh", "#!/bin/sh\npython3 tools/walksub.py\n", True)
+        w("tools/walksub.py", "import os, sys\nsrc = sys.argv[1]\nfor d, _, fs in os.walk(src):\n    pass\n")
+        w("tests/g_walkroot.sh", "#!/bin/sh\npython3 tools/walkroot.py\n", True)
+        w("tools/walkroot.py", "import os\nroot = '.'\nfor d, _, fs in os.walk(root):\n    pass\n")
+        # #286 (a): N-B on every .md (a message vs a read); N-E (a data file's prose mention vs a path); N-F (a run
+        # manifest named by basename only vs a reader of the runs); N-G (a bare `tests` lister vs a run record)
+        w("tests/g_mdmsg.sh", "#!/bin/sh\necho \"the rule is in CLAUDE.md, read it\"\n", True)
+        w("tests/g_mdread.sh", "#!/bin/sh\ngrep -c rule CLAUDE.md\n", True)
+        w("CLAUDE.md", "x\n")
+        w("tests/g_reg.sh", "#!/bin/sh\npython3 -c \"print(open('lists/reg.tsv').read())\"\n", True)
+        w("lists/reg.tsv", "a\tfrozen 2026-07-28, notes/ruled.md\nnotes/listed.md \u00a7 Ruled x ; notes/second.md \u00a7 y\n")
+        w("tests/g_mani.sh", "#!/bin/sh\necho \"each run keeps a manifest.tsv\" > /dev/null; ls manifest.tsv 2>/dev/null\n", True)
+        w("tests/g_maniruns.sh", "#!/bin/sh\nfor m in tests/rulecheck/runs/*/manifest.tsv; do cat \"$m\"; done\n", True)
+        w("tests/rulecheck/runs/2026-01-01-01/manifest.tsv", "notes/man.md\tabc\n")
+        w("notes/man.md", "x\n")
         # 14z-200 (#269 "C first"): a directory named only as a shell parameter default
         w("tests/g_shdef.sh", "#!/bin/sh\nREL=\"${1:-rel/m23/mame}\"\n[ -f \"$REL/manifest.json\" ] && ls \"$REL\"\n", True)
         # 14z-200 (#274): R4 in list form; a sibling program run by a path beside its caller, which reads a
@@ -537,16 +652,16 @@ def selftest():
             # reads tests/expected/ (and only it)
             ("docs/other.md", {"g_whole"}),
             # (g_casepat's `*tests/*.sh*` is still an R6 TEMPLATE for a tests/*.sh name; N-C's `*` rule is only R3's)
-            ("tests/new.sh", {"g_casepat", "g_pylist", "g_whole"}),
-            ("tests/data/new.txt", {"g_pylist", "g_whole"}),
-            ("tests/expected/new.txt", {"g_pylist", "g_pydeep", "g_whole"}),
+            ("tests/new.sh", {"g_casepat", "g_pylist", "g_testswalk", "g_testslink", "g_whole"}),
+            ("tests/data/new.txt", {"g_pylist", "g_testswalk", "g_testslink", "g_whole"}),
+            ("tests/expected/new.txt", {"g_pylist", "g_pydeep", "g_testswalk", "g_testslink", "g_whole"}),
             ("docs/sums.txt", {"g_pyfile", "g_whole"}),
             ("docs/project/x.md", {"g_join", "g_whole"}),
             # N-B: the message does not read STATE.md; the inline read and the bare argument do
             ("STATE.md", {"g_whole", "g_stateread", "g_statearg"}),
             # N-A: the bare `build` reader is carried, the deeper reader is not
             ("build/m1/new.log", {"g_buildsub", "g_buildtmpl", "g_whole"}),
-            ("tests/g_named.sh", {"g_casepat", "g_named", "g_pylist", "g_whole"}),
+            ("tests/g_named.sh", {"g_casepat", "g_named", "g_pylist", "g_testswalk", "g_testslink", "g_whole"}),
             # R5: g_data reads a data file that names the changed file
             ("notes/locked.md", {"g_data", "g_whole"}),
             # R6: g_tmpl's templated path matches; `$W/$n.out` is too generic to count (no stem)
@@ -568,6 +683,22 @@ def selftest():
             ("tools/sibdata/b.mjs", {"g_sib", "g_whole"}),
             # the shell default `${1:-rel/m23/mame}` names the directory every file under it is read from
             ("rel/m23/mame/README.md", {"g_shdef", "g_whole"}),
+            # #286 (a) N-B on .md: the message does not read CLAUDE.md, the grep does
+            ("CLAUDE.md", {"g_mdread", "g_whole"}),
+            # N-E: a prose mention in a data file is not a read; a path at a field start, or after ` ; `, is
+            ("notes/ruled.md", {"g_whole"}),
+            ("notes/listed.md", {"g_reg", "g_whole"}),
+            ("notes/second.md", {"g_reg", "g_whole"}),
+            # N-F: the run manifest is data only of the gate that names rulecheck/runs (g_mani names manifest.tsv bare)
+            ("notes/man.md", {"g_maniruns", "g_whole"}),
+            # N-G: a new run record is not a change for the bare `tests` lister g_pylist; the runs reader sees it
+            ("tests/rulecheck/runs/2026-01-02-01/packet.md", {"g_maniruns", "g_whole"}),
+            # N-F-CHANGE: a new run's manifest.tsv is no change for g_mani, which names the basename only
+            ("tests/rulecheck/runs/2026-01-02-01/manifest.tsv", {"g_maniruns", "g_whole"}),
+            # N-G: the ledger is no change for the bare `tests` lister
+            ("tests/rulecheck/ledger.tsv", {"g_testswalk", "g_whole"}),
+            # R7: .gitmodules is read by every git user, as .gitignore
+            (".gitmodules", {"g_git", "g_whole"}),
         ]
         subprocess.run(["git", "init", "-q"], cwd=root, check=True)
         subprocess.run(["git", "add", "-A"], cwd=root, check=True)
@@ -575,7 +706,7 @@ def selftest():
             _TEXT.clear(); _REFS.clear(); _DATA.clear(); _TMPL.clear(); _TRACKED.clear()
             _, stale, _ = predict(root, [c])
             got = set(stale)
-            want = want | {"g_gitlist"}   # the list-form whole-tree reader is stale for every change, as g_whole
+            want = want | {"g_gitlist", "g_walkroot"}   # the list-form and root-walk readers are stale for every change
             good = got == want
             ok = ok and good
             print(f"  {'ok' if good else 'FAIL'}: {c} -> stale {sorted(got)}" + ("" if good else f", expected {sorted(want)}"))

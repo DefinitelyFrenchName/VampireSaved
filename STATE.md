@@ -47,6 +47,23 @@ The maintainer: *"read handoff.md, state.md and docs/next_session.md"*. The open
 ### (1) WHERE THE CLOSE TIER'S TIME GOES — measured, three tickets filed
 The 14z-201 close's two passes re-ran 176 and 135 of 206 gates. The second pass followed a commit of record files only, and most of its re-runs came from rule R5 of `tools/static_confirm.py` (a data file naming a record file), `tests/rulecheck/runs/` under `tests/`, and the always-dirty `emu/fbneo`. Every re-run gate executed every control. The figures are on #286, from a `measurer` spec. Filed: #286 (the tier: false matches, the submodule, controls only on a real change), #287 (the procedure check right after each piece of work), #288 (measure the close's audit layer, then cut it down). Ruling: `DECISIONS_HISTORY.md` "Ruled 2026-10-15 (14z-202) — the close's cost must follow the change"; START HERE 0c is superseded by #286.
 
+### (2) THE FINDINGS TABLE
+`docs/project/findings/14z-202.tsv` — every finding, its live home, the test that reproduces it (checklist step 1).
+
+### (3) #286 (b) AND (c) BUILT — `1c59a7cd`
+The runner records `# subfp <path> <fingerprint>` per submodule and the plan drops a dirty submodule that did not change;
+a re-run gate executes its controls only when its code reads the changed file directly (R1, R2, R6), else it carries
+them. Gate `tests/test_static_runner.sh` sections 22-23 (controls `subfp-off`, `controls-always`, `controls-never`).
+Mid-session tier GREEN (PASS 207, `build/agent202/mid1.log`).
+
+### (4) #283 FIXED AND #286 (a) BUILT — scored on a PILOT trace before landing
+`tools/trace_static_reads.py` re-joins the opens strace splits (#283; section 2c of `tests/test_trace_static_reads.sh`).
+Five narrowings in `tools/static_confirm.py` ("#286 (a)": N-B on every `.md`, N-E, N-F, N-G, N-H; R7 takes
+`.gitmodules`), each with a selftest case and a control in `tests/test_static_confirm.sh`. The trace of all 225 gates
+at `1c59a7cd` on PILOT caught a first cut missing real reads (`test_docshape`'s `rglob` of `tests`, `.gitmodules`); the
+landed version scores 0 misses, and the change set of the 14z-201 final pass goes from 112 stale gates to 56. Figures
+and their sources: the "SCORED" paragraph of `tools/static_confirm.py`.
+
 ## Session 14z-201b — **#285: the Windows launcher gate's cmd-driven half moves to release cadence or on demand.** A continuation of 14z-201 after its close, on the same transcript (`979461fd`).
 
 ### opened with

@@ -803,7 +803,7 @@ printf '#!/bin/sh\ncat sub/x.txt > /dev/null\necho "PASS: s"\n' > "$FS/tests/g_s
   echo "cat data/list.tsv > /dev/null"; echo "echo 'PASS: f'"; echo "echo 'CONTROL FIRED: flip — caught'"; echo "exit 0"; } > "$FS/tests/g_f.sh"
 chmod +x "$FS/tests/"g_*.sh
 printf 'g_s\ng_f\n' > "$FS/tests/ci_portable.txt"; : > "$FS/tests/ci_static.txt"
-printf 'name\tnote\nf\tsee data/notes.md\n' > "$FS/data/list.tsv"; echo first > "$FS/data/notes.md"
+printf 'name\tnote\nf\tdata/notes.md\n' > "$FS/data/list.tsv"; echo first > "$FS/data/notes.md"
 (cd "$FS" && git init -q && git -c protocol.file.allow=always submodule add -q "$T/subsrc" sub > /dev/null 2>&1 \
     && git add -A && git -c user.name=t -c user.email=t@t commit -qm base)
 echo dirty > "$FS/sub/x.txt"   # the submodule is dirty in every run, as emu/fbneo is
@@ -823,7 +823,7 @@ s22() {   # s22 <static_confirm.py> -> sets S22a S22b S22c S22d (ok|bad)
     if printf '%s' "$_r" | grep -qE "^  re-run g_f +STALE: R5" && printf '%s' "$_r" | grep -qE "^  g_f +PASS +[0-9]+s" \
             && printf '%s' "$_r" | grep -q "controls carried: 1 honoured" && grep -q "^g_f	PASS	[0-9]*	1	1	1$" "$T/s4.tsv"; then S22c=ok
     else S22c=bad; echo "    a mention (R5) did not re-run g_f with its control carried: $(printf '%s' "$_r" | grep -E 'g_f|controls carried' | tr '\n' '|') / $(grep '^g_f' "$T/s4.tsv")"; fi
-    printf 'name\tnote\nf\tsee data/notes.md again\n' > "$FS/data/list.tsv"; sleep 1
+    printf 'name\tnote\nf\tdata/notes.md\ng\tdata/other.md\n' > "$FS/data/list.tsv"; sleep 1
     _r="$(cd "$FS" && STATIC_RESULTS_OUT="$T/s5.tsv" sh tests/run_all_static.sh --tier portable --confirm "$T/s4.tsv" 2>&1)" || true
     if printf '%s' "$_r" | grep -qE "^  re-run g_f +STALE: R2" && ! printf '%s' "$_r" | grep -q "controls carried" \
             && grep -q "^g_f	PASS	[0-9]*	1	1	1$" "$T/s5.tsv"; then S22d=ok

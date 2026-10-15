@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-523 entries (47 game / 134 platform / 342 project), counted from the buckets at generation.
+525 entries (47 game / 134 platform / 344 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 47 entries
 
@@ -209,7 +209,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - ON A WSL2 BOX REACHED ONLY OVER SSH, WSLg COMES UP WITH NO DESKTOP BEHIND IT AND EVERY MAME PROCESS WAITS 100-180 s ON ITS SOCKETS — a release run's two prereq TIMEOUTs were the environment, not the build (paid: 14z-198)
 - MAME `-playback` DOES NOT EXIT AT THE END OF THE RECORDING — `-exit_after_playback` does (paid: 14z-201)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 342 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 344 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -553,3 +553,5 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - WHAT A TEXT TELLS ITS READER IS READ, NOT INFERRED FROM THE COMMAND BESIDE IT (paid: 14z-201)
 - A GATE WITH NO CADENCE ROW RUNS AT EVERY CLOSE — a host-bound half then blocks every push (paid: 14z-201b, #285)
 - A COMMIT CHAINED BEHIND `grep` OF A CHECK'S OUTPUT RUNS ON A RED (paid: 14z-201b)
+- A STALENESS PREDICTOR SCORED ONLY ON ITS MISSES GROWS ITS OVER-RUNS UNSEEN (paid: 14z-202, #286)
+- A DATA FILE A GATE READS WITH `cat` IS NOT IN ITS REACH — the reach holds programs (paid: 14z-202, #286)

@@ -28,7 +28,8 @@ WHAT EACH STEP DOES.
            find a miss there is blind, and its clean score elsewhere means nothing. Exit 0 when the control fired.
   all      trace, then score, then control; exit 0 only when the score is clean AND the control fired.
 
-LIMITS (as the scratch versions'). Reads are judged by path only. A RELATIVE path counts as repo-relative only if it
+LIMITS (as the scratch versions'). A call strace split into `<unfinished ...>` and `<... resumed>` lines is re-joined
+(#283, 14z-202); before that, every split open was unscored. Reads are judged by path only. A RELATIVE path counts as repo-relative only if it
 exists at the repo root (strace prints no cwd). A gate that exited non-zero (a missing prerequisite on the tracing
 host) may have read less than a passing run. A file read only through a process strace did not follow is unseen.
 Gate: tests/test_trace_static_reads.sh (the scorer and the control on synthetic traces; no strace needed).
@@ -45,6 +46,12 @@ import time
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OPEN = re.compile(r'^\d+\s+(open|openat|execve)\((?:AT_FDCWD, )?"([^"]+)"(?:, ([A-Z_|]+))?.*\)\s+=\s+(-?\d+)')
+# #283 (14z-202): with several processes writing one file, strace SPLITS a call another process interrupts into
+# `PID call(args <unfinished ...>` and, later, `PID <... call resumed>) = rc`. Neither line matches OPEN, so every split
+# open was unscored (2,513 of 66,463 open lines at 5648e530, 3,784 of 89,228 at 344ebc5e; measured 14z-201). The two
+# halves are re-joined by (pid, call) before OPEN reads them.
+UNFINISHED = re.compile(r'^(\d+)\s+(open|openat|execve)\((.*) <unfinished \.\.\.>\s*$')
+RESUMED = re.compile(r'^(\d+)\s+<\.\.\. (open|openat|execve) resumed>(.*)$')
 # the over-narrowing that makes the control (each line must exist verbatim in the predictor, or the control REFUSES)
 OVER_NARROW = (
     ("        if k == 1 and parts[0] in NARROW_R3_TOP:   # N-A", "        if parts[0] in NARROW_R3_TOP:   # CONTROL over-narrowed"),
@@ -72,10 +79,29 @@ def repo_files(root):
     return out
 
 
+def joined(lines):
+    """strace's lines with every split call re-joined (#283): the `<unfinished ...>` half held by (pid, call) until its
+    `<... call resumed>` half arrives; an unpaired half is dropped, as it was before."""
+    held = {}
+    for line in lines:
+        line = line.rstrip("\n")
+        m = UNFINISHED.match(line)
+        if m:
+            held[(m.group(1), m.group(2))] = m.group(3)
+            continue
+        m = RESUMED.match(line)
+        if m:
+            k = (m.group(1), m.group(2))
+            if k in held:
+                yield f"{m.group(1)} {m.group(2)}({held.pop(k)}{m.group(3)}"
+            continue
+        yield line
+
+
 def reads_of(root, st, files):
     """the repo files a trace opened for reading, and how many came from a relative path"""
     reads, rel = set(), 0
-    for line in open(st, errors="replace"):
+    for line in joined(open(st, errors="replace")):   # SPLIT-PAIRED (#283)
         m = OPEN.match(line)
         if not m:
             continue
