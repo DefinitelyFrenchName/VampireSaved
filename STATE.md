@@ -51,7 +51,11 @@ saying there is no value intrinsically but the cost seems disproportionately hig
 freeze cadence and keeps its `SKIP (said)` at release cadence; on a Windows host it runs at any cadence. Measured on
 this Mac with the runner's own classifier (`tests/lib/classify.sh`): session PASS, freeze PASS, release SKIP. No
 `tests/ci_cadence.tsv` row (the option text named one): listing the gate there would defer its static half too, which
-the ruling keeps at every close. `docs/project/gate_coverage.md` regenerated. Ruling: `DECISIONS_HISTORY.md` "Ruled
+the ruling keeps at every close. `docs/project/gate_coverage.md` regenerated. The first close tier at `ab89682d` went red on it (PASS 206 FAIL 1):
+passing on the Mac, the gate showed its `first-found` control "not fired", a control only the Windows run had ever
+fired. The gate's static check now holds #248's newest-set rule (the candidate loop sends every candidate through
+`:consider`), so `first-found` fires on every host and `CONTROL=first-found` FAILs here (7 of 7 controls fired).
+Ruling: `DECISIONS_HISTORY.md` "Ruled
 2026-10-15 (14z-201b) — #285".
 
 ### (2) THE FINDINGS TABLE

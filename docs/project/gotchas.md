@@ -7189,3 +7189,8 @@ Mac; `--strict` counts a SKIP as a failure and the confirm runner never carries 
 run (two at 14z-201). No ruling had chosen that; the maintainer ruled cross-platform checks on demand or at release.
 **The rule:** a gate that cannot run on the session's host says so as a NOTE below the cadence that must run it, and
 a new gate's cadence is decided when it is registered, not left to the default.
+**Then (14z-201b):** turning that SKIP into a NOTE made the gate PASS on the Mac, and a passing gate must show
+every declared control FIRED: `first-found`, which only the Windows run fired, read "not fired" and the close tier went
+red. A SKIP had been hiding a control that could not fire on the host. The fix gave the control a real static leg
+(the candidate loop must send every candidate through `:consider`), so it fires on every host. **The rule:** before a
+host-bound section stops skipping, check that every control it fires has a leg on the other hosts.

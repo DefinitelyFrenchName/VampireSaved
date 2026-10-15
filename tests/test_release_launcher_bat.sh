@@ -42,7 +42,7 @@
 # MUST-FIRE: perturbed-copy: megaman-note-in-fbneo — the generator's README rendered for the FBNeo package with the MAME selection must FAIL on BOTH MAME-only notes: the four validation lines (#227) and the red bad-ROM box at every start (#234) belong to the MAME package only
 # MUST-FIRE: perturbed-copy: quarantine-name-wrong — the generator's MAME PLAY.command with its quarantine message put back to the pre-#239 "\"fbneo\" Not Opened" must FAIL: a MAME player told to look for a dialog naming fbneo is told about a program their package does not hold
 # MUST-FIRE: perturbed-copy: readme-names-absent-launcher — a copy of the release's texts whose mame package no longer ships PLAY.bat while its README still names it must FAIL: that is rule-checker run 2026-10-03-602's finding, the MiSTer README telling its reader to double-click two launchers its package never carried
-# MUST-FIRE: perturbed-copy: first-found — the generator's PLAY.bat with its candidate loop put back to first-found (the pre-#248 launcher) must run the older roms\ set over a newer rompath\ one and FAIL the Windows newest section; it runs only on Windows (REFUSED elsewhere)
+# MUST-FIRE: perturbed-copy: first-found — the generator's PLAY.bat with its candidate loop put back to first-found (the pre-#248 launcher) must FAIL the static candidate-loop check on every host (the loop no longer sends every candidate through :consider; 14z-201b, #285) and, on Windows, run the older roms\ set over a newer rompath\ one and FAIL the newest section
 #
 # WHY. #145 (maintainer report 2026-09-16, reproduced on ERIS 2026-10-03): double-clicking
 # fbneo.exe exits at once and cps2.exe finds no ROMs; ruled 2026-10-03 "PLAY.bat launcher".
@@ -135,6 +135,12 @@ else:
 for n in need:                      # a line that IS n, or starts with it (a trailing >nul)
     if not any(l == n or l.startswith(n + " ") for l in lines):
         bad.append(f"missing the line: {n}")
+# #248 "prefer the newest one, always", read statically (14z-201b, #285): the one candidate loop sends EVERY
+# candidate through :consider, which keeps the newest; a first-found loop (`if not defined ZIP ... set "ZIP=..."`)
+# is the pre-#248 launcher. The Windows run drives the same rule; this is what holds it on every other host.
+loop = [l for l in lines if l.startswith("for %%C in (")]
+if len(loop) != 1 or not loop[0].endswith(' if exist "%%~C" call :consider "%%~C"'):
+    bad.append("the candidate loop does not send every candidate through :consider (#248: the newest set wins)")
 for n in ("if not defined PLAY_DRY_RUN goto launch", ":fail", "pause", "exit /b 1"):
     if n not in lines:
         bad.append(f"missing the line: {n}")
@@ -178,7 +184,7 @@ textcopy() {  # textcopy <dst>
 echo "== test_release_launcher_bat: the Windows launcher for $NAME =="
 for p in fbneo mame; do
     src="$W/$p.bat"
-    case "$VS_CTL" in lf-endings|launch-line-changed) src="$W/ctl_${VS_CTL}_$p.bat" ;; esac
+    case "$VS_CTL" in lf-endings|launch-line-changed|first-found) src="$W/ctl_${VS_CTL}_$p.bat" ;; esac
     rc=0; check "$src" "$p" > "$W/check_$p.txt" 2>&1 || rc=$?
     case "$rc" in
     0) ok "$p: PLAY.bat is CRLF + ASCII, plain cmd, every goto lands, no block, the ruled launch line" ;;
@@ -289,7 +295,7 @@ case "$rc" in
 esac
 
 # the must-fire controls, in-gate: each perturbation must be caught on EVERY launcher it touches
-for c in lf-endings launch-line-changed; do
+for c in lf-endings launch-line-changed first-found; do
     got=""; dead=""
     for p in fbneo mame; do
         rc=0; check "$W/ctl_${c}_$p.bat" "$p" > "$W/ctl_${c}_$p.txt" 2>&1 || rc=$?
@@ -322,7 +328,6 @@ MINGW*|MSYS*|CYGWIN*) ON_WIN=1 ;;
 *) ON_WIN=0 ;;
 esac
 if [ "$ON_WIN" = 0 ] || ! command -v cmd >/dev/null 2>&1; then
-    [ "$VS_CTL" = first-found ] && { echo "REFUSED: CONTROL=first-found drives cmd, which runs only on a Windows host (MSYS2)"; exit 3; }
     # #285 (maintainer-ruled 2026-10-15, "we always worked on one environment and check cross compatibility either
     # on demand or at release"): off Windows the cmd-driven half is a SKIP only at release cadence, where a release
     # must have run it on a Windows host; at session or freeze cadence it is a NOTE, so a session close needs no ERIS
