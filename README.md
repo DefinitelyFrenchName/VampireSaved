@@ -35,7 +35,7 @@ No ROM data is distributed. You rebuild the game from your own dumps with a smal
 every byte before it writes anything.
 
 **Download ONE package** from the [release page](https://github.com/DefinitelyFrenchName/VampireSaved/releases/tag/freeze/merged-m19). 
-   (Make your life easier and play on MiSTer unless you really need emulation)
+   (Make your life easier and play on MiSTer unless you *really* need emulation)
    Follow the documentation included in the zip file. 
    You'll need you own dumps, unmodified, with these exact names: `vsavj.zip` (Vampire
    Savior, Japan 970519), `vsav.zip` (Europe 970519) and `vsav2.zip` (Vampire Savior 2, Japan 970913).
@@ -48,18 +48,18 @@ is. Each line points to where it is tracked or explained — follow the link for
 
 ### How the three new characters work (by design)
 
-- **Where they are:** a new row of three medallions below the existing character wheel.
 - **Where their data comes from:** Vampire Savior 2 — their moves, damage and animation, including
   data that game ships but never reaches, such as their Dark Force activation invincibility.
 - **Which rules they follow:** Vampire Savior's. Internally each new character is loaded into the slot
   of an existing one — its *shell* — so everything that is not specific to the character runs on
-  Vampire Savior's engine: Dark Force costs one bar and brings Vampire Savior's background change.
+  Vampire Savior's engine.
+- **Dark Force**: : Dark Force is Savior's version: costs one bar and brings Vampire Savior's background change.
+  The invunerability for VS2 characters is lifted from their unreacheable VS2 code and the behavior is their personal DF from VS2.
 - **Timing:** they run at Vampire Savior's game speeds. At factory settings NORMAL is the same speed as
   in Vampire Savior 2 and TURBO is one step slower. Compared at the same speed and with the same random
   draws, moves from Phobos, Donovan and Pyron match Vampire Savior 2 hit for hit and frame for frame. 
-- while the VS2 characters' movelists have been thoroughly tested, as well as most moves known to alter their sprites (throws, midnight bliss...),
-  there still is the possibility of gaps in reactions or interactions (e.g. some DF interactions, some reactions to moves).
-  Strictly testing everything is impractical as it would take days (currently it already takes hours at release) but I'm aiming to as close to 100% as I can make it.
+- **Potential gaps:** While the VS2 characters' movelists have been thoroughly tested, as well as most moves known to alter their sprites (throws, midnight bliss...),
+  there still is the possibility of gaps in reactions or interactions (e.g. some DF interactions, some reactions to moves). Please open an issue if you find something I missed.
   
 ### Features and original behaviour you might take for bugs
 
@@ -69,7 +69,6 @@ is. Each line points to where it is tracked or explained — follow the link for
   copies the opponent, copies the three new characters too.
 - **Random select** can land on the three new characters.
 - **The one-frame white flash at the first knockdown** is the original game's (if anyone can tell me why this exists...)
-- **Pyron's Cosmo satellites do not collide with other projectiles** — the same as in Vampire Savior 2.
 
 ### Known limits and cosmetic issues
 
