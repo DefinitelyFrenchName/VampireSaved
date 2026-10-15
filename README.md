@@ -35,7 +35,7 @@ No ROM data is distributed. You rebuild the game from your own dumps with a smal
 every byte before it writes anything.
 
 **Download ONE package** from the [release page](https://github.com/DefinitelyFrenchName/VampireSaved/releases/tag/freeze/merged-m19). 
-   Each one is complete.
+   (Make your life easier and play on MiSTer unless you really need emulation)
    Follow the documentation included in the zip file. 
    You'll need you own dumps, unmodified, with these exact names: `vsavj.zip` (Vampire
    Savior, Japan 970519), `vsav.zip` (Europe 970519) and `vsav2.zip` (Vampire Savior 2, Japan 970913).
