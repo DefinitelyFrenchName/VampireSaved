@@ -139,7 +139,37 @@ reworded opening sentence ("what ifs are tantalizing"), `test_retraction_reach` 
 ### (12) CLOSE (14z-201, 2026-10-15)
 The maintainer: *"then let's close. That'll also be a good moment to see how much time it takes."* The first close run
 by the step table and its driver (`docs/project/session_close.md`, `tools/close.py`; run dir `build/agent201/close`,
-local), started 15:21:53.
+local), started 15:21:53. Step by step:
+- **findings:** (a)-(t) in `docs/project/findings/14z-201.tsv`; (p)-(t) paid during the close itself, two of them
+  defects in the close's own tools — the claim tool dropped a premise starting `#282` (s), the scratch census never
+  counted `.bat`/`.ps1` (t); both fixed with self-test cases that fail on the old code.
+- **sections / next-session / rollover:** this section opened; 14z-200's #269 section points here; the 14z-200 opener
+  moved verbatim to `docs/NEXT_SESSION_HISTORY.md`, `docs/NEXT_SESSION.md` rewritten; the 14z-200 group (11 lines)
+  moved verbatim to `STATE_HISTORY.md` with its ledger line. #282 closed `done` (*"Close it done (Recommended)"*).
+- **inputs / render / checks:** 21 then 25 scratch programs classed, 1 promise carried by #284, 11 maintainer messages
+  exempted with reasons, `tests/rulecheck/retractions/14z-201.tsv` (2 reach controls, 1 gone); 38 checks, the last
+  full run every exit as expected.
+- **packet:** runs 2026-10-15-1083 to -1085 withdrawn unspawned (a premise lost to (s); a claim prepared beside a red
+  check; a stale subject); 1086, 1087 and 1088 VIOLATED on the real packet, every fixture caught, each resolved by work:
+  the stale README "203" sentence, unnamed gaps (the README figures, the GitHub comment bodies — fetched back, each
+  equal to its draft, `build/agent201/close/gh_posted.txt`, local — and #276's undercount), the census (t), and two
+  attributions without the maintainer's words. `resolve --recheck` was refused once because the run directory was
+  passed relative while the render holds it absolute; that resolution is in writing.
+- **commit:** `6544c713`. **tier:** strict `--confirm` on a snapshot of `6544c713`: PASS 206 SKIP 1 FAIL 0, controls
+  404 of 404, wall 2,371 s; the SKIP `test_release_launcher_bat` PASS on ERIS at `6544c713` (its first-found mode exits
+  1), `build/agent201/bat/bat201.log` (local). **sweep:** CLEAN.
+- **procedure (C1):** the extract in five parts, runs 2026-10-15-1089 to -1093, every fixture caught; 1090 and 1093 OK.
+  Confirmed against the extract (`build/agent201/c1/findings.md`, local) and resolved: the agent filed #282 without the
+  maintainer's go after promising to wait for it (1089); reported item B "every doc gate is green" after edits no gate
+  re-ran (1091, as finding (j)); told the maintainer HANDOFF went from "1,811 lines and 216,324 bytes" — the pair is
+  1,811 lines and 216,718 bytes (1091); said "Every gate these changes touch passes" while `test_close_tools` was red
+  (1092, as finding (k)). Workers: the census reader ran grep patterns its spec did not name (1091); a measurer ran on
+  past a failed command against its STOP rule (1092); a rule-checker could not read the 878 KB ledger in full (#258).
+  The saved copy of one reader's answer first dropped its last sentence; corrected to the reader's text.
+- **cap:** 0 breaches over 46 workers, no fallback. **dashboard:** 14z-163..14z-201 re-collected (1,621 figures, each
+  classed) and uploaded (`datasets/*`: figures, rc_runs and costly version 5, tiers 6); tier runs on a snapshot are
+  still uncounted (#276).
+- **Not mine, named:** two scratch worktrees from 14z-200 (`wt274`, `wt_bench` under its scratchpad) remain.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings
