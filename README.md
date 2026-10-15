@@ -2,7 +2,7 @@
 
 *"Worst of all, though, is that Vampire Savior never did get an all-in-one perfect competitive version that has all the characters together" -GuileWinQuote*
 
-A forever true statement. But the FGC loves what ifs and this project attempts to answer the question: "But if we had, how would it be then?"
+A forever true statement. But what ifs are tantalizing and this project attempts to answer the question: "But if we had, how would it be then?"
 
 ### Vampire Saved is Donovan, Phobos and Pyron, brought over from Vampire Savior 2 into the arcade Vampire Savior that competitive players use — with every original character left exactly as it was and everyone running the original engine.
 
