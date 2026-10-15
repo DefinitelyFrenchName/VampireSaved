@@ -138,10 +138,6 @@ every session's close, the slowest few only at a freeze or a release) with 254 p
 executed at the last close, 203 emulator and FPGA simulation checks, 194 scripted replays, 10
 hand-played recordings of reported problems, and 181 tracked tickets.
 
-**What all that green does not prove.** It does not prove that the new characters *feel* right —
-only players can judge that. The frame-by-frame guarantee covers the scripted replays, not every match
-anyone could play. And a few original sequences are allowed small, measured and frozen tolerances because 
-code added to reach the new characters costs the processor time (currently no change introduces a frame of lag in-fight).
 
 ## Licence and legal
 
