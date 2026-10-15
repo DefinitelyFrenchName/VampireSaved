@@ -37,8 +37,8 @@ every byte before it writes anything.
    (Make your life easier and play on MiSTer unless you *really* need emulation)
    Follow the documentation included in the zip file. 
    You'll need your own dumps, unmodified, with these exact names: `vsavj.zip` (Vampire
-   Savior, Japan 970519), `vsav.zip` (Europe 970519) and `vsav2.zip` (Vampire Savior 2, Japan 970913).
-   You also need Python 3.8 or newer — nothing else.
+   Savior, Japan 970519), `vsav.zip` (Europe 970519) and `vsav2.zip` (Vampire Savior 2, Japan 970913) and `qsound_hle.zip`.
+   You also need Python 3.8 or newer.
 
 ## What to expect
 
