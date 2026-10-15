@@ -18,9 +18,9 @@ A forever true statement. But the FGC loves what ifs and this project attempts t
 |                                         |                                                              |
 | --------------------------------------- | ------------------------------------------------------------ |
 | **Base game**                           | Vampire Savior, Japan, 1997-05-19                            |
-| **Roster**                              | The original Vampire Savior cast, plus Donovan, Phobos (Huitzil outside Japan) and Pyron from Vampire Savior 2. All characters run the Vampire Savior engine. |
-| **Original characters and game engine** | Both unchanged. In 2-player versus their game state is checked frame by frame against the unmodified game, and matches it within a few small, measured tolerances. |
-| **Plays on**                            | MiSTer, or a patched FBNeo or MAME (ready-made for Windows 10+ and Apple-silicon Macs on macOS 26+, or build it yourself on anything else) |
+| **Roster**                              | The original Vampire Savior cast, plus Donovan, Phobos and Pyron from Vampire Savior 2. All characters run the Vampire Savior engine. |
+| **Original characters and game engine** | Both unchanged. In 2-player versus their game state is checked frame by frame against the unmodified game, and matches it within a few small, measured tolerances (no frame of lag introduced, match is guaranteed at same speed with same RNG). |
+| **Plays on**                            | MiSTer (it can run a provided patched FBNeo or MAME but it's an involved process) |
 | **Current release**                     | `merged-m23` — the character-select screen shows **M23** in its bottom-right corner |
 | **Made for**                            | 2-player versus. Arcade mode can be played to the end but    |
 | **Tournaments**                         | **not** a tournament build. Tournaments run original releases; this is for casuals, labs and locals |
@@ -52,7 +52,7 @@ is. Each line points to where it is tracked or explained — follow the link for
 
 ### How the three new characters work (by design)
 
-- **Where they are:** a new row of three medallions below the character wheel.
+- **Where they are:** a new row of three medallions below the existing character wheel.
 - **Where their data comes from:** Vampire Savior 2 — their moves, damage and animation, including
   data that game ships but never reaches, such as their Dark Force activation invincibility.
 - **Which rules they follow:** Vampire Savior's. Internally each new character is loaded into the slot
@@ -61,11 +61,13 @@ is. Each line points to where it is tracked or explained — follow the link for
 - **Timing:** they run at Vampire Savior's game speeds. At factory settings NORMAL is the same speed as
   in Vampire Savior 2 and TURBO is one step slower. Compared at the same speed and with the same random
   draws, moves from Phobos, Donovan and Pyron match Vampire Savior 2 hit for hit and frame for frame. 
-- while the movelists have been thoroughly tested , there still is the possibility of gaps in reactions or interactions (e.g. some DF interactions, some reactions to 
+- while the VS2 characters' movelists have been thoroughly tested, as well as most moves known to alter their sprites (throws, midnight bliss...),
+  there still is the possibility of gaps in reactions or interactions (e.g. some DF interactions, some reactions to moves).
+  Strictly testing everything is impractical as it would take days (currently it already takes hours at release) but I'm aiming to as close to 100% as I can make it.
   
 ### Features and original behaviour you might take for bugs
 
-- **Oboro Bishamon** is selectable: put the cursor on Bishamon, hold Start and confirm. His long intro
+- **Oboro Bishamon** is selectable (but impractical) : put the cursor on Bishamon, hold Start and confirm. His long intro
   is kept on purpose to not alter original assets, so you only get control after the round begins.
 - **Dark Gallon and Shadow**, the original game's hidden characters, still work — and Shadow, who
   copies the opponent, copies the three new characters too ([select screen notes](docs/game/atlas/select_screen.md)).
