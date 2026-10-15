@@ -11,7 +11,7 @@ THE CLASS FILE (a session's own, under build/; tab-separated, `#` comments):
   path<TAB>PROMOTED<TAB>tools/the_tool.py          promoted into this tracked file
   path<TAB>CLOSE-CHECK<TAB>-                        a close-time check, run by the close's checks file
   path<TAB>NOT PROMOTED<TAB>the reason              kept as scratch, with its reason
-`path` is repo-relative. Every PROGRAM (.py .sh .lua .pl) under the scratch directories must have a row.
+`path` is repo-relative. Every PROGRAM (.py .sh .lua .pl .bat .ps1) under the scratch directories must have a row.
 
 THE VERDICT fails on any of:
   UNCLASSED   a scratch program with no row
@@ -28,7 +28,8 @@ Usage:
 """
 import os, subprocess, sys, tempfile
 
-PROG = (".py", ".sh", ".lua", ".pl")
+# .bat and .ps1 since the 14z-201 close (finding (t)): Windows scratch run on ERIS went uncounted
+PROG = (".py", ".sh", ".lua", ".pl", ".bat", ".ps1")
 
 
 def tracked(root):
@@ -139,12 +140,15 @@ def selftest():
             ("CLOSE-CHECK named by a tracked file", good, "tracked-ref", 1),
             ("NO REASON", good.replace("a one-off plot, quoted nowhere", ""), None, 1),
             ("STALE", good + "build/s/gone.py\tNOT PROMOTED\tdeleted since\n", None, 1),
+            ("UNCLASSED .bat", good, "bat-file", 1),
         ]
         for name, cls, checks_override, want in cases:
             w("build/classes.tsv", cls)
             if checks_override == "tracked-ref":
                 w("docs/doc.md", "see build/s/check.py\n")
                 sh("git", "add", "docs/doc.md")
+            elif checks_override == "bat-file":
+                w("build/s/run.bat", "@echo off\n")
             elif checks_override == "handoff-drop":
                 w("HANDOFF.md", "| nothing here |\n")
             elif checks_override:
@@ -155,6 +159,8 @@ def selftest():
             ok = ok and g
             print(("  ok: " if g else "  FAIL: ") + f"case {name}: {got} failure(s), expected " + ("none" if want == 0 else "at least one"))
             w("build/checks.tsv", "check\t0\tpython3 build/s/check.py\n")
+            if checks_override == "bat-file":
+                os.remove(os.path.join(root, "build/s/run.bat"))
             if checks_override == "tracked-ref":
                 w("docs/doc.md", "nothing scratch here\n")
                 sh("git", "add", "docs/doc.md")

@@ -1,0 +1,11 @@
+decision	recommendation
+subject	the 14z-201 close: the documentation packet over the final state (sections (1)-(12), findings (a)-(r), #282 closed done, #284's index row and requirements, the root README merged, NEXT_SESSION rewritten)
+session	14z-201
+model	rule-checker@163e4ce9cf7b
+claim	claim REFUSED — not a run of record: # run: full 2026-10-15T13:39:52Z dc1c0207 007ed40cc88b9509 | status: NOT A RUN OF RECORD — not as expected: scratch_census
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	12 flag(s): D-ABSOLUTE 5, D-FIGURE 7
+deliverables	STATE.md:42-141 docs/NEXT_SESSION.md

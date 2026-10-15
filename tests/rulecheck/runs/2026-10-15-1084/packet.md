@@ -1,0 +1,74 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: the 14z-201 close: the documentation packet over the final state (sections (1)-(12), findings (a)-(r), #282 closed done, #284's index row and requirements, the root README merged, NEXT_SESSION rewritten)
+Claim (the working agent's sentence): claim REFUSED — not a run of record: # run: full 2026-10-15T13:39:52Z dc1c0207 007ed40cc88b9509 | status: NOT A RUN OF RECORD — not as expected: scratch_census
+Artifacts (read every one, in full):
+  - build/agent201/close/findings_row.txt
+  - build/agent201/close/out/exits.tsv
+  - build/agent201/close/checks.tsv
+  - build/agent201/close/classes.tsv
+  - build/agent201/close/promises.tsv
+  - build/agent201/close/rulings_exempt.tsv
+  - build/agent201/close/premises.txt
+  - build/agent201/close/retraction_14z201.out
+  - tests/rulecheck/retractions/14z-201.tsv
+  - docs/project/findings/14z-201.tsv
+  - docs/NEXT_SESSION.md
+  - STATE.md.lines-42-141 (lines 42-141 of STATE.md)
+  - STATE.md.lines-148-149 (lines 148-149 of STATE.md)
+  - DECISIONS_HISTORY.md.lines-6982-7058 (lines 6982-7058 of DECISIONS_HISTORY.md)
+  - docs/project/gotchas.md.lines-7146-7182 (lines 7146-7182 of docs/project/gotchas.md)
+  - docs/project/gotchas.md.lines-7082-7102 (lines 7082-7102 of docs/project/gotchas.md)
+  - docs/project/gotchas.md.lines-3317-3330 (lines 3317-3330 of docs/project/gotchas.md)
+  - docs/platform/gotchas.md.lines-3312-3317 (lines 3312-3317 of docs/platform/gotchas.md)
+  - docs/project/tickets.tsv.lines-74-76 (lines 74-76 of docs/project/tickets.tsv)
+  - build/agent201/c282_D.md
+  - build/agent201/c282_close.md
+  - build/agent201/c284_report.md
+  - build/agent201/c284_qsound.md
+  - build/agent201/readme_scale_spec.txt
+  - build/agent201/readme_scale_figs.txt
+  - build/agent201/eris_readme/setup.log
+  - build/agent201/eris_readme/rec2.log
+  - build/agent201/eris_readme/ps.log
+  - build/agent201/eris_readme/rec3.log
+  - tests/rulecheck/ledger.tsv.lines-940-982 (lines 940-982 of tests/rulecheck/ledger.tsv)
+  - build/agent201/close/out/runs/anchors_selftest.out
+  - build/agent201/close/out/runs/census_selftest.out
+  - build/agent201/close/out/runs/claim_lint_selftest.out
+  - build/agent201/close/out/runs/close_findings.out
+  - build/agent201/close/out/runs/dup_decisions.out
+  - build/agent201/close/out/runs/dup_decisions_plant.out
+  - build/agent201/close/out/runs/dup_state_history.out
+  - build/agent201/close/out/runs/dup_state_history_plant.out
+  - build/agent201/close/out/runs/findings_anchors.out
+  - build/agent201/close/out/runs/findings_anchors_plant.out
+  - build/agent201/close/out/runs/findings_selftest.out
+  - build/agent201/close/out/runs/homes_selftest.out
+  - build/agent201/close/out/runs/homes_tracked.out
+  - build/agent201/close/out/runs/none_reasons.out
+  - build/agent201/close/out/runs/none_reasons_plant.out
+  - build/agent201/close/out/runs/none_reasons_selftest.out
+  - build/agent201/close/out/runs/open_tickets.out
+  - build/agent201/close/out/runs/open_tickets_plant.out
+  - build/agent201/close/out/runs/promise_check.out
+  - build/agent201/close/out/runs/promise_selftest.out
+  - build/agent201/close/out/runs/retraction_grep.out
+  - build/agent201/close/out/runs/retraction_selftest.out
+  - build/agent201/close/out/runs/row_copy.out
+  - build/agent201/close/out/runs/row_copy_plant.out
+  - build/agent201/close/out/runs/rulings_selftest.out
+  - build/agent201/close/out/runs/rulings_verbatim.out
+  - build/agent201/close/out/runs/scratch_census.out
+  - build/agent201/close/out/runs/session_metrics.out
+  - build/agent201/close/out/runs/shape.out
+  - build/agent201/close/out/runs/shape_selftest.out
+  - build/agent201/close/out/runs/standing_selftest.out
+  - build/agent201/close/out/runs/state_lists.out
+  - build/agent201/close/out/runs/submodule_pins.out
+  - build/agent201/close/out/runs/submodule_pins_plant.out
+  - build/agent201/close/out/runs/submodule_pins_selftest.out
+  - build/agent201/close/out/runs/superseded.out
+  - build/agent201/close/out/runs/superseded_selftest.out
+  - build/agent201/close/out/runs/tickets.out

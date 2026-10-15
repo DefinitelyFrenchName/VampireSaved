@@ -1,0 +1,13 @@
+  FLAG QUOTE: row copy /Users/koneko/Developer/Vampire_Saved/VampireSaved/build/agent201/close/findings_row.txt equals the newest group's row [11] THE FINDINGS TABLE [row sha
+  FLAG D-ABSOLUTE: > Rewritten at every session close ([VSP-17]).  [docs/NEXT_SESSION.md]
+  FLAG D-ABSOLUTE: A recommendation leans only on the maintainer's OWN words.  [docs/NEXT_SESSION.md]
+  FLAG D-ABSOLUTE: - **The root README** edited by the maintainer on GitHub (merged, never rebased); "The scale" re-measured.  [docs/NEXT_SESSION.md]
+  FLAG D-FIGURE: 1072  [STATE.md.lines-42-143 (lines 42-143 of STATE.md)]
+  FLAG D-FIGURE: 1076  [STATE.md.lines-42-143 (lines 42-143 of STATE.md)]
+  FLAG D-FIGURE: 1078  [STATE.md.lines-42-143 (lines 42-143 of STATE.md)]
+  FLAG D-FIGURE: 1080  [STATE.md.lines-42-143 (lines 42-143 of STATE.md)]
+  FLAG D-FIGURE: 91033  [STATE.md.lines-42-143 (lines 42-143 of STATE.md)]
+  FLAG D-FIGURE: 1811  [STATE.md.lines-42-143 (lines 42-143 of STATE.md)]
+  FLAG D-FIGURE: 216718  [STATE.md.lines-42-143 (lines 42-143 of STATE.md)]
+  FLAG D-ABSOLUTE: Only the paragraph's date and numbers changed; the maintainer's text is untouched.  [STATE.md.lines-42-143 (lines 42-143 of STATE.md)]
+packet_check: 12 flag(s): D-ABSOLUTE 4, D-FIGURE 7, QUOTE 1

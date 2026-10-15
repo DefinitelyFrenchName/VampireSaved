@@ -36,7 +36,7 @@ session key, the findings row's title and the run directory, and everything else
       the documentation packet's claim, ONE line on stdout, from the run of record DIR/out/exits.tsv and
       DIR/checks_decl.tsv: one sentence per check (its name, WHAT, exit, seconds, output path and the first output
       line its figure regex matches), then NOT TESTED: each check's NOT SEEN and the premises file's lines (the only
-      hand-typed part). Refuses unless `tools/close_checks.py status` would accept the run, and lints the result with
+      hand-typed part; a line starting `# `, or a lone `#`, is a comment, so a premise may open with `#N`). Refuses unless `tools/close_checks.py status` would accept the run, and lints the result with
       tools/claim_lint.py (exit 1 on an untied universal).
   --selftest [--perturb NAME]
       every subcommand on a synthetic tree with known answers. --perturb is the gate's must-fire hook
@@ -328,7 +328,9 @@ def claim(root, run, premises=None):
             gaps.append(f"`{n}`: {d[3]}")
     tail = "NOT TESTED by these checks, and so what this packet asks of its readers: " + "; ".join(gaps) + "."
     if premises:
-        lines = [l.strip() for l in open(premises, encoding="utf-8") if l.strip() and not l.startswith("#")]
+        # a comment is `#` then a space or nothing: a premise may open with a ticket number (`#282 closed ...`), which the
+        # earlier `startswith("#")` dropped without a word (14z-201 close, finding (s))
+        lines = [l.strip() for l in open(premises, encoding="utf-8") if l.strip() and not re.match(r"#(\s|$)", l)]
         if lines:
             tail += " This close's own premises, NOT TESTED: " + "; ".join(lines) + "."
     # #270 (C2, ruled 2026-10-12, 14z-199): the claim says what the deterministic checks cover and what is left to the
@@ -432,10 +434,11 @@ def selftest():
         w(run + "/checks_decl.tsv", "name\tsource\twhat\tnot_seen\tfigure\nnr\tstanding\tevery row is seen\twhether all rows are true\t^every\n"
           "nr_plant\tstanding\tthe plant fails\t-\t-\n")
         quiet(close_checks.run, os.path.join(d, run, "checks.tsv"), os.path.join(d, run, "out"), [], d)
-        w("prem.txt", "# premises\nthe tier ran on HEAD only\n")
+        w("prem.txt", "# premises\nthe tier ran on HEAD only\n#\n#282 stays a premise\n")
         r, o = quiet(claim, d, run, os.path.join(d, "prem.txt"))
         say(r == 0 and "`nr`: every row is seen" in o and 'output: "every row x"' in o and "NOT TESTED" in o
-            and "the tier ran on HEAD only" in o and o.count("\n") == 1, "claim: one line, a sentence per check with its figure, NOT TESTED from NOT SEEN and the premises")
+            and "the tier ran on HEAD only" in o and "#282 stays a premise" in o and "# premises" not in o
+            and o.count("\n") == 1, "claim: one line, a sentence per check with its figure, NOT TESTED from NOT SEEN and the premises (a `#N` premise kept, a `# ` comment dropped)")
         say(r == 0 and o.startswith("SCOPE (#270): the deterministic checks below cover what each states")
             and "what this packet asks of its readers: `nr`: whether all rows are true" in o,
             "claim: opens with its scope (#270) — what the checks cover, what the readers are asked, how a presentation finding is re-checked")

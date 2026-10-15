@@ -1,0 +1,6 @@
+# tests/rulecheck/retractions/14z-201.tsv — the wordings retracted or corrected in 14z-201, and reach controls that must be found live; columns pattern, source, class (retracted | gone | reach:N)
+Each item's design is put to the maintainer before it changes	14z-201 (44bf30af, finding (c)): the #282 order ruling's So line carried a sentence of the session's own the maintainer had not said; quoted only in its gotcha in docs/project/gotchas.md	retracted
+D's shape is the maintainer's to rule, after a probe	control: the corrected So line, live in DECISIONS_HISTORY.md's #282 order ruling	reach:1
+outside build/agent*/close, found by	14z-201 (7a3ac0dc, finding (k)): finding (i) named a build directory in its text; reworded	gone
+outside the default one, found by the driver	control: the reworded finding (i), live in docs/project/findings/14z-201.tsv	reach:1
+which is what the text tells players to create	14z-201 (finding (q)): the session's claim about the root README's text, corrected by the maintainer; quoted only in its gotcha in docs/project/gotchas.md	retracted

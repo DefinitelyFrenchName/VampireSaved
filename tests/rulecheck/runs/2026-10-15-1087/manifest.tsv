@@ -1,0 +1,70 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent201/close/findings_row.txt	85e70caa9b4e96eb5d152dbf8865b452fff1ccde
+build/agent201/close/out/exits.tsv	3d0023b2260e931e1da3084d066abcefe5fe9260
+build/agent201/close/checks.tsv	8df3f737998925a8cf5cacaaf1eb6aad586bcf65
+build/agent201/close/classes.tsv	38ea8028875aa5ea1796cfdf437cc51df65c0c49
+build/agent201/close/promises.tsv	74c6ed98f84c7d95b8e3cce654c13b559dde4a08
+build/agent201/close/rulings_exempt.tsv	274ee49a360983d54269c68853d197af955e8048
+build/agent201/close/premises.txt	52da056492d3f2cbdf915fba7410ae37e37175ed
+build/agent201/close/retraction_14z201.out	58ca3e1d5507c1429f0b3cda2ddaaa8dcb809f51
+tests/rulecheck/retractions/14z-201.tsv	88f87f0dad3637229f8db1b57a5aa46d1881aa63
+docs/project/findings/14z-201.tsv	3985e4d99ee1bf1de16b774f7a2309c9efccd3e6
+docs/NEXT_SESSION.md	f0b5b74070557797351f1ca4e62f8289e78317f3
+STATE.md.lines-42-143 (lines 42-143 of STATE.md)	7c054d67e7ac89069286f6ba3d9fee6d01416880
+STATE.md.lines-150-151 (lines 150-151 of STATE.md)	5042a4186243b1a75faaf518f6e4a9520c9c29b9
+DECISIONS_HISTORY.md.lines-6982-7058 (lines 6982-7058 of DECISIONS_HISTORY.md)	66757e6ff897d80770f3c0740f159dc6d77e3d76
+docs/project/gotchas.md.lines-7146-7182 (lines 7146-7182 of docs/project/gotchas.md)	a9e6d4958699cc44a5f0be48561507eb094bffd3
+docs/project/gotchas.md.lines-7082-7102 (lines 7082-7102 of docs/project/gotchas.md)	1a202fdc1c3d1276c81f2db8255f887a914ba642
+docs/project/gotchas.md.lines-3317-3330 (lines 3317-3330 of docs/project/gotchas.md)	c9c20032c98dae18afca232c9f149ba8d22c6a2e
+docs/platform/gotchas.md.lines-3312-3317 (lines 3312-3317 of docs/platform/gotchas.md)	0e3ea11762f10558eeabdd2c3d3afc1156625784
+docs/project/tickets.tsv.lines-74-76 (lines 74-76 of docs/project/tickets.tsv)	d73ace18d7d62eabf9ff5686a2d4bfb0dd28ec05
+build/agent201/c282_D.md	d48af08221d4f37ad03b9e557a8279b852ed5155
+build/agent201/c282_close.md	0f2e14635a6a32ae40347ed1ac87bbfe5b76b0af
+build/agent201/c284_report.md	87a6284bbba6972aab534d81aee22ca35c34ffaf
+build/agent201/c284_qsound.md	803ca6580a0c64de7e3ac230690101c3dc22b003
+build/agent201/readme_scale_spec.txt	980e561294f903261848346581975d3e54319d15
+build/agent201/readme_scale_figs.txt	a8e14060a3678a467ecde989d0986789948a0def
+README.md.lines-113-119 (lines 113-119 of README.md)	5c1c13aa976302b1b2d2f2e2874ae12f612630c4
+build/agent201/eris_readme/setup.log	586f0c13ef5a346c655100866030a81587b856fd
+build/agent201/eris_readme/rec2.log	d899807dee1ddaa64629ef0378f90a89b5fc2ba8
+build/agent201/eris_readme/ps.log	ea74a5557f46dba539ce2ad0eccf4a5722ead5de
+build/agent201/eris_readme/rec3.log	d790c01e3875920d10dd266fe4b42b16b0d8e828
+tests/rulecheck/ledger.tsv.lines-940-982 (lines 940-982 of tests/rulecheck/ledger.tsv)	806bcdb701bcaeb7929f46063d4a593735206294
+build/agent201/close/out/runs/anchors_selftest.out	c507a5e97a857cfce0e8f5d93ea7f3e66c706e71
+build/agent201/close/out/runs/census_selftest.out	009348f58e29edf51a76220602648f088da05f44
+build/agent201/close/out/runs/claim_lint_selftest.out	8e043d70fface9ba2a123c34fab881c495559429
+build/agent201/close/out/runs/close_findings.out	397dcd278b0cbd4e4c1ed13a0927ecb85a2515dc
+build/agent201/close/out/runs/dup_decisions.out	eb3ed47e7ccea702c1ba3a679780b59525c72eb4
+build/agent201/close/out/runs/dup_decisions_plant.out	9dca50ea867867b773fb621a5189e58c3f8a683c
+build/agent201/close/out/runs/dup_state_history.out	56be2c6951ece6243e7326fb3ca79d18a5eea886
+build/agent201/close/out/runs/dup_state_history_plant.out	b5ba39cd57a5c1a519802836ee376c9179b2e875
+build/agent201/close/out/runs/findings_anchors.out	97b349ccd598205bdf066d70e1fa5ed06114ff6a
+build/agent201/close/out/runs/findings_anchors_plant.out	88bbb50e82fbdcca4063fcd971a18c1f389b88fb
+build/agent201/close/out/runs/findings_selftest.out	1a6e2233fcbd559188b75487172c4bfd1448f7ab
+build/agent201/close/out/runs/homes_selftest.out	80ef48f70a88ae5d5578a775cdc7f5244a80717f
+build/agent201/close/out/runs/homes_tracked.out	c1e49cf09c243e96955a3495a75224982a6bd5ce
+build/agent201/close/out/runs/none_reasons.out	6f4d54ecda792459fe2826192122f20118143df2
+build/agent201/close/out/runs/none_reasons_plant.out	935fbdd7fd065a7164f9911272305d76c759365c
+build/agent201/close/out/runs/none_reasons_selftest.out	856233dffc4ac231dd63e2955987681a22064acc
+build/agent201/close/out/runs/open_tickets.out	a8f45adc08536721da76365cc08cda92dcff54c3
+build/agent201/close/out/runs/open_tickets_plant.out	9e0df2a96564cabfc5b043b7e8bc68a3d64e0286
+build/agent201/close/out/runs/promise_check.out	df23647bf26ba6c167f70801afe53d0670565b4a
+build/agent201/close/out/runs/promise_selftest.out	6c30dd58cf24ec93c94f8e4141d0b21e04a6b556
+build/agent201/close/out/runs/retraction_grep.out	58ca3e1d5507c1429f0b3cda2ddaaa8dcb809f51
+build/agent201/close/out/runs/retraction_selftest.out	12b5583ab0e4a71a9e73aaacc3ef06300e86258c
+build/agent201/close/out/runs/row_copy.out	3531d2bebd65ffe76c6c985a90eb8c3188339aa1
+build/agent201/close/out/runs/row_copy_plant.out	70fd544f91525ad4b4131c2da2c572e672080afc
+build/agent201/close/out/runs/rulings_selftest.out	b58e4344466e154c2a4fa056d1a324fb08214b77
+build/agent201/close/out/runs/rulings_verbatim.out	369e5736f449d5f915255a4bfa3271eca9560409
+build/agent201/close/out/runs/scratch_census.out	5517a494b19c2718cba767446fb09e419def5f18
+build/agent201/close/out/runs/session_metrics.out	51359c07e9081d03e218f8cefb1d80b8b3863e08
+build/agent201/close/out/runs/shape.out	ce90b9f1dc4479ea8a79ab3f8d6e4f2137145304
+build/agent201/close/out/runs/shape_selftest.out	a122ae8197de8a15bea4c80a3de7ea7788aacfc4
+build/agent201/close/out/runs/standing_selftest.out	c524a6b9d4d09a4e9037bbc31ac5b35bab7821a7
+build/agent201/close/out/runs/state_lists.out	d2ed88eae90c8e4f8ce1b83c358cf307b4a61a22
+build/agent201/close/out/runs/submodule_pins.out	ddd48d2c384d62133d4d3e0b2c27114205bd06b8
+build/agent201/close/out/runs/submodule_pins_plant.out	592260364a89c60a8938ea537e32a2c97fedbf49
+build/agent201/close/out/runs/submodule_pins_selftest.out	985ecc6d540c2e63428f576f2b341c07c12efb81
+build/agent201/close/out/runs/superseded.out	8bd1ce9faf362f7ec8d2f7bc3b1a2548977ec691
+build/agent201/close/out/runs/superseded_selftest.out	788cc539de952d645a86a5077ca6437654a6de80
+build/agent201/close/out/runs/tickets.out	b4bc611067216a6ad26950069dd58ed1b5ddaff9

@@ -7092,6 +7092,10 @@ the tally had been read by another command (the close's procedure check, rule-ch
 either read its output when it finishes or say in the next message that it is superseded and by what; and give a
 search over `build/` (hundreds of MB of scratch) a narrower root or a `timeout` before it is started.
 
+14z-201: a recursive `grep` for the README's build command went to the background the same way and was stopped
+(TaskStop) before its result was used, replaced by `git grep`; a 600 s ERIS run (`bpe9gm39u`) went too, read when it
+ended. A recursive grep from the repo root walks `build/`: start from `git grep`.
+
 ## A TRACE SCORES ONLY THE GATES IT COULD RUN — a SKIP or an early exit under the trace hides the reads a narrowing drops (paid: 14z-200, #274)
 
 `tools/trace_static_reads.py` scores a predictor against what each gate OPENED under strace. A gate that SKIPs
@@ -7167,3 +7171,12 @@ local") had vanished. A paraphrase reads as faithful to the one who wrote it. Re
 sentences, a second reader found 3 wording changes, all restored. **The rule:** a short form of a rule quotes the
 original's clauses and drops whole clauses only; then an independent reader compares them clause by clause before
 anyone is asked to approve it.
+
+## WHAT A TEXT TELLS ITS READER IS READ, NOT INFERRED FROM THE COMMAND BESIDE IT (paid: 14z-201)
+
+Recommending a fix for the root README's recording command, the session told the maintainer to "go back to
+`./nvram_fresh` and `./recordings`, which is what the text tells players to create". The text said only "Create two
+empty folders, `nvram_fresh` and `recordings`" — never where; the `./` was the command's, and the location it implied
+(the folder the command runs from) was written nowhere. The maintainer caught it. **The rule:** a statement of what a
+document says is a quote from it, read at the moment of saying it; what its command implies is a separate claim and is
+named as one.

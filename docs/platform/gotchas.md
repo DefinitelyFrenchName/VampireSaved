@@ -3308,3 +3308,10 @@ box unsets `DISPLAY WAYLAND_DISPLAY PULSE_SERVER XDG_RUNTIME_DIR` and exports `S
 SDL_AUDIODRIVER=dummy` after sourcing the profile (`docs/project/gotchas.md` "A REMOTE BATTERY STARTED FROM A
 NON-LOGIN SHELL"), and polls its first prereq rows early. A gate many times slower than its own history is the
 environment's until shown otherwise.
+
+## MAME `-playback` DOES NOT EXIT AT THE END OF THE RECORDING — `-exit_after_playback` does (paid: 14z-201)
+
+A scratch playback on ERIS (`cps2.exe vsavjw … -playback my_session.inp -video none -sound none -nothrottle`) kept
+running after its 15-second recording ended: MAME hands control back to live input when the `.inp` runs out, and with
+no `-seconds_to_run` nothing stops it. The run held the SSH session until its 600 s bound and was killed with
+`taskkill`. `tools/run_inp_guarded.sh` passes `-exit_after_playback` for this reason; every scripted playback does.
