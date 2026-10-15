@@ -41,10 +41,6 @@ every byte before it writes anything.
    Savior, Japan 970519), `vsav.zip` (Europe 970519) and `vsav2.zip` (Vampire Savior 2, Japan 970913).
    You also need Python 3.8 or newer — nothing else.
 
-**If it does not start:** "unknown system" means the emulator is not the patched one. A game frozen on
-the QSound/CAPCOM screen means the set was renamed to force it into a stock emulator — renaming is
-never the fix.
-
 ## What to expect
 
 Everything in this build that differs from what you might expect is listed below, sorted by what it
@@ -70,8 +66,8 @@ is. Each line points to where it is tracked or explained — follow the link for
 - **Oboro Bishamon** is selectable (but impractical) : put the cursor on Bishamon, hold Start and confirm. His long intro
   is kept on purpose to not alter original assets, so you only get control after the round begins.
 - **Dark Gallon and Shadow**, the original game's hidden characters, still work — and Shadow, who
-  copies the opponent, copies the three new characters too ([select screen notes](docs/game/atlas/select_screen.md)).
-- **Random select** can land on the three new characters ([port registry](docs/project/patch_index.md)).
+  copies the opponent, copies the three new characters too.
+- **Random select** can land on the three new characters.
 - **The one-frame white flash at the first knockdown** is the original game's (if anyone can tell me why this exists...)
 - **Pyron's Cosmo satellites do not collide with other projectiles** — the same as in Vampire Savior 2.
 
@@ -79,11 +75,8 @@ is. Each line points to where it is tracked or explained — follow the link for
 
 In versus:
 
-- Donovan's **Press of Death** sometimes shows the wrong colours ([#112](https://github.com/DefinitelyFrenchName/VampireSaved/issues/112); a potential cleaner fix is tracked
-  as [#127](https://github.com/DefinitelyFrenchName/VampireSaved/issues/127)).
-- On the select screen, **player 2's Donovan has an orange sword** — an accepted trade-off
-  ([port registry](docs/project/patch_index.md)).
-- The **extended character wheel** works but its look is not polished ([#126](https://github.com/DefinitelyFrenchName/VampireSaved/issues/126)).
+- Donovan's **Press of Death** sometimes shows the wrong colours.
+- On the select screen, **player 2's Donovan has an orange sword** — an accepted trade-off.
 - The three new characters **use their shell's win quotes**.
 
 In arcade mode (1 player) — never this project's scope; it plays to the end without crashing, and
