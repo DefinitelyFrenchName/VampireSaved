@@ -115,6 +115,9 @@ paragraph"*), "The scale" was re-measured by `measurer`s on the 14z-183b definit
 (all seven 2026-09-26 figures reproduced) and read at `edd1b323`: 461 test scripts, 225 emulator-free checks (133
 portable + 92 static), 394 controls executed at the 14z-200 close, 231 emulator/FPGA checks, 233 replays, 10
 recordings, 283 tickets. Only the paragraph's date and numbers changed; the maintainer's text is untouched.
+The maintainer then corrected the README on GitHub and trimmed the paragraph (no tickets or cadence clause); the
+merge conflicted on it and kept their version whole (`9e65edea`). It reads 203 emulator/FPGA checks where the
+measurement at `edd1b323` gave 231, raised with them.
 
 ### (10) THE FINDINGS TABLE
 `docs/project/findings/14z-201.tsv` — every finding, its live home, the test that reproduces it (checklist step 1).
