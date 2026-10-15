@@ -4,7 +4,7 @@
 
 A forever true statement. But the FGC loves what ifs and this project attempts to answer the question: "But if we had, how would it be then?"
 
-### Vampire Saved is Donovan, Phobos and Pyron, brought over from Vampire Savior 2 into the arcade Vampire Savior that competitive players use — with every original character left exactly as it was and everyone running the originla Vampire Savior engine.
+### Vampire Saved is Donovan, Phobos and Pyron, brought over from Vampire Savior 2 into the arcade Vampire Savior that competitive players use — with every original character left exactly as it was and everyone running the original engine.
 
 ### This project stands on the shoulders of the Vampire Savior community and of the CPS-2 wizards who came before it. Support them, and support MAME, FBNeo and Jotego — without Jotego's CPS-2 core, the MiSTer version of the larger board this needs would have been close to impossible.
 
@@ -18,12 +18,12 @@ A forever true statement. But the FGC loves what ifs and this project attempts t
 |                                         |                                                              |
 | --------------------------------------- | ------------------------------------------------------------ |
 | **Base game**                           | Vampire Savior, Japan, 1997-05-19                            |
-| **Roster**                              | The original Vampire Savior cast, plus Donovan, Phobos (Huitzil outside Japan) and Pyron from Vampire Savior 2. All characters run the Vampire Savior engine. |
-| **Original characters and game engine** | Both unchanged. In 2-player versus their game state is checked frame by frame against the unmodified game, and matches it within a few small, measured tolerances. |
-| **Plays on**                            | MiSTer, or a patched FBNeo or MAME (ready-made for Windows 10+ and Apple-silicon Macs on macOS 26+, or build it yourself on anything else) |
+| **Roster**                              | The original Vampire Savior cast, plus Donovan, Phobos and Pyron from Vampire Savior 2. All characters run the Vampire Savior engine. |
+| **Original characters and game engine** | Both unchanged. In 2-player versus their game state is checked frame by frame against the unmodified game, and matches it within a few small, measured tolerances (no frame of lag introduced, match is guaranteed at same speed with same RNG). |
+| **Plays on**                            | MiSTer (it can run a provided patched FBNeo or MAME but it's an involved process) |
 | **Current release**                     | `merged-m23` — the character-select screen shows **M23** in its bottom-right corner |
 | **Made for**                            | 2-player versus. Arcade mode can be played to the end but    |
-| **Tournaments**                         | **not** a tournament build. Tournaments run original releases; this is for casuals, labs and locals |
+| **Tournaments**                         | **not** a tournament build. Tournaments run the community's choice which in this case is the original CPS-2 release. Even at perfect accuracy, this is for casuals and locals|
 
 **Why the emulator has to be patched:** the 18 characters do not fit in a stock CPS-2. The project
 defines a larger CPS-2 (more room for program, graphics and sound) and adds it to FBNeo,
@@ -34,33 +34,12 @@ MAME and a MiSTer core. Stock emulators cannot run the game.
 No ROM data is distributed. You rebuild the game from your own dumps with a small script that checks
 every byte before it writes anything.
 
-1. **Download ONE package** from the [release page](https://github.com/DefinitelyFrenchName/VampireSaved/releases/tag/freeze/merged-m19). 
-   Each one is complete.
-     
-2. **Gather your dumps** in one folder, unmodified, with these exact names: `vsavj.zip` (Vampire
+**Download ONE package** from the [release page](https://github.com/DefinitelyFrenchName/VampireSaved/releases/tag/freeze/merged-m19). 
+   (Make your life easier and play on MiSTer unless you *really* need emulation)
+   Follow the documentation included in the zip file. 
+   You'll need you own dumps, unmodified, with these exact names: `vsavj.zip` (Vampire
    Savior, Japan 970519), `vsav.zip` (Europe 970519) and `vsav2.zip` (Vampire Savior 2, Japan 970913).
    You also need Python 3.8 or newer — nothing else.
-
-3. **Build the game:**
-
-       python3 apply_release.py --romdir /path/to/your/dumps --out ./rompath
-
-   This writes `rompath/vsavjw.zip`. A wrong or modified dump is refused by name.
-
-4. **Play:**
-
-   - **FBNeo:** put `vsavjw.zip` and your untouched `vsav.zip` in the `roms/` folder next to the
-     emulator, and start `vsavjw`.
-   - **MAME:** point the rom path at both the same way, and start `vsavjw`.
-   - **MiSTer:** copy the core and the two `.mra` files as the package's README says, put
-     `vsavjw.zip`, `vsav.zip`, `vsavj.zip` and `qsound.zip` in `games/mame/`, and launch
-     *Vampire Saved - CPS-2 WIDE*.
-
-   The boot screen reads **VAMPIRE SAVED**.
-
-**If it does not start:** "unknown system" means the emulator is not the patched one. A game frozen on
-the QSound/CAPCOM screen means the set was renamed to force it into a stock emulator — renaming is
-never the fix. Netplay has never been tested but in theory is possible however every player would need the same emulator build and the same romset.
 
 ## What to expect
 
@@ -69,60 +48,43 @@ is. Each line points to where it is tracked or explained — follow the link for
 
 ### How the three new characters work (by design)
 
-- **Where they are:** a new row of three medallions below the character wheel.
 - **Where their data comes from:** Vampire Savior 2 — their moves, damage and animation, including
   data that game ships but never reaches, such as their Dark Force activation invincibility.
 - **Which rules they follow:** Vampire Savior's. Internally each new character is loaded into the slot
   of an existing one — its *shell* — so everything that is not specific to the character runs on
-  Vampire Savior's engine: Dark Force costs one bar and brings Vampire Savior's background change.
+  Vampire Savior's engine.
+- **Dark Force**: : Dark Force is Savior's version: costs one bar and brings Vampire Savior's background change.
+  The invunerability for VS2 characters is lifted from their unreacheable VS2 code and the behavior is their personal DF from VS2.
 - **Timing:** they run at Vampire Savior's game speeds. At factory settings NORMAL is the same speed as
-  in Vampire Savior 2 and TURBO is one step slower, and Vampire Savior 2 starts player 1's speed menu on
-  TURBO where Vampire Savior starts it on NORMAL. Compared at the same speed and with the same random
-  draws, Donovan's Lightning Sword matches Vampire Savior 2 hit for hit and frame for frame
-  ([#135](https://github.com/DefinitelyFrenchName/VampireSaved/issues/135)); the rest of their moves are
-  being compared in [#136](https://github.com/DefinitelyFrenchName/VampireSaved/issues/136).
-
+  in Vampire Savior 2 and TURBO is one step slower. Compared at the same speed and with the same random
+  draws, moves from Phobos, Donovan and Pyron match Vampire Savior 2 hit for hit and frame for frame. 
+- **Potential gaps:** While the VS2 characters' movelists have been thoroughly tested, as well as most moves known to alter their sprites (throws, midnight bliss...),
+  there still is the possibility of gaps in reactions or interactions (e.g. some DF interactions, some reactions to moves). Please open an issue if you find something I missed.
+  
 ### Features and original behaviour you might take for bugs
 
-- **Oboro Bishamon** is selectable: put the cursor on Bishamon, hold Start and confirm. His long intro
-  is kept on purpose, so you get control after the round begins ([standing rulings](STATE.md#standing-rulings)).
+- **Oboro Bishamon** is selectable (but impractical) : put the cursor on Bishamon, hold Start and confirm. His long intro
+  is kept on purpose to not alter original assets, so you only get control after the round begins.
 - **Dark Gallon and Shadow**, the original game's hidden characters, still work — and Shadow, who
-  copies the opponent, copies the three new characters too ([select screen notes](docs/game/atlas/select_screen.md)).
-- **Random select** can land on the three new characters ([port registry](docs/project/patch_index.md)).
-- **The one-frame white flash at the first knockdown** is the original game's, not this project's
-  ([#113](https://github.com/DefinitelyFrenchName/VampireSaved/issues/113)).
-- **Pyron's Cosmo satellites do not collide with other projectiles** — the same as in Vampire Savior 2
-  ([#108](https://github.com/DefinitelyFrenchName/VampireSaved/issues/108)).
+  copies the opponent, copies the three new characters too.
+- **Random select** can land on the three new characters.
+- **The one-frame white flash at the first knockdown** is the original game's (if anyone can tell me why this exists...)
 
 ### Known limits and cosmetic issues
 
 In versus:
 
-- Donovan's **Press of Death** sometimes shows the wrong colours ([#112](https://github.com/DefinitelyFrenchName/VampireSaved/issues/112); a potential cleaner fix is tracked
-  as [#127](https://github.com/DefinitelyFrenchName/VampireSaved/issues/127)).
-- On the select screen, **player 2's Donovan has an orange sword** — an accepted trade-off
-  ([port registry](docs/project/patch_index.md)).
-- The **extended character wheel** works but its look is not polished ([#126](https://github.com/DefinitelyFrenchName/VampireSaved/issues/126)).
-- The three new characters **use their shell's win quotes** ([#123](https://github.com/DefinitelyFrenchName/VampireSaved/issues/123)).
+- Donovan's **Press of Death** sometimes shows the wrong colours.
+- On the select screen, **player 2's Donovan has an orange sword** — an accepted trade-off.
+- The three new characters **use their shell's win quotes**.
 
 In arcade mode (1 player) — never this project's scope; it plays to the end without crashing, and
-that is all it promises:
-
-- The **stage names and pictures** on the arcade map are the shell characters' ([#125](https://github.com/DefinitelyFrenchName/VampireSaved/issues/125)).
-- The **opponent roulette** shows the shell instead of the new character ([#124](https://github.com/DefinitelyFrenchName/VampireSaved/issues/124)).
-- The **next-stage screen** shows Donovan as Victor, with a blank portrait ([#100](https://github.com/DefinitelyFrenchName/VampireSaved/issues/100)).
-- The three new characters' **CPU AI** feels weaker than the rest of the cast ([#129](https://github.com/DefinitelyFrenchName/VampireSaved/issues/129)).
-- Playing an original character, **you never face one of the three** — not built, by choice
-  ([standing rulings](STATE.md#standing-rulings)).
+that is all it promises.
 
 Not included, or not planned:
 
-- **Marionette** is a Vampire Savior 2 character and is not brought over ([#128](https://github.com/DefinitelyFrenchName/VampireSaved/issues/128)).
-- **Not planned:** real CPS-2 hardware (the board's limits would make that a hardware project),
-  balance changes, new moves, characters beyond the official 18, or a training mode.
-
-The full, current list of tracked bugs, cosmetic items and planned work is
-[`docs/project/tickets.md`](docs/project/tickets.md).
+- **Marionette** is not brought over.
+  
 
 ## Report a problem
 
@@ -143,6 +105,8 @@ Vampire Saved is actually an experiment. It started as a work-adjacent project a
 engineering**: can AI agents, run the way you would run evolutive maintenance on a large system nobody can read
 in full, deliver a result that is *demonstrably* correct?
 
+The focus is purely accuracy of the end product and reliability of the harness..
+
 **Who did what.** All of the code was written by AI — Anthropic's Claude, through Claude Code.
 All of the decisions, the design of the test harness, part of the memory analysis and a very large
 amount of hands-on testing were done by a human brain. Work was accepted only on evidence, never on the agent's word.
@@ -156,7 +120,7 @@ behaviour is a failed change, not a trade-off.
 
 - Scripted input replays are played on the original game and on the modified one, and the game's
   memory is compared every frame (in MAME). FBNeo cross-checks on samples, and the MiSTer core is
-  tested in simulation and on real hardware.
+  tested in simulation and on a real MiSTer.
 - The new characters have no "original" to compare against in Vampire Savior, so they are compared
   with themselves in Vampire Savior 2, and between the two emulators.
 - Every check carries a deliberate defect it must catch. A check that can no longer fail turns the run
@@ -168,37 +132,12 @@ behaviour is a failed change, not a trade-off.
   catch a deliberately flawed case planted beside the real one. Each objection it raises is answered in
   writing before the step goes ahead. At the end of every working session, the same kind of checker reads
   the session's transcript to confirm the agent did what it said and ran what it claimed.
-- Freeze and release test runs play out on a snapshot of a named commit, so nothing changed in the
-  working copy while they run can reach them, and each run records exactly what it tested.
 
-**The scale, on 2026-09-26** (re-derive these rather than trusting this page): 1,731 commits over
-nine weeks, more than 180 working sessions, 392 test scripts, 184 checks that need no emulator (run at
+**The scale, on 2026-09-26** (re-derive these rather than trusting this page): 392 test scripts, 184 checks that need no emulator (run at
 every session's close, the slowest few only at a freeze or a release) with 254 planted-defect controls
 executed at the last close, 203 emulator and FPGA simulation checks, 194 scripted replays, 10
 hand-played recordings of reported problems, and 181 tracked tickets.
 
-**What all that green does not prove.** It does not prove that the new characters *feel* right —
-only players can judge that. The frame-by-frame guarantee covers the scripted replays, not every match
-anyone could play. And a few original sequences are allowed small, measured and frozen tolerances,
-because code added to reach the new characters costs the processor time. A move-by-move comparison of the three
-new characters with Vampire Savior 2 has been done ([#136](https://github.com/DefinitelyFrenchName/VampireSaved/issues/136)),
-and the differences it found are tracked as their own tickets.
-
-**Lineage.** The working discipline began in a Super Nintendo romhack project,
-[Sailor Moon S — FrenchName edition](https://github.com/DefinitelyFrenchName/SMS-FrenchName-edition),
-and was scaled up here. The test harness was then extracted into its own project,
-[BBH](https://github.com/DefinitelyFrenchName/BBH-frame-based), for anything that can be driven frame by frame, and generalised again as [BBX](https://github.com/DefinitelyFrenchName/BBX), for any work whose
-result has to be proven to someone who cannot read how it was made.
-
-## Find your way around
-
-| file                                                 | what it is                                                   |
-| ---------------------------------------------------- | ------------------------------------------------------------ |
-| [`docs/README.md`](docs/README.md)                   | the map of the documentation, in three halves: the game itself, the CPS-2 board and its emulators, and this port |
-| [`HANDOFF.md`](HANDOFF.md)                           | how to build everything from source, run the tests and play a development build |
-| [`CLAUDE.md`](CLAUDE.md)                             | the rules every change follows, whoever writes it            |
-| [`STATE.md`](STATE.md)                               | what the latest working sessions did, and the rulings in force |
-| [`docs/project/tickets.md`](docs/project/tickets.md) | every known bug, cosmetic item and planned evolution, each with its GitHub issue |
 
 ## Licence and legal
 
