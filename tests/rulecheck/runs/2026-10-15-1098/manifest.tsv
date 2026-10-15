@@ -1,0 +1,7 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent202/rc1/rec_287_288.md	155699a32b091a83e9cd114f8cbfcb2a56c003c4
+DECISIONS_HISTORY.md.lines-7074-7089 (lines 7074-7089 of DECISIONS_HISTORY.md)	2f068f46b089e13d43c664abf55fda8439974e74
+docs/project/session_close.md.lines-44-56 (lines 44-56 of docs/project/session_close.md)	f4f3c3002a061a16d01b8b385652651e344ed984
+docs/project/rule_checker.md.lines-286-297 (lines 286-297 of docs/project/rule_checker.md)	90341a8b62517a44a2fd75e72fa8ac661dfdf61c
+build/agent202/rc1/ledger_kinds.txt	05fb607e9846b396aaa574fcd043aa07d787603b
+tools/agent/close_loop_cost.py.lines-1-30 (lines 1-30 of tools/agent/close_loop_cost.py)	c21941612bce324d64b7c1c5bfe191aac48858dd

@@ -1,0 +1,16 @@
+  FLAG ATTRIB: The design for #287 and the measurement plan for #288 in rec_287_288.md follow from the maintainer's own words in the 14z-202 ruling, describe today's proced...
+  FLAG D-ABSOLUTE: - on the close's third layer: *"yes, although it may need to be fully cut down...  [build/agent202/rc1/rec_287_288.md]
+  FLAG D-ABSOLUTE: ## #287 — the procedure check right after each piece of work  [build/agent202/rc1/rec_287_288.md]
+  FLAG D-ABSOLUTE: Right after it, before the next piece starts, the working agent extracts the transcript span since the previous procedure run, prepares a procedure packet ov...  [build/agent202/rc1/rec_287_288.md]
+  FLAG D-ABSOLUTE: **The close's procedure step becomes coverage only:** every commit in the pushed range is named by a passed or resolved per-piece run.  [build/agent202/rc1/rec_287_288.md]
+  FLAG D-ABSOLUTE: No whole-sitting run.  [build/agent202/rc1/rec_287_288.md]
+  FLAG D-ABSOLUTE: - whether a missing per-piece run is held by discipline until the push (the hook, as today), or also refused at the next commit (a pre-commit hook: earliest,...  [build/agent202/rc1/rec_287_288.md]
+  FLAG D-ABSOLUTE: ## #288 — the measurement before any cut  [build/agent202/rc1/rec_287_288.md]
+  FLAG D-ABSOLUTE: Each VIOLATED run carries a written resolution per violated question;  [build/agent202/rc1/rec_287_288.md]
+  FLAG D-ABSOLUTE: **The plan (nothing is cut by it; the cuts are the maintainer's, on its table):**  [build/agent202/rc1/rec_287_288.md]
+  FLAG D-ABSOLUTE: **Catches per step:** every red or VIOLATED a step produced, classed by what the resolution CHANGED:  [build/agent202/rc1/rec_287_288.md]
+  FLAG D-ABSOLUTE: - (R) only the session's own record (a figure, a quote, a wording in STATE, the findings or the packet);  [build/agent202/rc1/rec_287_288.md]
+  FLAG D-ABSOLUTE: - (N) nothing: the finding was answered as accepted or as the check's own misreading.  [build/agent202/rc1/rec_287_288.md]
+  FLAG D-ABSOLUTE: **Downstream cost:** what each step's outputs make other steps re-do (for example the record commits that forced the second tier pass, #286).  [build/agent202/rc1/rec_287_288.md]
+  FLAG D-ABSOLUTE: Then each step is the maintainer's to keep, cut or replace.  [build/agent202/rc1/rec_287_288.md]
+packet_check: 15 flag(s): ATTRIB 1, D-ABSOLUTE 14
