@@ -10,7 +10,7 @@ A forever true statement. But what ifs are tantalizing and this project attempts
 
 ***Disclaimer:** From its inception, this project has been an experiment in black-box agentic engineering, as in "regardless of the code inside the box" can a demonstrably accurate result be obtained through guidance and an extensive testing harness. It just so happens that it's been applied to making a "Vampire Savior that never was" instead of applying it to a more boring undocumented legacy program. As such the use of AI is intrinsically central and the main deliverable to me is not even the game but the work discipline and the test harness. But just because my ultimate goal isn't the game itself doesn't retract from the potential value of the game to anyone who values accuracy.*
 
-[Play it](#play-it) · [What to expect](#what-to-expect) ·[How it was made](#how-it-was-made)
+[Play it](#play-it) · [What to expect](#what-to-expect) · [How it was made](#how-it-was-made)
 
 ## At a glance
 
