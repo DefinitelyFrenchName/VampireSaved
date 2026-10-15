@@ -11,12 +11,13 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**283 tickets** — status: open 25 · parked 9 · done 221 · declined 10 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 198 · cosmetic 16 · evolution 69 · **backfill debt: 0 rows**.
+**284 tickets** — status: open 26 · parked 9 · done 221 · declined 10 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 199 · cosmetic 16 · evolution 69 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#284](https://github.com/DefinitelyFrenchName/VampireSaved/issues/284) | bug | open | [regression] m23-merged README.md file is currently a mess | `release/merged-m23/mame/README.md` · `tools/package_release.py` | `DECISIONS_HISTORY.md § Ruled 2026-10-15 (14z-201) — the recording procedure moves to the release package README, under #284; the maintainer trims the root README` | none | none | 14z-201 |
 | [#283](https://github.com/DefinitelyFrenchName/VampireSaved/issues/283) | bug | open | trace_static_reads.py drops every open strace splits into ‹unfinished›/‹resumed› lines, so the predictor's miss scores never saw them | `tools/trace_static_reads.py` · `tests/test_trace_static_reads.sh` | none | none | none | - |
 | [#282](https://github.com/DefinitelyFrenchName/VampireSaved/issues/282) | evolution | open | The session documents and the close ritual are too large to follow: shrink, index and streamline them | none | `DECISIONS_HISTORY.md § Ruled 2026-10-14 (14z-201) — #282's scope` · `DECISIONS_HISTORY.md § Ruled 2026-10-14 (14z-201) — #282's order of work` | none | none | - |
 | [#281](https://github.com/DefinitelyFrenchName/VampireSaved/issues/281) | bug | open | Release-only: test_applier_page_browser's control run does not finish under strace | `tests/test_applier_page_browser.sh` · `tools/trace_static_reads.py` | `DECISIONS_HISTORY.md § Ruled 2026-10-14 (14z-200) — #274 closes done; four release-only tickets filed; the close is run` | none | none | 14z-200 |

@@ -119,7 +119,15 @@ The maintainer then corrected the README on GitHub and trimmed the paragraph (no
 merge conflicted on it and kept their version whole (`9e65edea`). It reads 203 emulator/FPGA checks where the
 measurement at `edd1b323` gave 231, raised with them.
 
-### (10) THE FINDINGS TABLE
+### (10) THE RECORDING PROCEDURE MOVES TO THE PACKAGE README (#284)
+On ERIS, with the published m23 Windows MAME package, the root README's recording command failed in cmd and PowerShell
+(`cps2.exe` is under `emulator\bin\windows-x86_64\`; `<…>` placeholders are redirections); by its path, with
+`-rompath rompath` alone, it records (exit 0); the MAME applier needs `qsound_hle.zip`, which the root README omits.
+The maintainer: *"I think we should put the "how to report a problem" details into the README.md of the release
+zips"*, then *"I'll trim it, add the instructions needs to #284"* (`DECISIONS_HISTORY.md` "Ruled 2026-10-15 (14z-201)
+— the recording procedure moves to the release package README"). #284 got its index row and the requirements.
+
+### (11) THE FINDINGS TABLE
 `docs/project/findings/14z-201.tsv` — every finding, its live home, the test that reproduces it (checklist step 1).
 
 ## Session 14z-200 — **The 14z-199 packet re-run; #274 built and closed; #269 built on the maintainer's "C first".** A plain Opus 5.5 session at effort High on the #172 setup (transcript `e4e310c7`).
@@ -140,6 +148,7 @@ measurement at `edd1b323` gave 231, raised with them.
 
 One line per ruling that still constrains work: the rule and where its full entry lives. A line is deleted when its ruling stops constraining work (CLAUDE.md [VSP-17]). Shortened to the rule plus its pointer 2026-10-14 (#282 item A); the longer lines are in git history at `44a09f7f`.
 
+- **The recording procedure lives in the release package README (#284, 2026-10-15, 14z-201):** the root README's "Report a problem" is the maintainer's to trim; #284's work moves `test_readme_recording` to the generated MAME package README — `DECISIONS_HISTORY.md` "Ruled 2026-10-15 (14z-201) — the recording procedure moves to the release package README".
 - **The live documents' budget (#282, 2026-10-14/15, 14z-201):** CLAUDE.md, STATE.md, HANDOFF.md and docs/NEXT_SESSION.md at most 500 lines and 50,000 bytes each, the aim 200 lines; the archives are indexed, not budgeted — `DECISIONS_HISTORY.md` "Ruled 2026-10-14 (14z-201) — #282's scope" and "Ruled 2026-10-15 (14z-201) — #282 item F"; gate `tests/test_live_budget.sh`.
 - **No swarm model at max effort, ever (2026-09-29, 14z-185);** the Sonnet 5.5 `xhigh` worker preference was dropped (14z-192) — `DECISIONS_HISTORY.md` 2026-09-29 and "Ruled 2026-10-05 (14z-192) — the opener's answers".
 - **The parity gates' per-frame level and RNG pins are their equalised input (2026-09-25, 14z-182):** they may write `RAM:$FF8116` and `RAM:$FF80D4` every frame on both legs; the rule-checker's Q3 reads that as a ruled premise — `DECISIONS_HISTORY.md` "Ruled 2026-09-25 (14z-182) — the parity gates' per-frame level and RNG pins".

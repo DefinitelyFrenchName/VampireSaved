@@ -71,6 +71,7 @@
 # WHAT THE GATE DOES NOT CLAIM: that an answer is ENOUGH. That is judged at the
 # close that closes the ticket.
 issue	kind	status	title	repro	decided	learned	wrong	sessions
+284	bug	open	[regression] m23-merged README.md file is currently a mess	release/merged-m23/mame/README.md ; tools/package_release.py	DECISIONS_HISTORY.md § Ruled 2026-10-15 (14z-201) — the recording procedure moves to the release package README, under #284; the maintainer trims the root README	none	none	14z-201
 283	bug	open	trace_static_reads.py drops every open strace splits into <unfinished>/<resumed> lines, so the predictor's miss scores never saw them	tools/trace_static_reads.py ; tests/test_trace_static_reads.sh	none	none	none	-
 282	evolution	open	The session documents and the close ritual are too large to follow: shrink, index and streamline them	none	DECISIONS_HISTORY.md § Ruled 2026-10-14 (14z-201) — #282's scope ; DECISIONS_HISTORY.md § Ruled 2026-10-14 (14z-201) — #282's order of work	none	none	-
 281	bug	open	Release-only: test_applier_page_browser's control run does not finish under strace	tests/test_applier_page_browser.sh ; tools/trace_static_reads.py	DECISIONS_HISTORY.md § Ruled 2026-10-14 (14z-200) — #274 closes done; four release-only tickets filed; the close is run	none	none	14z-200
