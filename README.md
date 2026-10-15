@@ -23,7 +23,7 @@ A forever true statement. But the FGC loves what ifs and this project attempts t
 | **Plays on**                            | MiSTer (it can run a provided patched FBNeo or MAME but it's an involved process) |
 | **Current release**                     | `merged-m23` — the character-select screen shows **M23** in its bottom-right corner |
 | **Made for**                            | 2-player versus. Arcade mode can be played to the end but    |
-| **Tournaments**                         | **not** a tournament build. Tournaments run original releases; this is for casuals, labs and locals |
+| **Tournaments**                         | **not** a tournament build. Tournaments run the community's choice which in this case is the original CPS-2 release. Even at perfect accuracy, this is for casuals and locals|
 
 **Why the emulator has to be patched:** the 18 characters do not fit in a stock CPS-2. The project
 defines a larger CPS-2 (more room for program, graphics and sound) and adds it to FBNeo,
@@ -132,8 +132,6 @@ behaviour is a failed change, not a trade-off.
   catch a deliberately flawed case planted beside the real one. Each objection it raises is answered in
   writing before the step goes ahead. At the end of every working session, the same kind of checker reads
   the session's transcript to confirm the agent did what it said and ran what it claimed.
-- Freeze and release test runs play out on a snapshot of a named commit, so nothing changed in the
-  working copy while they run can reach them, and each run records exactly what it tested.
 
 **The scale, on 2026-09-26** (re-derive these rather than trusting this page): 392 test scripts, 184 checks that need no emulator (run at
 every session's close, the slowest few only at a freeze or a release) with 254 planted-defect controls
@@ -143,10 +141,7 @@ hand-played recordings of reported problems, and 181 tracked tickets.
 **What all that green does not prove.** It does not prove that the new characters *feel* right —
 only players can judge that. The frame-by-frame guarantee covers the scripted replays, not every match
 anyone could play. And a few original sequences are allowed small, measured and frozen tolerances because 
-code added to reach the new characters costs the processor time. A move-by-move comparison of the three 
-new characters with Vampire Savior 2 has been done ([#136](https://github.com/DefinitelyFrenchName/VampireSaved/issues/136)),
-and the differences it found are tracked as their own tickets.
-
+code added to reach the new characters costs the processor time (currently no change introduces a frame of lag in-fight).
 
 ## Licence and legal
 
