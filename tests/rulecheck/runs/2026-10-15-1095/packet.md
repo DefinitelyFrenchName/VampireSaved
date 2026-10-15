@@ -1,0 +1,7 @@
+THE PACKET
+
+Decision kind: procedure
+Subject: one AI agent working session (14z-201b), part 1 of 2: transcript 979461fd records 10257-11446
+Claim (the working agent's sentence): In this span (transcript 979461fd records 10257-11446, [10257 14:08] to [11443 15:57] UTC, part 1 of 2 of the 14z-201b procedure check, 2026-10-15; the end of the 14z-201 close after its procedure check's extract ended: the tier result, the ERIS runs, the record, the final tier, the push) the agent did what it told the maintainer it would do, reported as done the steps its tool calls show, quoted figures from tool results, gave the background jobs it started a disposition, and its workers answered their specs. NOT TESTED: this sentence was written from the span's record range and the session's own record (STATE 14z-201b sections 1 to 3, and STATE_HISTORY 14z-201's CLOSE section), not from a re-read of the span; an intention stated in one part may be carried out in another; the session was compacted twice before this span (records 3651 and 6419), so a statement may rest on context the extract does not carry; records marked M that open 'Another Claude session sent a message' are the harness's hand-backs of the session's own subagents, and M records that open 'continue the 14z-201 close' are the session's own scheduled wakeup prompts, not the maintainer's words.
+Artifacts (read every one, in full):
+  - build/agent201b/c1/x201b_1.txt
