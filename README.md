@@ -74,7 +74,8 @@ is. Each line points to where it is tracked or explained — follow the link for
 In versus:
 
 - Donovan's **Press of Death** sometimes shows the wrong colours.
-- On the select screen, **player 2's Donovan has an orange sword** — an accepted trade-off.
+- Killshread's electrocuted state has a wrong palette.
+- On the select screen, **player 2's Donovan has an orange sword** — an accepted trade-off (palette limitations).
 - The three new characters **use their shell's win quotes**.
 
 In arcade mode (1 player) — never this project's scope; it plays to the end without crashing, and
@@ -133,8 +134,8 @@ behaviour is a failed change, not a trade-off.
   the session's transcript to confirm the agent did what it said and ran what it claimed.
 
 **The scale, on 2026-10-15** (re-derive these rather than trusting this page): 461 test scripts, 
-225 checks that need no emulator with 394 planted-defect controls executed at the last close, 
-203 emulator and FPGA simulation checks, 233 scripted replays, 10 hand-played recordings of reported problems.
+225 checks that need no emulator with 394 planted-defect controls, 
+231 emulator and FPGA simulation checks, 233 scripted replays, 10 hand-played recordings of reported problems.
 
 
 ## Licence and legal
