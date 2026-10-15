@@ -80,20 +80,6 @@ Not included:
 - **Marionette** is not brought over.
 - **1-player arcade mode:** Out of scope. Has many known issues but shouldn't crash.
   
-
-## Report a problem
-
-Open an [issue](https://github.com/DefinitelyFrenchName/VampireSaved/issues) and say which package you
-used and which mark the select screen shows (e.g. M23).
-
-**If you can make it happen again, it would be ideal if you could record it on MAME.** A recording lets the project replay your exact
-session, frame for frame. Create two empty folders, `nvram_fresh` and `recordings`, then run the MAME
-from your package (`cps2`, or `cps2.exe` on Windows):
-
-    cps2 vsavjw -rompath "./rompath;/path/to/your/dumps" -nvram_directory <path_to_nvram_fresh_folder> -input_directory <path_to_recordings_folder> -record my_session.inp
-
-Play until it happens, quit, and attach `recordings/my_session.inp` to the issue.
-
 ## How it was made
 
 Vampire Saved is actually an experiment. It started as a work-adjacent project about **black-box agentic
