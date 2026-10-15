@@ -18,9 +18,9 @@
 obj_bank_table	PRG:0x282D4	per-char(acter)? OBJ bank table	docs/game/atlas/character_tables.md,docs/game/engine_internals.md,docs/game/gotchas.md,docs/project/cps2_wide.md	PRG:0x27530
 obj_bank_table_vsav2	PRG:0x27530	vsav2 `PRG:0x27530`	docs/game/atlas/character_tables.md,docs/game/engine_internals.md
 sprite_pal_ptr_table	PRG:0x38C198	(sprite|SPRITE)[- ]palette pointer table|per-char pointer table	docs/game/atlas/character_tables.md,docs/game/atlas/venue_assets.md,docs/game/engine_internals.md
-ai_script_tables	PRG:0xBF01A	AI action-script tables	docs/game/atlas/character_tables.md,docs/game/engine_internals.md,docs/game/atlas/ram.md,HANDOFF.md
+ai_script_tables	PRG:0xBF01A	AI action-script tables	docs/game/atlas/character_tables.md,docs/game/engine_internals.md,docs/game/atlas/ram.md
 voice_borrow_writer	PRG:0x0AEF6	writer (is|must be) `?PRG:0x0AEF6|write at `PRG:0x0AEF6	docs/game/engine_internals.md,docs/game/gotchas.md,docs/game/atlas/ram.md,tests/audit_voice_borrow.sh
-gallon_variant_idiom	PRG:0x020B9C	Gallon-variant idiom at	docs/game/atlas/select_screen.md,docs/game/atlas/id_space.md,docs/game/engine_internals.md,docs/project/patch_index.md,HANDOFF.md
+gallon_variant_idiom	PRG:0x020B9C	Gallon-variant idiom at	docs/game/atlas/select_screen.md,docs/game/atlas/id_space.md,docs/game/engine_internals.md,docs/project/patch_index.md,docs/project/operations.md
 char_loader	PRG:0x028DD8	unmasked loader \(|vsavj `PRG:0x028DD8` \(≡	docs/game/atlas/character_tables.md,docs/game/atlas/select_screen.md	PRG:0x0280B8,PRG:0x0280E6
 id_fold_site	PRG:0x04FAC4	\| `PRG:0x04FAC4` \||`PRG:0x04FAC4` folds	docs/game/atlas/id_space.md,docs/game/gotchas.md	PRG:0x04FFA8
 id_fold_target	PRG:0x04FFA8	into `?PRG:0x04FFA8	docs/game/atlas/id_space.md
@@ -42,5 +42,5 @@ mra_profile_byte	0xFE	byte 41	docs/platform/mister.md,docs/project/mister_core.m
 #  legitimately sit beside the size in mister_map.md §3, and the 3,500-frame
 #  run length that sits beside the name at platform/mister.md:1665. Separated
 #  by ';' because a comma-grouped number cannot ride comma-splitting.)
-wide_rom_bytes	66,265,152	vsavjw\.rom	docs/project/mister_map.md,docs/project/mister_core.md,docs/platform/mister.md,docs/platform/gotchas.md,HANDOFF.md	6144;6400;15552;64704;3,500
+wide_rom_bytes	66,265,152	vsavjw\.rom	docs/project/mister_map.md,docs/project/mister_core.md,docs/platform/mister.md,docs/platform/gotchas.md	6144;6400;15552;64704;3,500
 wheel_record	PRG:0x272A68	wheel record	docs/game/atlas/select_screen.md,docs/game/engine_internals.md	PRG:0x2689FE

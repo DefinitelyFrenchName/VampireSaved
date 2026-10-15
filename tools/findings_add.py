@@ -98,6 +98,10 @@ def add(root, state, finding, homes, tests, ticket, none, create=False, dry=Fals
         # the row's own home/test separator: tools/homes_tracked.py then reads the finding as having no home
         # (14z-195: "0 red / 2 white" in a finding read FAIL letter-without-home and turned test_close_tools red)
         raise Refused("the finding text holds ' / ', the table's home/test separator: reword it")
+    if re.search(r"(?<![\w-])build/", finding) and PERTURB != "form-unchecked":
+        # tools/homes_tracked.py fails any build/ path in the row, prose included (14z-201: finding (i) turned
+        # test_close_tools red in the confirm tier at 7b0a8e87)
+        raise Refused("the finding text names a build/ path, which tools/homes_tracked.py fails: describe it without the path")
     if not homes:
         raise Refused("a finding needs at least one --home")
     if sum(bool(x) for x in (tests, ticket, none is not None)) != 1:
@@ -219,7 +223,8 @@ def selftest():
                         (dict(finding="a\ttab", homes=["a.md"], tests=["tests/t.sh"], ticket=None, none=None), "a tab"),
                         (dict(finding="x", homes=["a.md"], tests=["tests/t.sh"], ticket=7, none=None), "exactly one"),
                         (dict(finding="x", homes=["a.md Ruled — y"], tests=["tests/t.sh"], ticket=None, none=None), "separator"),
-                        (dict(finding="0 red / 2 white", homes=["a.md"], tests=["tests/t.sh"], ticket=None, none=None), "home/test separator")):
+                        (dict(finding="0 red / 2 white", homes=["a.md"], tests=["tests/t.sh"], ticket=None, none=None), "home/test separator"),
+                        (dict(finding="the log in build/agent9/x.log", homes=["a.md"], tests=["tests/t.sh"], ticket=None, none=None), "build/ path")):
             r, why = tryit(**k)
             say(r is None and want in why, f"refused: {want}")
         before = open(tsv).read()
