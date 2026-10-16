@@ -49,7 +49,9 @@ The maintainer asked whether keeping the before-an-action check kept it at the c
 #288, but a ticket closure or recommendation left for the end brings its check there (the 14z-202 close's run
 2026-10-16-1100). Ruled: each is done in the piece of work that finishes it — `DECISIONS_HISTORY.md` "Ruled 2026-10-16
 (14z-203) — an action is checked when its work is done, never held for the close"; `docs/project/session_close.md` item
-7 and `docs/project/rule_checker.md` carry it.
+7 and `docs/project/rule_checker.md` carry it. Then, asked whether the check runs at each worker report: no, before an
+action only; the maintainer kept that and had a run on every report the next step builds on added to #289 as a potential
+decision (its comment of 2026-10-16; the same `DECISIONS_HISTORY.md` entry).
 
 ## Session 14z-202 — **The close's cost must follow the change: #286, #287, #288 filed and made the direct priority.** Opened 2026-10-15 on Opus 5.5 (the ruled orchestrator); transcript `b5306e71`.
 
