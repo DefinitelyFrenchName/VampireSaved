@@ -1,0 +1,1 @@
+WITHDRAWN 2026-10-16 (14z-203), never spawned: its pre-prepare flags showed two absolutes in the deliverable ('It fires for every commit made in this clone, however it is typed', which --no-verify contradicts; 'the ruled tier can no longer be skipped or read wrong'); corrected and re-prepared as run 2026-10-16-1102.

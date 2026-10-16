@@ -89,6 +89,14 @@ and traceability"* — so session cadence stays in the working tree.
    gate that starts the runner in a synthetic repo truncated the file mid-tier, so the tier ended
    appending its rows under another run's header (`tests/test_static_runner.sh` section 12c, control
    `results-inherited`).
+   **Since #290 (14z-203) the results file is kept in the record by default** (`<record>/results.tsv`, unless
+   `STATIC_RESULTS_OUT` names another path), because the green guard's index row points at it.
+6. **The green guard's row (#290, ruled 2026-10-16).** The runner is handed the WORKING repository's
+   index, `.git/green_index.tsv` (`STATIC_GREEN_INDEX`, private to the runner like the results path) and appends one
+   row there: the tree it tested, its verdict and its scope. The git hooks read that row
+   (`tools/git-hooks/green_guard.py`). A snapshot may be taken of a commit that no branch names: the close tiers a
+   commit object of the staged index (`git commit-tree "$(git write-tree)" -p HEAD -m …`), and the local clone
+   holds it (measured 2026-10-16: "clone whole: 16818 tracked files" at `8986de91`, a commit of the staged tree).
 
 A run costs about 50 s of setup before the runner starts (the clone, the snapshot, the listing
 and 76 fingerprints; measured 14z-183b on this Mac).

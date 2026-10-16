@@ -470,3 +470,4 @@ tests/test_emu_clock.sh	platform
 tests/test_history_index.sh	docs
 tests/test_live_budget.sh	docs
 tests/test_session_close.sh	docs
+tests/test_green_guard.sh	review-triage

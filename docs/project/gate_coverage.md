@@ -13,7 +13,7 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**461 of 461 gates described.**
+**462 of 462 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
@@ -25,7 +25,7 @@ first sentence) is `gate_index.md`.
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 87 | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
 | [character-data](#character-data) | 83 | 83 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
-| [review-triage](#review-triage) | 36 | 36 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
+| [review-triage](#review-triage) | 37 | 37 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
 ## runner
@@ -3302,7 +3302,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 ## review-triage
 
-the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for. 36 of 36 described.
+the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for. 37 of 37 described.
 
 ### `test_applier_key_first.sh` — test, ci_portable
 
@@ -3391,6 +3391,14 @@ the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guar
 **HOW:** the builder's checks run over the manifest and the placed inventories (ROM-free, ~2 s).
 
 **EXPECTS:** every field agrees with the artifact (Huitzil's out-of-band bound re-measured, not widened); a red is policy the artifact producer no longer enforces.
+
+### `test_green_guard.sh` — test, ci_portable
+
+**WHAT:** tools/git-hooks/pre-commit refuses a commit whose tree (the index) has no counting row in the index (<git dir>/green_index.tsv); tools/git-hooks/pre-push refuses a push whose TIP's tree has none and lets an uncovered commit below a covered tip through (ruled: "the pushed tip only"); tests/run_all_static.sh writes the row a run earns, keyed by the tree it tested, and only that.
+
+**HOW:** a scratch repository with the REAL hooks (core.hooksPath at its tools/git-hooks) and a bare remote. Sections 1-3 write index rows by hand and commit or push: one row per refusal case (none, NOT GREEN, not strict, tier portable, tier static, ROMDIR unset, cadence ondemand, another tree) and the counting rows (session; --exec-controls none; freeze). Section 4 drives `record` on results files (tree moved, fields missing). Section 5 runs the REAL runner in the scratch repository (one stub gate) and commits on the row it wrote; a --tier portable run's row is refused.
+
+**EXPECTS:** every refusal case refused (exit non-zero, the commit absent); every counting row lets the commit land; the uncovered tip refused and the covered tip pushed; the runner's row carries the tested tree.
 
 ### `test_guard_integrity.sh` — test, emulator
 

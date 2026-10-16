@@ -155,6 +155,7 @@ declares	test_gate_descriptions
 declares	test_gate_follows
 declares	test_gate_index_current
 declares	test_gotchas_index_current
+declares	test_green_guard
 declares	test_header_defaults
 declares	test_history_index
 declares	test_hitbox_encoding

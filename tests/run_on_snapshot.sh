@@ -310,6 +310,14 @@ fi
 say "start       $(date '+%Y-%m-%d %H:%M:%S')"
 set +e
 ( cd "$C" && ls -d build/emu_* 2>/dev/null || true ) > "$REC/.emu_before"
+# THE GREEN GUARD (#290, 14z-203), for a runner other than the emulator one: the runner appends its row to the
+# WORKING repository's index, and its results file is KEPT in the record unless the caller names one (the row points at
+# it, and the snapshot's copy is removed with the snapshot). Exported here, not on the run lines the controls of
+# tests/test_run_on_snapshot.sh rewrite; the static runner keeps both to itself (GREEN-INDEX-PRIVATE).
+if [ "$EMU" != 1 ]; then
+    STATIC_GREEN_INDEX="$(git -C "$REPO" rev-parse --path-format=absolute --git-common-dir)/green_index.tsv"; STATIC_RESULTS_OUT="${STATIC_RESULTS_OUT:-$REC/results.tsv}"
+    export STATIC_GREEN_INDEX STATIC_RESULTS_OUT
+fi
 if [ "$EMU" = 1 ]; then
     { ( cd "$C" && HOME="$SNAP_HOME" JTSIM_SCRATCH="$JT_SNAP" "$@" ) 2>&1; echo $? > "$REC/.runner_exit"; } | tee "$REC/runner.log"
 else

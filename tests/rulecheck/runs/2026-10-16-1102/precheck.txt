@@ -1,0 +1,12 @@
+  FLAG ATTRIB: The design in design.md answers #290's four open points (where it hooks, what it reads, what a mid-session commit needs, how it is overridden), holds the thr...
+  FLAG D-ABSOLUTE: - **(iii) no tier at all for the change committed:** 1091, "item B was reported green and committed without a gate re-run".  [build/agent203/t290/design.md]
+  FLAG D-ABSOLUTE: A guard that holds all three must (1) read the verdict the runner itself wrote, never an exit status or a grep the session chose, and (2) tie that verdict to...  [build/agent203/t290/design.md]
+  FLAG D-ABSOLUTE: **pre-push** allows the push when the tree of every commit being pushed has such a row (the commit hook already held each; the push re-checks, so a commit ma...  [build/agent203/t290/design.md]
+  FLAG D-ABSOLUTE: What changes for a session is that skipping the ruled tier, or reading a red one as green, is refused at the commit instead of being caught later: every comm...  [build/agent203/t290/design.md]
+  FLAG D-ABSOLUTE: Whether a cheaper form should also count is question Q2; what the close's form costs on a doc-only commit is measured below.  [build/agent203/t290/design.md]
+  FLAG D-ABSOLUTE: The alternative (Q3) is to exempt the commit and hold only the push.  [build/agent203/t290/design.md]
+  FLAG D-ABSOLUTE: Why so many on a doc-only change, read from the plan the log prints (not yet checked against the code):  [build/agent203/t290/design.md]
+  FLAG D-ABSOLUTE: For #286: its done-when (a record-only pass re-running only gates that open a record file, no control executed) is NOT met on this change set; the three caus...  [build/agent203/t290/design.md]
+  FLAG D-ABSOLUTE: - **Q1** — where: commit and push (P1, P2), or push only?  [build/agent203/t290/design.md]
+  FLAG D-ABSOLUTE: - **Q3** — the close: tier on a snapshot of the staged tree, then commit (P4), or keep commit-then-tier and hold the close at the push only?  [build/agent203/t290/design.md]
+packet_check: 11 flag(s): ATTRIB 1, D-ABSOLUTE 10

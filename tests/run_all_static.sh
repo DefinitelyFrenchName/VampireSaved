@@ -280,6 +280,22 @@ RESULTS_OUT="${STATIC_RESULTS_OUT:-}"
 # inherit it, or that inner run truncates this run's file and this run appends to the inner one's
 # (paid 14z-199: a tier on a snapshot given an absolute path ended with another run's header).
 unset STATIC_RESULTS_OUT   # RESULTS-OUT-PRIVATE
+# THE GREEN GUARD'S INDEX (#290, ruled 2026-10-16, 14z-203): every run that writes a results file appends one row,
+# through tools/git-hooks/green_guard.py, to the index the git hooks read: <git common dir>/green_index.tsv, outside
+# the tree (under build/ it matched static_confirm's R6 templates and staled gates on every run). A snapshot run passes
+# the WORKING repo's index (tests/run_on_snapshot.sh), so its row outlives the snapshot; private like the results path
+# above, so a gate that starts the runner itself on a synthetic repo never writes into this run's index.
+GREEN_INDEX="${STATIC_GREEN_INDEX:-$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null || echo "$REPO/.git")/green_index.tsv}"
+unset STATIC_GREEN_INDEX   # GREEN-INDEX-PRIVATE
+# the TREE this run tests: the tracked content, HEAD plus any tracked change (a commit object `git stash create` writes
+# without touching the tree or the index). Taken again at the end: a run whose tree moved writes no index row.
+tree_now() {
+    if git rev-parse --git-dir >/dev/null 2>&1; then
+        _sc="$(git stash create 2>/dev/null || true)"
+        git rev-parse "${_sc:-HEAD}^{tree}" 2>/dev/null || echo none
+    else echo none; fi
+}
+TREE_START="$(tree_now)"
 [ -z "$RESULTS_OUT" ] && [ -n "$RUNREC" ] && RESULTS_OUT="$RUNREC/results.tsv"
 if [ -n "$RESULTS_OUT" ]; then
     mkdir -p "$(dirname "$RESULTS_OUT")"
@@ -287,6 +303,7 @@ if [ -n "$RESULTS_OUT" ]; then
       echo "# head $(git rev-parse HEAD 2>/dev/null || echo none)"
       echo "# utc $(date -u +%Y-%m-%dT%H:%M:%SZ)"
       echo "# args $_ORIG_ARGS"
+      echo "# tree $TREE_START"
       git status --porcelain 2>/dev/null | grep -v '^??' | awk '{print "# dirty " $NF}' || true
       # each submodule's state, so the next --confirm drops a dirty submodule that did not change (#286 (b))
       if [ -f tools/static_confirm.py ]; then python3 tools/static_confirm.py subfp --root . 2>/dev/null | sed 's/^/# subfp /' || true; fi
@@ -736,4 +753,20 @@ if [ "$STRICT" = 1 ] && [ "$n_skip" != 0 ]; then
 fi
 [ "$rc" = 0 ] && echo "GREEN — every registered emulator-free gate passed." \
               || echo "NOT GREEN — see above. Rule 6: fixing this is the only task."
+# THE VERDICT AND THE RUN'S SCOPE, last in the results file, and the green guard's row (#290). The guard counts a row
+# only when it is GREEN, --strict, of the whole tier, with ROMDIR set, at cadence session/freeze/release.
+if [ -n "$RESULTS_OUT" ]; then
+    { echo "# tree_end $(tree_now)"
+      if [ "$rc" = 0 ]; then echo "# verdict GREEN"; else echo "# verdict NOT GREEN"; fi
+      echo "# strict $STRICT"
+      echo "# tier $TIER"
+      if [ -n "${ROMDIR:-}" ] && [ -d "$ROMDIR" ]; then echo "# romdir set"; else echo "# romdir unset"; fi
+      echo "# cadence $CADENCE"
+      echo "# exec_controls $EXEC_CTL"
+    } >> "$RESULTS_OUT"
+    if [ -f tools/git-hooks/green_guard.py ]; then
+        python3 tools/git-hooks/green_guard.py record "$RESULTS_OUT" "$GREEN_INDEX" \
+            || echo "green guard: the index row was NOT written (see above)"
+    fi
+fi
 exit $rc

@@ -13,7 +13,8 @@ action caught a real error in 24 of 57, the close's documentation packet in 21 o
 procedure check in 9 of 111. The maintainer: *"Then for now let's cut everything except the "before an action" and let's
 open a ticket to revisit in the future when we have more data"* (#289). Cut from the close: the findings table, the
 live-docs step (the tier runs those gates), the close checks with their inputs and render, the documentation packet, the
-procedure check, the `--cap` read, and the final tier (the records are committed before the one tier now). Their tools stay
+procedure check, the `--cap` read, and the final tier (the records were then committed before the one tier; since #290,
+ruled 2026-10-16, 14z-203, they are STAGED, the tier runs on a snapshot of the staged tree, and the commit follows). Their tools stay
 in the tree and their gates are `ondemand` (`tests/ci_cadence.tsv`). A rule-checker run is made only before an action
 (`docs/project/rule_checker.md`). The one recurring real catch of the procedure check, a commit or close on a tier that
 was not green, is #290's deterministic guard.
@@ -49,8 +50,9 @@ Placeholders: `{KEY}` the session key; `{RUN}` the run directory (absolute); `{R
 | indexes | auto | `python3 tools/gen_history_index.py && python3 tools/tickets.py page && python3 tools/gen_gotchas_index.py` | exit 0 | the archives' indexes, the ticket page and the gotchas index regenerated | #282 item E, [VSP-12] |
 | dashboard | manual | `python3 tools/session_metrics.py collect`, then `check`; upload the four JSON files | - | the four datasets re-collected and uploaded to the dashboard, each `datasets/<id>` pointed at its new asset | #264; kept 2026-10-15 (#288) |
 | record | manual | - | - | the CLOSE section records every step's result up to here and names the tier's results file `{RUN}/tier_results.tsv`, the next close's `--prev` | [VSP-17] |
-| commit | manual | `git add -u` plus every new path by name | - | committed, the records included; no `build/` path staged; `git status` shows none of the sitting's own new files untracked | gotcha "`git add -u` STAGES NO NEW FILE" |
-| tier | auto | `ROMDIR={ROMDIR} STATIC_RESULTS_OUT={RUN}/tier_results.tsv tests/run_on_snapshot.sh -- tests/run_all_static.sh --strict --confirm {PREV}` | line ^GREEN | the tier on a snapshot of HEAD reads GREEN; a SKIP of a gate only another host can run is passed by hand with that host's PASS at the same commit; a red is fixed in a new commit and the tier re-run with `--confirm` on this run's results | #269, #286, [VSP-181] |
+| stage | manual | `git add -u` plus every new path by name | - | the records staged, nothing committed yet; no `build/` path staged; `git status` shows none of the sitting's own new files untracked | gotcha "`git add -u` STAGES NO NEW FILE"; #290 |
+| tier | auto | `ROMDIR={ROMDIR} STATIC_RESULTS_OUT={RUN}/tier_results.tsv tests/run_on_snapshot.sh --commit "$(git commit-tree "$(git write-tree)" -p HEAD -m '{KEY} close: the staged tree')" -- tests/run_all_static.sh --strict --confirm {PREV}` | line ^GREEN | the tier on a snapshot of the STAGED tree reads GREEN, and its row is in the green index (`.git/green_index.tsv`); a SKIP of a gate only another host can run is passed by hand with that host's PASS at the same tree; a red is fixed, re-staged and the tier re-run with `--confirm` on this run's results | #269, #286, #290, [VSP-181] |
+| commit | manual | `git commit -F -` (the message on a quoted heredoc) | - | committed; the pre-commit hook read the tier's row for the staged tree (`tools/git-hooks/green_guard.py`); `status` then marks the tier STALE, as it does `indexes`, because HEAD moved — the hook is what ties the run to the commit | #290 |
 | sweep | auto | `python3 tools/agent/sweep.py` | exit 0 | CLEAN, as the last command before the push: every survivor killed, leaves first, or declared with `--declare PID "REASON"` and named in the CLOSE section | C0.3, #172 S2 |
 | push | manual | `git push origin main` | - | pushed; anything red, skipped or unresolved leaves the commits local and the CLOSE section says so | ruled 2026-09-10, [VSP-17] |
 <!-- /CLOSE STEPS -->

@@ -1,0 +1,7 @@
+#!/bin/sh
+# pre-push — THE GREEN GUARD's light push check (GitHub #290, ruled 2026-10-16, 14z-203: "Commit, plus a light push
+# check on the tip."): refuse a push whose pushed TIP's tree has no strict GREEN run of the whole static tier. Only
+# the tip: it catches a merge, cherry-pick, rebase, revert or --no-verify commit that ends the range. Installed by
+# tools/install_hooks.sh; the logic: tools/git-hooks/green_guard.py; tested by tests/test_green_guard.sh.
+REPO="$(git rev-parse --show-toplevel)"
+exec python3 "$REPO/tools/git-hooks/green_guard.py" check-push

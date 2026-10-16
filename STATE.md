@@ -53,6 +53,40 @@ The maintainer asked whether keeping the before-an-action check kept it at the c
 action only; the maintainer kept that and had a run on every report the next step builds on added to #289 as a potential
 decision (its comment of 2026-10-16; the same `DECISIONS_HISTORY.md` entry).
 
+### (2) #290 — THE GREEN GUARD'S DESIGN, RULED
+The design (`build/agent203/t290/design.md`, local) went to the maintainer through rule-checker run 2026-10-16-1102
+(VIOLATED Q1 Q4, resolved in the design). Ruled: a `pre-commit` hook refuses a commit whose tree has no strict GREEN
+whole-tier run with `ROMDIR` set, and a `pre-push` hook checks the pushed tip's tree only; any ruled tier form counts,
+and also `--confirm --exec-controls none` once measured; the close runs its tier on a snapshot of the staged tree, then
+commits; the git hooks join the edit-lock. `DECISIONS_HISTORY.md` "Ruled 2026-10-16 (14z-203) — #290: the green guard
+sits at the commit, with a light push check on the tip". The close-form tier run on `da26e094` for the design's cost
+figure (GREEN, PASS 198, about 40 minutes, 177 controls executed on a doc-only change) shows #286's done-when not met.
+
+### (3) #290 BUILT — the green guard
+`tools/git-hooks/green_guard.py` behind `pre-commit` (the index's tree) and `pre-push` (each pushed tip's tree);
+`tests/run_all_static.sh` writes the tree it tested and its verdict and scope into its results file and one row into
+`.git/green_index.tsv`, outside the tree (none when the tree moved); `tests/run_on_snapshot.sh` hands it the working repository's index
+and keeps the results file in the record. Gate `tests/test_green_guard.sh` (ci_portable; controls
+`guard-ignores-tree`, `guard-ignores-strict`). The close's table now stages, tiers a snapshot of the staged tree, then
+commits (`docs/project/session_close.md`). The edit-locked half (two deny rules and a `pre_bash.py` refusal of
+`--no-verify` and of a `core.hooksPath` change) is drafted for the maintainer in
+`build/agent203/t290/hook_change/INSTALL.md` (local); until it is installed the session can bypass the hooks. #290's
+comment of 2026-10-16 carries the details.
+Its first tiers, on snapshots of the staged tree: a red on a ledger row staged without its run directories (mine,
+fixed by staging them); then three reds the new gate's registry freezes owed (`test_must_fire_census`,
+`test_gate_descriptions`, `test_gate_coverage_current`), and the live hook REFUSED the commit on that NOT GREEN row
+(`build/agent203/t290/live_refusal.txt`, local). Two facts from the plans: the index under `build/` matched
+`static_confirm.py`'s R6 template `build/$b` and staled gates on every run, so it moved to `.git/green_index.tsv`;
+and a `--confirm` on a run made with `--exec-controls none` re-runs every gate that run judged without its controls
+(the reason "0 of its N declared controls executed and honoured in the previous run" in the stopped run's plan, `build/agent203/mid4.log`, local), so a mid-session confirm is based on the newest run that EXECUTED its controls, not the newest.
+
+### (4) #291 FILED — on-demand comparative capture sheets
+The maintainer asked for a ticket: a tool that takes a tag or commit and draws the comparison sheet (ours against
+vsavj and/or vsav2) for every test that compares them, *"a visual proof of accuracy for humans"*. Filed as #291
+(evolution) with the need verbatim. Asked four questions, the maintainer ruled: every comparing test with filters, one
+browsable page, the moments each test itself judges, ours built from the commit (`DECISIONS_HISTORY.md` "Ruled 2026-10-16
+(14z-203) — #291: …"). Next: the census of comparing tests, then a design to the maintainer.
+
 ## Session 14z-202 — **The close's cost must follow the change: #286, #287, #288 filed and made the direct priority.** Opened 2026-10-15 on Opus 5.5 (the ruled orchestrator); transcript `b5306e71`.
 
 ### opened with

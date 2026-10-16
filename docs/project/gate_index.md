@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**461 scripts** — 133 ci_portable, 92 ci_static, 236 emulator-tier (run by name).
+**462 scripts** — 134 ci_portable, 92 ci_static, 236 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -28,7 +28,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
 | [character-data](#character-data) | 83 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
-| [review-triage](#review-triage) | 36 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
+| [review-triage](#review-triage) | 37 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
 ## runner
@@ -509,6 +509,7 @@ the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guar
 | `tests/test_entropy_tripwire.sh` | test | ci_portable | — | RULE 7'S TRIPWIRE READS THE INDEX, NOT `??` LINES (14z-197, GitHub #249). ci_portable: no ROM, ~10 s. | 14z-197 |
 | `tests/test_freeze_retires_diverge.sh` | test | ci_portable | — | freezing a replay must actually govern it (14z-94, GitHub #88). ROM-free, no MAME, ~2 s. | 14z-94 |
 | `tests/test_gfx_layout_fields_live.sh` | test | ci_portable | — | gfx_layout3.toml's profile and scatter fields must MEAN something (14z-94, GitHub #87). ROM-free, ~2 s. | 14z-94 |
+| `tests/test_green_guard.sh` | test | ci_portable | — | ground truth for the green guard (GitHub #290, ruled 2026-10-16, 14z-203): no commit, and no push of a tip, whose tree has no strict GREEN run of the whole static tier with ROMDIR set. ci_portable: | 2026-10-16 |
 | `tests/test_guard_integrity.sh` | test | emulator | MAME, a build dir, ~2 min | the crash guard must carry the input-integrity assertion, and must refuse env vars it does not implement (14z-94, GitHub #31). Needs ROMDIR + a WIDE build; ~2 min. | 14z-94 |
 | `tests/test_harness_frame_bound.sh` | test | ci_static | ROMDIR | the FBNeo harness must bound replay frame numbers (14z-94, GitHub #77). ROM-free structurally; the functional half runs only if a built binary and ROMDIR are present. ~5 s. | 14z-94 |
 | `tests/test_hex_lengths.sh` | test | ci_portable | — | ground truth for tools/audit_hex_lengths.py, the balanced-byte-edit check (14z-94, GitHub #20). ROM-free, ~1 s. | 14z-94 |

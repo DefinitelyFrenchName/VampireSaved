@@ -18,9 +18,10 @@ Say so at the opener. Never spawn any agent at `max`. A recommendation leans onl
 **Before any long job, check whether PILOT (`ssh pilot`) or ERIS (`ssh eris`) is idle, and run independent work
 there in parallel.** A long tier runs on a snapshot (`tests/run_on_snapshot.sh`), so the tree can be edited meanwhile.
 
-**THE SESSION CLOSE IS TEN STEPS (cut by #288):** `docs/project/session_close.md`, run by `python3 tools/close.py`
-(`start`, then `next`, `done`, `status`). The records are committed BEFORE the one tier (`--strict --confirm` on the
-previous close's results), so there is no second pass. The run of record is named in STATE 14z-202's CLOSE section.
+**THE SESSION CLOSE (cut by #288; reordered by #290, 14z-203):** `docs/project/session_close.md`, run by `python3 tools/close.py`
+(`start`, then `next`, `done`, `status`). The records are STAGED, the one tier (`--strict --confirm` on the previous
+close's results) runs on a snapshot of the staged tree, then the commit, which the green guard's pre-commit hook
+refuses unless that tier's row is GREEN for its tree; so there is no second pass. The run of record is named in STATE 14z-202's CLOSE section.
 **Since #286, a `--confirm` re-run gate executes its controls only when its own code reads a changed file directly**,
 and an unchanged dirty `emu/fbneo` no longer counts as changed.
 

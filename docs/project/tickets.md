@@ -11,13 +11,14 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**290 tickets** — status: open 27 · parked 9 · done 225 · declined 11 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 199 · cosmetic 16 · evolution 75 · **backfill debt: 0 rows**.
+**291 tickets** — status: open 28 · parked 9 · done 225 · declined 11 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 199 · cosmetic 16 · evolution 76 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
-| [#290](https://github.com/DefinitelyFrenchName/VampireSaved/issues/290) | evolution | open | A deterministic guard: no commit or push on a tier that did not read GREEN (replaces the procedure check's one recurring catch) | none | `DECISIONS_HISTORY.md § Ruled 2026-10-15 (14z-202) — #288: everything but the before-an-action check is cut` | none | none | 14z-202 |
+| [#291](https://github.com/DefinitelyFrenchName/VampireSaved/issues/291) | evolution | open | On demand, at a given tag or commit: comparative capture sheets (ours vs vsavj and/or vs2) for every comparing test, as a visual proof of accuracy for humans | none | `DECISIONS_HISTORY.md § Ruled 2026-10-16 (14z-203) — #291: the comparative capture sheets' scope, output, frames and build` | none | none | 14z-203 |
+| [#290](https://github.com/DefinitelyFrenchName/VampireSaved/issues/290) | evolution | open | A deterministic guard: no commit or push on a tier that did not read GREEN (replaces the procedure check's one recurring catch) | none | `DECISIONS_HISTORY.md § Ruled 2026-10-15 (14z-202) — #288: everything but the before-an-action check is cut` · `DECISIONS_HISTORY.md § Ruled 2026-10-16 (14z-203) — #290: the green guard sits at the commit, with a light push check on the tip` | none | none | 14z-202,14z-203 |
 | [#289](https://github.com/DefinitelyFrenchName/VampireSaved/issues/289) | evolution | open | Revisit the cut of the close's audit layer (documentation packet, procedure check) when there is more data | none | `DECISIONS_HISTORY.md § Ruled 2026-10-15 (14z-202) — #288: everything but the before-an-action check is cut` | none | none | 14z-202 |
 | [#286](https://github.com/DefinitelyFrenchName/VampireSaved/issues/286) | evolution | open | The close tier's cost follows the session, not the change: false re-runs, the dirty fbneo submodule, controls on every re-run gate | `tools/static_confirm.py` · `tests/test_static_runner.sh` | `DECISIONS_HISTORY.md § Ruled 2026-10-15 (14z-202) — the close's cost must follow the change` | none | none | 14z-202 |
 | [#284](https://github.com/DefinitelyFrenchName/VampireSaved/issues/284) | bug | open | [regression] m23-merged README.md file is currently a mess | `release/merged-m23/mame/README.md` · `tools/package_release.py` | `DECISIONS_HISTORY.md § Ruled 2026-10-15 (14z-201) — the recording procedure moves to the release package README, under #284; the maintainer trims the root README` | none | none | 14z-201 |

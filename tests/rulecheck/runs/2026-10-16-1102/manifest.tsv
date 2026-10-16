@@ -1,0 +1,16 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent203/t290/design.md	125377a64ecb16375dac48c1a3171971529345bc
+build/agent203/t290/issue_290.md	27bd27dd75e2ce9016190c1d4340c1f03b560ec9
+build/agent203/mid1.log	66c035973982d0bc2a92912945ff889ba328b8d1
+build/agent203/mid1_results.tsv	29c997c992a68b7f01c2001406d75fa4ece4ced4
+build/agent203/mid1_results.controls.tsv	b10f482fe65897da73e37167f93c9d6148a2edfb
+tests/rulecheck/ledger.tsv	9dcdd615c26d2e2185263b30d452a98d552121b1
+DECISIONS_HISTORY.md	dab1dddbc233dca35e18f82fe7360284df0a4771
+tools/git-hooks/commit-msg	b9a7502615d51c0d130ef895deee01d8a9d3c0aa
+tools/install_hooks.sh	d1241a14977f379edbc614336dd78b1a23c1b653
+.claude/settings.json	6d988ea13b00be701fbff39ad257592d3744c301
+tests/run_all_static.sh	cc18eb693259291dd479f3b345b480606e189c00
+tests/run_on_snapshot.sh	f4a5802c6588d84fd02874d6b463f28ebc8c4bc8
+docs/project/snapshot_runs.md	ea66d553e28fe82d35ed950efa842ed64b7a46cd
+docs/project/session_close.md	1c819c94eb94dd69315b15767f510fe2bc940c36
+HANDOFF.md	2524188a466dc530f5b6cee029a23b9a56691569
