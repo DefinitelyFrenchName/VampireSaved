@@ -1,0 +1,14 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent202/closures/c283.md	21b7de1eb02246ab92929f3a3e9fcd97a0260637
+build/agent202/closures/c287.md	7c0c4691182303690a4fba02aeeab11d063bd520
+build/agent202/closures/c288.md	c743e5eec1f7cc3b93eb0bf28000f74c09f0d0f5
+build/agent202/closures/rows_proposed.tsv	9f6d745355d5f15ab48f7a25a19b15149e2fc7ed
+build/agent202/closures/evidence.txt	2552b2646b931a833b2579f5907516ac5f0c0f58
+build/agent202/t288/summary.md	e2e334b6b07f2735f1a25e57fc81d97774c0918a
+DECISIONS_HISTORY.md.lines-7094-7130 (lines 7094-7130 of DECISIONS_HISTORY.md)	80ddfd0c803ffd3bac1c6964a176d75dd5c635c0
+tools/static_confirm.py.lines-66-71 (lines 66-71 of tools/static_confirm.py)	91eba0687535247b2ebc740716f2f8e0bd13a945
+tools/trace_static_reads.py.lines-82-110 (lines 82-110 of tools/trace_static_reads.py)	df71002125dd33575d7e362da1630a0091b13da0
+tests/test_trace_static_reads.sh.lines-20-30 (lines 20-30 of tests/test_trace_static_reads.sh)	a1b9f55b1f5e405c548ace936e778b6306125aa6
+tests/test_trace_static_reads.sh.lines-105-140 (lines 105-140 of tests/test_trace_static_reads.sh)	a6f92c011360af41598c7c08b2e6d7335d4b3308
+docs/project/gotchas.md.lines-7132-7144 (lines 7132-7144 of docs/project/gotchas.md)	845ad0d126dbcd4b7e2aae917cab677144ef94b5
+docs/project/rule_checker.md.lines-13-22 (lines 13-22 of docs/project/rule_checker.md)	ea50501b57af255ca3bf06839309b8d6bff2ae28

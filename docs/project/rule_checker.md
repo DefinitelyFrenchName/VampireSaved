@@ -301,7 +301,7 @@ changes, because either moves the instrument.
 row) must be named by an `OK` `freeze` run in the ledger, or
 `tests/test_rule_checker.sh` fails. The evidence family's other three decision kinds
 cannot be bound by a file the tree can see; they are bound by the rule above, and the
-ledger is what the maintainer audits. **The `procedure` kind is BOUND MECHANICALLY** (installed by the
+ledger is what the maintainer audits. **The `procedure` kind WAS BOUND MECHANICALLY** (**UNWIRED 2026-10-16, #288:** the procedure check is cut; the maintainer installed the settings change that removes this hook, *"The cp has been run."*; the hook and its cases stay in the tree) (installed by the
 maintainer 2026-09-23, 14z-176b): `tools/agent/hooks/pre_push.py`, a PreToolUse hook on
 `git push` OF THIS REPOSITORY, allows the push only when a passed or resolved
 `procedure` run checked a commit inside the pushed range (`meta.tsv` records that commit

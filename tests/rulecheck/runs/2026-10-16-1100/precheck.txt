@@ -1,0 +1,8 @@
+  FLAG ATTRIB: The three closing comments state what was built or ruled as the staged commits, gates, rulings and figures show, quote the maintainer verbatim, name what eac...
+  FLAG D-ABSOLUTE: Whether those older 0-miss scores would have changed is now history; nothing rests on them.  [build/agent202/closures/c283.md]
+  FLAG D-ABSOLUTE: Nothing of #287 was built.  [build/agent202/closures/c287.md]
+  FLAG D-ABSOLUTE: 360 VIOLATED rule-checker runs were read and classed by the session (not blind): a 60-run pilot (seed 202), then a 300-run confirmation (seed 2022) covering ...  [build/agent202/closures/c288.md]
+  FLAG D-ABSOLUTE: - the final tier (the records are committed before the one tier now).  [build/agent202/closures/c288.md]
+  FLAG D-ABSOLUTE: Cost per step was not measured: the maintainer ruled on every step from the catches.  [build/agent202/closures/c288.md]
+  FLAG D-ABSOLUTE: With the steps cut or kept on that ruling, nothing is left to measure here.  [build/agent202/closures/c288.md]
+packet_check: 7 flag(s): ATTRIB 1, D-ABSOLUTE 6

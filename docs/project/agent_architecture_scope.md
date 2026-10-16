@@ -13,8 +13,8 @@
 > 14z-133 session that the by-hand check for #172 had missed (§4). **S3 LANDED 14z-176
 > (ruled *"Build it as described"*):** C1 is the rule-checker's `procedure` family —
 > `tools/agent/extract.py`, the QP1-QP4 checklist in `docs/project/rule_checker.md`, four
-> fixtures calibrated on Opus 5.5 (runs `2026-09-23-101..104`); its push binding **`tools/agent/hooks/pre_push.py` is INSTALLED
-> (14z-176b, the maintainer: *"since we both think the push hook is a good idea, I'll install
+> fixtures calibrated on Opus 5.5 (runs `2026-09-23-101..104`); its push binding **`tools/agent/hooks/pre_push.py` is INSTALLED** (**UNWIRED 2026-10-16, #288:** the procedure check is cut; the maintainer installed the settings change that removes this hook, *"The cp has been run."*; the hook and its cases stay in the tree)
+> **(14z-176b, the maintainer: *"since we both think the push hook is a good idea, I'll install
 > it"*)** — refusing live a push of an unchecked commit, and letting another repository's push
 > through; gated by `tests/test_agent_hooks.sh` (18 cases and the real ledger; controls `open-push-hook`, `misread-ledger`, `no-target-check`). **S4 LANDED 14z-177/178** (§5): the
 > `measurer` / `reader` workers and their spec template, the extract's worker lines, the CALL GATE

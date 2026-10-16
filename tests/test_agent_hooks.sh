@@ -38,7 +38,8 @@
 # MUST-FIRE: perturbed-copy: stale-hint — a copy of the push hook whose refusal hint is the pre-#210 one (no `--session`, a `--model <model>`) must fail the hint check: the sample command must be one `tools/rulecheck.py prepare` accepts as printed (mode: the check reads that copy)
 # MUST-FIRE: perturbed-copy: open-push-hook — a copy of the C1 push hook (`pre_push.py`, slice S3) whose `decide` allows every call must let an unchecked push through, and the gate must FAIL on the must-deny push cases (mode: the gate drives that copy)
 #
-# SLICE S3's BINDING (installed by the maintainer 2026-09-23, 14z-176b): `pre_push.py`
+# SLICE S3's BINDING — UNWIRED 2026-10-16 (#288: the procedure check was cut; the maintainer installed the
+# settings change). Until then, installed by the maintainer 2026-09-23, 14z-176b: `pre_push.py`
 # refuses a `git push` of THIS repository unless a passed or resolved `procedure` run of
 # the rule-checker checked a commit in the pushed range. `tests/lib/pre_push_cases.py`
 # drives it through 18 cases against a scratch repo — including pushes of ANOTHER
@@ -195,8 +196,8 @@ need = {"Edit(.claude/settings.json)", "Edit(tools/agent/hooks/**)", "Edit(tools
 bad = []
 if not any("tools/agent/hooks/pre_bash.py" in c for c in cmds):
     bad.append("no PreToolUse Bash hook runs tools/agent/hooks/pre_bash.py")
-if not any("tools/agent/hooks/pre_push.py" in c for c in cmds):
-    bad.append("no PreToolUse Bash hook runs tools/agent/hooks/pre_push.py (C1's push binding)")
+# pre_push.py is no longer required: the procedure check was cut and the maintainer unwired the push hook
+# (#288; installed 2026-10-16, "The cp has been run."). Its cases still run below while the tool stays in the tree (#289).
 agent = [h.get("command", "") for m in s.get("hooks", {}).get("PreToolUse", []) if m.get("matcher") == "Agent|Task"
          for h in m.get("hooks", []) if h.get("type") == "command"]
 if not any("tools/agent/hooks/pre_agent.py" in c for c in agent):
@@ -206,7 +207,7 @@ if need - deny:
 for b in bad:
     print(f"FAIL: installation — {b}")
 if not bad:
-    print("  installation: .claude/settings.json wires pre_bash.py and pre_push.py on Bash, pre_agent.py on Agent|Task, and keeps the three edit-lock rules")
+    print("  installation: .claude/settings.json wires pre_bash.py on Bash, pre_agent.py on Agent|Task, and keeps the three edit-lock rules")
 sys.exit(1 if bad else 0)
 PY
 cat "$W/wiring.txt"

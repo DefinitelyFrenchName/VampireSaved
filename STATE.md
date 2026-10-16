@@ -73,42 +73,24 @@ cut steps' ten gates `ondemand` (`tests/ci_cadence.tsv`), `docs/project/rule_che
 group form without a findings section. Drafted for the maintainer to install: the push hook unwired
 (`build/agent202/hook_change/`). Filed: #289 (revisit with more data), #290 (the deterministic green guard).
 
-## Session 14z-201b — **#285: the Windows launcher gate's cmd-driven half moves to release cadence or on demand.** A continuation of 14z-201 after its close, on the same transcript (`979461fd`).
+### (6) THE PUSH HOOK UNWIRED; #283, #287, #288 CLOSED
+The maintainer installed the drafted settings change: *"The cp has been run."* (2026-10-16). `.claude/settings.json` no
+longer runs `tools/agent/hooks/pre_push.py`; the hook and its cases stay in the tree. `tests/test_agent_hooks.sh` stops
+requiring it wired (PASS, every control fired), and `docs/project/rule_checker.md`, `docs/project/operations.md` and
+`docs/project/agent_architecture_scope.md` mark it unwired. The closures went through rule-checker run 2026-10-16-1100
+(fixture caught; VIOLATED Q1 Q4 Q5, resolved). Reader b found the hook's install attributed to the maintainer without the
+maintainer's words, the `cap`/`dashboard` rulings described as made on catch figures, and #283's fix not shown in use on
+the real trace. Measured on PILOT for it (`build/agent202/closures/split_count.py`, local): the traces of all 225 gates
+hold 64,773 split open lines, and 12 read pairs in 2 gates come only from the re-joined lines. Closed: #283 `done`,
+#287 `declined` (superseded by the #288 ruling), #288 `done`, each with its closing comment on GitHub.
 
-### opened with
-The maintainer: *"Why do we have a windows only gate outside of release?"* Then, on the answer: *"I agree with your rationale in a vacuum but
-practically, we always worked on one environment and check cross compatibility either on demand or at release. I'm not
-saying there is no value intrinsically but the cost seems disproportionately high"*; then *"Now, as 14z-201b"*.
-
-### (1) #285 BUILT
-`tests/test_release_launcher_bat.sh`: off a Windows host the cmd-driven half prints a NOTE naming #285 at session and
-freeze cadence and keeps its `SKIP (said)` at release cadence; on a Windows host it runs at any cadence. Measured on
-this Mac with the runner's own classifier (`tests/lib/classify.sh`): session PASS, freeze PASS, release SKIP. No
-`tests/ci_cadence.tsv` row (the option text named one): listing the gate there would defer its static half too, which
-the ruling keeps at every close. `docs/project/gate_coverage.md` regenerated. The first close tier at `ab89682d` went red on it (PASS 206 FAIL 1):
-passing on the Mac, the gate showed its `first-found` control "not fired", a control only the Windows run had ever
-fired. The gate's static check now holds #248's newest-set rule (the candidate loop sends every candidate through
-`:consider`), so `first-found` fires on every host and `CONTROL=first-found` FAILs here (7 of 7 controls fired).
-Ruling: `DECISIONS_HISTORY.md` "Ruled
-2026-10-15 (14z-201b) — #285".
-
-### (2) THE FINDINGS TABLE
-`docs/project/findings/14z-201b.tsv` — every finding, its live home, the test that reproduces it (checklist step 1).
-
-### (3) CLOSE (14z-201b, 2026-10-15)
-Run by the step table and its driver (`docs/project/session_close.md`, `tools/close.py`; run dir
-`build/agent201b/close`, local). **STOPPED before the push, on the maintainer's word:** asked whether to finish (about
-1.5 hours more) or stop, the maintainer: *"honestly, stop here leave the commits local and the next session will push"*.
-Where it stopped:
-- findings (a)-(c); sections; NEXT_SESSION rewritten; the 14z-201 group rolled; checks green;
-- documentation packet: run 2026-10-15-1094, fixture caught, VIOLATED Q1 Q4 on the real packet (the checks ran before
-  the commit; a 41/38 count), verified and resolved; STATE and the findings changed after it, so it predates (b) and (c);
-- procedure check: runs 2026-10-15-1095 (the end of the 14z-201 close; one slip: "the last sweep was clean" dropped the
-  sweep's OPEN TASK line) and -1096 (OK), both fixtures caught;
-- tier at `ab89682d`: RED, PASS 206 FAIL 1 (`test_release_launcher_bat`'s `first-found` not fired, finding (b)), fixed
-  in `4eb066b0`; the re-run at `b29b90c3` was stopped with the close, its snapshot removed;
-- dashboard re-collected through 14z-201b and uploaded (figures, rc_runs and costly version 6, tiers 7);
-- not run: the record, the final tier, the push. The commits since `c81dc932` are local.
+### CLOSE (14z-202, 2026-10-16)
+Run by the ten-step table (`docs/project/session_close.md`, `tools/close.py`; run dir `build/agent202/close`, local),
+timed for the maintainer (*"let's time it to see what we gain or not already"*). Started 07:37:25.
+- sections: (1)-(6) and this one; next-session rewritten (the 14z-201b opener moved verbatim); rollover: the 14z-201b
+  group moved to `STATE_HISTORY.md` with its ledger line; indexes and dashboard: see the step logs;
+- the tier runs after this commit: `build/agent202/close/tier_results.tsv`, the next close's `--prev`. Its verdict, its
+  time and the push are reported after the commit, on #286 and to the maintainer.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings

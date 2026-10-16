@@ -1,0 +1,11 @@
+decision	recommendation
+subject	Ticket closures at the 14z-202 close: #283 done, #287 declined (superseded by the #288 ruling), #288 done
+session	14z-202
+model	rule-checker@163e4ce9cf7b
+claim	The three closing comments state what was built or ruled as the staged commits, gates, rulings and figures show, quote the maintainer verbatim, name what each ticket's done-when or fix list asked for that was not done, and the proposed tickets.tsv rows match the comments. Not tested: the 14z-200 #274 traces were not re-scored with the fixed reader; the cost per close step that #288's done-when names was not measured; whether the maintainer's settings.json change takes effect in this running session is unmeasured.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	7 flag(s): ATTRIB 1, D-ABSOLUTE 6
+deliverables	build/agent202/closures/c283.md build/agent202/closures/c287.md build/agent202/closures/c288.md
