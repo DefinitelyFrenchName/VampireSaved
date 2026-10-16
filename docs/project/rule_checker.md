@@ -19,6 +19,9 @@ more data"* (`DECISIONS_HISTORY.md` "Ruled 2026-10-15 (14z-202) — #288: everyt
 …"; the revisit is #289). A run is made before a freeze, a build, an expectation, a recommendation or a ticket closure.
 The procedure family below and the close's documentation packet are CUT: kept as the record of what they were, no step runs
 them, and the push hook's procedure requirement is unwired (`build/agent202/hook_change/`, installed by the maintainer).
+**No action is held for the close (ruled 2026-10-16, 14z-203):** a ticket closure or a recommendation is made, with its
+run, in the piece of work that finishes it — `DECISIONS_HISTORY.md` "Ruled 2026-10-16 (14z-203) — an action is checked
+when its work is done, never held for the close".
 
 ## The failure it exists to catch
 

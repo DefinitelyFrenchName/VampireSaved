@@ -68,7 +68,10 @@ The eight disagreements the census found (2026-10-15), each settled by the rulin
 5. **The rollover:** every group but this sitting's own (#282 item A). The indexes are regenerated after it.
 6. ~~**The checks file**~~ — CUT 2026-10-15 (#288) with the close checks.
 7. **The rule-checker at the close:** none since #288 (2026-10-15). The documentation packet and the procedure check are
-   cut; a rule-checker run is made only before an action.
+   cut; a rule-checker run is made only before an action. **And no action is held for the close (ruled 2026-10-16,
+   14z-203):** a ticket is closed and a recommendation put in the piece of work that finishes it, so its run happens
+   there; a rule-checker run cited in a CLOSE section is the tell that one was held (`DECISIONS_HISTORY.md` "Ruled
+   2026-10-16 (14z-203) — an action is checked when its work is done, never held for the close").
 8. **Pushing:** only at the close, and only when everything is green ([VSP-17]). A mid-session push needs the
    maintainer's word.
 
