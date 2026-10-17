@@ -101,7 +101,7 @@ count change the gate's own header recorded). Posted on each issue; ruled (`DECI
   `tests/run_all_static.sh`: executed and carried controls apart (mid1's "executed: 378" was 177 run plus 201 carried),
   and a cadence-deferred gate listed as `defer`, not `re-run`; `tests/test_static_runner.sh` section 22 checks both.
 
-### (6) #261 FROZEN AND #256 FIXED
+### (6) #261 FROZEN AND #256 FIXED — BOTH CLOSED
 - **#261:** `audit_effect_class_rows` section 4 runs before section 5 and its runs are held to frozen game clocks (leg
   `merged`); `build/manifest/type6_fallback.toml` freezes 0/0/0/0/270/1232 on merged-m23; the registry passes
   `BUILD=%MERGED%`. The 14z-89 counts (387, 948) had moved; recorded unattributed as ruled, with the old-clock run on this
@@ -109,6 +109,9 @@ count change the gate's own header recorded). Posted on each issue; ruled (`DECI
   pass: PASS 242 s.
 - **#256:** `close_standing.py open-tickets` expands a cited `#A-#B` range; the self-test plants one, and the
   `range-ends` control proves it.
+- **Committed `bd620817`** (tier GREEN, PASS 208, on the staged tree). #261 and #256 then CLOSED `done` through
+  rule-checker run 2026-10-17-1107 (VIOLATED Q1 Q4: evidence the packet lacked, gathered in
+  `build/agent203/close261_256/evidence.txt`, local).
 - **Paid twice this session:** a gate script edited while it ran (the static runner's own gate; the battery pass of
   `audit_effect_class_rows`, which died on a shell syntax error). Both runs were discarded and re-run untouched.
 

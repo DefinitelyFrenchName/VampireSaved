@@ -1,0 +1,11 @@
+decision	recommendation
+subject	Ticket closures, 14z-203: #261 done (the type-6 inventory frozen and run in the battery) and #256 done (open-tickets reads ranges), at commit bd620817
+session	14z-203
+model	rule-checker@163e4ce9cf7b
+claim	Both tickets have nothing left to do under the maintainer's 2026-10-17 rulings (DECISIONS_HISTORY.md): #261's freeze, clock hold and registry row are in commit bd620817, the tier on that tree is GREEN PASS 208 (build/agent203/tier8_results.tsv) and the battery runner's pass PASS (build/agent203/t261/emu_run/results.tsv); #256's range expansion, self-test case and range-ends control are in the same commit, test_close_standing PASS (build/agent203/t256_close_standing2.log); the draft rows (build/agent203/close261_256/tickets.tsv) answer the four questions with links tools/tickets.py checks, failing only on the two issues still being open. NOT TESTED: the cause of #261's two count moves since 14z-89 (ruled to be recorded unattributed); START HERE's ticket citations stay unchecked by the tier, as ruled for #256.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	11 flag(s): D-ABSOLUTE 11
+deliverables	build/agent203/close261_256/c261_close.md build/agent203/close261_256/c256_close.md build/agent203/close261_256/tickets.tsv

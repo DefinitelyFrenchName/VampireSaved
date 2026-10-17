@@ -1,0 +1,12 @@
+  FLAG D-ABSOLUTE: Every bug, cosmetic item and  [build/agent203/close261_256/tickets.tsv]
+  FLAG D-ABSOLUTE: # Live documents name a ticket by its issue number (#N) and never restate its  [build/agent203/close261_256/tickets.tsv]
+  FLAG D-ABSOLUTE: # only into a source of truth or an archive.  [build/agent203/close261_256/tickets.tsv]
+  FLAG D-ABSOLUTE: # every ticket — the four answer columns below.  [build/agent203/close261_256/tickets.tsv]
+  FLAG D-ABSOLUTE: Only the conversation, and a  [build/agent203/close261_256/tickets.tsv]
+  FLAG D-ABSOLUTE: # third party's report text, may exist on GitHub alone.  [build/agent203/close261_256/tickets.tsv]
+  FLAG D-ABSOLUTE: Every issue on GitHub has exactly  [build/agent203/close261_256/tickets.tsv]
+  FLAG D-ABSOLUTE: # label on GitHub, never a move.  [build/agent203/close261_256/tickets.tsv]
+  FLAG D-ABSOLUTE: # cosmetic presentation only, no gameplay effect  [build/agent203/close261_256/tickets.tsv]
+  FLAG D-ABSOLUTE: # CLOSED MEANS NOTHING IS LEFT TO DO: an option kept open is its own  [build/agent203/close261_256/tickets.tsv]
+  FLAG D-ABSOLUTE: Only issues listed  [build/agent203/close261_256/tickets.tsv]
+packet_check: 11 flag(s): D-ABSOLUTE 11
