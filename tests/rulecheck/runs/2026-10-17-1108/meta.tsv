@@ -1,0 +1,11 @@
+decision	recommendation
+subject	A working rule on when to commit (commit only at a boundary that needs one; run the bookkeeping gates before every tier), proposed to the maintainer
+session	14z-203
+model	rule-checker@163e4ce9cf7b
+claim	proposal.md's figures come from build/agent203/commit_rule/measurer_return.txt (eight tiers, four NOT GREEN, four commits since the 14z-202 close); each of the four reds was a gate of the proposal's step-2 list (mid2 test_rule_checker, mid3 test_must_fire_census test_gate_descriptions test_gate_coverage_current, mid5 test_gate_coverage_current, tier7 test_rule5_census, per the logs); the proposal changes no ruling in DECISIONS_HISTORY.md (#290's guard, the close). NOT TESTED: that step 2's list catches every red a future tier could find (it lists today's four classes and the gates of changed files); any time saving (the counterfactual tiers were not run); the cause of each red is the session's reading of its log, not a measurer figure.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	10 flag(s): D-ABSOLUTE 10
+deliverables	build/agent203/commit_rule/proposal.md

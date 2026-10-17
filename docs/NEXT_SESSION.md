@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-202 CLOSE, 2026-10-16)
+# NEXT SESSION — orientation (rewritten at the 14z-203 CLOSE, 2026-10-17)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` (then `python3 tools/gen_history_index.py`
@@ -10,36 +10,32 @@
 
 A plain **Opus 5.5 session at effort High** (the ruled orchestrator — STATE 'Standing rulings') on the
 #172 setup:
-- Every quoted figure comes from a `measurer` / `reader` spec (`docs/project/worker_spec.md`, the spec text IN the prompt, no model). The Bash tool's shell is zsh: write a revision and a path as `"${c}:path"`, never `$c:path` (`docs/project/gotchas.md`, 14z-201).
-- **The rule-checker runs ONLY BEFORE AN ACTION since #288 (2026-10-15):** a freeze, a build, an expectation, a recommendation, a ticket closure (`docs/project/rule_checker.md`). The pinned `rule-checker`, the prompt files pasted VERBATIM, then `record` and `resolve` on ONE line. Read `prepare`'s flags before spawning; pass `--deliverable` for what a packet puts forward. **A diagnosis put to the maintainer with proposals in it is a recommendation** (14z-202 finding (e)). **No action is held for the close** (ruled 14z-203): close a ticket, put a recommendation, in the piece of work that finishes it, with its run then.
-- There is no documentation packet, no procedure check and no `--cap` read at the close any more, and no push hook: the maintainer installed the settings change that unwired `pre_push.py` (2026-10-16).
+- Every quoted figure comes from a `measurer` / `reader` spec (`docs/project/worker_spec.md`, the spec text IN the prompt, no model). The Bash tool's shell is zsh: write a revision and a path as `"${c}:path"`, never `$c:path`.
+- **The rule-checker runs ONLY BEFORE AN ACTION** (a freeze, a build, an expectation, a recommendation, a ticket closure; `docs/project/rule_checker.md`), **as soon as that action's work is done, never held for the close** (ruled 2026-10-16). The pinned `rule-checker`, the prompt files pasted VERBATIM, then `record --session <the CURRENT transcript's prefix>` (after a resume the transcript id changes: 14z-203 recorded run 1107 against the old one first) and `resolve` on ONE line.
+- **THE GREEN GUARD (#290, live since 14z-203):** `tools/git-hooks/pre-commit` refuses a commit unless the staged tree has a strict GREEN whole-tier row (`.git/green_index.tsv`); tier the STAGED tree on a snapshot (`tests/run_on_snapshot.sh --commit "$(git commit-tree "$(git write-tree)" -p HEAD -m …)"`), then commit. Base a `--confirm` on the newest run that EXECUTED its controls.
+- **WHEN TO COMMIT (ruled 2026-10-17, `docs/project/working_methods.md` "When to commit"):** only at a ticket closure, a freeze or release, work handed to PILOT or ERIS, or the close. Before EVERY tier, regenerate the generated files and run the bookkeeping gates the change touches; all four red tiers of 14z-203 were those gates.
+- **Never edit a script while it runs** ([MJC-54]): 14z-203 did it twice; both runs were discarded.
 
 Say so at the opener. Never spawn any agent at `max`. A recommendation leans only on the maintainer's OWN words.
-**Before any long job, check whether PILOT (`ssh pilot`) or ERIS (`ssh eris`) is idle, and run independent work
-there in parallel.** A long tier runs on a snapshot (`tests/run_on_snapshot.sh`), so the tree can be edited meanwhile.
+**PILOT and ERIS are unavailable for a few days** (the maintainer, 2026-10-17); check `ssh pilot` / `ssh eris` before relying on them.
 
-**THE SESSION CLOSE (cut by #288; reordered by #290, 14z-203):** `docs/project/session_close.md`, run by `python3 tools/close.py`
-(`start`, then `next`, `done`, `status`). The records are STAGED, the one tier (`--strict --confirm` on the previous
-close's results) runs on a snapshot of the staged tree, then the commit, which the green guard's pre-commit hook
-refuses unless that tier's row is GREEN for its tree; so there is no second pass. The run of record is named in STATE 14z-202's CLOSE section.
-**Since #286, a `--confirm` re-run gate executes its controls only when its own code reads a changed file directly**,
-and an unchanged dirty `emu/fbneo` no longer counts as changed.
+**THE SESSION CLOSE:** `docs/project/session_close.md`, run by `python3 tools/close.py` (`start`, then `next`, `done`,
+`status`). The records are STAGED, the one tier runs on a snapshot of the staged tree, then the commit through the
+guard. The run of record is named in STATE 14z-203's CLOSE section.
 
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
-1. **THE MAINTAINER'S DIRECT PRIORITY: the close's cost (#286, #289, #290).**
-   - **#290 — the deterministic green guard** (no commit or push on a tier that did not read GREEN; it replaces the procedure check's one recurring real catch). **Its design goes to the maintainer BEFORE it is built**, through a recommendation rule-checker run. The guard is a hook or a gate: hooks are edit-locked, so a hook change is drafted under `build/` for the maintainer to install.
-   - **#286 — stays open on its done-when:** a record-only pass measured, re-running only gates that open a record file, no control executed. The close no longer has a record-only pass, so the cheapest measurement is a mid-session `--confirm` after a doc-only commit; put the restated done-when to the maintainer if that is not what they want. The 14z-202 close's tier figures are on #286.
-   - **#289 — revisit the cut** of the audit layer when there is more data; nothing to do until then except keep the before-an-action runs' resolutions classifiable (W/S/R/N, `build/agent202/t288/summary.md`, local).
-2. **Then ask the maintainer for the order of work.** The open tickets, by their GitHub severity label:
-   - medium: #284 (the release package README: its clean-up, and the recording procedure moved into it; `test_readme_recording` fails until it is done), #243, #257, #258, #259;
+1. **#286 — three narrowings built, waiting for a trace score.** `build/agent203/t286/narrowings.patch` (local; `git apply` it, then score with `tools/trace_static_reads.py all` on PILOT, 0 misses required, #225). Measured on 14z-203's tree: mid2's record-only change set 58 → 50 STALE, a new run record 33 → 31, none added (#286 comment). The remaining over-runs are R2 mentions in tools' self-tests (the trace or a call graph tells them apart). The done-when is amended (controls only for gates whose real inputs changed).
+2. **#291 — the comparative capture sheets: build S1** as ruled (`DECISIONS_HISTORY.md` "Ruled 2026-10-17 (14z-203) — #261 freeze as measured, …"; the design on #291): the `# SHEET:` grammar and its census gate, `tests/lib/sheet.sh`, the capture-and-prove step and its ground-truth gate, the page, and three exemplars (`audit_move_parity`, `test_gfx_menus`, `audit_merged_legacy`). The census of all 231 emulator gates: `build/agent203/t291/census_all.tsv` (local).
+3. **#290 — open until the maintainer installs** `build/agent203/t290/hook_change/INSTALL.md` (two deny rules and the `pre_bash.py` bypass rule). After the install: the 24 cases into `tests/agent/c01_commands.jsonl`, the two deny rules into `test_agent_hooks`' `need` set, then close #290 through a rule-checker run.
+4. **#289 — revisit the cut** of the audit layer when there is more data.
+5. **Then ask the maintainer for the order of work.** The open tickets, by their GitHub severity label:
+   - medium: #284 (the release package README; `test_readme_recording` fails until it is done), #243, #257, #258, #259;
    - low: #118, #129, #229, #244;
-   - no severity label: #260, #262, #263, #266, #267, #273 and #275 (rule-checker Q1 replication; the maintainer chose to replicate before deciding, `DECISIONS_HISTORY.md` "Ruled 2026-10-13 (14z-199) — #273: replicate before deciding; …"; plan in `build/agent199/t273/plan_replication.md`), #276 (the session dashboard misses every tier run on a snapshot), #277 (the procedure check's extract; the procedure check is cut, so ask whether it still matters);
+   - no severity label: #260, #262, #263, #266, #267, #273, #275, #276, #277;
    - **release-only** (worked at a release, not in a session): #278, #279, #280, #281.
-3. **#266 — PILOT's GNOME Shell segfaults under Wayland at every boot since 2026-10-09**, so `audit_release_linux_desktop` cannot run.
-4. **`tests/replays/118_chain.rpl`'s header names a leg of `audit_mizuumi_inputs` that gate never ran** (STATE_HISTORY 14z-198 finding (i)). The one-line correction stales the 76 emulator gates that follow `tests/replays/`, so make it in a session that runs those gates.
-5. **#118 — the chars gate, PARKED on branch `t118-196`.** **#129 stays the lowest priority**, captures first.
+6. **`tests/replays/118_chain.rpl`'s header names a leg of `audit_mizuumi_inputs` that gate never ran** (STATE_HISTORY 14z-198 finding (i)); make the one-line correction in a session that runs the 76 emulator gates following `tests/replays/`.
 
 ## PARKED (not open work)
 
@@ -47,14 +43,12 @@ and an unchanged dirty `emu/fbneo` no longer counts as changed.
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
-- **A staleness predictor is scored both ways** (`docs/project/gotchas.md` "A STALENESS PREDICTOR SCORED ONLY ON ITS MISSES…"): its misses on a trace, and its over-runs on a real change set.
-- **A data file a gate reads with `cat` is not in its reach** (`docs/project/gotchas.md` "A DATA FILE A GATE READS WITH `cat`…"): the control trigger is `direct_read`, never R1 alone.
-- **PILOT's state after 14z-202:** its clone is detached at `1c59a7cd`; scratch in `~/t202` (the traces of all 225 gates in `~/t202/tr`). `ROMDIR` is `/home/koneko/roms` and `.profile` does not set it.
+- **A static-runner readout can count what it did not do:** until 14z-203 the "executed:" line added carried controls, and the plan listed cadence-deferred gates as re-runs (both fixed, `tests/run_all_static.sh`; `tests/test_static_runner.sh` section 22).
+- **`audit_effect_class_rows` section 4 needs an absolute `BUILD`** for its reference legs, which run from their own directories (`tests/lib/instr_align.sh` `_ia_leg`); the gate makes it absolute and keeps the given form for the frozen headers.
+- **A frozen inventory under `build/manifest/` needs its keys classified in `tools/audit_rule5.py`** or `test_rule5_census` fails (14z-203's red tier7).
 
-## WHAT CLOSED THIS SITTING (14z-202)
+## WHAT CLOSED THIS SITTING (14z-203)
 
-- **#286 (a), (b), (c) built** (`1c59a7cd`, `f1b732e5`); the ticket stays open on its done-when (START HERE 1).
-- **#283 closed `done`**, **#287 closed `declined`** (superseded by the #288 ruling), **#288 closed `done`**: the close cut to ten steps.
-- **Filed:** #289, #290.
-- **14z-201b's and 14z-202's commits pushed** at this close (STATE 14z-202 CLOSE).
-- **Ruled:** each in the maintainer's own words in `DECISIONS_HISTORY.md` "Ruled 2026-10-15 (14z-202) — …".
+- **#290 built** (`a36dd6d3`; open until the install, START HERE 3). **#291 filed, its census and design ruled.**
+- **#261 closed `done`** (the type-6 inventory frozen on merged-m23, `bd620817`) and **#256 closed `done`** (open-tickets reads ranges), at `937ac1b3` through rule-checker run 2026-10-17-1107.
+- **Ruled:** an action is checked when its work is done; #290's four answers; #291's eight answers; #261, #256, #286; when to commit — each in the maintainer's own words in `DECISIONS_HISTORY.md` "Ruled 2026-10-16/17 (14z-203) — …".

@@ -1,4 +1,4 @@
-# WORKING METHODS — retraction, bug archaeology, field reports and the regression runner, in full
+# WORKING METHODS — retraction, bug archaeology, field reports, the regression runner and when to commit, in full
 
 The full text of CLAUDE.md rules on how work is done, moved here verbatim on 2026-10-15 (#282 item D, the
 maintainer: *"Rule + pointer (Recommended)"*). CLAUDE.md keeps each rule's `**[VSP-N]**` anchor and its statement;
@@ -99,3 +99,33 @@ this file holds its reasons, history and steps.
   never fired the move, corrected by the maintainer who remembered the fix
   working; the archaeology took two commands, the wrong conclusion took
   hours and reintroduced the crash.
+
+## When to commit
+
+Ruled 2026-10-17 (14z-203), the maintainer: *"Adopt as proposed (Recommended)"* (`DECISIONS_HISTORY.md` "Ruled
+2026-10-17 (14z-203) — when to commit: …"). Since #290 every commit needs a strict GREEN run of the whole static tier on
+the exact staged tree (`tools/git-hooks/green_guard.py`). With `--confirm` that tier re-runs only the gates a change
+reaches, and on 2026-10-16/17 it still took 12 to 40 minutes on an awake machine. Eight tiers ran for four commits, and
+four of the eight were red from a slip the gates below catch.
+
+1. **Commit only at a boundary that needs a commit:**
+   - a ticket closure: its closing comment cites the commit;
+   - a freeze or a release: the tag sits on a commit;
+   - work handed to PILOT or ERIS: a bundle of a commit;
+   - the close (`docs/project/session_close.md`).
+
+   Everything else stays in the working tree and rides the next boundary's one tier. The guard checks only at commit,
+   so uncommitted work costs no tier.
+2. **Before every tier, regenerate the generated files, then run the bookkeeping gates the change touches:**
+   - a gate added or removed, or its header or `# MUST-FIRE:` lines changed: `test_must_fire_census`,
+     `test_gate_descriptions`, `test_gate_coverage_current`, `test_gate_index_current`;
+   - a file under `build/manifest/`: `test_rule5_census`;
+   - `docs/project/tickets.tsv`, or an issue closed or filed: `test_tickets`;
+   - a rule-checker run recorded: `test_rule_checker`, with every run directory the ledger names staged;
+   - `STATE.md` or `docs/NEXT_SESSION.md`: `test_state_open_lists`, `test_live_budget`;
+   - a gate or tool changed: that gate, and the gates whose reach includes that tool, run directly.
+
+   Each of the four reds of 2026-10-16/17 was one of these gates. The tier then confirms; it should not discover.
+3. **The tier's base** is the newest run that executed its controls. A confirm based on a run made without controls
+   re-runs every gate whose controls that run did not execute.
+

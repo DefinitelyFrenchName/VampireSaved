@@ -115,59 +115,21 @@ count change the gate's own header recorded). Posted on each issue; ruled (`DECI
 - **Paid twice this session:** a gate script edited while it ran (the static runner's own gate; the battery pass of
   `audit_effect_class_rows`, which died on a shell syntax error). Both runs were discarded and re-run untouched.
 
-## Session 14z-202 — **The close's cost must follow the change: #286, #287, #288 filed and made the direct priority.** Opened 2026-10-15 on Opus 5.5 (the ruled orchestrator); transcript `b5306e71`.
+### (7) WHEN TO COMMIT — RULED; #286 NARROWED, AWAITING A TRACE SCORE
+- **The commit rule** (`DECISIONS_HISTORY.md` "Ruled 2026-10-17 (14z-203) — when to commit: …"; `docs/project/working_methods.md` "When to commit"): commit only at a closure, a freeze or release, remote work, or the close, and run the bookkeeping gates before every tier. Rule-checker run 2026-10-17-1108 (VIOLATED Q1 Q4, resolved).
+- **#286:** three narrowings in `tools/static_confirm.py` (N-I scoped `git ls-files`, N-J a walk OF the directory for N-G, N-F without the planner's own text), each with a self-test case and a control in `tests/test_static_confirm.sh` (PASS, every control fired). The scorer `tools/trace_static_reads.py` judges each read by `whole_covers`. **Not landed:** scoring on a trace of every gate needs PILOT, unavailable for a few days (the maintainer, 2026-10-17). Parked at the close as `build/agent203/t286/narrowings.patch` (local, 428 lines, `git apply --check` clean on the close's tree); measured on today's tree, mid2's change set 58 → 50 STALE, a new run record 33 → 31, none added (#286 comment).
 
-### opened with
-The maintainer: *"read handoff.md, state.md and docs/next_session.md"*. The opener's sweep read CLEAN. START HERE 0c (a cheaper final tier) was put to the maintainer, who asked why the final tier went from about 20 to over 90 minutes.
-
-### (1) WHERE THE CLOSE TIER'S TIME GOES — measured, three tickets filed
-The 14z-201 close's two passes re-ran 176 and 135 of 206 gates. The second pass followed a commit of record files only, and most of its re-runs came from rule R5 of `tools/static_confirm.py` (a data file naming a record file), `tests/rulecheck/runs/` under `tests/`, and the always-dirty `emu/fbneo`. Every re-run gate executed every control. The figures are on #286, from a `measurer` spec. Filed: #286 (the tier: false matches, the submodule, controls only on a real change), #287 (the procedure check right after each piece of work), #288 (measure the close's audit layer, then cut it down). Ruling: `DECISIONS_HISTORY.md` "Ruled 2026-10-15 (14z-202) — the close's cost must follow the change"; START HERE 0c is superseded by #286.
-
-### (2) THE FINDINGS TABLE
-`docs/project/findings/14z-202.tsv` — every finding, its live home, the test that reproduces it (checklist step 1).
-
-### (3) #286 (b) AND (c) BUILT — `1c59a7cd`
-The runner records `# subfp <path> <fingerprint>` per submodule and the plan drops a dirty submodule that did not change;
-a re-run gate executes its controls only when its code reads the changed file directly (R1, R2, R6), else it carries
-them. Gate `tests/test_static_runner.sh` sections 22-23 (controls `subfp-off`, `controls-always`, `controls-never`).
-Mid-session tier GREEN (PASS 207, `build/agent202/mid1.log`).
-
-### (4) #283 FIXED AND #286 (a) BUILT — scored on a PILOT trace before landing
-`tools/trace_static_reads.py` re-joins the opens strace splits (#283; section 2c of `tests/test_trace_static_reads.sh`).
-Five narrowings in `tools/static_confirm.py` ("#286 (a)": N-B on every `.md`, N-E, N-F, N-G, N-H; R7 takes
-`.gitmodules`), each with a selftest case and a control in `tests/test_static_confirm.sh`. The trace of all 225 gates
-at `1c59a7cd` on PILOT caught a first cut missing real reads (`test_docshape`'s `rglob` of `tests`, `.gitmodules`); the
-landed version scores 0 misses, and the change set of the 14z-201 final pass goes from 112 stale gates to 56. Figures
-and their sources: the "SCORED" paragraph of `tools/static_confirm.py`.
-
-### (5) #288 MEASURED AND THE AUDIT LAYER CUT — #287 superseded; #289 and #290 filed
-360 VIOLATED rule-checker runs classed by what each caught (`build/agent202/t288/summary.md`, local): before an action 24
-of 57 a real error in the work, the close's documentation packet 21 of 192 (1 of 78 in its last two weeks), the
-procedure check 9 of 111. The maintainer cut everything but the before-an-action check and kept the dashboard
-(`DECISIONS_HISTORY.md` "Ruled 2026-10-15 (14z-202) — #288: everything but the before-an-action check is cut; …").
-Built: the close table cut to ten steps (`docs/project/session_close.md`; records committed before the one tier), the
-cut steps' ten gates `ondemand` (`tests/ci_cadence.tsv`), `docs/project/rule_checker.md` and HANDOFF marked, STATE's
-group form without a findings section. Drafted for the maintainer to install: the push hook unwired
-(`build/agent202/hook_change/`). Filed: #289 (revisit with more data), #290 (the deterministic green guard).
-
-### (6) THE PUSH HOOK UNWIRED; #283, #287, #288 CLOSED
-The maintainer installed the drafted settings change: *"The cp has been run."* (2026-10-16). `.claude/settings.json` no
-longer runs `tools/agent/hooks/pre_push.py`; the hook and its cases stay in the tree. `tests/test_agent_hooks.sh` stops
-requiring it wired (PASS, every control fired), and `docs/project/rule_checker.md`, `docs/project/operations.md` and
-`docs/project/agent_architecture_scope.md` mark it unwired. The closures went through rule-checker run 2026-10-16-1100
-(fixture caught; VIOLATED Q1 Q4 Q5, resolved). Reader b found the hook's install attributed to the maintainer without the
-maintainer's words, the `cap`/`dashboard` rulings described as made on catch figures, and #283's fix not shown in use on
-the real trace. Measured on PILOT for it (`build/agent202/closures/split_count.py`, local): the traces of all 225 gates
-hold 64,773 split open lines, and 12 read pairs in 2 gates come only from the re-joined lines. Closed: #283 `done`,
-#287 `declined` (superseded by the #288 ruling), #288 `done`, each with its closing comment on GitHub.
-
-### CLOSE (14z-202, 2026-10-16)
-Run by the ten-step table (`docs/project/session_close.md`, `tools/close.py`; run dir `build/agent202/close`, local),
-timed for the maintainer (*"let's time it to see what we gain or not already"*). Started 07:37:25.
-- sections: (1)-(6) and this one; next-session rewritten (the 14z-201b opener moved verbatim); rollover: the 14z-201b
-  group moved to `STATE_HISTORY.md` with its ledger line; indexes and dashboard: see the step logs;
-- the tier runs after this commit: `build/agent202/close/tier_results.tsv`, the next close's `--prev`. Its verdict, its
-  time and the push are reported after the commit, on #286 and to the maintainer.
+### CLOSE (14z-203, 2026-10-17)
+The maintainer: *"let's close, we're at 75% context"*. Run directory `build/agent203/close/` (local); the tier's results
+`build/agent203/close/tier_results.tsv`, the next close's `--prev`. No rule-checker run is held for this close: every
+closure and recommendation of the sitting had its run when its work finished (1103-1108). Not landed and carried to
+the next sitting: the #286 narrowings (`build/agent203/t286/narrowings.patch`, awaiting a trace score on PILOT); #290
+awaits the maintainer's install of `build/agent203/t290/hook_change/INSTALL.md`; #291 S1 not started.
+- **Steps** (`tools/close.py`, run `build/agent203/close/`): sections, next-session (the 14z-202 opener moved verbatim), rollover
+  (the 14z-202 group to STATE_HISTORY with its ledger line; `check_state_lists` PASS), indexes (auto, DONE), dashboard (four
+  datasets re-collected, 1,716 figures all classed, uploaded and re-pointed); then stage, the tier on the staged tree
+  (`--strict --confirm build/agent203/tier9_results.tsv`, results `build/agent203/close/tier_results.tsv`), the commit
+  through the green guard, the sweep, the push.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings

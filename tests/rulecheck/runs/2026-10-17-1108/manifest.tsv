@@ -1,0 +1,15 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent203/commit_rule/proposal.md	1761894f9b5c213dc2268bc161831de147d8eb1c
+build/agent203/commit_rule/measurer_return.txt	93e3970287019dcce4a9b83c9f3a2d22560543cd
+build/agent203/mid1.log	66c035973982d0bc2a92912945ff889ba328b8d1
+build/agent203/mid2.log	ff3b497c076252316475667f6d6df28e9377b0fd
+build/agent203/mid3.log	c18db9bf9ba41008909e1f6211523d648c7bba3e
+build/agent203/mid4.log	d5c6d9e63bcfec64465979a56aee8de8dd7cadab
+build/agent203/mid5.log	f633c0954d87168f578b4a3b81448b1bd0ea9d37
+build/agent203/mid6.log	2a4cadacf0ea1ff552d1d5c3e0ac759d85c8f4ac
+build/agent203/tier7.log	e3cf06202019d59c17f51f2413f01b3bf6f99021
+build/agent203/tier8.log	76e7ff51373e11cdf58429f08bfcf29d5bfcdca4
+STATE.md	176dfd8842d376efa34a7ee0da9e3247677f816d
+docs/project/session_close.md	8615decb8ca014e4edff5aacc416cb2a97bb41b2
+DECISIONS_HISTORY.md	ad407eb21427792a3ce9475acc7bccc5febf6882
+tools/git-hooks/green_guard.py	0d8be9bf419dde7d1ffdb49e0fa4214f80863a69

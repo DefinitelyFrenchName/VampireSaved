@@ -1,0 +1,11 @@
+  FLAG D-ABSOLUTE: **Why.** Since #290 (the green guard), every commit needs a strict GREEN run of the whole static tier on the exact staged tree.  [build/agent203/commit_rule/proposal.md]
+  FLAG D-ABSOLUTE: - Four of the eight were NOT GREEN, and each red was a slip of the session's, not a defect in the work:  [build/agent203/commit_rule/proposal.md]
+  FLAG D-ABSOLUTE: - Each red cost a whole further tier.  [build/agent203/commit_rule/proposal.md]
+  FLAG D-ABSOLUTE: **Commit only at a boundary that needs a commit:**  [build/agent203/commit_rule/proposal.md]
+  FLAG D-ABSOLUTE: Uncommitted work costs no tier; the guard checks only at commit.  [build/agent203/commit_rule/proposal.md]
+  FLAG D-ABSOLUTE: **Before every tier, run the bookkeeping gates the change touches**, after regenerating the generated files.  [build/agent203/commit_rule/proposal.md]
+  FLAG D-ABSOLUTE: These are seconds to a few minutes each, against a 12 to 40 minute tier.  [build/agent203/commit_rule/proposal.md]
+  FLAG D-ABSOLUTE: - any gate or tool changed: that gate, and the gates whose reach includes that tool, run directly.  [build/agent203/commit_rule/proposal.md]
+  FLAG D-ABSOLUTE: **What it would have changed today.** The four reds were each a bookkeeping gate in step 2's list, so each was catchable before its tier.  [build/agent203/commit_rule/proposal.md]
+  FLAG D-ABSOLUTE: And da26e094 recorded only a ruling: under step 1 it would have waited for the next commit.  [build/agent203/commit_rule/proposal.md]
+packet_check: 10 flag(s): D-ABSOLUTE 10
