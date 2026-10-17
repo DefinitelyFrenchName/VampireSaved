@@ -20,6 +20,7 @@ THE TWO TRAPS PAID FOR WHILE MEASURING (both from rule-checker runs 2026-09-23-9
 """
 import json
 import re
+import shlex
 
 # ---------------------------------------------------------------- commands (C0.1)
 
@@ -185,3 +186,54 @@ def unread_finished(path):
     """The C0.2 question: tracked tasks that finished (a notification arrived) and whose
     result no later tool call has looked at."""
     return [t for t in tasks(path) if t["end_n"] is not None and not t["read_after"]]
+
+
+# #290 Q4 (ruled 2026-10-16, "Lock them"): a Bash command that would step around the green guard's git hooks.
+# hook_bypass_reason(cmd) -> a one-line reason, or None (heredoc bodies are data; `git push -n` is a dry run).
+# The override is the maintainer's own `! git commit --no-verify`, which runs outside the hooks.
+_SEGMENT = re.compile(r"&&|\|\||[;|\n&()]")
+_VERIFYING = {"commit", "push", "merge", "cherry-pick", "rebase", "revert", "am"}
+_CONFIG_WRITE = {"--unset", "--unset-all", "--add", "--replace-all"}
+
+
+def hook_bypass_reason(cmd):
+    # quoted strings are KEPT as tokens for the -c / env checks (`-c "core.hooksPath=x"` must still count),
+    # so only heredoc bodies are dropped before splitting; a quoted argument is one token after shlex
+    body = strip_heredocs(cmd)
+    for seg in _SEGMENT.split(_QUOTED.sub(lambda m: m.group(0).replace(";", " ").replace("&", " ").replace("|", " "), body)):
+        try:
+            toks = shlex.split(seg, comments=True)
+        except ValueError:
+            toks = seg.split()
+        lead = toks[:toks.index("git")] if "git" in toks else toks
+        if any(re.match(r"[A-Za-z_]\w*=", t) and "core.hookspath" in t.lower() for t in lead):
+            return "an environment assignment sets core.hooksPath (the green guard's hooks, #290)"
+        if "git" not in toks:
+            continue
+        i = toks.index("git") + 1
+        while i < len(toks) and toks[i].startswith("-"):     # global options
+            if toks[i] == "-c" and i + 1 < len(toks):
+                if toks[i + 1].lower().startswith("core.hookspath"):
+                    return "`git -c core.hooksPath=…` steps around the green guard's hooks (#290)"
+                i += 2
+            elif toks[i] in ("-C", "--git-dir", "--work-tree", "--namespace") and i + 1 < len(toks):
+                i += 2
+            else:
+                i += 1
+        if i >= len(toks):
+            continue
+        sub, args = toks[i], toks[i + 1:]
+        if sub == "config":
+            keys = [a for a in args if a.lower() == "core.hookspath"]
+            if keys:
+                k = args.index(keys[0])
+                positional_after = [a for a in args[k + 1:] if not a.startswith("-")]
+                if positional_after or _CONFIG_WRITE & set(args):
+                    return "`git config core.hooksPath` changes where the green guard's hooks are read from (#290)"
+        if sub in _VERIFYING and "--no-verify" in args:
+            return f"`git {sub} --no-verify` skips the green guard's hook (#290); the override is the maintainer's own `! git {sub} --no-verify`"
+        if sub == "commit":
+            for a in args:
+                if re.fullmatch(r"-[A-Za-z]+", a) and "n" in a[1:] and not a.startswith("-m"):
+                    return "`git commit -n` is --no-verify: it skips the green guard's hook (#290)"
+    return None

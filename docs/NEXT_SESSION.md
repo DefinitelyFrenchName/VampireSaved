@@ -28,14 +28,13 @@ guard. The run of record is named in STATE 14z-203's CLOSE section.
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
 1. **#286 — three narrowings built, waiting for a trace score.** `build/agent203/t286/narrowings.patch` (local; `git apply` it, then score with `tools/trace_static_reads.py all` on PILOT, 0 misses required, #225). Measured on 14z-203's tree: mid2's record-only change set 58 → 50 STALE, a new run record 33 → 31, none added (#286 comment). The remaining over-runs are R2 mentions in tools' self-tests (the trace or a call graph tells them apart). The done-when is amended (controls only for gates whose real inputs changed).
 2. **#291 — the comparative capture sheets: build S1** as ruled (`DECISIONS_HISTORY.md` "Ruled 2026-10-17 (14z-203) — #261 freeze as measured, …"; the design on #291): the `# SHEET:` grammar and its census gate, `tests/lib/sheet.sh`, the capture-and-prove step and its ground-truth gate, the page, and three exemplars (`audit_move_parity`, `test_gfx_menus`, `audit_merged_legacy`). The census of all 231 emulator gates: `build/agent203/t291/census_all.tsv` (local).
-3. **#290 — open until the maintainer installs** `build/agent203/t290/hook_change/INSTALL.md` (two deny rules and the `pre_bash.py` bypass rule). After the install: the 24 cases into `tests/agent/c01_commands.jsonl`, the two deny rules into `test_agent_hooks`' `need` set, then close #290 through a rule-checker run.
-4. **#289 — revisit the cut** of the audit layer when there is more data.
-5. **Then ask the maintainer for the order of work.** The open tickets, by their GitHub severity label:
+3. **#289 — revisit the cut** of the audit layer when there is more data.
+4. **Then ask the maintainer for the order of work.** The open tickets, by their GitHub severity label:
    - medium: #284 (the release package README; `test_readme_recording` fails until it is done), #243, #257, #258, #259;
    - low: #118, #129, #229, #244;
    - no severity label: #260, #262, #263, #266, #267, #273, #275, #276, #277;
    - **release-only** (worked at a release, not in a session): #278, #279, #280, #281.
-6. **`tests/replays/118_chain.rpl`'s header names a leg of `audit_mizuumi_inputs` that gate never ran** (STATE_HISTORY 14z-198 finding (i)); make the one-line correction in a session that runs the 76 emulator gates following `tests/replays/`.
+5. **`tests/replays/118_chain.rpl`'s header names a leg of `audit_mizuumi_inputs` that gate never ran** (STATE_HISTORY 14z-198 finding (i)); make the one-line correction in a session that runs the 76 emulator gates following `tests/replays/`.
 
 ## PARKED (not open work)
 
@@ -49,6 +48,6 @@ guard. The run of record is named in STATE 14z-203's CLOSE section.
 
 ## WHAT CLOSED THIS SITTING (14z-203)
 
-- **#290 built** (`a36dd6d3`; open until the install, START HERE 3). **#291 filed, its census and design ruled.**
+- **#290 built** (`a36dd6d3`). **#291 filed, its census and design ruled.**
 - **#261 closed `done`** (the type-6 inventory frozen on merged-m23, `bd620817`) and **#256 closed `done`** (open-tickets reads ranges), at `937ac1b3` through rule-checker run 2026-10-17-1107.
 - **Ruled:** an action is checked when its work is done; #290's four answers; #291's eight answers; #261, #256, #286; when to commit — each in the maintainer's own words in `DECISIONS_HISTORY.md` "Ruled 2026-10-16/17 (14z-203) — …".

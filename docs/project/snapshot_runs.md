@@ -97,6 +97,13 @@ and traceability"* — so session cadence stays in the working tree.
    (`tools/git-hooks/green_guard.py`). A snapshot may be taken of a commit that no branch names: the close tiers a
    commit object of the staged index (`git commit-tree "$(git write-tree)" -p HEAD -m …`), and the local clone
    holds it (measured 2026-10-16: "clone whole: 16818 tracked files" at `8986de91`, a commit of the staged tree).
+   **The index lives under `.git/`, never `build/`** (14z-203): under `build/` it matched `tools/static_confirm.py`'s R6
+   template `build/$b`, and since every run rewrites it, every `--confirm` staled gates on it. **What the hooks see**
+   (measured on git 2.54.0, 2026-10-16): `pre-commit` fires on a plain commit and on `--amend`, and not on a clean merge,
+   cherry-pick, rebase, revert or `--no-verify`; `pre-push` checks each pushed tip's tree only. The session's own
+   `--no-verify`, `commit -n` and `core.hooksPath` changes are refused by `tools/agent/hooks/pre_bash.py`
+   (`agentlib.hook_bypass_reason`, installed by the maintainer 2026-10-17; `tests/test_agent_hooks.sh`, control
+   `blind-bypass`); the maintainer's own `!` command is the override.
 
 A run costs about 50 s of setup before the runner starts (the clone, the snapshot, the listing
 and 76 fingerprints; measured 14z-183b on this Mac).

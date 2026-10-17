@@ -43,6 +43,10 @@ def decide(event):
     why = agentlib.detach_reason(cmd) or agentlib.waiter_reason(cmd)
     if why:
         return "deny", f"C0.1 (#172, no invisible jobs): {why}. {ALTERNATIVE}"
+    why = agentlib.hook_bypass_reason(cmd)
+    if why:
+        return "deny", (f"#290 (the green guard): {why}. A commit needs a strict GREEN run at its tree "
+                        "(tools/git-hooks/green_guard.py); only the maintainer's own `!` command overrides it.")
     return None, None
 
 

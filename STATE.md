@@ -131,6 +131,24 @@ awaits the maintainer's install of `build/agent203/t290/hook_change/INSTALL.md`;
   (`--strict --confirm build/agent203/tier9_results.tsv`, results `build/agent203/close/tier_results.tsv`), the commit
   through the green guard, the sweep, the push.
 
+## Session 14z-204 — **#290 closed; #259, #258, #243 next.** Opened 2026-10-17 on Opus 5.5 (the ruled orchestrator); transcript `db2f76be`.
+
+### opened with
+The maintainer: *"read handoff.md, state.md and docs/next_session.md"*. The opener's sweep read CLEAN; `main` at
+`c607b2aa`, pushed; PILOT and ERIS unreachable. Then: *"#286 cannot be done this session (PILOT and ERIS unavailable)
+#290 change installed so you can proceed After #290 you can do #259, #258, #243 in that order"*.
+
+### (1) #290 — THE INSTALL LANDED; THE TICKET CLOSES
+The maintainer installed `build/agent203/t290/hook_change/INSTALL.md` items 1-3 (the two deny rules,
+`agentlib.hook_bypass_reason`, its rule in `pre_bash.py`). Item 4 landed: the 24 cases in `tests/agent/c01_commands.jsonl`
+(source `14z-203:290`, 68 rows), the five edit-lock rules in `tests/test_agent_hooks.sh`'s installation check, and a
+control `blind-bypass` (13 must-deny rows let through; its CONTROL mode reaches the gate's FAIL). A live probe, `git
+commit --no-verify --dry-run`, was refused by the hook. The hooks' coverage and the index's place are homed in
+`docs/project/snapshot_runs.md` item 6. Rule-checker run 2026-10-17-1109, VIOLATED Q1 Q4: no artifact showed git running
+the installed `pre-commit` here, and the installation check had no control. Resolved: a real `git commit` in a scratch
+worktree was refused by the guard (`build/agent204/close290/live_git_refusal.txt`, local), and a tenth control
+`missing-lock` drops a deny rule from a settings copy; `pre-push` stays proven only in the gate's scratch repository.
+
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings
 

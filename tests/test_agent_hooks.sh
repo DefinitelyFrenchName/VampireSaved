@@ -8,10 +8,10 @@
 #   resolved procedure run in its range and lets another repository through; pre_agent.py
 #   refuses an over-cap or under-specified Agent call and passes forks.
 # HOW: replays the hooks exactly as Claude Code drives them (the PreToolUse JSON on stdin,
-#   the decision on stdout) over the frozen fixture tests/agent/c01_commands.jsonl (44
-#   rows), 18 push cases against a scratch repository and the real ledger, and 27 Agent-call
-#   cases; seven controls run copies of a hook with one rule blinded and must let a
-#   must-deny case through.
+#   the decision on stdout) over the frozen fixture tests/agent/c01_commands.jsonl (68
+#   rows, 24 of them #290's green-guard bypass cases), 18 push cases against a scratch
+#   repository and the real ledger, and 27 Agent-call cases; the controls run copies of a
+#   hook with one rule blinded and must let a must-deny case through.
 # EXPECTS: every must-deny row denied with its reason, every must-allow row allowed,
 #   fail-open recorded; a red names the row and the hook.
 #
@@ -31,6 +31,8 @@
 #
 # MUST-FIRE: perturbed-copy: blind-classifier — a copy of the hooks whose `detach_reason` always answers "no detach" must let the 14z-174 launches through, and the gate must FAIL on them (mode: the gate runs against that copy)
 # MUST-FIRE: perturbed-copy: greedy-heredoc — a copy whose `strip_heredocs` swallows every line after an UNTERMINATED `<<` operator (the defect rule-checker run 2026-09-23-100 found) must hide the `nohup` in the arithmetic-shift rows, and the gate must FAIL on the must-deny side (mode: the gate runs against that copy)
+# MUST-FIRE: perturbed-copy: blind-bypass — a copy whose `hook_bypass_reason` (#290, the green guard's bypass rule) always answers None must let the `--no-verify` / `commit -n` / `core.hooksPath` rows through, and the gate must FAIL on the must-deny side (mode: the gate runs against that copy)
+# MUST-FIRE: perturbed-copy: missing-lock — a copy of .claude/settings.json without the deny rule `Edit(tools/git-hooks/**)` (#290) must fail the installation check, so a settings edit that drops an edit-lock rule cannot pass (mode: the check reads that copy)
 # MUST-FIRE: perturbed-copy: no-heredoc-strip — a copy whose `strip_heredocs` returns the command unchanged must deny commands that only WRITE a script containing `&`, and the gate must FAIL on the must-allow side (mode: the gate runs against that copy)
 # MUST-FIRE: perturbed-copy: misread-ledger — a copy of the push hook whose ledger column tuple has `control_verdict` and `verdict` swapped must read the REAL ledger differently from the rule-checker's own reader, and the gate must FAIL (rule-checker run 2026-09-23-107: the 18 cases write their own ledger in the hook's assumed layout, so they cannot see a misread of the real one) (mode: the gate drives that copy)
 # MUST-FIRE: perturbed-copy: no-target-check — a copy of the push hook without the this-repository guard must refuse pushes of ANOTHER repository (the defect the proof found before installation, 14z-176b), and the gate must FAIL on those cases (mode: the gate drives that copy)
@@ -79,6 +81,15 @@ import sys; p = sys.argv[1]; s = open(p).read()
 a = '            if end is not None:\n                i = end + 1\n'
 assert s.count(a) == 1
 s = s.replace(a, '            i = end + 1 if end is not None else len(lines)  # CONTROL greedy-heredoc\n', 1)
+open(p, 'w').write(s)
+PY
+            ;;
+        blind-bypass)
+            python3 - "$W/$1/agent/agentlib.py" <<'PY'
+import sys; p = sys.argv[1]; s = open(p).read()
+a = 'def hook_bypass_reason(cmd):\n'
+assert s.count(a) == 1
+s = s.replace(a, a + '    return None  # CONTROL blind-bypass\n', 1)
 open(p, 'w').write(s)
 PY
             ;;
@@ -164,7 +175,7 @@ echo "  fixture: $n_deny must-deny ($n_174 of them the 14z-174 launches), $n_all
 [ "$n_174" -eq 12 ] || { echo "FAIL: the fixture must carry the twelve 14z-174 launches (has $n_174)"; fail=1; }
 
 AG=tools/agent
-if vs_ctl_is blind-classifier || vs_ctl_is greedy-heredoc || vs_ctl_is no-heredoc-strip || vs_ctl_is open-push-hook || vs_ctl_is open-agent-gate \
+if vs_ctl_is blind-classifier || vs_ctl_is blind-bypass || vs_ctl_is greedy-heredoc || vs_ctl_is no-heredoc-strip || vs_ctl_is open-push-hook || vs_ctl_is open-agent-gate \
    || vs_ctl_is misread-ledger || vs_ctl_is no-target-check; then AG="$(make_copy "$VS_CTL")"; fi
 replay "$AG" "$W/replay.txt"
 sed -n '/^MISMATCH/p' "$W/replay.txt" | head -12 | sed 's/^/  /'
@@ -181,9 +192,23 @@ else
 fi
 
 # the INSTALLATION (ruled 2026-09-23, "Install + protect"): the tracked project settings
-# must still wire this hook on Bash and keep the three edit-lock rules — a settings edit
+# must still wire this hook on Bash and keep the five edit-lock rules (the git hooks' two since
+# #290, installed by the maintainer 2026-10-17) — a settings edit
 # that drops either would otherwise switch the enforcement off with every gate green
-python3 - .claude/settings.json > "$W/wiring.txt" <<'PY' || fail=1
+# lock_copy <out> — the settings with the git hooks' deny rule removed (the control missing-lock)
+lock_copy() {
+    python3 - .claude/settings.json "$1" <<'PY'
+import json, sys
+s = json.load(open(sys.argv[1])); d = s["permissions"]["deny"]
+assert "Edit(tools/git-hooks/**)" in d
+d.remove("Edit(tools/git-hooks/**)")
+json.dump(s, open(sys.argv[2], "w"), indent=2)
+PY
+}
+SETTINGS=.claude/settings.json
+if vs_ctl_is missing-lock; then lock_copy "$W/settings_ctl.json"; SETTINGS="$W/settings_ctl.json"; fi
+check_install() {
+python3 - "$1" <<'PY'
 import json, sys
 try:
     s = json.load(open(sys.argv[1]))
@@ -192,7 +217,8 @@ except Exception as e:
 cmds = [h.get("command", "") for m in s.get("hooks", {}).get("PreToolUse", []) if m.get("matcher") == "Bash"
         for h in m.get("hooks", []) if h.get("type") == "command"]
 deny = set(s.get("permissions", {}).get("deny", []))
-need = {"Edit(.claude/settings.json)", "Edit(tools/agent/hooks/**)", "Edit(tools/agent/agentlib.py)"}
+need = {"Edit(.claude/settings.json)", "Edit(tools/agent/hooks/**)", "Edit(tools/agent/agentlib.py)",
+        "Edit(tools/git-hooks/**)", "Edit(tools/install_hooks.sh)"}
 bad = []
 if not any("tools/agent/hooks/pre_bash.py" in c for c in cmds):
     bad.append("no PreToolUse Bash hook runs tools/agent/hooks/pre_bash.py")
@@ -207,9 +233,11 @@ if need - deny:
 for b in bad:
     print(f"FAIL: installation — {b}")
 if not bad:
-    print("  installation: .claude/settings.json wires pre_bash.py on Bash, pre_agent.py on Agent|Task, and keeps the three edit-lock rules")
+    print("  installation: .claude/settings.json wires pre_bash.py on Bash, pre_agent.py on Agent|Task, and keeps the five edit-lock rules")
 sys.exit(1 if bad else 0)
 PY
+}
+check_install "$SETTINGS" > "$W/wiring.txt" || fail=1
 cat "$W/wiring.txt"
 
 # S4's call gate over its cases (the installed hook, or the control's perturbed copy)
@@ -325,9 +353,12 @@ PY
     rc=0; check_hint "$W/pre_push_stale_ctl.py" > "$W/ctl_hint.txt" 2>&1 || rc=$?
     if [ "$rc" = 3 ]; then vs_ctl_fired stale-hint "$(head -1 "$W/ctl_hint.txt" | sed 's/^ *//')"
     else vs_ctl_dead stale-hint "the pre-#210 hint passed the hint check (rc=$rc)" || fail=1; fi
-    for c in blind-classifier greedy-heredoc no-heredoc-strip; do
+    lock_copy "$W/settings_lock.json"
+    if check_install "$W/settings_lock.json" > "$W/ctl_lock.txt" 2>&1; then vs_ctl_dead missing-lock "the installation check passed settings without Edit(tools/git-hooks/**)" || fail=1
+    else vs_ctl_fired missing-lock "$(grep -m1 'edit-lock rules missing' "$W/ctl_lock.txt" | sed 's/^FAIL: installation — //')"; fi
+    for c in blind-classifier blind-bypass greedy-heredoc no-heredoc-strip; do
         replay "$(make_copy "$c")" "$W/ctl_$c.txt"
-        case "$c" in blind-classifier|greedy-heredoc) side=deny;; no-heredoc-strip) side=allow;; esac
+        case "$c" in blind-classifier|blind-bypass|greedy-heredoc) side=deny;; no-heredoc-strip) side=allow;; esac
         k=$(grep -c "^MISMATCH expect=$side " "$W/ctl_$c.txt" || true)
         if [ "${k:-0}" -gt 0 ]; then vs_ctl_fired "$c" "$k must-$side rows mismatched on the perturbed copy"
         else vs_ctl_dead "$c" "the perturbed copy matched every must-$side row — the replay cannot see this failure" || fail=1; fi

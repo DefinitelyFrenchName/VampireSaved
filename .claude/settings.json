@@ -27,7 +27,9 @@
     "deny": [
       "Edit(.claude/settings.json)",
       "Edit(tools/agent/hooks/**)",
-      "Edit(tools/agent/agentlib.py)"
+      "Edit(tools/agent/agentlib.py)",
+      "Edit(tools/git-hooks/**)",
+      "Edit(tools/install_hooks.sh)"
     ]
   }
 }
