@@ -1,0 +1,20 @@
+# build/manifest/type6_fallback.toml — FROZEN per-replay count of
+# LEGACY entries into the type-6 fallback (14z-91). Regenerate with
+# BUILD=<dir> tests/audit_effect_class_rows.sh --freeze, and REVIEW
+# every number: this file is the record of how often vanilla content
+# reaches a list-type we took over. Drift either way is a
+# stop-and-assess event, never something to absorb.
+# Frozen on BUILD=build/m3b_merged31 at a36dd6d3. The 14z-89 counts, taken by the old
+# $FF010C counter (21_don_mash 387, 26_don_arcade_mash 948), had moved before this first freeze;
+# both moves are recorded UNATTRIBUTED (#261, maintainer-ruled 2026-10-17). Measured before the freeze
+# (on #261): this build under the old frame_done clock reads 21_don_mash 388 (consistent with the
+# 14z-197 clock change, not proven: another instrument and build in 14z-89) and 26_don_arcade_mash
+# 1316 (so not the clock).
+schema = 1
+
+02_demitri_vs_cpu = 0
+07_mash_storm = 0
+09_mirror_pick = 0
+30_demitri_throw = 0
+21_don_mash = 270
+26_don_arcade_mash = 1232

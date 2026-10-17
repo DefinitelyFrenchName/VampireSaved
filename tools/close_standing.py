@@ -181,6 +181,20 @@ def ticket_status(path):
     return st
 
 
+RANGE_RE = re.compile(r"#(\d+)\s*[-\u2013]\s*#?(\d+)")   # #245-#255, #245–255 (#256)
+
+
+def cited_tickets(text):
+    """Every ticket a text cites: each `#N`, and every number inside a cited RANGE `#A-#B` (#256, 14z-203: a range was
+    read as its two ends only, so the tickets between were never checked). A range wider than 500 is not expanded."""
+    out = set(re.findall(r"#(\d+)", text))
+    for a, b in ([] if PERTURB == "range-ends" else RANGE_RE.findall(text)):
+        lo, hi = int(a), int(b)
+        if lo < hi <= lo + 500:
+            out |= {str(n) for n in range(lo, hi + 1)}
+    return out
+
+
 def open_tickets(title, nxt, state, tickets):
     try:
         nt, stt, st = open(nxt, encoding="utf-8").read(), read_state(state), ticket_status(tickets)
@@ -188,7 +202,7 @@ def open_tickets(title, nxt, state, tickets):
         print(f"missing input: {e}")
         return 2
     row, why = newest_row(stt, title)
-    cited = set(re.findall(r"#(\d+)", start_here(nt)))
+    cited = cited_tickets(start_here(nt))
     if row is not None:
         cited |= set(re.findall(r"#(\d+) \(open\)", row))
     else:
@@ -382,6 +396,10 @@ def selftest():
         r, o = quiet(plant, "next-closed", T, pd, d)
         r2, o2 = quiet(open_tickets, T, os.path.join(pd, "NEXT_SESSION_plant.md"), st, tk)
         say(r == 0 and r2 == 1 and "#6 done" in o2, "plant next-closed: a generated START HERE citing #6 (done) fails the open-ticket check")
+        rng = os.path.join(d, "NEXT_range.md")
+        open(rng, "w").write("# NEXT\n\n## START HERE\n\n1. #5-#7 go on.\n")
+        r, o = quiet(open_tickets, T, rng, st, tk)
+        say(r == 1 and "#6 done" in o and "cited 3  not open 1" in o, "open-tickets: a START HERE citing the range #5-#7 checks #6 inside it (done) and fails (#256)")
         r, _ = quiet(dup_entries, os.path.join(d, "DECISIONS_HISTORY.md"), True)
         say(r == 0, "dup-entries: distinct entries and headings pass")
         r, _ = quiet(plant, "dup-decisions", T, pd, d)

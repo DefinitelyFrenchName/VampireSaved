@@ -801,8 +801,10 @@ printf '#!/bin/sh\ncat sub/x.txt > /dev/null\necho "PASS: s"\n' > "$FS/tests/g_s
   echo "# MUST-FIRE: perturbed-copy: flip — a flipped byte must fail"
   echo 'if [ "${CONTROL:-}" = flip ]; then echo "FAIL: the flipped input was caught"; exit 1; fi'
   echo "cat data/list.tsv > /dev/null"; echo "echo 'PASS: f'"; echo "echo 'CONTROL FIRED: flip — caught'"; echo "exit 0"; } > "$FS/tests/g_f.sh"
+{ echo "#!/bin/sh"; echo "# g_o.sh — an ondemand stub: never run by a session tier, so absent from every base run"; echo "echo 'PASS: o'"; echo "exit 0"; } > "$FS/tests/g_o.sh"
 chmod +x "$FS/tests/"g_*.sh
-printf 'g_s\ng_f\n' > "$FS/tests/ci_portable.txt"; : > "$FS/tests/ci_static.txt"
+printf 'g_s\ng_f\ng_o\n' > "$FS/tests/ci_portable.txt"; : > "$FS/tests/ci_static.txt"
+printf 'g_o\tondemand\t-\n' > "$FS/tests/ci_cadence.tsv"
 printf 'name\tnote\nf\tdata/notes.md\n' > "$FS/data/list.tsv"; echo first > "$FS/data/notes.md"
 (cd "$FS" && git init -q && git -c protocol.file.allow=always submodule add -q "$T/subsrc" sub > /dev/null 2>&1 \
     && git add -A && git -c user.name=t -c user.email=t@t commit -qm base)
@@ -821,8 +823,10 @@ s22() {   # s22 <static_confirm.py> -> sets S22a S22b S22c S22d (ok|bad)
     echo second > "$FS/data/notes.md"; sleep 1
     _r="$(cd "$FS" && STATIC_RESULTS_OUT="$T/s4.tsv" sh tests/run_all_static.sh --tier portable --confirm "$T/s3.tsv" 2>&1)" || true
     if printf '%s' "$_r" | grep -qE "^  re-run g_f +STALE: R5" && printf '%s' "$_r" | grep -qE "^  g_f +PASS +[0-9]+s" \
-            && printf '%s' "$_r" | grep -q "controls carried: 1 honoured" && grep -q "^g_f	PASS	[0-9]*	1	1	1$" "$T/s4.tsv"; then S22c=ok
-    else S22c=bad; echo "    a mention (R5) did not re-run g_f with its control carried: $(printf '%s' "$_r" | grep -E 'g_f|controls carried' | tr '\n' '|') / $(grep '^g_f' "$T/s4.tsv")"; fi
+            && printf '%s' "$_r" | grep -q "controls carried: 1 honoured" && grep -q "^g_f	PASS	[0-9]*	1	1	1$" "$T/s4.tsv" \
+            && printf '%s' "$_r" | grep -q '^  executed: 0  honoured 0 ' && printf '%s' "$_r" | grep -q '^  carried:  1  ' \
+            && printf '%s' "$_r" | grep -qE '^  defer  g_o +absent' && ! printf '%s' "$_r" | grep -qE '^  re-run g_o'; then S22c=ok
+    else S22c=bad; echo "    a mention (R5) did not re-run g_f with its control carried (or the readout counted it executed, #286): $(printf '%s' "$_r" | grep -E 'g_f|g_o|controls carried|executed:|carried:' | tr '\n' '|') / $(grep '^g_f' "$T/s4.tsv")"; fi
     printf 'name\tnote\nf\tdata/notes.md\ng\tdata/other.md\n' > "$FS/data/list.tsv"; sleep 1
     _r="$(cd "$FS" && STATIC_RESULTS_OUT="$T/s5.tsv" sh tests/run_all_static.sh --tier portable --confirm "$T/s4.tsv" 2>&1)" || true
     if printf '%s' "$_r" | grep -qE "^  re-run g_f +STALE: R2" && ! printf '%s' "$_r" | grep -q "controls carried" \
@@ -835,7 +839,7 @@ vs_ctl_is subfp-off && SC22="$SUBOFF"; vs_ctl_is controls-always && SC22="$CTLAL
 s22 "$SC22"
 [ "$S22a" = ok ] && echo "  ok: the dirty submodule, unchanged since the base run (its # subfp equal), leaves g_s carried" || fail "section 22: an unchanged dirty submodule re-ran its reader"
 [ "$S22b" = ok ] && echo "  ok: the submodule changed again: g_s re-runs" || fail "section 22: a changed submodule was carried"
-[ "$S22c" = ok ] && echo "  ok: data/notes.md, only MENTIONED by g_f's data file, re-runs g_f (R5) with its control carried (honoured 1 recorded)" || fail "section 22: a mention executed the control"
+[ "$S22c" = ok ] && echo "  ok: data/notes.md, only MENTIONED by g_f's data file, re-runs g_f (R5) with its control carried (honoured 1 recorded; the readout says executed 0, carried 1; the ondemand g_o, absent from the base, is listed as deferred, not re-run)" || fail "section 22: a mention executed the control, or the readout counted a carried control as executed"
 [ "$S22d" = ok ] && echo "  ok: data/list.tsv, which g_f's code reads directly, re-runs g_f (R2, a direct read) and executes its control" || fail "section 22: a direct read carried the control"
 
 echo "== 23. MUST-FIRE: section 22's properties, each broken by its shadow =="

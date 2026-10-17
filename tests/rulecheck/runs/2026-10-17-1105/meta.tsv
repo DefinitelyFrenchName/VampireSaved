@@ -1,0 +1,11 @@
+decision	recommendation
+subject	#291 census (all 231 gates) and design, #261 (moved counts, a question before any freeze), #256 options, #286 next steps and one question, put to the maintainer for ruling (after runs 2026-10-16-1103 and 2026-10-17-1104)
+session	14z-203
+model	rule-checker@163e4ce9cf7b
+claim	recs.md and t291/design.md put four items to the maintainer; each figure in them comes from a measurer return (build/agent203/t291/measurer_census_all_return.txt, build/agent203/t286_measurer_return.txt, build/agent203/t286_trace_return.txt) or a named log or file (build/agent203/t261/run1.log to run4_hui30_oldclock.log, run1_t0.txt, fingerprint.log, build/agent203/mid2.log, build/agent203/t286_mid2_changeset.txt, build/agent203/t286_static_runner2.log); every registry gate has a row with its basis in census_all.tsv; each recommendation is consistent with the rulings in DECISIONS_HISTORY.md (#288, #290, #291). NOT TESTED: the 45 header-only rows of census_all.tsv against their scripts; the 85 screened-out rows not in the 10-gate sample; the screen's recall beyond the 62 gates it was tuned on; reads through git, and any change between the traced commit 1c59a7cd and mid2's 8986de91, which the #286 trace counts cannot see; the cause of 26_don_arcade_mash's 948 to 1316 (the hui30 run is inconclusive, its breakpoint offset decoded from today's manifest); whether a section-4 run covered its frames (no game-clock hold yet, proposed).
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	33 flag(s): D-ABSOLUTE 32, D-FIGURE 1
+deliverables	build/agent203/recs.md build/agent203/t291/design.md

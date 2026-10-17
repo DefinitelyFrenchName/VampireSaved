@@ -87,6 +87,31 @@ vsavj and/or vsav2) for every test that compares them, *"a visual proof of accur
 browsable page, the moments each test itself judges, ours built from the commit (`DECISIONS_HISTORY.md` "Ruled 2026-10-16
 (14z-203) — #291: …"). Next: the census of comparing tests, then a design to the maintainer.
 
+### (5) FOUR TICKETS PUT AND RULED — #291's census and design, #261, #256, #286
+One packet went to the maintainer after three rule-checker runs (2026-10-16-1103, 2026-10-17-1104, -1105; each VIOLATED,
+each finding fixed: a census that skipped 152 gates on their header alone, a battery cost summing FAILed rows, a #261
+count change the gate's own header recorded). Posted on each issue; ruled (`DECISIONS_HISTORY.md` "Ruled 2026-10-17
+(14z-203) — #261 freeze as measured, …").
+- **#291:** all 231 emulator gates classified with a basis per row (`build/agent203/t291/census_all.tsv`, local): 67
+  compare our build against vsavj and/or vs2. The design (each gate declares `# SHEET:` and writes the moments it judged;
+  the tool re-runs the legs and proves each picture against the gate's RAM checksum) is ruled with four answers. Next: S1.
+- **#286:** the PILOT traces show 31 of the 44 gates mid2 re-ran as STALE never open any of the three changed files
+  (`build/agent203/t286_trace_return.txt`) — candidate false re-runs, to be narrowed with a trace score (git-mediated reads
+  are invisible to it). The done-when is amended (the maintainer: *"Keep (c), amend done-when"*). Two readouts fixed in
+  `tests/run_all_static.sh`: executed and carried controls apart (mid1's "executed: 378" was 177 run plus 201 carried),
+  and a cadence-deferred gate listed as `defer`, not `re-run`; `tests/test_static_runner.sh` section 22 checks both.
+
+### (6) #261 FROZEN AND #256 FIXED
+- **#261:** `audit_effect_class_rows` section 4 runs before section 5 and its runs are held to frozen game clocks (leg
+  `merged`); `build/manifest/type6_fallback.toml` freezes 0/0/0/0/270/1232 on merged-m23; the registry passes
+  `BUILD=%MERGED%`. The 14z-89 counts (387, 948) had moved; recorded unattributed as ruled, with the old-clock run on this
+  build (388, 1316) in the frozen header. Rule-checker run 2026-10-17-1106 (VIOLATED Q1, resolved). The battery runner's
+  pass: PASS 242 s.
+- **#256:** `close_standing.py open-tickets` expands a cited `#A-#B` range; the self-test plants one, and the
+  `range-ends` control proves it.
+- **Paid twice this session:** a gate script edited while it ran (the static runner's own gate; the battery pass of
+  `audit_effect_class_rows`, which died on a shell syntax error). Both runs were discarded and re-run untouched.
+
 ## Session 14z-202 — **The close's cost must follow the change: #286, #287, #288 filed and made the direct priority.** Opened 2026-10-15 on Opus 5.5 (the ruled orchestrator); transcript `b5306e71`.
 
 ### opened with

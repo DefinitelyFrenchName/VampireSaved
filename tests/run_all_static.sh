@@ -318,8 +318,6 @@ if [ -n "$CONFIRM" ]; then
     [ -f "$CONFIRM" ] || { echo "--confirm: no such results file '$CONFIRM'" >&2; exit 2; }
     python3 tools/static_confirm.py plan --root . --results "$CONFIRM" > "$WORK/plan.tsv" 2> "$WORK/plan.err" || {
         echo "--confirm: the plan FAILED — nothing is carried on a failed plan:" >&2; cat "$WORK/plan.err" >&2; exit 2; }
-    echo "== confirm: $(awk -F'\t' '$1 == "RERUN"' "$WORK/plan.tsv" | wc -l | tr -d ' ') gate(s) to re-run, $(awk -F'\t' '$1 == "CARRY"' "$WORK/plan.tsv" | wc -l | tr -d ' ') to carry, from $CONFIRM =="
-    awk -F'\t' '$1 == "RERUN" {printf "  re-run %-34s %s\n", $2, $3}' "$WORK/plan.tsv"
 fi
 n_pass=0; n_skip=0; n_fail=0; n_miss=0
 failed=""; skipped=""
@@ -327,6 +325,7 @@ failed=""; skipped=""
 # and the executable-control rows (gate, name, verdict, seconds)
 c_decl=0; c_fired=0; c_undecl=0; c_none=0
 x_ok=0; x_lies=0; x_refused=0; x_died=0
+x_carry=0   # controls CARRIED from the confirmed run, never added to the executed counts (#286: "executed: 378" once read 177 run + 201 carried)
 t_gates=0; t_start=$(date +%s)   # where the time went (the controls readout)
 : > "$WORK/controls.tsv"
 
@@ -354,7 +353,7 @@ run_tier() {  # run_tier <label> <names>
                 set -- $_carry
                 printf '  %-34s PASS  carried (PASS in the confirmed run, predicted unaffected)\n' "$g"
                 n_pass=$((n_pass + 1)); n_carry=$((n_carry + 1))
-                c_decl=$((c_decl + $1)); c_fired=$((c_fired + $2)); x_ok=$((x_ok + $3))
+                c_decl=$((c_decl + $1)); c_fired=$((c_fired + $2)); x_carry=$((x_carry + $3))
                 record_row "$g" PASS 0 "$1" "$2" "$3"
                 continue
             fi
@@ -426,7 +425,7 @@ run_tier() {  # run_tier <label> <names>
             if [ "${VS_CTL_DECLARED:-0}" != 0 ]; then
                 # CONTROLS-CARRY (#286 (c)): the same declared count as the base row, and nothing in the reach changed
                 if [ -n "$_cc" ] && [ "${_cc%% *}" = "$VS_CTL_DECLARED" ]; then
-                    _cch="${_cc##* }"; x_ok=$((x_ok + _cch))
+                    _cch="${_cc##* }"; x_carry=$((x_carry + _cch))
                     printf '        | controls carried: %s honoured in the confirmed run; no path in the gate'"'"'s reach changed (#286)\n' "$_cch"
                 else exec_controls "$g" "$_label"; _cc=""; fi
             else _cc=""; fi ;;
@@ -478,6 +477,16 @@ exec_controls() {  # exec_controls <gate> <tier-label>
 
 PORTABLE_RUN="$(cad_select "$PORTABLE")"
 STATIC_RUN="$(cad_select "$STATIC")"
+# THE PLAN, printed after the cadence selection (#286, 14z-203): a gate the plan would re-run but the cadence
+# defers is NOT run, so it is listed as deferred, never as a re-run ("73 to re-run" once meant 46 run + 27 deferred)
+if [ -n "$CONFIRM" ]; then
+    printf '%s\n' $PORTABLE_RUN $STATIC_RUN > "$WORK/selected.txt"
+    awk -F'\t' 'NR == FNR {sel[$1] = 1; next} $1 == "RERUN" {print ($2 in sel ? "RUN" : "DEFER") "\t" $2 "\t" $3}' \
+        "$WORK/selected.txt" "$WORK/plan.tsv" > "$WORK/plan_shown.tsv"
+    echo "== confirm: $(awk -F'\t' '$1 == "RUN"' "$WORK/plan_shown.tsv" | wc -l | tr -d ' ') gate(s) to re-run, $(awk -F'\t' '$1 == "DEFER"' "$WORK/plan_shown.tsv" | wc -l | tr -d ' ') deferred by cadence, $(awk -F'\t' '$1 == "CARRY"' "$WORK/plan.tsv" | wc -l | tr -d ' ') to carry, from $CONFIRM =="
+    awk -F'\t' '$1 == "RUN" {printf "  re-run %-34s %s\n", $2, $3}' "$WORK/plan_shown.tsv"
+    awk -F'\t' '$1 == "DEFER" {printf "  defer  %-34s %s (its cadence: not run here)\n", $2, $3}' "$WORK/plan_shown.tsv"
+fi
 case "$TIER" in
 portable) run_tier portable "$PORTABLE_RUN" ;;
 static)   run_tier static   "$STATIC_RUN" ;;
@@ -673,7 +682,7 @@ done
 # F2 (opt-in, the real tier) is exact again; the header line below is generic
 # on both sides by construction — it named this file until the lift.
 _xn=$((x_ok + x_lies + x_refused + x_died))
-if [ $((c_decl + c_none + _xn)) != 0 ]; then
+if [ $((c_decl + c_none + _xn + x_carry)) != 0 ]; then
 echo
 echo "== must-fire controls =="
 echo "  read:     fired $c_fired / declared $c_decl  (gates declaring none: $c_none; undeclared: $c_undecl)"
@@ -701,6 +710,7 @@ else
         fi
     fi
 fi
+if [ "$x_carry" != 0 ]; then echo "  carried:  $x_carry  (honoured in the confirmed run, not executed here; #286)"; fi   # an `if`: the runner is set -e
 fi
 
 # THE CADENCE READOUT (14z-162, #148): printed only when something was deferred

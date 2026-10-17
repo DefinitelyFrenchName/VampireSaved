@@ -119,7 +119,12 @@ AUX_POKE_BANDS = [
 # silence - which is the one thing the census exists to prevent.
 KNOWN_PAIRS = {
     "(top)": {
-        "schema", "src_set"
+        "schema", "src_set",
+        # build/manifest/type6_fallback.toml (#261, frozen 14z-203): one key per legacy replay, its value the
+        # MEASURED count of entries into the type-6 fallback — a frozen expectation, not a tunable, so a fact.
+        # A replay added to that inventory is a new key and is refused here until a person classifies it.
+        "02_demitri_vs_cpu", "07_mash_storm", "09_mirror_pick", "30_demitri_throw", "21_don_mash",
+        "26_don_arcade_mash"
     },
     "aux_poke": {
         "addr", "name", "only_base_slot", "only_variant_slot", "op", "val"

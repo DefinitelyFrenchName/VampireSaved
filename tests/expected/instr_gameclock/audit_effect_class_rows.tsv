@@ -1,6 +1,7 @@
 # tests/expected/instr_gameclock/audit_effect_class_rows.tsv — the game clock RAM:$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,
-# option A) by `tests/audit_effect_class_rows.sh --freeze-clock` at 9f59c3cb: pristine vsavj, sections
-# 1-3; every reference leg held to replay.lua run live, every watch run to its reference leg's game clock.
+# option A) by `BUILD=build/m3b_merged31 tests/audit_effect_class_rows.sh --freeze-clock` at a36dd6d3: pristine vsavj,
+# sections 1-3, and leg merged = section 4's runs on that build (#261); every reference leg held to replay.lua run
+# live, every watch run to its reference leg's game clock.
 # leg<TAB>replay<TAB>frames<TAB>gameclock
 vsavj	02_demitri_vs_cpu	5520	33
 vsavj	07_mash_storm	4320	83
@@ -8,3 +9,9 @@ vsavj	09_mirror_pick	4720	13
 vsavj	30_demitri_throw	4720	13
 vsavj	21_don_mash	14120	cb
 vsavj	26_don_arcade_mash	40620	b9
+merged	02_demitri_vs_cpu	5520	33
+merged	07_mash_storm	4320	83
+merged	09_mirror_pick	4720	13
+merged	30_demitri_throw	4720	13
+merged	21_don_mash	14120	cb
+merged	26_don_arcade_mash	40620	b9

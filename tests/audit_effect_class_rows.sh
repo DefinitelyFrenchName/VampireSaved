@@ -16,8 +16,9 @@
 #   14z-197 (until then the type-10 run of 02_demitri_vs_cpu covered 2,817 emulated frames of 5,520 counted); each run's game clock
 #   RAM:$FF8080 at its last frame is held to tests/expected/instr_gameclock/audit_effect_class_rows.tsv, frozen by
 #   `--freeze-clock` from REFERENCE legs (no watch, no debugger) each held to replay.lua run live; one STAGING
-#   reference leg is held to replay.lua on every run (tests/lib/instr_align.sh). Section 4 (BUILD set) is not in
-#   the frozen file.
+#   reference leg is held to replay.lua on every run (tests/lib/instr_align.sh). Section 4's runs (BUILD set) are held
+#   the same way, as leg `merged` (#261, maintainer-ruled 2026-10-17 "Freeze, record as unattributed"); section 4
+#   therefore runs BEFORE section 5, and under --freeze-clock it registers its runs without judging them.
 # EXPECTS: 0 / used / used as measured, the fallback inventory exact; a blind instrument
 #   cannot pass as a clean result. Every section 1-3 run on emulated time at its frozen game clock, the staging leg
 #   on replay.lua's checksum.
@@ -25,7 +26,7 @@
 #   tests/lib/instr_align.sh tests/lua/emu_clock.lua tests/lua/replay.lua tests/lua/trace_writes.lua tests/replays/
 #   tools/run_mame.sh tools/setup_mame.sh
 #
-# MUST-FIRE: known-bad: drift-clock — a watch run under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 2,817 emulated frames of 5,520 counted on 02_demitri_vs_cpu) must miss its frozen game clock (in-gate: one extra run; mode: every section 1-3 watch run runs the old clock and the gate FAILs)
+# MUST-FIRE: known-bad: drift-clock — a watch run under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 2,817 emulated frames of 5,520 counted on 02_demitri_vs_cpu) must miss its frozen game clock (in-gate: one extra run; mode: every section 1-3 watch run, and with BUILD set every section 4 run (#261), runs the old clock and the gate FAILs)
 # MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs)
 #
 # WHY THIS EXISTS. Two of the beam port's rows are justified by "legacy
@@ -229,33 +230,11 @@ fi
 # blind-instrument shape this whole file exists to prevent), and the
 # fallback's offset inside the body is decoded from the manifest's two entry
 # branches, which must agree with each other.
-echo "5. the instrument's alignment, sections 1-3 (#228 step 4, option A)"
-if [ "$FREEZE_CLOCK" = 1 ]; then
-    [ "$fail" = 0 ] || { echo "REFUSED: sections 1-3 failed — nothing frozen"; exit 1; }
-    ia_freeze "$REPO/tests/lua/trace_writes.lua" "$WORK/manifest.tsv" "$WORK/fz" "${JOBS:-4}" "$WORK/clocks.tsv" \
-        > "$WORK/fz.txt" || { sed 's/^/  /' "$WORK/fz.txt"; echo "REFUSED: the alignment does not hold — nothing frozen"; exit 1; }
-    mkdir -p "$(dirname "$CLOCKS")"
-    { echo "# $CLOCKS — the game clock RAM:\$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,"
-      echo "# option A) by \`tests/audit_effect_class_rows.sh --freeze-clock\` at $(git rev-parse --short=8 HEAD): pristine vsavj, sections"
-      echo "# 1-3; every reference leg held to replay.lua run live, every watch run to its reference leg's game clock."
-      echo "# leg<TAB>replay<TAB>frames<TAB>gameclock"
-      cat "$WORK/clocks.tsv"; } > "$CLOCKS"
-    echo "froze $(wc -l < "$WORK/clocks.tsv" | tr -d ' ') game clocks into $CLOCKS"
-    exit 0
-fi
-if ia_check_manifest "$CLOCKS" "$WORK/manifest.tsv" > "$WORK/align_bad.txt"; then
-    echo "  ok: every section 1-3 run on emulated time, at its frozen game clock"
-else echo "  FAIL: $(wc -l < "$WORK/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$WORK/align_bad.txt" | sed 's/^/        /'; fail=1; fi
-ia_stage audit_effect_class_rows "$CLOCKS" "$REPO/tests/lua/trace_writes.lua" "$WORK/manifest.tsv" 1 "$WORK/st" "$MODE" || fail=1
-if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
-    [ "$fail" = 1 ] && { echo "FAIL audit_effect_class_rows.sh (control mode: $MODE)"; exit 1; }
-    echo "FAIL audit_effect_class_rows.sh — control mode $MODE left the gate green"; exit 1
-fi
-if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || fail=1; fi
-if [ "$IA_SKIP" = fired ]; then vs_ctl_fired first-frame-skip "$IA_SKIP_MSG"; else vs_ctl_dead first-frame-skip "$IA_SKIP_MSG" || fail=1; fi
-
 FB_FROZEN="build/manifest/type6_fallback.toml"
 if [ -n "${BUILD:-}" ]; then
+    # absolute: section 5's reference legs run from their own directories (tests/lib/instr_align.sh _ia_leg)
+    BUILD_ARG="$BUILD"   # as given, for the frozen files' headers (an absolute path would name this host)
+    case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
     echo "4. the type-6 fallback's EXECUTION matches its frozen inventory"
     [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "  FAIL: no $BUILD/rompath/vsavjw.zip"; fail=1; }
     THUNK=$(sed -n 's/^| `PRG:0x\([0-9A-Fa-f]*\)` | 0x[0-9A-Fa-f]* | GEN | site_thunk beam_list_type6 |.*/\1/p' \
@@ -279,11 +258,16 @@ PY
         BP=$(printf '%x' $((0x$THUNK + FB_OFF)))
         echo "  (thunk at 0x$THUNK, fallback entry +$(printf '0x%x' "$FB_OFF") -> breakpoint 0x$BP)"
         got=""
+        S4_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
         for r in $REPLAYS; do
-            MAME_ROMPATH="$BUILD/rompath;$ROMDIR" \
+            # each run is held to its frozen game clock in section 5, as sections 1-3 are (#261, ruled 2026-10-17)
+            ia_note "$WORK/manifest.tsv" merged "$r" vsavjw "$BUILD/rompath;$ROMDIR" "$REPO/tests/replays/$r.rpl" \
+                "$(frames_for "$r")" "MAME_BIN=$S4_BIN WATCH=$BP,1,b" "$WORK/trip_$r.align"
+            # shellcheck disable=SC2086
+            env $_clk MAME_ROMPATH="$BUILD/rompath;$ROMDIR" ALIGN_OUT="$WORK/trip_$r.align" \
             WATCH="$BP,1,b" TRACE_OUT="$WORK/trip_$r.txt" FRAMES="$(frames_for "$r")" \
             REPLAY="$REPO/tests/replays/$r.rpl" MAME_SANDBOX="$WORK/sbx_trip_$r" \
-            MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}" \
+            MAME_BIN="$S4_BIN" \
                 tools/run_mame.sh vsavjw -debug -debugger none \
                 -autoboot_script "$REPO/tests/lua/trace_writes.lua" \
                 > "$WORK/trip_$r.log" 2>&1 || { echo "  FAIL: $r run did not complete"; fail=1; continue; }
@@ -291,7 +275,7 @@ PY
                 "$WORK/trip_$r.txt" | grep -c '^' || true)
             got="$got $r:$n"
             want=$(sed -n "s/^$r = \([0-9]*\)$/\1/p" "$FB_FROZEN" 2>/dev/null | head -1)
-            if [ "${1:-}" = "--freeze" ]; then
+            if [ "${1:-}" = "--freeze" ] || [ "$FREEZE_CLOCK" = 1 ]; then
                 echo "  measured: $r -> $n"
             elif [ -z "$want" ]; then
                 echo "  FAIL: $r has no frozen expectation in $FB_FROZEN (measured $n)"
@@ -340,18 +324,54 @@ PY
               echo "# every number: this file is the record of how often vanilla content"
               echo "# reaches a list-type we took over. Drift either way is a"
               echo "# stop-and-assess event, never something to absorb."
+              echo "# Frozen on BUILD=$BUILD_ARG at $(git rev-parse --short=8 HEAD). The 14z-89 counts, taken by the old"
+              echo "# \$FF010C counter (21_don_mash 387, 26_don_arcade_mash 948), had moved before this first freeze;"
+              echo "# both moves are recorded UNATTRIBUTED (#261, maintainer-ruled 2026-10-17). Measured before the freeze"
+              echo "# (on #261): this build under the old frame_done clock reads 21_don_mash 388 (consistent with the"
+              echo "# 14z-197 clock change, not proven: another instrument and build in 14z-89) and 26_don_arcade_mash"
+              echo "# 1316 (so not the clock)."
               echo "schema = 1"; echo
               for kv in $got; do
                   echo "${kv%%:*} = ${kv##*:}"
               done
-            } > "$FB_FROZEN"
-            echo "  FROZE $FB_FROZEN"
+            } > "$WORK/type6_new.toml"   # promoted after section 5, only if every check held (#261)
         fi
     fi
 else
-    echo "4. fallback-execution check SKIPPED (set BUILD=build/hui40 to run it)"
+    echo "4. fallback-execution check SKIPPED (set BUILD=<the merged build> to run it; the registry passes BUILD=%MERGED%)"
 fi
 
+echo "5. the instrument's alignment, sections 1-3 and section 4's runs (#228 step 4, option A; #261)"
+if [ "$FREEZE_CLOCK" = 1 ]; then
+    [ "$fail" = 0 ] || { echo "REFUSED: sections 1-4 failed — nothing frozen"; exit 1; }
+    ia_freeze "$REPO/tests/lua/trace_writes.lua" "$WORK/manifest.tsv" "$WORK/fz" "${JOBS:-4}" "$WORK/clocks.tsv" \
+        > "$WORK/fz.txt" || { sed 's/^/  /' "$WORK/fz.txt"; echo "REFUSED: the alignment does not hold — nothing frozen"; exit 1; }
+    mkdir -p "$(dirname "$CLOCKS")"
+    { echo "# $CLOCKS — the game clock RAM:\$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,"
+      echo "# option A) by \`${BUILD_ARG:+BUILD=$BUILD_ARG }tests/audit_effect_class_rows.sh --freeze-clock\` at $(git rev-parse --short=8 HEAD): pristine vsavj,"
+      echo "# sections 1-3, and leg merged = section 4's runs on that build (#261); every reference leg held to replay.lua run"
+      echo "# live, every watch run to its reference leg's game clock."
+      echo "# leg<TAB>replay<TAB>frames<TAB>gameclock"
+      cat "$WORK/clocks.tsv"; } > "$CLOCKS"
+    echo "froze $(wc -l < "$WORK/clocks.tsv" | tr -d ' ') game clocks into $CLOCKS"
+    exit 0
+fi
+if ia_check_manifest "$CLOCKS" "$WORK/manifest.tsv" > "$WORK/align_bad.txt"; then
+    echo "  ok: every section 1-3 run${BUILD:+ and section 4 run} on emulated time, at its frozen game clock"
+else echo "  FAIL: $(wc -l < "$WORK/align_bad.txt" | tr -d ' ') problem(s) off the frozen alignment:"; head -8 "$WORK/align_bad.txt" | sed 's/^/        /'; fail=1; fi
+ia_stage audit_effect_class_rows "$CLOCKS" "$REPO/tests/lua/trace_writes.lua" "$WORK/manifest.tsv" 1 "$WORK/st" "$MODE" || fail=1
+if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
+    [ "$fail" = 1 ] && { echo "FAIL audit_effect_class_rows.sh (control mode: $MODE)"; exit 1; }
+    echo "FAIL audit_effect_class_rows.sh — control mode $MODE left the gate green"; exit 1
+fi
+if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || fail=1; fi
+if [ "$IA_SKIP" = fired ]; then vs_ctl_fired first-frame-skip "$IA_SKIP_MSG"; else vs_ctl_dead first-frame-skip "$IA_SKIP_MSG" || fail=1; fi
+
+
+if [ "${1:-}" = "--freeze" ] && [ -f "$WORK/type6_new.toml" ]; then
+    if [ "$fail" = 0 ]; then cp "$WORK/type6_new.toml" "$FB_FROZEN"; echo "  FROZE $FB_FROZEN"
+    else echo "  REFUSED: a check failed — $FB_FROZEN not written"; fi
+fi
 echo
 if [ "$fail" -eq 0 ]; then echo "PASS audit_effect_class_rows.sh"; exit 0
 else echo "FAIL audit_effect_class_rows.sh"; exit 1; fi
