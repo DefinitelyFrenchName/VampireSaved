@@ -1,0 +1,8 @@
+  FLAG D-FIGURE: 18  [build/agent204/t258/c258_close.md]
+  FLAG D-ABSOLUTE: - 3,000 short lines came back whole, so the cap is on size, not on lines.  [build/agent204/t258/c258_close.md]
+  FLAG D-ABSOLUTE: - **"check if the file format hasn't drifted"**: a range of an archive must start at an entry its INDEX names, and a stale INDEX is refused before any range ...  [build/agent204/t258/c258_close.md]
+  FLAG D-ABSOLUTE: Every staged artifact now fits one Read call, so the prompt's "Read every named file yourself, in full" can be obeyed.  [build/agent204/t258/c258_close.md]
+  FLAG D-ABSOLUTE: - **"the definition of done is clean"**: done means no packet hands a reader a text artifact it cannot read whole, and an archive too large to read whole goe...  [build/agent204/t258/c258_close.md]
+  FLAG D-ABSOLUTE: A small archive may still go in whole.  [build/agent204/t258/c258_close.md]
+  FLAG D-ABSOLUTE: a whole archive is refused, its entries' ranges listed;  [build/agent204/t258/c258_close.md]
+packet_check: 7 flag(s): D-ABSOLUTE 6, D-FIGURE 1

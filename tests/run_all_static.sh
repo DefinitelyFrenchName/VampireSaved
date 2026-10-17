@@ -316,7 +316,11 @@ record_row() {  # record_row <gate> <verdict> <seconds> <declared> <fired> <hono
 n_carry=0
 if [ -n "$CONFIRM" ]; then
     [ -f "$CONFIRM" ] || { echo "--confirm: no such results file '$CONFIRM'" >&2; exit 2; }
-    python3 tools/static_confirm.py plan --root . --results "$CONFIRM" > "$WORK/plan.tsv" 2> "$WORK/plan.err" || {
+    # the plan's progress and timing lines reach the terminal as it runs (#259: the 14z-195 close's plan ran 20 min
+    # silent) and stay in plan.err; its exit status crosses the pipe in plan.rc
+    { _rc=0; python3 tools/static_confirm.py plan --root . --results "$CONFIRM" 2>&1 > "$WORK/plan.tsv" || _rc=$?; echo "$_rc" > "$WORK/plan.rc"; } \
+        | tee "$WORK/plan.err" | sed 's/^/  /' >&2
+    [ "$(cat "$WORK/plan.rc" 2>/dev/null)" = 0 ] || {
         echo "--confirm: the plan FAILED — nothing is carried on a failed plan:" >&2; cat "$WORK/plan.err" >&2; exit 2; }
 fi
 n_pass=0; n_skip=0; n_fail=0; n_miss=0

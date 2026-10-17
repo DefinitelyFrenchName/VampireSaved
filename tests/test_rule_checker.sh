@@ -12,7 +12,10 @@
 #   verdict, an unbound recorder, a cross-family plant); the RECORD BINDING section proves a
 #   pinned-reader run cannot be recorded without its transcript; the PREPARE SESSION KEY section
 #   (#209, 14z-189) proves prepare refuses a run with no --session and one whose --session is a
-#   transcript prefix, and writes the key it was given into meta.tsv (the ledger's `session`).
+#   transcript prefix, and writes the key it was given into meta.tsv (the ledger's `session`); the PREPARE READ
+#   LIMIT section (#258, 14z-204) proves prepare refuses a text artifact a reader cannot read whole in one Read and
+#   a whole indexed archive (listing its entries' ranges), refuses an archive range that starts off its INDEX, and
+#   tells the reader which entry a range holds.
 # EXPECTS: PASS with every control fired; a red names the run or fixture and the shape in
 #   which the checker could look alive while asserting nothing.
 #
@@ -32,6 +35,7 @@
 # MUST-FIRE: shadow-tool: recheck-pruned-render — a copy of rulecheck.py that binds only the NAMED standing rows (EVERY_ROW off) must resolve a finding on a render with another standing row deleted, and the RESOLVE RECHECK section must FAIL: a re-check runs the whole standing set, every row present and unedited (#270, rule-checker run 2026-10-13-971 Q4; mode: the section runs that copy)
 # MUST-FIRE: shadow-tool: recheck-other-session — a copy of rulecheck.py whose re-check binds KEY from the checks file itself and TRANSCRIPT by its shape only (SESSION_BOUND off) must resolve a finding of one sitting on a genuine render made for another, and the RESOLVE RECHECK section must FAIL: the re-check reads THIS run's session — its key, the transcript and base close_standing.py derives (#270, rule-checker run 2026-10-13-972 Q4; mode: the section runs that copy)
 # MUST-FIRE: shadow-tool: recheck-unpinned-base — a copy of rulecheck.py whose re-check lets BASE be any hash (BASE_PINNED off) must resolve a finding on a render whose BASE fill was edited to another commit, and the RESOLVE RECHECK section must FAIL: BASE is what close_standing.py derives for the run's session (#270, rule-checker run 2026-10-13-973 Q4; mode: the section runs that copy)
+# MUST-FIRE: shadow-tool: unlimited-read — a copy of rulecheck.py with no read limit (READ_MAX_BYTES and READ_MAX_TOKENS lifted, the pre-#258 tool) must prepare a packet naming a 70 KB text artifact no reader can read whole, and the PREPARE READ LIMIT section must FAIL (#258, 14z-204)
 # MUST-FIRE: perturbed-copy: cross-family-plant — a copy of the record in which a PROCEDURE calibration names an EVIDENCE fixture as its plant must fail: a plant answers its own family's questions, so one from the other checklist proves nothing about the reader (#172 S3, 14z-176)
 #
 # WHY. The rule-checker (docs/project/rule_checker.md, [VSP-183]/[VSP-184]) is a
@@ -206,6 +210,61 @@ counted() {  # counted <out> — the shadow tool: prepare's auto id by the pre-#
 latecheck() {  # latecheck <out> — the shadow tool: prepare's early artifact check switched off
     sed 's/^    if missing:$/    if False:/' tools/rulecheck.py > "$1"
     grep -q '^    if False:$' "$1" || { echo "the early artifact check was not found to remove" >&2; return 1; }
+}
+# SECTION PREPARE READ LIMIT's probe (#258, 14z-204): on a throwaway root, a 70 KB text artifact (over the reader's
+# 25,000-token PARTIAL-view cap), a 50 KB file of 5,000 short lines (the per-line cost: a byte cap alone passes it), a fixture
+# holding a 70 KB file (the plant and calibrate paths) and a whole indexed archive must each be refused
+# leaving no run directory, the archive's refusal listing its entries' ranges; a range of the archive that starts at an
+# entry its INDEX names must prepare, and the packet must tell the reader which entry it is; a range starting elsewhere
+# must be refused, and so must any range once the archive's INDEX is stale. Prints READ-OK or the way it was not.
+prepare_readlimit() {  # prepare_readlimit <rulecheck.py to test> <root>
+    rm -rf "$2"; mkcopy "$2"; cp "$1" "$2/tools/rulecheck.py"; cp tools/gen_history_index.py "$2/tools/"
+    _ar=docs/project/tenant_manifest_history.md
+    python3 - "$2" "$_ar" <<'PYR' || { echo "NO-FIXTURE"; return; }
+import sys, os
+root, ar = sys.argv[1:3]
+sys.path.insert(0, os.path.join(root, "tools")); import gen_history_index as g
+pad = "a padding line of an archived entry, there only to make the archive larger than one Read call\n" * 300
+body = "# TENANT MANIFEST HISTORY\n\n" + "".join(f"## Entry {k} (14z-{900 + k})\n\n{pad}\n" for k in range(3))
+os.makedirs(os.path.dirname(os.path.join(root, ar)), exist_ok=True)
+open(os.path.join(root, ar), "w").write(g.render(body, g.ENTRY[ar]))
+open(os.path.join(root, "big.txt"), "w").write("x" * 70000 + "\n")
+open(os.path.join(root, "small.txt"), "w").write("a small artifact\n")
+open(os.path.join(root, "many.txt"), "w").write("".join(f"L{i:06d}x\n" for i in range(5000)))
+PYR
+    _before="$(ls "$2/tests/rulecheck/runs" | wc -l | tr -d ' ')"
+    if ( cd "$2" && python3 tools/rulecheck.py prepare --decision recommendation --subject s --claim c --artifact small.txt --artifact big.txt --session 14z-0 --id 2099-04-04-01 ) > "$2/r1.log" 2>&1; then
+        echo "PREPARED-AN-UNREADABLE-ARTIFACT"; return; fi
+    grep -q "would not read it in full (#258)" "$2/r1.log" || { echo "REFUSED-FOR-ANOTHER-REASON: $(tail -1 "$2/r1.log")"; return; }
+    if ( cd "$2" && python3 tools/rulecheck.py prepare --decision recommendation --subject s --claim c --artifact many.txt --session 14z-0 --id 2099-04-04-06 ) > "$2/r6.log" 2>&1; then
+        echo "PREPARED-MANY-SHORT-LINES"; return; fi
+    grep -q "would not read it in full (#258)" "$2/r6.log" || { echo "REFUSED-FOR-ANOTHER-REASON: $(tail -1 "$2/r6.log")"; return; }
+    cp "$2/big.txt" "$2/tests/rulecheck/fixtures/proc-planted-spec-14z178/files/big.txt"
+    if ( cd "$2" && python3 tools/rulecheck.py prepare --calibrate proc-planted-spec-14z178 --session 14z-0 --id 2099-04-04-07 ) > "$2/r7.log" 2>&1; then
+        echo "PREPARED-A-FIXTURE-WITH-AN-UNREADABLE-FILE"; return; fi
+    grep -q "would not read it in full (#258)" "$2/r7.log" || { echo "REFUSED-FOR-ANOTHER-REASON: $(tail -1 "$2/r7.log")"; return; }
+    rm "$2/tests/rulecheck/fixtures/proc-planted-spec-14z178/files/big.txt"
+    if ( cd "$2" && python3 tools/rulecheck.py prepare --decision recommendation --subject s --claim c --artifact "$_ar" --session 14z-901 --id 2099-04-04-02 ) > "$2/r2.log" 2>&1; then
+        echo "PREPARED-A-WHOLE-ARCHIVE"; return; fi
+    grep -q -- "--artifact $_ar:[0-9]*-[0-9]*    ## Entry 1 (14z-901)" "$2/r2.log" || { echo "NO-INDEX-RANGES: $(tail -2 "$2/r2.log" | tr '\n' '|')"; return; }
+    [ "$(ls "$2/tests/rulecheck/runs" | wc -l | tr -d ' ')" = "$_before" ] || { echo "LEFT-A-RUN-DIRECTORY"; return; }
+    _rng="$(grep -o -- "--artifact $_ar:[0-9]*-[0-9]*    ## Entry 1" "$2/r2.log" | sed "s|--artifact $_ar:||; s| .*||")"
+    _first="${_rng%-*}"
+    if ( cd "$2" && python3 tools/rulecheck.py prepare --decision recommendation --subject s --claim c --artifact "$_ar:$((_first + 1))-${_rng#*-}" --session 14z-0 --id 2099-04-04-03 ) > "$2/r3.log" 2>&1; then
+        echo "PREPARED-A-RANGE-OFF-THE-INDEX"; return; fi
+    grep -q "must start at an entry its INDEX names" "$2/r3.log" || { echo "REFUSED-FOR-ANOTHER-REASON: $(tail -1 "$2/r3.log")"; return; }
+    ( cd "$2" && python3 tools/rulecheck.py prepare --decision recommendation --subject s --claim c --artifact "$_ar:$_rng" --session 14z-0 --id 2099-04-04-04 ) > "$2/r4.log" 2>&1 \
+        || { echo "REFUSED-AN-INDEXED-RANGE: $(tail -1 "$2/r4.log")"; return; }
+    grep -q "its INDEX entry \"## Entry 1 (14z-901)\"" "$2/tests/rulecheck/runs/2099-04-04-04/packet.md" || { echo "ENTRY-NOT-NAMED-TO-THE-READER"; return; }
+    printf '## Entry 3 (14z-903), appended without regenerating the INDEX\n' >> "$2/$_ar"
+    if ( cd "$2" && python3 tools/rulecheck.py prepare --decision recommendation --subject s --claim c --artifact "$_ar:$_rng" --session 14z-0 --id 2099-04-04-05 ) > "$2/r5.log" 2>&1; then
+        echo "PREPARED-FROM-A-STALE-INDEX"; return; fi
+    grep -q "whose INDEX is stale" "$2/r5.log" || { echo "REFUSED-FOR-ANOTHER-REASON: $(tail -1 "$2/r5.log")"; return; }
+    echo READ-OK
+}
+unlimited() {  # unlimited <out> — the shadow tool: prepare with no read limit (the pre-#258 tool)
+    sed -e 's/^READ_MAX_BYTES = 256 \* 1024$/READ_MAX_BYTES = 10 ** 12/' -e 's/^READ_MAX_TOKENS = 25000$/READ_MAX_TOKENS = 10 ** 12/' tools/rulecheck.py > "$1"
+    [ "$(grep -c '^READ_MAX_[A-Z]* = 10 \*\* 12$' "$1")" = 2 ] || { echo "the READ_MAX lines were not found to lift" >&2; return 1; }
 }
 # SECTION PREPARE CITES's probe (#217, 14z-193): on a throwaway root, four hand-made fork runs — OK, VIOLATED
 # and resolved (one of its artifacts a line range), VIOLATED and unresolved, OK with its plant MISSED — then
@@ -491,6 +550,14 @@ if [ "${VS_CTL:-}" = recheck-unchecked ]; then
     echo "FAIL: rule-checker resolve recheck (control mode recheck-unchecked — $got)"; exit 1
 fi
 
+if [ "${VS_CTL:-}" = unlimited-read ]; then
+    unlimited "$W/unlimited.py" || exit 3
+    got="$(prepare_readlimit "$W/unlimited.py" "$W/prl_mode")"
+    echo "MODE: control unlimited-read — the shadow copy reads: $got"
+    case "$got" in PREPARED-AN-UNREADABLE-ARTIFACT*) ;; *) echo "REFUSED: the shadow copy did not prepare the unreadable artifact ($got)"; exit 3;; esac
+    echo "FAIL: rule-checker prepare read limit (control mode unlimited-read — $got)"; exit 1
+fi
+
 case "${VS_CTL:-}" in counted-id|late-validate)
     if [ "$VS_CTL" = counted-id ]; then counted "$W/shadow.py" || exit 3; else latecheck "$W/shadow.py" || exit 3; fi
     got="$(prepare_ids "$W/shadow.py" "$W/pimode")"
@@ -533,6 +600,11 @@ echo "== PREPARE SESSION KEY: prepare requires the sitting's 14z-N key and refus
 got="$(prepare_key tools/rulecheck.py "$W/pk")"
 echo "  the real tool: $got"
 [ "$got" = KEY-OK ] || { echo "FAIL: prepare's session key ($got)"; fail=1; }
+
+echo "== PREPARE READ LIMIT: no artifact a reader cannot read whole in one Read; an archive is named by its INDEX ranges (#258) =="
+got="$(prepare_readlimit tools/rulecheck.py "$W/prl")"
+echo "  the real tool: $got"
+[ "$got" = READ-OK ] || { echo "FAIL: prepare's read limit ($got)"; fail=1; }
 
 echo "== PREPARE CITES: a merge packet's fork runs are checked by the tool (#217) =="
 got="$(prepare_cites tools/rulecheck.py "$W/pcites")"
@@ -680,6 +752,16 @@ else
     vs_ctl_dead recheck-unchecked "the recheck switch was not found"; fail=1
 fi
 
+if unlimited "$W/unlimited_c.py"; then
+    got="$(prepare_readlimit "$W/unlimited_c.py" "$W/prlc")"
+    case "$got" in
+        PREPARED-AN-UNREADABLE-ARTIFACT*) vs_ctl_fired unlimited-read "the copy with no read limit: $got";;
+        *) vs_ctl_dead unlimited-read "the copy with no read limit read $got"; fail=1;;
+    esac
+else
+    vs_ctl_dead unlimited-read "the READ_MAX lines were not found to lift"; fail=1
+fi
+
 for c in counted-id late-validate; do
     if [ "$c" = counted-id ]; then counted "$W/shadow_$c.py"; else latecheck "$W/shadow_$c.py"; fi || { vs_ctl_dead "$c" "the shadow copy could not be made"; fail=1; continue; }
     got="$(prepare_ids "$W/shadow_$c.py" "$W/pc_$c")"
@@ -690,7 +772,7 @@ for c in counted-id late-validate; do
 done
 
 if [ "$fail" -eq 0 ]; then
-    echo "PASS: the rule-checker's record is sound, record binds the spawn check, prepare's ids hold, prepare requires the session key, a merge packet's cited fork runs are checked, resolve refuses unticketed instrument blame and takes a re-check only from a full run of the standing close checks it makes itself, and its seventeen controls fire"
+    echo "PASS: the rule-checker's record is sound, record binds the spawn check, prepare's ids hold, prepare requires the session key, a merge packet's cited fork runs are checked, resolve refuses unticketed instrument blame and takes a re-check only from a full run of the standing close checks it makes itself, prepare hands a reader nothing it cannot read whole (#258), and its eighteen controls fire"
 else
     echo "FAIL: rule-checker record"
     exit 1

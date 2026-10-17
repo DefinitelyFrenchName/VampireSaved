@@ -1,0 +1,13 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent204/t259/measurements.txt	ab9b2d7e51f391f4ef7b174bd79f6ee9b075d098
+build/agent204/t259/change.diff	ffde5b2bbdc59a8519bb2f169e93eff8aa91d479
+build/agent204/t259/test_static_runner.log	1ec015a248e4cbe61ca852dcc51ca0633a058df4
+build/agent204/t259/test_static_confirm.log	35af246dd2a716e4b4d499b6b2580770268c3770
+build/agent204/t259/g_test_close_tools.log	5a7c91207f054c4adfe58be2c5dd6ccf95c2acce
+build/agent204/t259/g_test_trace_static_reads.log	52ce8b10d483bce53624ed7028440a3ea07f0521
+build/agent204/t259/g_test_emulator_staleness.log	56dc10cb03617adc3c6217202ca9f1ca68fb8ab1
+build/agent204/t259/g_test_green_guard.log	0bb6c1ac0f7660b2050da6163d10e970bcf2435b
+build/agent204/t259/predict_today.txt	c5d856ba1220ebf4e7419926b5f1661eec70489b
+build/agent204/t259/predict_new4.txt	c5d856ba1220ebf4e7419926b5f1661eec70489b
+build/agent204/t259/plan_new.err	c4d11297e3c88164aa168e01a7d696c6a3465f19
+build/agent204/t259/c259_close.md	4465549a96ec8fd5eea1df0978594eb36bf111b7

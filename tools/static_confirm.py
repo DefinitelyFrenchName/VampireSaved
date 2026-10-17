@@ -134,6 +134,14 @@ Usage:
       carried, as a carried gate's are. Measured 14z-202 (section 22 of tests/test_static_runner.sh): a data file a
       gate reads with `cat` is R2, not R1 — the reach holds programs only. A freeze and a release execute every
       control (--confirm is refused there).
+  THE PLAN'S COST (#259, 14z-204): `plan` prints its progress every 25 gates and a closing timing line on stderr, which
+      tests/run_all_static.sh shows as it runs (the 14z-195 close's plan ran 20 min 22 s silent). R5 searches each data
+      basename once per gate and lists the data files once per root, and battery_reach's module lookup is memoised:
+      measured on the 14z-195 close's change set (79bb33c9..23a56fc8, 228 paths, in a worktree of 23a56fc8) 167 s -> 49 s,
+      one changed path 21 s -> 13 s, and a plan of this tree from the 14z-203 close's results 3 min 39 s -> 52 s; the
+      output byte-identical in each. The 194 rule-checker run files of that change set cost nothing as CHANGED paths,
+      before this change too (36 paths without them: 171 s on the old planner); what cost was R5 searching each run
+      record reader's blob once per run file, i.e. their presence as tracked data.
   python3 tools/static_confirm.py subfp --root DIR
       one line `<path> <fingerprint>` per initialised submodule of DIR (#286 (b)).
   python3 tools/static_confirm.py --selftest
@@ -346,23 +354,34 @@ def data_names(t, c, bpat):
 
 
 def data_files(root, blob):
-    """R5: the tracked data files the reach's code names, by path or basename (one scan per blob)."""
+    """R5: the tracked data files the reach's code names, by path or basename (one scan per blob, ONE SEARCH PER
+    BASENAME: #259, 14z-204 — on the 14z-195 close's change set the run-record readers searched their blob once per
+    run file, 3,750 times for 7 basenames; 36,023 whole-blob searches over the registry, 124 of the plan's 179 s)."""
     k = (root, hash(blob))
     if k not in _DATA:
-        tracked = _tracked(root)
-        out = []
-        for f in tracked:
-            if f.endswith(DATA_EXT):
-                if f.startswith(RUNS_DATA) and "rulecheck/runs" not in blob:   # N-F
-                    continue
-                b = os.path.basename(f)
-                if b in blob and re.search(r"(?<![\w.-])" + re.escape(b) + r"(?![\w-])", blob):
-                    out.append(f)
+        out, named = [], {}
+        runs_reader = "rulecheck/runs" in blob   # once per blob, not once per file (#259)
+        for f in _data_tracked(root):
+            if f.startswith(RUNS_DATA) and not runs_reader:   # N-F
+                continue
+            b = os.path.basename(f)
+            if b not in named:
+                named[b] = b in blob and re.search(r"(?<![\w.-])" + re.escape(b) + r"(?![\w-])", blob) is not None
+            if named[b]:
+                out.append(f)
         _DATA[k] = out
     return _DATA[k]
 
 
 _TRACKED = {}
+_DATAF = {}
+
+
+def _data_tracked(root):
+    """the tracked data files (DATA_EXT), listed once per root (#259)"""
+    if root not in _DATAF:
+        _DATAF[root] = [f for f in _tracked(root) if f.endswith(DATA_EXT)]
+    return _DATAF[root]
 
 
 def _tracked(root):
@@ -493,11 +512,25 @@ def _cached_refs(orig):
 
 
 br.refs = _cached_refs(br.refs)   # one reference scan per file, shared by every gate's closure
+_MODS = {}
 
 
-def predict(root, changed, r1=None):
+def _cached_resolve(orig):
+    def resolve_mod(name, files):
+        k = (id(files), name)
+        if k not in _MODS:
+            _MODS[k] = (files, orig(name, files))   # the list is held, so its id is not reused while cached
+        return _MODS[k][1]
+    return resolve_mod
+
+
+br.resolve_mod = _cached_resolve(br.resolve_mod)   # #259: one index scan per module name, not per import (2,549 scans, 10.7 s of a one-path plan's 21 s, 14z-204)
+
+
+def predict(root, changed, r1=None, progress=None):
     """the STALE map; when `r1` is a dict, r1[gate] is set, for a STALE gate, to whether its code names a changed path
-    DIRECTLY (direct_read: R1, R2 or R6; #286 (c))"""
+    DIRECTLY (direct_read: R1, R2 or R6; #286 (c)); `progress(done, total)` is called every 25 gates and at the end
+    (#259: the 14z-195 close's plan ran 20 min silent, which looks the same as a hang)"""
     files = br.index(root, [])
     gates = registry(root)
     pats = {c: patterns(c) for c in changed}
@@ -505,7 +538,9 @@ def predict(root, changed, r1=None):
     # N-D: the session tooling's scratch under build/ is judged by R4 alone (a whole-tree reader lists it); measured
     # 14z-200 on the trace at 6e329411 with the scratch present: no gate opened a file under it
     eff = [c for c in changed if not drop_scratch(c)]
-    for g in gates:
+    for n, g in enumerate(gates, 1):
+        if progress and (n % 25 == 0 or n == len(gates)):
+            progress(n, len(gates))
         rch = reach(root, g, files)
         blob = "\n".join(text(root, p) for p in rch)
         why = None
@@ -547,7 +582,7 @@ def backtest(events, repo):
             wt = os.path.join(d, "wt")
             subprocess.run(["git", "worktree", "add", "--detach", "-q", wt, head], cwd=repo, check=True)
             try:
-                _TEXT.clear(); _REFS.clear(); _DATA.clear(); _TMPL.clear(); _TRACKED.clear()
+                _TEXT.clear(); _REFS.clear(); _DATA.clear(); _TMPL.clear(); _TRACKED.clear(); _DATAF.clear(); _MODS.clear()
                 changed = changed_set(wt, base, head, extra)
                 gates, stale, carried = predict(wt, changed)
                 ok = gate in stale
@@ -703,7 +738,7 @@ def selftest():
         subprocess.run(["git", "init", "-q"], cwd=root, check=True)
         subprocess.run(["git", "add", "-A"], cwd=root, check=True)
         for c, want in cases:
-            _TEXT.clear(); _REFS.clear(); _DATA.clear(); _TMPL.clear(); _TRACKED.clear()
+            _TEXT.clear(); _REFS.clear(); _DATA.clear(); _TMPL.clear(); _TRACKED.clear(); _DATAF.clear(); _MODS.clear()
             _, stale, _ = predict(root, [c])
             got = set(stale)
             want = want | {"g_gitlist", "g_walkroot"}   # the list-form and root-walk readers are stale for every change
@@ -804,7 +839,12 @@ def plan(root, results):
         if subfp(root, p) == fps[p]:
             changed.discard(p)
     r1 = {}
-    _, stale, _ = predict(root, sorted(changed), r1) if changed else (gates, {}, gates)
+    t_plan = time.monotonic()
+    tell = lambda n, total: print(f"plan: {n}/{total} gates judged against {len(changed)} changed paths, "
+                                  f"{time.monotonic() - t_plan:.0f} s", file=sys.stderr, flush=True)
+    _, stale, _ = predict(root, sorted(changed), r1, tell) if changed else (gates, {}, gates)
+    print(f"plan: {len(changed)} changed paths, {len(stale)} of {len(gates)} gates STALE, "
+          f"{time.monotonic() - t_plan:.1f} s (#259)", file=sys.stderr, flush=True)
 
     def ctl(r):   # #286 (c): carry the base row's controls unless a path in the reach changed
         if r1.get(r[0]) or len(r) < 6:   # CONTROLS-ON-REACH

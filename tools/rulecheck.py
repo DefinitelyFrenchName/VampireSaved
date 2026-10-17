@@ -71,6 +71,7 @@ import random
 import re
 import shutil
 import sys
+import tempfile
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
@@ -322,9 +323,80 @@ def prompt_text(root: Path, packet: str, staged_root: str, family: str = "eviden
     )
 
 
-def stage_artifacts(root: Path, src_specs, dst: Path):
+# #258 (14z-204): A READER IS HANDED NOTHING IT CANNOT READ WHOLE IN ONE Read CALL. Measured 14z-204 on the Read tool
+# (the session's own and a capped Explore agent's; the pinned rule-checker cannot be spawned on a free prompt, but its
+# definition's tool is the same Read, and runs 750-758 saw its readers hit the size error): a file over 256 KB is an error
+# ("exceeds maximum allowed size (256KB)"); under it, over 25,000 tokens is a PARTIAL view of the first lines. Each line
+# costs tokens of its own (the line-number prefix): 59,000 bytes in 5,900 short lines gave "showing lines 1-3541 of 5901
+# total (35407 tokens, cap 25000)", and 237,343 bytes in 400 dense lines "lines 1-88 of 401 total (95981 tokens)". Tokens
+# are not countable here, so they are ESTIMATED from above: bytes / 2.4 (the densest ratio measured, 2.47, rounded down)
+# + 2 per line (the per-line cost fitted to the two partial views), refused above 25,000. The estimate exceeds both
+# measured partials (36,385 >= 35,407; 99,694 >= 95,981) and refuses some files that would fit (3,000 short lines,
+# 51,000 bytes, came back whole; estimated 27,252): wrong on the safe side. Before this check 110 staged text artifacts
+# over 256 KB went to readers, in 95 of 993 runs (DECISIONS_HISTORY.md in 8, at 552 KB in runs 750-758).
+READ_MAX_BYTES = 256 * 1024
+READ_MAX_TOKENS = 25000
+BYTES_PER_TOKEN = 2.4
+TOKENS_PER_LINE = 2
+
+
+def read_tokens(raw: bytes) -> int:
+    """the estimate from above of what one Read of this text costs (#258)"""
+    return int(len(raw) / BYTES_PER_TOKEN + TOKENS_PER_LINE * (raw.count(b"\n") + 1))
+
+
+PICTURE = (".png", ".jpg", ".jpeg", ".gif", ".webp", ".pdf")   # read as images or pages, not as text
+
+
+def _archive_entries(root: Path, rel: str):
+    """an indexed archive's entries as [(first line, last line, heading)], or None when rel is not one (the INDEX at
+    its head, tools/gen_history_index.py, #282 item E)"""
+    sys.path.insert(0, str(root / "tools"))
+    try:
+        import gen_history_index as ghi
+    except ImportError:
+        return None
+    finally:
+        sys.path.pop(0)
+    if rel not in ghi.ENTRY:
+        return None
+    text = (root / rel).read_text(encoding="utf-8")
+    if ghi.render(text, ghi.ENTRY[rel]) != text:
+        die(f"{rel} is an indexed archive whose INDEX is stale: regenerate it (python3 tools/gen_history_index.py) "
+            f"before a packet names a range of it (#258: the index is how a reader finds the entry)")
+    lines = text.split("\n")
+    marks = [(int(m.group(1)), m.group(2)) for m in (re.match(r"- L(\d+) (.*)", l) for l in
+             lines[lines.index(ghi.BEGIN) + 1:lines.index(ghi.END)]) if m]
+    return [(n, (marks[i + 1][0] - 1 if i + 1 < len(marks) else len(lines)), h) for i, (n, h) in enumerate(marks)]
+
+
+def read_limit_check(root: Path, rel: str, target: Path, disp: str, session: str = ""):
+    """#258: refuse a staged text artifact over the Read limits (read_tokens); for an indexed archive, list its entries' ranges"""
+    raw = target.read_bytes()
+    if rel.lower().endswith(PICTURE) or b"\0" in raw[:8192]:
+        return
+    est, nlines = read_tokens(raw), raw.count(b"\n") + 1
+    if len(raw) <= READ_MAX_BYTES and est <= READ_MAX_TOKENS:
+        return
+    msg = (f"artifact {disp} is {len(raw):,} bytes in {nlines:,} lines, about {est:,} tokens estimated from "
+           f"above: a reader's Read errors above {READ_MAX_BYTES // 1024} KB and shows a PARTIAL view above "
+           f"{READ_MAX_TOKENS:,} tokens, so it would not read it in full (#258). Name the part the claim rests on as "
+           f"{rel}:FIRST-LAST")
+    ents = _archive_entries(root, rel)
+    if ents is not None:
+        mine = [e for e in ents if session and session in e[2]]
+        msg += (f". {rel} is an indexed archive: name entries by their INDEX ranges"
+                + (f"; this sitting's ({session}):" if mine else f" (none of its {len(ents)} entries names {session or 'the session'}; pick from its INDEX at the head of the file)"))
+        for a, b, h in mine[:12]:
+            msg += f"\n    --artifact {rel}:{a}-{b}    {h[:100]}"
+    die(msg)
+
+
+def stage_artifacts(root: Path, src_specs, dst: Path, session: str = ""):
     """Copy each artifact (or a line range of it) under dst, keeping its path.
-    Returns [(display path, sha1 of the staged copy)]."""
+    Returns [(display path, sha1 of the staged copy)]. #258: every staged text copy must fit one Read call
+    (read_limit_check); a range of an indexed archive must start at an entry its INDEX names, and the reader is told
+    which entry it is."""
     out = []
     seen = []
     for spec in src_specs:
@@ -345,6 +417,14 @@ def stage_artifacts(root: Path, src_specs, dst: Path):
             lines = src.read_text(errors="replace").splitlines(keepends=True)
             target.write_text("".join(lines[int(a) - 1:int(b)]))
             disp = f"{staged} (lines {a}-{b} of {rel})"
+            ents = _archive_entries(root, str(rel))
+            if ents is not None:   # #258: an archive is read through its INDEX, entry by entry
+                first = [e for e in ents if e[0] == int(a)]
+                if not first:
+                    die(f"--artifact {spec}: a range of the indexed archive {rel} must start at an entry its INDEX names "
+                        f"(the `- L<line>` lines at its head); line {a} is not one (#258)")
+                disp = (f"{staged} (lines {a}-{b} of {rel}: its INDEX entry \"{first[0][2][:100]}\""
+                        + (", and the entries after it up to line " + b if int(b) > first[0][1] else "") + ")")
         else:
             target = dst / rel
             target.parent.mkdir(parents=True, exist_ok=True)
@@ -352,6 +432,7 @@ def stage_artifacts(root: Path, src_specs, dst: Path):
             disp = str(rel)
         if target.exists() and any(t == target for t in seen):
             die(f"artifact staged twice: {disp}")
+        read_limit_check(root, str(rel), target, disp, session)
         seen.append(target)
         out.append((disp, sha1(target), str(rel)))
     return out
@@ -487,6 +568,17 @@ def cmd_prepare(a):
             die(f"no positive {family} fixture CALIBRATED under the current checklist to plant — run `prepare --calibrate <fixture>` first")
         control_name = eligible[len(ledger_rows) % len(eligible)]
 
+    if not a.calibrate:   # #258: an artifact no reader can read whole is refused BEFORE the run directory exists
+        with tempfile.TemporaryDirectory() as _pre:   # (a MISSING artifact stays the early check's: control late-validate)
+            stage_artifacts(root, [x for x in a.artifact if (root / x.partition(":")[0]).is_file()], Path(_pre),
+                            a.session or "")
+    # ... and so is a fixture's file: the plant (and, calibrating, the fixture read as the real packet) is handed to a
+    # reader the same way (run 2026-10-17-1111 Q4: the cap first covered the real slot only)
+    for _fx in ([real_src] if a.calibrate else []) + [root / FIXTURES / control_name / "files"]:
+        for _f in sorted(_fx.rglob("*")):
+            if _f.is_file():
+                read_limit_check(root, str(_f.relative_to(root)), _f, str(_f.relative_to(root)))
+
     # slots: which of a/b carries the plant is drawn at random and recorded
     rng = random.SystemRandom()
     control_slot = rng.choice("ab")
@@ -502,7 +594,7 @@ def cmd_prepare(a):
         manifest = [(str(p.relative_to(real_src)), sha1(p), str(p.relative_to(real_src)))
                     for p in sorted(real_src.rglob("*")) if p.is_file()]
     else:
-        manifest = stage_artifacts(root, a.artifact, stage / real_slot)
+        manifest = stage_artifacts(root, a.artifact, stage / real_slot, a.session or "")
         real_text = packet_text(decision, subject, claim, [d for d, _, _ in manifest])
         if cited:
             real_text += ("Cited fork runs (#217; checked by the tool at prepare and again at record: each plant "

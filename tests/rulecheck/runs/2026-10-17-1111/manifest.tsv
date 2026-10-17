@@ -1,0 +1,10 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent204/t258/read_limits.txt	3b19a6db548a5b8bb11c4878136ecb2d3323a494
+build/agent204/t258/change.diff	358efd18829e4d5e00a574a091f20badf5c1878f
+build/agent204/t258/issue_258.txt	d8a1f537ead42dcc237590e48d4fc359ef1717a0
+build/agent204/t258/five_cases.txt	1841af48910de9d40ea202858d1fe56f8c0ae8b6
+build/agent204/t258/t258_gate.log	11cdd0964f558939ec283d6e3f9800ab4008df91
+build/agent204/t258/t258_ctl.log	f00cf9631ec396d09c63938fff720ed2317ab0a4
+build/agent204/t258/bk_test_must_fire_census.log	f5a92036bf612dd56ac36ad3c397ad986ba67263
+build/agent204/t258/bk_test_gate_coverage_current.log	9dde6893c00e4f13fd4fdd2a0cae221e3d1c3cbe
+build/agent204/t258/c258_close.md	f0e5d0e64672d9be45244c16e6a36dcc721935b1

@@ -148,6 +148,33 @@ commit --no-verify --dry-run`, was refused by the hook. The hooks' coverage and 
 the installed `pre-commit` here, and the installation check had no control. Resolved: a real `git commit` in a scratch
 worktree was refused by the guard (`build/agent204/close290/live_git_refusal.txt`, local), and a tenth control
 `missing-lock` drops a deny rule from a settings copy; `pre-push` stays proven only in the gate's scratch repository.
+Committed `a2c4df94` through the guard (tier GREEN, PASS 199, on the staged tree); #290 closed `done` on GitHub with its
+comment, its row in this group's next commit.
+
+### (2) #259 — THE PLAN IS 3.4 TIMES FASTER AND NO LONGER SILENT
+Measured first: today's planner on the 14z-195 close's change set (228 paths, a worktree of `23a56fc8`) took 167 s, not
+that day's 20 min 22 s, and the same without the 194 run files (171 s: as changed paths they cost nothing); 124 of 179 profiled seconds were R5:
+the run-record readers searched their whole reach once per run file, 36,023 searches where 1,383 basenames do. Built in
+`tools/static_confirm.py`: one search per basename and the N-F test once per blob, the data files listed once per root,
+`battery_reach.resolve_mod` memoised; `plan` prints progress every 25 gates and a timing line, which
+`tests/run_all_static.sh` now streams (its exit status kept across the pipe). 167 s -> 49 s on that set, one path 21 s ->
+13 s, a plan of today's tree 3 min 39 s -> 52 s, output byte-identical all three (`build/agent204/t259/measurements.txt`,
+local). `tests/test_static_runner.sh` section 18 checks the lines and a failing plan's refusal; the control
+`runs-data-off` follows the hoisted line. The parked #286 patch no longer applied: refreshed as
+`build/agent203/t286/narrowings_on259.patch` (two conflicts resolved, `test_static_confirm` PASS, 30 controls fired).
+Found on the way: `test_close_tools` (ondemand) REFUSES on HEAD's own STATE, its section 2b looking for a findings row
+that #288 removed — put to the maintainer.
+
+### (3) #258 — A READER IS HANDED NOTHING IT CANNOT READ WHOLE
+Measured the readers' Read tool: an error above 256 KB, a PARTIAL view above 25,000 tokens (a 237,343-byte file:
+"lines 1-88 of 401 total (95981 tokens, cap 25000)"), no line cap (3,000 lines whole). 110 staged text artifacts over
+256 KB had gone to readers in 95 of 993 runs. `tools/rulecheck.py prepare` now estimates an artifact's tokens from above (bytes / 2.4 + 2 per
+line: 59,000 bytes in 5,900 short lines was a PARTIAL view at 35,407 tokens, so a byte cap alone was wrong — found by
+rule-checker run 2026-10-17-1111) and refuses one over the caps before the run directory exists, fixtures included; for an indexed archive the refusal
+lists the session's entries as ready `path:a-b` ranges, a range must start at an INDEX entry, a stale INDEX is refused,
+and the packet names the entry to the reader — the maintainer's comment on #258 point by point, quoted in
+`docs/project/rule_checker.md`. `tests/test_rule_checker.sh` PREPARE READ LIMIT section (eight cases, control
+`unlimited-read`; a preflight kept missing artifacts the early check's, or `late-validate` went dead).
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings

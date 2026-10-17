@@ -109,7 +109,30 @@ test whether a premise is STATED. The tool stages the artifacts under
 range `path:a-b` stages under its own name (`path.lines-a-b`), because two
 ranges of one file used to collapse onto one staged copy while the manifest
 listed both (GitHub #156, 14z-164: a reader answered Q5 from the range that
-had overwritten the ruling it was asked to find). **A
+had overwritten the ruling it was asked to find). **Nothing goes in that a
+reader cannot read whole in one Read call (#258, 14z-204).** Measured on the Read tool (the session's own and a capped
+Explore agent's; the pinned rule-checker cannot be spawned on a free prompt, but its definition's tool is the same Read,
+and runs 750-758 saw its readers hit the size error): a file over 256 KB is an error ("exceeds maximum allowed size
+(256KB)"); under it, a file over 25,000 tokens comes back as a PARTIAL view of its first lines, and every line costs
+tokens of its own (the line-number prefix): 237,343 bytes in 400 dense lines gave "showing lines 1-88 of 401 total
+(95981 tokens, cap 25000)", 59,000 bytes in 5,900 short lines "showing lines 1-3541 of 5901 total (35407 tokens)".
+`prepare` estimates a text artifact's tokens from above, bytes / 2.4 + 2 per line (the densest byte ratio measured and
+the per-line cost fitted to those two views; it exceeds both, and refuses some files that fit, such as 3,000 short lines
+that came back whole), and refuses one over 25,000 or over 256 KB, before the run directory exists, telling the author
+to name the part the claim rests on as `path:a-b`. The same holds for every file of the planted fixture and of a fixture
+being calibrated. Pictures (`.png`, `.jpg`, `.pdf`, ...) are read as images and are not capped. Before the check, 110 staged
+text artifacts over 256 KB had gone to readers in 95 of 993 runs; the issue's case was `DECISIONS_HISTORY.md` at
+552 KB in runs 750-758, where several readers read a few slices and answered. **An indexed archive is read
+through its INDEX:** for any `*_HISTORY.md` / `*_history.md` that `tools/gen_history_index.py` configures, the
+refusal lists the entries naming the packet's session as ready `--artifact path:a-b` lines (an entry runs from
+its `- L<line>` to the line before the next); a range of an archive must START at an entry its INDEX names, its
+INDEX must be current (a stale one is refused: the index is how the range was found), and the packet tells the
+reader which entry it holds (`(lines a-b of DECISIONS_HISTORY.md: its INDEX entry "## Ruled …")`). The
+maintainer, on #258 (2026-10-11): *"Agreed on principle for the fix, however the core issue is that a file like
+DECISIONS_HISTORY.md is made to be accessed via its index so we also need to check if the file format hasn't drifted,
+if the reader task does list specifically how to access, read only the section pointed to and leverage its contents
+and conversely that the definition of done is clean."* Gate: the
+PREPARE READ LIMIT section of `tests/test_rule_checker.sh`, control `unlimited-read`. **A
 packet is complete when the artifacts can settle every premise the claim
 names**: the first calibration of the negative fixture handed the checker a
 claim about shared pokes without the file that lists them, and the checker

@@ -1,0 +1,15 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: Ticket closure, 14z-204: #258 done (prepare hands a reader no artifact it cannot read whole; an archive by its INDEX)
+Claim (the working agent's sentence): #258 has nothing left to do: the Read limits were measured (build/agent204/t258/read_limits.txt: an error above 256 KB, a PARTIAL view above 25,000 tokens, no line cap); the change (build/agent204/t258/change.diff) makes prepare refuse a staged text artifact over 60,000 bytes before the run directory exists, list an indexed archive's entry ranges, refuse an archive range not starting at an INDEX entry or taken from a stale INDEX, and name the entry to the reader, which answers the issue's fix and each point of the maintainer's comment quoted in build/agent204/t258/issue_258.txt; exercised on the real DECISIONS_HISTORY.md (build/agent204/t258/five_cases.txt) and gated by test_rule_checker's PREPARE READ LIMIT section with the control unlimited-read, in-gate and as a mode (build/agent204/t258/t258_gate.log, build/agent204/t258/t258_ctl.log); bookkeeping gates PASS (build/agent204/t258/bk_*.log). Not tested: the 60,000-byte cap is an estimate from one dense file's ratio (tokens are not countable here), so a text denser than 2.4 bytes per token under 60,000 bytes could still meet the partial view; readers' compliance with reading a staged file whole is not checked; the closure is conditional on the commit landing through the guard on a strict GREEN tier of its staged tree
+Artifacts (read every one, in full):
+  - build/agent204/t258/read_limits.txt
+  - build/agent204/t258/change.diff
+  - build/agent204/t258/issue_258.txt
+  - build/agent204/t258/five_cases.txt
+  - build/agent204/t258/t258_gate.log
+  - build/agent204/t258/t258_ctl.log
+  - build/agent204/t258/bk_test_must_fire_census.log
+  - build/agent204/t258/bk_test_gate_coverage_current.log
+  - build/agent204/t258/c258_close.md

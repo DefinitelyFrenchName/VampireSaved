@@ -10,7 +10,8 @@
 #   a changed input and nothing else, CARRYING the rest (14z-188, #188 route A wired); and the
 #   gates a run starts do not inherit its STATIC_RESULTS_OUT (section 12c, 14z-199); and, the session run of #269
 #   (14z-200, section 20), --confirm never carries a `# CONFIRM: always` core gate nor a gate whose controls the base
-#   run did not execute, and is refused at a freeze.
+#   run did not execute, and is refused at a freeze; its plan shows its progress and timing lines as it runs, and a
+#   plan that fails still refuses (#259, 14z-204, section 18).
 # HOW: a synthetic repo of stub gates with known verdicts run through the REAL runner via
 #   its registry files (never a copy of its logic); two shadow-tool controls unplug the
 #   controls reader and blind the cadence trigger match.
@@ -674,7 +675,7 @@ cp "$REPO/tools/static_confirm.py" "$REPO/tools/battery_reach.py" "$FC/tools/"
 cp "$FC/tools/static_confirm.py" "$T/static_confirm_off.py"
 python3 - "$T/static_confirm_off.py" <<'PYX'
 import sys; p = sys.argv[1]; s = open(p).read()
-a = "    _, stale, _ = predict(root, sorted(changed), r1) if changed else (gates, {}, gates)"
+a = "    _, stale, _ = predict(root, sorted(changed), r1, tell) if changed else (gates, {}, gates)"
 assert s.count(a) == 1, "the plan's predict line moved"
 open(p, "w").write(s.replace(a, "    stale = {}  # CONTROL prediction-off"))
 PYX
@@ -713,6 +714,17 @@ if printf '%s' "$r3" | grep -qE "^  re-run g_a +STALE" && printf '%s' "$r3" | gr
 else fail "after data/a.txt changed (exit $s3c): $(printf '%s' "$r3" | grep -E '^  g_|^  re-run' | tr '\n' '|')"; S18=bad; fi
 r4="$(cd "$FC" && sh tests/run_all_static.sh --tier portable --confirm "$T/nope.tsv" 2>&1)" && s4c=0 || s4c=$?
 [ "$s4c" = 2 ] && echo "  ok: a missing results file refuses (exit 2) — nothing carried from nothing" || fail "--confirm on a missing file exited $s4c"
+# #259 (14z-204): the plan is no longer silent — its progress and timing lines reach the runner's output as it runs —
+# and a plan that FAILS still refuses, its status carried across the pipe that streams them
+if printf '%s' "$r3" | grep -qE "^  plan: 5/5 gates judged against [0-9]+ changed paths" \
+        && printf '%s' "$r3" | grep -qE "^  plan: [0-9]+ changed paths, [0-9]+ of 5 gates STALE, [0-9.]+ s \(#259\)"; then
+    echo "  ok: the plan's progress line and its timing line are shown during the confirm run (#259)"
+else fail "#259: the confirm run did not show the plan's progress and timing lines: $(printf '%s' "$r3" | grep 'plan' | tr '\n' '|')"; fi
+{ grep '^# head ' "$T/r3.tsv"; echo "# utc not-a-time"; } > "$T/badutc.tsv"
+r4b="$(cd "$FC" && sh tests/run_all_static.sh --tier portable --confirm "$T/badutc.tsv" 2>&1)" && s4b=0 || s4b=$?
+[ "$s4b" = 2 ] && printf '%s' "$r4b" | grep -q "the plan FAILED" \
+    && echo "  ok: a plan that fails (an unreadable # utc) refuses with exit 2 through the streaming pipe — nothing carried" \
+    || fail "#259: a failing plan exited $s4b: $(printf '%s' "$r4b" | tail -2 | tr '\n' '|')"
 
 echo "== 19. MUST-FIRE: with the plan's prediction off, section 18's changed input is CARRIED =="
 if ! vs_ctl_is prediction-off; then

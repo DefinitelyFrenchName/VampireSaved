@@ -1,0 +1,6 @@
+  FLAG D-ABSOLUTE: That came to 36,023 whole-blob searches across the registry, where one per basename is 1,383.  [build/agent204/t259/c259_close.md]
+  FLAG D-ABSOLUTE: In addition, the N-F test scanned each blob once per data file.  [build/agent204/t259/c259_close.md]
+  FLAG D-ABSOLUTE: - R5 searches each data basename once per gate, and the N-F test runs once per blob;  [build/agent204/t259/c259_close.md]
+  FLAG D-ABSOLUTE: The output is byte-identical in all three: the predict lists have the same sha1, and so do the 226-row plans.  [build/agent204/t259/c259_close.md]
+  FLAG D-ABSOLUTE: - **The run-record paths:** since #286 (a) they cost nothing.  [build/agent204/t259/c259_close.md]
+packet_check: 5 flag(s): D-ABSOLUTE 5

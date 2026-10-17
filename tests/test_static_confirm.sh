@@ -87,7 +87,7 @@ edits = {
     "no-git-rule": ('    if base in (".gitignore", ".gitattributes", ".gitmodules") and GIT_RUN.search(blob):', "    if False:  # CONTROL no-git-rule"),
     "md-narrow-off": ('return tuple.__contains__(self, b) or str(b).endswith(".md")   # N-B-MD', "return tuple.__contains__(self, b)  # CONTROL md-narrow-off"),
     "data-position-off": ("        if (c in t or (bpat and base in t)) and data_names(t, c, bpat):   # N-E", "        if c in t or (bpat and base in t and bpat.search(t)):  # CONTROL data-position-off"),
-    "runs-data-off": ('                if f.startswith(RUNS_DATA) and "rulecheck/runs" not in blob:   # N-F', "                if False:  # CONTROL runs-data-off"),
+    "runs-data-off": ('            if f.startswith(RUNS_DATA) and not runs_reader:   # N-F', "            if False:  # CONTROL runs-data-off"),
     "runs-change-off": ('            if c.startswith(RUNS_DATA) and "rulecheck/runs" not in blob:   # N-F-CHANGE', "            if False:  # CONTROL runs-change-off"),
     "recursive-loose": ('RECURSIVE = re.compile(r"os', 'RECURSIVE = re.compile(r"\\bfind\\s|\\*\\*|os'),
     "whole-coarse-off": ("WHOLE = _Whole()", "WHOLE = _WHOLE_COARSE  # CONTROL whole-coarse-off"),
