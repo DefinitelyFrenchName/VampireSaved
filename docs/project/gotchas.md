@@ -7230,3 +7230,19 @@ executables). A file a gate reads (`cat data/list.tsv`) is not in it; a change t
 line names its basename), not R1. Building #286 (c) on "a changed path in the reach" would have carried a gate's
 controls when its own data changed; `tests/test_static_runner.sh` section 22 caught it on its first run. **The rule:**
 the control trigger is `direct_read` (R1, R2 or R6: the gate's code names the file), never R1 alone.
+
+## A GATE THAT DRAWS A ROTATED CHOICE ONCE SEES ONE ELEMENT OF IT (paid: 14z-204, #258)
+
+The rule-checker's plant is drawn by the ledger's length (`eligible[len(ledger_rows) % len(eligible)]`). The #258 read
+limit was gated by `prepare` probes that each prepare once, so they saw the one plant the ledger's length then drew; the
+tier was GREEN and the commit landed. Two runs later the rotation drew a plant whose rig file no reader can read whole,
+and every `prepare` was refused, three gates red on HEAD. **The rule:** where a tool picks by rotation, hash or date, the
+gate draws every position (here: one dummy ledger row before each of N prepares, the PLANT ROTATION section of
+`tests/test_rule_checker.sh`).
+
+## AN ESTIMATE "FROM ABOVE" FITTED ON ONE KIND OF TEXT IS NOT ONE (paid: 14z-204, #258)
+
+The first read-limit estimate took its bytes-per-token ratio from the densest file measured (random digits, 2.47) and
+called the result an upper bound. Code tokenises denser per byte than that once its line-number prefix is counted: a
+56,338-byte rig file of 870 lines cost 28,713 tokens against an estimate of 25,214. **The rule:** an upper bound is
+measured on every kind of input it will judge (here: digits, short lines, code), and re-checked when a new kind appears.

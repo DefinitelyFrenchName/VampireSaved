@@ -328,21 +328,35 @@ def prompt_text(root: Path, packet: str, staged_root: str, family: str = "eviden
 # definition's tool is the same Read, and runs 750-758 saw its readers hit the size error): a file over 256 KB is an error
 # ("exceeds maximum allowed size (256KB)"); under it, over 25,000 tokens is a PARTIAL view of the first lines. Each line
 # costs tokens of its own (the line-number prefix): 59,000 bytes in 5,900 short lines gave "showing lines 1-3541 of 5901
-# total (35407 tokens, cap 25000)", and 237,343 bytes in 400 dense lines "lines 1-88 of 401 total (95981 tokens)". Tokens
-# are not countable here, so they are ESTIMATED from above: bytes / 2.4 (the densest ratio measured, 2.47, rounded down)
-# + 2 per line (the per-line cost fitted to the two partial views), refused above 25,000. The estimate exceeds both
-# measured partials (36,385 >= 35,407; 99,694 >= 95,981) and refuses some files that would fit (3,000 short lines,
-# 51,000 bytes, came back whole; estimated 27,252): wrong on the safe side. Before this check 110 staged text artifacts
-# over 256 KB went to readers, in 95 of 993 runs (DECISIONS_HISTORY.md in 8, at 552 KB in runs 750-758).
+# total (35407 tokens, cap 25000)", 237,343 bytes in 400 dense lines "lines 1-88 of 401 total (95981 tokens)", and a
+# 56,338-byte rig file of 870 lines (a planted fixture's) "lines 1-643 of 870 total (28713 tokens)". Tokens are not
+# countable here, so they are ESTIMATED from above: bytes / 2.0 + 2 per line, refused above 25,000. The estimate exceeds
+# all three measured partials (41,302 >= 35,407; 119,473 >= 95,981; 29,909 >= 28,713) and refuses some files that would
+# fit (3,000 short lines, 51,000 bytes, came back whole; estimated 31,502): wrong on the safe side. The first cut of this
+# check took bytes / 2.4 from the digits file alone and under-estimated code (25,214 for that 28,713-token file): an
+# estimate "from above" fitted on one kind of text is not one. Before this check 110 staged text artifacts over 256 KB
+# went to readers, in 95 of 993 runs (DECISIONS_HISTORY.md in 8, at 552 KB in runs 750-758).
 READ_MAX_BYTES = 256 * 1024
 READ_MAX_TOKENS = 25000
-BYTES_PER_TOKEN = 2.4
+BYTES_PER_TOKEN = 2.0
 TOKENS_PER_LINE = 2
 
 
 def read_tokens(raw: bytes) -> int:
     """the estimate from above of what one Read of this text costs (#258)"""
     return int(len(raw) / BYTES_PER_TOKEN + TOKENS_PER_LINE * (raw.count(b"\n") + 1))
+
+
+def plant_readable(root: Path, name: str) -> bool:
+    """#258: a fixture is planted only when a reader can read every file of it whole (the rotation skips it otherwise;
+    calibrating it is refused by read_limit_check). 14z-204: two calibrated evidence plants carried a 56 KB rig file a
+    reader saw as a PARTIAL view at 28,713 tokens, and a prepare that drew one of them as its plant was refused."""
+    for p in sorted((root / FIXTURES / name / "files").rglob("*")):
+        if p.is_file() and not str(p).lower().endswith(PICTURE):
+            raw = p.read_bytes()
+            if b"\0" not in raw[:8192] and (len(raw) > READ_MAX_BYTES or read_tokens(raw) > READ_MAX_TOKENS):
+                return False
+    return True
 
 
 PICTURE = (".png", ".jpg", ".jpeg", ".gif", ".webp", ".pdf")   # read as images or pages, not as text
@@ -519,7 +533,7 @@ def cmd_prepare(a):
             # a NEGATIVE fixture is calibrated beside a PLANT (a calibrated positive), blind,
             # so a reader quiet because it is dead cannot read as a clean packet (run 08, Q4)
             eligible = [n for n, ex in fixtures if ex[0] == "VIOLATED" and fixture_family(root, n) == family
-                        and calibrated(ledger_rows, n, root)]
+                        and calibrated(ledger_rows, n, root) and plant_readable(root, n)]
             if not eligible:
                 die("a negative fixture is calibrated beside a plant — calibrate a positive fixture first (under the CURRENT checklist)")
             control_name = eligible[len(ledger_rows) % len(eligible)]
@@ -563,7 +577,7 @@ def cmd_prepare(a):
         real_packet = None
         # the plant, by rotation over the calibrated fixtures of THIS family, positive ones only
         eligible = [n for n, ex in fixtures if ex[0] == "VIOLATED" and fixture_family(root, n) == family
-                    and calibrated(ledger_rows, n, root)]
+                    and calibrated(ledger_rows, n, root) and plant_readable(root, n)]
         if not eligible:
             die(f"no positive {family} fixture CALIBRATED under the current checklist to plant — run `prepare --calibrate <fixture>` first")
         control_name = eligible[len(ledger_rows) % len(eligible)]

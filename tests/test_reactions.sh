@@ -12,7 +12,7 @@
 #   is a changed reaction set, extract, decoder or rig.
 # POKE READ-BACK (ruled 2026-09-25 (14z-181), tests/expected/poke_readback.tsv): the `x`/`p2x` columns (ff8410/ff8810, the rig's pins) were sampled and never read by tools/reaction_map.py — DROPPED; `p2hp`/`p2white` are the contact signal (OBSERVES).
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/lua/field_trace.lua
-#   tests/replays/ tools/anim_nodes.py tools/name_moves.py tools/reaction_map.py
+#   tests/replays/naming/ tools/anim_nodes.py tools/name_moves.py tools/reaction_map.py
 #   tools/run_mame.sh tools/setup_mame.sh
 #
 # WHAT IT HOLDS. tools/name_moves.py's `<tenant>_victim` schedules put the

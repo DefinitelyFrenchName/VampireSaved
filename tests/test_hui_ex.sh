@@ -9,7 +9,7 @@
 # EXPECTS: guard clean end to end and a stock consumed per section. Without the decrement a
 #   timing drift that stopped the move would leave the gate green — the silent coverage-loss
 #   mechanism.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay_guard.lua tests/replays/
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay_guard.lua tests/replays/hui/
 #   tools/build_donovan.sh tools/run_mame.sh tools/run_replay_guarded.sh tools/setup_mame.sh
 #
 # The maintainer's round-1 report: both EX moves (Final Guardian 623+2K,

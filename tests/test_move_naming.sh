@@ -14,7 +14,7 @@
 #   entered, P2 = 0x01 at every event and never in b:0x71/b:0x74; the neighbour swap fails.
 # POKE READ-BACK (ruled 2026-09-25 (14z-181), tests/expected/poke_readback.tsv): the `stock` (ff8509), `x` (ff8410), `p2hp` (ff8850) and `p2x` (ff8810) columns — every one a rig pin — were sampled and never compared (name_moves prints them in a diagnostic listing only) — DROPPED.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/lib/decrypt_cache.sh
-#   tests/lua/field_trace.lua tests/replays/ tools/anim_nodes.py tools/move_parity.py
+#   tests/lua/field_trace.lua tests/replays/naming/ tools/anim_nodes.py tools/move_parity.py
 #   tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh
 #
 # WHAT IT HOLDS. build/manifest/moves_donovan.toml carries a (table, seq) per

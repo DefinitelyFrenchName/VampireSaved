@@ -13,14 +13,15 @@
 #   widening rules require (the emulator's patches and setup script for the emulator the
 #   gate reaches, the manifest for a gate that takes or builds a romset, the core sources
 #   for the MiSTer lane, the rig generators) is declared; PROSE: every replay the gate's
-#   own # WHAT: / # HOW: description names resolves to a covered file.
+#   own # WHAT: / # HOW: description names resolves to a covered file; and (3, #243) no
+#   gate declares all of tests/replays/ unless its text composes a path directly under it.
 # HOW: tools/gate_follows.py (the ONE reader — the lane-carry tool and the staleness gate
 #   import it) parses each leading comment block, extracts each script's references and
 #   the rule-required prefixes, and reads the replay names out of the description prose
 #   (an INDEPENDENT extractor: the prose was written by reading the gate, so a path the
 #   text regex cannot see still has to be covered when the description names it); this
 #   gate compares the census classes with the frozen file and runs --reconcile over the
-#   tree; four controls run the checks on a copy of the tree with one gate perturbed.
+#   tree and --overwide; five controls run the checks on a copy of the tree with one gate perturbed.
 # EXPECTS: PASS when the census equals the frozen file and --reconcile names no gate. A
 #   red names the gate, the class and the item (lost its declaration / new declaration
 #   not yet frozen / text:, rule: or prose: outside its declaration — widen the
@@ -29,6 +30,7 @@
 # MUST-FIRE: perturbed-copy: dropped-declaration — a copy of the tree with one declaring gate's `# FOLLOWS:` field removed must class it undeclared and FAIL against the frozen file (mode: the census runs on that copy)
 # MUST-FIRE: perturbed-copy: narrow-declaration — a copy where one declaring gate's declaration loses the prefix covering its first text reference must be named by --reconcile (class text) and FAIL (mode: the reconciliation runs on that copy)
 # MUST-FIRE: perturbed-copy: rule-unwidened — a copy where a MAME-harness gate's declaration loses emu/mame-patches/ must be named by --reconcile (class rule) and FAIL: a widening rule that failed to fire is caught by the reader, not only by the script that wrote the declarations (mode: the reconciliation runs on that copy)
+# MUST-FIRE: perturbed-copy: replays-rewidened — a copy where one gate whose declaration names a part of tests/replays/ declares the whole directory again must be named by --overwide and FAIL: a declaration wider than its text there stales the gate on every new replay (#243, 14z-204; mode: the over-wide check runs on that copy)
 # MUST-FIRE: perturbed-copy: prose-uncovered — a copy where a gate's declaration loses every prefix covering a replay its own description names must be named by --reconcile (class prose) and FAIL, whatever the text regex saw (mode: the reconciliation runs on that copy)
 #
 # WHY A RECONCILIATION AND NOT JUST A CENSUS: a declaration that is present but too
@@ -60,6 +62,25 @@ perturb() {
             g="$(census . | awk -F'\t' '$1=="declares"{print $2; exit}')"
             [ -n "$g" ] || { echo NONE; return 1; }
             sed -i.bak -e '/^# FOLLOWS:/,/^#\( [A-Z]\|$\)/{/^# FOLLOWS:/d; /^#  /d;}' "$2/tests/$g.sh" ;;
+        replays-rewidened)
+            g="$(python3 - "$2" <<'PY'
+import sys, os, re
+sys.path.insert(0, "tools"); import gate_follows as gf
+root = sys.argv[1]; rows = gf.registry_rows(".")
+for g in sorted(rows):
+    p = f"tests/{g}.sh"
+    if not os.path.exists(p): continue
+    toks, problems = gf.declared(open(p).read())
+    sub = [t for t in toks if t.startswith("tests/replays/") and t != "tests/replays/"]
+    if problems or not sub or "tests/replays/" in toks: continue
+    text = open(os.path.join(root, p)).read()
+    new = re.sub(r"(?<=\s)" + re.escape(sub[0]) + r"(?=\s|$)", "tests/replays/", text, count=1, flags=re.M)
+    if new != text:
+        open(os.path.join(root, p), "w").write(new); print(g); break
+else:
+    print("NONE")
+PY
+)" ;;
         narrow-declaration|rule-unwidened|prose-uncovered)
             g="$(python3 - "$2" "$1" <<'PY'
 import sys, os
@@ -129,6 +150,13 @@ if [ -n "$grew" ]; then
     else bad "undeclared grew by a gate the frozen file does not know (a new emulator gate: declare what it follows, or FREEZE=1 after review): $(echo "$grew" | tr '\n' ' ')"; fi
 fi
 
+echo "== 2b. no gate declares all of tests/replays/ without composing a path there (#243: every new replay staled all such gates)"
+if python3 tools/gate_follows.py --root "$root" --overwide > "$W/ow.txt" 2> "$W/ow.err"; then
+    ok "$(cat "$W/ow.err")"
+else
+    bad "$(cat "$W/ow.err")"; sed 's/^/        /' "$W/ow.txt" | head -12
+fi
+
 echo "== 2. the reconciliation: no declaration narrower than its gate's text, its widening rules or its own description"
 if python3 tools/gate_follows.py --root "$root" --reconcile > "$W/rec.txt" 2> "$W/rec.err"; then
     ok "$(cat "$W/rec.err")"
@@ -152,6 +180,11 @@ if [ -z "$VS_CTL" ]; then
     if [ "$g" = NONE ]; then vs_ctl_dead dropped-declaration "no declaring gate to perturb"; fail=1
     elif census "$W/c1" | grep -qx "declares	$g"; then vs_ctl_dead dropped-declaration "$g still classed declares after its FOLLOWS line was removed"; fail=1
     else vs_ctl_fired dropped-declaration "$g classed undeclared on the perturbed copy"; fi
+    g="$(perturb replays-rewidened "$W/c5" | tail -1)"
+    if [ "$g" = NONE ]; then vs_ctl_dead replays-rewidened "no gate with a narrowed replays declaration to re-widen"; fail=1
+    elif python3 tools/gate_follows.py --root "$W/c5" --overwide 2>/dev/null | grep -q "^$g	OVERWIDE	tests/replays/"; then
+        vs_ctl_fired replays-rewidened "$g named OVERWIDE after its replays declaration was widened back to tests/replays/"
+    else vs_ctl_dead replays-rewidened "$g re-widened to tests/replays/ and --overwide did not name it"; fail=1; fi
     for c in "narrow-declaration text" "rule-unwidened rule" "prose-uncovered prose"; do
         set -- $c; name="$1"; cls="$2"
         g="$(perturb "$name" "$W/$name" | tail -1)"

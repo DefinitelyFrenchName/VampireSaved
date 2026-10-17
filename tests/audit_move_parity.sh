@@ -15,7 +15,7 @@
 #   with the flag up on both legs, every DF activation seen; each control turns verdicts. A
 #   DIFF's cause is audit_move_parity_attribution's question.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/move_parity_events.tsv
-#   tests/lib/decrypt_cache.sh tests/lua/field_trace.lua tests/replays/ tools/move_parity.py
+#   tests/lib/decrypt_cache.sh tests/lua/field_trace.lua tests/replays/naming/ tools/move_parity.py
 #   tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: unpinned-level — the native leg left at vsav2's DEFAULT play mode (TURBO, level 8) against ours at NORMAL must fail every part, so each verdict is proven to rest on the level the gate pins (in-gate: one part is re-run with the native level pin withheld and must diverge; mode: every native leg runs unpinned and the comparisons FAIL)

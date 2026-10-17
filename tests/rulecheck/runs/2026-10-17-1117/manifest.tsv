@@ -1,0 +1,10 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent204/cad/cadence.diff	e9896ce40ea5154c34c9cdc455c2394ea7270b14
+build/agent204/cad/evidence.txt	272d1978123a7f8178de44a3b407e50962422aec
+build/agent204/cad/state_only2_lines.txt	133e95a29ddd433525645cfe737407dda11aa34c
+build/agent204/cad/trigger2_lines.txt	2bfa7f3c82081baf2d0d1e3dbb5149160aa03ab5
+build/agent204/cad/state_only2.log	5b9a2f25bafcab9704bc08b473da330e7a1d80bd
+build/agent204/cad/trigger2.log	f4ad110f60b7d076309c8d2352da9e62711bb81f
+tests/test_static_runner.sh.lines-1-130 (lines 1-130 of tests/test_static_runner.sh)	d03e1a9bb264c61badd67df6fd0083549b106ef6
+tests/test_static_runner.sh.lines-232-283 (lines 232-283 of tests/test_static_runner.sh)	185928e85c6b4b392205f11031ca5f74089ccf93
+tests/test_static_runner.sh.lines-665-700 (lines 665-700 of tests/test_static_runner.sh)	5bf1ea3c2817bd93542e98a4e4dac9e3097ee09a

@@ -11,7 +11,7 @@
 #   measured a whiff or a meterless downgrade, not the EX).
 # EXPECTS: stock decremented and damage exactly the frozen value per leg; a red is either
 #   the move not firing (liveness) or its damage moving.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua tests/replays/
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua tests/replays/hui/
 #   tools/run_mame.sh tools/setup_mame.sh
 #
 # STATUS (14z-85f): the 14z-85e parity item this was filed against is

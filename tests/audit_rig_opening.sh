@@ -16,7 +16,7 @@
 # EXPECTS: the frozen rows equal, the pins after 2545, legs differing pre-pin and agreeing
 #   after; the swapped opening fails, the floor-less rig pins at 2370 and fails.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/rig_opening.tsv
-#   tests/lua/field_trace.lua tests/replays/ tools/name_moves.py tools/run_mame.sh
+#   tests/lua/field_trace.lua tests/replays/naming/ tools/name_moves.py tools/run_mame.sh
 #   tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: entrance-swapped — a copy of our opening rows carrying native's x and seq (what the two legs would read if they drew the SAME entrance) must FAIL the frozen compare, so the frozen entrance rows are a real difference and not a tautology (in-gate: the perturbed copy must differ from the frozen rows; mode: our rows are replaced before the compare and the table FAILs)

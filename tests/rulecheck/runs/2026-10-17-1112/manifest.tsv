@@ -1,0 +1,9 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent204/t243/recommendation.md	8c3104959ebbe1632b99f65471806c2cf8aaf4d1
+build/agent204/t243/census.txt	7bb09a37320f19fee9a74fc289bb346fc3e856c9
+build/agent204/t243/bare_sources.txt	9507eb28debbc05ed6721257af2fc58145b2af24
+build/agent204/t243/effect.txt	16b002c54453bb98a1c0c1a36b81b320777e9815
+build/agent204/t243/gate.log	7db7ddbb461538de3fe891eea41508c67577d146
+build/agent204/t243/ctl.log	7f9c676dedf6ed60cfbbe60c673535b06901e6a0
+build/agent204/t243/change.diff	3d0f46224672051ca3cdae5be6064f4f60823262
+build/agent204/t243/audit_emulator_staleness.py.txt	4c427b30e4612828ee40174cc60cf44d07c4ecfc

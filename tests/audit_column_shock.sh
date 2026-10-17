@@ -15,7 +15,7 @@
 # EXPECTS: our writes equal native's frame for frame, the timelines equal, the KO path equal
 #   and exception-free; the planted pre-fix shape fails. A red is the remap class back.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/column_shock.tsv
-#   tests/lua/field_trace.lua tests/lua/read_tap.lua tests/replays/ tools/name_moves.py
+#   tests/lua/field_trace.lua tests/lua/read_tap.lua tests/replays/naming/ tools/name_moves.py
 #   tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: air-marker — our AIR row (section 1c, the column on an airborne victim) with the GROUND case's marker 0x38 in place of the air stager's class 7 must differ from native's row and FAIL, so the air case is shown measured on the victim's class, not assumed from the ground case (in-gate: the perturbed row must differ; mode: our row is rewritten and the gate FAILs) — 14z-181, #163

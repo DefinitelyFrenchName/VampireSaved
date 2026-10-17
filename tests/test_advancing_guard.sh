@@ -17,7 +17,7 @@
 #   Anakaris inert); a red is the mechanic or threshold moving.
 # POKE READ-BACK (ruled 2026-09-25 (14z-181), tests/expected/poke_readback.tsv): the `p2x` (ff8810) and `p2hp` (ff8850) columns, both rig pins, were sampled and never read by tools/advancing_guard.py — DROPPED.
 # FOLLOWS: emu/mame-patches/ tests/expected/advancing_guard.txt tests/lib/decrypt_cache.sh
-#   tests/lua/field_trace.lua tests/replays/ tools/advancing_guard.py tools/name_moves.py
+#   tests/lua/field_trace.lua tests/replays/naming/donovan_victim_4 tools/advancing_guard.py tools/name_moves.py
 #   tools/run_mame.sh tools/setup_mame.sh
 #
 # WHY. 14z-121 (4) read vs2 `0x27082` (the second per-frame step routine,

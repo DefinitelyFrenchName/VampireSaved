@@ -2,8 +2,9 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 291
+# issues: 292
 number	state	reason	closed	labels	title
+292	OPEN	-	-	bug,performance,severity: medium	static_confirm: a tool's self-test strings count as a direct read (battery_reach names STATE.md), so 22 gates re-run with controls at every commit
 291	OPEN	-	-	evolution	On demand, at a given tag or commit: comparative capture sheets (ours vs vsavj and/or vs2) for every comparing test, as a visual proof of accuracy for humans
 290	CLOSED	COMPLETED	2026-10-17	evolution,severity: high	A deterministic guard: no commit or push on a tier that did not read GREEN (replaces the procedure check's one recurring catch)
 289	OPEN	-	-	evolution	Revisit the cut of the close's audit layer (documentation packet, procedure check) when there is more data
@@ -36,8 +37,8 @@ number	state	reason	closed	labels	title
 262	OPEN	-	-	bug	C1 extract drops a maintainer message stored as a queue enqueue plus an attachment record
 261	CLOSED	COMPLETED	2026-10-17	bug,severity: high	audit_effect_class_rows section 4 checks a type-6 fallback inventory that was never frozen
 260	OPEN	REOPENED	-	evolution	Check that every submodule pin exists on its remote before a push (the 14z-192 jtcores pin was unpushed)
-259	OPEN	-	-	bug,severity: medium	static_confirm plan took 20 min at the 14z-195 close (228 changed files, 194 rule-checker run files)
-258	OPEN	-	-	bug,severity: medium	rulecheck: a packet artifact above the Read limit gets a partial read
+259	CLOSED	COMPLETED	2026-10-17	bug,severity: medium	static_confirm plan took 20 min at the 14z-195 close (228 changed files, 194 rule-checker run files)
+258	CLOSED	COMPLETED	2026-10-17	bug,severity: medium	rulecheck: a packet artifact above the Read limit gets a partial read
 257	OPEN	-	-	bug,severity: medium	rulings_verbatim leaves a second maintainer quote on the same line unchecked
 256	CLOSED	COMPLETED	2026-10-17	bug,severity: high	Close check open-tickets reads a cited ticket range as its two ends only
 255	CLOSED	COMPLETED	2026-10-12	bug	[P3] Python release applier publishes output before rejecting an incorrect aggregate set key

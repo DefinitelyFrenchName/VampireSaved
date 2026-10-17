@@ -162,6 +162,9 @@ the run-record readers searched their whole reach once per run file, 36,023 sear
 local). `tests/test_static_runner.sh` section 18 checks the lines and a failing plan's refusal; the control
 `runs-data-off` follows the hoisted line. The parked #286 patch no longer applied: refreshed as
 `build/agent203/t286/narrowings_on259.patch` (two conflicts resolved, `test_static_confirm` PASS, 30 controls fired).
+Closure checked by rule-checker run 2026-10-17-1110 (VIOLATED Q1 Q3 Q4, resolved: the one-path identity measured, `test_close_tools`
+run on a clean HEAD, and the run files' cost re-measured on the OLD planner — 171 s without them, so they never cost as
+changed paths; the claim that #286 (a) had removed it was retracted).
 Found on the way: `test_close_tools` (ondemand) REFUSES on HEAD's own STATE, its section 2b looking for a findings row
 that #288 removed — put to the maintainer.
 
@@ -175,6 +178,38 @@ lists the session's entries as ready `path:a-b` ranges, a range must start at an
 and the packet names the entry to the reader — the maintainer's comment on #258 point by point, quoted in
 `docs/project/rule_checker.md`. `tests/test_rule_checker.sh` PREPARE READ LIMIT section (eight cases, control
 `unlimited-read`; a preflight kept missing artifacts the early check's, or `late-validate` went dead).
+Committed `9443f294`, closed on GitHub. **RETRACTED the same evening: "bytes / 2.4 + 2 per line" was not an estimate
+from above.** After the commit the plant rotation drew `fidelity-14z160-false-statement`, whose 56,338-byte rig file a
+reader sees as a PARTIAL view at 28,713 tokens (the estimate said 25,214), and every `prepare` was refused:
+`test_rule_checker`, `test_packet_check` and `test_claim_lint` red on HEAD (the tier had been green on the plant drawn
+then). Fixed: bytes / 2.0 + 2 per line (above all three measured views), the rotation skips a fixture a reader cannot read
+whole (`plant_readable`), and a PLANT ROTATION section draws every rotation position (control `unfiltered-plants`).
+Two of the three calibrated evidence plants (`fidelity-14z160-false-statement`, `forced-pick-14z159`) were out of
+rotation until their rig files fit; the maintainer: *"Do it this session"*. Their `name_moves.py.txt`, and the negative
+`fidelity-14z160`'s, lost the DONOVAN_VICTIM rigs and the trace-analysis section (one OMITTED marker each; nothing their
+claims cite), read whole, and were recalibrated: runs 2026-10-17-1114 (CAUGHT), -1115 (CAUGHT), -1116 (negative OK beside
+a caught plant). The rotation is back to three readable evidence plants.
+
+### (4) #243 — 24 DECLARATIONS NARROWED, THE OVER-WIDE CHECK, THE REST RULED WHOLE
+Re-measured: 75 gates declared the whole `tests/replays/` (79 at 14z-195), 51 compose a path there, 24 reach only part
+of it. The 24 now declare what their text reaches (reconcile PASS; not access-traced, the basis static); `tools/gate_follows.py
+--overwide` refuses a whole-directory declaration whose text composes nothing there (`tests/test_gate_follows.sh` section
+2b, control `replays-rewidened`). A new top-level replay stales 51 gates instead of 75. Put to the maintainer through
+rule-checker run 2026-10-17-1112 (VIOLATED Q1 Q4, resolved): the 51 keep the whole directory, step 1 lands untraced,
+`test_close_tools`' refusal is not filed (`DECISIONS_HISTORY.md` "Ruled 2026-10-17 (14z-204) — #243: …").
+
+### (5) WHERE A TIER'S TIME GOES — test_static_runner TO FREEZE CADENCE; #292 FILED
+Measured on the two closure tiers (about 50 and 45 minutes): controls were about 70% of the gate-and-control time, and
+`test_static_runner`'s 13 controls alone 652-706 s at every tier on record, pulled in because `tools/battery_reach.py`
+(in its reach through the planner) names STATE.md in its own self-test, and the planner counts a quoted literal as a
+direct read: 22 gates re-run with controls on every STATE.md change. The maintainer: *"freeze/release with triggers"*
+for the gate, the real fix *"later since apparently we need PILOT"*. Built: a freeze row in `tests/ci_cadence.tsv` with
+triggers on what the gate runs and reads; on the real runner a STATE.md-only change defers it (GREEN, PASS 120) and a
+`battery_reach.py` change pulls it in (GREEN, PASS 121). Filed #292 for the planner fix, quoting the maintainer that it
+*"may or may not imply removing"* the row.
+Rule-checker run 2026-10-17-1117 (VIOLATED Q1 Q4, resolved: those two runs used the runner's `STATIC_CHANGED_PATHS`
+override, now said, and a run without it pulled the gate in through the real changed set; the cause measured directly,
+`predict` on a STATE.md-only change: 29 gates execute controls, four tools in the gate's reach name STATE.md — on #292).
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings

@@ -15,7 +15,7 @@
 #   the silent range reads DEAD. Unsampled: the tenant as P2, the vs2 EX route, every path
 #   the corpus never runs.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/df_field_readers_live.tsv
-#   tests/lua/read_tap.lua tests/replays/ tools/audit_df_field_readers.py
+#   tests/lua/read_tap.lua tests/replays/naming/donovan_ tests/replays/naming/huitzil_ tests/replays/naming/pyron_ tools/audit_df_field_readers.py
 #   tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: shadow-tool: missed-planted — a copy of the census with the FIRST row the corpus reaches deleted must make the cross-check report that access as MISSED and FAIL, so a reader the census cannot see is caught wherever the corpus runs it (in-gate: the planted copy must report exactly one missed pc; mode: the gate cross-checks against the planted copy and FAILs)

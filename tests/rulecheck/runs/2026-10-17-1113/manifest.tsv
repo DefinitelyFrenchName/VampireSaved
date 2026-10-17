@@ -1,0 +1,11 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+DECISIONS_HISTORY.md.lines-7198-7205 (lines 7198-7205 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-17 (14z-204) — #243: the whole tests/replays/ stays the input of the gates that com")	c65dbf960e1be86a7d86aba71e51028633a87808
+build/agent204/t243/narrowed.diff	cb144926fb3eb758769ffbd6d5102e8a6b878dab
+build/agent204/t243/change.diff	2f7b16605a330cd10802747bf5126c8ef25d17fc
+build/agent204/t243/gate.log	7db7ddbb461538de3fe891eea41508c67577d146
+build/agent204/t243/ctl.log	7f9c676dedf6ed60cfbbe60c673535b06901e6a0
+build/agent204/t243/effect.txt	16b002c54453bb98a1c0c1a36b81b320777e9815
+build/agent204/t243/tools_reach.txt	6054065f170e1db60583b99e2512eb6117097a16
+build/agent204/t243/census.txt	7bb09a37320f19fee9a74fc289bb346fc3e856c9
+build/agent204/t243/c243_close.md	857bd1778d04c5d3ca4f6b26a749d9432f477d11
+build/agent204/t243/tickets_row.tsv.lines-122-122 (lines 122-122 of build/agent204/t243/tickets_row.tsv)	4bff77967d42c84f2111229c83f206fe1f534fc4

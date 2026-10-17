@@ -5,6 +5,7 @@ gate's verdict depends on (GitHub #171 slice Q3, ruled 2026-09-24: "Header line"
   python3 tools/gate_follows.py                      # census over tests/ci_emulator.tsv: declares / undeclared
   python3 tools/gate_follows.py --reconcile          # every declaring gate's references vs its declaration
   python3 tools/gate_follows.py --refs test_x        # what one gate's text (and its sourced libs) references
+  python3 tools/gate_follows.py --overwide           # a gate declaring all of tests/replays/ without composing a path there (#243)
   python3 tools/gate_follows.py --subjects mame      # a lane's derived subjects (the union the carry tool uses)
   python3 tools/gate_follows.py --root DIR ...       # over a copy of the tree (the gate's controls)
 
@@ -281,6 +282,26 @@ def reconcile(root, gate, rows=None, check="all", _idx=None):
     return prefixes, refs, unc, problems
 
 
+# #243 (14z-204): THE OVER-WIDE CHECK, the reconciliation's other side for the one directory where width costs. Every
+# new replay lands in tests/replays/, and the staleness audit (slice Q4) stales every gate whose declaration covers it:
+# at 14z-195, 79 gates declared the whole directory, so any new replay staled all 79 though none ran it. A gate may
+# declare `tests/replays/` itself only when its TEXT composes a path directly under it (the bare reference, a path cut
+# at a variable: `tests/replays/$name.rpl`, a `tests/replays/*.rpl` glob); otherwise its declaration names what its text
+# reaches (a subdirectory, a stem, the files). Measured 14z-204: 24 such gates narrowed, NOT access-traced (this reader
+# does not scan Python tools, and none in those gates' references names a replays path); 51 compose, and keep the whole
+# directory as their input (ruled 2026-10-17, DECISIONS_HISTORY.md "Ruled 2026-10-17 (14z-204) — #243": no resolver for
+# composed names — a name fed from data or a caller would be missed and a stale green carried).
+WIDE_DIRS = ("tests/replays/",)
+
+
+def overwide(root, gate, rows=None):
+    """-> the WIDE_DIRS the gate declares although its text never composes a path directly under them"""
+    text = open(os.path.join(root, f"tests/{gate}.sh"), encoding="utf-8", errors="replace").read()
+    prefixes, _ = declared(text)
+    refs = references(root, gate, rows)
+    return [d for d in WIDE_DIRS if d in prefixes and d not in refs]
+
+
 def census(root):
     """-> [(class, gate, detail)] over the registry's gates: declares / undeclared."""
     out = []
@@ -325,6 +346,8 @@ def main():
                     help="uncovered references per declaring gate (all, or one); exit 1 if any")
     ap.add_argument("--check", default="all", choices=("all", "text", "rule", "prose"),
                     help="which reconciliation class(es) to run (default all)")
+    ap.add_argument("--overwide", action="store_true",
+                    help="gates declaring a whole WIDE_DIRS directory their text never composes a path under (#243); exit 1 if any")
     ap.add_argument("--required", metavar="GATE", help="the prefixes the widening rules require of one gate")
     ap.add_argument("--refs", metavar="GATE", help="the references of one gate")
     ap.add_argument("--subjects", metavar="LANE", help="a lane's derived subjects")
@@ -346,6 +369,18 @@ def main():
             print(f"UNDECLARED in the {a.subjects} lane: {' '.join(und)}", file=sys.stderr)
             return 1
         return 0
+    if a.overwide:
+        rows = registry_rows(root)
+        bad = [(g, overwide(root, g, rows)) for g in sorted(rows) if os.path.exists(os.path.join(root, f"tests/{g}.sh"))]
+        bad = [(g, d) for g, d in bad if d]
+        for g, d in bad:
+            print(f"{g}\tOVERWIDE\t{' '.join(d)}")
+        n = sum(1 for g in rows if os.path.exists(os.path.join(root, f"tests/{g}.sh"))
+                and any(w in declared(open(os.path.join(root, f"tests/{g}.sh"), encoding="utf-8", errors="replace").read())[0]
+                        for w in WIDE_DIRS))
+        print(f"{'FAIL' if bad else 'PASS'}: {len(bad)} gate(s) declare a whole {' / '.join(WIDE_DIRS)} their text never "
+              f"composes a path under; {n - len(bad)} declare it and compose one (#243)", file=sys.stderr)
+        return 1 if bad else 0
     if a.reconcile:
         rows = registry_rows(root)
         gates = sorted(rows) if a.reconcile == "*" else [a.reconcile]

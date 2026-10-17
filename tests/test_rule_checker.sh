@@ -15,7 +15,8 @@
 #   transcript prefix, and writes the key it was given into meta.tsv (the ledger's `session`); the PREPARE READ
 #   LIMIT section (#258, 14z-204) proves prepare refuses a text artifact a reader cannot read whole in one Read and
 #   a whole indexed archive (listing its entries' ranges), refuses an archive range that starts off its INDEX, and
-#   tells the reader which entry a range holds.
+#   tells the reader which entry a range holds; the PLANT ROTATION section (#258, 14z-204) draws every rotation
+#   position and proves each plant is one a reader can read whole (the gate prepared once, so it saw one plant).
 # EXPECTS: PASS with every control fired; a red names the run or fixture and the shape in
 #   which the checker could look alive while asserting nothing.
 #
@@ -35,6 +36,7 @@
 # MUST-FIRE: shadow-tool: recheck-pruned-render — a copy of rulecheck.py that binds only the NAMED standing rows (EVERY_ROW off) must resolve a finding on a render with another standing row deleted, and the RESOLVE RECHECK section must FAIL: a re-check runs the whole standing set, every row present and unedited (#270, rule-checker run 2026-10-13-971 Q4; mode: the section runs that copy)
 # MUST-FIRE: shadow-tool: recheck-other-session — a copy of rulecheck.py whose re-check binds KEY from the checks file itself and TRANSCRIPT by its shape only (SESSION_BOUND off) must resolve a finding of one sitting on a genuine render made for another, and the RESOLVE RECHECK section must FAIL: the re-check reads THIS run's session — its key, the transcript and base close_standing.py derives (#270, rule-checker run 2026-10-13-972 Q4; mode: the section runs that copy)
 # MUST-FIRE: shadow-tool: recheck-unpinned-base — a copy of rulecheck.py whose re-check lets BASE be any hash (BASE_PINNED off) must resolve a finding on a render whose BASE fill was edited to another commit, and the RESOLVE RECHECK section must FAIL: BASE is what close_standing.py derives for the run's session (#270, rule-checker run 2026-10-13-973 Q4; mode: the section runs that copy)
+# MUST-FIRE: shadow-tool: unfiltered-plants — a copy of rulecheck.py whose plant rotation has no readable-plant filter (the first #258 cut) must be refused at some rotation position, drawing a plant whose rig file no reader can read whole, and the PLANT ROTATION section must FAIL (#258, 14z-204)
 # MUST-FIRE: shadow-tool: unlimited-read — a copy of rulecheck.py with no read limit (READ_MAX_BYTES and READ_MAX_TOKENS lifted, the pre-#258 tool) must prepare a packet naming a 70 KB text artifact no reader can read whole, and the PREPARE READ LIMIT section must FAIL (#258, 14z-204)
 # MUST-FIRE: perturbed-copy: cross-family-plant — a copy of the record in which a PROCEDURE calibration names an EVIDENCE fixture as its plant must fail: a plant answers its own family's questions, so one from the other checklist proves nothing about the reader (#172 S3, 14z-176)
 #
@@ -261,6 +263,42 @@ PYR
         echo "PREPARED-FROM-A-STALE-INDEX"; return; fi
     grep -q "whose INDEX is stale" "$2/r5.log" || { echo "REFUSED-FOR-ANOTHER-REASON: $(tail -1 "$2/r5.log")"; return; }
     echo READ-OK
+}
+# SECTION PLANT ROTATION's probe (#258, 14z-204): the plant is drawn by the ledger's length, so a gate that prepares once
+# sees ONE plant — the over-limit plants in rotation stayed invisible until the ledger grew by two and every prepare was
+# refused. On a throwaway root with one calibrated evidence plant made unreadable (a 70 KB file planted in it), one dummy
+# ledger row is appended before each of as many evidence prepares as the family has calibrated plants, so every rotation
+# position is drawn: each must prepare (the unreadable plant skipped).
+# Prints ROTATION-OK or the way it was not.
+plant_rotation() {  # plant_rotation <rulecheck.py to test> <root>
+    rm -rf "$2"; mkcopy "$2"; cp "$1" "$2/tools/rulecheck.py"; cp tools/gen_history_index.py "$2/tools/"
+    echo "a small artifact" > "$2/small.txt"
+    # one calibrated evidence plant made unreadable in the copy (a 70 KB file beside its own): since the 14z-204 trims no
+    # real plant is over the limit, so without this the filter would have nothing to skip and its control nothing to draw
+    python3 -c "open('$2/tests/rulecheck/fixtures/forced-pick-14z159/files/big.txt', 'w').write('x' * 70000 + chr(10))"
+    _n="$(cd "$2" && python3 - <<'PY'
+import sys; sys.path.insert(0, "tools"); import rulecheck as rc
+from pathlib import Path
+r = Path("."); rows = rc.read_ledger(r)
+print(len([n for n, ex in rc.list_fixtures(r) if ex[0] == "VIOLATED" and rc.fixture_family(r, n) == "evidence" and rc.calibrated(rows, n, r)]))
+PY
+)" || { echo "NO-COUNT"; return; }
+    [ "${_n:-0}" -ge 1 ] || { echo "NO-EVIDENCE-PLANT"; return; }
+    _last="$(grep -v '^#' "$2/tests/rulecheck/ledger.tsv" | grep -v '^id	' | tail -1)"
+    _k=0
+    while [ "$_k" -lt "$_n" ]; do
+        _k=$((_k + 1))
+        printf '%s\n' "$_last" | sed "s/^[^	]*/2099-05-05-$_k/" >> "$2/tests/rulecheck/ledger.tsv"
+        if ! ( cd "$2" && python3 tools/rulecheck.py prepare --decision recommendation --subject s --claim c --artifact small.txt --session 14z-0 --id "2099-05-06-$_k" ) > "$2/rot$_k.log" 2>&1; then
+            echo "REFUSED-AT-POSITION-$_k: $(grep -m1 -o 'artifact [^ ]* is [0-9,]* bytes' "$2/rot$_k.log" || tail -1 "$2/rot$_k.log")"; return
+        fi
+    done
+    echo ROTATION-OK
+}
+unfiltered() {  # unfiltered <out> — the shadow tool: the rotation without the readable-plant filter (the first #258 cut)
+    sed 's/ and calibrated(ledger_rows, n, root) and plant_readable(root, n)\]/ and calibrated(ledger_rows, n, root)]/' tools/rulecheck.py > "$1"
+    [ "$(grep -c 'plant_readable(root, n)\]' "$1")" = 0 ] && [ "$(grep -c 'plant_readable(root, n)\]' tools/rulecheck.py)" = 2 ] \
+        || { echo "the readable-plant filter was not found to remove" >&2; return 1; }
 }
 unlimited() {  # unlimited <out> — the shadow tool: prepare with no read limit (the pre-#258 tool)
     sed -e 's/^READ_MAX_BYTES = 256 \* 1024$/READ_MAX_BYTES = 10 ** 12/' -e 's/^READ_MAX_TOKENS = 25000$/READ_MAX_TOKENS = 10 ** 12/' tools/rulecheck.py > "$1"
@@ -550,6 +588,14 @@ if [ "${VS_CTL:-}" = recheck-unchecked ]; then
     echo "FAIL: rule-checker resolve recheck (control mode recheck-unchecked — $got)"; exit 1
 fi
 
+if [ "${VS_CTL:-}" = unfiltered-plants ]; then
+    unfiltered "$W/unfiltered.py" || exit 3
+    got="$(plant_rotation "$W/unfiltered.py" "$W/prot_mode")"
+    echo "MODE: control unfiltered-plants — the shadow copy reads: $got"
+    case "$got" in REFUSED-AT-POSITION-*) ;; *) echo "REFUSED: the shadow copy drew no over-limit plant ($got)"; exit 3;; esac
+    echo "FAIL: rule-checker plant rotation (control mode unfiltered-plants — $got)"; exit 1
+fi
+
 if [ "${VS_CTL:-}" = unlimited-read ]; then
     unlimited "$W/unlimited.py" || exit 3
     got="$(prepare_readlimit "$W/unlimited.py" "$W/prl_mode")"
@@ -600,6 +646,11 @@ echo "== PREPARE SESSION KEY: prepare requires the sitting's 14z-N key and refus
 got="$(prepare_key tools/rulecheck.py "$W/pk")"
 echo "  the real tool: $got"
 [ "$got" = KEY-OK ] || { echo "FAIL: prepare's session key ($got)"; fail=1; }
+
+echo "== PLANT ROTATION: every rotation position draws a plant a reader can read whole (#258, 14z-204) =="
+got="$(plant_rotation tools/rulecheck.py "$W/prot")"
+echo "  the real tool: $got"
+[ "$got" = ROTATION-OK ] || { echo "FAIL: the plant rotation ($got)"; fail=1; }
 
 echo "== PREPARE READ LIMIT: no artifact a reader cannot read whole in one Read; an archive is named by its INDEX ranges (#258) =="
 got="$(prepare_readlimit tools/rulecheck.py "$W/prl")"
@@ -752,6 +803,16 @@ else
     vs_ctl_dead recheck-unchecked "the recheck switch was not found"; fail=1
 fi
 
+if unfiltered "$W/unfiltered_c.py"; then
+    got="$(plant_rotation "$W/unfiltered_c.py" "$W/protc")"
+    case "$got" in
+        REFUSED-AT-POSITION-*) vs_ctl_fired unfiltered-plants "the rotation without the filter: $got";;
+        *) vs_ctl_dead unfiltered-plants "the rotation without the filter read $got"; fail=1;;
+    esac
+else
+    vs_ctl_dead unfiltered-plants "the readable-plant filter was not found to remove"; fail=1
+fi
+
 if unlimited "$W/unlimited_c.py"; then
     got="$(prepare_readlimit "$W/unlimited_c.py" "$W/prlc")"
     case "$got" in
@@ -772,7 +833,7 @@ for c in counted-id late-validate; do
 done
 
 if [ "$fail" -eq 0 ]; then
-    echo "PASS: the rule-checker's record is sound, record binds the spawn check, prepare's ids hold, prepare requires the session key, a merge packet's cited fork runs are checked, resolve refuses unticketed instrument blame and takes a re-check only from a full run of the standing close checks it makes itself, prepare hands a reader nothing it cannot read whole (#258), and its eighteen controls fire"
+    echo "PASS: the rule-checker's record is sound, record binds the spawn check, prepare's ids hold, prepare requires the session key, a merge packet's cited fork runs are checked, resolve refuses unticketed instrument blame and takes a re-check only from a full run of the standing close checks it makes itself, prepare hands a reader nothing it cannot read whole and every plant rotation position is readable (#258), and its nineteen controls fire"
 else
     echo "FAIL: rule-checker record"
     exit 1

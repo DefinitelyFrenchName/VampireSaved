@@ -18,7 +18,7 @@
 #   ES/normal distinction here rests on the wave counts (#171 shape 4).
 # POKE READ-BACK (ruled 2026-09-25 (14z-181), tests/expected/poke_readback.tsv): the `p1x`/`p2x` columns (ff8410/ff8810, the rig's pins) were sampled and never compared or printed — DROPPED; `p2hp`/`p2white` are the contact signal (OBSERVES).
 # FOLLOWS: emu/mame-patches/ tests/expected/killshread_es.txt tests/lua/field_trace.lua
-#   tests/replays/ tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh
+#   tests/replays/naming/donovan_12 tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh
 #
 # Rig: tools/name_moves.py donovan part 12 (tests/replays/naming/donovan_12.*):
 # Donovan (forced 0x13) on P1 pinned at x=552, DEMITRI idle on P2 at x=728 (in

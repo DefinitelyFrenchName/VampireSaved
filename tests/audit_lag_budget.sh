@@ -12,7 +12,7 @@
 # EXPECTS: no new zero-pass frame on any part; the planted frame is caught. NOT covered:
 #   content outside the naming corpus and the idle-time margin short of a lost pass.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/field_trace.lua
-#   tests/replays/ tools/build_fingerprint.py tools/name_moves.py tools/run_mame.sh
+#   tests/replays/naming/ tools/build_fingerprint.py tools/name_moves.py tools/run_mame.sh
 #   tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: lag-planted — a copy of each part's trace on the build under test with the midpoint frame's whole pass-counter advance removed (a zero-pass frame planted where the reference has none) must FAIL the subset check, so "no new zero-pass frame" is read from the build's own pass counter (in-gate: the planted copy of the first part must be caught; mode: every part's build trace is planted before the check and the gate FAILs)

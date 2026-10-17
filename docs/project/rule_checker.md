@@ -115,12 +115,14 @@ Explore agent's; the pinned rule-checker cannot be spawned on a free prompt, but
 and runs 750-758 saw its readers hit the size error): a file over 256 KB is an error ("exceeds maximum allowed size
 (256KB)"); under it, a file over 25,000 tokens comes back as a PARTIAL view of its first lines, and every line costs
 tokens of its own (the line-number prefix): 237,343 bytes in 400 dense lines gave "showing lines 1-88 of 401 total
-(95981 tokens, cap 25000)", 59,000 bytes in 5,900 short lines "showing lines 1-3541 of 5901 total (35407 tokens)".
-`prepare` estimates a text artifact's tokens from above, bytes / 2.4 + 2 per line (the densest byte ratio measured and
-the per-line cost fitted to those two views; it exceeds both, and refuses some files that fit, such as 3,000 short lines
-that came back whole), and refuses one over 25,000 or over 256 KB, before the run directory exists, telling the author
-to name the part the claim rests on as `path:a-b`. The same holds for every file of the planted fixture and of a fixture
-being calibrated. Pictures (`.png`, `.jpg`, `.pdf`, ...) are read as images and are not capped. Before the check, 110 staged
+(95981 tokens, cap 25000)", 59,000 bytes in 5,900 short lines "showing lines 1-3541 of 5901 total (35407 tokens)",
+and a planted fixture's 56,338-byte rig file of 870 lines "showing lines 1-643 of 870 total (28713 tokens)". `prepare`
+estimates a text artifact's tokens from above, bytes / 2.0 + 2 per line (above all three views; it refuses some files that
+fit, such as 3,000 short lines that came back whole), and refuses one over 25,000 or over 256 KB, before the run
+directory exists, telling the author to name the part the claim rests on as `path:a-b`. A fixture is held to the same
+limit: calibrating one over it is refused, and the plant rotation skips one (`plant_readable`). The first cut took bytes
+/ 2.4 from the digits file alone, under-estimated code (25,214 for that file), and so let two over-limit plants stay in
+rotation; when the ledger's length drew one, every `prepare` was refused (14z-204). Pictures (`.png`, `.jpg`, `.pdf`, ...) are read as images and are not capped. Before the check, 110 staged
 text artifacts over 256 KB had gone to readers in 95 of 993 runs; the issue's case was `DECISIONS_HISTORY.md` at
 552 KB in runs 750-758, where several readers read a few slices and answered. **An indexed archive is read
 through its INDEX:** for any `*_HISTORY.md` / `*_history.md` that `tools/gen_history_index.py` configures, the

@@ -24,7 +24,7 @@
 #   reader of the dead pair, the legacy legs paying the attacker the record on both engines;
 #   all four controls fail.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/throw_registration.tsv
-#   tests/lua/read_tap.lua tests/replays/ tools/name_moves.py tools/run_mame.sh
+#   tests/lua/read_tap.lua tests/replays/judge/02_throw.rpl tests/replays/naming/ tools/name_moves.py tools/run_mame.sh
 #   tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: legs-swapped — a copy of our reduced rows with the P1 and P2 meter steps swapped (the fixed shape) must FAIL the frozen compare (in-gate: the perturbed copy is diffed against the frozen rows and must differ; mode: the real rows are swapped and the gate FAILs)

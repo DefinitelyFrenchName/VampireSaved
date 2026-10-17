@@ -1,0 +1,5 @@
+  FLAG D-ABSOLUTE: - 5 read the whole corpus by glob or listing (audit_defense_row_reads, audit_guard_corpus, audit_legacy_pairings, audit_palette_seq_ids, audit_reaction_class...  [build/agent204/t243/recommendation.md]
+  FLAG D-ABSOLUTE: - A (recommended): the whole directory stays the honest input of all 51; #243 closes on steps 1 and 3.  [build/agent204/t243/recommendation.md]
+  FLAG D-ABSOLUTE: - B: teach the reader to resolve composed names, i.e. collect the replay stems a gate's text, args and libraries name literally, and accept a declaration of ...  [build/agent204/t243/recommendation.md]
+  FLAG D-ABSOLUTE: Not tested: whether B's resolver would cover every composed name.  [build/agent204/t243/recommendation.md]
+packet_check: 4 flag(s): D-ABSOLUTE 4

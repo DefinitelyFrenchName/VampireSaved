@@ -1,0 +1,3 @@
+  FLAG D-ABSOLUTE: 51 compose a path directly under it; 24 reach only part of it (15 only subdirectories, 9 only files).  [build/agent204/t243/c243_close.md]
+  FLAG D-ABSOLUTE: The whole directory stays the honest input of the 51 gates that compose a path there.  [build/agent204/t243/c243_close.md]
+packet_check: 2 flag(s): D-ABSOLUTE 2

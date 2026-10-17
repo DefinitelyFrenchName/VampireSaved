@@ -21,7 +21,7 @@
 #   replay.lua on every run (tests/lib/instr_align.sh).
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/instr_gameclock/ tests/lib/controls.sh
 #   tests/lib/instr_align.sh tests/lua/emu_clock.lua tests/lua/replay.lua
-#   tests/lua/trace_writes.lua tests/replays/ tools/build_fingerprint.py tools/name_moves.py
+#   tests/lua/trace_writes.lua tests/replays/naming/donovan_victim_4 tools/build_fingerprint.py tools/name_moves.py
 #   tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: known-bad: drift-clock — a watch run under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 6,808 emulated frames of 6,830 counted) must miss its frozen game clock (in-gate: one extra run of the ours leg; mode: both legs run the old clock and the gate FAILs)

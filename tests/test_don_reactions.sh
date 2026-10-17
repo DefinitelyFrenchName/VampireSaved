@@ -10,7 +10,7 @@
 #   knockdown control fails. The two-sided native comparison is test_don_immortal_native's;
 #   this gate keeps the one-sided locks honest.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/replay.lua
-#   tests/replays/ tools/run_mame.sh tools/setup_mame.sh
+#   tests/replays/48_don_immortal_ko.rpl tests/replays/54_don_matchend_ko.rpl tests/replays/56_don_es_ls.rpl tests/replays/59_don_blizzard_hcf.rpl tests/replays/60_don_grapple_hcb.rpl tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: known-bad: knockdown-forbidden — 421P must not knock down a standing opponent, so a knockdown-family node reading must fail section 1 (mode: the victim node is forced into the knockdown family so the no-knockdown assertion fails and the gate FAILs)
 #

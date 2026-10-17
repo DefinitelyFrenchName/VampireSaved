@@ -20,7 +20,7 @@
 #   answer; the maintainer ruled it not-ours 2026-09-25); both planted steps fail.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/phobos_dmg_residual.tsv tests/replays/judge/04_demitri_5hp_victor.rpl
 #   tests/expected/registry.tsv tests/lib/controls.sh tests/lua/field_trace.lua
-#   tests/replays/ tools/build_fingerprint.py tools/name_moves.py tools/run_mame.sh
+#   tests/replays/judge/04_demitri_5hp_victor.rpl tests/replays/naming/ tools/build_fingerprint.py tools/name_moves.py tools/run_mame.sh
 #   tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: legacy-same — a copy of the legacy pair's rows with vsav2's step in place of vsavj's (what two games that agreed would read) must FAIL the frozen compare, so the +1 the LEGACY victim takes on vsavj is read from the rows, not assumed (in-gate: the perturbed copy must differ from the frozen rows; mode: the rows are rewritten and the compare FAILs) — 14z-181, #161

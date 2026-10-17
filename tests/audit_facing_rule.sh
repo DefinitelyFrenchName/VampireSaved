@@ -16,7 +16,7 @@
 #   the defect (ours wrote 4 at 0x1886C; x 835 against native's 755).
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/facing_rule.tsv
 #   tests/lib/decrypt_cache.sh tests/lua/field_trace.lua tests/lua/read_tap.lua
-#   tests/replays/ tools/audit_facing_rules.py tools/build_fingerprint.py tools/name_moves.py
+#   tests/replays/naming/ tools/audit_facing_rules.py tools/build_fingerprint.py tools/name_moves.py
 #   tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: rule5-flipped — a copy of our facing rows with every value's side bit (bit 0) flipped — the victim put on the other side — must FAIL the frozen compare, so a regression of the fix is caught (in-gate: the table with the flipped copy must differ from the frozen rows; mode: our reduced rows are flipped before the compare and the table FAILs). Replaced 14z-185 the M21 control `rule5-resolved` (native's values over ours), which cannot fire once ours IS native's (it read DEAD on merged-m21).

@@ -23,7 +23,7 @@
 #   and leaves row 11 untouched after 2813; C4 the census reads the #162 site DIFF (vs2 bit 0x13 set, ours clear).
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/column_flash_cause.tsv tests/lib/controls.sh
 #   tests/lua/upload_tap.lua tests/lua/pokes_spec.lua tests/replays/naming/donovan_4.json
-#   tests/replays/naming/donovan_4.rpl tests/replays/ tools/audit_charid_masks.py tools/name_moves.py
+#   tests/replays/naming/donovan_4.rpl tests/replays/naming/donovan_4.json tests/replays/naming/donovan_4.rpl tools/audit_charid_masks.py tools/name_moves.py
 #   tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: mask-bit-planted — the census re-read with bit 0x13 flipped in our mask at PRG:0x02ADB2 (what the fix would ship) must read the #162 site SAME, so C4 reads the bit it claims to read (in-gate: C4 must fail on the planted census; mode: the planted census IS the census and the gate FAILs)

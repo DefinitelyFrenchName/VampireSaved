@@ -17,7 +17,7 @@
 #   expectation and fails, the short cursor path confirms another character and fails
 #   identity.
 # FOLLOWS: emu/mame-patches/ tests/audit_move_parity.sh tests/expected/forced_pick_fidelity.tsv
-#   tests/lua/replay.lua tests/replays/ tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh
+#   tests/lua/replay.lua tests/replays/naming/ tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh
 #
 # MUST-FIRE: perturbed-copy: same-leg — the poked leg diffed against ITSELF yields no latched offset, and that empty set must fail the frozen non-empty expectation (in-gate: the first row's poked leg is diffed against itself and must come out empty where the frozen set is not; mode: every row is diffed leg-against-itself and the comparison FAILs)
 # MUST-FIRE: known-bad: retyped-prologue — the pre-#155 hand-typed prologue (Victor's two P2 moves) over the rig's events must differ from the committed rig, and section 1b must FAIL on it: the legs are the rig's, not a replica that can drift (in-gate: the first row's rig retyped and compared; mode: every leg is built from the retyped prologue and section 1b FAILs) (GitHub #155, 14z-185)

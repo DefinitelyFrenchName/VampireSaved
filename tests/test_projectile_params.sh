@@ -17,7 +17,7 @@
 #   Disruption exempt and reported); the perturbed row fails the live compare. NOLIVE=1 runs
 #   the ROM-free half alone.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/projectile_params.txt
-#   tests/lib/decrypt_cache.sh tests/lua/field_trace.lua tests/replays/ tools/name_moves.py
+#   tests/lib/decrypt_cache.sh tests/lua/field_trace.lua tests/replays/naming/ tools/name_moves.py
 #   tools/projectile_params.py tools/run_mame.sh tools/setup_mame.sh
 #
 # WHAT IT HOLDS.

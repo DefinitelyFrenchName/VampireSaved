@@ -71,3 +71,12 @@ test_figure_check	ondemand	-
 test_rulings_verbatim	ondemand	-
 test_scratch_census	ondemand	-
 test_agent_extract	ondemand	-
+# SIXTH CUT (maintainer, 2026-10-17, 14z-204: "freeze/release with triggers"; the real fix is a ticket of its own):
+# test_static_runner executed its 13 controls at every tier on record (653, 658, 706, 652 s: about 28% of a tier's gate
+# and control wall), pulled in by tools/battery_reach.py, in its reach through the planner, whose SELF-TEST names
+# STATE.md — a file every closure commit edits — and the planner counts a quoted literal as a direct read. -> freeze,
+# triggered by what the gate runs and reads: the three runners (its lock checks read run_all_emulator and
+# run_battery_m2), the classifier libraries it links, the planner and its import, the run-record and green-guard tools
+# the runner calls, and the registries its section 7 parses. Its protection on a real runner change is unchanged: a
+# trigger pulls it, controls included, into the same tier.
+test_static_runner	freeze	tests/run_all_static.sh tests/run_all_emulator.sh tests/run_battery_m2.sh tests/lib/classify.sh tests/lib/controls.sh tests/lib/measures.sh tools/static_confirm.py tools/battery_reach.py tools/run_record.py tools/git-hooks/ tests/ci_portable.txt tests/ci_static.txt tests/ci_cadence.tsv
