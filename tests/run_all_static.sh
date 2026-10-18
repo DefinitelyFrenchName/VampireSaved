@@ -79,6 +79,12 @@
 #                                          A freeze runs --cadence freeze, a
 #                                          release --cadence release: the full
 #                                          tier on the commit they build from.
+#   ... --jobs N                           run N gates at once (14z-205, #299; default 1, or $STATIC_JOBS):
+#                                          each gate and the controls the run would execute for it run in a
+#                                          pool of N jobs (tests/lib/static_job.sh), then every result is
+#                                          classified and printed in REGISTRY order exactly as a serial run
+#                                          does — the same readout, the same results.tsv; only the wall
+#                                          clock differs. `# ORDER: last` gates run alone, after the pool.
 #   ... --cadence ondemand                 also the `ondemand` gates (maintainer-ruled
 #                                          2026-10-09, 14z-196): a gate listed
 #                                          `ondemand` is deferred and named at
@@ -134,7 +140,7 @@ cd "$REPO"
 . "$REPO/tests/lib/classify.sh"
 
 _ORIG_ARGS="$*"   # the command line as given, for the run record (#189) — the loop below shifts it away
-STRICT=0; TIER=all; LIST=0; EXEC_CTL=all; CADENCE=session; CONFIRM=""
+STRICT=0; TIER=all; LIST=0; EXEC_CTL=all; CADENCE=session; CONFIRM=""; JOBS="${STATIC_JOBS:-1}"
 while [ $# -gt 0 ]; do
     case "$1" in
     --strict) STRICT=1 ;;
@@ -143,6 +149,7 @@ while [ $# -gt 0 ]; do
     --exec-controls) shift; EXEC_CTL="${1:?--exec-controls needs all|portable|none}" ;;
     --cadence) shift; CADENCE="${1:?--cadence needs session|freeze|release|ondemand}" ;;
     --confirm) shift; CONFIRM="${1:?--confirm needs the results.tsv of a previous run}" ;;
+    --jobs)    shift; JOBS="${1:?--jobs needs a number}" ;;
     -h|--help) sed -n '2,40p' "$0"; exit 0 ;;
     *) echo "unknown argument '$1' (try --help)" >&2; exit 2 ;;
     esac
@@ -196,7 +203,24 @@ cad_of() {  # cad_of <gate> -> cadence name (session when unlisted)
 cad_triggers() {  # cad_triggers <gate> -> its path prefixes, plus its own script
     echo "tests/$1.sh"
     [ -f "$CAD_FILE" ] || return 0
-    awk -F'\t' -v g="$1" '!/^#/ && $1 == g && $3 != "-" {print $3}' "$CAD_FILE" | tr ' ' '\n' | awk 'NF'
+    awk -F'\t' -v g="$1" '!/^#/ && $1 == g && $3 != "-" {print $3}' "$CAD_FILE" | tr ' ' '\n' | awk 'NF' | while read -r _tk; do
+        # @code (14z-205, #297, ruled 2026-10-18 "Own code changed"): every program of the gate's reach — its own
+        # script, the libraries it sources, the runners and tools it calls, the modules they import — as
+        # tools/static_confirm.py's R1 reads it, computed once per run for all @code gates (cad_code_reach)
+        if [ "$_tk" = "@code" ]; then   # CODE-TRIGGER
+            cad_code_reach; awk -F'\t' -v g="$1" '$1 == g {print $2}' "$WORK/code_reach.tsv"
+        else echo "$_tk"; fi
+    done
+}
+cad_code_reach() {  # once per run: the reach of every @code gate of tests/ci_cadence.tsv, into $WORK/code_reach.tsv
+    [ -f "$WORK/code_reach.tsv" ] && return 0
+    _cg="$(awk -F'\t' '!/^#/ && $3 == "@code" {print $1}' "$CAD_FILE")"
+    # shellcheck disable=SC2086
+    if ! python3 tools/static_confirm.py reach --root . $_cg > "$WORK/code_reach.tsv" 2>/dev/null; then
+        # the reach could not be computed: the safe side is running the gate, so every top-level path triggers it
+        _tops="$(git ls-files 2>/dev/null | cut -d/ -f1 | sort -u)"
+        for _g in $_cg; do for _p in $_tops; do printf '%s\t%s\n' "$_g" "$_p"; done; done > "$WORK/code_reach.tsv"   # CODE-REACH-FAILSAFE
+    fi
 }
 # The paths that changed: committed-but-unpushed plus the working tree (untracked
 # included). STATIC_CHANGED_PATHS overrides (newline-separated) for a scratch-clone
@@ -373,11 +397,16 @@ run_tier() {  # run_tier <label> <names>
             continue
         fi
         _t0=$(date +%s)
+        if [ -f "$WORK/pre/$g.run" ]; then   # PARALLEL-PRE (#299): the pool ran it; read its exit and its seconds
+            read -r _st _dur < "$WORK/pre/$g.run"
+        else
         # </dev/null: a gate that reads stdin otherwise swallows the rest of
         # this loop's input. Paid for once — a 32-entry run became 28 silently.
         tests/"$g".sh </dev/null > "$WORK/$g.out" 2>&1 && _st=0 || _st=$?
         _t1=$(date +%s)
-        _dur=$((_t1 - _t0)); t_gates=$((t_gates + _dur))
+        _dur=$((_t1 - _t0))
+        fi
+        t_gates=$((t_gates + _dur))
         # EXIT STATUS DECIDES FIRST (corrected 14z-128): a gate that prints
         # `SKIP:` AND exits non-zero is a FAILURE; exit 0 after the shell's own
         # error line is a FAILURE too (14z-139, the branch this runner lacked).
@@ -461,9 +490,13 @@ exec_controls() {  # exec_controls <gate> <tier-label>
     *) echo "bad --exec-controls '$EXEC_CTL'" >&2; exit 2 ;;
     esac
     for _n in $(vs_ctl_declared "tests/$1.sh"); do
+        if [ -f "$WORK/pre/$1.ctl.$_n.run" ]; then   # PARALLEL-PRE (#299)
+            read -r _cs _cd < "$WORK/pre/$1.ctl.$_n.run"
+        else
         _c0=$(date +%s)
         CONTROL="$_n" tests/"$1".sh </dev/null > "$WORK/$1.ctl.$_n.out" 2>&1 && _cs=0 || _cs=$?
         _c1=$(date +%s); _cd=$((_c1 - _c0))
+        fi
         vs_classify_control "$_cs" "$WORK/$1.ctl.$_n.out" "tests/$1.sh"; _cv="$VS_CTL_EXEC"
         printf '%s\t%s\t%s\t%s\n' "$1" "$_n" "$_cv" "$_cd" >> "$WORK/controls.tsv"
         case "$_cv" in
@@ -479,6 +512,24 @@ exec_controls() {  # exec_controls <gate> <tier-label>
     done
 }
 
+# THE POOL (14z-205, #299): with --jobs N > 1, every gate a tier will execute (not carried, executable) runs first in N
+# parallel jobs, its controls with it when the run's rule would execute them; run_tier then reads the results in
+# registry order. `# ORDER: last` gates run alone after the pool, as in a serial run.
+pre_run() {  # pre_run <tier label> <names>
+    case "$JOBS" in ''|*[!0-9]*) echo "bad --jobs '$JOBS'" >&2; exit 2 ;; esac
+    [ "$JOBS" -gt 1 ] || return 0
+    mkdir -p "$WORK/pre"; _todo=""; _late=""
+    for _g in $2; do
+        if [ -n "$CONFIRM" ] && awk -F'\t' -v g="$_g" '$1 == "CARRY" && $2 == g {f = 1} END {exit !f}' "$WORK/plan.tsv"; then continue; fi
+        [ -x "tests/$_g.sh" ] || continue
+        if grep -q '^# ORDER: last' "tests/$_g.sh"; then _late="$_late $_g"; else _todo="$_todo $_g"; fi
+    done
+    _p0=$(date +%s)
+    printf '%s\n' $_todo | awk 'NF' | xargs -P "$JOBS" -I{} sh tests/lib/static_job.sh {} "$WORK" "$EXEC_CTL" "$1" 2>> "$WORK/pre/jobs.err" || true
+    for _g in $_late; do sh tests/lib/static_job.sh "$_g" "$WORK" "$EXEC_CTL" "$1" 2>> "$WORK/pre/jobs.err" || true; done
+    echo "== $1 tier: $(printf '%s\n' $_todo $_late | awk 'NF' | wc -l | tr -d ' ') gate(s) run in $JOBS parallel jobs, $(( $(date +%s) - _p0 )) s =="
+}
+
 PORTABLE_RUN="$(cad_select "$PORTABLE")"
 STATIC_RUN="$(cad_select "$STATIC")"
 # THE PLAN, printed after the cadence selection (#286, 14z-203): a gate the plan would re-run but the cadence
@@ -492,12 +543,12 @@ if [ -n "$CONFIRM" ]; then
     awk -F'\t' '$1 == "DEFER" {printf "  defer  %-34s %s (its cadence: not run here)\n", $2, $3}' "$WORK/plan_shown.tsv"
 fi
 case "$TIER" in
-portable) run_tier portable "$PORTABLE_RUN" ;;
-static)   run_tier static   "$STATIC_RUN" ;;
+portable) pre_run portable "$PORTABLE_RUN"; run_tier portable "$PORTABLE_RUN" ;;
+static)   pre_run static "$STATIC_RUN"; run_tier static   "$STATIC_RUN" ;;
 all)
-    run_tier portable "$PORTABLE_RUN"
+    pre_run portable "$PORTABLE_RUN"; run_tier portable "$PORTABLE_RUN"
     if [ -n "${ROMDIR:-}" ]; then
-        run_tier static "$STATIC_RUN"
+        pre_run static "$STATIC_RUN"; run_tier static "$STATIC_RUN"
     else
         echo "== static tier =="
         echo "  NOT RUN: ROMDIR is unset. These gates read the reference set or"

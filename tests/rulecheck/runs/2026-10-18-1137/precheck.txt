@@ -1,0 +1,13 @@
+  FLAG ATTRIB: #120 closes done at the maintainer's request, quoted in maintainer_words.txt: VampireSaved-Rebuilt#1 (rebuilt_issue_live.md, the issue as GitHub holds it) li...
+  FLAG D-FIGURE: 417  [build/agent205/t120close/rebuilt_issue_live.md]
+  FLAG D-FIGURE: 383  [build/agent205/t120close/rebuilt_issue_live.md]
+  FLAG D-FIGURE: 34  [build/agent205/t120close/rebuilt_issue_live.md]
+  FLAG D-FIGURE: 221  [build/agent205/t120close/rebuilt_issue_live.md]
+  FLAG D-FIGURE: 236  [build/agent205/t120close/rebuilt_issue_live.md]
+  FLAG D-FIGURE: 7979  [build/agent205/t120close/rebuilt_issue_live.md]
+  FLAG D-FIGURE: 8520  [build/agent205/t120close/rebuilt_issue_live.md]
+  FLAG D-FIGURE: 5.2  [build/agent205/t120close/rebuilt_issue_live.md]
+  FLAG D-FIGURE: 5.3  [build/agent205/t120close/rebuilt_issue_live.md]
+  FLAG D-ABSOLUTE: Each rule names its source in the original; a reader checked every attribution.  [build/agent205/t120close/rebuilt_issue_live.md]
+  FLAG D-ABSOLUTE: Each was judged by the agent that wrote it, and nobody has reviewed them rule by rule since.  [build/agent205/t120close/rebuilt_issue_live.md]
+packet_check: 12 flag(s): ATTRIB 1, D-ABSOLUTE 2, D-FIGURE 9

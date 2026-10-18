@@ -2,11 +2,15 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 295
+# issues: 299
 number	state	reason	closed	labels	title
+299	OPEN	-	-	evolution,performance	Static tier: run gates in parallel (--jobs, ~70-80% of the machine), proven equal to a serial run first
+298	OPEN	-	-	evolution,performance	Static tier scope: at a commit/close, execute a gate's controls only when a program of its reach changed (R1); all at freeze/release
+297	OPEN	-	-	evolution,performance	Static tier scope: six families (109 gates) to freeze cadence, triggered by their own code (@code)
+296	OPEN	-	-	evolution,severity: medium,test-integrity	run_mame.sh: refuse a run whose MAME_SANDBOX already holds an earlier run's state (#293's class, at run time)
 295	OPEN	-	-	evolution,severity: medium,test-integrity	audit_dmg_legacy_sweep never runs Demitri's legacy hits on our build: add an exact vsavj-vs-ours leg (superset coverage)
 294	OPEN	-	-	cosmetic,parked	Killshread's shock/electrocuted state has wrong palette (currently accepted tradeoff) - parked
-293	OPEN	-	-	bug,severity: medium,test-integrity	Two gates hand one MAME sandbox to several runs, so a later run boots on carried nvram (audit_flicker_attribution, audit_legacy_pairings)
+293	CLOSED	COMPLETED	2026-10-18	bug,severity: medium,test-integrity	Two gates hand one MAME sandbox to several runs, so a later run boots on carried nvram (audit_flicker_attribution, audit_legacy_pairings)
 292	OPEN	-	-	bug,performance,severity: high	static_confirm: a tool's self-test strings count as a direct read (battery_reach names STATE.md), so 22 gates re-run with controls at every commit
 291	OPEN	-	-	evolution	On demand, at a given tag or commit: comparative capture sheets (ours vs vsavj and/or vs2) for every comparing test, as a visual proof of accuracy for humans
 290	CLOSED	COMPLETED	2026-10-17	evolution,severity: high	A deterministic guard: no commit or push on a tier that did not read GREEN (replaces the procedure check's one recurring catch)
@@ -179,7 +183,7 @@ number	state	reason	closed	labels	title
 123	OPEN	-	-	cosmetic,parked	Win-quote text for the three tenants (forgone for now; only the clean way, vanilla untouched)
 122	CLOSED	COMPLETED	2026-10-06	evolution	Run the --controls release tier on the dedicated Linux server and compare its speed with the m2 pro (load balancing potential)
 121	OPEN	-	-	evolution,parked	Linux release binaries built on dedicated server, plus clean-machine check at release
-120	OPEN	-	-	evolution,parked	The rebuild-from-docs option after MiSTer (a possibility to preserve, not a commitment)
+120	CLOSED	COMPLETED	2026-10-18	evolution	The rebuild-from-docs option after MiSTer (a possibility to preserve, not a commitment)
 119	CLOSED	COMPLETED	2026-10-11	contested,evolution	The living-documentation framework as an independent sibling of bbh (ruled at the plan stage, not scheduled)
 118	OPEN	-	-	evolution,severity: low	Community cross-check: the ~90 unadopted mizuumi player-struct candidates, each adopted only once measured
 117	CLOSED	COMPLETED	2026-10-05	evolution	Community cross-check: naming rigs on vsavj for specials, supers, throws, the CL. rows and the 6-prefixed rows

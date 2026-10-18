@@ -80,3 +80,120 @@ test_agent_extract	ondemand	-
 # the runner calls, and the registries its section 7 parses. Its protection on a real runner change is unchanged: a
 # trigger pulls it, controls included, into the same tier.
 test_static_runner	freeze	tests/run_all_static.sh tests/run_all_emulator.sh tests/run_battery_m2.sh tests/lib/classify.sh tests/lib/controls.sh tests/lib/measures.sh tools/static_confirm.py tools/battery_reach.py tools/run_record.py tools/git-hooks/ tests/ci_portable.txt tests/ci_static.txt tests/ci_cadence.tsv
+# SIXTH CUT (maintainer, 2026-10-18, 14z-205, GitHub #297 — asked which families "would have very little impact being
+# run only at freeze/release", then "Let's do all three"; asked when a session should still run one: "Own code changed
+# (Recommended)"): the 109 session gates of six families -> freeze, triggered by `@code` only. Measured on the record
+# of 104 static runs (2026-10-02..18, build/agent205/tier_history_filtered.log, local): pipeline 43 gates 3 session
+# reds, review-triage 31 gates 1, gfx 13, oracle 10, mister 7, tenant 5 gates 0; in the two 14z-205 closes they re-ran
+# 71 and 66 times for 319 s each. `@code` (tests/run_all_static.sh cad_triggers, tools/static_confirm.py `reach`)
+# is every program of the gate's own reach, so a session that edits a gate or the code it runs still runs it, and a
+# change to what it checks (a manifest, a data file) waits for the freeze, which runs everything.
+audit_capture_matrix	freeze	@code
+test_attribute_patch_delta	freeze	@code
+test_audit_merged_dispatch	freeze	@code
+test_build_gate_status	freeze	@code
+test_build_identity_distinct	freeze	@code
+test_capture_kf_ownership	freeze	@code
+test_capture_pose_sources	freeze	@code
+test_copy_flags	freeze	@code
+test_effect_placeholders	freeze	@code
+test_escape_triage	freeze	@code
+test_extract_hp	freeze	@code
+test_freeze_artifacts_current	freeze	@code
+test_freeze_tag_coverage	freeze	@code
+test_fsm_census	freeze	@code
+test_hitclass_map_thunk	freeze	@code
+test_id_space	freeze	@code
+test_index_space	freeze	@code
+test_index_window_thunk	freeze	@code
+test_kernel_voice_tables	freeze	@code
+test_m2a_target_policy	freeze	@code
+test_m2a_target_resolution	freeze	@code
+test_manifest_merge	freeze	@code
+test_patch_overlap	freeze	@code
+test_pointer_flow	freeze	@code
+test_qs_id_table	freeze	@code
+test_qs_songs	freeze	@code
+test_qs_window_law	freeze	@code
+test_quote_font_window	freeze	@code
+test_reaction_hook_d2	freeze	@code
+test_region_overlap	freeze	@code
+test_region_overlap_control	freeze	@code
+test_rompath_reject	freeze	@code
+test_rule5_census	freeze	@code
+test_s4_thresholds	freeze	@code
+test_shared_writes	freeze	@code
+test_tenant_anim_relocation	freeze	@code
+test_tenant_row_owner	freeze	@code
+test_thunk_addr_literal	freeze	@code
+test_type_stamp_census	freeze	@code
+test_unless_composed	freeze	@code
+test_variant_dispatch	freeze	@code
+test_voice_row_range	freeze	@code
+test_win_quote_decode	freeze	@code
+test_applier_key_first	freeze	@code
+test_baseset_mask_invariant	freeze	@code
+test_basis_publish_atomic	freeze	@code
+test_battery_accounting	freeze	@code
+test_build_ref_rot	freeze	@code
+test_builder_rom_audit	freeze	@code
+test_decode_stage_banners	freeze	@code
+test_decrypt_cache	freeze	@code
+test_entropy_tripwire	freeze	@code
+test_freeze_retires_diverge	freeze	@code
+test_gfx_layout_fields_live	freeze	@code
+test_green_guard	freeze	@code
+test_harness_frame_bound	freeze	@code
+test_hex_lengths	freeze	@code
+test_launcher_newest	freeze	@code
+test_mame_mirror_guard	freeze	@code
+test_mame_runner_hygiene	freeze	@code
+test_member_classify	freeze	@code
+test_meter_in_field_map	freeze	@code
+test_minitoml_subset	freeze	@code
+test_no_tracked_mutation	freeze	@code
+test_optimize_guard	freeze	@code
+test_package_release_safety	freeze	@code
+test_patch_source_identity	freeze	@code
+test_phasea_a3_liveness	freeze	@code
+test_qs_ledger_binding	freeze	@code
+test_qs_wav_timebase	freeze	@code
+test_record_walk_bounds	freeze	@code
+test_ref_rot_image_pick	freeze	@code
+test_romset_path_guard	freeze	@code
+test_select_port_hygiene	freeze	@code
+audit_gfx_merged_census	freeze	@code
+test_beam_list_type6	freeze	@code
+test_biased_list_inventory	freeze	@code
+test_effect_palette_table	freeze	@code
+test_gfx_chain	freeze	@code
+test_gfx_collision_gate	freeze	@code
+test_gfx_layout3	freeze	@code
+test_gfx_menus_guard	freeze	@code
+test_gfx_tile_codec	freeze	@code
+test_gfx_tiles	freeze	@code
+test_list_type_census	freeze	@code
+test_obj_record_walk	freeze	@code
+test_obj_walker_relocation	freeze	@code
+test_attribute_ramdiff	freeze	@code
+test_classify_hitclass_probe	freeze	@code
+test_classify_pool_spawns	freeze	@code
+test_compare_composite	freeze	@code
+test_compare_flicker	freeze	@code
+test_compare_window	freeze	@code
+test_describe_masked_shape	freeze	@code
+test_freeze_basis_sandbox	freeze	@code
+test_m2a_flicker_gate	freeze	@code
+test_masked_compare	freeze	@code
+test_jtcores_twin	freeze	@code
+test_jtsim_scratch_heal	freeze	@code
+test_mister_page	freeze	@code
+test_mra_build_line	freeze	@code
+test_mra_parts	freeze	@code
+test_rpl2siminputs	freeze	@code
+test_sim_wram_contract	freeze	@code
+audit_select_bank_gates	freeze	@code
+test_attract_roster	freeze	@code
+test_roulette_tag_rows	freeze	@code
+test_tenant_id	freeze	@code
+test_tenant_loop	freeze	@code

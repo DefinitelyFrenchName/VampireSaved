@@ -366,6 +366,7 @@ test_win_stdout_utf8
 # #196 (14z-189): an unset MAME_BIN makes tools/run_mame.sh run the PINNED build for the set (WIDE for vsavjw,
 # the reference build for stock sets), never the mame on PATH; a missing default is refused; one control. ~1 s.
 test_mame_default_bin
+test_mame_sandbox_log
 test_release_launcher_bat
 # 14z-193 (#122): two emulator-tier runs' per-row speed over the rows both ran and both passed
 # (tools/emu_run_compare.py); two controls, one per rule of the common set. ~1 s.

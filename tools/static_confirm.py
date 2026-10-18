@@ -126,14 +126,23 @@ Usage:
       unignored file's name and content.
   CONTROLS ONLY ON A REAL CHANGE (#286 (c), 14z-202, maintainer-ruled 2026-10-15: *"with controls only when a gate or
       its real inputs changed"*): a RERUN row carries a 4th field. `controls` when the gate's controls must execute:
-      the gate is absent from the base, not PASS there, its base controls were not all executed, or the gate's CODE
-      names a changed path directly (`direct_read`: R1 a program in its reach, R2 a code line naming the file, R6 a
-      templated path matching it). Otherwise — STALE only by an indirect rule (R3 a directory it lists, R4 the whole
-      tree, R5 a data file that mentions the path, R7 git's own files), or the core with nothing it names changed —
+      the gate is absent from the base, not PASS there, its base controls were not all executed, or a PROGRAM in its
+      reach changed (R1: its own script, a library it sources, a runner or tool it calls, a module it imports). That
+      is where a gate's verdict logic can break, so that is where its controls must prove themselves again. NARROWED
+      14z-205 (maintainer-ruled 2026-10-18, the static tier's scope, GitHub #298): until then a direct read of DATA
+      (R2 a code line naming the file, R6 a templated path) executed them too; measured on the record of 104 static
+      runs (2026-10-02..18), 6,429 session-cadence control executions were all HONOURED, and on the 14z-205 tier-2
+      plan the rule cut the gates executing controls from 117 to 17. Otherwise — STALE only by a data or indirect
+      rule (R2, R3 a directory it lists, R4 the whole tree, R5 a data file that mentions the path, R6, R7 git's own
+      files), or the core with no program of its reach changed —
       `carry-controls<TAB>declared<TAB>fired<TAB>honoured` from the base row: the gate re-runs and its controls are
       carried, as a carried gate's are. Measured 14z-202 (section 22 of tests/test_static_runner.sh): a data file a
       gate reads with `cat` is R2, not R1 — the reach holds programs only. A freeze and a release execute every
       control (--confirm is refused there).
+  THE CADENCE'S @code TRIGGER (14z-205, #297, maintainer-ruled 2026-10-18 "Own code changed"): `reach --root R g...`
+      prints each gate's reach (the same closure R1 reads), one `gate<TAB>program` per line; tests/run_all_static.sh
+      reads it for every tests/ci_cadence.tsv row whose triggers are `@code`, so such a gate is pulled back into a
+      session run exactly when a program of its own reach changed, never by a data change.
   THE PLAN'S COST (#259, 14z-204): `plan` prints its progress every 25 gates and a closing timing line on stderr, which
       tests/run_all_static.sh shows as it runs (the 14z-195 close's plan ran 20 min 22 s silent). R5 searches each data
       basename once per gate and lists the data files once per root, and battery_reach's module lookup is memoised:
@@ -472,22 +481,6 @@ def stale_reason(root, rch, blob, c, pats):
     return None
 
 
-def direct_read(root, rch, blob, c, pats):
-    """#286 (c): does the gate's CODE name c directly — R1 (a program in the reach), R2 (a code line names its
-    basename, N-B applied) or R6 (a templated path matches it)? The indirect rules (R3 a directory, R4 the whole tree,
-    R5 a data file's mention, R7 git's own files) are not a direct read."""
-    if c in rch:
-        return True
-    bpat, _ = pats
-    base = os.path.basename(c)
-    if bpat and base in NARROW_R2:
-        if narrow_search(base, blob):
-            return True
-    elif bpat and bpat.search(blob):
-        return True
-    return any(rx.search(c if is_path else base) for rx, _, is_path in templates(root, blob))
-
-
 def changed_set(root, base, head, extra):
     out = set(extra)
     if base:
@@ -528,8 +521,8 @@ br.resolve_mod = _cached_resolve(br.resolve_mod)   # #259: one index scan per mo
 
 
 def predict(root, changed, r1=None, progress=None):
-    """the STALE map; when `r1` is a dict, r1[gate] is set, for a STALE gate, to whether its code names a changed path
-    DIRECTLY (direct_read: R1, R2 or R6; #286 (c)); `progress(done, total)` is called every 25 gates and at the end
+    """the STALE map; when `r1` is a dict, r1[gate] is set, for a STALE gate, to whether a PROGRAM in its reach
+    changed (R1: its own script, a script it sources or runs, a module it imports; 14z-205, narrowing #286 (c)); `progress(done, total)` is called every 25 gates and at the end
     (#259: the 14z-195 close's plan ran 20 min silent, which looks the same as a hang)"""
     files = br.index(root, [])
     gates = registry(root)
@@ -555,9 +548,8 @@ def predict(root, changed, r1=None, progress=None):
             why = f"R4 {where} reads the whole tree"
         if why:
             stale[g] = why
-            if r1 is not None:
-                r1[g] = any(direct_read(root, rch, blob, c, pats[c]) for c in eff
-                            if not (c.startswith(RUNS_DATA) and "rulecheck/runs" not in blob))
+            if r1 is not None:   # PROGRAM-CHANGED (14z-205, ruled 2026-10-18): R1 alone, a program in the reach
+                r1[g] = any(c in rch for c in eff)
         else:
             carried.append(g)
     return gates, stale, carried
@@ -892,6 +884,13 @@ def main():
         changed = changed_set(root, opt("--base"), opt("--head"), opt("--changed", True))
         gates, stale, carried = predict(root, changed)
         show(gates, stale, carried, changed)
+        return 0
+    if a[:1] == ["reach"] and opt("--root"):   # 14z-205 (#297): `gate<TAB>program` per line, the cadence's @code trigger
+        root = os.path.abspath(opt("--root"))
+        files = br.index(root, [])
+        for g in a[a.index("--root") + 2:]:
+            for prog in reach(root, g, files):
+                print(f"{g}\t{prog}")
         return 0
     if a[:1] == ["backtest"] and len(a) >= 2 and opt("--repo"):
         return backtest(a[1], os.path.abspath(opt("--repo")))

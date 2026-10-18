@@ -26,6 +26,7 @@
 #
 # MUST-FIRE: shadow-tool: reader-unplugged — a copy of run_all_static.sh that hands the classifier no gate script must let a stub with a declared-but-unfired control read PASS (mode: that copy is the runner every section drives, and section 11 must fail)
 # MUST-FIRE: shadow-tool: trigger-blind — a copy of run_all_static.sh with its cadence TRIGGER match disabled must leave a freeze-cadence gate deferred although a path it depends on changed; section 14's triggered case must FAIL under it
+# MUST-FIRE: shadow-tool: code-trigger-off — a copy of run_all_static.sh whose CODE-TRIGGER branch is disabled must leave a freeze-cadence `@code` gate deferred although a program it runs changed, and section 14j must FAIL (mode: that copy is the runner; 14z-205, #297)
 # MUST-FIRE: shadow-tool: ondemand-triggered — a copy of run_all_static.sh whose ONDEMAND-NO-TRIGGER line is disabled must let a change to an ondemand gate's own script pull it into a session run; section 14i must catch it (in-gate in section 16; as a mode the gate FAILs)
 # MUST-FIRE: shadow-tool: order-ignored — a copy of run_all_static.sh whose `# ORDER: last` test is disabled must run the marked stub FIRST, and section 16 must FAIL (mode: that copy drives every section; section 17 fires it in-run; 14z-185b, #188)
 # MUST-FIRE: shadow-tool: crash-unread — a copy of run_all_static.sh that hands the CONTROL classifier no gate script must read a control mode that dies of `command not found` (exit 127) as HONOURED, and section 12b must FAIL (mode: that copy drives every section; section 12b fires it in-run; 14z-196, #254)
@@ -35,7 +36,7 @@
 # MUST-FIRE: shadow-tool: confirm-at-freeze — a copy of run_all_static.sh whose CONFIRM-SESSION-ONLY refusal is disabled must accept --confirm at --cadence freeze, and section 20 must FAIL (mode: that copy drives section 20; section 21 fires it in-run; #269, 14z-200)
 # MUST-FIRE: shadow-tool: subfp-off — a copy of tools/static_confirm.py whose SUBMODULE-UNCHANGED drop is disabled must re-run the reader of an unchanged dirty submodule, and section 22 must FAIL (mode: that copy in the #286 repo; section 23 fires it in-run; #286, 14z-202)
 # MUST-FIRE: shadow-tool: controls-always — a copy of tools/static_confirm.py whose plan never carries controls must execute g_f's control when only a file its data MENTIONS changed, and section 22 must FAIL (mode: that copy in the #286 repo; section 23 fires it in-run; #286, 14z-202)
-# MUST-FIRE: shadow-tool: controls-never — a copy of tools/static_confirm.py whose CONTROLS-ON-REACH test is disabled must carry g_f's control when a data file its code reads directly changed, and section 22 must FAIL (mode: that copy in the #286 repo; section 23 fires it in-run; #286, 14z-202)
+# MUST-FIRE: shadow-tool: controls-never — a copy of tools/static_confirm.py whose CONTROLS-ON-REACH test is disabled must carry g_f's control when its own script changed (R1, a program in its reach; 14z-205), and section 22 must FAIL (mode: that copy in the #286 repo; section 23 fires it in-run; #286, 14z-202)
 # MUST-FIRE: shadow-tool: prediction-off — a copy of tools/static_confirm.py whose plan marks nothing STALE must CARRY the stub whose input changed, and section 18 must FAIL (mode: that copy in the confirm repo)
 #
 # WHY A GATE FOR THE RUNNER. CLAUDE.md §4: "Verdict logic is itself tested. A
@@ -85,6 +86,12 @@ SHADOW_T="$T/run_all_static_triggerblind.sh"
 sed 's|case "$_pth" in "$_t"\*) _hit="$_pth"; break 2 ;; esac   # TRIGGER-MATCH|: # TRIGGER-MATCH disabled|' "$RUNNER" > "$SHADOW_T"
 cmp -s "$RUNNER" "$SHADOW_T" && fail "could not blind the trigger — the TRIGGER-MATCH line moved"
 chmod +x "$SHADOW_T"
+# THE CODE SHADOW (14z-205, #297): the runner with its @code branch disabled — the token is read as a literal prefix,
+# so no program of the gate's reach pulls it back in.
+SHADOW_K="$T/run_all_static_codetriggeroff.sh"
+sed 's|        if \[ "$_tk" = "@code" \]; then   # CODE-TRIGGER|        if false; then   # CODE-TRIGGER disabled|' "$RUNNER" > "$SHADOW_K"
+cmp -s "$RUNNER" "$SHADOW_K" && fail "could not disable the @code trigger — the CODE-TRIGGER line moved"
+chmod +x "$SHADOW_K"
 # THE FIFTH SHADOW (14z-196, maintainer-ruled 2026-10-09): the runner with its ONDEMAND-NO-TRIGGER
 # line disabled — a changed path pulls an ondemand gate back in like any other listed gate.
 SHADOW_D="$T/run_all_static_ondemandtriggered.sh"
@@ -113,6 +120,7 @@ if vs_ctl_is reader-unplugged; then ln -s "$SHADOW" "$FR/tests/run_all_static.sh
 elif vs_ctl_is results-inherited; then ln -s "$SHADOW_R" "$FR/tests/run_all_static.sh"
 elif vs_ctl_is crash-unread; then ln -s "$SHADOW_C" "$FR/tests/run_all_static.sh"
 elif vs_ctl_is trigger-blind; then ln -s "$SHADOW_T" "$FR/tests/run_all_static.sh"
+elif vs_ctl_is code-trigger-off; then ln -s "$SHADOW_K" "$FR/tests/run_all_static.sh"
 elif vs_ctl_is ondemand-triggered; then ln -s "$SHADOW_D" "$FR/tests/run_all_static.sh"
 elif vs_ctl_is order-ignored; then ln -s "$SHADOW_O" "$FR/tests/run_all_static.sh"
 else ln -s "$RUNNER" "$FR/tests/run_all_static.sh"; fi
@@ -611,6 +619,28 @@ o14i3="$(cd "$FR" && STATIC_CHANGED_PATHS='tests/g_fail.sh' sh tests/run_all_sta
 o14i4="$(cd "$FR" && STATIC_CHANGED_PATHS= sh tests/run_all_static.sh --tier portable --exec-controls none --cadence ondemand 2>&1)" && s14i4=0 || s14i4=$?
 [ "$s14i4" = 1 ] && printf '%s' "$o14i4" | grep -qE '^  g_fail +FAIL' && echo "  ok: --cadence ondemand runs it and goes red" \
     || fail "14i: --cadence ondemand: exit $s14i4"
+# (j) @code (14z-205, #297, ruled 2026-10-18 "Own code changed"): a freeze gate whose trigger is its own reach is pulled
+#     back by a change to a program it runs, never by a change to the data it reads
+s14j() {  # s14j <runner in $FR/tests> -> sets S14j (ok|bad)
+    mkdir -p "$FR/tools" "$FR/data"; cp "$REPO/tools/static_confirm.py" "$REPO/tools/battery_reach.py" "$FR/tools/"
+    printf 'open("data/d.txt").read()\n' > "$FR/tools/chk.py"; echo d > "$FR/data/d.txt"
+    printf '#!/bin/sh\npython3 tools/chk.py\necho "FAIL: broken"\nexit 1\n' > "$FR/tests/g_code.sh"; chmod +x "$FR/tests/g_code.sh"
+    printf 'g_pass\ng_code\n' > "$FR/tests/ci_portable.txt"; printf 'g_code\tfreeze\t@code\n' > "$FR/tests/ci_cadence.tsv"
+    _jd="$(cd "$FR" && STATIC_CHANGED_PATHS='data/d.txt' sh "tests/$1" --tier portable --exec-controls none 2>&1)" && _sd=0 || _sd=$?
+    _jp="$(cd "$FR" && STATIC_CHANGED_PATHS='tools/chk.py' sh "tests/$1" --tier portable --exec-controls none 2>&1)" && _sp=0 || _sp=$?
+    if [ "$_sd" = 0 ] && ! printf '%s' "$_jd" | grep -q 'g_code <- ' && [ "$_sp" = 1 ] && printf '%s' "$_jp" | grep -q 'g_code <- tools/chk.py'; then S14j=ok
+    else S14j=bad; echo "    @code: data change exit $_sd ($(printf '%s' "$_jd" | grep -c 'g_code <- ') triggered), program change exit $_sp ($(printf '%s' "$_jp" | grep -E 'g_code' | head -2 | tr '\n' '|'))"; fi
+    printf 'g_pass\ng_fail\n' > "$FR/tests/ci_portable.txt"; rm -f "$FR/tests/g_code.sh"
+}
+s14j run_all_static.sh
+[ "$S14j" = ok ] && echo "  ok: @code: a changed data file leaves the freeze gate deferred; a changed program it runs triggers it, and the readout names the program" \
+    || fail "14j: the @code trigger"
+if ! vs_ctl_is code-trigger-off; then
+    ln -s "$SHADOW_K" "$FR/tests/run_all_static_codetriggeroff.sh"; s14j run_all_static_codetriggeroff.sh > /dev/null
+    [ "$S14j" = bad ] && vs_ctl_fired code-trigger-off "with the @code branch disabled, a changed program no longer pulls the freeze gate in — section 14j catches it" \
+        || { vs_ctl_dead code-trigger-off "the runner without @code still triggered the gate"; rc=1; }
+    rm -f "$FR/tests/run_all_static_codetriggeroff.sh"
+fi
 printf 'g_fail\tfreeze\tsrc/\n' > "$FR/tests/ci_cadence.tsv"   # back to section 14's freeze listing: section 15 runs on it
 # (h) the real cadence file: every listed gate is registered, cadence is freeze|release|ondemand, triggers non-empty
 o14h="$(awk -F'\t' '!/^#/ && NF {print $1, $2, ($3 == "" ? "EMPTY" : "ok")}' "$REPO/tests/ci_cadence.tsv")"
@@ -821,7 +851,7 @@ printf 'name\tnote\nf\tdata/notes.md\n' > "$FS/data/list.tsv"; echo first > "$FS
 (cd "$FS" && git init -q && git -c protocol.file.allow=always submodule add -q "$T/subsrc" sub > /dev/null 2>&1 \
     && git add -A && git -c user.name=t -c user.email=t@t commit -qm base)
 echo dirty > "$FS/sub/x.txt"   # the submodule is dirty in every run, as emu/fbneo is
-s22() {   # s22 <static_confirm.py> -> sets S22a S22b S22c S22d (ok|bad)
+s22() {   # s22 <static_confirm.py> -> sets S22a S22b S22c S22d S22e (ok|bad)
     cp "$1" "$FS/tools/static_confirm.py"; cp "$REPO/tools/battery_reach.py" "$FS/tools/"
     (cd "$FS" && STATIC_RESULTS_OUT="$T/s1.tsv" sh tests/run_all_static.sh --tier portable > /dev/null 2>&1) || true
     sleep 1
@@ -841,10 +871,18 @@ s22() {   # s22 <static_confirm.py> -> sets S22a S22b S22c S22d (ok|bad)
     else S22c=bad; echo "    a mention (R5) did not re-run g_f with its control carried (or the readout counted it executed, #286): $(printf '%s' "$_r" | grep -E 'g_f|g_o|controls carried|executed:|carried:' | tr '\n' '|') / $(grep '^g_f' "$T/s4.tsv")"; fi
     printf 'name\tnote\nf\tdata/notes.md\ng\tdata/other.md\n' > "$FS/data/list.tsv"; sleep 1
     _r="$(cd "$FS" && STATIC_RESULTS_OUT="$T/s5.tsv" sh tests/run_all_static.sh --tier portable --confirm "$T/s4.tsv" 2>&1)" || true
-    if printf '%s' "$_r" | grep -qE "^  re-run g_f +STALE: R2" && ! printf '%s' "$_r" | grep -q "controls carried" \
+    # 14z-205 (ruled 2026-10-18, #298): a data file the code reads directly (R2) re-runs the gate, its controls CARRIED
+    if printf '%s' "$_r" | grep -qE "^  re-run g_f +STALE: R2" && printf '%s' "$_r" | grep -q "controls carried: 1 honoured" \
             && grep -q "^g_f	PASS	[0-9]*	1	1	1$" "$T/s5.tsv"; then S22d=ok
-    else S22d=bad; echo "    a change in g_f's reach did not execute its control: $(printf '%s' "$_r" | grep -E 'g_f|controls carried' | tr '\n' '|')"; fi
-    (cd "$FS" && git checkout -q -- data && echo dirty > sub/x.txt)
+    else S22d=bad; echo "    a direct DATA read (R2) did not re-run g_f with its control carried: $(printf '%s' "$_r" | grep -E 'g_f|controls carried' | tr '\n' '|')"; fi
+    echo "# a comment: the script changed" >> "$FS/tests/g_f.sh"; sleep 1
+    _r="$(cd "$FS" && STATIC_RESULTS_OUT="$T/s6.tsv" sh tests/run_all_static.sh --tier portable --confirm "$T/s5.tsv" 2>&1)" || true
+    # the plan names the FIRST rule that hit (data/list.tsv is still changed from s5, so R2); what is judged here is
+    # that the control was EXECUTED, not carried, because a program in the reach (g_f's own script) changed
+    if printf '%s' "$_r" | grep -qE "^  re-run g_f +STALE" && ! printf '%s' "$_r" | grep -q "controls carried" \
+            && printf '%s' "$_r" | grep -q '^  executed: 1  honoured 1 ' && grep -q "^g_f	PASS	[0-9]*	1	1	1$" "$T/s6.tsv"; then S22e=ok
+    else S22e=bad; echo "    a change to g_f's own script (R1) did not execute its control: $(printf '%s' "$_r" | grep -E 'g_f|controls carried' | tr '\n' '|')"; fi
+    (cd "$FS" && git checkout -q -- data tests/g_f.sh && echo dirty > sub/x.txt)
 }
 SC22="$REPO/tools/static_confirm.py"
 vs_ctl_is subfp-off && SC22="$SUBOFF"; vs_ctl_is controls-always && SC22="$CTLALW"; vs_ctl_is controls-never && SC22="$CTLNEV"
@@ -852,7 +890,8 @@ s22 "$SC22"
 [ "$S22a" = ok ] && echo "  ok: the dirty submodule, unchanged since the base run (its # subfp equal), leaves g_s carried" || fail "section 22: an unchanged dirty submodule re-ran its reader"
 [ "$S22b" = ok ] && echo "  ok: the submodule changed again: g_s re-runs" || fail "section 22: a changed submodule was carried"
 [ "$S22c" = ok ] && echo "  ok: data/notes.md, only MENTIONED by g_f's data file, re-runs g_f (R5) with its control carried (honoured 1 recorded; the readout says executed 0, carried 1; the ondemand g_o, absent from the base, is listed as deferred, not re-run)" || fail "section 22: a mention executed the control, or the readout counted a carried control as executed"
-[ "$S22d" = ok ] && echo "  ok: data/list.tsv, which g_f's code reads directly, re-runs g_f (R2, a direct read) and executes its control" || fail "section 22: a direct read carried the control"
+[ "$S22d" = ok ] && echo "  ok: data/list.tsv, which g_f's code reads directly, re-runs g_f (R2) with its control carried (14z-205)" || fail "section 22: a direct data read executed the control"
+[ "$S22e" = ok ] && echo "  ok: g_f's own script changed: g_f re-runs (R1) and executes its control" || fail "section 22: a changed program in the reach carried the control"
 
 echo "== 23. MUST-FIRE: section 22's properties, each broken by its shadow =="
 if ! vs_ctl_is subfp-off && ! vs_ctl_is controls-always && ! vs_ctl_is controls-never; then
@@ -863,7 +902,7 @@ if ! vs_ctl_is subfp-off && ! vs_ctl_is controls-always && ! vs_ctl_is controls-
     [ "$S22c" = bad ] && vs_ctl_fired controls-always "a plan that never carries controls executes g_f's control for a mention — section 22 catches it" \
         || { vs_ctl_dead controls-always "the controls-always plan still carried g_f's control"; rc=1; }
     s22 "$CTLNEV" > /dev/null
-    [ "$S22d" = bad ] && vs_ctl_fired controls-never "a plan blind to direct reads carries g_f's control when the data its code reads changed — section 22 catches it" \
+    [ "$S22e" = bad ] && vs_ctl_fired controls-never "a plan blind to a changed program carries g_f's control when its own script changed — section 22 catches it" \
         || { vs_ctl_dead controls-never "the controls-never plan still executed g_f's control"; rc=1; }
 fi
 

@@ -1,0 +1,7 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent205/t120close/maintainer_words.txt	03cfa0257acea15f60ae227c5b98f615adf428af
+build/agent205/t120close/rebuilt_issue_live.md	92cbe4a95a8a8849ddbc4451840d2d0808c28486
+build/agent205/t120close/closing_comment.md	0066a0ca40042befd4ec555aa9b47b2c50f028c3
+build/agent205/t120close/row_120.tsv	73e7708ed338f1ef5bd05bf29bb5e25d020cd590
+build/agent205/t120close/decisions_entry.txt	b2a551f7d01a9c2ffade48fafb515e24c27f8434
+build/agent205/t120/issue_120.txt	0f74821f9e771a3466fb86dbf26438ad27bca321

@@ -38,7 +38,7 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
-## Session 14z-205 — **#291 S2 complete (58 gates draw, 174 declare; the event basis D2 built); #293 found and fixed; #120's rebuild spec pushed to its own repository.** Opened 2026-10-18 on Opus 5.5 (the ruled orchestrator); transcript `995e7259`.
+## Session 14z-205 — **#291 S2 complete (58 gates draw, 174 declare; the event basis D2 built); #293 found and fixed; #120's rebuild spec pushed to its own repository and #120 closed; the static tier's scope cut (#297, #298, #299).** Opened 2026-10-18 on Opus 5.5 (the ruled orchestrator); transcript `995e7259`.
 
 ### opened with
 The maintainer: *"read handoff.md, state.md and docs/next_session.md"*. The opener's sweep read CLEAN; `main` at
@@ -74,6 +74,7 @@ tenant control with a check that it loads that id, and an atomic `mkdir` that re
 `shared-sandbox`). On fresh boots the flicker attribution held (f5868: 3 bytes in `obj-builder-stack`); 7 pairings
 verdicts moved TENANT to LEGACY, each already carrying a `.masked`. Rule-checker runs 2026-10-18-1125 and -1126
 (VIOLATED, resolved: the control sandboxes' naming shown, then a real freshness check added for the sweep legs).
+**Closed** on GitHub after `bf92acd2`, its row `done` in the close commit (§ CLOSE).
 
 ### (3) #291 — THE DESIGN FOR THE LAST 22 GATES, RULED; D4 BUILT
 Put after rule-checker runs 2026-10-18-1120 to -1123 (VIOLATED, resolved) and -1124 (OK); posted on #291. The
@@ -106,7 +107,7 @@ corpus-wide censuses, `audit_walker_ghost`, three `-debug` gates, `audit_move_pa
 - **#293 follow-up census** (`build/agent205/sbx/`, local): 273 explicit sandbox sites in 168 gates; the 86 with no
   per-run variable read where two runs could reach them, none shared. The #293 shape itself (a variable key whose values
   repeat) is NOT covered by a static read: a dynamic check would refuse an existing sandbox in `tools/run_mame.sh` behind
-  an env flag — put to the maintainer.
+  an env flag — put to the maintainer; ruled *"it's a good idea, do it"*: #296, § (8).
 
 ### (5) #120 — THE REBUILD'S SPEC, DRAFTED AND PUSHED TO ITS OWN REPOSITORY
 - Drafted while tiers ran, from the maintainer's brief and answers (verbatim in `DECISIONS_HISTORY.md`, "#120: the
@@ -116,7 +117,7 @@ corpus-wide censuses, `audit_walker_ghost`, three `-debug` gates, `audit_move_pa
   (local). Rule-checker runs 2026-10-18-1129 to -1132, each VIOLATED and resolved; the last one's finding: the
   index-currency check named no tree, now stamped before and after by `tree_id.py` (both equal the inventory's line).
 - The classes are a script's reading of each gate's code, unconfirmed gate by gate. Phase 0 (the rule-5 extraction,
-  gameplay values first) is work in THIS repository; no ticket moves to the rebuild.
+  gameplay values first) is work in THIS repository; no ticket moves to the rebuild. #120 later closed, § (8).
 
 ### (6) THE FIRST TIER WAS RED: test_poked_legs; THE CENSUS RE-FROZEN
 - The tier on the staged tree (`build/agent205/tier1/`, local): PASS 199, FAIL 1, `test_poked_legs` (the forced-pick census
@@ -138,147 +139,49 @@ corpus-wide censuses, `audit_walker_ghost`, three `-debug` gates, `audit_move_pa
   and its page re-rendered (`build/agent205/s2/gates/audit_dmg_legacy_sweep/sheets/`, local). The other 57 are #291's
   (commented 2026-10-18).
 
-## Session 14z-204 — **#290, #259, #258, #243 closed; #291 S1 landed; test_static_runner to freeze cadence (#292).** Opened 2026-10-17 on Opus 5.5 (the ruled orchestrator); transcript `db2f76be`.
+### (8) #120 CLOSED, #296 STEP 1, THE ROM-CONTENT RULING
+- **#120 closed `done`** at the maintainer's request; what is left is VampireSaved-Rebuilt#1 (the drafts' review, the
+  ledgers' ten flags and their 201 adapted and 18 dropped rules, phase 0 in THIS repository, phase 1's setup, phases
+  1-4). The CLAUDE.md, skills and swarm went to the new repository as `d11c9a3` after rule-checker run 2026-10-18-1134
+  (resolved); the closure after run -1137 (resolved).
+- **#296** (the run-time sandbox guard, the maintainer: *"it's a good idea, do it"*), step 1 built: `MAME_SANDBOX_LOG`
+  in `tools/run_mame.sh` logs per run whether the sandbox already held an earlier run's state; the gate
+  `tests/test_mame_sandbox_log.sh` (ci_portable, a stub binary, control `state-blind`). NEXT: run the emulator lanes
+  with the log on (a remote box) and attribute every reuse; then step 2, refusal by default.
+- **ROM content in the tree, ruled:** addresses and discrete values are fine, whole graphics, sounds and algorithms are
+  not (`DECISIONS_HISTORY.md`, "the no-ROM-bytes rule"); the four quoted sound-driver bytes stay.
+- A page for the maintainer on what a tier does: https://claude.ai/artifact/1DzrvoGUphYYmtyRKvhJtZ (private).
 
-### opened with
-The maintainer: *"read handoff.md, state.md and docs/next_session.md"*. The opener's sweep read CLEAN; `main` at
-`c607b2aa`, pushed; PILOT and ERIS unreachable. Then: *"#286 cannot be done this session (PILOT and ERIS unavailable)
-#290 change installed so you can proceed After #290 you can do #259, #258, #243 in that order"*.
+### (9) THE STATIC TIER'S SCOPE — SIX FAMILIES TO FREEZE (#297), CONTROLS ON A CHANGED PROGRAM (#298), PARALLEL GATES (#299)
+- Asked what a commit or close runs: the static tier only; the emulator tier runs at a freeze and a release (the tiers
+  page, https://claude.ai/artifact/1DzrvoGUphYYmtyRKvhJtZ, private). Asked whether the session scope is too broad, the
+  record measured (`build/agent205/tier_history.py`, local): 104 static runs 2026-10-02..18; session reds by family
+  pipeline 3, review-triage 1, gfx, oracle, mister, tenant 0; 9,367 executed controls since 2026-10-04, all HONOURED;
+  controls 1,500-1,800 s of a close against 600-1,000 s of gates. Ruled (`DECISIONS_HISTORY.md`, "the static tier's
+  scope"): all three, the controls' middle option, and *"Own code changed (Recommended)"* for the moved gates.
+- **#297:** 109 gates to freeze cadence with the `@code` trigger (`tools/static_confirm.py reach`, the R1 closure; a
+  failed reach fails safe); `test_static_runner` 14j, control `code-trigger-off`. Open until a freeze runs them green.
+- **#298:** a stale gate's controls execute at a commit or close only when a program of its reach changed (R1; before,
+  R2/R6 data reads too); on the 14z-205 tier-2 plan 117 -> 17 gates; `test_static_runner` 22d/22e, controls
+  `controls-always`, `controls-never`. To be measured on this close's tier.
+- **#299:** `--jobs N` (`tests/lib/static_job.sh`, a pool, results classified in registry order). Portable tier without
+  controls: 89 gates, the same verdict each, 11 min 7 s serial, 4 min 54 s at 8 jobs (`build/agent205/t299_*`, local).
+  The decrypt cache was already race-safe (atomic rename). NEXT: the full tier with controls, serial against 8 jobs on
+  this close's snapshot.
+- **#296 step 1 on the real binaries:** the emulator prereq lane, 23/23 GREEN with the new `run_mame.sh`; its inventory,
+  324 MAME runs, every one on a fresh sandbox (`build/agent205/t296/`, local).
 
-### (1) #290 — THE INSTALL LANDED; THE TICKET CLOSES
-The maintainer installed `build/agent203/t290/hook_change/INSTALL.md` items 1-3 (the two deny rules,
-`agentlib.hook_bypass_reason`, its rule in `pre_bash.py`). Item 4 landed: the 24 cases in `tests/agent/c01_commands.jsonl`
-(source `14z-203:290`, 68 rows), the five edit-lock rules in `tests/test_agent_hooks.sh`'s installation check, and a
-control `blind-bypass` (13 must-deny rows let through; its CONTROL mode reaches the gate's FAIL). A live probe, `git
-commit --no-verify --dry-run`, was refused by the hook. The hooks' coverage and the index's place are homed in
-`docs/project/snapshot_runs.md` item 6. Rule-checker run 2026-10-17-1109, VIOLATED Q1 Q4: no artifact showed git running
-the installed `pre-commit` here, and the installation check had no control. Resolved: a real `git commit` in a scratch
-worktree was refused by the guard (`build/agent204/close290/live_git_refusal.txt`, local), and a tenth control
-`missing-lock` drops a deny rule from a settings copy; `pre-push` stays proven only in the gate's scratch repository.
-Committed `a2c4df94` through the guard (tier GREEN, PASS 199, on the staged tree); #290 closed `done` on GitHub with its
-comment, its row in this group's next commit.
-
-### (2) #259 — THE PLAN IS 3.4 TIMES FASTER AND NO LONGER SILENT
-Measured first: today's planner on the 14z-195 close's change set (228 paths, a worktree of `23a56fc8`) took 167 s, not
-that day's 20 min 22 s, and the same without the 194 run files (171 s: as changed paths they cost nothing); 124 of 179 profiled seconds were R5:
-the run-record readers searched their whole reach once per run file, 36,023 searches where 1,383 basenames do. Built in
-`tools/static_confirm.py`: one search per basename and the N-F test once per blob, the data files listed once per root,
-`battery_reach.resolve_mod` memoised; `plan` prints progress every 25 gates and a timing line, which
-`tests/run_all_static.sh` now streams (its exit status kept across the pipe). 167 s -> 49 s on that set, one path 21 s ->
-13 s, a plan of today's tree 3 min 39 s -> 52 s, output byte-identical all three (`build/agent204/t259/measurements.txt`,
-local). `tests/test_static_runner.sh` section 18 checks the lines and a failing plan's refusal; the control
-`runs-data-off` follows the hoisted line. The parked #286 patch no longer applied: refreshed as
-`build/agent203/t286/narrowings_on259.patch` (two conflicts resolved, `test_static_confirm` PASS, 30 controls fired).
-Closure checked by rule-checker run 2026-10-17-1110 (VIOLATED Q1 Q3 Q4, resolved: the one-path identity measured, `test_close_tools`
-run on a clean HEAD, and the run files' cost re-measured on the OLD planner — 171 s without them, so they never cost as
-changed paths; the claim that #286 (a) had removed it was retracted).
-Found on the way: `test_close_tools` (ondemand) REFUSES on HEAD's own STATE, its section 2b looking for a findings row
-that #288 removed — put to the maintainer.
-
-### (3) #258 — A READER IS HANDED NOTHING IT CANNOT READ WHOLE
-Measured the readers' Read tool: an error above 256 KB, a PARTIAL view above 25,000 tokens (a 237,343-byte file:
-"lines 1-88 of 401 total (95981 tokens, cap 25000)"), no line cap (3,000 lines whole). 110 staged text artifacts over
-256 KB had gone to readers in 95 of 993 runs. `tools/rulecheck.py prepare` now estimates an artifact's tokens from above (bytes / 2.4 + 2 per
-line: 59,000 bytes in 5,900 short lines was a PARTIAL view at 35,407 tokens, so a byte cap alone was wrong — found by
-rule-checker run 2026-10-17-1111) and refuses one over the caps before the run directory exists, fixtures included; for an indexed archive the refusal
-lists the session's entries as ready `path:a-b` ranges, a range must start at an INDEX entry, a stale INDEX is refused,
-and the packet names the entry to the reader — the maintainer's comment on #258 point by point, quoted in
-`docs/project/rule_checker.md`. `tests/test_rule_checker.sh` PREPARE READ LIMIT section (eight cases, control
-`unlimited-read`; a preflight kept missing artifacts the early check's, or `late-validate` went dead).
-Committed `9443f294`, closed on GitHub. **RETRACTED the same evening: "bytes / 2.4 + 2 per line" was not an estimate
-from above.** After the commit the plant rotation drew `fidelity-14z160-false-statement`, whose 56,338-byte rig file a
-reader sees as a PARTIAL view at 28,713 tokens (the estimate said 25,214), and every `prepare` was refused:
-`test_rule_checker`, `test_packet_check` and `test_claim_lint` red on HEAD (the tier had been green on the plant drawn
-then). Fixed: bytes / 2.0 + 2 per line (above all three measured views), the rotation skips a fixture a reader cannot read
-whole (`plant_readable`), and a PLANT ROTATION section draws every rotation position (control `unfiltered-plants`).
-Two of the three calibrated evidence plants (`fidelity-14z160-false-statement`, `forced-pick-14z159`) were out of
-rotation until their rig files fit; the maintainer: *"Do it this session"*. Their `name_moves.py.txt`, and the negative
-`fidelity-14z160`'s, lost the DONOVAN_VICTIM rigs and the trace-analysis section (one OMITTED marker each; nothing their
-claims cite), read whole, and were recalibrated: runs 2026-10-17-1114 (CAUGHT), -1115 (CAUGHT), -1116 (negative OK beside
-a caught plant). The rotation is back to three readable evidence plants.
-
-### (4) #243 — 24 DECLARATIONS NARROWED, THE OVER-WIDE CHECK, THE REST RULED WHOLE
-Re-measured: 75 gates declared the whole `tests/replays/` (79 at 14z-195), 51 compose a path there, 24 reach only part
-of it. The 24 now declare what their text reaches (reconcile PASS; not access-traced, the basis static); `tools/gate_follows.py
---overwide` refuses a whole-directory declaration whose text composes nothing there (`tests/test_gate_follows.sh` section
-2b, control `replays-rewidened`). A new top-level replay stales 51 gates instead of 75. Put to the maintainer through
-rule-checker run 2026-10-17-1112 (VIOLATED Q1 Q4, resolved): the 51 keep the whole directory, step 1 lands untraced,
-`test_close_tools`' refusal is not filed (`DECISIONS_HISTORY.md` "Ruled 2026-10-17 (14z-204) — #243: …").
-
-### (5) WHERE A TIER'S TIME GOES — test_static_runner TO FREEZE CADENCE; #292 FILED
-Measured on the two closure tiers (about 50 and 45 minutes): controls were about 70% of the gate-and-control time, and
-`test_static_runner`'s 13 controls alone 652-706 s at every tier on record, pulled in because `tools/battery_reach.py`
-(in its reach through the planner) names STATE.md in its own self-test, and the planner counts a quoted literal as a
-direct read: 22 gates re-run with controls on every STATE.md change. The maintainer: *"freeze/release with triggers"*
-for the gate, the real fix *"later since apparently we need PILOT"*. Built: a freeze row in `tests/ci_cadence.tsv` with
-triggers on what the gate runs and reads; on the real runner a STATE.md-only change defers it (GREEN, PASS 120) and a
-`battery_reach.py` change pulls it in (GREEN, PASS 121). Filed #292 for the planner fix, quoting the maintainer that it
-*"may or may not imply removing"* the row.
-Rule-checker run 2026-10-17-1117 (VIOLATED Q1 Q4, resolved: those two runs used the runner's `STATIC_CHANGED_PATHS`
-override, now said, and a run without it pulled the gate in through the real changed set; the cause measured directly,
-`predict` on a STATE.md-only change: 29 gates execute controls, four tools in the gate's reach name STATE.md — on #292).
-
-### (6) WHERE THE SITTING STANDS (written before a context compaction, 2026-10-17 ~23:05) — the NEXT item resolved in (7)
-- Commits, local and not pushed: `a2c4df94` (#290), `9443f294` (#259, #258), `c810e017` (#243, the cadence row, the #258
-  follow-up). All four tickets closed on GitHub; #258 carries a correction comment (the estimate and the plant rotation).
-- In the working tree, for the next commit: #243's `done` row (ticket index refreshed and checked).
-- The next tier's `--confirm` base: `build/agent204/tier3/tier_results.tsv` (GREEN, PASS 199, controls executed).
-- The maintainer's plan: compact, about 2 to 3 hours of tickets, then the close. The tickets are the maintainer's to name
-  (START HERE item 4's list); asked why #292 needs PILOT, the answer: the scorer is strace-based (Linux), the Mac has no
-  Linux route installed, and an `eslogger` backend (needs sudo) or a local Linux VM were offered, not built.
-- The time per tier this sitting: 50, 45 and 58 minutes with setup, controls about 70% of the gate-and-control time.
-- NEXT, the maintainer's choice: **#291 S1** (then more slices if time allows). The ruled design is on #291 (comment of
-  2026-10-16) and `DECISIONS_HISTORY.md` L7157 and L7169 entries. S1 = the `# SHEET:` grammar + `test_sheet_census` (with a
-  shrink-only debt list, as the must-fire retrofit), `tests/lib/sheet.sh` (SHEET_OUT: legs + moments), the capture-and-prove
-  tool (re-run each leg with `tests/lua/snapshot_frames.lua`, work-RAM checksum at each moment vs the gate's, NOT THE
-  JUDGED RUN on a mismatch, plus its ground-truth gate), the one-page HTML, and three exemplars: `audit_move_parity`
-  (events), `test_gfx_menus` (golden frames), `audit_merged_legacy` (anchors + attributed frames). Only reading done so
-  far (snapshot_frames.lua: REPLAY, SNAP_FRAMES, POKES, TRACE_OUT; MAME snapshots to <sandbox>/snap/<set>/NNNN.png); no
-  file changed for #291 yet.
-
-### (7) #291 S1 — THE COMPARATIVE CAPTURE SHEETS: GRAMMAR, CENSUS, HELPER, PROOF, PAGE, THREE EXEMPLARS
-The maintainer's choice after the compaction: *"let's do  #291 S1 (the comparative capture sheets) from START HERE , and
-maybe the other slices if it goes faster than expected"*. Built as ruled:
-- the `# SHEET:` line (`legs <roles> — moments: … — not comparable: …`, `no-reference-leg — …`, `none — …`), homed in
-  `docs/project/gate_header_contract.md`;
-- `tests/test_sheet_census.sh` (static, portable, ~2 s): every emulator-registry gate declares or is on the shrink-only
-  debt list `tests/expected/sheet_debt.txt` (228 rows today, the S2 work list); grammar and reader refusals; four controls;
-- `tests/lib/sheet.sh`: writes only with `SHEET_OUT` set;
-- `tools/proof_sheets.py run|prove|page|census`: re-runs each leg under a NEW instrument, `tests/lua/sheet_capture.lua`.
-  That is a change from the design text, which named `snapshot_frames.lua`: that file checksums nothing, and an option
-  in replay.lua would stale every gate following the oracle core. The new instrument reproduces replay.lua's frozen
-  checksums at f650, f651 and f950;
-- `tests/test_proof_sheets.sh` (emulator, prereq, ~17 s): the ground truth. On the log is PROVEN; one frame shifted is
-  NOT THE JUDGED RUN; fields at f3000 are PROVEN, and one off by one is refused. Anchors are proven and a cap is said. Controls
-  `frame-blind` and `cap-ignored`.
-Exemplars, run at HEAD on the Mac:
-- `test_gfx_menus`: the 3 goldens it compared, plus ours 3/3 PROVEN on its own log;
-- `audit_move_parity` (default 3 parts): 172/172 PROVEN on the 18 traced fields, 38 s;
-- `audit_merged_legacy`: 47 sheets, 604/604 PROVEN on each leg's masked log (214 attributed frames, 390 anchors; replay 37's down at
-  f6489, where the atlas has the KO at f6488); gate PASS, 706 s. **Superseded: 592/592 with 378 anchors.** Rule-checker run
-  2026-10-18-1118 found that the instrument capped anchors silently at 16 (`26_don_arcade_mash` hit it on both legs). Now there is
-  no cap by default, and a set cap is said on the sheet (ground-truth section 4, control `cap-ignored`). That replay draws 22 per leg.
-Found on the way: `tests/lib/sheet.sh`'s row loop `_sf` overwrote audit_merged_legacy's frame variable of that name
-(sh has no locals). The reader refused the sheet. Fixed with the `__sheet_` prefix, plus a census check and the control
-`leaky-helper`; the gotcha is recorded. All three exemplars print identical output with and without `SHEET_OUT`
-(audit_merged_legacy re-run without it for rule-checker run 2026-10-18-1118, resolved). #291 stays open for S2 and S3. Progress comment drafted:
-`build/agent204/t291/c291_s1.md`.
-
-### CLOSE (14z-204, 2026-10-18)
-- The close is driven by `tools/close.py` (run directory `build/agent204/close/`). `start` needed `--row -`: it still
-  looks for the findings section that #288 cut, and none of the steps uses it (not fixed; it rides a later close).
-- Commits this sitting before the close: `a2c4df94` (#290), `9443f294` (#259, #258), `c810e017` (#243, the cadence row, the
-  #258 follow-up), all local until this close's push.
-- Dashboard: figures, rc_runs and tiers re-collected (keys 14z-163..14z-204) and uploaded. **The `costly.json` upload was
-  denied by the auto-mode classifier** at the close. After the push, the maintainer said *"you have my permission"*; the
-  classifier denied it again, and with auto mode off the maintainer said *"retry"*. It was uploaded (asset
-  `a5771b70268d98cab4569737514b7073`, the same 08:05 collection) and `datasets/costly` was moved to it (version 9). The close
-  commit `6dee2be7` still records the denial; this line rides the next close.
-- Steps: sections (this group's (1)-(7), (6) points at (7)); next-session (the 14z-203 opener moved verbatim to
-  `docs/NEXT_SESSION_HISTORY.md`, the opener rewritten); rollover (the 14z-203 group moved verbatim to `STATE_HISTORY.md`, its
-  ledger line at the top); indexes (auto, DONE); dashboard (three of four datasets at the close, the fourth after it, above).
-- The tier runs on a snapshot of the staged tree with `--strict --confirm build/agent204/tier3/tier_results.tsv`; its
-  results are `build/agent204/close/tier_results.tsv`, the next close's `--prev`.
+### CLOSE (14z-205, 2026-10-18)
+- Run directory `build/agent205/close/`; `--prev` is this sitting's tier-2 run (`build/agent205/tier2/tier_results.tsv`,
+  strict GREEN on the tree of `bf92acd2`), not the 14z-204 close's: the same base the commit's guard read, and a plan of
+  ~80 s instead of 2 h 21 min (tier 1's).
+- Steps: sections, next-session (the 14z-204 opener moved verbatim, a new opener), rollover (14z-204's 141 lines to
+  `STATE_HISTORY.md`, byte-equal to HEAD's group, its ledger line on top), indexes (auto), dashboard (four datasets,
+  keys 14z-163..14z-205, 1,797 figures all classed; `datasets/*` re-pointed in one batch) — all DONE.
+- The tier's results: `build/agent205/close/tier_results.tsv` (the next close's `--prev`), on a snapshot of the staged
+  tree; its controls file measures #298's narrowing; the #299 serial-against-8-jobs comparison runs on the same commit
+  after the commit.
+- Commits this sitting: `bf92acd2` (#291 S2, #293, the census re-freeze), then this close's; both local until its push.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings
@@ -286,6 +189,7 @@ Found on the way: `tests/lib/sheet.sh`'s row loop `_sf` overwrote audit_merged_l
 
 One line per ruling that still constrains work: the rule and where its full entry lives. A line is deleted when its ruling stops constraining work (CLAUDE.md [VSP-17]). Shortened to the rule plus its pointer 2026-10-14 (#282 item A); the longer lines are in git history at `44a09f7f`.
 
+- **ROM content in the tree (2026-10-18, 14z-205):** addresses and discrete values are fine; a whole graphic or sound, or a whole algorithm, is not ([VSP-8]; the four quoted sound-driver bytes stay) — `DECISIONS_HISTORY.md` "Ruled 2026-10-18 (14z-205) — the no-ROM-bytes rule: …".
 - **#291's last 22 gates (2026-10-18, 14z-205):** the tap gates prove by an EVENT-PROVEN basis (D2), groups 3-5 take a `no-picture` declaration kind (D4), D4 first — `DECISIONS_HISTORY.md` "Ruled 2026-10-18 (14z-205) — #291 S2: …".
 - **An action is checked when its work is done, never held for the close (2026-10-16, 14z-203):** a ticket is closed and a recommendation put in the piece of work that finishes it, through its rule-checker run then; a run cited in a CLOSE section is the tell — `DECISIONS_HISTORY.md` "Ruled 2026-10-16 (14z-203) — an action is checked when its work is done, never held for the close".
 - **The close's cost must follow the change; #286, #287, #288 are the direct priority (2026-10-15, 14z-202):** controls only on a real change, the procedure check right after each piece of work, the audit layer measured before it is cut — `DECISIONS_HISTORY.md` "Ruled 2026-10-15 (14z-202) — the close's cost must follow the change".

@@ -317,6 +317,7 @@ declares	test_mame_ident
 declares	test_mame_mirror_guard
 declares	test_mame_parity
 declares	test_mame_runner_hygiene
+declares	test_mame_sandbox_log
 declares	test_mame_wide
 declares	test_manifest_merge
 declares	test_map_table_readers

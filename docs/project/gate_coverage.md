@@ -13,13 +13,13 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**464 of 464 gates described.**
+**465 of 465 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
 | [runner](#runner) | 46 | 46 | the suite runners and their own ground truth |
 | [docs](#docs) | 27 | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
-| [platform](#platform) | 48 | 48 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
+| [platform](#platform) | 49 | 49 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
@@ -622,7 +622,7 @@ the documentation locks — docs, skills, indexes, tables follow the tree. 27 of
 
 ## platform
 
-the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene. 48 of 48 described.
+the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene. 49 of 49 described.
 
 ### `audit_release_linux_cleanhost.sh` — audit, emulator
 
@@ -855,6 +855,14 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 **HOW:** section 1 runs every replay with a frozen .sha1 twice on the source build; section 1b runs every row of tests/expected/mame_parity_ab.tsv (the reference binary's own logs, frozen) twice on the source build; sections 2 and 3 run the vsavj and vsav2 replays frozen in neither on both binaries and compare directly (skipped LOUDLY without the reference binary — with every replay frozen, nothing is left to skip).
 
 **EXPECTS:** every frozen log reproduced, every A/B identical; a red means the instrument moved and every MAME finding since is in question.
+
+### `test_mame_sandbox_log.sh` — test, ci_portable
+
+**WHAT:** tools/run_mame.sh's sandbox inventory — one line per run (UTC time, fresh|reused, the set, the sandbox, the calling `tests/<gate>.sh` or "-"), the state read BEFORE the run writes anything; "reused" means an entry under cfg/, nvram/, sta/ or diff/ of the sandbox; an empty directory a gate made itself, or a snap/ written by a capture, is "fresh"; unset, nothing is written; the #196 fallback inventory still names its gate after the shared lookup.
+
+**HOW:** runs a copy of the wrapper (beside the real tests/lib it sources) with MAME_BIN a stub that writes an nvram file into the -nvram_directory it is handed, as MAME does at exit, and reads the log: a mktemp sandbox, a new named sandbox twice (the second run is #293's shape), a pre-made empty sandbox with an empty cfg/, a sandbox holding only snap/, a run from a fixture `tests/<gate>.sh,` and a run with the log unset. The control runs a copy whose state read is neutered.
+
+**EXPECTS:** fresh, fresh then reused, fresh, fresh, the fixture's gate name in the gate column, no log at all when unset, and the fallback line naming the fixture gate.
 
 ### `test_mame_wide.sh` — test, emulator
 

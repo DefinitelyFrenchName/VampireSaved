@@ -16,13 +16,13 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**464 scripts** — 135 ci_portable, 92 ci_static, 237 emulator-tier (run by name).
+**465 scripts** — 136 ci_portable, 92 ci_static, 237 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
 | [runner](#runner) | 46 | the suite runners and their own ground truth |
 | [docs](#docs) | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
-| [platform](#platform) | 48 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
+| [platform](#platform) | 49 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
@@ -153,6 +153,7 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 | `tests/test_mame_determinism.sh` | test | emulator | MAME | is MAME actually deterministic, run to run? | session 14z |
 | `tests/test_mame_ident.sh` | test | ci_static | ROMDIR | A GATE'S HEADER NAMES WHICH MAME RAN (14z-195, rule-checker run 2026-10-08-740 Q1). ci_static: stub binaries only, no emulator, <1 s. | 14z-195 |
 | `tests/test_mame_parity.sh` | test | emulator | MAME, FBNeo, ~16 s | B5 PREREQUISITE: the pinned MAME source build must be indistinguishable from the binary that froze the oracle, BEFORE any profile patch is applied to it. | 14z-187b |
+| `tests/test_mame_sandbox_log.sh` | test | ci_portable | — | with MAME_SANDBOX_LOG set, tools/run_mame.sh logs whether each run's sandbox already held an earlier run's MAME state (14z-205, #296 step 1). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-205 |
 | `tests/test_mame_wide.sh` | test | emulator | MAME, FBNeo, a build dir | CPS-2 WIDE profile gate, MAME side (B5). | session 14z |
 | `tests/test_null_build.sh` | test | ci_static | ROMDIR | M0 acceptance: the null-patch build reproduces vanilla vsavj bit-identically from reference inputs, deterministically. | M0 |
 | `tests/test_phasec_image.sh` | test | emulator | MAME, FBNeo, a build dir | Phase C step 2: the program image grows, and the extension is genuinely READ. | 14z-59g |

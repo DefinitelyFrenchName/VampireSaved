@@ -175,6 +175,7 @@ declares	test_mame_default_bin
 declares	test_mame_ident
 declares	test_mame_parity
 declares	test_mame_runner_hygiene
+declares	test_mame_sandbox_log
 declares	test_map_table_readers
 declares	test_md_subset
 declares	test_measures_contract

@@ -15,6 +15,14 @@ shift
 ROMDIR="${ROMDIR:?set ROMDIR to the reference-set directory}"
 
 SANDBOX="${MAME_SANDBOX:-$(mktemp -d)}"
+# THE SANDBOX INVENTORY (14z-205, GitHub #296 step 1), opt-in and inert unless asked: read BEFORE this run writes
+# anything, whether the sandbox already holds an earlier MAME run's state (any entry under cfg/, nvram/, sta/ or diff/
+# — the directories MAME writes; an empty directory a gate made itself does not count). #293's two gates named a
+# sandbox after part of a run's identity, so a later run booted on an earlier run's nvram and nothing failed.
+_sbstate=fresh
+for _sbd in cfg nvram sta diff; do
+    [ -n "$(ls -A "$SANDBOX/$_sbd" 2>/dev/null)" ] && _sbstate=reused
+done
 mkdir -p "$SANDBOX"
 
 # MAME_ROMPATH overrides the rompath (e.g. "patched_dir;$ROMDIR" for patched
@@ -81,18 +89,26 @@ if [ "$VS_NATIVE" = 1 ]; then
 else
     NSANDBOX="$SANDBOX"
 fi
-# THE FALLBACK INVENTORY (14z-188, GitHub #196), opt-in and inert unless asked: with MAME_FALLBACK_LOG set, a run
-# that runs with MAME_BIN UNSET (since 14z-189 it takes the pinned default by set name; before, `mame` on PATH) appends one line — the UTC time, the set, and the first
-# tests/<gate>.sh among this process's ancestors (or "-") — so one emulator tier names every gate that depends on
-# what `mame` happens to be. Nothing is printed and nothing else changes; unset, the line below never runs.
-if [ -z "${MAME_BIN:-}" ] && [ -n "${MAME_FALLBACK_LOG:-}" ]; then
+caller_gate() {  # the first tests/<gate>.sh among this process's ancestors, or "-" (the two inventories below)
     _fg="-"; _fp=$PPID; _fi=0
     while [ "$_fi" -lt 12 ] && [ -n "$_fp" ] && [ "$_fp" != 0 ] && [ "$_fp" != 1 ]; do
         _fa="$(ps -o args= -p "$_fp" 2>/dev/null || true)"
         case "$_fa" in *tests/*.sh*) _fg="$(printf '%s\n' "$_fa" | tr ' ' '\n' | grep -m1 'tests/[^/]*\.sh$' || echo -)"; break ;; esac
         _fp="$(ps -o ppid= -p "$_fp" 2>/dev/null | tr -d ' ' || true)"; _fi=$((_fi + 1))
     done
-    printf '%s\t%s\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$SET" "$_fg" >> "$MAME_FALLBACK_LOG" 2>/dev/null || true
+    echo "$_fg"
+}
+# With MAME_SANDBOX_LOG set (#296 step 1), one line per run: UTC time, fresh|reused, the set, the sandbox, the gate.
+# Nothing is printed and nothing else changes; unset, the line below never runs.
+if [ -n "${MAME_SANDBOX_LOG:-}" ]; then
+    printf '%s\t%s\t%s\t%s\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_sbstate" "$SET" "$SANDBOX" "$(caller_gate)" >> "$MAME_SANDBOX_LOG" 2>/dev/null || true
+fi
+# THE FALLBACK INVENTORY (14z-188, GitHub #196), opt-in and inert unless asked: with MAME_FALLBACK_LOG set, a run
+# that runs with MAME_BIN UNSET (since 14z-189 it takes the pinned default by set name; before, `mame` on PATH) appends one line — the UTC time, the set, and the first
+# tests/<gate>.sh among this process's ancestors (or "-") — so one emulator tier names every gate that depends on
+# what `mame` happens to be. Nothing is printed and nothing else changes; unset, the line below never runs.
+if [ -z "${MAME_BIN:-}" ] && [ -n "${MAME_FALLBACK_LOG:-}" ]; then
+    printf '%s\t%s\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$SET" "$(caller_gate)" >> "$MAME_FALLBACK_LOG" 2>/dev/null || true
 fi
 if [ -z "${MAME_BIN:-}" ]; then
     case "$SET" in

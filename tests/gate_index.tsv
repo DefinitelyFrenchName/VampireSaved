@@ -103,6 +103,7 @@ tests/test_build_identity_distinct.sh	pipeline
 tests/test_commit_subject.sh	docs
 tests/test_entropy_tripwire.sh	review-triage
 tests/test_mame_runner_hygiene.sh	review-triage
+tests/test_mame_sandbox_log.sh	platform
 tests/test_package_release_safety.sh	review-triage
 tests/test_applier_key_first.sh	review-triage
 tests/test_launcher_newest.sh	review-triage
