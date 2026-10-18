@@ -11,7 +11,9 @@
 #   --freeze regenerates the goldens from vanilla.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/vsavj/menus/
 #   tests/lua/replay.lua tests/replays/02_demitri_vs_cpu.rpl tools/run_mame.sh
-#   tools/setup_mame.sh
+#   tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vsavj,ours — moments: the three golden frames, 650 title, 950 select, 1250 speed menu — not comparable: the medallion cell box on 950 and 1250, masked by design (the wheel is ported, 14z-49)
 #
 # WHY THIS EXISTS: every RAM-basis gate is blind to graphics. The
 # session-14r overlay tile placements corrupted the title screen,
@@ -91,7 +93,7 @@ if [ "$FREEZE" = 1 ]; then
     exit 0
 fi
 
-python3 - "$SB/snap/$SET" "$GOLD" <<'EOF'
+python3 - "$SB/snap/$SET" "$GOLD" > "$SB/px.txt" <<'EOF' && px=0 || px=$?
 import sys, os
 from PIL import Image
 snapdir, gold = sys.argv[1], sys.argv[2]
@@ -120,4 +122,22 @@ for i, fr in enumerate(frames):
         print(f"  ok: frame {fr} pixel-identical{tag}")
 sys.exit(1 if fail else 0)
 EOF
+cat "$SB/px.txt"
+
+# THE SHEET (#291): with SHEET_OUT set, the legs and frames this run judged; nothing else changes. The vanilla row is
+# the frozen golden itself (what was compared), ours is proven on this run's checksum log.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on; then
+    sheet_new menus "Title, character select and speed menu: vanilla goldens above ours" - - \
+        "the medallion cell box on 950 and 1250, masked by design (the wheel is ported, 14z-49)"
+    sheet_leg menus gold vsavj vsavj "$ROMDIR" "$REPO/tests/replays/02_demitri_vs_cpu.rpl" - 1251
+    sheet_leg menus ours ours "$SET" "$ROMPATH" "$REPO/tests/replays/02_demitri_vs_cpu.rpl" - 1251 "$SB/r.log"
+    for fr in 650 950 1250; do
+        v="$(awk -v f="$fr" '$0 ~ ("frame " f "[: ]") {print ($1 == "ok:") ? "pixel-identical" : "DIFF"; exit}' "$SB/px.txt")"
+        sheet_moment menus "f$fr" "frame $fr" "${v:-no verdict}"
+        sheet_at menus "f$fr" gold "$fr" file "$(sheet_file menus "golden_$fr.png" "$GOLD/frame_$fr.png")"
+        sheet_at menus "f$fr" ours "$fr" log
+    done
+fi
+[ "$px" = 0 ] || exit "$px"
 echo "PASS: menu gfx gate"

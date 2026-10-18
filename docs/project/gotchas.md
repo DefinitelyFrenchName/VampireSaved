@@ -7246,3 +7246,11 @@ The first read-limit estimate took its bytes-per-token ratio from the densest fi
 called the result an upper bound. Code tokenises denser per byte than that once its line-number prefix is counted: a
 56,338-byte rig file of 870 lines cost 28,713 tokens against an estimate of 25,214. **The rule:** an upper bound is
 measured on every kind of input it will judge (here: digits, short lines, code), and re-checked when a new kind appears.
+
+## A SOURCED sh HELPER'S LOOP VARIABLE OVERWRITES THE CALLER'S OF THE SAME NAME (paid: 14z-204, #291)
+
+`tests/lib/sheet.sh`'s row writer looped `for _sf in "$@"`, and `tests/audit_merged_legacy.sh` read its frame into
+`_sf` before calling `sheet_moment` then `sheet_at "$name" … "$_sf" log`: sh has no locals, so the first call left `_sf`
+holding the moment row's last field, `-`, and the at-rows of a 12-minute gate run carried frame `-` (every one of the
+ten listed; the sheet held 214). The sheet reader refused the file, which is how it was seen. **The rule:** a sourced sh library assigns only names under its own prefix
+(`__sheet_` here), and its census checks that (`tests/test_sheet_census.sh` section 4, control `leaky-helper`).

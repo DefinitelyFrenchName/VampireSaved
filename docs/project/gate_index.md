@@ -16,11 +16,11 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**462 scripts** — 134 ci_portable, 92 ci_static, 236 emulator-tier (run by name).
+**464 scripts** — 135 ci_portable, 92 ci_static, 237 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 44 | the suite runners and their own ground truth |
+| [runner](#runner) | 46 | the suite runners and their own ground truth |
 | [docs](#docs) | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 48 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -68,6 +68,7 @@ the suite runners and their own ground truth.
 | `tests/test_must_fire_census.sh` | test | ci_portable | — | THE MUST-FIRE DOCTRINE, MACHINE-READ under the R10 grammar: which gates DECLARE a must-fire control (`# MUST-FIRE: <shape>: | 14z-145 |
 | `tests/test_poke_readback.sh` | test | ci_portable | — | EVERY GATE THAT SAMPLES AN ADDRESS ITS OWN RIG POKES IS ON THE TABLE, and the table's classification is the maintainer's, not the tool's (GitHub #171 slice Q6, shape 4 of docs/project/gate_qualification_scope.md). ci_portable: | 14z-180 |
 | `tests/test_promise_check.sh` | test | ci_portable | — | every promise a sitting's record makes is classed FULFILLED, CARRIED or NOT A PROMISE, and each class holds (`tools/promise_check.py`, 14z-187b, GitHub #190 P3). | 14z-187b |
+| `tests/test_proof_sheets.sh` | test | emulator | MAME, ~17 s | THE COMPARATIVE SHEETS' PROOF IS ITSELF TESTED ([VSP-19]; GitHub #291 slice S1, 14z-204). | 14z-204 |
 | `tests/test_py_escapes.sh` | test | ci_portable | — | NO TRACKED PYTHON FILE CARRIES AN INVALID STRING ESCAPE (14z-191). ci_portable: no ROM, ~3 s. | 14z-191 |
 | `tests/test_rule_checker.sh` | test | ci_portable | — | the adversarial RULE-CHECKER's record is sound: every run in tests/rulecheck/ledger.tsv is complete and structured, every planted violation was caught, every fixture is calibrated, every VIOLATED resolved, and every freeze since the checker… | 14z-163 |
 | `tests/test_rulings_verbatim.sh` | test | ci_portable | — | a quote a session attributes to the maintainer is the maintainer's own words, and every message the maintainer sent is on record (`tools/agent/rulings_verbatim.py`, 14z-185b, #190 P2). | 14z-185b |
@@ -75,6 +76,7 @@ the suite runners and their own ground truth.
 | `tests/test_run_record.sh` | test | ci_portable | — | a runner's record of what it ran on names every change to what it recorded (`tools/run_record.py`, 14z-185b, GitHub #189: "R-reach, both runners"). | 14z-185b |
 | `tests/test_scratch_census.sh` | test | ci_portable | — | every scratch program a session wrote is classed, and each class holds (`tools/scratch_census.py`, 14z-185b, GitHub #190 P4). | 14z-185b |
 | `tests/test_session_metrics.sh` | test | ci_portable | — | the session dashboard's collector reads every source as its rule says and labels every figure with its class (`tools/session_metrics.py`, 14z-198, GitHub #264). | 14z-198 |
+| `tests/test_sheet_census.sh` | test | ci_portable | — | EVERY EMULATOR GATE SAYS WHAT ITS COMPARATIVE SHEET SHOWS, OR IS ON THE RETROFIT'S DEBT LIST (GitHub #291 slice S1, 14z-204; the design ruled 2026-10-17: "Declared in each gate (Recommended)"). | 14z-204 |
 | `tests/test_shell_portability.sh` | test | ci_portable | — | a `#!/bin/sh` script must actually be POSIX sh (14z-90, GitHub issue #15). | 14z-90 |
 | `tests/test_static_confirm.sh` | test | ci_portable | — | the static tier's carry-forward predictor marks a gate STALE by every rule it states (`tools/static_confirm.py`, 14z-185b, GitHub #188 route A — wired 14z-188). | 14z-185b |
 | `tests/test_suite_dispatch.sh` | test | emulator | MAME, a build dir | ground truth for the auto-detecting runner's dispatch pieces (no emulator needed; the emulator-side behaviors they gate are proven by test_m2_repoint.sh and the suite itself): 1. build_fingerprint: vanilla rompath -> 'vsavj'; | 14z-132 |

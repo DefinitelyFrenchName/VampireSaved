@@ -13,11 +13,11 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**462 of 462 gates described.**
+**464 of 464 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
-| [runner](#runner) | 44 | 44 | the suite runners and their own ground truth |
+| [runner](#runner) | 46 | 46 | the suite runners and their own ground truth |
 | [docs](#docs) | 27 | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 48 | 48 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -30,7 +30,7 @@ first sentence) is `gate_index.md`.
 
 ## runner
 
-the suite runners and their own ground truth. 44 of 44 described.
+the suite runners and their own ground truth. 46 of 46 described.
 
 ### `run_all_emulator.sh` — run, emulator
 
@@ -280,6 +280,14 @@ the suite runners and their own ground truth. 44 of 44 described.
 
 **EXPECTS:** SELFTEST PASS (ten cases); each control's copy SELFTEST FAIL.
 
+### `test_proof_sheets.sh` — test, emulator
+
+**WHAT:** tools/proof_sheets.py proves a picture only when the re-run leg's state at that frame equals what the gate logged there: a moment on the gate's own checksum log is PROVEN, the same checksum claimed one frame later is NOT THE JUDGED RUN, a correct field expectation is PROVEN and one value off by one is refused, a basis `none` is shown UNPROVEN; and tests/lua/sheet_capture.lua's masked checksum equals replay.lua's frozen log frame for frame; a sheet asking for anchors gets every anchor its leg reaches, each proven on the log, and a set ANCHOR_MAX is said on the sheet, never silent (rule-checker run 2026-10-18-1118: a silent cap of 16 dropped rounds).
+
+**HOW:** a fixture SHEET_OUT on pristine vsavj (02_demitri_vs_cpu to frame 3001): the frozen masked vanilla log (tests/expected/vsavj/masked-v2) is the "gate's log", the masked-v2 mask the leg's; the field values are taken from tests/lua/field_trace.lua run live on the same inputs; `proof_sheets.py prove` on the fixture; one control.
+
+**EXPECTS:** the six verdicts above, each picture present; PASS. It does not claim any gate's sheet is complete — the census (tests/test_sheet_census.sh) and each gate's own verdict do that part.
+
 ### `test_py_escapes.sh` — test, ci_portable
 
 **WHAT:** every tracked .py under tools/ and tests/ compiles with invalid-escape warnings turned into errors (DeprecationWarning on Python <= 3.11, SyntaxWarning from 3.12) — so no host's Python warns on it today and none refuses it when the warning becomes an error.
@@ -335,6 +343,14 @@ the suite runners and their own ground truth. 44 of 44 described.
 **HOW:** builds a SYNTHETIC repository and project directory (no real transcript is committed: one carries the user's identity) holding every shape the collector must read right — a session key and its letter continuation (14z-9 / 14z-9b), a ledger row keyed by the transcript id instead of the key, an assistant message spread over two records (one usage), a mid-turn message recorded as a queue enqueue AND a user record (one message), harness noise, a transcript id on one STATE heading and none on the other (mapped by its commits), a tier run inside the span and one outside it — and requires the collector's exact figures; then `check` must pass, a PLANTED ledger row must move the run count by exactly one, and three controls run shadow copies with one perturbation each, each of which must fail the comparison for its own reason.
 
 **EXPECTS:** 14z-9: 4 rule-checker runs (one keyed by its transcript id), 2 VIOLATED, Q1/Q4/QP3 1 each, 3 packets, 1 re-check, longest 2; 1 commit (14z-9b's not counted); 3 findings; 2 retracted wordings; 2 tickets; 2 maintainer messages; reply median 10.0 min; 700 output tokens; 1 worker; 1 tier run, 0.03 h, 1 FAIL. 14z-10: its transcript found by its commit (DERIVED). check: 0 bad. The plant: 5 runs. Each control FIRES.
+
+### `test_sheet_census.sh` — test, ci_portable
+
+**WHAT:** every gate of the emulator registry (tests/ci_emulator.tsv) carries exactly one well-formed `# SHEET:` line in its leading comment block (`legs <roles> — moments: … — not comparable: …`, `no-reference-leg — <reason>` or `none — <reason>`) or is on the shrink-only debt list tests/expected/sheet_debt.txt; a `legs` gate sources tests/lib/sheet.sh; the declaration grammar and the sheet file's reader refuse what they must; tests/lib/sheet.sh assigns only `__sheet_` names (sh has no locals, and a gate's own variable must survive a call).
+
+**HOW:** tools/proof_sheets.py's own reader (`census`, `parse_declaration`, `read_sheet`) — the one the sheet tool uses — over tests/, the registry and the debt list; fixture declarations and sheet files for the refusals; four controls on perturbed copies.
+
+**EXPECTS:** PASS with the census counts; a red names the gate with no line, a malformed line, a legs gate that writes no sheet, or a debt row that should be gone. It does not claim a sheet is RIGHT: tests/test_proof_sheets.sh proves the pictures, and each gate's verdict is its own.
 
 ### `test_shell_portability.sh` — test, ci_portable
 

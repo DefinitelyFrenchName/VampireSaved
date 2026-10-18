@@ -373,6 +373,7 @@ declares	test_power_decode
 declares	test_projectile_census
 declares	test_projectile_params
 declares	test_promise_check
+declares	test_proof_sheets
 declares	test_py_escapes
 declares	test_pyron_blink
 declares	test_pyron_cosmo
@@ -429,6 +430,7 @@ declares	test_session_close
 declares	test_session_metrics
 declares	test_shadow_tenant
 declares	test_shared_writes
+declares	test_sheet_census
 declares	test_shell_portability
 declares	test_shim_charid
 declares	test_sim_wram_contract

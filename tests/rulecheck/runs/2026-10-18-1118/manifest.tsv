@@ -1,0 +1,16 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent204/t291/c291_s1.md	81683b4b44812957038501f42a36fe212c9913f6
+DECISIONS_HISTORY.md.lines-7157-7186 (lines 7157-7186 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-16 (14z-203) — #291: the comparative capture sheets' scope, output, frames and buil", and the entries after it up to line 7186)	5c3ba22ab115fcafcb98b6400f28ae4b3e919a59
+tools/proof_sheets.py	955197f6656e035efa7c73997f93a83689e20987
+tests/lib/sheet.sh	cbd57ef99153f1ac50d99376f162b064c6fbeb94
+tests/lua/sheet_capture.lua	ac72b8eb31ec4cef1c3fb2825b4841a468320009
+tests/test_sheet_census.sh	10b4f31805e565772ff21c51903145a17a1bddeb
+tests/test_proof_sheets.sh	b70c5630fa1ac6bd5dceca7099b032fcf7106247
+build/agent204/t291/s1_tracked.diff	fe079a23dbf2414a55e1043f83e586b35f17e003
+build/agent204/t291/census_gate.log	ddd50250d1665eed9a82146eca90f514f2711693
+build/agent204/t291/proof_gate.log	4e92593e5ceb78ef11753a44435d04200658533c
+build/agent204/t291/control_modes.txt	4d1fa285d9d6566b276f7ea9071eea2f4d9a3e49
+build/agent204/t291/proof_test_gfx_menus.tsv	f1e8a01546a2738ce0aef0efed2b14161f40b471
+build/agent204/t291/proof_audit_move_parity.tsv	26a17c4e755d443415002cb94a223de9306c0e1e
+build/agent204/t291/proof_audit_merged_legacy_summary.txt	50d1324ba04c25a6ba54d87e842603f3538dbd6f
+build/agent204/t291/run_audit_merged_legacy.out	452c96bb25bce2ad896039936e3936b70cdf9149

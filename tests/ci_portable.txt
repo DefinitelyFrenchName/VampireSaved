@@ -390,3 +390,7 @@ test_session_close
 # 14z-203 (#290, ruled 2026-10-16): the green guard — tools/git-hooks/pre-commit refuses a commit whose tree has no
 # strict GREEN whole-tier run with ROMDIR set, pre-push checks the pushed tip; the real runner's row; two controls. ~5 s.
 test_green_guard
+#
+# 14z-204 (#291 slice S1): every emulator-registry gate declares its comparative sheet (`# SHEET:`) or is on the
+# shrink-only debt list tests/expected/sheet_debt.txt; the grammar and the sheet reader's refusals; four controls. ~2 s.
+test_sheet_census

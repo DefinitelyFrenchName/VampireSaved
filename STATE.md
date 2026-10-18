@@ -38,100 +38,7 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
-## Session 14z-203 — **An action is checked when its work is done.** Opened 2026-10-16 on Opus 5.5 (the ruled orchestrator); transcript `d000b849`.
-
-### opened with
-The maintainer: *"read handoff.md, state.md and docs/next_session.md"*. The opener's sweep read CLEAN; `main` at
-`d3c980a7`, pushed.
-
-### (1) THE BEFORE-AN-ACTION CHECK AND THE CLOSE — ruled a working rule
-The maintainer asked whether keeping the before-an-action check kept it at the close too. No close step runs one since
-#288, but a ticket closure or recommendation left for the end brings its check there (the 14z-202 close's run
-2026-10-16-1100). Ruled: each is done in the piece of work that finishes it — `DECISIONS_HISTORY.md` "Ruled 2026-10-16
-(14z-203) — an action is checked when its work is done, never held for the close"; `docs/project/session_close.md` item
-7 and `docs/project/rule_checker.md` carry it. Then, asked whether the check runs at each worker report: no, before an
-action only; the maintainer kept that and had a run on every report the next step builds on added to #289 as a potential
-decision (its comment of 2026-10-16; the same `DECISIONS_HISTORY.md` entry).
-
-### (2) #290 — THE GREEN GUARD'S DESIGN, RULED
-The design (`build/agent203/t290/design.md`, local) went to the maintainer through rule-checker run 2026-10-16-1102
-(VIOLATED Q1 Q4, resolved in the design). Ruled: a `pre-commit` hook refuses a commit whose tree has no strict GREEN
-whole-tier run with `ROMDIR` set, and a `pre-push` hook checks the pushed tip's tree only; any ruled tier form counts,
-and also `--confirm --exec-controls none` once measured; the close runs its tier on a snapshot of the staged tree, then
-commits; the git hooks join the edit-lock. `DECISIONS_HISTORY.md` "Ruled 2026-10-16 (14z-203) — #290: the green guard
-sits at the commit, with a light push check on the tip". The close-form tier run on `da26e094` for the design's cost
-figure (GREEN, PASS 198, about 40 minutes, 177 controls executed on a doc-only change) shows #286's done-when not met.
-
-### (3) #290 BUILT — the green guard
-`tools/git-hooks/green_guard.py` behind `pre-commit` (the index's tree) and `pre-push` (each pushed tip's tree);
-`tests/run_all_static.sh` writes the tree it tested and its verdict and scope into its results file and one row into
-`.git/green_index.tsv`, outside the tree (none when the tree moved); `tests/run_on_snapshot.sh` hands it the working repository's index
-and keeps the results file in the record. Gate `tests/test_green_guard.sh` (ci_portable; controls
-`guard-ignores-tree`, `guard-ignores-strict`). The close's table now stages, tiers a snapshot of the staged tree, then
-commits (`docs/project/session_close.md`). The edit-locked half (two deny rules and a `pre_bash.py` refusal of
-`--no-verify` and of a `core.hooksPath` change) is drafted for the maintainer in
-`build/agent203/t290/hook_change/INSTALL.md` (local); until it is installed the session can bypass the hooks. #290's
-comment of 2026-10-16 carries the details.
-Its first tiers, on snapshots of the staged tree: a red on a ledger row staged without its run directories (mine,
-fixed by staging them); then three reds the new gate's registry freezes owed (`test_must_fire_census`,
-`test_gate_descriptions`, `test_gate_coverage_current`), and the live hook REFUSED the commit on that NOT GREEN row
-(`build/agent203/t290/live_refusal.txt`, local). Two facts from the plans: the index under `build/` matched
-`static_confirm.py`'s R6 template `build/$b` and staled gates on every run, so it moved to `.git/green_index.tsv`;
-and a `--confirm` on a run made with `--exec-controls none` re-runs every gate that run judged without its controls
-(the reason "0 of its N declared controls executed and honoured in the previous run" in the stopped run's plan, `build/agent203/mid4.log`, local), so a mid-session confirm is based on the newest run that EXECUTED its controls, not the newest.
-
-### (4) #291 FILED — on-demand comparative capture sheets
-The maintainer asked for a ticket: a tool that takes a tag or commit and draws the comparison sheet (ours against
-vsavj and/or vsav2) for every test that compares them, *"a visual proof of accuracy for humans"*. Filed as #291
-(evolution) with the need verbatim. Asked four questions, the maintainer ruled: every comparing test with filters, one
-browsable page, the moments each test itself judges, ours built from the commit (`DECISIONS_HISTORY.md` "Ruled 2026-10-16
-(14z-203) — #291: …"). Next: the census of comparing tests, then a design to the maintainer.
-
-### (5) FOUR TICKETS PUT AND RULED — #291's census and design, #261, #256, #286
-One packet went to the maintainer after three rule-checker runs (2026-10-16-1103, 2026-10-17-1104, -1105; each VIOLATED,
-each finding fixed: a census that skipped 152 gates on their header alone, a battery cost summing FAILed rows, a #261
-count change the gate's own header recorded). Posted on each issue; ruled (`DECISIONS_HISTORY.md` "Ruled 2026-10-17
-(14z-203) — #261 freeze as measured, …").
-- **#291:** all 231 emulator gates classified with a basis per row (`build/agent203/t291/census_all.tsv`, local): 67
-  compare our build against vsavj and/or vs2. The design (each gate declares `# SHEET:` and writes the moments it judged;
-  the tool re-runs the legs and proves each picture against the gate's RAM checksum) is ruled with four answers. Next: S1.
-- **#286:** the PILOT traces show 31 of the 44 gates mid2 re-ran as STALE never open any of the three changed files
-  (`build/agent203/t286_trace_return.txt`) — candidate false re-runs, to be narrowed with a trace score (git-mediated reads
-  are invisible to it). The done-when is amended (the maintainer: *"Keep (c), amend done-when"*). Two readouts fixed in
-  `tests/run_all_static.sh`: executed and carried controls apart (mid1's "executed: 378" was 177 run plus 201 carried),
-  and a cadence-deferred gate listed as `defer`, not `re-run`; `tests/test_static_runner.sh` section 22 checks both.
-
-### (6) #261 FROZEN AND #256 FIXED — BOTH CLOSED
-- **#261:** `audit_effect_class_rows` section 4 runs before section 5 and its runs are held to frozen game clocks (leg
-  `merged`); `build/manifest/type6_fallback.toml` freezes 0/0/0/0/270/1232 on merged-m23; the registry passes
-  `BUILD=%MERGED%`. The 14z-89 counts (387, 948) had moved; recorded unattributed as ruled, with the old-clock run on this
-  build (388, 1316) in the frozen header. Rule-checker run 2026-10-17-1106 (VIOLATED Q1, resolved). The battery runner's
-  pass: PASS 242 s.
-- **#256:** `close_standing.py open-tickets` expands a cited `#A-#B` range; the self-test plants one, and the
-  `range-ends` control proves it.
-- **Committed `bd620817`** (tier GREEN, PASS 208, on the staged tree). #261 and #256 then CLOSED `done` through
-  rule-checker run 2026-10-17-1107 (VIOLATED Q1 Q4: evidence the packet lacked, gathered in
-  `build/agent203/close261_256/evidence.txt`, local).
-- **Paid twice this session:** a gate script edited while it ran (the static runner's own gate; the battery pass of
-  `audit_effect_class_rows`, which died on a shell syntax error). Both runs were discarded and re-run untouched.
-
-### (7) WHEN TO COMMIT — RULED; #286 NARROWED, AWAITING A TRACE SCORE
-- **The commit rule** (`DECISIONS_HISTORY.md` "Ruled 2026-10-17 (14z-203) — when to commit: …"; `docs/project/working_methods.md` "When to commit"): commit only at a closure, a freeze or release, remote work, or the close, and run the bookkeeping gates before every tier. Rule-checker run 2026-10-17-1108 (VIOLATED Q1 Q4, resolved).
-- **#286:** three narrowings in `tools/static_confirm.py` (N-I scoped `git ls-files`, N-J a walk OF the directory for N-G, N-F without the planner's own text), each with a self-test case and a control in `tests/test_static_confirm.sh` (PASS, every control fired). The scorer `tools/trace_static_reads.py` judges each read by `whole_covers`. **Not landed:** scoring on a trace of every gate needs PILOT, unavailable for a few days (the maintainer, 2026-10-17). Parked at the close as `build/agent203/t286/narrowings.patch` (local, 428 lines, `git apply --check` clean on the close's tree); measured on today's tree, mid2's change set 58 → 50 STALE, a new run record 33 → 31, none added (#286 comment).
-
-### CLOSE (14z-203, 2026-10-17)
-The maintainer: *"let's close, we're at 75% context"*. Run directory `build/agent203/close/` (local); the tier's results
-`build/agent203/close/tier_results.tsv`, the next close's `--prev`. No rule-checker run is held for this close: every
-closure and recommendation of the sitting had its run when its work finished (1103-1108). Not landed and carried to
-the next sitting: the #286 narrowings (`build/agent203/t286/narrowings.patch`, awaiting a trace score on PILOT); #290
-awaits the maintainer's install of `build/agent203/t290/hook_change/INSTALL.md`; #291 S1 not started.
-- **Steps** (`tools/close.py`, run `build/agent203/close/`): sections, next-session (the 14z-202 opener moved verbatim), rollover
-  (the 14z-202 group to STATE_HISTORY with its ledger line; `check_state_lists` PASS), indexes (auto, DONE), dashboard (four
-  datasets re-collected, 1,716 figures all classed, uploaded and re-pointed); then stage, the tier on the staged tree
-  (`--strict --confirm build/agent203/tier9_results.tsv`, results `build/agent203/close/tier_results.tsv`), the commit
-  through the green guard, the sweep, the push.
-
-## Session 14z-204 — **#290 closed; #259, #258, #243 next.** Opened 2026-10-17 on Opus 5.5 (the ruled orchestrator); transcript `db2f76be`.
+## Session 14z-204 — **#290, #259, #258, #243 closed; #291 S1 landed; test_static_runner to freeze cadence (#292).** Opened 2026-10-17 on Opus 5.5 (the ruled orchestrator); transcript `db2f76be`.
 
 ### opened with
 The maintainer: *"read handoff.md, state.md and docs/next_session.md"*. The opener's sweep read CLEAN; `main` at
@@ -210,6 +117,66 @@ triggers on what the gate runs and reads; on the real runner a STATE.md-only cha
 Rule-checker run 2026-10-17-1117 (VIOLATED Q1 Q4, resolved: those two runs used the runner's `STATIC_CHANGED_PATHS`
 override, now said, and a run without it pulled the gate in through the real changed set; the cause measured directly,
 `predict` on a STATE.md-only change: 29 gates execute controls, four tools in the gate's reach name STATE.md — on #292).
+
+### (6) WHERE THE SITTING STANDS (written before a context compaction, 2026-10-17 ~23:05) — the NEXT item resolved in (7)
+- Commits, local and not pushed: `a2c4df94` (#290), `9443f294` (#259, #258), `c810e017` (#243, the cadence row, the #258
+  follow-up). All four tickets closed on GitHub; #258 carries a correction comment (the estimate and the plant rotation).
+- In the working tree, for the next commit: #243's `done` row (ticket index refreshed and checked).
+- The next tier's `--confirm` base: `build/agent204/tier3/tier_results.tsv` (GREEN, PASS 199, controls executed).
+- The maintainer's plan: compact, about 2 to 3 hours of tickets, then the close. The tickets are the maintainer's to name
+  (START HERE item 4's list); asked why #292 needs PILOT, the answer: the scorer is strace-based (Linux), the Mac has no
+  Linux route installed, and an `eslogger` backend (needs sudo) or a local Linux VM were offered, not built.
+- The time per tier this sitting: 50, 45 and 58 minutes with setup, controls about 70% of the gate-and-control time.
+- NEXT, the maintainer's choice: **#291 S1** (then more slices if time allows). The ruled design is on #291 (comment of
+  2026-10-16) and `DECISIONS_HISTORY.md` L7157 and L7169 entries. S1 = the `# SHEET:` grammar + `test_sheet_census` (with a
+  shrink-only debt list, as the must-fire retrofit), `tests/lib/sheet.sh` (SHEET_OUT: legs + moments), the capture-and-prove
+  tool (re-run each leg with `tests/lua/snapshot_frames.lua`, work-RAM checksum at each moment vs the gate's, NOT THE
+  JUDGED RUN on a mismatch, plus its ground-truth gate), the one-page HTML, and three exemplars: `audit_move_parity`
+  (events), `test_gfx_menus` (golden frames), `audit_merged_legacy` (anchors + attributed frames). Only reading done so
+  far (snapshot_frames.lua: REPLAY, SNAP_FRAMES, POKES, TRACE_OUT; MAME snapshots to <sandbox>/snap/<set>/NNNN.png); no
+  file changed for #291 yet.
+
+### (7) #291 S1 — THE COMPARATIVE CAPTURE SHEETS: GRAMMAR, CENSUS, HELPER, PROOF, PAGE, THREE EXEMPLARS
+The maintainer's choice after the compaction: *"let's do  #291 S1 (the comparative capture sheets) from START HERE , and
+maybe the other slices if it goes faster than expected"*. Built as ruled:
+- the `# SHEET:` line (`legs <roles> — moments: … — not comparable: …`, `no-reference-leg — …`, `none — …`), homed in
+  `docs/project/gate_header_contract.md`;
+- `tests/test_sheet_census.sh` (static, portable, ~2 s): every emulator-registry gate declares or is on the shrink-only
+  debt list `tests/expected/sheet_debt.txt` (228 rows today, the S2 work list); grammar and reader refusals; four controls;
+- `tests/lib/sheet.sh`: writes only with `SHEET_OUT` set;
+- `tools/proof_sheets.py run|prove|page|census`: re-runs each leg under a NEW instrument, `tests/lua/sheet_capture.lua`.
+  That is a change from the design text, which named `snapshot_frames.lua`: that file checksums nothing, and an option
+  in replay.lua would stale every gate following the oracle core. The new instrument reproduces replay.lua's frozen
+  checksums at f650, f651 and f950;
+- `tests/test_proof_sheets.sh` (emulator, prereq, ~17 s): the ground truth. On the log is PROVEN; one frame shifted is
+  NOT THE JUDGED RUN; fields at f3000 are PROVEN, and one off by one is refused. Anchors are proven and a cap is said. Controls
+  `frame-blind` and `cap-ignored`.
+Exemplars, run at HEAD on the Mac:
+- `test_gfx_menus`: the 3 goldens it compared, plus ours 3/3 PROVEN on its own log;
+- `audit_move_parity` (default 3 parts): 172/172 PROVEN on the 18 traced fields, 38 s;
+- `audit_merged_legacy`: 47 sheets, 604/604 PROVEN on each leg's masked log (214 attributed frames, 390 anchors; replay 37's down at
+  f6489, where the atlas has the KO at f6488); gate PASS, 706 s. **Superseded: 592/592 with 378 anchors.** Rule-checker run
+  2026-10-18-1118 found that the instrument capped anchors silently at 16 (`26_don_arcade_mash` hit it on both legs). Now there is
+  no cap by default, and a set cap is said on the sheet (ground-truth section 4, control `cap-ignored`). That replay draws 22 per leg.
+Found on the way: `tests/lib/sheet.sh`'s row loop `_sf` overwrote audit_merged_legacy's frame variable of that name
+(sh has no locals). The reader refused the sheet. Fixed with the `__sheet_` prefix, plus a census check and the control
+`leaky-helper`; the gotcha is recorded. All three exemplars print identical output with and without `SHEET_OUT`
+(audit_merged_legacy re-run without it for rule-checker run 2026-10-18-1118, resolved). #291 stays open for S2 and S3. Progress comment drafted:
+`build/agent204/t291/c291_s1.md`.
+
+### CLOSE (14z-204, 2026-10-18)
+- The close is driven by `tools/close.py` (run directory `build/agent204/close/`). `start` needed `--row -`: it still
+  looks for the findings section that #288 cut, and none of the steps uses it (not fixed; it rides a later close).
+- Commits this sitting before the close: `a2c4df94` (#290), `9443f294` (#259, #258), `c810e017` (#243, the cadence row, the
+  #258 follow-up), all local until this close's push.
+- Dashboard: figures, rc_runs and tiers re-collected (keys 14z-163..14z-204) and uploaded. **The `costly.json` upload was
+  denied by the auto-mode classifier**, so the dashboard's `costly` dataset still shows the 14z-203 file; it needs the
+  maintainer's go-ahead or a later close.
+- Steps: sections (this group's (1)-(7), (6) points at (7)); next-session (the 14z-203 opener moved verbatim to
+  `docs/NEXT_SESSION_HISTORY.md`, the opener rewritten); rollover (the 14z-203 group moved verbatim to `STATE_HISTORY.md`, its
+  ledger line at the top); indexes (auto, DONE); dashboard (three of four datasets, above).
+- The tier runs on a snapshot of the staged tree with `--strict --confirm build/agent204/tier3/tier_results.tsv`; its
+  results are `build/agent204/close/tier_results.tsv`, the next close's `--prev`.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings

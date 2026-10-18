@@ -1,0 +1,11 @@
+decision	expectation
+subject	#291 slice S1 landed: the # SHEET: grammar, test_sheet_census with the frozen shrink-only debt list tests/expected/sheet_debt.txt (228), tests/lib/sheet.sh, tools/proof_sheets.py + tests/lua/sheet_capture.lua, the ground-truth gate test_proof_sheets, the page, three exemplars; the progress comment for #291
+session	14z-204
+model	rule-checker@163e4ce9cf7b
+claim	S1 is built as ruled on #291 (DECISIONS_HISTORY 2026-10-16/17), with one stated deviation (a new capture instrument instead of snapshot_frames.lua); the three exemplar gates decide nothing differently with SHEET_OUT; every picture of the three exemplars is proven against what its gate logged (770 pictures: 6 gfx incl. 3 judged goldens, 172 move parity, 592 merged legacy); the census and ground-truth gates pass and their five controls fire; the frozen debt list holds exactly the registry gates without a line
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	14 flag(s): D-ABSOLUTE 11, D-FIGURE 2, FIGURE 1
+deliverables	build/agent204/t291/c291_s1.md

@@ -3,7 +3,7 @@
 > **STATUS: REFERENCE (opened 14z-180, GitHub #171).** The declarations a gate script
 > carries in its LEADING COMMENT BLOCK beside the must-fire lines, each with one reader
 > and one census. Today: the DESCRIPTION (`# WHAT:` / `# HOW:` / `# EXPECTS:`, slice Q0,
-> ruled and live), `# FOLLOWS:` (slice Q3, live) and `# MEASURES:` (slice Q2, live). The must-fire contract has its own document
+> ruled and live), `# FOLLOWS:` (slice Q3, live), `# MEASURES:` (slice Q2, live) and `# SHEET:` (#291, live 14z-204). The must-fire contract has its own document
 > (`must_fire_contract.md`, a copy of BBX's grammar) and is not restated here.
 
 ## Why the header
@@ -137,4 +137,32 @@ shape on a real gate (one page emptied after generation, `FREEZE=1` against a sc
 hashes: refused). **Two witnesses for a floor:** the count the gate prints and a count of a DIFFERENT
 file by a different expression (the frozen row set, the record's own text, the out-of-tree copy) —
 the first alone agrees with itself by construction. Spec: `gate_qualification_scope.md` §4 Q2.
+
+## `# SHEET:` — what the gate's comparative capture sheet shows (#291 slice S1, live 14z-204)
+
+The comparative capture sheets are a visual proof of accuracy for humans: on demand, `tools/proof_sheets.py run`
+draws, for every comparing gate, its legs as rows (native vs2, then vsavj, then ours) and the moments it judged as
+columns, and writes one page, `build/sheets/<commit>/index.html` (the design ruled 2026-10-16/17, `DECISIONS_HISTORY.md`
+"Ruled 2026-10-16 (14z-203) — #291 …" and "Ruled 2026-10-17 (14z-203) — … #291's design (four answers)").
+Each emulator-registry gate declares one line:
+
+    # SHEET: legs <roles> — moments: <what the gate judges> — not comparable: <what differs by design>
+    # SHEET: no-reference-leg — <reason>      our build against frozen values with no rig of the other game: listed, not drawn
+    # SHEET: none — <reason>                  the gate compares no leg of ours against a reference set
+
+`<roles>` is a comma list of `ours`, `vsavj`, `vs2`, naming `ours` and at least one reference. The separators are an em
+dash or `--` with spaces around it; a plain hyphen is text. A `legs` gate sources `tests/lib/sheet.sh` and, only when
+the caller set `SHEET_OUT`, writes the legs it ran (set, rompath, replay, pokes, its checksum log and mask) and the
+moments it judged (frame, label, its verdict there, and what proves the picture: the leg's own log, a checksum, the
+fields it compared, or a golden it compared). With `SHEET_OUT` unset it writes nothing and decides nothing differently.
+The tool re-runs each leg under `tests/lua/sheet_capture.lua` and proves every picture against what the gate logged at
+that frame; one it cannot prove is shown as NOT THE JUDGED RUN, never silently (`tests/test_proof_sheets.sh`, the
+tool's ground truth: a one-frame shift and a field off by one are refused; anchors are proven on the log, and a set
+`ANCHOR_MAX` is said on the sheet — by default every anchor a leg reaches is drawn).
+
+**Reader:** `tools/proof_sheets.py` (`parse_declaration`, `read_sheet`). **Census:** `tests/test_sheet_census.sh` —
+every registered gate declares one well-formed line or is on the shrink-only debt list `tests/expected/sheet_debt.txt`
+(the retrofit's work list, as the must-fire retrofit's was), and every `legs` gate sources the helper, and the helper assigns only `__sheet_` names; four controls.
+**Slice bounds:** S1 draws at HEAD with the builds the gates default to; S2 retrofits the remaining comparing gates;
+S3 builds the commit's romset in a clean checkout and adds `--host pilot|eris`.
 

@@ -28,7 +28,9 @@
 #   tools/compare_composite.py tools/compare_flicker.py tools/compare_window.py
 #   tools/describe_masked_shape.py tools/ensure_merged_inputs.sh tools/gen_donovan_patch.py
 #   tools/pack_build.sh tools/patch_prg.py tools/run_mame.sh tools/run_replay_guarded.sh
-#   tools/run_replay_mame.sh tools/setup_mame.sh
+#   tools/run_replay_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vsavj,ours — moments: per legacy replay of leg (a), the sync anchors (round start, each down, the next round's spawn) and every frame its ratified class attributes (each flicker frame, each window's first and last frame) — not comparable: the three tenants, blank on this LEGACY-ONLY instrument by design; inside a ratified window the legs differ by ratification
 #
 # MUST-FIRE: known-bad: drift-clock — a guarded run under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 5,317 emulated frames of 5,320 counted) must miss its frozen game clock (in-gate: one extra run; mode: every guarded run runs the old clock and the gate FAILs)
 # MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs)
@@ -378,6 +380,7 @@ echo "      classes in $EXPECT (merged1 is the default table since 14z-91; MERGE
 # which STATE.md 14z-89 (4) pre-flags as the wrong direction ("does the
 # merged build want its own class table?").
 . "$REPO/tests/lib/enumerate_expectations.sh"
+. "$REPO/tests/lib/sheet.sh"
 _eval=0; _noteval=0
 _enum="$(enumerate_expectations "$EXPECT" "$REPO")" || true
 for _line in $_enum; do
@@ -455,6 +458,33 @@ for spec in "$EXPECT"/*.masked; do
         else verdict=FAIL; detail="$(echo "$d" | tr '\n' ' ')"; fi ;;
     *)  verdict=FAIL; detail="unknown class '$class' in the prior" ;;
     esac
+    # THE SHEET (#291): with SHEET_OUT set, the two legs this verdict compared (each on its own masked checksum log)
+    # and the moments it rests on beyond "equal everywhere" (ruled 2026-10-17): the anchors, and the frames its class
+    # attributes. Nothing the gate decides changes.
+    if sheet_on && [ -z "$MODE" ] && [ "$FREEZE_CLOCK" = 0 ]; then
+        _sfr="$(awk '$1 ~ /^[0-9]+$/ {n = $1} END {print n}' "$baselog")"
+        sheet_new "$name" "$name: vanilla vsavj above the merged image ($class $args)" - - \
+            "the three tenants, blank on this LEGACY-ONLY instrument by design; inside a ratified window the legs differ by ratification"
+        sheet_leg "$name" vanilla vsavj vsavj "$ROMDIR" "$REPO/tests/replays/$name.rpl" - "$_sfr" "$baselog" "$MASK"
+        sheet_leg "$name" merged ours vsavjw "$MERGED_RP" "$REPO/tests/replays/$name.rpl" - "$_sfr" "$log" "$MASK"
+        sheet_anchors "$name"
+        case "$class" in
+            flicker)   _satt="$(printf '%s' "$args" | tr ',' '\n' | sed 's/$/:flicker frame/')" ;;
+            window)    _satt="$(printf '%s:window opens\n%s:window closes' "${args%% *}" "${args##* }")" ;;
+            composite) _satt="$(printf '%s\n' "${args%% *}" | tr ',' '\n' | sed 's/$/:flicker frame/'
+                                printf '%s' "${args##* }" | tr ';' '\n' | sed -n 's/^\([0-9]*\)-\([0-9]*\)$/\1:window opens\
+\2:window closes/p')" ;;
+            *)         _satt="" ;;
+        esac
+        _sn=0
+        printf '%s\n' "$_satt" | while IFS=: read -r _sf _sk; do
+            [ -n "$_sf" ] || continue
+            _sn=$((_sn + 1))
+            sheet_moment "$name" "a$_sn" "f$_sf $_sk (ratified $class)" "$verdict"
+            sheet_at "$name" "a$_sn" vanilla "$_sf" log
+            sheet_at "$name" "a$_sn" merged "$_sf" log
+        done
+    fi
     if [ "$verdict" = PASS ]; then
         echo "PASS $class ($detail)"
         printf '%s|%s|PASS|%s\n' "$name" "$class" "$detail" >> "$W/summary"

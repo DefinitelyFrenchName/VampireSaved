@@ -16,7 +16,9 @@
 #   DIFF's cause is audit_move_parity_attribution's question.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/move_parity_events.tsv
 #   tests/lib/decrypt_cache.sh tests/lua/field_trace.lua tests/replays/naming/ tools/move_parity.py
-#   tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh
+#   tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: one per event, at its first divergent frame for a DIFF and mid-window otherwise — not comparable: each game's stage and palette, and P2's art (Demitri, each game's own copy; [VSP-168])
 #
 # MUST-FIRE: perturbed-copy: unpinned-level — the native leg left at vsav2's DEFAULT play mode (TURBO, level 8) against ours at NORMAL must fail every part, so each verdict is proven to rest on the level the gate pins (in-gate: one part is re-run with the native level pin withheld and must diverge; mode: every native leg runs unpinned and the comparisons FAIL)
 # MUST-FIRE: shadow-tool: no-translation — comparing our RAW anim node pointer against native's, without translating it out of its placement, must fail, so every IDENTICAL verdict is proven to rest on the translation (in-gate: one part is compared both ways; mode: every part is compared untranslated and FAILs)
@@ -435,6 +437,53 @@ if [ "${FREEZE:-0}" = 1 ]; then
     exit 0
 fi
 [ -s "$W/got.tsv" ] || bad "the comparator produced no verdict at all — an empty result is not a pass"
+
+# THE SHEET (#291): with SHEET_OUT set, each part's two legs as this run played them and one moment per event, each
+# picture to be proven on the 18 fields this run traced at that frame. Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "$CONTROL" ]; then
+    for part in $SET; do
+        t="${part%_*}"; p="${part##*_}"
+        _j="$REPO/tests/replays/naming/${t}_${p}.json"
+        _fr="$(python3 -c "import json;print(json.load(open('$_j'))['frames'])")"
+        sheet_new "$part" "$part: every event, native vs2 above ours (level 6, RNG pinned, both legs real picks)" "$t" "#136" \
+            "each game's stage and palette, and P2's art (Demitri, each game's own copy; [VSP-168])"
+        sheet_leg "$part" native vs2 vsav2 "$ROMDIR" "$W/${t}_${p}_native.rpl" "$(pokes_for "$t" "$_j" native "$_fr")" "$_fr"
+        sheet_leg "$part" ours ours vsavjw "$BUILD/rompath;$ROMDIR" "$W/${t}_${p}_ours.rpl" "$(pokes_for "$t" "$_j" ours "$_fr")" "$_fr"
+        python3 - "$part" "$_j" "$W/got.tsv" "$FIELDS" "$W/tr_${t}_${p}_native.txt" "$W/tr_${t}_${p}_ours.txt" > "$W/sheet_$part.tsv" <<'PYS'
+import json, sys
+part, js, got, fields, trn, tro = sys.argv[1:7]
+spec = {name: "%s:%s" % (a.lower(), sz) for a, sz, name in (f.split(":") for f in fields.split(","))}
+def trace(p):
+    d = {}
+    for l in open(p):
+        f = l.split()
+        if f and f[0] == "F":
+            d[int(f[1])] = dict(kv.split("=", 1) for kv in f[2:])
+    return d
+tr = {"native": trace(trn), "ours": trace(tro)}
+ev = json.load(open(js))["events"]
+for row in (l.rstrip("\n").split("\t") for l in open(got)):
+    if row[0] != part or len(row) < 9:
+        continue
+    k, name, verdict, first, flds, frames = int(row[1]), row[2], row[3], row[4], row[5], row[6]
+    e = ev[k]["frame"]
+    if verdict == "DIFF" and first.lstrip("+-").isdigit():
+        fr, why = e + int(first), "first divergent frame"
+    elif frames.isdigit():
+        fr, why = e + int(frames) // 2, "mid-window"
+    else:
+        fr, why = e, "event frame"
+    vals = ("first %s, fields %s" % (first, flds)) if verdict == "DIFF" else "-"
+    print("moment\t%s\te%d\t%s (%s)\t%s\t%s" % (part, k, name, why, verdict, vals))
+    for leg in ("native", "ours"):
+        smp = tr[leg].get(fr)
+        exp = ",".join("%s=%s" % (spec[n], v) for n, v in sorted(smp.items()) if n in spec) if smp else "-"
+        print("at\t%s\te%d\t%s\t%d\t%s\t%s" % (part, k, leg, fr, "fields" if smp else "none", exp))
+PYS
+        sheet_rows "$W/sheet_$part.tsv"
+    done
+fi
 # the pins-ignored MODE judges the VERDICT columns only (part, event, name, verdict,
 # first, fields): the `excluded` count changes trivially with the exclusion off and
 # would make the mode fire on its own bookkeeping (14z-164, 14z-165)

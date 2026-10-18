@@ -199,6 +199,7 @@ declares	test_poked_legs
 declares	test_pokes_ranges
 declares	test_power_decode
 declares	test_promise_check
+declares	test_proof_sheets
 declares	test_py_escapes
 declares	test_pyron_medallion_2p
 declares	test_quote_font_window
@@ -233,6 +234,7 @@ declares	test_select_arrays
 declares	test_session_close
 declares	test_session_metrics
 declares	test_shadow_tenant
+declares	test_sheet_census
 declares	test_shell_portability
 declares	test_shim_charid
 declares	test_sim_wram_contract

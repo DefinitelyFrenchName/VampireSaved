@@ -1,0 +1,15 @@
+  FLAG FIGURE: 770
+  FLAG D-FIGURE: 172  [build/agent204/t291/c291_s1.md]
+  FLAG D-FIGURE: 214  [build/agent204/t291/c291_s1.md]
+  FLAG D-ABSOLUTE: Today: 3 legs, 1 none, 228 on the debt list (the S2 work list).  [build/agent204/t291/c291_s1.md]
+  FLAG D-ABSOLUTE: It then proves every picture against what the gate logged at that frame.  [build/agent204/t291/c291_s1.md]
+  FLAG D-ABSOLUTE: Rows are native vs2, then vsavj, then ours; columns are the moments, each captioned with its frame, the gate's verdict and the proof.  [build/agent204/t291/c291_s1.md]
+  FLAG D-ABSOLUTE: Each sheet carries its "not comparable" line, and the page is indexed by test, by character and by ticket.  [build/agent204/t291/c291_s1.md]
+  FLAG D-ABSOLUTE: It also lists the no-reference-leg gates and the debt, and names each ours build with its registry key.  [build/agent204/t291/c291_s1.md]
+  FLAG D-ABSOLUTE: Gate PASS, 9 s in all.  [build/agent204/t291/c291_s1.md]
+  FLAG D-ABSOLUTE: All 172 are PROVEN on the 18 fields the gate traced at that frame.  [build/agent204/t291/c291_s1.md]
+  FLAG D-ABSOLUTE: Gate PASS, 38 s in all.  [build/agent204/t291/c291_s1.md]
+  FLAG D-ABSOLUTE: Of these, 214 are the frames each replay's ratified class attributes (each flicker frame, each window's first and last frame) and 378 are anchors: round star...  [build/agent204/t291/c291_s1.md]
+  FLAG D-ABSOLUTE: - The page sorts each sheet's columns by frame, so the declared moments and the anchors form one timeline.  [build/agent204/t291/c291_s1.md]
+  FLAG D-ABSOLUTE: The moment frame chosen for an IDENT event (mid-window) is a choice of S1; the whole window is judged.  [build/agent204/t291/c291_s1.md]
+packet_check: 14 flag(s): D-ABSOLUTE 11, D-FIGURE 2, FIGURE 1
