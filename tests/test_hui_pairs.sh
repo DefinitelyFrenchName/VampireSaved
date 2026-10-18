@@ -23,6 +23,8 @@
 #   tests/replays/hui/81_hui_rw_gc.rpl tests/replays/hui/82_hui_df_2p.rpl
 #   tools/build_donovan.sh tools/run_mame.sh tools/run_replay_guarded.sh tools/setup_mame.sh
 #
+# SHEET: no-reference-leg — our build against frozen vs2 values, with no vs2 rig in the gate (ruled 2026-10-17: listed, not drawn)
+#
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
 #   Reflect Wall GC + Dark Force gate (14z-66): both native-matched signatures

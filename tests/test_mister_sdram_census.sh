@@ -20,6 +20,8 @@
 #   tools/check_wram_dumps.py tools/mister_mra.sh tools/mister_sdram_census.py
 #   tools/rpl2siminputs.py tools/run_sim_jtcps2.sh tools/setup_jtcores.sh
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # MUST-FIRE: known-bad: perturbed-map — the WIDE image must NOT match the STOCK map, so comparing leg A against the wrong map must fail (mode: leg A is censused against the STOCK map and the census fails, so the gate FAILs; REFUSES with exit 3 if the sim prerequisites are absent)
 #
 # WHY A CENSUS AND NOT A REPLAY. D2 PLACES the romset; the fetch that READS

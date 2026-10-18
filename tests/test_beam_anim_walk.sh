@@ -20,6 +20,8 @@
 #   tests/lib/instr_align.sh tests/lua/emu_clock.lua tests/lua/replay.lua tests/lua/trace_writes.lua
 #   tests/replays/hui/83b_hui_ray_2p.rpl tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: no-picture — its legs run under -debug with a read watch (trace_writes.lua), whose timeline a plain capture cannot reproduce ([VSP-129], [VSP-130])
+#
 # MUST-FIRE: known-bad: drift-clock — a watch run under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 3,227 emulated frames of 3,230 counted) must miss its frozen game clock (in-gate: one extra run of our leg; mode: both legs run the old clock and the gate FAILs)
 # MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs)
 #

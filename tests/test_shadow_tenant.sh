@@ -15,6 +15,8 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/replay.lua
 #   tests/replays/113_shadow_vs_tenant.rpl tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # MUST-FIRE: known-bad: four-presses-morph — FOUR START presses must NOT arm the copy, so demanding that the four-press leg morphed must fail (mode: the four-press control leg is asserted to have morphed to the tenant, which it never does, so the gate FAILs)
 #
 # THE QUESTION, in the maintainer's words: the risk with Shadow is not

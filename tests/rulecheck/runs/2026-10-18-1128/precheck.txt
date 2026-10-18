@@ -1,0 +1,4 @@
+  FLAG D-ABSOLUTE: - the sweep runs each DISTINCT build once per replay (its out file and sandbox are no longer shared between tenant ids);  [build/agent205/t293/closing_comment.md]
+  FLAG D-ABSOLUTE: A proven sheet does not show that a leg booted fresh: replay 23's verdict moved though its pictures had proven before the fix (the proof checks the state at ...  [build/agent205/t293/closing_comment.md]
+  FLAG D-ABSOLUTE: Not done here: a census of every other gate that might hand one sandbox to several runs; the two gates were found by the #291 sheets, which re-prove every dr...  [build/agent205/t293/closing_comment.md]
+packet_check: 3 flag(s): D-ABSOLUTE 3

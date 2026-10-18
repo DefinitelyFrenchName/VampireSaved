@@ -17,6 +17,8 @@
 # FOLLOWS: emu/mame-patches/ tests/lib/controls.sh tests/lib/decrypt_cache.sh
 #   tests/lua/tap_writes.lua tests/replays/ tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
+#
 # MUST-FIRE: shadow-tool: one-form-scan — section A's inventory built by the #100-shaped scan (the 0x0130 displacement word read at opcode+2 only) instead of the every-offset decoder must fail the five-writer inventory, so the inventory is proven to rest on a decoder that sees a write carrying an immediate word before its displacement
 # MUST-FIRE: perturbed-copy: lane-blind — section B's tap logs read with the write MASK ignored must put PRG:0x02033E and PRG:0x020AE8 on the $FF8130 lane and fail the lane assertion, so the lane attribution is proven to rest on the mask
 #

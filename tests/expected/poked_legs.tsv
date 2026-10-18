@@ -23,6 +23,7 @@ tests/audit_df_framework.sh	ours	replays/df/97_df_mech.rpl	P2	R R	03 Victor	03	S
 tests/audit_df_gold.sh	ours	replays/hui/85_hui_df_vs2.rpl	P1	-	01 Demitri	$id	PARAM	no id is CROSS-FLAVOR here
 tests/audit_df_gold.sh	ours	replays/hui/85_hui_df_vs2.rpl	P2	R R	03 Victor	05	CROSS-INERT	
 tests/audit_df_startup_invuln.sh	native	replays/df/97_df_mech.rpl	P1	-	01 Demitri	$1	PARAM	CROSS-FLAVOR if id in 0x13
+tests/audit_df_startup_invuln.sh	native	replays/df/97_df_mech.rpl	P1	-	01 Demitri	00 ($id)	CROSS-INERT	
 tests/audit_df_startup_invuln.sh	native	replays/df/97_df_mech.rpl	P1	-	01 Demitri	01 ($id)	SAME	
 tests/audit_df_startup_invuln.sh	native	replays/df/97_df_mech.rpl	P1	-	01 Demitri	02 ($id)	CROSS-INERT	
 tests/audit_df_startup_invuln.sh	native	replays/df/97_df_mech.rpl	P1	-	01 Demitri	03 ($id)	CROSS-INERT	
@@ -41,6 +42,7 @@ tests/audit_df_startup_invuln.sh	native	replays/df/97_df_mech.rpl	P1	-	01 Demitr
 tests/audit_df_startup_invuln.sh	native	replays/df/97_df_mech.rpl	P1	-	01 Demitri	13 ($id)	CROSS-FLAVOR	
 tests/audit_df_startup_invuln.sh	native	replays/df/97_df_mech.rpl	P2	R R	03 Victor	03	SAME	
 tests/audit_df_startup_invuln.sh	native	replays/df/98_df_startup_contact.rpl	P1	R R	13 Donovan	$1	PARAM	CROSS-FLAVOR if id in 0x10
+tests/audit_df_startup_invuln.sh	native	replays/df/98_df_startup_contact.rpl	P1	R R	13 Donovan	00 ($id)	CROSS-INERT	
 tests/audit_df_startup_invuln.sh	native	replays/df/98_df_startup_contact.rpl	P1	R R	13 Donovan	01 ($id)	CROSS-INERT	
 tests/audit_df_startup_invuln.sh	native	replays/df/98_df_startup_contact.rpl	P1	R R	13 Donovan	02 ($id)	CROSS-INERT	
 tests/audit_df_startup_invuln.sh	native	replays/df/98_df_startup_contact.rpl	P1	R R	13 Donovan	03 ($id)	CROSS-INERT	
@@ -59,6 +61,7 @@ tests/audit_df_startup_invuln.sh	native	replays/df/98_df_startup_contact.rpl	P1	
 tests/audit_df_startup_invuln.sh	native	replays/df/98_df_startup_contact.rpl	P1	R R	13 Donovan	13 ($id)	SAME	
 tests/audit_df_startup_invuln.sh	native	replays/df/98_df_startup_contact.rpl	P2	R R	03 Victor	03	SAME	
 tests/audit_df_startup_invuln.sh	ours	replays/df/97_df_mech.rpl	P1	-	01 Demitri	$1	PARAM	no id is CROSS-FLAVOR here
+tests/audit_df_startup_invuln.sh	ours	replays/df/97_df_mech.rpl	P1	-	01 Demitri	00 ($id)	CROSS-INERT	
 tests/audit_df_startup_invuln.sh	ours	replays/df/97_df_mech.rpl	P1	-	01 Demitri	01 ($id)	SAME	
 tests/audit_df_startup_invuln.sh	ours	replays/df/97_df_mech.rpl	P1	-	01 Demitri	02 ($id)	CROSS-INERT	
 tests/audit_df_startup_invuln.sh	ours	replays/df/97_df_mech.rpl	P1	-	01 Demitri	03 ($id)	CROSS-INERT	
@@ -77,6 +80,7 @@ tests/audit_df_startup_invuln.sh	ours	replays/df/97_df_mech.rpl	P1	-	01 Demitri	
 tests/audit_df_startup_invuln.sh	ours	replays/df/97_df_mech.rpl	P1	-	01 Demitri	13 ($id)	CROSS-INERT	
 tests/audit_df_startup_invuln.sh	ours	replays/df/97_df_mech.rpl	P2	R R	03 Victor	03	SAME	
 tests/audit_df_startup_invuln.sh	ours	replays/df/98_df_startup_contact.rpl	P1	R R	00 Bulleta	$1	PARAM	no id is CROSS-FLAVOR here
+tests/audit_df_startup_invuln.sh	ours	replays/df/98_df_startup_contact.rpl	P1	R R	00 Bulleta	00 ($id)	SAME	
 tests/audit_df_startup_invuln.sh	ours	replays/df/98_df_startup_contact.rpl	P1	R R	00 Bulleta	01 ($id)	CROSS-INERT	
 tests/audit_df_startup_invuln.sh	ours	replays/df/98_df_startup_contact.rpl	P1	R R	00 Bulleta	02 ($id)	CROSS-INERT	
 tests/audit_df_startup_invuln.sh	ours	replays/df/98_df_startup_contact.rpl	P1	R R	00 Bulleta	03 ($id)	CROSS-INERT	
@@ -94,27 +98,39 @@ tests/audit_df_startup_invuln.sh	ours	replays/df/98_df_startup_contact.rpl	P1	R 
 tests/audit_df_startup_invuln.sh	ours	replays/df/98_df_startup_contact.rpl	P1	R R	00 Bulleta	11 ($id)	CROSS-INERT	
 tests/audit_df_startup_invuln.sh	ours	replays/df/98_df_startup_contact.rpl	P1	R R	00 Bulleta	13 ($id)	CROSS-INERT	
 tests/audit_df_startup_invuln.sh	ours	replays/df/98_df_startup_contact.rpl	P2	R R	03 Victor	03	SAME	
+tests/audit_dmg_legacy_sweep.sh	native	replays/dmg191/demitri_p1.rpl	P1	-	01 Demitri	$2	PARAM	CROSS-FLAVOR if id in 0x13
 tests/audit_dmg_legacy_sweep.sh	native	replays/dmg191/demitri_p1.rpl	P1	-	01 Demitri	$_v	PARAM	CROSS-FLAVOR if id in 0x13
+tests/audit_dmg_legacy_sweep.sh	native	replays/dmg191/demitri_p1.rpl	P2	R R	03 Victor	$2	PARAM	CROSS-FLAVOR if id in 0x13
 tests/audit_dmg_legacy_sweep.sh	native	replays/dmg191/demitri_p1.rpl	P2	R R	03 Victor	$_v	PARAM	CROSS-FLAVOR if id in 0x13
 tests/audit_dmg_legacy_sweep.sh	native	replays/dmg191/demitri_p1.rpl	P2	R R	03 Victor	00	CROSS-INERT	
 tests/audit_dmg_legacy_sweep.sh	native	replays/dmg191/demitri_p1.rpl	P2	R R	03 Victor	01	CROSS-INERT	
+tests/audit_dmg_legacy_sweep.sh	native	replays/dmg191/demitri_p2.rpl	P1	-	01 Demitri	$2	PARAM	CROSS-FLAVOR if id in 0x13
 tests/audit_dmg_legacy_sweep.sh	native	replays/dmg191/demitri_p2.rpl	P1	-	01 Demitri	$_v	PARAM	CROSS-FLAVOR if id in 0x13
+tests/audit_dmg_legacy_sweep.sh	native	replays/dmg191/demitri_p2.rpl	P2	R R	03 Victor	$2	PARAM	CROSS-FLAVOR if id in 0x13
 tests/audit_dmg_legacy_sweep.sh	native	replays/dmg191/demitri_p2.rpl	P2	R R	03 Victor	$_v	PARAM	CROSS-FLAVOR if id in 0x13
 tests/audit_dmg_legacy_sweep.sh	native	replays/dmg191/demitri_p2.rpl	P2	R R	03 Victor	00	CROSS-INERT	
 tests/audit_dmg_legacy_sweep.sh	native	replays/dmg191/demitri_p2.rpl	P2	R R	03 Victor	01	CROSS-INERT	
+tests/audit_dmg_legacy_sweep.sh	native	replays/dmg191/donovan_p12.rpl	P1	R R	13 Donovan	$2	PARAM	CROSS-FLAVOR if id in 0x10
 tests/audit_dmg_legacy_sweep.sh	native	replays/dmg191/donovan_p12.rpl	P1	R R	13 Donovan	$_v	PARAM	CROSS-FLAVOR if id in 0x10
+tests/audit_dmg_legacy_sweep.sh	native	replays/dmg191/donovan_p12.rpl	P2	R	01 Demitri	$2	PARAM	CROSS-FLAVOR if id in 0x13
 tests/audit_dmg_legacy_sweep.sh	native	replays/dmg191/donovan_p12.rpl	P2	R	01 Demitri	$_v	PARAM	CROSS-FLAVOR if id in 0x13
 tests/audit_dmg_legacy_sweep.sh	native	replays/dmg191/donovan_p12.rpl	P2	R	01 Demitri	00	CROSS-INERT	
 tests/audit_dmg_legacy_sweep.sh	native	replays/dmg191/donovan_p12.rpl	P2	R	01 Demitri	01	SAME	
+tests/audit_dmg_legacy_sweep.sh	ours	replays/dmg191/demitri_p1.rpl	P1	-	01 Demitri	$2	PARAM	no id is CROSS-FLAVOR here
 tests/audit_dmg_legacy_sweep.sh	ours	replays/dmg191/demitri_p1.rpl	P1	-	01 Demitri	$_v	PARAM	no id is CROSS-FLAVOR here
+tests/audit_dmg_legacy_sweep.sh	ours	replays/dmg191/demitri_p1.rpl	P2	R R	03 Victor	$2	PARAM	no id is CROSS-FLAVOR here
 tests/audit_dmg_legacy_sweep.sh	ours	replays/dmg191/demitri_p1.rpl	P2	R R	03 Victor	$_v	PARAM	no id is CROSS-FLAVOR here
 tests/audit_dmg_legacy_sweep.sh	ours	replays/dmg191/demitri_p1.rpl	P2	R R	03 Victor	00	CROSS-INERT	
 tests/audit_dmg_legacy_sweep.sh	ours	replays/dmg191/demitri_p1.rpl	P2	R R	03 Victor	01	CROSS-INERT	
+tests/audit_dmg_legacy_sweep.sh	ours	replays/dmg191/demitri_p2.rpl	P1	-	01 Demitri	$2	PARAM	no id is CROSS-FLAVOR here
 tests/audit_dmg_legacy_sweep.sh	ours	replays/dmg191/demitri_p2.rpl	P1	-	01 Demitri	$_v	PARAM	no id is CROSS-FLAVOR here
+tests/audit_dmg_legacy_sweep.sh	ours	replays/dmg191/demitri_p2.rpl	P2	R R	03 Victor	$2	PARAM	no id is CROSS-FLAVOR here
 tests/audit_dmg_legacy_sweep.sh	ours	replays/dmg191/demitri_p2.rpl	P2	R R	03 Victor	$_v	PARAM	no id is CROSS-FLAVOR here
 tests/audit_dmg_legacy_sweep.sh	ours	replays/dmg191/demitri_p2.rpl	P2	R R	03 Victor	00	CROSS-INERT	
 tests/audit_dmg_legacy_sweep.sh	ours	replays/dmg191/demitri_p2.rpl	P2	R R	03 Victor	01	CROSS-INERT	
+tests/audit_dmg_legacy_sweep.sh	ours	replays/dmg191/donovan_p12.rpl	P1	R R	00 Bulleta	$2	PARAM	no id is CROSS-FLAVOR here
 tests/audit_dmg_legacy_sweep.sh	ours	replays/dmg191/donovan_p12.rpl	P1	R R	00 Bulleta	$_v	PARAM	no id is CROSS-FLAVOR here
+tests/audit_dmg_legacy_sweep.sh	ours	replays/dmg191/donovan_p12.rpl	P2	R	01 Demitri	$2	PARAM	no id is CROSS-FLAVOR here
 tests/audit_dmg_legacy_sweep.sh	ours	replays/dmg191/donovan_p12.rpl	P2	R	01 Demitri	$_v	PARAM	no id is CROSS-FLAVOR here
 tests/audit_dmg_legacy_sweep.sh	ours	replays/dmg191/donovan_p12.rpl	P2	R	01 Demitri	00	CROSS-INERT	
 tests/audit_dmg_legacy_sweep.sh	ours	replays/dmg191/donovan_p12.rpl	P2	R	01 Demitri	01	SAME	

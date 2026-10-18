@@ -13,6 +13,9 @@ shown as NOT THE JUDGED RUN, never silently ([VSP-19]: tests/test_proof_sheets.s
 THE DECLARATION, read the way `# MUST-FIRE:` is (one line in the leading comment block):
     # SHEET: legs ours,vs2 — moments: <what the gate judges> — not comparable: <what differs by design>
     # SHEET: no-reference-leg — <reason>   (our build against frozen values, no rig of the other game: listed, not drawn)
+    # SHEET: no-picture — <reason>         (the gate compares legs, but what it judges cannot be shown as a proven
+                                           picture: a corpus-wide summary, a -debug run, a run outside the gate script,
+                                           an FBNeo leg; ruled 2026-10-18, D4: listed, not drawn)
     # SHEET: none — <reason>               (the gate compares no leg of ours against a reference set)
 A `legs` gate must source tests/lib/sheet.sh. tests/test_sheet_census.sh holds every emulator-registry gate to one
 well-formed line, against a shrink-only debt list (tests/expected/sheet_debt.txt): the S2 retrofit's work list.
@@ -32,7 +35,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 ROLES = ("vs2", "vsavj", "ours")          # row order on a sheet: native vs2 on top, then vsavj, then ours (#177)
-BASES = ("log", "ram", "fields", "file", "none")
+BASES = ("log", "ram", "fields", "file", "event", "none")
 DECL = re.compile(r"^#\s*SHEET:\s*(.*)$")
 DASH = re.compile(r"\s+(?:—|--)\s+")
 
@@ -62,13 +65,13 @@ def parse_declaration(path):
     body = lines[0]
     parts = DASH.split(body)
     head = parts[0].strip()
-    if head in ("none", "no-reference-leg"):
+    if head in ("none", "no-reference-leg", "no-picture"):
         if len(parts) < 2 or not " ".join(parts[1:]).strip():
             return None, "`# SHEET: %s` needs a reason after the dash" % head
         return {"kind": head, "reason": " — ".join(p.strip() for p in parts[1:])}, None
     m = re.match(r"^legs\s+([a-z0-9,]+)$", head)
     if not m:
-        return None, "the line must start `legs <roles>`, `none —` or `no-reference-leg —` (got %r)" % head[:40]
+        return None, "the line must start `legs <roles>`, `none —`, `no-reference-leg —` or `no-picture —` (got %r)" % head[:40]
     roles = m.group(1).split(",")
     bad = [r for r in roles if r not in ROLES]
     if bad:
@@ -114,7 +117,7 @@ def read_debt(debt):
 
 
 def census(tests, registry, debt):
-    """-> (rows, problems). rows: (gate, class) with class legs|none|no-reference-leg|debt."""
+    """-> (rows, problems). rows: (gate, class) with class legs|none|no-reference-leg|no-picture|debt."""
     gates = [r[0] for r in registry_gates(registry)]
     owed = read_debt(debt)
     problems, rows = [], []
@@ -149,7 +152,7 @@ def census(tests, registry, debt):
 
 
 # ── the sheet file ──────────────────────────────────────────────────────────────────────────────────────────────
-WIDTH = {"sheet": 6, "leg": 11, "moment": 6, "at": 7, "anchors": 2}
+WIDTH = {"sheet": 6, "leg": 11, "moment": 6, "at": 7, "anchors": 2, "tap": 5}
 
 
 def read_sheet(d):
@@ -192,6 +195,19 @@ def read_sheet(d):
             s["moments"][f[2]]["at"][f[3]] = {"frame": int(f[4]), "basis": f[5], "expect": f[6]}
         elif kind == "anchors":
             s["anchors"] = True
+        elif kind == "tap":
+            if f[2] not in s["legs"]:
+                raise ValueError("sheet.tsv:%d: tap row for undeclared leg %s" % (n, f[2]))
+            env, last = {}, None
+            for kv in ([] if f[4] == "-" else f[4].split(";")):
+                k, eq, v = kv.partition("=")
+                if eq and re.match(r"^[A-Z_][A-Z0-9_]*$", k):
+                    env[k] = v; last = k
+                elif last is not None:
+                    env[last] += ";" + kv      # a value with its own ';' (read_tap's RTAP joins ranges with ';')
+                else:
+                    raise ValueError("sheet.tsv:%d: tap env entry %r is not NAME=value" % (n, kv))
+            s["legs"][f[2]]["tap"] = {"script": f[3], "env": env}
     return [sheets[k] for k in order]
 
 
@@ -222,12 +238,14 @@ def capture(sheet_dir, s, leg, work):
     frames = sorted({a["frame"] for m in s["moments"].values() for l, a in m["at"].items() if l == leg and a["basis"] != "file"})
     specs = sorted({k for m in s["moments"].values() for l, a in m["at"].items()
                     if l == leg and a["basis"] == "fields" for k in parse_fields(a["expect"])})
-    res = {"C": {}, "V": {}, "A": [], "S": {}, "error": None, "capped": None}
+    res = {"C": {}, "V": {}, "A": [], "S": {}, "T": None, "error": None, "capped": None}
     if not frames and not s["anchors"]:
         return res
     w = Path(work) / ("%s.%s" % (s["sid"], leg))
     shutil.rmtree(w, ignore_errors=True)
     w.mkdir(parents=True)
+    if lg.get("tap"):
+        return capture_tap(sheet_dir, lg, frames, w, res)
     env = dict(os.environ, MAME_SANDBOX=str(w / "sb"), MAME_ROMPATH=lg["rompath"],
                REPLAY=str(Path(sheet_dir) / lg["replay"]), POKES=lg["pokes"], MASK_RANGES=lg["mask"],
                SNAP_FRAMES=",".join(map(str, frames)), FIELDS=",".join(specs), CAPTURE_OUT=str(w / "cap.txt"),
@@ -263,6 +281,55 @@ def capture(sheet_dir, s, leg, work):
     return res
 
 
+def capture_tap(sheet_dir, lg, frames, w, res):
+    """D2 (ruled 2026-10-18): re-run a tap leg under its gate's own instrument (tests/lua/sheet_tap_capture.lua), with the
+    gate's env, its replay and pokes; photograph at the moment frames; keep the instrument's re-run log for the event proof."""
+    tap = lg["tap"]
+    env = dict(os.environ, **tap["env"])
+    env.update(MAME_SANDBOX=str(w / "sb"), MAME_ROMPATH=lg["rompath"], REPLAY=str(Path(sheet_dir) / lg["replay"]),
+               TAP_SCRIPT=str(ROOT / tap["script"]), SNAP_FRAMES=",".join(map(str, frames)), WRAP_OUT=str(w / "wrap.txt"),
+               TRACE_OUT=str(w / "tap.txt"), FIELD_OUT=str(w / "tap.txt"))   # rom_poke.lua hands off to field_trace.lua (FIELD_OUT)
+    if lg["pokes"]:
+        env["POKES"] = lg["pokes"]
+    else:
+        env.pop("POKES", None)
+    with open(w / "mame.log", "w") as lf:
+        subprocess.run([str(ROOT / "tools/run_mame.sh"), lg["set"], "-autoboot_script",
+                        str(ROOT / "tests/lua/sheet_tap_capture.lua")], env=env, cwd=w, stdout=lf, stderr=subprocess.STDOUT,
+                       stdin=subprocess.DEVNULL)
+    if not (w / "tap.txt").exists() or not (w / "wrap.txt").exists():
+        res["error"] = "the tap re-run did not finish (%s)" % (w / "mame.log")
+        return res
+    snaps = sorted(glob.glob(str(w / "sb" / "snap" / "*" / "*.png")))
+    for line in (w / "wrap.txt").read_text().splitlines():
+        t = line.split()
+        if len(t) == 3 and t[0] == "S":
+            hit = [p for p in snaps if os.path.basename(p) == "%04d.png" % int(t[1])]
+            if hit:
+                res["S"][int(t[2])] = hit[0]
+    res["T"] = str(w / "tap.txt")
+    return res
+
+
+TAPFRAME = re.compile(r"^[Ff]?(\d+)$")
+
+
+def tap_lines(path, lo, hi):
+    """The instrument log's lines whose frame (the first of the first two tokens reading `N`, `fN` or `FN`) is in
+    [lo, hi]: `W 7 PC …`, `f2197 id …`, `F f2197 e07 …`, `F2197 B0 E000 …`, `== f2197 id 0700 ==`."""
+    out = []
+    for line in Path(path).read_text(errors="replace").splitlines():
+        if line.split()[:1] and (line.split()[0] in ("END", "PCHIST", "OPATCH") or line.split()[0].endswith("SUMMARY")):
+            continue                     # a run summary, not an event
+        for tok in line.split()[:2]:
+            m = TAPFRAME.match(tok)
+            if m:
+                if lo <= int(m.group(1)) <= hi:
+                    out.append(line.rstrip())
+                break
+    return out
+
+
 def prove(at, lg, cap, sheet_dir):
     """-> (status, why). status: PROVEN | NOT THE JUDGED RUN | JUDGED FILE | UNPROVEN."""
     fr, basis, exp = at["frame"], at["basis"], at["expect"]
@@ -272,6 +339,21 @@ def prove(at, lg, cap, sheet_dir):
         return "UNPROVEN", "the gate logged nothing that can prove this picture"
     if fr not in cap["S"]:
         return "NOT THE JUDGED RUN", "no snapshot at f%d" % fr
+    if basis == "event":
+        m = re.match(r"^(.+):(\d+)-(\d+)$", exp)
+        if not m:
+            return "NOT THE JUDGED RUN", "an event expectation is <log>:<lo>-<hi>, not %r" % exp
+        if not cap.get("T"):
+            return "NOT THE JUDGED RUN", "the leg has no tap row, so it was not re-run under its instrument"
+        lo, hi = int(m.group(2)), int(m.group(3))
+        want, got = tap_lines(Path(sheet_dir) / m.group(1), lo, hi), tap_lines(cap["T"], lo, hi)
+        if not want:
+            return "UNPROVEN", "the gate logged no event in f%d-%d: nothing to prove the picture by" % (lo, hi)
+        if want == got:
+            return "EVENT-PROVEN", "the %d event line(s) the gate logged in f%d-%d are reproduced exactly; work RAM outside the tapped addresses is not proven" % (len(want), lo, hi)
+        diff = next((i for i in range(max(len(want), len(got))) if (want[i:i + 1] or [None]) != (got[i:i + 1] or [None])), 0)
+        return "NOT THE JUDGED RUN", "in f%d-%d the re-run logs %d event line(s) against the gate's %d; first difference: gate %r, re-run %r" % (
+            lo, hi, len(got), len(want), (want[diff:diff + 1] or ["-"])[0][:60], (got[diff:diff + 1] or ["-"])[0][:60])
     if basis in ("log", "ram"):
         if basis == "log":
             if not lg["log"]:
@@ -294,7 +376,7 @@ def prove(at, lg, cap, sheet_dir):
 
 def prove_dir(sheet_dir, jobs=4):
     """Capture and prove every sheet of one gate's SHEET_OUT; writes proof.json beside it and returns it."""
-    sheet_dir = Path(sheet_dir)
+    sheet_dir = Path(sheet_dir).resolve()  # each capture runs in its own work dir: a relative path would not resolve there
     sheets = read_sheet(sheet_dir)
     work = sheet_dir / "capture"
     tasks = [(s, leg) for s in sheets for leg in s["legs"]]
@@ -356,6 +438,18 @@ def expand(s, d):
     return s
 
 
+def verdict_line(text):
+    """The gate's verdict line: the last one starting PASS/FAIL/SKIP; else the last whose leading words end in PASS,
+    FAIL or SKIP (`AUDIT PASS`, `FLICKER ATTRIBUTION: PASS`, `audit_trap_shock: PASS (...)`, 14z-205), never a
+    CONTROL FIRED/DEAD line or an indented one."""
+    lines = text.splitlines()
+    hit = next((l for l in reversed(lines) if re.match(r"^(PASS|FAIL|SKIP)\b", l)), None)
+    if hit is None:
+        hit = next((l for l in reversed(lines) if not l.startswith(("CONTROL ", " ", "\t"))
+                    and re.match(r"^[A-Za-z0-9_ .-]{0,40}?:?\s?(PASS|FAIL|SKIP)\b", l)), None)
+    return hit or "no verdict line"
+
+
 def run_gate(row, sheet_dir, log):
     gate, args = row[0], row[4] if len(row) > 4 else "-"
     tmo = int(row[6]) if len(row) > 6 and row[6].strip().isdigit() else 5400
@@ -376,8 +470,7 @@ def run_gate(row, sheet_dir, log):
                                 stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, timeout=tmo).returncode
         except subprocess.TimeoutExpired:
             rc = 124
-    text = Path(log).read_text(errors="replace")
-    verdict = next((l for l in reversed(text.splitlines()) if re.match(r"^(PASS|FAIL|SKIP)\b", l)), "no verdict line")
+    verdict = verdict_line(Path(log).read_text(errors="replace"))
     return {"gate": gate, "rc": rc, "verdict": verdict[:200], "seconds": int(time.time() - t0)}
 
 
@@ -416,9 +509,62 @@ table.grid{border-collapse:collapse} .grid td,.grid th{padding:4px;vertical-alig
 .cell img{display:block;width:192px;height:auto;border:3px solid transparent}
 .PROVEN img{border-color:transparent} .DIFF img{border-color:var(--diff)}
 .NOTJUDGED img{border:3px dashed var(--bad)} .cap{font-size:11px;max-width:192px} .st{font-weight:600}
-.st.PROVEN{color:var(--ok)} .st.NOTJUDGED{color:var(--bad)} .st.UNPROVEN{color:var(--diff)}
+.st.PROVEN{color:var(--ok)} .st.NOTJUDGED{color:var(--bad)} .st.UNPROVEN{color:var(--diff)} .st.EVENT-PROVEN{color:var(--ok);font-style:italic}
 .idx a{margin-right:10px} a{color:var(--link)} .nc{font-size:12px;margin-top:6px}
+.note{background:var(--card);border-left:3px solid var(--link);padding:6px 12px;margin:6px 0 10px;max-width:900px}
+.note p{margin:6px 0} .note ul{margin:4px 0 6px 18px;padding:0}
 """
+
+
+NOTES = ROOT / "docs/project/sheet_notes.md"
+REPO_URL = "https://github.com/DefinitelyFrenchName/VampireSaved/issues/"
+
+
+def sheet_notes(path=NOTES):
+    """docs/project/sheet_notes.md -> {gate: text}: each `## <gate>` section's body (14z-205, #291)."""
+    notes, cur = {}, None
+    if not Path(path).exists():
+        return notes
+    for line in Path(path).read_text().splitlines():
+        m = re.match(r"^## +`?([A-Za-z0-9_]+)`?\s*$", line)
+        if m:
+            cur = m.group(1)
+            notes[cur] = []
+        elif line.startswith("#"):
+            cur = None
+        elif cur:
+            notes[cur].append(line)
+    return {g: "\n".join(t).strip() for g, t in notes.items()}
+
+
+def note_html(text):
+    """A note's paragraphs and `- ` bullets as HTML: **bold**, `code` and #N (a link to the issue); all else escaped."""
+    def inline(t):
+        t = html.escape(t)
+        t = re.sub(r"`([^`]+)`", r"<code>\1</code>", t)
+        t = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", t)
+        return re.sub(r"(?<![\w/&])#(\d+)\b", lambda m: '<a href="%s%s">#%s</a>' % (REPO_URL, m.group(1), m.group(1)), t)
+    out, para, items = [], [], []
+    def flush():
+        if para:
+            out.append("<p>%s</p>" % inline(" ".join(para))); para.clear()
+        if items:
+            out.append("<ul>%s</ul>" % "".join("<li>%s</li>" % inline(i) for i in items)); items.clear()
+    for line in text.splitlines():
+        if not line.strip():
+            flush()
+        elif line.lstrip().startswith("- "):
+            if para:
+                flush()
+            items.append(line.lstrip()[2:].strip())
+        elif items and line.startswith("  "):
+            items[-1] += " " + line.strip()
+        else:
+            if items:
+                flush()
+            para.append(line.strip())
+    flush()
+    return "".join(out)
 
 
 def page(out_dir, meta):
@@ -426,11 +572,14 @@ def page(out_dir, meta):
     pics = out_dir / "pics"
     pics.mkdir(exist_ok=True)
     body, by_char, by_ticket, by_test = [], {}, {}, []
+    notes = sheet_notes()
     for g in meta["gates"]:
         gid = g["gate"]
         by_test.append(gid)
         body.append('<h2 id="%s">%s</h2><div class="mut">gate verdict: %s (%ss)</div>' % (
             gid, html.escape(gid), html.escape(g["verdict"]), g["seconds"]))
+        if gid in notes:
+            body.append('<div class="note">%s</div>' % note_html(notes[gid]))
         for s in g.get("sheets", []):
             anchor = "%s--%s" % (gid, s["sid"])
             for c in s["chars"]:
@@ -453,9 +602,13 @@ def page(out_dir, meta):
                         "DIFF" if re.match(r"(?i)^(DIFF|FAIL|DIVERGE)", c["verdict"]) else "PROVEN")
                     img = ""
                     if cell["pic"] and os.path.exists(cell["pic"]):
-                        name = "%s.%s.%s.%d.png" % (gid, s["sid"], lg["leg"], k)
+                        ext = os.path.splitext(cell["pic"])[1].lower() or ".png"
+                        name = "%s.%s.%s.%d%s" % (gid, s["sid"], lg["leg"], k, ext)
                         shutil.copyfile(cell["pic"], pics / name)
-                        img = '<img src="pics/%s" alt="%s f%s">' % (html.escape(name), html.escape(lg["role"]), cell["frame"])
+                        if ext in (".wav", ".ogg", ".mp3"):   # the ruled sound clips (2026-10-17): the gate's own recording
+                            img = '<audio controls preload="none" src="pics/%s"></audio>' % html.escape(name)
+                        else:
+                            img = '<img src="pics/%s" alt="%s f%s">' % (html.escape(name), html.escape(lg["role"]), cell["frame"])
                     stc = "NOTJUDGED" if cls == "NOTJUDGED" else cell["status"].split()[0]
                     tds.append('<td class="cell %s">%s<div class="cap">f%s <span class="st %s">%s</span><br>'
                                '<span class="mut">%s</span></div></td>' % (
@@ -474,7 +627,8 @@ def page(out_dir, meta):
         idx.append('<div class="idx"><b>By ticket:</b> ' + "".join(
             '<a href="#%s">#%s (%d)</a>' % (v[0], html.escape(k), len(v)) for k, v in sorted(by_ticket.items())) + "</div>")
     lists = []
-    for key, title in (("no_reference_leg", "No reference leg (listed, not drawn)"), ("debt", "Not yet declared (the retrofit's debt)")):
+    for key, title in (("no_reference_leg", "No reference leg (listed, not drawn)"), ("no_picture", "No picture: compares legs, judges nothing a proven picture can show (listed, not drawn)"),
+                       ("debt", "Not yet declared (the retrofit's debt)")):
         if meta.get(key):
             lists.append("<h2>%s — %d</h2><div class=\"mut\">%s</div>" % (title, len(meta[key]), html.escape(", ".join(meta[key]))))
     builds = "".join("<li>%s: %s</li>" % (html.escape(k), html.escape(v)) for k, v in meta.get("builds", {}).items())
@@ -507,10 +661,10 @@ def cmd_run(a):
     if not os.environ.get("ROMDIR"):
         print("REFUSED: set ROMDIR")
         return 2
-    out = Path(a.out or ROOT / "build" / "sheets" / head[:12])
+    out = Path(a.out or ROOT / "build" / "sheets" / head[:12]).resolve()
     out.mkdir(parents=True, exist_ok=True)
     rows = registry_gates(ROOT / "tests/ci_emulator.tsv")
-    meta = {"commit": head, "date": time.strftime("%Y-%m-%d %H:%M"), "gates": [], "no_reference_leg": [], "debt": [], "builds": {}}
+    meta = {"commit": head, "date": time.strftime("%Y-%m-%d %H:%M"), "gates": [], "no_reference_leg": [], "no_picture": [], "debt": [], "builds": {}}
     declared = []
     for r in select(rows, a.gate, a.char, a.ticket):
         d, err = parse_declaration(ROOT / "tests" / (r[0] + ".sh"))
@@ -518,6 +672,8 @@ def cmd_run(a):
             meta["debt"].append(r[0])
         elif d["kind"] == "no-reference-leg":
             meta["no_reference_leg"].append(r[0])
+        elif d["kind"] == "no-picture":
+            meta["no_picture"].append(r[0])
         elif d["kind"] == "legs":
             declared.append(r)
     for r in declared:

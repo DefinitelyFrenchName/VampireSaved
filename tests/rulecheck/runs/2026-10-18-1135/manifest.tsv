@@ -1,0 +1,9 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent205/poked/census.diff	2b3b748740990db12150dc8b87d2c40e6c172560
+build/agent205/poked/census_after_reword.diff	3fb10a13dda0e837b1249cc3b88430907782274d
+build/agent205/poked/comment_sensitivity.txt	e7c1fedaf9677e3718a6518f825ab5bcb947452d
+build/agent205/poked/sheet_poke_lines.txt	0e4283edd0a0cf874b5275897bf189b27cac661a
+build/agent205/poked/gate_after_reword.log	9e071b713a660c376998fe7a8fbf4d645d1ec646
+build/agent205/poked/gate_header.txt	5e96d80f230a3ecdb6b0bf302ee40c89be0bbc32
+build/agent205/poked/tool_doc_36_47.txt	1585648da62391d6a5452c57beca39c1480fc2d1
+tests/expected/poked_legs_accepted.tsv	13e9fbf84e0d2e43074c0221f4cb6d0161414924

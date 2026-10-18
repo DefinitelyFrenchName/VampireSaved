@@ -49,6 +49,7 @@ declares	audit_ladder_selector
 declares	audit_lag_budget
 declares	audit_landing_sound
 declares	audit_latch_reads
+declares	audit_legacy_pairings
 declares	audit_marionette_cost
 declares	audit_merged_legacy
 declares	audit_merged_vec3

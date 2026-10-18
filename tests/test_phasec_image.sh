@@ -16,6 +16,8 @@
 #   tests/replays/judge/02_throw.rpl tools/build_donovan.sh tools/build_wide_romset.py
 #   tools/run_mame.sh tools/run_replay_fbneo.sh tools/setup_fbneo.sh tools/setup_mame.sh
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # The dual-track decision (14z-59g) says WIDE is the roster build while the
 # stock build stays byte-identical. This gate holds both halves at once:
 #

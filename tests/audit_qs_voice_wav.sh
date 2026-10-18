@@ -12,7 +12,9 @@
 #   audit_qs_voice_batch: equal data can still play differently.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/qs_sweep.lua
 #   tests/replays/06_test_mode.rpl tools/build_qs_songs.py tools/check_qs_voice_wav.py
-#   tools/qs_ledger.py tools/run_mame.sh tools/setup_mame.sh
+#   tools/qs_ledger.py tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: every SOUNDING voice window the spectral A/B compares (voice i on ours against vs2 voice i, the checker's own window and skip rule), each cell that leg's window cut from its own -wavwrite capture as a playable clip (the ruled clips, 2026-10-17), captioned with both ids and each leg's RMS and high-band ratio — not comparable: the screen (the test-mode sound sweep shows nothing worth a picture); the ids differ by design (ours authored ids, vs2's own)
 #
 # MUST-FIRE: perturbed-copy: truncated-window — a truncated sounding window in the OURS capture must be flagged by the spectral A/B (mode: the real ours capture is truncated and the A/B against native must fail)
 #
@@ -99,6 +101,43 @@ PY
 fi
 python3 "$REPO/tools/check_qs_voice_wav.py" "$W/ours/voices.wav" \
     "$W/native/voices.wav" "$W/ledger.json" || fail "spectral A/B"
+
+# THE SHEET (#291, the ruled clips): with SHEET_OUT set, every sounding window this A/B compared, each leg's window cut
+# from its own capture as a playable clip (basis file: the audio the gate judged). Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "$MODE" ]; then
+    mkdir -p "$SHEET_OUT/legs/qsw_rp" && cp "$W/rp/vsavjw.zip" "$SHEET_OUT/legs/qsw_rp/vsavjw.zip"
+    sheet_new voices "The voice sweep (test-mode venue): every sounding window, native vs2 above ours, as clips" - - \
+        "the screen (the test-mode sound sweep shows nothing worth a picture); the ids differ by design (ours authored ids, vs2's own)"
+    sheet_leg voices native vs2 vsav2 "$ROMDIR" "$REPO/tests/replays/06_test_mode.rpl" - 21000
+    sheet_leg voices ours ours vsavjw "$SHEET_OUT/legs/qsw_rp;$ROMDIR" "$REPO/tests/replays/06_test_mode.rpl" - 21000
+    python3 - "$W" "$SHEET_OUT" > "$W/sheet_rows.tsv" <<'PYS' || exit 1
+import json, os, sys, wave
+W, OUT = sys.argv[1:3]
+sys.path.insert(0, os.path.join(os.environ["REPO"], "tools"))
+from check_qs_voice_wav import window, load, metrics, FIRST_FRAME, STEP_FRAMES
+led = json.load(open(f"{W}/ledger.json"))
+ro, so = load(f"{W}/ours/voices.wav"); rn, sn = load(f"{W}/native/voices.wav")
+os.makedirs(f"{OUT}/files", exist_ok=True)
+def clip(leg, mono, rate, a, b, name):     # the leg's own capture, downmixed as the checker reads it, window a..b
+    w = wave.open(f"{OUT}/files/{name}", "wb"); w.setnchannels(1); w.setsampwidth(2); w.setframerate(rate)
+    import struct; w.writeframes(struct.pack("<%dh" % (b - a), *mono[a:b])); w.close()
+    return f"files/{name}"
+for i, v in enumerate(led["voices"]):
+    a, b = window(i, ro)
+    mo, mn = metrics(so, a, b), metrics(sn, a, b)
+    if mo[0] < 50 and mn[0] < 50:
+        continue                                   # the checker's own skip: a window both legs leave silent
+    q = lambda m: m[1] / m[0] if m[0] else 0
+    vals = "ours id %04x RMS %.0f hi/rms %.3f; vs2 id %03x RMS %.0f hi/rms %.3f" % (v["id"], mo[0], q(mo), v["vs2_id"], mn[0], q(mn))
+    mid = "v%d" % i
+    print("moment\tvoices\t%s\tvoice %d: ours %04x / vs2 %03x\tno suspect (the gate's spectral A/B)\t%s" % (mid, i, v["id"], v["vs2_id"], vals))
+    f0 = FIRST_FRAME + STEP_FRAMES * i
+    print("at\tvoices\t%s\tnative\t%d\tfile\t%s" % (mid, f0, clip("native", sn, rn, a, b, "voices.native.%d.wav" % i)))
+    print("at\tvoices\t%s\tours\t%d\tfile\t%s" % (mid, f0, clip("ours", so, ro, a, b, "voices.ours.%d.wav" % i)))
+PYS
+    sheet_rows "$W/sheet_rows.tsv"
+fi
 
 # verdict control: truncate one sounding window in a copy -> must fire.
 # Zero the HEAD (the loud attack), not the tail: RMS is attack-dominated,

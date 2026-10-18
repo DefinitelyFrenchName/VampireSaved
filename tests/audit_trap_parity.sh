@@ -14,7 +14,9 @@
 # EXPECTS: ours equals its frozen inventory, native its own, 0x739/0x73A absent on ours,
 #   0x49A present on both. The 0x10A/0x10B pair is a recorded cosmetic delta, not gated.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/ring_tap.lua
-#   tests/replays/hui/87_hui_plasma_trap.rpl tools/run_mame.sh tools/setup_mame.sh
+#   tests/replays/hui/87_hui_plasma_trap.rpl tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: each trap-event ring id the verdict compares in the two attempt windows (3400-3900, 4200-4700, the ambient 0x049A apart), the k-th event of each leg side by side, each picture EVENT-PROVEN on that leg's own ring log at the event's frame — not comparable: the ids themselves differ by design (native 0739/010b/073a, ours the restored 00d8/010b/0199, frozen per leg); each game's stage and palette, and Victor's art (each game's own copy; [VSP-168]); the sound itself (the ring holds ids)
 #
 # THE MEASURED MECHANISM THIS FREEZES (14z-85g, both halves):
 # native vs2 fires per trap attempt: id 0x0739 at the mine SPAWN
@@ -197,6 +199,43 @@ for e in errs: print("FAIL:", e)
 sys.exit(1 if errs else 0)
 PY
 rc=$?
+# THE SHEET (#291, D2): with SHEET_OUT set, the two ring-tap legs this verdict compared, re-run under ring_tap.lua
+# itself, one moment per trap event of each attempt window (the k-th event of each leg), EVENT-PROVEN on each leg's
+# own ring log at that event's frame. Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on; then
+    sheet_new trap "Phobos's Plasma Trap (replay 87), two attempts: the trap-event ring ids, native vs2 above ours" huitzil - \
+        "the ids themselves differ by design (native 0739/010b/073a, ours the restored 00d8/010b/0199, frozen per leg); each game's stage and palette, and Victor's art (each game's own copy; [VSP-168]); the sound itself (the ring holds ids)"
+    sheet_leg trap native vs2 vsav2 "$ROMDIR" "$RPL" "$PK" 5000
+    sheet_tap trap native tests/lua/ring_tap.lua "FRAMES=5000"
+    sheet_leg trap ours ours vsavjw "$BUILD_RP;$ROMDIR" "$RPL" "$PK" 5000
+    sheet_tap trap ours tests/lua/ring_tap.lua "FRAMES=5000"
+    _tn="$(sheet_file trap native.ring "$W/native/ring.txt")"; _to="$(sheet_file trap ours.ring "$W/ours/ring.txt")"
+    python3 - "$W" "$_tn" "$_to" > "$W/sheet_rows.tsv" <<'PYS'
+import re, sys
+W, tn, to = sys.argv[1:4]
+WINDOWS = [(3400, 3900), (4200, 4700)]
+def events(leg, wa, wb):
+    out = []
+    for line in open(f"{W}/{leg}/ring.txt"):
+        m = re.match(r"f(\d+) id ([0-9a-f]{4}) pc", line)
+        if m and wa <= int(m.group(1)) <= wb and m.group(2) not in ("049a", "0000", "ffff"):
+            out.append((int(m.group(1)), m.group(2)))
+    return out
+for w, (wa, wb) in enumerate(WINDOWS, 1):
+    ev = {"native": events("native", wa, wb), "ours": events("ours", wa, wb)}
+    for k in range(max(len(ev["native"]), len(ev["ours"]))):
+        n = ev["native"][k] if k < len(ev["native"]) else None
+        o = ev["ours"][k] if k < len(ev["ours"]) else None
+        mid = "w%de%d" % (w, k + 1)
+        vals = "native %s, ours %s" % ("%s at f%d" % (n[1], n[0]) if n else "none", "%s at f%d" % (o[1], o[0]) if o else "none")
+        print("moment\ttrap\t%s\tattempt %d, trap event %d\tjudged against each leg's frozen inventory\t%s" % (mid, w, k + 1, vals))
+        for leg, e, g in (("native", n, tn), ("ours", o, to)):
+            if e:   # a ring line labelled N is replay.lua's frame N+1: the picture is that frame, the window the line
+                print("at\ttrap\t%s\t%s\t%d\tevent\t%s:%d-%d" % (mid, leg, e[0] + 1, g, e[0], e[0]))
+PYS
+    sheet_rows "$W/sheet_rows.tsv"
+fi
 [ "$rc" = 0 ] && echo "audit_trap_parity: PASS (restored ejection+detonation state holds)" \
              || echo "audit_trap_parity: FAILURES"
 exit "$rc"

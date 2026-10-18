@@ -26,6 +26,8 @@
 #   tests/lua/trace_writes.lua tools/anim_nodes.py tools/name_moves.py tools/run_mame.sh
 #   tools/setup_mame.sh
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # MUST-FIRE: known-bad: drift-clock — a tap run under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 5,520 emulated frames of 5,620 counted) must miss its frozen game clock (in-gate: one extra run; mode: both tap runs run the old clock and the gate FAILs)
 # MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs)
 #

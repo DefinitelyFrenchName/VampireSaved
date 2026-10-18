@@ -17,6 +17,8 @@
 #   tests/lua/replay_guard.lua tests/replays/26_don_arcade_mash.rpl tools/run_mame.sh
 #   tools/run_replay_guarded.sh tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # MUST-FIRE: known-bad: mask-not-load-bearing — the in-use mask drives the stage, so a run where saturating it changes no stage must fail section 3 (mode: the saturated stage set is forced equal to the control so section 3 reads the mask as inert and the gate FAILs)
 #
 # WHY IT EXISTS. #99 is a crash reported at the FIFTH arcade match, and the

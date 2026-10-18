@@ -123,9 +123,16 @@ four of the eight were red from a slip the gates below catch.
    - `docs/project/tickets.tsv`, or an issue closed or filed: `test_tickets`;
    - a rule-checker run recorded: `test_rule_checker`, with every run directory the ledger names staged;
    - `STATE.md` or `docs/NEXT_SESSION.md`: `test_state_open_lists`, `test_live_budget`;
-   - a gate or tool changed: that gate, and the gates whose reach includes that tool, run directly.
+   - a gate or tool changed: that gate, and the gates whose reach includes that tool, run directly;
+   - a file added to, renamed in or removed from `tests/expected/`: `test_expectation_provenance` (its row in
+     `tests/expected/PROVENANCE.md`);
+   - any live document, manifest, gate script or tool changed (the carriers `tools/gen_annotations.py` reads, so nearly
+     every change): `test_annotations_current`.
 
-   Each of the four reds of 2026-10-16/17 was one of these gates. The tier then confirms; it should not discover.
+   Each of the four reds of 2026-10-16/17 was one of these gates, and so was each of the three reds of the 14z-204
+   close's first tier (2026-10-18: `test_expectation_provenance`, `test_gate_coverage_current`,
+   `test_annotations_current`, about 30 minutes of re-run against about 3 seconds of gates). The tier then confirms;
+   it should not discover.
 3. **The tier's base** is the newest run that executed its controls. A confirm based on a run made without controls
    re-runs every gate whose controls that run did not execute.
 

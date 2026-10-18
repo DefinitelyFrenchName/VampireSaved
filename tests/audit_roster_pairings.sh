@@ -15,6 +15,8 @@
 #   tests/lib/pairing.sh tests/lua/replay_guard.lua tests/replays/94_tenant_vs_tenant.rpl
 #   tools/run_mame.sh tools/run_replay_guarded.sh tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # WHY IT EXISTS. CLAUDE.md §4 mandates, for a ported character, "vs each of
 # the 18 (both sides)". The suite has never had it. 14z-95's
 # test_tenant_pairings closed the tenant-vs-tenant half — six orderings — and

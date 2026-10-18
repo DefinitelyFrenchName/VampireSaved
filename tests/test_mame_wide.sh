@@ -16,6 +16,8 @@
 #   tools/build_fingerprint.py tools/build_wide_romset.py tools/run_mame.sh
 #   tools/run_replay_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # The MAME twin of tests/test_wide_profile.sh. Same two invariants, same
 # two bases, so that "the profile is safe" is a claim two unrelated
 # emulator codebases have each had to satisfy independently:

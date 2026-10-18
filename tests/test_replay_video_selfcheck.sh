@@ -14,6 +14,8 @@
 #   tests/lua/replay.lua tests/replays/02_demitri_vs_cpu.rpl tests/test_m2b_stage6.sh tools/build_donovan.sh
 #   tools/run_mame.sh tools/run_replay_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # WHY: session 14z-55 discovered that the FBNeo harness had never rendered a
 # pixel — every gate the project owned on that side was structurally blind to
 # the video path, and would have reported the CPS-2 WIDE 19-bit tile address

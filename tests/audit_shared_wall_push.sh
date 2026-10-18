@@ -26,7 +26,9 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/shared_wall_push.tsv
 #   tests/lib/controls.sh tests/lib/decrypt_cache.sh tests/lua/field_trace.lua
 #   tests/lua/read_tap.lua tests/replays/naming/ tools/name_moves.py tools/run_mame.sh
-#   tools/select_paths.py tools/select_wheel.py tools/setup_mame.sh
+#   tools/select_paths.py tools/select_wheel.py tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,vsavj,ours — moments: per part the end of the push window (both fighters' x), and on legacy_lilith the legs' first split, each on that leg's own field trace at the taps' frame + 1 — not comparable: legacy_lilith is pristine vsavj against vs2 (the documented engine difference, no leg of ours); on huitzil_3 each game's stage and palette, and P2's art (each game's own copy; [VSP-168])
 #
 # MUST-FIRE: perturbed-copy: flag-planted — a copy of the pristine vsavj leg's tap with ONE non-zero store to P1's +0x148 planted at a game PC before the landing must add a writer to the vsavj flag row and FAIL the frozen compare, so "vsavj never sets +0x148" is something the reducer can refuse (in-gate: the planted copy is reduced and must differ; mode: the real vsavj and ours taps are planted and the gate FAILs)
 # MUST-FIRE: perturbed-copy: early-split — a copy of the vs2 legacy tap with ONE x write planted at the end of f3100, forty frames before the landing, must move the first-split row and FAIL, so "identical until the landing" is something the split reader can refuse (in-gate: the planted copy's split row must differ from the frozen one; mode: the real vs2 tap is planted, and the split row and the field-trace agreement both FAIL)
@@ -338,6 +340,52 @@ if echo " $PARTS " | grep -q " legacy_lilith "; then
 fi
 if diff -q "$W/want.tsv" "$W/swapped.tsv" > /dev/null; then vs_ctl_dead legs-swapped "the legs reduced under each other's labels still match" || fail=1
 else vs_ctl_fired legs-swapped "the legs reduced under each other's labels differ from the frozen rows"; fi
+
+# THE SHEET (#291): with SHEET_OUT set, each part's two field-traced legs as this run played them and the moments the
+# frozen rows judge (the end of the push window, the legacy first split), each picture proven on that leg's own trace
+# at the tap frame + 1 (the instruments' one-frame label offset, above). Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "${VS_CTL:-}" ]; then
+    for p in $PARTS; do
+        eval "_g=\$GEOM_$p"; set -- $_g; _fr=$1; _en=$4
+        case "$p" in
+        legacy_lilith) _la=vsavj; _ra=vsavj; _sa=vsavj; _rpa="$ROMDIR"; _ch=-
+            sheet_new "$p" "$p: Lilith walks Victor into the right corner, throws, pursues: pristine vsavj and native vs2 (no leg of ours: the engine difference itself)" - "#179" \
+                "no leg of ours by design (the two engines' own rule); each game's stage and palette" ;;
+        *) _la=ours; _ra=ours; _sa=vsavjw; _rpa="$BUILD/rompath;$ROMDIR"; _ch=huitzil
+            sheet_new "$p" "$p: Sitting Attack [8P] off a throw at the right corner, native vs2 above ours" huitzil "#179" \
+                "each game's stage and palette, and P2's art (each game's own copy; [VSP-168])" ;;
+        esac
+        sheet_leg "$p" vsav2 vs2 vsav2 "$ROMDIR" "$W/$p.vsav2.rpl" "$(tr -d '\n' < "$W/$p.pokes")" "$_fr"
+        sheet_leg "$p" "$_la" "$_ra" "$_sa" "$_rpa" "$W/$p.$_la.rpl" "$(tr -d '\n' < "$W/$p.pokes")" "$_fr"
+        if [ -s "$W/diff.$p" ] || [ ! -s "$W/got.$p" ]; then _v="DIFF from frozen"; else _v="as frozen"; fi
+        python3 - "$p" "$_la" "$W" "$FT" "$_en" "$_v" > "$W/sheet_$p.tsv" <<'PYS'
+import sys
+part, la, W, spec, en, verdict = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], int(sys.argv[5]), sys.argv[6]
+key = {name: "%s:%s" % (a.lower(), sz) for a, sz, name in (f.split(":") for f in spec.split(","))}
+def load(p):
+    d = {}
+    for l in open(p):
+        t = l.split()
+        if t and t[0] == "F":
+            d[int(t[1])] = ",".join("%s=%s" % (key[k], v) for k, v in sorted(kv.split("=", 1) for kv in t[2:]) if k in key)
+    return d
+tr = {leg: load("%s/%s.%s.ft.txt" % (W, part, leg)) for leg in ("vsav2", la)}
+rows = [l.rstrip("\n").split("\t") for l in open("%s/got.tsv" % W) if l.startswith(part + "\t")]
+ends = {r[1]: r[4] for r in rows if r[2] == "end"}
+moms = [("end", "end of the push window, tap frame %d (%s)" % (en, "; ".join("%s %s" % (k, v) for k, v in sorted(ends.items()))), en)]
+sp = next((r[4] for r in rows if r[2] == "first-split"), None)
+if sp and sp.isdigit():
+    moms.insert(0, ("split", "the legs' first split, tap frame %s" % sp, int(sp)))
+for mid, lab, f in moms:
+    print("moment\t%s\t%s\t%s\t%s\t-" % (part, mid, lab, verdict))
+    for leg in ("vsav2", la):
+        d = tr[leg]
+        print("at\t%s\t%s\t%s\t%d\t%s\t%s" % (part, mid, leg, f + 1, "fields" if f + 1 in d else "none", d.get(f + 1, "-")))
+PYS
+        sheet_rows "$W/sheet_$p.tsv"
+    done
+fi
 
 if [ "$fail" = 0 ]; then echo "PASS: audit_shared_wall_push — on a shared wall vsavj pushes P1 out and vs2 pushes P2 out, as frozen"
 else echo "FAIL: audit_shared_wall_push"; exit 1; fi

@@ -16,6 +16,8 @@
 #   tools/mister_mra.sh tools/rpl2siminputs.py tools/run_sim_jtcps2.sh
 #   tools/setup_jtcores.sh
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # WHAT IT ASSERTS. The reference core `cps2` and the CPS-2 WIDE core `cps2w`,
 # running the SAME stock `vsavj` download under Verilator, must produce
 # BIT-IDENTICAL 68k work RAM at every frame of a window. Not "agree on mapped

@@ -26,6 +26,8 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/vsavj/masked-v2/ tests/lib/controls.sh
 #   tests/lua/dispatch_census.lua tests/replays/ tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
+#
 # WHY (14z-89). The legacy-cycle regression's fix is option (b) (maintainer,
 # 2026-08-15): move the tenant's work OFF the legacy path. For obj_hook that
 # means putting the tenant's object types on table entries LEGACY NEVER

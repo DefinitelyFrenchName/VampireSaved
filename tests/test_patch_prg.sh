@@ -8,6 +8,8 @@
 # EXPECTS: all three; the null case is what the superset invariant rests on.
 # FOLLOWS: build/manifest/ tests/lua/dump_opcodes.lua tools/pack_build.sh tools/patch_prg.py
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # Usage: ROMDIR=... tests/test_patch_prg.sh
 # Gates: (1) null patch is bit-identical to reference vsavj; (2) an injected
 # code blob decrypts back to its plaintext in MAME's real opcode space;

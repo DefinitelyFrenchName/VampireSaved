@@ -17,6 +17,8 @@
 #   tests/expected/vanilla_normal_slots.tsv tests/lib/controls.sh tests/lib/measures.sh tests/lib/decrypt_cache.sh
 #   tests/lua/field_trace.lua tools/run_mame.sh tools/setup_mame.sh
 #   tools/vanilla_join_rig.py
+#
+# SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
 # MEASURES: slot-map-rows — 180 the rows of the measured slot map (180 non-comment rows of tests/expected/vanilla_normal_slots.tsv)
 # MEASURES: hit-damage-rows — 90 the rows of the hit-damage body hashed out of tree (90, recorded in tests/expected/vanilla_hit_damage.sha256)
 #

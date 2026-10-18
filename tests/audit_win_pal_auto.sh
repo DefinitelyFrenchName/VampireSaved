@@ -14,8 +14,10 @@
 # EXPECTS: with EXPECT_WHITE=0 (since the fix) every leg reads COLOURED; C must always be
 #   coloured or the reading is wrong. A DEAD leg (neither white nor coloured) is refused;
 #   leg E carries its own liveness (Demitri's base, P2 KO'd).
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua tests/replays/103_tenant_2pwin_auto.rpl tests/replays/104_1p_auto_ko_win.rpl tests/replays/105_legacy_2pwin_auto.rpl tests/replays/61_tenant_2pwin.rpl
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua tests/replays/103_tenant_2pwin_auto.rpl tests/replays/104_1p_auto_ko_win.rpl tests/replays/105_legacy_2pwin_auto.rpl tests/replays/61_tenant_2pwin.rpl tests/lib/sheet.sh
 #   tools/run_mame.sh tools/setup_mame.sh
+#
+# SHEET: legs vsavj,ours — moments: the victory screen on each leg, at its first sample holding a real portrait ramp (or the first all-white sample), where the verdict reads COLORED or WHITE — not comparable: the winners and replays differ by leg (leg C is vanilla on leg A's replay; B, D and E are other flows), so each leg's screen is on its own frame
 #
 # THE SURFACE (named from the maintainer's captures, reproduced
 # deterministically): the victory screen — winner portrait + win quote —
@@ -136,6 +138,7 @@ classify() {
 import glob, re, struct, sys
 d = sys.argv[1]
 runs, white_run, colored = 0, 0, False
+first_col = first_white = None
 for f in sorted(glob.glob(f"{d}/dump_*_90c2a0.bin"),
                 key=lambda p: int(re.search(r'dump_(\d+)_', p).group(1))):
     b = open(f, "rb").read()
@@ -147,7 +150,13 @@ for f in sorted(glob.glob(f"{d}/dump_*_90c2a0.bin"),
         runs = 0
         vals = set(x for x in w if x not in (0xFFFF, 0xF000, 0x0000))
         if len(vals) >= 4:
+            if not colored: first_col = int(re.search(r'dump_(\d+)_', f).group(1))
             colored = True
+    if runs == 1 and white_run <= 1: first_white = int(re.search(r'dump_(\d+)_', f).group(1))
+import os
+if os.environ.get("SHEET_OUT"):   # THE SHEET (#291): the frame the verdict word rests on; a file only
+    fr = first_white if white_run >= 2 else (first_col if colored else None)
+    if fr is not None: open(f"{d}/sheet_frame.txt", "w").write("%d\n" % fr)
 print("WHITE" if white_run >= 2 else "COLORED" if colored else "DEAD")
 PY
 }
@@ -191,6 +200,24 @@ else
         || { echo "FAIL: leg A is $A — the fix does not hold"; fail=1; }
     [ "$D" = COLORED ] && echo "  ok: AUTO tenant winner colored (1P)" \
         || { echo "FAIL: leg D is $D — the fix does not hold on the 1P flavor"; fail=1; }
+fi
+
+# THE SHEET (#291): with SHEET_OUT set, the five legs as this run played them, each proven on its own checksum log,
+# and the victory screen each one's verdict word rests on. Nothing decided changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on; then
+    sheet_new win "#105: the victory portrait — vanilla vsavj (leg C) above the merged build's legs A, B, D, E" "donovan,huitzil" "#105" \
+        "the winners and replays differ by leg (leg C is vanilla on leg A's replay; B, D and E are other flows), so each leg's screen is on its own frame"
+    sheet_leg win C vsavj vsavj "$ROMDIR" "$REPO/tests/replays/103_tenant_2pwin_auto.rpl" - 6600 "$W/C/out.log"
+    sheet_leg win A ours vsavjw "$REPO/$BUILD/rompath;$ROMDIR" "$REPO/tests/replays/103_tenant_2pwin_auto.rpl" - 6600 "$W/A/out.log"
+    sheet_leg win B ours vsavjw "$REPO/$BUILD/rompath;$ROMDIR" "$REPO/tests/replays/61_tenant_2pwin.rpl" - 6600 "$W/B/out.log"
+    sheet_leg win D ours vsavjw "$REPO/$BUILD/rompath;$ROMDIR" "$REPO/tests/replays/104_1p_auto_ko_win.rpl" "$PK_D" 6600 "$W/D/out.log"
+    sheet_leg win E ours vsavjw "$REPO/$BUILD/rompath;$ROMDIR" "$REPO/tests/replays/105_legacy_2pwin_auto.rpl" - 6600 "$W/E/out.log"
+    if [ "$fail" = 0 ]; then _sv="as expected"; else _sv=DIFF; fi
+    sheet_moment win screen "the victory screen (the frame its verdict word rests on)" "$_sv" "C $C, A $A, B $B, D $D, E $E"
+    for _sl in C A B D E; do
+        if [ -s "$W/$_sl/sheet_frame.txt" ]; then sheet_at win screen "$_sl" "$(cat "$W/$_sl/sheet_frame.txt")" log; fi
+    done
 fi
 
 [ "$fail" = 0 ] && echo "AUDIT PASS (defect state as expected)" || { echo "AUDIT FAIL"; exit 1; }

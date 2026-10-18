@@ -16,6 +16,8 @@
 #   tests/lua/ring_tap.lua tests/replays/don/90_don_plant.rpl tools/run_mame.sh
 #   tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, with static checks of vsavj and vs2 ROM bytes; no reference leg
+#
 # MUST-FIRE: known-bad: foreign-ring-id — a foreign id in the plant-end ring window must be caught by the membership check (mode: a foreign id is injected into the REAL ring and section 2 must fail)
 #
 # CORRECTION (14z-188, GitHub #195; engine_internals "The per-node sfx row is the fighter's OWN"): the

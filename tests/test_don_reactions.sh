@@ -12,6 +12,8 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/replay.lua
 #   tests/replays/48_don_immortal_ko.rpl tests/replays/54_don_matchend_ko.rpl tests/replays/56_don_es_ls.rpl tests/replays/59_don_blizzard_hcf.rpl tests/replays/60_don_grapple_hcb.rpl tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # MUST-FIRE: known-bad: knockdown-forbidden — 421P must not knock down a standing opponent, so a knockdown-family node reading must fail section 1 (mode: the victim node is forced into the knockdown family so the no-knockdown assertion fails and the gate FAILs)
 #
 # GAMEPLAY LOCK (round-41, maintainer): 421P is a standing up-to-8-hit

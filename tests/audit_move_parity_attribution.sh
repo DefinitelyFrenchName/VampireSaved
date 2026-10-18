@@ -22,6 +22,8 @@
 #   tests/expected/move_parity_events.tsv tools/move_parity_attribution.py tests/lua/rom_poke.lua tools/dmg_sweep.py
 #   tools/setup_mame.sh
 #
+# SHEET: no-picture — its rigs run inside tools/move_parity_attribution.py (an ablation over the parts carrying a DIFF), not as legs of this script
+#
 # MUST-FIRE: shadow-tool: no-ablation — the tool with ablation disabled (roots classified, never removed) must leave rows UNATTRIBUTED and FAIL, so every attribution rests on a row actually vanishing when its root's inputs are removed (in-gate: donovan_11 alone with ablation disabled must leave its row unattributed; mode: the whole table with ablation disabled FAILs)
 # MUST-FIRE: perturbed-copy: p2-record-unswapped — every P2-RECORD root's legs re-run with P2 Demitri's record byte set to the other game's value must take the other leg's damage; with the UNPOKED traces in their place the check must FAIL, and in-gate the unpoked legs must differ (in-gate: the unpoked legs differ on every root; mode: the unpoked traces stand in for the swapped ones and the gate FAILs)
 #

@@ -15,7 +15,9 @@
 #   non-zero then clears to 0 while matches follow. Leg A (vanilla) red means vanilla
 #   stopped resetting and #102 reopens as ours.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua
-#   tests/replays/26_don_arcade_mash.rpl tools/run_mame.sh tools/setup_mame.sh
+#   tests/replays/26_don_arcade_mash.rpl tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vsavj,ours — moments: each loss+continue that clears the in-use venue mask on each leg (the reset the verdict asserts), at the first dump frame the mask reads 0 — not comparable: the venue VALUES and which match is lost, per-build lottery draws (ram.md); the legs reach their resets on different frames
 #
 # #102 IS CLOSED — maintainer-ruled 2026-08-19, NOT OURS (the answer this
 # gate produced). It is now a REGRESSION LOCK, not an open investigation:
@@ -168,6 +170,29 @@ echo "== leg A: pristine vsavj (the discriminator leg)"
 A="$(classify "$W/vanilla")"; echo "$A" | sed 's/^/   /'
 echo "== leg B: the merged build, same rig"
 B="$(classify "$W/merged")"; echo "$B" | sed 's/^/   /'
+
+# THE SHEET (#291): with SHEET_OUT set, both legs as this run played them, each proven on its own checksum log, and
+# one moment per mask reset the classifier found (the k-th reset of each leg side by side). Nothing decided changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on; then
+    sheet_new ladder "#102: a loss+continue resets the ladder's venue mask, pristine vsavj above the merged build" - "#102" \
+        "the venue VALUES and which match is lost, per-build lottery draws (ram.md); the legs reach their resets on different frames"
+    sheet_leg ladder vanilla vsavj vsavj "$ROMDIR" "$RPL" "$PKV" 40600 "$W/vanilla/out.log"
+    sheet_leg ladder merged ours vsavjw "$REPO/$BUILD/rompath;$ROMDIR" "$RPL" "$PKV" 40600 "$W/merged/out.log"
+    python3 - "$A" "$B" > "$W/sheet_rows.tsv" <<'PYS'
+import re, sys
+legs = {"vanilla": re.findall(r"\('f(\d+)', '(0x[0-9a-f]+)'\)", sys.argv[1]),
+        "merged": re.findall(r"\('f(\d+)', '(0x[0-9a-f]+)'\)", sys.argv[2])}
+for k in range(max(len(v) for v in legs.values()) if any(legs.values()) else 0):
+    have = {l: v[k] for l, v in legs.items() if k < len(v)}
+    vals = ", ".join("%s mask %s -> 0 at f%s" % (l, m, f) for l, (f, m) in have.items())
+    print("moment\tladder\tr%d\treset %d: the in-use mask cleared on a continue\t%s\t%s"
+          % (k + 1, k + 1, "on both legs" if len(have) == 2 else "on one leg only", vals))
+    for l, (f, m) in have.items():
+        print("at\tladder\tr%d\t%s\t%s\tlog\t-" % (k + 1, l, f))
+PYS
+    sheet_rows "$W/sheet_rows.tsv"
+fi
 
 case "$A" in
 *"VERDICT CONTINUE-RESETS"*) echo "  ok: VANILLA's own continue resets the ladder mask — the #102 drift is the vanilla envelope" ;;

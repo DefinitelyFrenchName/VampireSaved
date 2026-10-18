@@ -19,6 +19,8 @@
 #   tests/replays/26_don_arcade_mash.rpl tools/run_mame.sh tools/run_replay_guarded.sh
 #   tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # THE DEFECT, measured on merged-m3 AND merged-m2 (so it predates the #101
 # batch): P1 Donovan loses a round to CPU Lilith in arcade -> his HP
 # underflows, he falls, Anita walks to his body, Lilith holds her win pose --

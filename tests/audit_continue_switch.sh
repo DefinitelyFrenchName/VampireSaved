@@ -18,6 +18,8 @@
 #   tests/replays/26_don_arcade_mash.rpl tools/run_mame.sh tools/run_replay_guarded.sh
 #   tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # THE SCENARIO (#99, maintainer field report on merged-m2): a crash-reset at
 # fight start of the 5th arcade match, Donovan vs CPU-Phobos, reached by
 # continuing WITH A CHARACTER SWITCH after losing as Phobos. This rig

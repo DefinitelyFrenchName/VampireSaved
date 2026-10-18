@@ -16,7 +16,9 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/column_flash.tsv
 #   tests/expected/registry.tsv tests/lib/controls.sh tests/lua/read_tap.lua
 #   tests/lua/replay.lua tests/replays/naming/donovan_4.json tests/replays/naming/donovan_4.rpl tools/build_fingerprint.py tools/name_moves.py
-#   tools/run_mame.sh tools/run_replay_mame.sh tools/setup_mame.sh
+#   tools/run_mame.sh tools/run_replay_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: the three palette-dump frames the verdict compares (2858, before the swap; 2860 and 2866, after), each proven on that leg's own checksum log — not comparable: each game's stage, the palette rows other than row 11, and P2's art (each game's own copy; [VSP-168]); row 11 is compared as a hash, never its bytes
 #
 # MUST-FIRE: perturbed-copy: flash-gone — a copy of our leg's palette dumps with row 11 replaced by native's (what a fix of the flash looks like) must FAIL the frozen compare, so the gate reads the row it claims to read (in-gate: the planted copy must differ from the frozen rows; mode: the planted copy IS our leg and the gate FAILs)
 #
@@ -160,6 +162,22 @@ sys.exit(1 if bad or not rows else 0)
 PY
 then ok "every writer of row 11 from 2780 is a movem.l d0-d3,(a1) — the palette-sequence uploader — in its own leg's opcode image"
 else bad "a writer of row 11 from 2780 is not the uploader's movem.l d0-d3,(a1) (or there is none)"; fi
+# THE SHEET (#291, D1): with SHEET_OUT set, the two dump legs this verdict compared, each proven on its own checksum
+# log at the three frames it reads. Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "$MODE" ]; then
+    sheet_new flash "Donovan's Killshread Lightning column ends (donovan_4): native vs2 above ours, palette row 11" donovan - \
+        "each game's stage, the palette rows other than row 11, and P2's art (each game's own copy; [VSP-168]); row 11 is compared as a hash, never its bytes"
+    sheet_leg flash native vs2 vsav2 "$ROMDIR" "$R" "$PK" "$FR" "$W/native/ram.log"
+    sheet_leg flash ours ours vsavjw "$BUILD/rompath;$ROMDIR" "$W/ours.rpl" "$PK" "$FR" "$W/ours/ram.log"
+    for f in $FRAMES_AT; do
+        _sn="$(awk -F'\t' -v f="$f" '$1=="native" && $2==f {print $3}' "$W/got.tsv")"; _so="$(awk -F'\t' -v f="$f" '$1=="ours" && $2==f {print $3}' "$W/got.tsv")"
+        if [ "$_sn" = "$_so" ]; then _sv=IDENTICAL; else _sv="DIFF (palette row 11)"; fi
+        sheet_moment flash "f$f" "f$f, palette row 11" "$_sv" "row 11 hash: native $_sn, ours $_so"
+        sheet_at flash "f$f" native "$f" log
+        sheet_at flash "f$f" ours "$f" log
+    done
+fi
 echo "== 3. the frozen rows"
 if [ "${FREEZE:-0}" = 1 ] && [ -z "$MODE" ]; then
     { echo "# tests/expected/column_flash.tsv — palette row 11 (RAM:\$90C160, 32 bytes, HASHED) at the end of Donovan's Killshread Lightning"

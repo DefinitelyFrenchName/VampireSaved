@@ -20,6 +20,8 @@
 #   tests/lua/field_trace.lua tests/replays/naming/donovan_victim_4 tools/advancing_guard.py tools/name_moves.py
 #   tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
+#
 # WHY. 14z-121 (4) read vs2 `0x27082` (the second per-frame step routine,
 # three byte lists at `0x2797A`: 91 / 115 / 157 px) plus its arming site
 # `0x2681E` and wrote them up as "the shape of a THROW MASH-ESCAPE pushing the

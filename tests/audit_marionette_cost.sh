@@ -36,6 +36,8 @@
 #   tools/audit_marionette_cost.py tools/run_replay_mame.sh
 #   tools/find_equiv.py tools/gfx_tiles.py tools/run_mame.sh tools/scan_code_refs.py tools/setup_mame.sh
 #
+# SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
+#
 # MUST-FIRE: perturbed-copy: site-removed — a copy of vs2's opcode view with the +0x3C3 store at PRG:0x007122 re-encoded as +0x3C4 must change the static census (28 -> 27 sites), so the hook list is read from the image, not echoed (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: known-bad: drift-clock — the witness replay re-run with every site armed under pc_count.lua's OLD frame_done clock (PC_CLOCK=frame_done, the [MFI-5] desync) must miss Shadow's arming (PRG:0x020AB4 never executes), cover fewer emulated frames than it counted, and read a game frame counter at its last frame unlike its reference leg's, so the witness, the coverage check and the game-clock anchor each see a replay whose input drifted under the instrument (in-gate on 1800 frames; as a mode every leg runs the old clock and the gate FAILs)
 # MUST-FIRE: known-bad: first-frame-skip — a reference leg of 03_two_player_vs under pc_count.lua's first-frame skip (PC_CLOCK=skip_first, the defect #228 fixed) must miss the frozen basis checksum at its anchor, so the anchor sees an instrument one frame behind replay.lua (in-gate; as a mode every reference leg runs the skip and the gate FAILs)

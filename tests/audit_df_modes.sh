@@ -17,7 +17,9 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/df_modes.tsv
 #   tests/lib/decrypt_cache.sh tests/lua/field_trace.lua tests/lua/read_tap.lua
 #   tests/replays/df/97_df_mech.rpl tools/run_mame.sh tools/select_paths.py
-#   tools/select_wheel.py tools/setup_mame.sh
+#   tools/select_wheel.py tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,vsavj,ours — moments: per character, each leg's activation (the first frame from 3255 its stock drops) and f3400 (the frame its stock-after is read), on that leg's own field trace; the tenants' EX legs on a sheet of their own — not comparable: vs2's P+K is a different mode by design (Dark Force POWER against vsavj's and ours' CHANGE: the frozen difference itself); each game's stage, palette and art; ids vsav2's wheel lacks (02, 09, 0a) have a vsavj leg only
 #
 # MUST-FIRE: perturbed-copy: power-armed — a copy of a vsav2 P+K leg's tap log with ONE planted +0x147 arming write (what a reachable Change handler would leave) must change that leg's row and FAIL the frozen compare, so a Power row's `arm=none` is a reading of the log, not a default (in-gate: the planted copy must reduce differently; mode: every vsav2 P+K log is planted before the reduction and the table FAILs)
 #
@@ -242,5 +244,60 @@ reduce power vsav2 13 "$W/$nm.ft" "$W/ctl.tap" > "$W/ctl.row" 2>/dev/null || tru
 if [ -s "$W/ctl.row" ] && ! grep -qxF "$(cat "$W/ctl.row")" "$W/got.tsv"; then
     echo "CONTROL FIRED: power-armed — the planted log reads $(cut -f6 "$W/ctl.row") where the real one reads $(grep "^power	vsav2	13	" "$W/got.tsv" | cut -f6)"
 else echo "CONTROL DEAD: power-armed — the planted write was not read"; fail=1; fi
+
+# THE SHEET (#291): with SHEET_OUT set, every leg this run reduced, grouped per character (P+K) and per tenant (EX),
+# and the two frames its row reads, each picture proven on that leg's own field trace. Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "$CONTROL" ]; then
+    python3 - "$W" "$FIELDS" > "$W/sheet_plan.tsv" <<'PYS'
+import os, sys
+W, spec = sys.argv[1], sys.argv[2]
+key = {name: "%s:%s" % (a.lower(), sz) for a, sz, name in (f.split(":") for f in spec.split(","))}
+want = {}
+for l in open(W + "/want.tsv"):
+    r = l.rstrip("\n").split("\t"); want[tuple(r[:3])] = l
+got = {}
+for l in open(W + "/got.tsv"):
+    r = l.rstrip("\n").split("\t"); got[tuple(r[:3])] = (l, r)
+ROLE = {"vsav2": "vs2", "vsavj": "vsavj", "ours": "ours"}
+groups = {}
+for (m, g, i), (line, r) in got.items():
+    sid = ("ex_%s" % i) if m == "ex" else ("pk_%s" % i)
+    groups.setdefault(sid, []).append((m, g, i, line, r))
+for sid in sorted(groups):
+    legs = sorted(groups[sid], key=lambda x: ("vsav2", "vsavj", "ours").index(x[1]))
+    ok = all(want.get((m, g, i)) == line for m, g, i, line, r in legs)
+    print("S\t%s\t%s\t%s" % (sid, "as frozen" if ok else "DIFF from frozen", "; ".join("%s %s %s %s" % (g, m, r[3], r[5]) for m, g, i, line, r in legs)))
+    for m, g, i, line, r in legs:
+        d = {}
+        for l in open("%s/%s_%s_%s.ft" % (W, m, g, i)):
+            t = l.split()
+            if t and t[0] == "F":
+                d[int(t[1])] = {k: v for k, v in (kv.split("=", 1) for kv in t[2:])}
+        act = next((f for f in sorted(d) if f >= 3255 and f - 1 in d and int(d[f]["stock"]) < int(d[f - 1]["stock"])), None)
+        def exp(f): return ",".join("%s=%s" % (key[k], v) for k, v in sorted(d[f].items()) if k in key) if f in d else "-"
+        print("L\t%s\t%s_%s\t%s\t%s\t%s\t%s\t%s" % (sid, m, g, ROLE[g], g, i, act if act else "-", exp(act) if act else "-"))
+        print("X\t%s\t%s_%s\t%s" % (sid, m, g, exp(3400)))
+PYS
+    : > "$W/sheet_rows.tsv"
+    while IFS='	' read -r _k _sid _a _b _c _d _e _f; do
+        case "$_k" in
+        S)  _i="${_sid#*_}"
+            case "$_i" in 10) _ch=huitzil ;; 11) _ch=pyron ;; 13) _ch=donovan ;; *) _ch=- ;; esac
+            case "$_sid" in ex_*) _ti="id 0x$_i, the tenant's vs2 EX input: native vs2 above ours" ;;
+                            *)    _ti="id 0x$_i, P+K: vs2's Dark Force POWER, vsavj's and ours' CHANGE" ;; esac
+            sheet_new "$_sid" "$_ti" "$_ch" "#136" "vs2's P+K is Dark Force POWER, vsavj's and ours' CHANGE (the frozen difference itself); each game's stage, palette and art"
+            printf 'moment\t%s\tact\tactivation: the first frame from 3255 the stock drops\t%s\t%s\n' "$_sid" "$_a" "$_b" >> "$W/sheet_rows.tsv"
+            printf 'moment\t%s\tf3400\tf3400, where the row reads the stock after\t%s\t-\n' "$_sid" "$_a" >> "$W/sheet_rows.tsv" ;;
+        L)  _m="${_a%%_*}"; _g="${_a#*_}"
+            case "$_g" in ours) _set=vsavjw; _rp="$BUILD/rompath;$ROMDIR" ;; *) _set="$_g"; _rp="$ROMDIR" ;; esac
+            sheet_leg "$_sid" "$_a" "$_b" "$_set" "$_rp" "$W/${_m}_${_g}_$_d.rpl" "$PK" "$FR"
+            if [ "$_e" != - ]; then printf 'at\t%s\tact\t%s\t%s\tfields\t%s\n' "$_sid" "$_a" "$_e" "$_f" >> "$W/sheet_rows.tsv"; fi ;;
+        X)  if [ "$_b" != - ]; then _bs=fields; else _bs=none; fi
+            printf 'at\t%s\tf3400\t%s\t3400\t%s\t%s\n' "$_sid" "$_a" "$_bs" "$_b" >> "$W/sheet_rows.tsv" ;;
+        esac
+    done < "$W/sheet_plan.tsv"
+    sheet_rows "$W/sheet_rows.tsv"
+fi
 
 if [ "$fail" = 0 ]; then echo "PASS: audit_df_modes"; else echo "FAIL: audit_df_modes"; exit 1; fi

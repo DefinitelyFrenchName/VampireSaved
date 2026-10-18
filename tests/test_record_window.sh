@@ -16,6 +16,8 @@
 #   tests/lua/replay.lua tests/replays/26_don_arcade_mash.rpl tools/run_mame.sh
 #   tools/setup_mame.sh
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # WHY THIS GATE EXISTS. A recorder that drops, duplicates or blanks frames
 # still produces a file that plays, and a human watching it cannot tell. Its
 # output is then used to date a visual event — which is exactly what the

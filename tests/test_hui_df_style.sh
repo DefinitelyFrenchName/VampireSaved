@@ -16,7 +16,9 @@
 #   restoring the withdrawn palette-seq row — it was Bulleta's block.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/obj_records_dump.lua
 #   tests/lua/replay.lua tests/replays/hui/85_hui_df_vs2.rpl tools/check_df_style.py
-#   tools/run_mame.sh tools/run_replay_mame.sh tools/setup_mame.sh
+#   tools/run_mame.sh tools/run_replay_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: the five OBJ-list frames the checker compares (3180 its control frame, then 3400 3440 3540 3560 in Dark Force), each proven on that leg's own checksum log — not comparable: each game's stage, and Victor's art (each game's own copy; [VSP-168]); the recolour and afterimages differ by the recorded expectation (DF_STYLE_EXPECT=differs)
 #
 # WHY IT EXISTS. The playtest item is "in Dark Force H gets afterimages
 # and a purple recolour; native applies neither". Two sessions chased it
@@ -156,10 +158,26 @@ leg ours vsavjw "$BUILD/rompath"
 
 echo
 echo "== 1. the A/B (expect: $EXPECT)"
-python3 "$REPO/tools/check_df_style.py" "$WORK" \
+if python3 "$REPO/tools/check_df_style.py" "$WORK" \
     --anchors "$ANCHORS" --pal "$PALFR" --obj "$OBJFR" \
-    --control "$CONTROL" --expect "$EXPECT" \
-    || { echo "FAIL: the DF-style comparison did not match expectation '$EXPECT'"; exit 1; }
+    --control "$CONTROL" --expect "$EXPECT"; then _dfs=0; else _dfs=1; fi
+# THE SHEET (#291, D1): with SHEET_OUT set, the two replay legs this comparison read, each proven on its own checksum
+# log at the OBJ-list frames the checker compares. Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on; then
+    sheet_new df "Phobos in Dark Force (replay 85): native vs2 above ours" huitzil - \
+        "each game's stage, and Victor's art (each game's own copy; [VSP-168]); the recolour and afterimages differ by the recorded expectation (DF_STYLE_EXPECT=$EXPECT)"
+    sheet_leg df native vs2 vsav2 "$ROMDIR" "$RPL" "$PK" 3700 "$WORK/native/ram.log"
+    sheet_leg df ours ours vsavjw "$BUILD/rompath;$ROMDIR" "$RPL" "$PK" 3700 "$WORK/ours/ram.log"
+    for f in $OBJFR; do
+        if [ "$f" = "$CONTROL" ]; then _sl="f$f, the control frame (before Dark Force)"; else _sl="f$f, in Dark Force"; fi
+        if [ "$_dfs" = 0 ]; then _sv="as expected ($EXPECT)"; else _sv="NOT as expected ($EXPECT)"; fi
+        sheet_moment df "f$f" "$_sl" "$_sv"
+        sheet_at df "f$f" native "$f" log
+        sheet_at df "f$f" ours "$f" log
+    done
+fi
+[ "$_dfs" = 0 ] || { echo "FAIL: the DF-style comparison did not match expectation '$EXPECT'"; exit 1; }
 
 echo
 echo "== 2. verdict-logic controls (each MUST fail)"

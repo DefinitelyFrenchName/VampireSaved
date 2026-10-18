@@ -12,6 +12,8 @@
 #   tools/analyze_divergence.py tools/run_mame.sh tools/run_replay_mame.sh
 #   tools/setup_mame.sh
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # The whole oracle rests on an assumption nobody had ever measured at
 # volume: that the same binary, the same set and the same inputs produce
 # the same work-RAM stream every time. B5 found two counterexamples in a

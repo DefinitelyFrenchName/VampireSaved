@@ -15,6 +15,8 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/field_trace.lua
 #   tests/replays/judge/02_throw.rpl tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: no-reference-leg — our build against frozen vs2 values, with no vs2 rig in the gate (ruled 2026-10-17: listed, not drawn)
+#
 # MEASURED (legacy control, 14z-104 (3)): the tech registers as the
 # victim's own throw input (forward + HP) held from ~2 frames AFTER the
 # grab connects; it HALVES the throw damage (control: 13 -> 7) while

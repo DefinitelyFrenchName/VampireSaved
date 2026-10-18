@@ -10,6 +10,8 @@
 #   CPS-2 encryption.
 # FOLLOWS: tests/lua/dump_opcodes.lua tools/cps2_decrypt.py
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # Usage: ROMDIR=/path/to/roms tests/test_decrypt_oracle.sh [set]   (default vsavj)
 # PASS = our decrypted image is byte-identical to MAME's opcode space.
 set -eu

@@ -14,7 +14,9 @@
 #   drifting is as loud as ours. Pre-fix builds read 1/1/1/1/1 on ours — the gate was
 #   ground-truthed failing there.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua
-#   tests/replays/hui/89_hui_ex_fg_vs2.rpl tools/run_mame.sh tools/setup_mame.sh
+#   tests/replays/hui/89_hui_ex_fg_vs2.rpl tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: each of the five EX attempts, at its first HP-decrement tick on each leg (its stock decrement if none landed) — not comparable: each game's stage and palette, and P2's art (Victor, each game's own copy; [VSP-168])
 #
 # THE ITEM THIS LOCKS (14z-85f, closing the 14z-85e parity item): the
 # beam ticks of FG are processed by the PORTED vs2 object-hit damage
@@ -90,7 +92,7 @@ run_leg ours vsavjw "$REPO/$BUILD/rompath" &
 wait
 
 python3 - "$W" <<'PY' || fail=1
-import glob, sys
+import glob, os, sys
 W = sys.argv[1]
 
 # The frozen native staircase (14z-85f). BOTH legs must match it —
@@ -149,6 +151,16 @@ for leg in ("native", "ours"):
     all_errs += errs
     if not errs:
         print(f"  ok: {leg} — 5 EX firings, staircase {got}")
+    # THE SHEET (#291): with SHEET_OUT set, each attempt's frames on this leg, for the shell to emit; writes a file only
+    if os.environ.get("SHEET_OUT") and ids == 0x10:
+        fired = [frames[i] for i in range(1, len(stock)) if stock[i] == stock[i-1] - 1]
+        ev = [(frames[i], hp[i-1] - hp[i]) for i in range(1, len(hp)) if hp[i] < hp[i-1]]
+        b = fired + [10**9]
+        with open(f"{W}/sheet_{leg}.tsv", "w") as sf:
+            for i in range(len(fired)):
+                e = [x for x in ev if b[i] <= x[0] < b[i+1]]
+                sf.write("%d\t%d\t%d\t%d\t%d\n" % (i + 1, fired[i], e[0][0] if e else fired[i],
+                                                    sum(x[1] for x in e), len(e)))
 
 # Verdict-logic controls (each MUST fail): the checker on (a) a leg with
 # one tick's damage removed, (b) a leg whose stocks never decrement.
@@ -177,6 +189,28 @@ for e in all_errs:
     print("FAIL:", e)
 sys.exit(1 if all_errs else 0)
 PY
+
+# THE SHEET (#291): with SHEET_OUT set, the two legs this verdict compared, each proven on its own checksum log, and
+# one moment per EX attempt. Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on; then
+    sheet_new fg "Phobos EX Final Guardian (623+2K), five attempts: native vs2 above ours" huitzil - \
+        "each game's stage and palette, and P2's art (Victor, each game's own copy; [VSP-168])"
+    sheet_leg fg native vs2 vsav2 "$ROMDIR" "$RPL" "$PK" 5220 "$W/native/c.ram"
+    sheet_leg fg ours ours vsavjw "$REPO/$BUILD/rompath;$ROMDIR" "$RPL" "$PK" 5220 "$W/ours/c.ram"
+    for n in 1 2 3 4 5; do
+        _nv="$(awk -F'\t' -v n=$n '$1 == n {print $4 "/" $5}' "$W/sheet_native.tsv" 2>/dev/null)"
+        _ov="$(awk -F'\t' -v n=$n '$1 == n {print $4 "/" $5}' "$W/sheet_ours.tsv" 2>/dev/null)"
+        _want="$(echo "23/12 23/12 23/12 23/12 52/12" | cut -d' ' -f$n)"
+        if [ "$_nv" = "$_want" ] && [ "$_ov" = "$_want" ]; then _v=IDENTICAL; else _v=DIFF; fi
+        sheet_moment fg "a$n" "attempt $n: first HP tick (frozen staircase $_want dmg/ticks)" "$_v" \
+            "native ${_nv:-none}, ours ${_ov:-none} (dmg/ticks)"
+        for leg in native ours; do
+            _fr="$(awk -F'\t' -v n=$n '$1 == n {print $3}' "$W/sheet_$leg.tsv" 2>/dev/null)"
+            [ -n "$_fr" ] && sheet_at fg "a$n" "$leg" "$_fr" log
+        done
+    done
+fi
 
 [ "$fail" = 0 ] || { echo "FAIL: FG parity audit"; exit 1; }
 echo "PASS: Final Guardian damage is NATIVE-PARITY on this build —"

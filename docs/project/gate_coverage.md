@@ -282,7 +282,7 @@ the suite runners and their own ground truth. 46 of 46 described.
 
 ### `test_proof_sheets.sh` — test, emulator
 
-**WHAT:** tools/proof_sheets.py proves a picture only when the re-run leg's state at that frame equals what the gate logged there: a moment on the gate's own checksum log is PROVEN, the same checksum claimed one frame later is NOT THE JUDGED RUN, a correct field expectation is PROVEN and one value off by one is refused, a basis `none` is shown UNPROVEN; and tests/lua/sheet_capture.lua's masked checksum equals replay.lua's frozen log frame for frame; a sheet asking for anchors gets every anchor its leg reaches, each proven on the log, and a set ANCHOR_MAX is said on the sheet, never silent (rule-checker run 2026-10-18-1118: a silent cap of 16 dropped rounds).
+**WHAT:** tools/proof_sheets.py proves a picture only when the re-run leg's state at that frame equals what the gate logged there: a moment on the gate's own checksum log is PROVEN, the same checksum claimed one frame later is NOT THE JUDGED RUN, a correct field expectation is PROVEN and one value off by one is refused, a basis `none` is shown UNPROVEN; and tests/lua/sheet_capture.lua's masked checksum equals replay.lua's frozen log frame for frame; a sheet asking for anchors gets every anchor its leg reaches, each proven on the log, and a set ANCHOR_MAX is said on the sheet, never silent (rule-checker run 2026-10-18-1118: a silent cap of 16 dropped rounds); and a SHEET_OUT named by a RELATIVE path is proven as an absolute one (14z-205: each capture runs in its own work directory, so an unresolved relative path made every capture fail and every picture NOT THE JUDGED RUN); and the EVENT basis (D2, ruled 2026-10-18): a leg re-run under its gate's own tap instrument (tests/lua/sheet_tap_capture.lua) is EVENT-PROVEN only where its log lines in the window equal the gate's — a one-frame shift and a wrong value are refused, an empty window is UNPROVEN.
 
 **HOW:** a fixture SHEET_OUT on pristine vsavj (02_demitri_vs_cpu to frame 3001): the frozen masked vanilla log (tests/expected/vsavj/masked-v2) is the "gate's log", the masked-v2 mask the leg's; the field values are taken from tests/lua/field_trace.lua run live on the same inputs; `proof_sheets.py prove` on the fixture; one control.
 
@@ -346,7 +346,7 @@ the suite runners and their own ground truth. 46 of 46 described.
 
 ### `test_sheet_census.sh` — test, ci_portable
 
-**WHAT:** every gate of the emulator registry (tests/ci_emulator.tsv) carries exactly one well-formed `# SHEET:` line in its leading comment block (`legs <roles> — moments: … — not comparable: …`, `no-reference-leg — <reason>` or `none — <reason>`) or is on the shrink-only debt list tests/expected/sheet_debt.txt; a `legs` gate sources tests/lib/sheet.sh; the declaration grammar and the sheet file's reader refuse what they must; tests/lib/sheet.sh assigns only `__sheet_` names (sh has no locals, and a gate's own variable must survive a call).
+**WHAT:** every gate of the emulator registry (tests/ci_emulator.tsv) carries exactly one well-formed `# SHEET:` line in its leading comment block (`legs <roles> — moments: … — not comparable: …`, `no-reference-leg — <reason>`, `no-picture — <reason>` or `none — <reason>`) or is on the shrink-only debt list tests/expected/sheet_debt.txt; a `legs` gate sources tests/lib/sheet.sh; the declaration grammar and the sheet file's reader refuse what they must; tests/lib/sheet.sh assigns only `__sheet_` names (sh has no locals, and a gate's own variable must survive a call); the page reads each gate's own verdict line, prefixed forms included, never a control or an indented line (14z-205); every section of docs/project/sheet_notes.md names a gate that exists, and a note renders its paragraphs, bullets, bold, code and issue links with everything else escaped (14z-205).
 
 **HOW:** tools/proof_sheets.py's own reader (`census`, `parse_declaration`, `read_sheet`) — the one the sheet tool uses — over tests/, the registry and the debt list; fixture declarations and sheet files for the refusals; four controls on perturbed copies.
 
@@ -1516,9 +1516,9 @@ the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, du
 
 **WHAT:** why each flicker frame of the frozen composite expectations is there: every differing byte at the attributed frames (37_victor_ko +7168, 105_legacy_2pwin_auto +2713/+5868, and +2093 of 03_two_player_vs and the five #118 replays whose merged-m23 spec carries it) falls inside a NAMED window — the palette-fade staging buffer rows or the OBJ-builder secondary stack — re-derived rather than trusted from the commit that first wrote it.
 
-**HOW:** ours-vs-vanilla work-RAM dumps at the attributed frames on MAME, every differing byte classified by tools/attribute_ramdiff.py against the named windows.
+**HOW:** ours-vs-vanilla work-RAM dumps at the attributed frames on MAME, every differing byte classified by tools/attribute_ramdiff.py against the named windows. Each CASE runs on its own fresh sandbox, and its vanilla leg must equal the frozen vanilla basis log (tests/expected/vsavj/masked-v2) at the case's frame, so the attribution is of the run the expectation describes (#293, 14z-205: the two 105 cases shared a sandbox, and the f5868 case booted on the f2713 run's nvram).
 
-**EXPECTS:** every byte inside its window; a byte outside means the specs describe something else and must be re-opened, never widened.
+**EXPECTS:** every byte inside its window; a byte outside means the specs describe something else and must be re-opened, never widened; a vanilla leg off the frozen basis is a FAIL (a carried sandbox).
 
 ### `audit_guard_corpus.sh` — audit, emulator
 
@@ -1534,7 +1534,7 @@ the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, du
 
 **HOW:** every non-skipped replay run bare on MAME as run_suite does (no pokes), the loaded characters read from +0x60 and classed LEGACY / TENANT / NO-MATCH by tools/check_legacy_pairings.py against the expectation kinds; a LEGACY verdict may be overridden only by a printed `.legacy-exempt` reason.
 
-**EXPECTS:** no legacy pairing on a bare .sha1, every override printed, NO-MATCH replays reported for hand judgement.
+**EXPECTS:** no legacy pairing on a bare .sha1, every override printed, NO-MATCH replays reported for hand judgement; each tenant's forced-pick control loads THAT tenant. Every leg runs on its own fresh sandbox (#293, 14z-205): the sweep runs each DISTINCT build once (the default names one build three times, once per tenant id, and those three legs used to share one sandbox and one out file, so a later leg booted on an earlier one's nvram), and each id's control has its own file.
 
 ### `audit_mask_window_ff4182.sh` — audit, emulator
 

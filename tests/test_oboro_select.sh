@@ -15,6 +15,8 @@
 #   tests/lua/replay.lua tools/run_mame.sh tools/run_replay_fbneo.sh tools/setup_fbneo.sh
 #   tools/setup_mame.sh
 #
+# SHEET: none — compares builds of ours with each other (A/B, merged vs solo, stock vs WIDE), not with a reference set
+#
 # vsavj ships Oboro Bishamon complete at variant id 0x18 (hitbox base
 # 0x0B3450, docs/game/atlas/character_tables.md) and the select commit path
 # accepts the id end-to-end; what it lacks is a player-facing way to pick

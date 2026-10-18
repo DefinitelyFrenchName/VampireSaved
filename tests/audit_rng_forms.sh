@@ -19,6 +19,8 @@
 #   tests/audit_move_parity.sh tests/expected/move_parity_events.tsv tests/expected/rng_forms.tsv tests/lib/controls.sh
 #   tools/rng_forms.py tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — a wrapper: it re-runs audit_move_parity, audit_chains174 and audit_chains184 under three RNG forms; those gates carry the sheets
+#
 # MUST-FIRE: perturbed-copy: ident-flipped — form B's move_parity table with one IDENT row made DIFF must break "under B no IDENT row turns DIFF", so that absence is read row by row against form A (in-gate: the flipped copy must show an IDENT->DIFF transition; mode: the real B table is flipped and the audit FAILs)
 # MUST-FIRE: perturbed-copy: baseline-moved — form A's move_parity table with its middle row's verdict flipped must break "form A equals the frozen table", so the build/basis control can fail (in-gate: the moved copy must differ from the frozen table; mode: the real A table is moved and the audit FAILs)
 # MUST-FIRE: perturbed-copy: form-inert — form B's table replaced by form A's must break "under B the pin reaches the game", so a knob that never reached the game cannot pass for "no new difference" (in-gate: A against itself must move no row; mode: the real B table is replaced and the audit FAILs)

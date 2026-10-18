@@ -24,7 +24,9 @@
 #   tests/lib/instr_align.sh tests/lua/emu_clock.lua tests/lua/replay.lua tests/lua/replay_guard.lua
 #   tests/replays/105_projectile_clash_ctl.rpl tests/replays/106_pyron_cosmo_clash.rpl
 #   tools/run_mame.sh tools/run_replay_guarded.sh tools/run_replay_mame.sh
-#   tools/setup_mame.sh
+#   tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: the f3520 pool dump both legs are judged on (a Cosmo satellite's bank word and +0x94 hit-row index) — not comparable: the bank word itself, each game's own by design (0x6000 native, 0x1000 our WIDE row, #108); each game's stage, palette and P2's art
 #
 # MUST-FIRE: known-bad: drift-clock — a guarded leg under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 5,151 emulated frames of 5,620 counted on the control) must miss its frozen game clock (in-gate: one extra run; mode: both guarded legs run the old clock and the gate FAILs)
 # MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs)
@@ -199,5 +201,22 @@ if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
 fi
 if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || fail=1; fi
 if [ "$IA_SKIP" = fired ]; then vs_ctl_fired first-frame-skip "$IA_SKIP_MSG"; else vs_ctl_dead first-frame-skip "$IA_SKIP_MSG" || fail=1; fi
+
+# THE SHEET (#291): with SHEET_OUT set, the tenant leg and its native anchor as this run played them, and the one
+# moment both are judged on, each proven on the leg's own checksum log. Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "$MODE" ]; then
+    if [ "$NT" = 0 ] && [ "$SAT" = 1000 ] && [ "$H94" = 00 ] && [ "$NSAT" = 6000 ] && [ "$N94" = 00 ]; then _v="IDENTICAL (sweep-inert on both)"; else _v=DIFF; fi
+    sheet_new clash "Pyron's Cosmo satellites vs a flare (106_pyron_cosmo_clash): native vs2 above ours" pyron "#108" \
+        "the bank word itself, each game's own by design (0x6000 native, 0x1000 our WIDE row); each game's stage, palette and P2's art"
+    sheet_leg clash native vs2 vsav2 "$ROMDIR" "$REPO/tests/replays/106_pyron_cosmo_clash.rpl" "$TEN_PK" \
+        "$(awk '$1 ~ /^[0-9]+$/ {n = $1} END {print n}' "$W/nat/out.log")" "$W/nat/out.log"
+    sheet_leg clash ours ours vsavjw "$REPO/$BUILD/rompath;$ROMDIR" "$REPO/tests/replays/106_pyron_cosmo_clash.rpl" "$TEN_PK" \
+        "$(awk '$1 ~ /^[0-9]+$/ {n = $1} END {print n}' "$W/ten/out.log")" "$W/ten/out.log"
+    sheet_moment clash f3520 "f3520: a Cosmo satellite in the pool dump" "$_v" \
+        "native word 0x$NSAT +0x94=$N94; ours word 0x$SAT +0x94=$H94, tenant probe fires $NT"
+    sheet_at clash f3520 native 3520 log
+    sheet_at clash f3520 ours 3520 log
+fi
 
 [ "$fail" = 0 ] && echo "AUDIT PASS" || { echo "AUDIT FAIL"; exit 1; }

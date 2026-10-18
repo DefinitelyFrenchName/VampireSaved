@@ -35,6 +35,8 @@
 #   tests/run_suite.sh tools/build_release_emulators.sh tools/check_host_libs.py
 #   tools/run_mame.sh tools/run_replay_fbneo.sh tools/run_replay_mame.sh
 #   tools/setup_fbneo.sh tools/setup_mame.sh
+#
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
 # MEASURES: binary-record-rows — 2 the sha256 rows verified across the two BINARY.txt records (release/emulators/<tool>/<os-arch>): a STRUCTURAL floor, one row per record — check_dir already fails a record with no rows, so this floor never fires on its own; the MEASURED value is the reviewable figure (macOS 4 + 2; Linux and Windows records bundle libraries and carry more), not a host-independent count that could be frozen
 #
 # AND SINCE 2026-09-20, SECTION 3: the SHIPPED release directory applied to the pristine

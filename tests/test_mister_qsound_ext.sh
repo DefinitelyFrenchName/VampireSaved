@@ -22,6 +22,8 @@
 #   tools/mister_mra.sh tools/rpl2siminputs.py tools/run_sim_jtcps2.sh
 #   tools/setup_jtcores.sh
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # This gate counts the SDRAM reads the core issues into that window while a
 # tenant is fighting, and requires the same image with the profile bit CLEAR
 # to issue NONE. It is the last major subsystem of the profile to get any

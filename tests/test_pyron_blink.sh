@@ -14,7 +14,9 @@
 #   test_variant_dispatch's.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/decrypt_cache.sh tests/lua/replay.lua
 #   tests/replays/pyron/76_pyron_blink_vs2.rpl tools/check_pyron_blink.py tools/run_mame.sh
-#   tools/run_replay_mame.sh tools/setup_mame.sh
+#   tools/run_replay_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: the first two frames of the compared window (f3400, f3401: a blink alternates every frame) and its last (f3439), where palette row 10 (Pyron's sprite and HUD mugshot) is compared — not comparable: each game's stage, and Victor's art (each game's own copy; [VSP-168]); only palette row 10 is compared
 #
 # Palette RAM row 10 (0x90C140) carries Pyron's SPRITE and his in-match
 # HUD MUGSHOT — which is why both blinked. Before the fix it alternated
@@ -171,6 +173,21 @@ else
     done
     python3 tools/check_pyron_blink.py "$WORK/native" "$WORK/ours" "$VAN" \
         "$LO" "$HI" --expect "$EXPECT" --expect-base "$EXPECT_BASE" || fail=1
+    # THE SHEET (#291): with SHEET_OUT set, both legs, each proven on its own checksum log, at three frames of the
+    # window the checker compared. Nothing decided changes.
+    . "$REPO/tests/lib/sheet.sh"
+    if sheet_on; then
+        if [ "$fail" = 0 ]; then _sv="as expected ($EXPECT)"; else _sv=DIFF; fi
+        sheet_new blink "Pyron's palette row 10 (sprite + HUD mugshot), replay 76: native vs2 above ours" pyron - \
+            "each game's stage, and Victor's art (each game's own copy; [VSP-168]); only palette row 10 is compared"
+        sheet_leg blink native vs2 vsav2 "$ROMDIR" "$RPL" "$PK" "$HI" "$WORK/native/ram.log"
+        sheet_leg blink ours ours vsavjw "$BUILD/rompath;$ROMDIR" "$RPL" "$PK" "$HI" "$WORK/ours/ram.log"
+        for _sf in "$LO" "$((LO + 1))" "$((HI - 1))"; do
+            sheet_moment blink "f$_sf" "f$_sf: palette row 10 in the compared window" "$_sv"
+            sheet_at blink "f$_sf" native "$_sf" log
+            sheet_at blink "f$_sf" ours "$_sf" log
+        done
+    fi
 fi
 
 echo "== 2. verdict controls (the checker's own logic)"

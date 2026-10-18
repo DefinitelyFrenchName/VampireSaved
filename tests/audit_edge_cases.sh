@@ -17,6 +17,8 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/field_trace.lua
 #   tests/replays/judge/02_throw.rpl tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: no-reference-leg — our build against frozen vs2 values, with no vs2 rig in the gate (ruled 2026-10-17: listed, not drawn)
+#
 # Three families, all on the judge/pokes scaffolding, all guarded by
 # field-liveness (a crash kills a leg's samples and fails it):
 #

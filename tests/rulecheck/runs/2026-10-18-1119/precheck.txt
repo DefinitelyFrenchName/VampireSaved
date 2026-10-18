@@ -1,0 +1,3 @@
+  FLAG D-ABSOLUTE: The alternative, making the tap instruments also write a checksum log, edits instruments many gates follow and would stale them all.  [build/agent205/s2/cd_design.md]
+  FLAG D-ABSOLUTE: NOT TESTED: no part of D2 or D3 is built; whether the capture can install every one of these taps alongside its own checksum, and the run time per gate, are ...  [build/agent205/s2/cd_design.md]
+packet_check: 2 flag(s): D-ABSOLUTE 2

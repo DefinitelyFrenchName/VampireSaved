@@ -16,6 +16,8 @@
 #   tests/lib/pairing.sh tests/lua/replay_guard.lua tests/replays/94_tenant_vs_tenant.rpl
 #   tools/run_mame.sh tools/run_replay_guarded.sh tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # WHY IT EXISTS. §4 requires "vs each of the 18 (both sides)" for a ported
 # character. Until 14z-95 `tests/replays/` contained no pairing of two ported
 # characters AT ALL — which is the gap GitHub #99 walked through, and the

@@ -12,7 +12,9 @@
 # EXPECTS: the per-seed rows frozen and the two legs' variant SETS equal; the rewritten
 #   copy's set differs and fails.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/entrance_draw.tsv
-#   tests/lua/field_trace.lua tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh
+#   tests/lua/field_trace.lua tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: per RNG seed, each leg's drawn entrance (the first frame a held variant shows, mid-drive for the drive-in) — not comparable: the variant drawn for one seed, which differs between the games by design (their RNG consumption differs; the gate compares the SETS), each game's stage and palette, and P2's art
 #
 # MUST-FIRE: perturbed-copy: variant-lost — a copy of our rows with every drive-in draw rewritten to the held variant 6 (what a build that lost the car arrival would read) must FAIL the set compare against native, so the compared sets are what the draws produced (in-gate: the perturbed copy's set must differ from native's; mode: our rows are rewritten before the compare and the table FAILs)
 #
@@ -127,6 +129,44 @@ fi
 grep -v '^#' "$EXPECT" > "$W/want.tsv"
 if diff "$W/want.tsv" "$W/got.tsv" > "$W/diff.txt"; then ok "every row as frozen"
 else bad "differs from the frozen rows"; sed 's/^/        /' "$W/diff.txt"; fi
+
+# THE SHEET (#291): with SHEET_OUT set, one sheet per seed — each leg as this run played it and its drawn entrance,
+# proven on the three fields this run traced at that frame. Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "$CONTROL" ]; then
+    for s in $SEEDS; do
+        sheet_new "seed$s" "Phobos's round-start entrance, RNG seed $s at f2250: native vs2 above ours" huitzil "#136" \
+            "the variant drawn for one seed differs between the games by design (the gate compares the SETS over six seeds); each game's stage and palette, and P2's art"
+        sheet_leg "seed$s" native vs2 vsav2 "$ROMDIR" "$W/rig.rpl" "$BASE;2250:ff80d4:$s" "$FR"
+        sheet_leg "seed$s" ours ours vsavjw "$BUILD/rompath;$ROMDIR" "$W/ours.rpl" "$BASE;2250:ff80d4:$s" "$FR"
+    done
+    python3 - "$W" "$SEEDS" "$W/want.tsv" > "$W/sheet_rows.tsv" <<'PYS'
+import sys
+W, seeds, want = sys.argv[1], sys.argv[2].split(), sys.argv[3]
+got = [l.rstrip("\n") for l in open(f"{W}/got.tsv")]
+frozen = set(l.rstrip("\n") for l in open(want))
+for s in seeds:
+    rows = [r for r in got if r.split("\t")[:1] == ["draw"] and r.split("\t")[2] == s]
+    v = {r.split("\t")[1]: r.split("\t")[3] for r in rows}
+    verdict = "as frozen" if all(r in frozen for r in rows) else "DIFF"
+    print("moment\tseed%s\tdraw\tthe entrance drawn (native variant %s, ours %s; 0 drive-in, 2/6 held)\t%s\t-" % (s, v.get("native"), v.get("ours"), verdict))
+    for leg in ("native", "ours"):
+        d = {}
+        for l in open(f"{W}/{leg}.{s}.ft"):
+            t = l.split()
+            if t and t[0] == "F": d[int(t[1])] = {k: int(x) for k, x in (kv.split("=", 1) for kv in t[2:])}
+        f0 = min(f for f in range(2300, 2545) if d[f]["intro"] != 255)
+        held = [f for f in range(f0, 2545) if d[f]["intro"] not in (0, 255)]
+        if held:
+            fr = held[0]
+        else:
+            mv = [f for f in range(f0, 2545) if 0 < d[f]["x"] < 552]
+            fr = mv[len(mv) // 2] if mv else f0
+        e = d[fr]
+        print("at\tseed%s\tdraw\t%s\t%d\tfields\tff840a:b=%d,ff8410:w=%d,ff8782:b=%d" % (s, leg, fr, e["intro"], e["x"], e["id"]))
+PYS
+    sheet_rows "$W/sheet_rows.tsv"
+fi
 
 if [ "$CONTROL" = variant-lost ]; then
     if [ "$fail" = 1 ]; then echo "CONTROL FIRED: variant-lost — our rows without the car arrival lose the frozen rows"; echo "FAIL: audit_entrance_draw (control mode)"; exit 1

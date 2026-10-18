@@ -14,6 +14,8 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay_guard.lua
 #   tests/replays/hui/75_hui_air.rpl tests/replays/hui/79_hui_airdash.rpl
 #   tests/lib/controls.sh tools/build_donovan.sh tools/run_mame.sh tools/run_replay_guarded.sh tools/setup_mame.sh
+#
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
 # MUST-FIRE: known-bad: ground-dash — replay 79 with every input from f3050 moved +5 frames (the re-time tried 14z-197) dashes ON THE GROUND on its first attempt (seq 0x14 over f3186-3196 at Y=40; sampled at f3186/f3195, inside the dash), and the dash check must miss it on height ALONE (in-gate: one extra run, MISSED: ground; mode: the section reads that copy and the gate FAILs)
 #
 # Mechanism (measured; STATE 14z-66): vs2 routes the class-02 jump seq

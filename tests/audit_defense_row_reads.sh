@@ -17,6 +17,8 @@
 #   tests/expected/roster_pairings/bases.tsv tests/lua/read_tap.lua tests/replays/
 #   tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: no-picture — a corpus-wide census: 221 read-tap runs judge that no read lands in a window (an absence), with no frame to show
+#
 # MUST-FIRE: perturbed-copy: planted-flavor — donovan_victim_1 on our build with a Lua poke of 0x01 into P2's +0x382 at frame 2680 (inside the match, before the first hit) must be reported as a tenant hit reading a row that is NOT its own and FAIL the own-row check, so the check reads the index the engine read (in-gate: that one run must report a mismatch; mode: every victim part carries the poke and the gate FAILs)
 # MUST-FIRE: perturbed-copy: range-silent — a copy of a tap log with every access to P2's +0x382 window deleted must be reported as a DEAD window, so each run's windows are each proven live to the end (in-gate: the first run's copy must read P2 dead; mode: every run's log is perturbed before the liveness check and the gate FAILs)
 #

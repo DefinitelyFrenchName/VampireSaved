@@ -23,6 +23,8 @@
 #   tests/lib/controls.sh tests/lua/field_trace.lua tests/lua/rom_poke.lua tools/audit_same_data_p2.py tools/hitbox_records.py
 #   tools/anim_nodes.py tools/cps2_decrypt.py tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
+#
 # MUST-FIRE: perturbed-copy: games-agree — the rows with every vsavj in-emulator row replaced by its vsav2 twin's (what two games with the same Demitri would read) must FAIL the frozen compare, so the split is read from the rows, not assumed (in-gate: the perturbed rows differ from the frozen ones; mode: the perturbed rows are the gate's rows and the compare FAILs)
 # MUST-FIRE: perturbed-copy: cause-unswapped — each game given the OTHER game's five bytes must read the other game's rows; with the UNPOKED traces in place of the swapped ones that must FAIL, and in-gate the unpoked games' rows must differ (in-gate: they differ; mode: the unpoked traces stand in and the gate FAILs)
 #

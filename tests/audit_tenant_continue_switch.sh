@@ -25,6 +25,8 @@
 #   tests/lua/read_tap.lua tests/lua/replay.lua tests/replays/don/202_don_continue_switch.rpl tools/run_mame.sh
 #   tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # POKE READ-BACK (tests/expected/poke_readback.tsv, ruled 2026-10-02, 14z-189): the RELEASED leg's check that its
 #   0x03 poke on $FF8B82 landed between the switch and the re-pick reads the rig's OWN poke back — a RIG RECORD, not
 #   the engine; the store write in the re-pick's frame and the $FF8782 commit are the game's own (OBSERVES).

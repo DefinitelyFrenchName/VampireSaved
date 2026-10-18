@@ -28,7 +28,9 @@
 # MUST-FIRE: perturbed-copy: press-is-kick — the declared rows' replay with P1's press swapped from the punch to the matching kick (MP->MK, HP->HK) must fail the press-input check, and the gate must FAIL (mode: the check reads the swapped copy of both air replays)
 # MUST-FIRE: perturbed-copy: nohold-no-attempt — a copy of the air replay with P1's toward+P press removed, run on a declared no-hold victim (both legs), must read declared-noattempt (no attempt, so its absent hold proves nothing), and the gate must FAIL (mode: every declared victim's air legs run the press-less copy)
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua tests/replays/ tools/name_moves.py
-#   tools/run_mame.sh tools/setup_mame.sh tests/expected/roster_pairings/bases.tsv tests/lib/controls.sh
+#   tools/run_mame.sh tools/setup_mame.sh tests/expected/roster_pairings/bases.tsv tests/lib/controls.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: per throw and victim, the hold's first and last captured frame on each leg (the ordered states, the damage and the arc between them are the verdict; a declared no-hold victim: its press frame) — not comparable: the victim's PIXELS (two generations of its art, pose compared through each game's own index table; [VSP-168]), each game's stage and palette
 #
 # THE ASK, verbatim in substance: *"there are throws that have been
 # historically problematic with the VS2 tenants as THROWERS, not victims,
@@ -730,6 +732,26 @@ if glob.glob(f"{W}/ctlw_00_std_ours"):
     print(f"CTLWRONG {'fired' if held and wrong else 'dead'} Victor in Donovan's slot: {len(held)} held frames, "
           f"{len(wrong)} with a base other than Donovan's (0x{wrong[0]:x})" if wrong else
           f"CTLWRONG dead Victor in Donovan's slot: {len(held)} held frames, none with another base")
+# THE SHEET (#291): with SHEET_OUT set, each cell's judged frames per leg, for the shell to emit; writes a file only
+if os.environ.get('SHEET_OUT') and not CTL:
+    with open(f"{W}/sheet_cells.tsv", "w") as sf:
+        for (att, nm), cells in LIVEDATA.items():
+            f = FROZEN[(att, nm)]; decl = set(f.get('nohold', set())) & set(VICTIMS)
+            for vic, (o, n, so, sn) in cells.items():
+                if vic in decl:
+                    sf.write(f"{att}\t{nm}\t{vic}\tdeclared no-hold\t{f['press']}\t{f['press']}\t{f['press']}\t{f['press']}\tno captured frame on either leg\n")
+                    continue
+                ho, hn = [e['fr'] for e in o if e['cap']], [e['fr'] for e in n if e['cap']]
+                if not ho or not hn:
+                    sf.write(f"{att}\t{nm}\t{vic}\tDIFF\t{ho[0] if ho else '-'}\t{ho[-1] if ho else '-'}\t{hn[0] if hn else '-'}\t{hn[-1] if hn else '-'}\tno hold on a leg\n")
+                    continue
+                ko, kn = [k for k, _ in so], [k for k, _ in sn]
+                to, tn = o[0]['hp'] - min(e['hp'] for e in o), n[0]['hp'] - min(e['hp'] for e in n)
+                av = ARCV.get((att, nm), {}).get(vic, {})
+                same = ko == kn and av.get('ours') == av.get('native')
+                v = 'IDENTICAL' if same and to == tn else ('IDENTICAL (frozen damage residue)' if same and f['dmg'].get(vic) == (to, tn) else 'DIFF')
+                sf.write(f"{att}\t{nm}\t{vic}\t{v}\t{ho[0]}\t{ho[-1]}\t{hn[0]}\t{hn[-1]}\t"
+                         f"{len(ko)} states ours, {len(kn)} native; damage ours {to}, native {tn}; arc ours {av.get('ours')}, native {av.get('native')}\n")
 sys.exit(1 if bad else 0)
 PY
 cat "$W/verdict.txt" | grep -v -E '^CTL(RESULT|WRONG|ARC|NHDROP|NHOVER|NHDEAD|NHNOATT|NHBASE|KICK)'
@@ -781,6 +803,36 @@ if [ -z "${VS_CTL:-}" ] && echo " $THROWERS " | grep -q " 13 "; then
         "CTLARC fired "*) vs_ctl_fired arc-swap "${_ca#CTLARC fired }" ;;
         *) vs_ctl_dead arc-swap "${_ca:-no control verdict}" || fail=1 ;;
     esac
+fi
+
+# THE SHEET (#291): with SHEET_OUT set, every (throw, victim) cell's two legs as this run played them, each proven on
+# its own checksum log, and the frames its verdict rests on. Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "${VS_CTL:-}" ] && [ -s "$W/sheet_cells.tsv" ]; then
+    while IFS="$(printf '\t')" read -r _a _nm _v _vd _o0 _o1 _n0 _n1 _vals; do
+        for _s in $(specs_for "$_a"); do [ "${_s%%:*}" = "$_nm" ] && _sp="$_s"; done
+        _r=${_sp#*:}; _rpl=${_r%%:*}; _r=${_r#*:}; _r=${_r#*:}; _hi=${_r%%:*}; _mt=${_r#*:}
+        _sid="${_a}_${_v}_${_nm}"
+        case "$_a" in 10) _ch=huitzil ;; 11) _ch=pyron ;; *) _ch=donovan ;; esac
+        sheet_new "$_sid" "$(echo "$_ch" | sed 's/huitzil/Phobos/; s/pyron/Pyron/; s/donovan/Donovan/') $_nm throw on victim 0x$_v: native vs2 above ours" "$_ch" "#230" \
+            "the victim's pixels (two generations of its art; pose compared through each game's own index table, [VSP-168]); each game's stage and palette"
+        for _leg in native ours; do
+            if [ "$_leg" = ours ]; then _set=vsavjw; _rp="$REPO/$BUILD/rompath;$ROMDIR"; else _set=vsav2; _rp="$ROMDIR"; fi
+            sheet_leg "$_sid" "$_leg" "$([ "$_leg" = native ] && echo vs2 || echo ours)" "$_set" "$_rp" "$REPO/tests/replays/$_rpl" \
+                "$(pokes_for "$_a" "$_v" "$_mt" "$_leg" "")" "$_hi" "$W/${_sid}_$_leg/out.log"
+        done
+        if [ "$_vd" = "declared no-hold" ]; then
+            sheet_moment "$_sid" press "f$_o0: the press (declared no-hold)" "$_vd" "$_vals"
+            sheet_at "$_sid" press native "$_n0" log; sheet_at "$_sid" press ours "$_o0" log
+            continue
+        fi
+        sheet_moment "$_sid" first "the hold's first captured frame" "$_vd" "$_vals"
+        [ "$_n0" != - ] && sheet_at "$_sid" first native "$_n0" log
+        [ "$_o0" != - ] && sheet_at "$_sid" first ours "$_o0" log
+        sheet_moment "$_sid" last "the hold's last captured frame" "$_vd" "$_vals"
+        [ "$_n1" != - ] && sheet_at "$_sid" last native "$_n1" log
+        [ "$_o1" != - ] && sheet_at "$_sid" last ours "$_o1" log
+    done < "$W/sheet_cells.tsv"
 fi
 
 [ "$fail" = 0 ] || { echo "FAIL: tenant throw geometry"; exit 1; }

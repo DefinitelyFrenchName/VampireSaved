@@ -16,6 +16,8 @@
 # FOLLOWS: emu/mame-patches/ tests/lua/ tests/replays/ tools/audit_z80_space.py
 #   tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
+#
 #   A1  unmapped 68k address space   -> is PRG linear growth to 6MB inert?
 #   A2  OBJ y-word bit 12            -> is the 19th tile-address bit free?
 #       (bit 15 is NOT available: it terminates the CPS-2 sprite list)

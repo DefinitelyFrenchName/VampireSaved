@@ -11,6 +11,8 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/audit_region_movability.sh
 #   tools/setup_mame.sh
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # WHY. The audit's verdict used to derive from the ABSENCE of a crash string:
 #
 #     tools/run_replay_guarded.sh ... || true

@@ -19,6 +19,8 @@
 #   tests/lua/replay.lua tests/lua/tap_writes.lua tests/replays/48_don_immortal_ko.rpl
 #   tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
+#
 # MUST-FIRE: perturbed-copy: twin-pc — vsav2's taps read with vsavj's tick and node-entry PCs must fail the live-twin assertion (no writes land there), so every count below is proven to rest on the PC map
 # MUST-FIRE: perturbed-copy: frame-counter-decider — section C's pass prediction computed from the FRAME counter $FF8080 instead of the PASS counter $FF8081 must fail the every-frame match, so the prediction is proven to rest on the counter the decider reads
 # MUST-FIRE: shadow-tool: supervisor-stack — section C's return-address chain read from the supervisor stack (the "SP" state, what tap_writes.lua's STACKLOG read before 14z-158) must fail to find the game-task loop, so the chain is proven to rest on the live user stack

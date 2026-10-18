@@ -15,6 +15,8 @@
 #   tests/replays/hui/83b_hui_ray_2p.rpl tools/build_donovan.sh tools/run_replay_fbneo.sh
 #   tools/setup_fbneo.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # Captures the tap probe that refuted the 14z-67 seq-D entry theory
 # and named the true root (STATE 14z-68). Two legs on replay 83b
 # (2P-dummy, cross-emulator-reproducible, FBNeo write taps):

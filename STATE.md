@@ -38,6 +38,106 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
+## Session 14z-205 — **#291 S2 complete (58 gates draw, 174 declare; the event basis D2 built); #293 found and fixed; #120's rebuild spec pushed to its own repository.** Opened 2026-10-18 on Opus 5.5 (the ruled orchestrator); transcript `995e7259`.
+
+### opened with
+The maintainer: *"read handoff.md, state.md and docs/next_session.md"*. The opener's sweep read CLEAN; `main` at
+`6dee2be7`, level with `origin/main`; PILOT and ERIS unreachable. Then: *"yes, do #291"*, and asked how much of S2 to
+take (the 228-row debt list split as 164 declaration-only gates and 64 comparing gates in four groups by what proves
+their pictures: A the leg's `replay.lua` log, B its `field_trace.lua` fields, C taps only, D ROM pokes or an FBNeo leg):
+*"A + B + the 164 lines"*.
+
+### (1) #291 S2 — THE 164 DECLARATIONS, GROUPS A AND B
+- **164 gates declared** (`none` 155 with the S-class reason among them, `no-reference-leg` 10 as ruled), each classed
+  from a reader's verbatim quotes of its leg launches (nine reader specs, `build/agent205/s2/decl/`, local); the line
+  follows each gate's `# FOLLOWS:` block.
+- **42 gates draw**: `audit_fg_parity` (the pilot) and 41 retrofitted by five parallel forks of this session, each run
+  plainly and with `SHEET_OUT` by `build/agent205/s2/check_gate.sh` (outputs identical once temporary paths, the shell's
+  segfault notice and a timestamped directory are normalised) and every picture proven; the combined page
+  `build/sheets/s2_14z205/index.html` (local, 65 MB): 2,141 pictures, 2,120 PROVEN, the 21 others the carried-nvram runs
+  of #293 (re-proven after its fix). Five fork gates moved to the tap group (C): nothing they log proves a frame.
+- **Tool fixes:** `tools/proof_sheets.py` resolves a relative `--out` (every capture failed on one: ground truth section
+  3b, control `relative-unresolved`; the gotcha is homed); the page reads verdict lines like `AUDIT PASS`
+  (`verdict_line`, cases in `test_sheet_census` 3b).
+- **Caught by looking at the pictures:** three declarations named the wrong P2 character (`audit_fg_parity`,
+  `audit_ex_refused`, `audit_df_moves`), corrected; and a fork's line had split `audit_win_pal_auto`'s `# FOLLOWS:` block
+  (`test_gate_follows` red, fixed).
+- **Retracted the same hour:** a fork's report that a fresh merged run draws another 1P CPU opponent than vanilla; a
+  fresh oracle run of replay 02 equals the frozen vanilla log at f2146 (`fa9d83bbfa84cea0`).
+
+### (2) #293 — TWO GATES RAN ON CARRIED NVRAM; FIXED
+Found by the sheets (a re-run on a fresh sandbox refused the gates' pictures). `audit_flicker_attribution` shared a
+sandbox between replay 105's two cases; `audit_legacy_pairings` ran each replay three times into one sandbox and one
+file, and its three tenant controls into one file. The maintainer: *"Ticket + fix both now"*. Fixed: a sandbox per case
+plus a frozen-basis check on each vanilla leg (control `shared-sandbox`); one sweep leg per distinct build, a file per
+tenant control with a check that it loads that id, and an atomic `mkdir` that refuses an existing sandbox (control
+`shared-sandbox`). On fresh boots the flicker attribution held (f5868: 3 bytes in `obj-builder-stack`); 7 pairings
+verdicts moved TENANT to LEGACY, each already carrying a `.masked`. Rule-checker runs 2026-10-18-1125 and -1126
+(VIOLATED, resolved: the control sandboxes' naming shown, then a real freshness check added for the sweep legs).
+
+### (3) #291 — THE DESIGN FOR THE LAST 22 GATES, RULED; D4 BUILT
+Put after rule-checker runs 2026-10-18-1120 to -1123 (VIOLATED, resolved) and -1124 (OK); posted on #291. The
+maintainer: *"EVENT-PROVEN basis (D2)"*, *"A no-picture kind (D4)"*, *"D4 first"*. D4 built: the `no-picture` kind in
+`tools/proof_sheets.py`, `test_sheet_census` (two grammar cases) and the contract, and eight gates declared (two
+corpus-wide censuses, `audit_walker_ghost`, three `-debug` gates, `audit_move_parity_attribution`,
+`test_fbneo_legacy_oracle`). Census: 45 legs, 10 no-reference-leg, 8 no-picture, 155 none, 14 on the debt list.
+
+### (4) #291 — D1 RETROFITTED, D2 BUILT (D3 NEEDS NOTHING OF ITS OWN)
+- **D1:** `audit_column_flash` (6 pictures) and `test_hui_df_style` (10) draw on their legs' own checksum logs, outputs
+  identical; `audit_dmg_legacy_sweep` waits for D2 (half its legs ran with ROM pokes).
+- **D2, measured before it was built** (`build/agent205/d2/`, local): a scratch wrapper loading `read_tap.lua` itself and
+  adding a snapshot hook wrote a byte-identical tap log (69 lines) to the plain run, and its f2050 picture equals
+  `sheet_capture.lua`'s f2050 pixel for pixel and differs from f2049 and f2051. Built on it:
+  `tests/lua/sheet_tap_capture.lua`, `sheet_tap` in `tests/lib/sheet.sh`, the `tap` row, the `event` basis and the
+  EVENT-PROVEN status in `tools/proof_sheets.py` (event lines: a frame in the first or second token; run summaries
+  excluded), clips (`.wav`) played on the page. Ground truth `tests/test_proof_sheets.sh` section 4b: events reproduced
+  EVENT-PROVEN, a one-frame shift and an altered value refused, an empty window UNPROVEN, the re-run's f2198 pixel-equal
+  to the checksum capture's; control `count-only` fires in-gate and FAILs as a mode.
+- **D3:** a leg's ROM pokes, opcode patch and sweep pokes are its instrument's env, which the wrapper passes unchanged —
+  no mechanism of its own (the contract says so).
+- **S2 complete:** the last 12 gates retrofitted by five more forks (6-10), each IDENTICAL and fully proven: ten tap gates
+  EVENT-PROVEN (`audit_throw_registration` 72, `audit_facing_sweep` 384, `audit_rng_draws` 16, `audit_column_flash_cause`
+  6, `audit_grenade_ground_tiles` 6, `audit_hui_grunt` 10, `audit_trap_parity` 15, `audit_air_gc_legacy` 21,
+  `audit_landing_sound` 70 plus 4 clips, `audit_qs_voice_wav` 148 clips) and `audit_dmg_legacy_sweep` (200 PROVEN, 12
+  EVENT-PROVEN through `rom_poke.lua`); `audit_qs_voice_batch` declared `no-picture` (it judges whole-run multisets over
+  two id lists). Two tool limits found by the forks and fixed: `capture_tap` routes `FIELD_OUT` (rom_poke.lua hands off
+  to field_trace.lua), and a tap env value keeps its own `;` (read_tap's multi-range RTAP; reader cases in
+  `test_sheet_census`). Census: 58 legs, 10 no-reference-leg, 9 no-picture, 155 none, **0 on the debt list**.
+- **#293 follow-up census** (`build/agent205/sbx/`, local): 273 explicit sandbox sites in 168 gates; the 86 with no
+  per-run variable read where two runs could reach them, none shared. The #293 shape itself (a variable key whose values
+  repeat) is NOT covered by a static read: a dynamic check would refuse an existing sandbox in `tools/run_mame.sh` behind
+  an env flag — put to the maintainer.
+
+### (5) #120 — THE REBUILD'S SPEC, DRAFTED AND PUSHED TO ITS OWN REPOSITORY
+- Drafted while tiers ran, from the maintainer's brief and answers (verbatim in `DECISIONS_HISTORY.md`, "#120: the
+  rebuild's brief…"): `SPEC.md`, `docs/tests_inventory.tsv` (the 464 top-level `tests/*.sh` in seven reuse classes: E1
+  119, E2 76, F 65, P 55, and T, M, R) and `tools/classify_tests.py`, pushed to `DefinitelyFrenchName/VampireSaved-Rebuilt`
+  (`8c1862d` v0.1, `4cce084` v0.2 with the four §10 answers); linked on #120. Working copies: `build/agent205/t120/`
+  (local). Rule-checker runs 2026-10-18-1129 to -1132, each VIOLATED and resolved; the last one's finding: the
+  index-currency check named no tree, now stamped before and after by `tree_id.py` (both equal the inventory's line).
+- The classes are a script's reading of each gate's code, unconfirmed gate by gate. Phase 0 (the rule-5 extraction,
+  gameplay values first) is work in THIS repository; no ticket moves to the rebuild.
+
+### (6) THE FIRST TIER WAS RED: test_poked_legs; THE CENSUS RE-FROZEN
+- The tier on the staged tree (`build/agent205/tier1/`, local): PASS 199, FAIL 1, `test_poked_legs` (the forced-pick census
+  23 rows longer, none removed). 7 rows were false native legs from this sitting's `# SHEET: none` comments naming vsav2
+  in three poked gates (the documented comments-included trap, paid again; `docs/project/gotchas.md`); the comments now
+  say vs2. The other 16 come from the sheet blocks' poke text in `audit_df_startup_invuln` and `audit_dmg_legacy_sweep`
+  (12 PARAM like the frozen `$_v` rows, 3 CROSS-INERT, 1 SAME; CROSS-FLAVOR unchanged, accepted list unchanged).
+  Rule-checker run 2026-10-18-1136 (VIOLATED Q1 Q4, resolved with `build/agent205/poked/census_evidence.txt`); the
+  maintainer saw the 16 rows and ruled *"re-freeze"*; `tests/expected/poked_legs.tsv` re-frozen (+16, -0), the gate
+  PASSes with both controls fired. Not built: a control for the census tool's loop-variable resolution.
+
+### (7) #295 FILED, #294 RECORDED, AND A NOTE ABOVE EACH SHEET (#291)
+- Reading `audit_dmg_legacy_sweep`'s sheet, the maintainer asked why it compares vsavj with vs2 and not with our build:
+  it was built for #191 (an engine difference between the original games); no gate runs those legacy legs on our build,
+  and the 53-replay oracle does not include them. Filed as #295 on the maintainer's word (`DECISIONS_HISTORY.md`,
+  "#295"); not built. #294 (Killshread's aura palette), filed parked by the maintainer, has its row and its local record.
+- **Sheet notes:** `docs/project/sheet_notes.md` (one section per gate, shown above its pictures by
+  `tools/proof_sheets.py page`; `test_sheet_census` section 3c, control `orphan-note`); one note written, the sweep's,
+  and its page re-rendered (`build/agent205/s2/gates/audit_dmg_legacy_sweep/sheets/`, local). The other 57 are #291's
+  (commented 2026-10-18).
+
 ## Session 14z-204 — **#290, #259, #258, #243 closed; #291 S1 landed; test_static_runner to freeze cadence (#292).** Opened 2026-10-17 on Opus 5.5 (the ruled orchestrator); transcript `db2f76be`.
 
 ### opened with
@@ -170,11 +270,13 @@ Found on the way: `tests/lib/sheet.sh`'s row loop `_sf` overwrote audit_merged_l
 - Commits this sitting before the close: `a2c4df94` (#290), `9443f294` (#259, #258), `c810e017` (#243, the cadence row, the
   #258 follow-up), all local until this close's push.
 - Dashboard: figures, rc_runs and tiers re-collected (keys 14z-163..14z-204) and uploaded. **The `costly.json` upload was
-  denied by the auto-mode classifier**, so the dashboard's `costly` dataset still shows the 14z-203 file; it needs the
-  maintainer's go-ahead or a later close.
+  denied by the auto-mode classifier** at the close. After the push, the maintainer said *"you have my permission"*; the
+  classifier denied it again, and with auto mode off the maintainer said *"retry"*. It was uploaded (asset
+  `a5771b70268d98cab4569737514b7073`, the same 08:05 collection) and `datasets/costly` was moved to it (version 9). The close
+  commit `6dee2be7` still records the denial; this line rides the next close.
 - Steps: sections (this group's (1)-(7), (6) points at (7)); next-session (the 14z-203 opener moved verbatim to
   `docs/NEXT_SESSION_HISTORY.md`, the opener rewritten); rollover (the 14z-203 group moved verbatim to `STATE_HISTORY.md`, its
-  ledger line at the top); indexes (auto, DONE); dashboard (three of four datasets, above).
+  ledger line at the top); indexes (auto, DONE); dashboard (three of four datasets at the close, the fourth after it, above).
 - The tier runs on a snapshot of the staged tree with `--strict --confirm build/agent204/tier3/tier_results.tsv`; its
   results are `build/agent204/close/tier_results.tsv`, the next close's `--prev`.
 
@@ -184,6 +286,7 @@ Found on the way: `tests/lib/sheet.sh`'s row loop `_sf` overwrote audit_merged_l
 
 One line per ruling that still constrains work: the rule and where its full entry lives. A line is deleted when its ruling stops constraining work (CLAUDE.md [VSP-17]). Shortened to the rule plus its pointer 2026-10-14 (#282 item A); the longer lines are in git history at `44a09f7f`.
 
+- **#291's last 22 gates (2026-10-18, 14z-205):** the tap gates prove by an EVENT-PROVEN basis (D2), groups 3-5 take a `no-picture` declaration kind (D4), D4 first — `DECISIONS_HISTORY.md` "Ruled 2026-10-18 (14z-205) — #291 S2: …".
 - **An action is checked when its work is done, never held for the close (2026-10-16, 14z-203):** a ticket is closed and a recommendation put in the piece of work that finishes it, through its rule-checker run then; a run cited in a CLOSE section is the tell — `DECISIONS_HISTORY.md` "Ruled 2026-10-16 (14z-203) — an action is checked when its work is done, never held for the close".
 - **The close's cost must follow the change; #286, #287, #288 are the direct priority (2026-10-15, 14z-202):** controls only on a real change, the procedure check right after each piece of work, the audit layer measured before it is cut — `DECISIONS_HISTORY.md` "Ruled 2026-10-15 (14z-202) — the close's cost must follow the change".
 - **Cross-platform checks run on demand or at release (#285, 2026-10-15, 14z-201b):** `test_release_launcher_bat`'s Windows half is a NOTE off Windows below release cadence, so a session close needs no ERIS — `DECISIONS_HISTORY.md` "Ruled 2026-10-15 (14z-201b) — #285".

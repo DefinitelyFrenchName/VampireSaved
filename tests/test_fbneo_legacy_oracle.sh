@@ -15,6 +15,8 @@
 # FOLLOWS: build/manifest/ emu/fbneo-patches/ emu/fbneo/ tests/expected/ tests/replays/
 #   tools/build_fingerprint.py tools/run_replay_fbneo.sh tools/setup_fbneo.sh
 #
+# SHEET: no-picture — its legs run on FBNeo, whose harness the capture does not drive; they log full-RAM dumps, not pictures
+#
 # THE HOLE THIS CLOSES. CLAUDE.md §4 defines the oracle as vanilla on
 # vanilla FBNeo versus the hacked set on patched FBNeo, per-frame work RAM.
 # What the suite actually had was two adjacent things:

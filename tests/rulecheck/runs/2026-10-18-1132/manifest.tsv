@@ -1,0 +1,11 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent205/t120/SPEC.md	29eb2e11460ffafac8fab4e5de05bb2b660b8b3e
+build/agent205/t120/classify_tests.py	fa37b3a4d5369a5598b8c26a697bd7ad55e5268a
+build/agent205/t120/measurer_inventory_spec.txt	7d531e7104006054115a2d68a86a4e764868bd62
+build/agent205/t120/measurer_inventory_return.txt	85190a571efe0c7461266ed9bf3c344b5c804056
+build/agent205/t120/tests_inventory.tsv.lines-1-60 (lines 1-60 of build/agent205/t120/tests_inventory.tsv)	db3c188699539c25fce694907d0186a40b2c7ed1
+build/agent205/t120/rule5_report.txt	1b21c3846b47f48a4990e6b35702627daa2d7891
+build/agent205/t120/gate_index_current.log	3556fe237806d6b6722aca84721dee6176ed2e79
+build/agent205/t120/issue_120.txt	0f74821f9e771a3466fb86dbf26438ad27bca321
+SPEC.md.lines-1-40 (lines 1-40 of SPEC.md)	522701dacd480f0586435a5094e6382517893bb0
+CLAUDE.md	06d450adb64a457dd24ba2235dcc5798d9d34b25

@@ -16,6 +16,8 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/read_tap.lua
 #   tests/replays/26_don_arcade_mash.rpl tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # THE MECHANISM THIS LOCKS (full chain on GitHub #103, 14z-98 comment):
 # the round judge kills on THE SIGN OF WHITE HP (+0x52; in-match machine
 # PRG:0x93CE, phase-6 handler 0x97DC, tests at 0x97FC/0x9804), and the

@@ -18,6 +18,8 @@
 #   tools/cps2_decrypt.py tools/run_mame.sh tools/setup_mame.sh tools/tick_durations.py
 #   tools/vanilla_frames.py tools/vanilla_join_rig.py
 #
+# SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
+#
 # MUST-FIRE: perturbed-copy: perturbed-total — a crouching move's derived total moved by one in the measured tick table must fail the derived-vs-measured compare (mode: JE's first crouch total is bumped and section 1 must fail)
 #
 # WHAT IT ASSERTS. For three vanilla characters (JE, LI, DE) every crouching

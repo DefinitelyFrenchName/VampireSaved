@@ -15,6 +15,8 @@
 #   tests/lua/tap_writes.lua tests/replays/104_1p_auto_ko_win.rpl tools/run_mame.sh
 #   tools/setup_mame.sh
 #
+# SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
+#
 # MUST-FIRE: known-bad: normal-base-satisfies — the normal palette base 0x90c0 must NOT satisfy the 4-write flash shape, so demanding that it does must fail (mode: 0x90c0 is asserted to satisfy the shape, which it never does, so the gate FAILs)
 #
 # WHAT IT ASSERTS. The white frame is a DELIBERATE PALETTE-BASE SWAP, not a

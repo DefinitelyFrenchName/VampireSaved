@@ -1,0 +1,14 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent205/s2/cd_design.md	4fd7bd45fd2e0fc321d0e7f1b2716ff4ece8447e
+build/agent205/s2/cd_reader_return.txt	3bfb06dee33b0c1fbbba00d3a7ae593d6d031e60
+tests/expected/sheet_debt.txt	9b65c3120aa732702990514168705c32ab0be961
+docs/project/gate_header_contract.md.lines-141-178 (lines 141-178 of docs/project/gate_header_contract.md)	4ef3597b450a9765c6dfa2a6d1bc41fba037ed49
+DECISIONS_HISTORY.md.lines-7169-7185 (lines 7169-7185 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-17 (14z-203) — #261 freeze as measured, #256 fix the tool only, #286 keep (c) and a")	656bcf83893edbc0dc06117186e6baff57e719f8
+tests/lua/read_tap.lua.lines-90-100 (lines 90-100 of tests/lua/read_tap.lua)	e0363a38c32b95ba6549cd2b06959ddfbc875b64
+tests/lua/ring_tap.lua.lines-1-12 (lines 1-12 of tests/lua/ring_tap.lua)	d7c3a87d0cb3823c31a9e0f9ea40538117523c3b
+tests/lua/qs_sweep.lua.lines-1-10 (lines 1-10 of tests/lua/qs_sweep.lua)	3672cdd644d8b297b3645337264d97782fe1ad1d
+tests/lua/obj_records_dump.lua.lines-20-27 (lines 20-27 of tests/lua/obj_records_dump.lua)	b230ddcaa5a5ae92c64a05577023261818c917ae
+tests/lua/upload_tap.lua.lines-1-8 (lines 1-8 of tests/lua/upload_tap.lua)	41ea47b34c14bd929b7850f576fd4656272921b6
+tests/lua/rng_draws.lua.lines-1-10 (lines 1-10 of tests/lua/rng_draws.lua)	662b237410c9d0a8a3d96b661d234d15d5af8cfb
+tests/lua/facing_tap.lua.lines-110-116 (lines 110-116 of tests/lua/facing_tap.lua)	f548cbb0878e5529a39023290e09e822257afb6a
+docs/project/gotchas.md.lines-2598-2630 (lines 2598-2630 of docs/project/gotchas.md)	1ab81c399115badf394f6835c2d779568ca4d101

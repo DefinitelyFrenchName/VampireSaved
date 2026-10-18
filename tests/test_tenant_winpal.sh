@@ -16,6 +16,8 @@
 #   tests/lib/tenant_build.sh tests/lua/field_trace.lua tests/lua/replay.lua tests/replays/
 #   tools/build_donovan.sh tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: no-reference-leg — our build against frozen vs2 values, with no vs2 rig in the gate (ruled 2026-10-17: listed, not drawn)
+#
 # MECHANISM (measured; STATE 14z-63 / patch_notes addendum 3). The 2P
 # victory screen's palette load at PRG:0x5F1B6 computes
 # pool + (color*17 + winner_id)*0xA0 with the winner id UNMASKED in d6

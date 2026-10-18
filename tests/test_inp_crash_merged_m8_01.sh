@@ -15,6 +15,8 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/inp/crash-merged-m8-01/
 #   tests/lua/inp_guard.lua tools/run_inp_guarded.sh tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 #   MODE=defect (the default until the fix shipped in merged-m9): asserts the crash fires EXACTLY
 #         as captured — vec11 (line-F) at PRG:0x422BAC, frame 4806 (+-2) —
 #         so the capture itself cannot rot silently.

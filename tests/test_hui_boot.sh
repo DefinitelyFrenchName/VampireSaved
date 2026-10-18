@@ -23,6 +23,8 @@
 #   tools/compare_flicker.py tools/force_pick_probe.sh tools/run_mame.sh
 #   tools/run_replay_guarded.sh tools/run_replay_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — the subject is a development-stage build of the M2a/tenant ladder, not a release set; its comparison with vsavj is outside #291's scope (census class S)
+#
 # MUST-FIRE: known-bad: drift-clock — the probe's guarded run under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 3,600 emulated frames of 3,601 counted) must miss its frozen game clock (in-gate: one extra run; mode: the probe run runs the old clock and the gate FAILs)
 # MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs)
 #

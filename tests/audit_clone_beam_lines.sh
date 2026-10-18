@@ -16,6 +16,8 @@
 #   tests/lua/obj_records_dump.lua tests/replays/df/100_df_clone_beams.rpl tools/run_mame.sh
 #   tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # MUST-FIRE: known-bad: expect-lines-flip — with the beam lines actually present, asserting the DEFECT signature (EXPECT_LINES=0) must fail (mode: EXPECT_LINES is forced to 0 so "line entries present but EXPECT_LINES=0" fires and the gate FAILs)
 #
 # THE MECHANISM (measured 14z-102, the whole chain on the issue): the

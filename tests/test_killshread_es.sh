@@ -20,6 +20,8 @@
 # FOLLOWS: emu/mame-patches/ tests/expected/killshread_es.txt tests/lua/field_trace.lua
 #   tests/replays/naming/donovan_12 tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
+#
 # Rig: tools/name_moves.py donovan part 12 (tests/replays/naming/donovan_12.*):
 # Donovan (forced 0x13) on P1 pinned at x=552, DEMITRI idle on P2 at x=728 (in
 # the sword's path; Victor until 14z-165 — the naming rigs' P2 is Demitri by

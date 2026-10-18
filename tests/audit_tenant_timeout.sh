@@ -13,6 +13,8 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/field_trace.lua
 #   tests/replays/judge/01_timeout_lead.rpl tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # §4 mandates timeout coverage per ported character; until this audit the
 # tenants' timeout wins were FIELD-CONFIRMED only (maintainer, 14z-101)
 # with no rerunnable instrument. The sharp risk is #103's class: the

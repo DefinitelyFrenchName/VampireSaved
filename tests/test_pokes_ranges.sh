@@ -13,6 +13,8 @@
 # FOLLOWS: emu/mame-patches/ tests/lua/pokes_spec.lua tests/lua/replay.lua tests/replays/dmg192/chaos_flare.rpl tools/run_mame.sh
 #   tools/setup_mame.sh tests/lib/controls.sh
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # MUST-FIRE: perturbed-copy: range-short — the frame-counter range ending one frame early must change the run (in-gate: the SHORT run's checksum log differs from the RANGES run's; mode: the SHORT pins stand in for the RANGES pins and the gate FAILs)
 #
 # WHY. Linux caps one environment string at 128 KiB (MAX_ARG_STRLEN; on ERIS 131,072 bytes fails and 131,067 passes)

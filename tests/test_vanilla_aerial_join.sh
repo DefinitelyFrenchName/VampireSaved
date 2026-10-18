@@ -18,6 +18,8 @@
 #   tests/lib/decrypt_cache.sh tests/lua/field_trace.lua tools/run_mame.sh
 #   tools/setup_mame.sh tools/vanilla_join_rig.py
 #
+# SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
+#
 # MUST-FIRE: perturbed-copy: swapped-directions — swapping one character's neutral/forward rows in a copy of the frozen aerial map must fail the section-3 compare against the measured map (mode: section 3 compares the measured map against that swapped copy and must fail)
 #
 # WHY IT EXISTS. The cross-check's seven aerial outliers (BI J.HP/J.LP, BU J.MP,

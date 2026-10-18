@@ -56,6 +56,8 @@
 #   tools/vanilla_join_rig.py tools/xlsx_read.py emu/mame-patches/ tests/expected/instr_gameclock/
 #   tests/lib/instr_align.sh tests/lua/emu_clock.lua tests/lua/replay.lua
 #
+# SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
+#
 # WHY: #229's ground-throw family, promoted the sitting it was measured ([VSP-18]). The damage figure is the
 # record's power CLASS (#241), the record found by what the GAME staged (the applier's A3) and held to the fall it
 # caused, never by a table lookup of our own.

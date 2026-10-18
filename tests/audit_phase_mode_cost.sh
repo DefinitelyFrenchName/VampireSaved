@@ -22,6 +22,8 @@
 #   tests/replays/ tools/build_donovan.sh tools/build_wide_romset.py tools/run_mame.sh
 #   tools/run_replay_guarded.sh tools/run_replay_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — compares builds of ours with each other (A/B, merged vs solo, stock vs WIDE), not with a reference set
+#
 # MUST-FIRE: known-bad: drift-clock — the probe run under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 5,317 emulated frames of 5,320 counted) must miss its frozen game clock (in-gate: one extra run; mode: the probe run runs the old clock and the gate FAILs)
 # MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs)
 #

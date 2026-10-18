@@ -17,6 +17,8 @@
 #   tests/replays/06_test_mode.rpl tools/build_qs_songs.py tools/check_qs_voice_batch.py
 #   tools/qs_ledger.py tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: no-picture — it judges whole-run keyon multisets over two different id lists (tools/check_qs_voice_batch.py), never pairing events; the screen is the test-mode venue and the gate records no audio
+#
 # Builds the qs_songs voice batch onto a scratch copy of the canonical
 # WIDE overlay (or verifies a given BUILD's romset directly), then sweeps
 # EVERY authored voice id on ours and every scoped vs2 id on native

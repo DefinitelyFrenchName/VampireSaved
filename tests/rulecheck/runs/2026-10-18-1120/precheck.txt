@@ -1,0 +1,2 @@
+  FLAG D-ABSOLUTE: NOT TESTED: no part of D2 or D3 is built; whether the capture can install every one of these taps alongside its own checksum, and the run time per gate, are ...  [build/agent205/s2/cd_design.md]
+packet_check: 1 flag(s): D-ABSOLUTE 1

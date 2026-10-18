@@ -22,6 +22,8 @@
 #   tools/run_replay_mame.sh tools/run_sim_jtcps2.sh tools/setup_jtcores.sh
 #   tools/setup_mame.sh
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # MUST-FIRE: known-bad: perturbed-field — a perturbed COMPARED field must be caught by the field comparison (mode: the timer byte is perturbed in the REAL sim dump and the anchor comparison must fail; REFUSES with exit 3 if the sim prerequisites are absent)
 #
 # WHY IT EXISTS, and why it is not the same gate as test_mister_sim_anchor.

@@ -11,6 +11,8 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua
 #   tests/replays/31_don_6hp_vsavj.rpl tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # Verifies the round-26 sword-swing fix: on 6HP the sword object
 # ($FF9500 on the ported build) must be COMMANDED into the swing anim
 # family. Mechanism under test (see docs/project/patch_notes.md 14z-5): the

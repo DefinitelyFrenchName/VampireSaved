@@ -24,6 +24,8 @@
 #   tests/lua/trace_writes.lua tests/replays/naming/donovan_victim_4 tools/build_fingerprint.py tools/name_moves.py
 #   tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: no-picture — its legs run under -debug with a read watch (trace_writes.lua), whose timeline a plain capture cannot reproduce ([VSP-129], [VSP-130])
+#
 # MUST-FIRE: known-bad: drift-clock — a watch run under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 6,808 emulated frames of 6,830 counted) must miss its frozen game clock (in-gate: one extra run of the ours leg; mode: both legs run the old clock and the gate FAILs)
 # MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs)
 # MUST-FIRE: known-bad: offset-0-read — a read at table offset 0 (mask[0], where the port's bytes sit) must be caught by section 3 (mode: an offset-0 read is injected into the REAL ours leg and the section-3 verdict must fail)

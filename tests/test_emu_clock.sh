@@ -30,6 +30,8 @@
 #   tests/lua/obj_record_full_trace.lua tests/lua/pokes_spec.lua tests/lua/replay.lua tests/lua/trace_writes.lua
 #   tests/replays/ tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # MUST-FIRE: known-bad: first-frame-skip — a reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss the basis checksum at frame 1500 (in-gate; as a mode the reference leg runs the skip and the gate FAILs)
 # MUST-FIRE: known-bad: drift-clock — the breakpoint leg under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync) must cover fewer emulated frames than it counts and read a game clock unlike the reference's (in-gate; as a mode the breakpoint leg runs the old clock and the gate FAILs)
 #

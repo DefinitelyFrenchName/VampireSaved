@@ -13,6 +13,8 @@
 #   tests/lua/replay.lua tests/replays/02_demitri_vs_cpu.rpl tools/build_donovan.sh
 #   tools/run_mame.sh tools/run_replay_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — the subject is a development-stage build of the M2a/tenant ladder, not a release set; its comparison with vsavj is outside #291's scope (census class S)
+#
 # Huitzil is a VARIANT-ID tenant (0x10): no vanilla path can reach his rows,
 # so unlike Donovan's M2a ladder (divergence frames pinned per stage) the
 # ladder invariant here is total:

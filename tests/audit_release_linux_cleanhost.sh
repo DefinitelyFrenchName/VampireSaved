@@ -22,6 +22,8 @@
 #   tools/package_release_platforms.py tools/build_release_emulators.sh tests/lib/controls.sh
 #   emu/fbneo/ emu/fbneo-patches/ tools/setup_fbneo.sh emu/mame-patches/ tools/setup_mame.sh build/manifest/
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # MUST-FIRE: known-bad: uninstalled-host-lib — the container built WITHOUT libasound2t64 (libasound.so.2, which both binaries link) must FAIL: C0 misses the soname and ldd reports it not found
 # MUST-FIRE: perturbed-copy: list-minus-one — the measured runs judged against the list without libGL.so.1 (asked for by both) must FAIL C1 (in-gate; as a mode the real runs are judged that way and the gate FAILs)
 #

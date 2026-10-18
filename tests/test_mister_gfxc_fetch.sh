@@ -23,6 +23,8 @@
 #   tools/check_wram_dumps.py tools/mister_mra.sh tools/rpl2siminputs.py
 #   tools/run_sim_jtcps2.sh tools/setup_jtcores.sh
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # WHAT IT PROVES, AND WHY IT IS NOT A PICTURE. Slices D0-D2 built the MRA, the
 # runtime profile gate and the SDRAM placement, and every one of them was
 # proven with a STATIC artefact: the .rom's bytes, an exhaustive bench, an

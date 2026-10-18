@@ -19,6 +19,8 @@
 #   tests/lua/field_trace.lua tests/replays/37_victor_ko_vsavj.rpl tools/run_mame.sh
 #   tools/setup_mame.sh
 #
+# SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
+#
 # WHY. ram.md recorded $FF8127 as a per-frame COMPARATOR written by
 # PRG:0x02228E — `d1 = (P1)+0x10; cmp.b (P2)+0x10,d1; beq/bcc -> 0, else 1`
 # — but left OPEN what the byte +0x10 it reads actually IS ("an 8-bit

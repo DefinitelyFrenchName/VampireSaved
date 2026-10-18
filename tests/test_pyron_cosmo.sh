@@ -17,6 +17,8 @@
 #   tests/replays/pyron/72_pyron_cosmo_2p.rpl tools/run_mame.sh tools/run_replay_mame.sh
 #   tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # THE CRASH. Pyron's EX drives the shared engine to sub-state 81 and the
 # engine dispatches it through a pc-relative table:
 #     018460  move.w ($6,PC,D0.w),D1     ; table base 0x018468

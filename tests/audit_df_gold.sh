@@ -15,6 +15,8 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua
 #   tests/replays/hui/85_hui_df_vs2.rpl tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # The palette path is RAM-gate-blind (the standing 14z-79 lesson), so
 # this guard reads the LIVE CPS palette RAM during a controlled DF
 # ($FF8509 stock bank + $FF802E asserted — the ratified rig) and

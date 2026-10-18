@@ -19,6 +19,8 @@
 #   tests/lua/replay.lua tests/replays/16_xemu_2p.rpl tests/replays/don/90_don_plant.rpl tools/run_mame.sh
 #   tools/setup_mame.sh
 #
+# SHEET: none — measures pristine vsavj and/or native vs2 only; no leg of our build
+#
 # MUST-FIRE: perturbed-copy: store-pc-moved — the tap checks run with the store PC moved off 0x0AEF6 must fail rig 90's one-write check, so the writer is attributed by its PC, not merely counted (in-gate: on the real tap log; mode: the PC moved and the gate FAILs)
 # MUST-FIRE: perturbed-copy: poke-legs-swapped — the dump checks run with the before- and after-poke legs exchanged must fail, so "before is overwritten, after is loaded" is something the checks can refuse (in-gate: on the real dumps; mode: exchanged and the gate FAILs)
 # MUST-FIRE: perturbed-copy: base-misnamed — the dump checks run with every legacy base reassigned to the next character must fail, so the loaded character is named by its +0x60 (in-gate: on the real dumps; mode: reassigned and the gate FAILs)

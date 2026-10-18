@@ -14,7 +14,9 @@
 #   open confound, deliberately not asserted.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua tests/lua/ring_tap.lua
 #   tests/replays/hui/93_hui_electrocuted.rpl tools/run_mame.sh tools/run_replay_mame.sh
-#   tools/setup_mame.sh
+#   tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: the held HP's electrocute install (its first class-0x07 frame on each leg, captioned with the frozen ring inventory of the window) and the quick 6+HP control's hit — not comparable: each game's stage and palette, and Victor's art (each game's own copy; [VSP-168]); the ring ids come from separate ring_tap legs, so the frames are the dump legs'
 #
 # WHY IT EXISTS. STATE recorded TWICE (14z-74, 14z-76) that "no existing
 # replay produces an electrocute", so the effect-palette block's visibility
@@ -197,6 +199,41 @@ else:
     print("  ok: no cross-leg delta — the legs' frozen inventories are equal (#223 closed the 010a/010b pair)")
 sys.exit(rc)
 PY
+
+# THE SHEET (#291): with SHEET_OUT set, the two dump legs as this run played them, each proven on its own checksum log,
+# and the moments sections 1-3 judge. Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on; then
+    python3 - "$W" > "$W/sheet_rows.txt" <<'PY'
+import glob, re, struct, sys
+W = sys.argv[1]
+for leg in ("native", "ours"):
+    rows = []
+    for f in sorted(glob.glob(f"{W}/{leg}/dump_*_ff8400.bin"), key=lambda p: int(p.split("_")[-2])):
+        v = open(f, "rb").read(); rows.append((int(f.split("_")[-2]), v[0x54], v[0x5C]))
+    held = [r for r in rows if 3400 <= r[0] < 3600 and r[1] == 0x07]
+    quick = [r for r in rows if 4000 <= r[0] < 4290 and r[1]]
+    ring = [m.group(2) for m in (re.match(r"f(\d+) id ([0-9a-f]{4}) pc", l.strip()) for l in open(f"{W}/{leg}_r/ring.txt"))
+            if m and 3380 <= int(m.group(1)) <= 3700 and m.group(2) not in ("0000", "ffff", "049a")]
+    print("%s held %s %s" % (leg, held[0][0] if held else "-", "%#x" % max(r[2] for r in held) if held else "-"))
+    print("%s quick %s %s" % (leg, quick[0][0] if quick else "-", "%#x" % quick[0][1] if quick else "-"))
+    print("%s ring %s" % (leg, ",".join(ring) or "-"))
+PY
+    _g() { awk -v l="$1" -v k="$2" -v n="$3" '$1 == l && $2 == k {print $n}' "$W/sheet_rows.txt"; }
+    sheet_new electrocute "Phobos as Victor's electrocute victim (93_hui_electrocuted): native vs2 above ours" huitzil - \
+        "each game's stage and palette, and Victor's art (each game's own copy; [VSP-168]); the ring ids come from separate ring_tap legs"
+    sheet_leg electrocute native vs2 vsav2 "$ROMDIR" "$RPL" "$PK" 4320 "$W/native/ram.log"
+    sheet_leg electrocute ours ours vsavjw "$REPO/$BUILD/rompath;$ROMDIR" "$RPL" "$PK" 4320 "$W/ours/ram.log"
+    if [ "$(_g native held 3)" != - ] && [ "$(_g ours held 3)" != - ]; then _v=IDENTICAL; else _v=DIFF; fi
+    sheet_moment electrocute held "held HP: the electrocute installs (class 0x07)" "$_v" \
+        "freeze native $(_g native held 4), ours $(_g ours held 4); window ring native $(_g native ring 3), ours $(_g ours ring 3)"
+    for leg in native ours; do [ "$(_g $leg held 3)" != - ] && sheet_at electrocute held $leg "$(_g $leg held 3)" log; done
+    if [ "$(_g native quick 3)" != - ] && [ "$(_g ours quick 3)" != - ]; then
+        sheet_moment electrocute quick "quick 6+HP control: an ordinary hit, no shake" IDENTICAL \
+            "first class native $(_g native quick 4), ours $(_g ours quick 4)"
+        for leg in native ours; do sheet_at electrocute quick $leg "$(_g $leg quick 3)" log; done
+    fi
+fi
 
 [ "$fail" = 0 ] && echo "PASS: Phobos electrocute — installs on both legs, quick control clean, ring frozen" \
     || { echo "FAIL: hui electrocute"; exit 1; }

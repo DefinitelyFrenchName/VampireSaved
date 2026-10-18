@@ -16,6 +16,8 @@
 # FOLLOWS: emu/mame-patches/ tests/lua/inp_probe.lua tests/replays/104_1p_auto_ko_win.rpl
 #   tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
+#
 # Runs tests/lua/inp_probe.lua (per-frame framebuffer fnv1a64 + fighter death
 # flags) on STOCK vsavj with 104_1p_auto_ko_win.rpl (a real KO at ~f6550, no
 # pokes needed — measured this session) and asserts the WHITE-FRAME INVENTORY:

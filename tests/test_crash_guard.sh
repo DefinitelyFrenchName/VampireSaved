@@ -16,6 +16,8 @@
 #   tests/lua/replay_guard.lua tests/replays/02_demitri_vs_cpu.rpl tools/pack_build.sh
 #   tools/patch_prg.py tools/run_mame.sh tools/run_replay_guarded.sh tools/setup_mame.sh
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # MUST-FIRE: known-bad: drift-clock — the -debug guard under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] count that took the debugger's boot halt for a frame until 14z-197) must NOT reproduce the frozen vanilla log (in-gate: one extra -debug run; mode: section 1b's runs use the old clock and the gate FAILs)
 #
 #   1a. Negative control, cheap mode (no -debug): clean AND checksum log

@@ -25,7 +25,9 @@
 #   all four controls fail.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/throw_registration.tsv
 #   tests/lua/read_tap.lua tests/replays/judge/02_throw.rpl tests/replays/naming/ tools/name_moves.py tools/run_mame.sh
-#   tools/setup_mame.sh
+#   tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vsavj,vs2,ours — moments: per part, each throw contact the frozen rows hold (the k-th contact on each leg, at its own frame), each picture EVENT-PROVEN on that leg's live-pair read tap in a window around the contact — not comparable: each game's stage and palette, and the victim's art (each game's own copy; [VSP-168]); the pair's addresses (vsavj's live pair against vs2's) and the meter steps are judged as rows, against the frozen file, not between the pictures
 #
 # MUST-FIRE: perturbed-copy: legs-swapped — a copy of our reduced rows with the P1 and P2 meter steps swapped (the fixed shape) must FAIL the frozen compare (in-gate: the perturbed copy is diffed against the frozen rows and must differ; mode: the real rows are swapped and the gate FAILs)
 # MUST-FIRE: perturbed-copy: dead-reader-planted — a copy of our dead-pair tap with ONE in-play read planted at a game PC must add a reader row and FAIL the frozen compare (in-gate: the planted copy is reduced and must differ; mode: the real tap is planted and the gate FAILs)
@@ -230,6 +232,7 @@ for p in $PARTS; do
         # REAL picks, no id poke: P1's default cell is Demitri 0x01 and P2's R,R is Victor 0x03 on BOTH wheels
         # (tools/select_paths.py --resolve on the decoded vsavj and vsav2 wheels, 14z-166); the ids are TAPPED and frozen
         pk="$(python3 -c "print(f'{2000}-{($fr)-1}:ff8116:06')");$(python3 -c "print(f'{2363}-{($fr)-1}:ff80d4:0000')")"
+        printf '%s\n%s\n' "$pk" "$fr" > "$W/$p.rig"   # the part's pokes and frames, kept for the sheet (#291); decides nothing
         tap "$p.j.m1" vsavj "$ROMDIR" "$r" "$pk" "$fr" ff850a,2 "$W/$p.vsavj.m1.txt"
         tap "$p.j.m2" vsavj "$ROMDIR" "$r" "$pk" "$fr" ff890a,2 "$W/$p.vsavj.m2.txt"
         tap "$p.j.pr" vsavj "$ROMDIR" "$r" "$pk" "$fr" ff343a,4 "$W/$p.vsavj.pair.txt"
@@ -253,6 +256,7 @@ for p in $PARTS; do
     pk="$(pokes_for "$j" "$fr")"
     # the KO: both HP words low and the victim on its last bar, two frames into the event (THE KO PART above)
     [ -z "$ko" ] || pk="$pk;${ko% *}:ff8850:00040004;${ko% *}:ff8938:0000"
+    printf '%s\n%s\n' "$pk" "$fr" > "$W/$p.rig"   # the part's pokes and frames, kept for the sheet (#291); decides nothing
     rpl_for "$t" "$r" native "$W/$p.native.rpl"; rpl_for "$t" "$r" ours "$W/$p.ours.rpl"
     ORP="$BUILD/rompath;$ROMDIR"
     tap "$p.o.m1" vsavjw "$ORP"    "$W/$p.ours.rpl"   "$pk" "$fr" ff850a,2 "$W/$p.ours.m1.txt"
@@ -315,6 +319,46 @@ for p in $PARTS; do for leg in $(legs_of "$p"); do
     if diff "$W/$p.$leg.want" "$W/$p.$leg.rows" > "$W/$p.$leg.diff"; then ok "$p $leg: as frozen"
     else bad "$p $leg: differs from the frozen rows"; sed 's/^/        /' "$W/$p.$leg.diff"; fi
 done; done
+
+# THE SHEET (#291, D2): with SHEET_OUT set, per part, each leg's live-pair tap run (re-run under read_tap.lua by the
+# tool) and one moment per throw contact, EVENT-PROVEN on that tap's lines around the contact. Nothing decided changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "$CONTROL" ]; then
+    for p in $PARTS; do
+        [ -s "$W/$p.rig" ] || continue
+        _spk="$(sed -n 1p "$W/$p.rig")"; _sfr="$(sed -n 2p "$W/$p.rig")"
+        case "$p" in legacy_*) _sch=- ;; *) _sch="${p%%_*}" ;; esac
+        sheet_new "$p" "$p: every throw contact, $(legs_of "$p" | sed 's/ / above /') (each leg's live-pair tap)" "$_sch" "#157,#180" \
+            "each game's stage and palette, and the victim's art (each game's own copy; [VSP-168]); the pair's addresses and the meter steps are judged as rows against the frozen file"
+        for leg in $(legs_of "$p"); do
+            case "$p:$leg" in
+                legacy_*:vsavj) _ss=vsavj;  _sr=vsavj;  _srp="$ROMDIR"; _srpl="$REPO/tests/replays/judge/02_throw.rpl"; _sta=ff343a,4 ;;
+                legacy_*:native) _ss=vsav2; _sr=vs2;    _srp="$ROMDIR"; _srpl="$REPO/tests/replays/judge/02_throw.rpl"; _sta=ff348c,4 ;;
+                *:native)        _ss=vsav2; _sr=vs2;    _srp="$ROMDIR"; _srpl="$W/$p.native.rpl"; _sta=ff348c,4 ;;
+                *:ours)          _ss=vsavjw; _sr=ours;  _srp="$BUILD/rompath;$ROMDIR"; _srpl="$W/$p.ours.rpl"; _sta=ff343a,4 ;;
+            esac
+            sheet_leg "$p" "$leg" "$_sr" "$_ss" "$_srp" "$_srpl" "$_spk" "$_sfr"
+            sheet_tap "$p" "$leg" tests/lua/read_tap.lua "RTAP=$_sta;WINDOW=0,$_sfr;FRAMES=$_sfr"
+            sheet_file "$p" "$leg.pair.txt" "$W/$p.$leg.pair.txt" > /dev/null
+        done
+        python3 - "$p" "$(legs_of "$p")" "$W" > "$W/$p.sheet_rows" <<'PYS'
+import sys
+p, legs, W = sys.argv[1], sys.argv[2].split(), sys.argv[3]
+rows = {l: [r.rstrip("\n").split("\t") for r in open(f"{W}/{p}.{l}.rows")] for l in legs}
+want = {l: [r.rstrip("\n").split("\t") for r in open(f"{W}/{p}.{l}.want")] for l in legs}
+contacts = {l: [(int(r[3]), r[4], r[5]) for r in rows[l] if r[2] == "contact"] for l in legs}
+asfrozen = all(rows[l] == want[l] for l in legs)
+for k in range(max(len(c) for c in contacts.values())):
+    vals = "; ".join("%s %s" % (l, "f%d %s %s" % contacts[l][k] if k < len(contacts[l]) else "no contact") for l in legs)
+    print("moment\t%s\tc%d\tthrow contact %d\t%s\t%s" % (p, k + 1, k + 1, "as frozen" if asfrozen else "DIFFERS from the frozen rows", vals))
+    for l in legs:
+        if k < len(contacts[l]):
+            f = contacts[l][k][0]   # read_tap labels an access N: it is replay.lua's frame N+1
+            print("at\t%s\tc%d\t%s\t%d\tevent\tfiles/%s.%s.pair.txt:%d-%d" % (p, k + 1, l, f + 1, p, l, f - 2, f + 2))
+PYS
+        sheet_rows "$W/$p.sheet_rows"
+    done
+fi
 
 echo "== 3. must-fire controls"
 if [ "$CONTROL" = legs-swapped ]; then

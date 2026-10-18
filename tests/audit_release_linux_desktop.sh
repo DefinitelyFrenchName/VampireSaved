@@ -26,6 +26,8 @@
 #   build/manifest/ tests/lib/controls.sh emu/fbneo/ emu/fbneo-patches/ tools/setup_fbneo.sh
 #   emu/mame-patches/ tools/setup_mame.sh tools/build_release_emulators.sh
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # MUST-FIRE: known-bad: muted-stream — the same run with the emulator's sound switched off at launch (MAME `-sound none` through PLAY.command's own argument pass-through, FBNeo SDL_AUDIODRIVER=dummy) must FAIL the signal check on BOTH emulators: a silent game is exactly what a gate that only saw a window would pass
 # MUST-FIRE: known-bad: unlinked-recorder — the recorder started with node.autoconnect=false (alive, linked to nothing) must FAIL the link check: a recording that is not of the emulator's output proves nothing about its sound, and the gate must be able to tell
 # MUST-FIRE: known-bad: wrong-mark — the select capture judged against a mark one glyph off (the release's mark with its last character changed) must FAIL: a mark check that accepts a near miss cannot tell this release's binary from the last one's

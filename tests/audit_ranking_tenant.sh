@@ -33,6 +33,8 @@
 #   tests/replays/26_don_arcade_mash.rpl tools/build_fingerprint.py tools/run_mame.sh tools/run_replay_guarded.sh
 #   tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged31] tests/audit_ranking_tenant.sh [--freeze-clock]
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"

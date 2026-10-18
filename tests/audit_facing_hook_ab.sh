@@ -24,6 +24,8 @@
 #   tools/audit_roms.py tools/build_fingerprint.py tools/cps2_decrypt.py tools/facing_hook_ab.py tools/patch_prg.py tools/run_mame.sh
 #   tools/setup_mame.sh
 #
+# SHEET: none — compares builds of ours with each other (A/B, merged vs solo, stock vs WIDE), not with a reference set
+#
 # MUST-FIRE: perturbed-copy: variant-inert — the `logicoff` variant built WITHOUT its edit (the thunk left as the build's) must fail the check that its thunk reads `cmpi.b #$FF,d0`, so the variant the reading rests on is proven to be the variant built (in-gate: an unedited copy is built beside the real ones and must fail that check; mode: the real `logicoff` is built unedited and the gate FAILs)
 # MUST-FIRE: perturbed-copy: stream-shifted — `logicoff`'s mash ring stream with its middle event moved a frame earlier must break its whole-run agreement with solo, so "agrees with solo" is a comparison that can fail (in-gate: the shifted copy must be caught; mode: the real stream is shifted and the gate FAILs)
 # MUST-FIRE: perturbed-copy: read-dropped — `unhooked`'s defense-read stream with its middle read deleted must break "logicoff reads what unhooked reads", so that identity is read read by read (in-gate: the copy must be caught; mode: the real stream loses the read and the gate FAILs)

@@ -19,6 +19,8 @@
 #   tests/replays/110_don_arcade_mash.rpl tools/run_mame.sh tools/run_replay_guarded.sh
 #   tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # HOW IT IS DETERMINISTIC. The arcade ladder's opponent draw is a
 # sound-state-fed LOTTERY (atlas/ram.md, $FF8110) UNLESS the venue byte
 # $FF8121 is pinned: the draw pool is rowA[venue..venue+7], so poking $FF8121

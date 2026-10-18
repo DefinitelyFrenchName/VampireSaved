@@ -14,6 +14,8 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/ring_tap.lua
 #   tests/replays/ tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — compares builds of ours with each other (A/B, merged vs solo, stock vs WIDE), not with a reference set
+#
 # MUST-FIRE: perturbed-copy: stream-shifted — a copy of the merged mash stream with ONE event (the middle one) moved a frame earlier must break the whole-run agreement and FAIL, so "agrees for the whole run" is a comparison that can fail (in-gate: the shifted copy must be caught; mode: the real merged stream is shifted before the compare and the gate FAILs). Replaced 14z-185 (the M21 freeze) the control `onset-earlier`, which guarded a frozen onset and read DEAD once the mash stream stopped diverging.
 #
 # WHAT 14z-85 MEASURED (the owner-tag fix's own before/after): the ring

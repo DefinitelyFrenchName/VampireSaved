@@ -22,6 +22,8 @@
 #   tests/replays/11_pick_donovan.rpl tools/run_mame.sh tools/select_arrays.py
 #   tools/setup_mame.sh
 #
+# SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
+#
 # MUST-FIRE: known-bad: drift-clock — a tap run under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 992 emulated frames of 1,200 counted) must miss its frozen game clock (in-gate: one extra run; mode: every tap run runs the old clock and the gate FAILs)
 # MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs)
 #

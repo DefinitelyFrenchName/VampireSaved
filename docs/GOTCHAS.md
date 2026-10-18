@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-528 entries (47 game / 134 platform / 347 project), counted from the buckets at generation.
+530 entries (47 game / 134 platform / 349 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 47 entries
 
@@ -209,7 +209,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - ON A WSL2 BOX REACHED ONLY OVER SSH, WSLg COMES UP WITH NO DESKTOP BEHIND IT AND EVERY MAME PROCESS WAITS 100-180 s ON ITS SOCKETS — a release run's two prereq TIMEOUTs were the environment, not the build (paid: 14z-198)
 - MAME `-playback` DOES NOT EXIT AT THE END OF THE RECORDING — `-exit_after_playback` does (paid: 14z-201)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 347 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 349 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -558,3 +558,5 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A GATE THAT DRAWS A ROTATED CHOICE ONCE SEES ONE ELEMENT OF IT (paid: 14z-204, #258)
 - AN ESTIMATE "FROM ABOVE" FITTED ON ONE KIND OF TEXT IS NOT ONE (paid: 14z-204, #258)
 - A SOURCED sh HELPER'S LOOP VARIABLE OVERWRITES THE CALLER'S OF THE SAME NAME (paid: 14z-204, #291)
+- A TOOL THAT RUNS EACH CHILD IN ITS OWN WORK DIRECTORY MUST RESOLVE THE PATHS IT HANDS THEM (paid: 14z-205, #291)
+- A SANDBOX NAMED BY PART OF A RUN'S IDENTITY IS SHARED BY EVERY RUN THAT PART NAMES (paid: 14z-205, #293)

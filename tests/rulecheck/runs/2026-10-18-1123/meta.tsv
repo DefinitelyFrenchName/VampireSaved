@@ -1,0 +1,11 @@
+decision	recommendation
+subject	#291 C/D proof design, revised after runs 1120-1122 (14z-205)
+session	14z-205
+model	rule-checker@163e4ce9cf7b
+claim	The 22 gates left on tests/expected/sheet_debt.txt are put in five groups by what their legs log, read from the quotes in build/agent205/s2/cd_reader_return.txt and three gate line ranges, and build/agent205/s2/cd_design.md proposes D1 (retrofit group 1 next, each checked as S2's gates were), D2 (an EVENT-PROVEN status for the non-debug taps, weaker than a checksum and said so, with its own ground-truth cases, and the ruled sound clips), D3 (the legs' own ROM pokes, opcode patches and sweep pokes in the capture) and D4 (a no-picture declaration kind for groups 3-5), each put to the maintainer as a question. NOT TESTED: nothing in D2, D3 or D4 is built; whether group 1's logs cover the frames those gates judge is unchecked; the grouping is the session's reading, checked by no tool; the further unchecked items are listed in the design's NOT TESTED line.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	3 flag(s): D-ABSOLUTE 3
+deliverables	build/agent205/s2/cd_design.md

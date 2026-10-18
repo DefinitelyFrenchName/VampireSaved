@@ -35,6 +35,8 @@
 #   tests/replays/17_don_oracle_vsav2.rpl tools/anim_nodes.py tools/run_mame.sh
 #   tools/setup_mame.sh
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/don_m27] tests/test_anim_node_walk.sh  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 #
 # HANDOFF's gate-table note, moved into this header 14z-123 (verbatim; the

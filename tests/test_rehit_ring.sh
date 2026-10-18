@@ -19,6 +19,8 @@
 #   tests/lua/tap_writes.lua tools/cps2_decrypt.py tools/rehit_ring.py tools/run_mame.sh
 #   tools/setup_mame.sh tools/vanilla_frames.py tools/vanilla_join_rig.py
 #
+# SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
+#
 # MUST-FIRE: perturbed-copy: clear-on-attack-node — a clear inserted on a non-last attack-node frame of JE's real tap must fail the structure check (mode: JE is reduced from that perturbed tap and section 1-4 must fail)
 # MUST-FIRE: perturbed-copy: missing-contact — a contact removed from MO's real tap must fail the contact/derivation check (mode: MO is reduced from that perturbed tap and section 1-4 must fail)
 #

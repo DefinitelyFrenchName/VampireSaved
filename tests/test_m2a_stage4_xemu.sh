@@ -17,6 +17,8 @@
 #   tools/run_replay_fbneo.sh tools/run_replay_mame.sh tools/setup_fbneo.sh
 #   tools/setup_mame.sh
 #
+# SHEET: none — dual-emulator agreement (MAME vs FBNeo) on our stage build; no reference set
+#
 # Follow offsets stay BEFORE the in-match battery (absolute frame 2600,
 # anchor ~2363): the two emulators reach the anchor a few frames apart, so
 # anchor-relative frames after scripted inputs land on different content —

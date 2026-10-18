@@ -18,6 +18,8 @@
 #   tests/lua/replay.lua tests/replays/ tools/audit_romset_identity.py tools/build_merged.sh
 #   tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — it compares decoded graphics memory (a gfx-region dump) of our build with vsavj's, not a screen; there is nothing to photograph (census class G)
+#
 # The RAM gates are structurally blind to the video path (14z-55/60z), and
 # until this gate NOTHING looked at Huitzil's or Pyron's art in any
 # emulator — Donovan's band check (test_wide_render_content.sh §2) was the

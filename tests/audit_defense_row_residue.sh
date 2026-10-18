@@ -24,6 +24,8 @@
 #   tests/lua/trace_writes.lua tests/replays/hui/80_hui_grab_2p.rpl
 #   tools/build_fingerprint.py tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: no-picture — its legs run under -debug with a read watch (trace_writes.lua), whose timeline a plain capture cannot reproduce ([VSP-129], [VSP-130])
+#
 # MUST-FIRE: known-bad: drift-clock — a watch run under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 3,397 emulated frames of 3,400 counted) must miss its frozen game clock (in-gate: one extra run; mode: every watch run runs the old clock and the gate FAILs)
 # MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs)
 # MUST-FIRE: known-bad: residue-answers-equal — a residue victim answering the SAME defense byte on both legs must fail section 3 (mode: the real native leg's bytes of the first residue victim — the first whose row differs between the BUILD and vs2 — are forced equal to ours and the section-3 verdict must fail)

@@ -1,0 +1,11 @@
+decision	recommendation
+subject	#120: the rebuild spec draft for VampireSaved-Rebuilt (14z-205)
+session	14z-205
+model	rule-checker@163e4ce9cf7b
+claim	build/agent205/t120/SPEC.md drafts the rebuild of #120 from the maintainer's brief and four rulings quoted in it: the original's law and game rulings carried unchanged, phases 0-4 with phase 0 the rule-5 extraction in the original (the census in rule5_report.txt), six implementation choices to reconsider, the original's 464 test scripts classed into seven reuse classes by classify_tests.py (counts re-derived by a measurer, measurer_inventory_return.txt), how they run, the harness requirements, the swarm and documents kept, and four open questions. NOT TESTED: each test's class is a script's reading of its code, unconfirmed gate by gate; the section-4 costs are cited by the original's anchors and tickets, not re-verified in this packet; the external-suite adapter is not built; nothing in the rebuild exists yet.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	26 flag(s): D-ABSOLUTE 21, D-FIGURE 5
+deliverables	build/agent205/t120/SPEC.md

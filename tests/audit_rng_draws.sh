@@ -26,7 +26,9 @@
 #   port copied on native); all five controls fail.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/rng_draws.tsv tests/lib/controls.sh
 #   tests/lib/decrypt_cache.sh tests/lua/rng_draws.lua tests/replays/chains174/ tools/rng_draws.py
-#   tools/run_mame.sh tools/select_paths.py tools/select_wheel.py tools/setup_mame.sh
+#   tools/run_mame.sh tools/select_paths.py tools/select_wheel.py tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vsavj,vs2,ours — moments: per pair (Lei-Lei pristine vsavj above ours; each tenant native vs2 above ours), the draws of the first five frames the RNG runs free (2600-2604) and of the rig's last five, each picture EVENT-PROVEN on that leg's own rng_draws.lua log in the window — not comparable: the callers' addresses (ours runs from its placement, the tenants' tracker calls run vsavj's trackers by ruling), each game's stage and palette, and P2's art (each game's own copy; [VSP-168])
 #
 # MUST-FIRE: perturbed-copy: relabel — the legacy ours taps with ONE draw's caller changed must FAIL check (a), so "legacy ours equals vsavj draw for draw" compares callers, not only counts (in-gate: the reader run with the plant must report (a); mode: the gate's own read carries the plant and the gate FAILs)
 # MUST-FIRE: perturbed-copy: drop — one huitzil ours draw removed from its tap must FAIL check (e), so the chain proves no draw was missed (in-gate: the reader with the plant must report (e); mode: the gate's own read carries the plant and FAILs)
@@ -131,6 +133,36 @@ command grep -v '^#' "$W/read.txt" | command grep -v '^CHECK' | sed 's/^/  | /'
 command grep -q '^CHECK PASS$' "$W/read.txt" && ok "every structural check (a) (b) (c) (e) (f) (g)" \
     || { bad "the reader's checks:"; command grep '^CHECK FAIL' "$W/read.txt" | sed 's/^/        /'; }
 command grep -v '^#' "$W/read.txt" | command grep -v '^CHECK' > "$W/got.tsv"
+# THE SHEET (#291, D2): with SHEET_OUT set, each pair of legs this read compared, re-run under rng_draws.lua itself and
+# EVENT-PROVEN on its own draws in two windows. Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "${VS_CTL:-}" ] && [ "${FREEZE:-0}" != 1 ]; then
+    if command grep -q '^CHECK PASS$' "$W/read.txt"; then _sv="the reader's checks PASS"; else _sv="the reader's checks FAIL"; fi
+    _semit() {  # _semit <sid> <title> <char> <ref leg> <ref role> <ref set> <ref rp> <ref rpl> <ref pc> <ours rpl> <pokes> <frames>
+        sheet_new "$1" "$2" "$3" "#176" "the callers' addresses (ours runs from its placement; the tenants' tracker calls run vsavj's trackers by ruling), each game's stage and palette, and P2's art (each game's own copy; [VSP-168])"
+        sheet_leg "$1" "$4" "$5" "$6" "$7" "$8" "${11}" "${12}"
+        sheet_tap "$1" "$4" tests/lua/rng_draws.lua "RSTACKN=48;RTAP=ff80d4,2;RPCS=$9;WINDOW=$S,${12};FRAMES=${12}"
+        sheet_leg "$1" "${1%%.*}_ours" ours vsavjw "$BUILD/rompath;$ROMDIR" "${10}" "${11}" "${12}"
+        sheet_tap "$1" "${1%%.*}_ours" tests/lua/rng_draws.lua "RSTACKN=48;RTAP=ff80d4,2;RPCS=14e8a;WINDOW=$S,${12};FRAMES=${12}"
+        _sfr="$(sheet_file "$1" ref.tap "$W/rt_$4.txt")"; _sfo="$(sheet_file "$1" ours.tap "$W/rt_${1%%.*}_ours.txt")"
+        _lo2=$((${12} - 6)); _hi2=$((${12} - 2))
+        sheet_moment "$1" free "the RNG runs free (f$S-$((S + 4)))" "$_sv"
+        sheet_at "$1" free "$4" $((S + 2)) event "$_sfr:$S-$((S + 4))"
+        sheet_at "$1" free "${1%%.*}_ours" $((S + 2)) event "$_sfo:$S-$((S + 4))"
+        sheet_moment "$1" last "the rig's last draws (f$_lo2-$_hi2)" "$_sv"
+        sheet_at "$1" last "$4" $((_lo2 + 2)) event "$_sfr:$_lo2-$_hi2"
+        sheet_at "$1" last "${1%%.*}_ours" $((_lo2 + 2)) event "$_sfo:$_lo2-$_hi2"
+    }
+    _semit leilei "Lei-Lei vs Demitri, RNG free from f$S: pristine vsavj above ours" - leilei_vsavj vsavj vsavj "$ROMDIR" "$W/leilei.rpl" 14e8a "$W/leilei.rpl" "$lpk" "$lfr"
+    for t in $TENANTS; do
+        fr="$(python3 -c "import json;print(json.load(open('$RIGS/${t}_c174.json'))['frames'])")"
+        pk="$(python3 -c "
+import json
+p=json.load(open('$RIGS/${t}_c174.json'))['pokes']+[f'{2000}-{($fr)-1}:ff8116:06']+[f'{2363}-{($S)-1}:ff80d4:$SEED']
+print(';'.join(p))")"
+        _semit "$t" "$t (audit_chains174's rig), RNG free from f$S: native vs2 above ours" "$t" "${t}_native" vs2 vsav2 "$ROMDIR" "$RIGS/${t}_c174.rpl" 1357e "$W/$t.ours.rpl" "$pk" "$fr"
+    done
+fi
 if [ "${FREEZE:-0}" = 1 ]; then
     [ -z "${VS_CTL:-}" ] || { echo "REFUSED: FREEZE=1 in control mode"; exit 3; }
     [ "$fail" = 0 ] || { echo "REFUSED: FREEZE=1 on a failing check"; exit 3; }

@@ -15,6 +15,8 @@
 #   tests/replays/naming/ tools/build_fingerprint.py tools/name_moves.py tools/run_mame.sh
 #   tools/setup_mame.sh
 #
+# SHEET: none — compares builds of ours with each other (A/B, merged vs solo, stock vs WIDE), not with a reference set
+#
 # MUST-FIRE: perturbed-copy: lag-planted — a copy of each part's trace on the build under test with the midpoint frame's whole pass-counter advance removed (a zero-pass frame planted where the reference has none) must FAIL the subset check, so "no new zero-pass frame" is read from the build's own pass counter (in-gate: the planted copy of the first part must be caught; mode: every part's build trace is planted before the check and the gate FAILs)
 #
 # WHY. The maintainer, of the 2026-09-18 fix rulings (DECISIONS_HISTORY.md, the defense-row entry):

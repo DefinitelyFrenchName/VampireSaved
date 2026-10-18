@@ -18,6 +18,8 @@
 #   tests/lua/read_tap.lua tests/replays/naming/donovan_ tests/replays/naming/huitzil_ tests/replays/naming/pyron_ tools/audit_df_field_readers.py
 #   tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, matched against the static reader census; no reference leg
+#
 # MUST-FIRE: shadow-tool: missed-planted — a copy of the census with the FIRST row the corpus reaches deleted must make the cross-check report that access as MISSED and FAIL, so a reader the census cannot see is caught wherever the corpus runs it (in-gate: the planted copy must report exactly one missed pc; mode: the gate cross-checks against the planted copy and FAILs)
 # MUST-FIRE: perturbed-copy: range-silent — a copy of a tap log with every access to P2's block range deleted must be reported as a DEAD range, so each run's two tap ranges are each proven live before the cross-check trusts their silence (in-gate: the perturbed copy of the first run must be reported silent in P2; mode: every run's log is perturbed before the liveness check and the gate FAILs)
 #

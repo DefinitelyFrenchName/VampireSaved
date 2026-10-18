@@ -13,6 +13,8 @@
 #   tests/replays/02_demitri_vs_cpu.rpl tools/run_mame.sh tools/run_replay_fbneo.sh
 #   tools/run_replay_mame.sh tools/setup_fbneo.sh tools/setup_mame.sh
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # WHY: FBNeo is the PRIMARY target (the GGPO rollback-netplay reference), yet
 # until B5b the oracle had far better debugging instruments than the platform
 # players actually use. "Who wrote this address?" — the question that

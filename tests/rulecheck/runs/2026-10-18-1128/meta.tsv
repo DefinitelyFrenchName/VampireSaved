@@ -1,0 +1,11 @@
+decision	recommendation
+subject	close #293 as done, after run 1126 (14z-205)
+session	14z-205
+model	rule-checker@163e4ce9cf7b
+claim	#293's two gates now run each leg on a fresh sandbox and pass: audit_flicker_attribution keys its sandboxes per case and checks each vanilla leg against the frozen basis (control shared-sandbox fires in-gate and FAILs as a mode); audit_legacy_pairings sweeps each distinct build once, writes each tenant id's control to its own file, checks that the control loads that id (a plant refused), and refuses any leg whose sandbox already exists through an atomic mkdir (control shared-sandbox fires in-gate and FAILs as a mode, its row added to tests/expected/must_fire_census.tsv); both re-ran with their sheets fully proven (18 of 18, 220 of 220) and outputs identical, and on fresh boots 7 pairings verdicts moved TENANT to LEGACY, each already carrying a .masked. NOT TESTED: no census of other gates that hand one sandbox to several runs; the sheets do not draw the pairings control legs; the pairings gate's runtime was measured twice; the fix does not re-run the legacy oracle itself.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	3 flag(s): D-ABSOLUTE 3
+deliverables	build/agent205/t293/closing_comment.md

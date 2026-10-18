@@ -1,0 +1,13 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent205/t293/closing_comment.md	b428dba051cd6932570767ce8ff3c2a031bfc641
+build/agent205/t293/flicker.diff	410acb0b43ae8c4f72f9d610ea20c344e4f0dcd5
+build/agent205/t293/pairings.diff	9dd42076b8e6f34c23437f636d0e0d011b6c254a
+build/agent205/t293/flicker_plain.log	b4eae1fb8f39141687c0370414eab52b27a501d7
+build/agent205/t293/flicker_ctl_shared_sandbox.log	859ac799ef738b3b705430e19067ee88e03fa204
+build/agent205/t293/flicker_check.log	c09845ced34c781c12926478929e8801ee085ddf
+build/agent205/t293/pairings_plain.log	e5a79b391a416945ce614e708fb8b71672ba272c
+build/agent205/t293/pairings_check.log	e6d631cba1f20203ecdaeffa157deb61f6ded774
+build/agent205/t293/lp_verdicts_before_after.txt	9a171e7470e38b1f4586b584945d4e689822c511
+build/agent205/s2/ticket_sandbox.md	136ded64c6dc501adf4fce682a9fd10aa0c545e7
+docs/project/tickets.tsv.lines-74-74 (lines 74-74 of docs/project/tickets.tsv)	0e3075b42730536ed39e798d562bd2407f758207
+tools/proof_sheets.py.lines-226-245 (lines 226-245 of tools/proof_sheets.py)	bbf270fbbdeede963a85e7812580c9b13229d9bb

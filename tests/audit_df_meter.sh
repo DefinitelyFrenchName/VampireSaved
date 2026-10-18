@@ -13,7 +13,9 @@
 #   the frozen table equal; the planted swings fail.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/df_meter.tsv
 #   tests/lib/decrypt_cache.sh tests/lua/field_trace.lua tools/run_mame.sh
-#   tools/select_paths.py tools/select_wheel.py tools/setup_mame.sh
+#   tools/select_paths.py tools/select_wheel.py tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vsavj,vs2,ours — moments: per character, each whiffed swing out of the mode (j.HP 2600, 5HP 2800) and in it (j.HP 3150, 5HP 3350) at its gauge step (where a leg builds none, the reference leg's step frame), and each leg's mode entry (+0x111) — not comparable: vs2's legs enter by the tenant's EX install, a different route into the mode, shown for reference; each game's stage and palette, and P2's art
 #
 # MUST-FIRE: perturbed-copy: swing-planted — a copy of our rows with one in-mode gauge step planted per tenant (+6 at the in-mode swing frames, the pre-fix defect) must FAIL the no-in-mode-gauge check, so "no gauge in the mode" is read from our legs' steps (in-gate: the planted copy must be caught; mode: our rows are planted before the checks and the gate FAILs)
 #
@@ -185,6 +187,58 @@ fi
 grep -v '^#' "$EXPECT" > "$W/want.tsv"
 if diff "$W/want.tsv" "$W/got.tsv" > "$W/diff.txt"; then ok "every row as frozen"
 else bad "differs from the frozen rows"; sed 's/^/        /' "$W/diff.txt"; fi
+
+# THE SHEET (#291): with SHEET_OUT set, one sheet per character — its legs as this run played them, at each swing's
+# gauge step and the mode entry, each proven on the three fields this run traced there. Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "$CONTROL" ]; then
+    for c in shells:01 huitzil:10 pyron:11 donovan:13; do
+        _n="${c%:*}"; _id="${c#*:}"
+        if [ "$_n" = shells ]; then _legs="vsavj:00 vsavj:01 vsavj:03 ours:01"; _ch=-; _tk=-; _t="the shells (Demitri, Morrigan, Gallon): vanilla vsavj above ours"
+        else _legs="vsav2:$_id ours:$_id"; _ch="$_n"; _tk="#157"; _t="$_n: native vs2 (its EX install) above ours (P+K)"; fi
+        sheet_new "$_n" "Gauge in and out of Dark Force Change — $_t" "$_ch" "$_tk" \
+            "vs2's legs enter by the tenant's EX install, a different route into the mode, shown for reference; each game's stage and palette, and P2's art"
+        for s in $_legs; do g="${s%:*}"; id="${s#*:}"
+            case $g in vsav2) _set=vsav2; _rp="$ROMDIR"; _ro=vs2 ;; vsavj) _set=vsavj; _rp="$ROMDIR"; _ro=vsavj ;;
+                        ours) _set=vsavjw; _rp="$BUILD/rompath;$ROMDIR"; _ro=ours ;; esac
+            sheet_leg "$_n" "${g}_$id" "$_ro" "$_set" "$_rp" "$W/${g}_$id.rpl" "$PK" "$FR"
+        done
+        python3 - "$W" "$_n" "$_legs" "$W/want.tsv" >> "$W/sheet_rows.tsv" <<'PYS'
+import sys
+W, sid, legs, want = sys.argv[1], sys.argv[2], [tuple(s.split(":")) for s in sys.argv[3].split()], sys.argv[4]
+spec = {"meter": "ff850a:w", "f111": "ff8511:b", "id": "ff8782:b"}
+got = [l.rstrip("\n").split("\t") for l in open(f"{W}/got.tsv")]
+frozen = set(l.rstrip("\n") for l in open(want))
+tr = {}
+for g, i in legs:
+    d = {}
+    for l in open(f"{W}/{g}.{i}.ft"):
+        t = l.split()
+        if t and t[0] == "F": d[int(t[1])] = dict(kv.split("=", 1) for kv in t[2:])
+    tr[(g, i)] = d
+ok = all("\t".join(r) in frozen for r in got if (r[1], r[2]) in legs)
+steps = {k: [(int(r[3]), int(r[4])) for r in got if r[0] == "step" and (r[1], r[2]) == k] for k in legs}
+mode = {k: int(next(r[3] for r in got if r[0] == "mode" and (r[1], r[2]) == k).split("..")[0]) for k in legs}
+ref = [k for k in legs if k[0] != "ours"]
+wins = [("swing1", "j.HP out of the mode", 2600, 2800), ("swing2", "5HP out of the mode", 2800, 3000),
+        ("swing3", "j.HP in the mode", 3150, 3350), ("swing4", "5HP in the mode", 3350, 3600)]
+def emit(mid, lab, frames, vals):
+    print("moment\t%s\t%s\t%s\t%s\t%s" % (sid, mid, lab, "as frozen" if ok else "DIFF from the frozen rows", vals))
+    for k, f in frames.items():
+        s = tr[k].get(f)
+        exp = ",".join("%s=%s" % (spec[n], s[n]) for n in sorted(spec) if n in s) if s else "-"
+        print("at\t%s\t%s\t%s_%s\t%d\t%s\t%s" % (sid, mid, k[0], k[1], f, "fields" if s else "none", exp))
+for mid, lab, lo, hi in wins:
+    own = {k: [f for f, dv in steps[k] if lo <= f < hi] for k in legs}
+    rf = next((own[k][0] for k in ref if own[k]), lo + 14)
+    fr = {k: (own[k][0] if own[k] else rf) for k in legs}
+    vals = ", ".join("%s_%s %s" % (k[0], k[1], ("+%d" % sum(dv for f, dv in steps[k] if lo <= f < hi)) if own[k] else "no gauge") for k in legs)
+    emit(mid, "%s (button f%d)" % (lab, lo + (14 if lo in (2600, 3150) else 0)), fr, "gauge step: " + vals)
+emit("mode", "the mode entry (+0x111 set)", dict(mode), "entry: " + ", ".join("%s_%s f%d" % (k[0], k[1], mode[k]) for k in legs))
+PYS
+    done
+    sheet_rows "$W/sheet_rows.tsv"
+fi
 
 echo "== 4. must-fire control (the mode)"
 if [ "$CONTROL" = swing-planted ]; then

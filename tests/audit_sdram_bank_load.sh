@@ -17,6 +17,8 @@
 #   tools/check_wram_dumps.py tools/mister_mra.sh tools/rpl2siminputs.py
 #   tools/run_sim_jtcps2.sh tools/setup_jtcores.sh
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # WHY IT EXISTS. The MiSTer memory-map ruling (maintainer, 2026-08-23) is the
 # BANK REPACK at our v1.7.3 pin: vanilla's 32 MB of GFX stays in SDRAM banks
 # 2+3, and the ~6.4 MB of tenant art goes into bank 1 ALONGSIDE the QSound

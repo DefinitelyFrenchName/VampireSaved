@@ -26,6 +26,8 @@
 #   tests/lib/instr_align.sh tests/lua/emu_clock.lua tests/lua/replay.lua tests/lua/trace_writes.lua tests/replays/
 #   tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — vanilla deadness measurements, and our build's tripwire count, each judged on its own; no leg of ours compared with a reference leg
+#
 # MUST-FIRE: known-bad: drift-clock — a watch run under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 2,817 emulated frames of 5,520 counted on 02_demitri_vs_cpu) must miss its frozen game clock (in-gate: one extra run; mode: every section 1-3 watch run, and with BUILD set every section 4 run (#261), runs the old clock and the gate FAILs)
 # MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs)
 #

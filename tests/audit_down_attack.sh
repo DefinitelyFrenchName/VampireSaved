@@ -15,6 +15,8 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/field_trace.lua
 #   tests/replays/judge/03_down_attack.rpl tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # The corpus had ZERO coverage of the down-state contact surface (no
 # rig, no gate, no doc mention). The surface is real ported data both
 # ways: a tenant attacking a downed legacy victim dispatches the

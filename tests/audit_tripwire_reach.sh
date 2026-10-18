@@ -14,6 +14,8 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay_guard.lua tests/replays/
 #   tools/run_mame.sh tools/run_replay_guarded.sh tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # WHAT A TRIPWIRE IS. Every shipped build is generated with
 # `--tripwire-open`, whose own help text is the point:
 #

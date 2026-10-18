@@ -14,7 +14,9 @@
 #   alias back. The gate locks the observed difference; the one-mechanism reading (position
 #   and pose from one keyframe stream) is in the header.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua
-#   tests/replays/judge/02_throw.rpl tools/run_mame.sh tools/setup_mame.sh
+#   tests/replays/judge/02_throw.rpl tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: per attacker (the Demitri control, then Pyron), the victim's hold under the 6+HP throw, at its first and middle held frames on each leg (the offsets the verdict compares) — not comparable: each game's stage and palette, and Victor's art (each game's own copy; [VSP-168]); the legs reach the hold on different frames
 #
 # THE MECHANISM, read off vsavj's own positioner at PRG:0x02802E (vanilla
 # engine code, byte-identical in both games):
@@ -170,6 +172,46 @@ print(f"{no} {nn} {len(so & sn)} {len(so | sn)} {len(so)} {len(sn)}")
 PY
 }
 
+# THE SHEET (#291): with SHEET_OUT set, one sheet per attacker pair this run made — its two legs, each proven on its own
+# checksum log, and the hold the verdict compares (first and middle held frame). Nothing decided changes.
+. "$REPO/tests/lib/sheet.sh"
+sheet_pair() {  # <sid> <pair dir> <title> <chars>; reads $pk, which run_pair left for this pair
+    sheet_on || return 0
+    _sv="$(python3 - "$2" <<'PYS'
+import glob, re, struct, sys
+d = sys.argv[1]
+def held(leg):
+    out = []
+    for f in sorted(glob.glob(f"{d}/{leg}/dump_*_ff8934.bin"), key=lambda p: int(re.search(r'dump_(\d+)_', p).group(1))):
+        b = open(f, 'rb').read()
+        if b and b[0]:
+            fr = int(re.search(r'dump_(\d+)_', f).group(1))
+            v = open(f"{d}/{leg}/dump_{fr}_ff8810.bin", 'rb').read(); a = open(f"{d}/{leg}/dump_{fr}_ff8410.bin", 'rb').read()
+            out.append((fr, struct.unpack_from('>h', v, 0)[0] - struct.unpack_from('>h', a, 0)[0],
+                        struct.unpack_from('>h', v, 4)[0] - struct.unpack_from('>h', a, 4)[0]))
+    return out
+h = {l: held(l) for l in ("native", "ours")}
+so, sn = {x[1:] for x in h["ours"]}, {x[1:] for x in h["native"]}
+print("IDENTICAL" if so and so == sn else "DIFF")
+for l, xs in h.items():
+    for k, x in (("first", xs[0]), ("mid", xs[len(xs) // 2])) if xs else ():
+        print("%s %s %d %d,%d" % (k, l, x[0], x[1], x[2]))
+PYS
+)"
+    sheet_new "$1" "$3: the victim's hold, native vs2 above ours" "$4" - \
+        "each game's stage and palette, and Victor's art (each game's own copy; [VSP-168]); the legs reach the hold on different frames"
+    sheet_leg "$1" native vs2 vsav2 "$ROMDIR" "$RPL" "$pk" 3075 "$2/native/out.log"
+    sheet_leg "$1" ours ours vsavjw "$REPO/$BUILD/rompath;$ROMDIR" "$RPL" "$pk" 3075 "$2/ours/out.log"
+    _sverd="$(printf '%s\n' "$_sv" | head -1)"
+    for _sk in first mid; do
+        sheet_moment "$1" "$_sk" "the $_sk held frame (offset set $_sverd on the two legs)" "$_sverd" \
+            "$(printf '%s\n' "$_sv" | awk -v k="$_sk" '$1 == k {printf "%s%s (x,y) %s", s, $2, $4; s = "; "}')"
+        printf '%s\n' "$_sv" | awk -v k="$_sk" '$1 == k {print $2, $3}' | while read -r _sl _sf; do
+            sheet_at "$1" "$_sk" "$_sl" "$_sf" log
+        done
+    done
+}
+
 echo "== 0. LEGACY CONTROL — a legacy attacker must AGREE on both legs =="
 run_pair 01 "$W/ctl"
 set -- $(compare "$W/ctl")
@@ -188,6 +230,8 @@ else
     echo "  ok: identical offset sets — the rig, the pokes and the convention hold"
     ctl_ok=1
 fi
+
+sheet_pair ctl "$W/ctl" "the Demitri control (attacker 0x01)" -
 
 echo "== 1. PYRON as attacker (row 0x11 of PRG:0x0BE27A) =="
 if [ "$ctl_ok" = 0 ]; then
@@ -224,6 +268,8 @@ else
         fi
     fi
 fi
+
+[ "$ctl_ok" = 1 ] && [ -d "$W/pyr" ] && sheet_pair pyr "$W/pyr" "Pyron as attacker (row 0x11)" pyron || true
 
 echo
 [ "$fail" = 0 ] || { echo "FAIL: pyron capture-block audit"; exit 1; }

@@ -15,6 +15,8 @@
 #   tests/replays/31_don_6hp_vsavj.rpl tests/replays/34_victor_5hp_vsavj.rpl
 #   tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # Mechanism under test (docs/project/patch_notes.md 14z-19): the engine MARCHES
 # palette row 0x0C (P1 weapon row) through accent slots T0 (0x39FBE0)
 # and T1 (0x39FC00) plus the sprite block; for slot 0x0F both slots

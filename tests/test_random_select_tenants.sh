@@ -13,6 +13,8 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/replay.lua
 #   tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — compares builds of ours with each other (A/B, merged vs solo, stock vs WIDE), not with a reference set
+#
 # MUST-FIRE: known-bad: no-tenant-drawn — the previous merged build (no thunk) draws NO tenant, so running the tenant-inclusion assertion against it must fail (mode: the build under test is set to the no-thunk control build; REFUSES with exit 3 if that build is absent)
 #
 # THE MECHANISM (docs/game/atlas/select_screen.md "THE RANDOM CELL"): while

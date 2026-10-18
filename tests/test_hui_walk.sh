@@ -14,6 +14,8 @@
 #   tests/replays/hui/74_hui_walk.rpl tools/build_donovan.sh tools/cps2_decrypt.py
 #   tools/run_mame.sh tools/run_replay_guarded.sh tools/setup_mame.sh
 #
+# SHEET: no-reference-leg — our build against frozen vs2 values, with no vs2 rig in the gate (ruled 2026-10-17: listed, not drawn)
+#
 # Mechanism (measured): both vsavj param32 tables are 32-row with rows
 # 0x10-0x1F byte-aliasing 0x00-0x0F, and all three consumers index the
 # RAW +0x382 id (no fold) — so tenant 0x10 moved at the ALIAS CONTENT

@@ -14,6 +14,8 @@
 #   tests/expected/registry.tsv tests/replays/ tools/audit_roms.py tools/build_fingerprint.py tools/run_mame.sh
 #   tools/setup_mame.sh
 #
+# SHEET: none — one set at a time (pristine vsavj, or a build when BUILD is set), judged on its own; no comparison between legs
+#
 # ON-DEMAND (22 MAME runs, ~10 min). Not in the battery; run it when the
 # claim below is load-bearing for a decision, and after any change that
 # could add a writer of the character-id field.

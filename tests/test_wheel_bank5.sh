@@ -21,6 +21,8 @@
 #   tests/replays/ tools/build_donovan.sh tools/check_wheel_bank5.py tools/gfx_tiles.py
 #   tools/run_mame.sh tools/setup_mame.sh tests/lua/emu_clock.lua
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # MUST-FIRE: known-bad: drift-clock — the trace leg under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync the gate ran on until 14z-197) must cover fewer emulated frames than it counts or read a game clock unlike the reference leg's (in-gate; as a mode the trace leg runs the old clock and the gate FAILs)
 # MUST-FIRE: known-bad: first-frame-skip — the reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum at the trace's last frame (in-gate; as a mode the reference leg runs the skip and the gate FAILs)
 #

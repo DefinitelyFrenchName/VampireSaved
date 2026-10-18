@@ -15,7 +15,9 @@
 #   Sasquatch — stated, not measured there.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/df_accumulator.txt
 #   tests/lib/controls.sh tests/lua/field_trace.lua tests/replays/df/105_df_sas_armor.rpl
-#   tools/df_accumulator_check.py tools/run_mame.sh tools/setup_mame.sh
+#   tools/df_accumulator_check.py tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vsavj,ours — moments: the armor leg's Dark Force entry, its arming, every contact of the frozen per-contact shape (armored adds, the break past 60) and the mode's end, on pristine vsavj and on the merged build (whose field trace must be byte-identical) — not comparable: nothing by design (legacy content under the superset invariant); the hphk and nodf legs are pristine-only and not drawn
 #
 # MUST-FIRE: perturbed-copy: perturbed-frozen-arm — a perturbed copy of the frozen per-contact table must fail the diff against the measured output (mode: the measured got.txt is compared against that perturbed copy and the gate must FAIL)
 #
@@ -129,6 +131,50 @@ if diff "$EXP_CMP" "$W/got.txt" > "$W/diff.txt"; then
     else vs_ctl_fired perturbed-frozen-arm "a perturbed copy of the frozen table differs from it, so the diff catches it (the mode compares the measured output against such a copy)"; fi
 else
     echo "  FAIL  frozen expectation differs:"; sed 's/^/        /' "$W/diff.txt"; exit 1
+fi
+# THE SHEET (#291): with SHEET_OUT set, the armor leg on pristine vsavj and on the merged build as this run played
+# them, at every frame of the frozen per-contact shape, proven on the ten fields this run traced there. Nothing the
+# gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "$MODE" ] && [ "$MERGED" = 1 ]; then
+    sheet_new armor "Sasquatch's Dark Force armor (+0x161), LP+LK: vanilla vsavj above the merged build" - - \
+        "nothing by design (legacy content under the superset invariant); the hphk and nodf legs are pristine-only and not drawn"
+    sheet_leg armor vanilla vsavj vsavj "$ROMDIR" "$RPL" "$PKB$STK" 4650
+    sheet_leg armor merged ours vsavjw "$REPO/$BUILD/rompath;$ROMDIR" "$RPL" "$PKB$STK" 4650
+    python3 - "$W" "$FIELDS" > "$W/sheet_rows.tsv" <<'PYS'
+import sys
+W, fields = sys.argv[1], sys.argv[2]
+spec = {name: "%s:%s" % (a, sz) for a, sz, name in (f.split(":") for f in fields.split(","))}
+tr = {}
+for leg, d in (("vanilla", "armor"), ("merged", "merged")):
+    rows = {}
+    for l in open(f"{W}/{d}/field.txt"):
+        t = l.split()
+        if len(t) >= 3 and t[0] == "F": rows[int(t[1])] = dict(kv.split("=", 1) for kv in t[2:])
+    tr[leg] = rows
+same = open(f"{W}/armor/field.txt", "rb").read() == open(f"{W}/merged/field.txt", "rb").read()
+v = "IDENTICAL (field trace byte-identical; the frozen shape matches)" if same else "DIFF"
+n = 0
+for line in open(f"{W}/got.txt"):
+    t = line.split()
+    if not t or t[0] != "armor": continue
+    if t[1] == "df_on":
+        moms = [(int(t[2]), "Dark Force entry ($FF802E = 1)"), (int(t[4]), "armed (+0x15E %s)" % t[5].split("=")[1])]
+    elif t[1] == "contact":
+        moms = [(int(t[2]), "contact: %s" % " ".join(t[3:]))]
+    elif t[1] == "df_off":
+        moms = [(int(t[2]), "Dark Force end (%s)" % " ".join(t[3:]))]
+    else:
+        continue
+    for f, lab in moms:
+        n += 1
+        print("moment\tarmor\tm%d\tf%d %s\t%s\t-" % (n, f, lab, v))
+        for leg in ("vanilla", "merged"):
+            s = tr[leg].get(f)
+            exp = ",".join("%s=%s" % (spec[k], s[k]) for k in sorted(spec) if k in s) if s else "-"
+            print("at\tarmor\tm%d\t%s\t%d\t%s\t%s" % (n, leg, f, "fields" if s else "none", exp))
+PYS
+    sheet_rows "$W/sheet_rows.tsv"
 fi
 # [VSP-19] the checker against a perturbed armor trace: a sum past 60 that did
 # not clear must be reported as a deviation.

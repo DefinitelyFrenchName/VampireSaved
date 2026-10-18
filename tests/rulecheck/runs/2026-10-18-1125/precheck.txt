@@ -1,0 +1,3 @@
+  FLAG D-ABSOLUTE: - the sweep runs each DISTINCT build once per replay (its out file and sandbox are no longer shared between tenant ids);  [build/agent205/t293/closing_comment.md]
+  FLAG D-ABSOLUTE: Not done here: a census of every other gate that might hand one sandbox to several runs; the two gates were found by the #291 sheets, which re-prove every dr...  [build/agent205/t293/closing_comment.md]
+packet_check: 2 flag(s): D-ABSOLUTE 2

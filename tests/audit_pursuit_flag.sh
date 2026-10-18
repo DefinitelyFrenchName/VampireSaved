@@ -33,6 +33,9 @@
 #   tests/lua/read_tap.lua tests/replays/naming/pyron_4.rpl tests/replays/naming/pyron_4.json tools/select_paths.py
 #   tools/select_wheel.py
 #   tools/build_fingerprint.py tools/name_moves.py tools/pursuit_rigs.py tools/run_mame.sh tools/setup_mame.sh
+#   tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: per rig (cosmo, ifrit, lsword), each event at its press frame (where P2's +0x117 is read) and, where a leg's pursuit connects, that leg's first HP drop after the press — not comparable: each game's stage and palette, and P2's art (Demitri, each game's own copy; [VSP-168]); the mark taps (pyron_4) run on ours only and are not drawn
 #
 # MUST-FIRE: perturbed-copy: expect-flipped — the comparison run with the OTHER expectation (same on an unhooked build, gap on a hooked one) must fail on every rig, so the verdict is something the comparison can refuse (in-gate: both rigs; mode: the expectation flipped and the gate FAILs)
 # MUST-FIRE: perturbed-copy: flag-zeroed — the comparison of OUR trace with P2's +0x117 read as 0 at every press must fail --expect same on every rig, so the flag at the press is something the verdict reads — discriminating on a HOOKED build only: on an unhooked one ours' flag is already 0 and the pursuit already differs (in-gate: both rigs, against --expect same; mode: ours zeroed against --expect same and the gate FAILs)
@@ -198,4 +201,52 @@ for t in p1 p2; do
     else vs_ctl_fired record4-marked "the perturbed log reads [$(marks "$W/tap_mark_$t.pert")] with Pyron on $t, refused"; fi
 done
 
+# THE SHEET (#291): with SHEET_OUT set, each rig's two legs as this run played them and one moment per event at its press
+# frame, plus each leg's first HP drop after the press where it falls, each picture proven on the fields that leg traced
+# there. Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "${VS_CTL:-}" ]; then
+    for r in cosmo ifrit lsword; do
+        J="$RIGS/$r.json"; fr="$(python3 -c "import json;print(json.load(open('$J'))['frames'])")"
+        pk="$(python3 -c "import json;print(';'.join(json.load(open('$J'))['pokes']))");2000-$((fr - 1)):ff8116:06;2363-$((fr - 1)):ff80d4:0000"
+        case $r in cosmo) _ch=pyron; _e="$EXPECT";; ifrit) _ch=donovan; _e="$EXPECT";; lsword) _ch=donovan; _e=inert;; esac
+        sheet_new "$r" "$r: the class-0x51 pursuit flag, native vs2 above ours ($HOOK build, expect=$_e)" "$_ch" "#195,#200" \
+            "each game's stage and palette, and P2's art (Demitri, each game's own copy; [VSP-168]); the mark taps (pyron_4) run on ours only and are not drawn" || true
+        sheet_leg "$r" native vs2 vsav2 "$ROMDIR" "$REPO/$RIGS/$r.rpl" "$pk" "$fr" || true
+        sheet_leg "$r" ours ours vsavjw "$BUILD/rompath;$ROMDIR" "$W/$r.ours.rpl" "$pk" "$fr" || true
+        python3 - "$r" "$J" "$W" "$FIELDS" "$_e" > "$W/sheet_$r.tsv" <<'PYS' && sheet_rows "$W/sheet_$r.tsv" || true
+import json, sys
+sys.path.insert(0, "tools")
+import pursuit_rigs as pr
+rig, js, W, fields, expect = sys.argv[1:6]
+spec = {name: "%s:%s" % (a.lower(), sz) for a, sz, name in (f.split(":") for f in fields.split(","))}
+def trace(p):
+    d = {}
+    for l in open(p):
+        q = l.split()
+        if q and q[0] == "F": d[int(q[1])] = dict(kv.split("=", 1) for kv in q[2:])
+    return d
+tr = {leg: trace(f"{W}/tr_{rig}.{leg}.txt") for leg in ("native", "ours")}
+N, O = pr.rows(js, f"{W}/tr_{rig}.native.txt"), pr.rows(js, f"{W}/tr_{rig}.ours.txt")
+def at(mid, leg, fr):
+    s = tr[leg].get(fr)
+    print("at\t%s\t%s\t%s\t%d\t%s\t%s" % (rig, mid, leg, fr, "fields" if s else "none", ",".join("%s=%s" % (spec[n], v) for n, v in sorted(s.items()) if n in spec) if s else "-"))
+for k, (e, n, o) in enumerate(zip(json.load(open(js))["events"], N, O)):
+    press = int(e["name"].rsplit("+", 1)[1]) if "U+LP at +" in e["name"] else 50
+    lo = e["frame"] + press
+    v = "SAME" if pr.fmt(n) == pr.fmt(o) else "DIFF"
+    vals = "native f117=%d pursuit=%s; ours f117=%d pursuit=%s (expect=%s)" % (n["f117"], n["pursuit"], o["f117"], o["pursuit"], expect)
+    print("moment\t%s\tp%d\t%s: the press (P2's +0x117 read here)\t%s\t%s" % (rig, k, e["name"], v, vals))
+    at("p%d" % k, "native", lo); at("p%d" % k, "ours", lo)
+    drop = {}
+    for leg, row in (("native", n), ("ours", o)):
+        if row["red"]:
+            drop[leg] = e["frame"] + int(row["red"][0].split(":")[0])
+    if drop:
+        print("moment\t%s\td%d\t%s: the first HP drop after the press\t%s\tnative %s; ours %s" % (rig, k, e["name"], v, " ".join(n["red"]) or "-", " ".join(o["red"]) or "-"))
+        for leg, fr in drop.items():
+            at("d%d" % k, leg, fr)
+PYS
+    done
+fi
 [ "$fail" = 0 ] && echo "PASS: audit_pursuit_flag ($HOOK build: expect=$EXPECT on both rigs)" || { echo "FAIL: audit_pursuit_flag"; exit 1; }

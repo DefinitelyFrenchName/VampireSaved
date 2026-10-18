@@ -10,12 +10,18 @@
 #   staging buffer rows or the OBJ-builder secondary stack — re-derived rather than trusted
 #   from the commit that first wrote it.
 # HOW: ours-vs-vanilla work-RAM dumps at the attributed frames on MAME, every differing byte
-#   classified by tools/attribute_ramdiff.py against the named windows.
+#   classified by tools/attribute_ramdiff.py against the named windows. Each CASE runs on its own fresh sandbox, and
+#   its vanilla leg must equal the frozen vanilla basis log (tests/expected/vsavj/masked-v2) at the case's frame, so the
+#   attribution is of the run the expectation describes (#293, 14z-205: the two 105 cases shared a sandbox, and the
+#   f5868 case booted on the f2713 run's nvram).
 # EXPECTS: every byte inside its window; a byte outside means the specs describe something
-#   else and must be re-opened, never widened.
+#   else and must be re-opened, never widened; a vanilla leg off the frozen basis is a FAIL (a carried sandbox).
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/lua/replay.lua
 #   tests/replays/ tools/attribute_ramdiff.py tools/build_fingerprint.py tools/run_mame.sh
-#   tools/run_replay_mame.sh tools/setup_mame.sh tests/lib/controls.sh
+#   tools/run_replay_mame.sh tools/setup_mame.sh tests/lib/controls.sh tests/lib/sheet.sh
+#
+# SHEET: legs vsavj,ours — moments: each frozen flicker frame the gate re-attributes (replay and frame from its CASES), on pristine vsavj and the merged build — not comparable: the named windows (the ratified mask and the staging rows the case names), where the two legs differ by attribution
+# MUST-FIRE: perturbed-copy: shared-sandbox — the cases share one sandbox per REPLAY (the pre-#293 rig), so 105's f5868 case boots on the f2713 run's nvram and its vanilla leg must fail the frozen-basis check (in-gate: the check run on the merged leg's log, a run that is not the frozen vanilla one, must refuse it; mode: the shared sandboxes and the gate FAILs)
 # MUST-FIRE: perturbed-copy: wrong-window — every case expects `qsound-handshake-latch`, a window none of the cases' bytes reach, so the count-aware check must FAIL each case (mode: the real cases with that expectation)
 #
 # WHY (14z-91). The legacy-regression fix re-measured 139 specs, and two of
@@ -145,6 +151,15 @@ CASES="37_victor_ko_vsavj:7168:staging-row-0x0A
        118_sel_b2:2093:staging-row-0x0C
        118_sel_b3:2093:staging-row-0x0C"
 
+. "$REPO/tests/lib/sheet.sh"
+BASIS=tests/expected/vsavj/masked-v2
+BASIS_MASK="$(cat "$BASIS/mask")"
+lastnew=""; lastrpl=""; lastframe=""
+# fresh_ok <log> <replay> <frame>: the log's checksum at <frame> equals the frozen basis log's (the one copy of the test)
+fresh_ok() {
+    _a="$(awk -v f="$3" '$1 == f {print $2}' "$1")"; _b="$(awk -v f="$3" '$1 == f {print $2}' "$BASIS/logs/$2.log")"
+    [ -n "$_a" ] && [ "$_a" = "$_b" ]
+}
 # hit_in <summary> <window>: true when attribute_ramdiff's summary counts at least one byte in <window> —
 # the one copy of the count-aware test (the case verdict and the inline wrong-window control both call it)
 hit_in() { printf '%s' "$1" | grep -Eq "[;,] [1-9][0-9]* $2(,|\$)"; }
@@ -153,21 +168,47 @@ for c in $CASES; do
     rpl="${c%%:*}"; rest="${c#*:}"; frame="${rest%%:*}"; want="${rest##*:}"
     if vs_ctl_is wrong-window; then want=qsound-handshake-latch; fi
     echo "== $rpl frame $frame — expect the unmasked diff in $want =="
-    mkdir -p "$W/van_$rpl" "$W/new_$rpl"
+    k="$rpl.$frame"                                  # one log dir and one FRESH sandbox per case (#293)
+    if vs_ctl_is shared-sandbox; then sk="$rpl"; else sk="$k"; fi
+    mkdir -p "$W/van_$k" "$W/new_$k"
     DUMPS="$frame:ff0000-ffffff" MASK_RANGES="$MASK" MAME_ROMPATH="$ROMDIR" \
         tools/run_replay_mame.sh vsavj "tests/replays/$rpl.rpl" \
-        "$W/van_$rpl/a.log" "$W/sbv_$rpl" >/dev/null 2>&1 &
+        "$W/van_$k/a.log" "$W/sbv_$sk" >/dev/null 2>&1 &
     DUMPS="$frame:ff0000-ffffff" MASK_RANGES="$MASK" \
     MAME_ROMPATH="$PWD/$BUILD/rompath;$ROMDIR" \
         tools/run_replay_mame.sh vsavjw "tests/replays/$rpl.rpl" \
-        "$W/new_$rpl/b.log" "$W/sbn_$rpl" >/dev/null 2>&1 &
+        "$W/new_$k/b.log" "$W/sbn_$sk" >/dev/null 2>&1 &
     wait
-    if [ ! -f "$W/van_$rpl/a.log" ] || [ ! -f "$W/new_$rpl/b.log" ]; then
+    if [ ! -f "$W/van_$k/a.log" ] || [ ! -f "$W/new_$k/b.log" ]; then
         echo "  FAIL: a leg did not complete"; fail=1; continue
     fi
-    out="$(python3 tools/attribute_ramdiff.py "$W/van_$rpl/a.log" \
-             "$W/new_$rpl/b.log" "$frame" $WINDOWS 2>&1)" && st=0 || st=$?
+    # the vanilla leg IS the frozen run: its checksum at the case frame equals the basis log's (same mask) — #293
+    if [ "$MASK" = "$BASIS_MASK" ]; then
+        if fresh_ok "$W/van_$k/a.log" "$rpl" "$frame"; then echo "  ok: the vanilla leg equals the frozen basis at f$frame (a fresh boot)"
+        else echo "  FAIL: the vanilla leg is NOT the frozen run at f$frame ($(awk -v f="$frame" '$1 == f {print $2}' "$W/van_$k/a.log") against the basis's $(awk -v f="$frame" '$1 == f {print $2}' "$BASIS/logs/$rpl.log")) — a carried sandbox, or the rig moved"; fail=1; continue; fi
+        lastnew="$W/new_$k/b.log"; lastrpl="$rpl"; lastframe="$frame"
+    else
+        echo "  NOTE: the build's mask is not the basis mask, so the vanilla leg is not checked against the basis"
+    fi
+    out="$(python3 tools/attribute_ramdiff.py "$W/van_$k/a.log" \
+             "$W/new_$k/b.log" "$frame" $WINDOWS 2>&1)" && st=0 || st=$?
     printf '%s\n' "$out" | sed 's/^/    /'
+    # THE SHEET (#291): with SHEET_OUT set, this case's two legs, each proven on its own masked checksum log, at the
+    # frame it attributes; the verdict word is the one the branch below prints. Nothing decided changes.
+    if sheet_on && [ -z "${VS_CTL:-}" ]; then
+        if [ "$st" != 0 ]; then _sv="DIFF outside every named window"
+        elif printf '%s' "$out" | grep -qi "identical\|0 differing"; then _sv="identical (the rig no longer reproduces it)"
+        elif hit_in "$out" "$want"; then _sv="attributed to $want"
+        else _sv="nothing in $want"; fi
+        sheet_new "$rpl.$frame" "$rpl f$frame: a frozen flicker frame, pristine vsavj above the merged build" - - \
+            "the named windows (the ratified mask and the staging rows the case names), where the two legs differ by attribution"
+        sheet_leg "$rpl.$frame" vanilla vsavj vsavj "$ROMDIR" "$REPO/tests/replays/$rpl.rpl" - "$((frame + 1))" "$W/van_$k/a.log" "$MASK"
+        sheet_leg "$rpl.$frame" merged ours vsavjw "$PWD/$BUILD/rompath;$ROMDIR" "$REPO/tests/replays/$rpl.rpl" - "$((frame + 1))" "$W/new_$k/b.log" "$MASK"
+        sheet_moment "$rpl.$frame" "f$frame" "f$frame, expected in $want" "$_sv" \
+            "$(printf '%s' "$out" | tail -1 | tr '\t' ' ' | cut -c1-300)"
+        sheet_at "$rpl.$frame" "f$frame" vanilla "$frame" log
+        sheet_at "$rpl.$frame" "f$frame" merged "$frame" log
+    fi
     if [ "$st" != 0 ]; then
         echo "  FAIL: a differing byte fell OUTSIDE every named window."
         echo "        The frozen specs that carry this flicker frame are"
@@ -199,6 +240,16 @@ done
 if ! vs_ctl_is wrong-window && [ -n "${out:-}" ]; then
     if hit_in "$out" qsound-handshake-latch; then vs_ctl_dead wrong-window "the window test said yes for qsound-handshake-latch on $rpl f$frame, which no byte reached" || fail=1
     else vs_ctl_fired wrong-window "the window test says no for qsound-handshake-latch on $rpl f$frame"; fi
+fi
+# THE shared-sandbox CONTROL, INLINE: the frozen-basis check must refuse a run that is not the frozen vanilla one —
+# the merged leg's log at its own flicker frame differs from vanilla by definition of that frame.
+if ! vs_ctl_is shared-sandbox && [ -n "$lastnew" ]; then
+    if fresh_ok "$lastnew" "$lastrpl" "$lastframe"; then vs_ctl_dead shared-sandbox "the frozen-basis check accepted the merged leg's log at $lastrpl f$lastframe" || fail=1
+    else vs_ctl_fired shared-sandbox "the frozen-basis check refuses a run that is not the frozen vanilla one ($lastrpl f$lastframe, the merged leg)"; fi
+fi
+if vs_ctl_is shared-sandbox; then
+    if [ "$fail" = 1 ]; then vs_ctl_fired shared-sandbox "with the cases sharing a sandbox per replay, a vanilla leg failed the frozen-basis check"
+    else vs_ctl_dead shared-sandbox "the shared sandboxes passed — the frozen-basis check cannot see carried nvram" || fail=1; fi
 fi
 if vs_ctl_is wrong-window; then
     if [ "$fail" = 1 ]; then vs_ctl_fired wrong-window "every case expecting qsound-handshake-latch read nothing in it"

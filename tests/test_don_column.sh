@@ -10,6 +10,8 @@
 #   tests/replays/50_don_column_ko.rpl tools/run_mame.sh tools/run_replay_guarded.sh
 #   tools/setup_mame.sh
 #
+# SHEET: no-reference-leg — our build against frozen vs2 values, with no vs2 rig in the gate (ruled 2026-10-17: listed, not drawn)
+#
 # The column's KO records carried vs2's EXTENDED record types
 # 0x50/0x52; vsavj's record-type dispatch table ends at entry 0x4F, so
 # those types fetched CODE BYTES as jump displacements -> vec3 reset

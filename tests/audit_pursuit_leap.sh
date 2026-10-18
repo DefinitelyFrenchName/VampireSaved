@@ -17,6 +17,8 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/field_trace.lua
 #   tests/replays/judge/03_down_attack.rpl tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # The maintainer confirmed (2026-08-22) vsav retains the Night Warriors
 # leaping pursuit: universal U + any P/K over a knocked-down opponent,
 # per-character animations, ES variant on two buttons. MEASURED 14z-104

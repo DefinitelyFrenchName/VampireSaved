@@ -16,6 +16,8 @@
 #   tests/lib/tenant_build.sh tests/lua/obj_records_dump.lua tests/replays/
 #   tools/build_donovan.sh tools/check_tenant_hud.py tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # MECHANISM (measured; docs/game/atlas/venue_assets.md addendum). Both HUD
 # consumers are UNMASKED (mugshot stager 0x8937C by $782/$b82(a5); name
 # stager 0x89684 by $382(a4)) and both per-char tables (0x89884 word/char,

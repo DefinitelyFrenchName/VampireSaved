@@ -14,7 +14,9 @@
 #   legs. A red on a tenant is the alias class back (Donovan served Victor's 6, Phobos
 #   Bulleta's 12); a red on the control voids every tenant verdict.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua
-#   tests/replays/96_don_victor_grab.rpl tools/run_mame.sh tools/setup_mame.sh
+#   tests/replays/96_don_victor_grab.rpl tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: per victim, the held capture record under Victor's 6+HP grab, at the first headbutt tick (hp drop) that samples the modal record on each leg — not comparable: each game's stage and palette, and a legacy victim's art (each game's own copy; [VSP-168]); the legs reach the hold on different frames
 #
 # THE REPORT (maintainer, MAME field test 2026-08-19): a tenant victim of
 # Victor's headbutting grab (6+HP) shows a half-right / half-squished
@@ -231,6 +233,10 @@ if not cnt:
     print("NO-HOLD"); sys.exit(0)
 addr, n = cnt.most_common(1)[0]
 total = sum(cnt.values())
+import os
+if os.environ.get("SHEET_OUT"):   # THE SHEET (#291): the first tick that samples the modal record; a file only
+    first = next(rows[i][0] for i in range(1, len(rows)) if rows[i][1] < rows[i - 1][1] and rows[i][2] == addr)
+    open(f"{d}/hold_frame.txt", "w").write("%d\n" % first)
 if n * 2 <= total:
     print("NO-HOLD"); sys.exit(0)
 # a TENANT victim on our leg lives in the placed copy; everything else is
@@ -242,6 +248,7 @@ print(f"{src:#08x} {idx[0] if idx else -1} {n}/{total}")
 PY
 }
 
+. "$REPO/tests/lib/sheet.sh"
 echo "== #104 capture-pose audit on $BUILD (EXPECT_MATCH=$EXPECT_MATCH)"
 for v in $VICTIMS; do
     reg="$(region_for "$v")"
@@ -249,6 +256,20 @@ for v in $VICTIMS; do
     A="$(held_index "$W/$v/ours"   ours   "$v" "$reg")"
     B="$(held_index "$W/$v/native" native "$v" "$reg")"
     ai="$(echo "$A" | awk '{print $2}')"; bi="$(echo "$B" | awk '{print $2}')"
+    # THE SHEET (#291): with SHEET_OUT set, this victim's two legs, each proven on its own checksum log, and the hold
+    # each one made. Nothing decided changes.
+    if sheet_on; then
+        case "$v" in 13) _sc=donovan ;; 10) _sc=huitzil ;; 11) _sc=pyron ;; *) _sc=- ;; esac
+        sheet_new "v$v" "victim 0x$v held by Victor's 6+HP grab: native vs2 above ours" "$_sc" "#104" \
+            "each game's stage and palette, and a legacy victim's art (each game's own copy; [VSP-168]); the legs reach the hold on different frames"
+        sheet_leg "v$v" native vs2 vsav2 "$ROMDIR" "$RPL" "$pk" 4700 "$W/$v/native/out.log"
+        sheet_leg "v$v" ours ours vsavjw "$REPO/$BUILD/rompath;$ROMDIR" "$RPL" "$pk" 4700 "$W/$v/ours/out.log"
+        if [ "$ai" = "$bi" ] && [ "$ai" != -1 ] && [ -n "$ai" ]; then _sv=IDENTICAL; else _sv=DIFF; fi
+        sheet_moment "v$v" hold "the held capture record (first headbutt tick on it)" "$_sv" "ours: $A; native: $B"
+        for _sl in native ours; do
+            if [ -s "$W/$v/$_sl/hold_frame.txt" ]; then sheet_at "v$v" hold "$_sl" "$(cat "$W/$v/$_sl/hold_frame.txt")" log; fi
+        done
+    fi
     printf "  victim 0x%s (%s)\n    ours  : %s\n    native: %s\n" "$v" "$reg" "$A" "$B"
     case "$A$B" in
     *DEAD*|*NO-HOLD*)

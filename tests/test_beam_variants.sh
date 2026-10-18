@@ -14,6 +14,8 @@
 #   tests/replays/hui/86_hui_beam_variants.rpl tools/gfx_tiles.py tools/run_mame.sh
 #   tools/setup_mame.sh
 #
+# SHEET: none — the emulator leg is native vsav2 only; our build enters as ROM bytes compared statically, so there is no leg of ours to draw
+#
 # WHY IT EXISTS. Two facts the beam port rests on, both measured this
 # session and both easy to get wrong later:
 #

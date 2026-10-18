@@ -13,6 +13,8 @@
 #   tests/lua/type_write_census.lua tests/replays/hui/87_hui_plasma_trap.rpl
 #   tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # WHY. Air 214+MK's detonation crashed the machine on every Phobos build
 # before the 14z-79 (b') fix. This audit locks that fix: the 87 timer
 # rig must SPAWN the mine (type-69 write into the projectile pool) and

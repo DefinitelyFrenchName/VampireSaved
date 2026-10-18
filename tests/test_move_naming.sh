@@ -17,6 +17,8 @@
 #   tests/lua/field_trace.lua tests/replays/naming/ tools/anim_nodes.py tools/move_parity.py
 #   tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
+#
 # WHAT IT HOLDS. build/manifest/moves_donovan.toml carries a (table, seq) per
 # move, measured by tools/name_moves.py: eight scripted rigs on NATIVE vs2
 # (P1 Donovan, P2 DEMITRI idle — Victor until 14z-165) perform every move; P1's anim node pointer

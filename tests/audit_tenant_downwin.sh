@@ -15,6 +15,8 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/field_trace.lua
 #   tests/replays/judge/01_timeout_lead.rpl tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # §4 mandates life-marker-transition coverage per ported character; the
 # corpus had it for Donovan only (20_don_round2 / 23_don_matchwin). This
 # is also the DIRECT #103-class lock: the round judge kills on WHITE

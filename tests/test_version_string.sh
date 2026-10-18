@@ -16,6 +16,8 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/obj_records_dump.lua
 #   tests/lua/snapshot_frames.lua tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # Where and how: the SELECT SCREEN, the one roster-owned always-visited
 # surface (attract/title would violate the superset invariant; select
 # already diverges under the ratified §4 v3 window). The [[select_wheel]]

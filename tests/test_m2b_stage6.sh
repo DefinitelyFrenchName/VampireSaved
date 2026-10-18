@@ -36,6 +36,8 @@
 #   tools/run_mame.sh tools/run_replay_guarded.sh tools/run_replay_mame.sh
 #   tools/setup_mame.sh
 #
+# SHEET: none — the subject is a development-stage build of the M2a/tenant ladder, not a release set; its comparison with vsavj is outside #291's scope (census class S)
+#
 # Usage: ROMDIR=... tests/test_m2b_stage6.sh [outbase]
 set -eu
 

@@ -22,7 +22,9 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/df_moves.tsv
 #   tests/expected/registry.tsv tests/lua/field_trace.lua tests/lua/read_tap.lua
 #   tests/lua/snapshot_frames.lua tests/lua/sprite_capture.lua tools/build_fingerprint.py
-#   tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh
+#   tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: one per in-DF event row, at each leg's own first hit frame (the event frame + 4 when it has none) — not comparable: each game's stage and palette, P2's art (each game's own copy; [VSP-168]), and the two modes' own looks (Change on ours, the vs2 EX install on native); the form rows (Pyron's palettes, Donovan's sword) are sprite-dump measurements, not drawn
 #
 # MUST-FIRE: perturbed-copy: mode-lost — our Change field +0x111 zeroed at the first compared event's frame (what a rig that outran the mode would read) must be refused by the in-mode check, so every compared event is MEASURED inside the mode on both legs, not assumed from the rig's spacing (in-gate: the zeroed copy must fail the check; mode: our field is zeroed before the check and the gate FAILs)
 # MUST-FIRE: perturbed-copy: idle-leg — our P1 state held still over the first compared event's window (what an input that produced nothing would read) must be refused by the acted check, so no SAME row can be two legs agreeing on nothing (in-gate: the held copy must fail the check; mode: our state is held before the check and the gate FAILs)
@@ -682,5 +684,45 @@ else bad "differs from the frozen rows ($(grep -c '^[<>]' "$W/diff.txt" | tr -d 
 if [ "$CONTROL" = hit-dropped ]; then
     if [ "$fail" = 1 ]; then echo "CONTROL FIRED: hit-dropped — our rows missing an altered attack's hit lose the frozen rows"; echo "FAIL: audit_df_moves (control mode)"; exit 1
     else echo "CONTROL DEAD: hit-dropped — the rewrite changed nothing"; echo "FAIL: audit_df_moves"; exit 1; fi
+fi
+# THE SHEET (#291): with SHEET_OUT set, each part's two legs as this run played them and one moment per in-DF event row,
+# at each leg's own first hit frame (the event frame + 4 when it has none), proven on the fields that leg traced there.
+# Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "$CONTROL" ]; then
+    for part in $PARTS; do
+        t="${part%_*}"
+        fr="$(python3 -c "import json;print(json.load(open('$W/$part.json'))['frames'])")"
+        pk="$(python3 -c "import json;print(';'.join(json.load(open('$W/$part.json'))['pokes']))");$(python3 -c "print(f'{2000}-{($fr)-1}:ff8116:06')");$(python3 -c "print(f'{2363}-{($fr)-1}:ff80d4:0000')")"
+        sheet_new "$part" "$part: the tenant's moves inside Dark Force, native vs2 (the vs2 EX install) above ours (Change, P+K)" "$t" "#136" \
+            "each game's stage and palette, P2's art (each game's own copy; [VSP-168]), and the two modes' own looks (Change on ours, the vs2 EX install on native)" || true
+        sheet_leg "$part" native vs2 vsav2 "$ROMDIR" "$W/$part.native.rpl" "$pk" "$fr" || true
+        sheet_leg "$part" ours ours vsavjw "$BUILD/rompath;$ROMDIR" "$W/$part.ours.cur.rpl" "$pk" "$fr" || true
+        python3 - "$part" "$W" "$FIELDS" > "$W/sheet_$part.tsv" <<'PYS' && sheet_rows "$W/sheet_$part.tsv" || true
+import json, re, sys
+part, W, fields = sys.argv[1:4]
+spec = {name: "%s:%s" % (a.lower(), sz) for a, sz, name in (f.split(":") for f in fields.split(","))}
+def trace(p):
+    d = {}
+    for l in open(p):
+        q = l.split()
+        if q and q[0] == "F": d[int(q[1])] = dict(kv.split("=", 1) for kv in q[2:])
+    return d
+tr = {leg: trace(f"{W}/{part}.{leg}.ft") for leg in ("native", "ours")}
+ev = json.load(open(f"{W}/{part}.json"))["events"]
+for l in open(f"{W}/got.tsv"):
+    r = l.rstrip("\n").split("\t")
+    if r[0] != "ev" or r[1] != part:
+        continue
+    k = int(r[2]); lo = ev[k]["frame"]
+    print("moment\t%s\tev%d\t%s (first hit; the event frame + 4 with none)\t%s\t%s" % (part, k, r[3], r[4], "-" if r[4] == "SAME" else "%s; %s" % (r[5], r[6])))
+    for leg, col in (("native", r[5]), ("ours", r[6])):
+        m = re.search(r"@\[([0-9, ]*)\]", col)
+        offs = [int(x) for x in m.group(1).split(",")] if m and m.group(1).strip() else []
+        fr = lo + (offs[0] if offs else 4); smp = tr[leg].get(fr)
+        exp = ",".join("%s=%s" % (spec[n], v) for n, v in sorted(smp.items()) if n in spec) if smp else "-"
+        print("at\t%s\tev%d\t%s\t%d\t%s\t%s" % (part, k, leg, fr, "fields" if smp else "none", exp))
+PYS
+    done
 fi
 if [ "$fail" = 0 ]; then echo "PASS: audit_df_moves"; else echo "FAIL: audit_df_moves"; exit 1; fi

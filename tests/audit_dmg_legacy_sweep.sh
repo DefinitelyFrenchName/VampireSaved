@@ -30,7 +30,9 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/dmg_legacy_sweep.tsv tests/replays/dmg191/
 #   tests/expected/registry.tsv tests/lib/controls.sh tests/lua/field_trace.lua tools/dmg_sweep.py
 #   tools/build_fingerprint.py tools/cps2_decrypt.py tools/run_mame.sh tools/setup_mame.sh
-#   tests/lua/rom_poke.lua tools/audit_same_data_p2.py tools/hitbox_records.py tools/anim_nodes.py
+#   tests/lua/rom_poke.lua tools/audit_same_data_p2.py tools/hitbox_records.py tools/anim_nodes.py tests/lib/sheet.sh
+#
+# SHEET: legs vsavj,vs2,ours — moments: each judged hit at each leg's own first red-drop frame: Demitri's 2HK/5HP/623HP on every legacy victim from both sides (pristine vsav2 above pristine vsavj), Donovan's four events (native vs2 above ours), each proven on that leg's own field trace; and section 5's counterfactual on victim 0x00 (each game unpoked and with the other game's records, through rom_poke.lua), EVENT-PROVEN on that leg's own field log around each hit — not comparable: the legacy sheets have no leg of ours (pristine vsavj against vsav2, the engine difference #191 records); each game's stage and palette, and the victims' art (each game's own copy; [VSP-168]); the whole-sweep swap (64 legs) and Donovan's swapped legs are judged as row equalities and not drawn
 #
 # MUST-FIRE: perturbed-copy: engines-agree — the rows with every vsavj total replaced by its vsav2 twin's (what two games that agreed would read) must FAIL the frozen compare, so the +1 between the GAMES is read from the rows, not assumed (in-gate: the perturbed rows must differ from the frozen ones; mode: the perturbed rows are the gate's rows and the compare FAILs)
 # MUST-FIRE: perturbed-copy: attacker-swapped — the reader run with the attacker id read as 0x03 at every hit must report every hit as not Demitri's, so "the hit was Demitri's 2HK" is something the gate can refuse (in-gate: the reader on the real traces with the perturbation must exit non-zero; mode: the gate's own read is perturbed and the gate FAILs)
@@ -99,16 +101,21 @@ grep -qx 'defense rows differing by id: 0a 10 13 19 1a' "$W/tables.txt" \
     || bad "the tables are not as the attribution needs them (rows differing only for 0a 10 13 19 1a, the two tables equal)"
 
 LV="$(python3 -c "print(f'{2000}-{(4730)-1}:ff8116:06' + ';' + f'{2363}-{(4730)-1}:ff80d4:0000')")"
+lpk() {  # lpk <side p1|p2> <victim id> — a legacy leg's forced picks and HP pins (one copy: the legs and the sheet)
+    if [ "$1" = p1 ]; then echo "1400:ff8b82:$2;1450:ff8b82:$2;1500:ff8b82:$2;2940:ff8850:01200120;3380:ff8850:01200120;3780:ff8850:01200120"
+    else echo "1400:ff8782:$2;1450:ff8782:$2;1500:ff8782:$2;1400:ff8b82:01;1450:ff8b82:01;1500:ff8b82:01;2940:ff8450:01200120;3380:ff8450:01200120;3780:ff8450:01200120"; fi
+}
+lrpl() { case "$1" in p1) echo "$REPO/tests/replays/dmg191/demitri_p1.rpl" ;; *) echo "$REPO/tests/replays/dmg191/demitri_p2.rpl" ;; esac; }
+LFIELDS="ff8450:w:p1hp,ff8452:w:p1white,ff8454:b:p1cls,ff8850:w:p2hp,ff8852:w:p2white,ff8854:b:p2cls,ff8782:b:id,ff8b82:b:p2id"
 lleg() {  # lleg <side p1|p2> <victim id> <vsavj|vsav2>
     _s="$1"; _v="$2"; _g="$3"; _d="$W/L.$_s.$_v.$_g"; mkdir -p "$_d"
-    if [ "$_s" = p1 ]; then _pk="1400:ff8b82:$_v;1450:ff8b82:$_v;1500:ff8b82:$_v;2940:ff8850:01200120;3380:ff8850:01200120;3780:ff8850:01200120"
-    else _pk="1400:ff8782:$_v;1450:ff8782:$_v;1500:ff8782:$_v;1400:ff8b82:01;1450:ff8b82:01;1500:ff8b82:01;2940:ff8450:01200120;3380:ff8450:01200120;3780:ff8450:01200120"; fi
-    case "$_s" in p1) _r="$REPO/tests/replays/dmg191/demitri_p1.rpl" ;; *) _r="$REPO/tests/replays/dmg191/demitri_p2.rpl" ;; esac
+    _pk="$(lpk "$_s" "$_v")"; _r="$(lrpl "$_s")"
     ( cd "$_d" && MAME_SANDBOX="$_d/sb" MAME_ROMPATH="$ROMDIR" REPLAY="$_r" POKES="$LV;$_pk" \
-        FIELDS="ff8450:w:p1hp,ff8452:w:p1white,ff8454:b:p1cls,ff8850:w:p2hp,ff8852:w:p2white,ff8854:b:p2cls,ff8782:b:id,ff8b82:b:p2id" \
+        FIELDS="$LFIELDS" \
         FIELD_OUT="$_d/f.ft" FIELD_FROM=2300 FIELD_TO=4100 FRAMES=4100 \
         "$REPO/tools/run_mame.sh" "$_g" -autoboot_script "$REPO/tests/lua/field_trace.lua" > "$_d/mame.log" 2>&1; rm -rf "$_d/sb" ) </dev/null
 }
+DFIELDS="ff8450:w:p1hp,ff8452:w:p1white,ff8454:b:p1cls,ff8782:b:id,ff8b82:b:p2id"
 dleg() {  # dleg <native|ours> — Donovan (P1) against Demitri (P2), the 14z-186 probe-12 rig, the parity gates' pins
     _l="$1"; _d="$W/D.$_l"; mkdir -p "$_d"; _j="$RD/donovan_p12.json"
     _fr="$(python3 -c "import json;print(json.load(open('$_j'))['frames'])")"
@@ -120,7 +127,7 @@ dleg() {  # dleg <native|ours> — Donovan (P1) against Demitri (P2), the 14z-18
             /^(1100|1160|1220|1280)-[0-9]+ p1=/ { next } { print }' "$REPO/tests/replays/dmg191/donovan_p12.rpl" > "$_d/r.rpl"
     fi
     ( cd "$_d" && MAME_SANDBOX="$_d/sb" MAME_ROMPATH="$_rp" REPLAY="$_d/r.rpl" POKES="$_pk;$LV" \
-        FIELDS="ff8450:w:p1hp,ff8452:w:p1white,ff8454:b:p1cls,ff8782:b:id,ff8b82:b:p2id" \
+        FIELDS="$DFIELDS" \
         FIELD_OUT="$_d/f.ft" FIELD_FROM=2300 FIELD_TO="$_fr" FRAMES="$_fr" \
         "$REPO/tools/run_mame.sh" "$_set" -autoboot_script "$REPO/tests/lua/field_trace.lua" > "$_d/mame.log" 2>&1; rm -rf "$_d/sb" ) </dev/null
 }
@@ -195,11 +202,13 @@ sed 's/^/     /' "$W/records.txt"
     || bad "the three hits' records are not all different — the counterfactual below has nothing to swap"
 eval "$(awk '/^record /{n=$2; split($5,a,"="); split($7,b,"="); sub(/^0x/,"",a[1]); sub(/^0x/,"",b[1]);
     printf "J_%s=%s:%02x; V_%s=%s:%02x; JV_%s=%s:%02x; VJ_%s=%s:%02x;\n", n, a[1], a[2], n, b[1], b[2], n, a[1], b[2], n, b[1], a[2]}' "$W/records.txt" | sed 's/J_623HP/J_623/g; s/V_623HP/V_623/g; s/JV_623HP/JV_623/g; s/VJ_623HP/VJ_623/g; s/J_2HK/J_2/g; s/V_2HK/V_2/g; s/JV_2HK/JV_2/g; s/VJ_2HK/VJ_2/g; s/J_5HP/J_5/g; s/V_5HP/V_5/g; s/JV_5HP/JV_5/g; s/VJ_5HP/VJ_5/g')"
+CPK="1400:ff8b82:00;1450:ff8b82:00;1500:ff8b82:00;2940:ff8850:01200120;3380:ff8850:01200120;3780:ff8850:01200120"
+CFIELDS="ff841c:l:node,ff8850:w:p2hp,ff8852:w:p2white,ff8782:b:id,ff8b82:b:p2id"
 cleg() {  # cleg <vsavj|vsav2> <tag> <ROMPOKE>
     _g="$1"; _d="$W/C.$_g.$2"; mkdir -p "$_d"
-    _pk="1400:ff8b82:00;1450:ff8b82:00;1500:ff8b82:00;2940:ff8850:01200120;3380:ff8850:01200120;3780:ff8850:01200120"
+    _pk="$CPK"
     ( cd "$_d" && MAME_SANDBOX="$_d/sb" MAME_ROMPATH="$ROMDIR" REPLAY="$REPO/tests/replays/dmg191/demitri_p1.rpl" POKES="$LV;$_pk" \
-        ROMPOKE="$3" FIELDS="ff841c:l:node,ff8850:w:p2hp,ff8852:w:p2white,ff8782:b:id,ff8b82:b:p2id" \
+        ROMPOKE="$3" FIELDS="$CFIELDS" \
         FIELD_OUT="$_d/f.ft" FIELD_FROM=2300 FIELD_TO=4100 FRAMES=4100 \
         "$REPO/tools/run_mame.sh" "$_g" -autoboot_script "$REPO/tests/lua/rom_poke.lua" > "$_d/mame.log" 2>&1; rm -rf "$_d/sb" ) </dev/null
 }
@@ -320,6 +329,94 @@ if [ -z "$MODE" ]; then
     if [ "$(_red "$W/C.vsavj.base.hits")" != "$(_red "$W/C.vsav2.base.hits")" ]; then
         vs_ctl_fired counterfactual-skipped "the unpoked games deal $(_red "$W/C.vsavj.base.hits")and $(_red "$W/C.vsav2.base.hits")— the swap's equality is something the comparison can refuse"
     else vs_ctl_dead counterfactual-skipped "the unpoked games already deal the same damage; the swap proves nothing" || fail=1; fi
+fi
+
+# THE SHEET (#291, D2): with SHEET_OUT set, the legs this run judged and one moment per judged hit — the legacy legs
+# and Donovan's on each leg's own field trace (basis fields), section 5's counterfactual legs re-run under their own
+# rom_poke.lua (basis event on each leg's own field log). Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "$MODE" ]; then
+    for s in p1 p2; do for v in $IDS; do
+        sheet_new "L.$s.$v" "Demitri's 2HK/5HP/623HP from $s on victim 0x$v: pristine vsav2 above pristine vsavj" - "#191" \
+            "no leg of ours: pristine vsavj against vsav2, the engine difference #191 records (vs2 lowered Demitri's own records); each game's stage, palette and art"
+        sheet_leg "L.$s.$v" v2 vs2 vsav2 "$ROMDIR" "$(lrpl "$s")" "$LV;$(lpk "$s" "$v")" 4100
+        sheet_leg "L.$s.$v" vj vsavj vsavj "$ROMDIR" "$(lrpl "$s")" "$LV;$(lpk "$s" "$v")" 4100
+    done; done
+    _dj="$RD/donovan_p12.json"; _dfr="$(python3 -c "import json;print(json.load(open('$_dj'))['frames'])")"
+    _dpk="$(python3 -c "import json;print(';'.join(json.load(open('$_dj'))['pokes']))")"
+    sheet_new D "Donovan (P1) against Demitri's 2HK/5HP/623HP: native vs2 above ours" donovan "#191" \
+        "each game's stage and palette, and Demitri's art (each game's own copy; [VSP-168])"
+    sheet_leg D native vs2 vsav2 "$ROMDIR" "$W/D.native/r.rpl" "$_dpk;$LV" "$_dfr"
+    sheet_leg D ours ours vsavjw "$BUILD/rompath;$ROMDIR" "$W/D.ours/r.rpl" "$_dpk;$LV" "$_dfr"
+    sheet_new C "Section 5: Demitri on victim 0x00, each game unpoked and with the OTHER game's three attack records" - "#191" \
+        "no leg of ours: the counterfactual runs on pristine vsavj and vsav2; each game's stage, palette and art"
+    for g in vsavj vsav2; do
+        if [ "$g" = vsavj ]; then _ro=vsavj _sw="$JV_2,$JV_5,$JV_623"; else _ro=vs2 _sw="$VJ_2,$VJ_5,$VJ_623"; fi
+        for tg in base swap; do
+            _rk=""; [ "$tg" = swap ] && _rk="$_sw"
+            sheet_leg C "$g.$tg" "$_ro" "$g" "$ROMDIR" "$REPO/tests/replays/dmg191/demitri_p1.rpl" "$LV;$CPK" 4100
+            sheet_tap C "$g.$tg" tests/lua/rom_poke.lua "ROMPOKE=$_rk;FIELDS=$CFIELDS;FIELD_FROM=2300;FIELD_TO=4100;FRAMES=4100"
+            sheet_file C "$g.$tg.ft" "$W/C.$g.$tg/f.ft" > /dev/null
+        done
+    done
+    python3 - "$W" "$REPO" "$LFIELDS" "$DFIELDS" "$_dj" "$IDS" > "$W/sheet_rows.tsv" <<'PYS'
+import json, sys
+W, REPO, LF, DF, DJ, IDS = sys.argv[1:7]
+sys.path.insert(0, REPO + "/tools")
+import dmg_sweep as ds
+spec = lambda F: {name: "%s:%s" % (a, sz) for a, sz, name in (f.split(":") for f in F.split(","))}
+def fields(R, f, sp):
+    s = R.get(f)
+    return ("fields", ",".join("%s=%d" % (sp[k], s[k]) for k in sorted(sp) if k in s)) if s else ("none", "-")
+def first_drop(R, fld, lo, hi):
+    d = ds.drops(R, fld, lo, hi)
+    return (d[0][0], sum(x for _, x in ds.drops(R, fld, lo, hi))) if d else (None, 0)
+LS = spec(LF)
+for side, m in ds.SIDE.items():
+    for v in IDS.split():
+        sid = "L.%s.%s" % (side, v)
+        tr = {leg: ds.load("%s/L.%s.%s.%s/f.ft" % (W, side, v, g))[0] for leg, g in (("v2", "vsav2"), ("vj", "vsavj"))}
+        for n, lo, hi in ds.WIN:
+            fd = {leg: first_drop(tr[leg], m["vic"] + "hp", lo, hi) for leg in tr}
+            if all(f is None for f, _ in fd.values()):
+                continue
+            vals = "red: vsavj %d, vs2 %d" % (fd["vj"][1], fd["v2"][1])
+            print("moment\t%s\t%s\t%s (Demitri's first red drop on each leg)\tvsavj %+d red\t%s" % (sid, n, n, fd["vj"][1] - fd["v2"][1], vals))
+            for leg in ("v2", "vj"):
+                f = fd[leg][0] or next(x for x, _ in fd.values() if x)
+                b, e = fields(tr[leg], f, LS)
+                print("at\t%s\t%s\t%s\t%d\t%s\t%s" % (sid, n, leg, f, b, e))
+DS = spec(DF)
+ev = json.load(open(DJ))["events"]
+tr = {leg: ds.load("%s/D.%s/f.ft" % (W, leg))[0] for leg in ("native", "ours")}
+for k, e in enumerate(ev):
+    fd = {leg: first_drop(tr[leg], "p1hp", e["frame"], e["frame"] + 120) for leg in tr}
+    if all(f is None for f, _ in fd.values()):
+        continue
+    print("moment\tD\te%d\tevent %d (Demitri's first red drop on Donovan)\tours %+d red\tred: ours %d, native %d" % (
+        k, k, fd["ours"][1] - fd["native"][1], fd["ours"][1], fd["native"][1]))
+    for leg in ("native", "ours"):
+        f = fd[leg][0] or next(x for x, _ in fd.values() if x)
+        b, x = fields(tr[leg], f, DS)
+        print("at\tD\te%d\t%s\t%d\t%s\t%s" % (k, leg, f, b, x))
+legs = ["vsavj.base", "vsavj.swap", "vsav2.base", "vsav2.swap"]
+hits = {}
+for leg in legs:
+    R = ds.load("%s/C.%s/f.ft" % (W, leg))[0]
+    hits[leg] = [f for f in sorted(R) if f - 1 in R and R[f]["p2hp"] < R[f - 1]["p2hp"]]
+    hits[leg] = [(f, R[f - 1]["p2hp"] - R[f]["p2hp"]) for f in hits[leg]]
+for k, name in enumerate(("2HK", "5HP", "623HP")):
+    if all(k >= len(hits[l]) for l in legs):
+        continue
+    vals = ", ".join("%s -%s" % (l, hits[l][k][1] if k < len(hits[l]) else "none") for l in legs)
+    print("moment\tC\th%d\t%s (each leg's %s red drop)\tswap deals the other game's damage\t%s" % (k, name, ["first", "second", "third"][k], vals))
+    for leg in legs:
+        if k >= len(hits[leg]):
+            continue
+        f = hits[leg][k][0]
+        print("at\tC\th%d\t%s\t%d\tevent\tfiles/C.%s.ft:%d-%d" % (k, leg, f, leg, f - 2, f + 2))
+PYS
+    sheet_rows "$W/sheet_rows.tsv"
 fi
 
 if [ "$fail" = 0 ]; then echo "PASS: audit_dmg_legacy_sweep"; else echo "FAIL: audit_dmg_legacy_sweep"; exit 1; fi

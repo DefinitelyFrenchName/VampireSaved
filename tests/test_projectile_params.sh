@@ -20,6 +20,8 @@
 #   tests/lib/decrypt_cache.sh tests/lua/field_trace.lua tests/replays/naming/ tools/name_moves.py
 #   tools/projectile_params.py tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
+#
 # WHAT IT HOLDS.
 #   1. the decoder's rows for the eight handlers on NATIVE vs2 (walker-2 table
 #      0x5C620[type]: 0x3E Blizzard Sword; 0x40/0x41/0x42 Sol Smasher ground/

@@ -13,6 +13,8 @@
 # FOLLOWS: build/manifest/ docs/project/gotchas.md emu/mame-patches/ tests/lua/ring_tap.lua
 #   tests/replays/ tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # THE TRIPWIRE THAT MATTERS: vsavj's sound-id range 0x700-0x7FF holds
 # MUSIC TRACKS, while vs2 uses that same range for Donovan's voice bank
 # (measured both sets, docs/project/m5/, engine_internals "Sound subsystem").

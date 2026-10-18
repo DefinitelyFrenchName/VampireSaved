@@ -22,6 +22,8 @@
 #   tests/lib/instr_align.sh tests/lua/emu_clock.lua tests/lua/replay.lua tests/lua/walker_sp.lua
 #   tests/replays/ tools/audit_walker_callers.py tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — compares builds of ours with each other (A/B, merged vs solo, stock vs WIDE), not with a reference set
+#
 # MUST-FIRE: known-bad: drift-clock — a breakpoint run under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 4,250 emulated frames of 18,520 counted on 24_don_winmash) must miss its frozen game clock (in-gate: one extra run of 21_don_mash on the build; mode: every breakpoint run runs the old clock and the gate FAILs)
 # MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs)
 # MUST-FIRE: known-bad: vanilla-walker-reached — after the relocation no caller reaches a vanilla walker, so a nonzero hit on one must fail section 1 (mode: a vanilla-walker hit count is forced nonzero so the "still reached" FAIL fires and the gate FAILs)

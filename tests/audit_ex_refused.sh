@@ -14,7 +14,9 @@
 #   path IS is for the captures, not frozen here.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ex_refused.tsv
 #   tests/lib/decrypt_cache.sh tests/lua/field_trace.lua tests/replays/df/97_df_mech.rpl
-#   tools/run_mame.sh tools/select_paths.py tools/select_wheel.py tools/setup_mame.sh
+#   tools/run_mame.sh tools/select_paths.py tools/select_wheel.py tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: per tenant, the EX input (f3260), each change of vs2's REFUSED (stock-0) state path over 3255-3400 (the path ours at stock 3 must equal, Pyron's frozen as measured), and the frame vs2's stocked leg enters the mode — not comparable: each game's stage and palette, and P2's art (each game's own copy; [VSP-168]); which move a path IS is for the maintainer, not judged
 #
 # MUST-FIRE: perturbed-copy: stock-kept — the refused legs run with their stock left at 3 (the refusal removed) must be reported as ENTERING the mode and FAIL, so "never enters" is read from the mode field, not assumed from the poke (in-gate: vs2's three stock-3 legs, already run, must read entered on the same check — ours' no longer enter, which is the fix; mode: every refused leg runs with stock 3, vs2's enter, and the gate FAILs)
 #
@@ -153,6 +155,67 @@ if [ -z "$CONTROL" ]; then
     grep -v '^#' "$EXPECT" > "$W/want.tsv"
     if diff "$W/want.tsv" "$W/got.tsv" > "$W/diff.txt"; then ok "every row as frozen"
     else bad "differs from the frozen rows"; sed 's/^/        /' "$W/diff.txt"; fi
+fi
+# THE SHEET (#291): with SHEET_OUT set, one sheet per tenant — the four legs as this run played them, at the moments
+# the verdict reads, each proven on the six fields this run traced there. Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "$CONTROL" ]; then
+    for id in 13 10 11; do
+        case $id in 13) _c=donovan; _in=421+KK ;; 10) _c=huitzil; _in=263+PP ;; 11) _c=pyron; _in=2623+PP ;; esac
+        sheet_new "t$id" "$_c's vs2 EX input $_in at stock 0 (refused) and 3 (stocked): native vs2 above ours" "$_c" "#136" \
+            "each game's stage and palette, and P2's art (each game's own copy; [VSP-168]); which move a path IS is for the maintainer, not judged"
+        for g in vsav2 ours; do for role in refused stocked; do
+            st=0; [ "$role" = stocked ] && st=3
+            case $g in vsav2) _set=vsav2; _rp="$ROMDIR"; _ro=vs2 ;; ours) _set=vsavjw; _rp="$BUILD/rompath;$ROMDIR"; _ro=ours ;; esac
+            sheet_leg "t$id" "${g}_$role" "$_ro" "$_set" "$_rp" "$W/${g}_${id}_$role.rpl" \
+                "3100:ff8509:$(printf %02x "$st");3120:ff8509:$(printf %02x "$st");$PINS" "$FR"
+        done; done
+    done
+    python3 - "$W" "$W/want.tsv" > "$W/sheet_rows.tsv" <<'PYS'
+import sys
+W, want = sys.argv[1], sys.argv[2]
+spec = {"df": "ff802e:b", "stock": "ff8509:b", "seq": "ff8406:b", "sub": "ff8407:b", "f111": "ff8511:b", "id": "ff8782:b"}
+got = {tuple(l.split("\t")[:3]): l.rstrip("\n") for l in open(f"{W}/got.tsv")}
+frozen = set(l.rstrip("\n") for l in open(want))
+legs = [(g, r) for g in ("vsav2", "ours") for r in ("refused", "stocked")]
+for i in ("13", "10", "11"):
+    tr = {}
+    for g, r in legs:
+        d = {}
+        for l in open(f"{W}/{g}_{i}_{r}.ft"):
+            t = l.split()
+            if t and t[0] == "F": d[int(t[1])] = dict(kv.split("=", 1) for kv in t[2:])
+        tr[(g, r)] = d
+    vp = got[("vsav2", i, "refused")].split("\t")[6][5:]
+    op = got[("ours", i, "stocked")].split("\t")[6][5:]
+    if i in ("13", "10"):
+        pv = "IDENTICAL (ours at stock 3 = vs2 at stock 0)" if vp == op else "DIFF (ours at stock 3 vs vs2 at stock 0)"
+    else:
+        pv = "as frozen" if all(got[(g, i, r)] in frozen for g, r in legs) else "DIFF from the frozen rows"
+    mom = [(3260, "f3260 the EX input")]
+    for step in vp.split():
+        off, k = step.split(":", 1)
+        f = 3260 + int(off)
+        if f != 3260: mom.append((f, "f%d vs2 refused path step %s (%s)" % (f, off, k)))
+    ent = [f for f in range(3255, 3700) if tr[("vsav2", "stocked")].get(f, {}).get("f111", "0") != "0"]
+    if ent: mom.append((ent[0], "f%d vs2 stocked enters the mode (+0x111)" % ent[0]))
+    seen = set()
+    for f, lab in mom:
+        if f in seen: continue
+        seen.add(f)
+        if lab.startswith("f%d vs2 stocked" % f):
+            ov = got[("ours", i, "stocked")].split("\t")[4]
+            v = "vs2 entered; ours stocked %s (the disabled EX route)" % ov
+        else:
+            v = pv
+        vals = ", ".join("%s_%s %s/%s" % (g, r, tr[(g, r)].get(f, {}).get("seq", "?"), tr[(g, r)].get(f, {}).get("sub", "?")) for g, r in legs)
+        print("moment\tt%s\tf%d\t%s\t%s\tseq/sub: %s" % (i, f, lab, v, vals))
+        for g, r in legs:
+            s = tr[(g, r)].get(f)
+            exp = ",".join("%s=%s" % (spec[k], s[k]) for k in sorted(spec) if k in s) if s else "-"
+            print("at\tt%s\tf%d\t%s_%s\t%d\t%s\t%s" % (i, f, g, r, f, "fields" if s else "none", exp))
+PYS
+    sheet_rows "$W/sheet_rows.tsv"
 fi
 if [ "$CONTROL" = stock-kept ]; then
     if [ "$fail" = 1 ]; then echo "CONTROL FIRED: stock-kept — the unrefused legs enter the mode"; echo "FAIL: audit_ex_refused (control mode)"; exit 1

@@ -20,6 +20,8 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/scroll3_watch.lua tests/replays/
 #   tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # Replays chosen for stage coverage: the attract (all demo stages incl
 # Jedah's own demo), the arcade-mode marathon (stage rotation), and the
 # standard match replays.

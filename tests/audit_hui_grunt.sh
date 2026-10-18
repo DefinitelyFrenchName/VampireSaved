@@ -14,7 +14,9 @@
 #   build REFUSES until measured); attempt 2 on the fixed builds reads 0x2a2. A red is the
 #   alias back or the alternation phase moving.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/ring_tap.lua
-#   tests/replays/hui/95_hui_electrocuted_x4.rpl tools/run_mame.sh tools/setup_mame.sh
+#   tests/replays/hui/95_hui_electrocuted_x4.rpl tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: each of the five electrocutions' kernel-voice slot (the ring ids from attempt+30 to attempt+110), each picture EVENT-PROVEN on that leg's own ring log, captioned with the ids each leg enqueued there — not comparable: each game's stage and palette, and Victor's art (each game's own copy; [VSP-168]); the sound itself (the ring holds ids, and 0x2a2 is a silent id by design)
 #
 # MUST-FIRE: known-bad: perturbed-inventory — a WRONG expected attempt-2 kernel voice id must fail the per-attempt comparison (mode: GRUNT_OURS_A2 is set to a wrong id so the measured ring != expected and the gate must FAIL)
 #
@@ -178,5 +180,44 @@ else:
           "so the perturbation would have nothing to mismatch")
 sys.exit(rc)
 PY
+
+# THE SHEET (#291, D2): with SHEET_OUT set, the two ring-tap legs this verdict compared, re-run under ring_tap.lua
+# itself, one moment per electrocution's kernel-voice slot, EVENT-PROVEN on each leg's own ring log. Nothing the gate
+# decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "$MODE" ]; then
+    sheet_new grunt "Phobos electrocuted five times (replay 95): the kernel-voice slot, native vs2 above ours" huitzil - \
+        "each game's stage and palette, and Victor's art (each game's own copy; [VSP-168]); the sound itself (the ring holds ids, and 0x2a2 is a silent id by design)"
+    sheet_leg grunt native vs2 vsav2 "$ROMDIR" "$RPL" "$PK" 6300
+    sheet_tap grunt native tests/lua/ring_tap.lua "FRAMES=6300"
+    sheet_leg grunt ours ours vsavjw "$REPO/$BUILD/rompath;$ROMDIR" "$RPL" "$PK" 6300
+    sheet_tap grunt ours tests/lua/ring_tap.lua "FRAMES=6300"
+    _gn="$(sheet_file grunt native.ring "$W/native/ring.txt")"; _go="$(sheet_file grunt ours.ring "$W/ours/ring.txt")"
+    python3 - "$W" "$_gn" "$_go" > "$W/sheet_rows.tsv" <<'PYS'
+import re, sys
+W, gn, go = sys.argv[1:4]
+ATT = [3400, 4050, 4700, 5350, 6000]
+def ring(leg):
+    ev = []
+    for line in open(f"{W}/{leg}/ring.txt"):
+        m = re.match(r"f(\d+) id ([0-9a-f]{4}) pc", line.strip())
+        if m and m.group(2) not in ("0000", "ffff", "049a"):
+            ev.append((int(m.group(1)), m.group(2)))
+    return ev
+r = {"native": ring("native"), "ours": ring("ours")}
+for k, a in enumerate(ATT):
+    lo, hi = a + 30, a + 109
+    slot = {l: [i for f, i in r[l] if lo <= f <= hi] for l in r}
+    mid = {l: [i for f, i in r[l] if lo <= f <= hi and i not in ("0625", "0419", "0402") and not i.startswith("010") and i != "00f3"] for l in r}
+    vals = "kernel voice: native %s, ours %s; ring ids in the slot: native %s, ours %s" % (
+        ",".join(mid["native"]) or "none", ",".join(mid["ours"]) or "none", ",".join(slot["native"]) or "none", ",".join(slot["ours"]) or "none")
+    print("moment\tgrunt\ta%d\telectrocution %d, kernel-voice slot (ring f%d-%d)\tjudged against the frozen inventory\t%s" % (k + 1, k + 1, lo, hi, vals))
+    for leg, g in (("native", gn), ("ours", go)):
+        fs = [f for f, i in r[leg] if lo <= f <= hi]
+        fr = (fs[0] + 1) if fs else a + 60          # a ring line labelled N is replay.lua's frame N+1
+        print("at\tgrunt\ta%d\t%s\t%d\tevent\t%s:%d-%d" % (k + 1, leg, fr, g, lo, hi))
+PYS
+    sheet_rows "$W/sheet_rows.tsv"
+fi
 
 [ "$fail" -eq 0 ] && echo "PASS: electrocute-grunt A/B — the alternating kernel voice matches the frozen inventory on both legs" || exit 1

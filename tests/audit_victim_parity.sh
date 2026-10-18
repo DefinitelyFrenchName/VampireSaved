@@ -32,7 +32,9 @@
 #   tests/lua/field_trace.lua tests/replays/naming/ tools/anim_nodes.py tools/name_moves.py
 #   tools/reaction_map.py tools/victim_parity.py tools/move_parity.py tools/select_paths.py
 #   tools/select_wheel.py tools/cps2_decrypt.py tools/audit_same_data_p2.py tools/run_mame.sh
-#   tools/setup_mame.sh
+#   tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: one per contact row, at each leg's own contact frame (the @f its row prints) — not comparable: each game's stage and palette, and P1's art (Victor, each game's own copy; [VSP-168]); the contact frame is printed, not compared (#168)
 #
 # MUST-FIRE: perturbed-copy: no-translation — our leg's contact lines decoded WITHOUT the placements translation (what a reader that took our node pointers for native addresses would read) must differ from the translated lines, so the translation is proven load-bearing and not a no-op (in-gate: the untranslated lines of the first part must differ; mode: every part is compared untranslated and the gate FAILs)
 # MUST-FIRE: perturbed-copy: p1-planted — our first part's trace with one P1 node set to a Victor chain whose data differs between the games must be REFUSED by the P1 check, so "Victor never entered a differing chain" is an assertion that can fail (in-gate: the planted copy must fail p1check; mode: the plant is applied to the real trace and the gate FAILs)
@@ -416,6 +418,46 @@ else
     else vs_ctl_fired hit-dropped "dropping one contact from our leg changes $(diff "$W/want_1.tsv" "$W/got_1d.tsv" | grep -c '^>') frozen row(s)"; fi
 fi
 [ -n "${GOT_OUT:-}" ] && cp "$W/rows.tsv" "$GOT_OUT"
+# THE SHEET (#291): with SHEET_OUT set, each tenant part's two legs as this run played them and one moment per contact
+# row, at each leg's own contact frame, proven on the fields that leg traced there. Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "${VS_CTL:-}" ]; then
+    grep '^ev	' "$W/rows.tsv" | cut -f2,3 | sort -u | while IFS='	' read -r TENANT p; do
+        sid="${TENANT}_victim_$p"; J="tests/replays/naming/${TENANT}_victim_$p.json"
+        FR="$(python3 -c "import json;print(json.load(open('$J'))['frames'])")"
+        sheet_new "$sid" "$sid: $TENANT as the victim of Victor, per contact, native vs2 above ours (level 8, RNG pinned, both legs real picks)" "$TENANT" "#136" \
+            "each game's stage and palette, and P1's art (Victor, each game's own copy; [VSP-168]); the contact frame is printed, not compared (#168)"
+        sheet_leg "$sid" native vs2 vsav2 "$ROMDIR" "$W/${TENANT}_$p.native.rpl" "$(cat "$W/${TENANT}_$p.pokes")" "$FR"
+        sheet_leg "$sid" ours ours vsavjw "$BUILD/rompath;$ROMDIR" "$W/${TENANT}_$p.ours.rpl" "$(cat "$W/${TENANT}_$p.pokes")" "$FR"
+        python3 - "$sid" "$TENANT" "$p" "$W/rows.tsv" "$FIELDS" "$W/${TENANT}_$p.native.ft" "$W/${TENANT}_$p.ours.ft" > "$W/sheet_$sid.tsv" <<'PYS' || continue
+import re, sys
+sid, tenant, part, rows, fields, ftn, fto = sys.argv[1:8]
+spec = {name: "%s:%s" % (a.lower(), sz) for a, sz, name in (f.split(":") for f in fields.split(","))}
+def trace(path):
+    d = {}
+    for l in open(path):
+        f = l.split()
+        if len(f) >= 3 and f[0] == "F":
+            d[int(f[1])] = dict(kv.split("=", 1) for kv in f[2:])
+    return d
+tr = {"native": trace(ftn), "ours": trace(fto)}
+for r in (l.rstrip("\n").split("\t") for l in open(rows)):
+    if r[0] != "ev" or r[1] != tenant or r[2] != part:
+        continue
+    k, name, verdict = r[3], r[4], r[5]
+    vals = "-" if verdict == "SAME" else "%s; %s; %s" % (r[6], r[7], r[9])
+    print("moment\t%s\tc%s\t%s (contact)\t%s\t%s" % (sid, k, name, verdict, vals))
+    for leg, col in (("native", r[6]), ("ours", r[7])):
+        m = re.search(r"@(\d+)$", col)
+        if not m:
+            continue
+        fr = int(m.group(1)); smp = tr[leg].get(fr)
+        exp = ",".join("%s=%s" % (spec[n], v) for n, v in sorted(smp.items()) if n in spec) if smp else "-"
+        print("at\t%s\tc%s\t%s\t%d\t%s\t%s" % (sid, k, leg, fr, "fields" if smp else "none", exp))
+PYS
+        sheet_rows "$W/sheet_$sid.tsv"
+    done
+fi
 [ -n "${KEEP:-}" ] && { mkdir -p "$KEEP"; cp "$W"/*.ft "$W"/*.lines "$W"/p1_*.txt "$W"/rows.tsv "$KEEP"/ 2>/dev/null; echo "  kept traces, lines and P1 checks in $KEEP"; }
 if [ -n "${VS_CTL:-}" ]; then [ $fail = 0 ] && { echo "PASS (the control mode did NOT reach FAIL — the control is dead)"; exit 0; } || { echo "FAIL: audit_victim_parity (control mode)"; exit 1; }; fi
 [ $fail = 0 ] && echo "PASS: audit_victim_parity" || echo "FAIL: audit_victim_parity"

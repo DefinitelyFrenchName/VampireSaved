@@ -21,7 +21,9 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/phobos_dmg_residual.tsv tests/replays/judge/04_demitri_5hp_victor.rpl
 #   tests/expected/registry.tsv tests/lib/controls.sh tests/lua/field_trace.lua
 #   tests/replays/judge/04_demitri_5hp_victor.rpl tests/replays/naming/ tools/build_fingerprint.py tools/name_moves.py tools/run_mame.sh
-#   tools/setup_mame.sh
+#   tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,vsavj,ours — moments: every P1 HP loss the frozen rows hold — Demitri's 5HP on Phobos per naming part and RNG pin (native vs2 above ours), and the legacy pair's two 5HPs on Victor per pin (vsav2 above vsavj) — not comparable: the damage itself on the legacy pair (Demitri's own 5HP record differs between the games, #161), each game's stage and palette, and P2's art
 #
 # MUST-FIRE: perturbed-copy: legacy-same — a copy of the legacy pair's rows with vsav2's step in place of vsavj's (what two games that agreed would read) must FAIL the frozen compare, so the +1 the LEGACY victim takes on vsavj is read from the rows, not assumed (in-gate: the perturbed copy must differ from the frozen rows; mode: the rows are rewritten and the compare FAILs) — 14z-181, #161
 # MUST-FIRE: perturbed-copy: residual-gone — a copy of our leg's HP trace with native's step in place of ours (what a fix of the residual looks like) must FAIL the frozen compare, so the gate reads the step it claims to read (in-gate: the planted copy must differ from the frozen rows; mode: the planted copy IS our leg and the gate FAILs)
@@ -202,6 +204,59 @@ fi
 grep -v '^#' "$EXPECT" > "$W/want.tsv"
 if cmp -s "$W/want.tsv" "$W/got.tsv"; then ok "every row as frozen"
 else bad "differs from the frozen rows"; diff "$W/want.tsv" "$W/got.tsv" | sed 's/^/        /'; fi
+# THE SHEET (#291): with SHEET_OUT set, every leg as this run played it at each HP loss the frozen rows hold, proven on
+# the three fields this run traced there. Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "$MODE" ]; then
+    cmp -s "$W/want.tsv" "$W/got.tsv" && _sv="as frozen" || _sv="DIFF from the frozen rows"
+    for p in $PARTS; do for v in $PINS; do
+        _r="$REPO/tests/replays/naming/$p.rpl"; _j="$REPO/tests/replays/naming/$p.json"
+        _last="$(awk -F'[- ]' '/^[0-9]/{print $1}' "$_r" | sort -n | tail -1)"; _fr=$((_last + 60))
+        _pk="$(python3 -c "import json;print(';'.join(json.load(open('$_j'))['pokes']))");$(python3 -c "print(f'{2000}-{($_fr)-1}:ff8116:06')");$(python3 -c "print(f'{2363}-{($_fr)-1}:ff80d4:$v')")"
+        sheet_new "$p.$v" "Demitri's 5HP on Phobos, $p at RNG pin $v: native vs2 above ours" huitzil "#161" \
+            "each game's stage and palette, and P2's art (Demitri, each game's own copy; [VSP-168])"
+        sheet_leg "$p.$v" native vs2 vsav2 "$ROMDIR" "$W/$p.$v.native/r.rpl" "$_pk" "$_fr"
+        sheet_leg "$p.$v" ours ours vsavjw "$BUILD/rompath;$ROMDIR" "$W/$p.$v.ours/r.rpl" "$_pk" "$_fr"
+    done; done
+    for v in $PINS; do
+        _pk="$(python3 -c "print(f'{2000}-{(3600)-1}:ff8116:06')");$(python3 -c "print(f'{2363}-{(3600)-1}:ff80d4:$v')")"
+        sheet_new "legacy.$v" "The legacy pair, Demitri's 5HP on Victor at RNG pin $v: native vs2 above vanilla vsavj (no port in the loop)" - "#161" \
+            "the damage itself: Demitri's own 5HP record differs between the games (#161, ruled not-ours); each game's stage and palette, and P2's art"
+        sheet_leg "legacy.$v" vsav2 vs2 vsav2 "$ROMDIR" "$REPO/tests/replays/judge/04_demitri_5hp_victor.rpl" "$_pk" 3600
+        sheet_leg "legacy.$v" vsavj vsavj vsavj "$ROMDIR" "$REPO/tests/replays/judge/04_demitri_5hp_victor.rpl" "$_pk" 3600
+    done
+    python3 - "$W" "$PARTS" "$PINS" "$_sv" > "$W/sheet_rows.tsv" <<'PYS'
+import sys
+W, parts, pins, sv = sys.argv[1], sys.argv[2].split(), sys.argv[3].split(), sys.argv[4]
+rows = [l.rstrip("\n").split("\t") for l in open(f"{W}/got.tsv")]
+def trace(path):
+    d = {}
+    for l in open(path):
+        t = l.split()
+        if t and t[0] == "F": d[int(t[1])] = dict(kv.split("=", 1) for kv in t[2:])
+    return d
+def emit(sid, mid, lab, legs, hpk, hpaddr):
+    spec = {hpk: hpaddr, "id": "ff8782:b", "p2id": "ff8b82:b"}
+    fr = int(legs[0][2])
+    vals = ", ".join("%s %s -> %s (-%d)" % (leg, a, b, int(a) - int(b)) for leg, _, f, a, b in legs)
+    print("moment\t%s\t%s\t%s\t%s\t%s" % (sid, mid, lab, sv, vals))
+    for leg, path, f, a, b in legs:
+        s = trace(path).get(int(f))
+        exp = ",".join("%s=%s" % (spec[k], s[k]) for k in sorted(spec) if k in s) if s else "-"
+        print("at\t%s\t%s\t%s\t%s\t%s\t%s" % (sid, mid, leg, f, "fields" if s else "none", exp))
+for p in parts:
+    for v in pins:
+        legs = [(l, f"{W}/{p}.{v}.{l}/f.ft", r[3], r[4], r[5]) for l in ("native", "ours") for r in rows if r[0] == p and r[1] == v and r[2] == l]
+        if legs:
+            emit(f"{p}.{v}", "hit", "f%s Demitri's 5HP lands on Phobos" % legs[0][2], legs, "p1hp", "ff8450:w")
+for v in pins:
+    hits = sorted({r[3] for r in rows if r[0] == "legacy" and r[1] == v}, key=int)
+    for k, f in enumerate(hits, 1):
+        legs = [(g, f"{W}/legacy.{v}.{g}/f.ft", r[3], r[4], r[5]) for g in ("vsav2", "vsavj") for r in rows if r[0] == "legacy" and r[1] == v and r[2] == g and r[3] == f]
+        emit(f"legacy.{v}", "hit%d" % k, "f%s Demitri's 5HP #%d lands on Victor" % (f, k), legs, "p2hp", "ff8850:w")
+PYS
+    sheet_rows "$W/sheet_rows.tsv"
+fi
 if [ -z "$MODE" ]; then
     if cmp -s "$W/want.tsv" "$W/pl.tsv"; then vs_ctl_dead residual-gone "our trace with native's step still matches the frozen rows" || fail=1
     else vs_ctl_fired residual-gone "our trace with native's step differs from the frozen rows ($(diff "$W/want.tsv" "$W/pl.tsv" | grep -c '^>') rows)"; fi

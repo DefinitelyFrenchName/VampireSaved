@@ -14,6 +14,7 @@
 #   moment  <sid> <mid> <label> <verdict> <values|->
 #   at      <sid> <mid> <leg> <frame> <basis> <expect|->
 #   anchors <sid>
+#   tap     <sid> <leg> <instrument> <env>   (D2: the leg re-runs under its gate's own instrument; env is K=V;K=V)
 # role is ours | vsavj | vs2. replay and log are paths INSIDE $SHEET_OUT (sheet_leg copies them there, because the
 # gate's own work directory is deleted at its exit). frames is how far the leg runs. mask is replay.lua's MASK_RANGES
 # for the leg's checksum log (`-` = the whole of work RAM).
@@ -22,7 +23,10 @@
 #   ram     <expect> is that checksum, given directly (16 hex digits);
 #   fields  <expect> is `addr:size=value,...` (size b/w/l, words and longs SIGNED: tests/lua/field_trace.lua's reading);
 #   file    <expect> is a picture inside $SHEET_OUT that the gate itself judged (a frozen golden): shown as it is;
-#   none    nothing the gate logged can prove it: the picture is shown UNPROVEN.
+#   none    nothing the gate logged can prove it: the picture is shown UNPROVEN;
+#   event   <expect> is `<log inside SHEET_OUT>:<lo>-<hi>`, the gate's own tap log and a frame window: the leg (which
+#           needs a `tap` row) is re-run under tests/lua/sheet_tap_capture.lua, and the picture is EVENT-PROVEN when the
+#           re-run's lines in the window equal the gate's — weaker than a checksum, and said so (ruled 2026-10-18, D2).
 # `anchors <sid>` asks for the replay's sync anchors (round start, each down and the next round's spawn) on every leg
 # of the sheet, proven on the leg's log: the legacy oracle's moments beyond its attributed frames (ruled 2026-10-17).
 
@@ -76,6 +80,11 @@ sheet_rows() {  # sheet_rows <file> — append moment/at rows a gate's own scrip
     awk -F'\t' '($1 == "moment" && NF == 6) || ($1 == "at" && NF == 7) {next} {bad = NR; exit} END {exit bad ? 1 : 0}' "$1" \
         || { echo "sheet.sh: $1 holds a row that is not a 6-field moment or a 7-field at" >&2; return 1; }
     mkdir -p "$SHEET_OUT"; cat "$1" >> "$SHEET_OUT/sheet.tsv"
+}
+
+sheet_tap() {  # sheet_tap <sid> <leg> <instrument path> <env: name-value pairs, ';'-separated> — the leg's own tap instrument (D2)
+    sheet_on || return 0
+    _sheet_row tap "$1" "$2" "$3" "$4"
 }
 
 sheet_anchors() {  # sheet_anchors <sid>

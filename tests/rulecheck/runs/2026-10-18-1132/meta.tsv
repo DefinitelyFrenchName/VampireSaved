@@ -1,0 +1,11 @@
+decision	recommendation
+subject	#120: the rebuild spec draft, revised after run 1131 (14z-205)
+session	14z-205
+model	rule-checker@163e4ce9cf7b
+claim	build/agent205/t120/SPEC.md drafts the rebuild of #120 from the maintainer's brief and five answers quoted in it: the original's law and game rulings carried unchanged, phases 0-4 with phase 0 the rule-5 extraction in the original (the census in rule5_report.txt, its tree on its first line), six implementation choices to reconsider, the original's 464 top-level test scripts classed into seven reuse classes by classify_tests.py on the tree its inventory's first line records (scripts and the three index inputs hashed; the generated index checked current, gate_index_current.log; the counts and that tree re-run by a measurer with the same script: measurer_inventory_spec.txt and its return), how they run, the harness requirements, the swarm and documents kept, and four open questions. NOT TESTED: each test's class is a script's reading of its code, unconfirmed gate by gate (the measurer's re-run confirms counts, not classes); the original's anchors, rulings and documents the spec cites are not re-verified in this packet; the external-suite adapter is not built; nothing in the rebuild exists yet.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	27 flag(s): D-ABSOLUTE 22, D-FIGURE 5
+deliverables	build/agent205/t120/SPEC.md

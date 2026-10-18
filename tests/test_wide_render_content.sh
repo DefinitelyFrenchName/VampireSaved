@@ -18,6 +18,8 @@
 #   tools/audit_romset_identity.py tools/build_donovan.sh tools/run_mame.sh
 #   tools/setup_mame.sh
 #
+# SHEET: none — it compares decoded graphics memory (a gfx-region dump) of our build with vsavj's, not a screen; there is nothing to photograph (census class G)
+#
 # WHY THIS EXISTS (14z-60z). Donovan and Anita rendered as garbage on the
 # WIDE track for two sessions while EVERY automated gate stayed green: the
 # RAM gates are structurally blind to the video path (14z-55) and nothing

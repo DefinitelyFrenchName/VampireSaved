@@ -15,6 +15,8 @@
 #   tools/compare_fields.py tools/run_mame.sh tools/run_replay_fbneo.sh
 #   tools/run_replay_mame.sh tools/setup_fbneo.sh tools/setup_mame.sh
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 #   1. Positive control (first real exercise of the amended CLAUDE.md §4
 #      protocol on known-good content): 16_xemu_2p on MAME vs patched FBNeo
 #      must agree on all mapped fields at the match-start anchor and shortly

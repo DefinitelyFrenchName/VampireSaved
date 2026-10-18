@@ -17,6 +17,8 @@
 #   tests/lua/replay_guard.lua tests/replays/16_xemu_2p.rpl tools/run_mame.sh
 #   tools/run_replay_guarded.sh tools/setup_mame.sh
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # MUST-FIRE: known-bad: wide-binary-no-stall — the same replay on the PATCHED binary with the real set must NOT diverge from itself at the frozen frame: under the mode the "stock" leg is the WIDE binary on the real set, so the divergence is absent and this gate must FAIL
 #
 # WHY. A user who renames vsavjw.zip to force it into a stock emulator sees a legal screen

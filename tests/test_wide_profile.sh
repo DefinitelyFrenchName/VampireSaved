@@ -15,6 +15,8 @@
 #   tests/replays/ tools/build_fingerprint.py tools/build_wide_romset.py
 #   tools/run_replay_fbneo.sh tools/setup_fbneo.sh
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # MUST-FIRE: known-bad: contaminated-ref — the reference guard must REFUSE the WIDE binary under test, a reference that carries the profile by construction; in-gate it classifies that binary before any negative on FBNEO_REF is trusted, and the mode points FBNEO_REF at it and must FAIL at the guard (#137)
 # MUST-FIRE: shadow-tool: blind-predicate — a `strings` that finds nothing must leave the guard UNPROVEN, so the gate FAILS without trusting any negative on FBNEO_REF; in-gate the stub makes the WIDE binary read as clean, and the mode puts it first on PATH for the run (#137)
 #

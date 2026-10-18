@@ -18,7 +18,9 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/hitbox_parity.tsv
 #   tests/lua/field_trace.lua tests/replays/naming/ tools/hitbox_parity.py tools/name_moves.py
 #   tools/select_paths.py tools/select_wheel.py tools/run_mame.sh tools/setup_mame.sh
-#   tests/lib/controls.sh tests/lib/decrypt_cache.sh tests/lib/measures.sh
+#   tests/lib/controls.sh tests/lib/decrypt_cache.sh tests/lib/measures.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: one per rig event of each part, at the node-equal frame nearest its mid-window (the frames this gate compares) — not comparable: each game's stage and palette, and P2's art and boxes (Demitri, each game's own copy; [VSP-168])
 #
 # MUST-FIRE: perturbed-copy: no-translation — our leg compared WITHOUT the placements translation (raw pointers) must read every pointer DIFFER, so the translation is proven load-bearing and the SAME rows are not two legs agreeing on untranslated numbers (in-gate: the raw compare of the first part must differ; mode: every part is compared raw and the gate FAILs)
 # MUST-FIRE: perturbed-copy: pointer-planted — our first part's trace with one node-equal frame's attack-table pointer moved by 0x20 must read that field DIFFER, so a pointer that resolves differently on one frame is seen (in-gate: the planted copy must differ from the real rows; mode: the plant is applied and the table FAILs)
@@ -142,6 +144,47 @@ for part in $PARTS; do
     if diff "$W/want_$part.tsv" "$W/got_$part.tsv" > "$W/diff_$part.txt"; then ok "$part: every row as frozen"; else bad "$part: rows moved:"; head -8 "$W/diff_$part.txt"; fi
 done
 [ -n "${GOT_OUT:-}" ] && cp "$W/rows.tsv" "$GOT_OUT"
+
+# THE SHEET (#291): with SHEET_OUT set, each part's two legs as this run played them and one moment per rig event, at
+# the node-equal frame (both legs on the same node, the frames section 2 compares) nearest the event's mid-window; each
+# picture proven on the fields this run traced there. Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "${VS_CTL:-}" ]; then
+    for part in $PARTS; do
+        t="${part%_*}"; J="tests/replays/naming/${part}.json"
+        FR="$(python3 -c "import json;print(json.load(open('$J'))['frames'])")"
+        PK="$(python3 -c "import json;j=json.load(open('$J'));fr=j['frames'];print(';'.join(j['pokes']+[f'{2000}-{(fr)-1}:ff8116:06']+[f'{2363}-{(fr)-1}:ff80d4:0000']))")"
+        sheet_new "$part" "$part: hitboxes in play per rig event, native vs2 above ours (level 6, RNG pinned, both legs real picks)" "$t" "#136" \
+            "each game's stage and palette, and P2's art and boxes (Demitri, each game's own copy; [VSP-168])"
+        sheet_leg "$part" native vs2 vsav2 "$ROMDIR" "$W/$part.native.rpl" "$PK" "$FR"
+        sheet_leg "$part" ours ours vsavjw "$BUILD/rompath;$ROMDIR" "$W/$part.ours.rpl" "$PK" "$FR"
+        python3 - "$part" "$t" "$J" "$FIELDS" "$W/$part.native.ft" "$W/$part.ours.ft" "$BUILD/patch/placements.json" > "$W/sheet_$part.tsv" <<'PYS' || continue
+import json, sys
+sys.path.insert(0, "tools")
+import hitbox_parity as hp
+part, tenant, js, fields, ftn, fto, plc = sys.argv[1:8]
+spec = {name: "%s:%s" % (a.lower(), sz) for a, sz, name in (f.split(":") for f in fields.split(","))}
+tr, _ = hp.translator(plc, tenant)
+n, o = hp.load_trace(ftn), hp.load_trace(fto)
+def eq(f):
+    return (n[f]["node"] & 0xFFFFFFFF) == tr(o[f]["node"]) and n[f]["node"]
+def same(f):
+    return all((n[f][k] & 0xFFFFFFFF) == ((o[f][k] & 0xFFFFFFFF) if k == "boxes" else tr(o[f][k])) for k in hp.FIELDS[1:])
+for k, e in enumerate(json.load(open(js))["events"]):
+    lo, hi = e["frame"], e["frame"] + e.get("gap", 1)
+    cand = [f for f in range(lo, hi) if f in n and f in o and eq(f)]
+    if not cand:
+        continue
+    mid = (lo + hi) // 2
+    fr = min(cand, key=lambda f: (abs(f - mid), f))
+    v = "SAME" if same(fr) else "DIFFER"
+    print("moment\t%s\te%d\t%s (node-equal frame nearest mid-window; %d of %d window frames node-equal)\t%s\t-" % (part, k, e["name"], len(cand), hi - lo, v))
+    for leg, tt in (("native", n), ("ours", o)):
+        print("at\t%s\te%d\t%s\t%d\tfields\t%s" % (part, k, leg, fr, ",".join("%s=%d" % (spec[nm], tt[fr][nm]) for nm in sorted(tt[fr]) if nm in spec)))
+PYS
+        sheet_rows "$W/sheet_$part.tsv"
+    done
+fi
 if [ -n "${VS_CTL:-}" ]; then [ $fail = 0 ] && { echo "PASS (the control mode did NOT reach FAIL — the control is dead)"; exit 0; } || { echo "FAIL: audit_hitbox_parity (control mode)"; exit 1; }; fi
 [ $fail = 0 ] && echo "PASS: audit_hitbox_parity" || echo "FAIL: audit_hitbox_parity"
 exit $fail

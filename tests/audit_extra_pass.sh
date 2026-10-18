@@ -32,6 +32,8 @@
 #   tests/replays/37_victor_ko_vsavj.rpl tools/cps2_decrypt.py tools/run_mame.sh tools/setup_mame.sh
 #   tools/audit_roms.py docs/checksums.txt tools/build_fingerprint.py tests/expected/registry.tsv
 #
+# SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
+#
 # MUST-FIRE: perturbed-copy: other-level — every leg predicted with the best OTHER level's pattern must lose frames (in-gate); as a mode E1 is judged with that pattern and the gate FAILs
 # MUST-FIRE: perturbed-copy: unpinned-equals-6 — the unpinned leg's distribution compared with the LEVEL-8 leg's must differ (in-gate); as a mode E3 compares against level 8 and the gate FAILs
 #

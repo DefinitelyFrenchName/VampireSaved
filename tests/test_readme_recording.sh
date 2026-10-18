@@ -17,6 +17,8 @@
 #   tests/lua/ tests/replays/03_two_player_vs.rpl tools/build_release_emulators.sh
 #   tools/setup_mame.sh tools/package_release.py
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # MUST-FIRE: perturbed-copy: used-nvram — a playback started from the nvram directory the recording run left behind (what a player's `nvram_fresh` holds once their session is over) must diverge from the recording and fail, so the comparison is proven able to fail and the README's EMPTY folder proven load-bearing
 # MUST-FIRE: perturbed-copy: truncated-inp — the recording cut to half its input stream must fail the frame-count check, so a playback that stops early can never pass as the whole session
 #

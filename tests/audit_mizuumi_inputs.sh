@@ -47,6 +47,8 @@
 #   tools/run_mame.sh tools/setup_mame.sh
 #   tools/audit_roms.py docs/checksums.txt tools/build_fingerprint.py tests/expected/registry.tsv
 #
+# SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
+#
 # MUST-FIRE: perturbed-copy: opposite-flip — I2 and I7's +0x123 judged with the L/R swap applied on the OPPOSITE flip source must lose frames (pooled), and as a mode the gate FAILs them
 # MUST-FIRE: perturbed-copy: never-swap — I2, I4 and I7 predicted with NO L/R swap by +0x0B at all must each lose frames (pooled; the frames with +0x0B set and L or R held are counted per side), and as a mode the gate FAILs all three
 # MUST-FIRE: perturbed-copy: other-side — I1 judged against the OTHER side's +0x394 must lose frames (pooled), and as a mode the gate FAILs I1

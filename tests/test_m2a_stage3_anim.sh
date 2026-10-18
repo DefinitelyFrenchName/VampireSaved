@@ -17,6 +17,8 @@
 #   tools/freeze_masked_basis.sh tools/propose_masked_specs.sh tools/run_mame.sh
 #   tools/run_replay_guarded.sh tools/run_replay_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — the subject is a development-stage build of the M2a/tenant ladder, not a release set; its comparison with vsavj is outside #291's scope (census class S)
+#
 # This is the ladder's weakest mixture: Jedah's state handlers index
 # Donovan's anim space. The gate is deliberately narrow — idle only:
 #   1. Anim system engages the relocated data: after match start, the anim

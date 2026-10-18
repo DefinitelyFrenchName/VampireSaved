@@ -15,6 +15,8 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh
 #   tests/lib/decrypt_cache.sh tests/lua/replay.lua tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: no-reference-leg — our build against frozen vs2 values, with no vs2 rig in the gate (ruled 2026-10-17: listed, not drawn)
+#
 # MUST-FIRE: known-bad: accent-lost — P1's accent must LAND on row 0x17 (not the pre-thunk grey ramp), so demanding the grey ramp must fail (mode: leg 2 is asserted to find the grey ramp on row 0x17, which a good build never has, so the gate FAILs)
 #
 # WHY THIS EXISTS — it closes a COVERAGE GAP, not just a bug.

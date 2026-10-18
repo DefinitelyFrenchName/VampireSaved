@@ -24,7 +24,9 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/column_flash_cause.tsv tests/lib/controls.sh
 #   tests/lua/upload_tap.lua tests/lua/pokes_spec.lua tests/replays/naming/donovan_4.json
 #   tests/replays/naming/donovan_4.rpl tests/replays/naming/donovan_4.json tests/replays/naming/donovan_4.rpl tools/audit_charid_masks.py tools/name_moves.py
-#   tools/run_mame.sh tools/setup_mame.sh
+#   tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: the two palette reloads the checks judge (2807, the move's start; 2858, its end), on native vs2, ours and ours with the counterfactual opcode patch, each picture EVENT-PROVEN on that leg's own upload_tap.lua log in f-1..f+1 — not comparable: each game's stage, the palette rows other than 0x0A-0x0D, and P2's art (each game's own copy; [VSP-168]); the counterfactual leg's patch is in the emulator's opcode share only, built nowhere
 #
 # MUST-FIRE: perturbed-copy: mask-bit-planted — the census re-read with bit 0x13 flipped in our mask at PRG:0x02ADB2 (what the fix would ship) must read the #162 site SAME, so C4 reads the bit it claims to read (in-gate: C4 must fail on the planted census; mode: the planted census IS the census and the gate FAILs)
 # MUST-FIRE: known-bad: fix-ignored — C3 evaluated on OUR unpatched leg instead of the counterfactual must fail, so the counterfactual leg is what C3 measures (in-gate; mode: ours replaces the counterfactual and the gate FAILs)
@@ -154,6 +156,30 @@ c4 "$CEN" && ok "[C4] the census reads the #162 site DIFF: vs2 PRG:0x02A108 sets
     || bad "[C4] the census does not read the #162 site as vs2-set / ours-clear"
 echo "     census (tenant bits 0x10 0x11 0x13 per site, vs2 | ours):"
 awk '$1=="ROW" {printf "       vs2 %s / ours %s  %s | %s  %s\n", $2, $4, $7, $8, $9}' "$CEN"
+
+# THE SHEET (#291, D2): with SHEET_OUT set, the three legs these checks read, re-run under upload_tap.lua itself (the
+# counterfactual's OPATCH travels in its env) and EVENT-PROVEN on each leg's own log around the two reload frames.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "$MODE" ] && [ "${FREEZE:-0}" != 1 ]; then
+    sheet_new cause "Killshread Lightning column (donovan_4): P1's palette reloads, native vs2 above ours and the counterfactual" donovan "#162" \
+        "each game's stage, the palette rows other than 0x0A-0x0D, and P2's art (each game's own copy; [VSP-168]); the counterfactual leg's patch is in the emulator's opcode share only, built nowhere"
+    sheet_leg cause native vs2 vsav2 "$ROMDIR" "$R" "$PK" "$FR"
+    sheet_tap cause native tests/lua/upload_tap.lua "UTAP=90c000,1024;UPCS=02a0ba,02a0ce;WINDOW=2780,2870;FRAMES=$FR;OPATCH="
+    sheet_leg cause ours ours vsavjw "$BUILD/rompath;$ROMDIR" "$W/ours.rpl" "$PK" "$FR"
+    sheet_tap cause ours tests/lua/upload_tap.lua "UTAP=90c000,1024;UPCS=02ad64,02ad78;WINDOW=2780,2870;FRAMES=$FR;OPATCH="
+    sheet_leg cause fix ours vsavjw "$BUILD/rompath;$ROMDIR" "$W/ours.rpl" "$PK" "$FR"
+    sheet_tap cause fix tests/lua/upload_tap.lua "UTAP=90c000,1024;UPCS=02ad64,02ad78;WINDOW=2780,2870;FRAMES=$FR;OPATCH=02adb4:ef9a"
+    _sf_native="$(sheet_file cause native.tap "$W/native/u.tap")"; _sf_ours="$(sheet_file cause ours.tap "$W/ours/u.tap")"
+    _sf_fix="$(sheet_file cause fix.tap "$W/fix/u.tap")"
+    for f in 2807 2858; do
+        o="$(upl_at "$W/ours/u.tap" $f)"; n="$(upl_at "$W/native/u.tap" $f)"; x="$(upl_at "$W/fix/u.tap" $f)"
+        if [ "$o" = "0a:blk+000 0b:blk+020 0c:blk+040 0d:blk+060" ] && [ "$x" = "0a:blk+000" ]; then _sv="ours reloads block rows 0-3 (row 11 from block row 1); native and the counterfactual row 0 only"; else _sv="not the frozen shape"; fi
+        sheet_moment cause "f$f" "f$f, P1's palette reload" "$_sv" "native: $n; ours: $o; counterfactual: $x"
+        sheet_at cause "f$f" native "$f" event "$_sf_native:$((f - 1))-$((f + 1))"
+        sheet_at cause "f$f" ours "$f" event "$_sf_ours:$((f - 1))-$((f + 1))"
+        sheet_at cause "f$f" fix "$f" event "$_sf_fix:$((f - 1))-$((f + 1))"
+    done
+fi
 
 # the frozen rows: P1's uploads per leg, the census's tenant-bit rows (never a mask's bytes), the build
 { for l in native ours fix; do summ "$l" "$W/$l/u.tap"; done

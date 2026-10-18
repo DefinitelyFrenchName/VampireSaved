@@ -148,6 +148,7 @@ Each emulator-registry gate declares one line:
 
     # SHEET: legs <roles> — moments: <what the gate judges> — not comparable: <what differs by design>
     # SHEET: no-reference-leg — <reason>      our build against frozen values with no rig of the other game: listed, not drawn
+    # SHEET: no-picture — <reason>            the gate compares legs, but what it judges cannot be shown as a proven picture: listed, not drawn
     # SHEET: none — <reason>                  the gate compares no leg of ours against a reference set
 
 `<roles>` is a comma list of `ours`, `vsavj`, `vs2`, naming `ours` and at least one reference. The separators are an em
@@ -165,4 +166,32 @@ every registered gate declares one well-formed line or is on the shrink-only deb
 (the retrofit's work list, as the must-fire retrofit's was), and every `legs` gate sources the helper, and the helper assigns only `__sheet_` names; four controls.
 **Slice bounds:** S1 draws at HEAD with the builds the gates default to; S2 retrofits the remaining comparing gates;
 S3 builds the commit's romset in a clean checkout and adds `--host pilot|eris`.
+**Where S2 stands (14z-205): complete.** Every registered gate declares; the debt list is empty. 58 draw (`legs`), 10 are
+`no-reference-leg` (the ruled ten), 9 are `no-picture` (ruled 2026-10-18, D4: two corpus-wide censuses,
+`audit_walker_ghost`, three gates whose legs run under `-debug`, `audit_move_parity_attribution`,
+`test_fbneo_legacy_oracle`, and `audit_qs_voice_batch`, which judges whole-run sound multisets over two id lists),
+155 are `none`, each classed from a reader's quotes of its leg launches (`build/agent205/s2/decl/`, local). Of the
+drawing gates, the tap gates prove by the event basis below (D2), and the ruled sound clips are their own `-wavwrite`
+captures. The design and its ruling: #291, `DECISIONS_HISTORY.md` "Ruled 2026-10-18 (14z-205) — #291 S2: …".
+**The event basis (D2, built 14z-205).** A tap gate's leg also writes `sheet_tap <sid> <leg> <instrument> <env>` (its
+own Lua instrument and the env it ran it with), and its moments take basis `event` with the expectation
+`<the gate's tap log, copied with sheet_file>:<lo>-<hi>`. The tool re-runs that leg under `tests/lua/sheet_tap_capture.lua`,
+which loads the instrument itself and only adds a snapshot, and the picture is **EVENT-PROVEN** when the re-run's log
+lines in the window equal the gate's, line for line (an event line is any line whose first or second token is a frame,
+`N`, `fN` or `FN`; run summaries are not events). It is weaker than a checksum and the page says so on each picture: it
+proves the tapped history in the window, not the rest of work RAM. Ground truth: `tests/test_proof_sheets.sh` section 4b (a
+one-frame shift and a wrong value refused, an empty window UNPROVEN, the re-run's frame pixel-equal to the checksum
+capture's; control `count-only`). **D3 needs nothing of its own:** a leg's ROM pokes (`rom_poke.lua`), opcode patch
+(`upload_tap.lua`'s `OPATCH`) or sweep pokes (`qs_sweep.lua`'s `SWEEP`/`IDLIST`) are its instrument's env, which the
+wrapper passes unchanged.
+**The notes (14z-205).** A gate's sheet can carry a plain-words note above its pictures: why it compares the legs it
+compares, and what a reader might expect it to check that it does not. Notes live in `docs/project/sheet_notes.md`, one
+`## <gate>` section each, never in the gate (a note is documentation, so writing one re-runs nothing); `tests/test_sheet_census.sh`
+section 3c refuses a section whose gate does not exist (control `orphan-note`) and holds the rendering. The maintainer,
+2026-10-18: *"Such an explanation would be a great addition to all other capture sheets"*; one note is written so far.
+
+**The S2 placement:** the line follows the gate's `# FOLLOWS:` block. **What a retrofit is checked by** (each S2 gate,
+`build/agent205/s2/check_gate.sh`, local): the gate run plainly and with `SHEET_OUT`, the two outputs identical once the
+volatile lines are normalised (temporary paths, the shell's segfault notice, a timestamped directory), and every
+picture PROVEN; a picture refused is reported, never re-emitted until it proves.
 

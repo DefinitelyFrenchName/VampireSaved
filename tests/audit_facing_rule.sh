@@ -17,7 +17,9 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/facing_rule.tsv
 #   tests/lib/decrypt_cache.sh tests/lua/field_trace.lua tests/lua/read_tap.lua
 #   tests/replays/naming/ tools/audit_facing_rules.py tools/build_fingerprint.py tools/name_moves.py
-#   tools/run_mame.sh tools/setup_mame.sh
+#   tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: each write to Demitri's +0x5D from 3850 (the n-th write of each leg paired) and his x at 3924 and 3946, each picture proven on the x that leg's field trace sampled there — not comparable: each game's stage and palette, and P2's art (Demitri, each game's own copy; [VSP-168]); the writer PC (ours writes from the thunk's placement)
 #
 # MUST-FIRE: perturbed-copy: rule5-flipped — a copy of our facing rows with every value's side bit (bit 0) flipped — the victim put on the other side — must FAIL the frozen compare, so a regression of the fix is caught (in-gate: the table with the flipped copy must differ from the frozen rows; mode: our reduced rows are flipped before the compare and the table FAILs). Replaced 14z-185 the M21 control `rule5-resolved` (native's values over ours), which cannot fire once ours IS native's (it read DEAD on merged-m21).
 # MUST-FIRE: perturbed-copy: branch-planted — a copy of vsavj's decrypted opcode image with the resolver's rule-4 compare rewritten to `cmpi.b #5` must change vsavj's static row and FAIL, so the static read sees the compare chain it claims to list (in-gate: the planted copy must read differently; mode: the real image is planted before the static read and the table FAILs)
@@ -243,4 +245,41 @@ if [ -s "$W/ctl.static" ] && ! grep -qxF "$(head -1 "$W/static.rows")" "$W/ctl.s
     echo "CONTROL FIRED: branch-planted — the planted image reads $(cut -f4 "$W/ctl.static") against the real $(head -1 "$W/static.rows" | cut -f4)"
 else echo "CONTROL DEAD: branch-planted — the planted compare was not read"; fail=1; fi
 
+# THE SHEET (#291): with SHEET_OUT set, the two legs this verdict compared, one moment per +0x5D write (the n-th of each
+# leg paired) and the two x frames, each picture proven on the x that leg's field trace sampled there. Nothing the gate
+# decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "$CONTROL" ]; then
+    sheet_new facing "Killshread Summon (ES)'s returning wave on Demitri, $PART: native vs2 above ours" donovan "#159" \
+        "each game's stage and palette, and P2's art (Demitri, each game's own copy; [VSP-168]); the writer PC (ours writes from the thunk's placement)" || true
+    sheet_leg facing native vs2 vsav2 "$ROMDIR" "$W/native.rpl" "$pk" "$FR" || true
+    sheet_leg facing ours ours vsavjw "$ORP" "$W/ours.rpl" "$pk" "$FR" || true
+    python3 - "$W" > "$W/sheet_rows.tsv" <<'PYS' && sheet_rows "$W/sheet_rows.tsv" || true
+import sys
+W = sys.argv[1]
+rows = {leg: [l.rstrip("\n").split("\t") for l in open(f"{W}/{leg}.rows")] for leg in ("native", "ours")}
+xs = {}
+for leg in ("native", "ours"):
+    xs[leg] = {}
+    for l in open(f"{W}/{leg}.x.txt"):
+        q = l.split()
+        if q and q[0] == "F": xs[leg][int(q[1])] = dict(kv.split("=", 1) for kv in q[2:]).get("p2x")
+fw = {leg: [r for r in rows[leg] if r[0] == "facing"] for leg in rows}
+def at(mid, leg, fr):
+    x = xs[leg].get(fr)
+    print("at\tfacing\t%s\t%s\t%d\t%s\t%s" % (mid, leg, fr, "fields" if x is not None else "none", "ff8810:w=%s" % x if x is not None else "-"))
+for i in range(max(len(fw["native"]), len(fw["ours"]))):
+    n = fw["native"][i] if i < len(fw["native"]) else None
+    o = fw["ours"][i] if i < len(fw["ours"]) else None
+    v = "SAME" if n and o and n[4] == o[4] else "DIFFER"
+    print("moment\tfacing\tw%d\twrite %d to Demitri's +0x5D\t%s\tnative %s, ours %s" % (i, i + 1, v, "f%s=%s" % (n[2], n[4]) if n else "none", "f%s=%s" % (o[2], o[4]) if o else "none"))
+    if n: at("w%d" % i, "native", int(n[2]))
+    if o: at("w%d" % i, "ours", int(o[2]))
+xr = {leg: {int(r[2]): r[3] for r in rows[leg] if r[0] == "x"} for leg in rows}
+for fr in (3924, 3946):
+    v = "SAME" if xr["native"].get(fr) == xr["ours"].get(fr) else "DIFFER"
+    print("moment\tfacing\tx%d\tDemitri's x at f%d (%s)\t%s\tnative %s, ours %s" % (fr, fr, "the last contact" if fr == 3924 else "the slide's end", v, xr["native"].get(fr), xr["ours"].get(fr)))
+    at("x%d" % fr, "native", fr); at("x%d" % fr, "ours", fr)
+PYS
+fi
 if [ "$fail" = 0 ]; then echo "PASS: audit_facing_rule"; else echo "FAIL: audit_facing_rule"; exit 1; fi

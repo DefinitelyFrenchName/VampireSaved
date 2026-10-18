@@ -31,6 +31,8 @@
 #   tools/classify_pool_spawns.py tools/run_mame.sh tools/run_replay_guarded.sh
 #   tools/run_replay_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — compares builds of ours with each other (A/B, merged vs solo, stock vs WIDE), not with a reference set
+#
 # THE CONSEQUENCE IS PER-INDEX, and this decides what can be a control
 # (measured 14z-129, vsavj OPCODE view at PRG:0x1A88E — the map lives in the
 # opcode image, which is what tools/gen_hitclass_map_thunk.py reads):

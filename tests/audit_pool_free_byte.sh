@@ -17,6 +17,8 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua tests/lua/tap_writes.lua
 #   tests/replays/ tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # POOL ATTRIBUTION (corrected 14z-85 — the 14z-84 version of this audit
 # measured only $FFB800 and attributed the result to the 59-75 family,
 # which was the WRONG POOL):

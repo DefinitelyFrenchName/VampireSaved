@@ -12,7 +12,9 @@
 #   identical outside the window. A (3) failure is stop-and-root-cause, never a mask
 #   widening.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua
-#   tests/replays/05_timeout_idle.rpl tools/run_mame.sh tools/setup_mame.sh
+#   tests/replays/05_timeout_idle.rpl tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vsavj,ours — moments: f9126, the match-to-win fade after the round-1 timeout, where the gate compares the $FF4140-$FF41DF staging dump — not comparable: the palette-fade staging slot $FF4182-$FF41A1 (select block-A row 14), recoloured by design (14z-49)
 #
 # THE WINDOW: RAM:$FF4182-$FF41A1, the palette-fade staging buffer's
 # slot for select palette-block-A row 14 (docs/game/atlas/ram.md). It is
@@ -73,6 +75,24 @@ run_side() { # $1=rompath $2=outsub
 
 run_side "$ROMDIR" van
 run_side "$RPDIR;$ROMDIR" pat
+
+# THE SHEET (#291): with SHEET_OUT set, the two legs, each proven on its own checksum log, at the one frame the gate
+# compares. The verdict there is re-read from the same dumps (outside the window equal); nothing decided changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on; then
+    sheet_new f9126 "05_timeout_idle f9126: the masked staging window, pristine vsavj above the build" donovan - \
+        "the palette-fade staging slot \$FF4182-\$FF41A1 (select block-A row 14), recoloured by design (14z-49)"
+    sheet_leg f9126 vanilla vsavj vsavj "$ROMDIR" "$REPO/tests/replays/05_timeout_idle.rpl" - 9180 "$WORK/van/c.log"
+    sheet_leg f9126 build ours vsavj "$RPDIR;$ROMDIR" "$REPO/tests/replays/05_timeout_idle.rpl" - 9180 "$WORK/pat/c.log"
+    _sv="$(python3 -c "
+import sys
+v = open(sys.argv[1], 'rb').read(); p = open(sys.argv[2], 'rb').read()
+print('IDENTICAL outside the window' if len(v) >= 0xA0 and len(p) >= 0xA0 and all(v[i] == p[i] for i in range(0xA0) if not 0x42 <= i < 0x62) else 'DIFF')
+" "$WORK/van/dump_9126_ff4140.bin" "$WORK/pat/dump_9126_ff4140.bin" 2>/dev/null || echo 'no dump')"
+    sheet_moment f9126 f9126 "f9126: the staging dump the gate compares" "$_sv"
+    sheet_at f9126 f9126 vanilla 9126 log
+    sheet_at f9126 f9126 build 9126 log
+fi
 
 python3 - "$WORK" <<'EOF'
 import sys, os

@@ -11,6 +11,8 @@
 # FOLLOWS: emu/mame-patches/ tests/lua/attract_checksum.lua tools/run_mame.sh
 #   tools/setup_mame.sh
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # Usage: ROMDIR=/path/to/roms tests/test_attract_determinism.sh [set] [frames]
 # Defaults: vsavj, 3600 frames. PASS = per-frame checksum logs identical.
 set -eu

@@ -17,7 +17,9 @@
 # MUST-FIRE: known-bad: pre-swap-build — the same `same` check run on the build BEFORE the swap (CTL_BUILD, merged-m22) must FAIL for both tenants: the check can see the landing sound the swap removed (in-gate; as a mode the pre-swap build's audio is what section 2 compares and the gate FAILs)
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/read_tap.lua tests/lua/field_trace.lua
 #   tests/replays/naming/ tools/build_fingerprint.py tools/landing_sound_ab.py tools/name_moves.py tools/run_mame.sh
-#   tools/setup_mame.sh
+#   tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: per tenant, each read of the landing-sound site (the k-th on each leg, at its own frame), each picture EVENT-PROVEN on that leg's own read-tap log in a window around the read; and the first landing by ear, each leg's own -wavwrite capture as a playable clip (the ruled clips, 2026-10-17) — not comparable: each game's stage and palette, and P2's art (each game's own copy; [VSP-168]); the site's address (ours 0x00395E, vs2 0x003994); the clip is the gate's own run to the landing + 120 frames, judged by ear against native's
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged31] [CTL_BUILD=build/m3b_merged30] [KEEP=<dir>] tests/audit_landing_sound.sh
 set -u
@@ -77,8 +79,39 @@ wait
 OURS=ours; vs_ctl_is pre-swap-build && OURS=ctl
 for n in huitzil donovan; do
     eval "land=\$LAND_$n"; echo "  -- $n"
-    python3 tools/landing_sound_ab.py same "$W/$n.native.wav" "$W/$n.$OURS.wav" "$land" $((land + 120)) || fail=1
+    if python3 tools/landing_sound_ab.py same "$W/$n.native.wav" "$W/$n.$OURS.wav" "$land" $((land + 120)); then eval "SAME_$n=0"; else eval "SAME_$n=1"; fail=1; fi
 done
+# THE SHEET (#291, D2): with SHEET_OUT set, each tenant's two read-tap legs as this run played them, re-run under their
+# own read tap and proven on the site's reads they logged, and the first landing's two captures as the ruled clips.
+# Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "${VS_CTL:-}" ]; then
+    for n in huitzil donovan; do
+        eval "_sland=\$LAND_$n"; eval "_ssame=\${SAME_$n:-1}"
+        _sfr="$(python3 -c "import json;print(json.load(open('tests/replays/naming/${n}_1.json'))['frames'])")"
+        _spk="$(python3 -c "import json;print(';'.join(json.load(open('tests/replays/naming/${n}_1.json'))['pokes']))");2000-$((_sfr - 1)):ff8116:06;2363-$((_sfr - 1)):ff80d4:0000"
+        sheet_new "$n" "$n (P1, part 1): the landing-sound site's reads, native vs2 above ours, and the first landing by ear" "$n" "#223" \
+            "each game's stage and palette, and P2's art (each game's own copy; [VSP-168]); the site's address (ours 0x00395E, vs2 0x003994); the clip is the gate's own run to the landing + 120 frames"
+        sheet_leg "$n" native vs2 vsav2 "$ROMDIR" "$REPO/tests/replays/naming/${n}_1.rpl" "$_spk" "$_sfr"
+        sheet_tap "$n" native tests/lua/read_tap.lua "RTAP=ff8782,2;ff8b82,2;RPCS=399a;WINDOW=2300,$_sfr;FRAMES=$_sfr"
+        sheet_leg "$n" ours ours vsavjw "$REPO/$BUILD/rompath;$ROMDIR" "$W/${n}_1.ours.rpl" "$_spk" "$_sfr"
+        sheet_tap "$n" ours tests/lua/read_tap.lua "RTAP=ff8782,2;ff8b82,2;RPCS=3964;WINDOW=2300,$_sfr;FRAMES=$_sfr"
+        _snt="$(sheet_file "$n" native.tap "$W/tap_$n.native.txt")"; _sot="$(sheet_file "$n" ours.tap "$W/tap_$n.ours.txt")"
+        awk '$1 == "R" {print $2}' "$W/tap_$n.native.txt" > "$W/sheet_$n.native.f"; awk '$1 == "R" {print $2}' "$W/tap_$n.ours.txt" > "$W/sheet_$n.ours.f"
+        _sk=0
+        while :; do
+            _sk=$((_sk + 1))
+            _sa="$(sed -n "${_sk}p" "$W/sheet_$n.native.f")"; _sb="$(sed -n "${_sk}p" "$W/sheet_$n.ours.f")"
+            [ -n "$_sa$_sb" ] || break
+            sheet_moment "$n" "r$_sk" "the site's read #$_sk" "$( [ "$_sa" = "$_sb" ] && echo 'the same frame' || echo 'DIFF: another frame')" "native f${_sa:-none}, ours f${_sb:-none} (read_tap labels)"
+            [ -n "$_sa" ] && sheet_at "$n" "r$_sk" native "$((_sa + 1))" event "$_snt:$((_sa - 2))-$((_sa + 2))"
+            [ -n "$_sb" ] && sheet_at "$n" "r$_sk" ours "$((_sb + 1))" event "$_sot:$((_sb - 2))-$((_sb + 2))"
+        done
+        sheet_moment "$n" clip "the first landing (f$_sland) by ear: each leg's own capture" "$( [ "$_ssame" = 0 ] && echo 'the same landing (#223)' || echo 'DIFF: the landing stands out')"
+        sheet_at "$n" clip native "$_sland" file "$(sheet_file "$n" native.wav "$W/$n.native.wav")"
+        sheet_at "$n" clip ours "$_sland" file "$(sheet_file "$n" ours.wav "$W/$n.ours.wav")"
+    done
+fi
 if vs_ctl_is pre-swap-build; then
     [ "$fail" = 1 ] && { echo "FAIL: audit_landing_sound (control mode: the pre-swap build's landing stands out)"; exit 1; }
     echo "FAIL: audit_landing_sound — the pre-swap build read as the same landing"; exit 1

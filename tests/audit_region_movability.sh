@@ -14,6 +14,8 @@
 #   tests/replays/12_donovan_vs_cpu.rpl tests/test_thunk_addr_literal.sh
 #   tools/build_donovan.sh tools/run_mame.sh tools/run_replay_guarded.sh tools/setup_mame.sh
 #
+# SHEET: none — compares builds of ours with each other (A/B, merged vs solo, stock vs WIDE), not with a reference set
+#
 # WHY (M3b, 14z-77). The merge's binding constraint is the CRYPT WINDOW, not
 # total size: one tenant already saturates hole_a, and three tenants keeping
 # their own region copies need 761,316 bytes of its 264,544

@@ -12,7 +12,9 @@
 #   covered: +0x121 in the air, while blocking, or on P2.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/crouch_flag.tsv
 #   tests/lua/field_trace.lua tests/replays/naming/donovan_1 tools/name_moves.py tools/run_mame.sh
-#   tools/setup_mame.sh
+#   tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: the frames the property judges — P1's +0x121 rising with the Down, its last held frame, and its fall at the release, each on that leg's own field trace — not comparable: each game's stage and palette, and P2's art (Demitri, each game's own copy; [VSP-168])
 #
 # MUST-FIRE: perturbed-copy: down-removed — the same rig with P1's Down (2840-2870) deleted from the replay must never raise +0x121, so the transition rows are proven to follow the input and not a timer (in-gate: the stripped run's +0x121 must stay 0 over the window; mode: every leg runs stripped and the frozen compare FAILs)
 #
@@ -137,5 +139,39 @@ else bad "differs from the frozen rows"; sed 's/^/        /' "$W/diff.txt"; fi
 if [ "$CONTROL" = down-removed ]; then
     if [ "$fail" = 1 ]; then echo "CONTROL FIRED: down-removed — the stripped rig fails the property and the frozen compare"; echo "FAIL: audit_crouch_flag (control mode)"; exit 1
     else echo "CONTROL DEAD: down-removed — the stripped rig passed"; echo "FAIL: audit_crouch_flag"; exit 1; fi
+fi
+# THE SHEET (#291): with SHEET_OUT set, the two traced legs as this run played them and one moment per frozen
+# transition, each picture proven on the fields that leg traced at that frame. Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "$CONTROL" ]; then
+    sheet_new crouch "Donovan holds Down 2840-2870 (naming part donovan_1): native vs2 above ours" donovan - \
+        "each game's stage and palette, and P2's art (Demitri, each game's own copy; [VSP-168])"
+    sheet_leg crouch native vs2 vsav2 "$ROMDIR" "$W/native.rpl" "$PK" 2885
+    sheet_leg crouch ours ours vsavjw "$BUILD/rompath;$ROMDIR" "$W/ours.rpl" "$PK" 2885
+    python3 - "$W" "$FIELDS" > "$W/sheet_rows.tsv" <<'PYS'
+import sys
+W, fields = sys.argv[1], sys.argv[2]
+spec = {name: "%s:%s" % (a.lower(), sz) for a, sz, name in (f.split(":") for f in fields.split(","))}
+def trace(p):
+    d = {}
+    for l in open(p):
+        f = l.split()
+        if f and f[0] == "F": d[int(f[1])] = dict(kv.split("=", 1) for kv in f[2:])
+    return d
+tr = {leg: trace("%s/%s.ft" % (W, leg)) for leg in ("native", "ours")}
+on = {leg: [f for f in range(2830, 2881) if f in tr[leg] and tr[leg][f]["f121"] != "0"] for leg in tr}
+same = "IDENTICAL" if on["native"] == on["ours"] and on["native"] else "DIFF"
+vals = "; ".join("%s +0x121 = 1 on %s" % (leg, ("%d-%d" % (v[0], v[-1])) if v else "no frame") for leg, v in on.items())
+moms = [("rise", "+0x121 rises with the Down", lambda v: v[0] if v else 2840),
+        ("held", "the last frame +0x121 is held", lambda v: v[-1] if v else 2870),
+        ("fall", "+0x121 falls at the release", lambda v: v[-1] + 1 if v else 2871)]
+for mid, lab, pick in moms:
+    print("moment\tcrouch\t%s\t%s\t%s\t%s" % (mid, lab, same, vals))
+    for leg in ("native", "ours"):
+        f = pick(on[leg]); smp = tr[leg].get(f)
+        exp = ",".join("%s=%s" % (spec[k], v) for k, v in sorted(smp.items()) if k in spec) if smp else "-"
+        print("at\tcrouch\t%s\t%s\t%d\t%s\t%s" % (mid, leg, f, "fields" if smp else "none", exp))
+PYS
+    sheet_rows "$W/sheet_rows.tsv"
 fi
 if [ "$fail" = 0 ]; then echo "PASS: audit_crouch_flag"; else echo "FAIL: audit_crouch_flag"; exit 1; fi

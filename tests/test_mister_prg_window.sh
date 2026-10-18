@@ -21,6 +21,8 @@
 #   tools/mister_mra.sh tools/prgprobe_verdict.py tools/rpl2siminputs.py
 #   tools/run_sim_jtcps2.sh tools/setup_jtcores.sh
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # MUST-FIRE: perturbed-copy: frozen-pair-moved — a perturbed copy of the frozen prg-window pair must fail the compare against the measured pair (mode: the measured pair is compared against that perturbed copy; REFUSES with exit 3 if the sim prerequisites or the frozen file are absent)
 #
 # THE QUESTION, AND WHY IT IS THREE-WAY. D4 declares a 6 MB program window.

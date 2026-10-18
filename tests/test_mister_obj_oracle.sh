@@ -20,6 +20,8 @@
 #   tools/mister_mra.sh tools/obj_select_compare.py tools/rpl2siminputs.py tools/run_mame.sh
 #   tools/run_sim_jtcps2.sh tools/setup_jtcores.sh tools/setup_mame.sh
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # MUST-FIRE: known-bad: perturbed-promoted-entry — a one-bit change in a promoted (group-C) tile code must be caught, so a perturbed promoted entry must break section 1's promoted-identical check (mode: one promoted entry is flipped in the REAL core dump and PROMOTED_IDENTICAL goes NO, so the gate FAILs; REFUSES with exit 3 if the sim prerequisites are absent)
 #
 # WHAT IT COMPARES. The OBJ (sprite) list the 68k builds in ORAM, dumped from

@@ -16,6 +16,8 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/field_trace.lua
 #   tests/replays/judge/03_down_attack.rpl tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: no-reference-leg — our build against frozen vs2 values, with no vs2 rig in the gate (ruled 2026-10-17: listed, not drawn)
+#
 # MUST-FIRE: known-bad: tap-must-not-roll — a 4-frame tap must NOT register a roll, so demanding the FORBIDDEN roll from the tap leg must fail (mode: the tap leg is asserted to roll >=60px, which the real tap never does, so the gate FAILs)
 #
 # MEASURED (legacy control, 14z-104 (3)): the roll registers as a HELD

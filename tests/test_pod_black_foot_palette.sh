@@ -16,6 +16,8 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/inp/ tests/lib/controls.sh
 #   tests/lua/inp_probe.lua tools/run_inp_probe.sh tools/setup_mame.sh
 #
+# SHEET: none — compares builds of ours with each other (A/B, merged vs solo, stock vs WIDE), not with a reference set
+#
 # MUST-FIRE: known-bad: neighbour-poke-disjoint — the neighbour palette entry 0x90C17A moves a DISJOINT non-black pixel set, so treating it as the black-foot set must fail (mode: the neighbour-poke set is substituted for the fix set and the black-pixel assertions fail; REFUSES with exit 3 if the recording is absent)
 #
 # WHY A CAUSAL GATE. The mechanism was first argued from a COLOUR COINCIDENCE

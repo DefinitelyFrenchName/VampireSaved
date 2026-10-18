@@ -15,6 +15,8 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/type_write_census.lua tests/replays/
 #   tools/audit_roms.py tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # ON-DEMAND (6 MAME runs, ~8 min). Run BEFORE trusting any change to the
 # type-renumbering emit path, and after any change that could add a family
 # stamp site.

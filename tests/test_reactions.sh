@@ -15,6 +15,8 @@
 #   tests/replays/naming/ tools/anim_nodes.py tools/name_moves.py tools/reaction_map.py
 #   tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
+#
 # WHAT IT HOLDS. tools/name_moves.py's `<tenant>_victim` schedules put the
 # tenant on P2 (the P2 early-window poke) against Victor on P1 (forced 0x03)
 # and run every contact class the naming rigs reached: light/medium/heavy

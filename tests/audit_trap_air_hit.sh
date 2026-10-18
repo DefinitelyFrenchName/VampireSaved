@@ -29,7 +29,9 @@
 #   tests/lua/field_trace.lua tests/replays/hui/92_hui_trap_shock.rpl tools/anim_nodes.py
 #   tools/hitbox_records.py tools/name_moves.py tools/run_mame.sh tools/select_paths.py
 #   tools/select_wheel.py tools/setup_mame.sh tools/trap_air_boxes.py tools/trap_air_probe.sh
-#   tools/trap_air_prologue.py tools/cps2_decrypt.py tools/_minitoml.py
+#   tools/trap_air_prologue.py tools/cps2_decrypt.py tools/_minitoml.py tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: per press (3508, 3511) the dome's first hit on Felicia on each leg, on that leg's own field trace (the victim's and Phobos's traced fields) — not comparable: the victim is each game's own Felicia (her charged head hurtbox, frozen per leg) and each game's stage and palette; the class byte at 3511 differs by ruling (0x52 native, the marker 0x38 ours)
 #
 # MUST-FIRE: perturbed-copy: air-grounded — a copy of the merged 3508 row with the hit's height set to the ground's 40 (what a dome that only hits grounded victims would read) must FAIL the airborne-hit check, so "hit in the air" is read from the height at the hit (in-gate: the perturbed row must fail the check; mode: the row is rewritten and the gate FAILs)
 # MUST-FIRE: perturbed-copy: air-class — a copy of the merged 3508 row with the class at the hit rewritten to the ground marker 0x38 must FAIL the air-stager check, so class 0x07 is read, not assumed (in-gate: the perturbed row must fail; mode: the row is rewritten and the gate FAILs)
@@ -256,5 +258,42 @@ fi
 grep -v '^#' "$EXPECT" > "$W/want.tsv"
 if cmp -s "$W/want.tsv" "$W/rows.tsv"; then ok "every row as frozen"; else bad "differs from the frozen rows"; diff "$W/want.tsv" "$W/rows.tsv" | cut -c1-160 | sed 's/^/        /'; fi
 if [ -n "${VS_CTL:-}" ]; then [ $fail = 0 ] && { echo "PASS (the control mode did NOT reach FAIL)"; exit 0; } || { echo "FAIL: audit_trap_air_hit (control mode)"; exit 1; }; fi
+# THE SHEET (#291): with SHEET_OUT set, the four field-traced legs as tools/trap_air_probe.sh ran them (its pokes are
+# rebuilt here from the same arguments; a wrong rebuild shows as NOT THE JUDGED RUN) and the dome's first hit on each,
+# each picture proven on that leg's own trace. Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "${VS_CTL:-}" ]; then
+    _pk="2000-3549:ff8116:06;2363-3549:ff80d4:0000;3470-3489:ff8810:02b7;3470-3489:ff8410:021c"
+    for p in 3508 3511; do
+        if [ "$p" = 3508 ]; then legs_equal "$W/rows.tsv" 3508 0 && _v=IDENTICAL || _v=DIFF; _lab="j.HP at 3508: hit IN THE AIR (the air stager)"
+        else legs_equal "$W/rows.tsv" 3511 1 && _v="IDENTICAL but the ruled class marker" || _v=DIFF; _lab="j.HP at 3511: hit on the landing frame (the ground path)"; fi
+        sheet_new "p$p" "Plasma Trap dome vs Felicia's j.HP pressed at $p: native vs2 above ours" huitzil "#175" \
+            "the victim is each game's own Felicia (her charged head hurtbox) and each game's stage and palette; at 3511 the class byte differs by ruling (0x52 / 0x38)"
+        sheet_leg "p$p" native vs2 vsav2 "$ROMDIR" "$W/native-$p/air.rpl" "$_pk" 3530
+        sheet_leg "p$p" merged ours vsavjw "$MERGED/rompath;$ROMDIR" "$W/merged-$p/air.rpl" "$_pk" 3530
+        python3 - "$W" "$p" "$_lab" "$_v" > "$W/sheet_$p.tsv" <<'PYS'
+import sys
+W, p, lab, v = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+key = {"vx": "ff8810:w", "vy": "ff8814:w", "vhp": "ff8850:w", "vcls": "ff8854:b", "vfrz": "ff885c:b", "vseq": "ff8806:b",
+       "vfam": "ff8894:l", "p1x": "ff8410:w", "p1hp": "ff8450:w", "p1frz": "ff845c:b"}
+rows = {}
+for l in open(W + "/rows.tsv"):
+    f = l.rstrip("\n").split("\t")
+    if f[0] == "p" + p: rows[f[1]] = dict(kv.split("=", 1) for kv in f[2:])
+print("moment\tp%s\thit\t%s\t%s\t%s" % (p, lab, v, "; ".join("%s hit f%s y %s cls %s" % (g, r["hit"], r["y_at_hit"], r["cls_at_hit"]) for g, r in sorted(rows.items(), reverse=True))))
+for leg in ("native", "merged"):
+    if leg not in rows: continue
+    h = int(rows[leg]["hit"]); d = None
+    for l in open("%s/%s-%s/trace.ft" % (W, leg, p)):
+        t = l.split()
+        if t and t[0] == "F" and int(t[1]) == h:
+            d = dict(kv.split("=", 1) for kv in t[2:])
+    exp = ",".join("%s=%s" % (key[k], d[k]) for k in sorted(key) if k in d) if d else "-"
+    print("at\tp%s\thit\t%s\t%d\t%s\t%s" % (p, leg, h, "fields" if d else "none", exp))
+PYS
+        sheet_rows "$W/sheet_$p.tsv"
+    done
+fi
+
 [ $fail = 0 ] && echo "PASS: audit_trap_air_hit" || echo "FAIL: audit_trap_air_hit"
 exit $fail

@@ -5371,7 +5371,13 @@ real path and re-freeze". Measuring first changed the job entirely:
 - **A static census of shell scripts over-approximates.** `audit_poked_legs.py`
   pairs every replay a script names with every poke it names; one of its three
   CROSS-FLAVOR rows is a pairing the gate never runs. The accepted list says so
-  per row rather than pretending the census can follow the shell.
+  per row rather than pretending the census can follow the shell. **It reads the
+  games a script boots from its whole text, COMMENTS INCLUDED** (the tool's
+  docstring): the bare word `vsav2` beside a MAME runner makes a native leg. Paid
+  twice — 14z-197 (a `test_hui_air.sh` comment) and 14z-205, when #291's `# SHEET:`
+  declarations named vsav2 in three poked gates that never boot it and
+  `test_poked_legs` FAILed the tier on 7 false native rows (the comments now say
+  vs2). In a poked script's comments, name the native game another way.
 
 The rule: before converting a rig on the strength of "the poke latches X", run
 the fidelity measure with its second-route control, read the writer's table,
@@ -7254,3 +7260,32 @@ measured on every kind of input it will judge (here: digits, short lines, code),
 holding the moment row's last field, `-`, and the at-rows of a 12-minute gate run carried frame `-` (every one of the
 ten listed; the sheet held 214). The sheet reader refused the file, which is how it was seen. **The rule:** a sourced sh library assigns only names under its own prefix
 (`__sheet_` here), and its census checks that (`tests/test_sheet_census.sh` section 4, control `leaky-helper`).
+
+## A TOOL THAT RUNS EACH CHILD IN ITS OWN WORK DIRECTORY MUST RESOLVE THE PATHS IT HANDS THEM (paid: 14z-205, #291)
+
+`tools/proof_sheets.py` runs every capture with `cwd=` its own work directory and passes it paths inside SHEET_OUT. With
+SHEET_OUT given relatively (`--out build/agent205/s2/sheets_fg`) MAME could not open the replay from there, every
+capture stopped at boot, and all ten pictures of the first S2 gate read NOT THE JUDGED RUN. S1 never saw it because it
+only ever used the default absolute path. The proof itself was right: it refused pictures that had not been taken.
+**The rule:** a tool that changes a child's working directory resolves every path argument first
+(`Path(...).resolve()`), and its ground truth runs once with a relative path (`tests/test_proof_sheets.sh` section 3b,
+control `relative-unresolved`).
+
+## A SANDBOX NAMED BY PART OF A RUN'S IDENTITY IS SHARED BY EVERY RUN THAT PART NAMES (paid: 14z-205, #293)
+
+An explicit `MAME_SANDBOX` is deliberate reuse ([VSP-117]): MAME writes its nvram there, and the next run in it boots
+on that nvram. Two gates named their sandboxes by only part of what made a run distinct. `audit_flicker_attribution`
+named them by replay, and replay 105 has two cases, so its f5868 case booted on the f2713 run's nvram.
+`audit_legacy_pairings` named them by build directory, and its default list names one build three times (once per
+tenant id), so each replay ran three times into one sandbox and one out file, and the three tenants' forced-pick
+controls shared one file. Both gates stayed green. On fresh boots the flicker attribution held, but the pairings
+classification moved: 7 replays the carried runs read TENANT (02, 05, 08, 104, 23, 26, 30) are LEGACY
+(`build/agent205/s2/lp_verdicts_before_after.txt`, local). A wrong TENANT verdict exempts a replay from needing a
+`.masked` expectation, which is the 14z-88 hole this gate exists to catch; all seven carried one, so nothing slipped
+through this time. It was found by the #291 proof sheets, which re-run each leg on a fresh sandbox and refuse a picture
+the gate's log does not match. **The rule:** key a sandbox and an out file by everything that makes the run distinct
+(replay, frame, build, id), and give a gate a check that its run is the fresh one: `audit_flicker_attribution`'s vanilla
+leg must equal the frozen basis at the case frame (control `shared-sandbox`), and `audit_legacy_pairings` creates each leg's
+sandbox with an atomic `mkdir` that refuses an existing one (control `shared-sandbox`), and its forced-pick leg must load
+the id it poked. A proven #291 sheet is not that check: it proves the state at its moments only, and replay 23's
+verdict moved though its pictures had proven.

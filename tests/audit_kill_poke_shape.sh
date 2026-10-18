@@ -15,6 +15,8 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/replay.lua
 #   tests/replays/26_don_arcade_mash.rpl tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # MUST-FIRE: known-bad: two-byte-flowed — the 2-byte kill poke must STALL (the judge reads white's sign), so a FLOWED classification of it must fail (mode: the 2-byte leg is classified FLOWED, which the real judge never allows, so the gate FAILs)
 #
 # THE ENGINE PROPERTY (engine_internals "THE ROUND JUDGE"): the round

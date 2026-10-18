@@ -18,6 +18,9 @@
 # MUST-FIRE: perturbed-copy: native-dash-planted — native's trace with a dash planted at the low event must FAIL the compare (under same: native then dashes where ours does not) (mode: the compare reads the planted native leg)
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/field_trace.lua tools/air_dash_rigs.py
 #   tools/build_fingerprint.py tools/name_moves.py tools/run_mame.sh tools/select_paths.py tools/setup_mame.sh
+#   tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: one per air-dash event, at the frame the leg enters the air dash (seq 0x14), or at the second R when it does not dash (the low event under vs2's row), on that leg's own field trace — not comparable: each game's stage and palette, and P2's art (each game's own copy; [VSP-168])
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged31] [EXPECT=same|gap] [KEEP=<dir>] tests/audit_air_dash_height.sh
 set -u
@@ -62,6 +65,35 @@ echo "== 2. control"
 python3 tools/air_dash_rigs.py compare "$J" "$W/tr_native.txt" "$W/tr_ours.txt" --expect "$EXPECT" --plant-native-dash > "$W/ctl.txt" 2>&1
 if grep -q 'MISMATCH' "$W/ctl.txt"; then vs_ctl_fired native-dash-planted "$(grep -m1 MISMATCH "$W/ctl.txt" | sed 's/^ *//')"
 else vs_ctl_dead native-dash-planted "no MISMATCH with the native dash planted (a pass, or a crash: $(tail -1 "$W/ctl.txt" | cut -c1-100))"; fail=1; fi
+# THE SHEET (#291): with SHEET_OUT set, the two traced legs as this run played them and one moment per event, each
+# picture proven on the fields that leg traced at that frame. Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "${VS_CTL:-}" ]; then
+    sheet_new h222 "Phobos jumps straight up and air-dashes (j.66) at +5..+16: native vs2 above ours" huitzil "#222" \
+        "each game's stage and palette, and P2's art (each game's own copy; [VSP-168])"
+    sheet_leg h222 native vs2 vsav2 "$ROMDIR" "$W/h222.rpl" "$pk" "$fr"
+    sheet_leg h222 ours ours vsavjw "$REPO/$BUILD/rompath;$ROMDIR" "$W/h222.ours.rpl" "$pk" "$fr"
+    python3 - "$J" "$W/tr_native.txt" "$W/tr_ours.txt" "$FIELDS" > "$W/sheet_rows.tsv" <<'PYS'
+import json, sys
+sys.path.insert(0, "tools")
+import air_dash_rigs as a
+js, trn, tro, fields = sys.argv[1:5]
+spec = {name: "%s:%s" % (ad.lower(), sz) for ad, sz, name in (f.split(":") for f in fields.split(","))}
+R = {"native": a.load(trn), "ours": a.load(tro)}
+rows = {"native": a.rows(js, trn), "ours": a.rows(js, tro)}
+ev = json.load(open(js))["events"]
+for i, (x, y) in enumerate(zip(rows["native"], rows["ours"])):
+    f0 = ev[i]["frame"]
+    print("moment\th222\tk%d\tair dash completed at +%d (height at the 2nd R: native %s, ours %s)\t%s\tnative %s | ours %s" % (
+        x["k"], x["k"], x["h"], y["h"], "IDENTICAL" if x == y else "DIFF", a.fmt(x), a.fmt(y)))
+    for leg, r in (("native", x), ("ours", y)):
+        f = f0 + (r["dash"] if r["dash"] is not None else r["k"])
+        smp = R[leg].get(f)
+        exp = ",".join("%s=%s" % (spec[n], v) for n, v in sorted(smp.items()) if n in spec) if smp else "-"
+        print("at\th222\tk%d\t%s\t%d\t%s\t%s" % (x["k"], leg, f, "fields" if smp else "none", exp))
+PYS
+    sheet_rows "$W/sheet_rows.tsv"
+fi
 [ "$fail" = 0 ] && echo "PASS: audit_air_dash_height — --expect $EXPECT: Phobos's air dash under vs2's row as expected (#222); identical above" \
                 || echo "FAIL: audit_air_dash_height"
 exit "$fail"

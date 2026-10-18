@@ -14,6 +14,8 @@
 #   tests/replays/11_pick_donovan.rpl tools/run_mame.sh tools/run_replay_guarded.sh
 #   tools/setup_mame.sh
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # WHY. replay_guard.lua's header advertised "same env contract ... can
 # substitute for replay.lua in any gate". Two things made that false:
 #

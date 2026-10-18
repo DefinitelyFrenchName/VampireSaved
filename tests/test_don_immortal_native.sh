@@ -15,7 +15,9 @@
 # POKE READ-BACK (ruled 2026-09-25 (14z-181), tests/expected/poke_readback.tsv): the f2600 ff8400-ff8600 dump is read at +0x60 only (who was selected); ff8509, the ES stock poke, lies inside the range and is never read (READS-BACK, a rig record).
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/roster_pairings/bases.tsv
 #   tests/lib/controls.sh tests/lua/replay.lua tests/lua/tap_writes.lua tests/replays/
-#   tools/run_mame.sh tools/setup_mame.sh
+#   tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: every hit of each ours-vs-native comparison (sections 2 and 5: each strength, no-mash and at the ceiling, at levels 6 and 8), at the frame the victim's HP drops on each leg — not comparable: each game's stage and palette, and Victor's art (each game's own copy; [VSP-168]); the engine, control and unpinned legs compare no leg of ours and are not drawn
 #
 # MUST-FIRE: known-bad: jedah-artefact — the #114 artefact (pristine vsavj + replay 48 selects JEDAH, not Donovan) must not be accepted as ours, so treating the Jedah control leg as ours must fail (mode: the control leg is measured and required to match Donovan, which it never does, so the gate FAILs)
 # MUST-FIRE: perturbed-copy: unmatched-modes — the native legs left at vsav2's DEFAULT play mode (TURBO, speed level 8) against ours at level 6 must fail, so the gate is proven to see the level it pins (in-gate: native LP at the ceiling at the default level lands its hits on different frames from ours at level 6; mode: every native leg runs at its default level and the level-6 comparisons FAIL)
@@ -239,7 +241,7 @@ run our_MP_L06_unpinned "$OURS_SET" "$RPDIR;$ROMDIR" "$WORK/our_MP.rpl" "$L6" "$
 tapleg tap_nat_MP_L06_unpinned vsav2       "$ROMDIR"        "$WORK/nat_MP.rpl" "$L6"
 tapleg tap_our_MP_L06_unpinned "$OURS_SET" "$RPDIR;$ROMDIR" "$WORK/our_MP.rpl" "$L6" "$OURS_BIN"
 
-python3 - "$WORK" "$BASES" "$MODE" <<'EOF2'
+python3 - "$WORK" "$BASES" "$MODE" <<'EOF2' && _py=0 || _py=$?
 import sys, os, struct
 sys.stdout.reconfigure(encoding="utf-8", newline="\n")
 work, bases_path = sys.argv[1], sys.argv[2]
@@ -407,8 +409,51 @@ need((fn, fo) == ([3, 4, 3], [3, 2, 4]),
      f"#142's mechanism, unpinned MP at level 6: the attacker's +0x5C writes on tap frame 2667 are native {fn} "
      f"(set, then reducer) and ours {fo} (reducer, then set) — frozen [3, 4, 3] / [3, 2, 4]")
 
+# THE SHEET (#291): with SHEET_OUT set, each compared pair's hit frames, for the shell to emit; writes a file only
+if os.environ.get("SHEET_OUT"):
+    with open(os.path.join(work, "sheet_hits.tsv"), "w") as sf:
+        for L in LEVELS:
+            for st in STR:
+                for kind in ("", "_ceil"):
+                    n, o = measure(f'nat_{st}{kind}_L{L:02d}'), measure(f'our_{st}{kind}_L{L:02d}')
+                    v = "IDENTICAL" if shape(o) == shape(n) and o['p1'] == DON else "DIFF"
+                    sf.write("%s%s_L%02d\t%s\t%s\t%s\t%s\t%s\n" % (st, kind, L, v,
+                             ",".join(map(str, n['frames'])) or "-", ",".join(map(str, o['frames'])) or "-",
+                             ",".join(map(str, n['vals'])) or "-", ",".join(map(str, o['vals'])) or "-"))
+
 if fails:
     print(f"FAIL: test_don_immortal_native — {len(fails)} assertion(s) failed")
     sys.exit(1)
 EOF2
+# THE SHEET (#291): with SHEET_OUT set, every ours-vs-native pair this run compared, each leg proven on its own
+# checksum log, one moment per hit. Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "$MODE" ] && [ -s "$WORK/sheet_hits.tsv" ]; then
+    R="$(rng_pokes)"
+    while IFS="$(printf '\t')" read -r _sid _v _nf _of _nd _od; do
+        [ "$_nf" = - ] && _nf=""; [ "$_of" = - ] && _of=""
+        _st="${_sid%%_*}"; _lv="${_sid##*_L}"; _k=""; case "$_sid" in *_ceil_*) _k=_ceil ;; esac
+        es=""; [ "$_st" = ES ] && es="2550:ff8509:09"
+        L="$(level_pokes "$_lv")"
+        sheet_new "$_sid" "421+P $_st$([ -n "$_k" ] && echo ' at the mash ceiling' || echo ' no-mash'), level $_lv, RNG pinned: native vs2 above ours" donovan "#114" \
+            "each game's stage and palette, and Victor's art (each game's own copy; [VSP-168])"
+        sheet_leg "$_sid" native vs2 vsav2 "$ROMDIR" "$WORK/nat_$_st$_k.rpl" "$(join_pokes "$es" "$L" "$R")" 2801 "$WORK/nat_${_st}${_k}_L$_lv/c.log"
+        sheet_leg "$_sid" ours ours "$OURS_SET" "$RPDIR;$ROMDIR" "$WORK/our_$_st$_k.rpl" "$(join_pokes "$es" "$L" "$R")" 2801 "$WORK/our_${_st}${_k}_L$_lv/c.log"
+        _i=0
+        for _f in $(echo "$_nf" | tr ',' ' '); do _i=$((_i + 1)); done; _nn=$_i
+        _i=0; for _f in $(echo "$_of" | tr ',' ' '); do _i=$((_i + 1)); done; _on=$_i
+        _m=$_nn; [ "$_on" -gt "$_m" ] && _m=$_on
+        _i=1
+        while [ "$_i" -le "$_m" ]; do
+            _a="$(echo "$_nf" | cut -d, -f$_i)"; _b="$(echo "$_of" | cut -d, -f$_i)"
+            [ "$_i" -le "$_nn" ] || _a=""; [ "$_i" -le "$_on" ] || _b=""
+            sheet_moment "$_sid" "h$_i" "hit $_i" "$_v" \
+                "native $([ -n "$_a" ] && echo "f$_a -$(echo "$_nd" | cut -d, -f$_i)" || echo none), ours $([ -n "$_b" ] && echo "f$_b -$(echo "$_od" | cut -d, -f$_i)" || echo none) HP"
+            [ -n "$_a" ] && sheet_at "$_sid" "h$_i" native "$_a" log
+            [ -n "$_b" ] && sheet_at "$_sid" "h$_i" ours "$_b" log
+            _i=$((_i + 1))
+        done
+    done < "$WORK/sheet_hits.tsv"
+fi
+[ "$_py" = 0 ] || exit "$_py"
 echo "PASS: 421+P matches native in count, damage and hit frames at every strength, no-mash and at the mash ceiling, at speed levels 6 and 8 with the RNG pinned"

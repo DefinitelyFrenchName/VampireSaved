@@ -17,7 +17,9 @@
 #   after; the swapped opening fails, the floor-less rig pins at 2370 and fails.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/rig_opening.tsv
 #   tests/lua/field_trace.lua tests/replays/naming/ tools/name_moves.py tools/run_mame.sh
-#   tools/setup_mame.sh
+#   tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: the nine sample frames the gate compares on huitzil_5 (before the first position pin the entrances differ, after it the legs agree), and the round start — not comparable: the round-start entrance before the first pin, which the two games draw differently by design; each game's stage and palette, and P2's art
 #
 # MUST-FIRE: perturbed-copy: entrance-swapped — a copy of our opening rows carrying native's x and seq (what the two legs would read if they drew the SAME entrance) must FAIL the frozen compare, so the frozen entrance rows are a real difference and not a tautology (in-gate: the perturbed copy must differ from the frozen rows; mode: our rows are replaced before the compare and the table FAILs)
 # MUST-FIRE: perturbed-copy: pin-before-round — the rig regenerated from a copy of tools/name_moves.py with its round-start floor removed (ROUND_START = 0, i.e. the pre-#168 schedule) pins at 2370, before the round starts, and must FAIL section 2's pin assertion AND its convergence assertion (in-gate: the perturbed generator's first pin must be < the round start; mode: the gate runs on that rig and FAILs)
@@ -249,6 +251,45 @@ fi
 grep -v '^#' "$EXPECT" > "$W/want.tsv"
 if diff "$W/want.tsv" "$W/got.tsv" > "$W/diff.txt"; then ok "3 every row as frozen"
 else bad "3 differs from the frozen rows"; sed 's/^/        /' "$W/diff.txt"; fi
+
+# THE SHEET (#291): with SHEET_OUT set, the two legs as this run played them and each compared sample frame, proven on
+# the four fields this run traced there. Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "$CONTROL" ]; then
+    sheet_new opening "$PART's opening: native vs2 above ours (first position pin f$PIN, round start f$RS)" huitzil "#168,#136" \
+        "the round-start entrance before the first pin, which the two games draw differently by design; each game's stage and palette, and P2's art"
+    sheet_leg opening native vs2 vsav2 "$ROMDIR" "$W/native.rpl" "$pk" "$FR"
+    sheet_leg opening ours ours vsavjw "$BUILD/rompath;$ROMDIR" "$W/ours.rpl" "$pk" "$FR"
+    python3 - "$W" "$SAMPLES $RS" "$PIN" > "$W/sheet_rows.tsv" <<'PYS'
+import sys
+W, frames, pin = sys.argv[1], sorted({int(x) for x in sys.argv[2].split()}), int(sys.argv[3])
+spec = {"x": "ff8410:w", "seq": "ff8406:b", "rnd": "ff812d:b", "id": "ff8782:b"}
+tr = {}
+for leg in ("native", "ours"):
+    d = {}
+    for l in open(f"{W}/{leg}.tr"):
+        t = l.split()
+        if t and t[0] == "F": d[int(t[1])] = dict(kv.split("=", 1) for kv in t[2:])
+    tr[leg] = d
+for f in frames:
+    n, o = tr["native"].get(f, {}), tr["ours"].get(f, {})
+    same = (n.get("x"), n.get("seq")) == (o.get("x"), o.get("seq"))
+    if f < pin:
+        lab, v = "f%d before the first pin (entrance)" % f, "IDENTICAL" if same else "DIFF (the entrances, by design)"
+    elif f == pin:
+        lab, v = "f%d the first pin (x poked on both legs)" % f, "pin frame, not judged"
+    else:
+        lab, v = "f%d after the first pin" % f, "IDENTICAL" if same else "DIFF"
+    if f not in (int(x) for x in sys.argv[2].split()[:-1]):
+        lab = "f%d the round start ($FF812D = 1)" % f
+    print("moment\topening\tf%d\t%s\t%s\tnative x=%s seq=%s, ours x=%s seq=%s" % (f, lab, v, n.get("x"), n.get("seq"), o.get("x"), o.get("seq")))
+    for leg in ("native", "ours"):
+        s = tr[leg].get(f)
+        exp = ",".join("%s=%s" % (spec[k], s[k]) for k in sorted(spec) if k in s) if s else "-"
+        print("at\topening\tf%d\t%s\t%d\t%s\t%s" % (f, leg, f, "fields" if s else "none", exp))
+PYS
+    sheet_rows "$W/sheet_rows.tsv"
+fi
 
 echo "== 4. must-fire controls"
 if [ -n "$CONTROL" ]; then

@@ -12,6 +12,8 @@
 #   tests/replays/17_don_oracle_vsavj.rpl tools/build_donovan.sh tools/run_mame.sh
 #   tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # Community-confirmed protocol (docs/game/atlas/character_tables.md): holding
 # YOUR Start through select confirm and match load selects the other
 # game's flavor of Donovan (VS2 default = latch 01; held = VH2 = 00).

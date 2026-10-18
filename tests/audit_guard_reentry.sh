@@ -17,7 +17,9 @@
 # POKE READ-BACK (ruled 2026-09-25 (14z-181), tests/expected/poke_readback.tsv): the `x` column (ff8410, the rig's pin) was sampled and never compared — DROPPED.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/guard_reentry.tsv
 #   tests/lua/field_trace.lua tests/lua/snapshot_frames.lua tools/name_moves.py
-#   tools/run_mame.sh tools/setup_mame.sh
+#   tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,vsavj,ours — moments: per guard-cancel event its +16 (where vsavj re-enters the block animation and vsav2 ticks), hit+20 of the 3640 event (inside the frozen pixel window), and per leg the first possible attack with back held to +21 — each on that leg's own field trace — not comparable: vsav2's counter differs from vsavj's by design (the engine difference this gate freezes); each game's stage palette (the pixel row's liveness)
 #
 # MUST-FIRE: perturbed-copy: act-late — a copy of the act rows with ours' and vsavj's first possible attack moved 3 frames later (what a re-entry that delayed recovery would read) must FAIL both the same-frame check and the frozen compare, so "identical" is a measured frame, not an absence (in-gate: the moved copy must fail the check; mode: the rows are moved before the checks and the gate FAILs)
 # MUST-FIRE: perturbed-copy: vs2-pattern — a copy of the vsavj rows carrying vsav2's counter values (what vsavj would read if it did NOT re-enter) must FAIL the frozen compare, so the frozen vsavj rows are the re-entry (in-gate: the perturbed copy must differ from the frozen rows; mode: the vsavj rows are replaced before the compare and the table FAILs)
@@ -281,5 +283,63 @@ fi
 vs2_rows "$W/got.tsv" "$W/ctl.tsv"
 if diff -q "$W/got.tsv" "$W/ctl.tsv" > /dev/null; then echo "CONTROL DEAD: vs2-pattern — vsavj's counters already equal vsav2's"; fail=1
 else echo "CONTROL FIRED: vs2-pattern — vsav2's counters change $(diff "$W/got.tsv" "$W/ctl.tsv" | grep -c '^<' | tr -d ' ') vsavj rows"; fi
+
+# THE SHEET (#291): with SHEET_OUT set, the three field-traced legs and the act legs this run judged, and their
+# moments, each picture proven on that leg's own field trace. Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "$CONTROL" ]; then
+    if [ -s "$W/diff.txt" ]; then _v="DIFF from frozen"; else _v="as frozen"; fi
+    _nc="vsav2's counter differs from vsavj's by design (the engine difference this gate freezes); each game's stage palette"
+    sheet_new reentry "Demitri mirror, Reflect Wall guard-cancel rig (huitzil part 5): vs2, pristine vsavj, ours" - "#136" "$_nc"
+    sheet_leg reentry vsav2 vs2 vsav2 "$ROMDIR" "$W/demitri.rpl" "$PK" "$FR"
+    sheet_leg reentry vsavj vsavj vsavj "$ROMDIR" "$W/demitri.rpl" "$PK" "$FR"
+    sheet_leg reentry ours ours vsavjw "$BUILD/rompath;$ROMDIR" "$W/demitri.rpl" "$PK" "$FR"
+    sheet_new act "The first possible attack after the hit+10 block, back held to +21 (LP every other frame; the earlier phase)" - "#136" "$_nc"
+    python3 - "$W" "$FIELDS" "$EVENTS" "$_v" > "$W/sheet_rows.tsv" 2> "$W/sheet.err" <<'PYS'
+import sys
+W, spec, evs, v = sys.argv[1], sys.argv[2], [int(x) for x in sys.argv[3].split()], sys.argv[4]
+ASPEC = "ff8406:b:seq,ff8407:b:sub,ff845c:b:frz,ff8782:b:id,ff8b82:b:p2id"
+def load(p, spec):
+    key = {name: "%s:%s" % (a.lower(), sz) for a, sz, name in (f.split(":") for f in spec.split(","))}
+    d = {}
+    for l in open(p):
+        t = l.split()
+        if t and t[0] == "F":
+            kv = dict(x.split("=", 1) for x in t[2:])
+            d[int(t[1])] = (kv, ",".join("%s=%s" % (key[k], val) for k, val in sorted(kv.items()) if k in key))
+    return d
+L = {g: load("%s/%s.ft" % (W, g), spec) for g in ("vsav2", "vsavj", "ours")}
+def at(sid, mid, leg, f, d):
+    print("at\t%s\t%s\t%s\t%d\t%s\t%s" % (sid, mid, leg, f, "fields" if f in d else "none", d[f][1] if f in d else "-"))
+for e in evs:
+    f = e + 16
+    vals = ", ".join("%s cnt=%s" % (g, L[g][f][0].get("cnt", "?")) for g in ("vsav2", "vsavj", "ours") if f in L[g])
+    print("moment\treentry\te%d\tevent %d (+16): the freeze ends into blockstun\t%s\t%s" % (e, e, v, vals))
+    for g in ("vsav2", "vsavj", "ours"): at("reentry", "e%d" % e, g, f, L[g])
+print("moment\treentry\tpx\thit+20 of the 3640 event, inside the frozen pixel window (3654-3666)\t%s\t-" % v)
+for g in ("vsav2", "vsavj", "ours"): at("reentry", "px", g, 3660, L[g])
+first = {}
+for g in ("vsav2", "vsavj", "ours"):
+    best = None
+    for ph in (0, 1):
+        d = load("%s/act_%s_3661_%d.ft" % (W, g, ph), ASPEC)
+        f = next((f for f in range(3660, 3740) if f in d and int(d[f][0]["seq"]) == 0x0A), None)
+        if f is not None and (best is None or f < best[0]): best = (f, ph, d)
+    if best: first[g] = best
+same = "IDENTICAL" if len({b[0] for b in first.values()}) == 1 and len(first) == 3 else "DIFF"
+print("moment\tact\ta\tthe first attack state (seq 0x0A)\t%s\t%s" % (same, ", ".join("%s +%d" % (g, b[0] - 3640) for g, b in first.items())))
+for g, (f, ph, d) in first.items():
+    print("L\t%s\t%d" % (g, ph))
+    at("act", "a", g, f, d)
+PYS
+    for g in vsav2 vsavj ours; do
+        _ph="$(awk -F'\t' -v g="$g" '$1 == "L" && $2 == g {print $3}' "$W/sheet_rows.tsv")"
+        [ -n "$_ph" ] || continue
+        case "$g" in vsav2) _r=vs2; _s=vsav2; _rp="$ROMDIR" ;; vsavj) _r=vsavj; _s=vsavj; _rp="$ROMDIR" ;; ours) _r=ours; _s=vsavjw; _rp="$BUILD/rompath;$ROMDIR" ;; esac
+        sheet_leg act "$g" "$_r" "$_s" "$_rp" "$W/act_3661_$_ph.rpl" "$APK" "$AFR"
+    done
+    grep -v '^L	' "$W/sheet_rows.tsv" > "$W/sheet_rows2.tsv"
+    sheet_rows "$W/sheet_rows2.tsv"
+fi
 
 if [ "$fail" = 0 ]; then echo "PASS: audit_guard_reentry"; else echo "FAIL: audit_guard_reentry"; exit 1; fi

@@ -25,6 +25,8 @@
 #   tests/lib/decrypt_cache.sh tests/lib/instr_align.sh tests/lua/emu_clock.lua tests/lua/replay.lua tests/lua/walker_sp.lua
 #   tests/replays/ tools/run_mame.sh tools/setup_mame.sh tools/walker_ghost.py
 #
+# SHEET: no-picture — it judges stack-push ranges over the corpus (a summary, no frame); its build legs run under -debug, which a plain capture cannot reproduce
+#
 # MUST-FIRE: known-bad: supervisor-read — the instrument forced to read MAME's SP (the idle supervisor stack, the pre-14z-185 read) must fail the ground-truth check: the longs on top of that stack end no call to the walker (in-gate: one extra run of 21_don_mash with WALKER_SP_READ=sp must fail GROUND; mode: every corpus run of BOTH legs reads SP and the gate FAILs on each) (GitHub #143, 14z-185)
 # MUST-FIRE: perturbed-copy: range-moved — the frozen sp_min shifted by 2 must fail the frozen compare, so a moved live range is re-frozen deliberately (in-gate: the reader run with --frozen-shift 2 must fail FROZEN; mode: the gate's own read carries the shift and FAILs)
 # MUST-FIRE: known-bad: drift-clock — a breakpoint run under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 4,203 emulated frames of 40,620 counted on 26_don_arcade_mash) must miss its frozen game clock (in-gate: one extra run of 21_don_mash; mode: every breakpoint run of both legs runs the old clock and the gate FAILs)

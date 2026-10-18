@@ -12,10 +12,16 @@
 #   tools/check_legacy_pairings.py against the expectation kinds; a LEGACY verdict may be
 #   overridden only by a printed `.legacy-exempt` reason.
 # EXPECTS: no legacy pairing on a bare .sha1, every override printed, NO-MATCH replays
-#   reported for hand judgement.
+#   reported for hand judgement; each tenant's forced-pick control loads THAT tenant.
+#   Every leg runs on its own fresh sandbox (#293, 14z-205): the sweep runs each DISTINCT build once (the default
+#   names one build three times, once per tenant id, and those three legs used to share one sandbox and one out file,
+#   so a later leg booted on an earlier one's nvram), and each id's control has its own file.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/lua/field_trace.lua
 #   tests/replays/ tools/build_fingerprint.py tools/check_legacy_pairings.py
-#   tools/freeze_masked_basis.sh tools/run_mame.sh tools/setup_mame.sh
+#   tools/freeze_masked_basis.sh tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh tests/lib/controls.sh
+#
+# SHEET: legs vsavj,ours — moments: per replay, the first frame of each distinct fighter pair the verdict compares (the +0x60 hitbox-base sequence), on each leg at its own frame; for a NO-MATCH replay its last traced frame — not comparable: the select wheel on our build (21 cells against vanilla's 16, by design) and a hook-cycle load phase of a frame or two (tolerated by the verdict)
+# MUST-FIRE: perturbed-copy: shared-sandbox — a leg whose sandbox already exists (a carried run, #293) must be refused, never run (in-gate: a planted leg with its sandbox made beforehand must leave a REUSED marker and no run; mode: the sweep runs every BUILDS entry without de-duplication, the pre-#293 rig, so a replay's second leg finds the first one's sandbox and the gate FAILs)
 #
 # WHY THIS EXISTS (14z-89, closing the gap 14z-88 exposed the hard way).
 # The 14z-87b medallion row move cost `38_victor_p1_vsavj` — P1 Victor vs
@@ -77,7 +83,8 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [JOBS=6] [PAIRINGS_OUT=build/legacy_pairings]
 #        tests/audit_legacy_pairings.sh [builddir:tenantid ...]
-# Default builds: the three current sets. ~30 min (225 MAME legs, JOBS-parallel).
+# Default builds: the merged build, once per tenant id for the forced-pick controls; the sweep runs each distinct
+# build once (#293). ~30 min before #293 (225 MAME legs, JOBS-parallel), fewer legs since.
 # Section 0 (verdict controls) is static and runs first — a checker that has
 # not been ground-truthed never issues a verdict.
 #
@@ -101,6 +108,7 @@
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
+. "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that
 # still contain $ROMDIR (e.g. MAME_ROMPATH="...;$ROMDIR"); a RELATIVE value —
@@ -174,7 +182,10 @@ last_frame() {   # $1 = .rpl ; the highest scripted frame
         if (f + 0 > m) m = f + 0 } END { print m + 0 }'
 }
 leg() {          # $1 out.field  $2 set  $3 rompath-or-empty  $4 rpl  $5 frames  [$6 pokes]
-    d="$(dirname "$1")/sb_$(basename "$1" .field)"; mkdir -p "$d"
+    d="$(dirname "$1")/sb_$(basename "$1" .field)"
+    # #293: a leg's sandbox must be NEW. mkdir (not -p) is atomic and fails on an existing directory, so a leg that would
+    # boot on another run's nvram is refused before MAME starts, and says so in a marker section 2 turns into a FAIL.
+    if ! mkdir "$d" 2>/dev/null; then echo "$d" > "$1.REUSED"; return 0; fi
     ( if [ -n "$3" ]; then MAME_ROMPATH="$3;$ROMDIR"; export MAME_ROMPATH; fi
       MAME_SANDBOX="$d" REPLAY="$4" FIELDS="$FIELDS" FIELD_OUT="$1" \
       FRAMES="$5" POKES="${6:-}" \
@@ -221,6 +232,18 @@ for b in $BUILDS; do
 done
 mkdir -p "$W/van"
 
+echo "== 0a: a leg whose sandbox already exists is refused, never run (#293; a planted leg) =="
+if ! vs_ctl_is shared-sandbox; then
+    mkdir -p "$W/plant/sb_PLANT_reused"
+    leg "$W/plant/PLANT_reused.field" vsavj "" "$W/no_such_replay.rpl" 10
+    if [ -f "$W/plant/PLANT_reused.field.REUSED" ] && [ ! -e "$W/plant/sb_PLANT_reused/mame.log" ]; then
+        vs_ctl_fired shared-sandbox "a planted leg whose sandbox existed was refused before MAME started (REUSED marker, no run)"
+    else
+        vs_ctl_dead shared-sandbox "a planted leg whose sandbox existed was run anyway"; fail=1
+    fi
+    rm -f "$W/plant/PLANT_reused.field.REUSED"
+fi
+
 echo "== 0b: a dead leg's MAME log is KEPT and shown (#233; a planted leg with no replay) =="
 mkdir -p "$W/plant"
 leg "$W/plant/PLANT_dead.field" vsavj "" "$W/no_such_replay.rpl" 10
@@ -235,12 +258,15 @@ else
 fi
 
 echo "== 1: sweep — id trajectories, vanilla vs each build (JOBS=$JOBS) =="
+# each DISTINCT build once (#293): one out file and one fresh sandbox per (replay, build), never shared between ids
+DIRS="$(for b in $BUILDS; do echo "${b%%:*}"; done | awk '!seen[$0]++' | tr '\n' ' ')"
+vs_ctl_is shared-sandbox && DIRS="$(for b in $BUILDS; do echo "${b%%:*}"; done | tr '\n' ' ')"   # the pre-#293 rig
 for rpl in "$REPO"/tests/replays/*.rpl; do
     name="$(basename "$rpl" .rpl)"
     fr=$(( $(last_frame "$rpl") + 120 ))
     want_van=0
-    for b in $BUILDS; do
-        dir="${b%%:*}"; tag="$(basename "$dir")"
+    for dir in $DIRS; do
+        tag="$(basename "$dir")"
         exp="$(cat "$W/expset_$tag")"
         if [ -f "$REPO/tests/expected/$exp/$name.skip" ]; then continue; fi
         want_van=1
@@ -261,7 +287,7 @@ for b in $BUILDS; do
     dir="${b%%:*}"; id="${b##*:}"; tag="$(basename "$dir")"
     rpl="$REPO/tests/replays/16_xemu_2p.rpl"
     fr=$(( $(last_frame "$rpl") + 120 ))
-    leg "$W/$tag/CONTROL_forced.field" vsavjw "$REPO/$dir/rompath" "$rpl" "$fr" \
+    leg "$W/$tag/CONTROL_forced_$id.field" vsavjw "$REPO/$dir/rompath" "$rpl" "$fr" \
         "1400:ff8782:$id;1450:ff8782:$id;1500:ff8782:$id" &
     sync_pool
 done
@@ -269,12 +295,43 @@ wait
 
 # ---------------------------------------------------------------- section 2
 echo "== 2: classify + assert coverage =="
+# loads_id <field file> <hex id>: the forced leg's P1 id reads <id> on its last in-match sample (#293: each tenant's
+# control is judged on ITS run, never on another id's)
+loads_id() { awk -v want="$(printf '%d' "0x$2")" '$1 == "F" { id = ""; hb = 0
+    for (i = 3; i <= NF; i++) { split($i, kv, "="); if (kv[1] == "p1id") id = kv[2] + 0; if (kv[1] == "p1hb") hb = kv[2] + 0 }
+    if (hb != 0 && id != "") last = id } END { exit (last != "" && last == want) ? 0 : 1 }' "$1"; }
 for b in $BUILDS; do
-    dir="${b%%:*}"; tag="$(basename "$dir")"
+    dir="${b%%:*}"; tag="$(basename "$dir")"; id="${b##*:}"
+    if [ -s "$W/$tag/CONTROL_forced_$id.field" ] && loads_id "$W/$tag/CONTROL_forced_$id.field" "$id"; then
+        echo "  ok control $id: the forced-pick leg loads id 0x$id (its own run)"
+    else
+        echo "  FAIL control $id: the forced-pick leg does not load id 0x$id — a shared or wrong control run"; fail=1
+    fi
+done
+# the id check refuses another tenant's run (a static plant: the first id's file judged against a different id)
+_b1="$(echo $BUILDS | awk '{print $1}')"; _d1="${_b1%%:*}"; _i1="${_b1##*:}"
+_other="$(for b in $BUILDS; do i="${b##*:}"; [ "$i" != "$_i1" ] && { echo "$i"; break; }; done)"
+if [ -n "$_other" ]; then
+    if loads_id "$W/$(basename "$_d1")/CONTROL_forced_$_i1.field" "$_other"; then
+        echo "  FAIL plant: id 0x$_i1's control was accepted as id 0x$_other — the id check cannot tell tenants apart"; fail=1
+    else echo "  ok plant: id 0x$_i1's control is refused as id 0x$_other"; fi
+fi
+_classified=""
+for b in $BUILDS; do
+    dir="${b%%:*}"; tag="$(basename "$dir")"; id="${b##*:}"
     exp="$(cat "$W/expset_$tag")"
     rep="$OUT/pairings_$exp.tsv"
+    echo "-- $dir (tenant 0x$id) -> tests/expected/$exp --"
+    verdict "$W/van/16_xemu_2p.field" "$W/$tag/CONTROL_forced_$id.field" forced-pick "$W/pos"
+    if [ "$rc" = 1 ]; then
+        echo "  ok control: the same replay with the tenant id poked -> TENANT"
+    else
+        echo "  FAIL control: poking the tenant id did not flip the verdict (rc=$rc)"
+        sed 's/^/      /' "$W/pos"; fail=1
+    fi
+    case " $_classified " in *" $tag "*) echo "  (the sweep of $tag is classified above, once)"; continue ;; esac
+    _classified="$_classified $tag"
     : > "$rep"
-    echo "-- $dir -> tests/expected/$exp --"
 
     # liveness + the live positive control, before any coverage verdict
     verdict "$W/van/16_xemu_2p.field" "$W/$tag/16_xemu_2p.field" liveness "$W/live"
@@ -285,18 +342,17 @@ for b in $BUILDS; do
         echo "  FAIL liveness: rc=$rc — the rig is not producing matches"
         sed 's/^/      /' "$W/live"; fail=1
     fi
-    verdict "$W/van/16_xemu_2p.field" "$W/$tag/CONTROL_forced.field" forced-pick "$W/pos"
-    if [ "$rc" = 1 ]; then
-        echo "  ok control: the same replay with the tenant id poked -> TENANT"
-    else
-        echo "  FAIL control: poking the tenant id did not flip the verdict (rc=$rc)"
-        sed 's/^/      /' "$W/pos"; fail=1
-    fi
 
     nl=0; nt=0; nn=0; holes=""
     # 14z-90 (#23): the corpus below is a glob, so assert first that nothing
     # dropped out of it. Without this the sweep's coverage is whatever
     # happened to survive.
+    _reused=$(ls "$W/$tag"/*.field.REUSED "$W/van"/*.field.REUSED 2>/dev/null | wc -l | tr -d ' ')
+    if [ "${_reused:-0}" != 0 ]; then
+        echo "FAIL: $_reused leg(s) found their sandbox already there — a carried run (#293), refused:"
+        for _rm in "$W/$tag"/*.field.REUSED "$W/van"/*.field.REUSED; do [ -f "$_rm" ] && echo "        $(basename "$_rm" .field.REUSED)"; done
+        fail=1
+    fi
     _dead=$(ls "$W/$tag"/*.field.DEAD "$W/van"/*.field.DEAD 2>/dev/null | wc -l | tr -d ' ')
     if [ "${_dead:-0}" != 0 ]; then
         echo "FAIL: $_dead leg(s) produced no field data — those replays were"
@@ -308,7 +364,7 @@ for b in $BUILDS; do
     fi
     for f in "$W/$tag"/*.field; do
         name="$(basename "$f" .field)"
-        if [ "$name" = CONTROL_forced ]; then continue; fi
+        case "$name" in CONTROL_forced*) continue ;; esac
         verdict "$W/van/$name.field" "$f" "$name" "$W/v"
         kind=none
         for k in masked pending sha1 diverge; do
@@ -354,5 +410,76 @@ for b in $BUILDS; do
     awk -F'\t' '$2 == "NO-MATCH" { printf "  no-match (hand-judged): %s [%s]\n", $1, $3 }' "$rep"
 done
 
+# THE SHEET (#291): with SHEET_OUT set, one sheet per replay this run classified — vanilla and our build as this run
+# played them (bare, as run_suite does), at the first frame of each distinct fighter pair the verdict compares, proven
+# on the four fields this run traced there. Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on; then
+    _done=""
+    for b in $BUILDS; do
+        dir="${b%%:*}"; tag="$(basename "$dir")"
+        case " $_done " in *" $tag "*) continue ;; esac; _done="$_done $tag"
+        exp="$(cat "$W/expset_$tag")"; rep="$OUT/pairings_$exp.tsv"
+        while IFS='	' read -r name v kind; do
+            [ -s "$W/van/$name.field" ] && [ -s "$W/$tag/$name.field" ] || continue
+            rpl="$REPO/tests/replays/$name.rpl"; fr=$(( $(last_frame "$rpl") + 120 ))
+            sheet_new "$tag.$name" "$name: vanilla vsavj above $tag (bare, as run_suite runs it)" - - \
+                "the select wheel on our build (21 cells against vanilla's 16, by design) and a hook-cycle load phase of a frame or two (tolerated by the verdict)"
+            sheet_leg "$tag.$name" vanilla vsavj vsavj "$ROMDIR" "$rpl" - "$fr"
+            sheet_leg "$tag.$name" ours ours vsavjw "$REPO/$dir/rompath;$ROMDIR" "$rpl" - "$fr"
+        done < "$rep"
+        python3 - "$W" "$tag" "$rep" "$REPO/tests/expected/$exp" >> "$W/sheet_rows.tsv" <<'PYS'
+import os, sys
+W, tag, rep, expdir = sys.argv[1:5]
+spec = {"p1id": "ff8782:b", "p2id": "ff8b82:b", "p1hb": "ff8460:l", "p2hb": "ff8860:l"}
+def trace(p):
+    d = []
+    for l in open(p):
+        t = l.split()
+        if t and t[0] == "F": d.append((int(t[1]), {k: int(v) for k, v in (kv.split("=", 1) for kv in t[2:])}))
+    return d
+def runs(d):
+    out = []
+    for f, s in d:
+        k = (s.get("p1hb", 0), s.get("p2hb", 0))
+        if not any(k): continue
+        if not out or out[-1][1] != k: out.append((f, k))
+    return out
+for line in open(rep):
+    name, v, kind = line.rstrip("\n").split("\t")
+    pv, pb = f"{W}/van/{name}.field", f"{W}/{tag}/{name}.field"
+    if not (os.path.getsize(pv) if os.path.exists(pv) else 0) or not (os.path.getsize(pb) if os.path.exists(pb) else 0):
+        continue
+    ex = " (legacy-exempt)" if os.path.exists(f"{expdir}/{name}.legacy-exempt") else ""
+    verdict = "%s, expectation %s%s" % (v, kind, ex)
+    tv, tb = trace(pv), trace(pb)
+    dv, db = {f: s for f, s in tv}, {f: s for f, s in tb}
+    rv, rb = runs(tv), runs(tb)
+    sid = f"{tag}.{name}"
+    if not rv and not rb:
+        mom = [("end", "the last traced frame: no fighter ever loaded (NO-MATCH, judged by hand)", tv[-1][0] if tv else 0, tb[-1][0] if tb else 0, "-")]
+    else:
+        mom = []
+        for k in range(max(len(rv), len(rb))):
+            a = rv[k] if k < len(rv) else None
+            b = rb[k] if k < len(rb) else None
+            vals = "vanilla %s, ours %s (hitbox bases)" % ("(%X,%X)" % a[1] if a else "none", "(%X,%X)" % b[1] if b else "none")
+            mom.append(("p%d" % (k + 1), "distinct fighter pair #%d" % (k + 1), a[0] if a else None, b[0] if b else None, vals))
+    for mid, lab, fa, fb, vals in mom:
+        print("moment\t%s\t%s\t%s\t%s\t%s" % (sid, mid, lab, verdict, vals))
+        for leg, f, dd in (("vanilla", fa, dv), ("ours", fb, db)):
+            if f is None: continue
+            s = dd.get(f)
+            exp = ",".join("%s=%d" % (spec[k], s[k]) for k in sorted(spec) if k in s) if s else "-"
+            print("at\t%s\t%s\t%s\t%d\t%s\t%s" % (sid, mid, leg, f, "fields" if s else "none", exp))
+PYS
+    done
+    [ -s "$W/sheet_rows.tsv" ] && sheet_rows "$W/sheet_rows.tsv"
+fi
+
+if vs_ctl_is shared-sandbox; then
+    if [ "$fail" = 1 ]; then vs_ctl_fired shared-sandbox "with the sweep not de-duplicated, a replay's second leg found the first one's sandbox and was refused"
+    else vs_ctl_dead shared-sandbox "the duplicated sweep passed — a carried sandbox goes unseen"; fail=1; fi
+fi
 if [ "$fail" = 0 ]; then echo "LEGACY-PAIRING COVERAGE: PASS"; else echo "LEGACY-PAIRING COVERAGE: FAIL"; fi
 exit "$fail"

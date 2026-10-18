@@ -1,0 +1,18 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent205/s2/cd_design.md	19a87c30d74af0e1305ad863af9a18adbe219c25
+build/agent205/s2/cd_reader_return.txt	3bfb06dee33b0c1fbbba00d3a7ae593d6d031e60
+tests/expected/sheet_debt.txt	9b65c3120aa732702990514168705c32ab0be961
+docs/project/gate_header_contract.md.lines-141-180 (lines 141-180 of docs/project/gate_header_contract.md)	0af72fa57aa8b371d2edb3fe4cffffb0ce192e60
+DECISIONS_HISTORY.md.lines-7169-7185 (lines 7169-7185 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-17 (14z-203) — #261 freeze as measured, #256 fix the tool only, #286 keep (c) and a")	656bcf83893edbc0dc06117186e6baff57e719f8
+tests/audit_landing_sound.sh.lines-45-53 (lines 45-53 of tests/audit_landing_sound.sh)	a4ec5ead62f3ab81e84b89b6dddc58570a60b438
+tests/audit_walker_ghost.sh.lines-18-24 (lines 18-24 of tests/audit_walker_ghost.sh)	f50db180f097983ed7bc8cc12dd2c5d9a6b5cc0b
+tests/audit_walker_ghost.sh.lines-150-158 (lines 150-158 of tests/audit_walker_ghost.sh)	f9cc9105bd2a419927a348557f8cf0834e530ebf
+tests/test_emulator_staleness.sh.lines-8-13 (lines 8-13 of tests/test_emulator_staleness.sh)	3867ca409d09163e3ee3798eb462c749563caccc
+tests/lua/read_tap.lua.lines-90-100 (lines 90-100 of tests/lua/read_tap.lua)	e0363a38c32b95ba6549cd2b06959ddfbc875b64
+tests/lua/ring_tap.lua.lines-1-12 (lines 1-12 of tests/lua/ring_tap.lua)	d7c3a87d0cb3823c31a9e0f9ea40538117523c3b
+tests/lua/qs_sweep.lua.lines-1-10 (lines 1-10 of tests/lua/qs_sweep.lua)	3672cdd644d8b297b3645337264d97782fe1ad1d
+tests/lua/obj_records_dump.lua.lines-20-27 (lines 20-27 of tests/lua/obj_records_dump.lua)	b230ddcaa5a5ae92c64a05577023261818c917ae
+tests/lua/upload_tap.lua.lines-1-20 (lines 1-20 of tests/lua/upload_tap.lua)	15f721c85fcb45ed5af0e7cb0c9d43c3fbe53421
+tests/lua/rng_draws.lua.lines-1-10 (lines 1-10 of tests/lua/rng_draws.lua)	662b237410c9d0a8a3d96b661d234d15d5af8cfb
+tests/lua/facing_tap.lua.lines-110-116 (lines 110-116 of tests/lua/facing_tap.lua)	f548cbb0878e5529a39023290e09e822257afb6a
+docs/project/gotchas.md.lines-2598-2630 (lines 2598-2630 of docs/project/gotchas.md)	1ab81c399115badf394f6835c2d779568ca4d101

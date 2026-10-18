@@ -14,7 +14,9 @@
 # FOLLOWS: build/manifest/ docs/platform/gotchas.md emu/mame-patches/
 #   tests/expected/pass_overrun.tsv tests/lua/field_trace.lua tests/lua/read_tap.lua
 #   tests/replays/naming/ tools/build_fingerprint.py tools/name_moves.py tools/run_mame.sh
-#   tools/setup_mame.sh
+#   tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: per part, every zero-pass frame either leg reads after the round start, and each event window's mid-frame captioned with both legs' idle figures — not comparable: each game's stage and palette, and P2's art (Demitri, each game's own copy; [VSP-168]); after a leg's lost pass the legs are one engine pass out of step by design of the measurement
 #
 # MUST-FIRE: perturbed-copy: overrun-planted — a copy of our donovan_11 trace with one pass-counter step removed (a zero-pass frame planted where ours has none) must change our overrun row and FAIL the frozen compare, so an `overrun ... none` row is a reading of the trace (in-gate: the planted copy must reduce differently; mode: every part's trace is planted before the reduction and the table FAILs)
 #
@@ -176,4 +178,46 @@ real_row="$(awk -F'\t' '$1=="overrun" && $2=="donovan_11" && $3=="ours" {print $
 if [ -n "$pl_row" ] && [ "$pl_row" != "$real_row" ]; then
     echo "CONTROL FIRED: overrun-planted — the planted trace reads $pl_row where ours reads $real_row"
 else echo "CONTROL DEAD: overrun-planted — the planted zero-pass frame was not read"; fail=1; fi
+# THE SHEET (#291): with SHEET_OUT set, each part's two legs as this run played them, every zero-pass frame either leg
+# reads and each event window's mid-frame, each picture proven on the pass counters that leg traced there. Nothing the
+# gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "$CONTROL" ]; then
+    for pf in $PARTS; do
+        part="${pf%:*}"; fr="${pf#*:}"; j="$REPO/tests/replays/naming/$part.json"; pk="$(pokes_for "$j" "$fr")"
+        sheet_new "$part" "$part: Blizzard Sword CPU overruns and idle time, native vs2 above ours (level 6, RNG pinned)" donovan "#136" \
+            "each game's stage and palette, and P2's art (Demitri, each game's own copy; [VSP-168]); after a leg's lost pass the legs are one engine pass out of step by design of the measurement" || true
+        sheet_leg "$part" native vs2 vsav2 "$ROMDIR" "$W/$part.native.rpl" "$pk" "$fr" || true
+        sheet_leg "$part" ours ours vsavjw "$BUILD/rompath;$ROMDIR" "$W/$part.ours.rpl" "$pk" "$fr" || true
+        python3 - "$part" "$fr" "$W" "$REPO" > "$W/sheet_$part.tsv" <<'PYS' && sheet_rows "$W/sheet_$part.tsv" || true
+import json, sys
+part, last, W, REPO = sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4]
+tr = {}
+for leg in ("native", "ours"):
+    d = {}
+    for l in open(f"{W}/{part}.{leg}.ft"):
+        q = l.split()
+        if q and q[0] == "F": d[int(q[1])] = dict(kv.split("=", 1) for kv in q[2:])
+    tr[leg] = d
+rows = [l.rstrip("\n").split("\t") for l in open(f"{W}/got.tsv")]
+zero = {r[2]: ([] if r[3] == "none" else [int(x) for x in r[3].split(",")]) for r in rows if r[0] == "overrun" and r[1] == part}
+idle = {(r[2], r[3]): "%s %s" % (r[4], r[5]) for r in rows if r[0] == "idle" and r[1] == part}
+def at(mid, fr):
+    for leg in ("native", "ours"):
+        s = tr[leg].get(fr)
+        print("at\t%s\t%s\t%s\t%d\t%s\t%s" % (part, mid, leg, fr, "fields" if s else "none", "ff8081:b=%s,ff8080:b=%s" % (s["pc"], s["fc"]) if s else "-"))
+for fr in sorted(set(zero.get("native", [])) | set(zero.get("ours", []))):
+    who = [leg for leg in ("native", "ours") if fr in zero.get(leg, [])]
+    print("moment\t%s\tz%d\tf%d: a frame with no logic pass on %s\t%s\t-" % (part, fr, fr, " and ".join(who), "both" if len(who) == 2 else "%s only" % who[0]))
+    at("z%d" % fr, fr)
+ev = json.load(open(f"{REPO}/tests/replays/naming/{part}.json"))["events"]
+for k, e in enumerate(ev):
+    if (str(k), "native") not in idle:
+        continue
+    lo = e["frame"]; hi = min((ev[k + 1]["frame"] if k + 1 < len(ev) else lo + e["gap"]) - 1, last - 1)
+    print("moment\t%s\ti%d\t%s: event window mid-frame (idle spin dispatches)\tas measured\tnative %s; ours %s" % (part, k, e["name"], idle[(str(k), "native")], idle.get((str(k), "ours"), "-")))
+    at("i%d" % k, (lo + hi) // 2)
+PYS
+    done
+fi
 if [ "$fail" = 0 ]; then echo "PASS: audit_pass_overrun"; else echo "FAIL: audit_pass_overrun"; exit 1; fi

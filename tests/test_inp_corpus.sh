@@ -13,6 +13,8 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/inp/ tests/lua/inp_guard.lua
 #   tools/run_inp_guarded.sh tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # WHY THIS EXISTS (the learning, paid for in 14z-109..111). WIDE_RECORD
 # (tools/run_wide.sh) had existed since 14z-9x and HANDOFF called a recorded
 # field report "a replay protocol" — but no gate consumed the recordings and

@@ -1,0 +1,12 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent205/t120/rebuilt/CLAUDE.md	ee3eeca576df080ea1dba32b9cc302178148f9db
+build/agent205/t120/reader_claude_md_return.txt	ca5f44b2bf1bee9ef0bb36f1b250fc3bb1106719
+build/agent205/t120/skills_brief.md	79dd1d46470bc830b2d2d11655c6b6c6e3a702a2
+build/agent205/t120/keep_check.py	57cdeaad6b7fc2fbec1823c721a23a9ac37708d0
+build/agent205/t120/keep_check.log	7d0d9571df923317c6785382564c8932765a9c3a
+build/agent205/t120/ledger_facts.tsv	99cba438e92d75ba6dbb78de0d67a4f2ba546dc8
+build/agent205/t120/ledger_mister.tsv	19c14699693577bce3bc7573c77a4902d8ae9b76
+build/agent205/t120/ledger_port.tsv	b19bceb530ab0f729d89a0b1ce0276140e346aa9
+build/agent205/t120/ledger_swarm.tsv	eea4ad09f783b31c68e09658ba4ff0fc2d9bca4d
+build/agent205/t120/rebuilt/.claude/skills/vampire-saved-port/SKILL.md.lines-1-40 (lines 1-40 of build/agent205/t120/rebuilt/.claude/skills/vampire-saved-port/SKILL.md)	86abefca2d05db010c6bfaf92b04938e6e625728
+CLAUDE.md	06d450adb64a457dd24ba2235dcc5798d9d34b25

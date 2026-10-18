@@ -15,7 +15,9 @@
 #   is a real divergence.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/obj_records_dump.lua
 #   tests/replays/hui/83d_hui_grenade_ground.rpl tools/gfx_tiles.py tools/run_mame.sh
-#   tools/setup_mame.sh
+#   tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: per leg, the detonation's first explosion frame, its fullest frame (most palette-06 explosion entries) and its last, each picture EVENT-PROVEN on that leg's own OBJ-list dump at that frame — not comparable: the frame numbers (the legs run ~5-6 frames apart, so the verdict compares tile SETS, phase-free), each game's stage, and Victor's art (each game's own copy; [VSP-168])
 #
 # WHY. engine_internals' grenade section (14z-70e/f) concluded the ground
 # mushroom "LOOKS right" from snapshots and that the original fuchsia report
@@ -90,7 +92,7 @@ run() {  # <set> <rompath-or-empty> <out>
 OURS="$(run vsavjw x "_o")"
 NATIVE="$(run vsav2 "" "_n")"
 
-python3 - "$OURS" "$NATIVE" "$BUILD" "$ROMDIR" <<'PY'
+python3 - "$OURS" "$NATIVE" "$BUILD" "$ROMDIR" <<'PY' && _rc=0 || _rc=$?
 import sys, re, zipfile, hashlib, importlib.util, collections
 ours, native, build, romdir = sys.argv[1:5]
 spec = importlib.util.spec_from_file_location("gt", "tools/gfx_tiles.py")
@@ -160,3 +162,42 @@ if not fail:
           "no blank/fuchsia tile; ours-only == 0")
 sys.exit(fail)
 PY
+
+# THE SHEET (#291, D2): with SHEET_OUT set, both legs re-run under obj_records_dump.lua itself and EVENT-PROVEN on their
+# own OBJ-list dump at three frames of the detonation each. Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on; then
+    if [ "$_rc" = 0 ]; then _sv="tile sets equal (ours-only 0, no blank)"; else _sv="the tile-set check FAILS"; fi
+    sheet_new grenade "Phobos's 214+LP ground explosion (replay 83d): native vs2 above ours" huitzil - \
+        "the frame numbers (the legs run ~5-6 frames apart, so the verdict compares tile SETS, phase-free), each game's stage, and Victor's art (each game's own copy; [VSP-168])"
+    _env="DUMP_FRAMES=$FR;FRAMES=3521"
+    sheet_leg grenade native vs2 vsav2 "$ROMDIR" "$REPO/$RPL" "$PK" 3521
+    sheet_tap grenade native tests/lua/obj_records_dump.lua "$_env"
+    sheet_leg grenade ours ours vsavjw "$BUILD/rompath;$ROMDIR" "$REPO/$RPL" "$PK" 3521
+    sheet_tap grenade ours tests/lua/obj_records_dump.lua "$_env"
+    _sfn="$(sheet_file grenade native.obj "$NATIVE")"; _sfo="$(sheet_file grenade ours.obj "$OURS")"
+    python3 - "$NATIVE" "$OURS" > "$W/sheet_frames.txt" <<'PYF'
+import re, sys
+pat = re.compile(r"F(\d+) B\d E\w+ x=(\w+) y=(\w+) code=(\w+) attr=\w+ pal=(\w+) ")
+for leg, path in (("native", sys.argv[1]), ("ours", sys.argv[2])):
+    n = {}
+    for ln in open(path):
+        m = pat.match(ln)
+        if not m: continue
+        x, y, code = int(m.group(2), 16) & 0x3ff, int(m.group(3), 16) & 0x3ff, int(m.group(4), 16)
+        if code and m.group(5) == "06" and 100 <= x <= 340 and 60 < y < 260:
+            n[int(m.group(1))] = n.get(int(m.group(1)), 0) + 1
+    if n:
+        fs = sorted(n); peak = max(fs, key=lambda f: (n[f], -f))
+        print(leg, fs[0], peak, fs[-1], n[fs[0]], n[peak], n[fs[-1]])
+PYF
+    for k in 1 2 3; do
+        case $k in 1) _sl="the first explosion frame" ;; 2) _sl="the fullest explosion frame" ;; 3) _sl="the last explosion frame" ;; esac
+        _fn="$(awk -v k=$k '$1=="native" {print $(k+1)}' "$W/sheet_frames.txt")"; _fo="$(awk -v k=$k '$1=="ours" {print $(k+1)}' "$W/sheet_frames.txt")"
+        _nn="$(awk -v k=$k '$1=="native" {print $(k+4)}' "$W/sheet_frames.txt")"; _no="$(awk -v k=$k '$1=="ours" {print $(k+4)}' "$W/sheet_frames.txt")"
+        sheet_moment grenade "m$k" "$_sl" "$_sv" "native f${_fn:-?} ${_nn:-0} entries, ours f${_fo:-?} ${_no:-0} entries"
+        [ -n "$_fn" ] && sheet_at grenade "m$k" native "$_fn" event "$_sfn:$_fn-$_fn"
+        [ -n "$_fo" ] && sheet_at grenade "m$k" ours "$_fo" event "$_sfo:$_fo-$_fo"
+    done
+fi
+exit "$_rc"

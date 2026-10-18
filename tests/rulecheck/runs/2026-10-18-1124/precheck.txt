@@ -1,0 +1,4 @@
+  FLAG D-ABSOLUTE: Whether those logs cover the frames each gate judges is NOT checked: no retrofit of them was run this session.  [build/agent205/s2/cd_design.md]
+  FLAG D-ABSOLUTE: Group 1: retrofit next**, as S2 did (no new mechanism), each checked as S2's were; a gate whose logs do not cover its judged frames moves to group 2.  [build/agent205/s2/cd_design.md]
+  FLAG D-ABSOLUTE: It is weaker than a checksum: it proves the tapped addresses' history in that window, not the rest of work RAM, and the page says so on each such picture.  [build/agent205/s2/cd_design.md]
+packet_check: 3 flag(s): D-ABSOLUTE 3

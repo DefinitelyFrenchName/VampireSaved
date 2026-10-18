@@ -3,10 +3,13 @@
 # (GitHub #291 slice S1, 14z-204; the design ruled 2026-10-17: "Declared in each gate (Recommended)").
 #
 # WHAT: every gate of the emulator registry (tests/ci_emulator.tsv) carries exactly one well-formed `# SHEET:` line in
-#   its leading comment block (`legs <roles> — moments: … — not comparable: …`, `no-reference-leg — <reason>` or
+#   its leading comment block (`legs <roles> — moments: … — not comparable: …`, `no-reference-leg — <reason>`, `no-picture — <reason>` or
 #   `none — <reason>`) or is on the shrink-only debt list tests/expected/sheet_debt.txt; a `legs` gate sources
 #   tests/lib/sheet.sh; the declaration grammar and the sheet file's reader refuse what they must; tests/lib/sheet.sh
-#   assigns only `__sheet_` names (sh has no locals, and a gate's own variable must survive a call).
+#   assigns only `__sheet_` names (sh has no locals, and a gate's own variable must survive a call); the page reads each
+#   gate's own verdict line, prefixed forms included, never a control or an indented line (14z-205); every section of
+#   docs/project/sheet_notes.md names a gate that exists, and a note renders its paragraphs, bullets, bold, code and
+#   issue links with everything else escaped (14z-205).
 # HOW: tools/proof_sheets.py's own reader (`census`, `parse_declaration`, `read_sheet`) — the one the sheet tool uses —
 #   over tests/, the registry and the debt list; fixture declarations and sheet files for the refusals; four controls
 #   on perturbed copies.
@@ -14,10 +17,12 @@
 #   sheet, or a debt row that should be gone. It does not claim a sheet is RIGHT: tests/test_proof_sheets.sh proves
 #   the pictures, and each gate's verdict is its own.
 # FOLLOWS: tests/ tools/proof_sheets.py tests/lib/sheet.sh tests/ci_emulator.tsv tests/expected/sheet_debt.txt tests/lib/controls.sh
+#   docs/project/sheet_notes.md
 #
 # MUST-FIRE: perturbed-copy: dropped-declaration — a copy of tests/ with one declaring gate's `# SHEET:` line neutered must be named as a registered gate with no line and not on the debt list (section 1 fails)
 # MUST-FIRE: perturbed-copy: silent-legs — a copy with one legs gate's source line for tests/lib/sheet.sh commented out must be named as declaring legs and writing no sheet (section 1 fails)
 # MUST-FIRE: perturbed-copy: leaky-helper — a copy of tests/lib/sheet.sh with one helper variable renamed out of the `__sheet_` prefix (the 14z-204 `_sf` collision, which overwrote audit_merged_legacy's frame variable) must be named (section 4 fails)
+# MUST-FIRE: perturbed-copy: orphan-note — a copy of docs/project/sheet_notes.md with a section for a gate that does not exist must be named (section 3c fails), so a note cannot outlive or misname its gate
 # MUST-FIRE: perturbed-copy: debt-regrown — a copy of the debt list with a declaring gate added back must be named as a row that should be gone (section 1 fails), or the list does not only shrink
 #
 # Usage: tests/test_sheet_census.sh   # ci_portable, ROM-free, ~2 s
@@ -52,7 +57,10 @@ leak_copy() {  # leak_copy <out> — the leaky-helper perturbation: the row loop
 }
 
 # THE EXECUTABLE FORM: under CONTROL=<name> the perturbed copy IS the input.
-SRC=tests; SDEBT="$DEBT"; LIB=tests/lib/sheet.sh
+SRC=tests; SDEBT="$DEBT"; LIB=tests/lib/sheet.sh; NOTES=docs/project/sheet_notes.md
+orphan_copy() {  # orphan_copy <out> — the orphan-note perturbation: a section for a gate that does not exist
+    { cat "$NOTES"; printf '\n## audit_no_such_gate\n\nA note whose gate does not exist.\n'; } > "$1"
+}
 L1="$(first_legs)"
 if vs_ctl_is dropped-declaration; then
     mkdir -p "$W/in"; cp tests/*.sh "$W/in/"; SRC="$W/in"; neuter_decl "$SRC" "$L1"
@@ -60,6 +68,8 @@ elif vs_ctl_is silent-legs; then
     mkdir -p "$W/in"; cp tests/*.sh "$W/in/"; SRC="$W/in"; neuter_source "$SRC" "$L1"
 elif vs_ctl_is leaky-helper; then
     leak_copy "$W/lib_sheet.sh"; LIB="$W/lib_sheet.sh"
+elif vs_ctl_is orphan-note; then
+    orphan_copy "$W/notes_in.md"; NOTES="$W/notes_in.md"
 elif vs_ctl_is debt-regrown; then
     cp "$DEBT" "$W/debt"; echo "$L1" >> "$W/debt"; SDEBT="$W/debt"
 fi
@@ -69,8 +79,9 @@ echo "== 1. the census"
 census "$SRC" "$SDEBT" > "$W/got.txt"; rc=$?
 nl="$(command grep -c '^legs	' "$W/got.txt")"; nn="$(command grep -c '^none	' "$W/got.txt")"
 nr="$(command grep -c '^no-reference-leg	' "$W/got.txt")"; nd="$(command grep -c '^debt	' "$W/got.txt")"
-echo "  measured: $nl legs, $nr no-reference-leg, $nn none, $nd on the debt list"
-echo "NOTE: sheet.legs $nl no-reference-leg $nr none $nn debt $nd"
+np="$(command grep -c '^no-picture	' "$W/got.txt")"
+echo "  measured: $nl legs, $nr no-reference-leg, $np no-picture, $nn none, $nd on the debt list"
+echo "NOTE: sheet.legs $nl no-reference-leg $nr no-picture $np none $nn debt $nd"
 if [ "$rc" = 0 ] && ! command grep -q '^PROBLEM' "$W/got.txt"; then
     ok "every registered gate declares one well-formed line or is on the debt list; every legs gate sources tests/lib/sheet.sh"
 else
@@ -92,6 +103,8 @@ check legs "a well-formed legs line" "# SHEET: legs ours,vs2 — moments: each e
 check legs "a hyphen inside the text is not a separator" "# SHEET: legs vsavj,ours — moments: a frame-exact list — not comparable: P2's art - each game's own"
 check none "a none line with its reason" "# SHEET: none — vanilla only"
 check no-reference-leg "a no-reference-leg line" "# SHEET: no-reference-leg — frozen vs2 values, no vs2 rig"
+check no-picture "a no-picture line (ruled 2026-10-18, D4)" "# SHEET: no-picture — a corpus-wide summary, no frame to show"
+check ERR "no-picture without a reason" "# SHEET: no-picture"
 check NONE "no line at all" "# WHAT: nothing"
 check ERR "legs without ours" "# SHEET: legs vsavj,vs2 — moments: x — not comparable: y"
 check ERR "legs without a reference" "# SHEET: legs ours — moments: x — not comparable: y"
@@ -117,6 +130,50 @@ rs "a short row" refused "$(mk short "$(printf '%s\n' "$good" | sed '3s/	-$//')"
 rs "an at-row for an undeclared leg" refused "$(mk noleg "$(printf '%s\n' "$good" | sed '4s/	x	50/	y	50/')")"
 rs "an unknown basis" refused "$(mk basis "$(printf '%s\n' "$good" | sed '4s/	ram	/	guess	/')")"
 rs "an unknown role" refused "$(mk role "$(printf '%s\n' "$good" | sed '2s/	ours	/	vsav	/')")"
+# a tap row's env keeps a value's own ';' (read_tap's RTAP joins ranges with it; 14z-205)
+tapf="$(mk tap "$(printf '%s\ntap%sa%sx%stests/lua/read_tap.lua%sRTAP=ff8558,2;ff8506,2;WINDOW=0,10\n' "$good" "$T" "$T" "$T" "$T")")"
+got="$(python3 -c "import sys; sys.path.insert(0, 'tools'); import proof_sheets as p; s = p.read_sheet(sys.argv[1])[0]; e = s['legs']['x']['tap']['env']; print(e['RTAP'] + '|' + e['WINDOW'])" "$(dirname "$tapf")" 2>&1)"
+if [ "$got" = "ff8558,2;ff8506,2|0,10" ]; then ok "a tap env value keeps its own ';': $got"; else nope "a tap env value lost its ';': $got"; fi
+rs "a tap env that starts without NAME=" refused "$(mk tapbad "$(printf '%s\ntap%sa%sx%stests/lua/read_tap.lua%sff8558,2\n' "$good" "$T" "$T" "$T" "$T")")"
+
+echo "== 3b. the page names each gate's own verdict line (tools/proof_sheets.py verdict_line; 14z-205)"
+vl() {  # vl <name> <want> <log text> — want is the line the page must show, or `no verdict line`
+    got="$(printf '%s' "$3" | python3 -c "import sys; sys.path.insert(0, 'tools'); import proof_sheets as p; print(p.verdict_line(sys.stdin.read()))")"
+    if [ "$got" = "$2" ]; then ok "$1: $got"; else nope "$1: got '$got', want '$2'"; fi
+}
+vl "a column-0 verdict" "PASS: a" "  ok: x
+PASS: a"
+vl "the last of two" "FAIL: b (1)" "PASS: a
+FAIL: b (1)"
+vl "a prefixed verdict" "AUDIT PASS (defect state as expected)" "  ok: x
+AUDIT PASS (defect state as expected)"
+vl "a named verdict" "FLICKER ATTRIBUTION: PASS" "FLICKER ATTRIBUTION: PASS"
+vl "a control line is not a verdict" "no verdict line" "CONTROL FIRED: x — the tool would PASS"
+vl "an indented line is not a verdict" "no verdict line" "  ok: PASS"
+
+echo "== 3c. the sheet notes (docs/project/sheet_notes.md, read by tools/proof_sheets.py sheet_notes and note_html; 14z-205)"
+orphans() {  # orphans <notes file> -> every section whose gate has no tests/<gate>.sh
+    python3 -c "import sys; sys.path.insert(0, 'tools'); import proof_sheets as p, os
+for g in sorted(p.sheet_notes(sys.argv[1])):
+    os.path.exists('tests/%s.sh' % g) or print(g)" "$1"
+}
+nnotes="$(python3 -c "import sys; sys.path.insert(0, 'tools'); import proof_sheets as p; print(len(p.sheet_notes(sys.argv[1])))" "$NOTES")"
+orp="$(orphans "$NOTES" | tr '\n' ' ')"
+if [ -z "$orp" ]; then ok "$nnotes note(s), each naming a gate that exists"; else nope "a note names no gate that exists: $orp"; fi
+nh() {  # nh <name> <want substring> <note text>
+    got="$(printf '%s' "$3" | python3 -c "import sys; sys.path.insert(0, 'tools'); import proof_sheets as p; print(p.note_html(sys.stdin.read()))")"
+    case "$got" in *"$2"*) ok "$1" ;; *) nope "$1: got '$got', want it to contain '$2'" ;; esac
+}
+nh "an issue number is a link" '<a href="https://github.com/DefinitelyFrenchName/VampireSaved/issues/191">#191</a>' "built for #191, not"
+nh "bold and code" '<b>Why.</b> see <code>a_b.sh</code>' '**Why.** see `a_b.sh`'
+nh "bullets, with a continued line" '<ul><li>one two</li><li>three</li></ul>' "- one
+  two
+- three"
+nh "two paragraphs" '<p>a</p><p>b</p>' "a
+
+b"
+nh "markup is escaped" '&lt;script&gt;' "<script>"
+nh "an HTML entity's # is not an issue" '&#x27;' "it's"
 
 echo "== 4. tests/lib/sheet.sh assigns only __sheet_ names (sh has no locals)"
 lk="$(leaks "$LIB" | tr '\n' ' ')"
@@ -137,9 +194,14 @@ if census tests "$W/debt2" | command grep -q "^PROBLEM	$L1: declares .* but is s
     vs_ctl_fired debt-regrown "$L1 added back to the debt list is named as a row that should be gone"
 else vs_ctl_dead debt-regrown "$L1 added back to the debt list was not named"; nope "control debt-regrown"; fi
 
+orphan_copy "$W/notes_orphan.md"
+if orphans "$W/notes_orphan.md" | command grep -qx audit_no_such_gate; then
+    vs_ctl_fired orphan-note "a notes copy with a section for audit_no_such_gate is named"
+else vs_ctl_dead orphan-note "a notes copy with a section for a missing gate was not named"; nope "control orphan-note"; fi
+
 leak_copy "$W/leak.sh"
 if [ -n "$(leaks "$W/leak.sh")" ]; then vs_ctl_fired leaky-helper "a copy whose row loop uses _sf is named: $(leaks "$W/leak.sh" | tr '\n' ' ')"
 else vs_ctl_dead leaky-helper "a copy whose row loop uses _sf was not named"; nope "control leaky-helper"; fi
 
-[ "$bad" = 0 ] && { echo "PASS: test_sheet_census — $nl legs, $nr no-reference-leg, $nn none, $nd on the debt list"; exit 0; }
+[ "$bad" = 0 ] && { echo "PASS: test_sheet_census — $nl legs, $nr no-reference-leg, $np no-picture, $nn none, $nd on the debt list"; exit 0; }
 echo "FAIL: test_sheet_census ($bad)"; exit 1

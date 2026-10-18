@@ -166,6 +166,7 @@ history twins and are listed last. Level-0 files are the entry points above.
 - [`porting_sprite_lists.md`](project/porting_sprite_lists.md) — **REFERENCE** · what a tenant port must do so ported effects DRAW: the class row, the missing list type, the per-game code bias, and which gfx bank the art comes f…
 - [`operations.md`](project/operations.md) — **REFERENCE** · OPERATIONS — the tool catalogue ("What exists"), the native-leg recipe and the method sections, moved verbatim out of HANDOFF.md (#282 item B, 14z-201)
 - [`session_close.md`](project/session_close.md) — **REFERENCE** · THE SESSION CLOSE — the one copy of the ritual: its step table, in order, which `tools/close.py` runs (#282 item C, 14z-201)
+- [`sheet_notes.md`](project/sheet_notes.md) — **REFERENCE** · CAPTURE SHEET NOTES — per gate, why its sheet compares the legs it compares and what it does not cover, shown above the gate's pictures (#291, 14z-205)
 - [`session_records.md`](project/session_records.md) — **REFERENCE** · SESSION RECORDS — the full text of CLAUDE.md [VSP-17], [VSP-182] and [VSP-162]: STATE.md, the ticket rules, the session key (#282 item D)
 - [`working_methods.md`](project/working_methods.md) — **REFERENCE** · WORKING METHODS — the full text of CLAUDE.md [VSP-13], [VSP-14], [VSP-20] and the regression runner (#282 item D)
 - [`release_format.md`](project/release_format.md) — **REFERENCE** · the release format (ruled 2026-08-28): one release, one SELF-SUFFICIENT directory per platform (`fbneo/`, `mame/`, `mister/`), the patch set copied…

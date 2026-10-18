@@ -20,6 +20,8 @@
 #   tests/replays/naming/ tools/name_moves.py tools/projectile_census.py tools/run_mame.sh
 #   tools/setup_mame.sh
 #
+# SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
+#
 # Usage: ROMDIR=... [MAME_BIN=...] [FREEZE=1] tests/test_projectile_census.sh
 #   FREEZE=1 (since 14z-160) rewrites the census from the run; re-frozen 14z-160
 #   when the Phobos and Pyron rigs became REAL cursor picks on native vs2

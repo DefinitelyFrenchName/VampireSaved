@@ -12,7 +12,9 @@
 #   (peak delta 0); a leg without seq 0x0E and 0x13 damage is refused; the controls fail.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/field_trace.lua
 #   tests/replays/hui/80_hui_grab_2p.rpl tools/check_grab_victim.py tools/run_mame.sh
-#   tools/setup_mame.sh
+#   tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: the grab onset on each leg (P1 seq 0x0E) and the hold it judges, onset+6 and onset+12 — not comparable: absolute positions (the games differ by a fixed ~21px camera offset; the gate compares the victim's offset from the attacker), each game's stage and palette, and P2's art (Victor, each game's own copy; [VSP-168])
 #
 # THE DEFECT — FIXED 14z-73 (grab_hold_keyframes: H's own vs2 keyframe
 # block 0x0C56AA ported, row 0xBE2BA repointed; patch_index documents this
@@ -113,6 +115,42 @@ echo "== native leg (vsav2)"
 leg native vsav2 ""
 echo "== build leg ($BUILD)"
 leg ours vsavjw "$BUILD/rompath"
+
+# THE SHEET (#291): with SHEET_OUT set, the two legs as this run played them, at the grab onset and through the hold
+# the checker judges (each leg anchored on its own onset), proven on the eleven fields this run traced there. Nothing
+# the gate decides changes: the checker's verdict for the sheet is a second, silent run of it.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on; then
+    python3 "$REPO/tools/check_grab_victim.py" "$WORK" --expect "$EXPECT" --quiet > /dev/null 2>&1 && _gv="matches native (expect $EXPECT): PASS" || _gv="FAIL against expect $EXPECT"
+    sheet_new grab "Phobos's Circuit Scrapper grab on Victor (replay 80): native vs2 above ours" huitzil - \
+        "absolute positions (the games differ by a fixed ~21px camera offset; the gate compares the victim's offset from the attacker), each game's stage and palette, and P2's art (Victor, each game's own copy; [VSP-168])"
+    sheet_leg grab native vs2 vsav2 "$ROMDIR" "$RPL" "$PK" 3400
+    sheet_leg grab ours ours vsavjw "$BUILD/rompath;$ROMDIR" "$RPL" "$PK" 3400
+    python3 - "$WORK" "$FIELDS" "$_gv" > "$WORK/sheet_rows.tsv" <<'PYS'
+import sys
+W, fields, gv = sys.argv[1], sys.argv[2], sys.argv[3]
+spec = {name: "%s:%s" % (a, sz) for a, sz, name in (f.split(":") for f in fields.split(","))}
+tr = {}
+for leg in ("native", "ours"):
+    d = {}
+    for l in open(f"{W}/{leg}/field.txt"):
+        t = l.split()
+        if t and t[0] == "F": d[int(t[1])] = dict(kv.split("=", 1) for kv in t[2:])
+    tr[leg] = d
+on = {leg: min((f for f in tr[leg] if tr[leg][f].get("p1seq") == "14"), default=None) for leg in tr}
+for k, lab in ((0, "the grab onset (P1 seq 0x0E)"), (6, "onset+6, in the hold"), (12, "onset+12, the end of the judged hold")):
+    vals = ", ".join("%s dx=%s" % (leg, (int(tr[leg][on[leg] + k]["p2x"]) - int(tr[leg][on[leg] + k]["p1x"])) if on[leg] is not None and on[leg] + k in tr[leg] else "?") for leg in tr)
+    print("moment\tgrab\to%d\t%s\t%s\t%s" % (k, lab, gv, vals))
+    for leg in ("native", "ours"):
+        if on[leg] is None:
+            continue
+        f = on[leg] + k
+        s = tr[leg].get(f)
+        exp = ",".join("%s=%s" % (spec[n], s[n]) for n in sorted(spec) if n in s) if s else "-"
+        print("at\tgrab\to%d\t%s\t%d\t%s\t%s" % (k, leg, f, "fields" if s else "none", exp))
+PYS
+    sheet_rows "$WORK/sheet_rows.tsv"
+fi
 
 echo
 echo "== the relative-offset A/B (expect: $EXPECT)"

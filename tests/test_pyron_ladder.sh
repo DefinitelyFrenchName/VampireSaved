@@ -17,6 +17,8 @@
 #   tools/force_pick_probe.sh tools/run_mame.sh tools/run_replay_guarded.sh
 #   tools/run_replay_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — the subject is a development-stage build of the M2a/tenant ladder, not a release set; its comparison with vsavj is outside #291's scope (census class S)
+#
 # Pyron is a VARIANT-ID tenant (0x11): no vanilla path can reach his rows,
 # so the stage 1-3 ladder invariant is total (the H-ladder shape).
 # STAGE 4: the generator emits engine-hook sites unconditionally, so its

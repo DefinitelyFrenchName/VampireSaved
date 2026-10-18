@@ -16,7 +16,9 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/fields_m2a.tsv tests/lua/replay.lua
 #   tests/replays/18_veteran_ctl_vsav2.rpl tests/replays/18_veteran_ctl_vsavj.rpl
 #   tests/replays/hui/90_hui_oracle.rpl tools/build_donovan.sh tools/compare_fields.py
-#   tools/run_mame.sh tools/setup_mame.sh
+#   tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: the match-start anchor (lock 1) and each change of P2's HP in the battery window (lock 3a), on each leg — not comparable: each game's stage and palette, and P2's art (each game's own copy; [VSP-168]); the skipped fields (ids, hitbox bases, anim pointers: placement-dependent)
 #
 # ONE replay (tests/replays/hui/90_hui_oracle.rpl) runs on native vsav2
 # (reference binary) and on the ported vsavjw build (WIDE binary) with
@@ -151,6 +153,40 @@ if [ "$mm_hui" -le "$mm_ctl" ]; then
     echo "  ok: ported-Huitzil battery mismatches ($mm_hui) <= veteran control ($mm_ctl)"
 else
     echo "FAIL: ported Huitzil diverges MORE than a native veteran ($mm_hui > $mm_ctl)"; fail=1
+fi
+
+# THE SHEET (#291): with SHEET_OUT set, the two oracle legs (each proven on its own checksum log), the match-start
+# anchor of lock 1 and every P2 HP step of lock 3a. Nothing decided changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on; then
+    sheet_new oracle "Phobos's moveset (replay 90): native vs2 above the WIDE build" huitzil - \
+        "each game's stage and palette, and P2's art (each game's own copy; [VSP-168]); the skipped fields (ids, hitbox bases, anim pointers: placement-dependent)"
+    _sfr="$(awk '$1 ~ /^[0-9]+$/ {n = $1} END {print n}' "$WORK/nat_bat/c.log")"
+    sheet_leg oracle native vs2 vsav2 "$ROMDIR" "$REPO/tests/replays/hui/90_hui_oracle.rpl" "$PK" "$_sfr" "$WORK/nat_bat/c.log"
+    sheet_leg oracle ours ours vsavjw "$RPDIR;$ROMDIR" "$REPO/tests/replays/hui/90_hui_oracle.rpl" "$PK" "$_sfr" "$WORK/por_bat/c.log"
+    if [ "$a_nat" = "$a_por" ] && [ -n "$a_nat" ]; then _sv=IDENTICAL; else _sv=DIFF; fi
+    sheet_moment oracle anchor "the match-start anchor (lock 1)" "$_sv" "native $(echo $a_nat), ours $(echo $a_por)"
+    _sa="$(echo $a_nat | awk '{print $1}')"; [ -n "$_sa" ] && sheet_at oracle anchor native "$_sa" log
+    _sa="$(echo $a_por | awk '{print $1}')"; [ -n "$_sa" ] && sheet_at oracle anchor ours "$_sa" log
+    python3 - "$WORK/nat_bat" "$WORK/por_bat" > "$WORK/sheet_rows.tsv" <<'PYS'
+import glob, sys
+def steps(d):
+    last, out = None, []
+    for p in sorted(glob.glob(f"{d}/dump_*_ff8400.bin"), key=lambda p: int(p.split("_")[-2])):
+        hp = int.from_bytes(open(p, "rb").read()[0x450:0x452], "big")
+        if hp != last:
+            out.append((int(p.split("_")[-2]), hp)); last = hp
+    return out[1:]   # the first sample is the starting HP, not a step
+n, o = steps(sys.argv[1]), steps(sys.argv[2])
+for k in range(max(len(n), len(o))):
+    a, b = (n[k] if k < len(n) else None), (o[k] if k < len(o) else None)
+    v = "IDENTICAL" if a and b and a[1] == b[1] else "DIFF"
+    print("moment\toracle\thp%d\tP2 HP step %d (lock 3a)\t%s\tnative %s, ours %s" % (k + 1, k + 1, v,
+          "%d at f%d" % (a[1], a[0]) if a else "none", "%d at f%d" % (b[1], b[0]) if b else "none"))
+    for leg, x in (("native", a), ("ours", b)):
+        if x: print("at\toracle\thp%d\t%s\t%d\tlog\t-" % (k + 1, leg, x[0]))
+PYS
+    sheet_rows "$WORK/sheet_rows.tsv"
 fi
 
 [ "$fail" = 0 ] && echo "PASS: Huitzil oracle gate" \

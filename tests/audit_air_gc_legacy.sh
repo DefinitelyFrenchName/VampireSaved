@@ -37,7 +37,9 @@
 #   the window and commits in E1 and in E2; all five controls fail.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/air_gc_legacy.tsv
 #   tests/lib/controls.sh tests/lib/decrypt_cache.sh tests/lua/read_tap.lua tools/build_fingerprint.py
-#   tools/run_mame.sh tools/select_paths.py tools/select_wheel.py tools/setup_mame.sh
+#   tools/run_mame.sh tools/select_paths.py tools/select_wheel.py tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vsavj,vs2,ours — moments: per character, its three events (E0 the ground block's guard cancel, at its commit write; E1/E2 the air blocks, at their first tapped write — no window, no commit on a legacy leg; native Phobos, the positive leg, at his air commit), each picture EVENT-PROVEN on that leg's own read-tap log in a window around the write — not comparable: the commit routine's PC (one routine per game, [VSE-8]); each game's stage and palette, and Demitri's art (each game's own copy; [VSP-168]); Phobos has a native vs2 leg only (the positive leg)
 #
 # MUST-FIRE: perturbed-copy: air-window-planted — a copy of the pristine vsavj tap with ONE non-zero +0x158 store planted in E1 must FAIL the no-air-window check, so "no window in the air" is something the reader can refuse (in-gate: the first character's planted copy must count a non-zero air window write; mode: every vsavj leg's tap is planted and the gate FAILs)
 # MUST-FIRE: perturbed-copy: ground-window-removed — a copy of a tap with every +0x158 write removed from E0 must FAIL the ground check, so the air zero is read by an instrument proven to see the window (in-gate: the stripped copy's ground count must be zero; mode: every leg's taps are stripped and the gate FAILs)
@@ -258,6 +260,42 @@ for c in $CHARS; do
         else bad "$c: $leg differs from pristine vsavj"; diff "$W/$c.eq.vsavj" "$W/$c.eq.$leg" | sed 's/^/        /' || true; fi
     done
 done
+
+# THE SHEET (#291, D2): with SHEET_OUT set, each character's legs as this run played them (pristine vsavj, native vs2, ours;
+# Phobos's positive leg on native vs2), each re-run under its own read tap and proven on the events it logged around
+# each event's judged write. Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "${VS_CTL:-}" ]; then
+    _spk="$(pins)"
+    for c in $CHARS; do
+        eval "_sc=\$CHAR_$c"; set -- $_sc; _sid=$1
+        sheet_new "$c" "$c (P1 0x$_sid) against Demitri: the guard-cancel motion from a ground block (E0) and two air blocks (E1, E2)" - "#182" \
+            "the commit routine's PC (one routine per game, [VSE-8]); each game's stage and palette, and Demitri's art (each game's own copy; [VSP-168])$( [ "$c" = phobos ] && echo '; Phobos has a native vs2 leg only (the positive leg)')"
+        for ev in $EVENTS; do
+            _sn="${ev%%:*}"; _st="${ev#*:}"
+            case "$_sn" in E0) _sl="E0 f$_st, the ground block's guard cancel" ;; *) _sl="$_sn f$_st, the air block" ;; esac
+            sheet_moment "$c" "$_sn" "$_sl" "as frozen" "$(for l2 in $(legs_of "$c"); do printf '%s window %s commit %s; ' "$l2" "$(nonzero "$W/$c.$l2.rows" "^$_sn\$" window158)" "$(commits "$W/$c.$l2.rows" "^$_sn\$")"; done)"
+        done
+        for leg in $(legs_of "$c"); do
+            case "$leg" in vsavj) _sr=vsavj; _ss=vsavj; _srp="$ROMDIR"; _srpl="$W/$c.vsavj.rpl" ;;
+                           vsav2) _sr=vs2; _ss=vsav2; _srp="$ROMDIR"; _srpl="$W/$c.vsav2.rpl" ;;
+                           ours)  _sr=ours; _ss=vsavjw; _srp="$BUILD/rompath;$ROMDIR"; _srpl="$W/$c.vsavj.rpl" ;; esac
+            sheet_leg "$c" "$leg" "$_sr" "$_ss" "$_srp" "$_srpl" "$_spk" "$FR"
+            sheet_tap "$c" "$leg" tests/lua/read_tap.lua "RTAP=$RT;WINDOW=0,0;FRAMES=$FR"
+            _stf="$(sheet_file "$c" "$leg.tap" "$W/$c.$leg.txt")"
+            for ev in $EVENTS; do
+                _sn="${ev%%:*}"; _st="${ev#*:}"
+                # the judged write: E0's (and Phobos's air) commit +0x3B5 := 6, else the event's first tapped write
+                _sf="$(awk -v t="$_st" -v c="$c" -v e="$_sn" '$1 == "W" && $2 >= t - 10 && $2 < t + 70 {
+                        if ((e == "E0" || c == "phobos") && $6 == "ff87b4" && substr($8, 7, 2) == "06") { print $2; found = 1; exit }
+                        if (first == "") first = $2 }
+                    END { if (!found && first != "") print first }' "$W/$c.$leg.txt" | head -1)"
+                [ -n "$_sf" ] || continue
+                sheet_at "$c" "$_sn" "$leg" "$((_sf + 1))" event "$_stf:$((_sf - 2))-$((_sf + 2))"
+            done
+        done
+    done
+fi
 
 echo "== 4. must-fire controls"
 if vs_ctl_is air-window-planted || vs_ctl_is ground-window-removed || vs_ctl_is air-commit-planted || vs_ctl_is ground-commit-removed || vs_ctl_is positive-stripped; then

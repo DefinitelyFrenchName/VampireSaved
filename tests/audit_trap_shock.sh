@@ -14,7 +14,9 @@
 #   frame-for-frame identical over the dome window. Pre-fix builds fail by design.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/replay.lua
 #   tests/replays/hui/92_hui_trap_shock.rpl tools/run_mame.sh tools/run_replay_mame.sh
-#   tools/setup_mame.sh
+#   tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: the dome's first hit, the victim's shock install (class, seq7 = 4, freeze) and the last shock sample, on native vs2, the merged build and the solo Phobos build (speed level and RNG pinned) — not comparable: each game's stage and palette, and Victor's art (each game's own copy; [VSP-168]); the solo track's attacker freeze differs from vs2 by ruling (S1)
 #
 # MUST-FIRE: perturbed-copy: attacker-frozen — a copy of the merged leg's dumps with Phobos's +0x5C set to 0x0B at the dome's first hit frame (the pre-fix attacker freeze) must FAIL the merged verdict, so "the attacker is exempt" is read from the merged leg's own RAM (in-gate: the planted rows must be caught; mode: the merged leg's rows are planted before the verdict and the gate FAILs)
 #
@@ -178,9 +180,40 @@ if [r for r in fake if r[2] == EXPECT["solo"][0] and r[4] == 4]:
     errs.append("control PASSED on the pre-fix shape — verdict logic dead")
 else:
     print("  ok: verdict control — pre-fix shape fails as designed")
+# THE SHEET (#291): with SHEET_OUT set, each leg's frames for the three moments this verdict reads; a file only
+import os
+if os.environ.get("SHEET_OUT") and MODE == "":
+    with open(f"{W}/sheet_rows.tsv", "w") as sf:
+        per = {}
+        for leg in ("native", "merged", "solo"):
+            rows = states[leg]; cls = EXPECT[leg][0]
+            hit = [r for r in rows if r[1] < 288]
+            sh = [r for r in hit if r[2] == cls and r[4] == 4 and r[3] >= 0x10]
+            last = [r[0] for r in hit if r[4] == 4]
+            e, _ = verdict(leg, rows)
+            per[leg] = ({"hit": hit[0][0] if hit else None, "shock": sh[0][0] if sh else None,
+                         "last": max(last) if last else None}, "ok" if not e else "FAIL", cls)
+        for mid, label in (("hit", "the dome's first hit"), ("shock", "the shock install (class, seq7 = 4, freeze)"),
+                           ("last", "the last shock sample")):
+            v = ", ".join("%s %s (class %#x)" % (l, per[l][1], per[l][2]) for l in per)
+            fr = ", ".join("%s f%s" % (l, per[l][0][mid]) for l in per)
+            sf.write("moment\ttrap\t%s\t%s\t%s\t%s\n" % (mid, label, "IDENTICAL" if all(per[l][1] == "ok" for l in per) else "DIFF", v + "; " + fr))
+            for l in per:
+                if per[l][0][mid] is not None:
+                    sf.write("at\ttrap\t%s\t%s\t%d\tlog\t-\n" % (mid, l, per[l][0][mid]))
 for e in errs: print("FAIL:", e)
 sys.exit(1 if errs else 0)
 PY
+# THE SHEET (#291): the three legs, each proven on its own checksum log, and the rows the verdict's python wrote.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "$MODE" ] && [ -s "$W/sheet_rows.tsv" ]; then
+    sheet_new trap "Phobos's Plasma Trap dome: native vs2, the merged build, the solo Phobos build" huitzil - \
+        "each game's stage and palette, and Victor's art (each game's own copy; [VSP-168]); the solo track's attacker freeze differs from vs2 by ruling (S1)"
+    sheet_leg trap native vs2 vsav2 "$ROMDIR" "$RPL" "$PK" 3640 "$W/native/ram.log"
+    sheet_leg trap merged ours vsavjw "$MERGED_RP;$ROMDIR" "$RPL" "$PK" 3640 "$W/merged/ram.log"
+    sheet_leg trap solo ours vsavjw "$SOLO_RP;$ROMDIR" "$RPL" "$PK" 3640 "$W/solo/ram.log"
+    sheet_rows "$W/sheet_rows.tsv"
+fi
 [ "$rc" = 0 ] && echo "audit_trap_shock: PASS (dome shock live on both tracks: merged plays vs2's rule, solo keeps the ruled remap)" \
              || echo "audit_trap_shock: FAILURES"
 exit "$rc"

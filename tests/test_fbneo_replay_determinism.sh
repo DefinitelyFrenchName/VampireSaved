@@ -9,6 +9,8 @@
 # EXPECTS: identical logs; a difference is nondeterminism in the harness or the sandbox.
 # FOLLOWS: emu/fbneo-patches/ emu/fbneo/ tools/run_replay_fbneo.sh tools/setup_fbneo.sh
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # Usage: ROMDIR=... tests/test_fbneo_replay_determinism.sh [set] [replay]
 set -eu
 

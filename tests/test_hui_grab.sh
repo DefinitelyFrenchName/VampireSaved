@@ -14,6 +14,8 @@
 #   tests/replays/hui/80_hui_grab_2p.rpl tools/build_donovan.sh tools/run_mame.sh
 #   tools/run_replay_guarded.sh tools/setup_mame.sh
 #
+# SHEET: no-reference-leg — our build against frozen vs2 values, with no vs2 rig in the gate (ruled 2026-10-17: listed, not drawn)
+#
 # Root (measured): recognition was ALWAYS live (probe-proven); the
 # move-start died on x026142's oracle-invisible pcrel escapes — fixed
 # by pcrel_escape_fix. 14z-67: the THROW-ARC fix (site_thunk

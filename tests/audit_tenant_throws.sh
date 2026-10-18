@@ -13,6 +13,8 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/field_trace.lua
 #   tests/replays/judge/02_throw.rpl tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # §4 mandates throw/tech coverage per ported character. The corpus had
 # command grabs (H: 80/Circuit Scrapper, D: 65/96) but NO normal-throw
 # rig for Pyron at all, and no systematic tenant-as-victim legs. This

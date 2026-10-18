@@ -17,6 +17,8 @@
 #   tools/freeze_masked_basis.sh tools/propose_masked_specs.sh tools/run_mame.sh
 #   tools/run_replay_guarded.sh tools/run_replay_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — the subject is a development-stage build of the M2a/tenant ladder, not a release set; its comparison with vsavj is outside #291's scope (census class S)
+#
 # Stage 2 injects Donovan's hitbox + projectile-hitbox blobs and all his
 # per-character value rows; Jedah's code and anim stay (dispatch 00/01 still
 # route through the stage-1 trampolines). The mixture is wrong-but-defined:

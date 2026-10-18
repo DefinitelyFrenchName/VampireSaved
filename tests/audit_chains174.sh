@@ -29,7 +29,9 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/chains174.tsv
 #   tests/lib/controls.sh tests/lib/decrypt_cache.sh tests/lua/field_trace.lua
 #   tests/replays/chains174/ tools/anim_nodes.py tools/build_fingerprint.py tools/chains174_rigs.py
-#   tools/move_parity.py tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh
+#   tools/move_parity.py tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: one per targeted event (spacers apart), two frames after native enters its last target chain, its first divergent frame for a DIFF, each on that leg's own field trace — not comparable: each game's stage and palette, and P2's art (Demitri, each game's own copy; [VSP-168]); each event after a pin starts from the rig's shared position by design
 #
 # MUST-FIRE: perturbed-copy: wrong-target — the entry check run with every event's target replaced by a chain the rig never enters (a:0x7f) must report MISSING for every event, so "enters its target" is something the check can refuse (in-gate: the first tenant's events, each must read MISSING; mode: every tenant's targets replaced, and the gate FAILs)
 # MUST-FIRE: perturbed-copy: order-swapped — the entry check run with every multi-chain target REVERSED (Genocide Vulcan's a2:0x50 then a2:0x29 read as a2:0x29 then a2:0x50) must report those events MISSING, so the check reads the ORDER of the entered chains, not only their presence (in-gate: the first tenant's multi-chain events; mode: every tenant's multi-chain targets reversed, and the gate FAILs) — added 14z-184 on rule-checker run 2026-09-25-308 Q4
@@ -309,6 +311,67 @@ sf=0; sa=0
 for t in $TENANTS; do landing "$t" -1 > "$W/ls.txt" && sf=1; sa=$((sa + $(command grep -c '	AT-F$' "$W/ls.txt" || true))); done
 if [ "$sf" = 0 ] && [ "$sa" = 0 ]; then vs_ctl_fired pins-shifted "every tenant's landing check fails with its pins read one frame early, none read AT-F"
 else vs_ctl_dead pins-shifted "a tenant passed ($sf) or $sa pins still read AT-F with the pins read one frame early" || fail=1; fi
+
+# THE SHEET (#291): with SHEET_OUT set, each tenant's two traced legs as this run played them and one moment per
+# targeted event, each picture proven on the fields that leg traced at that frame. Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "${VS_CTL:-}" ]; then
+    for t in $TENANTS; do
+        fr="$(python3 -c "import json;print(json.load(open('$RIGS/${t}_c174.json'))['frames'])")"
+        base="$(python3 -c "import json;print(';'.join(json.load(open('$RIGS/${t}_c174.json'))['pokes']))")"
+        pins="$(python3 -c "print(f'{2000}-{($fr)-1}:ff8116:06' + ';' + f'{2363}-{(${RNG_UNTIL:-$fr})-1}:ff80d4:${RNG_WORD:-0000}')")"
+        sheet_new "$t" "$t: #174's once never-entered a2 attack chains, one per event, native vs2 above ours" "$t" "#174" \
+            "each game's stage and palette, and P2's art (Demitri, each game's own copy; [VSP-168])"
+        sheet_leg "$t" native vs2 vsav2 "$ROMDIR" "$W/$t.native.rpl" "$base;$pins" "$fr"
+        sheet_leg "$t" ours ours vsavjw "$BUILD/rompath;$ROMDIR" "$W/$t.ours.rpl" "$base;$pins" "$fr"
+        python3 - "$t" "$RIGS/${t}_c174.json" "$W/got.tsv" "$FIELDS" "$W/tr_$t.native.txt" "$W/tr_$t.ours.txt" "$W/an_$t.json" > "$W/sheet_$t.tsv" <<'PYS'
+import json, os, sys
+sys.path.insert(0, "tools")
+import chains174_rigs as c
+t, js, got, fields, trn, tro, anp = sys.argv[1:8]
+spec = {name: "%s:%s" % (a.lower(), sz) for a, sz, name in (f.split(":") for f in fields.split(","))}
+def trace(p):
+    d = {}
+    for l in open(p):
+        f = l.split()
+        if f and f[0] == "F":
+            d[int(f[1])] = dict(kv.split("=", 1) for kv in f[2:])
+    return d
+tr = {"native": trace(trn), "ours": trace(tro)}
+an = json.load(open(anp))["events"] if os.path.exists(anp) else []
+tf = {}
+for k, e in enumerate(an):
+    if e["name"] not in c.TARGET: continue
+    got_ = e.get("entered", []); i, last = 0, None
+    for g in c.TARGET[e["name"]].split():
+        j = next((n for n in range(i, len(got_)) if got_[n]["chain"] == g), None)
+        if j is None: last = None; break
+        i, last = j + 1, got_[j]["frame"]
+    if last is not None: tf[k] = last
+ev = json.load(open(js))["events"]
+for row in (l.rstrip("\n").split("\t") for l in open(got)):
+    if row[0] != "parity" or row[1] != t + "_c174" or len(row) < 8 or row[3].startswith("spacer"):
+        continue
+    k, name, verdict, first, flds, frames = int(row[2]), row[3], row[4], row[5], row[6], row[7]
+    e = ev[k]["frame"]
+    if verdict == "DIFF" and first.lstrip("+-").isdigit():
+        fr, why = e + int(first), "first divergent frame"
+    elif k in tf:
+        fr, why = tf[k] + 2, "two frames into its last target chain"
+    elif frames.isdigit():
+        fr, why = e + int(frames) // 2, "mid-window"
+    else:
+        fr, why = e, "event frame"
+    vals = ("first %s, fields %s" % (first, flds)) if verdict == "DIFF" else "-"
+    print("moment\t%s\te%d\t%s (%s)\t%s\t%s" % (t, k, name, why, verdict, vals))
+    for leg in ("native", "ours"):
+        smp = tr[leg].get(fr)
+        exp = ",".join("%s=%s" % (spec[n], v) for n, v in sorted(smp.items()) if n in spec) if smp else "-"
+        print("at\t%s\te%d\t%s\t%d\t%s\t%s" % (t, k, leg, fr, "fields" if smp else "none", exp))
+PYS
+        sheet_rows "$W/sheet_$t.tsv"
+    done
+fi
 
 if [ "$fail" = 0 ]; then echo "PASS: audit_chains174 — every once never-entered a2 attack chain entered on native and compared with ours, as frozen"
 else echo "FAIL: audit_chains174"; exit 1; fi

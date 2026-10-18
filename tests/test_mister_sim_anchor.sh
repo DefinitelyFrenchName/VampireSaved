@@ -20,6 +20,8 @@
 #   tools/rpl2siminputs.py tools/run_mame.sh tools/run_replay_mame.sh
 #   tools/run_sim_jtcps2.sh tools/setup_jtcores.sh tools/setup_mame.sh
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # SINCE SLICE D1 THE CORE UNDER TEST IS `cps2w`, NOT `cps2`, AND THAT IS THE
 # POINT (14z-107 (6)). cores/cps2w now carries RTL, and the profile it adds is
 # selected at RUNTIME from a spare MRA header byte — so a STOCK vsavj MRA runs

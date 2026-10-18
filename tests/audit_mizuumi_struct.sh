@@ -55,6 +55,8 @@
 #   tests/lua/pokes_spec.lua tests/lua/read_tap.lua tests/replays/ tools/run_mame.sh tools/setup_mame.sh
 #   tools/audit_roms.py docs/checksums.txt tools/build_fingerprint.py tests/expected/registry.tsv
 #
+# SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
+#
 # MUST-FIRE: perturbed-copy: sides-swapped — the checks run with each side's candidate fields read against the other side's HP and X must fail the hit-flag, hit-counter and streak checks, so the checks see which side is which (in-gate on the real traces; as a mode the gate FAILs)
 # MUST-FIRE: known-bad: refutation-pokes — the checks run with the poked 03 leg in place of the real one must fail the +0x15A refutation, and every value poked into +0x130 must read back, so the trace reads both addresses and the refutation could have come out the other way (in-gate; as a mode the gate FAILs)
 # MUST-FIRE: perturbed-copy: roles-inverted — C8 run with each tapped replay's winner and loser swapped, replay 02's checks run with its human and CPU sides swapped, and C9-C14 run with every derived role swapped (winner/loser, human/CPU, AUTO chooser), must fail (C8, C8b, C4, C9, C10, C10b on each of the six KO legs, C11 and C14), so every role statement — 0x027CCC on the winner, 0x031206 on 03's winner only, the +0x39F/+0x3F0/+0x05 writers ram.md attributes to a winner or a loser (C8b), +0x380 2 on the human side, +0x3B0's 0xFF on the KO loser, +0x3B6's 0 on the KO loser and its 0x019152 write on the winner, +0x3B2/+0x3E2 on the AUTO chooser and their writers — is derived (human sides from the input scripts, winners from HP at the first decisive outcome, the AUTO choice from the script), not assumed (in-gate; as a mode the gate FAILs)

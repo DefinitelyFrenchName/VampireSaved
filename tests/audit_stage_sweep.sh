@@ -15,6 +15,8 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua
 #   tests/replays/judge/02_throw.rpl tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # Stage selection is the $FF8100 word (the ladder/venue index,
 # engine_internals "the stage-name banner" section: 12 stages, values
 # 0x00..0x16 even; the twelve are identical at identical values across

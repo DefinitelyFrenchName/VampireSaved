@@ -14,6 +14,8 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua tests/replays/hui/
 #   tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # STATUS (14z-85f): the 14z-85e parity item this was filed against is
 # CLOSED — the divergence was NEVER the scaler (all scaler tables are
 # byte-equivalent between the games) but the ported object-hit damage

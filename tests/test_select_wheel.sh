@@ -18,6 +18,8 @@
 #   tools/check_wheel_walk.py tools/run_mame.sh tools/select_wheel.py tools/setup_mame.sh
 #   tools/wheel_layout.py tools/wheel_positions.py
 #
+# SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
+#
 # WHY THIS EXISTS. The roster plan (option 1: append three cells) rests
 # entirely on how the select cursor moves and what it commits. That
 # mechanism had been recorded in a session log only — one address of it

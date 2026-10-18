@@ -20,6 +20,8 @@
 # FOLLOWS: emu/mame-patches/ tests/expected/vanilla_meter_gain.sha256 tests/lib/controls.sh tests/lib/measures.sh
 #   tests/lua/field_trace.lua tools/cps2_decrypt.py tools/meter_gain.py tools/run_mame.sh
 #   tools/setup_mame.sh tools/vanilla_frames.py tools/vanilla_join_rig.py
+#
+# SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
 # MEASURES: meter-gain-rows — 49 the rows of the measured meter table (49 measured 2026-09-24 on the frozen vanilla_meter_gain.sha256; the out-of-tree copy's 51 lines include its two header lines); an empty table hashes too, which is the M19 shape this floor refuses
 #
 # MUST-FIRE: perturbed-copy: perturbed-net — SA 5MP's net meter gain moved by one in a copy of the measured table must fail law A (mode: section A-D runs the real verdict on that perturbed table and must fail)

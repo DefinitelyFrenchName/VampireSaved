@@ -13,6 +13,8 @@
 #   tests/replays/hui/70_hui_mash.rpl tools/build_donovan.sh tools/run_mame.sh
 #   tools/run_replay_guarded.sh tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # The full behavioral chain, guarded, on the REAL packed set: builds stage
 # 4, forces id 0x10 through the vanilla select flow, then runs the chaos
 # soak (tests/replays/hui/70_hui_mash.rpl — QCF/QCB/DP/charges/pairs, the

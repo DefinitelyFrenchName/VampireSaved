@@ -9,6 +9,8 @@
 # EXPECTS: all members (OK), emulation running for the whole soak.
 # FOLLOWS: emu/fbneo-patches/ emu/fbneo/ tools/run_fbneo.sh tools/setup_fbneo.sh
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # Usage: ROMDIR=/path/to/roms tests/test_fbneo_smoke.sh [set] [seconds]
 # PASS = all ROM members load OK, emulation starts, and the process is still
 # alive after the soak period (we kill it ourselves).

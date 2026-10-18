@@ -13,6 +13,8 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/obj_records_dump.lua tests/replays/
 #   tools/gfx_tiles.py tools/run_mame.sh tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # WHY. A tenant's gfx remap rewrites tile codes in a band from the source
 # bank to group C. If a tile inside that band was never COPIED — because
 # the OBJ-record walk that builds the copy inventory follows pointers and

@@ -2,8 +2,11 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 292
+# issues: 295
 number	state	reason	closed	labels	title
+295	OPEN	-	-	evolution,severity: medium,test-integrity	audit_dmg_legacy_sweep never runs Demitri's legacy hits on our build: add an exact vsavj-vs-ours leg (superset coverage)
+294	OPEN	-	-	cosmetic,parked	Killshread's shock/electrocuted state has wrong palette (currently accepted tradeoff) - parked
+293	OPEN	-	-	bug,severity: medium,test-integrity	Two gates hand one MAME sandbox to several runs, so a later run boots on carried nvram (audit_flicker_attribution, audit_legacy_pairings)
 292	OPEN	-	-	bug,performance,severity: high	static_confirm: a tool's self-test strings count as a direct read (battery_reach names STATE.md), so 22 gates re-run with controls at every commit
 291	OPEN	-	-	evolution	On demand, at a given tag or commit: comparative capture sheets (ours vs vsavj and/or vs2) for every comparing test, as a visual proof of accuracy for humans
 290	CLOSED	COMPLETED	2026-10-17	evolution,severity: high	A deterministic guard: no commit or push on a tier that did not read GREEN (replaces the procedure check's one recurring catch)

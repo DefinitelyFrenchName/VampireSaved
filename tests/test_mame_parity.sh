@@ -18,6 +18,8 @@
 # FOLLOWS: emu/mame-patches/ tests/expected/vsavj/ tests/expected/mame_parity_ab.tsv
 #   tests/lib/controls.sh tests/lua/replay.lua tests/replays/ tools/run_mame.sh tools/run_replay_mame.sh
 #   tools/setup_mame.sh
+#
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
 # MUST-FIRE: perturbed-copy: wrong-hash — the first frozen reference row's hash with one hex digit changed must FAIL the comparison its real log passed, so section 1b's verdict can refuse a log (in-gate: the perturbed hash against the real log must mismatch; mode: every row of the table is perturbed and the gate FAILs)
 #
 # THE FROZEN REFERENCE TABLE (14z-187b, 2026-10-01; the maintainer: "option A and pin mame"):

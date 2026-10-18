@@ -27,7 +27,9 @@
 #   retired into build/manifest/donovan.toml's `facing_rule5` row) and re-froze the leg and build5 rows. Both controls fail the gate.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/facing_sweep.tsv tests/lib/controls.sh
 #   tests/lua/facing_tap.lua tests/replays/naming/ tools/build_fingerprint.py tools/facing_sweep.py
-#   tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh
+#   tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: per geometry, each of native's rule-5 facing stores (the Summon's contacts, PC 0x0171E0), at that frame on both legs, each picture EVENT-PROVEN on that leg's facing tap in a window around the contact — not comparable: each game's stage and palette, and Demitri's art (each game's own copy; [VSP-168]); the writer PCs (ours writes from the thunk's placement)
 #
 # MUST-FIRE: perturbed-copy: flip — native's rule-5 values inverted before the node table must change the node rows and FAIL, so the node table is read from native's writes (in-gate: the reader with the plant must print different node rows; mode: the gate's own read carries the plant and FAILs)
 # MUST-FIRE: perturbed-copy: perturb — the last write of the build's L_60 leg (and its build5 value on native's last rule-5 frame) XORed with 1 must change that leg's row and FAIL, so the leg rows compare the build's own writes (in-gate: the reader with the plant must print a different L_60 row; mode: the gate's own read carries the plant and FAILs)
@@ -136,6 +138,44 @@ fi
 command grep -v '^#' "$EXPECT" > "$W/want.tsv"
 if diff "$W/want.tsv" "$W/got.tsv" > "$W/diff.txt"; then ok "$(wc -l < "$W/got.tsv" | tr -d ' ') rows as frozen"
 else bad "rows differ from $(basename "$EXPECT"):"; sed 's/^/        /' "$W/diff.txt" | head -30; fi
+
+# THE SHEET (#291, D2): with SHEET_OUT set, one sheet per geometry, both legs re-run under facing_tap.lua by the tool,
+# one moment per native rule-5 store, EVENT-PROVEN on each leg's own tap around it. Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "${VS_CTL:-}" ]; then
+    for d in 60 70 80 90 a0 b0 c0 d0 e0 f0 100 110 120 130 140 150; do
+        l="$(printf '%04x' $((0x1f3 + 0x$d)))"; r="$(printf '%04x' $((0x343 - 0x$d)))"
+        for sd in L R; do
+            g="${sd}_$d"
+            if [ "$sd" = L ]; then _snr="$R"; _sor="$W/ours.rpl"; _spk="$(pk ff8410=01f3 ff8810=$l)"
+            else _snr="$W/native_mirror.rpl"; _sor="$W/ours_mirror.rpl"; _spk="$(pk ff8410=0343 ff8810=$r)"; fi
+            sheet_new "$g" "Killshread Summon (ES), geometry $g: native vs2 above ours" donovan "#159" \
+                "each game's stage and palette, and Demitri's art (each game's own copy; [VSP-168]); the writer PCs (ours writes from the thunk's placement)"
+            sheet_leg "$g" native vs2 vsav2 "$ROMDIR" "$_snr" "$_spk" "$FR"
+            sheet_leg "$g" ours ours vsavjw "$BUILD/rompath;$ROMDIR" "$_sor" "$_spk" "$FR"
+            for s in native ours; do
+                sheet_tap "$g" "$s" tests/lua/facing_tap.lua "RTAP=ff885c,2;WINDOW=$FROM,$FR;FRAMES=$FR"
+                sheet_file "$g" "$s.tap" "$W/w_${s}_$g.txt" > /dev/null
+            done
+            python3 - "$g" "$W/w_native_$g.txt" "$W/got.tsv" > "$W/sheet_$g.tsv" <<'PYS'
+import sys
+g, tap, got = sys.argv[1:4]
+rows = [l.rstrip("\n").split("\t") for l in open(got)]
+legrow = next((r for r in rows if r[0] == "leg" and r[1] == g), None)
+r5 = next((r[2] for r in rows if r[0] == "rule5" and r[1] == g), "-")
+b5 = next((r[2].split(",") for r in rows if r[0] == "build5" and r[1] == g), [])
+fr = [int(t[1]) for t in (l.split() for l in open(tap)) if t and t[0] == "W" and t[3] == "0171e0" and t[9] == "000000ff"]
+verdict = (legrow[8] + " (every write of the leg, write for write)") if legrow else "no leg row"
+for k, f in enumerate(fr):
+    nv = r5[k] if k < len(r5) else "?"; bv = b5[k] if k < len(b5) else "-"
+    print("moment\t%s\tc%d\tcontact %d (native rule-5 store)\t%s\tfacing: native %s, ours %s" % (g, k + 1, k + 1, verdict, nv, bv))
+    for s in ("native", "ours"):   # facing_tap labels an access N: it is replay.lua's frame N+1
+        print("at\t%s\tc%d\t%s\t%d\tevent\tfiles/%s.%s.tap:%d-%d" % (g, k + 1, s, f + 1, g, s, f - 1, f + 1))
+PYS
+            sheet_rows "$W/sheet_$g.tsv"
+        done
+    done
+fi
 
 echo "== 3. must-fire controls"
 if [ -n "$_plant" ]; then

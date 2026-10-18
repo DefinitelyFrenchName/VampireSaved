@@ -13,6 +13,8 @@
 #   tests/replays/11_pick_donovan.rpl tools/run_mame.sh tools/run_replay_mame.sh
 #   tools/setup_mame.sh
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # WHY IT MATTERS. The mask string IS the definition of the ratified comparison
 # basis (CLAUDE.md §4, docs/game/atlas/ram.md). Every `.masked` expectation
 # cites one. freeze_masked_basis.sh grew three guards in 14z-89 because a

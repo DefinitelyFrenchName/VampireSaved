@@ -16,6 +16,8 @@
 #   tests/replays/ tools/pack_build.sh tools/patch_prg.py tools/run_mame.sh
 #   tools/setup_mame.sh
 #
+# SHEET: none — the subject is a development-stage build of the M2a/tenant ladder, not a release set; its comparison with vsavj is outside #291's scope (census class S)
+#
 # Experiment: repoint vsavj Jedah's (slot 0x0F) hitbox-base entry in table
 # PRG:0x0BD97A to Demitri's (slot 0x01, 0x093B6A). Then:
 #   1. in a live match, picking Jedah loads 0x093B6A at RAM:$FF8460;

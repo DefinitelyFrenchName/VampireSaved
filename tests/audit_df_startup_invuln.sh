@@ -18,7 +18,9 @@
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/df_startup_invuln.tsv
 #   tests/lib/controls.sh tests/lib/decrypt_cache.sh tests/lua/field_trace.lua
 #   tests/replays/df/97_df_mech.rpl tests/replays/df/98_df_startup_contact.rpl
-#   tools/run_mame.sh tools/setup_mame.sh tools/vanilla_join_rig.py
+#   tools/run_mame.sh tools/setup_mame.sh tools/vanilla_join_rig.py tests/lib/sheet.sh
+#
+# SHEET: legs vsavj,vs2,ours — moments: per leg of the trace section, the Dark Force entry, the first armed +0x147 sample and its first zero (the shells pristine above merged; Donovan native vs2 above the tenants on the merged build), and per contact leg Victor's 5HP active frame inside and outside the window — not comparable: native vs2's leg enters Dark Force POWER (P+K), a different mode with no observable window ([VSE-69]); the contact legs are judged against the ruled expectation, not against a reference leg; each game's stage and palette
 #
 # MUST-FIRE: perturbed-copy: perturbed-frozen-arm — a perturbed frozen arm value must be caught by the trace compare (mode: the frozen baseline is perturbed and the measured trace no longer matches it, so the gate FAILs)
 #
@@ -158,7 +160,7 @@ if [ "$SECTION" = contact ] || [ "$SECTION" = all ]; then
 fi
 wait
 
-python3 - "$W" "$EXP" "$SECTION" "$FREEZE" "$REPO" "$MODE" <<'PY' || { echo "FAIL: DF startup invulnerability audit"; exit 1; }
+if python3 - "$W" "$EXP" "$SECTION" "$FREEZE" "$REPO" "$MODE" <<'PY'
 import sys, os
 from pathlib import Path
 W, EXP, SECTION, FREEZE, REPO = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4] == "1", sys.argv[5]
@@ -328,4 +330,94 @@ if SECTION in ("contact", "all"): print("CONTACT — the hit test honours +0x147
 for e in errs: print("  FAIL:", e)
 sys.exit(1 if errs else 0)
 PY
+then _pyfail=0; else _pyfail=1; fi
+
+# THE SHEET (#291): with SHEET_OUT set, every leg as this run played it at the moments its verdict reads, proven on the
+# fields this run traced there (the frames re-derived from the same traces by the verdict's own definitions). Nothing
+# the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "$MODE" ]; then
+    [ "$_pyfail" = 0 ] && _sv="as frozen / as ruled" || _sv="FAIL (the gate's lines name it)"
+    if [ "$SECTION" = trace ] || [ "$SECTION" = all ]; then
+        for id in 00 01 03; do
+            [ -d "$W/v_$id" ] && [ -d "$W/m_$id" ] || continue
+            sheet_new "shell_$id" "Dark Force startup window, shell 0x$id: vanilla vsavj above the merged build" - - \
+                "nothing by design (legacy content under the superset invariant: the traces must be byte-identical)"
+            sheet_leg "shell_$id" "v_$id" vsavj vsavj "$ROMDIR" "$RPL97" "$(pk_char "$id")" 3600
+            sheet_leg "shell_$id" "m_$id" ours vsavjw "$MERGED" "$RPL97" "$(pk_char "$id")" 3600
+        done
+        sheet_new tenants "Dark Force startup window: native vs2 Donovan above the three tenants on the merged build" donovan,huitzil,pyron - \
+            "native vs2's leg enters Dark Force POWER (P+K), a different mode with no observable window ([VSE-69]); each tenant is judged against its own frozen vs2 window; each game's stage and palette"
+        [ -d "$W/n_13" ] && sheet_leg tenants n_13 vs2 vsav2 "$ROMDIR" "$RPL97" "$(pk_char 13)" 3600
+        for id in 13 10 11; do [ -d "$W/m_$id" ] && sheet_leg tenants "m_$id" ours vsavjw "$MERGED" "$RPL97" "$(pk_char "$id")" 3600; done
+    fi
+    if [ "$SECTION" = contact ] || [ "$SECTION" = all ]; then
+        sheet_new contact "The hit test honours +0x147: Victor's 5HP inside and outside the window, on the merged build" donovan,huitzil,pyron - \
+            "judged against the ruled expectation (IN refused, OUT landing), not against a reference leg; Phobos's leg (0x10) is reported only — his Dark Force is a flight mode"
+        for id in ${CONTACT_LEGS:-01 13 11 10}; do
+            PK="1400:ff8782:$id;1450:ff8782:$id;1500:ff8782:$id;1400:ff8b82:03;1450:ff8b82:03;1500:ff8b82:03"
+            PK="$PK;3100:ff8509:03;3120:ff8509:03;4100:ff8509:03;4120:ff8509:03"
+            PK="$PK;3030:ff8410:0228;3030:ff8810:02d8;4030:ff8410:0228;4030:ff8810:02d8"
+            PK="$PK;3240:ff8450:01200120;4240:ff8450:01200120"
+            [ -d "$W/c_$id" ] && sheet_leg contact "c_$id" ours vsavjw "$MERGED" "$RPL98" "$PK" 4600
+        done
+    fi
+    python3 - "$W" "$REPO" "$_sv" "$SECTION" > "$W/sheet_rows.tsv" <<'PYS'
+import sys, os
+from pathlib import Path
+W, REPO, sv, SECTION = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+sys.path.insert(0, os.path.join(REPO, "tools"))
+F1 = {"df": "ff802e:b", "inv": "ff8547:b", "thr": "ff8543:b", "seq": "ff8406:b", "sub": "ff8407:b"}
+F2 = {"df": "ff802e:b", "inv": "ff8547:b", "p1hp": "ff8450:w", "p1seq": "ff8406:b", "p2node": "ff881c:l",
+      "p2seq": "ff8806:b", "p1x": "ff8410:w", "p2x": "ff8810:w", "p1y": "ff8414:w"}
+T = 3260
+def samples(leg):
+    rows = {}
+    for ln in (Path(W) / leg / "field.txt").read_text().splitlines():
+        f = ln.split()
+        if len(f) >= 3 and f[0] == "F": rows[int(f[1])] = {k: int(v) for k, v in (p.split("=", 1) for p in f[2:])}
+    return rows
+def at(sid, mid, leg, f, rows, spec):
+    s = rows.get(f)
+    exp = ",".join("%s=%d" % (spec[k], s[k]) for k in sorted(spec) if k in s) if s else "-"
+    print("at\t%s\t%s\t%s\t%d\t%s\t%s" % (sid, mid, leg, f, "fields" if s else "none", exp))
+def marks(rows):
+    fr = sorted(f for f in rows if T - 5 <= f <= T + 260)
+    df = next((f for f in fr if rows[f]["df"] == 1), None)
+    f0 = next((f for f in fr if rows[f]["inv"] != 0), None)
+    z = next((f for f in fr if f0 is not None and f > f0 and rows[f]["inv"] == 0), None)
+    return df, f0, z
+def trace_sheet(sid, legs):
+    have = [l for l in legs if (Path(W) / l / "field.txt").exists()]
+    rs = {l: samples(l) for l in have}
+    mk = {l: marks(rs[l]) for l in have}
+    ref = next((mk[l] for l in have if mk[l][1] is not None), (T, T, T))
+    for k, lab in ((0, "the Dark Force entry ($FF802E = 1)"), (1, "the first armed +0x147 sample (the window)"), (2, "+0x147 first back at zero (the window's end)")):
+        frames = {l: (mk[l][k] if mk[l][k] is not None else (ref[k] if ref[k] is not None else T)) for l in have}
+        vals = ", ".join("%s inv=%s f%d" % (l, rs[l].get(frames[l], {}).get("inv", "?"), frames[l]) for l in have)
+        print("moment\t%s\tm%d\t%s\t%s\t%s" % (sid, k, lab, sv, vals))
+        for l in have: at(sid, "m%d" % k, l, frames[l], rs[l], F1)
+if SECTION in ("trace", "all"):
+    for i in ("00", "01", "03"):
+        if (Path(W) / f"v_{i}").exists() and (Path(W) / f"m_{i}").exists(): trace_sheet(f"shell_{i}", [f"v_{i}", f"m_{i}"])
+    trace_sheet("tenants", ["n_13", "m_13", "m_10", "m_11"])
+if SECTION in ("contact", "all"):
+    import vanilla_join_rig
+    nm = vanilla_join_rig.node_map((Path(W) / "vj_data.bin").read_bytes(), 0x03, detail=True)
+    legs = sorted(d.name for d in Path(W).iterdir() if d.name.startswith("c_") and (d / "field.txt").exists())
+    rs = {l: samples(l) for l in legs}
+    for t, lab in ((3260, "IN: Victor's 5HP active inside the window (P1's HP must not move)"), (4260, "OUT: Victor's 5HP active outside it (P1's HP must drop)")):
+        frames = {}
+        for l in legs:
+            fr = sorted(f for f in rs[l] if t - 30 <= f <= t + 200)
+            atk = [f for f in fr if f >= t and (nm.get(rs[l][f]["p2node"]) or (None,))[0] in {"a2:0x04", "a2:0x05"}]
+            act = [f for f in atk if nm[rs[l][f]["p2node"]][2]]
+            frames[l] = act[0] if act else t
+        vals = ", ".join("%s hp=%s inv=%s f%d" % (l, rs[l].get(frames[l], {}).get("p1hp", "?"), rs[l].get(frames[l], {}).get("inv", "?"), frames[l]) for l in legs)
+        print("moment\tcontact\t%s\t%s\t%s\t%s" % ("in" if t == 3260 else "out", lab, sv, vals))
+        for l in legs: at("contact", "in" if t == 3260 else "out", l, frames[l], rs[l], F2)
+PYS
+    sheet_rows "$W/sheet_rows.tsv"
+fi
+[ "$_pyfail" = 0 ] || { echo "FAIL: DF startup invulnerability audit"; exit 1; }
 echo "PASS: DF startup invulnerability audit"

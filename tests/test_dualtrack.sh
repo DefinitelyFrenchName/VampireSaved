@@ -13,6 +13,8 @@
 # FOLLOWS: build/manifest/ docs/game/atlas/ram.md emu/fbneo-patches/ emu/fbneo/
 #   tests/lib/controls.sh tests/replays/ tools/run_replay_fbneo.sh tools/setup_fbneo.sh
 #
+# SHEET: none — compares builds of ours with each other (A/B, merged vs solo, stock vs WIDE), not with a reference set
+#
 # MUST-FIRE: known-bad: stray-byte-growth — a byte differing before a replay's frozen onset OUTSIDE the six frozen execution-position offsets is GROWTH, not a flicker, and must move the STATE onset earlier (mode: such a byte is flipped in a REAL pre-onset WIDE dump so a legacy replay's onset moves earlier and the gate FAILs)
 #
 # The dual-track decision (14z-59g) keeps a stock-size build alongside the

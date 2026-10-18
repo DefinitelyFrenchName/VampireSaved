@@ -53,6 +53,8 @@
 #   tests/replays/118_chain.rpl tests/replays/118_input_sweep.rpl tools/run_mame.sh tools/setup_mame.sh
 #   tools/audit_roms.py docs/checksums.txt tools/build_fingerprint.py tests/expected/registry.tsv
 #
+# SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
+#
 # MUST-FIRE: perturbed-copy: previous-press-key — A1 judged against each press's PREVIOUS press must fail (in-gate); as a mode A1 uses it and the gate FAILs
 # MUST-FIRE: perturbed-copy: hit-vs-start — A2 counted against landed hits instead of attack starts must fail (in-gate); as a mode A2 uses it and the gate FAILs
 # MUST-FIRE: perturbed-copy: writes-shifted — A2 with every +0x1B8 write moved 20 frames later (beyond the 1-frame pairing window) must fail (in-gate); as a mode A2 uses the moved writes and the gate FAILs

@@ -17,6 +17,8 @@
 #   tests/lua/replay_guard.lua tests/replays/ tools/run_mame.sh tools/run_replay_guarded.sh
 #   tools/setup_mame.sh
 #
+# SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
+#
 # MUST-FIRE: known-bad: known-crash — the 14z-93 vec4 tripwire on build/hui41 + 26_don_arcade_mash must reproduce a crash (mode: the gate runs that rig with the late pick frames and must FAIL; REFUSES with exit 3 if build/hui41 or the replay is absent)
 #
 # WHY IT EXISTS. The suite's comparison gates see divergence, not vectors;

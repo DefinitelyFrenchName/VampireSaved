@@ -16,7 +16,9 @@
 #   and exception-free; the planted pre-fix shape fails. A red is the remap class back.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/column_shock.tsv
 #   tests/lua/field_trace.lua tests/lua/read_tap.lua tests/replays/naming/ tools/name_moves.py
-#   tools/run_mame.sh tools/setup_mame.sh
+#   tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: the column's timeline on each leg (the special, each hit, Donovan's and the victim's return to neutral), the column KO's death frame, and the first hit on the airborne victim, each on that leg's own field trace — not comparable: each game's stage and palette, and P2's art (Demitri, each game's own copy; [VSP-168]); the +0x5C write taps are not drawn (read taps prove no frame), their hit frames are the timeline's
 #
 # MUST-FIRE: perturbed-copy: air-marker — our AIR row (section 1c, the column on an airborne victim) with the GROUND case's marker 0x38 in place of the air stager's class 7 must differ from native's row and FAIL, so the air case is shown measured on the victim's class, not assumed from the ground case (in-gate: the perturbed row must differ; mode: our row is rewritten and the gate FAILs) — 14z-181, #163
 # MUST-FIRE: perturbed-copy: old-shock — a copy of our rows with the pre-fix mechanism planted (the victim's hit writes 24 -> 12, a 4 written to Donovan's +0x5C at each hit — the 14z-42 Lightning Sword values the column took until 14z-170) must FAIL the native-equality check, so "equal to native" is a comparison of the two legs' writes (in-gate: the planted copy must be caught; mode: our rows are planted before the checks and the gate FAILs)
@@ -318,6 +320,70 @@ echo "== 3. must-fire control"
 if [ "$CONTROL" = old-shock ]; then
     if [ "$fail" = 1 ]; then echo "CONTROL FIRED: old-shock — the planted pre-fix mechanism fails the gate"; echo "FAIL: audit_column_shock (control mode)"; exit 1
     else echo "CONTROL DEAD: old-shock — the planted rows passed"; echo "FAIL: audit_column_shock"; exit 1; fi
+fi
+
+# THE SHEET (#291): with SHEET_OUT set, the three field-traced leg pairs this run judged (the timeline, the KO, the
+# airborne hit) and their moments, each picture proven on that leg's own trace at that frame. Nothing decided changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "$CONTROL" ]; then
+    _nc="each game's stage and palette, and P2's art (Demitri, each game's own copy; [VSP-168])"
+    sheet_new column "Killshread Lightning [MP] column ($PART event 1): the move's timeline, native vs2 above ours" donovan "#136" "$_nc"
+    sheet_leg column native vs2 vsav2 "$ROMDIR" "$W/native.rpl" "$pk_t" 2990
+    sheet_leg column ours ours vsavjw "$ORP" "$W/ours.rpl" "$pk_t" 2990
+    sheet_new ko "Killshread Lightning column KO (P2 poked to 1 HP): native vs2 above ours" donovan "#136" "$_nc"
+    sheet_leg ko native vs2 vsav2 "$ROMDIR" "$W/native.rpl" "$(pokes_for "$j" 3100);2826:ff8850:0001;2826:ff8852:0001;2830:ff8850:0001;2830:ff8852:0001" 3100
+    sheet_leg ko ours ours vsavjw "$ORP" "$W/ours.rpl" "$(pokes_for "$j" 3100);2826:ff8850:0001;2826:ff8852:0001;2830:ff8850:0001;2830:ff8852:0001" 3100
+    sheet_new air "Killshread Lightning column on an AIRBORNE victim (P2 jumps at 2826): native vs2 above ours" donovan "#163" "$_nc"
+    sheet_leg air native vs2 vsav2 "$ROMDIR" "$W/air_native.rpl" "$(pokes_for "$j" 2990)" 2990
+    sheet_leg air ours ours vsavjw "$ORP" "$W/air_ours.rpl" "$(pokes_for "$j" 2990)" 2990
+    python3 - "$W" > "$W/sheet_rows.tsv" <<'PYS'
+import sys
+W = sys.argv[1]
+SPEC = {"t": "ff8406:b:seq,ff845c:b:frz,ff8806:b:p2seq,ff885c:b:p2frz,ff8850:w:p2hp",
+        "k": "ff8854:b:cls,ff8850:w:hp,ff8852:w:white,ff8807:b:sub,ff891f:b:dead,ff0000:w:exc,ff8406:b:p1seq",
+        "a": "ff8406:b:seq,ff845c:b:frz,ff8806:b:p2seq,ff8807:b:p2sub,ff8854:b:p2cls,ff885c:b:p2frz,ff8850:w:p2hp,ff8814:w:p2y"}
+def load(p, spec):
+    key = {name: "%s:%s" % (a.lower(), sz) for a, sz, name in (f.split(":") for f in spec.split(","))}
+    d = {}
+    for l in open(p):
+        t = l.split()
+        if t and t[0] == "F":
+            d[int(t[1])] = ",".join("%s=%s" % (key[k], v) for k, v in sorted(kv.split("=", 1) for kv in t[2:]) if k in key)
+    return d
+def at(sid, mid, leg, fr, d):
+    print("at	%s	%s	%s	%d	%s	%s" % (sid, mid, leg, fr, "fields" if fr in d else "none", d.get(fr, "-")))
+rows = [l.rstrip("\n").split("\t") for l in open(W + "/got.tsv")]
+tl = {r[1]: dict(x.split("=", 1) for x in r[2:]) for r in rows if r[0] == "timeline"}
+same = "IDENTICAL" if tl.get("native") == tl.get("ours") and tl.get("native") else "DIFF"
+tr = {leg: load("%s/%s.ft" % (W, leg), SPEC["t"]) for leg in ("native", "ours")}
+fr = {leg: [("special", int(tl[leg]["special"]))] + [("hit %d" % (i + 1), int(h)) for i, h in enumerate(tl[leg]["hits"].split(","))]
+           + [("Donovan back to neutral", int(tl[leg]["p1_neutral"])), ("the victim back to neutral", int(tl[leg]["p2_neutral"]))]
+      for leg in tl}
+n = max(len(v) for v in fr.values())
+for i in range(n):
+    lab = (fr.get("native") or fr["ours"])[min(i, len(fr.get("native") or fr["ours"]) - 1)][0]
+    vals = ", ".join("%s f%d" % (leg, fr[leg][i][1]) for leg in ("native", "ours") if leg in fr and i < len(fr[leg]))
+    print("moment\tcolumn\tt%d\t%s (the timeline: %s)\t%s\t%s" % (i, lab, "equal" if same == "IDENTICAL" else "differs", same, vals))
+    for leg in ("native", "ours"):
+        if leg in fr and i < len(fr[leg]): at("column", "t%d" % i, leg, fr[leg][i][1], tr[leg])
+ko = {r[1]: dict(x.split("=", 1) for x in r[2:]) for r in rows if r[0] == "ko"}
+if ko:
+    kt = {leg: load("%s/ko_%s.ft" % (W, leg), SPEC["k"]) for leg in ("native", "ours")}
+    v = "IDENTICAL" if kt["native"] == kt["ours"] else "DIFF"
+    print("moment\tko\tk\tthe column KOs the victim (death flag set; class %s)\t%s\t%s" % (
+        ko.get("ours", {}).get("cls", "?"), v, ", ".join("%s f%s" % (l, ko[l]["ko_frame"]) for l in ("native", "ours") if l in ko)))
+    for leg in ("native", "ours"):
+        if leg in ko: at("ko", "k", leg, int(ko[leg]["ko_frame"]), kt[leg])
+air = {r[1]: dict(x.split("=", 1) for x in r[2:]) for r in rows if r[0] == "air"}
+if air:
+    at_ = {leg: load("%s/air_%s.ft" % (W, leg), SPEC["a"]) for leg in ("native", "ours")}
+    v = "IDENTICAL" if air.get("native") == air.get("ours") else "DIFF"
+    print("moment\tair\th\tfirst hit on the airborne victim (height %s; class steps %s)\t%s\t-" % (
+        air.get("ours", {}).get("y_at_hit", "?"), air.get("ours", {}).get("cls", "?"), v))
+    for leg in ("native", "ours"):
+        if leg in air: at("air", "h", leg, int(air[leg]["hits"].split(",")[0]), at_[leg])
+PYS
+    sheet_rows "$W/sheet_rows.tsv"
 fi
 
 if [ "$fail" = 0 ]; then echo "PASS: audit_column_shock"; else echo "FAIL: audit_column_shock"; exit 1; fi

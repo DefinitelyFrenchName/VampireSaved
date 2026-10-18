@@ -26,7 +26,9 @@
 #   tried — GitHub #175), the solo Phobos track.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/trap_airborne.tsv
 #   tests/lua/field_trace.lua tests/replays/hui/92_hui_trap_shock.rpl tools/run_mame.sh
-#   tools/setup_mame.sh tests/lib/controls.sh
+#   tools/setup_mame.sh tests/lib/controls.sh tests/lib/sheet.sh
+#
+# SHEET: legs vs2,ours — moments: the jump's take-off, its apex, the last airborne frame and the landing frame the dome hits on, each on each leg's own frame — not comparable: each game's stage and palette, and P2's art (Victor, each game's own copy; [VSP-168]); the class byte differs by ruling (0x52 native, the marker 0x38 ours)
 #
 # MUST-FIRE: perturbed-copy: air-class — a copy of the merged leg's rows with the victim's class steps rewritten to the air stager's 7 (what a dome hit routed to the AIR case would read) must FAIL the frozen compare, so "the dome takes the ground path" is read from the rows, not assumed (in-gate: the perturbed copy must differ from the frozen rows; mode: the merged rows are rewritten and the compare FAILs)
 # MUST-FIRE: perturbed-copy: air-hit — a copy of the merged leg's rows with the first hit moved INSIDE the airborne span (hit = the span's first frame + 10, y 95 -> 100) must FAIL the landing-frame clause of the same check (y > 40 the frame before, 40 at the hit, hit == landing), so a dome that DID connect in the air could not pass as a landing hit — the clause the conclusion rests on, exercised on its own (in-gate: the perturbed copy must fail the check; mode: the merged rows are rewritten and the check FAILs)
@@ -188,6 +190,46 @@ if cmp -s "$W/want.tsv" "$W/rows.tsv"; then ok "every row as frozen"; else bad "
 if [ -z "${VS_CTL:-}" ]; then
     if cmp -s "$W/want.tsv" "$W/rows_pert.tsv"; then vs_ctl_dead air-class "the merged rows with the air stager's class still match the frozen rows"; fail=1
     else vs_ctl_fired air-class "the merged rows with the air stager's class 7 in place of the marker differ from the frozen rows"; fi
+fi
+# THE SHEET (#291): with SHEET_OUT set, the two legs this verdict compared and the jump's moments on each leg (take-off,
+# apex, last airborne frame, the landing hit), proven on the fields each leg traced there. Nothing the gate decides changes.
+. "$REPO/tests/lib/sheet.sh"
+if sheet_on && [ -z "${VS_CTL:-}" ]; then
+    sheet_new trap_air "Plasma Trap dome on a jumping Victor (P2 up at $JUMP): native vs2 above ours" huitzil "#163,#175" \
+        "each game's stage and palette, and P2's art (Victor, each game's own copy; [VSP-168]); the class byte differs by ruling (0x52 native, the marker 0x38 ours)"
+    sheet_leg trap_air native vs2 vsav2 "$ROMDIR" "$W/air.rpl" "$PK" 3620
+    sheet_leg trap_air merged ours vsavjw "$MERGED/rompath;$ROMDIR" "$W/air.rpl" "$PK" 3620
+    python3 - "$W" > "$W/sheet_rows.tsv" <<'PYS' && sheet_rows "$W/sheet_rows.tsv"
+import sys
+W = sys.argv[1]
+spec = {"seq": "ff8406:b", "frz": "ff845c:b", "p2seq": "ff8806:b", "p2sub": "ff8807:b", "p2cls": "ff8854:b", "p2frz": "ff885c:b",
+        "p2hp": "ff8850:w", "p2y": "ff8814:w", "id": "ff8782:b", "p2id": "ff8b82:b"}
+def load(p):
+    d = {}
+    for l in open(p):
+        t = l.split()
+        if t and t[0] == "F": d[int(t[1])] = dict(kv.split("=", 1) for kv in t[2:])
+    return d
+mom = {}
+for leg in ("native", "merged"):
+    d = load(f"{W}/{leg}.ft")
+    air = [f for f in range(3396, 3620) if int(d[f]["p2y"]) > 40]
+    if not air:
+        continue
+    apex = max(air, key=lambda f: (int(d[f]["p2y"]), -f))
+    mom[leg] = (d, {"take": air[0], "apex": apex, "last": air[-1], "land": air[-1] + 1})
+labels = {"take": "take-off (first frame y > 40)", "apex": "apex", "last": "last airborne frame", "land": "landing frame (the dome's first hit)"}
+for k in ("take", "apex", "last", "land"):
+    if len(mom) != 2:
+        break
+    fr = {leg: mom[leg][1][k] for leg in mom}
+    y = {leg: mom[leg][0][fr[leg]]["p2y"] for leg in mom}
+    v = "IDENTICAL" if fr["native"] == fr["merged"] and y["native"] == y["merged"] else "DIFF"
+    print("moment\ttrap_air\t%s\t%s\t%s\tnative f%d y=%s, ours f%d y=%s" % (k, labels[k], v, fr["native"], y["native"], fr["merged"], y["merged"]))
+    for leg in ("native", "merged"):
+        smp = mom[leg][0][fr[leg]]
+        print("at\ttrap_air\t%s\t%s\t%d\tfields\t%s" % (k, leg, fr[leg], ",".join("%s=%s" % (spec[n], smp[n]) for n in sorted(smp) if n in spec)))
+PYS
 fi
 if [ -n "${VS_CTL:-}" ]; then [ $fail = 0 ] && { echo "PASS (the control mode did NOT reach FAIL)"; exit 0; } || { echo "FAIL: audit_trap_airborne (control mode)"; exit 1; }; fi
 [ $fail = 0 ] && echo "PASS: audit_trap_airborne" || echo "FAIL: audit_trap_airborne"

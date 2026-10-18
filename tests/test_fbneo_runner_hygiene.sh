@@ -12,6 +12,8 @@
 # FOLLOWS: emu/fbneo-patches/ emu/fbneo/ tests/replays/01_attract_long.rpl
 #   tools/run_replay_fbneo.sh tools/setup_fbneo.sh
 #
+# SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
+#
 # WHY. tools/run_replay_fbneo.sh decides success by an ARTIFACT check —
 # `grep -q "^END " "$OUT"` — and did not clear $OUT first. Paired with the C++
 # half (main.cpp calls HarnessRun() for side effects inside a void DoGame and

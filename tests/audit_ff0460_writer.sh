@@ -12,6 +12,8 @@
 # FOLLOWS: emu/fbneo-patches/ emu/fbneo/ tests/replays/04_select_fuzz.rpl
 #   tools/run_replay_fbneo.sh tools/setup_fbneo.sh
 #
+# SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
+#
 # ON-DEMAND (1 FBNeo run, ~1 min). The measurement behind the 14z-82 atlas
 # row: $FF0460 is the SOUND DRIVER's current-record pointer spill, written
 # by the dispatch prologue at PRG:0x0011DE/0x0011E2 (`move.l sp,(-$7BA4,A5);
