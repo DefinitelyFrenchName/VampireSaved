@@ -18,10 +18,10 @@ A forever true statement. But what ifs are tantalizing and this project attempts
 | --------------------------------------- | ------------------------------------------------------------ |
 | **Base game**                           | Vampire Savior, Japan, 1997-05-19                            |
 | **Roster**                              | The original Vampire Savior cast, plus Donovan, Phobos and Pyron from Vampire Savior 2. All characters run the Vampire Savior engine. |
-| **Original characters and game engine** | Both unchanged. In 2-player versus their game state is checked frame by frame against the unmodified game, and matches it within a few small, measured tolerances (no frame of lag introduced, matching with the original games is met if set at same speed with same RNG). |
+| **Original characters and game engine** | Both unchanged |
 | **Plays on**                            | MiSTer (it also runs on a patched FBNeo or MAME but it's a more involved process) |
-| **Made for**                            | 2-player versus. (solo play is possible but there are many known issues and it's out of the project's scope) |
-| **Tournaments**                         | **not** a tournament build. Tournaments run the community's choice, which in this case is the original CPS-2 release. Even at perfect accuracy, this is aimed at casuals and locals|
+| **Scope**                               | 2-player versus with frame perfect accuracy. (solo play is possible but there are many known issues and it's out of the project's scope) |
+| **Tournaments?**                        | **not** a tournament build. Tournaments run the community's choice, which is the original CPS-2 release. Even at perfect accuracy, this is aimed at casuals and locals |
 
 **Why the emulator has to be patched:** the 18 characters do not fit in a stock CPS-2. The project
 defines a larger CPS-2 (more room for program, graphics and sound) and adds it to FBNeo,
