@@ -126,13 +126,14 @@
 #     poke ([VSP-131], [VSP-123]).
 #
 # ON THE VICTIM SAMPLE (the maintainer's own question: "do we test all victims
-# or only a sample and if it's a sample how to determine it"). ONE victim is
+# or only a sample and if it's a sample how to determine it"). SUPERSEDED (found 14z-205, #291: VICTIMS defaults to
+# all 18 victims, the WHAT above and the code below): ~~ONE victim is
 # used here, Victor 0x03, deliberately: this gate's subject is the ATTACKER's
 # geometry, and the capture block's per-victim head is what the #104 work
 # already covers from the other side (audit_don_grab_pose sweeps
 # VICTIMS="01 13 10 11" — a legacy victim plus each tenant row). Widening
 # this gate to all four victims is a VICTIMS= loop away if ever wanted; it
-# would quadruple a ~12 min run to re-measure an axis already gated.
+# would quadruple a ~12 min run to re-measure an axis already gated.~~
 #
 # PYRON'S AIR THROW (14z-194, #235). Measured first on ERIS (the #235 fork, build/agent194/t235/): neither
 # tenant's 6+MK/6+HK and none of Donovan's air presses ever hold a victim — on both games, on all 36 legs of

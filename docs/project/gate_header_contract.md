@@ -164,8 +164,25 @@ tool's ground truth: a one-frame shift and a field off by one are refused; ancho
 **Reader:** `tools/proof_sheets.py` (`parse_declaration`, `read_sheet`). **Census:** `tests/test_sheet_census.sh` —
 every registered gate declares one well-formed line or is on the shrink-only debt list `tests/expected/sheet_debt.txt`
 (the retrofit's work list, as the must-fire retrofit's was), and every `legs` gate sources the helper, and the helper assigns only `__sheet_` names; four controls.
-**Slice bounds:** S1 draws at HEAD with the builds the gates default to; S2 retrofits the remaining comparing gates;
+**Slice bounds:** S1 drew at HEAD with the builds the gates default to; S2 retrofits the remaining comparing gates;
 S3 builds the commit's romset in a clean checkout and adds `--host pilot|eris`.
+**S3, as built (14z-205).** `proof_sheets.py run <commit>` bundles the commit, clones it into a clean checkout (default
+`build/sheets/<commit>.tree`; never the working tree, so the HEAD-and-working-tree path of S1 is gone, as the ruling
+"Built from the commit" wants), builds there the five tracks the commit's own `tests/run_all_emulator.sh` names
+(MERGED DON HUI PYR STOCK) by `tests/test_m3a_reproducible.sh`'s recipe after `tools/audit_roms.py`, and **refuses the
+run** unless each track's fingerprint equals that commit's own `EXPECT_*` reference (the anchor is the commit's frozen
+value, not the tool). Gates, capture scripts, notes and registry are then the checkout's. **A picture of an `ours` leg
+is NOT THE JUDGED RUN unless the leg ran on a build in the checkout's `build/`** made during the run (a rom path outside
+the checkout, or a tracked path in it, is refused: `commit_check`); a gate that defaults to an older build the commit
+does not make (`test_gfx_menus` and `audit_mask_window_ff4182` on `build/donovan6`, `audit_landing_sound`'s control
+`build/m3b_merged30`) shows that, never silently. The page lists the commit, each track's fingerprint and the emulator
+binaries (the host's pinned builds: no emulator is built from the commit). `--reuse-tree` re-uses a clean checkout of
+the same commit and re-checks its fingerprints. **`--host pilot|eris`** sends the bundle and the tool itself (so a
+commit from before S3 is drawn by today's tool; one from before S1 is refused) to `~/<--host-dir>/<commit>`, starts
+the run (PILOT detached; ERIS held open by the ssh, since WSL2 stops a distro with no client — **ERIS is untested**),
+polls with bounded ssh calls (no output in 180 s, or `--host-timeout`, stops it), and brings `out/` back to
+`build/sheets/<commit>/` without the capture snapshots. Ground truth: `tests/test_proof_sheets.sh` section 4c
+(controls `build-blind`, `fingerprint-blind`).
 **Where S2 stands (14z-205): complete.** Every registered gate declares; the debt list is empty. 58 draw (`legs`), 10 are
 `no-reference-leg` (the ruled ten), 9 are `no-picture` (ruled 2026-10-18, D4: two corpus-wide censuses,
 `audit_walker_ghost`, three gates whose legs run under `-debug`, `audit_move_parity_attribution`,

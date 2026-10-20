@@ -85,6 +85,8 @@
 #                                          classified and printed in REGISTRY order exactly as a serial run
 #                                          does — the same readout, the same results.tsv; only the wall
 #                                          clock differs. `# ORDER: last` gates run alone, after the pool.
+#                                          A session close runs --jobs 8 (ruled 2026-10-19, its tier row in
+#                                          docs/project/session_close.md); test_static_runner section 24 proves it.
 #   ... --cadence ondemand                 also the `ondemand` gates (maintainer-ruled
 #                                          2026-10-09, 14z-196): a gate listed
 #                                          `ondemand` is deferred and named at
@@ -522,7 +524,7 @@ pre_run() {  # pre_run <tier label> <names>
     for _g in $2; do
         if [ -n "$CONFIRM" ] && awk -F'\t' -v g="$_g" '$1 == "CARRY" && $2 == g {f = 1} END {exit !f}' "$WORK/plan.tsv"; then continue; fi
         [ -x "tests/$_g.sh" ] || continue
-        if grep -q '^# ORDER: last' "tests/$_g.sh"; then _late="$_late $_g"; else _todo="$_todo $_g"; fi
+        if grep -q '^# ORDER: last' "tests/$_g.sh"; then _late="$_late $_g"; else _todo="$_todo $_g"; fi   # POOL-ORDER-LAST
     done
     _p0=$(date +%s)
     printf '%s\n' $_todo | awk 'NF' | xargs -P "$JOBS" -I{} sh tests/lib/static_job.sh {} "$WORK" "$EXEC_CTL" "$1" 2>> "$WORK/pre/jobs.err" || true
@@ -833,5 +835,12 @@ if [ -n "$RESULTS_OUT" ]; then
         python3 tools/git-hooks/green_guard.py record "$RESULTS_OUT" "$GREEN_INDEX" \
             || echo "green guard: the index row was NOT written (see above)"
     fi
+fi
+# THE RUN RECORD KEEPS ITS RESULTS (#276, 14z-205): a run told to write them elsewhere (STATIC_RESULTS_OUT: a close's
+# tier_results.tsv, a snapshot's record) copies them into its own record too, where tools/session_metrics.py counts
+# every tier run; 9 of the 12 newest records held none (2026-10-19). Silent unless the copy fails.
+if [ -n "$RESULTS_OUT" ] && [ -n "$RUNREC" ] && [ -f "$RESULTS_OUT" ] && [ ! "$RESULTS_OUT" -ef "$RUNREC/results.tsv" ]; then
+    cp "$RESULTS_OUT" "$RUNREC/results.tsv" || echo "run record: the results copy FAILED"   # RUNREC-KEEPS-RESULTS
+    if [ -f "${RESULTS_OUT%.tsv}.controls.tsv" ]; then cp "${RESULTS_OUT%.tsv}.controls.tsv" "$RUNREC/results.controls.tsv" || echo "run record: the control-times copy FAILED"; fi   # RUNREC-KEEPS-CONTROLS
 fi
 exit $rc

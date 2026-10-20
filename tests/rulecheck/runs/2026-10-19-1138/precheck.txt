@@ -1,0 +1,3 @@
+  FLAG ATTRIB: The fix's shape (keep 2b, NOTE when absent, rather than retire it) is the session's choice, not a ruling; the maintainer's words: maintainer_words.txt
+  FLAG D-ABSOLUTE: **The fix (the session's choice, not a ruling — nothing is removed, so #289's revisit can bring the table back):**  [build/agent205/t300/closing_comment.md]
+packet_check: 2 flag(s): ATTRIB 1, D-ABSOLUTE 1

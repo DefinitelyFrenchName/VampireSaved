@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """dmg_sweep.py — the reader of tests/audit_dmg_legacy_sweep.sh (14z-187, GitHub #191).
 
-Two commands, both reading every line of every field trace they are given:
+Five commands, each reading every line of every field trace it is given:
 
   tables <vsavj data view> <vsav2 data view>
       The damage pipeline's TABLES compared between the two games in the DATA view (the view their An-relative
@@ -30,6 +30,14 @@ Two commands, both reading every line of every field trace they are given:
       --perturb engines-agree: every vsavj row takes its vsav2 twin's red/white totals (what two engines that
       agreed would read). --perturb attacker-swapped: the attacker id is read as 0x03 at every hit (what a leg
       whose attacker was not Demitri would read). Both are the gate's must-fire controls.
+
+  ours <work dir> [--perturb ours-diverged] [--leg-from ours.<side>.<victim>=<trace>,...]
+      #295 (14z-205): every legacy leg of OUR merged build (<dir>/L.<side>.<victim>.ours/f.ft) against the same run's
+      vsavj leg — the superset invariant on these hits: each trace BYTE-IDENTICAL to vsavj's (2300-4100, all fields),
+      and each row equal hit for hit (red, white, first drop frame, attacker, class). Prints the summary line and one
+      `DIFF ...` line per difference (exit 1 if any, or on a structural problem). --perturb ours-diverged: the ours row
+      of P1/victim 0x00's 2HK takes one more red HP (the planted one-HP difference); --leg-from: read a leg from another
+      trace (the gate's records-swapped control). Both are the gate's must-fire controls.
 """
 import hashlib
 import json
@@ -75,17 +83,22 @@ def drops(R, fld, lo, hi):
     return out
 
 
-def rows(work, rig, perturb=None):
+def _hit(R, vic, att, lo, hi, perturb=None):
+    """one hit's (red, white, first red-drop frame, attacker id there, victim class there) in [lo, hi)"""
+    red, wh = drops(R, f"{vic}hp", lo, hi), drops(R, f"{vic}white", lo, hi)
+    return (sum(d for _, d in red), sum(d for _, d in wh), red[0][0] if red else "-",
+            (0x03 if perturb == "attacker-swapped" else R[red[0][0]][att]) if red else None,
+            R[red[0][0]][f"{vic}cls"] if red else None)
+
+
+def legacy_rows(work, games, perturb=None, leg_from=None):
+    """the legacy legs' rows for GAMES (L.<side>.<victim>.<game>/f.ft under WORK; LEG_FROM maps "<game>.<side>.<victim>"
+    to another trace path) and their structural problems"""
     out, probs = [], []
-    hit = lambda R, vic, att, lo, hi: (lambda red, wh: (
-        sum(d for _, d in red), sum(d for _, d in wh),
-        red[0][0] if red else "-",
-        (0x03 if perturb == "attacker-swapped" else R[red[0][0]][att]) if red else None,
-        R[red[0][0]][f"{vic}cls"] if red else None))(drops(R, f"{vic}hp", lo, hi), drops(R, f"{vic}white", lo, hi))
     for side, m in SIDE.items():
         for vid in LEGACY_IDS:
-            for g in ("vsavj", "vsav2"):
-                p = f"{work}/L.{side}.{vid}.{g}/f.ft"
+            for g in games:
+                p = (leg_from or {}).get(f"{g}.{side}.{vid}", f"{work}/L.{side}.{vid}.{g}/f.ft")
                 if not os.path.exists(p):
                     probs.append(f"PROBLEM legacy {side} {vid} {g}: no trace")
                     continue
@@ -97,11 +110,47 @@ def rows(work, rig, perturb=None):
                     probs.append(f"PROBLEM legacy {side} {vid} {g}: ids at 2300 attacker {R[2300][m['att']]:#04x} victim "
                                  f"{R[2300][m['vid']]:#04x}, not Demitri 0x01 against 0x{vid} — the forced picks did not land")
                 for n, lo, hi in WIN:
-                    red, wh, fr, att, cls = hit(R, m["vic"], m["att"], lo, hi)
+                    red, wh, fr, att, cls = _hit(R, m["vic"], m["att"], lo, hi, perturb)
                     if att is not None and att != 0x01:
                         probs.append(f"PROBLEM legacy {side} {vid} {g} {n}: the attacker at the first red drop is {att:#04x}, not Demitri 0x01")
                     out.append(["legacy", side, vid, g, n, str(red), str(wh), f"f{fr}" if fr != "-" else "-",
                                 f"{att:#04x}" if att is not None else "-", f"{cls:#04x}" if cls is not None else "-"])
+    return out, probs
+
+
+def ours(work, perturb=None, leg_from=None):
+    """#295: every legacy leg of OUR build (game "ours") against the same run's vsavj leg — the traces byte-identical and
+    the rows equal hit for hit (red, white, first drop frame, attacker, class); returns (report lines, differences,
+    structural problems)"""
+    o, po = legacy_rows(work, ("ours",), None, leg_from)
+    j, pj = legacy_rows(work, ("vsavj",))
+    if perturb == "ours-diverged":   # the planted one-HP difference: Demitri on P1, victim 0x00, 2HK
+        o = [r[:5] + [str(int(r[5]) + 1)] + r[6:] if r[1:3] == ["p1", "00"] and r[4] == "2HK" else r for r in o]
+    jt = {(r[1], r[2], r[4]): r for r in j}
+    lines, diffs, same_tr, eq = [], [], 0, 0
+    for side in SIDE:
+        for vid in LEGACY_IDS:
+            po_ = (leg_from or {}).get(f"ours.{side}.{vid}", f"{work}/L.{side}.{vid}.ours/f.ft")
+            pj_ = f"{work}/L.{side}.{vid}.vsavj/f.ft"
+            if os.path.exists(po_) and os.path.exists(pj_) and open(po_, "rb").read() == open(pj_, "rb").read():
+                same_tr += 1
+            else:
+                diffs.append(f"DIFF legacy {side} {vid}: the ours trace is not byte-identical to vsavj's")
+    for r in o:
+        t = jt.get((r[1], r[2], r[4]))
+        if t is not None and r[5:] == t[5:]:
+            eq += 1
+        else:
+            diffs.append(f"DIFF legacy {r[1]} {r[2]} {r[4]}: ours red {r[5]} white {r[6]} at {r[7]} attacker {r[8]} class {r[9]}"
+                         f" against vsavj " + (f"red {t[5]} white {t[6]} at {t[7]} attacker {t[8]} class {t[9]}" if t else "no row"))
+    n = len(SIDE) * len(LEGACY_IDS)
+    lines.append(f"ours against vsavj: {same_tr} of {n} legs trace-identical; {eq} of {len(o)} hits equal")
+    return lines, diffs, po + pj
+
+
+def rows(work, rig, perturb=None):
+    out, probs = legacy_rows(work, ("vsavj", "vsav2"), perturb)
+    hit = lambda R, vic, att, lo, hi: _hit(R, vic, att, lo, hi, perturb)
     ev = json.load(open(rig))["events"]
     for leg in ("native", "ours"):
         p = f"{work}/D.{leg}/f.ft"
@@ -191,6 +240,15 @@ def main():
         for p in probs:
             print(p, file=sys.stderr)
         return 1 if probs else 0
+    if len(sys.argv) >= 3 and sys.argv[1] == "ours":
+        pert = sys.argv[sys.argv.index("--perturb") + 1] if "--perturb" in sys.argv else None
+        lf = dict(a.split("=", 1) for a in sys.argv[sys.argv.index("--leg-from") + 1].split(",")) if "--leg-from" in sys.argv else None
+        lines, diffs, probs = ours(sys.argv[2], pert, lf)
+        for l in lines + diffs:
+            print(l)
+        for p in probs:
+            print(p, file=sys.stderr)
+        return 1 if diffs or probs else 0
     print(__doc__, file=sys.stderr)
     return 2
 

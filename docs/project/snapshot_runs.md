@@ -73,6 +73,10 @@ and traceability"* — so session cadence stays in the working tree.
    run created inside the clone is copied into the working tree's `build/`, where
    `tools/audit_emulator_staleness.py` reads the newest one; a name already taken there is never
    overwritten (the run's exit turns to 2). Its `commit.txt` names the snapshot's commit.
+   Every `build/static_runs/*` record the run created comes home the same way (#276, 14z-205), so
+   `tools/session_metrics.py` counts a snapshot tier with the sitting's other tier runs; a name already taken is said
+   and skipped, and the exit is unchanged, since the record is the dashboard's, not the run of record. The static
+   runner copies its results into that record even when `STATIC_RESULTS_OUT` sends them elsewhere.
 5. **The record**, `build/snapshot_runs/<stamp>-<commit>/` in the working tree: `record.txt` (the
    commit, the runner and its arguments, its exit, the submodule commits, the ROMDIR
    verdicts), `tree_porcelain_start.txt` (what the run did NOT test: the tree's uncommitted changes),

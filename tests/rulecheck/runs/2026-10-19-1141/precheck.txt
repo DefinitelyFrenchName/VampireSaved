@@ -1,0 +1,3 @@
+  FLAG D-FIGURE: 18  [build/agent205/t257/closing_comment.md]
+  FLAG D-ABSOLUTE: On four sessions' real records, old against new: 14z-202, 14z-203 and 14z-204 read identically; 14z-205 checks 6 more maintainer quotes, all found verbatim, ...  [build/agent205/t257/closing_comment.md]
+packet_check: 2 flag(s): D-ABSOLUTE 1, D-FIGURE 1

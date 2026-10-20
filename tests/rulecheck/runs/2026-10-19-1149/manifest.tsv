@@ -1,0 +1,9 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent205/t273/closing_comment.md	3021a619a3980158a5004328e8ab7ffd211e9a69
+build/agent205/t273/row_273.tsv	49363749da5606ba8ffbc6329e0c0e577e64e3d4
+build/agent205/t273/ruling_273.txt	53332aa661f3b839334f460545509e64efb2e801
+build/agent205/t273/rule_checker_entry.txt	720cb0d01da652b16cf5f1be0d83b8c084158934
+build/agent205/t273/gotcha_entry.txt	f185412aa38c89153dabad73c96e760409787f26
+build/agent205/t273/results.md	8b73fcbbd29771550f22684d73990317f0788261
+build/agent205/t273/score.out	e9f29dd79fe4ff5dcac7f89867db87d11eabf9c0
+build/agent205/t273/plan.md	086c5501de53f8e1462b999d2a1c04953bf784c4

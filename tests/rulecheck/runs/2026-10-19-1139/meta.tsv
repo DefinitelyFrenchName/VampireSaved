@@ -1,0 +1,11 @@
+decision	recommendation
+subject	#295: the plan for a vsavj-vs-ours leg in audit_dmg_legacy_sweep (14z-205)
+session	14z-205
+model	rule-checker@163e4ce9cf7b
+claim	Build #295 as plan.md says: section 2's legacy leg run on our merged build (vsavjw) for all 32 legs, judged against the same run's vsavj leg by byte-identical field traces and equal rows hit for hit, with two must-fire controls (ours-diverged, a planted one-HP row; ours-records-swapped, our build with vs2's three records through rom_poke.lua), the ours leg on the sheet, and no frozen expectation changed. The pilot (pilot_result.txt, pilot.sh) measured 4 of the 32 legs identical. What the plan rests on that it does not test is listed in plan.md's last section: the shared rig (poked picks, HP, level and RNG pins), MAME only, one build, three hits by one attacker, and the 28 legs the pilot did not run. The maintainer's request: maintainer_words.txt; the original question and the filing: decision_295.txt
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	12 flag(s): D-ABSOLUTE 10, D-FIGURE 2
+deliverables	build/agent205/t295/plan.md

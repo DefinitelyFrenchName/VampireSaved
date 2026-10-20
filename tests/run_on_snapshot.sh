@@ -310,6 +310,7 @@ fi
 say "start       $(date '+%Y-%m-%d %H:%M:%S')"
 set +e
 ( cd "$C" && ls -d build/emu_* 2>/dev/null || true ) > "$REC/.emu_before"
+( cd "$C" && ls -d build/static_runs/*_* 2>/dev/null || true ) > "$REC/.runs_before"
 # THE GREEN GUARD (#290, 14z-203), for a runner other than the emulator one: the runner appends its row to the
 # WORKING repository's index, and its results file is KEPT in the record unless the caller names one (the row points at
 # it, and the snapshot's copy is removed with the snapshot). Exported here, not on the run lines the controls of
@@ -345,6 +346,15 @@ for d in $(comm -13 "$REC/.emu_before" "$REC/.emu_after"); do
     else cow "$C/$d" "$REPO/$d"; say "run_record  $d copied back to the working tree ($(head -1 "$REPO/$d/commit.txt" 2>/dev/null || echo 'no commit.txt'))"; fi
 done
 rm -f "$REC/.emu_before" "$REC/.emu_after"
+# ...and so does every static run record (#276, 14z-205): tools/session_metrics.py counts a sitting's tier runs from
+# build/static_runs/*, and a snapshot tier's record died with the clone. A record is the dashboard's, not the run of
+# record, so a name already taken is said and skipped without changing the exit.
+( cd "$C" && ls -d build/static_runs/*_* 2>/dev/null || true ) > "$REC/.runs_after"
+for d in $(comm -13 "$REC/.runs_before" "$REC/.runs_after"); do   # STATIC-RUNS-COPY-BACK
+    if [ -e "$REPO/$d" ]; then say "run_record  $d NOT copied back — the working tree already has one"
+    else mkdir -p "$REPO/build/static_runs"; cow "$C/$d" "$REPO/$d"; say "run_record  $d copied back to the working tree"; fi
+done
+rm -f "$REC/.runs_before" "$REC/.runs_after"
 if [ "$EMU" = 1 ]; then
     hash_instruments "$CACHE_SRC" > "$REC/instruments_end.tsv"
     if cmp -s "$REC/instruments_start.tsv" "$REC/instruments_end.tsv"; then say "instruments unchanged in the live cache during the run"

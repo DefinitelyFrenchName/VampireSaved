@@ -4,8 +4,9 @@
 #
 # WHAT: Phobos as the ELECTROCUTE victim, ours vs native vsav2: Victor's HELD HP (class
 #   0x07) installs the electric shake on both legs, a quick press does not, and the
-#   sound-ring inventory across the electrocute window matches native up to the recorded
-#   cosmetic 0x10A/0x10B pair.
+#   sound-ring inventory across the electrocute window matches native ~~up to the recorded
+#   cosmetic 0x10A/0x10B pair~~ id for id (the pair closed at the M23 freeze, 14z-192, #223; corrected here 14z-205,
+#   #291: section 3's paragraph below).
 # HOW: replay 93 on both games on MAME (four runs), the victim's class, freeze and shake
 #   rows read from dumps; the quick-press leg is a standing negative control; section 3
 #   freezes the ring over the electrocute window only.

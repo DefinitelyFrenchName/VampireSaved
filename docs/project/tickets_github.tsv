@@ -2,13 +2,15 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 299
+# issues: 301
 number	state	reason	closed	labels	title
+301	OPEN	-	-	evolution,severity: low	Community cross-check: report the #229 workbook differences to the community, and check the open questions against vswiki
+300	CLOSED	COMPLETED	2026-10-19	bug,test-integrity	test_close_tools REFUSED on the live tree: section 2b reads the findings table #288 cut from the close
 299	OPEN	-	-	evolution,performance	Static tier: run gates in parallel (--jobs, ~70-80% of the machine), proven equal to a serial run first
 298	OPEN	-	-	evolution,performance	Static tier scope: at a commit/close, execute a gate's controls only when a program of its reach changed (R1); all at freeze/release
 297	OPEN	-	-	evolution,performance	Static tier scope: six families (109 gates) to freeze cadence, triggered by their own code (@code)
 296	OPEN	-	-	evolution,severity: medium,test-integrity	run_mame.sh: refuse a run whose MAME_SANDBOX already holds an earlier run's state (#293's class, at run time)
-295	OPEN	-	-	evolution,severity: medium,test-integrity	audit_dmg_legacy_sweep never runs Demitri's legacy hits on our build: add an exact vsavj-vs-ours leg (superset coverage)
+295	CLOSED	COMPLETED	2026-10-19	evolution,severity: medium,test-integrity	audit_dmg_legacy_sweep never runs Demitri's legacy hits on our build: add an exact vsavj-vs-ours leg (superset coverage)
 294	OPEN	-	-	cosmetic,parked	Killshread's shock/electrocuted state has wrong palette (currently accepted tradeoff) - parked
 293	CLOSED	COMPLETED	2026-10-18	bug,severity: medium,test-integrity	Two gates hand one MAME sandbox to several runs, so a later run boots on carried nvram (audit_flicker_attribution, audit_legacy_pairings)
 292	OPEN	-	-	bug,performance,severity: high	static_confirm: a tool's self-test strings count as a direct read (battery_reach names STATE.md), so 22 gates re-run with controls at every commit
@@ -27,10 +29,10 @@ number	state	reason	closed	labels	title
 279	OPEN	-	-	bug	Release-only: release patches built with xdelta3 3.0.11 (PILOT's apt) carry verbatim reference-ROM runs
 278	OPEN	-	-	bug	Release-only: a census of gates that compare locale-sorted output against byte-ordered frozen lists
 277	OPEN	-	-	bug	The procedure check's extract flags a figure written with fewer decimals as unsourced, and a part boundary hides a step's evidence
-276	OPEN	-	-	bug	The session dashboard misses every static tier run on a snapshot: its results stay in the removed clone
-275	OPEN	-	-	-	Negative fixture fidelity-14z160: its packet's gate carries the FREEZE gap fixed as #154 — does EXPECT OK still stand?
+276	CLOSED	COMPLETED	2026-10-19	bug	The session dashboard misses every static tier run on a snapshot: its results stay in the removed clone
+275	CLOSED	COMPLETED	2026-10-19	-	Negative fixture fidelity-14z160: its packet's gate carries the FREEZE gap fixed as #154 — does EXPECT OK still stand?
 274	CLOSED	COMPLETED	2026-10-14	evolution	Narrow tools/static_confirm.py's directory-read rule (R3) and its change set, scored on a fresh trace, before #269 is built
-273	OPEN	-	-	evolution	Measure a bounded Q1 on past rule-checker packets before any rewording
+273	CLOSED	COMPLETED	2026-10-19	evolution	Measure a bounded Q1 on past rule-checker packets before any rewording
 272	CLOSED	COMPLETED	2026-10-13	evolution	A pre-prepare check for rule-checker packets: figures staged, attributions quoted, absolutes flagged, small packets
 271	CLOSED	COMPLETED	2026-10-13	evolution	Rule-checker readers exempt from the unsourced-figure hint, a recurrence alarm over the ledger, and resolve refuses unticketed instrument-blame
 270	CLOSED	COMPLETED	2026-10-13	evolution	The close's documentation packet asks only what the deterministic close checks do not cover; presentation fixes re-checked deterministically
@@ -46,7 +48,7 @@ number	state	reason	closed	labels	title
 260	OPEN	REOPENED	-	evolution	Check that every submodule pin exists on its remote before a push (the 14z-192 jtcores pin was unpushed)
 259	CLOSED	COMPLETED	2026-10-17	bug,severity: medium	static_confirm plan took 20 min at the 14z-195 close (228 changed files, 194 rule-checker run files)
 258	CLOSED	COMPLETED	2026-10-17	bug,severity: medium	rulecheck: a packet artifact above the Read limit gets a partial read
-257	OPEN	-	-	bug,severity: medium	rulings_verbatim leaves a second maintainer quote on the same line unchecked
+257	CLOSED	COMPLETED	2026-10-19	bug,severity: medium	rulings_verbatim leaves a second maintainer quote on the same line unchecked
 256	CLOSED	COMPLETED	2026-10-17	bug,severity: high	Close check open-tickets reads a cited ticket range as its two ends only
 255	CLOSED	COMPLETED	2026-10-12	bug	[P3] Python release applier publishes output before rejecting an incorrect aggregate set key
 254	CLOSED	COMPLETED	2026-10-09	bug	[P2] Executable shell-crash controls are classified HONOURED on nonzero exits
@@ -176,7 +178,7 @@ number	state	reason	closed	labels	title
 130	CLOSED	COMPLETED	2026-10-03	bug	bundle_win_dlls.py prints a broken character for its em dash on MSYS2 (build logs only)
 129	OPEN	-	-	evolution,parked,severity: low	Tenant CPU AI looks lackluster (unproven; first question: are the ported script blocks complete?)
 128	OPEN	-	-	evolution,parked	Marionette: parked until further notice
-127	OPEN	-	-	cosmetic,parked	#112 option (B): the Press of Death effect owns its palette row (scope first)
+127	OPEN	-	-	cosmetic,parked	fix Press of Death by making its effect own its palette row (scope first) [#112's option (B)]
 126	CLOSED	COMPLETED	2026-10-01	cosmetic,parked	Select-wheel look-and-feel polish
 125	OPEN	-	-	cosmetic,parked	Arcade-ladder map: for the three tenants the next opponent's name and small portrait are wrong (the VS screen that follows is correct)
 124	OPEN	-	-	cosmetic,parked	Arcade-ladder map tag shows the base/shell character for a VS2 tenant opponent

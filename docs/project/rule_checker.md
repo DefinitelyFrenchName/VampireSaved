@@ -439,6 +439,17 @@ model and effort, no model FALLBACK (a safety-classifier stop can move a worker 
 `docs/platform/gotchas.md`), no instructions attachment; and each verdict file was written by
 `rulecheck.py collect` from the reader's own `SubagentHandback`, never retyped.
 
+**A bounded Q1, measured and not adopted (#273, 14z-199 and 14z-205).** The wording tried adds to Q1: *"VIOLATED only
+for an untested premise the claim does not name that, if false, would change the action"*. It was run beside the
+checklist's Q1 on past packets, on staged copies, with three pinned readers per arm, before-action packets only (#288
+cut the documentation packet). On the 11 packets whose Q1 finding mattered (a gap whose being false changed what was
+done, by the 14z-199 rubric), readers 1, 2 and 3 under Q1 as it is caught the gap in 5, 8 and 8 of them, under the
+bounded Q1 in 4, 5 and 7 (both of two blind judges saying so). On the 14 whose finding did not matter, the bounded Q1 dropped it 7, 6 and 7 times, Q1
+as it is 2, 2 and 2. On the negative fixture fidelity-14z160 (EXPECT OK) the bounded Q1 raised Q1 in 2 of 3 readers, Q1
+as it is in none. The maintainer kept Q1 as it is (`DECISIONS_HISTORY.md` "Ruled 2026-10-19 (14z-205) — #273: Q1's
+wording stays as it is"). The method, every check's output and the scoring: `build/agent205/t273/results.md` (not
+tracked); one reader per arm is not a measurement of a wording (`docs/project/gotchas.md`, "ONE READER PER ARM").
+
 ## What it will not catch
 
 **A reader can echo the claim's figures as its own reading (measured 14z-179, run `2026-09-24-140`

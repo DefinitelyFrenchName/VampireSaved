@@ -474,3 +474,4 @@ tests/test_session_close.sh	docs
 tests/test_green_guard.sh	review-triage
 tests/test_sheet_census.sh	runner
 tests/test_proof_sheets.sh	runner
+tests/test_submodule_pins.sh	review-triage

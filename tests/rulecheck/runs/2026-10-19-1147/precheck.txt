@@ -1,0 +1,6 @@
+  FLAG ATTRIB: #275 closes done: the fixture's claim names the unguarded FREEZE branch (fixture_v6.diff), as the maintainer chose (maintainer_words.txt, ruling.txt), under ...
+  FLAG D-ABSOLUTE: A normal run re-tests them, compares the frozen rows and exits 1 on any failure (lines 298-305, 324).  [build/agent205/t275/closing_comment.md]
+  FLAG D-ABSOLUTE: The packet holds no run log, so nothing in it shows that the frozen rows came from a run whose section 2 was green.  [build/agent205/t275/closing_comment.md]
+  FLAG D-ABSOLUTE: Its reader confirmed every named premise at its line, the FREEZE one at 292-296, and found no further one.  [build/agent205/t275/closing_comment.md]
+  FLAG D-ABSOLUTE: **Not covered:** v6 has been read under the current Q1 only.  [build/agent205/t275/closing_comment.md]
+packet_check: 5 flag(s): ATTRIB 1, D-ABSOLUTE 4

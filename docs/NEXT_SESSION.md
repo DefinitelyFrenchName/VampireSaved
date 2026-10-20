@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-205 CLOSE, 2026-10-18)
+# NEXT SESSION — orientation (rewritten at the 14z-205b CLOSE, 2026-10-20)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` (then `python3 tools/gen_history_index.py`
@@ -17,33 +17,63 @@ A plain **Opus 5.5 session at effort High** (the ruled orchestrator — STATE 'S
 - **Never edit a script while it runs** ([MJC-54]); the emulator runner reports a tracked file changed during its run.
 
 Say so at the opener. Never spawn any agent at `max`. A recommendation leans only on the maintainer's OWN words.
-PILOT and ERIS were unavailable on 2026-10-17/18; check `ssh pilot` / `ssh eris` before relying on them.
+PILOT was back on 2026-10-20 (6 vCPU, 47 GB; its profile sets no ROMDIR: `ROMDIR=~/roms`, 76 of 76 verified); ERIS was not
+tried. Work handed to either is a bundle of a COMMIT ("When to commit"); 14z-205b broke this twice with an rsync of
+the working tree (STATE 14z-205b (5)).
 
 **THE SESSION CLOSE:** `docs/project/session_close.md`, run by `python3 tools/close.py` (`start --key … --row - --prev
-<results>`, then `next`, `done`, `status`). The run of record is named in STATE 14z-205's CLOSE section.
+<results>`, then `next`, `done`, `status`). The run of record is named in STATE 14z-205b's CLOSE section.
 
 **THE STATIC TIER CHANGED THIS SITTING (14z-205; the page https://claude.ai/artifact/1DzrvoGUphYYmtyRKvhJtZ, private):**
 109 gates of six families run at freeze cadence, pulled into a session only when their own code changes (`@code`,
 #297); at a commit or close a gate's controls execute only when a program of its reach changed (#298); `--jobs N` runs
-gates in parallel (#299, not yet a close's default).
+gates in parallel (#299; a close runs `--jobs 8`, ruled 2026-10-19).
 
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
-1. **#299 — parallel gates: the full-tier comparison.** The portable tier without controls matched at 8 jobs (89 gates, 11 min 7 s → 4 min 54 s). Next: on one snapshot, the full tier with controls serially and at `--jobs 8`, every verdict compared, CPU and memory sampled (STATE 14z-205 (9) and its CLOSE section say how far this close got); then ask the maintainer whether a close runs at `--jobs 8`.
-2. **#298 — measure the narrowed controls** on this close's tier (`build/agent205/close/tier_results.controls.tsv`, local) against 1,500-1,800 s of controls per close before; comment the figures on #298 and close it if the narrowing held.
-3. **#296 — the sandbox inventory over the other emulator lanes** (step 1 is built: `MAME_SANDBOX_LOG`; the prereq lane's 324 runs were all fresh). Run the mame and fbneo lanes with the log on, on PILOT or ERIS when they are back, attribute every `reused` line, then step 2: refusal by default with `MAME_SANDBOX_REUSE=1` for a declared reuse.
-4. **#295 — a vsavj-vs-ours leg for `audit_dmg_legacy_sweep`'s legacy hits.** Plan it and put the plan through the rule-checker before building (32 more MAME runs, judged exact against vsavj, a planted one-HP control).
-5. **#291 — the capture sheets: S2 is complete.** Left: a note above each of the other 57 drawing gates (`docs/project/sheet_notes.md`, one written; each from the gate's header and the subject docs, never invented; #291's comment of 2026-10-18), then S3 (build from the commit, `--host pilot|eris`).
-6. **#286 and #292, when PILOT is back:** the parked narrowings (`build/agent203/t286/narrowings_on259.patch`, local) and the planner's self-test reads, each scored on a PILOT trace (0 misses, #225).
-7. **#297 stays open until a freeze has run the 109 moved gates green**; a freeze runs every gate anyway.
-8. **Then ask the maintainer for the order of work.** The open tickets by their GitHub severity label:
+1. **#291 — the unfiltered S3 run, then close #291.** S3 is built (STATE 14z-205b (6)): `python3 tools/proof_sheets.py
+   run <the 14z-205b close commit> --host pilot` builds that commit clean on PILOT and draws every declaring gate
+   (estimated 2-3 h; the filtered proof took 319 s). Three gates will show NOT THE JUDGED RUN by design (they default to
+   builds a commit does not make). Put the page to the maintainer, then the closure through the rule-checker.
+2. **#229 — WAITING ON THE MAINTAINER; everything is listed on #229 (comment of 2026-10-20) and in STATE 14z-205b (1)-(5).**
+   - **The work is LOCAL and UNTRACKED:** the six gates, their expectations, rigs and Lua (105 files,
+     `build/agent205/t229/pending_gates_229.list`, backed up in `pending_gates_229.tar` beside it); the forks' reports,
+     probes and sheets under `build/agent205/t229/`. Never `git clean`.
+   - **The maintainer's docs (private):** questions https://claude.ai/artifact/88mHYGNsf1wyYZ2EFfzPCE, community
+     cross-check https://claude.ai/artifact/Wfn7XUHignvbQphap3MwyK (#301). Read the questions doc for new answers first.
+   - **Answered** (`DECISIONS_HISTORY.md` "Read 2026-10-20 (14z-205b) — #229"): Q3, Q4's per-row inputs; Q1 for the
+     pursuits, the five light grabs, Hell's Gate and Ira Piano.
+   - **Waiting:** Q1 for the rest of the specials, ES/EX, the guard cancels and the command throws (the flagged rows:
+     `build/agent205/t229/look_first_index.md`); Q2 (the four 14z-194 pursuit claims; mid-screen does not explain them);
+     Q4's (a) join under the engine's input or (b) leave unjoined; Q5, Q6, Q7; and whether to comment on #301 that its
+     vswiki "inputs no rig could make fire" are answered (offered 2026-10-20, no answer yet).
+   - **Then, in order:** fix the two wrong joins (F3's "ES Ira Pino" is ES Ira Spinta; F1's workbook row 38 is a 6+P,
+     Tsuji Hayate needs Karame Dama first); Hell's Gate's rig shows little with LK (Zabel on the left), a stronger kick
+     or the other side if the maintainer wants it; a rule-checker run before each freeze; register the six gates (then restore them as #301's repro in `docs/project/tickets.tsv`, `none` while untracked);
+     `docs/project/tables/community_crosscheck.md`; the gotchas (the `-debug` pass skew, the MAME tap crash at exit,
+     the `nm.hcf` backdash trap).
+3. **#299 — the four items its comment of 2026-10-20 names** (the closure's rule-checker withdrew it, STATE 14z-205b
+   (7)): per-gate output compared serial against `--jobs 8`, a cold decrypt cache under the pool, a collision control
+   or census, wall-clock gates under load. The close's `--jobs 8` default stands.
+4. **#260** — the close's `pins` step was to close it after a close's push passes it (rule-checker first); STATE
+   14z-205b's CLOSE section says whether that happened.
+5. **#298 — measure the narrowed controls** on a close's tier against 1,500-1,800 s of controls per close before
+   (14z-205 commented 143 controls, 1,448 s); comment the figures on #298 and close it if the narrowing held.
+6. **#296 — the sandbox inventory over the other emulator lanes** (step 1 is built: `MAME_SANDBOX_LOG`). Run the mame
+   and fbneo lanes with the log on, on PILOT, attribute every `reused` line, then step 2: refusal by default with
+   `MAME_SANDBOX_REUSE=1` for a declared reuse.
+7. **#286 and #292, now that PILOT is back:** the parked narrowings (`build/agent203/t286/narrowings_on259.patch`,
+   local) and the planner's self-test reads, each scored on a PILOT trace (0 misses, #225).
+8. **#297 stays open until a freeze has run the 109 moved gates green**; a freeze runs every gate anyway.
+9. **Then ask the maintainer for the order of work.** The open tickets by their GitHub severity label:
    - high: #286, #292;
-   - medium: #295, #296, #284, #257;
-   - low: #118, #229, #244 (and #129, parked);
-   - no severity label: #260, #262, #263, #266, #267, #273, #275, #276, #277, #289, #291, #297, #298, #299;
+   - medium: #296, #284;
+   - low: #118, #229, #244, #301 (and #129, parked);
+   - no severity label: #260, #262, #263, #266, #267, #277, #289, #291, #297, #298, #299;
    - **release-only:** #278, #279, #280, #281.
-9. **`tests/replays/118_chain.rpl`'s header names a leg of `audit_mizuumi_inputs` that gate never ran** (STATE_HISTORY 14z-198 finding (i)); the one-line correction rides a session that runs the emulator gates following `tests/replays/`.
+10. **`tests/replays/118_chain.rpl`'s header names a leg of `audit_mizuumi_inputs` that gate never ran** (STATE_HISTORY
+    14z-198 finding (i)); the one-line correction rides a session that runs the emulator gates following `tests/replays/`.
 
 ## PARKED (not open work)
 
@@ -52,14 +82,21 @@ gates in parallel (#299, not yet a close's default).
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
-- **The forced-pick census reads a script's comments:** the word `vsav2` in a poked gate's prose makes a native leg (`docs/project/gotchas.md`, paid twice, 14z-197 and 14z-205). In a `# SHEET:` line of a gate that pokes ids, write vs2.
-- **A sandbox named after part of a run's identity is shared** (#293; `docs/project/gotchas.md`); `MAME_SANDBOX_LOG=<file>` now logs every run's sandbox as fresh or reused.
-- **The no-ROM-bytes rule's line** (ruled 2026-10-18): addresses and discrete values are fine; whole graphics, sounds and algorithms are not.
-- **A capture sheet's explanation** lives in `docs/project/sheet_notes.md`, never in the gate (writing one re-runs nothing).
+- **A capture sheet for the maintainer's eye has at least 5 tiles per move, 9 preferred** (*"5 per move is the strict
+  minimum and 9 is likely preferable"*, 2026-10-20), and a row to look at first carries a FILLED band and a thick frame
+  plus an index of sheet and row (tinted text went unseen).
+- **Light-strength command grabs exist on five moves** (SA Big Swing and Big Brunch, LI Mystic Arrow, JE Nero Fatica,
+  QB Catch and Release); the other command throws mask light out. Confirmed by eye 2026-10-20.
+- **The engine's motion trackers accept a prefix:** 4-1-2-3 + button also completes on 41236 (Karame Dama, Catch and
+  Release, Hell's Gate).
+- **`nm.hcf`'s gapped back taps are a backdash** on a character whose double back-tap dashes (Bishamon): the press then
+  lands in the hop.
+- **The forced-pick census reads a script's comments** (`docs/project/gotchas.md`); in a `# SHEET:` line of a gate that
+  pokes ids, write vs2.
 
-## WHAT CLOSED THIS SITTING (14z-205)
+## WHAT CLOSED THIS SITTING (14z-205b, and 14z-205 after its close)
 
-- **#291 S2 complete** (`bf92acd2`): 58 gates draw, 174 declare, the EVENT-PROVEN basis and the `no-picture` kind; the debt list is empty.
-- **#293 closed `done`** (`bf92acd2`): both carried-nvram gates give every run a fresh sandbox.
-- **#120 closed `done`**: the rebuild's spec, CLAUDE.md, skills and swarm in `DefinitelyFrenchName/VampireSaved-Rebuilt`; the rest is its #1.
-- **Filed:** #294 (by the maintainer), #295, #296, #297, #298, #299. **Ruled:** the census re-freeze, #295, the ROM-bytes line, #296, and the static tier's scope (`DECISIONS_HISTORY.md`, 2026-10-18 entries).
+- **Closed `done`:** #300, #295, #257, #276, #275, #273 (STATE_HISTORY 14z-205, after the close).
+- **Filed:** #300, #301. **Ruled:** #299's `--jobs 8` close, #262/#263/#277 parked under #289, #260 a close step,
+  #273's re-scope and Q1 kept (`DECISIONS_HISTORY.md`, 2026-10-19 entries); #229's answers read 2026-10-20.
+- **Built, not closed:** #291 S3 (the unfiltered run is START HERE 1); #229's six gates (unregistered, START HERE 2).

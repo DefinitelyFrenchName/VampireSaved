@@ -51,8 +51,9 @@ Placeholders: `{KEY}` the session key; `{RUN}` the run directory (absolute); `{R
 | dashboard | manual | `python3 tools/session_metrics.py collect`, then `check`; upload the four JSON files | - | the four datasets re-collected and uploaded to the dashboard, each `datasets/<id>` pointed at its new asset | #264; kept 2026-10-15 (#288) |
 | record | manual | - | - | the CLOSE section records every step's result up to here and names the tier's results file `{RUN}/tier_results.tsv`, the next close's `--prev` | [VSP-17] |
 | stage | manual | `git add -u` plus every new path by name | - | the records staged, nothing committed yet; no `build/` path staged; `git status` shows none of the sitting's own new files untracked | gotcha "`git add -u` STAGES NO NEW FILE"; #290 |
-| tier | auto | `ROMDIR={ROMDIR} STATIC_RESULTS_OUT={RUN}/tier_results.tsv tests/run_on_snapshot.sh --commit "$(git commit-tree "$(git write-tree)" -p HEAD -m '{KEY} close: the staged tree')" -- tests/run_all_static.sh --strict --confirm {PREV}` | line ^GREEN | the tier on a snapshot of the STAGED tree reads GREEN, and its row is in the green index (`.git/green_index.tsv`); a SKIP of a gate only another host can run is passed by hand with that host's PASS at the same tree; a red is fixed, re-staged and the tier re-run with `--confirm` on this run's results | #269, #286, #290, [VSP-181] |
+| tier | auto | `ROMDIR={ROMDIR} STATIC_RESULTS_OUT={RUN}/tier_results.tsv tests/run_on_snapshot.sh --commit "$(git commit-tree "$(git write-tree)" -p HEAD -m '{KEY} close: the staged tree')" -- tests/run_all_static.sh --strict --jobs 8 --confirm {PREV}` | line ^GREEN | the tier on a snapshot of the STAGED tree, 8 gates at a time (#299), reads GREEN, and its row is in the green index (`.git/green_index.tsv`); a SKIP of a gate only another host can run is passed by hand with that host's PASS at the same tree; a red is fixed, re-staged and the tier re-run with `--confirm` on this run's results | #269, #286, #290, #299, [VSP-181] |
 | commit | manual | `git commit -F -` (the message on a quoted heredoc) | - | committed; the pre-commit hook read the tier's row for the staged tree (`tools/git-hooks/green_guard.py`); `status` then marks the tier STALE, as it does `indexes`, because HEAD moved — the hook is what ties the run to the commit | #290 |
+| pins | auto | `python3 tools/submodule_pins.py` | exit 0 | every submodule pin in HEAD, the commit the push sends, is served by the remote its `.gitmodules` names: a fetch by sha into an empty repository, what a fresh clone's `git submodule update` does (2.3 to 2.9 s, measured 2026-10-19). A MISSING pin is pushed to its own remote first, then the step re-run; an ERROR (the remote could not be asked) is never passed by hand without that remote's answer | #260, ruled 2026-10-19 (14z-205) |
 | sweep | auto | `python3 tools/agent/sweep.py` | exit 0 | CLEAN, as the last command before the push: every survivor killed, leaves first, or declared with `--declare PID "REASON"` and named in the CLOSE section | C0.3, #172 S2 |
 | push | manual | `git push origin main` | - | pushed; anything red, skipped or unresolved leaves the commits local and the CLOSE section says so | ruled 2026-09-10, [VSP-17] |
 <!-- /CLOSE STEPS -->
@@ -76,6 +77,10 @@ The eight disagreements the census found (2026-10-15), each settled by the rulin
    2026-10-16 (14z-203) — an action is checked when its work is done, never held for the close").
 8. **Pushing:** only at the close, and only when everything is green ([VSP-17]). A mid-session push needs the
    maintainer's word.
+9. **The submodule pins:** checked by the `pins` step, after the commit and before the sweep, so it reads the commit the
+   push sends. It was a close-check row from 14z-197 and went with the close checks in #288; the maintainer brought it
+   back as a step: *"#260 make it a close step"* (2026-10-19, 14z-205). Its logic is gated in every tier by
+   `tests/test_submodule_pins.sh`.
 
 ## The rules the steps carry
 

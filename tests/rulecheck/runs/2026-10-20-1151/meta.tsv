@@ -1,0 +1,11 @@
+decision	recommendation
+subject	#229: put the community document to the maintainer, recommending its section 1 be reported once identity is confirmed and its section 4 be checked against vswiki
+session	14z-205
+model	rule-checker@163e4ce9cf7b
+claim	The community document recommends that its section 1 (workbook differences where our side was re-checked) be reported to the community once the maintainer confirms identity on the capture sheets, that its section 4 be checked against seesaawiki vswiki, and that section 3 (inconsistent patterns on our side) and the page's four contested 14z-194 pursuit claims be held back; each item rests on the fork report it names or on the cross-check page; not tested: identity (unconfirmed), other victims, FBNeo, mashed hit counts, throw techs, frame advantage, invulnerability, the dealt-vs-record mechanism, and whether vswiki covers any section 4 question.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	28 flag(s): ATTRIB 1, D-ABSOLUTE 26, D-FIGURE 1
+deliverables	build/agent205/t229/community_report.md

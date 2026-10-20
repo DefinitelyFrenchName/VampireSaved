@@ -1,0 +1,11 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent205/t300/issue_live.md	a4cff65518ca36b6c8a7b9498708efcccc13533e
+build/agent205/t300/fix.diff	946c4ed19bd0422aafd0a7906c4b181326ac4ce1
+build/agent205/t300/gate_before_fix.log	f145359c75321478e2064878b74ec508aee25180
+build/agent205/t300/gate_without_standin.log	5ba4462dc1f942745a5381b4ac0b49ae1f2e34d4
+build/agent205/t300/gate_pass.log	4a83e32d4e9971268a59640bafea68ac0a69abcc
+build/agent205/t300/mode_output_overwrites.log	e98890976fa831429ab008628f908939a4bc92c3
+build/agent205/t300/planted_row.log	858da26aa4e42383916fafe06ce8686329157fd4
+build/agent205/t300/maintainer_words.txt	8e19d541f838ccd1bebc779789adf5ab6ac0901d
+build/agent205/t300/row_300.tsv	90f5dec73e5f35e947ebb1cce4d907ecf0a97ad9
+build/agent205/t300/closing_comment.md	70f2d8e13c7082f4ef442bc0064429af0b0fb6e6

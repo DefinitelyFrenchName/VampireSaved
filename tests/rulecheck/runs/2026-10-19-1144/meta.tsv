@@ -1,0 +1,11 @@
+decision	recommendation
+subject	#273 and #275: re-scope #273's replication to before-action packets; fidelity-14z160 v6 names the freeze gap (14z-205)
+session	14z-205
+model	rule-checker@163e4ce9cf7b
+claim	report.md puts two recommendations to the maintainer: #273's replication re-scoped to the before-action packets (29 packets, 116 readers) because #288 cut the documentation packets that 4 of the 15 mattered and 16 of the 30 did-not-matter packets were (split_by_kind.out), and Q1 is still named in all 32 of the 36 before-action runs since 2026-10-16 that were VIOLATED (ledger_since_288.out); and fidelity-14z160's claim v6 naming the unguarded FREEZE branch (fixture_gate_excerpt.txt) under the fixture's own rule (fixture_NOTES.txt), then a recalibration. The cost figures are the 14z-199 readers' measured usage (cost.out) scaled by count, an estimate. Not tested: whether v6 reads OK under either arm; whether a C reader would find the freeze gap; whether 2 more readers per arm resolve a one-in-eleven difference (the plan's read-as rule allows unresolved); the DOC/ACTION split uses the ledger subject's wording. The ruling it departs from: ruling_14z199.txt, plan_replication_14z199.md; the maintainer's words: maintainer_words.txt
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	17 flag(s): D-ABSOLUTE 11, D-FIGURE 6
+deliverables	build/agent205/t273/report.md

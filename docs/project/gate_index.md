@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**465 scripts** — 136 ci_portable, 92 ci_static, 237 emulator-tier (run by name).
+**466 scripts** — 137 ci_portable, 92 ci_static, 237 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -28,7 +28,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
 | [character-data](#character-data) | 83 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
-| [review-triage](#review-triage) | 37 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
+| [review-triage](#review-triage) | 38 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
 ## runner
@@ -68,7 +68,7 @@ the suite runners and their own ground truth.
 | `tests/test_must_fire_census.sh` | test | ci_portable | — | THE MUST-FIRE DOCTRINE, MACHINE-READ under the R10 grammar: which gates DECLARE a must-fire control (`# MUST-FIRE: <shape>: | 14z-145 |
 | `tests/test_poke_readback.sh` | test | ci_portable | — | EVERY GATE THAT SAMPLES AN ADDRESS ITS OWN RIG POKES IS ON THE TABLE, and the table's classification is the maintainer's, not the tool's (GitHub #171 slice Q6, shape 4 of docs/project/gate_qualification_scope.md). ci_portable: | 14z-180 |
 | `tests/test_promise_check.sh` | test | ci_portable | — | every promise a sitting's record makes is classed FULFILLED, CARRIED or NOT A PROMISE, and each class holds (`tools/promise_check.py`, 14z-187b, GitHub #190 P3). | 14z-187b |
-| `tests/test_proof_sheets.sh` | test | emulator | MAME, ~17 s | THE COMPARATIVE SHEETS' PROOF IS ITSELF TESTED ([VSP-19]; GitHub #291 slice S1, 14z-204). | 14z-204 |
+| `tests/test_proof_sheets.sh` | test | emulator | MAME, a build dir, ~17 s | THE COMPARATIVE SHEETS' PROOF IS ITSELF TESTED ([VSP-19]; GitHub #291 slice S1, 14z-204). | 14z-204 |
 | `tests/test_py_escapes.sh` | test | ci_portable | — | NO TRACKED PYTHON FILE CARRIES AN INVALID STRING ESCAPE (14z-191). ci_portable: no ROM, ~3 s. | 14z-191 |
 | `tests/test_rule_checker.sh` | test | ci_portable | — | the adversarial RULE-CHECKER's record is sound: every run in tests/rulecheck/ledger.tsv is complete and structured, every planted violation was caught, every fixture is calibrated, every VIOLATED resolved, and every freeze since the checker… | 14z-163 |
 | `tests/test_rulings_verbatim.sh` | test | ci_portable | — | a quote a session attributes to the maintainer is the maintainer's own words, and every message the maintainer sent is on record (`tools/agent/rulings_verbatim.py`, 14z-185b, #190 P2). | 14z-185b |
@@ -429,7 +429,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/audit_df_modes.sh` | audit | emulator | MAME, a build dir, ~95 s | DARK FORCE POWER vs DARK FORCE CHANGE, every selectable character, frozen AS MEASURED (14z-168, GitHub #136): on vsav2 P+K is the global DARK FORCE POWER (two stocks, no startup invincibility, the seq-0x16 handler never reached); | 14z-168 |
 | `tests/audit_df_moves.sh` | audit | emulator | MAME, a build dir, ~40 s | THE TENANTS' MOVES INSIDE THEIR DARK FORCE, ours (Dark Force Change, P+K) vs native (the vs2 personal-Dark-Force EX install), frozen AS MEASURED (14z-168, GitHub #136): | 14z-168 |
 | `tests/audit_df_startup_invuln.sh` | audit | emulator | MAME, a build dir, ~3 min | THE DARK FORCE STARTUP INVINCIBILITY IS +0x147, ARMED PER CHARACTER BY THE seq-0x16 HANDLER, AND THE TENANTS ARM THEIR OWN (measured 14z-126; STATE "Decisions pending" DF-startup item). | 14z-126 |
-| `tests/audit_dmg_legacy_sweep.sh` | audit | emulator | MAME, FBNeo, a build dir, ~10 min | DEMITRI'S 2HK/5HP/623HP TAKE MORE HP ON VSAVJ THAN ON VSAV2 FROM ALMOST EVERY LEGACY VICTIM, with no port in the loop, BECAUSE VS2 LOWERED HIS OWN ATTACK RECORDS (10/14/20 -> 9/13/18) — each game given the other's records takes the other's… | 14z-187b |
+| `tests/audit_dmg_legacy_sweep.sh` | audit | emulator | MAME, FBNeo, a build dir | DEMITRI'S 2HK/5HP/623HP TAKE MORE HP ON VSAVJ THAN ON VSAV2 FROM ALMOST EVERY LEGACY VICTIM, with no port in the loop, BECAUSE VS2 LOWERED HIS OWN ATTACK RECORDS (10/14/20 -> 9/13/18) — each game given the other's records takes the other's… | 14z-187b |
 | `tests/audit_entrance_draw.sh` | audit | emulator | MAME, a build dir, ~15 s | PHOBOS'S ROUND-START ENTRANCE IS DRAWN FROM THE SAME THREE VARIANTS ON OUR BUILD AS ON vsav2 (14z-168, GitHub #136): the legs of #136's guard-cancel rigs drew different entrances because the draw follows each game's RNG state at character l… | 14z-168 |
 | `tests/audit_ex_refused.sh` | audit | emulator | MAME, a build dir | WHAT THE TENANTS' vs2 EX INPUT DOES WHEN THE MODE IS REFUSED, on native vsav2 and on our merged build, frozen AS MEASURED (14z-169; since 14z-170 the ruled EX-route fix's gate): | 14z-169 |
 | `tests/audit_extra_pass.sh` | audit | emulator | MAME, FBNeo, ~3 min | THE SPEED LEVEL'S EXTRA LOGIC PASS, PREDICTED PER FRAME (14z-195, promoted from the #118 pilot of 14z-194, GitHub #118; HOMING item 2) | 14z-195 |
@@ -538,6 +538,7 @@ the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guar
 | `tests/test_romset_path_guard.sh` | test | ci_portable | — | build_wide_romset must never write into, or delete, the reference set (14z-94, GitHub #76). ROM-free, ~2 s: the fixture builds its own fake romdir, so no real dump is ever at risk in this test. | 14z-94 |
 | `tests/test_select_port_hygiene.sh` | test | ci_portable | — | select_port.py must be chainable, idempotent and free of unreachable statements (14z-94, GitHub #46). ROM-free-ish, ~2 s. | 14z-94 |
 | `tests/test_static_runner.sh` | test | ci_portable | — | ground truth for tests/run_all_static.sh (14z-94, GitHub #30). ROM-free, ~3 s. | 14z-94 |
+| `tests/test_submodule_pins.sh` | test | ci_portable | — | the submodule-pin check's verdicts mean what they say (`tools/submodule_pins.py`, GitHub #260). | 2026-10-19 |
 
 ## mister
 

@@ -12,7 +12,8 @@
 #   sound ring's ids around each trap event are collected and compared with the frozen
 #   inventories per leg.
 # EXPECTS: ours equals its frozen inventory, native its own, 0x739/0x73A absent on ours,
-#   0x49A present on both. The 0x10A/0x10B pair is a recorded cosmetic delta, not gated.
+#   0x49A present on both. ~~The 0x10A/0x10B pair is a recorded cosmetic delta, not gated.~~ RESOLVED at the M23
+#   freeze (14z-192, #223; corrected here 14z-205, #291): ours fires 0x010B like native (the paragraph below).
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/ring_tap.lua
 #   tests/replays/hui/87_hui_plasma_trap.rpl tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
 #

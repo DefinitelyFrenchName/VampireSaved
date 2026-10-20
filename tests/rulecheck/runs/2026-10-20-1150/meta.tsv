@@ -1,0 +1,11 @@
+decision	recommendation
+subject	#229: put the questions document to the maintainer, with its recommendations Q2 (a), Q4 (a), Q5 (a), Q6 (a) and Q7 (a)-(c)
+session	14z-205
+model	rule-checker@163e4ce9cf7b
+claim	The questions document puts seven questions to the maintainer and recommends Q2 (a) retract the page's four 14z-194 pursuit claims once Q1 confirms F6's sheet, Q4 (a) join rows under the engine's input, Q5 (a) measure the dealt-vs-record mechanism before choosing a guard-cancel damage basis, Q6 (a) classify guard-cancel active and recovery on the whiff, and Q7 (a)-(c) file three tickets, each on the fork reports and outputs it cites; not tested: identity (Q1 is unanswered), the 14z-194 rigs (lost with ERIS's scratch files, so the page's side cannot be re-run), the dealt-vs-record mechanism, the guard-cancel hit-vs-whiff comparison beyond F5's two tick outputs (one attacker, one timing), and whether any committed expectation relies on a negative animation-table entry.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	27 flag(s): ATTRIB 1, D-ABSOLUTE 26
+deliverables	build/agent205/t229/questions_for_maintainer.md

@@ -1,0 +1,11 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent205/t275/fixture_v6.diff	d2f4af78977ff07fa9cd7ad456d19b46af1e2070
+build/agent205/t275/ledger_1146.txt	21e6b218867ebc5a645c7a457978279e4be54cea
+build/agent205/t275/verdict_negative_1146.txt	4c9ae20b14eff504ed898f699cc0f3483d18106c
+build/agent205/t275/verdict_plant_1146.txt	31eadf5254b4a79f3dc0ddbdff1a5617e5a5c443
+build/agent205/t275/test_rule_checker_fixture_lines.txt	9cfbf46f98355b66ebe423cbd8d9386107749a78
+build/agent205/t275/fixture_gate_excerpt.txt	89bfb410538846a5727a3fcbe25b14fce1b2edcd
+build/agent205/t275/ruling.txt	01aeff1a6198f772e16902517f96028f4eca7f0b
+build/agent205/t275/maintainer_words.txt	54a6d0bdb257cd70a3d6ec6ebff476b4ad40b236
+build/agent205/t275/closing_comment.md	577aa37933ae7f8e7279236d66aafc22b42e5333
+build/agent205/t275/row_275.tsv	40cb10afc2b6766257cd948484e2351ca1690ef9

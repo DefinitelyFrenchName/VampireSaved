@@ -114,7 +114,8 @@ Usage:
       re-runs everything. THE SESSION RUN (#269, 14z-200; ruled 2026-10-12, *"I agree with your proposal to turn the
       static tier around"*, and 2026-10-14, the three-gate core after the maintainer's *"C first"*): two more reasons re-run a gate that is PASS and
       not STALE — the CORE, a gate whose script carries the line `# CONFIRM: always` (test_commit_subject,
-      test_close_tools, test_rule_checker: their inputs move outside the tracked tree), and a gate whose recorded
+      test_close_tools, test_rule_checker: their inputs move outside the tracked tree; test_close_tools is `ondemand`
+      since #288, so a session run defers it whatever its mark, #300), and a gate whose recorded
       controls were not all executed and honoured in FILE (`honoured` below `declared`: a base run made with
       --exec-controls none or portable), so a carried gate's controls were executed in the run it is carried from.
   THE DIRTY SUBMODULE (#286 (b), 14z-202, maintainer-ruled 2026-10-15): `emu/fbneo` carries our applied patches, so it

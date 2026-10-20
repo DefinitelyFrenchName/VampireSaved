@@ -1,0 +1,2 @@
+  FLAG D-ABSOLUTE: This is options (a) and (b) of the issue in the form (a) took: the run record comes home whole, and the collector is unchanged.  [build/agent205/tooling/closing_comment_276.md]
+packet_check: 1 flag(s): D-ABSOLUTE 1

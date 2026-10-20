@@ -1,0 +1,4 @@
+  FLAG D-ABSOLUTE: - every trace byte-identical (frames 2300–4100, all eight fields): 32 of 32;  [build/agent205/t295/closing_comment.md]
+  FLAG D-ABSOLUTE: - every hit equal (red, white, first-drop frame, attacker, reaction class): 96 of 96;  [build/agent205/t295/closing_comment.md]
+  FLAG D-ABSOLUTE: **The sheet:** each legacy sheet shows vs2 above vsavj above ours (34 sheets, 308 pictures, 0 not the judged run); the maintainer: *"pictures look good"*.  [build/agent205/t295/closing_comment.md]
+packet_check: 3 flag(s): D-ABSOLUTE 3

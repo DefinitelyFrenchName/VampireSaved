@@ -1,0 +1,12 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent205/tooling/fix276.diff	6bac70f8195ef1e817779d3acf8116b083f6ff78
+build/agent205/tooling/test_static_runner_s26.txt	5c72d046c01ab5b0b82083ff606f90087f6d547b
+build/agent205/tooling/static_runner.log	9cb3c31516124b379f603df37bda3cf8d16eb25d
+build/agent205/tooling/mode_runrec-lost.log	4cd4736876a5908bd2578ac1111107d4cb597c9b
+build/agent205/tooling/mode_runrec-controls-lost.log	fafae1ae15adf33c58c741e52603044fb1553048
+build/agent205/tooling/run_on_snapshot.log	f9a48debf3ebe5fd574ff4f6ea6afa32c34dd30e
+build/agent205/tooling/mode_no-runs-copy-back.log	5cbacbc58e25dfbc2116f547a045bd260efc39aa
+build/agent205/tooling/e2e.txt	5be7dd936fef36567dba71d6d7ce4e7f26ee1ee7
+build/agent205/tooling/maintainer_words.txt	1516881f9835ff71993c6e00e436d824f7a496a8
+build/agent205/tooling/closing_comment_276.md	9f1d631350ec2a8a14e21d1df061f3b9594decb4
+build/agent205/tooling/row_276.tsv	8a8cea6a30fb195da9edd0fef8824784bee660cd

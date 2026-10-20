@@ -1,0 +1,9 @@
+  FLAG ATTRIB: The re-scoped replication ran as plan.md fixed it (116 replica readers, spawn check 116 of 116 ok, the path check's 5 calls outside a copy kept and shown not...
+  FLAG D-ABSOLUTE: | the 11 that mattered, caught on Q1 (both judges), k = 1 / 2 / 3 | 5 / 8 / 8 (21 of 33) | 4 / 5 / 7 (16 of 33) | **a wording cost** (V < C at every k) |  [build/agent205/t273/results.md]
+  FLAG D-ABSOLUTE: | the same, caught on any question (both judges) | 6 / 10 / 9 | 4 / 6 / 7 | — |  [build/agent205/t273/results.md]
+  FLAG D-ABSOLUTE: | the 14 that did not matter, Q1 dropped, k = 1 / 2 / 3 | 2 / 2 / 2 (6 of 42) | 7 / 6 / 7 (20 of 42) | **a wording gain** (V > C at every k) |  [build/agent205/t273/results.md]
+  FLAG D-ABSOLUTE: Fixtures (EXPECT from each fixture's own file): the three planted fixtures give the same VIOLATED questions under both arms for all three readers, each conta...  [build/agent205/t273/results.md]
+  FLAG D-ABSOLUTE: The negative fixture fidelity-14z160 (the 14z-199 v5 copy, EXPECT OK) reads OK under C for all three readers and VIOLATED on Q1 under V for two of three: on ...  [build/agent205/t273/results.md]
+  FLAG D-ABSOLUTE: - By the plan's rule both labels hold at every one of the three reader pairings: the bounded Q1 caught fewer gaps that mattered (5 fewer of 33 on Q1, 8 fewer...  [build/agent205/t273/results.md]
+  FLAG D-ABSOLUTE: Keep Q1 as it is (arm C) and close #273 with this result: on the packets that still run, the bounded wording lost 5 of 33 catches of a gap that mattered, and...  [build/agent205/t273/results.md]
+packet_check: 8 flag(s): ATTRIB 1, D-ABSOLUTE 7

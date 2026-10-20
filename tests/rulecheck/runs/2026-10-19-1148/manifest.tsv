@@ -1,0 +1,14 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent205/t273/results.md	f57c4169dcf858f820ecbfa29aab8a13c78b72de
+build/agent205/t273/plan.md	086c5501de53f8e1462b999d2a1c04953bf784c4
+build/agent205/t273/score.py	a0494f682dfb876071fa36a002b1d7b7137a3f03
+build/agent205/t273/score.out	e9f29dd79fe4ff5dcac7f89867db87d11eabf9c0
+build/agent205/t273/collect2.out	ada00ea7d9c4feb36f3c164942ef08060d78039d
+build/agent205/t273/spawncheck_all.out	49d2f5f41cfc3a06bc8f1d56b1d642033e59049d
+build/agent205/t273/excluded.out	6754500e498058fab2af67e3cdeb039b71a0dc47
+build/agent205/t273/judge5/build_items.out	133caa5c258928f4cb3ead6d40e8fe642d2abac9
+build/agent205/t273/judge5/judge_check.out	c9ce71f1cc47022a093e743904e8b612bf5d8f7f
+build/agent205/t273/judge5/key.tsv	5f4c3d6c9407b657b5130643a2beb110f1ac9c8c
+build/agent205/t273/judge5/judge_11.tsv	7734e248cfc5eb5c91e33b47d6ab458344a48dde
+build/agent205/t273/judge5/judge_12.tsv	0ab40747838bd2426f777c02e8795c1a32a69674
+build/agent205/t273/ledger_since_288.out	816b83074917e0d7e029895d24f7fc8b8675105d

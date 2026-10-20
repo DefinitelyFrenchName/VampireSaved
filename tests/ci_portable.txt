@@ -395,3 +395,6 @@ test_green_guard
 # 14z-204 (#291 slice S1): every emulator-registry gate declares its comparative sheet (`# SHEET:`) or is on the
 # shrink-only debt list tests/expected/sheet_debt.txt; the grammar and the sheet reader's refusals; four controls. ~2 s.
 test_sheet_census
+# 14z-205 (#260): the submodule-pin check the close runs as its `pins` step reads MISSING for a pin only the local
+# clone holds and never passes a pin it could not check; its selftest on a file:// remote, two controls. ~3 s.
+test_submodule_pins

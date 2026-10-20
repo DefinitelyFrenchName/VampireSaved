@@ -20,13 +20,25 @@ THE DECLARATION, read the way `# MUST-FIRE:` is (one line in the leading comment
 A `legs` gate must source tests/lib/sheet.sh. tests/test_sheet_census.sh holds every emulator-registry gate to one
 well-formed line, against a shrink-only debt list (tests/expected/sheet_debt.txt): the S2 retrofit's work list.
 
-SLICE S1 BOUNDS (said, not hidden): the commit must be HEAD, and the builds are the ones the gates default to (or the
-runner's %PLACEHOLDER% defaults) — building that commit in a clean checkout is slice S3, as are --host pilot|eris.
+SLICE S3 (14z-205): "OURS" IS BUILT FROM THE COMMIT ("Built from the commit", ruled 2026-10-16). `run <commit>` bundles
+the commit, clones it into a CLEAN CHECKOUT (never the working tree), builds there the five tracks the commit's own
+runner defaults name (tests/run_all_emulator.sh: MERGED DON HUI PYR STOCK) by the commit's reproducibility recipe
+(tests/test_m3a_reproducible.sh), and REFUSES the run unless each built track's fingerprint equals the commit's own
+frozen reference (that gate's EXPECT_* lines: the anchor sits outside this tool, [VSP-166]). It then runs the commit's
+gates, capture scripts and notes from the checkout. A picture of an `ours` leg is shown as NOT THE JUDGED RUN unless
+that leg ran on a build made in the checkout's build/ during this run (commit_check). The page states the commit, each
+built track's fingerprint, and the emulator binaries (the host's pinned builds: an emulator is not built from the
+commit). With `--host pilot|eris` the same run happens on that machine: the bundle and this file are sent, the run is
+started there (PILOT: detached; ERIS: held open by the ssh, WSL2 stops a distro with no client), polled with a bounded
+ssh, and the page is brought back to build/sheets/<commit>/. The commit's own copy of this tool is not used, so a
+commit from before S3 is drawn by this one; a commit from before S1 (no tests/lib/sheet.sh) is refused.
 
 Usage:
-    proof_sheets.py run [<commit>] [--gate G]... [--char C] [--ticket N] [--jobs N] [--out DIR]
+    proof_sheets.py run [<commit>] [--gate G]... [--char C] [--ticket N] [--jobs N] [--out DIR] [--tree DIR]
+                        [--reuse-tree] [--host pilot|eris [--host-dir D] [--host-romdir D] [--host-timeout S]]
     proof_sheets.py prove <sheet_out dir> [--jobs N]       re-run, photograph and prove one gate's SHEET_OUT
     proof_sheets.py page <out dir>                         re-draw the page from proven sheets
+    proof_sheets.py commitcheck <proof.json> <tree>        S3's ours-leg check on a proven sheet (ground truth)
     proof_sheets.py census [--tests DIR] [--registry F] [--debt F]
 Env: ROMDIR (required for run/prove), MAME_BIN.
 """
@@ -34,6 +46,7 @@ import concurrent.futures, glob, html, json, os, re, shutil, subprocess, sys, ti
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+TOOL_ROOT = ROOT                          # the repository this file sits in; `run` points ROOT at the clean checkout
 ROLES = ("vs2", "vsavj", "ours")          # row order on a sheet: native vs2 on top, then vsavj, then ours (#177)
 BASES = ("log", "ram", "fields", "file", "event", "none")
 DECL = re.compile(r"^#\s*SHEET:\s*(.*)$")
@@ -516,12 +529,13 @@ table.grid{border-collapse:collapse} .grid td,.grid th{padding:4px;vertical-alig
 """
 
 
-NOTES = ROOT / "docs/project/sheet_notes.md"
 REPO_URL = "https://github.com/DefinitelyFrenchName/VampireSaved/issues/"
 
 
-def sheet_notes(path=NOTES):
-    """docs/project/sheet_notes.md -> {gate: text}: each `## <gate>` section's body (14z-205, #291)."""
+def sheet_notes(path=None):
+    """docs/project/sheet_notes.md -> {gate: text}: each `## <gate>` section's body (14z-205, #291). Read from ROOT at
+    call time: under `run` that is the commit's checkout, so the notes are the commit's."""
+    path = path or ROOT / "docs/project/sheet_notes.md"
     notes, cur = {}, None
     if not Path(path).exists():
         return notes
@@ -601,10 +615,12 @@ def page(out_dir, meta):
                     cls = "NOTJUDGED" if cell["status"] == "NOT THE JUDGED RUN" else (
                         "DIFF" if re.match(r"(?i)^(DIFF|FAIL|DIVERGE)", c["verdict"]) else "PROVEN")
                     img = ""
-                    if cell["pic"] and os.path.exists(cell["pic"]):
-                        ext = os.path.splitext(cell["pic"])[1].lower() or ".png"
-                        name = "%s.%s.%s.%d%s" % (gid, s["sid"], lg["leg"], k, ext)
-                        shutil.copyfile(cell["pic"], pics / name)
+                    ext = os.path.splitext(cell["pic"] or "")[1].lower() or ".png"
+                    name = "%s.%s.%s.%d%s" % (gid, s["sid"], lg["leg"], k, ext)
+                    # a page brought back from a --host run is re-drawn from its own pics/ (the cell paths are the host's)
+                    if cell["pic"] and (os.path.exists(cell["pic"]) or (pics / name).exists()):
+                        if os.path.exists(cell["pic"]):
+                            shutil.copyfile(cell["pic"], pics / name)
                         if ext in (".wav", ".ogg", ".mp3"):   # the ruled sound clips (2026-10-17): the gate's own recording
                             img = '<audio controls preload="none" src="pics/%s"></audio>' % html.escape(name)
                         else:
@@ -632,6 +648,7 @@ def page(out_dir, meta):
         if meta.get(key):
             lists.append("<h2>%s — %d</h2><div class=\"mut\">%s</div>" % (title, len(meta[key]), html.escape(", ".join(meta[key]))))
     builds = "".join("<li>%s: %s</li>" % (html.escape(k), html.escape(v)) for k, v in meta.get("builds", {}).items())
+    builds += "".join("<li>%s</li>" % html.escape(v) for v in meta.get("provenance", []))   # S3: what was built, and on what
     doc = ('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
            '<title>Proof Sheets</title><style>%s</style></head><body><h1>Comparative capture sheets</h1>'
            '<div class="mut">commit %s · run %s · each picture proven against what its gate logged (#291)</div>'
@@ -648,23 +665,374 @@ def build_key(rompath, set_):
     return ("registered: %s" % v) if r.returncode == 0 else ("UNREGISTERED: %s" % v)
 
 
+# ── S3: the commit, built in a clean checkout (14z-205) ─────────────────────────────────────────────────────────
+# What each runner-default track is built as: (set, the commit's frozen reference in tests/test_m3a_reproducible.sh,
+# env, argv). The recipe is that gate's own (the four tracks, then the merged image from its inputs); a recipe that
+# drifts from the commit's is caught by the fingerprint check against EXPECT_*, not trusted.
+WIDE_FLAGS = "--allow-plausible --tripwire-open --profile cps2-wide-v1"
+STOCK_FLAGS = "--allow-plausible --tripwire-open"
+TENANT_FLAGS = "--profile cps2-wide-v1 --allow-plausible --tripwire-open"
+TRACKS = ("DON", "STOCK", "HUI", "PYR", "MERGED")
+TRACK_SET = {"DON": "vsavjw", "STOCK": "vsavj", "HUI": "vsavjw", "PYR": "vsavjw", "MERGED": "vsavjw"}
+TRACK_EXPECT = {"DON": "WIDE", "STOCK": "STOCK", "HUI": "HUI", "PYR": "PYR", "MERGED": "MERGED"}
+
+
+def build_steps(names, tree, romdir):
+    """-> [(label, env, argv)] in order, run from the checkout's root."""
+    wide = str(Path(tree) / "build/wide0/rompath/vsavjw.zip")
+    return [
+        ("wide0", {}, ["python3", "tools/build_wide_romset.py", romdir, "build/wide0/rompath", "--qsound", "2", "--gfx", "4", "--prg", "4"]),
+        ("DON", {"KEY_SET": "vsavj", "WIDE_ROMSET": wide, "GEN_FLAGS": WIDE_FLAGS}, ["tools/build_donovan.sh", "6", names["DON"]]),
+        ("STOCK", {"GEN_FLAGS": STOCK_FLAGS}, ["tools/build_donovan.sh", "6", names["STOCK"]]),
+        ("HUI", {"TENANT_MANIFEST": "build/manifest/huitzil.toml", "TENANT_CHAR": "0x10", "WIDE_ROMSET": wide, "GEN_FLAGS": TENANT_FLAGS},
+         ["tools/build_donovan.sh", "6", names["HUI"]]),
+        ("PYR", {"TENANT_MANIFEST": "build/manifest/pyron.toml", "TENANT_CHAR": "0x11", "WIDE_ROMSET": wide, "GEN_FLAGS": TENANT_FLAGS},
+         ["tools/build_donovan.sh", "6", names["PYR"]]),
+        ("merged inputs", {}, ["tools/ensure_merged_inputs.sh"]),
+        ("MERGED", {"WIDE_ROMSET": wide}, ["tools/build_merged.sh", names["MERGED"]]),
+    ]
+
+
+def frozen_references(tree):
+    """The commit's own frozen track fingerprints: {WIDE|STOCK|HUI|PYR|MERGED: sha1} from its test_m3a_reproducible.sh."""
+    p = Path(tree) / "tests/test_m3a_reproducible.sh"
+    if not p.exists():
+        return {}
+    return dict(re.findall(r'^EXPECT_(WIDE|STOCK|HUI|PYR|MERGED)="([0-9a-f]{40})"', p.read_text(), re.M))
+
+
+def fingerprint(tree, rompath, set_, romdir):
+    r = subprocess.run([sys.executable, "tools/build_fingerprint.py", "%s;%s" % (rompath, romdir), "--set", set_, "--sha-only"],
+                       cwd=tree, capture_output=True, text=True)
+    return r.stdout.strip().splitlines()[-1] if r.returncode == 0 and r.stdout.strip() else None
+
+
+def check_builds(built, expect):
+    """built {track: fp|None}, expect {WIDE|...: fp} -> problems ([] = every track is the commit's frozen reference)."""
+    out = []
+    for t in TRACKS:
+        want = expect.get(TRACK_EXPECT[t])
+        if not want:
+            out.append("%s: the commit freezes no reference fingerprint (EXPECT_%s) — nothing says this build is the commit's" % (t, TRACK_EXPECT[t]))
+        elif built.get(t) != want:
+            out.append("%s: built %s, the commit's frozen reference is %s — the commit does not reproduce its own build" % (t, built.get(t), want))
+    return out
+
+
+def build_commit(tree, romdir, logs, reuse):
+    """Build the runner-default tracks in the checkout. -> (record, problems)."""
+    names = runner_defaults()                            # ROOT is the checkout: the commit's own names
+    missing = [t for t in TRACKS if t not in names]
+    if missing:
+        return None, ["the commit's tests/run_all_emulator.sh names no default for %s" % ", ".join(missing)]
+    rec_p = Path(tree) / ".proof_build.json"
+    logs.mkdir(parents=True, exist_ok=True)
+    if not (reuse and rec_p.exists()):
+        r = subprocess.run([sys.executable, "tools/audit_roms.py", romdir], cwd=tree, capture_output=True, text=True)
+        (logs / "audit_roms.log").write_text(r.stdout + r.stderr)
+        if r.returncode != 0:
+            return None, ["ROMDIR %s does not match the commit's docs/checksums.txt (CLAUDE.md §3; %s)" % (romdir, logs / "audit_roms.log")]
+        for label, env, argv in build_steps(names, tree, romdir):
+            t0 = time.time()
+            print("   build %s: %s" % (label, " ".join(argv)), flush=True)
+            with open(logs / ("%s.log" % label.replace(" ", "_")), "w") as lf:
+                rc = subprocess.run(argv, cwd=tree, env=dict(os.environ, ROMDIR=romdir, **env), stdout=lf,
+                                    stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL).returncode
+            print("     exit %d, %ds" % (rc, time.time() - t0), flush=True)
+            if rc != 0:
+                return None, ["the %s build failed (exit %d; %s)" % (label, rc, logs / ("%s.log" % label.replace(" ", "_")))]
+    built = {t: fingerprint(tree, names[t] + "/rompath", TRACK_SET[t], romdir) for t in TRACKS}
+    expect = frozen_references(tree)
+    rec = {"tracks": {t: {"dir": names[t], "set": TRACK_SET[t], "fingerprint": built[t], "frozen": expect.get(TRACK_EXPECT[t])} for t in TRACKS}}
+    rec_p.write_text(json.dumps(rec, indent=1))
+    return rec, check_builds(built, expect)
+
+
+def is_tracked(tree, rel):
+    r = subprocess.run(["git", "ls-files", "--", rel], cwd=tree, capture_output=True, text=True)
+    return bool(r.stdout.strip())
+
+
+def ours_build_problem(rompath, tree):
+    """None when an `ours` leg ran on a build made in the clean checkout's build/ (a clean checkout has no untracked
+    build/ entry until this run makes one: the S3 build step, or a gate building from the commit's own sources);
+    else why the leg is not the commit's build."""
+    tree = Path(tree).resolve()
+    first = (rompath or "").split(";")[0].strip()
+    if not first:
+        return "ours names no rom path"
+    p = Path(first) if os.path.isabs(first) else tree / first
+    p = p.resolve()
+    if not str(p).startswith(str((tree / "build").resolve()) + os.sep):
+        return "ours ran on %s, outside the clean checkout's build/: not a build this run made from the commit" % first
+    rel = str(p.relative_to(tree))
+    if is_tracked(tree, rel):
+        return "ours ran on %s, a tracked path of the commit, not a build" % first
+    return None
+
+
+def commit_check(sheets, tree):
+    """Mark every picture of an `ours` leg that did not run on the commit's build NOT THE JUDGED RUN (S3). In place."""
+    for s in sheets:
+        bad = {}
+        for lg in s["legs"]:
+            if lg["role"] == "ours":
+                why = ours_build_problem(lg["rompath"], tree)
+                if why:
+                    bad[lg["leg"]] = why
+        for c in s["cols"]:
+            for leg, x in c["cells"].items():
+                if leg in bad:
+                    x["why"] = "%s (its own proof: %s %s)" % (bad[leg], x["status"], x["why"])
+                    x["status"] = "NOT THE JUDGED RUN"
+    return sheets
+
+
+def emulators():
+    out = []
+    bins = [os.environ["MAME_BIN"]] if os.environ.get("MAME_BIN") else [
+        os.path.expanduser("~/.cache/vampire-saved/mame/cps2"), os.path.expanduser("~/.cache/vampire-saved/mame-ref/cps2")]
+    for b in bins:
+        if os.path.exists(b):
+            r = subprocess.run(["shasum" if shutil.which("shasum") else "sha1sum", b], capture_output=True, text=True)
+            out.append("emulator %s sha1 %s (this host's pinned build, not built from the commit)" % (b, (r.stdout.split() or ["?"])[0]))
+    return out
+
+
+def make_checkout(sha, tree, bundle, reuse):
+    """A clean checkout of exactly `sha` at `tree`, cloned from a bundle. -> problem or None."""
+    tree = Path(tree)
+    if tree.exists() and any(tree.iterdir()):
+        if not reuse:
+            return "%s exists; remove it, or pass --reuse-tree to use the checkout a previous run of this commit made" % tree
+        head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=tree, capture_output=True, text=True).stdout.strip()
+        dirty = subprocess.run(["git", "status", "--porcelain", "--untracked-files=no"], cwd=tree, capture_output=True, text=True).stdout.strip()
+        if head != sha or dirty:
+            return "%s is not a clean checkout of %s (HEAD %s, %d modified tracked file(s))" % (tree, sha[:12], head[:12], len(dirty.splitlines()))
+        return None
+    tree.mkdir(parents=True, exist_ok=True)
+    # init + fetch every ref of the bundle: a clone takes only refs/heads and refs/tags, and the bundle's one ref is
+    # the temporary refs/proof-sheets/* (make_bundle), so a clone would arrive empty (found on PILOT, 14z-205)
+    for argv in (["git", "-C", str(tree), "init", "--quiet"],
+                 ["git", "-C", str(tree), "fetch", "--quiet", str(bundle), "+refs/*:refs/bundle/*"],
+                 ["git", "-C", str(tree), "checkout", "--quiet", "--detach", sha]):
+        r = subprocess.run(argv, capture_output=True, text=True)
+        if r.returncode != 0:
+            return "%s: %s" % (" ".join(argv[:3]), (r.stderr.strip().splitlines() or ["failed"])[-1])
+    return None
+
+
+def make_bundle(sha, path):
+    """A bundle of the commit's history, through a temporary ref (git bundles refs, not bare commits); the ref is gone after."""
+    ref = "refs/proof-sheets/run-%d" % os.getpid()
+    try:
+        subprocess.run(["git", "update-ref", ref, sha], cwd=TOOL_ROOT, check=True)
+        r = subprocess.run(["git", "bundle", "create", str(path), ref], cwd=TOOL_ROOT, capture_output=True, text=True)
+        return None if r.returncode == 0 else (r.stderr.strip().splitlines() or ["git bundle failed"])[-1]
+    finally:
+        subprocess.run(["git", "update-ref", "-d", ref], cwd=TOOL_ROOT)
+
+
+# The hosts (docs/project/operations.md / the remote machines): how to reach a shell, where files land for scp, where
+# that place is seen from the run's shell, the ROMDIR, and whether the run may be detached. PILOT is a Linux VM;
+# ERIS reaches WSL2 through wsl.exe, whose distro stops when no client is open, so its run is held by the ssh
+# (UNTESTED: written 14z-205 while ERIS was unreachable).
+HOSTS = {
+    "pilot": {"ssh": "pilot", "shell": "sh -s", "xfer": "{dir}", "xfer_seen": "$HOME/{dir}", "run": "$HOME/{dir}",
+              "romdir": "$HOME/roms", "detach": True, "pre": ""},
+    "eris": {"ssh": "eris", "shell": "wsl.exe -e sh -s", "xfer": "proof_sheets_xfer/{sha}",
+             "xfer_seen": "/mnt/c/Users/chaton/proof_sheets_xfer/{sha}", "run": "$HOME/{dir}", "romdir": None,
+             "detach": False, "pre": "unset DISPLAY WAYLAND_DISPLAY PULSE_SERVER XDG_RUNTIME_DIR; "
+                                     "export SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy"},
+}
+
+
+def ssh_script(h, script, timeout):
+    """Run a shell script on the host (stdin), bounded. -> CompletedProcess (rc 124 on timeout)."""
+    body = '. "$HOME/.profile" >/dev/null 2>&1\n%s\n%s\n' % (h["pre"], script)
+    try:
+        return subprocess.run(["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=15", h["ssh"], h["shell"]], input=body,
+                              capture_output=True, text=True, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        return subprocess.CompletedProcess([], 124, "", "ssh timed out after %ds" % timeout)
+
+
+def q(s):
+    return "'" + str(s).replace("'", "'\\''") + "'"
+
+
+def host_run(a, sha):
+    if a.host not in HOSTS:
+        print("REFUSED: unknown host %r (hosts: %s)" % (a.host, ", ".join(sorted(HOSTS))))
+        return 2
+    h = HOSTS[a.host]
+    romdir = a.host_romdir or h["romdir"]
+    if not romdir:
+        print("REFUSED: --host %s needs --host-romdir (no default ROMDIR is recorded for it)" % a.host)
+        return 2
+    s12 = sha[:12]
+    d = "%s/%s" % ((a.host_dir or "proof_sheets").rstrip("/"), s12)
+    run, xfer, seen = h["run"].format(dir=d), h["xfer"].format(dir=d, sha=s12), h["xfer_seen"].format(dir=d, sha=s12)
+    local_out = Path(a.out or TOOL_ROOT / "build" / "sheets" / s12).resolve()
+    local_out.mkdir(parents=True, exist_ok=True)
+    stage = local_out / "host_stage"
+    shutil.rmtree(stage, ignore_errors=True)
+    stage.mkdir()
+    err = make_bundle(sha, stage / "c.bundle")
+    if err:
+        print("REFUSED: could not bundle %s: %s" % (sha[:12], err))
+        return 2
+    shutil.copyfile(Path(__file__).resolve(), stage / "proof_sheets_s3.py")
+    r = ssh_script(h, "set -e; rm -rf %s; mkdir -p %s %s" % (run, run, seen if seen != run else run), 60)
+    if r.returncode != 0:
+        print("REFUSED: %s unreachable or refused the work dir: %s" % (a.host, (r.stderr or r.stdout).strip()[-300:]))
+        return 2
+    t0 = time.time()
+    try:
+        rc = subprocess.run(["scp", "-q", "-o", "BatchMode=yes", str(stage / "c.bundle"), str(stage / "proof_sheets_s3.py"),
+                             "%s:%s/" % (h["ssh"], xfer)], timeout=1800).returncode
+    except subprocess.TimeoutExpired:
+        rc = 124
+    if rc != 0:
+        print("REFUSED: sending the bundle to %s failed (exit %d)" % (a.host, rc))
+        return 2
+    print("   sent the bundle and the tool to %s:%s (%ds)" % (a.host, run, time.time() - t0), flush=True)
+    opts = "".join(" --gate %s" % q(g) for g in (a.gate or [])) + (" --char %s" % q(a.char) if a.char else "") + \
+        (" --ticket %s" % q(a.ticket) if a.ticket else "") + " --jobs %d" % a.jobs
+    cmd = ("cd %s && { [ %s = %s ] || cp %s/c.bundle %s/proof_sheets_s3.py %s/; } && "
+           "ROMDIR=%s python3 proof_sheets_s3.py run %s --bundle c.bundle --tree tree --out out%s > run.log 2>&1; echo $? > rc"
+           % (run, q(seen), q(run), seen, seen, run, romdir, sha, opts))
+    if h["detach"]:
+        r = ssh_script(h, "cd %s || exit 1\nrm -f rc\nnohup setsid sh -c %s > /dev/null 2>&1 < /dev/null &\necho $! > pid\necho started"
+                       % (run, q(cmd)), 60)
+        held = None
+        if "started" not in r.stdout:
+            print("REFUSED: could not start the run on %s: %s" % (a.host, (r.stderr or r.stdout).strip()[-300:]))
+            return 2
+    else:                                               # held: the ssh keeps WSL2's distro alive for the whole run
+        held = subprocess.Popen(["ssh", "-o", "BatchMode=yes", h["ssh"], h["shell"]], stdin=subprocess.PIPE,
+                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, text=True)
+        held.stdin.write('. "$HOME/.profile" >/dev/null 2>&1\n%s\n%s\n' % (h["pre"], cmd))
+        held.stdin.close()
+    t0, seen_output, last = time.time(), False, ""
+    while True:
+        time.sleep(15 if not seen_output else 60)
+        r = ssh_script(h, "cd %s && { cat rc 2>/dev/null || echo RUNNING; }; wc -c < run.log 2>/dev/null || echo 0; tail -n 1 run.log 2>/dev/null" % run, 60)
+        lines = r.stdout.splitlines()
+        state = lines[0].strip() if lines else "?"
+        size = int(lines[1].strip()) if len(lines) > 1 and lines[1].strip().isdigit() else 0
+        tail = lines[2] if len(lines) > 2 else ""
+        seen_output = seen_output or size > 0
+        if tail != last:
+            print("   [%s %ds] %s" % (a.host, time.time() - t0, tail[:160]), flush=True)
+            last = tail
+        if state != "RUNNING" and state.isdigit():
+            break
+        if not seen_output and time.time() - t0 > 180:          # the early poll: a run that writes nothing is not running
+            print("FAILED: the run on %s wrote no output in 180 s" % a.host)
+            host_kill(h, run, held)
+            return 1
+        if time.time() - t0 > a.host_timeout:
+            print("FAILED: the run on %s passed --host-timeout %ds; stopped" % (a.host, a.host_timeout))
+            host_kill(h, run, held)
+            return 1
+    if held:
+        held.wait(timeout=120)
+    remote_rc = int(state)
+    r = ssh_script(h, "cd %s && tar -cf %s/out.tar --exclude='out/gates/*/capture' out run.log && echo packed" % (run, seen), 1800)
+    if "packed" not in r.stdout:
+        print("FAILED: could not pack the page on %s: %s" % (a.host, (r.stderr or r.stdout).strip()[-300:]))
+        return 1
+    try:
+        rc = subprocess.run(["scp", "-q", "-o", "BatchMode=yes", "%s:%s/out.tar" % (h["ssh"], xfer), str(stage / "out.tar")], timeout=3600).returncode
+    except subprocess.TimeoutExpired:
+        rc = 124
+    if rc != 0:
+        print("FAILED: fetching the page from %s failed (exit %d)" % (a.host, rc))
+        return 1
+    subprocess.run(["tar", "-xf", str(stage / "out.tar"), "-C", str(stage)], check=True)
+    for p in (stage / "out").iterdir():
+        dst = local_out / p.name
+        if dst.is_dir():
+            shutil.rmtree(dst)
+        elif dst.exists():
+            dst.unlink()
+        shutil.move(str(p), str(dst))
+    shutil.move(str(stage / "run.log"), str(local_out / ("host_run_%s.log" % a.host)))
+    shutil.rmtree(stage, ignore_errors=True)
+    print("   the run on %s exited %d after %ds; its log is %s" % (a.host, remote_rc, time.time() - t0, local_out / ("host_run_%s.log" % a.host)))
+    if (local_out / "index.html").exists() and remote_rc == 0:
+        print("WROTE %s" % (local_out / "index.html"))
+    return remote_rc
+
+
+def host_kill(h, run, held):
+    ssh_script(h, "cd %s && [ -f pid ] && kill -TERM -$(cat pid) 2>/dev/null; kill -TERM $(cat pid) 2>/dev/null; echo 130 > rc" % run, 60)
+    if held:
+        held.kill()
+
+
 # ── commands ────────────────────────────────────────────────────────────────────────────────────────────────────
 def cmd_run(a):
-    head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
-    want = subprocess.run(["git", "rev-parse", a.commit + "^{commit}"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
-    if not want:
-        print("REFUSED: %s is not a commit" % a.commit)
-        return 2
-    if want != head:
-        print("REFUSED: %s is not HEAD (%s) — building another commit's romset is slice S3 (#291)" % (a.commit, head[:8]))
-        return 2
+    global ROOT
+    if a.host:
+        if a.host not in HOSTS:
+            print("REFUSED: unknown host %r (hosts: %s)" % (a.host, ", ".join(sorted(HOSTS))))
+            return 2
+        sha = subprocess.run(["git", "rev-parse", a.commit + "^{commit}"], cwd=TOOL_ROOT, capture_output=True, text=True).stdout.strip()
+        if not sha:
+            print("REFUSED: %s is not a commit" % a.commit)
+            return 2
+        return host_run(a, sha)
     if not os.environ.get("ROMDIR"):
         print("REFUSED: set ROMDIR")
         return 2
-    out = Path(a.out or ROOT / "build" / "sheets" / head[:12]).resolve()
+    romdir = str(Path(os.environ["ROMDIR"]).expanduser().resolve())
+    os.environ["ROMDIR"] = romdir
+    if a.bundle:                                         # on a host: the commit arrives as a bundle, named by its full sha
+        sha = a.commit if re.match(r"^[0-9a-f]{40}$", a.commit) else ""
+        if not sha:
+            print("REFUSED: with --bundle the commit is named by its full 40-hex sha, not %r" % a.commit)
+            return 2
+        bundle = Path(a.bundle).resolve()
+    else:
+        sha = subprocess.run(["git", "rev-parse", a.commit + "^{commit}"], cwd=TOOL_ROOT, capture_output=True, text=True).stdout.strip()
+        if not sha:
+            print("REFUSED: %s is not a commit" % a.commit)
+            return 2
+        bundle = None
+    out = Path(a.out or TOOL_ROOT / "build" / "sheets" / sha[:12]).resolve()
     out.mkdir(parents=True, exist_ok=True)
+    tree = Path(a.tree or out.parent / ("%s.tree" % sha[:12])).resolve()
+    if bundle is None and not (a.reuse_tree and tree.exists()):
+        bundle = out / "c.bundle"
+        err = make_bundle(sha, bundle)
+        if err:
+            print("REFUSED: could not bundle %s: %s" % (sha[:12], err))
+            return 2
+    print("== the clean checkout of %s at %s" % (sha[:12], tree), flush=True)
+    err = make_checkout(sha, tree, bundle, a.reuse_tree)
+    if err:
+        print("REFUSED: %s" % err)
+        return 2
+    if not (tree / "tests/lib/sheet.sh").exists():
+        print("REFUSED: %s predates #291 S1 (no tests/lib/sheet.sh): no gate of it declares a sheet" % sha[:12])
+        return 2
+    ROOT = tree                                          # from here every gate, script, note and registry is the commit's
+    print("== building the commit's tracks in the checkout", flush=True)
+    rec, problems = build_commit(tree, romdir, out / "build_logs", a.reuse_tree)
+    for p in problems:
+        print("REFUSED: %s" % p)
+    if problems:
+        return 2
+    prov = ["commit %s, built in a clean checkout (%s)" % (sha, tree)]
+    prov += ["%s %s (%s): %s = the commit's frozen reference" % (t, v["dir"], v["set"], v["fingerprint"]) for t, v in rec["tracks"].items()]
+    prov += emulators()
+    for p in prov:
+        print("   " + p, flush=True)
     rows = registry_gates(ROOT / "tests/ci_emulator.tsv")
-    meta = {"commit": head, "date": time.strftime("%Y-%m-%d %H:%M"), "gates": [], "no_reference_leg": [], "no_picture": [], "debt": [], "builds": {}}
+    meta = {"commit": sha, "date": time.strftime("%Y-%m-%d %H:%M"), "gates": [], "no_reference_leg": [], "no_picture": [], "debt": [],
+            "builds": {}, "provenance": prov}
     declared = []
     for r in select(rows, a.gate, a.char, a.ticket):
         d, err = parse_declaration(ROOT / "tests" / (r[0] + ".sh"))
@@ -688,7 +1056,8 @@ def cmd_run(a):
             meta["gates"].append(res)
             continue
         print("   capturing and proving", flush=True)
-        res["sheets"] = prove_dir(sd, a.jobs)
+        res["sheets"] = commit_check(prove_dir(sd, a.jobs), tree)
+        (sd / "proof.json").write_text(json.dumps(res["sheets"], indent=1))
         n = sum(len(c["cells"]) for s in res["sheets"] for c in s["cols"])
         bad = sum(1 for s in res["sheets"] for c in s["cols"] for x in c["cells"].values() if x["status"] == "NOT THE JUDGED RUN")
         print("   %d sheet(s), %d picture(s), %d NOT THE JUDGED RUN" % (len(res["sheets"]), n, bad), flush=True)
@@ -727,6 +1096,15 @@ def cmd_page(a):
     return 0
 
 
+def cmd_commitcheck(a):
+    sheets = commit_check(json.loads(Path(a.proof).read_text()), a.tree)
+    for s in sheets:
+        for c in s["cols"]:
+            for leg, x in c["cells"].items():
+                print("%s\t%s\t%s\tf%s\t%s\t%s" % (s["sid"], c["label"], leg, x["frame"], x["status"], x["why"]))
+    return 0
+
+
 def cmd_census(a):
     rows, problems = census(a.tests, a.registry, a.debt)
     for g, c in rows:
@@ -747,9 +1125,19 @@ def main(argv):
     r.add_argument("--ticket")
     r.add_argument("--jobs", type=int, default=4)
     r.add_argument("--out")
+    r.add_argument("--tree", help="the clean checkout (default build/sheets/<commit>.tree)")
+    r.add_argument("--reuse-tree", action="store_true", help="use the checkout and builds a previous run of this commit made")
+    r.add_argument("--bundle", help="clone the commit from this bundle (what a --host run does on the host)")
+    r.add_argument("--host", help="run on pilot or eris and bring the page back")
+    r.add_argument("--host-dir", help="the work dir under the host's home (default proof_sheets)")
+    r.add_argument("--host-romdir", help="ROMDIR on the host (PILOT's default: ~/roms)")
+    r.add_argument("--host-timeout", type=int, default=8 * 3600)
     p = sub.add_parser("prove")
     p.add_argument("dir")
     p.add_argument("--jobs", type=int, default=4)
+    k = sub.add_parser("commitcheck")
+    k.add_argument("proof")
+    k.add_argument("tree")
     g = sub.add_parser("page")
     g.add_argument("dir")
     c = sub.add_parser("census")
@@ -757,7 +1145,7 @@ def main(argv):
     c.add_argument("--registry", default=str(ROOT / "tests/ci_emulator.tsv"))
     c.add_argument("--debt", default=str(ROOT / "tests/expected/sheet_debt.txt"))
     a = ap.parse_args(argv)
-    return {"run": cmd_run, "prove": cmd_prove, "page": cmd_page, "census": cmd_census}[a.cmd](a)
+    return {"run": cmd_run, "prove": cmd_prove, "page": cmd_page, "commitcheck": cmd_commitcheck, "census": cmd_census}[a.cmd](a)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,11 @@
+  FLAG ATTRIB: #273 closes done: the maintainer, asked with the replication's figures, chose to keep Q1 as it is (ruling_273.txt quotes the question and the answer verbatim...
+  FLAG D-ABSOLUTE: The plan, including its read-as rule, was fixed before any of them was read.  [build/agent205/t273/closing_comment.md]
+  FLAG D-ABSOLUTE: The three figures in each cell are readers 1, 2 and 3; reader 1 is the 14z-199 reader.  [build/agent205/t273/closing_comment.md]
+  FLAG D-ABSOLUTE: - All 116 spawns carried their prompt file byte for byte and ran on the definition's model.  [build/agent205/t273/closing_comment.md]
+  FLAG D-ABSOLUTE: - Each judge read only its instructions and items and wrote only its own file.  [build/agent205/t273/closing_comment.md]
+  FLAG D-ABSOLUTE: On the 33 reader-answers it caught 5 fewer on Q1 and 8 fewer on any question.  [build/agent205/t273/closing_comment.md]
+  FLAG D-ABSOLUTE: It also raised a finding on the packet built to have none.  [build/agent205/t273/closing_comment.md]
+  FLAG D-ABSOLUTE: Its saving is findings that did not matter, and each of those costs at most a resolve.  [build/agent205/t273/closing_comment.md]
+  FLAG D-ABSOLUTE: - The first round's single reader understated the current wording's catches: 5 of 11, where two more readers caught 8 each.  [build/agent205/t273/closing_comment.md]
+  FLAG D-ABSOLUTE: - any other wording;  [build/agent205/t273/closing_comment.md]
+packet_check: 10 flag(s): ATTRIB 1, D-ABSOLUTE 9

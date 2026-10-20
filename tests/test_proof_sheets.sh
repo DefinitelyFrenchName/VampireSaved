@@ -11,21 +11,28 @@
 #   unresolved relative path made every capture fail and every picture NOT THE JUDGED RUN); and the EVENT basis (D2,
 #   ruled 2026-10-18): a leg re-run under its gate's own tap instrument (tests/lua/sheet_tap_capture.lua) is
 #   EVENT-PROVEN only where its log lines in the window equal the gate's — a one-frame shift and a wrong value are
-#   refused, an empty window is UNPROVEN.
+#   refused, an empty window is UNPROVEN; and S3 (14z-205: "ours" is built from the commit): an `ours` leg is
+#   NOT THE JUDGED RUN unless it ran on a build made in the clean checkout's build/ (a rom path outside the checkout,
+#   or a tracked path in it, is refused; a built one keeps its own verdict), a build whose fingerprint is not the
+#   commit's frozen reference refuses the run, a checkout at another commit is refused for reuse, and an unknown
+#   --host is refused.
 # HOW: a fixture SHEET_OUT on pristine vsavj (02_demitri_vs_cpu to frame 3001): the frozen masked vanilla log
 #   (tests/expected/vsavj/masked-v2) is the "gate's log", the masked-v2 mask the leg's; the field values are taken
 #   from tests/lua/field_trace.lua run live on the same inputs; `proof_sheets.py prove` on the fixture; one control.
-# EXPECTS: the six verdicts above, each picture present; PASS. It does not claim any gate's sheet is complete — the
+# EXPECTS: the six verdicts above, each picture present, the S3 refusals (section 6, no build: the checks run on
+#   section 3's proven sheet re-labelled `ours`, a scratch git checkout and the tool's own functions); PASS. It does not claim any gate's sheet is complete — the
 #   census (tests/test_sheet_census.sh) and each gate's own verdict do that part.
 # FOLLOWS: tools/proof_sheets.py tests/lua/sheet_capture.lua tests/lua/pokes_spec.lua tests/lua/field_trace.lua
 #   tests/expected/vsavj/masked-v2/logs/02_demitri_vs_cpu.log tests/expected/merged1/mask
 #   tests/replays/02_demitri_vs_cpu.rpl tests/lib/controls.sh tools/run_mame.sh tools/setup_mame.sh emu/mame-patches/
-#   tests/lua/sheet_tap_capture.lua tests/lua/read_tap.lua
+#   tests/lua/sheet_tap_capture.lua tests/lua/read_tap.lua build/manifest/
 #
 # SHEET: none — the sheet tool's own ground truth on pristine vsavj; it compares no leg of ours against a reference set
 # MUST-FIRE: shadow-tool: cap-ignored — a copy of tools/proof_sheets.py that drops the capture's ACAP line must leave the capped sheet with no cap note, so the note rests on the line (in-gate: the shadow is run on the capped fixture; mode: the shadow is the tool under test and the gate FAILs)
 # MUST-FIRE: shadow-tool: relative-unresolved — a copy of tools/proof_sheets.py that does not resolve the SHEET_OUT path must fail the relative-path moment (its capture cannot find the replay), so that PROVEN rests on the resolve (in-gate: the shadow is run on a relative fixture path; mode: the shadow is the tool under test and the gate FAILs)
 # MUST-FIRE: shadow-tool: count-only — a copy of tools/proof_sheets.py whose event proof compares only the NUMBER of lines in the window must EVENT-PROVE the moment whose logged value was altered, so the event basis rests on the lines themselves (in-gate: the shadow is run on the event fixture; mode: the shadow is the tool under test and the gate FAILs)
+# MUST-FIRE: shadow-tool: build-blind — a copy of tools/proof_sheets.py whose commit check accepts any rom path must leave the ours leg that ran outside the clean checkout PROVEN, so S3's refusal rests on the check (in-gate: the shadow is run on the re-labelled sheet; mode: the shadow is the tool under test and the gate FAILs)
+# MUST-FIRE: shadow-tool: fingerprint-blind — a copy of tools/proof_sheets.py whose build check never compares fingerprints must accept a track built off the commit's frozen reference, so the run's refusal rests on the comparison (in-gate: the shadow's check_builds on the mismatched set; mode: the shadow is the tool under test and the gate FAILs)
 # MUST-FIRE: shadow-tool: frame-blind — a copy of tools/proof_sheets.py that accepts a logged checksum found at ANY captured frame, instead of at the moment's own frame, must prove the moment shifted by one frame, so the one-frame refusal rests on the frame-exact lookup (in-gate: the shadow is run on the same fixture; mode: the shadow is the tool under test and the gate FAILs)
 #
 # Usage: ROMDIR=... [MAME_BIN=...] tests/test_proof_sheets.sh   # emulator tier (MAME), ~17 s (measured 14z-204)
@@ -61,7 +68,17 @@ count_only() {  # count_only <out.py> — the shadow whose event proof compares 
     sed -e 's/        if want == got:$/        if len(want) == len(got):/' -e "s|^ROOT = .*|ROOT = Path('$REPO')|" tools/proof_sheets.py > "$1"
     [ "$(command grep -c '        if len(want) == len(got):' "$1")" = 1 ] || { echo "the event comparison was not found to replace" >&2; return 1; }
 }
+build_blind() {  # build_blind <out.py> — the shadow whose commit check accepts every rom path
+    sed -e 's/                why = ours_build_problem(lg\["rompath"\], tree)$/                why = None/' -e "s|^ROOT = .*|ROOT = Path('$REPO')|" tools/proof_sheets.py > "$1"
+    [ "$(command grep -c '                why = None$' "$1")" = 1 ] || { echo "the commit check was not found to drop" >&2; return 1; }
+}
+fingerprint_blind() {  # fingerprint_blind <out.py> — the shadow whose build check never compares a fingerprint
+    sed -e 's/        elif built\.get(t) != want:$/        elif False:/' -e "s|^ROOT = .*|ROOT = Path('$REPO')|" tools/proof_sheets.py > "$1"
+    [ "$(command grep -c '        elif False:' "$1")" = 1 ] || { echo "the fingerprint comparison was not found to drop" >&2; return 1; }
+}
 TOOL=tools/proof_sheets.py
+if vs_ctl_is build-blind; then build_blind "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
+if vs_ctl_is fingerprint-blind; then fingerprint_blind "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
 if vs_ctl_is count-only; then count_only "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
 if vs_ctl_is relative-unresolved; then relative_unresolved "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
 if vs_ctl_is frame-blind; then frame_blind "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
@@ -193,6 +210,63 @@ PYF
 if [ "$(cat "$W/frame.txt")" = "2197=differs 2198=same 2199=differs" ]; then ok "the tap re-run's f2198 is sheet_capture's f2198 pixel for pixel, not its neighbours ($(cat "$W/frame.txt"))"
 else nope "the tap re-run's picture is not frame-exact: $(cat "$W/frame.txt")"; fi
 
+echo "== 4c. S3: ours is the commit's build ($TOOL; no build, no emulator)"
+FT="$W/tree"; mkdir -p "$FT/build/manifest" "$FT/build/x/rompath"; : > "$FT/build/manifest/a.toml"
+( cd "$FT" && git init -q && git add build/manifest/a.toml && git -c user.name=t -c user.email=t@t commit -qm t ) >/dev/null 2>&1 \
+    || { echo "FAIL: could not make the scratch checkout"; exit 1; }
+relabel() {  # relabel <proof.json> <rompath> <out.json> — section 3's proven sheet with its leg made `ours` on <rompath>
+    python3 -c "import json, sys; d = json.load(open(sys.argv[1]))
+for s in d:
+    for l in s['legs']: l['role'] = 'ours'; l['rompath'] = sys.argv[2]
+json.dump(d, open(sys.argv[3], 'w'))" "$1" "$2" "$3"
+}
+relabel "$S/proof.json" "$ROMDIR" "$W/c_out.json"; relabel "$S/proof.json" "$FT/build/x/rompath;$ROMDIR" "$W/c_in.json"
+relabel "$S/proof.json" "$FT/build/manifest" "$W/c_tr.json"
+python3 "$TOOL" commitcheck "$W/c_out.json" "$FT" > "$W/c_out.tsv" 2>&1
+python3 "$TOOL" commitcheck "$W/c_in.json" "$FT" > "$W/c_in.tsv" 2>&1
+python3 "$TOOL" commitcheck "$W/c_tr.json" "$FT" > "$W/c_tr.tsv" 2>&1
+n_out="$(awk -F'\t' '$5 == "NOT THE JUDGED RUN" && $6 ~ /outside the clean checkout/' "$W/c_out.tsv" | wc -l | tr -d ' ')"
+[ "$n_out" = 6 ] && ok "ours on ROMDIR (outside the checkout): 6 of 6 pictures NOT THE JUDGED RUN" || nope "ours outside the checkout: $n_out of 6 refused"
+want "$W/c_in.tsv" "on the log" PROVEN
+want "$W/c_in.tsv" "shifted by one" "NOT THE JUDGED RUN"
+n_tr="$(awk -F'\t' '$5 == "NOT THE JUDGED RUN" && $6 ~ /tracked path/' "$W/c_tr.tsv" | wc -l | tr -d ' ')"
+[ "$n_tr" = 6 ] && ok "ours on a tracked path of the checkout: 6 of 6 refused" || nope "ours on a tracked path: $n_tr of 6 refused"
+s3_units() {  # s3_units <tool> -> one line per case: <case> <result>
+    python3 - "$1" "$FT" <<'PYU'
+import importlib.util, json, subprocess, sys
+spec = importlib.util.spec_from_file_location("ps", sys.argv[1]); ps = importlib.util.module_from_spec(spec); spec.loader.exec_module(ps)
+fp = {t: ("%02d" % i) * 20 for i, t in enumerate(ps.TRACKS)}
+expect = {ps.TRACK_EXPECT[t]: v for t, v in fp.items()}
+print("equal", len(ps.check_builds(dict(fp), expect)))
+off = dict(fp); off["HUI"] = "ff" * 20
+print("off", len(ps.check_builds(off, expect)), "HUI" in " ".join(ps.check_builds(off, expect)))
+print("unfrozen", len(ps.check_builds(dict(fp), {k: v for k, v in expect.items() if k != "MERGED"})))
+head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=sys.argv[2], capture_output=True, text=True).stdout.strip()
+print("reuse-same", ps.make_checkout(head, sys.argv[2], None, True) is None)
+print("reuse-other", ps.make_checkout("0" * 40, sys.argv[2], None, True) is not None)
+print("no-reuse", ps.make_checkout(head, sys.argv[2], None, False) is not None)
+# the clean checkout from a bundle whose one ref is outside refs/heads, as make_bundle writes it
+b = sys.argv[2] + "/../c.bundle"; c = sys.argv[2] + "/../clone"
+subprocess.run(["git", "update-ref", "refs/proof-sheets/run-1", head], cwd=sys.argv[2], check=True)
+subprocess.run(["git", "bundle", "create", "-q", b, "refs/proof-sheets/run-1"], cwd=sys.argv[2], capture_output=True, check=True)
+err = ps.make_checkout(head, c, b, False)
+got = subprocess.run(["git", "rev-parse", "HEAD"], cwd=c, capture_output=True, text=True).stdout.strip()
+print("clone", err is None and got == head and __import__("os").path.exists(c + "/build/manifest/a.toml"))
+PYU
+}
+s3_units "$TOOL" > "$W/units.txt" 2>&1
+u() { awk -v c="$1" '$1 == c {$1 = ""; sub(/^ /, ""); print}' "$W/units.txt"; }
+[ "$(u equal)" = 0 ] && ok "five tracks equal to the commit's frozen references: accepted" || nope "equal tracks: $(u equal) problem(s)"
+[ "$(u off)" = "1 True" ] && ok "a track built off its frozen reference: the run is refused, the track named" || nope "a track off its reference: '$(u off)'"
+[ "$(u unfrozen)" = 1 ] && ok "a track the commit freezes no reference for: refused" || nope "an unfrozen track: '$(u unfrozen)'"
+[ "$(u reuse-same)" = True ] && [ "$(u reuse-other)" = True ] && [ "$(u no-reuse)" = True ] \
+    && ok "--reuse-tree takes only a clean checkout of the same commit; an existing tree without it is refused" \
+    || nope "checkout reuse: same $(u reuse-same), other $(u reuse-other), no-reuse $(u no-reuse)"
+[ "$(u clone)" = True ] && ok "the clean checkout from a bundle whose ref is not a branch lands on the commit" || nope "clone from the bundle: '$(u clone)'"
+python3 "$TOOL" run HEAD --host nosuch > "$W/host.txt" 2>&1; hrc=$?
+[ "$hrc" = 2 ] && command grep -q "^REFUSED: unknown host 'nosuch'" "$W/host.txt" && ok "an unknown --host is refused (exit 2)" \
+    || nope "unknown host: exit $hrc, $(head -1 "$W/host.txt")"
+
 echo "== 5. must-fire controls"
 if frame_blind "$W/fb.py"; then
     S2="$W/sheet2"; cp -R "$S" "$S2"; rm -rf "$S2/capture" "$S2/proof.json"
@@ -225,5 +299,18 @@ if cap_ignored "$W/ci.py"; then
     else vs_ctl_dead cap-ignored "the shadow still produced a cap note"; nope "control cap-ignored"; fi
 else vs_ctl_dead cap-ignored "the ACAP branch was not found to drop"; nope "control cap-ignored"; fi
 
-[ "$bad" = 0 ] && { echo "PASS: test_proof_sheets — proven on the judged run, a one-frame shift and a field off refused, anchors proven and a cap said, a relative path resolved, events proven on their lines"; exit 0; }
+if build_blind "$W/bb.py"; then
+    python3 "$W/bb.py" commitcheck "$W/c_out.json" "$FT" > "$W/bb.tsv" 2>&1
+    g="$(awk -F'\t' '$2 == "on the log" {print $5}' "$W/bb.tsv")"
+    if [ "$g" = PROVEN ]; then vs_ctl_fired build-blind "a tool whose commit check accepts any rom path proves the ours leg that ran outside the checkout"
+    else vs_ctl_dead build-blind "the shadow read '$g' on the outside leg"; nope "control build-blind"; fi
+else vs_ctl_dead build-blind "the commit check was not found to drop"; nope "control build-blind"; fi
+
+if fingerprint_blind "$W/fpb.py"; then
+    g="$(s3_units "$W/fpb.py" | awk '$1 == "off" {print $2}')"
+    if [ "$g" = 0 ]; then vs_ctl_fired fingerprint-blind "a tool that never compares fingerprints accepts a track built off the commit's frozen reference"
+    else vs_ctl_dead fingerprint-blind "the shadow still found $g problem(s)"; nope "control fingerprint-blind"; fi
+else vs_ctl_dead fingerprint-blind "the fingerprint comparison was not found to drop"; nope "control fingerprint-blind"; fi
+
+[ "$bad" = 0 ] && { echo "PASS: test_proof_sheets — proven on the judged run, a one-frame shift and a field off refused, anchors proven and a cap said, a relative path resolved, events proven on their lines, ours held to the commit's build"; exit 0; }
 echo "FAIL: test_proof_sheets ($bad)"; exit 1

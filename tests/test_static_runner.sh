@@ -23,6 +23,11 @@
 #   Since #286 (14z-202, section 22): a dirty submodule whose fingerprint equals the base run's does not re-run
 #   its reader, a changed one does; a gate re-run for a mention (R5) carries its controls, a gate whose code
 #   reads the changed file directly (R1, R2, R6) executes them.
+#   Since #299 (14z-205, section 24): `--jobs 4` reads exactly as `--jobs 1` (every verdict line in registry order,
+#   the controls readout, every results and control row but its seconds), with and without --confirm; each gate and
+#   control runs once, `# ORDER: last` runs after the pool, and the pool never runs a control the plan carries.
+#   Since #276 (14z-205, section 26): a run given STATIC_RESULTS_OUT also leaves a byte-identical copy of its results
+#   and control times in its own run record (build/static_runs/<stamp>), where tools/session_metrics.py reads them.
 #
 # MUST-FIRE: shadow-tool: reader-unplugged — a copy of run_all_static.sh that hands the classifier no gate script must let a stub with a declared-but-unfired control read PASS (mode: that copy is the runner every section drives, and section 11 must fail)
 # MUST-FIRE: shadow-tool: trigger-blind — a copy of run_all_static.sh with its cadence TRIGGER match disabled must leave a freeze-cadence gate deferred although a path it depends on changed; section 14's triggered case must FAIL under it
@@ -37,6 +42,11 @@
 # MUST-FIRE: shadow-tool: subfp-off — a copy of tools/static_confirm.py whose SUBMODULE-UNCHANGED drop is disabled must re-run the reader of an unchanged dirty submodule, and section 22 must FAIL (mode: that copy in the #286 repo; section 23 fires it in-run; #286, 14z-202)
 # MUST-FIRE: shadow-tool: controls-always — a copy of tools/static_confirm.py whose plan never carries controls must execute g_f's control when only a file its data MENTIONS changed, and section 22 must FAIL (mode: that copy in the #286 repo; section 23 fires it in-run; #286, 14z-202)
 # MUST-FIRE: shadow-tool: controls-never — a copy of tools/static_confirm.py whose CONTROLS-ON-REACH test is disabled must carry g_f's control when its own script changed (R1, a program in its reach; 14z-205), and section 22 must FAIL (mode: that copy in the #286 repo; section 23 fires it in-run; #286, 14z-202)
+# MUST-FIRE: shadow-tool: pool-blind — a copy of run_all_static.sh whose PARALLEL-PRE read of a gate's pool result is disabled must run every gate a second time after the pool, and section 24 must FAIL (mode: that copy drives section 24)
+# MUST-FIRE: shadow-tool: pool-order-ignored — a copy of run_all_static.sh whose POOL-ORDER-LAST test is disabled must run the `# ORDER: last` stub inside the pool, before the slow stub ends, and section 24 must FAIL (mode: that copy drives section 24)
+# MUST-FIRE: shadow-tool: job-carry-blind — a copy of tests/lib/static_job.sh whose JOB-CARRY-CONTROLS exit is disabled must run g_f's control although the --confirm plan carries it, and section 24 must FAIL (mode: that copy is the job section 24 runs)
+# MUST-FIRE: shadow-tool: runrec-lost — a copy of run_all_static.sh whose RUNREC-KEEPS-RESULTS copy is disabled must leave a run given STATIC_RESULTS_OUT with no results in its own run record, and section 26 must FAIL (mode: that copy drives section 26; section 27 fires it in-run; #276, 14z-205)
+# MUST-FIRE: shadow-tool: runrec-controls-lost — a copy of run_all_static.sh whose RUNREC-KEEPS-CONTROLS copy is disabled must leave the run record without the control times, and section 26 must FAIL (mode: that copy drives section 26; section 27 fires it in-run; #276, 14z-205)
 # MUST-FIRE: shadow-tool: prediction-off — a copy of tools/static_confirm.py whose plan marks nothing STALE must CARRY the stub whose input changed, and section 18 must FAIL (mode: that copy in the confirm repo)
 #
 # WHY A GATE FOR THE RUNNER. CLAUDE.md §4: "Verdict logic is itself tested. A
@@ -904,6 +914,117 @@ if ! vs_ctl_is subfp-off && ! vs_ctl_is controls-always && ! vs_ctl_is controls-
     s22 "$CTLNEV" > /dev/null
     [ "$S22e" = bad ] && vs_ctl_fired controls-never "a plan blind to a changed program carries g_f's control when its own script changed — section 22 catches it" \
         || { vs_ctl_dead controls-never "the controls-never plan still executed g_f's control"; rc=1; }
+fi
+
+echo "== 24. --jobs (#299, 14z-205): a parallel run reads exactly as a serial one, each gate run once, ORDER: last after the pool =="
+SHADOW_P="$T/run_all_static_poolblind.sh"
+sed 's|        if \[ -f "$WORK/pre/$g.run" \]; then   # PARALLEL-PRE|        if false; then   # PARALLEL-PRE disabled|' "$RUNNER" > "$SHADOW_P"
+cmp -s "$RUNNER" "$SHADOW_P" && fail "could not blind the pool's results — the PARALLEL-PRE line moved"
+SHADOW_Q="$T/run_all_static_poolorder.sh"
+sed 's|then _late="$_late $_g"; else _todo="$_todo $_g"; fi   # POOL-ORDER-LAST|then _todo="$_todo $_g"; else _todo="$_todo $_g"; fi   # POOL-ORDER-LAST disabled|' "$RUNNER" > "$SHADOW_Q"
+cmp -s "$RUNNER" "$SHADOW_Q" && fail "could not disable the pool's ORDER: last — the POOL-ORDER-LAST line moved"
+JOB_C="$T/static_job_carryblind.sh"
+sed 's|    \[ -n "$_cc" \] && \[ "$_cc" = "$VS_CTL_DECLARED" \] && exit 0   # JOB-CARRY-CONTROLS|    :   # JOB-CARRY-CONTROLS disabled|' "$REPO/tests/lib/static_job.sh" > "$JOB_C"
+cmp -s "$REPO/tests/lib/static_job.sh" "$JOB_C" && fail "could not disable the job's carried controls — the JOB-CARRY-CONTROLS line moved"
+FJ="$T/repo299"; mkdir -p "$FJ/tests/lib" "$FJ/tools" "$FJ/data"
+for _l in classify controls measures; do ln -s "$REPO/tests/lib/$_l.sh" "$FJ/tests/lib/$_l.sh"; done
+cp "$REPO/tools/static_confirm.py" "$REPO/tools/battery_reach.py" "$FJ/tools/"
+mkj() {  # mkj <name> <exit> <body line> [control]: a stub that logs each run, after its body (and each control run), outside the repo
+    { echo "#!/bin/sh"; echo "# $1.sh — a stub of section 24"
+      [ -n "${4:-}" ] && echo "# MUST-FIRE: perturbed-copy: flip — a flipped byte must fail"
+      [ "$1" = g_l ] && echo "# ORDER: last"
+      [ -n "${4:-}" ] && echo 'if [ "${CONTROL:-}" = flip ]; then echo "ctl '"$1"'" >> "'"$T"'/j.ctl"; echo "FAIL: the flipped input was caught"; exit 1; fi'
+      echo "$3"; echo "echo $1 >> '$T/j.ran'"; [ -n "${4:-}" ] && echo "echo 'CONTROL FIRED: flip — caught'"; echo "exit $2"; } > "$FJ/tests/$1.sh"
+    chmod +x "$FJ/tests/$1.sh"
+}
+mkj g_a 0 "echo 'PASS: a'" ctl
+mkj g_b 1 "echo 'FAIL: b'"
+mkj g_c 0 "sleep 1; echo 'PASS: c, the slow one'"
+mkj g_d 0 "echo 'SKIP: no build at build/nope'"
+mkj g_l 0 "echo 'PASS: l'"
+mkj g_f 0 "cat data/list.tsv > /dev/null; echo 'PASS: f'" ctl
+printf 'g_l\ng_a\ng_b\ng_c\ng_d\ng_f\n' > "$FJ/tests/ci_portable.txt"; : > "$FJ/tests/ci_static.txt"
+printf 'name\nf\n' > "$FJ/data/list.tsv"
+(cd "$FJ" && git init -q && git add -A && git -c user.name=t -c user.email=t@t commit -qm base)
+rd24() {  # rd24 <readout> <results.tsv>: what must not depend on --jobs (verdict lines in order, controls lines, rows less seconds)
+    printf '%s\n' "$1" | awk '/^  g_/ {print $1, $2} /^  (read|executed|carried): / {print}'
+    grep -v '^#' "$2" | cut -f1,2,4-; grep -v '^#' "${2%.tsv}.controls.tsv" 2>/dev/null | cut -f1-3
+}
+s24() {   # s24 <runner> <static_job.sh> [confirm] -> sets S24a S24b S24c [S24d] (ok|bad)
+    rm -f "$FJ/tests/run_all_static.sh" "$FJ/tests/lib/static_job.sh"
+    ln -s "$1" "$FJ/tests/run_all_static.sh"; ln -s "$2" "$FJ/tests/lib/static_job.sh"
+    _o1="$(cd "$FJ" && STATIC_CHANGED_PATHS= STATIC_RESULTS_OUT="$T/j1.tsv" sh tests/run_all_static.sh --tier portable --jobs 1 2>&1)" || true
+    rm -f "$T/j.ran" "$T/j.ctl"
+    _o4="$(cd "$FJ" && STATIC_CHANGED_PATHS= STATIC_RESULTS_OUT="$T/j4.tsv" sh tests/run_all_static.sh --tier portable --jobs 4 2>&1)" || true
+    if [ "$(rd24 "$_o1" "$T/j1.tsv")" = "$(rd24 "$_o4" "$T/j4.tsv")" ] && [ -n "$(rd24 "$_o1" "$T/j1.tsv")" ] \
+            && printf '%s' "$_o4" | grep -q '^== portable tier: 6 gate(s) run in 4 parallel jobs'; then S24a=ok
+    else S24a=bad; echo "    the --jobs 4 readout differs from --jobs 1:"; rd24 "$_o1" "$T/j1.tsv" > "$T/r1.txt"; rd24 "$_o4" "$T/j4.tsv" > "$T/r4.txt"; diff "$T/r1.txt" "$T/r4.txt" | sed 's/^/      /' | head -20; fi
+    if [ "$(sort "$T/j.ran" | uniq -c | awk '$1 != 1' | wc -l | tr -d ' ')" = 0 ] && [ "$(wc -l < "$T/j.ran" | tr -d ' ')" = 6 ] \
+            && [ "$(sort "$T/j.ctl" | uniq -c | awk '$1 != 1' | wc -l | tr -d ' ')" = 0 ] && [ "$(wc -l < "$T/j.ctl" | tr -d ' ')" = 2 ]; then S24b=ok
+    else S24b=bad; echo "    at --jobs 4 a gate or a control did not run exactly once: $(sort "$T/j.ran" "$T/j.ctl" | uniq -c | tr -s ' ' | tr '\n' '|')"; fi
+    [ "$(tail -1 "$T/j.ran")" = g_l ] && S24c=ok || { S24c=bad; echo "    at --jobs 4 the ORDER: last stub did not run last: $(tr '\n' ' ' < "$T/j.ran")"; }
+    [ -n "${3:-}" ] || return 0
+    # --confirm on the serial run, after a change to the data g_f's code reads directly (R2: g_f re-runs, its control CARRIED, #298)
+    printf 'name\nf\ng\n' > "$FJ/data/list.tsv"; sleep 1
+    _c1="$(cd "$FJ" && STATIC_RESULTS_OUT="$T/c1.tsv" sh tests/run_all_static.sh --tier portable --jobs 1 --confirm "$T/j1.tsv" 2>&1)" || true
+    rm -f "$T/j.ran" "$T/j.ctl"
+    _c4="$(cd "$FJ" && STATIC_RESULTS_OUT="$T/c4.tsv" sh tests/run_all_static.sh --tier portable --jobs 4 --confirm "$T/j1.tsv" 2>&1)" || true
+    if [ "$(rd24 "$_c1" "$T/c1.tsv")" = "$(rd24 "$_c4" "$T/c4.tsv")" ] && printf '%s' "$_c4" | grep -qE "^  re-run g_f +STALE: R2" \
+            && printf '%s' "$_c4" | grep -q "controls carried: 1 honoured" && [ ! -s "$T/j.ctl" ] && grep -qx g_f "$T/j.ran"; then S24d=ok
+    else S24d=bad; echo "    under --confirm the --jobs 4 run differs from --jobs 1, or ran the control the plan carried: control runs '$(cat "$T/j.ctl" 2>/dev/null | tr '\n' ' ')'"
+        rd24 "$_c1" "$T/c1.tsv" > "$T/r1.txt"; rd24 "$_c4" "$T/c4.tsv" > "$T/r4.txt"; diff "$T/r1.txt" "$T/r4.txt" | sed 's/^/      /' | head -20; fi
+    (cd "$FJ" && git checkout -q -- data)
+}
+R24="$RUNNER"; J24="$REPO/tests/lib/static_job.sh"
+vs_ctl_is pool-blind && R24="$SHADOW_P"; vs_ctl_is pool-order-ignored && R24="$SHADOW_Q"; vs_ctl_is job-carry-blind && J24="$JOB_C"
+s24 "$R24" "$J24" confirm
+[ "$S24a" = ok ] && echo "  ok: --jobs 4 and --jobs 1 read the same: every verdict line in registry order, the controls readout, every results row and control row but its seconds" || fail "section 24: a parallel run read differently from a serial one"
+[ "$S24b" = ok ] && echo "  ok: at --jobs 4 each of the 6 stubs ran once and each of the 2 controls ran once (the pool's results are the ones read)" || fail "section 24: the parallel run ran a gate or a control twice, or not at all"
+[ "$S24c" = ok ] && echo "  ok: at --jobs 4 the ORDER: last stub ran after the pool" || fail "section 24: ORDER: last did not run after the pool"
+[ "$S24d" = ok ] && echo "  ok: --confirm at --jobs 4 reads as at --jobs 1; g_f re-runs (R2) and the pool does not run the control the plan carries" || fail "section 24: --confirm under --jobs differs, or the pool ran a carried control"
+
+echo "== 25. MUST-FIRE: section 24's properties, each broken by its shadow =="
+if ! vs_ctl_is pool-blind && ! vs_ctl_is pool-order-ignored && ! vs_ctl_is job-carry-blind; then
+    s24 "$SHADOW_P" "$REPO/tests/lib/static_job.sh" > /dev/null
+    [ "$S24b" = bad ] && vs_ctl_fired pool-blind "a runner that ignores the pool's results runs every gate twice — section 24 catches it" \
+        || { rc=1; vs_ctl_dead pool-blind "the pool-blind runner still ran each gate once" || :; }
+    s24 "$SHADOW_Q" "$REPO/tests/lib/static_job.sh" > /dev/null
+    [ "$S24c" = bad ] && vs_ctl_fired pool-order-ignored "a pool that takes the ORDER: last stub in runs it before the slow stub ends — section 24 catches it" \
+        || { rc=1; vs_ctl_dead pool-order-ignored "the order-ignoring pool still ran g_l last" || :; }
+    s24 "$RUNNER" "$JOB_C" confirm > /dev/null
+    [ "$S24d" = bad ] && vs_ctl_fired job-carry-blind "a job blind to the plan's carried controls runs g_f's control under --confirm — section 24 catches it" \
+        || { rc=1; vs_ctl_dead job-carry-blind "the carry-blind job still left g_f's control unrun" || :; }
+fi
+
+echo "== 26. a run told to write its results elsewhere keeps a copy in its own run record (#276, 14z-205) =="
+SHADOW_L="$T/run_all_static_runreclost.sh"
+sed 's@    cp "$RESULTS_OUT" "$RUNREC/results.tsv" || echo "run record: the results copy FAILED"   # RUNREC-KEEPS-RESULTS@    :   # RUNREC-KEEPS-RESULTS disabled@' "$RUNNER" > "$SHADOW_L"
+cmp -s "$RUNNER" "$SHADOW_L" && fail "could not disable the run record's results copy — the RUNREC-KEEPS-RESULTS line moved"
+SHADOW_M="$T/run_all_static_runrecctllost.sh"
+sed 's@; then cp "${RESULTS_OUT%.tsv}.controls.tsv" @; then : "${RESULTS_OUT%.tsv}.controls.tsv" @' "$RUNNER" > "$SHADOW_M"
+cmp -s "$RUNNER" "$SHADOW_M" && fail "could not disable the run record's control-times copy — the RUNREC-KEEPS-CONTROLS line moved"
+cp "$REPO/tools/run_record.py" "$FJ/tools/"   # a run record needs the tool; section 24's runs had none
+s26() {   # s26 <runner> -> S26 (ok|bad)
+    rm -f "$FJ/tests/run_all_static.sh" "$FJ/tests/lib/static_job.sh"; rm -rf "$FJ/build/static_runs"
+    ln -s "$1" "$FJ/tests/run_all_static.sh"; ln -s "$REPO/tests/lib/static_job.sh" "$FJ/tests/lib/static_job.sh"
+    (cd "$FJ" && STATIC_CHANGED_PATHS= STATIC_RESULTS_OUT="$T/k1.tsv" sh tests/run_all_static.sh --tier portable > "$T/k1.out" 2>&1) || true
+    _rr="$(ls -d "$FJ"/build/static_runs/*_* 2>/dev/null | head -1)"
+    if [ -n "$_rr" ] && [ -s "$T/k1.tsv" ] && cmp -s "$T/k1.tsv" "$_rr/results.tsv" \
+            && [ -s "$T/k1.controls.tsv" ] && cmp -s "$T/k1.controls.tsv" "$_rr/results.controls.tsv"; then S26=ok
+    else S26=bad; echo "    the run record ${_rr:-(none written)} does not hold the results and control times the run wrote to \$T/k1.tsv: $(ls "${_rr:-/nonexistent}" 2>/dev/null | tr '\n' ' ')"; fi
+}
+R26="$RUNNER"; vs_ctl_is runrec-lost && R26="$SHADOW_L"; vs_ctl_is runrec-controls-lost && R26="$SHADOW_M"
+s26 "$R26"
+[ "$S26" = ok ] && echo "  ok: the run record holds a byte-identical copy of the results file and the control times written to STATIC_RESULTS_OUT" || fail "section 26: the run record lacks the results the run wrote elsewhere (#276)"
+
+echo "== 27. MUST-FIRE: section 26's two copies, each broken by its shadow =="
+if ! vs_ctl_is runrec-lost && ! vs_ctl_is runrec-controls-lost; then
+    s26 "$SHADOW_L" > /dev/null
+    [ "$S26" = bad ] && vs_ctl_fired runrec-lost "a runner that never copies its results into its run record leaves the record without them — section 26 catches it" \
+        || { rc=1; vs_ctl_dead runrec-lost "the copy-less runner's record still held the results" || :; }
+    s26 "$SHADOW_M" > /dev/null
+    [ "$S26" = bad ] && vs_ctl_fired runrec-controls-lost "a runner that copies the results but not the control times leaves the record without them — section 26 catches it" \
+        || { rc=1; vs_ctl_dead runrec-controls-lost "the runner without the control-times copy still left them in the record" || :; }
 fi
 
 [ "$rc" = 0 ] && echo "PASS: the runner's verdicts mean what they say." \

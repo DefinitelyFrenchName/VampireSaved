@@ -1,0 +1,11 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent205/t299/closing_comment.md	4da8e77f4fbd1b37083fe168dd16aa513d1680c2
+build/agent205/t299/issue_299.txt	16d7a101d95e1b7ecfee44b773b52097ceee525d
+build/agent205/t299/ruling_299.txt	a541ed43ba4d7ab28bda64575575096ae4682aa1
+build/agent205/t299/close_row.txt	eaf9b7635e2645f8093c907145aeaeca97f9feeb
+build/agent205/t299/section24.txt	3f0d480c37f7772c0d99f34dc016b838f85122f5
+build/agent205/t299/decrypt_cache_excerpt.txt	c4b9495d5f20e80716ddb9ed1385bd2ba2b9d1bc
+build/agent205/t299/tsr.log	581c2e04606603a079f59066a8f5f6164290f05d
+build/agent205/t299/ctl_pool-blind.st	82ef21382c6cdb642c051ffdf043b7769d378d69
+build/agent205/t299/ctl_pool-order-ignored.st	f903974dc0eea18cfe18f9fa48457e69f94161ab
+build/agent205/t299/ctl_job-carry-blind.st	65f74542cfba6e4142512ddce1336ada18854821

@@ -24,7 +24,10 @@
 #   (1b) the matcher's self-test;
 #   (2) tools/homes_tracked.py --selftest
 #   passes, and (2b) the tool runs on the NEWEST findings-table row of STATE.md (the current
-#   sitting's, on the live tree: every home and test it names is tracked) — a planted findings row citing a backticked build/ file, a prose build/ path, a name
+#   sitting's, on the live tree: every home and test it names is tracked; since #288 (14z-202) the close writes no
+#   findings table, so with none in STATE.md 2b prints a NOTE that it had nothing to read, never ok, #300; section 2f
+#   proves that reading on planted states: a row citing build/x.log FAILs, no row is a NOTE, an unreadable state is
+#   REFUSED) — a planted findings row citing a backticked build/ file, a prose build/ path, a name
 #   that resolves nowhere, a gate stem that resolves nowhere, a ticket with no index row, ticket rows
 #   citing a build/ file, an untracked file and a § anchor on no line, a prose-cited document that resolves nowhere and a
 #   parenthesised test clause saying scratch, and a backticked and a prose name that end two or
@@ -60,6 +63,7 @@
 # MUST-FIRE: known-bad: build-home-planted — tools/homes_tracked.py --selftest --blind: the tool with its build/ reads DISABLED (a known-bad variant) must FAIL its own self-test, whose planted row cites a backticked build/ file and a prose build/ path, an unresolved name, an unresolved gate stem, a ticket with no index row, ticket rows (a planted index) citing a build/ file, an untracked file and a § anchor on no line, a prose-cited document that resolves nowhere and a parenthesised scratch-citing test clause (in-gate: --selftest must print SELFTEST PASS and --selftest --blind must print SELFTEST FAIL naming the two build/ reads as missed — a traceback is DEAD, not fired; mode: the blind variant is the one checked, so the gate FAILs because the plant is not caught)
 # MUST-FIRE: known-bad: bare-name-silent — tools/homes_tracked.py --selftest --nobare: the tool with bare-name resolution REMOVED (the pre-#205 tool, a bare `engine_internals` silent) must print SELFTEST FAIL with bare=False, while --selftest prints SELFTEST PASS (section 2; #205, rule-checker run 2026-10-02-562) (in-gate; mode: the no-bare variant is the one checked, so the gate FAILs)
 # MUST-FIRE: known-bad: letter-unchecked — tools/homes_tracked.py --selftest --noletters: the tool with the PER-LETTER home check removed must print SELFTEST FAIL with letters=False, so a finding whose only home resolves nowhere cannot pass on the other letters' homes (section 2; #205) (in-gate; mode: the no-letters variant is the one checked, so the gate FAILs)
+# MUST-FIRE: shadow-tool: note-always — section 2b's reading with every non-zero exit of the homes tool taken as "no findings table" must turn a planted findings row citing build/x.log from FAIL into a NOTE, so section 2f fails (#300; in-gate: b2 on the planted row, blind; mode: section 2f reads the planted row blind and FAILs)
 # MUST-FIRE: known-bad: bare-none-accepted — tools/none_reasons.py --selftest --lenient: the reason check with a bare `none` ACCEPTED (a known-bad variant) must print SELFTEST FAIL on the planted bare-none row, while --selftest prints SELFTEST PASS (section 2c; 14z-188 close, rule-checker run 2026-10-02-563)
 #
 # WHY: at the 14z-181 close the two checks lived in inline scripts recorded nowhere, and the
@@ -69,7 +73,9 @@
 # Usage: tests/test_close_tools.sh
 #
 # CONFIRM: always — the CORE of a session run (#269, 14z-200): it reads the paths changed since origin/main, which move with every commit and fetch,
-# none of which a changed tracked path shows, so tests/run_all_static.sh --confirm never carries it.
+# none of which a changed tracked path shows, so tests/run_all_static.sh --confirm never carries it. Since #288 (14z-202,
+# `ee9dc1f0`) the gate is `ondemand` in tests/ci_cadence.tsv, so a session run defers it and the mark has no effect
+# until a cadence brings the gate back (#300).
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
@@ -209,16 +215,49 @@ open(sys.argv[2], "w").write(s.replace(a, "        if False:   # CONTROL output-
 PY
     cp tools/findings_table.py "$(dirname "$1")/"   # the copy's sibling module (#282 item C)
 }
+state_copy() {  # state_copy <dst>: STATE.md, plus a stand-in findings row when it holds none (the close writes none
+    # since #288, #300) — 2d and its control judge the OUTPUT guard, which the tool reaches only past a row it found
+    cp STATE.md "$1"
+    grep -qE '^\| \*\*\([0-9]+\) THE FINDINGS TABLE\*\*' "$1" \
+        || printf '\n| **(1) THE FINDINGS TABLE** | (a) a stand-in row for the output guard; home `STATE.md`, test `tests/test_close_tools.sh` |\n' >> "$1"
+}
+b2() {  # b2 <state> [blind]: section 2b's reading of the newest findings row -> one line "ok|NOTE|FAIL|REFUSED <detail>"
+    # (blind: the note-always perturbation, every non-zero exit read as "no table")
+    if _o="$(python3 tools/homes_tracked.py --newest --state "$1" 2>&1)"; then echo "ok $(printf '%s\n' "$_o" | head -1 | cut -c1-200)"
+    elif [ "${2:-}" = blind ] || [ "$_o" = "no row starting with '| **--newest' in $1" ]; then   # NO-FINDINGS-TABLE (#300)
+        echo "NOTE 2b had nothing to read: $1 holds no findings table (the close writes none since #288, 14z-202); it is judged again when one comes back (#289)"
+    elif printf '%s\n' "$_o" | grep -q '^FAIL'; then echo "FAIL $(printf '%s\n' "$_o" | grep '^FAIL' | head -3 | tr '\n' ' ') $(printf '%s\n' "$_o" | grep '^#' | head -2 | tr '\n' ' ')" | cut -c1-400
+    else echo "REFUSED tools/homes_tracked.py --newest exited non-zero with no FAIL line (a crash, not a verdict): $(printf '%s\n' "$_o" | tail -1 | cut -c1-160)"; fi
+}
 if [ -z "${VS_CTL:-}" ]; then
 echo "== 2b. the NEWEST findings table row of STATE.md, on the live tree (the close's own output is a snapshot)"
-if out="$(python3 tools/homes_tracked.py --newest 2>&1)"; then ok "$(printf '%s\n' "$out" | head -1 | cut -c1-200)"
-elif printf '%s\n' "$out" | grep -q '^FAIL'; then bad "$(printf '%s\n' "$out" | grep '^FAIL\|^#' | head -4 | tr '\n' ' ' | cut -c1-300)"
-else echo "REFUSED: tools/homes_tracked.py --newest exited non-zero with no FAIL line (a crash, not a verdict): $(printf '%s\n' "$out" | tail -1 | cut -c1-160)"; exit 3; fi
+r2b="$(b2 STATE.md)"
+case "$r2b" in
+ok\ *)   ok "${r2b#ok }" ;;
+NOTE\ *) echo "  NOTE  ${r2b#NOTE }" ;;
+FAIL\ *) bad "${r2b#FAIL }" ;;
+*)       echo "REFUSED: ${r2b#REFUSED }"; exit 3 ;;
+esac
+fi
+
+if runs_for note-always; then
+echo "== 2f. 2b's reading on planted states (#300): a row is judged, no row is a NOTE, a crash is REFUSED"
+printf '# a planted state\n\n| **(1) THE FINDINGS TABLE** | (a) home `build/x.log`, test none |\n' > "$W/P_row.md"
+printf '# a planted state with no findings table\n\nprose only\n' > "$W/P_none.md"
+B2X=""; vs_ctl_is note-always && B2X=blind
+r="$(b2 "$W/P_row.md" $B2X)"; case "$r" in FAIL\ *untracked-build*) ok "a row citing build/x.log is judged: FAIL untracked-build" ;; *) bad "a planted findings row read '${r%% *}', not FAIL: $(echo "$r" | cut -c1-160)" ;; esac
+r="$(b2 "$W/P_none.md")"; case "$r" in NOTE\ *) ok "a state with no findings table reads NOTE" ;; *) bad "no findings table read '${r%% *}', not NOTE" ;; esac
+r="$(b2 "$W/no_such_state.md")"; case "$r" in REFUSED\ *) ok "a state the tool cannot read is REFUSED, not a NOTE" ;; *) bad "an unreadable state read '${r%% *}', not REFUSED" ;; esac
+if [ -z "${VS_CTL:-}" ]; then
+    r="$(b2 "$W/P_row.md" blind)"
+    case "$r" in NOTE\ *) vs_ctl_fired note-always "a 2b that reads every non-zero exit as no table turns the planted row's FAIL into a NOTE — the row case above catches it" ;;
+    *) fail=1; vs_ctl_dead note-always "the blind 2b still read '${r%% *}' on the planted row" || : ;; esac
+fi
 fi
 
 if runs_for output-overwrites; then
 echo "== 2d. the output path is never an input (14z-191: \`--newest STATE.md\` wrote the report over STATE.md)"
-cp STATE.md "$W/S.md"; H0="$(shasum "$W/S.md" | cut -c1-40)"
+state_copy "$W/S.md"; H0="$(shasum "$W/S.md" | cut -c1-40)"
 HT=tools/homes_tracked.py
 if vs_ctl_is output-overwrites; then unguard "$W/ht_unguarded.py"; HT="$W/ht_unguarded.py"; fi
 python3 "$HT" --newest --state "$W/S.md" "$W/S.md" > "$W/ow.txt" 2>&1; rc=$?
@@ -229,7 +268,7 @@ fi
 
 if [ -z "${VS_CTL:-}" ]; then
     echo "== 3. controls"
-    cp STATE.md "$W/S2.md"; H2="$(shasum "$W/S2.md" | cut -c1-40)"; unguard "$W/ht_unguarded.py"
+    state_copy "$W/S2.md"; H2="$(shasum "$W/S2.md" | cut -c1-40)"; unguard "$W/ht_unguarded.py"
     python3 "$W/ht_unguarded.py" --newest --state "$W/S2.md" "$W/S2.md" > /dev/null 2>&1
     if [ "$(shasum "$W/S2.md" | cut -c1-40)" != "$H2" ]; then vs_ctl_fired output-overwrites "without the guard the report overwrote the state copy it read"
     else vs_ctl_dead output-overwrites "the unguarded copy left the state copy unchanged"; fail=1; fi

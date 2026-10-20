@@ -1,0 +1,11 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent205/t295/fix.diff	e01bf37ae76c10bd2c5aa563eadb170053466c8a
+build/agent205/t295/run1/gate.log	9a6c9f7c273947daab1d390696b7b41f31a1289a
+build/agent205/t295/run1/mode_ours-diverged.log	6e1d007ba6723add94b5f8d0937414146bf07b84
+build/agent205/t295/run1/mode_ours-records-swapped.log	e1a73dc58e0f99d19513921292f9f3ff01a18652
+build/agent205/t295/run1/bk_poked_legs.log	4c6f52e4b8673f0e4d30bbac2faab89df1180e02
+build/agent205/t295/sheet_summary.txt	94f4ca4261adacfc74a942e4f03e37fe0083b1f9
+build/agent205/t295/maintainer_words.txt	ed341c5305fd1ee97b2a8ef814b9e6fa94a03fa7
+build/agent205/t295/plan.md	f1cd539ab31f18f23a0bfd016137290ca93f2308
+build/agent205/t295/closing_comment.md	e123e844d7c384479cf891d4b34f01549ae422a7
+build/agent205/t295/row_295.tsv	9497cc3dd9fc91aa124e1c0075410fd2d952d42a

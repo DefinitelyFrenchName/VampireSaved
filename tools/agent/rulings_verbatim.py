@@ -23,7 +23,12 @@ it on its line:
               question text (an AskUserQuestion question or an assistant message), never checked as the
               maintainer's;
   OTHER       anything else (a doc quote), listed, not checked.
-A MAINTAINER quote not found (whitespace collapsed, `\\"` read as `"`) in the maintainer's own words FAILS.
+A quote JOINED to the previous one on its line (by "then", "and", a comma, or a short sub-label ending in a colon:
+"*"..."*; on the scope: *"..."*") takes that one's class unless the text between carries its own label; a bare
+semicolon join does not (question/answer lists alternate parties that way; #257, 14z-205).
+A MAINTAINER quote not found (whitespace collapsed, `\\"` read as `"`) in the maintainer's own words FAILS; an elided
+quote ("a … b" or "a ... b") is found when every part is in one message, in the quote's order (what the elision
+leaves out is not judged).
 (2) HOMED. Every maintainer message and answer since --since (an ISO time; default: all) must have a quoted
 span of at least 5 words (or the whole message when shorter) in a record file, or be named in --exempt FILE
 (`<first words of the message><TAB><reason>`, e.g. a status question). Missing FAILS; an exempt row that
@@ -39,10 +44,15 @@ import json, os, re, sys, tempfile
 NOISE = ("[Subagent hand-back]", "<agent-message", "Another Claude session sent a message", "<task-notification>", "<system-reminder>",
          "This session is being continued", "<local-command-caveat>", "<command-name>", "<local-command-stdout>")
 QUOTE = re.compile(r'\*"((?:[^"\\]|\\.)*?)"\*')
-MAINT = re.compile(r"(maintainer|mid-turn|side conversation)[^*\n]{0,60}(\*\*|:)\s*[^*]{0,12}$", re.I)
-# a quote joined to the previous one ("*"..."*, then, asked X, *"..."*", "*"..."* and *"..."*") is spoken by
-# the SAME party as that one — the previous quote's class, never a fresh guess (measured 14z-185b)
-CONT = re.compile(r'"\*[,;]?\s*(then|and)\b[^*\n]{0,40}$', re.I)
+# ...the label may carry a sub-label ending in a colon ("**The maintainer:** on the scope: *"..."*", #257)
+MAINT = re.compile(r"(maintainer|mid-turn|side conversation)[^*\n]{0,60}(\*\*|:)\s*([^*]{0,12}|[^*\"\n]{0,40}:\s*)$", re.I)
+# a quote JOINED to the previous one on its line ("*"..."*, then, asked X, *"..."*", "*"..."* and *"..."*", and since
+# #257 "*"..."*; on the scope: *"..."*") is spoken by the SAME party as that one — the previous quote's class — unless
+# the text since it carries a label of its own (measured 14z-185b for "then"/"and"; the sub-label form 14z-205, #257:
+# it was classed OTHER, so a second maintainer quote went unchecked). A bare join ("*"..."*; *"..."*") is NOT one:
+# question/answer lists alternate parties that way, joined by a semicolon (DECISIONS_HISTORY 14z-202's step list,
+# measured 14z-205); a bare COMMA lists one party's quotes ("*"a"*, *"b"*")
+JOIN = re.compile(r'^(?:,\s*|[,;]?\s*(?:(?:then|and)\b[^*\n]{0,80}|[^*"\n.]{0,40}:\s*))$', re.I)   # a bare comma is a list
 # a QUESTION is a bold label naming one ("**The question, verbatim:**"), or "asked" IMMEDIATELY before the quote;
 # "then, asked who edits, *"..."*" introduces the maintainer's ANSWER (measured 14z-185b: the first form misread it)
 QUEST = re.compile(r"\*\*[^*\n]*question[^*\n]*\*\*\s*[^*]{0,12}$|\basked\s*$", re.I)
@@ -113,10 +123,28 @@ def record_blocks(path, key):
     return [m.group(0)] if m else []
 
 
+def in_order(parts, w):
+    """every part found in W, each after the end of the one before (an elided quote keeps its parts' order, #257)"""
+    pos = 0
+    for x in parts:
+        i = w.find(x, pos)
+        if i < 0:
+            return False
+        pos = i + len(x)   # ELISION-ORDER
+    return True
+
+
 def classify(before, prev=None):
     tail = before[-90:]
-    if prev and CONT.search(tail) and not re.search(r"\basked\s*$", tail) and not re.search(r"\*\*[^*]*question", tail, re.I):
-        return prev
+    if prev:
+        seg = before[before.rfind('"*') + 2:]   # the text since the previous quote closed
+        if QUEST.search(seg):
+            return "QUESTION"
+        if MAINT.search(seg):
+            return "MAINTAINER"
+        if JOIN.search(seg):
+            return prev   # SAME-PARTY (#257)
+        tail = seg   # not joined: the quote is classed by its own text only, never by a label before the first quote
     if QUEST.search(tail):
         return "QUESTION"
     if MAINT.search(tail):
@@ -140,7 +168,9 @@ def run(key, transcripts, records, sources, since, exempt):
                     kind = classify(line[:m.start()], prev)
                     prev = kind
                     if kind == "MAINTAINER":
-                        if any(q in w for w in words):
+                        # an elided quote ("a … b", #257's first real run) is found when every part is in ONE message
+                        parts = [x.strip() for x in re.split(r"…|\.\.\.", q) if x.strip()]
+                        if any(in_order(parts, w) for w in words):
                             print(f"  ok         maintainer: {q[:90]}")
                         else:
                             print(f"  NOT FOUND  quoted as the maintainer's but in none of their messages: {q[:120]}")
@@ -216,6 +246,29 @@ def selftest():
             ("stale exempt", good, "what's the status\ta status question\nnever sent this\tno such message\n", 1),
             # an ANSWER introduced by "then, asked X," is the maintainer's and is checked
             ("answer after 'then, asked'", good.replace(', then, asked which route, *"Route A, backtested"*', ', then, asked which route, *"Route B, untested"*'),
+             "what's the status\ta status question\n", 1),
+            # #257 (14z-205): a second quote after a sub-label on the same line is the first one's party, and checked —
+            # it was classed OTHER from the line before the first quote, so an altered one passed
+            ("second quote after a sub-label", good + '**The maintainer:** on the ranges: *"Freeze the real ranges now please"*; on the route: *"Route B, untested"*\n',
+             "what's the status\ta status question\n", 1),
+            ("first quote after a sub-label", good + '**The maintainer:** on the ranges: *"Freeze the real ranges later"*\n',
+             "what's the status\ta status question\n", 1),
+            ("second quote after a sub-label, verbatim", good + '**The maintainer:** on the ranges: *"Freeze the real ranges now please"*; on the route: *"Route A, backtested"*\n',
+             "what's the status\ta status question\n", 0),
+            # ...and a quote with its own maintainer label after a doc quote is checked too
+            # an elided maintainer quote is found when every part is in one message, and an altered part is not
+            ("elided quote", good + '**The maintainer:** *"Freeze the … now please"*\n', "what's the status\ta status question\n", 0),
+            ("elided quote, parts reordered", good + '**The maintainer:** *"now please … Freeze the real"*\n', "what's the status\ta status question\n", 1),
+            ("elided quote, a part altered", good + '**The maintainer:** *"Freeze the … later please"*\n', "what's the status\ta status question\n", 1),
+            # a quote in a NEW SENTENCE after a maintainer quote does not inherit the label (the session's question)
+            ("new sentence after a maintainer quote", good + '**The maintainer:** *"Route A, backtested"*. Then, by a prompt: *"Is this the session text?"*\n',
+             "what's the status\ta status question\n", 0),
+            # question/answer alternating on one line: a bare question after an answer is NOT the maintainer's
+            ("a comma-listed second quote, altered", good + '**The maintainer:** *"Route A, backtested"*, *"Freeze the real ranges later please"*\n',
+             "what's the status\ta status question\n", 1),
+            ("question-answer list", good + '*"Which route should it take?"* — **the maintainer:** *"Route A, backtested"*; *"Is this the session text?"* — **the maintainer:** *"Freeze the real ranges now please"*\n',
+             "what's the status\ta status question\n", 0),
+            ("maintainer label after a doc quote", good + 'the doc reads *"anything at all"*; the maintainer: *"Route B, untested"*\n',
              "what's the status\ta status question\n", 1),
         ]
         for name, dh, exr, want in cases:

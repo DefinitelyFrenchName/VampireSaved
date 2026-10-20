@@ -1,0 +1,4 @@
+  FLAG ATTRIB: #299 closes done: its plan's four steps are complete — --jobs N in the runner; the full-tier serial-vs-8-jobs comparison on one snapshot was identical in eve...
+  FLAG D-ABSOLUTE: **Fix what differs:** nothing differed, so nothing was fixed.  [build/agent205/t299/closing_comment.md]
+  FLAG D-ABSOLUTE: **Not measured:** total memory across concurrent jobs (only the largest single process, 869 MB), and a cold decrypt cache under the pool.  [build/agent205/t299/closing_comment.md]
+packet_check: 3 flag(s): ATTRIB 1, D-ABSOLUTE 2

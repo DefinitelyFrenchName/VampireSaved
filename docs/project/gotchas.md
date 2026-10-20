@@ -7289,3 +7289,29 @@ leg must equal the frozen basis at the case frame (control `shared-sandbox`), an
 sandbox with an atomic `mkdir` that refuses an existing one (control `shared-sandbox`), and its forced-pick leg must load
 the id it poked. A proven #291 sheet is not that check: it proves the state at its moments only, and replay 23's
 verdict moved though its pictures had proven.
+
+## A GATE MOVED TO `ondemand` WITH ITS STEP STOPS BEING RUN, SO A CUT THAT REMOVES ITS INPUT BREAKS IT UNSEEN (paid: 14z-205, #300)
+
+#288's cut (14z-202, `ee9dc1f0`) removed the close's findings table and, in the same commit, moved the ten gates of the
+cut steps to `ondemand` in `tests/ci_cadence.tsv`. `test_close_tools` read that table in two places: section 2b judged
+the newest findings row of `STATE.md`, and section 2d (and its `output-overwrites` control) ran the homes tool on a
+copy of `STATE.md`. Once the first group without a table rolled in, 2b crashed the gate (REFUSED, exit 3) and 2d's
+control read DEAD, and no tier saw it, because an `ondemand` gate runs only when asked. It was found
+running the bookkeeping gates by hand for #299. The gate's `# CONFIRM: always` mark also went quiet: a session run
+defers an `ondemand` gate whatever its mark, while HANDOFF still listed it in the confirm core. **The rule:** a commit
+that moves a gate to `ondemand` because its step was cut runs that gate once on the tree after the cut, and any input
+the cut removes gets a stand-in or a NOTE in the gate (2b prints a NOTE when there is no table; 2d plants a stand-in row);
+the cadence move is also a claim to grep for wherever the gate is named as running.
+
+## ONE READER PER ARM IS ONE SAMPLE, NOT A MEASUREMENT OF A WORDING — the first round's reader caught 5 of 11 where two more caught 8 each (paid: 14z-205, GitHub #273)
+
+#273 compared two wordings of the rule-checker's Q1 on past packets. The first round (14z-199) ran one pinned reader
+per arm and read the difference as small: on the 11 packets that mattered, 5 caught under the current wording against 4.
+Two more readers per arm (14z-205) caught 8 and 8 under the current wording, against 5 and 7. So the first round
+understated the current wording's catches, and with them the bounded wording's cost. The same reader definition on the
+same staged packet found a different gap from one spawn to the next. The second round also corrected a wrong premise
+in its own plan: it said the first round's blind judges had no model parameter, but their `meta.json` records
+`"model":"opus"`, found only when the pre_agent hook refused the spawn. **The rule:** a comparison of rule-checker
+wordings reads at least three readers per arm, and its read-as rule is fixed before any reader is read. The rule
+has to be able to say "unresolved". A plan that copies an earlier round's setup copies it from that round's own
+transcript or meta files, not from its prose.

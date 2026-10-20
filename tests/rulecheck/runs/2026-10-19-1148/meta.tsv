@@ -1,0 +1,11 @@
+decision	recommendation
+subject	#273: put the re-scoped replication's result to the maintainer, recommending Q1's wording stays as it is
+session	14z-205
+model	rule-checker@163e4ce9cf7b
+claim	The re-scoped replication ran as plan.md fixed it (116 replica readers, spawn check 116 of 116 ok, the path check's 5 calls outside a copy kept and shown not to move a label, two blind judges who read only their items, k = 1 re-judged 22 of 22 as judge4): on the 11 before-action packets that mattered the bounded Q1 caught 4/5/7 against the current 5/8/8 (a wording cost by the plan's rule), on the 14 that did not it dropped 7/6/7 against 2/2/2 (a wording gain), and on the negative fixture it raised Q1 in 2 of 3 readers where the current wording raised none; so I recommend keeping Q1 as it is, the maintainer deciding (results.md). Not tested: the documentation packets; any other wording; packets where Q1 did not fire in 14z-196..198; the fixture's v6; whether three readers resolve a difference of one; the 'mattered' split, which stays the 14z-199 rubric's; that a finding which did not matter costs only a resolve, not a wrong action, is a judgement, not a measurement.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	8 flag(s): ATTRIB 1, D-ABSOLUTE 7
+deliverables	build/agent205/t273/results.md

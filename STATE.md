@@ -38,150 +38,130 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
-## Session 14z-205 — **#291 S2 complete (58 gates draw, 174 declare; the event basis D2 built); #293 found and fixed; #120's rebuild spec pushed to its own repository and #120 closed; the static tier's scope cut (#297, #298, #299).** Opened 2026-10-18 on Opus 5.5 (the ruled orchestrator); transcript `995e7259`.
+## Session 14z-205b — **#229: six gates to registration standard (unregistered), the questions put, the maintainer's Q3/Q4 answers probed, Q1 partly confirmed on 9-tile sheets; #301 filed; #291 S3.** A continuation of 14z-205 after its close, on the same transcript (`995e7259`).
 
 ### opened with
-The maintainer: *"read handoff.md, state.md and docs/next_session.md"*. The opener's sweep read CLEAN; `main` at
-`6dee2be7`, level with `origin/main`; PILOT and ERIS unreachable. Then: *"yes, do #291"*, and asked how much of S2 to
-take (the 228-row debt list split as 164 declaration-only gates and 64 comparing gates in four groups by what proves
-their pictures: A the leg's `replay.lua` log, B its `field_trace.lua` fields, C taps only, D ROM pokes or an FBNeo leg):
-*"A + B + the 164 lines"*.
+The work after the 14z-205 close commit is recorded under STATE_HISTORY 14z-205 "CLOSE (14z-205, 2026-10-18)", in its bullets
+"After the close commit" to "#273's replication, and #273 closed" (#276, #295, #257, #260, #273, #275, #299, #300 and
+#291's notes). Then the maintainer: *"let's do #229"*, *"feel free to parallelize what you can: the whole machine is
+yours"*, and on the plan, *"All in parallel"*.
 
-### (1) #291 S2 — THE 164 DECLARATIONS, GROUPS A AND B
-- **164 gates declared** (`none` 155 with the S-class reason among them, `no-reference-leg` 10 as ruled), each classed
-  from a reader's verbatim quotes of its leg launches (nine reader specs, `build/agent205/s2/decl/`, local); the line
-  follows each gate's `# FOLLOWS:` block.
-- **42 gates draw**: `audit_fg_parity` (the pilot) and 41 retrofitted by five parallel forks of this session, each run
-  plainly and with `SHEET_OUT` by `build/agent205/s2/check_gate.sh` (outputs identical once temporary paths, the shell's
-  segfault notice and a timestamped directory are normalised) and every picture proven; the combined page
-  `build/sheets/s2_14z205/index.html` (local, 65 MB): 2,141 pictures, 2,120 PROVEN, the 21 others the carried-nvram runs
-  of #293 (re-proven after its fix). Five fork gates moved to the tap group (C): nothing they log proves a frame.
-- **Tool fixes:** `tools/proof_sheets.py` resolves a relative `--out` (every capture failed on one: ground truth section
-  3b, control `relative-unresolved`; the gotcha is homed); the page reads verdict lines like `AUDIT PASS`
-  (`verdict_line`, cases in `test_sheet_census` 3b).
-- **Caught by looking at the pictures:** three declarations named the wrong P2 character (`audit_fg_parity`,
-  `audit_ex_refused`, `audit_df_moves`), corrected; and a fork's line had split `audit_win_pal_auto`'s `# FOLLOWS:` block
-  (`test_gate_follows` red, fixed).
-- **Retracted the same hour:** a fork's report that a fresh merged run draws another 1P CPU opponent than vanilla; a
-  fresh oracle run of replay 02 equals the frozen vanilla log at f2146 (`fa9d83bbfa84cea0`).
+### (1) #229 — SIX GATES BUILT TO THE REGISTRATION STANDARD, NOT REGISTERED
+Six forks measured the community workbook `vsav-framedata.xlsx` against vsavj in MAME, one family each, naming every
+move by what the engine did (its chain, the stock spent, the objects spawned; [VSE-47]), never by the input:
+`tests/audit_vanilla_specials_a.sh` (F1), `tests/audit_vanilla_specials_b.sh` (F2), `tests/audit_es_ex.sh` (F3),
+`tests/audit_command_throws.sh` (F4), `tests/audit_guard_cancels.sh` (F5) and `tests/audit_vanilla_pursuits.sh` (F6).
+Each final run PASSES and every control fails as its own mode (the forks' `REPORT_followup.md`,
+`build/agent205/t229/f<N>_*/`, local). **They are not registered and not committed:** their expectations wait for Q1
+(identity by eye) and a rule-checker run before any freeze. The 105 untracked files (the six gates, their
+expectations, rigs, Lua and `tools/*_rigs.py`) are listed in `build/agent205/t229/pending_gates_229.list` and backed up
+in `pending_gates_229.tar` beside it (local). F5's expectations are drafts in its own directory. Per-move values stay
+out of the tree (identity in the clear, a hash of the numbers; the 14z-126 ruling).
 
-### (2) #293 — TWO GATES RAN ON CARRIED NVRAM; FIXED
-Found by the sheets (a re-run on a fresh sandbox refused the gates' pictures). `audit_flicker_attribution` shared a
-sandbox between replay 105's two cases; `audit_legacy_pairings` ran each replay three times into one sandbox and one
-file, and its three tenant controls into one file. The maintainer: *"Ticket + fix both now"*. Fixed: a sandbox per case
-plus a frozen-basis check on each vanilla leg (control `shared-sandbox`); one sweep leg per distinct build, a file per
-tenant control with a check that it loads that id, and an atomic `mkdir` that refuses an existing sandbox (control
-`shared-sandbox`). On fresh boots the flicker attribution held (f5868: 3 bytes in `obj-builder-stack`); 7 pairings
-verdicts moved TENANT to LEGACY, each already carrying a `.masked`. Rule-checker runs 2026-10-18-1125 and -1126
-(VIOLATED, resolved: the control sandboxes' naming shown, then a real freshness check added for the sweep legs).
-**Closed** on GitHub after `bf92acd2`, its row `done` in the close commit (§ CLOSE).
+### (2) #229 — THE QUESTIONS AND THE COMMUNITY CROSS-CHECK; #301 FILED
+The maintainer: *"Can you make a document that lists all the questions I need to answer and the pointers/links to the
+ressources they relate to. Also, if you have inconsistencies than would be valuable to report to the community and/or
+cross check with the japanese reverse engineered data, can you make a document of it and create a related ticket"*,
+then *"I think the empty doc got closed but otherwise please create and fill both documents"*.
+- The questions doc (Q1-Q7): https://claude.ai/artifact/88mHYGNsf1wyYZ2EFfzPCE (private; local source
+  `build/agent205/t229/questions_for_maintainer.md`); rule-checker run `2026-10-20-1150` (VIOLATED Q1 Q2 Q4 Q5,
+  resolved).
+- The community cross-check doc: https://claude.ai/artifact/Wfn7XUHignvbQphap3MwyK (private; it quotes per-move values;
+  local source `build/agent205/t229/community_report.md`); rule-checker run `2026-10-20-1151` (VIOLATED Q1-Q4, resolved).
+- **#301 filed** (evolution): report the workbook differences once identity is confirmed, and check the open
+  questions against seesaawiki vswiki. Its body names classes only.
 
-### (3) #291 — THE DESIGN FOR THE LAST 22 GATES, RULED; D4 BUILT
-Put after rule-checker runs 2026-10-18-1120 to -1123 (VIOLATED, resolved) and -1124 (OK); posted on #291. The
-maintainer: *"EVENT-PROVEN basis (D2)"*, *"A no-picture kind (D4)"*, *"D4 first"*. D4 built: the `no-picture` kind in
-`tools/proof_sheets.py`, `test_sheet_census` (two grammar cases) and the contract, and eight gates declared (two
-corpus-wide censuses, `audit_walker_ghost`, three `-debug` gates, `audit_move_parity_attribution`,
-`test_fbneo_legacy_oracle`). Census: 45 legs, 10 no-reference-leg, 8 no-picture, 155 none, 14 on the debt list.
+### (3) #229 — Q3 AND Q4 ANSWERED IN THE DOC; FOUR PROBE ROUNDS
+The maintainer answered most of Q3 (how the never-fired moves are performed) and Q4 (rows whose workbook input
+differs) in the questions doc; copied verbatim to `build/agent205/t229/answers_q3_q4_rev1216.md` (local) and recorded
+in `DECISIONS_HISTORY.md` "Read 2026-10-20 (14z-205b) — #229". Four probe forks (P1-P4, no gate edits,
+`build/agent205/t229/p<N>_*/REPORT.md`, local) tried every answered input; every one fires. What they add:
+- **Big Swing's LK grab** (F4 measured it; the maintainer had written "never light"): re-checked, it stands; shown on
+  `p3_throws/sheets/row1_light_grabs.png`, the maintainer: *"you are correct, light grabs on the specific command grabs
+  you show on the capture sheet"*.
+- Catch and Release, Karame Dama and Hell's Gate: the engine's trackers are 4-1-2-3 + button, so mizuumi's 4123 and the
+  Japanese RE's 41236 both work. Demon Billion is 263KK; ES Rolling Buckler is one paid move (236PP); Tenraiha fires
+  on LK,HK,MP,MP,8; HK SXP never spends stock.
+- Situational moves: Kienzen (623P/PP) is accepted only in a window as stun or a knockdown ends or on landing (his
+  guard cancel's chains); Tsuji Hayate only after Karame Dama connects; BI ES 22PP, FE 22P and ES 22PP are pursuits;
+  Pit of Blame only from a knockdown; Prova di Servo needs a second K; Victor's air throw connects only when both
+  fighters converge.
+- **F3's "ES Ira Pino" join is wrong:** `J.63214KK` alone is ES Ira Spinta; the paying ES Piano is `J.63214KK` then P.
+- **F1's row-38 join is wrong:** the maintainer, on the 236P rows: *"maybe they are 236+P but since Karame Dama has not
+  been sucessfully performed on the opponent before, even if the input was 236+P, it only results in 6+P"*.
+- A rig trap: `nm.hcf`'s gapped back taps make Bishamon backdash before the button.
+The community doc and its local source carry these (40 candidate differences).
 
-### (4) #291 — D1 RETROFITTED, D2 BUILT (D3 NEEDS NOTHING OF ITS OWN)
-- **D1:** `audit_column_flash` (6 pictures) and `test_hui_df_style` (10) draw on their legs' own checksum logs, outputs
-  identical; `audit_dmg_legacy_sweep` waits for D2 (half its legs ran with ROM pokes).
-- **D2, measured before it was built** (`build/agent205/d2/`, local): a scratch wrapper loading `read_tap.lua` itself and
-  adding a snapshot hook wrote a byte-identical tap log (69 lines) to the plain run, and its f2050 picture equals
-  `sheet_capture.lua`'s f2050 pixel for pixel and differs from f2049 and f2051. Built on it:
-  `tests/lua/sheet_tap_capture.lua`, `sheet_tap` in `tests/lib/sheet.sh`, the `tap` row, the `event` basis and the
-  EVENT-PROVEN status in `tools/proof_sheets.py` (event lines: a frame in the first or second token; run summaries
-  excluded), clips (`.wav`) played on the page. Ground truth `tests/test_proof_sheets.sh` section 4b: events reproduced
-  EVENT-PROVEN, a one-frame shift and an altered value refused, an empty window UNPROVEN, the re-run's f2198 pixel-equal
-  to the checksum capture's; control `count-only` fires in-gate and FAILs as a mode.
-- **D3:** a leg's ROM pokes, opcode patch and sweep pokes are its instrument's env, which the wrapper passes unchanged —
-  no mechanism of its own (the contract says so).
-- **S2 complete:** the last 12 gates retrofitted by five more forks (6-10), each IDENTICAL and fully proven: ten tap gates
-  EVENT-PROVEN (`audit_throw_registration` 72, `audit_facing_sweep` 384, `audit_rng_draws` 16, `audit_column_flash_cause`
-  6, `audit_grenade_ground_tiles` 6, `audit_hui_grunt` 10, `audit_trap_parity` 15, `audit_air_gc_legacy` 21,
-  `audit_landing_sound` 70 plus 4 clips, `audit_qs_voice_wav` 148 clips) and `audit_dmg_legacy_sweep` (200 PROVEN, 12
-  EVENT-PROVEN through `rom_poke.lua`); `audit_qs_voice_batch` declared `no-picture` (it judges whole-run multisets over
-  two id lists). Two tool limits found by the forks and fixed: `capture_tap` routes `FIELD_OUT` (rom_poke.lua hands off
-  to field_trace.lua), and a tap env value keeps its own `;` (read_tap's multi-range RTAP; reader cases in
-  `test_sheet_census`). Census: 58 legs, 10 no-reference-leg, 9 no-picture, 155 none, **0 on the debt list**.
-- **#293 follow-up census** (`build/agent205/sbx/`, local): 273 explicit sandbox sites in 168 gates; the 86 with no
-  per-run variable read where two runs could reach them, none shared. The #293 shape itself (a variable key whose values
-  repeat) is NOT covered by a static read: a dynamic check would refuse an existing sandbox in `tools/run_mame.sh` behind
-  an env flag — put to the maintainer; ruled *"it's a good idea, do it"*: #296, § (8).
+### (4) #229 — Q1 ON 9-TILE SHEETS; WHAT IS CONFIRMED
+The maintainer: *"For Q1, I really could use more captures, 5 per move is the strict minimum and 9 is likely
+preferable."* Three sheet forks remade every family's sheets at 9 tiles per move (one more per extra hit on
+pursuits), from each frozen gate's own events, every tile's frame checked against the gate's trace
+(`build/agent205/t229/f<N>_*/cap9/`, local). The maintainer then: *"FYI I don't see any row boxed or highlighted"*:
+the rows to look at first carried only tinted text or a thin outline. Re-rendered from the same snapshots with a
+filled band and a thick frame, and an index of every flagged row by sheet and row number
+(`build/agent205/t229/look_first_index.md`, made by `look_first_index.py`). **Confirmed so far** (verbatim in
+`build/agent205/t229/answers_q1.md`, local, and the DECISIONS_HISTORY entry): every pursuit (*"For Q1 all the
+pursuits look good"*), the five light grabs, Hell's Gate and Ira Piano. Not yet looked at: the rest of the specials,
+ES/EX, the guard cancels and the command throws.
 
-### (5) #120 — THE REBUILD'S SPEC, DRAFTED AND PUSHED TO ITS OWN REPOSITORY
-- Drafted while tiers ran, from the maintainer's brief and answers (verbatim in `DECISIONS_HISTORY.md`, "#120: the
-  rebuild's brief…"): `SPEC.md`, `docs/tests_inventory.tsv` (the 464 top-level `tests/*.sh` in seven reuse classes: E1
-  119, E2 76, F 65, P 55, and T, M, R) and `tools/classify_tests.py`, pushed to `DefinitelyFrenchName/VampireSaved-Rebuilt`
-  (`8c1862d` v0.1, `4cce084` v0.2 with the four §10 answers); linked on #120. Working copies: `build/agent205/t120/`
-  (local). Rule-checker runs 2026-10-18-1129 to -1132, each VIOLATED and resolved; the last one's finding: the
-  index-currency check named no tree, now stamped before and after by `tree_id.py` (both equal the inventory's line).
-- The classes are a script's reading of each gate's code, unconfirmed gate by gate. Phase 0 (the rule-5 extraction,
-  gameplay values first) is work in THIS repository; no ticket moves to the rebuild. #120 later closed, § (8).
+### (5) #229 — TWO RUNS ON PILOT (PROBES ONLY), AND A RULE BROKEN
+The maintainer: *"checking all of this will take a bit of time. While I do that, can you check if you can reach PILOT?"*,
+then *"yes"*. PILOT was reachable (6 vCPU, 47 GB; `ROMDIR=~/roms`, 76 of 76 members against `docs/checksums.txt`).
+- **Ira Piano's startup** (R1, `build/agent205/t229/r1_ira_piano/`): the workbook's 62 is the duration-byte sum from the
+  K press (Ira Spinta 36 + Piano 26); live it is 59 ticks (Piano's last node never plays); F1's 26 times Piano alone.
+  A counting convention, not a disagreement.
+- **The pursuits mid-screen** (R2, `build/agent205/t229/r2_pursuits_mid/`): all 75 events equal F6's on every field it
+  reads; the bands and 8K's start edge unchanged; none of Q2's four claims moves toward the workbook. F6's own presses
+  were in the corner on 51 of 60 knockdowns, not all (P4's "every press" held for P4's rigs only).
+- **Broken:** both runs used an rsync of the uncommitted working tree, where `docs/project/working_methods.md` "When
+  to commit" says work handed to PILOT is a bundle of a commit. Nothing from them entered a gate or an expectation.
 
-### (6) THE FIRST TIER WAS RED: test_poked_legs; THE CENSUS RE-FROZEN
-- The tier on the staged tree (`build/agent205/tier1/`, local): PASS 199, FAIL 1, `test_poked_legs` (the forced-pick census
-  23 rows longer, none removed). 7 rows were false native legs from this sitting's `# SHEET: none` comments naming vsav2
-  in three poked gates (the documented comments-included trap, paid again; `docs/project/gotchas.md`); the comments now
-  say vs2. The other 16 come from the sheet blocks' poke text in `audit_df_startup_invuln` and `audit_dmg_legacy_sweep`
-  (12 PARAM like the frozen `$_v` rows, 3 CROSS-INERT, 1 SAME; CROSS-FLAVOR unchanged, accepted list unchanged).
-  Rule-checker run 2026-10-18-1136 (VIOLATED Q1 Q4, resolved with `build/agent205/poked/census_evidence.txt`); the
-  maintainer saw the 16 rows and ruled *"re-freeze"*; `tests/expected/poked_legs.tsv` re-frozen (+16, -0), the gate
-  PASSes with both controls fired. Not built: a control for the census tool's loop-variable resolution.
+### (6) #291 S3 — BUILT FROM THE COMMIT, `--host pilot|eris`; PROVEN ON PILOT WITH A FILTER
+The maintainer: *"Since PILOT is available, could we make it do the remaining of #291?"*, then *"I don't mind the commit
+and we could even close and start #291 on a fresh session, just make sure that we keep track of all of #229 that is
+still ongoing/todo/waiting for me."* `tools/proof_sheets.py run <commit>` now bundles the commit, clones it clean,
+checks the ROMs against that commit's `docs/checksums.txt`, builds the five tracks its `tests/run_all_emulator.sh` names
+(the `tests/test_m3a_reproducible.sh` recipe) and refuses the run unless every track's fingerprint equals the commit's
+own `EXPECT_*`; an `ours` picture whose leg did not run on a build made in that checkout is NOT THE JUDGED RUN
+(`commit_check`). The working-tree mode of S1 is gone ("Built from the commit"). `--host pilot|eris` sends the bundle
+and the tool, runs detached with bounded polls, and brings `build/sheets/<commit>/` back; ERIS is written and untested.
+Ground truth: `tests/test_proof_sheets.sh` section 4c, controls `build-blind` and `fingerprint-blind` (each FAILs the gate
+as its mode); `test_proof_sheets` and `test_sheet_census` PASS. **On PILOT, filtered** (`audit_entrance_draw`,
+`test_hui_grab_victim`, `audit_trap_shock` at `779bc589`): 319 s end to end, the five tracks equal their references,
+27 pictures, 27 PROVEN (`build/sheets/779bc589d39e/`, local; the fork's report `build/agent205/t291s3/REPORT.md`).
+Not run: the unfiltered run (estimated 2-3 h on PILOT), which runs from this close's commit next session. Three gates
+default to builds a commit does not make (`test_gfx_menus` and `audit_mask_window_ff4182` on `build/donovan6`,
+`audit_landing_sound`'s control on `build/m3b_merged30`) and will show NOT THE JUDGED RUN.
 
-### (7) #295 FILED, #294 RECORDED, AND A NOTE ABOVE EACH SHEET (#291)
-- Reading `audit_dmg_legacy_sweep`'s sheet, the maintainer asked why it compares vsavj with vs2 and not with our build:
-  it was built for #191 (an engine difference between the original games); no gate runs those legacy legs on our build,
-  and the 53-replay oracle does not include them. Filed as #295 on the maintainer's word (`DECISIONS_HISTORY.md`,
-  "#295"); not built. #294 (Killshread's aura palette), filed parked by the maintainer, has its row and its local record.
-- **Sheet notes:** `docs/project/sheet_notes.md` (one section per gate, shown above its pictures by
-  `tools/proof_sheets.py page`; `test_sheet_census` section 3c, control `orphan-note`); one note written, the sweep's,
-  and its page re-rendered (`build/agent205/s2/gates/audit_dmg_legacy_sweep/sheets/`, local). The other 57 are #291's
-  (commented 2026-10-18).
+### (7) #299 NOT CLOSED: ITS CLOSURE'S RULE-CHECKER FOUND THE PLAN UNFINISHED
+START HERE had #299 closing at this close. Rule-checker run `2026-10-20-1152` (VIOLATED Q1 Q3 Q4, plant caught): the
+plan's step 2 asked for every gate's output compared, and only verdicts and summaries were; the cold decrypt cache,
+collisions between concurrent gates and wall-clock gates under load are uncontrolled. Resolved by withdrawing the
+closure: #299 stays open, its comment of 2026-10-20 names the four items left. The close's `--jobs 8` default stands
+(ruled 2026-10-19).
 
-### (8) #120 CLOSED, #296 STEP 1, THE ROM-CONTENT RULING
-- **#120 closed `done`** at the maintainer's request; what is left is VampireSaved-Rebuilt#1 (the drafts' review, the
-  ledgers' ten flags and their 201 adapted and 18 dropped rules, phase 0 in THIS repository, phase 1's setup, phases
-  1-4). The CLAUDE.md, skills and swarm went to the new repository as `d11c9a3` after rule-checker run 2026-10-18-1134
-  (resolved); the closure after run -1137 (resolved).
-- **#296** (the run-time sandbox guard, the maintainer: *"it's a good idea, do it"*), step 1 built: `MAME_SANDBOX_LOG`
-  in `tools/run_mame.sh` logs per run whether the sandbox already held an earlier run's state; the gate
-  `tests/test_mame_sandbox_log.sh` (ci_portable, a stub binary, control `state-blind`). NEXT: run the emulator lanes
-  with the log on (a remote box) and attribute every reuse; then step 2, refusal by default.
-- **ROM content in the tree, ruled:** addresses and discrete values are fine, whole graphics, sounds and algorithms are
-  not (`DECISIONS_HISTORY.md`, "the no-ROM-bytes rule"); the four quoted sound-driver bytes stay.
-- A page for the maintainer on what a tier does: https://claude.ai/artifact/1DzrvoGUphYYmtyRKvhJtZ (private).
-
-### (9) THE STATIC TIER'S SCOPE — SIX FAMILIES TO FREEZE (#297), CONTROLS ON A CHANGED PROGRAM (#298), PARALLEL GATES (#299)
-- Asked what a commit or close runs: the static tier only; the emulator tier runs at a freeze and a release (the tiers
-  page, https://claude.ai/artifact/1DzrvoGUphYYmtyRKvhJtZ, private). Asked whether the session scope is too broad, the
-  record measured (`build/agent205/tier_history.py`, local): 104 static runs 2026-10-02..18; session reds by family
-  pipeline 3, review-triage 1, gfx, oracle, mister, tenant 0; 9,367 executed controls since 2026-10-04, all HONOURED;
-  controls 1,500-1,800 s of a close against 600-1,000 s of gates. Ruled (`DECISIONS_HISTORY.md`, "the static tier's
-  scope"): all three, the controls' middle option, and *"Own code changed (Recommended)"* for the moved gates.
-- **#297:** 109 gates to freeze cadence with the `@code` trigger (`tools/static_confirm.py reach`, the R1 closure; a
-  failed reach fails safe); `test_static_runner` 14j, control `code-trigger-off`. Open until a freeze runs them green.
-- **#298:** a stale gate's controls execute at a commit or close only when a program of its reach changed (R1; before,
-  R2/R6 data reads too); on the 14z-205 tier-2 plan 117 -> 17 gates; `test_static_runner` 22d/22e, controls
-  `controls-always`, `controls-never`. To be measured on this close's tier.
-- **#299:** `--jobs N` (`tests/lib/static_job.sh`, a pool, results classified in registry order). Portable tier without
-  controls: 89 gates, the same verdict each, 11 min 7 s serial, 4 min 54 s at 8 jobs (`build/agent205/t299_*`, local).
-  The decrypt cache was already race-safe (atomic rename). NEXT: the full tier with controls, serial against 8 jobs on
-  this close's snapshot.
-- **#296 step 1 on the real binaries:** the emulator prereq lane, 23/23 GREEN with the new `run_mame.sh`; its inventory,
-  324 MAME runs, every one on a fresh sandbox (`build/agent205/t296/`, local).
-
-### CLOSE (14z-205, 2026-10-18)
-- Run directory `build/agent205/close/`; `--prev` is this sitting's tier-2 run (`build/agent205/tier2/tier_results.tsv`,
-  strict GREEN on the tree of `bf92acd2`), not the 14z-204 close's: the same base the commit's guard read, and a plan of
-  ~80 s instead of 2 h 21 min (tier 1's).
-- Steps: sections, next-session (the 14z-204 opener moved verbatim, a new opener), rollover (14z-204's 141 lines to
-  `STATE_HISTORY.md`, byte-equal to HEAD's group, its ledger line on top), indexes (auto), dashboard (four datasets,
-  keys 14z-163..14z-205, 1,797 figures all classed; `datasets/*` re-pointed in one batch) — all DONE.
-- The tier's results: `build/agent205/close/tier_results.tsv` (the next close's `--prev`), on a snapshot of the staged
-  tree; its controls file measures #298's narrowing; the #299 serial-against-8-jobs comparison runs on the same commit
-  after the commit.
-- Commits this sitting: `bf92acd2` (#291 S2, #293, the census re-freeze), then this close's; both local until its push.
+### CLOSE (14z-205b, 2026-10-20)
+Run by the step table and its driver (`docs/project/session_close.md`, `tools/close.py`; run dir
+`build/agent205b/close`, local). The maintainer, on closing now: *"I don't mind the commit and we could even close and
+start #291 on a fresh session"*.
+- sections, next-session and rollover done by hand (the 14z-205 group rolled to STATE_HISTORY with its ledger line; no
+  `STATE.md §` citation pointed into it); indexes regenerated (`tools/close.py next`);
+- dashboard re-collected for 14z-163..14z-205b (1,814 figures, 0 unclassed) and uploaded (datasets versions 11, 11,
+  12, 11);
+- bookkeeping gates before the tier: `test_tickets`, `test_state_open_lists`, `test_live_budget`,
+  `test_gotchas_index_current`, `test_history_index`, `test_rulings_verbatim` PASS; `test_gate_index_current` FAILS on
+  the working tree only because of #229's six untracked gates (the staged snapshot does not hold them);
+- **#229's 105 untracked files are deliberately NOT staged** (expectations not yet rule-checked, Q1 unfinished; listed
+  in `build/agent205/t229/pending_gates_229.list`, backed up beside it);
+- the tier's results file, the next close's `--prev`: `build/agent205b/close/tier_results.tsv`.
+- **tier run 1 RED** (PASS 95 FAIL 3: `test_gate_follows`, `test_gate_coverage_current`, `test_tickets`) and **run 2 RED**
+  (PASS 95 FAIL 3: the last two and `test_gate_index_current`), both at `--jobs 8`
+  (`build/agent205b/close/tier.run1.log`, `tier.run2.log`, local). All four were real, not a collision between
+  concurrent gates as I first told the maintainer (my snapshot probe's filter hid the failure lines; a clean worktree of
+  the staged commit showed them): S3 changed `test_proof_sheets`' header without the gate index, the coverage page or
+  its FOLLOWS (`build/manifest/`, which the widening rule asks of a gate naming `/rompath`) being regenerated or
+  widened, and #301's repro column named the six untracked #229 gates (set to `none` until they register, NEXT_SESSION
+  START HERE 2). Fixed and re-staged; the six gates pass in a clean worktree of the staged tree.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings

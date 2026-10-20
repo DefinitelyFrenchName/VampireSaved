@@ -1,0 +1,11 @@
+decision	recommendation
+subject	#275 closed done: fidelity-14z160's EXPECT OK stands with its claim at v6, recalibrated (14z-205)
+session	14z-205
+model	rule-checker@163e4ce9cf7b
+claim	#275 closes done: the fixture's claim names the unguarded FREEZE branch (fixture_v6.diff), as the maintainer chose (maintainer_words.txt, ruling.txt), under the fixture's own rule for a premise found true (fixture_v6.diff's NOTES context, the v2 entry); calibration run 2026-10-19-1146 read the plant CAUGHT and v6 OK (ledger_1146.txt, verdict_negative_1146.txt, verdict_plant_1146.txt), and tests/test_rule_checker.sh passes with the fixture calibrated under the current checklist (test_rule_checker_fixture_lines.txt). Not tested: v6 under the bounded Q1 (#273's replication reads the 14z-199 staged copy); one reader read v6; the plant fidelity-14z160-false-statement keeps its v5 base text. Closing comment and row: closing_comment.md, row_275.tsv
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	5 flag(s): ATTRIB 1, D-ABSOLUTE 4
+deliverables	build/agent205/t275/closing_comment.md build/agent205/t275/row_275.tsv

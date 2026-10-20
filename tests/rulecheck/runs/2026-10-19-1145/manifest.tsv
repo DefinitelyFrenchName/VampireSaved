@@ -1,0 +1,15 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent205/t273/report.md	4d4cfa2a568ed2b7f31c1df6015fa88c64cf8a5b
+build/agent205/t273/split_by_kind.py	9f8ee7054d2e572c7245d99f73d23706d99d1122
+build/agent205/t273/split_by_kind.out	34fd8244a5ec20e8a048f067145ce971d0344f88
+build/agent205/t273/ledger_since_288.tsv	5e3988ab943aa72b2bbe0b6e62a1f6a6d705dd5e
+build/agent205/t273/ledger_since_288.out	75b31aee7aee1155e4970376c15d3d955022db73
+build/agent205/t273/cost.out	9255efcc4e86b879a524caa416f859602d670708
+build/agent205/t273/fixture_gate_excerpt.txt	3fcdd8e9d17bda7e75f597061f60244d116f485b
+build/agent205/t273/live_gate_freeze.txt	14e237976e429c19018fc2a3f25eeb455c7f2314
+build/agent205/t273/fixture_packet.md	7fca8950638a67591756e503bca418ed6c800466
+build/agent205/t273/fixture_NOTES.txt	65d3d529ce9d062109c473f131730215448f1461
+build/agent205/t273/plan_replication_14z199.md	0a8471372735c783d112d6bc6d3be56b9e272230
+build/agent205/t273/ruling_14z199.txt	61584e93e5f9b51f42e639dd6d1e32f1624b13bf
+build/agent205/t273/ledger_1116.txt	2c141b2e0c31b400719c4fe2cdf2b49001992c63
+build/agent205/t273/maintainer_words.txt	87534902e18bf4cbd06b4775ba0a2bb9c772ccb7

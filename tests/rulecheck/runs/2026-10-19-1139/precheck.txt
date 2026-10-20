@@ -1,0 +1,13 @@
+  FLAG D-FIGURE: 98  [build/agent205/t295/plan.md]
+  FLAG D-FIGURE: 96  [build/agent205/t295/plan.md]
+  FLAG D-ABSOLUTE: - all four ours traces are byte-identical to the vsavj traces (1802 lines each);  [build/agent205/t295/plan.md]
+  FLAG D-ABSOLUTE: The other 28 legs are not measured yet; the build step runs all 32.  [build/agent205/t295/plan.md]
+  FLAG D-ABSOLUTE: Same structural checks on the ours legs: a complete trace, the forced ids landed at 2300, Demitri the attacker at every hit.  [build/agent205/t295/plan.md]
+  FLAG D-ABSOLUTE: **The judgment (a new section, after section 5's record read).** For each of the 32 legs:  [build/agent205/t295/plan.md]
+  FLAG D-ABSOLUTE: - the ours trace is BYTE-IDENTICAL to the same run's vsavj trace (frames 2300–4100, all eight fields: both HP words, both white-HP words, both reaction class...  [build/agent205/t295/plan.md]
+  FLAG D-ABSOLUTE: This shows the ours leg reads our build's own data and the comparison can refuse it, on the real instrument, not only on planted rows.  [build/agent205/t295/plan.md]
+  FLAG D-ABSOLUTE: - **The same rig on both legs.** Both run the same replay with the same pokes: forced picks written into the id bytes at 1400–1500, HP pinned to 288 before e...  [build/agent205/t295/plan.md]
+  FLAG D-ABSOLUTE: It does not cover the select screen or a cursor pick on our wheel (the whole-RAM legacy oracle's job), nor the game under other levels or RNG values (already...  [build/agent205/t295/plan.md]
+  FLAG D-ABSOLUTE: - **One emulator.** MAME only, not FBNeo or the MiSTer core.  [build/agent205/t295/plan.md]
+  FLAG D-ABSOLUTE: If any of the other 28 differs, the gate is red, and that is a superset finding to root-cause ([VSP-7]), not something to tune.  [build/agent205/t295/plan.md]
+packet_check: 12 flag(s): D-ABSOLUTE 10, D-FIGURE 2

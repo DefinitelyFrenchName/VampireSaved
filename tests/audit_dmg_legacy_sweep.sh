@@ -2,11 +2,13 @@
 # audit_dmg_legacy_sweep.sh — DEMITRI'S 2HK/5HP/623HP TAKE MORE HP ON VSAVJ THAN ON VSAV2 FROM ALMOST EVERY LEGACY VICTIM, with no port in the loop, BECAUSE VS2 LOWERED HIS OWN ATTACK RECORDS (10/14/20 -> 9/13/18) — each game given the other's records takes the other's damage on 14 of the 16 legacy victims, both sides (not on Sasquatch 0x0A, whose defense row differs, nor Oboro 0x18, whose hits land differently), 14z-187b; so Donovan's 9-against-8 on our build is vsavj's Demitri, not ours (GitHub #191, ruled not-ours 2026-10-01). ~~the two ENGINES'~~ RETRACTED 14z-187b: on these three hits the damage follows the record, on 14 of the 16 legacy victims (section 5); whether the engines ever differ on a record-equal hit is not claimed (Sasquatch 0x0A's rows stay apart with equal records).
 #
 # WHAT: Demitri's 2HK, 5HP and 623HP on every legacy victim, from P1 and from P2, on pristine vsavj
-#   against pristine vsav2, and on Donovan (P1) on our merged build against native vs2; and WHY the
+#   against pristine vsav2, and on Donovan (P1) on our merged build against native vs2; since #295 (14z-205) the
+#   same 32 legacy legs on OUR merged build against pristine vsavj, exact (the superset invariant on these hits); and WHY the
 #   games differ: those hits' own attack records, swapped between the games, swap the damage — the
 #   record of #191 (the maintainer: "1) close as not ours 2) document with the other engine
 #   differences between vsavj and VS2", 2026-10-01).
-# HOW: 66 MAME runs, six at a time: 16 legacy victims x 2 games x 2 sides on the 14z-186
+# HOW: 173 MAME runs, six at a time (section 2's 98: 16 legacy victims x 3 legs x 2 sides and Donovan's two; section 5's 74;
+#   section 6's one): 16 legacy victims x vsavj/vsav2/ours x 2 sides on the 14z-186
 #   control's two replays (victim and Demitri by the early-window forced picks, the victim's HP
 #   pinned to 288 sixty frames before each hit, the level pinned 6 from 2000 and the RNG word
 #   0000 from 2363), and Donovan's 14z-186 probe-12 rig on native vs2 and ours (the parity
@@ -16,7 +18,9 @@
 #   images; section 5 reads the three hits' attack records on both games (tools/dmg_sweep.py
 #   records) and replays one leg per game with those bytes set to the other game's values through
 #   tests/lua/rom_poke.lua (verified writes, an own-value poke as the inert control on each of
-#   the three images: vsavj and vs2 on victim 0x00's leg, the merged build and vs2 on Donovan's).
+#   the three images: vsavj and vs2 on victim 0x00's leg, the merged build and vs2 on Donovan's). Section 6 (#295)
+#   compares each ours legacy trace with the same run's vsavj trace byte for byte (tools/dmg_sweep.py ours) and the
+#   rows hit for hit, and runs one ours leg (P1, victim 0x00) with vs2's three records through rom_poke.lua.
 # EXPECTS: every leg's forced ids as traced, Demitri the attacker at every hit, the defense rows
 #   differing only for ids 0a 10 13 19 1a with the attack table and the 2D map equal, and every
 #   row equal to tests/expected/dmg_legacy_sweep.tsv (on 2026-10-01: vsavj one more red HP on 2HK
@@ -26,17 +30,22 @@
 #   the hits are the record chains' nodes; over the WHOLE sweep (64 swapped legs) 176 of 192 rows equal
 #   the other game's frozen row, the 16 others exactly Sasquatch 0x0A's and Oboro 0x18's; Donovan's
 #   own legs swapped (ours given vs2's records, native given vsavj's) read the other leg's frozen rows,
-#   8 of 8, and his own-value legs reproduce their unpoked traces; all three controls fire.
+#   8 of 8, and his own-value legs reproduce their unpoked traces; on our build every legacy leg's trace is
+#   byte-identical to vsavj's, 32 of 32, and its rows equal vsavj's, 96 of 96 hits, each leg running $BUILD's
+#   vsavjw.zip (section 6, not frozen: judged against the same run's vsavj legs, which section 4 holds); all five
+#   controls fire.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/dmg_legacy_sweep.tsv tests/replays/dmg191/
 #   tests/expected/registry.tsv tests/lib/controls.sh tests/lua/field_trace.lua tools/dmg_sweep.py
 #   tools/build_fingerprint.py tools/cps2_decrypt.py tools/run_mame.sh tools/setup_mame.sh
 #   tests/lua/rom_poke.lua tools/audit_same_data_p2.py tools/hitbox_records.py tools/anim_nodes.py tests/lib/sheet.sh
 #
-# SHEET: legs vsavj,vs2,ours — moments: each judged hit at each leg's own first red-drop frame: Demitri's 2HK/5HP/623HP on every legacy victim from both sides (pristine vsav2 above pristine vsavj), Donovan's four events (native vs2 above ours), each proven on that leg's own field trace; and section 5's counterfactual on victim 0x00 (each game unpoked and with the other game's records, through rom_poke.lua), EVENT-PROVEN on that leg's own field log around each hit — not comparable: the legacy sheets have no leg of ours (pristine vsavj against vsav2, the engine difference #191 records); each game's stage and palette, and the victims' art (each game's own copy; [VSP-168]); the whole-sweep swap (64 legs) and Donovan's swapped legs are judged as row equalities and not drawn
+# SHEET: legs vsavj,vs2,ours — moments: each judged hit at each leg's own first red-drop frame: Demitri's 2HK/5HP/623HP on every legacy victim from both sides (pristine vsav2 above pristine vsavj above ours, #295), Donovan's four events (native vs2 above ours), each proven on that leg's own field trace; and section 5's counterfactual on victim 0x00 (each game unpoked and with the other game's records, through rom_poke.lua), EVENT-PROVEN on that leg's own field log around each hit — not comparable: vs2 against vsavj on the legacy sheets (the engine difference #191 records; ours against vsavj is exact, #295); each game's stage and palette, and the victims' art (each game's own copy; [VSP-168]); the whole-sweep swap (64 legs) and Donovan's swapped legs are judged as row equalities and not drawn
 #
 # MUST-FIRE: perturbed-copy: engines-agree — the rows with every vsavj total replaced by its vsav2 twin's (what two games that agreed would read) must FAIL the frozen compare, so the +1 between the GAMES is read from the rows, not assumed (in-gate: the perturbed rows must differ from the frozen ones; mode: the perturbed rows are the gate's rows and the compare FAILs)
 # MUST-FIRE: perturbed-copy: attacker-swapped — the reader run with the attacker id read as 0x03 at every hit must report every hit as not Demitri's, so "the hit was Demitri's 2HK" is something the gate can refuse (in-gate: the reader on the real traces with the perturbation must exit non-zero; mode: the gate's own read is perturbed and the gate FAILs)
 # MUST-FIRE: perturbed-copy: counterfactual-skipped — the unpoked vsavj and vs2 legs must deal DIFFERENT damage, so "each game poked to the other's records deals the other's damage" is an equality the comparison can refuse (in-gate: the unpoked legs differ; mode: the unpoked traces stand in for the poked ones and the gate FAILs)
+# MUST-FIRE: perturbed-copy: ours-diverged — the ours rows with one more red HP on P1/victim 0x00's 2HK (a planted one-HP difference) must fail section 6's comparison with vsavj, so "ours equals vsavj hit for hit" is something the gate can refuse (#295; in-gate: tools/dmg_sweep.py ours --perturb ours-diverged must exit non-zero naming that hit; mode: the perturbed rows are the ones compared and the gate FAILs)
+# MUST-FIRE: perturbed-copy: ours-records-swapped — our build on P1/victim 0x00 with vs2's three attack records written through rom_poke.lua (every write verified) must deal different damage and fail section 6's comparison, so the comparison refuses a real difference on the real instrument, not only a planted row (#295; it does not show the leg ran OUR build: the mame.log check does; in-gate: that trace in place of the ours leg must fail naming the leg; mode: it stands in for the ours leg and the gate FAILs)
 #
 # POKE READ-BACK (ruled 2026-10-01 (14z-187), tests/expected/poke_readback.tsv): the victim's HP words (ff8450/ff8850,
 # red and white) are pinned to 288 before each hit and only the DROPS after the pin are read (OBSERVES); the two ids
@@ -65,12 +74,19 @@
 # <+offset> <attacker id> <victim class>`, plus the table check's two lines and one `ours build` row. FREEZE=1
 # rewrites it.
 #
+# #295 (14z-205; the maintainer, reading this gate's sheet: "Why are we not making the same tests with vsavj vs vsavjw?
+# ... since it's about vsavj characters I fail to see the value" of vs2 alone): the gate was built for #191, an engine
+# difference between the two ORIGINAL games, and ran our build only on Donovan's legs; these legacy hits were in no
+# superset check (the 53-replay legacy oracle holds none of tests/replays/dmg191/). Section 6 adds them, judged exact
+# against vsavj on the same rig (rule-checker runs 2026-10-19-1139, the plan, resolved). The legs start from poked ids
+# after select, so the select screen and a cursor pick on our wheel stay the whole-RAM oracle's.
+#
 # NOT COVERED: WHERE in vsavj's pipeline the point is added (the ticket's open question, as for #161); the
 # damage-level config byte; attackers other than Demitri and moves other than these three; Donovan as P2; whether
 # the level and RNG pins change the per-game difference; FBNeo and the MiSTer core.
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged31] [JOBS=6] [FREEZE=1] tests/audit_dmg_legacy_sweep.sh
-#   emulator tier, MAME; 66 runs of up to 4725 frames, six at a time (~10 min quiet)
+#   emulator tier, MAME; 173 runs of up to 4725 frames, six at a time
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
@@ -107,13 +123,14 @@ lpk() {  # lpk <side p1|p2> <victim id> — a legacy leg's forced picks and HP p
 }
 lrpl() { case "$1" in p1) echo "$REPO/tests/replays/dmg191/demitri_p1.rpl" ;; *) echo "$REPO/tests/replays/dmg191/demitri_p2.rpl" ;; esac; }
 LFIELDS="ff8450:w:p1hp,ff8452:w:p1white,ff8454:b:p1cls,ff8850:w:p2hp,ff8852:w:p2white,ff8854:b:p2cls,ff8782:b:id,ff8b82:b:p2id"
-lleg() {  # lleg <side p1|p2> <victim id> <vsavj|vsav2>
+lleg() {  # lleg <side p1|p2> <victim id> <vsavj|vsav2|ours> — ours: our merged build ($BUILD's vsavjw), the same inputs (#295)
     _s="$1"; _v="$2"; _g="$3"; _d="$W/L.$_s.$_v.$_g"; mkdir -p "$_d"
     _pk="$(lpk "$_s" "$_v")"; _r="$(lrpl "$_s")"
-    ( cd "$_d" && MAME_SANDBOX="$_d/sb" MAME_ROMPATH="$ROMDIR" REPLAY="$_r" POKES="$LV;$_pk" \
+    _set="$_g"; _rp="$ROMDIR"; [ "$_g" = ours ] && { _set=vsavjw; _rp="$BUILD/rompath;$ROMDIR"; }
+    ( cd "$_d" && MAME_SANDBOX="$_d/sb" MAME_ROMPATH="$_rp" REPLAY="$_r" POKES="$LV;$_pk" \
         FIELDS="$LFIELDS" \
         FIELD_OUT="$_d/f.ft" FIELD_FROM=2300 FIELD_TO=4100 FRAMES=4100 \
-        "$REPO/tools/run_mame.sh" "$_g" -autoboot_script "$REPO/tests/lua/field_trace.lua" > "$_d/mame.log" 2>&1; rm -rf "$_d/sb" ) </dev/null
+        "$REPO/tools/run_mame.sh" "$_set" -autoboot_script "$REPO/tests/lua/field_trace.lua" > "$_d/mame.log" 2>&1; rm -rf "$_d/sb" ) </dev/null
 }
 DFIELDS="ff8450:w:p1hp,ff8452:w:p1white,ff8454:b:p1cls,ff8782:b:id,ff8b82:b:p2id"
 dleg() {  # dleg <native|ours> — Donovan (P1) against Demitri (P2), the 14z-186 probe-12 rig, the parity gates' pins
@@ -131,9 +148,9 @@ dleg() {  # dleg <native|ours> — Donovan (P1) against Demitri (P2), the 14z-18
         FIELD_OUT="$_d/f.ft" FIELD_FROM=2300 FIELD_TO="$_fr" FRAMES="$_fr" \
         "$REPO/tools/run_mame.sh" "$_set" -autoboot_script "$REPO/tests/lua/field_trace.lua" > "$_d/mame.log" 2>&1; rm -rf "$_d/sb" ) </dev/null
 }
-echo "== 2. the legs (16 victims x vsavj/vsav2 x Demitri on P1/P2; Donovan native/ours $(basename "$BUILD")), $JOBS at a time"
+echo "== 2. the legs (16 victims x vsavj/vsav2/ours x Demitri on P1/P2; Donovan native/ours $(basename "$BUILD")), $JOBS at a time"
 n=0
-for s in p1 p2; do for v in $IDS; do for g in vsavj vsav2; do
+for s in p1 p2; do for v in $IDS; do for g in vsavj vsav2 ours; do
     lleg "$s" "$v" "$g" & n=$((n + 1)); [ $((n % JOBS)) = 0 ] && wait
 done; done; done
 dleg native & dleg ours & wait
@@ -331,16 +348,54 @@ if [ -z "$MODE" ]; then
     else vs_ctl_dead counterfactual-skipped "the unpoked games already deal the same damage; the swap proves nothing" || fail=1; fi
 fi
 
+echo "== 6. our build against vsavj on every legacy leg (#295: the superset invariant on these hits)"
+# The same 32 legs as section 2's vsavj legs, on our merged build: each trace must be BYTE-IDENTICAL to the same run's
+# vsavj trace (2300-4100, every field) and each row equal hit for hit (red, white, first drop frame, attacker, class).
+# The vsavj legs are held by the frozen rows (section 4); the ours rows are judged against them and not frozen.
+_ol=0; for s in p1 p2; do for v in $IDS; do
+    grep -qF "opened archive file $BUILD/rompath/vsavjw.zip" "$W/L.$s.$v.ours/mame.log" && _ol=$((_ol + 1))
+done; done
+[ "$_ol" = 32 ] && ok "all 32 ours legs ran $(basename "$BUILD")'s vsavjw.zip (each mame.log)" \
+    || bad "only $_ol of the 32 ours legs show MAME opening $BUILD/rompath/vsavjw.zip"
+# the records-swapped leg (control ours-records-swapped): ours on P1 against victim 0x00 with vs2's three attack records
+# at vsavj's addresses (section 5's JV values, the ones Donovan's ours swap uses), every write verified
+_od="$W/O.swap"; mkdir -p "$_od"
+( cd "$_od" && MAME_SANDBOX="$_od/sb" MAME_ROMPATH="$BUILD/rompath;$ROMDIR" REPLAY="$(lrpl p1)" POKES="$LV;$(lpk p1 00)" \
+    ROMPOKE="$JV_2,$JV_5,$JV_623" FIELDS="$LFIELDS" FIELD_OUT="$_od/f.ft" FIELD_FROM=2300 FIELD_TO=4100 FRAMES=4100 \
+    "$REPO/tools/run_mame.sh" vsavjw -autoboot_script "$REPO/tests/lua/rom_poke.lua" > "$_od/mame.log" 2>&1; rm -rf "$_od/sb" ) </dev/null
+OARGS=""
+[ "$MODE" = ours-diverged ] && OARGS="--perturb ours-diverged"
+[ "$MODE" = ours-records-swapped ] && OARGS="--leg-from ours.p1.00=$_od/f.ft"
+if python3 "$REPO/tools/dmg_sweep.py" ours "$W" $OARGS > "$W/ours.txt" 2> "$W/ours_problems.txt"; then
+    ok "$(head -1 "$W/ours.txt")"
+else
+    bad "our build differs from vsavj on a legacy leg, or a leg is structurally wrong:"
+    sed 's/^/        /' "$W/ours.txt" "$W/ours_problems.txt" | head -40
+fi
+if [ -z "$MODE" ]; then
+    if python3 "$REPO/tools/dmg_sweep.py" ours "$W" --perturb ours-diverged > "$W/ours_div.txt" 2>&1; then
+        vs_ctl_dead ours-diverged "the ours rows with one more red HP on P1/0x00's 2HK still read equal to vsavj's" || fail=1
+    elif grep -q '^DIFF legacy p1 00 2HK: ours red' "$W/ours_div.txt"; then
+        vs_ctl_fired ours-diverged "one more red HP on P1/0x00's 2HK is refused: $(grep -m1 '^DIFF legacy p1 00 2HK' "$W/ours_div.txt" | cut -c1-120)"
+    else vs_ctl_dead ours-diverged "the planted row failed without naming P1/0x00's 2HK: $(head -3 "$W/ours_div.txt" | tr '\n' ' ' | cut -c1-160)" || fail=1; fi
+    if [ "$(grep -c '^ROMPOKE ok' "$_od/mame.log")" = 3 ] && ! grep -q 'ROMPOKE FAIL' "$_od/mame.log" \
+            && ! python3 "$REPO/tools/dmg_sweep.py" ours "$W" --leg-from "ours.p1.00=$_od/f.ft" > "$W/ours_swap.txt" 2>&1 \
+            && grep -q '^DIFF legacy p1 00 ' "$W/ours_swap.txt"; then
+        vs_ctl_fired ours-records-swapped "our build with vs2's three records (verified) deals $(python3 -c "import sys; sys.path.insert(0, '$REPO/tools'); import dmg_sweep as d; R = d.load('$_od/f.ft')[0]; print('/'.join(str(sum(x for _, x in d.drops(R, 'p2hp', lo, hi))) for _, lo, hi in d.WIN))") on P1/0x00 and is refused"
+    else vs_ctl_dead ours-records-swapped "the swapped leg's writes did not verify, or its trace still read equal to vsavj's" || fail=1; fi
+fi
+
 # THE SHEET (#291, D2): with SHEET_OUT set, the legs this run judged and one moment per judged hit — the legacy legs
 # and Donovan's on each leg's own field trace (basis fields), section 5's counterfactual legs re-run under their own
 # rom_poke.lua (basis event on each leg's own field log). Nothing the gate decides changes.
 . "$REPO/tests/lib/sheet.sh"
 if sheet_on && [ -z "$MODE" ]; then
     for s in p1 p2; do for v in $IDS; do
-        sheet_new "L.$s.$v" "Demitri's 2HK/5HP/623HP from $s on victim 0x$v: pristine vsav2 above pristine vsavj" - "#191" \
-            "no leg of ours: pristine vsavj against vsav2, the engine difference #191 records (vs2 lowered Demitri's own records); each game's stage, palette and art"
+        sheet_new "L.$s.$v" "Demitri's 2HK/5HP/623HP from $s on victim 0x$v: pristine vsav2 above pristine vsavj above ours" - "#191, #295" \
+            "vs2 against vsavj is the engine difference #191 records (vs2 lowered Demitri's own records); ours against vsavj is exact (#295); each game's stage, palette and art"
         sheet_leg "L.$s.$v" v2 vs2 vsav2 "$ROMDIR" "$(lrpl "$s")" "$LV;$(lpk "$s" "$v")" 4100
         sheet_leg "L.$s.$v" vj vsavj vsavj "$ROMDIR" "$(lrpl "$s")" "$LV;$(lpk "$s" "$v")" 4100
+        sheet_leg "L.$s.$v" ours ours vsavjw "$BUILD/rompath;$ROMDIR" "$(lrpl "$s")" "$LV;$(lpk "$s" "$v")" 4100
     done; done
     _dj="$RD/donovan_p12.json"; _dfr="$(python3 -c "import json;print(json.load(open('$_dj'))['frames'])")"
     _dpk="$(python3 -c "import json;print(';'.join(json.load(open('$_dj'))['pokes']))")"
@@ -375,14 +430,15 @@ LS = spec(LF)
 for side, m in ds.SIDE.items():
     for v in IDS.split():
         sid = "L.%s.%s" % (side, v)
-        tr = {leg: ds.load("%s/L.%s.%s.%s/f.ft" % (W, side, v, g))[0] for leg, g in (("v2", "vsav2"), ("vj", "vsavj"))}
+        tr = {leg: ds.load("%s/L.%s.%s.%s/f.ft" % (W, side, v, g))[0] for leg, g in (("v2", "vsav2"), ("vj", "vsavj"), ("ours", "ours"))}
         for n, lo, hi in ds.WIN:
             fd = {leg: first_drop(tr[leg], m["vic"] + "hp", lo, hi) for leg in tr}
             if all(f is None for f, _ in fd.values()):
                 continue
-            vals = "red: vsavj %d, vs2 %d" % (fd["vj"][1], fd["v2"][1])
-            print("moment\t%s\t%s\t%s (Demitri's first red drop on each leg)\tvsavj %+d red\t%s" % (sid, n, n, fd["vj"][1] - fd["v2"][1], vals))
-            for leg in ("v2", "vj"):
+            vals = "red: vsavj %d, vs2 %d, ours %d" % (fd["vj"][1], fd["v2"][1], fd["ours"][1])
+            print("moment\t%s\t%s\t%s (Demitri's first red drop on each leg)\tvsavj %+d red against vs2, ours %+d against vsavj\t%s" % (
+                sid, n, n, fd["vj"][1] - fd["v2"][1], fd["ours"][1] - fd["vj"][1], vals))
+            for leg in ("v2", "vj", "ours"):
                 f = fd[leg][0] or next(x for x, _ in fd.values() if x)
                 b, e = fields(tr[leg], f, LS)
                 print("at\t%s\t%s\t%s\t%d\t%s\t%s" % (sid, n, leg, f, b, e))

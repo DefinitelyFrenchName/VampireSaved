@@ -439,6 +439,7 @@ declares	test_skill_guides
 declares	test_state_open_lists
 declares	test_static_confirm
 declares	test_static_runner
+declares	test_submodule_pins
 declares	test_suite_dispatch
 declares	test_suite_dispatch_selftest
 declares	test_superseded_pins

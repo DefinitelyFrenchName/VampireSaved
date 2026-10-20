@@ -1,0 +1,9 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent205/t295/plan.md	370d2851b626710535e901fe1a8d4898e3cf33b0
+build/agent205/t295/pilot_result.txt	c9cb206e2f086d37bef4cef2898b31a93aeea390
+build/agent205/t295/pilot.sh	77febbd2b4e6a8ef3a371df9c52e9c9873e0ac22
+tests/audit_dmg_legacy_sweep.sh	7491038d6970cfe9f95ce3496bc60ab1c55c9d41
+tools/dmg_sweep.py	7bedce3ef0204e0b211674c796261b10401966b3
+build/agent205/t295/issue_live.md	1bd9063c69db9f5e251b19710bad62c322e55659
+build/agent205/t295/decision_295.txt	50a0af9e99ab44b4d6dfb090817ea0c7d136f957
+build/agent205/t295/maintainer_words.txt	3fe136a264b37bf3b959f6bcd4a3aa65dc561957

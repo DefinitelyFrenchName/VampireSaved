@@ -8,12 +8,15 @@
 #   record and not exempt (UNHOMED), and an exempt row matching no message or without a reason (STALE);
 #   a clean record passes, two questions joined by "and" stay the session's, and an answer introduced
 #   by "then, asked X," is checked as the maintainer's; text the harness injected (an `isMeta` record —
-#   a skill load, an agent hand-back) is never the maintainer's, so a quote matching it is NOT FOUND.
-# HOW: drives the tool's selftest (nine cases over a synthetic transcript with a user message, a
+#   a skill load, an agent hand-back) is never the maintainer's, so a quote matching it is NOT FOUND. Since #257
+#   (14z-205): a quote joined to the previous one on its line (by "then", "and", a comma or a short sub-label ending in
+#   a colon) is that one's party and checked as such, a bare semicolon join is not (question/answer lists), a
+#   maintainer label may carry a sub-label, and an elided quote ("a … b") is found when every part is in one message, in order.
+# HOW: drives the tool's selftest (nineteen cases over a synthetic transcript with a user message, a
 #   mid-turn enqueue, a task notification, a harness-injected skill load and an AskUserQuestion answer);
-#   five controls, one per condition of the verdict (#185 item 5) and one for the harness-text skip
-#   (14z-189), run copies with it switched off, and each must fail.
-# EXPECTS: the selftest's nine cases read as designed and all five controls fail on their copies.
+#   eight controls, one per condition of the verdict (#185 item 5), one for the harness-text skip
+#   (14z-189) and three for #257's joins and elisions, run copies with it switched off, and each must fail.
+# EXPECTS: the selftest's nineteen cases read as designed and all eight controls fail on their copies.
 #
 # WHY. The 14z-185 close's rule-checker runs 425, 443, 444 and 445 found rulings quoted only from the
 # session's own record, a heading quote the maintainer never wrote, a mid-turn message never recorded
@@ -26,6 +29,9 @@
 # MUST-FIRE: perturbed-copy: questions-unseen — a copy that never classes a QUESTION must check the session's question as the maintainer's, and the selftest must FAIL (mode: that copy's selftest)
 # MUST-FIRE: perturbed-copy: unhomed-ignored — a copy that never counts an UNHOMED message must pass the unhomed case, and the selftest must FAIL (mode: that copy's selftest)
 # MUST-FIRE: perturbed-copy: stale-ignored — a copy that never counts a STALE exempt row must pass the stale case, and the selftest must FAIL (mode: that copy's selftest)
+# MUST-FIRE: perturbed-copy: join-blind — a copy that classes a quote joined to the previous one on its line as OTHER (the pre-#257 reading of a "; on the scope:" sub-label) must leave an altered second maintainer quote unchecked, and the selftest must FAIL (mode: that copy's selftest)
+# MUST-FIRE: perturbed-copy: elision-blind — a copy that looks for an elided quote ("a … b") whole must report the verbatim elided quote NOT FOUND, and the selftest must FAIL (mode: that copy's selftest)
+# MUST-FIRE: perturbed-copy: elision-unordered — a copy that finds an elided quote's parts in any order must pass the reordered case as verified, and the selftest must FAIL (mode: that copy's selftest)
 # MUST-FIRE: perturbed-copy: meta-counted — a copy that reads isMeta records as the maintainer's must count the skill load (an unhomed message in the clean case, a verified quote in the harness-text case), and the selftest must FAIL (mode: that copy's selftest)
 #
 # Usage: tests/test_rulings_verbatim.sh      # ci_portable, ~1 s
@@ -47,6 +53,9 @@ edits = {
                         "        print(f\"  UNHOMED    {ts[:16]} {n[:110]}\")  # CONTROL unhomed-ignored\n"),
     "stale-ignored": ("\"matches no message\"))\n            bad += 1\n", "\"matches no message\"))  # CONTROL stale-ignored\n"),
     "meta-counted": ("for tx in ([] if r.get(\"isMeta\") else texts_of(content)):", "for tx in texts_of(content):  # CONTROL meta-counted"),
+    "join-blind": ("            return prev   # SAME-PARTY (#257)\n", "            return \"OTHER\"   # CONTROL join-blind\n"),
+    "elision-unordered": ("        pos = i + len(x)   # ELISION-ORDER\n", "        pos = 0   # CONTROL elision-unordered\n"),
+    "elision-blind": ("parts = [x.strip() for x in re.split(r\"…|\\.\\.\\.\", q) if x.strip()]", "parts = [q]  # CONTROL elision-blind"),
 }
 a, b = edits[name]
 assert s.count(a) == 1, name
@@ -58,13 +67,13 @@ PY
 echo "== test_rulings_verbatim: #190 P2 — the maintainer's words, verbatim, and every message on record =="
 fail=0
 RV=tools/agent/rulings_verbatim.py
-case "${VS_CTL:-}" in notfound-ignored|questions-unseen|unhomed-ignored|stale-ignored|meta-counted) RV="$(make_copy "$VS_CTL")" ;; esac
+case "${VS_CTL:-}" in notfound-ignored|questions-unseen|unhomed-ignored|stale-ignored|meta-counted|join-blind|elision-blind|elision-unordered) RV="$(make_copy "$VS_CTL")" ;; esac
 python3 "$RV" --selftest > "$W/self.txt" 2>&1 || true
 sed 's/^/  /' "$W/self.txt"
 grep -q '^SELFTEST PASS$' "$W/self.txt" || { echo "FAIL: the tool's selftest"; fail=1; }
 
 if [ -z "${VS_CTL:-}" ]; then
-    for c in notfound-ignored questions-unseen unhomed-ignored stale-ignored meta-counted; do
+    for c in notfound-ignored questions-unseen unhomed-ignored stale-ignored meta-counted join-blind elision-blind elision-unordered; do
         python3 "$(make_copy "$c")" --selftest > "$W/ctl_$c.txt" 2>&1 || true
         if grep -q '^SELFTEST FAIL$' "$W/ctl_$c.txt"; then vs_ctl_fired "$c" "$(grep -m1 '  FAIL:' "$W/ctl_$c.txt" | sed 's/^ *//')"
         else vs_ctl_dead "$c" "the perturbed copy passed its selftest — the selftest cannot see this failure" || fail=1; fi

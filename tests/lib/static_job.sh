@@ -25,7 +25,7 @@ case "$VS_VERDICT" in TIMEOUT|FAIL|SKIP) exit 0 ;; esac
 [ "${VS_CTL_DECLARED:-0}" != 0 ] || exit 0
 if [ -f "$W/plan.tsv" ]; then
     _cc="$(awk -F'\t' -v g="$g" '$1 == "RERUN" && $2 == g && $4 == "carry-controls" {print $5}' "$W/plan.tsv")"
-    [ -n "$_cc" ] && [ "$_cc" = "$VS_CTL_DECLARED" ] && exit 0
+    [ -n "$_cc" ] && [ "$_cc" = "$VS_CTL_DECLARED" ] && exit 0   # JOB-CARRY-CONTROLS
 fi
 for _n in $(vs_ctl_declared "tests/$g.sh"); do
     _c0=$(date +%s)

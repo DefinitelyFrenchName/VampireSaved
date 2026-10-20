@@ -9,7 +9,7 @@
 #   of the ~/.cache/vampire-saved instrument cache, a Verilator scratch
 #   clone, and the runner's own file — and its record names the commit the run was taken at;
 #   a tracked file carries its last commit's time, a build/emu_* the run writes comes back to
-#   the working tree, and an instrument binary changed in the LIVE cache during a run is reported;
+#   the working tree, and so does a build/static_runs/* record (#276), and an instrument binary changed in the LIVE cache during a run is reported;
 #   a run started inside another run's snapshot (the outer run's RUN_ON_SNAPSHOT_SELF inherited,
 #   as when a tier on a snapshot runs this gate) still makes its own copy and leaves the outer's.
 # HOW: builds a throwaway world (a repo with a submodule, a build/ output, a community sibling,
@@ -22,7 +22,7 @@
 #   run, or the immunity leg proves nothing); section 4 changes an instrument binary mid-run.
 # EXPECTS: the snapshot run reads every input unchanged, records the commit taken before the
 #   perturbation, sees t.txt at its commit's time, reaches the real HOME's other entries, and
-#   returns its build/emu_probe to the tree; the in-place run sees eight readings change; a
+#   returns its build/emu_probe and its static run record to the tree; the in-place run sees eight readings change; a
 #   mid-run instrument change reads unchanged inside the run and turns the run's exit to 2
 #   with its AFTER line; each control makes the gate FAIL.
 #
@@ -33,6 +33,7 @@
 # MUST-FIRE: perturbed-copy: shared-scratch — a copy that leaves JTSIM_SCRATCH on the caller's scratch clone must let the scratch perturbation reach the run, and the gate must FAIL (mode: the gate runs against that copy)
 # MUST-FIRE: perturbed-copy: checkout-mtime — a copy that skips S1b leaves t.txt at its checkout time instead of its commit's, and the gate must FAIL (mode: the gate runs against that copy)
 # MUST-FIRE: perturbed-copy: no-copy-back — a copy that never copies the run's build/emu_* back leaves the working tree without the run of record, and the gate must FAIL (mode: the gate runs against that copy)
+# MUST-FIRE: perturbed-copy: no-runs-copy-back — a copy that never copies the run's build/static_runs/* records back leaves the dashboard's collector without the snapshot tier's record (#276), and the gate must FAIL (mode: the gate runs against that copy)
 # MUST-FIRE: perturbed-copy: no-instrument-check — a copy that never compares the live instruments at the end exits 0 after an instrument changed mid-run, and the gate must FAIL (mode: the gate runs against that copy)
 # MUST-FIRE: perturbed-copy: inherited-self — a copy that skips its own copy whenever RUN_ON_SNAPSHOT_SELF is set (the pre-14z-199 test for emptiness) must be cut short in section 2b's nested leg, which inherits an outer run's copy, and the gate must FAIL (mode: the gate runs against that copy)
 #
@@ -77,6 +78,8 @@ edits = {
                        'done += 1  # CONTROL checkout-mtime'),
     "no-copy-back": ('for d in $(comm -13 "$REC/.emu_before" "$REC/.emu_after"); do',
                      'for d in ; do  # CONTROL no-copy-back'),
+    "no-runs-copy-back": ('for d in $(comm -13 "$REC/.runs_before" "$REC/.runs_after"); do',
+                          'for d in ; do  # CONTROL no-runs-copy-back'),
     "no-instrument-check": ('if cmp -s "$REC/instruments_start.tsv" "$REC/instruments_end.tsv"; then',
                             ': CONTROL no-instrument-check; if true; then'),
 }
@@ -118,6 +121,7 @@ cat "$HOME/Library/l.txt" > "$PROBE_OUT.lib" 2>&1 || true
 i=0; while [ ! -f "$PROBE_FLAGS/go" ] && [ $i -lt 600 ]; do sleep 0.1; i=$((i+1)); done
 rd > "$PROBE_OUT.t1"
 mkdir -p build/emu_probe; git rev-parse HEAD > build/emu_probe/commit.txt
+mkdir -p build/static_runs/20260101T000000Z_1; echo probe-run > build/static_runs/20260101T000000Z_1/results.tsv
 EOF
     git -C "$D/tree" add t.txt build/manifest.txt .gitignore probe.sh
     git -C "$D/tree" -c user.email=t@t -c user.name=t -c protocol.file.allow=always submodule add -q "$D/sub" mod >/dev/null 2>&1
@@ -206,11 +210,12 @@ immune() {
     [ "$(cat "$W/$2.mtime")" = 1609459200 ] || { echo "  $2: MTIME: t.txt read $(cat "$W/$2.mtime") inside the run, not its commit's time 1609459200 (S1b)"; return 1; }
     [ "$(cat "$W/$2.lib")" = lib-v1 ] || { echo "  $2: the private HOME lost the real HOME's other entries (Library/l.txt read: $(cat "$W/$2.lib"))"; return 1; }
     [ "$(cat "$W/$2/tree/build/emu_probe/commit.txt" 2>/dev/null)" = "$rc" ] || { echo "  $2: the run's build/emu_probe was NOT COPIED BACK to the working tree with the start commit"; return 1; }
-    echo "  $2: all eight inputs unchanged across the perturbation and the runner's own file truncated mid-run; record complete, commit $(printf %.12s "$rc") = the start commit; t.txt at its commit's time; build/emu_probe copied back"
+    [ "$(cat "$W/$2/tree/build/static_runs/20260101T000000Z_1/results.tsv" 2>/dev/null)" = probe-run ] || { echo "  $2: the run's static RUN RECORD was NOT COPIED back to the working tree (#276)"; return 1; }
+    echo "  $2: all eight inputs unchanged across the perturbation and the runner's own file truncated mid-run; record complete, commit $(printf %.12s "$rc") = the start commit; t.txt at its commit's time; build/emu_probe and the static run record copied back"
 }
 
 RUNNER="$REPO/tests/run_on_snapshot.sh"
-CONTROLS="link-build in-place no-self-copy shared-home shared-scratch checkout-mtime no-copy-back no-instrument-check inherited-self"
+CONTROLS="link-build in-place no-self-copy shared-home shared-scratch checkout-mtime no-copy-back no-runs-copy-back no-instrument-check inherited-self"
 for c in $CONTROLS; do if vs_ctl_is "$c"; then RUNNER="$(make_copy "$VS_CTL")"; fi; done
 
 echo "== 1. the positive leg: the perturbation reaches an IN-PLACE run"
@@ -266,7 +271,7 @@ if [ -z "${VS_CTL:-}" ]; then
     for ctl in $CONTROLS; do
         # the leg's world dir must not be the copy's dir (world() empties it first)
         case "$ctl" in
-        checkout-mtime) mark='MTIME' ;; no-copy-back) mark='NOT COPIED BACK' ;;
+        checkout-mtime) mark='MTIME' ;; no-copy-back) mark='NOT COPIED BACK' ;; no-runs-copy-back) mark='RUN RECORD was NOT COPIED' ;;
         no-instrument-check) mark='NOT DETECTED' ;; *) mark='REACHED' ;;
         esac
         copy="$(make_copy "$ctl")"
