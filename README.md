@@ -37,7 +37,6 @@ every byte before it writes anything.
    Follow the documentation included in the zip file. 
    You'll need your own dumps, unmodified, with these exact names: `vsavj.zip` (Vampire
    Savior, Japan 970519), `vsav.zip` (Europe 970519) and `vsav2.zip` (Vampire Savior 2, Japan 970913) and `qsound_hle.zip`.
-   You also need Python 3.8 or newer.
 
 ## What to expect
 
@@ -86,7 +85,7 @@ Vampire Saved is actually an experiment. It started as a work-adjacent project a
 engineering**: can AI agents, run the way you would run evolutive maintenance on a large system nobody can read
 in full, deliver a result that is *demonstrably* correct?
 
-The focus is purely accuracy of the end product and reliability of the harness..
+The focus is purely demonstrable accuracy of the end product and reliability of the harness.
 
 **Who did what.** All of the code was written by AI — Anthropic's Claude, through Claude Code.
 All of the decisions, the design of the test harness, part of the memory analysis and a very large
