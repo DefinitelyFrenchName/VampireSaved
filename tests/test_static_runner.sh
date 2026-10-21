@@ -30,6 +30,9 @@
 #   exception line is DIED; its own DEAD alone, and an exception beside ANOTHER control's DEAD, stay honoured.
 #   Since #276 (14z-205, section 26): a run given STATIC_RESULTS_OUT also leaves a byte-identical copy of its results
 #   and control times in its own run record (build/static_runs/<stamp>), where tools/session_metrics.py reads them.
+#   Since #299 (14z-206, section 28): with ROMDIR set and a cold decrypt cache, the runner builds the reference sets'
+#   views before the static tier, so a gate that reads build/out directly PASSES at --jobs 1 and --jobs 3; two
+#   decrypt_view callers racing on one cold set both get full images.
 #
 # MUST-FIRE: shadow-tool: reader-unplugged — a copy of run_all_static.sh that hands the classifier no gate script must let a stub with a declared-but-unfired control read PASS (mode: that copy is the runner every section drives, and section 11 must fail)
 # MUST-FIRE: shadow-tool: trigger-blind — a copy of run_all_static.sh with its cadence TRIGGER match disabled must leave a freeze-cadence gate deferred although a path it depends on changed; section 14's triggered case must FAIL under it
@@ -50,6 +53,7 @@
 # MUST-FIRE: shadow-tool: job-carry-blind — a copy of tests/lib/static_job.sh whose JOB-CARRY-CONTROLS exit is disabled must run g_f's control although the --confirm plan carries it, and section 24 must FAIL (mode: that copy is the job section 24 runs)
 # MUST-FIRE: shadow-tool: runrec-lost — a copy of run_all_static.sh whose RUNREC-KEEPS-RESULTS copy is disabled must leave a run given STATIC_RESULTS_OUT with no results in its own run record, and section 26 must FAIL (mode: that copy drives section 26; section 27 fires it in-run; #276, 14z-205)
 # MUST-FIRE: shadow-tool: runrec-controls-lost — a copy of run_all_static.sh whose RUNREC-KEEPS-CONTROLS copy is disabled must leave the run record without the control times, and section 26 must FAIL (mode: that copy drives section 26; section 27 fires it in-run; #276, 14z-205)
+# MUST-FIRE: shadow-tool: decrypt-warm-off — a copy of run_all_static.sh whose DECRYPT-WARM call is disabled must leave a stub that reads build/out directly on a cold cache, and section 28 must FAIL (mode: that copy drives section 28; section 29 fires it in-run; #299, 14z-206)
 # MUST-FIRE: shadow-tool: prediction-off — a copy of tools/static_confirm.py whose plan marks nothing STALE must CARRY the stub whose input changed, and section 18 must FAIL (mode: that copy in the confirm repo)
 #
 # WHY A GATE FOR THE RUNNER. CLAUDE.md §4: "Verdict logic is itself tested. A
@@ -1068,6 +1072,64 @@ if ! vs_ctl_is runrec-lost && ! vs_ctl_is runrec-controls-lost; then
     s26 "$SHADOW_M" > /dev/null
     [ "$S26" = bad ] && vs_ctl_fired runrec-controls-lost "a runner that copies the results but not the control times leaves the record without them — section 26 catches it" \
         || { rc=1; vs_ctl_dead runrec-controls-lost "the runner without the control-times copy still left them in the record" || :; }
+fi
+
+echo "== 28. a cold decrypt cache is built BEFORE the static tier, serial and pooled (#299, 14z-206) =="
+# Five real gates read build/out/<set>_*.bin directly and failed or SKIPped under --jobs 8 with a cold cache: the views
+# appeared only when a decrypt_view caller ran (PILOT, 14z-205c). Here two stubs read build/out directly and one calls
+# decrypt_view, the cache starts cold, and a stub decrypt tool writes full-length images; every stub must PASS at
+# --jobs 1 and --jobs 3. vhunt2 has no zip in this ROMDIR, so it must not be attempted.
+SHADOW_W="$T/run_all_static_decryptwarmoff.sh"
+sed 's@        if decrypt_cache_ensure "$_s" 2>> "$WORK/decrypt_warm.err"; then _dw_built="$_dw_built $_s"   # DECRYPT-WARM@        if true; then :   # DECRYPT-WARM disabled@' "$RUNNER" > "$SHADOW_W"
+cmp -s "$RUNNER" "$SHADOW_W" && fail "could not disable the decrypt warm-up — the DECRYPT-WARM line moved"
+FV="$T/repo_dv"; RV="$T/romdir_dv"; mkdir -p "$FV/tests/lib" "$FV/tools" "$RV"
+for _l in classify controls measures static_job decrypt_cache; do ln -s "$REPO/tests/lib/$_l.sh" "$FV/tests/lib/$_l.sh"; done
+: > "$RV/vsavj.zip"; : > "$RV/vsav2.zip"
+cat > "$FV/tools/cps2_decrypt.py" <<'PY'
+import sys, time                      # a stub decrypt: <zip> <op> --data-out <dat>, full-length images after a second
+time.sleep(1)
+open(sys.argv[2], "wb").write(b"\x00" * 4194304); open(sys.argv[4], "wb").write(b"\x01" * 4194304)
+PY
+mkv() {  # mkv <name> <body line>
+    { echo "#!/bin/sh"; echo "# $1.sh — a stub of section 28"; echo "$2"; echo "exit 0"; } > "$FV/tests/$1.sh"; chmod +x "$FV/tests/$1.sh"
+}
+mkv g_v1 '[ "$(wc -c < build/out/vsavj_opcodes.bin 2>/dev/null | tr -d " ")" = 4194304 ] && echo "PASS: v1" || { echo "FAIL: no full build/out/vsavj_opcodes.bin"; exit 1; }'
+mkv g_v2 '[ -f build/out/vsav2_data.bin ] && echo "PASS: v2" || { echo "SKIP: need build/out/vsav2_data.bin"; exit 0; }'
+mkv g_v3 'REPO="$(pwd)"; . tests/lib/decrypt_cache.sh; W="$(mktemp -d)"; decrypt_view vsavj "$W/o" "$W/d" && echo "PASS: v3" || { echo "FAIL: decrypt_view"; exit 1; }; rm -rf "$W"'
+: > "$FV/tests/ci_portable.txt"; printf 'g_v1\ng_v2\ng_v3\n' > "$FV/tests/ci_static.txt"
+(cd "$FV" && git init -q && git add -A && git -c user.name=t -c user.email=t@t commit -qm base)
+s28() {   # s28 <runner> -> S28 (ok|bad): both --jobs 1 and --jobs 3 from a cold cache
+    rm -f "$FV/tests/run_all_static.sh"; ln -s "$1" "$FV/tests/run_all_static.sh"; S28=ok; S28V3=ok
+    for _j in 1 3; do
+        rm -rf "$FV/build"
+        _o="$(cd "$FV" && ROMDIR="$RV" STATIC_CHANGED_PATHS= sh tests/run_all_static.sh --tier static --strict --jobs $_j 2>&1)" || true
+        for _g in g_v1 g_v2 g_v3; do
+            printf '%s' "$_o" | grep -qE "^  $_g +PASS( |$)" || { S28=bad; [ $_g = g_v3 ] && S28V3=bad; echo "    --jobs $_j: $_g did not PASS from a cold cache: $(printf '%s' "$_o" | grep -E "^  $_g" | head -1)"; }
+        done
+        printf '%s' "$_o" | grep -q '^== decrypt views built before the tier: vsavj vsav2 (' \
+            || { S28=bad; echo "    --jobs $_j: no 'decrypt views built before the tier: vsavj vsav2' line"; }
+    done
+}
+R28="$RUNNER"; vs_ctl_is decrypt-warm-off && R28="$SHADOW_W"
+s28 "$R28"
+[ "$S28" = ok ] && echo "  ok: from a cold cache the runner built vsavj and vsav2 (not vhunt2, absent) before the tier, and both direct readers and the decrypt_view caller PASS at --jobs 1 and --jobs 3" \
+    || fail "section 28: a gate reading build/out directly met a cold cache (#299)"
+# the helper's own race: two decrypt_view callers on one cold set at once both get full images, and no temp dir is left
+rm -rf "$FV/build"
+( cd "$FV" && REPO="$FV" ROMDIR="$RV" sh -c '. tests/lib/decrypt_cache.sh; decrypt_view vsavj "$1/a_o" "$1/a_d"' sh "$T" ) > "$T/race_a" 2>&1 & _ra=$!
+( cd "$FV" && REPO="$FV" ROMDIR="$RV" sh -c '. tests/lib/decrypt_cache.sh; decrypt_view vsavj "$1/b_o" "$1/b_d"' sh "$T" ) > "$T/race_b" 2>&1 & _rb=$!
+wait $_ra && _sa=0 || _sa=$?; wait $_rb && _sb=0 || _sb=$?
+if [ "$_sa" = 0 ] && [ "$_sb" = 0 ] && [ "$(wc -c < "$T/a_o" | tr -d ' ')" = 4194304 ] && [ "$(wc -c < "$T/b_d" | tr -d ' ')" = 4194304 ] \
+        && [ "$(wc -c < "$FV/build/out/vsavj_opcodes.bin" | tr -d ' ')" = 4194304 ] && [ -z "$(ls -A "$FV/build/out" | grep '^\.decrypt\.')" ]; then
+    echo "  ok: two decrypt_view callers racing on one cold set both got full images; the cache is full and no temp dir is left"
+else fail "section 28: two racing decrypt_view callers: exits $_sa/$_sb, $(cat "$T/race_a" "$T/race_b" | head -3 | tr '\n' ' ')$(ls -A "$FV/build/out" 2>/dev/null | tr '\n' ' ')"; fi
+
+echo "== 29. MUST-FIRE: section 28's warm-up, broken by its shadow =="
+if ! vs_ctl_is decrypt-warm-off; then
+    s28 "$SHADOW_W" > /dev/null
+    # fired only when the shadow runner itself worked: its decrypt_view caller still PASSES, only the direct readers fail
+    [ "$S28" = bad ] && [ "$S28V3" = ok ] && vs_ctl_fired decrypt-warm-off "a runner that does not build the views first leaves a direct reader on a cold cache — section 28 catches it" \
+        || { rc=1; vs_ctl_dead decrypt-warm-off "the runner without the warm-up still gave every stub its views" || :; }
 fi
 
 [ "$rc" = 0 ] && echo "PASS: the runner's verdicts mean what they say." \

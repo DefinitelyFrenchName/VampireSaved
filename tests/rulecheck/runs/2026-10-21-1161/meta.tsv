@@ -1,0 +1,11 @@
+decision	recommendation
+subject	#299 closed done: the static tier's --jobs pool, its four open items measured and the cold-cache one fixed (14z-206)
+session	14z-206
+model	rule-checker@163e4ce9cf7b
+claim	#299 can close done: its plan's four steps are done (--jobs N landed 14z-205; the close runs --jobs 8, ruled 2026-10-19); of the four items its 2026-10-20 comment left open, (1) serial against --jobs 8 with every log kept gave 612 of 620 logs identical on PILOT, the only verdict difference the MRA pair; (2) the five direct build/out readers that failed or skipped cold under the pool are fixed by a warm-up in tests/run_all_static.sh (test_static_runner sections 28-29, control decrypt-warm-off), and a strict --cadence freeze --jobs 8 tier on a snapshot of the landing tree with the six views deleted inside it read PASS 214 SKIP 0 FAIL 1, the FAIL test_emulator_staleness, red by design at freeze cadence, with 415 of 415 controls honoured and the five gates passing; (3) the write census's only colliding class, the jtsim scratch, is locked (test_jtsim_scratch_heal section 6) and its honoured-for-the-wrong-reason control now reads DIED; (4) one loaded run moved no results or control row; NOT tested: the emulator runner's warm-up and build_donovan.sh's non-atomic write (both #305), unlink/rename/mkdir collisions, more than one loaded run, a foreign mode failure without its own CONTROL DEAD beside an exception
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	6 flag(s): D-ABSOLUTE 6
+deliverables	build/agent206/t299/closing_comment.md

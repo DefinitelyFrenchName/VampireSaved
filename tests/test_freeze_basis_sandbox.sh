@@ -13,8 +13,10 @@
 #   superset invariant rests on being silently redefined.
 #
 # WHY (14z-91, measured). freeze_one() derives its sandbox paths from the
-# replay NAME alone (`$WORK/sb_${_n}_$_i`), and tools/run_mame.sh:6-10 treats
-# an explicit MAME_SANDBOX as DELIBERATE REUSE — it does not clear it. So
+# replay NAME alone (`$WORK/sb_${_n}_$_i`), and tools/run_mame.sh:6-10 treated
+# an explicit MAME_SANDBOX as DELIBERATE REUSE — it did not clear it (since #296,
+# 14z-206, run_mame.sh:6-12 refuses such a sandbox with exit 3 unless
+# MAME_SANDBOX_REUSE=1; this gate's stub stands in for the pre-#296 reuse). So
 # calling freeze_one twice for the same name in one invocation gives the
 # second call the first call's cfg/nvram (an EEPROM is written on every run).
 #

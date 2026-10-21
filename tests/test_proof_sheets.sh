@@ -15,7 +15,11 @@
 #   NOT THE JUDGED RUN unless it ran on a build made in the clean checkout's build/ (a rom path outside the checkout,
 #   or a tracked path in it, is refused; a built one keeps its own verdict), a build whose fingerprint is not the
 #   commit's frozen reference refuses the run, a checkout at another commit is refused for reuse, and an unknown
-#   --host is refused.
+#   --host is refused; and a CONTROL BUILD (#291 S4-A, 14z-206, Q5): a gate's `# SHEET-BUILD:` line is read (a
+#   malformed one refused), the freeze tag's own `program key` is read, and a control track built off it is refused;
+#   and a leg's RELATIVE rom path (the registry's %STOCK_RP% expands to one) is read as absolute against the tree its
+#   gate ran in (14z-206: a capture runs in its own work directory, where `build/m5_stock22/rompath` named nothing and
+#   test_gfx_menus' ours leg re-ran on pristine vsavj from ROMDIR).
 # HOW: a fixture SHEET_OUT on pristine vsavj (02_demitri_vs_cpu to frame 3001): the frozen masked vanilla log
 #   (tests/expected/vsavj/masked-v2) is the "gate's log", the masked-v2 mask the leg's; the field values are taken
 #   from tests/lua/field_trace.lua run live on the same inputs; `proof_sheets.py prove` on the fixture; one control.
@@ -25,7 +29,7 @@
 # FOLLOWS: tools/proof_sheets.py tests/lua/sheet_capture.lua tests/lua/pokes_spec.lua tests/lua/field_trace.lua
 #   tests/expected/vsavj/masked-v2/logs/02_demitri_vs_cpu.log tests/expected/merged1/mask
 #   tests/replays/02_demitri_vs_cpu.rpl tests/lib/controls.sh tools/run_mame.sh tools/setup_mame.sh emu/mame-patches/
-#   tests/lua/sheet_tap_capture.lua tests/lua/read_tap.lua build/manifest/
+#   tests/lua/sheet_tap_capture.lua tests/lua/read_tap.lua build/manifest/ tests/audit_landing_sound.sh
 #
 # SHEET: none — the sheet tool's own ground truth on pristine vsavj; it compares no leg of ours against a reference set
 # MUST-FIRE: shadow-tool: cap-ignored — a copy of tools/proof_sheets.py that drops the capture's ACAP line must leave the capped sheet with no cap note, so the note rests on the line (in-gate: the shadow is run on the capped fixture; mode: the shadow is the tool under test and the gate FAILs)
@@ -33,6 +37,8 @@
 # MUST-FIRE: shadow-tool: count-only — a copy of tools/proof_sheets.py whose event proof compares only the NUMBER of lines in the window must EVENT-PROVE the moment whose logged value was altered, so the event basis rests on the lines themselves (in-gate: the shadow is run on the event fixture; mode: the shadow is the tool under test and the gate FAILs)
 # MUST-FIRE: shadow-tool: build-blind — a copy of tools/proof_sheets.py whose commit check accepts any rom path must leave the ours leg that ran outside the clean checkout PROVEN, so S3's refusal rests on the check (in-gate: the shadow is run on the re-labelled sheet; mode: the shadow is the tool under test and the gate FAILs)
 # MUST-FIRE: shadow-tool: fingerprint-blind — a copy of tools/proof_sheets.py whose build check never compares fingerprints must accept a track built off the commit's frozen reference, so the run's refusal rests on the comparison (in-gate: the shadow's check_builds on the mismatched set; mode: the shadow is the tool under test and the gate FAILs)
+# MUST-FIRE: shadow-tool: tag-key-blind — a copy of tools/proof_sheets.py whose control check never compares the built track with the freeze tag's program key must accept a control build off its tag, so the refusal rests on the comparison (#291 S4-A; in-gate: the shadow's control_check on the mismatched key; mode: the shadow is the tool under test and the gate FAILs)
+# MUST-FIRE: shadow-tool: rompath-unresolved — a copy of tools/proof_sheets.py that keeps a leg's rom path as the gate wrote it must leave a relative element relative, so the capture's rom path rests on the resolve (#291 S4-A; in-gate: the shadow's read_sheet on a fixture leg with a relative element; mode: the shadow is the tool under test and the gate FAILs)
 # MUST-FIRE: shadow-tool: frame-blind — a copy of tools/proof_sheets.py that accepts a logged checksum found at ANY captured frame, instead of at the moment's own frame, must prove the moment shifted by one frame, so the one-frame refusal rests on the frame-exact lookup (in-gate: the shadow is run on the same fixture; mode: the shadow is the tool under test and the gate FAILs)
 #
 # Usage: ROMDIR=... [MAME_BIN=...] tests/test_proof_sheets.sh   # emulator tier (MAME), ~17 s (measured 14z-204)
@@ -76,7 +82,17 @@ fingerprint_blind() {  # fingerprint_blind <out.py> — the shadow whose build c
     sed -e 's/        elif built\.get(t) != want:$/        elif False:/' -e "s|^ROOT = .*|ROOT = Path('$REPO')|" tools/proof_sheets.py > "$1"
     [ "$(command grep -c '        elif False:' "$1")" = 1 ] || { echo "the fingerprint comparison was not found to drop" >&2; return 1; }
 }
+tag_key_blind() {  # tag_key_blind <out.py> — the shadow whose control check never compares the tag's program key
+    sed -e 's/    if built != want:$/    if False:/' -e "s|^ROOT = .*|ROOT = Path('$REPO')|" tools/proof_sheets.py > "$1"
+    [ "$(command grep -c '    if False:$' "$1")" = 1 ] || { echo "the tag-key comparison was not found to drop" >&2; return 1; }
+}
+rompath_unresolved() {  # rompath_unresolved <out.py> — the shadow that keeps a leg's rom path as written
+    sed -e 's/"rompath": abs_rompath(f\[5\])/"rompath": f[5]/' -e "s|^ROOT = .*|ROOT = Path('$REPO')|" tools/proof_sheets.py > "$1"
+    [ "$(command grep -c '"rompath": f\[5\]' "$1")" = 1 ] || { echo "the rom path resolve was not found to drop" >&2; return 1; }
+}
 TOOL=tools/proof_sheets.py
+if vs_ctl_is rompath-unresolved; then rompath_unresolved "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
+if vs_ctl_is tag-key-blind; then tag_key_blind "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
 if vs_ctl_is build-blind; then build_blind "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
 if vs_ctl_is fingerprint-blind; then fingerprint_blind "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
 if vs_ctl_is count-only; then count_only "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
@@ -252,6 +268,20 @@ subprocess.run(["git", "bundle", "create", "-q", b, "refs/proof-sheets/run-1"], 
 err = ps.make_checkout(head, c, b, False)
 got = subprocess.run(["git", "rev-parse", "HEAD"], cwd=c, capture_output=True, text=True).stdout.strip()
 print("clone", err is None and got == head and __import__("os").path.exists(c + "/build/manifest/a.toml"))
+# the control build (#291 S4-A, Q5): the declaration, the tag's own key, the check against it
+import os, tempfile
+fx = tempfile.NamedTemporaryFile("w", suffix=".sh", delete=False)
+fx.write("#!/bin/sh\n# x.sh\n# SHEET-BUILD: CTL_BUILD freeze/merged-m22 MERGED \u2014 the control leg\n# SHEET-BUILD: ctl freeze/x NOPE\nset -u\n")
+fx.close()
+cbs, errs = ps.parse_sheet_builds(fx.name); os.unlink(fx.name)
+print("decl", len(cbs) == 1 and cbs[0]["var"] == "CTL_BUILD" and cbs[0]["tag"] == "freeze/merged-m22" and cbs[0]["track"] == "MERGED", len(errs))
+real, rerrs = ps.parse_sheet_builds(str(ps.TOOL_ROOT / "tests/audit_landing_sound.sh"))
+print("decl-real", [(c["var"], c["tag"], c["track"]) for c in real] == [("CTL_BUILD", "freeze/merged-m22", "MERGED")] and not rerrs)
+key = ps.tag_program_key("freeze/merged-m22")
+print("tag-key", key == "110467a7ec1cf73d106dce59284be344349e0953")
+print("ctl-equal", len(ps.control_check("freeze/merged-m22", "MERGED", key, key)))
+print("ctl-off", len(ps.control_check("freeze/merged-m22", "MERGED", "ff" * 20, key)))
+print("ctl-nokey", len(ps.control_check("freeze/x", "MERGED", key, None)))
 PYU
 }
 s3_units "$TOOL" > "$W/units.txt" 2>&1
@@ -263,6 +293,25 @@ u() { awk -v c="$1" '$1 == c {$1 = ""; sub(/^ /, ""); print}' "$W/units.txt"; }
     && ok "--reuse-tree takes only a clean checkout of the same commit; an existing tree without it is refused" \
     || nope "checkout reuse: same $(u reuse-same), other $(u reuse-other), no-reuse $(u no-reuse)"
 [ "$(u clone)" = True ] && ok "the clean checkout from a bundle whose ref is not a branch lands on the commit" || nope "clone from the bundle: '$(u clone)'"
+[ "$(u decl)" = "True 1" ] && [ "$(u decl-real)" = True ] \
+    && ok "a gate's # SHEET-BUILD: line is read (audit_landing_sound's: CTL_BUILD freeze/merged-m22 MERGED), a malformed one refused" \
+    || nope "the control-build declaration: fixture '$(u decl)', audit_landing_sound '$(u decl-real)'"
+[ "$(u tag-key)" = True ] && ok "freeze/merged-m22's own program key is read from its tag: 110467a7" || nope "the tag's program key: '$(u tag-key)'"
+[ "$(u ctl-equal)" = 0 ] && [ "$(u ctl-off)" = 1 ] && [ "$(u ctl-nokey)" = 1 ] \
+    && ok "a control track equal to its tag's key is accepted; one off it, or a tag with no key, is refused" \
+    || nope "the control check: equal $(u ctl-equal), off $(u ctl-off), no key $(u ctl-nokey)"
+rp_unit() {  # rp_unit <tool> -> "<resolved rom path>" for a fixture leg written `build/x/rompath;$ROMDIR`
+    RPD="$W/rp_$(basename "$1" .py)"; rm -rf "$RPD"; mkdir -p "$RPD"
+    awk -F'\t' -v OFS='\t' -v r="build/x/rompath;$ROMDIR" '$1 == "leg" {$6 = r} {print}' "$S/sheet.tsv" > "$RPD/sheet.tsv"
+    python3 - "$1" "$RPD" <<'PYR'
+import importlib.util, sys
+spec = importlib.util.spec_from_file_location("ps", sys.argv[1]); ps = importlib.util.module_from_spec(spec); spec.loader.exec_module(ps)
+print(ps.read_sheet(sys.argv[2])[0]["legs"]["v"]["rompath"])
+PYR
+}
+rpg="$(rp_unit "$TOOL" 2>&1)"
+[ "$rpg" = "$REPO/build/x/rompath;$ROMDIR" ] && ok "a leg's relative rom path element is read against the gate's tree; the absolute one is kept" \
+    || nope "the relative rom path: read as '$rpg'"
 python3 "$TOOL" run HEAD --host nosuch > "$W/host.txt" 2>&1; hrc=$?
 [ "$hrc" = 2 ] && command grep -q "^REFUSED: unknown host 'nosuch'" "$W/host.txt" && ok "an unknown --host is refused (exit 2)" \
     || nope "unknown host: exit $hrc, $(head -1 "$W/host.txt")"
@@ -311,6 +360,18 @@ if fingerprint_blind "$W/fpb.py"; then
     if [ "$g" = 0 ]; then vs_ctl_fired fingerprint-blind "a tool that never compares fingerprints accepts a track built off the commit's frozen reference"
     else vs_ctl_dead fingerprint-blind "the shadow still found $g problem(s)"; nope "control fingerprint-blind"; fi
 else vs_ctl_dead fingerprint-blind "the fingerprint comparison was not found to drop"; nope "control fingerprint-blind"; fi
+
+if rompath_unresolved "$W/rpu.py"; then
+    g="$(rp_unit "$W/rpu.py" 2>&1)"
+    if [ "$g" = "build/x/rompath;$ROMDIR" ]; then vs_ctl_fired rompath-unresolved "a tool keeping the rom path as written leaves '$g' relative"
+    else vs_ctl_dead rompath-unresolved "the shadow read '$g'"; nope "control rompath-unresolved"; fi
+else vs_ctl_dead rompath-unresolved "the rom path resolve was not found to drop"; nope "control rompath-unresolved"; fi
+
+if tag_key_blind "$W/tkb.py"; then
+    g="$(s3_units "$W/tkb.py" | awk '$1 == "ctl-off" {print $2}')"
+    if [ "$g" = 0 ]; then vs_ctl_fired tag-key-blind "a tool that never compares the tag's program key accepts a control build off its tag"
+    else vs_ctl_dead tag-key-blind "the shadow still found $g problem(s)"; nope "control tag-key-blind"; fi
+else vs_ctl_dead tag-key-blind "the tag-key comparison was not found to drop"; nope "control tag-key-blind"; fi
 
 [ "$bad" = 0 ] && { echo "PASS: test_proof_sheets — proven on the judged run, a one-frame shift and a field off refused, anchors proven and a cap said, a relative path resolved, events proven on their lines, ours held to the commit's build"; exit 0; }
 echo "FAIL: test_proof_sheets ($bad)"; exit 1

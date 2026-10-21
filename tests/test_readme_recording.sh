@@ -1,13 +1,16 @@
 #!/bin/sh
-# test_readme_recording.sh — the README's "record it on MAME" command, run as written on this host's release MAME against the current merged romset, records a session the project replays frame for frame: work RAM identical on every frame, on the release binary and on the tree's source-built MAME, from an empty nvram (14z-158).
+# test_readme_recording.sh — the MAME package README's "record it" command, run as written on this host's release MAME against the romset that README's own build step writes, records a session the project replays frame for frame: work RAM identical on every frame, on the release binary and on the tree's source-built MAME, from an empty nvram (14z-158).
 #
-# WHAT: the README's 'record it on MAME' command, run as written on this host's release MAME
-#   against the merged romset, records a session the project replays frame for frame — work
-#   RAM identical every frame on the release binary and on the source-built MAME, from an
-#   EMPTY nvram — and the README prose agrees with the command.
-# HOW: the indented command read out of README.md and run token for token from a player
-#   folder built as the README says (cps2 -> the release binary, the dumps path -> $ROMDIR;
-#   headless flags and -noreadconfig appended), the recording leg driven by replay 03, then
+# WHAT: the 'record it' command of the MAME package README the generator writes NOW (#284),
+#   the line for this host's os-arch, run as written on this host's release MAME against the
+#   set the README's own build step writes, records a session the project replays frame for
+#   frame — work RAM identical every frame on the release binary and on the source-built MAME,
+#   from an EMPTY nvram — and the README prose agrees with the command.
+# HOW: the MAME README rendered by tools/package_release.py + package_release_platforms.py from
+#   $REL_TREE's manifest; its host line read out and run token for token from a player folder
+#   built as the README says (`rompath/` written by the package's apply_release.py from $ROMDIR,
+#   emulator/bin/<os-arch>/cps2 -> the release binary; headless flags and -noreadconfig
+#   appended), the recording leg driven by replay 03, then
 #   playback on both binaries; a no-playback leg must differ; controls start playback from a
 #   used nvram and truncate the .inp.
 # EXPECTS: the .inp valid and complete, both playbacks covering every frame with
@@ -15,16 +18,21 @@
 #   the truncated recording fail.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lib/native_path.sh
 #   tests/lua/ tests/replays/03_two_player_vs.rpl tools/build_release_emulators.sh
-#   tools/setup_mame.sh tools/package_release.py
+#   tools/setup_mame.sh tools/package_release.py tools/package_release_platforms.py
+#   tools/package_release_readme.template.md tools/apply_release.py
 #
 # SHEET: none — an instrument, emulator, release or host check; no leg of our build compared with a reference set
 #
 # MUST-FIRE: perturbed-copy: used-nvram — a playback started from the nvram directory the recording run left behind (what a player's `nvram_fresh` holds once their session is over) must diverge from the recording and fail, so the comparison is proven able to fail and the README's EMPTY folder proven load-bearing
 # MUST-FIRE: perturbed-copy: truncated-inp — the recording cut to half its input stream must fail the frame-count check, so a playback that stops early can never pass as the whole session
 #
-# SINCE 2026-10-15 (14z-201) the root README carries no recording command: the maintainer moved the procedure to the
-# release package README (DECISIONS_HISTORY.md "Ruled 2026-10-15 (14z-201) — the recording procedure moves to the
-# release package README"), and this gate fails until #284's work reads the command from there.
+# SINCE #284 (14z-206) the command is read from the MAME package README the generator writes, not the root
+# README: the maintainer moved the procedure there (DECISIONS_HISTORY.md "Ruled 2026-10-15 (14z-201) — the
+# recording procedure moves to the release package README"). The README writes one line per OS with the
+# binary at its place in the package and `-rompath rompath` alone (#284's ERIS measurements: `cps2.exe` bare is
+# "not recognized", `<…>` placeholders never start MAME, the dumps folder is not needed), so the gate picks this
+# host's line and builds the set the way the README does — the build's own vsavjw.zip lacks the seven members
+# the applier's standalone completion adds, and MAME would not load it from `rompath` alone.
 #
 # WHY IT EXISTS. README.md "Report a problem" tells a player to create two
 # empty folders, run the release MAME with `-record`, and attach the `.inp`.
@@ -34,14 +42,13 @@
 # frame for frame", and a recording that plays back into a different game
 # exits 0 just the same.
 #
-# WHAT IS RUN. The indented `cps2 vsavjw … -record …` line is read OUT OF
-# README.md and run token for token from a player folder the gate builds the
-# way the README says (`rompath/` holding the merged romset's `vsavjw.zip`,
-# where apply_release.py writes it — its --out read from the package README's
-# source, tools/package_release.py; the two named folders, empty). The only
-# substitutions: `cps2` becomes this host's release binary
-# (release/emulators/mame/<os-arch>/), and the rompath's
-# `/path/to/your/dumps` becomes $ROMDIR. APPENDED to every leg, never
+# WHAT IS RUN. The indented `emulator/bin/<os-arch>/cps2 vsavjw … -record …`
+# line for this host is read OUT OF the rendered MAME package README and run
+# token for token from a player folder the gate builds the way the README says
+# (`rompath/` written by `apply_release.py --romdir $ROMDIR --out` with the
+# README's own `--out`; the two named folders, empty). The only substitution:
+# the binary becomes this host's release binary
+# (release/emulators/mame/<os-arch>/, what that package directory holds). APPENDED to every leg, never
 # replacing a README token: the headless flags, a private cfg/state sandbox,
 # and `-noreadconfig` — MAME reads the user's own `mame.ini` (on macOS
 # `~/Library/Application Support/mame/`) even under `-homepath`, and on the
@@ -51,7 +58,8 @@
 # prose is checked against the command, so the two cannot drift apart: the
 # two "empty folders" it names are the command's nvram and input
 # directories, the file it says to attach is <input dir>/<record name>, and
-# the rompath's first element is apply_release.py's `--out`.
+# the rompath is apply_release.py's `--out` in the same README, and the README
+# says each recording starts from an EMPTY nvram folder.
 #
 # The recording leg drives tests/lua/replay.lua with tests/replays/
 # 03_two_player_vs.rpl (two credits, a 2-player fight, inputs through frame
@@ -78,10 +86,10 @@
 # 16_xemu_2p, whose inputs stop at frame 1362, half the stream reproduced
 # every checksum, and only MAME's frame count saw the cut.
 #
-# Usage: ROMDIR=... [MERGED=build/m3b_merged31] [RELEASE_EMULATORS=release/emulators]
+# Usage: ROMDIR=... [REL_TREE=release/merged-m23] [RELEASE_EMULATORS=release/emulators]
 #        [MAME_BIN=~/.cache/vampire-saved/mame/cps2] [RPL=tests/replays/03_two_player_vs.rpl]
 #        tests/test_readme_recording.sh
-#   SKIPs when this host has no release MAME, no source-built MAME or no romset.
+#   SKIPs when this host has no release MAME, no source-built MAME or no release tree.
 # Runtime: ~50 s (six MAME legs; 47 s wall measured solo 14z-158), emulator tier.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
@@ -104,38 +112,54 @@ esac
 case "$(uname -m)" in arm64|aarch64) ARCH=arm64 ;; x86_64|amd64) ARCH=x86_64 ;; *) ARCH="$(uname -m)" ;; esac
 EXESUF=""; [ "$HOSTOS" = windows ] && EXESUF=".exe"
 OSARCH="$HOSTOS-$ARCH"
-MERGED="${MERGED:-build/m3b_merged31}"
+REL_TREE="${REL_TREE:-release/merged-m23}"
 ROOT="${RELEASE_EMULATORS:-release/emulators}"
 SRC="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 RPL="${RPL:-tests/replays/03_two_player_vs.rpl}"
 REL="$ROOT/mame/$OSARCH/cps2$EXESUF"
 [ -x "$REL" ] || refuse_or SKIP "no release MAME at $REL for this host (tools/build_release_emulators.sh mame)"
 [ -x "$SRC" ] || refuse_or SKIP "no source-built MAME at $SRC, the binary the project plays reports back on (tools/setup_mame.sh)"
-[ -f "$MERGED/rompath/vsavjw.zip" ] || refuse_or SKIP "no romset at $MERGED/rompath/vsavjw.zip"
+[ -f "$REL_TREE/mame/manifest.json" ] && [ -f "$REL_TREE/mame/apply_release.py" ] || refuse_or SKIP "no MAME package at $REL_TREE/mame (manifest.json, apply_release.py)"
 [ -f "$RPL" ] || refuse_or FAIL "no replay $RPL"
 REL="$(cd "$(dirname "$REL")" && pwd)/cps2$EXESUF"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 PLAY="$W/player"
-echo "== the README recording route on $OSARCH: release $REL, playback also on $SRC, romset $MERGED"
+echo "== the MAME package README's recording route on $OSARCH: release $REL, playback also on $SRC, package $REL_TREE/mame"
 
-# ---- 0. the command, read out of README.md and checked against its own prose
-python3 - "$REPO/README.md" "$(native_path "$ROMDIR")" "$W/readme.env" "$W/argv.txt" "$REPO/tools/package_release.py" <<'PY'
+# ---- 0. the command, read out of the MAME package README the generator writes now, checked against its own prose
+mkdir -p "$W/pkg"; cp "$REL_TREE/mame/manifest.json" "$W/pkg/manifest.json"
+python3 - "$W/pkg" <<'PY' || refuse_or FAIL "the generator did not render the MAME package README"
+import json, os, sys
+sys.path.insert(0, "tools")
+import package_release as pr, package_release_platforms as pp
+d = sys.argv[1]
+pp.binaries_side = lambda platform, edir: []      # text only: no binary read or copied
+m = json.load(open(os.path.join(d, "manifest.json")))
+open(os.path.join(d, "README.md"), "w").write(pr.readme(None, m, 1, 1))   # the counts are prose only
+pp.select_platform_text(d, "mame"); pp.emulator_side("mame", d, m["name"]); pp.fill_platform_text(d, "mame")
+PY
+python3 - "$W/pkg/README.md" "$OSARCH" "$W/readme.env" "$W/argv.txt" <<'PY'
 import re, shlex, sys
 sys.stdout.reconfigure(encoding="utf-8", newline="\n")  # a native Windows python writes CRLF (docs/platform/gotchas.md)
-readme, romdir, envp, argvp, pkg = sys.argv[1:]
+readme, osarch, envp, argvp = sys.argv[1:]
 t = open(readme, encoding="utf-8").read()
-cands = [l for l in t.splitlines() if re.match(r"^(?: {4}|\t)\s*cps2(?:\.exe)?\s", l) and " -record " in l]
-if len(cands) != 1:
-    print("FAIL: README.md carries %d indented `cps2 ... -record ...` command lines, expected exactly one" % len(cands))
+exe = "cps2.exe" if osarch.startswith("windows") else "cps2"
+want0 = "emulator/bin/%s/%s" % (osarch, exe)
+binpath = lambda a: re.sub(r"^\.[\\/]", "", a).replace("\\", "/")
+lines = [l for l in t.splitlines() if re.match(r"^(?: {4}|\t)", l) and " -record " in l]
+mine = [l for l in lines if binpath(l.split()[0]) == want0]
+if len(mine) != 1:
+    print("FAIL: the MAME package README carries %d indented `%s ... -record ...` lines, expected exactly one (of %d record lines)" % (len(mine), want0, len(lines)))
     sys.exit(1)
-argv = shlex.split(cands[0])
-print("  README command: " + cands[0].strip())
+line = mine[0].strip()
+print("  README command: " + line)
 bad = []
 def need(ok, what):
     if not ok:
         bad.append(what)
-need(argv[0] in ("cps2", "cps2.exe") and len(argv) > 1 and argv[1] == "vsavjw",
-     "the command starts `cps2 vsavjw` (got %r)" % argv[:2])
+need(not re.search(r"[\"'<>|&;]", line), "the line has no quote, placeholder or shell operator: a player types it as it is")
+argv = line.split()          # no quotes (checked), so a Windows line's backslashes survive, as shlex.split would not
+need(len(argv) > 1 and argv[1] == "vsavjw", "the command starts `%s vsavjw` (got %r)" % (want0, argv[:2]))
 VALUED = ("-rompath", "-nvram_directory", "-input_directory", "-record")
 opts, i = {}, 2
 while i < len(argv):
@@ -148,15 +172,10 @@ for k in VALUED:
     need(k in opts, "the command passes %s" % k)
 if bad:
     print("\n".join("FAIL: README.md: " + b for b in bad)); sys.exit(1)
-norm = lambda p: p[2:] if p.startswith("./") else p
-elems = opts["-rompath"].split(";")
-ph = [e for e in elems if "path/to/your/dumps" in e]
-need(len(ph) == 1, "the rompath carries one `/path/to/your/dumps` placeholder (got %r)" % elems)
-# the build step lives in the package's README, written by tools/package_release.py, not in the root one
-# (maintainer, 2026-10-15: "this had no business being there as it should be in the delverables README.md")
-m = re.search(r"apply_release\.py\b[^\n]*--out\s+(\S+)", open(pkg, encoding="utf-8").read())
-need(bool(m) and norm(m.group(1)) == norm(elems[0]),
-     "the rompath's first element is apply_release.py's --out in the package README (%r vs %r)" % (m and m.group(1), elems[0]))
+norm = lambda p: re.sub(r"^\.[\\/]", "", p)
+m = re.search(r"apply_release\.py\b[^\n]*--out\s+(\S+)", t)
+need(bool(m) and norm(m.group(1)) == norm(opts["-rompath"]),
+     "the rompath is apply_release.py's --out in the same README (%r vs %r)" % (m and m.group(1), opts["-rompath"]))
 m = re.search(r"empty folders?,\s*`([^`]+)`\s+and\s+`([^`]+)`", t)
 need(bool(m) and {norm(m.group(1)), norm(m.group(2))} == {norm(opts["-nvram_directory"]), norm(opts["-input_directory"])},
      "the two empty folders the prose names are the command's nvram and input directories (%r vs %r)"
@@ -164,23 +183,25 @@ need(bool(m) and {norm(m.group(1)), norm(m.group(2))} == {norm(opts["-nvram_dire
 m = re.search(r"attach\s+`([^`]+)`", t)
 need(bool(m) and norm(m.group(1)) == norm(opts["-input_directory"]) + "/" + opts["-record"],
      "the file the prose says to attach is <input dir>/<record name> (%r)" % (m and m.group(1)))
+need(re.search(r"\*\*empty\*\*\s+`" + re.escape(norm(opts["-nvram_directory"])) + "`", t) is not None,
+     "the prose says each recording starts from an EMPTY nvram folder (what the used-nvram control proves)")
 need(opts["-record"].endswith(".inp"), "the record name ends in .inp")
 if bad:
     print("\n".join("FAIL: README.md: " + b for b in bad)); sys.exit(1)
-rp = ";".join(romdir if e in ph else e for e in elems)
-out = []
-for a in argv[1:]:
-    out.append(rp if a == opts["-rompath"] else a)
-open(argvp, "w").write("\n".join(out) + "\n")
+open(argvp, "w").write("\n".join(argv[1:]) + "\n")
 q = shlex.quote
 open(envp, "w").write("OUTDIR=%s\nNVDIR=%s\nINDIR=%s\nINPNAME=%s\nROMPATH_ARG=%s\n" % (
-    q(norm(elems[0])), q(norm(opts["-nvram_directory"])), q(norm(opts["-input_directory"])),
-    q(opts["-record"]), q(rp)))
-print("  ok: the prose agrees with the command (folders, attachment, apply_release --out)")
+    q(norm(opts["-rompath"])), q(norm(opts["-nvram_directory"])), q(norm(opts["-input_directory"])),
+    q(opts["-record"]), q(opts["-rompath"])))
+print("  ok: the prose agrees with the command (folders, attachment, empty nvram, apply_release --out)")
 PY
 . "$W/readme.env"
-mkdir -p "$PLAY/$OUTDIR" "$PLAY/$NVDIR" "$PLAY/$INDIR"
-cp "$MERGED/rompath/vsavjw.zip" "$PLAY/$OUTDIR/vsavjw.zip"
+mkdir -p "$PLAY/$NVDIR" "$PLAY/$INDIR"
+# the set, built the way the README's step 1 says: the package's applier, the player's dumps, the README's --out
+python3 "$REL_TREE/mame/apply_release.py" --romdir "$(native_path "$ROMDIR")" --out "$(native_path "$PLAY/$OUTDIR")" > "$W/apply.out" 2>&1 \
+    || { tail -3 "$W/apply.out"; refuse_or FAIL "the package's apply_release.py did not build the set"; }
+grep -q '^OK:' "$W/apply.out" || { tail -3 "$W/apply.out"; refuse_or FAIL "apply_release.py printed no OK: line"; }
+echo "  ok: the set built by the package's applier into $OUTDIR/ ($(grep -m1 '^OK:' "$W/apply.out"))"
 
 run_mame() { # <bin> <sandbox> <lua> <mame output> <args...> — from the player folder, headless flags APPENDED
     _bin="$1"; _sb="$2"; _lua="$3"; _out="$4"; shift 4

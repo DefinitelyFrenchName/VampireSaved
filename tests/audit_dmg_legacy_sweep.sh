@@ -7,8 +7,8 @@
 #   games differ: those hits' own attack records, swapped between the games, swap the damage — the
 #   record of #191 (the maintainer: "1) close as not ours 2) document with the other engine
 #   differences between vsavj and VS2", 2026-10-01).
-# HOW: 173 MAME runs, six at a time (section 2's 98: 16 legacy victims x 3 legs x 2 sides and Donovan's two; section 5's 74;
-#   section 6's one): 16 legacy victims x vsavj/vsav2/ours x 2 sides on the 14z-186
+# HOW: 175 MAME runs, six at a time (section 2's 98: 16 legacy victims x 3 legs x 2 sides and Donovan's two; section 5's 74;
+#   section 6's one, and its control's two 60-frame runs); the ours legs pass `-verbose` (#291 S4-A): 16 legacy victims x vsavj/vsav2/ours x 2 sides on the 14z-186
 #   control's two replays (victim and Demitri by the early-window forced picks, the victim's HP
 #   pinned to 288 sixty frames before each hit, the level pinned 6 from 2000 and the RNG word
 #   0000 from 2363), and Donovan's 14z-186 probe-12 rig on native vs2 and ours (the parity
@@ -32,7 +32,7 @@
 #   own legs swapped (ours given vs2's records, native given vsavj's) read the other leg's frozen rows,
 #   8 of 8, and his own-value legs reproduce their unpoked traces; on our build every legacy leg's trace is
 #   byte-identical to vsavj's, 32 of 32, and its rows equal vsavj's, 96 of 96 hits, each leg running $BUILD's
-#   vsavjw.zip (section 6, not frozen: judged against the same run's vsavj legs, which section 4 holds); all five
+#   vsavjw.zip (section 6, not frozen: judged against the same run's vsavj legs, which section 4 holds); all six
 #   controls fire.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/dmg_legacy_sweep.tsv tests/replays/dmg191/
 #   tests/expected/registry.tsv tests/lib/controls.sh tests/lua/field_trace.lua tools/dmg_sweep.py
@@ -46,6 +46,7 @@
 # MUST-FIRE: perturbed-copy: counterfactual-skipped — the unpoked vsavj and vs2 legs must deal DIFFERENT damage, so "each game poked to the other's records deals the other's damage" is an equality the comparison can refuse (in-gate: the unpoked legs differ; mode: the unpoked traces stand in for the poked ones and the gate FAILs)
 # MUST-FIRE: perturbed-copy: ours-diverged — the ours rows with one more red HP on P1/victim 0x00's 2HK (a planted one-HP difference) must fail section 6's comparison with vsavj, so "ours equals vsavj hit for hit" is something the gate can refuse (#295; in-gate: tools/dmg_sweep.py ours --perturb ours-diverged must exit non-zero naming that hit; mode: the perturbed rows are the ones compared and the gate FAILs)
 # MUST-FIRE: perturbed-copy: ours-records-swapped — our build on P1/victim 0x00 with vs2's three attack records written through rom_poke.lua (every write verified) must deal different damage and fail section 6's comparison, so the comparison refuses a real difference on the real instrument, not only a planted row (#295; it does not show the leg ran OUR build: the mame.log check does; in-gate: that trace in place of the ours leg must fail naming the leg; mode: it stands in for the ours leg and the gate FAILs)
+# MUST-FIRE: known-bad: zip-check-blind — an ours leg run as on a host whose mame.ini does not set `verbose` (`-noreadconfig`, and not the gate's own `-verbose`) shows NO `opened archive file` line, so section 6's ran-our-build check rests on the `-verbose` the gate passes, never on the user's file (#291 S4-A: on PILOT and ERIS the check read 0 of 32; in-gate: a 60-frame ours run with `-noreadconfig` shows none of the 25 lines the same run shows with `-noreadconfig -verbose`; mode: the 32 ours legs run that way and section 6 FAILs)
 #
 # POKE READ-BACK (ruled 2026-10-01 (14z-187), tests/expected/poke_readback.tsv): the victim's HP words (ff8450/ff8850,
 # red and white) are pinned to 288 before each hit and only the DROPS after the pin are read (OBSERVES); the two ids
@@ -86,7 +87,7 @@
 # the level and RNG pins change the per-game difference; FBNeo and the MiSTer core.
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged31] [JOBS=6] [FREEZE=1] tests/audit_dmg_legacy_sweep.sh
-#   emulator tier, MAME; 173 runs of up to 4725 frames, six at a time
+#   emulator tier, MAME; 175 runs of up to 4725 frames, six at a time
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
@@ -122,15 +123,20 @@ lpk() {  # lpk <side p1|p2> <victim id> — a legacy leg's forced picks and HP p
     else echo "1400:ff8782:$2;1450:ff8782:$2;1500:ff8782:$2;1400:ff8b82:01;1450:ff8b82:01;1500:ff8b82:01;2940:ff8450:01200120;3380:ff8450:01200120;3780:ff8450:01200120"; fi
 }
 lrpl() { case "$1" in p1) echo "$REPO/tests/replays/dmg191/demitri_p1.rpl" ;; *) echo "$REPO/tests/replays/dmg191/demitri_p2.rpl" ;; esac; }
+# The ours legs pass `-verbose` (#291 S4-A, 14z-206): section 6's ran-our-build check greps MAME's `opened archive file`
+# line, which MAME prints only with verbose on. Until then the check passed only where the user's own mame.ini sets
+# `verbose 1` (this Mac; docs/platform/gotchas.md "MAME READS THE USER'S OWN `mame.ini`") and read 0 of 32 on PILOT and
+# ERIS. `-verbose` changes the log, not the run: the field traces are what the gate compares.
+OURS_VERBOSE="-verbose"; [ "$MODE" = zip-check-blind ] && OURS_VERBOSE="-noreadconfig"
 LFIELDS="ff8450:w:p1hp,ff8452:w:p1white,ff8454:b:p1cls,ff8850:w:p2hp,ff8852:w:p2white,ff8854:b:p2cls,ff8782:b:id,ff8b82:b:p2id"
 lleg() {  # lleg <side p1|p2> <victim id> <vsavj|vsav2|ours> — ours: our merged build ($BUILD's vsavjw), the same inputs (#295)
     _s="$1"; _v="$2"; _g="$3"; _d="$W/L.$_s.$_v.$_g"; mkdir -p "$_d"
     _pk="$(lpk "$_s" "$_v")"; _r="$(lrpl "$_s")"
-    _set="$_g"; _rp="$ROMDIR"; [ "$_g" = ours ] && { _set=vsavjw; _rp="$BUILD/rompath;$ROMDIR"; }
+    _set="$_g"; _rp="$ROMDIR"; _vx=""; [ "$_g" = ours ] && { _set=vsavjw; _rp="$BUILD/rompath;$ROMDIR"; _vx="$OURS_VERBOSE"; }
     ( cd "$_d" && MAME_SANDBOX="$_d/sb" MAME_ROMPATH="$_rp" REPLAY="$_r" POKES="$LV;$_pk" \
         FIELDS="$LFIELDS" \
         FIELD_OUT="$_d/f.ft" FIELD_FROM=2300 FIELD_TO=4100 FRAMES=4100 \
-        "$REPO/tools/run_mame.sh" "$_set" -autoboot_script "$REPO/tests/lua/field_trace.lua" > "$_d/mame.log" 2>&1; rm -rf "$_d/sb" ) </dev/null
+        "$REPO/tools/run_mame.sh" "$_set" -autoboot_script "$REPO/tests/lua/field_trace.lua" $_vx > "$_d/mame.log" 2>&1; rm -rf "$_d/sb" ) </dev/null
 }
 DFIELDS="ff8450:w:p1hp,ff8452:w:p1white,ff8454:b:p1cls,ff8782:b:id,ff8b82:b:p2id"
 dleg() {  # dleg <native|ours> — Donovan (P1) against Demitri (P2), the 14z-186 probe-12 rig, the parity gates' pins
@@ -352,6 +358,20 @@ echo "== 6. our build against vsavj on every legacy leg (#295: the superset inva
 # The same 32 legs as section 2's vsavj legs, on our merged build: each trace must be BYTE-IDENTICAL to the same run's
 # vsavj trace (2300-4100, every field) and each row equal hit for hit (red, white, first drop frame, attacker, class).
 # The vsavj legs are held by the frozen rows (section 4); the ours rows are judged against them and not frozen.
+if [ -z "$MODE" ]; then   # control zip-check-blind: without -verbose and without the user's file, the line is not printed
+    for _zv in blind verbose; do
+        _zd="$W/Z.$_zv"; mkdir -p "$_zd"; _zx="-noreadconfig"; [ "$_zv" = verbose ] && _zx="-noreadconfig -verbose"
+        ( cd "$_zd" && MAME_SANDBOX="$_zd/sb" MAME_ROMPATH="$BUILD/rompath;$ROMDIR" FIELDS="ff8450:w:p1hp" \
+            FIELD_OUT="$_zd/f.ft" FIELD_FROM=1 FIELD_TO=60 FRAMES=60 \
+            "$REPO/tools/run_mame.sh" vsavjw -autoboot_script "$REPO/tests/lua/field_trace.lua" $_zx > "$_zd/mame.log" 2>&1
+          rm -rf "$_zd/sb" ) </dev/null
+    done
+    _zb="$(grep -cF "opened archive file $BUILD/rompath/vsavjw.zip" "$W/Z.blind/mame.log" || true)"
+    _zw="$(grep -cF "opened archive file $BUILD/rompath/vsavjw.zip" "$W/Z.verbose/mame.log" || true)"
+    if [ "$_zb" = 0 ] && [ "$_zw" -gt 0 ]; then
+        vs_ctl_fired zip-check-blind "a 60-frame ours run with -noreadconfig shows 0 'opened archive file' lines, with -noreadconfig -verbose $_zw: the check rests on the gate's own -verbose"
+    else vs_ctl_dead zip-check-blind "with -noreadconfig the run shows $_zb such lines, with -verbose $_zw: the check cannot tell a host without verbose" || fail=1; fi
+fi
 _ol=0; for s in p1 p2; do for v in $IDS; do
     grep -qF "opened archive file $BUILD/rompath/vsavjw.zip" "$W/L.$s.$v.ours/mame.log" && _ol=$((_ol + 1))
 done; done

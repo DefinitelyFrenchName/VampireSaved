@@ -38,265 +38,89 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
-## Session 14z-205c — **#292 declined; #277, #262, #263 closed; #299's MRA lock and the dead-control scoring; #229's Q1 answers and both re-rigged joins confirmed; #296 and #299 measured on ERIS and PILOT; #302, #303, #304 filed.** Opened 2026-10-20 on the same transcript (`995e7259`) after the 14z-205b close (`b91532d8`, pushed).
+## Session 14z-206 — **PILOT and ERIS offline: the Mac carries the work in parallel. #299's cold cache fixed, its closure still open; #296's, #286's code halves; #284 done awaiting release; #291 S4 planned, S4-A done; #305, #306, #307 filed.** Opened 2026-10-21 after the 14z-205c close (`b89fc9d7`, pushed).
 
 ### opened with
-The maintainer, on whether to close and start the next session without clearing, while #286 runs on PILOT: *"Should we
-formally close the session and start the next (without clear or exit)? So that we can go on while #286 finishes?"*,
-then *"yes"* to opening 14z-205c with the sweep and #266. No second close: the records written after the 14z-205b push
-(its group, "after the push") wait for this session's close. The opener sweep: one survivor, fork X1's bounded wait on
-PILOT's `score.end` (#286, started in 14z-205b), declared; an old open task (`bas3z7por`, the 14z-194 pursuit-rig search)
-holds no process. #286 on PILOT at the opener: trace done (228 of 228 gates), the committed predictor's score PASS
-(87,773 pairs, 0 misses; six gates non-zero under the trace), the narrowed score running, the control not started.
+HANDOFF, STATE and NEXT_SESSION read; the sweep CLEAN, `main` equal to `origin/main`. The maintainer: *"Currently PILOT
+and ERIS are offline, what does that change?"*, then, on the offline order proposed: *"start in the offline order, and
+don't hesitate to parallelize the task, you have the whole machine to you"* (`DECISIONS_HISTORY.md` "Ruled 2026-10-21
+(14z-206) — PILOT and ERIS offline …"). Forks, each editing only its own files and none a record file: S (#291 S4's
+plan), R (#284's proposal), C (#299), M (#296), T (#286); then A (#291 S4-A), R2 (#284 applied), K (two tickets and
+#296's text), B4 (#291 S4-B onwards, in its own git worktree). The harness refuses a subagent's write of a report file,
+so each hand-back is saved verbatim by the orchestrator (`build/agent206/<t…>/REPORT.md`, local).
 
-### (1) #266 — DONE, AWAITING RELEASE (NOT CLOSED)
-PILOT's `apt` history read again (`build/agent205c/t266/pilot_apt_display.txt`, local): the build toolchain's one `apt
-install` run of 2026-10-02 14:50:15 carried an `Upgrade:` line, the Mesa runtime `25.2.8-0ubuntu0.24.04.2` → `.3`, so
-#266's body ("No graphics-stack package changed after 2026-10-02") read the install list and missed it; the body is
-marked corrected in place. Homed: `docs/project/build_environments.md` "PILOT'S DISPLAY CARD IS VirtIO-GPU" (the card,
-the crash, the gate's PASS of 14z-205b, the logged-in-session condition) and `docs/platform/gotchas.md` "AN `apt
-install` ALSO UPGRADES WHAT IT PULLS IN"; `docs/GOTCHAS.md` regenerated; row 266 carries the learned and wrong answers.
-**The closure was withdrawn** by rule-checker run `2026-10-20-1154` (VIOLATED Q1 Q4): the to-do ends "so the next
-release carries its PASS", and the gate exits 0 on a SKIP when nobody is logged in on PILOT, which no control catches.
-#266 stays open, done awaiting release: the comment of 2026-10-20 (14z-205c) says it closes when the next release's
-battery records the gate PASSING on PILOT, with the maintainer logged in.
+### (1) #291 — S4 PLANNED, ITS FIVE QUESTIONS ANSWERED; S4-A DONE
+Fork S's plan (`build/agent206/t291/PLAN.md`, `REPORT.md`, local), read-only on the S3 page: the 136 near-blank pictures
+come from two selection paths, 104 from the round-end fade anchor (102 in `audit_merged_legacy`, 2 in
+`test_tenant_select_records`) and 28 from `audit_legacy_pairings`' load frame; Felicia's wall jump is never drawn; no tag
+on the page is defined. The maintainer's answers (`DECISIONS_HISTORY.md` "Ruled 2026-10-21 (14z-206) — #291 S4: …"): a
+move is a judged event, ~9 tiles unless it has more; the replay oracle draws up to 18 frames at the replay's inputs;
+frames without fighters go in a separate labelled strip; Q4/Q5 as recommended. **S4-A** (fork A, `build/agent206/t291/
+s4a/REPORT.md`, local): the six gates that did not pass on a clean checkout now pass there with every picture proven
+(temporary commit objects `d82803e55787`, `4c6ba05794ea`, never refs): `audit_flicker_attribution` reads the tracked
+`MASK` (it failed on every case-sensitive filesystem, proven on an APFS case-sensitive image); `audit_dmg_legacy_sweep`'s
+ours legs pass `-verbose` (the zip-opened check rested on the maintainer's own `mame.ini`, `verbose 1`; reproduced on the
+Mac with a HOME that has none; control `zip-check-blind`), its gotcha retracted in `docs/platform/gotchas.md`;
+`audit_grenade_ground_tiles` prints an unindented PASS line; the two menu gates run on the stock twin (`%STOCK_RP%`);
+`tools/proof_sheets.py` builds `audit_landing_sound`'s control from `freeze/merged-m22` (`# SHEET-BUILD:`), and resolves
+a relative rom path against the gate's own tree (it had re-run both menu gates on pristine vsavj; control
+`rompath-unresolved`). S4-B onwards runs in fork B4's worktree (*"Now, in a worktree (Recommended)"*). #291 stays open.
 
-### (2) #286 — THE PILOT TRACE: BOTH PREDICTORS 0 MISSES
-Fork X1 (started in 14z-205b at the maintainer's *"Can we next use PILOT for #286 ?"*), report saved verbatim to
-`build/agent205b/t286/REPORT.md` (local). A clean clone of a bundle of `779bc589` on PILOT; all 228 static gates traced
-under strace in 487 s; 87,773 (gate, file read) pairs. The committed predictor and the narrowed one (the parked
-narrowings adapted to `779bc589`, `build/agent205b/t286/narrowings_on_779bc589.patch`, local) both score 0 misses in 0
-gates; the over-narrowed control FIRED (102 missed reads); the planner's self-test passes on the narrowed copy with its
-30 controls firing. The narrowing drops 8 gates from a typical close's STALE set (59 → 51 on mid2's change set). **Not
-settled:** six gates exited non-zero under the trace, so their reads may be short (test_close_tools and
-test_mister_mra_map are new to that list since 14z-202); one hunk collided with #298's PROGRAM-CHANGED line and the fork
-kept #298's ruled line; nothing was traced at HEAD `b91532d8` (it adds test_submodule_pins). Landing it takes a
-rule-checker run and a tier. PILOT keeps `~/t205/x1` (9.4 GB) for rescoring. **Re-traced at `b91532d8` (14z-205c)**: a bundle of the commit into
-the x1 tree (its `build/` and submodules copied from PILOT's own checkout, `emu/fbneo` with our applied patch paths),
-229 of 229 gates in 529 s; both predictors 0 misses on 88,351 pairs; the over-narrowed control FIRED (102); four gates
-non-zero under the trace (the 14z-202 four); the two MRA gates also traced serially, both exit 0
-(`build/agent205c/t286/pilot/`, local). **Landing was WITHDRAWN** by rule-checker run `2026-10-20-1156` (VIOLATED Q1 Q3
-Q4 Q5): the scorer judges each read by `stale_reason` and never applies `predict()`'s N-F-CHANGE skip, so a run-record
-read the narrowing carries is invisible to both legs. Measured on the same traces (`build/agent205c/t286/
-nf_change_check.py`, `.out`): the committed predictor carries 0 of 32,695 run-record reads in 10 gates; the narrowed
-one carries 1 — `test_tickets` opens `tests/rulecheck/runs/2026-09-17-22/verdict_real.txt` and is no runs reader
-under the narrowed N-F. The narrowings are NOT applied to the tree (`build/agent205c/t286/landing.diff` keeps them).
+### (2) #284 — THE TEMPLATE IN THE PIPELINE; DONE, AWAITING RELEASE
+Fork R rebuilt the pre-edit drafts from the 14z-205c transcript and diffed the maintainer's edits (`build/agent206/t284/
+PROPOSAL.md`, local); the maintainer's answers (`DECISIONS_HISTORY.md` "Ruled 2026-10-21 (14z-206) — #284: …"). Fork R2
+(`build/agent206/t284/apply/REPORT.md`, local) put the template in as `tools/package_release_readme.template.md`, with
+"Play on" and "Report a problem" moved into it; `tools/package_release.py` and `package_release_platforms.py` fill it
+(a marker line removed whole; a left-over token stops the packaging). Rendered from the M23 manifest
+(`build/agent206/t284/rendered/`): FBNeo equals the maintainer's edit but for the kept `EMULATOR.md` clause. Gates:
+`test_release_roundtrip` (the proposal's version went red on the published M23 READMEs, fixed, control
+`generator-report-dropped`), `test_release_launcher_bat`, `test_release_recipe_text` and `test_readme_recording` (macOS:
+the set built by the package's `apply_release.py`, 5,320 frames reproduced on both MAMEs) PASS with their controls; its
+Windows and Linux legs not run (ERIS, PILOT offline). The new READMEs ship with the next release.
 
-### (3) #229 — Q1: BULLETA'S AND LEI-LEI'S GUARD CANCELS, AULBATH'S DIRECT SCISSORS, BULLETA'S ES COOL HUNTING, FELICIA'S ES PLEASE HELP ME CONFIRMED; JEDAH'S ES ROW IS ES IRA SPINTA
-The maintainer, on `f5_gc/cap9/sheets/gc9_BU.png` rows 1-4: *"yes she has no attack but invulnerability, switches sides
-and allows for punish, this is indeed her correct GC. Not sure what you mean by no A no H without you defining your
-one-letter acronyms"*. Recorded in `DECISIONS_HISTORY.md` "Read 2026-10-20 (14z-205c) — #229 Q1" and
-`build/agent205/t229/answers_q1.md` (local). The sheets' tile letters were never defined on the sheets (`cap9.py`). On
-`gc9_LE.png` rows 1-4 the maintainer quoted mizuumi's Senpuubu entry, then: *"I would say that fits your findings"*
-(mizuumi's ~20F startup invulnerability was not measured). On `esex9_AU.png` row 8 (`[22PPP]`, stock paid 3):
-*"it is indeed Direct Scissors; the move didn't hit because the opponent was too far. Of note, the move is supposed to be
-actually done with 22+PP (PPP works but the extra P is not needed)"* (22PP not yet measured). On `esex9_BU.png` row 6
-(ES Cool Hunting, entry f5818): *"it's the correct move. Why there is so little damage I don't know. Maybe Buletta wasn't
-far enough and Victor was hit by a single one of the hitboxes?"*; F3's records: fired at a 51 px gap, one HP fall,
-against nine from 184 px (f5600). On `esex9_FE.png` rows 7-9 (ES Please Help Me, three
-pairs): *"it is the correct move. One version didn't connect because the opponent was out of range of that specific
-variant"* (F3: LK+HK made no HP fall at 64 px or 184 px; the other two hit at both ranges). On `esex9_JE.png` row 2:
-*"What  I see is ES Ira Spinta (J.6324+KK) not the ES follow-up."*, agreeing with P2 that F3's ES Ira Piano join is
-wrong.
+### (3) #299 — THE COLD DECRYPT CACHE FIXED; THE CLOSURE STILL OPEN
+Fork C (`build/agent206/t299/REPORT.md`, local): 36 gates and 11 tools read `build/out/*.bin` by path; with the cache
+cold, the five gates FAIL or SKIP under `--jobs 8` and PASS serially, saved there only by the tier's order (the first
+gate, `test_m3a_reproducible`, builds the views). Fixed: `tests/run_all_static.sh` builds the views before the tier
+(`decrypt_cache_ensure`, ~24 s cold, six size checks warm), and `tests/lib/decrypt_cache.sh` makes its temp dir inside
+`build/out` (a `mv` across filesystems is a copy a reader could catch half-written). In an isolated copy, cold: all five
+PASS at `--jobs 8` and `--jobs 1`; `test_static_runner` sections 28-29, control `decrypt-warm-off`. The two gaps are
+**#305** (*"New ticket, close #299 (Recommended)"*). Its closure: rule-checker runs below, then the maintainer's *"option A"* (the landing commits, #299 stays open). Rule-checker runs `2026-10-21-1161` (VIOLATED Q1 Q3 Q4: PILOT's six environment-failed gates
+and an unchecked comparer) and `2026-10-21-1162` (VIOLATED Q1 Q4: the open-only census's unresolved relative paths) were
+resolved by work: a Mac serial-against-pool mini-tier of those six on the landing commit (`build/agent206/t299/c2/`;
+planted differences found `compare_legs.py` blind to hex ids, large numbers and sizes, a corrected copy is not), and a
+re-traced write census on PILOT with every path resolved (`build/agent206/t299/x2/`), which found one new hazard,
+fixed: `test_checkdocs_rom`'s control 5 rewrote a tracked file in place (`tools/checkdocs_rom.py --covered`). Runs
+`-1163`, `-1165` resolved by work too (the final tree's confirm tier; PILOT's diffs printed in full; date and epoch plants,
+which found the epoch class erasing an epoch-shaped real number, shown to hide nothing), `-1164` withdrawn unspawned (a
+summed figure). **`-1166` VIOLATED (Q1 Q4), unresolved:** PILOT's logs came from a faulty 2-second copier, a confirm-log
+line does not show its claim, and the comparer's duration/PID/date/temp-name classes were never planted with a real value.
+The maintainer, offered to commit the landing first: *"option A"* (`DECISIONS_HISTORY.md` "Ruled 2026-10-21 (14z-206) —
+the landing commits now; #299 stays open …"). #299 stays open; `build/agent206/CHECKPOINT.md` holds its next steps.
 
-### (4) #286 / #299 — WHY TWO GATES EXITED NON-ZERO UNDER THE PILOT TRACE; A LIVE COLLISION UNDER `--jobs`
-- `test_close_tools` (exit 3): its section 2b REFUSED on the findings table #288 cut, which is #300, fixed in `b91532d8`
-  after the traced `779bc589` (`git show 779bc589:tests/test_close_tools.sh` has no `NO-FINDINGS-TABLE` branch).
-- `test_mister_mra_map` (exit 1, `FileNotFoundError` under `/tmp/vampire-saved-jtsim/release/mra/`): **two static gates
-  share one scratch clone.** `test_mister_mra_map` and `test_mra_build_line` both call `tools/mister_mra.sh` on the
-  default `${JTSIM_SCRATCH:-$TMPDIR/vampire-saved-jtsim}`, and the tool's `rm -rf "$RLS" "$ROM"` (line 234) deletes the
-  other run's `release/mra`. In the trace they finished adjacently (`done.tsv` rows 141 and 143; 27 s and 7 s).
-  Reproduced on the Mac: the two started 2 s apart, three times: pair 1 both PASS, pair 2 the map gate crashed, pair 3
-  both failed; the map gate alone PASSES (`build/agent205c/t299/`, local). This is #299's collision item, live: the
-  close's `--jobs 8` tier can go red on it by chance, and nothing shows a crossed copy could not pass. **Fixed** (the
-maintainer: *"Lock in mister_mra.sh (Recommended)"*): `tools/mister_mra.sh` section 0b holds a lock directory beside the
-scratch from the clone to the copy-out (a dead holder taken over, a live one waited for up to `MRA_LOCK_WAIT`, default
-900 s); `tests/test_jtsim_scratch_heal.sh` section 6 locks it, control `lock-removed` (PASS in 11 s; the mode FAILs);
-four concurrent pairs of the two gates all PASS with the lock; `docs/project/gotchas.md` "TWO STATIC GATES SHARED ONE
-JTSIM SCRATCH".
+### (4) #296 — THE CODE HALF: THE SANDBOX KEY AND THE REFUSAL
+Fork M (`build/agent206/t296/REPORT.md`, local): `audit_wide_phase_a` keys its sandbox by section and replay;
+`tools/run_mame.sh` refuses a sandbox that holds an earlier run's state (exit 3) unless `MAME_SANDBOX_REUSE=1`, and
+logs absolute paths; `test_mame_sandbox_log` gains the refusal section and control `refusal-removed`. Phase A PASSES in
+231 s with 37 fresh runs and its A1-A4 decisions unchanged; the old phase-A script now fails loudly; 13 MAME gates
+sampled, 54 runs, all fresh. No gate needs the override. The live text that called an explicit sandbox a reuse made past
+tense by fork K ([VSP-117], `SKILL.md`, two comments, `operations.md`). Not closed: its "done when" is the mame and
+fbneo lanes green with the refusal on, on the Mac after the landing.
 
-### (5) #292 — WHICH STATE.md HITS ARE REAL, MEASURED ON THE PILOT TRACE
-`static_confirm.py predict --changed STATE.md` at HEAD, in a scratch worktree with the #286 narrowings applied
-(`build/agent205c/t292/`, local): 38 gates STALE (41 committed), 30 of them by R2 "names STATE.md". Of those 30, the
-PILOT trace (`779bc589`) saw ~~11~~ **12** open STATE.md; ~~19~~ **18** did not (**CORRECTED** by rule-checker run `2026-10-20-1155`: `test_recurrence_alarm`, counted among the 19, is STALE by R5, and the opens are 12 of the 30). ~~`tools/battery_reach.py` alone makes 13 of the 19~~ **CORRECTED the same day: the planner names only the FIRST file of a reach that names STATE.md; with battery_reach.py cleaned, 11 of those 13 stay STALE through the planner's own `NARROW_R2 = _NarrowR2(("STATE.md",))` and 2 through `close_standing.py`, so battery_reach alone saves none (`build/agent205c/t292/all_namers.txt`, every naming file per gate)** (its
-mentions: the docstring, the module-level `PATS` default "the control's own", and fixtures in `control()`);
-`tools/close_standing.py` 3 (its `main()` defaults `--state STATE.md`, a real read on another call path);
-`tools/checkskills.py` 1 (its module-level document list); `tools/agent/rulings_verbatim.py` 1 (its `main()` default);
-`test_recurrence_alarm` 1 by R5 (`tickets.tsv` names STATE.md). ~~**What the 13 cost now:** in the 14z-205b close tier,
-the 12 at close cadence (`test_static_runner` is at freeze cadence since 14z-204) took 209 s of gate time and ran 5
-control rows~~ **CORRECTED (run `2026-10-20-1155`): that counted only the gates first named by battery_reach.py and
-left out `test_static_runner`, which re-ran in that tier as "STALE: R2 tools/battery_reach.py names STATE.md"
-(`build/agent205b/close/tier.run3.log:36`, 134 s) whatever its freeze cadence row says. Every STALE gate for a
-STATE.md-only change that the trace did not see open STATE.md: 25, of which 19 ran in the 14z-205b close tier for
-422 s of gate time and 5 control rows (6 s)**, since #298 executes controls only on a changed program; #292's 1,321 s of 14z-204 is mostly gone. **Built in the scratch
-worktree** (maintainer: *"Narrow only battery_reach (Recommended)"*, then, on the corrected premise, *"Add the planner
-self-exclusion (Recommended)"*): N-K (a mention inside a python `control`/`selftest`/`_selftest`/`self_test` body is no
-N-B read), the planner's own file read for no N-B, battery_reach.py's control-only `PATS` default moved into its
-`control()`; `test_static_confirm` PASSES with the controls `selftest-scope-off` and `planner-self-off` firing.
-**It saves 0 gates on a STATE.md-only change (38 → 38):** the 11 are also STALE by R5 (the ledger, which the planner
-names only in its selftest's case list) and under that by R4 (`tests/run_all_emulator.sh` reads the whole tree) and R5
-through old run manifests (`build/agent205c/t292/all_rules.txt`). A trial of N-K on R5's data-file scan failed the
-planner's gate and saved nothing; reverted. **#292 CLOSED `declined`** at the maintainer's word (*"Close #292, keep code out
-(Recommended)"*, confirmed on the corrected figures: *"Stands: close, code out (Recommended)"*); rule-checker run
-`2026-10-20-1155` (VIOLATED Q1 Q4: the counts and the cost, corrected above, resolved); the narrowing code stays out.
+### (5) #286 — THE SCORER JUDGES AS `predict()` DOES; STATE 14z-205c (2) RETRACTED IN PART
+Fork T (`build/agent206/t286/REPORT.md`, local): `tools/static_confirm.py` exposes `runs_reader`, `change_reason` and
+`whole_covers`, which `predict()` and `tools/trace_static_reads.py`'s scorer both call (nine change sets' predictions
+byte-identical before and after); control `nf-change-unscored`. The committed predictor carries `test_tickets`' read
+of `tests/rulecheck/runs/2026-09-17-22/verdict_real.txt` too (row 156 of `tickets.tsv` links it; `tools/tickets.py`
+opens every link target): 14z-205c's check script took every gate as a runs reader on the committed leg, so its "0 of
+32,695" could not find a miss (retracted in (2) of 14z-205c and NEXT_SESSION). `landing.diff` (NOT applied) adds
+N-F-LINK; the rescore on PILOT's traces (`pilot_rescore.sh`) waits for PILOT.
 
-### (6) #291 — THE UNFILTERED S3 RUN AT `b91532d8`, ON PILOT
-`python3 tools/proof_sheets.py run b91532d8 --host pilot --host-dir t205c/s3 --jobs 5`: the commit bundled and checked out
-clean on PILOT, its five tracks built there, each equal to the commit's frozen reference (DON `167d870f`, STOCK
-`a3910ded`, HUI `cc9c4b68`, PYR `9d135e7b`, MERGED `6148d0b1`); emulators are PILOT's pinned builds, not built from the
-commit. 6,100 s; exit 0; the page is `build/sheets/b91532d88bf3/index.html` (local, 328 MB with its pictures). **58
-gates drawn: 52 gave a PASS line, 6 did not;** 470 sheets, 3,839 tiles with a status: 3,206 PROVEN, 542 EVENT-PROVEN,
-79 NOT THE JUDGED RUN (74 in `audit_qs_voice_wav`, 5 in `test_tenant_select_records`: both build their own legs).
-The six: `test_gfx_menus` and `audit_mask_window_ff4182` need `build/donovan6`, `audit_landing_sound` needs
-`build/m3b_merged30` (builds the commit does not make), `audit_flicker_attribution` needs the local masked basis
-`tests/expected/vsavj/masked-v2/mask`, all four failing at 0 s; `audit_dmg_legacy_sweep` FAILED its section-6 check
-"only 0 of the 32 ours legs show MAME opening .../build/m3b_merged31/rompath/vsavjw.zip" while its 32 legs were
-trace-identical to vsavj and 96 of 96 hits equal (its controls fired); `audit_grenade_ground_tiles` printed its PASS
-line in a form the runner does not read (exit 0). **The maintainer's review:** *"it looks good in general, it also shows area of concern (e.g.
-Felicia's wall jump show no sprites at all, meaning there is no way for a human to compare and confirm. I don't deny
-that maybe the memory values compared are both correct and relevant, just it can't be visually confirmed)"* and *"even if
-it meant creating multiple webpages if it becomes too big, having around 9 captures per move is the reference."* A
-census of the page's pictures: 136 of 3,753 are 97%+ one color (106 in `audit_merged_legacy`, 28 in
-`audit_legacy_pairings`, 2 in `test_tenant_select_records`), a floor (stage-only tiles are not counted). #291 stays open
-(`DECISIONS_HISTORY.md` "Read 2026-10-20 (14z-205c) — #291's unfiltered page").
-
-### (7) FIVE FORKS ON THREE MACHINES
-The maintainer: *"on PILOT: do #299 / on ERIS: do #296 (unless it needs PILOT) / on the mac:  do #284’s README draft, not
-going beyond draft without validation by maintainer. Then do  #229’s ruled-wrong links and the three gotchas (note: Ira
-Pino is a typo, it should be Ira Piano), then #277, #262 and #263. Parallelize if possible and ressources are
-available"*. Five forks, each reporting under `build/agent205c/` and editing no record file: P (#299 on PILOT), E (#296
-on ERIS), R (#284's draft, `build/agent205c/t284/` only), L (#229's two joins, the Ira Piano spelling, the three
-gotchas), X (#277, #262, #263 in turn).
-
-### (8) #277, #262 AND #263 CLOSED
-Fork X fixed the three in `tools/agent/extract.py` (`build/agent205c/t277_262_263_REPORT.md`, local). The maintainer
-accepted its choices (*"Accept all three (Recommended)"* for #277, *"Accept W§ (Recommended)"* for #263). The closures'
-rule-checker runs found real defects in the fixes: `2026-10-20-1157` (#277, VIOLATED Q1 Q4): A@ quoted figures from
-inside a hash or a session key, and nobody had measured what the rounding rule clears; on three whole transcripts it
-cleared 5 of 8 flagged decimals, 2 falsely ("2.5" from `git version 2.54.0`, "1.9 MB" from a load average thousands of
-records back), so the maintainer ruled *"Near + whole token (Recommended)"*: a rounded source must be a whole number
-token in a tool result of the last 50 records; re-measured, 3 true clears and 0 false. `2026-10-20-1158` (#262, VIOLATED
-Q1 Q4): one M line per TEXT for the whole transcript dropped a repeated message; the set is now cleared at every reply.
-`tests/test_agent_extract.sh` PASSES with 45 checks and 13 controls firing, the four new controls (`cites-in-word`,
-`said-global`, `rounding-far`, `rounding-version`) each failing it as their mode; `test_agent_worker`,
-`test_figure_check`, `test_packet_check`, `test_recurrence_alarm` and `test_gate_follows` pass. **#277 and #262 closed
-`done`** with their comments of 2026-10-21. **#263 closed `done`** (comment of 2026-10-21) after its run `2026-10-21-1160` (VIOLATED Q1 Q4): the
-derivability census's output was unsaved and "mostly false" unmeasured (now saved, `build/agent205c/t263/
-proto_derivable.out`, and the wording withdrawn), and W§ merged files of one basename and dropped unread or over-cap
-lines silently (now per full path, a shared basename quotes neither, an unread line is marked, the cap is counted;
-control `reads-merged`). The gate: 47 checks, 14 controls firing, none dead; its gotcha `docs/project/gotchas.md` "A
-\"DERIVABLE AS a ± b\" CLEARANCE OF A FIGURE IS NOISE".
-
-### (10) #296 — STEP 1'S INVENTORY ON ERIS: 24 OF 4,437 RUNS REUSED, ALL ONE GATE
-Fork E (report `build/agent205c/t296/REPORT.md`, local): a bundle of `b91532d8` into a clone on ERIS (WSL2), `build/`
-and submodules copied from ERIS's own checkout, the five tracks rebuilt there equal to the commit's fingerprints; the
-mame and fbneo lanes at `--scope all` and `ondemand` with `MAME_SANDBOX_LOG` on (`--jobs 8`, two bounded chunks).
-4,437 MAME runs from 183 gates: 4,413 fresh, 24 reused, all `tests/audit_wide_phase_a.sh` (ondemand): its `run_one`
-names a sandbox by the replay alone, and sections A1-A3 each run the 12 corpus replays, so A2 and A3 boot on A1's
-state — #293's shape, a defect, no gate needs `MAME_SANDBOX_REUSE=1`. Proposed, not applied
-(`build/agent205c/t296/proposals/`): key that sandbox by section and replay; step 2's refusal in `tools/run_mame.sh`
-(exit 3 on a reused sandbox unless `MAME_SANDBOX_REUSE=1`), the log writing absolute paths (seven gates pass a relative
-`s1`). Not covered: `run_inp_guarded.sh` and `run_inp_probe.sh` bypass `run_mame.sh` (fresh `mktemp -d` each run), the
-prereq and mister lanes. **Seen on the way, not investigated:** `audit_dmg_legacy_sweep`'s "0 of the 32 ours legs show
-MAME opening" fails on a clean clone on ERIS too (as on PILOT, #291 S4); `audit_flicker_attribution` needs the
-uncommitted masked basis (as on PILOT); `test_wide_profile`'s mtime check fails in a fresh clone; **`audit_marionette_cost`
-(ondemand, in no tier) differs from its frozen expectation** — several hook rows count 8 more replays (`HIT 00895c
-replays 43` → 51), which looks like corpus growth since its freeze, unexplained.
-
-### (11) #299 — THE FOUR OPEN ITEMS MEASURED ON PILOT
-Fork P (report `build/agent205c/t299/REPORT.md`, local): `b91532d8` from a bundle on PILOT, four `--strict --cadence
-freeze` legs: A `--jobs 8` warm (1,269 s), B serial (3,527 s), C `--jobs 8` with the decrypt cache cold (1,272 s), D
-`--jobs 8` under six busy-loops (2,051 s, load ~10 on 6 vCPU). Six failures in every leg, B included, are PILOT's
-environment (#279, #280, #281, the copied `build/`'s staleness, perl locale warnings from the Mac's forwarded
-`LC_CTYPE=UTF-8`, the workbook SKIP). **(1) Serial against `--jobs 8`:** of 620 gate and control logs, 612 identical;
-the only verdict differences are the MRA pair (the collision, (4)); the rest are an unnormalised timestamp, a partial
-copy and two git processes' stderr order. **(2) Cold cache:** the cache rebuilt byte-identical (6 of 6), but five
-gates that read `build/out/*.bin` directly, bypassing `decrypt_view`, FAIL or SKIP cold under the pool
-(`test_tenant_loop`, `test_tenant_row_owner`, `test_thunk_addr_literal`, `test_beam_list_type6`,
-`test_decode_stage_banners`); serial cold not measured. **(3) Collision census** from the #286 trace's writes: 2,912
-paths written by two or more gates; among absolute paths only the jtsim scratch (the known pair) and submodule
-`index.lock`s taken by `git status` (benign). Live: leg A's MRA pair failed on a crossed image, and in leg D
-**`test_mra_build_line`'s control `foreign-rompath` printed `CONTROL DEAD` (it died on the collision) and the runner
-counted it HONOURED** because its mode run exited non-zero. **(4) Under load:** no results or control row moved
-against serial; no gate asserts on an elapsed time. Peak memory of the pool 932 MiB (leg A, 30 processes). Proposed,
-none applied: land the lock; a control whose mode run prints `CONTROL DEAD` or dies outside its perturbation counted
-DIED, not HONOURED; build the decrypt views before the pool (or move the 27 direct readers to `decrypt_view`); trace
-`unlinkat`/`renameat`/`mkdir`/`chdir`; remote scripts set `LC_ALL=C.UTF-8`; a ticket for ~1,690 temp dirs gates leave
-in `/tmp` per four tiers.
-**→ The dead-control item: fixed 2026-10-21 with a narrower rule than proposed, (12); the temp-dir ticket is #303.**
-
-### (9) #229 — THE TWO WRONG JOINS RE-RIGGED; IRA PIANO; THE THREE GOTCHAS
-Fork L (report `build/agent205c/t229/REPORT.md`, local; backups `before_fork_L.tar` and `after_fork_L.tar` beside it).
-**F3's ES Ira Piano row** (the workbook spells it "ES IRA PINO"; the maintainer: *"Ira Pino is a typo, it should be Ira
-Piano"*) now fires `J.63214KK~PP` on both legs (`a2:0x36`, stock 1, 5 staged records against 6 for the bare
-`J.63214KK`); two lines of the draft `es_ex.tsv` changed; FREEZE, freeze-clock and a normal run pass and the five modes
-fail on their own clauses. **F1's row 38** (Tsuji Hayate) is joined to a new state part `BI^`: 4123P (Karame Dama)
-connecting, then 236P of the same strength 30 frames later, entering `a2:0x38>a2:0x39` with two HP falls; red 20,
-white 8 and gauge 8 equal the workbook, startup 6 against its 7 (not looked into); the three neutral 236P events stay
-as measured 6+P with no row; the six modes fail on their own clauses. Both stay drafts in the untracked gates (no
-freeze, no registration). Sheets for the maintainer: `build/agent205c/t229/f1cap/cap9/sheets/BI^_9.png` and
-`build/agent205c/t229/f3cap/cap9/sheets/esex9_JE.png` (row 2, with a tag legend). Our "Ira Pino" spellings corrected;
-the workbook's key, quotes and posted text kept. **The three gotchas** written: `docs/platform/gotchas.md` (the
-`-debug` pass skew; the MAME tap crash at exit), `docs/game/gotchas.md` (the backdash trap); `docs/GOTCHAS.md`
-regenerated.
-**→ Both sheets confirmed by the maintainer 2026-10-21 ("both are correct"), (12).**
-
-### (12) 2026-10-21 — #229'S TWO SHEETS CONFIRMED; #284'S DRAFT EDITED; THE DEAD-CONTROL SCORING FIXED; #302, #303
-The maintainer, on the two re-rigged #229 sheets (`esex9_JE.png` row 2, ES Ira Piano; `BI^_9.png`, Tsuji Hayate):
-*"both are correct"*, and *"I believe #229 must stay open as I still have answers to provide for Q2 especially"*. On
-#284: the maintainer edited the README drafts and template in `build/agent205c/t284/` directly (*"mostly removing the
-deliverables section that held no value since you've downloaded already"*) and asked whether `apply_release.html` needs
-Python: it does not — the page's own text says it builds the romset *"without Python and without a terminal"*, has no
-network code, and names `apply_release.py` only as the fallback for a browser missing what it needs
-(`release/merged-m23/mame/apply_release.html` 105-107, 744-747). #284 stays open (*"let's keep #284 open for next
-session to not block the close of this one"*). Filed at the maintainer's word (*"File the two tickets you proposed to
-file"*): **#302** (`audit_marionette_cost` reads 8 more replays per hook row than frozen on a clean clone) and **#303**
-(static-tier gates leave ~1,690 temp dirs, ~2.3 GB, in `/tmp` over four tiers).
-**The dead-control scoring** (*"Fix the dead-control scoring, then close"*). Fork P's proposed rule — a mode run that
-prints `CONTROL DEAD` for its own control is DIED — **was measured wrong before it was applied**: four gates print their
-OWN `CONTROL DEAD` as their honoured mode in all four PILOT legs (`test_df_startup_provenance` perturbed-expectation,
-`test_defense_rows_census` tenant-row-moved, `test_bundle_parsers` unbundled-leftover and msys-path-untranslated), so it
-would have turned 4 good controls red. A Python exception's last line alone (`FileNotFoundError: …`, the half the
-collision left in the log because the gate quoted only `tail -2` of its generator) is no better:
-`build/emu_rel198_eris/audit_victim_parity@no-translation.log` quotes two child `ValueError`s beside ANOTHER control's
-`CONTROL DEAD` while its own control fired. **The rule landed is the conjunction:** `tests/lib/classify.sh` reads a mode
-run DIED when the gate prints `CONTROL DEAD: <its own control>` AND a Python exception line stands in the log (the
-runners now pass the control's name as a 4th argument). Over 2,351 control logs (#299's four PILOT legs, 1,610; the
-other 139 static and 602 emulator-tier logs under `build/` since 2026-09-01) it matches exactly the one leg-D row.
-Gate: `tests/test_static_runner.sh` section 12d (the dead-beside-crash stub DIED; the own-DEAD and other-DEAD
-look-alikes honoured; must-fire `dead-crash-unread`, a classifier copy with the branch disabled, fires, and FAILS the
-gate as its mode); `test_static_runner` and `test_emulator_runner` PASS, their `crash-unread` modes FAIL. Not covered: a
-foreign failure in a mode run that prints no own `CONTROL DEAD` or no exception line still reads HONOURED (the runner
-scores the exit status). Seen, not ticketed: `audit_victim_parity`'s in-gate controls tenant-planted and timing-planted
-crash building their copies under the no-translation mode (release 198, ERIS).
-
-### CLOSE (14z-205c, 2026-10-21)
-Run by the step table and its driver (`docs/project/session_close.md`, `tools/close.py`; run dir
-`build/agent205c/close`, local). The maintainer: *"Fix the dead-control scoring, then close"*.
-- sections done by hand (pointers on (9) and (11) to (12)); the #292 worktree `build/agent205c/t292/tree` removed after
-  its diff was saved beside it (`nk_worktree.diff`, local); `origin/main` fetched, nothing new;
-- next-session (the 14z-205b opener moved verbatim to `docs/NEXT_SESSION_HISTORY.md`) and rollover (the 14z-205b
-  group, 144 lines, to STATE_HISTORY with its ledger line; no `STATE.md §` citation pointed into it) done by hand;
-  indexes regenerated (`tools/close.py next`); `docs/project/gate_coverage.md` regenerated in a clean worktree of the
-  staged changes (three gate headers changed; the gate index unchanged), where `test_gate_index_current`,
-  `test_gate_coverage_current`, `test_must_fire_census` (259 declaring), `test_gate_descriptions` and
-  `test_gate_follows` PASS;
-- dashboard re-collected for 14z-163..14z-205c (1,834 figures, 0 unclassed) and uploaded (datasets versions 12, 12, 12,
-  13);
-- bookkeeping gates before the tier: `test_tickets`, `test_state_open_lists`, `test_live_budget`,
-  `test_gotchas_index_current`, `test_history_index`, `test_rulings_verbatim` PASS;
-- **#229's untracked gates are again deliberately NOT staged** (Q1 not finished, Q2 pending), nor `build/`;
-- the tier's results file, the next close's `--prev`: `build/agent205c/close/tier_results.tsv`.
-- **the first tier stopped in its plan** (2 h 50 min, 150 of 229 gates judged, no gate run): 5,739 untracked proof
-  sheets under `build/sheets/b91532d88bf3/` counted as changed inputs. `build/sheets/` was moved to
-  `../sheets_aside_14z205c/` (outside the tree, nothing deleted) and the tier re-run; filed **#304** at the maintainer's
-  word (*"Please file a ticket to review what we even include or exclude from the planner"*);
-- `origin/main` fetched again before the re-run: the maintainer's two README commits (`e0bcfd0c`, `2e79bab7`)
-  fast-forwarded in, so the tier covers them.
-- **the restarted tier was red on `test_rule_checker`**: the ledger rows of runs 1153-1158 and 1160 were staged but
-  their run directories were not (untracked, so `git add -u` left them out). The eight run directories (1159 included:
-  prepared and never recorded, which the tree keeps as it keeps `2026-09-18-36`) were staged and the tier re-run with
-  `--confirm` on the red run's results (`tier_results_run2.tsv`), as the tier step says.
+### (6) #305, #306, #307 FILED
+At the maintainer's word: **#305** (#299's two gaps) and **#306** (nine emulator gates default to `build/donovan6`,
+which only `test_m2b_stage6` builds, so a clean checkout's gate order decides whether the others find it — a correction
+of S4-A's "a build the commit does not make" for those nine). **#307** (*"file that ticket"*): `build/` has no retention
+rule for logs and session evidence, 47 GB in 1,134 entries; measure what references each family before pruning.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings

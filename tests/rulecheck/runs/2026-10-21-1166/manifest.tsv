@@ -1,0 +1,34 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent206/t299/closing_comment.md	c003014072f9ea4b651bd3dd94e303c2bdaca64c
+build/agent206/t299/issue_299.txt	c882e3a31195561f723c30e7828599c3dae48b1a
+build/agent205c/t299/REPORT.md	4ae4669dd638965c0a3d7b32f653fd63fb05e298
+build/agent206/t299/REPORT.md	7a18d3a66a3941a41cfe5bbbe72a22b87932751b
+build/agent206/t299/c2/REPORT.md	f4b63b41038748da55f10afee4550811c47c9ff1
+build/agent206/t299/c2/compare_c2.out	40b0987c1d96cbf74c1d0fd9a8e72e56020ad504
+build/agent206/t299/c2/plant_check2.py	aa50f88032050c76f35da414c1baeb44c77f7d5a
+build/agent206/t299/c2/plant_mac2/result_compare_legs_c2.tsv	02816581a90ad4d6201b9bc4bb14d29a4951587b
+build/agent206/t299/c2/plant_mac2/result_compare_legs.tsv	b0962b4130daded879a9235fdef32a53e1bbac34
+build/agent206/t299/c2/epoch_scan.out	8ad7e6d6b7da512be1a2d9481db970c002a95de1
+build/agent206/t299/c2/pilot_BA_normal_c2_full.out	80c34d66f79bcb3518377a8f72340346eb8798c6
+build/agent206/t299/c2/pilot_24_classified.md	bd0e446e9edcf8647b3f11637922fbf797ce5abd
+build/agent206/t299/x2/REPORT.md	14d1a6c88c5c67016aec6fe27b2bddfcd69a176a
+build/agent206/t299/x2/pilot/c2/shared_writes.tsv	84912c9e1885d7cd4a89badd658168e31b271bd9
+build/agent206/t299/x2/pilot/c2/write_read_cross.tsv	36f5be8580d0da9ce278b804333097c8d8f426f5
+build/agent206/t299/x2/pilot/c2/notes.txt	9ca6579a62e14b50ccf4f20c51b4783fc50bac2b
+build/agent206/t299/x2/pilot/ctl/out.json	43ddcc9bed3259ce79a6a769c09221b5b5d21dda
+build/agent206/t299/x2/pilot/ctl/out/shared_writes.tsv	5ac223cbd66509c80eac5beb0ffa13485ed18d85
+build/agent206/t299/x2/pilot/ctl/out_blind.json	ef5c7d63f1257bb59c8c299c7eb1b1960576a149
+build/agent206/t299/x2/pilot/ctl/out_blind/shared_writes.tsv	959d81eb6c516177ed3fecc8592d8acfb8405048
+build/agent206/t299/x2fix/checkdocs.diff	1ab66cc71954f03a531fc12438daf098d52ecaec
+build/agent206/t299/x2fix/gate.log	5cb48437c30630c461968a01a03ee7954eda5009
+build/agent206/t299/x2fix/mode.log	ed6e54ddadc2c1a01ec2b8af18d0592311095f89
+build/agent206/t299/t299.diff	76bad7318408fcf88d3dd38a1ca73c58faacd376
+build/agent206/tier/tier.log	3a039355acff31b5f2d4b2f622489f78a1969222
+build/agent206/tier/confirm2.log.lines-1-218 (lines 1-218 of build/agent206/tier/confirm2.log)	fd1b36b1f6f3199ff4ea9f12807a369d11e629b9
+build/agent206/tier/confirm2.log.lines-219-558 (lines 219-558 of build/agent206/tier/confirm2.log)	0df4c2b2c06141c62c48edc81caad6f571902ff6
+build/agent206/book/test_rule_checker_after1163.log	4eec6ac04dbd344b5c9864dc4c55ec91cb5e2af6
+STATE_HISTORY.md.lines-698-959 (lines 698-959 of STATE_HISTORY.md: its INDEX entry "## Session 14z-205c — **#292 declined; #277, #262, #263 closed; #299's MRA lock and the dead-control")	2f91eb80790591d113928d92fb48dda111cfce87
+DECISIONS_HISTORY.md.lines-7310-7315 (lines 7310-7315 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-19 (14z-205) — #299: a session close runs its tier at `--jobs 8`")	a541ed43ba4d7ab28bda64575575096ae4682aa1
+DECISIONS_HISTORY.md.lines-7585-7593 (lines 7585-7593 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-21 (14z-206) — the landing: one commit at #299's closure; two tickets; S4-B in a wo")	2952bf3f1bc47a15cd31cea9fc11e67f9c154369
+docs/project/gotchas.md.lines-7384-7411 (lines 7384-7411 of docs/project/gotchas.md)	dc47b3529a804b7a7a1193428f3635d268a57a4b
+docs/project/tickets.tsv.lines-82-82 (lines 82-82 of docs/project/tickets.tsv)	a6bc518fee093b5a51185c0052f6d516ee1f740f

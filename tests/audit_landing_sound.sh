@@ -20,6 +20,7 @@
 #   tools/setup_mame.sh tests/lib/sheet.sh
 #
 # SHEET: legs vs2,ours — moments: per tenant, each read of the landing-sound site (the k-th on each leg, at its own frame), each picture EVENT-PROVEN on that leg's own read-tap log in a window around the read; and the first landing by ear, each leg's own -wavwrite capture as a playable clip (the ruled clips, 2026-10-17) — not comparable: each game's stage and palette, and P2's art (each game's own copy; [VSP-168]); the site's address (ours 0x00395E, vs2 0x003994); the clip is the gate's own run to the landing + 120 frames, judged by ear against native's
+# SHEET-BUILD: CTL_BUILD freeze/merged-m22 MERGED — the control leg (must-fire pre-swap-build) runs the build BEFORE #223's swap, which a clean checkout of the commit cannot make (#291 S4-A, the maintainer's Q5)
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged31] [CTL_BUILD=build/m3b_merged30] [KEEP=<dir>] tests/audit_landing_sound.sh
 set -u
@@ -28,10 +29,13 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 : "${ROMDIR:?set ROMDIR}"
 BUILD="${BUILD:-build/m3b_merged31}"
 CTL_BUILD="${CTL_BUILD:-build/m3b_merged30}"   # the build BEFORE #223's swap: the control (merged-m22; NOT a current-build default — a re-point sweep must leave it, 14z-192)
+# CTL_BUILD may be absolute: tools/proof_sheets.py passes the control build it made from freeze/merged-m22 in a second
+# clean checkout (#291 S4-A, 14z-206). A relative one is the repository's, as before.
+case "$CTL_BUILD" in /*) CTL_RP="$CTL_BUILD/rompath" ;; *) CTL_RP="$REPO/$CTL_BUILD/rompath" ;; esac
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
 [ -x "$MAME_BIN" ] || { echo "FAIL: no MAME binary at $MAME_BIN (tools/setup_mame.sh)"; exit 1; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "FAIL: no $BUILD/rompath/vsavjw.zip"; exit 1; }
-[ -f "$CTL_BUILD/rompath/vsavjw.zip" ] || { echo "FAIL: no $CTL_BUILD/rompath/vsavjw.zip (the control build)"; exit 1; }
+[ -f "$CTL_RP/vsavjw.zip" ] || { echo "FAIL: no $CTL_RP/vsavjw.zip (the control build)"; exit 1; }
 W="${KEEP:-$(mktemp -d)}"; mkdir -p "$W"
 [ -n "${KEEP:-}" ] || trap 'rm -rf "$W"' EXIT INT TERM
 echo "== audit_landing_sound (#223): build $BUILD ($(python3 tools/build_fingerprint.py "$BUILD/rompath" --set vsavjw --sha-only 2>/dev/null | cut -c1-8))"
@@ -41,7 +45,7 @@ leg() {  # leg <tenant> <native|ours|ctl> <tap|wav> <frames>
     t=$1; side=$2; kind=$3; fr=$4; J="tests/replays/naming/${t}_1.json"
     pk="$(python3 -c "import json;print(';'.join(json.load(open('$J'))['pokes']))");2000-$((fr - 1)):ff8116:06;2363-$((fr - 1)):ff80d4:0000"
     if [ "$side" = native ]; then s=vsav2; rp="$ROMDIR"; R="$REPO/tests/replays/naming/${t}_1.rpl"; pcs=399a
-    elif [ "$side" = ctl ]; then s=vsavjw; rp="$REPO/$CTL_BUILD/rompath;$ROMDIR"; R="$W/${t}_1.ours.rpl"; pcs=3964
+    elif [ "$side" = ctl ]; then s=vsavjw; rp="$CTL_RP;$ROMDIR"; R="$W/${t}_1.ours.rpl"; pcs=3964
     else s=vsavjw; rp="$REPO/$BUILD/rompath;$ROMDIR"; R="$W/${t}_1.ours.rpl"; pcs=3964; fi
     d="$W/run_$t.$side.$kind"; rm -rf "$d"; mkdir -p "$d"   # never the name of an output file (14z-191: the .wav became this dir)
     if [ "$kind" = tap ]; then

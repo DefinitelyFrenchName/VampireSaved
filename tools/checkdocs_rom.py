@@ -743,6 +743,10 @@ def main():
                     help="rewrite the covered-set TSV from this run")
     ap.add_argument("--check-covered", action="store_true",
                     help="every frozen covered row must still be covered")
+    ap.add_argument("--covered", metavar="PATH",
+                    help="the covered-set TSV to check or freeze instead of the tracked "
+                         + COVERED_TSV + " (a gate's control perturbs a COPY, never the "
+                         "tracked file: other gates read it while a --jobs tier runs, #299)")
     args = ap.parse_args()
     root = Path(args.root).resolve()
 
@@ -791,7 +795,7 @@ def main():
     covered = total = 0
     if not args.only and not args.doc:
         covered, total = report_uncovered(root, args.uncovered)
-        tsv = root / COVERED_TSV
+        tsv = Path(args.covered).resolve() if args.covered else root / COVERED_TSV
         if args.freeze:
             n = write_covered(root, tsv)
             print("  froze %d covered rows -> %s" % (n, COVERED_TSV))

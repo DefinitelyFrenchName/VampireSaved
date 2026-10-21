@@ -1,0 +1,7 @@
+  FLAG D-ABSOLUTE: The only verdict difference is the MRA pair (item 3).  [build/agent206/t299/closing_comment.md]
+  FLAG D-ABSOLUTE: 415 of 415 controls were executed and honoured, none died.  [build/agent206/t299/closing_comment.md]
+  FLAG D-ABSOLUTE: Among absolute paths, only two classes:  [build/agent206/t299/closing_comment.md]
+  FLAG D-ABSOLUTE: **Not covered**, so nothing here claims them:  [build/agent206/t299/closing_comment.md]
+  FLAG D-ABSOLUTE: - The collision census traced opens only: no unlink, rename or mkdir, and one trace run.  [build/agent206/t299/closing_comment.md]
+  FLAG D-ABSOLUTE: - Under load: one loaded run only.  [build/agent206/t299/closing_comment.md]
+packet_check: 6 flag(s): D-ABSOLUTE 6

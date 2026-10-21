@@ -19,7 +19,7 @@
 # MUST-FIRE: perturbed-copy: flipped-rom-byte — one byte flipped at a checked address, in a copy of the view, must be a MISMATCH
 # MUST-FIRE: perturbed-copy: paraphrase-literal — the PARAPHRASE claim's literal fact perturbed in a copy of the view must be a MISMATCH (the declared class cannot degrade into a silent skip)
 # MUST-FIRE: shadow-tool: vacuous-validator — a copy of the checker with a @table validator weakened to accept anything must be reported Vacuous
-# MUST-FIRE: perturbed-copy: dropped-covered-row — a frozen covered row the run does not reach must be reported (the frozen set is perturbed on a copy and restored)
+# MUST-FIRE: perturbed-copy: dropped-covered-row — a frozen covered row the run does not reach must be reported (a COPY of the frozen set is perturbed and passed with --covered; the tracked file is never written)
 #
 # WHAT IT HOLDS. `tools/checkdocs_rom.py` runs every registered check over the
 # tree: each QUOTES its claim from the atlas (`says()`, so a check cannot
@@ -124,18 +124,18 @@ PY
 cmp -s "$W/weak.py" tools/checkdocs_rom.py && bad "control 4: the tool perturbation did not apply"
 COV=tests/expected/checkdocs_rom_covered.tsv; cp "$COV" "$W/cov.bak"                       # 5: a frozen row the run does not reach
 { cat "$W/cov.bak"; printf 'venue_pointer_table\tvenue_assets.md\tPRG:0x38C258\n'; } > "$W/cov.new"
-RUN_TOOL=tools/checkdocs_rom.py; RUN_ROOT=""; RUN_VIEWS="$W/views"
+RUN_TOOL=tools/checkdocs_rom.py; RUN_ROOT=""; RUN_VIEWS="$W/views"; RUN_COV=""
 case "$VS_CTL" in
 reworded-claim)     RUN_ROOT="--root $W/root1" ;;
 flipped-rom-byte)   RUN_VIEWS="$W/v2" ;;
 paraphrase-literal) RUN_VIEWS="$W/v3" ;;
 vacuous-validator)  RUN_TOOL="$W/weak.py" ;;
-dropped-covered-row) cp "$W/cov.new" "$COV"; trap 'cp "$W/cov.bak" "$COV"; rm -rf "$W"' EXIT INT TERM ;;
+dropped-covered-row) RUN_COV="--covered $W/cov.new" ;;
 esac
 
 echo "== 2. every check, over the tree"
 out="$W/run.txt"
-python3 "$RUN_TOOL" $RUN_ROOT --views "$RUN_VIEWS" --check-covered > "$out" 2>&1
+python3 "$RUN_TOOL" $RUN_ROOT --views "$RUN_VIEWS" --check-covered $RUN_COV > "$out" 2>&1
 rc=$?
 [ "$rc" = 0 ] || { sed 's/^/    /' "$out"; bad "checkdocs_rom exited $rc"; }
 grep -q '^MISMATCH' "$out" && bad "a check disagreed with the image"
@@ -190,15 +190,16 @@ ctl vacuous-validator  "Vacuous"                       "$W/root"  "$W/views" "$W
 
 # 5 — a frozen covered row the run does not reach (0x38C258 is an atlas
 # address the venue check deliberately does NOT read: the document says it is
-# NOT a table). Compared as a MULTISET, so a duplicated row fails too. The
-# frozen file is perturbed IN PLACE and restored; under the mode section 2
-# already ran on the perturbed file, which the EXIT trap restores.
-cp "$W/cov.new" "$COV"
-_b=$(wc -l < "$W/cov.bak"); _a=$(wc -l < "$COV")
+# NOT a table). Compared as a MULTISET, so a duplicated row fails too. A COPY
+# of the frozen file is perturbed and handed to the checker with --covered; the
+# tracked file is never written (until 14z-206 it was perturbed IN PLACE and
+# restored, and five tree-scanning gates read it while a --jobs tier ran: the
+# #299 re-traced write census on PILOT).
+_b=$(wc -l < "$W/cov.bak"); _a=$(wc -l < "$W/cov.new")
 if [ "$_a" -ne $((_b + 1)) ]; then
     vs_ctl_dead dropped-covered-row "the frozen-set perturbation did not apply"; bad "control 5"
 else
-    python3 tools/checkdocs_rom.py --views "$W/views" --check-covered > "$W/c5.txt" 2>&1
+    python3 tools/checkdocs_rom.py --views "$W/views" --check-covered --covered "$W/cov.new" > "$W/c5.txt" 2>&1
     _rc=$?
     if [ "$_rc" = 0 ]; then
         vs_ctl_dead dropped-covered-row "a frozen row the run does not cover still exited 0"; bad "control 5"
@@ -208,7 +209,6 @@ else
         sed 's/^/    /' "$W/c5.txt"; vs_ctl_dead dropped-covered-row "exited $_rc but not for the stated reason"; bad "control 5"
     fi
 fi
-cp "$W/cov.bak" "$COV"
-cmp -s "$W/cov.bak" "$COV" || bad "control 5: the frozen set was not restored"
+cmp -s "$W/cov.bak" "$COV" || bad "control 5: the tracked frozen set changed during the run (the control must perturb a copy)"
 
 if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi

@@ -482,6 +482,36 @@ def stale_reason(root, rch, blob, c, pats):
     return None
 
 
+# predict()'s judgment of one gate for one changed path, in three parts it calls and tools/trace_static_reads.py
+# calls too (14z-206, #286): the scorer judged each traced read by stale_reason alone and never applied N-F-CHANGE, so a
+# run-record read the predictor carries was invisible to it (rule-checker run 2026-10-20-1156).
+def runs_reader(root, rch, blob):
+    """N-F-CHANGE's test, once per gate: does the reach name `rulecheck/runs`?"""
+    return "rulecheck/runs" in blob
+
+
+def change_reason(root, rch, blob, c, pats, reader):
+    """the rule that makes this gate STALE for the changed path c, R4 aside (whole_covers): none for the session
+    scratch (N-D) or for a run record when the reach reads none (`reader`, runs_reader's answer), else stale_reason's"""
+    if drop_scratch(c):   # N-D
+        return None
+    if c.startswith(RUNS_DATA) and not reader:   # N-F-CHANGE
+        return None
+    return stale_reason(root, rch, blob, c, pats)
+
+
+_WHOLE_HIT = {}
+
+
+def whole_covers(blob, c):
+    """R4 for the changed path c: in this version every path, once the reach reads the whole tree (searched once per
+    blob)"""
+    k = hash(blob)
+    if k not in _WHOLE_HIT:
+        _WHOLE_HIT[k] = bool(WHOLE.search(blob))
+    return _WHOLE_HIT[k]
+
+
 def changed_set(root, base, head, extra):
     out = set(extra)
     if base:
@@ -537,14 +567,13 @@ def predict(root, changed, r1=None, progress=None):
             progress(n, len(gates))
         rch = reach(root, g, files)
         blob = "\n".join(text(root, p) for p in rch)
+        reader = runs_reader(root, rch, blob)
         why = None
         for c in eff:
-            if c.startswith(RUNS_DATA) and "rulecheck/runs" not in blob:   # N-F-CHANGE
-                continue
-            why = stale_reason(root, rch, blob, c, pats[c])
+            why = change_reason(root, rch, blob, c, pats[c], reader)
             if why:
                 break
-        if not why and changed and WHOLE.search(blob):
+        if not why and changed and any(whole_covers(blob, c) for c in changed):   # R4
             where = next((p for p in rch if WHOLE.search(text(root, p))), "?")
             why = f"R4 {where} reads the whole tree"
         if why:

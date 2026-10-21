@@ -53,13 +53,16 @@ CORPUS="${*:-01_attract_long 02_demitri_vs_cpu 03_two_player_vs 04_select_fuzz \
 10_midattract_start 29_felicia_walljump 30_demitri_throw}"
 
 run_one() { # $1=script $2=replay $3=outfile $4=frames  (extra env passed through)
-    mkdir -p "$WORK/$2"
+    # one sandbox per (section, replay): keyed by the replay alone, A2 and A3 booted on the state A1's run of the
+    # same replay left (#296 step 1 on ERIS, 14z-205c: 24 reused runs, every one here)
+    _sb="$WORK/${1%.lua}_$2"
+    mkdir -p "$_sb"
     # MAME can segfault during teardown after manager.machine:exit() — a
     # known cosmetic race in this harness. The log is fully written before
     # that, so the exit code is not evidence; every caller asserts on the
     # instrument's own SUMMARY line instead.
     REPLAY="$REPO/tests/replays/$2.rpl" FRAMES="$4" TRACE_OUT="$3" \
-        CHECKSUM_OUT="$WORK/$2/c.log" MAME_SANDBOX="$WORK/$2" \
+        CHECKSUM_OUT="$_sb/c.log" MAME_SANDBOX="$_sb" \
         MAME_ROMPATH="$ROMDIR" tools/run_mame.sh vsavj \
         -autoboot_script "$REPO/tests/lua/$1" > /dev/null 2>&1 || true
 }

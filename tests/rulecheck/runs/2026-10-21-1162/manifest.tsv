@@ -1,0 +1,22 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent206/t299/closing_comment.md	1a07d4a301657bdeb55f366ad13c5d934de31ad2
+build/agent206/t299/issue_299.txt	c882e3a31195561f723c30e7828599c3dae48b1a
+build/agent205c/t299/REPORT.md	4ae4669dd638965c0a3d7b32f653fd63fb05e298
+build/agent206/t299/REPORT.md	7a18d3a66a3941a41cfe5bbbe72a22b87932751b
+build/agent206/t299/c2/REPORT.md	f4b63b41038748da55f10afee4550811c47c9ff1
+build/agent206/t299/c2/serial/runner.log	d318afcd4ac6b2fb64d5779982f66dd177b2890a
+build/agent206/t299/c2/pool/runner.log	35753dd661181e9a7fcb4718c657248739337e87
+build/agent206/t299/c2/compare_c2.out	40b0987c1d96cbf74c1d0fd9a8e72e56020ad504
+build/agent206/t299/c2/compare_orig_strict.out	de42114b2c487e3411b1925d17af68d9a6c79082
+build/agent206/t299/c2/plant_mac/result_c2.tsv	ab964718e97161b73974b6f91b6885d57e69e4dd
+build/agent206/t299/c2/plant_mac/result_orig.tsv	eeedc92101a5cdd603bceae49594203b9a717710
+build/agent206/t299/c2/pilot_BA_normal_c2.out	4855234855dcdae739ba2beb094e4ce3cbec2fb7
+build/agent206/t299/c2/pilot_16_read.txt	2c40706e14bb20ef50b64d13fb4fe1b7eccf0a5f
+build/agent206/t299/t299.diff	76bad7318408fcf88d3dd38a1ca73c58faacd376
+build/agent206/tier/tier.log	3a039355acff31b5f2d4b2f622489f78a1969222
+build/snapshot_runs/20261021T164034-04a537694b90/results.tsv	dfcbc96c2935408b3811a8f3cb1bac0c413e55bf
+STATE_HISTORY.md.lines-698-959 (lines 698-959 of STATE_HISTORY.md: its INDEX entry "## Session 14z-205c — **#292 declined; #277, #262, #263 closed; #299's MRA lock and the dead-control")	2f91eb80790591d113928d92fb48dda111cfce87
+DECISIONS_HISTORY.md.lines-7310-7315 (lines 7310-7315 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-19 (14z-205) — #299: a session close runs its tier at `--jobs 8`")	a541ed43ba4d7ab28bda64575575096ae4682aa1
+DECISIONS_HISTORY.md.lines-7585-7593 (lines 7585-7593 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-21 (14z-206) — the landing: one commit at #299's closure; two tickets; S4-B in a wo")	2952bf3f1bc47a15cd31cea9fc11e67f9c154369
+docs/project/gotchas.md.lines-7384-7397 (lines 7384-7397 of docs/project/gotchas.md)	5678a2db6bc0d1bb4c6a9c911e9e8df268ce429f
+docs/project/tickets.tsv.lines-82-82 (lines 82-82 of docs/project/tickets.tsv)	ead8ed61ea8f5a8cf94dc9f3e7a2d7bd1a81277f

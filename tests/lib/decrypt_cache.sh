@@ -26,8 +26,17 @@
 #   . "$REPO/tests/lib/decrypt_cache.sh"
 #   decrypt_view vsavj "$WORK/vj_op.bin" "$WORK/vj_data.bin"   # data optional
 #
+#   decrypt_cache_ensure vsavj    # build the cache if missing or short, deliver nothing
+#
 # Needs ROMDIR only when the cache has to be built. The cache lives in
 # build/out/, shared with the builders, so a suite run warms it for them too.
+#
+# THE RUNNER WARMS IT FIRST (#299, 14z-206). 36 gate scripts name build/out/<set>_{opcodes,
+# data}.bin and read it DIRECTLY, not through decrypt_view, and so do the generator and ten
+# other tools that more gates run (census of 14z-206). A cold cache used to be warmed only by the first decrypt_view caller,
+# so under `--jobs 8` five such gates ran before it and failed or SKIPped (#299,
+# measured on PILOT at 14z-205c). tests/run_all_static.sh calls decrypt_cache_ensure
+# for every reference set before its static tier, serial or pooled.
 
 # Reference-set program images are 4 MiB. A decrypt that produces anything
 # else did not finish, whatever its exit status said.
@@ -40,9 +49,9 @@ _dv_ok() {  # _dv_ok <path> -> 0 if present and full-length
     [ "$(_dv_size "$1")" = "$DECRYPT_VIEW_SIZE" ]
 }
 
-# decrypt_view <set> <op_dest> [<data_dest>]
-decrypt_view() {
-    _dv_set="$1"; _dv_op="$2"; _dv_dat="${3:-}"
+# decrypt_cache_ensure <set> -> 0 when build/out holds both full-length views of <set>
+decrypt_cache_ensure() {
+    _dv_set="$1"
     _dv_repo="${REPO:?decrypt_view needs REPO set}"
     _dv_cop="$_dv_repo/build/out/${_dv_set}_opcodes.bin"
     _dv_cdat="$_dv_repo/build/out/${_dv_set}_data.bin"
@@ -54,8 +63,11 @@ decrypt_view() {
         mkdir -p "$_dv_repo/build/out"
         # ATOMIC: decrypt to temp names and rename only on success, so an
         # interrupted run can never leave a short file at the cache path for
-        # the next `[ -f ]` to accept.
-        _dv_tmp="$(mktemp -d)"
+        # the next `[ -f ]` to accept. The temp dir sits INSIDE build/out so the
+        # mv is a rename on one filesystem (#299, 14z-206): from $TMPDIR on another
+        # filesystem mv copies, and a concurrent direct reader can open a part-written
+        # file. Two callers racing on a cold set each rename a full image; the last wins.
+        _dv_tmp="$(mktemp -d "$_dv_repo/build/out/.decrypt.XXXXXX")"
         if ! python3 "$_dv_repo/tools/cps2_decrypt.py" "$ROMDIR/${_dv_set}.zip" \
                 "$_dv_tmp/op.bin" --data-out "$_dv_tmp/dat.bin" >/dev/null 2>&1; then
             echo "decrypt_view: cps2_decrypt failed for $_dv_set" >&2
@@ -71,6 +83,13 @@ decrypt_view() {
         mv "$_dv_tmp/dat.bin" "$_dv_cdat"
         rm -rf "$_dv_tmp"
     fi
+    return 0
+}
+
+# decrypt_view <set> <op_dest> [<data_dest>]
+decrypt_view() {
+    _dv_op="$2"; _dv_dat="${3:-}"
+    decrypt_cache_ensure "$1" || return 1
 
     cp "$_dv_cop" "$_dv_op" || return 1
     [ -n "$_dv_dat" ] && { cp "$_dv_cdat" "$_dv_dat" || return 1; }

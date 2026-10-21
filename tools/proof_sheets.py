@@ -20,6 +20,13 @@ THE DECLARATION, read the way `# MUST-FIRE:` is (one line in the leading comment
 A `legs` gate must source tests/lib/sheet.sh. tests/test_sheet_census.sh holds every emulator-registry gate to one
 well-formed line, against a shrink-only debt list (tests/expected/sheet_debt.txt): the S2 retrofit's work list.
 
+A CONTROL BUILD (#291 S4-A, 14z-206, the maintainer's Q5 "Both as recommended"): a gate whose control leg runs a build
+the commit does not make declares it, one line each, in the same leading block:
+    # SHEET-BUILD: <VAR> <freeze/tag> <TRACK> — <why the gate needs it>
+`run` then checks the tag's commit out in a SECOND clean checkout (build/sheets/<sha>.ctl.tree), builds it there by the
+same recipe, refuses unless every track equals that commit's own frozen reference (and TRACK the tag's program key),
+passes VAR=<that build's dir> to the gate, and the page labels it "control build, from <tag>, not the commit".
+
 SLICE S3 (14z-205): "OURS" IS BUILT FROM THE COMMIT ("Built from the commit", ruled 2026-10-16). `run <commit>` bundles
 the commit, clones it into a CLEAN CHECKOUT (never the working tree), builds there the five tracks the commit's own
 runner defaults name (tests/run_all_emulator.sh: MERGED DON HUI PYR STOCK) by the commit's reproducibility recipe
@@ -50,6 +57,7 @@ TOOL_ROOT = ROOT                          # the repository this file sits in; `r
 ROLES = ("vs2", "vsavj", "ours")          # row order on a sheet: native vs2 on top, then vsavj, then ours (#177)
 BASES = ("log", "ram", "fields", "file", "event", "none")
 DECL = re.compile(r"^#\s*SHEET:\s*(.*)$")
+SHEET_BUILD = re.compile(r"^#\s*SHEET-BUILD:\s*(.*)$")
 DASH = re.compile(r"\s+(?:—|--)\s+")
 
 
@@ -99,6 +107,23 @@ def parse_declaration(path):
         if not fields.get(need):
             return None, "a legs declaration needs `— %s: <text>`" % need
     return {"kind": "legs", "roles": roles, "moments": fields["moments"], "not_comparable": fields["not comparable"]}, None
+
+
+def parse_sheet_builds(path):
+    """-> ([{var, tag, track, why}], [errors]): the gate's `# SHEET-BUILD:` lines (its control builds)."""
+    out, errs = [], []
+    for l in leading_block(path):
+        m = SHEET_BUILD.match(l)
+        if not m:
+            continue
+        parts = DASH.split(m.group(1).strip(), maxsplit=1)
+        f = parts[0].split()
+        why = parts[1].strip() if len(parts) > 1 else ""
+        if len(f) != 3 or not re.match(r"^[A-Z_][A-Z0-9_]*$", f[0]) or not f[1].startswith("freeze/") or f[2] not in TRACKS or not why:
+            errs.append("`# SHEET-BUILD:` must read `<VAR> <freeze/tag> <%s> — <why>` (got %r)" % ("|".join(TRACKS), m.group(1)[:80]))
+            continue
+        out.append({"var": f[0], "tag": f[1], "track": f[2], "why": why})
+    return out, errs
 
 
 def sources_sheet_lib(path):
@@ -192,7 +217,7 @@ def read_sheet(d):
         if kind == "leg":
             if f[3] not in ROLES:
                 raise ValueError("sheet.tsv:%d: role %r" % (n, f[3]))
-            s["legs"][f[2]] = {"leg": f[2], "role": f[3], "set": f[4], "rompath": f[5], "replay": f[6],
+            s["legs"][f[2]] = {"leg": f[2], "role": f[3], "set": f[4], "rompath": abs_rompath(f[5]), "replay": f[6],
                                "pokes": "" if f[7] == "-" else f[7], "frames": int(f[8]),
                                "log": None if f[9] == "-" else f[9], "mask": "" if f[10] == "-" else f[10]}
         elif kind == "moment":
@@ -222,6 +247,14 @@ def read_sheet(d):
                     raise ValueError("sheet.tsv:%d: tap env entry %r is not NAME=value" % (n, kv))
             s["legs"][f[2]]["tap"] = {"script": f[3], "env": env}
     return [sheets[k] for k in order]
+
+
+def abs_rompath(rp):
+    """A leg's rom path with each relative element made absolute against ROOT, the tree its gate ran in (gates run
+    from it: run_gate's cwd). A capture runs in its own work directory, where a relative element names nothing and MAME
+    falls through to the next element: #291 S4-A (14z-206) measured test_gfx_menus' ours leg, recorded as
+    `build/m5_stock22/rompath;$ROMDIR` (the registry's %STOCK_RP%), re-run on PRISTINE vsavj from ROMDIR."""
+    return ";".join(e if not e.strip() or os.path.isabs(e) else str(ROOT / e) for e in rp.split(";"))
 
 
 def read_log(path):
@@ -440,8 +473,8 @@ def prove_dir(sheet_dir, jobs=4):
 
 
 # ── running the gates ───────────────────────────────────────────────────────────────────────────────────────────
-def runner_defaults():
-    txt = (ROOT / "tests/run_all_emulator.sh").read_text()
+def runner_defaults(root=None):
+    txt = (Path(root or ROOT) / "tests/run_all_emulator.sh").read_text()
     return dict(re.findall(r'^(MERGED|DON|HUI|PYR|STOCK)="\$\{\w+:-([^}]*)\}"', txt, re.M))
 
 
@@ -463,10 +496,10 @@ def verdict_line(text):
     return hit or "no verdict line"
 
 
-def run_gate(row, sheet_dir, log):
+def run_gate(row, sheet_dir, log, extra_env=None):
     gate, args = row[0], row[4] if len(row) > 4 else "-"
     tmo = int(row[6]) if len(row) > 6 and row[6].strip().isdigit() else 5400
-    env, pos = dict(os.environ, SHEET_OUT=str(sheet_dir)), []
+    env, pos = dict(os.environ, SHEET_OUT=str(sheet_dir), **(extra_env or {})), []
     if args.strip() not in ("", "-"):
         for tok in expand(args, runner_defaults()).split():
             if re.match(r"^[A-Z_][A-Z0-9_]*=", tok) and not pos:
@@ -592,6 +625,8 @@ def page(out_dir, meta):
         by_test.append(gid)
         body.append('<h2 id="%s">%s</h2><div class="mut">gate verdict: %s (%ss)</div>' % (
             gid, html.escape(gid), html.escape(g["verdict"]), g["seconds"]))
+        for cb in g.get("control_builds", []):          # Q5 (14z-206): a control leg's build is said, never silent
+            body.append('<div class="nc"><b>Control build:</b> %s</div>' % html.escape(cb))
         if gid in notes:
             body.append('<div class="note">%s</div>' % note_html(notes[gid]))
         for s in g.get("sheets", []):
@@ -721,7 +756,7 @@ def check_builds(built, expect):
 
 def build_commit(tree, romdir, logs, reuse):
     """Build the runner-default tracks in the checkout. -> (record, problems)."""
-    names = runner_defaults()                            # ROOT is the checkout: the commit's own names
+    names = runner_defaults(tree)                        # the checkout's own names (the commit's, or a control's)
     missing = [t for t in TRACKS if t not in names]
     if missing:
         return None, ["the commit's tests/run_all_emulator.sh names no default for %s" % ", ".join(missing)]
@@ -746,6 +781,55 @@ def build_commit(tree, romdir, logs, reuse):
     rec = {"tracks": {t: {"dir": names[t], "set": TRACK_SET[t], "fingerprint": built[t], "frozen": expect.get(TRACK_EXPECT[t])} for t in TRACKS}}
     rec_p.write_text(json.dumps(rec, indent=1))
     return rec, check_builds(built, expect)
+
+
+def tag_program_key(tag):
+    """The freeze tag's own `program key` line (its message), or None."""
+    r = subprocess.run(["git", "cat-file", "-p", tag], cwd=TOOL_ROOT, capture_output=True, text=True)
+    m = re.search(r"^program key\s+([0-9a-f]{40})\s*$", r.stdout, re.M)
+    return m.group(1) if m else None
+
+
+def control_check(tag, track, built, want):
+    """-> problems: the control track must be the build the tag names (its `program key`), or the run says so."""
+    if not want:
+        return ["%s carries no `program key` line: nothing says which build it froze" % tag]
+    if built != want:
+        return ["%s: %s built %s, the tag's program key is %s" % (tag, track, built, want)]
+    return []
+
+
+def control_build(tag, track, out, romdir, bundle):
+    """A control build: `tag`'s commit in a second clean checkout, built by the recipe, every track its own frozen
+    reference and `track` the tag's program key. -> (build dir | None, provenance line, problems). A checkout and build
+    a previous run of this tag made are re-used and re-fingerprinted (the commit is fixed, so the build is too)."""
+    sha = subprocess.run(["git", "rev-parse", "--verify", "--quiet", tag + "^{commit}"], cwd=TOOL_ROOT,
+                         capture_output=True, text=True).stdout.strip()
+    if not sha:
+        return None, "", ["%s does not resolve to a commit in %s (a --host run carries no tags: not supported)" % (tag, TOOL_ROOT)]
+    ctree = (Path(out).parent / ("%s.ctl.tree" % sha[:12])).resolve()
+    reuse = ctree.exists() and any(ctree.iterdir())
+    if bundle is None and not reuse:
+        bundle = Path(out) / ("ctl_%s.bundle" % sha[:12])
+        err = make_bundle(sha, bundle)
+        if err:
+            return None, "", ["could not bundle %s (%s): %s" % (tag, sha[:12], err)]
+    print("== the control build %s (%s): a second clean checkout at %s" % (tag, sha[:12], ctree), flush=True)
+    err = make_checkout(sha, ctree, bundle, reuse)
+    if err:
+        return None, "", ["%s: %s" % (tag, err)]
+    rec, problems = build_commit(ctree, romdir, Path(out) / ("build_logs_ctl_%s" % sha[:12]), reuse and (ctree / ".proof_build.json").exists())
+    if problems:
+        return None, "", ["%s: %s" % (tag, p) for p in problems]
+    tr = rec["tracks"][track]
+    want = tag_program_key(tag)
+    problems = control_check(tag, track, tr["fingerprint"], want)
+    if problems:
+        return None, "", problems
+    d = ctree / tr["dir"]
+    prov = "control build, from %s, not the commit: %s %s (%s) = %s's frozen reference and the tag's program key, built in a second clean checkout (%s)" % (
+        tag, track, tr["dir"], tr["fingerprint"], sha[:12], ctree)
+    return d, prov, []
 
 
 def is_tracked(tree, rel):
@@ -1044,11 +1128,33 @@ def cmd_run(a):
             meta["no_picture"].append(r[0])
         elif d["kind"] == "legs":
             declared.append(r)
+    controls = {}                                        # (tag, track) -> (dir, provenance, problems), built once a run
     for r in declared:
         g = r[0]
         sd = out / "gates" / g
+        extra, ctl_lines, ctl_problems = {}, [], []
+        cbs, errs = parse_sheet_builds(ROOT / "tests" / (g + ".sh"))
+        ctl_problems += errs
+        for cb in cbs:
+            key = (cb["tag"], cb["track"])
+            if key not in controls:
+                controls[key] = control_build(cb["tag"], cb["track"], out, romdir, bundle)
+                if controls[key][1]:
+                    meta["provenance"].append(controls[key][1])
+            d, prov, probs = controls[key]
+            ctl_problems += probs
+            if d is not None:
+                extra[cb["var"]] = str(d)
+                ctl_lines.append("%s = %s" % (cb["var"], prov))
+        if ctl_problems:
+            for p in ctl_problems:
+                print("REFUSED (%s): %s" % (g, p), flush=True)
+            meta["gates"].append({"gate": g, "rc": 2, "seconds": 0, "tickets": [],
+                                  "verdict": "NOT RUN: its control build was refused (%s)" % "; ".join(ctl_problems)[:300]})
+            continue
         print("== %s: running the gate with SHEET_OUT" % g, flush=True)
-        res = run_gate(r, sd, out / ("%s.log" % g))
+        res = run_gate(r, sd, out / ("%s.log" % g), extra)
+        res["control_builds"] = ctl_lines
         print("   %s (exit %d, %ds)" % (res["verdict"], res["rc"], res["seconds"]), flush=True)
         res["tickets"] = sorted(set(re.findall(r"#(\d+)", "\n".join(leading_block(ROOT / "tests" / (g + ".sh"))))))
         if not (sd / "sheet.tsv").exists():

@@ -18,11 +18,14 @@ WHAT EACH STEP DOES.
            DIR/gates.txt, DIR/head.txt (the HEAD traced) and DIR/done.tsv (gate, exit status, seconds). Run it on the
            commit whose predictor is to be scored, with ROMDIR set (a gate that SKIPs reads less).
   score    for every traced gate, every repo file it OPENED for reading — tracked, or untracked and not ignored (the
-           predictor's input is the change set, never an ignored file) — must make the predictor mark the gate STALE
-           (its `stale_reason`, or R4, the whole-tree reader). A read it does not flag is a MISS, and so is a read the
-           predictor's change set drops (`drop_scratch`, N-D, #274) in a gate that is not a whole-tree reader. The predictor is
-           imported from --tools (default: this tree's tools/), so the same traces score any version of it. Exit 1 on
-           a miss. The gates that exited non-zero under the trace are NAMED: their reads may be short of a passing run's.
+           predictor's input is the change set, never an ignored file) — must make the predictor mark the gate STALE,
+           judged as `predict()` judges a changed path, by the predictor's own functions: `change_reason` (the change
+           set's drop of the session scratch, N-D, #274; a run record no change for a reach that reads none,
+           N-F-CHANGE; then `stale_reason`) or R4 for that path (`whole_covers`). A read it does not flag is a MISS.
+           Until 14z-206 (#286) the scorer called `stale_reason` itself and never applied N-F-CHANGE, so a run-record
+           read the predictor carries was invisible (rule-checker run 2026-10-20-1156); a predictor without those three
+           functions is REFUSED. The predictor is imported from --tools (default: this tree's tools/), so the same
+           traces score any version of it from 14z-206 on. Exit 1 on a miss. The gates that exited non-zero under the trace are NAMED: their reads may be short of a passing run's.
   control  the same traces scored by a deliberately OVER-NARROWED copy of this tree's predictor (N-A at every depth
            under build/, N-B on every basename, R6's directory templates off), which MUST miss: a scorer that cannot
            find a miss there is blind, and its clean score elsewhere means nothing. Exit 0 when the control fired.
@@ -122,6 +125,16 @@ def reads_of(root, st, files):
 _W = {}
 
 
+def judged(tools):
+    """REFUSED for a predictor older than its shared judgment (14z-206): scoring it by stale_reason alone would hide
+    every read N-F-CHANGE carries, the blind spot rule-checker run 2026-10-20-1156 found"""
+    s = open(os.path.join(tools, "static_confirm.py")).read()
+    missing = [f for f in ("change_reason", "runs_reader", "whole_covers") if f"\ndef {f}(" not in s]
+    if missing:
+        sys.exit(f"REFUSED: the predictor in {tools} has no {', '.join(missing)}: it predates the scorer's shared "
+                 "judgment (14z-206, #286); score it with the scorer of its own commit, and say that one cannot see N-F-CHANGE")
+
+
 def _init(root, tools, traces):
     os.chdir(root)
     sc, br = load_predictor(tools)
@@ -136,14 +149,17 @@ def _score_one(g):
     reads, rel = reads_of(root, st, _W["files"])
     rch = sc.reach(root, g, _W["idx"])
     blob = "\n".join(sc.text(root, p) for p in rch)
-    whole = bool(sc.WHOLE.search(blob))
-    dropped = getattr(sc, "drop_scratch", lambda c: False)   # N-D: a read the change set drops is a miss
-    miss = [c for c in sorted(reads) if not (whole or (not dropped(c) and sc.stale_reason(root, rch, blob, c, sc.patterns(c))))]
+    # each read judged as predict() judges a changed path, by the predictor's own functions (14z-206, #286): N-D, N-F-
+    # CHANGE and stale_reason (change_reason), R4 per path (whole_covers)
+    judge = sc.change_reason
+    reader = sc.runs_reader(root, rch, blob)
+    miss = [c for c in sorted(reads) if not (sc.whole_covers(blob, c) or judge(root, rch, blob, c, sc.patterns(c), reader))]
     return g, len(reads), miss, rel
 
 
 def score(root, traces, tools, jobs, label):
-    gates = [g.strip() for g in open(os.path.join(traces, "gates.txt")) if g.strip()]
+    judged(tools)
+    gates =[g.strip() for g in open(os.path.join(traces, "gates.txt")) if g.strip()]
     with mp.Pool(jobs, initializer=_init, initargs=(root, tools, traces)) as pool:
         res = pool.map(_score_one, gates, chunksize=1)
     traced = sum(1 for r in res if r[1] is not None)

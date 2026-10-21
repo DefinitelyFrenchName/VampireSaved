@@ -355,305 +355,48 @@ def package(a, rel):
         print(f"  applied set key: {manifest['applied_set_key'][:8]}")
 
 
-def readme(a, m, npatch, ncopy):
-    """THE END-USER README (common part; tools/package_release_platforms.py
-    appends the per-platform "Play on …" section). Written for someone who
-    owns the dumps and has never seen this project; the inventory of what a
-    release is and is not is docs/project/release_format.md (ruled 2026-09-11).
-    The diagnostics in "If it does not work" are MEASURED (STATE 14z-148)."""
-    zips = ", ".join(sorted(m["zips"]))
-    key = (m["build_fingerprint"] or "?")[:8]
-    akey = (m.get("applied_set_key") or "?")[:8]
-    akeymin = (m.get("applied_set_key_no_qsound_bios") or "?")[:8]
-    fillrows = m.get("standalone_completion") or []
-    nfill = len(fillrows)
+def fill_text(m):
+    """The standalone completion in words, grouped by the dump each copy comes from:
+    "`dl-1425.bin` from `qsound_hle.zip` (the optional one), and `vm3.11m`, … from `vsav.zip`"."""
     opt = {e["member"] for z in m.get("zips", {}).values() for e in z if e.get("optional")}
-    fill = ", ".join(r + (" (optional)" if r.split(" <- ")[0] in opt else "")
-                     for r in fillrows) if fillrows else "none"
-    return f"""# VAMPIRE SAVED — {m['name']}
+    groups = {}
+    for r in m.get("standalone_completion") or []:
+        mem, src = r.split(" <- ")
+        groups.setdefault(src, []).append(mem)
+    if not groups:
+        return "none"
+    parts = []
+    for src, mems in groups.items():
+        if len(mems) == 1 and mems[0] in opt:
+            parts.append(f"`{mems[0]}` from `{src}` (the optional one)")
+        else:
+            parts.append(", ".join(f"`{x}`" + (" (optional)" if x in opt else "") for x in mems) + f" from `{src}`")
+    return parts[0] if len(parts) == 1 else ", ".join(parts[:-1]) + ", and " + parts[-1]
 
-**What this is.** Vampire Savior (the arcade fighting game, 1997) with three
-characters added who were never in it: **Donovan**, **Phobos** (called Huitzil in
-the Western release) and **Pyron**. They come from two sister games Capcom built
-on the same hardware. Nothing else is changed — every original character plays
-exactly as before. Once it is running, the character-select screen shows the mark
-`{m['version_string']}` in the bottom-right corner, which is how you can tell you
-are playing this and not the original.
 
-**What you need before you start.** Three things, and the first one is the one we
-cannot help with:
+README_TEMPLATE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "package_release_readme.template.md")
 
-1. **Your own copies of the original arcade game files.** These are the contents
-   of an arcade machine's chips, usually called *ROM sets* or *dumps*; they are
-   ordinary `.zip` files. **We cannot give them to you** — they are Capcom's
-   property, and this package deliberately contains none of them. You need
-   `vsavj.zip`, `vsav.zip` and `vsav2.zip`, unmodified, with exactly those names,
-   together in one folder. (A fourth, `qsound_hle.zip`, only for MAME — see
-   "One optional member" below.)
-2. **A way to run step 1 — and you almost certainly already have one.** Either
-   **a web browser** (double-click `apply_release.html`, in this folder: no
-   install, no terminal, and it works with the internet disconnected), or
-   **Python 3**, a free programming language macOS and Linux already include and
-   Windows offers in its store. Both produce exactly the same file. If you are
-   not sure which you want, use the browser.
-3. **Room and time**: about 60 MB of free disk space for the package and the
-   file you build, and ten minutes. The build briefly uses around 150 MB of
-   memory in Python, or around 300 MB in a browser tab — either way, less than
-   any machine made this century has.
 
-**What you are going to do — three steps, in this order:**
-
-> **1. Build the game file.** One command turns *your* files into a new file,
-> `vsavjw.zip`. That file is the modified game.
-> **Double-click `apply_release.html`** and your browser does it, or run one
-> command with Python — whichever you prefer.
-<!--EMU-->
-> **2. Get the emulator** — the program that pretends to be the arcade machine.
-> This package already contains one, prepared for this game. **An ordinary
-> emulator you may already own will not work**; the reason is below.
-<!--/EMU-->
-<!--MISTER-->
-> **2. Get the core** — the program that turns your MiSTer into the arcade board.
-> This package already contains it: `jtcps2w.rbf`, with the `.mra` files that
-> tell the MiSTer which files to load. **Jotego's ordinary CPS-2 core will not
-> run this game**; the reason is below.
-<!--/MISTER-->
-<!--EMU-->
-> **3. Put them together and play.** On **macOS**, double-click
-> **`PLAY.command`** and it does steps 2 and 3 for you. On Linux, run
-> `sh PLAY.command`. On **Windows**, double-click **`PLAY.bat`** — the same
-> thing for Windows.
-<!--/EMU-->
-<!--MISTER-->
-> **3. Put them together and play.** Copy the file and the core to your
-> MiSTer's SD card as `MISTER.md` describes, and start the game from the
-> MiSTer menu. There is no launcher to run on a MiSTer.
-<!--/MISTER-->
-
-**THIS PACKAGE CONTAINS NO ROM DATA AND NO COPYRIGHTED ASSET, EVER.** What it
-carries instead is a list of *differences* — "take these bytes from the file you
-already own, change these ones". Applied to your files they produce the modified
-game; by themselves they are not playable and contain nothing of Capcom's. Every
-byte produced is checked against an expected fingerprint before anything is
-written, so a wrong, renamed or damaged file is reported by name instead of being
-silently used.
-
-<!--EMU-->
-**Why an ordinary emulator will not work.** The three added characters need more
-storage than a real CPS-2 arcade board had, so this version runs on a slightly
-extended board. A normal emulator knows only the original board: it will refuse
-the file, or sit on the startup screen forever. The emulator here is an ordinary
-FBNeo or MAME with one small published change that teaches it the larger board —
-that is the only difference, and you can read the change if you want to.
-<!--/EMU-->
-<!--MISTER-->
-**Why the ordinary CPS-2 core will not work.** The three added characters need
-more storage than a real CPS-2 arcade board had, so this version runs on a
-slightly extended board. Jotego's own `jtcps2.rbf` knows only the original board.
-The core here, `jtcps2w.rbf`, is that core extended to the larger board, kept as
-a separate core so the ordinary one is untouched: stock Vampire Savior keeps
-running on `jtcps2.rbf` as before. `MISTER.md` says where each file goes and how
-to check the core you copied.
-<!--/MISTER-->
-
-## What is in this package
-<!--EMU-->
-- `PLAY.command` / `PLAY.bat` — **double-click this to play** once you have done
-  step 1: `PLAY.command` on macOS (on Linux, `sh PLAY.command`), `PLAY.bat` on
-  Windows. It
-  finds the right emulator for your machine, checks it really is the prepared
-  one, puts the game file where the emulator will look, and starts it. If
-  anything is missing it tells you which thing and what to do about it.
-<!--/EMU-->
-- `apply_release.html` — **step 1 in your browser.** Double-click it, choose your
-  `.zip` dumps, press the button, save the file it gives you. Nothing is
-  installed and nothing is uploaded: the page has no network code in it at all,
-  and it works with the internet switched off. Open it and read it if you like —
-  it is one plain file.
-- `apply_release.py` — step 1 on the command line instead. Needs Python 3 and
-  nothing else. It and the page produce the same romset, member for member, and
-  a test asserts that on every build.
-- `patches/` — {npatch} files of differences, one for each part of the game that
-  changed. Not readable, not playable, and no use without your own game files.
-- `manifest.json` — the list of expected fingerprints the applier checks
-  everything against. You never edit this.
-- this README, plus notes for your platform beside it
-
-## What you need
-- **Python 3** (3.8 or newer). No other tool: the applier decodes the
-  patches itself.
-- **The reference dumps, unmodified, with these exact names** in one
-  directory: `vsavj.zip` (Vampire Savior, Japan 970519), `vsav.zip` (Europe
-  970519), `vsav2.zip` (Vampire Savior 2, Japan 970913) — and `qsound_hle.zip`
-  (the QSound BIOS set) UNLESS you pass `--no-qsound-bios`, for which see
-  "One optional member" below. Vampire Hunter 2 is
-  NOT needed (it is the project's verification oracle, not a source of
-  anything in the set). The applier checks every member's SHA-1
-  against the manifest before doing anything, so a wrong, renamed or
-  modified dump is reported by name, never silently patched over.
-
-## Build the romset
-
-"Romset" is just the name for the game file the emulator loads. There are two
-ways to make yours and they produce the same file; take whichever suits you.
-
-### The easy way: your browser
-
-**Double-click `apply_release.html`.** It opens as an ordinary web page. It lists
-the dump files it needs, you choose them (or drag them onto it), you press
-**Build**, and it hands you `{zips}` to save. It checks every byte against the
-same fingerprints the command below does, and refuses to give you anything at all
-if something does not match.
-
-It runs entirely inside your browser, on your machine. Your dumps are not
-uploaded — there is no code in that page capable of sending them anywhere, which
-you can check for yourself, and it works with the internet disconnected.
-
-*If your browser is too old it will say so plainly, in which case use the command
-line below.*
-
-### The other way: one command
-
-To do the same thing with Python,
-open a terminal, go to this folder, and run the line below — replacing
-`/path/to/your/dumps` with the folder that holds your `vsavj.zip`, `vsav.zip`
-and `vsav2.zip`:
-
-    python3 apply_release.py --romdir /path/to/your/dumps --out ./rompath
-
-If you have never used a terminal: on macOS open **Terminal** from
-Applications > Utilities, type `cd ` (with the space), drag this folder onto the
-window, and press Return — you are now "in" this folder. On Windows use
-**PowerShell** the same way, and type `py` where the line says `python3`. It
-prints a line per step and finishes with `OK:`.
-
-`./rompath/` then holds `{zips}`, and that is **the only file you place** —
-it is a STANDALONE set: every member the emulator asks for is inside it,
-including the ones normally resolved from the parent `vsav.zip` and MAME's
-QSound BIOS, each copied pristine from your own dumps and SHA-1 verified. You
-do not put `vsav.zip`, `vsavj.zip` or `qsound_hle.zip` in the emulator's rom
-directory. The applier refuses to write if any member's SHA-1 does not match
-the manifest. One member is optional — see below if you are on MiSTer.
-
-<!--PLAY-->
-
-## One optional member — the sound chip's own program
-
-The arcade board's sound hardware had a small program of its own, in a file
-called `dl-1425.bin`. It is the only part of the set you get a choice about,
-because different emulators want it in different places.
-
-- **Keep it (the default).** The romset is then self-sufficient on every
-  emulator, MAME included. You need `qsound_hle.zip` among your dumps.
-- **Leave it out:** in the browser page, pick "Leave it out" in step 3; on the
-  command line, `python3 apply_release.py --romdir … --out … --no-qsound-bios`.
-  You then do not need `qsound_hle.zip` at all.
-  - **On MiSTer this is the one to pick.** Any CPS emulation on MiSTer already
-    requires your own `qsound.zip` in the `games/mame` folder, so there is no
-    reason to put a second copy inside the Vampire Saved romset. (Measured
-    2026-09-20: all 31 parts still resolve — 30 from `vsavjw.zip` and the sound
-    program from that `qsound.zip`.)
-  - **FBNeo** runs the smaller set identically: its descriptor does not list the
-    member; zero `(not found)`, same RAM and same framebuffer over 12,120 frames.
-  - **MAME refuses the smaller set** (`dl-1425.bin - NOT FOUND`), so keep the
-    member if MAME is your emulator.
-
-Either way the applier prints the set key it wrote and checks it against this
-release's own declaration, so you can tell at a glance which variant you hold —
-and netplay peers must hold the same one.
-
-## Identify the build
-- In game: the mark `{m['version_string']}` at the bottom-right of the
-  character-select screen, and the boot name screen reads VAMPIRE SAVED.
-- On disk: whole-set key `{akey}` — the set the applier writes by default
-  (`{akeymin}` with `--no-qsound-bios`), which `manifest.json` carries as
-  `applied_set_key` / `applied_set_key_no_qsound_bios` with every member's SHA-1.
-  (The build this was packaged from is `{key}`; they differ by the standalone
-  completion above, which is pristine content from your dumps.)
-
-## If it does not work
-Almost every first-time problem is one of these.
-
-<!--EMU-->
-- **macOS says the emulator "Not Opened — Apple could not verify…"** and offers
-  only *Done* and *Move to Bin*. macOS is refusing to run a program that was not
-  submitted to Apple for approval; nothing is wrong with the file. **Right-clicking
-  and choosing Open does NOT get past it** on current macOS. Two things do:
-  - **The one-step way (recommended).** On macOS, double-click `PLAY.command`; it
-    offers to clear the "downloaded from the internet" mark for the whole folder at
-    once and then starts the game. By hand, the same thing is one line in a terminal
-    opened in this folder: `xattr -dr com.apple.quarantine .`
-  - **Without a terminal at all.** After a blocked attempt, open **System Settings >
-    Privacy & Security**, scroll to the message about the blocked program, and click
-    **Open Anyway**. This works (confirmed 2026-09-20) but you must do it **for each
-    blocked file separately** — and there are more than one, because the program
-    carries its own copies of the libraries it needs. For MAME that is **2** files;
-    **for FBNeo it is 24**, so on FBNeo prefer the one-step way above.
-- **On Windows, double-clicking `fbneo.exe` flashes a window shut, or MAME's
-  `cps2.exe` says files are "NOT FOUND"** — the emulator was started without
-  being told which game to run or where it is. Double-click `PLAY.bat` instead:
-  it starts FBNeo as `fbneo.exe vsavjw` with the set in `roms\\` beside it, and
-  MAME as `cps2.exe vsavjw -rompath rompath`.
-- **"Unknown system: vsavjw" / "no such driver"** — the emulator is not the
-  prepared one, so it does not know this game. Use the emulator in this package,
-  or build one with the recipe in `EMULATOR.md`. Your normal emulator cannot be
-  made to work by renaming anything.
-- **The game sits on the QSound / CAPCOM legal screen and never reaches the
-  title** — you renamed the set to force it into an unpatched emulator. The
-  stock 4 MB driver never loads the program extension, the sound driver or
-  the QSound extension, so the boot handshake never completes (measured
-  2026-09-11: no crash, no gameplay, the legal screen forever). It needs the
-  patched emulator; renaming is never the fix.
-<!--MAME-->
-- **MAME prints "Errors: Driver is a clone of nonexistent driver megaman"
-  four times every time it starts** (for `mmancp2u`, `mmancp2ur1`, `mmancp2ur2`
-  and `rmancp2j`) — this is expected and harmless. The MAME here is built with
-  only the CPS-2 games, to keep it small, and those four Mega Man games name a
-  parent game that lives outside that set. The game starts and runs normally
-  after these lines.
-- **MAME opens on a red box, "One or more ROMs/disk images for this system are
-  incorrect. The system may not run correctly. Press any key to continue",
-  every time it starts** — this is expected and harmless: press any key and the
-  game starts and plays normally. MAME checks each game file against the
-  checksums it has on file, and the files this patch rebuilds or adds can never
-  match them. The applier has already checked every file against this
-  release's own checksums before writing the set, so the box says nothing about
-  your files. No MAME option hides it.
-<!--/MAME-->
-<!--/EMU-->
-<!--MISTER-->
-- **The game is not in the MiSTer menu, or the MiSTer reports a missing file** —
-  one of the files is not where the MiSTer looks. `MISTER.md` lists each place:
-  the `.mra` files in `_Arcade/`, `jtcps2w.rbf` in `_Arcade/cores/`, and the
-  game files in `games/mame/`.
-<!--/MISTER-->
-- **"reference dumps do not match the manifest"** — one of your original game
-  files is not the exact version expected: a different region, a different
-  revision, or altered at some point. The message names the file and the part of
-  it that differs. Nothing is written when this happens.
-- **The game runs but a character looks wrong, or the sound is missing** — almost
-  always a game file that is the right size but the wrong contents. Re-run the
-  build command; it checks every part and will say which one.
-<!--EMU-->
-- **Playing online against someone** — both of you need the same emulator AND the
-  same game file. Compare the key printed under "Identify the build": if they do
-  not match, you are not running the same thing.
-<!--/EMU-->
-
-## What is patched — for the curious, not needed to play
-The finished `vsavjw.zip` has {npatch} parts rebuilt from the differences in
-`patches/` and {ncopy} copied across from your own files untouched. Of those
-copies, {nfill} are there so the result needs no other file beside it:
-{fill}.
-
-The difference files describe only what this project itself wrote — relocated
-program code, data tables, the version lettering. Anything that came from the
-original games is expressed as "copy it from the player's own file" rather than
-included, which is what keeps this package free of Capcom's content. Before any
-release is published, an automated check scans every difference file for runs of
-original game data and refuses to ship if it finds any.
-"""
-
+def readme(a, m, npatch, ncopy):
+    """THE END-USER README (#284, 14z-206): `tools/package_release_readme.template.md`, the one source the
+    maintainer edits as Markdown, with this release's values put in. What is true of one platform
+    only sits between `<!--EMU-->` / `<!--MISTER-->` / `<!--MAME-->` / `<!--NOTMAME-->` markers and
+    `@PKG@`-style tokens, which tools/package_release_platforms.py selects and fills; the "Play on …"
+    and "Report a problem" sections are the template's own blocks too (#284 Q4). Written for someone who owns the dumps and has never seen
+    this project; the inventory of what a release is and is not is docs/project/release_format.md
+    (ruled 2026-09-11). The diagnostics in "If it does not work" are MEASURED (STATE 14z-148)."""
+    values = {
+        "@NAME@": m["name"], "@MARK@": m["version_string"],
+        "@KEY@": (m["build_fingerprint"] or "?")[:8],
+        "@AKEY@": (m.get("applied_set_key") or "?")[:8],
+        "@AKEYMIN@": (m.get("applied_set_key_no_qsound_bios") or "?")[:8],
+        "@NPATCH@": str(npatch), "@NCOPY@": str(ncopy),
+        "@NFILL@": str(len(m.get("standalone_completion") or [])), "@FILL@": fill_text(m),
+    }
+    body = open(README_TEMPLATE, encoding="utf-8").read()
+    for k, v in values.items():
+        body = body.replace(k, v)
+    return body
 
 if __name__ == "__main__":
     main()

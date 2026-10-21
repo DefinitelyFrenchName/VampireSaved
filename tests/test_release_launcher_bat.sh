@@ -38,7 +38,7 @@
 #
 # MUST-FIRE: perturbed-copy: lf-endings — BOTH PLAY.bat files with CRLF turned into LF must FAIL: cmd reads a LF-only batch file in 512-byte blocks and loses `goto` labels across them, so the line-ending rule is the one a working-looking launcher breaks silently
 # MUST-FIRE: perturbed-copy: launch-line-changed — the FBNeo PLAY.bat without `vsavjw` on its launch line, and the MAME PLAY.bat without `-rompath`, must FAIL: those are #145's two failures, an emulator with no game name that flashes shut and a MAME that finds no ROMs
-# MUST-FIRE: perturbed-copy: emu-text-in-mister — the generator's README rendered for the MiSTer package with the EMULATOR selection must FAIL: that is #214, the MiSTer README telling its reader the package already contains an emulator (step 2, the "why" paragraph, the troubleshooting bullet)
+# MUST-FIRE: perturbed-copy: emu-text-in-mister — the generator's README rendered for the MiSTer package with the EMULATOR selection must FAIL: that is #214, the MiSTer README telling its reader the package already contains an emulator (since #284: the troubleshooting bullet, the launcher line of "What is in this package", the only-game-file paragraph)
 # MUST-FIRE: perturbed-copy: megaman-note-in-fbneo — the generator's README rendered for the FBNeo package with the MAME selection must FAIL on BOTH MAME-only notes: the four validation lines (#227) and the red bad-ROM box at every start (#234) belong to the MAME package only
 # MUST-FIRE: perturbed-copy: quarantine-name-wrong — the generator's MAME PLAY.command with its quarantine message put back to the pre-#239 "\"fbneo\" Not Opened" must FAIL: a MAME player told to look for a dialog naming fbneo is told about a program their package does not hold
 # MUST-FIRE: perturbed-copy: readme-names-absent-launcher — a copy of the release's texts whose mame package no longer ships PLAY.bat while its README still names it must FAIL: that is rule-checker run 2026-10-03-602's finding, the MiSTer README telling its reader to double-click two launchers its package never carried
@@ -222,7 +222,7 @@ import json, os, sys
 sys.path.insert(0, "tools")
 import package_release as pr, package_release_platforms as pp
 m = json.load(open(sys.argv[1])); out = sys.argv[2]; mister_sel = sys.argv[3]; fbneo_sel = sys.argv[4]
-CLAIMS = ("This package already contains one", "The emulator here", "Use the emulator in this package")
+CLAIMS = ("Use the one in this package", "check it is the prepared one", "the **only** game file the emulator needs")   # #284: the template's words
 NOTE = "clone of nonexistent driver megaman"     # #227: the MAME build's four validation lines
 BOX = "ROMs/disk images for this system are"     # #234: the red bad-ROM box at every MAME start
 bad = []

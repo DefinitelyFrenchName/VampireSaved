@@ -10,7 +10,7 @@
 # HOW: packages the build, applies it in a scratch dir, compares members and keys; section 2
 #   exercises the refusals; section 3 indexes every 64-byte-aligned reference chunk and
 #   slides a window over every patch byte; section 4 checks the per-platform layout,
-#   BINARY.txt hashes and the README sections; eight known-bad controls.
+#   BINARY.txt hashes and the README sections; nine known-bad controls.
 # EXPECTS: every section green and every control caught (the planted reference chunk, the
 #   secondary-compressed patch, the stray file, the missing README section among them).
 #
@@ -22,6 +22,7 @@
 # MUST-FIRE: known-bad: secondary-compressed-patch — a patch re-encoded WITH secondary compression must be REFUSED by the applier's own VCDIFF decoder (it would hide reference bytes from the rule-7 scan); mode: section 1 applies that package and must fail
 # MUST-FIRE: known-bad: stray-file — a release copy with a file outside the ruled inventory must fail section 4 (nothing outside the definition ships; mode: section 4 checks that copy)
 # MUST-FIRE: known-bad: readme-missing-section — a release copy whose README lacks the "If it does not work" section must fail section 4 (mode: section 4 checks that copy)
+# MUST-FIRE: known-bad: generator-report-dropped — the generator's README without its "Report a problem" section must fail section 4 (#284; mode: the rendered READMEs lose that heading before the check)
 #
 # A release is a set of xdelta3 patches + a manifest + an applier
 # (tools/package_release.py). This gate is what makes it shippable:
@@ -423,18 +424,48 @@ else
             case "$(basename "$f")" in BINARY.txt) ;; *) grep -q " $(basename "$f")\$" "$rec" || { echo "FAIL: $f is not named by its BINARY.txt"; fail=1; } ;; esac
         done
     done
-    # THE END-USER README: the sections the ruling asks for, on every platform copy
+    # THE END-USER README: the sections the ruling asks for, on every platform copy. #284 (14z-206):
+    # the deliverables section left the package README for the release page, and "Report a problem"
+    # joined it; a release tree packaged before #284 has the old sixth section, so the tree's copies
+    # are held to the five both generations carry, and the README the generator writes NOW, from
+    # this tree's own manifest, to all six (the next release repackages the tree from it).
+    gen_sections() {  # gen_sections <README> — 0 when the generator's README carries all six sections
+        for h in "## Report a problem" "## What you need" "## Build the romset" "## Play on " "## If it does not work" "NO ROM DATA"; do
+            grep -q "$h" "$1" || { echo "FAIL: the generator's README $1 lacks '$h'"; return 1; }
+        done
+    }
     for p in fbneo mame mister; do
-        for h in "## The deliverables" "## What you need" "## Build the romset" "## Play on " "## If it does not work" "NO ROM DATA"; do
+        for h in "## What you need" "## Build the romset" "## Play on " "## If it does not work" "NO ROM DATA"; do
             grep -q "$h" "$REL/$p/README.md" || { echo "FAIL: $REL/$p/README.md lacks '$h'"; fail=1; }
         done
+        mkdir -p "$W/gen_readme/$p"; cp "$REL/$p/manifest.json" "$W/gen_readme/$p/manifest.json"
+        python3 - "$W/gen_readme/$p" "$p" <<'PY' || { echo "FAIL: the generator did not render the $p README"; fail=1; }
+import json, os, sys
+sys.path.insert(0, "tools")
+import package_release as pr, package_release_platforms as pp
+d, plat = sys.argv[1:3]
+m = json.load(open(os.path.join(d, "manifest.json")))
+open(os.path.join(d, "README.md"), "w").write(pr.readme(None, m, 1, 1))   # the counts are prose only
+pp.select_platform_text(d, plat); pp.fill_platform_text(d, plat)
+PY
+        if vs_ctl_is generator-report-dropped; then
+            sed '/^## Report a problem/d' "$W/gen_readme/$p/README.md" > "$W/gen_readme/$p/r.new" && mv "$W/gen_readme/$p/r.new" "$W/gen_readme/$p/README.md"
+        fi
+        gen_sections "$W/gen_readme/$p/README.md" || fail=1
     done
-    [ "$fail" = 0 ] && echo "  ok: every shipped file is in the ruled inventory, every prebuilt binary matches its record, every README carries the six end-user sections"
+    [ "$fail" = 0 ] && echo "  ok: every shipped file is in the ruled inventory, every prebuilt binary matches its record, every README carries the five end-user sections both generations hold, and the generator's README all six"
     # must-fire control: the same checks on a copy with mame/emulator/ removed must FAIL
     if cmp -s "$W/layout_bad/mame/emulator/0002-cps2-wide-v1.patch" "emu/mame-patches/0002-cps2-wide-v1.patch" 2>/dev/null; then
         vs_ctl_dead missing-emulator-dir "a release missing mame/emulator/ was accepted"; fail=1
     else
         vs_ctl_fired missing-emulator-dir "a release missing mame/emulator/ is rejected"
+    fi
+    # must-fire control: the generator's README without its "Report a problem" section must FAIL the same check
+    sed '/^## Report a problem/d' "$W/gen_readme/fbneo/README.md" > "$W/gen_noreport.md"
+    if gen_sections "$W/gen_noreport.md" > /dev/null; then
+        vs_ctl_dead generator-report-dropped "a generator README without its report section was accepted"; fail=1
+    else
+        vs_ctl_fired generator-report-dropped "a generator README without \"Report a problem\" fails the check"
     fi
     if find "$W/layout_stray/mame" -type f | sed "s|^$W/layout_stray/mame/||" | grep -vE "$EMU_INV" | grep -q .; then
         vs_ctl_fired stray-file "mame/notes.bin is outside the inventory and would fail the check"

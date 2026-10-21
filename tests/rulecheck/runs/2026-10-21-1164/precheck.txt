@@ -1,0 +1,8 @@
+  FLAG D-FIGURE: 8015971  [build/agent206/t299/closing_comment.md]
+  FLAG D-ABSOLUTE: The only verdict difference is the MRA pair (item 3).  [build/agent206/t299/closing_comment.md]
+  FLAG D-ABSOLUTE: 415 of 415 controls were executed and honoured, none died.  [build/agent206/t299/closing_comment.md]
+  FLAG D-ABSOLUTE: Whether any verdict was ever moved by it is not measured.  [build/agent206/t299/closing_comment.md]
+  FLAG D-ABSOLUTE: **Not covered**, so nothing here claims them:  [build/agent206/t299/closing_comment.md]
+  FLAG D-ABSOLUTE: - The census traced the static tier only, on Linux only, with no timestamps (so whether a reader ever hit a write window is unmeasured); it is a session inst...  [build/agent206/t299/closing_comment.md]
+  FLAG D-ABSOLUTE: - Under load: one loaded run only.  [build/agent206/t299/closing_comment.md]
+packet_check: 7 flag(s): D-ABSOLUTE 6, D-FIGURE 1

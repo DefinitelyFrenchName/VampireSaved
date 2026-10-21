@@ -2808,17 +2808,24 @@ final line — the only way to reach that print without dumps.
    `/it` in the logged-on user's session: both launchers stayed up 25 s there
    (session 1) on ERIS, 2026-10-03.
 
-## MAME READS THE USER'S OWN `mame.ini` EVEN UNDER `-homepath` — every harness leg inherits what that file sets (found 2026-09-15, 14z-158, gating the README's recording command; nothing paid)
+## MAME READS THE USER'S OWN `mame.ini` EVEN UNDER `-homepath` — every harness leg inherits what that file sets (found 2026-09-15, 14z-158, gating the README's recording command; PAID 2026-10-20, a gate's check rested on the file's `verbose`)
 
 Every MAME run's log opens with `Parsing …/Library/Application Support/mame/mame.ini`
 on this Mac, and a sandboxed `-homepath` does not stop it. Measured on both the
 release `cps2` and the source-built one, `cps2 -showconfig` against
 `cps2 -noreadconfig -showconfig`: the file sets `verbose 1` and a `rompath`
 naming the pre-rename `…/Vampire Saved/VampireSaved/build/donovan6/rompath`
-(the third differing line, `readconfig`, is the flag itself). Nothing measured
-depends on it today: every harness leg passes `-rompath`, which the command line
+(the third differing line, `readconfig`, is the flag itself). ~~Nothing measured
+depends on it today~~ **RETRACTED 2026-10-21 (14z-206, #291 S4-A): a gate's check did.** Every harness leg passes `-rompath`, which the command line
 wins (the 14z-158 scratch legs read the file and still loaded the set from the
-`-rompath` they passed), and `verbose` changes only the log. But whatever the
+`-rompath` they passed), ~~and `verbose` changes only the log~~ but `verbose` puts lines in the log that a gate can
+read. `tests/audit_dmg_legacy_sweep.sh` section 6 (#295, 14z-205) counted MAME's `opened archive file
+…/vsavjw.zip` line in each ours leg's log, a line MAME prints only with `verbose` on: it passed on this Mac, where
+the file sets `verbose 1`, and read "0 of the 32" on PILOT and ERIS, which have no such file (the S3 sheets page of
+`b91532d8` and #296's ERIS run). Measured on the Mac (`build/agent206/t291/s4a/probe_verbose/`): a 60-frame ours run
+shows 25 such lines plain, 0 with `-noreadconfig`, 25 with `-noreadconfig -verbose`. Since 14z-206 the gate passes
+`-verbose` on its ours legs, and its control `zip-check-blind` is the `-noreadconfig` run. **A log line is evidence
+only under the flags that print it: a check that greps one passes the flag itself.** But whatever the
 file gains later — a `cheat`, a `bios`, a sound or video option that changes
 emulation — reaches every leg silently, and another host holds a different file.
 `-noreadconfig` removes it. `tests/test_readme_recording.sh` passes it; the

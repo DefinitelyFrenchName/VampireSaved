@@ -2748,10 +2748,14 @@ Rules now:
 
 `tools/freeze_masked_basis.sh`'s `freeze_one()` derived its MAME sandbox
 paths from the replay NAME alone (`$WORK/sb_${_n}_$_i`), and
-`tools/run_mame.sh` treats an explicit `MAME_SANDBOX` as **deliberate
-reuse** — its own header says so ("to test nvram-carrying scenarios"). So
+`tools/run_mame.sh` ~~treats~~ **treated** (until #296, 14z-206) an explicit `MAME_SANDBOX` as **deliberate
+reuse** — its own header said so ("to test nvram-carrying scenarios"). So
 calling `freeze_one` twice for one name in a single invocation handed the
 second call the first call's `cfg/` and `nvram/eeprom`.
+**SUPERSEDED 14z-206 (#296):** `tools/run_mame.sh` now REFUSES a sandbox that already holds an earlier run's state
+(`cfg/ nvram/ sta/ diff/`): exit 3 and a `REFUSED:` line before the binary starts, unless `MAME_SANDBOX_REUSE=1`
+declares the reuse. Gate `tests/test_mame_sandbox_log.sh`, control `refusal-removed`. This defect would now fail
+loudly instead of moving the basis.
 
 That is not an exotic ordering. It is exactly what the canary command
 `docs/NEXT_SESSION.md` documents does, because the name appears twice —
@@ -2770,7 +2774,8 @@ precise failure its own docstring warns against.
 
 Rules now:
 - **Clear a sandbox before every run** unless nvram carry-over is the
-  point. Fixed in the tool; gated by `tests/test_freeze_basis_sandbox.sh`,
+  point, and then declare it with `MAME_SANDBOX_REUSE=1` (since #296, an
+  undeclared reuse is refused). Fixed in the tool; gated by `tests/test_freeze_basis_sandbox.sh`,
   whose verdict control reconstructs the pre-fix tool and requires it to
   reproduce the defect.
 - **"The instrument control passed" is not "nothing moved".** Check
@@ -7273,8 +7278,9 @@ control `relative-unresolved`).
 
 ## A SANDBOX NAMED BY PART OF A RUN'S IDENTITY IS SHARED BY EVERY RUN THAT PART NAMES (paid: 14z-205, #293)
 
-An explicit `MAME_SANDBOX` is deliberate reuse ([VSP-117]): MAME writes its nvram there, and the next run in it boots
-on that nvram. Two gates named their sandboxes by only part of what made a run distinct. `audit_flicker_attribution`
+An explicit `MAME_SANDBOX` ~~is~~ **was** deliberate reuse ([VSP-117]): MAME writes its nvram there, and the next run in it boots
+on that nvram. (**SUPERSEDED 14z-206, #296:** `tools/run_mame.sh` now refuses such a run with exit 3 unless
+`MAME_SANDBOX_REUSE=1` declares the reuse, so both gates below would fail loudly today.) Two gates named their sandboxes by only part of what made a run distinct. `audit_flicker_attribution`
 named them by replay, and replay 105 has two cases, so its f5868 case booted on the f2713 run's nvram.
 `audit_legacy_pairings` named them by build directory, and its default list names one build three times (once per
 tenant id), so each replay ran three times into one sandbox and one out file, and the three tenants' forced-pick
@@ -7374,3 +7380,32 @@ own control fired. Only the conjunction — own `CONTROL DEAD` and an exception 
 2,351 control logs). **Before tightening a verdict rule, census it over every log it will judge, and look for the
 gates whose honoured shape the rule names as failure.** Still uncovered: a mode run that fails for a foreign reason
 without both signs reads HONOURED.
+
+## A GATE THAT READS `build/out` DIRECTLY WAS SAVED BY THE TIER'S ORDER, NOT BY THE CACHE — under `--jobs` it ran before the views existed (paid: 14z-206, #299; found on PILOT, 14z-205c)
+
+36 gates and 11 tools read `build/out/<set>_{opcodes,data}.bin` by path instead of through `decrypt_view`
+(`tests/lib/decrypt_cache.sh`), and the generator reads them at 19 sites with no fallback. With the cache cold, five of
+them (`test_tenant_loop`, `test_tenant_row_owner`, `test_thunk_addr_literal`, `test_beam_list_type6`,
+`test_decode_stage_banners`) FAIL or SKIP under `tests/run_all_static.sh --jobs 8` and PASS serially: the first static
+gate, `test_m3a_reproducible`, runs `tools/build_donovan.sh`, which builds the views, so in a serial tier they always
+existed by the time a direct reader ran. Nothing declared that dependency. The runner now builds the views before the
+tier (`decrypt_cache_ensure`, the `# DECRYPT-WARM` line; `tests/test_static_runner.sh` sections 28-29, control
+`decrypt-warm-off`), and the helper's temp dir sits inside `build/out`, because a `mv` from another filesystem's
+`$TMPDIR` is a copy a direct reader can catch half-written. **When gates start running in parallel, a dependency that
+only the run order satisfied stops being satisfied — look for what an EARLIER gate leaves behind, not only for what
+two gates write at once.** Not covered: the emulator runner has no warm-up, and `tools/build_donovan.sh` writes the
+cache non-atomically (#305).
+
+## A CONTROL THAT PERTURBS A TRACKED FILE IN PLACE AND RESTORES IT IS INVISIBLE TO `test_no_tracked_mutation` — and under `--jobs` five other gates read that file mid-run (paid: 14z-206, #299; found by the re-traced write census on PILOT)
+
+`test_checkdocs_rom`'s control 5 copied a planted row ONTO the tracked `tests/expected/checkdocs_rom_covered.tsv`, ran
+the checker, then copied the backup back. Serially that is harmless, and `test_no_tracked_mutation` sees only the end
+state, which is clean. Under `tests/run_all_static.sh --jobs 8` five gates that scan the tree
+(`test_emulator_staleness`, `test_entropy_tripwire`, `test_m2a_target_policy`, `test_close_tools`,
+`test_retraction_reach`) could read the planted row or a truncated file while it was there. Found only by tracing
+every static gate's writes with paths resolved against each process's working directory (strace `-f -y` plus
+chdir/fchdir/unlink/rename/mkdir; `build/agent206/t299/x2/`, local): the open-only census of 14z-205c had left 2,894
+shared RELATIVE paths unresolved. Fixed: `tools/checkdocs_rom.py --covered PATH`, so the control perturbs a COPY, and
+the gate fails if the tracked file changed during its run. **A control perturbs a copy and points the tool at it;
+"perturb, run, restore" on a tracked file is a race the moment gates run in parallel.** Not covered: the census is
+a session instrument, not a gate, so a new in-place perturbation would be caught only by another trace.

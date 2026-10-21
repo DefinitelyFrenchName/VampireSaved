@@ -32,13 +32,12 @@ gates in parallel (#299; a close runs `--jobs 8`, ruled 2026-10-19).
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
-1. **#291 — S4: every tile a human can confirm, ~9 per move** (the maintainer on the unfiltered S3 page,
-   `DECISIONS_HISTORY.md` "Read 2026-10-20 (14z-205c) — #291's unfiltered page"; STATE 14z-205c (6)). The S3 run at
-   `b91532d8` drew 58 gates on PILOT (page `build/sheets/b91532d88bf3/`, local). To do: tiles drawn where the fighters
-   are on screen (136 of 3,753 pictures are a flash or a blank, a floor; stage-only frames too), ~9 per move with
-   several pages when one gets too big, and the six non-passing gates on a clean checkout (four need builds or a basis
-   the commit does not make, `audit_dmg_legacy_sweep`'s MAME-opened-zip check read 0 of 32, `audit_grenade_ground_tiles`'
-   PASS line). Plan it and show the plan first; then the closure through the rule-checker.
+1. **#291 — S4: S4-A done (14z-206), S4-B onwards in fork B4's git worktree** (the plan and the maintainer's
+   answers: `build/agent206/t291/PLAN.md`, `DECISIONS_HISTORY.md` "Ruled 2026-10-21 (14z-206) — #291 S4: …"; STATE
+   14z-206 (1)). S4-A's six gates pass on a clean checkout. Next: S4-B (the fighters-on-screen predicate, scored first),
+   S4-C (legends), S4-D (~9 tiles per judged event, more where a gate has more), S4-E (up to 18 replay frames at the
+   inputs; no-fighter frames in a labelled strip), S4-F (paging); then S4-G, the full run on the Mac, shown to the
+   maintainer before the closure goes through the rule-checker. The S3 page moved to `../sheets_aside_14z206/`.
 2. **#229 — WAITING ON THE MAINTAINER, Q2 especially** (*"I still have answers to provide for Q2 especially"*,
    2026-10-21); everything is listed on #229 (comment of 2026-10-20) and in STATE_HISTORY 14z-205b (1)-(5).
    - **The work is LOCAL and UNTRACKED:** the six gates, their expectations, rigs and Lua (105 files,
@@ -62,37 +61,30 @@ gates in parallel (#299; a close runs `--jobs 8`, ruled 2026-10-19).
    2026-10-20): it closes when the next release's battery records `audit_release_linux_desktop` PASSING on PILOT. Ask
    the maintainer to be logged in to PILOT's desktop before that battery runs: the login screen still starts on X11,
    and with no user session the gate SKIPs and exits 0.
-4. **#284 — the README drafts, edited by the maintainer** (`build/agent205c/t284/README.{mame,fbneo,mister}.md`,
-   `README.template.md`, local; *"mostly removing the deliverables section"*, 2026-10-21). Read their edits first, then
-   propose how the template enters the release pipeline; nothing goes beyond draft without the maintainer's validation.
-   Answered: `apply_release.html` needs no Python (it is self-contained; `apply_release.py` is the fallback).
-5. **#299 — two of its four items are done** (STATE 14z-205c (11), (12)): the MRA lock and the dead-control scoring
-   (the own-`CONTROL DEAD`-beside-an-exception rule; a foreign failure without both signs still reads HONOURED) land
-   with the 14z-205c close. Open: five gates that read `build/out/*.bin` directly fail under the pool with a cold cache
-   (build the views first, or route the 27 direct readers through `decrypt_view`); serial cold not measured. Then the
-   closure through the rule-checker.
+4. **#284 — done, awaiting release** (14z-206, STATE 14z-206 (2)): the template is in the pipeline
+   (`tools/package_release_readme.template.md`); it closes when the next release ships the new READMEs and
+   `test_readme_recording` runs its Windows and Linux legs.
+5. **#299 — the cold cache is fixed; the closure is open** (STATE 14z-206 (3); rule-checker run `2026-10-21-1166`
+   VIOLATED, unresolved; the maintainer: *"option A"*, the landing committed without it). To close: replace PILOT's
+   copier-kept logs with a whole-tier serial against `--jobs 8` on the Mac, every log kept by the runner's exit traps
+   (fork C2's method, `build/agent206/t299/c2/inside.sh`); plant real values shaped like a duration, PID, date and temp
+   name in the comparer check (`c2/plant_check2.py`) or name them; fix the closing comment's browser-log line (the
+   difference is the truncated serial copy) and cite the confirm-tier line that shows `test_rule_checker`'s cause; resolve
+   1166, then a fresh packet. The closing comment: `build/agent206/t299/closing_comment.md`.
 6. **#298 — measure the narrowed controls** on a close's tier against 1,500-1,800 s of controls per close before
    (14z-205 commented 143 controls, 1,448 s); comment the figures on #298 and close it if the narrowing held.
-7. **#296 — step 1's inventory is done** (ERIS, STATE 14z-205c (10)): 24 of 4,437 runs reused, all
-   `audit_wide_phase_a` (a sandbox named by replay alone). Next: apply the proposed key fix and step 2's refusal
-   (`build/agent205c/t296/proposals/`, with a refusal section and a must-fire control in
-   `tests/test_mame_sandbox_log.sh`), then run the mame and fbneo lanes green with refusal on (#296's "done when"; ERIS
-   carried them in ~2 h at `--jobs 8`). Seen there: `audit_marionette_cost`'s drift is #302.
-8. **#286 — the narrowings did NOT land** (STATE 14z-205c (2); rule-checker run `2026-10-20-1156` withdrew them). On a
-   re-trace at `b91532d8` both predictors scored 0 misses, but the scorer (`tools/trace_static_reads.py` `_score_one`)
-   never applies `predict()`'s N-F-CHANGE skip; measured with `build/agent205c/t286/nf_change_check.py`, the narrowed
-   N-F carries one real read: `test_tickets` opens a run record and is no runs reader once the planner's own text is
-   dropped. To do, in order: make the scorer judge reads as `predict()` does (N-F-CHANGE included) with a control that
-   fires on a carried run-record read; find what makes `test_tickets` read run records and let N-F see it; rescore on
-   the PILOT traces (`~/t205/x2/tr`, kept); then a rule-checker packet that names the copied `build/`, shows the scored
-   patch equals the landed diff, carries `test_trace_static_reads`' log and quotes #298's ruling from
-   `DECISIONS_HISTORY.md`.
+7. **#296 — the code half is in** (14z-206, STATE 14z-206 (4)): the phase-A sandbox key and `run_mame.sh`'s
+   refusal of a reused sandbox. Its "done when": the mame and fbneo lanes green with the refusal on (the command is
+   in `build/agent206/t296/REPORT.md`), then the closure through the rule-checker.
+8. **#286 — the scorer judges as `predict()` does** (14z-206, STATE 14z-206 (5)); the narrowings plus N-F-LINK are
+   `build/agent206/t286/landing.diff`, NOT applied. Waits on PILOT: `build/agent206/t286/pilot_rescore.sh` on the
+   traces `~/t205/x2/tr`, then a rule-checker packet as `build/agent206/t286/REPORT.md` item 13 names it.
 9. **#297 stays open until a freeze has run the 109 moved gates green**; a freeze runs every gate anyway.
 10. **Then ask the maintainer for the order of work.** The open tickets by their GitHub severity label:
    - high: #286;
    - medium: #296, #284;
    - low: #118, #229, #244, #301 (and #129, parked);
-   - no severity label: #266, #267, #289, #291, #297, #298, #299, #302, #303, #304;
+   - no severity label: #266, #267, #289, #291, #297, #298, #299, #302, #303, #304, #305, #306, #307;
    - **release-only:** #278, #279, #280, #281.
 11. **`tests/replays/118_chain.rpl`'s header names a leg of `audit_mizuumi_inputs` that gate never ran** (STATE_HISTORY
     14z-198 finding (i)); the one-line correction rides a session that runs the emulator gates following `tests/replays/`.

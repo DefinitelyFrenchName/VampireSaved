@@ -2,9 +2,12 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 304
+# issues: 307
 number	state	reason	closed	labels	title
-304	OPEN	-	-	bug,test-integrity	The static-tier planner counts untracked build/ output as changed inputs (build/sheets/: 5,739 files, a 3-hour plan); review what it includes and excludes
+307	OPEN	-	-	evolution	build/ has no retention rule for logs and session evidence (47 GB, 1,134 entries); measure what references each family before pruning
+306	OPEN	-	-	bug,test-integrity	Nine emulator gates default to build/donovan6, which only test_m2b_stage6 builds; a clean checkout's order decides whether they find it
+305	OPEN	-	-	bug,test-integrity	The emulator tier has no decrypt-view warm-up, and build_donovan.sh writes the view cache non-atomically (#299's two gaps)
+304	OPEN	-	-	bug,severity: high,test-integrity	The static-tier planner counts untracked build/ output as changed inputs (build/sheets/: 5,739 files, a 3-hour plan); review what it includes and excludes
 303	OPEN	-	-	bug	Static-tier gates leave their temp directories in /tmp (~1,690 entries, ~2.3 GB over four tiers)
 302	OPEN	-	-	bug,test-integrity	audit_marionette_cost reads 8 more replays per hook row than its frozen expectation on a clean clone
 301	OPEN	-	-	evolution,severity: low	Community cross-check: create report of the #229 workbook differences for the community, and check the open questions against vswiki

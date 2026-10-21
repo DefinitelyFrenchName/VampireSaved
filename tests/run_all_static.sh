@@ -87,6 +87,9 @@
 #                                          clock differs. `# ORDER: last` gates run alone, after the pool.
 #                                          A session close runs --jobs 8 (ruled 2026-10-19, its tier row in
 #                                          docs/project/session_close.md); test_static_runner section 24 proves it.
+#                                          With ROMDIR set, the decrypted views of $DECRYPT_WARM_SETS (default
+#                                          vsavj vsav2 vhunt2) are built into build/out before the static tier,
+#                                          serial or pooled (#299, 14z-206; test_static_runner section 28).
 #   ... --cadence ondemand                 also the `ondemand` gates (maintainer-ruled
 #                                          2026-10-09, 14z-196): a gate listed
 #                                          `ondemand` is deferred and named at
@@ -543,6 +546,24 @@ if [ -n "$CONFIRM" ]; then
     echo "== confirm: $(awk -F'\t' '$1 == "RUN"' "$WORK/plan_shown.tsv" | wc -l | tr -d ' ') gate(s) to re-run, $(awk -F'\t' '$1 == "DEFER"' "$WORK/plan_shown.tsv" | wc -l | tr -d ' ') deferred by cadence, $(awk -F'\t' '$1 == "CARRY"' "$WORK/plan.tsv" | wc -l | tr -d ' ') to carry, from $CONFIRM =="
     awk -F'\t' '$1 == "RUN" {printf "  re-run %-34s %s\n", $2, $3}' "$WORK/plan_shown.tsv"
     awk -F'\t' '$1 == "DEFER" {printf "  defer  %-34s %s (its cadence: not run here)\n", $2, $3}' "$WORK/plan_shown.tsv"
+fi
+# THE DECRYPT VIEWS FIRST (#299, 14z-206): 36 gate scripts, the generator and ten other tools read
+# build/out/<set>_{opcodes,data}.bin directly, and a cold cache was warmed only by the first decrypt_view caller —
+# under --jobs 8 five gates ran before it and failed or SKIPped (PILOT, 14z-205c). So the views of every reference set
+# in ROMDIR are made here, once, before any gate of the static tier runs, serial or pooled; a warm cache costs six size
+# checks and prints nothing. A repo without the helper (the runner gate's synthetic ones) skips this.
+DECRYPT_WARM_SETS="${DECRYPT_WARM_SETS:-vsavj vsav2 vhunt2}"
+if [ -n "${ROMDIR:-}" ] && [ "$TIER" != portable ] && [ -f "$REPO/tests/lib/decrypt_cache.sh" ]; then
+    . "$REPO/tests/lib/decrypt_cache.sh"
+    _dw0=$(date +%s); _dw_built=""; _dw_bad=""
+    for _s in $DECRYPT_WARM_SETS; do
+        [ -f "$ROMDIR/$_s.zip" ] || continue
+        if _dv_ok "build/out/${_s}_opcodes.bin" && _dv_ok "build/out/${_s}_data.bin"; then continue; fi
+        if decrypt_cache_ensure "$_s" 2>> "$WORK/decrypt_warm.err"; then _dw_built="$_dw_built $_s"   # DECRYPT-WARM
+        else _dw_bad="$_dw_bad $_s"; fi
+    done
+    [ -z "$_dw_built" ] || echo "== decrypt views built before the tier:$_dw_built ($(( $(date +%s) - _dw0 )) s) =="
+    [ -z "$_dw_bad" ] || { echo "== DECRYPT VIEWS FAILED:$_dw_bad — the gates that read build/out directly will FAIL or SKIP =="; sed 's/^/  /' "$WORK/decrypt_warm.err" 2>/dev/null || :; }
 fi
 case "$TIER" in
 portable) pre_run portable "$PORTABLE_RUN"; run_tier portable "$PORTABLE_RUN" ;;

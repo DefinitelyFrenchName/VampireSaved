@@ -200,4 +200,7 @@ PYF
         [ -n "$_fo" ] && sheet_at grenade "m$k" ours "$_fo" event "$_sfo:$_fo-$_fo"
     done
 fi
+# The verdict line, unindented and last (#291 S4-A, 14z-206): the python block's own PASS/FAIL lines are indented, and
+# a runner's or the proof page's verdict reader skips an indented line, so the S3 page read "no verdict line".
+if [ "$_rc" = 0 ]; then echo "PASS: audit_grenade_ground_tiles"; else echo "FAIL: audit_grenade_ground_tiles"; fi
 exit "$_rc"

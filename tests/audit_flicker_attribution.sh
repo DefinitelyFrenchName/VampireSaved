@@ -153,7 +153,10 @@ CASES="37_victor_ko_vsavj:7168:staging-row-0x0A
 
 . "$REPO/tests/lib/sheet.sh"
 BASIS=tests/expected/vsavj/masked-v2
-BASIS_MASK="$(cat "$BASIS/mask")"
+# The basis tracks its mask as MASK, upper case (git ls-files). Until 14z-206 (#291 S4-A) this read `$BASIS/mask`, which
+# only a case-insensitive filesystem resolves: the gate passed on the Mac and failed on every Linux run (PILOT, ERIS).
+[ -f "$BASIS/MASK" ] || { echo "FAIL: no $BASIS/MASK (the vanilla basis's tracked mask)"; exit 1; }
+BASIS_MASK="$(cat "$BASIS/MASK")"
 lastnew=""; lastrpl=""; lastframe=""
 # fresh_ok <log> <replay> <frame>: the log's checksum at <frame> equals the frozen basis log's (the one copy of the test)
 fresh_ok() {

@@ -6,8 +6,10 @@
 # Every run gets a FRESH sandbox for cfg/nvram/etc under $MAME_SANDBOX (or a
 # mktemp dir), so runs are reproducible: no leaked EEPROM/nvram state between
 # runs, which would silently break determinism comparisons. Set
-# MAME_SANDBOX=/some/dir to inspect or reuse a sandbox (e.g. to test
-# nvram-carrying scenarios deliberately).
+# MAME_SANDBOX=/some/dir to inspect a sandbox; to REUSE one that already
+# holds an earlier run's state (e.g. to test nvram-carrying scenarios
+# deliberately) also set MAME_SANDBOX_REUSE=1, or the run is refused with
+# exit 3 (#296 step 2).
 set -eu
 
 SET="${1:?usage: run_mame.sh <set> [mame args...]}"
@@ -101,7 +103,15 @@ caller_gate() {  # the first tests/<gate>.sh among this process's ancestors, or 
 # With MAME_SANDBOX_LOG set (#296 step 1), one line per run: UTC time, fresh|reused, the set, the sandbox, the gate.
 # Nothing is printed and nothing else changes; unset, the line below never runs.
 if [ -n "${MAME_SANDBOX_LOG:-}" ]; then
-    printf '%s\t%s\t%s\t%s\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_sbstate" "$SET" "$SANDBOX" "$(caller_gate)" >> "$MAME_SANDBOX_LOG" 2>/dev/null || true
+    # the ABSOLUTE sandbox (#296 step 1 on ERIS, 14z-205c: seven gates' relative `s1` read as one sandbox in the log)
+    _sbabs="$(cd "$SANDBOX" 2>/dev/null && pwd || echo "$SANDBOX")"
+    printf '%s\t%s\t%s\t%s\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_sbstate" "$SET" "$_sbabs" "$(caller_gate)" >> "$MAME_SANDBOX_LOG" 2>/dev/null || true
+fi
+# #296 step 2: a run whose sandbox already holds an earlier run's MAME state is REFUSED unless the caller declares
+# the reuse (MAME_SANDBOX_REUSE=1) — #293's class at run time. Logged first, so the inventory still sees it.
+if [ "$_sbstate" = reused ] && [ "${MAME_SANDBOX_REUSE:-}" != 1 ]; then
+    echo "REFUSED: $SANDBOX already holds an earlier MAME run's state (cfg/ nvram/ sta/ diff/); a deliberate reuse sets MAME_SANDBOX_REUSE=1 (#296)" >&2
+    exit 3
 fi
 # THE FALLBACK INVENTORY (14z-188, GitHub #196), opt-in and inert unless asked: with MAME_FALLBACK_LOG set, a run
 # that runs with MAME_BIN UNSET (since 14z-189 it takes the pinned default by set name; before, `mame` on PATH) appends one line — the UTC time, the set, and the first

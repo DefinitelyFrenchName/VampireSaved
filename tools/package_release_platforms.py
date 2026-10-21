@@ -44,7 +44,7 @@ Rule 7: nothing here reads a reference ROM except through package_release.py
 (which reads them only to compute deltas), and nothing ROM-derived is written.
 Deterministic: two runs produce byte-identical trees.
 """
-import argparse, os, re, shutil, subprocess, sys, tempfile
+import argparse, json, os, re, shutil, subprocess, sys, tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
@@ -514,17 +514,27 @@ def run_packager(rompath, romdir, name, version, dest):
         shutil.copytree(src, dest)
 
 
-def release_url(name):
-    """The GitHub release page the prebuilt assets attach to (ruled 14z-149): the origin
-    remote's HTTPS form + /releases/tag/freeze/<name>; a placeholder when no remote exists."""
+def repo_url():
+    """The origin remote's HTTPS form, or "" when no remote exists."""
     out = subprocess.run(["git", "-C", REPO, "remote", "get-url", "origin"],
                          capture_output=True, text=True).stdout.strip()
-    if not out:
-        return "the project's GitHub release page"
     out = out[:-4] if out.endswith(".git") else out
     if out.startswith("git@github.com:"):
         out = "https://github.com/" + out[len("git@github.com:"):]
-    return f"{out}/releases/tag/freeze/{name}"
+    return out
+
+
+def release_url(name):
+    """The GitHub release page the prebuilt assets attach to (ruled 14z-149): the origin
+    remote's HTTPS form + /releases/tag/freeze/<name>; a placeholder when no remote exists."""
+    out = repo_url()
+    return f"{out}/releases/tag/freeze/{name}" if out else "the project's GitHub release page"
+
+
+def issues_url():
+    """Where a player reports a problem (#284): the origin's issues page."""
+    out = repo_url()
+    return f"{out}/issues" if out else "the project's GitHub issues page"
 
 
 def pin_of(submodule):
@@ -569,70 +579,6 @@ def binaries_side(platform, edir):
     return copied
 
 
-def bins_available():
-    """Which os-arch dirs under release/emulators/<platform>/ hold binaries (not a record alone) —
-    read-only; binaries_side() is what verifies and copies them. Used by the deliverables table."""
-    out = {}
-    for platform in ("fbneo", "mame"):
-        root = os.path.join(REPO, "release", "emulators", platform)
-        found = []
-        if os.path.isdir(root):
-            for osarch in sorted(os.listdir(root)):
-                d = os.path.join(root, osarch)
-                if os.path.isdir(d) and os.path.exists(os.path.join(d, "BINARY.txt")) \
-                        and [f for f in os.listdir(d) if f != "BINARY.txt"]:
-                    found.append(osarch)
-        out[platform] = found
-    return out
-
-
-def insert_deliverables(dest, name, platform):
-    """THE DELIVERABLES section (maintainer, 2026-09-11: "please make the readme clearly
-    explain what are each deliverable and how to use them") — inserted before "What is in
-    this package" in every platform README: every asset on the release page, what it is,
-    who needs it, and that GitHub's auto-added source archives are not needed to play."""
-    url = release_url(name)
-    b = bins_available()
-    def have(pf):
-        return ", ".join(b[pf]) if b[pf] else "none yet for any OS — build per the recipe in that package's `EMULATOR.md`"
-    up = {"fbneo": "FBNeo", "mame": "MAME", "mister": "MiSTer"}[platform]
-    text = f"""## The deliverables — what to download, and what each is for
-Everything ships as ASSETS of the GitHub release on tag `freeze/{name}`:
-{url}
-
-**TAKE EXACTLY ONE.** Every asset below is complete on its own: the README,
-the romset patch set, the applier, and ONE way to get the emulator or core.
-There is nothing to combine and nothing to download twice.
-
-| asset | what it is | who needs it |
-|---|---|---|
-| `{name}-fbneo-<os-arch>.zip` | the FBNeo package for that OS, **ready to play**: this README, the romset patch set + applier, and a prebuilt patched FBNeo with its `BINARY.txt` of sha256s. No build step, nothing to patch (available: {have('fbneo')}) | FBNeo players on a listed OS |
-| `{name}-fbneo-recipe.zip` | the same FBNeo package for **any** OS, carrying the driver patch + build recipe (`EMULATOR.md`) instead of a binary: you build the emulator once | FBNeo players on any other OS, or anyone who prefers to build |
-| `{name}-mame-<os-arch>.zip` | the MAME package for that OS, ready to play: the same romset patch set + applier, and a prebuilt patched MAME (CPS-2 subtarget) with its `BINARY.txt` (available: {have('mame')}) | MAME players on a listed OS |
-| `{name}-mame-recipe.zip` | the same MAME package for any OS, with the driver patch + `EMULATOR.md` instead of a binary | MAME players on any other OS, or anyone who prefers to build |
-| `{name}-mister.zip` | the MiSTer package: the same romset patch set + applier, the `jtcps2w.rbf` bitstream + its record (`BITSTREAM.txt`), the two `.mra` files, `MISTER.md` | MiSTer owners |
-| "Source code (zip / tar.gz)" | added by GitHub to every release: the whole project repository at the tag — development tooling, logs and all. **NOT needed to play**; nothing above requires it | nobody, unless you want to audit or rebuild the project |
-
-A prebuilt package deliberately carries NO emulator patch and no build
-recipe: your binary already contains them, and a patch you cannot use is a
-patch you might try to apply. If you want to read or rebuild what your binary
-contains, the `-recipe` package of the same platform is where the patch
-lives, and your `BINARY.txt` names its sha1.
-
-Every package rebuilds the SAME `vsavjw.zip` from your own dumps (the three
-copies of the patch set are byte-identical, and a gate asserts it).
-**You are reading the {up} package.** In order: build the romset (below),
-get the emulator or core ("Play on {up}" at the end), play.
-
-"""
-    rp = os.path.join(dest, "README.md")
-    t = open(rp).read()
-    marker = "## What is in this package"
-    if marker not in t:
-        sys.exit(f"{rp}: no '{marker}' section to insert the deliverables before")
-    open(rp, "w").write(t.replace(marker, text + marker, 1))
-
-
 def select_platform_text(dest, platform):
     """THE COMMON README NAMES ONLY WHAT THIS PACKAGE SHIPS (14z-189, rule-checker run
     2026-10-03-602): tools/package_release.py writes the launcher passages between
@@ -643,39 +589,32 @@ def select_platform_text(dest, platform):
     unbalanced pair, stops the packaging rather than shipping it.
     `<!--MAME-->` / `<!--/MAME-->` (14z-192, GitHub #227) nest inside an EMU block and hold
     what is true of the MAME build alone (its four validation lines); only the mame package
-    keeps them. They are dropped FIRST, so the EMU pass sees no nested pair."""
+    keeps them. They are dropped FIRST, so the EMU pass sees no nested pair.
+    `<!--NOTMAME-->` / `<!--/NOTMAME-->` (#284) hold what every package but MAME's says (the
+    report section without the recording procedure); only the mame package drops them."""
     import re
     path = os.path.join(dest, "README.md")
     body = open(path).read()
     keep, drop = ("MISTER", "EMU") if platform == "mister" else ("EMU", "MISTER")
-    for tag in (keep, drop, "MAME"):
+    for tag in (keep, drop, "MAME", "NOTMAME"):
         if body.count(f"<!--{tag}-->") != body.count(f"<!--/{tag}-->"):
             sys.exit(f"{path}: unbalanced <!--{tag}--> markers")
+    # A marker stands on a line of its own and may be INDENTED (#284: the template's markers sit
+    # inside the Markdown lists they cut), so the whole line goes, indentation included.
+    mark = lambda t: rf"^[ \t]*<!--{t}-->[ \t]*\n"
+    block = lambda t: rf"^[ \t]*<!--{t}-->[ \t]*\n.*?^[ \t]*<!--/{t}-->[ \t]*\n"
     if platform == "mame":
-        body = body.replace("<!--MAME-->\n", "").replace("<!--/MAME-->\n", "")
+        body = re.sub(mark("/?MAME"), "", body, flags=re.M)
+        body = re.sub(block("NOTMAME"), "", body, flags=re.S | re.M)
     else:
-        body = re.sub(r"<!--MAME-->\n.*?<!--/MAME-->\n", "", body, flags=re.S)
-    body = re.sub(rf"<!--{drop}-->\n.*?<!--/{drop}-->\n", "", body, flags=re.S)
-    body = body.replace(f"<!--{keep}-->\n", "").replace(f"<!--/{keep}-->\n", "")
-    left = re.findall(r"<!--/?(?:EMU|MISTER|MAME)-->", body)
+        body = re.sub(block("MAME"), "", body, flags=re.S | re.M)
+        body = re.sub(mark("/?NOTMAME"), "", body, flags=re.M)
+    body = re.sub(block(drop), "", body, flags=re.S | re.M)
+    body = re.sub(mark("/?" + keep), "", body, flags=re.M)
+    left = re.findall(r"<!--/?(?:EMU|MISTER|MAME|NOTMAME)-->", body)
     if left:
         sys.exit(f"{path}: platform markers left after selection: {left}")
     open(path, "w").write(body)
-
-
-def append_play(dest, text):
-    """Put the platform's "Play on …" section where a PLAYER needs it — directly after
-    the build step — rather than at the end of the file, which is where a plain append
-    left it. #146, 2026-09-20: the reader is not a developer and has never seen this
-    project, so the document has to run in the order they will act in."""
-    path = os.path.join(dest, "README.md")
-    body = open(path).read()
-    if "<!--PLAY-->" in body:
-        body = body.replace("<!--PLAY-->", text.strip("\n"), 1)
-        open(path, "w").write(body)
-    else:                       # no marker (an older common README): keep the old behaviour
-        with open(path, "a") as f:
-            f.write(text)
 
 
 def emulator_side(platform, dest, name):
@@ -685,54 +624,9 @@ def emulator_side(platform, dest, name):
     shutil.copy(os.path.join(REPO, e["patch"]), os.path.join(edir, os.path.basename(e["patch"])))
     pin = pin_of(e["submodule"])
     bins = binaries_side(platform, edir)
-    # THE TWO ROUTES NEVER TRAVEL TOGETHER (maintainer-ruled 2026-09-12), so this
-    # step is written for a reader holding EITHER asset and says which files they
-    # will actually see. A prebuilt package has no EMULATOR.md and no patch in it.
-    avail = (f"built for: {', '.join(bins)}" if bins
-             else "none built for any OS in this release yet — take the `-recipe` package")
-    up = platform.upper()
-    # #145: what a double-click on the bare program does, and what PLAY.bat runs instead
-    win_note = ("On Windows, double-clicking `fbneo.exe` itself only flashes a window shut: "
-                "it needs the game name, which `PLAY.bat` gives it (`fbneo.exe vsavjw`, started "
-                "from its own folder with the set in `roms\\` beside it)."
-                if platform == "fbneo" else
-                "On Windows, double-clicking `cps2.exe` itself finds no game files: it needs to "
-                "be told where they are, which `PLAY.bat` does (`cps2.exe vsavjw -rompath "
-                "rompath`, from this folder).")
-    play = f"""
-## Play on {up}
-You need the prepared emulator, and then the game file next to it.
-
-1. **The emulator.** You already have it, or you build it once — whichever package
-   you downloaded:
-   - `{name}-{platform}-<os-arch>.zip` ({avail}): the emulator is in this package
-     under `emulator/bin/<os-arch>/`, where `<os-arch>` names your system —
-     `macos-arm64` is an Apple-Silicon Mac, `windows-x86_64` an ordinary 64-bit
-     Windows PC. `BINARY.txt` beside it lists a fingerprint for every file so you
-     can confirm nothing was altered in transit. Nothing to build or patch.
-   - `{name}-{platform}-recipe.zip`: no ready-made program, but the one small
-     change (`emulator/0002-cps2-wide-v1.patch`) and step-by-step build commands
-     in `EMULATOR.md`. Use this if your system is not listed above, or if you
-     would rather build it yourself than trust a binary.
-   Both routes give the same program.
-2. **The easy way, with the prebuilt download — macOS: double-click `PLAY.command`** (Linux:
-   `sh PLAY.command`). **Windows: double-click `PLAY.bat`.** It picks the right
-   program for your machine, checks it is the prepared one and not an ordinary
-   copy, handles macOS's "downloaded from the internet" block, puts your
-   `vsavjw.zip` where this emulator actually looks for it, and starts the game.
-   If anything is missing it names it. Skip to step 4.
-   {win_note}
-3. **By hand** (the `-recipe` route always starts here: `PLAY.command` and `PLAY.bat` only
-   run a prebuilt program, so with an emulator you built yourself they stop and say so).
-   Put the `vsavjw.zip` you built from your dumps (the README's first part) {'in a folder called `roms/` next to the emulator program, and start the emulator FROM that folder. This sounds fussy and is: this version of FBNeo has no setting for where games live — it only ever looks in `roms/` beside wherever you started it, so pointing at the file from its menu will not work' if platform == 'fbneo' else 'anywhere you like, and tell the emulator where by starting it with `-rompath "/that/folder"`'}.
-   It is the **only** file you put there — not `vsav.zip`, not `vsavj.zip`, not
-   the sound file. Everything the emulator needs is already inside it{', as long as you built it the normal way (without `--no-qsound-bios`, which is for MiSTer and which MAME will refuse)' if platform == 'mame' else ''}.
-4. Start it. The emulator calls this game `vsavjw`. When it works, the first
-   screen reads **VAMPIRE SAVED** and the character-select screen shows
-   **{name.split('-')[-1].upper() if '-' in name else ''}** in the bottom-right
-   corner. Donovan, Phobos and Pyron are on the select screen with everyone else.
-"""
-    append_play(dest, play)
+    # THE TWO ROUTES NEVER TRAVEL TOGETHER (maintainer-ruled 2026-09-12): the README's "Play on …"
+    # section is written for a reader holding EITHER asset. Since #284 (Q4, 14z-206) it is the
+    # template's own EMU block, its by-hand sentence the per-platform token @HAND@ (PLATFORM_TEXT).
     # the launcher, executable, beside the README it points at
     lp = os.path.join(dest, "PLAY.command")
     with open(lp, "w") as f:
@@ -907,15 +801,63 @@ VERIFY THE BITSTREAM'S sha256 BEFORE FLASHING: a timing-failing fitter seed
 emits an .rbf indistinguishable from a passing one.
 """
     open(os.path.join(dest, "MISTER.md"), "w").write(text)
-    append_play(dest, f"""
-## Play on MiSTer
-1. Copy `jtcps2w.rbf` to `_Arcade/cores/` and the two `.mra` files to
-   `_Arcade/` (verify the bitstream's sha256 against `BITSTREAM.txt` first).
-2. Put `vsavjw.zip` (from the applier), your pristine `vsav.zip` and
-   `vsavj.zip`, and `qsound.zip` in `games/mame/`.
-3. Launch "Vampire Saved - CPS-2 WIDE" from the Arcade menu. `MISTER.md` has
-   the card layout and what the [STOCK CONTROL] entry is for.
-""")
+    # its "Play on MiSTer" section is the template's own MISTER block since #284 (Q4, 14z-206)
+
+
+# THE PER-PLATFORM WORDS (#284): the template's `@TOKEN@`s that differ by package. The report section
+# and the "Play on …" sections are the template's own blocks since #284 Q4 (14z-206: the maintainer edits
+# one file): only the MAME packages record (the recording procedure moved there from the root README,
+# ruled 2026-10-15), and tests/test_readme_recording.sh runs the MAME command as written. @HAND@ is the
+# by-hand sentence of "Play on …"; @PKGL@ the package's name part in the not-MAME report section.
+HAND = {
+    "fbneo": ("put `vsavjw.zip` in a folder called `roms` next to the emulator program and start the emulator "
+              "from that folder: this FBNeo has no option for where games are, it only looks in `roms/` beside "
+              "wherever it was started"),
+    "mame": ("start the emulator with `-rompath` naming the folder that holds `vsavjw.zip`, for example "
+             "`-rompath rompath` from this folder"),
+}
+
+PLATFORM_TEXT = {
+    "mame": {"@PKG@": "MAME", "@EXE@": "cps2", "@ENGINE@": "emulator", "@HAND@": HAND["mame"], "@PKGL@": "mame-",
+             "@SETTINGS_COUNT@": "for this MAME, 2 files.",
+             "@WIN_SYMPTOM@": "finds no game files (\"NOT FOUND\")",
+             "@WIN_NEEDS@": "where the game file is (`cps2.exe vsavjw -rompath rompath`)",
+             "@PKGFILES@": "- `emulator/bin/<os-arch>/` — the prepared MAME, and `BINARY.txt` with a fingerprint\n  for every file. (The recipe package has `EMULATOR.md` and the patch instead.)",
+             "@WHY_TAIL@": "A normal MAME knows only the original board: it refuses the file, or sits on the\nstartup screen forever. The MAME here is an ordinary MAME with one small published\nchange that teaches it the larger board."},
+    "fbneo": {"@PKG@": "FBNeo", "@EXE@": "fbneo", "@ENGINE@": "emulator",
+              "@HAND@": HAND["fbneo"], "@PKGL@": "fbneo-",
+              "@SETTINGS_COUNT@": "for this FBNeo, 24 files (the program and the 23 libraries it carries),\n    which is why the Terminal way is the one to use.",
+              "@WIN_SYMPTOM@": "only flashes a window shut",
+              "@WIN_NEEDS@": "the game's name and to start where `roms\\` holds the game file (`fbneo.exe vsavjw`)",
+              "@PKGFILES@": "- `emulator/bin/<os-arch>/` — the prepared FBNeo, and `BINARY.txt` with a fingerprint\n  for every file. (The recipe package has `EMULATOR.md` and the patch instead.)",
+              "@WHY_TAIL@": "A normal FBNeo knows only the original board: it refuses the file, or sits on the\nstartup screen forever. The FBNeo here is an ordinary FBNeo with one small published\nchange that teaches it the larger board."},
+    "mister": {"@PKG@": "MiSTer", "@EXE@": "", "@ENGINE@": "CPS-2 core",
+               "@HAND@": "", "@PKGL@": "mister",
+               "@SETTINGS_COUNT@": "", "@WIN_SYMPTOM@": "", "@WIN_NEEDS@": "",
+               "@PKGFILES@": "- `jtcps2w.rbf`, `BITSTREAM.txt`, the two `.mra` files and `MISTER.md` — the core, its\n  record, the menu entries, and where each file goes on the SD card.",
+               "@WHY_TAIL@": "Jotego's own `jtcps2.rbf` knows only the original board. `jtcps2w.rbf` is that core\nextended to the larger board, kept as a separate core so the ordinary one is\nuntouched."},
+}
+
+
+def fill_platform_text(dest, platform):
+    """The last README step: the per-platform words, and the values the template's per-platform
+    sections name (`@NAME@`, `@MARK@`, from this package's own manifest). A token
+    left over stops the packaging rather than shipping it, as a marker does."""
+    path = os.path.join(dest, "README.md")
+    m = json.load(open(os.path.join(dest, "manifest.json")))
+    body = open(path, encoding="utf-8").read()
+    vals = dict(PLATFORM_TEXT[platform])
+    vals["@SAVE_WHERE@"] = ("into a folder called `rompath` in this folder (make it if it is not there)"
+                            if platform in EMU else
+                            'anywhere you like; it goes on the SD card in step 2 ("Play on MiSTer")')
+    vals["@MISTER_FLAG@"] = "" if platform in EMU else " --no-qsound-bios"
+    vals.update({"@ISSUES@": issues_url(), "@NAME@": m["name"], "@MARK@": m["version_string"]})
+    for k, v in vals.items():
+        body = body.replace(k, v)
+    left = sorted(set(re.findall(r"@[A-Z_]+@", body)))
+    if left:
+        sys.exit(f"{path}: template tokens left after filling: {left}")
+    open(path, "w", encoding="utf-8").write(re.sub(r"\n{3,}", "\n\n", body))
 
 
 def main():
@@ -953,7 +895,7 @@ def main():
         subprocess.run([sys.executable, os.path.join(HERE, "gen_applier_page.py"),
                         dest, "--platform", p, "-o", os.path.join(dest, "apply_release.html")],
                        check=True, stdout=subprocess.DEVNULL)
-        insert_deliverables(dest, a.name, p)
+        fill_platform_text(dest, p)
         n = sum(len(f) for _, _, f in os.walk(dest))
         print(f"  {p}: {n} files -> {dest}")
     print(f"packaged {a.name} for {', '.join(plats)} -> {root}")

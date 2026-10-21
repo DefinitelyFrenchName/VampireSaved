@@ -6,11 +6,12 @@
 #   build line with the same Qt-debugger switch the project's own Linux builds use, names the
 #   build dependencies per OS (qmake6 on Linux for MAME, which tools/setup_mame.sh refuses
 #   without), points at no file the asset does not hold, and describes -verifyroms without the
-#   "exactly the members inside vsavjw.zip" overstatement; the README's by-hand step no longer
-#   says the set was built "in step 1" (step 1 is the emulator) and tells a recipe player that
-#   the launchers run only a prebuilt program.
+#   "exactly the members inside vsavjw.zip" overstatement; the README's play section tells a
+#   recipe player that the launchers run only a prebuilt program. (The #240 check that the by-hand
+#   step did not say the set was built "in step 1" retired with #284: building the set IS step 1.)
 # HOW: tools/package_release_platforms.py's emulator_side() rendered into a scratch directory for
-#   fbneo and mame (binaries_side stubbed out: text only), the switch read from tools/setup_mame.sh
+#   fbneo and mame (binaries_side stubbed out: text only), the README from the template as the
+#   packager renders it (a stub manifest: the play section is the template's own since #284), the switch read from tools/setup_mame.sh
 #   (QTFLAG) and tools/build_release_emulators.sh (QTNOTE) and required on the rendered Linux make
 #   line; the qmake6 requirement read from setup_mame.sh's refusal; three controls perturb the
 #   rendered text the way each defect looked before the fix.
@@ -23,28 +24,30 @@
 #
 # MUST-FIRE: perturbed-copy: qtdebug-dropped — the rendered MAME EMULATOR.md with USE_QTDEBUG=0 taken off its Linux make line must FAIL: that is #238, the recipe that stops on a missing moc
 # MUST-FIRE: perturbed-copy: deps-dropped — the rendered MAME EMULATOR.md without its Linux dependency line must FAIL: without qmake6 the build dies minutes in on char8_t, and nothing tells the reader why
-# MUST-FIRE: perturbed-copy: step1-wording — the rendered README with the pre-#240 "the vsavjw.zip you built in step 1" must FAIL: in the recipe flow step 1 is the emulator, not the set
+# MUST-FIRE: perturbed-copy: recipe-route-dropped — the rendered README without its "By hand, or with the recipe package" paragraph must FAIL: a recipe player is again sent to a launcher that only runs a prebuilt program (#240)
 #
 # Usage: tests/test_release_recipe_text.sh      # ci_portable, ~1 s, no ROMDIR, no emulator, no ROM bytes
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
-case "${VS_CTL:-}" in ""|qtdebug-dropped|deps-dropped|step1-wording) ;;
+case "${VS_CTL:-}" in ""|qtdebug-dropped|deps-dropped|recipe-route-dropped) ;;
 *) echo "REFUSED: CONTROL=$VS_CTL is not a mode of this gate"; exit 3 ;; esac
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 
-render() {  # render <dir> — the generator's EMULATOR.md + README play section for fbneo and mame
+render() {  # render <dir> — the generator's EMULATOR.md + README (its play section) for fbneo and mame
     python3 - "$1" <<'PYEOF'
-import os, sys
+import json, os, sys
 sys.path.insert(0, "tools")
-import package_release_platforms as pp
+import package_release as pr, package_release_platforms as pp
 pp.binaries_side = lambda platform, edir: []      # text only: no binary is read or copied
 out = sys.argv[1]
+m = {"name": "merged-m99", "version_string": "M99", "build_fingerprint": "0" * 40}   # a stub: the text is all this gate reads
 for plat in ("fbneo", "mame"):
     d = os.path.join(out, plat); os.makedirs(d, exist_ok=True)
-    open(os.path.join(d, "README.md"), "w").write("<!--PLAY-->\n")
-    pp.emulator_side(plat, d, "merged-m99")
+    json.dump(m, open(os.path.join(d, "manifest.json"), "w"))
+    open(os.path.join(d, "README.md"), "w").write(pr.readme(None, m, 1, 1))
+    pp.select_platform_text(d, plat); pp.emulator_side(plat, d, m["name"]); pp.fill_platform_text(d, plat)
 PYEOF
 }
 
@@ -58,10 +61,9 @@ if c == "qtdebug-dropped":
     edit(os.path.join(d, "mame", "EMULATOR.md"), lambda s: s.replace(" USE_QTDEBUG=0", ""))
 elif c == "deps-dropped":
     edit(os.path.join(d, "mame", "EMULATOR.md"), lambda s: re.sub(r"(?m)^- \*\*Linux.*\n(  .*\n)*", "", s))
-elif c == "step1-wording":
+elif c == "recipe-route-dropped":
     edit(os.path.join(d, "fbneo", "README.md"),
-         lambda s: s.replace("Put the `vsavjw.zip` you built from your dumps (the README's first part)",
-                             "Put the `vsavjw.zip` you built in step 1"))
+         lambda s: re.sub(r"\*\*By hand, or with the recipe package\*\*.*?\n\n", "", s, count=1, flags=re.S))
 PYEOF
 }
 
@@ -90,9 +92,7 @@ for plat in ("fbneo", "mame"):
     for os_name in ("Linux", "macOS", "Windows"):
         if not re.search(rf"(?m)^- \*\*{os_name}\b", emd):
             bad.append(f"{plat}: EMULATOR.md names no {os_name} dependencies")
-    if "you built in step 1" in rd:
-        bad.append(f"{plat}: README step 3 says the set was built in step 1 (step 1 is the emulator)")
-    if "only\n   run a prebuilt program" not in rd and "only run a prebuilt program" not in rd:
+    if "run only a prebuilt program" not in rd:
         bad.append(f"{plat}: README does not tell a recipe player the launchers run only a prebuilt program")
     if plat == "mame":
         lines = [l for l in emd.splitlines() if "make SOURCES=" in l and "LINUX" in l]
@@ -117,13 +117,13 @@ render "$W/real" > "$W/render.log" 2>&1 || { echo "FAIL: the generator did not r
 [ -z "${VS_CTL:-}" ] || { echo "  mode: $VS_CTL applied to the rendered text"; perturb "$VS_CTL" "$W/real"; }
 rc=0; check "$W/real" > "$W/check.txt" 2>&1 || rc=$?
 case "$rc" in
-0) echo "  ok    both EMULATOR.md: dependencies per OS, no missing-file pointer; mame: the Linux line carries the switch the project's builds use, qmake6 named, -verifyroms described, a play line; both READMEs: step 3 for a recipe player" ;;
+0) echo "  ok    both EMULATOR.md: dependencies per OS, no missing-file pointer; mame: the Linux line carries the switch the project's builds use, qmake6 named, -verifyroms described, a play line; both READMEs: the by-hand route for a recipe player" ;;
 3) echo "  FAIL  the rendered recipe text:"; cat "$W/check.txt"; fail=1 ;;
 *) echo "  FAIL  the check itself failed (rc=$rc):"; sed 's/^/      /' "$W/check.txt"; fail=1 ;;
 esac
 
 if [ -z "${VS_CTL:-}" ]; then
-    for c in qtdebug-dropped deps-dropped step1-wording; do
+    for c in qtdebug-dropped deps-dropped recipe-route-dropped; do
         render "$W/$c" > /dev/null 2>&1
         if ! perturb "$c" "$W/$c" > "$W/$c.perturb" 2>&1; then
             vs_ctl_dead "$c" "the perturbation did not apply: $(tail -1 "$W/$c.perturb")" || true; fail=1; continue

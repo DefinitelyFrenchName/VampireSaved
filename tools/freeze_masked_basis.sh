@@ -83,10 +83,13 @@ freeze_one() {
     _o="$WORK/out_$_n"
     if [ ! -f "$_rpl" ]; then echo "$_n: no such replay" > "$_o"; touch "$WORK/fail_$_n"; return 0; fi
     for _i in 1 2; do
-        # FRESH SANDBOX, ALWAYS (14z-91). run_mame.sh treats an explicit
+        # FRESH SANDBOX, ALWAYS (14z-91). run_mame.sh treated an explicit
         # MAME_SANDBOX as DELIBERATE REUSE ("to test nvram-carrying scenarios",
-        # tools/run_mame.sh:6-10), and these paths are derived from the replay
-        # NAME alone — so calling freeze_one twice for one name in a single
+        # tools/run_mame.sh:6-10 as it read until #296); since #296 (14z-206)
+        # it REFUSES a sandbox that already holds an earlier run's state
+        # (exit 3) unless MAME_SANDBOX_REUSE=1 (tools/run_mame.sh:6-12), so
+        # the trap below now fails loudly instead of silently. These paths
+        # are derived from the replay NAME alone — so calling freeze_one twice for one name in a single
         # invocation hands the second call the first call's EEPROM. That is
         # not hypothetical: it is what `VERIFY_BASIS=<name> ... <name>` does,
         # i.e. the canary command docs/NEXT_SESSION.md documents. Measured:
