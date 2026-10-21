@@ -8,7 +8,11 @@
 #   workers' specs, commands and reports — a BACKGROUND worker's report being the hand-back the
 #   session received (#208), never its first text, and `NOT DELIVERED` when it had not handed back;
 #   and (since #271, 14z-199) a RULE-CHECKER reader's figure quoted from its own prompt is not
-#   flagged, while one in neither its prompt nor its results still is.
+#   flagged, while one in neither its prompt nor its results still is; and (since #277, 14z-205c) a decimal written
+#   to fewer places than its source is sourced, a figure or path cited past a result line's 160-character cut is quoted
+#   (A@/W@), and a --from span opens with the event lines before its cut, marked `<`; and (since #262) a maintainer
+#   message sent mid-turn, stored only as a `queued_command` attachment from a human, is an M line, once; and (since
+#   #263) under a W# line, W§ quotes the file lines a worker's report cites beside a listed figure, from its own read.
 # HOW: drives the extractor's selftest over a synthetic transcript with known answers (a
 #   sourced figure, an invented one, non-figures, an open task, a marker merely quoted); two
 #   controls run copies with the launch test loosened and the figure finder blinded and must
@@ -36,6 +40,16 @@
 # MUST-FIRE: perturbed-copy: loose-launch — a copy whose launch test (agentlib.tracked_launch) accepts the marker ANYWHERE in a result (the pre-14z-176 test) must invent the quoted task, and the selftest must FAIL (mode: the gate runs against that copy)
 # MUST-FIRE: perturbed-copy: handback-ignored — a copy whose extractor ignores the hand-backs the SESSION received (session_handbacks' result dropped) must stop showing the fixture's delivered verdict, and the gate must FAIL (#208; mode: the gate runs against that copy)
 # MUST-FIRE: perturbed-copy: judge-prompt-unsourced — a copy whose extractor does not count a RULE-CHECKER reader's prompt as a source (the pre-#271 extractor, JUDGE_PROMPT_SOURCED off) must flag the selftest reader's quoted claim figure 2560, and the selftest must FAIL (#271, 14z-199: a calibration plant's reader quoting its claim's frames 2550/2560 failed procedure runs from 14z-179 to 14z-198; mode: the gate runs against that copy)
+# MUST-FIRE: perturbed-copy: rounding-off — a copy whose figure matcher has no rounding clause (the pre-#277 extractor) must flag the selftest's 10.5 sourced only by `real 10.45`, and the selftest must FAIL (#277, 14z-205c; mode: the gate runs against that copy)
+# MUST-FIRE: perturbed-copy: cut-cites-off — a copy whose cut_cites returns nothing must drop the A@ line quoting the cited figure and path past the 160-character cut, and the selftest must FAIL (#277; mode: the gate runs against that copy)
+# MUST-FIRE: perturbed-copy: prelude-off — a copy whose prelude holds no lines must open a --from span bare, and the selftest must FAIL (#277; mode: the gate runs against that copy)
+# MUST-FIRE: perturbed-copy: mid-turn-blind — a copy whose mid_turn_message reads nothing (the pre-#262 extractor) must drop the selftest's mid-turn maintainer message, and the selftest must FAIL (#262, 14z-205c; mode: the gate runs against that copy)
+# MUST-FIRE: perturbed-copy: cites-in-word — a copy whose A@ finder accepts a figure inside a word (a hash, a key) must quote the selftest's 35 from inside a commit hash, and the selftest must FAIL (#277, run 2026-10-20-1157; mode: the gate runs against that copy)
+# MUST-FIRE: perturbed-copy: said-global — a copy whose M-line set is never cleared (one M line per TEXT for the whole transcript) must drop the selftest's second, later "identical Phobos confirmed", and the selftest must FAIL (#262, run 2026-10-20-1158; mode: the gate runs against that copy)
+# MUST-FIRE: perturbed-copy: rounding-far — a copy whose rounded sources are looked for in the whole transcript must source the selftest's 1.9 from a load average 60 records back, and the selftest must FAIL (#277, run 2026-10-20-1157; mode: the gate runs against that copy)
+# MUST-FIRE: perturbed-copy: rounding-version — a copy whose rounded source may be part of a version must source the selftest's 2.5 from git version 2.54.0, and the selftest must FAIL (#277, run 2026-10-20-1157; mode: the gate runs against that copy)
+# MUST-FIRE: perturbed-copy: reads-merged — a copy whose cited_lines treats two files of one basename as one must quote a cfg.txt line for the selftest's 5678, and the selftest must FAIL (#263, run 2026-10-21-1160; mode: the gate runs against that copy)
+# MUST-FIRE: perturbed-copy: cited-lines-off — a copy whose cited_lines returns nothing must drop the W§ line quoting name_moves.py.txt:77 and 699 under the selftest worker's derived 2550, and the selftest must FAIL (#263, 14z-205c; mode: the gate runs against that copy)
 # MUST-FIRE: perturbed-copy: blind-figures — a copy whose figure finder returns nothing must stop flagging the invented figure, and the selftest must FAIL (mode: the gate runs against that copy)
 #
 # Usage: tests/test_agent_extract.sh      # ci_portable, ~1 s
@@ -62,6 +76,21 @@ edits = {
     "judge-prompt-unsourced": ("JUDGE_PROMPT_SOURCED = True", "JUDGE_PROMPT_SOURCED = False  # CONTROL judge-prompt-unsourced"),
     "handback-ignored": ("    sess_hb = session_handbacks(path)\n",
                          "    sess_hb = {}  # CONTROL handback-ignored\n"),
+    # #277 (14z-205c)
+    "rounding-off": ("        rounds = lambda m: Decimal(m).quantize(q, ROUND_HALF_UP) == want\n",
+                     "        rounds = lambda m: False  # CONTROL rounding-off\n"),
+    "cut-cites-off": ('    prints (RESULT_CHARS), with its context from the latest such result. `results` is [(record, full text)]."""\n',
+                      '    prints (RESULT_CHARS), with its context from the latest such result. `results` is [(record, full text)]."""\n    return []  # CONTROL cut-cites-off\n'),
+    "mid-turn-blind": ('    a = (r.get("attachment") or {}) if r.get("type") == "attachment" else {}\n',
+                       '    return None  # CONTROL mid-turn-blind\n'),
+    "cited-lines-off": ('    is quoted from either), a cited line the reads do not hold is marked, and lines past the cap are counted"""\n',
+                        '    is quoted from either), a cited line the reads do not hold is marked, and lines past the cap are counted"""\n    return []  # CONTROL cited-lines-off\n'),
+    "cites-in-word": ("                continue   # inside a word: not this figure's source\n", "                pass  # CONTROL cites-in-word\n"),
+    "said-global": ("            said.clear()   # #262", "            pass  # CONTROL said-global #262"),
+    "rounding-far": ("                    miss = [f for f in figures(txt) if not sourced(f, corpus, near)]", "                    miss = [f for f in figures(txt) if not sourced(f, corpus)]  # CONTROL rounding-far"),
+    "rounding-version": ("(?![\\w]|\\.\\d)\"))", "(?![\\w])\"))  # CONTROL rounding-version"),
+    "reads-merged": ("            if len(files) > 1:   # which file the report means is unknown: quote neither", "            if False:  # CONTROL reads-merged"),
+    "prelude-off": ("    before = collections.deque(maxlen=max(prelude, 0))", "    before = collections.deque(maxlen=0)  # CONTROL prelude-off"),
 }
 a, b = edits[name]
 assert s.count(a) == 1, name
@@ -73,7 +102,10 @@ PY
 echo "== test_agent_extract: #172 slice S3 — the extract C1 reads =="
 fail=0
 EX=tools/agent/extract.py
-if vs_ctl_is loose-launch || vs_ctl_is blind-figures || vs_ctl_is handback-ignored || vs_ctl_is judge-prompt-unsourced; then EX="$(make_copy "$VS_CTL")"; fi
+if vs_ctl_is loose-launch || vs_ctl_is blind-figures || vs_ctl_is handback-ignored || vs_ctl_is judge-prompt-unsourced \
+   || vs_ctl_is rounding-off || vs_ctl_is cut-cites-off || vs_ctl_is prelude-off || vs_ctl_is mid-turn-blind \
+   || vs_ctl_is cited-lines-off || vs_ctl_is cites-in-word || vs_ctl_is said-global \
+   || vs_ctl_is rounding-far || vs_ctl_is rounding-version || vs_ctl_is reads-merged; then EX="$(make_copy "$VS_CTL")"; fi
 python3 "$EX" --selftest > "$W/self.txt" 2>&1 || true
 sed 's/^/  /' "$W/self.txt"
 grep -q -- '-> PASS$' "$W/self.txt" || { echo "FAIL: the extractor's selftest"; fail=1; }
@@ -95,7 +127,7 @@ echo "  $(echo "$r" | tr '\n' ' ')"
 case "$r" in *WRONG*) echo "FAIL: the hand-back fixture: $(echo "$r" | tr '\n' ' ')"; grep -E ' (WX|W ) ' "$W/fx.full" | head -3 | cut -c1-140; fail=1 ;; esac
 
 if [ -z "${VS_CTL:-}" ]; then
-    for c in loose-launch blind-figures judge-prompt-unsourced; do
+    for c in loose-launch blind-figures judge-prompt-unsourced rounding-off cut-cites-off prelude-off mid-turn-blind cited-lines-off cites-in-word said-global rounding-far rounding-version reads-merged; do
         python3 "$(make_copy "$c")" --selftest > "$W/ctl_$c.txt" 2>&1 || true
         if grep -q -- '-> FAIL$' "$W/ctl_$c.txt"; then vs_ctl_fired "$c" "$(grep -m1 'WRONG' "$W/ctl_$c.txt" | sed 's/^ *//')"
         else vs_ctl_dead "$c" "the perturbed copy passed its selftest — the selftest cannot see this failure" || fail=1; fi
@@ -106,5 +138,5 @@ if [ -z "${VS_CTL:-}" ]; then
                  *) vs_ctl_dead handback-ignored "the copy that ignores the session's hand-backs still showed the delivered verdict ($(echo "$r" | tr '\n' ' '))" || fail=1 ;; esac
 fi
 
-if [ "$fail" = 0 ]; then echo "PASS: the extract sources and flags figures, excludes reasoning, lists detached, open and only REAL tracked launches, and shows a background worker's DELIVERED report (or NOT DELIVERED), never its first text"
+if [ "$fail" = 0 ]; then echo "PASS: the extract sources and flags figures (a rounded decimal sourced), quotes what a cut result line hid, opens a cut span with its prelude, shows a mid-turn maintainer message, quotes the lines a worker cites for a listed figure, excludes reasoning, lists detached, open and only REAL tracked launches, and shows a background worker's DELIVERED report (or NOT DELIVERED), never its first text"
 else echo "FAIL: test_agent_extract"; exit 1; fi

@@ -1,0 +1,18 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent205c/t292/closing_comment.md	7b8ac5d1c1bd995145cf758464b4b705b61f4fa6
+build/agent205c/t292/predict_state_wt.txt	89287ab5eeff636da3c1def73975d95402d35e8b
+build/agent205c/t292/predict_state_nk2.txt	0f6e8bc5130187c325910a91202cc24cb08191d6
+build/agent205c/t292/predict_state_nk3.txt	f26e794cae565740489ec5f46b10c08c5e93ef0b
+build/agent205c/t292/opens_state.txt	bc78c72a5bdde7202022a8e2736ff3fcc993e4bf
+build/agent205c/t292/all_namers.txt	5dd5f3280038c48fed0b46b72c7fd50c8ebb91b3
+build/agent205c/t292/all_rules_compact.txt	76d7691ddc045a29f9795c695469feb7588096b0
+build/agent205c/t292/gate_nk2.log	228b1edc65ae223ecfd1383049e1a6d5e33fcb6d
+build/agent205c/t292/gate_mode_planner-self-off.log	e7557efc573a7accd0c44f830c7c777be986541b
+build/agent205c/t292/gate_mode_selftest-scope-off.log	fb509068deb84e6f29a0dd113613b161cfada810
+build/agent205b/close/tier_results.tsv	44eefd21a476417ac954023b2eb4abaedf5a1ce6
+build/agent205b/close/tier_results.controls.tsv	4da2acee83368dbabbdfd71fafa793abfd06c405
+DECISIONS_HISTORY.md.lines-7414-7443 (lines 7414-7443 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-20 (14z-205c) — #299's shared jtsim scratch collision: a lock in mister_mra.sh; #29", and the entries after it up to line 7443)	8dc40761a622354cde1f53f8a6a405bf38d8d5b4
+docs/project/gotchas.md.lines-7337-7347 (lines 7337-7347 of docs/project/gotchas.md)	4bc744e331c98fdbbcc1752c458f1df5ada8f03b
+docs/project/tickets.tsv.lines-20-73 (lines 20-73 of docs/project/tickets.tsv)	9dfa8f780ef01408d21bb7f9cab32492559f4ccd
+docs/project/tickets.tsv.lines-83-83 (lines 83-83 of docs/project/tickets.tsv)	fdc4bcdd733a09c8c24ba076379bd8e75fd9d1f5
+STATE.md.lines-100-122 (lines 100-122 of STATE.md)	b466d27a36b239830152f343c5350d83482d4699

@@ -1,0 +1,13 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent205c/t263/closing_comment.md	304c0d1e7deca8fe5af5f74cf3f840a102ce05e0
+build/agent205c/t263/x199_head.txt.lines-30218-30263 (lines 30218-30263 of build/agent205c/t263/x199_head.txt)	f7b6b16b0089615b80d229e37a4f44071835ff82
+build/agent205c/t263/fixed_986.txt	3218f19cabc3cd817a6a2cd9867ef01eb20cb9d7
+build/agent205c/t263/proto_derivable.py	b786ba8bc1656f5459cb5ccbc5b804ba05b071f0
+build/agent205c/t277/gate_rc2.log	fe9b5ff0742e7e90cac463e15e51c97582470e71
+build/agent205c/t263/gate_mode_cited-lines-off_final.log	d4fab1ba0d04ac2f670d32baa277df0107554124
+build/agent205c/t263/extract_change_final.diff	e27ee5d7dc83461c631687c315b3ce50546293dc
+DECISIONS_HISTORY.md.lines-7492-7500 (lines 7492-7500 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-20 (14z-205c) — #277, #262 and #263 are taken up (parked under #289 since 2026-10-1", and the entries after it up to line 7500)	e7537540de269ba5d0f3c7c82d78557b0bcc8371
+DECISIONS_HISTORY.md.lines-7500-7514 (lines 7500-7514 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-20 (14z-205c) — #277's three fixes and #263's W§ line accepted", and the entries after it up to line 7514)	789107474a36cbd2e14c81d483710490afe3547a
+docs/project/gotchas.md.lines-7350-7362 (lines 7350-7362 of docs/project/gotchas.md)	02dc6812a532ff5f2cc01159073bcd85c6b01aa2
+docs/project/tickets.tsv.lines-20-73 (lines 20-73 of docs/project/tickets.tsv)	9dfa8f780ef01408d21bb7f9cab32492559f4ccd
+docs/project/tickets.tsv.lines-112-112 (lines 112-112 of docs/project/tickets.tsv)	5848b1453f7ca9605c3a70771ec5c2edf5cb2602

@@ -1,0 +1,2 @@
+  FLAG D-ABSOLUTE: My first figure ("battery_reach makes 13 of the 19") came from the first reason printed per gate, not from every reason, and the question was put to the main...  [build/agent205c/t292/closing_comment.md]
+packet_check: 1 flag(s): D-ABSOLUTE 1

@@ -1,0 +1,16 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent205c/t277/closing_comment.md	db5fd9fc098950ad12bb23426d6a65326435f248
+build/agent205c/t277/repro_decimals.txt	ac07b616b00ed2b25213280cb47f7a517b232575
+build/agent205c/t277/fixed_decimals.txt	5ac61427914688d4ec18ef9e2ad5a927bcaa4a8b
+build/agent205c/t277/repro_part_boundary.txt	97a38f51cb4b089b546b59fac18a8bf3c8bd90cb
+build/agent205c/t277/fixed_part_boundary.txt	b7c35b0fba7289e7361b0a00286ea27814bcca1c
+build/agent205c/t277/gate_final.log	ba10cc38552049641724bb8efb37439a3aa8d6a0
+build/agent205c/t277/gate_mode_rounding-off.log	4f98d2e824d19e46e5209d0198d68c08c74fc751
+build/agent205c/t277/gate_mode_cut-cites-off.log	590accfe09026f3aa7aa79bd80a8fe888156a71b
+build/agent205c/t277/gate_mode_prelude-off.log	5c69fb4e22ce5517444eedab8d488c0afbb21e31
+build/agent205c/t277/test_packet_check.log	457de3a57f77e97d81f31bce989980cbdb028c57
+build/agent205c/t277/extract_change.diff	d0a9cbcc90d3e718c5c2a7411f88070a0472ced3
+DECISIONS_HISTORY.md.lines-7307-7320 (lines 7307-7320 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-19 (14z-205) — #262, #263 and #277 are parked under #289", and the entries after it up to line 7320)	623f4e5b337144e4f43c1acefc709a8c9be03aa9
+DECISIONS_HISTORY.md.lines-7491-7510 (lines 7491-7510 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-20 (14z-205c) — #277, #262 and #263 are taken up (parked under #289 since 2026-10-1", and the entries after it up to line 7510)	f20d2217fd4100fc096bcd4c00c776dbffba4742
+docs/project/tickets.tsv.lines-20-73 (lines 20-73 of docs/project/tickets.tsv)	9dfa8f780ef01408d21bb7f9cab32492559f4ccd
+docs/project/tickets.tsv.lines-98-98 (lines 98-98 of docs/project/tickets.tsv)	e8853fd8901b3dfbf7b12836c5beb66a5b9b7cf9

@@ -3315,3 +3315,42 @@ A scratch playback on ERIS (`cps2.exe vsavjw … -playback my_session.inp -video
 running after its 15-second recording ended: MAME hands control back to live input when the `.inp` runs out, and with
 no `-seconds_to_run` nothing stops it. The run held the SSH session until its 600 s bound and was killed with
 `taskkill`. `tools/run_inp_guarded.sh` passes `-exit_after_playback` for this reason; every scripted playback does.
+
+## AN `apt install` ALSO UPGRADES WHAT IT PULLS IN — a "no package of that kind changed" read of the install list missed the Mesa runtime it upgraded (paid: 14z-198 filed, 14z-205b found, #266)
+
+#266's body (14z-198) said no graphics-stack package changed on PILOT after 2026-10-02, and that the only changes
+were the build toolchain's `-dev` installs at 14:50. The toolchain's one `apt install -y build-essential … libsdl2-dev
+…` run (`/var/log/apt/history.log`, Start-Date 2026-10-02 14:50:15) carried an `Upgrade:` line too: `libgl1-mesa-dri`,
+`libegl-mesa0`, `libglx-mesa0`, `libgbm1`, `mesa-libgallium` and the va/vdpau/vulkan drivers, `25.2.8-0ubuntu0.24.04.2`
+→ `.3`, pulled up to the version the new `libgbm-dev` needed. GNOME Shell on the bochs card segfaulted from the next
+boot (`docs/project/build_environments.md` "PILOT'S DISPLAY CARD IS VirtIO-GPU"). **The rule:** to answer "what changed
+on this host", read every `upgrade` line of `/var/log/dpkg.log*` (or each run's `Upgrade:` line in apt's history) in
+the window, not the list of packages that were asked for.
+
+## UNDER `-debug`, A STOP THAT LANDS AS THE SCREEN FRAME ADVANCES MAKES THAT FRAME'S PER-FRAME SAMPLE READ ONE ENGINE PASS EARLY — and the game clock cannot see it (paid: 14z-205, #229, fork F2)
+
+Fork F2 timed the vanilla specials from a `-debug` tap leg (`tests/lua/specials_b_trace.lua`) and took each move's
+IDENTITY from a separate leg with no debugger. The tap leg stayed on `replay.lua`'s timeline: its pass counter ended
+equal to the identity leg's and every stream held the right number of passes, and both legs sat on their frozen game
+clocks (`tests/expected/instr_gameclock/audit_vanilla_specials_b.tsv`). Yet a debugger stop that landed just as the
+screen frame advanced made that frame's sample read one pass early: 110 frames on Lei-Lei's rig, 44 Lilith, 58
+Morrigan, 30 Sasquatch, 0 on Q-Bee, Victor and Zabel, every one an isolated frame. Once, it showed Q-Bee's AIR MK
+DELTA A as `a2:0x34` where the reference timeline reads `a2:0x36`. Fork F1 saw the debugger's other face on its own
+instrument: with no breakpoint at all, only attaching `-debug` drifted its old frame_done clock by one (4,830 frames
+counted over 4,829 emulated; game clock 80 against 81). **The rule:** a per-frame SAMPLE from a `-debug` leg is not
+the engine's state at that frame; take identity from a leg with no debugger, take timing from an ordered stream of
+events tagged with their pass number, and assert pass-for-pass equality between the two (`tools/specials_b_rigs.py
+passeq` is the check). A matching game clock does not prove a matching sample.
+
+## A MAME WRITE TAP THAT READS MEMORY OR `cpu.state` INSIDE ITS CALLBACK CRASHED MAME AT TEARDOWN — and write taps crash there intermittently anyway (paid: 14z-205, #229, fork F1; seen again 14z-205b, R1)
+
+Building `tests/lua/specials_trace.lua` (#229's specials gate), fork F1 found that reading memory or the CPU state
+from inside a write-tap callback, or tapping the words from the first frame on, crashed MAME at teardown. Following
+the node from the game's own writes to `+0x1C`/`+0x1E`, with no read inside the tap, removed that cause, but not the
+crash: on 13 rigs run two at a time, MAME exited 139 at teardown after writing every line, for 2 of 13 legs under
+`tap_writes.lua` and 3 of 13 under the new instrument; on 14z-205b's R1 (PILOT), all three trace legs did. This is
+the class of "MAME Lua write taps are silently dropped on handler re-install" above, whose rule stands: judge a tap
+run by its own END or SUMMARY line, never by MAME's exit code. What #229 adds: reading inside a tap is a cause of its
+own, avoidable; the remaining crash is not root-caused. **The rule:** a write-tap callback records the written value
+and the frame and reads nothing else; a gate accepts exit 0, or 139 with every one of its output lines present
+(field, tick and ALIGN lines in `tests/audit_vanilla_specials_a.sh`), and fails any other exit.

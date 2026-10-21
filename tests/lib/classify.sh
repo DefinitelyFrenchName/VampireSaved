@@ -112,9 +112,20 @@ vs_classify() {
 #             `<gate>: N: <word>…` — is DIED; a child script's error quoted in a real FAIL
 #             is not the gate's own, and a teardown segfault's job line has digits where
 #             the word would be (`line 64:  2444 Segmentation fault`), so neither matches.
+#             AND (#299, 14z-205c): given the control's name (the optional 4th argument), a
+#             mode run whose gate prints `CONTROL DEAD: <that name>` while a Python exception's
+#             last line (`FileNotFoundError: …`) stands in the log is DIED. The gate itself says
+#             its control did not do its job, and the FAIL beside it is a crash's: measured on
+#             PILOT, `test_mra_build_line`'s foreign-rompath mode died of the jtsim scratch
+#             collision ("generator failed for another reason: … FileNotFoundError") and read
+#             HONOURED. Neither half alone: four gates (test_df_startup_provenance,
+#             test_defense_rows_census, test_bundle_parsers twice) print their OWN `CONTROL DEAD`
+#             as their honoured mode, and audit_victim_parity@no-translation quotes a child's
+#             exception beside ANOTHER control's DEAD line; over 2,351 control logs (#299's four
+#             PILOT legs, 602 emulator-tier logs) the conjunction matches that one row only.
 #   TIMEOUT   the wrapper's exits, as for any gate
-vs_classify_control() {  # vs_classify_control <exit-status> <logfile> [<gate script as invoked>]
-    _cst="$1"; _clog="$2"; _cgate="${3:-}"
+vs_classify_control() {  # vs_classify_control <exit-status> <logfile> [<gate script as invoked>] [<control name>]
+    _cst="$1"; _clog="$2"; _cgate="${3:-}"; _cname="${4:-}"
     if grep -qa '^REFUSED: CONTROL=' "$_clog"; then
         VS_CTL_EXEC=REFUSED; VS_CTL_EXEC_DETAIL="declared in the header, not a mode of the gate"; return 0
     fi
@@ -132,6 +143,9 @@ vs_classify_control() {  # vs_classify_control <exit-status> <logfile> [<gate sc
             VS_CTL_EXEC=DIED; VS_CTL_EXEC_DETAIL="a crash is not a verdict (exit $_cst): $_cself"
         elif [ "$_cst" = 0 ] || grep -qa '^Traceback' "$_clog"; then
             VS_CTL_EXEC=DIED; VS_CTL_EXEC_DETAIL="a crash is not a verdict: $(grep -aE '\.sh: line [0-9]+: [A-Za-z_][A-Za-z0-9_]*: |^Traceback|Error' "$_clog" | head -1 | cut -c1-90)"
+        elif [ -n "$_cname" ] && grep -qa "^CONTROL DEAD: $_cname " "$_clog" \
+                && grep -qaE '^([a-z_][a-z0-9_]*\.)*[A-Z][A-Za-z0-9]*(Error|Exception): ' "$_clog"; then   # DEAD-BESIDE-CRASH
+            VS_CTL_EXEC=DIED; VS_CTL_EXEC_DETAIL="its own control reported dead beside a crash: $(grep -aE '^([a-z_][a-z0-9_]*\.)*[A-Z][A-Za-z0-9]*(Error|Exception): ' "$_clog" | head -1 | cut -c1-80)"
         else
             VS_CTL_EXEC=HONOURED; VS_CTL_EXEC_DETAIL="reached the gate's own FAIL (exit $_cst)"
         fi ;;

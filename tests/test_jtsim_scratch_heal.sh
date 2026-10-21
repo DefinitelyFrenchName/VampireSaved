@@ -12,11 +12,14 @@
 #   tool, which must leave the reaped clone hollow. Section 5 (#232): a SUBMODULE initialised
 #   from the local emu/jtcores checkout (no network), reaped as the 03:35 maintenance did it —
 #   its gitdir HEAD, worktree gitfile and tracked files gone — must be healed back to the
-#   commit the superproject records; its control cuts only the submodule heal.
+#   commit the superproject records; its control cuts only the submodule heal. Section 6 (#299, 14z-205c): the
+#   tool's LOCK on the scratch — a live holder is waited for and the run gives up loudly, a dead holder is taken
+#   over, and the lock is gone after a run; its control cuts the lock block.
 # EXPECTS: the three shapes handled as stated and the control failing; a red is the 0-second
 #   'Cannot open macros.def' red returning between two static runs.
 #
 # MUST-FIRE: shadow-tool: heal-removed — a copy of mister_mra.sh with the 1b HEAL block cut must leave a hollowed clone hollow (mode: section 2 runs that copy, and must fail)
+# MUST-FIRE: shadow-tool: lock-removed — a copy of mister_mra.sh with the 0b LOCK block cut must run straight through a scratch a live process holds (mode: section 6 runs that copy, and must fail)
 # MUST-FIRE: shadow-tool: submodule-heal-removed — a copy of mister_mra.sh with only the SUBMODULE heal cut must leave a reaped submodule broken (mode: section 5 runs that copy, and must fail)
 #
 # THE CLASS. tools/mister_mra.sh and tools/run_sim_jtcps2.sh keep a clone of
@@ -88,6 +91,18 @@ TOOL=tools/mister_mra.sh
 vs_ctl_is heal-removed && TOOL="sh $CTL"
 TOOL5=tools/mister_mra.sh
 vs_ctl_is submodule-heal-removed && TOOL5="sh $CTL2"
+# THE THIRD SHADOW TOOL (#299): the lock block cut
+CTL3="$(shadow_tool "$WORK/ctl3" mister_mra.sh)"
+python3 - "$CTL3" <<'PY'
+import sys
+p = sys.argv[1]; s = open(p).read()
+a = s.index("# ---------------------------------------------------- 0b. THE LOCK")
+b = s.index('PIN="$(sed', a)
+open(p, "w").write(s[:a] + "unlock() { :; }\n" + s[b:])
+PY
+grep -q "0b. THE LOCK" "$CTL3" && { echo "  FAIL: the lock control still carries the lock"; fail=1; }
+TOOL6=tools/mister_mra.sh
+vs_ctl_is lock-removed && TOOL6="sh $CTL3"
 
 echo "== 1. a fresh scratch is cloned and pinned =="
 JTSIM_SCRATCH="$S" tools/mister_mra.sh --ensure-scratch --quiet || { echo "  FAIL: ensure on a fresh dir"; fail=1; }
@@ -146,5 +161,26 @@ else
              || vs_ctl_fired submodule-heal-removed "without the submodule heal $SM stays broken (HEAD $(git -C "$S/$SM" rev-parse --short HEAD 2>/dev/null || echo none), want ${WANT%%${WANT#???????}})"
 fi
 
-if [ "$fail" -eq 0 ]; then echo "PASS: a hollowed jtsim scratch clone is healed, re-cloned when its store is gone, and the control fires"
+echo "== 6. THE LOCK (#299): a live holder is waited for, a dead one taken over, none left behind =="
+LOCK="$WORK/.lock-scratch"
+sleep 120 & HOLDER=$!
+mkdir "$LOCK" && echo "$HOLDER" > "$LOCK/pid"
+if MRA_LOCK_WAIT=2 JTSIM_SCRATCH="$S" $TOOL6 --ensure-scratch --quiet > "$WORK/lock6.log" 2>&1; then
+    echo "  FAIL: the tool ran while pid $HOLDER held the scratch"; fail=1
+else
+    grep -q "locked by pid $HOLDER" "$WORK/lock6.log" && [ "$(cat "$LOCK/pid" 2>/dev/null)" = "$HOLDER" ] \
+        && echo "  ok: held by a live pid, the run waited 2 s and gave up; the holder's lock untouched" \
+        || { echo "  FAIL: refused, but not on the lock: $(tail -1 "$WORK/lock6.log")"; fail=1; }
+fi
+if ! vs_ctl_is lock-removed; then
+    if MRA_LOCK_WAIT=2 JTSIM_SCRATCH="$S" sh "$CTL3" --ensure-scratch --quiet >/dev/null 2>&1; then
+        vs_ctl_fired lock-removed "without the lock the tool ran through a scratch pid $HOLDER held"
+    else vs_ctl_dead lock-removed "the lock-less copy refused a held scratch"; fail=1; fi
+fi
+kill "$HOLDER" 2>/dev/null; wait "$HOLDER" 2>/dev/null || true
+JTSIM_SCRATCH="$S" tools/mister_mra.sh --ensure-scratch --quiet || { echo "  FAIL: ensure with a dead holder's lock"; fail=1; }
+[ ! -e "$LOCK" ] && echo "  ok: a dead holder's lock taken over, and none left after the run" \
+                 || { echo "  FAIL: a lock is left at $LOCK"; fail=1; }
+
+if [ "$fail" -eq 0 ]; then echo "PASS: a hollowed jtsim scratch clone is healed, re-cloned when its store is gone, the scratch is locked, and the controls fire"
 else echo "FAIL: jtsim scratch heal"; exit 1; fi

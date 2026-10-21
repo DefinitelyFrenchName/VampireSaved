@@ -2,9 +2,12 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 301
+# issues: 304
 number	state	reason	closed	labels	title
-301	OPEN	-	-	evolution,severity: low	Community cross-check: report the #229 workbook differences to the community, and check the open questions against vswiki
+304	OPEN	-	-	bug,test-integrity	The static-tier planner counts untracked build/ output as changed inputs (build/sheets/: 5,739 files, a 3-hour plan); review what it includes and excludes
+303	OPEN	-	-	bug	Static-tier gates leave their temp directories in /tmp (~1,690 entries, ~2.3 GB over four tiers)
+302	OPEN	-	-	bug,test-integrity	audit_marionette_cost reads 8 more replays per hook row than its frozen expectation on a clean clone
+301	OPEN	-	-	evolution,severity: low	Community cross-check: create report of the #229 workbook differences for the community, and check the open questions against vswiki
 300	CLOSED	COMPLETED	2026-10-19	bug,test-integrity	test_close_tools REFUSED on the live tree: section 2b reads the findings table #288 cut from the close
 299	OPEN	-	-	evolution,performance	Static tier: run gates in parallel (--jobs, ~70-80% of the machine), proven equal to a serial run first
 298	OPEN	-	-	evolution,performance	Static tier scope: at a commit/close, execute a gate's controls only when a program of its reach changed (R1); all at freeze/release
@@ -13,7 +16,7 @@ number	state	reason	closed	labels	title
 295	CLOSED	COMPLETED	2026-10-19	evolution,severity: medium,test-integrity	audit_dmg_legacy_sweep never runs Demitri's legacy hits on our build: add an exact vsavj-vs-ours leg (superset coverage)
 294	OPEN	-	-	cosmetic,parked	Killshread's shock/electrocuted state has wrong palette (currently accepted tradeoff) - parked
 293	CLOSED	COMPLETED	2026-10-18	bug,severity: medium,test-integrity	Two gates hand one MAME sandbox to several runs, so a later run boots on carried nvram (audit_flicker_attribution, audit_legacy_pairings)
-292	OPEN	-	-	bug,performance,severity: high	static_confirm: a tool's self-test strings count as a direct read (battery_reach names STATE.md), so 22 gates re-run with controls at every commit
+292	CLOSED	NOT_PLANNED	2026-10-20	bug,performance,severity: high	static_confirm: a tool's self-test strings count as a direct read (battery_reach names STATE.md), so 22 gates re-run with controls at every commit
 291	OPEN	-	-	evolution	On demand, at a given tag or commit: comparative capture sheets (ours vs vsavj and/or vs2) for every comparing test, as a visual proof of accuracy for humans
 290	CLOSED	COMPLETED	2026-10-17	evolution,severity: high	A deterministic guard: no commit or push on a tier that did not read GREEN (replaces the procedure check's one recurring catch)
 289	OPEN	-	-	evolution	Revisit the cut of the close's audit layer (documentation packet, procedure check) when there is more data
@@ -28,7 +31,7 @@ number	state	reason	closed	labels	title
 280	OPEN	-	-	bug	Release-only: test_applier_page section 3b fails on Python 3.12 (a faked win32 makes shutil import _winapi)
 279	OPEN	-	-	bug	Release-only: release patches built with xdelta3 3.0.11 (PILOT's apt) carry verbatim reference-ROM runs
 278	OPEN	-	-	bug	Release-only: a census of gates that compare locale-sorted output against byte-ordered frozen lists
-277	OPEN	-	-	bug	The procedure check's extract flags a figure written with fewer decimals as unsourced, and a part boundary hides a step's evidence
+277	CLOSED	COMPLETED	2026-10-20	bug	The procedure check's extract flags a figure written with fewer decimals as unsourced, and a part boundary hides a step's evidence
 276	CLOSED	COMPLETED	2026-10-19	bug	The session dashboard misses every static tier run on a snapshot: its results stay in the removed clone
 275	CLOSED	COMPLETED	2026-10-19	-	Negative fixture fidelity-14z160: its packet's gate carries the FREEZE gap fixed as #154 — does EXPECT OK still stand?
 274	CLOSED	COMPLETED	2026-10-14	evolution	Narrow tools/static_confirm.py's directory-read rule (R3) and its change set, scored on a fresh trace, before #269 is built
@@ -42,10 +45,10 @@ number	state	reason	closed	labels	title
 266	OPEN	-	-	bug	PILOT's GNOME Shell segfaults under Wayland since 2026-10-09, so audit_release_linux_desktop cannot run
 265	CLOSED	COMPLETED	2026-10-13	evolution	audit_mask_window_ff42a2 at a release: an instrument with no default subject SKIPs, and the staleness audit now FAILs that SKIP
 264	CLOSED	COMPLETED	2026-10-12	evolution	A session dashboard: time per activity, checks and re-checks and why, tier cost and quality signals, each figure labelled measured, derived, estimated, inferred or extrapolated
-263	OPEN	-	-	bug	C1 extract's W# hint flags a worker figure derived from a file it read as unsourced
-262	OPEN	-	-	bug	C1 extract drops a maintainer message stored as a queue enqueue plus an attachment record
+263	CLOSED	COMPLETED	2026-10-20	bug	C1 extract's W# hint flags a worker figure derived from a file it read as unsourced
+262	CLOSED	COMPLETED	2026-10-20	bug	C1 extract drops a maintainer message stored as a queue enqueue plus an attachment record
 261	CLOSED	COMPLETED	2026-10-17	bug,severity: high	audit_effect_class_rows section 4 checks a type-6 fallback inventory that was never frozen
-260	OPEN	REOPENED	-	evolution	Check that every submodule pin exists on its remote before a push (the 14z-192 jtcores pin was unpushed)
+260	CLOSED	COMPLETED	2026-10-20	evolution	Check that every submodule pin exists on its remote before a push (the 14z-192 jtcores pin was unpushed)
 259	CLOSED	COMPLETED	2026-10-17	bug,severity: medium	static_confirm plan took 20 min at the 14z-195 close (228 changed files, 194 rule-checker run files)
 258	CLOSED	COMPLETED	2026-10-17	bug,severity: medium	rulecheck: a packet artifact above the Read limit gets a partial read
 257	CLOSED	COMPLETED	2026-10-19	bug,severity: medium	rulings_verbatim leaves a second maintainer quote on the same line unchecked

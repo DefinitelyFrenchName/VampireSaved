@@ -1,0 +1,10 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent205b/t260/closing_comment.md	22985c79040836be2f7c42f490b97e96cf7a6aa3
+build/agent205b/t260/issue_260.txt	d87054854b3f05af0ac55ecb947bec0ce381b232
+build/agent205b/t260/ruling_260.txt	67a6b7463916c9da32e1b60a99f69dd29c4eeaa4
+build/agent205b/t260/close_row.txt	412651ae2286ef14215d08889301f82260caac4e
+build/agent205b/t260/gate_run.txt	22eeaf5ffc7d0677048f334aeae951deed4959b5
+build/agent205b/t260/controls.txt	b1b6f80701255a9fd7b86abbfdaf22ba32a2560c
+build/agent205b/t260/tier_lines.txt	1451c53b45ace9603663305b5eb70f6d915ddbfb
+build/agent205b/t260/pins.log	cf7bc73be1782dbb35f19191b50f69a5f0c9eed0
+build/agent205b/t260/push.txt	f48d647730bbcc087eded5356cb8adf98a1e52bc

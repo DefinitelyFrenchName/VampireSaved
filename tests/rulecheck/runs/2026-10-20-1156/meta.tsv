@@ -1,0 +1,11 @@
+decision	recommendation
+subject	#286: land the narrowings N-I, N-J and N-F-without-the-planner's-text in tools/static_confirm.py (adapted to #298's PROGRAM-CHANGED line), at the 14z-205c close
+session	14z-205c
+model	rule-checker@163e4ce9cf7b
+claim	The narrowed planner can land: on a strace of every static gate at b91532d8 (PILOT, a clean checkout from a bundle of the commit, 229 of 229 gates, 88,351 gate-file pairs) both the committed and the narrowed predictor score 0 misses, and the over-narrowed control misses 102 reads (CONTROL FIRED); test_static_confirm passes on the tree with all 30 of its controls firing and none dead, and test_trace_static_reads passes; it drops 8 gates from mid2's change set (59 to 51), 8 from a full run record (53 to 45) and 3 from a STATE.md-only change (41 to 38). The hunk that collided with #298's ruled PROGRAM-CHANGED line was resolved by keeping #298's line, which landing.diff leaves untouched (it carries no r1[g] line; REPORT.md 'One hunk moved'). Not tested: four gates exited non-zero under the trace (test_applier_page_browser, test_applier_page, test_emulator_staleness, test_release_roundtrip), so their traced reads may be short of a passing run's; the trace sees reads by path only (a read through git is not seen); the tree it lands in carries uncommitted changes since b91532d8 (the mister_mra.sh lock, the scratch-heal gate's section 6, records) that the trace does not cover; the savings are predictions, not a measured tier.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	75 flag(s): D-ABSOLUTE 51, D-FIGURE 24
+deliverables	build/agent205c/t286/landing.diff

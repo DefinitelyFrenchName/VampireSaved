@@ -1,0 +1,11 @@
+decision	recommendation
+subject	#266 closed done: PILOT's Wayland restored on VirtIO-GPU and audit_release_linux_desktop PASSED there; the body's 'no graphics-stack package changed' corrected (14z-205c)
+session	14z-205c
+model	rule-checker@163e4ce9cf7b
+claim	#266 can close done: its to-do was (1) root-cause the crash (the stack trace first), (2) restore PILOT's Wayland session, (3) re-run audit_release_linux_desktop there so the next release carries its PASS. (2) is done (VirtIO-GPU display, a wayland session on seat0, pilot_apt_display.txt); (3) PASSED on 2026-10-20 with its three controls failing as modes (REPORT.md, normal.log and the mode logs), and the next release's own battery re-runs it; (1) is answered as far as measured: the crash was on the bochs card after the 2026-10-02 14:50 apt run upgraded the Mesa runtime, the stack trace was not read, and the card is no longer used, so nothing is left to do. The body's 'No graphics-stack package changed' is wrong and is corrected; the facts are homed in build_environments.md and gotchas.md and row 266 carries the four answers.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	1 flag(s): D-ABSOLUTE 1
+deliverables	build/agent205c/t266/closing_comment.md

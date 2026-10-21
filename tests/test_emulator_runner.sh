@@ -91,7 +91,7 @@ sed 's| \&\& $6 !~ /^instrument:/||' "$RUNNER" > "$T/runner_instrumentrun.sh"
 cmp -s "$RUNNER" "$T/runner_instrumentrun.sh" && fail "could not remove the instrument exclusion — the selection line moved"
 chmod +x "$T/runner_instrumentrun.sh"
 # the control classifier's gate-script argument removed (14z-196, #254)
-sed 's|vs_classify_control "$_cs" "$_clog" "tests/$_g.sh"|vs_classify_control "$_cs" "$_clog"|' "$RUNNER" > "$T/runner_crashunread.sh"
+sed 's|vs_classify_control "$_cs" "$_clog" "tests/$_g.sh" "$_cn"|vs_classify_control "$_cs" "$_clog" "" "$_cn"|' "$RUNNER" > "$T/runner_crashunread.sh"
 cmp -s "$RUNNER" "$T/runner_crashunread.sh" && fail "could not unplug the crash reader — the vs_classify_control call moved"
 chmod +x "$T/runner_noexport.sh" "$T/runner_unplugged.sh" "$T/runner_dryrecords.sh" "$T/runner_emptygreen.sh" "$T/runner_crashunread.sh"
 case "$VS_CTL" in

@@ -481,7 +481,7 @@ run_one() {   # run_one <gate> <lane> <scope> <args> — writes one results row
                 env $_env CONTROL="$_cn" "tests/$_g.sh" $_pos </dev/null 8>&- >> "$_clog" 2>&1 && _cs=0 || _cs=$?
             fi
             _c1=$(date +%s); _cdur=$((_c1 - _c0))
-            vs_classify_control "$_cs" "$_clog" "tests/$_g.sh"
+            vs_classify_control "$_cs" "$_clog" "tests/$_g.sh" "$_cn"
             case "$VS_CTL_EXEC" in
             HONOURED) _cv=PASS; _cd="control honoured: $_cn $VS_CTL_EXEC_DETAIL" ;;
             TIMEOUT)  _cv=TIMEOUT; _cd="control $_cn killed after ${_tmo}s" ;;

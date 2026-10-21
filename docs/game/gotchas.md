@@ -944,3 +944,17 @@ frames before the throw event) reaches `0x28B3C`. Rule: a poked KO pokes BOTH HP
 tap proves which writer set `$FFFF` before the result is read as the branch under test
 (`tests/audit_throw_registration.sh`, part `donovan_2_ko`; `docs/game/engine_internals.md`, "THE THIRD PAIR
 STORE IS THE APPLIER'S KO BRANCH").
+
+## A MOTION THAT LEAVES A NEUTRAL FRAME BETWEEN BACK AND DOWN-BACK IS TWO TAPS TOWARD BACK, AND A CHARACTER WITH A BACKDASH DASHES — the press then lands in the hop (paid: 14z-205, #229, forks F3 and P1)
+
+`tools/name_moves.py`'s `hcf` (41236) holds each direction for a few frames with a one-frame gap between them: back on
+frames 0-2, nothing on frame 3, down-back from frame 4. The engine reads back, neutral, down-back as two taps toward
+back. On Felicia, Bishamon, Gallon and Sasquatch that is a BACKDASH: on Bishamon's rig his chain went to `a2:0x29`,
+airborne from +4, moving back from x 545 to 428, and the button then landed during the hop (`a2:0x18`) or on landing
+(`a:0x0f`), so Karame Dama never fired (probe P1, `build/agent205/t229/p1_specials/REPORT.md`). Gapped 4123LP failed
+the same way, and the one gapped 41236 whose press came after the hop fired; held without gaps, 41236 entered Karame
+Dama (`a2:0x45`) on 6 of 6 tight variants, all three strengths (4123, mizuumi's input, is the engine's own table). F3's ES/EX rigs hit the same trap first and now hold 41236 and
+63214 contiguous (`tools/es_ex_rigs.py` HCF/HCB); `name_moves.hcb_cont` already named it for 63214. **The rule:** a
+motion that starts toward back is scripted with no neutral frame between its directions, unless the gap is the thing
+measured; a rig that "never fires" a back-start motion is checked for a backdash (an airborne chain within a few frames
+of the first direction) before the move is called missing.

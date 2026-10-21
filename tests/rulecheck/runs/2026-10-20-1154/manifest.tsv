@@ -1,0 +1,17 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent205c/t266/closing_comment.md	84a208dcddb83aa686d5a415f12bbb2d6612cde9
+build/agent205c/t266/body_before.md	4c3802f5f7aaa7731348829abbaf2a4ebe5b1324
+build/agent205c/t266/pilot_apt_display.txt	548165b0d5ad348ea49c963928d053d5d3254370
+build/agent205b/t266/REPORT.md	570251246cf5ea1094e6c65b61c22618a16cb2c3
+build/agent205b/t266/comment.md	de1b650788a1727dae010b5ccaa9e1733546033b
+build/agent205b/t266/pilot_logs/normal.log	abd70360116e303b56de0fa19de6a538432da6d5
+build/agent205b/t266/pilot_logs/muted-stream.log	65a3b8217d95be2336a946aa330c40118b9285bd
+build/agent205b/t266/pilot_logs/unlinked-recorder.log	80b574432167fb61e47473e2d39e1c1147a81c33
+build/agent205b/t266/pilot_logs/wrong-mark.log	58b5bd89e3249a5a69f7a21d38178d594639b67f
+docs/project/build_environments.md	4e835afb26597a71ccaf1ee65c9c25b22f5ba9e9
+docs/platform/gotchas.md.lines-3319-3328 (lines 3319-3328 of docs/platform/gotchas.md)	17184929b3e2b682c1d295087bf49cbc9c27d995
+docs/project/tickets.tsv.lines-20-73 (lines 20-73 of docs/project/tickets.tsv)	9dfa8f780ef01408d21bb7f9cab32492559f4ccd
+docs/project/tickets.tsv.lines-109-109 (lines 109-109 of docs/project/tickets.tsv)	c1d7dc475e99a06079fae13459c35cdf8c1baf74
+STATE.md.lines-41-51 (lines 41-51 of STATE.md)	9bfc78f74b6fbcbdfbca2f60a221170023b822a8
+STATE.md.lines-179-195 (lines 179-195 of STATE.md)	e7134a77829192652b767f553bccdbab517a630d
+tests/audit_release_linux_desktop.sh	68c85324632f0b4568807b93ca8fd9d70eec4385

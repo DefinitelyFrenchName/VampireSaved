@@ -1,0 +1,11 @@
+decision	recommendation
+subject	#277 closed done: the extract sources a rounded decimal, opens a cut span with a 40-line prelude, and quotes figures a 160-character cut hid (14z-205c)
+session	14z-205c
+model	rule-checker@163e4ce9cf7b
+claim	#277 can close done: its three ways were reproduced on transcript 116d721a with the tool as committed (repro_decimals.txt, repro_part_boundary.txt) and each is gone with the fix (fixed_decimals.txt, fixed_part_boundary.txt); tests/test_agent_extract.sh passes on the tree with its controls firing (gate_final.log), and the three new controls rounding-off, cut-cites-off and prelude-off each fail the gate as modes; the three fix choices were put to the maintainer, who accepted them. Not tested: an integer written from a decimal source (12 for 11.80) is still flagged; the prelude is 40 event lines, not a whole part; A@ reads tool results only, not a cut tool input; packet_check's figure flag inherits the rounding rule and was run only through its own gate (test_packet_check.log).
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	2 flag(s): ATTRIB 1, D-ABSOLUTE 1
+deliverables	build/agent205c/t277/closing_comment.md

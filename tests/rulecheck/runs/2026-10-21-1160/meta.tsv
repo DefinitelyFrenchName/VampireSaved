@@ -1,0 +1,11 @@
+decision	recommendation
+subject	#263 closed done: the extract's W§ line quotes the file lines a worker cites beside a W#-flagged figure; neither of the body's sketches (14z-205c)
+session	14z-205c
+model	rule-checker@163e4ce9cf7b
+claim	#263 can close done: the defect was reproduced at HEAD on transcript 116d721a, record 10520 listing 6630 and 9230 under W# though the worker derived them from lines of a file it read (x199_head.txt); with the fix a W§ line quotes the cited lines from the worker's own read (fixed_986.txt), the figures staying listed; sketch 1 was measured and dropped (proto_derivable.py; 110 of 130 and 30 of 33 figures would clear, mostly falsely); the maintainer accepted W§ in their own words; tests/test_agent_extract.sh passes on the final tree with 13 controls firing (build/agent205c/t277/gate_rc2.log) and cited-lines-off fails it as its mode. Not tested: a derivation whose inputs the report does not cite by file:line (9230 also needs MOVEMENT and NORMALS, defined outside the cited lines); a file read by Grep or Bash rather than Read; a figure derived from another report figure; the W§ line helps the checker but clears nothing, so whether checkers use it is not measured.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	1 flag(s): ATTRIB 1
+deliverables	build/agent205c/t263/closing_comment.md

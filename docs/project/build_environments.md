@@ -121,6 +121,15 @@ MAME Demitri vs Bulleta after the select screen shows the 18 medallions and M23.
 bad-ROM box until a key is pressed — expected by the driver's sentinel CRCs, unexplained in the README: #234.
 **Not covered on this host:** sound (the VM has no audio device; `aplay -l` finds none) and the physical
 keyboard path (XTEST enters at the X server, not through the kernel and libinput).
+**PILOT'S DISPLAY CARD IS VirtIO-GPU (since 2026-10-20, #266).** On Proxmox's standard VGA card (`1234:1111`,
+bochs-drm), GNOME Shell segfaulted at the start of every Wayland session from the boot of 2026-10-09, the first boot
+after the Mesa runtime went from `25.2.8-0ubuntu0.24.04.2` to `.3` (2026-10-02 14:50, docs/platform/gotchas.md "AN `apt
+install` ALSO UPGRADES"); GDM fell back to Xorg and `tests/audit_release_linux_desktop.sh` SKIPped. Mesa `.4` on that
+card gave a black screen. The maintainer switched Hardware → Display to plain VirtIO-GPU (not VirGL; 256 MiB kept):
+`virtio_gpu` drives `/dev/dri/card1`, the user session is Wayland, and the gate PASSED there on 2026-10-20 (14z-205b)
+with each of its three controls failing it as a mode. Mesa on the bochs card is a correlation, not a proven cause (the
+crash report needs root and was not read). **The gate needs the maintainer logged in:** the login screen still started
+on X11 at that boot, so after a reboot with nobody logged in it SKIPs until someone logs in.
 
 ## Conditions known to break a build
 

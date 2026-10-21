@@ -90,6 +90,29 @@ case "$SCRATCH" in
     "$REPO"|"$REPO"/*) echo "REFUSING: JTSIM_SCRATCH is inside the repo ($SCRATCH)." >&2
                        echo "  jtframe mra writes release/ and rom/ into it." >&2; exit 2 ;;
 esac
+# ---------------------------------------------------- 0b. THE LOCK (#299, 14z-205c)
+# Two static gates (test_mister_mra_map, test_mra_build_line) run this tool on the same default scratch, and under
+# `run_all_static.sh --jobs N` they can run at once: section 5's `rm -rf "$RLS" "$ROM"` then deletes the other run's
+# release/mra (reproduced 14z-205c: two pairs of three failed). So one run at a time holds the scratch, from the clone
+# to the copy-out. The lock is a directory beside the scratch, named outside run_on_snapshot.sh's `$JTSIM_SCRATCH*`
+# glob; a holder that is no longer alive is taken over, and a live one is waited for up to MRA_LOCK_WAIT seconds
+# (default 900), then the run fails loudly. docs/project/gotchas.md "TWO STATIC GATES SHARED ONE JTSIM SCRATCH".
+LOCK="$(dirname "$SCRATCH")/.lock-$(basename "$SCRATCH")"
+HAVE_LOCK=0
+unlock() { if [ "$HAVE_LOCK" = 1 ]; then rm -rf "$LOCK"; HAVE_LOCK=0; fi; }
+_waited=0
+while ! mkdir "$LOCK" 2>/dev/null; do
+    _holder="$(cat "$LOCK/pid" 2>/dev/null || true)"
+    if [ -n "$_holder" ] && ! kill -0 "$_holder" 2>/dev/null; then
+        say "taking over the scratch lock of pid $_holder (no longer running)"; rm -rf "$LOCK"; continue
+    fi
+    if [ "$_waited" -ge "${MRA_LOCK_WAIT:-900}" ]; then
+        echo "the scratch clone $SCRATCH is locked by pid ${_holder:-?} ($LOCK); gave up after ${_waited}s" >&2; exit 1
+    fi
+    sleep 1; _waited=$((_waited + 1))
+done
+echo $$ > "$LOCK/pid"; HAVE_LOCK=1
+trap unlock EXIT INT TERM
 PIN="$(sed -n 's/^PINNED="\([0-9a-f]*\)".*/\1/p' "$REPO/tools/setup_jtcores.sh")"
 [ -n "$PIN" ] || { echo "cannot read PINNED from tools/setup_jtcores.sh" >&2; exit 1; }
 
@@ -219,7 +242,7 @@ restore() {
     git -C "$SCRATCH" checkout --quiet -- "cores/$CORE/cfg/mame2mra.toml" 2>/dev/null || true
     git -C "$SCRATCH" checkout --quiet -- "doc/mame.xml" 2>/dev/null || true
 }
-trap restore EXIT INT TERM
+trap 'restore; unlock' EXIT INT TERM
 # `if`, not `[ … ] && { … }`: an AND-OR list whose test fails is a portability
 # trap under `set -e` (its behaviour differs between shells), and this is the
 # one place a silent early exit would leave the scratch clone perturbed.

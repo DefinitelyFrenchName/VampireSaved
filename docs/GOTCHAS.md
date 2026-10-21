@@ -20,9 +20,9 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-532 entries (47 game / 134 platform / 351 project), counted from the buckets at generation.
+540 entries (48 game / 137 platform / 355 project), counted from the buckets at generation.
 
-## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 47 entries
+## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 48 entries
 
 - (the 14z-90 onset-frame entry that opened this file was RE-FILED to `docs/project/gotchas.md` at 14z-118 — it is a VERIFICATION-CLASS fact, not a game fact; S-C12 flagged it)
 - OBJ record formats differ in ENTRY STRIDE, not just header meaning
@@ -71,8 +71,9 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - "WHEN CAN THE BLOCKER ACT" IS NOT ASKED BY MASHING INSIDE THE BLOCK WINDOW — that measures the ADVANCING GUARD (paid: 14z-168)
 - A RECORD'S CLASS BYTE IS NOT THE VICTIM'S REACTION CLASS — the guard reads it first and the stager rewrites it (paid: 14z-169)
 - A POKED KO NEEDS THE VICTIM ON ITS LAST BAR, AND THE KO MUST COME FROM THE PATH YOU MEAN TO TEST — a low HP alone rallies (paid: 14z-184, GitHub #180)
+- A MOTION THAT LEAVES A NEUTRAL FRAME BETWEEN BACK AND DOWN-BACK IS TWO TAPS TOWARD BACK, AND A CHARACTER WITH A BACKDASH DASHES — the press then lands in the hop (paid: 14z-205, #229, forks F3 and P1)
 
-## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 134 entries
+## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 137 entries
 
 - LINUX CAPS ONE ENVIRONMENT STRING AT 128 KiB; `/bin/sh` IS DASH; THE PINNED MAME'S VERBOSITY IS A BUILD FACT — three macOS facts the first Linux emulator tier paid for (paid: 2026-10-01, ERIS WSL2 Ubuntu, GitHub #201)
 - `spctl -a` REPORTS THE SIGNING-POLICY VERDICT, NOT WHETHER A LAUNCH IS BLOCKED — and `unzip` DOES propagate com.apple.quarantine (measured: 2026-09-20, macOS 26.0 arm64, #144)
@@ -208,8 +209,11 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - `find` IN A .BAT RUN FROM MSYS2 (OR WITH GIT'S usr\bin ON PATH) IS THE UNIX find — `find /c /v ""` walked the whole C: drive for hours (paid: 14z-197, GitHub #248)
 - ON A WSL2 BOX REACHED ONLY OVER SSH, WSLg COMES UP WITH NO DESKTOP BEHIND IT AND EVERY MAME PROCESS WAITS 100-180 s ON ITS SOCKETS — a release run's two prereq TIMEOUTs were the environment, not the build (paid: 14z-198)
 - MAME `-playback` DOES NOT EXIT AT THE END OF THE RECORDING — `-exit_after_playback` does (paid: 14z-201)
+- AN `apt install` ALSO UPGRADES WHAT IT PULLS IN — a "no package of that kind changed" read of the install list missed the Mesa runtime it upgraded (paid: 14z-198 filed, 14z-205b found, #266)
+- UNDER `-debug`, A STOP THAT LANDS AS THE SCREEN FRAME ADVANCES MAKES THAT FRAME'S PER-FRAME SAMPLE READ ONE ENGINE PASS EARLY — and the game clock cannot see it (paid: 14z-205, #229, fork F2)
+- A MAME WRITE TAP THAT READS MEMORY OR `cpu.state` INSIDE ITS CALLBACK CRASHED MAME AT TEARDOWN — and write taps crash there intermittently anyway (paid: 14z-205, #229, fork F1; seen again 14z-205b, R1)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 351 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 355 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -562,3 +566,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A SANDBOX NAMED BY PART OF A RUN'S IDENTITY IS SHARED BY EVERY RUN THAT PART NAMES (paid: 14z-205, #293)
 - A GATE MOVED TO `ondemand` WITH ITS STEP STOPS BEING RUN, SO A CUT THAT REMOVES ITS INPUT BREAKS IT UNSEEN (paid: 14z-205, #300)
 - ONE READER PER ARM IS ONE SAMPLE, NOT A MEASUREMENT OF A WORDING — the first round's reader caught 5 of 11 where two more caught 8 each (paid: 14z-205, GitHub #273)
+- TWO STATIC GATES SHARED ONE JTSIM SCRATCH, AND `--jobs` RAN THEM AT ONCE — each run of `tools/mister_mra.sh` deleted the other's `release/mra` (paid: 14z-205c, #299; found on the #286 PILOT trace)
+- THE PLANNER NAMES ONE REASON PER STALE GATE, SO A FALSE RE-RUN CAN BE OVER-DETERMINED — narrowing the named rule moved nothing (paid: 14z-205c, #292)
+- A "DERIVABLE AS a ± b" CLEARANCE OF A FIGURE IS NOISE — a worker's results hold hundreds of numbers, so almost any figure is a sum or difference of two of them (paid: 14z-205c, #263)
+- A GATE'S OWN `CONTROL DEAD` IS SOME GATES' HONOURED MODE — "a dead own control means the mode died" would have turned four good controls red (paid: 14z-205c, #299)

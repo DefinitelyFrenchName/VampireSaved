@@ -1,0 +1,11 @@
+decision	recommendation
+subject	#262 closed done: a mid-turn maintainer message (a queued_command attachment from a human) is an M line of the extract (14z-205c)
+session	14z-205c
+model	rule-checker@163e4ce9cf7b
+claim	#262 can close done: the defect was reproduced on transcript 6426a4a0 with the tool as committed, record 9507's message drawing no M line (repro.txt), and the fixed extract shows it as M [mid-turn] (fixed.txt); tests/test_agent_extract.sh passes on the tree (gate_final.log) and its new control mid-turn-blind fails the gate as its mode (gate_mode_mid-turn-blind.log). Not tested: the enqueue record itself is not read, only the attachment, so a message whose attachment was never written would draw no M line (no such case in the two transcripts read); the census of the form covers two transcripts only.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	4 flag(s): D-ABSOLUTE 1, D-FIGURE 3
+deliverables	build/agent205c/t262/closing_comment.md

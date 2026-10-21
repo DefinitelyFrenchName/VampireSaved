@@ -1,0 +1,20 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent205c/t286/landing.diff	c7991cd177699cce8af0124dd0501977a8f26a26
+build/agent205c/t286/pilot/head.txt	cc2866532a410bc40a2805aecc73ce299625c21c
+build/agent205c/t286/pilot/status.txt	d54a23f1ffc29c826575c845dde37696915aa7f8
+build/agent205c/t286/pilot/trace.log	cad57da438dd6851d40d440c0f00b264f8ccc92e
+build/agent205c/t286/pilot/tr/done.tsv	40c8416bb637f5e63718c59ac7f316b94cdfebc8
+build/agent205c/t286/pilot/score_committed.log	4baa03b8539c74bc96018d550564dd3664861668
+build/agent205c/t286/pilot/score_narrowed.log	95a87fa040affc05cd1a7e56780894d821f85144
+build/agent205c/t286/pilot/control_narrowed.log	19b13461d2311371d952c4766cd055d71aee7e00
+build/agent205c/t286/pilot/patch.log	bb95fdbf7099785aa411e6a3fc6f291f287ee6cf
+build/agent205c/t286/pilot/run_x2.sh	6abb2bff01e2adbe9c0d4a51d3c6ba367d6861d0
+build/agent205c/t286/gate_main.log	60038f12bae9d4fb15d558d5dfdea72ab45e8dfc
+build/agent205c/t286/predict_mid2_base.txt	b5b42f161080e2a79e7785d0127e25d60fc8b00a
+build/agent205c/t286/predict_mid2_wt.txt	09ef15c18df4b52a9d5209be709fe8b5bb1d8fa9
+build/agent205c/t286/predict_fullrecord_base.txt	968c4202df5f837bf2da35630ff26a4fb37714cf
+build/agent205c/t286/predict_fullrecord_wt.txt	5841036f88b24d47ad806285c759a2e498da6ec4
+build/agent205c/t286/predict_state_base.txt	4411573891defa204a320e7c4feee483aa087732
+build/agent205c/t286/predict_state_wt.txt	89287ab5eeff636da3c1def73975d95402d35e8b
+build/agent205b/t286/REPORT.md	98db61844ccab2030a39f0f5aa5cde8a7082e780
+STATE.md.lines-64-78 (lines 64-78 of STATE.md)	6e1e288115be405402526c0fec62f60c22fe7d51

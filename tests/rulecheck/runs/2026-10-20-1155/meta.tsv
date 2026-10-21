@@ -1,0 +1,11 @@
+decision	recommendation
+subject	#292 closed declined: the self-test narrowing (N-K + planner self-exclusion) saves no gate on a STATE.md-only change, so the code stays out (14z-205c)
+session	14z-205c
+model	rule-checker@163e4ce9cf7b
+claim	#292 can close declined at the maintainer's word ('Close #292, keep code out'): measured on the PILOT trace at 779bc589, a STATE.md-only change marks 38 gates STALE (30 by R2 'names STATE.md', 11 of them opening STATE.md); the ruled narrowing was built in a scratch worktree, its gate passes with its two controls failing it as modes, and it leaves the STALE set at 38 because the same gates are STALE by R5 and R4 as well (all_rules_compact.txt); the remaining cost is 209 s of gate time and 5 control rows per close tier (14z-205b close). Not tested: R4 and R5 narrowing for these gates; the trace is at 779bc589, not at b91532d8; the trace sees opens by path only, so a gate reading STATE.md through git would be counted as not opening it.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	1 flag(s): D-ABSOLUTE 1
+deliverables	build/agent205c/t292/closing_comment.md

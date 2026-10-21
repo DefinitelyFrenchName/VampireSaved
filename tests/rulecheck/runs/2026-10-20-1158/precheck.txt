@@ -1,0 +1,5 @@
+  FLAG D-FIGURE: 9495  [build/agent205c/t262/closing_comment.md]
+  FLAG D-FIGURE: 9510  [build/agent205c/t262/closing_comment.md]
+  FLAG D-FIGURE: 9505  [build/agent205c/t262/closing_comment.md]
+  FLAG D-ABSOLUTE: **Not covered:** the enqueue record itself is not read (only the attachment); a message whose enqueue was removed without an attachment ever being written wo...  [build/agent205c/t262/closing_comment.md]
+packet_check: 4 flag(s): D-ABSOLUTE 1, D-FIGURE 3

@@ -7315,3 +7315,62 @@ in its own plan: it said the first round's blind judges had no model parameter, 
 wordings reads at least three readers per arm, and its read-as rule is fixed before any reader is read. The rule
 has to be able to say "unresolved". A plan that copies an earlier round's setup copies it from that round's own
 transcript or meta files, not from its prose.
+
+## TWO STATIC GATES SHARED ONE JTSIM SCRATCH, AND `--jobs` RAN THEM AT ONCE — each run of `tools/mister_mra.sh` deleted the other's `release/mra` (paid: 14z-205c, #299; found on the #286 PILOT trace)
+
+`test_mister_mra_map` and `test_mra_build_line` both call `tools/mister_mra.sh` without `JTSIM_SCRATCH`, so both use
+`$TMPDIR/vampire-saved-jtsim`, and the tool's generation step starts with `rm -rf "$RLS" "$ROM"` inside that clone.
+Serially that is harmless; in `tests/run_all_static.sh --jobs N` the two can overlap. On the #286 strace of every
+static gate (PILOT, `--jobs 5`, `779bc589`) `test_mister_mra_map` crashed on a `FileNotFoundError` for an MRA under
+`/tmp/vampire-saved-jtsim/release/mra/`; the two finished adjacently in `done.tsv`. On the Mac, the two started 2 s
+apart, three times: one pair passed, one had the map gate crash, one had both fail; the map gate alone passed. The
+14z-205b close tier at `--jobs 8` was green, so the race had simply not been hit, and nothing showed a crossed copy
+could not pass. **The fix** (maintainer-ruled 2026-10-20, *"Lock in mister_mra.sh"*): the tool holds a lock directory
+beside the scratch (`.lock-<scratch name>`, outside `run_on_snapshot.sh`'s `$JTSIM_SCRATCH*` copy glob) from the clone
+to the copy-out, takes over a dead holder's lock, and gives up loudly after `MRA_LOCK_WAIT` seconds (default 900);
+`tests/test_jtsim_scratch_heal.sh` section 6 locks it, with the control `lock-removed`. With the lock, four concurrent
+pairs all passed. **Not covered:** `tools/run_sim_jtcps2.sh` takes the lock only for its `--ensure-scratch` call and then
+runs jtsim in the scratch unlocked; the Verilator lane gives each job slot its own `-slotN` scratch. **The rule:** a
+gate that writes shared scratch outside its own `mktemp -d` is a `--jobs` hazard; give it its own directory or a lock,
+and look for the next one in the trace of a parallel run, where a gate that passes alone fails.
+
+## THE PLANNER NAMES ONE REASON PER STALE GATE, SO A FALSE RE-RUN CAN BE OVER-DETERMINED — narrowing the named rule moved nothing (paid: 14z-205c, #292)
+
+`tools/static_confirm.py predict` prints the FIRST rule, and within it the FIRST reach file, that makes a gate STALE.
+#292 was measured from those lines: for a STATE.md-only change, 30 gates STALE by R2 "names STATE.md", 12 of them
+opening STATE.md on the PILOT trace, 13 of the other 18 naming `tools/battery_reach.py` (first counted 11 and 19, and
+the cost from the battery_reach gates only: rule-checker run `2026-10-20-1155` caught both). Narrowing exactly that (a
+mention inside a self-test body is no read; battery_reach's control-only default moved) moved 0 gates: 11 of the 13
+were next named by the planner's own N-B configuration line, then, with that excluded too (maintainer-ruled), by R5
+(the ledger, which the planner names only in its selftest's case list), and under that by R4 and by R5 through old run
+manifests (`build/agent205c/t292/all_rules.txt`, local). The question put to the maintainer on the first figure had to
+be put again. **The rule:** before narrowing for a false re-run class, list EVERY rule and reach file that marks each
+gate STALE, not the first one the planner prints, and count the gates whose every reason the narrowing removes.
+
+## A "DERIVABLE AS a ± b" CLEARANCE OF A FIGURE IS NOISE — a worker's results hold hundreds of numbers, so almost any figure is a sum or difference of two of them (paid: 14z-205c, #263)
+
+#263's first sketch would have cleared a worker's `W#` figure that equals a sum or difference of two numbers in its
+own results. Measured over every `W#` integer figure in two transcripts (`build/agent205c/t263/proto_derivable.py`,
+local, output `proto_derivable.out`): it would clear 110 of 130 (14z-199) and 30 of 33 (14z-197), and random 3- to
+5-digit figures are "derivable" against the same result sets 358 of 3,650 and 202 of 1,250 times. The census does not
+classify a clearance as true or false; the examples read were false (6851 = 7500 − 649, recurring; 2560 = 60 + 2500,
+where the truth is 2600 − 40). **The rule:** a figure check does not clear a figure by arithmetic it searched for; it
+shows the inputs the worker CITED (`tools/agent/extract.py`'s `W§` line, maintainer-accepted 2026-10-20) and leaves the
+arithmetic to the checker. The same lesson bit #277's rounding rule the next day: a rounded source looked for over a
+whole transcript matched a load average and a version string, and it now must be near and a whole token.
+
+## A GATE'S OWN `CONTROL DEAD` IS SOME GATES' HONOURED MODE — "a dead own control means the mode died" would have turned four good controls red (paid: 14z-205c, #299)
+
+Under `CONTROL=<name>`, the runner (`tests/lib/classify.sh` `vs_classify_control`) scores the run HONOURED when it
+exits non-zero without a crash. On PILOT, `test_mra_build_line`'s foreign-rompath mode failed on the jtsim scratch
+collision instead of its perturbation; the gate said so (`CONTROL DEAD: foreign-rompath — generator failed for another
+reason`) and the run still read HONOURED. The obvious fix — any own `CONTROL DEAD` in a mode run is DIED — is wrong:
+`test_df_startup_provenance`, `test_defense_rows_census` and `test_bundle_parsers` (two controls) DEFINE their mode as
+"unplug the predicate, so the in-run control dies and the gate FAILs", and print their own `CONTROL DEAD` in every
+honoured run. The other obvious half fails too: the dead row's crash survives only as the exception's last line
+(`FileNotFoundError: …`; the gate quoted `tail -2` of its generator, so no `Traceback` line), and
+`audit_victim_parity@no-translation` carries such lines from two in-gate controls that crash under its mode while its
+own control fired. Only the conjunction — own `CONTROL DEAD` and an exception line — singles out the bad row (1 of
+2,351 control logs). **Before tightening a verdict rule, census it over every log it will judge, and look for the
+gates whose honoured shape the rule names as failure.** Still uncovered: a mode run that fails for a foreign reason
+without both signs reads HONOURED.

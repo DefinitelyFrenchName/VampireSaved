@@ -1,0 +1,11 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent205c/t262/closing_comment.md	878c18bdd8359067a423db05ec0c6d8b9005c74a
+build/agent205c/t262/repro.txt	69408b8c796c1f184db07fcfa592b9473fa8c38b
+build/agent205c/t262/fixed.txt	a9808d7e3be99e0d4b55cc1b87620512cfa739d4
+build/agent205c/t277/gate_final.log	ba10cc38552049641724bb8efb37439a3aa8d6a0
+build/agent205c/t262/gate_mode_mid-turn-blind.log	958042fbd95317462f2f195777296206509b6b94
+build/agent205c/t277/extract_change.diff	d0a9cbcc90d3e718c5c2a7411f88070a0472ced3
+DECISIONS_HISTORY.md.lines-7307-7320 (lines 7307-7320 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-19 (14z-205) — #262, #263 and #277 are parked under #289", and the entries after it up to line 7320)	623f4e5b337144e4f43c1acefc709a8c9be03aa9
+DECISIONS_HISTORY.md.lines-7491-7500 (lines 7491-7500 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-20 (14z-205c) — #277, #262 and #263 are taken up (parked under #289 since 2026-10-1", and the entries after it up to line 7500)	8a698db6e49fdc4514fc95e144b8599de3f13cda
+docs/project/tickets.tsv.lines-20-73 (lines 20-73 of docs/project/tickets.tsv)	9dfa8f780ef01408d21bb7f9cab32492559f4ccd
+docs/project/tickets.tsv.lines-113-113 (lines 113-113 of docs/project/tickets.tsv)	5d5bf53596bef1f0ec017ba22b3a2127a43ab3e5
