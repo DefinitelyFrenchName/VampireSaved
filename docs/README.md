@@ -1,5 +1,7 @@
 # docs — the taxonomy
 
+## Docs are mostly in their original log form and will need rewriting for human use!
+
 Split 2026-08-08 (14z-69) into knowledge about **the game**, knowledge
 about **the platform**, and knowledge about **this project**. One
 question decides where a fact goes:
