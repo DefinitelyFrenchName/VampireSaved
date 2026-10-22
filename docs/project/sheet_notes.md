@@ -9,7 +9,15 @@ gate's header and the subject documents; a section names a ticket by its number 
 
 Format: paragraphs, `- ` bullets, `**bold**`, `` `code` `` and `#N` (rendered as a link to the issue).
 
+Each section opens with ONE `Setup: ` line (14z-206, #291; the maintainer: *"it would be great if each test / gate
+had a concise description: basically which characters and what setup is tested"*): where the gate runs, what its rig
+does and what it compares, in one sentence. The page shows it under the gate's name in the index and at the top of its
+page. The characters are NOT written here: the page reads them from the game's state at the pictures (P1/P2 ids and
+the speed level, `tests/lua/screen_state.lua`), so they cannot drift from what ran.
+
 ## audit_air_dash_height
+
+Setup: A straight-up jump with the air dash input at +5 to +16 frames: the heights at which the dash starts.
 
 **Why the gate looks the way it does.** It was built for #222: on vs2 Phobos's air dash has a minimum height of 24,
 and ours allowed it at height 21. It was ruled that Phobos, a vs2-only character, follows vs2 for his air dash, and
@@ -24,6 +32,8 @@ height 34 and up, both dash on the same frame at the same height. So on the low 
 
 ## audit_air_gc_legacy
 
+Setup: The guard cancel from a ground block (E0) and two air blocks (E1, E2) against Demitri: the legacy control for #182.
+
 **Why the gate looks the way it does.** The legacy control for #182, where Phobos's guard cancel from an air block never fires on ours: before fixing it, the gate shows the air guard cancel is Phobos's alone in both games, so a fix overrides no rule of the host engine, and it is the legacy guard any fix must keep green. Lei-Lei and Zabel try their guard cancel against Demitri from a ground block and from two air blocks, on pristine vsavj, native vs2 and ours, and the three legs must give the same rows. Native Phobos on vs2 is the positive leg: on the same timings he does commit an air guard cancel, so the legacy zero is a zero at a timing that can produce one. Lei-Lei's 623+P does come out of an air block, with no guard cancel banner, identically on every leg; it is not a guard cancel.
 
 **What isn't covered.**
@@ -33,6 +43,8 @@ height 34 and up, both dash on the same frame at the same height. So on the low 
 - Level 6 and the RNG are pinned; MAME only, not FBNeo.
 
 ## audit_chains174
+
+Setup: #174's eight once never-entered attack chains, one rig event each: ours compared with native vs2 on the entered chain.
 
 **Why the gate looks the way it does.** #174 counted the tenants' attack chains that no naming rig had ever entered;
 eight of them carry attack records, and this gate covers those eight. They are Phobos's Reflect Wall from a crouching
@@ -51,6 +63,8 @@ event after such a pin starts from the rig's shared position by design, not from
 
 ## audit_chains184
 
+Setup: #184's ten once never-entered animation chains without an attack record, each proven entered on native, then ours compared.
+
 **Why the gate looks the way it does.** #184 is about the tenants' animation chains with no attack record that no rig
 had ever entered, so their ours-against-native match was never measured. This gate takes the ten that a focused rig
 enters on native vs2, such as Donovan's Start-button taunt, Phobos's Circuit Scrapper whiff and Pyron's taunt. Each rig
@@ -68,6 +82,8 @@ on native (hit and contact events damage P2; blocks, misses, whiffs and taunts d
 
 ## audit_column_flash
 
+Setup: The end of Killshread Lightning's column (donovan_4): the content of palette row 11.
+
 **Why the gate looks the way it does.** As Donovan's Killshread Lightning column ends, the maintainer saw the
 stand-like entity above him turn orange instead of staying blue, and ruled "Ticket it, go on". Both games use the same
 palettes in their sprite lists; the difference is the content of palette row 11. Ours holds a fire ramp there where
@@ -83,6 +99,8 @@ red.
 - MAME only: FBNeo and the MiSTer core are not covered.
 
 ## audit_column_flash_cause
+
+Setup: The same column end: P1's palette reloads and the per-character mask that decides them, with a counterfactual leg.
 
 **Why the gate looks the way it does.** #162: the deity above Donovan flashes orange as his Killshread Lightning column
 ends. Earlier work found the row (11), its writer and its source (his palette block row 1), but not which path sends it
@@ -101,6 +119,8 @@ such mask site where a tenant's bit differs. The pictures: the reloads at 2807 (
 
 ## audit_column_shock
 
+Setup: Killshread Lightning [MP]'s column: every shock and freeze write of both fighters, plus a KO (P2 poked to 1 HP) and an airborne victim (P2 jumps at f2826).
+
 **Why the gate looks the way it does.** In the #136 parity work, Donovan's Killshread Lightning column played differently on ours. On native vs2 its hits shock the victim 24 frames and leave Donovan unfrozen; on ours an old remap gave them the Lightning Sword's values, 12 frames and Donovan frozen 4. Since the 14z-170 fix the gate checks that every shock and freeze write of both fighters equals native's in frame and value, the move's timeline matches, and a column KO takes the same path. Since 14z-181 it also checks the column on a jumping victim, which takes the air case (class 7) on both legs. The pictures are frames of the move's timeline, the KO's death frame and the first airborne hit, each leg on its own frames; Demitri is each game's own art.
 
 **What isn't covered.**
@@ -110,6 +130,8 @@ such mask site where a tenant's bit differs. The pictures: the reloads at 2807 (
 - MAME only, real cursor picks with the parity gate's pins.
 
 ## audit_continue_ladder
+
+Setup: A full arcade marathon with a loss and a continue: the ladder's venue mask after the continue, pristine vsavj against the merged build.
 
 **Why the gate looks the way it does.** It was built for #102: later arcade matches land on earlier venues and the
 chain can exceed the arcade norm, when switching to or from VS2 characters. To tell whether that is ours, the gate
@@ -128,6 +150,8 @@ different matches, because the venue drawn and the match lost are lottery draws 
 
 ## audit_crouch_flag
 
+Setup: Down held f2840-f2870 (naming part donovan_1): the victim's +0x121 crouch byte rising and falling.
+
 **Why the gate looks the way it does.** The game's guard decision checks the victim's +0x121 before choosing between two lists of attack classes, one for a standing victim and one for a crouching one. Which list was which rested on what +0x121 is, and that was undocumented until this gate. The gate shows +0x121 rising with a scripted Down and falling with its release, the same on native vs2 and ours, so it is the crouch flag. The rig is P1 Donovan holding Down over frames 2840-2870; a control run with the Down deleted must never raise the flag. The pictures show the rise, the last held frame and the fall, each leg on its own frames; Demitri is each game's own art.
 
 **What isn't covered.**
@@ -137,6 +161,8 @@ different matches, because the venue drawn and the match lost are lottery draws 
 - One character (Donovan), on MAME only.
 
 ## audit_df_accumulator
+
+Setup: Dark Force armor (LP+LK): the +0x161 hit counter rising per hit until 60, pristine vsavj against the merged build.
 
 **Why the gate looks the way it does.** It settles what a fighter's +0x161 counter is for. A reading of the code had
 given it to Aulbath, never observed live; measured, it is Sasquatch's Dark Force armor. While the armor is armed, each
@@ -152,6 +178,8 @@ byte-identical (the superset invariant). So the two rows of pictures are expecte
 
 ## audit_df_meter
 
+Setup: The gauge in and out of Dark Force: ours by P+K (Change), native by the tenant's vs2 EX install.
+
 **Why the gate looks the way it does.** The gauge code is the same in both games except for which mode it tests, vsavj's Dark Force Change or vs2's Dark Force Power, and the tenants carry vs2's copy. So under our Dark Force Change their copy never saw the mode, and until the 14z-170 fix (#157) they gained +6 gauge per swing in it. The maintainer agreed that no gauge should be built during Dark Force: the shells' behaviour is the rule. P2 is kept out of reach so every attack whiffs and only start-up gauge can move: j.HP and 5HP, out of the mode and in it. The vs2 legs, shown for reference, enter by the tenant's EX install and do pay gauge; where a leg builds none, its picture is taken at the reference leg's step frame.
 
 **What isn't covered.**
@@ -160,6 +188,8 @@ byte-identical (the superset invariant). So the two rows of pictures are expecte
 - MAME only, with real cursor picks and the speed level pinned.
 
 ## audit_df_modes
+
+Setup: P+K on every selectable character: what it does on each game (vs2's Dark Force Power, vsavj's and ours' Dark Force Change).
 
 **Why the gate looks the way it does.** The maintainer pointed out, on #136, that vs2's P+K is not the same mode as ours: on vs2 it is the global Dark Force Power, on vsavj and ours each character's Dark Force Change. The gate freezes, for every selectable character, what P+K does on each game: vs2's Power costs two stocks and gives no startup invincibility. The tenants' vs2 EX moves (Slay Shred, Ray of Doom, Shining Gemini) are different: they reach each tenant's Change handler on both games. So on the main sheet the vs2 row shows a different mode by design: that difference is what is frozen. Characters vs2's wheel lacks (ids 02, 09, 0a) have a vsavj leg only, and the tenants' EX legs are on a sheet of their own.
 
@@ -170,6 +200,8 @@ byte-identical (the superset invariant). So the two rows of pictures are expecte
 - Stocks are poked and the speed level and RNG pinned, on MAME only.
 
 ## audit_df_moves
+
+Setup: The tenant's moves inside Dark Force: ours by P+K (Change), native by the tenant's vs2 EX install, one event per activation.
 
 **Why the gate looks the way it does.** #136's rigs outran the 360-frame Dark Force, and the maintainer agreed that
 needed a rig change. The first version compared our P+K with vs2's P+K, a different mode (Dark Force Power); the
@@ -186,6 +218,8 @@ CONTACT group (#109's Phobos beams, #178's Hop Kick) must hit on both legs.
 - MAME only; the build the gate is given (default `build/m3b_merged31`).
 
 ## audit_df_startup_invuln
+
+Setup: Dark Force started on each shell character: the invincible startup window vanilla grants, against what each tenant arms.
 
 **Why the gate looks the way it does.** The maintainer asked (2026-08-31) whether the three tenants get the invincible
 startup window vanilla characters get when Dark Force starts, and if so whether it is shared by everyone or inherited
@@ -205,6 +239,8 @@ leg.
 
 ## audit_dmg_legacy_sweep
 
+Setup: Demitri's 2HK, 5HP and 623HP from P1 on every legacy victim: pristine vsav2, pristine vsavj and ours.
+
 **Why the gate looks the way it does.** It was built for #191, not for the superset invariant. #191 began as a tenant
 question: Donovan took 9 HP from Demitri's 2HK on our build but 8 on native vs2, and the worry was that the +1 was ours.
 To settle that, the gate compared vsavj with vs2 on every legacy victim. It showed the two original games already
@@ -221,6 +257,8 @@ difference between the two original games, and ours against vsavj shows there is
 - Demitri's 2HK, 5HP and 623HP only: other attackers and moves are not checked.
 
 ## audit_don_grab_pose
+
+Setup: Victor's 6+HP headbutt grab on each victim: the hold pose from the victim's capture record, native vs2 against ours.
 
 **Why the gate looks the way it does.** It was built for #104. The maintainer saw a tenant held in Victor's
 headbutting grab (6+HP) in a half-right, half-squished pose, and named Donovan and Phobos. The hold pose comes from a
@@ -239,6 +277,8 @@ tenant verdict is void.
 
 ## audit_entrance_draw
 
+Setup: The round-start entrance drawn from six RNG seeds at f2250, native vs2 against ours.
+
 **Why the gate looks the way it does.** On #136's guard-cancel rigs the two legs opened differently: native drew Phobos's car arrival, ours the arrival with Cecil in hand. The question was whether our build can draw the car arrival at all. The entrance is drawn from the RNG at character load, and the two games use the RNG differently, so one seed gives different entrances on each. The gate runs six seeds and compares the SET of entrances: both legs draw the same three variants (0 the drive-in, 2 and 6 held). A draw whose variant and position disagree is VOID.
 
 **What isn't covered.**
@@ -247,6 +287,8 @@ tenant verdict is void.
 - MAME only, the RNG poked once and the level pinned.
 
 ## audit_ex_refused
+
+Setup: Each tenant's vs2 EX input at stock 0 (refused) and stock 3 (the positive control).
 
 **Why the gate looks the way it does.** The maintainer ruled the tenants' vs2 EX route into Dark Force disabled on our build. Before a byte moved, the gate measured what the input does on vs2 when the mode is refused, with no stock left. It runs each tenant's EX input (Donovan 421+KK, Phobos 263+PP, Pyron 2623+PP) on both games with the stock poked to 0, and to 3 as the positive control. Since the fix, no leg of ours enters the mode; Phobos and Donovan at stock 3 follow vs2's refused path, and Pyron does 623+PP, his ES move. So on a sheet, ours at stock 3 is meant to match vs2 at stock 0.
 
@@ -258,6 +300,8 @@ tenant verdict is void.
 
 ## audit_facing_rule
 
+Setup: Donovan's Killshread Summon (ES) returning wave on Demitri (donovan_3): the victim's facing byte, native vs2 against ours.
+
 **Why the gate looks the way it does.** It was built for #159. An attack record tells the victim which way to face, as a rule number; vs2's code knows rule 5 and vsavj's does not, and our tenants run on vsavj's engine. Before M21 that left a wrong value in Demitri's facing byte on ours, so the returning wave of Donovan's Killshread Summon (ES) dragged Demitri toward Donovan on native but left him in place on ours. Since M21 a fix teaches vsavj's code vs2's rule 5, and ours writes native's values; Demitri ends at x 755 on both legs. The pictures are each write to his facing byte from frame 3850, and his x at 3924 and 3946. A static part also reads both games' code and counts the legacy records that carry rule 5.
 
 **What isn't covered.**
@@ -268,6 +312,8 @@ tenant verdict is void.
 - The address that does the write: ours writes from the fix's own place, by design.
 
 ## audit_facing_sweep
+
+Setup: Killshread Summon (ES) from 32 player positions: every facing write at its six contacts, write for write.
 
 **Why the gate looks the way it does.** #159 is Donovan's Killshread Summon (ES) pushing Demitri away where native drags
 him in: vsavj's hit code XORs facing rule 5 into the victim's facing. The gate moves the players before the Summon to 32
@@ -286,6 +332,8 @@ rule-5 facing writes, at that frame on both legs.
 
 ## audit_fg_parity
 
+Setup: EX Final Guardian (623+2K), five attempts: HP ticks and damage against the frozen native staircase.
+
 **Why the gate looks the way it does.** It checks that Phobos's EX Final Guardian (623+2K) deals the same damage on our build as on native vs2. Before the fix, the ported damage code put its damage where vs2 keeps it, which vsavj never reads: twelve ticks counted but almost no HP, ours 1/1/1/1/1 against native 23/23/23/23/52. Both legs must equal the frozen native staircase over five attempts, with 12 HP ticks each and one stock spent per attempt as the sign the EX version fired. The native leg is re-measured every run, so a drifting reference fails as loudly as ours. The fifth attempt lands in the corner, 11 beam ticks plus one 30 HP final hit, hence 52.
 
 **What isn't covered.**
@@ -294,6 +342,8 @@ rule-5 facing writes, at that frame on both legs.
 - MAME only. Not comparable: each game's stage and palette, and Victor's art.
 
 ## audit_flicker_attribution
+
+Setup: The frozen flicker frames of legacy replays: every byte our build differs on must fall inside a named window.
 
 **Why the gate looks the way it does.** Some frozen legacy expectations allow a flicker frame, where our build and
 vsavj differ; such a frame is a claim about the build, so it is not written into an expectation until it is
@@ -312,6 +362,8 @@ vanilla run at that frame, so the attribution is of the run the expectation desc
 
 ## audit_grenade_ground_tiles
 
+Setup: Replay 83d's 214+LP ground explosion: the tiles it draws, every frame, native vs2 against ours.
+
 **Why the gate looks the way it does.** It checks that Phobos's 214+LP ground explosion draws vs2's own art. Earlier work judged from snapshots that it looked right and that the old "fuchsia" report was most likely fixed, but that was a guess; this gate measures every frame, by tile content, across both games. The two legs run about 5-6 frames apart, so a frame-by-frame comparison would read as disagreement; the gate instead compares the set of tiles drawn over the whole detonation. Measured: 441 tiles, all drawn by both, none blank. The "fuchsia" was always the explosion's correct orange-to-magenta fade.
 
 **What isn't covered.**
@@ -321,6 +373,8 @@ vanilla run at that frame, so the attribution is of the run the expectation desc
 - MAME only; Victor's art is each game's own copy.
 
 ## audit_guard_reentry
+
+Setup: A Reflect Wall guard-cancel rig with legacy Demitri on vs2, pristine vsavj and ours: the block restart while back is held.
 
 **Why the gate looks the way it does.** It was built for #136, where Phobos's Reflect Wall guard cancels read DIFF
 against native vs2. The question was whether that comes from our port or from the host engine, so the gate runs the
@@ -337,6 +391,8 @@ So on these sheets vs2 is expected to differ from the other two; the stage palet
 
 ## audit_hitbox_parity
 
+Setup: The naming rigs' events: the hitboxes in play (node, box pointers and ids) on every frame both legs are on the event.
+
 **Why the gate looks the way it does.** A record for #136 claimed exact hitboxes over 3,021 frames, and no gate, log
 or file was found behind it. On this engine the boxes in play on a frame come from tables the fighter block points at,
 chosen by the node's box ids, so the same hitboxes means the same node giving the same pointers and ids. The gate
@@ -351,6 +407,8 @@ every pointer differs.
 - Three rigs only; level 6 and the random number 0000 pinned; MAME only.
 
 ## audit_hui_grunt
+
+Setup: Replay 95, five electrocutions: the voice fired on every other one, the kernel-voice slot compared.
 
 **Why the gate looks the way it does.** It answers the maintainer's 2026-08-18 grunt report. When Phobos is
 electrocuted, the sound engine fires a voice on every other electrocution, chosen by the victim's class. On vsavj the
@@ -367,6 +425,8 @@ id is still queued, which is what makes silence checkable.
 
 ## audit_landing_sound
 
+Setup: Naming part 1: the frames that reach the landing-sound code, and the first landing played by ear.
+
 **Why the gate looks the way it does.** Built for #223: vs2 gives Phobos the big-body landing sound and Donovan the ordinary one, and ours had the reverse. The maintainer ruled "#223 I confirm the sound effects should be swapped to match VS2", and the build from M23 on takes vs2's choice. The gate checks that the landing-sound code is reached on the same frames on both games, and that at the first landing the two games' audio differs no more than 4x what it differs a second earlier, so the landing no longer stands out. A control runs the same check on the build before the swap and must fail, which shows the check can detect the landing sound the swap removed.
 
 **What isn't covered.**
@@ -377,6 +437,8 @@ id is still queued, which is what makes silence checkable.
 
 ## audit_legacy_pairings
 
+Setup: Every legacy replay, its fighters read from the game, compared against pristine vsavj rather than against itself.
+
 **Why the gate looks the way it does.** It asks which replays are legacy content, and whether each one is compared against vanilla rather than against itself. It was built after 14z-88, when a replay named for Victor in fact loaded Jedah, carried an expectation frozen from the build's own earlier run, and so let a superset regression sit green. The filename does not tell what a replay loads, so the gate reads the fighters each replay actually loads, on vsavj and on ours. The gate judges the first frame of each fighter pair, each leg at its own frame; that frame is the load, so it shows no fighter and sits in the sheet's "Judged frames without fighters" strip, while the sheet itself shows up to 9 frames of that pair's own run with a round on (#291 S4-E), each proven on the gate's trace; the select wheel on ours has 21 cells against vanilla's 16 by design, and a load phase of a frame or two may differ. Since #293 every leg runs on its own fresh sandbox, so no run starts from an earlier run's saved data.
 
 **What isn't covered.**
@@ -386,6 +448,8 @@ id is still queued, which is what makes silence checkable.
 - Skipped replays are not checked; MAME only.
 
 ## audit_mask_window_ff4182
+
+Setup: One legacy frame (05_timeout_idle f9126): the oracle's masked palette window hides the designed medallion change and nothing else.
 
 **Why the gate looks the way it does.** The legacy oracle ignores one small memory window, $FF4182-$FF41A1, the
 palette-fade staging slot for select block-A row 14. It is ignored because the 14z-49 medallion recolour changes that
@@ -402,6 +466,8 @@ difference between vsavj and ours.
 
 ## audit_merged_legacy
 
+Setup: The legacy replays on the merged three-tenant image against pristine vsavj, each held to its ratified comparison class.
+
 **Why the gate looks the way it does.** It asks whether a program image carrying all three tenants at once changes anything for the original characters. When it was written, the merged patch applied but had never run in an emulator; this gate is the evidence that the merge behaves. It plays the legacy replays on our merged image and on vsavj, the superset invariant's ground truth, and each replay must land on its ratified comparison class: inside a ratified window the two legs are allowed to differ, and any other difference fails instead of being absorbed. The merged image here carries blank tenant graphics, so it is a legacy-only instrument that must never reach a playtest.
 
 **What isn't covered.**
@@ -411,6 +477,8 @@ difference between vsavj and ours.
 - MAME only.
 
 ## audit_move_parity
+
+Setup: Every naming-rig event of each tenant, native vs2 against ours, both legs real cursor picks; speed pinned, RNG pinned 0000; the tenant's state compared every frame.
 
 **Why the gate looks the way it does.** It was built for #136: does each move of Donovan, Phobos and Pyron behave on our build as on native vs2? Both legs run the same rigs with the same inputs, as real cursor picks, and the tenant's own state is compared every frame, with one verdict per event (IDENT, DIFF or VOID) for all 526 events. The speed level is pinned to 6 on both legs, because vs2 starts in TURBO and vsavj in NORMAL, and an unpinned comparison would measure the play mode, not the port. P2 is Demitri, each game's own copy of him, so his art may differ; only his HP is compared. On the Phobos parts huitzil_5/6/7, the first-event DIFF rows are the round-start entrance, not the move.
 
@@ -422,6 +490,8 @@ difference between vsavj and ours.
 - MAME only, at one speed level (6).
 
 ## audit_pass_overrun
+
+Setup: Three Blizzard Sword rigs (speed 6, RNG pinned): the frames where a double-pass overruns and no logic pass completes.
 
 **Why the gate looks the way it does.** 29 of #136's 108 DIFF rows begin on a frame where the pass counter does not
 step on one leg, right after a double-pass frame. On three Blizzard Sword frames a double-pass activation runs past
@@ -438,6 +508,8 @@ takes precedence."
 
 ## audit_phobos_dmg_residual
 
+Setup: Demitri's 5HP on Phobos (huitzil_5) at three RNG pins: the HP taken, native vs2 against ours.
+
 **Why the gate looks the way it does.** After the M19 fix gave Phobos vs2's defense rows, he still took one more HP than on native vs2 from Demitri's 5HP: 12 against 11, at three RNG pins. This gate was the reproducer for #161. A legacy pair then showed the same +1 with no port in the loop: Demitri's 5HP on Victor reads 12 on pristine vsavj and 11 on pristine vs2. The cause is Demitri's own 5HP record, 14 on vsavj and 13 on vs2, so #161 was ruled not ours, and the gate is kept as the record. On the sheet, Phobos's hits show native vs2 above ours, and the legacy pair shows vs2 above vsavj; the damage on the legacy pair differs between the two games, as expected.
 
 **What isn't covered.**
@@ -447,6 +519,8 @@ takes precedence."
 
 ## audit_projectile_clash
 
+Setup: Replay 106: whether Pyron's Cosmo satellites can meet a flare, with a Demitri-vs-Demitri control that must show the sweep alive.
+
 **Why the gate looks the way it does.** It asks whether Pyron's Cosmo satellites can meet other projectiles on our build as on native vs2. On both games they cannot: their hit-row index (+0x94) is 0, so the projectile sweep never picks them up. That is measured native parity, not a defect (#108). There are three legs: a Demitri-vs-Demitri control that must show the sweep alive, Pyron's rig on our build, and the same rig on pristine vs2 as the anchor. The bank word differs by design, 0x6000 on vs2 and 0x1000 on ours, because our WIDE layout needs its own value and 0x6000 there garbles tenant sprites.
 
 **What isn't covered.**
@@ -455,6 +529,8 @@ takes precedence."
 - MAME only.
 
 ## audit_pursuit_flag
+
+Setup: Pyron's Cosmo Disruption, Donovan's Ifrit and Lightning Sword: the class-0x51 pursuit flag after the knockdown.
 
 **Why the gate looks the way it does.** It was built for #195: after Cosmo Disruption, Pyron could not pursue on our
 build. vs2 marks a knocked-down victim as open to a pursuit only for reaction class 0x51, and our tenants' 0x51
@@ -474,6 +550,8 @@ pursuit starts on either game.
 
 ## audit_pyron_capture_block
 
+Setup: Pyron's throws holding a victim with his own vs2 capture block; Demitri throws first as the control.
+
 **Why the gate looks the way it does.** Pyron's throws now hold the victim with his own capture block from vs2, ported at 14z-143. Before that, vsavj's row for him pointed at Demitri's block, so the held victim's position and pose differed from native vs2. The gate compares ours against native vs2, the game Pyron comes from, as the maintainer ruled. Demitri throws first as the control: he must look the same on both legs, which proves the rig made the hold on both and that both legs are read the same way. The pictures show Victor held under the 6+HP throw at the first and middle held frames; each game draws its own stage, palette and Victor, and the legs reach the hold on different frames.
 
 **What isn't covered.**
@@ -483,6 +561,8 @@ pursuit starts on either game.
 - MAME only, on the build the gate is given (`BUILD`, default `build/m3b_merged31`).
 
 ## audit_qs_voice_wav
+
+Setup: The test-mode voice sweep recorded as audio: each voice's loudness and high-band energy, native vs2 against ours.
 
 **Why the gate looks the way it does.** It records the whole voice sweep as audio on ours and native vs2 and compares each voice's loudness (RMS) and high-band energy. It exists because it caught a defect every other gate passed: samples packed across a bank's 0x8000 offset were cut short, while registers, records and bytes were all correct. Each cell is a playable clip of one voice, because the test-mode sweep shows nothing worth a picture, and the ids under each pair differ by design: ours are authored ids, vs2's its own.
 
@@ -494,6 +574,8 @@ pursuit starts on either game.
 
 ## audit_rig_opening
 
+Setup: huitzil_5's opening, position pin f2565 after the round start f2545: the round-start entrance on each game.
+
 **Why the gate looks the way it does.** Built for #168, part of #136: ten rows of the move-parity table differed on x with no move involved. Seven naming parts pinned both fighters' position at frame 2370, but the round starts at 2545, so the pin landed inside the round-start entrance, and the two games draw different entrances: native the car arrival, ours the arrival with Cecil in hand. The maintainer identified the two entrances on the capture. So on this sheet the frames before the first pin should differ; the gate claims only that every part's first pin lands after the round start, and that from then on the legs agree at every sample.
 
 **What isn't covered.**
@@ -503,6 +585,8 @@ pursuit starts on either game.
 - MAME only. Not comparable: each game's stage and palette, and P2's art.
 
 ## audit_rng_draws
+
+Setup: RNG seeded once and free from f2600: the draws compared by caller, legacy against pristine vsavj, each tenant against native vs2.
 
 **Why the gate looks the way it does.** It was built for #176. The parity gates pin the RNG word every frame, so a
 defect in how the RNG advances would be reset away on both legs. This gate seeds the RNG once, lets it run free from
@@ -521,6 +605,8 @@ frozen.
 
 ## audit_shared_wall_push
 
+Setup: A throw into the right corner then Sitting Attack [8P]; a legacy Lilith-vs-Victor corner leg shows the engines' own difference.
+
 **Why the gate looks the way it does.** It answers #179: after a throw, at Phobos's Sitting Attack landing, native Phobos keeps the corner and ours is pushed out. When both fighters are against the same wall in the same frame, the push-apart code is the same in both games, but vs2's screen-edge clamp sets a flag that swaps who gets pushed: vsavj pushes P1 out, vs2 pushes P2 out. The tenants run on vsavj's engine and follow its rule, ruled the host engine's behaviour, documented, not ported. The `legacy_lilith` part is the maintainer's control design: Lilith and Victor with the same setup on pristine vsavj and vs2, which shows the difference is engine-wide. Its sheet has no leg of ours. The `huitzil_3` part runs the rig on vs2 and ours.
 
 **What isn't covered.**
@@ -532,6 +618,8 @@ frozen.
 
 ## audit_tenant_cpu_soak
 
+Setup: The tenant as the CPU over one long round with P1 standing still and with P1 active; speed 6, HP and timer pinned, RNG free.
+
 **Why the gate looks the way it does.** Built for #129, which asks whether the tenants' CPU AI is lackluster on our build. Their AI blocks are byte-identical to vs2's, so the gate measures what the CPU does: Phobos, Pyron and Donovan as the CPU, ours against native vs2, over one long round with P1 standing still and with P1 active. The random choices are not pinned, so the legs part ways from the first random draw and the pictures are samples, not matching frames. What is judged is how often each move, state and command shows up, the mean distance and the airborne time, and how far the two legs' figures are apart, all frozen as measured. The gate does not judge "plays the same": what the figures mean is the maintainer's to read from the sheets.
 
 **What isn't covered.**
@@ -541,6 +629,8 @@ frozen.
 - A frame-by-frame comparison of the two legs.
 
 ## audit_tenant_throw_geometry
+
+Setup: Every tenant throw on every victim: where the victim is held relative to the thrower, every frame of the hold, in order.
 
 **Why the gate looks the way it does.** The maintainer asked whether Phobos's three throws (6+HP, Circuit Scrapper, ES
 Circuit Scrapper) match their vs2 versions; #230 added Pyron's and Donovan's standard throws and #235 Pyron's air throw.
@@ -560,6 +650,8 @@ victims are never held by Pyron's air throw on either game; their sheets show th
 
 ## audit_throw_registration
 
+Setup: Every throw contact of the naming rigs: the attacker/victim record written just before meter is paid, from each leg's live-pair tap.
+
 **Why the gate looks the way it does.** Built for #157, from #136's meter differences: at a throw the game records who is attacker and who is victim just before it hands out meter. Up to M19 our ported throw code wrote that record where vs2 keeps it, a place vsavj never reads, so the attacker got the victim's flat 8 meter and the victim got the throw's; since M20 it writes vsavj's own record and ours pays like native vs2, which the gate freezes for each tenant. A legacy control, Demitri throwing Victor on pristine vsavj and on vs2, shows both games record the pair and pay the attacker the same way, so the fault was the port's, not a difference between the two engines. A fourth part, donovan_2_ko, forces a KO to reach a third store (#180). The meter steps and addresses are judged as rows against the frozen file, not between the pictures.
 
 **What isn't covered.**
@@ -569,6 +661,8 @@ victims are never held by Pyron's air throw on either game; their sheets show th
 - Not comparable between the pictures: each game's stage and palette, and the victim's art (each game's own copy).
 
 ## audit_trap_air_hit
+
+Setup: The Plasma Trap dome against Felicia's j.HP pressed at f3508 and f3511, whose hurtbox reaches below her feet.
 
 **Why the gate looks the way it does.** #175 asked whether Phobos's Plasma Trap dome can hit an airborne opponent at
 all. An earlier gate had shown a jumping Victor is never hit in the air; 14z-182 found why: the dome's box is flat, its
@@ -588,6 +682,8 @@ her head hurtbox differs between the legs, frozen per leg; ours is checked equal
 
 ## audit_trap_airborne
 
+Setup: The Plasma Trap dome while Victor jumps (P2 up at f3490): cleared in the air, hit on landing, then the shock compared.
+
 **Why the gate looks the way it does.** #163 left one question open: what does the Plasma Trap dome do to a victim in the air? Here Victor jumps while the dome is active: he clears it in the air (apex 127) and is hit on the frame he lands, on both legs. From that frame the shock plays as on the ground, identical on native vs2 and ours except the class byte: 0x52 native, the marker 0x38 ours, by ruling. The ground is height 40, so "in the air" means above 40, not above 0; the gate's first form got this wrong. The pictures show the take-off, the apex, the last airborne frame and the landing hit, each leg on its own frames.
 
 **What isn't covered.**
@@ -598,6 +694,8 @@ her head hurtbox differs between the legs, frozen per leg; ours is checked equal
 
 ## audit_trap_parity
 
+Setup: Replay 87, Plasma Trap twice on its timer: the sound-event ids at ejection and detonation, native vs2 against ours.
+
 **Why the gate looks the way it does.** It checks the Plasma Trap's sounds on our build against native vs2, on the same far/timer replay. Native vs2 fires 0739 when the mine appears, then 010b, then 073a when it detonates on its timer; on vsavj 0739 and 073a are music, so ours must never send them: their appearance would be the music bug. Ours plays restored twins instead, 00d8 for the ejection and 0199 for the detonation chirp, so the ids under the pictures differ by design and each leg is held to its own frozen list. The native leg is re-measured every run, and the background id 049a must appear on both legs as proof the sound log is live.
 
 **What isn't covered.**
@@ -606,6 +704,8 @@ her head hurtbox differs between the legs, frozen per leg; ours is checked equal
 - Not comparable: each game's stage and palette, and Victor's art.
 
 ## audit_trap_shock
+
+Setup: The Plasma Trap dome's hit on its victim: native vs2 as the anchor, the merged build and the solo Phobos build measured against it.
 
 **Why the gate looks the way it does.** Phobos's Plasma Trap dome must shock its victim. Its hit records carry vs2's
 extended class 0x52, which vsavj's victim-reaction table does not reach, so unfixed it lands as a plain hit. Native vs2
@@ -623,6 +723,8 @@ pinned, native and merged are frame-for-frame identical over the dome window.
 
 ## audit_victim_parity
 
+Setup: The tenant as victim: Victor attacks with every kind of contact; reaction class, freeze, chain and recovery compared, real picks, speed 8, RNG pinned.
+
 **Why the gate looks the way it does.** #136's census found the tenant AS VICTIM measured against native nowhere: the older reaction test ran the native leg only. Here Victor attacks the tenant with every kind of contact, on vs2 and on ours, both by real cursor picks, and the tenant's reaction is compared: the class byte, the freeze, the chain it runs and the frames until it stands again. Victor is the attacker because his attack chains are the same data in both games; his chains that differ are his own reactions, which he never enters here. The level is pinned to 8, vs2's TURBO, because the rigs were tuned there. On throw rows, Victor's throw start is one frame shorter on vsavj, so most throw hits land a frame earlier on ours: his data, not ours. Pyron's different heavy-hit reaction is #173.
 
 **What isn't covered.**
@@ -634,6 +736,8 @@ pinned, native and merged are frame-for-frame identical over the dome window.
 
 ## audit_win_pal_auto
 
+Setup: #105's victory portrait with AUTO-GUARD on and off, the 1P vs COM screen and a legacy winner, pristine vsavj as the control leg.
+
 **Why the gate looks the way it does.** It locks #105: with AUTO chosen by the winner, the victory screen drew a tenant winner's portrait white. The colours were not missing, they arrived late, after the screen. AUTO here is AUTO-GUARD, not autoplay. The legs: our build with AUTO, our build without AUTO, pristine vsavj with AUTO, the 1P vs COM screen, and a legacy winner (Demitri). The vsavj leg is the not-ours control: vanilla draws its own AUTO winner in colour, so the white was ours. Since the fix every leg must read coloured. The legs use different winners and replays, so each picture is that leg's own screen, not the same moment side by side.
 
 **What isn't covered.**
@@ -642,6 +746,8 @@ pinned, native and merged are frame-for-frame identical over the dome window.
 - Five runs only, one legacy winner (Demitri), MAME only.
 
 ## test_don_immortal_native
+
+Setup: Lightning Sword (421+P) at every strength, no mash and at the mash ceiling, speed 6 and 8, RNG pinned: hit count, damage and frame of each hit.
 
 **Why the gate looks the way it does.** The gate asks whether Donovan's Lightning Sword (421+P) lands the same hits on
 our build as on native vs2: the hit count, the damage and the frame of each hit, at every strength, with no mash and
@@ -661,6 +767,8 @@ draws its own copy.
 
 ## test_gfx_menus
 
+Setup: Pixels of three screens (title f650, select f950, speed menu f1250) against frozen vanilla pictures.
+
 **Why the gate looks the way it does.** The RAM gates cannot see graphics. In session 14r an overlay corrupted the title screen, the select screen and the speed menu while every RAM gate stayed green, and only playtesting caught it. So this gate compares the pixels of three screens on ours against frozen vanilla pictures: the title at frame 650, the select screen at 950 (Demitri hovered) and the speed menu at 1250. On 950 and 1250 the medallion cell box is masked, because our wheel is ported by design; everything else must match exactly.
 
 **What isn't covered.**
@@ -669,6 +777,8 @@ draws its own copy.
 - MAME only.
 
 ## test_hui_df_style
+
+Setup: Replay 85 in Dark Force: palette and afterimage evidence at the reported phase, judged only with Dark Force really active on both legs.
 
 **Why the gate looks the way it does.** It answers a playtest report: in Dark Force, Phobos gets afterimages and a
 purple recolour, and native applies neither. The gate runs replay 85 unchanged on native vs2 and on our build and
@@ -687,6 +797,8 @@ has his own palette block. Frame 3180 is the control frame, before Dark Force.
 
 ## test_hui_electrocute
 
+Setup: Replay 93: the tenant electrocuted by Victor's held HP, native vs2 against ours.
+
 **Why the gate looks the way it does.** STATE twice recorded that no existing replay produced an electrocute, so the maintainer's 2026-08-18 sound report had no instrument; this gate is that instrument. Phobos is the victim on ours and on native vs2, and the trigger came from the maintainer: Victor's held HP, "the electrocuting version of his HP", a chargeable normal, not a special. A quick press of the same button lands an ordinary hit, so the gate keeps it as a negative control: it must not install the electric shake. Over the electrocute window the two legs' sound ids agree id for id.
 
 **What isn't covered.**
@@ -696,6 +808,8 @@ has his own palette block. Frame 3180 is the control frame, before Dark Force.
 - Not comparable: each game's stage and palette, and Victor's art; the sound ids come from separate runs, so the pictured frames are from the dump runs.
 
 ## test_hui_grab_victim
+
+Setup: Replay 80's Circuit Scrapper grab: the victim's offset from the attacker through the whole hold.
 
 **Why the gate looks the way it does.** Before the 14z-73 fix, the victim of Phobos's grab teleported about 109 px
 mid-animation: the start and end looked right, but the held part did not. The gate checks that our build places the
@@ -710,6 +824,8 @@ measures nothing. The expected result is a match, with a peak difference of 0.
 - One replay (80) with Victor as the victim, MAME only, and the build the gate is given (default `build/hui61`).
 
 ## test_hui_oracle
+
+Setup: Replay 90, the whole moveset, same inputs and pokes, RNG fixed: match-start anchors, neutral-window fields, P2's HP sequence.
 
 **Why the gate looks the way it does.** It is Phobos's whole-moveset check with native vs2 as the oracle: one replay
 (90) runs on native vs2 and on our build with identical inputs and pokes, and the RNG fixed. It holds four locks: the
@@ -727,6 +843,8 @@ games. The pictures are at the match start and at each change of P2's HP.
 
 ## test_m2a_stage4_oracle
 
+Setup: Replay pair 17: a scripted battery from the same inputs on native vs2 and on the stock twin build; match start and idle-window fields compared.
+
 **Why the gate looks the way it does.** The M2a stage-4 gate: ported Donovan on vsavj against native Donovan on
 vs2, with identical inputs on both games: P1 Donovan, P2 Victor, then a scripted battery. "Ours" here is the stock
 twin, where Donovan takes slot 0x0F, not the merged build. The match must start on the same frame on both, and the
@@ -740,6 +858,8 @@ equal, and that Donovan diverges across the games no more than Demitri, an untou
 - One battery against Victor, Donovan only, on the stock twin (default `build/m5_stock22/rompath`); MAME only.
 
 ## test_pyron_blink
+
+Setup: Replay 76: the distinct values of palette row 10 (sprite and HUD mugshot), which must hold constant as on native.
 
 **Why the gate looks the way it does.** Pyron's sprite and his in-match HUD mugshot share palette row 10. Before the
 fix that row changed every frame while native vs2 held it constant, so both blinked. The cause was a dead row: a
@@ -756,6 +876,8 @@ recolour, but he was never in Dark Force on either leg.
 - One replay (76), MAME only, the build the gate is given (default `build/pyron46`).
 
 ## test_tenant_select_records
+
+Setup: The tenant's select-screen pick on the 0x13 build against vanilla vsavj: its own select records, the host's back to vanilla bytes.
 
 **Why the gate looks the way it does.** When the tenant moved off Jedah's slot 0x0F onto its own id 0x13, its select-screen pieces stopped being surgery on Jedah's records and became repointed rows plus records composed from vs2. The gate freezes that: the tenant carries its own select records, and the host's records go back to vanilla bytes. Most of it is checked without pictures: the bytes of the built image, three planted faults that must fail, and the records the engine reads as the cursor walks onto cell 0x13. The pictures come from one pick on replay 11, the frozen vanilla log against our build's, at the first and last frame of the window 889-2415 and the replay's sync anchors. Inside that window the two legs differ on purpose: our select wheel has added cells.
 

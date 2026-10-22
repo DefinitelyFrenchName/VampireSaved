@@ -1,0 +1,69 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: #299 closed done: the static tier's --jobs pool, after the Mac's whole-tier serial against --jobs 8 rerun with the rig corrected (14z-206), after runs 1161-1166 and 1170
+Claim (the working agent's sentence): #299 can close done: its plan's four steps are done (--jobs N landed 14z-205; the close runs --jobs 8, ruled 2026-10-19) and the four items its 2026-10-20 comment left open are each measured, and fixed where they failed. (1) On the Mac the whole static tier of 8b82d5d2 ran serially and at --jobs 8 on one snapshot (--strict --cadence freeze, logs kept by the runner's own exit traps, the rig c3/inside_v2.sh with its clone diff c3/v2/clone_diff.patch and its own control at c3/snapshot_v2.log:20): both legs PASS 213 SKIP 0 FAIL 1 (test_emulator_staleness, by design at freeze cadence) with 413 of 413 controls executed and read HONOURED, test_static_runner's 21 among them (c3/v2/serial/runner.log, c3/v2/pool/runner.log), and the results and controls tables equal row for row (c3/compare_v2_serial_pool.out). Of 627 logs per leg 24 differ under the narrowed comparer, and c3/compare_v2_serial_pool_full.out shows each a run-time value, a control's own free stub order, a designed fork race's stopping point, or the one exception: the pool leg's executed broken-page mode of test_applier_page_browser stalled and read HONOURED without judging the page (c3/v2/pool/logs/test_applier_page_browser.ctl.broken-page.out, against c3/v2/serial/logs/test_applier_page_browser.ctl.broken-page.out), a classifier gap older than the pool, filed as #310 (issue_310.md) with the census showing it is the only FIRED-line difference between the legs (c3/v2/fired_census.out). The first pair of legs, discarded, is in c3/REPORT.md and c3/ORCH_test_static_runner.md: the rig's patch failed test_static_runner in both and leaked 54 fixture logs per leg; neither v2 leg holds one (c3/v2/log_census.out). PILOT's 14z-205c legs and the comparer plants stand as in the previous packet (c3/pilot_BA_c2.out, c3/pilot_BA_c3.out, c3/plant_check3.py, c3/plant_c3_serial.tsv). (2) The cold decrypt cache under the pool is fixed (t299.diff) and proven on a whole tier with the views deleted (build/agent206/tier/tier.log). (3) The collision census was re-traced with relative paths resolved (x2/REPORT.md); the new hazard it found, a control rewriting a tracked file, is fixed, and the guard that proves it now stamps mtime, inode, size and content, with control restored-write showing a restored in-place write it catches and a content compare passes (x2fix2/checkdocs_rom.diff, x2fix2/gate.log, x2fix2/mode_restored-write.log, x2fix2/tracked_stamp.txt). (4) Load moved no verdict (build/agent205c/t299/REPORT.md §4). What is not measured is in the closing comment's Not covered list.
+Artifacts (read every one, in full):
+  - build/agent206/t299/closing_comment.md
+  - build/agent206/t299/issue_299.txt
+  - build/agent206/t299/issue_310.md
+  - build/agent205c/t299/REPORT.md
+  - build/agent206/t299/REPORT.md
+  - build/agent206/t299/c2/REPORT.md
+  - build/agent206/t299/c2/plant_check2.py
+  - build/agent206/t299/c2/epoch_scan.out
+  - build/agent206/t299/c2/pilot_BA_normal_c2_full.out
+  - build/agent206/t299/c2/pilot_24_classified.md
+  - build/agent206/t299/c3/REPORT.md
+  - build/agent206/t299/c3/ORCH_test_static_runner.md
+  - build/agent206/t299/c3/trap_sete_repro.sh
+  - build/agent206/t299/c3/tsr_head_unset.log
+  - build/agent206/t299/c3/tsr_head_C2KEEP.log
+  - build/agent206/t299/c3/tsr_patched_unset.log
+  - build/agent206/t299/c3/tsr_patched_C2KEEP.log
+  - build/agent206/t299/c3/inside_v2.sh
+  - build/agent206/t299/c3/snapshot_v2.log
+  - build/agent206/t299/c3/v2/clone_diff.patch
+  - build/agent206/t299/c3/v2/inside_head.txt
+  - build/agent206/t299/c3/v2/patch_control.log
+  - build/agent206/t299/c3/v2/serial/runner.log
+  - build/agent206/t299/c3/v2/pool/runner.log
+  - build/agent206/t299/c3/v2/serial/results.tsv
+  - build/agent206/t299/c3/v2/pool/results.tsv
+  - build/agent206/t299/c3/v2/serial/results.controls.tsv
+  - build/agent206/t299/c3/v2/pool/results.controls.tsv
+  - build/agent206/t299/c3/compare_v2_serial_pool.out
+  - build/agent206/t299/c3/compare_v2_serial_pool_full.out
+  - build/agent206/t299/c3/v2/serial/logs/test_applier_page_browser.ctl.broken-page.out
+  - build/agent206/t299/c3/v2/pool/logs/test_applier_page_browser.ctl.broken-page.out
+  - build/agent206/t299/c3/v2/fired_census.sh
+  - build/agent206/t299/c3/v2/fired_census.out
+  - build/agent206/t299/c3/v2/log_census.out
+  - build/agent206/t299/c3/compare_legs_c3.diff
+  - build/agent206/t299/c3/plant_check3.py
+  - build/agent206/t299/c3/plant_c3_serial.tsv
+  - build/agent206/t299/c3/plant_c2_plant_pilotB_A.tsv
+  - build/agent206/t299/c3/pilot_BA_c2.out
+  - build/agent206/t299/c3/pilot_BA_c3.out
+  - build/agent206/t299/c3/epoch_scan_mac_whole.out
+  - build/agent206/t299/c3/rule_checker_5f31e850.log
+  - build/agent206/t299/x2/REPORT.md
+  - build/agent206/t299/x2fix/gate.log
+  - build/agent206/t299/x2fix/mode.log
+  - build/agent206/t299/t299.diff
+  - build/agent206/t299/x2fix2/checkdocs_rom.diff
+  - build/agent206/t299/x2fix2/gate.log
+  - build/agent206/t299/x2fix2/mode_restored-write.log
+  - build/agent206/t299/x2fix2/mode_dropped-covered-row.log
+  - build/agent206/t299/x2fix2/tracked_stamp.txt
+  - tests/lib/classify.sh.lines-95-152 (lines 95-152 of tests/lib/classify.sh)
+  - build/agent206/tier/tier.log
+  - build/agent206/tier/confirm2.log.lines-219-558 (lines 219-558 of build/agent206/tier/confirm2.log)
+  - build/agent206/tier/confirm3.log
+  - DECISIONS_HISTORY.md.lines-7314-7318 (lines 7314-7318 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-19 (14z-205) — #299: a session close runs its tier at `--jobs 8`")
+  - DECISIONS_HISTORY.md.lines-7606-7613 (lines 7606-7613 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-21 (14z-206) — the landing commits now; #299 stays open and its closure goes on sep")
+  - docs/project/gotchas.md.lines-7389-7417 (lines 7389-7417 of docs/project/gotchas.md)
+  - docs/project/gotchas.md.lines-7437-7448 (lines 7437-7448 of docs/project/gotchas.md)
+  - docs/project/tickets.tsv.lines-74-74 (lines 74-74 of docs/project/tickets.tsv)
+  - docs/project/tickets.tsv.lines-85-85 (lines 85-85 of docs/project/tickets.tsv)
+  - STATE.md.lines-96-115 (lines 96-115 of STATE.md)

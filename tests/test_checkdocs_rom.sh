@@ -9,17 +9,21 @@
 #   view, every @table negative control fires, the coverage NOTE is re-emitted at column 0,
 #   and the covered set equals the frozen tests/expected/checkdocs_rom_covered.tsv as a
 #   multiset.
-# HOW: tools/checkdocs_rom.py over the three decrypted views (~2 s warm); five controls: a
+# HOW: tools/checkdocs_rom.py over the three decrypted views (~2 s warm); six controls: a
 #   reworded claim (STALE), a flipped ROM byte (MISMATCH), a PARAPHRASE claim's literal
-#   perturbed (MISMATCH), a vacuous @table validator, a dropped covered row.
+#   perturbed (MISMATCH), a vacuous @table validator, a dropped covered row, and a write to
+#   a scratch copy of the frozen set that is restored before the check (the guard below).
 # EXPECTS: every check derived equal, the note printed, the covered set exact; each control
-#   caught. Coverage is NOTE-class, never fatal (ruled).
+#   caught; the tracked frozen set untouched across the run: its mtime, inode, size and
+#   content equal at the end to the start (a write restored before the end still moves
+#   the mtime). Coverage is NOTE-class, never fatal (ruled).
 #
 # MUST-FIRE: perturbed-copy: reworded-claim — a quoted claim reworded in a copy of the atlas must be reported STALE (mode: section 2 runs over that copy)
 # MUST-FIRE: perturbed-copy: flipped-rom-byte — one byte flipped at a checked address, in a copy of the view, must be a MISMATCH
 # MUST-FIRE: perturbed-copy: paraphrase-literal — the PARAPHRASE claim's literal fact perturbed in a copy of the view must be a MISMATCH (the declared class cannot degrade into a silent skip)
 # MUST-FIRE: shadow-tool: vacuous-validator — a copy of the checker with a @table validator weakened to accept anything must be reported Vacuous
 # MUST-FIRE: perturbed-copy: dropped-covered-row — a frozen covered row the run does not reach must be reported (a COPY of the frozen set is perturbed and passed with --covered; the tracked file is never written)
+# MUST-FIRE: perturbed-copy: restored-write — a scratch copy of the frozen set written in place and restored before the check (the pre-14z-206 shape of control 5) must be caught by the untouched-file guard, where a content compare alone passes (mode: the guard runs on that copy)
 #
 # WHAT IT HOLDS. `tools/checkdocs_rom.py` runs every registered check over the
 # tree: each QUOTES its claim from the atlas (`says()`, so a check cannot
@@ -63,8 +67,12 @@
 #   5 a frozen COVERED row the run does not reach -> "no longer covers"
 #     (0x38C258 is an atlas address the venue check deliberately does not
 #     read: the document itself says it is NOT a table)
+#   6 a scratch copy of the frozen set written IN PLACE and restored before
+#     the check -> caught by the untouched-file guard (#299, rule-checker run
+#     2026-10-22-1170: a content compare cannot see a restored write)
 # Controls 2 and 3 perturb a COPY of the decrypted view, never the cache;
-# control 5 perturbs the frozen set and restores it, asserting both.
+# control 5 perturbs a COPY of the frozen set (since 14z-206, #299) and the
+# tracked file is never written, which the guard at the end asserts.
 set -u
 REPO=$(cd "$(dirname "$0")/.." && pwd)
 cd "$REPO" || exit 1
@@ -72,6 +80,10 @@ W=$(mktemp -d); trap 'rm -rf "$W"' EXIT INT TERM
 fail=0
 ok()  { echo "  ok   $1"; }
 bad() { echo "  FAIL $1"; fail=1; }
+# the untouched-file guard's reading: mtime (ns), inode, size and content hash. A write restored before the end
+# still moves the mtime, which a content compare alone cannot see (#299, rule-checker run 2026-10-22-1170).
+fstamp() { python3 -c 'import hashlib, os, sys; s = os.stat(sys.argv[1]); print(s.st_mtime_ns, s.st_ino, s.st_size, hashlib.sha1(open(sys.argv[1], "rb").read()).hexdigest())' "$1"; }
+COV=tests/expected/checkdocs_rom_covered.tsv; COV_STAMP="$(fstamp "$COV")"
 
 . "$REPO/tests/lib/decrypt_cache.sh"
 
@@ -129,7 +141,7 @@ case "$VS_CTL" in
 reworded-claim)     RUN_ROOT="--root $W/root1" ;;
 flipped-rom-byte)   RUN_VIEWS="$W/v2" ;;
 paraphrase-literal) RUN_VIEWS="$W/v3" ;;
-vacuous-validator)  RUN_TOOL="$W/weak.py" ;;
+vacuous-validator)  RUN_TOOL="$W/weak.py"; RUN_ROOT="--root $PWD" ;;   # the copy's own default root is $W/.. (14z-206: dead since 14z-147b)
 dropped-covered-row) RUN_COV="--covered $W/cov.new" ;;
 esac
 
@@ -209,6 +221,22 @@ else
         sed 's/^/    /' "$W/c5.txt"; vs_ctl_dead dropped-covered-row "exited $_rc but not for the stated reason"; bad "control 5"
     fi
 fi
-cmp -s "$W/cov.bak" "$COV" || bad "control 5: the tracked frozen set changed during the run (the control must perturb a copy)"
+
+# 6 — the guard below, proven on a SCRATCH copy: written in place and restored before the check, the old shape of
+# control 5. Its content is back, so a content compare passes; the mtime moved, so the guard must catch it. The copy's
+# mtime is set to 2000 first, so the write moves it even on a filesystem with coarse timestamps.
+cp "$COV" "$W/gcopy.tsv"; touch -t 200001010000 "$W/gcopy.tsv"; _g0="$(fstamp "$W/gcopy.tsv")"
+printf 'venue_pointer_table\tvenue_assets.md\tPRG:0x38C258\n' >> "$W/gcopy.tsv"; cp "$W/cov.bak" "$W/gcopy.tsv"
+if ! cmp -s "$W/gcopy.tsv" "$W/cov.bak"; then
+    vs_ctl_dead restored-write "the scratch copy's content was not restored, so the control does not test a restored write"; bad "control 6"
+elif [ "$(fstamp "$W/gcopy.tsv")" = "$_g0" ]; then
+    vs_ctl_dead restored-write "a restored in-place write left the guard's reading unchanged"; bad "control 6"
+else
+    vs_ctl_fired restored-write "a restored in-place write is caught by the guard, where a content compare passes"
+fi
+GUARD_FILE="$COV"; GUARD_STAMP="$COV_STAMP"
+[ "$VS_CTL" = restored-write ] && { GUARD_FILE="$W/gcopy.tsv"; GUARD_STAMP="$_g0"; }   # the mode: the guard over the written copy
+[ "$(fstamp "$GUARD_FILE")" = "$GUARD_STAMP" ] \
+    || bad "the guarded file $GUARD_FILE was written during the run (mtime, inode, size or content moved; a control must perturb a copy; under CONTROL=restored-write this is the written scratch copy)"
 
 if [ "$fail" = 0 ]; then echo "PASS"; else echo "FAIL"; exit 1; fi

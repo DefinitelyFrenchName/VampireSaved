@@ -1,0 +1,98 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: #299 closed done: the static tier's --jobs pool, after the Mac's whole-tier serial against --jobs 8 rerun with the rig corrected and a loaded leg (14z-206), after runs 1161-1166 and 1170-1174
+Claim (the working agent's sentence): #299 can close done: its plan's four steps are done (--jobs N landed 14z-205; the close runs --jobs 8, ruled 2026-10-19) and the four items its 2026-10-20 comment left open are each measured, and fixed where they failed. (1) On the Mac the whole static tier of 8b82d5d2 ran serially and at --jobs 8 on one snapshot (--strict --cadence freeze, logs kept by the runner's own exit traps, the rig c3/inside_v2.sh with its clone diff c3/v2/clone_diff.patch and its own control at c3/snapshot_v2.log:20): both legs PASS 213 SKIP 0 FAIL 1 (test_emulator_staleness, by design at freeze cadence) with 413 controls executed in each and all read HONOURED (test_emulator_staleness's 10 not among them: the runner records a gate's controls only when it passes, and it fails by design at freeze cadence), test_static_runner's 21 among them (c3/v2/serial/runner.log, c3/v2/pool/runner.log), and the results and controls tables equal row for row (c3/compare_v2_serial_pool.out). Of 627 logs per leg 24 differ under the narrowed comparer, and c3/compare_v2_serial_pool_full.out shows each a run-time value, a control's own free stub order, a designed fork race's stopping point, or the one exception: the pool leg's executed broken-page mode of test_applier_page_browser stalled and read HONOURED without judging the page (c3/v2/pool/logs/test_applier_page_browser.ctl.broken-page.out, against c3/v2/serial/logs/test_applier_page_browser.ctl.broken-page.out), a classifier gap older than the pool, filed as #310 (issue_310.md, comment_310_scope.md). The equal controls tables therefore show that every control ended the same way in both legs under one classifier, not that every mode measured its perturbation; a CONTROL FIRED line in a mode log does not show it either, since gates print in-gate firings in every mode. One mode measured nothing in both legs, test_checkdocs_rom's vacuous-validator (c3/v2/serial/logs/test_checkdocs_rom.ctl.vacuous-validator.out:5,9), dead since 14z-147b and fixed in 14z-206 (x2fix4/modes.txt); which of the other modes measured is #310's census, not claimed here. The first pair of legs, discarded, is in c3/REPORT.md and c3/ORCH_test_static_runner.md: the rig's patch failed test_static_runner in both and leaked 54 fixture logs per leg; neither v2 leg holds one (c3/v2/log_census.out). PILOT's 14z-205c legs and the comparer plants stand as in the previous packet (c3/pilot_BA_c2.out, c3/pilot_BA_c3.out, c3/plant_check3.py, c3/plant_c3_serial.tsv). (2) The cold decrypt cache under the pool is fixed (t299.diff) and proven on a whole tier with the views deleted (build/agent206/tier/tier.log). (3) The collision census was re-traced with relative paths resolved (x2/REPORT.md); the new hazard it found, a control rewriting a tracked file, is fixed, and the guard that proves it now stamps mtime, inode, size and content, with control restored-write showing a restored in-place write it catches and a content compare passes (x2fix4/checkdocs_rom.diff, against 8b82d5d2; on the gate as it stands, x2fix4/gate.log, x2fix4/modes.txt with each of the six modes read by the runner's classifier, registering 15 checks and naming its own failing finding, x2fix4/mode_*.log, x2fix4/tracked_stamp.txt); that guard has not yet run inside a tier, and its first is the commit's strict tier. (4) Load moved no results row and no control row as the 14z-205c classifier read them (build/agent205c/t299/REPORT.md §4); one of leg D's control rows was a jtsim collision read HONOURED (REPORT.md:75), which today's classifier reads DIED and the lock now prevents, and that mode's own section refused the foreign rompath in both Mac v2 legs (c3/v2/{serial,pool}/logs/test_mra_build_line.ctl.foreign-rompath.out); the loaded run was not repeated with today's classifier. The browser gate, whose verdict depends on a run finishing within a time budget, was red for environment on PILOT and so never loaded there; on the Mac it is ordered last and its stalled control ran after every other pool log was written (browser_alone/leg_tail_mtimes.txt), and alone its broken-page mode fired on its own section 10 times out of 10, 2 after the designed retry (browser_alone/runs.txt), so that stall was not pool load; why a browser run stalls is not known (#311, issue_311.md). Under heavy load on the Mac (load/summary.txt: 18 of the 19 gates, --jobs 8 beside 12 busy-loops, 1-minute load median 78.6 on 12 cores), 17 read as in the serial leg, test_applier_page, test_applier_key_first and test_community_crosscheck among them, with their 23 control rows equal; test_applier_page_browser went PASS to FAIL unjudged (load/out/logs/test_applier_page_browser.out), a red that judged nothing, filed as #311; test_release_roundtrip runs only at release cadence and was never loaded, which the Not covered list names. What is not measured is in the closing comment's Not covered list.
+Artifacts (read every one, in full):
+  - build/agent206/t299/closing_comment.md
+  - build/agent206/t299/issue_299.txt
+  - build/agent206/t299/issue_310.md
+  - build/agent206/t299/comment_310_scope.md
+  - build/agent206/t299/issue_311.md
+  - build/agent205c/t299/REPORT.md
+  - build/agent206/t299/REPORT.md
+  - build/agent206/t299/c2/REPORT.md
+  - build/agent206/t299/c2/plant_check2.py
+  - build/agent206/t299/c2/epoch_scan.out
+  - build/agent206/t299/c2/pilot_BA_normal_c2_full.out
+  - build/agent206/t299/c2/pilot_24_classified.md
+  - build/agent206/t299/c3/REPORT.md
+  - build/agent206/t299/c3/ORCH_test_static_runner.md
+  - build/agent206/t299/c3/trap_sete_repro.sh
+  - build/agent206/t299/c3/tsr_head_unset.log
+  - build/agent206/t299/c3/tsr_head_C2KEEP.log
+  - build/agent206/t299/c3/tsr_patched_unset.log
+  - build/agent206/t299/c3/tsr_patched_C2KEEP.log
+  - build/agent206/t299/c3/inside_v2.sh
+  - build/agent206/t299/c3/snapshot_v2.log
+  - build/agent206/t299/c3/v2/clone_diff.patch
+  - build/agent206/t299/c3/v2/inside_head.txt
+  - build/agent206/t299/c3/v2/patch_control.log
+  - build/agent206/t299/c3/v2/serial/runner.log
+  - build/agent206/t299/c3/v2/pool/runner.log
+  - build/agent206/t299/c3/v2/serial/results.tsv
+  - build/agent206/t299/c3/v2/pool/results.tsv
+  - build/agent206/t299/c3/v2/serial/results.controls.tsv
+  - build/agent206/t299/c3/v2/pool/results.controls.tsv
+  - build/agent206/t299/c3/compare_v2_serial_pool.out
+  - build/agent206/t299/c3/compare_v2_serial_pool_full.out
+  - build/agent206/t299/c3/v2/serial/logs/test_applier_page_browser.ctl.broken-page.out
+  - build/agent206/t299/c3/v2/pool/logs/test_applier_page_browser.ctl.broken-page.out
+  - build/agent206/t299/c3/v2/serial/logs/test_mra_build_line.ctl.foreign-rompath.out
+  - build/agent206/t299/c3/v2/pool/logs/test_mra_build_line.ctl.foreign-rompath.out
+  - build/agent206/t299/c3/v2/serial/logs/test_checkdocs_rom.ctl.vacuous-validator.out
+  - build/agent206/t299/c3/v2/pool/logs/test_checkdocs_rom.ctl.vacuous-validator.out
+  - build/agent206/t299/c3/v2/fired_census.sh
+  - build/agent206/t299/c3/v2/fired_census.out
+  - build/agent206/t299/c3/v2/log_census.out
+  - build/agent206/t299/browser_alone/runs.txt
+  - build/agent206/t299/browser_alone/leg_tail_mtimes.txt
+  - build/agent206/t299/browser_alone/run_4.log
+  - build/agent206/t299/browser_alone/run_1.log
+  - tests/test_applier_page_browser.sh
+  - build/agent206/t299/load/inside_load.sh
+  - build/agent206/t299/load/snapshot.log
+  - build/agent206/t299/load/summary.txt
+  - build/agent206/t299/load/out/load.log
+  - build/agent206/t299/load/out/runner.log
+  - build/agent206/t299/load/out/results.tsv
+  - build/agent206/t299/load/out/results.controls.tsv
+  - build/agent206/t299/load/out/logs/test_applier_page_browser.out
+  - build/agent206/t299/load/compare_serial_loaded_full.out
+  - build/agent206/t299/load/out/clone_diff_stat.txt
+  - tests/run_all_static.sh.lines-440-505 (lines 440-505 of tests/run_all_static.sh)
+  - build/agent206/t299/c3/compare_legs_c3.diff
+  - build/agent206/t299/c3/plant_check3.py
+  - build/agent206/t299/c3/plant_c3_serial.tsv
+  - build/agent206/t299/c3/plant_c2_plant_pilotB_A.tsv
+  - build/agent206/t299/c3/pilot_BA_c2.out
+  - build/agent206/t299/c3/pilot_BA_c3.out
+  - build/agent206/t299/c3/epoch_scan_mac_whole.out
+  - build/agent206/t299/c3/rule_checker_5f31e850.log
+  - build/agent206/t299/x2/REPORT.md
+  - build/agent206/t299/x2fix/gate.log
+  - build/agent206/t299/x2fix/mode.log
+  - build/agent206/t299/t299.diff
+  - build/agent206/t299/x2fix4/checkdocs_rom.diff
+  - build/agent206/t299/x2fix4/gate.log
+  - build/agent206/t299/x2fix4/modes.txt
+  - build/agent206/t299/x2fix4/tracked_stamp.txt
+  - build/agent206/t299/x2fix4/mode_restored-write.log
+  - build/agent206/t299/x2fix4/mode_dropped-covered-row.log
+  - build/agent206/t299/x2fix4/mode_reworded-claim.log
+  - build/agent206/t299/x2fix4/mode_flipped-rom-byte.log
+  - build/agent206/t299/x2fix4/mode_paraphrase-literal.log
+  - build/agent206/t299/x2fix4/mode_vacuous-validator.log
+  - tests/test_checkdocs_rom.sh
+  - tools/checkdocs_rom.py.lines-725-740 (lines 725-740 of tools/checkdocs_rom.py)
+  - tests/lib/classify.sh.lines-95-152 (lines 95-152 of tests/lib/classify.sh)
+  - build/agent206/tier/tier.log
+  - build/agent206/tier/confirm2.log.lines-219-558 (lines 219-558 of build/agent206/tier/confirm2.log)
+  - build/agent206/tier/confirm3.log
+  - DECISIONS_HISTORY.md.lines-7314-7318 (lines 7314-7318 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-19 (14z-205) — #299: a session close runs its tier at `--jobs 8`")
+  - DECISIONS_HISTORY.md.lines-7606-7613 (lines 7606-7613 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-21 (14z-206) — the landing commits now; #299 stays open and its closure goes on sep")
+  - docs/project/gotchas.md.lines-7389-7417 (lines 7389-7417 of docs/project/gotchas.md)
+  - docs/project/gotchas.md.lines-7437-7461 (lines 7437-7461 of docs/project/gotchas.md)
+  - docs/project/tickets.tsv.lines-74-75 (lines 74-75 of docs/project/tickets.tsv)
+  - docs/project/tickets.tsv.lines-86-86 (lines 86-86 of docs/project/tickets.tsv)
+  - STATE.md.lines-96-115 (lines 96-115 of STATE.md)

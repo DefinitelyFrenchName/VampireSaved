@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-542 entries (48 game / 137 platform / 357 project), counted from the buckets at generation.
+546 entries (48 game / 137 platform / 361 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 48 entries
 
@@ -213,7 +213,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - UNDER `-debug`, A STOP THAT LANDS AS THE SCREEN FRAME ADVANCES MAKES THAT FRAME'S PER-FRAME SAMPLE READ ONE ENGINE PASS EARLY — and the game clock cannot see it (paid: 14z-205, #229, fork F2)
 - A MAME WRITE TAP THAT READS MEMORY OR `cpu.state` INSIDE ITS CALLBACK CRASHED MAME AT TEARDOWN — and write taps crash there intermittently anyway (paid: 14z-205, #229, fork F1; seen again 14z-205b, R1)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 357 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 361 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -572,3 +572,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A GATE'S OWN `CONTROL DEAD` IS SOME GATES' HONOURED MODE — "a dead own control means the mode died" would have turned four good controls red (paid: 14z-205c, #299)
 - A GATE THAT READS `build/out` DIRECTLY WAS SAVED BY THE TIER'S ORDER, NOT BY THE CACHE — under `--jobs` it ran before the views existed (paid: 14z-206, #299; found on PILOT, 14z-205c)
 - A CONTROL THAT PERTURBS A TRACKED FILE IN PLACE AND RESTORES IT IS INVISIBLE TO `test_no_tracked_mutation` — and under `--jobs` five other gates read that file mid-run (paid: 14z-206, #299; found by the re-traced write census on PILOT)
+- A RELATIVE NAME THAT CLIMBS OUT OF THE REPOSITORY RESOLVES DIFFERENTLY BY PATH DEPTH — surplus `..` stop at `/`, so a "must not resolve" control is dead on a deep enough host (paid: 14z-206, #309)
+- A GUARD THAT COMPARES A FILE'S CONTENT BEFORE AND AFTER CANNOT SEE A WRITE THAT WAS RESTORED IN BETWEEN — read its mtime and inode too (paid: 14z-206, #299)
+- A CONTROL MODE THAT FAILS FOR A FOREIGN REASON READS HONOURED, AND ITS LOG CAN STILL CARRY ITS OWN `CONTROL FIRED` LINE — read what the mode itself reached (paid: 14z-206, #299, #310)
+- JOB-SECONDS OVER THE WALL CLOCK IS CONCURRENCY, NOT CPU — a wall-clock-timed job's seconds say nothing about cores busy (paid: 14z-206, #299, #312)

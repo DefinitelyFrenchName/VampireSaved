@@ -1,0 +1,4 @@
+  FLAG D-ABSOLUTE: **Closed (14z-206, 2026-10-22): both steps landed, every emulator lane ran with the refusal on, and no run was refused.**  [build/agent206/t296/closing_comment.md]
+  FLAG D-ABSOLUTE: **Not every row is PASS.  [build/agent206/t296/closing_comment.md]
+  FLAG D-ABSOLUTE: None of the non-PASS rows involves the refusal.** The done-when's "green with refusal on" is counted as no red caused by the refusal, with each red named bel...  [build/agent206/t296/closing_comment.md]
+packet_check: 3 flag(s): D-ABSOLUTE 3

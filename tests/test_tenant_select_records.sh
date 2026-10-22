@@ -28,6 +28,7 @@
 #   tools/run_mame.sh tools/run_replay_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
 #
 # SHEET: legs vsavj,ours — moments: section 4's host pick on replay 11 (the frozen vanilla masked log against the variant-id build's): the bounded window's first and last frame (889, 2415) and the replay's sync anchors — not comparable: inside the ratified window 889-2415 the legs differ by ratification (the select wheel's added cells); sections 1-3 (static bytes, the record walker's reads) have no picture
+# SHEET-VARIANT: TENANT13_OUTBASE tests/lib/tenant_build.sh tenant_build_13 vsavjw — the ours leg is the 0x13 variant this gate builds for itself, not one of the commit's tracks: proof_sheets builds it in the clean checkout and states its fingerprint (ruled 2026-10-22, "Built in checkout, stated")
 #
 # MUST-FIRE: known-bad: drift-clock — a tap run under the OLD frame_done clock (INSTR_CLOCK=frame_done, the [MFI-5] desync this gate ran on until 14z-197: 1,059 emulated frames of 1,400 counted) must miss its frozen game clock (in-gate: one extra run of the highlight tap — two other taps lose exactly 256 frames, which the byte cannot see; mode: every tap run runs the old clock and the gate FAILs)
 # MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs)
@@ -378,19 +379,22 @@ if [ "${SKIP_RUNTIME:-0}" != 1 ]; then
 fi
 
 # THE SHEET (#291): with SHEET_OUT set, section 4's two legs — the frozen vanilla masked log and this run's — and the
-# moments its window verdict rests on. The fresh build lives in $WORK, deleted at exit, so its rompath is copied into
-# SHEET_OUT for the capture. Nothing the gate decides changes.
+# moments its window verdict rests on. A fresh build lives in $WORK, deleted at exit, so its rompath is copied into
+# SHEET_OUT for the capture; a build handed in through TENANT13_OUTBASE (tools/proof_sheets.py run builds the declared
+# variant in the clean checkout's build/, ruled 2026-10-22) persists and is named as it is. Nothing the gate decides changes.
 . "$REPO/tests/lib/sheet.sh"
 if sheet_on && [ -z "$MODE" ] && [ "$FREEZE_CLOCK" = 0 ] && [ "${SKIP_RUNTIME:-0}" != 1 ] && [ -f "$WORK/11_legacy.log" ]; then
     _sb="tests/expected/vsavj/masked-v2/logs/11_pick_donovan.log"
     _sfr="$(awk '$1 ~ /^[0-9]+$/ {n = $1} END {print n}' "$_sb")"
     _smask="$(cat tests/expected/donovan-m5/mask)"
-    mkdir -p "$SHEET_OUT/legs"; rm -rf "$SHEET_OUT/legs/t13_rompath"; cp -R "$OUTBASE/rompath" "$SHEET_OUT/legs/t13_rompath"
+    mkdir -p "$SHEET_OUT/legs"
+    if [ -n "${TENANT13_OUTBASE:-}" ]; then _t13rp="$OUTBASE/rompath"
+    else rm -rf "$SHEET_OUT/legs/t13_rompath"; cp -R "$OUTBASE/rompath" "$SHEET_OUT/legs/t13_rompath"; _t13rp="$SHEET_OUT/legs/t13_rompath"; fi
     if python3 tools/compare_window.py "$_sb" "$WORK/11_legacy.log" --onset 889 --end 2415 > /dev/null 2>&1; then _v="window as frozen"; else _v=DIFF; fi
     sheet_new host11 "The host pick on a variant-id build (11_pick_donovan): vanilla vsavj above the 0x13 build" donovan - \
         "inside the ratified window 889-2415 the legs differ by ratification (the select wheel's added cells)"
     sheet_leg host11 vanilla vsavj vsavj "$ROMDIR" "$REPO/tests/replays/11_pick_donovan.rpl" - "$_sfr" "$_sb" "$_smask"
-    sheet_leg host11 t13 ours vsavjw "$SHEET_OUT/legs/t13_rompath;$ROMDIR" "$REPO/tests/replays/11_pick_donovan.rpl" - "$_sfr" \
+    sheet_leg host11 t13 ours vsavjw "$_t13rp;$ROMDIR" "$REPO/tests/replays/11_pick_donovan.rpl" - "$_sfr" \
         "$WORK/11_legacy.log" "$_smask"
     sheet_anchors host11
     sheet_inputs host11 18      # #291 S4-E (Q2: "at the replay's inputs, up to 18 frames", "18 per round"), each proven on the logs above

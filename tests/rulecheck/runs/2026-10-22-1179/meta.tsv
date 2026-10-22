@@ -1,0 +1,11 @@
+decision	recommendation
+subject	#296 closed done: the reused-sandbox refusal, with every emulator lane run under it (14z-206)
+session	14z-206
+model	rule-checker@163e4ce9cf7b
+claim	#296 can close done: its done-when (issue_296_body.md) is met. Both steps landed: the opt-in sandbox inventory in 3b85b623 (14z-205) and the refusal in a8fa5350 (14z-206), tools/run_mame.sh refusing a run whose sandbox already holds MAME state unless MAME_SANDBOX_REUSE=1 (t296.diff, tools/run_mame.sh, tests/test_mame_sandbox_log.sh with control refusal-removed). Every declared reuse names its reason because there are none: outside documentation MAME_SANDBOX_REUSE appears only in run_mame.sh's own check, test_mame_sandbox_log's stub runs and comments (reuse_grep.txt). The emulator lanes ran with MAME_SANDBOX_LOG on and MAME_SANDBOX_REUSE unset on 04a53769: ERIS's fbneo, mame and prereq lanes, all and ondemand (remote/eris/REPORT.md, remote/eris3/REPORT.md), and PILOT's mister lane, GREEN 8 of 8 (remote/pilot3/mister/run_mister/results.tsv, run_mister_resume.out), with 4,775 MAME runs all logged fresh (4,463 + 308 + 4: the two ERIS reports and pilot3/mister/sandbox.log) and no REFUSED line from run_mame.sh in any gate log. The four red rows are none of them the refusal's, each named with its cause in the closing comment (test_wide_profile's host mtime, audit_marionette_cost's #302 drift, test_mame_parity without a reference MAME on ERIS, test_proof_sheets' #309), and "green with refusal on" is counted as no red caused by the refusal by the maintainer's ruling ("Close, reds named (Recommended)", DECISIONS_HISTORY.md). The mister lane's one void row, test_mister_gfxc_fetch's FAIL 221 exit 143 (results.before_resume.tsv), was the session's kill of a gate fork; it was deleted and re-run under --resume to PASS (resume_gfxc.sh). Not covered, as the comment's last paragraph says: the lanes on 8b82d5d2's tree, the mister ondemand scope, and run_inp_guarded.sh and run_inp_probe.sh, which bypass run_mame.sh.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	3 flag(s): D-ABSOLUTE 3
+deliverables	build/agent206/t296/closing_comment.md

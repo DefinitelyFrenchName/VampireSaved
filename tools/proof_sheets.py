@@ -27,6 +27,13 @@ the commit does not make declares it, one line each, in the same leading block:
 same recipe, refuses unless every track equals that commit's own frozen reference (and TRACK the tag's program key),
 passes VAR=<that build's dir> to the gate, and the page labels it "control build, from <tag>, not the commit".
 
+A GATE-BUILT VARIANT (#291, 14z-206, ruled 2026-10-22 "Built in checkout, stated (Recommended)"): a gate whose `ours`
+leg runs a variant it builds for itself (test_tenant_select_records' 0x13 image) declares the builder:
+    # SHEET-VARIANT: <VAR> tests/lib/<file>.sh <function> <vsavj|vsavjw> — <why>
+`run` builds it once in the clean checkout's build/sheet_variants/<function>/ (`. <file>; <function> <work>`, which
+sets OUTBASE), passes VAR=<OUTBASE> to the gate, and the page states "gate-built variant, from the commit, no frozen
+reference" with its fingerprint. Nothing freezes that fingerprint, so drift is shown, never refused.
+
 SLICE S3 (14z-205): "OURS" IS BUILT FROM THE COMMIT ("Built from the commit", ruled 2026-10-16). `run <commit>` bundles
 the commit, clones it into a CLEAN CHECKOUT (never the working tree), builds there the five tracks the commit's own
 runner defaults name (tests/run_all_emulator.sh: MERGED DON HUI PYR STOCK) by the commit's reproducibility recipe
@@ -49,6 +56,7 @@ Usage:
     proof_sheets.py census [--tests DIR] [--registry F] [--debt F]
 Env: ROMDIR (required for run/prove), MAME_BIN.
 """
+from collections import Counter
 import concurrent.futures, glob, html, json, os, re, shutil, subprocess, sys, time
 from pathlib import Path
 
@@ -58,6 +66,7 @@ ROLES = ("vs2", "vsavj", "ours")          # row order on a sheet: native vs2 on 
 BASES = ("log", "ram", "fields", "file", "event", "none")
 DECL = re.compile(r"^#\s*SHEET:\s*(.*)$")
 SHEET_BUILD = re.compile(r"^#\s*SHEET-BUILD:\s*(.*)$")
+SHEET_VARIANT = re.compile(r"^#\s*SHEET-VARIANT:\s*(.*)$")
 DASH = re.compile(r"\s+(?:—|--)\s+")
 
 
@@ -123,6 +132,26 @@ def parse_sheet_builds(path):
             errs.append("`# SHEET-BUILD:` must read `<VAR> <freeze/tag> <%s> — <why>` (got %r)" % ("|".join(TRACKS), m.group(1)[:80]))
             continue
         out.append({"var": f[0], "tag": f[1], "track": f[2], "why": why})
+    return out, errs
+
+
+def parse_sheet_variants(path):
+    """-> ([{var, lib, func, set, why}], [errors]): the gate's `# SHEET-VARIANT:` lines, each a variant the gate builds
+    for itself (ruled 2026-10-22, "Built in checkout, stated"): `run` builds it in the clean checkout's build/ with the
+    commit's own builder and hands it to the gate through VAR."""
+    out, errs = [], []
+    for l in leading_block(path):
+        m = SHEET_VARIANT.match(l)
+        if not m:
+            continue
+        parts = DASH.split(m.group(1).strip(), maxsplit=1)
+        f = parts[0].split()
+        why = parts[1].strip() if len(parts) > 1 else ""
+        if (len(f) != 4 or not re.match(r"^[A-Z_][A-Z0-9_]*$", f[0]) or not re.match(r"^tests/lib/[A-Za-z0-9_]+\.sh$", f[1])
+                or not re.match(r"^[A-Za-z_][A-Za-z0-9_]*$", f[2]) or f[3] not in ("vsavj", "vsavjw") or not why):
+            errs.append("`# SHEET-VARIANT:` must read `<VAR> tests/lib/<file>.sh <function> <vsavj|vsavjw> — <why>` (got %r)" % m.group(1)[:80])
+            continue
+        out.append({"var": f[0], "lib": f[1], "func": f[2], "set": f[3], "why": why})
     return out, errs
 
 
@@ -402,6 +431,69 @@ def fighters(sc):
     if not sc or "fp" not in sc:
         return None
     return "yes" if sc.get("m4") == 0x40000 and sc.get("m8") in MATCH_M8 and sc["fp"] >= 1 else "no"
+
+
+# The atlas slot table (docs/game/atlas/character_tables.md), held by tests/test_charid_names.sh; the ids are the same in
+# vsavj, vsav2 and vhunt2 (that file's "Variant-slot semantics"), so one map names every leg. The maintainer's names.
+NAMES = {0x00: "Bulleta", 0x01: "Demitri", 0x02: "Gallon", 0x03: "Victor", 0x04: "Zabel", 0x05: "Morrigan",
+         0x06: "Anakaris", 0x07: "Felicia", 0x08: "Bishamon", 0x09: "Aulbath", 0x0A: "Sasquatch", 0x0B: "random",
+         0x0C: "Q-Bee", 0x0D: "Lei-Lei", 0x0E: "Lilith", 0x0F: "Jedah", 0x10: "Phobos", 0x11: "Pyron",
+         0x12: "Marionette", 0x13: "Donovan", 0x18: "Oboro"}
+WHO_PAIRS = 4                     # above this many pairings a line names each side's characters instead of every pair
+
+
+def who(sc):
+    """Who plays whom, at what speed, in this picture: (P1 id, P2 id, speed level) read from the game's state
+    (tests/lua/screen_state.lua's c1/c2/lv: $FF8782, $FF8B82, $FF8116), or None where the fighters are not on screen
+    or no state was read. The maintainer, 14z-206: "it would be great if each test / gate had a concise description:
+    basically which characters and what setup is tested" — the characters are MEASURED, never written by hand."""
+    if fighters(sc) != "yes" or "c1" not in sc:
+        return None
+    return (sc["c1"], sc["c2"], sc["lv"])
+
+
+def char_name(i):
+    return NAMES.get(i, "id %02x" % i)
+
+
+def who_text(counts):
+    """Counter {(c1, c2, lv): pictures} -> one line: "P1 Donovan vs P2 Demitri, speed level 6"; several pairings each
+    with its picture count, most first; above WHO_PAIRS pairings, each side's characters. "" when nothing was read."""
+    if not counts:
+        return ""
+    lv = sorted({k[2] for k in counts})
+    speed = "speed level %s" % "/".join(str(v) for v in lv)
+    pairs = Counter()
+    for (c1, c2, _), n in counts.items():
+        pairs[(c1, c2)] += n
+    if len(pairs) == 1:
+        (c1, c2), = pairs
+        return "P1 %s vs P2 %s, %s" % (char_name(c1), char_name(c2), speed)
+    if len(pairs) <= WHO_PAIRS:
+        return "%s; %s" % ("; ".join("P1 %s vs P2 %s (%d picture%s)" % (char_name(a), char_name(b), n, "" if n == 1 else "s")
+                                     for (a, b), n in sorted(pairs.items(), key=lambda kv: (-kv[1], kv[0]))), speed)
+    side = lambda k: ", ".join(char_name(i) for i in sorted({p[k] for p in pairs}))
+    return "%d pairings: P1 %s; P2 %s; %s" % (len(pairs), side(0), side(1), speed)
+
+
+def sheet_who(s):
+    """{leg: Counter} over every picture of a sheet (its moments, strips and timeline) that shows the fighters."""
+    out = {}
+    for c in s["cols"]:
+        xs = list(c["cells"].items()) + [(leg, x) for leg, ys in c.get("strip", {}).items() for x in ys if not x.get("moment")]
+        for leg, x in xs:
+            k = x.get("who")
+            if k:
+                out.setdefault(leg, Counter())[tuple(k)] += 1
+    return out
+
+
+def legs_who(legs, counts):
+    """[(role label, text)]: one line when every leg reads the same, else one per leg."""
+    texts = [(lg["role"] + " (" + lg["set"] + ")", who_text(counts.get(lg["leg"], Counter()))) for lg in legs]
+    if texts and all(x == texts[0][1] for _, x in texts):
+        return [("every leg", texts[0][1])] if texts[0][1] else []
+    return [(r, x or "no picture shows the fighters") for r, x in texts]
 
 
 # ── capture and prove ───────────────────────────────────────────────────────────────────────────────────────────
@@ -724,15 +816,23 @@ def prove_dir(sheet_dir, jobs=4):
         for c in cols:                                # S4-B: whether the fighters are on screen, read from the game's state
             for x in all_cells(c):
                 x["fighters"] = fighters(x.get("screen"))
+                x["who"] = who(x.get("screen"))
             for xs in c.get("strip", {}).values():
                 for x in xs:
                     x["fighters"] = fighters(x.get("screen"))
+                    x["who"] = who(x.get("screen"))
         out.append({"sid": s["sid"], "title": s["title"], "chars": s["chars"], "tickets": s["tickets"],
                     "not_comparable": s["not_comparable"], "capped": capped,
                     "legs": [{"leg": l["leg"], "role": l["role"], "set": l["set"], "rompath": l["rompath"]} for l in legs],
                     "cols": cols})
     (sheet_dir / "proof.json").write_text(json.dumps(out, indent=1))
     return out
+
+
+def who_cell(x):
+    """The prove listing's who column: "<P1 id>/<P2 id>/<speed level>" in hex/hex/decimal, or "-"."""
+    k = x.get("who")
+    return "%02x/%02x/%d" % tuple(k) if k else "-"
 
 
 def all_cells(col):
@@ -830,6 +930,7 @@ table.grid{border-collapse:collapse} .grid td,.grid th{padding:4px;vertical-alig
 .idx a{margin-right:10px} a{color:var(--link)} .nc{font-size:12px;margin-top:6px}
 .note{background:var(--card);border-left:3px solid var(--link);padding:6px 12px;margin:6px 0 10px;max-width:900px}
 .note p{margin:6px 0} .note ul{margin:4px 0 6px 18px;padding:0}
+.who{margin:2px 0;max-width:1100px} .who p{display:inline;margin:0}
 .strip .cell img{width:128px} .strip .cap{max-width:128px} .MOMENT img{border:3px solid var(--fg)}
 .mblock{margin:8px 0 12px} .mh{margin:4px 0} .legend,.nof{margin:8px 0} .lg dt{font-weight:600;margin-top:4px} .lg dd{margin:0 0 0 16px}
 h3{font-size:14px;margin:12px 0 4px}
@@ -853,9 +954,62 @@ def sheet_notes(path=None):
             notes[cur] = []
         elif line.startswith("#"):
             cur = None
-        elif cur:
+        elif cur and not line.startswith(SETUP):
             notes[cur].append(line)
     return {g: "\n".join(t).strip() for g, t in notes.items()}
+
+
+SETUP = "Setup: "
+
+
+def sheet_setups(path=None):
+    """docs/project/sheet_notes.md -> {gate: its one `Setup: ` line} — the setup a state read cannot name (where, what
+    is compared, what the rig does), written per gate; the characters are measured instead (who())."""
+    path = path or ROOT / "docs/project/sheet_notes.md"
+    out, cur = {}, None
+    if not Path(path).exists():
+        return out
+    for line in Path(path).read_text().splitlines():
+        m = re.match(r"^## +`?([A-Za-z0-9_]+)`?\s*$", line)
+        if m:
+            cur = m.group(1)
+        elif line.startswith("#"):
+            cur = None
+        elif cur and line.startswith(SETUP) and cur not in out:
+            out[cur] = line[len(SETUP):].strip()
+    return out
+
+
+def gate_who(g):
+    """{leg role (set): Counter} over every sheet of a gate, legs matched by role and set."""
+    out, legs = {}, {}
+    for s in g.get("sheets", []):
+        per = sheet_who(s)
+        for lg in s["legs"]:
+            key = lg["role"] + " (" + lg["set"] + ")"
+            legs.setdefault(key, {"leg": key, "role": lg["role"], "set": lg["set"]})
+            out.setdefault(key, Counter()).update(per.get(lg["leg"], Counter()))
+    return [dict(v, leg=k) for k, v in legs.items()], out
+
+
+def gate_head(gid, g, setups):
+    """The top of a gate's page: its setup line (written) and who plays whom on each leg (read)."""
+    out = []
+    if gid in setups:
+        out.append('<div class="who"><b>Setup:</b> %s</div>' % note_html(setups[gid]))
+    legs, counts = gate_who(g)
+    for r, x in legs_who([dict(lg, role=lg["role"], set=lg["set"]) for lg in legs], counts):
+        out.append('<div class="who"><b>Characters, %s:</b> %s <span class="mut">(read from the game at the pictures)</span></div>'
+                   % (html.escape(r), html.escape(x)))
+    return "".join(out)
+
+
+def gate_line(gid, g, setups):
+    """The index's "what it tests" cell: the setup line, then the characters (every leg's, when they agree)."""
+    legs, counts = gate_who(g)
+    lw = legs_who(legs, counts)
+    chars = "; ".join(x if r == "every leg" else "%s: %s" % (r, x) for r, x in lw)
+    return "%s%s" % (note_html(setups[gid]) if gid in setups else "", ('<br><span class="mut">%s</span>' % html.escape(chars)) if chars else "")
 
 
 def note_html(text):
@@ -1058,6 +1212,7 @@ def sheet_html(gid, s, pics):
         if target is None:
             timeline.append((c, dict((lg["leg"], h) for lg, h in cells)))
     out = ['<div class="sheet" id="%s"><b>%s</b>' % (anchor, html.escape(s["title"]))]
+    out += ['<div class="who"><b>%s:</b> %s</div>' % (html.escape(r), html.escape(x)) for r, x in legs_who(s["legs"], sheet_who(s))]
     out += blocks
     if timeline:
         head = "".join('<th class="cap">%s<br><span class="mut">%s</span></th>' % (html.escape(c["label"]), html.escape(c["verdict"])) for c, _ in timeline)
@@ -1089,7 +1244,7 @@ def page(out_dir, meta):
     gdir = out_dir / "g"
     gdir.mkdir(exist_ok=True)
     by_char, by_ticket, by_test, empty, undefined, gate_words = {}, {}, [], [], [], {}
-    notes = sheet_notes()
+    notes, setups = sheet_notes(), sheet_setups()
     for g in meta["gates"]:
         gid = g["gate"]
         words, errs = parse_verdict_legend(ROOT / "tests" / (gid + ".sh"))
@@ -1119,6 +1274,9 @@ def page(out_dir, meta):
             body.append('<h1 id="%s">%s</h1><div class="mut">gate verdict: %s (%ss)</div>' % (gid, html.escape(gid), html.escape(g["verdict"]), g["seconds"]))
             for cb in g.get("control_builds", []):
                 body.append('<div class="nc"><b>Control build:</b> %s</div>' % html.escape(cb))
+            for vb in g.get("variant_builds", []):
+                body.append('<div class="nc"><b>Gate-built variant:</b> %s</div>' % html.escape(vb))
+            body.append(gate_head(gid, g, setups))
             if gid in notes:
                 body.append('<div class="note">%s</div>' % note_html(notes[gid]))
             if words:
@@ -1139,8 +1297,9 @@ def page(out_dir, meta):
     if by_ticket:
         idx.append('<div class="idx"><b>By ticket:</b> ' + "".join(
             '<a href="%s">#%s (%d)</a>' % (v[0], html.escape(k), len(v)) for k, v in sorted(by_ticket.items())) + "</div>")
-    verdicts = "".join('<tr><td><a href="g/%s">%s</a></td><td>%s</td><td>%ss</td></tr>' % (f, html.escape(t), html.escape(g["verdict"]), g["seconds"])
-                       for t, f, g, _ in by_test)
+    verdicts = '<tr><th>gate</th><th>what it tests</th><th>verdict</th><th></th></tr>' + "".join(
+        '<tr><td><a href="g/%s">%s</a></td><td>%s</td><td>%s</td><td>%ss</td></tr>' % (
+            f, html.escape(t), gate_line(t, g, setups), html.escape(g["verdict"]), g["seconds"]) for t, f, g, _ in by_test)
     top, rest = [], []
     if undefined:
         top.append('<h2 class="st NOTJUDGED">Undefined tags — %d</h2><ul>%s</ul>' % (len(undefined), "".join("<li>%s</li>" % html.escape(u) for u in undefined)))
@@ -1298,6 +1457,42 @@ def control_build(tag, track, out, romdir, bundle):
     prov = "control build, from %s, not the commit: %s %s (%s) = %s's frozen reference and the tag's program key, built in a second clean checkout (%s)" % (
         tag, track, tr["dir"], tr["fingerprint"], sha[:12], ctree)
     return d, prov, []
+
+
+def variant_build(v, tree, romdir, logs, reuse):
+    """A gate-declared variant, built in the clean checkout's build/ by the commit's own builder (`. <lib>; <func> <work>`,
+    which sets OUTBASE). -> (OUTBASE | None, provenance line, problems). Its fingerprint is stated, never frozen: there
+    is no reference to refuse it against (ruled 2026-10-22)."""
+    tree = Path(tree).resolve()
+    work = tree / "build" / "sheet_variants" / v["func"]
+    log = Path(logs) / ("variant_%s.log" % v["func"])
+    Path(logs).mkdir(parents=True, exist_ok=True)
+    if not (tree / v["lib"]).is_file():
+        return None, "", ["%s names %s, which the commit does not carry" % (v["func"], v["lib"])]
+    outbase = work / "build"
+    if not (reuse and (outbase / "rompath").is_dir()):
+        shutil.rmtree(work, ignore_errors=True)
+        work.mkdir(parents=True)
+        print("   build variant %s (%s) in %s" % (v["func"], v["lib"], work), flush=True)
+        t0 = time.time()
+        with open(log, "w") as lf:
+            r = subprocess.run(["sh", "-c", '. "./$1" && unset TENANT13_OUTBASE && OUTBASE= && %s "$2" "" && echo "VARIANT_OUTBASE=$OUTBASE"' % v["func"],
+                                "sh", v["lib"], str(work)], cwd=tree, env=dict(os.environ, ROMDIR=romdir), stdout=lf,
+                               stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL)
+        print("     exit %d, %ds" % (r.returncode, time.time() - t0), flush=True)
+        said = re.findall(r"^VARIANT_OUTBASE=(.*)$", log.read_text(errors="replace"), re.M)
+        if r.returncode != 0 or not said:
+            return None, "", ["the variant %s did not build (exit %d; %s)" % (v["func"], r.returncode, log)]
+        outbase = Path(said[-1].strip())
+    problem = ours_build_problem(str(outbase / "rompath"), tree)
+    if problem:
+        return None, "", ["the variant %s: %s" % (v["func"], problem)]
+    fp = fingerprint(tree, str(outbase / "rompath"), v["set"], romdir)
+    if not fp:
+        return None, "", ["the variant %s: no fingerprint of %s (%s)" % (v["func"], outbase / "rompath", v["set"])]
+    prov = "gate-built variant, from the commit, no frozen reference: %s (%s), %s %s = %s, built in the clean checkout (%s)" % (
+        v["func"], v["lib"], v["set"], outbase.relative_to(tree), fp, tree)
+    return outbase, prov, []
 
 
 def is_tracked(tree, rel):
@@ -1599,6 +1794,7 @@ def cmd_run(a):
         elif d["kind"] == "legs":
             declared.append(r)
     controls = {}                                        # (tag, track) -> (dir, provenance, problems), built once a run
+    variants = {}                                        # (lib, func, set) -> (OUTBASE, provenance, problems), built once a run
     for r in declared:
         g = r[0]
         sd = out / "gates" / g
@@ -1616,15 +1812,30 @@ def cmd_run(a):
             if d is not None:
                 extra[cb["var"]] = str(d)
                 ctl_lines.append("%s = %s" % (cb["var"], prov))
+        var_lines = []
+        vds, errs = parse_sheet_variants(ROOT / "tests" / (g + ".sh"))
+        ctl_problems += errs
+        for v in vds:
+            key = (v["lib"], v["func"], v["set"])
+            if key not in variants:
+                variants[key] = variant_build(v, tree, romdir, out / "build_logs", a.reuse_tree)
+                if variants[key][1]:
+                    meta["provenance"].append(variants[key][1])
+            d, prov, probs = variants[key]
+            ctl_problems += probs
+            if d is not None:
+                extra[v["var"]] = str(d)
+                var_lines.append("%s = %s" % (v["var"], prov))
         if ctl_problems:
             for p in ctl_problems:
                 print("REFUSED (%s): %s" % (g, p), flush=True)
             meta["gates"].append({"gate": g, "rc": 2, "seconds": 0, "tickets": [],
-                                  "verdict": "NOT RUN: its control build was refused (%s)" % "; ".join(ctl_problems)[:300]})
+                                  "verdict": "NOT RUN: its control build or variant was refused (%s)" % "; ".join(ctl_problems)[:300]})
             continue
         print("== %s: running the gate with SHEET_OUT" % g, flush=True)
         res = run_gate(r, sd, out / ("%s.log" % g), extra)
         res["control_builds"] = ctl_lines
+        res["variant_builds"] = var_lines
         print("   %s (exit %d, %ds)" % (res["verdict"], res["rc"], res["seconds"]), flush=True)
         res["tickets"] = sorted(set(re.findall(r"#(\d+)", "\n".join(leading_block(ROOT / "tests" / (g + ".sh"))))))
         if not (sd / "sheet.tsv").exists():
@@ -1664,11 +1875,11 @@ def cmd_prove(a):
     for s in sheets:
         for c in s["cols"]:
             for leg, x in c["cells"].items():
-                print("%s\t%s\t%s\tf%s\t%s\t%s\t%s" % (s["sid"], c["label"], leg, x["frame"], x["status"], x["why"], x.get("fighters")))
+                print("%s\t%s\t%s\tf%s\t%s\t%s\t%s\t%s" % (s["sid"], c["label"], leg, x["frame"], x["status"], x["why"], x.get("fighters"), who_cell(x)))
             for leg, xs in c.get("strip", {}).items():      # S4-D: a span's other frames, labelled `<label> [span]`
                 for x in xs:
                     if not x.get("moment"):
-                        print("%s\t%s [span]\t%s\tf%s\t%s\t%s\t%s" % (s["sid"], c["label"], leg, x["frame"], x["status"], x["why"], x.get("fighters")))
+                        print("%s\t%s [span]\t%s\tf%s\t%s\t%s\t%s\t%s" % (s["sid"], c["label"], leg, x["frame"], x["status"], x["why"], x.get("fighters"), who_cell(x)))
     return 0
 
 

@@ -7414,3 +7414,61 @@ shared RELATIVE paths unresolved. Fixed: `tools/checkdocs_rom.py --covered PATH`
 the gate fails if the tracked file changed during its run. **A control perturbs a copy and points the tool at it;
 "perturb, run, restore" on a tracked file is a race the moment gates run in parallel.** Not covered: the census is
 a session instrument, not a gate, so a new in-place perturbation would be caught only by another trace.
+
+## A RELATIVE NAME THAT CLIMBS OUT OF THE REPOSITORY RESOLVES DIFFERENTLY BY PATH DEPTH — surplus `..` stop at `/`, so a "must not resolve" control is dead on a deep enough host (paid: 14z-206, #309)
+
+`test_proof_sheets`' control `relative-unresolved` proves that `tools/proof_sheets.py` resolves a relative SHEET_OUT
+before a capture runs MAME from its own work dir: a shadow tool that drops the resolve must fail to find the replay.
+The gate built that relative dir under its `mktemp` work dir, so the name (`os.path.relpath` from the repository)
+climbed out with one `..` per directory level of the repository path. The kernel resolves those `..` against the
+capture's PHYSICAL cwd, and the surplus stop at `/`; once the repository path is at least as deep as the capture's cwd,
+the "unresolved" name lands on the real replay and the shadow proves the moment. The control fired on the Mac and on
+PILOT's `~/t206/p2` (depth 4) and was DEAD on ERIS (`~/t206/e2/tree`, depth 5, under a 3-deep `/tmp/tmp.X/rel`), and
+on the Mac from a logical path 9 deep (`build/agent206/t309/deep.txt`, local). Fixed: the dir lives under
+`$REPO/build/.proof_rel.XXXXXX`, so the name carries no `..`, and the gate fails if it ever climbs again. **A control
+whose failure depends on a relative path NOT resolving must make that path's meaning independent of where the tree
+and the temp dir sit; "it fired here" is a statement about this host's path depths.** Reproducing it on the Mac has a
+trap of its own: macOS `mktemp -d` (no template) ignored `TMPDIR=/tmp` and still made its dir under `/var/folders/…/T/`
+(measured 14z-206), so a "shallow temp dir" leg ran on the deep one and its PASS proved nothing; a deep logical repo
+path (a symlink) is what separates. The symlinked leg also fails "the relative rom path" check on both the old and the
+fixed gate: the gate takes the logical `pwd`, the tool the physical path — a property of the symlink rig, not of a real
+checkout.
+
+## A GUARD THAT COMPARES A FILE'S CONTENT BEFORE AND AFTER CANNOT SEE A WRITE THAT WAS RESTORED IN BETWEEN — read its mtime and inode too (paid: 14z-206, #299)
+
+`test_checkdocs_rom`'s control 5 used to write a planted row onto the tracked `tests/expected/checkdocs_rom_covered.tsv`
+and restore it; under a `--jobs` tier five tree-scanning gates read that file meanwhile (#299's re-traced write census).
+The 14z-206 fix made the control perturb a copy, and added a guard that the tracked file is unchanged at the end:
+`cmp` of a copy taken at the start against the file. Rule-checker run `2026-10-22-1170` asked what fires if the fix
+regresses, and nothing did: the old shape restored the content before any check ran, so a content compare passes on
+exactly the write it exists to catch. The guard now reads mtime (ns), inode, size and content at the start and the end
+(`fstamp`), and control `restored-write` proves it on a scratch copy written in place and restored, where `cmp` alone
+passes; the copy's mtime is set to 2000 first, so the write moves it even on a filesystem with coarse timestamps.
+**A "the file is untouched" guard must read what a restored write leaves behind (the mtime, the inode), not only what
+it restores; and it needs a control written in the regression's own shape.**
+
+## A CONTROL MODE THAT FAILS FOR A FOREIGN REASON READS HONOURED, AND ITS LOG CAN STILL CARRY ITS OWN `CONTROL FIRED` LINE — read what the mode itself reached (paid: 14z-206, #299, #310)
+
+`test_checkdocs_rom`'s `vacuous-validator` mode runs a weakened copy of the checker from the gate's temp dir. The copy
+was run with no `--root`, and its default root is the directory above its own (`Path(__file__).parent.parent`), so it
+found no documents, registered 0 checks and exited 1. The runner's classifier reads any non-crash FAIL of a mode run
+as HONOURED, so the control counted as working in every tier from `6bead019` (14z-147b) to 14z-206. Nothing looked
+wrong because the mode log ALSO printed `CONTROL FIRED: vacuous-validator — Vacuous`, from the gate's in-gate section,
+which runs in every mode. Found by rule-checker run `2026-10-22-1172` on #299's whole-tier comparison, after a census
+had counted that line as the mode firing. The mode now passes the repository as the copy's root and fails on its own
+`Vacuous` mismatch with 15 checks registered. **A copied tool resolves its default paths from where the COPY lives;
+and a mode run is judged by what ITS OWN section reached and why it failed, never by its exit status or by a
+`CONTROL FIRED` line the gate prints in every mode.** The census of every mode is #310.
+
+## JOB-SECONDS OVER THE WALL CLOCK IS CONCURRENCY, NOT CPU — a wall-clock-timed job's seconds say nothing about cores busy (paid: 14z-206, #299, #312)
+
+`tests/run_all_static.sh`'s time line ("gates 1985s  controls 4237s  wall 2600s") sums each pool job's ELAPSED seconds,
+timed with `date +%s` in `tests/lib/static_job.sh`. Dividing by the wall clock gives how many jobs were running at once
+on average (about 2.4 of 8 slots at `--jobs 8`, about 1.0 serially), not how many cores were busy: a job waiting on I/O,
+on a lock or on a child counts the same as one burning a core, and a job that forks a dozen processes counts once.
+14z-206 wrote that ratio up as "2.4 of 12 cores" in a question the maintainer ruled on, before rule-checker run
+`2026-10-22-1176` caught the mislabel. The correction then overshot: it called 14z-205's "about 2.2 cores of 12" the
+same ratio, but that one IS CPU (`/usr/bin/time` user+sys over real), as run `2026-10-22-1177` showed. Check the
+numerator of every figure a correction touches, not only the one that was caught. **CPU use is measured with CPU time
+(the runner under `/usr/bin/time -l`, or `ps`/`top` sampling), never derived from elapsed seconds; name a ratio by what
+its numerator counts.**

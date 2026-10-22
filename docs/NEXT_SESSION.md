@@ -32,12 +32,13 @@ gates in parallel (#299; a close runs `--jobs 8`, ruled 2026-10-19).
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
-1. **#291 — S4: S4-A done (14z-206), S4-B onwards in fork B4's git worktree** (the plan and the maintainer's
-   answers: `build/agent206/t291/PLAN.md`, `DECISIONS_HISTORY.md` "Ruled 2026-10-21 (14z-206) — #291 S4: …"; STATE
-   14z-206 (1)). S4-A's six gates pass on a clean checkout. Next: S4-B (the fighters-on-screen predicate, scored first),
-   S4-C (legends), S4-D (~9 tiles per judged event, more where a gate has more), S4-E (up to 18 replay frames at the
-   inputs; no-fighter frames in a labelled strip), S4-F (paging); then S4-G, the full run on the Mac, shown to the
-   maintainer before the closure goes through the rule-checker. The S3 page moved to `../sheets_aside_14z206/`.
+1. **#291 — S4: S4-A..F landed (`a8fa5350`, `8b82d5d2`), S4-G ran and was reviewed** (STATE 14z-206 (1); the plan
+   and answers: `build/agent206/t291/PLAN.md`, `DECISIONS_HISTORY.md` "Ruled 2026-10-21 (14z-206) — #291 S4: …" and
+   "Ruled 2026-10-22 (14z-206) — #291 S4-G reviewed …"). In the working tree: each gate's characters read from the
+   game (c1/c2/lv) and one `Setup: ` line per gate in `docs/project/sheet_notes.md`. Next: run `test_proof_sheets`
+   (section 6b, control `who-swapped`), build a gate-declared variant in the clean checkout
+   (`# SHEET-VARIANT:`, ruled 2026-10-22 "Built in checkout, stated": `test_tenant_select_records`' `tenant_build_13`),
+   re-run S4-G, show the maintainer; then the closure through the rule-checker.
 2. **#229 — WAITING ON THE MAINTAINER, Q2 especially** (*"I still have answers to provide for Q2 especially"*,
    2026-10-21); everything is listed on #229 (comment of 2026-10-20) and in STATE_HISTORY 14z-205b (1)-(5).
    - **The work is LOCAL and UNTRACKED:** the six gates, their expectations, rigs and Lua (105 files,
@@ -64,30 +65,20 @@ gates in parallel (#299; a close runs `--jobs 8`, ruled 2026-10-19).
 4. **#284 — done, awaiting release** (14z-206, STATE 14z-206 (2)): the template is in the pipeline
    (`tools/package_release_readme.template.md`); it closes when the next release ships the new READMEs and
    `test_readme_recording` runs its Windows and Linux legs.
-5. **#299 — the cold cache is fixed; the closure is open** (STATE 14z-206 (3); rule-checker run `2026-10-21-1166`
-   VIOLATED, unresolved; the maintainer: *"option A"*, the landing committed without it). To close: replace PILOT's
-   copier-kept logs with a whole-tier serial against `--jobs 8` on the Mac, every log kept by the runner's exit traps
-   (fork C2's method, `build/agent206/t299/c2/inside.sh`); plant real values shaped like a duration, PID, date and temp
-   name in the comparer check (`c2/plant_check2.py`) or name them; fix the closing comment's browser-log line (the
-   difference is the truncated serial copy) and cite the confirm-tier line that shows `test_rule_checker`'s cause; resolve
-   1166, then a fresh packet. The closing comment: `build/agent206/t299/closing_comment.md`.
-6. **#298 — measure the narrowed controls** on a close's tier against 1,500-1,800 s of controls per close before
+5. **#298 — measure the narrowed controls** on a close's tier against 1,500-1,800 s of controls per close before
    (14z-205 commented 143 controls, 1,448 s); comment the figures on #298 and close it if the narrowing held.
-7. **#296 — the code half is in** (14z-206, STATE 14z-206 (4)): the phase-A sandbox key and `run_mame.sh`'s
-   refusal of a reused sandbox. Its "done when": the mame and fbneo lanes green with the refusal on (the command is
-   in `build/agent206/t296/REPORT.md`), then the closure through the rule-checker.
-8. **#286 — the scorer judges as `predict()` does; the narrowings plus N-F-LINK are applied** (14z-206, STATE 14z-206
+6. **#286 — the scorer judges as `predict()` does; the narrowings plus N-F-LINK are applied** (14z-206, STATE 14z-206
    (5); PILOT's rescore 0 misses, rule-checker run `2026-10-22-1169` OK). What is left is the done-when itself: a
    record-only commit's `--confirm` tier measured, re-running only the gates that open a record file, controls only
    where real inputs changed, with the before/after figures on the ticket.
-9. **#297 stays open until a freeze has run the 109 moved gates green**; a freeze runs every gate anyway.
-10. **Then ask the maintainer for the order of work.** The open tickets by their GitHub severity label:
+7. **#297 stays open until a freeze has run the 109 moved gates green**; a freeze runs every gate anyway.
+8. **Then ask the maintainer for the order of work.** The open tickets by their GitHub severity label:
    - high: #286;
-   - medium: #296, #284;
-   - low: #118, #229, #244, #301, #308 (and #129, parked);
-   - no severity label: #266, #267, #289, #291, #297, #298, #299, #302, #303, #304, #305, #306, #307;
+   - medium: #284;
+   - low: #118, #229, #244, #301, #308, #309, #310, #311 (and #129, parked);
+   - no severity label: #266, #267, #289, #291, #297, #298, #302, #303, #304, #305, #306, #307, #312;
    - **release-only:** #278, #279, #280, #281.
-11. **`tests/replays/118_chain.rpl`'s header names a leg of `audit_mizuumi_inputs` that gate never ran** (STATE_HISTORY
+9. **`tests/replays/118_chain.rpl`'s header names a leg of `audit_mizuumi_inputs` that gate never ran** (STATE_HISTORY
     14z-198 finding (i)); the one-line correction rides a session that runs the emulator gates following `tests/replays/`.
 
 ## PARKED (not open work)

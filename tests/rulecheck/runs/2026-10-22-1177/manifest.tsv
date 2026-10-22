@@ -1,0 +1,97 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent206/t299/closing_comment.md	0ced0d3f817df3925c34ea45d9d02fd476a91783
+build/agent206/t299/issue_299_body.md	b0e86a4d643d117248b6474f846313e5e08d210a
+build/agent206/t299/issue_299.txt	c882e3a31195561f723c30e7828599c3dae48b1a
+build/agent206/t299/issue_310.md	009f8cdd6f2f20c7f3273913e9620c36651c1c9c
+build/agent206/t299/comment_310_scope.md	fc7149377485df9ff6a53cc62916d69397181eb1
+build/agent206/t299/issue_311.md	f59c37e78ab21a2a2623beb444c1a9e8f30bc853
+build/agent206/t299/issue_312.md	48062d9fd3c7f81dd2f371d80627fef82798ba44
+build/agent205c/t299/REPORT.md	4ae4669dd638965c0a3d7b32f653fd63fb05e298
+build/agent206/t299/REPORT.md	7a18d3a66a3941a41cfe5bbbe72a22b87932751b
+build/agent206/t299/c2/REPORT.md	f4b63b41038748da55f10afee4550811c47c9ff1
+build/agent206/t299/c2/plant_check2.py	aa50f88032050c76f35da414c1baeb44c77f7d5a
+build/agent206/t299/c2/epoch_scan.out	8ad7e6d6b7da512be1a2d9481db970c002a95de1
+build/agent206/t299/c2/pilot_BA_normal_c2_full.out	80c34d66f79bcb3518377a8f72340346eb8798c6
+build/agent206/t299/c2/pilot_24_classified.md	bd0e446e9edcf8647b3f11637922fbf797ce5abd
+build/agent206/t299/c3/REPORT.md	5db6c58a553dbc237f1993c755108695b6c40097
+build/agent206/t299/c3/ORCH_test_static_runner.md	83422fe9eb2c37ed237156959398d371b30d352c
+build/agent206/t299/c3/trap_sete_repro.sh	ce944e5a3f98dc64dd6ad4583d3dcaf71dc64f28
+build/agent206/t299/c3/tsr_head_unset.log	cf6533091137c5fc07799c33fb1ad112381878d0
+build/agent206/t299/c3/tsr_head_C2KEEP.log	cf6533091137c5fc07799c33fb1ad112381878d0
+build/agent206/t299/c3/tsr_patched_unset.log	cf6533091137c5fc07799c33fb1ad112381878d0
+build/agent206/t299/c3/tsr_patched_C2KEEP.log	13ac8a6ccd2633297693e0092061816ab31d11de
+build/agent206/t299/c3/inside_v2.sh	1f88c34c24bdcc4a5a10d284d1d73a7feb7b90e1
+build/agent206/t299/c3/snapshot_v2.log	8e016e81358655e8acd8d7bf59bd1c2ce714b96f
+build/agent206/t299/c3/v2/clone_diff.patch	fa3426c42fe500056587386f95194286ce246739
+build/agent206/t299/c3/v2/inside_head.txt	3565a88f6985daa7eaa3619b9330321a73ed2a53
+build/agent206/t299/c3/v2/patch_control.log	75e1961a0569f8f2f2349538146a7c2d2f5bf09b
+build/agent206/t299/c3/v2/serial/runner.log	44e048bd4e09c44da89fa72fa1419cce017d024e
+build/agent206/t299/c3/v2/pool/runner.log	2a908c5d80790f7c18fa923de3ad768c8e186a8e
+build/agent206/t299/c3/v2/serial/results.tsv	f3c80312da212bb944f84025c76e7245da6e483c
+build/agent206/t299/c3/v2/pool/results.tsv	27ff2bd1f0b4d4813a5db53d204e2e2a7cf22c12
+build/agent206/t299/c3/v2/serial/results.controls.tsv	885ee6eccdf6b51d21ebb94dde0e3ec4c506a080
+build/agent206/t299/c3/v2/pool/results.controls.tsv	adcc0419332ca2ff54e2a06b5da353fdbbdbef30
+build/agent206/t299/c3/compare_v2_serial_pool.out	520754afa8d53c744002e6bbca60b833ac007f9b
+build/agent206/t299/c3/compare_v2_serial_pool_full.out	602bd7cc1e93e64e95a1e06ebe8794baffd0495d
+build/agent206/t299/c3/v2/serial/logs/test_applier_page_browser.ctl.broken-page.out	5cc1ace04a359bd4bfb1b48cd4c2c98aac061364
+build/agent206/t299/c3/v2/pool/logs/test_applier_page_browser.ctl.broken-page.out	d1b76cd853c60bb7b89bbb0484d42f2b7ed25fe2
+build/agent206/t299/c3/v2/serial/logs/test_mra_build_line.ctl.foreign-rompath.out	8fe54ab5744692e637853adabe3fa4cdb5fcad72
+build/agent206/t299/c3/v2/pool/logs/test_mra_build_line.ctl.foreign-rompath.out	79f7b362e57d940f7246acf166ed60cea482379c
+build/agent206/t299/c3/v2/serial/logs/test_checkdocs_rom.ctl.vacuous-validator.out	acccdf64ba90a387668ad55f25b24b5eb7b329f3
+build/agent206/t299/c3/v2/pool/logs/test_checkdocs_rom.ctl.vacuous-validator.out	acccdf64ba90a387668ad55f25b24b5eb7b329f3
+build/agent206/t299/c3/v2/fired_census.sh	eb24237c785bc40d167721f523c4b1a9937e9c75
+build/agent206/t299/c3/v2/fired_census.out	1cfdb036f4d184829fd4043f5d7190de3eee7374
+build/agent206/t299/c3/v2/log_census.out	8f455b335821dc751509de0bca5a741077267d93
+build/agent206/t299/browser_alone/runs.txt	fb460c245281726d2baa236f1d998df0fa43eb32
+build/agent206/t299/browser_alone/leg_tail_mtimes.txt	2ccc8ec1a308d0f0cd4338c25a2436e5fa3f64d1
+build/agent206/t299/browser_alone/run_4.log	6fee50dbd4ccaf0088d127547086dc2f6df024e6
+build/agent206/t299/browser_alone/run_1.log	4d739cdf394406aae46e8ce8fb9905764ce3affc
+tests/test_applier_page_browser.sh	3790a8017ada73d093b6327da4fa4f0846ffc5d9
+build/agent206/t299/load/inside_load.sh	ac5f1d221700fc7dfd6af0f6050e84596b628030
+build/agent206/t299/load/snapshot.log	6c9774aaf56a88750e89384fc3e4b2c8855d97b6
+build/agent206/t299/load/summary.txt	cf50f7fb0866fb054c00a7212c5c8a53b8db03ea
+build/agent206/t299/load/out/load.log	9560a5ccdf37ebbc2fec13274a49c7a75d8f5208
+build/agent206/t299/load/out/runner.log	99c8b6c06b0c22e6e47042289dffef2764fbdbd4
+build/agent206/t299/load/out/results.tsv	fc46afe851fff367a2c384a12546d2ef7d70753e
+build/agent206/t299/load/out/results.controls.tsv	e0e51ee0a8c7f9d14fb9a9d21922eb4889b3cd9f
+build/agent206/t299/load/out/logs/test_applier_page_browser.out	16fde20e6c3f70727ba6667484894ce467294549
+build/agent206/t299/load/compare_serial_loaded_full.out	8638b104caa8bbbdcaacd6cd33488d87b0c4afe8
+build/agent206/t299/load/out/clone_diff_stat.txt	3fee3227bd6a6fec8a8bca5b4caaba6a8125a181
+tests/run_all_static.sh.lines-440-540 (lines 440-540 of tests/run_all_static.sh)	0afa20d1b67a06991e027da9a5fc483f7bebdf9a
+tests/lib/static_job.sh	0c445d5f83acfc8aa3f2f954069e5dbb7e1ca36c
+build/agent206/t299/c3/compare_legs_c3.diff	ad05d59f92a332709a8d706eed7739101cd2d259
+build/agent206/t299/c3/plant_check3.py	2864d921b1253247324f95cced4e11ed92bc87d3
+build/agent206/t299/c3/plant_c3_serial.tsv	ab860139f14d42a4084190f4df726c1e97885436
+build/agent206/t299/c3/plant_c2_plant_pilotB_A.tsv	73aeeb2764e666331e93ecac4d434e5f799e843d
+build/agent206/t299/c3/pilot_BA_c2.out	9ee0daf411b383413d497c3ef4b29f37d19e9307
+build/agent206/t299/c3/pilot_BA_c3.out	8da1d3a86d536b95daf48bcd794d1721a4e54961
+build/agent206/t299/c3/epoch_scan_mac_whole.out	616c31c0dd729d7a3bc1ebabf4513dea7cc0efea
+build/agent206/t299/c3/rule_checker_5f31e850.log	22aeabf0681e8d77629ef21aa2144a9b2884a243
+build/agent206/t299/x2/REPORT.md	14d1a6c88c5c67016aec6fe27b2bddfcd69a176a
+build/agent206/t299/x2fix/gate.log	5cb48437c30630c461968a01a03ee7954eda5009
+build/agent206/t299/x2fix/mode.log	ed6e54ddadc2c1a01ec2b8af18d0592311095f89
+build/agent206/t299/t299.diff	76bad7318408fcf88d3dd38a1ca73c58faacd376
+build/agent206/t299/x2fix4/checkdocs_rom.diff	b30f8185a05d0636331181367de74c1acedf4f1e
+build/agent206/t299/x2fix4/gate.log	5420e89835ad79f5900ca10f60c0231bc26241b1
+build/agent206/t299/x2fix4/modes.txt	bba5019efafc2902360cca6f3f576f79f42590f5
+build/agent206/t299/x2fix4/tracked_stamp.txt	22eb3e1ab7aca7340e4d7e3fca4f5046a60a12b3
+build/agent206/t299/x2fix4/mode_restored-write.log	38360683d29e704d87c06908dffdebeeb54dc083
+build/agent206/t299/x2fix4/mode_dropped-covered-row.log	4b9a5bacb78d95c01e60f12abb9a8523419aa654
+build/agent206/t299/x2fix4/mode_reworded-claim.log	e6cfc62f3a2ef61c324e9e3c0ad88b041c5a53d3
+build/agent206/t299/x2fix4/mode_flipped-rom-byte.log	8b16ba4ab7c7aaf5f9d6c39749816db28dd20e8d
+build/agent206/t299/x2fix4/mode_paraphrase-literal.log	d6cebd3410ba060f319e396415dc1071062df2d4
+build/agent206/t299/x2fix4/mode_vacuous-validator.log	8fd2c968b95163e9c5402c15d1f65a22632c4b9d
+tests/test_checkdocs_rom.sh	edc13d09a22adc23381cfc443ebf08ad86baf5b2
+tools/checkdocs_rom.py.lines-725-740 (lines 725-740 of tools/checkdocs_rom.py)	f8029c5e0a42c52858caee21b97c76f6eac921c0
+tests/lib/classify.sh.lines-95-152 (lines 95-152 of tests/lib/classify.sh)	846d9fe7d93ddbcd641b8752bd15be3963701753
+build/agent206/tier/tier.log	3a039355acff31b5f2d4b2f622489f78a1969222
+build/agent206/tier/confirm2.log.lines-219-558 (lines 219-558 of build/agent206/tier/confirm2.log)	0df4c2b2c06141c62c48edc81caad6f571902ff6
+build/agent206/tier/confirm3.log	571c5cddf87b58ed33cc2709d9d1a5c4e3089a13
+DECISIONS_HISTORY.md.lines-7315-7319 (lines 7315-7319 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-19 (14z-205) — #299: a session close runs its tier at `--jobs 8`")	05855547c6a0ac6c7c738ae59277ec9796de7c09
+DECISIONS_HISTORY.md.lines-7607-7614 (lines 7607-7614 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-21 (14z-206) — the landing commits now; #299 stays open and its closure goes on sep")	dad6d41a76717e40264494116c1a4405501fc74a
+DECISIONS_HISTORY.md.lines-7647-7659 (lines 7647-7659 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-22 (14z-206) — #299: "70-80% of resources" is met as 8 parallel job slots; their us")	038ce7c7c068e24d1cae0c3533b622abc8535fb1
+docs/project/gotchas.md.lines-7389-7417 (lines 7389-7417 of docs/project/gotchas.md)	4db0983f9bd056b563c6125d7e0ae6a3098d86ba
+docs/project/gotchas.md.lines-7437-7472 (lines 7437-7472 of docs/project/gotchas.md)	91d12b8307ab2d5a03f19198a334568443b6a7a1
+docs/project/tickets.tsv.lines-74-76 (lines 74-76 of docs/project/tickets.tsv)	55f3414c92f949433476186cd67e4a867935f1a7
+docs/project/tickets.tsv.lines-87-87 (lines 87-87 of docs/project/tickets.tsv)	a6bc518fee093b5a51185c0052f6d516ee1f740f
+STATE.md.lines-96-115 (lines 96-115 of STATE.md)	e51150fa2e73bfba8c73990a4d4d31f4753a01bf

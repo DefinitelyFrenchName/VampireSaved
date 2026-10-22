@@ -17,6 +17,9 @@
 #   commit's frozen reference refuses the run, a checkout at another commit is refused for reuse, and an unknown
 #   --host is refused; and a CONTROL BUILD (#291 S4-A, 14z-206, Q5): a gate's `# SHEET-BUILD:` line is read (a
 #   malformed one refused), the freeze tag's own `program key` is read, and a control track built off it is refused;
+#   and a GATE-BUILT VARIANT (14z-206, ruled 2026-10-22): a gate's `# SHEET-VARIANT:` line is read (malformed ones
+#   refused), the variant is built in the checkout's build/ with its fingerprint stated as no frozen reference, and a
+#   builder that lands outside build/ or fails is refused;
 #   and a leg's RELATIVE rom path (the registry's %STOCK_RP% expands to one) is read as absolute against the tree its
 #   gate ran in (14z-206: a capture runs in its own work directory, where `build/m5_stock22/rompath` named nothing and
 #   test_gfx_menus' ours leg re-ran on pristine vsavj from ROMDIR); and #291 S4 (14z-206): each picture's "fighters on
@@ -29,11 +32,14 @@
 #   starts (or, short of that, holds) an input, each proven on the log; and the page defines every tag it shows (an undefined upper-case verdict
 #   word is listed at its top), splits a gate's page by sheet above PAGE_TILES pictures, moves each picture into pics/
 #   once, and puts a judged frame without a fighter on any leg into the labelled "Judged frames without fighters" strip
-#   (the maintainer's Q3).
+#   (the maintainer's Q3); and who plays whom (14z-206, the maintainer: each gate's characters and setup): a picture
+#   showing the fighters carries the P1/P2 character ids and the speed level read from the game's state, equal to what
+#   tests/lua/field_trace.lua reads at $FF8782/$FF8B82/$FF8116 on the same frame, none where no fighter is on screen; the
+#   index and each gate's page name them, and a sheet_notes `Setup: ` line is the gate's setup line, kept out of its notes.
 # HOW: a fixture SHEET_OUT on pristine vsavj (02_demitri_vs_cpu to frame 3001): the frozen masked vanilla log
 #   (tests/expected/vsavj/masked-v2) is the "gate's log", the masked-v2 mask the leg's; the field values are taken
 #   from tests/lua/field_trace.lua run live on the same inputs; `proof_sheets.py prove` on the fixture; one control.
-# EXPECTS: the six verdicts above, section 6's fighters readings, section 7's spans, section 8's inputs and section 9's
+# EXPECTS: the six verdicts above, section 6's fighters readings and 6b's characters, section 7's spans, section 8's inputs and section 9's
 #   page checks, each picture present, the S3 refusals (section 6, no build: the checks run on
 #   section 3's proven sheet re-labelled `ours`, a scratch git checkout and the tool's own functions); PASS. It does not claim any gate's sheet is complete — the
 #   census (tests/test_sheet_census.sh) and each gate's own verdict do that part.
@@ -41,7 +47,8 @@
 #   tests/expected/vsavj/masked-v2/logs/02_demitri_vs_cpu.log tests/expected/merged1/mask
 #   tests/replays/02_demitri_vs_cpu.rpl tests/lib/controls.sh tools/run_mame.sh tools/setup_mame.sh emu/mame-patches/
 #   tests/lua/sheet_tap_capture.lua tests/lua/read_tap.lua build/manifest/ tests/audit_landing_sound.sh
-#   tests/lua/screen_state.lua
+#   tests/lua/screen_state.lua docs/project/sheet_notes.md tests/test_tenant_select_records.sh
+#   tests/lib/ tools/build_donovan.sh
 #
 # SHEET: none — the sheet tool's own ground truth on pristine vsavj; it compares no leg of ours against a reference set
 # MUST-FIRE: shadow-tool: cap-ignored — a copy of tools/proof_sheets.py that drops the capture's ACAP line must leave the capped sheet with no cap note, so the note rests on the line (in-gate: the shadow is run on the capped fixture; mode: the shadow is the tool under test and the gate FAILs)
@@ -58,6 +65,7 @@
 # MUST-FIRE: shadow-tool: no-split — a copy of tools/proof_sheets.py that never starts a new page part must put both fixture sheets on one page, so the paging rests on the split (#291 S4-F; in-gate: the shadow draws the fixture page; mode: the shadow is the tool under test and the gate FAILs)
 # MUST-FIRE: shadow-tool: strip-ignored — a copy of tools/proof_sheets.py whose no-fighter test is always false must leave the white frame on the sheet, so the labelled strip rests on the test (#291 Q3; in-gate: the shadow draws the fixture page; mode: the shadow is the tool under test and the gate FAILs)
 # MUST-FIRE: shadow-tool: frame-blind — a copy of tools/proof_sheets.py that accepts a logged checksum found at ANY captured frame, instead of at the moment's own frame, must prove the moment shifted by one frame, so the one-frame refusal rests on the frame-exact lookup (in-gate: the shadow is run on the same fixture; mode: the shadow is the tool under test and the gate FAILs)
+# MUST-FIRE: shadow-tool: who-swapped — a copy of tools/proof_sheets.py whose who() swaps P1 and P2 must read the fixture's pair the wrong way round, so the page's per-sheet characters rest on the right id for each side (the maintainer, 14z-206: each gate's characters and setup; in-gate: the fixture's P1 and P2 differ, so a swap is visible)
 #
 # Usage: ROMDIR=... [MAME_BIN=...] tests/test_proof_sheets.sh   # emulator tier (MAME), ~17 s (measured 14z-204)
 set -u
@@ -134,7 +142,12 @@ strip_ignored() {  # strip_ignored <out.py> — the shadow whose no-fighter test
     sed -e 's/^    return bool(vals) and all(v == "no" for v in vals)$/    return False  # shadow/' -e "s|^ROOT = .*|ROOT = Path('$REPO')|" tools/proof_sheets.py > "$1"
     [ "$(command grep -c '# shadow$' "$1")" = 1 ] || { echo "the no-fighter test was not found to replace" >&2; return 1; }
 }
+who_swapped() {  # who_swapped <out.py> — the shadow whose who() reads P2 as P1 and P1 as P2
+    sed -e 's/^    return (sc\["c1"\], sc\["c2"\], sc\["lv"\])$/    return (sc["c2"], sc["c1"], sc["lv"])  # shadow/' -e "s|^ROOT = .*|ROOT = Path('$REPO')|" tools/proof_sheets.py > "$1"
+    [ "$(command grep -c '# shadow$' "$1")" = 1 ] || { echo "the who() read was not found to swap" >&2; return 1; }
+}
 TOOL=tools/proof_sheets.py
+if vs_ctl_is who-swapped; then who_swapped "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
 if vs_ctl_is fighters-blind; then fighters_blind "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
 if vs_ctl_is span-blind; then span_blind "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
 if vs_ctl_is inputs-unbounded; then inputs_unbounded "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
@@ -203,9 +216,15 @@ read -r np nc < "$W/pics.txt"
 [ "$np" = "$nc" ] && [ "$nc" = 6 ] && ok "every moment has its picture ($np of $nc)" || nope "pictures: $np of $nc"
 
 echo "== 3b. a SHEET_OUT named by a relative path ($TOOL, from the repository root)"
-R3="$W/rel"; mkdir -p "$R3/legs"; cp "$S/legs/gt.v.rpl" "$S/legs/gt.v.log" "$R3/legs/"
+# The relative dir lives UNDER the repository (build/), as a real SHEET_OUT does, so its relative name carries no
+# "..": with "$W/rel" the name climbs out of the repo, and when the repo path is at least as deep as the capture's
+# work dir the surplus ".." stop at / and the UNRESOLVED name still reaches the replay (ERIS, 14z-206: repo depth 5,
+# /tmp/tmp.X/rel/capture/gt.v depth 5), which left relative-unresolved dead there while it fired on the Mac.
+mkdir -p "$REPO/build"; R3="$(mktemp -d "$REPO/build/.proof_rel.XXXXXX")"; trap 'rm -rf "$W" "$R3"' EXIT
+mkdir -p "$R3/legs"; cp "$S/legs/gt.v.rpl" "$S/legs/gt.v.log" "$R3/legs/"
 command grep -v -e '	shift	' -e '	ram950	' -e '	fields	' -e '	fieldoff	' -e '	none	' "$S/sheet.tsv" > "$R3/sheet.tsv"
 RREL="$(python3 -c 'import os, sys; print(os.path.relpath(sys.argv[1], sys.argv[2]))' "$R3" "$REPO")"
+case "/$RREL/" in */../*) nope "the relative SHEET_OUT name climbs out of the repository: $RREL";; esac
 prove_rel() {  # prove_rel <tool> <relative dir> -> the label/status rows, run from the repository root
     ( cd "$REPO" && python3 "$1" prove "$2" --jobs 1 )
 }
@@ -332,6 +351,31 @@ print("tag-key", key == "110467a7ec1cf73d106dce59284be344349e0953")
 print("ctl-equal", len(ps.control_check("freeze/merged-m22", "MERGED", key, key)))
 print("ctl-off", len(ps.control_check("freeze/merged-m22", "MERGED", "ff" * 20, key)))
 print("ctl-nokey", len(ps.control_check("freeze/x", "MERGED", key, None)))
+# a variant a gate builds for itself (ruled 2026-10-22, "Built in checkout, stated"): the declaration, then the build in
+# the checkout's build/ with its fingerprint stated, a builder landing outside build/ refused, a failing one refused
+fx = tempfile.NamedTemporaryFile("w", suffix=".sh", delete=False)
+fx.write("#!/bin/sh\n# SHEET-VARIANT: T_OUT tests/lib/v.sh v_build vsavjw \u2014 the variant\n# SHEET-VARIANT: T_OUT tests/lib/v.sh v_build vsav2 \u2014 a set no leg runs\n# SHEET-VARIANT: T_OUT lib/v.sh v_build vsavjw \u2014 outside tests/lib\nset -u\n")
+fx.close()
+vds, verrs = ps.parse_sheet_variants(fx.name); os.unlink(fx.name)
+print("vdecl", len(vds) == 1 and vds[0] == {"var": "T_OUT", "lib": "tests/lib/v.sh", "func": "v_build", "set": "vsavjw", "why": "the variant"}, len(verrs))
+vreal, vrerrs = ps.parse_sheet_variants(str(ps.TOOL_ROOT / "tests/test_tenant_select_records.sh"))
+print("vdecl-real", [(v["var"], v["lib"], v["func"], v["set"]) for v in vreal] == [("TENANT13_OUTBASE", "tests/lib/tenant_build.sh", "tenant_build_13", "vsavjw")] and not vrerrs)
+vt = tempfile.mkdtemp(); os.makedirs(vt + "/tests/lib")
+open(vt + "/tests/lib/v.sh", "w").write(
+    'v_build() { OUTBASE="$1/build"; mkdir -p "$OUTBASE/rompath"; : > "$OUTBASE/rompath/vsavjw.zip"; }\n'
+    'v_out() { OUTBASE="$PWD/elsewhere"; mkdir -p "$OUTBASE/rompath"; }\n'
+    'v_fail() { return 1; }\n')
+subprocess.run(["git", "init", "-q", vt], check=True)
+ps.fingerprint = lambda tree, rompath, set_, romdir: "ab" * 20 if os.path.isfile(rompath + "/vsavjw.zip") else None
+logs = tempfile.mkdtemp()
+d, prov, probs = ps.variant_build({"var": "T_OUT", "lib": "tests/lib/v.sh", "func": "v_build", "set": "vsavjw"}, vt, "/nowhere", logs, False)
+print("vbuild", not probs and d is not None and str(d).startswith(os.path.realpath(vt) + "/build/sheet_variants/v_build/")
+      and "gate-built variant, from the commit, no frozen reference" in prov and "ab" * 20 in prov)
+d2, _, p2 = ps.variant_build({"var": "T_OUT", "lib": "tests/lib/v.sh", "func": "v_out", "set": "vsavjw"}, vt, "/nowhere", logs, False)
+print("vout", d2 is None and len(p2) == 1 and "outside the clean checkout's build/" in p2[0])
+d3, _, p3 = ps.variant_build({"var": "T_OUT", "lib": "tests/lib/v.sh", "func": "v_fail", "set": "vsavjw"}, vt, "/nowhere", logs, False)
+print("vfail", d3 is None and len(p3) == 1 and "did not build" in p3[0])
+import shutil; shutil.rmtree(vt, ignore_errors=True); shutil.rmtree(logs, ignore_errors=True)
 PYU
 }
 s3_units "$TOOL" > "$W/units.txt" 2>&1
@@ -346,6 +390,12 @@ u() { awk -v c="$1" '$1 == c {$1 = ""; sub(/^ /, ""); print}' "$W/units.txt"; }
 [ "$(u decl)" = "True 1" ] && [ "$(u decl-real)" = True ] \
     && ok "a gate's # SHEET-BUILD: line is read (audit_landing_sound's: CTL_BUILD freeze/merged-m22 MERGED), a malformed one refused" \
     || nope "the control-build declaration: fixture '$(u decl)', audit_landing_sound '$(u decl-real)'"
+[ "$(u vdecl)" = "True 2" ] && [ "$(u vdecl-real)" = True ] \
+    && ok "a gate's # SHEET-VARIANT: line is read (test_tenant_select_records': TENANT13_OUTBASE tenant_build_13 vsavjw), two malformed ones refused" \
+    || nope "the variant declaration: fixture '$(u vdecl)', test_tenant_select_records '$(u vdecl-real)'"
+[ "$(u vbuild)" = True ] && [ "$(u vout)" = True ] && [ "$(u vfail)" = True ] \
+    && ok "a declared variant is built in the checkout's build/ and its fingerprint stated (no frozen reference); one landing outside build/, or failing, is refused" \
+    || nope "the variant build: built $(u vbuild), outside build/ $(u vout), failing $(u vfail)"
 [ "$(u tag-key)" = True ] && ok "freeze/merged-m22's own program key is read from its tag: 110467a7" || nope "the tag's program key: '$(u tag-key)'"
 [ "$(u ctl-equal)" = 0 ] && [ "$(u ctl-off)" = 1 ] && [ "$(u ctl-nokey)" = 1 ] \
     && ok "a control track equal to its tag's key is accepted; one off it, or a tag with no key, is refused" \
@@ -388,6 +438,24 @@ wantf "$W/fight.tsv" "the round-end white" no
 wantf "$W/fight.tsv" "the stage before the drop-in" no
 wantf "$W/fight.tsv" "the round start" yes
 wantf "$W/fight.tsv" "in the round" yes
+
+echo "== 6b. who plays whom, read from the game's state (the maintainer, 14z-206: each gate's characters and setup)"
+( cd "$W" && MAME_SANDBOX="$W/ft3" MAME_ROMPATH="$ROMDIR" REPLAY="$REPO/$RPL" FIELDS="ff8782:b:c1,ff8b82:b:c2,ff8116:b:lv" \
+    FIELD_OUT="$W/ft3.txt" FIELD_FROM=2900 FIELD_TO=2900 FRAMES=3001 \
+    "$REPO/tools/run_mame.sh" vsavj -autoboot_script "$REPO/tests/lua/field_trace.lua" > "$W/ft3.log" 2>&1 ) </dev/null
+FW="$(awk '$1 == "F" && $2 == 2900' "$W/ft3.txt")"
+[ -n "$FW" ] || { echo "FAIL: field_trace produced no sample at 2900 ($W/ft3.log)"; exit 1; }
+c1="$(printf '%s' "$FW" | sed 's/.* c1=\([0-9]*\).*/\1/')"; c2="$(printf '%s' "$FW" | sed 's/.* c2=\([0-9]*\).*/\1/')"
+lv="$(printf '%s' "$FW" | sed 's/.* lv=\([0-9]*\).*/\1/')"
+WHO="$(printf '%02x/%02x/%d' "$c1" "$c2" "$lv")"; WHO_SWAP="$(printf '%02x/%02x/%d' "$c2" "$c1" "$lv")"
+[ "$c1" != "$c2" ] && ok "the fixture's P1 ($c1) and P2 ($c2) differ, so a swapped read is visible" || nope "fixture P1 and P2 are one character ($c1): who-swapped cannot fire"
+whof() {  # whof <file> <label> -> the prove listing's who column
+    awk -F'\t' -v l="$2" '$2 == l {print $8}' "$1"
+}
+[ "$(whof "$W/fight.tsv" "in the round")" = "$WHO" ] && ok "in the round: P1/P2/speed $WHO, as field_trace reads \$FF8782/\$FF8B82/\$FF8116" \
+    || nope "in the round: who '$(whof "$W/fight.tsv" "in the round")', field_trace '$WHO'"
+[ "$(whof "$W/fight.tsv" "the select screen")" = "-" ] && ok "the select screen: no fighters, no characters read" \
+    || nope "the select screen: who '$(whof "$W/fight.tsv" "the select screen")', want '-'"
 
 echo "== 7. S4-D: a span — about 9 frames of a judged event, each proven on the moment's own basis"
 ( cd "$W" && MAME_SANDBOX="$W/ft2" MAME_ROMPATH="$ROMDIR" REPLAY="$REPO/$RPL" FIELDS="ff8410:w:x,ff8810:w:x2,ff8109:b:timer" \
@@ -498,11 +566,11 @@ print("tags", ps.undefined_tags("WEIRD-TAG, then IDENTICAL and DIFF(p1meter)", {
 out = Path(sys.argv[2]); shutil.rmtree(out, ignore_errors=True); (out / "src").mkdir(parents=True)
 def pic(n):
     p = out / "src" / ("%d.png" % n); Image.new("RGB", (8, 8), (n * 20 % 255, 0, 0)).save(p); return str(p)
-def cell(n, f):
-    return {"frame": 1000 + n, "status": "PROVEN", "why": "w", "pic": pic(n), "screen": None, "fighters": f}
+def cell(n, f, w=None):
+    return {"frame": 1000 + n, "status": "PROVEN", "why": "w", "pic": pic(n), "screen": None, "fighters": f, "who": w}
 legs = [{"leg": "v", "role": "vsavj", "set": "vsavj", "rompath": "-"}, {"leg": "o", "role": "ours", "set": "vsavjw", "rompath": "-"}]
 s1 = {"sid": "a", "title": "A", "chars": [], "tickets": [], "not_comparable": "-", "capped": [], "legs": legs,
-      "cols": [{"label": "a fight", "verdict": "WEIRD-TAG", "values": "-", "cells": {"v": cell(1, "yes"), "o": cell(2, "yes")}},
+      "cols": [{"label": "a fight", "verdict": "WEIRD-TAG", "values": "-", "cells": {"v": cell(1, "yes", (0x13, 0x01, 6)), "o": cell(2, "yes", (0x13, 0x01, 6))}},
                {"label": "a white frame", "verdict": "-", "values": "-", "cells": {"v": cell(3, "no"), "o": cell(4, "no")}}]}
 s2 = {"sid": "b", "title": "B", "chars": [], "tickets": [], "not_comparable": "-", "capped": [], "legs": legs,
       "cols": [{"label": "b fight", "verdict": "SAME", "values": "-", "cells": {"v": cell(5, "yes"), "o": cell(6, "yes")}},
@@ -517,6 +585,10 @@ print("legend", all(w in (out / "index.html").read_text() for w in ("PROVEN", "E
 print("split", (out / "g" / "g_fix.2.html").exists() and "b fight" in (out / "g" / "g_fix.2.html").read_text() and "b fight" not in g)
 print("strip", "a white frame" in nof and "a fight" not in nof and "a fight" in g)
 print("moved", len(list((out / "pics").glob("*.png"))) == 8 and not any((out / "src").glob("*.png")))
+idx = (out / "index.html").read_text()
+print("who", "P1 Donovan vs P2 Demitri, speed level 6" in idx and "Characters, every leg:" in g)
+nf = out / "notes.md"; nf.write_text("## g_fix\n\nSetup: a rig that does X\n\n**Why.** a reason\n")
+print("setup", ps.sheet_setups(nf) == {"g_fix": "a rig that does X"} and "Setup:" not in ps.sheet_notes(nf).get("g_fix", "Setup:"))
 PYG
 }
 page_units "$TOOL" > "$W/page.txt" 2>&1
@@ -527,6 +599,8 @@ pu() { awk -v c="$1" '$1 == c {$1 = ""; sub(/^ /, ""); print}' "$W/page.txt"; }
 [ "$(pu split)" = True ] && ok "a gate page over PAGE_TILES pictures is split by sheet into parts" || nope "paging: '$(pu split)'"
 [ "$(pu strip)" = True ] && ok "a judged frame with no fighter on any leg goes to the 'Judged frames without fighters' strip; the fight stays on the sheet" || nope "Q3 strip: '$(pu strip)'"
 [ "$(pu moved)" = True ] && ok "each picture is moved into pics/, one copy" || nope "pictures moved: '$(pu moved)'"
+[ "$(pu who)" = True ] && ok "the index's gate row and the gate page name who plays whom, from the cells' reads" || nope "who lines: '$(pu who)'"
+[ "$(pu setup)" = True ] && ok "a section's Setup: line is the gate's setup, and stays out of its notes" || nope "setup line: '$(pu setup)'"
 
 echo "== 5. must-fire controls"
 if frame_blind "$W/fb.py"; then
@@ -592,6 +666,14 @@ if fighters_blind "$W/fbl.py"; then
     if [ "$g" = yes ]; then vs_ctl_fired fighters-blind "a predicate that always says yes reads the bare stage before the drop-in as showing the fighters"
     else vs_ctl_dead fighters-blind "the shadow read '$g' on the bare stage"; nope "control fighters-blind"; fi
 else vs_ctl_dead fighters-blind "the fighters predicate was not found to replace"; nope "control fighters-blind"; fi
+
+if who_swapped "$W/wsw.py"; then
+    rm -rf "$W/fight_ctl/capture" "$W/fight_ctl/proof.json"
+    prove "$W/wsw.py" "$W/fight_ctl" > "$W/wsw.tsv" 2>&1
+    g="$(whof "$W/wsw.tsv" "in the round")"
+    if [ "$g" = "$WHO_SWAP" ] && [ "$g" != "$WHO" ]; then vs_ctl_fired who-swapped "a read that swaps the sides names P1 $c2 and P2 $c1 where the game holds P1 $c1"
+    else vs_ctl_dead who-swapped "the shadow read '$g' in the round (the game: $WHO)"; nope "control who-swapped"; fi
+else vs_ctl_dead who-swapped "the who() read was not found to swap"; nope "control who-swapped"; fi
 
 if span_blind "$W/sbl.py"; then
     rm -rf "$W/span_ctl/capture" "$W/span_ctl/proof.json"

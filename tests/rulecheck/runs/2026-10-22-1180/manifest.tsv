@@ -1,0 +1,23 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent206/t296/closing_comment.md	210bd50a0c5cca60e8ec770cfff425e71fc17d5f
+build/agent206/t296/issue_296_body.md	07761364a842619a40b1fcee2a2e3f845160c8fc
+build/agent206/t296/REPORT.md	8a4abcf71dca608e9c7fdeecd3a6afbd8ec97d61
+build/agent206/t296/t296.diff	9926405ad21f36b17bdfbeda9b2a8113635d44b6
+build/agent206/t296/reuse_grep.txt	156d098457d9631e98ef0a5a8f561b6231aa478e
+tools/run_mame.sh	4aeb916f534e1e9c46be18ad87c6d2b6a56041ec
+tests/test_mame_sandbox_log.sh	da7be0415b57c65f285f978b99e09ae8667136b1
+build/agent206/remote/eris/REPORT.md	a63ea89bfcae9524d42ce074cd87b56e808bb847
+build/agent206/remote/eris3/REPORT.md	a383e99838e2430a3721243f0631004f01967f30
+build/agent206/remote/pilot3/REPORT.md	2fcd5a446cc67137d96d8de95814695825dfed86
+build/agent206/remote/pilot3/mister/sandbox.log	a1e93ede929aafb1a2d8d0ac71d90bf0835ee246
+build/agent206/remote/pilot3/mister/lanes.log	7acfeb8c81b31b3e07c80554fbe02def566a7fde
+build/agent206/remote/pilot3/mister/lanes_p3.sh	a67bb2e482126a05bea6cde357c84af365825ce4
+build/agent206/remote/pilot3/mister/resume_gfxc.sh	6dc51b1de732fa70a0cc3c93aec625d1a3b789e3
+build/agent206/remote/pilot3/mister/run_mister.out	7f7ce6fc7f28cf49670487fd3576eb0348ca215a
+build/agent206/remote/pilot3/mister/run_mister_resume.out	167877a538d918c5d994a0563dad149f45fcc1b2
+build/agent206/remote/pilot3/mister/run_mister/results.tsv	7ce05ec20e9fae9d31448d19b8bc1d37630e9b2e
+build/agent206/remote/pilot3/mister/run_mister/results.before_resume.tsv	374ae24e010358428c2c73cf8b46f48f59bf71bc
+build/agent206/remote/pilot3/mister/run_mister/commit.txt	4b9ac87c8c4259ac014c393acc8835aeffdd1cf3
+build/agent206/remote/pilot3/mister/refused_grep.txt	be927f955b0b5832f186a4a43b66120eb56a55c0
+build/agent206/remote/pilot3/mister/prereq_scopes.txt	b7e9eb8adcd10ee367da2e780b28998d2be40fb4
+DECISIONS_HISTORY.md.lines-7662-7672 (lines 7662-7672 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-22 (14z-206) — #296: "the emulator lanes are green with refusal on" is met with no ")	e5286f63d814546dce1050e423fd977d6cabd60f

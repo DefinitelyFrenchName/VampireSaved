@@ -2,8 +2,12 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 308
+# issues: 312
 number	state	reason	closed	labels	title
+312	OPEN	-	-	evolution,performance	A --jobs 8 static tier keeps only about 2.4 of its 8 job slots busy (CPU about 2.2 of 12 cores, 14z-205): one gate's controls run serially inside one pool job
+311	OPEN	-	-	bug,severity: low,test-integrity	test_applier_page_browser's browser run does not complete under heavy load (a false red), and sometimes stalls unloaded
+310	OPEN	-	-	bug,severity: low,test-integrity	An executed control whose mode run FAILs without judging anything reads HONOURED
+309	OPEN	-	-	bug,severity: low,test-integrity	test_proof_sheets' control relative-unresolved is dead wherever the repository path is as deep as the capture's work dir
 308	OPEN	-	-	bug,severity: low,test-integrity	On Windows the release generator writes cp1252 and test_readme_recording writes CRLF, so the gate cannot pass there
 307	OPEN	-	-	evolution	build/ has no retention rule for logs and session evidence (47 GB, 1,134 entries); measure what references each family before pruning
 306	OPEN	-	-	bug,test-integrity	Nine emulator gates default to build/donovan6, which only test_m2b_stage6 builds; a clean checkout's order decides whether they find it
@@ -13,10 +17,10 @@ number	state	reason	closed	labels	title
 302	OPEN	-	-	bug,test-integrity	audit_marionette_cost reads 8 more replays per hook row than its frozen expectation on a clean clone
 301	OPEN	-	-	evolution,severity: low	Community cross-check: create report of the #229 workbook differences for the community, and check the open questions against vswiki
 300	CLOSED	COMPLETED	2026-10-19	bug,test-integrity	test_close_tools REFUSED on the live tree: section 2b reads the findings table #288 cut from the close
-299	OPEN	-	-	evolution,performance	Static tier: run gates in parallel (--jobs, ~70-80% of the machine), proven equal to a serial run first
+299	CLOSED	COMPLETED	2026-10-22	evolution,performance	Static tier: run gates in parallel (--jobs, ~70-80% of the machine), proven equal to a serial run first
 298	OPEN	-	-	evolution,performance	Static tier scope: at a commit/close, execute a gate's controls only when a program of its reach changed (R1); all at freeze/release
 297	OPEN	-	-	evolution,performance	Static tier scope: six families (109 gates) to freeze cadence, triggered by their own code (@code)
-296	OPEN	-	-	evolution,severity: medium,test-integrity	run_mame.sh: refuse a run whose MAME_SANDBOX already holds an earlier run's state (#293's class, at run time)
+296	CLOSED	COMPLETED	2026-10-22	evolution,severity: medium,test-integrity	run_mame.sh: refuse a run whose MAME_SANDBOX already holds an earlier run's state (#293's class, at run time)
 295	CLOSED	COMPLETED	2026-10-19	evolution,severity: medium,test-integrity	audit_dmg_legacy_sweep never runs Demitri's legacy hits on our build: add an exact vsavj-vs-ours leg (superset coverage)
 294	OPEN	-	-	cosmetic,parked	Killshread's shock/electrocuted state has wrong palette (currently accepted tradeoff) - parked
 293	CLOSED	COMPLETED	2026-10-18	bug,severity: medium,test-integrity	Two gates hand one MAME sandbox to several runs, so a later run boots on carried nvram (audit_flicker_attribution, audit_legacy_pairings)
@@ -45,7 +49,7 @@ number	state	reason	closed	labels	title
 270	CLOSED	COMPLETED	2026-10-13	evolution	The close's documentation packet asks only what the deterministic close checks do not cover; presentation fixes re-checked deterministically
 269	CLOSED	COMPLETED	2026-10-14	evolution	Static tier turned around: a session runs the gates whose followed paths changed plus a core, controls only for changed gates; freeze and release run everything
 268	CLOSED	COMPLETED	2026-10-13	evolution	test_close_tools cut back: session runs self-tests only, one-pass retraction scan at freeze/release, section-scoped control modes, retraction-file audit
-267	OPEN	-	-	evolution	Session ledger as a static page generated into docs/site/ at each close (hosting and what to publish are the maintainer's calls)
+267	OPEN	-	-	evolution,parked	Session ledger as a static page generated into docs/site/ at each close (hosting and what to publish are the maintainer's calls)
 266	OPEN	-	-	bug	PILOT's GNOME Shell segfaults under Wayland since 2026-10-09, so audit_release_linux_desktop cannot run
 265	CLOSED	COMPLETED	2026-10-13	evolution	audit_mask_window_ff42a2 at a release: an instrument with no default subject SKIPs, and the staleness audit now FAILs that SKIP
 264	CLOSED	COMPLETED	2026-10-12	evolution	A session dashboard: time per activity, checks and re-checks and why, tier cost and quality signals, each figure labelled measured, derived, estimated, inferred or extrapolated

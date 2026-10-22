@@ -8,7 +8,10 @@
 --
 -- The line, one per snapshot:  R <frame> st=<$FF812D> ph=<$FF810E> m4=<$FF8004.l> m8=<$FF8008.l> a1=<$FF8400.b>
 --   a2=<$FF8800.b> hp1=<$FF8450.w> hp2=<$FF8850.w> t=<$FF8109> o0=<OBJ entries at 708000> o1=<OBJ entries at 710000>
---   fp=<OBJ entries at 708000 whose palette (attribute & 0x1F) is 0x01-0x09>
+--   fp=<OBJ entries at 708000 whose palette (attribute & 0x1F) is 0x01-0x09> c1=<$FF8782> c2=<$FF8B82> lv=<$FF8116>
+-- c1/c2 are the P1/P2 character ids (fighter block +0x382; docs/game/atlas/ram.md, the same ids in vsavj, vsav2 and
+-- vhunt2: docs/game/atlas/character_tables.md) and lv the speed level ($FF8116): who plays whom, and at what speed,
+-- for the page's per-sheet line (the maintainer, 14z-206: each gate's characters and setup, MEASURED).
 -- (docs/game/atlas/ram.md: $FF812D 0 outside a round; $FF810E the round phase, 0 fighting, 1 a down settled, FF the
 -- match's end; $FF8004/$FF8008 both 0x40000 in a match; +0x00 the fighter's alive header, +0x50 its HP; the OBJ walk is
 -- tests/lua/inp_probe.lua's, hardware-style: stop at a Y with bit 15 or an attribute >= 0xFF00.)
@@ -34,10 +37,10 @@ function M.line(space, frame)
         return n
     end
     local o0 = walk(0x708000, true)
-    return string.format("R %d st=%d ph=%d m4=%x m8=%x a1=%d a2=%d hp1=%d hp2=%d t=%d o0=%d o1=%d fp=%d\n", frame,
+    return string.format("R %d st=%d ph=%d m4=%x m8=%x a1=%d a2=%d hp1=%d hp2=%d t=%d o0=%d o1=%d fp=%d c1=%d c2=%d lv=%d\n", frame,
         space:read_u8(0xFF812D), space:read_u8(0xFF810E), space:read_u32(0xFF8004), space:read_u32(0xFF8008),
         space:read_u8(0xFF8400), space:read_u8(0xFF8800), s16(0xFF8450), s16(0xFF8850), space:read_u8(0xFF8109),
-        o0, walk(0x710000, false), fp)
+        o0, walk(0x710000, false), fp, space:read_u8(0xFF8782), space:read_u8(0xFF8B82), space:read_u8(0xFF8116))
 end
 
 return M
