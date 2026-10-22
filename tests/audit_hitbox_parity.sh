@@ -181,7 +181,11 @@ for k, e in enumerate(json.load(open(js))["events"]):
     print("moment\t%s\te%d\t%s (node-equal frame nearest mid-window; %d of %d window frames node-equal)\t%s\t-" % (part, k, e["name"], len(cand), hi - lo, v))
     for leg, tt in (("native", n), ("ours", o)):
         print("at\t%s\te%d\t%s\t%d\tfields\t%s" % (part, k, leg, fr, ",".join("%s=%d" % (spec[nm], tt[fr][nm]) for nm in sorted(tt[fr]) if nm in spec)))
+        # S4-D (#291): the rig event's judged window, its node-equal frames (the frames the gate can compare)
+        print("span\t%s\te%d\t%s\t%d-%d" % (part, k, leg, min(cand), max(cand)))
 PYS
+        sheet_trace "$part" native "$W/$part.native.ft" "$FIELDS"
+        sheet_trace "$part" ours "$W/$part.ours.ft" "$FIELDS"
         sheet_rows "$W/sheet_$part.tsv"
     done
 fi

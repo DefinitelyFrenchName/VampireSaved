@@ -468,6 +468,7 @@ for spec in "$EXPECT"/*.masked; do
         sheet_leg "$name" vanilla vsavj vsavj "$ROMDIR" "$REPO/tests/replays/$name.rpl" - "$_sfr" "$baselog" "$MASK"
         sheet_leg "$name" merged ours vsavjw "$MERGED_RP" "$REPO/tests/replays/$name.rpl" - "$_sfr" "$log" "$MASK"
         sheet_anchors "$name"
+        sheet_inputs "$name" 18      # #291 S4-E (Q2: "at the replay's inputs, up to 18 frames", "18 per round"), each proven on the logs above
         case "$class" in
             flicker)   _satt="$(printf '%s' "$args" | tr ',' '\n' | sed 's/$/:flicker frame/')" ;;
             window)    _satt="$(printf '%s:window opens\n%s:window closes' "${args%% *}" "${args##* }")" ;;

@@ -19,6 +19,7 @@
 #   tools/name_moves.py tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
 #
 # SHEET: legs vs2,ours — moments: one per event, at its first divergent frame for a DIFF and mid-window otherwise — not comparable: each game's stage and palette, and P2's art (Demitri, each game's own copy; [VSP-168])
+# SHEET-VERDICTS: NOT-IN-DF = an event labelled "in DF" ran without the Dark Force flag up on both legs, so it is not compared
 #
 # MUST-FIRE: perturbed-copy: unpinned-level — the native leg left at vsav2's DEFAULT play mode (TURBO, level 8) against ours at NORMAL must fail every part, so each verdict is proven to rest on the level the gate pins (in-gate: one part is re-run with the native level pin withheld and must diverge; mode: every native leg runs unpinned and the comparisons FAIL)
 # MUST-FIRE: shadow-tool: no-translation — comparing our RAW anim node pointer against native's, without translating it out of its placement, must fail, so every IDENTICAL verdict is proven to rest on the translation (in-gate: one part is compared both ways; mode: every part is compared untranslated and FAILs)
@@ -476,11 +477,20 @@ for row in (l.rstrip("\n").split("\t") for l in open(got)):
         fr, why = e, "event frame"
     vals = ("first %s, fields %s" % (first, flds)) if verdict == "DIFF" else "-"
     print("moment\t%s\te%d\t%s (%s)\t%s\t%s" % (part, k, name, why, verdict, vals))
+    # S4-D (#291): the judged window, as tools/move_parity.py compares it — the event's frame to the next event's,
+    # the frames where both legs' anim node is live — so the sheet shows the move from its start to its recovery
+    hi = ev[k + 1]["frame"] if k + 1 < len(ev) else max(tr["native"]) + 1
+    live = [f for f in range(e, hi) if f in tr["native"] and f in tr["ours"]
+            and tr["native"][f].get("node", "0") != "0" and tr["ours"][f].get("node", "0") != "0"]
     for leg in ("native", "ours"):
         smp = tr[leg].get(fr)
         exp = ",".join("%s=%s" % (spec[n], v) for n, v in sorted(smp.items()) if n in spec) if smp else "-"
         print("at\t%s\te%d\t%s\t%d\t%s\t%s" % (part, k, leg, fr, "fields" if smp else "none", exp))
+        if smp and live:
+            print("span\t%s\te%d\t%s\t%d-%d" % (part, k, leg, min(live + [fr]), max(live + [fr])))
 PYS
+        sheet_trace "$part" native "$W/tr_${t}_${p}_native.txt" "$FIELDS"
+        sheet_trace "$part" ours "$W/tr_${t}_${p}_ours.txt" "$FIELDS"
         sheet_rows "$W/sheet_$part.tsv"
     done
 fi

@@ -454,7 +454,11 @@ for r in (l.rstrip("\n").split("\t") for l in open(rows)):
         fr = int(m.group(1)); smp = tr[leg].get(fr)
         exp = ",".join("%s=%s" % (spec[n], v) for n, v in sorted(smp.items()) if n in spec) if smp else "-"
         print("at\t%s\tc%s\t%s\t%d\t%s\t%s" % (sid, k, leg, fr, "fields" if smp else "none", exp))
+        if smp:    # S4-D (#291): the contact in context, 8 frames before it to 8 after, on the leg's own field trace
+            print("span\t%s\tc%s\t%s\t%d-%d" % (sid, k, leg, fr - 8, fr + 8))
 PYS
+        sheet_trace "$sid" native "$W/${TENANT}_$p.native.ft" "$FIELDS"
+        sheet_trace "$sid" ours "$W/${TENANT}_$p.ours.ft" "$FIELDS"
         sheet_rows "$W/sheet_$sid.tsv"
     done
 fi

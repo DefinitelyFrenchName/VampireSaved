@@ -393,6 +393,7 @@ if sheet_on && [ -z "$MODE" ] && [ "$FREEZE_CLOCK" = 0 ] && [ "${SKIP_RUNTIME:-0
     sheet_leg host11 t13 ours vsavjw "$SHEET_OUT/legs/t13_rompath;$ROMDIR" "$REPO/tests/replays/11_pick_donovan.rpl" - "$_sfr" \
         "$WORK/11_legacy.log" "$_smask"
     sheet_anchors host11
+    sheet_inputs host11 18      # #291 S4-E (Q2: "at the replay's inputs, up to 18 frames", "18 per round"), each proven on the logs above
     for _sw in 889:opens 2415:closes; do
         sheet_moment host11 "w${_sw%%:*}" "f${_sw%%:*} window ${_sw#*:} (ratified bounded window)" "$_v"
         sheet_at host11 "w${_sw%%:*}" vanilla "${_sw%%:*}" log

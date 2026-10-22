@@ -71,6 +71,7 @@
 # WHAT THE GATE DOES NOT CLAIM: that an answer is ENOUGH. That is judged at the
 # close that closes the ticket.
 issue	kind	status	title	repro	decided	learned	wrong	sessions
+308	bug	open	On Windows the release generator writes cp1252 and test_readme_recording writes CRLF, so the gate cannot pass there	tests/test_readme_recording.sh ; tools/package_release_platforms.py	none	none	none	14z-206
 307	evolution	open	build/ has no retention rule for logs and session evidence (47 GB, 1,134 entries); measure what references each family before pruning	none	none	none	none	14z-206
 306	bug	open	Nine emulator gates default to build/donovan6, which only test_m2b_stage6 builds; a clean checkout's order decides whether they find it	none	none	none	none	14z-206
 305	bug	open	The emulator tier has no decrypt-view warm-up, and build_donovan.sh writes the view cache non-atomically (#299's two gaps)	none	none	none	none	14z-206

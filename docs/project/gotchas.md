@@ -3059,6 +3059,11 @@ and clear them in the function**, or pass them as arguments.
 Caught by the control that existed precisely to catch a vacuous pass — which
 is the argument for writing that control every time.
 
+**Paid again 14z-206 (#291 S4):** `tests/test_proof_sheets.sh` section 4 runs `ANCHOR_MAX=$((na - 1)) prove …`, where
+`prove` is a function; the cap outlived the call, and the new inputs section's anchors stopped two short of the round
+start, so it picked no input frame (`round start ''`). The fixture by hand, outside the gate, found the round. The
+gate now `unset`s it before section 6.
+
 ### 3. `grep -vxF "$multiline_string"` matches EVERYTHING if any line is blank
 
 Used to compute "lines in AFTER that are not in BEFORE":

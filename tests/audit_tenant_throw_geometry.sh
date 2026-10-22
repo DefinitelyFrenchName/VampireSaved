@@ -830,6 +830,9 @@ if sheet_on && [ -z "${VS_CTL:-}" ] && [ -s "$W/sheet_cells.tsv" ]; then
         sheet_moment "$_sid" first "the hold's first captured frame" "$_vd" "$_vals"
         [ "$_n0" != - ] && sheet_at "$_sid" first native "$_n0" log
         [ "$_o0" != - ] && sheet_at "$_sid" first ours "$_o0" log
+        # S4-D (#291): the whole hold, its first captured frame to its last, each frame proven on the leg's log
+        [ "$_n0" != - ] && [ "$_n1" != - ] && sheet_span "$_sid" first native "$_n0-$_n1"
+        [ "$_o0" != - ] && [ "$_o1" != - ] && sheet_span "$_sid" first ours "$_o0-$_o1"
         sheet_moment "$_sid" last "the hold's last captured frame" "$_vd" "$_vals"
         [ "$_n1" != - ] && sheet_at "$_sid" last native "$_n1" log
         [ "$_o1" != - ] && sheet_at "$_sid" last ours "$_o1" log

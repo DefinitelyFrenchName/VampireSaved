@@ -451,6 +451,9 @@ if sheet_on && [ -z "$MODE" ] && [ -s "$WORK/sheet_hits.tsv" ]; then
                 "native $([ -n "$_a" ] && echo "f$_a -$(echo "$_nd" | cut -d, -f$_i)" || echo none), ours $([ -n "$_b" ] && echo "f$_b -$(echo "$_od" | cut -d, -f$_i)" || echo none) HP"
             [ -n "$_a" ] && sheet_at "$_sid" "h$_i" native "$_a" log
             [ -n "$_b" ] && sheet_at "$_sid" "h$_i" ours "$_b" log
+            # S4-D (#291): the hit in context, 8 frames before it to 8 after, each frame proven on the leg's log
+            [ -n "$_a" ] && sheet_span "$_sid" "h$_i" native "$((_a - 8))-$((_a + 8))"
+            [ -n "$_b" ] && sheet_span "$_sid" "h$_i" ours "$((_b - 8))-$((_b + 8))"
             _i=$((_i + 1))
         done
     done < "$WORK/sheet_hits.tsv"

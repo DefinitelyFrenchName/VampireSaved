@@ -51,9 +51,14 @@
 # MUST-FIRE: perturbed-copy: data-position-off — a copy without N-E must mark g_reg stale for notes/ruled.md, which its data file mentions only in prose, and the selftest must FAIL (mode: that copy's selftest; #286 (a))
 # MUST-FIRE: perturbed-copy: runs-data-off — a copy without N-F must make the run manifest data of g_mani, which names `manifest.tsv` only in a message, and the selftest must FAIL (mode: that copy's selftest; #286 (a))
 # MUST-FIRE: perturbed-copy: runs-change-off — a copy without N-F-CHANGE must mark g_mani stale for a new run's manifest.tsv, which it names only by basename, and the selftest must FAIL (mode: that copy's selftest; #286 (a))
+# MUST-FIRE: perturbed-copy: runs-link-off — a copy without N-F-LINK must carry g_runlink, whose data file links a run record by path, for that record, and the selftest must FAIL (mode: that copy's selftest; 14z-206, test_tickets' traced read)
+# MUST-FIRE: perturbed-copy: runs-link-basename — a copy whose N-F-LINK counts a basename must mark g_runlink stale for another run's verdict.txt, and the selftest must FAIL (mode: that copy's selftest; 14z-206)
 # MUST-FIRE: perturbed-copy: recursive-off — a copy whose N-G ignores a recursive walk must carry g_testswalk, which rglobs `tests`, for a ledger change, and the selftest must FAIL (mode: that copy's selftest; the PILOT trace's 2,225 test_docshape reads, 14z-202)
 # MUST-FIRE: perturbed-copy: recursive-loose — a copy whose RECURSIVE test matches the word `find` and markdown `**` must keep g_testslink, an `ls tests` lister whose message says "**not** find", stale for a ledger change, and the selftest must FAIL (mode: that copy's selftest; 14z-202)
 # MUST-FIRE: perturbed-copy: whole-coarse-off — a copy whose R4 counts every `os.walk(`, `.rglob(` and `find .` as whole-tree (N-H off) must mark g_cdfind and g_walksub stale for every change, and the selftest must FAIL (mode: that copy's selftest; #286 (a))
+# MUST-FIRE: perturbed-copy: lsf-scope-off — a copy whose `git ls-files` ignores its pathspecs (N-I off, 14z-203, #286) must mark g_lsglob and g_lsdir stale for every change, and the selftest must FAIL (mode: that copy's selftest)
+# MUST-FIRE: perturbed-copy: walks-dir-loose — a copy whose N-G exception is cancelled by any recursive walk in the reach (N-J off, 14z-203, #286) must mark g_cdwalk and g_subwalk stale on the ledger, and the selftest must FAIL (mode: that copy's selftest)
+# MUST-FIRE: perturbed-copy: runs-self-off — a copy whose N-F counts the planner's own `rulecheck/runs` (14z-203, #286) must mark g_planner stale on a run record's own change (the fixture run's packet.md and manifest.tsv), and the selftest must FAIL (mode: that copy's selftest)
 # MUST-FIRE: perturbed-copy: runs-dir-off — a copy without N-G must mark the bare `tests` lister g_pylist stale for a new run record, and the selftest must FAIL (mode: that copy's selftest; #286 (a))
 # MUST-FIRE: perturbed-copy: prose-pairing — a copy of N-B whose prose regex skips short quoted strings (pairing a path's closing quote with the next opening one) must mark the gate stale whose `[ -f "$D/x.diverge" ] && echo "... STATE.md ..."` line names STATE.md only in a message, and the selftest must FAIL (mode: that copy's selftest)
 #
@@ -79,9 +84,9 @@ edits = {
     "r3c-off": ('    for d in [x for x, _, _ in dps if "/" in x]:', "    for d in []:  # CONTROL r3c-off"),
     "sibling-off": ("            for m in SIBLING_PROG.finditer(text(root, p)):", "            for m in []:  # CONTROL sibling-off"),
     "shdef-off": ("        pats.append((d, \"lit\", re.compile(r\"(?:(?<=:[-=+?])", "        None and pats.append((d, \"lit\", re.compile(r\"(?:(?<=:[-=+?])"),   # CONTROL shdef-off: never appended
-    "list-git-off": ('r"|[\\"\']git', 'r"|NEVER[\\"\']git'),
+    "list-git-off": ('r"|[\\"\']git[\\"\']\\s*,\\s*(?:', 'r"|NEVER[\\"\']git[\\"\']\\s*,\\s*(?:'),
     "scratch-off": ("    return bool(SCRATCH.match(c))", "    return False  # CONTROL scratch-off"),
-    "no-whole-rule": ("        if not why and changed and any(whole_covers(blob, c) for c in changed):   # R4", "        if False:  # CONTROL no-whole-rule"),
+    "no-whole-rule": ("        if not why and changed and any(whole_covers(blob, c) for c in changed):   # N-I: per changed path", "        if False:  # CONTROL no-whole-rule"),
     "no-data-rule": ("    for d in data_files(root, blob):", "    for d in []:  # CONTROL no-data-rule"),
     "no-template-rule": ("    for rx, tok, is_path in templates(root, blob):", "    for rx, tok, is_path in []:  # CONTROL no-template-rule"),
     "no-git-rule": ('    if base in (".gitignore", ".gitattributes", ".gitmodules") and GIT_RUN.search(blob):', "    if False:  # CONTROL no-git-rule"),
@@ -89,10 +94,15 @@ edits = {
     "data-position-off": ("        if (c in t or (bpat and base in t)) and data_names(t, c, bpat):   # N-E", "        if c in t or (bpat and base in t and bpat.search(t)):  # CONTROL data-position-off"),
     "runs-data-off": ('            if f.startswith(RUNS_DATA) and not runs_reader:   # N-F', "            if False:  # CONTROL runs-data-off"),
     "runs-change-off": ("    if c.startswith(RUNS_DATA) and not reader:   # N-F-CHANGE", "    if False:  # CONTROL runs-change-off"),
+    "runs-link-off": ("        return run_link(root, blob, c)   # N-F-LINK", "        return None  # CONTROL runs-link-off"),
+    "runs-link-basename": ("        if f != c and c in t and data_names(t, c, None):", "        if f != c and data_names(t, c, patterns(c)[0]):  # CONTROL runs-link-basename"),
     "recursive-loose": ('RECURSIVE = re.compile(r"os', 'RECURSIVE = re.compile(r"\\bfind\\s|\\*\\*|os'),
-    "whole-coarse-off": ("WHOLE = _Whole()", "WHOLE = _WHOLE_COARSE  # CONTROL whole-coarse-off"),
-    "runs-dir-off": ("                and not RECURSIVE.search(blob)):   # N-G", "                and False):  # CONTROL runs-dir-off"),
-    "recursive-off": ("                and not RECURSIVE.search(blob)):   # N-G", "                ):  # CONTROL recursive-off"),
+    "whole-coarse-off": ('        hit = m.group(0)\n        if hit.startswith("os.walk("):   # N-H', '        hit = m.group(0)\n        return {ALL}  # CONTROL whole-coarse-off\n        if hit.startswith("os.walk("):   # N-H'),
+    "lsf-scope-off": ('            return _lsf_scopes(t, m)', '            return {ALL}  # CONTROL lsf-scope-off'),
+    "walks-dir-loose": ('    bare = re.compile(r"(?<![\\w.-])" + re.escape(d)', '    return bool(RECURSIVE.search("\\n".join(text(root, p) for p in rch)))  # CONTROL walks-dir-loose\n    bare = re.compile(r"(?<![\\w.-])" + re.escape(d)'),
+    "runs-self-off": ('    return any("rulecheck/runs" in text(root, p) for p in rch if p != "tools/static_confirm.py")', '    return any("rulecheck/runs" in text(root, p) for p in rch)  # CONTROL runs-self-off'),
+    "runs-dir-off": ("                and not walks_dir(root, rch, d)):   # N-G, N-J", "                and False):  # CONTROL runs-dir-off"),
+    "recursive-off": ("                and not walks_dir(root, rch, d)):   # N-G, N-J", "                ):  # CONTROL recursive-off"),
     "binary-as-text": ('t = "" if b"\\0" in raw[:8192] else raw', "t = raw"),
     "narrow-build-off": ("        if k == 1 and parts[0] in NARROW_R3_TOP:   # N-A", "        if False:  # CONTROL narrow-build-off"),
     "narrow-state-off": ("    if bpat and base in NARROW_R2:   # N-B", "    if False:  # CONTROL narrow-state-off"),
@@ -117,7 +127,7 @@ sed 's/^/  /' "$W/self.txt"
 grep -q '^SELFTEST PASS$' "$W/self.txt" || { echo "FAIL: the predictor's selftest"; fail=1; }
 
 if [ -z "${VS_CTL:-}" ]; then
-    for c in no-dir-rule no-whole-rule no-data-rule no-template-rule no-git-rule dashdash-comment binary-as-text narrow-build-off narrow-state-off narrow-literal-blind prose-pairing dir-template-off r3-prose-off r3-joined-off r3c-off sibling-off shdef-off list-git-off scratch-off md-narrow-off data-position-off runs-data-off runs-change-off runs-dir-off recursive-off recursive-loose whole-coarse-off; do
+    for c in no-dir-rule no-whole-rule no-data-rule no-template-rule no-git-rule dashdash-comment binary-as-text narrow-build-off narrow-state-off narrow-literal-blind prose-pairing dir-template-off r3-prose-off r3-joined-off r3c-off sibling-off shdef-off list-git-off scratch-off md-narrow-off data-position-off runs-data-off runs-change-off runs-link-off runs-link-basename runs-dir-off recursive-off recursive-loose whole-coarse-off lsf-scope-off walks-dir-loose runs-self-off; do
         python3 "$(make_copy "$c")" --selftest > "$W/ctl_$c.txt" 2>&1 || true
         if grep -q '^SELFTEST FAIL$' "$W/ctl_$c.txt"; then vs_ctl_fired "$c" "$(grep -m1 'FAIL:' "$W/ctl_$c.txt" | sed 's/^ *//')"
         else vs_ctl_dead "$c" "the perturbed copy passed its selftest — the selftest cannot see this failure" || fail=1; fi

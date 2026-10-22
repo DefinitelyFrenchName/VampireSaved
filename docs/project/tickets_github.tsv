@@ -2,8 +2,9 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 307
+# issues: 308
 number	state	reason	closed	labels	title
+308	OPEN	-	-	bug,severity: low,test-integrity	On Windows the release generator writes cp1252 and test_readme_recording writes CRLF, so the gate cannot pass there
 307	OPEN	-	-	evolution	build/ has no retention rule for logs and session evidence (47 GB, 1,134 entries); measure what references each family before pruning
 306	OPEN	-	-	bug,test-integrity	Nine emulator gates default to build/donovan6, which only test_m2b_stage6 builds; a clean checkout's order decides whether they find it
 305	OPEN	-	-	bug,test-integrity	The emulator tier has no decrypt-view warm-up, and build_donovan.sh writes the view cache non-atomically (#299's two gaps)
@@ -27,7 +28,7 @@ number	state	reason	closed	labels	title
 287	CLOSED	NOT_PLANNED	2026-10-16	evolution,severity: high	The procedure check runs at the close; run it right after each piece of work, scoped to that work
 286	OPEN	-	-	evolution,performance,severity: high	The close tier's cost follows the session, not the change: false re-runs, the dirty fbneo submodule, controls on every re-run gate
 285	CLOSED	COMPLETED	2026-10-15	evolution	test_release_launcher_bat: its Windows half at release cadence or on demand, never a session-close SKIP
-284	OPEN	-	-	bug,severity: medium	[regression] m23-merged README.md file is currently a mess
+284	OPEN	-	-	bug,done unshipped,severity: medium	[regression] m23-merged README.md file is currently a mess
 283	CLOSED	COMPLETED	2026-10-16	bug	trace_static_reads.py drops every open strace splits into <unfinished>/<resumed> lines, so the predictor's miss scores never saw them
 282	CLOSED	COMPLETED	2026-10-15	evolution	The session documents and the close ritual are too large to follow: shrink, index and streamline them
 281	OPEN	-	-	bug	Release-only: test_applier_page_browser's control run does not finish under strace

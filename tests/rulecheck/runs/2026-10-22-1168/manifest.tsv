@@ -1,0 +1,20 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent206/t286/landing.diff	59af56a2b53ce1f7d343a7a40c63c6d315a84c5f
+build/agent206/t286/REPORT.md	6224ae522504d5b08edf1217fdb65e60d25982f5
+build/agent206/t286/issue_286.txt	f5d16e8d1148626b7cf91dd70e6c550de1415afb
+build/agent206/remote/pilot/REPORT.md	75dcf29498acb538ac766f69f111b385d39ac0ce
+build/agent206/remote/pilot/logs/out/committed.log	34481f7ef97f0b312865c4ba0740bfcf7b5089cc
+build/agent206/remote/pilot/logs/out/narrowed.log	97e95593ddecd50bba0ba0ce8e103521f2a82c8f
+build/agent206/remote/pilot/logs/out/nolink.log	e02ae44ed0b355328f60ad3685dfbbc8c979c6db
+build/agent206/remote/pilot/logs/out/control.log	560566a3b43b85fdaf20d63a864982c380464802
+build/agent206/t286/land/static_confirm.log	5feabf84a0fa51c5608ea1dd153a3478f449dd78
+build/agent206/t286/land/trace.log	6fa20eaede0c0707cf093c9fae5d40964f6e1ddd
+build/agent206/t286/land/predict_cmp.txt	a92b06e365b165e34d3908701791d5430cae0c91
+build/agent206/t286/land/mode_runs-link-off.log	a7536bd7c8aa4ae7a6a921428a641a3a8bf126bb
+build/agent206/t286/land/mode_runs-link-basename.log	3df0434e8493e4632dcd7113311d15945b6fb273
+build/agent206/t286/land/mode_no-data-rule.log	47015ccd81b90cfca065bad9096a886dfe6a5379
+build/agent206/t286/land/mode_runs-change-off.log	94a9b151a0c4007a4bade5f0985e61615c631182
+build/agent206/t286/link_census.out	8b17c3a5f1055ebb6087109b7d8d240a2a40191e
+build/agent206/t286/synth_tickets.out	5c32fa0a49ca17258828936bdb4407537e249339
+tools/static_confirm.py.lines-560-600 (lines 560-600 of tools/static_confirm.py)	959462796248a723abfa513daf44ded69028d6ef
+DECISIONS_HISTORY.md.lines-7302-7309 (lines 7302-7309 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-18 (14z-205) — the static tier's scope: six families to freeze cadence (#297), cont")	e577e46ad8d5e7b4fd8fbbc21ae211094094697b

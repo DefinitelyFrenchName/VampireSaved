@@ -206,6 +206,35 @@ compares, and what a reader might expect it to check that it does not. Notes liv
 `## <gate>` section each, never in the gate (a note is documentation, so writing one re-runs nothing); `tests/test_sheet_census.sh`
 section 3c refuses a section whose gate does not exist (control `orphan-note`) and holds the rendering. The maintainer,
 2026-10-18: *"Such an explanation would be a great addition to all other capture sheets"*; one note is written so far.
+**S4 (14z-206): every tile a human can confirm, ~9 per move** (the maintainer's answers to the S4 plan, 2026-10-21: Q1
+*"per judged event. Unless it currently has more than 9 tiles already in which case keep the current number"*, Q2 *"at
+the replay's inputs, up to 18 frames"* — read as *"18 per round"*, the maintainer, 2026-10-21 — Q3 the separate
+labelled strip).
+- **Fighters on screen (S4-B).** Every snapshot also writes `tests/lua/screen_state.lua`'s `R` line (the round state,
+  the match words, the OBJ count and `fp`, the OBJ entries drawn with a fighter palette 0x01-0x09); `fighters()` reads
+  "yes" when a match is on and `fp` ≥ 1. It was scored against pictures classed by eye before the page used it
+  (chosen on 118, confirmed on 201 re-captured from the S3 page: 104 of 104 with fighters yes, 89 of 89 without no; 7
+  of 8 with one fighter entering a bare stage read no).
+- **Spans (S4-D).** A gate writes `sheet_span <sid> <mid> <leg> <lo-hi | f1,f2,...>` after the moment's `at` row: about
+  9 frames across the judged event (the moment's own frame among them), or an explicit list kept whole. Each frame is
+  proven on the moment's own basis: `log` at that frame, `event` over the window widened to it, and `fields` on the
+  gate's per-frame field trace handed over with `sheet_trace <sid> <leg> <file> <FIELDS>` (a `fields` span without a
+  trace, or a span on any other basis, is refused).
+- **Inputs (S4-E).** `sheet_inputs <sid> <n>` (n ≤ 18) on an `anchors` sheet photographs, in EACH round of the
+  reference leg, up to n frames where its replay starts an input, spread over those onsets, and, when a round has
+  fewer onsets than n, the rest spread over the frames an input is held there; each proven on every leg's log.
+- **Verdict words (S4-C).** The page carries a legend of every proof status, role, term, common verdict word and move
+  notation. A gate whose verdicts use an upper-case word of its own declares it beside its `# SHEET:` line:
+
+      # SHEET-VERDICTS: WORD = meaning; WORD = meaning
+
+  An upper-case verdict word defined nowhere is listed under "Undefined tags" at the top of the page's index;
+  `tests/test_sheet_census.sh` holds the line well formed.
+- **Pages (S4-F).** `index.html` holds the provenance, the legend, the indexes and the lists; each gate has its own page
+  under `g/`, split by sheet above `PAGE_TILES` (400) pictures; pictures load lazily and are MOVED into `pics/` (one
+  copy). A judged frame where no leg shows a fighter goes to the sheet's "Judged frames without fighters" strip.
+Ground truth: `tests/test_proof_sheets.sh` sections 6-9 (controls `fighters-blind`, `span-blind`, `inputs-unbounded`,
+`undefined-tag`, `no-split`, `strip-ignored`).
 
 **The S2 placement:** the line follows the gate's `# FOLLOWS:` block. **What a retrofit is checked by** (each S2 gate,
 `build/agent205/s2/check_gate.sh`, local): the gate run plainly and with `SHEET_OUT`, the two outputs identical once the

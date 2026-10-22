@@ -76,14 +76,15 @@ gates in parallel (#299; a close runs `--jobs 8`, ruled 2026-10-19).
 7. **#296 — the code half is in** (14z-206, STATE 14z-206 (4)): the phase-A sandbox key and `run_mame.sh`'s
    refusal of a reused sandbox. Its "done when": the mame and fbneo lanes green with the refusal on (the command is
    in `build/agent206/t296/REPORT.md`), then the closure through the rule-checker.
-8. **#286 — the scorer judges as `predict()` does** (14z-206, STATE 14z-206 (5)); the narrowings plus N-F-LINK are
-   `build/agent206/t286/landing.diff`, NOT applied. Waits on PILOT: `build/agent206/t286/pilot_rescore.sh` on the
-   traces `~/t205/x2/tr`, then a rule-checker packet as `build/agent206/t286/REPORT.md` item 13 names it.
+8. **#286 — the scorer judges as `predict()` does; the narrowings plus N-F-LINK are applied** (14z-206, STATE 14z-206
+   (5); PILOT's rescore 0 misses, rule-checker run `2026-10-22-1169` OK). What is left is the done-when itself: a
+   record-only commit's `--confirm` tier measured, re-running only the gates that open a record file, controls only
+   where real inputs changed, with the before/after figures on the ticket.
 9. **#297 stays open until a freeze has run the 109 moved gates green**; a freeze runs every gate anyway.
 10. **Then ask the maintainer for the order of work.** The open tickets by their GitHub severity label:
    - high: #286;
    - medium: #296, #284;
-   - low: #118, #229, #244, #301 (and #129, parked);
+   - low: #118, #229, #244, #301, #308 (and #129, parked);
    - no severity label: #266, #267, #289, #291, #297, #298, #299, #302, #303, #304, #305, #306, #307;
    - **release-only:** #278, #279, #280, #281.
 11. **`tests/replays/118_chain.rpl`'s header names a leg of `audit_mizuumi_inputs` that gate never ran** (STATE_HISTORY

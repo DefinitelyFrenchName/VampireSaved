@@ -9,7 +9,10 @@
 #   assigns only `__sheet_` names (sh has no locals, and a gate's own variable must survive a call); the page reads each
 #   gate's own verdict line, prefixed forms included, never a control or an indented line (14z-205); every section of
 #   docs/project/sheet_notes.md names a gate that exists, and a note renders its paragraphs, bullets, bold, code and
-#   issue links with everything else escaped (14z-205).
+#   issue links with everything else escaped (14z-205); and (#291 S4, 14z-206) every `legs` gate shows about 9 frames
+#   per judged event — its code writes span or inputs rows, or it proves only by the event basis or its own files — or
+#   is on the shrink-only span debt list tests/expected/sheet_span_debt.txt, and a `# SHEET-VERDICTS:` line is well
+#   formed.
 # HOW: tools/proof_sheets.py's own reader (`census`, `parse_declaration`, `read_sheet`) — the one the sheet tool uses —
 #   over tests/, the registry and the debt list; fixture declarations and sheet files for the refusals; four controls
 #   on perturbed copies.
@@ -17,12 +20,15 @@
 #   sheet, or a debt row that should be gone. It does not claim a sheet is RIGHT: tests/test_proof_sheets.sh proves
 #   the pictures, and each gate's verdict is its own.
 # FOLLOWS: tests/ tools/proof_sheets.py tests/lib/sheet.sh tests/ci_emulator.tsv tests/expected/sheet_debt.txt tests/lib/controls.sh
+#   tests/expected/sheet_span_debt.txt
 #   docs/project/sheet_notes.md
 #
 # MUST-FIRE: perturbed-copy: dropped-declaration — a copy of tests/ with one declaring gate's `# SHEET:` line neutered must be named as a registered gate with no line and not on the debt list (section 1 fails)
 # MUST-FIRE: perturbed-copy: silent-legs — a copy with one legs gate's source line for tests/lib/sheet.sh commented out must be named as declaring legs and writing no sheet (section 1 fails)
 # MUST-FIRE: perturbed-copy: leaky-helper — a copy of tests/lib/sheet.sh with one helper variable renamed out of the `__sheet_` prefix (the 14z-204 `_sf` collision, which overwrote audit_merged_legacy's frame variable) must be named (section 4 fails)
 # MUST-FIRE: perturbed-copy: orphan-note — a copy of docs/project/sheet_notes.md with a section for a gate that does not exist must be named (section 3c fails), so a note cannot outlive or misname its gate
+# MUST-FIRE: perturbed-copy: span-debt-regrown — a copy of the span debt list with a spanned gate added back must be named as a row that should be gone (section 1 fails), or the span list does not only shrink
+# MUST-FIRE: perturbed-copy: span-dropped — a copy of tests/ with one spanned gate's span rows neutered must be named as a legs gate with no span and not on the span debt list (section 1 fails)
 # MUST-FIRE: perturbed-copy: debt-regrown — a copy of the debt list with a declaring gate added back must be named as a row that should be gone (section 1 fails), or the list does not only shrink
 #
 # Usage: tests/test_sheet_census.sh   # ci_portable, ROM-free, ~2 s
@@ -35,8 +41,13 @@ DEBT=tests/expected/sheet_debt.txt
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 bad=0; ok() { echo "  ok    $1"; }; nope() { echo "  FAIL  $1"; bad=$((bad + 1)); }
 
-census() {  # census <tests dir> <debt file> -> the tool's rows and PROBLEM lines; status 1 on a problem
-    python3 tools/proof_sheets.py census --tests "$1" --registry "$REG" --debt "$2"
+SPAN_DEBT=tests/expected/sheet_span_debt.txt
+census() {  # census <tests dir> <debt file> [<span debt file>] -> the tool's rows and PROBLEM lines; status 1 on a problem
+    python3 tools/proof_sheets.py census --tests "$1" --registry "$REG" --debt "$2" --span-debt "${3:-$SSPAN}"
+}
+SPANNED=audit_move_parity     # a gate whose code writes span rows (#291 S4-D)
+neuter_span() {  # neuter_span <dir> <gate> — the span-dropped perturbation: the gate's span and trace writers renamed away
+    perl -pi -e 's/\bsheet_span\b/sheet_spxn/g; s/span\\t/spxn\\t/g' "$1/$2.sh"
 }
 first_legs() {  # the first gate the real census classes `legs`
     census tests "$DEBT" | awk -F'\t' '$1 == "legs" {print $2; exit}'
@@ -57,7 +68,7 @@ leak_copy() {  # leak_copy <out> — the leaky-helper perturbation: the row loop
 }
 
 # THE EXECUTABLE FORM: under CONTROL=<name> the perturbed copy IS the input.
-SRC=tests; SDEBT="$DEBT"; LIB=tests/lib/sheet.sh; NOTES=docs/project/sheet_notes.md
+SRC=tests; SDEBT="$DEBT"; SSPAN="$SPAN_DEBT"; LIB=tests/lib/sheet.sh; NOTES=docs/project/sheet_notes.md
 orphan_copy() {  # orphan_copy <out> — the orphan-note perturbation: a section for a gate that does not exist
     { cat "$NOTES"; printf '\n## audit_no_such_gate\n\nA note whose gate does not exist.\n'; } > "$1"
 }
@@ -72,6 +83,10 @@ elif vs_ctl_is orphan-note; then
     orphan_copy "$W/notes_in.md"; NOTES="$W/notes_in.md"
 elif vs_ctl_is debt-regrown; then
     cp "$DEBT" "$W/debt"; echo "$L1" >> "$W/debt"; SDEBT="$W/debt"
+elif vs_ctl_is span-debt-regrown; then
+    cp "$SPAN_DEBT" "$W/sdebt"; echo "$SPANNED" >> "$W/sdebt"; SSPAN="$W/sdebt"
+elif vs_ctl_is span-dropped; then
+    mkdir -p "$W/in"; cp tests/*.sh "$W/in/"; SRC="$W/in"; neuter_span "$SRC" "$SPANNED"
 fi
 
 echo "== test_sheet_census: every emulator gate declares its comparative sheet, or is on the debt list (#291) =="
@@ -82,6 +97,8 @@ nr="$(command grep -c '^no-reference-leg	' "$W/got.txt")"; nd="$(command grep -c
 np="$(command grep -c '^no-picture	' "$W/got.txt")"
 echo "  measured: $nl legs, $nr no-reference-leg, $np no-picture, $nn none, $nd on the debt list"
 echo "NOTE: sheet.legs $nl no-reference-leg $nr no-picture $np none $nn debt $nd"
+nsd="$(command grep -cv '^#' "$SSPAN")"
+echo "  span debt: $nsd of the $nl legs gates still show one frame per judged event ($SSPAN)"
 if [ "$rc" = 0 ] && ! command grep -q '^PROBLEM' "$W/got.txt"; then
     ok "every registered gate declares one well-formed line or is on the debt list; every legs gate sources tests/lib/sheet.sh"
 else
@@ -198,6 +215,15 @@ orphan_copy "$W/notes_orphan.md"
 if orphans "$W/notes_orphan.md" | command grep -qx audit_no_such_gate; then
     vs_ctl_fired orphan-note "a notes copy with a section for audit_no_such_gate is named"
 else vs_ctl_dead orphan-note "a notes copy with a section for a missing gate was not named"; nope "control orphan-note"; fi
+
+cp "$SPAN_DEBT" "$W/sdebt2"; echo "$SPANNED" >> "$W/sdebt2"
+if census tests "$DEBT" "$W/sdebt2" | command grep -q "^PROBLEM	$SPANNED: writes spans but is still on the span debt list"; then
+    vs_ctl_fired span-debt-regrown "$SPANNED added back to the span debt list is named as a row that should be gone"
+else vs_ctl_dead span-debt-regrown "$SPANNED added back to the span debt list was not named"; nope "control span-debt-regrown"; fi
+mkdir -p "$W/t3"; cp tests/*.sh "$W/t3/"; neuter_span "$W/t3" "$SPANNED"
+if census "$W/t3" "$DEBT" "$SPAN_DEBT" | command grep -q "^PROBLEM	$SPANNED: a \`legs\` gate with no span"; then
+    vs_ctl_fired span-dropped "$SPANNED with its span rows neutered is named: no span, not on the span debt list"
+else vs_ctl_dead span-dropped "$SPANNED with its span rows neutered was not named"; nope "control span-dropped"; fi
 
 leak_copy "$W/leak.sh"
 if [ -n "$(leaks "$W/leak.sh")" ]; then vs_ctl_fired leaky-helper "a copy whose row loop uses _sf is named: $(leaks "$W/leak.sh" | tr '\n' ' ')"

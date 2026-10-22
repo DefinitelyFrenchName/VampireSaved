@@ -11,12 +11,13 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**307 tickets** — status: open 25 · parked 9 · done 243 · declined 12 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 207 · cosmetic 17 · evolution 83 · **backfill debt: 0 rows**.
+**308 tickets** — status: open 26 · parked 9 · done 243 · declined 12 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 208 · cosmetic 17 · evolution 83 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#308](https://github.com/DefinitelyFrenchName/VampireSaved/issues/308) | bug | open | On Windows the release generator writes cp1252 and test_readme_recording writes CRLF, so the gate cannot pass there | `tests/test_readme_recording.sh` · `tools/package_release_platforms.py` | none | none | none | 14z-206 |
 | [#307](https://github.com/DefinitelyFrenchName/VampireSaved/issues/307) | evolution | open | build/ has no retention rule for logs and session evidence (47 GB, 1,134 entries); measure what references each family before pruning | none | none | none | none | 14z-206 |
 | [#306](https://github.com/DefinitelyFrenchName/VampireSaved/issues/306) | bug | open | Nine emulator gates default to build/donovan6, which only test_m2b_stage6 builds; a clean checkout's order decides whether they find it | none | none | none | none | 14z-206 |
 | [#305](https://github.com/DefinitelyFrenchName/VampireSaved/issues/305) | bug | open | The emulator tier has no decrypt-view warm-up, and build_donovan.sh writes the view cache non-atomically (#299's two gaps) | none | none | none | none | 14z-206 |

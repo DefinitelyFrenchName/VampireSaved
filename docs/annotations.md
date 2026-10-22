@@ -283,7 +283,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x00F85A` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] |
 | `PRG:0x00F8EE` | docs/game/engine_internals.md — The child companion's shadow — a remapped tile never copied (fixed 14z-69o) |
 | `PRG:0x00F954` | docs/game/engine_internals.md — The WIN-QUOTE TEXT SYSTEM — fully decoded (14z-76) [vs2]; docs/project/patch_index.md — DEFERRED BY MAINTAINER DECISION (14z-76) — the win-quote bank relocation [vs2]; tools/decode_win_quotes.py |
-| `PRG:0x010000` | docs/game/atlas/select_screen.md — The wheel DRAWER — object, bank word, and the bank-5 move (14z-63); docs/game/engine_internals.md — GFX ROM (sprite/tile) subsystem; docs/game/engine_internals.md — The QSound Z80 driver: id table, songs, streams, sample records (measured 14z-86, reader-traced on live vsavj, id 0x119); docs/game/engine_internals.md — The WIN-QUOTE TEXT SYSTEM — fully decoded (14z-76); docs/game/engine_internals.md — The Z80 command dispatch, the note-table array, the dead type-C song class and the alias bit (measured 14z-86, the voice batch); docs/platform/gotchas.md — A member's REGION layout is not its FILE layout — and the Z80 driver's own address space is a THIRD thing (14z-86); +47 more |
+| `PRG:0x010000` | docs/game/atlas/select_screen.md — The wheel DRAWER — object, bank word, and the bank-5 move (14z-63); docs/game/engine_internals.md — GFX ROM (sprite/tile) subsystem; docs/game/engine_internals.md — The QSound Z80 driver: id table, songs, streams, sample records (measured 14z-86, reader-traced on live vsavj, id 0x119); docs/game/engine_internals.md — The WIN-QUOTE TEXT SYSTEM — fully decoded (14z-76); docs/game/engine_internals.md — The Z80 command dispatch, the note-table array, the dead type-C song class and the alias bit (measured 14z-86, the voice batch); docs/platform/gotchas.md — A member's REGION layout is not its FILE layout — and the Z80 driver's own address space is a THIRD thing (14z-86); +48 more |
 | `PRG:0x0104C8` | docs/platform/gotchas.md — PC-relative reads are DECRYPTED reads on CPS-2 (paid: 2026-07-25, ~45min) |
 | `PRG:0x010A80` | docs/game/engine_internals.md — GFX ROM (sprite/tile) subsystem |
 | `PRG:0x010DFA` | docs/project/patch_notes.md — B. the obj_hook dispatch sites left VANILLA — the WALKER is relocated; build/manifest/donovan.toml — obj_hook; build/manifest/huitzil.toml — obj_hook; build/manifest/pyron.toml — obj_hook |
@@ -1696,7 +1696,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x03E556` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x03ED4C` | docs/game/engine_internals.md — Select-screen (portrait/name) pipeline — mapped (session 14c) [vs2] |
 | `PRG:0x03FFFF` | docs/game/engine_internals.md — GFX ROM (sprite/tile) subsystem; tests/lua/scroll3_watch.lua; tools/gfx_tiles.py |
-| `PRG:0x040000` | docs/game/atlas/ram.md — System / match globals; docs/game/engine_internals.md — GFX ROM (sprite/tile) subsystem; docs/game/engine_internals.md — The QSound Z80 driver: id table, songs, streams, sample records (measured 14z-86, reader-traced on live vsavj, id 0x119); docs/game/gotchas.md — The attract INTRO CUTSCENE is Jedah — per-char display sites are legacy surface; docs/project/gotchas.md — "Run once at match start" is a TIMING TRAP — use a match-active countdown; docs/project/mister_map.md — As mapped (the proposal); +26 more |
+| `PRG:0x040000` | docs/game/atlas/ram.md — System / match globals; docs/game/engine_internals.md — GFX ROM (sprite/tile) subsystem; docs/game/engine_internals.md — The QSound Z80 driver: id table, songs, streams, sample records (measured 14z-86, reader-traced on live vsavj, id 0x119); docs/game/gotchas.md — The attract INTRO CUTSCENE is Jedah — per-char display sites are legacy surface; docs/project/gotchas.md — "Run once at match start" is a TIMING TRAP — use a match-active countdown; docs/project/mister_map.md — As mapped (the proposal); +29 more |
 | `PRG:0x0402F4` | docs/project/mister_fit.md — 1. Program ROM (68k) |
 | `PRG:0x0409EC` | docs/game/atlas/id_space.md — The seven vsavj folding sites; docs/game/atlas/id_space.md — What a per-tenant manifest must declare; docs/project/tenant_manifest.md — The schema |
 | `PRG:0x040AF6` | docs/project/gotchas.md — A frozen build stops being a usable REFERENCE when the profile bumps (14z-92); tests/test_merged_render_content.sh |
@@ -3423,7 +3423,7 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x05FFA0` | tools/decode_stage_banners.py |
 | `PRG:0x05FFC0` | tools/decode_stage_banners.py |
 | `PRG:0x05FFFF` | tools/gfx_tiles.py |
-| `PRG:0x060000` | tests/audit_empty_tiles.sh; tests/audit_grenade_ground_tiles.sh; tools/gen_donovan_patch.py |
+| `PRG:0x060000` | tests/audit_empty_tiles.sh; tests/audit_grenade_ground_tiles.sh; tools/gen_donovan_patch.py; tools/proof_sheets.py |
 | `PRG:0x0603DE` | tests/test_roulette_tag_rows.sh |
 | `PRG:0x06041E` | tests/test_roulette_tag_rows.sh |
 | `PRG:0x0616F8` | tools/overlay_port.py |

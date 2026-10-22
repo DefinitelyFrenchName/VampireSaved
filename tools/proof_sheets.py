@@ -154,7 +154,7 @@ def read_debt(debt):
     return [l.strip() for l in Path(debt).read_text().splitlines() if l.strip() and not l.startswith("#")]
 
 
-def census(tests, registry, debt):
+def census(tests, registry, debt, span_debt=None):
     """-> (rows, problems). rows: (gate, class) with class legs|none|no-reference-leg|no-picture|debt."""
     gates = [r[0] for r in registry_gates(registry)]
     owed = read_debt(debt)
@@ -183,14 +183,50 @@ def census(tests, registry, debt):
             problems.append("%s: declares `# SHEET: %s` but is still in the debt list — remove it (the list only shrinks)" % (g, d["kind"]))
         if d["kind"] == "legs" and not sources_sheet_lib(p):
             problems.append("%s: declares legs but never sources tests/lib/sheet.sh — it would write no sheet" % g)
+        for e in parse_verdict_legend(p)[1]:           # #291 S4-C: a gate's own verdict words, well formed
+            problems.append("%s: %s" % (g, e))
         rows.append((g, d["kind"]))
     for g in sorted(owed_set - set(gates)):
         problems.append("%s: in the debt list but not an emulator-registry gate — remove it" % g)
+    problems += span_census(tests, [g for g, c in rows if c == "legs"], span_debt or ROOT / "tests/expected/sheet_span_debt.txt")
     return rows, problems
 
 
+SPAN_ROWS = re.compile(r"\bsheet_(span|inputs)\b|[\"']span\\t")
+EVENT_OR_FILE = re.compile(r"\bsheet_(tap|file)\b")
+FIELDS_BASIS = re.compile(r"[\"']fields[\"']|\\tfields\\t|fields\\t")
+
+
+def spanned_source(text):
+    """A gate's code writes spans or inputs, or proves only by the event basis or its own files (no `fields` moment)."""
+    return bool(SPAN_ROWS.search(text) or (EVENT_OR_FILE.search(text) and not FIELDS_BASIS.search(text)))
+
+
+def span_census(tests, legs_gates, span_debt):
+    """#291 S4-D/E: every `legs` gate shows about 9 frames per judged event, or is on the shrink-only span debt list
+    (tests/expected/sheet_span_debt.txt, the retrofit's work list). A gate counts as spanned when its code writes span
+    or inputs rows, or proves by the event basis (`sheet_tap`: an event moment's window is spanned by default), or
+    compares its own golden files (`sheet_file`: a JUDGED FILE has no frames to add)."""
+    owed = read_debt(span_debt)
+    if owed is None:
+        return ["no span debt list at %s" % span_debt]
+    out = []
+    for g in legs_gates:
+        spanned = spanned_source((Path(tests) / (g + ".sh")).read_text(errors="replace"))
+        if spanned and g in owed:
+            out.append("%s: writes spans but is still on the span debt list — remove it (the list only shrinks)" % g)
+        elif not spanned and g not in owed:
+            out.append("%s: a `legs` gate with no span, inputs or event moments and not on the span debt list" % g)
+    for g in sorted(set(owed) - set(legs_gates)):
+        out.append("%s: on the span debt list but not a `legs` gate — remove it" % g)
+    return out
+
+
 # ── the sheet file ──────────────────────────────────────────────────────────────────────────────────────────────
-WIDTH = {"sheet": 6, "leg": 11, "moment": 6, "at": 7, "anchors": 2, "tap": 5}
+WIDTH = {"sheet": 6, "leg": 11, "moment": 6, "at": 7, "anchors": 2, "tap": 5, "trace": 5, "span": 5, "inputs": 3}
+SPAN_N = 9          # #291 S4-D (the maintainer, Q1): about 9 tiles per judged event, "unless it currently has more than 9
+                    # tiles already in which case keep the current number" — an explicit frame list is kept whole
+INPUTS_MAX = 18     # #291 S4-E (the maintainer, Q2): "at the replay's inputs, up to 18 frames" — "18 per round" (2026-10-21)
 
 
 def read_sheet(d):
@@ -208,7 +244,7 @@ def read_sheet(d):
                 raise ValueError("sheet.tsv:%d: sheet %s declared twice" % (n, sid))
             sheets[sid] = {"sid": sid, "title": f[2], "chars": [] if f[3] == "-" else f[3].split(","),
                            "tickets": [] if f[4] == "-" else f[4].split(","), "not_comparable": f[5],
-                           "legs": {}, "moments": {}, "mids": [], "anchors": False}
+                           "legs": {}, "moments": {}, "mids": [], "anchors": False, "inputs": None}
             order.append(sid)
             continue
         if sid not in sheets:
@@ -233,6 +269,24 @@ def read_sheet(d):
             s["moments"][f[2]]["at"][f[3]] = {"frame": int(f[4]), "basis": f[5], "expect": f[6]}
         elif kind == "anchors":
             s["anchors"] = True
+        elif kind == "inputs":
+            if not re.match(r"^\d+$", f[2]) or not 0 < int(f[2]) <= INPUTS_MAX:
+                raise ValueError("sheet.tsv:%d: inputs takes 1..%d frames, not %r" % (n, INPUTS_MAX, f[2]))
+            s["inputs"] = int(f[2])
+        elif kind == "trace":
+            if f[2] not in s["legs"]:
+                raise ValueError("sheet.tsv:%d: trace row for undeclared leg %s" % (n, f[2]))
+            s["legs"][f[2]]["trace"] = {"file": f[3], "spec": parse_trace_spec(f[4], n)}
+        elif kind == "span":
+            m = s["moments"].get(f[2])
+            if m is None or f[3] not in m["at"]:
+                raise ValueError("sheet.tsv:%d: span row before the at-row of moment %s leg %s" % (n, f[2], f[3]))
+            at = m["at"][f[3]]
+            if at["basis"] not in ("log", "fields", "event"):
+                raise ValueError("sheet.tsv:%d: a span proves each frame on the moment's basis; basis %r cannot (log, fields or event)" % (n, at["basis"]))
+            if at["basis"] == "fields" and not s["legs"][f[3]].get("trace"):
+                raise ValueError("sheet.tsv:%d: a fields span needs the leg's trace row first (the gate's per-frame trace proves each frame)" % n)
+            m.setdefault("span", {})[f[3]] = span_frames(f[4], at["frame"], n)
         elif kind == "tap":
             if f[2] not in s["legs"]:
                 raise ValueError("sheet.tsv:%d: tap row for undeclared leg %s" % (n, f[2]))
@@ -246,7 +300,55 @@ def read_sheet(d):
                 else:
                     raise ValueError("sheet.tsv:%d: tap env entry %r is not NAME=value" % (n, kv))
             s["legs"][f[2]]["tap"] = {"script": f[3], "env": env}
+    for s in sheets.values():          # S4-D: an `event` moment's own window IS its judged event: spanned by default
+        for m in s["moments"].values():
+            for leg, at in m["at"].items():
+                ev = re.match(r"^(.+):(\d+)-(\d+)$", at["expect"]) if at["basis"] == "event" else None
+                if ev and leg not in m.get("span", {}):
+                    m.setdefault("span", {})[leg] = span_frames("%s-%s" % (ev.group(2), ev.group(3)), at["frame"])
     return [sheets[k] for k in order]
+
+
+def parse_trace_spec(spec, n=0):
+    """A trace row's FIELDS spec, field_trace.lua's `addr:size:name,...` -> {name: "addr:size"} (the at-rows' key form)."""
+    out = {}
+    for item in spec.split(","):
+        m = re.match(r"^\s*([0-9a-fA-F]+):([bwl]):([A-Za-z0-9_.]+)\s*$", item)
+        if not m:
+            raise ValueError("sheet.tsv:%d: trace spec entry %r is not addr:size:name" % (n, item))
+        out[m.group(3)] = "%s:%s" % (m.group(1).lower(), m.group(2))
+    return out
+
+
+def span_frames(spec, keep, n=0):
+    """A span row's frames: `lo-hi` -> SPAN_N frames spread evenly across the window, the moment's own frame among
+    them; `a,b,c` -> exactly those (an explicit list is kept whole: Q1). Always sorted, unique, `keep` included."""
+    m = re.match(r"^(\d+)-(\d+)$", spec)
+    if m:
+        lo, hi = int(m.group(1)), int(m.group(2))
+        if lo > hi:
+            raise ValueError("sheet.tsv:%d: span %s is inverted" % (n, spec))
+        if hi - lo + 1 <= SPAN_N:
+            fr = list(range(lo, hi + 1))
+        else:
+            fr = sorted({lo + round(i * (hi - lo) / (SPAN_N - 1)) for i in range(SPAN_N)})
+            if keep not in fr and lo <= keep <= hi:
+                fr[min(range(len(fr)), key=lambda i: abs(fr[i] - keep))] = keep
+    elif re.match(r"^\d+(,\d+)*$", spec):
+        fr = [int(x) for x in spec.split(",")]
+    else:
+        raise ValueError("sheet.tsv:%d: span %r is neither lo-hi nor a frame list" % (n, spec))
+    return sorted(set(fr) | {keep})
+
+
+def read_trace(path):
+    """field_trace.lua's file -> {frame: {name: value}}."""
+    out = {}
+    for line in Path(path).read_text(errors="replace").splitlines():
+        t = line.split()
+        if len(t) >= 2 and t[0] == "F" and t[1].isdigit():
+            out[int(t[1])] = {k: int(v) for k, _, v in (kv.partition("=") for kv in t[2:]) if re.match(r"^-?\d+$", v)}
+    return out
 
 
 def abs_rompath(rp):
@@ -276,18 +378,54 @@ def parse_fields(spec):
     return out
 
 
+def parse_screen(text):
+    """tests/lua/screen_state.lua's `R` line body -> {name: int} (m4/m8 are hex, the rest decimal)."""
+    out = {}
+    for kv in text.split():
+        k, _, v = kv.partition("=")
+        out[k] = int(v, 16) if k in ("m4", "m8") else int(v)
+    return out
+
+
+MATCH_M8 = (0x40000, 0x60000)     # $FF8008 in a match: fighting, and the frame the next round spawns
+
+
+def fighters(sc):
+    """#291 S4-B: are the fighters on screen in this picture? -> "yes" | "no" | None (no state was read).
+    "yes" = a match is on ($FF8004 0x40000, $FF8008 0x40000 or 0x60000) and the OBJ list draws at least one entry
+    with a fighter palette (0x01-0x09: tests/lua/screen_state.lua's `fp`). SCORED BEFORE IT WAS TRUSTED (14z-206,
+    build/agent206/t291/s4b/, local): chosen on 118 pictures classified by eye, then confirmed with this instrument on
+    all 201 of the sample (ten gates of the S3 page re-captured on this Mac, every picture proven): every one of the 104
+    showing the fighters read yes, every one of the 89 showing none read no, and 7 of the 8 showing ONE fighter entering
+    an otherwise bare stage read no (they go to the labelled strip, never dropped). tests/test_proof_sheets.sh section 6
+    holds five pictures of a frozen vanilla run to it."""
+    if not sc or "fp" not in sc:
+        return None
+    return "yes" if sc.get("m4") == 0x40000 and sc.get("m8") in MATCH_M8 and sc["fp"] >= 1 else "no"
+
+
 # ── capture and prove ───────────────────────────────────────────────────────────────────────────────────────────
-def capture(sheet_dir, s, leg, work):
+def leg_frames(s, leg):
+    """Every frame the leg is photographed at: its moments' frames (a `file` basis is the gate's own picture) and, since
+    #291 S4-D, every frame of their spans."""
+    fr = {a["frame"] for m in s["moments"].values() for l, a in m["at"].items() if l == leg and a["basis"] != "file"}
+    fr |= {f for m in s["moments"].values() for f in m.get("span", {}).get(leg, [])}
+    return sorted(fr)
+
+
+def capture(sheet_dir, s, leg, work, frames=None, tag=None):
     """Run one leg under sheet_capture.lua; -> {"C": {frame: hex}, "V": {frame: {spec: v}}, "A": [(frame, label)],
-    "S": {frame: png}, "error": str|None}."""
+    "S": {frame: png}, "R": {frame: screen state}, "error": str|None}. With `frames` (the S4-E inputs pass) only those
+    frames are photographed, without anchors, in a work dir of their own (`tag`)."""
     lg = s["legs"][leg]
-    frames = sorted({a["frame"] for m in s["moments"].values() for l, a in m["at"].items() if l == leg and a["basis"] != "file"})
+    anchors = s["anchors"] and frames is None
+    frames = leg_frames(s, leg) if frames is None else sorted(frames)
     specs = sorted({k for m in s["moments"].values() for l, a in m["at"].items()
                     if l == leg and a["basis"] == "fields" for k in parse_fields(a["expect"])})
-    res = {"C": {}, "V": {}, "A": [], "S": {}, "T": None, "error": None, "capped": None}
-    if not frames and not s["anchors"]:
+    res = {"C": {}, "V": {}, "A": [], "S": {}, "R": {}, "T": None, "error": None, "capped": None}
+    if not frames and not anchors:
         return res
-    w = Path(work) / ("%s.%s" % (s["sid"], leg))
+    w = Path(work) / ("%s.%s%s" % (s["sid"], leg, "." + tag if tag else ""))
     shutil.rmtree(w, ignore_errors=True)
     w.mkdir(parents=True)
     if lg.get("tap"):
@@ -295,7 +433,7 @@ def capture(sheet_dir, s, leg, work):
     env = dict(os.environ, MAME_SANDBOX=str(w / "sb"), MAME_ROMPATH=lg["rompath"],
                REPLAY=str(Path(sheet_dir) / lg["replay"]), POKES=lg["pokes"], MASK_RANGES=lg["mask"],
                SNAP_FRAMES=",".join(map(str, frames)), FIELDS=",".join(specs), CAPTURE_OUT=str(w / "cap.txt"),
-               FRAMES=str(lg["frames"] if s["anchors"] else max(frames) + 1), ANCHORS="1" if s["anchors"] else "")
+               FRAMES=str(lg["frames"] if anchors else max(frames) + 1), ANCHORS="1" if anchors else "")
     for k in ("POKES", "MASK_RANGES", "FIELDS", "ANCHORS"):
         if not env[k]:
             env.pop(k)
@@ -316,6 +454,8 @@ def capture(sheet_dir, s, leg, work):
             res["V"][int(t[1])] = parse_fields(t[2])
         elif t[0] == "A":
             res["A"].append((int(t[1]), t[2]))
+        elif t[0] == "R":
+            res["R"][int(t[1])] = parse_screen(t[2])
         elif t[0] == "ACAP":
             res["capped"] = "anchors capped by ANCHOR_MAX: the next, %s at f%s, and any after it are not drawn" % (t[2], t[1])
         elif t[0] == "S":
@@ -349,6 +489,8 @@ def capture_tap(sheet_dir, lg, frames, w, res):
     snaps = sorted(glob.glob(str(w / "sb" / "snap" / "*" / "*.png")))
     for line in (w / "wrap.txt").read_text().splitlines():
         t = line.split()
+        if len(t) > 2 and t[0] == "R":
+            res["R"][int(t[1])] = parse_screen(line.split(" ", 2)[2])
         if len(t) == 3 and t[0] == "S":
             hit = [p for p in snaps if os.path.basename(p) == "%04d.png" % int(t[1])]
             if hit:
@@ -420,24 +562,119 @@ def prove(at, lg, cap, sheet_dir):
     return "PROVEN", "the %d compared field(s) at f%d equal the gate's" % (len(want), fr)
 
 
+def prove_span_frame(fr, at, lg, cap, sheet_dir, traces):
+    """One frame of a moment's span, proven on the moment's own basis (#291 S4-D): `log` at that frame of the leg's
+    log; `fields` the moment's compared fields read from the gate's per-frame trace at that frame; `event` the gate's
+    tap lines over the moment's window widened to reach the frame. -> (status, why)."""
+    if at["basis"] == "log":
+        return prove({"frame": fr, "basis": "log", "expect": "-"}, lg, cap, sheet_dir)
+    if at["basis"] == "fields":
+        tr = traces.get(lg["leg"])
+        if tr is None:
+            tr = traces[lg["leg"]] = read_trace(Path(sheet_dir) / lg["trace"]["file"])
+        row = tr.get(fr)
+        if row is None:
+            return "UNPROVEN", "the gate's trace has no f%d" % fr
+        by_key = {v: k for k, v in lg["trace"]["spec"].items()}
+        keys = list(parse_fields(at["expect"]))
+        missing = [k for k in keys if k not in by_key or by_key[k] not in row]
+        if missing:
+            return "UNPROVEN", "the gate's trace does not carry %s" % ", ".join(missing[:3])
+        return prove({"frame": fr, "basis": "fields", "expect": ",".join("%s=%d" % (k, row[by_key[k]]) for k in keys)}, lg, cap, sheet_dir)
+    m = re.match(r"^(.+):(\d+)-(\d+)$", at["expect"])
+    if not m:
+        return "NOT THE JUDGED RUN", "an event expectation is <log>:<lo>-<hi>, not %r" % at["expect"]
+    lo, hi = min(int(m.group(2)), fr), max(int(m.group(3)), fr)
+    return prove({"frame": fr, "basis": "event", "expect": "%s:%d-%d" % (m.group(1), lo, hi)}, lg, cap, sheet_dir)
+
+
+def replay_inputs(path):
+    """A replay's inputs (replay.lua grammar) -> (onsets, held): the frames at which a range starts holding an input,
+    and every frame some input is held."""
+    on, held = set(), set()
+    for line in Path(path).read_text(errors="replace").splitlines():
+        body = line.split("#", 1)[0].split()
+        if len(body) >= 2:
+            m = re.match(r"^(\d+)(?:-(\d+))?$", body[0])
+            if m and any(re.match(r"^(p1|p2|sys)=\S+$", x) for x in body[1:]):
+                a = int(m.group(1)); b = int(m.group(2) or a)
+                on.add(a); held.update(range(a, b + 1))
+    return sorted(on), sorted(held)
+
+
+def spread(frames, n):
+    """n of `frames` spread evenly (all of them when there are no more than n)."""
+    if len(frames) <= n:
+        return list(frames)
+    return [frames[round(i * (len(frames) - 1) / (n - 1))] for i in range(n)] if n > 1 else frames[:1]
+
+
+def rounds(anchors, last):
+    """The in-round windows of a leg from its anchors: each `round start` to the next anchor that ends the fight (a
+    down settling or any other round-phase change), or the leg's last frame."""
+    out, open_at = [], None
+    for fr, label in anchors:
+        if label == "round start":
+            if open_at is not None:
+                out.append((open_at, fr - 1))
+            open_at = fr
+        elif open_at is not None and (label.startswith("down settles") or label.startswith("round phase")):
+            out.append((open_at, fr))
+            open_at = None
+    if open_at is not None:
+        out.append((open_at, last))
+    return out
+
+
+def input_picks(s, ref, cap, sheet_dir):
+    """#291 S4-E (Q2, "at the replay's inputs, up to 18 frames"; the maintainer 2026-10-21: "18 per round"): in EACH
+    round of the REFERENCE leg (its anchors), up to s["inputs"] frames where its replay holds an input: the frames
+    where an input STARTS first, spread evenly when there are more; when there are fewer, the rest spread over the
+    frames an input is HELD (a replay of long held ranges, such as Felicia's wall jump, has few onsets).
+    -> [(frame, label)]."""
+    lg = s["legs"][ref]
+    onsets, held = replay_inputs(Path(sheet_dir) / lg["replay"])
+    n, labels = s["inputs"], []
+    for k, (a, b) in enumerate(rounds(cap["A"], lg["frames"])):
+        on = spread([f for f in onsets if a < f <= b], n)
+        if len(on) < n:
+            taken = set(on)
+            on += spread([f for f in held if a < f <= b and f not in taken], n - len(on))
+        labels += [(f, "input at f%d (round %d)" % (f, k + 1)) for f in sorted(set(on))]
+    return labels
+
+
+def cell_of(st, why, fr, pic, cap):
+    return {"frame": fr, "status": st, "why": why, "pic": pic, "screen": cap["R"].get(fr) if fr is not None else None}
+
+
 def prove_dir(sheet_dir, jobs=4):
     """Capture and prove every sheet of one gate's SHEET_OUT; writes proof.json beside it and returns it."""
     sheet_dir = Path(sheet_dir).resolve()  # each capture runs in its own work dir: a relative path would not resolve there
     sheets = read_sheet(sheet_dir)
     work = sheet_dir / "capture"
-    tasks = [(s, leg) for s in sheets for leg in s["legs"]]
     caps = {}
-    with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, jobs)) as ex:
-        futs = {ex.submit(capture, sheet_dir, s, leg, work): (s["sid"], leg) for s, leg in tasks}
-        for fu in concurrent.futures.as_completed(futs):
-            caps[futs[fu]] = fu.result()
+
+    def run_all(tasks):
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, jobs)) as ex:
+            futs = {ex.submit(fn, *args): key for key, fn, args in tasks}
+            for fu in concurrent.futures.as_completed(futs):
+                caps[futs[fu]] = fu.result()
+    run_all([((s["sid"], leg), capture, (sheet_dir, s, leg, work)) for s in sheets for leg in s["legs"]])
+    picks = {}                                       # S4-E: the inputs pass needs the first pass's anchors
+    for s in sheets:
+        if s["inputs"] and s["anchors"]:
+            ref = sorted(s["legs"].values(), key=lambda l: (ROLES.index(l["role"]), l["leg"]))[0]["leg"]
+            picks[s["sid"]] = input_picks(s, ref, caps[(s["sid"], ref)], sheet_dir)
+    run_all([((s["sid"], leg, "inputs"), capture, (sheet_dir, s, leg, work, [f for f, _ in picks[s["sid"]]], "inputs"))
+             for s in sheets if picks.get(s["sid"]) for leg in s["legs"]])
     out = []
     for s in sheets:
         legs = sorted(s["legs"].values(), key=lambda l: (ROLES.index(l["role"]), l["leg"]))
-        cols = []
+        cols, traces = [], {}
         for mid in s["mids"]:
             m = s["moments"][mid]
-            cells = {}
+            cells, strip = {}, {}
             for lg in legs:
                 at = m["at"].get(lg["leg"])
                 if not at:
@@ -445,8 +682,18 @@ def prove_dir(sheet_dir, jobs=4):
                 cap = caps[(s["sid"], lg["leg"])]
                 st, why = ("NOT THE JUDGED RUN", cap["error"]) if cap["error"] and at["basis"] != "file" else prove(at, lg, cap, sheet_dir)
                 pic = str(sheet_dir / at["expect"]) if at["basis"] == "file" else cap["S"].get(at["frame"])
-                cells[lg["leg"]] = {"frame": at["frame"], "status": st, "why": why, "pic": pic}
-            cols.append({"label": m["label"], "verdict": m["verdict"], "values": m["values"], "cells": cells})
+                cells[lg["leg"]] = cell_of(st, why, at["frame"], pic, cap)
+                for fr in m.get("span", {}).get(lg["leg"], []):
+                    if fr == at["frame"]:
+                        x = dict(cells[lg["leg"]], moment=True)
+                    else:
+                        st2, why2 = ("NOT THE JUDGED RUN", cap["error"]) if cap["error"] else prove_span_frame(fr, at, lg, cap, sheet_dir, traces)
+                        x = dict(cell_of(st2, why2, fr, cap["S"].get(fr), cap), moment=False)
+                    strip.setdefault(lg["leg"], []).append(x)
+            col = {"label": m["label"], "verdict": m["verdict"], "values": m["values"], "cells": cells}
+            if strip:
+                col["strip"] = strip
+            cols.append(col)
         if s["anchors"]:
             ref = legs[0]["leg"]
             for k, (fr, label) in enumerate(caps[(s["sid"], ref)]["A"]):
@@ -454,21 +701,45 @@ def prove_dir(sheet_dir, jobs=4):
                 for lg in legs:
                     cap = caps[(s["sid"], lg["leg"])]
                     if k >= len(cap["A"]):
-                        cells[lg["leg"]] = {"frame": None, "status": "NOT THE JUDGED RUN", "why": "this leg has no anchor %d" % (k + 1), "pic": None}
+                        cells[lg["leg"]] = {"frame": None, "status": "NOT THE JUDGED RUN", "why": "this leg has no anchor %d" % (k + 1), "pic": None, "screen": None}
                         continue
                     afr, alabel = cap["A"][k]
                     st, why = prove({"frame": afr, "basis": "log", "expect": "-"}, lg, cap, sheet_dir)
                     if (afr, alabel) != (fr, label):
                         why += "; this leg's anchor %d is %s at f%d" % (k + 1, alabel, afr)
-                    cells[lg["leg"]] = {"frame": afr, "status": st, "why": why, "pic": cap["S"].get(afr)}
+                    cells[lg["leg"]] = cell_of(st, why, afr, cap["S"].get(afr), cap)
                 cols.append({"label": "anchor: " + label, "verdict": "-", "values": "-", "cells": cells})
+        for fr, label in picks.get(s["sid"], []):
+            cells = {}
+            for lg in legs:
+                cap = caps.get((s["sid"], lg["leg"], "inputs"))
+                if cap is None or cap["error"]:
+                    cells[lg["leg"]] = {"frame": fr, "status": "NOT THE JUDGED RUN", "why": (cap or {}).get("error") or "no inputs pass", "pic": None, "screen": None}
+                    continue
+                st, why = prove({"frame": fr, "basis": "log", "expect": "-"}, lg, cap, sheet_dir)
+                cells[lg["leg"]] = cell_of(st, why, fr, cap["S"].get(fr), cap)
+            cols.append({"label": label, "verdict": "-", "values": "-", "cells": cells, "input": True})
         capped = [("%s: %s" % (lg["leg"], caps[(s["sid"], lg["leg"])]["capped"])) for lg in legs
                   if caps[(s["sid"], lg["leg"])]["capped"]]
+        for c in cols:                                # S4-B: whether the fighters are on screen, read from the game's state
+            for x in all_cells(c):
+                x["fighters"] = fighters(x.get("screen"))
+            for xs in c.get("strip", {}).values():
+                for x in xs:
+                    x["fighters"] = fighters(x.get("screen"))
         out.append({"sid": s["sid"], "title": s["title"], "chars": s["chars"], "tickets": s["tickets"],
                     "not_comparable": s["not_comparable"], "capped": capped,
                     "legs": [{"leg": l["leg"], "role": l["role"], "set": l["set"], "rompath": l["rompath"]} for l in legs],
                     "cols": cols})
     (sheet_dir / "proof.json").write_text(json.dumps(out, indent=1))
+    return out
+
+
+def all_cells(col):
+    """Every picture cell of a column: the moment's own cells and, since S4-D, its strips' other frames."""
+    out = list(col["cells"].values())
+    for leg, xs in col.get("strip", {}).items():
+        out += [x for x in xs if not x.get("moment")]
     return out
 
 
@@ -559,6 +830,9 @@ table.grid{border-collapse:collapse} .grid td,.grid th{padding:4px;vertical-alig
 .idx a{margin-right:10px} a{color:var(--link)} .nc{font-size:12px;margin-top:6px}
 .note{background:var(--card);border-left:3px solid var(--link);padding:6px 12px;margin:6px 0 10px;max-width:900px}
 .note p{margin:6px 0} .note ul{margin:4px 0 6px 18px;padding:0}
+.strip .cell img{width:128px} .strip .cap{max-width:128px} .MOMENT img{border:3px solid var(--fg)}
+.mblock{margin:8px 0 12px} .mh{margin:4px 0} .legend,.nof{margin:8px 0} .lg dt{font-weight:600;margin-top:4px} .lg dd{margin:0 0 0 16px}
+h3{font-size:14px;margin:12px 0 4px}
 """
 
 
@@ -614,82 +888,276 @@ def note_html(text):
     return "".join(out)
 
 
+STATUS_LEGEND = [
+    ("PROVEN", "the re-run's state at this frame equals what the gate logged there: its per-frame work-RAM checksum "
+               "log, a checksum, or the RAM fields it compared — this picture is of the run the gate judged"),
+    ("EVENT-PROVEN", "the re-run, under the gate's own tap instrument, logged exactly the event lines the gate logged in "
+                     "the window around this frame; weaker than PROVEN: work RAM outside the tapped addresses is not proven"),
+    ("JUDGED FILE", "the picture the gate itself compared (a frozen golden), shown as it is"),
+    ("UNPROVEN", "the gate logged nothing that can prove this picture; shown, never claimed"),
+    ("NOT THE JUDGED RUN", "the re-run differs from what the gate judged at this frame (or ran on a build that is not "
+                           "the commit's): the picture is NOT evidence; red dashed border"),
+]
+ROLE_LEGEND = [
+    ("vs2", "native Vampire Savior 2 (vsav2), where the ported characters come from"),
+    ("vsavj", "vanilla Vampire Savior, Japan 970519 (vsavj), the game this romset extends"),
+    ("ours", "the build under test, made from the commit (the role row names its set and rom path)"),
+]
+TERM_LEGEND = [
+    ("f<N>", "a frame number: frames since power-on, 60 per second"),
+    ("moment", "one thing the gate judged (a column); its verdict is printed under its label"),
+    ("strip", "about 9 frames across a judged event, from its start to its recovery (#291 S4-D); the judged frame "
+              "itself has a thick border; every frame is proven on the moment's own basis"),
+    ("anchor: …", "a sync point found by the capture: round start, a down settling, the next round spawning, a "
+                  "round-phase change"),
+    ("input at f<N> (round k)", "a frame where the replay starts holding an input inside round k (#291 S4-E: up to 18 "
+                                "in each round)"),
+    ("fighters on screen", "read from the game's state at that frame, not from the picture (#291 S4-B): a match is on "
+                           "and the sprite list draws a fighter's palette; scored against pictures classed by eye; a "
+                           "judged frame where no leg shows a fighter is moved to the labelled strip under its sheet, "
+                           "never dropped"),
+    ("Judged frames without fighters", "frames the gate judged where no fighter is on screen (the round-end fade, the "
+                                       "stage before the drop-in, select/VS/continue screens, wipes); the maintainer's "
+                                       "Q3: kept, in a separate strip"),
+    ("Not comparable", "what differs between the legs by design, so a difference there is not a finding"),
+]
+VERDICT_LEGEND = [
+    ("IDENTICAL / IDENT / SAME", "the legs' compared values are equal at this moment"),
+    ("DIFF / DIFFER", "the legs' compared values differ at this moment; whether that is expected is the gate's verdict "
+                      "(a ruled difference, or a finding)"),
+    ("PASS / FAIL", "the gate's own check of this moment passed / failed"),
+    ("as frozen / as expected / as measured / as ruled", "equal to the gate's frozen expectation file, expected value, "
+                                                         "earlier measurement, or the maintainer's ruling"),
+    ("-", "a frame shown for context (an anchor or an input frame), not itself judged"),
+]
+NOTATION_LEGEND = [
+    ("1-9", "joystick directions, numpad layout for a fighter facing right: 6 forward, 4 back, 2 down, 8 up, 3 down-forward"),
+    ("LP MP HP / LK MK HK", "light, medium, heavy punch / kick; P or K alone = any strength"),
+    ("PP / KK / PPP", "two / three punches pressed together; [..] a button combination held together"),
+    ("j.", "in the air (jumping): j.66 is an air dash"),
+    ("~", "followed by"),
+    ("ES / EX", "an enhanced special (spends a stock) / the EX version of a special"),
+    ("DF", "Dark Force (each character's timed power-up mode)"),
+    ("GC", "guard cancel"),
+    ("P1 / P2", "player 1 (left start) / player 2"),
+]
+COMMON_TAGS = {"IDENTICAL", "IDENT", "SAME", "DIFF", "DIFFER", "PASS", "FAIL", "SKIP",     # the verdict legend
+               "LP", "MP", "HP", "LK", "MK", "HK", "PP", "KK", "PPP", "KKK", "ES", "EX", "DF", "GC"}   # the notation legend
+TAG = re.compile(r"\b[A-Z][A-Z0-9]+(?:-[A-Z0-9]+)*\b")
+SHEET_VERDICTS = re.compile(r"^#\s*SHEET-VERDICTS:\s*(.*)$")
+PAGE_TILES = 400        # #291 S4-F: a gate page is split by sheet above this many pictures (~11 MB at S3's 27.6 KB each)
+
+
+def parse_verdict_legend(path):
+    """A gate's `# SHEET-VERDICTS: WORD = meaning; WORD = meaning` lines -> ({word: meaning}, [errors])."""
+    out, errs = {}, []
+    if not path or not Path(path).exists():
+        return out, errs
+    for l in leading_block(path):
+        m = SHEET_VERDICTS.match(l)
+        if not m:
+            continue
+        for item in m.group(1).split(";"):
+            k, eq, v = item.partition("=")
+            if not eq or not k.strip() or not v.strip():
+                errs.append("`# SHEET-VERDICTS:` entry %r is not WORD = meaning" % item.strip()[:60])
+                continue
+            out[k.strip()] = v.strip()
+    return out, errs
+
+
+def undefined_tags(verdict, gate_words):
+    """The tags of a verdict string the legend does not define: every upper-case word (IDENTICAL, NO-MATCH, NOT-IN-DF)
+    must be a common verdict word or one the gate declares (`# SHEET-VERDICTS:`); prose (lower case) is read as prose."""
+    words = set(COMMON_TAGS) | {w for k in gate_words for w in TAG.findall(k)}
+    return sorted({w for w in TAG.findall(verdict or "") if w not in words and not re.match(r"^(F|P)\d+$", w)})
+
+
+def legend_html(gate_words=None):
+    def dl(title, items):
+        return "<h3>%s</h3><dl class=\"lg\">%s</dl>" % (html.escape(title), "".join(
+            "<dt>%s</dt><dd>%s</dd>" % (html.escape(k), html.escape(v)) for k, v in items))
+    out = dl("Proof status (under each picture)", STATUS_LEGEND) + dl("Rows: the legs", ROLE_LEGEND) + \
+        dl("Terms", TERM_LEGEND) + dl("Verdict words used by every gate", VERDICT_LEGEND) + \
+        dl("Move notation in labels", NOTATION_LEGEND)
+    for g, words in sorted((gate_words or {}).items()):
+        if words:
+            out += dl("Verdict words of %s" % g, sorted(words.items()))
+    return '<details class="legend" open><summary><b>Legend — every tag on these pages</b></summary>%s</details>' % out
+
+
+def cell_html(gid, sid, lg, cell, name, pics, big=False):
+    """One picture with its frame and status. The picture is MOVED into pics/ (#291 S4-F: one copy, not two)."""
+    img = ""
+    ext = os.path.splitext(cell["pic"] or "")[1].lower() or ".png"
+    name = name + ext
+    if cell["pic"] and (os.path.exists(cell["pic"]) or (pics / name).exists()):
+        if os.path.exists(cell["pic"]) and not (pics / name).exists():
+            shutil.move(cell["pic"], pics / name)
+        if ext in (".wav", ".ogg", ".mp3"):
+            img = '<audio controls preload="none" src="../pics/%s"></audio>' % html.escape(name)
+        else:
+            img = '<a href="../pics/%s"><img loading="lazy" src="../pics/%s" alt="%s f%s"></a>' % (
+                html.escape(name), html.escape(name), html.escape(lg["role"]), cell["frame"])
+    cls = "NOTJUDGED" if cell["status"] == "NOT THE JUDGED RUN" else "PROVEN"
+    stc = "NOTJUDGED" if cls == "NOTJUDGED" else cell["status"].split()[0]
+    fx = {"yes": "", "no": " · no fighter on screen", None: ""}.get(cell.get("fighters"), "")
+    return '<td class="cell %s%s">%s<div class="cap">f%s <span class="st %s">%s</span>%s<br><span class="mut">%s</span></div></td>' % (
+        cls, " MOMENT" if big else "", img, cell["frame"], stc, html.escape(cell["status"]), html.escape(fx), html.escape(cell["why"]))
+
+
+def no_fighter(cells):
+    """A column (or a strip frame) goes to the no-fighter strip when every leg's picture is read as showing none."""
+    vals = [x.get("fighters") for x in cells if x]
+    return bool(vals) and all(v == "no" for v in vals)
+
+
+def sheet_html(gid, s, pics):
+    """One sheet: the moments with strips as blocks (legs x frames), the other columns as a timeline (legs x columns),
+    and under it the judged frames without fighters (Q3). -> (html, picture count)."""
+    anchor = "%s--%s" % (gid, s["sid"])
+    s["cols"] = sorted(s["cols"], key=lambda c: min([x["frame"] for x in c["cells"].values() if x["frame"] is not None] or [0]))
+    blocks, timeline, nofight, n = [], [], [], 0
+    for k, c in enumerate(s["cols"]):
+        head = '<div class="mh"><b>%s</b> <span class="mut">%s</span></div>' % (html.escape(c["label"]), html.escape(c["verdict"]))
+        if c.get("strip"):
+            frames = sorted({x["frame"] for xs in c["strip"].values() for x in xs})
+            keep = [f for f in frames if not no_fighter([next((x for x in xs if x["frame"] == f), None) for xs in c["strip"].values()])]
+            drop = [f for f in frames if f not in keep]
+            rows = []
+            for lg in s["legs"]:
+                xs = {x["frame"]: x for x in c["strip"].get(lg["leg"], [])}
+                tds = []
+                for f in keep:
+                    x = xs.get(f)
+                    if x:
+                        n += 1
+                        tds.append(cell_html(gid, s["sid"], lg, x, "%s.%s.%s.%d.f%d" % (gid, s["sid"], lg["leg"], k, f), pics, x.get("moment")))
+                    else:
+                        tds.append("<td></td>")
+                rows.append('<tr><th class="cap">%s<br><span class="mut">%s</span></th>%s</tr>' % (
+                    html.escape(lg["role"]), html.escape(lg["set"]), "".join(tds)))
+            blocks.append('<div class="mblock">%s<table class="grid strip">%s</table></div>' % (head, "".join(rows)))
+            for f in drop:
+                for lg in s["legs"]:
+                    x = next((x for x in c["strip"].get(lg["leg"], []) if x["frame"] == f), None)
+                    if x:
+                        n += 1
+                        nofight.append((c["label"], lg, cell_html(gid, s["sid"], lg, x, "%s.%s.%s.%d.f%d" % (gid, s["sid"], lg["leg"], k, f), pics)))
+            continue
+        target = nofight if no_fighter(list(c["cells"].values())) else None
+        cells = []
+        for lg in s["legs"]:
+            x = c["cells"].get(lg["leg"])
+            if x:
+                n += 1
+                h = cell_html(gid, s["sid"], lg, x, "%s.%s.%s.%d" % (gid, s["sid"], lg["leg"], k), pics)
+                if target is not None:
+                    nofight.append((c["label"], lg, h))
+                cells.append((lg, h))
+        if target is None:
+            timeline.append((c, dict((lg["leg"], h) for lg, h in cells)))
+    out = ['<div class="sheet" id="%s"><b>%s</b>' % (anchor, html.escape(s["title"]))]
+    out += blocks
+    if timeline:
+        head = "".join('<th class="cap">%s<br><span class="mut">%s</span></th>' % (html.escape(c["label"]), html.escape(c["verdict"])) for c, _ in timeline)
+        rows = "".join('<tr><th class="cap">%s<br><span class="mut">%s</span></th>%s</tr>' % (
+            html.escape(lg["role"]), html.escape(lg["set"]), "".join(hs.get(lg["leg"], "<td></td>") for _, hs in timeline)) for lg in s["legs"])
+        out.append('<table class="grid"><tr><th></th>%s</tr>%s</table>' % (head, rows))
+    out.append('<div class="nc"><b>Not comparable:</b> %s</div>' % html.escape(s["not_comparable"]))
+    out += ['<div class="nc st NOTJUDGED">%s</div>' % html.escape(c) for c in s.get("capped", [])]
+    if nofight:
+        out.append('<details class="nof"><summary><b>Judged frames without fighters</b> — %d picture(s): the gate judged them; '
+                   'no fighter is on screen (see the legend)</summary><table class="grid"><tr>%s</tr><tr>%s</tr></table></details>' % (
+                       len(nofight), "".join('<th class="cap">%s<br><span class="mut">%s</span></th>' % (html.escape(l), html.escape(lg["role"])) for l, lg, _ in nofight),
+                       "".join(h for _, _, h in nofight)))
+    out.append("</div>")
+    return "".join(out), n
+
+
+def page_doc(title, meta, body, css_extra=""):
+    return ('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+            '<title>%s</title><style>%s%s</style></head><body>%s</body></html>') % (html.escape(title), CSS, css_extra, body)
+
+
 def page(out_dir, meta):
+    """#291 S4-F: index.html (the provenance, the legend, the indexes, the lists) and one page per gate under g/, split
+    by sheet above PAGE_TILES pictures; pictures load lazily from pics/."""
     out_dir = Path(out_dir)
     pics = out_dir / "pics"
     pics.mkdir(exist_ok=True)
-    body, by_char, by_ticket, by_test = [], {}, {}, []
+    gdir = out_dir / "g"
+    gdir.mkdir(exist_ok=True)
+    by_char, by_ticket, by_test, empty, undefined, gate_words = {}, {}, [], [], [], {}
     notes = sheet_notes()
     for g in meta["gates"]:
         gid = g["gate"]
-        by_test.append(gid)
-        body.append('<h2 id="%s">%s</h2><div class="mut">gate verdict: %s (%ss)</div>' % (
-            gid, html.escape(gid), html.escape(g["verdict"]), g["seconds"]))
-        for cb in g.get("control_builds", []):          # Q5 (14z-206): a control leg's build is said, never silent
-            body.append('<div class="nc"><b>Control build:</b> %s</div>' % html.escape(cb))
-        if gid in notes:
-            body.append('<div class="note">%s</div>' % note_html(notes[gid]))
+        words, errs = parse_verdict_legend(ROOT / "tests" / (gid + ".sh"))
+        gate_words[gid] = words
+        for e in errs:
+            undefined.append("%s: %s" % (gid, e))
+        parts, cur, cur_n = [], [], 0
         for s in g.get("sheets", []):
-            anchor = "%s--%s" % (gid, s["sid"])
-            for c in s["chars"]:
-                by_char.setdefault(c, []).append(anchor)
-            for t in s["tickets"] + g.get("tickets", []):
-                by_ticket.setdefault(t.lstrip("#"), []).append(anchor)
-            # one timeline: the declared moments and the anchors, by frame (the first leg's frame that is known)
-            s["cols"] = sorted(s["cols"], key=lambda c: min([x["frame"] for x in c["cells"].values() if x["frame"] is not None] or [0]))
-            rows = []
-            head = "".join('<th class="cap">%s<br><span class="mut">%s</span></th>' % (
-                html.escape(c["label"]), html.escape(c["verdict"])) for c in s["cols"])
-            for lg in s["legs"]:
-                tds = []
-                for k, c in enumerate(s["cols"]):
-                    cell = c["cells"].get(lg["leg"])
-                    if not cell:
-                        tds.append("<td></td>")
-                        continue
-                    cls = "NOTJUDGED" if cell["status"] == "NOT THE JUDGED RUN" else (
-                        "DIFF" if re.match(r"(?i)^(DIFF|FAIL|DIVERGE)", c["verdict"]) else "PROVEN")
-                    img = ""
-                    ext = os.path.splitext(cell["pic"] or "")[1].lower() or ".png"
-                    name = "%s.%s.%s.%d%s" % (gid, s["sid"], lg["leg"], k, ext)
-                    # a page brought back from a --host run is re-drawn from its own pics/ (the cell paths are the host's)
-                    if cell["pic"] and (os.path.exists(cell["pic"]) or (pics / name).exists()):
-                        if os.path.exists(cell["pic"]):
-                            shutil.copyfile(cell["pic"], pics / name)
-                        if ext in (".wav", ".ogg", ".mp3"):   # the ruled sound clips (2026-10-17): the gate's own recording
-                            img = '<audio controls preload="none" src="pics/%s"></audio>' % html.escape(name)
-                        else:
-                            img = '<img src="pics/%s" alt="%s f%s">' % (html.escape(name), html.escape(lg["role"]), cell["frame"])
-                    stc = "NOTJUDGED" if cls == "NOTJUDGED" else cell["status"].split()[0]
-                    tds.append('<td class="cell %s">%s<div class="cap">f%s <span class="st %s">%s</span><br>'
-                               '<span class="mut">%s</span></div></td>' % (
-                                   cls, img, cell["frame"], stc, html.escape(cell["status"]), html.escape(cell["why"])))
-                rows.append('<tr><th class="cap">%s<br><span class="mut">%s</span></th>%s</tr>' % (
-                    html.escape(lg["role"]), html.escape(lg["set"]), "".join(tds)))
-            body.append('<div class="sheet" id="%s"><b>%s</b><table class="grid"><tr><th></th>%s</tr>%s</table>'
-                        '<div class="nc"><b>Not comparable:</b> %s</div>%s</div>' % (
-                            anchor, html.escape(s["title"]), head, "".join(rows), html.escape(s["not_comparable"]),
-                            "".join('<div class="nc st NOTJUDGED">%s</div>' % html.escape(c) for c in s.get("capped", []))))
-    idx = ['<div class="idx"><b>By test:</b> ' + "".join('<a href="#%s">%s</a>' % (t, html.escape(t)) for t in by_test) + "</div>"]
+            h, n = sheet_html(gid, s, pics)
+            for c in s["cols"]:
+                for w in undefined_tags(c["verdict"], words):
+                    u = "%s: verdict word %s (first in %r) is defined neither in the common legend nor in the gate's `# SHEET-VERDICTS:`" % (gid, w, c["verdict"][:60])
+                    if not any(x.startswith("%s: verdict word %s " % (gid, w)) for x in undefined):
+                        undefined.append(u)
+            if all(x.get("fighters") == "no" for c in s["cols"] for x in all_cells(c)) and any(all_cells(c) for c in s["cols"]):
+                empty.append("%s / %s" % (gid, s["sid"]))
+            if cur and cur_n + n > PAGE_TILES:
+                parts.append(cur); cur, cur_n = [], 0
+            cur.append((s, h)); cur_n += n
+        if cur:
+            parts.append(cur)
+        files = ["%s.html" % gid] + ["%s.%d.html" % (gid, i + 1) for i in range(1, len(parts))]
+        by_test.append((gid, files[0], g, len(parts)))
+        for i, part in enumerate(parts or [[]]):
+            nav = " · ".join(('<a href="%s">part %d</a>' % (f, j + 1)) if j != i else "part %d" % (j + 1) for j, f in enumerate(files)) if len(parts) > 1 else ""
+            body = ['<div class="mut"><a href="../index.html">index and legend</a> %s</div>' % (("· " + nav) if nav else "")]
+            body.append('<h1 id="%s">%s</h1><div class="mut">gate verdict: %s (%ss)</div>' % (gid, html.escape(gid), html.escape(g["verdict"]), g["seconds"]))
+            for cb in g.get("control_builds", []):
+                body.append('<div class="nc"><b>Control build:</b> %s</div>' % html.escape(cb))
+            if gid in notes:
+                body.append('<div class="note">%s</div>' % note_html(notes[gid]))
+            if words:
+                body.append(legend_html({gid: words}).replace(" open>", ">"))
+            for s, h in part:
+                anchor = "%s--%s" % (gid, s["sid"])
+                for c in s["chars"]:
+                    by_char.setdefault(c, []).append("g/%s#%s" % (files[i], anchor))
+                for tk in s["tickets"] + g.get("tickets", []):
+                    by_ticket.setdefault(tk.lstrip("#"), []).append("g/%s#%s" % (files[i], anchor))
+                body.append(h)
+            (gdir / files[i]).write_text(page_doc("%s — Proof Sheets" % gid, meta, "".join(body)))
+    idx = ['<div class="idx"><b>By test:</b> ' + "".join('<span class="it"><a href="g/%s">%s</a>%s</span> ' % (f, html.escape(t), (" (%d parts)" % k) if k > 1 else "")
+                                                       for t, f, _, k in by_test) + "</div>"]
     if by_char:
         idx.append('<div class="idx"><b>By character:</b> ' + "".join(
-            '<a href="#%s">%s (%d)</a>' % (v[0], html.escape(k), len(v)) for k, v in sorted(by_char.items())) + "</div>")
+            '<a href="%s">%s (%d)</a>' % (v[0], html.escape(k), len(v)) for k, v in sorted(by_char.items())) + "</div>")
     if by_ticket:
         idx.append('<div class="idx"><b>By ticket:</b> ' + "".join(
-            '<a href="#%s">#%s (%d)</a>' % (v[0], html.escape(k), len(v)) for k, v in sorted(by_ticket.items())) + "</div>")
-    lists = []
+            '<a href="%s">#%s (%d)</a>' % (v[0], html.escape(k), len(v)) for k, v in sorted(by_ticket.items())) + "</div>")
+    verdicts = "".join('<tr><td><a href="g/%s">%s</a></td><td>%s</td><td>%ss</td></tr>' % (f, html.escape(t), html.escape(g["verdict"]), g["seconds"])
+                       for t, f, g, _ in by_test)
+    top, rest = [], []
+    if undefined:
+        top.append('<h2 class="st NOTJUDGED">Undefined tags — %d</h2><ul>%s</ul>' % (len(undefined), "".join("<li>%s</li>" % html.escape(u) for u in undefined)))
+    if empty:
+        top.append('<h2>Sheets where no picture shows the fighters — %d</h2><div class="mut">%s</div>' % (len(empty), html.escape(", ".join(empty))))
     for key, title in (("no_reference_leg", "No reference leg (listed, not drawn)"), ("no_picture", "No picture: compares legs, judges nothing a proven picture can show (listed, not drawn)"),
                        ("debt", "Not yet declared (the retrofit's debt)")):
         if meta.get(key):
-            lists.append("<h2>%s — %d</h2><div class=\"mut\">%s</div>" % (title, len(meta[key]), html.escape(", ".join(meta[key]))))
+            rest.append("<h2>%s — %d</h2><div class=\"mut\">%s</div>" % (title, len(meta[key]), html.escape(", ".join(meta[key]))))
     builds = "".join("<li>%s: %s</li>" % (html.escape(k), html.escape(v)) for k, v in meta.get("builds", {}).items())
-    builds += "".join("<li>%s</li>" % html.escape(v) for v in meta.get("provenance", []))   # S3: what was built, and on what
-    doc = ('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
-           '<title>Proof Sheets</title><style>%s</style></head><body><h1>Comparative capture sheets</h1>'
-           '<div class="mut">commit %s · run %s · each picture proven against what its gate logged (#291)</div>'
-           '<ul class="mut">%s</ul>%s%s%s</body></html>') % (
-               CSS, html.escape(meta["commit"]), html.escape(meta["date"]), builds, "".join(idx), "".join(body), "".join(lists))
-    (out_dir / "index.html").write_text(doc)
+    builds += "".join("<li>%s</li>" % html.escape(v) for v in meta.get("provenance", []))
+    body = ('<h1>Comparative capture sheets</h1><div class="mut">commit %s · run %s · each picture proven against what its gate '
+            'logged (#291)</div><ul class="mut">%s</ul>%s%s%s<h2>The gates</h2><table class="grid">%s</table>%s') % (
+                html.escape(meta["commit"]), html.escape(meta["date"]), builds, "".join(top), legend_html(), "".join(idx),
+                verdicts, "".join(rest))
+    (out_dir / "index.html").write_text(page_doc("Proof Sheets", meta, body))
+    meta["undefined_tags"] = undefined
     return out_dir / "index.html"
 
 
@@ -865,10 +1333,12 @@ def commit_check(sheets, tree):
                 if why:
                     bad[lg["leg"]] = why
         for c in s["cols"]:
-            for leg, x in c["cells"].items():
-                if leg in bad:
+            pairs = list(c["cells"].items()) + [(leg, x) for leg, xs in c.get("strip", {}).items() for x in xs]
+            for leg, x in pairs:
+                if leg in bad and not x.get("_s3"):
                     x["why"] = "%s (its own proof: %s %s)" % (bad[leg], x["status"], x["why"])
                     x["status"] = "NOT THE JUDGED RUN"
+                    x["_s3"] = True
     return sheets
 
 
@@ -1177,7 +1647,9 @@ def cmd_run(a):
     (out / "meta.json").write_text(json.dumps(meta, indent=1))
     p = page(out, meta)
     print("WROTE %s" % p)
-    return 0
+    for u in meta.get("undefined_tags", []):     # S4-C: a tag the page shows but defines nowhere fails the run, loudly
+        print("UNDEFINED TAG: %s" % u)
+    return 1 if meta.get("undefined_tags") else 0
 
 
 def cmd_prove(a):
@@ -1192,7 +1664,11 @@ def cmd_prove(a):
     for s in sheets:
         for c in s["cols"]:
             for leg, x in c["cells"].items():
-                print("%s\t%s\t%s\tf%s\t%s\t%s" % (s["sid"], c["label"], leg, x["frame"], x["status"], x["why"]))
+                print("%s\t%s\t%s\tf%s\t%s\t%s\t%s" % (s["sid"], c["label"], leg, x["frame"], x["status"], x["why"], x.get("fighters")))
+            for leg, xs in c.get("strip", {}).items():      # S4-D: a span's other frames, labelled `<label> [span]`
+                for x in xs:
+                    if not x.get("moment"):
+                        print("%s\t%s [span]\t%s\tf%s\t%s\t%s\t%s" % (s["sid"], c["label"], leg, x["frame"], x["status"], x["why"], x.get("fighters")))
     return 0
 
 
@@ -1212,7 +1688,7 @@ def cmd_commitcheck(a):
 
 
 def cmd_census(a):
-    rows, problems = census(a.tests, a.registry, a.debt)
+    rows, problems = census(a.tests, a.registry, a.debt, a.span_debt)
     for g, c in rows:
         print("%s\t%s" % (c, g))
     for p in problems:
@@ -1250,6 +1726,7 @@ def main(argv):
     c.add_argument("--tests", default=str(ROOT / "tests"))
     c.add_argument("--registry", default=str(ROOT / "tests/ci_emulator.tsv"))
     c.add_argument("--debt", default=str(ROOT / "tests/expected/sheet_debt.txt"))
+    c.add_argument("--span-debt", default=str(ROOT / "tests/expected/sheet_span_debt.txt"))
     a = ap.parse_args(argv)
     return {"run": cmd_run, "prove": cmd_prove, "page": cmd_page, "commitcheck": cmd_commitcheck, "census": cmd_census}[a.cmd](a)
 

@@ -28,6 +28,7 @@
 -- Output, one line each:  S <n> <frame>  (MAME's snapshot number n, in the order taken)
 --                         C <frame> <checksum>   V <frame> <addr:size=value,...>   A <frame> <label>
 --                         ACAP <frame> <label>  (the first anchor past ANCHOR_MAX, not photographed)
+--                         R <frame> ...  (tests/lua/screen_state.lua: the round state and OBJ count, #291 S4-B)
 -- then CAPSUMMARY frames=<n> taken=<k> wanted=<w>.
 -- INPUT STAGING IS CANONICAL (replay.lua's: parse held[fr], stage held[frame + 1]); tests/test_replay_stage_census.sh.
 
@@ -90,8 +91,10 @@ for line in io.lines(replay_path) do
     end
 end
 
+local here = debug.getinfo(1, "S").source:match("^@(.*/)") or "./"
 local pokes = {}
-dofile((debug.getinfo(1, "S").source:match("^@(.*/)") or "./") .. "pokes_spec.lua").append(pokes, os.getenv("POKES"))
+dofile(here .. "pokes_spec.lua").append(pokes, os.getenv("POKES"))
+local screen_state = dofile(here .. "screen_state.lua")
 
 -- the checksum: replay.lua's FNV-1a64 over work RAM, its mask parsed and validated the same way
 local mask_ranges = {}
@@ -149,6 +152,7 @@ local function photograph(label)
         f:write(string.format("V %d %s\n", frame, table.concat(parts, ",")))
     end
     if label then f:write(string.format("A %d %s\n", frame, label)) end
+    f:write(screen_state.line(program, frame))      -- #291 S4-B: what the picture shows, read from the game's state
     machine.video:snapshot()
     f:write(string.format("S %d %d\n", taken, frame))
     taken = taken + 1

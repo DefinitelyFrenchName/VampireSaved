@@ -38,7 +38,7 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
-## Session 14z-206 — **PILOT and ERIS offline: the Mac carries the work in parallel. #299's cold cache fixed, its closure still open; #296's, #286's code halves; #284 done awaiting release; #291 S4 planned, S4-A done; #305, #306, #307 filed.** Opened 2026-10-21 after the 14z-205c close (`b89fc9d7`, pushed).
+## Session 14z-206 — **PILOT and ERIS offline: the Mac carries the work in parallel. #299's cold cache fixed, its closure still open; #296's, #286's code halves; #284 done awaiting release; #291 S4 planned, S4-A done; #305, #306, #307, #308 filed.** Opened 2026-10-21 after the 14z-205c close (`b89fc9d7`, pushed).
 
 ### opened with
 HANDOFF, STATE and NEXT_SESSION read; the sweep CLEAN, `main` equal to `origin/main`. The maintainer: *"Currently PILOT
@@ -76,7 +76,9 @@ PROPOSAL.md`, local); the maintainer's answers (`DECISIONS_HISTORY.md` "Ruled 20
 `test_release_roundtrip` (the proposal's version went red on the published M23 READMEs, fixed, control
 `generator-report-dropped`), `test_release_launcher_bat`, `test_release_recipe_text` and `test_readme_recording` (macOS:
 the set built by the package's `apply_release.py`, 5,320 frames reproduced on both MAMEs) PASS with their controls; its
-Windows and Linux legs not run (ERIS, PILOT offline). The new READMEs ship with the next release.
+Windows and Linux legs not run (ERIS, PILOT offline) — since run: Linux PASS on PILOT
+(`build/agent206/remote/pilot/REPORT.md` job 3, local); Windows not a pass, three host defects, #308. The new READMEs
+ship with the next release; the "done unshipped" comment and label are on the issue (citing `a8fa5350`).
 
 ### (3) #299 — THE COLD DECRYPT CACHE FIXED; THE CLOSURE STILL OPEN
 Fork C (`build/agent206/t299/REPORT.md`, local): 36 gates and 11 tools read `build/out/*.bin` by path; with the cache
@@ -113,14 +115,26 @@ Fork T (`build/agent206/t286/REPORT.md`, local): `tools/static_confirm.py` expos
 byte-identical before and after); control `nf-change-unscored`. The committed predictor carries `test_tickets`' read
 of `tests/rulecheck/runs/2026-09-17-22/verdict_real.txt` too (row 156 of `tickets.tsv` links it; `tools/tickets.py`
 opens every link target): 14z-205c's check script took every gate as a runs reader on the committed leg, so its "0 of
-32,695" could not find a miss (retracted in (2) of 14z-205c and NEXT_SESSION). `landing.diff` (NOT applied) adds
-N-F-LINK; the rescore on PILOT's traces (`pilot_rescore.sh`) waits for PILOT.
+32,695" could not find a miss (retracted in (2) of 14z-205c and NEXT_SESSION). `landing.diff` adds N-F-LINK. **Since
+then (2026-10-22): rescored and applied.** PILOT (fork P2, `build/agent206/remote/pilot/REPORT.md`, local) scored 14z-205c's
+traces of `b91532d8` (229 gates, 88,351 pairs): committed predictor MISSES 1 (`test_tickets`), narrowed + N-F-LINK 0,
+narrowed without N-F-LINK the same miss, the over-narrowed control fired (103). Rule-checker runs `2026-10-22-1167`
+(VIOLATED Q1: four change sets counted where five differ, a log naming no tree, the four gates short under the trace
+unnamed), `-1168` (VIOLATED Q1: the wrong four modes called new; PILOT's committed leg not tied to `a8fa5350`), each
+resolved by work (logs with a tree header, all five new modes run and failing on their own case, the tool blobs tied);
+**`-1169` OK.** `landing.diff` is applied in the working tree (one header line of `runs-self-off` reworded as the
+checker noted); it lands with the next tiered commit. Not tested: a fresh trace of `a8fa5350`, reads through git or on
+an untaken branch, the four gates short under the trace. #286's done-when is still open.
 
-### (6) #305, #306, #307 FILED
+### (6) #305, #306, #307, #308 FILED
 At the maintainer's word: **#305** (#299's two gaps) and **#306** (nine emulator gates default to `build/donovan6`,
 which only `test_m2b_stage6` builds, so a clean checkout's gate order decides whether the others find it — a correction
 of S4-A's "a build the commit does not make" for those nine). **#307** (*"file that ticket"*): `build/` has no retention
 rule for logs and session evidence, 47 GB in 1,134 entries; measure what references each family before pruning.
+**#308** (*"you can"*), filed after the landing commit `a8fa5350`: #284's Windows leg on ERIS found three host defects
+that predate #284 — the generator's unencoded writes (cp1252 on Windows), the gate's own CRLF `argv.txt`, and its silent
+exit 2 under `set -eu` (`build/agent206/remote/eris/REPORT.md`, local). Its first body named the README as the CRLF
+source; corrected on the issue the same evening.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings

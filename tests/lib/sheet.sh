@@ -15,6 +15,14 @@
 #   at      <sid> <mid> <leg> <frame> <basis> <expect|->
 #   anchors <sid>
 #   tap     <sid> <leg> <instrument> <env>   (D2: the leg re-runs under its gate's own instrument; env is K=V;K=V)
+#   trace   <sid> <leg> <trace file> <FIELDS>   (#291 S4-D: the gate's per-frame tests/lua/field_trace.lua log of the
+#           leg and its addr:size:name spec, so every frame of a `fields` span is proven on what the gate traced there)
+#   span    <sid> <mid> <leg> <lo-hi | f1,f2,...>   (#291 S4-D: the judged event's window on that leg — about 9 frames
+#           spread across lo-hi, the moment's frame among them — or an explicit frame list, kept whole; each frame is
+#           proven on the moment's own basis: log, fields (needs the leg's trace row first) or event)
+#   inputs  <sid> <n>   (#291 S4-E: also photograph, in EACH round, up to n (at most 18) frames where the replay starts
+#           holding an input (or, short of that, holds one), the rounds found from the sheet's anchors; each proven on
+#           the leg's log)
 # role is ours | vsavj | vs2. replay and log are paths INSIDE $SHEET_OUT (sheet_leg copies them there, because the
 # gate's own work directory is deleted at its exit). frames is how far the leg runs. mask is replay.lua's MASK_RANGES
 # for the leg's checksum log (`-` = the whole of work RAM).
@@ -75,16 +83,33 @@ sheet_file() {  # sheet_file <sid> <name> <picture> — copy a picture the gate 
     cp "$3" "$SHEET_OUT/files/$1.$2" && printf 'files/%s.%s' "$1" "$2"
 }
 
-sheet_rows() {  # sheet_rows <file> — append moment/at rows a gate's own script wrote in the format above (bulk emitters)
+sheet_rows() {  # sheet_rows <file> — append moment/at/span rows a gate's own script wrote in the format above (bulk emitters)
     sheet_on || return 0
-    awk -F'\t' '($1 == "moment" && NF == 6) || ($1 == "at" && NF == 7) {next} {bad = NR; exit} END {exit bad ? 1 : 0}' "$1" \
-        || { echo "sheet.sh: $1 holds a row that is not a 6-field moment or a 7-field at" >&2; return 1; }
+    awk -F'\t' '($1 == "moment" && NF == 6) || ($1 == "at" && NF == 7) || ($1 == "span" && NF == 5) {next} {bad = NR; exit} END {exit bad ? 1 : 0}' "$1" \
+        || { echo "sheet.sh: $1 holds a row that is not a 6-field moment, a 7-field at or a 5-field span" >&2; return 1; }
     mkdir -p "$SHEET_OUT"; cat "$1" >> "$SHEET_OUT/sheet.tsv"
 }
 
 sheet_tap() {  # sheet_tap <sid> <leg> <instrument path> <env: name-value pairs, ';'-separated> — the leg's own tap instrument (D2)
     sheet_on || return 0
     _sheet_row tap "$1" "$2" "$3" "$4"
+}
+
+sheet_trace() {  # sheet_trace <sid> <leg> <field_trace file> <FIELDS addr:size:name,...> — the leg's per-frame trace (S4-D)
+    sheet_on || return 0
+    mkdir -p "$SHEET_OUT/legs"
+    __sheet_tr="legs/$1.$2.trace"; cp "$3" "$SHEET_OUT/$__sheet_tr" || return 1
+    _sheet_row trace "$1" "$2" "$__sheet_tr" "$4"
+}
+
+sheet_span() {  # sheet_span <sid> <mid> <leg> <lo-hi | f1,f2,...> — the judged event's window on that leg (S4-D)
+    sheet_on || return 0
+    _sheet_row span "$1" "$2" "$3" "$4"
+}
+
+sheet_inputs() {  # sheet_inputs <sid> <n> — up to n frames at the replay's own inputs, inside rounds (S4-E)
+    sheet_on || return 0
+    _sheet_row inputs "$1" "$2"
 }
 
 sheet_anchors() {  # sheet_anchors <sid>

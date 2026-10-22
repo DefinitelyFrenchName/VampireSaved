@@ -21,6 +21,7 @@
 #   tools/freeze_masked_basis.sh tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh tests/lib/controls.sh
 #
 # SHEET: legs vsavj,ours — moments: per replay, the first frame of each distinct fighter pair the verdict compares (the +0x60 hitbox-base sequence), on each leg at its own frame; for a NO-MATCH replay its last traced frame — not comparable: the select wheel on our build (21 cells against vanilla's 16, by design) and a hook-cycle load phase of a frame or two (tolerated by the verdict)
+# SHEET-VERDICTS: LEGACY = the replay loads only vanilla characters on the build, so it is legacy content and must carry a .masked (or .pending) expectation; TENANT = it loads a tenant (Donovan, Phobos or Pyron), so a bare .sha1 is correct; NO-MATCH = no fighter pair ever loaded, reported and hand-judged, never classed
 # MUST-FIRE: perturbed-copy: shared-sandbox — a leg whose sandbox already exists (a carried run, #293) must be refused, never run (in-gate: a planted leg with its sandbox made beforehand must leave a REUSED marker and no run; mode: the sweep runs every BUILDS entry without de-duplication, the pre-#293 rig, so a replay's second leg finds the first one's sandbox and the gate FAILs)
 #
 # WHY THIS EXISTS (14z-89, closing the gap 14z-88 exposed the hard way).
@@ -123,7 +124,7 @@ JOBS="${JOBS:-6}"
 OUT="${PAIRINGS_OUT:-build/legacy_pairings}"
 CHK="python3 $REPO/tools/check_legacy_pairings.py"
 BUILDS="${*:-build/m3b_merged31:13 build/m3b_merged31:10 build/m3b_merged31:11}"  # re-pointed 14z-133b: MERGED (B2, maintainer-ruled; expectation set merged-m16)  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-FIELDS="ff8782:b:p1id,ff8b82:b:p2id,ff8460:l:p1hb,ff8860:l:p2hb"
+FIELDS="ff8782:b:p1id,ff8b82:b:p2id,ff8460:l:p1hb,ff8860:l:p2hb,ff812d:b:st,ff810e:b:ph"   # st/ph: the sheet's in-round frames only (#291 S4-E); the checker reads the four named above
 
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 mkdir -p "$OUT"
@@ -431,6 +432,7 @@ if sheet_on; then
         python3 - "$W" "$tag" "$rep" "$REPO/tests/expected/$exp" >> "$W/sheet_rows.tsv" <<'PYS'
 import os, sys
 W, tag, rep, expdir = sys.argv[1:5]
+os.makedirs(f"{W}/sheettr", exist_ok=True)
 spec = {"p1id": "ff8782:b", "p2id": "ff8b82:b", "p1hb": "ff8460:l", "p2hb": "ff8860:l"}
 def trace(p):
     d = []
@@ -465,15 +467,36 @@ for line in open(rep):
             b = rb[k] if k < len(rb) else None
             vals = "vanilla %s, ours %s (hitbox bases)" % ("(%X,%X)" % a[1] if a else "none", "(%X,%X)" % b[1] if b else "none")
             mom.append(("p%d" % (k + 1), "distinct fighter pair #%d" % (k + 1), a[0] if a else None, b[0] if b else None, vals))
+    # S4-E (#291): each pair's own run is the frames from its first frame to the next pair's; the frames in it where a
+    # round is on ($FF812D) show the pair fighting, so up to 9 of them are drawn beside the load frame the gate judged
+    def inround(r, d, k, last):
+        lo = r[k][0] if k < len(r) else None
+        if lo is None: return []
+        hi = r[k + 1][0] if k + 1 < len(r) else last + 1
+        fr = [f for f in sorted(d) if lo <= f < hi and d[f].get("st", 0) != 0]
+        return [fr[round(i * (len(fr) - 1) / 8)] for i in range(9)] if len(fr) > 9 else fr
+    keep = {"vanilla": set(), "ours": set()}
     for mid, lab, fa, fb, vals in mom:
         print("moment\t%s\t%s\t%s\t%s\t%s" % (sid, mid, lab, verdict, vals))
-        for leg, f, dd in (("vanilla", fa, dv), ("ours", fb, db)):
+        for leg, f, dd, rr, tt in (("vanilla", fa, dv, rv, tv), ("ours", fb, db, rb, tb)):
             if f is None: continue
             s = dd.get(f)
             exp = ",".join("%s=%d" % (spec[k], s[k]) for k in sorted(spec) if k in s) if s else "-"
             print("at\t%s\t%s\t%s\t%d\t%s\t%s" % (sid, mid, leg, f, "fields" if s else "none", exp))
+            span = inround(rr, dd, int(mid[1:]) - 1, tt[-1][0] if tt else 0) if s and mid.startswith("p") else []
+            if span:
+                print("span\t%s\t%s\t%s\t%s" % (sid, mid, leg, ",".join(map(str, sorted(set(span) | {f})))))
+                keep[leg] |= set(span) | {f}
+    for leg, src in (("vanilla", pv), ("ours", pb)):
+        if keep[leg]:                 # the gate's own trace lines at the drawn frames, nothing else
+            dst = f"{W}/sheettr/{sid}.{leg}.trace"
+            with open(dst, "w") as o:
+                o.writelines(l for l in open(src) if l.startswith("F ") and int(l.split()[1]) in keep[leg])
+            with open(f"{W}/sheettr.list", "a") as o:
+                o.write("%s\t%s\t%s\n" % (sid, leg, dst))
 PYS
     done
+    [ -s "$W/sheettr.list" ] && while IFS='	' read -r _sid _leg _tr; do sheet_trace "$_sid" "$_leg" "$_tr" "$FIELDS"; done < "$W/sheettr.list"
     [ -s "$W/sheet_rows.tsv" ] && sheet_rows "$W/sheet_rows.tsv"
 fi
 

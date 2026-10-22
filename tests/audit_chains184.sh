@@ -327,11 +327,20 @@ for row in (l.rstrip("\n").split("\t") for l in open(got)):
         fr, why = e, "event frame"
     vals = ("first %s, fields %s" % (first, flds)) if verdict == "DIFF" else "-"
     print("moment\t%s\te%d\t%s (%s)\t%s\t%s" % (t, k, name, why, verdict, vals))
+    # S4-D (#291): the judged window as tools/move_parity.py compares it — the event's frame to the next event's,
+    # the frames where both legs' anim node is live — so the sheet shows the move from its start to its recovery
+    hi = ev[k + 1]["frame"] if k + 1 < len(ev) else max(tr["native"]) + 1
+    live = [f for f in range(e, hi) if f in tr["native"] and f in tr["ours"]
+            and tr["native"][f].get("node", "0") != "0" and tr["ours"][f].get("node", "0") != "0"]
     for leg in ("native", "ours"):
         smp = tr[leg].get(fr)
         exp = ",".join("%s=%s" % (spec[n], v) for n, v in sorted(smp.items()) if n in spec) if smp else "-"
         print("at\t%s\te%d\t%s\t%d\t%s\t%s" % (t, k, leg, fr, "fields" if smp else "none", exp))
+        if smp and live:
+            print("span\t%s\te%d\t%s\t%d-%d" % (t, k, leg, min(live + [fr]), max(live + [fr])))
 PYS
+        sheet_trace "$t" native "$W/tr_$t.native.txt" "$FIELDS"
+        sheet_trace "$t" ours "$W/tr_$t.ours.txt" "$FIELDS"
         sheet_rows "$W/sheet_$t.tsv"
     done
 fi
