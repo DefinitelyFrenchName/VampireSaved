@@ -698,6 +698,8 @@ if sheet_on && [ -z "$CONTROL" ]; then
             "each game's stage and palette, P2's art (each game's own copy; [VSP-168]), and the two modes' own looks (Change on ours, the vs2 EX install on native)" || true
         sheet_leg "$part" native vs2 vsav2 "$ROMDIR" "$W/$part.native.rpl" "$pk" "$fr" || true
         sheet_leg "$part" ours ours vsavjw "$BUILD/rompath;$ROMDIR" "$W/$part.ours.cur.rpl" "$pk" "$fr" || true
+        sheet_trace "$part" native "$W/$part.native.ft" "$FIELDS" || true
+        sheet_trace "$part" ours "$W/$part.ours.ft" "$FIELDS" || true
         python3 - "$part" "$W" "$FIELDS" > "$W/sheet_$part.tsv" <<'PYS' && sheet_rows "$W/sheet_$part.tsv" || true
 import json, re, sys
 part, W, fields = sys.argv[1:4]
@@ -714,7 +716,7 @@ for l in open(f"{W}/got.tsv"):
     r = l.rstrip("\n").split("\t")
     if r[0] != "ev" or r[1] != part:
         continue
-    k = int(r[2]); lo = ev[k]["frame"]
+    k = int(r[2]); lo = ev[k]["frame"]; hi = ev[k + 1]["frame"] if k + 1 < len(ev) else lo + ev[k]["gap"]
     print("moment\t%s\tev%d\t%s (first hit; the event frame + 4 with none)\t%s\t%s" % (part, k, r[3], r[4], "-" if r[4] == "SAME" else "%s; %s" % (r[5], r[6])))
     for leg, col in (("native", r[5]), ("ours", r[6])):
         m = re.search(r"@\[([0-9, ]*)\]", col)
@@ -722,6 +724,11 @@ for l in open(f"{W}/got.tsv"):
         fr = lo + (offs[0] if offs else 4); smp = tr[leg].get(fr)
         exp = ",".join("%s=%s" % (spec[n], v) for n, v in sorted(smp.items()) if n in spec) if smp else "-"
         print("at\t%s\tev%d\t%s\t%d\t%s\t%s" % (part, k, leg, fr, "fields" if smp else "none", exp))
+        # S4-D (#291): the judged window as the rows compare it — the event's frame to the next event's — each frame
+        # proven on the fields this leg traced there
+        sp = [f for f in range(lo, hi) if f in tr[leg]]
+        if smp and sp:
+            print("span\t%s\tev%d\t%s\t%d-%d" % (part, k, leg, min(sp + [fr]), max(sp + [fr])))
 PYS
     done
 fi

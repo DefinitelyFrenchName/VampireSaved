@@ -334,6 +334,9 @@ test_promise_check
 # 14z-185b (#188 route A, PROVISIONAL): the carry-forward predictor (tools/static_confirm.py) marks a gate STALE
 # by each of its four rules; two controls. Not wired into this runner until the traced test. ~1 s.
 test_static_confirm
+# test_build_dirs.sh — #304 (14z-207): every build/ top-level directory named by a program or present is classed
+# in tests/expected/build_dirs.tsv, and the planner's scratch pathspec and regex generated from it agree; five controls. ~10 s.
+test_build_dirs
 # test_trace_static_reads.sh — #188's traced test promoted (GitHub #225, 14z-191): the scorer finds a read the
 # predictor misses and its over-narrowed control must miss, on synthetic traces; two controls. ROM-free, ~3 s.
 test_trace_static_reads
@@ -363,6 +366,8 @@ test_claim_lint
 # #130 (14z-189): the Windows-run python tools write UTF-8, never cp1252 (a PYTHONIOENCODING=cp1252
 # stand-in for MSYS2's native-python pipe, reproduced on ERIS); one control. ~1 s.
 test_win_stdout_utf8
+# test_host_text_opens.sh — the release generator's text opens name encoding= and newline= (#308, 14z-207); two controls. ~1 s.
+test_host_text_opens
 # #196 (14z-189): an unset MAME_BIN makes tools/run_mame.sh run the PINNED build for the set (WIDE for vsavjw,
 # the reference build for stock sets), never the mame on PATH; a missing default is refused; one control. ~1 s.
 test_mame_default_bin

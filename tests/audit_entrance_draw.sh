@@ -164,7 +164,15 @@ for s in seeds:
             fr = mv[len(mv) // 2] if mv else f0
         e = d[fr]
         print("at\tseed%s\tdraw\t%s\t%d\tfields\tff840a:b=%d,ff8410:w=%d,ff8782:b=%d" % (s, leg, fr, e["intro"], e["x"], e["id"]))
+        # S4-D (#291): the entrance the gate reads, from its first drawn frame (the held variant's first, or the drive-in's
+        # first moving frame) to f2544, each frame proven on the three fields this run traced there. Not from f0: +0x0A
+        # initialises behind the pre-round screen, where no fighter is drawn yet (measured 14z-207, seed 0000)
+        lo = held[0] if held else (mv[0] if mv else f0)
+        print("span\tseed%s\tdraw\t%s\t%d-2544" % (s, leg, lo))
 PYS
+    for s in $SEEDS; do for leg in native ours; do
+        sheet_trace "seed$s" $leg "$W/$leg.$s.ft" "ff840a:b:intro,ff8410:w:x,ff8782:b:id"
+    done; done
     sheet_rows "$W/sheet_rows.tsv"
 fi
 

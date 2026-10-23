@@ -679,7 +679,7 @@ o14i4="$(cd "$FR" && STATIC_CHANGED_PATHS= sh tests/run_all_static.sh --tier por
 # (j) @code (14z-205, #297, ruled 2026-10-18 "Own code changed"): a freeze gate whose trigger is its own reach is pulled
 #     back by a change to a program it runs, never by a change to the data it reads
 s14j() {  # s14j <runner in $FR/tests> -> sets S14j (ok|bad)
-    mkdir -p "$FR/tools" "$FR/data"; cp "$REPO/tools/static_confirm.py" "$REPO/tools/battery_reach.py" "$FR/tools/"
+    mkdir -p "$FR/tools" "$FR/data"; cp "$REPO/tools/static_confirm.py" "$REPO/tools/battery_reach.py" "$REPO/tools/build_dirs.py" "$REPO/tests/expected/build_dirs.tsv" "$FR/tools/"
     printf 'open("data/d.txt").read()\n' > "$FR/tools/chk.py"; echo d > "$FR/data/d.txt"
     printf '#!/bin/sh\npython3 tools/chk.py\necho "FAIL: broken"\nexit 1\n' > "$FR/tests/g_code.sh"; chmod +x "$FR/tests/g_code.sh"
     printf 'g_pass\ng_code\n' > "$FR/tests/ci_portable.txt"; printf 'g_code\tfreeze\t@code\n' > "$FR/tests/ci_cadence.tsv"
@@ -758,11 +758,11 @@ echo "== 18. --confirm (14z-188, #188 route A): a red is re-run, a changed input
 FC="$T/confirmrepo"; mkdir -p "$FC/tests/lib" "$FC/tools" "$FC/data"
 ln -s "$RUNNER" "$FC/tests/run_all_static.sh"
 for _l in classify controls measures; do ln -s "$REPO/tests/lib/$_l.sh" "$FC/tests/lib/$_l.sh"; done
-cp "$REPO/tools/static_confirm.py" "$REPO/tools/battery_reach.py" "$FC/tools/"
+cp "$REPO/tools/static_confirm.py" "$REPO/tools/battery_reach.py" "$REPO/tools/build_dirs.py" "$REPO/tests/expected/build_dirs.tsv" "$FC/tools/"
 cp "$FC/tools/static_confirm.py" "$T/static_confirm_off.py"
 python3 - "$T/static_confirm_off.py" <<'PYX'
 import sys; p = sys.argv[1]; s = open(p).read()
-a = "    _, stale, _ = predict(root, sorted(changed), r1, tell) if changed else (gates, {}, gates)"
+a = "    _, stale, _ = predict(root, sorted(changed), r1, tell, scratch, jobs or PLAN_JOBS, t_plan + PLAN_TIME_LIMIT, tracked) if changed or any(True for _ in scratch) else (gates, {}, gates)"
 assert s.count(a) == 1, "the plan's predict line moved"
 open(p, "w").write(s.replace(a, "    stale = {}  # CONTROL prediction-off"))
 PYX
@@ -909,7 +909,7 @@ printf 'name\tnote\nf\tdata/notes.md\n' > "$FS/data/list.tsv"; echo first > "$FS
     && git add -A && git -c user.name=t -c user.email=t@t commit -qm base)
 echo dirty > "$FS/sub/x.txt"   # the submodule is dirty in every run, as emu/fbneo is
 s22() {   # s22 <static_confirm.py> -> sets S22a S22b S22c S22d S22e (ok|bad)
-    cp "$1" "$FS/tools/static_confirm.py"; cp "$REPO/tools/battery_reach.py" "$FS/tools/"
+    cp "$1" "$FS/tools/static_confirm.py"; cp "$REPO/tools/battery_reach.py" "$REPO/tools/build_dirs.py" "$REPO/tests/expected/build_dirs.tsv" "$FS/tools/"
     (cd "$FS" && STATIC_RESULTS_OUT="$T/s1.tsv" sh tests/run_all_static.sh --tier portable > /dev/null 2>&1) || true
     sleep 1
     _r="$(cd "$FS" && STATIC_RESULTS_OUT="$T/s2.tsv" sh tests/run_all_static.sh --tier portable --confirm "$T/s1.tsv" 2>&1)" || true
@@ -975,7 +975,7 @@ sed 's|    \[ -n "$_cc" \] && \[ "$_cc" = "$VS_CTL_DECLARED" \] && exit 0   # JO
 cmp -s "$REPO/tests/lib/static_job.sh" "$JOB_C" && fail "could not disable the job's carried controls — the JOB-CARRY-CONTROLS line moved"
 FJ="$T/repo299"; mkdir -p "$FJ/tests/lib" "$FJ/tools" "$FJ/data"
 for _l in classify controls measures; do ln -s "$REPO/tests/lib/$_l.sh" "$FJ/tests/lib/$_l.sh"; done
-cp "$REPO/tools/static_confirm.py" "$REPO/tools/battery_reach.py" "$FJ/tools/"
+cp "$REPO/tools/static_confirm.py" "$REPO/tools/battery_reach.py" "$REPO/tools/build_dirs.py" "$REPO/tests/expected/build_dirs.tsv" "$FJ/tools/"
 mkj() {  # mkj <name> <exit> <body line> [control]: a stub that logs each run, after its body (and each control run), outside the repo
     { echo "#!/bin/sh"; echo "# $1.sh — a stub of section 24"
       [ -n "${4:-}" ] && echo "# MUST-FIRE: perturbed-copy: flip — a flipped byte must fail"

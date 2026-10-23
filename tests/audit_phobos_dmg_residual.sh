@@ -217,6 +217,9 @@ if sheet_on && [ -z "$MODE" ]; then
             "each game's stage and palette, and P2's art (Demitri, each game's own copy; [VSP-168])"
         sheet_leg "$p.$v" native vs2 vsav2 "$ROMDIR" "$W/$p.$v.native/r.rpl" "$_pk" "$_fr"
         sheet_leg "$p.$v" ours ours vsavjw "$BUILD/rompath;$ROMDIR" "$W/$p.$v.ours/r.rpl" "$_pk" "$_fr"
+        # S4-D (#291): each leg's own field trace, so every frame of a span is proven on what this gate traced there
+        sheet_trace "$p.$v" native "$W/$p.$v.native/f.ft" "ff8450:w:p1hp,ff8782:b:id,ff8b82:b:p2id"
+        sheet_trace "$p.$v" ours "$W/$p.$v.ours/f.ft" "ff8450:w:p1hp,ff8782:b:id,ff8b82:b:p2id"
     done; done
     for v in $PINS; do
         _pk="$(python3 -c "print(f'{2000}-{(3600)-1}:ff8116:06')");$(python3 -c "print(f'{2363}-{(3600)-1}:ff80d4:$v')")"
@@ -224,6 +227,8 @@ if sheet_on && [ -z "$MODE" ]; then
             "the damage itself: Demitri's own 5HP record differs between the games (#161, ruled not-ours); each game's stage and palette, and P2's art"
         sheet_leg "legacy.$v" vsav2 vs2 vsav2 "$ROMDIR" "$REPO/tests/replays/judge/04_demitri_5hp_victor.rpl" "$_pk" 3600
         sheet_leg "legacy.$v" vsavj vsavj vsavj "$ROMDIR" "$REPO/tests/replays/judge/04_demitri_5hp_victor.rpl" "$_pk" 3600
+        sheet_trace "legacy.$v" vsav2 "$W/legacy.$v.vsav2/f.ft" "ff8850:w:p2hp,ff8782:b:id,ff8b82:b:p2id"
+        sheet_trace "legacy.$v" vsavj "$W/legacy.$v.vsavj/f.ft" "ff8850:w:p2hp,ff8782:b:id,ff8b82:b:p2id"
     done
     python3 - "$W" "$PARTS" "$PINS" "$_sv" > "$W/sheet_rows.tsv" <<'PYS'
 import sys
@@ -241,9 +246,12 @@ def emit(sid, mid, lab, legs, hpk, hpaddr):
     vals = ", ".join("%s %s -> %s (-%d)" % (leg, a, b, int(a) - int(b)) for leg, _, f, a, b in legs)
     print("moment\t%s\t%s\t%s\t%s\t%s" % (sid, mid, lab, sv, vals))
     for leg, path, f, a, b in legs:
-        s = trace(path).get(int(f))
+        d = trace(path); s = d.get(int(f))
         exp = ",".join("%s=%s" % (spec[k], s[k]) for k in sorted(spec) if k in s) if s else "-"
         print("at\t%s\t%s\t%s\t%s\t%s\t%s" % (sid, mid, leg, f, "fields" if s else "none", exp))
+        # S4-D (#291): the HP loss in context, 8 frames either side, clipped to the leg's own trace (which proves each)
+        if s:
+            print("span\t%s\t%s\t%s\t%d-%d" % (sid, mid, leg, max(int(f) - 8, min(d)), min(int(f) + 8, max(d))))
 for p in parts:
     for v in pins:
         legs = [(l, f"{W}/{p}.{v}.{l}/f.ft", r[3], r[4], r[5]) for l in ("native", "ours") for r in rows if r[0] == p and r[1] == v and r[2] == l]

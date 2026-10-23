@@ -1,0 +1,10 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent207/commit_tier/poked_legs.diff	0ce5b1ac68092793955eb419de67acc391d41824
+build/agent207/commit_tier/poke_readback.diff	cf16dba74af7f00784fc992b308ece337ac97b55
+build/agent207/commit_tier/hui_oracle_rows.txt	647b566bc6d98b4fa3a728a486120389321ca688
+build/agent207/commit_tier/poked_legs_after.log	5fbc36caf65038b2cf08eac7d557a9c6139b3728
+build/agent207/commit_tier/poke_readback_after.log	9aad6d57b98c75d6683cd5d64f736a1aeeb58a2e
+build/agent207/commit_tier/trap_air_hit_lines.txt	3a7a4ce6ed3ccbe16c17e66b3b9a7c0132e80bcc
+build/agent207/commit_tier/proof_sheets_lines.txt	4f3b1ac76d6fc0147aabdb0ee9a3b0531159f585
+build/agent207/commit_tier/ruling_poke_readback.txt	47e3cdfe97af0ccde6bb10dec552fddedab2537c
+build/agent207/commit_tier/tier.log	831c9ce20e82c52cffcaf63bfeb1d87fb4bc0f67

@@ -1,0 +1,15 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent207/t308/closing_comment.md	8691f81b31a037a4c9f165a66372f0050f6c0521
+build/agent207/t308/issue308.md	0fa7bcb3f80f3958d44054b7cdc288df6541429c
+build/agent207/t308/REPORT.md	d8447aa2c32cbf1868670d375bba4cf4ef6d2aec
+build/agent207/t308/code.patch	a395f747d13fb48932e9d737cba5746c4c9d2467
+build/agent207/t308/main_vs_9141f4f8.diff	b5ffb59472193c94ccdca15539d95b95ecf7df9e
+build/agent207/t308/static/test_host_text_opens.sh.txt	314b9f42e521d73668c9dd9623954451adc68c98
+build/agent207/t308/static/gate.log	972b26acb0b0b8346ce53b9b011a5bb34690b8fa
+build/agent207/t308/static/modes.txt	77c32d42120cba82cd781fdd28d5b0007bc9c51c
+build/agent207/t308/static/book_clean_checkout.txt	61d12718b70bebda077dd042757ad5aa79bf871c
+build/agent207/t308/eris/verdicts.txt	ebb1f61bc718e648e8f7add377213365c71c95c0
+build/agent207/t308/eris_bytes.txt	5d5ed77e00427349817ce373d3e0a66b2b1c76f1
+build/agent207/t308/mac/gate_v2.log	16e7d438ec8fb3efc13fe3475b408c696d2a03e1
+build/agent207/t308/mac/modes_v2.txt	f152c96a1e0213fc800e18fea6ff65ca92eec8f8
+build/agent207/t308/mac/siblings.txt	ecf647f935f8ea2b94629ec63709ada84b736362

@@ -161,6 +161,7 @@ declares	test_beam_list_type6
 declares	test_beam_variants
 declares	test_bg_leg_shape
 declares	test_biased_list_inventory
+declares	test_build_dirs
 declares	test_build_environment_entry
 declares	test_build_gate_status
 declares	test_build_identity_distinct
@@ -266,6 +267,7 @@ declares	test_history_index
 declares	test_hitbox_encoding
 declares	test_hitclass_map_thunk
 declares	test_host_libs
+declares	test_host_text_opens
 declares	test_hui_air
 declares	test_hui_boot
 declares	test_hui_df_style

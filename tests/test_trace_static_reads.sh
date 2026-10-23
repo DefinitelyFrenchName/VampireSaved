@@ -42,7 +42,7 @@ fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 
 R="$W/r"; mkdir -p "$R/tools" "$R/tests" "$R/docs" "$R/build/m1" "$R/tests/rulecheck/runs/r1"
-cp tools/static_confirm.py tools/battery_reach.py tools/trace_static_reads.py "$R/tools/"
+cp tools/static_confirm.py tools/battery_reach.py tools/build_dirs.py tests/expected/build_dirs.tsv tools/trace_static_reads.py "$R/tools/"
 printf 'g_named\ng_tmpl\ng_whole\ng_runs\n' > "$R/tests/ci_portable.txt"
 printf '#!/bin/sh\necho "each run keeps a verdict.txt" > /dev/null; ls verdict.txt 2>/dev/null\n' > "$R/tests/g_runs.sh"
 echo v > "$R/tests/rulecheck/runs/r1/verdict.txt"

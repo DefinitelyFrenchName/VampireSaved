@@ -294,6 +294,7 @@ if sheet_on && [ -z "$CONTROL" ]; then
     sheet_leg reentry vsav2 vs2 vsav2 "$ROMDIR" "$W/demitri.rpl" "$PK" "$FR"
     sheet_leg reentry vsavj vsavj vsavj "$ROMDIR" "$W/demitri.rpl" "$PK" "$FR"
     sheet_leg reentry ours ours vsavjw "$BUILD/rompath;$ROMDIR" "$W/demitri.rpl" "$PK" "$FR"
+    for g in vsav2 vsavj ours; do sheet_trace reentry "$g" "$W/$g.ft" "$FIELDS"; done
     sheet_new act "The first possible attack after the hit+10 block, back held to +21 (LP every other frame; the earlier phase)" - "#136" "$_nc"
     python3 - "$W" "$FIELDS" "$EVENTS" "$_v" > "$W/sheet_rows.tsv" 2> "$W/sheet.err" <<'PYS'
 import sys
@@ -309,15 +310,19 @@ def load(p, spec):
             d[int(t[1])] = (kv, ",".join("%s=%s" % (key[k], val) for k, val in sorted(kv.items()) if k in key))
     return d
 L = {g: load("%s/%s.ft" % (W, g), spec) for g in ("vsav2", "vsavj", "ours")}
-def at(sid, mid, leg, f, d):
+def at(sid, mid, leg, f, d, lo=None, hi=None):
     print("at\t%s\t%s\t%s\t%d\t%s\t%s" % (sid, mid, leg, f, "fields" if f in d else "none", d[f][1] if f in d else "-"))
+    # S4-D (#291): the moment's judged window on the leg's own trace, the moment's frame among it
+    live = [g for g in range(lo, hi + 1) if g in d] if lo is not None else []
+    if f in d and live:
+        print("span\t%s\t%s\t%s\t%d-%d" % (sid, mid, leg, min(live + [f]), max(live + [f])))
 for e in evs:
     f = e + 16
     vals = ", ".join("%s cnt=%s" % (g, L[g][f][0].get("cnt", "?")) for g in ("vsav2", "vsavj", "ours") if f in L[g])
     print("moment\treentry\te%d\tevent %d (+16): the freeze ends into blockstun\t%s\t%s" % (e, e, v, vals))
-    for g in ("vsav2", "vsavj", "ours"): at("reentry", "e%d" % e, g, f, L[g])
+    for g in ("vsav2", "vsavj", "ours"): at("reentry", "e%d" % e, g, f, L[g], e + 8, e + 25)   # the frozen +8..+25 rows
 print("moment\treentry\tpx\thit+20 of the 3640 event, inside the frozen pixel window (3654-3666)\t%s\t-" % v)
-for g in ("vsav2", "vsavj", "ours"): at("reentry", "px", g, 3660, L[g])
+for g in ("vsav2", "vsavj", "ours"): at("reentry", "px", g, 3660, L[g], 3654, 3666)   # the frozen pixel window
 first = {}
 for g in ("vsav2", "vsavj", "ours"):
     best = None
@@ -330,13 +335,14 @@ same = "IDENTICAL" if len({b[0] for b in first.values()}) == 1 and len(first) ==
 print("moment\tact\ta\tthe first attack state (seq 0x0A)\t%s\t%s" % (same, ", ".join("%s +%d" % (g, b[0] - 3640) for g, b in first.items())))
 for g, (f, ph, d) in first.items():
     print("L\t%s\t%d" % (g, ph))
-    at("act", "a", g, f, d)
+    at("act", "a", g, f, d, 3660, f + 4)   # from the hit+20 block to just past the first attack state
 PYS
     for g in vsav2 vsavj ours; do
         _ph="$(awk -F'\t' -v g="$g" '$1 == "L" && $2 == g {print $3}' "$W/sheet_rows.tsv")"
         [ -n "$_ph" ] || continue
         case "$g" in vsav2) _r=vs2; _s=vsav2; _rp="$ROMDIR" ;; vsavj) _r=vsavj; _s=vsavj; _rp="$ROMDIR" ;; ours) _r=ours; _s=vsavjw; _rp="$BUILD/rompath;$ROMDIR" ;; esac
         sheet_leg act "$g" "$_r" "$_s" "$_rp" "$W/act_3661_$_ph.rpl" "$APK" "$AFR"
+        sheet_trace act "$g" "$W/act_${g}_3661_$_ph.ft" "ff8406:b:seq,ff8407:b:sub,ff845c:b:frz,ff8782:b:id,ff8b82:b:p2id"
     done
     grep -v '^L	' "$W/sheet_rows.tsv" > "$W/sheet_rows2.tsv"
     sheet_rows "$W/sheet_rows2.tsv"

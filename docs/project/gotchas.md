@@ -7485,3 +7485,27 @@ ledger at `$W/ledger.json`, and the sheet run of scratch commit `ecce6294` passe
 (`build/agent206/t_qsv/`, local). **A gate's optional mode is code like any other: run it once whenever it changes,
 or it is not tested; give every alternative input path ONE name downstream, so a reader can't depend on which branch
 ran.**
+
+## A PLANNER THAT JUDGES EVERY CHANGED PATH FOR EVERY GATE IS AS SLOW AS THE LARGEST UNTRACKED TREE — the `--confirm` plan stalled for 30 min on #291's proof sheets (paid: 14z-206, #313; fixed 14z-207)
+
+`tools/static_confirm.py plan` counts every untracked, unignored file newer than the base run as changed, and
+`run_on_snapshot.sh` copies all of `build/`, mtimes kept. One afternoon of `tools/proof_sheets.py` left 20,271 sheet
+files under `build/sheets/`, which the N-D scratch filter did not name, and `predict` judged each against every gate
+still CARRIED: 25 of 229 gates in 1,902 s, then the tier's 2 h timeout (exit 124), where the evening before it judged
+all 229 in 37 s against 45 paths. Fixed by lane F (`1a2210f6`): `build/sheets/` is N-D scratch, scored on a PILOT
+trace of all 229 gates with a replica of the sheet tree present (0 misses over 88,235 reads; the over-narrowed control
+102), and the per-path work is bounded with every verdict unchanged (old against new IDENTICAL on sampled sheet and
+tracked-diff paths; 20,297 paths planned in 22.1 s on PILOT; `build/agent207/t313/`, local). **A directory a tool
+starts writing under `build/` is planner input until something says otherwise: name it scratch when the tool lands,
+and keep the planner's cost bounded by the path count it can see, not by hope.** The one-list-and-census answer is
+#304.
+
+## A CENSUS THAT LISTS FILES WITH `git ls-files` NEVER SEES THE FILE THAT ISN'T TRACKED YET — including itself (paid: 14z-207, #304)
+
+Fork J's `tests/test_build_dirs.sh` PASSED in its worktree: `tools/build_dirs.py census` collects every `build/<dir>`
+named in `git ls-files tools tests`, and the fork's new files were committed as a commit object only, so the census never
+read `tools/build_dirs.py` itself. In a clean checkout of the merged tree, where that file is tracked, the census read
+its selftest's deliberate plants and near misses (`build/zz_code`, `build/sheets2`, `build/agentX`, …) as real
+directories and FAILED. The reader of the list now skips itself, as it skips fixture directories. **A gate that
+discovers its inputs through git must be proven on a checkout where the change under test is TRACKED — a clean
+checkout of the commit, not the worktree that wrote it.**

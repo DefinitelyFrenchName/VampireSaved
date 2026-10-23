@@ -148,7 +148,13 @@ for k, lab in ((0, "the grab onset (P1 seq 0x0E)"), (6, "onset+6, in the hold"),
         s = tr[leg].get(f)
         exp = ",".join("%s=%s" % (spec[n], s[n]) for n in sorted(spec) if n in s) if s else "-"
         print("at\tgrab\to%d\t%s\t%d\t%s\t%s" % (k, leg, f, "fields" if s else "none", exp))
+        # S4-D (#291): the onset's moment spans the whole hold the checker judges, onset..onset+12 (HOLD_LEN), each
+        # frame proven on the fields this run traced there
+        if k == 0 and s:
+            print("span\tgrab\to0\t%s\t%d-%d" % (leg, f, max(x for x in range(f, f + 13) if x in tr[leg])))
 PYS
+    sheet_trace grab native "$WORK/native/field.txt" "$FIELDS"
+    sheet_trace grab ours "$WORK/ours/field.txt" "$FIELDS"
     sheet_rows "$WORK/sheet_rows.tsv"
 fi
 

@@ -91,7 +91,13 @@ for i, (x, y) in enumerate(zip(rows["native"], rows["ours"])):
         smp = R[leg].get(f)
         exp = ",".join("%s=%s" % (spec[n], v) for n, v in sorted(smp.items()) if n in spec) if smp else "-"
         print("at\th222\tk%d\t%s\t%d\t%s\t%s" % (x["k"], leg, f, "fields" if smp else "none", exp))
+        # S4-D (#291): the judged window, the 60 frames from the jump in which tools/air_dash_rigs.py looks for the dash
+        live = [g for g in range(f0, f0 + 60) if g in R[leg]]
+        if smp and live:
+            print("span\th222\tk%d\t%s\t%d-%d" % (x["k"], leg, min(live + [f]), max(live + [f])))
 PYS
+    sheet_trace h222 native "$W/tr_native.txt" "$FIELDS"
+    sheet_trace h222 ours "$W/tr_ours.txt" "$FIELDS"
     sheet_rows "$W/sheet_rows.tsv"
 fi
 [ "$fail" = 0 ] && echo "PASS: audit_air_dash_height — --expect $EXPECT: Phobos's air dash under vs2's row as expected (#222); identical above" \

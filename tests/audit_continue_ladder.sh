@@ -190,6 +190,9 @@ for k in range(max(len(v) for v in legs.values()) if any(legs.values()) else 0):
           % (k + 1, k + 1, "on both legs" if len(have) == 2 else "on one leg only", vals))
     for l, (f, m) in have.items():
         print("at\tladder\tr%d\t%s\t%s\tlog\t-" % (k + 1, l, f))
+        # S4-D (#291): the window the reset was judged in, the dump before it (mask still set, 80 frames earlier) to
+        # the dump that reads 0, each frame proven on the leg's own log
+        print("span\tladder\tr%d\t%s\t%d-%s" % (k + 1, l, int(f) - 80, f))
 PYS
     sheet_rows "$W/sheet_rows.tsv"
 fi

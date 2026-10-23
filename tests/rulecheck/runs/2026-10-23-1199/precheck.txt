@@ -1,0 +1,2 @@
+  FLAG D-ABSOLUTE: #286's record-only measure from the same run is on #286.  [build/agent207/t313/closing_comment.md]
+packet_check: 1 flag(s): D-ABSOLUTE 1

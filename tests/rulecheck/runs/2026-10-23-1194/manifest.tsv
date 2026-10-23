@@ -1,0 +1,19 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent207/t304/REPORT.md	f4f1c774c7a2de3a1a5e5a8eaaa8f61ae9419172
+build/agent207/t304/issue304.md	a0320c4150de37a5f1b6f5921dfbb8a92350b486
+build/agent207/t304/ur.txt	1386c4e5e61357fc24c1a057b585d2d72da29815
+build/agent207/t304/build_needs.txt	eb013385bc2f084d0ca71184d31635fa5761263b
+build/agent207/t304/build_names_in_code.txt	3bbe44ba88c30265c4e45f5a8a8c3f8a43a62c48
+build/agent207/t304/snapshot_listing_prefixes.txt	3ffad199c98ed6b60c6ce5e1afd5bd1ed8797e78
+build/agent207/t304/snapsteps.txt	3d847504c3421444419043592cc1ce0f4285497d
+build/agent207/t304/snapshot_setup_records.txt	6dd5065267270371717c97abb59e6d1a9c6c82fe
+build/agent207/t304/r4_readers.txt	49fbd63a3b0db06cf3c251ca51ee87e73fa61d55
+build/agent207/t304/scratch_reads_in_trace.txt	1e69dd9caaf7600f0d0c213f2758c1c909ac9699
+build/agent207/t304/prof/f_head_1.log	54911891fe7e8fb99afa063cac09732f73d77bd4
+build/agent207/t304/prof/f_head_2.log	d86316d634f48319ee28353cfe049e8005c907de
+build/agent207/t304/prof/old_base_f_head_1.log	dc0b974e1771c50739e09b3af66ac693b4ae41af
+build/agent207/t304/prof/old_base_f_noscr_1.log	0f2f4df1a3157f9e9e20cf3c7ae8c29ad17dc84b
+build/agent207/t304/prof/old_base_f_noscr_2.log	816694875d594d8b45080d3073ba01ca4f3b38e1
+build/agent207/t304/prof/old_base_f_noscr_tf_1.log	eb1d616026a778abbeece766dd1704e631f99153
+build/agent207/t304/prof/old_base_f_noscr_tf_2.log	aae564889a1842b6a8bd14d22dfd392823596ed0
+build/agent207/t304/prof/par_plan.log	94af8b29f921c78d80a7b5a2fd1853a71c10b16f

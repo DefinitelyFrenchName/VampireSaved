@@ -25,7 +25,9 @@
 #   test_gfx_menus' ours leg re-ran on pristine vsavj from ROMDIR); and #291 S4 (14z-206): each picture's "fighters on
 #   screen" is read from the game's state (tests/lua/screen_state.lua) — the select screen, the round-end white and the
 #   stage before the drop-in read no, the round start and the round read yes, the predicate chosen on 118 pictures
-#   classed by eye and confirmed on 201 (build/agent206/t291/s4b/, local); a SPAN shows about 9 frames of a judged
+#   classed by eye and confirmed on 201 (build/agent206/t291/s4b/, local), and since 14z-207 the vs2 round intro (both
+#   fighters drawn, no entry in 0x01-0x09) reads yes and its round load no, through the latched fighter-row count fv
+#   (scored on 288 pictures classed by eye, build/agent207/t291/H/, local); a SPAN shows about 9 frames of a judged
 #   event, each proven on the
 #   moment's own basis (the log, or the gate's own per-frame field trace — an altered trace frame refused), a basis that
 #   cannot prove each frame refused; an INPUTS sheet photographs at most 18 frames IN EACH ROUND where the replay
@@ -39,13 +41,16 @@
 # HOW: a fixture SHEET_OUT on pristine vsavj (02_demitri_vs_cpu to frame 3001): the frozen masked vanilla log
 #   (tests/expected/vsavj/masked-v2) is the "gate's log", the masked-v2 mask the leg's; the field values are taken
 #   from tests/lua/field_trace.lua run live on the same inputs; `proof_sheets.py prove` on the fixture; one control.
+#   Section 6 adds one pristine vsav2 leg (tests/replays/hui/90_hui_oracle.rpl with test_hui_oracle's pokes, to f2382),
+#   proven on P1/P2 x read live by field_trace.lua, for the round load and the round intro.
 # EXPECTS: the six verdicts above, section 6's fighters readings and 6b's characters, section 7's spans, section 8's inputs and section 9's
 #   page checks, each picture present, the S3 refusals (section 6, no build: the checks run on
 #   section 3's proven sheet re-labelled `ours`, a scratch git checkout and the tool's own functions); PASS. It does not claim any gate's sheet is complete — the
 #   census (tests/test_sheet_census.sh) and each gate's own verdict do that part.
 # FOLLOWS: tools/proof_sheets.py tests/lua/sheet_capture.lua tests/lua/pokes_spec.lua tests/lua/field_trace.lua
 #   tests/expected/vsavj/masked-v2/logs/02_demitri_vs_cpu.log tests/expected/merged1/mask
-#   tests/replays/02_demitri_vs_cpu.rpl tests/lib/controls.sh tools/run_mame.sh tools/setup_mame.sh emu/mame-patches/
+#   tests/replays/02_demitri_vs_cpu.rpl tests/replays/hui/90_hui_oracle.rpl tests/lib/controls.sh tools/run_mame.sh
+#   tools/setup_mame.sh emu/mame-patches/
 #   tests/lua/sheet_tap_capture.lua tests/lua/read_tap.lua build/manifest/ tests/audit_landing_sound.sh
 #   tests/lua/screen_state.lua docs/project/sheet_notes.md tests/test_tenant_select_records.sh
 #   tests/lib/ tools/build_donovan.sh
@@ -59,6 +64,7 @@
 # MUST-FIRE: shadow-tool: tag-key-blind — a copy of tools/proof_sheets.py whose control check never compares the built track with the freeze tag's program key must accept a control build off its tag, so the refusal rests on the comparison (#291 S4-A; in-gate: the shadow's control_check on the mismatched key; mode: the shadow is the tool under test and the gate FAILs)
 # MUST-FIRE: shadow-tool: rompath-unresolved — a copy of tools/proof_sheets.py that keeps a leg's rom path as the gate wrote it must leave a relative element relative, so the capture's rom path rests on the resolve (#291 S4-A; in-gate: the shadow's read_sheet on a fixture leg with a relative element; mode: the shadow is the tool under test and the gate FAILs)
 # MUST-FIRE: shadow-tool: fighters-blind — a copy of tools/proof_sheets.py whose fighters() always says yes must read the bare stage before the drop-in as showing the fighters, so the no-fighter strip rests on the measured predicate (#291 S4-B; in-gate: the shadow is run on the fighters fixture; mode: the shadow is the tool under test and the gate FAILs)
+# MUST-FIRE: shadow-tool: intro-blind — a copy of tools/proof_sheets.py whose fighters() reads fp alone (S4-B's predicate, without the latched fighter-row count fv) must read the vs2 round intro, both fighters drawn, as showing none, so the intro's "yes" rests on fv (#291, 14z-207; in-gate: the shadow is run on the fighters fixture; mode: the shadow is the tool under test and the gate FAILs)
 # MUST-FIRE: shadow-tool: span-blind — a copy of tools/proof_sheets.py whose fields span never compares the gate's trace must prove the frame whose trace value was altered, so each span frame's proof rests on the trace (#291 S4-D; in-gate: the shadow is run on the span fixture; mode: the shadow is the tool under test and the gate FAILs)
 # MUST-FIRE: shadow-tool: inputs-unbounded — a copy of tools/proof_sheets.py that takes the whole replay as one round must pick input frames outside the round, so the in-round picks rest on the anchors (#291 S4-E; in-gate: the shadow is run on the inputs fixture; mode: the shadow is the tool under test and the gate FAILs)
 # MUST-FIRE: shadow-tool: undefined-tag — a copy of tools/proof_sheets.py whose tag census finds nothing must leave the fixture's undefined verdict word unlisted, so the legend's completeness rests on the census (#291 S4-C; in-gate: the shadow draws the fixture page; mode: the shadow is the tool under test and the gate FAILs)
@@ -117,9 +123,14 @@ rompath_unresolved() {  # rompath_unresolved <out.py> — the shadow that keeps 
     [ "$(command grep -c '"rompath": f\[5\]' "$1")" = 1 ] || { echo "the rom path resolve was not found to drop" >&2; return 1; }
 }
 fighters_blind() {  # fighters_blind <out.py> — the shadow whose fighters() always says yes
-    sed -e 's/^    return "yes" if sc.get("m4") == 0x40000 and sc.get("m8") in MATCH_M8 and sc\["fp"\] >= 1 else "no"$/    return "yes"  # shadow/' \
+    sed -e 's/^    return "yes" if sc.get("m4") == 0x40000 and sc.get("m8") in MATCH_M8 and (sc\["fp"\] >= 1 or sc.get("fv", 0) >= 1) else "no"$/    return "yes"  # shadow/' \
         -e "s|^ROOT = .*|ROOT = Path('$REPO')|" tools/proof_sheets.py > "$1"
     [ "$(command grep -c '# shadow$' "$1")" = 1 ] || { echo "the fighters predicate was not found to replace" >&2; return 1; }
+}
+intro_blind() {  # intro_blind <out.py> — the shadow whose fighters() reads fp alone (S4-B's predicate, no fv)
+    sed -e 's/^    return "yes" if sc.get("m4") == 0x40000 and sc.get("m8") in MATCH_M8 and (sc\["fp"\] >= 1 or sc.get("fv", 0) >= 1) else "no"$/    return "yes" if sc.get("m4") == 0x40000 and sc.get("m8") in MATCH_M8 and sc["fp"] >= 1 else "no"  # shadow/' \
+        -e "s|^ROOT = .*|ROOT = Path('$REPO')|" tools/proof_sheets.py > "$1"
+    [ "$(command grep -c '# shadow$' "$1")" = 1 ] || { echo "the fighters predicate's fv term was not found to drop" >&2; return 1; }
 }
 span_blind() {  # span_blind <out.py> — the shadow whose fields span never compares the trace
     sed -e 's/^        return prove({"frame": fr, "basis": "fields", "expect": ",".join(.*$/        return "PROVEN", "shadow: not compared"/' \
@@ -149,6 +160,7 @@ who_swapped() {  # who_swapped <out.py> — the shadow whose who() reads P2 as P
 TOOL=tools/proof_sheets.py
 if vs_ctl_is who-swapped; then who_swapped "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
 if vs_ctl_is fighters-blind; then fighters_blind "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
+if vs_ctl_is intro-blind; then intro_blind "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
 if vs_ctl_is span-blind; then span_blind "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
 if vs_ctl_is inputs-unbounded; then inputs_unbounded "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
 if vs_ctl_is undefined-tag; then undefined_tag "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
@@ -427,6 +439,25 @@ B="$W/fight"; mkdir -p "$B/legs"; cp "$S/legs/gt.v.rpl" "$S/legs/gt.v.log" "$B/l
   echo "moment${T}gt${T}start${T}the round start${T}-${T}-";       echo "at${T}gt${T}start${T}v${T}2328${T}log${T}-"
   echo "moment${T}gt${T}fight${T}in the round${T}-${T}-";          echo "at${T}gt${T}fight${T}v${T}2900${T}log${T}-"
 } > "$B/sheet.tsv"
+# 14z-207: the ROUND INTRO on pristine vsav2 (test_hui_oracle's replay and pokes: Phobos vs Victor). Both fighters are
+# drawn from f2365 with no entry in palettes 0x01-0x09 (fp=0) until the HUD; f2363 is the bare stage the round loads
+# on. Proven on P1/P2 x read live by field_trace.lua (no frozen vsav2 log exists to read).
+IRPL=tests/replays/hui/90_hui_oracle.rpl
+IPK="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10;2360:ff80d4:42;2360:ff80d5:42;2500:ff8509:09"
+( cd "$W" && MAME_SANDBOX="$W/ft4" MAME_ROMPATH="$ROMDIR" REPLAY="$REPO/$IRPL" POKES="$IPK" FIELDS="ff8410:w:x,ff8810:w:x2" \
+    FIELD_OUT="$W/ft4.txt" FIELD_FROM=2363 FIELD_TO=2381 FRAMES=2382 \
+    "$REPO/tools/run_mame.sh" vsav2 -autoboot_script "$REPO/tests/lua/field_trace.lua" > "$W/ft4.log" 2>&1 ) </dev/null
+ifl() {  # ifl <frame> -> ff8410:w=<x>,ff8810:w=<x2> at that frame of the live trace
+    awk -v f="$1" '$1 == "F" && $2 == f {x = $0; sub(/.* x=/, "", x); sub(/ .*/, "", x); y = $0; sub(/.*x2=/, "", y); sub(/ .*/, "", y); print "ff8410:w=" x ",ff8810:w=" y}' "$W/ft4.txt"
+}
+I63="$(ifl 2363)"; I81="$(ifl 2381)"
+[ -n "$I63" ] && [ -n "$I81" ] || { echo "FAIL: field_trace gave no vsav2 sample at 2363/2381 ($W/ft4.log)"; exit 1; }
+cp "$IRPL" "$B/legs/gi.n.rpl"
+{ echo "sheet${T}gi${T}round intro${T}-${T}-${T}-"
+  echo "leg${T}gi${T}n${T}vs2${T}vsav2${T}$ROMDIR${T}legs/gi.n.rpl${T}$IPK${T}2382${T}-${T}-"
+  echo "moment${T}gi${T}load${T}the round load, vs2${T}-${T}-";   echo "at${T}gi${T}load${T}n${T}2363${T}fields${T}$I63"
+  echo "moment${T}gi${T}intro${T}the round intro, vs2${T}-${T}-"; echo "at${T}gi${T}intro${T}n${T}2381${T}fields${T}$I81"
+} >> "$B/sheet.tsv"
 cp -R "$B" "$W/fight_ctl"
 prove "$TOOL" "$B" > "$W/fight.tsv" 2>&1
 wantf() {  # wantf <file> <label> <fighters>
@@ -438,6 +469,8 @@ wantf "$W/fight.tsv" "the round-end white" no
 wantf "$W/fight.tsv" "the stage before the drop-in" no
 wantf "$W/fight.tsv" "the round start" yes
 wantf "$W/fight.tsv" "in the round" yes
+wantf "$W/fight.tsv" "the round load, vs2" no
+wantf "$W/fight.tsv" "the round intro, vs2" yes
 
 echo "== 6b. who plays whom, read from the game's state (the maintainer, 14z-206: each gate's characters and setup)"
 ( cd "$W" && MAME_SANDBOX="$W/ft3" MAME_ROMPATH="$ROMDIR" REPLAY="$REPO/$RPL" FIELDS="ff8782:b:c1,ff8b82:b:c2,ff8116:b:lv" \
@@ -666,6 +699,14 @@ if fighters_blind "$W/fbl.py"; then
     if [ "$g" = yes ]; then vs_ctl_fired fighters-blind "a predicate that always says yes reads the bare stage before the drop-in as showing the fighters"
     else vs_ctl_dead fighters-blind "the shadow read '$g' on the bare stage"; nope "control fighters-blind"; fi
 else vs_ctl_dead fighters-blind "the fighters predicate was not found to replace"; nope "control fighters-blind"; fi
+
+if intro_blind "$W/ibl.py"; then
+    rm -rf "$W/fight_ctl/capture" "$W/fight_ctl/proof.json"
+    prove "$W/ibl.py" "$W/fight_ctl" > "$W/ibl.tsv" 2>&1
+    g="$(awk -F'\t' '$2 == "the round intro, vs2" {print $7}' "$W/ibl.tsv")"
+    if [ "$g" = no ]; then vs_ctl_fired intro-blind "a predicate on fp alone reads the round intro, both fighters drawn, as showing none"
+    else vs_ctl_dead intro-blind "the shadow read '$g' on the round intro"; nope "control intro-blind"; fi
+else vs_ctl_dead intro-blind "the fighters predicate's fv term was not found to drop"; nope "control intro-blind"; fi
 
 if who_swapped "$W/wsw.py"; then
     rm -rf "$W/fight_ctl/capture" "$W/fight_ctl/proof.json"

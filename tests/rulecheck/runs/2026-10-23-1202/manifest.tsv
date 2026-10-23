@@ -1,0 +1,18 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent207/t308/closing_comment.md	1b3d3094c99c7d75f5949501568244beebc0ff70
+build/agent207/t308/issue308.md	0fa7bcb3f80f3958d44054b7cdc288df6541429c
+build/agent207/t308/REPORT.md	d8447aa2c32cbf1868670d375bba4cf4ef6d2aec
+build/agent207/t308/code.patch	a395f747d13fb48932e9d737cba5746c4c9d2467
+build/agent207/t308/main_vs_9141f4f8.diff	b5ffb59472193c94ccdca15539d95b95ecf7df9e
+build/agent207/t308/static/test_host_text_opens.sh.txt	cd4147bd01122d611d4faf670932554d197e9873
+build/agent207/t308/static/gate2.log	405a6efbf76148048e83e7aeed8e3d2e0c841473
+build/agent207/t308/static/modes2.txt	173b7308ca891b7a44db362b54afdc8a536ea465
+build/agent207/t308/static/book_clean_checkout2.txt	23470cb7c505dd505098d81deb06fe99ecc0d1cb
+build/agent207/t308/static/shell_portability_main.log	d7ff18ebd33043e6f50326bc28d927eeb4405ade
+build/agent207/t308/main_siblings/verdicts.txt	a999582897f1a203d45214023645a14ebfab7df4
+build/agent207/t308/main_siblings/test_release_roundtrip.log	13ec6cf4ba61798be1e8e70828949d6a80d055aa
+build/agent207/t308/main_siblings/tree.txt	af66f48d43bc46e1218770744cf92568aa6ed548
+build/agent207/t308/eris/verdicts.txt	ebb1f61bc718e648e8f7add377213365c71c95c0
+build/agent207/t308/eris/b_degraded.log	ea9e46ed4bdb8b67ff052cce0edc8dc81f1c3f06
+build/agent207/t308/mac/gate_v2.log	16e7d438ec8fb3efc13fe3475b408c696d2a03e1
+build/agent207/t308/mac/modes_v2.txt	f152c96a1e0213fc800e18fea6ff65ca92eec8f8

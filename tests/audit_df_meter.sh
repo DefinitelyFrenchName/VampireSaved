@@ -202,6 +202,7 @@ if sheet_on && [ -z "$CONTROL" ]; then
             case $g in vsav2) _set=vsav2; _rp="$ROMDIR"; _ro=vs2 ;; vsavj) _set=vsavj; _rp="$ROMDIR"; _ro=vsavj ;;
                         ours) _set=vsavjw; _rp="$BUILD/rompath;$ROMDIR"; _ro=ours ;; esac
             sheet_leg "$_n" "${g}_$id" "$_ro" "$_set" "$_rp" "$W/${g}_$id.rpl" "$PK" "$FR"
+            sheet_trace "$_n" "${g}_$id" "$W/$g.$id.ft" "$FIELDS"
         done
         python3 - "$W" "$_n" "$_legs" "$W/want.tsv" >> "$W/sheet_rows.tsv" <<'PYS'
 import sys
@@ -222,19 +223,24 @@ mode = {k: int(next(r[3] for r in got if r[0] == "mode" and (r[1], r[2]) == k).s
 ref = [k for k in legs if k[0] != "ours"]
 wins = [("swing1", "j.HP out of the mode", 2600, 2800), ("swing2", "5HP out of the mode", 2800, 3000),
         ("swing3", "j.HP in the mode", 3150, 3350), ("swing4", "5HP in the mode", 3350, 3600)]
-def emit(mid, lab, frames, vals):
+def emit(mid, lab, frames, vals, start):
     print("moment\t%s\t%s\t%s\t%s\t%s" % (sid, mid, lab, "as frozen" if ok else "DIFF from the frozen rows", vals))
     for k, f in frames.items():
         s = tr[k].get(f)
         exp = ",".join("%s=%s" % (spec[n], s[n]) for n in sorted(spec) if n in s) if s else "-"
         print("at\t%s\t%s\t%s_%s\t%d\t%s\t%s" % (sid, mid, k[0], k[1], f, "fields" if s else "none", exp))
+        # S4-D (#291): the judged move from its first input (the jump, the press, the activation) to 16 frames past
+        # the frame shown, each frame proven on the three fields this leg traced there (1400-3600)
+        span = [x for x in range(min(start, f), f + 17) if x in tr[k]]
+        if s and span:
+            print("span\t%s\t%s\t%s_%s\t%d-%d" % (sid, mid, k[0], k[1], min(span), max(span)))
 for mid, lab, lo, hi in wins:
     own = {k: [f for f, dv in steps[k] if lo <= f < hi] for k in legs}
     rf = next((own[k][0] for k in ref if own[k]), lo + 14)
     fr = {k: (own[k][0] if own[k] else rf) for k in legs}
     vals = ", ".join("%s_%s %s" % (k[0], k[1], ("+%d" % sum(dv for f, dv in steps[k] if lo <= f < hi)) if own[k] else "no gauge") for k in legs)
-    emit(mid, "%s (button f%d)" % (lab, lo + (14 if lo in (2600, 3150) else 0)), fr, "gauge step: " + vals)
-emit("mode", "the mode entry (+0x111 set)", dict(mode), "entry: " + ", ".join("%s_%s f%d" % (k[0], k[1], mode[k]) for k in legs))
+    emit(mid, "%s (button f%d)" % (lab, lo + (14 if lo in (2600, 3150) else 0)), fr, "gauge step: " + vals, lo)
+emit("mode", "the mode entry (+0x111 set)", dict(mode), "entry: " + ", ".join("%s_%s f%d" % (k[0], k[1], mode[k]) for k in legs), 3000)
 PYS
     done
     sheet_rows "$W/sheet_rows.tsv"

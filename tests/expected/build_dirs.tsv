@@ -1,0 +1,98 @@
+# THE ONE CLASSING OF build/'s TOP-LEVEL DIRECTORIES (#304, 14z-207; maintainer-ruled 2026-10-23, "Adopt all four
+# (Recommended)"). Read by tools/build_dirs.py; tools/static_confirm.py's N-D scratch rule and its pruned untracked
+# listing are GENERATED from the `scratch` rows, never written a second time (written twice, the glob
+# `build/agent[0-9]*/**` and the regex `agent\d+\w*` disagreed on build/agent7-x/ and build/agent7.d/).
+# Census: tests/test_build_dirs.sh — every build/<top> that tools/ and tests/ programs name, and every build/ top-level
+# directory present, must be classed here, or the gate fails.
+#
+# class<TAB>pattern<TAB>reason. A pattern is ONE path component: a glob of `*`, `?` and `[...]` (git's glob magic).
+# A name's class is the first of scratch, input, kept, fixture with a row matching it; a name matching a scratch row
+# and a row of another class fails the census (the planner's split must be unambiguous).
+#   scratch  the session tooling's own output: no static gate reads a file under it (PILOT trace, #313/#304); the
+#            planner judges it by R4 alone (N-D) and the planned snapshot change (#304 item 2) would leave it out
+#   input    a gate or a tool reads it (a program names it, or the PILOT trace saw a read)
+#   kept     a build or session output nothing is known to read; judged by every rule, as before
+#   fixture  named only inside a gate's synthetic repository or message; never a real directory of this tree
+# Top-level FILES under build/ (logs and the like) are out of this list's scope; the planner judges them as before.
+scratch	agent[0-9]*	session, fork and lane scratch (build/agent<N>/, N-D since 14z-200)
+scratch	rulecheck	tools/rulecheck.py's staged packets (N-D)
+scratch	static_runs	tests/run_all_static.sh's run records (N-D; test_session_metrics lists it, an R4 reader)
+scratch	snapshot_runs	tests/run_on_snapshot.sh's snapshots (N-D)
+scratch	sheets	tools/proof_sheets.py's pages and clean checkouts (N-D since #313)
+input	out	the decrypt cache (38 gates read it in the PILOT trace)
+input	manifest	the build manifests (tracked)
+input	wide0	the WIDE profile's rompath (3 gates in the PILOT trace)
+input	wide_canary	the WIDE canary's rompath (tests/test_mame_wide.sh)
+input	m3b_merged*	merged builds; m3b_merged31 is the frozen merged default
+input	merged1	the first merged build (9 programs name it)
+input	hui[0-9]*	Huitzil/Phobos builds; hui61 is the frozen default
+input	pyron[0-9]*	Pyron builds; pyron46 is the frozen default
+input	don_m[0-9]*	Donovan builds; don_m27 is the frozen default
+input	don_stage4_m*	Donovan stage-4 builds
+input	don_phys_probe	tests/test_m3a_reproducible.sh names it
+input	donovan	the first Donovan build (tests/ci_emulator.tsv)
+input	donovan[0-9]*	Donovan builds; donovan6 is gate-written (tests/run_battery_m2.sh)
+input	donovan_stage4_gate	gate-written by tests/test_m2a_stage4_code.sh
+input	m5_*	stock and WIDE builds; m5_stock22 is the frozen stock default
+input	m5w	tools/run_wide.sh's WIDE build
+input	emu_*	emulator-tier run records (tests/run_all_emulator.sh writes them; test_emulator_staleness reads them)
+input	gate_failures	emulator gates' failure logs (audit_merged_legacy names it)
+input	gate_failures_static	static gates' failure logs (tests/run_all_static.sh writes them)
+input	legacy_pairings	tests/audit_legacy_pairings.sh's output
+input	guard_corpus	tests/audit_guard_corpus.sh's output
+input	inp_guard	tools/run_inp_guarded.sh's output
+input	inp_probe	tools/run_inp_probe.sh's output
+input	rc[0-9]*	release-candidate builds (tests/test_m3a_reproducible.sh)
+input	rig[0-9]*	rig builds (tests/audit_tick_phase.sh reads rig172)
+input	fromrelease	tests/test_release_binaries.sh's unpacked release
+input	freeze_*	tools/freeze_expectation_set.py's freeze records
+input	scratch	tracked historical builds, gitignored by name (tests/audit_release_linux_cleanhost.sh names it)
+input	cleanhost_release	tests/audit_release_linux_cleanhost.sh's output
+input	desktop_release	tests/audit_release_linux_desktop.sh's output
+input	sheet_variants	tests/test_proof_sheets.sh's gate-built variants
+input	dualtrack_merged_*	tests/test_dualtrack.sh's builds
+input	trap_air_sheet_*	tools/trap_air_sheet.sh's output
+input	trap_air_probe	tools/trap_air_probe.sh's output
+input	probe_*	tools/probe_hook_removal.sh's builds (gitignored)
+input	agent_hooks	tests/test_agent_hooks.sh's work dir
+input	charpages	tools/charmap_html.py's pages
+input	fbneo_boot_*	tests/test_release_binaries.sh's boot logs
+input	x_family_14z167	tests/audit_facing_rule.sh reads it
+input	probe_104	tests/audit_don_grab_pose.sh reads it
+input	meter_probe_14z166	a probe build programs name
+input	p136_14z168	a probe build programs name
+input	.release_prune_*	tests/test_release_prune.sh's own temp directory (written and read by that gate)
+kept	*_14z[0-9]*	session-tagged outputs (<what>_14z<N>)
+kept	gfx_hashes	gitignored hash cache
+kept	probe[0-9]*	probe outputs (probe157)
+kept	fix[0-9]*	fix outputs (fix170_b)
+kept	gatequal[0-9]*	gate-qualification outputs (gatequal180)
+fixture	a9	tools/close_standing.py's synthetic tree
+fixture	agent	tests/test_static_confirm.sh's synthetic repo
+fixture	agentless	tools/static_confirm.py's selftest (not scratch)
+fixture	basis	tests/audit_rng_forms.sh's message
+fixture	content	a message
+fixture	cr	tests/test_rule_checker.sh's synthetic tree
+fixture	definitely_not_a_build	tests/test_region_overlap_control.sh's absent path
+fixture	definitely_not_the_current_dir	tests/test_freeze_artifacts_current.sh's absent path
+fixture	fake	tests/test_shared_writes.sh's synthetic build
+fixture	fake_merged	tests/test_emulator_runner.sh's synthetic build
+fixture	m1	tests/test_static_confirm.sh's synthetic build
+fixture	m2	tools/static_confirm.py's selftest
+fixture	leak	tools/static_confirm.py's plan selftest (case D, a leaked output)
+fixture	merged1-vs-shipped-merged	tests/test_suite_dispatch.sh's message
+fixture	mirror	tests/test_mame_mirror_guard.sh's synthetic tree
+fixture	name	tests/test_build_ref_rot.sh's placeholder
+fixture	new_dir	tests/test_header_defaults.sh's synthetic path
+fixture	old_dir	tests/test_header_defaults.sh's synthetic path
+fixture	nope	tests/test_emulator_runner.sh's absent path
+fixture	pc	tests/test_packet_check.sh's synthetic tree
+fixture	plainx	tests/test_ref_rot_image_pick.sh's synthetic path
+fixture	rompath	a `$BUILD/rompath` read as build/rompath
+fixture	s	tools/scratch_census.py's synthetic tree
+fixture	sheetsx	tools/static_confirm.py's selftest (not scratch)
+fixture	stockx	tests/test_ref_rot_image_pick.sh's synthetic path
+fixture	t118	tests/audit_mizuumi_struct.sh's message
+fixture	t277	tools/agent/extract.py's example
+fixture	widex	tests/test_ref_rot_image_pick.sh's synthetic path
+fixture	x	tests/test_close_loop_cost.sh's synthetic tree

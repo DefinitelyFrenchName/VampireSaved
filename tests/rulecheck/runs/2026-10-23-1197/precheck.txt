@@ -1,0 +1,4 @@
+  FLAG D-ABSOLUTE: - **The per-path work is bounded, with every verdict unchanged.** The selftest's g_bound case judges 44 paths with the bounded and the unbounded planner, pat...  [build/agent207/t313/closing_comment.md]
+  FLAG D-ABSOLUTE: The committed planner and the bounded one gave identical gate-by-gate output on 2 Mac change sets (3 and 188 paths) and on 3 PILOT chunks (110 to 111 paths e...  [build/agent207/t313/closing_comment.md]
+  FLAG D-ABSOLUTE: #286's record-only measure from the same run is on #286.  [build/agent207/t313/closing_comment.md]
+packet_check: 3 flag(s): D-ABSOLUTE 3

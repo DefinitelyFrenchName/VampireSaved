@@ -16,13 +16,13 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**466 scripts** — 137 ci_portable, 92 ci_static, 237 emulator-tier (run by name).
+**468 scripts** — 139 ci_portable, 92 ci_static, 237 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 46 | the suite runners and their own ground truth |
+| [runner](#runner) | 47 | the suite runners and their own ground truth |
 | [docs](#docs) | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
-| [platform](#platform) | 49 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
+| [platform](#platform) | 50 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
@@ -48,6 +48,7 @@ the suite runners and their own ground truth.
 | `tests/test_agent_sweep.sh` | test | ci_portable | — | SLICE S2 OF GitHub #172: C0.3, the close-time process sweep (`tools/agent/sweep.py`), names every survivor it must and nothing it must not (docs/project/agent_architecture_scope.md §4 C0.3, 2026-09-23). | 2026-09-23 |
 | `tests/test_agent_worker.sh` | test | ci_portable | — | SLICE S4 OF GitHub #172, step 2: "a worker run on a known task returns figures each traceable to a command" (docs/project/agent_architecture_scope.md §5), over a FROZEN real run — ruled 2026-09-23 (14z-177, DECISIONS_HISTORY.md "Ruled 2026-… | 2026-09-23 |
 | `tests/test_bg_leg_shape.sh` | test | ci_portable | — | NO GATE MAY BACKGROUND AN EMULATOR LEG THAT WRITES ITS EXIT STATUS UNDER `set -e` WITHOUT `set +e` INSIDE THE GROUP (14z-171). ROM-free, ~2 s. Tool: tools/audit_bg_leg_shape.py (its docstring is the WHY). | 14z-171 |
+| `tests/test_build_dirs.sh` | test | ci_portable | — | every build/ top-level directory is classed in ONE list, and the planner's two scratch forms generated from it agree (`tools/build_dirs.py`, tests/expected/build_dirs.tsv; #304, 14z-207). | 14z-207 |
 | `tests/test_claim_lint.sh` | test | ci_portable | — | every universal or definite in a rule-checker claim is tied to a named check or to the claim's NOT TESTED part (tools/claim_lint.py, 14z-187b, GitHub #185 item 3). | 14z-187b |
 | `tests/test_close_checks.sh` | test | ci_portable | — | the close's check runner times every check, re-runs one alone, and never lets a partial run read as the run of record (`tools/close_checks.py`, 14z-185b, GitHub #187). | 14z-185b |
 | `tests/test_close_loop_cost.sh` | test | ci_portable | — | the close-loop cost reader counts every pass of a close's check runner and the packet's span, whatever interpreter ran the runner and however a prepare's output was cut (`tools/agent/close_loop_cost.py`, 14z-187b, GitHub #187). | 14z-187b |
@@ -148,6 +149,7 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 | `tests/test_fbneo_tree_integrity_control.sh` | test | ci_static | ROMDIR | ground truth for the emu/fbneo tree integrity gate (14z-90, GitHub issue #36). | 14z-90 |
 | `tests/test_frozen_rompath_guard.sh` | test | ci_static | ROMDIR | tools/build_donovan.sh must refuse to rebuild over a FROZEN REFERENCE rompath (14z-90, GitHub issue #26). | 14z-90 |
 | `tests/test_host_libs.sh` | test | ci_portable | — | tools/check_host_libs.py, the rule a Linux release folder is held to (every file's DIRECT NEEDED sonames are shipped in the folder and resolve there, or are on tests/expected/linux_host_provided.tsv; | 2026-09-13 |
+| `tests/test_host_text_opens.sh` | test | ci_portable | — | THE RELEASE GENERATOR'S TEXT FILES NAME THEIR ENCODING AND NEWLINE (#308, 14z-207). ci_portable: no ROM, ~1 s. | 14z-207 |
 | `tests/test_input_integrity.sh` | test | emulator | MAME | ground truth for the input-integrity check. | session 14z |
 | `tests/test_mame_default_bin.sh` | test | ci_portable | — | with MAME_BIN unset, tools/run_mame.sh runs the PINNED build for the set, never the `mame` on PATH (14z-189, #196). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-189 |
 | `tests/test_mame_determinism.sh` | test | emulator | MAME | is MAME actually deterministic, run to run? | session 14z |

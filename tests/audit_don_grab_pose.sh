@@ -237,6 +237,17 @@ import os
 if os.environ.get("SHEET_OUT"):   # THE SHEET (#291): the first tick that samples the modal record; a file only
     first = next(rows[i][0] for i in range(1, len(rows)) if rows[i][1] < rows[i - 1][1] and rows[i][2] == addr)
     open(f"{d}/hold_frame.txt", "w").write("%d\n" % first)
+    # S4-D (#291): the window of the grab that tick belongs to — the replay grabs five times, each hold a run of
+    # headbutt ticks ~20-30 frames apart and the grabs 150+ frames apart (measured 14z-207 on victim 0x13, both legs) —
+    # from the sample before the hold's first tick to its last
+    ticks = [rows[i][0] for i in range(1, len(rows)) if rows[i][1] < rows[i - 1][1]]
+    k = ticks.index(first)
+    while k > 0 and ticks[k] - ticks[k - 1] <= 60:
+        k -= 1
+    j = ticks.index(first)
+    while j + 1 < len(ticks) and ticks[j + 1] - ticks[j] <= 60:
+        j += 1
+    open(f"{d}/hold_span.txt", "w").write("%d-%d\n" % (max(ticks[k] - 10, 0), ticks[j]))
 if n * 2 <= total:
     print("NO-HOLD"); sys.exit(0)
 # a TENANT victim on our leg lives in the placed copy; everything else is
@@ -268,6 +279,8 @@ for v in $VICTIMS; do
         sheet_moment "v$v" hold "the held capture record (first headbutt tick on it)" "$_sv" "ours: $A; native: $B"
         for _sl in native ours; do
             if [ -s "$W/$v/$_sl/hold_frame.txt" ]; then sheet_at "v$v" hold "$_sl" "$(cat "$W/$v/$_sl/hold_frame.txt")" log; fi
+            # S4-D (#291): the hold in full, every frame proven on the leg's own checksum log
+            if [ -s "$W/$v/$_sl/hold_frame.txt" ] && [ -s "$W/$v/$_sl/hold_span.txt" ]; then sheet_span "v$v" hold "$_sl" "$(cat "$W/$v/$_sl/hold_span.txt")"; fi
         done
     fi
     printf "  victim 0x%s (%s)\n    ours  : %s\n    native: %s\n" "$v" "$reg" "$A" "$B"

@@ -217,6 +217,10 @@ if sheet_on && [ -z "$MODE" ]; then
         "native word 0x$NSAT +0x94=$N94; ours word 0x$SAT +0x94=$H94, tenant probe fires $NT"
     sheet_at clash f3520 native 3520 log
     sheet_at clash f3520 ours 3520 log
+    # S4-D (#291): the satellite in context, 8 frames before the dump to 8 after (or the leg's last logged frame), each
+    # frame proven on the leg's own log
+    sheet_span clash f3520 native "3512-$(awk '$1 ~ /^[0-9]+$/ {n = $1} END {print (n < 3528 ? n : 3528)}' "$W/nat/out.log")"
+    sheet_span clash f3520 ours "3512-$(awk '$1 ~ /^[0-9]+$/ {n = $1} END {print (n < 3528 ? n : 3528)}' "$W/ten/out.log")"
 fi
 
 [ "$fail" = 0 ] && echo "AUDIT PASS" || { echo "AUDIT FAIL"; exit 1; }

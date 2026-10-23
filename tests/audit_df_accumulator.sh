@@ -173,7 +173,14 @@ for line in open(f"{W}/got.txt"):
             s = tr[leg].get(f)
             exp = ",".join("%s=%s" % (spec[k], s[k]) for k in sorted(spec) if k in s) if s else "-"
             print("at\tarmor\tm%d\t%s\t%d\t%s\t%s" % (n, leg, f, "fields" if s else "none", exp))
+            # S4-D (#291): the event in context, 8 frames before it to 8 after (the contact's attack and the reaction
+            # it does or does not cause), each frame proven on the fields this leg traced there (3000-4600)
+            fr = [x for x in range(f - 8, f + 9) if x in tr[leg]]
+            if s and fr:
+                print("span\tarmor\tm%d\t%s\t%d-%d" % (n, leg, min(fr), max(fr)))
 PYS
+    sheet_trace armor vanilla "$W/armor/field.txt" "$FIELDS"
+    sheet_trace armor merged "$W/merged/field.txt" "$FIELDS"
     sheet_rows "$W/sheet_rows.tsv"
 fi
 # [VSP-19] the checker against a perturbed armor trace: a sum past 60 that did

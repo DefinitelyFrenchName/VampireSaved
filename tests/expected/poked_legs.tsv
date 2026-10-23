@@ -315,6 +315,10 @@ tests/test_phasec_image.sh	ours	replays/12_donovan_vs_cpu.rpl	P1	U U R	0f Jedah	
 tests/test_phasec_image.sh	ours	replays/12_donovan_vs_cpu.rpl	P2	-	-	03	?	
 tests/test_phasec_image.sh	ours	replays/judge/02_throw.rpl	P1	-	01 Demitri	13	CROSS-INERT	
 tests/test_phasec_image.sh	ours	replays/judge/02_throw.rpl	P2	R R	03 Victor	03	SAME	
+tests/test_proof_sheets.sh	native	replays/02_demitri_vs_cpu.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/test_proof_sheets.sh	native	replays/hui/90_hui_oracle.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/test_proof_sheets.sh	ours	replays/02_demitri_vs_cpu.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/test_proof_sheets.sh	ours	replays/hui/90_hui_oracle.rpl	P1	-	01 Demitri	10	CROSS-INERT	
 tests/test_pyron_blink.sh	native	replays/pyron/76_pyron_blink_vs2.rpl	P1	-	01 Demitri	11	CROSS-INERT	
 tests/test_pyron_blink.sh	native	replays/pyron/76_pyron_blink_vs2.rpl	P2	R R	03 Victor	03	SAME	
 tests/test_pyron_blink.sh	ours	replays/pyron/76_pyron_blink_vs2.rpl	P1	-	01 Demitri	11	CROSS-INERT	

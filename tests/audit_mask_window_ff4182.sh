@@ -92,6 +92,9 @@ print('IDENTICAL outside the window' if len(v) >= 0xA0 and len(p) >= 0xA0 and al
     sheet_moment f9126 f9126 "f9126: the staging dump the gate compares" "$_sv"
     sheet_at f9126 f9126 vanilla 9126 log
     sheet_at f9126 f9126 build 9126 log
+    # S4-D (#291): the compared frame in context, 8 frames before it to 8 after, each proven on the leg's own log
+    sheet_span f9126 f9126 vanilla 9118-9134
+    sheet_span f9126 f9126 build 9118-9134
 fi
 
 python3 - "$WORK" <<'EOF'

@@ -1,0 +1,14 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent207/t313/closing_comment.md	883249e90438011ec123a6e22da95227dac989a7
+build/agent207/t313/issue313.md	50af5370d8bec850f7ddfcedf52521283c7773e5
+build/agent207/t313/REPORT.md	4f712dbc2071ffaff1814896726ee431f7b6fe54
+build/agent207/t313/f207_313_code.patch	6849285d1a380136823248bb5adc30c86a344cbe
+build/agent207/t313/gate_main.log	3bb470be907627c068a7608257072b4a0abd4424
+build/agent207/t313/mac_equiv_cmp.txt	5d4033519e89302cb76df59852cb0361c006f99a
+build/agent207/t313/F/pilot/trace_setup.log	aa4533de1740d56d54c91889483f93532ce011ef
+build/agent207/t313/F/pilot/trace_all.log	363e5d8a2319889b3ed4555b81cf7cf7116c9b9a
+build/agent207/t313/F/pilot/tier.log	074ffe7ccfae615f5030130d95a7ab4c11c6c5fd
+build/agent207/t313/F/pilot/confirm_tier.log	4d86276885db58194bdc70d38b65bb00319c101a
+build/agent207/t313/F/pilot/equiv2/diff_0.log	c8d9e500e6ea0ba5a07cec4aef849127a3a4ae00
+build/agent207/t313/F/pilot/equiv2/diff_1.log	b51084e97c62d007b29eeadd5ec1801dbdd4a4b6
+build/agent207/t313/F/pilot/equiv2/diff_2.log	a3ec2a4cf6240fa3bdd5193f354894b35ae846a7

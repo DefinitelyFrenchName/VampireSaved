@@ -31,6 +31,12 @@
 #   tools/select_wheel.py tools/setup_mame.sh tools/trap_air_boxes.py tools/trap_air_probe.sh
 #   tools/trap_air_prologue.py tools/cps2_decrypt.py tools/_minitoml.py tests/lib/sheet.sh
 #
+# RIG RECORD: the traced p1x step (ff8410) is Phobos parked by P1XPIN (540 over 3470-3489) and holds 540 through
+# the whole 3500..3530 window on every leg — a rig record (READS-BACK), never a measurement of the game (ruled
+# 2026-10-23, 14z-207, tests/expected/poke_readback.tsv). vx starts at the pinned 695: on the 3508 legs its later steps
+# (696-698, the air hit's pushback) are the game's; on the 3511 legs it holds the pinned 695 through the whole window, a
+# rig record on those two rows (the column ruled OBSERVES, 3511 noted).
+#
 # SHEET: legs vs2,ours — moments: per press (3508, 3511) the dome's first hit on Felicia on each leg, on that leg's own field trace (the victim's and Phobos's traced fields) — not comparable: the victim is each game's own Felicia (her charged head hurtbox, frozen per leg) and each game's stage and palette; the class byte at 3511 differs by ruling (0x52 native, the marker 0x38 ours)
 #
 # MUST-FIRE: perturbed-copy: air-grounded — a copy of the merged 3508 row with the hit's height set to the ground's 40 (what a dome that only hits grounded victims would read) must FAIL the airborne-hit check, so "hit in the air" is read from the height at the hit (in-gate: the perturbed row must fail the check; mode: the row is rewritten and the gate FAILs)
@@ -290,7 +296,14 @@ for leg in ("native", "merged"):
             d = dict(kv.split("=", 1) for kv in t[2:])
     exp = ",".join("%s=%s" % (key[k], d[k]) for k in sorted(key) if k in d) if d else "-"
     print("at\tp%s\thit\t%s\t%d\t%s\t%s" % (p, leg, h, "fields" if d else "none", exp))
+    # S4-D (#291): the judged window, the whole traced press 3500..3530 (the descent, the hit, the reaction), each
+    # frame proven on the leg's own trace
+    if d: print("span\tp%s\thit\t%s\t3500-3530" % (p, leg))
 PYS
+        # S4-D (#291): each leg's own field trace (the probe's trace.ft), named by the keys the at-rows compare
+        for _leg in native merged; do
+            sheet_trace "p$p" "$_leg" "$W/$_leg-$p/trace.ft" "ff8810:w:vx,ff8814:w:vy,ff8850:w:vhp,ff8854:b:vcls,ff885c:b:vfrz,ff8806:b:vseq,ff8894:l:vfam,ff8410:w:p1x,ff8450:w:p1hp,ff845c:b:p1frz"
+        done
         sheet_rows "$W/sheet_$p.tsv"
     done
 fi

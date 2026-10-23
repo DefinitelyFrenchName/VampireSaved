@@ -347,7 +347,7 @@ else vs_ctl_fired legs-swapped "the legs reduced under each other's labels diffe
 . "$REPO/tests/lib/sheet.sh"
 if sheet_on && [ -z "${VS_CTL:-}" ]; then
     for p in $PARTS; do
-        eval "_g=\$GEOM_$p"; set -- $_g; _fr=$1; _en=$4
+        eval "_g=\$GEOM_$p"; set -- $_g; _fr=$1; _lo=$2; _en=$4
         case "$p" in
         legacy_lilith) _la=vsavj; _ra=vsavj; _sa=vsavj; _rpa="$ROMDIR"; _ch=-
             sheet_new "$p" "$p: Lilith walks Victor into the right corner, throws, pursues: pristine vsavj and native vs2 (no leg of ours: the engine difference itself)" - "#179" \
@@ -359,9 +359,10 @@ if sheet_on && [ -z "${VS_CTL:-}" ]; then
         sheet_leg "$p" vsav2 vs2 vsav2 "$ROMDIR" "$W/$p.vsav2.rpl" "$(tr -d '\n' < "$W/$p.pokes")" "$_fr"
         sheet_leg "$p" "$_la" "$_ra" "$_sa" "$_rpa" "$W/$p.$_la.rpl" "$(tr -d '\n' < "$W/$p.pokes")" "$_fr"
         if [ -s "$W/diff.$p" ] || [ ! -s "$W/got.$p" ]; then _v="DIFF from frozen"; else _v="as frozen"; fi
-        python3 - "$p" "$_la" "$W" "$FT" "$_en" "$_v" > "$W/sheet_$p.tsv" <<'PYS'
+        python3 - "$p" "$_la" "$W" "$FT" "$_en" "$_v" "$_lo" > "$W/sheet_$p.tsv" <<'PYS'
 import sys
 part, la, W, spec, en, verdict = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], int(sys.argv[5]), sys.argv[6]
+lo = int(sys.argv[7])
 key = {name: "%s:%s" % (a.lower(), sz) for a, sz, name in (f.split(":") for f in spec.split(","))}
 def load(p):
     d = {}
@@ -382,7 +383,14 @@ for mid, lab, f in moms:
     for leg in ("vsav2", la):
         d = tr[leg]
         print("at\t%s\t%s\t%s\t%d\t%s\t%s" % (part, mid, leg, f + 1, "fields" if f + 1 in d else "none", d.get(f + 1, "-")))
+        # S4-D (#291): the end moment spans the frozen push window (its tap frames + 1), the split 4 frames either side
+        a, b = (lo + 1, f + 1) if mid == "end" else (f + 1 - 4, f + 1 + 4)
+        live = [g for g in range(a, b + 1) if g in d]
+        if f + 1 in d and live:
+            print("span\t%s\t%s\t%s\t%d-%d" % (part, mid, leg, min(live + [f + 1]), max(live + [f + 1])))
 PYS
+        sheet_trace "$p" vsav2 "$W/$p.vsav2.ft.txt" "$FT"
+        sheet_trace "$p" "$_la" "$W/$p.$_la.ft.txt" "$FT"
         sheet_rows "$W/sheet_$p.tsv"
     done
 fi

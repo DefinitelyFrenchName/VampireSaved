@@ -169,6 +169,7 @@ if sheet_on && [ -z "$CONTROL" ]; then
             case $g in vsav2) _set=vsav2; _rp="$ROMDIR"; _ro=vs2 ;; ours) _set=vsavjw; _rp="$BUILD/rompath;$ROMDIR"; _ro=ours ;; esac
             sheet_leg "t$id" "${g}_$role" "$_ro" "$_set" "$_rp" "$W/${g}_${id}_$role.rpl" \
                 "3100:ff8509:$(printf %02x "$st");3120:ff8509:$(printf %02x "$st");$PINS" "$FR"
+            sheet_trace "t$id" "${g}_$role" "$W/${g}_${id}_$role.ft" "$FIELDS"
         done; done
     done
     python3 - "$W" "$W/want.tsv" > "$W/sheet_rows.tsv" <<'PYS'
@@ -200,6 +201,7 @@ for i in ("13", "10", "11"):
     ent = [f for f in range(3255, 3700) if tr[("vsav2", "stocked")].get(f, {}).get("f111", "0") != "0"]
     if ent: mom.append((ent[0], "f%d vs2 stocked enters the mode (+0x111)" % ent[0]))
     seen = set()
+    shown = sorted(set(f for f, lab in mom))
     for f, lab in mom:
         if f in seen: continue
         seen.add(f)
@@ -214,6 +216,12 @@ for i in ("13", "10", "11"):
             s = tr[(g, r)].get(f)
             exp = ",".join("%s=%s" % (spec[k], s[k]) for k in sorted(spec) if k in s) if s else "-"
             print("at\tt%s\tf%d\t%s_%s\t%d\t%s\t%s" % (i, f, g, r, f, "fields" if s else "none", exp))
+            # S4-D (#291): the path state this moment opens, to the next moment's frame (at least 9 frames, 16 past the
+            # last), each frame proven on the six fields this leg traced there (1400-3700)
+            nx = [x for x in shown if x > f]
+            sp = [x for x in range(f, max(nx[0] - 1, f + 8) + 1 if nx else f + 17) if x in tr[(g, r)]]
+            if s and sp:
+                print("span\tt%s\tf%d\t%s_%s\t%d-%d" % (i, f, g, r, min(sp), max(sp)))
 PYS
     sheet_rows "$W/sheet_rows.tsv"
 fi

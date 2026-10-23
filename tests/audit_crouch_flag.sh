@@ -171,7 +171,14 @@ for mid, lab, pick in moms:
         f = pick(on[leg]); smp = tr[leg].get(f)
         exp = ",".join("%s=%s" % (spec[k], v) for k, v in sorted(smp.items()) if k in spec) if smp else "-"
         print("at\tcrouch\t%s\t%s\t%d\t%s\t%s" % (mid, leg, f, "fields" if smp else "none", exp))
+        # S4-D (#291): the transition in context, 4 frames either side; the held moment spans the whole held range
+        lo, hi = (on[leg][0], on[leg][-1]) if mid == "held" and on[leg] else (f - 4, f + 4)
+        live = [g for g in range(lo, hi + 1) if g in tr[leg]]
+        if smp and live:
+            print("span\tcrouch\t%s\t%s\t%d-%d" % (mid, leg, min(live + [f]), max(live + [f])))
 PYS
+    sheet_trace crouch native "$W/native.ft" "$FIELDS"
+    sheet_trace crouch ours "$W/ours.ft" "$FIELDS"
     sheet_rows "$W/sheet_rows.tsv"
 fi
 if [ "$fail" = 0 ]; then echo "PASS: audit_crouch_flag"; else echo "FAIL: audit_crouch_flag"; exit 1; fi

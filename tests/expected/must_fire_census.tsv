@@ -106,6 +106,7 @@ declares	test_attribute_patch_delta
 declares	test_battery_accounting
 declares	test_beam_anim_walk
 declares	test_bg_leg_shape
+declares	test_build_dirs
 declares	test_build_environment_entry
 declares	test_bundle_parsers
 declares	test_capture_kf_ownership
@@ -161,6 +162,7 @@ declares	test_header_defaults
 declares	test_history_index
 declares	test_hitbox_encoding
 declares	test_host_libs
+declares	test_host_text_opens
 declares	test_hui_air
 declares	test_hui_boot
 declares	test_jtcores_twin

@@ -159,8 +159,8 @@ for leg in ("native", "ours"):
         with open(f"{W}/sheet_{leg}.tsv", "w") as sf:
             for i in range(len(fired)):
                 e = [x for x in ev if b[i] <= x[0] < b[i+1]]
-                sf.write("%d\t%d\t%d\t%d\t%d\n" % (i + 1, fired[i], e[0][0] if e else fired[i],
-                                                    sum(x[1] for x in e), len(e)))
+                sf.write("%d\t%d\t%d\t%d\t%d\t%d\n" % (i + 1, fired[i], e[0][0] if e else fired[i],
+                                                        sum(x[1] for x in e), len(e), e[-1][0] if e else fired[i]))
 
 # Verdict-logic controls (each MUST fail): the checker on (a) a leg with
 # one tick's damage removed, (b) a leg whose stocks never decrement.
@@ -208,6 +208,9 @@ if sheet_on; then
         for leg in native ours; do
             _fr="$(awk -F'\t' -v n=$n '$1 == n {print $3}' "$W/sheet_$leg.tsv" 2>/dev/null)"
             [ -n "$_fr" ] && sheet_at fg "a$n" "$leg" "$_fr" log
+            # S4-D (#291): the attempt's judged window, its stock decrement to its last HP tick, each frame on the leg's log
+            _sp="$(awk -F'\t' -v n=$n '$1 == n {print $2 "-" $6}' "$W/sheet_$leg.tsv" 2>/dev/null)"
+            [ -n "$_fr" ] && [ -n "$_sp" ] && sheet_span fg "a$n" "$leg" "$_sp"
         done
     done
 fi

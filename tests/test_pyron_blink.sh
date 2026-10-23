@@ -187,6 +187,10 @@ else
             sheet_at blink "f$_sf" native "$_sf" log
             sheet_at blink "f$_sf" ours "$_sf" log
         done
+        # S4-D (#291): the first moment spans the whole window the checker compares, f$LO..f$((HI - 1)), every frame
+        # proven on the leg's own checksum log (the spread lands on both phases of the every-frame blink)
+        sheet_span blink "f$LO" native "$LO-$((HI - 1))"
+        sheet_span blink "f$LO" ours "$LO-$((HI - 1))"
     fi
 fi
 

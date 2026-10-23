@@ -211,6 +211,10 @@ for c in $CASES; do
             "$(printf '%s' "$out" | tail -1 | tr '\t' ' ' | cut -c1-300)"
         sheet_at "$rpl.$frame" "f$frame" vanilla "$frame" log
         sheet_at "$rpl.$frame" "f$frame" merged "$frame" log
+        # S4-D (#291): the flicker frame in context, the 8 frames before it and the frame itself (the legs stop at
+        # f+1), each proven on the leg's own masked log
+        sheet_span "$rpl.$frame" "f$frame" vanilla "$((frame - 8))-$frame"
+        sheet_span "$rpl.$frame" "f$frame" merged "$((frame - 8))-$frame"
     fi
     if [ "$st" != 0 ]; then
         echo "  FAIL: a differing byte fell OUTSIDE every named window."

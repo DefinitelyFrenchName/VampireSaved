@@ -278,6 +278,13 @@ for sid in sorted(groups):
         def exp(f): return ",".join("%s=%s" % (key[k], v) for k, v in sorted(d[f].items()) if k in key) if f in d else "-"
         print("L\t%s\t%s_%s\t%s\t%s\t%s\t%s\t%s" % (sid, m, g, ROLE[g], g, i, act if act else "-", exp(act) if act else "-"))
         print("X\t%s\t%s_%s\t%s" % (sid, m, g, exp(3400)))
+        # S4-D (#291): the activation from its input (f3260; the scan starts at 3255) to 16 frames past the stock's
+        # drop, and f3400 in context (8 frames either side), each frame proven on the fields this leg traced (1400-3900)
+        if act:
+            sp = [f for f in range(3256, act + 17) if f in d]
+            if sp: print("P\t%s\tact\t%s_%s\t%d-%d" % (sid, m, g, min(sp), max(sp)))
+        sp = [f for f in range(3392, 3409) if f in d]
+        if 3400 in d and sp: print("P\t%s\tf3400\t%s_%s\t%d-%d" % (sid, m, g, min(sp), max(sp)))
 PYS
     : > "$W/sheet_rows.tsv"
     while IFS='	' read -r _k _sid _a _b _c _d _e _f; do
@@ -292,9 +299,11 @@ PYS
         L)  _m="${_a%%_*}"; _g="${_a#*_}"
             case "$_g" in ours) _set=vsavjw; _rp="$BUILD/rompath;$ROMDIR" ;; *) _set="$_g"; _rp="$ROMDIR" ;; esac
             sheet_leg "$_sid" "$_a" "$_b" "$_set" "$_rp" "$W/${_m}_${_g}_$_d.rpl" "$PK" "$FR"
+            sheet_trace "$_sid" "$_a" "$W/${_m}_${_g}_$_d.ft" "$FIELDS"
             if [ "$_e" != - ]; then printf 'at\t%s\tact\t%s\t%s\tfields\t%s\n' "$_sid" "$_a" "$_e" "$_f" >> "$W/sheet_rows.tsv"; fi ;;
         X)  if [ "$_b" != - ]; then _bs=fields; else _bs=none; fi
             printf 'at\t%s\tf3400\t%s\t3400\t%s\t%s\n' "$_sid" "$_a" "$_bs" "$_b" >> "$W/sheet_rows.tsv" ;;
+        P)  printf 'span\t%s\t%s\t%s\t%s\n' "$_sid" "$_a" "$_b" "$_c" >> "$W/sheet_rows.tsv" ;;
         esac
     done < "$W/sheet_plan.tsv"
     sheet_rows "$W/sheet_rows.tsv"

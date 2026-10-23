@@ -345,11 +345,15 @@ if sheet_on && [ -z "$MODE" ]; then
                 "nothing by design (legacy content under the superset invariant: the traces must be byte-identical)"
             sheet_leg "shell_$id" "v_$id" vsavj vsavj "$ROMDIR" "$RPL97" "$(pk_char "$id")" 3600
             sheet_leg "shell_$id" "m_$id" ours vsavjw "$MERGED" "$RPL97" "$(pk_char "$id")" 3600
+            sheet_trace "shell_$id" "v_$id" "$W/v_$id/field.txt" "$F1"
+            sheet_trace "shell_$id" "m_$id" "$W/m_$id/field.txt" "$F1"
         done
         sheet_new tenants "Dark Force startup window: native vs2 Donovan above the three tenants on the merged build" donovan,huitzil,pyron - \
             "native vs2's leg enters Dark Force POWER (P+K), a different mode with no observable window ([VSE-69]); each tenant is judged against its own frozen vs2 window; each game's stage and palette"
-        [ -d "$W/n_13" ] && sheet_leg tenants n_13 vs2 vsav2 "$ROMDIR" "$RPL97" "$(pk_char 13)" 3600
-        for id in 13 10 11; do [ -d "$W/m_$id" ] && sheet_leg tenants "m_$id" ours vsavjw "$MERGED" "$RPL97" "$(pk_char "$id")" 3600; done
+        [ -d "$W/n_13" ] && sheet_leg tenants n_13 vs2 vsav2 "$ROMDIR" "$RPL97" "$(pk_char 13)" 3600 \
+            && sheet_trace tenants n_13 "$W/n_13/field.txt" "$F1"
+        for id in 13 10 11; do [ -d "$W/m_$id" ] && sheet_leg tenants "m_$id" ours vsavjw "$MERGED" "$RPL97" "$(pk_char "$id")" 3600 \
+            && sheet_trace tenants "m_$id" "$W/m_$id/field.txt" "$F1"; done
     fi
     if [ "$SECTION" = contact ] || [ "$SECTION" = all ]; then
         sheet_new contact "The hit test honours +0x147: Victor's 5HP inside and outside the window, on the merged build" donovan,huitzil,pyron - \
@@ -359,7 +363,8 @@ if sheet_on && [ -z "$MODE" ]; then
             PK="$PK;3100:ff8509:03;3120:ff8509:03;4100:ff8509:03;4120:ff8509:03"
             PK="$PK;3030:ff8410:0228;3030:ff8810:02d8;4030:ff8410:0228;4030:ff8810:02d8"
             PK="$PK;3240:ff8450:01200120;4240:ff8450:01200120"
-            [ -d "$W/c_$id" ] && sheet_leg contact "c_$id" ours vsavjw "$MERGED" "$RPL98" "$PK" 4600
+            [ -d "$W/c_$id" ] && sheet_leg contact "c_$id" ours vsavjw "$MERGED" "$RPL98" "$PK" 4600 \
+                && sheet_trace contact "c_$id" "$W/c_$id/field.txt" "$F2"
         done
     fi
     python3 - "$W" "$REPO" "$_sv" "$SECTION" > "$W/sheet_rows.tsv" <<'PYS'
@@ -377,10 +382,15 @@ def samples(leg):
         f = ln.split()
         if len(f) >= 3 and f[0] == "F": rows[int(f[1])] = {k: int(v) for k, v in (p.split("=", 1) for p in f[2:])}
     return rows
-def at(sid, mid, leg, f, rows, spec):
+def at(sid, mid, leg, f, rows, spec, lo=None, hi=None):
     s = rows.get(f)
     exp = ",".join("%s=%d" % (spec[k], s[k]) for k in sorted(spec) if k in s) if s else "-"
     print("at\t%s\t%s\t%s\t%d\t%s\t%s" % (sid, mid, leg, f, "fields" if s else "none", exp))
+    # S4-D (#291): the judged window lo-hi (default: the frame in context, 8 either side), each frame proven on the
+    # fields this leg traced there (the trace legs 3200-3560, the contact legs 3200-4560)
+    sp = [x for x in range(f - 8 if lo is None else lo, (f + 8 if hi is None else hi) + 1) if x in rows]
+    if s and sp:
+        print("span\t%s\t%s\t%s\t%d-%d" % (sid, mid, leg, min(sp + [f]), max(sp + [f])))
 def marks(rows):
     fr = sorted(f for f in rows if T - 5 <= f <= T + 260)
     df = next((f for f in fr if rows[f]["df"] == 1), None)
@@ -396,7 +406,11 @@ def trace_sheet(sid, legs):
         frames = {l: (mk[l][k] if mk[l][k] is not None else (ref[k] if ref[k] is not None else T)) for l in have}
         vals = ", ".join("%s inv=%s f%d" % (l, rs[l].get(frames[l], {}).get("inv", "?"), frames[l]) for l in have)
         print("moment\t%s\tm%d\t%s\t%s\t%s" % (sid, k, lab, sv, vals))
-        for l in have: at(sid, "m%d" % k, l, frames[l], rs[l], F1)
+        for l in have:
+            # the entry from the activation press; the armed window whole, from its first armed sample to its zero
+            lo, hi = {0: (T - 4, frames[l] + 8), 1: (frames[l], (mk[l][2] if mk[l][2] is not None else frames[l] + 8)),
+                      2: (frames[l] - 8, frames[l] + 8)}[k]
+            at(sid, "m%d" % k, l, frames[l], rs[l], F1, lo, hi)
 if SECTION in ("trace", "all"):
     for i in ("00", "01", "03"):
         if (Path(W) / f"v_{i}").exists() and (Path(W) / f"m_{i}").exists(): trace_sheet(f"shell_{i}", [f"v_{i}", f"m_{i}"])
@@ -407,15 +421,16 @@ if SECTION in ("contact", "all"):
     legs = sorted(d.name for d in Path(W).iterdir() if d.name.startswith("c_") and (d / "field.txt").exists())
     rs = {l: samples(l) for l in legs}
     for t, lab in ((3260, "IN: Victor's 5HP active inside the window (P1's HP must not move)"), (4260, "OUT: Victor's 5HP active outside it (P1's HP must drop)")):
-        frames = {}
+        frames, wins = {}, {}
         for l in legs:
             fr = sorted(f for f in rs[l] if t - 30 <= f <= t + 200)
             atk = [f for f in fr if f >= t and (nm.get(rs[l][f]["p2node"]) or (None,))[0] in {"a2:0x04", "a2:0x05"}]
             act = [f for f in atk if nm[rs[l][f]["p2node"]][2]]
             frames[l] = act[0] if act else t
+            wins[l] = (atk[0], atk[-1]) if atk else (frames[l] - 8, frames[l] + 8)   # Victor's 5HP, startup to recovery
         vals = ", ".join("%s hp=%s inv=%s f%d" % (l, rs[l].get(frames[l], {}).get("p1hp", "?"), rs[l].get(frames[l], {}).get("inv", "?"), frames[l]) for l in legs)
         print("moment\tcontact\t%s\t%s\t%s\t%s" % ("in" if t == 3260 else "out", lab, sv, vals))
-        for l in legs: at("contact", "in" if t == 3260 else "out", l, frames[l], rs[l], F2)
+        for l in legs: at("contact", "in" if t == 3260 else "out", l, frames[l], rs[l], F2, *wins[l])
 PYS
     sheet_rows "$W/sheet_rows.tsv"
 fi

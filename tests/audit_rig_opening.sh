@@ -287,7 +287,13 @@ for f in frames:
         s = tr[leg].get(f)
         exp = ",".join("%s=%s" % (spec[k], s[k]) for k in sorted(spec) if k in s) if s else "-"
         print("at\topening\tf%d\t%s\t%d\t%s\t%s" % (f, leg, f, "fields" if s else "none", exp))
+        # S4-D (#291): the sample frame in context, 4 frames either side on the leg's own trace
+        live = [g for g in range(f - 4, f + 5) if g in tr[leg]]
+        if s and live:
+            print("span\topening\tf%d\t%s\t%d-%d" % (f, leg, min(live + [f]), max(live + [f])))
 PYS
+    sheet_trace opening native "$W/native.tr" "ff8410:w:x,ff8406:b:seq,ff812d:b:rnd,ff8782:b:id"
+    sheet_trace opening ours "$W/ours.tr" "ff8410:w:x,ff8406:b:seq,ff812d:b:rnd,ff8782:b:id"
     sheet_rows "$W/sheet_rows.tsv"
 fi
 

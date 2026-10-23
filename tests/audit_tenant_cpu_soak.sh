@@ -29,7 +29,7 @@
 #   tests/lua/field_trace.lua tests/lua/pokes_spec.lua tools/cpu_soak_dist.py tools/run_mame.sh tools/setup_mame.sh
 #   tests/lib/sheet.sh
 #
-# SHEET: legs vs2,ours — moments: per tenant and condition, four samples of the judged window (its first frame and three evenly spaced after it), captioned with that pair's distances — not comparable: the frames themselves (the RNG is not pinned, so the legs diverge from the first random draw by construction: the distributions are what is judged, the pictures are samples of each window); each game's stage and palette, and P1's art
+# SHEET: legs vs2,ours — moments: per tenant and condition, the judged window as one moment shown by nine frames spread evenly across it (its first frame among them), captioned with that pair's distances — not comparable: the frames themselves (the RNG is not pinned, so the legs diverge from the first random draw by construction: the distributions are what is judged, the pictures are samples of each window); each game's stage and palette, and P1's art
 #
 # POKE READ-BACK (tests/expected/poke_readback.tsv): the pins' check reads the rig's OWN pokes back ($FF8450,
 #   $FF8850, $FF8109, $FF8116 — a RIG RECORD that the round stayed stationary); the venue and mask only steer the ladder's
@@ -198,10 +198,10 @@ else
     echo "  FAIL  the figures moved ($(grep -c '^[<>]' "$W/diff.txt") line(s)):"; sed 's/^/      /' "$W/diff.txt" | head -20; fail=1
 fi
 
-# THE SHEET (#291): with SHEET_OUT set, each tenant x condition pair's two legs as this run played them and four samples
-# of the judged window, each proven on the fields that leg traced there, captioned with the pair's distances. The
-# distributions are what is judged (the legs diverge by construction), so the samples are frames of each window, not
-# matched moments. Nothing the gate decides changes.
+# THE SHEET (#291): with SHEET_OUT set, each tenant x condition pair's two legs as this run played them and nine
+# samples spread across the judged window (S4-D: one moment, the window, ~9 frames), each proven on the fields that leg
+# traced there, captioned with the pair's distances. The distributions are what is judged (the legs diverge by
+# construction), so the samples are frames of each window, not matched moments. Nothing the gate decides changes.
 . "$REPO/tests/lib/sheet.sh"
 if sheet_on && [ -z "${VS_CTL:-}" ]; then
     if [ "$fail" = 0 ]; then _sv="figures as frozen"; else _sv="figures moved"; fi
@@ -213,7 +213,7 @@ if sheet_on && [ -z "${VS_CTL:-}" ]; then
         _pk="1750-2860:ff8121:$_V;1750-2860:ff8110:$_M;2000-99999:ff8116:06;2880-99999:ff8450:0120;2880-99999:ff8850:0120;2880-99999:ff8109:63"
         sheet_leg "$_sid" native vs2 vsav2 "$ROMDIR" "$W/${t}_${c}_native/leg.rpl" "$_pk" "$FRAMES" || true
         sheet_leg "$_sid" ours ours vsavjw "$BUILD/rompath;$ROMDIR" "$W/${t}_${c}_ours/leg.rpl" "$_pk" "$FRAMES" || true
-        python3 - "$_sid" "$GOT" "$t $c" "$FIELDS" "$W/${t}_${c}_native/trace.txt" "$W/${t}_${c}_ours/trace.txt" "$FRAMES" "$_sv" > "$W/sheet_$_sid.tsv" <<'PYS' && sheet_rows "$W/sheet_$_sid.tsv" || true
+        python3 - "$_sid" "$GOT" "$t $c" "$FIELDS" "$W/${t}_${c}_native/trace.txt" "$W/${t}_${c}_ours/trace.txt" "$FRAMES" "$_sv" > "$W/sheet_$_sid.tsv" <<'PYS' && sheet_trace "$_sid" native "$W/${t}_${c}_native/trace.txt.sheet" "$FIELDS" && sheet_trace "$_sid" ours "$W/${t}_${c}_ours/trace.txt.sheet" "$FIELDS" && sheet_rows "$W/sheet_$_sid.tsv" || true
 import sys
 sid, got, head, fields, ftn, fto, frames, sv = sys.argv[1:9]
 spec = {name: "%s:%s" % (a.lower(), sz) for a, sz, name in (f.split(":") for f in fields.split(","))}
@@ -230,14 +230,24 @@ for l in open(got):
     if cur == head and len(q) > 2 and q[1] == "tvd": tvd.append("%s tvd %s" % (q[0], q[2]))
 vals = ", ".join(tvd) or "-"
 tr = {"native": trace(ftn), "ours": trace(fto)}
-lo, hi = 2900, int(frames)
-for i in range(4):
-    fr = lo + i * (hi - lo) // 4
-    print("moment\t%s\ts%d\twindow sample %d of 4 (f%d; a sample, not a matched moment)\t%s\t%s" % (sid, i, i + 1, fr, sv, vals))
-    for leg in ("native", "ours"):
-        smp = tr[leg].get(fr)
-        exp = ",".join("%s=%s" % (spec[n], v) for n, v in sorted(smp.items()) if n in spec) if smp else "-"
-        print("at\t%s\ts%d\t%s\t%d\t%s\t%s" % (sid, i, leg, fr, "fields" if smp else "none", exp))
+# S4-D (#291): the judged window is ONE event: nine frames spread evenly across it, the first frame the moment's own,
+# each proven on the leg's trace. The sheet carries only those frames' trace lines (verbatim; the whole trace is ~20,000
+# lines a leg), written beside the gate's trace and handed over by sheet_trace below.
+lo = 2900
+hi = min(max(tr["native"] or [lo]), max(tr["ours"] or [lo]), int(frames) - 1)
+frs = sorted({lo + round(i * (hi - lo) / 8) for i in range(9)})
+for leg, src in (("native", ftn), ("ours", fto)):
+    with open(src) as fi, open(src + ".sheet", "w") as fo:
+        for l in fi:
+            q = l.split()
+            if not (q and q[0] == "F") or (len(q) > 1 and q[1].isdigit() and int(q[1]) in frs): fo.write(l)
+print("moment\t%s\tw\tthe judged window f%d-f%d (9 frames across it; samples, not matched moments)\t%s\t%s" % (sid, lo, hi, sv, vals))
+for leg in ("native", "ours"):
+    smp = tr[leg].get(lo)
+    exp = ",".join("%s=%s" % (spec[n], v) for n, v in sorted(smp.items()) if n in spec) if smp else "-"
+    print("at\t%s\tw\t%s\t%d\t%s\t%s" % (sid, leg, lo, "fields" if smp else "none", exp))
+    if smp:
+        print("span\t%s\tw\t%s\t%s" % (sid, leg, ",".join(map(str, frs))))
 PYS
     done; done
 fi

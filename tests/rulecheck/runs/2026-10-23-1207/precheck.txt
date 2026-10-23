@@ -1,0 +1,3 @@
+  FLAG D-ABSOLUTE: - **The fighters check now reads round intros.** The sheets' fighters-on-screen check read every intro as "no fighters" (the fighters draw with their own pal...  [build/agent207/t291/close/closing_comment.md]
+  FLAG D-ABSOLUTE: - Every gate page carries its Setup line, and every index row its setup text.  [build/agent207/t291/close/closing_comment.md]
+packet_check: 2 flag(s): D-ABSOLUTE 2

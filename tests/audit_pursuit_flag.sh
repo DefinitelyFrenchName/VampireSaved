@@ -214,6 +214,8 @@ if sheet_on && [ -z "${VS_CTL:-}" ]; then
             "each game's stage and palette, and P2's art (Demitri, each game's own copy; [VSP-168]); the mark taps (pyron_4) run on ours only and are not drawn" || true
         sheet_leg "$r" native vs2 vsav2 "$ROMDIR" "$REPO/$RIGS/$r.rpl" "$pk" "$fr" || true
         sheet_leg "$r" ours ours vsavjw "$BUILD/rompath;$ROMDIR" "$W/$r.ours.rpl" "$pk" "$fr" || true
+        sheet_trace "$r" native "$W/tr_$r.native.txt" "$FIELDS" || true
+        sheet_trace "$r" ours "$W/tr_$r.ours.txt" "$FIELDS" || true
         python3 - "$r" "$J" "$W" "$FIELDS" "$_e" > "$W/sheet_$r.tsv" <<'PYS' && sheet_rows "$W/sheet_$r.tsv" || true
 import json, sys
 sys.path.insert(0, "tools")
@@ -228,16 +230,20 @@ def trace(p):
     return d
 tr = {leg: trace(f"{W}/tr_{rig}.{leg}.txt") for leg in ("native", "ours")}
 N, O = pr.rows(js, f"{W}/tr_{rig}.native.txt"), pr.rows(js, f"{W}/tr_{rig}.ours.txt")
-def at(mid, leg, fr):
+def at(mid, leg, fr, lo, hi):
     s = tr[leg].get(fr)
     print("at\t%s\t%s\t%s\t%d\t%s\t%s" % (rig, mid, leg, fr, "fields" if s else "none", ",".join("%s=%s" % (spec[n], v) for n, v in sorted(s.items()) if n in spec) if s else "-"))
+    # S4-D (#291): the moment's window on the leg's own trace, the moment's frame among it
+    live = [g for g in range(lo, hi + 1) if g in tr[leg]]
+    if s and live:
+        print("span\t%s\t%s\t%s\t%d-%d" % (rig, mid, leg, min(live + [fr]), max(live + [fr])))
 for k, (e, n, o) in enumerate(zip(json.load(open(js))["events"], N, O)):
     press = int(e["name"].rsplit("+", 1)[1]) if "U+LP at +" in e["name"] else 50
     lo = e["frame"] + press
     v = "SAME" if pr.fmt(n) == pr.fmt(o) else "DIFF"
     vals = "native f117=%d pursuit=%s; ours f117=%d pursuit=%s (expect=%s)" % (n["f117"], n["pursuit"], o["f117"], o["pursuit"], expect)
     print("moment\t%s\tp%d\t%s: the press (P2's +0x117 read here)\t%s\t%s" % (rig, k, e["name"], v, vals))
-    at("p%d" % k, "native", lo); at("p%d" % k, "ours", lo)
+    at("p%d" % k, "native", lo, lo, lo + 139); at("p%d" % k, "ours", lo, lo, lo + 139)   # tools/pursuit_rigs.py's judged window
     drop = {}
     for leg, row in (("native", n), ("ours", o)):
         if row["red"]:
@@ -245,7 +251,7 @@ for k, (e, n, o) in enumerate(zip(json.load(open(js))["events"], N, O)):
     if drop:
         print("moment\t%s\td%d\t%s: the first HP drop after the press\t%s\tnative %s; ours %s" % (rig, k, e["name"], v, " ".join(n["red"]) or "-", " ".join(o["red"]) or "-"))
         for leg, fr in drop.items():
-            at("d%d" % k, leg, fr)
+            at("d%d" % k, leg, fr, fr - 4, fr + 4)   # the drop, 4 frames either side
 PYS
     done
 fi

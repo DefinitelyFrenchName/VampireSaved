@@ -216,7 +216,13 @@ if sheet_on; then
     if [ "$fail" = 0 ]; then _sv="as expected"; else _sv=DIFF; fi
     sheet_moment win screen "the victory screen (the frame its verdict word rests on)" "$_sv" "C $C, A $A, B $B, D $D, E $E"
     for _sl in C A B D E; do
-        if [ -s "$W/$_sl/sheet_frame.txt" ]; then sheet_at win screen "$_sl" "$(cat "$W/$_sl/sheet_frame.txt")" log; fi
+        if [ -s "$W/$_sl/sheet_frame.txt" ]; then
+            sheet_at win screen "$_sl" "$(cat "$W/$_sl/sheet_frame.txt")" log
+            # S4-D (#291): the 9 palette samples the classifier read nearest that frame (its dump frames: every 100
+            # from 4600, leg D's from 5400, to 6500), so the leg's ramp is shown across the samples it was judged on
+            _lo=4600; [ "$_sl" = D ] && _lo=5400
+            sheet_span win screen "$_sl" "$(python3 -c "import sys; f, lo = int(sys.argv[1]), int(sys.argv[2]); print(','.join(map(str, sorted(sorted(range(lo, 6600, 100), key=lambda x: (abs(x - f), x))[:9]))))" "$(cat "$W/$_sl/sheet_frame.txt")" "$_lo")"
+        fi
     done
 fi
 

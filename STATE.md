@@ -38,187 +38,102 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
-## Session 14z-206 — **PILOT and ERIS offline: the Mac carries the work in parallel. #299's cold cache fixed and #299 closed done; #296 and #309 closed done; #286's code half; #284 done awaiting release; #291 S4-A..F landed and S4-G shown, kept open for S4-D's 38 gates; #305..#313 filed; the sheet gates run on demand only.** Opened 2026-10-21 on transcript `fc0caa60` after the 14z-205c close (`b89fc9d7`, pushed).
+## Session 14z-207 — **PILOT and ERIS online, the work run in parallel lanes: #291 closed done (the span retrofit, the fighters check on round intros, the full sheet run reviewed); #308 and #313 closed done; #286 measured on PILOT; #304 analysed and its four recommendations adopted; #314 filed.** Opened 2026-10-23 on transcript `e552692b` after the 14z-206 close (`c494fac2`, pushed).
 
 ### opened with
-HANDOFF, STATE and NEXT_SESSION read; the sweep CLEAN, `main` equal to `origin/main`. The maintainer: *"Currently PILOT
-and ERIS are offline, what does that change?"*, then, on the offline order proposed: *"start in the offline order, and
-don't hesitate to parallelize the task, you have the whole machine to you"* (`DECISIONS_HISTORY.md` "Ruled 2026-10-21
-(14z-206) — PILOT and ERIS offline …"). Forks, each editing only its own files and none a record file: S (#291 S4's
-plan), R (#284's proposal), C (#299), M (#296), T (#286); then A (#291 S4-A), R2 (#284 applied), K (two tickets and
-#296's text), B4 (#291 S4-B onwards, in its own git worktree). The harness refuses a subagent's write of a report file,
-so each hand-back is saved verbatim by the orchestrator (`build/agent206/<t…>/REPORT.md`, local).
+HANDOFF, STATE and NEXT_SESSION read; the sweep CLEAN, `main` equal to `origin/main`. The maintainer: *"no answers right
+now for #229. PILOT and ERIS available. Let's parallelize work as much as we can"*. Forks, each in its own git worktree
+and editing only its own files, none a record file: A-E (#291 S4-D, the 38 debt gates by family), F (#313 then #286's
+done-when, the tier on PILOT), G (#308, the Windows leg on ERIS), then H (the fighters check, from lanes C and D's
+finding). The green guard refuses a fork's branch commit, so each lane's work is a commit object pinned as
+`refs/agent207/<lane>` (local), and each hand-back is saved verbatim by the orchestrator
+(`build/agent207/<t…>/REPORT.md`, local).
 
-### (1) #291 — S4-A..F LANDED, S4-G SHOWN, `audit_qs_voice_wav`'s VARIANT FIXED; OPEN UNTIL S4-D's 38 GATES GET SPANS (ruled 2026-10-23)
-Fork S's plan (`build/agent206/t291/PLAN.md`, `REPORT.md`, local), read-only on the S3 page: the 136 near-blank pictures
-come from two selection paths, 104 from the round-end fade anchor (102 in `audit_merged_legacy`, 2 in
-`test_tenant_select_records`) and 28 from `audit_legacy_pairings`' load frame; Felicia's wall jump is never drawn; no tag
-on the page is defined. The maintainer's answers (`DECISIONS_HISTORY.md` "Ruled 2026-10-21 (14z-206) — #291 S4: …"): a
-move is a judged event, ~9 tiles unless it has more; the replay oracle draws up to 18 frames at the replay's inputs;
-frames without fighters go in a separate labelled strip; Q4/Q5 as recommended. **S4-A** (fork A, `build/agent206/t291/
-s4a/REPORT.md`, local): the six gates that did not pass on a clean checkout now pass there with every picture proven
-(temporary commit objects `d82803e55787`, `4c6ba05794ea`, never refs): `audit_flicker_attribution` reads the tracked
-`MASK` (it failed on every case-sensitive filesystem, proven on an APFS case-sensitive image); `audit_dmg_legacy_sweep`'s
-ours legs pass `-verbose` (the zip-opened check rested on the maintainer's own `mame.ini`, `verbose 1`; reproduced on the
-Mac with a HOME that has none; control `zip-check-blind`), its gotcha retracted in `docs/platform/gotchas.md`;
-`audit_grenade_ground_tiles` prints an unindented PASS line; the two menu gates run on the stock twin (`%STOCK_RP%`);
-`tools/proof_sheets.py` builds `audit_landing_sound`'s control from `freeze/merged-m22` (`# SHEET-BUILD:`), and resolves
-a relative rom path against the gate's own tree (it had re-run both menu gates on pristine vsavj; control
-`rompath-unresolved`). S4-B onwards ran in fork B4's worktree (*"Now, in a worktree (Recommended)"*). **Since then
-(2026-10-22): S4-B..F landed in `8b82d5d2`** (the fighters predicate, legends, ~9-tile spans, input frames per round,
-paging; `tests/expected/sheet_span_debt.txt`, 38 rows). **S4-G ran on the Mac** (`tools/proof_sheets.py run 8b82d5d2
---jobs 4`, `build/agent206/t291/s4g/run.log`, local): exit 0, 58 gates all PASS, 483 sheets, 5,563 pictures, the five
-tracks equal to their frozen fingerprints; one sheet with unproven pictures (`test_tenant_select_records`, 5 of 10 NOT
-THE JUDGED RUN: every one its `ours` leg, refused by S3 because the gate builds its own 0x13 image with
-`tenant_build_13` in its `mktemp` dir, a build with no frozen fingerprint; ruled 2026-10-22 *"Built in checkout, stated (Recommended)"*: the tool builds a gate-declared variant in the checkout's `build/` and states its fingerprint, `DECISIONS_HISTORY.md`); 26 sheets where no picture shows the fighters (attract, select, test mode, KO
-frames). Shown to the maintainer: *"generally very good, it would be great if each test / gate had a concise
-description: basically which characters and what setup is tested"*; ruled measured + one written line, in both places
-(DECISIONS_HISTORY "Ruled 2026-10-22 (14z-206) — #291 S4-G reviewed …"). In the working tree: `screen_state.lua`
-reads c1/c2/lv (`$FF8782`, `$FF8B82`, `$FF8116`), `proof_sheets.py` names them per sheet, per gate and in the index,
-58 `Setup: ` lines in `docs/project/sheet_notes.md`, `test_proof_sheets` section 6b and control `who-swapped` —
-rendered on a two-gate copy, the gate not yet run (the Mac carries #299's whole tier). Next: the gate, then S4-G
-again, shown to the maintainer. #291 stays open.
-**Later in 14z-206 (2026-10-23):** S4-G ran on `7b663645`. All 58 gates PASS and the five tracks match their frozen
-references (`build/agent206/s4g_7b663645/`, local). It was shown to the maintainer: *"pages are looking good"*. The 74
-unproven cells, all `audit_qs_voice_wav`'s ours clips, were fixed in `e5d6f445` (`# SHEET-VARIANT: QSV_OUTBASE`,
-`tests/lib/qs_voice_build.sh`, plus its supplied-build ledger, gotcha written); that gate's sheet on `e5d6f445` reads
-0 NOT THE JUDGED RUN. The closure went to the rule-checker: run `2026-10-23-1190` VIOLATED, then `-1192` VIOLATED, each
-resolved by work; `-1189` and `-1191` were withdrawn unspawned. Run `-1193` found S4-D unfinished: 38 gates, 541 judged
-events at 1 tile each (`build/agent206/t291/close/span_measure_7b663645.txt`, local). The maintainer: *"Keep #291 open
-(Recommended)"*. #291 stays open until those 38 get spans (NEXT_SESSION).
+### (1) #291 — S4-D's SPAN RETROFIT, ALL 38 GATES; THE FIGHTERS CHECK READS ROUND INTROS
+Lanes A-E (`build/agent207/t291/{A..E}/REPORT.md`, local) gave every gate on `tests/expected/sheet_span_debt.txt` span
+rows of about 9 frames per judged event, each gate's output identical with and without `SHEET_OUT` but for MAME's
+teardown-segfault PID lines, every gate PASS, every picture proven on the lane's own sheet run. `audit_qs_voice_wav`'s
+moments are audio clips: `tools/proof_sheets.py`'s census now counts its printed `file` rows as it counts `fields` rows.
+The debt list is empty; the census passes. The maintainer, on stages shorter than 9 tiles because the next stage is its
+own moment: *"Keep as is (Recommended)"* (the move shown whole across its moments). Lane H
+(`build/agent207/t291/H/REPORT.md`, local): the fighters check read every round intro as no fighters (the fighters draw
+with their own palette rows, and the picture is MAME's latched OBJ list, two frames behind OBJ RAM; gotcha written);
+on 288 pictures classed by eye the new check reads yes on 96 of 96 intro pictures (old: 0) and no on every bare stage,
+flash and non-fight screen; `test_proof_sheets` control `intro-blind`. The full sheet run of the merged tree (commit
+object `a9098ffa`, `refs/agent207/merged1`; `build/agent207/t291/full/`, local): 58 of 58 gates PASS, 483 sheets, 25,561
+tiles (23,107 PROVEN, 2,299 EVENT-PROVEN, 155 JUDGED FILE), 0 NOT THE JUDGED RUN, the five tracks equal to the commit's
+frozen references; the 37 span-retrofitted gates show 9 tiles per event (7b663645: 1); tiles without fighters 869 of
+16,932 then, 1,028 of 25,561 now (`measure.txt`, `before_after.txt`). The maintainer, on the pages: *"all looks and sounds
+good"*. **#291 closed done**: rule-checker runs 2026-10-23-1207 to -1210 VIOLATED and resolved, each finding one more
+short event or unnamed gap (`audit_column_flash`'s last moment at 8, ruled *"Keep 8 (Recommended)"*; two earlier span
+gates' 1-tile moments, ruled *"Keep as is (Recommended)"*; `test_proof_sheets` re-run on the landing tree, PASS with 16
+controls), run -1211 OK.
 
-### (2) #284 — THE TEMPLATE IN THE PIPELINE; DONE, AWAITING RELEASE
-Fork R rebuilt the pre-edit drafts from the 14z-205c transcript and diffed the maintainer's edits (`build/agent206/t284/
-PROPOSAL.md`, local); the maintainer's answers (`DECISIONS_HISTORY.md` "Ruled 2026-10-21 (14z-206) — #284: …"). Fork R2
-(`build/agent206/t284/apply/REPORT.md`, local) put the template in as `tools/package_release_readme.template.md`, with
-"Play on" and "Report a problem" moved into it; `tools/package_release.py` and `package_release_platforms.py` fill it
-(a marker line removed whole; a left-over token stops the packaging). Rendered from the M23 manifest
-(`build/agent206/t284/rendered/`): FBNeo equals the maintainer's edit but for the kept `EMULATOR.md` clause. Gates:
-`test_release_roundtrip` (the proposal's version went red on the published M23 READMEs, fixed, control
-`generator-report-dropped`), `test_release_launcher_bat`, `test_release_recipe_text` and `test_readme_recording` (macOS:
-the set built by the package's `apply_release.py`, 5,320 frames reproduced on both MAMEs) PASS with their controls; its
-Windows and Linux legs not run (ERIS, PILOT offline) — since run: Linux PASS on PILOT
-(`build/agent206/remote/pilot/REPORT.md` job 3, local); Windows not a pass, three host defects, #308. The new READMEs
-ship with the next release; the "done unshipped" comment and label are on the issue (citing `a8fa5350`).
+### (2) #308 — THE THREE WINDOWS DEFECTS FIXED
+Lane G (`build/agent207/t308/REPORT.md`, local): the generator's text writes name `encoding="utf-8"` and
+`newline="\n"`; the gate's `argv.txt`/`readme.env` are written LF; a missing `rec.log` reaches the FAIL line; a
+host-text guard and controls `unencoded-launcher`, `crlf-argv`, `rec-log-missing`. `test_readme_recording` PASSES on the
+Mac and on ERIS's Windows leg (the release `cps2.exe`, ERIS has no source-built MAME); gotcha written. The same defect
+in `tools/gen_applier_page.py` is **#314** (*"File it, severity low (Recommended)"*). **#308 closed done**: rule-checker runs 2026-10-23-1198, -1200
+and -1201 VIOLATED and resolved (the guard covers the README render path only; the ERIS byte counts named no run), run
+-1202 OK. Added for it: `tests/test_host_text_opens.sh` (ci_portable), an ast read of every text `open()` in the two
+generator files (15), refusing pathlib `write_text` (its `newline=` needs Python 3.10); controls `unencoded-open`,
+`newline-dropped`, `write-text`. The three sibling release gates PASS on the main tree.
 
-### (3) #299 — THE COLD DECRYPT CACHE FIXED; CLOSED DONE (rule-checker run `2026-10-22-1178` OK)
-Fork C (`build/agent206/t299/REPORT.md`, local): 36 gates and 11 tools read `build/out/*.bin` by path; with the cache
-cold, the five gates FAIL or SKIP under `--jobs 8` and PASS serially, saved there only by the tier's order (the first
-gate, `test_m3a_reproducible`, builds the views). Fixed: `tests/run_all_static.sh` builds the views before the tier
-(`decrypt_cache_ensure`, ~24 s cold, six size checks warm), and `tests/lib/decrypt_cache.sh` makes its temp dir inside
-`build/out` (a `mv` across filesystems is a copy a reader could catch half-written). In an isolated copy, cold: all five
-PASS at `--jobs 8` and `--jobs 1`; `test_static_runner` sections 28-29, control `decrypt-warm-off`. The two gaps are
-**#305** (*"New ticket, close #299 (Recommended)"*). Its closure: rule-checker runs below, then the maintainer's *"option A"* (the landing commits, #299 stays open). Rule-checker runs `2026-10-21-1161` (VIOLATED Q1 Q3 Q4: PILOT's six environment-failed gates
-and an unchecked comparer) and `2026-10-21-1162` (VIOLATED Q1 Q4: the open-only census's unresolved relative paths) were
-resolved by work: a Mac serial-against-pool mini-tier of those six on the landing commit (`build/agent206/t299/c2/`;
-planted differences found `compare_legs.py` blind to hex ids, large numbers and sizes, a corrected copy is not), and a
-re-traced write census on PILOT with every path resolved (`build/agent206/t299/x2/`), which found one new hazard,
-fixed: `test_checkdocs_rom`'s control 5 rewrote a tracked file in place (`tools/checkdocs_rom.py --covered`). Runs
-`-1163`, `-1165` resolved by work too (the final tree's confirm tier; PILOT's diffs printed in full; date and epoch plants,
-which found the epoch class erasing an epoch-shaped real number, shown to hide nothing), `-1164` withdrawn unspawned (a
-summed figure). **`-1166` VIOLATED (Q1 Q4), resolved as the closure withdrawn (`a8fa5350`):** PILOT's logs came from a faulty 2-second copier, a confirm-log
-line does not show its claim, and the comparer's duration/PID/date/temp-name classes were never planted with a real value.
-The maintainer, offered to commit the landing first: *"option A"* (`DECISIONS_HISTORY.md` "Ruled 2026-10-21 (14z-206) —
-the landing commits now; #299 stays open …"). #299 stays open; `build/agent206/CHECKPOINT.md` holds its next steps.
-**Closed done, later in 14z-206** (GitHub comment of 2026-10-22, `build/agent206/t299/closing_comment.md`): the Mac's
-whole tier of `8b82d5d2`, serial against `--jobs 8` on one snapshot with the log-keeping rig corrected, read `PASS 213
-SKIP 0 FAIL 1` in both legs with equal results and controls tables (`build/agent206/t299/c3/v2/`); a 19-gate loaded leg
-beside 12 busy-loops (`build/agent206/t299/load/`); `test_checkdocs_rom`'s guard stamps mtime, inode, size and content
-(control `restored-write`) and its `vacuous-validator` mode, dead since 14z-147b, is fixed. Rule-checker runs
-`2026-10-22-1170` to `-1177` VIOLATED, each resolved by work; `-1178` OK. Filed from it: **#310** (an unjudged mode run
-reads HONOURED), **#311** (the browser gate red under heavy load), **#312** (a `--jobs 8` tier keeps about 2.4 of its 8
-slots busy). The maintainer ruled the "70-80%" target met as 8 job slots (*"Close #299, new ticket (Recommended)"*,
-`DECISIONS_HISTORY.md`, 2026-10-22).
+### (3) #313 CLOSED DONE; #286 MEASURED ON PILOT
+Lane F (`build/agent207/t313/REPORT.md`, local; commits `refs/agent207/t313` `949a8feb`, its parent `1a2210f6` traced):
+`build/sheets/` joins N-D scratch (PILOT trace of 229 of 229 gates with a replica of the sheet tree, 0 misses over 88,235
+reads, the over-narrowed control 102), and the planner's per-path work is bounded with verdicts unchanged (old against
+new IDENTICAL on 3x80 sheet paths and 3x110-111 tracked-diff paths on PILOT and 2 Mac sets); with the replica present
+the committed planner hit its 1,800 s timeout, the fixed one planned 20,297 paths in 22.1 s. Applied to main; four new
+`test_static_confirm` controls. Rule-checker run 2026-10-23-1197 VIOLATED and resolved (the sheet-path equivalence and a
+planted `build/sheets/` read were not in the packet), run -1199 OK; closed, gotcha written. **#286** (progress comment):
+the record-only confirm tier on PILOT re-ran 45 gates and executed 0 of 394 controls (the controls clause met); 25 of the
+re-run gates open none of the changed files (R2 `battery_reach.py`/`close_standing.py`/`checkskills.py` mentions, R3
+`docs` through `test_tenant_loop.sh`, R5), the next narrowing candidates. PILOT's four host reds (#279, #280, #281, its
+stale emulator records) stand; its disk is down to 5.9 GB free.
 
-### (4) #296 — THE CODE HALF: THE SANDBOX KEY AND THE REFUSAL; CLOSED DONE (rule-checker run `2026-10-22-1185` OK)
-Fork M (`build/agent206/t296/REPORT.md`, local): `audit_wide_phase_a` keys its sandbox by section and replay;
-`tools/run_mame.sh` refuses a sandbox that holds an earlier run's state (exit 3) unless `MAME_SANDBOX_REUSE=1`, and
-logs absolute paths; `test_mame_sandbox_log` gains the refusal section and control `refusal-removed`. Phase A PASSES in
-231 s with 37 fresh runs and its A1-A4 decisions unchanged; the old phase-A script now fails loudly; 13 MAME gates
-sampled, 54 runs, all fresh. No gate needs the override. The live text that called an explicit sandbox a reuse made past
-tense by fork K ([VSP-117], `SKILL.md`, two comments, `operations.md`). Not closed: its "done when" is the mame and
-fbneo lanes green with the refusal on, on the Mac after the landing.
-**Closed done, later in 14z-206** (GitHub comment of 2026-10-22, `build/agent206/t296/closing_comment.md`): every lane
-ran on `04a53769` with the refusal on (ERIS fbneo, mame, prereq; PILOT mister GREEN 8 of 8 after a voided row was
-re-run): 4,775 MAME runs, all `fresh`, no `REFUSED` line. Four reds, none the refusal's, ruled acceptable by the
-maintainer (*"Close, reds named (Recommended)"*, `DECISIONS_HISTORY.md`, 2026-10-22). Rule-checker runs `-1179` to
-`-1184` VIOLATED, each resolved by work (`-1183` withdrawn unspawned); `-1185` OK.
+### (4) #304 — ANALYSED, FOUR RECOMMENDATIONS ADOPTED, THE BUILD IN A FORK
+Fork I (`build/agent207/t304/REPORT.md`, local): session scratch is 5,182,386 of the 5,241,597 files a snapshot copies,
+and setup grows with the files copied (recorded runs: under 100k files mean 52 s, over 2M mean 1,037 s). Rule-checker
+runs 2026-10-23-1194 and -1195 VIOLATED and resolved (the fork's parallel-plan script skipped plan()'s submodule
+fingerprints and marked 12 gates STALE; the pathspec glob and the scratch regex disagree on `build/agent7-x/`), run
+-1196 OK. The four recommendations (`build/agent207/t304/recommendation.md`, local): one tracked list classing each
+`build/` top dir with a census gate; the snapshot without scratch, after a with/without tier comparison; the planner
+prunes scratch from its listing (pathspec and rule generated from the one list), judges tracked changes first, runs its
+gate loop in parallel, refuses past a path budget; sharding only if still too slow. The maintainer: *"Adopt all four
+(Recommended)"* (DECISIONS_HISTORY.md). Fork J built items 1 and 3 and the census on `949a8feb`
+(`build/agent207/t304/J/REPORT.md`, local; `refs/agent207/t304-J` `a2ed6c65`): `tests/expected/build_dirs.tsv` (scratch,
+input, kept, fixture), `tools/build_dirs.py` generating the planner's scratch regex and pathspecs, the planner's pruned
+listing with a lazy scratch check for R4 readers, tracked-first judging, forked workers, a path budget and a time limit,
+and `tests/test_build_dirs.sh`; plan identical to `949a8feb`'s on F's three change sets (23,552 sheet paths included) and
+on the main tree's two bases (reasons differ on 7 gates of the old base, from the tracked-first order). Its four
+judgement calls went to the maintainer, who discussed them, then: *"I'd go by default for planner processes = 12, the
+rest can stay as is"* — measured here, 12 processes plan in 7.3/7.1 s against 27.2/26.8 s serial, plans identical. Item
+2 waits for its with/without comparison; fork J found emulator-tier audits reading scratch-named dirs (`audit_chains174`
+reads `build/agent185`), which item 2 must reclass first. Folded into this sitting's commit. Its census had passed only
+because `tools/build_dirs.py` was untracked in the fork: tracked, it read its own selftest plants; the reader now skips
+itself (gotcha written).
 
-### (5) #286 — THE SCORER JUDGES AS `predict()` DOES; STATE 14z-205c (2) RETRACTED IN PART
-Fork T (`build/agent206/t286/REPORT.md`, local): `tools/static_confirm.py` exposes `runs_reader`, `change_reason` and
-`whole_covers`, which `predict()` and `tools/trace_static_reads.py`'s scorer both call (nine change sets' predictions
-byte-identical before and after); control `nf-change-unscored`. The committed predictor carries `test_tickets`' read
-of `tests/rulecheck/runs/2026-09-17-22/verdict_real.txt` too (row 156 of `tickets.tsv` links it; `tools/tickets.py`
-opens every link target): 14z-205c's check script took every gate as a runs reader on the committed leg, so its "0 of
-32,695" could not find a miss (retracted in (2) of 14z-205c and NEXT_SESSION). `landing.diff` adds N-F-LINK. **Since
-then (2026-10-22): rescored and applied.** PILOT (fork P2, `build/agent206/remote/pilot/REPORT.md`, local) scored 14z-205c's
-traces of `b91532d8` (229 gates, 88,351 pairs): committed predictor MISSES 1 (`test_tickets`), narrowed + N-F-LINK 0,
-narrowed without N-F-LINK the same miss, the over-narrowed control fired (103). Rule-checker runs `2026-10-22-1167`
-(VIOLATED Q1: four change sets counted where five differ, a log naming no tree, the four gates short under the trace
-unnamed), `-1168` (VIOLATED Q1: the wrong four modes called new; PILOT's committed leg not tied to `a8fa5350`), each
-resolved by work (logs with a tree header, all five new modes run and failing on their own case, the tool blobs tied);
-**`-1169` OK.** `landing.diff` is applied in the working tree (one header line of `runs-self-off` reworded as the
-checker noted); it lands with the next tiered commit. Not tested: a fresh trace of `a8fa5350`, reads through git or on
-an untaken branch, the four gates short under the trace. #286's done-when is still open.
+### (6) PILOT AND ERIS LANES (in progress)
+The maintainer: use PILOT and ERIS for other tickets, preparing a freeze+release *"as soon as we have a stable situation"*,
+and chose the lanes (DECISIONS_HISTORY.md "Ruled 2026-10-23 (14z-207) — the PILOT and ERIS lanes"): P on PILOT — its disk first (98% full; the maintainer
+approved deleting the old session work folders after a check: *"Yes, after the check (Recommended)"*), then #303, then
+the release-only #279, #280, #281, #278; Q on ERIS (Windows) — #314, the Windows packaging leg, a source-built MAME; R on
+ERIS (WSL) — #286's 25 narrowings, each scored on a trace; S on ERIS (WSL) — #312. All four from commit object
+`2a155ba3` (`refs/agent207/base2`, the whole tree). #298 is measured at this sitting's close; #304 item 2 stays on the
+Mac.
 
-### (6) #305, #306, #307, #308, #309 FILED; #309 CLOSED DONE (rule-checker run `2026-10-23-1188` OK); #305 AND #306 SEVERITY LOW (ruled 2026-10-23)
-At the maintainer's word: **#305** (#299's two gaps) and **#306** (nine emulator gates default to `build/donovan6`,
-which only `test_m2b_stage6` builds, so a clean checkout's gate order decides whether the others find it — a correction
-of S4-A's "a build the commit does not make" for those nine). **#307** (*"file that ticket"*): `build/` has no retention
-rule for logs and session evidence, 47 GB in 1,134 entries; measure what references each family before pruning.
-**#308** (*"you can"*), filed after the landing commit `a8fa5350`: #284's Windows leg on ERIS found three host defects
-that predate #284 — the generator's unencoded writes (cp1252 on Windows), the gate's own CRLF `argv.txt`, and its silent
-exit 2 under `set -eu` (`build/agent206/remote/eris/REPORT.md`, local). Its first body named the README as the CRLF
-source; corrected on the issue the same evening.
-**#309** (*"Yes"*): `test_proof_sheets`' control `relative-unresolved` is dead wherever the repository path is as
-deep as the capture's work dir (ERIS in #296's prereq lane): the relative SHEET_OUT under `/tmp` climbs out with one `..`
-per repository level, the surplus stop at `/`, and the unresolved name still reaches the replay. Measured by fork P3 on
-PILOT (a six-deep symlink: DEAD; the plain clone: FIRES; `build/agent206/remote/pilot3/REPORT.md`, local). **The fix
-is applied in the working tree** (`relunres.diff`: the dir under `$REPO/build/.proof_rel.XXXXXX`, and a FAIL if the
-name climbs out). On the Mac (`build/agent206/t309/`, local), from a logical repo path 9 deep, HEAD's gate is DEAD and
-the fixed one FIRES; the "relative rom path" FAIL on both is the symlink rig's (logical `pwd` vs physical path);
-from the plain tree the fixed gate PASSES; with `R3="$W/rel"` put back the new check FAILS ("climbs out"). macOS
-`mktemp -d` ignored `TMPDIR=/tmp`, so a first "shallow temp" leg tested nothing (gotcha written). Not closed: the
-ticket's to-do runs it on ERIS's deep clone, unreachable from this network.
-**Closed done, later in 14z-206** (GitHub comment of 2026-10-23, `build/agent206/t309/closing_comment.md`): the fix
-landed in `7b663645`; the committed gate and tool were then run on PILOT in a 7-deep plain worktree of `7b663645`
-(`8b82d5d2`'s gate DEAD, the committed gate FIRED and PASSES) and on the Mac (FIRED and PASSES; the old line restored
-FAILS on the climbs-out check), `build/agent206/t309/commit_legs/`; ERIS's deep clone ran the fix on `04a53769` first
-(`build/agent206/t309/eris/`). Rule-checker runs `2026-10-23-1186`, `-1187` VIOLATED, resolved by work; `-1188` OK.
-**Severity, 2026-10-23:** #305 and #306 labelled `severity: low` (*"Both low (Recommended)"*, `DECISIONS_HISTORY.md`).
-
-### (7) #313 FILED — THE `--confirm` PLANNER STALLS ON AN UNTRACKED `build/sheets/` TREE
-At the maintainer's word (*"Yes"*, 2026-10-23): `tools/static_confirm.py plan` took 1,902 s for 25 of 229 gates in the first commit
-tier (it hit its 2 h timeout; the commit was tiered again without `--confirm`), against 37 s for all 229 the day before.
-Its changed set held 23,803 paths. A recount gives 23,848, of which 20,273 are judged path by path, all but 2 under
-`build/sheets/8b82d5d247c6/`, #291's sheets, which the N-D `SCRATCH` filter does not drop (`build/agent206/t_confirm_slow/`, local).
-
-### (8) THE SHEET GATES RUN ON DEMAND ONLY (ruled 2026-10-23)
-The maintainer, unprompted (*"if we have any tests/gates on the captures sheets, they really
-should be ondemand scope"*, DECISIONS_HISTORY.md): `test_proof_sheets` moves to emulator scope `ondemand` (reason `sheets:`),
-and `test_sheet_census` to static cadence `ondemand`. Both PASS run by hand after the move, as do `test_emulator_runner`,
-`test_lane_carry` and `test_gate_follows`.
-
-### CLOSE (14z-206, 2026-10-23)
-The maintainer: *"let's keep the end of #291 for next session. Let's try to aim closing this one, making sure that
-tickets that need updating/commenting/tagging/closing are updated accordingly"*. The sitting's commits, all local until
-this close's push: `a8fa5350`, `8b82d5d2`, `7b663645`, `e5d6f445`, each on a strict GREEN tier of its staged tree.
-**Tickets:** a GitHub check of every ticket this group names (#284, #286, #291, #296, #299, #305-#313). #305 and #306
-labelled (ruled); the `sessions` column of #284, #286 and #291 gains 14z-206; progress comments on #286 and #291 go up
-after the push, so they cite pushed commits. #296, #299 and #309 were closed on GitHub as their work finished.
-**The tier runs without `--confirm`** (#313): `tools/static_confirm.py plan` stalls on this sitting's untracked sheet
-trees under `build/sheets/`, as it did on the first commit tier. So the tier is the whole strict tier at `--jobs 8`
-(session cadence), and the table's `tier` step is passed by hand with that evidence.
-Steps (`tools/close.py`, run dir `build/agent206/close/`): **sections** done (headings to reality; #313 and the
-ondemand ruling split into (7) and (8)); **next-session** done (14z-205c's opener moved verbatim to
-`docs/NEXT_SESSION_HISTORY.md`; the opener rewritten, `test_live_budget` PASS); **rollover** nothing to move; **indexes**
-done; **dashboard** done (14z-163..14z-206 collected, 1,876 figures, 0 unclassed; this heading now names transcript
-`fc0caa60`; the four files uploaded, datasets at versions 13, 13, 13, 14). **record** this paragraph; **stage** 41 files (`git add -u` and the five new rule-checker run directories), 0 under
-`build/`, the bookkeeping gates PASS; **tier**: first the whole strict tier without `--confirm` (#313) on the staged
-tree `74c64b0b`, GREEN, PASS 91, 323 of 323 controls honoured, 609 s wall (`build/agent206/close/tier_results_full.tsv`);
-then the table's `--confirm` tier based on that run, since a base newer than this sitting's sheet trees keeps the
-planner clear of #313; its results `build/agent206/close/tier_results.tsv` are the next close's `--prev`. Then commit,
-pins, sweep, push, and the #286 and #291 progress comments.
+### (5) THE FIRST COMMIT TIER WAS NOT GREEN — FIXED
+The strict `--confirm` tier of the staged tree (snapshot of `4dfd9fd3`, `build/agent207/commit_tier/tier.log`, local):
+PASS 99, FAIL 4, MISSING 1. Causes: `tests/test_host_text_opens.sh` created without its execute bit (MISSING, and
+`test_static_runner` FAIL on it); the rule-checker run directories 1194-1202 never staged (`git add -u` skips new
+files; `test_rule_checker` FAIL); `test_poked_legs` FAIL on four new `test_proof_sheets` census rows (lane H's vsav2
+leg; CROSS-INERT, as `test_hui_oracle`'s); `test_poke_readback` FAIL on three findings with no row. The maintainer
+classed them (DECISIONS_HISTORY.md, three entries): `test_proof_sheets` c1 CROSS-LEG; `audit_trap_air_hit` p1x first
+OBSERVES, then — rule-checker run 2026-10-23-1204 showed its frozen steps hold the pinned 540 the whole window —
+READS-BACK, labelled in the gate's header; vx OBSERVES, its 3511 rows (the pin held the whole window, run -1205) noted
+in the header. The two expectation edits: rule-checker runs 2026-10-23-1203..-1205 VIOLATED and resolved, -1206 OK.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings

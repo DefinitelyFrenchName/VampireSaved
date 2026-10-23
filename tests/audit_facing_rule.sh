@@ -254,6 +254,8 @@ if sheet_on && [ -z "$CONTROL" ]; then
         "each game's stage and palette, and P2's art (Demitri, each game's own copy; [VSP-168]); the writer PC (ours writes from the thunk's placement)" || true
     sheet_leg facing native vs2 vsav2 "$ROMDIR" "$W/native.rpl" "$pk" "$FR" || true
     sheet_leg facing ours ours vsavjw "$ORP" "$W/ours.rpl" "$pk" "$FR" || true
+    sheet_trace facing native "$W/native.x.txt" "ff8810:w:p2x" || true
+    sheet_trace facing ours "$W/ours.x.txt" "ff8810:w:p2x" || true
     python3 - "$W" > "$W/sheet_rows.tsv" <<'PYS' && sheet_rows "$W/sheet_rows.tsv" || true
 import sys
 W = sys.argv[1]
@@ -268,6 +270,12 @@ fw = {leg: [r for r in rows[leg] if r[0] == "facing"] for leg in rows}
 def at(mid, leg, fr):
     x = xs[leg].get(fr)
     print("at\tfacing\t%s\t%s\t%d\t%s\t%s" % (mid, leg, fr, "fields" if x is not None else "none", "ff8810:w=%s" % x if x is not None else "-"))
+    # S4-D (#291): the moment in context on the leg's own x trace — 4 frames either side of a write or the last contact,
+    # and the slide from the last contact (3924) to its end for the slide's-end frame
+    lo, hi = (3924, fr) if mid == "x3946" else (fr - 4, fr + 4)
+    live = [g for g in range(lo, hi + 1) if g in xs[leg]]
+    if x is not None and live:
+        print("span\tfacing\t%s\t%s\t%d-%d" % (mid, leg, min(live + [fr]), max(live + [fr])))
 for i in range(max(len(fw["native"]), len(fw["ours"]))):
     n = fw["native"][i] if i < len(fw["native"]) else None
     o = fw["ours"][i] if i < len(fw["ours"]) else None

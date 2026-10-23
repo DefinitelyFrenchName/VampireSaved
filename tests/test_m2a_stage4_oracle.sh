@@ -168,6 +168,18 @@ if sheet_on; then
     sheet_moment oracle anchor "the match-start anchor (lock 1)" "$_sv" "native $(echo $a_nat), ours $(echo $a_por)"
     _sa="$(echo $a_nat | awk '{print $1}')"; [ -n "$_sa" ] && sheet_at oracle anchor native "$_sa" log
     _sa="$(echo $a_por | awk '{print $1}')"; [ -n "$_sa" ] && sheet_at oracle anchor ours "$_sa" log
+    # S4-D (#291): each moment's judged window, every frame proven on the leg's own battery log (it logs every frame):
+    # the anchor from match start to the end of the neutral window lock 2 compares (f2509), and each HP step as the
+    # hit in context, 8 frames either side of the first sample with the new HP (the battery samples every 2 frames)
+    for _sl in native ours; do
+        if [ "$_sl" = native ]; then _sa="$(echo $a_nat | awk '{print $1}')"; _sd=nat; else _sa="$(echo $a_por | awk '{print $1}')"; _sd=por; fi
+        _se="$(awk '$1 ~ /^[0-9]+$/ {n = $1} END {print n}' "$WORK/${_sd}_bat/c.log")"
+        if [ -n "$_sa" ]; then
+            if [ "$_sa" -lt 2509 ]; then _sh=2509; else _sh=$((_sa + 8)); fi
+            [ "$_sh" -gt "$_se" ] && _sh="$_se"
+            sheet_span oracle anchor "$_sl" "$_sa-$_sh"
+        fi
+    done
     python3 - "$WORK/nat_bat" "$WORK/por_bat" > "$WORK/sheet_rows.tsv" <<'PYS'
 import glob, sys
 def steps(d):
@@ -185,6 +197,10 @@ for k in range(max(len(n), len(o))):
           "%d at f%d" % (a[1], a[0]) if a else "none", "%d at f%d" % (b[1], b[0]) if b else "none"))
     for leg, x in (("native", a), ("ours", b)):
         if x: print("at\toracle\thp%d\t%s\t%d\tlog\t-" % (k + 1, leg, x[0]))
+    for leg, x, d in (("native", a, sys.argv[1]), ("ours", b, sys.argv[2])):
+        if x:
+            last = max(int(l.split()[0]) for l in open(d + "/c.log") if l.split()[:1] and l.split()[0].isdigit())
+            print("span\toracle\thp%d\t%s\t%d-%d" % (k + 1, leg, max(x[0] - 8, 0), min(x[0] + 8, last)))
 PYS
     sheet_rows "$WORK/sheet_rows.tsv"
 fi

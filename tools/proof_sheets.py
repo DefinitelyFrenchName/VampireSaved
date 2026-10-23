@@ -222,7 +222,7 @@ def census(tests, registry, debt, span_debt=None):
 
 
 SPAN_ROWS = re.compile(r"\bsheet_(span|inputs)\b|[\"']span\\t")
-EVENT_OR_FILE = re.compile(r"\bsheet_(tap|file)\b")
+EVENT_OR_FILE = re.compile(r"\bsheet_(tap|file)\b|\\tfile\\t")
 FIELDS_BASIS = re.compile(r"[\"']fields[\"']|\\tfields\\t|fields\\t")
 
 
@@ -427,10 +427,17 @@ def fighters(sc):
     all 201 of the sample (ten gates of the S3 page re-captured on this Mac, every picture proven): every one of the 104
     showing the fighters read yes, every one of the 89 showing none read no, and 7 of the 8 showing ONE fighter entering
     an otherwise bare stage read no (they go to the labelled strip, never dropped). tests/test_proof_sheets.sh section 6
-    holds five pictures of a frozen vanilla run to it."""
+    holds five pictures of a frozen vanilla run to it.
+    14z-207 (#291, found by the S4-D lanes C and D): the ROUND INTRO shows the fighters with no entry in 0x01-0x09, so
+    `fp` alone read intro pictures as "no". A match picture is also "yes" when `fv` >= 1: the latched OBJ list MAME
+    draws from holds an entry in a fighter's own palette row (+0x18B) with a tile wholly on screen (the measurement is
+    in tests/lua/screen_state.lua). Scored on 288 pictures classified by eye (build/agent207/t291/H/, local): all 96
+    intro pictures showing the fighters read yes (fp alone: 0), and none of the 93 bare stages, 18 flashes and 24
+    non-fight screens does; 8 of 9 pictures showing only a sliver of one fighter at an edge read yes. Section 6 of
+    tests/test_proof_sheets.sh holds a vs2 round load (no) and intro (yes) to it, control intro-blind."""
     if not sc or "fp" not in sc:
         return None
-    return "yes" if sc.get("m4") == 0x40000 and sc.get("m8") in MATCH_M8 and sc["fp"] >= 1 else "no"
+    return "yes" if sc.get("m4") == 0x40000 and sc.get("m8") in MATCH_M8 and (sc["fp"] >= 1 or sc.get("fv", 0) >= 1) else "no"
 
 
 # The atlas slot table (docs/game/atlas/character_tables.md), held by tests/test_charid_names.sh; the ids are the same in

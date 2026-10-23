@@ -1,0 +1,5 @@
+  FLAG D-ABSOLUTE: - This lands only after a Mac tier with scratch and one without are compared.  [build/agent207/t304/recommendation.md]
+  FLAG D-ABSOLUTE: They either always re-run, or a cheap scratch-changed check decides.  [build/agent207/t304/recommendation.md]
+  FLAG D-ABSOLUTE: Shard across machines only if still too slow  [build/agent207/t304/recommendation.md]
+  FLAG D-ABSOLUTE: The census of item 1, with a synthetic plant under each scratch directory and under one unclassed directory.  [build/agent207/t304/recommendation.md]
+packet_check: 4 flag(s): D-ABSOLUTE 4

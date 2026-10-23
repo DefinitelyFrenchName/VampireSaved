@@ -66,7 +66,7 @@ OVER_NARROW = (
 
 def load_predictor(tools):
     sys.path.insert(0, tools)
-    for m in ("static_confirm", "battery_reach"):
+    for m in ("static_confirm", "battery_reach", "build_dirs"):
         sys.modules.pop(m, None)
     import static_confirm as sc  # noqa: E402
     import battery_reach as br   # noqa: E402
@@ -185,6 +185,11 @@ def control_tools(root, dest):
     """a copy of this tree's predictor, over-narrowed (the control); REFUSED if a perturbation point moved"""
     os.makedirs(dest, exist_ok=True)
     shutil.copy(os.path.join(root, "tools", "battery_reach.py"), dest)
+    sys.path.insert(0, os.path.join(root, "tools"))
+    sys.modules.pop("build_dirs", None)
+    import build_dirs   # #304: the planner generates N-D from the build-dir list; the copy takes it along
+    sys.path.pop(0)
+    build_dirs.copy_beside(dest)
     s = open(os.path.join(root, "tools", "static_confirm.py")).read()
     for a, b in OVER_NARROW:
         if s.count(a) != 1:

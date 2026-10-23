@@ -326,6 +326,7 @@ tests/test_release_os_metadata.sh	platform
 tests/test_bundle_parsers.sh	platform
 tests/test_fbneo_boot_log.sh	platform
 tests/test_host_libs.sh	platform
+tests/test_host_text_opens.sh	platform
 tests/test_build_environment_entry.sh	platform
 tests/test_replay_stage_census.sh	platform
 tests/test_replay_video_selfcheck.sh	platform
@@ -433,6 +434,7 @@ tests/run_on_snapshot.sh	runner
 tests/test_run_on_snapshot.sh	runner
 tests/test_close_checks.sh	runner
 tests/test_static_confirm.sh	runner
+tests/test_build_dirs.sh	runner
 tests/test_trace_static_reads.sh	runner
 tests/test_py_escapes.sh	runner
 tests/test_run_record.sh	runner

@@ -2788,6 +2788,23 @@ recorded). The gate's portable half runs the applier on a SYNTHETIC release (a m
 whose one member is a `pristine_from` copy of a made-up file: no ROM byte, no ROMDIR) to its
 final line — the only way to reach that print without dumps.
 
+## A PYTHON TEXT FILE OPENED WITHOUT `encoding=` AND `newline=` IS THE HOST'S — cp1252 and CRLF on Windows, UTF-8 and LF elsewhere, so only a Windows run sees it (paid: 2026-10-21, #308, ERIS; fixed 14z-207)
+
+The stdout rule above is per PROCESS; this one is per FILE. `open(path, "w")` with no `encoding=` takes the
+locale's encoding — cp1252 on ERIS's MSYS2 MINGW64 (Python 3.14.7, UTF-8 mode off) — and the release generator died
+writing PLAY.command (`UnicodeEncodeError: 'charmap'`, its box-drawing characters). With no `newline=` each `\n`
+becomes `\r\n`: `test_readme_recording`'s own `argv.txt` handed MAME `$'vsavjw\r'`, and MAME recorded nothing. A read
+with no `encoding=` is the same hazard the other way. The Mac and Linux are UTF-8 and LF, so nothing off Windows sees
+either. Every text open() in the generator names `encoding="utf-8"` and every write `newline="\n"`; the gate's render
+and reader run under a host-text guard that refuses a text open() without them on every host (controls
+`unencoded-launcher`, `crlf-argv`). `PYTHONUTF8=1` hides only the encoding half, only for whoever sets it. A file that
+must be CRLF (`PLAY.bat`) is written in binary.
+
+**And under `set -eu`, `N="$(awk … missing.log 2>/dev/null)"` STOPS the script:** an assignment's status is its
+command substitution's, so awk's exit 2 ends the gate before its FAIL line; `2>/dev/null` hides only the message
+(ERIS: exit 2, no verdict). Read a possibly absent file through a function that tests for it (`rec_end`), or end the
+assignment with `|| N=""`. Control `rec-log-missing`.
+
 ## A WINDOWS BATCH FILE AND ITS TEST HOST HAVE FOUR TRAPS — `%` on a `rem` line, LF endings, MSYS2 rewriting `/J`, and an SSH session with no desktop (found 2026-10-03, 14z-189, building #145's PLAY.bat; each paid once)
 
 1. **cmd expands `%` on a `rem` line.** A comment reading `rem what %~a reports`
@@ -3361,3 +3378,17 @@ run by its own END or SUMMARY line, never by MAME's exit code. What #229 adds: r
 own, avoidable; the remaining crash is not root-caused. **The rule:** a write-tap callback records the written value
 and the frame and reads nothing else; a gate accepts exit 0, or 139 with every one of its output lines present
 (field, tick and ALIGN lines in `tests/audit_vanilla_specials_a.sh`), and fails any other exit.
+
+## THE PICTURE IS MAME'S LATCHED OBJ LIST, TWO FRAMES BEHIND OBJ RAM — a screen-state reader that counts sprites at `CPU:$708000` sees the fighters before the frame shows them (paid: 2026-10-23, 14z-207, #291 fork H)
+
+MAME's CPS-2 renderer draws from its buffered copy of the OBJ list (save item `0/m_cps2_buffered_obj`), not from OBJ
+RAM. Measured on test_hui_oracle's pristine vsav2 leg (`tests/replays/hui/90_hui_oracle.rpl`): OBJ RAM holds the
+fighters from f2363, the latched list only from f2365, and the snapshots show a bare stage at f2363 and f2364 and the
+fighters at f2365 (fork H's `mechanism_latch_lag.txt`, `build/agent207/t291/H/` in its worktree, local). So a
+"what is on screen" predicate reads the latched list, and places each tile as `cps2_render_sprites` does (the
+`$400008`/`$40000A` offsets, block sprites, bit 7). A tile that only overlaps the visible edge is not evidence: at
+f2365 such a tile's visible columns were all transparent and the picture was pixel-identical to the bare stage, so
+`tests/lua/screen_state.lua`'s `fv` counts only tiles WHOLLY inside x 64-447 / y 16-239. Also paid in the same
+measurement: the fighters draw with their own palette rows (the fighter block's +0x18B; 0x0A and 0x10 on every leg
+measured), not palettes 0x01-0x09, which appear only about 117 frames into a round, so a palette-count predicate reads
+every round intro as "no fighters". Control `intro-blind` in `tests/test_proof_sheets.sh`.

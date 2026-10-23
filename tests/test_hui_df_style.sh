@@ -175,6 +175,9 @@ if sheet_on; then
         sheet_moment df "f$f" "$_sl" "$_sv"
         sheet_at df "f$f" native "$f" log
         sheet_at df "f$f" ours "$f" log
+        # S4-D (#291): the compared frame in context, 8 frames either side, each frame proven on the leg's own log
+        sheet_span df "f$f" native "$((f - 8))-$((f + 8))"
+        sheet_span df "f$f" ours "$((f - 8))-$((f + 8))"
     done
 fi
 [ "$_dfs" = 0 ] || { echo "FAIL: the DF-style comparison did not match expectation '$EXPECT'"; exit 1; }

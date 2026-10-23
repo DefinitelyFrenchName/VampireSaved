@@ -199,6 +199,10 @@ if sheet_on && [ -z "${VS_CTL:-}" ]; then
         "each game's stage and palette, and P2's art (Victor, each game's own copy; [VSP-168]); the class byte differs by ruling (0x52 native, the marker 0x38 ours)"
     sheet_leg trap_air native vs2 vsav2 "$ROMDIR" "$W/air.rpl" "$PK" 3620
     sheet_leg trap_air merged ours vsavjw "$MERGED/rompath;$ROMDIR" "$W/air.rpl" "$PK" 3620
+    # S4-D (#291): each leg's own field trace, so every frame of a span is proven on what this gate traced there
+    for _leg in native merged; do
+        sheet_trace trap_air "$_leg" "$W/$_leg.ft" "ff8406:b:seq,ff845c:b:frz,ff8806:b:p2seq,ff8807:b:p2sub,ff8854:b:p2cls,ff885c:b:p2frz,ff8850:w:p2hp,ff8814:w:p2y,ff8782:b:id,ff8b82:b:p2id"
+    done
     python3 - "$W" > "$W/sheet_rows.tsv" <<'PYS' && sheet_rows "$W/sheet_rows.tsv"
 import sys
 W = sys.argv[1]
@@ -229,6 +233,13 @@ for k in ("take", "apex", "last", "land"):
     for leg in ("native", "merged"):
         smp = mom[leg][0][fr[leg]]
         print("at\ttrap_air\t%s\t%s\t%d\tfields\t%s" % (k, leg, fr[leg], ",".join("%s=%s" % (spec[n], smp[n]) for n in sorted(smp) if n in spec)))
+        # S4-D (#291): the jump stage by stage, each moment to the next (take-off from 4 frames before it, the landing
+        # hit and the 8 frames of the shock after it), clipped to the leg's own trace, which proves every frame
+        m = mom[leg][1]
+        lo, hi = {"take": (m["take"] - 4, m["apex"] - 1), "apex": (m["apex"], m["last"] - 1),
+                  "last": (m["last"], m["land"] - 1), "land": (m["land"], m["land"] + 8)}[k]
+        lo, hi = max(lo, min(mom[leg][0])), min(hi, max(mom[leg][0]))
+        print("span\ttrap_air\t%s\t%s\t%d-%d" % (k, leg, min(lo, fr[leg]), max(hi, fr[leg])))
 PYS
 fi
 if [ -n "${VS_CTL:-}" ]; then [ $fail = 0 ] && { echo "PASS (the control mode did NOT reach FAIL)"; exit 0; } || { echo "FAIL: audit_trap_airborne (control mode)"; exit 1; }; fi

@@ -196,6 +196,8 @@ print("IDENTICAL" if so and so == sn else "DIFF")
 for l, xs in h.items():
     for k, x in (("first", xs[0]), ("mid", xs[len(xs) // 2])) if xs else ():
         print("%s %s %d %d,%d" % (k, l, x[0], x[1], x[2]))
+    if xs:     # S4-D (#291): the whole hold the verdict compares, its first to its last held frame
+        print("span %s %d-%d" % (l, xs[0][0], xs[-1][0]))
 PYS
 )"
     sheet_new "$1" "$3: the victim's hold, native vs2 above ours" "$4" - \
@@ -209,6 +211,10 @@ PYS
         printf '%s\n' "$_sv" | awk -v k="$_sk" '$1 == k {print $2, $3}' | while read -r _sl _sf; do
             sheet_at "$1" "$_sk" "$_sl" "$_sf" log
         done
+    done
+    # S4-D (#291): the first held frame's moment spans the hold, every frame proven on the leg's own checksum log
+    printf '%s\n' "$_sv" | awk '$1 == "span" {print $2, $3}' | while read -r _sl _sw; do
+        sheet_span "$1" first "$_sl" "$_sw"
     done
 }
 

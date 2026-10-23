@@ -443,6 +443,12 @@ spec = lambda F: {name: "%s:%s" % (a, sz) for a, sz, name in (f.split(":") for f
 def fields(R, f, sp):
     s = R.get(f)
     return ("fields", ",".join("%s=%d" % (sp[k], s[k]) for k in sorted(sp) if k in s)) if s else ("none", "-")
+def window(R, fld, f, lo, hi):
+    # S4-D (#291): the judged hit in context — 12 frames before the leg's first red drop in the judged window to 12
+    # after its last (every hit the gate sums), inside that window and the trace; about 9 frames spread across it
+    d = [x for x, _ in ds.drops(R, fld, lo, hi)]
+    a, b = (d[0], d[-1]) if d else (f, f)
+    return "%d-%d" % (max(lo, a - 12, min(R)), min(hi - 1, b + 12, max(R)))
 def first_drop(R, fld, lo, hi):
     d = ds.drops(R, fld, lo, hi)
     return (d[0][0], sum(x for _, x in ds.drops(R, fld, lo, hi))) if d else (None, 0)
@@ -462,6 +468,8 @@ for side, m in ds.SIDE.items():
                 f = fd[leg][0] or next(x for x, _ in fd.values() if x)
                 b, e = fields(tr[leg], f, LS)
                 print("at\t%s\t%s\t%s\t%d\t%s\t%s" % (sid, n, leg, f, b, e))
+                if b == "fields":
+                    print("span\t%s\t%s\t%s\t%s" % (sid, n, leg, window(tr[leg], m["vic"] + "hp", f, lo, hi)))
 DS = spec(DF)
 ev = json.load(open(DJ))["events"]
 tr = {leg: ds.load("%s/D.%s/f.ft" % (W, leg))[0] for leg in ("native", "ours")}
@@ -475,6 +483,8 @@ for k, e in enumerate(ev):
         f = fd[leg][0] or next(x for x, _ in fd.values() if x)
         b, x = fields(tr[leg], f, DS)
         print("at\tD\te%d\t%s\t%d\t%s\t%s" % (k, leg, f, b, x))
+        if b == "fields":
+            print("span\tD\te%d\t%s\t%s" % (k, leg, window(tr[leg], "p1hp", f, e["frame"], e["frame"] + 120)))
 legs = ["vsavj.base", "vsavj.swap", "vsav2.base", "vsav2.swap"]
 hits = {}
 for leg in legs:
@@ -490,8 +500,17 @@ for k, name in enumerate(("2HK", "5HP", "623HP")):
         if k >= len(hits[leg]):
             continue
         f = hits[leg][k][0]
-        print("at\tC\th%d\t%s\t%d\tevent\tfiles/C.%s.ft:%d-%d" % (k, leg, f, leg, f - 2, f + 2))
+        # S4-D (#291): the event window is the span (spanned by default), widened from +-2 to +-4: 9 frames
+        print("at\tC\th%d\t%s\t%d\tevent\tfiles/C.%s.ft:%d-%d" % (k, leg, f, leg, f - 4, f + 4))
 PYS
+    # S4-D (#291): each fields leg's per-frame trace, which proves every frame of its spans
+    for s in p1 p2; do for v in $IDS; do
+        sheet_trace "L.$s.$v" v2 "$W/L.$s.$v.vsav2/f.ft" "$LFIELDS"
+        sheet_trace "L.$s.$v" vj "$W/L.$s.$v.vsavj/f.ft" "$LFIELDS"
+        sheet_trace "L.$s.$v" ours "$W/L.$s.$v.ours/f.ft" "$LFIELDS"
+    done; done
+    sheet_trace D native "$W/D.native/f.ft" "$DFIELDS"
+    sheet_trace D ours "$W/D.ours/f.ft" "$DFIELDS"
     sheet_rows "$W/sheet_rows.tsv"
 fi
 

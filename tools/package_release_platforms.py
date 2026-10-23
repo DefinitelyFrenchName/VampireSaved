@@ -561,7 +561,7 @@ def binaries_side(platform, edir):
         rec = os.path.join(bdir, "BINARY.txt")
         if not os.path.isdir(bdir) or not os.path.exists(rec):
             continue
-        text = open(rec).read()
+        text = open(rec, encoding="utf-8").read()
         rows = re.findall(r"^sha256\s+([0-9a-f]{64})\s+(\S+)\s*$", text, re.M)
         if not rows:
             sys.exit(f"{rec} names no 'sha256 <hex> <file>' row")
@@ -594,7 +594,7 @@ def select_platform_text(dest, platform):
     report section without the recording procedure); only the mame package drops them."""
     import re
     path = os.path.join(dest, "README.md")
-    body = open(path).read()
+    body = open(path, encoding="utf-8").read()
     keep, drop = ("MISTER", "EMU") if platform == "mister" else ("EMU", "MISTER")
     for tag in (keep, drop, "MAME", "NOTMAME"):
         if body.count(f"<!--{tag}-->") != body.count(f"<!--/{tag}-->"):
@@ -614,7 +614,7 @@ def select_platform_text(dest, platform):
     left = re.findall(r"<!--/?(?:EMU|MISTER|MAME|NOTMAME)-->", body)
     if left:
         sys.exit(f"{path}: platform markers left after selection: {left}")
-    open(path, "w").write(body)
+    open(path, "w", encoding="utf-8", newline="\n").write(body)
 
 
 def emulator_side(platform, dest, name):
@@ -629,7 +629,7 @@ def emulator_side(platform, dest, name):
     # template's own EMU block, its by-hand sentence the per-platform token @HAND@ (PLATFORM_TEXT).
     # the launcher, executable, beside the README it points at
     lp = os.path.join(dest, "PLAY.command")
-    with open(lp, "w") as f:
+    with open(lp, "w", encoding="utf-8", newline="\n") as f:
         f.write(launcher_text(platform, name))
     os.chmod(lp, 0o755)
     # and its Windows twin (#145): plain cmd, CRLF, beside it
@@ -691,7 +691,7 @@ rather than joining it.
   ROM-load warning (`src/frontend/mame/ui/ui.cpp`, `display_startup_screens`).
   The applier has already verified every member's sha1 (#234).
 """
-    open(os.path.join(dest, "EMULATOR.md"), "w").write(text)
+    open(os.path.join(dest, "EMULATOR.md"), "w", encoding="utf-8", newline="\n").write(text)
 
 
 def resolve_bitstream(arg):
@@ -702,7 +702,7 @@ def resolve_bitstream(arg):
     cur = os.path.join(root, "CURRENT")
     if not os.path.exists(cur):
         sys.exit(f"{cur} missing — no canonical bitstream to package (see docs/project/release_format.md)")
-    return os.path.join(root, open(cur).read().strip())
+    return os.path.join(root, open(cur, encoding="utf-8").read().strip())
 
 
 def bitstream_side(dest, bdir):
@@ -711,7 +711,7 @@ def bitstream_side(dest, bdir):
     if not os.path.exists(rec) or len(rbfs) != 1:
         sys.exit(f"{bdir} must hold exactly one .rbf and a BITSTREAM.txt (found {rbfs})")
     import hashlib, re
-    want = re.search(r"sha256\s+([0-9a-f]{64})", open(rec).read())
+    want = re.search(r"sha256\s+([0-9a-f]{64})", open(rec, encoding="utf-8").read())
     if not want:
         sys.exit(f"{rec} carries no 'sha256 <64 hex>' line")
     rbf = os.path.join(bdir, rbfs[0])
@@ -800,7 +800,7 @@ Vampire Savior on Jotego's own `jtcps2.rbf` keeps working from the same
 VERIFY THE BITSTREAM'S sha256 BEFORE FLASHING: a timing-failing fitter seed
 emits an .rbf indistinguishable from a passing one.
 """
-    open(os.path.join(dest, "MISTER.md"), "w").write(text)
+    open(os.path.join(dest, "MISTER.md"), "w", encoding="utf-8", newline="\n").write(text)
     # its "Play on MiSTer" section is the template's own MISTER block since #284 (Q4, 14z-206)
 
 
@@ -844,7 +844,7 @@ def fill_platform_text(dest, platform):
     sections name (`@NAME@`, `@MARK@`, from this package's own manifest). A token
     left over stops the packaging rather than shipping it, as a marker does."""
     path = os.path.join(dest, "README.md")
-    m = json.load(open(os.path.join(dest, "manifest.json")))
+    m = json.load(open(os.path.join(dest, "manifest.json"), encoding="utf-8"))
     body = open(path, encoding="utf-8").read()
     vals = dict(PLATFORM_TEXT[platform])
     vals["@SAVE_WHERE@"] = ("into a folder called `rompath` in this folder (make it if it is not there)"
@@ -857,7 +857,7 @@ def fill_platform_text(dest, platform):
     left = sorted(set(re.findall(r"@[A-Z_]+@", body)))
     if left:
         sys.exit(f"{path}: template tokens left after filling: {left}")
-    open(path, "w", encoding="utf-8").write(re.sub(r"\n{3,}", "\n\n", body))
+    open(path, "w", encoding="utf-8", newline="\n").write(re.sub(r"\n{3,}", "\n\n", body))
 
 
 def main():

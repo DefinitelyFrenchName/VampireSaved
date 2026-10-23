@@ -176,6 +176,11 @@ if sheet_on && [ -z "$MODE" ]; then
         sheet_moment flash "f$f" "f$f, palette row 11" "$_sv" "row 11 hash: native $_sn, ours $_so"
         sheet_at flash "f$f" native "$f" log
         sheet_at flash "f$f" ours "$f" log
+        # S4-D (#291): the column's end around the dump, 4 frames either side (to the run's last logged frame), each
+        # frame proven on the leg's own checksum log
+        _hi=$((f + 4)); [ "$_hi" -lt "$FR" ] || _hi=$((FR - 1))
+        sheet_span flash "f$f" native "$((f - 4))-$_hi"
+        sheet_span flash "f$f" ours "$((f - 4))-$_hi"
     done
 fi
 echo "== 3. the frozen rows"

@@ -201,6 +201,12 @@ if os.environ.get("SHEET_OUT") and MODE == "":
             for l in per:
                 if per[l][0][mid] is not None:
                     sf.write("at\ttrap\t%s\t%s\t%d\tlog\t-\n" % (mid, l, per[l][0][mid]))
+                    # S4-D (#291): the shock stage by stage on the leg's own log, each moment to the next (the hit from
+                    # 4 frames before it, the last shock sample and the 8 frames after it), within the 3640-frame run
+                    f0, nx = per[l][0][mid], {"hit": "shock", "shock": "last", "last": None}[mid]
+                    f1 = per[l][0][nx] if nx else None
+                    lo, hi = (f0 - 4 if mid == "hit" else f0), (f1 - 1 if f1 is not None and f1 > f0 else f0 + 8)
+                    sf.write("span\ttrap\t%s\t%s\t%d-%d\n" % (mid, l, max(lo, 0), min(hi, 3639)))
 for e in errs: print("FAIL:", e)
 sys.exit(1 if errs else 0)
 PY

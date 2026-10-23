@@ -352,6 +352,12 @@ def load(p, spec):
     return d
 def at(sid, mid, leg, fr, d):
     print("at	%s	%s	%s	%d	%s	%s" % (sid, mid, leg, fr, "fields" if fr in d else "none", d.get(fr, "-")))
+def span(sid, mid, leg, fr, lo, hi, d):
+    # S4-D (#291): the judged event's window on the leg, clipped to the frames the leg's own trace holds (each frame
+    # of a fields span is proven on that trace); a moment the trace cannot prove gets no span
+    if fr in d:
+        lo, hi = max(lo, min(d)), min(hi, max(d))
+        print("span\t%s\t%s\t%s\t%d-%d" % (sid, mid, leg, min(lo, fr), max(hi, fr)))
 rows = [l.rstrip("\n").split("\t") for l in open(W + "/got.tsv")]
 tl = {r[1]: dict(x.split("=", 1) for x in r[2:]) for r in rows if r[0] == "timeline"}
 same = "IDENTICAL" if tl.get("native") == tl.get("ours") and tl.get("native") else "DIFF"
@@ -365,7 +371,14 @@ for i in range(n):
     vals = ", ".join("%s f%d" % (leg, fr[leg][i][1]) for leg in ("native", "ours") if leg in fr and i < len(fr[leg]))
     print("moment\tcolumn\tt%d\t%s (the timeline: %s)\t%s\t%s" % (i, lab, "equal" if same == "IDENTICAL" else "differs", same, vals))
     for leg in ("native", "ours"):
-        if leg in fr and i < len(fr[leg]): at("column", "t%d" % i, leg, fr[leg][i][1], tr[leg])
+        if leg in fr and i < len(fr[leg]):
+            f0 = fr[leg][i][1]
+            at("column", "t%d" % i, leg, f0, tr[leg])
+            # the timeline step to the next one (the special to its first hit, a hit to the next, ...); the last step
+            # (or one the next does not follow) in context, 4 frames either side
+            f1 = fr[leg][i + 1][1] if i + 1 < len(fr[leg]) else None
+            if f1 is not None and f1 > f0: span("column", "t%d" % i, leg, f0, f0, f1 - 1, tr[leg])
+            else: span("column", "t%d" % i, leg, f0, f0 - 4, f0 + 4, tr[leg])
 ko = {r[1]: dict(x.split("=", 1) for x in r[2:]) for r in rows if r[0] == "ko"}
 if ko:
     kt = {leg: load("%s/ko_%s.ft" % (W, leg), SPEC["k"]) for leg in ("native", "ours")}
@@ -373,7 +386,10 @@ if ko:
     print("moment\tko\tk\tthe column KOs the victim (death flag set; class %s)\t%s\t%s" % (
         ko.get("ours", {}).get("cls", "?"), v, ", ".join("%s f%s" % (l, ko[l]["ko_frame"]) for l in ("native", "ours") if l in ko)))
     for leg in ("native", "ours"):
-        if leg in ko: at("ko", "k", leg, int(ko[leg]["ko_frame"]), kt[leg])
+        if leg in ko:
+            f0 = int(ko[leg]["ko_frame"])
+            at("ko", "k", leg, f0, kt[leg])
+            span("ko", "k", leg, f0, f0 - 8, f0 + 8, kt[leg])       # the KO in context, 8 frames either side
 air = {r[1]: dict(x.split("=", 1) for x in r[2:]) for r in rows if r[0] == "air"}
 if air:
     at_ = {leg: load("%s/air_%s.ft" % (W, leg), SPEC["a"]) for leg in ("native", "ours")}
@@ -381,8 +397,17 @@ if air:
     print("moment\tair\th\tfirst hit on the airborne victim (height %s; class steps %s)\t%s\t-" % (
         air.get("ours", {}).get("y_at_hit", "?"), air.get("ours", {}).get("cls", "?"), v))
     for leg in ("native", "ours"):
-        if leg in air: at("air", "h", leg, int(air[leg]["hits"].split(",")[0]), at_[leg])
+        if leg in air:
+            f0 = int(air[leg]["hits"].split(",")[0])
+            at("air", "h", leg, f0, at_[leg])
+            span("air", "h", leg, f0, f0 - 8, f0 + 8, at_[leg])     # the jump up to the hit, and after it
 PYS
+    # S4-D (#291): each leg's own field trace, so every frame of a span is proven on what this gate traced there
+    for leg in native ours; do
+        sheet_trace column "$leg" "$W/$leg.ft" "ff8406:b:seq,ff845c:b:frz,ff8806:b:p2seq,ff885c:b:p2frz,ff8850:w:p2hp"
+        sheet_trace ko "$leg" "$W/ko_$leg.ft" "ff8854:b:cls,ff8850:w:hp,ff8852:w:white,ff8807:b:sub,ff891f:b:dead,ff0000:w:exc,ff8406:b:p1seq"
+        sheet_trace air "$leg" "$W/air_$leg.ft" "ff8406:b:seq,ff845c:b:frz,ff8806:b:p2seq,ff8807:b:p2sub,ff8854:b:p2cls,ff885c:b:p2frz,ff8850:w:p2hp,ff8814:w:p2y"
+    done
     sheet_rows "$W/sheet_rows.tsv"
 fi
 

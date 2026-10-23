@@ -219,6 +219,11 @@ for leg in ("native", "ours"):
     print("%s held %s %s" % (leg, held[0][0] if held else "-", "%#x" % max(r[2] for r in held) if held else "-"))
     print("%s quick %s %s" % (leg, quick[0][0] if quick else "-", "%#x" % quick[0][1] if quick else "-"))
     print("%s ring %s" % (leg, ",".join(ring) or "-"))
+    # S4-D (#291): each moment's window — the held HP's class-0x07 frames, first to last, and the quick control's hit,
+    # its first to its last frame with a class set (the dumps sample every 2 frames)
+    qrun = [r for r in rows if 4000 <= r[0] < 4290 and r[1]]
+    print("%s heldspan %s" % (leg, "%d-%d" % (held[0][0], held[-1][0]) if held else "-"))
+    print("%s quickspan %s" % (leg, "%d-%d" % (qrun[0][0], qrun[-1][0]) if qrun else "-"))
 PY
     _g() { awk -v l="$1" -v k="$2" -v n="$3" '$1 == l && $2 == k {print $n}' "$W/sheet_rows.txt"; }
     sheet_new electrocute "Phobos as Victor's electrocute victim (93_hui_electrocuted): native vs2 above ours" huitzil - \
@@ -229,10 +234,12 @@ PY
     sheet_moment electrocute held "held HP: the electrocute installs (class 0x07)" "$_v" \
         "freeze native $(_g native held 4), ours $(_g ours held 4); window ring native $(_g native ring 3), ours $(_g ours ring 3)"
     for leg in native ours; do [ "$(_g $leg held 3)" != - ] && sheet_at electrocute held $leg "$(_g $leg held 3)" log; done
+    for leg in native ours; do [ "$(_g $leg heldspan 3)" != - ] && sheet_span electrocute held $leg "$(_g $leg heldspan 3)"; done
     if [ "$(_g native quick 3)" != - ] && [ "$(_g ours quick 3)" != - ]; then
         sheet_moment electrocute quick "quick 6+HP control: an ordinary hit, no shake" IDENTICAL \
             "first class native $(_g native quick 4), ours $(_g ours quick 4)"
         for leg in native ours; do sheet_at electrocute quick $leg "$(_g $leg quick 3)" log; done
+        for leg in native ours; do [ "$(_g $leg quickspan 3)" != - ] && sheet_span electrocute quick $leg "$(_g $leg quickspan 3)"; done
     fi
 fi
 

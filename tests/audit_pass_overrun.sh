@@ -189,6 +189,9 @@ if sheet_on && [ -z "$CONTROL" ]; then
             "each game's stage and palette, and P2's art (Demitri, each game's own copy; [VSP-168]); after a leg's lost pass the legs are one engine pass out of step by design of the measurement" || true
         sheet_leg "$part" native vs2 vsav2 "$ROMDIR" "$W/$part.native.rpl" "$pk" "$fr" || true
         sheet_leg "$part" ours ours vsavjw "$BUILD/rompath;$ROMDIR" "$W/$part.ours.rpl" "$pk" "$fr" || true
+        # S4-D (#291): each leg's own pass-counter trace, so every frame of a span is proven on what this gate traced
+        sheet_trace "$part" native "$W/$part.native.ft" "ff8081:b:pc,ff8080:b:fc" || true
+        sheet_trace "$part" ours "$W/$part.ours.ft" "ff8081:b:pc,ff8080:b:fc" || true
         python3 - "$part" "$fr" "$W" "$REPO" > "$W/sheet_$part.tsv" <<'PYS' && sheet_rows "$W/sheet_$part.tsv" || true
 import json, sys
 part, last, W, REPO = sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4]
@@ -202,21 +205,24 @@ for leg in ("native", "ours"):
 rows = [l.rstrip("\n").split("\t") for l in open(f"{W}/got.tsv")]
 zero = {r[2]: ([] if r[3] == "none" else [int(x) for x in r[3].split(",")]) for r in rows if r[0] == "overrun" and r[1] == part}
 idle = {(r[2], r[3]): "%s %s" % (r[4], r[5]) for r in rows if r[0] == "idle" and r[1] == part}
-def at(mid, fr):
+def at(mid, fr, lo, hi):
     for leg in ("native", "ours"):
         s = tr[leg].get(fr)
         print("at\t%s\t%s\t%s\t%d\t%s\t%s" % (part, mid, leg, fr, "fields" if s else "none", "ff8081:b=%s,ff8080:b=%s" % (s["pc"], s["fc"]) if s else "-"))
+        # S4-D (#291): the judged window, clipped to the leg's own trace, which proves every frame on the pass counters
+        if s:
+            print("span\t%s\t%s\t%s\t%d-%d" % (part, mid, leg, min(max(lo, min(tr[leg])), fr), max(min(hi, max(tr[leg])), fr)))
 for fr in sorted(set(zero.get("native", [])) | set(zero.get("ours", []))):
     who = [leg for leg in ("native", "ours") if fr in zero.get(leg, [])]
     print("moment\t%s\tz%d\tf%d: a frame with no logic pass on %s\t%s\t-" % (part, fr, fr, " and ".join(who), "both" if len(who) == 2 else "%s only" % who[0]))
-    at("z%d" % fr, fr)
+    at("z%d" % fr, fr, fr - 4, fr + 4)      # the lost pass in context, 4 frames either side
 ev = json.load(open(f"{REPO}/tests/replays/naming/{part}.json"))["events"]
 for k, e in enumerate(ev):
     if (str(k), "native") not in idle:
         continue
     lo = e["frame"]; hi = min((ev[k + 1]["frame"] if k + 1 < len(ev) else lo + e["gap"]) - 1, last - 1)
     print("moment\t%s\ti%d\t%s: event window mid-frame (idle spin dispatches)\tas measured\tnative %s; ours %s" % (part, k, e["name"], idle[(str(k), "native")], idle.get((str(k), "ours"), "-")))
-    at("i%d" % k, (lo + hi) // 2)
+    at("i%d" % k, (lo + hi) // 2, lo, hi)    # the event window the idle figures are measured over
 PYS
     done
 fi

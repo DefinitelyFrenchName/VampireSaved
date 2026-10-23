@@ -335,10 +335,10 @@ def package(a, rel):
         "xdelta3_flags": XDELTA_FLAGS,
         "zips": members,
     }
-    json.dump(manifest, open(os.path.join(rel, "manifest.json"), "w"), indent=1)
+    json.dump(manifest, open(os.path.join(rel, "manifest.json"), "w", encoding="utf-8", newline="\n"), indent=1)
     shutil.copy(os.path.join(os.path.dirname(__file__), "apply_release.py"),
                 os.path.join(rel, "apply_release.py"))
-    open(os.path.join(rel, "README.md"), "w").write(readme(a, manifest, npatch, ncopy))
+    open(os.path.join(rel, "README.md"), "w", encoding="utf-8", newline="\n").write(readme(a, manifest, npatch, ncopy))
     # THE APPLIER PAGE — the no-Python route to the same romset, generated from the
     # manifest and patches just written (docs/project/applier_app_scope.md). It is
     # ONE self-contained file because a page opened from file:// cannot read anything
