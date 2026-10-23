@@ -38,7 +38,7 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
-## Session 14z-206 — **PILOT and ERIS offline: the Mac carries the work in parallel. #299's cold cache fixed and #299 closed done; #296 and #309 closed done; #286's code half; #284 done awaiting release; #291 S4 planned, S4-A done; #305, #306, #307, #308, #309 filed.** Opened 2026-10-21 after the 14z-205c close (`b89fc9d7`, pushed).
+## Session 14z-206 — **PILOT and ERIS offline: the Mac carries the work in parallel. #299's cold cache fixed and #299 closed done; #296 and #309 closed done; #286's code half; #284 done awaiting release; #291 S4-A..F landed and S4-G shown, kept open for S4-D's 38 gates; #305..#313 filed; the sheet gates run on demand only.** Opened 2026-10-21 on transcript `fc0caa60` after the 14z-205c close (`b89fc9d7`, pushed).
 
 ### opened with
 HANDOFF, STATE and NEXT_SESSION read; the sweep CLEAN, `main` equal to `origin/main`. The maintainer: *"Currently PILOT
@@ -49,7 +49,7 @@ plan), R (#284's proposal), C (#299), M (#296), T (#286); then A (#291 S4-A), R2
 #296's text), B4 (#291 S4-B onwards, in its own git worktree). The harness refuses a subagent's write of a report file,
 so each hand-back is saved verbatim by the orchestrator (`build/agent206/<t…>/REPORT.md`, local).
 
-### (1) #291 — S4 PLANNED, ITS FIVE QUESTIONS ANSWERED; S4-A DONE
+### (1) #291 — S4-A..F LANDED, S4-G SHOWN, `audit_qs_voice_wav`'s VARIANT FIXED; OPEN UNTIL S4-D's 38 GATES GET SPANS (ruled 2026-10-23)
 Fork S's plan (`build/agent206/t291/PLAN.md`, `REPORT.md`, local), read-only on the S3 page: the 136 near-blank pictures
 come from two selection paths, 104 from the round-end fade anchor (102 in `audit_merged_legacy`, 2 in
 `test_tenant_select_records`) and 28 from `audit_legacy_pairings`' load frame; Felicia's wall jump is never drawn; no tag
@@ -78,6 +78,14 @@ reads c1/c2/lv (`$FF8782`, `$FF8B82`, `$FF8116`), `proof_sheets.py` names them p
 58 `Setup: ` lines in `docs/project/sheet_notes.md`, `test_proof_sheets` section 6b and control `who-swapped` —
 rendered on a two-gate copy, the gate not yet run (the Mac carries #299's whole tier). Next: the gate, then S4-G
 again, shown to the maintainer. #291 stays open.
+**Later in 14z-206 (2026-10-23):** S4-G ran on `7b663645`. All 58 gates PASS and the five tracks match their frozen
+references (`build/agent206/s4g_7b663645/`, local). It was shown to the maintainer: *"pages are looking good"*. The 74
+unproven cells, all `audit_qs_voice_wav`'s ours clips, were fixed in `e5d6f445` (`# SHEET-VARIANT: QSV_OUTBASE`,
+`tests/lib/qs_voice_build.sh`, plus its supplied-build ledger, gotcha written); that gate's sheet on `e5d6f445` reads
+0 NOT THE JUDGED RUN. The closure went to the rule-checker: run `2026-10-23-1190` VIOLATED, then `-1192` VIOLATED, each
+resolved by work; `-1189` and `-1191` were withdrawn unspawned. Run `-1193` found S4-D unfinished: 38 gates, 541 judged
+events at 1 tile each (`build/agent206/t291/close/span_measure_7b663645.txt`, local). The maintainer: *"Keep #291 open
+(Recommended)"*. #291 stays open until those 38 get spans (NEXT_SESSION).
 
 ### (2) #284 — THE TEMPLATE IN THE PIPELINE; DONE, AWAITING RELEASE
 Fork R rebuilt the pre-edit drafts from the 14z-205c transcript and diffed the maintainer's edits (`build/agent206/t284/
@@ -153,7 +161,7 @@ resolved by work (logs with a tree header, all five new modes run and failing on
 checker noted); it lands with the next tiered commit. Not tested: a fresh trace of `a8fa5350`, reads through git or on
 an untaken branch, the four gates short under the trace. #286's done-when is still open.
 
-### (6) #305, #306, #307, #308, #309 FILED
+### (6) #305, #306, #307, #308, #309 FILED; #309 CLOSED DONE (rule-checker run `2026-10-23-1188` OK); #305 AND #306 SEVERITY LOW (ruled 2026-10-23)
 At the maintainer's word: **#305** (#299's two gaps) and **#306** (nine emulator gates default to `build/donovan6`,
 which only `test_m2b_stage6` builds, so a clean checkout's gate order decides whether the others find it — a correction
 of S4-A's "a build the commit does not make" for those nine). **#307** (*"file that ticket"*): `build/` has no retention
@@ -177,14 +185,40 @@ landed in `7b663645`; the committed gate and tool were then run on PILOT in a 7-
 (`8b82d5d2`'s gate DEAD, the committed gate FIRED and PASSES) and on the Mac (FIRED and PASSES; the old line restored
 FAILS on the climbs-out check), `build/agent206/t309/commit_legs/`; ERIS's deep clone ran the fix on `04a53769` first
 (`build/agent206/t309/eris/`). Rule-checker runs `2026-10-23-1186`, `-1187` VIOLATED, resolved by work; `-1188` OK.
-**#313** (*"Yes"*, 2026-10-23): `tools/static_confirm.py plan` took 1,902 s for 25 of 229 gates in the first commit
+**Severity, 2026-10-23:** #305 and #306 labelled `severity: low` (*"Both low (Recommended)"*, `DECISIONS_HISTORY.md`).
+
+### (7) #313 FILED — THE `--confirm` PLANNER STALLS ON AN UNTRACKED `build/sheets/` TREE
+At the maintainer's word (*"Yes"*, 2026-10-23): `tools/static_confirm.py plan` took 1,902 s for 25 of 229 gates in the first commit
 tier (it hit its 2 h timeout; the commit was tiered again without `--confirm`), against 37 s for all 229 the day before.
 Its changed set held 23,803 paths. A recount gives 23,848, of which 20,273 are judged path by path, all but 2 under
 `build/sheets/8b82d5d247c6/`, #291's sheets, which the N-D `SCRATCH` filter does not drop (`build/agent206/t_confirm_slow/`, local).
-**Ruled 2026-10-23: the sheet gates run on demand only** (*"if we have any tests/gates on the captures sheets, they really
+
+### (8) THE SHEET GATES RUN ON DEMAND ONLY (ruled 2026-10-23)
+The maintainer, unprompted (*"if we have any tests/gates on the captures sheets, they really
 should be ondemand scope"*, DECISIONS_HISTORY.md): `test_proof_sheets` moves to emulator scope `ondemand` (reason `sheets:`),
 and `test_sheet_census` to static cadence `ondemand`. Both PASS run by hand after the move, as do `test_emulator_runner`,
 `test_lane_carry` and `test_gate_follows`.
+
+### CLOSE (14z-206, 2026-10-23)
+The maintainer: *"let's keep the end of #291 for next session. Let's try to aim closing this one, making sure that
+tickets that need updating/commenting/tagging/closing are updated accordingly"*. The sitting's commits, all local until
+this close's push: `a8fa5350`, `8b82d5d2`, `7b663645`, `e5d6f445`, each on a strict GREEN tier of its staged tree.
+**Tickets:** a GitHub check of every ticket this group names (#284, #286, #291, #296, #299, #305-#313). #305 and #306
+labelled (ruled); the `sessions` column of #284, #286 and #291 gains 14z-206; progress comments on #286 and #291 go up
+after the push, so they cite pushed commits. #296, #299 and #309 were closed on GitHub as their work finished.
+**The tier runs without `--confirm`** (#313): `tools/static_confirm.py plan` stalls on this sitting's untracked sheet
+trees under `build/sheets/`, as it did on the first commit tier. So the tier is the whole strict tier at `--jobs 8`
+(session cadence), and the table's `tier` step is passed by hand with that evidence.
+Steps (`tools/close.py`, run dir `build/agent206/close/`): **sections** done (headings to reality; #313 and the
+ondemand ruling split into (7) and (8)); **next-session** done (14z-205c's opener moved verbatim to
+`docs/NEXT_SESSION_HISTORY.md`; the opener rewritten, `test_live_budget` PASS); **rollover** nothing to move; **indexes**
+done; **dashboard** done (14z-163..14z-206 collected, 1,876 figures, 0 unclassed; this heading now names transcript
+`fc0caa60`; the four files uploaded, datasets at versions 13, 13, 13, 14). **record** this paragraph; **stage** 41 files (`git add -u` and the five new rule-checker run directories), 0 under
+`build/`, the bookkeeping gates PASS; **tier**: first the whole strict tier without `--confirm` (#313) on the staged
+tree `74c64b0b`, GREEN, PASS 91, 323 of 323 controls honoured, 609 s wall (`build/agent206/close/tier_results_full.tsv`);
+then the table's `--confirm` tier based on that run, since a base newer than this sitting's sheet trees keeps the
+planner clear of #313; its results `build/agent206/close/tier_results.tsv` are the next close's `--prev`. Then commit,
+pins, sweep, push, and the #286 and #291 progress comments.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings

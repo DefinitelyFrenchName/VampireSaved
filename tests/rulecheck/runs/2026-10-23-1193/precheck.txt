@@ -1,0 +1,5 @@
+  FLAG ATTRIB: On e5d6f445, test_proof_sheets PASSes with 15 controls FIRED (test_proof_sheets.log) and test_sheet_census PASSes, 58 legs and 0 on the debt list (test_sheet...
+  FLAG D-ABSOLUTE: The five tracks each equal the commit's frozen reference (the run's own lines).  [build/agent206/t291/close/closing_comment.md]
+  FLAG D-ABSOLUTE: Since 2026-10-23 both run only on demand.  [build/agent206/t291/close/closing_comment.md]
+  FLAG D-ABSOLUTE: - That those 29 sheets show no fighter rests on the game-state read, not on a look at each picture.  [build/agent206/t291/close/closing_comment.md]
+packet_check: 4 flag(s): ATTRIB 1, D-ABSOLUTE 3

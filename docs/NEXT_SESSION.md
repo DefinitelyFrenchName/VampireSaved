@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-205c CLOSE, 2026-10-21)
+# NEXT SESSION — orientation (rewritten at the 14z-206 CLOSE, 2026-10-23)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` (then `python3 tools/gen_history_index.py`
@@ -17,12 +17,16 @@ A plain **Opus 5.5 session at effort High** (the ruled orchestrator — STATE 'S
 - **Never edit a script while it runs** ([MJC-54]); the emulator runner reports a tracked file changed during its run.
 
 Say so at the opener. Never spawn any agent at `max`. A recommendation leans only on the maintainer's OWN words.
-PILOT (6 vCPU, 47 GB, display VirtIO-GPU since 2026-10-20) and ERIS both carried work in 14z-205c; neither profile sets
-ROMDIR (`ROMDIR=~/roms`). Work handed to either is a bundle of a COMMIT ("When to commit"), e.g. `main ^<last pushed>`
+PILOT (6 vCPU, 47 GB) carried the mister lane and #309's deep leg in 14z-206; ERIS comes online when the maintainer
+brings it up (*"I can pull ERIS online on a per-need basis"*, 2026-10-22). Neither profile sets ROMDIR
+(`ROMDIR=~/roms`). Work handed to either is a bundle of a COMMIT ("When to commit"), e.g. `main ^<last pushed>`
 (bare SHAs fail); 14z-205b broke this twice with an rsync of the working tree (STATE_HISTORY 14z-205b (5)).
 
 **THE SESSION CLOSE:** `docs/project/session_close.md`, run by `python3 tools/close.py` (`start --key … --row - --prev
-<results>`, then `next`, `done`, `status`). The run of record is named in STATE 14z-205c's CLOSE section.
+<results>`, then `next`, `done`, `status`). The run of record is named in STATE 14z-206's CLOSE section.
+**`--confirm` STALLS WHILE SHEET TREES SIT UNDER `build/sheets/` (#313):** its planner judges every untracked file there
+path by path. Until #313 is fixed, run a tier without `--confirm` (as all of 14z-206's commits and its close did), or
+move `build/sheets/` out of the tree first.
 
 **THE STATIC TIER CHANGED THIS SITTING (14z-205; the page https://claude.ai/artifact/1DzrvoGUphYYmtyRKvhJtZ, private):**
 109 gates of six families run at freeze cadence, pulled into a session only when their own code changes (`@code`,
@@ -32,13 +36,14 @@ gates in parallel (#299; a close runs `--jobs 8`, ruled 2026-10-19).
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
-1. **#291 — S4: S4-A..F landed (`a8fa5350`, `8b82d5d2`), S4-G ran and was reviewed** (STATE 14z-206 (1); the plan
-   and answers: `build/agent206/t291/PLAN.md`, `DECISIONS_HISTORY.md` "Ruled 2026-10-21 (14z-206) — #291 S4: …" and
-   "Ruled 2026-10-22 (14z-206) — #291 S4-G reviewed …"). In the working tree: each gate's characters read from the
-   game (c1/c2/lv) and one `Setup: ` line per gate in `docs/project/sheet_notes.md`. Next: run `test_proof_sheets`
-   (section 6b, control `who-swapped`), build a gate-declared variant in the clean checkout
-   (`# SHEET-VARIANT:`, ruled 2026-10-22 "Built in checkout, stated": `test_tenant_select_records`' `tenant_build_13`),
-   re-run S4-G, show the maintainer; then the closure through the rule-checker.
+1. **#291 — OPEN until S4-D's span retrofit of the remaining 38 gates lands** (ruled 2026-10-23, *"Keep #291 open
+   (Recommended)"*, `DECISIONS_HISTORY.md`). S4-A..F landed (`a8fa5350`, `8b82d5d2`); S4-G ran on `7b663645` and was
+   shown (*"pages are looking good"*); `audit_qs_voice_wav`'s 74 unproven clips fixed in `e5d6f445` (a gate-built
+   variant). Left: the 38 gates on `tests/expected/sheet_span_debt.txt` (541 judged events at 1 tile each, measured in
+   `build/agent206/t291/close/span_measure_7b663645.txt`, local) get span rows, family by family as S4-D did, each with
+   S2's check (the gate's output identical with and without `SHEET_OUT`); then a full sheet run, shown to the maintainer,
+   and the closure through the rule-checker. The closure evidence of runs `2026-10-23-1190`..`-1193` is in
+   `build/agent206/t291/close/` (local). `test_proof_sheets` and `test_sheet_census` run on demand only (ruled 2026-10-23).
 2. **#229 — WAITING ON THE MAINTAINER, Q2 especially** (*"I still have answers to provide for Q2 especially"*,
    2026-10-21); everything is listed on #229 (comment of 2026-10-20) and in STATE_HISTORY 14z-205b (1)-(5).
    - **The work is LOCAL and UNTRACKED:** the six gates, their expectations, rigs and Lua (105 files,
@@ -67,16 +72,17 @@ gates in parallel (#299; a close runs `--jobs 8`, ruled 2026-10-19).
    `test_readme_recording` runs its Windows and Linux legs.
 5. **#298 — measure the narrowed controls** on a close's tier against 1,500-1,800 s of controls per close before
    (14z-205 commented 143 controls, 1,448 s); comment the figures on #298 and close it if the narrowing held.
-6. **#286 — the scorer judges as `predict()` does; the narrowings plus N-F-LINK are applied** (14z-206, STATE 14z-206
-   (5); PILOT's rescore 0 misses, rule-checker run `2026-10-22-1169` OK). What is left is the done-when itself: a
+6. **#286 — the scorer judges as `predict()` does; the narrowings plus N-F-LINK landed** (`8b82d5d2`; STATE
+   14z-206 (5); PILOT's rescore 0 misses, rule-checker run `2026-10-22-1169` OK). What is left is the done-when itself: a
    record-only commit's `--confirm` tier measured, re-running only the gates that open a record file, controls only
-   where real inputs changed, with the before/after figures on the ticket.
+   where real inputs changed, with the before/after figures on the ticket. That tier needs `--confirm`, so fix #313
+   first (STATE 14z-206 (7)), or measure with `build/sheets/` moved out of the tree.
 7. **#297 stays open until a freeze has run the 109 moved gates green**; a freeze runs every gate anyway.
 8. **Then ask the maintainer for the order of work.** The open tickets by their GitHub severity label:
    - high: #286;
    - medium: #284, #313;
-   - low: #118, #229, #244, #301, #308, #310, #311 (and #129, parked);
-   - no severity label: #266, #267, #289, #291, #297, #298, #302, #303, #304, #305, #306, #307, #312;
+   - low: #118, #229, #244, #301, #305, #306, #308, #310, #311 (and #129, parked; #305 and #306 labelled 2026-10-23, *"Both low (Recommended)"*);
+   - no severity label: #266, #267, #289, #291, #297, #298, #302, #303, #304, #307, #312;
    - **release-only:** #278, #279, #280, #281.
 9. **`tests/replays/118_chain.rpl`'s header names a leg of `audit_mizuumi_inputs` that gate never ran** (STATE_HISTORY
     14z-198 finding (i)); the one-line correction rides a session that runs the emulator gates following `tests/replays/`.
@@ -90,20 +96,26 @@ gates in parallel (#299; a close runs `--jobs 8`, ruled 2026-10-19).
 
 - **Every capture sheet: ~9 tiles per move** (several pages when one gets too big), every tile showing the fighters (no
   flash, no blank), every tag defined on the sheet (the maintainer on #291's S3 page and on the #229 sheets, 2026-10-20).
-- **Before tightening a verdict rule, census it over every log it will judge:** a gate's own `CONTROL DEAD` is the
-  honoured mode of four gates (`docs/project/gotchas.md` "A GATE'S OWN `CONTROL DEAD` IS SOME GATES' HONOURED MODE").
-- **The planner names one reason per stale gate**, so a false re-run can be over-determined; read every layer before
-  narrowing one (#292, `docs/project/gotchas.md`).
-- **`tools/trace_static_reads.py`'s scorer does not judge reads as `predict()` does** (no N-F-CHANGE skip): a 0-miss
-  score of a narrowed predictor is not proof (#286, START HERE 8).
-- **Remote handoff:** a bundle needs a ref range (`main ^<sha>`), not bare SHAs; an ssh that launches a `setsid` job can
-  time out (exit 124) while the job runs — poll the job, not the ssh.
+  38 drawing gates still show 1 tile per judged event (`tests/expected/sheet_span_debt.txt`, START HERE 1).
+- **Job-seconds over the wall clock is concurrency, not CPU**: measure CPU with `/usr/bin/time` or sampling, and name a
+  ratio by what its numerator counts (`docs/project/gotchas.md`, #312).
+- **A mode run is judged by what its own section reached**, never by its exit status or a `CONTROL FIRED` line the gate
+  prints in every mode (#310; `test_checkdocs_rom`'s `vacuous-validator` was dead from 14z-147b to 14z-206).
+- **A branch no runner takes rots unseen**: `audit_qs_voice_wav`'s supplied-build path failed every run from 14z-94 to
+  14z-206 (`docs/project/gotchas.md`).
+- **The `--confirm` planner reads every untracked, unignored file newer than its base**; its scratch filter skips
+  `build/agent*`, `build/rulecheck`, `build/static_runs` and `build/snapshot_runs`, but not `build/sheets/` (#313).
+- **The rule-checker caught real gaps before every closure this sitting**, in VIOLATED runs: #299 8 (`1170`-`1177`),
+  #296 5 (`1179`-`1182`, `1184`), #309 2 (`1186`, `1187`), #291 3 (`1190`, `1192`, `1193`, then kept open). The lesson: give a closure packet every file the tool reads that the commit changes, and measure a done-when's
+  every clause (per sheet, per gate, per index row), not the one that is easiest to count.
 
-## WHAT CLOSED THIS SITTING (14z-205c)
+## WHAT CLOSED THIS SITTING (14z-206)
 
-- **Closed:** #292 `declined` (its narrowing saves no gate); #277, #262, #263 `done` (the agent extractor's rounding,
-  dedupe and W§ fixes, `tools/agent/extract.py`).
-- **Filed:** #302, #303, #304. **Ruled:** #299's lock; #292 closed, code out; #277/#263's fixes and the rounding rule; #229's
-  Q1 answers and the two sheets; #284 stays open (`DECISIONS_HISTORY.md`, 2026-10-20 and 2026-10-21 entries).
-- **Done, awaiting release:** #266 (closes when the next release records `audit_release_linux_desktop` PASSING on PILOT).
-- **Withdrawn by the rule-checker:** #266's closure (run 1154), #286's narrowings (run 1156).
+- **Closed `done`:** #299 (`--jobs 8`, the cold decrypt cache), #296 (the sandbox key and refusal), #309
+  (`test_proof_sheets`' relative SHEET_OUT).
+- **Filed:** #305, #306, #307, #308, #309, #310, #311, #312, #313. **Ruled:** PILOT and ERIS offline order; #291 S4's
+  five questions, S4-G's review, the gate-built variant, the sheet gates on demand, #291 kept open; #299's target met as
+  8 job slots; #296's reds named; #305 and #306 severity low (`DECISIONS_HISTORY.md`, 2026-10-21 to 2026-10-23 entries).
+- **Done, awaiting release:** #284 (its README template), with #266 from 14z-205c.
+- **Withdrawn by the rule-checker:** #291's closure (run `2026-10-23-1193`, the S4-D span debt). Runs `-1183`, `-1189`
+  and `-1191` were withdrawn unspawned.
