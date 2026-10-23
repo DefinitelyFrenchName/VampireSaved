@@ -11,8 +11,11 @@
 #   node against apply_release.py on $ROMDIR for member order, bytes, zip header fields and
 #   the set key (container bytes deliberately not compared); the Python applier run under a
 #   Windows sys.platform writing the same container as on this host (#215); six refusals
-#   exercised on both tools; five controls (a fetch() in the shell, the CSP removed, the
-#   member check removed, a flipped member, the create_system pin removed).
+#   exercised on both tools; six controls (a fetch() in the shell, the CSP removed, the
+#   member check removed, a flipped member, the create_system pin removed, a generator copy
+#   whose page write names no encoding). The first generation runs under the HOST-TEXT GUARD
+#   (tests/lib/hosttext.py, #314): a text open() of the generator naming no encoding, or a
+#   text write naming no newline, is refused on every host, not only on Windows.
 # EXPECTS: every section green and every control failing; a red names the member, refusal or
 #   primitive. The page's own WIRING is test_applier_page_browser's half.
 #
@@ -67,6 +70,7 @@
 # MUST-FIRE: shadow-tool: no-member-check — a copy of applier.mjs with the rebuilt-member sha1 check removed must make section 4 fail, because a corrupted patch would then be accepted instead of refused; if the section still passed, it would not be reading the verification at all (mode: the gate runs against that copy)
 # MUST-FIRE: shadow-tool: flipped-member — a copy of applier.mjs that flips one byte of one finished member AND skips the set-key check must make section 3's member-for-member comparison fail; if it still passed, the comparison would not be comparing the bytes (mode: the gate runs against that copy)
 # MUST-FIRE: shadow-tool: windows-host — a copy of apply_release.py without its create_system pin, run under a Windows sys.platform, must write members with create_system 0 and make section 3b fail; if it passed, the gate would not be reading the host byte that made the container differ by host (#215) (mode: section 3b runs that copy)
+# MUST-FIRE: shadow-tool: unencoded-page — a copy of tools/gen_applier_page.py whose apply_release.html write names no encoding and no newline (#314: cp1252 and CRLF on Windows) must be refused by the host-text guard on every host, so the guard is proven live (in-gate: the copy run under the guard must print a HOST-TEXT line naming the page write; mode: the copy generates section 1's page and the gate FAILs)
 # MUST-FIRE: perturbed-copy: page-with-fetch — a copy of the page shell carrying a fetch() call must make section 1 fail; if it passed, the self-containment property would be unchecked and the page's one hard constraint would rest on nothing (mode: the gate generates from that shell)
 # MUST-FIRE: perturbed-copy: page-without-csp — a copy of the page shell with its Content-Security-Policy meta removed must make section 1 fail; the CSP is what makes "no network of any kind" a property the BROWSER enforces rather than one a denylist guesses at, and a denylist cannot prove absence, so a page that lost it must not ship (mode: the gate generates from that shell)
 #
@@ -158,12 +162,39 @@ PY
 }
 
 GEN_SHELL="$SHELL_HTML"
+# the generator under the HOST-TEXT GUARD (#314): tests/lib/hosttext.py is imported first, then the tool runs as __main__
+gen_guarded() {   # <generator .py> <args...>
+    _g="$1"; shift
+    python3 -c 'import runpy, sys; sys.path.insert(0, sys.argv[1]); import hosttext; t = sys.argv[2]; sys.argv = [t] + sys.argv[3:]; runpy.run_path(t, run_name="__main__")' \
+        "$REPO/tests/lib" "$_g" "$@"
+}
+unencoded_gen() {   # <dest .py>: a copy of the generator whose page write names no encoding and no newline (the #314 shape),
+    mkdir -p "$(dirname "$1")"; ln -sf "$MOD" "$(dirname "$1")/applier"   # beside its modules, which it finds by its own path
+    python3 - "$REPO/tools/gen_applier_page.py" "$1" <<'PY'
+import sys
+src, dst = sys.argv[1:3]
+s = open(src, encoding="utf-8").read()
+a = 'open(out, "w", encoding="utf-8", newline="\\n").write(html)'
+assert s.count(a) == 1, "the generator's page write moved: the control has nothing to strip"
+open(dst, "w", encoding="utf-8", newline="\n").write(s.replace(a, 'open(out, "w").write(html)'))
+PY
+}
+GEN_TOOL="$REPO/tools/gen_applier_page.py"
+if vs_ctl_is unencoded-page; then
+    unencoded_gen "$W/shadow_gen/gen_applier_page.py" || { echo "REFUSED: CONTROL=unencoded-page — the shadow generator could not be written"; exit 3; }
+    GEN_TOOL="$W/shadow_gen/gen_applier_page.py"; note "CONTROL: a generator copy whose page write names no encoding"
+fi
 for c in page-with-fetch page-without-csp; do
     if vs_ctl_is "$c"; then break_shell "$c" "$W/shell_bad.html"; GEN_SHELL="$W/shell_bad.html"; fi
 done
 
 gen_rc=0
-python3 tools/gen_applier_page.py "$REL" --shell "$GEN_SHELL" -o "$W/page1.html" > "$W/gen1.txt" 2>&1 || gen_rc=$?
+gen_guarded "$GEN_TOOL" "$REL" --shell "$GEN_SHELL" -o "$W/page1.html" > "$W/gen1.txt" 2>&1 || gen_rc=$?
+if grep -q '^HOST-TEXT:' "$W/gen1.txt"; then
+    sed 's/^/  /' "$W/gen1.txt"
+    echo "FAIL: the page generator wrote host-dependent text (the host-text guard, #314)"; exit 1
+fi
+vs_ctl_is unencoded-page && { echo "FAIL: test_applier_page — the shadow generator wrote its page: the host-text guard did not refuse it"; exit 1; }
 for c in page-with-fetch page-without-csp; do
     vs_ctl_is "$c" || continue
     if [ "$gen_rc" = 0 ]; then
@@ -605,6 +636,16 @@ if [ -d "$W/ctl_win" ] && ! hb="$(host_byte "$W/ctl_win" "$W/py_standalone")"; t
     vs_ctl_fired windows-host "without the pin the Windows run writes $hb"
 else
     vs_ctl_dead windows-host "the unpinned applier under win32 still wrote the reference container (${hb:-no output})" || true
+    fails=$((fails + 1))
+fi
+
+# the host-text guard must refuse a generator whose page write names no encoding (#314)
+unencoded_gen "$W/ctl_gen/gen_applier_page.py"
+if ! gen_guarded "$W/ctl_gen/gen_applier_page.py" "$REL" --shell "$SHELL_HTML" -o "$W/ctl_page_unenc.html" > "$W/ctl_unenc.txt" 2>&1 \
+   && grep -q "^HOST-TEXT: .*apply_release\.html\|^HOST-TEXT: .*ctl_page_unenc\.html" "$W/ctl_unenc.txt"; then
+    vs_ctl_fired unencoded-page "$(grep -m1 '^HOST-TEXT:' "$W/ctl_unenc.txt" | sed 's/^HOST-TEXT: //' | cut -c1-160)"
+else
+    vs_ctl_dead unencoded-page "the generator copy without its page encoding was not refused: $(head -1 "$W/ctl_unenc.txt" 2>/dev/null)" || true
     fails=$((fails + 1))
 fi
 

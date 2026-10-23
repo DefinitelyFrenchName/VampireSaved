@@ -53,7 +53,7 @@ def inline_modules():
     surprise here would ship as a broken page."""
     out = []
     for name in MODULES:
-        src = open(os.path.join(APPLIER, name)).read()
+        src = open(os.path.join(APPLIER, name), encoding="utf-8").read()
         lines = []
         for i, line in enumerate(src.splitlines(), 1):
             if IMPORT_RE.match(line):
@@ -141,7 +141,7 @@ def main():
     mpath = os.path.join(a.pkgdir, "manifest.json")
     if not os.path.exists(mpath):
         sys.exit(f"no manifest.json in {a.pkgdir}")
-    manifest = json.load(open(mpath))
+    manifest = json.load(open(mpath, encoding="utf-8"))
 
     patches = {}
     for entries in manifest["zips"].values():
@@ -155,7 +155,7 @@ def main():
             patches[e["patch"]] = base64.b64encode(blob).decode("ascii")
 
     out_zip = sorted(manifest["zips"])[0]
-    html = open(a.shell).read()
+    html = open(a.shell, encoding="utf-8").read()
     subs = {
         "{{RELEASE_NAME}}": manifest.get("name") or "this release",
         "{{VERSION_STRING}}": manifest.get("version_string") or "?",
@@ -177,7 +177,7 @@ def main():
 
     out = a.out or os.path.join(a.pkgdir, "apply_release.html")
     assert_self_contained(html, out)
-    open(out, "w").write(html)
+    open(out, "w", encoding="utf-8", newline="\n").write(html)
     print(f"{out}: {len(html) / 1048576:.2f} MB, {len(patches)} patches inlined, "
           f"{len(MODULES)} modules, manifest {subs['{{MANIFEST_FP}}']}, platform {platform}")
 

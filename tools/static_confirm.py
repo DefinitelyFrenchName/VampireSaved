@@ -436,13 +436,36 @@ def deprose(t):
 
 
 _R3B = {}
+# N-K (14z-207, #286): a python program fed to python3 from a shell HEREDOC is python, so N-C's bare clause skips it as
+# it skips a .py file: tests/test_tenant_loop.sh's `docs = []` (in `python3 - <<'PY' ... PY`) made 7 gates readers of
+# docs/, and tests/test_manifest_merge.sh's `docs = load(...)` one more (lane F's record-only tier on PILOT, 14z-207:
+# all 8 open no file under docs/). The shell lines around the heredoc still count; only the body between the opener
+# and its terminator line leaves the BARE haystack (the lit and join forms still search the whole text).
+PY_HEREDOC = re.compile(r"^([^\n#]*\bpython3?\b[^\n]*<<-?[ \t]*(['\"]?)(\w+)\2[^\n]*\n)(.*?)(^[ \t]*\3[ \t]*$)",
+                        re.M | re.S)
+NARROW_HEREDOC = True
+_SHPY = {}
+
+
+def shell_code(t):
+    """N-K: a shell text with the BODIES of its python heredocs removed, cached per text"""
+    k = hash(t)
+    if k not in _SHPY:
+        _SHPY[k] = PY_HEREDOC.sub(lambda m: m.group(1) + m.group(5), t) if NARROW_HEREDOC else t
+    return _SHPY[k]
+
+
+def r3_text(root, p):
+    """N-C and N-K: one non-python file of the reach as R3's bare clause reads it"""
+    t = text(root, p)
+    return deprose(shell_code(t) if p.endswith(".sh") else t)
 
 
 def r3_blob(root, rch, blob):
     """N-C: the reach's non-python code with every prose string removed — where a BARE directory token counts"""
     k = (root, hash(blob))
     if k not in _R3B:
-        _R3B[k] = "\n".join(deprose(text(root, p)) for p in rch if not p.endswith(".py"))
+        _R3B[k] = "\n".join(r3_text(root, p) for p in rch if not p.endswith(".py"))
     return _R3B[k]
 
 
@@ -704,7 +727,7 @@ def stale_reason(root, rch, blob, c, pats):
             where = None
             if all(has_run(hay, x) for x in d.split("/")[1:]) and rx.search(hay):
                 if kind == "bare":
-                    where = next((p for p in rch if not p.endswith(".py") and rx.search(deprose(text(root, p)))), "?")
+                    where = next((p for p in rch if not p.endswith(".py") and rx.search(r3_text(root, p))), "?")
                 else:
                     where = next((p for p in rch if rx.search(text(root, p))), "?")
             _R3MEMO[mk] = where and f"R3 {where} reads directory {d}"
@@ -955,7 +978,8 @@ def selftest():
           "g_buildbare\ng_buildsub\ng_buildtmpl\ng_statemsg\ng_stateread\ng_statearg\ng_statepair\n"
           "g_prose\ng_pyident\ng_pyfile\ng_casepat\ng_pylist\ng_pydeep\ng_gitlist\ng_sib\ng_shdef\n"
           "g_mdmsg\ng_mdread\ng_reg\ng_mani\ng_maniruns\ng_cdfind\ng_walksub\ng_walkroot\ng_testswalk\ng_testslink\n"
-          "g_lsglob\ng_lsdir\ng_lsvar\ng_cdwalk\ng_subwalk\ng_planner\ng_constwalk\ng_runlink\ng_dotend\n")
+          "g_lsglob\ng_lsdir\ng_lsvar\ng_cdwalk\ng_subwalk\ng_planner\ng_constwalk\ng_runlink\ng_dotend\n"
+          "g_pyheredoc\ng_shdocs\n")
         w("tests/g_testswalk.sh", "#!/bin/sh\npython3 tools/testswalk.py\n", True)
         w("tests/g_testslink.sh", "#!/bin/sh\necho \"a copy would **not** find the tests otherwise\"\nls tests > /dev/null\n", True)
         w("tools/testswalk.py", "import pathlib\nfor d in (\"tests\",):\n    for p in sorted((pathlib.Path('.') / d).rglob('*')):\n        pass\n")
@@ -1043,25 +1067,29 @@ def selftest():
         w("tests/g_runlink.sh", "#!/bin/sh\ncat lists/links.tsv > /dev/null\n", True)
         w("lists/links.tsv", "id\tlink\n1\ttests/rulecheck/runs/2026-01-01-01/verdict.txt\n")
         w("tests/rulecheck/runs/2026-01-01-01/verdict.txt", "Q1 HOLDS\n")
+        # N-K (#286, 14z-207): a python heredoc's `docs = []` is python, not a shell read of docs/ (test_tenant_loop's
+        # shape); a shell `ls docs` after a heredoc still reads it
+        w("tests/g_pyheredoc.sh", "#!/bin/sh\npython3 - \"$1\" <<'PY' || exit 1\nimport sys\ndocs = []\nprint(len(docs))\nPY\n", True)
+        w("tests/g_shdocs.sh", "#!/bin/sh\npython3 - <<'PY'\nx = 1\nPY\nls docs > /dev/null\n", True)
         # #313: a basename R2 matches where a `.` follows it (`end.tsv.*`) is not a whole [\w.-] run of the text
         w("tests/g_dotend.sh", "#!/bin/sh\nfor f in data/end.tsv.*; do :; done\n", True)
         cases = [
             # g_join names 'docs' as a bare quoted directory: every change under docs/ is STALE for it
             # (over-approximate by design, R3 at depth 1)
             # N-C: g_join's 'docs' is joined to the literal 'project', so it names docs/project, not docs
-            ("docs/data/table.tsv", {"g_named", "g_whole"}),
+            ("docs/data/table.tsv", {"g_named", "g_shdocs", "g_whole"}),
             ("tools/helper.py", {"g_prog", "g_whole"}),
-            ("docs/game/new.md", {"g_dir", "g_lsdir", "g_whole"}),
+            ("docs/game/new.md", {"g_dir", "g_lsdir", "g_shdocs", "g_whole"}),
             # N-C: prose, a python identifier, a joined literal file and a case-pattern glob read no directory;
             # the python listing of the quoted directory does (tests/new.sh), and the joined pair's listing
             # reads tests/expected/ (and only it)
-            ("docs/other.md", {"g_whole"}),
+            ("docs/other.md", {"g_shdocs", "g_whole"}),   # N-K: not g_pyheredoc
             # (g_casepat's `*tests/*.sh*` is still an R6 TEMPLATE for a tests/*.sh name; N-C's `*` rule is only R3's)
             ("tests/new.sh", {"g_casepat", "g_cdwalk", "g_constwalk", "g_lsglob", "g_pylist", "g_subwalk", "g_testswalk", "g_testslink", "g_whole"}),
             ("tests/data/new.txt", {"g_cdwalk", "g_constwalk", "g_pylist", "g_subwalk", "g_testswalk", "g_testslink", "g_whole"}),
             ("tests/expected/new.txt", {"g_cdwalk", "g_constwalk", "g_pylist", "g_pydeep", "g_subwalk", "g_testswalk", "g_testslink", "g_whole"}),
-            ("docs/sums.txt", {"g_pyfile", "g_whole"}),
-            ("docs/project/x.md", {"g_join", "g_whole"}),
+            ("docs/sums.txt", {"g_pyfile", "g_shdocs", "g_whole"}),
+            ("docs/project/x.md", {"g_join", "g_shdocs", "g_whole"}),
             # N-B: the message does not read STATE.md; the inline read and the bare argument do
             ("STATE.md", {"g_whole", "g_stateread", "g_statearg"}),
             # N-A: the bare `build` reader is carried, the deeper reader is not

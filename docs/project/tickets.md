@@ -11,13 +11,12 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**314 tickets** — status: open 26 · parked 9 · done 249 · declined 12 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 213 · cosmetic 17 · evolution 84 · **backfill debt: 0 rows**.
+**314 tickets** — status: open 25 · parked 9 · done 250 · declined 12 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 213 · cosmetic 17 · evolution 84 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
-| [#314](https://github.com/DefinitelyFrenchName/VampireSaved/issues/314) | bug | open | tools/gen_applier_page.py writes host-encoded text: cp1252 and CRLF on Windows, the #308 defect in a sibling tool | `tools/gen_applier_page.py` | none | none | none | 14z-207 |
 | [#312](https://github.com/DefinitelyFrenchName/VampireSaved/issues/312) | evolution | open | A --jobs 8 static tier keeps only about 2.4 of its 8 job slots busy (CPU about 2.2 of 12 cores, 14z-205): one gate's controls run serially inside one pool job | `tests/lib/static_job.sh` · `tests/run_all_static.sh` | none | none | none | 14z-206 |
 | [#311](https://github.com/DefinitelyFrenchName/VampireSaved/issues/311) | bug | open | test_applier_page_browser's browser run does not complete under heavy load (a false red), and sometimes stalls unloaded | `tests/test_applier_page_browser.sh` | none | none | none | 14z-206 |
 | [#310](https://github.com/DefinitelyFrenchName/VampireSaved/issues/310) | bug | open | An executed control whose mode run FAILs without judging anything reads HONOURED | `tests/lib/classify.sh` · `tests/test_applier_page_browser.sh` | none | none | none | 14z-206 |
@@ -57,6 +56,7 @@ backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py pag
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#314](https://github.com/DefinitelyFrenchName/VampireSaved/issues/314) | bug | done | tools/gen_applier_page.py writes host-encoded text: cp1252 and CRLF on Windows, the #308 defect in a sibling tool | `tools/gen_applier_page.py` · `tests/test_applier_page.sh § unencoded-page` · `tests/test_host_text_opens.sh § applier-no-newline` | none | `docs/platform/gotchas.md § A PYTHON TEXT FILE OPENED WITHOUT `encoding=` AND `newline=` IS THE HOST'S` | `docs/platform/gotchas.md § A PYTHON TEXT FILE OPENED WITHOUT `encoding=` AND `newline=` IS THE HOST'S` | 14z-207 |
 | [#313](https://github.com/DefinitelyFrenchName/VampireSaved/issues/313) | bug | done | tools/static_confirm.py plan stalls on a large untracked build/sheets/ tree: 1,902 s for 25 of 229 gates, against 37 s for all 229 the day before | `tools/static_confirm.py` · `tests/test_static_confirm.sh § sheets-scratch-off` · `tests/test_static_confirm.sh § bound-exact-run` | none | `docs/project/gotchas.md § A PLANNER THAT JUDGES EVERY CHANGED PATH FOR EVERY GATE IS AS SLOW AS THE LARGEST UNTRACKED TREE` | `docs/project/gotchas.md § A PLANNER THAT JUDGES EVERY CHANGED PATH FOR EVERY GATE IS AS SLOW AS THE LARGEST UNTRACKED TREE` | 14z-206,14z-207 |
 | [#309](https://github.com/DefinitelyFrenchName/VampireSaved/issues/309) | bug | done | test_proof_sheets' control relative-unresolved is dead wherever the repository path is as deep as the capture's work dir | `tests/test_proof_sheets.sh` | none | `docs/project/gotchas.md § A RELATIVE NAME THAT CLIMBS OUT OF THE REPOSITORY RESOLVES DIFFERENTLY BY PATH DEPTH` | none | 14z-206 |
 | [#308](https://github.com/DefinitelyFrenchName/VampireSaved/issues/308) | bug | done | On Windows the release generator writes cp1252 and test_readme_recording writes CRLF, so the gate cannot pass there | `tests/test_readme_recording.sh § unencoded-launcher` · `tests/test_host_text_opens.sh` · `tools/package_release_platforms.py` | none | `docs/platform/gotchas.md § A PYTHON TEXT FILE OPENED WITHOUT `encoding=` AND `newline=` IS THE HOST'S` | `docs/platform/gotchas.md § A PYTHON TEXT FILE OPENED WITHOUT `encoding=` AND `newline=` IS THE HOST'S` | 14z-206,14z-207 |

@@ -1,0 +1,19 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent207/Q/closing_comment.md	622c1453d911f055e5caec85f730e880a09a6dce
+build/agent207/Q/issue314.md	133666b0b71a10796e4587523d8e1161e91cb7e1
+build/agent207/Q/REPORT.md	b686cebf5628e50c72d9117630b9adc0c788c342
+build/agent207/Q/main_vs_faef92f4.txt	109f045077c729443fc979e382fff19b4bc1cfd3
+build/agent207/Q/forkQ_2a155ba3..faef92f4.patch	fc901ac6209743d7ca306ec7b2038baf2685f9a1
+build/agent207/Q/eris/logs/gen_old_unguarded.out	826e582e6615b00ec0d570782d4ce9672f165a40
+build/agent207/Q/separating.txt	935ebe4ef9230edd185477a153ceff4b068fc68a
+build/agent207/Q/main2/test_applier_page.log	3a428d6e203cce619cb46328170eca9336f36d5d
+build/agent207/Q/main2/test_static_confirm.log	bb13d65bcc5709ce8699964c801803dffa41affa
+build/agent207/Q/static3/gate.log	9872133304a94fe3e382cfcbc8673aec68e5e61b
+build/agent207/Q/static3/modes.txt	14958e5a315aab2a7d759fd84f03312643074ca6
+build/agent207/Q/host_text_opens_old.txt	c410e1211fd7479542ddc7015966be6bd593d816
+build/agent207/Q/readme_main.log	55416797a0fec41052909a23eb544dfd716c3d05
+build/agent207/Q/eris/logs/a_pages.txt	f4f656346ebe1630ec2fcc8b8a56ccf426b1ca75
+build/agent207/Q/eris_unguarded.txt	02a8da5dcf5c748ee9bef33f55bcc98122a4d41e
+build/agent207/Q/eris/logs/e_readme_as_designed.log	fd4f73ad5d063099fe95de1e1d4a1d24d664b11a
+build/agent207/Q/eris/logs/b_applier_page.log	4e048ff68957d48ce549afaee2adb460f5b05bdd
+build/agent207/Q/eris/logs/b_host_text_opens.log	bb71445e60d22ed72bb7450c7699570544bc058a

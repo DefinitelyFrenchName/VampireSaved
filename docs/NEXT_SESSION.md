@@ -75,7 +75,7 @@ gates in parallel (#299; a close runs `--jobs 8`, ruled 2026-10-19).
 8. **Then ask the maintainer for the order of work.** The open tickets by their GitHub severity label:
    - high: #286;
    - medium: #284;
-   - low: #118, #229, #244, #301, #305, #306, #310, #311, #314 (and #129, parked; #305 and #306 labelled 2026-10-23, *"Both low (Recommended)"*);
+   - low: #118, #229, #244, #301, #305, #306, #310, #311 (and #129, parked; #305 and #306 labelled 2026-10-23, *"Both low (Recommended)"*);
    - no severity label: #266, #267, #289, #297, #298, #302, #303, #304, #307, #312;
    - **release-only:** #278, #279, #280, #281.
 9. **`tests/replays/118_chain.rpl`'s header names a leg of `audit_mizuumi_inputs` that gate never ran** (STATE_HISTORY

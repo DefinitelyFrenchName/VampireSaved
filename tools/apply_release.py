@@ -208,7 +208,7 @@ def main():
                          "for MiSTer, or any setup that already provides it")
     a = ap.parse_args()
     here = os.path.dirname(os.path.abspath(a.manifest))
-    m = json.load(open(a.manifest))
+    m = json.load(open(a.manifest, encoding="utf-8"))
 
     # 1. the reference dumps
     refs = {}

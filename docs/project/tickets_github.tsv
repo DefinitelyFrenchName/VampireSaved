@@ -4,7 +4,7 @@
 # repo: DefinitelyFrenchName/VampireSaved
 # issues: 314
 number	state	reason	closed	labels	title
-314	OPEN	-	-	bug,severity: low	tools/gen_applier_page.py writes host-encoded text: cp1252 and CRLF on Windows (the #308 defect in a sibling tool)
+314	CLOSED	COMPLETED	2026-10-23	bug,severity: low	tools/gen_applier_page.py writes host-encoded text: cp1252 and CRLF on Windows (the #308 defect in a sibling tool)
 313	CLOSED	COMPLETED	2026-10-23	bug,performance,severity: medium	tools/static_confirm.py plan stalls on a large untracked build/sheets/ tree: 1,902 s for 25 of 229 gates, against 37 s for all 229 the day before
 312	OPEN	-	-	evolution,performance	A --jobs 8 static tier keeps only about 2.4 of its 8 job slots busy (CPU about 2.2 of 12 cores, 14z-205): one gate's controls run serially inside one pool job
 311	OPEN	-	-	bug,severity: low,test-integrity	test_applier_page_browser's browser run does not complete under heavy load (a false red), and sometimes stalls unloaded

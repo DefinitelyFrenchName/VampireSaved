@@ -115,6 +115,18 @@ reads `build/agent185`), which item 2 must reclass first. Folded into this sitti
 because `tools/build_dirs.py` was untracked in the fork: tracked, it read its own selftest plants; the reader now skips
 itself (gotcha written).
 
+### (7) #314 CLOSED DONE; #286'S HEREDOC NARROWING (N-K) LANDED
+Lane Q (`build/agent207/Q/REPORT.md`, local; `refs/agent207/q314` `faef92f4`): `tools/gen_applier_page.py` named no
+encoding — on ERIS it did not only write CRLF but stopped at its page write with `UnicodeEncodeError`; fixed, the guard
+shared as `tests/lib/hosttext.py`, `test_applier_page` control `unencoded-page`, the static gate over all four release
+text tools (control `applier-no-newline`); the pages ERIS writes, guarded and plain, equal the Mac's shipped pages; a
+source-built MAME builds on ERIS's MSYS2 unchanged (709 s) and `test_readme_recording` passes there as designed.
+Rule-checker runs 2026-10-23-1212, -1213 VIOLATED and resolved, -1214 OK; **#314 closed done**. Lane R
+(`build/agent207/R/REPORT.md`, local; `refs/agent207/r286` `04e8324b`): N-K, a Python heredoc read as Python for R3,
+scored on an ERIS WSL trace (0 misses over 94,317 reads, control 90); predicted record-only re-runs 52 → 44, 15 open a
+record file, 0 controls. The other 29 the maintainer accepted as precision cost (DECISIONS_HISTORY.md). #286 closes on
+a measured record-only `--confirm` tier of the tree with N-K.
+
 ### (6) PILOT AND ERIS LANES (in progress)
 The maintainer: use PILOT and ERIS for other tickets, preparing a freeze+release *"as soon as we have a stable situation"*,
 and chose the lanes (DECISIONS_HISTORY.md "Ruled 2026-10-23 (14z-207) — the PILOT and ERIS lanes"): P on PILOT — its disk first (98% full; the maintainer

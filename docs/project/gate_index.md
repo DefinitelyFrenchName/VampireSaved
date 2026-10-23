@@ -149,7 +149,7 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 | `tests/test_fbneo_tree_integrity_control.sh` | test | ci_static | ROMDIR | ground truth for the emu/fbneo tree integrity gate (14z-90, GitHub issue #36). | 14z-90 |
 | `tests/test_frozen_rompath_guard.sh` | test | ci_static | ROMDIR | tools/build_donovan.sh must refuse to rebuild over a FROZEN REFERENCE rompath (14z-90, GitHub issue #26). | 14z-90 |
 | `tests/test_host_libs.sh` | test | ci_portable | — | tools/check_host_libs.py, the rule a Linux release folder is held to (every file's DIRECT NEEDED sonames are shipped in the folder and resolve there, or are on tests/expected/linux_host_provided.tsv; | 2026-09-13 |
-| `tests/test_host_text_opens.sh` | test | ci_portable | — | THE RELEASE GENERATOR'S TEXT FILES NAME THEIR ENCODING AND NEWLINE (#308, 14z-207). ci_portable: no ROM, ~1 s. | 14z-207 |
+| `tests/test_host_text_opens.sh` | test | ci_portable | — | THE RELEASE TOOLS' TEXT FILES NAME THEIR ENCODING AND NEWLINE (#308, #314, 14z-207). ci_portable: no ROM, ~1 s. | 14z-207 |
 | `tests/test_input_integrity.sh` | test | emulator | MAME | ground truth for the input-integrity check. | session 14z |
 | `tests/test_mame_default_bin.sh` | test | ci_portable | — | with MAME_BIN unset, tools/run_mame.sh runs the PINNED build for the set, never the `mame` on PATH (14z-189, #196). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-189 |
 | `tests/test_mame_determinism.sh` | test | emulator | MAME | is MAME actually deterministic, run to run? | session 14z |

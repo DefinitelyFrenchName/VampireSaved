@@ -1,8 +1,9 @@
 #!/bin/sh
-# test_host_text_opens.sh — THE RELEASE GENERATOR'S TEXT FILES NAME THEIR ENCODING AND NEWLINE (#308, 14z-207). ci_portable: no ROM, ~1 s.
+# test_host_text_opens.sh — THE RELEASE TOOLS' TEXT FILES NAME THEIR ENCODING AND NEWLINE (#308, #314, 14z-207). ci_portable: no ROM, ~1 s.
 #
-# WHAT: every text open() in the release generator (tools/package_release.py, tools/package_release_platforms.py)
-#   names `encoding=`, and every text write also names `newline=`, so the bytes it writes are the same on every
+# WHAT: every text open() in the release tools (the generator tools/package_release.py and
+#   tools/package_release_platforms.py, the page generator tools/gen_applier_page.py, the end-user applier
+#   tools/apply_release.py) names `encoding=`, and every text write also names `newline=`, so the bytes it writes are the same on every
 #   host; a pathlib read_text names `encoding=` too, and a pathlib write_text is refused outright (its `newline=` needs
 #   Python 3.10, and this Mac's python3 is 3.9: a text write goes through open()). A binary open ('b' in its mode) is
 #   exempt.
@@ -14,16 +15,19 @@
 #
 # SCOPE: the files in FILES below. test_readme_recording.sh's host-text guard catches the same defect at run time,
 #   but only on the README render path it executes (rule-checker run 2026-10-23-1198 Q4); this gate reads every
-#   call site. tools/gen_applier_page.py joins FILES when #314 is fixed.
+#   call site. tools/gen_applier_page.py joined with #314's fix (its gate, test_applier_page.sh, runs its render under
+#   the same guard), and tools/apply_release.py with it (its manifest read named no encoding; harmless while the
+#   manifest is ASCII).
 #
 # MUST-FIRE: perturbed-copy: unencoded-open — a copy of tools/package_release.py with `encoding="utf-8", ` removed from its first text write must be named and FAIL the gate (mode: the check runs over that copy too)
 # MUST-FIRE: perturbed-copy: newline-dropped — a copy of tools/package_release_platforms.py with `, newline="\n"` removed from its first text write must be named and FAIL the gate (mode: the check runs over that copy too)
+# MUST-FIRE: perturbed-copy: applier-no-newline — a copy of tools/gen_applier_page.py (#314) with `, newline="\n"` removed from its page write must be named and FAIL the gate, so the files added to FILES are read too (rule-checker run 2026-10-23-1212 Q4) (mode: the check runs over that copy too)
 # MUST-FIRE: perturbed-copy: write-text — a file whose one text write is `Path(p).write_text(s, encoding="utf-8")` must be named and FAIL the gate (rule-checker run 2026-10-23-1200 Q4) (mode: the check runs over that file too)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
-FILES="tools/package_release.py tools/package_release_platforms.py"
+FILES="tools/package_release.py tools/package_release_platforms.py tools/gen_applier_page.py tools/apply_release.py"
 # the two perturbed copies: the first match of each pattern only
 python3 - "$W" <<'PY'
 import sys
@@ -35,10 +39,14 @@ open(f"{w}/unencoded.py", "w", encoding="utf-8", newline="\n").write(s.replace(k
 s = open("tools/package_release_platforms.py", encoding="utf-8").read()
 assert k in s, "no text write to perturb in tools/package_release_platforms.py"
 open(f"{w}/nonewline.py", "w", encoding="utf-8", newline="\n").write(s.replace(k, 'encoding="utf-8"', 1))
+s = open("tools/gen_applier_page.py", encoding="utf-8").read()
+k2 = 'encoding="utf-8", newline="\\n"'
+assert k2 in s, "no text write to perturb in tools/gen_applier_page.py"
+open(f"{w}/applier.py", "w", encoding="utf-8", newline="\n").write(s.replace(k2, 'encoding="utf-8"', 1))
 open(f"{w}/writetext.py", "w", encoding="utf-8", newline="\n").write(
     'from pathlib import Path\nPath("x.txt").write_text("a\\n", encoding="utf-8")\n')
 PY
-[ -s "$W/unencoded.py" ] && [ -s "$W/nonewline.py" ] && [ -s "$W/writetext.py" ] || { echo "FAIL: test_host_text_opens — the perturbed copies were not written"; exit 1; }
+[ -s "$W/unencoded.py" ] && [ -s "$W/nonewline.py" ] && [ -s "$W/writetext.py" ] && [ -s "$W/applier.py" ] || { echo "FAIL: test_host_text_opens — the perturbed copies were not written"; exit 1; }
 check() {   # check <file>... — name each text open missing encoding= (or newline= on a write); exit 1 if any
     python3 - "$@" <<'PY'
 import ast, sys
@@ -78,6 +86,7 @@ EXTRA=""
 vs_ctl_is unencoded-open && EXTRA="$W/unencoded.py"
 vs_ctl_is newline-dropped && EXTRA="$W/nonewline.py"
 vs_ctl_is write-text && EXTRA="$W/writetext.py"
+vs_ctl_is applier-no-newline && EXTRA="$W/applier.py"
 echo "== 1. the release generator's text opens"
 # shellcheck disable=SC2086
 if check $FILES $EXTRA; then fail=0; echo "  ok    every text open names its encoding, every write its newline"
@@ -93,5 +102,7 @@ if check "$W/nonewline.py" > "$W/c2.txt" 2>&1; then vs_ctl_dead newline-dropped 
 else vs_ctl_fired newline-dropped "$(grep -m1 'no newline' "$W/c2.txt" | sed 's/^ *//')"; fi
 if check "$W/writetext.py" > "$W/c3.txt" 2>&1; then vs_ctl_dead write-text "the file with a write_text passed"; fail=1
 else vs_ctl_fired write-text "$(grep -m1 'write_text' "$W/c3.txt" | sed 's/^ *//')"; fi
+if check "$W/applier.py" > "$W/c4.txt" 2>&1; then vs_ctl_dead applier-no-newline "the gen_applier_page.py copy without newline= passed"; fail=1
+else vs_ctl_fired applier-no-newline "$(grep -m1 'no newline' "$W/c4.txt" | sed 's/^ *//')"; fi
 [ "$fail" = 0 ] && echo "PASS: test_host_text_opens" || echo "FAIL: test_host_text_opens"
 exit "$fail"

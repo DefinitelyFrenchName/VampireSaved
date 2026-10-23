@@ -22,7 +22,8 @@
 #   scratch pruned by pathspecs generated from the same rows, a whole-tree reader still sees a scratch change (asked
 #   lazily, newest first) and only one newer than the base run, the plan judges in forked workers with the serial
 #   verdicts, past a walk cap the scratch comes from git's own listing, and it REFUSES past its path budget or its
-#   time limit (the selftest's plan cases A-F on a git repo).
+#   time limit (the selftest's plan cases A-F on a git repo). Since #286 (14z-207): a python program fed to python3
+#   from a shell heredoc is python for R3's bare clause (N-K), so a `docs = []` there reads no directory.
 # HOW: drives the predictor's selftest over a synthetic repo of twenty-five gates (since 14z-200), one per reader class
 #   plus the seven of #188 option B's two narrowings (14z-190), with known answers; twelve controls run copies
 #   with one rule removed (directory, whole-tree, data, template, git), `--` read as a comment outside Lua
@@ -82,9 +83,10 @@
 # MUST-FIRE: perturbed-copy: deadline-off — a copy whose time limit never fires must plan past it (plan case E), and the selftest must FAIL (mode: that copy's selftest; #304)
 # MUST-FIRE: perturbed-copy: walk-cap-listing-off — a copy whose scratch check, past its walk cap, takes nothing from git's listing must carry p_whole on a new scratch file (plan case F), and the selftest must FAIL (mode: that copy's selftest; #304)
 # MUST-FIRE: perturbed-copy: scratch-mtime-off — a copy whose scratch walk counts every file, older than the base run too, must re-run p_whole on old scratch (plan case C), and the selftest must FAIL (mode: that copy's selftest; #304)
+# MUST-FIRE: perturbed-copy: heredoc-off — a copy without N-K (#286, 14z-207) must mark g_pyheredoc, whose `docs = []` sits in a python heredoc, stale for a change under docs/, and the selftest must FAIL (mode: that copy's selftest)
 # MUST-FIRE: perturbed-copy: prose-pairing — a copy of N-B whose prose regex skips short quoted strings (pairing a path's closing quote with the next opening one) must mark the gate stale whose `[ -f "$D/x.diverge" ] && echo "... STATE.md ..."` line names STATE.md only in a message, and the selftest must FAIL (mode: that copy's selftest)
 #
-# Usage: tests/test_static_confirm.sh      # ci_portable, ~2 min with its 43 controls (123 s and 139 s, 14z-207, load 7-8)
+# Usage: tests/test_static_confirm.sh      # ci_portable, ~2 min with its 44 controls (123 s and 139 s, 14z-207, load 7-8)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
@@ -144,6 +146,7 @@ edits = {
     "deadline-off": ("        if deadline is not None and time.monotonic() > deadline:", "        if False:  # CONTROL deadline-off"),
     "walk-cap-listing-off": ("        for c in (r.stdout.splitlines() if r else []):", "        for c in []:  # CONTROL walk-cap-listing-off"),
     "scratch-mtime-off": ("            return os.path.getmtime(os.path.join(self.root, rel)) >= self.t0", "            return True  # CONTROL scratch-mtime-off"),
+    "heredoc-off": ("\nNARROW_HEREDOC = True\n", "\nNARROW_HEREDOC = False  # CONTROL heredoc-off\n"),
     "prose-pairing": ('QUOTED.sub(lambda m: "" if re.search(r"\s", m.group(0)) else m.group(0), t)',
                       're.sub(r"\\"[^\\"\\n]*\\s[^\\"\\n]*\\"|\'[^\'\\n]*\\s[^\'\\n]*\'", "", t)'),
 }
@@ -163,7 +166,7 @@ sed 's/^/  /' "$W/self.txt"
 grep -q '^SELFTEST PASS$' "$W/self.txt" || { echo "FAIL: the predictor's selftest"; fail=1; }
 
 if [ -z "${VS_CTL:-}" ]; then
-    for c in no-dir-rule no-whole-rule no-data-rule no-template-rule no-git-rule dashdash-comment binary-as-text narrow-build-off narrow-state-off narrow-literal-blind prose-pairing dir-template-off r3-prose-off r3-joined-off r3c-off sibling-off shdef-off list-git-off scratch-off md-narrow-off data-position-off runs-data-off runs-change-off runs-link-off runs-link-basename runs-dir-off recursive-off recursive-loose whole-coarse-off lsf-scope-off walks-dir-loose runs-self-off bound-exact-run bound-first-component r3-memo-loose sheets-scratch-off prune-off lazy-scratch-off workers-eff-empty budget-off deadline-off scratch-mtime-off walk-cap-listing-off; do
+    for c in no-dir-rule no-whole-rule no-data-rule no-template-rule no-git-rule dashdash-comment binary-as-text narrow-build-off narrow-state-off narrow-literal-blind prose-pairing dir-template-off r3-prose-off r3-joined-off r3c-off sibling-off shdef-off list-git-off scratch-off md-narrow-off data-position-off runs-data-off runs-change-off runs-link-off runs-link-basename runs-dir-off recursive-off recursive-loose whole-coarse-off lsf-scope-off walks-dir-loose runs-self-off bound-exact-run bound-first-component r3-memo-loose sheets-scratch-off prune-off lazy-scratch-off workers-eff-empty budget-off deadline-off scratch-mtime-off walk-cap-listing-off heredoc-off; do
         python3 "$(make_copy "$c")" --selftest > "$W/ctl_$c.txt" 2>&1 || true
         if grep -q '^SELFTEST FAIL$' "$W/ctl_$c.txt"; then vs_ctl_fired "$c" "$(grep -m1 'FAIL:' "$W/ctl_$c.txt" | sed 's/^ *//')"
         else vs_ctl_dead "$c" "the perturbed copy passed its selftest — the selftest cannot see this failure" || fail=1; fi
