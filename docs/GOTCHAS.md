@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-546 entries (48 game / 137 platform / 361 project), counted from the buckets at generation.
+547 entries (48 game / 137 platform / 362 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 48 entries
 
@@ -213,7 +213,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - UNDER `-debug`, A STOP THAT LANDS AS THE SCREEN FRAME ADVANCES MAKES THAT FRAME'S PER-FRAME SAMPLE READ ONE ENGINE PASS EARLY — and the game clock cannot see it (paid: 14z-205, #229, fork F2)
 - A MAME WRITE TAP THAT READS MEMORY OR `cpu.state` INSIDE ITS CALLBACK CRASHED MAME AT TEARDOWN — and write taps crash there intermittently anyway (paid: 14z-205, #229, fork F1; seen again 14z-205b, R1)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 361 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 362 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -576,3 +576,4 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A GUARD THAT COMPARES A FILE'S CONTENT BEFORE AND AFTER CANNOT SEE A WRITE THAT WAS RESTORED IN BETWEEN — read its mtime and inode too (paid: 14z-206, #299)
 - A CONTROL MODE THAT FAILS FOR A FOREIGN REASON READS HONOURED, AND ITS LOG CAN STILL CARRY ITS OWN `CONTROL FIRED` LINE — read what the mode itself reached (paid: 14z-206, #299, #310)
 - JOB-SECONDS OVER THE WALL CLOCK IS CONCURRENCY, NOT CPU — a wall-clock-timed job's seconds say nothing about cores busy (paid: 14z-206, #299, #312)
+- A BRANCH NO RUNNER TAKES ROTS UNSEEN — a gate's "supplied build" path was broken for two months because every run took the default (paid: 14z-206, #291)

@@ -64,7 +64,8 @@
 # with no default subject — reason keyword `instrument:` — which run bare only SKIPs and
 # is run by hand with its operands (audit_mask_window_ff42a2, [VSP-35]). This runner
 # selects an instrument row in NO scope, `--scope ondemand` included: it would pass the
-# registry's bare args and only SKIP.
+# registry's bare args and only SKIP. Since 14z-206 (maintainer-ruled 2026-10-23, #291) it also holds the gates whose
+# subject is the comparative capture sheets — reason keyword `sheets:` (test_proof_sheets) — selected by --scope ondemand.
 # A pristine-only gate guarding a case KNOWN to have broken before (a
 # tenant change that once moved vsavj characters) stays `release`.
 #

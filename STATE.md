@@ -38,7 +38,7 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
-## Session 14z-206 — **PILOT and ERIS offline: the Mac carries the work in parallel. #299's cold cache fixed and #299 closed done; #296 closed done; #286's code half; #284 done awaiting release; #291 S4 planned, S4-A done; #305, #306, #307, #308, #309 filed.** Opened 2026-10-21 after the 14z-205c close (`b89fc9d7`, pushed).
+## Session 14z-206 — **PILOT and ERIS offline: the Mac carries the work in parallel. #299's cold cache fixed and #299 closed done; #296 and #309 closed done; #286's code half; #284 done awaiting release; #291 S4 planned, S4-A done; #305, #306, #307, #308, #309 filed.** Opened 2026-10-21 after the 14z-205c close (`b89fc9d7`, pushed).
 
 ### opened with
 HANDOFF, STATE and NEXT_SESSION read; the sweep CLEAN, `main` equal to `origin/main`. The maintainer: *"Currently PILOT
@@ -172,6 +172,19 @@ the fixed one FIRES; the "relative rom path" FAIL on both is the symlink rig's (
 from the plain tree the fixed gate PASSES; with `R3="$W/rel"` put back the new check FAILS ("climbs out"). macOS
 `mktemp -d` ignored `TMPDIR=/tmp`, so a first "shallow temp" leg tested nothing (gotcha written). Not closed: the
 ticket's to-do runs it on ERIS's deep clone, unreachable from this network.
+**Closed done, later in 14z-206** (GitHub comment of 2026-10-23, `build/agent206/t309/closing_comment.md`): the fix
+landed in `7b663645`; the committed gate and tool were then run on PILOT in a 7-deep plain worktree of `7b663645`
+(`8b82d5d2`'s gate DEAD, the committed gate FIRED and PASSES) and on the Mac (FIRED and PASSES; the old line restored
+FAILS on the climbs-out check), `build/agent206/t309/commit_legs/`; ERIS's deep clone ran the fix on `04a53769` first
+(`build/agent206/t309/eris/`). Rule-checker runs `2026-10-23-1186`, `-1187` VIOLATED, resolved by work; `-1188` OK.
+**#313** (*"Yes"*, 2026-10-23): `tools/static_confirm.py plan` took 1,902 s for 25 of 229 gates in the first commit
+tier (it hit its 2 h timeout; the commit was tiered again without `--confirm`), against 37 s for all 229 the day before.
+Its changed set held 23,803 paths. A recount gives 23,848, of which 20,273 are judged path by path, all but 2 under
+`build/sheets/8b82d5d247c6/`, #291's sheets, which the N-D `SCRATCH` filter does not drop (`build/agent206/t_confirm_slow/`, local).
+**Ruled 2026-10-23: the sheet gates run on demand only** (*"if we have any tests/gates on the captures sheets, they really
+should be ondemand scope"*, DECISIONS_HISTORY.md): `test_proof_sheets` moves to emulator scope `ondemand` (reason `sheets:`),
+and `test_sheet_census` to static cadence `ondemand`. Both PASS run by hand after the move, as do `test_emulator_runner`,
+`test_lane_carry` and `test_gate_follows`.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings

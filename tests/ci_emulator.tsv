@@ -77,6 +77,8 @@
 #             pristine:    the subject is pristine content only (14z-196)
 #             instrument:  an instrument with no default subject, run by hand
 #                          with its operands (14z-199, #265)
+#             sheets:      the subject is the comparative capture sheets themselves
+#                          (14z-206, maintainer-ruled 2026-10-23, #291)
 #           for scope=release, free text (a runtime hint, a known trap).
 #
 # THE CLASSIFICATION IS RULED (maintainer, 2026-09-03) — 141 release, 23 out.
@@ -113,7 +115,7 @@ audit_move_parity	mame	release	romset	-	release: every EVENT of the three tenant
 test_mame_parity	prereq	release	romset	-	THE instrument gate: the pinned MAME source build must reproduce every frozen oracle log before the profile patch goes near it ([CPE-24]). Run it FIRST.
 test_mame_determinism	prereq	release	romset	-	RUNS defaults high; MAME's own run-to-run determinism
 test_attract_determinism	prereq	release	romset	-	M0 acceptance, 3600 frames
-test_proof_sheets	prereq	release	romset	-	the comparative sheets' ground truth (#291, 14z-204): tools/proof_sheets.py proves a picture on the gate's own log and refuses a one-frame shift and a field off; anchors proven, a cap said; two controls. ~17 s
+test_proof_sheets	prereq	ondemand	romset	-	sheets: ONDEMAND since 14z-206 (maintainer-ruled 2026-10-23, 'Of note: if we have any tests/gates on the captures sheets, they really should be ondemand scope'). the comparative sheets' ground truth (#291, 14z-204): tools/proof_sheets.py proves a picture on the gate's own log and refuses a one-frame shift and a field off; anchors proven, a cap said; two controls. ~17 s
 test_decrypt_oracle	prereq	release	romset	-	python decrypt == MAME opcode space
 test_crash_guard	prereq	release	romset	-	clean negative + vec4/vec3 positive controls ([VSP-19])
 test_input_integrity	prereq	release	romset	-	ground truth for the input-integrity check

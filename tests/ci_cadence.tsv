@@ -197,3 +197,10 @@ test_attract_roster	freeze	@code
 test_roulette_tag_rows	freeze	@code
 test_tenant_id	freeze	@code
 test_tenant_loop	freeze	@code
+# SEVENTH CUT (maintainer, 2026-10-23, 14z-206, #291 — "Of note: if we have any tests/gates on the captures sheets, they really should be ondemand scope"): the gates whose subject is the comparative
+# capture sheets themselves go ondemand. Of the static tier that is test_sheet_census (every emulator gate declares its
+# `# SHEET:` or is on the debt list); its emulator-tier twin test_proof_sheets moves to scope `ondemand` in
+# tests/ci_emulator.tsv (reason `sheets:`). A gate that only DRAWS a sheet when SHEET_OUT is set is not a sheet gate and
+# keeps its cadence. They run with --cadence ondemand (test_sheet_census), tests/run_all_emulator.sh --scope ondemand
+# (test_proof_sheets), or by hand.
+test_sheet_census	ondemand	-

@@ -1,0 +1,11 @@
+decision	recommendation
+subject	#309 closed done: test_proof_sheets relative-unresolved fixed, measured on the committed gate on PILOT deep and the Mac (14z-206), after runs 1186-1187
+session	14z-206
+model	rule-checker@163e4ce9cf7b
+claim	#309 can close done: its three to-dos (issue_309_body.md) are met, measured on the committed gate and tool. The fix (relunres.diff, committed in 7b663645) makes section 3b's relative SHEET_OUT under the repository's build/ and adds a check that fails the gate if the relative name climbs out of the repository. On PILOT, in a worktree of 7b663645 seven levels deep with no symlink, against a capture work dir five levels deep (commit_legs/pilot_legs.txt, pilot_legs.sh), 8b82d5d2's gate run with the committed tool has relative-unresolved DEAD and FAILs on that control alone (pilot_head.log), and the committed gate (sha1 e572f24a, tool sha1 048b4d1c) has it FIRED and PASSes (pilot_commit.log). On the Mac at 7b663645 the committed gate, the same sha1s, FIRES and PASSes (commit_legs/mac.txt, mac_commit.log), and a copy of it with the old R3="$W/rel" restored FAILs on the new climbs-out check (mac_guard.txt, mac_guard.log, mac_guard.sh, source sha1 recorded). No build/.proof_rel.* directory was left on either host. The earlier legs on ERIS (04a53769) and the Mac (8b82d5d2) ran their own trees' gate and tool and are context only; section 3b is identical across all three (section3b_commit_vs_eris.txt, section3b_commit_vs_mac.txt). Not tested: the Mac never runs a shallow /tmp work dir (macOS mktemp -d ignores TMPDIR=/tmp, REPORT.md), so the deep case rests on PILOT (and earlier ERIS); the earlier Mac deep leg's symlink gives a "relative rom path" FAIL that is that rig's own, while the committed-gate legs use no symlink.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	0 flag(s)
+deliverables	build/agent206/t309/closing_comment.md

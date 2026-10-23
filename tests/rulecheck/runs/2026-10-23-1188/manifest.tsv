@@ -1,0 +1,21 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent206/t309/closing_comment.md	7dc92346099f787ad661fe5ae303a1fad1ef2dab
+build/agent206/t309/issue_309_body.md	cf5710c9b8dce10a51861b113be668076161d132
+build/agent206/t309/REPORT.md	700e653bf1934a64753f5e56515f3d46ac68bd0a
+build/agent206/t291/relunres/relunres.diff	1d30a471569bede18b87f45e6ceed5f0e7578289
+build/agent206/t309/commit_legs/pilot_legs.sh	cad2a148788e78a15a536057abd1b20e298f3f83
+build/agent206/t309/commit_legs/pilot_legs.txt	f5c5a5313e8c1b37f655e5882914b68752c17690
+build/agent206/t309/commit_legs/pilot_head.log	d3d7e01e0bb41fb67a51be3ee75b2a4145020e17
+build/agent206/t309/commit_legs/pilot_commit.log	dd568e406c688cd1786956bb493f37320c400af2
+build/agent206/t309/commit_legs/pilot_worktree.log	8d9dec55e1b5441e2c39acb2543fb8b70888e733
+build/agent206/t309/commit_legs/mac.txt	35abbe56032f974b1ec356a00c7f5d2e43479ebe
+build/agent206/t309/commit_legs/mac_commit.log	71f5b82e72e348582a92a259061584722fb4e431
+build/agent206/t309/commit_legs/mac_guard.sh	1440fbcc8b52290952176b44d3276f999a2c85b8
+build/agent206/t309/commit_legs/mac_guard.txt	755558b5c4ef971ec6f234ee3397321c6ac84d80
+build/agent206/t309/commit_legs/mac_guard.log	da5c37388c56aa70b6a2544250f8c5fb3789bda0
+build/agent206/t309/section3b_commit_vs_eris.txt	e3e5ca9b9556346ef5fe0934cc36930850e400db
+build/agent206/t309/section3b_commit_vs_mac.txt	1c2b3f5121ed7351b6f1a376c0351cc8a3e1d7a2
+build/agent206/t309/eris/legs.txt	1ae9d57d6daed7ccd45079c751104543b33121c5
+build/agent206/t309/legs.txt	48f87ffb21beeee4ddfa72abf23d62783b30c5a5
+build/agent206/t309/deep.txt	28ac5930cbc2bd29d497a9cc351b35b9bb5d5423
+tests/test_proof_sheets.sh.lines-200-240 (lines 200-240 of tests/test_proof_sheets.sh)	c3ce9b1a266e89448558c86c4637e660dfb77443

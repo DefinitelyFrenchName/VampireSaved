@@ -7472,3 +7472,16 @@ same ratio, but that one IS CPU (`/usr/bin/time` user+sys over real), as run `20
 numerator of every figure a correction touches, not only the one that was caught. **CPU use is measured with CPU time
 (the runner under `/usr/bin/time -l`, or `ps`/`top` sampling), never derived from elapsed seconds; name a ratio by what
 its numerator counts.**
+
+## A BRANCH NO RUNNER TAKES ROTS UNSEEN — a gate's "supplied build" path was broken for two months because every run took the default (paid: 14z-206, #291)
+
+`tests/audit_qs_voice_wav.sh` takes an optional build dir. #89 (14z-94, `ecb18959`) bound its voice ids to the
+artifact's own ledger, and the supplied-build branch then pointed `LEDGER` at `$1/rompath/vsavjw.zip.ledger.json`.
+But the spectral A/B, the sheet code and the truncation control all read `$W/ledger.json`, which only the self-build
+branch writes. So every supplied-build run FAILED its A/B on a missing file, from 14z-94 to 14z-206. No runner ever
+passed a build dir, so every run took the self-build branch and PASSED. It surfaced only when #291's sheet variant
+(`QSV_OUTBASE`, `tests/lib/qs_voice_build.sh`) became the first caller of that branch. Both branches now leave the
+ledger at `$W/ledger.json`, and the sheet run of scratch commit `ecce6294` passed on the supplied build
+(`build/agent206/t_qsv/`, local). **A gate's optional mode is code like any other: run it once whenever it changes,
+or it is not tested; give every alternative input path ONE name downstream, so a reader can't depend on which branch
+ran.**

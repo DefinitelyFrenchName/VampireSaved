@@ -12,9 +12,10 @@
 #   audit_qs_voice_batch: equal data can still play differently.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/qs_sweep.lua
 #   tests/replays/06_test_mode.rpl tools/build_qs_songs.py tools/check_qs_voice_wav.py
-#   tools/qs_ledger.py tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
+#   tools/qs_ledger.py tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh tests/lib/qs_voice_build.sh
 #
 # SHEET: legs vs2,ours — moments: every SOUNDING voice window the spectral A/B compares (voice i on ours against vs2 voice i, the checker's own window and skip rule), each cell that leg's window cut from its own -wavwrite capture as a playable clip (the ruled clips, 2026-10-17), captioned with both ids and each leg's RMS and high-band ratio — not comparable: the screen (the test-mode sound sweep shows nothing worth a picture); the ids differ by design (ours authored ids, vs2's own)
+# SHEET-VARIANT: QSV_OUTBASE tests/lib/qs_voice_build.sh qs_voice_build vsavjw — the ours leg is build/wide0 plus the voice batch, which this gate builds for itself, not one of the commit's tracks: proof_sheets builds it in the clean checkout and states its fingerprint (the 14z-206 sheet of 7b663645 read all 74 ours clips NOT THE JUDGED RUN without it)
 #
 # MUST-FIRE: perturbed-copy: truncated-window — a truncated sounding window in the OURS capture must be flagged by the spectral A/B (mode: the real ours capture is truncated and the A/B against native must fail)
 #
@@ -31,6 +32,7 @@
 # capture must fire the suspect verdict.
 #
 # Usage: ROMDIR=... tests/audit_qs_voice_wav.sh [builddir]
+#   (QSV_OUTBASE=<builddir> is the same as passing it: tools/proof_sheets.py run hands the declared variant in so)
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -54,9 +56,14 @@ mkdir -p "$W/rp" "$W/ours" "$W/native"
 # build with no ledger got its voice id list rebuilt from the canonical
 # overlay, i.e. from current manifest state, and the WAV verdict was then
 # attributed to the supplied artifact.
-if [ -n "${1:-}" ]; then
-    cp "$1/rompath/vsavjw.zip" "$W/rp/vsavjw.zip" || fail "no romset in $1"
-    LEDGER="$1/rompath/vsavjw.zip.ledger.json"
+# A SUPPLIED BUILD'S LEDGER IS COPIED TO $W/ledger.json (14z-206): the A/B, the sheet and the control all read that
+# name, and from 14z-94 (#89) to 14z-206 this branch left it unwritten, so every supplied-build run FAILED its spectral
+# A/B on a missing file. No runner passed a build dir until #291's sheet variant (QSV_OUTBASE) did.
+SUPPLIED="${1:-${QSV_OUTBASE:-}}"
+if [ -n "$SUPPLIED" ]; then
+    cp "$SUPPLIED/rompath/vsavjw.zip" "$W/rp/vsavjw.zip" || fail "no romset in $SUPPLIED"
+    cp "$SUPPLIED/rompath/vsavjw.zip.ledger.json" "$W/ledger.json" || fail "no ledger beside the romset in $SUPPLIED"
+    LEDGER="$W/ledger.json"
 else
     [ -f "$REPO/build/wide0/rompath/vsavjw.zip" ] || {
         echo "SKIP: no canonical overlay"; exit 0; }
@@ -106,11 +113,14 @@ python3 "$REPO/tools/check_qs_voice_wav.py" "$W/ours/voices.wav" \
 # from its own capture as a playable clip (basis file: the audio the gate judged). Nothing the gate decides changes.
 . "$REPO/tests/lib/sheet.sh"
 if sheet_on && [ -z "$MODE" ]; then
-    mkdir -p "$SHEET_OUT/legs/qsw_rp" && cp "$W/rp/vsavjw.zip" "$SHEET_OUT/legs/qsw_rp/vsavjw.zip"
+    # the ours leg names the build it ran: a supplied one where it lies (proof_sheets' variant, in the clean checkout's
+    # build/), else a copy of the gate's own, which the page shows as NOT THE JUDGED RUN (built outside the checkout)
+    if [ -n "$SUPPLIED" ]; then QSW_RP="$(cd "$SUPPLIED/rompath" && pwd)"
+    else mkdir -p "$SHEET_OUT/legs/qsw_rp" && cp "$W/rp/vsavjw.zip" "$SHEET_OUT/legs/qsw_rp/vsavjw.zip"; QSW_RP="$SHEET_OUT/legs/qsw_rp"; fi
     sheet_new voices "The voice sweep (test-mode venue): every sounding window, native vs2 above ours, as clips" - - \
         "the screen (the test-mode sound sweep shows nothing worth a picture); the ids differ by design (ours authored ids, vs2's own)"
     sheet_leg voices native vs2 vsav2 "$ROMDIR" "$REPO/tests/replays/06_test_mode.rpl" - 21000
-    sheet_leg voices ours ours vsavjw "$SHEET_OUT/legs/qsw_rp;$ROMDIR" "$REPO/tests/replays/06_test_mode.rpl" - 21000
+    sheet_leg voices ours ours vsavjw "$QSW_RP;$ROMDIR" "$REPO/tests/replays/06_test_mode.rpl" - 21000
     python3 - "$W" "$SHEET_OUT" > "$W/sheet_rows.tsv" <<'PYS' || exit 1
 import json, os, sys, wave
 W, OUT = sys.argv[1:3]

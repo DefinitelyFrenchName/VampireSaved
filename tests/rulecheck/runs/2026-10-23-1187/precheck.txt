@@ -1,0 +1,2 @@
+  FLAG D-ABSOLUTE: Section 3b of the committed gate is the one both fixed legs ran, line for line.  [build/agent206/t309/closing_comment.md]
+packet_check: 1 flag(s): D-ABSOLUTE 1

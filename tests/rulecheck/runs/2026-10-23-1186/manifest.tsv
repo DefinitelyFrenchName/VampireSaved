@@ -1,0 +1,23 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent206/t309/closing_comment.md	4929f2ca1881736aca2fa3bbf8727a35bd48e673
+build/agent206/t309/issue_309_body.md	cf5710c9b8dce10a51861b113be668076161d132
+build/agent206/t309/REPORT.md	700e653bf1934a64753f5e56515f3d46ac68bd0a
+build/agent206/t291/relunres/relunres.diff	1d30a471569bede18b87f45e6ceed5f0e7578289
+build/agent206/t309/section3b_commit_vs_eris.txt	e3e5ca9b9556346ef5fe0934cc36930850e400db
+build/agent206/t309/eris/legs.txt	1ae9d57d6daed7ccd45079c751104543b33121c5
+build/agent206/t309/eris/head.log	393f7e84d0054383c464a426025137618c50848d
+build/agent206/t309/eris/fixed.log	860ba301c6f7d53ab4748954bf1f55d69515d293
+build/agent206/t309/eris/guard_reverted.log	b102864e23a0933fdfafbdb4554fd0acc286405a
+build/agent206/t309/eris/eris_legs.sh	c913caf1fef6da5cf0e35c1bbf034251d0e7bae8
+build/agent206/t309/eris/patch.out	46c5ca581771b10eb3f611d4198eb94fc8216fbc
+build/agent206/t309/legs.sh	b1fd9b4826e2c2fd3bc8fc1514e26d09b213f708
+build/agent206/t309/legs.txt	48f87ffb21beeee4ddfa72abf23d62783b30c5a5
+build/agent206/t309/deep.sh	739005d2e5ec2c47c33587c32691be10b20c8d84
+build/agent206/t309/deep.txt	28ac5930cbc2bd29d497a9cc351b35b9bb5d5423
+build/agent206/t309/head_deep.log	90d7e3a3602e1660e413574466038df93f783304
+build/agent206/t309/fixed_deep.log	bc768e146e6a7bee62f845577b4b16fecad84a64
+build/agent206/t309/fixed_tmp.log	79c65db7706cf007a3c8c40d8f9fa8b22f0c1488
+build/agent206/t309/fixed_default.log	79c65db7706cf007a3c8c40d8f9fa8b22f0c1488
+build/agent206/t309/head_tmp.log	79c65db7706cf007a3c8c40d8f9fa8b22f0c1488
+build/agent206/t309/guard_reverted.log	3d0e8492b578d4ae9fefe6ffd2a5cf7e52837c56
+tests/test_proof_sheets.sh.lines-200-240 (lines 200-240 of tests/test_proof_sheets.sh)	c3ce9b1a266e89448558c86c4637e660dfb77443

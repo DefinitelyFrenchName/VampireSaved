@@ -74,8 +74,8 @@ gates in parallel (#299; a close runs `--jobs 8`, ruled 2026-10-19).
 7. **#297 stays open until a freeze has run the 109 moved gates green**; a freeze runs every gate anyway.
 8. **Then ask the maintainer for the order of work.** The open tickets by their GitHub severity label:
    - high: #286;
-   - medium: #284;
-   - low: #118, #229, #244, #301, #308, #309, #310, #311 (and #129, parked);
+   - medium: #284, #313;
+   - low: #118, #229, #244, #301, #308, #310, #311 (and #129, parked);
    - no severity label: #266, #267, #289, #291, #297, #298, #302, #303, #304, #305, #306, #307, #312;
    - **release-only:** #278, #279, #280, #281.
 9. **`tests/replays/118_chain.rpl`'s header names a leg of `audit_mizuumi_inputs` that gate never ran** (STATE_HISTORY
