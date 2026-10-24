@@ -2,96 +2,108 @@
 # Read by tests/lib/static_job.sh: under tests/run_all_static.sh --jobs N, a listed gate's controls run as pool jobs of
 # their own once the gate's own run has ended (tests/lib/static_pool.py); an unlisted gate's controls run one after
 # another in one job, as before #312. A gate is listed only when a write trace of each of its control modes shows no
-# path two of them write (each control's own mktemp directories aside). gate<TAB>reason
+# path two of them write (each control's own mktemp directories aside). gate<TAB>traced blob<TAB>trace<TAB>reason
+# HELD BY tests/test_controls_concurrent.sh (#315, ruled 2026-10-24): each row records the git blob of the script that
+# was write-traced and the trace that cleared it; a script changed since, an unregistered gate, or a gate declaring
+# fewer than two controls is named, and the row must be re-traced (tools/trace_controls.sh on a Linux host with
+# strace, scored by tools/controls_overlap.py) or taken off; the whole list is re-traced at each freeze (HANDOFF.md).
+# TRACES: eris-wsl:2a155ba3 = ERIS WSL, lane S (14z-207), all control modes of the base 2a155ba3's multi-control gates; pilot:bdef935e = PILOT (Ubuntu 24.04), fork T (14z-207, #315).
 # NOT listed, from the same census: test_close_tools (its controls take the real checkout's .git/modules/emu/{fbneo,mame}/index.lock); test_emulator_staleness (its controls take the real checkout's .git/modules/emu/{fbneo,mame}/index.lock); test_mra_parts (two controls rename onto zips/parts.zip, a relative path the trace cannot place); test_release_asset_shape (its controls write build/scratch/release_assets/merged-m23/*.zip(.list)); test_romset_path_guard (two controls rename onto build/rompath/vsavjw.zip, a relative path the trace cannot place).
-# NOT listed until re-traced (14z-207, landing): test_applier_page, test_host_text_opens, test_mame_sandbox_log, test_package_release_safety, test_release_roundtrip, test_static_confirm, test_static_runner, test_trace_static_reads — each script changed after the ERIS trace at 2a155ba3 (lanes P, P2, Q, R and #312's own test_static_runner), so the trace no longer describes it; the follow-up ticket re-traces them.
-audit_capture_matrix	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
-audit_mister_map_fit	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_agent_defs	7 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_agent_extract	14 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_agent_hooks	10 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_agent_sweep	4 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_agent_worker	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_air_attack_height	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_annotations_current	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_build_dirs	5 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_build_environment_entry	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_bundle_parsers	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_capture_kf_ownership	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_charid_names	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_charmap_current	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_charmap_overrides	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_checkdocs	4 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_checkdocs_rom	6 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_checkskills	11 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_claim_lint	4 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_close_checks	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_close_loop_cost	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_close_standing	9 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_controls_contract	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_copy_flags	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_defense_rows_census	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_doc_anchor_census	4 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_docs_site	5 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_docshape	15 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_emu_run_compare	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_emulator_runner	8 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_entropy_tripwire	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_expectation_provenance	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_fbneo_boot_log	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_figure_check	4 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_freeze_artifacts_current	6 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_freeze_set_shape	7 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_freeze_tag_coverage	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_gate_coverage_current	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_gate_descriptions	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_gate_follows	5 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_gate_index_current	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_gotchas_index_current	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_green_guard	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_history_index	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_host_libs	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_jtcores_twin	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_jtsim_scratch_heal	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_lane_carry	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_latch_readers	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_live_budget	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_map_table_readers	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_md_subset	9 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_measures_contract	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_mister_mra_map	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_mister_page	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_mister_wide_gate	7 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_module_refs	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_must_fire_census	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_packet_check	4 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_poke_readback	4 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_poked_legs	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_power_decode	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_promise_check	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_reaction_classes	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_recurrence_alarm	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_release_launcher_bat	7 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_release_recipe_text	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_retraction_reach	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_rompath_reject	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_rpl2siminputs	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_rule5_census	4 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_rule_checker	19 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_rulings_verbatim	8 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_run_on_snapshot	10 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_run_record	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_same_data_p2	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_scratch_census	7 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_session_close	4 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_session_metrics	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_sheet_census	7 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_shell_portability	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_sim_wram_contract	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_skill_guides	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_state_open_lists	7 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_submodule_pins	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_superseded_pins	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_tickets	6 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_win_quote_decode	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_win_stdout_utf8	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
+# NOT listed, from the PILOT trace (14z-207, #315): test_mister_mra_map (its two controls write 340 paths in common, all under the shared jtsim scratch /tmp/vampire-saved-jtsim and its lock /tmp/.lock-vampire-saved-jtsim; lane S had listed it from an ERIS trace in which it SKIPped, emu/jtcores not initialised).
+audit_capture_matrix	30719e3e5a1f9d826f990e29638f4ecd0cd550eb	eris-wsl:2a155ba3	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
+audit_mister_map_fit	1a2aa94645e31f6c4ee1149948548796d6037043	eris-wsl:2a155ba3	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_agent_defs	d82b476cf3a0d3b523047321b0d33d50737e7865	eris-wsl:2a155ba3	7 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_agent_extract	bdf483dd94553638ab5aabfeee68a4ca41d5692b	eris-wsl:2a155ba3	14 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_agent_hooks	f7d318b0151adb7cd6968b6f14aa8f7f8db6531a	eris-wsl:2a155ba3	10 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_agent_sweep	1c5598907366844fe342b7625d07e0b74c6b63be	eris-wsl:2a155ba3	4 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_agent_worker	3218fa4079b0c330f092a60b5fd4d103c669adfc	eris-wsl:2a155ba3	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_air_attack_height	5f2a0e35cc2f3fc96208035ab901e2ee2e217e48	eris-wsl:2a155ba3	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_annotations_current	6f9531050db0bc69d7175ea9863176820075e43e	eris-wsl:2a155ba3	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_applier_page	499dcdd5e08b95d392d2c480a601b4873d08fa31	pilot:bdef935e	6 controls write-traced 14z-207 (#315): none writes a path a sibling writes or reads
+test_build_dirs	7f27fa9f3caa750c802f9872b1b0102b1fb14eed	eris-wsl:2a155ba3	5 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_build_environment_entry	53d6e131f0360a44f768145a0fba28792d7144a9	eris-wsl:2a155ba3	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_bundle_parsers	6fffa5217edb881bd9175030b76c4161c9bdeebd	eris-wsl:2a155ba3	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_capture_kf_ownership	3b2d998e1f4cf140432ec11472c3eaef5bd53b1d	eris-wsl:2a155ba3	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_charid_names	9fa34a5b7f188000abfe8a4e4a3cae24693b33af	eris-wsl:2a155ba3	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_charmap_current	f618cc414fddb09924455250e6e622359e287345	eris-wsl:2a155ba3	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_charmap_overrides	568dc76123a5a135bbd617c3d8dd63da8738e09a	eris-wsl:2a155ba3	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_checkdocs	5cc77a14408f1737d700f4a771627d6197f57bb0	eris-wsl:2a155ba3	4 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_checkdocs_rom	ba3722469903b310b4cae4704f3ee54a29726e7b	eris-wsl:2a155ba3	6 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_checkskills	bd99e75b7d0aad42b56800eaaf10e72ada9aa882	eris-wsl:2a155ba3	11 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_claim_lint	e79b6b2f769d1b36ded329c36e8ffde80cc95225	eris-wsl:2a155ba3	4 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_close_checks	dec808c3a4ce928e2df0bea4d115253df09cc6ec	eris-wsl:2a155ba3	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_close_loop_cost	35ed29b00b4d7d4f241129df2e60f4ca53d152a9	eris-wsl:2a155ba3	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_close_standing	8cb536d7173936a1ea04c12b16050cad49bf364d	eris-wsl:2a155ba3	9 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_controls_contract	a669a9d4509214f054c19e3e41aa544439a98346	eris-wsl:2a155ba3	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_copy_flags	6233d72bdc5c1eeff69f1a967202ba98533e6458	eris-wsl:2a155ba3	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_defense_rows_census	aa9d18f9c683a1c37cb1f07a9b54a2d8a6f8ea9d	eris-wsl:2a155ba3	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_doc_anchor_census	b36f0488ef4305b1f6203fd86b3fb9399cbe63ee	eris-wsl:2a155ba3	4 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_docs_site	8eb794f38966cd8704776699b1067e1bd1061905	eris-wsl:2a155ba3	5 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_docshape	59bacabcea4b180b34e3506b3d7f9faf9d643998	eris-wsl:2a155ba3	15 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_emu_run_compare	ceacb0bc049d1de5591bcbd200f7b1d3cf19f911	eris-wsl:2a155ba3	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_emulator_runner	d045d2b96a83d679d27aca80efd309646a942145	eris-wsl:2a155ba3	8 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_entropy_tripwire	a82f6262ba8b8ce4e96038e004708d033a67e098	eris-wsl:2a155ba3	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_expectation_provenance	b5f04141b82a2e57241ca9b901e848e2e24764f9	eris-wsl:2a155ba3	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_fbneo_boot_log	4b08e262cc64272f9f9665bd4416ca571710cd96	eris-wsl:2a155ba3	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_figure_check	6ff3f9a3e6470410536438bfcfae3540563d28f9	eris-wsl:2a155ba3	4 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_freeze_artifacts_current	8088ae39fdb0a743e9c12f355c1c43c416f3a7fd	eris-wsl:2a155ba3	6 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_freeze_set_shape	f266f81e313c8a84ec202ed57bd1a57158767739	eris-wsl:2a155ba3	7 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_freeze_tag_coverage	00b0323a8304f877ce8af8d897e3fcb459ef9929	eris-wsl:2a155ba3	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_gate_coverage_current	a5d2f35c2a64862454cdab625104f0b715ca99af	eris-wsl:2a155ba3	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_gate_descriptions	85f6ceee7f50016ffe8b61220d7f99a2a4357189	eris-wsl:2a155ba3	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_gate_follows	9d4986ad6f10b8072d57936eaf2b422412e8af57	eris-wsl:2a155ba3	5 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_gate_index_current	c001b769585cad5582cc913f9ff9b3011484a81c	eris-wsl:2a155ba3	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_gotchas_index_current	e62dfaabe5aa59e545e8503b6d7708d1917bf5d0	eris-wsl:2a155ba3	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_green_guard	d1738dd729451c5bc452f8659cb2f916a06e3c94	eris-wsl:2a155ba3	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_history_index	18a5cf88a678af05d1c734fb034f78e2a779be03	eris-wsl:2a155ba3	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_host_libs	07e33e0245a5069e859f7e46856602f4955e8365	eris-wsl:2a155ba3	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_host_text_opens	742571dd586f9cf00ffdeb55ade92b057bf52711	pilot:bdef935e	4 controls write-traced 14z-207 (#315): none writes a path a sibling writes or reads
+test_jtcores_twin	fb26ab2f304c818730673bfd2fe06b392adfd4f1	pilot:bdef935e	2 controls write-traced 14z-207 (#315): none writes a path a sibling writes or reads
+test_jtsim_scratch_heal	9b52a11f9a750fc526565256d1a1074cb90aa77c	pilot:bdef935e	3 controls write-traced 14z-207 (#315): none writes a path a sibling writes or reads
+test_lane_carry	c9b3570f6970b0d32f1a4aa33daab8b659305b60	eris-wsl:2a155ba3	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_latch_readers	9659b8c5ed58cc084a5156d80c0a8577581e5939	eris-wsl:2a155ba3	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_live_budget	7da53123906071239ad3757f5137294417e06123	eris-wsl:2a155ba3	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_mame_sandbox_log	d07bcbae2a09ef98f9f2cb2e9f25f6777d98c5f8	pilot:bdef935e	2 controls write-traced 14z-207 (#315): none writes a path a sibling writes or reads
+test_map_table_readers	3978f11ac128190e692999af043d723224221204	eris-wsl:2a155ba3	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_md_subset	648143f8772fcc13aa010ac5d6b4f212ce836c4d	eris-wsl:2a155ba3	9 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_measures_contract	ab2c2a0e54e2b9e1f41fc7c76261f5a06d09cd9c	eris-wsl:2a155ba3	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_mister_page	500e2eaf901029f82b9d89ffd987c99268445ef7	eris-wsl:2a155ba3	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_mister_wide_gate	3b42e0b956f9550df735ef5f4fc4717167b1f4c4	pilot:bdef935e	7 controls write-traced 14z-207 (#315): none writes a path a sibling writes or reads
+test_module_refs	ae209ad0071b7a180190fe3f9ba597c8949aa4b4	eris-wsl:2a155ba3	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_must_fire_census	f7f2087609084788c1d01f4879ea55faf9483a69	eris-wsl:2a155ba3	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_package_release_safety	928234834cf885f22522e53bf63712e0e484ebf2	pilot:bdef935e	2 controls write-traced 14z-207 (#315): none writes a path a sibling writes or reads
+test_packet_check	bb7f3c91b741ab31b6f69ef8eb0cbbb7d038984d	eris-wsl:2a155ba3	4 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_poke_readback	fbdce7a10adcc39262fa5fd1a3831c9896970d9b	eris-wsl:2a155ba3	4 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_poked_legs	e1f6052052afff7723b1346966f6aa69a962c595	eris-wsl:2a155ba3	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_power_decode	020e2b8bc7dae1add4f66937121c356cf5b51251	eris-wsl:2a155ba3	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_promise_check	fa54463334e4914e361b002220ad27bf7648d55a	eris-wsl:2a155ba3	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_reaction_classes	3ee3745e9a2e606b3667c3d5add2648188326c42	eris-wsl:2a155ba3	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_recurrence_alarm	fff7c06f0b2c1c0dc490ca20a6277edec8cb8189	eris-wsl:2a155ba3	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_release_launcher_bat	4cc357ae8a61bfc3b5e6d4c4fd67be4cedbc8ca0	eris-wsl:2a155ba3	7 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_release_recipe_text	0775e67ba880c921519a66518cdb438a42f3c11d	eris-wsl:2a155ba3	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_release_roundtrip	28f1eacca4242b3a7a7b35552961571b2d770d48	pilot:bdef935e	10 controls write-traced 14z-207 (#315): none writes a path a sibling writes or reads
+test_retraction_reach	fd7dbe95d9233ed2045269d264cd1fc3b1518e7d	eris-wsl:2a155ba3	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_rompath_reject	7f326f5d060ad0afd6910e8c81600f7d9c5085f7	eris-wsl:2a155ba3	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_rpl2siminputs	53adf042868c338fb2ee21b04faf5786f8f7991f	eris-wsl:2a155ba3	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_rule5_census	4030c294649501a1553d0da30672bd8242a3dbee	eris-wsl:2a155ba3	4 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_rule_checker	1828af65b62e5197d22acfa2c449bba2886615b8	eris-wsl:2a155ba3	19 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_rulings_verbatim	741c442732b00a0ab8e020624675a35d7ffb18a2	eris-wsl:2a155ba3	8 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_run_on_snapshot	851fbfb6168c2b04670a7a105f492f8701ab5582	eris-wsl:2a155ba3	10 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_run_record	02af6e1e6d885e74c23a94dbd185439ff537430d	eris-wsl:2a155ba3	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_same_data_p2	4e1df217560651cc4ed8840366fd6bde8bb2ada5	eris-wsl:2a155ba3	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_scratch_census	335581ff018dc7619368015fa8bbbe0dba6427be	eris-wsl:2a155ba3	7 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_session_close	ba45d711529716a485ad96806d4cc3691fbf05f0	eris-wsl:2a155ba3	4 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_session_metrics	f1a4278731aa4ed523a725e5d478fa5f91f46820	eris-wsl:2a155ba3	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_sheet_census	611f62b56efa3e662642519863c8c81745e9ddc1	eris-wsl:2a155ba3	7 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_shell_portability	90d9992766527599600367649b03854e922b70c2	eris-wsl:2a155ba3	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_sim_wram_contract	c8cec18a0ca8d6b053f0c331eff05b0c2cdf41e9	eris-wsl:2a155ba3	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_skill_guides	f85f0746efaf9a22d3fab37bd7ea4c540ad26598	eris-wsl:2a155ba3	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_state_open_lists	ce1f370ea7ba14e2d0b1ad4efd55f630dcf4ddf5	eris-wsl:2a155ba3	7 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_static_confirm	8a9212e8a7154af86dd2568ae84aa865dbb8776c	pilot:bdef935e	44 controls write-traced 14z-207 (#315): none writes a path a sibling writes or reads
+test_static_runner	5838912b901e4813dabe00b9a42e2e416587c3b5	pilot:bdef935e	23 controls write-traced 14z-207 (#315): none writes a path a sibling writes or reads
+test_submodule_pins	2b6b6efafe65bb7e805fad83099d6e05c3c4e7a7	eris-wsl:2a155ba3	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_superseded_pins	5c79a05e78f77af8f53e123e772abdc4f9ff7f0e	eris-wsl:2a155ba3	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_tickets	9402d66e0fd0ea30c93c1eeebf5808f8ddc6a078	eris-wsl:2a155ba3	6 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_trace_static_reads	b71442a80c648d4fc521760e45f1c127c8fa3d31	pilot:bdef935e	6 controls write-traced 14z-207 (#315): none writes a path a sibling writes or reads
+test_win_quote_decode	3641cda34515ac0bd93ca1e99480534ea1af2f90	eris-wsl:2a155ba3	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
+test_win_stdout_utf8	38de7f9e01f6aa4a3ae52fbe97ba7b73cbe3450f	eris-wsl:2a155ba3	3 controls write-traced 14z-207: none writes a path a sibling writes or reads

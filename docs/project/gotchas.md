@@ -7540,3 +7540,23 @@ afterwards: every call without `MAME_SANDBOX`/`FBNEO_SANDBOX` (or the replay run
 (on PILOT: 14, 8 and 1 per run of `audit_phase_mode_cost`, `test_mask_ranges_reader`, `test_tenant_select_records`).
 Ruled 2026-10-23: callers pass a sandbox inside their own trapped folder; `tests/test_tmp_hygiene.sh` refuses a call
 that does not (control `planted-unsandboxed`).
+
+## ONE POOL JOB PER GATE MADE A GATE'S CONTROLS A SERIAL TAIL (paid: 14z-205/14z-207, #312)
+
+Before #312, `tests/run_all_static.sh --jobs 8` gave each gate ONE pool job that ran the gate and then every one of its
+must-fire controls in turn, so a gate with many controls held one slot for all of them while the other slots emptied:
+`test_static_runner`'s 21 controls took 1,322 s one after another (ERIS) and 2,047 s of a 2,600 s tier (the Mac,
+14z-206), and the pool averaged about 2.5 busy slots of 8. `tests/lib/static_pool.py` now queues a gate's controls as
+jobs of their own once its run ends; on ERIS a freeze tier went from about 1,670 s to about 760 s wall with every result
+and control row equal to a serial run. Controls may run side by side only for the gates on
+`tests/controls_concurrent.txt`, chosen from a write trace of every control (#315). **The rule:** read a pool's
+job-seconds over wall clock against its slot count before calling it parallel; one long job hides the idle slots.
+
+## A WRITE TRACE TAKEN WHERE A GATE SKIPS PROVES NOTHING ABOUT ITS CONTROLS (paid: 14z-207, #315)
+
+Lane S chose the gates whose controls may run side by side from a `strace -f` write census on ERIS, which has no
+`emu/jtcores`; four jtcores gates SKIPped there, so their traces were empty and they were listed as safe. Re-traced on
+PILOT, where they run, one of them (`test_mister_mra_map`) has two controls writing the same 340 paths under
+`/tmp/vampire-saved-jtsim`. `tools/controls_overlap.py` now marks a gate whose every control SKIPped HOLLOW, never
+SAFE. Same family as "A TRACE TAKEN WHERE A GATE SKIPS SCORES THE SKIP, NOT THE GATE" (#286). **The rule:** a trace
+answers only for a gate that ran; trace each gate on a host where it runs, and say which host in the list.

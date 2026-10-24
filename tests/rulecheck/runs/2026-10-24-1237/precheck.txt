@@ -1,0 +1,3 @@
+  FLAG D-ABSOLUTE: A gate's controls go to the front of the queue when its own run ends, and only when the runner's rule would execute them.  [build/agent207/T315/close/closing_312.md]
+  FLAG D-ABSOLUTE: **Not tested:** only gate-level SKIPs were checked for hollow traces; a listed gate that took another host-specific branch on ERIS and still passed would not...  [build/agent207/T315/close/closing_315.md]
+packet_check: 2 flag(s): D-ABSOLUTE 2

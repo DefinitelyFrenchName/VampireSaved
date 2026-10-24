@@ -123,6 +123,7 @@ declares	test_close_standing
 declares	test_close_tools
 declares	test_commit_subject
 declares	test_community_crosscheck
+declares	test_controls_concurrent
 declares	test_controls_contract
 declares	test_copy_flags
 declares	test_crash_guard

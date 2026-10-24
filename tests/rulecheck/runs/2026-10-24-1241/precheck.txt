@@ -1,0 +1,6 @@
+  FLAG D-ABSOLUTE: A gate's controls go to the front of the queue when its own run ends, and only when the runner's rule would execute them.  [build/agent207/T315/close/closing_312.md]
+  FLAG D-ABSOLUTE: **Not measured:** a write trace or a serial-against-pool leg on macOS (every trace ran on Linux, so a shared path only macOS writes is not seen); the Mac's w...  [build/agent207/T315/close/closing_312.md]
+  FLAG D-ABSOLUTE: **Not tested:** only gate-level SKIPs were checked for hollow traces; a listed gate that took another host-specific branch on ERIS and still passed would not...  [build/agent207/T315/close/closing_315.md]
+  FLAG D-ABSOLUTE: **Limit:** every trace runs on Linux (ERIS WSL, PILOT), though the list also governs the Mac's tier.  [build/agent207/T315/close/closing_315.md]
+  FLAG D-ABSOLUTE: The gate compares each listed gate's own script with the traced one; a change to a library or tool the gate calls is not seen until the freeze re-trace.  [build/agent207/T315/close/closing_315.md]
+packet_check: 5 flag(s): D-ABSOLUTE 5

@@ -1,0 +1,22 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: #312 and #315 closed done (14z-207, lanes S and T), after runs 2026-10-24-1237 and -1238
+Claim (the working agent's sentence): #312 and #315 can close done when this session's fifth commit lands (closing_312.md, closing_315.md). #312's to-dos (issue312.md): its controls as separate pool jobs after the gate's own run and only when the runner's rule would execute them, the registry-order classification and serial-equal verdicts kept, test_static_runner's concurrent controls checked against a write census, and CPU, slot use and wall measured before and after, are met by lane S (S_REPORT.md): the pool legs a1 and a2 (v4) and a3 and a4 (v6, the final code) equal the serial leg s1 in results (220 rows) and controls (390 rows), and the base differs only in test_static_runner's two new controls (legcmp_s1.txt, legcmp_v6.txt, legcmp_b2.txt); s1 ran v4, not v6, which differs from it in three files and seven lines: the pool's job log becomes one file per tier, opened anew (tests/lib/static_pool.py) and copied per tier (tests/run_all_static.sh), and test_static_runner's section-24 stub sleeps and logs only in its --jobs 4 run; the queue and scheduling code is unchanged (v4_v6.diff), wall 1,658 s to 758-759 s and 1.72 to about 4.1 cores (legcmp_b2.txt, legcmp_v6.txt), the write census on ERIS (overlap3.txt) and its re-trace on PILOT for the 8 gates that changed after it and for four jtcores gates lane S had listed while they SKIPped on ERIS (T_REPORT.md, overlap.txt, overlap_jt.txt: 8 and 3 SAFE, test_mister_mra_map SHARED and kept serial). #315's done-when (issue315.md) is met by fork T (T_REPORT.md): the census gate holds the list, failing a listed gate that is unregistered, has fewer than two controls or whose script changed since its trace, with each control firing and each mode exiting 1 on commit 5's staged tree in a clean checkout (book5.txt); the 8 re-traced gates are listed; the freeze procedure re-runs the trace (HANDOFF.md, per T_REPORT.md). The ruling for the gate is the maintainer's "Census gate + re-trace at freeze (Recommended)" (ruling_315.txt). Not tested: the Mac's wall clock and CPU with the final 97-gate list (commit 5's tier will run it; commit 4's tier on the Mac, with test_static_runner still off the list, spent 2,689 s on its 23 controls one after another, mac_tier4.txt); no serial leg ran the final v6 code; the serial-equal proof ran with lane S's 98-gate list, not the final 97 (one jtcores gate removed, three re-listed from a PILOT trace, eight re-listed from a PILOT trace at a later commit); the ERIS legs were red for host reasons, FAIL 9 and SKIP 7 identically on base and after (S_REPORT.md); the write census did not trace mkdir and unlink and kept rename targets as written (S_REPORT.md); only gate-level SKIPs were checked for hollow traces (T_REPORT.md); a listed gate that SKIPs on ERIS (7 SKIP rows on every leg, legcmp_v6.txt) never ran its controls side by side in either equality leg, so the equality says nothing about it, and test_mister_mra_map was such a gate while it was listed (overlap_jt.txt: SHARED; now off the list); the census gate compares each listed gate's own script with the traced one and does not see a change to a library or tool the gate calls (such as tests/lib/static_job.sh), and the 86 gates kept from the ERIS trace were checked by their own scripts only (T_REPORT.md).
+Artifacts (read every one, in full):
+  - build/agent207/T315/close/issue312.md
+  - build/agent207/T315/close/issue315.md
+  - build/agent207/T315/close/ruling_315.txt
+  - build/agent207/T315/close/S_REPORT.md
+  - build/agent207/T315/close/T_REPORT.md
+  - build/agent207/T315/close/legcmp_s1.txt
+  - build/agent207/T315/close/legcmp_v6.txt
+  - build/agent207/T315/close/legcmp_b2.txt
+  - build/agent207/T315/close/v4_v6.diff
+  - build/agent207/T315/close/overlap3.txt
+  - build/agent207/T315/close/overlap.txt
+  - build/agent207/T315/close/overlap_jt.txt
+  - build/agent207/T315/close/book5.txt
+  - build/agent207/T315/close/mac_tier4.txt
+  - build/agent207/T315/close/closing_312.md
+  - build/agent207/T315/close/closing_315.md

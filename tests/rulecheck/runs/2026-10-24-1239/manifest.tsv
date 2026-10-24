@@ -1,0 +1,17 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent207/T315/close/issue312.md	3114a0d9c4d1e390cd3aa250c717138a6a866e93
+build/agent207/T315/close/issue315.md	b5709e3d595bc1f67e6457a66a09c2392a6098dd
+build/agent207/T315/close/ruling_315.txt	c7fa0043e8ab6d144ba2493b343c6e1f4e51943c
+build/agent207/T315/close/S_REPORT.md	b1f898d62c2edc929eddd75e4db8fa0c489dcd62
+build/agent207/T315/close/T_REPORT.md	8b7ad6690adc362d5efeb71d37a8d005b83434fa
+build/agent207/T315/close/legcmp_s1.txt	3d4292a6a588401ec0523a3d0fcba47bcf28c1bb
+build/agent207/T315/close/legcmp_v6.txt	05fe0ce06fd0da0bd760b8a35abdbb58fd0ce616
+build/agent207/T315/close/legcmp_b2.txt	a7500a14108d41eb20d0aa5bb275bdc25c7166a3
+build/agent207/T315/close/v4_v6.diff	3eb8453fdf553ff97557b73bfb94dd64f7265762
+build/agent207/T315/close/overlap3.txt	f8cd7b09a456188a17a1bf6bfd3512df6628954f
+build/agent207/T315/close/overlap.txt	e4ca5b3a22e6319bf6e4ff1af86485215744522f
+build/agent207/T315/close/overlap_jt.txt	2f1b64bf218214846fa20a673ad85fad871d6fe1
+build/agent207/T315/close/book5.txt	5fadf1486ba30a45e63e36d2d2446b3447e8f250
+build/agent207/T315/close/mac_tier4.txt	a3fa87f2cc5c42db38f773dfce8929857f435cbf
+build/agent207/T315/close/closing_312.md	a583a73083df0243674526eaf69f5631f862f8c3
+build/agent207/T315/close/closing_315.md	d42e6790835889b53a23eac284776537a52d6235

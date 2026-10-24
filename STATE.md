@@ -38,7 +38,7 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
-## Session 14z-207 — **PILOT and ERIS online, the work run in parallel lanes: #291 closed done (the span retrofit, the fighters check on round intros, the full sheet run reviewed); #308 and #313 closed done; #286 measured, then closed done; #304 analysed and its four recommendations adopted; #314 filed and closed done; #303, #279, #280 and #281 closed done (lanes P and P2 on PILOT).** Opened 2026-10-23 on transcript `e552692b` after the 14z-206 close (`c494fac2`, pushed).
+## Session 14z-207 — **PILOT and ERIS online, the work run in parallel lanes: #291 closed done (the span retrofit, the fighters check on round intros, the full sheet run reviewed); #308 and #313 closed done; #286 measured, then closed done; #304 analysed and its four recommendations adopted; #314 filed and closed done; #303, #279, #280 and #281 closed done (lanes P and P2 on PILOT); #312 and #315 closed done (lane S on ERIS, fork T on PILOT).** Opened 2026-10-23 on transcript `e552692b` after the 14z-206 close (`c494fac2`, pushed).
 
 ### opened with
 HANDOFF, STATE and NEXT_SESSION read; the sweep CLEAN, `main` equal to `origin/main`. The maintainer: *"no answers right
@@ -92,6 +92,7 @@ the record-only confirm tier on PILOT re-ran 45 gates and executed 0 of 394 cont
 re-run gates open none of the changed files (R2 `battery_reach.py`/`close_standing.py`/`checkskills.py` mentions, R3
 `docs` through `test_tenant_loop.sh`, R5), the next narrowing candidates. PILOT's four host reds (#279, #280, #281, its
 stale emulator records) stand; its disk is down to 5.9 GB free.
+**Resolved later this sitting:** #286 closed done, and #279, #280, #281 with the record-only tier and PILOT's tools — (8).
 
 ### (4) #304 — ANALYSED, FOUR RECOMMENDATIONS ADOPTED, THE BUILD IN A FORK
 Fork I (`build/agent207/t304/REPORT.md`, local): session scratch is 5,182,386 of the 5,241,597 files a snapshot copies,
@@ -114,6 +115,25 @@ rest can stay as is"* — measured here, 12 processes plan in 7.3/7.1 s against 
 reads `build/agent185`), which item 2 must reclass first. Folded into this sitting's commit. Its census had passed only
 because `tools/build_dirs.py` was untracked in the fork: tracked, it read its own selftest plants; the reader now skips
 itself (gotcha written).
+
+### (9) #312 AND #315 CLOSED DONE: A GATE'S CONTROLS RUN AS POOL JOBS; THE LIST HELD BY A CENSUS GATE
+**Lane S** (ERIS WSL, `build/agent207/S/REPORT.md`, local; `refs/agent207/s312` `434f1bbf`): `tests/lib/static_pool.py`
+replaces the runner's `xargs -P` pool and queues a gate's controls as jobs of their own once its run ends; for the gates on
+`tests/controls_concurrent.txt` they run side by side, chosen from a `strace -f -y` write census of every control. On ERIS
+a `--jobs 8` freeze tier went from about 1,670 s to about 760 s wall, 1.7 to about 4.1 cores, with results (220 rows)
+and controls (390 rows) equal to a serial run. Landed in the fourth commit (`723b148f`) with 8 changed gates held off
+the list. The maintainer ruled a census gate and a re-trace at each freeze (DECISIONS_HISTORY.md, 2026-10-24), filed as
+**#315**. **Fork T** (PILOT, `build/agent207/T315/REPORT.md`, local; `refs/agent207/t315` `1c459df3`):
+`tests/test_controls_concurrent.sh` (`tools/controls_concurrent.py`; controls unregistered, one-control,
+changed-script) fails a listed gate that is unregistered, has fewer than two controls or whose script changed since its
+trace; the list records each gate's traced blob and host; `tools/trace_controls.sh` and `tools/controls_overlap.py`
+tracked, the re-trace added to HANDOFF.md's freeze steps. The re-trace cleared the 8 (test_static_runner among them) and
+found that lane S had listed four jtcores gates from ERIS traces where they SKIPped: `test_mister_mra_map`'s two controls
+share 340 written paths and stay serial. 97 gates listed. Rule-checker runs 2026-10-24-1237..-1240 and -1242 VIOLATED
+and resolved, -1243 OK (-1241 prepared and not run); the named gaps include: no trace on macOS, no serial leg of the final
+code, 18 listed gates that did not PASS on ERIS, the census seeing a gate's own script only. Two gotchas filed. Also
+2026-10-24: ERIS's lane folders deleted (ruled); #279/#280/#281 kept closed (ruled). The commit tiers this sitting:
+commit 4's GREEN, PASS 100, `test_static_runner`'s 23 controls serial (2,689 s), 4,730 s wall with snapshot setup.
 
 ### (8) #286, #303, #279, #280 AND #281 CLOSED DONE; LANES P AND P2 APPLIED
 **#286** (rule-checker runs 2026-10-23-1215, -1216, -1218, -1219, -1222, -1225 VIOLATED and resolved, -1227 OK;
@@ -146,8 +166,9 @@ Rule-checker runs 2026-10-23-1212, -1213 VIOLATED and resolved, -1214 OK; **#314
 scored on an ERIS WSL trace (0 misses over 94,317 reads, control 90); predicted record-only re-runs 52 → 44, 15 open a
 record file, 0 controls. The other 29 the maintainer accepted as precision cost (DECISIONS_HISTORY.md). #286 closes on
 a measured record-only `--confirm` tier of the tree with N-K.
+**Resolved:** #286 closed done — (8).
 
-### (6) PILOT AND ERIS LANES (P, P2, Q, R done and applied; S on #312 still running)
+### (6) PILOT AND ERIS LANES (P, P2, Q, R, S and T done and applied; see (8) and (9))
 The maintainer: use PILOT and ERIS for other tickets, preparing a freeze+release *"as soon as we have a stable situation"*,
 and chose the lanes (DECISIONS_HISTORY.md "Ruled 2026-10-23 (14z-207) — the PILOT and ERIS lanes"): P on PILOT — its disk first (98% full; the maintainer
 approved deleting the old session work folders after a check: *"Yes, after the check (Recommended)"*), then #303, then
@@ -166,6 +187,24 @@ classed them (DECISIONS_HISTORY.md, three entries): `test_proof_sheets` c1 CROSS
 OBSERVES, then — rule-checker run 2026-10-23-1204 showed its frozen steps hold the pinned 540 the whole window —
 READS-BACK, labelled in the gate's header; vx OBSERVES, its 3511 rows (the pin held the whole window, run -1205) noted
 in the header. The two expectation edits: rule-checker runs 2026-10-23-1203..-1205 VIOLATED and resolved, -1206 OK.
+
+### CLOSE (14z-207, 2026-10-24)
+The close's steps (`docs/project/session_close.md`, `tools/close.py`, run `build/agent207/close/`, local), filled as they run.
+The maintainer, asked what next once every lane had reported: *"Close the session now (Recommended)"*. **sections:** (1)-(9),
+with pointers in (3) and (7) to (8). **next-session:** `docs/NEXT_SESSION.md` rewritten as the 14z-207 opener; the 14z-206
+opener moved verbatim to the top of `docs/NEXT_SESSION_HISTORY.md`. **rollover:** nothing to move (this group is the
+only one). **indexes:** regenerated. **dashboard:** 14z-163..14z-207 collected (1,916 figures, 0 unclassed; 14z-207: 40,
+transcript `e552692b`), the four files uploaded, datasets versions 14, 14, 15, 14. Also before the record: #278's
+progress comment posted (lane P's locale measurement; no closure). **The tier's results:**
+`build/agent207/close/tier_results.tsv`, the next close's `--prev`; its verdict and time line go in the close commit's
+message (the staged tree cannot hold them) and the next sitting's opening record. The staged tree carries fork T's #315 change (`refs/agent207/t315`) with the records.
+**The first close tier was NOT GREEN** (snapshot of `fd4dbb54`, `build/snapshot_runs/20261024T100115-fd4dbb549dd1`, local):
+PASS 95, FAIL 2, the runner's wall 822 s (commit 4's tier: 3,156 s). `test_live_budget`: fork T's freeze step took
+HANDOFF.md to 503 lines and 50,369 bytes; the step moved to `docs/project/operations.md` "THE CONCURRENT-CONTROLS
+RE-TRACE", a two-line pointer left. `test_build_dirs`: `tests/test_controls_concurrent.sh`'s synthetic strace lines named
+`/r/build/a` and `/r/build/b`, which the census read as unclassed `build/` directories; renamed `/r/w/…`. Both PASS
+after, the census gate's three modes still exit 1. A new gate's fixture strings tripped a tree census twice this
+sitting (also `test_mame_bin_pinned`, (8)).
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings

@@ -13,11 +13,11 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**469 of 469 gates described.**
+**470 of 470 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
-| [runner](#runner) | 48 | 48 | the suite runners and their own ground truth |
+| [runner](#runner) | 49 | 49 | the suite runners and their own ground truth |
 | [docs](#docs) | 27 | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 50 | 50 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -30,7 +30,7 @@ first sentence) is `gate_index.md`.
 
 ## runner
 
-the suite runners and their own ground truth. 48 of 48 described.
+the suite runners and their own ground truth. 49 of 49 described.
 
 ### `run_all_emulator.sh` — run, emulator
 
@@ -159,6 +159,14 @@ the suite runners and their own ground truth. 48 of 48 described.
 **HOW:** the three tools' self-tests on synthetic trees with known answers; then the REAL template rendered into a temp run dir (no close is needed to render) and linted: every row parses for tools/close_checks.py, every `*_plant` row expects a non-zero exit and its base check is in the set, every standing check declares WHAT and NOT SEEN. Seven controls are known-bad variants (each tool's --perturb, and a template copy whose plant expects 0).
 
 **EXPECTS:** the three self-tests PASS, the template lint clean, and every control's variant FAILs.
+
+### `test_controls_concurrent.sh` — test, ci_portable
+
+**WHAT:** tools/controls_concurrent.py reads tests/controls_concurrent.txt, the gates whose must-fire controls tests/run_all_static.sh --jobs N runs beside one another (#312), and names every row whose gate is not registered (tests/ci_portable.txt, tests/ci_static.txt), declares fewer than two must-fire controls, or whose script's git blob differs from the blob that was write-traced. Each named row must be re-traced or taken off the list (ruled 2026-10-24: "Census gate + re-trace at freeze (Recommended)").
+
+**HOW:** the census over the tree; then on a copy of the tree's registries, list and gate scripts, three perturbations of the list's first row: its gate dropped from the registries, its script cut to one MUST-FIRE line, its script given one more line. Each must be named with its own tag, and the unperturbed copy must read clean. Then the freeze re-trace's scorer, tools/controls_overlap.py, on synthetic traces: distinct writes SAFE, a shared write, a write a sibling reads and a write split by strace SHARED, a control's own mktemp path and a bytecode cache SAFE, a gate whose every control SKIPped HOLLOW.
+
+**EXPECTS:** 0 rows named on the tree. A red names the gate and says "re-trace it or take it off the list" — the #315 shape: 8 of lane S's 98 traced gates had changed before #312 landed and would have kept running their controls beside one another on a trace that no longer described them.
 
 ### `test_controls_contract.sh` — test, ci_portable
 

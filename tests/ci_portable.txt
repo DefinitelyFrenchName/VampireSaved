@@ -370,6 +370,8 @@ test_win_stdout_utf8
 test_host_text_opens
 # test_tmp_hygiene.sh — every temporary a tool or gate makes is removed when its maker exits (#303, 14z-207); two controls. ~2 s.
 test_tmp_hygiene
+# test_controls_concurrent.sh — the concurrent-controls list still describes the gates it names (#315, 14z-207); three controls. ~2 s.
+test_controls_concurrent
 # #196 (14z-189): an unset MAME_BIN makes tools/run_mame.sh run the PINNED build for the set (WIDE for vsavjw,
 # the reference build for stock sets), never the mame on PATH; a missing default is refused; one control. ~1 s.
 test_mame_default_bin

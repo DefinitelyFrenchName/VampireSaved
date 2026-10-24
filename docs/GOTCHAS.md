@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-557 entries (48 game / 142 platform / 367 project), counted from the buckets at generation.
+559 entries (48 game / 142 platform / 369 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 48 entries
 
@@ -218,7 +218,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - Python 3.12's `shutil` imports `_winapi` WHEN `sys.platform` IS FAKED TO `win32` (paid: 14z-200/14z-207, #280)
 - UNDER `strace -f`, CHROME NEVER OPENS A PAGE'S `file://` READS (measured 14z-207, #281)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 367 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 369 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -587,3 +587,5 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A TRACE TAKEN WHERE A GATE SKIPS SCORES THE SKIP, NOT THE GATE (paid: 14z-207, #286)
 - xdelta3 3.0.11 WRITES VERBATIM REFERENCE-ROM RUNS WHERE 3.2.0 COPIES (paid: 14z-200/14z-207, #279)
 - `run_mame.sh` AND `run_fbneo.sh` EXEC THE EMULATOR, SO THEIR DEFAULT SANDBOX IS NEVER REMOVED (paid: 14z-207, #303)
+- ONE POOL JOB PER GATE MADE A GATE'S CONTROLS A SERIAL TAIL (paid: 14z-205/14z-207, #312)
+- A WRITE TRACE TAKEN WHERE A GATE SKIPS PROVES NOTHING ABOUT ITS CONTROLS (paid: 14z-207, #315)

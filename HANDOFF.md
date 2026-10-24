@@ -438,6 +438,9 @@ well as the old build names. The gotcha is
 `docs/project/gotchas.md` [VSP-185]; the fingerprint half is caught by
 `tests/test_superseded_pins.sh` since 14z-185b (#167).
 
+**AT A FREEZE, RE-TRACE THE CONCURRENT-CONTROLS LIST (#315, ruled 2026-10-24)** on a Linux host with `strace`
+(PILOT): the commands and how to refresh the list are in `docs/project/operations.md` "THE CONCURRENT-CONTROLS RE-TRACE".
+
 *(Moved 2026-10-14, #282 item B: Build registry — the two rows that are not builds, and the table's narratives → `docs/project/operations.md`.)*
 
 | build (mark) | fingerprint(s) | dir · tag | what changed | detail |

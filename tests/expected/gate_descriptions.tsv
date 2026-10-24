@@ -190,6 +190,7 @@ declares	test_compare_composite
 declares	test_compare_fields_selfcheck
 declares	test_compare_flicker
 declares	test_compare_window
+declares	test_controls_concurrent
 declares	test_controls_contract
 declares	test_copy_flags
 declares	test_crash_guard

@@ -16,11 +16,11 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**469 scripts** — 140 ci_portable, 92 ci_static, 237 emulator-tier (run by name).
+**470 scripts** — 141 ci_portable, 92 ci_static, 237 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 48 | the suite runners and their own ground truth |
+| [runner](#runner) | 49 | the suite runners and their own ground truth |
 | [docs](#docs) | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 50 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -53,6 +53,7 @@ the suite runners and their own ground truth.
 | `tests/test_close_checks.sh` | test | ci_portable | — | the close's check runner times every check, re-runs one alone, and never lets a partial run read as the run of record (`tools/close_checks.py`, 14z-185b, GitHub #187). | 14z-185b |
 | `tests/test_close_loop_cost.sh` | test | ci_portable | — | the close-loop cost reader counts every pass of a close's check runner and the packet's span, whatever interpreter ran the runner and however a prepare's output was cut (`tools/agent/close_loop_cost.py`, 14z-187b, GitHub #187). | 14z-187b |
 | `tests/test_close_standing.sh` | test | ci_portable | — | the standing close-check set renders with every list derived and every plant generated, its claim comes from the run of record, and a finding is appended in the table's form (GitHub #204, #206, #207; 14z-189). | 14z-189 |
+| `tests/test_controls_concurrent.sh` | test | ci_portable | — | THE CONCURRENT-CONTROLS LIST STILL DESCRIBES THE GATES IT NAMES (#315, 14z-207). ci_portable: no ROM, ~2 s. | 14z-207 |
 | `tests/test_controls_contract.sh` | test | ci_portable | — | ground truth for THE MUST-FIRE CONTRACT'S READER, tests/lib/controls.sh: the four regexes of the R10 grammar, the leading comment block as the header (a bare `#` continues it, a non-comment line ends it), the declared-vs-fired readback the… | 14z-147 |
 | `tests/test_demand_after_trap.sh` | test | ci_portable | — | no gate carries a `${VAR:?msg}` DEMAND after its EXIT trap (14z-134). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-134 |
 | `tests/test_emu_run_compare.sh` | test | ci_portable | — | two emulator-tier runs are compared per row over what BOTH ran and BOTH passed (`tools/emu_run_compare.py`, 14z-193, GitHub #122). | 14z-193 |
