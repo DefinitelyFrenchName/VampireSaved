@@ -4,7 +4,7 @@
 # repo: DefinitelyFrenchName/VampireSaved
 # issues: 317
 number	state	reason	closed	labels	title
-317	OPEN	-	-	evolution	Snapshot tiers: measure the remaining setup, re-snapshot incrementally after a red, base the re-run on the red run
+317	CLOSED	COMPLETED	2026-10-24	evolution	Snapshot tiers: measure the remaining setup, re-snapshot incrementally after a red, base the re-run on the red run
 316	OPEN	-	-	evolution	Release reuses the freeze's tier results when it builds from the freeze's exact tree
 315	CLOSED	COMPLETED	2026-10-24	evolution,test-integrity	#312's concurrent-controls list is a snapshot: nothing re-checks that a listed gate still writes as it was traced
 314	CLOSED	COMPLETED	2026-10-23	bug,severity: low	tools/gen_applier_page.py writes host-encoded text: cp1252 and CRLF on Windows (the #308 defect in a sibling tool)

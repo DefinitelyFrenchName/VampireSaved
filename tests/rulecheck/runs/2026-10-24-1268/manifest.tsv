@@ -1,0 +1,12 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent208/t317/issue317_body.md	661d1db5e4453b644dc216d760ee49f8fbaa728c
+build/agent208/t317/closing_317.md	5a7d7b9befe048856389ed68abbb71b465c9a273
+docs/project/tickets.tsv.lines-74-74 (lines 74-74 of docs/project/tickets.tsv)	75c2cd3e3792de41738da043e92d04b2571dd700
+build/agent208/S2/REPORT.md	2c0d9cd8544ac659d4d99dbeed5ce402c3ca3d1d
+build/agent208/t317/red_green_pair.txt	1133115ed860eb2d1d52e925355c1f882b9eb37a
+build/agent208/t317/close_change.diff	46c3f91e127b7d22ecb0d4c3c0897da1c9f18dd6
+build/agent208/t317/snapshot_change.diff	844bc8f5c949fb9776862c1f5974abf150eefd1e
+docs/project/snapshot_runs.md.lines-126-195 (lines 126-195 of docs/project/snapshot_runs.md)	8e337893d8df5935ee578ec1ccf214a001290b3d
+docs/project/gotchas.md.lines-7564-7574 (lines 7564-7574 of docs/project/gotchas.md)	dda1a490107d3025099bbca78a142db80c5eaf32
+DECISIONS_HISTORY.md.lines-7987-7994 (lines 7987-7994 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-24 (14z-208) — #317: snapshot setup measured, incremental re-snapshot after a red, ")	b6f66d9663a18a0c6a12d544f781ff7ce08bdde1
+DECISIONS_HISTORY.md.lines-7995-8001 (lines 7995-8001 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-24 (14z-208) — #317: change 2 (incremental re-snapshot) measured and dropped")	569f0530facce3732d618d776c0dd44ff269f09a

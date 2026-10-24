@@ -1,0 +1,6 @@
+  FLAG D-FIGURE: 1245  [build/agent208/t317/closing_317.md]
+  FLAG D-FIGURE: 213  [build/agent208/t317/closing_317.md]
+  FLAG D-ABSOLUTE: No cache: nothing left was worth its staleness risk.  [build/agent208/t317/closing_317.md]
+  FLAG D-ABSOLUTE: The incremental re-snapshot:** measured and not built — a clean copy to re-clone from costs 16.4-18.1 s to make and 8.3-11.0 s to delete on every run, to sav...  [build/agent208/t317/closing_317.md]
+  FLAG D-ABSOLUTE: Before #317 a snapshot setup alone was 900-1,300 s (2026-10-20..24) and the 14z-207 close re-ran a full tier after its red.  [build/agent208/t317/closing_317.md]
+packet_check: 5 flag(s): D-ABSOLUTE 3, D-FIGURE 2

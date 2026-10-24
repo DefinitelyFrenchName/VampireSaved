@@ -1,0 +1,5 @@
+  FLAG D-FIGURE: 1245  [build/agent208/t317/closing_317.md]
+  FLAG D-FIGURE: 213  [build/agent208/t317/closing_317.md]
+  FLAG D-ABSOLUTE: No cache: nothing left was worth its staleness risk.  [build/agent208/t317/closing_317.md]
+  FLAG D-ABSOLUTE: The incremental re-snapshot:** measured and not built — a clean copy to re-clone from costs 16.4-18.1 s to make and 8.3-11.0 s to delete on every run, to sav...  [build/agent208/t317/closing_317.md]
+packet_check: 4 flag(s): D-ABSOLUTE 2, D-FIGURE 2

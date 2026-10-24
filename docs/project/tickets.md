@@ -11,13 +11,12 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**317 tickets** — status: open 17 · parked 8 · done 261 · declined 13 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 213 · cosmetic 17 · evolution 87 · **backfill debt: 0 rows**.
+**317 tickets** — status: open 16 · parked 8 · done 262 · declined 13 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 213 · cosmetic 17 · evolution 87 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
-| [#317](https://github.com/DefinitelyFrenchName/VampireSaved/issues/317) | evolution | open | Snapshot tiers: measure the remaining setup, re-snapshot incrementally after a red, base the re-run on the red run | none | `DECISIONS_HISTORY.md § Ruled 2026-10-24 (14z-208) — #317` | none | none | 14z-208 |
 | [#316](https://github.com/DefinitelyFrenchName/VampireSaved/issues/316) | evolution | open | Release reuses the freeze's tier results when it builds from the freeze's exact tree (tree, instruments, ROMDIR) | none | `DECISIONS_HISTORY.md § Ruled 2026-10-24 (14z-208) — #316` | none | none | 14z-208 |
 | [#311](https://github.com/DefinitelyFrenchName/VampireSaved/issues/311) | bug | open | test_applier_page_browser's browser run does not complete under heavy load (a false red), and sometimes stalls unloaded | `tests/test_applier_page_browser.sh` | none | none | none | 14z-206 |
 | [#310](https://github.com/DefinitelyFrenchName/VampireSaved/issues/310) | bug | open | An executed control whose mode run FAILs without judging anything reads HONOURED | `tests/lib/classify.sh` · `tests/test_applier_page_browser.sh` | none | none | none | 14z-206 |
@@ -47,6 +46,7 @@ backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py pag
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#317](https://github.com/DefinitelyFrenchName/VampireSaved/issues/317) | evolution | done | Snapshot tiers: measure the remaining setup, re-snapshot incrementally after a red, base the re-run on the red run | `tests/test_session_close.sh` · `tests/test_run_on_snapshot.sh` | `DECISIONS_HISTORY.md § Ruled 2026-10-24 (14z-208) — #317: snapshot setup measured` · `DECISIONS_HISTORY.md § Ruled 2026-10-24 (14z-208) — #317: change 2` | `docs/project/snapshot_runs.md § Since #317 (14z-208)` · `docs/project/session_close.md § based on the red run` | `docs/project/gotchas.md § A STALE SUBMODULE` | 14z-208 |
 | [#315](https://github.com/DefinitelyFrenchName/VampireSaved/issues/315) | evolution | done | #312's concurrent-controls list is a snapshot: nothing re-checks that a listed gate still writes as it was traced | `tests/test_controls_concurrent.sh` | `DECISIONS_HISTORY.md § Ruled 2026-10-24 (14z-207) — #312's concurrent-controls list held by a census gate, re-traced at each freeze` | `docs/project/gotchas.md § A WRITE TRACE TAKEN WHERE A GATE SKIPS PROVES NOTHING ABOUT ITS CONTROLS` | `docs/project/gotchas.md § A WRITE TRACE TAKEN WHERE A GATE SKIPS PROVES NOTHING ABOUT ITS CONTROLS` | 14z-207 |
 | [#314](https://github.com/DefinitelyFrenchName/VampireSaved/issues/314) | bug | done | tools/gen_applier_page.py writes host-encoded text: cp1252 and CRLF on Windows, the #308 defect in a sibling tool | `tools/gen_applier_page.py` · `tests/test_applier_page.sh § unencoded-page` · `tests/test_host_text_opens.sh § applier-no-newline` | none | `docs/platform/gotchas.md § A PYTHON TEXT FILE OPENED WITHOUT `encoding=` AND `newline=` IS THE HOST'S` | `docs/platform/gotchas.md § A PYTHON TEXT FILE OPENED WITHOUT `encoding=` AND `newline=` IS THE HOST'S` | 14z-207 |
 | [#313](https://github.com/DefinitelyFrenchName/VampireSaved/issues/313) | bug | done | tools/static_confirm.py plan stalls on a large untracked build/sheets/ tree: 1,902 s for 25 of 229 gates, against 37 s for all 229 the day before | `tools/static_confirm.py` · `tests/test_static_confirm.sh § sheets-scratch-off` · `tests/test_static_confirm.sh § bound-exact-run` | none | `docs/project/gotchas.md § A PLANNER THAT JUDGES EVERY CHANGED PATH FOR EVERY GATE IS AS SLOW AS THE LARGEST UNTRACKED TREE` | `docs/project/gotchas.md § A PLANNER THAT JUDGES EVERY CHANGED PATH FOR EVERY GATE IS AS SLOW AS THE LARGEST UNTRACKED TREE` | 14z-206,14z-207 |

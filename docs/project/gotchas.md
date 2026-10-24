@@ -7560,3 +7560,14 @@ PILOT, where they run, one of them (`test_mister_mra_map`) has two controls writ
 `/tmp/vampire-saved-jtsim`. `tools/controls_overlap.py` now marks a gate whose every control SKIPped HOLLOW, never
 SAFE. Same family as "A TRACE TAKEN WHERE A GATE SKIPS SCORES THE SKIP, NOT THE GATE" (#286). **The rule:** a trace
 answers only for a gate that ran; trace each gate on a host where it runs, and say which host in the list.
+
+## A STALE SUBMODULE `index.lock` MAKES EVERY `git status` RE-READ THE WHOLE SUBMODULE — and every snapshot copies it (paid: 14z-208, #317)
+
+`.git/modules/emu/mame/index.lock` sat there from 2026-09-30, 0 bytes, held by no process. With it, git can never save
+mame's refreshed index, so each `git status` re-read all 31,279 files of `emu/mame`: 6.3-8.9 s a call, in the working
+tree and in every snapshot (`tests/run_on_snapshot.sh` copies the lock with the submodule's git dir), about 26 s of the
+74-80 s snapshot setup measured by fork S2 (`build/agent208/S2/REPORT.md`, local). Removed 2026-10-24: `git status` in
+`emu/mame` 8.74 s before, 0.11 s after the first refresh. A likely origin, not measured: `test_close_tools`'s controls
+take the real checkout's `.git/modules/emu/{fbneo,mame}/index.lock` (`tests/controls_concurrent.txt`), and a control run
+killed mid-way would leave one. **The rule:** a slow `git status` in a submodule is checked for a stale `index.lock`
+(no holder, old mtime) before anything else is blamed.

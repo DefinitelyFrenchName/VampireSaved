@@ -400,6 +400,10 @@ ROMDIR=... tests/run_all_emulator.sh --scope all --lane all --strict --controls 
 - **Any difference refuses the whole reuse**: the runner prints each key `same` or `DIFFERS` and `REUSE REFUSED`,
   then runs everything as before. A release whose tiers run on a later commit than the freeze (a README fix, a
   package regenerated) has a different tree and runs everything.
+- **The order:** the release's tiers run on the freeze commit itself, nothing committed between them; the publish and
+  record commits come after. The maintainer, 14z-208, asked between that and today's order (the M23 release ran its
+  tiers six sessions after its freeze commit): *"Release tiers on the freeze commit (Recommended)"*
+  (`DECISIONS_HISTORY.md`).
 
 Gate: `tests/test_release_reuse.sh` (a changed tree, a changed instrument and a changed ROMDIR file each refuse; the
 release-cadence stub is never reused; seven must-fire controls).
