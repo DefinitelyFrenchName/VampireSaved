@@ -38,6 +38,19 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
+## Session 14z-208b — **#229's Q4, Q7 and #301 answered: Q7's three findings filed (#318, #319, #320); Q4 (a) to apply; F4 (Q1) not confirmed, gaps or wrong moves seen.** A continuation of 14z-208 after its close (`9fed2ec8`, pushed), on the same transcript (`7462776e`).
+
+### (1) #229 — THE MAINTAINER'S ANSWERS
+Q7: *"three side findings, and I suggest a ticket for each: -> agreed"* — filed #318 (`tools/anim_nodes.py` reads offsets
+unsigned), #319 (`tests/expected/ground_throws.tsv` per-move data in the clear), #320 (MAME write taps exit 139). Q4:
+*"(a) join them under the engine's input"*. Q1 (F4): *"needs more time on my end but apparently it seems we have
+gaps/wrong moves"*. #301: *"you can add the comment"* (DECISIONS_HISTORY.md, 14z-208b entries).
+Applied: Q4 (a) written above the input table of the cross-check report (`build/agent205/t229/community_report.md`,
+local) and of the community page (artifact `Wfn7XUHignvbQphap3MwyK`), F4's two rows (Big Swing, Catch and Release)
+waiting on Q1; #301's progress comment posted (the no-rig inputs answered, still candidates until the maintainer's
+check against the Japanese sources and F4's identity). Open: F4's identity (Q1), then #229's swap, census and
+registration.
+
 ## Session 14z-208 — **#298, #289, #304, #307 and #317 closed done; #316 built (open until a measured release); #229's Q2 and Q5 ruled and applied, Q1, Q4 and Q7 open; #170 recorded declined.** Opened 2026-10-24 after the 14z-207 close (`c624ee13`, pushed).
 
 ### opened with

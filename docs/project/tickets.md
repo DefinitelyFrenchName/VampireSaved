@@ -11,12 +11,15 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**317 tickets** — status: open 16 · parked 8 · done 262 · declined 13 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 213 · cosmetic 17 · evolution 87 · **backfill debt: 0 rows**.
+**320 tickets** — status: open 19 · parked 8 · done 262 · declined 13 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 216 · cosmetic 17 · evolution 87 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#320](https://github.com/DefinitelyFrenchName/VampireSaved/issues/320) | bug | open | MAME write taps exit 139 at teardown after every output is written; gates accept it only with full output | none | `DECISIONS_HISTORY.md § Ruled 2026-10-24 (14z-208b) — #229 Q7` | none | none | 14z-208b |
+| [#319](https://github.com/DefinitelyFrenchName/VampireSaved/issues/319) | bug | open | tests/expected/ground_throws.tsv holds per-move signatures in the clear (the 14z-126 frame-data ruling) | none | `DECISIONS_HISTORY.md § Ruled 2026-10-24 (14z-208b) — #229 Q7` | none | none | 14z-208b |
+| [#318](https://github.com/DefinitelyFrenchName/VampireSaved/issues/318) | bug | open | tools/anim_nodes.py reads the animation tables' offsets unsigned; the game sign-extends them (negative entries on 11 characters) | none | `DECISIONS_HISTORY.md § Ruled 2026-10-24 (14z-208b) — #229 Q7` | none | none | 14z-208b |
 | [#316](https://github.com/DefinitelyFrenchName/VampireSaved/issues/316) | evolution | open | Release reuses the freeze's tier results when it builds from the freeze's exact tree (tree, instruments, ROMDIR) | none | `DECISIONS_HISTORY.md § Ruled 2026-10-24 (14z-208) — #316` | none | none | 14z-208 |
 | [#311](https://github.com/DefinitelyFrenchName/VampireSaved/issues/311) | bug | open | test_applier_page_browser's browser run does not complete under heavy load (a false red), and sometimes stalls unloaded | `tests/test_applier_page_browser.sh` | none | none | none | 14z-206 |
 | [#310](https://github.com/DefinitelyFrenchName/VampireSaved/issues/310) | bug | open | An executed control whose mode run FAILs without judging anything reads HONOURED | `tests/lib/classify.sh` · `tests/test_applier_page_browser.sh` | none | none | none | 14z-206 |

@@ -1,229 +1,146 @@
-# VAMPIRE SAVED — merged-m23
+# VAMPIRE SAVED — merged-m23 (MiSTer package)
 
 **What this is.** Vampire Savior (the arcade fighting game, 1997) with three
 characters added who were never in it: **Donovan**, **Phobos** (called Huitzil in
-the Western release) and **Pyron**. They come from two sister games Capcom built
-on the same hardware. Nothing else is changed — every original character plays
-exactly as before. Once it is running, the character-select screen shows the mark
-`M23` in the bottom-right corner, which is how you can tell you
-are playing this and not the original.
+the Western release) and **Pyron**. They come from two sister games Capcom built on
+the same hardware. Nothing else is changed: every original character plays exactly
+as before. When it runs, the character-select screen shows the mark **`M23`** in
+the bottom-right corner, and the first screen reads **VAMPIRE SAVED**.
 
-**What you need before you start.** Three things, and the first one is the one we
-cannot help with:
+**This package contains NO ROM DATA and no copyrighted asset.** It carries a list of
+*differences* that turn the game files you already own into the modified game. By
+themselves they are not playable and contain nothing of Capcom's.
 
-1. **Your own copies of the original arcade game files.** These are the contents
-   of an arcade machine's chips, usually called *ROM sets* or *dumps*; they are
-   ordinary `.zip` files. **We cannot give them to you** — they are Capcom's
-   property, and this package deliberately contains none of them. You need
-   `vsavj.zip`, `vsav.zip` and `vsav2.zip`, unmodified, with exactly those names,
-   together in one folder. (A fourth, `qsound_hle.zip`, only for MAME — see
-   "One optional member" below.)
-2. **A way to run step 1 — and you almost certainly already have one.** Either
-   **a web browser** (double-click `apply_release.html`, in this folder: no
-   install, no terminal, and it works with the internet disconnected), or
-   **Python 3**, a free programming language macOS and Linux already include and
-   Windows offers in its store. Both produce exactly the same file. If you are
-   not sure which you want, use the browser.
-3. **Room and time**: about 60 MB of free disk space for the package and the
-   file you build, and ten minutes. The build briefly uses around 150 MB of
-   memory in Python, or around 300 MB in a browser tab — either way, less than
-   any machine made this century has.
+## Quick start
 
-**What you are going to do — three steps, in this order:**
-
-> **1. Build the game file.** One command turns *your* files into a new file,
-> `vsavjw.zip`. That file is the modified game.
-> **Double-click `apply_release.html`** and your browser does it, or run one
-> command with Python — whichever you prefer.
-> **2. Get the core** — the program that turns your MiSTer into the arcade board.
-> This package already contains it: `jtcps2w.rbf`, with the `.mra` files that
-> tell the MiSTer which files to load. **Jotego's ordinary CPS-2 core will not
-> run this game**; the reason is below.
-> **3. Put them together and play.** Copy the file and the core to your
-> MiSTer's SD card as `MISTER.md` describes, and start the game from the
-> MiSTer menu. There is no launcher to run on a MiSTer.
-
-**THIS PACKAGE CONTAINS NO ROM DATA AND NO COPYRIGHTED ASSET, EVER.** What it
-carries instead is a list of *differences* — "take these bytes from the file you
-already own, change these ones". Applied to your files they produce the modified
-game; by themselves they are not playable and contain nothing of Capcom's. Every
-byte produced is checked against an expected fingerprint before anything is
-written, so a wrong, renamed or damaged file is reported by name instead of being
-silently used.
-
-**Why the ordinary CPS-2 core will not work.** The three added characters need
-more storage than a real CPS-2 arcade board had, so this version runs on a
-slightly extended board. Jotego's own `jtcps2.rbf` knows only the original board.
-The core here, `jtcps2w.rbf`, is that core extended to the larger board, kept as
-a separate core so the ordinary one is untouched: stock Vampire Savior keeps
-running on `jtcps2.rbf` as before. `MISTER.md` says where each file goes and how
-to check the core you copied.
-
-## The deliverables — what to download, and what each is for
-Everything ships as ASSETS of the GitHub release on tag `freeze/merged-m23`:
-https://github.com/DefinitelyFrenchName/VampireSaved/releases/tag/freeze/merged-m23
-
-**TAKE EXACTLY ONE.** Every asset below is complete on its own: the README,
-the romset patch set, the applier, and ONE way to get the emulator or core.
-There is nothing to combine and nothing to download twice.
-
-| asset | what it is | who needs it |
-|---|---|---|
-| `merged-m23-fbneo-<os-arch>.zip` | the FBNeo package for that OS, **ready to play**: this README, the romset patch set + applier, and a prebuilt patched FBNeo with its `BINARY.txt` of sha256s. No build step, nothing to patch (available: linux-x86_64, macos-arm64, windows-x86_64) | FBNeo players on a listed OS |
-| `merged-m23-fbneo-recipe.zip` | the same FBNeo package for **any** OS, carrying the driver patch + build recipe (`EMULATOR.md`) instead of a binary: you build the emulator once | FBNeo players on any other OS, or anyone who prefers to build |
-| `merged-m23-mame-<os-arch>.zip` | the MAME package for that OS, ready to play: the same romset patch set + applier, and a prebuilt patched MAME (CPS-2 subtarget) with its `BINARY.txt` (available: linux-x86_64, macos-arm64, windows-x86_64) | MAME players on a listed OS |
-| `merged-m23-mame-recipe.zip` | the same MAME package for any OS, with the driver patch + `EMULATOR.md` instead of a binary | MAME players on any other OS, or anyone who prefers to build |
-| `merged-m23-mister.zip` | the MiSTer package: the same romset patch set + applier, the `jtcps2w.rbf` bitstream + its record (`BITSTREAM.txt`), the two `.mra` files, `MISTER.md` | MiSTer owners |
-| "Source code (zip / tar.gz)" | added by GitHub to every release: the whole project repository at the tag — development tooling, logs and all. **NOT needed to play**; nothing above requires it | nobody, unless you want to audit or rebuild the project |
-
-A prebuilt package deliberately carries NO emulator patch and no build
-recipe: your binary already contains them, and a patch you cannot use is a
-patch you might try to apply. If you want to read or rebuild what your binary
-contains, the `-recipe` package of the same platform is where the patch
-lives, and your `BINARY.txt` names its sha1.
-
-Every package rebuilds the SAME `vsavjw.zip` from your own dumps (the three
-copies of the patch set are byte-identical, and a gate asserts it).
-**You are reading the MiSTer package.** In order: build the romset (below),
-get the emulator or core ("Play on MiSTer" at the end), play.
-
-## What is in this package
-- `apply_release.html` — **step 1 in your browser.** Double-click it, choose your
-  `.zip` dumps, press the button, save the file it gives you. Nothing is
-  installed and nothing is uploaded: the page has no network code in it at all,
-  and it works with the internet switched off. Open it and read it if you like —
-  it is one plain file.
-- `apply_release.py` — step 1 on the command line instead. Needs Python 3 and
-  nothing else. It and the page produce the same romset, member for member, and
-  a test asserts that on every build.
-- `patches/` — 20 files of differences, one for each part of the game that
-  changed. Not readable, not playable, and no use without your own game files.
-- `manifest.json` — the list of expected fingerprints the applier checks
-  everything against. You never edit this.
-- this README, plus notes for your platform beside it
+1. **Build the game file** from your own dumps, without the QSound BIOS member: in
+   `apply_release.html` pick "Leave it out", or run the command with
+   `--no-qsound-bios` ("Build the romset" below).
+2. **Copy it and the core to your SD card** as "Play on MiSTer" below and `MISTER.md` say,
+   and start "Vampire Saved - CPS-2 WIDE" from the Arcade menu.
 
 ## What you need
-- **Python 3** (3.8 or newer). No other tool: the applier decodes the
-  patches itself.
-- **The reference dumps, unmodified, with these exact names** in one
-  directory: `vsavj.zip` (Vampire Savior, Japan 970519), `vsav.zip` (Europe
-  970519), `vsav2.zip` (Vampire Savior 2, Japan 970913) — and `qsound_hle.zip`
-  (the QSound BIOS set) UNLESS you pass `--no-qsound-bios`, for which see
-  "One optional member" below. Vampire Hunter 2 is
-  NOT needed (it is the project's verification oracle, not a source of
-  anything in the set). The applier checks every member's SHA-1
-  against the manifest before doing anything, so a wrong, renamed or
-  modified dump is reported by name, never silently patched over.
 
-## Build the romset
+1. **Your own copies of the original arcade game files** (*ROM sets*, or *dumps*:
+   ordinary `.zip` files). **We cannot give them to you**: they are Capcom's property.
+   Put them, unmodified and with exactly these names, together in one folder:
+   - `vsavj.zip` (Vampire Savior, Japan 970519)
+   - `vsav.zip` (Vampire Savior, Europe 970519)
+   - `vsav2.zip` (Vampire Savior 2, Japan 970913)
+   - not `qsound_hle.zip`: on MiSTer you build without it (see "The QSound program"
+     below), and the core takes that member from the `qsound.zip` your card already
+     holds for every CPS-2 game.
 
-"Romset" is just the name for the game file the emulator loads. There are two
-ways to make yours and they produce the same file; take whichever suits you.
+   Vampire Hunter 2 is not needed.
+2. **A web browser, or Python 3** (3.8 or newer) for step 1. Both build exactly the
+   same file. If you are not sure, use the browser.
+3. **About 60 MB of disk space and ten minutes.**
 
-### The easy way: your browser
+## Build the romset (step 1)
 
-**Double-click `apply_release.html`.** It opens as an ordinary web page. It lists
-the dump files it needs, you choose them (or drag them onto it), you press
-**Build**, and it hands you `vsavjw.zip` to save. It checks every byte against the
-same fingerprints the command below does, and refuses to give you anything at all
-if something does not match.
+The game file is `vsavjw.zip`. You build it from your own dumps, in one of two ways;
+both give the same file.
 
-It runs entirely inside your browser, on your machine. Your dumps are not
-uploaded — there is no code in that page capable of sending them anywhere, which
-you can check for yourself, and it works with the internet disconnected.
+**Option 1: In your browser.** Double-click `apply_release.html`. Choose your dump files (or
+drag them onto the page), press **Build**, and save the `vsavjw.zip` it gives you
+anywhere you like; it goes on the SD card in step 2 ("Play on MiSTer"). The page runs entirely on your machine: it has no network code, your
+dumps are not uploaded, and it works with the internet disconnected. If your browser
+is too old, it says so; then use the command below.
 
-*If your browser is too old it will say so plainly, in which case use the command
-line below.*
+**Option 2: With Python.** Open a terminal in this folder and run, with the folder that holds
+your dumps in place of `/path/to/your/dumps`:
 
-### The other way: one command
+    python3 apply_release.py --romdir /path/to/your/dumps --out ./rompath --no-qsound-bios
 
-To do the same thing with Python,
-open a terminal, go to this folder, and run the line below — replacing
-`/path/to/your/dumps` with the folder that holds your `vsavj.zip`, `vsav.zip`
-and `vsav2.zip`:
+On Windows, type `py` instead of `python3`. To open a terminal in this folder on
+macOS: open **Terminal** (Applications > Utilities), type `cd ` with the space, drag
+this folder onto the window, and press Return. It prints a line per step and ends
+with `OK:`.
 
-    python3 apply_release.py --romdir /path/to/your/dumps --out ./rompath
+Either way, every byte is checked against this release's fingerprints before
+anything is written. A wrong, renamed or damaged dump is named, and nothing is
+written.
 
-If you have never used a terminal: on macOS open **Terminal** from
-Applications > Utilities, type `cd ` (with the space), drag this folder onto the
-window, and press Return — you are now "in" this folder. On Windows use
-**PowerShell** the same way, and type `py` where the line says `python3`. It
-prints a line per step and finishes with `OK:`.
+## Play on MiSTer (step 2)
 
-`./rompath/` then holds `vsavjw.zip`, and that is **the only file you place** —
-it is a STANDALONE set: every member the emulator asks for is inside it,
-including the ones normally resolved from the parent `vsav.zip` and MAME's
-QSound BIOS, each copied pristine from your own dumps and SHA-1 verified. You
-do not put `vsav.zip`, `vsavj.zip` or `qsound_hle.zip` in the emulator's rom
-directory. The applier refuses to write if any member's SHA-1 does not match
-the manifest. One member is optional — see below if you are on MiSTer.
+1. Copy `jtcps2w.rbf` to `_Arcade/cores/` and the two `.mra` files to `_Arcade/`.
+   Check the core's sha256 against `BITSTREAM.txt` after copying.
+2. Put the `vsavjw.zip` you built (without the QSound program) in `games/mame/`.
+   The core also reads `dl-1425.bin` from the `qsound.zip` your card already has there
+   for every CPS-2 game.
+3. Start "Vampire Saved - CPS-2 WIDE" from the Arcade menu.
 
-## Play on MiSTer
-1. Copy `jtcps2w.rbf` to `_Arcade/cores/` and the two `.mra` files to
-   `_Arcade/` (verify the bitstream's sha256 against `BITSTREAM.txt` first).
-2. Put `vsavjw.zip` (from the applier), your pristine `vsav.zip` and
-   `vsavj.zip`, and `qsound.zip` in `games/mame/`.
-3. Launch "Vampire Saved - CPS-2 WIDE" from the Arcade menu. `MISTER.md` has
-   the card layout and what the [STOCK CONTROL] entry is for.
+`MISTER.md` has the full card layout: the `[STOCK CONTROL]` entry, what it needs
+(your pristine `vsavj.zip` and `vsav.zip`), and why the ordinary `jtcps2.rbf` keeps
+running stock Vampire Savior beside this one.
 
-## One optional member — the sound chip's own program
+## The QSound program — the one choice in the build
 
-The arcade board's sound hardware had a small program of its own, in a file
-called `dl-1425.bin`. It is the only part of the set you get a choice about,
-because different emulators want it in different places.
+The arcade board's sound chip had a small program of its own, `dl-1425.bin`, which
+comes from `qsound_hle.zip`.
 
-- **Keep it (the default).** The romset is then self-sufficient on every
-  emulator, MAME included. You need `qsound_hle.zip` among your dumps.
-- **Leave it out:** in the browser page, pick "Leave it out" in step 3; on the
-  command line, `python3 apply_release.py --romdir … --out … --no-qsound-bios`.
-  You then do not need `qsound_hle.zip` at all.
-  - **On MiSTer this is the one to pick.** Any CPS emulation on MiSTer already
-    requires your own `qsound.zip` in the `games/mame` folder, so there is no
-    reason to put a second copy inside the Vampire Saved romset. (Measured
-    2026-09-20: all 31 parts still resolve — 30 from `vsavjw.zip` and the sound
-    program from that `qsound.zip`.)
-  - **FBNeo** runs the smaller set identically: its descriptor does not list the
-    member; zero `(not found)`, same RAM and same framebuffer over 12,120 frames.
-  - **MAME refuses the smaller set** (`dl-1425.bin - NOT FOUND`), so keep the
-    member if MAME is your emulator.
+- **Keep it (the default).** You need `qsound_hle.zip` among your dumps, and the game
+  file then runs on every emulator. **MAME needs it**: it refuses the game file
+  without it (`dl-1425.bin - NOT FOUND`).
+- **Leave it out:** pick "Leave it out" in the browser page, or add
+  `--no-qsound-bios` to the command. You then do not need `qsound_hle.zip`.
+  **This is the choice for MiSTer**, where every CPS-2 game already needs your own
+  `qsound.zip` in `games/mame/` and the core reads the program from there. FBNeo
+  runs either file the same.
 
-Either way the applier prints the set key it wrote and checks it against this
-release's own declaration, so you can tell at a glance which variant you hold —
-and netplay peers must hold the same one.
+The build prints the key of the file it wrote; "Identify the build" lists both.
 
-## Identify the build
-- In game: the mark `M23` at the bottom-right of the
-  character-select screen, and the boot name screen reads VAMPIRE SAVED.
-- On disk: whole-set key `67f12ab3` — the set the applier writes by default
-  (`6e0f9030` with `--no-qsound-bios`), which `manifest.json` carries as
-  `applied_set_key` / `applied_set_key_no_qsound_bios` with every member's SHA-1.
-  (The build this was packaged from is `f601342d`; they differ by the standalone
-  completion above, which is pristine content from your dumps.)
+## Report a problem
+
+Open an issue at https://github.com/DefinitelyFrenchName/VampireSaved/issues and say which package you used (`merged-m23-mister…`) and the
+mark on the select screen (`M23`). If you can make it happen again, a **recording**
+helps most: the project replays it frame for frame. Recordings are made with MAME, so
+take the `merged-m23-mame-<os-arch>.zip` package (it builds the same `vsavjw.zip`) and
+follow "Report a problem — and record it" in its README.
 
 ## If it does not work
-Almost every first-time problem is one of these.
 
-- **The game is not in the MiSTer menu, or the MiSTer reports a missing file** —
-  one of the files is not where the MiSTer looks. `MISTER.md` lists each place:
-  the `.mra` files in `_Arcade/`, `jtcps2w.rbf` in `_Arcade/cores/`, and the
-  game files in `games/mame/`.
-- **"reference dumps do not match the manifest"** — one of your original game
-  files is not the exact version expected: a different region, a different
-  revision, or altered at some point. The message names the file and the part of
-  it that differs. Nothing is written when this happens.
-- **The game runs but a character looks wrong, or the sound is missing** — almost
-  always a game file that is the right size but the wrong contents. Re-run the
-  build command; it checks every part and will say which one.
+- **The game is not in the Arcade menu, or the MiSTer reports a missing file** — a
+  file is not where the MiSTer looks. "Play on MiSTer" and `MISTER.md` list each place.
+- **"reference dumps do not match the manifest"** — one of your dumps is not the
+  exact version expected: another region, another revision, or modified. The message
+  names the file. Nothing is written.
+- **A character looks wrong, or the sound is missing** — almost always a dump of the
+  right size with the wrong contents. Build the game file again: the check names the
+  part.
 
-## What is patched — for the curious, not needed to play
+## Identify the build
+
+- In the game: the mark `M23` at the bottom-right of the character-select screen.
+- On disk: the game file's key is `67f12ab3` (`6e0f9030` built with
+  `--no-qsound-bios`). `manifest.json` carries both, with every part's SHA-1.
+  (The build this was packaged from is `f601342d`: the difference is the parts copied in
+  from your own dumps.)
+
+## What is in this package
+
+- `apply_release.html` — step 1 in a browser. One plain file you can read.
+- `apply_release.py` — step 1 with Python. A test checks on every build that it and
+  the page produce the same file.
+- `patches/` — 20 difference files, one per changed part of the game. Useless
+  without your own dumps.
+- `manifest.json` — the fingerprints everything is checked against.
+- `jtcps2w.rbf`, `BITSTREAM.txt`, the two `.mra` files and `MISTER.md` — the core, its
+  record, the menu entries, and where each file goes on the SD card.
+
+**Why an ordinary CPS-2 core will not work.** The three added characters need more
+storage than a real CPS-2 board had, so this version runs on a slightly extended
+board. Jotego's own `jtcps2.rbf` knows only the original board. `jtcps2w.rbf` is that core
+extended to the larger board, kept as a separate core so the ordinary one is
+untouched.
+
+## What is patched — for the curious
+
 The finished `vsavjw.zip` has 20 parts rebuilt from the differences in
-`patches/` and 12 copied across from your own files untouched. Of those
-copies, 7 are there so the result needs no other file beside it:
-dl-1425.bin <- qsound_hle.zip (optional), vm3.11m <- vsav.zip, vm3.12m <- vsav.zip, vm3.14m <- vsav.zip, vm3.16m <- vsav.zip, vm3.18m <- vsav.zip, vm3.20m <- vsav.zip.
+`patches/` and 12 copied untouched from your own dumps; 7 of those copies
+are there so the file needs nothing beside it: `dl-1425.bin` from `qsound_hle.zip` (the optional one), and `vm3.11m`, `vm3.12m`, `vm3.14m`, `vm3.16m`, `vm3.18m`, `vm3.20m` from `vsav.zip`.
 
-The difference files describe only what this project itself wrote — relocated
-program code, data tables, the version lettering. Anything that came from the
-original games is expressed as "copy it from the player's own file" rather than
-included, which is what keeps this package free of Capcom's content. Before any
-release is published, an automated check scans every difference file for runs of
-original game data and refuses to ship if it finds any.
+The difference files hold only what this project wrote: relocated program code, data
+tables, the version lettering. Anything from the original games is "copy it from the
+player's own file". Before a release is published, an automated check scans every
+difference file for runs of original game data and refuses to ship if it finds any.

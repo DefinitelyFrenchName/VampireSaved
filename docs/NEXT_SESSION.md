@@ -53,10 +53,9 @@ the maintainer approves it before anything is deleted.
    - Closed by the release: #266 (`audit_release_linux_desktop` PASSING on PILOT; ask the maintainer to be logged in to
      PILOT's desktop first), #284 (the new READMEs, `test_readme_recording`'s Windows and Linux legs). #278 is measured,
      open (its comment of 14z-207). #297 closes once a freeze has run its 109 moved gates green.
-2. **#229 — WAITING ON THE MAINTAINER** (STATE 14z-208 (6)): Q1 (F4's identity on the 18-tile sheets), Q4 ((a) join under
-   the engine's input with the difference on the page, or (b) leave unjoined), Q7 (three side findings: the
-   `tools/anim_nodes.py` sign bug, `tests/expected/ground_throws.tsv` holding per-move data in the clear, MAME write taps
-   exiting 139; a ticket each suggested), and whether to comment on #301. Q2 and Q5 are ruled and applied.
+2. **#229 — WAITING ON THE MAINTAINER'S F4 LOOK** (STATE 14z-208 (6), 14z-208b (1)): Q1 on F4's 18-tile command-throw
+   sheets, *"needs more time on my end but apparently it seems we have gaps/wrong moves"* (2026-10-24); ask which tiles.
+   Q2, Q4 (a), Q5 and Q7 are ruled; Q7's findings are #318, #319, #320.
    - **The work is LOCAL and UNTRACKED:** the six gates, their expectations, rigs and Lua (105 files,
      `build/agent205/t229/pending_gates_229.list`, backed up in `pending_gates_229.tar` beside it). Never `git clean`.
    - **The guard-cancel expectation** with dealt legs is ready beside the frozen one (`build/agent208/X2/new/`, hash
@@ -66,7 +65,7 @@ the maintainer approves it before anything is deleted.
 3. **Then ask the maintainer for the order of work.** Open tickets by GitHub severity label:
    - medium: #284 (done, unshipped);
    - low: #118, #229, #244, #305, #306, #310, #311 (and #129 and #301, parked);
-   - no severity label: #266, #278 (release-only), #297, #302, #316;
+   - no severity label: #266, #278 (release-only), #297, #302, #316, #318, #319, #320;
    - parked: #121, #123, #124, #125, #127, #128, #162, #267, #294.
 4. **`tests/replays/118_chain.rpl`'s header names a leg of `audit_mizuumi_inputs` that gate never ran** (STATE_HISTORY
    14z-198 finding (i)); the one-line correction rides a session that runs the emulator gates following `tests/replays/`.

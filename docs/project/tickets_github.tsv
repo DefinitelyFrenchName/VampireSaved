@@ -2,8 +2,11 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 317
+# issues: 320
 number	state	reason	closed	labels	title
+320	OPEN	-	-	bug,test-integrity	MAME write taps exit 139 at teardown after every output is written; gates accept it only with full output
+319	OPEN	-	-	bug	tests/expected/ground_throws.tsv holds per-move signatures in the clear (the 14z-126 frame-data ruling)
+318	OPEN	-	-	bug,correctness	tools/anim_nodes.py reads the animation tables' offsets unsigned; the game sign-extends them (negative entries on 11 characters)
 317	CLOSED	COMPLETED	2026-10-24	evolution	Snapshot tiers: measure the remaining setup, re-snapshot incrementally after a red, base the re-run on the red run
 316	OPEN	-	-	evolution	Release reuses the freeze's tier results when it builds from the freeze's exact tree
 315	CLOSED	COMPLETED	2026-10-24	evolution,test-integrity	#312's concurrent-controls list is a snapshot: nothing re-checks that a listed gate still writes as it was traced
