@@ -38,6 +38,28 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
+## Session 14z-208 — **#298 closed done on the 14z-207 close tier, `test_static_runner`'s controls counted apart (ruled).** Opened 2026-10-24 after the 14z-207 close (`c624ee13`, pushed).
+
+### opened with
+HANDOFF, STATE and NEXT_SESSION read; the sweep CLEAN, `main` equal to `origin/main` at `c624ee13`. The maintainer, on the
+opener's #298 item: *"agreed. From what I see there is already substantial time gained too."*
+
+### (1) #298 CLOSED DONE
+A measurer (`build/agent208/t298/`, local) read the 14z-207 close tier (`build/agent207/close/`, its `--prev` the 14z-206
+close's run): 161 controls executed, all HONOURED, 3,941 s; `test_static_runner` 23 of them, 3,172 s, re-run with every
+control as a gate absent from the 14z-206 run; the other 25 gates 138 controls, 769 s, against 1,500-1,800 s before the
+rule; the seconds are not load-normalised (the controls ran in #312's pools, the portable tier's 7.1 of 8 slots busy,
+the static tier's 3.1; one control 48 s there against 18 s at 14z-205), so the count executed is the load-free figure.
+Of the five closes from 14z-205 on, only 14z-207's recorded tier is based on the previous close's run (14z-205's on its own
+tier 2, 14z-205b's and 14z-205c's on their own earlier passes, 11 and 19 controls); the 14z-206 close records no figure under the rule (its tier of record ran without `--confirm`, #313, and its
+`--confirm` run kept a controls file byte-identical to that run's). #298's 14z-205 comment had
+asked for a close that does not touch the runner; asked, the maintainer: *"Close now, runner apart (Recommended)"*
+(DECISIONS_HISTORY.md). The tier's 832 s wall is #312's pool, not #298. `docs/project/must_fire_contract.md` still said a
+`--confirm` close executes every control of every re-run gate (stale since #286 (c)); corrected, with the figures.
+Rule-checker runs 2026-10-24-1244 to -1247 VIOLATED and resolved (the closes' bases described on different terms; the
+seconds' load; the two pools and a 'first close' wording; the 14z-205b and 14z-205c closes, measured and named), run -1248
+OK. **#298 closed done.**
+
 ## Session 14z-207 — **PILOT and ERIS online, the work run in parallel lanes: #291 closed done (the span retrofit, the fighters check on round intros, the full sheet run reviewed); #308 and #313 closed done; #286 measured, then closed done; #304 analysed and its four recommendations adopted; #314 filed and closed done; #303, #279, #280 and #281 closed done (lanes P and P2 on PILOT); #312 and #315 closed done (lane S on ERIS, fork T on PILOT).** Opened 2026-10-23 on transcript `e552692b` after the 14z-206 close (`c494fac2`, pushed).
 
 ### opened with

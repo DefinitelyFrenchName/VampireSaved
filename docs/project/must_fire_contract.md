@@ -118,13 +118,37 @@ commit adds or changes; the session close ran the default `all` until #269 (belo
 condition, the cost and the revisit clause: `DECISIONS_HISTORY.md` "Ruled
 2026-09-14 (14z-154)". **Since #269 (14z-200; ruled 2026-10-12, the tier
 turned around)** the session close runs `--strict --confirm <the previous
-close's results.tsv>`: every control of every gate it RE-RUNS is executed —
-the gates whose followed paths changed (`tools/static_confirm.py`), the
-`# CONFIRM: always` core, any gate not PASS in the base, and any gate whose
-controls the base did not execute — while a CARRIED gate keeps the control
-counts of the run it is carried from. A freeze and a release still run every
+close's results.tsv>`: it RE-RUNS the gates whose followed paths changed
+(`tools/static_confirm.py`), the `# CONFIRM: always` core, any gate absent from
+the base or not PASS there, and any gate whose controls the base did not
+execute, while a CARRIED gate keeps the control counts of the run it is carried
+from. **Since #286 (c) and #298 (14z-202, narrowed 14z-205; ruled 2026-10-15 and
+2026-10-18)** a re-run gate EXECUTES its controls only when it is absent from the
+base, not PASS there, its base controls were not all executed, or a PROGRAM of
+its reach changed (R1: its script, a library it sources, a runner or tool it
+calls, a module it imports); re-run for a data change alone, it carries them.
+Measured (#298) on the five closes from 14z-205 to 14z-207, whose recorded
+tiers differ by base: 14z-205's is based on that sitting's own tier 2, 14z-205b's
+and 14z-205c's on their own earlier passes (11 controls in 180 s; 19 in 71 s;
+the earlier passes kept no controls file), 14z-206's on its own whole tier,
+and 14z-207's, the only one, on the previous close's run. The 14z-205 close
+executed 143 controls in 1,448 s and the 14z-207 close 161 in 3,941 s, against
+1,500-1,800 s of controls at a close before the rule; in both `test_static_runner` re-ran with every
+control, the runner's own cost (871 s over 14; 3,172 s over 23, the gate absent
+from the 14z-206 base), and without it 129 controls in 577 s and 138 in 769 s
+(`build/agent205/close/`, `build/agent207/close/tier_results.controls.tsv`,
+local). The 14z-206 close records no figure under the rule: its tier of record
+was the whole tier without `--confirm` (#313), and the `--confirm` run based on
+it kept a controls file byte-identical to that run's. Control SECONDS are not
+load-normalised: the 14z-207 controls ran in #312's pools, the portable tier's
+with 7.1 of 8 slots busy on average and the static tier's with 3.1, and one
+portable-tier control (`test_emulator_staleness` `keys-ignored`) took 48 s there
+against 18 s at 14z-205; the load-free figure is the COUNT executed (161, 214
+carried). The 14z-207 tier's wall, 832 s against those 3,941 s, is #312's pool,
+which runs controls as jobs of their own. A freeze and a release still run every
 gate and every control (`--confirm` is refused at their cadence). Ground
-truth: `tests/test_static_runner.sh` sections 18-21.
+truth: `tests/test_static_runner.sh` sections 18-23 (22-23 the controls rule,
+controls `controls-always` and `controls-never`).
 
 `tests/run_all_emulator.sh` reads every block on every run and executes the
 controls only under `--controls` (one more run per declared name; its rows are

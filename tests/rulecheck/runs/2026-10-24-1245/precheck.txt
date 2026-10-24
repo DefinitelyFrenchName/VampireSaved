@@ -1,0 +1,4 @@
+  FLAG ATTRIB: #298 can close done (build/agent208/t298/closing_298.md; docs/project/tickets.tsv line 91): its body's done-when (build/agent208/t298/issue298_body.md) — a c...
+  FLAG D-ABSOLUTE: - **Executed:** 161 controls, all 161 HONOURED, in 3,941 s of control time.  [build/agent208/t298/closing_298.md]
+  FLAG D-ABSOLUTE: **Not measured:** why each of the other 25 gates executed its controls, gate by gate (the runner's plan decided; its log names a gate's re-run reason, not it...  [build/agent208/t298/closing_298.md]
+packet_check: 3 flag(s): ATTRIB 1, D-ABSOLUTE 2

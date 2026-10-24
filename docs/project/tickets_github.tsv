@@ -21,7 +21,7 @@ number	state	reason	closed	labels	title
 301	OPEN	-	-	evolution,severity: low	Community cross-check: create report of the #229 workbook differences for the community, and check the open questions against vswiki
 300	CLOSED	COMPLETED	2026-10-19	bug,test-integrity	test_close_tools REFUSED on the live tree: section 2b reads the findings table #288 cut from the close
 299	CLOSED	COMPLETED	2026-10-22	evolution,performance	Static tier: run gates in parallel (--jobs, ~70-80% of the machine), proven equal to a serial run first
-298	OPEN	-	-	evolution,performance	Static tier scope: at a commit/close, execute a gate's controls only when a program of its reach changed (R1); all at freeze/release
+298	CLOSED	COMPLETED	2026-10-24	evolution,performance	Static tier scope: at a commit/close, execute a gate's controls only when a program of its reach changed (R1); all at freeze/release
 297	OPEN	-	-	evolution,performance	Static tier scope: six families (109 gates) to freeze cadence, triggered by their own code (@code)
 296	CLOSED	COMPLETED	2026-10-22	evolution,severity: medium,test-integrity	run_mame.sh: refuse a run whose MAME_SANDBOX already holds an earlier run's state (#293's class, at run time)
 295	CLOSED	COMPLETED	2026-10-19	evolution,severity: medium,test-integrity	audit_dmg_legacy_sweep never runs Demitri's legacy hits on our build: add an exact vsavj-vs-ours leg (superset coverage)

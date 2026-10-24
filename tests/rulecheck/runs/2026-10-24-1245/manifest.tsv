@@ -1,0 +1,17 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent208/t298/issue298.md	70998013d83483b4543698fb6723af73a3c3cb22
+build/agent208/t298/issue298_body.md	8f97406db548ba7c334a5255d0527a1dca2878c2
+build/agent208/t298/closing_298.md	ee655c305e44f6bea5819b44b030955650bfdcaa
+docs/project/tickets.tsv.lines-91-91 (lines 91-91 of docs/project/tickets.tsv)	dffb617c4465f6039b72cc38614ee657976e9853
+build/agent208/t298/measure.txt	f45c375a8d1c2290cf81b2b5c01f45c9910929a0
+build/agent208/t298/runner_absent_206.txt	3c69dec83f83918043ce0aad382b4be66c921478
+build/agent207/close/tier_results.controls.tsv	830aa4d22c4a3188417f6f900c71997614bcc4f6
+build/agent207/close/close_params.tsv	26427104e3d8f5cc452942ffe53c6c3e8fb6f6d4
+build/snapshot_runs/20261024T104527-5d32ece0fbe5/runner.log	46ff449d53a3a0fd00df1ec92890b6deaf6335ee
+build/agent205/close/tier_results.controls.tsv	a6ba486624d5df5118b4b4131cfeb49f65b7be1e
+build/agent205/close/close_params.tsv	278f564457b0f16697bc21f8819cb45a6bb0525d
+tools/static_confirm.py.lines-144-158 (lines 144-158 of tools/static_confirm.py)	efd2e00df51f35488119e0cac907717a6dd3eec3
+docs/project/must_fire_contract.md.lines-114-145 (lines 114-145 of docs/project/must_fire_contract.md)	2d8fe196dcee17e94088b6ec6eb9f9498f415877
+build/agent208/t298/must_fire.diff	bfb87e9a261e833143b30d3fc27cc35733f70e74
+DECISIONS_HISTORY.md.lines-7874-7883 (lines 7874-7883 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-24 (14z-208) — #298 closed on the 14z-207 close tier, `test_static_runner`'s contro")	892d5f4444f086b871a2efd6aee7a3d8abf8c73d
+STATE_HISTORY.md.lines-700-881 (lines 700-881 of STATE_HISTORY.md: its INDEX entry "## Session 14z-206 — **PILOT and ERIS offline: the Mac carries the work in parallel. #299's cold cac")	9626ea4254ffbfc6df404bb85426103774d5f8c0

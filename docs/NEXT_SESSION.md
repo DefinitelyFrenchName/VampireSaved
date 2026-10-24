@@ -38,9 +38,6 @@ changed since its trace ("re-trace it or take it off the list"). The re-trace is
    situation"* (2026-10-23). The release-only tickets #279, #280, #281 closed done 14z-207 (kept closed, ruled
    2026-10-24); #278 is measured but open (its comment of 14z-207). The freeze runs every gate with every control and,
    since #315, re-runs the controls' write trace (HANDOFF.md, before the tags). Ask the maintainer when.
-2. **#298 — close it on this close's figures** (rule-checker run first): the 14z-207 close's tier is the first close tier
-   with #298's narrowing and #312's pool; its time line is in STATE 14z-207's CLOSE section, against 1,500-1,800 s of
-   controls per close before.
 3. **#304 item 2 (severity high)** — the snapshot without scratch: fork J found emulator-tier audits reading scratch-named
    directories (`audit_chains174` reads `build/agent185`), which item 2 must reclass first (STATE 14z-207 (4)).
 4. **#229 — WAITING ON THE MAINTAINER, Q2 especially** (*"I still have answers to provide for Q2 especially"*,
@@ -60,7 +57,7 @@ changed since its trace ("re-trace it or take it off the list"). The re-trace is
    - high: #304;
    - medium: #284;
    - low: #118, #229, #244, #301, #305, #306, #310, #311 (and #129, parked);
-   - no severity label: #266, #278 (release-only), #289, #297, #298, #302, #307;
+   - no severity label: #266, #278 (release-only), #289, #297, #302, #307;
    - parked: #121, #123, #124, #125, #127, #128, #162, #170, #267, #294.
 8. **`tests/replays/118_chain.rpl`'s header names a leg of `audit_mizuumi_inputs` that gate never ran** (STATE_HISTORY
    14z-198 finding (i)); the one-line correction rides a session that runs the emulator gates following `tests/replays/`.
