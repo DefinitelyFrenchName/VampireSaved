@@ -63,9 +63,9 @@ awk '{ l=$0; sub(/#.*/,"",l)
        if (match(l, /^[ \t]*[0-9]+/)) { n=int(substr(l,RSTART,RLENGTH)); if (n<=400) print }
        else print }' tests/replays/11_pick_donovan.rpl > "$T/short.rpl"
 
-run() { # run <tag> <mask>
+run() { # run <tag> <mask> — each run its own sandbox inside the trapped T (#303)
     MASK_RANGES="$2" MAME_ROMPATH="$RP" \
-      tools/run_replay_mame.sh vsavjw "$T/short.rpl" "$T/$1.log" \
+      tools/run_replay_mame.sh vsavjw "$T/short.rpl" "$T/$1.log" "$(mktemp -d "$T/sb.XXXXXX")" \
       > "$T/$1.out" 2>&1 && return 0 || return $?
 }
 

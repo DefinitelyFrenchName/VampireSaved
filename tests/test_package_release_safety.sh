@@ -23,7 +23,8 @@ W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 rc=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; rc=1; }
 
 mkdir -p "$W/bin" "$W/romdir" "$W/rompath" "$W/badpath" "$W/empty"
-printf '#!/bin/sh\nfor a in "$@"; do last="$a"; done\nprintf "stub patch" > "$last"\n' > "$W/bin/xdelta3"
+# the stub answers -V as the version tools/package_release.py requires (#279), or the packager refuses it first
+printf '#!/bin/sh\n[ "$1" = -V ] && { echo "Xdelta version 3.2.0 (stub)" >&2; exit 0; }\nfor a in "$@"; do last="$a"; done\nprintf "stub patch" > "$last"\n' > "$W/bin/xdelta3"
 chmod +x "$W/bin/xdelta3"
 python3 - "$W" <<'PY'
 import os, sys, zipfile

@@ -347,9 +347,15 @@ unpin_copy() {   # $1 = destination: apply_release.py without its create_system 
 }
 as_windows() {   # $1 = applier, $2 = out dir: run it with sys.platform = "win32" (what ZipInfo reads)
     python3 - "$1" --romdir "$ROMDIR" --out "$2" --manifest "$REL/manifest.json" <<'PY'
-import runpy, sys
-sys.platform = "win32"
+import ast, importlib, runpy, sys
 path = sys.argv[1]
+# #280: import every module the applier imports BEFORE faking the platform. Python 3.12's shutil decides at IMPORT
+# time to `import _winapi` when sys.platform is win32, which a Linux python lacks; ZipInfo, the one reader this
+# section is about, reads sys.platform at CALL time, so it still sees win32.
+for n in ast.walk(ast.parse(open(path, encoding="utf-8").read())):
+    for m in ([a.name for a in n.names] if isinstance(n, ast.Import) else [n.module] if isinstance(n, ast.ImportFrom) and n.module and not n.level else []):
+        importlib.import_module(m)
+sys.platform = "win32"
 sys.argv = [path] + sys.argv[2:]
 runpy.run_path(path, run_name="__main__")
 PY

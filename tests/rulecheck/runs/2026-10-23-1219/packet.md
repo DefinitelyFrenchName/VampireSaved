@@ -1,0 +1,21 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: #286 closed done (14z-207), after runs 2026-10-23-1215, -1216 and -1218
+Claim (the working agent's sentence): #286 can close done (closing_comment.md), after runs 2026-10-23-1215, -1216 and -1218: its done-when (issue286.md) is measured on the Mac: the record-only probe f3445a70, one phrase changed in each of STATE.md, DECISIONS_HISTORY.md and docs/NEXT_SESSION.md on top of the second commit bbeedfed, ran a strict --confirm tier on that commit's GREEN base (the run of commit object a8be81ee, whose tree equals bbeedfed's: PASS 109, GREEN; its planner, bbeedfed's tools/static_confirm.py, carries N-K and equals fork R's scored predictor 04e8324b byte for byte; record_only_tier/base_and_planner.txt): GREEN, PASS 93, 3 changed paths, 45 of 231 gates STALE, 30 re-run (28 STALE and the 2 '# CONFIRM: always' core gates), 63 carried, controls executed 0 and carried 345 (record_only_tier/summary.txt, record_only_tier/tier.log). Every gate fork R's ERIS trace shows opening a record file, plus test_session_metrics, which lane F's PILOT trace lists as an opener (F_REPORT.md), is followed through the tier: 11 re-ran, 5 were deferred by cadence, none was carried (record_only_tier/openers_fate.txt). Of the 30 re-runs, 11 open a record file and 19 open none (record_only_tier/reruns_vs_opens.txt, test_session_metrics counted as an opener): the 2 core gates re-run by #269's ruling (ruling_269_core.txt) and 17 fall in the classes the maintainer accepted as precision cost (ruling_286.txt: "(c) Accept as precision cost", put on fork R's predicted set), so the re-run clause stands as ruled, not as written. The controls clause holds as #298 rules it, the maintainer having confirmed its middle option as the rule as built (ruling_298_confirmed.txt: "Yes, that's it"): controls execute at a commit or close only on a changed program, a data-file change carries them; test_static_runner's section 22 on the main tree holds both halves, a changed script executing its control and the shadows controls-never and controls-always firing (static_runner_section22.log, a run that failed overall only because tests/test_host_text_opens.sh then lacked its execute bit, fixed before the first commit; the gate PASSes in the GREEN base run, base_and_planner.txt). N-K is fork R's (REPORT.md; its trace 0 misses over 94,317 reads, the over-narrowed control 90, eris/trace_all.log). The before/after figures go on the ticket: 135 re-run and 1,543 s of controls at c81dc932, the 14z-201 final tier, on its own change set of STATE.md and 35 rule-checker run files (issue286.md); 45 re-run with 0 controls executed on PILOT after #313, on a base that was not green, 4 of the 45 re-run as base reds (F_REPORT.md); 30 now. Not tested: the opener classes come from traces taken at earlier commits (ERIS at 93ecfae3 with 15 gates non-zero under it for host reasons, REPORT.md; PILOT at 1a2210f6, F_REPORT.md), and they disagree on one gate; a trace sees file opens only, so a read through git counts as opening none; the open-none classes rest on fork R's reading, not a per-gate code read here; of the plan's 45 STALE, 28 re-ran and the rest are not each itemised with their STALE reason in the tier's log (4 deferred lines name one); the runner's carry line says "no path in the gate's reach changed" for a data change, wording that does not say "program", not changed here.
+Artifacts (read every one, in full):
+  - build/agent207/R/closing_comment.md
+  - build/agent207/R/issue286.md
+  - build/agent207/R/record_only_tier/summary.txt
+  - build/agent207/R/record_only_tier/tier.log
+  - build/agent207/R/record_only_tier/base_and_planner.txt
+  - build/agent207/R/record_only_tier/reruns_vs_opens.txt
+  - build/agent207/R/record_only_tier/openers_fate.txt
+  - build/agent207/R/ruling_286.txt
+  - build/agent207/R/ruling_269_core.txt
+  - build/agent207/R/ruling_298.txt
+  - build/agent207/R/ruling_298_confirmed.txt
+  - build/agent207/R/static_runner_section22.log
+  - build/agent207/R/REPORT.md
+  - build/agent207/R/eris/trace_all.log
+  - build/agent207/R/F_REPORT.md

@@ -1,0 +1,4 @@
+  FLAG QUOTE: A record-only commit's --confirm tier is measured and re-runs only gates that open a record file, executing controls only for gates whose real inputs changed...
+  FLAG D-ABSOLUTE: - **controls executed: 0**, 345 carried — the controls clause holds as #298 ruled it (2026-10-18: at a commit or a close, a stale gate's controls execute onl...  [build/agent207/R/closing_comment.md]
+  FLAG D-ABSOLUTE: **Which re-run gates open a record file** (each crossed with fork R's ERIS trace of all 231 gates): 10 of the 30.  [build/agent207/R/closing_comment.md]
+packet_check: 3 flag(s): D-ABSOLUTE 2, QUOTE 1

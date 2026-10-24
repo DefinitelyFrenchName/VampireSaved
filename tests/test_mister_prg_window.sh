@@ -205,7 +205,7 @@ elif [ -f "$EXPECT" ]; then
     EP="$(mktemp)"; sed '1s/./X/' "$EW" > "$EP"
     if cmp -s "$EW" "$EP"; then echo "CONTROL DEAD: frozen-pair-moved — a perturbed copy of the frozen pair is identical to it"
     else vs_ctl_fired frozen-pair-moved "a perturbed copy of the frozen pair differs from it, so the pair compare catches a move (the mode compares the measured pair against such a copy)"; fi
-    rm -f "$EW" "$EP"
+    rm -f "$EW" "$EP" "${EWM:-}"   # #303: the mode's copy too
 else
     bad "no frozen expectation at $EXPECT — run once with --freeze"
 fi

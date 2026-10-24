@@ -150,8 +150,9 @@ for rpl in "$REPO"/tests/replays/*.rpl; do
     fi
     RUNMASK=""
     [ -f "$EXPDIR/$name.masked" ] && RUNMASK="$MASK"
-    MASK_RANGES="$RUNMASK" "$REPO/tools/run_replay_mame.sh" "$SET" "$rpl" "$WORK/$name.1.log" || { echo "RUN-FAIL"; fail=1; continue; }
-    MASK_RANGES="$RUNMASK" "$REPO/tools/run_replay_mame.sh" "$SET" "$rpl" "$WORK/$name.2.log" || { echo "RUN-FAIL"; fail=1; continue; }
+    # each run its own sandbox inside the trapped WORK (#303: the runner's default sandbox outlives the suite)
+    MASK_RANGES="$RUNMASK" "$REPO/tools/run_replay_mame.sh" "$SET" "$rpl" "$WORK/$name.1.log" "$WORK/$name.1.sb" || { echo "RUN-FAIL"; fail=1; continue; }
+    MASK_RANGES="$RUNMASK" "$REPO/tools/run_replay_mame.sh" "$SET" "$rpl" "$WORK/$name.2.log" "$WORK/$name.2.sb" || { echo "RUN-FAIL"; fail=1; continue; }
     if ! cmp -s "$WORK/$name.1.log" "$WORK/$name.2.log"; then
         echo "NONDETERMINISTIC (first divergent frame below)"
         diff "$WORK/$name.1.log" "$WORK/$name.2.log" | head -3

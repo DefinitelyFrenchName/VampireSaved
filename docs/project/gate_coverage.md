@@ -13,11 +13,11 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**468 of 468 gates described.**
+**469 of 469 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
-| [runner](#runner) | 47 | 47 | the suite runners and their own ground truth |
+| [runner](#runner) | 48 | 48 | the suite runners and their own ground truth |
 | [docs](#docs) | 27 | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 50 | 50 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -30,7 +30,7 @@ first sentence) is `gate_index.md`.
 
 ## runner
 
-the suite runners and their own ground truth. 47 of 47 described.
+the suite runners and their own ground truth. 48 of 48 described.
 
 ### `run_all_emulator.sh` — run, emulator
 
@@ -399,6 +399,14 @@ the suite runners and their own ground truth. 47 of 47 described.
 **HOW:** runs the tool's selftest (seven cases), then the tool over this tree; two controls plant, in a scratch root built from this tree's own registry, a live pin on a real superseded key, and a rulecheck.py without its birth key — each must be refused.
 
 **EXPECTS:** the selftest PASS, the tree clean (0 live pins, 0 stale exemptions), both controls FAIL their scratch root.
+
+### `test_tmp_hygiene.sh` — test, ci_portable
+
+**WHAT:** tools/tmp_hygiene.py's static census of `tools/*.py,` `tests/*.py,` `tests/lib/*.py` and `tests/*.sh` finds no uncleaned temporary: every python mkdtemp/mkstemp/NamedTemporaryFile(delete=False) registers its removal at exit or removes it in its function, every shell `X="$(mktemp ...)"` is removed by an EXIT trap or a plain rm (or lies inside a removed directory), or the site is on the tool's reviewed ALLOW list with its reason. And every CALL of an emulator runner in a shell script passes its own sandbox (#303's emulator half, ruled 2026-10-23: "Callers pass a sandbox"): a 4th argument to tools/run_replay_mame.sh / run_replay_guarded.sh, MAME_SANDBOX / FBNEO_SANDBOX for tools/run_mame.sh / run_fbneo.sh (TMPDIR alone does not count: macOS's mktemp -d ignores it); the runners keep their default for by-hand use.
+
+**HOW:** the census over the tree; then known answers on a synthetic tree: five clean forms (atexit, a finally rmtree, a shell EXIT trap set in an `if`, a trap calling a cleanup function, a directory made inside a trapped one) must not be named, and an uncleaned python mkdtemp and an untrapped shell mktemp must be; three sandboxed runner calls (a quoted "$REPO" path with a $(mktemp) 4th argument across a continuation, an env MAME_SANDBOX, a 4-argument guarded call) must not be named, and a 3-argument replay call must be.
+
+**EXPECTS:** 0 uncleaned on the tree. A red names the file, the line, the function and the temp variable — the #303 shape: six static gates left python tempfile directories behind on every run (up to 145 entries a run, test_poke_readback), measured by running every static gate and each of its controls in a fresh TMPDIR on PILOT.
 
 ### `test_trace_static_reads.sh` — test, ci_portable
 
@@ -986,9 +994,9 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 
 ### `test_release_roundtrip.sh` — test, ci_static
 
-**WHAT:** the release package is shippable: applied to the PRISTINE dumps it reproduces every authored member byte-identically and every added standalone member from its declared source, hashes to the manifest's keys (both variants), deterministically; the applier REFUSES a corrupted patch, a wrong dump and a wrong target sha1 without writing; no patch carries a verbatim run of reference-ROM bytes (rule 7); and every platform directory has exactly the ruled inventory with the end-user README sections.
+**WHAT:** the release package is shippable: applied to the PRISTINE dumps it reproduces every authored member byte-identically and every added standalone member from its declared source, hashes to the manifest's keys (both variants), deterministically; the applier REFUSES a corrupted patch, a wrong dump and a wrong target sha1 without writing; no patch carries a verbatim run of reference-ROM bytes (rule 7); and every platform directory has exactly the ruled inventory with the end-user README sections. The packager refuses an xdelta3 older than the version measured clean (#279).
 
-**HOW:** packages the build, applies it in a scratch dir, compares members and keys; section 2 exercises the refusals; section 3 indexes every 64-byte-aligned reference chunk and slides a window over every patch byte; section 4 checks the per-platform layout, BINARY.txt hashes and the README sections; nine known-bad controls.
+**HOW:** section 0 runs the packager with a fake xdelta3 reporting 3.0.11 first on PATH; packages the build, applies it in a scratch dir, compares members and keys; section 2 exercises the refusals; section 3 indexes every 64-byte-aligned reference chunk and slides a window over every patch byte; section 4 checks the per-platform layout, BINARY.txt hashes and the README sections; nine known-bad controls and one perturbed copy.
 
 **EXPECTS:** every section green and every control caught (the planted reference chunk, the secondary-compressed patch, the stray file, the missing README section among them).
 

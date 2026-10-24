@@ -3392,3 +3392,31 @@ f2365 such a tile's visible columns were all transparent and the picture was pix
 measurement: the fighters draw with their own palette rows (the fighter block's +0x18B; 0x0A and 0x10 on every leg
 measured), not palettes 0x01-0x09, which appear only about 117 frames into a round, so a palette-count predicate reads
 every round intro as "no fighters". Control `intro-blind` in `tests/test_proof_sheets.sh`.
+
+## macOS `mktemp -d` WITH NO TEMPLATE IGNORES `TMPDIR`; Python's `tempfile` honours it (paid: 14z-207, #303)
+
+Lane P's #303 census gave every gate a fresh `TMPDIR` and moved two gates' temp folders under it; on PILOT (Linux) the
+leftovers went to 0, on this Mac they did not. `/usr/bin/mktemp -d` with no template writes under the per-user
+`/var/folders/.../T/` whatever `TMPDIR` says, while `tempfile.mkdtemp()` and `mktemp -d "$TMPDIR/x.XXXXXX"` follow it
+(fork P2, `build/agent207/P2/REPORT.md`, local). **The rule:** to contain a temp folder, pass it explicitly (a
+sandbox argument, or a template under a folder you own); never rely on `TMPDIR` alone. `tools/tmp_hygiene.py` counts
+an emulator runner call as sandboxed only when it passes `MAME_SANDBOX`/`FBNEO_SANDBOX` or the replay runner's 4th
+argument, for this reason.
+
+## Python 3.12's `shutil` imports `_winapi` WHEN `sys.platform` IS FAKED TO `win32` (paid: 14z-200/14z-207, #280)
+
+`tests/test_applier_page.sh` section 3b runs `tools/apply_release.py` under a faked `sys.platform = "win32"` to check
+the container byte a Windows host writes. On Python 3.12 (PILOT, 3.12.3) a module imported after the fake makes
+`shutil` take its Windows branch and import `_winapi`, which does not exist on Linux: *"ModuleNotFoundError: No
+module named '_winapi'"*; the Mac's 3.9.6 never took that branch. **The rule:** import every module a faked-platform
+run needs BEFORE faking the platform, then fake only what the code under test reads. Section 3b now does so, and its
+control `windows-host` proves the fake still reaches the container (14z-207: PASS on 3.12.3 and on 3.9.6).
+
+## UNDER `strace -f`, CHROME NEVER OPENS A PAGE'S `file://` READS (measured 14z-207, #281)
+
+On PILOT (Chrome for Testing 155), `tests/test_applier_page_browser.sh` PASSes untraced in 19 s; traced by
+`tools/trace_static_reads.py` (`strace -f`), every run stops at 8 s with the page's ROM reads never opened, at
+virtual-time budgets of 1.8e6, 1.8e7 and 1.8e8 ms alike, so no timeout fixes it (`build/agent207/P/close/summary.txt`,
+local). The snap Chromium does not start under strace at all (*"snap-confine ... cap_dac_override not found"*).
+**The rule:** a browser-driven gate cannot be traced with `strace -f`; `TRACE_LIMITS` names it (#281) and every score
+says it is untraced.

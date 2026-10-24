@@ -15,7 +15,7 @@ number	state	reason	closed	labels	title
 306	OPEN	-	-	bug,severity: low,test-integrity	Nine emulator gates default to build/donovan6, which only test_m2b_stage6 builds; a clean checkout's order decides whether they find it
 305	OPEN	-	-	bug,severity: low,test-integrity	The emulator tier has no decrypt-view warm-up, and build_donovan.sh writes the view cache non-atomically (#299's two gaps)
 304	OPEN	-	-	bug,severity: high,test-integrity	The static-tier planner counts untracked build/ output as changed inputs (build/sheets/: 5,739 files, a 3-hour plan); review what it includes and excludes
-303	OPEN	-	-	bug	Static-tier gates leave their temp directories in /tmp (~1,690 entries, ~2.3 GB over four tiers)
+303	CLOSED	COMPLETED	2026-10-23	bug	Static-tier gates leave their temp directories in /tmp (~1,690 entries, ~2.3 GB over four tiers)
 302	OPEN	-	-	bug,test-integrity	audit_marionette_cost reads 8 more replays per hook row than its frozen expectation on a clean clone
 301	OPEN	-	-	evolution,severity: low	Community cross-check: create report of the #229 workbook differences for the community, and check the open questions against vswiki
 300	CLOSED	COMPLETED	2026-10-19	bug,test-integrity	test_close_tools REFUSED on the live tree: section 2b reads the findings table #288 cut from the close
@@ -32,14 +32,14 @@ number	state	reason	closed	labels	title
 289	OPEN	-	-	evolution	Revisit the cut of the close's audit layer (documentation packet, procedure check) when there is more data
 288	CLOSED	COMPLETED	2026-10-16	evolution,severity: high	Measure what each step of the close's audit layer has caught and cost, then cut it down (possibly entirely)
 287	CLOSED	NOT_PLANNED	2026-10-16	evolution,severity: high	The procedure check runs at the close; run it right after each piece of work, scoped to that work
-286	OPEN	-	-	evolution,performance,severity: high	The close tier's cost follows the session, not the change: false re-runs, the dirty fbneo submodule, controls on every re-run gate
+286	CLOSED	COMPLETED	2026-10-23	evolution,performance,severity: high	The close tier's cost follows the session, not the change: false re-runs, the dirty fbneo submodule, controls on every re-run gate
 285	CLOSED	COMPLETED	2026-10-15	evolution	test_release_launcher_bat: its Windows half at release cadence or on demand, never a session-close SKIP
 284	OPEN	-	-	bug,done unshipped,severity: medium	[regression] m23-merged README.md file is currently a mess
 283	CLOSED	COMPLETED	2026-10-16	bug	trace_static_reads.py drops every open strace splits into <unfinished>/<resumed> lines, so the predictor's miss scores never saw them
 282	CLOSED	COMPLETED	2026-10-15	evolution	The session documents and the close ritual are too large to follow: shrink, index and streamline them
-281	OPEN	-	-	bug	Release-only: test_applier_page_browser's control run does not finish under strace
-280	OPEN	-	-	bug	Release-only: test_applier_page section 3b fails on Python 3.12 (a faked win32 makes shutil import _winapi)
-279	OPEN	-	-	bug	Release-only: release patches built with xdelta3 3.0.11 (PILOT's apt) carry verbatim reference-ROM runs
+281	CLOSED	COMPLETED	2026-10-23	bug	Release-only: test_applier_page_browser's control run does not finish under strace
+280	CLOSED	COMPLETED	2026-10-23	bug	Release-only: test_applier_page section 3b fails on Python 3.12 (a faked win32 makes shutil import _winapi)
+279	CLOSED	COMPLETED	2026-10-23	bug	Release-only: release patches built with xdelta3 3.0.11 (PILOT's apt) carry verbatim reference-ROM runs
 278	OPEN	-	-	bug	Release-only: a census of gates that compare locale-sorted output against byte-ordered frozen lists
 277	CLOSED	COMPLETED	2026-10-20	bug	The procedure check's extract flags a figure written with fewer decimals as unsourced, and a part boundary hides a step's evidence
 276	CLOSED	COMPLETED	2026-10-19	bug	The session dashboard misses every static tier run on a snapshot: its results stay in the removed clone

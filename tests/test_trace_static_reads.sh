@@ -31,6 +31,7 @@
 # MUST-FIRE: shadow-tool: scratch-unscored — a copy of the predictor whose change_reason keeps the session scratch (N-D off) must leave g_tmpl's read of build/agent7/x.txt flagged (its template names it), and section 2b must FAIL (mode: section 2b scores with that copy; the scorer reads the drop from the predictor since 14z-206)
 # MUST-FIRE: shadow-tool: nf-change-unscored — a copy of the tool that judges reads as it did before 14z-206 (the drop, then stale_reason; no N-F-CHANGE) must count g_runs' run-record read as flagged, and section 2d must FAIL (mode: section 2d scores with that copy; #286, rule-checker run 2026-10-20-1156)
 # MUST-FIRE: shadow-tool: split-unread — a copy of the tool whose reads_of reads strace's lines without re-joining the split ones must miss nothing in the split traces, and section 2c must FAIL (mode: section 2c scores with that copy; #283, 14z-202)
+# MUST-FIRE: shadow-tool: limit-unnamed — a copy of the tool whose first named trace limit (TRACE_LIMITS) lost its ticket number must fail section 4b's check that every limit names its ticket and a gate (#281; mode: section 4b reads that copy)
 # MUST-FIRE: shadow-tool: no-narrowing — a copy of the tool whose control narrows nothing must not fire, and the gate must FAIL (mode: section 3 runs that copy)
 #
 # The real-data run lives on Linux: `python3 tools/trace_static_reads.py all --out DIR` on PILOT (strace), whose
@@ -185,7 +186,34 @@ else
     [ "$rc" != 0 ] && echo "$out" | grep -q 'REFUSED: strace not found' && ok "REFUSED without strace" || bad "trace without strace: exit $rc"
 fi
 
-if vs_ctl_is planted-miss || vs_ctl_is no-narrowing || vs_ctl_is scratch-unscored || vs_ctl_is split-unread || vs_ctl_is nf-change-unscored; then
+echo "== 4b. the named limits (#281): every one names its ticket and a gate of this tree, and score names it untraced"
+limit_unnamed() {   # the shadow: a copy of the tool whose first named limit lost its ticket number
+    python3 - "$TOOL" "$1" <<'PY'
+import re, sys
+s = open(sys.argv[1], encoding="utf-8").read()
+t = re.sub(r'": "#\d+: ', '": "', s, count=1)
+sys.exit("the limit's ticket is not where limit-unnamed expects it") if t == s else open(sys.argv[2], "w", encoding="utf-8").write(t)
+PY
+}
+limits_named() {   # limits_named <tool copy>: every TRACE_LIMITS entry names a #ticket and a tests/<gate>.sh of this tree
+    python3 - "$1" "$REPO" <<'PY'
+import importlib.util, os, re, sys
+spec = importlib.util.spec_from_file_location("tsr", sys.argv[1]); m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+bad = [g for g, why in m.TRACE_LIMITS.items() if not re.search(r"#\d+", why) or not os.path.exists(os.path.join(sys.argv[2], "tests", g + ".sh"))]
+print(f"  {len(m.TRACE_LIMITS)} named limit(s): {', '.join(sorted(m.TRACE_LIMITS))}" + (f"; WITHOUT a ticket or a gate: {bad}" if bad else ""))
+sys.exit(1 if bad else 0)
+PY
+}
+LT="$TOOL"; if vs_ctl_is limit-unnamed; then limit_unnamed "$W/tool_lu.py" && LT="$W/tool_lu.py"; fi
+limits_named "$LT" && ok "every named limit names its ticket and a gate" || bad "a named limit names no ticket or no gate"
+mkdir -p "$W/limited/st"; printf 'g_named\n' > "$W/limited/gates.txt"; echo fixture > "$W/limited/head.txt"
+echo "#281: fixture" > "$W/limited/st/g_named.limit"; printf 'g_named\tLIMIT\t0\n' > "$W/limited/done.tsv"
+out="$(python3 "$TOOL" score --root "$RR" --traces "$W/limited" --jobs 2 2>&1)"
+if echo "$out" | grep -q '^NOT TRACED (named limit)	g_named	#281: fixture$' && ! echo "$out" | grep -q 'non-zero under the trace'; then
+    ok "score names the untraced gate and does not count it as a non-zero run"
+else bad "score did not name the limited gate: $(echo "$out" | tail -2 | tr '\n' ' ')"; fi
+
+if vs_ctl_is planted-miss || vs_ctl_is no-narrowing || vs_ctl_is scratch-unscored || vs_ctl_is split-unread || vs_ctl_is nf-change-unscored || vs_ctl_is limit-unnamed; then
     [ "$fail" = 1 ] && { echo "FAIL: test_trace_static_reads (control mode: caught as it must be)"; exit 1; }
     # not caught: the gate's own verdict is PASS and the mode exits 0, which the runner reads as LIES (the control tests
     # nothing). Until 14z-200 this line exited 1, so a mode could never read LIES (rule-checker run 2026-10-14-1048 Q4).
@@ -211,6 +239,10 @@ no_narrowing "$W/tool_nn.py"
 out="$(cd "$R/tools" && python3 "$W/tool_nn.py" control --root "$RR" --traces "$W/clean" --jobs 2 2>&1)"
 if echo "$out" | grep -q '^CONTROL DEAD: over-narrowed'; then vs_ctl_fired no-narrowing "a control that narrows nothing reports itself dead"
 else vs_ctl_dead no-narrowing "a control narrowing nothing still claimed to fire"; fail=1; fi
+
+limit_unnamed "$W/tool_lu.py"
+if limits_named "$W/tool_lu.py" > /dev/null; then vs_ctl_dead limit-unnamed "a limit without its ticket number still passed"; fail=1
+else vs_ctl_fired limit-unnamed "a named limit whose ticket number is removed fails section 4b"; fi
 
 [ "$fail" = 0 ] && echo "PASS: test_trace_static_reads" || echo "FAIL: test_trace_static_reads"
 exit "$fail"

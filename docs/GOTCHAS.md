@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-551 entries (48 game / 139 platform / 364 project), counted from the buckets at generation.
+557 entries (48 game / 142 platform / 367 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 48 entries
 
@@ -73,7 +73,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A POKED KO NEEDS THE VICTIM ON ITS LAST BAR, AND THE KO MUST COME FROM THE PATH YOU MEAN TO TEST — a low HP alone rallies (paid: 14z-184, GitHub #180)
 - A MOTION THAT LEAVES A NEUTRAL FRAME BETWEEN BACK AND DOWN-BACK IS TWO TAPS TOWARD BACK, AND A CHARACTER WITH A BACKDASH DASHES — the press then lands in the hop (paid: 14z-205, #229, forks F3 and P1)
 
-## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 139 entries
+## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 142 entries
 
 - LINUX CAPS ONE ENVIRONMENT STRING AT 128 KiB; `/bin/sh` IS DASH; THE PINNED MAME'S VERBOSITY IS A BUILD FACT — three macOS facts the first Linux emulator tier paid for (paid: 2026-10-01, ERIS WSL2 Ubuntu, GitHub #201)
 - `spctl -a` REPORTS THE SIGNING-POLICY VERDICT, NOT WHETHER A LAUNCH IS BLOCKED — and `unzip` DOES propagate com.apple.quarantine (measured: 2026-09-20, macOS 26.0 arm64, #144)
@@ -214,8 +214,11 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - UNDER `-debug`, A STOP THAT LANDS AS THE SCREEN FRAME ADVANCES MAKES THAT FRAME'S PER-FRAME SAMPLE READ ONE ENGINE PASS EARLY — and the game clock cannot see it (paid: 14z-205, #229, fork F2)
 - A MAME WRITE TAP THAT READS MEMORY OR `cpu.state` INSIDE ITS CALLBACK CRASHED MAME AT TEARDOWN — and write taps crash there intermittently anyway (paid: 14z-205, #229, fork F1; seen again 14z-205b, R1)
 - THE PICTURE IS MAME'S LATCHED OBJ LIST, TWO FRAMES BEHIND OBJ RAM — a screen-state reader that counts sprites at `CPU:$708000` sees the fighters before the frame shows them (paid: 2026-10-23, 14z-207, #291 fork H)
+- macOS `mktemp -d` WITH NO TEMPLATE IGNORES `TMPDIR`; Python's `tempfile` honours it (paid: 14z-207, #303)
+- Python 3.12's `shutil` imports `_winapi` WHEN `sys.platform` IS FAKED TO `win32` (paid: 14z-200/14z-207, #280)
+- UNDER `strace -f`, CHROME NEVER OPENS A PAGE'S `file://` READS (measured 14z-207, #281)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 364 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 367 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -581,3 +584,6 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A BRANCH NO RUNNER TAKES ROTS UNSEEN — a gate's "supplied build" path was broken for two months because every run took the default (paid: 14z-206, #291)
 - A PLANNER THAT JUDGES EVERY CHANGED PATH FOR EVERY GATE IS AS SLOW AS THE LARGEST UNTRACKED TREE — the `--confirm` plan stalled for 30 min on #291's proof sheets (paid: 14z-206, #313; fixed 14z-207)
 - A CENSUS THAT LISTS FILES WITH `git ls-files` NEVER SEES THE FILE THAT ISN'T TRACKED YET — including itself (paid: 14z-207, #304)
+- A TRACE TAKEN WHERE A GATE SKIPS SCORES THE SKIP, NOT THE GATE (paid: 14z-207, #286)
+- xdelta3 3.0.11 WRITES VERBATIM REFERENCE-ROM RUNS WHERE 3.2.0 COPIES (paid: 14z-200/14z-207, #279)
+- `run_mame.sh` AND `run_fbneo.sh` EXEC THE EMULATOR, SO THEIR DEFAULT SANDBOX IS NEVER REMOVED (paid: 14z-207, #303)

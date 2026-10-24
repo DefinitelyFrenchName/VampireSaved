@@ -7509,3 +7509,34 @@ its selftest's deliberate plants and near misses (`build/zz_code`, `build/sheets
 directories and FAILED. The reader of the list now skips itself, as it skips fixture directories. **A gate that
 discovers its inputs through git must be proven on a checkout where the change under test is TRACKED — a clean
 checkout of the commit, not the worktree that wrote it.**
+
+## A TRACE TAKEN WHERE A GATE SKIPS SCORES THE SKIP, NOT THE GATE (paid: 14z-207, #286)
+
+`tools/trace_static_reads.py` flags a gate that exits NON-ZERO under the trace ("their reads may be short of a passing
+run's"), but a SKIP often exits 0. On ERIS's WSL trace of all 231 static gates at `93ecfae3`, 15 gates printed a SKIP line
+(no `node`, no Chrome, no community workbook, no `emu/jtcores`, no xdelta3, no build dir) and 8 printed no verdict
+line at all; the tool flagged only the 6 of them that also exited non-zero (exit 77 or 1), so 11 skips and 6 no-verdict
+gates passed as complete traces. A skipped gate reads almost nothing, so the trace
+classes it "opens none" and the predictor's 0 misses say nothing about it. In the 14z-207 record-only tier, 4 of the
+skipped gates were carried (`test_applier_page`, `test_applier_page_browser`, `test_applier_vcdiff`,
+`test_community_crosscheck`); their carry rests on the planner's text rules alone. Found only because the rule-checker
+asked (run 2026-10-23-1225); the per-gate verdicts are in each gate's own trace output (`<tr>/st/<gate>.out`).
+**The rule:** score a trace against the gates that PASSED under it; list the SKIPs and the no-verdict gates beside the
+non-zero ones, and treat all three as untraced.
+
+## xdelta3 3.0.11 WRITES VERBATIM REFERENCE-ROM RUNS WHERE 3.2.0 COPIES (paid: 14z-200/14z-207, #279)
+
+With the packager's flags (`-e -S none -B 2^28 -W 2^23`), apt's xdelta3 3.0.11 (PILOT, Ubuntu 24.04) wrote three
+patches (`d_vm3j_04d`, `d_vsw_41`, `d_vsw_42`) whose target bytes it ADDED instead of COPYING them from the vsav2
+source, so the patches carried reference-ROM runs and `tests/test_release_roundtrip.sh`'s rule-7 scan refused them;
+this Mac's 3.2.0 writes none. Rule 7 (no ROM bytes in any artifact) therefore depends on the ENCODER'S VERSION, not
+only on our flags. **The rule:** `tools/package_release.py` refuses an xdelta3 older than 3.2.0 before any work
+(section 0 of the round-trip gate, control `encoder-check-removed`), and a new host gets the measured version.
+
+## `run_mame.sh` AND `run_fbneo.sh` EXEC THE EMULATOR, SO THEIR DEFAULT SANDBOX IS NEVER REMOVED (paid: 14z-207, #303)
+
+Both runners make a default sandbox when the caller passes none, then `exec` the emulator, so no trap of theirs runs
+afterwards: every call without `MAME_SANDBOX`/`FBNEO_SANDBOX` (or the replay runner's 4th argument) left one folder
+(on PILOT: 14, 8 and 1 per run of `audit_phase_mode_cost`, `test_mask_ranges_reader`, `test_tenant_select_records`).
+Ruled 2026-10-23: callers pass a sandbox inside their own trapped folder; `tests/test_tmp_hygiene.sh` refuses a call
+that does not (control `planted-unsandboxed`).

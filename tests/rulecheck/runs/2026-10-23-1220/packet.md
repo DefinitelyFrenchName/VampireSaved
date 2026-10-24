@@ -1,0 +1,18 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: #303 closed done: the static tier's and the emulator callers' temp leaks (forks P and P2, 14z-207)
+Claim (the working agent's sentence): #303 can close done when this session's third commit lands (closing_303.md): its to-dos (issue303.md: attribute each leftover to its gate with a fresh TMPDIR per gate, add a trap or TemporaryDirectory where missing, and a gate could check a tier leaves /tmp as it found it) are met by forks P and P2 (REPORT_P.md, REPORT_P2.md), whose changed files equal the main tree's but for fork Q's later additions to test_applier_page.sh and the two allow-list rows the maintainer's 'audits clean up' ruling removed from tools/tmp_hygiene.py (main_vs_p2.txt, with its time, tree and diffs). Lane P's per-gate fresh-TMPDIR census on PILOT went from 470 leftover entries over 11 gates to 5, all in two MiSTer gates' jtsim scratch kept on purpose (census_compare2.txt). The emulator half follows the maintainer's ruling "Callers pass a sandbox" (ruling_pilot_tools.txt): four callers now pass a trapped sandbox, and on PILOT audit_phase_mode_cost, test_mask_ranges_reader and test_tenant_select_records went from 14, 8 and 1 leftovers to 0, every run PASS (pilot_census_p2.txt); audit_id_writers and audit_type_writes remove their default folder at exit as ruled ("(b) Audits clean up", ruling_303_audits.txt), both PASS on the Mac with 0 new leftovers of their own (audits_main.txt, which notes the one concurrent entry as test_static_runner's). The check is the new static gate tests/test_tmp_hygiene.sh, which PASSes on the main tree with controls planted-mkdtemp, planted-mktemp and planted-unsandboxed firing (tmp_hygiene_main.log), and nine of lanes P and P2's ten changed static gates PASS on the main tree with every control firing (main_gates.txt). Not tested: test_mister_prg_window, whose one-line cleanup change was not re-run on the main tree (it hit this run's 1,800 s timeout; the registry gives it ~55 min a leg at romset cadence, main_gates.txt); tests/run_suite.sh's two sandboxed calls were not run (hours at a freeze; syntax and census only, REPORT_P2.md); the census does not see runner calls made through a variable or from Python (REPORT_P2.md); the jtsim scratch of the MiSTer gates is kept by design; a whole static tier with TMPDIR measured before and after on the main tree's final code was not run (lane P's census ran on its own commit in PILOT's clone); the emulator tier as a whole was not run.
+Artifacts (read every one, in full):
+  - build/agent207/P/close/closing_303.md
+  - build/agent207/P/close/issue303.md
+  - build/agent207/P/close/REPORT_P.md
+  - build/agent207/P/close/REPORT_P2.md
+  - build/agent207/P/close/main_vs_p2.txt
+  - build/agent207/P/close/census_compare2.txt
+  - build/agent207/P/close/ruling_pilot_tools.txt
+  - build/agent207/P/close/pilot_census_p2.txt
+  - build/agent207/P/close/ruling_303_audits.txt
+  - build/agent207/P/close/audits_main.txt
+  - build/agent207/P/close/tmp_hygiene_main.log
+  - build/agent207/P/close/main_gates.txt

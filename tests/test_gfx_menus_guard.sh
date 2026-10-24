@@ -61,7 +61,8 @@ echo "== 2. a rompath that EXISTS but holds no vsavj.zip =="
 # build dir if present, else synthesise the same shape.
 WIDE_RP="$REPO/build/don_m27/rompath"  # re-pointed 14z-117b (random-select freeze) <- 14z-117  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 if [ ! -f "$WIDE_RP/vsavjw.zip" ] || [ -f "$WIDE_RP/vsavj.zip" ]; then
-    WIDE_RP="$(mktemp -d)/rompath"; mkdir -p "$WIDE_RP"; : > "$WIDE_RP/vsavjw.zip"
+    WIDE_TMP="$(mktemp -d)"; trap 'rm -rf "$WIDE_TMP"' EXIT   # #303: removed at exit
+    WIDE_RP="$WIDE_TMP/rompath"; mkdir -p "$WIDE_RP"; : > "$WIDE_RP/vsavjw.zip"
 fi
 set +e; out=$("$REPO/$G" "$WIDE_RP" 2>&1); rc=$?; set -e
 if [ "$rc" != 0 ] && echo "$out" | grep -q "no vsavj.zip"; then

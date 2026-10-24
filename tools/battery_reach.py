@@ -39,6 +39,7 @@ is unresolved; (ii) without it the five in-tree readers are flagged and extpkg.e
 (iii) a path-only finder flags none. Exit 1 when the control is DEAD.
 """
 import argparse, os, re, sys, subprocess, tempfile
+import atexit, shutil  # #303
 
 PATS = {"STATE.md": r"\bSTATE\.md\b"}   # the control's own; main() replaces it with --dirty
 REF = re.compile(r"[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)+")
@@ -182,7 +183,7 @@ def hits(root, files_set):
     return out
 
 def control():
-    d = tempfile.mkdtemp(prefix="closure_ctl_")
+    d = tempfile.mkdtemp(prefix="closure_ctl_"); atexit.register(shutil.rmtree, d, True)  # #303: removed at exit
     def w(rel, t):
         os.makedirs(os.path.dirname(os.path.join(d, rel)), exist_ok=True); open(os.path.join(d, rel), "w").write(t)
     rd = "x = open('STATE.md').read()\n"

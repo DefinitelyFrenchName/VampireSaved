@@ -255,6 +255,7 @@ declares	test_tenant_id
 declares	test_tenant_select_records
 declares	test_tick_durations
 declares	test_tickets
+declares	test_tmp_hygiene
 declares	test_trace_static_reads
 declares	test_unless_composed
 declares	test_vanilla_aerial_join

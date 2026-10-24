@@ -107,6 +107,7 @@ def selftest():
     planted, homed = "PRG:0x7FFFF1", "RAM:$FF812D"
     suffixed = "PRG:0x7FFFE0/F3"   # the suffix form: 0x7FFFF3 must be read and reported a gap (14z-184, run 322)
     with tempfile.NamedTemporaryFile("w", suffix=".md", delete=False) as f:
+        import atexit, os; atexit.register(lambda p=f.name: os.path.exists(p) and os.remove(p))  # #303: removed at exit
         f.write(f"## Session 99z-1 — **selftest**\n\n| | |\n|---|---|\n| (1) | {planted} and {homed} and {suffixed}; PLANTED-PROMISE: this is stated so from here on |\n\n---\n")
     import subprocess
     out = subprocess.run([sys.executable, __file__, "99z-1", "--state", f.name], capture_output=True, text=True).stdout

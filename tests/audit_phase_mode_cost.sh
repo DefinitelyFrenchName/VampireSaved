@@ -157,9 +157,9 @@ POK="1400:ff8782:13;1450:ff8782:13;1500:ff8782:13;\
 # caught it as "the shim never ran", which is the control working.
 abspath() { case "$1" in /*) echo "$1";; *) echo "$PWD/$1";; esac; }
 
-run() {  # run <build> <replay> <out> [pokes]
+run() {  # run <build> <replay> <out> [pokes] — each run its own sandbox inside the trapped WORK (#303)
     POKES="${4:-}" MAME_ROMPATH="$(abspath "$1")/rompath;$ROMDIR" \
-        tools/run_replay_mame.sh vsavjw "tests/replays/$2.rpl" "$3" \
+        tools/run_replay_mame.sh vsavjw "tests/replays/$2.rpl" "$3" "$(mktemp -d "$WORK/sb.XXXXXX")" \
         >/dev/null 2>&1 || true
 }
 

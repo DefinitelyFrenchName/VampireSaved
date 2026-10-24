@@ -47,6 +47,18 @@ import argparse, hashlib, json, os, re, shutil, subprocess, sys, tempfile, zipfi
 
 SOURCE_ORDER = ["vsavj.zip", "vsav.zip", "vsav2.zip"]   # three since 14z-149; vhunt2 is the oracle, not a source
 XDELTA_FLAGS = ["-e", "-S", "none", "-B", str(1 << 28), "-W", str(1 << 23), "-f"]
+# THE ENCODER IS CHECKED (#279, 14z-207). With these flags, apt's xdelta3 3.0.11 (PILOT, Ubuntu 24.04) wrote three
+# patches carrying a verbatim reference-ROM run, which tests/test_release_roundtrip.sh's rule-7 scan refuses
+# (d_vm3j_04d, d_vsw_41, d_vsw_42: target bytes it ADDED where 3.2.0 COPIES them from the vsav2 source); xdelta3
+# 3.2.0 (this Mac's) writes none. So an encoder older than the version measured clean is refused before any work.
+XDELTA_MIN = (3, 2, 0)
+
+
+def xdelta_version():
+    """xdelta3's (major, minor, patch) from `xdelta3 -V` ("Xdelta version 3.2.0, ..."), or None"""
+    r = subprocess.run(["xdelta3", "-V"], capture_output=True, text=True)
+    m = re.search(r"version (\d+)\.(\d+)\.(\d+)", r.stdout + r.stderr)
+    return tuple(int(x) for x in m.groups()) if m else None
 
 # ── THE STANDALONE SET (ruled 2026-09-20, route (c)) ────────────────────────
 # A build packs only the members it AUTHORS, and the emulators resolve the rest
@@ -172,6 +184,11 @@ def main():
     final = safe_release_name(a.out, a.name)     # before anything else, a check included
     if not shutil.which("xdelta3"):
         sys.exit("xdelta3 not found on PATH (brew install xdelta)")
+    xv = xdelta_version()
+    if xv is None or xv < XDELTA_MIN:
+        sys.exit("xdelta3 %s is older than %s, the version measured to write no verbatim reference-ROM run with these "
+                 "flags (#279: 3.0.11 wrote three); install a newer one or put it first on PATH"
+                 % (".".join(map(str, xv)) if xv else "(version unreadable)", ".".join(map(str, XDELTA_MIN))))
 
     os.makedirs(a.out, exist_ok=True)
     # STAGED, THEN SWAPPED IN (14z-197, GitHub #247). The previous package at <out>/<name> was

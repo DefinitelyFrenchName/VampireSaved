@@ -42,7 +42,7 @@ Usage:
   python3 tools/promise_check.py --key 14z-187 --classes build/<dir>/promises.tsv [--state STATE.md] [--base C] [--root DIR]
   python3 tools/promise_check.py --selftest
 """
-import argparse, os, re, subprocess, sys, tempfile
+import argparse, atexit, os, re, shutil, subprocess, sys, tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -164,7 +164,7 @@ def check(root, key, classes_path, state_path, base):
 
 def selftest():
     """one case per failure condition, in a synthetic git repository"""
-    d = tempfile.mkdtemp()
+    d = tempfile.mkdtemp(); atexit.register(shutil.rmtree, d, True)  # #303: removed at exit
     def sh(*a): subprocess.run(a, cwd=d, check=True, capture_output=True)
     def w(p, s): os.makedirs(os.path.dirname(os.path.join(d, p)) or d, exist_ok=True); open(os.path.join(d, p), "w").write(s)
     sh("git", "init", "-q"); sh("git", "config", "user.email", "t@t"); sh("git", "config", "user.name", "t")

@@ -54,6 +54,7 @@ start a2:0x38 is 25 data frames on vs2 and 24 on vsavj (its first node dur 2 vs
 on the same frame) and the tenant's release chains read `len` one frame longer.
 """
 import json
+import atexit, shutil  # #303
 import os
 import sys
 
@@ -345,7 +346,7 @@ def chains_identical(extract_dir, ours_image, placements, tenant, tables=("a", "
     key = "anim" if tenant == "donovan" else "anim@" + tenant
     dst, src, ln = regs[key]["dst"], regs[key]["src"], regs[key]["len"]
     assert (src, ln) == (r["src"], r["len"]), "the placement's anim region is not the extract's (%#x/%#x vs %#x/%#x)" % (src, ln, r["src"], r["len"])
-    tmp = tempfile.mkdtemp()
+    tmp = tempfile.mkdtemp(); atexit.register(shutil.rmtree, tmp, True)  # #303: removed at exit
     # our decoder sees exactly the placed REGION, as the native one sees region_anim.bin: a chain
     # whose nodes link past the region decodes short on both (the first form read the whole data
     # view on ours and 76 of Phobos's c chains "differed" by the bytes past the region's end)
@@ -404,7 +405,7 @@ def chains_plant(extract_dir, ours_image, placements, tenant, out_image, table="
     regs = json.load(open(placements))["regions"]
     key = "anim" if tenant == "donovan" else "anim@" + tenant
     dst, src, ln = regs[key]["dst"], regs[key]["src"], regs[key]["len"]
-    tmp = tempfile.mkdtemp()
+    tmp = tempfile.mkdtemp(); atexit.register(shutil.rmtree, tmp, True)  # #303: removed at exit
     img = bytearray(open(ours_image, "rb").read())
     sl = os.path.join(tmp, "ours_region.bin"); open(sl, "wb").write(bytes(img[dst:dst + ln]))
     j = os.path.join(tmp, "ours_%s.json" % table)

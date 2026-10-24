@@ -1,0 +1,18 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent207/R/issue286.md	8fe7ff1111d5282c23da609fd9a05dc06997ce34
+build/agent207/R/F_REPORT.md	4f712dbc2071ffaff1814896726ee431f7b6fe54
+build/agent207/R/REPORT.md	fa778c1bf1834592135f2b20f2d1360594da998a
+build/agent207/R/ruling_286.txt	486166fbe017650ee13b47874f284dc0cc1ea77d
+build/agent207/R/static_runner_section22.log	d94148d80d991381d17ec5a764e7add642fad5bf
+build/agent207/R/ruling_298.txt	531a522d153282994db3d2d4656ffa8e3a1d721d
+build/agent207/R/trace283_fixed.txt	d40ff6cdde444822a8f46dd6d69d53057ac14153
+build/agent207/R/closing_comment.md	eed4bc62ce48e1c6612366a8a5b3ba6345f9c040
+build/agent207/R/ruling_269_core.txt	b787f53de7c19af8842dab6b949ddab1d2b10c10
+build/agent207/R/ruling_298_confirmed.txt	8a70c94b480fd3fbd239f220f8cea58fbcfc6e6f
+build/agent207/R/eris/trace_all.log	05472f5dc896ed61d8084ed8f87b1ac1a74186bb
+build/agent207/R/record_only_tier/base_and_planner.txt	ce50f49e84273c3e165a41c78a58e79dfd415f1c
+build/agent207/R/record_only_tier/tier.log	e0549582d520895d02961f42c3ac89636a6f9895
+build/agent207/R/record_only_tier/openers_fate.txt	73054914a7596f36fc9e5a14e1febfd641f538af
+build/agent207/R/record_only_tier/summary.txt	a07e5213e3272587fd4201b314f467ca6dd3255c
+build/agent207/R/record_only_tier/reruns_vs_opens.txt	c6b2384e8525cbe8ef8bf2001d0279d325ea2c1e
+build/agent207/R/record_only_tier/nonzero15_fate.txt	954b58d59e5a80bc24b20cfc760ca8809efa0723

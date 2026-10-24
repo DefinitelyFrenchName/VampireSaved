@@ -28,7 +28,7 @@ cited descriptive anchors ("the ugrep section", "The session column") that no li
 
 WHAT IT CANNOT SEE: whether the anchored paragraph STATES the finding (a hand read); a home given only as a ticket.
 """
-import os, re, sys, tempfile
+import atexit, os, re, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from findings_table import read_state   # a TSV-backed findings section reads as its row (#282 item C)
 
@@ -95,7 +95,7 @@ def plant(title, state, out):
     return 3
 
 def selftest():
-    d = tempfile.mkdtemp()
+    d = tempfile.mkdtemp(); atexit.register(shutil.rmtree, d, True)  # #303: removed at exit
     open(os.path.join(d, "home.md"), "w").write("THE REAL HEADING is here\n")
     st = os.path.join(d, "STATE.md")
     open(st, "w").write("| **(9) T** | (a) one — `home.md` THE REAL HEADING / none (r); (b) two — GitHub #5 / `t.sh` |\n")

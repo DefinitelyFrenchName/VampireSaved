@@ -1,0 +1,17 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: #286 closed done (14z-207), after run 2026-10-23-1215
+Claim (the working agent's sentence): #286 can close done (closing_comment.md), after run 2026-10-23-1215: its done-when (issue286.md: "A record-only commit's --confirm tier is measured and re-runs only gates that open a record file, executing controls only for gates whose real inputs changed. The before/after figures are on this ticket") is measured on the Mac: the record-only probe f3445a70, one phrase changed in each of STATE.md, DECISIONS_HISTORY.md and docs/NEXT_SESSION.md on top of the second commit bbeedfed, ran a strict --confirm tier on that commit's GREEN base: GREEN, PASS 93, 3 changed paths, 45 of 231 gates STALE, 30 re-run (28 STALE and the 2 '# CONFIRM: always' core gates), 4 deferred lines carrying a STALE reason, 63 carried, controls executed 0 and carried 345 (record_only_tier/summary.txt, record_only_tier/tier.log). Crossed with fork R's ERIS trace of all 231 gates, 10 of the 30 open a record file and 20 open none (record_only_tier/reruns_vs_opens.txt): the 2 core gates re-run by #269's ruling (ruling_269_core.txt), and the other 18 fall in the classes the maintainer accepted as precision cost, quoted in ruling_286.txt ("(c) Accept as precision cost"), put on fork R's predicted set (R2 10, R4 3, R3 2, R5 3), so the re-run clause stands as ruled, not as written. The controls clause holds as the maintainer's #298 ruling reads it (ruling_298.txt: "a stale gate's controls execute only when a program of its reach changed"): a record file is data, so the 10 gates that open one carry their controls. N-K is fork R's (REPORT.md; its trace 0 misses over 94,317 reads, the over-narrowed control 90, eris/trace_all.log). The before/after figures go on the ticket in the closing comment: 135 re-run and 1,543 s of controls at c81dc932, the 14z-201 final tier (issue286.md); 45 re-run with 0 controls executed on PILOT after #313, on a base that was not green, 4 of the 45 re-run as base reds (F_REPORT.md); 30 now. Not tested: the trace that classes 'opens a record file' was taken on ERIS at 93ecfae3, an earlier commit than the probe's, with 15 gates exiting non-zero under it for host reasons (REPORT.md); the trace sees file opens only, so a gate reading a record file through git would count as opening none; the open-none classes rest on fork R's reading (REPORT.md), not on a per-gate code read here; of the plan's 45 STALE, 28 re-ran and 4 deferred lines name a STALE reason, and the other 13 are not itemised in the tier's log, so their open/none split was not measured.
+Artifacts (read every one, in full):
+  - build/agent207/R/closing_comment.md
+  - build/agent207/R/issue286.md
+  - build/agent207/R/record_only_tier/summary.txt
+  - build/agent207/R/record_only_tier/tier.log
+  - build/agent207/R/record_only_tier/reruns_vs_opens.txt
+  - build/agent207/R/ruling_286.txt
+  - build/agent207/R/ruling_269_core.txt
+  - build/agent207/R/ruling_298.txt
+  - build/agent207/R/REPORT.md
+  - build/agent207/R/eris/trace_all.log
+  - build/agent207/R/F_REPORT.md

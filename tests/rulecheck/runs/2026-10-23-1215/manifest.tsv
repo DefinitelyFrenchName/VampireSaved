@@ -1,0 +1,10 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent207/R/closing_comment.md	188d756ef82fb25389043b5200a4d91eab2366c1
+build/agent207/R/issue286.md	8fe7ff1111d5282c23da609fd9a05dc06997ce34
+build/agent207/R/record_only_tier/summary.txt	a07e5213e3272587fd4201b314f467ca6dd3255c
+build/agent207/R/record_only_tier/tier.log	e0549582d520895d02961f42c3ac89636a6f9895
+build/agent207/R/record_only_tier/reruns_vs_opens.txt	1f699e7596be1e346c0992e2154e63d923c8f0e8
+build/agent207/R/ruling_286.txt	486166fbe017650ee13b47874f284dc0cc1ea77d
+build/agent207/R/REPORT.md	fa778c1bf1834592135f2b20f2d1360594da998a
+build/agent207/R/eris/trace_all.log	05472f5dc896ed61d8084ed8f87b1ac1a74186bb
+build/agent207/R/F_REPORT.md	4f712dbc2071ffaff1814896726ee431f7b6fe54

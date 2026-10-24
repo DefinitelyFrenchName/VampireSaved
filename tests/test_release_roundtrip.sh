@@ -6,14 +6,16 @@
 #   source, hashes to the manifest's keys (both variants), deterministically; the applier
 #   REFUSES a corrupted patch, a wrong dump and a wrong target sha1 without writing; no
 #   patch carries a verbatim run of reference-ROM bytes (rule 7); and every platform
-#   directory has exactly the ruled inventory with the end-user README sections.
-# HOW: packages the build, applies it in a scratch dir, compares members and keys; section 2
+#   directory has exactly the ruled inventory with the end-user README sections. The packager
+#   refuses an xdelta3 older than the version measured clean (#279).
+# HOW: section 0 runs the packager with a fake xdelta3 reporting 3.0.11 first on PATH; packages the build, applies it in a scratch dir, compares members and keys; section 2
 #   exercises the refusals; section 3 indexes every 64-byte-aligned reference chunk and
 #   slides a window over every patch byte; section 4 checks the per-platform layout,
-#   BINARY.txt hashes and the README sections; nine known-bad controls.
+#   BINARY.txt hashes and the README sections; nine known-bad controls and one perturbed copy.
 # EXPECTS: every section green and every control caught (the planted reference chunk, the
 #   secondary-compressed patch, the stray file, the missing README section among them).
 #
+# MUST-FIRE: perturbed-copy: encoder-check-removed — a copy of tools/package_release.py without its xdelta3 version check, run with an xdelta3 reporting 3.0.11 first on PATH, must not refuse with the #279 message, and section 0 must fail (#279; mode: section 0 runs that copy)
 # MUST-FIRE: known-bad: corrupted-patch — a package with one patch byte flipped must be REFUSED by the applier without writing (mode: section 1 applies that package and must fail)
 # MUST-FIRE: known-bad: wrong-target-sha1 — a manifest naming a wrong target sha1 must be refused without writing
 # MUST-FIRE: known-bad: wrong-dump — a reference dump with one byte flipped must be refused without writing (mode: section 1 applies against it)
@@ -93,6 +95,30 @@ W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail=0
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 
+echo "== 0. the packager refuses an xdelta3 older than the one measured clean (#279) =="
+# a fake xdelta3 that reports apt's 3.0.11 (PILOT), first on PATH: the packager must stop before any work, naming #279
+mkdir -p "$W/oldx"; printf '#!/bin/sh\necho "Xdelta version 3.0.11, Copyright (C) Joshua MacDonald"\nexit 0\n' > "$W/oldx/xdelta3"; chmod +x "$W/oldx/xdelta3"
+sed 's/^    if xv is None or xv < XDELTA_MIN:$/    if False:/' tools/package_release.py > "$W/pkg_nocheck.py"
+cmp -s tools/package_release.py "$W/pkg_nocheck.py" && { echo "  the encoder check is not where this control expects it"; fail=1; }
+refuses_old() {  # refuses_old <packager> <out>: exit 0 when it stops on the old encoder before any work, naming #279
+    PATH="$W/oldx:$PATH" timeout 300 python3 "$1" "$RP" "$2" --romdir "$ROMDIR" --name "$NAME" > "$2.log" 2>&1 && return 1
+    grep -q "#279" "$2.log" && [ ! -e "$2/$NAME" ]
+}
+PKG=tools/package_release.py
+vs_ctl_is encoder-check-removed && PKG="$W/pkg_nocheck.py"
+if refuses_old "$PKG" "$W/rel_oldx"; then
+    echo "  ok: refused before any work: $(grep -m1 '#279' "$W/rel_oldx.log" | cut -c1-110)"
+else
+    echo "  the packager did not refuse xdelta3 3.0.11: $(tail -1 "$W/rel_oldx.log" | cut -c1-110)"; fail=1
+fi
+if vs_ctl_is encoder-check-removed; then echo "FAIL: release package (control mode: the encoder check removed)"; exit 1; fi
+# must-fire control: the packager without its check does not refuse the old encoder
+if refuses_old "$W/pkg_nocheck.py" "$W/rel_nocheck"; then
+    vs_ctl_dead encoder-check-removed "the packager without its version check still refused 3.0.11"; fail=1
+else
+    vs_ctl_fired encoder-check-removed "without the check the packager runs on xdelta3 3.0.11: $(tail -1 "$W/rel_nocheck.log" | cut -c1-80)"
+fi
+
 echo "== 1. round trip: package -> apply to pristine dumps -> byte-identical =="
 python3 tools/package_release.py "$RP" "$W/rel" --romdir "$ROMDIR" --name "$NAME" \
     --version "$(grep -h '^version_text' build/manifest/donovan.toml | sed 's/.*= *"\(.*\)"/\1/')" \
@@ -118,10 +144,10 @@ PY
 cp -r "$W/rel/$NAME" "$W/bad_lzma"
 pl="$(find "$W/bad_lzma/patches" -name 'd_vsw_43.xdelta' | head -1)"
 python3 - "$W/bad_lzma/manifest.json" "$pl" "$ROMDIR" <<'PY'
-import json, sys, subprocess, tempfile, os, zipfile, hashlib
+import atexit, json, shutil, sys, subprocess, tempfile, os, zipfile, hashlib
 mf, pf, romdir = sys.argv[1:4]
 m = json.load(open(mf)); e = next(x for x in m["zips"]["vsavjw.zip"] if x.get("patch", "").endswith("d_vsw_43.xdelta"))
-w = tempfile.mkdtemp()
+w = tempfile.mkdtemp(); atexit.register(shutil.rmtree, w, True)  # #303: removed at exit
 src = os.path.join(w, "source.bin")
 with open(src, "wb") as f:
     for z in m["source"]["order"]:

@@ -37,6 +37,7 @@ tenant at a time with that tenant's own extract:
 Exit 1 if any pointer resolves to bytes that do not match its table.
 """
 import argparse
+import atexit, shutil  # #303
 import json
 import os
 import subprocess
@@ -57,7 +58,7 @@ if not __debug__:
 def decrypted_views(zip_path):
     """decrypt a built romset to (opcode, data) byte images"""
     repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    tmp = tempfile.mkdtemp()
+    tmp = tempfile.mkdtemp(); atexit.register(shutil.rmtree, tmp, True)  # #303: removed at exit
     op = os.path.join(tmp, "op.bin")
     da = os.path.join(tmp, "da.bin")
     subprocess.run([sys.executable, os.path.join(repo, "tools", "cps2_decrypt.py"),
@@ -93,7 +94,7 @@ def main():
     if a.census:
         census = json.load(open(a.census))
     else:
-        tmp = tempfile.mkdtemp()
+        tmp = tempfile.mkdtemp(); atexit.register(shutil.rmtree, tmp, True)  # #303: removed at exit
         out = os.path.join(tmp, "census.json")
         subprocess.run([sys.executable,
                         os.path.join(repo, "tools", "census_regions.py"),

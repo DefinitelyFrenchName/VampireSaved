@@ -74,7 +74,9 @@ if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN   # the pinned WIDE build: BUILD= boots vsavjw (14z-192, test_mame_bin_pinned)
 cd "$REPO"
-OUT="${1:-$(mktemp -d)}"   # GitHub #68: not a predictable default
+if [ -n "${1:-}" ]; then OUT="$1"; else   # GitHub #68: not a predictable default; #303 (ruled 2026-10-23, 14z-207):
+    OUT="$(mktemp -d)"; trap 'rm -rf "$OUT"' EXIT INT TERM   # the default folder is removed at exit
+fi
 mkdir -p "$OUT"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 SET=vsavj; RP="$ROMDIR"

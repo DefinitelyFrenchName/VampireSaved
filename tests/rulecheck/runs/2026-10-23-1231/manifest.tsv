@@ -1,0 +1,20 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent207/P/close/issue279.md	863bb8a79a0a3dea28d756491d0eb27d1ff2fae6
+build/agent207/P/close/issue280.md	cc7d5610ad27609eda9d85f5d9b016ed82b3c5a0
+build/agent207/P/close/issue281.md	c0c139479d36d9c072fd4ecdae0be0b470566c32
+build/agent207/P/close/REPORT_P.md	7f6e194161980097e0f8ec6f4ab5e684689e99e0
+build/agent207/P/close/REPORT_P2.md	3755d0db869a30f3611d646fb53123040e5b5408
+build/agent207/P/close/ruling_pilot_tools.txt	a106ed1149ba6c92858150daed33a4ac47a33d4b
+build/agent207/P/close/pilot_main/PROVENANCE.txt	85818aa1d2c7df4c6f9e3e4b27fc2bbe8f2e49f1
+build/agent207/P/close/pilot_main/env.txt	33551da8b2311cdb30de419c45e7b7e3edc2a43e
+build/agent207/P/close/pilot_main/verdicts.txt	0aaca9564a775eb8806ebc06e9ccc391471696bf
+build/agent207/P/close/pilot_main/test_release_roundtrip.log	7456e4b31ce0430e4cf32a4776217a4d7e201410
+build/agent207/P/close/pilot_main/test_applier_page.log	64613004123537be785e1d15270fc38288e7c635
+build/agent207/P/close/pilot_main/real_apt_xdelta.txt	9f0c33eb21f419819cf140839cd4d18ba89cb2dd
+build/agent207/P/close/main_gates.txt	5ac518670eb264db0841b69786086a5fd71cfd48
+build/agent207/P/close/summary.txt	8b89829f17eb1a8f7a9f70c33d3f23a05b237da7
+build/agent207/P/close/t281_main.log	f7a97b3ac7423d4fe7c910f752d8e51c4f6cb90c
+build/agent207/P/close/t281_main_mode.log	a3376ac228aa73e2324d7833a59670fa556932cb
+build/agent207/P/close/closing_279.md	234e9a0cbf10606368167b19bcc37f01ef7f0e7e
+build/agent207/P/close/closing_280.md	7dbe73d717e72ebd21549885299d6e2fd93b40ce
+build/agent207/P/close/closing_281.md	eaf72166dc56237332b4b795e2b4ae729bb2ce49

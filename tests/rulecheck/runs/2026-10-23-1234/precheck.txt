@@ -1,0 +1,2 @@
+  FLAG D-ABSOLUTE: **Not tested:** packaging a whole release on Linux end to end (the round-trip gate packages its own set); the Windows host (ERIS's MSYS2 has no xdelta3, so t...  [build/agent207/P/close/closing_279.md]
+packet_check: 1 flag(s): D-ABSOLUTE 1

@@ -48,6 +48,14 @@ import tempfile
 import time
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# NAMED LIMITS (#281, 14z-207): gates this tracer cannot drive. `trace` does not run them under strace and writes a
+# <gate>.limit marker instead; `score` names each one on its own line, so an untraced gate is never silent. Every reason
+# names its ticket (tests/test_trace_static_reads.sh holds that).
+TRACE_LIMITS = {
+    "test_applier_page_browser": "#281: under strace -f, Chrome never opens the page's file:// ROM reads and the driver "
+                                 "stalls after asks_for (PILOT, Chrome for Testing 155, 14z-207: 8 s at virtual-time "
+                                 "budgets of 1.8e6, 1.8e7 and 1.8e8 ms; the same run untraced PASSES in 19 s)",
+}
 OPEN = re.compile(r'^\d+\s+(open|openat|execve)\((?:AT_FDCWD, )?"([^"]+)"(?:, ([A-Z_|]+))?.*\)\s+=\s+(-?\d+)')
 # #283 (14z-202): with several processes writing one file, strace SPLITS a call another process interrupts into
 # `PID call(args <unfinished ...>` and, later, `PID <... call resumed>) = rc`. Neither line matches OPEN, so every split
@@ -171,10 +179,14 @@ def score(root, traces, tools, jobs, label):
           f"relative-path opens resolved at the root {sum(r[3] for r in res)}")
     done = os.path.join(traces, "done.tsv")
     if os.path.exists(done):
-        bad = [l.split("\t")[:2] for l in open(done) if l.strip() and l.split("\t")[1] != "0"]
+        bad = [l.split("\t")[:2] for l in open(done) if l.strip() and l.split("\t")[1] not in ("0", "LIMIT")]
         if bad:
             print("non-zero under the trace (their reads may be short of a passing run's): "
                   + ", ".join(f"{g} ({rc})" for g, rc in bad))
+    for g in gates:   # the named limits (#281): not traced, so not scored, and said so
+        lim = os.path.join(traces, "st", g + ".limit")
+        if os.path.exists(lim):
+            print(f"NOT TRACED (named limit)\t{g}\t{open(lim).read().strip()}")
     print(f"MISSES {len(misses)} in {len({g for g, _ in misses})} gates")
     for g, c in misses:
         print(f"MISS\t{g}\t{c}")
@@ -215,6 +227,10 @@ def trace(root, out, jobs, timeout, gates_file):
     while queue or running:
         while queue and len(running) < jobs:
             g = queue.pop(0)
+            if g in TRACE_LIMITS:   # a named limit: not traced, marked
+                open(os.path.join(out, "st", g + ".limit"), "w").write(TRACE_LIMITS[g] + "\n")
+                done.write(f"{g}\tLIMIT\t0\n"); done.flush()
+                continue
             st, log = os.path.join(out, "st", g + ".st"), open(os.path.join(out, "st", g + ".out"), "w")
             p = subprocess.Popen(["timeout", "-k", "30", str(timeout), "strace", "-f", "-qq", "-e", "trace=open,openat,execve",
                                   "-o", st, "sh", f"tests/{g}.sh"], cwd=root, stdout=log, stderr=subprocess.STDOUT,

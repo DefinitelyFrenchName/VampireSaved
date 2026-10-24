@@ -1,0 +1,4 @@
+  FLAG D-ABSOLUTE: - **controls executed: 0**, 345 carried — the controls clause holds as #298 rules it: at a commit or a close a re-run gate executes its controls only when a ...  [build/agent207/R/closing_comment.md]
+  FLAG D-ABSOLUTE: **Which re-run gates open a record file** (each crossed with fork R's ERIS trace of all 231 gates, and with lane F's PILOT trace where they disagree): 11 of ...  [build/agent207/R/closing_comment.md]
+  FLAG D-ABSOLUTE: A trace sees file opens only: a read through git, or an open the tracer fails to record, counts as opening none.  [build/agent207/R/closing_comment.md]
+packet_check: 3 flag(s): D-ABSOLUTE 3

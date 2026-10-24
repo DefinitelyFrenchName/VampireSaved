@@ -457,6 +457,7 @@ declares	test_tenant_winpal
 declares	test_thunk_addr_literal
 declares	test_tick_durations
 declares	test_tickets
+declares	test_tmp_hygiene
 declares	test_trace_static_reads
 declares	test_type_stamp_census
 declares	test_unless_composed

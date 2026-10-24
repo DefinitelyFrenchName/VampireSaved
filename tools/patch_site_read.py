@@ -15,6 +15,7 @@ form) and to where, or EQUAL to the pristine set's opcode view at the same six b
 $ROMDIR/<pristine>.zip), or NEITHER. No ROM byte is printed. Exit 1 when a site reads NEITHER.
 """
 import argparse, os, subprocess, sys, tempfile
+import atexit, shutil  # #303
 ap = argparse.ArgumentParser()
 ap.add_argument("--build", action="append", required=True)
 ap.add_argument("--site", action="append", required=True, help="ADDR:LABEL, ADDR in hex")
@@ -22,7 +23,7 @@ ap.add_argument("--set", default="vsavjw"); ap.add_argument("--pristine", defaul
 a = ap.parse_args()
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 romdir = os.environ.get("ROMDIR") or sys.exit("set ROMDIR")
-W = tempfile.mkdtemp(prefix="patch_site_read_")
+W = tempfile.mkdtemp(prefix="patch_site_read_"); atexit.register(shutil.rmtree, W, True)  # #303: removed at exit
 def decrypt(zipf, out):
     r = subprocess.run([sys.executable, os.path.join(REPO, "tools/cps2_decrypt.py"), zipf, out], capture_output=True, text=True)
     if r.returncode: sys.exit(f"decrypt failed for {zipf}: {r.stderr.strip()[-200:]}")

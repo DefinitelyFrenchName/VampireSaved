@@ -38,7 +38,7 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
-## Session 14z-207 — **PILOT and ERIS online, the work run in parallel lanes: #291 closed done (the span retrofit, the fighters check on round intros, the full sheet run reviewed); #308 and #313 closed done; #286 measured on PILOT; #304 analysed and its four recommendations adopted; #314 filed.** Opened 2026-10-23 on transcript `e552692b` after the 14z-206 close (`c494fac2`, pushed).
+## Session 14z-207 — **PILOT and ERIS online, the work run in parallel lanes: #291 closed done (the span retrofit, the fighters check on round intros, the full sheet run reviewed); #308 and #313 closed done; #286 measured, then closed done; #304 analysed and its four recommendations adopted; #314 filed and closed done; #303, #279, #280 and #281 closed done (lanes P and P2 on PILOT).** Opened 2026-10-23 on transcript `e552692b` after the 14z-206 close (`c494fac2`, pushed).
 
 ### opened with
 HANDOFF, STATE and NEXT_SESSION read; the sweep CLEAN, `main` equal to `origin/main`. The maintainer: *"no answers right
@@ -115,6 +115,26 @@ reads `build/agent185`), which item 2 must reclass first. Folded into this sitti
 because `tools/build_dirs.py` was untracked in the fork: tracked, it read its own selftest plants; the reader now skips
 itself (gotcha written).
 
+### (8) #286, #303, #279, #280 AND #281 CLOSED DONE; LANES P AND P2 APPLIED
+**#286** (rule-checker runs 2026-10-23-1215, -1216, -1218, -1219, -1222, -1225 VIOLATED and resolved, -1227 OK;
+`build/agent207/R/claim286.txt`, local): a record-only probe `f3445a70` on `bbeedfed` ran a strict `--confirm` tier,
+GREEN, 30 of 231 gates re-run, 0 controls executed; every traced opener of a record file re-ran or was deferred, none
+carried. The readers found three blind spots of the trace, all now named on the ticket: 15 gates exited non-zero under
+it, 15 printed a SKIP and 8 no verdict (4 skipped gates were carried here, on the planner's text rules alone) — a new
+gotcha (`docs/project/gotchas.md` "A TRACE TAKEN WHERE A GATE SKIPS"). **Lanes P and P2** (`build/agent207/P/`,
+`build/agent207/P2/`, local; `refs/agent207/p207`, `refs/agent207/p2`) applied to the main tree: the temp cleanups, the
+new static gate `tests/test_tmp_hygiene.sh` (`tools/tmp_hygiene.py`; controls planted-mkdtemp, planted-mktemp,
+planted-unsandboxed), callers passing a sandbox, the audits' default-folder cleanup as ruled, the packager's xdelta3
+>= 3.2.0 check, section 3b's import order, the trace tool's named limit. PILOT now carries xdelta3 3.2.0 and Node
+v24.22.1 user-local (ruled); its `/tmp` was cleared (ruled). **#303** (runs -1220, -1223, -1226, -1228, -1232, -1235
+VIOLATED and resolved, -1236 OK): the audits remove their default folder and keep a given one (both measured on the
+Mac, `build/agent207/P/close/audit_ctl/`, local). **#279, #280, #281** (runs -1230, -1231, -1233 VIOLATED and resolved,
+-1234 OK): both release gates PASS on PILOT on a snapshot of the final tree (`7d38f1b5`); the packager refuses PILOT's
+real apt xdelta3 3.0.11. Closed before a release because their done-whens are met with no release step left (the
+maintainer had filed them release-only; flagged to them). Five gotchas filed (two project, three platform). Not run:
+`test_mister_prg_window` on the final tree (~55 min), `run_suite.sh`'s sandboxed calls, a whole tier measured for
+leftovers. Runs -1217, -1221, -1224, -1229 prepared and not run (NOT-RUN.txt in each).
+
 ### (7) #314 CLOSED DONE; #286'S HEREDOC NARROWING (N-K) LANDED
 Lane Q (`build/agent207/Q/REPORT.md`, local; `refs/agent207/q314` `faef92f4`): `tools/gen_applier_page.py` named no
 encoding — on ERIS it did not only write CRLF but stopped at its page write with `UnicodeEncodeError`; fixed, the guard
@@ -127,7 +147,7 @@ scored on an ERIS WSL trace (0 misses over 94,317 reads, control 90); predicted 
 record file, 0 controls. The other 29 the maintainer accepted as precision cost (DECISIONS_HISTORY.md). #286 closes on
 a measured record-only `--confirm` tier of the tree with N-K.
 
-### (6) PILOT AND ERIS LANES (in progress)
+### (6) PILOT AND ERIS LANES (P, P2, Q, R done and applied; S on #312 still running)
 The maintainer: use PILOT and ERIS for other tickets, preparing a freeze+release *"as soon as we have a stable situation"*,
 and chose the lanes (DECISIONS_HISTORY.md "Ruled 2026-10-23 (14z-207) — the PILOT and ERIS lanes"): P on PILOT — its disk first (98% full; the maintainer
 approved deleting the old session work folders after a check: *"Yes, after the check (Recommended)"*), then #303, then

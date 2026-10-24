@@ -49,7 +49,7 @@ addresses (GUARD_PROBE, breakpoints) — they report PCs, not sampled values.
 The frozen classification lives in tests/expected/poke_readback.tsv; its gate
 tests/test_poke_readback.sh re-derives every finding and holds the table to it.
 """
-import argparse, json, os, re, subprocess, sys, tempfile
+import argparse, atexit, json, os, re, shutil, subprocess, sys, tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -89,7 +89,7 @@ def rig_pokes(root, text):
             for t in tenants:
                 for p in nm.SCHEDULES[t]:
                     pairs.add((t, p))
-        d = tempfile.mkdtemp()
+        d = tempfile.mkdtemp(); atexit.register(shutil.rmtree, d, True)  # #303: removed at exit
         for t, p in sorted(pairs):
             try:
                 import io, contextlib
@@ -112,7 +112,7 @@ def rig_pokes(root, text):
             for cid in range(0x00, 0x0F):
                 for dist in dists:
                     pairs.add((cid, dist))
-        d = tempfile.mkdtemp()
+        d = tempfile.mkdtemp(); atexit.register(shutil.rmtree, d, True)  # #303: removed at exit
         for cid, dist in sorted(pairs):
             try:
                 import io, contextlib

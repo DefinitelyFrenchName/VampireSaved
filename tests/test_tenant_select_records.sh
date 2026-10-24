@@ -331,7 +331,7 @@ else
     MASK_RANGES="$(cat tests/expected/donovan-m5/mask)" MAME_BIN="$WIDE_BIN" \
     MAME_ROMPATH="$OUTBASE/rompath;$ROMDIR" \
         tools/run_replay_mame.sh vsavjw tests/replays/11_pick_donovan.rpl \
-        "$WORK/11_legacy.log" > "$WORK/11_legacy.out" 2>&1 || {
+        "$WORK/11_legacy.log" "$WORK/11_legacy.sb" > "$WORK/11_legacy.out" 2>&1 || {   # its own sandbox in the trapped WORK (#303)
         echo "  FAIL: replay 11 did not complete"; fail=1; }
     if [ -f "$WORK/11_legacy.log" ]; then
         if python3 tools/compare_window.py \

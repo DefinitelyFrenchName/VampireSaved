@@ -36,6 +36,14 @@ set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
+# #303 (ruled 2026-10-23, "Callers pass a sandbox"): tools/run_mame.sh makes a mktemp sandbox when MAME_SANDBOX is
+# unset and then execs MAME, so nothing removes it. This gate's subject IS that default (its first run logs a mktemp
+# sandbox as fresh), so instead of passing a sandbox it contains the default: TMPDIR inside $W, and a `mktemp` shim
+# first on PATH that honours TMPDIR for a template-less `mktemp -d` — macOS's /usr/bin/mktemp ignores TMPDIR there
+mkdir -p "$W/tmp" "$W/shim"; TMPDIR="$W/tmp"; export TMPDIR
+MK="$(command -v mktemp)"
+printf '#!/bin/sh\n[ "$*" = "-d" ] && exec "%s" -d "$TMPDIR/tmp.XXXXXXXXXX"\nexec "%s" "$@"\n' "$MK" "$MK" > "$W/shim/mktemp"
+chmod +x "$W/shim/mktemp"; PATH="$W/shim:$PATH"; export PATH
 fail=0
 ok() { echo "  ok    $*"; }
 bad() { echo "  FAIL  $*"; fail=1; }

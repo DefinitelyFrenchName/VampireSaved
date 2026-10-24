@@ -24,6 +24,7 @@ Usage: python3 tools/program_bytediff.py [--record] <OLD build dir> <NEW build d
   1- or 2-byte range's sha1 is its bytes by brute force. A whole 4 MiB image's sha1 is not.
 """
 import hashlib, os, subprocess, sys, tempfile
+import atexit, shutil  # #303
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -35,7 +36,7 @@ def views(d):
         z = os.path.join(rp, "vsavj.zip")
     if not os.path.exists(z):
         sys.exit(f"program_bytediff: no vsavjw.zip or vsavj.zip under {rp}")
-    t = tempfile.mkdtemp()
+    t = tempfile.mkdtemp(); atexit.register(shutil.rmtree, t, True)  # #303: removed at exit
     subprocess.run([sys.executable, os.path.join(REPO, "tools", "cps2_decrypt.py"), z, t + "/op.bin",
                     "--data-out", t + "/data.bin"], capture_output=True, check=True)
     return open(t + "/op.bin", "rb").read(), open(t + "/data.bin", "rb").read()
