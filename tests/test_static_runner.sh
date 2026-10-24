@@ -26,6 +26,9 @@
 #   Since #299 (14z-205, section 24): `--jobs 4` reads exactly as `--jobs 1` (every verdict line in registry order,
 #   the controls readout, every results and control row but its seconds), with and without --confirm; each gate and
 #   control runs once, `# ORDER: last` runs after the pool, and the pool never runs a control the plan carries.
+#   Since #312 (14z-207, section 24): the pool runs a gate's controls as jobs of their own, queued only when the gate's
+#   job has ended; a gate listed in tests/controls_concurrent.txt has its controls run beside one another, any other gate has
+#   them run one after another, and either way the readout and the results tables are the serial run's.
 #   Since #299 (14z-205c, section 12d): a control mode whose gate prints its OWN `CONTROL DEAD` beside a Python
 #   exception line is DIED; its own DEAD alone, and an exception beside ANOTHER control's DEAD, stay honoured.
 #   Since #276 (14z-205, section 26): a run given STATIC_RESULTS_OUT also leaves a byte-identical copy of its results
@@ -51,6 +54,8 @@
 # MUST-FIRE: shadow-tool: pool-blind — a copy of run_all_static.sh whose PARALLEL-PRE read of a gate's pool result is disabled must run every gate a second time after the pool, and section 24 must FAIL (mode: that copy drives section 24)
 # MUST-FIRE: shadow-tool: pool-order-ignored — a copy of run_all_static.sh whose POOL-ORDER-LAST test is disabled must run the `# ORDER: last` stub inside the pool, before the slow stub ends, and section 24 must FAIL (mode: that copy drives section 24)
 # MUST-FIRE: shadow-tool: job-carry-blind — a copy of tests/lib/static_job.sh whose JOB-CARRY-CONTROLS exit is disabled must run g_f's control although the --confirm plan carries it, and section 24 must FAIL (mode: that copy is the job section 24 runs)
+# MUST-FIRE: shadow-tool: pool-concurrency-off — a copy of tests/lib/static_pool.py whose POOL-CONCURRENT branch is disabled must run the concurrent-listed stub's three controls one after another, and section 24 must FAIL (mode: that copy is the pool section 24 runs; #312, 14z-207)
+# MUST-FIRE: shadow-tool: pool-controls-early — a copy of tests/lib/static_pool.py that queues the concurrent stub's controls with the gates, not when the gate's job ends, must start one of them before the stub's gate run ended, and section 24 must FAIL (mode: that copy is the pool section 24 runs; #312, 14z-207)
 # MUST-FIRE: shadow-tool: runrec-lost — a copy of run_all_static.sh whose RUNREC-KEEPS-RESULTS copy is disabled must leave a run given STATIC_RESULTS_OUT with no results in its own run record, and section 26 must FAIL (mode: that copy drives section 26; section 27 fires it in-run; #276, 14z-205)
 # MUST-FIRE: shadow-tool: runrec-controls-lost — a copy of run_all_static.sh whose RUNREC-KEEPS-CONTROLS copy is disabled must leave the run record without the control times, and section 26 must FAIL (mode: that copy drives section 26; section 27 fires it in-run; #276, 14z-205)
 # MUST-FIRE: shadow-tool: decrypt-warm-off — a copy of run_all_static.sh whose DECRYPT-WARM call is disabled must leave a stub that reads build/out directly on a cold cache, and section 28 must FAIL (mode: that copy drives section 28; section 29 fires it in-run; #299, 14z-206)
@@ -973,6 +978,12 @@ cmp -s "$RUNNER" "$SHADOW_Q" && fail "could not disable the pool's ORDER: last �
 JOB_C="$T/static_job_carryblind.sh"
 sed 's|    \[ -n "$_cc" \] && \[ "$_cc" = "$VS_CTL_DECLARED" \] && exit 0   # JOB-CARRY-CONTROLS|    :   # JOB-CARRY-CONTROLS disabled|' "$REPO/tests/lib/static_job.sh" > "$JOB_C"
 cmp -s "$REPO/tests/lib/static_job.sh" "$JOB_C" && fail "could not disable the job's carried controls — the JOB-CARRY-CONTROLS line moved"
+POOL_S="$T/static_pool_serial.py"
+sed 's|    if lines\[0\] == "concurrent":   # POOL-CONCURRENT|    if False:   # POOL-CONCURRENT disabled|' "$REPO/tests/lib/static_pool.py" > "$POOL_S"
+cmp -s "$REPO/tests/lib/static_pool.py" "$POOL_S" && fail "could not disable the pool's concurrent controls — the POOL-CONCURRENT line moved"
+POOL_E="$T/static_pool_early.py"
+sed 's|^queue = collections.deque(("gate", g, "") for g in gates)$|queue = collections.deque([("gate", g, "") for g in gates] + [("control", "g_k", c) for c in ("flip", "flop", "flap") if "g_k" in gates])   # POOL-EARLY shadow|' "$REPO/tests/lib/static_pool.py" > "$POOL_E"
+cmp -s "$REPO/tests/lib/static_pool.py" "$POOL_E" && fail "could not make the pool queue controls early — its queue line moved"
 FJ="$T/repo299"; mkdir -p "$FJ/tests/lib" "$FJ/tools" "$FJ/data"
 for _l in classify controls measures; do ln -s "$REPO/tests/lib/$_l.sh" "$FJ/tests/lib/$_l.sh"; done
 cp "$REPO/tools/static_confirm.py" "$REPO/tools/battery_reach.py" "$REPO/tools/build_dirs.py" "$REPO/tests/expected/build_dirs.tsv" "$FJ/tools/"
@@ -990,31 +1001,49 @@ mkj g_c 0 "sleep 1; echo 'PASS: c, the slow one'"
 mkj g_d 0 "echo 'SKIP: no build at build/nope'"
 mkj g_l 0 "echo 'PASS: l'"
 mkj g_f 0 "cat data/list.tsv > /dev/null; echo 'PASS: f'" ctl
-printf 'g_l\ng_a\ng_b\ng_c\ng_d\ng_f\n' > "$FJ/tests/ci_portable.txt"; : > "$FJ/tests/ci_static.txt"
+{ echo "#!/bin/sh"; echo "# g_k.sh — the #312 stub of section 24: three controls the pool may run beside one another"
+  for _c in flip flop flap; do echo "# MUST-FIRE: perturbed-copy: $_c — a $_c must fail"; done
+  echo 'case "${CONTROL:-}" in flip|flop|flap) echo "ctl g_k $CONTROL" >> "'"$T"'/j.ctl"; if [ -f "'"$T"'/k.on" ]; then echo "start $CONTROL $(date +%s)" >> "'"$T"'/k.log"; sleep 2; echo "end $CONTROL $(date +%s)" >> "'"$T"'/k.log"; fi; echo "FAIL: the $CONTROL was caught"; exit 1 ;; esac'
+  echo "if [ -f '$T/k.on' ]; then sleep 2; echo \"gate_end \$(date +%s)\" >> '$T/k.log'; fi; echo g_k >> '$T/j.ran'"
+  for _c in flip flop flap; do echo "echo 'CONTROL FIRED: $_c — caught'"; done
+  echo "echo 'PASS: k'"; } > "$FJ/tests/g_k.sh"
+chmod +x "$FJ/tests/g_k.sh"
+printf '# the gates whose controls may run beside one another (#312)\ng_k\tsection 24 stub\n' > "$FJ/tests/controls_concurrent.txt"
+printf 'g_l\ng_a\ng_b\ng_c\ng_d\ng_f\ng_k\n' > "$FJ/tests/ci_portable.txt"; : > "$FJ/tests/ci_static.txt"
 printf 'name\nf\n' > "$FJ/data/list.tsv"
 (cd "$FJ" && git init -q && git add -A && git -c user.name=t -c user.email=t@t commit -qm base)
 rd24() {  # rd24 <readout> <results.tsv>: what must not depend on --jobs (verdict lines in order, controls lines, rows less seconds)
     printf '%s\n' "$1" | awk '/^  g_/ {print $1, $2} /^  (read|executed|carried): / {print}'
     grep -v '^#' "$2" | cut -f1,2,4-; grep -v '^#' "${2%.tsv}.controls.tsv" 2>/dev/null | cut -f1-3
 }
-s24() {   # s24 <runner> <static_job.sh> [confirm] -> sets S24a S24b S24c [S24d] (ok|bad)
-    rm -f "$FJ/tests/run_all_static.sh" "$FJ/tests/lib/static_job.sh"
-    ln -s "$1" "$FJ/tests/run_all_static.sh"; ln -s "$2" "$FJ/tests/lib/static_job.sh"
+s24() {   # s24 <runner> <static_job.sh> <static_pool.py> [confirm] -> sets S24a S24b S24c S24e [S24d] (ok|bad)
+    rm -f "$FJ/tests/run_all_static.sh" "$FJ/tests/lib/static_job.sh" "$FJ/tests/lib/static_pool.py"
+    ln -s "$1" "$FJ/tests/run_all_static.sh"; ln -s "$2" "$FJ/tests/lib/static_job.sh"; ln -s "$3" "$FJ/tests/lib/static_pool.py"
     _o1="$(cd "$FJ" && STATIC_CHANGED_PATHS= STATIC_RESULTS_OUT="$T/j1.tsv" sh tests/run_all_static.sh --tier portable --jobs 1 2>&1)" || true
-    rm -f "$T/j.ran" "$T/j.ctl"
+    rm -f "$T/j.ran" "$T/j.ctl" "$T/k.log"; : > "$T/k.on"   # g_k sleeps and logs in this run only
     _o4="$(cd "$FJ" && STATIC_CHANGED_PATHS= STATIC_RESULTS_OUT="$T/j4.tsv" sh tests/run_all_static.sh --tier portable --jobs 4 2>&1)" || true
+    rm -f "$T/k.on"
     if [ "$(rd24 "$_o1" "$T/j1.tsv")" = "$(rd24 "$_o4" "$T/j4.tsv")" ] && [ -n "$(rd24 "$_o1" "$T/j1.tsv")" ] \
-            && printf '%s' "$_o4" | grep -q '^== portable tier: 6 gate(s) run in 4 parallel jobs'; then S24a=ok
+            && printf '%s' "$_o4" | grep -q '^== portable tier: 7 gate(s) run in 4 parallel jobs'; then S24a=ok
     else S24a=bad; echo "    the --jobs 4 readout differs from --jobs 1:"; rd24 "$_o1" "$T/j1.tsv" > "$T/r1.txt"; rd24 "$_o4" "$T/j4.tsv" > "$T/r4.txt"; diff "$T/r1.txt" "$T/r4.txt" | sed 's/^/      /' | head -20; fi
-    if [ "$(sort "$T/j.ran" | uniq -c | awk '$1 != 1' | wc -l | tr -d ' ')" = 0 ] && [ "$(wc -l < "$T/j.ran" | tr -d ' ')" = 6 ] \
-            && [ "$(sort "$T/j.ctl" | uniq -c | awk '$1 != 1' | wc -l | tr -d ' ')" = 0 ] && [ "$(wc -l < "$T/j.ctl" | tr -d ' ')" = 2 ]; then S24b=ok
+    if [ "$(sort "$T/j.ran" | uniq -c | awk '$1 != 1' | wc -l | tr -d ' ')" = 0 ] && [ "$(wc -l < "$T/j.ran" | tr -d ' ')" = 7 ] \
+            && [ "$(sort "$T/j.ctl" | uniq -c | awk '$1 != 1' | wc -l | tr -d ' ')" = 0 ] && [ "$(wc -l < "$T/j.ctl" | tr -d ' ')" = 5 ]; then S24b=ok
     else S24b=bad; echo "    at --jobs 4 a gate or a control did not run exactly once: $(sort "$T/j.ran" "$T/j.ctl" | uniq -c | tr -s ' ' | tr '\n' '|')"; fi
     [ "$(tail -1 "$T/j.ran")" = g_l ] && S24c=ok || { S24c=bad; echo "    at --jobs 4 the ORDER: last stub did not run last: $(tr '\n' ' ' < "$T/j.ran")"; }
-    [ -n "${3:-}" ] || return 0
+    # #312: g_k's three controls overlap one another (the last start before the first end) and none starts before
+    # its gate's run ended
+    # (one awk, never a shell number test: a shadow that runs g_k twice logs two gate_end lines, and a shell error line
+    # would turn every control mode of this gate into DIED — paid on ERIS, 14z-207)
+    if awk '$1 == "start" {n++; if (!(fs) || $3 < fs) fs = $3; if ($3 > ls) ls = $3}
+            $1 == "end" {if (!(fe) || $3 < fe) fe = $3}
+            $1 == "gate_end" {g++; ge = $2}
+            END {exit !(n == 3 && g == 1 && ls < fe && fs >= ge)}' "$T/k.log" 2>/dev/null; then S24e=ok
+    else S24e=bad; echo "    at --jobs 4 g_k's controls did not run beside one another after its gate: $(tr '\n' '|' < "$T/k.log" 2>/dev/null)"; fi
+    [ -n "${4:-}" ] || return 0
     # --confirm on the serial run, after a change to the data g_f's code reads directly (R2: g_f re-runs, its control CARRIED, #298)
     printf 'name\nf\ng\n' > "$FJ/data/list.tsv"; sleep 1
     _c1="$(cd "$FJ" && STATIC_RESULTS_OUT="$T/c1.tsv" sh tests/run_all_static.sh --tier portable --jobs 1 --confirm "$T/j1.tsv" 2>&1)" || true
-    rm -f "$T/j.ran" "$T/j.ctl"
+    rm -f "$T/j.ran" "$T/j.ctl" "$T/k.log"
     _c4="$(cd "$FJ" && STATIC_RESULTS_OUT="$T/c4.tsv" sh tests/run_all_static.sh --tier portable --jobs 4 --confirm "$T/j1.tsv" 2>&1)" || true
     if [ "$(rd24 "$_c1" "$T/c1.tsv")" = "$(rd24 "$_c4" "$T/c4.tsv")" ] && printf '%s' "$_c4" | grep -qE "^  re-run g_f +STALE: R2" \
             && printf '%s' "$_c4" | grep -q "controls carried: 1 honoured" && [ ! -s "$T/j.ctl" ] && grep -qx g_f "$T/j.ran"; then S24d=ok
@@ -1022,25 +1051,33 @@ s24() {   # s24 <runner> <static_job.sh> [confirm] -> sets S24a S24b S24c [S24d]
         rd24 "$_c1" "$T/c1.tsv" > "$T/r1.txt"; rd24 "$_c4" "$T/c4.tsv" > "$T/r4.txt"; diff "$T/r1.txt" "$T/r4.txt" | sed 's/^/      /' | head -20; fi
     (cd "$FJ" && git checkout -q -- data)
 }
-R24="$RUNNER"; J24="$REPO/tests/lib/static_job.sh"
+R24="$RUNNER"; J24="$REPO/tests/lib/static_job.sh"; P24="$REPO/tests/lib/static_pool.py"
 vs_ctl_is pool-blind && R24="$SHADOW_P"; vs_ctl_is pool-order-ignored && R24="$SHADOW_Q"; vs_ctl_is job-carry-blind && J24="$JOB_C"
-s24 "$R24" "$J24" confirm
+vs_ctl_is pool-concurrency-off && P24="$POOL_S"; vs_ctl_is pool-controls-early && P24="$POOL_E"
+s24 "$R24" "$J24" "$P24" confirm
 [ "$S24a" = ok ] && echo "  ok: --jobs 4 and --jobs 1 read the same: every verdict line in registry order, the controls readout, every results row and control row but its seconds" || fail "section 24: a parallel run read differently from a serial one"
 [ "$S24b" = ok ] && echo "  ok: at --jobs 4 each of the 6 stubs ran once and each of the 2 controls ran once (the pool's results are the ones read)" || fail "section 24: the parallel run ran a gate or a control twice, or not at all"
 [ "$S24c" = ok ] && echo "  ok: at --jobs 4 the ORDER: last stub ran after the pool" || fail "section 24: ORDER: last did not run after the pool"
 [ "$S24d" = ok ] && echo "  ok: --confirm at --jobs 4 reads as at --jobs 1; g_f re-runs (R2) and the pool does not run the control the plan carries" || fail "section 24: --confirm under --jobs differs, or the pool ran a carried control"
+[ "$S24e" = ok ] && echo "  ok: at --jobs 4 the concurrent-listed stub's three controls ran beside one another, each started after its gate's run ended (#312)" || fail "section 24: a concurrent gate's controls ran one after another, or before their gate ended (#312)"
 
 echo "== 25. MUST-FIRE: section 24's properties, each broken by its shadow =="
-if ! vs_ctl_is pool-blind && ! vs_ctl_is pool-order-ignored && ! vs_ctl_is job-carry-blind; then
-    s24 "$SHADOW_P" "$REPO/tests/lib/static_job.sh" > /dev/null
+if ! vs_ctl_is pool-blind && ! vs_ctl_is pool-order-ignored && ! vs_ctl_is job-carry-blind && ! vs_ctl_is pool-concurrency-off && ! vs_ctl_is pool-controls-early; then
+    s24 "$SHADOW_P" "$REPO/tests/lib/static_job.sh" "$REPO/tests/lib/static_pool.py" > /dev/null
     [ "$S24b" = bad ] && vs_ctl_fired pool-blind "a runner that ignores the pool's results runs every gate twice — section 24 catches it" \
         || { rc=1; vs_ctl_dead pool-blind "the pool-blind runner still ran each gate once" || :; }
-    s24 "$SHADOW_Q" "$REPO/tests/lib/static_job.sh" > /dev/null
+    s24 "$SHADOW_Q" "$REPO/tests/lib/static_job.sh" "$REPO/tests/lib/static_pool.py" > /dev/null
     [ "$S24c" = bad ] && vs_ctl_fired pool-order-ignored "a pool that takes the ORDER: last stub in runs it before the slow stub ends — section 24 catches it" \
         || { rc=1; vs_ctl_dead pool-order-ignored "the order-ignoring pool still ran g_l last" || :; }
-    s24 "$RUNNER" "$JOB_C" confirm > /dev/null
+    s24 "$RUNNER" "$JOB_C" "$REPO/tests/lib/static_pool.py" confirm > /dev/null
     [ "$S24d" = bad ] && vs_ctl_fired job-carry-blind "a job blind to the plan's carried controls runs g_f's control under --confirm — section 24 catches it" \
         || { rc=1; vs_ctl_dead job-carry-blind "the carry-blind job still left g_f's control unrun" || :; }
+    s24 "$RUNNER" "$REPO/tests/lib/static_job.sh" "$POOL_S" > /dev/null
+    [ "$S24e" = bad ] && vs_ctl_fired pool-concurrency-off "a pool that runs a concurrent gate's controls one after another — section 24 catches it" \
+        || { rc=1; vs_ctl_dead pool-concurrency-off "the serialising pool still overlapped g_k's controls" || :; }
+    s24 "$RUNNER" "$REPO/tests/lib/static_job.sh" "$POOL_E" > /dev/null
+    [ "$S24e" = bad ] && vs_ctl_fired pool-controls-early "a pool that queues the controls with the gates starts one before its gate ended — section 24 catches it" \
+        || { rc=1; vs_ctl_dead pool-controls-early "the early-queueing pool still started every control after g_k's gate" || :; }
 fi
 
 echo "== 26. a run told to write its results elsewhere keeps a copy in its own run record (#276, 14z-205) =="
@@ -1084,6 +1121,7 @@ sed 's@        if decrypt_cache_ensure "$_s" 2>> "$WORK/decrypt_warm.err"; then 
 cmp -s "$RUNNER" "$SHADOW_W" && fail "could not disable the decrypt warm-up — the DECRYPT-WARM line moved"
 FV="$T/repo_dv"; RV="$T/romdir_dv"; mkdir -p "$FV/tests/lib" "$FV/tools" "$RV"
 for _l in classify controls measures static_job decrypt_cache; do ln -s "$REPO/tests/lib/$_l.sh" "$FV/tests/lib/$_l.sh"; done
+ln -s "$REPO/tests/lib/static_pool.py" "$FV/tests/lib/static_pool.py"   # the pool (#312)
 : > "$RV/vsavj.zip"; : > "$RV/vsav2.zip"
 cat > "$FV/tools/cps2_decrypt.py" <<'PY'
 import sys, time                      # a stub decrypt: <zip> <op> --data-out <dat>, full-length images after a second

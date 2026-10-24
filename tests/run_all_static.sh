@@ -81,7 +81,10 @@
 #                                          tier on the commit they build from.
 #   ... --jobs N                           run N gates at once (14z-205, #299; default 1, or $STATIC_JOBS):
 #                                          each gate and the controls the run would execute for it run in a
-#                                          pool of N jobs (tests/lib/static_job.sh), then every result is
+#                                          pool of N jobs (tests/lib/static_pool.py, tests/lib/static_job.sh;
+#                                          since #312 a gate's controls are jobs of their own, queued when the
+#                                          gate's job ends, beside one another when the gate is listed in
+#                                          tests/controls_concurrent.txt), then every result is
 #                                          classified and printed in REGISTRY order exactly as a serial run
 #                                          does — the same readout, the same results.tsv; only the wall
 #                                          clock differs. `# ORDER: last` gates run alone, after the pool.
@@ -518,8 +521,11 @@ exec_controls() {  # exec_controls <gate> <tier-label>
 }
 
 # THE POOL (14z-205, #299): with --jobs N > 1, every gate a tier will execute (not carried, executable) runs first in N
-# parallel jobs, its controls with it when the run's rule would execute them; run_tier then reads the results in
-# registry order. `# ORDER: last` gates run alone after the pool, as in a serial run.
+# parallel jobs, its controls after it when the run's rule would execute them; run_tier then reads the results in
+# registry order. `# ORDER: last` gates run alone after the pool, as in a serial run. Since #312 (14z-207) the pool is
+# tests/lib/static_pool.py: a gate's controls are queued, at the front, when its job ends — each a job of its own when
+# the gate is listed in tests/controls_concurrent.txt (its controls share nothing they write), otherwise one job running
+# them in turn — so one gate's controls no longer hold one slot while the others idle.
 pre_run() {  # pre_run <tier label> <names>
     case "$JOBS" in ''|*[!0-9]*) echo "bad --jobs '$JOBS'" >&2; exit 2 ;; esac
     [ "$JOBS" -gt 1 ] || return 0
@@ -530,8 +536,10 @@ pre_run() {  # pre_run <tier label> <names>
         if grep -q '^# ORDER: last' "tests/$_g.sh"; then _late="$_late $_g"; else _todo="$_todo $_g"; fi   # POOL-ORDER-LAST
     done
     _p0=$(date +%s)
-    printf '%s\n' $_todo | awk 'NF' | xargs -P "$JOBS" -I{} sh tests/lib/static_job.sh {} "$WORK" "$EXEC_CTL" "$1" 2>> "$WORK/pre/jobs.err" || true
+    # shellcheck disable=SC2086
+    python3 tests/lib/static_pool.py "$JOBS" "$WORK" "$EXEC_CTL" "$1" $_todo 2>> "$WORK/pre/jobs.err" | sed 's/^/  /' || true   # POOL-SPLIT (#312)
     for _g in $_late; do sh tests/lib/static_job.sh "$_g" "$WORK" "$EXEC_CTL" "$1" 2>> "$WORK/pre/jobs.err" || true; done
+    [ -z "$RUNREC" ] || [ ! -f "$WORK/pre/pool_$1.tsv" ] || cp "$WORK/pre/pool_$1.tsv" "$RUNREC/pool_$1.tsv"   # each job's slot, start and end (#312)
     echo "== $1 tier: $(printf '%s\n' $_todo $_late | awk 'NF' | wc -l | tr -d ' ') gate(s) run in $JOBS parallel jobs, $(( $(date +%s) - _p0 )) s =="
 }
 

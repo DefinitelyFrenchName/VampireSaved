@@ -11,12 +11,13 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**314 tickets** — status: open 20 · parked 9 · done 255 · declined 12 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 213 · cosmetic 17 · evolution 84 · **backfill debt: 0 rows**.
+**315 tickets** — status: open 21 · parked 9 · done 255 · declined 12 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 213 · cosmetic 17 · evolution 85 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#315](https://github.com/DefinitelyFrenchName/VampireSaved/issues/315) | evolution | open | #312's concurrent-controls list is a snapshot: nothing re-checks that a listed gate still writes as it was traced | `tests/controls_concurrent.txt` | `DECISIONS_HISTORY.md § Ruled 2026-10-24 (14z-207) — #312's concurrent-controls list held by a census gate, re-traced at each freeze` | none | none | 14z-207 |
 | [#312](https://github.com/DefinitelyFrenchName/VampireSaved/issues/312) | evolution | open | A --jobs 8 static tier keeps only about 2.4 of its 8 job slots busy (CPU about 2.2 of 12 cores, 14z-205): one gate's controls run serially inside one pool job | `tests/lib/static_job.sh` · `tests/run_all_static.sh` | none | none | none | 14z-206 |
 | [#311](https://github.com/DefinitelyFrenchName/VampireSaved/issues/311) | bug | open | test_applier_page_browser's browser run does not complete under heavy load (a false red), and sometimes stalls unloaded | `tests/test_applier_page_browser.sh` | none | none | none | 14z-206 |
 | [#310](https://github.com/DefinitelyFrenchName/VampireSaved/issues/310) | bug | open | An executed control whose mode run FAILs without judging anything reads HONOURED | `tests/lib/classify.sh` · `tests/test_applier_page_browser.sh` | none | none | none | 14z-206 |
