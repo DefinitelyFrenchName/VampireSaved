@@ -373,6 +373,37 @@ must-fire control (a copy with `mame/emulator/` removed must fail). The
 packager's own refusal (a record whose sha256 does not match the file) was
 exercised by hand at 14z-113.
 
+## The release run on the freeze's tree — what it reuses (#316)
+
+The maintainer, 14z-208: *"yes, let's file this and do it before we freeze."* A release whose tree is the freeze's
+reuses the freeze's tier results instead of repeating them; every test still runs on that tree, once.
+
+```sh
+ROMDIR=... tests/run_all_static.sh --strict --cadence release --reuse <the freeze run's results.tsv>
+ROMDIR=... tests/run_all_emulator.sh --scope all --lane all --strict --controls --reuse <the freeze run's log dir>
+```
+
+- **The identity** (`tools/reuse_identity.py emit`, written by every run of both runners: the static runner's results
+  file at its start (`# id`) and end (`# id_end`), the emulator runner's `identity.tsv` and `identity_end.tsv`): the
+  tracked tree, the untracked files outside `build/`, each submodule's fingerprint, every file of `$ROMDIR`, the
+  instruments (mame-wide, mame-ref, `emu/fbneo/fbneo`, a caller's `MAME_BIN`, python3) and the five build
+  placeholders' rompaths — by content, so a snapshot run and a working-tree run agree when every byte does.
+- **Reused** only when every key is the freeze's, and the freeze run is its run of record (static: strict, GREEN,
+  the whole tier with ROMDIR, `--cadence freeze`, every control executed, no `--confirm`, its tree and identity
+  unmoved during it; emulator: `--strict`, its identity unmoved during it). Static: a gate PASS there with every
+  control honoured is counted PASS `reused` and its controls are not executed. Emulator: a gate PASS there is
+  written PASS `reused: ...`.
+- **Never reused:** a release-cadence static gate (`tests/ci_cadence.tsv`), a gate whose script reads `VS_CADENCE`
+  (its verdict depends on the cadence), and every emulator `--controls` mode (release cadence, ruled 2026-09-10).
+  Anything the freeze did not run (the out-of-freeze-scope rows, the Verilator lane if the freeze skipped it) is
+  absent from its results and runs.
+- **Any difference refuses the whole reuse**: the runner prints each key `same` or `DIFFERS` and `REUSE REFUSED`,
+  then runs everything as before. A release whose tiers run on a later commit than the freeze (a README fix, a
+  package regenerated) has a different tree and runs everything.
+
+Gate: `tests/test_release_reuse.sh` (a changed tree, a changed instrument and a changed ROMDIR file each refuse; the
+release-cadence stub is never reused; seven must-fire controls).
+
 ## Where a release's history is
 
 The registry row in `HANDOFF.md` "Build registry", the annotated tag

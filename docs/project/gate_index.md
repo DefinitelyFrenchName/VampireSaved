@@ -16,11 +16,11 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**471 scripts** — 142 ci_portable, 92 ci_static, 237 emulator-tier (run by name).
+**472 scripts** — 143 ci_portable, 92 ci_static, 237 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 50 | the suite runners and their own ground truth |
+| [runner](#runner) | 51 | the suite runners and their own ground truth |
 | [docs](#docs) | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 50 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -37,7 +37,7 @@ the suite runners and their own ground truth.
 
 | gate | kind | tier | needs | locks (the script's own header) | since |
 |---|---|---|---|---|---|
-| `tests/run_all_emulator.sh` | run | emulator | Verilator, MAME, FBNeo, a build dir, ~1 s | THE EMULATOR-TIER GATE CHAIN. One command, every gate that needs MAME, FBNeo or the Verilator simulator. (14z-128.) | 14z-128 |
+| `tests/run_all_emulator.sh` | run | emulator | Verilator, MAME, FBNeo, a build dir | THE EMULATOR-TIER GATE CHAIN. One command, every gate that needs MAME, FBNeo or the Verilator simulator. (14z-128.) | 14z-128 |
 | `tests/run_all_static.sh` | run | emulator | FBNeo, a build dir | THE PRE-COMMIT GATE CHAIN. One command, every gate that does not need an emulator. (14z-94, GitHub #30.) | 14z-94 |
 | `tests/run_battery_m2.sh` | run | emulator | MAME, FBNeo, a build dir, ~15 min | the M2 deliverable battery: the EXACT gate chain a stage-6 dev build must pass before any commit that touches the build (CLAUDE.md rule 2 / persistent-suite doctrine). One command, no chat-memory chain. Sections: 0. | M2 |
 | `tests/run_on_snapshot.sh` | run | emulator | Verilator, FBNeo, a build dir | RUN A TIER ON A SNAPSHOT AT A NAMED COMMIT, immune to the working tree (GitHub #153, lever B of #148; ruled 2026-09-26, DECISIONS_HISTORY.md "Ruled 2026-09-26 (14z-183b) — #153"). | 2026-09-26 |
@@ -73,6 +73,7 @@ the suite runners and their own ground truth.
 | `tests/test_promise_check.sh` | test | ci_portable | — | every promise a sitting's record makes is classed FULFILLED, CARRIED or NOT A PROMISE, and each class holds (`tools/promise_check.py`, 14z-187b, GitHub #190 P3). | 14z-187b |
 | `tests/test_proof_sheets.sh` | test | emulator | MAME, a build dir, ~17 s | THE COMPARATIVE SHEETS' PROOF IS ITSELF TESTED ([VSP-19]; GitHub #291 slice S1, 14z-204). | 14z-204 |
 | `tests/test_py_escapes.sh` | test | ci_portable | — | NO TRACKED PYTHON FILE CARRIES AN INVALID STRING ESCAPE (14z-191). ci_portable: no ROM, ~3 s. | 14z-191 |
+| `tests/test_release_reuse.sh` | test | ci_portable | — | A RELEASE REUSES THE FREEZE'S TIER ONLY ON THE FREEZE'S IDENTITY (#316, 14z-208). | 14z-208 |
 | `tests/test_rule_checker.sh` | test | ci_portable | — | the adversarial RULE-CHECKER's record is sound: every run in tests/rulecheck/ledger.tsv is complete and structured, every planted violation was caught, every fixture is calibrated, every VIOLATED resolved, and every freeze since the checker… | 14z-163 |
 | `tests/test_rulings_verbatim.sh` | test | ci_portable | — | a quote a session attributes to the maintainer is the maintainer's own words, and every message the maintainer sent is on record (`tools/agent/rulings_verbatim.py`, 14z-185b, #190 P2). | 14z-185b |
 | `tests/test_run_on_snapshot.sh` | test | ci_portable | — | S6 OF GitHub #153 (and #181's inputs): a run on a snapshot is IMMUNE to the working tree (ruled 2026-09-26, DECISIONS_HISTORY.md "Ruled 2026-09-26 (14z-183b) — #153"; | 2026-09-26 |

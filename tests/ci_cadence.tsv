@@ -204,3 +204,6 @@ test_tenant_loop	freeze	@code
 # keeps its cadence. They run with --cadence ondemand (test_sheet_census), tests/run_all_emulator.sh --scope ondemand
 # (test_proof_sheets), or by hand.
 test_sheet_census	ondemand	-
+# #316 (14z-208): the release-reuse gate drives both runners and the identity tool over a synthetic repo (~12 s, seven
+# controls of ~12 s each) -> freeze, triggered by what it runs: the two runners, the tool and its import, the libraries.
+test_release_reuse	freeze	tests/run_all_static.sh tests/run_all_emulator.sh tools/reuse_identity.py tools/static_confirm.py tests/lib/classify.sh tests/lib/controls.sh

@@ -107,7 +107,9 @@ REC="$REPO/build/snapshot_runs/$STAMP-$SHORT"
 if [ "$NOROM" = 0 ]; then [ -n "${ROMDIR:-}" ] && [ -d "$ROMDIR" ] || refuse "ROMDIR is not set to a directory (use --no-romdir only for a tree that reads no ROM)"; fi
 mkdir -p "$SNAP" "$REC"
 # explicit tests, never ${X:?}: after an EXIT trap a demand's abort exits 0 on macOS bash 3.2 (test_demand_after_trap)
-cleanup() { rm -f "${RUN_ON_SNAPSHOT_SELF:-/nonexistent}"; if [ "$KEEP" = 0 ] && [ -n "$SNAP" ] && [ -d "$SNAP" ]; then rm -rf "$SNAP"; fi; }
+# a refusal can come while a setup step runs in the background (#317): wait for it, so nothing writes into the
+# snapshot after its removal
+cleanup() { wait 2>/dev/null || true; rm -f "${RUN_ON_SNAPSHOT_SELF:-/nonexistent}"; if [ "$KEEP" = 0 ] && [ -n "$SNAP" ] && [ -d "$SNAP" ]; then rm -rf "$SNAP"; fi; }
 trap cleanup EXIT INT TERM
 say() { echo "$*"; echo "$*" >> "$REC/record.txt"; }
 cow() { cp -Rc "$1" "$2" 2>/dev/null || cp -Rp "$1" "$2"; }   # copy-on-write where the filesystem has it (both keep mtimes)
@@ -117,8 +119,10 @@ say "commit      $SHA"
 say "repo        $REPO"
 say "snapshot    $SNAP"
 say "runner      $*"
-git -C "$REPO" status --porcelain > "$REC/tree_porcelain_start.txt" 2>&1 || true
-say "tree_porcelain_at_start  $(grep -vc '^??' "$REC/tree_porcelain_start.txt" || true) tracked, $(grep -c '^??' "$REC/tree_porcelain_start.txt" || true) untracked — uncommitted changes are NOT tested"
+# the working tree's porcelain runs in the background while S1 and build/ are copied (#317, measured 8.9-10.0 s of the
+# setup); it is waited for BEFORE the first submodule git dir is copied, since a status refreshes those dirs' index files
+git -C "$REPO" status --porcelain > "$REC/tree_porcelain_start.txt" 2>&1 &
+PORC_PID=$!
 
 # ---- S1: the clone, at the commit, with its own object store
 # a local clone hardlinks the object files: git never rewrites an object or pack in place, so a gc
@@ -157,15 +161,52 @@ if [ -d "$REPO/build" ]; then
         echo snapshot_runs > "$REC/.build_scratch"
         S2_HOW="build/ copied whole but snapshot_runs (no tools/build_dirs.py at this commit)"
     fi
+    : > "$REC/.build_keep"
     while IFS= read -r n; do
         e="$REPO/build/$n"
         if [ -d "$e" ] && [ ! -L "$e" ] && grep -qxF "$n" "$REC/.build_scratch"; then
             LEFT_OUT="$LEFT_OUT $n"; continue
         fi
-        if [ -d "$e" ] && [ ! -L "$e" ]; then mkdir -p "$C/build/$n"; cow "$e/." "$C/build/$n/"
-        else rm -rf "$C/build/$n"; cow "$e" "$C/build/$n"; fi
+        printf '%s\n' "$n" >> "$REC/.build_keep"
     done < "$REC/.build_tops"
     rm -f "$REC/.build_tops"
+    # BUILD-COPY-BACKGROUND (#317): the kept entries are copied while the submodules are (measured 13.3-16.4 s
+    # beside their 17.6-18.9 s, one after the other before); waited for, its exit checked, before anything reads $C/build
+    ( while IFS= read -r n; do
+        e="$REPO/build/$n"
+        if [ -d "$e" ] && [ ! -L "$e" ]; then mkdir -p "$C/build/$n"; cow "$e/." "$C/build/$n/"
+        else rm -rf "$C/build/$n"; cow "$e" "$C/build/$n"; fi
+    done < "$REC/.build_keep" ) &
+    BUILD_PID=$!
+fi
+wait "$PORC_PID" || true
+say "tree_porcelain_at_start  $(grep -vc '^??' "$REC/tree_porcelain_start.txt" || true) tracked, $(grep -c '^??' "$REC/tree_porcelain_start.txt" || true) untracked — uncommitted changes are NOT tested"
+k=0; SUB_PIDS=""
+SUBS="$(git -C "$C" config -f .gitmodules --get-regexp 'submodule\..*\.path' 2>/dev/null | awk '{print $2}' || true)"
+for sm in $SUBS; do
+    want="$(git -C "$C" rev-parse "$SHA:$sm" 2>/dev/null || true)"
+    if [ ! -e "$REPO/$sm/.git" ]; then say "submodule   $sm  NOT initialised in the working tree — not snapshotted"; continue; fi
+    have="$(git -C "$REPO/$sm" rev-parse HEAD)"
+    [ "$have" = "$want" ] || refuse "submodule $sm is at $have in the working tree, the commit pins $want"
+    gd="$(git -C "$REPO/$sm" rev-parse --absolute-git-dir)"
+    mkdir -p "$C/.git/modules/$(dirname "$sm")"
+    cow "$gd" "$C/.git/modules/$sm"
+    [ -n "$sm" ] || continue
+    rm -rf "$C/$sm"
+    cow "$REPO/$sm" "$C/$sm"
+    printf 'gitdir: %s\n' "$C/.git/modules/$sm" > "$C/$sm/.git"
+    git -C "$C/$sm" config core.worktree "$C/$sm"
+    got="$(git -C "$C/$sm" rev-parse HEAD)"
+    [ "$got" = "$want" ] || refuse "the snapshotted submodule $sm is at $got, not $want"
+    # SUBMODULE-COUNT-BACKGROUND (#317): the count is a status, and a submodule's first status in a fresh copy
+    # re-reads every file (emu/mame: ~8.5 s, measured); it runs beside the steps below and is said before the run
+    k=$((k + 1)); printf '%s\t%s\n' "$sm" "$want" > "$REC/.sub_$k"
+    ( git -C "$C/$sm" status --porcelain 2>/dev/null | wc -l | tr -d ' ' > "$REC/.sub_$k.n" ) &
+    SUB_PIDS="$SUB_PIDS $!"
+done
+if [ -n "${BUILD_PID:-}" ]; then
+    wait "$BUILD_PID" || refuse "S2: copying build/ into the snapshot failed"
+    rm -f "$REC/.build_keep"
     # the commit's own tracked files under build/ win over the working tree's copies
     if git -C "$C" ls-files --error-unmatch build >/dev/null 2>&1; then git -C "$C" checkout -q "$SHA" -- build; fi
     say "build       $S2_HOW; left out:${LEFT_OUT:- nothing}"
@@ -183,31 +224,15 @@ if [ -d "$REPO/build" ]; then
     done
     rm -f "$REC/.build_scratch"
 fi
-SUBS="$(git -C "$C" config -f .gitmodules --get-regexp 'submodule\..*\.path' 2>/dev/null | awk '{print $2}' || true)"
-for sm in $SUBS; do
-    want="$(git -C "$C" rev-parse "$SHA:$sm" 2>/dev/null || true)"
-    if [ ! -e "$REPO/$sm/.git" ]; then say "submodule   $sm  NOT initialised in the working tree — not snapshotted"; continue; fi
-    have="$(git -C "$REPO/$sm" rev-parse HEAD)"
-    [ "$have" = "$want" ] || refuse "submodule $sm is at $have in the working tree, the commit pins $want"
-    gd="$(git -C "$REPO/$sm" rev-parse --absolute-git-dir)"
-    mkdir -p "$C/.git/modules/$(dirname "$sm")"
-    cow "$gd" "$C/.git/modules/$sm"
-    [ -n "$sm" ] || continue
-    rm -rf "$C/$sm"
-    cow "$REPO/$sm" "$C/$sm"
-    printf 'gitdir: %s\n' "$C/.git/modules/$sm" > "$C/$sm/.git"
-    git -C "$C/$sm" config core.worktree "$C/$sm"
-    got="$(git -C "$C/$sm" rev-parse HEAD)"
-    [ "$got" = "$want" ] || refuse "the snapshotted submodule $sm is at $got, not $want"
-    say "submodule   $sm  $want  ($(git -C "$C/$sm" status --porcelain | wc -l | tr -d ' ') changed paths — the tracked patches, checked in the run)"
-done
 if [ -d "$REPO/../community" ]; then cow "$REPO/../community" "$SNAP/community"; say "sibling     community  snapshotted"; else say "sibling     community  absent"; fi
 
 # ---- S1 check: the clone is whole — the commit's file count, and no tracked change but the submodules
 want_n="$(git -C "$C" ls-tree -r --name-only "$SHA" | wc -l | tr -d ' ')"
 have_n="$(git -C "$C" ls-files | wc -l | tr -d ' ')"
 [ "$want_n" = "$have_n" ] || refuse "the clone tracks $have_n files, the commit $want_n"
-porc="$(git -C "$C" status --porcelain | grep -v '^??' | awk '{print $2}' || true)"
+# -uno --ignore-submodules=all: the submodule paths and the untracked lines are dropped below anyway, and the
+# submodules' scan was the whole of this check's measured ~8.8 s (#317)
+porc="$(git -C "$C" status --porcelain -uno --ignore-submodules=all | grep -v '^??' | awk '{print $2}' || true)"
 for p in $porc; do
     case " $(echo $SUBS) " in *" $p "*) ;; *) refuse "the clone differs from $SHORT at $p before the run" ;; esac
 done
@@ -343,17 +368,33 @@ PY
 say "listing     $(wc -l < "$REC/listing.tsv" | tr -d ' ') files outside git (listing.tsv)"
 : > "$REC/fingerprints.tsv"
 if [ -f "$C/tools/build_fingerprint.py" ]; then
+    # FINGERPRINTS-PARALLEL (#317): one process per build dir, eight at a time, each into its own file, assembled in
+    # the glob's order — the serial loop's rows (measured 19.1-19.6 s serial for 91 dirs)
     for rp in "$C"/build/*/rompath; do
         [ -d "$rp" ] || continue
-        d="${rp%/rompath}"; d="${d##*/}"
-        set_arg=""; [ -f "$rp/vsavjw.zip" ] && set_arg="--set vsavjw"
-        fp="$(cd "$C" && python3 tools/build_fingerprint.py $set_arg "build/$d/rompath${ROMDIR:+;$ROMDIR}" 2>&1 | tail -1)"
-        printf 'build/%s\t%s\n' "$d" "$fp" >> "$REC/fingerprints.tsv"
-    done
+        d="${rp%/rompath}"; printf '%s\n' "${d##*/}"
+    done > "$REC/.fp_dirs"
+    mkdir -p "$REC/.fp"
+    tr '\n' '\0' < "$REC/.fp_dirs" | ( cd "$C" && FP_ROMDIR="${ROMDIR:-}" FP_OUT="$REC/.fp" xargs -0 -n 1 -P 8 sh -c '
+        set_arg=""; [ -f "build/$1/rompath/vsavjw.zip" ] && set_arg="--set vsavjw"
+        python3 tools/build_fingerprint.py $set_arg "build/$1/rompath${FP_ROMDIR:+;$FP_ROMDIR}" 2>&1 | tail -1 > "$FP_OUT/$1"' sh ) || true
+    while IFS= read -r d; do
+        printf 'build/%s\t%s\n' "$d" "$(cat "$REC/.fp/$d" 2>/dev/null)" >> "$REC/fingerprints.tsv"
+    done < "$REC/.fp_dirs"
+    rm -rf "$REC/.fp" "$REC/.fp_dirs"
     say "fingerprints $(wc -l < "$REC/fingerprints.tsv" | tr -d ' ') build dirs with a rompath (fingerprints.tsv)"
 else
     say "fingerprints no tools/build_fingerprint.py at this commit"
 fi
+
+for pid in $SUB_PIDS; do wait "$pid" || true; done
+i=0
+while [ "$i" -lt "$k" ]; do
+    i=$((i + 1))
+    IFS="$(printf '\t')" read -r sm want < "$REC/.sub_$i"
+    say "submodule   $sm  $want  ($(cat "$REC/.sub_$i.n" 2>/dev/null || echo '?') changed paths — the tracked patches, checked in the run)"
+    rm -f "$REC/.sub_$i" "$REC/.sub_$i.n"
+done
 
 # ---- the run (its exit status survives the tee through a file)
 say "start       $(date '+%Y-%m-%d %H:%M:%S')"
@@ -382,7 +423,7 @@ say "runner_exit $st"
 after="$(git -C "$C" rev-parse HEAD)"
 [ "$after" = "$SHA" ] || { say "AFTER: the clone's HEAD moved to $after during the run"; st=2; }
 not_sub() { for p in "$@"; do case " $(echo $SUBS) " in *" $p "*) ;; *) echo "$p" ;; esac; done; }
-moved="$(not_sub $(git -C "$C" status --porcelain | grep -v '^??' | awk '{print $2}'))"
+moved="$(not_sub $(git -C "$C" status --porcelain -uno --ignore-submodules=all | grep -v '^??' | awk '{print $2}'))"
 if [ -n "$moved" ]; then say "AFTER: tracked files changed inside the snapshot during the run: $(echo $moved)"; fi
 romcheck end || st=2
 # the run of record comes home (#181, ruled 2026-09-27 "Copied back"): every build/emu_* the run

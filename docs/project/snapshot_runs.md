@@ -122,8 +122,22 @@ and traceability"* — so session cadence stays in the working tree.
    (`agentlib.hook_bypass_reason`, installed by the maintainer 2026-10-17; `tests/test_agent_hooks.sh`, control
    `blind-bypass`); the maintainer's own `!` command is the override.
 
-A run costs about 50 s of setup before the runner starts (the clone, the snapshot, the listing
-and 76 fingerprints; measured 14z-183b on this Mac).
+A run costs about 27 s of setup before the runner starts, and about 12 s after it (the end checks and removing the
+snapshot). **Since #317 (14z-208)** the setup overlaps its slow parts: the working tree's start porcelain runs while the
+clone and `build/` are copied (and is waited for before the first submodule git dir is copied, since a status rewrites
+those dirs' index files); `build/` is classed in the foreground and copied in the background while the submodules are,
+and is waited for, its exit checked, before anything reads it; each submodule's changed-path count (a status, which in
+a fresh copy re-reads every file — `emu/mame`, about 8.5 s) runs beside the steps after it and is said before the run;
+the clone's two tracked-change checks pass `-uno --ignore-submodules=all` (they dropped the submodule and untracked
+lines anyway, and the submodules' scan was the whole of their cost); and the fingerprints run eight at a time,
+assembled in the glob's order. Measured at `1e24cae1` with runner `true`, three runs each, nothing else snapshotting
+(fork S2, `build/agent208/S2/REPORT.md`, local): 64.3 to 70.2 s from the record's first line to the runner (74 to 80 s
+with the start porcelain before it) against 26.9 to 27.9 s; the fingerprints (91 build dirs) 19.1 to 19.6 s against
+3.6 to 3.8 s, byte-identical; the listing identical in path and size (its symlink rows carry the copy's time, which
+differs between any two runs). **A stale `index.lock` in a submodule's git dir** (found 2026-10-24 in
+`.git/modules/emu/mame/`, 0 bytes, dated 2026-09-30, no git process holding it) stops every status from saving its
+refreshed index, so each status in the working tree and in every snapshot re-reads all 31,279 `emu/mame` files (6.3 to
+8.9 s measured; 0.11 s once the lock was removed in a snapshot) — the runner copies the lock with the git dir.
 
 ## What is proved, and by what
 
@@ -175,6 +189,13 @@ and 76 fingerprints; measured 14z-183b on this Mac).
   unchanged, the run of record came back as `build/emu_sweep_20260927_065635` stamped `454a1e19`, and
   none of the six copied scratch clones still named its original after the run (the record,
   `build/snapshot_runs/20260927T065450-454a1e19c98b/`, and `build/agent184/proof181_outer.log`).
+- **An incremental re-snapshot after a red** (#317's change 2) is measured and not built: a pristine copy of the
+  snapshot, kept to re-clone from, cost 16.4 to 18.1 s to make and 8.3 to 11.0 s to remove, on every run, green or
+  red, against a whole setup of about 27 s, so a re-run after a red could save at most about 10 s while every run
+  paid about 25 s more. A re-run after a red tier is cut instead by its BASE: at a close or any commit tier, re-run it with
+  `--confirm <the RED run's results.tsv>` — on a snapshot that is `<record>/results.tsv`, or the `STATIC_RESULTS_OUT`
+  the red run named, copied aside first when the re-run writes the same path — so it re-runs what was not PASS there
+  or changed since and carries the rest; the close driver does both (`docs/project/session_close.md`, the `tier` step).
 - **Host tools** — Homebrew's SDL libraries the MAME binaries link, Verilator, python3, `timeout` —
   are neither snapshotted nor recorded.
 - **A commit other than `HEAD`** is refused whenever a submodule's gitlink differs from the tree's

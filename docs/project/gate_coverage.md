@@ -13,11 +13,11 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**471 of 471 gates described.**
+**472 of 472 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
-| [runner](#runner) | 50 | 50 | the suite runners and their own ground truth |
+| [runner](#runner) | 51 | 51 | the suite runners and their own ground truth |
 | [docs](#docs) | 27 | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 50 | 50 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -30,7 +30,7 @@ first sentence) is `gate_index.md`.
 
 ## runner
 
-the suite runners and their own ground truth. 50 of 50 described.
+the suite runners and their own ground truth. 51 of 51 described.
 
 ### `run_all_emulator.sh` — run, emulator
 
@@ -319,6 +319,14 @@ the suite runners and their own ground truth. 50 of 50 described.
 **HOW:** each file compiled, never imported, under `python3 -W error::DeprecationWarning -W error::SyntaxWarning`; a file whose compile raises is named with the message.
 
 **EXPECTS:** every file compiles. A red names the file and the escape — the 14z-191 shape: tools/package_release.py's README text held `roms\` before a backtick, an invalid escape PILOT's Python 3.12 printed as a SyntaxWarning on every packaging run (the Mac's 3.9 stays silent).
+
+### `test_release_reuse.sh` — test, ci_portable
+
+**WHAT:** a release run given the freeze run's results (`tests/run_all_static.sh --cadence release --reuse <freeze results.tsv>`, `tests/run_all_emulator.sh --reuse <freeze log dir>`) reuses a gate's PASS only when the tree, the instruments and ROMDIR are the freeze's, byte for byte, and otherwise runs everything; a release-cadence gate, a gate that reads VS_CADENCE and an emulator gate's must-fire controls are never reused.
+
+**HOW:** one synthetic git repo of stub gates that log every execution (session, freeze and release cadence, one reading VS_CADENCE, one with a declared control; two emulator-tier stubs, one with a control) driven through the REAL runners and the REAL tools/reuse_identity.py: a strict GREEN freeze run, then a release --reuse run on the same identity, then one release run each with a tracked file changed, the mame-wide instrument changed and a ROMDIR file changed; the emulator runner likewise (a freeze run, a --controls release on it, one with the instrument changed); the argument refusals; and the tool's own self-test.
+
+**EXPECTS:** the same-identity release reuses exactly the session and freeze gates and executes no control of theirs, runs the release-cadence and VS_CADENCE gates, and is GREEN; each changed key prints REUSE REFUSED with that key DIFFERS and runs every gate; the emulator release reuses both gate rows and still executes the control; --reuse outside --cadence release or beside --confirm exits 2. A red names the case that reused what it must not.
 
 ### `test_rule_checker.sh` — test, ci_portable
 
@@ -614,7 +622,7 @@ the documentation locks — docs, skills, indexes, tables follow the tree. 27 of
 
 ### `test_session_close.sh` — test, ci_portable
 
-**WHAT:** docs/project/session_close.md's step table parses (six cells a row, ids unique, kind auto or manual, every auto step one backticked command and a verdict `exit 0` or `line <regex>`), its commands name only tools and tests that exist and only the placeholders tools/close.py fills, and CLAUDE.md, STATE.md, HANDOFF.md and docs/NEXT_SESSION.md each point to it; tools/close.py --selftest passes (order, placeholders, a verdict line judged over the exit code, done only at the step the close is at).
+**WHAT:** docs/project/session_close.md's step table parses (six cells a row, ids unique, kind auto or manual, every auto step one backticked command and a verdict `exit 0` or `line <regex>`), its commands name only tools and tests that exist and only the placeholders tools/close.py fills, and CLAUDE.md, STATE.md, HANDOFF.md and docs/NEXT_SESSION.md each point to it; tools/close.py --selftest passes (order, placeholders, a verdict line judged over the exit code, done only at the step the close is at, a re-run after a red tier confirmed on the red run's results — #317).
 
 **HOW:** tools/close.py check over the tree, and the self-test; controls on a copy of the doc and the four live documents.
 

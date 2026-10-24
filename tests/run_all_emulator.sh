@@ -95,6 +95,16 @@
 #   ... --stale                                          run exactly the gates tests/test_emulator_staleness.sh
 #                                                        names (a passed gate whose # FOLLOWS: path moved)
 #   ... --dry-run                                        print the resolved command per gate
+#   ... --reuse FREEZE_LOGDIR                            A RELEASE REUSES THE FREEZE'S ROWS (#316, 14z-208): when the
+#                                                        freeze run's identity (FREEZE_LOGDIR/identity.tsv, written by
+#                                                        every run at its start and identity_end.tsv at its end:
+#                                                        tools/reuse_identity.py emit — tree, untracked files, submodules,
+#                                                        ROMDIR, instruments, builds) equals this run's key by key, a gate
+#                                                        PASS there is written PASS "reused" and not re-run; its
+#                                                        --controls modes STILL RUN (controls are release cadence, ruled
+#                                                        2026-09-10, and a control row is never reused). Any difference, a
+#                                                        freeze run without --strict, or one whose identity moved during it,
+#                                                        REFUSES the reuse and everything runs.
 #   ... --controls                                       EXECUTE every declared must-fire control
 #                                                        (`CONTROL=<name> tests/<g>.sh` after a PASS;
 #                                                        one results row per control; off by default —
@@ -148,7 +158,7 @@ cd "$REPO"
 REG=tests/ci_emulator.tsv
 SCOPE=release; CADENCE=all; LANES="prereq fbneo mame"; LANES_SET=""; ONLY=""; JOBS=1; TMO=5400
 _ORIG_ARGS="$*"   # the command line as given, for the run record (#189) — the loop below shifts it away
-LOGDIR=""; RESUME=0; STRICT=0; KEEPGOING=0; DRY=0; LIST=0; CONTROLS=0; STALE=0
+LOGDIR=""; RESUME=0; STRICT=0; KEEPGOING=0; DRY=0; LIST=0; CONTROLS=0; STALE=0; REUSE=""
 while [ $# -gt 0 ]; do
     case "$1" in
     --scope)   shift; SCOPE="${1:?--scope needs release|all|ondemand}"
@@ -176,6 +186,7 @@ while [ $# -gt 0 ]; do
     --dry-run) DRY=1 ;;
     --controls) CONTROLS=1 ;;
     --stale)   STALE=1 ;;
+    --reuse)   shift; REUSE="${1:?--reuse needs the log directory of the freeze run}" ;;
     --list)    LIST=1 ;;
     -h|--help) sed -n '2,82p' "$0"; exit 0 ;;
     *) echo "unknown argument '$1' (try --help)" >&2; exit 2 ;;
@@ -398,6 +409,32 @@ if [ -z "${MAME_BIN:-}" ]; then MAME_BIN="$_MAME_W"; _mame_from="runner default"
 else                            _mame_from="set by the caller"; fi
 export MAME_BIN
 printf '    %-10s %s   (%s)\n' "MAME_BIN" "$MAME_BIN" "$_mame_from"
+# THE RUN'S IDENTITY (#316): what a release's --reuse compares with the freeze run's, taken after MAME_BIN is settled.
+# Written once per run directory (a --resume continues the run it records), and again at the end as identity_end.tsv.
+_ID_NOW="$LOGDIR/.identity_now"
+python3 tools/reuse_identity.py emit --root . > "$_ID_NOW" 2>/dev/null || : > "$_ID_NOW"
+if [ "$DRY" = 0 ] && [ ! -f "$LOGDIR/identity.tsv" ]; then
+    { echo "# identity (tests/run_all_emulator.sh; read by --reuse, #316)"; echo "# args $_ORIG_ARGS"; cat "$_ID_NOW"; } > "$LOGDIR/identity.tsv"
+fi
+REUSE_OK=""
+if [ -n "$REUSE" ]; then
+    echo
+    echo "== reuse: the freeze run $REUSE, its identity against this run's =="
+    if [ ! -f "$REUSE/identity.tsv" ] || [ ! -f "$REUSE/identity_end.tsv" ] || [ ! -f "$REUSE/results.tsv" ]; then
+        echo "  REUSE REFUSED: $REUSE lacks identity.tsv, identity_end.tsv or results.tsv — running everything"
+    elif ! grep -q '^# args .*--strict' "$REUSE/identity.tsv" || grep -q '^# args .*--reuse' "$REUSE/identity.tsv"; then
+        echo "  REUSE REFUSED: the freeze run was not --strict, or reused another run itself — running everything"
+    elif ! python3 tools/reuse_identity.py compare "$REUSE/identity.tsv" "$REUSE/identity_end.tsv" > /dev/null 2>&1; then
+        echo "  REUSE REFUSED: the freeze run's identity moved during it — running everything"
+    elif ! python3 tools/reuse_identity.py compare "$REUSE/identity.tsv" "$_ID_NOW" > "$LOGDIR/.reuse_cmp" 2>&1; then   # REUSE-IDENTITY
+        sed 's/^/  /' "$LOGDIR/.reuse_cmp"
+        echo "  REUSE REFUSED: the identity differs (above) — running everything"
+    else
+        sed 's/^/  /' "$LOGDIR/.reuse_cmp"
+        REUSE_OK=1
+        echo "  identity: the same — a gate PASS in the freeze run is reused; its --controls modes still run"
+    fi
+fi
 command -v timeout >/dev/null 2>&1 || command -v gtimeout >/dev/null 2>&1 || {
     echo "  note: no timeout(1) — gates will run unbounded"; }
 TIMEOUT_BIN="$(command -v timeout 2>/dev/null || command -v gtimeout 2>/dev/null || true)"
@@ -432,6 +469,13 @@ run_one() {   # run_one <gate> <lane> <scope> <args> — writes one results row
         *)                  _pos="$_pos $_tok" ;;
         esac
     done
+    # A GATE PASS IN THE FREEZE RUN, ON THIS RUN'S IDENTITY, IS REUSED (#316) — never a control row: controls are
+    # release cadence (ruled 2026-09-10), so the --controls block below runs for it as for any PASS
+    if [ -n "$REUSE_OK" ] && awk -F'\t' -v g="$_g" 'NR > 1 && $1 == g && $4 == "PASS" {f = 1} END {exit !f}' "$REUSE/results.tsv"; then   # REUSE-ROW
+        printf '%s\t%s\t%s\tPASS\t0\treused: PASS in the freeze run %s\n' "$_g" "$_lane" "$_scope" "$REUSE" >> "$RESULTS"
+        printf '  %-34s %-7s %4ss  %s\n' "$_g" PASS 0 "reused (PASS in the freeze run)"
+        _v=PASS; VS_CTL_DECLARED=$(vs_ctl_declared "tests/$_g.sh" | wc -w | tr -d ' ')
+    else
     _t0=$(date +%s)
     {
         echo "### $_g  lane=$_lane scope=$_scope"
@@ -468,6 +512,7 @@ run_one() {   # run_one <gate> <lane> <scope> <args> — writes one results row
     [ "$_v" = TIMEOUT ] && _d="killed after ${_tmo}s"
     printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$_g" "$_lane" "$_scope" "$_v" "$_dur" "$_d" >> "$RESULTS"
     printf '  %-34s %-7s %4ss  %s\n' "$_g" "$_v" "$_dur" "$_d"
+    fi
     # THE EXECUTABLE CONTROLS (--controls): one more run per declared name.
     if [ "$CONTROLS" = 1 ] && [ "$_v" = PASS ] && [ "${VS_CTL_DECLARED:-0}" != 0 ]; then
         for _cn in $(vs_ctl_declared "tests/$_g.sh"); do
@@ -631,6 +676,13 @@ for _l in $LANES; do
     fi
 done
 
+# THE IDENTITY AT THE END (#316): a freeze run whose instruments, ROMDIR or tree moved while it ran is not reused
+if [ "$DRY" = 0 ]; then
+    { echo "# identity at the end (tests/run_all_emulator.sh; read by --reuse, #316)"
+      python3 tools/reuse_identity.py emit --root . 2>/dev/null || true; } > "$LOGDIR/identity_end.tsv"
+fi
+rm -f "$_ID_NOW" "$LOGDIR/.reuse_cmp"
+
 # ── REGISTRY COVERAGE (the anti-orphan check, re-derived here every run) ────
 echo
 echo "== registry coverage (the anti-orphan check) =="
@@ -752,6 +804,8 @@ for kind in SKIP FAIL TIMEOUT MISSING; do
     [ -n "$_l" ] && echo "$(printf '%-8s' "$kind"):$_l"
 done
 echo "results   $RESULTS"
+_nr=$(awk -F'\t' 'NR>1 && $6 ~ /^reused: /' "$RESULTS" | wc -l | tr -d ' ')
+if [ "$_nr" != 0 ]; then echo "reused: $_nr of the PASS (not re-run: PASS in the freeze run $REUSE, its identity this run's — #316)"; fi
 rc=0
 [ "$n_fail" = 0 ] && [ "$n_tmo" = 0 ] && [ "$n_miss" = 0 ] || rc=1
 if [ "$STRICT" = 1 ]; then

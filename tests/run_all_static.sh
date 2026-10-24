@@ -101,6 +101,20 @@
 #                                          back in — not even its own script. It
 #                                          runs only when asked for: this flag,
 #                                          or `sh tests/<gate>.sh` directly.
+#   ... --reuse FREEZE_RESULTS             A RELEASE REUSES THE FREEZE'S TIER (#316, 14z-208, the maintainer:
+#                                          "yes, let's file this and do it before we freeze"): accepted only with
+#                                          --cadence release and without --confirm (exit 2 otherwise). Every run
+#                                          writes its IDENTITY into its results file (`# id` lines at the start,
+#                                          `# id_end` at the end: tools/reuse_identity.py emit — the tree, the
+#                                          untracked files outside build/, the submodules, ROMDIR's files, the
+#                                          instruments and the five build placeholders, by content). When the
+#                                          freeze's identity is this run's, key by key, and the freeze file is a
+#                                          strict GREEN whole-tier freeze run with every control executed, each
+#                                          gate PASS there with every control honoured is REUSED — counted PASS,
+#                                          named, not re-run, no control executed — except a release-cadence gate
+#                                          and a gate whose script reads VS_CADENCE, which always run. Any
+#                                          difference REFUSES the reuse, prints what it compared, and the run runs
+#                                          everything. test_release_reuse.sh holds it.
 #
 # THE MUST-FIRE CONTROLS ARE READ AND EXECUTED (14z-147, step two of the
 # maintainer's ruling, STATE 14z-145). Two things, both through
@@ -148,7 +162,7 @@ cd "$REPO"
 . "$REPO/tests/lib/classify.sh"
 
 _ORIG_ARGS="$*"   # the command line as given, for the run record (#189) — the loop below shifts it away
-STRICT=0; TIER=all; LIST=0; EXEC_CTL=all; CADENCE=session; CONFIRM=""; JOBS="${STATIC_JOBS:-1}"
+STRICT=0; TIER=all; LIST=0; EXEC_CTL=all; CADENCE=session; CONFIRM=""; REUSE=""; JOBS="${STATIC_JOBS:-1}"
 while [ $# -gt 0 ]; do
     case "$1" in
     --strict) STRICT=1 ;;
@@ -157,6 +171,7 @@ while [ $# -gt 0 ]; do
     --exec-controls) shift; EXEC_CTL="${1:?--exec-controls needs all|portable|none}" ;;
     --cadence) shift; CADENCE="${1:?--cadence needs session|freeze|release|ondemand}" ;;
     --confirm) shift; CONFIRM="${1:?--confirm needs the results.tsv of a previous run}" ;;
+    --reuse)   shift; REUSE="${1:?--reuse needs the results.tsv of the freeze run}" ;;
     --jobs)    shift; JOBS="${1:?--jobs needs a number}" ;;
     -h|--help) sed -n '2,40p' "$0"; exit 0 ;;
     *) echo "unknown argument '$1' (try --help)" >&2; exit 2 ;;
@@ -200,6 +215,10 @@ cad_rank() { case "$1" in session) echo 0 ;; freeze) echo 1 ;; release) echo 2 ;
 # session run, so --confirm at any other cadence is refused rather than quietly carrying gates past a freeze.
 if [ -n "$CONFIRM" ] && [ "$CADENCE" != session ]; then   # CONFIRM-SESSION-ONLY
     echo "--confirm: a $CADENCE run runs every gate and executes every control — nothing is carried (#269)" >&2; exit 2
+fi
+# --reuse is the RELEASE's (#316): a release on the freeze's identity reuses the freeze's verdicts; nothing else may
+if [ -n "$REUSE" ] && { [ "$CADENCE" != release ] || [ -n "$CONFIRM" ]; }; then   # REUSE-RELEASE-ONLY
+    echo "--reuse: only a --cadence release run without --confirm reuses a freeze run (#316)" >&2; exit 2
 fi
 # The gates that judge BY cadence read it from here (tests/test_emulator_staleness.sh:
 # a stale emulator gate is a NOTE at session, a FAIL at freeze/release — ruled 2026-09-24).
@@ -328,6 +347,10 @@ tree_now() {
     else echo none; fi
 }
 TREE_START="$(tree_now)"
+# THE RUN'S IDENTITY (#316): what a release compares with the freeze's before reusing a verdict. A root without the
+# tool (the runner gate's synthetic ones) has none, and a --reuse there is refused below.
+: > "$WORK/id_start.txt"
+if [ -f tools/reuse_identity.py ]; then python3 tools/reuse_identity.py emit --root . --tree "$TREE_START" > "$WORK/id_start.txt" 2>/dev/null || : > "$WORK/id_start.txt"; fi
 [ -z "$RESULTS_OUT" ] && [ -n "$RUNREC" ] && RESULTS_OUT="$RUNREC/results.tsv"
 if [ -n "$RESULTS_OUT" ]; then
     mkdir -p "$(dirname "$RESULTS_OUT")"
@@ -338,7 +361,10 @@ if [ -n "$RESULTS_OUT" ]; then
       echo "# tree $TREE_START"
       git status --porcelain 2>/dev/null | grep -v '^??' | awk '{print "# dirty " $NF}' || true
       # each submodule's state, so the next --confirm drops a dirty submodule that did not change (#286 (b))
-      if [ -f tools/static_confirm.py ]; then python3 tools/static_confirm.py subfp --root . 2>/dev/null | sed 's/^/# subfp /' || true; fi
+      # (the identity already holds them, in this form: one fingerprint pass, not two)
+      if [ -s "$WORK/id_start.txt" ]; then grep '^subfp ' "$WORK/id_start.txt" | grep -v -e '^subfp unreadable ' -e ' none$' | sed 's/^/# /' || true
+      elif [ -f tools/static_confirm.py ]; then python3 tools/static_confirm.py subfp --root . 2>/dev/null | sed 's/^/# subfp /' || true; fi
+      sed 's/^/# id /' "$WORK/id_start.txt"   # the identity a release's --reuse compares (#316)
       printf '# gate\tverdict\tseconds\tdeclared\tfired\thonoured\n'
     } > "$RESULTS_OUT"
 fi
@@ -354,6 +380,27 @@ if [ -n "$CONFIRM" ]; then
         | tee "$WORK/plan.err" | sed 's/^/  /' >&2
     [ "$(cat "$WORK/plan.rc" 2>/dev/null)" = 0 ] || {
         echo "--confirm: the plan FAILED — nothing is carried on a failed plan:" >&2; cat "$WORK/plan.err" >&2; exit 2; }
+fi
+# THE REUSE (#316): the identity compared key by key, then the plan of the freeze rows a release may reuse. Any
+# difference, or a freeze file that is not a freeze's run of record, leaves $WORK/reuse.tsv empty: everything runs.
+n_reuse=0; x_reuse=0; : > "$WORK/reuse.tsv"
+if [ -n "$REUSE" ]; then
+    [ -f "$REUSE" ] || { echo "--reuse: no such results file '$REUSE'" >&2; exit 2; }
+    echo "== reuse: the freeze run $REUSE, its identity against this run's =="
+    if [ ! -s "$WORK/id_start.txt" ]; then
+        echo "  REUSE REFUSED: this run has no identity (no tools/reuse_identity.py) — running everything"
+    elif ! python3 tools/reuse_identity.py compare "$REUSE" "$WORK/id_start.txt" > "$WORK/reuse_cmp.txt" 2>&1; then   # REUSE-IDENTITY
+        sed 's/^/  /' "$WORK/reuse_cmp.txt"
+        echo "  REUSE REFUSED: the identity differs (above) — running everything"
+    elif ! python3 tools/reuse_identity.py plan --root . --results "$REUSE" > "$WORK/reuse.tsv" 2> "$WORK/reuse_plan.err"; then
+        : > "$WORK/reuse.tsv"
+        sed 's/^/  /' "$WORK/reuse_cmp.txt"; sed 's/^/  /' "$WORK/reuse_plan.err"
+        echo "  REUSE REFUSED: the freeze file cannot be reused (above) — running everything"
+    else
+        sed 's/^/  /' "$WORK/reuse_cmp.txt"
+        echo "  identity: the same — $(awk -F'\t' '$1 == "REUSE"' "$WORK/reuse.tsv" | wc -l | tr -d ' ') gate(s) to reuse; run here:"
+        awk -F'\t' '$1 == "RUN" {printf "    run    %-34s %s\n", $2, $3}' "$WORK/reuse.tsv"
+    fi
 fi
 n_pass=0; n_skip=0; n_fail=0; n_miss=0
 failed=""; skipped=""
@@ -383,6 +430,15 @@ run_tier() {  # run_tier <label> <names>
     [ -n "$_names" ] || return 0
     echo "== $_label tier =="
     for g in $_names; do
+        _ru="$(awk -F'\t' -v g="$g" '$1 == "REUSE" && $2 == g {print $3 " " $4 " " $5}' "$WORK/reuse.tsv")"   # REUSE-CARRY
+        if [ -n "$_ru" ]; then
+            set -- $_ru
+            printf '  %-34s PASS  reused (PASS in the freeze run, every control honoured there)\n' "$g"
+            n_pass=$((n_pass + 1)); n_reuse=$((n_reuse + 1))
+            c_decl=$((c_decl + $1)); c_fired=$((c_fired + $2)); x_reuse=$((x_reuse + $3))
+            record_row "$g" PASS 0 "$1" "$2" "$3"
+            continue
+        fi
         if [ -n "$CONFIRM" ]; then   # CONFIRM-CARRY
             _carry="$(awk -F'\t' -v g="$g" '$1 == "CARRY" && $2 == g {print $3 " " $4 " " $5}' "$WORK/plan.tsv")"
             if [ -n "$_carry" ]; then
@@ -532,6 +588,7 @@ pre_run() {  # pre_run <tier label> <names>
     mkdir -p "$WORK/pre"; _todo=""; _late=""
     for _g in $2; do
         if [ -n "$CONFIRM" ] && awk -F'\t' -v g="$_g" '$1 == "CARRY" && $2 == g {f = 1} END {exit !f}' "$WORK/plan.tsv"; then continue; fi
+        if awk -F'\t' -v g="$_g" '$1 == "REUSE" && $2 == g {f = 1} END {exit !f}' "$WORK/reuse.tsv"; then continue; fi   # POOL-REUSE (#316)
         [ -x "tests/$_g.sh" ] || continue
         if grep -q '^# ORDER: last' "tests/$_g.sh"; then _late="$_late $_g"; else _todo="$_todo $_g"; fi   # POOL-ORDER-LAST
     done
@@ -768,7 +825,7 @@ done
 # F2 (opt-in, the real tier) is exact again; the header line below is generic
 # on both sides by construction — it named this file until the lift.
 _xn=$((x_ok + x_lies + x_refused + x_died))
-if [ $((c_decl + c_none + _xn + x_carry)) != 0 ]; then
+if [ $((c_decl + c_none + _xn + x_carry + x_reuse)) != 0 ]; then
 echo
 echo "== must-fire controls =="
 echo "  read:     fired $c_fired / declared $c_decl  (gates declaring none: $c_none; undeclared: $c_undecl)"
@@ -797,6 +854,7 @@ else
     fi
 fi
 if [ "$x_carry" != 0 ]; then echo "  carried:  $x_carry  (honoured in the confirmed run, not executed here; #286)"; fi   # an `if`: the runner is set -e
+if [ "$x_reuse" != 0 ]; then echo "  reused:   $x_reuse  (honoured in the freeze run, not executed here; #316)"; fi
 fi
 
 # THE CADENCE READOUT (14z-162, #148): printed only when something was deferred
@@ -828,6 +886,7 @@ printf 'PASS %-4s  SKIP %-4s  FAIL %-4s  MISSING %s\n' \
     "$n_pass" "$n_skip" "$n_fail" "$n_miss"
 [ "$n_defer" != 0 ] && echo "deferred: $n_defer (cadence $CADENCE — named above, not run)"
 [ "$n_carry" != 0 ] && echo "carried: $n_carry of the PASS (not re-run: PASS in $CONFIRM and predicted unaffected — tools/static_confirm.py plan)"
+[ "$n_reuse" != 0 ] && echo "reused: $n_reuse of the PASS (not re-run: PASS in the freeze run $REUSE, its identity this run's — tools/reuse_identity.py, #316)"
 [ -n "$RESULTS_OUT" ] && echo "results: $RESULTS_OUT (confirm a red with --confirm $RESULTS_OUT)"
 [ -n "$skipped" ] && echo "skipped:$skipped"
 [ -n "$failed" ]  && echo "failed: $failed"
@@ -852,7 +911,10 @@ fi
 # THE VERDICT AND THE RUN'S SCOPE, last in the results file, and the green guard's row (#290). The guard counts a row
 # only when it is GREEN, --strict, of the whole tier, with ROMDIR set, at cadence session/freeze/release.
 if [ -n "$RESULTS_OUT" ]; then
-    { echo "# tree_end $(tree_now)"
+    _tree_end="$(tree_now)"
+    { echo "# tree_end $_tree_end"
+      if [ -s "$WORK/id_start.txt" ]; then python3 tools/reuse_identity.py emit --root . --tree "$_tree_end" 2>/dev/null | sed 's/^/# id_end /' || true; fi
+      [ -z "$REUSE" ] || echo "# reuse $REUSE $n_reuse"
       if [ "$rc" = 0 ]; then echo "# verdict GREEN"; else echo "# verdict NOT GREEN"; fi
       echo "# strict $STRICT"
       echo "# tier $TIER"

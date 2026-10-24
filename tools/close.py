@@ -12,21 +12,25 @@ driver reads that table, so the order a close runs in cannot drift from the orde
       runs the auto steps from the first step not done, in order; stops at a red (shows the log's tail) or at a manual
       step (shows what it needs). Each auto step logs to DIR/steps/<step>.log.
   python3 tools/close.py run STEP [--run DIR]       re-runs one auto step (after a fix)
+      A RED step whose command confirms on {PREV} and writes {RUN}/tier_results.tsv (the tier) is re-run with
+      --confirm on THE RED RUN'S results, kept as {RUN}/tier_results.red-<utc>.tsv, not on the previous close's (#317):
+      the re-run re-runs what was not PASS there or changed since, and carries the rest
   python3 tools/close.py done STEP "EVIDENCE" [--run DIR]
       marks a manual step done, or passes a RED auto step by hand (shown as such); never a step not yet reached
   python3 tools/close.py status [--run DIR]         every step, its state, the commit it ran at, and NEXT
   python3 tools/close.py inputs [--run DIR]         the close-time input files exist (the `inputs` step)
   python3 tools/close.py check [--root DIR]         the table parses, its commands name only tools and tests that
       exist and only known placeholders, and the four live documents point to docs/project/session_close.md
-  python3 tools/close.py --selftest [--perturb verdict-ignored]
-      a synthetic table with known answers; the perturbed driver reads every exit as 0, and its self-test must FAIL
+  python3 tools/close.py --selftest [--perturb verdict-ignored|red-base-ignored]
+      a synthetic table with known answers; the perturbed drivers (every exit read as 0; a re-run after a red based on
+      {PREV} again) must FAIL it
 
 WITHOUT --run, the run directory is $CLOSE_RUN (which the driver sets for every command it runs), else the newest
 build/agent*/close/ holding a close_params.tsv.
 WHAT IT CANNOT SEE: whether a manual step's evidence is true. A manual step is done when the operator says so in
 writing; the documentation packet and the procedure check are what read those claims.
 """
-import datetime, glob, os, re, subprocess, sys, tempfile
+import calendar, datetime, glob, os, re, shutil, subprocess, sys, tempfile
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 DOC = "docs/project/session_close.md"
@@ -144,10 +148,35 @@ def judge(verdict, rc, log):
     return re.search(rx, log, re.M) is not None
 
 
+def red_base(run, row, state):
+    """#317: the base a RED tier step is re-run on — the red run's own results, copied aside so the re-run's results
+    file never overwrites the base it reads; None when the step is not a red confirming tier, or when the red run wrote
+    no results of its own (refused before its runner: the results file is older than the red run's log), and the
+    previous base then stands"""
+    step, cmd = row[0], row[2]
+    if PERTURB == "red-base-ignored":   # the known-bad driver: a re-run after a red confirms on {PREV} again
+        return None
+    if state.get(step, [""])[0] != "RED" or "--confirm {PREV}" not in cmd or "{RUN}/tier_results.tsv" not in cmd:
+        return None
+    res, logp = os.path.join(run, "tier_results.tsv"), os.path.join(run, "steps", step + ".log")
+    if not (os.path.exists(res) and os.path.exists(logp)):
+        return None
+    m = re.match(r"# (\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ) ", open(logp, encoding="utf-8", errors="replace").readline())
+    if not m or os.path.getmtime(res) < calendar.timegm(datetime.datetime.strptime(m.group(1), "%Y-%m-%dT%H:%M:%SZ").timetuple()):
+        return None
+    keep = os.path.join(run, "tier_results.red-" + utc().replace(":", "") + ".tsv")
+    shutil.copyfile(res, keep)
+    return keep
+
+
 def run_step(root, run, params, row, state):
     step, kind, cmd = row[0], row[1], row[2]
     os.makedirs(os.path.join(run, "steps"), exist_ok=True)
     logp = os.path.join(run, "steps", step + ".log")
+    base = red_base(run, row, state)
+    if base:
+        params = dict(params, PREV=base)
+        print(f"-- {step}: re-run after a red — --confirm on the red run's results {os.path.relpath(base, root)}, not the previous close's (#317)")
     full = fill(cmd, params)
     print(f"-- {step}: {full}")
     sys.stdout.flush()
@@ -334,6 +363,33 @@ def selftest():
             "a step passed by hand is shown as such, and the walk goes on past it")
         say(f"run={run}" in open(os.path.join(run, "steps/five.log")).read(),
             "every command runs with CLOSE_RUN set to the close's run directory (a step that calls the driver again finds it)")
+        # #317: a red confirming tier re-runs on the red run's results; a red run that wrote none keeps the base
+        open(os.path.join(d, "prev.tsv"), "w").write("previous-close\n")
+        conf = ("<!-- CLOSE STEPS: x -->\n| step | kind | command | verdict | done when | from |\n|---|---|---|---|---|---|\n"
+                "| tier | auto | `cat {PREV} >> {RUN}/bases.txt; echo --confirm {PREV} > /dev/null; "
+                "test -f {RUN}/refuse || echo run$(($(wc -l < {RUN}/bases.txt))) > {RUN}/tier_results.tsv; "
+                "test -f {RUN}/go` | exit 0 | t | r |\n<!-- /CLOSE STEPS -->\n")
+        open(os.path.join(d, DOC), "w").write(conf)
+        crun = os.path.join(d, "crun")
+        os.makedirs(crun)
+        open(os.path.join(crun, "close_params.tsv"), "w").write(f"KEY\t14z-9\nPREV\t{os.path.join(d, 'prev.tsv')}\nRUN\t{crun}\n")
+        crows = steps(open(os.path.join(d, DOC)).read())
+        r1 = walk(d, crun, crows)                 # red: based on the previous close, writes run1
+        r2 = walk(d, crun, crows)                 # red again: based on run1, writes run2
+        open(os.path.join(crun, "go"), "w").write("")
+        r3 = walk(d, crun, crows)                 # green: based on run2
+        bases = open(os.path.join(crun, "bases.txt")).read().split()
+        kept = sorted(glob.glob(os.path.join(crun, "tier_results.red-*.tsv")))
+        say(r1 == 1 and r2 == 1 and r3 == 0 and bases == ["previous-close", "run1", "run2"] and len(kept) >= 1,
+            f"a re-run after a red confirms on the red run's results, kept aside (bases read: {bases})")
+        st = read_tsv(os.path.join(crun, "close_state.tsv"))
+        st["tier"] = ["RED", utc(), "-", "by hand"]
+        write_state(crun, st, ["tier"])
+        open(os.path.join(crun, "refuse"), "w").write("")
+        os.utime(os.path.join(crun, "tier_results.tsv"), (1, 1))   # a results file older than the red run's log
+        walk(d, crun, crows)
+        b4 = open(os.path.join(crun, "bases.txt")).read().split()[3:]
+        say(b4 == ["previous-close"], f"a red run that wrote no results of its own leaves the previous base (read: {b4})")
         bad = ("<!-- CLOSE STEPS: x -->\n| step | kind | command | verdict | done when | from |\n|---|---|---|---|---|---|\n"
                "| one | auto | `echo {NOPE}` | exit 0 | a | r |\n"
                "| four | auto | `python3 tools/gone.py` | exit 0 | d | r |\n"

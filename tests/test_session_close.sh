@@ -6,7 +6,7 @@
 #   step one backticked command and a verdict `exit 0` or `line <regex>`), its commands name only tools and tests that
 #   exist and only the placeholders tools/close.py fills, and CLAUDE.md, STATE.md, HANDOFF.md and docs/NEXT_SESSION.md
 #   each point to it; tools/close.py --selftest passes (order, placeholders, a verdict line judged over the exit code,
-#   done only at the step the close is at).
+#   done only at the step the close is at, a re-run after a red tier confirmed on the red run's results — #317).
 # HOW: tools/close.py check over the tree, and the self-test; controls on a copy of the doc and the four live documents.
 # EXPECTS: the tree passes; each perturbed copy fails naming what broke; the known-bad driver fails its self-test.
 #
@@ -14,6 +14,7 @@
 # MUST-FIRE: perturbed-copy: missing-tool — a step naming tools/no_such_tool.py must fail by name, or a renamed tool leaves the close a step that cannot run
 # MUST-FIRE: perturbed-copy: pointer-lost — STATE.md without its pointer to docs/project/session_close.md must fail, or a second copy of the ritual can grow back unnoticed
 # MUST-FIRE: known-bad: verdict-ignored — tools/close.py --selftest --perturb verdict-ignored (every step read as passed) must print SELFTEST FAIL, or a red tier could walk on to the push
+# MUST-FIRE: known-bad: red-base-ignored — tools/close.py --selftest --perturb red-base-ignored (a tier re-run after a red confirmed on the previous close's results again) must print SELFTEST FAIL, or the re-run re-runs every gate the red run already judged (#317)
 #
 # WHY. The maintainer (#282): the close "is almost never compeletely executed by default". A census found the ritual in
 # 58 places across 30 files, none of them complete, 8 sets disagreeing. Ruled "Doc + driver (Recommended)"
@@ -52,7 +53,7 @@ PY
                          EXPECT="tools/no_such_tool.py, which does not exist" ;;
     pointer-lost)        sed -i.bak 's#docs/project/session_close\.md#docs/project/elsewhere.md#g' "$2/STATE.md"; rm -f "$2/STATE.md.bak"
                          EXPECT="STATE.md does not point to $DOC" ;;
-    verdict-ignored)     EXPECT="SELFTEST FAIL" ;;
+    verdict-ignored|red-base-ignored) EXPECT="SELFTEST FAIL" ;;
     *) echo "no such perturbation: $1"; exit 3 ;;
     esac
 }
@@ -60,7 +61,7 @@ PY
 # THE EXECUTABLE FORM: under CONTROL=<name> the perturbed copy (or the known-bad driver) IS what the main check reads.
 ROOT="$REPO"; PERT=""
 if [ -n "$VS_CTL" ]; then
-    if [ "$VS_CTL" = verdict-ignored ]; then PERT="--perturb verdict-ignored"
+    if [ "$VS_CTL" = verdict-ignored ] || [ "$VS_CTL" = red-base-ignored ]; then PERT="--perturb $VS_CTL"
     else mkcopy "$W/mode"; perturb "$VS_CTL" "$W/mode"; ROOT="$W/mode"; fi
 fi
 
@@ -71,8 +72,8 @@ if python3 tools/close.py --selftest $PERT >"$W/self.log" 2>&1 && grep -q '^SELF
 else bad "tools/close.py --selftest:"; grep 'FAIL' "$W/self.log" | head -4 | sed 's/^/        /'; fi
 
 control() {  # control <name>
-    if [ "$1" = verdict-ignored ]; then
-        python3 tools/close.py --selftest --perturb verdict-ignored >"$W/vi.log" 2>&1
+    if [ "$1" = verdict-ignored ] || [ "$1" = red-base-ignored ]; then
+        python3 tools/close.py --selftest --perturb "$1" >"$W/vi.log" 2>&1
         if grep -q '^SELFTEST FAIL' "$W/vi.log"; then vs_ctl_fired "$1" "$(grep '^  FAIL' "$W/vi.log" | head -1 | cut -c1-120)"; ok "$1: fires"
         else vs_ctl_dead "$1" "the known-bad driver passed its self-test"; bad "$1"; fi
         return
