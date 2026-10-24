@@ -1,0 +1,18 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: #307 closed done: the build/ retention rule written and gated, closed work archived to files-hades, build/ pruned once (14z-208), after run 2026-10-24-1261
+Claim (the working agent's sentence): #307 can close done (build/agent208/t307/closing_307.md; docs/project/tickets.tsv line 82): its body's three steps (build/agent208/t307/issue307_body.md) are met — step 1, fork V's census of what references each build/ family (build/agent208/V/REPORT.md); step 2, the maintainer ruled closed work's evidence archived then moved to files-hades, and after moving it waived the destination checksum on the basis of their own diff (the two DECISIONS_HISTORY.md entries of 2026-10-24 on #307, quoted); step 3, the rule beside [VSP-96] (docs/project/build_dir_triage.md 'The retention rule'), its tool and gate built by forks V2 and V3 and committed in 47c118e4 (build/agent208/V2/REPORT.md, build/agent208/V3/REPORT.md), the first cut's input-class defect caught by its own gate before any deletion and fixed; the prune applied once — 1,218 deletions, 0 emu_*, 0 refusals, census 0 problems after (build/agent208/t307/prune_applied.txt, which reads the apply output), one item beyond the reviewed dry run identified by diff as a listing.tsv pushed out of the newest three by two later snapshot runs, and the open-ticket text the plan used shown current at apply time (build/agent208/t307/apply_checks.txt) — and the strict tier [VSP-96] requires run after it (the apply ended 14:03:20, the tier started 14:12:04, apply_checks.txt): the full session-cadence strict tier of 47c118e4 on a scratch-free snapshot of the pruned tree, GREEN, PASS 106, 390 controls honoured (build/agent208/t304/batch_tier_noscratch.txt), and test_emulator_runner PASS on its own (its log in apply_checks.txt). NOT TESTED: whether a folder the plan archived or pruned is opened at run time by an emulator-tier gate (the plan's references are code text; no emulator tier ran after the prune); whether a gate reads a pruned scratch folder through a path built from data — the post-prune tier ran on a snapshot that leaves scratch out, so it could not see a missing scratch folder, and fork U's census (no gate reads scratch) is code text plus a PILOT strace; the 84 tars' arrival is the maintainer's diff, not a destination checksum; the free-space figures (49 to 78 GiB) were read by df in the session, not saved by a command into an artifact; the tool ran on macOS only; the apply ran from the plan as computed at apply time, not from the reviewed dry-run list, and no control stops an apply that differs from its dry run (here one listing.tsv, found by diff afterwards).
+Artifacts (read every one, in full):
+  - build/agent208/t307/issue307_body.md
+  - build/agent208/t307/closing_307.md
+  - docs/project/tickets.tsv.lines-82-82 (lines 82-82 of docs/project/tickets.tsv)
+  - build/agent208/V/REPORT.md
+  - build/agent208/V2/REPORT.md
+  - build/agent208/V3/REPORT.md
+  - build/agent208/t307/prune_applied.txt
+  - build/agent208/t307/apply_checks.txt
+  - build/agent208/t304/batch_tier_noscratch.txt
+  - docs/project/build_dir_triage.md.lines-94-120 (lines 94-120 of docs/project/build_dir_triage.md)
+  - DECISIONS_HISTORY.md.lines-7909-7915 (lines 7909-7915 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-24 (14z-208) — #307: closed work's evidence is archived, then moved to files-hades")
+  - DECISIONS_HISTORY.md.lines-7951-7959 (lines 7951-7959 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-24 (14z-208) — #307: the archive's move to files-hades verified by the maintainer's")

@@ -1,0 +1,3 @@
+  FLAG D-ABSOLUTE: 84 tars (5.83 GB, every tar's member count equal to its folder's) were written outside the tree and moved by the maintainer, who verified them: *"I peformed ...  [build/agent208/t307/closing_307.md]
+  FLAG D-ABSOLUTE: **Not measured:** the 128 freeze/release-cadence static gates on the pruned tree (only their names were checked against the pruned folders); whether any fold...  [build/agent208/t307/closing_307.md]
+packet_check: 2 flag(s): D-ABSOLUTE 2

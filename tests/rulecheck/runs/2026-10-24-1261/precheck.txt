@@ -1,0 +1,3 @@
+  FLAG D-ABSOLUTE: 84 tars (5.83 GB, every tar's member count equal to its folder's) were written outside the tree and moved by the maintainer, who verified them: *"I peformed ...  [build/agent208/t307/closing_307.md]
+  FLAG D-ABSOLUTE: **Not measured:** whether any folder the plan archived or pruned is opened at run time by an emulator-tier gate (only code text was searched; the emulator ti...  [build/agent208/t307/closing_307.md]
+packet_check: 2 flag(s): D-ABSOLUTE 2

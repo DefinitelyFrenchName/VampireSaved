@@ -70,6 +70,25 @@ The maintainer: *"Keep cut, close #289 (Recommended)"*, then on two corrected fi
 (DECISIONS_HISTORY.md). Fact homed in `docs/project/rule_checker.md` "THE CUT STANDS". Rule-checker runs 2026-10-24-1249
 to -1251 VIOLATED and resolved, -1252 OK. **#289 closed done.**
 
+### (3) #304 CLOSED DONE: THE SNAPSHOT LEAVES SCRATCH OUT
+Fork U's census (`build/agent208/U/REPORT.md`, local): no gate of either tier reads an input under a scratch `build/`
+directory; fork J's 14z-207 examples were comment lines. Fork U2 built it (`tests/run_on_snapshot.sh` copies `build/`
+per top entry, leaving out the commit's scratch classes; a relative scratch runner argument copied in, ruled; section 5
+and controls `copy-all-build`, `no-arg-copy`), committed in `47c118e4`. Snapshot setup about 1,112 s with scratch, 95 s
+without. The comparison's rows were mostly carried, so every freeze-cadence gate then ran without scratch on `2b6d703c`
+(PASS 215, FAIL 3, none from scratch) and the session-cadence gates again on the committed tree (GREEN, PASS 106). The
+recommendation kept `build/static_runs`; the maintainer on leaving it out: *"Leave it out (Recommended)"*. Rule-checker
+runs 2026-10-24-1254 to -1259 VIOLATED and resolved (1253 prepared and not run), -1260 OK. **#304 closed done.**
+
+### (4) #307 CLOSED DONE: THE build/ RETENTION RULE, THE ARCHIVE, ONE PRUNE
+Fork V's census (`build/agent208/V/REPORT.md`, local); the maintainer: *"Archive, then move to files-hades (10.20.0.39) .
+I can do the file moving if need be"*. Forks V2 and V3 built `tools/build_retention.py` and `tests/test_build_retention.sh`
+and the rule beside [VSP-96] (`docs/project/build_dir_triage.md`), committed in `47c118e4`; the first cut planned 83
+input-classed `emu_*` folders away, caught by its own gate on the real tree before any deletion, fixed (input always
+kept). 84 tars (5.83 GB) moved to files-hades by the maintainer, checksums waived on their diff (DECISIONS_HISTORY.md).
+The prune: 1,218 items, 0 `emu_*`, 49 → 78 GiB free; the strict tier after it GREEN. The leftover 14z-205c snapshot (43.1
+GB) deleted (ruled). Rule-checker runs 2026-10-24-1261 to -1264 VIOLATED and resolved, -1265 OK. **#307 closed done.**
+
 ## Session 14z-207 — **PILOT and ERIS online, the work run in parallel lanes: #291 closed done (the span retrofit, the fighters check on round intros, the full sheet run reviewed); #308 and #313 closed done; #286 measured, then closed done; #304 analysed and its four recommendations adopted; #314 filed and closed done; #303, #279, #280 and #281 closed done (lanes P and P2 on PILOT); #312 and #315 closed done (lane S on ERIS, fork T on PILOT).** Opened 2026-10-23 on transcript `e552692b` after the 14z-206 close (`c494fac2`, pushed).
 
 ### opened with

@@ -1,0 +1,13 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent208/t307/issue307_body.md	5e27bf5f4cea7ed836b469fedb4620013e8426c3
+build/agent208/t307/closing_307.md	a45b3a6c156f6b5f891d498e504714da3ea9ac98
+docs/project/tickets.tsv.lines-82-82 (lines 82-82 of docs/project/tickets.tsv)	994e243591c53f0b9bee99febe13c91808d6aa37
+build/agent208/V/REPORT.md	186015fa95630668d723ea2c538bb40dfedad95a
+build/agent208/V2/REPORT.md	0124696da344f2cf3761f12e58ab62f426de9f0b
+build/agent208/V3/REPORT.md	5bdcc0d41d268fa8236283a48f65b379ce284801
+build/agent208/t307/prune_applied.txt	7337bad1bda0eac56bb21c6ac303fdb7690c1264
+build/agent208/t307/apply_checks.txt	d1e0b3db8556f26b8a6fa2044b0460c2736e60e0
+build/agent208/t304/batch_tier_noscratch.txt	119cbab0d6ebe426bad2794932f9e2de8b7e8c07
+docs/project/build_dir_triage.md.lines-94-120 (lines 94-120 of docs/project/build_dir_triage.md)	6d3960343a31347b25514a5f50000c4768767348
+DECISIONS_HISTORY.md.lines-7909-7915 (lines 7909-7915 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-24 (14z-208) — #307: closed work's evidence is archived, then moved to files-hades")	3983906e57b35ebc94259f6541475b4b18d1073a
+DECISIONS_HISTORY.md.lines-7951-7959 (lines 7951-7959 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-24 (14z-208) — #307: the archive's move to files-hades verified by the maintainer's")	776d057643834fea821c8f78903097e8e07bc74a

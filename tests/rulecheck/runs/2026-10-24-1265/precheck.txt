@@ -1,0 +1,3 @@
+  FLAG D-ABSOLUTE: 84 tars (5.83 GB, every tar's member count equal to its folder's) were written outside the tree and moved by the maintainer, who verified them: *"I peformed ...  [build/agent208/t307/closing_307.md]
+  FLAG D-ABSOLUTE: **Not measured:** whether each archived folder was still identical to its tar when the apply deleted it (the tars were made at 13:11; none of the deleted fol...  [build/agent208/t307/closing_307.md]
+packet_check: 2 flag(s): D-ABSOLUTE 2
