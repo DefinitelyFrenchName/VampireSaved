@@ -108,6 +108,7 @@ declares	test_beam_anim_walk
 declares	test_bg_leg_shape
 declares	test_build_dirs
 declares	test_build_environment_entry
+declares	test_build_retention
 declares	test_bundle_parsers
 declares	test_capture_kf_ownership
 declares	test_charid_names

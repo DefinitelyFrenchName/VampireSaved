@@ -18,7 +18,7 @@ number	state	reason	closed	labels	title
 304	OPEN	-	-	bug,severity: high,test-integrity	The static-tier planner counts untracked build/ output as changed inputs (build/sheets/: 5,739 files, a 3-hour plan); review what it includes and excludes
 303	CLOSED	COMPLETED	2026-10-23	bug	Static-tier gates leave their temp directories in /tmp (~1,690 entries, ~2.3 GB over four tiers)
 302	OPEN	-	-	bug,test-integrity	audit_marionette_cost reads 8 more replays per hook row than its frozen expectation on a clean clone
-301	OPEN	-	-	evolution,severity: low	Community cross-check: create report of the #229 workbook differences for the community, and check the open questions against vswiki
+301	OPEN	-	-	evolution,parked,severity: low	Community cross-check: create report of the #229 workbook differences for the community, and check the open questions against vswiki
 300	CLOSED	COMPLETED	2026-10-19	bug,test-integrity	test_close_tools REFUSED on the live tree: section 2b reads the findings table #288 cut from the close
 299	CLOSED	COMPLETED	2026-10-22	evolution,performance	Static tier: run gates in parallel (--jobs, ~70-80% of the machine), proven equal to a serial run first
 298	CLOSED	COMPLETED	2026-10-24	evolution,performance	Static tier scope: at a commit/close, execute a gate's controls only when a program of its reach changed (R1); all at freeze/release
@@ -30,7 +30,7 @@ number	state	reason	closed	labels	title
 292	CLOSED	NOT_PLANNED	2026-10-20	bug,performance,severity: high	static_confirm: a tool's self-test strings count as a direct read (battery_reach names STATE.md), so 22 gates re-run with controls at every commit
 291	CLOSED	COMPLETED	2026-10-23	evolution	On demand, at a given tag or commit: comparative capture sheets (ours vs vsavj and/or vs2) for every comparing test, as a visual proof of accuracy for humans
 290	CLOSED	COMPLETED	2026-10-17	evolution,severity: high	A deterministic guard: no commit or push on a tier that did not read GREEN (replaces the procedure check's one recurring catch)
-289	OPEN	-	-	evolution	Revisit the cut of the close's audit layer (documentation packet, procedure check) when there is more data
+289	CLOSED	COMPLETED	2026-10-24	evolution	Revisit the cut of the close's audit layer (documentation packet, procedure check) when there is more data
 288	CLOSED	COMPLETED	2026-10-16	evolution,severity: high	Measure what each step of the close's audit layer has caught and cost, then cut it down (possibly entirely)
 287	CLOSED	NOT_PLANNED	2026-10-16	evolution,severity: high	The procedure check runs at the close; run it right after each piece of work, scoped to that work
 286	CLOSED	COMPLETED	2026-10-23	evolution,performance,severity: high	The close tier's cost follows the session, not the change: false re-runs, the dirty fbneo submodule, controls on every re-run gate

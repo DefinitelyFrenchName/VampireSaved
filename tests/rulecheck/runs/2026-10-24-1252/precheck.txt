@@ -1,0 +1,7 @@
+  FLAG D-ABSOLUTE: - **What reached a commit, a push or the maintainer after the cut:** nine errors (fork W's table E1-E9), taken from the session records and the bug tickets o...  [build/agent208/t289/closing_289.md]
+  FLAG D-ABSOLUTE: Four were tool or gate defects (#258's token estimate, the proof sheets read as planner inputs, #309's dead control, #300), a kind the documentation packet a...  [build/agent208/t289/closing_289.md]
+  FLAG D-ABSOLUTE: - **The green guard (#290):** all 22 session commits from 2026-10-17 on sit on a strict GREEN row for their exact tree; the other two commits are the maintai...  [build/agent208/t289/closing_289.md]
+  FLAG D-ABSOLUTE: - **Option 2 (a run on every worker report a later step builds on):** no after-cut finding traced to a measurer's or reader's figure; twelve runs caught a wr...  [build/agent208/t289/closing_289.md]
+  FLAG D-ABSOLUTE: How far the work had gone on each before that check, and what a run on every worker report would cost (prepare, two readers, record), were not measured.  [build/agent208/t289/closing_289.md]
+  FLAG D-ABSOLUTE: **Not measured:** whether fork W's tracing of wrong bases to their source is complete (it found none from a measurer's or reader's figure, with no planted ca...  [build/agent208/t289/closing_289.md]
+packet_check: 6 flag(s): D-ABSOLUTE 6

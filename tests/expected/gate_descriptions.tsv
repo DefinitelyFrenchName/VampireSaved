@@ -166,6 +166,7 @@ declares	test_build_environment_entry
 declares	test_build_gate_status
 declares	test_build_identity_distinct
 declares	test_build_ref_rot
+declares	test_build_retention
 declares	test_builder_rom_audit
 declares	test_bundle_parsers
 declares	test_capture_kf_ownership

@@ -11,7 +11,10 @@
 #   a tracked file carries its last commit's time, a build/emu_* the run writes comes back to
 #   the working tree, and so does a build/static_runs/* record (#276), and an instrument binary changed in the LIVE cache during a run is reported;
 #   a run started inside another run's snapshot (the outer run's RUN_ON_SNAPSHOT_SELF inherited,
-#   as when a tier on a snapshot runs this gate) still makes its own copy and leaves the outer's.
+#   as when a tier on a snapshot runs this gate) still makes its own copy and leaves the outer's;
+#   and build/'s scratch classes (the commit's tests/expected/build_dirs.tsv) are LEFT OUT of the snapshot while
+#   input, unclassed and top-level entries are kept and a relative runner argument under a left-out dir is copied in
+#   (section 5, #304 item 2).
 # HOW: builds a throwaway world (a repo with a submodule, a build/ output, a community sibling,
 #   a HOME holding an instrument cache, a scratch clone), starts a probe under
 #   run_on_snapshot.sh --emulator-inputs that reads all eight inputs, pauses it, perturbs them in
@@ -35,6 +38,8 @@
 # MUST-FIRE: perturbed-copy: no-copy-back — a copy that never copies the run's build/emu_* back leaves the working tree without the run of record, and the gate must FAIL (mode: the gate runs against that copy)
 # MUST-FIRE: perturbed-copy: no-runs-copy-back — a copy that never copies the run's build/static_runs/* records back leaves the dashboard's collector without the snapshot tier's record (#276), and the gate must FAIL (mode: the gate runs against that copy)
 # MUST-FIRE: perturbed-copy: no-instrument-check — a copy that never compares the live instruments at the end exits 0 after an instrument changed mid-run, and the gate must FAIL (mode: the gate runs against that copy)
+# MUST-FIRE: perturbed-copy: copy-all-build — a copy that copies every build/ entry (the pre-#304 behaviour) carries the planted scratch files into the snapshot, and section 5 must FAIL (mode: the gate runs against that copy)
+# MUST-FIRE: perturbed-copy: no-arg-copy — a copy that never copies in a relative runner argument under a left-out dir leaves the run without its --confirm-shaped base, and section 5 must FAIL (mode: the gate runs against that copy)
 # MUST-FIRE: perturbed-copy: inherited-self — a copy that skips its own copy whenever RUN_ON_SNAPSHOT_SELF is set (the pre-14z-199 test for emptiness) must be cut short in section 2b's nested leg, which inherits an outer run's copy, and the gate must FAIL (mode: the gate runs against that copy)
 #
 # The world lives in a scratch dir; the snapshots go under ~/.cache/vampire-saved (the runner
@@ -61,8 +66,8 @@ make_copy() {
     python3 - "$W/ctl_$1/tests/run_on_snapshot.sh" "$1" <<'PY'
 import sys; p, name = sys.argv[1:3]; s = open(p).read()
 edits = {
-    "link-build": ('    cow "$REPO/build/." "$C/build/"\n',
-                   '    for e in "$REPO"/build/*; do ln -sfn "$e" "$C/build/"; done  # CONTROL link-build\n'),
+    "link-build": ('        if [ -d "$e" ] && [ ! -L "$e" ]; then mkdir -p "$C/build/$n"; cow "$e/." "$C/build/$n/"\n        else rm -rf "$C/build/$n"; cow "$e" "$C/build/$n"; fi\n',
+                   '        rm -rf "$C/build/$n"; ln -sfn "$e" "$C/build/$n"  # CONTROL link-build\n'),
     "in-place":   [('{ ( cd "$C" && "$@" ) 2>&1;', '{ ( cd "$REPO" && "$@" ) 2>&1;  # CONTROL in-place\n'),
                    ('{ ( cd "$C" && HOME="$SNAP_HOME" JTSIM_SCRATCH="$JT_SNAP" "$@" ) 2>&1;',
                     '{ ( cd "$REPO" && "$@" ) 2>&1;  # CONTROL in-place\n')],
@@ -82,6 +87,10 @@ edits = {
                           'for d in ; do  # CONTROL no-runs-copy-back'),
     "no-instrument-check": ('if cmp -s "$REC/instruments_start.tsv" "$REC/instruments_end.tsv"; then',
                             ': CONTROL no-instrument-check; if true; then'),
+    "copy-all-build": ('if [ -d "$e" ] && [ ! -L "$e" ] && grep -qxF "$n" "$REC/.build_scratch"; then',
+                       'if false; then  # CONTROL copy-all-build'),
+    "no-arg-copy": ('    for a in "$@"; do\n        a="${a#--*=}"',
+                    '    for a in ; do  # CONTROL no-arg-copy\n        a="${a#--*=}"'),
 }
 pairs = edits[name]
 if isinstance(pairs, tuple): pairs = [pairs]
@@ -214,8 +223,55 @@ immune() {
     echo "  $2: all eight inputs unchanged across the perturbation and the runner's own file truncated mid-run; record complete, commit $(printf %.12s "$rc") = the start commit; t.txt at its commit's time; build/emu_probe and the static run record copied back"
 }
 
+# scratch_leg <runner> <label> — section 5 (#304 item 2): a world whose commit carries this tree's
+# tools/build_dirs.py and tests/expected/build_dirs.tsv, a file planted under an instance of EVERY scratch pattern
+# (read from that list, so a new scratch row is planted too), an input-classed dir, an unclassed dir and a top-level
+# file; the run is given a RELATIVE runner argument under a scratch dir (a --confirm base's shape). The snapshot must
+# hold no scratch plant, every other plant, and the argument's file.
+scratch_leg() {
+    D="$W/$2"; rm -rf "$D"; mkdir -p "$D/tree/tools" "$D/tree/tests/expected"
+    git -C "$D/tree" init -q
+    cp "$REPO/tools/build_dirs.py" "$D/tree/tools/"; cp "$REPO/tests/expected/build_dirs.tsv" "$D/tree/tests/expected/"
+    insts="$(python3 - "$D/tree/tests/expected/build_dirs.tsv" <<'PY'
+import re, sys
+for l in open(sys.argv[1]):
+    f = l.rstrip("\n").split("\t")
+    if len(f) >= 2 and f[0] == "scratch":
+        print(re.sub(r"\[[^]]*\]", "7", f[1]).replace("*", "").replace("?", "x"))
+PY
+)"
+    [ -n "$insts" ] || { echo "  FAIL: $2: no scratch row in build_dirs.tsv"; return 1; }
+    for i in $insts; do mkdir -p "$D/tree/build/$i"; echo scratch > "$D/tree/build/$i/plant.txt"; done
+    first="$(echo $insts | awk '{print $1}')"
+    mkdir -p "$D/tree/build/$first/close"; echo base-v1 > "$D/tree/build/$first/close/tier_results.tsv"
+    un="zz_unclassed$$"   # a name no class row matches, built at run time so the census never reads it as a build/ dir
+    mkdir -p "$D/tree/build/out" "$D/tree/build/$un"
+    echo input > "$D/tree/build/out/plant.txt"; echo unclassed > "$D/tree/build/$un/plant.txt"; echo top > "$D/tree/build/top.log"
+    cat > "$D/tree/probe5.sh" <<'EOF'
+#!/bin/sh
+# list each plant as present/absent, and read the relative argument
+for p in $PLANTS; do if [ -e "build/$p/plant.txt" ]; then echo "present $p"; else echo "absent $p"; fi; done > "$PROBE_OUT"
+if [ -f "$1" ]; then echo "arg $(cat "$1")"; else echo "arg MISSING"; fi >> "$PROBE_OUT"
+[ -f build/top.log ] && echo "present top.log" >> "$PROBE_OUT" || echo "absent top.log" >> "$PROBE_OUT"
+EOF
+    git -C "$D/tree" add tools tests probe5.sh
+    git -C "$D/tree" -c user.email=t@t -c user.name=t commit -qm world5
+    got=0
+    ( PLANTS="$insts out $un" PROBE_OUT="$W/$2.out" SNAPSHOT_ROOT="$SROOT" \
+      sh "$1" --repo "$D/tree" --no-romdir --no-emulator-inputs -- sh probe5.sh "build/$first/close/tier_results.tsv" ) > "$W/$2.log" 2>&1 || got=$?
+    [ "$got" = 0 ] || { echo "  FAIL: $2: the run exited $got"; tail -5 "$W/$2.log" | sed 's/^/    /'; return 1; }
+    bad=0
+    for i in $insts; do grep -qx "absent $i" "$W/$2.out" || { echo "  $2: SCRATCH COPIED: build/$i/plant.txt reached the snapshot"; bad=1; }; done
+    for i in out "$un" top.log; do grep -qx "present $i" "$W/$2.out" || { echo "  $2: KEPT ENTRY MISSING: build/$i is not in the snapshot"; bad=1; }; done
+    grep -qx "arg base-v1" "$W/$2.out" || { echo "  $2: BASE MISSING: the relative argument build/$first/close/tier_results.tsv did not reach the run"; bad=1; }
+    rec="$(ls -d "$D/tree/build/snapshot_runs/"*/ 2>/dev/null | head -1)"
+    grep -q '^build .*left out:' "$rec/record.txt" 2>/dev/null || { echo "  $2: the record names no left-out build/ entries"; bad=1; }
+    [ "$bad" = 0 ] || return 1
+    echo "  $2: $(echo $insts | wc -w | tr -d ' ') scratch plants left out ($(echo $insts)), the input, unclassed and top-level plants kept, the relative scratch argument copied in; the record says: $(grep '^build ' "$rec/record.txt" | cut -c1-90)"
+}
+
 RUNNER="$REPO/tests/run_on_snapshot.sh"
-CONTROLS="link-build in-place no-self-copy shared-home shared-scratch checkout-mtime no-copy-back no-runs-copy-back no-instrument-check inherited-self"
+CONTROLS="link-build in-place no-self-copy shared-home shared-scratch checkout-mtime no-copy-back no-runs-copy-back no-instrument-check inherited-self copy-all-build no-arg-copy"
 for c in $CONTROLS; do if vs_ctl_is "$c"; then RUNNER="$(make_copy "$VS_CTL")"; fi; done
 
 echo "== 1. the positive leg: the perturbation reaches an IN-PLACE run"
@@ -266,13 +322,17 @@ instrument() {
 echo "== 3. an instrument changed in the live cache mid-run is detected"
 if ! instrument "$RUNNER" inst; then fail=1; fi
 
+echo "== 5. build/'s scratch classes are left out of the snapshot, a relative argument under one is copied in (#304 item 2)"
+if ! scratch_leg "$RUNNER" scr; then fail=1; fi
+
 echo "== 4. controls"
 if [ -z "${VS_CTL:-}" ]; then
     for ctl in $CONTROLS; do
         # the leg's world dir must not be the copy's dir (world() empties it first)
         case "$ctl" in
         checkout-mtime) mark='MTIME' ;; no-copy-back) mark='NOT COPIED BACK' ;; no-runs-copy-back) mark='RUN RECORD was NOT COPIED' ;;
-        no-instrument-check) mark='NOT DETECTED' ;; *) mark='REACHED' ;;
+        no-instrument-check) mark='NOT DETECTED' ;; copy-all-build) mark='SCRATCH COPIED' ;; no-arg-copy) mark='BASE MISSING' ;;
+        *) mark='REACHED' ;;
         esac
         copy="$(make_copy "$ctl")"
         # a copy its own edit broke would "fire" by crashing (docs/project/gotchas.md, paid 14z-184)
@@ -281,6 +341,7 @@ if [ -z "${VS_CTL:-}" ]; then
         fi
         if [ "$ctl" = no-instrument-check ]; then instrument "$copy" "leg_$ctl" > "$W/leg_$ctl.txt" 2>&1 && ok=1 || ok=0
         elif [ "$ctl" = inherited-self ]; then nested "$copy" "leg_$ctl" > "$W/leg_$ctl.txt" 2>&1 && ok=1 || ok=0
+        elif [ "$ctl" = copy-all-build ] || [ "$ctl" = no-arg-copy ]; then scratch_leg "$copy" "leg_$ctl" > "$W/leg_$ctl.txt" 2>&1 && ok=1 || ok=0
         else immune "$copy" "leg_$ctl" > "$W/leg_$ctl.txt" 2>&1 && ok=1 || ok=0; fi
         if [ "$ok" = 1 ]; then
             vs_ctl_dead "$ctl" "the perturbed copy still passed — the gate cannot see this failure" || fail=1

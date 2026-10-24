@@ -1,0 +1,20 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent208/t304/issue304_body.md	4c4ca70916713bba31e3e0c5c8a4dbbceaf6418b
+build/agent208/t304/issue304.md	39fe1a7f52c7aa602de74f178bd212ee175ac44b
+build/agent208/t304/closing_304.md	785fd5a63e29ce934c186e30e023536adbd80e25
+docs/project/tickets.tsv.lines-85-85 (lines 85-85 of docs/project/tickets.tsv)	af084501a79a72cf2dfc4ce542a437b3c7a40470
+build/agent207/t304/recommendation.md	dff6f5f5bbc0c6672a11c6ce6960dde4211d85ea
+build/agent208/U/REPORT.md	91f9013ec6e0c8b8cbefe5fb6e2bd75da9f48fe0
+build/agent208/U2/REPORT.md	847660130cbfa8e4eeb0a4fa6595a05d76e5d867
+build/agent208/U2/compare.txt	fa62f55ee18037c0b328c19e2839e7b658437160
+build/agent208/U2/emu_dryrun.diff	95c441bf05bc1415677bd263501361c7cbadf81b
+build/agent208/U2/modes.txt	d5dddc53a6251ee1b55af223661b290c238f1b90
+build/agent208/t304/run_on_snapshot.diff	81cab71c99ebd0b365e76873fb263bc95d957c5d
+build/agent208/t304/snapshot_runs.diff	333e8575d0a2dcf78ce46c4558d863a69eba4078
+build/agent208/t304/plan_times.txt	5f6b8ea88338963a015003920619fbee2ee0f65a
+build/agent208/t304/fulltier_noscratch.txt	6c50da50c347458ca6a57d7d8268459033fe2ce9
+build/agent208/t304/staleness_with_without.txt	01a4b6dc042777f97e063180802e66b106140e6a
+STATE.md.lines-129-150 (lines 129-150 of STATE.md)	24d13163e389d78005919c9b4e0940f8279f50d5
+DECISIONS_HISTORY.md.lines-7749-7770 (lines 7749-7770 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-23 (14z-207) — #304: the four recommendations adopted", and the entries after it up to line 7770)	39b7324864fd1d6dc804d6276783f7586aa86e61
+DECISIONS_HISTORY.md.lines-7893-7902 (lines 7893-7902 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-24 (14z-208) — #304 item 2: a relative scratch `--confirm` base is copied in; the e")	cee131b8a130ee9fef7c4fb6b624acd1a935f054
+DECISIONS_HISTORY.md.lines-7960-7966 (lines 7960-7966 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-24 (14z-208) — #304 item 2: build/static_runs stays out of the snapshot")	88e65cee19def254c490d53e6d97c0dd6ef7833d

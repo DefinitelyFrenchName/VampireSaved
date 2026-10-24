@@ -60,6 +60,16 @@ Rule-checker runs 2026-10-24-1244 to -1247 VIOLATED and resolved (the closes' ba
 seconds' load; the two pools and a 'first close' wording; the 14z-205b and 14z-205c closes, measured and named), run -1248
 OK. **#298 closed done.**
 
+### (2) #289 CLOSED DONE: THE CUT STANDS; #262, #263, #277 ALREADY DONE
+The maintainer asked to finish #304, #307 and #289 + #262, #263, #277 before the freeze (#262, #263, #277 were closed done
+in 14z-205c; parked under #289, nothing more is owed). Fork W (`build/agent208/W/REPORT.md`, local) measured the sessions
+after the cut: the before-an-action check's VIOLATED runs a real error in 36 of 108 (24 of 57 before); every session
+commit from 2026-10-17 on on a strict GREEN tier; nine errors reached a commit, a push or the maintainer (a floor: the
+transcripts' corrections not searched), four tool or gate defects, two documented facts; none from a worker's figure.
+The maintainer: *"Keep cut, close #289 (Recommended)"*, then on two corrected figures *"Ruling stands, close"*
+(DECISIONS_HISTORY.md). Fact homed in `docs/project/rule_checker.md` "THE CUT STANDS". Rule-checker runs 2026-10-24-1249
+to -1251 VIOLATED and resolved, -1252 OK. **#289 closed done.**
+
 ## Session 14z-207 — **PILOT and ERIS online, the work run in parallel lanes: #291 closed done (the span retrofit, the fighters check on round intros, the full sheet run reviewed); #308 and #313 closed done; #286 measured, then closed done; #304 analysed and its four recommendations adopted; #314 filed and closed done; #303, #279, #280 and #281 closed done (lanes P and P2 on PILOT); #312 and #315 closed done (lane S on ERIS, fork T on PILOT).** Opened 2026-10-23 on transcript `e552692b` after the 14z-206 close (`c494fac2`, pushed).
 
 ### opened with

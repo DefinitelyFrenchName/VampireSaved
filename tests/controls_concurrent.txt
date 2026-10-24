@@ -10,6 +10,7 @@
 # TRACES: eris-wsl:2a155ba3 = ERIS WSL, lane S (14z-207), all control modes of the base 2a155ba3's multi-control gates; pilot:bdef935e = PILOT (Ubuntu 24.04), fork T (14z-207, #315).
 # NOT listed, from the same census: test_close_tools (its controls take the real checkout's .git/modules/emu/{fbneo,mame}/index.lock); test_emulator_staleness (its controls take the real checkout's .git/modules/emu/{fbneo,mame}/index.lock); test_mra_parts (two controls rename onto zips/parts.zip, a relative path the trace cannot place); test_release_asset_shape (its controls write build/scratch/release_assets/merged-m23/*.zip(.list)); test_romset_path_guard (two controls rename onto build/rompath/vsavjw.zip, a relative path the trace cannot place).
 # NOT listed, from the PILOT trace (14z-207, #315): test_mister_mra_map (its two controls write 340 paths in common, all under the shared jtsim scratch /tmp/vampire-saved-jtsim and its lock /tmp/.lock-vampire-saved-jtsim; lane S had listed it from an ERIS trace in which it SKIPped, emu/jtcores not initialised).
+# OFF the list since 14z-208 (#304 item 2): test_run_on_snapshot — its script gained section 5 and two controls after its 14z-207 trace; it goes back on after a re-trace (the freeze re-traces the whole list).
 audit_capture_matrix	30719e3e5a1f9d826f990e29638f4ecd0cd550eb	eris-wsl:2a155ba3	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
 audit_mister_map_fit	1a2aa94645e31f6c4ee1149948548796d6037043	eris-wsl:2a155ba3	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
 test_agent_defs	d82b476cf3a0d3b523047321b0d33d50737e7865	eris-wsl:2a155ba3	7 controls write-traced 14z-207: none writes a path a sibling writes or reads
@@ -88,7 +89,6 @@ test_rpl2siminputs	53adf042868c338fb2ee21b04faf5786f8f7991f	eris-wsl:2a155ba3	3 
 test_rule5_census	4030c294649501a1553d0da30672bd8242a3dbee	eris-wsl:2a155ba3	4 controls write-traced 14z-207: none writes a path a sibling writes or reads
 test_rule_checker	1828af65b62e5197d22acfa2c449bba2886615b8	eris-wsl:2a155ba3	19 controls write-traced 14z-207: none writes a path a sibling writes or reads
 test_rulings_verbatim	741c442732b00a0ab8e020624675a35d7ffb18a2	eris-wsl:2a155ba3	8 controls write-traced 14z-207: none writes a path a sibling writes or reads
-test_run_on_snapshot	851fbfb6168c2b04670a7a105f492f8701ab5582	eris-wsl:2a155ba3	10 controls write-traced 14z-207: none writes a path a sibling writes or reads
 test_run_record	02af6e1e6d885e74c23a94dbd185439ff537430d	eris-wsl:2a155ba3	3 controls write-traced 14z-207: none writes a path a sibling writes or reads
 test_same_data_p2	4e1df217560651cc4ed8840366fd6bde8bb2ada5	eris-wsl:2a155ba3	2 controls write-traced 14z-207: none writes a path a sibling writes or reads
 test_scratch_census	335581ff018dc7619368015fa8bbbe0dba6427be	eris-wsl:2a155ba3	7 controls write-traced 14z-207: none writes a path a sibling writes or reads

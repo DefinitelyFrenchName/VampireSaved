@@ -1,0 +1,3 @@
+  FLAG ATTRIB: #304 can close done (build/agent208/t304/closing_304.md; docs/project/tickets.tsv line 85): the maintainer adopted four recommendations (DECISIONS_HISTORY.md...
+  FLAG D-ABSOLUTE: - **Item 4, sharding only if still too slow:** not needed — the planner's step and the snapshot's setup are now each under two minutes on the Mac, so nothing...  [build/agent208/t304/closing_304.md]
+packet_check: 2 flag(s): ATTRIB 1, D-ABSOLUTE 1

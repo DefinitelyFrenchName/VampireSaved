@@ -22,6 +22,15 @@ them, and the push hook's procedure requirement is unwired (`build/agent202/hook
 **No action is held for the close (ruled 2026-10-16, 14z-203):** a ticket closure or a recommendation is made, with its
 run, in the piece of work that finishes it — `DECISIONS_HISTORY.md` "Ruled 2026-10-16 (14z-203) — an action is checked
 when its work is done, never held for the close".
+**THE CUT STANDS (ruled 2026-10-24, 14z-208, #289 closed).** Measured on the sessions after it, 14z-203 to 14z-208
+(`build/agent208/W/REPORT.md`, local; classes by #288's W/S/R/N from each run's resolution, not blind): the
+before-an-action check's VIOLATED runs were a real error in the work in 36 of 108 (24 of 57 before the cut); every
+session commit from 2026-10-17 on sat on a strict GREEN tier (#290; the four of 2026-10-16 were not checked); of nine
+errors that reached a commit, a push or the maintainer (from the session records and bug tickets; the maintainer's
+corrections in the transcripts were not searched, so nine is a floor), four were tool or gate defects, a kind the cut
+checks never recorded catching, and two documented facts, the documentation packet's kind; none traced to a measurer's
+or reader's figure, so a run on every worker report (#289's option 2) is not adopted. The maintainer: *"Keep cut, close
+#289 (Recommended)"* (`DECISIONS_HISTORY.md` "Ruled 2026-10-24 (14z-208) — #289: the cut stands; #289 closes").
 
 ## The failure it exists to catch
 

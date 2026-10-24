@@ -27,7 +27,9 @@
 #      test_fbneo_tree_integrity);
 #   S2 every out-of-git input SNAPSHOTTED by copy-on-write (`cp -Rc`, APFS clonefile; a plain
 #      copy elsewhere) at the start, so nothing the working tree does afterwards reaches the
-#      run: all of build/ (then the commit's own tracked build/ files restored over it), each
+#      run: build/ but its scratch classes (#304 item 2: the commit's tests/expected/build_dirs.tsv, through
+#      tools/build_dirs.py; a relative runner argument under a left-out dir is copied in on its own; then the
+#      commit's own tracked build/ files restored over it), each
 #      initialised submodule's checkout with its .git/modules dir (refused unless its HEAD is
 #      the commit's gitlink), and the declared sibling ../community beside the tree (the bbh
 #      checkout is no longer copied: bbh is its own project, 14z-197);
@@ -127,12 +129,59 @@ C="$SNAP/repo"
 [ -n "$SNAP" ] && [ -d "$C/.git" ] || refuse "the clone at $C was not created"
 
 # ---- S2: the out-of-git inputs, snapshotted now
+# build/ is copied one top-level entry at a time, and every directory the COMMIT's own tools/build_dirs.py classes
+# `scratch` (session and lane work dirs, the rule-checker's staging, the run records, the snapshots, the proof
+# sheets) is LEFT OUT (#304 item 2, ruled 2026-10-23 "Adopt all four (Recommended)"): no gate of either tier reads
+# an input under one (fork U's census, build/agent208/U/REPORT.md), and they were 5,356,128 of the 14z-207 close
+# snapshot's 5,415,283 build/ files. The class list is the commit's tests/expected/build_dirs.tsv, never a second
+# list written here; a commit without tools/build_dirs.py copies everything but snapshot_runs, as before.
+# A runner argument naming a file under a left-out directory by a RELATIVE path (a --confirm base: a session
+# dir's close/tier_results.tsv) is copied in on its own (ruled 2026-10-24, "Copy that file in
+# (Recommended)"), so the run still reads it from the snapshot; an absolute path is read where it points, as before.
+LEFT_OUT=""
 if [ -d "$REPO/build" ]; then
     mkdir -p "$C/build"
-    cow "$REPO/build/." "$C/build/"
-    [ ! -d "$C/build/snapshot_runs" ] || rm -rf "$C/build/snapshot_runs"
+    : > "$REC/.build_tops"
+    for e in "$REPO"/build/* "$REPO"/build/.[!.]*; do
+        { [ -e "$e" ] || [ -L "$e" ]; } || continue
+        printf '%s\n' "${e##*/}" >> "$REC/.build_tops"
+    done
+    : > "$REC/.build_scratch"
+    if [ -f "$C/tools/build_dirs.py" ] && [ -s "$REC/.build_tops" ]; then
+        # BUILD-DIRS-CLASSIFY: the commit's classing; only directories are left out
+        ( cd "$C" && python3 tools/build_dirs.py classify $(cat "$REC/.build_tops") ) > "$REC/.build_classes" 2>&1 \
+            || refuse "S2: the commit's tools/build_dirs.py could not class build/'s entries: $(tail -1 "$REC/.build_classes")"
+        awk -F'\t' '$2 == "scratch" {print $1}' "$REC/.build_classes" > "$REC/.build_scratch"; rm -f "$REC/.build_classes"
+        S2_HOW="build/ copied without the scratch classes of the commit's tests/expected/build_dirs.tsv"
+    else
+        echo snapshot_runs > "$REC/.build_scratch"
+        S2_HOW="build/ copied whole but snapshot_runs (no tools/build_dirs.py at this commit)"
+    fi
+    while IFS= read -r n; do
+        e="$REPO/build/$n"
+        if [ -d "$e" ] && [ ! -L "$e" ] && grep -qxF "$n" "$REC/.build_scratch"; then
+            LEFT_OUT="$LEFT_OUT $n"; continue
+        fi
+        if [ -d "$e" ] && [ ! -L "$e" ]; then mkdir -p "$C/build/$n"; cow "$e/." "$C/build/$n/"
+        else rm -rf "$C/build/$n"; cow "$e" "$C/build/$n"; fi
+    done < "$REC/.build_tops"
+    rm -f "$REC/.build_tops"
     # the commit's own tracked files under build/ win over the working tree's copies
     if git -C "$C" ls-files --error-unmatch build >/dev/null 2>&1; then git -C "$C" checkout -q "$SHA" -- build; fi
+    say "build       $S2_HOW; left out:${LEFT_OUT:- nothing}"
+    # RELATIVE-ARG-COPY: a runner argument that names, relative to the repo, a file under a left-out directory
+    nin=0
+    for a in "$@"; do
+        a="${a#--*=}"
+        case "$a" in /*|"") continue ;; esac
+        case "$a" in build/*/*) ;; *) continue ;; esac
+        top="${a#build/}"; top="${top%%/*}"
+        grep -qxF "$top" "$REC/.build_scratch" || continue
+        [ -f "$REPO/$a" ] || continue
+        mkdir -p "$C/$(dirname "$a")"; cow "$REPO/$a" "$C/$a"; nin=$((nin + 1))
+        say "copied_in   $a (a runner argument under the left-out build/$top)"
+    done
+    rm -f "$REC/.build_scratch"
 fi
 SUBS="$(git -C "$C" config -f .gitmodules --get-regexp 'submodule\..*\.path' 2>/dev/null | awk '{print $2}' || true)"
 for sm in $SUBS; do

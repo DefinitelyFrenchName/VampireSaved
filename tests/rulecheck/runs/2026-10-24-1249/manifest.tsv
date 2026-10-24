@@ -1,0 +1,9 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent208/t289/issue289.md	05d9ec7d553376a86898f856641f8ec2c6fffadb
+build/agent208/t289/closing_289.md	0e6026823afec262b60be86d2cc39b71e82a2f6c
+docs/project/tickets.tsv.lines-100-100 (lines 100-100 of docs/project/tickets.tsv)	dd601f355c7a8139e3143870c770c038c4823842
+build/agent208/W/REPORT.md	9e389b42fb258680b9b4cce315dc5765b025dbbf
+build/agent208/W/classes_after.tsv	bd32d09c11dfbfebe0f548de6441e4c6957654d3
+build/agent208/W/green_guard_check.txt	5c95bc980cf035d4c154de62cbb77d43828b9301
+docs/project/rule_checker.md.lines-15-31 (lines 15-31 of docs/project/rule_checker.md)	77719defc290157c59d2d569100749816398b968
+DECISIONS_HISTORY.md.lines-7912-7919 (lines 7912-7919 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-24 (14z-208) — #289: the cut stands; #289 closes")	df72ad73ca1f4ed08ecc6eb844e320e742693679

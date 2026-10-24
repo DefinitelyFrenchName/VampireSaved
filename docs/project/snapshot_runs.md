@@ -42,7 +42,20 @@ and traceability"* — so session cadence stays in the working tree.
    copied, not checked out).
 2. **Everything else it reads, snapshotted at the start by copy-on-write** (`cp -Rc`, APFS
    clonefile; about 9 s for all of `build/`, 62,298 files, measured 14z-183b; no disk space until a
-   file diverges): all of `build/` with the commit's own tracked `build/` files restored over it;
+   file diverges): `build/` with the commit's own tracked `build/` files restored over it, **but its
+   scratch classes since #304 item 2** (14z-208; ruled 2026-10-23 "Adopt all four (Recommended)"): every
+   top-level directory the COMMIT's `tools/build_dirs.py` classes `scratch` in its `tests/expected/build_dirs.tsv`
+   (session and lane work dirs, the rule-checker's staging, the static and snapshot run records, the proof sheets)
+   is left out, generated from that list and never written a second time, and the record's `build` line names
+   what was left out. No gate of either tier reads an input under one (fork U's census, `build/agent208/U/REPORT.md`,
+   local: 118 code lines in 38 files name them, every one a comment, a synthetic fixture, a runner's own write or a
+   tool's own staging), and at the 14z-207 close they were 5,356,128 of the snapshot's 5,415,283 `build/` files
+   (31.81 of 42.97 GB) and that snapshot's setup took 1,051 s. Measured with and without (fork U2,
+   `build/agent208/U2/REPORT.md`, local; the same `--confirm` base): 5,308,810 files listed outside git against 59,213,
+   setup about 1,112 s against 95 s, the whole run 2,050 s against 501 s, and no verdict differing. A runner argument naming a file under a left-out
+   directory by a RELATIVE path (a `--confirm` base such as `build/agent207/close/tier_results.tsv`) is copied in on
+   its own (ruled 2026-10-24, "Copy that file in (Recommended)"); an absolute one is read where it points, as it
+   always was. A commit without `tools/build_dirs.py` copies `build/` whole but `snapshot_runs`, as before;
    each initialised submodule's checkout with its `.git/modules` dir (refused unless its `HEAD` is
    the commit's gitlink; the applied patches travel with it and `test_fbneo_tree_integrity` checks
    them against `emu/fbneo-patches/` inside the run); the sibling the gates read, `../community`
@@ -131,7 +144,11 @@ and 76 fingerprints; measured 14z-183b on this Mac).
   changes the instrument in the live cache mid-run and requires the run to read the copy AND exit 2
   with its AFTER line. Five more controls — the caller's HOME kept, `JTSIM_SCRATCH` left on the
   caller's clone, S1b skipped, the copy-back skipped, the end-of-run instrument comparison skipped —
-  each turn the gate red for their own reason; a control counts only when the perturbed copy RAN
+  each turn the gate red for their own reason. **Since #304 item 2 (14z-208)** section 5 builds a world whose
+  commit carries this tree's `tools/build_dirs.py` and class list, plants a file under an instance of every
+  `scratch` pattern the list holds, under an input-classed dir, an unclassed dir and at `build/`'s top, and passes
+  a relative argument under a scratch dir: the snapshot must hold no scratch plant, every other plant and the
+  argument's file; controls `copy-all-build` (the pre-#304 copy) and `no-arg-copy` turn it red. A control counts only when the perturbed copy RAN
   (the `no-instrument-check` copy first "fired" by crashing on a syntax error its own edit made,
   14z-184 — `docs/project/gotchas.md`).
 - **The emulator-tier census it rests on (14z-184, `build/agent184/c181/plan_181.md`):** four snapshot
@@ -142,7 +159,8 @@ and 76 fingerprints; measured 14z-183b on this Mac).
 - **The census it rests on (14z-183b, `build/agent183b/plan_153.md`):** in a clone with nothing
   supplied, the freeze-cadence static tier read PASS 128 / SKIP 30 / FAIL 20; every one of the 50 read
   an input git does not carry, three of them named in data or beside the tree rather than in the gate's
-  text — which is why the whole of `build/` is snapshotted, not a list. With those inputs supplied,
+  text — which is why the whole of `build/` is snapshotted, not a list (since #304 item 2 its scratch classes
+  are left out: a class list the census gate `test_build_dirs` holds, not a list of inputs). With those inputs supplied,
   the real runner in the clone read PASS 177 / FAIL 1, the one FAIL being a verdict the working tree
   gives too.
 

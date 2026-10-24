@@ -16,11 +16,11 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**470 scripts** — 141 ci_portable, 92 ci_static, 237 emulator-tier (run by name).
+**471 scripts** — 142 ci_portable, 92 ci_static, 237 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 49 | the suite runners and their own ground truth |
+| [runner](#runner) | 50 | the suite runners and their own ground truth |
 | [docs](#docs) | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 50 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -49,6 +49,7 @@ the suite runners and their own ground truth.
 | `tests/test_agent_worker.sh` | test | ci_portable | — | SLICE S4 OF GitHub #172, step 2: "a worker run on a known task returns figures each traceable to a command" (docs/project/agent_architecture_scope.md §5), over a FROZEN real run — ruled 2026-09-23 (14z-177, DECISIONS_HISTORY.md "Ruled 2026-… | 2026-09-23 |
 | `tests/test_bg_leg_shape.sh` | test | ci_portable | — | NO GATE MAY BACKGROUND AN EMULATOR LEG THAT WRITES ITS EXIT STATUS UNDER `set -e` WITHOUT `set +e` INSIDE THE GROUP (14z-171). ROM-free, ~2 s. Tool: tools/audit_bg_leg_shape.py (its docstring is the WHY). | 14z-171 |
 | `tests/test_build_dirs.sh` | test | ci_portable | — | every build/ top-level directory is classed in ONE list, and the planner's two scratch forms generated from it agree (`tools/build_dirs.py`, tests/expected/build_dirs.tsv; #304, 14z-207). | 14z-207 |
+| `tests/test_build_retention.sh` | test | ci_portable | — | what under build/ is kept, archived or pruned is decided by one tool whose rules are proven on a planted tree, and nothing it plans to delete is something a gate, a ticket or the session needs (`tools/build_retention.py`; #307, 14z-208). | 14z-208 |
 | `tests/test_claim_lint.sh` | test | ci_portable | — | every universal or definite in a rule-checker claim is tied to a named check or to the claim's NOT TESTED part (tools/claim_lint.py, 14z-187b, GitHub #185 item 3). | 14z-187b |
 | `tests/test_close_checks.sh` | test | ci_portable | — | the close's check runner times every check, re-runs one alone, and never lets a partial run read as the run of record (`tools/close_checks.py`, 14z-185b, GitHub #187). | 14z-185b |
 | `tests/test_close_loop_cost.sh` | test | ci_portable | — | the close-loop cost reader counts every pass of a close's check runner and the packet's span, whatever interpreter ran the runner and however a prepare's output was cut (`tools/agent/close_loop_cost.py`, 14z-187b, GitHub #187). | 14z-187b |

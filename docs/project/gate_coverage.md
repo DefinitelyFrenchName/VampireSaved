@@ -13,11 +13,11 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**470 of 470 gates described.**
+**471 of 471 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
-| [runner](#runner) | 49 | 49 | the suite runners and their own ground truth |
+| [runner](#runner) | 50 | 50 | the suite runners and their own ground truth |
 | [docs](#docs) | 27 | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 50 | 50 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -30,7 +30,7 @@ first sentence) is `gate_index.md`.
 
 ## runner
 
-the suite runners and their own ground truth. 49 of 49 described.
+the suite runners and their own ground truth. 50 of 50 described.
 
 ### `run_all_emulator.sh` — run, emulator
 
@@ -127,6 +127,14 @@ the suite runners and their own ground truth. 49 of 49 described.
 **HOW:** drives the tool's selftest (the generated forms on known paths, the classing, the plant check, and a census of a synthetic repository with an unclassed code name, an unclassed directory and an ambiguous one), then runs the census with the plant over THIS tree; five controls run perturbed copies and each must fail.
 
 **EXPECTS:** the selftest passes, the census of this tree reports 0 problems, and every control fails. A red names the unclassed `build/<top>` and where it came from: class it in tests/expected/build_dirs.tsv (scratch only for output no static gate reads), or remove the directory.
+
+### `test_build_retention.sh` — test, ci_portable
+
+**WHAT:** tools/build_retention.py's plan keeps every build/ unit a rule names — an input-classed directory FIRST (the emulator run records `emu_*` among them, never overridden), a directory a tracked program names outside a comment, one an open or parked ticket's row or GitHub text names, one in START HERE, one in STATE.md, the newest close folders, an unrecorded rule-checker staging folder — archives closed work's evidence, and prunes only regenerable or unread bulk (old snapshot listings, recorded staging, sheet pages older than the newest freeze); its apply deletes an archived unit only when the destination's sha256 of its tar was recorded as verified.
+
+**HOW:** drives the tool's selftest (a throwaway git repository with one planted unit per rule, plus an apply over a manifest with one verified and one unverified tar), then plans THIS tree without sizes and checks that every input-classed directory is kept; five controls run perturbed copies and each must fail the selftest.
+
+**EXPECTS:** the selftest passes, no input-classed directory of this tree is planned for archiving or pruning, and every control fails. A red names the planted unit the tool decided wrongly, or this tree's directory.
 
 ### `test_claim_lint.sh` — test, ci_portable
 
@@ -330,7 +338,7 @@ the suite runners and their own ground truth. 49 of 49 described.
 
 ### `test_run_on_snapshot.sh` — test, ci_portable
 
-**WHAT:** tests/run_on_snapshot.sh runs its command on a snapshot that nothing done to the working tree during the run can reach — a tracked file edited and committed, a build/ output rewritten, a tracked build/ file, a submodule file, the ../community sibling, a file of the ~/.cache/vampire-saved instrument cache, a Verilator scratch clone, and the runner's own file — and its record names the commit the run was taken at; a tracked file carries its last commit's time, a `build/emu_*` the run writes comes back to the working tree, and so does a `build/static_runs/*` record (#276), and an instrument binary changed in the LIVE cache during a run is reported; a run started inside another run's snapshot (the outer run's RUN_ON_SNAPSHOT_SELF inherited, as when a tier on a snapshot runs this gate) still makes its own copy and leaves the outer's.
+**WHAT:** tests/run_on_snapshot.sh runs its command on a snapshot that nothing done to the working tree during the run can reach — a tracked file edited and committed, a build/ output rewritten, a tracked build/ file, a submodule file, the ../community sibling, a file of the ~/.cache/vampire-saved instrument cache, a Verilator scratch clone, and the runner's own file — and its record names the commit the run was taken at; a tracked file carries its last commit's time, a `build/emu_*` the run writes comes back to the working tree, and so does a `build/static_runs/*` record (#276), and an instrument binary changed in the LIVE cache during a run is reported; a run started inside another run's snapshot (the outer run's RUN_ON_SNAPSHOT_SELF inherited, as when a tier on a snapshot runs this gate) still makes its own copy and leaves the outer's; and build/'s scratch classes (the commit's tests/expected/build_dirs.tsv) are LEFT OUT of the snapshot while input, unclassed and top-level entries are kept and a relative runner argument under a left-out dir is copied in (section 5, #304 item 2).
 
 **HOW:** builds a throwaway world (a repo with a submodule, a build/ output, a community sibling, a HOME holding an instrument cache, a scratch clone), starts a probe under run_on_snapshot.sh --emulator-inputs that reads all eight inputs, pauses it, perturbs them in the working tree, releases it and has it read them again (its runner file truncated too, the leg's copy padded past any shell's read-ahead so that truncation reaches a dash run as well — #203); then runs the SAME probe IN PLACE with the same perturbation (the positive leg: the perturbation must reach an unsnapshotted run, or the immunity leg proves nothing); section 4 changes an instrument binary mid-run.
 

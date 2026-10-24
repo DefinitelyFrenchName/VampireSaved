@@ -407,3 +407,6 @@ test_sheet_census
 # 14z-205 (#260): the submodule-pin check the close runs as its `pins` step reads MISSING for a pin only the local
 # clone holds and never passes a pin it could not check; its selftest on a file:// remote, two controls. ~3 s.
 test_submodule_pins
+# test_build_retention.sh — #307 (14z-208): tools/build_retention.py decides what under build/ is kept, archived or
+# pruned; its rules are proven on a planted tree and apply deletes an archive only once its tar is verified; five controls. ~5 s.
+test_build_retention

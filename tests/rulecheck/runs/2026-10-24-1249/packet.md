@@ -1,0 +1,14 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: #289 closed done: the cut of the close's audit layer stands (14z-208)
+Claim (the working agent's sentence): #289 can close done (build/agent208/t289/closing_289.md; docs/project/tickets.tsv line 100): its done-when (build/agent208/t289/issue289.md: the after-cut figures measured over enough sessions to compare, put to the maintainer, and the maintainer has ruled whether any cut check comes back) is met — fork W measured sessions 14z-203 to 14z-208 (build/agent208/W/REPORT.md, its evidence build/agent208/W/classes_after.tsv and green_guard_check.txt), the figures were put to the maintainer, who ruled to keep the cut and close #289 (the DECISIONS_HISTORY.md entry of 2026-10-24, 14z-208, '#289: the cut stands'); the fact is homed in docs/project/rule_checker.md 'THE CUT STANDS'. The figures quoted in the closing comment and the doc are fork W's (its report); the closing comment also states that #262, #263 and #277 were already closed done in 14z-205c (issue289.md's 2026-10-19 comment names them parked here). NOT TESTED: fork W assigned the W/S/R/N classes from each run's resolution text and not blind, as #288's were, and no second reader re-classed them; what the cut checks would have caught after the cut is unmeasurable (they did not run); how many worker returns a later step built on was not measured; the bug-ticket rates by window do not measure session error rates; the 186 rule-checker calls on the 14z-205 transcripts against 68 ledger readers are unexplained; the 14z-205c closures of #262, #263 and #277 were not re-read in this packet beyond the issue comment.
+Artifacts (read every one, in full):
+  - build/agent208/t289/issue289.md
+  - build/agent208/t289/closing_289.md
+  - docs/project/tickets.tsv.lines-100-100 (lines 100-100 of docs/project/tickets.tsv)
+  - build/agent208/W/REPORT.md
+  - build/agent208/W/classes_after.tsv
+  - build/agent208/W/green_guard_check.txt
+  - docs/project/rule_checker.md.lines-15-31 (lines 15-31 of docs/project/rule_checker.md)
+  - DECISIONS_HISTORY.md.lines-7912-7919 (lines 7912-7919 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-24 (14z-208) — #289: the cut stands; #289 closes")

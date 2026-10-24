@@ -1,0 +1,4 @@
+  FLAG D-ABSOLUTE: Four were tool or gate defects (#258's token estimate, the proof sheets read as planner inputs, #309's dead control, #300), a kind the documentation packet a...  [build/agent208/t289/closing_289.md]
+  FLAG D-ABSOLUTE: - **The green guard (#290):** all 22 session commits since 2026-10-17 sit on a strict GREEN row for their exact tree; the other two commits are the maintaine...  [build/agent208/t289/closing_289.md]
+  FLAG D-ABSOLUTE: - **Option 2 (a run on every worker report a later step builds on):** no after-cut finding traced to a measurer's or reader's figure; twelve runs caught a wr...  [build/agent208/t289/closing_289.md]
+packet_check: 3 flag(s): D-ABSOLUTE 3
