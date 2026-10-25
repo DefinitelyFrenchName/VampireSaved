@@ -1,0 +1,1 @@
+WITHDRAWN unspawned (14z-208b, 2026-10-25): its PACKET CHECK flagged figures in closing_316.md (2921, 1117, 1148) and closing_297.md (473) that closures_evidence.txt did not carry; the evidence is extended and the packet re-prepared.

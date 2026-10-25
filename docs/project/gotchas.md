@@ -7571,3 +7571,13 @@ tree and in every snapshot (`tests/run_on_snapshot.sh` copies the lock with the 
 take the real checkout's `.git/modules/emu/{fbneo,mame}/index.lock` (`tests/controls_concurrent.txt`), and a control run
 killed mid-way would leave one. **The rule:** a slow `git status` in a submodule is checked for a stale `index.lock`
 (no holder, old mtime) before anything else is blamed.
+
+## A HOST-COVERED GATE RE-RUN BEFORE THE REMOTE RUN ENDS IS HIDDEN BY THE REMOTE'S LATER SKIP (paid: 14z-208b, the freeze battery)
+
+`tools/audit_emulator_staleness.py` judges each gate by its NEWEST row over every `build/emu_*` run (by the results
+file's mtime). In the 14z-208b freeze, ERIS's run wrote SKIP or FAIL rows for the five gates only the Mac and PILOT can
+run (`test_mame_parity` PARTIAL with no separate reference, the two Mac-only release gates, the two PILOT gates). The
+Mac's PASS re-runs had finished before ERIS did, so ERIS's later rows were the newest. Every host-covered gate was
+re-run after ERIS ended, at the freeze and again at the release. **The rule:** run the host-covered gates after the
+remote run they cover has ENDED. A tarball copied back keeps the remote's mtime (`tar xzf`), which is the order the
+audit reads.

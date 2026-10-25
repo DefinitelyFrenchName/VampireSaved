@@ -2805,6 +2805,13 @@ command substitution's, so awk's exit 2 ends the gate before its FAIL line; `2>/
 (ERIS: exit 2, no verdict). Read a possibly absent file through a function that tests for it (`rec_end`), or end the
 assignment with `|| N=""`. Control `rec-log-missing`.
 
+**A gate's own fixture is the same hazard, and #308's fix left one (paid: 14z-208b, #322, at the merged-m23
+re-release).** `test_release_launcher_bat`'s `gen_claims` fixture wrote a test README with `open(path, "w")`. #308 made
+the generator read README.md as UTF-8, so on ERIS the template's em dash, written as cp1252 `0x97`, raised
+`UnicodeDecodeError` and the Windows half failed. `test_host_text_opens` reads only the release TOOLS, not a gate's
+inline Python, and the gate's Windows half runs only at release, so the release was the first run to see it. When a
+reader of a file gains an encoding, grep the gates that write that file for the old default too.
+
 ## A WINDOWS BATCH FILE AND ITS TEST HOST HAVE FOUR TRAPS — `%` on a `rem` line, LF endings, MSYS2 rewriting `/J`, and an SSH session with no desktop (found 2026-10-03, 14z-189, building #145's PLAY.bat; each paid once)
 
 1. **cmd expands `%` on a `rem` line.** A comment reading `rem what %~a reports`

@@ -1,0 +1,6 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent208/close_rel/issue322.md	d0b601d5f3de348c472005cb18754e2219cfa528
+build/agent208/close_rel/evidence322.txt	d84888606cf6516fcebaabe9203de951146134e8
+build/agent208/close_rel/launcher_cause.txt	9390ba5fd6f2f3d3beba060a3eee2c43f29b2ee0
+build/agent208/close_rel/maintainer_words.txt	6348b1d4a03b84d50f32bda82f996a53d23355b6
+build/agent208/close_rel/closing_322.md	66da6e1698c697c49df565ddcb3e097d082e7c7e

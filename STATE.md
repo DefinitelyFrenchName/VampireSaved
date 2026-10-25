@@ -38,7 +38,7 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
-## Session 14z-208b — **#229's Q4, Q7 and #301 answered: Q7's three findings filed (#318, #319, #320); Q4 (a) to apply; F4 (Q1) not confirmed, gaps or wrong moves seen.** A continuation of 14z-208 after its close (`9fed2ec8`, pushed), on the same transcript (`7462776e`).
+## Session 14z-208b — **The freeze (a battery, no new build) and merged-m23 re-released from it with #316's reuse; #316, #266, #284, #297 and #322 closed done; #321, #323, #324, #325 filed; #229's Q4, Q7 and #301 answered (#318, #319, #320 filed), F4 (Q1) not confirmed.** A continuation of 14z-208 after its close (`9fed2ec8`, pushed), on the same transcript (`7462776e`).
 
 ### (1) #229 — THE MAINTAINER'S ANSWERS
 Q7: *"three side findings, and I suggest a ticket for each: -> agreed"* — filed #318 (`tools/anim_nodes.py` reads offsets
@@ -51,94 +51,68 @@ waiting on Q1; #301's progress comment posted (the no-rig inputs answered, still
 check against the Japanese sources and F4's identity). Open: F4's identity (Q1), then #229's swap, census and
 registration.
 
-## Session 14z-208 — **#298, #289, #304, #307 and #317 closed done; #316 built (open until a measured release); #229's Q2 and Q5 ruled and applied, Q1, Q4 and Q7 open; #170 recorded declined.** Opened 2026-10-24 after the 14z-207 close (`c624ee13`, pushed).
+### (2) THE FREEZE — A BATTERY ON HEAD WITH NO NEW BUILD; THE FREEZE COMMIT `a14e811e`
+The maintainer: *"Freeze"*, then *"Battery, no new build"* (DECISIONS_HISTORY.md): HEAD reproduced merged-m23's
+romset, so no tags and no registry rows. Tree `f6218146` (the records, `release/merged-m23` regenerated with #284's
+READMEs and #314's appliers, `tests/controls_concurrent.txt` re-traced on PILOT: 102 SAFE, 6 SHARED, 0 HOLLOW,
+`build/agent208/RT/REPORT.md`). Static freeze tier: GREEN, PASS 220, 473 controls executed and honoured, 1,269 s wall.
+Emulator `--freeze`: ERIS PASS 177 of 182, its five non-PASS rows host-covered and re-run after ERIS ended (Mac
+`test_mame_parity`, `test_release_binaries`, `test_readme_recording`; PILOT `audit_release_linux_cleanhost`,
+`audit_release_linux_desktop` in the maintainer's session after their *"ready"*), all PASS; the Mac's MiSTer lane PASS 3.
+Rule-checker runs `2026-10-24-1270` (VIOLATED Q1 Q4, resolved: each run's working tree recorded) and `-1271` (OK).
+Committed as `a14e811e`, not pushed until the close. Records: `build/agent208/freeze/freeze_record.txt` (local). The
+ordering lesson is a gotcha (`docs/project/gotchas.md` "A HOST-COVERED GATE RE-RUN BEFORE THE REMOTE RUN ENDS").
 
-### opened with
-HANDOFF, STATE and NEXT_SESSION read; the sweep CLEAN, `main` equal to `origin/main` at `c624ee13`. The maintainer, on the
-opener's #298 item: *"agreed. From what I see there is already substantial time gained too."*
+### (3) THE RELEASE — merged-m23 RE-RELEASED FROM `a14e811e`, REUSING THE FREEZE'S RUNS (#316)
+The maintainer, during the battery: *"I don't want you to alter anything that would compromise the ongoing freeze or
+force re-runs"*, so no tracked file moved until the release was done. Both runners took `--reuse`; every identity
+read `the same`. Emulator, every control: ERIS PASS 417 (177 reused); the Mac's MiSTer lane PASS 12 (3 reused, 12,834 s);
+the Mac host gates PASS 2, 5 and 6, PILOT's PASS 3 and 4, each gate row reused. Two reds on the way, neither a reuse
+problem:
+- ERIS STOPPED on the prereq row `test_mame_parity` (PARTIAL, no separate reference on ERIS); resumed with `--resume
+  --keep-going`. The freeze run had not stopped on the same row: #323.
+- `audit_hitclass_map_cost@drift-clock` took 2,921 s of its 5,400 s cap at `--jobs 8`, a headroom FAIL; re-run alone at
+  `--jobs 4` on the same commit, 1,117-1,148 s, PASS 4 (`build/emu_rel208_eris_hitclass`). The data point is on #321.
+Static release tier (216 reused, 161-164 s): its run of record PASS 223, FAIL 0, SKIP 1 — `test_release_launcher_bat`'s
+Windows half, whose ERIS run FAILED on its own fixture's encoding: the maintainer, *"Release a14e811e, fix after
+(Recommended)"* (#322). Upload: *"Upload with --prune (Recommended)"*; nine assets replaced and re-verified from GitHub,
+nothing pruned. The measured figures are in `docs/project/release_format.md` (#316). Records: `build/agent208/release/`
+(local).
 
-### (1) #298 CLOSED DONE
-A measurer (`build/agent208/t298/`, local) read the 14z-207 close tier (`build/agent207/close/`, its `--prev` the 14z-206
-close's run): 161 controls executed, all HONOURED, 3,941 s; `test_static_runner` 23 of them, 3,172 s, re-run with every
-control as a gate absent from the 14z-206 run; the other 25 gates 138 controls, 769 s, against 1,500-1,800 s before the
-rule; the seconds are not load-normalised (the controls ran in #312's pools, the portable tier's 7.1 of 8 slots busy,
-the static tier's 3.1; one control 48 s there against 18 s at 14z-205), so the count executed is the load-free figure.
-Of the five closes from 14z-205 on, only 14z-207's recorded tier is based on the previous close's run (14z-205's on its own
-tier 2, 14z-205b's and 14z-205c's on their own earlier passes, 11 and 19 controls); the 14z-206 close records no figure under the rule (its tier of record ran without `--confirm`, #313, and its
-`--confirm` run kept a controls file byte-identical to that run's). #298's 14z-205 comment had
-asked for a close that does not touch the runner; asked, the maintainer: *"Close now, runner apart (Recommended)"*
-(DECISIONS_HISTORY.md). The tier's 832 s wall is #312's pool, not #298. `docs/project/must_fire_contract.md` still said a
-`--confirm` close executes every control of every re-run gate (stale since #286 (c)); corrected, with the figures.
-Rule-checker runs 2026-10-24-1244 to -1247 VIOLATED and resolved (the closes' bases described on different terms; the
-seconds' load; the two pools and a 'first close' wording; the 14z-205b and 14z-205c closes, measured and named), run -1248
-OK. **#298 closed done.**
+### (4) TICKETS FILED: #321, #323, #324, #325
+#321 (parallelise the serial-by-default gates) at the maintainer's word: *"I would like to file this as a ticket,
+including any other similar avenue for parallelization in others tests, checks and controls"* (DECISIONS_HISTORY.md);
+its index row waited for the release. #323 (the prereq STOP applied unevenly), #324 (PILOT's untracked `-V` file, a stub
+`xdelta3` leak, not reproduced), #325 (two snapshot runs of one commit in the same second share a directory).
 
-### (2) #289 CLOSED DONE: THE CUT STANDS; #262, #263, #277 ALREADY DONE
-The maintainer asked to finish #304, #307 and #289 + #262, #263, #277 before the freeze (#262, #263, #277 were closed done
-in 14z-205c; parked under #289, nothing more is owed). Fork W (`build/agent208/W/REPORT.md`, local) measured the sessions
-after the cut: the before-an-action check's VIOLATED runs a real error in 36 of 108 (24 of 57 before); every session
-commit from 2026-10-17 on on a strict GREEN tier; nine errors reached a commit, a push or the maintainer (a floor: the
-transcripts' corrections not searched), four tool or gate defects, two documented facts; none from a worker's figure.
-The maintainer: *"Keep cut, close #289 (Recommended)"*, then on two corrected figures *"Ruling stands, close"*
-(DECISIONS_HISTORY.md). Fact homed in `docs/project/rule_checker.md` "THE CUT STANDS". Rule-checker runs 2026-10-24-1249
-to -1251 VIOLATED and resolved, -1252 OK. **#289 closed done.**
+### (5) #316, #266, #284, #297 AND #322 CLOSED DONE
+The maintainer's *"Do it"* to the plan of closing them against the release, each after a rule-checker run. They asked
+whether the closures could share one run; they could: one run for the four the release closes, one for #322.
+- **#316, #266, #284, #297** — rule-checker runs `2026-10-25-1274` (VIOLATED Q1 Q4: ERIS's FAIL and SKIP rows unnamed,
+  the desktop gate's fresh cut asserted and not shown, `8b0c7bd9`'s tree not shown, the static run of record's NOT GREEN
+  unstated), `-1275` (VIOLATED Q1: a control figure quoted from the freeze run as the release's, the live session not
+  shown, a cause given for an unread red), `-1276` (VIOLATED Q1: the launcher red's cause stated not shown, and #284's
+  generator README check never asserted at `a14e811e`, its two controls DEAD there), `-1277` (OK); `-1272` and `-1273`
+  withdrawn unspawned on their packet-check flags. Evidence: `build/agent208/release/closures_evidence.txt` (local).
+  #316 on the measured release (the figures in `docs/project/release_format.md`); #266 on `audit_release_linux_desktop`
+  PASSING on PILOT in the maintainer's session; #284 on the release shipping the template READMEs (three zips
+  downloaded back, byte-identical to the tree) and `test_readme_recording` PASS on macOS and on PILOT's Linux at
+  `a14e811e` (the Windows leg not run at this commit); #297 on all 109 moved gates PASS in the freeze's run of record.
+- **#322** — the fixture fix in `tests/test_release_launcher_bat.sh`; on ERIS at the commit object `3c3b6130` (the fix
+  and the records so far) the gate PASSES with 8 controls firing (6 at `a14e811e`) and `first-found` fails as a mode;
+  run `2026-10-25-1278` OK. The lesson: `docs/platform/gotchas.md` (a gate's own fixture is outside
+  `test_host_text_opens`). The changed script no longer matched its traced blob, so the close tier's first run was red
+  on `test_controls_concurrent`; the gate is taken off `tests/controls_concurrent.txt` until the next freeze's re-trace.
 
-### (3) #304 CLOSED DONE: THE SNAPSHOT LEAVES SCRATCH OUT
-Fork U's census (`build/agent208/U/REPORT.md`, local): no gate of either tier reads an input under a scratch `build/`
-directory; fork J's 14z-207 examples were comment lines. Fork U2 built it (`tests/run_on_snapshot.sh` copies `build/`
-per top entry, leaving out the commit's scratch classes; a relative scratch runner argument copied in, ruled; section 5
-and controls `copy-all-build`, `no-arg-copy`), committed in `47c118e4`. Snapshot setup about 1,112 s with scratch, 95 s
-without. The comparison's rows were mostly carried, so every freeze-cadence gate then ran without scratch on `2b6d703c`
-(PASS 215, FAIL 3, none from scratch) and the session-cadence gates again on the committed tree (GREEN, PASS 106). The
-recommendation kept `build/static_runs`; the maintainer on leaving it out: *"Leave it out (Recommended)"*. Rule-checker
-runs 2026-10-24-1254 to -1259 VIOLATED and resolved (1253 prepared and not run), -1260 OK. **#304 closed done.**
-
-### (4) #307 CLOSED DONE: THE build/ RETENTION RULE, THE ARCHIVE, ONE PRUNE
-Fork V's census (`build/agent208/V/REPORT.md`, local); the maintainer: *"Archive, then move to files-hades (10.20.0.39) .
-I can do the file moving if need be"*. Forks V2 and V3 built `tools/build_retention.py` and `tests/test_build_retention.sh`
-and the rule beside [VSP-96] (`docs/project/build_dir_triage.md`), committed in `47c118e4`; the first cut planned 83
-input-classed `emu_*` folders away, caught by its own gate on the real tree before any deletion, fixed (input always
-kept). 84 tars (5.83 GB) moved to files-hades by the maintainer, checksums waived on their diff (DECISIONS_HISTORY.md).
-The prune: 1,218 items, 0 `emu_*`, 49 → 78 GiB free; the strict tier after it GREEN. The leftover 14z-205c snapshot (43.1
-GB) deleted (ruled). Rule-checker runs 2026-10-24-1261 to -1264 VIOLATED and resolved, -1265 OK. **#307 closed done.**
-
-### (5) #316 BUILT (OPEN UNTIL A MEASURED RELEASE); #317 CLOSED DONE
-Asked why each of close, freeze and release redoes the last, the maintainer filed both: *"yes, let's file this and do it
-before we freeze"* (#316), *"yes"* and *"and we deal with it before the release"* (#317) (DECISIONS_HISTORY.md). Both
-committed in `dd1154f5`. **#316** (fork R2, `build/agent208/R2/REPORT.md`, local): `tools/reuse_identity.py`, `--reuse`
-on both runners, gate `tests/test_release_reuse.sh` (seven controls), `docs/project/release_format.md`; the release's
-tiers run on the freeze commit itself, the maintainer: *"Release tiers on the freeze commit (Recommended)"*, now in
-`release_format.md`. Progress comment posted; it closes with a measured release. **#317** (fork S2,
-`build/agent208/S2/REPORT.md`, local): setup 74-80 s measured by part, about 26 s of it a stale `emu/mame` `index.lock`
-(removed; `docs/project/gotchas.md`); the slow parts overlapped, fingerprints 8 at a time, about 25 s; change 2 measured
-and dropped, *"Drop change 2 (Recommended)"*; `tools/close.py` bases a re-run after a red on the red run (control
-`red-base-ignored`). The pair: red full freeze-cadence tier 1,279 s, the green `--confirm` on it 249 s
-(`build/agent208/t317/red_green_pair.txt`, local). Rule-checker runs 2026-10-24-1266 and -1268 VIOLATED and resolved
-(uncontrolled waits and the fallback named), -1267 prepared and not run, -1269 OK. **#317 closed done.**
-
-### (6) #229 — Q2 AND Q5 RULED AND APPLIED; Q1, Q4, Q7 OPEN
-Fork X (`build/agent208/X/REPORT.md`, local) made the Q2 captures and the 8K/8KK sweep (390 legs on PILOT). The
-maintainer on Q2: *"retract our three claims ... Mark “active +1 on 12 of 15” as not reproduced, method unknown. ->
-agreed"*; on Q5: *"(a) compare guard-cancel damage as dealt on a −3 victim and name the victim on the page ... -> agreed"*
-(DECISIONS_HISTORY.md). Fork X2 (`build/agent208/X2/REPORT.md`, local) applied both: the community page artifact and
-the tracked `docs/project/tables/community_crosscheck.md`, carried into its generator `tools/crosscheck_framedata.py`
-(committed in `47c118e4`); `audit_guard_cancels.sh` gained dealt legs (271 rigs, 430 legs, PASS on PILOT, six controls
-fired) and a new expectation beside the frozen one (`build/agent208/X2/new/`, hash `6f6f14a3`), NOT swapped in. The six
-#229 gates stay local and untracked. Open, the maintainer's: Q1 (F4's identity on the 18-tile sheets), Q4 (join under
-the engine's input, (a), or leave unjoined, (b)), Q7 (three side findings, a ticket each suggested), and whether to
-comment on #301. After them: the swap with its rule-checker run, the join census, the six gates registered, #229 closed.
-
-### (7) #170 RECORDED DECLINED
-Found closed on GitHub by the maintainer: *"Community Demand is close to nil, ressources are nil. Closing"*
-(DECISIONS_HISTORY.md); its row set to `declined`, committed in `dd1154f5`.
-
-### CLOSE (14z-208, 2026-10-24)
-Driver `build/agent208/close/` (`--prev build/agent208/commit5b/tier_results.tsv`, this sitting's last GREEN tier, the
-fixed tree's `--confirm` on the 45838d1b red run). Before it: #317 closed (run `2026-10-24-1269` OK) and #316's progress
-comment posted. Steps: sections, next-session (the 14z-207 opener to `docs/NEXT_SESSION_HISTORY.md`), rollover (the
-14z-207 group, 167 lines, to `STATE_HISTORY.md` with its ledger line), indexes, dashboard (14z-163..14z-208, 1,956
-figures, 0 unclassed; datasets versions 15, 15, 15, 16) — done. The tier's results: `build/agent208/close/tier_results.tsv`,
-the next close's `--prev`. Left local and untracked: #229's 105 files (`build/agent205/t229/pending_gates_229.list`).
+### CLOSE (14z-208b, 2026-10-25)
+Driver `build/agent208/close208b/` (`--prev build/agent208/close/tier_results.tsv`, the 14z-208 close's run of record).
+Before it: the four release closures (run `2026-10-25-1277` OK) and #322 (run `-1278` OK) closed on GitHub. Steps:
+sections; next-session (the 14z-208 opener to `docs/NEXT_SESSION_HISTORY.md`); rollover (the 14z-208 group, 89 lines, to
+`STATE_HISTORY.md` with its ledger line; no `STATE.md §` citation pointed into it); indexes (regenerated in a clean
+checkout of the staged tree, where `test_tickets`, `test_state_open_lists` and `test_live_budget` PASS); dashboard
+(14z-163..14z-208b, 1,958 figures, 0 unclassed; datasets versions 16, 16, 17, 16) — done. The tier's results:
+`build/agent208/close208b/tier_results.tsv`, the next close's `--prev`. The push carries the freeze commit `a14e811e`
+and this close's commit. Left local and untracked: #229's 105 files (`build/agent205/t229/pending_gates_229.list`).
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings

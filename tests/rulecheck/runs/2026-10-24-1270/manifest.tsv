@@ -1,0 +1,5 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent208/freeze/freeze_record.txt	bb43f950fe4026eb14d32629bfd72e757b433b80
+build/agent208/RT/REPORT.md	f5281b86c7fa8009813e65f4b2e1e5f40d55ad43
+DECISIONS_HISTORY.md.lines-8037-8044 (lines 8037-8044 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-24 (14z-208b) — the freeze is a battery on HEAD with no new build; merged-m23 is re")	4c6c5489bfbbc7f54dd293f417bb755dbc0d042b
+build/emu_freeze208_eris/results.tsv	5d36a2c06236ad70e9858204273228221d9f5bc9

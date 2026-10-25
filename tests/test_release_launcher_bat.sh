@@ -216,21 +216,23 @@ esac
 # for each platform through its own select_platform_text(), may claim that the package holds an emulator
 # only on an emulator platform. The released tree is not checked for this: merged-m22 shipped before the
 # fix (#214 stays open until the next release carries it), so the generator is what is held.
+# The fixture's own text opens name UTF-8 (#322, 14z-208b): ERIS's Python defaults to cp1252, and since #308 the
+# generator reads README.md as UTF-8, so a default-encoded fixture README failed the Windows half at the release.
 gen_claims() {  # gen_claims <mister selection: mister|fbneo> [<fbneo selection: fbneo|mame>] -> prints findings; exit 0 clean, 3 findings
     python3 - "$REL/fbneo/manifest.json" "$W/gen" "$1" "${2:-fbneo}" <<'PYEOF'
 import json, os, sys
 sys.path.insert(0, "tools")
 import package_release as pr, package_release_platforms as pp
-m = json.load(open(sys.argv[1])); out = sys.argv[2]; mister_sel = sys.argv[3]; fbneo_sel = sys.argv[4]
+m = json.load(open(sys.argv[1], encoding="utf-8")); out = sys.argv[2]; mister_sel = sys.argv[3]; fbneo_sel = sys.argv[4]
 CLAIMS = ("Use the one in this package", "check it is the prepared one", "the **only** game file the emulator needs")   # #284: the template's words
 NOTE = "clone of nonexistent driver megaman"     # #227: the MAME build's four validation lines
 BOX = "ROMs/disk images for this system are"     # #234: the red bad-ROM box at every MAME start
 bad = []
 for plat, sel in (("fbneo", fbneo_sel), ("mame", "mame"), ("mister", mister_sel)):
     d = os.path.join(out, plat); os.makedirs(d, exist_ok=True)
-    open(os.path.join(d, "README.md"), "w").write(pr.readme(None, m, 1, 1))
+    open(os.path.join(d, "README.md"), "w", encoding="utf-8", newline="\n").write(pr.readme(None, m, 1, 1))
     pp.select_platform_text(d, sel)
-    body = open(os.path.join(d, "README.md")).read()
+    body = open(os.path.join(d, "README.md"), encoding="utf-8").read()
     has = [c for c in CLAIMS if c in body]
     if plat == "mister" and has:
         bad.append(f"the generator's MiSTer README claims an emulator it does not ship: {has}")

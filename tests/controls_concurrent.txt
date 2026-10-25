@@ -11,6 +11,7 @@
 # NOT listed, from the pilot:bd004554 trace (SHARED): test_close_tools and test_emulator_staleness (their controls take the checkout's .git/modules/emu/{fbneo,jtcores,jtcores/modules/modules/fx68k}/index.lock); test_mister_mra_map (one control writes /tmp/vampire-saved-jtsim/.git/{HEAD,config,packed-refs}, another reads them: the shared jtsim scratch); test_mra_parts (two controls rename onto zips/parts.zip, a relative path the trace cannot place); test_release_asset_shape (its controls write build/scratch/release_assets/merged-m23/*.zip(.list)); test_romset_path_guard (two controls rename onto build/rompath/vsavjw.zip, a relative path the trace cannot place).
 # BACK ON since 14z-208b (#304 item 2): test_run_on_snapshot — off after its script gained section 5 and two controls; re-traced at pilot:bd004554, its 12 controls SAFE.
 # BACK ON since 14z-208b (#317): test_session_close — off after its script gained the control red-base-ignored; re-traced at pilot:bd004554, its 5 controls SAFE.
+# OFF since 14z-208b (#322): test_release_launcher_bat — its script's gen_claims fixture now names its encoding, so its traced blob 4cc357ae no longer matches; its controls run one after another (8 s in all at the 14z-208b close tier) until the next freeze's re-trace.
 audit_capture_matrix	30719e3e5a1f9d826f990e29638f4ecd0cd550eb	pilot:bd004554	2 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 audit_mister_map_fit	1a2aa94645e31f6c4ee1149948548796d6037043	pilot:bd004554	3 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_agent_defs	d82b476cf3a0d3b523047321b0d33d50737e7865	pilot:bd004554	7 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
@@ -83,7 +84,6 @@ test_power_decode	020e2b8bc7dae1add4f66937121c356cf5b51251	pilot:bd004554	2 cont
 test_promise_check	fa54463334e4914e361b002220ad27bf7648d55a	pilot:bd004554	3 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_reaction_classes	3ee3745e9a2e606b3667c3d5add2648188326c42	pilot:bd004554	3 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_recurrence_alarm	fff7c06f0b2c1c0dc490ca20a6277edec8cb8189	pilot:bd004554	2 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
-test_release_launcher_bat	4cc357ae8a61bfc3b5e6d4c4fd67be4cedbc8ca0	pilot:bd004554	7 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_release_recipe_text	0775e67ba880c921519a66518cdb438a42f3c11d	pilot:bd004554	3 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_release_reuse	c5e1bcc3a52db6ba72da581a99e5e19dc1e27ad5	pilot:bd004554	7 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_release_roundtrip	28f1eacca4242b3a7a7b35552961571b2d770d48	pilot:bd004554	10 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads

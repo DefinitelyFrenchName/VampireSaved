@@ -408,6 +408,21 @@ ROMDIR=... tests/run_all_emulator.sh --scope all --lane all --strict --controls 
 Gate: `tests/test_release_reuse.sh` (a changed tree, a changed instrument and a changed ROMDIR file each refuse; the
 release-cadence stub is never reused; seven must-fire controls).
 
+**Measured at the merged-m23 re-release (14z-208b, 2026-10-25, freeze commit `a14e811e`).** Every identity line read
+`the same`, and no run printed `REUSE REFUSED`.
+- Static: the freeze run took 1,269 s wall. The release run reused 216 rows and took 161 to 164 s wall in each of its
+  three runs. The first two were red on `test_emulator_staleness` for reasons outside reuse: first the emulator rows
+  were not in yet, then a headroom FAIL.
+- Emulator: ERIS reused 177 of its 417 PASS rows, the Mac's MiSTer lane 3 of 12 (12,834 s wall), and each Mac or
+  PILOT host gate its one gate row. All 254 control rows ran.
+- **What reuse does not shorten:** the controls. They dominate the release's emulator time, which is why the
+  emulator tier was hours where the static tier was minutes.
+- **Two things to plan for:**
+  - Run every host-covered gate (the Mac's and PILOT's) AFTER the ERIS run ends. The staleness audit keeps each
+    gate's NEWEST row, and an ERIS SKIP written later would hide the host's PASS.
+  - A release at `--jobs 8` on ERIS can push a long MAME control over half its cap. `audit_hitclass_map_cost@drift-clock`
+    took 2,921 s of 5,400 s; re-run alone at `--jobs 4` on the same commit it took 1,122 s (#321).
+
 ## Where a release's history is
 
 The registry row in `HANDOFF.md` "Build registry", the annotated tag

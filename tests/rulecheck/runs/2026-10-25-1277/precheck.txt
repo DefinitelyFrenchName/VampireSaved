@@ -1,0 +1,9 @@
+  FLAG D-ABSOLUTE: Wall 161 to 164 s in each of its three runs.  [build/agent208/close_rel/closing_316.md]
+  FLAG D-ABSOLUTE: The second's cause, read from a re-run of that gate alone, was the headroom row below.  [build/agent208/close_rel/closing_316.md]
+  FLAG D-ABSOLUTE: Each one PASSES on the Mac or PILOT at the release.  [build/agent208/close_rel/closing_316.md]
+  FLAG D-ABSOLUTE: - FBNeo and MAME each showed mark M23, 0 of 147 cells wrong.  [build/agent208/close_rel/closing_266.md]
+  FLAG D-ABSOLUTE: - Every audio link was active.  [build/agent208/close_rel/closing_266.md]
+  FLAG D-ABSOLUTE: - macOS: PASS (the gate row from the freeze run on the same tree), and all 5 controls honoured at the release.  [build/agent208/close_rel/closing_284.md]
+  FLAG D-ABSOLUTE: - Linux (PILOT): PASS, and all 5 controls honoured.  [build/agent208/close_rel/closing_284.md]
+  FLAG D-ABSOLUTE: Nothing was left unbuilt.  [build/agent208/close_rel/closing_297.md]
+packet_check: 8 flag(s): D-ABSOLUTE 8

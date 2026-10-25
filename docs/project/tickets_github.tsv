@@ -2,13 +2,18 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 320
+# issues: 325
 number	state	reason	closed	labels	title
+325	OPEN	-	-	bug,severity: low	run_on_snapshot: two runs of one commit started in the same second share a snapshot directory
+324	OPEN	-	-	bug,severity: low,test-integrity	PILOT's clone root holds an untracked '-V' file ('stub patch', 2026-10-23): a stub xdelta3 leaking into the repository
+323	OPEN	-	-	bug,severity: low,test-integrity	The emulator runner's prereq STOP applied unevenly: the freeze run went on past a red prereq row, the release run stopped on the same row
+322	CLOSED	COMPLETED	2026-10-25	bug,severity: medium,test-integrity	test_release_launcher_bat's Windows half: its gen_claims fixture writes the README in the host's default encoding (cp1252 on ERIS)
+321	OPEN	-	-	evolution,performance,severity: medium	Parallelise the gates that run serially by default: test_mame_parity's PARITY_JOBS and the other job knobs, checks and controls
 320	OPEN	-	-	bug,test-integrity	MAME write taps exit 139 at teardown after every output is written; gates accept it only with full output
 319	OPEN	-	-	bug	tests/expected/ground_throws.tsv holds per-move signatures in the clear (the 14z-126 frame-data ruling)
 318	OPEN	-	-	bug,correctness	tools/anim_nodes.py reads the animation tables' offsets unsigned; the game sign-extends them (negative entries on 11 characters)
 317	CLOSED	COMPLETED	2026-10-24	evolution	Snapshot tiers: measure the remaining setup, re-snapshot incrementally after a red, base the re-run on the red run
-316	OPEN	-	-	evolution	Release reuses the freeze's tier results when it builds from the freeze's exact tree
+316	CLOSED	COMPLETED	2026-10-25	evolution	Release reuses the freeze's tier results when it builds from the freeze's exact tree
 315	CLOSED	COMPLETED	2026-10-24	evolution,test-integrity	#312's concurrent-controls list is a snapshot: nothing re-checks that a listed gate still writes as it was traced
 314	CLOSED	COMPLETED	2026-10-23	bug,severity: low	tools/gen_applier_page.py writes host-encoded text: cp1252 and CRLF on Windows (the #308 defect in a sibling tool)
 313	CLOSED	COMPLETED	2026-10-23	bug,performance,severity: medium	tools/static_confirm.py plan stalls on a large untracked build/sheets/ tree: 1,902 s for 25 of 229 gates, against 37 s for all 229 the day before
@@ -27,7 +32,7 @@ number	state	reason	closed	labels	title
 300	CLOSED	COMPLETED	2026-10-19	bug,test-integrity	test_close_tools REFUSED on the live tree: section 2b reads the findings table #288 cut from the close
 299	CLOSED	COMPLETED	2026-10-22	evolution,performance	Static tier: run gates in parallel (--jobs, ~70-80% of the machine), proven equal to a serial run first
 298	CLOSED	COMPLETED	2026-10-24	evolution,performance	Static tier scope: at a commit/close, execute a gate's controls only when a program of its reach changed (R1); all at freeze/release
-297	OPEN	-	-	evolution,performance	Static tier scope: six families (109 gates) to freeze cadence, triggered by their own code (@code)
+297	CLOSED	COMPLETED	2026-10-25	evolution,performance	Static tier scope: six families (109 gates) to freeze cadence, triggered by their own code (@code)
 296	CLOSED	COMPLETED	2026-10-22	evolution,severity: medium,test-integrity	run_mame.sh: refuse a run whose MAME_SANDBOX already holds an earlier run's state (#293's class, at run time)
 295	CLOSED	COMPLETED	2026-10-19	evolution,severity: medium,test-integrity	audit_dmg_legacy_sweep never runs Demitri's legacy hits on our build: add an exact vsavj-vs-ours leg (superset coverage)
 294	OPEN	-	-	cosmetic,parked	Killshread's shock/electrocuted state has wrong palette (currently accepted tradeoff) - parked
@@ -40,7 +45,7 @@ number	state	reason	closed	labels	title
 287	CLOSED	NOT_PLANNED	2026-10-16	evolution,severity: high	The procedure check runs at the close; run it right after each piece of work, scoped to that work
 286	CLOSED	COMPLETED	2026-10-23	evolution,performance,severity: high	The close tier's cost follows the session, not the change: false re-runs, the dirty fbneo submodule, controls on every re-run gate
 285	CLOSED	COMPLETED	2026-10-15	evolution	test_release_launcher_bat: its Windows half at release cadence or on demand, never a session-close SKIP
-284	OPEN	-	-	bug,done unshipped,severity: medium	[regression] m23-merged README.md file is currently a mess
+284	CLOSED	COMPLETED	2026-10-25	bug,severity: medium	[regression] m23-merged README.md file is currently a mess
 283	CLOSED	COMPLETED	2026-10-16	bug	trace_static_reads.py drops every open strace splits into <unfinished>/<resumed> lines, so the predictor's miss scores never saw them
 282	CLOSED	COMPLETED	2026-10-15	evolution	The session documents and the close ritual are too large to follow: shrink, index and streamline them
 281	CLOSED	COMPLETED	2026-10-23	bug	Release-only: test_applier_page_browser's control run does not finish under strace
@@ -58,7 +63,7 @@ number	state	reason	closed	labels	title
 269	CLOSED	COMPLETED	2026-10-14	evolution	Static tier turned around: a session runs the gates whose followed paths changed plus a core, controls only for changed gates; freeze and release run everything
 268	CLOSED	COMPLETED	2026-10-13	evolution	test_close_tools cut back: session runs self-tests only, one-pass retraction scan at freeze/release, section-scoped control modes, retraction-file audit
 267	OPEN	-	-	evolution,parked	Session ledger as a static page generated into docs/site/ at each close (hosting and what to publish are the maintainer's calls)
-266	OPEN	-	-	bug	PILOT's GNOME Shell segfaults under Wayland since 2026-10-09, so audit_release_linux_desktop cannot run
+266	CLOSED	COMPLETED	2026-10-25	bug	PILOT's GNOME Shell segfaults under Wayland since 2026-10-09, so audit_release_linux_desktop cannot run
 265	CLOSED	COMPLETED	2026-10-13	evolution	audit_mask_window_ff42a2 at a release: an instrument with no default subject SKIPs, and the staleness audit now FAILs that SKIP
 264	CLOSED	COMPLETED	2026-10-12	evolution	A session dashboard: time per activity, checks and re-checks and why, tier cost and quality signals, each figure labelled measured, derived, estimated, inferred or extrapolated
 263	CLOSED	COMPLETED	2026-10-20	bug	C1 extract's W# hint flags a worker figure derived from a file it read as unsourced

@@ -1,0 +1,14 @@
+  FLAG FIGURE: 182
+  FLAG D-FIGURE: 177  [build/agent208/freeze/freeze_record.txt]
+  FLAG D-FIGURE: 473  [build/agent208/freeze/freeze_record.txt]
+  FLAG D-FIGURE: 220  [build/agent208/freeze/freeze_record.txt]
+  FLAG D-FIGURE: 1324.90  [build/agent208/freeze/freeze_record.txt]
+  FLAG D-FIGURE: 3770.78  [build/agent208/freeze/freeze_record.txt]
+  FLAG D-FIGURE: 2197.74  [build/agent208/freeze/freeze_record.txt]
+  FLAG D-FIGURE: 226  [build/agent208/freeze/freeze_record.txt]
+  FLAG D-FIGURE: 52  [build/agent208/freeze/freeze_record.txt]
+  FLAG D-FIGURE: 0.41  [build/agent208/freeze/freeze_record.txt]
+  FLAG D-FIGURE: 465  [build/agent208/freeze/freeze_record.txt]
+  FLAG D-FIGURE: 251  [build/agent208/freeze/freeze_record.txt]
+  FLAG D-ABSOLUTE: # 14z-208b freeze battery on the freeze tree f6218146 (commit objects 8b0c7bd9 for the emulator runs, 96d96b53 for the static tier) — every line below is a c...  [build/agent208/freeze/freeze_record.txt]
+packet_check: 13 flag(s): D-ABSOLUTE 1, D-FIGURE 11, FIGURE 1
