@@ -108,6 +108,11 @@ printf 'g_sess\ng_frz\ng_rel\ng_cad\n' > "$R/tests/ci_portable.txt"; : > "$R/tes
 printf 'g_frz\tfreeze\t-\ng_rel\trelease\t-\n' > "$R/tests/ci_cadence.tsv"
 printf 'e_a\tmame\trelease\tromset\t-\ta stub\ne_b\tmame\trelease\tromset\t-\ta stub\n' > "$R/tests/ci_emulator.tsv"
 echo base > "$R/README"
+# THE REAL REPO'S BYTECODE IGNORES (#326): Python with no pycache prefix (Linux; Apple's sets one outside the tree)
+# writes tools/__pycache__/ during the freeze run, and the identity counts every untracked, unignored file, so without
+# these lines the synthetic repo's identity moved mid-run and the release refused all reuse — on PILOT only
+grep -xE '__pycache__/|\*\.pyc' "$REPO/.gitignore" > "$R/.gitignore"
+[ "$(wc -l < "$R/.gitignore" | tr -d ' ')" = 2 ] || fail "the real .gitignore's two bytecode lines were not found"
 (cd "$R" && git init -q && git add -A && git -c user.name=t -c user.email=t@t commit -qm base)
 echo "zip-one" > "$T/roms/a.zip"; echo "zip-two" > "$T/roms2/a.zip"
 printf 'wide\n' > "$T/mame_w"; printf 'wide-rebuilt\n' > "$T/mame_w2"; printf 'ref\n' > "$T/mame_r"

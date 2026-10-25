@@ -1542,6 +1542,22 @@ vsavj and vs2; addresses vs2 / vsavj-twin):
   feel); reconciliation of helper families MUST match by table
   content + dispatcher kind, never code similarity (GOTCHAS).
 
+### Which half-circle spellings vsavj accepts (14z-208b, MEASURED, #229)
+
+Asked by the maintainer (2026-10-25: whether a half circle needs 63214, 6324, 6321, 6214 or 624, and its mirror —
+"it doesn't change the input on stick but it might change the input on leverless controlers"). Measured on pristine
+vsavj, P1 facing right, each direction 2 frames with no release, the last held 6 with the button from its third frame
+(`tools/command_throw_rigs.py` `motion`; the gate `tests/audit_command_throws.sh`, its `motion …` rows, #229):
+
+- **Half circle back (63214):** 63214, 6324, 6214 and 624 all enter the move — the same chain, hold and damage as the
+  full motion — on all 14 command grabs measured (13 on the ground, Bishamon's EX among them, and Jedah's air Ira Spinta). **6321 never
+  does**: the final BACK is required, every diagonal is optional. It matches the step table's last step being the back
+  direction (vsavj [1,5,4,16] above: 6, 3, 2, then 4 with its flag).
+- **Half circle forward (41236):** 41236, 4126, 4123, 4236 and 426 all enter Q-Bee's Catch and Release, on the ground
+  and in the air, and all start Jedah's Prova di Servo — the 6 is not needed and the diagonals are optional.
+- **360:** the rotation tracker takes the four cardinals 6 2 4 8 (`rot`, measured 14z-205 on Demitri and Bishamon).
+- **Not measured:** other cadences (slower steps, a release between directions), the left-facing tables, vs2.
+
 ## In-fight HUD asset tables + the select-wheel record (session 14z-49, measured)
 
 **Atlas rows this section depends on:** `atlas/venue_assets.md` (the HUD

@@ -1,0 +1,1 @@
+WITHDRAWN unspawned (14z-208b, 2026-10-25): its PACKET CHECK flagged an attribution ("The ruling is the maintainer's words in maintainer_words319.txt") that the claim did not quote; the packet is re-prepared with the ruling quoted inline.

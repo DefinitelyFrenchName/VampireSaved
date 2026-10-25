@@ -2,15 +2,17 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 325
+# issues: 327
 number	state	reason	closed	labels	title
-325	OPEN	-	-	bug,severity: low	run_on_snapshot: two runs of one commit started in the same second share a snapshot directory
-324	OPEN	-	-	bug,severity: low,test-integrity	PILOT's clone root holds an untracked '-V' file ('stub patch', 2026-10-23): a stub xdelta3 leaking into the repository
+327	OPEN	-	-	bug,severity: low,test-integrity	test_static_runner: 'printf | grep -q' races (SIGPIPE) and a control reads DIED under load
+326	CLOSED	COMPLETED	2026-10-25	bug,severity: low,test-integrity	test_release_reuse FAILs on Linux: its synthetic repo counts Python's __pycache__ as untracked, so the freeze identity moves mid-run
+325	CLOSED	COMPLETED	2026-10-25	bug,severity: low	run_on_snapshot: two runs of one commit started in the same second share a snapshot directory
+324	CLOSED	COMPLETED	2026-10-25	bug,severity: low,test-integrity	PILOT's clone root holds an untracked '-V' file ('stub patch', 2026-10-23): a stub xdelta3 leaking into the repository
 323	OPEN	-	-	bug,severity: low,test-integrity	The emulator runner's prereq STOP applied unevenly: the freeze run went on past a red prereq row, the release run stopped on the same row
 322	CLOSED	COMPLETED	2026-10-25	bug,severity: medium,test-integrity	test_release_launcher_bat's Windows half: its gen_claims fixture writes the README in the host's default encoding (cp1252 on ERIS)
 321	OPEN	-	-	evolution,performance,severity: medium	Parallelise the gates that run serially by default: test_mame_parity's PARITY_JOBS and the other job knobs, checks and controls
 320	OPEN	-	-	bug,test-integrity	MAME write taps exit 139 at teardown after every output is written; gates accept it only with full output
-319	OPEN	-	-	bug	tests/expected/ground_throws.tsv holds per-move signatures in the clear (the 14z-126 frame-data ruling)
+319	CLOSED	COMPLETED	2026-10-25	bug	tests/expected/ground_throws.tsv holds per-move signatures in the clear (the 14z-126 frame-data ruling)
 318	OPEN	-	-	bug,correctness	tools/anim_nodes.py reads the animation tables' offsets unsigned; the game sign-extends them (negative entries on 11 characters)
 317	CLOSED	COMPLETED	2026-10-24	evolution	Snapshot tiers: measure the remaining setup, re-snapshot incrementally after a red, base the re-run on the red run
 316	CLOSED	COMPLETED	2026-10-25	evolution	Release reuses the freeze's tier results when it builds from the freeze's exact tree
@@ -51,7 +53,7 @@ number	state	reason	closed	labels	title
 281	CLOSED	COMPLETED	2026-10-23	bug	Release-only: test_applier_page_browser's control run does not finish under strace
 280	CLOSED	COMPLETED	2026-10-23	bug	Release-only: test_applier_page section 3b fails on Python 3.12 (a faked win32 makes shutil import _winapi)
 279	CLOSED	COMPLETED	2026-10-23	bug	Release-only: release patches built with xdelta3 3.0.11 (PILOT's apt) carry verbatim reference-ROM runs
-278	OPEN	-	-	bug	Release-only: a census of gates that compare locale-sorted output against byte-ordered frozen lists
+278	CLOSED	COMPLETED	2026-10-25	bug	Release-only: a census of gates that compare locale-sorted output against byte-ordered frozen lists
 277	CLOSED	COMPLETED	2026-10-20	bug	The procedure check's extract flags a figure written with fewer decimals as unsourced, and a part boundary hides a step's evidence
 276	CLOSED	COMPLETED	2026-10-19	bug	The session dashboard misses every static tier run on a snapshot: its results stay in the removed clone
 275	CLOSED	COMPLETED	2026-10-19	-	Negative fixture fidelity-14z160: its packet's gate carries the FREEZE gap fixed as #154 — does EXPECT OK still stand?
@@ -206,9 +208,9 @@ number	state	reason	closed	labels	title
 126	CLOSED	COMPLETED	2026-10-01	cosmetic,parked	Select-wheel look-and-feel polish
 125	OPEN	-	-	cosmetic,parked	Arcade-ladder map: for the three tenants the next opponent's name and small portrait are wrong (the VS screen that follows is correct)
 124	OPEN	-	-	cosmetic,parked	Arcade-ladder map tag shows the base/shell character for a VS2 tenant opponent
-123	OPEN	-	-	cosmetic,parked	Win-quote text for the three tenants (forgone for now; only the clean way, vanilla untouched)
+123	OPEN	-	-	cosmetic,parked	Win-quote text for the three tenants (vanilla untouched, dangerously impactful for a cosmetic change)
 122	CLOSED	COMPLETED	2026-10-06	evolution	Run the --controls release tier on the dedicated Linux server and compare its speed with the m2 pro (load balancing potential)
-121	OPEN	-	-	evolution,parked	Linux release binaries built on dedicated server, plus clean-machine check at release
+121	CLOSED	COMPLETED	2026-10-25	evolution	Linux release binaries built on dedicated server, plus clean-machine check at release
 120	CLOSED	COMPLETED	2026-10-18	evolution	The rebuild-from-docs option after MiSTer (a possibility to preserve, not a commitment)
 119	CLOSED	COMPLETED	2026-10-11	contested,evolution	The living-documentation framework as an independent sibling of bbh (ruled at the plan stage, not scheduled)
 118	OPEN	-	-	evolution,severity: low	Community cross-check: the ~90 unadopted mizuumi player-struct candidates, each adopted only once measured

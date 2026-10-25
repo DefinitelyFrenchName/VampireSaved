@@ -27,7 +27,8 @@
 #   perturbation, sees t.txt at its commit's time, reaches the real HOME's other entries, and
 #   returns its build/emu_probe and its static run record to the tree; the in-place run sees eight readings change; a
 #   mid-run instrument change reads unchanged inside the run and turns the run's exit to 2
-#   with its AFTER line; each control makes the gate FAIL.
+#   with its AFTER line; since #325 (14z-208b, section 6) two runs of one commit started in one second each complete in
+#   a snapshot and a record of their own; each control makes the gate FAIL.
 #
 # MUST-FIRE: perturbed-copy: link-build — a copy of run_on_snapshot.sh that SYMLINKS each entry of build/ instead of snapshotting it must let the build/ perturbation reach the run, and the gate must FAIL (mode: the gate runs against that copy)
 # MUST-FIRE: perturbed-copy: in-place — a copy that runs the command in the working tree instead of the clone must let every perturbation reach the run, and the gate must FAIL (mode: the gate runs against that copy)
@@ -41,6 +42,7 @@
 # MUST-FIRE: perturbed-copy: copy-all-build — a copy that copies every build/ entry (the pre-#304 behaviour) carries the planted scratch files into the snapshot, and section 5 must FAIL (mode: the gate runs against that copy)
 # MUST-FIRE: perturbed-copy: no-arg-copy — a copy that never copies in a relative runner argument under a left-out dir leaves the run without its --confirm-shaped base, and section 5 must FAIL (mode: the gate runs against that copy)
 # MUST-FIRE: perturbed-copy: inherited-self — a copy that skips its own copy whenever RUN_ON_SNAPSHOT_SELF is set (the pre-14z-199 test for emptiness) must be cut short in section 2b's nested leg, which inherits an outer run's copy, and the gate must FAIL (mode: the gate runs against that copy)
+# MUST-FIRE: perturbed-copy: same-name — a copy that names its snapshot and record by commit and second alone (the pre-#325 names) must make two runs of one commit started in one pinned second collide, and section 6 must FAIL (mode: the copy is the runner under test)
 #
 # The world lives in a scratch dir; the snapshots go under ~/.cache/vampire-saved (the runner
 # refuses a temporary directory, the macOS reaper's hunting ground) and are removed on exit.
@@ -91,6 +93,8 @@ edits = {
                        'if false; then  # CONTROL copy-all-build'),
     "no-arg-copy": ('    for a in "$@"; do\n        a="${a#--*=}"',
                     '    for a in ; do  # CONTROL no-arg-copy\n        a="${a#--*=}"'),
+    "same-name": [('SNAP="$ROOT/$SHORT-$STAMP-$$"   # SNAP-NAME', 'SNAP="$ROOT/$SHORT-$STAMP"   # CONTROL same-name'),
+                  ('REC="$REPO/build/snapshot_runs/$STAMP-$SHORT-$$"', 'REC="$REPO/build/snapshot_runs/$STAMP-$SHORT"   # CONTROL same-name')],
 }
 pairs = edits[name]
 if isinstance(pairs, tuple): pairs = [pairs]
@@ -270,8 +274,31 @@ EOF
     echo "  $2: $(echo $insts | wc -w | tr -d ' ') scratch plants left out ($(echo $insts)), the input, unclassed and top-level plants kept, the relative scratch argument copied in; the record says: $(grep '^build ' "$rec/record.txt" | cut -c1-90)"
 }
 
+# together <runner> <label> — section 6 (#325): two runs of ONE commit started together in ONE second (a stub
+# `date` pins the stamp the runner names its snapshot by) must both complete, each in a snapshot and a record of its
+# own; before #325 they shared one name and one refused or failed mid-setup.
+together() {
+    D="$W/$2"; rm -rf "$D"; mkdir -p "$D/tree/tools" "$D/tree/tests/expected" "$D/bin"
+    git -C "$D/tree" init -q
+    cp "$REPO/tools/build_dirs.py" "$D/tree/tools/"; cp "$REPO/tests/expected/build_dirs.tsv" "$D/tree/tests/expected/"
+    printf '#!/bin/sh\n# probe6.sh: hold the snapshot a while, then say where it ran\nsleep 3; pwd > "$PROBE_OUT"\n' > "$D/tree/probe6.sh"
+    git -C "$D/tree" add tools tests probe6.sh
+    git -C "$D/tree" -c user.email=t@t -c user.name=t commit -qm world6
+    printf '#!/bin/sh\n[ "$1" = "+%%Y%%m%%dT%%H%%M%%S" ] && { echo 20260101T000000; exit 0; }\nexec /bin/date "$@"\n' > "$D/bin/date"; chmod +x "$D/bin/date"
+    ( PATH="$D/bin:$PATH" PROBE_OUT="$W/$2.a" SNAPSHOT_ROOT="$SROOT" sh "$1" --repo "$D/tree" --no-romdir --no-emulator-inputs -- sh probe6.sh ) > "$W/$2.la" 2>&1 & pa=$!
+    ( PATH="$D/bin:$PATH" PROBE_OUT="$W/$2.b" SNAPSHOT_ROOT="$SROOT" sh "$1" --repo "$D/tree" --no-romdir --no-emulator-inputs -- sh probe6.sh ) > "$W/$2.lb" 2>&1 & pb=$!
+    ea=0; wait $pa || ea=$?; eb=0; wait $pb || eb=$?
+    nrec=$(ls -d "$D/tree/build/snapshot_runs/"*/ 2>/dev/null | wc -l | tr -d ' ')
+    if [ "$ea" != 0 ] || [ "$eb" != 0 ]; then
+        echo "  $2: COLLIDED: two runs of one commit in one second exited $ea and $eb: $(grep -h -m1 -E 'REFUSED|fatal|error' "$W/$2.la" "$W/$2.lb" | head -1 | cut -c1-110)"; return 1; fi
+    [ -s "$W/$2.a" ] && [ -s "$W/$2.b" ] && [ "$(cat "$W/$2.a")" != "$(cat "$W/$2.b")" ] \
+        || { echo "  $2: COLLIDED: the two runs did not run in two snapshots ($(cat "$W/$2.a" "$W/$2.b" 2>/dev/null | tr '\n' ' '))"; return 1; }
+    [ "$nrec" = 2 ] || { echo "  $2: COLLIDED: $nrec run record(s) for two runs"; return 1; }
+    echo "  $2: two runs of one commit in one pinned second both exited 0, each in its own snapshot, two records"
+}
+
 RUNNER="$REPO/tests/run_on_snapshot.sh"
-CONTROLS="link-build in-place no-self-copy shared-home shared-scratch checkout-mtime no-copy-back no-runs-copy-back no-instrument-check inherited-self copy-all-build no-arg-copy"
+CONTROLS="link-build in-place no-self-copy shared-home shared-scratch checkout-mtime no-copy-back no-runs-copy-back no-instrument-check inherited-self copy-all-build no-arg-copy same-name"
 for c in $CONTROLS; do if vs_ctl_is "$c"; then RUNNER="$(make_copy "$VS_CTL")"; fi; done
 
 echo "== 1. the positive leg: the perturbation reaches an IN-PLACE run"
@@ -325,6 +352,9 @@ if ! instrument "$RUNNER" inst; then fail=1; fi
 echo "== 5. build/'s scratch classes are left out of the snapshot, a relative argument under one is copied in (#304 item 2)"
 if ! scratch_leg "$RUNNER" scr; then fail=1; fi
 
+echo "== 6. two runs of one commit started in one second each get their own snapshot (#325)"
+if ! together "$RUNNER" two; then fail=1; fi
+
 echo "== 4. controls"
 if [ -z "${VS_CTL:-}" ]; then
     for ctl in $CONTROLS; do
@@ -332,6 +362,7 @@ if [ -z "${VS_CTL:-}" ]; then
         case "$ctl" in
         checkout-mtime) mark='MTIME' ;; no-copy-back) mark='NOT COPIED BACK' ;; no-runs-copy-back) mark='RUN RECORD was NOT COPIED' ;;
         no-instrument-check) mark='NOT DETECTED' ;; copy-all-build) mark='SCRATCH COPIED' ;; no-arg-copy) mark='BASE MISSING' ;;
+        same-name) mark='COLLIDED' ;;
         *) mark='REACHED' ;;
         esac
         copy="$(make_copy "$ctl")"
@@ -342,6 +373,7 @@ if [ -z "${VS_CTL:-}" ]; then
         if [ "$ctl" = no-instrument-check ]; then instrument "$copy" "leg_$ctl" > "$W/leg_$ctl.txt" 2>&1 && ok=1 || ok=0
         elif [ "$ctl" = inherited-self ]; then nested "$copy" "leg_$ctl" > "$W/leg_$ctl.txt" 2>&1 && ok=1 || ok=0
         elif [ "$ctl" = copy-all-build ] || [ "$ctl" = no-arg-copy ]; then scratch_leg "$copy" "leg_$ctl" > "$W/leg_$ctl.txt" 2>&1 && ok=1 || ok=0
+        elif [ "$ctl" = same-name ]; then together "$copy" "leg_$ctl" > "$W/leg_$ctl.txt" 2>&1 && ok=1 || ok=0
         else immune "$copy" "leg_$ctl" > "$W/leg_$ctl.txt" 2>&1 && ok=1 || ok=0; fi
         if [ "$ok" = 1 ]; then
             vs_ctl_dead "$ctl" "the perturbed copy still passed — the gate cannot see this failure" || fail=1

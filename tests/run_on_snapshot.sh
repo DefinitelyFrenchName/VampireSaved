@@ -101,11 +101,16 @@ SHORT="$(printf %.12s "$SHA")"
 STAMP="$(date +%Y%m%dT%H%M%S)"
 ROOT="${SNAPSHOT_ROOT:-$HOME/.cache/vampire-saved/snapshots}"
 case "$ROOT" in "${TMPDIR:-/nonexistent}"*|/tmp/*|/private/tmp/*|/var/folders/*) refuse "SNAPSHOT_ROOT $ROOT is under a temporary directory the macOS reaper cleans" ;; esac
-SNAP="$ROOT/$SHORT-$STAMP"
-REC="$REPO/build/snapshot_runs/$STAMP-$SHORT"
+# THE PROCESS ID IN BOTH NAMES (#325): three runs of one commit started in the same second shared one name (the 14z-208b
+# freeze) — one refused, two failed mid-setup ("unable to write new index file", "Directory not empty"). Each run
+# gets its own pair now, and each directory is made by one atomic mkdir, refused if another run holds it.
+SNAP="$ROOT/$SHORT-$STAMP-$$"   # SNAP-NAME
+REC="$REPO/build/snapshot_runs/$STAMP-$SHORT-$$"
 [ ! -e "$SNAP" ] || refuse "$SNAP already exists"
 if [ "$NOROM" = 0 ]; then [ -n "${ROMDIR:-}" ] && [ -d "$ROMDIR" ] || refuse "ROMDIR is not set to a directory (use --no-romdir only for a tree that reads no ROM)"; fi
-mkdir -p "$SNAP" "$REC"
+mkdir -p "$ROOT" "$REPO/build/snapshot_runs"
+mkdir "$SNAP" 2>/dev/null || refuse "$SNAP is held by another run"
+mkdir "$REC" 2>/dev/null || { rmdir "$SNAP"; refuse "$REC is held by another run"; }
 # explicit tests, never ${X:?}: after an EXIT trap a demand's abort exits 0 on macOS bash 3.2 (test_demand_after_trap)
 # a refusal can come while a setup step runs in the background (#317): wait for it, so nothing writes into the
 # snapshot after its removal

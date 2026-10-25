@@ -434,8 +434,8 @@ on other victims, the active-column exceptions, what the startup offset counts, 
 
 ## The ground throws (14z-195, #229)
 
-Measured on vsavj on PILOT; the gate is `tests/audit_ground_throws.sh` (its frozen figures
-`tests/expected/ground_throws.tsv`; the rigs `tools/ground_throw_rigs.py`). **Scope**: the
+Measured on vsavj on PILOT; the gate is `tests/audit_ground_throws.sh` (its frozen hashes
+`tests/expected/ground_throws.tsv`, the figures outside the tree since #319; the rigs `tools/ground_throw_rigs.py`). **Scope**: the
 workbook's 23 ground-throw rows — 22 measured on the 14 characters that have one (Anakaris
 has none), each "6MP or 6HP" row run with both buttons (42 events); Victor's Graviton
 Knuckle (a follow-up input during his MP throw) is not measured. The rigs' row set is checked

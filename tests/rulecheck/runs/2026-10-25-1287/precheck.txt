@@ -1,0 +1,2 @@
+  FLAG D-ABSOLUTE: In the gate's test below, two runs of one commit started in one pinned second each got their own.  [build/agent208/t325/closing_325.md]
+packet_check: 1 flag(s): D-ABSOLUTE 1

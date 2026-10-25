@@ -422,8 +422,18 @@ t_gates=0; t_start=$(date +%s)   # where the time went (the controls readout)
 # their output location is not, and that is its own fix.
 tree_before=""
 TREE_SUSPECT=""
+# THE UNTRACKED FILES OUTSIDE build/ (#324, ruled 2026-10-25 "Runner-wide check"): a gate that writes into the clone
+# instead of a temp dir leaves a file the tracked check above never sees — a stub xdelta3 wrote `-V` into PILOT's clone
+# root on 2026-10-23 and every tier passed over it. Compared before and after; the runner's own results files aside.
+_untracked() {
+    _ro=""; case "${RESULTS_OUT:-}" in "$REPO"/*) _ro="${RESULTS_OUT#"$REPO"/}" ;; /*|"") ;; *) _ro="$RESULTS_OUT" ;; esac
+    git ls-files --others --exclude-standard 2>/dev/null | grep -v '^build/' \
+        | grep -vxF -e "${_ro:-/}" -e "${_ro%.tsv}.controls.tsv" | LC_ALL=C sort || true
+}
+untracked_before=""
 if git rev-parse --git-dir >/dev/null 2>&1; then
     tree_before="$(git status --porcelain -- . 2>/dev/null | grep -v '^??' || true)"
+    untracked_before="$(_untracked)"
 fi
 
 run_tier() {  # run_tier <label> <names>
@@ -786,6 +796,22 @@ else
         fi
     fi
 fi
+echo "== untracked files outside build/ (a run must leave none behind, #324) =="
+STRAY=""
+if git rev-parse --git-dir >/dev/null 2>&1; then
+    printf '%s\n' "$untracked_before" | awk 'NF' > "$WORK/untracked_before.txt"
+    _untracked | awk 'NF' > "$WORK/untracked_after.txt"
+    STRAY="$(LC_ALL=C comm -13 "$WORK/untracked_before.txt" "$WORK/untracked_after.txt" | tr '\n' ' ')"   # STRAY-CHECK
+    if [ -n "$STRAY" ]; then
+        echo "  NEW UNTRACKED FILE(S) OUTSIDE build/ AFTER THE RUN: $STRAY"
+        echo "    (a) a GATE wrote into the clone instead of a temp dir -> find the writer, fix it, delete the file"
+        echo "    (b) a file was created in the tree while the run read it -> re-run on a quiet tree"
+    else
+        echo "  ok: no new untracked file outside build/"
+    fi
+else
+    echo "  note: not a git checkout — not checked"
+fi
 
 # NOTE-class numbers: measurements a gate REPORTS but never gates on (ruled
 # 2026-09-07, living-docs L2). A NOTE is per NUMBER where a verdict is per
@@ -906,6 +932,10 @@ rc=0
 if [ "$STRICT" = 1 ] && [ "$n_skip" != 0 ]; then
     echo "--strict: SKIP counts as failure (a skipped gate asserts NOTHING)"
     rc=1
+fi
+if [ -n "$STRAY" ]; then
+    echo "LEFT BEHIND: new untracked file(s) outside build/ — $STRAY"
+    [ "$STRICT" = 1 ] && { echo "--strict: a file left in the clone counts as failure (#324)"; rc=1; }
 fi
 [ "$rc" = 0 ] && echo "GREEN — every registered emulator-free gate passed." \
               || echo "NOT GREEN — see above. Rule 6: fixing this is the only task."

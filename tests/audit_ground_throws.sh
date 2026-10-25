@@ -1,18 +1,23 @@
 #!/bin/sh
-# audit_ground_throws.sh — THE VSAVJ GROUND THROWS, MEASURED: every vanilla character's ground throw holds from the
+# audit_ground_throws.sh — THE VSAVJ NORMAL THROWS (ground and air), MEASURED: every vanilla character's throw holds from the
 # press, lands the damage the game staged, and stages the records it does — for the community cross-check (GitHub
 # #229, 14z-195; reworked the same sitting on rule-checker runs 2026-10-08-728 and -730). Emulator tier, MAME lane,
 # the vsavj ROM (the reference MAME build run_mame.sh pins for a stock set).
 #
 # WHAT: for each of the 14 vanilla characters the workbook lists with a ground throw (Anakaris has none), every
 #   ground-throw input of the workbook (each "6MP or 6HP" row run with BOTH buttons, so the sheet's one-row claim is
-#   measured; Aulbath's 4+P back throw; Victor's MP, HP and K throws), 42 events: the throw HOLDS from the press frame
+#   measured; Aulbath's 4+P back throw; Victor's MP, HP and K throws), 42 events, and since 14z-208b every AIR throw
+#   row (the maintainer, 2026-10-25: "Remove all, Victor too, but add them to the normal throws!"; they were rows of
+#   tests/audit_command_throws.sh) with toward+MP and toward+HP, 28 events in one gt_XX_air rig per character, Victor's
+#   with the pair converging: the throw HOLDS from the press frame
 #   and NOT before it (P1's +0x134 = 0x01 and P2's = 0xFF, RAM:$FF8534/$FF8934); the victim's red and white HP words
 #   FALL (read from the dumps, never from the record reader); every record the appliers staged lies in the THROWER'S
 #   OWN attack table and LANDS (a fall within 2 frames after its probe frame, in the same run); the event's frozen
 #   signature — press-to-hold, the side P2 ends on, the meter paid, the measured falls (red, white, count, the first
 #   fall's offset), the staged records in frame order (applier site, record index, real/white power CLASS, flags,
-#   the record's meter) — is unchanged. Also: the rigs' row set equals the workbook's ground-throw rows.
+#   the record's meter) — is unchanged: in the tree as a 16-hex SHA-256 per event, the full line beside the frame data
+#   outside it (../charpages/framedata/ground_throws_full.tsv, GT_FULL; #319, ruled 2026-10-25 "Convert now"; a red
+#   prints the run's own line). Also: the rigs' row set equals the workbook's ground- and air-throw rows.
 # HOW: tools/ground_throw_rigs.py gen builds the rigs (tests/replays/ground_throws/, committed; a fresh gen must
 #   equal them); each rig runs twice under tools/run_replay_guarded.sh (-debug, one logging breakpoint per run): at
 #   the fighter applier's record read PRG:0x0189EA and at the object-hit applier's PRG:0x02979A. BOTH legs carry the
@@ -24,10 +29,10 @@
 #   (the 0x0189EA leg until 14z-197) also takes SNAP_FRAMES at each event's frozen first-fall frame; a PASS means each snapshot is the frame that run's
 #   own first fall landed on, drawn into the CAPTURE SHEET <OUT>/capture.png (tools/ground_throw_rigs.py sheet). The
 #   header prints the tree's commit (`git describe --dirty`) and the host.
-# EXPECTS: 42 events, each holding from the press and not on the frame before, every dump frame present on both
+# EXPECTS: 70 events (42 ground, 28 air), each holding from the press and not on the frame before, every dump frame present on both
 #   legs, the legs agreeing, every damage record own and landed, falls exactly when damage is staged, and every
-#   signature equal to its frozen line; the row set equal to the workbook's (22 rows, Graviton Knuckle declared not
-#   measured) where the workbook is present. Every leg on emulated time at its frozen game clock, the staging leg on
+#   signature equal to its frozen line; the row set equal to the workbook's (36 rows: 22 ground, 14 air; Graviton
+#   Knuckle declared not measured) where the workbook is present. Every leg on emulated time at its frozen game clock, the staging leg on
 #   replay.lua's checksum.
 #   THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"): replay_guard.lua counts
 #   EMULATED frames (tests/lua/emu_clock.lua), so every press, dump and snapshot frame is an emulated frame since
@@ -101,10 +106,11 @@ raw_tool() {  # raw_tool <out path>: a copy of the rows reader that reads the RA
     return 0
 }
 shadow_legs() {  # shadow_legs <legs root> <out root> <shift|falls>: a perturbed view of every rig's legs (symlinks)
-    python3 - "$1" "$2" "$3" <<'PY'
-import os, re, sys
-src, dst, kind = sys.argv[1:]
+    python3 - "$1" "$2" "$3" "$REPO/$RIGS" <<'PY'
+import json, os, re, sys
+src, dst, kind, rigs = sys.argv[1:]
 for rig in sorted(os.listdir(src)):
+    after = {e["press"] + 1 for e in json.load(open(os.path.join(rigs, rig + ".json")))["events"]}
     for leg in ("0189ea", "02979a"):
         s, d = os.path.join(src, rig, leg), os.path.join(dst, rig, leg)
         if not os.path.isdir(s):
@@ -119,7 +125,7 @@ for rig in sorted(os.listdir(src)):
                 txt = re.sub(r"A3=([0-9a-fA-F]{8})", lambda m: f"A3={int(m.group(1), 16) + 0x100000:08x}", txt)
                 open(os.path.join(d, f), "w").write(txt); continue
             m = re.match(r"dump_(\d+)_ff8850\.bin$", f)
-            if kind == "falls" and leg == "02979a" and m and (int(m.group(1)) - 2800) % 600 == 1:
+            if kind == "falls" and leg == "02979a" and m and int(m.group(1)) in after:
                 b = bytearray(open(p, "rb").read())       # one extra 1-point red fall on the frame after each press
                 v = int.from_bytes(b[0:2], "big", signed=True) - 1
                 b[0:2] = v.to_bytes(2, "big", signed=True)
@@ -148,6 +154,7 @@ rows_of() {  # rows_of <rig json dir> <legs root> <tool> [probe extra] -> rows.j
         PYTHONPATH="$REPO/tools" python3 "$3" rows "$_j" "$2/$_b" "$W/vsavj_data.bin" ${4:+"$4"}
     done
 }
+NEV="$(python3 -c "import json,glob,sys;print(sum(len(json.load(open(j))['events']) for j in glob.glob(sys.argv[1] + '/gt_*.json')))" "$RIGS")"
 # THE ONE PREDICATE PER CONTROL: did ITS perturbation make ITS clause fail? <expect output> <rows.jsonl>; prints the
 # evidence; 0 = fired. The control section and the mode read the same function (run 730: a mode that exits 1 on any
 # failure cannot tell a firing control from a dead one).
@@ -155,13 +162,13 @@ ctl_judge() {  # ctl_judge <control> <expect.txt> <rows.jsonl>
     case "$1" in
         lp-no-throw) _n=$(python3 -c "import json,sys;print(sum(1 for l in open(sys.argv[1]) if json.loads(l)['sheet']=='BU' and json.loads(l)['hold'] is None))" "$3")
                      echo "$_n of 2 BU events read NO HOLD"; [ "$_n" = 2 ] ;;
-        foreign-record) _n=$(grep -c 'outside the thrower' "$2"); echo "$_n of 42 events fail the identity clause"; [ "$_n" = 42 ] ;;
+        foreign-record) _n=$(grep -c 'outside the thrower' "$2"); echo "$_n of $NEV events fail the identity clause"; [ "$_n" = $NEV ] ;;
         class-raw) _n=$(wc -l < "$3" | tr -d ' ')
-                   echo "rows $_n of 42; $(grep -c '^BAD' "$2") events differ; Q-Bee's flagged hit: $(grep -c "^BAD ('QB', 'P', '6MP'): got" "$2")"
-                   [ "$_n" = 42 ] && ! grep -q 'frozen but not measured' "$2" && grep -q "^BAD ('QB', 'P', '6MP'): got" "$2" ;;
-        leg-falls) _n=$(grep -c 'two applier legs disagree' "$2"); echo "$_n of 42 events read the legs' fall amounts disagreeing"; [ "$_n" = 42 ] ;;
-        hold-before-press) _n=$(grep -c 'frame BEFORE the press' "$2"); echo "$_n of 42 events find the hold set before the press"; [ "$_n" = 42 ] ;;
-        phantom-record) _n=$(grep -c 'damage the victim never took' "$2"); echo "$_n of 42 events read the planted record NOT LANDED"; [ "$_n" = 42 ] ;;
+                   echo "rows $_n of $NEV; $(grep -c '^BAD' "$2") events differ; Q-Bee's flagged hit: $(grep -c "^BAD ('QB', 'P', '6MP'): got" "$2")"
+                   [ "$_n" = "$NEV" ] && ! grep -q 'frozen but not measured' "$2" && grep -q "^BAD ('QB', 'P', '6MP'): got" "$2" ;;
+        leg-falls) _n=$(grep -c 'two applier legs disagree' "$2"); echo "$_n of $NEV events read the legs' fall amounts disagreeing"; [ "$_n" = $NEV ] ;;
+        hold-before-press) _n=$(grep -c 'frame BEFORE the press' "$2"); echo "$_n of $NEV events find the hold set before the press"; [ "$_n" = $NEV ] ;;
+        phantom-record) _n=$(grep -c 'damage the victim never took' "$2"); echo "$_n of $NEV events read the planted record NOT LANDED"; [ "$_n" = $NEV ] ;;
         *) echo "no such control: $1"; return 2 ;;
     esac
 }

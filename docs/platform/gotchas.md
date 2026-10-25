@@ -3427,3 +3427,14 @@ virtual-time budgets of 1.8e6, 1.8e7 and 1.8e8 ms alike, so no timeout fixes it 
 local). The snap Chromium does not start under strace at all (*"snap-confine ... cap_dac_override not found"*).
 **The rule:** a browser-driven gate cannot be traced with `strace -f`; `TRACE_LIMITS` names it (#281) and every score
 says it is untraced.
+
+## LINUX PYTHON WRITES `__pycache__/` BESIDE THE MODULE; APPLE'S PYTHON DOES NOT (paid: 14z-208b/14z-208c, #326)
+
+Apple's Python sets `sys.pycache_prefix` to `~/Library/Caches/com.apple.python`, so importing a tool writes its bytecode
+outside the tree; Ubuntu 24.04's Python 3.12 has no prefix and writes `tools/__pycache__/*.pyc` beside the module. A
+gate that builds a synthetic repository and imports the tree's tools there grows untracked files during its own run on
+Linux only: `tests/test_release_reuse.sh`'s freeze identity counted 0 untracked files at its start and 3 at its end on
+PILOT, so the release refused every reuse and two controls read DEAD, while the Mac passed. The real repository ignores
+`__pycache__/` and `*.pyc` (`.gitignore`); a synthetic one has no `.gitignore` unless the gate gives it one (the fix:
+the real file's two bytecode lines, checked present). Measure a fixture-building gate on Linux before calling it host-
+independent.

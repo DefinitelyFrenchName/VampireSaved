@@ -36,6 +36,8 @@
 #   Since #299 (14z-206, section 28): with ROMDIR set and a cold decrypt cache, the runner builds the reference sets'
 #   views before the static tier, so a gate that reads build/out directly PASSES at --jobs 1 and --jobs 3; two
 #   decrypt_view callers racing on one cold set both get full images.
+#   Since #324 (14z-208b, section 30): a strict run whose gate leaves a new untracked file outside build/ is NOT GREEN
+#   and names the file; a file left inside build/, and one already there before the run, do not count.
 #
 # MUST-FIRE: shadow-tool: reader-unplugged — a copy of run_all_static.sh that hands the classifier no gate script must let a stub with a declared-but-unfired control read PASS (mode: that copy is the runner every section drives, and section 11 must fail)
 # MUST-FIRE: shadow-tool: trigger-blind — a copy of run_all_static.sh with its cadence TRIGGER match disabled must leave a freeze-cadence gate deferred although a path it depends on changed; section 14's triggered case must FAIL under it
@@ -59,6 +61,7 @@
 # MUST-FIRE: shadow-tool: runrec-lost — a copy of run_all_static.sh whose RUNREC-KEEPS-RESULTS copy is disabled must leave a run given STATIC_RESULTS_OUT with no results in its own run record, and section 26 must FAIL (mode: that copy drives section 26; section 27 fires it in-run; #276, 14z-205)
 # MUST-FIRE: shadow-tool: runrec-controls-lost — a copy of run_all_static.sh whose RUNREC-KEEPS-CONTROLS copy is disabled must leave the run record without the control times, and section 26 must FAIL (mode: that copy drives section 26; section 27 fires it in-run; #276, 14z-205)
 # MUST-FIRE: shadow-tool: decrypt-warm-off — a copy of run_all_static.sh whose DECRYPT-WARM call is disabled must leave a stub that reads build/out directly on a cold cache, and section 28 must FAIL (mode: that copy drives section 28; section 29 fires it in-run; #299, 14z-206)
+# MUST-FIRE: shadow-tool: stray-blind — a copy of run_all_static.sh whose STRAY-CHECK comparison is disabled must read GREEN on a strict run whose stub leaves a file in the clone root, and section 30 must FAIL (mode: that copy drives section 30; section 31 fires it in-run; #324, 14z-208b)
 # MUST-FIRE: shadow-tool: prediction-off — a copy of tools/static_confirm.py whose plan marks nothing STALE must CARRY the stub whose input changed, and section 18 must FAIL (mode: that copy in the confirm repo)
 #
 # WHY A GATE FOR THE RUNNER. CLAUDE.md §4: "Verdict logic is itself tested. A
@@ -1168,6 +1171,41 @@ if ! vs_ctl_is decrypt-warm-off; then
     # fired only when the shadow runner itself worked: its decrypt_view caller still PASSES, only the direct readers fail
     [ "$S28" = bad ] && [ "$S28V3" = ok ] && vs_ctl_fired decrypt-warm-off "a runner that does not build the views first leaves a direct reader on a cold cache — section 28 catches it" \
         || { rc=1; vs_ctl_dead decrypt-warm-off "the runner without the warm-up still gave every stub its views" || :; }
+fi
+
+echo "== 30. a strict run that leaves a new untracked file outside build/ is NOT GREEN (#324, 14z-208b) =="
+# Measured: a stub xdelta3 wrote `-V` into PILOT's clone root (2026-10-23) and every tier passed over it — the
+# runner's tree check read tracked files only. Here g_x leaves `stray_324` in the clone root and a file in build/;
+# `old_324` was untracked before the run. Only stray_324 may be named, and the strict run must not be GREEN.
+SHADOW_X="$T/run_all_static_strayblind.sh"
+sed 's@    STRAY="$(LC_ALL=C comm -13 "$WORK/untracked_before.txt" "$WORK/untracked_after.txt" | tr .\\n. . .)"   # STRAY-CHECK@    STRAY=""   # STRAY-CHECK disabled@' "$RUNNER" > "$SHADOW_X"
+cmp -s "$RUNNER" "$SHADOW_X" && fail "could not disable the untracked-file comparison — the STRAY-CHECK line moved"
+FX="$T/repo_stray"; mkdir -p "$FX/tests/lib" "$FX/tools"
+for _l in classify controls measures static_job decrypt_cache; do ln -s "$REPO/tests/lib/$_l.sh" "$FX/tests/lib/$_l.sh"; done
+ln -s "$REPO/tests/lib/static_pool.py" "$FX/tests/lib/static_pool.py"
+[ ! -f "$REPO/tests/lib/collation.sh" ] || ln -s "$REPO/tests/lib/collation.sh" "$FX/tests/lib/collation.sh"
+{ echo "#!/bin/sh"; echo "# g_x.sh — a stub of section 30: leaves a file in the clone root and one in build/"
+  echo ': > stray_324; mkdir -p build/agent324; : > build/agent324/inside_324'; echo 'echo "PASS: x"'; echo "exit 0"; } > "$FX/tests/g_x.sh"
+chmod +x "$FX/tests/g_x.sh"; printf 'g_x\n' > "$FX/tests/ci_portable.txt"; : > "$FX/tests/ci_static.txt"
+(cd "$FX" && git init -q && git add -A && git -c user.name=t -c user.email=t@t commit -qm base)
+s30() {   # s30 <runner> -> S30 (ok|bad)
+    rm -f "$FX/tests/run_all_static.sh" "$FX/stray_324"; rm -rf "$FX/build"; : > "$FX/old_324"
+    ln -s "$1" "$FX/tests/run_all_static.sh"
+    _o="$(cd "$FX" && STATIC_CHANGED_PATHS= sh tests/run_all_static.sh --tier portable --strict 2>&1)" || true
+    if printf '%s' "$_o" | grep -q '^NOT GREEN' && printf '%s' "$_o" | grep -q '^LEFT BEHIND: new untracked file(s) outside build/ — stray_324 *$' \
+            && printf '%s' "$_o" | grep -qE '^  g_x +PASS'; then S30=ok
+    else S30=bad; echo "    the strict run: $(printf '%s' "$_o" | grep -E '^(GREEN|NOT GREEN|LEFT BEHIND)|^  g_x' | tr '\n' '|')"; fi
+}
+R30="$RUNNER"; vs_ctl_is stray-blind && R30="$SHADOW_X"
+s30 "$R30"
+[ "$S30" = ok ] && echo "  ok: the strict run is NOT GREEN and names stray_324 alone (not build/agent324/inside_324, not old_324 that was there before)" \
+    || fail "section 30: a strict run that left a file in the clone root read GREEN or named the wrong file (#324)"
+
+echo "== 31. MUST-FIRE: section 30's comparison, broken by its shadow =="
+if ! vs_ctl_is stray-blind; then
+    s30 "$SHADOW_X" > /dev/null
+    [ "$S30" = bad ] && vs_ctl_fired stray-blind "a runner that never compares the untracked files reads the leaking run GREEN — section 30 catches it" \
+        || { rc=1; vs_ctl_dead stray-blind "the comparison-less runner still named the stray file" || :; }
 fi
 
 [ "$rc" = 0 ] && echo "PASS: the runner's verdicts mean what they say." \

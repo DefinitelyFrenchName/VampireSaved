@@ -1,0 +1,5 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent208/t325/issue325.md	eb26b891654fa4636941c737f625de7e131feff2
+build/agent208/t325/evidence325.txt	6ed4384e7929eb42d291c76e430a3bc642484a3a
+build/agent208/t325/maintainer_words325.txt	9097f32c00a1023214afcef04141d2c112d1beb5
+build/agent208/t325/closing_325.md	fd60ff9fd5e2ec5d2f8d7d5c43d85458dbed349e

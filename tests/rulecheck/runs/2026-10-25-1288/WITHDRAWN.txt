@@ -1,0 +1,1 @@
+WITHDRAWN unspawned (14z-208b, 2026-10-25): its PACKET CHECK flagged an absolute in closing_324.md ("found no existing gate leaving a file behind") wider than the session-cadence tier behind it; reworded to that tier's own output line and re-prepared.

@@ -7603,3 +7603,35 @@ meant to be "in a UTF-8 locale" sets `LC_ALL` itself. **Paid twice:** the 14z-20
 freeze-cadence locale step because the opener named the ticket only as "measured, open"; every freeze script's
 `LC_ALL=C.UTF-8` sorts in byte order, so nothing there exercised it. When a freeze or release is planned, read each open
 ticket's comments for a step that runs AT it.
+
+## A STUB THAT WRITES TO ITS LAST ARGUMENT LEAKS A FILE NAMED BY ANY CALL IT DID NOT EXPECT, AND THE RUNNER SAW ONLY TRACKED FILES (paid: 14z-207/14z-208c, #324)
+
+`tests/test_package_release_safety.sh`'s stub `xdelta3` wrote `stub patch` to its last argument. When #279 added the
+packager's `xdelta3 -V` version check, the stub as it stood answered that call too: its last argument was `-V`, and the
+gate runs from the repository root, so a file named `-V` appeared in PILOT's clone root (2026-10-23, reproduced through
+`tools/package_release.py`'s own `xdelta_version()`). The stub has answered `-V` since `031c09d8`. A stub must answer, or
+refuse loudly, every call its caller can make, and a change to the caller is a change to the stub. The static runner
+compared TRACKED files before and after a run (`grep -v '^??'`), so nothing saw an untracked leak; since 14z-208c it
+also compares the untracked files outside `build/` and a `--strict` run is NOT GREEN on a new one (`tests/run_all_static.sh`
+`STRAY-CHECK`; `tests/test_static_runner.sh` section 30). Limits: a file written OUTSIDE a runner run (a gate run by
+hand, as this one most likely was: it predates the next tier by nine minutes) or present before one is never flagged;
+a non-strict run only names it; ignored files and `build/` are not compared.
+
+## A SNAPSHOT NAMED BY THE COMMIT AND THE SECOND COLLIDES WHEN TWO RUNS OF ONE COMMIT START TOGETHER (paid: 14z-208b/14z-208c, #325)
+
+`tests/run_on_snapshot.sh` named its snapshot `<commit>-<second>` and its record `<second>-<commit>`, checked the name
+was free, then made it with `mkdir -p`: three runs of one commit started in one second at the 14z-208b freeze shared the
+name — one refused, two failed mid-setup ("unable to write new index file", "Directory not empty"). A check-then-create
+on a shared name is a race; the process id now joins both names and each directory is made by one atomic `mkdir` that
+refuses if held (`tests/test_run_on_snapshot.sh` section 6 pins the stamp with a stub `date`; control `same-name`).
+
+## A "FAR" EVENT'S POSITION PINS DO NOT HOLD WHILE THE PREVIOUS EVENT'S THROW STILL RUNS — AND A PROBE'S RESULT IS NOT THE GATE'S (paid: 14z-208c, #229)
+
+`tools/command_throw_rigs.py` pins both fighters at the far pair 230 frames before each event; a throw still animating
+from the previous event moves them after the pin, so an event that does not walk in starts wherever the throw left them:
+after San Bassale HK, Jedah stood 64 px from Victor, not 176, and Prova di Servo's blood hand passed him. Three rows the
+maintainer had confirmed carried the same defect (Anakaris's MP/HP Mummy Drop "far" at 127/78 px — the HP one "never
+reached in its slot" since F4 — and Cryptic Needle at 64 px). Events walking in less than 150 frames are now re-placed at
+t-50-walk. The other half: a probe rig running the same input in a different slot grabbed, and that probe's result was
+reported to the maintainer as the gate's; the maintainer's sheet read caught it. Report a row from the gate run's own
+rows, and measure a "far" event's start distance on its trace before calling it far.

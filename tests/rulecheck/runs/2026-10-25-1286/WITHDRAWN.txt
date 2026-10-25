@@ -1,0 +1,1 @@
+WITHDRAWN unspawned (14z-208b, 2026-10-25): its PACKET CHECK flagged an absolute in closing_325.md ("Two runs of one commit started in the same second now each get their own.") wider than the evidence (the gate's synthetic tree); the sentence is scoped to the measurement and the packet re-prepared.

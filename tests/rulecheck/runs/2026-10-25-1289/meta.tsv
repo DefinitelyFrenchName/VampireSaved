@@ -1,0 +1,11 @@
+decision	recommendation
+subject	#324 closed done at the next push: the writer found, its leak closed, the static runner fails a strict run that leaves a new untracked file (14z-208b, after its close), after withdrawn run 2026-10-25-1288
+session	14z-208b
+model	rule-checker@163e4ce9cf7b
+claim	#324 can close done at the next push with the closing comment closing_324.md. Its done-when (issue324.md: the writer is found, the leak is fixed, a gate holds it with a control — a run that leaves a file in the clone root fails — and the file on PILOT is deleted) is met: evidence324.txt section 1 shows the writer (the stub xdelta3 of test_package_release_safety before 031c09d8 wrote stub patch to its last argument, and 031c09d8 added the packager's xdelta3 -V check and the stub's -V branch together; the old stub against the check reproduced the file, the current stub does not) and section 2 the file saved before its removal from PILOT; sections 3 and 4 show the runner's untracked-file comparison (a strict run NOT GREEN on a new file outside build/) and the runner test's sections 30/31; section 5 shows the runner test PASS with 24 controls fired including stray-blind and none dead; section 6 shows the stray-blind mode failing section 30; section 7 shows a strict session-cadence tier on PILOT over the whole change set printing 'ok: no new untracked file outside build/', its six reds each explained; section 8 shows test_static_runner's 24 controls re-traced SAFE on the blob in the tree and test_controls_concurrent PASS. Building the runner-wide check was the maintainer's choice, quoted in maintainer_words324.txt: "Runner-wide check (Recommended)". NOT TESTED: the exact run that wrote PILOT's file on 2026-10-23 is not identified (no log survives; the mechanism is reproduced, not the event); the emulator runner has no such check; files left inside build/ are not checked; the stray-blind mode run was on the script before the stub's build path moved to build/agent324/ (the plain run is on the final script); the PILOT tier ran at session cadence, so release-cadence and emulator gates were not run under the new check.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	0 flag(s)
+deliverables	build/agent208/t324/closing_324.md

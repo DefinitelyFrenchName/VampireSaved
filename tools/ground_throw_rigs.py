@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
-"""ground_throw_rigs.py — the vsavj GROUND THROWS for the community cross-check (GitHub #229, 14z-195).
+"""ground_throw_rigs.py — the vsavj NORMAL THROWS (ground, and since 14z-208b air) for the community cross-check
+(GitHub #229, 14z-195). The AIR THROWS joined on the maintainer's ruling of 2026-10-25 (*"Remove all, Victor too, but
+add them to the normal throws!"*): they were rows of tools/command_throw_rigs.py, and they are the game's plain throw.
 
-  python3 tools/ground_throw_rigs.py gen <out dir>                      one rig per vanilla character (.rpl + .json)
+  python3 tools/ground_throw_rigs.py gen <out dir>                      per vanilla character a ground rig (gt_XX) and an
+                                                                       air rig (gt_XX_air) (.rpl + .json)
   python3 tools/ground_throw_rigs.py rows <rig.json> <rig legs dir> <vsavj_data.bin> [<+off>:<a3 hex>]
                                                                        one row per event (JSON lines); the legs dir
                                                                        holds 0189ea/ and 02979a/, each with run.log + dumps
@@ -17,7 +20,8 @@
 THE RIG (tools/vanilla_join_rig.py's walk-in, tools/name_moves.py's tokens): the character FORCED on P1 by the
 early-window poke (P1 0x01's cell; P2 Victor 0x03, or Demitri 0x01 when Victor throws), REPLAY17's prologue; per
 EVENT both fighters pinned to the far pair (552, 728) at t-230, P1 walks right t-190..t-40 to pushbox contact, a
-40-frame pause, then ONE throw input at t (toward or back + the button, held 4 frames). Before each event P2's two
+40-frame pause, then ONE throw input at t (toward or back + the button, held 4 frames; an AIR event: both jump, then
+toward + the button in the air — its press is that button's frame). Before each event P2's two
 HP words are re-pinned to 288 (both words, [VSP-125]) and P1's stock and meter to 0. Events are GAP frames apart (a
 Victor MP throw runs ~250 frames).
 
@@ -51,6 +55,27 @@ VICTIM = 0x03
 # throw`, `k ground throw`), each "6MP or 6HP" row run with BOTH buttons so the sheet's one-row claim is measured.
 TOWARD = lambda b: [(0, 3, "R" + nm.B[b])]
 BACK = lambda b: [(0, 3, "L" + nm.B[b])]
+GAP_AIR = 624       # the air rigs: 16 x 39 (name_moves.TICK_QUANTUM, #168) — at 600 the air throws' outcome moved with the
+                    # event's slot (measured 14z-205 on tools/command_throw_rigs.py, which ran them at 624 until 14z-208b)
+
+
+def _jump_throw(b, at=14):
+    """the air throw: both jump from contact, P2 two frames ahead (name_moves.air_throw, #169), toward+button at +at"""
+    return [(-2, 0, "U", "p2"), (0, 2, "U"), (at, at + 3, "R" + nm.B[b])]
+
+
+def _converge(b):
+    """Victor's air throw: P1 jumps toward, P2 jumps toward 4 frames AHEAD, toward+button at +16 — it connects only when
+    the pair converges (build/agent205/t229/p3_throws Row 5: 4 of 72; this set-up threw with HP and MP, re-run 14z-208b)"""
+    return [(-4, -2, "UL", "p2"), (0, 2, "UR"), (16, 19, "R" + nm.B[b])]
+
+
+# the workbook's AIR THROW rows ("J.6P or J.4P", one per vanilla character but Anakaris), each run with toward+MP and
+# toward+HP: Bulleta's at +18 (at +14 it is a jump normal, measured 14z-205), Victor's converging
+AIR = {tab: [("AIR", f"j.6{b}", _jump_throw(b)) for b in ("MP", "HP")]
+       for tab in ("FE", "AU", "BI", "DE", "GA", "JE", "LE", "LI", "MO", "QB", "SA", "ZA")}
+AIR["BU"] = [("AIR", f"j.6{b} at 18", _jump_throw(b, 18)) for b in ("MP", "HP")]
+AIR["VI"] = [("AIR", f"j.6{b} converging", _converge(b)) for b in ("MP", "HP")]
 THROWS = {
     "BU": [("P", "6MP", TOWARD("MP")), ("P", "6HP", TOWARD("HP"))],
     "DE": [("P", "6MP", TOWARD("MP")), ("P", "6HP", TOWARD("HP")), ("K", "6MK", TOWARD("MK")), ("K", "6HK", TOWARD("HK"))],
@@ -69,9 +94,16 @@ THROWS = {
 }
 
 
+def _press(rec):
+    """the press: the first P1 token that carries a button (a ground throw's first token)"""
+    return min(r[0] for r in rec if (len(r) < 4 or r[3] == "p1") and any(ch.isdigit() for ch in r[2]))
+
+
 def gen(out_dir):
     out = Path(out_dir); out.mkdir(parents=True, exist_ok=True)
-    for tab, evs in THROWS.items():
+    rigs = [(tab, f"gt_{tab}", evs, GAP) for tab, evs in THROWS.items()] + \
+           [(tab, f"gt_{tab}_air", evs, GAP_AIR) for tab, evs in AIR.items()]
+    for tab, name, evs, gap in rigs:
         cid = vf.CHARS[tab][0]
         vic = 0x01 if cid == VICTIM else VICTIM
         x1, x2 = nm.PIN["far"]
@@ -80,16 +112,16 @@ def gen(out_dir):
                  "# (the characters are FORCED by the early-window poke, so the cursor path does not matter).",
                  nm.REPLAY17_PROLOGUE.rstrip()]
         t = t0 = nm.FIRST_EVENT + vj.WALKIN_SHIFT
-        sched = {"char": f"{cid:#04x}", "sheet": tab, "victim": f"{vic:#04x}", "gap": GAP, "events": []}
+        sched = {"char": f"{cid:#04x}", "sheet": tab, "victim": f"{vic:#04x}", "gap": gap, "events": []}
         pokes = [f"{f}:ff8782:{cid:02x}" for f in (1400, 1450, 1500)] + [f"{f}:ff8b82:{vic:02x}" for f in (1400, 1450, 1500)]
         for key, inp, rec in evs:
             pokes += [f"{t - 230}:ff8410:{x1:04x}", f"{t - 230}:ff8810:{x2:04x}",
                       f"{t - 20}:ff8850:01200120", f"{t - 20}:ff8509:000000"]
             lines.append(f"{t - 190}-{t - 40} p1=R")
-            for a, bb, tok in rec:
-                lines.append(f"{t + a}-{t + bb} p1={tok}")
-            sched["events"].append({"key": key, "input": inp, "frame": t, "press": t + rec[0][0]})
-            t += GAP
+            for r in rec:
+                lines.append(f"{t + r[0]}-{t + r[1]} {r[3] if len(r) > 3 else 'p1'}={r[2]}")
+            sched["events"].append({"key": key, "input": inp, "frame": t, "press": t + _press(rec)})
+            t += gap
         end = t + 100
         lines.append(f"{end} wait")
         assert end - t0 < 7500, "a rig must fit inside one round"
@@ -97,14 +129,14 @@ def gen(out_dir):
         sched["frames"] = end + 50
         # per event: every frame of the hold window (the hold starts on the press frame) and the event's END frame
         # (the meter and HP it closed on) — a whole-window dump of four events overran the environment (E2BIG)
-        sched["dumps"] = [[e["frame"] - 5, e["frame"] + HOLD_WIN] for e in sched["events"]]
+        sched["dumps"] = [[e["press"] - 5, e["press"] + HOLD_WIN] for e in sched["events"]]
         # the END frame lands BEFORE the next event's position pins (t + GAP - 230): read later, an event's x is the
         # next walk-in's, not the throw's (14z-195's first freeze read every non-last event's side as R that way).
         # The longest throw stages its last record at +186 (Victor's MP), so +360 closes every throw.
         sched["ends"] = [e["frame"] + END_AT for e in sched["events"]]
-        (out / f"gt_{tab}.rpl").write_text("\n".join(lines) + "\n")
-        (out / f"gt_{tab}.json").write_text(json.dumps(sched, indent=1) + "\n")
-    print(f"wrote {len(THROWS)} rigs to {out}")
+        (out / f"{name}.rpl").write_text("\n".join(lines) + "\n")
+        (out / f"{name}.json").write_text(json.dumps(sched, indent=1) + "\n")
+    print(f"wrote {len(rigs)} rigs to {out}")
 
 
 def dumps_spec(sched):
@@ -272,15 +304,34 @@ def signature(r):
                                       dr, dw, len(r["drops"]), first, recs))
 
 
-HEADER = ("# tests/expected/ground_throws.tsv — the vsavj ground throws (#229, 14z-195), FROZEN by\n"
-          "# `tools/ground_throw_rigs.py freeze`; columns: sheet key input press_to_hold p2_side meter_paid\n"
-          "# red_fall white_fall n_falls first_fall_offset records (falls = P2's HP words read from the dumps)")
+HEADER = ("# tests/expected/ground_throws.tsv — the vsavj normal throws, ground and air (#229, 14z-195; air 14z-208b), FROZEN\n"
+          "# by `tools/ground_throw_rigs.py freeze`. Columns: sheet key input sig — `sig` is the first 16 hex of SHA-256 over the\n"
+          "# event's full signature line (tools/ground_throw_rigs.py signature: press_to_hold p2_side meter_paid red_fall white_fall\n"
+          "# n_falls first_fall_offset records). The per-move numbers are NOT in the tree (the 14z-126 frame-data ruling; #319,\n"
+          "# ruled 2026-10-25 \"Convert now\"): the full lines are written beside the frame data, outside it (GT_FULL), and a red\n"
+          "# prints the run's own.")
+FULL_DEFAULT = str(Path(__file__).resolve().parent.parent.parent / "charpages/framedata/ground_throws_full.tsv")
+
+
+def _full_path():
+    return os.environ.get("GT_FULL", FULL_DEFAULT)
+
+
+def hashed(full):
+    """a full signature line as its in-tree form: the three identity columns and the 16-hex SHA-256 of the whole line"""
+    import hashlib
+    return "\t".join(full.split("\t")[:3] + [hashlib.sha256(full.encode()).hexdigest()[:16]])
 
 
 def freeze(rows_path):
+    fulls = [signature(json.loads(l)) for l in open(rows_path)]
+    Path(_full_path()).parent.mkdir(parents=True, exist_ok=True)
+    Path(_full_path()).write_text("# the FULL lines behind tests/expected/ground_throws.tsv's hashes (outside the tree): sheet key "
+                                  "input press_to_hold p2_side meter_paid red_fall white_fall n_falls first_fall_offset records\n"
+                                  + "\n".join(fulls) + "\n")
     print(HEADER)
-    for l in open(rows_path):
-        print(signature(json.loads(l)))
+    for f in fulls:
+        print(hashed(f))
 
 
 def expect(rows_path, exp_path):
@@ -290,6 +341,9 @@ def expect(rows_path, exp_path):
             continue
         f = l.rstrip("\n").split("\t")
         want[tuple(f[:3])] = l.rstrip("\n")
+    wfull = {}
+    if os.path.exists(_full_path()):
+        wfull = {tuple(l.split("\t")[:3]): l.rstrip("\n") for l in open(_full_path()) if l.strip() and not l.startswith("#")}
     bad, seen = 0, set()
 
     def no(k, why):
@@ -321,9 +375,10 @@ def expect(rows_path, exp_path):
             no(k, f"staged record(s) {unlanded} with no fall of P2's HP within {LAND} frames — damage the victim never took"); continue
         if (len(r["drops"]) > 0) != (len(dealt) > 0):
             no(k, "falls and staged damage disagree"); continue
-        got = signature(r)
+        full = signature(r)
+        got = hashed(full)
         if got != want.get(k):
-            no(k, f"got  {got}\n    want {want.get(k)}")
+            no(k, f"got  {got}\n    want {want.get(k)}\n    run  {full}\n    was  {wfull.get(k, '(no full line outside the tree)')}")
         else:
             print(f"ok  {got}")
     for k in sorted(set(want) - seen):
@@ -335,10 +390,12 @@ def expect(rows_path, exp_path):
 def snaps(sched_path, exp_path):
     """SNAP_FRAMES for a rig's capture: each event's press + its FROZEN first-fall offset (the frame the damage
     lands). The run that takes them is held to the same expectation, so a PASS means each snapshot is the frame
-    that run's own first fall landed on."""
+    that run's own first fall landed on. Since #319 the offset is read from the FULL lines outside the tree
+    (GT_FULL); a host without them takes no snapshots (the gate's sheet section says so)."""
     sched = json.loads(Path(sched_path).read_text())
     want = {}
-    for l in open(exp_path):
+    src = _full_path() if os.path.exists(_full_path()) else exp_path
+    for l in open(src):
         if not l.startswith("#") and l.strip():
             f = l.rstrip("\n").split("\t")
             if len(f) >= 11:   # an expectation in an older column form carries no first-fall offset: no snapshot
@@ -364,7 +421,7 @@ def sheet(out_png, legs_root, rigs_dir, exp_path):
         shots = sorted(Path(legs_root, j.stem, _src, "sb", "snap").rglob("*.png"))
         evs = {e["press"]: e for e in sched["events"]}
         for fr, p in zip(frames, shots):
-            e = next(ev for pr, ev in evs.items() if pr <= fr < pr + GAP)
+            e = next(ev for pr, ev in evs.items() if pr <= fr < pr + sched["gap"])
             tiles.append((f"{sched['sheet']} {e['input']}  frame {fr} (press {e['press']} +{fr - e['press']})", Image.open(p).convert("RGB")))
     if not tiles:
         sys.exit("sheet: no snapshots found")
@@ -383,7 +440,7 @@ def sheet(out_png, legs_root, rigs_dir, exp_path):
 
 # THE ROW SET (run 728 Q1c): the workbook's ground-throw rows, by its own `type` column, against THROWS. Graviton
 # Knuckle (a follow-up input during Victor's MP throw) is declared NOT MEASURED.
-MOVE_KEY = {"P THROW": "P", "K THROW": "K", "P THROW BACK": "PB", "MP THROW": "MP", "HP THROW": "HP"}
+MOVE_KEY = {"P THROW": "P", "K THROW": "K", "P THROW BACK": "PB", "MP THROW": "MP", "HP THROW": "HP", "AIR THROW": "AIR"}
 NOT_MEASURED = {("VI", "GRAVITON KNUCKLE")}
 
 
@@ -394,16 +451,17 @@ def rowset(xlsx):
     for tab in wb.sheet_names:
         for d in wb.rows(tab):
             d = {k.lower(): str(v).strip() for k, v in d.items()}
-            if "ground throw" not in d.get("type", "").lower():
+            ty = d.get("type", "").lower()
+            if "ground throw" not in ty and ty != "air throw":
                 continue
-            mv = d.get("move", "").upper()
+            mv = "AIR THROW" if ty == "air throw" else d.get("move", "").upper()   # Bishamon's move cell is empty
             if (tab, mv) in NOT_MEASURED:
                 continue
             if mv not in MOVE_KEY:
                 unknown.append((tab, mv)); continue
             got.add((tab, MOVE_KEY[mv]))
-    ours = {(tab, k) for tab, evs in THROWS.items() for k, _, _ in evs}
-    print(f"workbook ground-throw rows {len(got)} (+{len(NOT_MEASURED)} declared not measured); rigs cover {len(ours)}")
+    ours = {(tab, k) for tab, evs in list(THROWS.items()) + list(AIR.items()) for k, _, _ in evs}
+    print(f"workbook ground- and air-throw rows {len(got)} (+{len(NOT_MEASURED)} declared not measured); rigs cover {len(ours)}")
     for x in sorted(got - ours):
         print(f"MISSING from the rigs: {x}")
     for x in sorted(ours - got):

@@ -9,6 +9,9 @@
 # strace, scored by tools/controls_overlap.py) or taken off; the whole list is re-traced at each freeze (HANDOFF.md).
 # TRACES: pilot:bd004554 = PILOT (Ubuntu 24.04), the freeze re-trace of 14z-208b (fork RT): every control mode of all 108 multi-control static gates, 522 runs in 1,752 s; it supersedes eris-wsl:2a155ba3 (lane S, 14z-207) and pilot:bdef935e (fork T, 14z-207, #315) for every row.
 # NOT listed, from the pilot:bd004554 trace (SHARED): test_close_tools and test_emulator_staleness (their controls take the checkout's .git/modules/emu/{fbneo,jtcores,jtcores/modules/modules/fx68k}/index.lock); test_mister_mra_map (one control writes /tmp/vampire-saved-jtsim/.git/{HEAD,config,packed-refs}, another reads them: the shared jtsim scratch); test_mra_parts (two controls rename onto zips/parts.zip, a relative path the trace cannot place); test_release_asset_shape (its controls write build/scratch/release_assets/merged-m23/*.zip(.list)); test_romset_path_guard (two controls rename onto build/rompath/vsavjw.zip, a relative path the trace cannot place).
+# TRACES: pilot:b7d2f4dd = PILOT, 14z-208b after its close (#324): test_static_runner's 24 controls on its changed script, 24 runs in 3,456 s, SAFE (local evidence build/agent208/t324/).
+# TRACES: pilot:1589fd17 = PILOT, 14z-208b after its close (#325): test_run_on_snapshot's 13 controls on its changed script, 13 runs in 142 s, SAFE (local evidence build/agent208/t325/).
+# TRACES: pilot:1c314f83 = PILOT, 14z-208b after its close (#326): test_release_reuse's 7 controls on its fixed script, 7 runs in 66 s, SAFE (local evidence build/agent208/t326/).
 # BACK ON since 14z-208b (#304 item 2): test_run_on_snapshot — off after its script gained section 5 and two controls; re-traced at pilot:bd004554, its 12 controls SAFE.
 # BACK ON since 14z-208b (#317): test_session_close — off after its script gained the control red-base-ignored; re-traced at pilot:bd004554, its 5 controls SAFE.
 # OFF since 14z-208b (#322): test_release_launcher_bat — its script's gen_claims fixture now names its encoding, so its traced blob 4cc357ae no longer matches; its controls run one after another (8 s in all at the 14z-208b close tier) until the next freeze's re-trace.
@@ -85,7 +88,7 @@ test_promise_check	fa54463334e4914e361b002220ad27bf7648d55a	pilot:bd004554	3 con
 test_reaction_classes	3ee3745e9a2e606b3667c3d5add2648188326c42	pilot:bd004554	3 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_recurrence_alarm	fff7c06f0b2c1c0dc490ca20a6277edec8cb8189	pilot:bd004554	2 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_release_recipe_text	0775e67ba880c921519a66518cdb438a42f3c11d	pilot:bd004554	3 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
-test_release_reuse	c5e1bcc3a52db6ba72da581a99e5e19dc1e27ad5	pilot:bd004554	7 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
+test_release_reuse	11376be2bc74c8ad3fb10389d1df26edaea82c1a	pilot:1c314f83	7 controls re-traced 14z-208b after #326's fixture fix (the synthetic repo's .gitignore): none writes a path a sibling writes or reads
 test_release_roundtrip	28f1eacca4242b3a7a7b35552961571b2d770d48	pilot:bd004554	10 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_retraction_reach	fd7dbe95d9233ed2045269d264cd1fc3b1518e7d	pilot:bd004554	3 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_rompath_reject	7f326f5d060ad0afd6910e8c81600f7d9c5085f7	pilot:bd004554	2 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
@@ -93,7 +96,7 @@ test_rpl2siminputs	53adf042868c338fb2ee21b04faf5786f8f7991f	pilot:bd004554	3 con
 test_rule5_census	4030c294649501a1553d0da30672bd8242a3dbee	pilot:bd004554	4 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_rule_checker	1828af65b62e5197d22acfa2c449bba2886615b8	pilot:bd004554	19 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_rulings_verbatim	741c442732b00a0ab8e020624675a35d7ffb18a2	pilot:bd004554	8 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
-test_run_on_snapshot	65b75661e2bf26f4a42d74b4d54b29de6fd784cd	pilot:bd004554	12 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
+test_run_on_snapshot	75ac443160ef62b4accb428c43be14900e7ed269	pilot:1589fd17	13 controls re-traced 14z-208b after #325's section 6 and control same-name: none writes a path a sibling writes or reads
 test_run_record	02af6e1e6d885e74c23a94dbd185439ff537430d	pilot:bd004554	3 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_same_data_p2	4e1df217560651cc4ed8840366fd6bde8bb2ada5	pilot:bd004554	2 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_scratch_census	335581ff018dc7619368015fa8bbbe0dba6427be	pilot:bd004554	7 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
@@ -105,7 +108,7 @@ test_sim_wram_contract	c8cec18a0ca8d6b053f0c331eff05b0c2cdf41e9	pilot:bd004554	3
 test_skill_guides	f85f0746efaf9a22d3fab37bd7ea4c540ad26598	pilot:bd004554	3 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_state_open_lists	ce1f370ea7ba14e2d0b1ad4efd55f630dcf4ddf5	pilot:bd004554	7 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_static_confirm	8a9212e8a7154af86dd2568ae84aa865dbb8776c	pilot:bd004554	44 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
-test_static_runner	5838912b901e4813dabe00b9a42e2e416587c3b5	pilot:bd004554	23 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
+test_static_runner	9b56b342241edb8090646ebb803f78551a61a138	pilot:b7d2f4dd	24 controls re-traced 14z-208b after #324's sections 30/31 and control stray-blind: none writes a path a sibling writes or reads
 test_submodule_pins	2b6b6efafe65bb7e805fad83099d6e05c3c4e7a7	pilot:bd004554	2 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_superseded_pins	5c79a05e78f77af8f53e123e772abdc4f9ff7f0e	pilot:bd004554	2 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_tickets	9402d66e0fd0ea30c93c1eeebf5808f8ddc6a078	pilot:bd004554	6 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
