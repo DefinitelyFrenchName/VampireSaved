@@ -18,7 +18,7 @@ A plain **Opus 5.5 session at effort High** (the ruled orchestrator — STATE 'S
 
 Say so at the opener. Never spawn any agent at `max`. A recommendation leans only on the maintainer's OWN words.
 **PILOT** (6 vCPU, 47 GB, Ubuntu 24.04) carries xdelta3 3.2.0 and Node v24.22.1 user-local (`~/.local/bin`, ruled
-2026-10-23) and has `strace`; its clone sits at `a14e811e` (the freeze commit) with a dirty `emu/fbneo` and an untracked
+2026-10-23) and has `strace`; its clone sits at `25dbfea1` (checked out for #278's locale run; `~/p208b_t278/`, `~/t278chk/`, `~/p278_*.sh` are its deletable scratch) with a dirty `emu/fbneo` and an untracked
 `-V` file in its root (#324: leave it until #324 finds its writer); fork X2's scratch there is deletable
 (`~/x2wt`, `~/x2out`, `~/x2.bundle`, `~/t229.tar`, `~/x2f5`, `~/x2_run_*.sh`). **ERIS** (WSL2 and MSYS2) has a
 source-built MAME at its pin (`C:\Users\Chaton\.cache\vampire-saved\mame\cps2.exe`), no xdelta3 and no node; its lane
@@ -59,7 +59,12 @@ the maintainer approves it before anything is deleted.
 2. **Then ask the maintainer for the order of work.** Open tickets by GitHub severity label:
    - medium: #321 (parallelise the serial-by-default gates; its headroom data point is on the issue);
    - low: #118, #229, #244, #305, #306, #310, #311, #323, #324, #325 (and #129 and #301, parked);
-   - no severity label: #278 (release-only, measured, open: its comment of 14z-207), #302, #318, #319, #320;
+   - no severity label: #278 (release-only), #302, #318, #319, #320;
+   - **#278 CLOSES AT THIS SESSION'S PUSH** (ruled *"Close at the next push"*, STATE 14z-208b (6)): its change is
+     committed locally after the 14z-208b close. After the push: post `build/agent208/t278/closing_278.md` (local) as the
+     closing comment, close the issue, and set its row `done` in the close's commit (rule-checker run `2026-10-25-1281`, OK).
+   - **Before planning any freeze or release, read each open ticket's comments for a step that runs AT it** (#278's
+     locale step was missed at the 14z-208b freeze: `docs/project/gotchas.md`, the UTF-8 collation entry).
    - parked: #121, #123, #124, #125, #127, #128, #162, #267, #294.
 3. **`tests/replays/118_chain.rpl`'s header names a leg of `audit_mizuumi_inputs` that gate never ran** (STATE_HISTORY
    14z-198 finding (i)); the one-line correction rides a session that runs the emulator gates following `tests/replays/`.

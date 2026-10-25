@@ -70,6 +70,7 @@ if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 OUTBASE="${1:-$REPO/build/donovan6}"
 cd "$REPO"
+[ ! -f "$REPO/tests/lib/collation.sh" ] || { . "$REPO/tests/lib/collation.sh"; vs_pin_collation; }   # COLLATION-PIN: byte-order sort/ls for every gate (#278); absent only in a runner test's synthetic repo
 
 # ── SKIP ACCOUNTING (14z-94, GitHub #24) ────────────────────────────────────
 # This script is `set -eu` and invoked each gate as a bare command, so exit 0

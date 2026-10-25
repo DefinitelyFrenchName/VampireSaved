@@ -114,6 +114,41 @@ checkout of the staged tree, where `test_tickets`, `test_state_open_lists` and `
 `build/agent208/close208b/tier_results.tsv`, the next close's `--prev`. The push carries the freeze commit `a14e811e`
 and this close's commit. Left local and untracked: #229's 105 files (`build/agent205/t229/pending_gates_229.list`).
 
+### (6) AFTER THE CLOSE — #278: COLLATION PINNED IN THE RUNNERS; COMMITTED LOCALLY, CLOSES AT THE NEXT PUSH
+The maintainer asked why #278 was not considered at the freeze: its comment of 14z-207 left a freeze-cadence locale
+run, and the opener named it only as "measured, open" (the lesson: `docs/project/gotchas.md`, the UTF-8 collation
+entry). Ruled *"Both"*, *"A with only that one per-line pin"*, *"Commit stays local"*, *"Close at the next push"*
+(`DECISIONS_HISTORY.md` "Ruled 2026-10-25 (14z-208b) — #278: …").
+- **PILOT, at `25dbfea1`, before the change:** the strict static tier at freeze cadence under `LC_ALL=en_US.UTF-8` and
+  under `LC_ALL=C`: PASS 217, FAIL 2 under both, the 219 per-gate verdicts identical; the two reds are host state, not
+  collation (`test_emulator_staleness`: PILOT's emulator records; `test_release_reuse`: its synthetic repo's reuse plan
+  refuses, "the freeze run's identity moved during it" — a Linux-only red at `25dbfea1`, not yet a ticket). The five
+  release-cadence gates were deferred in both runs. Evidence: `build/agent208/t278/evidence278.txt` (local).
+- **The census widened** to every tracked shell file (lane P's covered the 231 static gates): 212 unpinned
+  `sort`/`ls`/`comm`/`join` lines in 92 of 536 files; 134 lines in 61 files past the order-free shapes
+  (`build/agent208/t278/census278b.txt`, `classify278.py`, local).
+- **The change:** `tests/lib/collation.sh` (`vs_pin_collation`), called once at the top of `tests/run_all_static.sh`,
+  `tests/run_all_emulator.sh` and `tests/run_battery_m2.sh`, sourced only when present (the runner tests' synthetic
+  repos carry part of `tests/lib`; the first tier on the change was red on those four gates); `test_charmap_current.sh`'s
+  FREEZE=1 write sorts under `LC_ALL=C` and leaves `tests/controls_concurrent.txt` until the next freeze's re-trace; the
+  new gate `tests/test_runner_collation.sh` (five controls), PASS on the Mac and on PILOT, where the pinned sort gives
+  byte order under `en_US.UTF-8`. The opener's #278 line now says to read a ticket's comments before planning a freeze.
+- **Two of the session's own statements corrected before the commit:** macOS's `en_US.UTF-8` does collate (case and
+  punctuation; this Mac's sessions run under `LANG=C.UTF-8`, byte order), so the gate's probe now compares against a
+  `C` sort and works on both systems; and nine gates, not one, write a frozen file whose order comes from a shell sort on
+  a hand-run `FREEZE=1` — the one-pin ruling was re-confirmed on that basis (*"yes"*). The maintainer asked for the gates
+  explained plainly: `docs/project/gates_explained.md`.
+- **After the change, on PILOT** (the commit object `6a9051e1`, freeze cadence, `LC_ALL=en_US.UTF-8`): PASS 218, FAIL 2,
+  the 220 per-gate verdicts equal to the two earlier runs' apart from the new gate's PASS. A probe gate run through the
+  real static runner reads `en_US.UTF-8` and a dictionary sort under the old runner, `LC_COLLATE=C` and byte order under
+  the changed one (`build/agent208/t278/p278_probe.sh`).
+- **Rule-checker:** run `2026-10-25-1279` withdrawn unspawned (its packet check flagged an unshown absolute in the
+  closing comment); `-1280` VIOLATED on Q1, Q3 and Q4 (no freeze-cadence tier on the change; nothing showed the locale
+  reached the gates in the earlier runs), resolved by the after-change run and the probe; `-1281` OK.
+- **Not done here:** #278 stays `open` in `docs/project/tickets.tsv` and on GitHub until the next push; its closing
+  comment is `build/agent208/t278/closing_278.md` (local). PILOT's clone sits at `25dbfea1`; `~/p208b_t278/`, `~/t278chk/` and
+  `~/p278_*.sh` there are this work's scratch.
+
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings
 

@@ -414,3 +414,6 @@ test_build_retention
 # instruments, ROMDIR), never a release-cadence gate, a VS_CADENCE reader or an emulator control; the real runners over a
 # synthetic repo; seven controls. ROM-free, ~12 s.
 test_release_reuse
+# test_runner_collation.sh — #278 (14z-208b): the three runners pin byte-order collation (tests/lib/collation.sh) before
+# their first gate, whatever the caller's locale; five controls. ROM-free, ~1 s.
+test_runner_collation

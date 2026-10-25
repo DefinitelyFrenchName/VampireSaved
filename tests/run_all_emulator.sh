@@ -154,6 +154,7 @@ cd "$REPO"
 # THE ONE CLASSIFIER (14z-139): the verdict branches this runner carried
 # inline are tests/lib/classify.sh now, sourced by all three runners.
 . "$REPO/tests/lib/classify.sh"
+[ ! -f "$REPO/tests/lib/collation.sh" ] || { . "$REPO/tests/lib/collation.sh"; vs_pin_collation; }   # COLLATION-PIN: byte-order sort/ls for every gate (#278); absent only in a runner test's synthetic repo
 
 REG=tests/ci_emulator.tsv
 SCOPE=release; CADENCE=all; LANES="prereq fbneo mame"; LANES_SET=""; ONLY=""; JOBS=1; TMO=5400

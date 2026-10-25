@@ -16,11 +16,11 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**472 scripts** — 143 ci_portable, 92 ci_static, 237 emulator-tier (run by name).
+**473 scripts** — 144 ci_portable, 92 ci_static, 237 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 51 | the suite runners and their own ground truth |
+| [runner](#runner) | 52 | the suite runners and their own ground truth |
 | [docs](#docs) | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 50 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -78,6 +78,7 @@ the suite runners and their own ground truth.
 | `tests/test_rulings_verbatim.sh` | test | ci_portable | — | a quote a session attributes to the maintainer is the maintainer's own words, and every message the maintainer sent is on record (`tools/agent/rulings_verbatim.py`, 14z-185b, #190 P2). | 14z-185b |
 | `tests/test_run_on_snapshot.sh` | test | ci_portable | — | S6 OF GitHub #153 (and #181's inputs): a run on a snapshot is IMMUNE to the working tree (ruled 2026-09-26, DECISIONS_HISTORY.md "Ruled 2026-09-26 (14z-183b) — #153"; | 2026-09-26 |
 | `tests/test_run_record.sh` | test | ci_portable | — | a runner's record of what it ran on names every change to what it recorded (`tools/run_record.py`, 14z-185b, GitHub #189: "R-reach, both runners"). | 14z-185b |
+| `tests/test_runner_collation.sh` | test | ci_portable | — | THE RUNNERS SORT IN BYTE ORDER WHATEVER THE CALLER'S LOCALE (#278, 14z-208b). ci_portable: no ROM, ~1 s. | 14z-208b |
 | `tests/test_scratch_census.sh` | test | ci_portable | — | every scratch program a session wrote is classed, and each class holds (`tools/scratch_census.py`, 14z-185b, GitHub #190 P4). | 14z-185b |
 | `tests/test_session_metrics.sh` | test | ci_portable | — | the session dashboard's collector reads every source as its rule says and labels every figure with its class (`tools/session_metrics.py`, 14z-198, GitHub #264). | 14z-198 |
 | `tests/test_sheet_census.sh` | test | ci_portable | — | EVERY EMULATOR GATE SAYS WHAT ITS COMPARATIVE SHEET SHOWS, OR IS ON THE RETROFIT'S DEBT LIST (GitHub #291 slice S1, 14z-204; the design ruled 2026-10-17: "Declared in each gate (Recommended)"). | 14z-204 |

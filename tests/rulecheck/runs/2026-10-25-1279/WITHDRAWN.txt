@@ -1,0 +1,1 @@
+WITHDRAWN unspawned (14z-208b, 2026-10-25): its PACKET CHECK flagged an absolute in closing_278.md ("the freeze plan never read the step") that no artifact showed; the evidence gains the 14z-208 opener's #278 line and the freeze scripts' locale (section 9), the comment is reworded, and the packet re-prepared.

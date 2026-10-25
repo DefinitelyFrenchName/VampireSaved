@@ -150,8 +150,9 @@ if [ "${FREEZE:-0}" = 1 ]; then
     if vs_meas_guard "$0" charmap-anim-rows "$anim_rows"; then
         set -- $pending
         while [ $# -ge 3 ]; do
+            # byte order (#278): a hand-run FREEZE=1 is outside the runners' collation pin (tests/lib/collation.sh)
             grep -v "^$1_anim.md \|^$1.html " "$PAGES" > "$W/pages.tmp" 2>/dev/null || true
-            { cat "$W/pages.tmp"; echo "$1_anim.md $2"; echo "$1.html $3"; } | sort > "$PAGES"; echo "  FROZE $PAGES for $1"
+            { cat "$W/pages.tmp"; echo "$1_anim.md $2"; echo "$1.html $3"; } | LC_ALL=C sort > "$PAGES"; echo "  FROZE $PAGES for $1"
             shift 3
         done
     else bad "the freeze was REFUSED by the measurement floor"; fi

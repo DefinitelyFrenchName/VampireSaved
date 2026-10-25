@@ -13,11 +13,11 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**472 of 472 gates described.**
+**473 of 473 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
-| [runner](#runner) | 51 | 51 | the suite runners and their own ground truth |
+| [runner](#runner) | 52 | 52 | the suite runners and their own ground truth |
 | [docs](#docs) | 27 | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 50 | 50 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -30,7 +30,7 @@ first sentence) is `gate_index.md`.
 
 ## runner
 
-the suite runners and their own ground truth. 51 of 51 described.
+the suite runners and their own ground truth. 52 of 52 described.
 
 ### `run_all_emulator.sh` — run, emulator
 
@@ -359,6 +359,14 @@ the suite runners and their own ground truth. 51 of 51 described.
 **HOW:** drives the tool's selftest over a synthetic repository with a submodule; three controls run copies blind to untracked files, blind to the reach, and with the secret filter removed, and each must fail the selftest.
 
 **EXPECTS:** the selftest's 14 checks pass and all three controls fail on their copies; a red names the plant compare did not name.
+
+### `test_runner_collation.sh` — test, ci_portable
+
+**WHAT:** tests/lib/collation.sh's vs_pin_collation leaves LC_ALL unset and LC_COLLATE=C, and moves a caller's LC_ALL onto LANG and the other categories (so only collation changes); each of the three runners (tests/run_all_static.sh, tests/run_all_emulator.sh, tests/run_battery_m2.sh) calls it at the top level, once, before its first gate runs. A runner sources the library only when it is there: the runner tests (test_static_runner, test_emulator_runner, test_green_guard, test_release_reuse) run the real runners in synthetic repos that carry only some of tests/lib, and editing them would take their controls off tests/controls_concurrent.txt; so (2) also requires the library tracked.
+
+**HOW:** (1) the function runs in a clean `env -i` shell under three caller locales and its result is read; where this host has a COLLATING en_US.UTF-8 (Linux and macOS: it sorts a case-and-punctuation probe differently from C), a sort after the pin must give byte order; (2) each runner's text is read for the pin line and the line of its first gate run; (3) when a runner started this gate (VS_COLLATION_PINNED set), this run's own environment must carry the pin.
+
+**EXPECTS:** (1) en_US.UTF-8 in LC_ALL -> LC_ALL unset, LC_COLLATE C, LC_CTYPE and LANG en_US.UTF-8; LANG and LC_COLLATE en_US.UTF-8 -> LC_COLLATE C, LANG kept; nothing set -> LC_COLLATE C. (2) exactly one pin line in each runner, above its first gate run. A red names the case or the runner — the #278 shape: test_escape_triage and test_jtcores_twin compared a locale-sorted list against a byte-ordered frozen one and went red on PILOT only (14z-200).
 
 ### `test_scratch_census.sh` — test, ci_portable
 

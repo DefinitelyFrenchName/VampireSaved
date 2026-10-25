@@ -1,0 +1,3 @@
+  FLAG D-ABSOLUTE: It runs the pin under three caller locales and reads the result, checks the library is tracked, checks each runner calls it before its first gate, and checks...  [build/agent208/t278/closing_278.md]
+  FLAG D-ABSOLUTE: **Why it was missed at the 14z-208b freeze:** the opener named this ticket only as "measured, open", so the freeze plan never read the step this ticket's 14z...  [build/agent208/t278/closing_278.md]
+packet_check: 2 flag(s): D-ABSOLUTE 2

@@ -1,0 +1,2 @@
+  FLAG D-ABSOLUTE: - The five release-cadence static gates and the emulator-tier gates were not run under a collating locale; the runner pin covers them by construction (the pr...  [build/agent208/t278/closing_278.md]
+packet_check: 1 flag(s): D-ABSOLUTE 1

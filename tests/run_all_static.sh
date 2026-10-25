@@ -160,6 +160,7 @@ cd "$REPO"
 # pre-commit command read such a crash as PASS while run_all_emulator.sh
 # read it as FAIL. Sourced, not copied, so the two cannot drift again.
 . "$REPO/tests/lib/classify.sh"
+[ ! -f "$REPO/tests/lib/collation.sh" ] || { . "$REPO/tests/lib/collation.sh"; vs_pin_collation; }   # COLLATION-PIN: byte-order sort/ls for every gate (#278); absent only in a runner test's synthetic repo
 
 _ORIG_ARGS="$*"   # the command line as given, for the run record (#189) — the loop below shifts it away
 STRICT=0; TIER=all; LIST=0; EXEC_CTL=all; CADENCE=session; CONFIRM=""; REUSE=""; JOBS="${STATIC_JOBS:-1}"

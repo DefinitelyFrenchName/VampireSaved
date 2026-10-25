@@ -7581,3 +7581,25 @@ Mac's PASS re-runs had finished before ERIS did, so ERIS's later rows were the n
 re-run after ERIS ended, at the freeze and again at the release. **The rule:** run the host-covered gates after the
 remote run they cover has ENDED. A tarball copied back keeps the remote's mtime (`tar xzf`), which is the order the
 audit reads.
+
+## A UTF-8 DICTIONARY LOCALE DOES NOT SORT IN BYTE ORDER, SO A SHELL SORT IS A HOST DEPENDENCY (paid: 14z-200 and 14z-208b, #278)
+
+`sort`, `ls`, `comm` and `join`, and a bash glob, order by the caller's `LC_COLLATE`. `C` and `C.UTF-8` sort in byte
+order on Linux and on macOS. A dictionary locale does not, and not the same way on both: under `en_US.UTF-8` Linux
+ignores `_`, `.` and `:` at the first level (`ab` sorts before `a_c`), and macOS orders case and punctuation its own way
+(`a A a_c a-c a:c a.c` where byte order gives `A a a-c a.c a:c a_c`, measured 14z-208b). This Mac's sessions run under
+`LANG=C.UTF-8`, so a list frozen here is in byte order, and the same gate re-made under `en_US.UTF-8` on Linux went red
+(`test_escape_triage`, `test_jtcores_twin`, 14z-200). The 14z-208b census found 212 unpinned lines in 92 of 536 shell
+files (`build/agent208/t278/census278b.txt`, local). **The rule:** the three runners pin collation through
+`tests/lib/collation.sh` (`vs_pin_collation`: `LC_COLLATE=C`, a caller's `LC_ALL` moved onto the other categories), held
+by `tests/test_runner_collation.sh`. A gate run BY HAND keeps the caller's locale. Nine gates write a frozen file whose
+order comes from a shell sort under `FREEZE=1` (`test_charmap_current`, `test_must_fire_census`,
+`test_gate_descriptions`, `test_gate_follows`, `test_poke_readback`, `audit_ex_refused`, `audit_latch_reads`,
+`audit_move_parity`, `test_mame_parity`'s table rows; read 14z-208b): `test_charmap_current` pins its line; of the
+others, only `audit_ex_refused` compares its file's order directly (`diff` against `tests/expected/ex_refused.tsv`), so a
+hand re-freeze of it in a dictionary locale makes the next runner pass red on order alone, until it is re-frozen under
+a runner's locale. An SSH session from the Mac carries `LC_CTYPE=UTF-8`, which PILOT does not define, so a Linux run
+meant to be "in a UTF-8 locale" sets `LC_ALL` itself. **Paid twice:** the 14z-208b freeze ran without #278's
+freeze-cadence locale step because the opener named the ticket only as "measured, open"; every freeze script's
+`LC_ALL=C.UTF-8` sorts in byte order, so nothing there exercised it. When a freeze or release is planned, read each open
+ticket's comments for a step that runs AT it.
