@@ -1,0 +1,31 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_vanilla_specials_a.sh	957d9bdc9773c82ecd7d77be524c4e5628d903c9
+tests/lib/pristine_vsavj.sh	cbff6a8400c70620eeb140106f6f2b4cbdad2ef6
+tests/lib/mame_ident.sh	ec9f2a6d7fae4a5668b3d63ec28989e0b11d1ac2
+tests/lib/controls.sh	b3fc50460a4872fda43d468bb834e040a7b97ad5
+tools/run_mame.sh	4aeb916f534e1e9c46be18ad87c6d2b6a56041ec
+tests/expected/vanilla_specials_a.tsv	45bd95b524750ac22f7dcbaa3a68fefaa71ddf2a
+tests/expected/vanilla_specials_a_verdicts.tsv	02a83e0bcdcd1cb984b50bc516542385f15fca98
+tests/expected/instr_gameclock/audit_vanilla_specials_a.tsv	b703dffeb315ac9bc3005f17a5dbce6ccdc97924
+build/agent209/t229/v5/vanilla_specials_a.log	5e03e1355d8bdb279de64af77bdb02bae93d03b2
+build/agent209/t229/v5/wide_vanilla_specials_a.log	604f8bff52588ebb0fc4161df595d1e3bd2c9597
+build/agent209/t229/v5/vanilla_specials_a@drift-clock.log	1e5e7f63066d4a30f0cf6fb68ee74d6576d7530a
+build/agent209/t229/v5/vanilla_specials_a@first-frame-skip.log	3a2c724c44864f9c6f4678e2b20d279473dbbec3
+build/agent209/t229/v5/vanilla_specials_a@dead-tap.log	a18a34ce2d824e9ac495844f76beffe829eb3c9a
+build/agent209/t229/v5/vanilla_specials_a@swapped-chains.log	c5179020d53b6e3ebf1fbbaece4fee90bc87e779
+build/agent209/t229/v5/vanilla_specials_a@hidden-normal.log	1def13fb19eea5e8543a214eac90a704c3b168a0
+build/agent209/t229/v5/vanilla_specials_a@sheet-hits.log	ca008e270395962bbef48afbe4011ba208cb753b
+build/agent209/t229/v5/vanilla_specials_a@foreign-image.log	c7268415aefd38e02abea7a691f37b240b05f015
+build/agent209/t229/v5/vanilla_specials_a@foreign-romset.log	ca1f702f1560a99c2b7fd275bc8536a27f365148
+build/agent209/t229/v5/vanilla_specials_a@foreign-rompath.log	9386c0151bd39bcb7aebb6b4c22c031b79780541
+build/agent209/t229/v5/vanilla_specials_a@foreign-mame.log	5ab762e49b8d49ba92b5f1869c2a092714fcd2f5
+build/agent209/t229/asrun/vanilla_specials_a_version.txt	7ca4a97f895ac121d4f72096b99b736ee7fa7c3b
+build/agent209/t229/asrun/vanilla_specials_a_vs_tar.txt	f4615bb9ac3c5b676b6d8cb60c629fe545a4352d
+build/agent209/t229/asrun/vanilla_specials_a_files.txt	bd58740835d6e3191ebc4a3511c84534cdce6648
+build/agent209/t229/asrun/workbook.txt	054ae873efba4ddf37235e93b1e2a957db6437f0
+build/agent209/t229/asrun/q1_doc_excerpt.txt	ec5457af5958c285abcf592cbab610889cdaf8de
+build/agent205/t229/f1_specials_a/cap9/REPORT.md	0ebc2f2933b70d2ed9cfd29596fe8a8a103581e0
+build/agent209/t229/sheetmap/cmp_f1.py	80b4893f5f329c8bf0206b94a479fef55717b680
+build/agent209/t229/sheetmap/cmp_f1.out	ab538273d2e3ea7c78ac57c01d5a3c5eb5555da6
+DECISIONS_HISTORY.md.lines-8269-8279 (lines 8269-8279 of DECISIONS_HISTORY.md: its INDEX entry "## Read 2026-10-25 (14z-209) — #229 Q1: the maintainer's answer in the questions doc — the sheets of")	e78a915c65e6d0c09cfacf0a65709b1aeae9d5b0
+DECISIONS_HISTORY.md.lines-7589-7596 (lines 7589-7596 of DECISIONS_HISTORY.md: its INDEX entry "## Read 2026-10-21 (14z-205c) — #229's two re-rigged sheets are correct; #229 stays open for Q2")	7d4a79cce84e4dcdf102c23299a44a61877bd39c

@@ -36,6 +36,17 @@ import hitbox_records  # noqa: E402
 import frame_data  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
+
+
+def power_html(b):
+    """A record's +8 / +9 POWER BYTE as the engine reads it (#244, the #241 decode, hitbox_records.power()): the
+    damage CLASS, then — when bit 5 (nostat) or bit 7 (nokill) is set — the raw byte and those flags beside it, as
+    tools/charmap_md.py's power_cell (the maintainer's "Class + flags"); the raw byte is not a damage amount."""
+    p = hitbox_records.power(b)
+    if not (p["nostat"] or p["nokill"]): return f"{p['class']}"
+    return f"{p['class']}<small> (" + " ".join([f"{b:#04x}"] + [k for k in ("nostat", "nokill") if p[k]]) + ")</small>"
+
+
 DISPLAY = {"donovan": ("Donovan Baine", "Vampire Savior 2 / Vampire Hunter 2", "0x13"),
            "huitzil": ("Huitzil (Phobos)", "Vampire Savior 2 / Vampire Hunter 2", "0x10"),
            "pyron": ("Pyron", "Vampire Savior 2 / Vampire Hunter 2", "0x11")}
@@ -161,7 +172,7 @@ def main():
                 cells += [f'<dl><dt>startup</dt><dd>{fd["startup"]}</dd></dl>', f'<dl><dt>active</dt><dd>{act}</dd></dl>',
                           f'<dl><dt>recovery</dt><dd>{fd["recovery"]}</dd></dl>', f'<dl><dt>total</dt><dd>{total}</dd></dl>']
                 if r:
-                    cells += [f'<dl><dt>damage</dt><dd>{r["real"]}<small>/{r["white"]} white</small></dd></dl>', f'<dl><dt>meter</dt><dd>{r["meter"]}</dd></dl>',
+                    cells += [f'<dl><dt>power class</dt><dd>{power_html(r["real"])}<small>/{power_html(r["white"])} white</small></dd></dl>', f'<dl><dt>meter</dt><dd>{r["meter"]}</dd></dl>',
                               f'<dl><dt>class</dt><dd>{r["cls"]:#04x}</dd></dl>', f'<dl><dt>pushback</dt><dd>{r["pb_hit"]}<small>/{r["pb_blk"]} blk</small></dd></dl>',
                               f'<dl><dt>freeze</dt><dd>{r["freeze"]}</dd></dl>']
                 if len(rids) > 1:

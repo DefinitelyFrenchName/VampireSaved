@@ -47,8 +47,15 @@
 # the mistake session 14z-55 caught on the FBNeo side.
 #
 # Usage:
-#   ROMDIR=... [MAME_WIDE_BIN=...] [MAME_REF_BIN=...] [WIDE_ROMPATH=...] \
+#   ROMDIR=... [MAME_WIDE_BIN=...] [MAME_REF_BIN=...] [WIDE_ROMPATH=...] [WIDE_JOBS=N] \
 #     tests/test_mame_wide.sh [replay names...]
+#
+# WIDE_JOBS (14z-209, #321, maintainer-ruled 2026-10-26 "WIDE_JOBS queue"): the 72 MAME runs (12 replays x the two legs
+# of each of the three sections) are independent, so they go through ONE queue, WIDE_JOBS at a time (default
+# min(6, CPUs/4), at least 1), and only then is every pair compared and printed, in the serial order and with the
+# serial lines — the readout cannot depend on the job count. Until 14z-209 each run ran in turn: 3,746 s in the
+# 14z-208b freeze on ERIS; the same replays split by hand 4 and 12 at a time took 730 and 522 s, every section's lines
+# equal to the single run's (fork A, build/agent209/t321/wide_split_vs_freeze.txt).
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that
@@ -83,23 +90,30 @@ CORPUS="${*:-01_attract_long 02_demitri_vs_cpu 03_two_player_vs 04_select_fuzz \
 
 fail=0
 fail_skipped=""
+if [ -z "${WIDE_JOBS:-}" ]; then   # min(6, CPUs/4), at least 1 (#321)
+    _np="$(getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)"
+    WIDE_JOBS=$(( _np / 4 )); [ "$WIDE_JOBS" -le 6 ] || WIDE_JOBS=6; [ "$WIDE_JOBS" -ge 1 ] || WIDE_JOBS=1
+fi
 
 # go <tag> <bin> <set> <rompath> <replay> [canary]
-#   -> writes $WORK/<tag>.log (work RAM) and $WORK/<tag>.vid (framebuffer)
+#   -> QUEUES one run, which writes $WORK/<tag>.log (work RAM) and $WORK/<tag>.vid (framebuffer); run_queue runs them.
 # The canary is an explicit ARGUMENT, not a `VAR=1 go ...` prefix: in POSIX
 # sh a prefix assignment on a FUNCTION call persists in — and is exported
 # from — the calling shell, so it would leak into every later run and
 # quietly turn the control half of section 3 into a second canary run.
-go() {
-    if [ "${6:-}" = "canary" ]; then
-        CPS2_WIDE_CANARY=1 VIDEO_OUT="$WORK/$1.vid" MAME_BIN="$2" MAME_ROMPATH="$4" \
-            tools/run_replay_mame.sh "$3" "$REPO/tests/replays/$5.rpl" \
-            "$WORK/$1.log" "$WORK/sb_$1" >/dev/null 2>&1
-    else
-        VIDEO_OUT="$WORK/$1.vid" MAME_BIN="$2" MAME_ROMPATH="$4" \
-            tools/run_replay_mame.sh "$3" "$REPO/tests/replays/$5.rpl" \
-            "$WORK/$1.log" "$WORK/sb_$1" >/dev/null 2>&1
-    fi
+go() { printf '%s %s %s %s %s %s\n' "$1" "$2" "$3" "$4" "$5" "${6:--}" >> "$WORK/queue"; }
+# run_queue — every queued run, WIDE_JOBS at a time; a run that fails leaves $WORK/<tag>.runfail. Until 14z-209 a failed
+# run aborted the gate under `set -e` with no line; now it is named and the gate FAILs.
+run_queue() {
+    [ -s "$WORK/queue" ] || return 0
+    sed "s|\$| $WORK $REPO|" "$WORK/queue" | xargs -P "$WIDE_JOBS" -L 1 sh -c '
+        REPO="$7"   # named so, the replay path reads as tests/gate_follows.py composes it (#243)
+        if [ "$5" = canary ]; then _c="CPS2_WIDE_CANARY=1"; else _c="_NO_CANARY=1"; fi
+        env "$_c" VIDEO_OUT="$6/$0.vid" MAME_BIN="$1" MAME_ROMPATH="$3" \
+            "$REPO/tools/run_replay_mame.sh" "$2" "$REPO/tests/replays/$4.rpl" \
+            "$6/$0.log" "$6/sb_$0" >/dev/null 2>&1 || touch "$6/$0.runfail"' || :
+    _rf="$(cd "$WORK" && ls ./*.runfail 2>/dev/null | sed 's|^\./||; s|\.runfail$||' | tr '\n' ' ')"
+    [ -z "$_rf" ] || { echo "FAIL: a MAME run failed: $_rf"; exit 1; }
 }
 # both <tagA> <tagB> <label> <failmsg>
 both() {
@@ -126,6 +140,49 @@ echo "  WIDE binary: $WIDE_BIN  sha1 $(shasum "$WIDE_BIN" | cut -d' ' -f1)"
 python3 tools/build_fingerprint.py "$WIDE_ROMPATH;$ROMDIR" --set vsavjw --full 2>/dev/null | sed 's/^/  WIDE  /' || true
 python3 tools/build_fingerprint.py "$ROMDIR" --set vsavj --full 2>/dev/null | sed 's/^/  stock /' || true
 
+# ── THE RUNS FIRST: every leg of every section queued, then run WIDE_JOBS at a time ──
+if [ -x "$REF_BIN" ]; then
+    ref_ver="$("$REF_BIN" -version 2>/dev/null | head -1)"
+    wide_ver="$("$WIDE_BIN" -version 2>/dev/null | head -1)"
+    if ! "$REF_BIN" -listfull vsavjw >/dev/null 2>&1 && [ "$ref_ver" = "$wide_ver" ]; then   # section 1's own test, below
+        for rp in $CORPUS; do
+            go "ref_$rp" "$REF_BIN"  vsavj "$ROMDIR" "$rp"
+            go "new_$rp" "$WIDE_BIN" vsavj "$ROMDIR" "$rp"
+        done
+    fi
+fi
+for rp in $CORPUS; do
+    go "stock_$rp" "$WIDE_BIN" vsavj  "$ROMDIR" "$rp"
+    go "wide_$rp"  "$WIDE_BIN" vsavjw "$WIDE_ROMPATH;$ROMDIR" "$rp"
+done
+# The canary needs group C to be a byte COPY of group B, which is a shape
+# that must never ship: it carries group B's CRCs, and both emulators
+# resolve a ROM entry by hash before name, so in a set whose group B is
+# PATCHED the loader serves pristine tiles for it (14z-60z — that is how
+# the WIDE build rendered Donovan with vanilla art). So the canary romset
+# now lives in its OWN directory and the shippable overlay ($WIDE_ROMPATH)
+# is zero-filled; section 3 reads CANARY_ROMPATH, never the shippable set.
+CANARY_ROMPATH="${CANARY_ROMPATH:-$REPO/build/wide_canary/rompath}"
+SEC3=0
+if python3 - "$CANARY_ROMPATH" <<'PYEOF'
+import sys, zipfile, hashlib, os
+z = zipfile.ZipFile(os.path.join(sys.argv[1], "vsavjw.zip"))
+p = zipfile.ZipFile(os.path.join(os.environ["ROMDIR"], "vsav.zip"))
+ok = all(hashlib.sha1(z.read(c)).digest() == hashlib.sha1(p.read(b)).digest()
+         for c, b in zip(("vsw.31m", "vsw.33m", "vsw.35m", "vsw.37m"),
+                         ("vm3.14m", "vm3.16m", "vm3.18m", "vm3.20m"))
+         if c in z.namelist())
+sys.exit(0 if ok and "vsw.31m" in z.namelist() else 1)
+PYEOF
+then
+    SEC3=1
+    for rp in $CORPUS; do
+        go "cs_$rp" "$WIDE_BIN" vsavj  "$ROMDIR" "$rp"
+        go "cw_$rp" "$WIDE_BIN" vsavjw "$CANARY_ROMPATH;$ROMDIR" "$rp" canary
+    done
+fi
+run_queue
+
 echo "== 1. emulator superset invariant (stock vsavj: reference vs WIDE binary) =="
 if [ -x "$REF_BIN" ]; then
     ref_ver="$("$REF_BIN" -version 2>/dev/null | head -1)"
@@ -148,8 +205,6 @@ if [ -x "$REF_BIN" ]; then
     else
         echo "  both binaries report '$wide_ver' — same pinned revision"
         for rp in $CORPUS; do
-            go "ref_$rp" "$REF_BIN"  vsavj "$ROMDIR" "$rp"
-            go "new_$rp" "$WIDE_BIN" vsavj "$ROMDIR" "$rp"
             both "ref_$rp" "new_$rp" "$rp bit-identical (RAM + framebuffer)" \
                  "$rp — the patched binary changed STOCK vsavj behaviour"
         done
@@ -164,36 +219,14 @@ fi
 
 echo "== 2. profile inertness (WIDE set vs stock set, same binary) =="
 for rp in $CORPUS; do
-    go "stock_$rp" "$WIDE_BIN" vsavj  "$ROMDIR" "$rp"
-    go "wide_$rp"  "$WIDE_BIN" vsavjw "$WIDE_ROMPATH;$ROMDIR" "$rp"
     both "stock_$rp" "wide_$rp" "$rp bit-identical on the grown regions (RAM + framebuffer)" \
          "$rp — a grown region is NOT inert"
 done
 
-# ── 3. B4 canary ────────────────────────────────────────────────────────
-# The canary needs group C to be a byte COPY of group B, which is a shape
-# that must never ship: it carries group B's CRCs, and both emulators
-# resolve a ROM entry by hash before name, so in a set whose group B is
-# PATCHED the loader serves pristine tiles for it (14z-60z — that is how
-# the WIDE build rendered Donovan with vanilla art). So the canary romset
-# now lives in its OWN directory and the shippable overlay ($WIDE_ROMPATH)
-# is zero-filled; this section reads CANARY_ROMPATH, never the shippable set.
-CANARY_ROMPATH="${CANARY_ROMPATH:-$REPO/build/wide_canary/rompath}"
-if python3 - "$CANARY_ROMPATH" <<'PYEOF'
-import sys, zipfile, hashlib, os
-z = zipfile.ZipFile(os.path.join(sys.argv[1], "vsavjw.zip"))
-p = zipfile.ZipFile(os.path.join(os.environ["ROMDIR"], "vsav.zip"))
-ok = all(hashlib.sha1(z.read(c)).digest() == hashlib.sha1(p.read(b)).digest()
-         for c, b in zip(("vsw.31m", "vsw.33m", "vsw.35m", "vsw.37m"),
-                         ("vm3.14m", "vm3.16m", "vm3.18m", "vm3.20m"))
-         if c in z.namelist())
-sys.exit(0 if ok and "vsw.31m" in z.namelist() else 1)
-PYEOF
-then
+# ── 3. B4 canary (the canary romset's shape is checked above, before the runs) ──
+if [ "$SEC3" = 1 ]; then
     echo "== 3. B4 canary: sprites served from the appended gfx banks =="
     for rp in $CORPUS; do
-        go "cs_$rp" "$WIDE_BIN" vsavj  "$ROMDIR" "$rp"
-        go "cw_$rp" "$WIDE_BIN" vsavjw "$CANARY_ROMPATH;$ROMDIR" "$rp" canary
         both "cs_$rp" "cw_$rp" "$rp identical with sprites fetched from banks 4/5" \
              "$rp — the appended banks do not render correctly"
     done

@@ -1,0 +1,19 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_marionette_cost.sh	91d76e680469b208bf08d90bcc31d4bfb5e018cb
+build/agent209/t302/usage_comment.diff	13ccb460f968c974934d921342dc3c462f651a42
+tests/expected/marionette_cost.tsv	199df58296b70eb098d0f244b5111bd7697f431a
+build/agent209/t302/marionette_cost.tsv.candidate	df2867b2c0de2630fbcd6c3c4526f286ff7eac2f
+build/agent209/t302/rowdiff.txt	443bf277e223577bb3b4645ecc56f55e62d8d8d1
+build/agent209/t302/p302.sh	0fe434f6033dc685014a7bf29591f9665258ce12
+build/agent209/t302/pilot/head_full.txt	7be8bb139393e85c41ddecf5b240331f28a0c6c6
+build/agent209/t302/pilot/head_minus.txt	7be8bb139393e85c41ddecf5b240331f28a0c6c6
+build/agent209/t302/basis_logs_2aacebe8.txt	933f6f9420194edadc66657de44da519906df8e0
+build/agent209/t302/pilot/full.log	8681cfa0165dd96b5b5fafdc42ecb821fe7caffa
+build/agent209/t302/pilot/minus.log	3b32fa6da1077036f6b28c50c0cdfd4ccb13e633
+build/agent209/t302/pilot/minus_basis_logs.txt	ffb80d10ea87ad586c0387d9ff901a9861076dd9
+build/agent209/t302/pilot/freeze.log	1a4bdea7f27ed60574b277903c43ecdfe9dd5cd2
+build/agent209/t302/pilot/verify.log	cb76849e4059fa926ea8394a3c85f5f516298a47
+build/agent209/t302/pilot/summary.txt	eff26578c1a1aa22847333a5b7fad97369a87148
+build/agent209/t302/commit_7c757b12.txt	96bf061613551dc1c22819406f91acd18969f859
+build/agent209/t302/expectation_history.txt	323cf818e127f831c4ab465ff0e98dc0ccebf05d
+build/agent209/t302/issue302.md	d50ae5d8b7228e68af63172883ed384b6551e1e5

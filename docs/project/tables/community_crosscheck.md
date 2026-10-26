@@ -432,7 +432,7 @@ Lei-Lei fewer~~ — Morrigan lands 4 (ES 8), Bulleta 6 (ES 12), Lei-Lei 4 (ES 8)
 counts. **Not covered:** the ES pursuits' extra hits compared as records, the hit counts
 on other victims, the active-column exceptions, what the startup offset counts, FBNeo.
 
-## The ground throws (14z-195, #229)
+## The normal throws, ground and air (14z-195; air 14z-208c, classified 14z-209, #229)
 
 Measured on vsavj on PILOT; the gate is `tests/audit_ground_throws.sh` (its frozen hashes
 `tests/expected/ground_throws.tsv`, the figures outside the tree since #319; the rigs `tools/ground_throw_rigs.py`). **Scope**: the
@@ -466,6 +466,109 @@ Demitri's and Gallon's K throws. The multi-hit throws' single white cell (VI 4, 
 FE `2+2`) does not decompose into our per-hit whites (2, 2, 2, 1) and is left UNCOMPARABLE.
 **Not covered:** Graviton Knuckle, mashed hit counts, throw techs, other victims, the
 characters picked by the cursor (they are forced by poke), FBNeo.
+
+### The air throws (14z-208c, classified 14z-209)
+
+Since 14z-208c the same gate measures the workbook's 14 air-throw rows, moved here from the command throws (the
+maintainer: *"Remove all, Victor too, but add them to the normal throws!"*, 2026-10-25): one `gt_XX_air` rig per
+character, toward+MP and toward+HP after a jump (28 events), Victor's with the two jumps converging. **Identity** as
+above: every air throw HOLDS from its press frame and not before, and its records lie in the thrower's own table and
+land. Classified by `tools/crosscheck_229.py gt-air` over a kept run of the gate; `gt-ground` re-derives the ground
+rows above the same way and reproduces their verdicts (22 rows: startup, gauge, red and white as stated).
+
+| column | verdict over the 14 |
+|---|---|
+| gauge | **EXACT** on all 14 |
+| red | **EXACT** on all 14 |
+| white | **EXACT** on 13 of 14 — Morrigan's row writes the same figure in its white cell as in its red, where ours stages a white part of that total |
+| startup | **CONSTANT OFFSET**: sheet = ours +1 on all 14, as on the ground |
+| recovery, throw tech | not measured |
+
+## The specials, LE LI MO QB SA VI ZA (14z-205, classified 14z-209, #229)
+
+Measured on vsavj; the gate is `tests/audit_vanilla_specials_b.sh` (its frozen identity map
+`tests/expected/vanilla_specials_b.tsv`, its timing as a hash, `tests/expected/vanilla_specials_b_ticks.sha256`;
+the rigs `tools/specials_b_rigs.py`). **Scope**: the workbook's 80 motion-special, special-projectile and
+movement-special rows of the seven characters, every one FIRED (the chain it entered is the join). **Identity**: the
+maintainer read F2's capture sheets (9 tiles per move): *"they do but for F4"* (Q1, `DECISIONS_HISTORY.md`).
+**Timing** is in exact engine passes from a `-debug` tap leg (each sample tagged with its pass, `passeq`); the 17 rows
+whose whiff event touched P2 are CONTACT, their timing reported and not classified. Red / white / gauge are the first
+active record's (the page's rule). Classified by `tools/crosscheck_229.py sb` over a kept run of the gate.
+
+| column | verdict over the joined rows (sheet - ours) |
+|---|---|
+| startup | **INCONSISTENT**: +1 on 46 of 62 (spread -16..+4); CONSTANT OFFSET +1 for LE and VI, the other five INCONSISTENT; 18 uncomparable (CONTACT, prose) |
+| active | **INCONSISTENT**: +0 on 31 of 56 (spread -94..+1); EXACT for MO, SA, VI, CONSTANT OFFSET +1 for ZA, INCONSISTENT LE LI QB; 24 uncomparable |
+| recovery | **INCONSISTENT**: +2 on 17 of 32 (spread -4..+3); EXACT MO, CONSTANT OFFSET LI +1 and QB +2, INCONSISTENT LE SA VI, ZA no data; 48 uncomparable (mostly prose) |
+| red / white | **INCONSISTENT** but near: red +0 on 75 of 79 (the residue: Lei-Lei's LP Henkyouki and Victor's three Giga Stakes), white +0 on 76 of 79 (Lei-Lei's LP Henkyouki and Victor's LP and MP Giga Stakes) |
+| gauge whiff / gauge hit | **INCONSISTENT** but near: whiff +0 on 59 of 63 (Q-Bee's two MK SXP, Sasquatch's HK Big Typhoon and Lvl 2 Big Blow), hit +0 on 73 of 79 (LE LP Henkyouki, SA Lvl 2/3 Big Blow, VI's three Giga Stakes) |
+
+## The ES specials and EX supers (14z-205, classified 14z-209, #229)
+
+Measured on vsavj; the gate is `tests/audit_es_ex.sh` (its frozen identity map and record hashes
+`tests/expected/es_ex.tsv`; the rigs `tools/es_ex_rigs.py`). **Scope**: the workbook's 111 ES/EX rows: 98 joined
+to an event that FIRED (each named by the chain it entered and the stock it spent, never by the
+input; a workbook input the engine reads differently joins under the engine's, Q4); 12 rows on 10 inputs are
+UNRESOLVED and named with the reason in `tools/es_ex_rigs.py` UNRESOLVED (every timing tried enters a normal or pays
+nothing on vsavj: BI 22PP / 236PP / 623PP, DE 623KK, FE 22PP and 236PP~PP, LE Tenraiha, QB SXP and air SXP, SA 720KK);
+Demitri's ES Demon Cradle GC is a guard cancel (the next family). **Identity**: the maintainer read F3's sheets
+(Q1), and Jedah's re-rigged ES row is ES Ira Spinta, ES Ira Piano being `J.63214KK~PP` (*"both are correct"*,
+2026-10-21). **Timing** in engine ticks from the field leg's pass counter, from the move's entry; a projectile or a
+move with no attack node on P1 is uncomparable. Classified by `tools/crosscheck_229.py es`.
+
+| column | verdict over the joined rows (sheet - ours) |
+|---|---|
+| startup | **INCONSISTENT**: +1 on 30 of 44 (spread +0..+3) — close to the page's +1 for normals; 66 uncomparable (projectiles, no attack node on P1, unresolved) |
+| active | **INCONSISTENT**: +0 on 5 of 43 (spread -200..+13) — unresolved: ours counts attack-node ticks, the sheet's cell is not that for most supers |
+| recovery | **INCONSISTENT**: +1 on 5 of 20 (spread -63..+3); 90 uncomparable (mostly prose) |
+| red / white (first hit) | **INCONSISTENT** but near: red +0 on 75 of 87, white +0 on 76 of 87; the residue of the two sits on a few moves (Lilith's Gloomy Puppet rows, Aulbath's Sea Rage, Bulleta's Cool Hunting Hunters, Gallon's ES Beast Cannons, Jedah's ES Dio Sega, Lilith's ES Merry Turn, Anakaris's ES Cobra Blow and Pharaoh Magic, Bishamon's [4]6KK) |
+| gauge hit | **INCONSISTENT** but near: +0 on 97 of 98 (Lei-Lei's Chuukadan the one) |
+
+## The command throws and grabs (14z-205, re-rigged 14z-208c, classified 14z-209, #229)
+
+Measured on vsavj; the gate is `tests/audit_command_throws.sh` (identity in the clear and a signature hash per event
+in `tests/expected/command_throws.tsv`, the full lines outside the tree; the rigs `tools/command_throw_rigs.py`).
+**Scope**: the workbook's 54 command-throw and grab rows, plus Victor's Mega Spike, which the workbook does not list
+(the maintainer supplied it); the air throws left this family for the normal throws (*"Remove all, Victor too, but add
+them to the normal throws!"*, 2026-10-25). 53 rows GRAB (P2 held, `+0x134`); Bishamon's 360+LP never does — LP
+Kirisute Gomen holds nothing on vsavj, as the confirmed sheet shows. **Identity**: the maintainer confirmed every row
+on 18-tile sheets after the re-rig (*"all good"*, 2026-10-25). **Damage** is each landed record's power class (#241),
+compared as the whole HIT SERIES against the sheet's cell (`4+4+19`, `5x(1~4)+16`: a ranged count must contain the
+unmashed count); **gauge** is P1's meter at the event's end from 0; **startup** is press-to-hold. Classified by
+`tools/crosscheck_229.py ct`.
+
+| column | verdict over the 53 grabbing rows |
+|---|---|
+| red (hit series) | **EXACT** on 44, **IN RANGE** on 6 (a mashed count inside the sheet's range), **INCONSISTENT** on 3: Demitri's Negative Stolen and Midnight Pleasure, Q-Bee's O.M. |
+| white (hit series) | **EXACT** on 47, **IN RANGE** on 5, **INCONSISTENT** on 1: Anakaris's ES Mummy Drop |
+| gauge | **EXACT** on 47, **INCONSISTENT** on 5 (Anakaris's Pit of Blame and ES Pit of Blame, Gallon's Wild Circular, Morrigan's Cryptic Needle, Victor's Giga Shock), **UNCOMPARABLE** on 1 (Midnight Pleasure: its input's own normals land first) |
+| startup (press to hold) | **INCONSISTENT**: +1 on 19 of 53 (spread -44..+8); CONSTANT OFFSET +1 for BU FE GA LE SA VI ZA (the ground throws' offset), +8 for LI, INCONSISTENT for AN AU BI DE JE MO QB — what the sheet counts for a motion grab is open |
+| recovery, throw tech | not measured |
+
+## The guard cancels (14z-205, classified 14z-209 on the Q5/Q6 basis, #229)
+
+Measured on vsavj; the gate is `tests/audit_guard_cancels.sh` (its 271-event table as a hash,
+`tests/expected/guard_cancels.sha256`, the table outside the tree; the rigs `tools/gc_rigs.py`). **Scope**: the
+workbook's 42 guard-cancel rows on the 14 characters that have one (Demitri has none), joined by their 623+button set:
+53 buttons commit the game's own guard cancel (P1's `+0x3B5` := 6 by `PRG:0x029C6E`). **Identity**: the maintainer
+read F5's sheets (Q1); Bulleta's guard cancel has no attack (*"this is indeed her correct GC"*). **Timing** is the
+HIT's, the gc event's (Q6, *"(b) Keep the hit timing as the record. -> yes"*), in engine ticks; Bulleta's (no attack)
+and Lei-Lei's (her hits come from another object) are uncomparable. **Damage** is what is DEALT on a defense-row -3
+victim (Q5): Gallon, Zabel on Gallon's own rows, the first fall of P2's HP. **Gauge**: the whiff event's own gain, and
+the hit cell as the page's 2b rule (the swing plus the record). Classified by `tools/crosscheck_229.py gc`.
+
+| column | verdict over the joined events (sheet - ours) |
+|---|---|
+| startup | **INCONSISTENT**: +1 on 41 of 45 (spread +0..+1) — CONSTANT OFFSET +1 for 11 characters (the page's convention), EXACT for Aulbath, Bulleta and Lei-Lei no data |
+| active | **INCONSISTENT**: +0 on 28 of 45 (spread -12..+21); EXACT for AN BI JE MO QB SA VI, CONSTANT OFFSET +2 for FE, INCONSISTENT AU GA LI ZA |
+| recovery | **INCONSISTENT**: +3 on 15 of 45 (spread -23..+23); a CONSTANT OFFSET for 8 characters but not one value (+2 FE QB SA, +3 AN BI LI, +5 MO, -4 VI), INCONSISTENT AU GA JE ZA |
+| red / white (dealt, -3 victim) | **INCONSISTENT** but near: red +0 on 48 of 49 (Gallon's ES Diagonal Beast Cannon GC reads the sheet one above), white +0 on 48 of 49 (Q-Bee's ES R.M. one below); Bulleta's three deal nothing |
+| gauge whiff | **INCONSISTENT** but near: +0 on 46 of 47 (Sasquatch's HK Big Typhoon GC the one) |
+| gauge hit | **EXACT** on all 45 |
+
+**Not covered (the four families):** FBNeo; victims other than the rigs'; the characters as picked by the cursor (they
+are forced by poke);
+per-move values, which stay outside the tree (`../charpages/framedata/crosscheck_229/`, `--pairs`).
 
 ## What is NOT known
 

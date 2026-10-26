@@ -5,12 +5,15 @@
 # WHAT: tests/run_all_emulator.sh's verdicts mean what they say: PASS / FAIL / SKIP counted
 #   apart, SKIP-in-prose read as PASS, a non-executable registry row MISSING, a timeout
 #   TIMEOUT, the anti-orphan check both ways, --strict, the prereq stop, --scope,
-#   placeholder expansion, the exported MAME_BIN, the controls reader, and a --dry-run
-#   writing no commit of record (#219).
+#   placeholder expansion, the exported MAME_BIN, the controls reader, a --dry-run
+#   writing no commit of record (#219), and since 14z-209 (#321, #323, #305): a red prereq gate followed by a green one
+#   still STOPS, the fbneo and mame lanes share one pool, --skip leaves a host-covered gate out by name, and a cold
+#   decrypt cache is built before the tier.
 # HOW: a synthetic repository of stub gates with KNOWN verdicts is driven through the REAL
 #   runner by symlink (never a copy of its logic), with stub tools so the runner's own
-#   preconditions run; four controls run copies of the runner with a piece removed (the
-#   export, the reader, an executable row, the --dry-run guard).
+#   preconditions run; the controls run copies of the runner (and, for #323, of the two readers) with a piece removed
+#   or restored (the export, the reader, an executable row, the --dry-run guard, the lane loop's own name, the decrypt
+#   warm-up).
 # EXPECTS: every case reads the verdict it was built to produce and each control's section
 #   fails on its copy; a red names the case — a wrong reading here would turn the release
 #   policy into a rubber stamp.
@@ -22,6 +25,8 @@
 # MUST-FIRE: shadow-tool: instrument-run — a copy whose selection keeps `instrument:` rows must run one under --scope ondemand (mode: that copy is the runner every section drives; section 6a must fail; 14z-199, #265)
 # MUST-FIRE: shadow-tool: dry-run-records — a copy of the runner without the --dry-run guard on commit.txt must write a run of record on a dry run (mode: that copy is the runner every section drives; section 15's dry-run case must fail)
 # MUST-FIRE: shadow-tool: empty-green — a copy of the runner without the empty-selection guard must print GREEN and write a run directory for a selection that matches no gate (mode: that copy is the runner every section drives; section 15's empty-selection case must fail)
+# MUST-FIRE: shadow-tool: lane-var-shared — copies of the runner and of tests/lib/controls.sh and measures.sh with the lane loop variable and the readers' log variable all named `_l` again (the #323 shape) must let a red prereq gate followed by a green one run on past the prereq lane (mode: those copies are what every section drives; section 5b must fail; 14z-209)
+# MUST-FIRE: shadow-tool: decrypt-warm-off — a copy of the runner whose DECRYPT-WARM call is disabled must leave a gate that reads build/out directly on a cold cache, and section 17 must FAIL (mode: that copy is the runner every section drives; #305, 14z-209)
 # MUST-FIRE: perturbed-copy: row-not-executable — a farm of symlinks to the REAL scripts named by the REAL tests/ci_emulator.tsv, with ONE replaced by a non-executable copy, must make section 10b report it unrunnable (mode: that farm is what 10b checks; section 10b must fail)
 #
 # WHY A GATE FOR THE RUNNER, again. CLAUDE.md §4: "Verdict logic is itself
@@ -52,7 +57,8 @@
 #   UNREGISTERED / DEAD ROW      the anti-orphan check, both directions
 #   --strict                     SKIP and an unregistered gate become failures
 #   prereq stop                  a red instrument gate STOPS the run ([CPE-24]);
-#                                the mame lane must not have run
+#                                the mame lane must not have run — and (5b, #323) a green
+#                                prereq gate AFTER the red one must not un-stop it
 #   --scope release              `out` rows are excluded; --scope all includes
 #   %PLACEHOLDER% expansion      the build set reaches the gate's argv
 set -eu
@@ -93,7 +99,16 @@ chmod +x "$T/runner_instrumentrun.sh"
 # the control classifier's gate-script argument removed (14z-196, #254)
 sed 's|vs_classify_control "$_cs" "$_clog" "tests/$_g.sh" "$_cn"|vs_classify_control "$_cs" "$_clog" "" "$_cn"|' "$RUNNER" > "$T/runner_crashunread.sh"
 cmp -s "$RUNNER" "$T/runner_crashunread.sh" && fail "could not unplug the crash reader — the vs_classify_control call moved"
-chmod +x "$T/runner_noexport.sh" "$T/runner_unplugged.sh" "$T/runner_dryrecords.sh" "$T/runner_emptygreen.sh" "$T/runner_crashunread.sh"
+# #323 restored (14z-209): the lane loop variable named `_l` again, and the two readers' log variable `_l` again
+sed 's/_lane_pool/_l/g' "$RUNNER" > "$T/runner_lanevar.sh"
+cmp -s "$RUNNER" "$T/runner_lanevar.sh" && fail "could not restore the shared name — the lane loop variable moved"
+sed 's/_vcr_l\([=";]\)/_l\1/g' "$REPO/tests/lib/controls.sh" > "$T/controls_lanevar.sh"   # a no-op on readers that still say _l
+sed 's/_vmr_l\([=";]\)/_l\1/g' "$REPO/tests/lib/measures.sh" > "$T/measures_lanevar.sh"
+grep -q '_l="\$2"' "$T/controls_lanevar.sh" || fail "could not restore the shared name in the controls reader — its _vcr_l moved"
+# the decrypt warm-up call disabled (#305, 14z-209)
+sed 's@    decrypt_cache_warm "$LOGDIR/decrypt_warm.err" || :   # DECRYPT-WARM@    :   # DECRYPT-WARM disabled@' "$RUNNER" > "$T/runner_warmoff.sh"
+cmp -s "$RUNNER" "$T/runner_warmoff.sh" && fail "could not disable the decrypt warm-up — the DECRYPT-WARM line moved"
+chmod +x "$T/runner_noexport.sh" "$T/runner_unplugged.sh" "$T/runner_dryrecords.sh" "$T/runner_emptygreen.sh" "$T/runner_crashunread.sh" "$T/runner_lanevar.sh" "$T/runner_warmoff.sh"
 case "$VS_CTL" in
 empty-green)      ln -s "$T/runner_emptygreen.sh" "$FR/tests/run_all_emulator.sh" ;;
 export-removed)   ln -s "$T/runner_noexport.sh" "$FR/tests/run_all_emulator.sh" ;;
@@ -102,13 +117,17 @@ dry-run-records)  ln -s "$T/runner_dryrecords.sh" "$FR/tests/run_all_emulator.sh
 crash-unread)     ln -s "$T/runner_crashunread.sh" "$FR/tests/run_all_emulator.sh" ;;
 ondemand-in-all)  ln -s "$T/runner_ondemandinall.sh" "$FR/tests/run_all_emulator.sh" ;;
 instrument-run)   ln -s "$T/runner_instrumentrun.sh" "$FR/tests/run_all_emulator.sh" ;;
+lane-var-shared)  ln -s "$T/runner_lanevar.sh" "$FR/tests/run_all_emulator.sh" ;;
+decrypt-warm-off) ln -s "$T/runner_warmoff.sh" "$FR/tests/run_all_emulator.sh" ;;
 *)                ln -s "$RUNNER" "$FR/tests/run_all_emulator.sh" ;;
 esac
 # the runner sources THE ONE classifier relative to its repo (14z-139), so
 # the synthetic repo carries it too — the shipped lib, never a copy
 mkdir -p "$FR/tests/lib"; ln -s "$REPO/tests/lib/classify.sh" "$FR/tests/lib/classify.sh"
-ln -s "$REPO/tests/lib/controls.sh" "$FR/tests/lib/controls.sh"   # the controls reader beside it (14z-147)
-ln -s "$REPO/tests/lib/measures.sh" "$FR/tests/lib/measures.sh"   # the measurement reader too (14z-180): the runner must survive a gate that declares nothing
+CTLLIB="$REPO/tests/lib/controls.sh"; MEASLIB="$REPO/tests/lib/measures.sh"
+if vs_ctl_is lane-var-shared; then CTLLIB="$T/controls_lanevar.sh"; MEASLIB="$T/measures_lanevar.sh"; fi
+ln -s "$CTLLIB" "$FR/tests/lib/controls.sh"   # the controls reader beside it (14z-147)
+ln -s "$MEASLIB" "$FR/tests/lib/measures.sh"   # the measurement reader too (14z-180): the runner must survive a gate that declares nothing
 
 # Stub tools so the runner's preconditions execute for real.
 printf '#!/usr/bin/env python3\nimport sys\n' > "$FR/tools/audit_roms.py"
@@ -251,6 +270,32 @@ printf '%s\n' "$out7" | grep -q "== mame lane" \
     && ok "--keep-going runs the later lanes anyway" \
     || fail "--keep-going did not continue past the prereq lane"
 
+echo "5b. a red prereq gate FOLLOWED by a green one still STOPS the run (#323, 14z-209)"
+# The prereq lane is serial, so run_one runs in the runner's own shell, and the readers vs_classify calls on a PASS
+# assigned `_l` — the runner's lane loop variable — so the STOP check after a green prereq gate read a log path, not
+# "prereq". The 14z-208b freeze ran past test_mame_parity's PARTIAL that way (fork A's repro, build/agent209/t321/).
+s5b() {  # s5b <runner script name in the fakerepo> <log> -> S5B ok|bad
+    reg "$(row g_prereq_bad prereq release - '')" "$(row g_prereq prereq release - '')" "$(row g_pass mame release - '')"
+    _o="$( (cd "$FR" && ROMDIR="$T/roms" MERGED=build/fake_merged sh "tests/$1" --log "$2" 2>&1) || true)"
+    S5B=ok
+    printf '%s\n' "$_o" | grep -q "STOP: the prereq lane is not green" || S5B=bad
+    awk -F'\t' 'NR>1 && $1=="g_pass"' "$2/results.tsv" 2>/dev/null | grep -q . && S5B=bad
+    awk -F'\t' 'NR>1 && $1=="g_prereq" && $4=="PASS"' "$2/results.tsv" 2>/dev/null | grep -q . || S5B=bad   # the green one RAN
+}
+s5b run_all_emulator.sh "$T/l7b"
+[ "$S5B" = ok ] && ok "a red prereq gate then a green one: the run STOPS after the prereq lane and the mame lane never runs" \
+                || fail "section 5b: a green prereq gate after a red one un-stopped the run (#323)"
+if ! vs_ctl_is lane-var-shared; then
+    ln -s "$T/runner_lanevar.sh" "$FR/tests/run_all_emulator_lanevar.sh"
+    rm -f "$FR/tests/lib/controls.sh" "$FR/tests/lib/measures.sh"
+    ln -s "$T/controls_lanevar.sh" "$FR/tests/lib/controls.sh"; ln -s "$T/measures_lanevar.sh" "$FR/tests/lib/measures.sh"
+    s5b run_all_emulator_lanevar.sh "$T/l7c"
+    rm -f "$FR/tests/run_all_emulator_lanevar.sh" "$FR/tests/lib/controls.sh" "$FR/tests/lib/measures.sh"
+    ln -s "$CTLLIB" "$FR/tests/lib/controls.sh"; ln -s "$MEASLIB" "$FR/tests/lib/measures.sh"
+    [ "$S5B" = bad ] && vs_ctl_fired lane-var-shared "with the lane loop and the readers sharing \`_l\` again, the green prereq gate un-stopped the run and the mame lane ran" \
+        || { vs_ctl_dead lane-var-shared "the copies sharing \`_l\` still stopped the run"; fail "lane-var-shared"; }
+fi
+
 echo "6. --scope all includes the out-of-release-scope rows"
 reg "$(row g_pass mame release - '')" "$(row g_out mame out - 'momentary: a stub')"
 out8="$(run --scope all --log "$T/l8" || true)"
@@ -338,25 +383,39 @@ else
     fail "a repeated --lane ran the lane more than once"
 fi
 
-echo "9. a lane WAITS for its own gates (--jobs > 1)"
+echo "9. a pool WAITS for its own gates (--jobs > 1); the fbneo and mame lanes are ONE pool (#321, 14z-209)"
 # The pipeline version announced the next lane while the previous lane's last
-# partial batch was still running, orphaning gates across the boundary.
+# partial batch was still running, orphaning gates across the boundary. Since 14z-209 the fbneo and mame lanes share
+# one pool, so the boundary that must hold is the pool's: here a slow mame gate against the mister lane after it.
 { echo '#!/bin/sh'; echo ': "${MAME_BIN:-}"'; echo 'sleep 3'; echo 'echo slow-done'; } \
     > "$FR/tests/g_slow3.sh"; chmod +x "$FR/tests/g_slow3.sh"
-reg "$(row g_slow3 fbneo release - '')" "$(row g_pass mame release - '')"
-out12="$(run --jobs 4 --log "$T/l12" || true)"
-# the slow fbneo gate's verdict line must appear BEFORE the mame lane heading
+reg "$(row g_slow3 mame release - '')" "$(row g_pass mister release - '')"
+out12="$(run --lane mame --lane mister --jobs 4 --log "$T/l12" || true)"
+# the slow mame gate's verdict line must appear BEFORE the mister lane heading
 slow_line="$(printf '%s\n' "$out12" | grep -n 'g_slow3 ' | head -1 | cut -d: -f1)"
-mame_line="$(printf '%s\n' "$out12" | grep -n '== mame lane' | head -1 | cut -d: -f1)"
-if [ -n "$slow_line" ] && [ -n "$mame_line" ] && [ "$slow_line" -lt "$mame_line" ]; then
-    ok "a lane's gates finish before the next lane is announced"
+mist_line="$(printf '%s\n' "$out12" | grep -n '== mister lane' | head -1 | cut -d: -f1)"
+if [ -n "$slow_line" ] && [ -n "$mist_line" ] && [ "$slow_line" -lt "$mist_line" ]; then
+    ok "a pool's gates finish before the next lane is announced"
 else
-    fail "lane boundary crossed: g_slow3 at line ${slow_line:-none}, mame lane at ${mame_line:-none}"
+    fail "pool boundary crossed: g_slow3 at line ${slow_line:-none}, mister lane at ${mist_line:-none}"
 fi
-if awk -F'\t' 'NR>1 && $1=="g_slow3" && $2=="fbneo"' "$T/l12/results.tsv" | grep -q .; then
-    ok "its result is recorded under its OWN lane"
+# ONE POOL: the slow fbneo gate is queued first, and the mame gate beside it finishes before it — which only a shared
+# pool allows (lane by lane, the mame lane would not start until g_slow3 had ended)
+reg "$(row g_slow3 fbneo release - '')" "$(row g_pass mame release - '')"
+out12b="$(run --jobs 4 --log "$T/l12b" || true)"
+slow_b="$(printf '%s\n' "$out12b" | grep -n 'g_slow3 ' | head -1 | cut -d: -f1)"
+pass_b="$(printf '%s\n' "$out12b" | grep -n 'g_pass ' | head -1 | cut -d: -f1)"
+if [ -n "$slow_b" ] && [ -n "$pass_b" ] && [ "$pass_b" -lt "$slow_b" ] \
+        && printf '%s\n' "$out12b" | grep -q '== fbneo lane (1 gates; one pool of 2 with the mame lane'; then
+    ok "the fbneo and mame lanes ran as one pool: g_pass (mame) finished while g_slow3 (fbneo, queued first) still ran"
 else
-    fail "g_slow3's result is missing or filed under the wrong lane"
+    fail "the fbneo and mame lanes did not share a pool: g_slow3 at line ${slow_b:-none}, g_pass at ${pass_b:-none}"
+fi
+if awk -F'\t' 'NR>1 && $1=="g_slow3" && $2=="fbneo"' "$T/l12b/results.tsv" | grep -q . \
+        && awk -F'\t' 'NR>1 && $1=="g_pass" && $2=="mame"' "$T/l12b/results.tsv" | grep -q .; then
+    ok "each result is recorded under its OWN lane"
+else
+    fail "a pooled result is missing or filed under the wrong lane"
 fi
 
 echo "10. the shipped registry is complete both ways"
@@ -684,6 +743,57 @@ printf '%s' "$out15i" | grep -q '^GREEN' && [ -f "$T/l15i/commit.txt" ] \
     || { vs_ctl_dead empty-green "the unguarded copy did not print GREEN with a run of record"; fail "empty-green"; }
 rm -f "$FR/tests/run_all_emulator_emptygreen.sh"
 rm -rf "$FR/.git" "$FR/tools/audit_emulator_staleness.py"
+
+echo "16. --skip leaves a host-covered gate OUT, by name, with no row (#321, maintainer-ruled 2026-10-26 \"Parity only on the Mac\")"
+# ERIS has no reference MAME for test_mame_parity's A/B section, so the gate is PARTIAL there, a red prereq row — and
+# with #323 fixed that STOPS the tier. The ERIS tier passes --skip test_mame_parity; the Mac's run is the row of record.
+reg "$(row g_prereq_bad prereq release - '')" "$(row g_prereq prereq release - '')" "$(row g_pass mame release - '')"
+out16="$(run --skip 'g_prereq_b*' --log "$T/l16" || true)"
+if ! printf '%s\n' "$out16" | grep -q "STOP:" && awk -F'\t' 'NR>1 && $1=="g_pass" && $4=="PASS"' "$T/l16/results.tsv" | grep -q . \
+        && ! awk -F'\t' 'NR>1 && $1=="g_prereq_bad"' "$T/l16/results.tsv" | grep -q . \
+        && printf '%s\n' "$out16" | grep -q "NOT HERE   --skip 'g_prereq_b\*': g_prereq_bad" \
+        && printf '%s\n' "$out16" | grep -q "^not here  (--skip): g_prereq_bad"; then
+    ok "--skip 'g_prereq_b*' left g_prereq_bad out (no row, no STOP), named it in the header and the readout, and ran the rest"
+else
+    fail "--skip: $(printf '%s\n' "$out16" | grep -E 'NOT HERE|STOP|not here' | head -3 | tr '\n' ' ')"
+fi
+out16b="$(run --log "$T/l16b" || true)"
+printf '%s\n' "$out16b" | grep -q "STOP: the prereq lane is not green" && ! printf '%s\n' "$out16b" | grep -q "NOT HERE" \
+    && ok "without --skip the same registry STOPS on the red prereq gate and names nothing as skipped" \
+    || fail "without --skip: $(printf '%s\n' "$out16b" | grep -E 'NOT HERE|STOP' | head -2 | tr '\n' ' ')"
+
+echo "17. a cold decrypt cache is built BEFORE the tier (#305, 14z-209)"
+# 15 release-scope emulator gates read build/out/<set>_*.bin directly; with the cache cold two SKIPped (ERIS, fork A).
+# Here a stub reads build/out directly, the cache starts cold, a stub decrypt tool writes full-length images, and the
+# ROMDIR holds vsavj and vsav2 but not vhunt2, which must not be attempted.
+RV="$T/roms_dv"; mkdir -p "$RV"; : > "$RV/vsavj.zip"; : > "$RV/vsav2.zip"
+ln -s "$REPO/tests/lib/decrypt_cache.sh" "$FR/tests/lib/decrypt_cache.sh"
+cat > "$FR/tools/cps2_decrypt.py" <<'PY'
+import sys                            # a stub decrypt: <zip> <op> --data-out <dat>, full-length images
+open(sys.argv[2], "wb").write(b"\x00" * 4194304); open(sys.argv[4], "wb").write(b"\x01" * 4194304)
+PY
+{ echo '#!/bin/sh'; echo ': "${MAME_BIN:-}"'
+  echo '[ "$(wc -c < build/out/vsavj_data.bin 2>/dev/null | tr -d " ")" = 4194304 ] && echo "PASS: views" || { echo "SKIP: no build/out/vsavj_data.bin"; exit 0; }'; } \
+    > "$FR/tests/g_views.sh"; chmod +x "$FR/tests/g_views.sh"
+reg "$(row g_views mame release - '')"
+s17() {  # s17 <runner script name> <log> -> S17 ok|bad
+    rm -rf "$FR/build/out"
+    _o="$( (cd "$FR" && ROMDIR="$RV" MERGED=build/fake_merged sh "tests/$1" --lane mame --strict --log "$2" 2>&1) || true)"
+    S17=ok
+    awk -F'\t' 'NR>1 && $1=="g_views" && $4=="PASS"' "$2/results.tsv" 2>/dev/null | grep -q . || S17=bad
+    printf '%s\n' "$_o" | grep -q '^== decrypt views built before the tier: vsavj vsav2 (' || S17=bad
+}
+s17 run_all_emulator.sh "$T/l17"
+[ "$S17" = ok ] && ok "from a cold cache the runner built vsavj and vsav2 (not vhunt2, absent) before the tier, and the direct reader PASSed" \
+                || fail "section 17: a gate reading build/out directly met a cold cache (#305)"
+if ! vs_ctl_is decrypt-warm-off; then
+    ln -s "$T/runner_warmoff.sh" "$FR/tests/run_all_emulator_warmoff.sh"
+    s17 run_all_emulator_warmoff.sh "$T/l17b"
+    rm -f "$FR/tests/run_all_emulator_warmoff.sh"
+    [ "$S17" = bad ] && vs_ctl_fired decrypt-warm-off "a runner that does not build the views first leaves the direct reader on a cold cache (it SKIPs) — section 17 catches it" \
+        || { vs_ctl_dead decrypt-warm-off "the runner without the warm-up still gave the reader its views"; fail "decrypt-warm-off"; }
+fi
+rm -rf "$FR/build/out" "$FR/tools/cps2_decrypt.py" "$FR/tests/lib/decrypt_cache.sh"
 
 echo
 [ "$rc" = 0 ] && echo "PASS: run_all_emulator.sh classifies every ground-truth case correctly" \

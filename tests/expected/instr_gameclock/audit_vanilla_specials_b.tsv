@@ -1,0 +1,10 @@
+# tests/expected/instr_gameclock/audit_vanilla_specials_b.tsv — the game clock RAM:$FF8080 at each tap leg's last
+# frame (#228 option A), taken from REFERENCE legs (the instrument, no -debug) each held to replay.lua run live.
+# leg<TAB>replay<TAB>frames<TAB>gameclock
+tap	LE_whiff	6170	bd
+tap	LI_whiff	5990	09
+tap	MO_whiff	5270	39
+tap	QB_whiff	5590	79
+tap	SA_whiff	6170	bd
+tap	VI_whiff	6410	ad
+tap	ZA_whiff	6590	61

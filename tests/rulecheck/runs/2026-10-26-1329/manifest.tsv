@@ -1,0 +1,20 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent209/closing/229.md	f77c454be6db657d2c008ea79495b03ba342749a
+build/agent209/closing/229_registry.txt	68db79852e8d97cece7192420540fb8f909537e1
+build/agent209/closing/229_freeze_runs.txt	4e99472506aca5037c75fe9dd7965b208f0e263e
+build/agent209/t229/v10/summary.txt	37b30cee6fb6885340365bc2967feec172a042ed
+build/agent209/t229/v10/vanilla_specials_a.log	5c7044c55821af6a971b3285d1e19cd7b675cc2e
+build/agent209/t229/v10/vanilla_specials_b.log	84d8fdc5f33627c47e719b34b44d7bdbf9052407
+build/agent209/t229/v10/es_ex.log	d534ab6bc0a3891665fb405c3c22b6235b473bee
+build/agent209/t229/v10/command_throws.log	0376f5c9498015061375e98f56de6bd690997e6f
+build/agent209/t229/v10/guard_cancels.log	784159d2aaa37449cbb1b1b2928599db371030ed
+build/agent209/t229/v10/vanilla_pursuits.log	0b55b470b9d8d62ced45c417015fddb11fdd95a6
+docs/project/tables/community_crosscheck.md.lines-398-600 (lines 398-600 of docs/project/tables/community_crosscheck.md)	2fa998536eb3fc525cb74262a0b7272e24c648da
+tests/expected/vanilla_specials_a_verdicts.tsv	02a83e0bcdcd1cb984b50bc516542385f15fca98
+build/agent209/closing/test_crosscheck_229.log	69594a1f7faa6ba56c7135b0a9c476d006674ead
+DECISIONS_HISTORY.md.lines-8286-8295 (lines 8286-8295 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-25 (14z-209) — #229 finishes by classifying every family's columns, then closes")	dfc507c3656487ddb2659f34f1cd111fce57cf97
+DECISIONS_HISTORY.md.lines-8274-8285 (lines 8274-8285 of DECISIONS_HISTORY.md: its INDEX entry "## Read 2026-10-25 (14z-209) — #229 Q1: the maintainer's answer in the questions doc — the sheets of")	38277721e9f1ca49255fe357782865947ee1e6e2
+DECISIONS_HISTORY.md.lines-8341-8352 (lines 8341-8352 of DECISIONS_HISTORY.md: its INDEX entry "## Read 2026-10-26 (14z-209) — #229 F4: the 71 motion-test rows shown at last, and frozen as measure")	a0a6330c044850b72df793b971432159c2af3f5b
+DECISIONS_HISTORY.md.lines-8353-8362 (lines 8353-8362 of DECISIONS_HISTORY.md: its INDEX entry "## Read 2026-10-26 (14z-209) — #229 F4: the moves no answer named, confirmed by the maintainer; the ")	e84eef6e67b5f8e6972436e2ba09e518ab2bdb39
+build/agent209/closing/new_halfcircle.md	85b83ad0a3a6bfd224367ec7765f2ece1b3ab63f
+build/agent209/closing/new_throwcols.md	a8ef18ff79b6b13be75bc33c9a6c798d3a17a5c7

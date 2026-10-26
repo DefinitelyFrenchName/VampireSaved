@@ -1,0 +1,90 @@
+{
+ "char": "0x0c",
+ "sheet": "QB",
+ "part": 1,
+ "victim": "0x03",
+ "gap": 624,
+ "events": [
+  {
+   "row": "LP CATCH AND RELEASE",
+   "label": "41236LP",
+   "meter": false,
+   "frame": 2800,
+   "press": 2818,
+   "end": 3158
+  },
+  {
+   "row": "MP CATCH AND RELEASE",
+   "label": "41236MP",
+   "meter": false,
+   "frame": 3424,
+   "press": 3442,
+   "end": 3782
+  },
+  {
+   "row": "HP CATCH AND RELEASE",
+   "label": "41236HP",
+   "meter": false,
+   "frame": 4048,
+   "press": 4066,
+   "end": 4406
+  },
+  {
+   "row": "ES CATCH AND RELEASE",
+   "label": "41236PP",
+   "meter": true,
+   "frame": 4672,
+   "press": 4690,
+   "end": 5030
+  },
+  {
+   "row": "AIR LP CATCH AND RELEASE",
+   "label": "j.41236LP p2 jumps",
+   "meter": false,
+   "frame": 5296,
+   "press": 5311,
+   "end": 5651
+  },
+  {
+   "row": "AIR MP CATCH AND RELEASE",
+   "label": "j.41236MP p2 jumps",
+   "meter": false,
+   "frame": 5920,
+   "press": 5935,
+   "end": 6275
+  }
+ ],
+ "pokes": [
+  "1400:ff8782:0c",
+  "1450:ff8782:0c",
+  "1500:ff8782:0c",
+  "1400:ff8b82:03",
+  "1450:ff8b82:03",
+  "1500:ff8b82:03",
+  "2570:ff8410:0228",
+  "2570:ff8810:02d8",
+  "2780:ff8850:01200120",
+  "2780:ff8509:000000",
+  "3194:ff8410:0228",
+  "3194:ff8810:02d8",
+  "3404:ff8850:01200120",
+  "3404:ff8509:000000",
+  "3818:ff8410:0228",
+  "3818:ff8810:02d8",
+  "4028:ff8850:01200120",
+  "4028:ff8509:000000",
+  "4442:ff8410:0228",
+  "4442:ff8810:02d8",
+  "4652:ff8850:01200120",
+  "4652:ff8509:090000",
+  "5066:ff8410:0228",
+  "5066:ff8810:02d8",
+  "5276:ff8850:01200120",
+  "5276:ff8509:000000",
+  "5690:ff8410:0228",
+  "5690:ff8810:02d8",
+  "5900:ff8850:01200120",
+  "5900:ff8509:000000"
+ ],
+ "frames": 6694
+}

@@ -19,6 +19,16 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import frame_data  # noqa: E402
+import hitbox_records  # noqa: E402
+
+
+def power_cell(b):
+    """A record's +8 / +9 POWER BYTE as the engine reads it (#244, the #241 decode, hitbox_records.power()): the damage
+    CLASS, then — when bit 5 (nostat) or bit 7 (nokill) is set — the raw byte and those flags named, as the maintainer
+    ruled ("Class + flags"); bit 6 has no engine reader on vsavj and alone shows nothing beyond the class."""
+    p = hitbox_records.power(b)
+    if not (p["nostat"] or p["nokill"]): return f"{p['class']}"
+    return f"{p['class']} (" + " ".join([f"{b:#04x}"] + [k for k in ("nostat", "nokill") if p[k]]) + ")"
 
 
 def h(s):
@@ -173,22 +183,22 @@ def main():
           f"{sm.get('proj_records', 0)} projectile records ({sm.get('proj_differ', 0)} differ, {sm.get('proj_unattributed', 0)} unattributed). "
           f"Encoding: {HB['_encoding']}. Verified by `{HB['_verified_by']}`.")
         w("")
-        w("| idx | addr | box (x, y, hw, hh) | real | white | hit id | str | meter | spc | class | pb hit/blk (+0xC/+0xD) | frz (+0x13) | face (+0xE) | scale (+0x1A) | recov (+0x1B) | +0x1C (DF acc) | ours differs | ours source |")
+        w("| idx | addr | box (x, y, hw, hh) | real power class (+8) | white power class (+9) | hit id | str | meter | spc | class | pb hit/blk (+0xC/+0xD) | frz (+0x13) | face (+0xE) | scale (+0x1A) | recov (+0x1B) | +0x1C (DF acc) | ours differs | ours source |")
         w("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|")
         for rec in HB["attack"]:
             f = rec["fields"]
             if f["box"] == [0, 0, 0, 0] and not f["real"] and not f["cls"] and not rec["ours_diff"]: continue
-            w(f"| {rec['idx']:#x} | `{rec['addr']}` | {tuple(f['box'])} | {f['real']} | {f['white']} | {f['hit_id']} | {f['strength']} | {f['meter']} | {f['special']} | {f['cls']:#04x} | {f.get('pb_hit',0)}/{f.get('pb_blk',0)} | {f.get('freeze',0)} | {f.get('facing',0)} | {f.get('scale',0)} | {f.get('recov',0)} | {f['b1c']:#04x} | {' '.join(rec['ours_diff'])} | {rec['ours_source'] if rec['ours_diff'] else ''} |")
+            w(f"| {rec['idx']:#x} | `{rec['addr']}` | {tuple(f['box'])} | {power_cell(f['real'])} | {power_cell(f['white'])} | {f['hit_id']} | {f['strength']} | {f['meter']} | {f['special']} | {f['cls']:#04x} | {f.get('pb_hit',0)}/{f.get('pb_blk',0)} | {f.get('freeze',0)} | {f.get('facing',0)} | {f.get('scale',0)} | {f.get('recov',0)} | {f['b1c']:#04x} | {' '.join(rec['ours_diff'])} | {rec['ours_source'] if rec['ours_diff'] else ''} |")
         if HB.get("proj"):
             w("")
             w("Projectile records (`hitbox_proj`):")
             w("")
-            w("| idx | addr | box | real | white | hit id | str | meter | spc | class | pb hit/blk (+0xC/+0xD) | frz (+0x13) | face (+0xE) | scale (+0x1A) | recov (+0x1B) | +0x1C (DF acc) | ours differs | ours source |")
+            w("| idx | addr | box | real power class (+8) | white power class (+9) | hit id | str | meter | spc | class | pb hit/blk (+0xC/+0xD) | frz (+0x13) | face (+0xE) | scale (+0x1A) | recov (+0x1B) | +0x1C (DF acc) | ours differs | ours source |")
             w("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|")
             for rec in HB["proj"]:
                 f = rec["fields"]
                 if f["box"] == [0, 0, 0, 0] and not f["real"] and not f["cls"] and not rec["ours_diff"]: continue
-                w(f"| {rec['idx']:#x} | `{rec['addr']}` | {tuple(f['box'])} | {f['real']} | {f['white']} | {f['hit_id']} | {f['strength']} | {f['meter']} | {f['special']} | {f['cls']:#04x} | {f.get('pb_hit',0)}/{f.get('pb_blk',0)} | {f.get('freeze',0)} | {f.get('facing',0)} | {f.get('scale',0)} | {f.get('recov',0)} | {f['b1c']:#04x} | {' '.join(rec['ours_diff'])} | {rec['ours_source'] if rec['ours_diff'] else ''} |")
+                w(f"| {rec['idx']:#x} | `{rec['addr']}` | {tuple(f['box'])} | {power_cell(f['real'])} | {power_cell(f['white'])} | {f['hit_id']} | {f['strength']} | {f['meter']} | {f['special']} | {f['cls']:#04x} | {f.get('pb_hit',0)}/{f.get('pb_blk',0)} | {f.get('freeze',0)} | {f.get('facing',0)} | {f.get('scale',0)} | {f.get('recov',0)} | {f['b1c']:#04x} | {' '.join(rec['ours_diff'])} | {rec['ours_source'] if rec['ours_diff'] else ''} |")
         w("")
     # ---- projectile parameters (phase 3, 14z-121) ----
     PJ = S.get("projectile") or {}

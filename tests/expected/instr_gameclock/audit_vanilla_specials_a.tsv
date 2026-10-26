@@ -1,0 +1,18 @@
+# tests/expected/instr_gameclock/audit_vanilla_specials_a.tsv — the game clock RAM:$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,
+# option A) by `tests/audit_vanilla_specials_a.sh --freeze-clock` at freeze/donovan-m27-254-gb91532d8-dirty: pristine vsavj; one
+# leg per rig (tests/lua/specials_trace.lua); every reference leg held to replay.lua run live.
+# leg<TAB>replay<TAB>frames<TAB>gameclock
+vsavj	FE	7650	85
+vsavj	AN	6390	99
+vsavj	AU	5550	51
+vsavj	BI	8430	91
+vsavj	BI+	7530	0d
+vsavj	BU	8610	45
+vsavj	DE	6450	d5
+vsavj	DE+	6450	d5
+vsavj	GA	7530	0d
+vsavj	JE	4830	81
+vsavj	BI~	5930	cd
+vsavj	DE~	4490	2d
+vsavj	GA~	4490	2d
+vsavj	BI^	4490	2d

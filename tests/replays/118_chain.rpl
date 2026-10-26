@@ -1,5 +1,5 @@
 # 118_chain.rpl — promoted 14z-195 from the #118 pilot's scratch rig (14z-194, build/agent194/t118/rpl/): a leg of
-# tests/audit_mizuumi_inputs.sh and tests/audit_mizuumi_attack.sh (GitHub #118). Original header:
+# tests/audit_mizuumi_attack.sh (GitHub #118; never a leg of tests/audit_mizuumi_inputs.sh). Original header:
 # 118_chain (scratch, 14z-194, #118 group b): 03's lead-in + 4 chains LP LK MP MK HP 6 frames apart after a walk-in
 300-305 sys=C1
 330-335 sys=C2

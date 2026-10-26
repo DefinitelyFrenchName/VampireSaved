@@ -1,0 +1,10 @@
+decision	expectation
+subject	#229: freeze tests/audit_vanilla_specials_b.sh's expectations (the 80-row identity map, the timing hash, the game clocks) on pristine vsavj, for registration
+session	14z-209
+model	rule-checker@163e4ce9cf7b
+claim	CLAIM: tests/expected/vanilla_specials_b.tsv (80 rows: tab, workbook move, input as performed, special chain, first chain, status), tests/expected/vanilla_specials_b_ticks.sha256 (the SHA-256 of the 80-row timing table in engine passes, values outside the tree) and tests/expected/instr_gameclock/audit_vanilla_specials_b.tsv are the expectations of tests/audit_vanilla_specials_b.sh on pristine vsavj and may enter the tree as frozen: the gate's plain run on the Mac at 14z-209, on the script as it is registered, reads PASS with the map and the timing hash equal, the legs at their frozen game clocks and the six declared controls FIRED in-gate (build/agent209/t229/v2/vanilla_specials_b.log); each control as a CONTROL= mode reaches the gate's own FAIL (build/agent205/t229/f2_specials_b/mode_*.log, run 2026-10-20 on the script before the 14z-209 header edit, which is comment-only: build/agent209/t229/asrun/specials_b_header.diff); the identity rests on the maintainer's read of F2's capture sheets (DECISIONS_HISTORY.md 8267-8277) and the frozen map still names each of the 80 sheet events by the chain its sheet showed (build/agent209/t229/sheetmap/cmp_f23.py, cmp_f23.out). NOT TESTED: FBNeo; victims other than an idle Victor; the timing values against the workbook (the community page compares them, nothing here freezes them); a mode run on the header-edited script; any host but the Mac (the modes ran on the Mac too).
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	0 flag(s)

@@ -1,0 +1,38 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_vanilla_pursuits.sh	d65cd564827dfdc53793d9ba9d7167274b3db67e
+tests/lib/pristine_vsavj.sh	cbff6a8400c70620eeb140106f6f2b4cbdad2ef6
+tests/lib/mame_ident.sh	ec9f2a6d7fae4a5668b3d63ec28989e0b11d1ac2
+tests/lib/controls.sh	b3fc50460a4872fda43d468bb834e040a7b97ad5
+tools/run_mame.sh	4aeb916f534e1e9c46be18ad87c6d2b6a56041ec
+tools/run_replay_guarded.sh	fc7b89aac11bbc0ca3ec34e734465768e36a93a3
+tests/lib/instr_align.sh	8e99164b3ae4e6d97c18c7e142d90ab0dac08bb4
+tests/expected/vanilla_pursuits.tsv	6198d06b18a472445d2b7417a6f6b345f30fedb4
+tests/expected/vanilla_pursuit_bands.tsv	7c2ab1a7aafb5133cf317f8148cf49e2ecbde189
+tests/expected/instr_gameclock/audit_vanilla_pursuits.tsv	647c3d18fd6f735c43c9845c3eddeb9891bfd5e1
+build/agent209/t229/v6/vanilla_pursuits.log	ae0edc7d1066b00b7d5d5af35e375d5ad3f6eded
+build/agent209/t229/v6/wide_vanilla_pursuits.log	0f87a7ee5858f96d04dd168a7de66052db7c73ab
+build/agent209/t229/v6/vanilla_pursuits@drift-clock.log	a413ccf50f98ecb038be91610fff3174763a365f
+build/agent209/t229/v6/vanilla_pursuits@first-frame-skip.log	b381b106e03f73f8ed558426d4816c3679ec5c62
+build/agent209/t229/v6/vanilla_pursuits@es-no-stock.log	0858ad896209cdc59e34085698f5cf030d90d28d
+build/agent209/t229/v6/vanilla_pursuits@control-as-pursuit.log	49b4ca80a8f409f8d5dbc4066fd2db83a5b3d991
+build/agent209/t229/v6/vanilla_pursuits@foreign-record.log	ada67c6ae324b4c3334610b2a7b31d4a0c087d7d
+build/agent209/t229/v6/vanilla_pursuits@class-raw.log	8f12136fd66bca6ff54ce075ef9b50cd0bcb6034
+build/agent209/t229/v6/vanilla_pursuits@tick-dropped.log	c0a50e1711bfe9dbec5583dc6207160bc2a56189
+build/agent209/t229/v6/vanilla_pursuits@band-moved.log	903906af827ae183a714d6816f811c52e294468c
+build/agent209/t229/v6/vanilla_pursuits@phantom-record.log	1b83241f671d7c0fc6efd5fd13f6a8c7ab6b700c
+build/agent209/t229/v6/vanilla_pursuits@foreign-image.log	b5b50792707ad0e77c37af86eb1d4dec420a2f2c
+build/agent209/t229/v6/vanilla_pursuits@foreign-romset.log	665086ad9d7566e28f229941ade366b575543ab3
+build/agent209/t229/v6/vanilla_pursuits@foreign-rompath.log	047f8c43a0a7771685a848b3ea2288a31f9ee2a5
+build/agent209/t229/v6/vanilla_pursuits@foreign-mame.log	3813a29e225844f610b4f8aaa7e9541c26f8d3b3
+build/agent209/t229/asrun/vanilla_pursuits_version.txt	0315ce18c8251a0f4bf711331dddedc7f19515f9
+build/agent209/t229/asrun/vanilla_pursuits_vs_tar.txt	8442d6d585aff404937efd4f450644e61e4c03d9
+build/agent209/t229/asrun/vanilla_pursuits_files.txt	472ef3f5a2542833a96073b716bbdb86f7519beb
+build/agent209/t229/asrun/q1_doc_excerpt.txt	ec5457af5958c285abcf592cbab610889cdaf8de
+build/agent205/t229/f6_pursuits/cap9/REPORT.md	6deeb5b965f83b8f575d194b959551c30ea5334f
+build/agent209/t229/asrun/f6_set.txt	ed1627794ebde359e1ac25d1d0e3fbe1fff97334
+build/agent209/t229/sheetmap/cmp_f6.py	f58b6322a6085c2f02dfbd4668191c6cc1a91935
+build/agent209/t229/sheetmap/cmp_f6.out	6e2154774ad6241a04b308ee8ff55f30f8ac4a74
+DECISIONS_HISTORY.md.lines-8271-8282 (lines 8271-8282 of DECISIONS_HISTORY.md: its INDEX entry "## Read 2026-10-25 (14z-209) — #229 Q1: the maintainer's answer in the questions doc — the sheets of")	38277721e9f1ca49255fe357782865947ee1e6e2
+DECISIONS_HISTORY.md.lines-8301-8308 (lines 8301-8308 of DECISIONS_HISTORY.md: its INDEX entry "## Read 2026-10-25 (14z-209) — #229 Q1: the maintainer's answer covered both the first sheets and th")	1f985d49f9f07f0f120ff5bbbbd2bc50e7ed7580
+DECISIONS_HISTORY.md.lines-7404-7442 (lines 7404-7442 of DECISIONS_HISTORY.md: its INDEX entry "## Read 2026-10-20 (14z-205b) — #229: Q3 and Q4 answered in the questions doc; Q1 confirmed for the ")	ef55271210d66d01ec096e6e2bdc1207327b12ca
+DECISIONS_HISTORY.md.lines-704-719 (lines 704-719 of DECISIONS_HISTORY.md: its INDEX entry "## Read 2026-10-07 (14z-194) — #229: the pilot's three pursuits are each character's pursuit and ES ")	8c96566e35b7fd7add11824ceb56ac6c3ad18ea7

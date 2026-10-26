@@ -1,0 +1,20 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent209/closing/244.md	95eca8d0297595ab41742d1d24eaaea4fc681a86
+build/agent209/closing/305.md	cc0de6517d7429c0795c993433248f3fe5ecd8c3
+build/agent209/closing/306.md	ddbca7cd5d36bba4b921641d2cbb50fc8c8bb653
+build/agent209/closing/321.md	19bbaf56f3cc8ce95293706ef88e13df8af4e837
+build/agent209/closing/323.md	5bde6e84dc47fa6b39b329a0c8898f71b54f9fcf
+build/agent209/t244/v3/verify_cells.out	78dd45496a21a1880f398e882207dd92fd12455b
+build/agent209/t244/v3/verify_rows.out	6824f28015093a14a7916864161e1dc20f03eb73
+build/agent209/t244/v4/pages_before_after.txt	e46af5be37bae079b66307d4e84bec00102d0480
+build/agent209/t244/v4/html_inputs.out	62ec851319f416f18c571dfb0747e79a1ef68664
+build/agent209/t321e/REPORT_handback.md	a860c1cba0fed0d6819cc108e08c14b795f5f928
+build/agent209/t321e/compare_tier.txt	55d0387927b55086bf5724308187444f02854576
+build/agent209/t321e/parity_compare.txt	fb68947990f0195044e7cf2d5a6565804ed3fc62
+build/agent209/t321e/test_emulator_runner.log	1e14616d6371b8e15fe37ea5cebaccd760bf7203
+build/agent209/t306/pilot/summary.txt	da7e7d4cd8080eced09cfb6e6814630b38a061f3
+build/agent209/t306/pilot/run_after_test_don_accent/test_don_accent.log	d0299b5818a775aaf9cdebcd55c0b368c0e30282
+build/agent209/t306/pilot/run_after2_test_don_accent/test_don_accent.log	305fc5a5d987e392a1252a1882afa0c41e048deb
+DECISIONS_HISTORY.md.lines-8323-8340 (lines 8323-8340 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-26 (14z-209) — #321 phase 2: all four speed-ups, parity on the Mac only, #305 with ")	92e40aeefd53bb7ae4a8856b939af62ccac363a4
+DECISIONS_HISTORY.md.lines-8296-8303 (lines 8296-8303 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-25 (14z-209) — #244: the tenant charmap pages show the power class, with the raw by")	0c3c69803714d1dbf74f803b64085ce7b4dccc67
+docs/project/gotchas.md.lines-7653-7674 (lines 7653-7674 of docs/project/gotchas.md)	e0b8a687712b37ef8bf19486425c6801cf42ad64

@@ -1,0 +1,7 @@
+  FLAG ATTRIB: JOINED AND FROZEN: six gates registered ondemand in the MAME lane (build/agent209/closing/229_registry.txt), each frozen through the rule-checker — 23 runs t...
+  FLAG D-ABSOLUTE: **Done when:** every special, super, EX/ES move, throw and pursuit row of the workbook is joined to a measured chain on vsavj (or named as unjoinable, with t...  [build/agent209/closing/229.md]
+  FLAG D-ABSOLUTE: Each freeze went through the rule-checker before it entered the tree.  [build/agent209/closing/229.md]
+  FLAG D-ABSOLUTE: Each family's identity rests on capture sheets the maintainer read: the questions-doc answer, the 18-tile F4 sheets answered move by move, the motion-test sh...  [build/agent209/closing/229.md]
+  FLAG D-ABSOLUTE: **What this closure leaves to other tickets** (closed means nothing left to do here): the exact minimal half-circle inputs, which the maintainer says are not...  [build/agent209/closing/229.md]
+  FLAG D-ABSOLUTE: The page also names the startup/recovery offsets it does not adjudicate and lists each family's INCONSISTENT residue per move; those are classifications, rec...  [build/agent209/closing/229.md]
+packet_check: 6 flag(s): ATTRIB 1, D-ABSOLUTE 5

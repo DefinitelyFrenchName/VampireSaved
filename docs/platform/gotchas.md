@@ -3438,3 +3438,20 @@ PILOT, so the release refused every reuse and two controls read DEAD, while the 
 `__pycache__/` and `*.pyc` (`.gitignore`); a synthetic one has no `.gitignore` unless the gate gives it one (the fix:
 the real file's two bytecode lines, checked present). Measure a fixture-building gate on Linux before calling it host-
 independent.
+
+## UNDER `-debug`, A STOP THAT LANDS AS THE SCREEN FRAME ADVANCES MAKES THAT FRAME'S SAMPLE READ ONE ENGINE PASS EARLY — and the game clock cannot see it (paid: 14z-205b, #229)
+
+`tests/audit_vanilla_specials_b.sh` reads its timing from a `-debug` tap leg: a write tap on the engine's pass counter
+`RAM:$FF8081` (written at `PRG:0x008E14`) and on P1's node timer, sampled once per emulated frame by
+`tests/lua/specials_b_trace.lua`. The tap leg stays on `replay.lua`'s timeline — its pass counter ends equal to the
+non-debug leg's, and the frozen game clock holds — yet on isolated frames the per-frame SAMPLE was taken one pass early:
+a stop that lands just as the screen frame advances is sampled before that frame's pass. Measured by fork F2: 110
+frames on Lei-Lei, 44 Lilith, 58 Morrigan, 30 Sasquatch, 0 on Q-Bee, Victor and Zabel, every one an isolated frame
+(`build/agent205/t229/f2_specials_b/REPORT_followup.md`, local). It once showed Q-Bee's air MK as `a2:0x34` where the
+reference timeline reads `a2:0x36`. The game clock ([VSP-25]'s alignment, `tests/lib/instr_align.sh`) checks where the
+game IS, not when a sample was taken, so it passes through it.
+
+**The rule:** in a `-debug` leg, never read identity from a per-frame sample; take identity from a leg with no debugger,
+and tag every sample of a `-debug` leg with the pass it belongs to (the pass counter's own writes), then assert the two
+legs' passes agree (`tools/specials_b_rigs.py passeq`, run by the gate on every run). Any per-frame sample of a `-debug`
+leg can show it.

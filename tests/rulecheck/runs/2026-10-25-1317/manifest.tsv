@@ -1,0 +1,30 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent209/t321/freeze208_wall.txt	57c44bc3af87199f6089d9a80ffec13b09c12bce
+build/emu_freeze208_eris/results.tsv	5d36a2c06236ad70e9858204273228221d9f5bc9
+build/agent209/t321/knob_census.txt	118aa9aa9b71ec85c226eb578a8a22b0bbda01ed
+build/agent209/t321/eris_batch1.sh	bc489134355cdff5663bb0b1bca7ab6c99ae55d1
+build/agent209/t321/eris_batch1.out	f1acdb80c62bdf7dd229b8079d79292311b6b493
+build/agent209/t321/eris_batch1_wide.txt	d07cd902f00adfcb8018f353cdfe8fcfdaafc97d
+build/agent209/t321/batch1_x/a209/times.tsv	a63f595cf69bf3ec5a312fe46c564be9e1111332
+build/agent209/t321/parity_verdicts.txt	59952ee9d0dd8d6a1fdb83a38edf05a99c47bcf7
+build/agent209/t321/parity_body.txt	26b989c497e8dc4377e62581b92bd677f9db7ccb
+build/agent209/t321/batch1_x/a209/emu305_cold/results.tsv	d92f3fac82d881e353baafc6867f66579e8768bf
+build/agent209/t321/batch1_x/a209/emu305_warm/results.tsv	ba8ae5979d31da645e528954a5ac49e58a30e9cd
+build/agent209/t321/eris_batch2.sh	ad044e8ede0dd339105949a68e925319301fdeb2
+build/agent209/t321/b2/timeline_b2_r8.txt	3bc18e32040358b92fac06505a9504d3bde8ba3d
+build/agent209/t321/b2/compare_b2_r8.txt	2b1f330eb311bfc54ea978e584814bb4743686e3
+build/agent209/t321/b2/first_red_causes.txt	f2307f34c676994b89167cf68dc8c3d55bd17273
+build/agent209/t321/b2/first/emu_b2_r8_p8_g8/audit_type_writes.log	b924727442e3616ff5364771bcf9326105fabf16
+tests/audit_type_writes.sh.lines-95-140 (lines 95-140 of tests/audit_type_writes.sh)	d26ad1fba3680f24fa43e58b99fbb39bb7d5db2f
+build/agent209/t321/eris_batch2fix.sh	34ec0ed0e8f0622ef3c19f9016d5f1f52853d0a1
+build/agent209/t321/b2/eris_batch2fix.out	d262c02f044ace2708226ede7847caa09da9b893
+build/agent209/t321/repro323/repro.sh	62a84ef9c90fd6f17585d474e627872604bca357
+build/agent209/t321/repro323/repro.out	9aef3e6b115bf1853088784f15f446848116a1f8
+tests/lib/controls.sh	b3fc50460a4872fda43d468bb834e040a7b97ad5
+tests/lib/measures.sh	39b00dd65f4891de0697e9efbc38cc512c44b8ab
+tests/run_all_emulator.sh.lines-236-250 (lines 236-250 of tests/run_all_emulator.sh)	cd4c6e68843ccf447119f3722b4e00c7157ce70c
+tests/run_all_emulator.sh.lines-545-680 (lines 545-680 of tests/run_all_emulator.sh)	a6a2cc59d94b3ad5c2cf097cf35c7f1715a4052b
+tests/audit_guard_corpus.sh	7e03ba3263c264bcc929df01d25b890e1d11fad3
+tests/ci_emulator.tsv.lines-1-40 (lines 1-40 of tests/ci_emulator.tsv)	8e4840871eb2d18544aeca36699f902628ab2ddc
+tests/ci_emulator.tsv.lines-112-150 (lines 112-150 of tests/ci_emulator.tsv)	ea3eea7ee786ec153419182b4404bc892926c9a3
+tests/lib/decrypt_cache.sh	2608458bb911d903edd1a2601e95e93cd4806e3a

@@ -49,8 +49,8 @@
 #   FBNeo; vh2's 3 extra sites (vh2 31 vs vs2 28, tests/test_copy_flags.sh) — vs2 is the measured source.
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [JOBS=4] [KEEP=<dir>] [FREEZE=1] tests/audit_marionette_cost.sh
-#   emulator tier, MAME; ~8 min at JOBS=4 (static census ~40 s twice, 57 legs and their 57 reference legs, the
-#   control legs)
+#   emulator tier, MAME; ~8 min at JOBS=4 (static census ~40 s twice, 65 legs and their 65 reference legs — 57 until
+#   7c757b12 added the eight 118_* basis logs, #302 — the control legs)
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"

@@ -1,0 +1,22 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent209/t244/v3/tools.diff	6b57b188f731a8c8052531a29202ea83881311e4
+build/agent209/t244/v3/oracle.py	87042b3348b3a14a9d33eb0160199fd1dbb1e80b
+build/agent209/t244/v3/verify_cells.py	e53f5dfcb3913a798b5bf8ccfb089d71f96148cd
+build/agent209/t244/v3/verify_cells.out	78dd45496a21a1880f398e882207dd92fd12455b
+build/agent209/t244/v3/verify_rows.py	b433f0b663d6c0d9f98d0c94a467e75d7677ddf1
+build/agent209/t244/v3/verify_rows.out	6824f28015093a14a7916864161e1dc20f03eb73
+build/agent209/t244/v3/json_vs_head.txt	26027c0879faa9c4380b48157bda09428bc156c0
+build/agent209/t244/v3/html_census.py	94e81b98af8e259259f1a335c9d9a1f40e527062
+build/agent209/t244/v3/html_census.out	818e48f2ca9c0f5dd28c7a3d9b3232ece5a679c5
+build/agent209/t244/v3/framedata_pages.log	e19242989b3145a243a0bcd4a9a206ecbf2a9c03
+tests/expected/charmap_pages.sha256	2996985a88c1ccb3cf162cf8e268199f595ae931
+build/agent209/t244/v3/charmap_pages.sha256.before	2996985a88c1ccb3cf162cf8e268199f595ae931
+build/agent209/t244/v3/freeze.log	7064b4f83d9291936ce8d676173c3a8cca614e9b
+build/agent209/t244/v3/plain.log	76b89a4bc35458006b9ecfc8906ca8caf44f3108
+build/agent209/t244/v3/mode_changed-built-byte.log	1ef20f23ca0beda3e649a19304816c6584d2579d
+build/agent209/t244/v3/mode_empty-page-frozen.log	74721e701a1a312f767259e3676640c2370f28d5
+build/agent209/t244/v3/mode_added-override.log	f95c4b63e9dd01dad3d7ac84e63cf6fdb6677b2b
+build/agent209/t244/v3/test_power_decode.log	152387253942ddaa33274895bd7c9d4084e81ef9
+build/agent209/t244/v3/test_tables_current.log	3d190b9933ef22e5b1fc7cdc5a15044fdde56665
+build/agent209/t244/v3/test_community_crosscheck.log	e44ce8d74270dbf96e523720174a118491e391bb
+DECISIONS_HISTORY.md.lines-8295-8302 (lines 8295-8302 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-25 (14z-209) — #244: the tenant charmap pages show the power class, with the raw by")	0c3c69803714d1dbf74f803b64085ce7b4dccc67

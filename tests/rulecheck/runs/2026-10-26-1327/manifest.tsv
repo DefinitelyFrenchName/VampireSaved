@@ -1,0 +1,35 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_guard_cancels.sh	9d4634045d78b27c1d5df66a4d4f8c7232c7d12e
+tests/expected/guard_cancels.sha256	72ed37b7f637463b8f0d0b24164345ab3bf61b9f
+tests/expected/instr_gameclock/audit_guard_cancels.tsv	e4a9c74a19a5805b434efb14ab5cdc335d76a780
+build/agent209/t229/v10/guard_cancels.log	784159d2aaa37449cbb1b1b2928599db371030ed
+build/agent209/t229/v8/guard_cancels.log	0c81eb9529f84c851a7822b843f42e3ba2af3292
+build/agent209/t229/v5p/guard_cancels.log	f91bd06710521b286d7ceb73bfe58149d198992e
+build/agent209/t229/v5p/summary_P1.txt	2b0fb3003bfb76fca5f7e9dc55030f0bc0175852
+build/agent209/t229/v5p/wide_guard_cancels.log	9ad86bdae801317dc06eb4e868ab615edddf3850
+build/agent209/t229/v5p/guard_cancels@commit-stripped.log	5c49736c5555d00b81c5c8df889d20d34cd3e6ee
+build/agent209/t229/v5p/guard_cancels@drift-clock.log	15a952cd33862da27970ad1c2c3f2723d1e91ee2
+build/agent209/t229/v5p/guard_cancels@first-frame-skip.log	73c2ffdeba051eddc8018e59b4d01e8b5c417d87
+build/agent209/t229/v5p/guard_cancels@foreign-image.log	967fdd8e24024c9db870236c310517fc431d26ae
+build/agent209/t229/v5p/guard_cancels@foreign-mame.log	5c3a68dfd4a8f12627951421fd52c699ae652a6e
+build/agent209/t229/v5p/guard_cancels@foreign-pc.log	ae47745675041e91b95e0dec42c4cd23cf715b88
+build/agent209/t229/v5p/guard_cancels@foreign-rompath.log	34b479d529fefaba98ff00b443828a4e7c31bb48
+build/agent209/t229/v5p/guard_cancels@foreign-romset.log	a8e2e9998668d9aa8adf5e003cb0c5ac891feeea
+build/agent209/t229/v5p/guard_cancels@noblock.log	3091e823d71d8af2c349c7aac2994c38c622b1f7
+build/agent209/t229/v5p/guard_cancels@node-shift.log	1f02e652d69078bd5f78cca16f359aaf04f43391
+build/agent209/t229/asrun/guard_cancels_header.diff	9d16bac4ee21b9b979eab0c8bd63e632b4a211cf
+build/agent209/t229/asrun/guard_cancels_followed_v10.txt	1002fbea0090186d6025fd7bcade7e2fa1e9f393
+build/agent209/t229/asrun/guard_cancels_charmap_reach.txt	9422300df8eab82a8dbf2053037343f066b2b996
+build/agent209/t229/sheetmap/cmp_f5.py	6bb72e3b3cb8d3ffe9574925a104841f22135bd6
+build/agent209/t229/sheetmap/cmp_f5.out	29fccefe443ecb9f32568e135646ed2244a98285
+build/agent208/X2/REPORT.md	0bfff88705bf9f464b007467a11f751cdebf87e2
+build/agent205/t229/f5_gc/cap9/REPORT.md	bb8258ac43e32517a73e7a236919abf4fffa733f
+DECISIONS_HISTORY.md.lines-8274-8285 (lines 8274-8285 of DECISIONS_HISTORY.md: its INDEX entry "## Read 2026-10-25 (14z-209) — #229 Q1: the maintainer's answer in the questions doc — the sheets of")	38277721e9f1ca49255fe357782865947ee1e6e2
+DECISIONS_HISTORY.md.lines-8304-8311 (lines 8304-8311 of DECISIONS_HISTORY.md: its INDEX entry "## Read 2026-10-25 (14z-209) — #229 Q1: the maintainer's answer covered both the first sheets and th")	1f985d49f9f07f0f120ff5bbbbd2bc50e7ed7580
+DECISIONS_HISTORY.md.lines-7446-7504 (lines 7446-7504 of DECISIONS_HISTORY.md: its INDEX entry "## Read 2026-10-20 (14z-205c) — #229 Q1: Bulleta's and Lei-Lei's guard cancels, Aulbath's Direct Sci")	cfc07d31f552ff082d716c2432f06868ee56b10e
+DECISIONS_HISTORY.md.lines-7969-7978 (lines 7969-7978 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-24 (14z-208) — #229 Q5: guard-cancel damage is compared as dealt on a −3 victim, na")	c220203fd50fc80e63c15d598d321b25bbcd9895
+DECISIONS_HISTORY.md.lines-8262-8273 (lines 8262-8273 of DECISIONS_HISTORY.md: its INDEX entry "## Read 2026-10-25 (14z-209) — #229 Q6: the hit timing stays the guard cancels' timing of record")	5e0132ba7ce030829a1c0b04b6c804aea8804089
+tools/run_replay_guarded.sh.lines-30-50 (lines 30-50 of tools/run_replay_guarded.sh)	9fb7eaae5344b3927a2ba48f1756f6f16334717c
+tests/lib/instr_align.sh.lines-118-145 (lines 118-145 of tests/lib/instr_align.sh)	314e7a5c131d2a3b35d847914c0aa3bd04281676
+tools/run_mame.sh.lines-25-40 (lines 25-40 of tools/run_mame.sh)	fb521646413662f33b27ad13a9bb7867f846bdad
+tests/lib/pristine_vsavj.sh	cbff6a8400c70620eeb140106f6f2b4cbdad2ef6

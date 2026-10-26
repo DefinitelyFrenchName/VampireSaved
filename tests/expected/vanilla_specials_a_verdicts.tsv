@@ -1,0 +1,52 @@
+# tests/audit_vanilla_specials_a.sh — per-character column verdicts (timing in LIVE ENGINE TICKS), the live-vs-derived tick agreement, and the sha256 of the joined values (FREEZE=1)
+AN	active	EXACT	3/3
+AN	gauge_hit	EXACT	3/3
+AN	recovery	CONSTANT OFFSET	sheet = ours +2 on all 3
+AN	red	EXACT	3/3
+AN	startup	CONSTANT OFFSET	sheet = ours +1 on all 3
+AN	white	INCONSISTENT	most common delta +0 on 2/3; spread +0..+24
+AU	active	CONSTANT OFFSET	sheet = ours +1 on all 3
+AU	gauge_hit	EXACT	3/3
+AU	recovery	EXACT	3/3
+AU	red	EXACT	3/3
+AU	startup	EXACT	3/3
+AU	white	EXACT	3/3
+BI	active	INCONSISTENT	most common delta -2 on 2/6; spread -2..+2
+BI	gauge_hit	INCONSISTENT	most common delta -3 on 2/6; spread -3..+3
+BI	recovery	INCONSISTENT	most common delta +4 on 2/6; spread +0..+4
+BI	red	INCONSISTENT	most common delta -8 on 2/6; spread -8..+3
+BI	startup	CONSTANT OFFSET	sheet = ours +1 on all 6
+BI	white	INCONSISTENT	most common delta -3 on 2/6; spread -3..+1
+BU	active	EXACT	7/7
+BU	gauge_hit	EXACT	7/7
+BU	recovery	INCONSISTENT	most common delta +2 on 6/7; spread +2..+7
+BU	red	INCONSISTENT	most common delta +0 on 3/7; spread -2..+4
+BU	startup	CONSTANT OFFSET	sheet = ours +1 on all 4
+BU	white	INCONSISTENT	most common delta +0 on 5/7; spread +0..+2
+DE	active	CONSTANT OFFSET	sheet = ours +1 on all 6
+DE	gauge_hit	EXACT	6/6
+DE	recovery	CONSTANT OFFSET	sheet = ours +2 on all 6
+DE	red	INCONSISTENT	most common delta +18 on 2/6; spread +18..+20
+DE	startup	CONSTANT OFFSET	sheet = ours +1 on all 6
+DE	white	CONSTANT OFFSET	sheet = ours +4 on all 6
+FE	active	INCONSISTENT	most common delta +1 on 1/2; spread +0..+1
+FE	gauge_hit	INCONSISTENT	most common delta +0 on 10/12; spread +0..+2
+FE	recovery	INCONSISTENT	most common delta +2 on 1/2; spread +2..+4
+FE	red	EXACT	12/12
+FE	startup	CONSTANT OFFSET	sheet = ours +1 on all 12
+FE	white	EXACT	12/12
+GA	active	EXACT	6/6
+GA	gauge_hit	EXACT	3/3
+GA	recovery	CONSTANT OFFSET	sheet = ours +3 on all 6
+GA	red	INCONSISTENT	most common delta +15 on 1/3; spread +15..+17
+GA	startup	INCONSISTENT	most common delta +1 on 3/6; spread +1..+2
+GA	white	CONSTANT OFFSET	sheet = ours +4 on all 3
+OVERALL
+active	INCONSISTENT	most common delta +0 on 19/33; spread -2..+2
+gauge_hit	INCONSISTENT	most common delta +0 on 34/40; spread -3..+3
+recovery	INCONSISTENT	most common delta +2 on 18/33; spread +0..+7
+red	INCONSISTENT	most common delta +0 on 23/40; spread -8..+20
+startup	INCONSISTENT	most common delta +1 on 34/40; spread +0..+2
+white	INCONSISTENT	most common delta +0 on 24/40; spread -3..+24
+TICKS-AGREE	startup 36/61, active 31/61, recovery 27/61
+VALUES-SHA256	271bb573004f2eb11c898bdffef30eb0a709cbed63eac878705c60ee6af7cc0b 301

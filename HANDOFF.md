@@ -306,6 +306,7 @@ python3 tools/audit_effect_rects.py --ours <hashes> --stock <hashes> --donor n=<
 
 ```sh
 ROMDIR=... tests/run_all_emulator.sh                  # prereq + fbneo + mame, release scope
+ROMDIR=... tests/run_all_emulator.sh --freeze --strict --jobs 8 --skip test_mame_parity  # ERIS, #321
 ROMDIR=... tests/run_all_emulator.sh --scope all      # + the out-of-release-scope rows
 ROMDIR=... tests/run_all_emulator.sh --scope ondemand # ONLY the `ondemand` rows (pristine-only gates, 14z-196); no tier, close, freeze or release run selects them
 ROMDIR=... tests/run_all_emulator.sh --scope ondemand --only 'audit_mizuumi_*'   # a subset of them (--lane, --controls, --strict, --jobs as for any run)

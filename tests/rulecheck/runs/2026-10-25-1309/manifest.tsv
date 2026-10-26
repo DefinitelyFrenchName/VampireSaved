@@ -1,0 +1,32 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_es_ex.sh	4efcfffff012263598621b570600f449f32712ea
+tests/lib/pristine_vsavj.sh	cbff6a8400c70620eeb140106f6f2b4cbdad2ef6
+tests/lib/mame_ident.sh	ec9f2a6d7fae4a5668b3d63ec28989e0b11d1ac2
+tests/lib/controls.sh	b3fc50460a4872fda43d468bb834e040a7b97ad5
+tools/run_mame.sh	4aeb916f534e1e9c46be18ad87c6d2b6a56041ec
+tests/expected/es_ex.tsv	b367409053832926a3060a138fbb224c5770f2f7
+tests/expected/instr_gameclock/audit_es_ex.tsv	378969e5b748ee6d08b36dd30fd4eb0dc5db3c0c
+build/agent209/t229/v4/es_ex.log	b47b346a716990ca5dcea0f90fa9df5513b7c38f
+build/agent209/t229/wide/es_ex.log	6fbf43719ae706347c23b85cfd7fc65121786329
+build/agent209/t229/v4/es_ex@drift-clock.log	2523eac2830a6cc6371b94bbc9244f89261db698
+build/agent209/t229/v4/es_ex@first-frame-skip.log	8131ad912f95333f600a73fd221833020cddb7ae
+build/agent209/t229/v4/es_ex@unsigned-offsets.log	2249b38440fe168584ce58eba6667e62756a2527
+build/agent209/t229/v4/es_ex@empty-bank.log	3f174a4760526b169670f59339a6c4d8f560e911
+build/agent209/t229/v4/es_ex@swapped-move.log	59a620cc544a0370cdcb2b6a8137a523d396ff20
+build/agent209/t229/v4/es_ex@foreign-image.log	f1227b0bfef3c5d1c55c861a090977d389e8630c
+build/agent209/t229/v4/es_ex@foreign-romset.log	3eccba7231e8300fcdf0f4544bd51d9fef5540d4
+build/agent209/t229/v4/es_ex@foreign-rompath.log	c2285b8ec9b5a3ee599e8f115ba8598083f39ab9
+build/agent209/t229/v4/es_ex@foreign-mame.log	fe96cc45d406bb3272affa2533ae913ea2f43ae4
+build/agent209/t229/asrun/es_ex_version.txt	a269c408a8eb43dfcba9f808a1e1374131ada981
+build/agent209/t229/asrun/es_ex_vs_tar.txt	4d35379eeba1c7205fe0d301f35f5440372bf41e
+build/agent209/t229/asrun/es_ex_files.txt	084c45509bb8128d8b055183902dfb722eeff3a4
+build/agent209/t229/asrun/q1_doc_excerpt.txt	ec5457af5958c285abcf592cbab610889cdaf8de
+build/agent205/t229/f3_es_ex/cap9/REPORT.md	a12449b6804fbad6cbd30f146e6088322be1b270
+build/agent209/t229/asrun/f3cap_set.txt	937c11acb443cfb8e188ffda902e787d6d3e875d
+build/agent205c/t229/REPORT.md	3e631f9c65921e8a85d3692082395791e907808b
+build/agent209/t229/sheetmap/cmp_f3_full.py	39d836cb42112848c14d392ae2dff6c6724d56f8
+build/agent209/t229/sheetmap/cmp_f3_full.out	9b68814cd9bc33bedcf6dca92d442535455d0469
+DECISIONS_HISTORY.md.lines-8270-8280 (lines 8270-8280 of DECISIONS_HISTORY.md: its INDEX entry "## Read 2026-10-25 (14z-209) — #229 Q1: the maintainer's answer in the questions doc — the sheets of")	e78a915c65e6d0c09cfacf0a65709b1aeae9d5b0
+DECISIONS_HISTORY.md.lines-8300-8306 (lines 8300-8306 of DECISIONS_HISTORY.md: its INDEX entry "## Read 2026-10-25 (14z-209) — #229 Q1: the maintainer's answer covered both the first sheets and th")	83e5f1d7da877d5beb4eb8750c3e93265acefc09
+DECISIONS_HISTORY.md.lines-7442-7500 (lines 7442-7500 of DECISIONS_HISTORY.md: its INDEX entry "## Read 2026-10-20 (14z-205c) — #229 Q1: Bulleta's and Lei-Lei's guard cancels, Aulbath's Direct Sci")	cfc07d31f552ff082d716c2432f06868ee56b10e
+DECISIONS_HISTORY.md.lines-7590-7597 (lines 7590-7597 of DECISIONS_HISTORY.md: its INDEX entry "## Read 2026-10-21 (14z-205c) — #229's two re-rigged sheets are correct; #229 stays open for Q2")	7d4a79cce84e4dcdf102c23299a44a61877bd39c

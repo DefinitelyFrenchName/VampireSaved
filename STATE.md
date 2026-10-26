@@ -38,147 +38,80 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
-## Session 14z-208c — **#278, #326, #319, #324 and #325 closed done at this push; #229's F4 re-rigged on the maintainer's answers and every row confirmed (the motion test; the air throws moved to the normal throws; #319's hashes); #121 reconciled.** A continuation of 14z-208b after its close (`25dbfea1`, pushed), on the same transcript (`7462776e`).
+## Session 14z-209 — **#229 closed done: the six vsavj family gates frozen and registered, every family classified; #321 phase 2 (with #305, #306, #323) and #244 done; #302 done; #327's fix applied; #328-#330 filed.**
 
-### (1) AFTER 14z-208b'S CLOSE (written as 14z-208b (6) until this close) — #278: COLLATION PINNED IN THE RUNNERS; COMMITTED LOCALLY, CLOSES AT THE NEXT PUSH
-The maintainer asked why #278 was not considered at the freeze: its comment of 14z-207 left a freeze-cadence locale
-run, and the opener named it only as "measured, open" (the lesson: `docs/project/gotchas.md`, the UTF-8 collation
-entry). Ruled *"Both"*, *"A with only that one per-line pin"*, *"Commit stays local"*, *"Close at the next push"*
-(`DECISIONS_HISTORY.md` "Ruled 2026-10-25 (14z-208b) — #278: …").
-- **PILOT, at `25dbfea1`, before the change:** the strict static tier at freeze cadence under `LC_ALL=en_US.UTF-8` and
-  under `LC_ALL=C`: PASS 217, FAIL 2 under both, the 219 per-gate verdicts identical; the two reds are host state, not
-  collation (`test_emulator_staleness`: PILOT's emulator records; `test_release_reuse`: its synthetic repo's reuse plan
-  refuses, "the freeze run's identity moved during it" — a Linux-only red at `25dbfea1`, filed as #326 after the
-  commit: the gate's synthetic repo has no `.gitignore`, and Linux Python's `__pycache__` changes its untracked key mid-run). The five release-cadence
-  gates were deferred in both runs. Evidence: `build/agent208/t278/evidence278.txt` (local).
-- **The census widened** to every tracked shell file (lane P's covered the 231 static gates): 212 unpinned
-  `sort`/`ls`/`comm`/`join` lines in 92 of 536 files; 134 lines in 61 files past the order-free shapes
-  (`build/agent208/t278/census278b.txt`, `classify278.py`, local).
-- **The change:** `tests/lib/collation.sh` (`vs_pin_collation`), called once at the top of `tests/run_all_static.sh`,
-  `tests/run_all_emulator.sh` and `tests/run_battery_m2.sh`, sourced only when present (the runner tests' synthetic
-  repos carry part of `tests/lib`; the first tier on the change was red on those four gates); `test_charmap_current.sh`'s
-  FREEZE=1 write sorts under `LC_ALL=C` and leaves `tests/controls_concurrent.txt` until the next freeze's re-trace; the
-  new gate `tests/test_runner_collation.sh` (five controls), PASS on the Mac and on PILOT, where the pinned sort gives
-  byte order under `en_US.UTF-8`. The opener's #278 line now says to read a ticket's comments before planning a freeze.
-- **Two of the session's own statements corrected before the commit:** macOS's `en_US.UTF-8` does collate (case and
-  punctuation; this Mac's sessions run under `LANG=C.UTF-8`, byte order), so the gate's probe now compares against a
-  `C` sort and works on both systems; and nine gates, not one, write a frozen file whose order comes from a shell sort on
-  a hand-run `FREEZE=1` — the one-pin ruling was re-confirmed on that basis (*"yes"*). The maintainer asked for the gates
-  explained plainly: `docs/project/gates_explained.md`.
-- **After the change, on PILOT** (the commit object `6a9051e1`, freeze cadence, `LC_ALL=en_US.UTF-8`): PASS 218, FAIL 2,
-  the 220 per-gate verdicts equal to the two earlier runs' apart from the new gate's PASS. A probe gate run through the
-  real static runner reads `en_US.UTF-8` and a dictionary sort under the old runner, `LC_COLLATE=C` and byte order under
-  the changed one (`build/agent208/t278/p278_probe.sh`).
-- **Rule-checker:** run `2026-10-25-1279` withdrawn unspawned (its packet check flagged an unshown absolute in the
-  closing comment); `-1280` VIOLATED on Q1, Q3 and Q4 (no freeze-cadence tier on the change; nothing showed the locale
-  reached the gates in the earlier runs), resolved by the after-change run and the probe; `-1281` OK.
-- **Not done here:** #278 stays `open` in `docs/project/tickets.tsv` and on GitHub until the next push; its closing
-  comment is `build/agent208/t278/closing_278.md` (local). PILOT's clone sits at `25dbfea1`; `~/p208b_t278/`, `~/t278chk/` and
-  `~/p278_*.sh` there are this work's scratch.
-- **After the commit, uncommitted for the next close:** #326 filed (above); refreshing the ticket snapshot showed #121
-  closed by the maintainer on GitHub (2026-10-25T09:27Z, their comment quoted in `DECISIONS_HISTORY.md`), reconciled to
-  `done`; #123's title follows their edit.
-- **#229 Q1, the maintainer's fourteen answers on F4's sheets (2026-10-25), each quoted and read against the capture:** moved VERBATIM to `DECISIONS_HISTORY.md` "Read 2026-10-25 (14z-208c) — #229 Q1: the maintainer's answers on F4's 18-tile command-throw sheets" (the live budget). Ruled among them: every air throw leaves the command-throw set for the normal throws.
-- **#229 F4 RE-RIG, DONE ON THE MAC (the maintainer: *"do it"*, 2026-10-25; PILOT was the plan, the batch was small
-  enough to run here — about 5 min a gate run).** Probes `build/agent208/RR/` (`probe.py`, `run_all.sh`, `summ.py`), then:
-  - `tools/command_throw_rigs.py` (local, untracked): the 14 air-throw rows removed (ruled); Pit of Blame after a P2
-    sweep, 623K at +20, P2 brought over the portal (walk-in + pursuit, or a jump toward), HK and KK, plus a no-623K
-    control — the press counted from the 623K (from the sweep, Victor's own sweep record fell in the window and read
-    foreign: the first freeze REFUSED, 5 events); Prova di Servo's second HK at +30 from the far pin plus a no-second-K
-    control (+24..+36 all grab); Ira Spinta HK at +16 after the jump — at the F4 cadence (+12) it grabbed or whiffed with
-    the walk-in (whiffed at 130/110/90/70/50, grabbed at 150/30/0), at +8 and +16 it grabbed at every walk-in, so the
-    whiff was the cadence, not the range; MEGA SPIKE 360 LP/MP/HP/PP (all three punches grab, chain `a2:0x33`, 23/39; PP
-    is NOT an ES, stock 9→9 — as the maintainer said), declared `NOT_IN_WORKBOOK`; Bishamon's labels carry the names;
-    THE MOTION TEST, 71 events. 167 events, 37 rigs; row set 54 workbook rows + Mega Spike.
-  - THE MOTION TEST's result (`build/agent208/RR/motion_table.txt`; `docs/game/engine_internals.md` "Which half-circle
-    spellings vsavj accepts"): half circle back — 63214, 6324, 6214, 624 grab on all 14 rows, 6321 never (a crouching
-    normal); half circle forward — all five spellings work (Q-Bee ground and air; Prova di Servo's start).
-  - `tests/audit_command_throws.sh` (local): header and the five controls' counts from the frozen lines (155 events stage
-    a record, 34 spend stock, 155 have a fall; unsigned-chain 12 of Sasquatch's 13, all but motion 6321HP). Frozen
-    (`FREEZE=1`, run `RR/g2`), clocks frozen (`RR/g3`), plain run `RR/g4`.
-  - `tests/audit_ground_throws.sh` + `tools/ground_throw_rigs.py` (TRACKED): the air throws joined as one `gt_XX_air` rig per
-    character at GAP 624 (the 28 old rig files regenerate byte-identical), Bulleta's at +18, Victor's converging (P1
-    UR, P2 UL 4 frames ahead, toward+button at +16: both MP and HP throw, chain `a2:0x37`, 15/23); the leg-falls plant
-    reads the rig schedules instead of the 600-frame grid, the counts come from the rigs (`NEV`). 70 events; the 42 old
-    expectation lines and 42 old clocks unchanged; plain run `RR/gt3` PASS, all 8 controls FIRED. Needs the close's
-    bookkeeping (gate descriptions, generated indexes) and its tier.
-  - Sheets (18 tiles per move, the changed rows only, P2 HP equal to the trace at every tile): `build/agent208/RR/capA/
-    sheets/f4_AN.png` (Pit of Blame ×4 + control), `f4_JE.png` (Ira Spinta HK, Prova di Servo + control),
-    `f4_VI.png` (Mega Spike ×4), `build/agent208/RR/capV/sheets/f4_VI_airthrow.png` (Victor's air throw, the gate's own
-    set-up). Backups of everything replaced: `build/agent208/RR/before/`.
-- **#229, the maintainer on the re-rig sheets (2026-10-25):** *"All is correctd except prova di servo's second part which
-  is correctly input but Victor is too close to get grabbed by the blood hand so the second part whiffs."* Measured: in
-  the gate the event read NOT held, no fall (the "7 hits" reported to the maintainer were the PROBE's, a wrong report
-  from the probe rows instead of the gate's rows — every other changed row was re-read from the gate run and holds).
-  Cause: a "far" event's x pins (t-230) do not hold when the previous event is a throw still running: after San Bassale
-  HK Jedah stood at x 664, 64 px from Victor, not 176. Fixed by ordering: Prova di Servo's two events now open rig
-  `ct_JE_5` (`tools/command_throw_rigs.py`); in the gate the hand grabs, 7 falls, 32/48, and the control holds nothing
-  (re-frozen `RR/g5`; the three record controls now 156). New sheet `build/agent208/RR/capP/sheets/f4_JE_prova.png`. The
-  same defect sits under three rows the maintainer confirmed: AN 236MP "far" (gap 127) and 236HP "far" (gap 78) — the
-  F4 "HP Mummy Drop never reached in its slot" — and MO Cryptic Needle "far" (gap 64; it grabs anyway). RULED *"Fix all,
-  re-show"* (`DECISIONS_HISTORY.md` 2026-10-25): every event walking in under 150 frames is re-placed at t-50-walk
-  (`tools/command_throw_rigs.py` gen). Measured (`RR/g7`): AN 236MP/HP start at 176 px and BOTH grab now (19/31; HP
-  never had), the walk20 pair at 140, Cryptic Needle at 160 (EX, held, 35/37 — its damage moved), Prova di Servo 176
-  and grabs. Record controls now 157. Sheets `build/agent208/RR/capF/sheets/f4_AN.png` (Mummy Drops), `f4_MO.png`.
-  The maintainer on the three sheets (`capF/sheets/f4_AN.png`, `f4_MO.png`, `capP/sheets/f4_JE_prova.png`), 2026-10-25:
-  *"all good"* — every F4 row is now confirmed.
-- **#326 DONE, closes at the next push** (the maintainer: *"both"*, PILOT for #326 and #324): the synthetic repo of
-  `tests/test_release_reuse.sh` takes the real `.gitignore`'s two bytecode lines (checked present). On PILOT in a scratch
-  clone, scratch commit object `1c314f83` (HEAD + the fix, never pushed; `refs/agent208/t326`): before FAIL, 5 controls
-  fired, 2 dead; after PASS, 7 fired; on the Mac PASS, 7 fired. Re-traced on PILOT (`tools/trace_controls.sh`): 7
-  controls SAFE, `tests/controls_concurrent.txt` row on blob `11376be2`, trace `pilot:1c314f83`; test_controls_concurrent
-  PASS. Evidence `build/agent208/t326/` (incl. `pilot_p326/`). Rule-checker run 2026-10-25-1282 OK (plant caught); the closing comment `build/agent208/t326/closing_326.md` (local), posted at the push.
-- **#324, the writer found and its leak already closed; the guard open** (`build/agent208/t324/evidence324.md`): the
-  stub `xdelta3` of `tests/test_package_release_safety.sh` before `031c09d8` had no `-V` branch, and `031c09d8` (14z-207,
-  developed 2026-10-23) added the packager's `xdelta3 -V` check (#279) and the stub's branch together — the old stub
-  answering the new check writes `stub patch` to `./-V`, reproduced; the gate cds to the repo root. PILOT's `-V` saved
-  and removed. Open: the done-when's guard — the static runner compares tracked files only (`grep -v '^??'`).
-- **#319 CONVERTED (ruled *"Convert now"*):** `tests/expected/ground_throws.tsv` holds sheet, key, input and a 16-hex
-  SHA-256 per event; the full lines go outside the tree (`../charpages/framedata/ground_throws_full.tsv`, `GT_FULL`), a
-  red prints the run's own, `snaps` reads the first-fall offsets there (no file: no snapshots). On `RR/gt3`'s rows the
-  70 full lines equal the old plain lines byte for byte, expect 70/0 bad, snap frames unchanged. The gate's plain run `RR/gt4`:
-  PASS, 70/0 bad, 70 snapshots, all 8 controls FIRED. CLOSES AT THE NEXT PUSH: rule-checker run 2026-10-25-1283
-  withdrawn unspawned (an attribution flag), 1284 VIOLATED Q1 Q3 Q4 (no red shown through the hashed compare; the
-  hash check used the tool's own function) and resolved (evidence sections 7-8: class-raw's 8 reds print got/want/run/
-  was; a shasum-CLI hash of the 70 lines, 0 mismatches), 1285 OK; closing comment `build/agent208/t319/closing_319.md`. Command-throw gate after the re-placement `RR/g8`: PASS, 8 FIRED.
-- **#324's guard BUILT (ruled *"Runner-wide check"*):** `tests/run_all_static.sh` lists the untracked files outside
-  `build/` (its own results files aside) before and after, names a new one (`LEFT BEHIND`), and `--strict` is NOT GREEN
-  on it (`STRAY-CHECK`); `tests/test_static_runner.sh` sections 30/31, control `stray-blind`: PASS, 24 fired; the mode
-  exits 1. A strict session tier on PILOT on scratch commit `6eefd93c` (the tracked change set): `ok: no new untracked
-  file outside build/`; its 6 reds: PILOT's own staleness rows (red before too), 3 generated pages (the close's
-  bookkeeping), test_build_dirs (section 30 named build/inside_324 — moved to build/agent324/, PASS) and
-  test_controls_concurrent (test_static_runner re-traced: 24 SAFE, `pilot:b7d2f4dd`). CLOSES AT THE NEXT PUSH: rule-checker runs
-  2026-10-25-1288 withdrawn unspawned, 1289-1292 VIOLATED and resolved (a mis-counted dead control; PILOT's deletion and the
-  reproduction through the packager not shown; the cause not separated from the stray — section 11's causation runs;
-  the named limits: a non-strict run stays GREEN, ignored files are not compared, and a file written OUTSIDE a runner run
-  is never flagged — PILOT's `-V` came at 17:26Z, before the 17:35Z run, so this check would not have caught it), 1293
-  OK; closing comment `build/agent208/t324/closing_324.md`.
-- **#325 FIXED on the Mac** (the maintainer: *"#325 can maybe run since we're waiting for PILOT?"*):
-  `tests/run_on_snapshot.sh` names the snapshot and its record by commit, second AND process id, and makes each with
-  one atomic `mkdir`, refusing cleanly if another run holds it (`SNAP-NAME`). `tests/test_run_on_snapshot.sh` section 6:
-  a stub `date` pins the stamp, two runs of one commit start together — both exit 0, two snapshots, two records; control
-  `same-name` (the old names) collides (the second REFUSED) and FIRES; PASS in 26 s; the mode exits 1. Its
-  `controls_concurrent.txt` row re-traced on PILOT (13 controls SAFE, `pilot:1589fd17`). CLOSES AT THE NEXT PUSH: run
-  2026-10-25-1286 withdrawn unspawned (an absolute in the comment), 1287 OK; closing comment
-  `build/agent208/t325/closing_325.md`.
+### opened with
+Transcript `ebf842b3`. The 14z-208c close's opener (`docs/NEXT_SESSION_HISTORY.md`); the sweep CLEAN, `main` = `origin/main` at `2aacebe8`. The
+maintainer: *"do the one-line fix to the header of tests/replays/118_chain.rpl … The let's finish #229 and so #321 (maybe
+some low severity tickets can be done in parallel on PILOT or ERIS?)"*. Parallel tickets ruled: #302 and #306 on PILOT,
+#327 and #244 on the Mac; #305 and #323 folded into #321 (`DECISIONS_HISTORY.md` 14z-209 entries).
 
-### CLOSE (14z-208c, 2026-10-25)
-Driver `build/agent208/close208c/` (`--prev build/agent208/close208b/tier_results.tsv`, the 14z-208b close's run of
-record). Before it, each ticket closed on GitHub with its comment, on its rule-checker run: #278 (`2026-10-25-1281`),
-#326 (`-1282`), #319 (`-1285`), #325 (`-1287`), #324 (`-1293`); the snapshot refreshed (`tools/tickets.py refresh`).
-Steps: sections (the work of this sitting is section (1), written as 14z-208b (6) until this close); next-session (the
-14z-208b opener to `docs/NEXT_SESSION_HISTORY.md`); rollover (the 14z-208b group, 77 lines, to `STATE_HISTORY.md` with its
-ledger line; its one `STATE` citation re-pointed; today's post-close rulings relabelled 14z-208c); indexes (regenerated
-in a clean checkout of the staged tree, with the gate index, coverage and crosscheck pages, where test_tickets,
-test_state_open_lists, test_live_budget, test_history_index, test_gate_index_current, test_gate_coverage_current,
-test_controls_concurrent, test_build_dirs, test_docshape, test_doc_anchor_census, test_gate_descriptions and
-test_must_fire_census PASS); dashboard (14z-163..14z-208c, 1,960 figures, 0 unclassed; datasets versions 17, 17, 18, 17)
-— done. The tier's results: `build/agent208/close208c/tier_results.tsv`, the next close's `--prev`. The push carries
-`e0965d4d` (#278) and this close's commit. Left local and untracked: #229's 131 files
-(`build/agent205/t229/pending_gates_229.list`). The tier went RED on one control (`test_static_runner`'s `pool-concurrency-off`
-DIED: `printf: write error: Broken pipe`, a `printf | grep -q` race in its section 22); the maintainer: *"Ticket it, re-run
-tier (Recommended)"* — filed #327; the driver re-ran the red (`build/agent208/close208c/tier_results.red-*.tsv`).
+### (1) THE 118_chain HEADER (NEXT_SESSION item 3)
+`tests/replays/118_chain.rpl` line 2 names `tests/audit_mizuumi_attack.sh` (#118), not a leg of
+`audit_mizuumi_inputs`, which the gate never ran.
 
+### (2) #229 — THE SIX FAMILY GATES FROZEN, REGISTERED AND CLASSIFIED; #229 CLOSED DONE
+- **Provenance** (rule-checker run `2026-10-25-1294`, "no control fires if the analysed image or the romset is not
+  pristine vsavj"): `tests/lib/pristine_vsavj.sh` (new) — ROMDIR audited, the vsavj fingerprint = the registry row, the
+  analysed image = the data view decrypted afresh, `MAME_ROMPATH` unset or ROMDIR, the MAME the legs run named by
+  `vs_mame_ident`; four controls (foreign-image, -romset, -rompath, -mame) in every gate, in-gate and as modes.
+- **The six gates** (`tests/audit_{vanilla_specials_a,vanilla_specials_b,es_ex,command_throws,guard_cancels,vanilla_pursuits}.sh`,
+  their expectations, rigs and tools) registered `ondemand` in the MAME lane (`tests/ci_emulator.tsv`), `gate_index.tsv`,
+  `PROVENANCE.md`, `operations.md`; FOLLOWS completed where the follows census caught three (`build/agent209/book/`).
+  Each freeze through the rule-checker (23 runs, `build/agent209/closing/229_freeze_runs.txt`); the maintainer ruled
+  *"Re-check only new evidence (Recommended)"* for these freezes. The six plain runs on the tree as committed: all PASS,
+  0 dead controls (`build/agent209/t229/v10/`); every mode exits 1; stock and WIDE MAME both PASS.
+- **Found and fixed on the way:** stale "and air throws" header wording (gate, map, `SIG_HEADER`); a dangling header line
+  in guard cancels; the command-throw clocks frozen before the 15:50 re-rig — re-frozen on today's rigs, 111 rows
+  identical (`build/agent209/t229/v9/`); the 71 motion-test rows never shown — drawn at 9 tiles
+  (`build/agent209/t229/capM/out/sheets/`), the maintainer: *"Freeze them as they are"*; eleven moves no answer named —
+  the maintainer: *"They are right …"* (`DECISIONS_HISTORY.md` "Read 2026-10-26 (14z-209)" entries).
+- **Classified:** fork D's `tools/crosscheck_229.py` + `tests/test_crosscheck_229.sh`; `docs/project/tables/community_crosscheck.md`
+  sections per family. Run `2026-10-26-1330` found three gaps (Demitri's ES Demon Cradle GC joined nowhere; no page
+  section for the specials FE..JE, Jedah's cells all uncomparable; two stale lines the page generator prints); the
+  maintainer: *"Split and close"* — they are #331, and #229 is **closed done** on the run's written resolution. Follow-ups
+  #329 (minimal half-circle inputs) and #330 (throws' recovery and throw tech).
+
+### (3) #321 PHASE 2, WITH #305, #306 AND #323 — DONE
+Fork A measured (`build/agent209/t321/`): the 14z-208b freeze tier 8,784 s, 45% at one job. Rule-checker runs
+`2026-10-25-1316`..`-1318`; -1318 found that fixing #323 makes every ERIS freeze tier STOP at parity's PARTIAL. Ruled
+(`DECISIONS_HISTORY.md` "Ruled 2026-10-26 (14z-209) — #321 phase 2"): all four speed-ups, *"Parity only on the Mac
+(Recommended)"*, #305 *"Yes, with #306 (Recommended)"*. Fork E built it (`build/agent209/t321e/`, its report saved
+verbatim as `REPORT_handback.md`): the ERIS tier 4,364 s in one pass, 181 of 181 shared verdicts equal; parity at 8 jobs
+on the Mac, 121 lines identical; `--skip`; `decrypt_cache_warm`; the lane variable `_lane_pool`. Closed on run
+`2026-10-26-1328` (with #244); #306's leftovers are #328.
+
+### (4) #244 — THE POWER CLASS ON THE CHARMAP PAGES — DONE
+Ruled *"Class + flags (Recommended)"*. Runs `2026-10-26-1320`..`-1323` found the html dropping the raw byte, bit 6 named,
+and a row check comparing the tool with itself; the cells now follow the ruling's words, checked by an oracle written
+from them (`build/agent209/t244/v3`, `v4`); tables, pages and `charmap_pages.sha256` regenerated. Gotcha appended.
+
+### (5) #302 — DONE
+`tests/expected/marionette_cost.tsv` re-frozen with the eight 118_* replays (run `2026-10-25-1297`, OK, closure included).
+
+### (6) #327 — FIX APPLIED, TICKET STAYS OPEN (progress comment posted)
+Fork C's `fix327.diff` (every builtin-fed `grep -q` in `tests/test_static_runner.sh` made `grep >/dev/null`, sections 32/33)
+applied over phase 2; the combined script re-traced on PILOT. The 14z-208c red was not reproduced at gate scale, and 183
+sites of the same form remain in 50 other files (`build/agent209/t327/census_code.txt`), so #327 stays open.
+
+### (7) TICKETS AT THE CLOSE
+Closed done, each with its comment, on its rule-checker run: #229 (`2026-10-26-1330`), #244, #305, #306, #321, #323
+(`2026-10-26-1328`), #302 (`2026-10-25-1297`). Filed: #328 (two stale build defaults, from #306), #329, #330, #331
+(from #229). #301 found closed by the maintainer on 2026-10-25 (*"No request from the community … Let's reopen a ticket
+when the time is right."*), recorded declined. `tools/tickets.py refresh` saved GitHub's state.
+
+
+### CLOSE (14z-209, 2026-10-26)
+Driver `build/agent209/close/` (`--prev build/agent208/close208c/tier_results.tsv`, the 14z-208c close's run of record).
+Before it, each ticket closed on GitHub with its comment, on its rule-checker run: #229 (`2026-10-26-1330`, split to #331 on
+the maintainer's *"Split and close"*), #244, #305, #306, #321 and #323 (`2026-10-26-1328`), #302 (`2026-10-25-1297`); #328 to
+#331 filed; #327 a progress comment; #301 found closed by the maintainer; the snapshot refreshed (`tools/tickets.py refresh`).
+Steps: sections ((1)..(7)); next-session (the 14z-208c opener to `docs/NEXT_SESSION_HISTORY.md`); rollover (the 14z-208c group,
+142 lines, to `STATE_HISTORY.md` with its ledger line); indexes (the archives', the ticket page, the gotchas index;
+regenerated with the gate index, coverage, descriptions, follows and must-fire censuses, where their gates PASS);
+dashboard (14z-163..14z-209, 1,982 figures, 0 unclassed; datasets versions 18, 18, 19, 18) — done. The tier's results:
+`build/agent209/close/tier_results.tsv`, the next close's `--prev`. `tests/controls_concurrent.txt`'s `test_static_runner`
+row re-traced on PILOT for the combined script (#321 phase 2 and #327).
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings
@@ -186,6 +119,7 @@ tier (Recommended)"* — filed #327; the driver re-ran the red (`build/agent208/
 
 One line per ruling that still constrains work: the rule and where its full entry lives. A line is deleted when its ruling stops constraining work (CLAUDE.md [VSP-17]). Shortened to the rule plus its pointer 2026-10-14 (#282 item A); the longer lines are in git history at `44a09f7f`.
 
+- **ERIS tiers skip parity; the Mac's parity run is the row of record (#321, 2026-10-26, 14z-209):** ERIS runs `--skip test_mame_parity` — `DECISIONS_HISTORY.md` "Ruled 2026-10-26 (14z-209) — #321 phase 2".
 - **ROM content in the tree (2026-10-18, 14z-205):** addresses and discrete values are fine; a whole graphic or sound, or a whole algorithm, is not ([VSP-8]; the four quoted sound-driver bytes stay) — `DECISIONS_HISTORY.md` "Ruled 2026-10-18 (14z-205) — the no-ROM-bytes rule: …".
 - **#291's last 22 gates (2026-10-18, 14z-205):** the tap gates prove by an EVENT-PROVEN basis (D2), groups 3-5 take a `no-picture` declaration kind (D4), D4 first — `DECISIONS_HISTORY.md` "Ruled 2026-10-18 (14z-205) — #291 S2: …".
 - **An action is checked when its work is done, never held for the close (2026-10-16, 14z-203):** a ticket is closed and a recommendation put in the piece of work that finishes it, through its rule-checker run then; a run cited in a CLOSE section is the tell — `DECISIONS_HISTORY.md` "Ruled 2026-10-16 (14z-203) — an action is checked when its work is done, never held for the close".

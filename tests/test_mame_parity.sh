@@ -63,10 +63,13 @@
 # because an unrun check must never read as green.
 #
 # Usage:
-#   ROMDIR=... [MAME_SRC_BIN=...] [MAME_REF_BIN=mame] [PARITY_JOBS=1] tests/test_mame_parity.sh
+#   ROMDIR=... [MAME_SRC_BIN=...] [MAME_REF_BIN=mame] [PARITY_JOBS=N] tests/test_mame_parity.sh
 #   ROMDIR=... FREEZE=1 [PARITY_JOBS=6] tests/test_mame_parity.sh   (needs the reference)
-#   PARITY_JOBS runs sections 1/1b and FREEZE N replays at a time (default 1, serial);
-#   ~16 s per run serial — 24 x 2 runs took 15 min 50 s on ERIS (WSL2, 2026-10-01).
+#   PARITY_JOBS runs sections 1/1b and FREEZE N replays at a time (default min(16, CPUs x 2/3) since 14z-209, #321:
+#   1 until then); sections 2/3, the A/B extension, run one replay at a time whatever it says. Measured alone on ERIS
+#   (24 threads, fork A of 14z-209, build/agent209/t321/): 2,485 s at 1 job in the 14z-208b freeze, 666/375/300/244 s at
+#   4/8/12/16, the whole output identical to the freeze's at every count. The gate runs in the prereq lane, which the
+#   runner keeps serial, so nothing runs beside it.
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -90,7 +93,12 @@ cd "$REPO"
 SRC_BIN="${MAME_SRC_BIN:-$HOME/.cache/vampire-saved/mame-ref/cps2}"
 REF_BIN="${MAME_REF_BIN:-$(command -v mame || true)}"
 AB_TABLE="$REPO/tests/expected/mame_parity_ab.tsv"
-PARITY_JOBS="${PARITY_JOBS:-1}"
+# THE DEFAULT JOB COUNT (14z-209, #321, maintainer-ruled 2026-10-26 "Parity jobs"): two thirds of the host's CPUs, at
+# most 16 and at least 1 (getconf on Linux/WSL2, sysctl on macOS).
+if [ -z "${PARITY_JOBS:-}" ]; then
+    _np="$(getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 1)"
+    PARITY_JOBS=$(( _np * 2 / 3 )); [ "$PARITY_JOBS" -le 16 ] || PARITY_JOBS=16; [ "$PARITY_JOBS" -ge 1 ] || PARITY_JOBS=1
+fi
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT

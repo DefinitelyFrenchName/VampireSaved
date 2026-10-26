@@ -73,32 +73,34 @@ vs_ctl_fired() { echo "CONTROL FIRED: $1 — $2"; }
 vs_ctl_dead()  { echo "CONTROL DEAD: $1 — $2"; return 1; }
 
 vs_ctl_read() {  # vs_ctl_read <script> <log>
-    _s="$1"; _l="$2"
+    # ITS SCRATCH NAMES ARE PREFIXED (14z-209, #323): a sh function has no locals, and this one ran in the runner's
+    # own shell, where its `_l` overwrote the lane loop variable and disabled the prereq STOP.
+    _vcr_s="$1"; _vcr_l="$2"
     VS_CTL_DECLARED=0; VS_CTL_FIRED=0; VS_CTL_DEAD=0; VS_CTL_UNDECLARED=0
     VS_CTL_MISSING=""; VS_CTL_DETAIL=""; VS_CTL_VERDICT=OK
-    _decl="$(vs_ctl_declared "$_s")"
-    _none="$(vs_ctl_none "$_s")"
-    _fired="$(grep -aE '^CONTROL FIRED: [a-z0-9-]+' "$_l" 2>/dev/null | sed -E 's/^CONTROL FIRED: ([a-z0-9-]+).*/\1/')"
-    _dead="$(grep -aE '^CONTROL DEAD: [a-z0-9-]+' "$_l" 2>/dev/null | sed -E 's/^CONTROL DEAD: ([a-z0-9-]+).*/\1/')"
-    for _n in $_decl; do
+    _vcr_decl="$(vs_ctl_declared "$_vcr_s")"
+    _vcr_none="$(vs_ctl_none "$_vcr_s")"
+    _vcr_fired="$(grep -aE '^CONTROL FIRED: [a-z0-9-]+' "$_vcr_l" 2>/dev/null | sed -E 's/^CONTROL FIRED: ([a-z0-9-]+).*/\1/')"
+    _vcr_dead="$(grep -aE '^CONTROL DEAD: [a-z0-9-]+' "$_vcr_l" 2>/dev/null | sed -E 's/^CONTROL DEAD: ([a-z0-9-]+).*/\1/')"
+    for _vcr_n in $_vcr_decl; do
         VS_CTL_DECLARED=$((VS_CTL_DECLARED + 1))
-        if printf '%s\n' "$_dead" | grep -qx -- "$_n"; then
-            VS_CTL_DEAD=$((VS_CTL_DEAD + 1)); VS_CTL_MISSING="$VS_CTL_MISSING $_n(dead)"
-        elif printf '%s\n' "$_fired" | grep -qx -- "$_n"; then
+        if printf '%s\n' "$_vcr_dead" | grep -qx -- "$_vcr_n"; then
+            VS_CTL_DEAD=$((VS_CTL_DEAD + 1)); VS_CTL_MISSING="$VS_CTL_MISSING $_vcr_n(dead)"
+        elif printf '%s\n' "$_vcr_fired" | grep -qx -- "$_vcr_n"; then
             VS_CTL_FIRED=$((VS_CTL_FIRED + 1))
         else
-            VS_CTL_DEAD=$((VS_CTL_DEAD + 1)); VS_CTL_MISSING="$VS_CTL_MISSING $_n(not fired)"
+            VS_CTL_DEAD=$((VS_CTL_DEAD + 1)); VS_CTL_MISSING="$VS_CTL_MISSING $_vcr_n(not fired)"
         fi
     done
-    for _n in $_fired $_dead; do
-        printf '%s\n' "$_decl" | grep -qx -- "$_n" \
-            || { VS_CTL_UNDECLARED=$((VS_CTL_UNDECLARED + 1)); VS_CTL_MISSING="$VS_CTL_MISSING $_n(undeclared)"; }
+    for _vcr_n in $_vcr_fired $_vcr_dead; do
+        printf '%s\n' "$_vcr_decl" | grep -qx -- "$_vcr_n" \
+            || { VS_CTL_UNDECLARED=$((VS_CTL_UNDECLARED + 1)); VS_CTL_MISSING="$VS_CTL_MISSING $_vcr_n(undeclared)"; }
     done
     if [ "$VS_CTL_DEAD" != 0 ] || [ "$VS_CTL_UNDECLARED" != 0 ]; then
         VS_CTL_VERDICT=RED
         VS_CTL_DETAIL="controls RED:$VS_CTL_MISSING"
     elif [ "$VS_CTL_DECLARED" = 0 ]; then
-        if [ -n "$_none" ]; then VS_CTL_VERDICT=NONE; VS_CTL_DETAIL="none — $_none"
+        if [ -n "$_vcr_none" ]; then VS_CTL_VERDICT=NONE; VS_CTL_DETAIL="none — $_vcr_none"
         else VS_CTL_VERDICT=UNDECLARED; VS_CTL_DETAIL="no MUST-FIRE line"; fi
     fi
     return 0

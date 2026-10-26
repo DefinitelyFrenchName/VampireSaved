@@ -1,0 +1,18 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_vanilla_specials_b.sh	78f153727e7ba62961c1d8114a495da2c2de5184
+tests/expected/vanilla_specials_b.tsv	2fbab6d36de909d8623ccd0a061410b87ac3990f
+tests/expected/vanilla_specials_b_ticks.sha256	137aa690fd5279931865c42a45db3e1b95deab13
+tests/expected/instr_gameclock/audit_vanilla_specials_b.tsv	6357c1496ebca2f414b07f5bb58be63d1c7c134b
+tests/lua/specials_b_trace.lua	f4a7da0453015cbba474f2f52b8982de6fbcc5bb
+build/agent209/t229/v2/vanilla_specials_b.log	adcab7129c3b23f36662f8ebd5e3edd8f06f6568
+build/agent205/t229/f2_specials_b/mode_swapped-strengths.log	ad02c4c135ea1bf3456c02e9286d658b9f88772d
+build/agent205/t229/f2_specials_b/mode_unsigned-offsets.log	e4102af67982b90d83438402bac8c4a00ad62c6d
+build/agent205/t229/f2_specials_b/mode_window-at-event.log	cdab2274c668a4abbf6fff0baa38c25404cee5a4
+build/agent205/t229/f2_specials_b/mode_p1-clock.log	4c08ca387152990a862f2a261b283c3de2bbab64
+build/agent205/t229/f2_specials_b/mode_drift-clock.log	199fd7f3d97aba50b362be33c87ed429a349695b
+build/agent205/t229/f2_specials_b/mode_first-frame-skip.log	2d98c4464f232b682b42fc2f2731154747947372
+build/agent209/t229/asrun/specials_b_header.diff	0e7f1ff708182afd9f1791f23ce9dda3713559f6
+build/agent209/t229/sheetmap/cmp_f23.py	adfc2a35b4e76e710543db53b6badab2e57b1f0d
+build/agent209/t229/sheetmap/cmp_f23.out	f32d846f51f1f5d7cf470eb74857d7073765352b
+DECISIONS_HISTORY.md.lines-8267-8277 (lines 8267-8277 of DECISIONS_HISTORY.md: its INDEX entry "## Read 2026-10-25 (14z-209) — #229 Q1: the maintainer's answer in the questions doc — the sheets of")	e78a915c65e6d0c09cfacf0a65709b1aeae9d5b0
+build/agent205/t229/f2_specials_b/REPORT_followup.md	314a7de8466c90264af47f68c017df8860adb55b

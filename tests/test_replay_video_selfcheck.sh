@@ -39,7 +39,9 @@
 #                       Both directions matter: an instrument that always
 #                       differs is as useless as one that never does.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] tests/test_replay_video_selfcheck.sh
+# Usage: ROMDIR=... [MAME_BIN=...] tests/test_replay_video_selfcheck.sh [rompath]
+#   rompath: check 4's build with the known medallion difference; default build/donovan6/rompath (the registry
+#   passes %STOCK_RP%, the stock twin, built by the same recipe — 14z-209, #306)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that
@@ -54,6 +56,7 @@ cd "$REPO"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 RPL="tests/replays/02_demitri_vs_cpu.rpl"
+DONRP="${1:-$REPO/build/donovan6/rompath}"
 fail=0
 
 run() {   # run <tag> <rompath>
@@ -97,13 +100,13 @@ else
 fi
 
 echo "== 4. two-sided ground truth vs a known pixel difference =="
-if [ ! -f "build/donovan6/rompath/vsavj.zip" ]; then
-    echo "  SKIPPED: no build/donovan6/rompath (the dev build tests/test_m2b_stage6.sh makes: GEN_FLAGS=\"--allow-plausible --tripwire-open\" tools/build_donovan.sh 6 build/donovan6)"
+if [ ! -f "$DONRP/vsavj.zip" ]; then
+    echo "  SKIPPED: no $DONRP/vsavj.zip (the stock twin, or the dev build tests/test_m2b_stage6.sh makes: GEN_FLAGS=\"--allow-plausible --tripwire-open\" tools/build_donovan.sh 6 build/donovan6)"
     echo "  NOTE: checks 1-3 show the instrument is live, deterministic and"
     echo "        harmless, but NOT that it detects a real pixel difference."
     skipped=1
 else
-    run don "$REPO/build/donovan6/rompath;$ROMDIR"
+    run don "$DONRP;$ROMDIR"
     # Frame 650 (title): tests/test_gfx_menus.sh compares it full-frame and
     # passes, so these two builds are pixel-identical there.
     if [ "$(vsum van 650)" = "$(vsum don 650)" ]; then

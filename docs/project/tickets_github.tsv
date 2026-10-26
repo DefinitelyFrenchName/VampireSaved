@@ -2,18 +2,22 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 327
+# issues: 331
 number	state	reason	closed	labels	title
+331	OPEN	-	-	evolution,severity: low	#229's remainder: Demitri's ES Demon Cradle GC unjoined; the FE..JE specials section and two stale lines on the cross-check page
+330	OPEN	-	-	evolution,severity: low	Throws: recovery and throw tech not measured for the normal and command throws (split from #229)
+329	OPEN	-	-	evolution,severity: low	The minimal half-circle inputs vsavj accepts are not measured from the command handlers (split from #229)
+328	OPEN	-	-	bug,severity: low,test-integrity	Two emulator gates default to builds a clean clone lacks: audit_trap_sound (build/hui30), test_shim_charid (build/m5_wide)
 327	OPEN	-	-	bug,severity: low,test-integrity	test_static_runner: 'printf | grep -q' races (SIGPIPE) and a control reads DIED under load
 326	CLOSED	COMPLETED	2026-10-25	bug,severity: low,test-integrity	test_release_reuse FAILs on Linux: its synthetic repo counts Python's __pycache__ as untracked, so the freeze identity moves mid-run
 325	CLOSED	COMPLETED	2026-10-25	bug,severity: low	run_on_snapshot: two runs of one commit started in the same second share a snapshot directory
 324	CLOSED	COMPLETED	2026-10-25	bug,severity: low,test-integrity	PILOT's clone root holds an untracked '-V' file ('stub patch', 2026-10-23): a stub xdelta3 leaking into the repository
-323	OPEN	-	-	bug,severity: low,test-integrity	The emulator runner's prereq STOP applied unevenly: the freeze run went on past a red prereq row, the release run stopped on the same row
+323	CLOSED	COMPLETED	2026-10-26	bug,severity: low,test-integrity	The emulator runner's prereq STOP applied unevenly: the freeze run went on past a red prereq row, the release run stopped on the same row
 322	CLOSED	COMPLETED	2026-10-25	bug,severity: medium,test-integrity	test_release_launcher_bat's Windows half: its gen_claims fixture writes the README in the host's default encoding (cp1252 on ERIS)
-321	OPEN	-	-	evolution,performance,severity: medium	Parallelise the gates that run serially by default: test_mame_parity's PARITY_JOBS and the other job knobs, checks and controls
-320	OPEN	-	-	bug,test-integrity	MAME write taps exit 139 at teardown after every output is written; gates accept it only with full output
+321	CLOSED	COMPLETED	2026-10-26	evolution,performance,severity: medium	Parallelise the gates that run serially by default: test_mame_parity's PARITY_JOBS and the other job knobs, checks and controls
+320	OPEN	-	-	bug,severity: low,test-integrity	MAME write taps exit 139 at teardown after every output is written; gates accept it only with full output
 319	CLOSED	COMPLETED	2026-10-25	bug	tests/expected/ground_throws.tsv holds per-move signatures in the clear (the 14z-126 frame-data ruling)
-318	OPEN	-	-	bug,correctness	tools/anim_nodes.py reads the animation tables' offsets unsigned; the game sign-extends them (negative entries on 11 characters)
+318	OPEN	-	-	bug,correctness,severity: low	tools/anim_nodes.py reads the animation tables' offsets unsigned; the game sign-extends them (negative entries on 11 characters)
 317	CLOSED	COMPLETED	2026-10-24	evolution	Snapshot tiers: measure the remaining setup, re-snapshot incrementally after a red, base the re-run on the red run
 316	CLOSED	COMPLETED	2026-10-25	evolution	Release reuses the freeze's tier results when it builds from the freeze's exact tree
 315	CLOSED	COMPLETED	2026-10-24	evolution,test-integrity	#312's concurrent-controls list is a snapshot: nothing re-checks that a listed gate still writes as it was traced
@@ -25,12 +29,12 @@ number	state	reason	closed	labels	title
 309	CLOSED	COMPLETED	2026-10-22	bug,severity: low,test-integrity	test_proof_sheets' control relative-unresolved is dead wherever the repository path is as deep as the capture's work dir
 308	CLOSED	COMPLETED	2026-10-23	bug,severity: low,test-integrity	On Windows the release generator writes cp1252 and test_readme_recording writes CRLF, so the gate cannot pass there
 307	CLOSED	COMPLETED	2026-10-24	evolution	build/ has no retention rule for logs and session evidence (47 GB, 1,134 entries); measure what references each family before pruning
-306	OPEN	-	-	bug,severity: low,test-integrity	Nine emulator gates default to build/donovan6, which only test_m2b_stage6 builds; a clean checkout's order decides whether they find it
-305	OPEN	-	-	bug,severity: low,test-integrity	The emulator tier has no decrypt-view warm-up, and build_donovan.sh writes the view cache non-atomically (#299's two gaps)
+306	CLOSED	COMPLETED	2026-10-26	bug,severity: low,test-integrity	Nine emulator gates default to build/donovan6, which only test_m2b_stage6 builds; a clean checkout's order decides whether they find it
+305	CLOSED	COMPLETED	2026-10-26	bug,severity: low,test-integrity	The emulator tier has no decrypt-view warm-up, and build_donovan.sh writes the view cache non-atomically (#299's two gaps)
 304	CLOSED	COMPLETED	2026-10-24	bug,severity: high,test-integrity	The static-tier planner counts untracked build/ output as changed inputs (build/sheets/: 5,739 files, a 3-hour plan); review what it includes and excludes
 303	CLOSED	COMPLETED	2026-10-23	bug	Static-tier gates leave their temp directories in /tmp (~1,690 entries, ~2.3 GB over four tiers)
-302	OPEN	-	-	bug,test-integrity	audit_marionette_cost reads 8 more replays per hook row than its frozen expectation on a clean clone
-301	OPEN	-	-	evolution,parked,severity: low	Community cross-check: create report of the #229 workbook differences for the community, and check the open questions against vswiki
+302	CLOSED	COMPLETED	2026-10-26	bug,test-integrity	audit_marionette_cost reads 8 more replays per hook row than its frozen expectation on a clean clone
+301	CLOSED	COMPLETED	2026-10-25	evolution,parked,severity: low	Community cross-check: create report of the #229 workbook differences for the community, and check the open questions against vswiki
 300	CLOSED	COMPLETED	2026-10-19	bug,test-integrity	test_close_tools REFUSED on the live tree: section 2b reads the findings table #288 cut from the close
 299	CLOSED	COMPLETED	2026-10-22	evolution,performance	Static tier: run gates in parallel (--jobs, ~70-80% of the machine), proven equal to a serial run first
 298	CLOSED	COMPLETED	2026-10-24	evolution,performance	Static tier scope: at a commit/close, execute a gate's controls only when a program of its reach changed (R1); all at freeze/release
@@ -87,7 +91,7 @@ number	state	reason	closed	labels	title
 247	CLOSED	COMPLETED	2026-10-12	bug	[P3] Direct release packager deletes the previous package before replacement validation
 246	CLOSED	COMPLETED	2026-10-12	bug	[P3] Release name can escape the output root and recursively delete a sibling directory
 245	CLOSED	COMPLETED	2026-10-12	bug	[P2] WIDE overlay builder overwrites a source vsavjw.zip through its own symlink
-244	OPEN	-	-	bug,severity: low	Tenant charmap pages print the raw +8/+9 power byte as damage (the #241 decode not applied to charmap_html/charmap_md)
+244	CLOSED	COMPLETED	2026-10-26	bug,severity: low	Tenant charmap pages print the raw +8/+9 power byte as damage (the #241 decode not applied to charmap_html/charmap_md)
 243	CLOSED	COMPLETED	2026-10-17	bug,severity: medium	Staleness audit: 79 emulator gates declare the whole tests/replays/ directory, so any new replay stales them all
 242	CLOSED	COMPLETED	2026-10-08	bug	retraction_grep never lists a retracted wording broken by a quote prefix or HTML markup
 241	CLOSED	COMPLETED	2026-10-08	bug	Cross-check record derivation reads bit 7 of Zabel's pursuit damage bytes as damage (258/130 for a 0/2 hit)
@@ -102,7 +106,7 @@ number	state	reason	closed	labels	title
 232	CLOSED	COMPLETED	2026-10-06	bug	The jtsim scratch heal does not cover submodules: the tmp reaper took their gitdir HEAD and the MiSTer lane failed in 3 s
 231	CLOSED	COMPLETED	2026-10-06	bug	attribute_patch_delta.py needs a gen.log the solo tracks never write, and the freeze has no byte-level program diff step
 230	CLOSED	COMPLETED	2026-10-06	evolution	Capture geometry in-emulator: Pyron's and Donovan's throws against the roster victims (split from #116)
-229	OPEN	-	-	evolution,severity: low	Community cross-check: naming rigs on vsavj for specials, supers, EX/ES moves, throws and pursuits (split from #117)
+229	CLOSED	COMPLETED	2026-10-26	evolution,severity: low	Community cross-check: naming rigs on vsavj for specials, supers, EX/ES moves, throws and pursuits (split from #117)
 228	CLOSED	COMPLETED	2026-10-11	bug,severity: medium	Breakpoint instruments on the frame_done clock, and pc_count.lua's first-frame skip: measure each for drift (#213's class)
 227	CLOSED	COMPLETED	2026-10-07	cosmetic	MAME README: say the four 'clone of nonexistent driver megaman' lines at every start are expected and harmless
 226	CLOSED	COMPLETED	2026-10-08	done unshipped,evolution	Test the Linux release end to end: PILOT's linux-x86_64 build as a player gets it (asset, applier, launcher, a real desktop run)

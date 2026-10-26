@@ -87,13 +87,15 @@ python3 tools/audit_roms.py "$ROMDIR" > /dev/null || {
 # Decrypted analysis views (gitignored intermediates): the extractor and
 # generator read build/out/<set>_{opcodes,data}.bin. Regenerate any that
 # are missing — deterministic from the audited reference sets.
-mkdir -p build/out
+# THROUGH THE ONE CACHE WRITER (#305, 14z-209): this loop wrote the views in place behind a bare `[ -f ]`, so a decrypt
+# that died half-way left a short file every later `[ -f ]` accepted, and a direct reader racing it could open a
+# part-written one. decrypt_cache_ensure (tests/lib/decrypt_cache.sh) writes to a temp file inside build/out, size-checks
+# it and renames it, and rebuilds a SHORT view as well as a missing one.
+. "$REPO/tests/lib/decrypt_cache.sh"
 for _set in vsavj vsav2 vhunt2; do
-    if [ ! -f "build/out/${_set}_opcodes.bin" ] || [ ! -f "build/out/${_set}_data.bin" ]; then
+    if ! _dv_ok "build/out/${_set}_opcodes.bin" || ! _dv_ok "build/out/${_set}_data.bin"; then
         echo "regenerating decrypted views for $_set ..."
-        python3 tools/cps2_decrypt.py "$ROMDIR/${_set}.zip" \
-            "build/out/${_set}_opcodes.bin" \
-            --data-out "build/out/${_set}_data.bin" | tail -2
+        decrypt_cache_ensure "$_set" || { echo "FAIL: the decrypted views of $_set could not be built" >&2; exit 1; }
     fi
 done
 

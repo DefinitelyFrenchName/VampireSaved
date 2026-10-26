@@ -38,6 +38,10 @@
 #   decrypt_view callers racing on one cold set both get full images.
 #   Since #324 (14z-208b, section 30): a strict run whose gate leaves a new untracked file outside build/ is NOT GREEN
 #   and names the file; a file left inside build/, and one already there before the run, do not count.
+#   Since #327 (14z-209, section 32): no line of this gate feeds a builtin printf/echo into `grep -q` — grep -q exits at
+#   its first match, and a builtin still writing a capture larger than the pipe buffer, with SIGPIPE ignored, prints
+#   `printf: write error: Broken pipe`, which the classifier reads as a crash (the 14z-208c close's DIED control);
+#   the premise is measured in the same section, the old form printing the error and `grep >/dev/null` not.
 #
 # MUST-FIRE: shadow-tool: reader-unplugged — a copy of run_all_static.sh that hands the classifier no gate script must let a stub with a declared-but-unfired control read PASS (mode: that copy is the runner every section drives, and section 11 must fail)
 # MUST-FIRE: shadow-tool: trigger-blind — a copy of run_all_static.sh with its cadence TRIGGER match disabled must leave a freeze-cadence gate deferred although a path it depends on changed; section 14's triggered case must FAIL under it
@@ -62,6 +66,7 @@
 # MUST-FIRE: shadow-tool: runrec-controls-lost — a copy of run_all_static.sh whose RUNREC-KEEPS-CONTROLS copy is disabled must leave the run record without the control times, and section 26 must FAIL (mode: that copy drives section 26; section 27 fires it in-run; #276, 14z-205)
 # MUST-FIRE: shadow-tool: decrypt-warm-off — a copy of run_all_static.sh whose DECRYPT-WARM call is disabled must leave a stub that reads build/out directly on a cold cache, and section 28 must FAIL (mode: that copy drives section 28; section 29 fires it in-run; #299, 14z-206)
 # MUST-FIRE: shadow-tool: stray-blind — a copy of run_all_static.sh whose STRAY-CHECK comparison is disabled must read GREEN on a strict run whose stub leaves a file in the clone root, and section 30 must FAIL (mode: that copy drives section 30; section 31 fires it in-run; #324, 14z-208b)
+# MUST-FIRE: perturbed-copy: pipe-q — a copy of this gate with one builtin `printf | grep -q` line planted must be named by section 32's lint (mode: section 32 lints that copy and must FAIL; section 33 fires it in-run; #327, 14z-209)
 # MUST-FIRE: shadow-tool: prediction-off — a copy of tools/static_confirm.py whose plan marks nothing STALE must CARRY the stub whose input changed, and section 18 must FAIL (mode: that copy in the confirm repo)
 #
 # WHY A GATE FOR THE RUNNER. CLAUDE.md §4: "Verdict logic is itself tested. A
@@ -185,7 +190,7 @@ out="$(cd "$FR" && sh tests/run_all_static.sh --tier portable 2>&1)" && st=0 || 
 
 echo "== 1. each verdict is classified correctly =="
 check() {  # check <name> <expected-verdict>
-    if printf '%s' "$out" | grep -qE "^  $1 +$2( |$)"; then
+    if printf '%s' "$out" | grep -E >/dev/null "^  $1 +$2( |$)"; then
         echo "  ok: $1 -> $2"
     else
         fail "$1 was not classified $2:"
@@ -200,7 +205,7 @@ check g_prose PASS
 check g_skip_fail FAIL
 
 echo "== 2. the TALLY matches (the number a human reads) =="
-if printf '%s' "$out" | grep -q "PASS 2 .*SKIP 2 .*FAIL 2"; then
+if printf '%s' "$out" | grep >/dev/null "PASS 2 .*SKIP 2 .*FAIL 2"; then
     echo "  ok: PASS 2  SKIP 2  FAIL 2 (the SKIP-and-exit-2 gate counts FAIL)"
 else
     fail "wrong tally: $(printf '%s' "$out" | grep -E '^PASS ' || echo '(none printed)')"
@@ -216,7 +221,7 @@ o2="$(cd "$FR" && sh tests/run_all_static.sh --tier portable 2>&1)" && s2=0 || s
 if [ "$s2" = 0 ]; then
     echo "  ok: without --strict an all-SKIP run exits 0 (skips are legitimate"
     echo "      on a fresh checkout) — but it must SAY so:"
-    printf '%s' "$o2" | grep -qE "SKIP 2" \
+    printf '%s' "$o2" | grep -E >/dev/null "SKIP 2" \
         && echo "      ok: the tally reports SKIP 2, so it cannot read as 2 passes" \
         || fail "the tally hides the skips"
 else
@@ -233,7 +238,7 @@ fi
 echo "== 5. a registered-but-missing gate is MISSING, not silently dropped =="
 printf 'g_pass\nno_such_gate\n' > "$FR/tests/ci_portable.txt"
 o4="$(cd "$FR" && sh tests/run_all_static.sh --tier portable 2>&1)" && s4=0 || s4=$?
-if printf '%s' "$o4" | grep -q "MISSING" && [ "$s4" != 0 ]; then
+if printf '%s' "$o4" | grep >/dev/null "MISSING" && [ "$s4" != 0 ]; then
     echo "  ok: reported MISSING and exited nonzero"
 else
     fail "a registered gate that does not exist was ignored — a typo in the"
@@ -244,7 +249,7 @@ echo "== 6. the anti-orphan check finds an unregistered emulator-free gate =="
 printf 'g_pass\n' > "$FR/tests/ci_portable.txt"
 mk g_orphan 0 "PASS: nobody registered me"
 o5="$(cd "$FR" && sh tests/run_all_static.sh --tier portable 2>&1)"
-if printf '%s' "$o5" | grep -q "g_orphan"; then
+if printf '%s' "$o5" | grep >/dev/null "g_orphan"; then
     echo "  ok: the unregistered gate is named"
 else
     fail "an unregistered emulator-free gate was NOT reported — this check is"
@@ -255,7 +260,7 @@ mk g_emu 0 "PASS: I boot mame"
 printf '#!/bin/sh\nMAME_BIN=x tools/run_mame.sh vsavj\n' > "$FR/tests/g_emu.sh"
 chmod +x "$FR/tests/g_emu.sh"
 o6="$(cd "$FR" && sh tests/run_all_static.sh --tier portable 2>&1)"
-if printf '%s' "$o6" | grep -q "g_emu"; then
+if printf '%s' "$o6" | grep >/dev/null "g_emu"; then
     fail "an EMULATOR gate was reported as an unregistered static gate — the"
     fail "      check would nag about every soak in the repo and be ignored"
 else
@@ -288,16 +293,16 @@ mk g_shellcrash 0 "tests/g_shellcrash.sh: line 3: FOO: set FOO to a dir OUTSIDE 
 mk g_segv 0 "PASS: the summary line" "tests/g_segv.sh: line 64:  2444 Segmentation fault: 11  REPLAY=x"
 printf 'g_pass\ng_shellcrash\ng_segv\n' > "$FR/tests/ci_portable.txt"
 o8="$(cd "$FR" && sh tests/run_all_static.sh --tier portable 2>&1)" && s8=0 || s8=$?
-if printf '%s' "$o8" | grep -qE '^  g_shellcrash +FAIL .*\(exit 0 after a shell error\)'; then
+if printf '%s' "$o8" | grep -E >/dev/null '^  g_shellcrash +FAIL .*\(exit 0 after a shell error\)'; then
     echo "  ok: a shell-error line with exit 0 is FAIL, and the row says why"
 else
     fail "shell-error crash not classified FAIL (was PASS before 14z-139):"
     printf '%s' "$o8" | grep -E '^  g_shellcrash' | sed 's/^/        /'
 fi
-printf '%s' "$o8" | grep -qE '^  g_segv +PASS' \
+printf '%s' "$o8" | grep -E >/dev/null '^  g_segv +PASS' \
     && echo "  ok: a MAME teardown segfault line after the summary stays PASS" \
     || fail "the benign segfault shape was not PASS"
-printf '%s' "$o8" | grep -q "PASS 2 .*SKIP 0 .*FAIL 1" \
+printf '%s' "$o8" | grep >/dev/null "PASS 2 .*SKIP 0 .*FAIL 1" \
     && echo "  ok: tally PASS 2  SKIP 0  FAIL 1" \
     || fail "wrong tally: $(printf '%s' "$o8" | grep -E '^PASS ' || echo '(none printed)')"
 [ "$s8" != 0 ] && echo "  ok: and the runner exits nonzero ($s8)" \
@@ -329,24 +334,24 @@ out="$(cd "$FR" && sh tests/run_all_static.sh 2>&1)" && st=0 || st=$?
 # so a bare grep for a gate name matches its verdict line and any control
 # built on that is dead (measured on the first write, 14z-141).
 noteblock() { printf '%s\n' "$1" | awk '/^== NOTE-class numbers/{f=1;next} /^====/{f=0} f'; }
-printf '%s\n' "$(noteblock "$out")" | grep -q 'g_note  *rule5.gameplay in-table 15 baked 202' \
+printf '%s\n' "$(noteblock "$out")" | grep >/dev/null 'g_note  *rule5.gameplay in-table 15 baked 202' \
     && echo "  ok: the NOTE line is surfaced, named by its gate" \
     || fail "the NOTE line was not surfaced"
-printf '%s\n' "$out" | grep -q 'PASS 3 ' \
+printf '%s\n' "$out" | grep >/dev/null 'PASS 3 ' \
     && echo "  ok: a NOTE does not disturb the tally (3 PASS)" \
     || fail "the tally moved: $(printf '%s\n' "$out" | grep '^PASS ')"
 [ "$st" = 0 ] && echo "  ok: a NOTE does not change the exit status" \
               || fail "a NOTE changed the runner's exit status ($st)"
-printf '%s\n' "$(noteblock "$out")" | grep -q 'g_noteprose' \
+printf '%s\n' "$(noteblock "$out")" | grep >/dev/null 'g_noteprose' \
     && fail "prose containing 'note' was surfaced as a NOTE" \
     || echo "  ok: prose containing the word note is NOT a NOTE line"
 # the control's own LIVENESS: the block reader must really see g_note there
-printf '%s\n' "$(noteblock "$out")" | grep -q 'g_note ' \
+printf '%s\n' "$(noteblock "$out")" | grep >/dev/null 'g_note ' \
     || fail "the block reader sees nothing - the must-NOT-fire control is dead"
 # and the empty case must say so rather than printing a row per gate
 printf 'g_pass\n' > "$FR/tests/ci_portable.txt"
 out2="$(cd "$FR" && sh tests/run_all_static.sh 2>&1)"
-printf '%s\n' "$(noteblock "$out2")" | grep -q '(none)' \
+printf '%s\n' "$(noteblock "$out2")" | grep >/dev/null '(none)' \
     && echo "  ok: with no NOTE anywhere the block says (none)" \
     || fail "the empty NOTE block printed rows: $(printf '%s\n' "$out2" | grep -A3 'NOTE-class')"
 
@@ -385,19 +390,19 @@ else
 chmod +x "$FR/tests/g_editor.sh"
 printf 'g_editor\ng_reader\n' > "$FR/tests/ci_portable.txt"
 o10="$(cd "$FR" && sh tests/run_all_static.sh --tier portable 2>&1)" || true
-if printf '%s' "$o10" | grep -q 'TRACKED FILES CHANGED DURING THE RUN'; then
+if printf '%s' "$o10" | grep >/dev/null 'TRACKED FILES CHANGED DURING THE RUN'; then
     echo "  ok: the tree change is reported as a FACT with both causes offered"
 else
     fail "the reworded tree-change message did not appear"
 fi
-if printf '%s' "$o10" | grep -q 'a GATE wrote into a tracked path' \
-   && printf '%s' "$o10" | grep -q 'the TREE WAS EDITED while the run'; then
+if printf '%s' "$o10" | grep >/dev/null 'a GATE wrote into a tracked path' \
+   && printf '%s' "$o10" | grep >/dev/null 'the TREE WAS EDITED while the run'; then
     echo "  ok: BOTH causes are offered — the message no longer asserts one"
 else
     fail "the message still asserts a single cause; the mid-run-edit cause is"
     fail "      the one that cost a run on 2026-09-09"
 fi
-if printf '%s' "$o10" | grep -q 'SUSPECT'; then
+if printf '%s' "$o10" | grep >/dev/null 'SUSPECT'; then
     echo "  ok: the failing gate's verdict is marked SUSPECT"
 else
     fail "a gate failed while a tracked file changed and its verdict was"
@@ -407,7 +412,7 @@ fi
 # becomes noise and gets skipped exactly like the message it replaces.
 printf 'g_pass\ng_fail\n' > "$FR/tests/ci_portable.txt"
 o11="$(cd "$FR" && sh tests/run_all_static.sh --tier portable 2>&1)" || true
-if printf '%s' "$o11" | grep -q 'SUSPECT'; then
+if printf '%s' "$o11" | grep >/dev/null 'SUSPECT'; then
     fail "a run that changed NOTHING reported SUSPECT — the caveat would be"
     fail "      noise, and a caveat that always fires is not read"
 else
@@ -434,7 +439,7 @@ mkc g_cnone    0 "# MUST-FIRE: none — a lister asserts nothing" "PASS: fine"
 printf 'g_pass\ng_cfired\ng_cmissing\ng_cdead\ng_cghost\ng_cnone\n' > "$FR/tests/ci_portable.txt"
 o11="$(cd "$FR" && sh tests/run_all_static.sh --tier portable --exec-controls none 2>&1)" && s11=0 || s11=$?
 c11() {  # c11 <gate> <verdict>
-    printf '%s' "$o11" | grep -qE "^  $1 +$2( |$)" && echo "  ok: $1 -> $2" \
+    printf '%s' "$o11" | grep -E >/dev/null "^  $1 +$2( |$)" && echo "  ok: $1 -> $2" \
         || { fail "$1 not classified $2:"; printf '%s' "$o11" | grep -E "^  $1" | sed 's/^/        /'; }
 }
 c11 g_cfired PASS
@@ -443,13 +448,13 @@ c11 g_cdead FAIL
 c11 g_cghost FAIL
 c11 g_cnone PASS
 c11 g_pass PASS
-printf '%s' "$o11" | grep -q 'read:     fired 1 / declared 3' \
+printf '%s' "$o11" | grep >/dev/null 'read:     fired 1 / declared 3' \
     && echo "  ok: the readout counts fired 1 / declared 3 (three declaring stubs, one fired)" \
     || fail "readout wrong: $(printf '%s' "$o11" | grep 'read:' || echo '(none)')"
-printf '%s' "$o11" | grep -q 'gates declaring none: 1; undeclared: 1' \
+printf '%s' "$o11" | grep >/dev/null 'gates declaring none: 1; undeclared: 1' \
     && echo "  ok: one none-declaring gate and one undeclared gate (g_pass) are counted, not failed" \
     || fail "the none/undeclared counts are wrong: $(printf '%s' "$o11" | grep 'read:' || echo '(none)')"
-printf '%s' "$o11" | grep -q 'PASS 3 .*SKIP 0 .*FAIL 3' \
+printf '%s' "$o11" | grep >/dev/null 'PASS 3 .*SKIP 0 .*FAIL 3' \
     && echo "  ok: tally PASS 3  FAIL 3 — a red controls block is plain FAIL, no fourth verdict" \
     || fail "wrong tally: $(printf '%s' "$o11" | grep -E '^PASS ' || echo '(none printed)')"
 [ "$s11" != 0 ] && echo "  ok: and the runner exits nonzero ($s11)" || fail "a dead control left the runner green"
@@ -462,13 +467,13 @@ echo "== 11b. a NON-PASS gate after a declaring one adds nothing to the readout 
 mk g_shellcrash 0 "tests/g_shellcrash.sh: line 3: FOO: parameter not set"
 printf 'g_cfired\ng_fail\ng_fail\ng_cnone\ng_fail\ng_cmissing\ng_shellcrash\n' > "$FR/tests/ci_portable.txt"
 o11b="$(cd "$FR" && sh tests/run_all_static.sh --tier portable --exec-controls none 2>&1)" || true
-printf '%s' "$o11b" | grep -q 'read:     fired 1 / declared 2' \
+printf '%s' "$o11b" | grep >/dev/null 'read:     fired 1 / declared 2' \
     && echo "  ok: fired 1 / declared 2 — only g_cfired's and g_cmissing's own declarations, none re-added after a FAIL" \
     || fail "#140 readout wrong: $(printf '%s' "$o11b" | grep 'read:' || echo '(none)')"
-printf '%s' "$o11b" | grep -q 'gates declaring none: 1;' \
+printf '%s' "$o11b" | grep >/dev/null 'gates declaring none: 1;' \
     && echo "  ok: one none-declaring gate, not re-counted by the FAIL after it" \
     || fail "#140 none count wrong: $(printf '%s' "$o11b" | grep 'read:' || echo '(none)')"
-printf '%s' "$o11b" | grep -qE '^  g_shellcrash +FAIL .*\(exit 0 after a shell error\)$' \
+printf '%s' "$o11b" | grep -E >/dev/null '^  g_shellcrash +FAIL .*\(exit 0 after a shell error\)$' \
     && echo "  ok: the shell-crash stub after a controls-red gate keeps its own label" \
     || fail "#140 label: $(printf '%s' "$o11b" | grep -E '^  g_shellcrash' || echo '(none)')"
 
@@ -491,21 +496,21 @@ printf 'g_xhon\ng_xlies\ng_xref\ng_xdied\n' > "$FR/tests/ci_portable.txt"
 o12="$(cd "$FR" && STATIC_RESULTS_OUT="$T/r12.tsv" sh tests/run_all_static.sh --tier portable 2>&1)" && s12=0 || s12=$?
 for pair in "g_xlies:LIES" "g_xref:REFUSED" "g_xdied:DIED"; do
     g="${pair%%:*}"; v="${pair##*:}"
-    printf '%s' "$o12" | grep -qE "^  $g +CONTROL $v: flip" && echo "  ok: $g -> CONTROL $v" \
+    printf '%s' "$o12" | grep -E >/dev/null "^  $g +CONTROL $v: flip" && echo "  ok: $g -> CONTROL $v" \
         || { fail "$g was not reported CONTROL $v:"; printf '%s' "$o12" | grep -E "^  $g" | sed 's/^/        /'; }
 done
-printf '%s' "$o12" | grep -qE "^  g_xhon +CONTROL" && fail "the honoured control printed a red row" || echo "  ok: g_xhon (honoured) prints no red row"
-printf '%s' "$o12" | grep -q 'executed: 4  honoured 1  lies 1  refused 1  died 1' \
+printf '%s' "$o12" | grep -E >/dev/null "^  g_xhon +CONTROL" && fail "the honoured control printed a red row" || echo "  ok: g_xhon (honoured) prints no red row"
+printf '%s' "$o12" | grep >/dev/null 'executed: 4  honoured 1  lies 1  refused 1  died 1' \
     && echo "  ok: readout — executed 4, honoured 1, lies 1, refused 1, died 1" \
     || fail "executable readout wrong: $(printf '%s' "$o12" | grep 'executed:' || echo '(none)')"
 # where the time went (2026-09-14): printed only when controls were executed
-printf '%s' "$o12" | grep -qE '^  time:     gates [0-9]+s  controls [0-9]+s  wall [0-9]+s  \(costliest controls: g_x[a-z]+ [0-9]+s over 1' \
+printf '%s' "$o12" | grep -E >/dev/null '^  time:     gates [0-9]+s  controls [0-9]+s  wall [0-9]+s  \(costliest controls: g_x[a-z]+ [0-9]+s over 1' \
     && echo "  ok: readout — where the time went: gates, controls, wall and the costliest controls" \
     || fail "no time line after executed controls: $(printf '%s' "$o12" | grep 'time:' || echo '(none)')"
-printf '%s' "$o12" | grep -q 'PASS 4 .*SKIP 0 .*FAIL 3' \
+printf '%s' "$o12" | grep >/dev/null 'PASS 4 .*SKIP 0 .*FAIL 3' \
     && echo "  ok: tally PASS 4  FAIL 3 — every gate passed its own run, three controls failed theirs" \
     || fail "wrong tally: $(printf '%s' "$o12" | grep -E '^PASS ' || echo '(none printed)')"
-printf '%s' "$o12" | grep -q 'g_xlies(control:flip:LIES)' && echo "  ok: the failure list names the gate, the control and the verdict" \
+printf '%s' "$o12" | grep >/dev/null 'g_xlies(control:flip:LIES)' && echo "  ok: the failure list names the gate, the control and the verdict" \
     || fail "the failure list does not name the lying control: $(printf '%s' "$o12" | grep '^failed:' || echo '(none)')"
 [ "$s12" != 0 ] && echo "  ok: and the runner exits nonzero ($s12)" || fail "a lying control left the runner green"
 # the per-control times are KEPT (14z-190, #188 option D): one row per executed control beside
@@ -520,10 +525,10 @@ else fail "no per-control times beside results.tsv ($CT12): $(grep -v '^#' "$CT1
 o12b="$(cd "$FR" && STATIC_RESULTS_OUT="$T/r12b.tsv" sh tests/run_all_static.sh --tier portable --exec-controls none 2>&1)" && s12b=0 || s12b=$?
 [ -f "$T/r12b.controls.tsv" ] && fail "--exec-controls none wrote a control-times file" \
     || echo "  ok: with --exec-controls none no control-times file is written"
-[ "$s12b" = 0 ] && printf '%s' "$o12b" | grep -q 'PASS 4 .*FAIL 0' && printf '%s' "$o12b" | grep -q 'executed: (off' \
+[ "$s12b" = 0 ] && printf '%s' "$o12b" | grep >/dev/null 'PASS 4 .*FAIL 0' && printf '%s' "$o12b" | grep >/dev/null 'executed: (off' \
     && echo "  ok: control — with --exec-controls none the same four stubs are PASS 4 and the readout says off" \
     || fail "--exec-controls none still executed or failed something: $(printf '%s' "$o12b" | grep -E '^PASS |executed' || echo '(none)')"
-printf '%s' "$o12b" | grep -q '^  time:' && fail "--exec-controls none printed a time line" \
+printf '%s' "$o12b" | grep >/dev/null '^  time:' && fail "--exec-controls none printed a time line" \
     || echo "  ok: with --exec-controls none there is no time line"
 # and the portable-only selector leaves a STATIC gate's controls unexecuted
 : > "$FR/tests/ci_portable.txt"; printf 'g_xlies\n' > "$FR/tests/ci_static.txt"
@@ -541,9 +546,9 @@ mkx g_xdie127 'no_such_helper_254; exit 1'
 mkx g_xquote  'echo "tests/other.sh: line 3: x: command not found"; echo "FAIL: the flipped input was caught"; exit 1'
 printf 'g_xdie127\ng_xquote\n' > "$FR/tests/ci_portable.txt"
 o12c="$(cd "$FR" && STATIC_RESULTS_OUT="$T/r12c.tsv" sh tests/run_all_static.sh --tier portable 2>&1)" || true
-printf '%s' "$o12c" | grep -qE "^  g_xdie127 +CONTROL DIED: flip" && echo "  ok: a mode dying of command-not-found (exit 127) -> CONTROL DIED" \
+printf '%s' "$o12c" | grep -E >/dev/null "^  g_xdie127 +CONTROL DIED: flip" && echo "  ok: a mode dying of command-not-found (exit 127) -> CONTROL DIED" \
     || { fail "a crashing mode was not DIED:"; printf '%s' "$o12c" | grep -E '^  g_xdie127' | sed 's/^/        /'; }
-printf '%s' "$o12c" | grep -qE "^  g_xquote +CONTROL" && fail "a real FAIL quoting another script's error read as a crash" \
+printf '%s' "$o12c" | grep -E >/dev/null "^  g_xquote +CONTROL" && fail "a real FAIL quoting another script's error read as a crash" \
     || echo "  ok: a real FAIL quoting another script's shell error stays honoured"
 # the copy runs INSIDE the synthetic repo (the runner takes its repo from its own path; run from $T it
 # judged nothing, and the absence of a red row read as a firing — 14z-199), and the firing needs the
@@ -551,7 +556,7 @@ printf '%s' "$o12c" | grep -qE "^  g_xquote +CONTROL" && fail "a real FAIL quoti
 cp "$SHADOW_C" "$FR/tests/run_all_static_cu"
 o12d="$(cd "$FR" && STATIC_RESULTS_OUT="$T/r12d.tsv" sh tests/run_all_static_cu --tier portable 2>&1)" || true
 rm -f "$FR/tests/run_all_static_cu"
-if printf '%s' "$o12d" | grep -qE "^  g_xdie127 +CONTROL" || ! printf '%s' "$o12d" | grep -q 'executed: 2  honoured 2'; then
+if printf '%s' "$o12d" | grep -E >/dev/null "^  g_xdie127 +CONTROL" || ! printf '%s' "$o12d" | grep >/dev/null 'executed: 2  honoured 2'; then
     vs_ctl_dead crash-unread "the copy with no gate script did not read g_xdie127's crash as HONOURED: $(printf '%s' "$o12d" | grep -E '^  g_xdie127|executed:' | tr '\n' ' ')"; rc=1
 else
     vs_ctl_fired crash-unread "with no gate script handed to the control classifier, a mode dying of command-not-found (exit 127) reads HONOURED"
@@ -570,14 +575,14 @@ mkx g_xdeadown   'echo "CONTROL DEAD: flip — a flipped byte was NOT caught"; e
 mkx g_xdeadother 'echo "  FAIL  other-planted could not build its copy: Traceback (most recent call last):"; echo "ValueError: not enough values to unpack"; echo "CONTROL FIRED: flip — caught"; echo "CONTROL DEAD: other — passed"; echo "FAIL: the gate (control mode)"; exit 1'
 printf 'g_xdeadcrash\ng_xdeadown\ng_xdeadother\n' > "$FR/tests/ci_portable.txt"
 o12g="$(cd "$FR" && STATIC_RESULTS_OUT="$T/r12g.tsv" sh tests/run_all_static.sh --tier portable 2>&1)" || true
-printf '%s' "$o12g" | grep -qE "^  g_xdeadcrash +CONTROL DIED: flip — its own control reported dead beside a crash: FileNotFoundError" \
+printf '%s' "$o12g" | grep -E >/dev/null "^  g_xdeadcrash +CONTROL DIED: flip — its own control reported dead beside a crash: FileNotFoundError" \
     && echo "  ok: its own CONTROL DEAD beside a Python exception -> CONTROL DIED" \
     || { fail "a mode whose own control died beside a crash was not DIED:"; printf '%s' "$o12g" | grep -E '^  g_xdeadcrash' | sed 's/^/        /'; }
 for g in g_xdeadown g_xdeadother; do
-    printf '%s' "$o12g" | grep -qE "^  $g +CONTROL" && fail "$g read as a crash: $(printf '%s' "$o12g" | grep -E "^  $g")" \
+    printf '%s' "$o12g" | grep -E >/dev/null "^  $g +CONTROL" && fail "$g read as a crash: $(printf '%s' "$o12g" | grep -E "^  $g")" \
         || echo "  ok: $g stays honoured"
 done
-printf '%s' "$o12g" | grep -q 'executed: 3  honoured 2  lies 0  refused 0  died 1' \
+printf '%s' "$o12g" | grep >/dev/null 'executed: 3  honoured 2  lies 0  refused 0  died 1' \
     && echo "  ok: readout — executed 3, honoured 2, died 1" \
     || fail "12d readout wrong: $(printf '%s' "$o12g" | grep 'executed:' || echo '(none)')"
 # the shadow: the classifier with its DEAD-BESIDE-CRASH branch disabled reads all three honoured
@@ -587,14 +592,14 @@ cmp -s "$REPO/tests/lib/classify.sh" "$SHADOW_K" && fail "could not disable DEAD
 rm -f "$FR/tests/lib/classify.sh"; ln -s "$SHADOW_K" "$FR/tests/lib/classify.sh"
 o12h="$(cd "$FR" && STATIC_RESULTS_OUT="$T/r12h.tsv" sh tests/run_all_static.sh --tier portable 2>&1)" || true
 rm -f "$FR/tests/lib/classify.sh"; ln -s "$REPO/tests/lib/classify.sh" "$FR/tests/lib/classify.sh"
-if printf '%s' "$o12h" | grep -q 'executed: 3  honoured 3'; then
+if printf '%s' "$o12h" | grep >/dev/null 'executed: 3  honoured 3'; then
     vs_ctl_fired dead-crash-unread "with DEAD-BESIDE-CRASH disabled, the mode whose own control died beside a FileNotFoundError reads HONOURED"
 else
     vs_ctl_dead dead-crash-unread "the copy without DEAD-BESIDE-CRASH did not read all three honoured: $(printf '%s' "$o12h" | grep -E '^  g_xdead|executed:' | tr '\n' ' ')"; rc=1
 fi
 if vs_ctl_is dead-crash-unread; then rm -f "$FR/tests/lib/classify.sh"; ln -s "$SHADOW_K" "$FR/tests/lib/classify.sh"
     o12i="$(cd "$FR" && STATIC_RESULTS_OUT="$T/r12i.tsv" sh tests/run_all_static.sh --tier portable 2>&1)" || true
-    printf '%s' "$o12i" | grep -qE "^  g_xdeadcrash +CONTROL DIED" || fail "MODE dead-crash-unread: the dead-beside-crash mode read HONOURED"
+    printf '%s' "$o12i" | grep -E >/dev/null "^  g_xdeadcrash +CONTROL DIED" || fail "MODE dead-crash-unread: the dead-beside-crash mode read HONOURED"
 fi
 rm -f "$FR/tests/g_xdeadcrash.sh" "$FR/tests/g_xdeadown.sh" "$FR/tests/g_xdeadother.sh"
 
@@ -628,7 +633,7 @@ ln -s "$SHADOW" "$FR/tests/run_all_static_unplugged.sh"
 mkc g_cmissing 0 "# MUST-FIRE: perturbed-copy: flip — a flipped byte must fail" "PASS: fine"
 printf 'g_cmissing\n' > "$FR/tests/ci_portable.txt"
 o13="$(cd "$FR" && sh tests/run_all_static_unplugged.sh --tier portable --exec-controls none 2>&1)" || true
-if printf '%s' "$o13" | grep -qE '^  g_cmissing +PASS'; then
+if printf '%s' "$o13" | grep -E >/dev/null '^  g_cmissing +PASS'; then
     vs_ctl_fired reader-unplugged "with no gate script handed to the classifier, a declared-but-unfired control reads PASS"
 else
     vs_ctl_dead reader-unplugged "the unplugged runner still failed g_cmissing: $(printf '%s' "$o13" | grep -E '^  g_cmissing')"; rc=1
@@ -641,23 +646,23 @@ printf 'g_pass\ng_fail\n' > "$FR/tests/ci_portable.txt"; : > "$FR/tests/ci_stati
 # (a) no cadence file: the pre-#148 behaviour, byte-for-byte — g_fail runs, no cadence text
 rm -f "$FR/tests/ci_cadence.tsv"
 o14a="$(cd "$FR" && STATIC_CHANGED_PATHS= sh tests/run_all_static.sh --tier portable --exec-controls none 2>&1)" && s14a=0 || s14a=$?
-[ "$s14a" = 1 ] && ! printf '%s' "$o14a" | grep -qi 'cadence' \
+[ "$s14a" = 1 ] && ! printf '%s' "$o14a" | grep -i >/dev/null 'cadence' \
     && echo "  ok: without tests/ci_cadence.tsv every gate runs and nothing mentions a cadence" \
     || fail "14a: without a cadence file: exit $s14a, cadence text: $(printf '%s' "$o14a" | grep -ci cadence)"
 # (b) g_fail listed freeze: a default (session) run defers it, NAMES it, and is GREEN
 printf 'g_fail\tfreeze\tsrc/\n' > "$FR/tests/ci_cadence.tsv"
 o14b="$(cd "$FR" && STATIC_CHANGED_PATHS= sh tests/run_all_static.sh --tier portable --exec-controls none 2>&1)" && s14b=0 || s14b=$?
-if [ "$s14b" = 0 ] && printf '%s' "$o14b" | grep -q 'deferred (freeze cadence): g_fail' \
-   && printf '%s' "$o14b" | grep -q '^deferred: 1 '; then echo "  ok: session run defers g_fail, names it, exits 0"
+if [ "$s14b" = 0 ] && printf '%s' "$o14b" | grep >/dev/null 'deferred (freeze cadence): g_fail' \
+   && printf '%s' "$o14b" | grep >/dev/null '^deferred: 1 '; then echo "  ok: session run defers g_fail, names it, exits 0"
 else fail "14b: session run: exit $s14b; $(printf '%s' "$o14b" | grep -E 'deferred|g_fail' | head -3)"; fi
-printf '%s' "$o14b" | grep -qE '^  g_fail ' && fail "14b: the deferred gate still RAN"
+printf '%s' "$o14b" | grep -E >/dev/null '^  g_fail ' && fail "14b: the deferred gate still RAN"
 # (c) --cadence freeze runs it -> RED
 o14c="$(cd "$FR" && STATIC_CHANGED_PATHS= sh tests/run_all_static.sh --tier portable --exec-controls none --cadence freeze 2>&1)" && s14c=0 || s14c=$?
-[ "$s14c" = 1 ] && printf '%s' "$o14c" | grep -qE '^  g_fail +FAIL' && echo "  ok: --cadence freeze runs g_fail and goes red" \
+[ "$s14c" = 1 ] && printf '%s' "$o14c" | grep -E >/dev/null '^  g_fail +FAIL' && echo "  ok: --cadence freeze runs g_fail and goes red" \
     || fail "14c: --cadence freeze: exit $s14c"
 # (d) a changed trigger path pulls it back into a session run -> RED, and says why
 o14d="$(cd "$FR" && STATIC_CHANGED_PATHS='src/gen.py' sh tests/run_all_static.sh --tier portable --exec-controls none 2>&1)" && s14d=0 || s14d=$?
-if [ "$s14d" = 1 ] && printf '%s' "$o14d" | grep -q 'g_fail <- src/gen.py'; then echo "  ok: a changed src/ path triggers g_fail in a session run, and the readout names the path"
+if [ "$s14d" = 1 ] && printf '%s' "$o14d" | grep >/dev/null 'g_fail <- src/gen.py'; then echo "  ok: a changed src/ path triggers g_fail in a session run, and the readout names the path"
 else fail "14d: triggered run: exit $s14d; $(printf '%s' "$o14d" | grep -E 'triggered|g_fail' | head -3)"; fi
 # (e) an unrelated changed path does not
 o14e="$(cd "$FR" && STATIC_CHANGED_PATHS='docs/x.md' sh tests/run_all_static.sh --tier portable --exec-controls none 2>&1)" && s14e=0 || s14e=$?
@@ -667,22 +672,22 @@ o14f="$(cd "$FR" && STATIC_CHANGED_PATHS='tests/g_fail.sh' sh tests/run_all_stat
 [ "$s14f" = 1 ] && echo "  ok: editing the gate's own script triggers it" || fail "14f: own-script change did not trigger (exit $s14f)"
 # (g) --list tags the listed gate
 o14g="$(cd "$FR" && sh tests/run_all_static.sh --list 2>&1)"
-printf '%s' "$o14g" | grep -q 'g_fail  \[freeze\]' && echo "  ok: --list tags g_fail [freeze]" || fail "14g: --list lacks the tag"
+printf '%s' "$o14g" | grep >/dev/null 'g_fail  \[freeze\]' && echo "  ok: --list tags g_fail [freeze]" || fail "14g: --list lacks the tag"
 # (i) ONDEMAND (14z-196, maintainer-ruled 2026-10-09): deferred and named at EVERY cadence below
 #     ondemand, never pulled back by a changed path — its own script included — and run by --cadence ondemand
 printf 'g_fail\tondemand\t-\n' > "$FR/tests/ci_cadence.tsv"
 o14i1="$(cd "$FR" && STATIC_CHANGED_PATHS= sh tests/run_all_static.sh --tier portable --exec-controls none 2>&1)" && s14i1=0 || s14i1=$?
-if [ "$s14i1" = 0 ] && printf '%s' "$o14i1" | grep -q 'deferred (ondemand cadence): g_fail' \
-   && printf '%s' "$o14i1" | grep -q 'an ondemand gate runs only when asked for'; then echo "  ok: a session run defers the ondemand g_fail, names it and says how to run it"
+if [ "$s14i1" = 0 ] && printf '%s' "$o14i1" | grep >/dev/null 'deferred (ondemand cadence): g_fail' \
+   && printf '%s' "$o14i1" | grep >/dev/null 'an ondemand gate runs only when asked for'; then echo "  ok: a session run defers the ondemand g_fail, names it and says how to run it"
 else fail "14i: session run with g_fail ondemand: exit $s14i1"; fi
 o14i2="$(cd "$FR" && STATIC_CHANGED_PATHS= sh tests/run_all_static.sh --tier portable --exec-controls none --cadence release 2>&1)" && s14i2=0 || s14i2=$?
-[ "$s14i2" = 0 ] && printf '%s' "$o14i2" | grep -q 'deferred (ondemand cadence): g_fail' && echo "  ok: --cadence release still defers it" \
+[ "$s14i2" = 0 ] && printf '%s' "$o14i2" | grep >/dev/null 'deferred (ondemand cadence): g_fail' && echo "  ok: --cadence release still defers it" \
     || fail "14i: --cadence release ran the ondemand gate (exit $s14i2)"
 o14i3="$(cd "$FR" && STATIC_CHANGED_PATHS='tests/g_fail.sh' sh tests/run_all_static.sh --tier portable --exec-controls none 2>&1)" && s14i3=0 || s14i3=$?
-[ "$s14i3" = 0 ] && ! printf '%s' "$o14i3" | grep -q 'g_fail <- ' && echo "  ok: a change to its own script does not pull it in" \
+[ "$s14i3" = 0 ] && ! printf '%s' "$o14i3" | grep >/dev/null 'g_fail <- ' && echo "  ok: a change to its own script does not pull it in" \
     || fail "14i: a changed own script pulled the ondemand gate in (exit $s14i3)"
 o14i4="$(cd "$FR" && STATIC_CHANGED_PATHS= sh tests/run_all_static.sh --tier portable --exec-controls none --cadence ondemand 2>&1)" && s14i4=0 || s14i4=$?
-[ "$s14i4" = 1 ] && printf '%s' "$o14i4" | grep -qE '^  g_fail +FAIL' && echo "  ok: --cadence ondemand runs it and goes red" \
+[ "$s14i4" = 1 ] && printf '%s' "$o14i4" | grep -E >/dev/null '^  g_fail +FAIL' && echo "  ok: --cadence ondemand runs it and goes red" \
     || fail "14i: --cadence ondemand: exit $s14i4"
 # (j) @code (14z-205, #297, ruled 2026-10-18 "Own code changed"): a freeze gate whose trigger is its own reach is pulled
 #     back by a change to a program it runs, never by a change to the data it reads
@@ -693,7 +698,7 @@ s14j() {  # s14j <runner in $FR/tests> -> sets S14j (ok|bad)
     printf 'g_pass\ng_code\n' > "$FR/tests/ci_portable.txt"; printf 'g_code\tfreeze\t@code\n' > "$FR/tests/ci_cadence.tsv"
     _jd="$(cd "$FR" && STATIC_CHANGED_PATHS='data/d.txt' sh "tests/$1" --tier portable --exec-controls none 2>&1)" && _sd=0 || _sd=$?
     _jp="$(cd "$FR" && STATIC_CHANGED_PATHS='tools/chk.py' sh "tests/$1" --tier portable --exec-controls none 2>&1)" && _sp=0 || _sp=$?
-    if [ "$_sd" = 0 ] && ! printf '%s' "$_jd" | grep -q 'g_code <- ' && [ "$_sp" = 1 ] && printf '%s' "$_jp" | grep -q 'g_code <- tools/chk.py'; then S14j=ok
+    if [ "$_sd" = 0 ] && ! printf '%s' "$_jd" | grep >/dev/null 'g_code <- ' && [ "$_sp" = 1 ] && printf '%s' "$_jp" | grep >/dev/null 'g_code <- tools/chk.py'; then S14j=ok
     else S14j=bad; echo "    @code: data change exit $_sd ($(printf '%s' "$_jd" | grep -c 'g_code <- ') triggered), program change exit $_sp ($(printf '%s' "$_jp" | grep -E 'g_code' | head -2 | tr '\n' '|'))"; fi
     printf 'g_pass\ng_fail\n' > "$FR/tests/ci_portable.txt"; rm -f "$FR/tests/g_code.sh"
 }
@@ -722,7 +727,7 @@ echo "  ok: the real tests/ci_cadence.tsv lists $(printf '%s\n' "$o14h" | awk 'N
 echo "== 15. MUST-FIRE: with the trigger match blinded, section 14(d)'s changed path leaves g_fail deferred =="
 ln -s "$SHADOW_T" "$FR/tests/run_all_static_triggerblind.sh"
 o15="$(cd "$FR" && STATIC_CHANGED_PATHS='src/gen.py' sh tests/run_all_static_triggerblind.sh --tier portable --exec-controls none 2>&1)" && s15=0 || s15=$?
-if [ "$s15" = 0 ] && ! printf '%s' "$o15" | grep -q 'g_fail <- '; then
+if [ "$s15" = 0 ] && ! printf '%s' "$o15" | grep >/dev/null 'g_fail <- '; then
     vs_ctl_fired trigger-blind "with the trigger match disabled, a changed src/ path no longer pulls the freeze-cadence g_fail into a session run (exit 0, nothing triggered)"
 else
     vs_ctl_dead trigger-blind "the blinded runner still triggered g_fail (exit $s15)"; rc=1
@@ -733,7 +738,7 @@ echo "== 16. MUST-FIRE: with ONDEMAND-NO-TRIGGER disabled, section 14i's own-scr
 printf 'g_fail\tondemand\t-\n' > "$FR/tests/ci_cadence.tsv"
 ln -s "$SHADOW_D" "$FR/tests/run_all_static_ondemandtriggered.sh"
 o16="$(cd "$FR" && STATIC_CHANGED_PATHS='tests/g_fail.sh' sh tests/run_all_static_ondemandtriggered.sh --tier portable --exec-controls none 2>&1)" && s16=0 || s16=$?
-if [ "$s16" = 1 ] && printf '%s' "$o16" | grep -q 'g_fail <- tests/g_fail.sh'; then
+if [ "$s16" = 1 ] && printf '%s' "$o16" | grep >/dev/null 'g_fail <- tests/g_fail.sh'; then
     vs_ctl_fired ondemand-triggered "with ONDEMAND-NO-TRIGGER disabled, a change to tests/g_fail.sh pulls the ondemand g_fail into a session run (exit 1)"
 else
     vs_ctl_dead ondemand-triggered "the copy still deferred the ondemand g_fail (exit $s16)"; rc=1
@@ -795,15 +800,15 @@ grep -q "^g_c	FAIL" "$T/r1.tsv" && grep -q "^g_a	PASS" "$T/r1.tsv" && echo "  ok
     || fail "the first run's results.tsv: $(grep -v '^#' "$T/r1.tsv" 2>/dev/null | tr '\n' ' ')"
 echo good > "$FC/data/c.txt"; sleep 1
 r2="$(cd "$FC" && STATIC_RESULTS_OUT="$T/r2.tsv" sh tests/run_all_static.sh --tier portable --confirm "$T/r1.tsv" 2>&1)" && s2c=0 || s2c=$?
-if [ "$s2c" = 0 ] && printf '%s' "$r2" | grep -qE "^  g_a +PASS  carried" && printf '%s' "$r2" | grep -qE "^  g_b +PASS  carried" \
-        && printf '%s' "$r2" | grep -qE "^  g_c +PASS +[0-9]+s" && printf '%s' "$r2" | grep -qE "^  g_d +PASS  carried" \
-        && printf '%s' "$r2" | grep -q "carried: 3 of the PASS" && printf '%s' "$r2" | grep -qE "^  re-run g_e +the core"; then
+if [ "$s2c" = 0 ] && printf '%s' "$r2" | grep -E >/dev/null "^  g_a +PASS  carried" && printf '%s' "$r2" | grep -E >/dev/null "^  g_b +PASS  carried" \
+        && printf '%s' "$r2" | grep -E >/dev/null "^  g_c +PASS +[0-9]+s" && printf '%s' "$r2" | grep -E >/dev/null "^  g_d +PASS  carried" \
+        && printf '%s' "$r2" | grep >/dev/null "carried: 3 of the PASS" && printf '%s' "$r2" | grep -E >/dev/null "^  re-run g_e +the core"; then
     echo "  ok: confirming the red re-runs g_c (now PASS) and the core g_e, and carries g_a, g_b and g_d — GREEN, 'carried: 3'"
 else fail "the confirm run (exit $s2c): $(printf '%s' "$r2" | grep -E '^  g_|^carried|^  re-run' | tr '\n' '|')"; fi
 echo two > "$FC/data/a.txt"; sleep 1
 r3="$(cd "$FC" && STATIC_RESULTS_OUT="$T/r3.tsv" sh tests/run_all_static.sh --tier portable --confirm "$T/r2.tsv" 2>&1)" && s3c=0 || s3c=$?
-if printf '%s' "$r3" | grep -qE "^  re-run g_a +STALE" && printf '%s' "$r3" | grep -qE "^  g_a +PASS +[0-9]+s" \
-        && printf '%s' "$r3" | grep -qE "^  g_b +PASS  carried"; then
+if printf '%s' "$r3" | grep -E >/dev/null "^  re-run g_a +STALE" && printf '%s' "$r3" | grep -E >/dev/null "^  g_a +PASS +[0-9]+s" \
+        && printf '%s' "$r3" | grep -E >/dev/null "^  g_b +PASS  carried"; then
     echo "  ok: a change to data/a.txt re-runs its reader g_a (STALE), g_b stays carried"
     S18=ok
 else fail "after data/a.txt changed (exit $s3c): $(printf '%s' "$r3" | grep -E '^  g_|^  re-run' | tr '\n' '|')"; S18=bad; fi
@@ -811,13 +816,13 @@ r4="$(cd "$FC" && sh tests/run_all_static.sh --tier portable --confirm "$T/nope.
 [ "$s4c" = 2 ] && echo "  ok: a missing results file refuses (exit 2) — nothing carried from nothing" || fail "--confirm on a missing file exited $s4c"
 # #259 (14z-204): the plan is no longer silent — its progress and timing lines reach the runner's output as it runs —
 # and a plan that FAILS still refuses, its status carried across the pipe that streams them
-if printf '%s' "$r3" | grep -qE "^  plan: 5/5 gates judged against [0-9]+ changed paths" \
-        && printf '%s' "$r3" | grep -qE "^  plan: [0-9]+ changed paths, [0-9]+ of 5 gates STALE, [0-9.]+ s \(#259\)"; then
+if printf '%s' "$r3" | grep -E >/dev/null "^  plan: 5/5 gates judged against [0-9]+ changed paths" \
+        && printf '%s' "$r3" | grep -E >/dev/null "^  plan: [0-9]+ changed paths, [0-9]+ of 5 gates STALE, [0-9.]+ s \(#259\)"; then
     echo "  ok: the plan's progress line and its timing line are shown during the confirm run (#259)"
 else fail "#259: the confirm run did not show the plan's progress and timing lines: $(printf '%s' "$r3" | grep 'plan' | tr '\n' '|')"; fi
 { grep '^# head ' "$T/r3.tsv"; echo "# utc not-a-time"; } > "$T/badutc.tsv"
 r4b="$(cd "$FC" && sh tests/run_all_static.sh --tier portable --confirm "$T/badutc.tsv" 2>&1)" && s4b=0 || s4b=$?
-[ "$s4b" = 2 ] && printf '%s' "$r4b" | grep -q "the plan FAILED" \
+[ "$s4b" = 2 ] && printf '%s' "$r4b" | grep >/dev/null "the plan FAILED" \
     && echo "  ok: a plan that fails (an unreadable # utc) refuses with exit 2 through the streaming pipe — nothing carried" \
     || fail "#259: a failing plan exited $s4b: $(printf '%s' "$r4b" | tail -2 | tr '\n' '|')"
 
@@ -826,7 +831,7 @@ if ! vs_ctl_is prediction-off; then
     cp "$T/static_confirm_off.py" "$FC/tools/static_confirm.py"
     echo three > "$FC/data/a.txt"; sleep 1
     r5="$(cd "$FC" && sh tests/run_all_static.sh --tier portable --confirm "$T/r3.tsv" 2>&1)" || true
-    if printf '%s' "$r5" | grep -qE "^  g_a +PASS  carried"; then
+    if printf '%s' "$r5" | grep -E >/dev/null "^  g_a +PASS  carried"; then
         vs_ctl_fired prediction-off "with nothing marked STALE, g_a is carried although data/a.txt changed — section 18's check is what catches it"
     else vs_ctl_dead prediction-off "the prediction-off copy still re-ran g_a: $(printf '%s' "$r5" | grep -E '^  g_a')"; rc=1; fi
 fi
@@ -852,11 +857,11 @@ mkdir -p "$FC/shadow"; ln -s "$FREEZE_SHADOW" "$FC/shadow/run_all_static.sh"
 s20() {   # s20 <static_confirm.py to plan with> <runner> -> sets S20a S20b S20c (ok|bad), prints what it saw
     cp "$1" "$FC/tools/static_confirm.py"
     _r="$(cd "$FC" && sh tests/run_all_static.sh --tier portable --confirm "$T/r3.tsv" 2>&1)" || true
-    if printf '%s' "$_r" | grep -qE "^  re-run g_e +the core" && printf '%s' "$_r" | grep -qE "^  g_e +PASS +[0-9]+s"; then S20a=ok
+    if printf '%s' "$_r" | grep -E >/dev/null "^  re-run g_e +the core" && printf '%s' "$_r" | grep -E >/dev/null "^  g_e +PASS +[0-9]+s"; then S20a=ok
     else S20a=bad; echo "    g_e (unchanged core) was not re-run: $(printf '%s' "$_r" | grep -E '^  g_e|^  re-run g_e' | tr '\n' '|')"; fi
     (cd "$FC" && STATIC_RESULTS_OUT="$T/r6.tsv" sh tests/run_all_static.sh --tier portable --exec-controls none > /dev/null 2>&1) || true
     _r="$(cd "$FC" && sh tests/run_all_static.sh --tier portable --confirm "$T/r6.tsv" 2>&1)" || true
-    if grep -q "^g_d	PASS	[0-9]*	1	1	0$" "$T/r6.tsv" && printf '%s' "$_r" | grep -qE "^  re-run g_d +0 of its 1 declared controls"; then S20b=ok
+    if grep -q "^g_d	PASS	[0-9]*	1	1	0$" "$T/r6.tsv" && printf '%s' "$_r" | grep -E >/dev/null "^  re-run g_d +0 of its 1 declared controls"; then S20b=ok
     else S20b=bad; echo "    g_d (controls not executed in the base) was not re-run: $(grep '^g_d' "$T/r6.tsv" 2>/dev/null) / $(printf '%s' "$_r" | grep -E '^  g_d|^  re-run g_d' | tr '\n' '|')"; fi
     _st=0; (cd "$FC" && sh "$2" --tier portable --cadence freeze --confirm "$T/r3.tsv" > "$T/r7.out" 2>&1) || _st=$?
     if [ "$_st" = 2 ] && grep -q "nothing is carried (#269)" "$T/r7.out"; then S20c=ok
@@ -921,31 +926,31 @@ s22() {   # s22 <static_confirm.py> -> sets S22a S22b S22c S22d S22e (ok|bad)
     (cd "$FS" && STATIC_RESULTS_OUT="$T/s1.tsv" sh tests/run_all_static.sh --tier portable > /dev/null 2>&1) || true
     sleep 1
     _r="$(cd "$FS" && STATIC_RESULTS_OUT="$T/s2.tsv" sh tests/run_all_static.sh --tier portable --confirm "$T/s1.tsv" 2>&1)" || true
-    if grep -q '^# subfp sub ' "$T/s1.tsv" && printf '%s' "$_r" | grep -qE "^  g_s +PASS  carried"; then S22a=ok
+    if grep -q '^# subfp sub ' "$T/s1.tsv" && printf '%s' "$_r" | grep -E >/dev/null "^  g_s +PASS  carried"; then S22a=ok
     else S22a=bad; echo "    the unchanged dirty submodule re-ran g_s: $(grep -c '^# subfp' "$T/s1.tsv") subfp line(s); $(printf '%s' "$_r" | grep -E '^  g_s|^  re-run g_s' | tr '\n' '|')"; fi
     echo dirtier > "$FS/sub/x.txt"; sleep 1
     _r="$(cd "$FS" && STATIC_RESULTS_OUT="$T/s3.tsv" sh tests/run_all_static.sh --tier portable --confirm "$T/s2.tsv" 2>&1)" || true
-    if printf '%s' "$_r" | grep -qE "^  g_s +PASS +[0-9]+s"; then S22b=ok
+    if printf '%s' "$_r" | grep -E >/dev/null "^  g_s +PASS +[0-9]+s"; then S22b=ok
     else S22b=bad; echo "    the changed submodule did not re-run g_s: $(printf '%s' "$_r" | grep -E '^  g_s' | tr '\n' '|')"; fi
     echo second > "$FS/data/notes.md"; sleep 1
     _r="$(cd "$FS" && STATIC_RESULTS_OUT="$T/s4.tsv" sh tests/run_all_static.sh --tier portable --confirm "$T/s3.tsv" 2>&1)" || true
-    if printf '%s' "$_r" | grep -qE "^  re-run g_f +STALE: R5" && printf '%s' "$_r" | grep -qE "^  g_f +PASS +[0-9]+s" \
-            && printf '%s' "$_r" | grep -q "controls carried: 1 honoured" && grep -q "^g_f	PASS	[0-9]*	1	1	1$" "$T/s4.tsv" \
-            && printf '%s' "$_r" | grep -q '^  executed: 0  honoured 0 ' && printf '%s' "$_r" | grep -q '^  carried:  1  ' \
-            && printf '%s' "$_r" | grep -qE '^  defer  g_o +absent' && ! printf '%s' "$_r" | grep -qE '^  re-run g_o'; then S22c=ok
+    if printf '%s' "$_r" | grep -E >/dev/null "^  re-run g_f +STALE: R5" && printf '%s' "$_r" | grep -E >/dev/null "^  g_f +PASS +[0-9]+s" \
+            && printf '%s' "$_r" | grep >/dev/null "controls carried: 1 honoured" && grep -q "^g_f	PASS	[0-9]*	1	1	1$" "$T/s4.tsv" \
+            && printf '%s' "$_r" | grep >/dev/null '^  executed: 0  honoured 0 ' && printf '%s' "$_r" | grep >/dev/null '^  carried:  1  ' \
+            && printf '%s' "$_r" | grep -E >/dev/null '^  defer  g_o +absent' && ! printf '%s' "$_r" | grep -E >/dev/null '^  re-run g_o'; then S22c=ok
     else S22c=bad; echo "    a mention (R5) did not re-run g_f with its control carried (or the readout counted it executed, #286): $(printf '%s' "$_r" | grep -E 'g_f|g_o|controls carried|executed:|carried:' | tr '\n' '|') / $(grep '^g_f' "$T/s4.tsv")"; fi
     printf 'name\tnote\nf\tdata/notes.md\ng\tdata/other.md\n' > "$FS/data/list.tsv"; sleep 1
     _r="$(cd "$FS" && STATIC_RESULTS_OUT="$T/s5.tsv" sh tests/run_all_static.sh --tier portable --confirm "$T/s4.tsv" 2>&1)" || true
     # 14z-205 (ruled 2026-10-18, #298): a data file the code reads directly (R2) re-runs the gate, its controls CARRIED
-    if printf '%s' "$_r" | grep -qE "^  re-run g_f +STALE: R2" && printf '%s' "$_r" | grep -q "controls carried: 1 honoured" \
+    if printf '%s' "$_r" | grep -E >/dev/null "^  re-run g_f +STALE: R2" && printf '%s' "$_r" | grep >/dev/null "controls carried: 1 honoured" \
             && grep -q "^g_f	PASS	[0-9]*	1	1	1$" "$T/s5.tsv"; then S22d=ok
     else S22d=bad; echo "    a direct DATA read (R2) did not re-run g_f with its control carried: $(printf '%s' "$_r" | grep -E 'g_f|controls carried' | tr '\n' '|')"; fi
     echo "# a comment: the script changed" >> "$FS/tests/g_f.sh"; sleep 1
     _r="$(cd "$FS" && STATIC_RESULTS_OUT="$T/s6.tsv" sh tests/run_all_static.sh --tier portable --confirm "$T/s5.tsv" 2>&1)" || true
     # the plan names the FIRST rule that hit (data/list.tsv is still changed from s5, so R2); what is judged here is
     # that the control was EXECUTED, not carried, because a program in the reach (g_f's own script) changed
-    if printf '%s' "$_r" | grep -qE "^  re-run g_f +STALE" && ! printf '%s' "$_r" | grep -q "controls carried" \
-            && printf '%s' "$_r" | grep -q '^  executed: 1  honoured 1 ' && grep -q "^g_f	PASS	[0-9]*	1	1	1$" "$T/s6.tsv"; then S22e=ok
+    if printf '%s' "$_r" | grep -E >/dev/null "^  re-run g_f +STALE" && ! printf '%s' "$_r" | grep >/dev/null "controls carried" \
+            && printf '%s' "$_r" | grep >/dev/null '^  executed: 1  honoured 1 ' && grep -q "^g_f	PASS	[0-9]*	1	1	1$" "$T/s6.tsv"; then S22e=ok
     else S22e=bad; echo "    a change to g_f's own script (R1) did not execute its control: $(printf '%s' "$_r" | grep -E 'g_f|controls carried' | tr '\n' '|')"; fi
     (cd "$FS" && git checkout -q -- data tests/g_f.sh && echo dirty > sub/x.txt)
 }
@@ -1027,7 +1032,7 @@ s24() {   # s24 <runner> <static_job.sh> <static_pool.py> [confirm] -> sets S24a
     _o4="$(cd "$FJ" && STATIC_CHANGED_PATHS= STATIC_RESULTS_OUT="$T/j4.tsv" sh tests/run_all_static.sh --tier portable --jobs 4 2>&1)" || true
     rm -f "$T/k.on"
     if [ "$(rd24 "$_o1" "$T/j1.tsv")" = "$(rd24 "$_o4" "$T/j4.tsv")" ] && [ -n "$(rd24 "$_o1" "$T/j1.tsv")" ] \
-            && printf '%s' "$_o4" | grep -q '^== portable tier: 7 gate(s) run in 4 parallel jobs'; then S24a=ok
+            && printf '%s' "$_o4" | grep >/dev/null '^== portable tier: 7 gate(s) run in 4 parallel jobs'; then S24a=ok
     else S24a=bad; echo "    the --jobs 4 readout differs from --jobs 1:"; rd24 "$_o1" "$T/j1.tsv" > "$T/r1.txt"; rd24 "$_o4" "$T/j4.tsv" > "$T/r4.txt"; diff "$T/r1.txt" "$T/r4.txt" | sed 's/^/      /' | head -20; fi
     if [ "$(sort "$T/j.ran" | uniq -c | awk '$1 != 1' | wc -l | tr -d ' ')" = 0 ] && [ "$(wc -l < "$T/j.ran" | tr -d ' ')" = 7 ] \
             && [ "$(sort "$T/j.ctl" | uniq -c | awk '$1 != 1' | wc -l | tr -d ' ')" = 0 ] && [ "$(wc -l < "$T/j.ctl" | tr -d ' ')" = 5 ]; then S24b=ok
@@ -1048,8 +1053,8 @@ s24() {   # s24 <runner> <static_job.sh> <static_pool.py> [confirm] -> sets S24a
     _c1="$(cd "$FJ" && STATIC_RESULTS_OUT="$T/c1.tsv" sh tests/run_all_static.sh --tier portable --jobs 1 --confirm "$T/j1.tsv" 2>&1)" || true
     rm -f "$T/j.ran" "$T/j.ctl" "$T/k.log"
     _c4="$(cd "$FJ" && STATIC_RESULTS_OUT="$T/c4.tsv" sh tests/run_all_static.sh --tier portable --jobs 4 --confirm "$T/j1.tsv" 2>&1)" || true
-    if [ "$(rd24 "$_c1" "$T/c1.tsv")" = "$(rd24 "$_c4" "$T/c4.tsv")" ] && printf '%s' "$_c4" | grep -qE "^  re-run g_f +STALE: R2" \
-            && printf '%s' "$_c4" | grep -q "controls carried: 1 honoured" && [ ! -s "$T/j.ctl" ] && grep -qx g_f "$T/j.ran"; then S24d=ok
+    if [ "$(rd24 "$_c1" "$T/c1.tsv")" = "$(rd24 "$_c4" "$T/c4.tsv")" ] && printf '%s' "$_c4" | grep -E >/dev/null "^  re-run g_f +STALE: R2" \
+            && printf '%s' "$_c4" | grep >/dev/null "controls carried: 1 honoured" && [ ! -s "$T/j.ctl" ] && grep -qx g_f "$T/j.ran"; then S24d=ok
     else S24d=bad; echo "    under --confirm the --jobs 4 run differs from --jobs 1, or ran the control the plan carried: control runs '$(cat "$T/j.ctl" 2>/dev/null | tr '\n' ' ')'"
         rd24 "$_c1" "$T/c1.tsv" > "$T/r1.txt"; rd24 "$_c4" "$T/c4.tsv" > "$T/r4.txt"; diff "$T/r1.txt" "$T/r4.txt" | sed 's/^/      /' | head -20; fi
     (cd "$FJ" && git checkout -q -- data)
@@ -1120,7 +1125,8 @@ echo "== 28. a cold decrypt cache is built BEFORE the static tier, serial and po
 # decrypt_view, the cache starts cold, and a stub decrypt tool writes full-length images; every stub must PASS at
 # --jobs 1 and --jobs 3. vhunt2 has no zip in this ROMDIR, so it must not be attempted.
 SHADOW_W="$T/run_all_static_decryptwarmoff.sh"
-sed 's@        if decrypt_cache_ensure "$_s" 2>> "$WORK/decrypt_warm.err"; then _dw_built="$_dw_built $_s"   # DECRYPT-WARM@        if true; then :   # DECRYPT-WARM disabled@' "$RUNNER" > "$SHADOW_W"
+# since #305 (14z-209) the warm-up is tests/lib/decrypt_cache.sh's decrypt_cache_warm, and the runner's DECRYPT-WARM line calls it
+sed 's@    decrypt_cache_warm "$WORK/decrypt_warm.err" || :   # DECRYPT-WARM@    :   # DECRYPT-WARM disabled@' "$RUNNER" > "$SHADOW_W"
 cmp -s "$RUNNER" "$SHADOW_W" && fail "could not disable the decrypt warm-up — the DECRYPT-WARM line moved"
 FV="$T/repo_dv"; RV="$T/romdir_dv"; mkdir -p "$FV/tests/lib" "$FV/tools" "$RV"
 for _l in classify controls measures static_job decrypt_cache; do ln -s "$REPO/tests/lib/$_l.sh" "$FV/tests/lib/$_l.sh"; done
@@ -1145,9 +1151,9 @@ s28() {   # s28 <runner> -> S28 (ok|bad): both --jobs 1 and --jobs 3 from a cold
         rm -rf "$FV/build"
         _o="$(cd "$FV" && ROMDIR="$RV" STATIC_CHANGED_PATHS= sh tests/run_all_static.sh --tier static --strict --jobs $_j 2>&1)" || true
         for _g in g_v1 g_v2 g_v3; do
-            printf '%s' "$_o" | grep -qE "^  $_g +PASS( |$)" || { S28=bad; [ $_g = g_v3 ] && S28V3=bad; echo "    --jobs $_j: $_g did not PASS from a cold cache: $(printf '%s' "$_o" | grep -E "^  $_g" | head -1)"; }
+            printf '%s' "$_o" | grep -E >/dev/null "^  $_g +PASS( |$)" || { S28=bad; [ $_g = g_v3 ] && S28V3=bad; echo "    --jobs $_j: $_g did not PASS from a cold cache: $(printf '%s' "$_o" | grep -E "^  $_g" | head -1)"; }
         done
-        printf '%s' "$_o" | grep -q '^== decrypt views built before the tier: vsavj vsav2 (' \
+        printf '%s' "$_o" | grep >/dev/null '^== decrypt views built before the tier: vsavj vsav2 (' \
             || { S28=bad; echo "    --jobs $_j: no 'decrypt views built before the tier: vsavj vsav2' line"; }
     done
 }
@@ -1192,8 +1198,8 @@ s30() {   # s30 <runner> -> S30 (ok|bad)
     rm -f "$FX/tests/run_all_static.sh" "$FX/stray_324"; rm -rf "$FX/build"; : > "$FX/old_324"
     ln -s "$1" "$FX/tests/run_all_static.sh"
     _o="$(cd "$FX" && STATIC_CHANGED_PATHS= sh tests/run_all_static.sh --tier portable --strict 2>&1)" || true
-    if printf '%s' "$_o" | grep -q '^NOT GREEN' && printf '%s' "$_o" | grep -q '^LEFT BEHIND: new untracked file(s) outside build/ — stray_324 *$' \
-            && printf '%s' "$_o" | grep -qE '^  g_x +PASS'; then S30=ok
+    if printf '%s' "$_o" | grep >/dev/null '^NOT GREEN' && printf '%s' "$_o" | grep >/dev/null '^LEFT BEHIND: new untracked file(s) outside build/ — stray_324 *$' \
+            && printf '%s' "$_o" | grep -E >/dev/null '^  g_x +PASS'; then S30=ok
     else S30=bad; echo "    the strict run: $(printf '%s' "$_o" | grep -E '^(GREEN|NOT GREEN|LEFT BEHIND)|^  g_x' | tr '\n' '|')"; fi
 }
 R30="$RUNNER"; vs_ctl_is stray-blind && R30="$SHADOW_X"
@@ -1206,6 +1212,44 @@ if ! vs_ctl_is stray-blind; then
     s30 "$SHADOW_X" > /dev/null
     [ "$S30" = bad ] && vs_ctl_fired stray-blind "a runner that never compares the untracked files reads the leaking run GREEN — section 30 catches it" \
         || { rc=1; vs_ctl_dead stray-blind "the comparison-less runner still named the stray file" || :; }
+fi
+
+echo "== 32. no builtin printf/echo feeds an early-exit grep -q (#327) =="
+# The premise, measured: with SIGPIPE ignored (as a parent may leave it), a builtin printf of ~1 MB into `grep -q`
+# prints the shell's write error; the same pipe into `grep >/dev/null`, which reads to EOF, does not.
+_big="$T/big327.txt"; { echo "  re-run g_f STALE"; i=0; while [ $i -lt 20000 ]; do echo "padding line $i of a captured runner output"; i=$((i+1)); done; } > "$_big"
+s32p() {   # s32p <old|new> -> the number of stderr lines over 5 runs with SIGPIPE ignored
+    python3 - "$1" "$_big" <<'EOF'
+import signal, subprocess, sys
+signal.signal(signal.SIGPIPE, signal.SIG_IGN)
+q = '-' + 'qE'   # spelled apart so section 32's lint does not read this line as a site
+c = 'printf "%s" "$(cat "$1")" | grep ' + q + ' "^  re-run g_f +STALE"' if sys.argv[1] == 'old' else \
+    'printf "%s" "$(cat "$1")" | grep -E "^  re-run g_f +STALE" >/dev/null'
+n = 0
+for _ in range(5):
+    r = subprocess.run(['sh', '-c', c, 'sh', sys.argv[2]], capture_output=True, text=True, restore_signals=False)
+    n += len([l for l in r.stderr.splitlines() if 'Broken pipe' in l]) + (0 if r.returncode == 0 else 100)
+print(n)
+EOF
+}
+_p_old="$(s32p old)"; _p_new="$(s32p new)"
+[ "$_p_old" -gt 0 ] && [ "$_p_old" -lt 100 ] && [ "$_p_new" = 0 ] \
+    && echo "  ok: the premise holds — the old form printed $_p_old write-error line(s) in 5 runs, grep >/dev/null none, both matched" \
+    || fail "section 32: the premise did not hold (old form: $_p_old, new form: $_p_new; a count of 100 or more is a missed match)"
+s32() {   # s32 <file> -> the builtin-fed `grep -q` lines of <file>, comments aside
+    grep -nE '(printf|echo)[^|]*[|][[:space:]]*(command )?grep -[a-zA-Z]*q' "$1" | grep -vE '^[0-9]+:[[:space:]]*#' || :
+}
+_lint="$REPO/tests/test_static_runner.sh"
+_q=q; _planted="$T/tsr_planted.sh"; { cat "$_lint"; echo "printf '%s' \"\$_r\" | grep -$_q x && :"; } > "$_planted"
+vs_ctl_is pipe-q && _lint="$_planted"
+_hits="$(s32 "$_lint")"
+[ -z "$_hits" ] && echo "  ok: no line feeds a builtin printf/echo into grep -q" \
+    || fail "section 32: a builtin feeds grep -q (#327): $(printf '%s' "$_hits" | tr '\n' '|')"
+
+echo "== 33. MUST-FIRE: section 32's lint, given a planted line =="
+if ! vs_ctl_is pipe-q; then
+    [ -n "$(s32 "$_planted")" ] && vs_ctl_fired pipe-q "a planted builtin-fed early-exit grep line is named by section 32's lint" \
+        || { rc=1; vs_ctl_dead pipe-q "the lint did not name the planted line" || :; }
 fi
 
 [ "$rc" = 0 ] && echo "PASS: the runner's verdicts mean what they say." \

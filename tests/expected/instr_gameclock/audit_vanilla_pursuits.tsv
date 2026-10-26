@@ -1,0 +1,34 @@
+# tests/expected/instr_gameclock/audit_vanilla_pursuits.tsv — the game clock RAM:$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,
+# option A) by `tests/audit_vanilla_pursuits.sh --freeze-clock` at 779bc589: pristine vsavj; legs nostop and
+# p0189ea per rig; every reference leg held to replay.lua run live, every guarded leg to its reference leg's game clock.
+# leg<TAB>replay<TAB>frames<TAB>gameclock
+nostop	pu_AN	5270	39
+p0189ea	pu_AN	5270	39
+nostop	pu_AU	5270	39
+p0189ea	pu_AU	5270	39
+nostop	pu_BI	5270	39
+p0189ea	pu_BI	5270	39
+nostop	pu_BU	5270	39
+p0189ea	pu_BU	5270	39
+nostop	pu_DE	5270	39
+p0189ea	pu_DE	5270	39
+nostop	pu_FE	5270	39
+p0189ea	pu_FE	5270	39
+nostop	pu_GA	5270	39
+p0189ea	pu_GA	5270	39
+nostop	pu_JE	5270	39
+p0189ea	pu_JE	5270	39
+nostop	pu_LE	5270	39
+p0189ea	pu_LE	5270	39
+nostop	pu_LI	5270	39
+p0189ea	pu_LI	5270	39
+nostop	pu_MO	5270	39
+p0189ea	pu_MO	5270	39
+nostop	pu_QB	5270	39
+p0189ea	pu_QB	5270	39
+nostop	pu_SA	5270	39
+p0189ea	pu_SA	5270	39
+nostop	pu_VI	5270	39
+p0189ea	pu_VI	5270	39
+nostop	pu_ZA	5270	39
+p0189ea	pu_ZA	5270	39

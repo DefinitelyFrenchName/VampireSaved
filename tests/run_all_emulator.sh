@@ -75,7 +75,7 @@
 # ([CPE-24], and test_mame_parity.sh's own header). --keep-going overrides.
 #
 # Usage:
-#   ROMDIR=... tests/run_all_emulator.sh                 prereq+fbneo+mame, release scope
+#   ROMDIR=... tests/run_all_emulator.sh                 prereq, then fbneo+mame in one pool, release scope
 #   MAME_BIN=... tests/run_all_emulator.sh              override the exported MAME default (else the WIDE build)
 #   ROMDIR=... tests/run_all_emulator.sh --scope all     + the out-of-scope rows (never the ondemand ones)
 #   ROMDIR=... tests/run_all_emulator.sh --scope ondemand   ONLY the ondemand rows (pristine-only gates, 14z-196; instruments, 14z-199)
@@ -83,7 +83,14 @@
 #   ... --cadence romset|bitstream|all                   default: all
 #   ... --freeze                                         = --cadence romset (see below)
 #   ... --only 'glob'                                    a subset (shell glob on the gate name)
-#   ... --jobs N                                         run N gates at once (default 1)
+#   ... --skip 'glob'                                    NOT on this host (repeatable): the gates it matches are left out of
+#                                                        the selection and named, and write no row — their row of record is
+#                                                        another host's run. THE ERIS TIER passes --skip test_mame_parity
+#                                                        (maintainer-ruled 2026-10-26, #321 "Parity only on the Mac": ERIS has
+#                                                        no reference MAME for its A/B section, so it is always PARTIAL there,
+#                                                        and the Mac's parity run is the row of record)
+#   ... --jobs N                                         run N gates at once (default 1); the fbneo and mame lanes
+#                                                        share ONE pool of N slots when both are selected (14z-209, #321)
 #   ... --timeout SECS                                   per gate (default 5400 = 90 min); a row's
 #                                                        7th column (seconds) overrides it (14z-134)
 #   ... --jobs N with --lane mister                      N Verilator runs at once, one scratch
@@ -159,7 +166,7 @@ cd "$REPO"
 REG=tests/ci_emulator.tsv
 SCOPE=release; CADENCE=all; LANES="prereq fbneo mame"; LANES_SET=""; ONLY=""; JOBS=1; TMO=5400
 _ORIG_ARGS="$*"   # the command line as given, for the run record (#189) — the loop below shifts it away
-LOGDIR=""; RESUME=0; STRICT=0; KEEPGOING=0; DRY=0; LIST=0; CONTROLS=0; STALE=0; REUSE=""
+LOGDIR=""; RESUME=0; STRICT=0; KEEPGOING=0; DRY=0; LIST=0; CONTROLS=0; STALE=0; REUSE=""; SKIP=""
 while [ $# -gt 0 ]; do
     case "$1" in
     --scope)   shift; SCOPE="${1:?--scope needs release|all|ondemand}"
@@ -178,6 +185,7 @@ while [ $# -gt 0 ]; do
                            esac
                            LANES="${LANES_SET# }" ;; esac ;;
     --only)    shift; ONLY="${1:?--only needs a glob}" ;;
+    --skip)    shift; SKIP="${SKIP:+$SKIP }${1:?--skip needs a glob}" ;;
     --jobs)    shift; JOBS="${1:?--jobs needs N}" ;;
     --timeout) shift; TMO="${1:?--timeout needs seconds}" ;;
     --log)     shift; LOGDIR="${1:?--log needs a dir}" ;;
@@ -239,8 +247,8 @@ fi
 selected() {  # rows matching --lane / --scope / --cadence / --only / --stale, in lane order
     # An `instrument:` row (14z-199, #265) is never selected, in any scope: run bare it only SKIPs at its operand
     # check, and the runner passes it the registry's bare args, so it is run by hand with its operands instead.
-    for _l in $LANES; do
-        rows | awk -F'\t' -v lane="$_l" -v scope="$SCOPE" -v cad="$CADENCE" '
+    for _sel_l in $LANES; do
+        rows | awk -F'\t' -v lane="$_sel_l" -v scope="$SCOPE" -v cad="$CADENCE" '
             $2 == lane && ((scope == "all" && $3 != "ondemand") || (scope != "all" && $3 == scope)) \
                        && (cad == "all"   || $4 == cad) && $6 !~ /^instrument:/'
     done | while IFS= read -r line; do
@@ -252,8 +260,17 @@ selected() {  # rows matching --lane / --scope / --cadence / --only / --stale, i
         if [ "$STALE" = 1 ]; then
             printf '%s\n' "$STALE_NAMES" | grep -qx -- "$_g" || continue
         fi
+        skipped_here "$_g" && continue
         printf '%s\n' "$line"
     done
+}
+skipped_here() {  # skipped_here <gate> — true when a --skip glob matches it (the globs are split, never expanded)
+    _sk_hit=1; set -f
+    for _sk in $SKIP; do
+        # shellcheck disable=SC2254
+        case "$1" in $_sk) _sk_hit=0 ;; esac
+    done
+    set +f; return $_sk_hit
 }
 
 if [ "$LIST" = 1 ]; then
@@ -276,6 +293,7 @@ if [ "$STALE" = 1 ]; then
     _out=""
     for _n in $STALE_NAMES; do
         selected | awk -F'\t' -v g="$_n" '$1 == g {f=1} END {exit !f}' && continue
+        skipped_here "$_n" && continue
         _ln="$(rows | awk -F'\t' -v g="$_n" '$1 == g {print $2; exit}')"
         _out="$_out $_n(lane ${_ln:-unregistered})"
     done
@@ -337,11 +355,25 @@ if [ "$DRY" = 0 ] && [ -f tools/run_record.py ] && git rev-parse --git-dir >/dev
     fi
 fi
 
+# THE DECRYPT VIEWS FIRST (#305, 14z-209, maintainer-ruled 2026-10-26 "Yes, with #306"): 15 release-scope emulator gates
+# read build/out/<set>_{opcodes,data}.bin directly, and with the cache cold two of them SKIPped (ERIS, fork A). The static
+# runner has built the views before its tier since #299; this runner now calls the same one copy, after the ROM audit.
+# A warm cache costs six size checks and prints nothing; a repo without the helper (the runner gate's synthetic ones)
+# skips this. Not under --dry-run, which executes nothing.
+if [ "$DRY" = 0 ] && [ -f "$REPO/tests/lib/decrypt_cache.sh" ]; then
+    . "$REPO/tests/lib/decrypt_cache.sh"
+    decrypt_cache_warm "$LOGDIR/decrypt_warm.err" || :   # DECRYPT-WARM
+fi
+
 echo "== the emulator-tier sweep =="
 echo "  registry   $REG"
 echo "  lanes      $LANES"
 echo "  scope      $SCOPE${ONLY:+   only=$ONLY}"
 echo "  cadence    $CADENCE"
+if [ -n "$SKIP" ]; then
+    _skn="$(rows | while IFS= read -r line; do _g="${line%%	*}"; if skipped_here "$_g"; then printf ' %s' "$_g"; fi; done)"
+    echo "  NOT HERE   --skip '$SKIP':${_skn:- (no registry row matches)} — no row here; the row of record is another host's run"
+fi
 echo "  jobs       $JOBS   timeout ${TMO}s (a row's 7th column overrides it)"
 JTSIM_BASE="${JTSIM_SCRATCH:-${TMPDIR:-/tmp}/vampire-saved-jtsim}"
 [ "$JOBS" -gt 1 ] && echo "  scratch    $JTSIM_BASE (mister slot 0), $JTSIM_BASE-slotN (slots 1..$((JOBS-1)))"
@@ -546,23 +578,47 @@ already_done() {  # already_done <gate>
 }
 
 n_total=0
-for _l in $LANES; do
-    _rows="$(selected | awk -F'\t' -v lane="$_l" '$2 == lane')"
+# THE POOLS (14z-209, #321, maintainer-ruled 2026-10-26 "fbneo lane into the pool"): when both are selected, the fbneo
+# and mame lanes run as ONE pool of --jobs slots, fbneo's rows queued first. They ran one after the other until then, and
+# the fbneo lane was 896 s of test_dualtrack alone on ERIS (the 14z-208b freeze). Each row keeps its OWN lane label in
+# results.tsv and the readout prints each lane's heading, so nothing that reads a lane changes.
+_POOLS=""
+case " $LANES " in *" fbneo "*) case " $LANES " in *" mame "*) _fm=1 ;; *) _fm=0 ;; esac ;; *) _fm=0 ;; esac
+for _pl in $LANES; do
+    case "$_pl" in
+    fbneo|mame) if [ "$_fm" = 1 ]; then
+                    case " $_POOLS " in *" fbneo+mame "*) ;; *) _POOLS="$_POOLS fbneo+mame" ;; esac
+                else _POOLS="$_POOLS $_pl"; fi ;;
+    *)          _POOLS="$_POOLS $_pl" ;;
+    esac
+done
+# THE LOOP VARIABLE IS _lane_pool, NOT _l (14z-209, #323): run_one runs IN this shell on a serial pool (the prereq lane,
+# always), and vs_classify's readers (tests/lib/controls.sh vs_ctl_read, tests/lib/measures.sh vs_meas_read) assigned
+# `_l` — so after any PASS the STOP check below read a log path instead of "prereq", and a red prereq gate followed by
+# a green one did not stop the run (the 14z-208b freeze on ERIS went on past test_mame_parity's PARTIAL that way, and
+# its run directory kept the .lane_prereq this loop deletes by name). tests/test_emulator_runner.sh section 5b.
+for _lane_pool in $_POOLS; do
+    _rows="$(selected | awk -F'\t' -v pool="+$_lane_pool+" 'index(pool, "+" $2 "+")')"
     [ -n "$_rows" ] || continue
     _n=$(printf '%s\n' "$_rows" | wc -l | tr -d ' ')
-    echo "== $_l lane ($_n gates) =="
+    _plns="$(printf '%s\n' "$_rows" | awk -F'\t' '!seen[$2]++ {print $2}')"   # the pool's lanes that HAVE rows, in order
+    for _pl in $_plns; do
+        _pn=$(printf '%s\n' "$_rows" | awk -F'\t' -v lane="$_pl" '$2 == lane' | wc -l | tr -d ' ')
+        if [ "$_pn" = "$_n" ]; then echo "== $_pl lane ($_pn gates) =="
+        else echo "== $_pl lane ($_pn gates; one pool of $_n with the $(printf '%s\n' "$_plns" | grep -vx "$_pl" | tr '\n' ' ' | sed 's/ $//') lane, #321) =="; fi
+    done
     n_total=$((n_total + _n))
     # The prereq lane runs SEQUENTIALLY whatever --jobs says: these gates
     # measure the instruments, and an instrument measured under contention is
     # a different instrument.
-    _jobs=$JOBS; [ "$_l" = prereq ] && _jobs=1
+    _jobs=$JOBS; [ "$_lane_pool" = prereq ] && _jobs=1
     # THE SLOT SEMAPHORE (14z-144). One FIFO per lane, pre-filled with $_jobs
     # tokens whose VALUE is the slot number; fd 8 is both ends so a worker can
     # give its token back without reopening. Serial lanes use no FIFO at all,
     # which keeps --jobs 1 and the prereq lane byte-for-byte the old path.
     SLOTFIFO=""
     if [ "$_jobs" -gt 1 ]; then
-        SLOTFIFO="$LOGDIR/.slots_$_l"
+        SLOTFIFO="$LOGDIR/.slots_$_lane_pool"
         rm -f "$SLOTFIFO"; mkfifo "$SLOTFIFO"
         exec 8<>"$SLOTFIFO"
         _s=0; while [ "$_s" -lt "$_jobs" ]; do printf '%s\n' "$_s" >&8; _s=$((_s + 1)); done
@@ -575,7 +631,7 @@ for _l in $LANES; do
     # `test_wide_profile` was left running ORPHANED, overlapping the next
     # lane, and its result landed under the wrong heading. Reading from a file
     # keeps the loop — and `wait`, and `_running` — in the main shell.
-    printf '%s\n' "$_rows" > "$LOGDIR/.lane_$_l"
+    printf '%s\n' "$_rows" > "$LOGDIR/.lane_$_lane_pool"
     while IFS="$(printf '\t')" read -r g lane scope cadence args note tmo; do
         [ -n "$g" ] || continue
         if already_done "$g"; then
@@ -643,7 +699,7 @@ for _l in $LANES; do
                 read -r _slot <&8                  # BLOCKS until a slot frees
             fi
             _slot_env=""
-            if [ "$_l" = mister ]; then
+            if [ "$_lane_pool" = mister ]; then
                 # `[ … ] && x=y` as a STANDALONE statement is a set -e abort
                 # when the test fails ([VSP-176]'s family). An `if` is not.
                 _scr="$JTSIM_BASE"
@@ -657,13 +713,13 @@ for _l in $LANES; do
                 if [ -n "$SLOTFIFO" ]; then printf '%s\n' "${_slot:-0}" >&8; fi
             ) &
         fi
-    done < "$LOGDIR/.lane_$_l"
+    done < "$LOGDIR/.lane_$_lane_pool"
     wait                       # the lane is not finished until its gates are
     if [ -n "$SLOTFIFO" ]; then exec 8>&-; rm -f "$SLOTFIFO"; SLOTFIFO=""; fi
-    rm -f "$LOGDIR/.lane_$_l"
+    rm -f "$LOGDIR/.lane_$_lane_pool"
     # THE INSTRUMENT GATE. A red prereq means every later measurement is
     # measured with a moved instrument, so the run stops by default.
-    if [ "$_l" = prereq ] && [ "$DRY" = 0 ] && [ "$KEEPGOING" = 0 ]; then
+    if [ "$_lane_pool" = prereq ] && [ "$DRY" = 0 ] && [ "$KEEPGOING" = 0 ]; then
         _bad="$(awk -F'\t' 'NR>1 && $2=="prereq" && ($4=="FAIL"||$4=="TIMEOUT"||$4=="MISSING") {print $1}' "$RESULTS")"
         if [ -n "$_bad" ]; then
             echo
@@ -805,6 +861,7 @@ for kind in SKIP FAIL TIMEOUT MISSING; do
     [ -n "$_l" ] && echo "$(printf '%-8s' "$kind"):$_l"
 done
 echo "results   $RESULTS"
+[ -z "${_skn:-}" ] || echo "not here  (--skip):$_skn — no row in this run; the row of record is another host's"
 _nr=$(awk -F'\t' 'NR>1 && $6 ~ /^reused: /' "$RESULTS" | wc -l | tr -d ' ')
 if [ "$_nr" != 0 ]; then echo "reused: $_nr of the PASS (not re-run: PASS in the freeze run $REUSE, its identity this run's — #316)"; fi
 rc=0

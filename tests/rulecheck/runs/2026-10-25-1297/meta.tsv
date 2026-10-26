@@ -1,0 +1,10 @@
+decision	expectation
+subject	#302: re-freeze tests/expected/marionette_cost.tsv with the eight 118_* replays in its legs (65 legs, was 57), and close #302 done — after run 2026-10-25-1296
+session	14z-209
+model	rule-checker@163e4ce9cf7b
+claim	CLAIM: tests/audit_marionette_cost.sh takes as legs every replay with a vanilla basis log plus 128_shadow_vs_legacy_vsavj (its legs line: 57 in minus.log, 65 in full.log), commit 7c757b12 (14z-198) added the eight 118_* basis logs (commit_7c757b12.txt, basis_logs_2aacebe8.txt), and on two fresh PILOT clones of 2aacebe8 made by p302.sh (head_full.txt, head_minus.txt) the gate FAILs with all 65 legs and PASSes against the 14z-196 frozen file with exactly those eight logs removed (p302.sh's rm of 118_*.log; basis_logs_2aacebe8.txt lists the eight, 56 left, as minus_basis_logs.txt reads) (full.log, minus.log), so the red is those eight legs and the expectation, not the port; re-frozen with FREEZE=1 on the 65-leg clone and verified by a plain run PASS with its three controls FIRED (freeze.log, verify.log), the candidate's data rows equal the raw freeze's and differ from the frozen file on 12 of its 26 HIT rows only, each replay count +8, every max unchanged (rowdiff.txt); it replaces tests/expected/marionette_cost.tsv, its header line 2 naming the rule-checker run that passes it (written <pending> in the candidate until then), and the gate's usage comment gives 65 legs (usage_comment.diff, comment lines only; the verify run on the unedited script). NOT TESTED: the Mac or ERIS (PILOT only); FBNeo; whether the eight replays exercise the Marionette path the gate prices (they enter as legacy legs like the rest); the next basis log added turns the gate red the same way (a re-freeze per corpus change, as here).
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	0 flag(s)

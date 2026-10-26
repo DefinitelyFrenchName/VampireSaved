@@ -7635,3 +7635,48 @@ reached in its slot" since F4 — and Cryptic Needle at 64 px). Events walking i
 t-50-walk. The other half: a probe rig running the same input in a different slot grabbed, and that probe's result was
 reported to the maintainer as the gate's; the maintainer's sheet read caught it. Report a row from the gate run's own
 rows, and measure a "far" event's start distance on its trace before calling it far.
+
+## A GAPPED HALF-CIRCLE BACK IS TWO TAPS TOWARD BACK, SO A CHARACTER WITH A BACKDASH DASHES INSTEAD OF DOING THE MOVE (paid: 14z-205b, #229)
+
+`tools/name_moves.py`'s `hcf()` spells 41236 with a neutral frame between each direction. On Bishamon its 41236+P never
+entered Karame Dama: the back, the neutral frame and the down-back read as two taps toward back, a backdash — the trace
+shows `a2:0x29` airborne from +4, moving back from x 545 to 428 — and the press then lands in the hop (`a2:0x18`) or on
+landing (`a:0x0f`). The same probe round entered Karame Dama (`a2:0x45`) on every tight spelling, and the one gapped
+41236 whose press came after the hop fired too, so it is the rig, not the input (`build/agent205/t229/p1_specials/REPORT.md`,
+local). `tools/es_ex_rigs.py` spells its 41236 and 63214 contiguous for the same reason (its comment, F3), and
+`name_moves.hcb_cont` already names the trap for 63214; `tools/specials_b_rigs.py` keeps `nm.hcf` on two rows (`HELLS
+GATE`, `HELL 41236 K`).
+
+**The rule:** a motion that starts toward back is written with no neutral frame between its first two directions on any
+character whose back-tap is a backdash; a rig that "never fires" a back-start motion is checked for a dash chain first.
+
+## A SH FUNCTION HAS NO LOCALS, SO A LIBRARY'S SCRATCH NAME CAN BE ITS CALLER'S LOOP VARIABLE (paid: 14z-208b/14z-209, #323)
+
+`tests/run_all_emulator.sh` looped over its lanes with `for _l in $LANES`, and on a serial lane (the prereq lane, always)
+it classified each gate in its OWN shell. `vs_classify` called `vs_ctl_read` and `vs_meas_read` on a PASS, and both
+began `_s="$1"; _l="$2"`. So after any passing prereq gate `_l` held a log path, the STOP check `[ "$_l" = prereq ]`
+was false, and a red `test_mame_parity` ahead of a green gate let the 14z-208b freeze run on. Its one trace was a file:
+the lane loop deletes `.lane_$_l` after the lane, and the freeze's run directory still holds `.lane_prereq` (fork A's
+repro, `build/agent209/t321/repro323/`). A parallel lane hides it, because there the gate runs in a `( … ) &` subshell. **The rule:** a sourced function's scratch variables carry its own prefix (`_vcr_`, `_vmr_`, as
+`_dv_` and `_dw_` in `tests/lib/decrypt_cache.sh`), and a runner's loop variables do not use a short shared name
+(`_lane_pool`); `tests/test_emulator_runner.sh` section 5b pins the case, with the shared name restored as its control.
+
+## A RULED OUTPUT FORMAT IS IMPLEMENTED FROM THE RULING'S WORDS, AND CHECKED BY AN ORACLE WRITTEN FROM THEM (paid: 14z-209, #244)
+
+The maintainer ruled the tenant charmap pages' power cells as *"the class, plus the raw byte and the flag named when
+bit 5 or 7 is set"* ("Class + flags"). The first implementation (`tools/charmap_md.py` power_cell, `tools/charmap_html.py`
+power_html) named bit 6 too, and the html form left the raw byte out; the row check that "proved" it compared each
+regenerated cell with the SAME function's output, so it agreed with itself. Three rule-checker rounds (2026-10-26-1320
+to -1322) found the drift; the fix was an independent oracle written from the ruling's sentence alone
+(`build/agent209/t244/v3/oracle.py`), checked on all 256 bytes and on hand-written cases, with mutant functions as its
+controls. **The rule:** when a ruling fixes a printed form, write the expected form from the ruling's words in a
+separate check, never from the tool being checked, and give it a mutant that the check must reject.
+
+## A GATE WHOSE LEGS ARE "EVERY REPLAY WITH A BASIS LOG" GOES RED THE DAY A BASIS LOG IS ADDED (paid: 14z-205c/14z-209, #302)
+
+`tests/audit_marionette_cost.sh` takes as its legs every replay that has a vanilla basis log, plus one named replay.
+Commit `7c757b12` (14z-198) added eight basis logs (`118_chain`, `118_input_sweep`, `118_sel_b1`..`b6`) after the
+expectation was last frozen, so on a clean clone every hit row read exactly +8 replays and the gate went red with no
+change to the code it measures (#302; re-frozen at 65 legs, `build/agent209/t302/`, local). **The rule:** a gate whose
+leg set is "whatever files of a kind exist" must say so in its header and is re-frozen in the commit that adds such a
+file — or its legs are a frozen list, so a new file is a deliberate addition rather than a silent red.

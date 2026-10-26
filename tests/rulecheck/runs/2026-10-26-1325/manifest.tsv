@@ -1,0 +1,39 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_command_throws.sh	cff63fa44a0329399ed7bab24e5272a19fd1a714
+tests/expected/command_throws.tsv	8fcd78ec4858389de126b1b9d464eb60e9734ca0
+tests/expected/instr_gameclock/audit_command_throws.tsv	a0f60326114f79c58f867369b0e6859ccfc93693
+build/agent209/t229/v10/command_throws.log	0376f5c9498015061375e98f56de6bd690997e6f
+build/agent209/t229/v6/wide_command_throws.log	01b6ee7664190e8ee1e38a926313b6563d6543d9
+build/agent209/t229/v6/command_throws@cap-off-by-one.log	8f0031ac4c12f45cbf4cce8f4ad5b13187a03d15
+build/agent209/t229/v6/command_throws@drift-clock.log	83db1db2f9937fbc697ac1b32359b0860da97201
+build/agent209/t229/v6/command_throws@first-frame-skip.log	003ddccdfcf29c065e9dd625f7e3e50a7d6eb378
+build/agent209/t229/v6/command_throws@foreign-image.log	a650fdab0343544192c64b711f08fa5d7c853e4a
+build/agent209/t229/v6/command_throws@foreign-mame.log	1a468d4dc5e4a80f21205a6cd99bea28005301d1
+build/agent209/t229/v6/command_throws@foreign-record.log	ae51211f8679722f582566ba791c20372b75e16a
+build/agent209/t229/v6/command_throws@foreign-rompath.log	ad22d5c8b2f76f46698e0eb02bdabb3707a244d6
+build/agent209/t229/v6/command_throws@foreign-romset.log	9c6ef219f373f931873f6e36faed4e7db67b4888
+build/agent209/t229/v6/command_throws@light-strength.log	82489596ecc812f096f7119df722c32381f6a972
+build/agent209/t229/v6/command_throws@phantom-record.log	8d11e7abfb03aa7f73775a06fb852e3bc7165fcd
+build/agent209/t229/v6/command_throws@stock-blind.log	18b16a9f25de3e4e78b5b0efd3e955cc440e75b4
+build/agent209/t229/v6/command_throws@unsigned-chain.log	8fd3636872b39e3e65dd76297d0f233aa70dbf56
+build/agent209/t229/asrun/command_throws_header.diff	f7a12f5ecccbe487908b039046bf5c4039f34cb0
+build/agent209/t229/asrun/command_throws_followed_v10.txt	3f8951874f8ff06fdf9a2ad5ab2310fb674c1557
+build/agent209/t229/asrun/command_throws_charmap_reach.txt	55d1b889ca8ac23a95972488f904571546a1fc0f
+build/agent209/t229/asrun/command_throws_version.txt	316d77e56c6b1ab5f420f11947e7956c252a07ad
+build/agent209/t229/asrun/command_throws_vs_tar.txt	30d12674a297d833d3404cdad1da75f80a651eb8
+build/agent209/t229/v9/freeze_clock.log	062822ad121f3fe20589b1db120abc55789b7813
+build/agent209/t229/asrun/ct_clocks_before.tsv	1414979ed93c5803f499e7b8fd9beb05fa7ddd6a
+build/agent209/t229/sheetmap/cmp_f4_full.py	ca69adfd4e13c456dc29be1e3c9a76bd7fe5dff0
+build/agent209/t229/sheetmap/cmp_f4_full.out	201bcba36bcf53394b6fd82ac23b42a6b8fe8eb3
+build/agent209/t229/capM/run.log	2a4b71508459a234fcdfc395c93d0dddcc1268d1
+build/agent209/t229/asrun/capM_source_vs_today.txt	8686683cc1dd28f38a700c7737e32af61755cac6
+DECISIONS_HISTORY.md.lines-8112-8120 (lines 8112-8120 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-25 (14z-208c) — #229 Q1 (F4): the air throws leave the command-throw set and join t")	ea55a1ce6547ccec7e415dfa03b102b545510e5c
+DECISIONS_HISTORY.md.lines-8121-8238 (lines 8121-8238 of DECISIONS_HISTORY.md: its INDEX entry "## Read 2026-10-25 (14z-208c) — #229 Q1: the maintainer's answers on F4's 18-tile command-throw shee")	c64faf3a5e2bd24e4fe622e80471118ea920295e
+DECISIONS_HISTORY.md.lines-8239-8252 (lines 8239-8252 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-25 (14z-208c) — #229's "far" rows re-placed; #324's guard runner-wide; #319 convert")	ce2244f8bf6cf7bd7c1f6e32a9c3c7213cb479e3
+DECISIONS_HISTORY.md.lines-8273-8284 (lines 8273-8284 of DECISIONS_HISTORY.md: its INDEX entry "## Read 2026-10-25 (14z-209) — #229 Q1: the maintainer's answer in the questions doc — the sheets of")	38277721e9f1ca49255fe357782865947ee1e6e2
+DECISIONS_HISTORY.md.lines-8340-8350 (lines 8340-8350 of DECISIONS_HISTORY.md: its INDEX entry "## Read 2026-10-26 (14z-209) — #229 F4: the 71 motion-test rows shown at last, and frozen as measure")	f12106b31f5639ba6191e23077824c469194bdab
+STATE.md.lines-82-125 (lines 82-125 of STATE.md)	a00d00f030882ed54dc743c0c8e7c40ee338f7e2
+tools/run_replay_guarded.sh.lines-30-50 (lines 30-50 of tools/run_replay_guarded.sh)	9fb7eaae5344b3927a2ba48f1756f6f16334717c
+tests/lib/instr_align.sh.lines-118-145 (lines 118-145 of tests/lib/instr_align.sh)	314e7a5c131d2a3b35d847914c0aa3bd04281676
+tools/run_mame.sh.lines-25-40 (lines 25-40 of tools/run_mame.sh)	fb521646413662f33b27ad13a9bb7867f846bdad
+tests/lib/pristine_vsavj.sh	cbff6a8400c70620eeb140106f6f2b4cbdad2ef6

@@ -1,0 +1,27 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_vanilla_specials_b.sh	95a8db8611bf656ea0e15d0dba70d228ec5975b1
+tests/lib/pristine_vsavj.sh	cbff6a8400c70620eeb140106f6f2b4cbdad2ef6
+tests/lib/mame_ident.sh	ec9f2a6d7fae4a5668b3d63ec28989e0b11d1ac2
+tests/lib/controls.sh	b3fc50460a4872fda43d468bb834e040a7b97ad5
+tools/run_mame.sh	4aeb916f534e1e9c46be18ad87c6d2b6a56041ec
+tests/expected/vanilla_specials_b.tsv	2fbab6d36de909d8623ccd0a061410b87ac3990f
+tests/expected/vanilla_specials_b_ticks.sha256	137aa690fd5279931865c42a45db3e1b95deab13
+tests/expected/instr_gameclock/audit_vanilla_specials_b.tsv	6357c1496ebca2f414b07f5bb58be63d1c7c134b
+tests/lua/specials_b_trace.lua	f4a7da0453015cbba474f2f52b8982de6fbcc5bb
+build/agent209/t229/v4/vanilla_specials_b.log	51122b691acdfec44c4e2ee90fc9439a88399b6d
+build/agent209/t229/v4/vanilla_specials_b@swapped-strengths.log	bfc74cce5427f2f15b87aafc20ba16d2138388b3
+build/agent209/t229/v4/vanilla_specials_b@unsigned-offsets.log	f229fca590b6c2e8e03d344c0b2b9f6fe991b7ed
+build/agent209/t229/v4/vanilla_specials_b@window-at-event.log	8d1f6b21043fa2729b4bbf4bf53cb51f5a36b0c4
+build/agent209/t229/v4/vanilla_specials_b@p1-clock.log	92c8f48d12388daab8489cef5d68806d025315fa
+build/agent209/t229/v4/vanilla_specials_b@drift-clock.log	03d181e4e8913a393966a92af99fe092fa18de9e
+build/agent209/t229/v4/vanilla_specials_b@first-frame-skip.log	23ae77665c0748b5081aaf6e6e238d7a15fbc695
+build/agent209/t229/v4/vanilla_specials_b@foreign-image.log	570b770a05fe8fc990f4521c8b24ef60175e33c0
+build/agent209/t229/v4/vanilla_specials_b@foreign-romset.log	a5f7a8cf22cefa36012a5befd9dfd6dcd46ec977
+build/agent209/t229/v4/vanilla_specials_b@foreign-rompath.log	0cd5851b6aaf893b24b884a4d4c78d327526c571
+build/agent209/t229/v4/vanilla_specials_b@foreign-mame.log	02da90b80d7a0a2ba7b31c56cece16323718aaef
+build/agent209/t229/asrun/specials_b_version.txt	29fa07f19a945ef25584ca2d75e3de24cf323c68
+build/agent209/t229/asrun/vanilla_specials_b_vs_tar.txt	dce6f27a38ee8fbbe1670a3b4865c9874df54976
+build/agent209/t229/asrun/vanilla_specials_b_files.txt	ed94f00a476b6d0caf6eae8f72b4651af084cde4
+build/agent209/t229/sheetmap/cmp_f23.py	adfc2a35b4e76e710543db53b6badab2e57b1f0d
+build/agent209/t229/sheetmap/cmp_f23.out	f32d846f51f1f5d7cf470eb74857d7073765352b
+DECISIONS_HISTORY.md.lines-8269-8279 (lines 8269-8279 of DECISIONS_HISTORY.md: its INDEX entry "## Read 2026-10-25 (14z-209) — #229 Q1: the maintainer's answer in the questions doc — the sheets of")	e78a915c65e6d0c09cfacf0a65709b1aeae9d5b0

@@ -417,3 +417,6 @@ test_release_reuse
 # test_runner_collation.sh — #278 (14z-208b): the three runners pin byte-order collation (tests/lib/collation.sh) before
 # their first gate, whatever the caller's locale; five controls. ROM-free, ~1 s.
 test_runner_collation
+# test_crosscheck_229.sh — #229 (14z-209): tools/crosscheck_229.py's join and classification on synthetic fixtures with
+# known verdicts (36 cases: every verdict class, the Q5 dealt and Q6 hit bases); four controls. ROM-free, ~1 s.
+test_crosscheck_229

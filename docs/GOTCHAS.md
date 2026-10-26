@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-566 entries (48 game / 143 platform / 375 project), counted from the buckets at generation.
+571 entries (48 game / 144 platform / 379 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 48 entries
 
@@ -73,7 +73,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A POKED KO NEEDS THE VICTIM ON ITS LAST BAR, AND THE KO MUST COME FROM THE PATH YOU MEAN TO TEST — a low HP alone rallies (paid: 14z-184, GitHub #180)
 - A MOTION THAT LEAVES A NEUTRAL FRAME BETWEEN BACK AND DOWN-BACK IS TWO TAPS TOWARD BACK, AND A CHARACTER WITH A BACKDASH DASHES — the press then lands in the hop (paid: 14z-205, #229, forks F3 and P1)
 
-## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 143 entries
+## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 144 entries
 
 - LINUX CAPS ONE ENVIRONMENT STRING AT 128 KiB; `/bin/sh` IS DASH; THE PINNED MAME'S VERBOSITY IS A BUILD FACT — three macOS facts the first Linux emulator tier paid for (paid: 2026-10-01, ERIS WSL2 Ubuntu, GitHub #201)
 - `spctl -a` REPORTS THE SIGNING-POLICY VERDICT, NOT WHETHER A LAUNCH IS BLOCKED — and `unzip` DOES propagate com.apple.quarantine (measured: 2026-09-20, macOS 26.0 arm64, #144)
@@ -218,8 +218,9 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - Python 3.12's `shutil` imports `_winapi` WHEN `sys.platform` IS FAKED TO `win32` (paid: 14z-200/14z-207, #280)
 - UNDER `strace -f`, CHROME NEVER OPENS A PAGE'S `file://` READS (measured 14z-207, #281)
 - LINUX PYTHON WRITES `__pycache__/` BESIDE THE MODULE; APPLE'S PYTHON DOES NOT (paid: 14z-208b/14z-208c, #326)
+- UNDER `-debug`, A STOP THAT LANDS AS THE SCREEN FRAME ADVANCES MAKES THAT FRAME'S SAMPLE READ ONE ENGINE PASS EARLY — and the game clock cannot see it (paid: 14z-205b, #229)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 375 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 379 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -596,3 +597,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A STUB THAT WRITES TO ITS LAST ARGUMENT LEAKS A FILE NAMED BY ANY CALL IT DID NOT EXPECT, AND THE RUNNER SAW ONLY TRACKED FILES (paid: 14z-207/14z-208c, #324)
 - A SNAPSHOT NAMED BY THE COMMIT AND THE SECOND COLLIDES WHEN TWO RUNS OF ONE COMMIT START TOGETHER (paid: 14z-208b/14z-208c, #325)
 - A "FAR" EVENT'S POSITION PINS DO NOT HOLD WHILE THE PREVIOUS EVENT'S THROW STILL RUNS — AND A PROBE'S RESULT IS NOT THE GATE'S (paid: 14z-208c, #229)
+- A GAPPED HALF-CIRCLE BACK IS TWO TAPS TOWARD BACK, SO A CHARACTER WITH A BACKDASH DASHES INSTEAD OF DOING THE MOVE (paid: 14z-205b, #229)
+- A SH FUNCTION HAS NO LOCALS, SO A LIBRARY'S SCRATCH NAME CAN BE ITS CALLER'S LOOP VARIABLE (paid: 14z-208b/14z-209, #323)
+- A RULED OUTPUT FORMAT IS IMPLEMENTED FROM THE RULING'S WORDS, AND CHECKED BY AN ORACLE WRITTEN FROM THEM (paid: 14z-209, #244)
+- A GATE WHOSE LEGS ARE "EVERY REPLAY WITH A BASIS LOG" GOES RED THE DAY A BASIS LOG IS ADDED (paid: 14z-205c/14z-209, #302)

@@ -65,32 +65,34 @@ vs_meas_guard() {  # vs_meas_guard <script> <name> <n>
 }
 
 vs_meas_read() {  # vs_meas_read <script> <log>
-    _s="$1"; _l="$2"
+    # ITS SCRATCH NAMES ARE PREFIXED (14z-209, #323): a sh function has no locals, and this one ran in the runner's
+    # own shell, where its `_l` overwrote the lane loop variable and disabled the prereq STOP.
+    _vmr_s="$1"; _vmr_l="$2"
     VS_MEAS_DECLARED=0; VS_MEAS_OK=0; VS_MEAS_BELOW=0; VS_MEAS_MISSING=0; VS_MEAS_UNDECLARED=0
     VS_MEAS_NAMES=""; VS_MEAS_DETAIL=""; VS_MEAS_VERDICT=OK
-    _decl="$(vs_meas_declared "$_s")"
-    _got="$(grep -aE '^MEASURED: [a-z0-9-]+ = -?[0-9]+' "$_l" 2>/dev/null | sed -E 's/^MEASURED: ([a-z0-9-]+) = (-?[0-9]+).*/\1 \2/')"
+    _vmr_decl="$(vs_meas_declared "$_vmr_s")"
+    _vmr_got="$(grep -aE '^MEASURED: [a-z0-9-]+ = -?[0-9]+' "$_vmr_l" 2>/dev/null | sed -E 's/^MEASURED: ([a-z0-9-]+) = (-?[0-9]+).*/\1 \2/')"
     # one declaration per line, name<TAB>floor: read with cut, never with a parameter
     # expansion on a literal tab (an editor can silently turn it into spaces)
     # awk, not `grep -v`: an empty declaration list must not return 1 under a runner's set -e
     # (the first close tier of 14z-180 died on its first gate exactly there)
-    printf '%s\n' "$_decl" | awk 'NF' > "${TMPDIR:-/tmp}/vs_meas_$$.txt"
-    while IFS= read -r _row; do
-        _n="$(printf '%s' "$_row" | cut -f1)"; _f="$(printf '%s' "$_row" | cut -f2)"
+    printf '%s\n' "$_vmr_decl" | awk 'NF' > "${TMPDIR:-/tmp}/vs_meas_$$.txt"
+    while IFS= read -r _vmr_row; do
+        _vmr_n="$(printf '%s' "$_vmr_row" | cut -f1)"; _vmr_f="$(printf '%s' "$_vmr_row" | cut -f2)"
         VS_MEAS_DECLARED=$((VS_MEAS_DECLARED + 1))
-        _v="$(printf '%s\n' "$_got" | awk -v n="$_n" '$1 == n {print $2; exit}')"
-        if [ -z "$_v" ]; then
-            VS_MEAS_MISSING=$((VS_MEAS_MISSING + 1)); VS_MEAS_NAMES="$VS_MEAS_NAMES $_n(not measured)"
-        elif [ "$_v" -lt "$_f" ]; then
-            VS_MEAS_BELOW=$((VS_MEAS_BELOW + 1)); VS_MEAS_NAMES="$VS_MEAS_NAMES $_n=$_v<$_f"
+        _vmr_v="$(printf '%s\n' "$_vmr_got" | awk -v n="$_vmr_n" '$1 == n {print $2; exit}')"
+        if [ -z "$_vmr_v" ]; then
+            VS_MEAS_MISSING=$((VS_MEAS_MISSING + 1)); VS_MEAS_NAMES="$VS_MEAS_NAMES $_vmr_n(not measured)"
+        elif [ "$_vmr_v" -lt "$_vmr_f" ]; then
+            VS_MEAS_BELOW=$((VS_MEAS_BELOW + 1)); VS_MEAS_NAMES="$VS_MEAS_NAMES $_vmr_n=$_vmr_v<$_vmr_f"
         else
             VS_MEAS_OK=$((VS_MEAS_OK + 1))
         fi
     done < "${TMPDIR:-/tmp}/vs_meas_$$.txt"
     rm -f "${TMPDIR:-/tmp}/vs_meas_$$.txt"
-    for _n in $(printf '%s\n' "$_got" | awk '{print $1}' | sort -u); do
-        printf '%s\n' "$_decl" | cut -f1 | grep -qx -- "$_n" \
-            || { VS_MEAS_UNDECLARED=$((VS_MEAS_UNDECLARED + 1)); VS_MEAS_NAMES="$VS_MEAS_NAMES $_n(undeclared)"; }
+    for _vmr_n in $(printf '%s\n' "$_vmr_got" | awk '{print $1}' | sort -u); do
+        printf '%s\n' "$_vmr_decl" | cut -f1 | grep -qx -- "$_vmr_n" \
+            || { VS_MEAS_UNDECLARED=$((VS_MEAS_UNDECLARED + 1)); VS_MEAS_NAMES="$VS_MEAS_NAMES $_vmr_n(undeclared)"; }
     done
     if [ "$VS_MEAS_MISSING" != 0 ] || [ "$VS_MEAS_BELOW" != 0 ] || [ "$VS_MEAS_UNDECLARED" != 0 ]; then
         VS_MEAS_VERDICT=RED

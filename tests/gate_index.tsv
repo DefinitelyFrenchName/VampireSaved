@@ -131,6 +131,13 @@ tests/audit_ranking_tenant.sh	character-data
 tests/audit_mizuumi_inputs.sh	character-data
 tests/audit_extra_pass.sh	character-data
 tests/audit_mizuumi_attack.sh	character-data
+tests/audit_vanilla_specials_a.sh	character-data
+tests/audit_vanilla_specials_b.sh	character-data
+tests/audit_es_ex.sh	character-data
+tests/audit_command_throws.sh	character-data
+tests/audit_guard_cancels.sh	character-data
+tests/audit_vanilla_pursuits.sh	character-data
+tests/test_crosscheck_229.sh	character-data
 tests/test_compare_composite.sh	oracle
 tests/test_compare_fields_selfcheck.sh	oracle
 tests/test_compare_flicker.sh	oracle

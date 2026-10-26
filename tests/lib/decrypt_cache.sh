@@ -27,6 +27,7 @@
 #   decrypt_view vsavj "$WORK/vj_op.bin" "$WORK/vj_data.bin"   # data optional
 #
 #   decrypt_cache_ensure vsavj    # build the cache if missing or short, deliver nothing
+#   decrypt_cache_warm <errfile>  # every reference set in ROMDIR, before a tier (the runners call it)
 #
 # Needs ROMDIR only when the cache has to be built. The cache lives in
 # build/out/, shared with the builders, so a suite run warms it for them too.
@@ -37,6 +38,11 @@
 # so under `--jobs 8` five such gates ran before it and failed or SKIPped (#299,
 # measured on PILOT at 14z-205c). tests/run_all_static.sh calls decrypt_cache_ensure
 # for every reference set before its static tier, serial or pooled.
+# AND SO DOES THE EMULATOR RUNNER (#305, 14z-209, maintainer-ruled 2026-10-26 "Yes, with #306"): with build/out cold,
+# `tests/run_all_emulator.sh --only 'audit_[dt][mr][ga]*' --strict` SKIPped audit_trap_air_hit and
+# audit_dmg_legacy_sweep, which read the views directly, and both PASSed once the views were built (ERIS, fork A,
+# build/agent209/t321/batch1_x). The warm-up the static runner ran inline is decrypt_cache_warm now, one copy, which
+# both runners call after the ROM audit; tools/build_donovan.sh builds its views through decrypt_cache_ensure too.
 
 # Reference-set program images are 4 MiB. A decrypt that produces anything
 # else did not finish, whatever its exit status said.
@@ -82,6 +88,28 @@ decrypt_cache_ensure() {
         mv "$_dv_tmp/op.bin" "$_dv_cop"
         mv "$_dv_tmp/dat.bin" "$_dv_cdat"
         rm -rf "$_dv_tmp"
+    fi
+    return 0
+}
+
+# decrypt_cache_warm [<errfile>] — both views of every reference set in ROMDIR ($DECRYPT_WARM_SETS, default vsavj
+# vsav2 vhunt2; a set without its zip is passed over) in build/out, before a tier runs. A warm cache costs six size
+# checks and prints nothing; it prints one line naming what it built, and one naming what failed (decrypt_view's
+# messages appended to <errfile>, default /dev/null, and echoed). Returns 1 when a set failed.
+decrypt_cache_warm() {
+    _dw_err="${1:-/dev/null}"; _dw0=$(date +%s); _dw_built=""; _dw_bad=""
+    _dw_repo="${REPO:?decrypt_cache_warm needs REPO set}"
+    for _dw_s in ${DECRYPT_WARM_SETS:-vsavj vsav2 vhunt2}; do
+        [ -f "${ROMDIR:-}/$_dw_s.zip" ] || continue
+        if _dv_ok "$_dw_repo/build/out/${_dw_s}_opcodes.bin" && _dv_ok "$_dw_repo/build/out/${_dw_s}_data.bin"; then continue; fi
+        if decrypt_cache_ensure "$_dw_s" 2>> "$_dw_err"; then _dw_built="$_dw_built $_dw_s"
+        else _dw_bad="$_dw_bad $_dw_s"; fi
+    done
+    [ -z "$_dw_built" ] || echo "== decrypt views built before the tier:$_dw_built ($(( $(date +%s) - _dw0 )) s) =="
+    if [ -n "$_dw_bad" ]; then
+        echo "== DECRYPT VIEWS FAILED:$_dw_bad — the gates that read build/out directly will FAIL or SKIP =="
+        [ "$_dw_err" = /dev/null ] || sed 's/^/  /' "$_dw_err" 2>/dev/null || :
+        return 1
     fi
     return 0
 }

@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-208c CLOSE, 2026-10-25)
+# NEXT SESSION — orientation (rewritten at the 14z-209 CLOSE, 2026-10-26)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` (then `python3 tools/gen_history_index.py`
@@ -18,16 +18,16 @@ A plain **Opus 5.5 session at effort High** (the ruled orchestrator — STATE 'S
 
 Say so at the opener. Never spawn any agent at `max`. A recommendation leans only on the maintainer's OWN words.
 **PILOT** (6 vCPU, 47 GB, Ubuntu 24.04) carries xdelta3 3.2.0 and Node v24.22.1 user-local (`~/.local/bin`, ruled
-2026-10-23) and has `strace`; its clone sits at `25dbfea1` with a dirty `emu/fbneo` (its `-V` file removed, #324). Deletable scratch: `~/p208b_t278/`,
-`~/t278chk/`, `~/p278_*.sh` (#278); `~/t326`, `~/p326*`, `~/t326.bundle` (#326); `~/t324t`, `~/p324*`, `~/t324*.bundle`,
-`~/t325t`, `~/p325*`, `~/t325.bundle` (#324, #325); fork X2's scratch
-(`~/x2wt`, `~/x2out`, `~/x2.bundle`, `~/t229.tar`, `~/x2f5`, `~/x2_run_*.sh`). **ERIS** (WSL2 and MSYS2) has a
-source-built MAME at its pin (`C:\Users\Chaton\.cache\vampire-saved\mame\cps2.exe`), no xdelta3 and no node; its lane
-folders were deleted 2026-10-24 (ruled). Neither profile sets ROMDIR (`ROMDIR=~/roms`). Work handed to either is a bundle
-of a COMMIT ("When to commit"); a remote script goes over `ssh <host> 'wsl -e bash -s' < script` (nested quotes break).
+2026-10-23) and has `strace`. Deletable scratch from 14z-209: `~/c229_gc5` (#229's guard-cancel lane), `~/e321s`, `~/e321s2`,
+`~/e321_trace*`, `~/e321_*.diff`, `~/e327c*` (#321, #327), `~/b209_306*`, `~/c209_*` (#306, #327); older: fork X2's `~/x2wt`,
+`~/x2out`, `~/x2.bundle`, `~/t229.tar`, `~/x2f5`. **ERIS** (WSL2 and MSYS2) has a source-built MAME at its pin; its freeze
+tier is now `tests/run_all_emulator.sh --freeze --strict --jobs 8 --skip test_mame_parity` (#321: parity runs on the Mac only,
+ruled 2026-10-26); deletable scratch `~/a209_*`, `~/e321`, `C:\Users\Chaton\a209*`, `C:\Users\Chaton\e321_*`. Neither profile
+sets ROMDIR (`ROMDIR=~/roms`). Work handed to either is a bundle of a COMMIT; a remote script goes over
+`ssh <host> 'wsl -e bash -s' < script` (nested quotes break).
 
 **THE SESSION CLOSE:** `docs/project/session_close.md`, run by `python3 tools/close.py` (`start --key … --row - --prev
-<results> --transcript <id>`, then `next`, `done`, `status`). The run of record is named in STATE 14z-208c's CLOSE section.
+<results> --transcript <id>`, then `next`, `done`, `status`). The run of record is named in STATE 14z-209's CLOSE section.
 A red tier is re-run by the driver on THE RED RUN'S results, not `--prev` (#317); a snapshot's setup is about 25 s now (#304,
 #317), so a red costs the gates it re-runs, not a second copy.
 
@@ -52,25 +52,15 @@ the maintainer approves it before anything is deleted.
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
-1. **#229 — every F4 row is confirmed** (the maintainer, 2026-10-25: *"all good"*, STATE 14z-208c (1)): the re-rig,
-   the motion test (`docs/game/engine_internals.md`), the air throws in the TRACKED `audit_ground_throws`. What is left:
-   - **The work is LOCAL and UNTRACKED:** the six gates, their expectations, rigs and Lua (131 files,
-     `build/agent205/t229/pending_gates_229.list`, backed up in `pending_gates_229.tar` beside it). Never `git clean`.
-     Registering them (gate index, ci lists, gate descriptions) is #229's next step: ask the maintainer when.
-   - **The guard-cancel expectation** with dealt legs is ready beside the frozen one (`build/agent208/X2/new/`, hash
-     `6f6f14a3`); the swap needs its own rule-checker run.
-   - **The maintainer's docs (private):** questions https://claude.ai/artifact/88mHYGNsf1wyYZ2EFfzPCE, community
-     cross-check https://claude.ai/artifact/Wfn7XUHignvbQphap3MwyK. Read the questions doc for new answers first.
-2. **Then ask the maintainer for the order of work.** Open tickets by GitHub severity label:
-   - medium: #321 (parallelise the serial-by-default gates; its headroom data point is on the issue);
-   - low: #118, #229, #244, #305, #306, #310, #311, #323, #327 (the close's red: `printf | grep -q` races in
-     `test_static_runner`) (and #129 and #301, parked);
-   - no severity label: #302, #318, #320;
-   - **Before planning any freeze or release, read each open ticket's comments for a step that runs AT it** (#278's
-     locale step was missed at the 14z-208b freeze: `docs/project/gotchas.md`, the UTF-8 collation entry).
-   - parked: #123, #124, #125, #127, #128, #162, #267, #294.
-3. **`tests/replays/118_chain.rpl`'s header names a leg of `audit_mizuumi_inputs` that gate never ran** (STATE_HISTORY
-   14z-198 finding (i)); the one-line correction rides a session that runs the emulator gates following `tests/replays/`.
+1. **Ask the maintainer for the order of work.** Open tickets (GitHub severity labels):
+   - low: #118, #310, #311, #318, #320, #327 (fix applied 14z-209; the 14z-208c red not reproduced, 183 sites of the form
+     remain elsewhere — its progress comment), #328 (two stale build defaults), #329 (minimal half-circle inputs), #330 (the
+     throws' recovery and throw tech), #331 (#229's remainder: Demitri's ES Demon Cradle GC, the FE..JE page section, two
+     stale page lines);
+   - parked: #123, #124, #125, #127, #128, #129, #162, #267, #294.
+   - **Before planning any freeze or release, read each open ticket's comments for a step that runs AT it.**
+2. **The next freeze or release** runs the six #229 gates only on demand (`ondemand`, pristine vsavj); ERIS's tier takes
+   `--skip test_mame_parity` and the Mac runs parity (#321).
 
 ## PARKED (not open work)
 
@@ -79,24 +69,21 @@ the maintainer approves it before anything is deleted.
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
-- **A "far" event's position pins do not hold while the previous event's throw still runs, and a probe's result is not
-  the gate's** (`docs/project/gotchas.md`): measure a far event's start distance on its trace; report a row from the
-  gate run's own rows.
-- **Half circles on vsavj** (`docs/game/engine_internals.md`): back needs its final 4 (6324, 6214, 624 grab; 6321 never);
-  forward takes all five spellings; a 360 is the four cardinals.
-- **Linux Python writes `__pycache__/` beside the module** (`docs/platform/gotchas.md`): a gate's synthetic repo needs the
-  real `.gitignore`'s bytecode lines.
-- **A stub must answer every call its caller can make** (`docs/project/gotchas.md`, #324); **a check-then-create on a shared
-  name is a race** (#325).
-- **The rule-checker caught real gaps before every closure this sitting** (runs `2026-10-25-1284`, `-1289` to `-1292`):
-  a red path never shown, a hash checked by its own function, a mis-counted dead control, a deletion not shown, a
-  cause not separated from its fixture, a limit unnamed. Six rounds on #324 cost about an hour; each found a real gap.
+- **A pristine-vsavj gate proves which ROM, image, ROM path and MAME it measured** (`tests/lib/pristine_vsavj.sh`, four
+  controls): a new pristine gate sources it after `decrypt_view`.
+- **A sh function has no locals** (`docs/project/gotchas.md`, #323): a library's scratch variable can be its caller's loop
+  variable; prefix them.
+- **A ruled output format is checked by an oracle written from the ruling's words** (`docs/project/gotchas.md`, #244).
+- **A gate whose legs are "every replay with a basis log" goes red the day one is added** (`docs/project/gotchas.md`, #302).
+- **The rule-checker on six freezes and three closures** (runs `2026-10-25-1294` to `2026-10-26-1330`): it found the
+  provenance gap, clocks frozen before a re-rig, 71 rows never shown to the maintainer, eleven moves no answer named, a
+  row check comparing a tool with itself, and a workbook row joined nowhere. The maintainer ruled re-checks only on new
+  evidence for #229's freezes (2026-10-25).
 
-## WHAT CLOSED THIS SITTING (14z-208c)
+## WHAT CLOSED THIS SITTING (14z-209)
 
-- **Closed `done`:** #278 (`e0965d4d`, pushed with this close), #326, #319, #324, #325 — each on its rule-checker run
-  with its closing comment.
-- **#229:** F4 re-rigged on the maintainer's fourteen answers and confirmed; the air throws moved to the normal throws
-  (*"Remove all, Victor too, but add them to the normal throws!"*).
-- **Ruled** (`DECISIONS_HISTORY.md`, 14z-208c entries): the air throws; the "far" rows re-placed, #324's guard
-  runner-wide, #319 converted now; #121 closed by the maintainer.
+- **Closed `done`:** #229 (split: #331), #244, #302, #305, #306, #321, #323 — each on its rule-checker run with its
+  closing comment. **Filed:** #328, #329, #330, #331. **#301** found closed by the maintainer, recorded declined.
+- **Ruled** (`DECISIONS_HISTORY.md`, 14z-209 entries): #321 phase 2 (all four speed-ups; parity on the Mac only; #305
+  with #306); #244 "Class + flags"; #229's freezes re-checked only on new evidence; the motion rows and the eleven
+  unnamed moves confirmed; #229 split and closed.

@@ -1,0 +1,18 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent209/t244/v2/tools.diff	7ffd83608fd07fcce359c2fb2a93c720f7b7c6e3
+build/agent209/t244/v2/verify_rows.py	08397a1e12e2c6afd661c6e216c1f6d53ce0e6a7
+build/agent209/t244/v2/verify_rows.out	6824f28015093a14a7916864161e1dc20f03eb73
+build/agent209/t244/v2/html_census.out	a30f0a7e747bd5d6649dc7d5c53532dbb0d429e2
+build/agent209/t244/v2/framedata_pages.log	e19242989b3145a243a0bcd4a9a206ecbf2a9c03
+tools/hitbox_records.py.lines-60-81 (lines 60-81 of tools/hitbox_records.py)	e29b54ad9a8397281d9daf096b1b63a423fb3d5c
+tests/expected/charmap_pages.sha256	2996985a88c1ccb3cf162cf8e268199f595ae931
+build/agent209/t244/v2/charmap_pages.sha256.before	c3bde3c2438e81db3c722a547ed4a383be62bb1e
+build/agent209/t244/v2/freeze.log	7064b4f83d9291936ce8d676173c3a8cca614e9b
+build/agent209/t244/v2/plain.log	76b89a4bc35458006b9ecfc8906ca8caf44f3108
+build/agent209/t244/v2/mode_changed-built-byte.log	40e47f8aa629bc3031a80283ef805a201c32a442
+build/agent209/t244/v2/mode_empty-page-frozen.log	1a16a780d332542ecf24bdd1bc9e8f8bfad7ce17
+build/agent209/t244/v2/mode_added-override.log	f95c4b63e9dd01dad3d7ac84e63cf6fdb6677b2b
+build/agent209/t244/v2/test_power_decode.log	152387253942ddaa33274895bd7c9d4084e81ef9
+build/agent209/t244/v2/test_tables_current.log	3d190b9933ef22e5b1fc7cdc5a15044fdde56665
+build/agent209/t244/v2/test_community_crosscheck.log	e44ce8d74270dbf96e523720174a118491e391bb
+DECISIONS_HISTORY.md.lines-8295-8302 (lines 8295-8302 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-25 (14z-209) — #244: the tenant charmap pages show the power class, with the raw by")	0c3c69803714d1dbf74f803b64085ce7b4dccc67

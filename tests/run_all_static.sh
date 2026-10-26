@@ -631,15 +631,7 @@ fi
 DECRYPT_WARM_SETS="${DECRYPT_WARM_SETS:-vsavj vsav2 vhunt2}"
 if [ -n "${ROMDIR:-}" ] && [ "$TIER" != portable ] && [ -f "$REPO/tests/lib/decrypt_cache.sh" ]; then
     . "$REPO/tests/lib/decrypt_cache.sh"
-    _dw0=$(date +%s); _dw_built=""; _dw_bad=""
-    for _s in $DECRYPT_WARM_SETS; do
-        [ -f "$ROMDIR/$_s.zip" ] || continue
-        if _dv_ok "build/out/${_s}_opcodes.bin" && _dv_ok "build/out/${_s}_data.bin"; then continue; fi
-        if decrypt_cache_ensure "$_s" 2>> "$WORK/decrypt_warm.err"; then _dw_built="$_dw_built $_s"   # DECRYPT-WARM
-        else _dw_bad="$_dw_bad $_s"; fi
-    done
-    [ -z "$_dw_built" ] || echo "== decrypt views built before the tier:$_dw_built ($(( $(date +%s) - _dw0 )) s) =="
-    [ -z "$_dw_bad" ] || { echo "== DECRYPT VIEWS FAILED:$_dw_bad — the gates that read build/out directly will FAIL or SKIP =="; sed 's/^/  /' "$WORK/decrypt_warm.err" 2>/dev/null || :; }
+    decrypt_cache_warm "$WORK/decrypt_warm.err" || :   # DECRYPT-WARM (the warm-up is tests/lib/decrypt_cache.sh's since #305)
 fi
 case "$TIER" in
 portable) pre_run portable "$PORTABLE_RUN"; run_tier portable "$PORTABLE_RUN" ;;

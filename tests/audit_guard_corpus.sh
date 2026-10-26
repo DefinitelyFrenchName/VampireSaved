@@ -8,7 +8,7 @@
 # WHAT: every replay in tests/replays runs under the authoritative crash guard on the build
 #   under test in four legs — unpoked and with P1 forced to each tenant — with no 68k
 #   exception, PC excursion or soft reset anywhere (rule 6 on any finding).
-# HOW: ~79 replays x 4 legs, guarded on MAME at JOBS=2 (~30-45 min), a DEAD leg (no verdict
+# HOW: ~79 replays x 4 legs, guarded on MAME at JOBS legs at once (default min(8, CPUs/3)), a DEAD leg (no verdict
 #   line) refused; the control replays the known 14z-93 vec4 tripwire on build/hui41 and
 #   must FAIL.
 # EXPECTS: every leg END-clean; the known crash reproduced by the control. A PASS is
@@ -46,11 +46,14 @@
 # line is not a measurement) and a per-run verdict map kept under
 # build/guard_corpus/ for the record.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged31] [JOBS=2]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged31] [JOBS=N]
 #        [LEGS="none 10 11 13"] [ONLY=<replay-stem>]
 #        [PICK_FRAMES="1400 1450 1500 1600 1700"]
 #        tests/audit_guard_corpus.sh
-# ~30-45 min at JOBS=2 (niced — playtests may share the machine).
+# ~30-45 min at JOBS=2 (niced — playtests may share the machine). The default is min(8, CPUs/3), at least 1, since
+# 14z-209 (#321, maintainer-ruled 2026-10-26 "Guard corpus jobs"): measured alone on ERIS (24 threads, fork A,
+# build/agent209/t321/) 3,106 s at 2, 1,138 s at 8, 830 s at 16, the 389-row verdict table byte-identical; 4,827 s at 2
+# inside the 14z-208b freeze tier, 1,679 s at 8 inside the proposed one.
 #
 # MUST-FIRE CONTROL (run it whenever the classifier is doubted): the
 # known 14z-93 crash must reproduce and be named —
@@ -83,7 +86,10 @@ if [ "$MODE" = known-crash ]; then
     BUILD=build/hui41; ONLY=26_don_arcade_mash; LEGS=10; PICK_FRAMES="1704 1760 1900 2100 2400"
 fi
 BUILD="${BUILD:-build/m3b_merged31}"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
-JOBS="${JOBS:-2}"
+if [ -z "${JOBS:-}" ]; then   # min(8, CPUs/3), at least 1 (#321)
+    _np="$(getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 3)"
+    JOBS=$(( _np / 3 )); [ "$JOBS" -le 8 ] || JOBS=8; [ "$JOBS" -ge 1 ] || JOBS=1
+fi
 LEGS="${LEGS:-none 10 11 13}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no WIDE MAME binary at $MAME_BIN"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no WIDE build at $BUILD"; exit 0; }

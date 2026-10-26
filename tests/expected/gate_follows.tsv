@@ -11,6 +11,7 @@ declares	audit_clone_beam_lines
 declares	audit_column_flash
 declares	audit_column_flash_cause
 declares	audit_column_shock
+declares	audit_command_throws
 declares	audit_continue_ladder
 declares	audit_continue_switch
 declares	audit_crouch_flag
@@ -37,6 +38,7 @@ declares	audit_edge_cases
 declares	audit_effect_class_rows
 declares	audit_empty_tiles
 declares	audit_entrance_draw
+declares	audit_es_ex
 declares	audit_ex_refused
 declares	audit_extra_pass
 declares	audit_facing_hook_ab
@@ -51,6 +53,7 @@ declares	audit_forced_pick_fidelity
 declares	audit_front_comparator
 declares	audit_grenade_ground_tiles
 declares	audit_ground_throws
+declares	audit_guard_cancels
 declares	audit_guard_corpus
 declares	audit_guard_mask_reads
 declares	audit_guard_reentry
@@ -119,6 +122,9 @@ declares	audit_trap_shock
 declares	audit_trap_sound
 declares	audit_tripwire_reach
 declares	audit_type_writes
+declares	audit_vanilla_pursuits
+declares	audit_vanilla_specials_a
+declares	audit_vanilla_specials_b
 declares	audit_victim_parity
 declares	audit_voice_borrow
 declares	audit_walker_ghost

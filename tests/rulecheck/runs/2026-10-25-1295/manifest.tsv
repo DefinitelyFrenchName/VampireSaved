@@ -1,0 +1,20 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+tests/audit_vanilla_specials_b.sh	de535310dd740fa330014382cca19d0994a7ec8a
+tests/lib/pristine_vsavj.sh	479e4e385bf9897e5608ba9aae046411406f836d
+tests/expected/vanilla_specials_b.tsv	2fbab6d36de909d8623ccd0a061410b87ac3990f
+tests/expected/vanilla_specials_b_ticks.sha256	137aa690fd5279931865c42a45db3e1b95deab13
+tests/expected/instr_gameclock/audit_vanilla_specials_b.tsv	6357c1496ebca2f414b07f5bb58be63d1c7c134b
+tests/lua/specials_b_trace.lua	f4a7da0453015cbba474f2f52b8982de6fbcc5bb
+build/agent209/t229/v3/vanilla_specials_b.log	d9706d4cedf90d7c91bdcc0df7c6f26523da65b1
+build/agent209/t229/v3/vanilla_specials_b@swapped-strengths.log	8472532ef3ce2542d6546d78d54397f7c486a350
+build/agent209/t229/v3/vanilla_specials_b@unsigned-offsets.log	f193ae058283e7ba994990c34616a122d42746b1
+build/agent209/t229/v3/vanilla_specials_b@window-at-event.log	d4fe7c998c1bf48f2b29abd70dbe3139271d9ff0
+build/agent209/t229/v3/vanilla_specials_b@p1-clock.log	4d8c4da676b97a63aa59730069300a73607ce371
+build/agent209/t229/v3/vanilla_specials_b@drift-clock.log	64655cd17ca95c08b2ef649f3a573b7b867a6957
+build/agent209/t229/v3/vanilla_specials_b@first-frame-skip.log	624be52a440f3ac4ee1e6021a54dc820f3c72a54
+build/agent209/t229/v3/vanilla_specials_b@foreign-image.log	c05cef19a94c14a369f56469e6402d93a6b7ce0b
+build/agent209/t229/v3/vanilla_specials_b@foreign-romset.log	ecaada1a1d585d46a32af421eb390f66f7f8bee4
+build/agent209/t229/asrun/specials_b_full.diff	f8d33670ea9c155b19b8d319d078ec0e57507236
+build/agent209/t229/sheetmap/cmp_f23.py	adfc2a35b4e76e710543db53b6badab2e57b1f0d
+build/agent209/t229/sheetmap/cmp_f23.out	f32d846f51f1f5d7cf470eb74857d7073765352b
+DECISIONS_HISTORY.md.lines-8268-8278 (lines 8268-8278 of DECISIONS_HISTORY.md: its INDEX entry "## Read 2026-10-25 (14z-209) — #229 Q1: the maintainer's answer in the questions doc — the sheets of")	e78a915c65e6d0c09cfacf0a65709b1aeae9d5b0

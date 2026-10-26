@@ -12,6 +12,7 @@ declares	audit_clone_beam_lines
 declares	audit_column_flash
 declares	audit_column_flash_cause
 declares	audit_column_shock
+declares	audit_command_throws
 declares	audit_crouch_flag
 declares	audit_defense_row_reads
 declares	audit_defense_row_residue
@@ -27,6 +28,7 @@ declares	audit_dispatch_census
 declares	audit_dmg_legacy_sweep
 declares	audit_effect_class_rows
 declares	audit_entrance_draw
+declares	audit_es_ex
 declares	audit_ex_refused
 declares	audit_extra_pass
 declares	audit_facing_hook_ab
@@ -36,6 +38,7 @@ declares	audit_ff8130_writers
 declares	audit_flicker_attribution
 declares	audit_forced_pick_fidelity
 declares	audit_ground_throws
+declares	audit_guard_cancels
 declares	audit_guard_corpus
 declares	audit_guard_mask_reads
 declares	audit_guard_reentry
@@ -87,6 +90,9 @@ declares	audit_tick_phase
 declares	audit_trap_air_hit
 declares	audit_trap_airborne
 declares	audit_trap_shock
+declares	audit_vanilla_pursuits
+declares	audit_vanilla_specials_a
+declares	audit_vanilla_specials_b
 declares	audit_victim_parity
 declares	audit_voice_borrow
 declares	audit_walker_ghost
@@ -128,6 +134,7 @@ declares	test_controls_concurrent
 declares	test_controls_contract
 declares	test_copy_flags
 declares	test_crash_guard
+declares	test_crosscheck_229
 declares	test_defense_rows_census
 declares	test_demand_after_trap
 declares	test_df_field_readers

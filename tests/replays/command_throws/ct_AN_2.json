@@ -1,0 +1,54 @@
+{
+ "char": "0x06",
+ "sheet": "AN",
+ "part": 2,
+ "victim": "0x03",
+ "gap": 624,
+ "events": [
+  {
+   "row": "ES PIT OF BLAME",
+   "label": "P2 sweep ~623KK+20, P2 walk +41..+61, pursuit +62",
+   "meter": true,
+   "frame": 2800,
+   "press": 2820,
+   "end": 3160
+  },
+  {
+   "row": "ES PIT OF BLAME",
+   "label": "P2 sweep ~623KK+20, P2 jumps toward +50",
+   "meter": true,
+   "frame": 3424,
+   "press": 3444,
+   "end": 3784
+  },
+  {
+   "row": "PIT OF BLAME",
+   "label": "P2 sweep, no 623K, P2 jumps toward +50 (control)",
+   "meter": false,
+   "frame": 4048,
+   "press": 4068,
+   "end": 4408
+  }
+ ],
+ "pokes": [
+  "1400:ff8782:06",
+  "1450:ff8782:06",
+  "1500:ff8782:06",
+  "1400:ff8b82:03",
+  "1450:ff8b82:03",
+  "1500:ff8b82:03",
+  "2570:ff8410:0228",
+  "2570:ff8810:02d8",
+  "2780:ff8850:01200120",
+  "2780:ff8509:090000",
+  "3194:ff8410:0228",
+  "3194:ff8810:02d8",
+  "3404:ff8850:01200120",
+  "3404:ff8509:090000",
+  "3818:ff8410:0228",
+  "3818:ff8810:02d8",
+  "4028:ff8850:01200120",
+  "4028:ff8509:000000"
+ ],
+ "frames": 4822
+}
