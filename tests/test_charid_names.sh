@@ -53,7 +53,7 @@ fi
 
 echo "== 2. controls: each must fire in-gate (the modes above prove them as modes)"
 P="$($TOOL --plant --floor "$floor" 2>&1)"
-if printf '%s\n' "$P" | grep -q '^CONTROL FIRED: shifted-map' && printf '%s\n' "$P" | grep -q '^MISMATCH <plant'; then
+if printf '%s\n' "$P" | grep >/dev/null '^CONTROL FIRED: shifted-map' && printf '%s\n' "$P" | grep >/dev/null '^MISMATCH <plant'; then
     vs_ctl_fired shifted-map "$(printf '%s\n' "$P" | grep '^CONTROL FIRED: shifted-map' | sed 's/^CONTROL FIRED: shifted-map — //')"
 else vs_ctl_dead shifted-map "the planted shift was not reported"; fail=1; fi
 if [ -n "$n" ] && ! $TOOL --floor "$((n + 1))" >/dev/null 2>&1; then

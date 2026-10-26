@@ -110,7 +110,9 @@ if [ ! -x "$MAME_BIN" ] || [ ! -f "$WIDE_ZIP" ]; then
     exit 0
 fi
 
-WORK="$(mktemp -d)"; trap 'rm -rf "$WORK" build/manifest/_phase_probe.toml' EXIT
+# the probe manifest is named per process (#321, 14z-210): two control modes side by side wrote one fixed path
+PROBE="build/manifest/_phase_probe.$$.toml"
+WORK="$(mktemp -d)"; trap 'rm -rf "$WORK" "$PROBE"' EXIT
 fail=0
 FREEZE_CLOCK=0; [ "${1:-}" = "--freeze-clock" ] && FREEZE_CLOCK=1
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
@@ -120,15 +122,15 @@ CLOCKS="tests/expected/instr_gameclock/audit_phase_mode_cost.tsv"
 _clk=""; [ "$MODE" = drift-clock ] && _clk="INSTR_CLOCK=frame_done"
 
 echo "== build a phase-mode Donovan (MEASUREMENT ONLY — never freeze it) =="
-python3 - <<'PY'
-import pathlib
+PROBE="$PROBE" python3 - <<'PY'
+import os, pathlib
 src = pathlib.Path("build/manifest/donovan.toml").read_text()
 a = 'latch_disp = 0x7966\n'
 assert src.count(a) == 1, "init_shim shape moved; this probe needs updating"
-pathlib.Path("build/manifest/_phase_probe.toml").write_text(
+pathlib.Path(os.environ["PROBE"]).write_text(
     src.replace(a, a + 'latch_mode = "phase"\n'))
 PY
-KEY_SET=vsavj TENANT_MANIFEST=build/manifest/_phase_probe.toml TENANT_CHAR=0x13 \
+KEY_SET=vsavj TENANT_MANIFEST="$PROBE" TENANT_CHAR=0x13 \
 WIDE_ROMSET="$WIDE_ZIP" \
 GEN_FLAGS="--allow-plausible --tripwire-open --profile cps2-wide-v1" \
 tools/build_donovan.sh 6 "$WORK/phase" > "$WORK/build.log" 2>&1 || {

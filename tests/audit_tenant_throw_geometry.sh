@@ -255,7 +255,7 @@ for vic in $VICTIMS; do
         lo=${_r%%:*}; _r=${_r#*:}; hi=${_r%%:*}; mt=${_r#*:}
         # the nohold-no-attempt MODE: every declared victim's air legs run the press-less copy
         if [ -n "$NOATT" ] && [ "$att" = 11 ] && case "$nm" in air*) true ;; *) false ;; esac \
-           && echo " $AIR_NOHOLD " | grep -q " $vic "; then
+           && echo " $AIR_NOHOLD " | grep >/dev/null " $vic "; then
             rpl="$(air_nopress "$nm")"; [ -n "$rpl" ] || exit 1
         fi
         for leg in ours native; do
@@ -267,7 +267,7 @@ done
 done
 # THE CONTROL's legs (normal runs only): Donovan's standard throw, NATIVE leg with the level pin
 # withheld — measured 14z-193: unpinned, all 18 victims' hold orders diverge from ours.
-if [ -z "${VS_CTL:-}" ] && echo " $THROWERS " | grep -q " 13 "; then
+if [ -z "${VS_CTL:-}" ] && echo " $THROWERS " | grep >/dev/null " 13 "; then
     # wrong-thrower's leg: Victor thrown in Donovan's ours slot, one victim
     run_leg "$W/ctlw_00_std_ours" ours judge/02_throw.rpl "$(pokes_for 03 00 "" ours "")" 3000 3260
     for vic in $VICTIMS; do
@@ -276,9 +276,9 @@ if [ -z "${VS_CTL:-}" ] && echo " $THROWERS " | grep -q " 13 "; then
 fi
 # THE nohold-no-attempt CONTROL's legs (normal runs): the first declared victim, both legs, on the press-less
 # copy of the MP air replay — the same pokes and window as its real air legs.
-if [ -z "${VS_CTL:-}" ] && echo " $THROWERS " | grep -q " 11 "; then
+if [ -z "${VS_CTL:-}" ] && echo " $THROWERS " | grep >/dev/null " 11 "; then
     _v0="$(echo $AIR_NOHOLD | cut -d' ' -f1)"
-    if echo " $VICTIMS " | grep -q " $_v0 "; then
+    if echo " $VICTIMS " | grep >/dev/null " $_v0 "; then
         _np="$(air_nopress airm)"; [ -n "$_np" ] || exit 1
         for leg in ours native; do
             run_leg "$W/ctln_${_v0}_airm_${leg}" "$leg" "$_np" "$(pokes_for 11 "$_v0" "" "$leg" "")" 3000 3320
@@ -762,7 +762,7 @@ _nk="$(grep '^CTLKICK' "$W/verdict.txt" || true)"
 _nd="$(grep '^CTLNHDROP' "$W/verdict.txt" || true)"
 _no="$(grep '^CTLNHOVER' "$W/verdict.txt" || true)"
 _nx="$(grep '^CTLNHDEAD' "$W/verdict.txt" || true)"
-if [ -z "${VS_CTL:-}" ] && echo " $THROWERS " | grep -q " 11 "; then
+if [ -z "${VS_CTL:-}" ] && echo " $THROWERS " | grep >/dev/null " 11 "; then
     case "$_nx" in
         "CTLNHDEAD fired "*) vs_ctl_fired nohold-dead-leg "${_nx#CTLNHDEAD fired }" ;;
         *) vs_ctl_dead nohold-dead-leg "${_nx:-no control verdict}" || fail=1 ;;
@@ -791,7 +791,7 @@ fi
 _ca="$(grep '^CTLARC' "$W/verdict.txt" || true)"
 _cr="$(grep '^CTLRESULT' "$W/verdict.txt" || true)"
 _cw="$(grep '^CTLWRONG' "$W/verdict.txt" || true)"
-if [ -z "${VS_CTL:-}" ] && echo " $THROWERS " | grep -q " 13 "; then
+if [ -z "${VS_CTL:-}" ] && echo " $THROWERS " | grep >/dev/null " 13 "; then
     case "$_cr" in
         "CTLRESULT fired "*) vs_ctl_fired unpinned-level "${_cr#CTLRESULT fired }" ;;
         *) vs_ctl_dead unpinned-level "${_cr:-no control verdict}" || fail=1 ;;

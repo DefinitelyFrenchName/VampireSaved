@@ -770,6 +770,13 @@ def main():
     root = Path(a.root)
     if a.list_files:
         rels = set(walk_docs(root)) | {SHAPE_TSV, ALLOW_TSV, "CLAUDE.md"}
+        # every path the declaration names, and its history twin (#310, 14z-210): a root-level twin such as
+        # HANDOFF_HISTORY.md is no docs/ walk's, and a copy without it fails every control mode for that reason alone
+        for line in (root / SHAPE_TSV).read_text(encoding="utf-8").splitlines():
+            f = line.split("\t")
+            if line.startswith("#") or len(f) < 3:
+                continue
+            rels |= {x for x in (f[0], f[2]) if x and x != "-"}
         print("\n".join(sorted(r for r in rels if (root / r).exists())))
         return
     fails, pending = check(root, a.only, a.no_pending, a.verbose)

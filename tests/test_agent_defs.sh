@@ -81,7 +81,7 @@ out="$($CHECK "$target" 2>&1)" && rc=0 || rc=$?
 echo "$out" | sed 's/^/  /'
 if [ "$rc" -ne 0 ]; then echo "FAIL: a definition breaks the caps"; fail=1; fi
 for n in measurer reader rule-checker; do
-    echo "$out" | grep -q "^OK  $n.md$" || { echo "FAIL: $n.md is not an OK definition"; fail=1; }
+    echo "$out" | grep >/dev/null "^OK  $n.md$" || { echo "FAIL: $n.md is not an OK definition"; fail=1; }
 done
 
 if [ -z "$VS_CTL" ]; then

@@ -267,7 +267,10 @@ def _walk_signed(img, table, signed=True):
     word add sign-extends). tools/anim_nodes.py's walk_table reads them unsigned, which mislabels the chains below
     their index table (found by #229 fork F2, 14z-205; its walker is tools/specials_b_rigs.py's walk_signed — copied
     here, not imported, per the parallel run's brief): the same node rules (flags bit 7 = link at +0x18, bit 6 = hold,
-    else sequential), the entry count bounded by the smallest positive offset."""
+    else sequential), the entry count bounded by the smallest positive offset.
+    RESOLVED #318 (14z-210): tools/anim_nodes.py's walk_table reads the offsets SIGNED too since #318, so the
+    "reads them unsigned" above describes the tool before it. This local walk stays: the frozen #229 identities
+    were measured with it, and its entry bound differs from the tool's (it skips odd words instead of ending)."""
     words, k = [], 0
     while k < 1024:
         w = int.from_bytes(img[table + 2 * k:table + 2 * k + 2], "big", signed=signed)
@@ -325,7 +328,7 @@ def analyse(sched_path, trace, img_path):
     img = Path(img_path).read_bytes()
     cid = int(sched["char"], 16)
     nmap = node_map_signed(img, cid)
-    umap = vj.node_map(img, cid)        # the unsigned read (tools/anim_nodes.py), kept beside it for the comparison
+    umap = vj.node_map(img, cid, signed=False)   # the pre-#318 unsigned read (tools/anim_nodes.py signed=False), kept beside it for the comparison
     smap = node_map_signed(img, cid, signed=os.environ.get("CT_UNSIGNED") != "1", starts=True)   # chain STARTS
     # (signed: the identity the report uses; CT_UNSIGNED=1 reads them unsigned — the gate's control `unsigned-chain`)
     fr = vj._samples(trace)

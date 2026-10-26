@@ -88,7 +88,7 @@ for d in tests/inp/*/; do
     live_run "$W/run_$name.txt" || { echo "  FAIL: $name — dead run ($(live_why "$W/run_$name.txt"))"; tail -3 "$W/run_$name.txt"; fail=1; continue; }
     if [ -f "$d/DEFECT" ]; then
         want="$(cat "$d/DEFECT")"; open=$((open+1))
-        echo "$CR" | grep -q "$want" \
+        echo "$CR" | grep >/dev/null "$want" \
             && echo "  OPEN (as frozen): $name — $CR" \
             || { echo "  FAIL: $name declared DEFECT '$want' but got '${CR:-none}' — the capture rotted or the defect moved"; fail=1; }
     elif [ -n "$CR" ]; then

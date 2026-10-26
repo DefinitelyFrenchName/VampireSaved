@@ -58,7 +58,7 @@ D="$WORK/shared"; mkdir -p "$D"
 : > "$D/a.log"; : > "$D/b.log"
 mkdiff "$D/dump_4400_ff0000.bin" 0
 set +e; out=$(python3 "$T" "$D/a.log" "$D/b.log" 4400 --window 0-3f:everything 2>&1); rc=$?; set -e
-if [ "$rc" != 0 ] && echo "$out" | grep -q "SAME dump file"; then
+if [ "$rc" != 0 ] && echo "$out" | grep >/dev/null "SAME dump file"; then
     echo "  ok: refused, and named the collision"
 else
     echo "FAIL: comparing a file with itself did not fail (rc=$rc)"
@@ -90,7 +90,7 @@ set +e; out=$(python3 "$T" "$A/a.log" "$B/b.log" 4400 --window 0-0f:head 2>&1); 
 echo "== 4. two distinct files that happen to be identical =="
 mkdiff "$B/dump_4400_ff0000.bin" 0
 set +e; out=$(python3 "$T" "$A/a.log" "$B/b.log" 4400 --window 0-3f:everything 2>&1); rc=$?; set -e
-if [ "$rc" = 0 ] && echo "$out" | grep -q "IDENTICAL"; then
+if [ "$rc" = 0 ] && echo "$out" | grep >/dev/null "IDENTICAL"; then
     echo "  ok: a measured identity is still a note (not conflated with the collision)"
 else
     echo "FAIL: a genuine zero-diff between distinct files was mishandled (rc=$rc)"; fail=1

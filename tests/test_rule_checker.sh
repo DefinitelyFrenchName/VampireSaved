@@ -466,7 +466,7 @@ PY3
     _render; sed '1d' "$2/build/cr/checks.tsv" > "$2/build/cr/c.tmp" && mv "$2/build/cr/c.tmp" "$2/build/cr/checks.tsv"
     _no 2099-08-08-14 A-HAND-WRITTEN-FILE "was not rendered from" "--recheck build/cr --checks figs"
     _rr 2099-08-08-15 "" || _out="$_out REFUSED-A-PLAIN-RESOLVE"
-    echo "${_out# }" | grep -q . && echo "${_out# }" || echo RECHECK-OK
+    echo "${_out# }" | grep >/dev/null . && echo "${_out# }" || echo RECHECK-OK
 }
 unrecheck() {  # unrecheck <out> — the shadow tool: resolve takes any --recheck at its word
     sed 's/^RECHECK_CHECKED = True /RECHECK_CHECKED = False /' tools/rulecheck.py > "$1"

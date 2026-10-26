@@ -265,6 +265,9 @@ for j in "$G"/pu_*.json; do
 done
 wait
 dead=0
+# A leg is judged by its content, never MAME's exit code: a TAP leg's END line is written immediately before
+# machine:exit(), so a teardown segfault (exit 139) after it is accepted with the full output (#320, root-caused 14z-210:
+# MAME 0.288's change-notifier binding; tests/lua/tap_writes.lua pins the thread, docs/platform/gotchas.md).
 for j in "$G"/pu_*.json; do b=$(basename "$j" .json)
     grep -q '^FIELDSUMMARY' "$W/legs/$b/field/t.txt" 2>/dev/null || { bad "leg $b/field did not complete"; dead=1; }
     grep -q '^END' "$W/legs/$b/tap/t.tap" 2>/dev/null || { bad "leg $b/tap did not complete"; dead=1; }

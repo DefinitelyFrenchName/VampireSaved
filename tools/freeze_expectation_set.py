@@ -12,6 +12,10 @@ silent-green failure modes closed by construction (docs/project/gotchas.md, 14z-
 Every set is VERIFIED (`tests/run_suite.sh` without --freeze) and its SHAPE checked
 (`tools/freeze_set_shape.py --set`).
 
+  4. (#321, 14z-210) Each set's suite runs its MAME runs SUITE_JOBS at a time (tests/run_suite.sh, output unchanged
+     line for line — tests/test_suite_jobs.sh): the caller's SUITE_JOBS, else max(1, min(8, CPUs // --jobs)), so the
+     sets in flight share the host's cores. Until then each set ran its ~97 replays twice, one MAME run at a time.
+
 PRECONDITIONS it refuses without: the new set must not exist yet; the build's rompath must exist; the build's
 fingerprint must already be registered to THAT set name in tests/expected/registry.tsv (the suite selects the set
 by fingerprint, so a wrong row would freeze into the wrong directory).
@@ -69,7 +73,14 @@ def carry(root, old, new, build):
     return len(auth)
 
 
-def one(root, build, new, romdir, set_key, logdir, suite=None):
+def suite_jobs(jobs):
+    """The SUITE_JOBS each set's suite gets: the caller's, else the host's CPUs shared by the sets in flight (capped)."""
+    if os.environ.get("SUITE_JOBS"):
+        return os.environ["SUITE_JOBS"]
+    return str(max(1, min(8, (os.cpu_count() or 1) // max(1, jobs))))
+
+
+def one(root, build, new, romdir, set_key, logdir, suite=None, sjobs="1"):
     L = lambda k: open(os.path.join(logdir, f"{new}.{k}.log"), "w")
     old = predecessor(root, new)
     if os.path.exists(os.path.join(root, "tests/expected", new)):
@@ -83,7 +94,7 @@ def one(root, build, new, romdir, set_key, logdir, suite=None):
         return new, f"REFUSED: {new} has no predecessor to carry from"
     with L("carry") as fh:
         fh.write(f"carry {old} -> {new}: {carry(root, old, new, build)} authored files\n")
-    env = dict(os.environ, MAME_BIN=os.environ.get("MAME_BIN") or PIN, ROMDIR=romdir,
+    env = dict(os.environ, MAME_BIN=os.environ.get("MAME_BIN") or PIN, ROMDIR=romdir, SUITE_JOBS=sjobs,
                MAME_ROMPATH=f"{os.path.join(root, 'build', build, 'rompath')};{romdir}")
     run = (suite or {}).get("run") or [os.path.join(root, "tests/run_suite.sh")]
     for step, args in (("freeze", ["--freeze", set_key]), ("verify", [set_key])):
@@ -111,8 +122,10 @@ def one(root, build, new, romdir, set_key, logdir, suite=None):
 def drive(root, pairs, jobs, set_key, romdir, suite=None, logdir=None):
     logdir = logdir or os.path.join(root, "build", "freeze_" + time.strftime("%Y%m%dT%H%M%SZ", time.gmtime()))
     os.makedirs(logdir, exist_ok=True)
+    sj = suite_jobs(jobs)
+    print(f"sets {len(pairs)} at --jobs {jobs}; each suite at SUITE_JOBS={sj}")
     with concurrent.futures.ThreadPoolExecutor(max_workers=jobs) as ex:
-        res = list(ex.map(lambda p: one(root, p[0], p[1], romdir, set_key, logdir, suite), pairs))
+        res = list(ex.map(lambda p: one(root, p[0], p[1], romdir, set_key, logdir, suite, sj), pairs))
     for new, verdict in res:
         print(f"  {new:22s} {verdict}")
     bad = [r for r in res if not r[1].startswith("OK")]
@@ -140,6 +153,7 @@ def selftest():
             "import os, sys\nfreeze = '--freeze' in sys.argv\nrp = os.environ['MAME_ROMPATH'].split(';')[0]\n"
             "s = {'don2': 'donovan-m2', 'mer2': 'merged-m2', 'wrong': 'donovan-m9'}[rp.split('/build/')[1].split('/')[0]]\n"
             "d = os.path.join('tests/expected', s)\nopen(os.path.join(d, '.mame_bin_seen'), 'w').write(os.environ.get('MAME_BIN', ''))\n"
+            "open(os.path.join(d, '.suite_jobs_seen'), 'w').write(os.environ.get('SUITE_JOBS', ''))\n"
             "if freeze:\n    open(os.path.join(d, 't.sha1'), 'w').write('sha')\n    os.makedirs(os.path.join(d, 'logs'), exist_ok=True)\n"
             "    open(os.path.join(d, 'logs', 't.log'), 'w').write('log')\n"
             "elif not os.path.exists(os.path.join(d, 't.sha1')) and not os.path.exists(os.path.join(d, 't.masked')):\n"
@@ -151,7 +165,7 @@ def selftest():
             out = []
             for b, s in pairs:
                 suite = {"run": [sys.executable, fake], "fp": [sys.executable, fp, f"{os.path.join(root, 'build', b, 'rompath')};/roms"]}
-                out.append(one(root, b, s, "/roms", "vsavjw", os.path.join(root, "logs"), suite))
+                out.append(one(root, b, s, "/roms", "vsavjw", os.path.join(root, "logs"), suite, "3"))
             return out
         os.makedirs(os.path.join(root, "logs"))
         (n1, v1), (n2, v2) = run_pairs([("don2", "donovan-m2"), ("mer2", "merged-m2")])
@@ -164,6 +178,17 @@ def selftest():
         say(all(os.path.exists(os.path.join(d2, f)) for f in ("a.masked", "b.skip", "mask")) and
             open(os.path.join(d2, "mask")).read() == "mask-bytes", "the authored files are CARRIED verbatim before the freeze")
         say(open(os.path.join(d2, ".mame_bin_seen")).read() == PIN, "the suite ran with MAME_BIN pinned to the tree's pin")
+        say(open(os.path.join(d2, ".suite_jobs_seen")).read() == "3", "the suite was handed the driver's SUITE_JOBS (#321)")
+        sj_env = os.environ.pop("SUITE_JOBS", None)
+        cpus = os.cpu_count() or 1
+        say(suite_jobs(4) == str(max(1, min(8, cpus // 4))) and suite_jobs(1) == str(max(1, min(8, cpus))),
+            f"SUITE_JOBS derives from the host: {cpus} CPUs -> {suite_jobs(1)} at --jobs 1, {suite_jobs(4)} at --jobs 4")
+        os.environ["SUITE_JOBS"] = "5"
+        say(suite_jobs(4) == "5", "a caller's SUITE_JOBS wins")
+        if sj_env is None:
+            os.environ.pop("SUITE_JOBS", None)
+        else:
+            os.environ["SUITE_JOBS"] = sj_env
         say(not [f for f in os.listdir(m2) if f.endswith(".sha1")] and not os.path.exists(os.path.join(m2, "logs")),
             "the merged set's .sha1 and logs/ are removed (#111)")
         say(os.path.exists(os.path.join(d2, "t.sha1")), "a solo set keeps its self-frozen .sha1")

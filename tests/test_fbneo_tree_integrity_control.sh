@@ -71,7 +71,7 @@ cp "$TARGET" "$WORK/cps_obj.orig"
 echo "== 1. a forgotten probe at EOF — the case apply -R --check ACCEPTS =="
 printf '// forgotten debug probe\n' >> "$TARGET"
 run_gate
-if [ "$GRC" != 0 ] && echo "$GOUT" | grep -q "DIFFERS from pinned-commit"; then
+if [ "$GRC" != 0 ] && echo "$GOUT" | grep >/dev/null "DIFFERS from pinned-commit"; then
     echo "  ok: caught, and named the file"
 else
     echo "FAIL: an EOF edit was NOT caught (rc=$GRC) — the gate fails open on"
@@ -104,7 +104,7 @@ cp "$WORK/harness.orig" "$H"
 echo "== 4. an extra untracked file in the tree =="
 printf 'x\n' > "$S/emu/fbneo/src/burner/sdl/stray_probe.cpp"
 run_gate
-if [ "$GRC" != 0 ] && echo "$GOUT" | grep -q "changed-file set"; then
+if [ "$GRC" != 0 ] && echo "$GOUT" | grep >/dev/null "changed-file set"; then
     echo "  ok: inventory check caught a file no patch touches"
 else
     echo "FAIL: a stray untracked file was not caught (rc=$GRC)"; fail=1

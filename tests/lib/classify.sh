@@ -123,6 +123,12 @@ vs_classify() {
 #             as their honoured mode, and audit_victim_parity@no-translation quotes a child's
 #             exception beside ANOTHER control's DEAD line; over 2,351 control logs (#299's four
 #             PILOT legs, 602 emulator-tier logs) the conjunction matches that one row only.
+#   UNJUDGED  (#310, 14z-210) a FAIL whose log carries a line starting `NOT JUDGED: ` — the gate says THIS run measured
+#             nothing (a browser run that did not complete, an instrument that never armed), so its FAIL is not the
+#             perturbation caught. Until then any non-zero exit without a crash read HONOURED: measured 14z-206,
+#             test_applier_page_browser's broken-page mode stalled twice under --jobs 8 load, printed "page NOT
+#             judged" in words, exited 1 and read HONOURED. A gate prints the marker on every path that ends a run
+#             without a verdict about what it measures; read after the crash classes (a crash stays DIED).
 #   TIMEOUT   the wrapper's exits, as for any gate
 vs_classify_control() {  # vs_classify_control <exit-status> <logfile> [<gate script as invoked>] [<control name>]
     _cst="$1"; _clog="$2"; _cgate="${3:-}"; _cname="${4:-}"
@@ -146,6 +152,8 @@ vs_classify_control() {  # vs_classify_control <exit-status> <logfile> [<gate sc
         elif [ -n "$_cname" ] && grep -qa "^CONTROL DEAD: $_cname " "$_clog" \
                 && grep -qaE '^([a-z_][a-z0-9_]*\.)*[A-Z][A-Za-z0-9]*(Error|Exception): ' "$_clog"; then   # DEAD-BESIDE-CRASH
             VS_CTL_EXEC=DIED; VS_CTL_EXEC_DETAIL="its own control reported dead beside a crash: $(grep -aE '^([a-z_][a-z0-9_]*\.)*[A-Z][A-Za-z0-9]*(Error|Exception): ' "$_clog" | head -1 | cut -c1-80)"
+        elif grep -qa '^NOT JUDGED: ' "$_clog"; then   # NOT-JUDGED (#310)
+            VS_CTL_EXEC=UNJUDGED; VS_CTL_EXEC_DETAIL="the mode run measured nothing: $(grep -a -m1 '^NOT JUDGED: ' "$_clog" | cut -c13-92)"
         else
             VS_CTL_EXEC=HONOURED; VS_CTL_EXEC_DETAIL="reached the gate's own FAIL (exit $_cst)"
         fi ;;

@@ -91,7 +91,7 @@ if [ -n "${BUILD:-}" ]; then
     ZSHA="$(python3 -c "import hashlib,sys;print(hashlib.sha1(open(sys.argv[1],'rb').read()).hexdigest())" "$BUILD/rompath/vsavjw.zip")"
     echo "build: registry row '${REGNAME:-?}', program fingerprint ${FULLFP:-?}, vsavjw.zip sha1 $ZSHA"
     # build_fingerprint.py prints the registry NAME for a registered image and the bare hex otherwise
-    if [ -z "$REGNAME" ] || printf '%s' "$REGNAME" | grep -Eq '^[0-9a-f]{40}$'; then
+    if [ -z "$REGNAME" ] || printf '%s' "$REGNAME" | grep -E >/dev/null '^[0-9a-f]{40}$'; then
         echo "FAIL: BUILD=$BUILD resolves to no registry row — not a registered build"; exit 1
     fi
 fi

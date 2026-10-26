@@ -226,7 +226,9 @@ wait
 # output is written, which MAME's write taps produce intermittently (measured 14z-205 on these 13 rigs, 2 at a time:
 # tests/lua/tap_writes.lua 2 of 13, this instrument 3 of 13, the same with every tap handle kept alive; never without a
 # tap). The tree's tap gates judge such legs by content (tests/test_tick_durations.sh runs its legs `|| true`). Any other
-# exit, or a missing output, FAILS.
+# exit, or a missing output, FAILS. ROOT-CAUSED #320 (14z-210): the crash is MAME 0.288's `add_change_notifier` binding
+# keeping the callback on the Lua thread that registered it, a thread the GC may free before ~address_space unrefs it;
+# the instrument now pins that thread (docs/platform/gotchas.md). 139 stays accepted here, with the full output required.
 dead=0; c139=0
 for L in $LEGS; do tab="${L%%:*}"; d="$W/leg_$tab"; rc="$(cat "$d/rc" 2>/dev/null)"
     grep -q '^FIELDSUMMARY' "$d/t.txt" 2>/dev/null && grep -q '^TICKSUMMARY' "$d/t.txt" 2>/dev/null && [ -s "$d/align" ] \

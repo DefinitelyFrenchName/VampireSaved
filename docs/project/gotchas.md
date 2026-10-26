@@ -7680,3 +7680,16 @@ expectation was last frozen, so on a clean clone every hit row read exactly +8 r
 change to the code it measures (#302; re-frozen at 65 legs, `build/agent209/t302/`, local). **The rule:** a gate whose
 leg set is "whatever files of a kind exist" must say so in its header and is re-frozen in the commit that adds such a
 file — or its legs are a frozen list, so a new file is a deliberate addition rather than a silent red.
+
+## AN INDEX TABLE'S WORD OFFSET IS SIGNED, AND A DECODER THAT READS IT UNSIGNED STILL "WALKS" — 64 KiB PAST THE CHAIN, INTO WHATEVER IS THERE (paid: 14z-205/14z-210, #229, #318)
+
+`tools/anim_nodes.py` read the anim index tables' words unsigned (`start = table + w`); the engine adds them
+sign-extended, and 71 entries on 11 vsavj characters are negative (chains stored below their table). Nothing
+failed: each such entry walked 64 KiB higher, through another character's nodes or plain data, and the readers
+counted the garbage as his — 21 phantom attack records on vsavj (14 on vs2) in the reaction-class and facing-rule
+censuses, Demitri's c:0x2e/0x2f read "invalid on vs2" by the same-data census, one garbage node in Pyron's map.
+#229's fork F2 saw it only because a measured move (Sasquatch's Big Breath) read UNFIRED. **The rule:** a word
+added to an address is decoded with the sign the CPU gives it (the walker's word add sign-extends), and a structural bound
+that only accepts offsets "past the table" must say what it does with a negative one — here a negative word is an
+entry and plays no part in the bound (`tests/test_anim_signed_offsets.sh`, controls `unsigned-read` and
+`negative-ends-table`).

@@ -47,6 +47,7 @@
 # MUST-FIRE: perturbed-copy: commit-stripped — every commit stop removed from a copy of each trace must read every event no GC, and the identity clause must FAIL on all 53 and the dealt clause on all 53 dealt events (in-gate and mode)
 # MUST-FIRE: perturbed-copy: foreign-pc — every commit stop's PC moved off 0x029C74 in a copy of each trace must read every event no GC (the identity is the commit ROUTINE, not the mark's value), and the identity clause must FAIL on all 53 and the dealt clause on all 53 dealt events (in-gate and mode)
 # MUST-FIRE: perturbed-copy: node-shift — every walker node write moved one node (0x18) on in a copy of each trace must change the tick table (the ticks are segmented by the node writes, so the hash reads the walk, not a constant), and the gate must FAIL (in-gate and mode)
+# MUST-FIRE: known-bad: table-absent — node-shift judged with no frozen table on the host (FRAMEDATA_OUT an empty dir) must read NOT JUDGED, never "0 lines differ" (#332; in-gate: one extra judgement; mode: the gate runs with FRAMEDATA_OUT empty and FAILs naming the absent table)
 # MUST-FIRE: known-bad: foreign-image — an image one byte off vsavj's data view must fail the provenance check (tests/lib/pristine_vsavj.sh; in-gate; mode: the check is handed that image and the gate FAILs)
 # MUST-FIRE: known-bad: foreign-romset — a ROMDIR whose vsavj.zip is vsav2.zip must fail the provenance check (in-gate; mode: the check audits that ROMDIR and the gate FAILs)
 # MUST-FIRE: known-bad: foreign-rompath — MAME_ROMPATH pointed away from the audited ROMDIR must fail the provenance check (in-gate; mode: the check runs with it set and the gate FAILs)
@@ -84,6 +85,8 @@ FRAMEDATA_OUT="${FRAMEDATA_OUT:-$REPO/../charpages/framedata}"
 T=tools/gc_rigs.py
 W="${OUT:-$(mktemp -d "${TMPDIR:-/tmp}/gcancel.XXXXXX")}"; mkdir -p "$W"
 [ -n "${OUT:-}" ] || trap 'rm -rf "$W"' EXIT
+# control table-absent's mode (#332): the out-of-tree table is made absent — an empty dir in its place, inside $W
+[ "${CONTROL:-}" = table-absent ] && { FRAMEDATA_OUT="$W/no_table_mode"; mkdir -p "$FRAMEDATA_OUT"; }
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 . "$REPO/tests/lib/decrypt_cache.sh"
 decrypt_view vsavj "$W/vsavj_op.bin" "$W/vsavj_data.bin" >/dev/null 2>&1 || { echo "SKIP: the vsavj data view could not be made"; exit 0; }
@@ -237,6 +240,12 @@ ctl_judge() {  # ctl_judge <control> <identity output> <table> ; 0 = fired
             echo "$_n of $_w committing buttons fail the identity clause; $_c gc events commit; $_dn of $_dw dealt events read no guard cancel"
             [ "$_n" = "$_w" ] && [ "$_c" = 0 ] && [ "$_dn" = "$_dw" ] ;;
         node-shift)
+            # the frozen TABLE is out of tree (#332, 14z-210): a host without it cannot judge this clause — say so, and
+            # never compare against nothing (diff 2>/dev/null read a missing table as "0 lines differ", so ERIS read DEAD)
+            if [ ! -f "$FRAMEDATA_OUT/guard_cancels.tsv" ]; then
+                echo "NOT JUDGED: the frozen table $FRAMEDATA_OUT/guard_cancels.tsv is not on this host (out of tree: FREEZE=1 here, or copy it from a host whose table hashes as $EXP)"
+                return 3
+            fi
             _h="$(python3 -c 'import hashlib,sys; print(hashlib.sha256(open(sys.argv[1],"rb").read()).hexdigest())' "$3")"
             # against the FROZEN table (out of tree): in the mode the run's own table IS the shifted one
             _d="$(diff "$3" "$FRAMEDATA_OUT/guard_cancels.tsv" 2>/dev/null | grep -c '^<')"
@@ -279,8 +288,9 @@ if [ "$H" = "$WANT" ]; then ok "the 271-event table equals the frozen hash"
 else bad "the table's hash $H is not the frozen ${WANT:-<none>}"
     [ -f "$FRAMEDATA_OUT/guard_cancels.tsv" ] && diff "$FRAMEDATA_OUT/guard_cancels.tsv" "$W/table.tsv" | head -8 | sed 's/^/        /'; fi
 
-if [ -n "$MODE" ] && [ "$MODE" != drift-clock ] && [ "$MODE" != first-frame-skip ]; then
+if [ -n "$MODE" ] && [ "$MODE" != drift-clock ] && [ "$MODE" != first-frame-skip ] && [ "$MODE" != table-absent ]; then
     if _ev="$(ctl_judge "$MODE" "$W/identity.txt" "$W/table.tsv")"; then vs_ctl_fired "$MODE" "$_ev (mode)"; echo "FAIL"; exit 1; fi
+    case "$_ev" in "NOT JUDGED: "*) echo "$_ev"; echo "FAIL"; exit 1 ;; esac   # #332: the mode measured nothing
     echo "REFUSED: mode $MODE — its perturbation did not make its own clause fail ($_ev): a dead mode, not a verdict"; exit 3
 fi
 
@@ -312,11 +322,17 @@ if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else 
 if [ "$IA_SKIP" = fired ]; then vs_ctl_fired first-frame-skip "$IA_SKIP_MSG"; else vs_ctl_dead first-frame-skip "$IA_SKIP_MSG" || fail=1; fi
 
 echo "== 5. controls"
-judge() { if _ev="$(ctl_judge "$1" "$2" "${3:-}")"; then vs_ctl_fired "$1" "$_ev"; else vs_ctl_dead "$1" "$_ev"; fail=1; fi; }
+judge() { if _ev="$(ctl_judge "$1" "$2" "${3:-}")"; then vs_ctl_fired "$1" "$_ev"
+          else case "$_ev" in "NOT JUDGED: "*) bad "control $1 ${_ev#NOT JUDGED: }" ;; *) vs_ctl_dead "$1" "$_ev"; fail=1 ;; esac; fi; }   # #332
 rows_of "$W/legs" 1 > "$W/rows_nb.jsonl"; identity "$W/rows_nb.jsonl" > "$W/id_nb.txt"; judge noblock "$W/id_nb.txt"
 for c in strip:commit-stripped foreign:foreign-pc shift:node-shift; do k="${c%%:*}"; name="${c##*:}"
     perturb "$k" "$W/c_$k"; rows_of "$W/c_$k/legs" > "$W/rows_$k.jsonl"; identity "$W/rows_$k.jsonl" > "$W/id_$k.txt"
     python3 $T table2 "$W/rows_$k.jsonl" > "$W/table_$k.tsv"; judge "$name" "$W/id_$k.txt" "$W/table_$k.tsv"
 done
+# table-absent (#332): the same node-shift judgement with no frozen table on the host must say so, not "0 lines differ"
+mkdir -p "$W/no_table"
+_ta="$(FRAMEDATA_OUT="$W/no_table" ctl_judge node-shift "$W/id_shift.txt" "$W/table_shift.tsv")"; _tr=$?
+case "$_ta" in "NOT JUDGED: "*) [ "$_tr" = 3 ] && vs_ctl_fired table-absent "no frozen table: ${_ta#NOT JUDGED: }" || { vs_ctl_dead table-absent "NOT JUDGED printed but rc $_tr"; fail=1; } ;;
+    *) vs_ctl_dead table-absent "with no frozen table the judgement read: $_ta"; fail=1 ;; esac
 [ "$fail" -eq 0 ] && echo "PASS" || echo "FAIL"
 exit "$fail"

@@ -244,6 +244,11 @@ if [ -n "$VS_CTL" ] && [ "$VS_CTL" != newest-dir ] && [ "$VS_CTL" != keys-ignore
     esac
     echo "MODE: control $VS_CTL — the tool's verdict on the planted run is this gate's verdict"
     sed 's/^/  /' "$f"
+    # the plant also FAILs at freeze on g_undeclared, whatever the moved replay does: the mode judges its OWN finding
+    # (#310 census, measured 14z-210)
+    if [ "$VS_CTL" = moved-input ] && [ "$rc" != 0 ] && ! grep -q 'g_follows: tests/replays/x.rpl' "$f"; then
+        echo "NOT JUDGED: the planted run FAILed without naming g_follows's moved replay stale (g_undeclared alone fails it at freeze)"
+    fi
     [ "$rc" = 0 ] && { echo "PASS"; exit 0; } || { echo "FAIL"; exit 1; }
 fi
 

@@ -16,8 +16,9 @@ character-data map) exactly as the engine's node walker does.
 THE RULES, READ OFF THE WALKER (vs2 PRG:0x02713C..0x0271F2, decoded 14z-118 —
 docs/game/engine_internals.md "Anim-script walker"):
   node select (0x2713C): a0 = table + word[table + 2*seq]  (offsets are
-    relative to the TABLE base); obj+0x1C = a0; obj+0x20.l = node[0..3]
-    (+0 duration countdown, +1 flags -> obj+0x21); node+8.w * 4 indexes the
+    relative to the TABLE base and SIGNED — the word is sign-extended, so a
+    negative entry names a chain stored below its table, #318); obj+0x1C = a0;
+    obj+0x20.l = node[0..3] (+0 duration countdown, +1 flags -> obj+0x21); node+8.w * 4 indexes the
     obj+0x64 hitbox-family table -> obj+0x68, obj+0x94 = its first long (the
     box ids); node+0x16 nonzero -> per-node sfx record (index * 8 into the
     character's [[sound_table]] array: id, alt id, p4, p5, d3).
@@ -33,15 +34,18 @@ OUTPUT (--json): {"table": ..., "entries": N, "chains": {seq: {"start": addr,
 "runaway"}}}. Node fields are decoded numbers — never raw hex beyond the
 6-byte script-op area at +0x10 (kept as hex because it is undecoded).
 
-Table length: the entry count is the smallest word offset / 2 — every
-offset points past the table, so the first node's offset bounds the table
-(validated per table: any offset below that count*2 is reported as an
-inconsistency and the walk refuses).
+Table length: the entry count is the smallest POSITIVE word offset / 2 —
+every positive offset points past the table, so the first node above it
+bounds the table; a negative offset (a chain below the table, #318) is an
+entry and plays no part in the bound (validated per table: any positive
+offset below that count*2 is reported as an inconsistency).
 
-NOT YET MEASURED LIVE: the phase-1 rig (tests/test_anim_node_walk.sh)
-compares these chains against obj+0x1C / obj+0x20 sampled per frame on a
-native vs2 run. Until it passes, this decoder's output is a READING of the
-walker, not a verified instrument.
+MEASURED LIVE (14z-118): tests/test_anim_node_walk.sh compares these chains
+against obj+0x1C / obj+0x20 sampled per frame on a native vs2 run (Donovan,
+3,638/3,638 node pointers — docs/game/engine_internals.md). The SIGNED read
+(#318, 14z-210) is the engine's own instruction: vs2 PRG:0x027134 `move.w
+(a0,d0.w),d0` then PRG:0x027138 `lea.l (a0,d0.w),a0`, a sign-extended word
+index; tests/test_anim_signed_offsets.sh holds it.
 """
 import argparse
 import hashlib
@@ -53,7 +57,11 @@ NODE = 0x18
 MAX_NODES = 4096
 
 
-def walk_table(img, base, table, end=None, max_seq=None, entries=None):
+def walk_table(img, base, table, end=None, max_seq=None, entries=None, signed=True):
+    """signed=False reproduces the pre-#318 UNSIGNED read exactly (a negative entry walked at
+    table + word, 64 KiB past its chain) — kept ONLY for the #229 rigs' report columns that print
+    where the two reads differ (command_throw_rigs `entered_unsigned`, vanilla_pursuit_rigs
+    `chain_unsigned`); every reading of the game uses the default."""
     def rd(addr, n):
         o = addr - base
         if o < 0 or o + n > len(img):
@@ -66,33 +74,43 @@ def walk_table(img, base, table, end=None, max_seq=None, entries=None):
         b = rd(table + 2 * k, 2)
         if b is None:
             break
-        w = int.from_bytes(b, "big")
+        w = int.from_bytes(b, "big", signed=signed)
+        # THE OFFSETS ARE SIGNED (#318): the engine adds the word SIGN-EXTENDED
+        # (a 68000 word add), and some tables carry NEGATIVE entries — chains
+        # stored BELOW their index table (vsavj: 71 entries on 11 characters,
+        # Sasquatch's a2:0x24/0x25 Big Breath/Big Blow among them). Until #318
+        # this read was unsigned and walked those seqs at table + w + 0x10000.
+        # A negative entry is a valid entry: it neither ends the table nor
+        # enters the min that bounds it (only POSITIVE offsets point past the
+        # table's own end).
         # THE TABLE ENDS AT THE FIRST WORD THAT CANNOT BE AN ENTRY (14z-121):
-        # an entry is an even offset past the table's own end (or 0 = unused).
+        # an entry is an even offset past the table's own end, a negative even
+        # offset, or 0 = unused.
         # Until 14z-121 the word was appended BEFORE the bound test, so the
         # first NODE word past the real end (Huitzil's table b: 0x0025 at index
         # 129, odd) entered the min and collapsed the count to 18 — the
         # "unindexed lying/wake nodes" of 14z-120 (7) were b:0x2a/0x2d,
         # entries the decoder never read.
-        if w and (w & 1 or w < 2 * (k + 1)):
+        if w and (w & 1 or 0 < w < 2 * (k + 1)):
             break
         words.append(w)
         k += 1
         if max_seq and k >= max_seq:
             break
         # stop reading once we would run into the first node
-        if words and k * 2 >= min(w for w in words if w):
+        pos = [x for x in words if x > 0]
+        if pos and k * 2 >= min(pos):
             break
-    nonzero = [w for w in words if w]
-    if not nonzero and entries is None:
+    positive = [w for w in words if w > 0]
+    if not positive and entries is None:
         return {"table": f"{table:#x}", "entries": 0, "chains": {}, "error": "empty table"}
     if entries is None:
-        entries = min(nonzero) // 2
+        entries = min(positive) // 2
     else:
         # a caller-imposed count (the ours side of a comparison): read that many words
-        words = [int.from_bytes(rd(table + 2 * k, 2) or b"\0\0", "big") for k in range(entries)]
+        words = [int.from_bytes(rd(table + 2 * k, 2) or b"\0\0", "big", signed=signed) for k in range(entries)]
     words = words[:entries]
-    bad = [i for i, w in enumerate(words) if w and w < entries * 2]
+    bad = [i for i, w in enumerate(words) if 0 < w < entries * 2]
     chains = {}
     for seq, w in enumerate(words):
         if w == 0:

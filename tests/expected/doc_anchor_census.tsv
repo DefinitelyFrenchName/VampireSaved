@@ -43,7 +43,7 @@ CPE-36	docs/project/gotchas.md	Sound is invisible to every RAM and pixel gate �
 CPE-37	docs/platform/gotchas.md	A state-dependent value may not be correlated ACROSS runs — serialize read and write in ONE run (14z	IN-LIST
 CPE-38	docs/platform/gotchas.md	A canary must change exactly ONE thing, or it cannot answer anything	IN-LIST
 CPE-39	docs/platform/gotchas.md	A relocation test with no negative control proves nothing	IN-LIST
-CPE-40	HANDOFF.md	If it still will not start, in order	IN-LIST
+CPE-40	docs/project/operations.md	From HANDOFF.md: «Running a CPS-2 WIDE build — if it still will not start, in order»	IN-LIST
 CPE-41	docs/project/operations.md	Platform / migration notes (14z-59d)	IN-LIST
 CPE-42	docs/platform/gotchas.md	TWO BUILDS CAN SHARE A PROGRAM FINGERPRINT — the merged build and its legacy-only instrument do, del	IN-LIST
 CPH-1	docs/platform/gotchas.md	CPS-2 ROM file byte order is NOT 68k logical order (paid: 2026-07-25, ~1h)	IN-LIST
@@ -115,7 +115,7 @@ MFI-36	docs/project/gotchas.md	Sound is invisible to every RAM and pixel gate �
 MFI-37	docs/platform/gotchas.md	A state-dependent value may not be correlated ACROSS runs — serialize read and write in ONE run (14z	IN-LIST
 MFI-38	docs/platform/gotchas.md	A canary must change exactly ONE thing, or it cannot answer anything	IN-LIST
 MFI-39	docs/platform/gotchas.md	A relocation test with no negative control proves nothing	IN-LIST
-MFI-40	HANDOFF.md	If it still will not start, in order	IN-LIST
+MFI-40	docs/project/operations.md	From HANDOFF.md: «Running a CPS-2 WIDE build — if it still will not start, in order»	IN-LIST
 MFI-41	docs/project/operations.md	Platform / migration notes (14z-59d)	IN-LIST
 MFI-42	docs/platform/gotchas.md	TWO BUILDS CAN SHARE A PROGRAM FINGERPRINT — the merged build and its legacy-only instrument do, del	IN-LIST
 MFI-43	docs/platform/gotchas.md	CPS-2 ROM file byte order is NOT 68k logical order (paid: 2026-07-25, ~1h)	IN-LIST

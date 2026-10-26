@@ -81,9 +81,15 @@ printf 'PASS: fine\nCONTROL FIRED: ghost — nobody declared me\n' > "$T/ghost.l
 vs_classify 0 "$T/ghost.log" 90 "$T/g5.sh"
 if [ "$VS_VERDICT" = FAIL ]; then vs_ctl_fired undeclared-firing "a FIRED line no header declares classifies FAIL: $VS_DETAIL"
 else vs_ctl_dead undeclared-firing "an undeclared firing classified $VS_VERDICT"; rc=1; fi
-vs_classify 0 "$T/ok.log" 90 "$T/g1.sh"
+# THE MODES (#310, 14z-210): each plants its known-bad log where this section expects a good one, so the gate's own
+# check reads it and FAILs. Until then neither mode perturbed anything: both "failed" only because CONTROL leaked
+# into section 5's synthetic g6.sh, which refused it with exit 3 (the #310 census, measured 14z-210).
+_good="$T/ok.log"; _undecl="$T/empty.log"
+vs_ctl_is dead-control-log && _good="$T/dead.log"
+vs_ctl_is undeclared-firing && _undecl="$T/ghost.log"
+vs_classify 0 "$_good" 90 "$T/g1.sh"
 [ "$VS_VERDICT" = PASS ] && ok "both fired -> the verdict stays PASS" || bad "a green controls block changed the verdict to $VS_VERDICT"
-vs_classify 0 "$T/empty.log" 90 "$T/g5.sh"
+vs_classify 0 "$_undecl" 90 "$T/g5.sh"
 [ "$VS_VERDICT" = PASS ] && ok "an undeclared gate is left PASS (identity for the 236 gates that predate the grammar)" || bad "an undeclared gate was failed: $VS_VERDICT"
 printf 'SKIP: no build\n' > "$T/skip.log"
 vs_classify 0 "$T/skip.log" 90 "$T/g1.sh"
@@ -105,7 +111,7 @@ if vs_ctl_is flip; then echo "FAIL: flipped"; exit 1; fi
 echo "PASS"; exit 0
 EOF
 chmod +x "$T/g6.sh"
-LIB="$REPO/tests/lib/controls.sh" sh "$T/g6.sh" > "$T/o1" 2>&1 && s1=0 || s1=$?
+LIB="$REPO/tests/lib/controls.sh" env -u CONTROL sh "$T/g6.sh" > "$T/o1" 2>&1 && s1=0 || s1=$?   # never this gate's own CONTROL (#310)
 [ "$s1" = 0 ] && grep -q '^PASS' "$T/o1" && ok "no CONTROL: the gate runs normally (exit 0)" || bad "plain run: exit $s1: $(cat "$T/o1")"
 LIB="$REPO/tests/lib/controls.sh" CONTROL=flip sh "$T/g6.sh" > "$T/o2" 2>&1 && s2=0 || s2=$?
 [ "$s2" = 1 ] && grep -q '^CONTROL MODE: flip' "$T/o2" && grep -q '^FAIL' "$T/o2" && ok "CONTROL=flip: the mode is announced and the gate reaches its own FAIL (exit 1)" || bad "mode run: exit $s2: $(cat "$T/o2")"

@@ -118,32 +118,32 @@ echo "== 1. the clean traces: no miss"
 T1="$W/clean"; vs_ctl_is planted-miss && T1="$W/planted"
 out="$(python3 "$TOOL" score --root "$RR" --traces "$T1" --jobs 2 2>&1)"; rc=$?
 echo "$out" | sed 's/^/  /'
-if [ "$rc" = 0 ] && echo "$out" | grep -q '^MISSES 0 in 0 gates$'; then ok "every traced read flagged"; else bad "the clean traces scored a miss or failed (exit $rc)"; fi
+if [ "$rc" = 0 ] && echo "$out" | grep >/dev/null '^MISSES 0 in 0 gates$'; then ok "every traced read flagged"; else bad "the clean traces scored a miss or failed (exit $rc)"; fi
 
 echo "== 2. a planted unnamed read: exactly one miss"
 out="$(python3 "$TOOL" score --root "$RR" --traces "$W/planted" --jobs 2 2>&1)"; rc=$?
-if [ "$rc" = 1 ] && [ "$(echo "$out" | grep -c '^MISS	')" = 1 ] && echo "$out" | grep -q '^MISS	g_named	docs/hidden.md$'; then
+if [ "$rc" = 1 ] && [ "$(echo "$out" | grep -c '^MISS	')" = 1 ] && echo "$out" | grep >/dev/null '^MISS	g_named	docs/hidden.md$'; then
     ok "MISS g_named docs/hidden.md, exit 1"
 else bad "the planted read: exit $rc, $(echo "$out" | grep '^MISS' | tr '\n' ' ')"; fi
 
 echo "== 2b. the session scratch (N-D, #274): a dropped read is a miss, except in a whole-tree reader"
 SU="$RR/tools"; if vs_ctl_is scratch-unscored; then scratch_unscored "$W/tools_su"; SU="$W/tools_su"; fi
 out="$(cd "$R/tools" && python3 "$TOOL" score --root "$RR" --traces "$W/scratch" --tools "$SU" --jobs 2 2>&1)"; rc=$?
-if [ "$rc" = 1 ] && [ "$(echo "$out" | grep -c '^MISS	')" = 1 ] && echo "$out" | grep -q '^MISS	g_tmpl	build/agent7/x.txt$'; then
+if [ "$rc" = 1 ] && [ "$(echo "$out" | grep -c '^MISS	')" = 1 ] && echo "$out" | grep >/dev/null '^MISS	g_tmpl	build/agent7/x.txt$'; then
     ok "MISS g_tmpl build/agent7/x.txt (its template names it, the change set drops it); g_whole's read is no miss; exit 1"
 else bad "the scratch traces: exit $rc, $(echo "$out" | grep '^MISS' | tr '\n' ' ')"; fi
 
 echo "== 2c. a read strace SPLIT around another process's line is scored (#283)"
 SP="$TOOL"; if vs_ctl_is split-unread; then split_unread "$W/tool_sp.py"; SP="$W/tool_sp.py"; fi
 out="$(cd "$R/tools" && python3 "$SP" score --root "$RR" --traces "$W/split" --jobs 2 2>&1)"; rc=$?
-if [ "$rc" = 1 ] && [ "$(echo "$out" | grep -c '^MISS	')" = 1 ] && echo "$out" | grep -q '^MISS	g_named	docs/hidden.md$'; then
+if [ "$rc" = 1 ] && [ "$(echo "$out" | grep -c '^MISS	')" = 1 ] && echo "$out" | grep >/dev/null '^MISS	g_named	docs/hidden.md$'; then
     ok "MISS g_named docs/hidden.md from the split lines, exit 1"
 else bad "the split read: exit $rc, $(echo "$out" | grep '^MISS' | tr '\n' ' ')"; fi
 
 echo "== 2d. a run-record read N-F-CHANGE carries is a miss (14z-206, #286): the scorer judges as predict() does"
 NF="$TOOL"; if vs_ctl_is nf-change-unscored; then nf_change_unscored "$W/tool_nf.py"; NF="$W/tool_nf.py"; fi
 out="$(cd "$R/tools" && python3 "$NF" score --root "$RR" --traces "$W/runs" --jobs 2 2>&1)"; rc=$?
-if [ "$rc" = 1 ] && [ "$(echo "$out" | grep -c '^MISS	')" = 1 ] && echo "$out" | grep -q '^MISS	g_runs	tests/rulecheck/runs/r1/verdict.txt$'; then
+if [ "$rc" = 1 ] && [ "$(echo "$out" | grep -c '^MISS	')" = 1 ] && echo "$out" | grep >/dev/null '^MISS	g_runs	tests/rulecheck/runs/r1/verdict.txt$'; then
     ok "MISS g_runs tests/rulecheck/runs/r1/verdict.txt (R2 names it, N-F-CHANGE carries it), exit 1"
 else bad "the run-record read: exit $rc, $(echo "$out" | grep '^MISS' | tr '\n' ' ')"; fi
 
@@ -168,14 +168,14 @@ print(f"verdicts {n} disagreements {bad}")
 PY
 )"
 echo "$out" | sed 's/^/  /'
-if echo "$out" | grep -q '^verdicts [1-9][0-9]* disagreements 0$'; then ok "the scorer and predict() agree on every read"
+if echo "$out" | grep >/dev/null '^verdicts [1-9][0-9]* disagreements 0$'; then ok "the scorer and predict() agree on every read"
 else bad "the scorer and predict() disagree (or nothing was scored)"; fi
 
 echo "== 3. the over-narrowed control misses the build-template read"
 CT="$TOOL"; if vs_ctl_is no-narrowing; then no_narrowing "$W/tool_nn.py"; CT="$W/tool_nn.py"; fi
 out="$(cd "$R/tools" && python3 "$CT" control --root "$RR" --traces "$W/clean" --jobs 2 2>&1)"; rc=$?
 echo "$out" | grep -v '^==\|^traces' | sed 's/^/  /'
-if [ "$rc" = 0 ] && echo "$out" | grep -q '^CONTROL FIRED: over-narrowed' && echo "$out" | grep -q '^MISS	g_tmpl	build/m1/out.txt$'; then
+if [ "$rc" = 0 ] && echo "$out" | grep >/dev/null '^CONTROL FIRED: over-narrowed' && echo "$out" | grep >/dev/null '^MISS	g_tmpl	build/m1/out.txt$'; then
     ok "the control misses g_tmpl's build/m1/out.txt"
 else bad "the control did not miss (exit $rc)"; fi
 
@@ -183,7 +183,7 @@ echo "== 4. the trace step refuses without strace"
 if command -v strace >/dev/null 2>&1; then ok "strace present on this host: the refusal is not exercised here"
 else
     out="$(python3 "$TOOL" trace --root "$RR" --out "$W/tr" 2>&1)"; rc=$?
-    [ "$rc" != 0 ] && echo "$out" | grep -q 'REFUSED: strace not found' && ok "REFUSED without strace" || bad "trace without strace: exit $rc"
+    [ "$rc" != 0 ] && echo "$out" | grep >/dev/null 'REFUSED: strace not found' && ok "REFUSED without strace" || bad "trace without strace: exit $rc"
 fi
 
 echo "== 4b. the named limits (#281): every one names its ticket and a gate of this tree, and score names it untraced"
@@ -209,7 +209,7 @@ limits_named "$LT" && ok "every named limit names its ticket and a gate" || bad 
 mkdir -p "$W/limited/st"; printf 'g_named\n' > "$W/limited/gates.txt"; echo fixture > "$W/limited/head.txt"
 echo "#281: fixture" > "$W/limited/st/g_named.limit"; printf 'g_named\tLIMIT\t0\n' > "$W/limited/done.tsv"
 out="$(python3 "$TOOL" score --root "$RR" --traces "$W/limited" --jobs 2 2>&1)"
-if echo "$out" | grep -q '^NOT TRACED (named limit)	g_named	#281: fixture$' && ! echo "$out" | grep -q 'non-zero under the trace'; then
+if echo "$out" | grep >/dev/null '^NOT TRACED (named limit)	g_named	#281: fixture$' && ! echo "$out" | grep >/dev/null 'non-zero under the trace'; then
     ok "score names the untraced gate and does not count it as a non-zero run"
 else bad "score did not name the limited gate: $(echo "$out" | tail -2 | tr '\n' ' ')"; fi
 
@@ -221,23 +221,23 @@ if vs_ctl_is planted-miss || vs_ctl_is no-narrowing || vs_ctl_is scratch-unscore
 fi
 echo "== 5. controls"
 out="$(python3 "$TOOL" score --root "$RR" --traces "$W/planted" --jobs 2 2>&1)"
-if echo "$out" | grep -q '^MISS	g_named	docs/hidden.md$'; then vs_ctl_fired planted-miss "the planted traces score MISS g_named docs/hidden.md"
+if echo "$out" | grep >/dev/null '^MISS	g_named	docs/hidden.md$'; then vs_ctl_fired planted-miss "the planted traces score MISS g_named docs/hidden.md"
 else vs_ctl_dead planted-miss "the planted read was not reported"; fail=1; fi
 scratch_unscored "$W/tools_su"
 out="$(cd "$R/tools" && python3 "$TOOL" score --root "$RR" --traces "$W/scratch" --tools "$W/tools_su" --jobs 2 2>&1)"
-if ! echo "$out" | grep -q '^MISS	g_tmpl	build/agent7/x.txt$'; then vs_ctl_fired scratch-unscored "a predictor that keeps the scratch leaves g_tmpl's scratch read flagged — section 2b is what catches it"
+if ! echo "$out" | grep >/dev/null '^MISS	g_tmpl	build/agent7/x.txt$'; then vs_ctl_fired scratch-unscored "a predictor that keeps the scratch leaves g_tmpl's scratch read flagged — section 2b is what catches it"
 else vs_ctl_dead scratch-unscored "the predictor copy keeping the scratch still let the miss be reported"; fail=1; fi
 nf_change_unscored "$W/tool_nf.py"
 out="$(cd "$R/tools" && python3 "$W/tool_nf.py" score --root "$RR" --traces "$W/runs" --jobs 2 2>&1)"
-if ! echo "$out" | grep -q '^MISS	g_runs	tests/rulecheck/runs/r1/verdict.txt$'; then vs_ctl_fired nf-change-unscored "the scorer of before 14z-206 counts g_runs' run-record read as flagged — section 2d is what catches it"
+if ! echo "$out" | grep >/dev/null '^MISS	g_runs	tests/rulecheck/runs/r1/verdict.txt$'; then vs_ctl_fired nf-change-unscored "the scorer of before 14z-206 counts g_runs' run-record read as flagged — section 2d is what catches it"
 else vs_ctl_dead nf-change-unscored "the pre-14z-206 judgment still reported the run-record miss"; fail=1; fi
 split_unread "$W/tool_sp.py"
 out="$(cd "$R/tools" && python3 "$W/tool_sp.py" score --root "$RR" --traces "$W/split" --jobs 2 2>&1)"
-if ! echo "$out" | grep -q '^MISS	g_named	docs/hidden.md$'; then vs_ctl_fired split-unread "a scorer reading strace's lines raw misses the split read — section 2c is what catches it"
+if ! echo "$out" | grep >/dev/null '^MISS	g_named	docs/hidden.md$'; then vs_ctl_fired split-unread "a scorer reading strace's lines raw misses the split read — section 2c is what catches it"
 else vs_ctl_dead split-unread "the copy without re-joining still reported the split read"; fail=1; fi
 no_narrowing "$W/tool_nn.py"
 out="$(cd "$R/tools" && python3 "$W/tool_nn.py" control --root "$RR" --traces "$W/clean" --jobs 2 2>&1)"
-if echo "$out" | grep -q '^CONTROL DEAD: over-narrowed'; then vs_ctl_fired no-narrowing "a control that narrows nothing reports itself dead"
+if echo "$out" | grep >/dev/null '^CONTROL DEAD: over-narrowed'; then vs_ctl_fired no-narrowing "a control that narrows nothing reports itself dead"
 else vs_ctl_dead no-narrowing "a control narrowing nothing still claimed to fire"; fail=1; fi
 
 limit_unnamed "$W/tool_lu.py"

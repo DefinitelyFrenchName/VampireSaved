@@ -173,6 +173,7 @@ if wt then
         wtaps[#wtaps + 1] = space:install_write_tap(lo, hi, "inp_writetap", on_w)
     end
     install_w()
+    do local r = debug.getregistry(); r.vs_notifier_threads = r.vs_notifier_threads or {}; r.vs_notifier_threads[#r.vs_notifier_threads + 1] = coroutine.running() end   -- #320: keep this Lua thread alive past teardown (docs/platform/gotchas.md)
     space:add_change_notifier(function()
         for _, t in ipairs(wtaps) do t:remove() end
         wtaps = {}

@@ -93,6 +93,7 @@ end
 install()
 -- CPS-2 reinstalls handlers after boot; a tap dropped then would read as
 -- "nobody ever touched it" (the documented GOTCHA that cost a session).
+do local r = debug.getregistry(); r.vs_notifier_threads = r.vs_notifier_threads or {}; r.vs_notifier_threads[#r.vs_notifier_threads + 1] = coroutine.running() end   -- #320: keep this Lua thread alive past teardown (docs/platform/gotchas.md)
 space:add_change_notifier(function() install() end)
 
 local held = {}

@@ -1,0 +1,11 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent210/rc318/expectations.diff	2a91cc7f536ae106d1d9f26eee8668d443991b51
+build/agent210/rc318/facing_plain.log	9dbefe02faf66d77196e32dc9a4a639fe23cfac5
+build/agent210/t318/census_vsavj.txt.lines-445-470 (lines 445-470 of build/agent210/t318/census_vsavj.txt)	0a4dfe51dff71bcb3a27b55ba133b05f98fa47ab
+build/agent210/t318/explain_rc_vsavj.txt	76ab2429687bef995266792535809a267d8cc096
+build/agent210/t318/explain_rc_vsav2.txt	7bd814a39a721886f54e5d5156ee0cd430002751
+build/agent210/t318/explain_sdp2.txt	031d91bfba3f6851a5dbfd52748bb1da24bbf9d6
+build/agent210/t318/equiv.py	a8e961438f5e6766bb88f3954af1ee106be1fca3
+build/agent210/t318/gates/test_reaction_classes.freeze.log	e3fec2241896db637591b834d5bf087cb59ffa0a
+build/agent210/t318/gates/test_charmap_current.freeze.log	5e6ab70e2532712a7055d6ad3f6af39152ac1cb1
+tools/anim_nodes.py	a51b4d0c09271d84093d29bee09d30cc9f40ab49

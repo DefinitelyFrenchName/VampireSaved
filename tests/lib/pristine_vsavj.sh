@@ -40,7 +40,7 @@ _pv_check() {
     _pv_mi="$(vs_mame_ident "${MAME_BIN:-$HOME/.cache/vampire-saved/mame-ref/cps2}")" || {
         echo "FAIL: the MAME the legs run is not the pin's release:"; echo "$_pv_mi" | sed 's/^/        /'; return 1; }
     _pv_rc="$(python3 "$REPO/tools/audit_roms.py" "$_pv_rd" 2>&1)" || true
-    echo "$_pv_rc" | grep -q 'all match' || {
+    echo "$_pv_rc" | grep >/dev/null 'all match' || {
         echo "FAIL: ROMDIR is not the pristine reference set (tools/audit_roms.py against docs/checksums.txt):"
         echo "$_pv_rc" | tail -3 | sed 's/^/        /'; return 1; }
     _pv_fp="$(python3 "$REPO/tools/build_fingerprint.py" "$_pv_rd" --set vsavj --sha-only 2>/dev/null)" || true

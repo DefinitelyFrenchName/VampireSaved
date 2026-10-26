@@ -43,7 +43,9 @@ WHAT IS COMPARED, per id (the classes a VICTIM's behaviour rests on first):
            their garbage differed by game by construction); a seq that is a
            live chain on one game and invalid on the other is listed per row
            as `invalid_one_side`, never as a content difference (run 27:
-           Demitri's c:0x2e is live on vsavj and out_of_region on vs2); the
+           Demitri's c:0x2e is live on vsavj and out_of_region on vs2 —
+           RETRACTED by #318: c:0x2e is a NEGATIVE entry the unsigned walk read
+           64 KiB past its chain; read signed it is live and equal on both); the
            sprite-record pointer is the one node field not compared (it is
            relocated between games). A node whose boxes cannot be resolved is
            counted per row (`unresolved_nodes`), never read as equal. The first

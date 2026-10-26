@@ -5,7 +5,10 @@ Reads the traces tools/trace_controls.sh wrote (one or more trace directories; e
 out/<gate>.<control>.out and done.tsv, whose 5th column is the repository root that control ran in) and, per gate,
 lists every path written by TWO OR MORE of its controls and every path one control writes and another reads. A write
 is a successful open/openat/creat with O_WRONLY, O_RDWR or O_CREAT (its path the absolute one strace -y printed), or a
-rename's target (a relative target is kept as written, its cwd unknown, and listed apart). /dev, /proc, /sys, pipes
+rename's target. A RELATIVE rename target is placed (#321, 14z-210: five emulator gates read SHARED only on a
+relative `vsavjw.zip`, every one inside its own mktemp dir) by the directory strace -y printed for its renameat
+dirfd (`AT_FDCWD</dir>` or `N</dir>`), else by the same pid's last `AT_FDCWD</dir>`; one that cannot be placed is kept as
+written and listed apart, which reads SHARED. /dev, /proc, /sys, pipes
 and sockets are ignored; a path under a control's own mktemp directory (/tmp/tmp.*, /tmp/<name>.<6+ random>) differs
 per control and cannot collide; Python's bytecode caches (__pycache__/*.pyc) are written atomically and are already
 shared across gates, so they are set aside. A gate is HOLLOW when every one of its control runs printed a SKIP line:
@@ -20,6 +23,8 @@ if "--root" in args:
     i = args.index("--root"); default_root = args[i + 1].rstrip("/") + "/"; del args[i:i + 2]
 OPEN_RET = re.compile(r'^(\d+)\s+(?:open|openat|creat)\((.*)\)\s+=\s+(\d+)<([^>]*)>')
 RENAME = re.compile(r'^(\d+)\s+rename(?:at2?)?\((.*)\)\s+=\s+0')
+CWD = re.compile(r'AT_FDCWD<([^>]*)>')
+NEWDIR = re.compile(r'<([^>]*)>,\s*"((?:[^"\\]|\\.)*)"(?:,\s*[A-Z_|0-9]+)?\s*$')   # renameat's new dirfd, then the target
 UNF = re.compile(r'^(\d+)\s+(\w+)\((.*) <unfinished \.\.\.>\s*$')
 RES = re.compile(r'^(\d+)\s+<\.\.\. (\w+) resumed>(.*)$')
 TMP = re.compile(r"^/tmp/(tmp\.|[^/]*\.[A-Za-z0-9]{6,}(/|$))")
@@ -44,7 +49,12 @@ def lines(path):  # strace's lines with every split call re-joined (#283)
 
 def writes(path, root):
     out, rel, rd = set(), set(), set()
+    cwd = {}   # pid -> its last AT_FDCWD directory, as strace -y printed it
     for line in lines(path):
+        pid = line.split(None, 1)[0] if line[:1].isdigit() else None
+        c = CWD.search(line)
+        if pid and c:
+            cwd[pid] = c.group(1)
         m = OPEN_RET.match(line)
         if m:
             a, p = m.group(2), m.group(4)
@@ -58,6 +68,11 @@ def writes(path, root):
             q = re.findall(r'"([^"]*)"', m.group(2))
             if q:
                 t = q[-1]
+                if not t.startswith("/"):
+                    d = NEWDIR.search(m.group(2))
+                    base = d.group(1) if d and d.group(2) == t else cwd.get(m.group(1))
+                    if base and base.startswith("/"):
+                        t = os.path.normpath(os.path.join(base, t))
                 (out if t.startswith("/") else rel).add(t[len(root):] if t.startswith(root) else t)
     return out, rel, rd
 

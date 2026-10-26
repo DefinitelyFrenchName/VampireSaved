@@ -88,7 +88,13 @@
 # deviation from that table still fails loudly with a measured shape and
 # a proposed line, and is a RATIFICATION question, never a re-freeze.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [MERGED_OUT=build/merged1] [MERGED_PREBUILT=0] [MERGED_EXPECT=tests/expected/merged1] tests/audit_merged_legacy.sh [--freeze-clock]
+# Usage: ROMDIR=... [MAME_BIN=...] [MERGED_OUT=build/merged1] [MERGED_PREBUILT=0] [MERGED_EXPECT=tests/expected/merged1] [MERGED_JOBS=N] tests/audit_merged_legacy.sh [--freeze-clock]
+#
+# MERGED_JOBS (14z-210, #321, maintainer-ruled 2026-10-26 "merged_legacy queue (Recommended)"): leg (a)'s masked replays
+# are independent MAME runs, each in its own sandbox, so they are made first through ONE queue, MERGED_JOBS at a time
+# (default min(6, CPUs/4), at least 1, test_mame_wide's WIDE_JOBS rule), and the loop then judges them in order, its
+# output the serial run's. Until then they ran one at a time: 1,151 s alone on ERIS at about one core, the tier's
+# second-longest row (fork K, build/agent210/t321k/, local). A run that fails reads RUN-FAIL, as before.
 # On-demand: builds build/merged1 and runs the legs below (~2 h since
 # 14z-89 — leg (a) is a GLOB over tests/expected/merged1/*.masked and
 # that set grew 14 -> 45 .masked with the legacy-pairing promotion; it was
@@ -144,6 +150,10 @@ export MAME_BIN
 # (op-count assert + member identity still run — a prebuilt dir is trusted
 # for its bytes, never for its shape).
 OUT="${MERGED_OUT:-build/merged1}"
+# A CONTROL MODE BUILDS PRIVATELY (#321, 14z-210): the PILOT write trace found both modes rebuilding build/merged1, so two
+# run side by side would write one tree; a mode now builds into its own temp dir (the plain run keeps build/merged1).
+_MODE_OUT=""
+if [ -n "${CONTROL:-}" ] && [ -z "${MERGED_OUT:-}" ]; then _MODE_OUT="$(mktemp -d)"; OUT="$_MODE_OUT/merged1"; fi
 PREBUILT="${MERGED_PREBUILT:-0}"
 WIDE_ZIP="${WIDE_ROMSET:-$PWD/build/wide0/rompath/vsavjw.zip}"
 EXPECT="${MERGED_EXPECT:-tests/expected/merged1}"   # the merged build's OWN class table; MERGED_EXPECT= re-targets it (14z-133b: the SHIPPED set, tests/expected/merged-m16, measured with MERGED_PREBUILT=1)
@@ -180,7 +190,7 @@ if [ -n "$missing" ]; then
     exit 0
 fi
 
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
+W="$(mktemp -d)"; trap 'rm -rf "$W" ${_MODE_OUT:+"$_MODE_OUT"}' EXIT
 fail=0
 FREEZE_CLOCK=0; [ "${1:-}" = "--freeze-clock" ] && FREEZE_CLOCK=1
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
@@ -406,6 +416,20 @@ done
 echo "leg (a) coverage: $_eval/$((_eval+_noteval)) legacy pairings evaluated, $_noteval NOT EVALUATED (.pending)"
 
 : > "$W/summary"
+# THE RUNS FIRST (MERGED_JOBS, #321): every leg-(a) replay not already run (03 ran in section 0b), queued; each run's exit
+# status beside its log in $W/a_<name>.rc, which the loop reads before the log (a failed run may leave a partial log)
+if [ -z "${MERGED_JOBS:-}" ]; then
+    _np="$(getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)"
+    MERGED_JOBS=$(( _np / 4 )); [ "$MERGED_JOBS" -le 6 ] || MERGED_JOBS=6; [ "$MERGED_JOBS" -ge 1 ] || MERGED_JOBS=1
+fi
+if [ "$MERGED_JOBS" -gt 1 ]; then   # MERGED-QUEUE
+    for spec in "$EXPECT"/*.masked; do
+        name="$(basename "$spec" .masked)"; [ -f "$W/a_$name.log" ] || printf '%s\n' "$name"
+    done > "$W/a_queue"
+    MASK="$MASK" MERGED_RP="$MERGED_RP" W="$W" xargs -P "$MERGED_JOBS" -I{} sh -c '
+        MASK_RANGES="$MASK" MAME_ROMPATH="$MERGED_RP" tools/run_replay_mame.sh vsavjw "tests/replays/$1.rpl" \
+            "$W/a_$1.log" "$W/abox_$1" >/dev/null 2>&1; echo "$?" > "$W/a_$1.rc"' _ {} < "$W/a_queue"
+fi
 for spec in "$EXPECT"/*.masked; do
     name="$(basename "$spec" .masked)"
     printf '%-24s ' "$name"
@@ -422,6 +446,11 @@ for spec in "$EXPECT"/*.masked; do
     class=${sline%% *}; rest=${sline#* }; base=${rest%% *}; args=${rest#* }
     baselog="$REPO/tests/expected/$base/logs/$name.log"
     log="$W/a_$name.log"
+    if [ -f "$W/a_$name.rc" ] && [ "$(cat "$W/a_$name.rc")" != 0 ]; then   # a queued run that failed (#321)
+        echo "RUN-FAIL"; fail=1
+        printf '%s|%s|RUN-FAIL|-\n' "$name" "$class" >> "$W/summary"
+        continue
+    fi
     if [ ! -f "$log" ]; then    # 03 already ran in section 0b
         MASK_RANGES="$MASK" MAME_ROMPATH="$MERGED_RP" \
             tools/run_replay_mame.sh vsavjw "tests/replays/$name.rpl" \

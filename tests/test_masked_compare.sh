@@ -109,7 +109,7 @@ check() {
         fail=1
         return
     fi
-    if [ -n "$_want" ] && ! printf '%s' "$out" | grep -q "$_want"; then
+    if [ -n "$_want" ] && ! printf '%s' "$out" | grep >/dev/null "$_want"; then
         echo "  FAIL  $_l (rc ok, but the verdict did not mention '$_want')"
         printf '%s\n' "$out" | sed 's/^/        /'
         fail=1

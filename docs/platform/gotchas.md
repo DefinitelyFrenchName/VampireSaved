@@ -434,7 +434,8 @@ on a MAME segfault at TEARDOWN after a complete log (`test_select_wheel`
 12 of 12 runs under a 24-way parallel load, 0 of 4 at 5-way); both now
 read the END line or the dumps. Removing the superseded tap before
 re-installing (`read_tap.lua`'s pattern) cut the rate to 5 of 12 but did
-not remove it: the crash is not root-caused.
+not remove it: the crash is not root-caused. **RESOLVED 14z-210 (#320):** the teardown crash is the change
+notifier's, not the tap's — see "MAME 0.288's `add_change_notifier` KEEPS ITS CALLBACK ON THE CALLING LUA THREAD" below.
 
 ## OBJ RAM dumps span BOTH pages — filter by code range and you will
 ## blame the wrong drawer
@@ -490,7 +491,8 @@ MAME segfaults with no Lua error and no diagnostic. `tap_writes.lua`
 carries an `installing` flag for exactly this reason; new instruments
 must copy it. (Separately: MAME can segfault during teardown AFTER
 `manager.machine:exit()`. The log is already written, so scripted audits
-must assert on the instrument's own SUMMARY line, never on the exit code.)
+must assert on the instrument's own SUMMARY line, never on the exit code.
+Root-caused 14z-210, #320: the change notifier's Lua thread, see below.)
 
 ## FBNeo's d_cps2.cpp is not valid UTF-8, and SKIPDEPEND hides driver edits
 Two traps when scripting FBNeo descriptor changes. (1) `d_cps2.cpp`
@@ -3021,6 +3023,18 @@ The retry makes the race rare, not impossible: a twice-incomplete run is answere
 re-running the tier, never by passing the gate by hand.
 Since 14z-185b (#188) the gate carries `# ORDER: last`, so it and its controls run after every other
 gate of the static tier; the race's cause is still not measured.
+**MEASURED AND RESOLVED, 14z-210 (#311; Chrome 154, the Mac).** The driver logged `performance.now()` at each step
+(`build/agent210/t311/s2_*/`, local). The driver's own 48 MB of `file://` fetches cost about 35 virtual ms, because a
+pending fetch pauses virtual time. The PAGE's `File.arrayBuffer()` reads of the dropped files are blob reads, and nothing
+pauses them: one read jumped virtual time by 103,000 to 1,260,000 ms in 11-20 ms of wall time, over 10 unloaded runs
+against a budget of 1,800,000. The builds cost 0. Beside 12 busy loops, the budget ran out inside that read in 8 of 10
+runs. **The rule:** a virtual-time budget cannot bound a page that waits on blob reads, crypto or other off-thread work.
+No budget size is safe, because a larger budget also delays the dump after the page is done. Read such a page over the
+DevTools pipe (`--remote-debugging-pipe`) on wall time, and end the run on the page's own completion marker. The gate
+has worked that way since #311. Gate runs, before and after: unloaded, 10/10 PASS both times. Loaded, before: 2/10
+PASS. The page leg completed first time in 1 run, on the retry in 2, and not at all in 7, and one of the retried runs
+then failed on its control leg. Loaded, after: 10/10 PASS, every leg first time
+(`build/agent210/t311/{before,after}_{unloaded,loaded}/runs.txt`).
 
 ## A SUBAGENT WITH NO `effort` LINE RUNS AT ITS CALLER'S EFFORT, AND THE CALLER'S `model` BEATS THE DEFINITION'S — a cap written in `.claude/agents/<name>.md` alone does not hold (measured 2026-09-23, 14z-177, Claude Code 2.1.280, and all twelve legs re-run on 2.1.281 after it updated mid-session)
 
@@ -3375,6 +3389,8 @@ passeq` is the check). A matching game clock does not prove a matching sample.
 
 ## A MAME WRITE TAP THAT READS MEMORY OR `cpu.state` INSIDE ITS CALLBACK CRASHED MAME AT TEARDOWN — and write taps crash there intermittently anyway (paid: 14z-205, #229, fork F1; seen again 14z-205b, R1)
 
+**ROOT-CAUSED (#320):** the crash is the change notifier's, see "MAME 0.288's `add_change_notifier`" below.
+
 Building `tests/lua/specials_trace.lua` (#229's specials gate), fork F1 found that reading memory or the CPU state
 from inside a write-tap callback, or tapping the words from the first frame on, crashed MAME at teardown. Following
 the node from the game's own writes to `+0x1C`/`+0x1E`, with no read inside the tap, removed that cause, but not the
@@ -3382,7 +3398,8 @@ crash: on 13 rigs run two at a time, MAME exited 139 at teardown after writing e
 `tap_writes.lua` and 3 of 13 under the new instrument; on 14z-205b's R1 (PILOT), all three trace legs did. This is
 the class of "MAME Lua write taps are silently dropped on handler re-install" above, whose rule stands: judge a tap
 run by its own END or SUMMARY line, never by MAME's exit code. What #229 adds: reading inside a tap is a cause of its
-own, avoidable; the remaining crash is not root-caused. **The rule:** a write-tap callback records the written value
+own, avoidable; the remaining crash is not root-caused (RESOLVED 14z-210, #320: the crash is the change notifier's
+Lua thread, freed by the GC; see "MAME 0.288's `add_change_notifier`" below). **The rule:** a write-tap callback records the written value
 and the frame and reads nothing else; a gate accepts exit 0, or 139 with every one of its output lines present
 (field, tick and ALIGN lines in `tests/audit_vanilla_specials_a.sh`), and fails any other exit.
 
@@ -3426,7 +3443,8 @@ On PILOT (Chrome for Testing 155), `tests/test_applier_page_browser.sh` PASSes u
 virtual-time budgets of 1.8e6, 1.8e7 and 1.8e8 ms alike, so no timeout fixes it (`build/agent207/P/close/summary.txt`,
 local). The snap Chromium does not start under strace at all (*"snap-confine ... cap_dac_override not found"*).
 **The rule:** a browser-driven gate cannot be traced with `strace -f`; `TRACE_LIMITS` names it (#281) and every score
-says it is untraced.
+says it is untraced. Since #311 (14z-210) the gate reads Chrome over the DevTools pipe on wall time rather than a
+virtual-time budget. Whether the traced stall survives that change has not been measured.
 
 ## LINUX PYTHON WRITES `__pycache__/` BESIDE THE MODULE; APPLE'S PYTHON DOES NOT (paid: 14z-208b/14z-208c, #326)
 
@@ -3455,3 +3473,23 @@ game IS, not when a sample was taken, so it passes through it.
 and tag every sample of a `-debug` leg with the pass it belongs to (the pass counter's own writes), then assert the two
 legs' passes agree (`tools/specials_b_rigs.py passeq`, run by the gate on every run). Any per-frame sample of a `-debug`
 leg can show it.
+
+## MAME 0.288's `add_change_notifier` KEEPS ITS CALLBACK ON THE CALLING LUA THREAD — the GC frees that thread, and `~address_space` segfaults at teardown (exit 139 after every output) (paid: 14z-210, #320)
+
+MAME runs the autoboot script, and every `register_frame_done` callback, on a NEW Lua thread (`lua_engine::invoke`,
+`src/frontend/mame/luaengine.h`). `install_write_tap` re-binds its callback to the main state; `add_change_notifier`
+(`luaengine_mem.cpp`) does not: the delegate stored in the address space keeps a reference on the calling thread, which
+nothing else holds once the script returns. When the GC has collected that thread, `~address_space` → `~notifier` →
+`luaL_unref` reads freed memory and MAME exits 139 after every output is written. All 24 macOS crash reports of the
+pinned `cps2` MAME (0.288) dated 2026-10-25 show that stack (`~/Library/Logs/DiagnosticReports`, local). Intermittent because it waits on a GC cycle: `collectgarbage()` before `machine:exit()` makes it certain (one
+`read_u16` inside `tap_writes.lua`'s tap did not raise the rate: 0/30).
+
+Measured on vsavj (`build/agent210/t320/results_batch1.tsv`, `results_batch2.tsv`, local; 30 legs per variant,
+interleaved, two at a time): forced GC 30/30 crashed; the same with the calling thread pinned 0/30; notifier only (no tap)
+30/30; tap only (no notifier) 0/30; `tap:remove()` + `notifier:unsubscribe()` before exit 30/30 (unsubscribing leaves the
+delegate in place, and the `remove()` itself fires the notifier on the dead thread). Natural rate: `specials_trace.lua`
+12 of 60, pinned 0 of 30; `tap_writes.lua` 0 of 30 on one rig (14z-205 saw 2 of 13).
+
+**The rule:** pin the thread that calls `add_change_notifier`. Every instrument in `tests/lua/` carries the same line
+before the call (`debug.getregistry().vs_notifier_threads`, filled with `coroutine.running()`). Removing the tap or
+unsubscribing does not fix it. Gates still judge a leg by its full output (#320).

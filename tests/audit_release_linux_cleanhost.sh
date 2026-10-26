@@ -50,7 +50,7 @@ command -v podman >/dev/null 2>&1 || { echo "SKIP: podman is not installed on th
 [ -n "${ROMDIR:-}" ] && [ -d "$ROMDIR" ] || { echo "FAIL: set ROMDIR to the reference dumps"; exit 1; }
 ROMDIR="$(cd "$ROMDIR" && pwd)"
 IMAGE="${IMAGE:-docker.io/library/ubuntu:24.04}"
-echo "  head  $(git describe --always --dirty --abbrev=40 2>/dev/null || echo no git); host $(hostname) $(uname -sm); podman $(podman --version | awk '{print $3}'); image $IMAGE"
+echo "  head  $(GIT_OPTIONAL_LOCKS=0 git describe --always --dirty --abbrev=40 2>/dev/null || echo no git); host $(hostname) $(uname -sm); podman $(podman --version | awk '{print $3}'); image $IMAGE"
 
 # The packages that provide the list's sonames on Ubuntu 24.04 (C0 checks the list is covered), and the two extras.
 PKGS="libc6 libgcc-s1 libstdc++6 libatomic1 libnsl2 zlib1g libexpat1 libglib2.0-0t64 libgl1 libice6 libsm6 libx11-6
@@ -58,7 +58,9 @@ PKGS="libc6 libgcc-s1 libstdc++6 libatomic1 libnsl2 zlib1g libexpat1 libglib2.0-
  libwayland-egl1 libdrm2 libgbm1 libasound2t64 libpulse0 libudev1 python3 xvfb"
 
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
-OUT="$REPO/build/cleanhost_release"; rm -rf "$OUT"; mkdir -p "$OUT"
+# a control mode writes privately (#321, 14z-210); the plain run keeps build/cleanhost_release, its registered output
+OUT="$REPO/build/cleanhost_release"; [ -n "${CONTROL:-}" ] && OUT="$W/out"
+rm -rf "$OUT"; mkdir -p "$OUT"
 
 # ---- the release under test (the desktop gate's rule) and its assets ------------------------------------------
 NAME="${RELEASE:-}"

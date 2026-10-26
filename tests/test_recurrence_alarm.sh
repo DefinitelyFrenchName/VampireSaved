@@ -36,10 +36,10 @@ if [ -z "${VS_CTL:-}" ] || vs_ctl_is through-ignored; then
 echo "== 1. the alarm's verdict logic on a synthetic ledger (--selftest)"
 v=""; vs_ctl_is through-ignored && { v="--through-ignored"; echo "MODE: control through-ignored — the self-test runs the variant whose acknowledgements cover future runs too"; }
 out="$(python3 tools/recurrence_alarm.py --selftest $v 2>&1)"
-if printf '%s\n' "$out" | grep -q '^SELFTEST PASS'; then ok "$(printf '%s\n' "$out" | tail -1)"
-elif printf '%s\n' "$out" | grep -q '^SELFTEST FAIL'; then
+if printf '%s\n' "$out" | grep >/dev/null '^SELFTEST PASS'; then ok "$(printf '%s\n' "$out" | tail -1)"
+elif printf '%s\n' "$out" | grep >/dev/null '^SELFTEST FAIL'; then
     bad "$(printf '%s\n' "$out" | grep 'WRONG\|^SELFTEST' | tr '\n' ' ' | cut -c1-200)"
-    if vs_ctl_is through-ignored && ! printf '%s\n' "$out" | grep -q 'WRONG: occurrences after the acknowledged run recur afresh'; then
+    if vs_ctl_is through-ignored && ! printf '%s\n' "$out" | grep >/dev/null 'WRONG: occurrences after the acknowledged run recur afresh'; then
         echo "REFUSED: mode through-ignored — the self-test failed, but not on the recurs-afresh case"; exit 3; fi
 else echo "REFUSED: tools/recurrence_alarm.py --selftest printed no SELFTEST line (a crash, not a verdict): $(printf '%s\n' "$out" | tail -1 | cut -c1-160)"; exit 3; fi
 fi
@@ -49,10 +49,10 @@ echo "== 2. the real ledger: every recurring finding acknowledged by a ticket"
 a=""; vs_ctl_is ack-dropped && { a="--ack $W/empty.tsv"; echo "MODE: control ack-dropped — the real ledger judged with an empty acknowledgement file"; }
 # shellcheck disable=SC2086
 out="$(python3 tools/recurrence_alarm.py $a 2>&1)"; rc=$?
-if [ "$rc" = 0 ] && printf '%s\n' "$out" | grep -q '^recurrence: .* 0 not$'; then ok "$(printf '%s\n' "$out" | head -1)"
-elif [ "$rc" = 1 ] && printf '%s\n' "$out" | grep -q '^RECURRING: '; then
+if [ "$rc" = 0 ] && printf '%s\n' "$out" | grep >/dev/null '^recurrence: .* 0 not$'; then ok "$(printf '%s\n' "$out" | head -1)"
+elif [ "$rc" = 1 ] && printf '%s\n' "$out" | grep >/dev/null '^RECURRING: '; then
     bad "$(printf '%s\n' "$out" | head -1)"; printf '%s\n' "$out" | grep '^RECURRING: ' | head -10 | cut -c1-200 | sed 's/^/        /'
-    if vs_ctl_is ack-dropped && ! printf '%s\n' "$out" | grep -q '^RECURRING: QP3 2550 + 2560 '; then
+    if vs_ctl_is ack-dropped && ! printf '%s\n' "$out" | grep >/dev/null '^RECURRING: QP3 2550 + 2560 '; then
         echo "REFUSED: mode ack-dropped — the alarm failed, but not on the plant readers' 2550 + 2560"; exit 3; fi
 else echo "REFUSED: tools/recurrence_alarm.py exited $rc with no verdict (a crash or a refused acknowledgement): $(printf '%s\n' "$out" | tail -1 | cut -c1-160)"; exit 3; fi
 fi

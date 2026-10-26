@@ -163,7 +163,8 @@ cd "$REPO"
 [ ! -f "$REPO/tests/lib/collation.sh" ] || { . "$REPO/tests/lib/collation.sh"; vs_pin_collation; }   # COLLATION-PIN: byte-order sort/ls for every gate (#278); absent only in a runner test's synthetic repo
 
 _ORIG_ARGS="$*"   # the command line as given, for the run record (#189) — the loop below shifts it away
-STRICT=0; TIER=all; LIST=0; EXEC_CTL=all; CADENCE=session; CONFIRM=""; REUSE=""; JOBS="${STATIC_JOBS:-1}"
+STRICT=0; TIER=all; LIST=0; EXEC_CTL=all; CADENCE=session; CONFIRM=""; REUSE=""; RUN_JOBS="${STATIC_JOBS:-1}"
+# RUN_JOBS, never JOBS (#321, 14z-210): a gate reads JOBS for its own legs, so an exported JOBS took the runner's count
 while [ $# -gt 0 ]; do
     case "$1" in
     --strict) STRICT=1 ;;
@@ -173,7 +174,7 @@ while [ $# -gt 0 ]; do
     --cadence) shift; CADENCE="${1:?--cadence needs session|freeze|release|ondemand}" ;;
     --confirm) shift; CONFIRM="${1:?--confirm needs the results.tsv of a previous run}" ;;
     --reuse)   shift; REUSE="${1:?--reuse needs the results.tsv of the freeze run}" ;;
-    --jobs)    shift; JOBS="${1:?--jobs needs a number}" ;;
+    --jobs)    shift; RUN_JOBS="${1:?--jobs needs a number}" ;;
     -h|--help) sed -n '2,40p' "$0"; exit 0 ;;
     *) echo "unknown argument '$1' (try --help)" >&2; exit 2 ;;
     esac
@@ -556,6 +557,7 @@ run_tier() {  # run_tier <label> <names>
 #   REFUSED   the gate does not honour the mode (a declared name it never reads)
 #   DIED      a shell error line or a traceback — a crash is not a verdict
 #             ([VSP-108]: distinguish "rejected" from "died")
+#   UNJUDGED  a `NOT JUDGED: ` line — the mode run measured nothing (#310, tests/lib/classify.sh)
 # Every row lands in the tally as a failure when it is not HONOURED.
 exec_controls() {  # exec_controls <gate> <tier-label>
     case "$EXEC_CTL" in
@@ -594,8 +596,8 @@ exec_controls() {  # exec_controls <gate> <tier-label>
 # the gate is listed in tests/controls_concurrent.txt (its controls share nothing they write), otherwise one job running
 # them in turn — so one gate's controls no longer hold one slot while the others idle.
 pre_run() {  # pre_run <tier label> <names>
-    case "$JOBS" in ''|*[!0-9]*) echo "bad --jobs '$JOBS'" >&2; exit 2 ;; esac
-    [ "$JOBS" -gt 1 ] || return 0
+    case "$RUN_JOBS" in ''|*[!0-9]*) echo "bad --jobs '$RUN_JOBS'" >&2; exit 2 ;; esac
+    [ "$RUN_JOBS" -gt 1 ] || return 0
     mkdir -p "$WORK/pre"; _todo=""; _late=""
     for _g in $2; do
         if [ -n "$CONFIRM" ] && awk -F'\t' -v g="$_g" '$1 == "CARRY" && $2 == g {f = 1} END {exit !f}' "$WORK/plan.tsv"; then continue; fi
@@ -605,10 +607,10 @@ pre_run() {  # pre_run <tier label> <names>
     done
     _p0=$(date +%s)
     # shellcheck disable=SC2086
-    python3 tests/lib/static_pool.py "$JOBS" "$WORK" "$EXEC_CTL" "$1" $_todo 2>> "$WORK/pre/jobs.err" | sed 's/^/  /' || true   # POOL-SPLIT (#312)
+    python3 tests/lib/static_pool.py "$RUN_JOBS" "$WORK" "$EXEC_CTL" "$1" $_todo 2>> "$WORK/pre/jobs.err" | sed 's/^/  /' || true   # POOL-SPLIT (#312)
     for _g in $_late; do sh tests/lib/static_job.sh "$_g" "$WORK" "$EXEC_CTL" "$1" 2>> "$WORK/pre/jobs.err" || true; done
     [ -z "$RUNREC" ] || [ ! -f "$WORK/pre/pool_$1.tsv" ] || cp "$WORK/pre/pool_$1.tsv" "$RUNREC/pool_$1.tsv"   # each job's slot, start and end (#312)
-    echo "== $1 tier: $(printf '%s\n' $_todo $_late | awk 'NF' | wc -l | tr -d ' ') gate(s) run in $JOBS parallel jobs, $(( $(date +%s) - _p0 )) s =="
+    echo "== $1 tier: $(printf '%s\n' $_todo $_late | awk 'NF' | wc -l | tr -d ' ') gate(s) run in $RUN_JOBS parallel jobs, $(( $(date +%s) - _p0 )) s =="
 }
 
 PORTABLE_RUN="$(cad_select "$PORTABLE")"

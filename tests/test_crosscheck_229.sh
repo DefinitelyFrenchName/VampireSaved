@@ -12,7 +12,8 @@
 #   prose cell) for a hit series; CONTACT rows kept out of a specials timing verdict; an UNRESOLVED ES/EX row and a
 #   projectile counted uncomparable with their reasons; a command-throw row that never grabs; the guard cancels'
 #   timing read from the HIT and never the whiff (#229 Q6) and their damage read as DEALT on the -3 victim, never
-#   from the Demitri event (Q5); the normal throws ground and air, the air rows joined on key AIR.
+#   from the Demitri event (Q5); a row NAMED a guard cancel but typed otherwise reported NOT RUN with its reason (#331:
+#   Demitri's four Demon Cradle GC rows); the normal throws ground and air, the air rows joined on key AIR.
 # HOW: one Python program (below) builds every fixture, calls the functions and compares each got verdict with its
 #   expected one; CONTROL=<name> or the in-gate control loop re-runs it with that control's perturbation.
 # EXPECTS: every case's verdict equals its expected one (the case table below), and each control's perturbation makes
@@ -137,6 +138,13 @@ check("gc startup on the hit", cf.classify(pairs["startup"])[0], "CONSTANT OFFSE
 check("gc dealt red", cf.classify(pairs["red (dealt, -3 victim)"])[0], "EXACT")
 check("gc dealt white", cf.classify(pairs["white (dealt, -3 victim)"])[0], "EXACT")
 check("gc joined", st.get("JOINED"), 2)
+# 6b. #331: a row NAMED a guard cancel but typed `special` is reported NOT RUN with its reason, never silently dropped
+wbn = WB({"XX": [{"type": "special", "move": "LP FOO GC"}, {"type": "special GC", "move": "MP FOO GC"},
+                 {"type": "special", "move": "FOO"}],
+          "YY": [{"type": "es special", "move": "ES BAR GC "}]})
+nr = x.gc_named_untyped(wbn, ("special gc", "es special gc", "gc", "es gc"), ["YY"])
+check("gc named untyped rows", [(t, i) for t, i, *_ in nr], [("XX", 0), ("YY", 0)])
+check("gc named untyped no-rig reason", ["no guard-cancel rig" in w for *_, w in nr], [True, False])
 
 # 7. the normal throws, ground and air
 def gtrow(key, inp, press_to_hold, recs, meter=9):
@@ -175,7 +183,7 @@ else
     for c in "flipped-expectation:es red" "whiff-for-hit:gc startup on the hit" "record-for-dealt:gc dealt red" "contact-counted:sb startup"; do
         name="${c%%:*}"; target="${c#*:}"
         d="$(cases "$name" 2>&1 | grep '^DIFF ')"
-        if echo "$d" | grep -q "^DIFF $target got="; then vs_ctl_fired "$name" "$(echo "$d" | grep "^DIFF $target got=" | head -1)"
+        if echo "$d" | grep >/dev/null "^DIFF $target got="; then vs_ctl_fired "$name" "$(echo "$d" | grep "^DIFF $target got=" | head -1)"
         else vs_ctl_dead "$name" "its target case '$target' did not differ (differences: $(echo "$d" | wc -l | tr -d ' '))" || fail=1; fi
     done
 fi

@@ -121,19 +121,19 @@ if [ "$RC" = 0 ]; then
 else
     echo "  ok: audit exited $RC"
 fi
-if echo "$OUT" | grep -q "DEAD RIG"; then
+if echo "$OUT" | grep >/dev/null "DEAD RIG"; then
     echo "  ok: the leg is named dead, not scored as evidence"
 else
     echo "FAIL: dead rig was not identified as such"; fail=1
 fi
-if echo "$OUT" | grep -qE '^ *ok: .* -> runs'; then
+if echo "$OUT" | grep -E >/dev/null '^ *ok: .* -> runs'; then
     echo "FAIL: a leg still scored 'runs' with no emulator output"; fail=1
 else
     echo "  ok: no leg scored 'runs'"
 fi
 # The anti-SKIP clause: ~33 gates in this repo exit 0 on missing inputs, and a
 # control that a SKIP could satisfy proves nothing.
-if echo "$OUT" | grep -q '^SKIP'; then
+if echo "$OUT" | grep >/dev/null '^SKIP'; then
     echo "FAIL: audit SKIPped — this control measured nothing"; fail=1
 else
     echo "  ok: audit did not skip"
@@ -151,7 +151,7 @@ set +e
 OUT="$(BUILDER_CMD="$WORK/builder" GUARDED_RUNNER="$WORK/runner_empty" \
        ROMDIR="$ROMDIR" "$REPO/$AUDIT" 2>&1)"; RC=$?
 set -e
-if [ "$RC" != 0 ] && echo "$OUT" | grep -q "DEAD RIG"; then
+if [ "$RC" != 0 ] && echo "$OUT" | grep >/dev/null "DEAD RIG"; then
     echo "  ok: an END-less log is dead, not 'runs'"
 else
     echo "FAIL: an empty log did not fail the audit (rc=$RC)"; fail=1

@@ -36,7 +36,9 @@
 # THE PARITY GATE is tests/audit_trap_parity.sh (frozen per-attempt
 # inventories, ours vs native; forbids 0739/073a on ours).
 #
-# Usage: ROMDIR=... tests/audit_trap_sound.sh [builddir]   (~10 min, 2 runs)
+# Usage: ROMDIR=... tests/audit_trap_sound.sh [builddir]   (2 runs; 9 s on the Mac at 14z-210, ~10 min at 14z-82d)
+#   builddir defaults to the current huitzil freeze build, made by the four-track recipe (HANDOFF "Running a CPS-2
+#   WIDE build"); the registry row passes %HUI% (#328, 14z-210: it defaulted to build/hui30 until then).
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -57,7 +59,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-BUILD="${1:-build/hui30}"
+BUILD="${1:-build/hui61}"  # re-pointed 14z-210 (#328) <- build/hui30, a pre-M23 build no clean clone has
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
 [ -d "$BUILD/rompath" ] || { echo "SKIP: no build at $BUILD"; exit 0; }

@@ -67,8 +67,8 @@ decrypt_view vsavj "$W/vsavj_op.bin" "$W/vsavj_data.bin"
 JIMG="$W/vsavj_data.bin"; [ -f "$JIMG" ] || JIMG="$REPO/build/out/vsavj_data.bin"
 jout=$(python3 "$REPO/tools/obj_records.py" "$JIMG" --base 0 \
     --start 0x248B88 --end 0x26AB88)
-echo "$jout" | grep -q "unique expanded tiles 18094" \
-    && echo "$jout" | grep -q "band 0xAD3D-0xEEBB: 16707 tiles" \
+echo "$jout" | grep >/dev/null "unique expanded tiles 18094" \
+    && echo "$jout" | grep >/dev/null "band 0xAD3D-0xEEBB: 16707 tiles" \
     && echo "  ok: Jedah OBJ inventory locked (18094 tiles; main band 0xAD3D-0xEEBB)" \
     || { echo "FAIL: Jedah OBJ inventory drifted:"; echo "$jout" | head -3; fail=1; }
 

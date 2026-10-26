@@ -65,25 +65,25 @@ $(python3 tools/tmp_hygiene.py --root "$W/t" "$EXTRA" 2>&1)"   # the mode: the p
 echo "$out" | sed 's/^/  /' | tail -12
 if [ -z "$EXTRA" ]; then [ "$rc" = 0 ] && ok "no uncleaned temporary in the tree" || bad "an uncleaned temporary (above)"
 else
-    echo "$out" | grep -q '^UNCLEANED\|^UNSANDBOXED' && { echo "FAIL: test_tmp_hygiene (control mode: the planted site was named)"; exit 1; }
+    echo "$out" | grep >/dev/null '^UNCLEANED\|^UNSANDBOXED' && { echo "FAIL: test_tmp_hygiene (control mode: the planted site was named)"; exit 1; }
     echo "FAIL: test_tmp_hygiene — the planted site was not named"; exit 1
 fi
 
 echo "== 2. known answers on a synthetic tree"
 out="$(python3 tools/tmp_hygiene.py --root "$W/t" tools/clean.py tests/clean.sh 2>&1)"
-if echo "$out" | grep -q '^UNCLEANED\|^UNSANDBOXED'; then bad "a clean form was named: $(echo "$out" | grep -m1 'UNCLEANED\|UNSANDBOXED')"
+if echo "$out" | grep >/dev/null '^UNCLEANED\|^UNSANDBOXED'; then bad "a clean form was named: $(echo "$out" | grep -m1 'UNCLEANED\|UNSANDBOXED')"
 else ok "five clean forms and three sandboxed runner calls read clean ($(echo "$out" | tail -1))"; fi
 echo "$out" | tail -1 | grep -q ' 3 emulator-runner call(s) read' && ok "the three runner calls were read" || bad "the synthetic runner calls were not all read: $(echo "$out" | tail -1)"
 
 echo "== 3. controls"
 out="$(python3 tools/tmp_hygiene.py --root "$W/t" tools/planted.py 2>&1)"
-if echo "$out" | grep -q '^UNCLEANED	tools/planted.py:3	f	mkdtemp	d$'; then vs_ctl_fired planted-mkdtemp "$(echo "$out" | grep -m1 UNCLEANED)"
+if echo "$out" | grep >/dev/null '^UNCLEANED	tools/planted.py:3	f	mkdtemp	d$'; then vs_ctl_fired planted-mkdtemp "$(echo "$out" | grep -m1 UNCLEANED)"
 else vs_ctl_dead planted-mkdtemp "the uncleaned python mkdtemp was not named"; fail=1; fi
 out="$(python3 tools/tmp_hygiene.py --root "$W/t" tests/planted.sh 2>&1)"
-if echo "$out" | grep -q '^UNCLEANED	tests/planted.sh:2	shell	mktemp	W$'; then vs_ctl_fired planted-mktemp "$(echo "$out" | grep -m1 UNCLEANED)"
+if echo "$out" | grep >/dev/null '^UNCLEANED	tests/planted.sh:2	shell	mktemp	W$'; then vs_ctl_fired planted-mktemp "$(echo "$out" | grep -m1 UNCLEANED)"
 else vs_ctl_dead planted-mktemp "the untrapped shell mktemp was not named"; fail=1; fi
 out="$(python3 tools/tmp_hygiene.py --root "$W/t" tests/unsandboxed.sh 2>&1)"
-if echo "$out" | grep -q '^UNSANDBOXED	tests/unsandboxed.sh:3	run_replay_mame.sh'; then vs_ctl_fired planted-unsandboxed "$(echo "$out" | grep -m1 UNSANDBOXED)"
+if echo "$out" | grep >/dev/null '^UNSANDBOXED	tests/unsandboxed.sh:3	run_replay_mame.sh'; then vs_ctl_fired planted-unsandboxed "$(echo "$out" | grep -m1 UNSANDBOXED)"
 else vs_ctl_dead planted-unsandboxed "the 3-argument replay call was not named"; fail=1; fi
 
 [ "$fail" = 0 ] && echo "PASS: test_tmp_hygiene" || echo "FAIL: test_tmp_hygiene"

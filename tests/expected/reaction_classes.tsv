@@ -96,28 +96,28 @@ vsavj	property	028d00	-	06:0f,07:0f,08:0f,38:0f,39:0f,48:0f,4e:00
 vsav2	property	027fd8	-	06:0f,07:0f,08:0f,38:0f,39:0f,48:0f,4e:0f,52:0f
 both	shock-handler	023ac8|022656	-	13|15 instructions; vs2-only: cmpi.b #$52, $54(a6) ; vs2-only: beq.b T
 ours	shock-handler	023ac8	-	13|13 instructions vs pristine; vsavj-only: move.b #$18, $5c(a6) ; vsavj-only: move.b #$b, $5c(a4) ; ours-only: jsr T ; ours-only: jsr T
-vsavj	records	reachable	-	1085
-vsavj	records	class>=50	-	9
+vsavj	records	reachable	-	1064
+vsavj	records	class>=50	-	5
 vsavj	records	class	06	9 Jedah/fighter:3,Lilith/fighter:1,Victor/fighter:5
 vsavj	records	class	07	8 Felicia/proj:1,Jedah/fighter:1,Victor/fighter:6
-vsavj	records	class	08	12 Jedah/fighter:2,Lilith/fighter:1,Victor/fighter:5,Victor/proj:1,Zabel/fighter:3
+vsavj	records	class	08	11 Jedah/fighter:2,Victor/fighter:5,Victor/proj:1,Zabel/fighter:3
 vsavj	records	class	38	1 Victor/fighter:1
 vsavj	records	class	39	1 Victor/fighter:1
 vsavj	records	class	48	4 Victor/fighter:4
 vsavj	records	class	4e	0 -
 vsavj	records	class	52	0 -
 vsavj	records	unused<50	-	0c,0d,12,14,15,1e,25,2a,2b,2d,2e,30,3a,45,46,4b,4e,4f
-vsav2	records	reachable	-	1143
+vsav2	records	reachable	-	1129
 vsav2	records	class>=50	-	2
 vsav2	records	class	06	9 Bishamon/fighter:1,Jedah/fighter:1,Lilith/fighter:1,Victor/fighter:5,Zabel/fighter:1
 vsav2	records	class	07	10 Jedah/fighter:2,Lilith/fighter:1,Victor/fighter:6,Zabel/fighter:1
 vsav2	records	class	08	12 Jedah/fighter:2,Victor/fighter:5,Victor/proj:1,Zabel/fighter:3,Zabel/proj:1
 vsav2	records	class	38	1 Victor/fighter:1
-vsav2	records	class	39	2 Bulleta/fighter:1,Victor/fighter:1
+vsav2	records	class	39	1 Victor/fighter:1
 vsav2	records	class	48	4 Victor/fighter:4
 vsav2	records	class	4e	0 -
 vsav2	records	class	52	1 Bishamon/fighter:1
-vsav2	records	unused<50	-	0d,0e,12,13,14,1f,25,30,32,3a,45,4b,4e,4f
+vsav2	records	unused<50	-	0c,0d,0e,12,13,14,1e,1f,25,30,32,3a,45,4b,4e,4f
 vsavj	imm54	sites	-	43
 vsavj	imm54	values	-	00:4,01:1,03:5,04:2,05:10,06:1,07:1,08:1,0a:1,0c:1,0e:1,0f:2,11:1,15:1,17:2,18:1,1f:1,24:1,25:2,2b:1,45:1,ff:2
 vsavj	imm54	value	06	0186d0/a1

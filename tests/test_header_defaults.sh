@@ -102,7 +102,7 @@ mk_stale "$T/tests"
 
 out="$(python3 "$T/tools/audit_header_defaults.py" --root "$T" 2>&1 || true)"
 check() {  # check <gate> <expect caught|clean> <why>
-    if printf '%s\n' "$out" | grep -q "tests/$1.sh"; then got=caught; else got=clean; fi
+    if printf '%s\n' "$out" | grep >/dev/null "tests/$1.sh"; then got=caught; else got=clean; fi
     if [ "$got" = "$2" ]; then
         echo "  ok: $1 $2 — $3"
     else
@@ -110,7 +110,7 @@ check() {  # check <gate> <expect caught|clean> <why>
     fi
 }
 check g_a caught "a Usage line naming a non-default dir"
-if printf '%s\n' "$out" | grep -q "tests/g_a.sh"; then vs_ctl_fired stale-usage-dir "a Usage line naming a non-default build dir is caught"
+if printf '%s\n' "$out" | grep >/dev/null "tests/g_a.sh"; then vs_ctl_fired stale-usage-dir "a Usage line naming a non-default build dir is caught"
 else vs_ctl_dead stale-usage-dir "the stale Usage line was not caught"; fi
 check g_b clean  "the same line, agreeing with the code"
 check g_c clean  "a stale dir cited in prose is a measurement, not an instruction"

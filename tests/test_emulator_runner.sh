@@ -1,6 +1,6 @@
 #!/bin/sh
 # test_emulator_runner.sh — ground truth for tests/run_all_emulator.sh
-# (14z-128). ROM-free, ~26 s (measured 14z-162; the header said ~5 s).
+# (14z-128). ROM-free, ~72 s (measured 14z-210 on the Mac; ~26 s at 14z-162, before sections 18-19).
 #
 # WHAT: tests/run_all_emulator.sh's verdicts mean what they say: PASS / FAIL / SKIP counted
 #   apart, SKIP-in-prose read as PASS, a non-executable registry row MISSING, a timeout
@@ -8,7 +8,9 @@
 #   placeholder expansion, the exported MAME_BIN, the controls reader, a --dry-run
 #   writing no commit of record (#219), and since 14z-209 (#321, #323, #305): a red prereq gate followed by a green one
 #   still STOPS, the fbneo and mame lanes share one pool, --skip leaves a host-covered gate out by name, and a cold
-#   decrypt cache is built before the tier.
+#   decrypt cache is built before the tier; since 14z-210 (#321): a listed gate's controls run beside one another in a
+#   pool (an unlisted gate's, and any gate's at --jobs 1, one after another) without deadlocking a full pool, and
+#   --order starts a pooled lane longest first; and a control mode that says `NOT JUDGED: ` reads UNJUDGED (#310).
 # HOW: a synthetic repository of stub gates with KNOWN verdicts is driven through the REAL
 #   runner by symlink (never a copy of its logic), with stub tools so the runner's own
 #   preconditions run; the controls run copies of the runner (and, for #323, of the two readers) with a piece removed
@@ -27,6 +29,10 @@
 # MUST-FIRE: shadow-tool: empty-green — a copy of the runner without the empty-selection guard must print GREEN and write a run directory for a selection that matches no gate (mode: that copy is the runner every section drives; section 15's empty-selection case must fail)
 # MUST-FIRE: shadow-tool: lane-var-shared — copies of the runner and of tests/lib/controls.sh and measures.sh with the lane loop variable and the readers' log variable all named `_l` again (the #323 shape) must let a red prereq gate followed by a green one run on past the prereq lane (mode: those copies are what every section drives; section 5b must fail; 14z-209)
 # MUST-FIRE: shadow-tool: decrypt-warm-off — a copy of the runner whose DECRYPT-WARM call is disabled must leave a gate that reads build/out directly on a cold cache, and section 17 must FAIL (mode: that copy is the runner every section drives; #305, 14z-209)
+# MUST-FIRE: shadow-tool: unjudged-honoured — a copy of tests/lib/classify.sh whose NOT-JUDGED branch is disabled must read a control mode that FAILs after printing `NOT JUDGED: ` as an honoured PASS, and section 14c must FAIL (mode: that copy is the classifier every section's runner sources; #310, 14z-210)
+# MUST-FIRE: shadow-tool: jobs-leak — a copy of the runner whose own job count is named JOBS again must hand a caller-exported JOBS=7 to a gate as its --jobs 2, and section 20 must FAIL (mode: that copy is the runner every section drives; #321, 14z-210)
+# MUST-FIRE: shadow-tool: concurrent-off — a copy of the runner whose CONCURRENT-CONTROLS test is always false must run a listed gate's two controls one after another, and section 18 must FAIL (mode: that copy is the runner every section drives; #321, 14z-210)
+# MUST-FIRE: shadow-tool: order-ignored — a copy of the runner whose ORDER-SORT step is disabled must start a pooled lane's gates in registry order under --order, and section 19 must FAIL (mode: that copy is the runner every section drives; #321, 14z-210)
 # MUST-FIRE: perturbed-copy: row-not-executable — a farm of symlinks to the REAL scripts named by the REAL tests/ci_emulator.tsv, with ONE replaced by a non-executable copy, must make section 10b report it unrunnable (mode: that farm is what 10b checks; section 10b must fail)
 #
 # WHY A GATE FOR THE RUNNER, again. CLAUDE.md §4: "Verdict logic is itself
@@ -108,7 +114,16 @@ grep -q '_l="\$2"' "$T/controls_lanevar.sh" || fail "could not restore the share
 # the decrypt warm-up call disabled (#305, 14z-209)
 sed 's@    decrypt_cache_warm "$LOGDIR/decrypt_warm.err" || :   # DECRYPT-WARM@    :   # DECRYPT-WARM disabled@' "$RUNNER" > "$T/runner_warmoff.sh"
 cmp -s "$RUNNER" "$T/runner_warmoff.sh" && fail "could not disable the decrypt warm-up — the DECRYPT-WARM line moved"
-chmod +x "$T/runner_noexport.sh" "$T/runner_unplugged.sh" "$T/runner_dryrecords.sh" "$T/runner_emptygreen.sh" "$T/runner_crashunread.sh" "$T/runner_lanevar.sh" "$T/runner_warmoff.sh"
+# the concurrent-controls test made always false; the longest-first sort disabled (#321, 14z-210)
+sed 's@                && awk -F.\\t. -v g="$_g" .!/^#/ && $1 == g {f = 1} END {exit !f}. tests/controls_concurrent_emu.txt 2>/dev/null; then   # CONCURRENT-CONTROLS@                \&\& false; then   # CONCURRENT-CONTROLS disabled@' "$RUNNER" > "$T/runner_ccoff.sh"
+cmp -s "$RUNNER" "$T/runner_ccoff.sh" && fail "could not disable the concurrent-controls test — the CONCURRENT-CONTROLS line moved"
+sed 's@    if \[ -n "$ORDER" \] && \[ "$_jobs" -gt 1 \]; then   # ORDER-SORT@    if false; then   # ORDER-SORT disabled@' "$RUNNER" > "$T/runner_orderoff.sh"
+cmp -s "$RUNNER" "$T/runner_orderoff.sh" && fail "could not disable the longest-first sort — the ORDER-SORT line moved"
+# the runner's own job count named JOBS again (#321, 14z-210)
+sed 's/RUN_JOBS/JOBS/g' "$RUNNER" > "$T/runner_jobsleak.sh"
+cmp -s "$RUNNER" "$T/runner_jobsleak.sh" && fail "could not restore the JOBS name — RUN_JOBS moved"
+chmod +x "$T/runner_jobsleak.sh"
+chmod +x "$T/runner_noexport.sh" "$T/runner_unplugged.sh" "$T/runner_dryrecords.sh" "$T/runner_emptygreen.sh" "$T/runner_crashunread.sh" "$T/runner_lanevar.sh" "$T/runner_warmoff.sh" "$T/runner_ccoff.sh" "$T/runner_orderoff.sh"
 case "$VS_CTL" in
 empty-green)      ln -s "$T/runner_emptygreen.sh" "$FR/tests/run_all_emulator.sh" ;;
 export-removed)   ln -s "$T/runner_noexport.sh" "$FR/tests/run_all_emulator.sh" ;;
@@ -119,13 +134,21 @@ ondemand-in-all)  ln -s "$T/runner_ondemandinall.sh" "$FR/tests/run_all_emulator
 instrument-run)   ln -s "$T/runner_instrumentrun.sh" "$FR/tests/run_all_emulator.sh" ;;
 lane-var-shared)  ln -s "$T/runner_lanevar.sh" "$FR/tests/run_all_emulator.sh" ;;
 decrypt-warm-off) ln -s "$T/runner_warmoff.sh" "$FR/tests/run_all_emulator.sh" ;;
+concurrent-off)   ln -s "$T/runner_ccoff.sh" "$FR/tests/run_all_emulator.sh" ;;
+jobs-leak)        ln -s "$T/runner_jobsleak.sh" "$FR/tests/run_all_emulator.sh" ;;
+order-ignored)    ln -s "$T/runner_orderoff.sh" "$FR/tests/run_all_emulator.sh" ;;
 *)                ln -s "$RUNNER" "$FR/tests/run_all_emulator.sh" ;;
 esac
 # the runner sources THE ONE classifier relative to its repo (14z-139), so
 # the synthetic repo carries it too — the shipped lib, never a copy
-mkdir -p "$FR/tests/lib"; ln -s "$REPO/tests/lib/classify.sh" "$FR/tests/lib/classify.sh"
+mkdir -p "$FR/tests/lib"
+if vs_ctl_is unjudged-honoured; then ln -s "$T/classify_unjudged.sh" "$FR/tests/lib/classify.sh"
+else ln -s "$REPO/tests/lib/classify.sh" "$FR/tests/lib/classify.sh"; fi
 CTLLIB="$REPO/tests/lib/controls.sh"; MEASLIB="$REPO/tests/lib/measures.sh"
 if vs_ctl_is lane-var-shared; then CTLLIB="$T/controls_lanevar.sh"; MEASLIB="$T/measures_lanevar.sh"; fi
+# the classifier with its NOT-JUDGED branch disabled (#310, 14z-210)
+sed "s@        elif grep -qa '^NOT JUDGED: ' \"\$_clog\"; then   # NOT-JUDGED (#310)@        elif false; then   # NOT-JUDGED disabled@" "$REPO/tests/lib/classify.sh" > "$T/classify_unjudged.sh"
+cmp -s "$REPO/tests/lib/classify.sh" "$T/classify_unjudged.sh" && fail "could not disable the NOT-JUDGED branch — the line moved"
 ln -s "$CTLLIB" "$FR/tests/lib/controls.sh"   # the controls reader beside it (14z-147)
 ln -s "$MEASLIB" "$FR/tests/lib/measures.sh"   # the measurement reader too (14z-180): the runner must survive a gate that declares nothing
 
@@ -209,9 +232,9 @@ case "$line" in *"SKIP 1 "*) ok "SKIP counted separately from PASS" ;;
 *) fail "expected SKIP 1, got: $line" ;; esac
 case "$line" in *"MISSING 1"*) ok "a non-executable registered gate is MISSING" ;;
 *) fail "expected MISSING 1, got: $line" ;; esac
-printf '%s\n' "$out" | grep -q "g_out" && fail "an \`out\` row ran under --scope release" \
+printf '%s\n' "$out" | grep >/dev/null "g_out" && fail "an \`out\` row ran under --scope release" \
     || ok "--scope release excluded the out-of-scope row"
-printf '%s\n' "$out" | grep -qE '^GREEN' && fail "a run with a FAIL printed GREEN" \
+printf '%s\n' "$out" | grep -E >/dev/null '^GREEN' && fail "a run with a FAIL printed GREEN" \
     || ok "a run with a FAIL is NOT GREEN"
 
 echo "2. the placeholder reached the gate's argv"
@@ -231,12 +254,12 @@ echo "3. the anti-orphan check, both directions"
 # check is measured against a gate that never had a row rather than a removal.
 mk g_orphan2 0 "no row for me"
 out2="$(run --log "$T/l2" || true)"
-printf '%s\n' "$out2" | grep -q "g_orphan2" \
+printf '%s\n' "$out2" | grep >/dev/null "g_orphan2" \
     && ok "an emulator-tier gate with no row is reported UNREGISTERED" \
     || fail "the unregistered gate was not reported"
 reg "$(row g_pass mame release - '')" "$(row g_gone mame release - '')"
 out3="$(run --log "$T/l3" || true)"
-printf '%s\n' "$out3" | grep -q "DEAD ROW" \
+printf '%s\n' "$out3" | grep >/dev/null "DEAD ROW" \
     && ok "a row whose script is gone is reported DEAD" \
     || fail "a dead registry row was not reported"
 
@@ -257,16 +280,16 @@ echo "5. a red prereq STOPS the run ([CPE-24])"
 mk g_prereq_bad 1 "the instrument moved" "FAIL: parity lost"
 reg "$(row g_prereq_bad prereq release - '')" "$(row g_pass mame release - '')"
 out6="$(run --log "$T/l6" || true)"
-printf '%s\n' "$out6" | grep -q "STOP: the prereq lane is not green" \
+printf '%s\n' "$out6" | grep >/dev/null "STOP: the prereq lane is not green" \
     && ok "the run stopped at the prereq lane" \
     || fail "a red prereq did not stop the run"
-if printf '%s\n' "$out6" | grep -q "== mame lane"; then
+if printf '%s\n' "$out6" | grep >/dev/null "== mame lane"; then
     fail "the mame lane ran after a red prereq"
 else
     ok "no later lane ran after a red prereq"
 fi
 out7="$(run --keep-going --log "$T/l7" || true)"
-printf '%s\n' "$out7" | grep -q "== mame lane" \
+printf '%s\n' "$out7" | grep >/dev/null "== mame lane" \
     && ok "--keep-going runs the later lanes anyway" \
     || fail "--keep-going did not continue past the prereq lane"
 
@@ -278,7 +301,7 @@ s5b() {  # s5b <runner script name in the fakerepo> <log> -> S5B ok|bad
     reg "$(row g_prereq_bad prereq release - '')" "$(row g_prereq prereq release - '')" "$(row g_pass mame release - '')"
     _o="$( (cd "$FR" && ROMDIR="$T/roms" MERGED=build/fake_merged sh "tests/$1" --log "$2" 2>&1) || true)"
     S5B=ok
-    printf '%s\n' "$_o" | grep -q "STOP: the prereq lane is not green" || S5B=bad
+    printf '%s\n' "$_o" | grep >/dev/null "STOP: the prereq lane is not green" || S5B=bad
     awk -F'\t' 'NR>1 && $1=="g_pass"' "$2/results.tsv" 2>/dev/null | grep -q . && S5B=bad
     awk -F'\t' 'NR>1 && $1=="g_prereq" && $4=="PASS"' "$2/results.tsv" 2>/dev/null | grep -q . || S5B=bad   # the green one RAN
 }
@@ -299,32 +322,32 @@ fi
 echo "6. --scope all includes the out-of-release-scope rows"
 reg "$(row g_pass mame release - '')" "$(row g_out mame out - 'momentary: a stub')"
 out8="$(run --scope all --log "$T/l8" || true)"
-printf '%s\n' "$out8" | grep -q "g_out .*PASS" \
+printf '%s\n' "$out8" | grep >/dev/null "g_out .*PASS" \
     && ok "--scope all ran the out-of-scope row" \
     || fail "--scope all did not run the out-of-scope row"
 
 echo "6a. an ONDEMAND row runs only under --scope ondemand — never by default, never under --scope all (14z-196)"
 reg "$(row g_pass mame release - '')" "$(row g_out mame out - 'momentary: a stub')" "$(row g_ond mame ondemand - 'pristine: a stub')" "$(row g_inst mame ondemand - 'instrument: a stub')"
 o6a="$(run --log "$T/l6a1" || true)"; o6b="$(run --scope all --log "$T/l6a2" || true)"; o6c="$(run --scope ondemand --log "$T/l6a3" || true)"
-printf '%s\n' "$o6a" | grep -q "g_ond " && fail "the default (release) run ran the ondemand row" || ok "the default run skips the ondemand row"
-printf '%s\n' "$o6b" | grep -q "g_ond " && fail "--scope all ran the ondemand row" || ok "--scope all skips the ondemand row (and still runs g_out: $(printf '%s\n' "$o6b" | grep -c 'g_out .*PASS'))"
-printf '%s\n' "$o6b" | grep -q "g_out .*PASS" || fail "--scope all no longer runs the out row"
-if printf '%s\n' "$o6c" | grep -q "g_ond .*PASS" && ! printf '%s\n' "$o6c" | grep -qE "g_(pass|out) .*PASS"; then
+printf '%s\n' "$o6a" | grep >/dev/null "g_ond " && fail "the default (release) run ran the ondemand row" || ok "the default run skips the ondemand row"
+printf '%s\n' "$o6b" | grep >/dev/null "g_ond " && fail "--scope all ran the ondemand row" || ok "--scope all skips the ondemand row (and still runs g_out: $(printf '%s\n' "$o6b" | grep -c 'g_out .*PASS'))"
+printf '%s\n' "$o6b" | grep >/dev/null "g_out .*PASS" || fail "--scope all no longer runs the out row"
+if printf '%s\n' "$o6c" | grep >/dev/null "g_ond .*PASS" && ! printf '%s\n' "$o6c" | grep -E >/dev/null "g_(pass|out) .*PASS"; then
     ok "--scope ondemand runs the ondemand row and nothing else"
 else fail "--scope ondemand did not run exactly the ondemand row"; fi
 ln -s "$T/runner_ondemandinall.sh" "$FR/tests/run_all_emulator_ondemandinall.sh"
 o6d="$( (cd "$FR" && ROMDIR="$T/roms" MERGED=build/fake_merged sh tests/run_all_emulator_ondemandinall.sh --scope all --log "$T/l6a4" 2>&1) || true)"
-printf '%s\n' "$o6d" | grep -q "g_ond .*PASS" \
+printf '%s\n' "$o6d" | grep >/dev/null "g_ond .*PASS" \
     && vs_ctl_fired ondemand-in-all "with the exclusion removed, --scope all ran the ondemand row" \
     || { vs_ctl_dead ondemand-in-all "the copy without the exclusion still skipped g_ond"; fail "ondemand-in-all"; }
 rm -f "$FR/tests/run_all_emulator_ondemandinall.sh"
 # an `instrument:` row (14z-199, #265) is selected by NO scope: run bare it only SKIPs, so it is run by hand
-_ran=0; for _o in "$o6a" "$o6b" "$o6c"; do printf '%s\n' "$_o" | grep -q "g_inst " && _ran=1; done
+_ran=0; for _o in "$o6a" "$o6b" "$o6c"; do printf '%s\n' "$_o" | grep >/dev/null "g_inst " && _ran=1; done
 [ "$_ran" = 0 ] && ok "no scope (default, --scope all, --scope ondemand) runs the instrument row" \
                 || fail "a scope ran the instrument row"
 ln -s "$T/runner_instrumentrun.sh" "$FR/tests/run_all_emulator_instrumentrun.sh"
 o6e="$( (cd "$FR" && ROMDIR="$T/roms" MERGED=build/fake_merged sh tests/run_all_emulator_instrumentrun.sh --scope ondemand --log "$T/l6a5" 2>&1) || true)"
-printf '%s\n' "$o6e" | grep -q "g_inst .*PASS" \
+printf '%s\n' "$o6e" | grep >/dev/null "g_inst .*PASS" \
     && vs_ctl_fired instrument-run "with the exclusion removed, --scope ondemand ran the instrument row" \
     || { vs_ctl_dead instrument-run "the copy without the exclusion still skipped g_inst"; fail "instrument-run"; }
 rm -f "$FR/tests/run_all_emulator_instrumentrun.sh"
@@ -337,21 +360,21 @@ echo "6b. CADENCE selects independently of scope, and --freeze ASKS the question
 reg "$(row  g_pass  mame   release   -  '')" \
     "$(rowc g_bits  mister release bitstream - 'a bitstream-cadence gate')"
 outc="$(run --lane mame --lane mister --log "$T/lc" || true)"
-printf '%s\n' "$outc" | grep -q "g_bits" \
+printf '%s\n' "$outc" | grep >/dev/null "g_bits" \
     && ok "cadence=all (the default) runs the bitstream row" \
     || fail "the default cadence did NOT run the bitstream row"
 outf="$(run --lane mame --lane mister --freeze --log "$T/lf" || true)"
-printf '%s\n' "$outf" | grep -q "g_bits .*PASS" \
+printf '%s\n' "$outf" | grep >/dev/null "g_bits .*PASS" \
     && fail "--freeze RAN a bitstream-cadence gate" \
     || ok "--freeze excluded the bitstream-cadence gate"
-printf '%s\n' "$outf" | grep -q "bitstream gates DROPPED" \
+printf '%s\n' "$outf" | grep >/dev/null "bitstream gates DROPPED" \
     && ok "--freeze NAMED what it dropped (the question is asked, not remembered)" \
     || fail "--freeze dropped a gate SILENTLY — the ruling's whole point"
-printf '%s\n' "$outf" | grep -q "g_bits" \
+printf '%s\n' "$outf" | grep >/dev/null "g_bits" \
     && ok "the dropped gate is named by name" \
     || fail "--freeze did not name the dropped gate"
 # and the control: a romset-cadence gate is NOT dropped by --freeze
-printf '%s\n' "$outf" | grep -q "g_pass .*PASS" \
+printf '%s\n' "$outf" | grep >/dev/null "g_pass .*PASS" \
     && ok "--freeze kept the romset-cadence gate (it drops by cadence, not by lane)" \
     || fail "--freeze dropped a ROMSET-cadence gate"
 
@@ -370,8 +393,8 @@ fi
 echo "8. --lane ACCUMULATES (it used to assign, and silently dropped a lane)"
 reg "$(row g_pass mame release - '')" "$(row g_prereq fbneo release - '')"
 out10="$(run --lane fbneo --lane mame --log "$T/l10" || true)"
-if printf '%s\n' "$out10" | grep -q "== fbneo lane" \
-   && printf '%s\n' "$out10" | grep -q "== mame lane"; then
+if printf '%s\n' "$out10" | grep >/dev/null "== fbneo lane" \
+   && printf '%s\n' "$out10" | grep >/dev/null "== mame lane"; then
     ok "two --lane flags select BOTH lanes"
 else
     fail "two --lane flags did not select both lanes"
@@ -406,7 +429,7 @@ out12b="$(run --jobs 4 --log "$T/l12b" || true)"
 slow_b="$(printf '%s\n' "$out12b" | grep -n 'g_slow3 ' | head -1 | cut -d: -f1)"
 pass_b="$(printf '%s\n' "$out12b" | grep -n 'g_pass ' | head -1 | cut -d: -f1)"
 if [ -n "$slow_b" ] && [ -n "$pass_b" ] && [ "$pass_b" -lt "$slow_b" ] \
-        && printf '%s\n' "$out12b" | grep -q '== fbneo lane (1 gates; one pool of 2 with the mame lane'; then
+        && printf '%s\n' "$out12b" | grep >/dev/null '== fbneo lane (1 gates; one pool of 2 with the mame lane'; then
     ok "the fbneo and mame lanes ran as one pool: g_pass (mame) finished while g_slow3 (fbneo, queued first) still ran"
 else
     fail "the fbneo and mame lanes did not share a pool: g_slow3 at line ${slow_b:-none}, g_pass at ${pass_b:-none}"
@@ -540,14 +563,14 @@ chmod +x "$FR/tests/g_mamebin.sh"
 reg "$(row g_mamebin mame release - '')"
 out11a="$( (unset MAME_BIN; MAME_WIDE_BIN="$T/fake_wide" run --lane mame --only g_mamebin --log "$T/l11a") )"
 if grep -q "mame_bin=$T/fake_wide" "$T/l11a/g_mamebin.log" 2>/dev/null \
-   && printf '%s' "$out11a" | grep -q "MAME_BIN.*(runner default)"; then
+   && printf '%s' "$out11a" | grep >/dev/null "MAME_BIN.*(runner default)"; then
     ok "unset by the caller -> the gate receives the WIDE instrument, and the log says 'runner default'"
 else
     fail "runner default not delivered: $(grep mame_bin "$T/l11a/g_mamebin.log" 2>/dev/null)"
 fi
 out11b="$( MAME_BIN="$T/caller_mame" MAME_WIDE_BIN="$T/fake_wide" run --lane mame --only g_mamebin --log "$T/l11b" )"
 if grep -q "mame_bin=$T/caller_mame" "$T/l11b/g_mamebin.log" 2>/dev/null \
-   && printf '%s' "$out11b" | grep -q "MAME_BIN.*(set by the caller)"; then
+   && printf '%s' "$out11b" | grep >/dev/null "MAME_BIN.*(set by the caller)"; then
     ok "set by the caller -> the caller's value wins, and the log says so"
 else
     fail "caller's MAME_BIN not honoured: $(grep mame_bin "$T/l11b/g_mamebin.log" 2>/dev/null)"
@@ -644,7 +667,7 @@ n14="$(awk -F'\t' 'NR>1 && $1 ~ /@/' "$T/l14a/results.tsv" | wc -l | tr -d ' ')"
 out14="$(run --lane mame --controls --log "$T/l14b" || true)"
 x14() {  # x14 <row> <verdict> <detail substring>
     v="$(awk -F'\t' -v r="$1" '$1==r{print $4}' "$T/l14b/results.tsv")"; d="$(awk -F'\t' -v r="$1" '$1==r{print $6}' "$T/l14b/results.tsv")"
-    [ "$v" = "$2" ] && printf '%s' "$d" | grep -q "$3" && ok "$1 -> $2 ($3)" || fail "$1 -> '$v' '$d', expected $2 / $3"
+    [ "$v" = "$2" ] && printf '%s' "$d" | grep >/dev/null "$3" && ok "$1 -> $2 ($3)" || fail "$1 -> '$v' '$d', expected $2 / $3"
 }
 x14 g_cfired@flip PASS "honoured"
 x14 g_clies@flip  FAIL "LIES"
@@ -653,9 +676,9 @@ x14 g_cref@flip   FAIL "REFUSED"
     || fail "a control was executed for a gate whose own run failed"
 # PASS 4 = three gates that passed their own run + the honoured @ row; FAIL 3 =
 # g_cmissing (its FIRED line missing) + the LIES row + the REFUSED row
-printf '%s' "$out14" | grep -q 'PASS 4 .*FAIL 3' && ok "tally PASS 4 / FAIL 3: the @ rows count like gates" \
+printf '%s' "$out14" | grep >/dev/null 'PASS 4 .*FAIL 3' && ok "tally PASS 4 / FAIL 3: the @ rows count like gates" \
     || fail "tally: $(printf '%s' "$out14" | grep -E '^PASS ' || echo '(none)')"
-printf '%s' "$out14" | grep -q 'read:     fired 3 / declared 4' && ok "readout: fired 3 / declared 4" \
+printf '%s' "$out14" | grep >/dev/null 'read:     fired 3 / declared 4' && ok "readout: fired 3 / declared 4" \
     || fail "readout: $(printf '%s' "$out14" | grep 'read:' || echo '(none)')"
 # MUST-FIRE: the same stub through the reader-unplugged copy reads PASS
 ln -s "$T/runner_unplugged.sh" "$FR/tests/run_all_emulator_unplugged.sh"
@@ -682,6 +705,35 @@ v14f="$(awk -F'\t' '$1=="g_cdie127@flip"{print $4}' "$T/l14f/results.tsv" 2>/dev
 [ "$v14f" = PASS ] && vs_ctl_fired crash-unread "with no gate script handed to the control classifier, a mode dying of command-not-found (exit 127) reads an honoured PASS" \
                    || { vs_ctl_dead crash-unread "the copy with no gate script classified g_cdie127@flip '$v14f'"; fail "crash-unread"; }
 rm -f "$FR/tests/run_all_emulator_crashunread.sh" "$FR/tests/g_cdie127.sh" "$FR/tests/g_cquote.sh"
+
+echo "14c. a control mode that FAILs after saying NOT JUDGED measured nothing: UNJUDGED, not honoured (#310, 14z-210)"
+# 14z-206: test_applier_page_browser's broken-page mode stalled under load, printed "page NOT judged" and exited 1, and
+# the classifier read it HONOURED. A gate now marks such a run with a `NOT JUDGED: ` line; a crash beside it stays DIED.
+mkc g_cunj    'echo "NOT JUDGED: the browser run did not complete"; echo "FAIL: page NOT judged"; exit 1' "PASS: fine" "CONTROL FIRED: flip — caught"
+mkc g_cunjdie 'echo "NOT JUDGED: stalled"; no_such_helper_310; exit 1' "PASS: fine" "CONTROL FIRED: flip — caught"
+mkc g_cjudged 'echo "  judged: NOT JUDGED would be a lie here"; echo "FAIL: caught"; exit 1' "PASS: fine" "CONTROL FIRED: flip — caught"
+reg "$(row g_cunj mame release - '')" "$(row g_cunjdie mame release - '')" "$(row g_cjudged mame release - '')"
+run --lane mame --controls --log "$T/l14g" >/dev/null 2>&1 || true
+v14g="$(awk -F'\t' '$1=="g_cunj@flip"{print $4"|"$6}' "$T/l14g/results.tsv")"
+case "$v14g" in
+    FAIL\|*UNJUDGED*) ok "g_cunj@flip -> FAIL (UNJUDGED: the mode run measured nothing)" ;;
+    PASS\|*) fail "g_cunj@flip -> '$v14g', expected FAIL / UNJUDGED"
+             vs_ctl_is unjudged-honoured && vs_ctl_fired unjudged-honoured "with the NOT-JUDGED branch disabled, a mode that measured nothing reads an honoured PASS" ;;
+    *) fail "g_cunj@flip -> '$v14g', expected FAIL / UNJUDGED" ;;
+esac
+v14h="$(awk -F'\t' '$1=="g_cunjdie@flip"{print $4"|"$6}' "$T/l14g/results.tsv")"
+case "$v14h" in FAIL\|*DIED*) ok "g_cunjdie@flip -> FAIL (DIED: the crash class is read first)" ;; *) fail "g_cunjdie@flip -> '$v14h', expected FAIL / DIED" ;; esac
+v14i="$(awk -F'\t' '$1=="g_cjudged@flip"{print $4}' "$T/l14g/results.tsv")"
+[ "$v14i" = PASS ] && ok "g_cjudged@flip -> PASS (the words NOT JUDGED inside a line are not the marker)" || fail "g_cjudged@flip -> '$v14i', expected PASS"
+if ! vs_ctl_is unjudged-honoured; then
+    rm -f "$FR/tests/lib/classify.sh"; ln -s "$T/classify_unjudged.sh" "$FR/tests/lib/classify.sh"
+    run --lane mame --controls --log "$T/l14j" >/dev/null 2>&1 || true
+    rm -f "$FR/tests/lib/classify.sh"; ln -s "$REPO/tests/lib/classify.sh" "$FR/tests/lib/classify.sh"
+    v14j="$(awk -F'\t' '$1=="g_cunj@flip"{print $4}' "$T/l14j/results.tsv" 2>/dev/null)"
+    [ "$v14j" = PASS ] && vs_ctl_fired unjudged-honoured "a classifier without the NOT-JUDGED branch reads a mode that measured nothing as an honoured PASS — section 14c catches it" \
+        || { vs_ctl_dead unjudged-honoured "the classifier without the branch read g_cunj@flip '$v14j'"; fail "unjudged-honoured"; }
+fi
+rm -f "$FR/tests/g_cunj.sh" "$FR/tests/g_cunjdie.sh" "$FR/tests/g_cjudged.sh"
 
 echo "15. the commit of record and --stale (14z-180, GitHub #171 slice Q4)"
 # commit.txt: HEAD on its first line when the tree is a git checkout, `no-git` otherwise;
@@ -715,7 +767,7 @@ n15="$(awk -F'\t' 'NR>1{print $1}' "$T/l15c/results.tsv" 2>/dev/null | tr '\n' '
 [ "$n15" = "g_out " ] && ok "--stale ran exactly the named gate (g_out), not g_pass" || fail "--stale selection: '$n15'"
 printf '#!/usr/bin/env python3\n' > "$FR/tools/audit_emulator_staleness.py"
 out15="$(run --lane mame --stale --log "$T/l15d" 2>&1 || true)"
-printf '%s' "$out15" | grep -q 'no emulator gate is stale' && [ ! -d "$T/l15d" ] \
+printf '%s' "$out15" | grep >/dev/null 'no emulator gate is stale' && [ ! -d "$T/l15d" ] \
     && ok "--stale with nothing named exits before writing a run directory and says so" \
     || fail "--stale with an empty list: $(printf '%s' "$out15" | head -1)"
 # 14z-192 (GitHub #211): a --stale name outside the selected lanes is REFUSED by name, and a
@@ -724,13 +776,13 @@ printf '%s' "$out15" | grep -q 'no emulator gate is stale' && [ ! -d "$T/l15d" ]
 reg "$(row g_pass mame release - '')" "$(row g_mist mister release - '')"
 printf '#!/usr/bin/env python3\nimport sys\nif "--names" in sys.argv: print("g_mist")\n' > "$FR/tools/audit_emulator_staleness.py"
 rc15g=0; out15g="$(run --lane mame --stale --log "$T/l15g" 2>&1)" || rc15g=$?
-printf '%s' "$out15g" | grep -q 'REFUSED: --stale names gate(s) outside' && printf '%s' "$out15g" | grep -q 'g_mist(lane mister)' \
+printf '%s' "$out15g" | grep >/dev/null 'REFUSED: --stale names gate(s) outside' && printf '%s' "$out15g" | grep >/dev/null 'g_mist(lane mister)' \
     && [ "$rc15g" != 0 ] && [ ! -d "$T/l15g" ] \
     && ok "--stale naming a mister-lane gate under --lane mame is REFUSED by name, exit $rc15g, no run directory" \
     || fail "--stale outside the lanes: exit $rc15g, $(printf '%s' "$out15g" | head -2 | tr '\n' ' ')"
-printf '%s' "$out15g" | grep -q 'GREEN' && fail "the refused --stale run printed GREEN" || ok "the refused --stale run printed no GREEN"
+printf '%s' "$out15g" | grep >/dev/null 'GREEN' && fail "the refused --stale run printed GREEN" || ok "the refused --stale run printed no GREEN"
 rc15h=0; out15h="$(run --lane mame --only g_nosuch --log "$T/l15h" 2>&1)" || rc15h=$?
-if printf '%s' "$out15h" | grep -q 'NOTHING SELECTED' && [ "$rc15h" != 0 ] && [ ! -d "$T/l15h" ]; then
+if printf '%s' "$out15h" | grep >/dev/null 'NOTHING SELECTED' && [ "$rc15h" != 0 ] && [ ! -d "$T/l15h" ]; then
     ok "a selection matching no gate exits $rc15h with NOTHING SELECTED and no run directory"
 else
     fail "empty selection: exit $rc15h, run dir $([ -d "$T/l15h" ] && echo present || echo absent), $(printf '%s' "$out15h" | tail -1)"
@@ -738,7 +790,7 @@ fi
 # MUST-FIRE: the same empty selection through the copy without the guard prints GREEN
 ln -s "$T/runner_emptygreen.sh" "$FR/tests/run_all_emulator_emptygreen.sh"
 out15i="$( (cd "$FR" && ROMDIR="$T/roms" MERGED=build/fake_merged sh tests/run_all_emulator_emptygreen.sh --lane mame --only g_nosuch --log "$T/l15i" 2>&1) || true )"
-printf '%s' "$out15i" | grep -q '^GREEN' && [ -f "$T/l15i/commit.txt" ] \
+printf '%s' "$out15i" | grep >/dev/null '^GREEN' && [ -f "$T/l15i/commit.txt" ] \
     && vs_ctl_fired empty-green "without the guard an empty selection prints GREEN and writes $T/l15i/commit.txt" \
     || { vs_ctl_dead empty-green "the unguarded copy did not print GREEN with a run of record"; fail "empty-green"; }
 rm -f "$FR/tests/run_all_emulator_emptygreen.sh"
@@ -749,16 +801,16 @@ echo "16. --skip leaves a host-covered gate OUT, by name, with no row (#321, mai
 # with #323 fixed that STOPS the tier. The ERIS tier passes --skip test_mame_parity; the Mac's run is the row of record.
 reg "$(row g_prereq_bad prereq release - '')" "$(row g_prereq prereq release - '')" "$(row g_pass mame release - '')"
 out16="$(run --skip 'g_prereq_b*' --log "$T/l16" || true)"
-if ! printf '%s\n' "$out16" | grep -q "STOP:" && awk -F'\t' 'NR>1 && $1=="g_pass" && $4=="PASS"' "$T/l16/results.tsv" | grep -q . \
+if ! printf '%s\n' "$out16" | grep >/dev/null "STOP:" && awk -F'\t' 'NR>1 && $1=="g_pass" && $4=="PASS"' "$T/l16/results.tsv" | grep >/dev/null . \
         && ! awk -F'\t' 'NR>1 && $1=="g_prereq_bad"' "$T/l16/results.tsv" | grep -q . \
-        && printf '%s\n' "$out16" | grep -q "NOT HERE   --skip 'g_prereq_b\*': g_prereq_bad" \
-        && printf '%s\n' "$out16" | grep -q "^not here  (--skip): g_prereq_bad"; then
+        && printf '%s\n' "$out16" | grep >/dev/null "NOT HERE   --skip 'g_prereq_b\*': g_prereq_bad" \
+        && printf '%s\n' "$out16" | grep >/dev/null "^not here  (--skip): g_prereq_bad"; then
     ok "--skip 'g_prereq_b*' left g_prereq_bad out (no row, no STOP), named it in the header and the readout, and ran the rest"
 else
     fail "--skip: $(printf '%s\n' "$out16" | grep -E 'NOT HERE|STOP|not here' | head -3 | tr '\n' ' ')"
 fi
 out16b="$(run --log "$T/l16b" || true)"
-printf '%s\n' "$out16b" | grep -q "STOP: the prereq lane is not green" && ! printf '%s\n' "$out16b" | grep -q "NOT HERE" \
+printf '%s\n' "$out16b" | grep >/dev/null "STOP: the prereq lane is not green" && ! printf '%s\n' "$out16b" | grep >/dev/null "NOT HERE" \
     && ok "without --skip the same registry STOPS on the red prereq gate and names nothing as skipped" \
     || fail "without --skip: $(printf '%s\n' "$out16b" | grep -E 'NOT HERE|STOP' | head -2 | tr '\n' ' ')"
 
@@ -781,7 +833,7 @@ s17() {  # s17 <runner script name> <log> -> S17 ok|bad
     _o="$( (cd "$FR" && ROMDIR="$RV" MERGED=build/fake_merged sh "tests/$1" --lane mame --strict --log "$2" 2>&1) || true)"
     S17=ok
     awk -F'\t' 'NR>1 && $1=="g_views" && $4=="PASS"' "$2/results.tsv" 2>/dev/null | grep -q . || S17=bad
-    printf '%s\n' "$_o" | grep -q '^== decrypt views built before the tier: vsavj vsav2 (' || S17=bad
+    printf '%s\n' "$_o" | grep >/dev/null '^== decrypt views built before the tier: vsavj vsav2 (' || S17=bad
 }
 s17 run_all_emulator.sh "$T/l17"
 [ "$S17" = ok ] && ok "from a cold cache the runner built vsavj and vsav2 (not vhunt2, absent) before the tier, and the direct reader PASSed" \
@@ -794,6 +846,111 @@ if ! vs_ctl_is decrypt-warm-off; then
         || { vs_ctl_dead decrypt-warm-off "the runner without the warm-up still gave the reader its views"; fail "decrypt-warm-off"; }
 fi
 rm -rf "$FR/build/out" "$FR/tools/cps2_decrypt.py" "$FR/tests/lib/decrypt_cache.sh"
+
+echo "18. a LISTED gate's controls run beside one another in a pool; an unlisted gate's, and --jobs 1, one after another (#321, 14z-210)"
+# g_cc declares two controls; each control mode writes its start second, sleeps 3 s and FAILs as it must. Beside one
+# another their starts are at most a second apart; one after another, at least three.
+mkcc() {  # mkcc <name> — a stub gate with two controls that record when they started
+    { echo '#!/bin/sh'; echo "# $1.sh — a stub"
+      echo '# MUST-FIRE: perturbed-copy: ca — a planted fault must fail'
+      echo '# MUST-FIRE: perturbed-copy: cb — another planted fault must fail'
+      echo ': "${MAME_BIN:-}"'
+      echo 'case "${CONTROL:-}" in ca|cb) date +%s > "'"$T"'/cc_$(basename "$0" .sh)_$CONTROL"; sleep 3; echo "FAIL: caught"; exit 1 ;; esac'
+      echo 'echo "PASS: fine"; echo "CONTROL FIRED: ca — caught"; echo "CONTROL FIRED: cb — caught"; exit 0'; } > "$FR/tests/$1.sh"
+    chmod +x "$FR/tests/$1.sh"
+}
+mkcc g_cc; mkcc g_cc2
+gap18() {  # gap18 <gate> -> the seconds between its two controls' starts
+    _a="$(cat "$T/cc_$1_ca" 2>/dev/null || echo 0)"; _b="$(cat "$T/cc_$1_cb" 2>/dev/null || echo 999)"
+    _d=$((_a - _b)); [ "$_d" -lt 0 ] && _d=$((0 - _d)); echo "$_d"
+}
+honoured18() {  # honoured18 <log dir> <gate> -> true when both control rows are honoured PASS rows
+    [ "$(awk -F'\t' -v g="$2" '$1 == g "@ca" || $1 == g "@cb" {if ($4 == "PASS" && $6 ~ /honoured/) n++} END {print n + 0}' "$1/results.tsv")" = 2 ]
+}
+reg "$(row g_cc mame release - '')"
+printf '# a fake list\ng_cc\t%s\tfake\ttest\n' "$(printf '%040d' 0)" > "$FR/tests/controls_concurrent_emu.txt"
+rm -f "$T"/cc_*; run --lane mame --controls --jobs 4 --log "$T/l18a" >/dev/null 2>&1 || true
+g18a="$(gap18 g_cc)"
+if [ "$g18a" -le 1 ] && honoured18 "$T/l18a" g_cc; then ok "listed, --jobs 4: the two controls started ${g18a}s apart, both honoured"
+else fail "listed, --jobs 4: the controls started ${g18a}s apart (want <= 1), or a row is not an honoured PASS"
+     vs_ctl_is concurrent-off && vs_ctl_fired concurrent-off "with the test always false the listed gate's controls ran one after another (${g18a}s apart)"; fi
+rm -f "$T"/cc_*; run --lane mame --controls --jobs 1 --log "$T/l18b" >/dev/null 2>&1 || true
+g18b="$(gap18 g_cc)"
+[ "$g18b" -ge 3 ] && honoured18 "$T/l18b" g_cc && ok "listed, --jobs 1: one after another (${g18b}s apart)" \
+    || fail "listed, --jobs 1: the controls started ${g18b}s apart (want >= 3)"
+: > "$FR/tests/controls_concurrent_emu.txt"
+rm -f "$T"/cc_*; run --lane mame --controls --jobs 4 --log "$T/l18c" >/dev/null 2>&1 || true
+g18c="$(gap18 g_cc)"
+[ "$g18c" -ge 3 ] && honoured18 "$T/l18c" g_cc && ok "unlisted, --jobs 4: one after another (${g18c}s apart)" \
+    || fail "unlisted, --jobs 4: the controls started ${g18c}s apart (want >= 3)"
+# A FULL POOL DOES NOT DEADLOCK: two listed gates, two slots, four controls — each worker gives its slot back before it
+# asks for its controls' slots. A watchdog kills the run after 60 s.
+reg "$(row g_cc mame release - '')" "$(row g_cc2 mame release - '')"
+printf 'g_cc\t%s\tfake\ttest\ng_cc2\t%s\tfake\ttest\n' "$(printf '%040d' 0)" "$(printf '%040d' 0)" > "$FR/tests/controls_concurrent_emu.txt"
+rm -f "$T"/cc_*
+( cd "$FR" && ROMDIR="$T/roms" MERGED=build/fake_merged sh tests/run_all_emulator.sh --lane mame --controls --jobs 2 --log "$T/l18d" > "$T/l18d.out" 2>&1 ) &
+_p18=$!; _w=0; while kill -0 "$_p18" 2>/dev/null && [ "$_w" -lt 60 ]; do sleep 1; _w=$((_w + 1)); done
+if kill -0 "$_p18" 2>/dev/null; then kill "$_p18" 2>/dev/null; pkill -P "$_p18" 2>/dev/null; fail "two listed gates in a pool of two did not finish in 60 s (a deadlock)"
+else wait "$_p18" 2>/dev/null || true
+     honoured18 "$T/l18d" g_cc && honoured18 "$T/l18d" g_cc2 && ok "two listed gates, two slots: all four controls ran and were honoured, in ${_w}s" \
+         || fail "two listed gates, two slots: a control row is missing or not honoured"; fi
+if ! vs_ctl_is concurrent-off; then
+    reg "$(row g_cc mame release - '')"; printf 'g_cc\t%s\tfake\ttest\n' "$(printf '%040d' 0)" > "$FR/tests/controls_concurrent_emu.txt"
+    ln -s "$T/runner_ccoff.sh" "$FR/tests/run_all_emulator_ccoff.sh"; rm -f "$T"/cc_*
+    (cd "$FR" && ROMDIR="$T/roms" MERGED=build/fake_merged sh tests/run_all_emulator_ccoff.sh --lane mame --controls --jobs 4 --log "$T/l18e" >/dev/null 2>&1) || true
+    rm -f "$FR/tests/run_all_emulator_ccoff.sh"; g18e="$(gap18 g_cc)"
+    [ "$g18e" -ge 3 ] && vs_ctl_fired concurrent-off "a runner whose concurrent test is always false ran the listed gate's controls ${g18e}s apart — section 18 catches it" \
+        || { vs_ctl_dead concurrent-off "the disabled runner still ran them ${g18e}s apart"; fail "concurrent-off"; }
+fi
+: > "$FR/tests/controls_concurrent_emu.txt"; rm -f "$FR/tests/g_cc.sh" "$FR/tests/g_cc2.sh" "$T"/cc_*
+
+echo "19. --order starts a pooled lane LONGEST FIRST; --jobs 1 and no --order keep registry order (#321, 14z-210)"
+# The earlier run gives g_o1 100 s plus a 250 s control row (350 in all) and g_o3 300 s; g_o2 has no row, so its cost is
+# unknown and it goes first. Registry order is g_o1 g_o2 g_o3; longest first is g_o2 g_o1 g_o3.
+mk g_o1 0 "one"; mk g_o2 0 "two"; mk g_o3 0 "three"
+reg "$(row g_o1 mame release - '')" "$(row g_o2 mame release - '')" "$(row g_o3 mame release - '')"
+printf 'gate\tlane\tscope\tverdict\tseconds\tdetail\ng_o1\tmame\trelease\tPASS\t100\t\ng_o1@x\tmame\trelease\tPASS\t250\t\ng_o3\tmame\trelease\tPASS\t300\t\n' > "$T/order.tsv"
+ord19() {  # ord19 <runner> <args...> -> the gates in the order a dry run lists them
+    _r="$1"; shift
+    (cd "$FR" && ROMDIR="$T/roms" MERGED=build/fake_merged sh "tests/$_r" --lane mame --dry-run "$@" 2>&1) | awk '$1 ~ /^g_o[0-9]$/ {printf "%s ", $1}'
+}
+o19a="$(ord19 run_all_emulator.sh --jobs 4 --order "$T/order.tsv")"
+[ "$o19a" = "g_o2 g_o1 g_o3 " ] && ok "--order, --jobs 4: $o19a(the unknown first, then 350 s, then 300 s)" \
+    || { fail "--order, --jobs 4: got '$o19a', want 'g_o2 g_o1 g_o3 '"
+         vs_ctl_is order-ignored && vs_ctl_fired order-ignored "with the sort disabled the lane kept registry order ('$o19a')"; }
+o19b="$(ord19 run_all_emulator.sh --jobs 1 --order "$T/order.tsv")"
+[ "$o19b" = "g_o1 g_o2 g_o3 " ] && ok "--order, --jobs 1: registry order ($o19b)" || fail "--order, --jobs 1: got '$o19b'"
+o19c="$(ord19 run_all_emulator.sh --jobs 4)"
+[ "$o19c" = "g_o1 g_o2 g_o3 " ] && ok "no --order, --jobs 4: registry order ($o19c)" || fail "no --order: got '$o19c'"
+run --lane mame --jobs 4 --order "$T/order.tsv" --log "$T/l19" >/dev/null 2>&1 || true
+[ "$(awk -F'\t' 'NR > 1 && $4 == "PASS"' "$T/l19/results.tsv" | wc -l | tr -d ' ')" = 3 ] && ok "the ordered run gave every gate its verdict (3 PASS)" \
+    || fail "the ordered run lost a verdict: $(cut -f1,4 "$T/l19/results.tsv" | tr '\n' ' ')"
+if ! vs_ctl_is order-ignored; then
+    ln -s "$T/runner_orderoff.sh" "$FR/tests/run_all_emulator_orderoff.sh"
+    o19d="$(ord19 run_all_emulator_orderoff.sh --jobs 4 --order "$T/order.tsv")"; rm -f "$FR/tests/run_all_emulator_orderoff.sh"
+    [ "$o19d" != "g_o2 g_o1 g_o3 " ] && vs_ctl_fired order-ignored "a runner without the sort starts '$o19d' — section 19 catches it" \
+        || { vs_ctl_dead order-ignored "the runner without the sort still ordered them longest first"; fail "order-ignored"; }
+fi
+rm -f "$FR/tests/g_o1.sh" "$FR/tests/g_o2.sh" "$FR/tests/g_o3.sh"
+
+echo "20. a caller's exported JOBS reaches the gate unchanged; the runner's --jobs is its own (#321, 14z-210)"
+# fork K: the runner's count was named JOBS, the name many gates read for their own legs, so `JOBS=8 ... --jobs 8` gave 8x8
+{ echo '#!/bin/sh'; echo ': "${MAME_BIN:-}"'; echo 'echo "gate JOBS=${JOBS:-unset}"'; } > "$FR/tests/g_jobs.sh"; chmod +x "$FR/tests/g_jobs.sh"
+reg "$(row g_jobs mame release - '')"
+j20() {  # j20 <runner> <log> -> the JOBS the gate saw
+    (cd "$FR" && JOBS=7 ROMDIR="$T/roms" MERGED=build/fake_merged sh "tests/$1" --lane mame --jobs 2 --log "$2" >/dev/null 2>&1) || true
+    sed -n 's/^gate JOBS=//p' "$2/g_jobs.log" 2>/dev/null | head -1
+}
+v20="$(j20 run_all_emulator.sh "$T/l20")"
+if [ "$v20" = 7 ]; then ok "exported JOBS=7 with --jobs 2: the gate saw JOBS=7"
+else fail "exported JOBS=7 with --jobs 2: the gate saw JOBS=$v20"; vs_ctl_is jobs-leak && vs_ctl_fired jobs-leak "with the runner's count named JOBS the gate saw JOBS=$v20"; fi
+if ! vs_ctl_is jobs-leak; then
+    ln -s "$T/runner_jobsleak.sh" "$FR/tests/run_all_emulator_jobsleak.sh"
+    v20b="$(j20 run_all_emulator_jobsleak.sh "$T/l20b")"; rm -f "$FR/tests/run_all_emulator_jobsleak.sh"
+    [ "$v20b" = 2 ] && vs_ctl_fired jobs-leak "a runner whose count is named JOBS hands the gate JOBS=2 for an exported 7 — section 20 catches it" \
+        || { vs_ctl_dead jobs-leak "the JOBS-named runner handed the gate JOBS=$v20b"; fail "jobs-leak"; }
+fi
+rm -f "$FR/tests/g_jobs.sh"
 
 echo
 [ "$rc" = 0 ] && echo "PASS: run_all_emulator.sh classifies every ground-truth case correctly" \

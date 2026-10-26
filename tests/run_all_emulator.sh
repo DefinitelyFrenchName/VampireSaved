@@ -115,7 +115,15 @@
 #   ... --controls                                       EXECUTE every declared must-fire control
 #                                                        (`CONTROL=<name> tests/<g>.sh` after a PASS;
 #                                                        one results row per control; off by default —
-#                                                        it re-runs each gate once per control)
+#                                                        it re-runs each gate once per control). In a pooled fbneo/mame
+#                                                        lane a gate listed in tests/controls_concurrent_emu.txt runs its
+#                                                        controls as pool jobs of their own, beside one another (#321,
+#                                                        14z-210); an unlisted gate runs them one after another in its slot
+#   ... --order RESULTS.tsv                              LONGEST FIRST (#321, ruled 2026-10-26 "Yes, longest first"): a
+#                                                        pooled lane starts its gates in the order of their seconds in that
+#                                                        earlier run's results.tsv, a gate's control rows counted with it;
+#                                                        a gate with no row there starts first, in registry order. Run
+#                                                        order only — never a verdict. The prereq lane keeps its order
 #
 # THE MUST-FIRE CONTROLS ARE READ ON EVERY RUN (14z-147, step two of the
 # maintainer's ruling, STATE 14z-145): the classifier is handed the gate
@@ -164,9 +172,11 @@ cd "$REPO"
 [ ! -f "$REPO/tests/lib/collation.sh" ] || { . "$REPO/tests/lib/collation.sh"; vs_pin_collation; }   # COLLATION-PIN: byte-order sort/ls for every gate (#278); absent only in a runner test's synthetic repo
 
 REG=tests/ci_emulator.tsv
-SCOPE=release; CADENCE=all; LANES="prereq fbneo mame"; LANES_SET=""; ONLY=""; JOBS=1; TMO=5400
+# RUN_JOBS, never JOBS (#321, 14z-210): many gates read JOBS for their own legs, so a caller who exported JOBS had every
+# gate inherit the runner's --jobs as its own (fork K reproduced it); the runner's count is a name no gate reads
+SCOPE=release; CADENCE=all; LANES="prereq fbneo mame"; LANES_SET=""; ONLY=""; RUN_JOBS=1; TMO=5400
 _ORIG_ARGS="$*"   # the command line as given, for the run record (#189) — the loop below shifts it away
-LOGDIR=""; RESUME=0; STRICT=0; KEEPGOING=0; DRY=0; LIST=0; CONTROLS=0; STALE=0; REUSE=""; SKIP=""
+LOGDIR=""; RESUME=0; STRICT=0; KEEPGOING=0; DRY=0; LIST=0; CONTROLS=0; STALE=0; REUSE=""; SKIP=""; ORDER=""
 while [ $# -gt 0 ]; do
     case "$1" in
     --scope)   shift; SCOPE="${1:?--scope needs release|all|ondemand}"
@@ -186,7 +196,7 @@ while [ $# -gt 0 ]; do
                            LANES="${LANES_SET# }" ;; esac ;;
     --only)    shift; ONLY="${1:?--only needs a glob}" ;;
     --skip)    shift; SKIP="${SKIP:+$SKIP }${1:?--skip needs a glob}" ;;
-    --jobs)    shift; JOBS="${1:?--jobs needs N}" ;;
+    --jobs)    shift; RUN_JOBS="${1:?--jobs needs N}" ;;
     --timeout) shift; TMO="${1:?--timeout needs seconds}" ;;
     --log)     shift; LOGDIR="${1:?--log needs a dir}" ;;
     --resume)  RESUME=1 ;;
@@ -196,6 +206,8 @@ while [ $# -gt 0 ]; do
     --controls) CONTROLS=1 ;;
     --stale)   STALE=1 ;;
     --reuse)   shift; REUSE="${1:?--reuse needs the log directory of the freeze run}" ;;
+    --order)   shift; ORDER="${1:?--order needs the results.tsv of an earlier run}"
+               [ -f "$ORDER" ] || { echo "--order: no file $ORDER" >&2; exit 2; } ;;
     --list)    LIST=1 ;;
     -h|--help) sed -n '2,82p' "$0"; exit 0 ;;
     *) echo "unknown argument '$1' (try --help)" >&2; exit 2 ;;
@@ -258,7 +270,7 @@ selected() {  # rows matching --lane / --scope / --cadence / --only / --stale, i
             case "$_g" in $ONLY) ;; *) continue ;; esac
         fi
         if [ "$STALE" = 1 ]; then
-            printf '%s\n' "$STALE_NAMES" | grep -qx -- "$_g" || continue
+            printf '%s\n' "$STALE_NAMES" | grep -x >/dev/null -- "$_g" || continue
         fi
         skipped_here "$_g" && continue
         printf '%s\n' "$line"
@@ -374,9 +386,9 @@ if [ -n "$SKIP" ]; then
     _skn="$(rows | while IFS= read -r line; do _g="${line%%	*}"; if skipped_here "$_g"; then printf ' %s' "$_g"; fi; done)"
     echo "  NOT HERE   --skip '$SKIP':${_skn:- (no registry row matches)} — no row here; the row of record is another host's run"
 fi
-echo "  jobs       $JOBS   timeout ${TMO}s (a row's 7th column overrides it)"
+echo "  jobs       $RUN_JOBS   timeout ${TMO}s (a row's 7th column overrides it)"
 JTSIM_BASE="${JTSIM_SCRATCH:-${TMPDIR:-/tmp}/vampire-saved-jtsim}"
-[ "$JOBS" -gt 1 ] && echo "  scratch    $JTSIM_BASE (mister slot 0), $JTSIM_BASE-slotN (slots 1..$((JOBS-1)))"
+[ "$RUN_JOBS" -gt 1 ] && echo "  scratch    $JTSIM_BASE (mister slot 0), $JTSIM_BASE-slotN (slots 1..$((RUN_JOBS-1)))"
 echo "  log        $LOGDIR"
 echo "  ROMDIR     $ROMDIR"
 
@@ -548,7 +560,28 @@ run_one() {   # run_one <gate> <lane> <scope> <args> — writes one results row
     fi
     # THE EXECUTABLE CONTROLS (--controls): one more run per declared name.
     if [ "$CONTROLS" = 1 ] && [ "$_v" = PASS ] && [ "${VS_CTL_DECLARED:-0}" != 0 ]; then
-        for _cn in $(vs_ctl_declared "tests/$_g.sh"); do
+        # CONCURRENT CONTROLS (#321, 14z-210): in a pooled fbneo/mame lane, a gate listed in
+        # tests/controls_concurrent_emu.txt (a PILOT write trace showed no control writes a path a sibling writes or
+        # reads) gives its own slot back and runs each control in a slot of its own, beside one another and beside the
+        # pool's other gates. The release run of 14z-208b on ERIS spent 53,104 of its 60,228 s in control rows, and a
+        # gate's controls held its one slot end to end (audit_hitclass_map_cost: about 7,600 s in one slot). A worker
+        # holds no token while it waits for its controls, so the pool cannot deadlock on them.
+        if [ -n "$SLOTFIFO" ] && [ "$_lane" != mister ] && [ "$_lane" != prereq ] \
+                && awk -F'\t' -v g="$_g" '!/^#/ && $1 == g {f = 1} END {exit !f}' tests/controls_concurrent_emu.txt 2>/dev/null; then   # CONCURRENT-CONTROLS
+            printf '%s\n' "${_slot:-0}" >&8; _slot_given=1
+            for _cn in $(vs_ctl_declared "tests/$_g.sh"); do
+                read -r _cslot <&8                 # BLOCKS until a slot frees
+                ( run_control "$_cn"; printf '%s\n' "$_cslot" >&8 ) &
+            done
+            wait
+        else
+            for _cn in $(vs_ctl_declared "tests/$_g.sh"); do run_control "$_cn"; done
+        fi
+    fi
+}
+
+run_control() {  # run_control <name> — one control mode of run_one's gate ($_g, $_env, $_pos, $_tmo, $_lane, $_scope)
+            _cn="$1"
             _clog="$LOGDIR/$_g@$_cn.log"; _c0=$(date +%s)
             { echo "### $_g@$_cn  CONTROL=$_cn (the executable must-fire control; this run must FAIL)"
               echo "### cmd: env$_env CONTROL=$_cn tests/$_g.sh$_pos"; } > "$_clog"
@@ -568,8 +601,6 @@ run_one() {   # run_one <gate> <lane> <scope> <args> — writes one results row
             esac
             printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$_g@$_cn" "$_lane" "$_scope" "$_cv" "$_cdur" "$_cd" >> "$RESULTS"
             printf '  %-34s %-7s %4ss  %s\n' "$_g@$_cn" "$_cv" "$_cdur" "$_cd"
-        done
-    fi
 }
 
 already_done() {  # already_done <gate>
@@ -611,7 +642,7 @@ for _lane_pool in $_POOLS; do
     # The prereq lane runs SEQUENTIALLY whatever --jobs says: these gates
     # measure the instruments, and an instrument measured under contention is
     # a different instrument.
-    _jobs=$JOBS; [ "$_lane_pool" = prereq ] && _jobs=1
+    _jobs=$RUN_JOBS; [ "$_lane_pool" = prereq ] && _jobs=1
     # THE SLOT SEMAPHORE (14z-144). One FIFO per lane, pre-filled with $_jobs
     # tokens whose VALUE is the slot number; fd 8 is both ends so a worker can
     # give its token back without reopening. Serial lanes use no FIFO at all,
@@ -632,6 +663,15 @@ for _lane_pool in $_POOLS; do
     # lane, and its result landed under the wrong heading. Reading from a file
     # keeps the loop — and `wait`, and `_running` — in the main shell.
     printf '%s\n' "$_rows" > "$LOGDIR/.lane_$_lane_pool"
+    # LONGEST FIRST (--order, #321): a pooled lane's rows sorted by the seconds an earlier run spent on each gate and its
+    # control rows, the most first; a gate absent there first of all (its cost is unknown), the sort stable so ties keep
+    # registry order. A long gate started last is the tail every slot waits on.
+    if [ -n "$ORDER" ] && [ "$_jobs" -gt 1 ]; then   # ORDER-SORT
+        awk -F'\t' 'NR == FNR { if (FNR > 1 && $5 ~ /^[0-9]+$/) { g = $1; sub(/@.*/, "", g); t[g] += $5; k[g] = 1 }; next }
+                     { printf "%d\t%d\t%s\n", ($1 in k) ? t[$1] : 999999999, FNR, $0 }' "$ORDER" "$LOGDIR/.lane_$_lane_pool" \
+            | sort -t "$(printf '\t')" -k1,1nr -k2,2n | cut -f3- > "$LOGDIR/.lane_$_lane_pool.sorted"
+        mv "$LOGDIR/.lane_$_lane_pool.sorted" "$LOGDIR/.lane_$_lane_pool"
+    fi
     while IFS="$(printf '\t')" read -r g lane scope cadence args note tmo; do
         [ -n "$g" ] || continue
         if already_done "$g"; then
@@ -709,8 +749,9 @@ for _lane_pool in $_POOLS; do
                 _slot_env="JTSIM_SCRATCH=$_scr "
             fi
             (
+                _slot_given=""
                 run_one "$g" "$lane" "$scope" "$_slot_env${args:--}" "${tmo:-}"
-                if [ -n "$SLOTFIFO" ]; then printf '%s\n' "${_slot:-0}" >&8; fi
+                if [ -n "$SLOTFIFO" ] && [ -z "$_slot_given" ]; then printf '%s\n' "${_slot:-0}" >&8; fi
             ) &
         fi
     done < "$LOGDIR/.lane_$_lane_pool"

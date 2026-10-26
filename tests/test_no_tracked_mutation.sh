@@ -98,12 +98,12 @@ for f in tests/*.sh; do
     # Strip comments so PROSE describing the old pattern is not a hit.
     body="$(sed 's/#.*//' "$f")"
     # (a) a python heredoc writing a literal tools/ path
-    if printf '%s' "$body" | grep -q 'Path("tools/' && \
-       printf '%s' "$body" | grep -q 'write_text'; then
+    if printf '%s' "$body" | grep >/dev/null 'Path("tools/' && \
+       printf '%s' "$body" | grep >/dev/null 'write_text'; then
         hits="$hits $b(write_text)"
     fi
     # (b) shell copying/redirecting/editing INTO tools/
-    if printf '%s' "$body" | grep -qE '(^|[^-])> *"?tools/|cp +[^|]*[ "]tools/[a-z_]+\.(py|sh)"? *$|sed +-i[^|]* tools/'; then
+    if printf '%s' "$body" | grep -E >/dev/null '(^|[^-])> *"?tools/|cp +[^|]*[ "]tools/[a-z_]+\.(py|sh)"? *$|sed +-i[^|]* tools/'; then
         hits="$hits $b(shell-write)"
     fi
 done
@@ -127,8 +127,8 @@ p.write_text(p.read_text().replace("a", "b"))
 PY
 BAD
 body="$(sed 's/#.*//' "$T/fake/test_bad.sh")"
-if printf '%s' "$body" | grep -q 'Path("tools/' && \
-   printf '%s' "$body" | grep -q 'write_text'; then
+if printf '%s' "$body" | grep >/dev/null 'Path("tools/' && \
+   printf '%s' "$body" | grep >/dev/null 'write_text'; then
     echo "  ok: a deliberately offending test IS detected"
 else
     fail "the scan does not detect a clear in-place mutation, so section 3"

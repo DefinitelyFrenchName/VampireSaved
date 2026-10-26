@@ -16,18 +16,18 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**480 scripts** — 145 ci_portable, 92 ci_static, 243 emulator-tier (run by name).
+**482 scripts** — 146 ci_portable, 93 ci_static, 243 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 52 | the suite runners and their own ground truth |
+| [runner](#runner) | 53 | the suite runners and their own ground truth |
 | [docs](#docs) | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 50 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 90 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 91 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 38 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -41,7 +41,7 @@ the suite runners and their own ground truth.
 | `tests/run_all_static.sh` | run | emulator | FBNeo, a build dir | THE PRE-COMMIT GATE CHAIN. One command, every gate that does not need an emulator. (14z-94, GitHub #30.) | 14z-94 |
 | `tests/run_battery_m2.sh` | run | emulator | MAME, FBNeo, a build dir, ~15 min | the M2 deliverable battery: the EXACT gate chain a stage-6 dev build must pass before any commit that touches the build (CLAUDE.md rule 2 / persistent-suite doctrine). One command, no chat-memory chain. Sections: 0. | M2 |
 | `tests/run_on_snapshot.sh` | run | emulator | Verilator, FBNeo, a build dir | RUN A TIER ON A SNAPSHOT AT A NAMED COMMIT, immune to the working tree (GitHub #153, lever B of #148; ruled 2026-09-26, DECISIONS_HISTORY.md "Ruled 2026-09-26 (14z-183b) — #153"). | 2026-09-26 |
-| `tests/run_suite.sh` | run | emulator | MAME | the oracle replay suite (MAME side), auto-detecting runner. | 14z-94 |
+| `tests/run_suite.sh` | run | emulator | MAME | the oracle replay suite (MAME side), auto-detecting runner. | 14z-210 |
 | `tests/test_agent_defs.sh` | test | ci_portable | — | SLICE S4 OF GitHub #172, step 1: every worker definition under `.claude/agents/` STATES its caps (tools/agent/agent_defs.py), ruled 2026-09-23 (14z-177, DECISIONS_HISTORY.md "Ruled 2026-09-23 (14z-177)"): | 2026-09-23 |
 | `tests/test_agent_extract.sh` | test | ci_portable | — | SLICE S3 OF GitHub #172: the transcript EXTRACT the procedural checker (C1) reads says what the transcript says (`tools/agent/extract.py`, 2026-09-23). | 2026-09-23 |
 | `tests/test_agent_hooks.sh` | test | ci_portable | — | SLICE S1 OF GitHub #172: the agent-discipline hooks decide what the evidence says they should (docs/project/agent_architecture_scope.md, 2026-09-23). | 2026-09-23 |
@@ -58,7 +58,7 @@ the suite runners and their own ground truth.
 | `tests/test_controls_contract.sh` | test | ci_portable | — | ground truth for THE MUST-FIRE CONTRACT'S READER, tests/lib/controls.sh: the four regexes of the R10 grammar, the leading comment block as the header (a bare `#` continues it, a non-comment line ends it), the declared-vs-fired readback the… | 14z-147 |
 | `tests/test_demand_after_trap.sh` | test | ci_portable | — | no gate carries a `${VAR:?msg}` DEMAND after its EXIT trap (14z-134). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-134 |
 | `tests/test_emu_run_compare.sh` | test | ci_portable | — | two emulator-tier runs are compared per row over what BOTH ran and BOTH passed (`tools/emu_run_compare.py`, 14z-193, GitHub #122). | 14z-193 |
-| `tests/test_emulator_runner.sh` | test | ci_portable | — | ground truth for tests/run_all_emulator.sh (14z-128). ROM-free, ~26 s (measured 14z-162; the header said ~5 s). | 14z-128 |
+| `tests/test_emulator_runner.sh` | test | ci_portable | — | ground truth for tests/run_all_emulator.sh (14z-128). ROM-free, ~72 s (measured 14z-210 on the Mac; ~26 s at 14z-162, before sections 18-19). | 14z-128 |
 | `tests/test_emulator_staleness.sh` | test | ci_portable | — | WHICH EMULATOR GATES' GREEN IS STALE, and is any row eating its cap (GitHub #171 slices Q4 and Q5, ruled 2026-09-24: "NOTE at session, FAIL at freeze/release"; | 2026-09-24 |
 | `tests/test_figure_check.sh` | test | ci_portable | — | a close's stated figures equal their sources, and a claim's figures are each checked or named unchecked (`tools/figure_check.py`, 14z-185b, GitHub #190 P1). | 14z-185b |
 | `tests/test_freeze_set_shape.sh` | test | ci_portable | — | every numbered expectation set LOSES NOTHING its predecessor held, and the committed freeze driver carries, pins, verifies and cleans up in that order (`tools/freeze_set_shape.py`, `tools/freeze_expectation_set.py`; 14z-185b, GitHub #150). | 14z-185b |
@@ -86,6 +86,7 @@ the suite runners and their own ground truth.
 | `tests/test_static_confirm.sh` | test | ci_portable | — | the static tier's carry-forward predictor marks a gate STALE by every rule it states (`tools/static_confirm.py`, 14z-185b, GitHub #188 route A — wired 14z-188). | 14z-185b |
 | `tests/test_suite_dispatch.sh` | test | emulator | MAME, a build dir | ground truth for the auto-detecting runner's dispatch pieces (no emulator needed; the emulator-side behaviors they gate are proven by test_m2_repoint.sh and the suite itself): 1. build_fingerprint: vanilla rompath -> 'vsavj'; | 14z-132 |
 | `tests/test_suite_dispatch_selftest.sh` | test | ci_static | ROMDIR | ground truth for the kind->owner table in tests/test_suite_dispatch.sh (14z-90, GitHub issue #7). | 14z-90 |
+| `tests/test_suite_jobs.sh` | test | ci_portable | — | run_suite.sh at SUITE_JOBS=N says what it says at SUITE_JOBS=1 (#321, 14z-210). ROM-free, no MAME, ~15 s. | 14z-210 |
 | `tests/test_superseded_pins.sh` | test | ci_portable | — | no live line in tests/ or tools/ pins a fingerprint the registry has SUPERSEDED (`tools/superseded_pins.py`, 14z-185b, GitHub #167). | 14z-185b |
 | `tests/test_tmp_hygiene.sh` | test | ci_portable | — | EVERY TEMPORARY A TOOL OR GATE MAKES IS REMOVED WHEN ITS MAKER EXITS (#303, 14z-207). ci_portable: no ROM, ~2 s. | 14z-207 |
 | `tests/test_trace_static_reads.sh` | test | ci_portable | — | #188's TRACED TEST, PROMOTED: the scorer finds a read the predictor does not flag, and its over-narrowed control must miss (GitHub #225, 14z-191). ci_portable: no ROM, no emulator, no strace, ~3 s. | 14z-191 |
@@ -484,6 +485,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/test_advancing_guard.sh` | test | emulator | MAME, ~2.5 min | THE ADVANCING GUARD (guard push), MEASURED on native vs2 and on vsavj, and frozen (14z-123, the documentation pass's G2). | 14z-123 |
 | `tests/test_air_attack_height.sh` | test | ci_static | ROMDIR | vsavj's MINIMUM AIR-DASH HEIGHT table, read where the code reads it (14z-189; the 14z-121 "36" corrected; "air-attack" CORRECTED to AIR-DASH 14z-191 — every caller's taken branch enters seq 0x14, the air dash, docs/game/engine_internals.md;… | 14z-189 |
 | `tests/test_anim_node_walk.sh` | test | emulator | MAME, a build dir, ~2 min | THE ANIMATION-NODE DECODER IS AN INSTRUMENT (character-data map, phase 1; 14z-118). tools/anim_nodes.py reads the per-character anim index tables and walks the 0x18-byte node chains by the rules read off vs2's walker (PRG:0x02713C / 0x0271C… | 14z-118 |
+| `tests/test_anim_signed_offsets.sh` | test | ci_static | ROMDIR | THE ANIM INDEX TABLES' OFFSETS ARE READ SIGNED (#318). ci_static: needs ROMDIR (or a warm decrypt cache), no build dir, no emulator, ~5 s warm. | 14z-205 |
 | `tests/test_charid_names.sh` | test | ci_portable | — | EVERY IN-TREE CHARACTER-ID -> NAME MAP AGREES WITH THE ATLAS SLOT TABLE (GitHub #218, 14z-191). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-191 |
 | `tests/test_community_crosscheck.sh` | test | ci_static | ROMDIR | OUR DERIVED VANILLA FRAME DATA STILL SAYS WHAT THE COMMUNITY WORKBOOK SAYS (14z-125, the community cross-check). | 14z-125 |
 | `tests/test_crosscheck_229.sh` | test | ci_portable | — | #229'S COLUMN CLASSIFIER RETURNS THE VERDICT IT SHOULD, ON FIXTURES WHOSE VERDICT IS KNOWN (14z-209, CLAUDE.md §4 [VSP-19]: a test's classification code is validated against known ground truth before its verdicts are trusted). | 14z-209 |

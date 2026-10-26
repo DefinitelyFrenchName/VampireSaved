@@ -46,12 +46,12 @@ json.dump({"ops": [
 ]}, open(os.path.join(w, "clean/patch/patch.json"), "w"))
 PY
 BAD="$(python3 tools/audit_pointer_flow.py "$W/bad")"
-echo "$BAD" | grep -q "STRONG	code:movea_imm.*WIDE-HOLE" \
-    && echo "$BAD" | grep -q "STRONG	op-extent.*OFF-IMAGE" \
+echo "$BAD" | grep >/dev/null "STRONG	code:movea_imm.*WIDE-HOLE" \
+    && echo "$BAD" | grep >/dev/null "STRONG	op-extent.*OFF-IMAGE" \
     && echo "   ok: both synthetic defects flagged STRONG" \
     || { echo "FAIL: synthetic defects not flagged"; fail=1; }
 CLEAN="$(python3 tools/audit_pointer_flow.py "$W/clean")"
-echo "$CLEAN" | grep -q "FLAGGED: 0" \
+echo "$CLEAN" | grep >/dev/null "FLAGGED: 0" \
     && echo "   ok: clean synthetic flags nothing" \
     || { echo "FAIL: clean synthetic produced flags"; fail=1; }
 

@@ -57,7 +57,9 @@ W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 # COPY OF THE REAL CARRIERS and the main check runs on that copy — it must FAIL.
 ROOT="$REPO"
 if [ -n "$VS_CTL" ]; then
-    mkdir -p "$W/mode/build"; cp -R docs tools tests "$W/mode/"; cp -R build/manifest "$W/mode/build/"
+    # every carrier tools/gen_annotations.py reads (CARRIERS), HANDOFF.md included: a copy without it reads STALE
+    # unperturbed, so both modes failed whatever their perturbation did (#310 census, measured 14z-210)
+    mkdir -p "$W/mode/build"; cp -R docs tools tests "$W/mode/"; cp -R build/manifest "$W/mode/build/"; cp HANDOFF.md "$W/mode/"
     case "$VS_CTL" in
     new-carrier-address) printf '\n## A synthetic section\n\nand `PRG:0x0FFFFE` too\n' >> "$W/mode/docs/game/atlas/ram.md" ;;
     hand-edited-index)   printf '| `PRG:0x0FFFFE` | hand-written |\n' >> "$W/mode/docs/annotations.md" ;;
@@ -72,6 +74,10 @@ if python3 tools/gen_annotations.py --root "$ROOT" --check >"$LOG" 2>&1; then
 else
     bad "gen_annotations.py --check FAILS (regenerate: python3 tools/gen_annotations.py):"
     sed 's/^/        /' "$LOG" | head -20
+    # a mode run judges its OWN perturbation, the planted address (#310, 14z-210)
+    if [ -n "$VS_CTL" ] && ! grep -q 'PRG:0x0FFFFE\|0FFFFE' "$LOG"; then
+        echo "NOT JUDGED: the copy failed --check without the planted PRG:0x0FFFFE in the difference"
+    fi
 fi
 mkdir -p "$W/docs/game/atlas" "$W/build/manifest"
 printf '# doc_shape\n' > "$W/docs/doc_shape.tsv"

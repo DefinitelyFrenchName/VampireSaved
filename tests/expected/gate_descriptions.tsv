@@ -149,6 +149,7 @@ declares	test_agent_sweep
 declares	test_agent_worker
 declares	test_air_attack_height
 declares	test_anim_node_walk
+declares	test_anim_signed_offsets
 declares	test_annotations_current
 declares	test_applier_key_first
 declares	test_applier_page
@@ -455,6 +456,7 @@ declares	test_static_runner
 declares	test_submodule_pins
 declares	test_suite_dispatch
 declares	test_suite_dispatch_selftest
+declares	test_suite_jobs
 declares	test_superseded_pins
 declares	test_tables_current
 declares	test_tenant_anim_relocation

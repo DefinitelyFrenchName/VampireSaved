@@ -12,6 +12,8 @@
 #   re-trace's scorer, tools/controls_overlap.py, on synthetic traces: distinct writes SAFE, a shared write, a write
 #   a sibling reads and a write split by strace SHARED, a control's own mktemp path and a bytecode cache SAFE, a gate
 #   whose every control SKIPped HOLLOW.
+#   Section 3b (#321, 14z-210) runs the same census over the EMULATOR list, tests/controls_concurrent_emu.txt
+#   (tools/controls_concurrent.py --emulator: a row's gate must have an fbneo or mame row in tests/ci_emulator.tsv).
 # EXPECTS: 0 rows named on the tree. A red names the gate and says "re-trace it or take it off the list" — the #315
 #   shape: 8 of lane S's 98 traced gates had changed before #312 landed and would have kept running their controls
 #   beside one another on a trace that no longer described them.
@@ -61,12 +63,20 @@ echo "== 3. controls"
 chk() {  # chk <control> <tag>: the copy with that perturbation names the first row with that tag
     mkcopy "$W/$1" "$1"
     out="$(python3 tools/controls_concurrent.py --root "$W/$1" 2>&1)"
-    if echo "$out" | grep -q "^$2	$G1	"; then vs_ctl_fired "$1" "$(echo "$out" | grep -m1 "^$2	" | cut -c1-120)"
+    if echo "$out" | grep >/dev/null "^$2	$G1	"; then vs_ctl_fired "$1" "$(echo "$out" | grep -m1 "^$2	" | cut -c1-120)"
     else vs_ctl_dead "$1" "the $1 row was not named $2: $(echo "$out" | tail -1)"; fail=1; fi
 }
 chk unregistered UNREGISTERED
 chk one-control FEWCONTROLS
 chk changed-script STALE
+
+echo "== 3b. the EMULATOR list (#321, 14z-210): tests/controls_concurrent_emu.txt, read by tests/run_all_emulator.sh"
+out="$(python3 tools/controls_concurrent.py --root "$REPO" --emulator 2>&1)"; erc=$?
+echo "$out" | sed 's/^/  /' | tail -8
+[ "$erc" = 0 ] && ok "every listed emulator gate has an fbneo/mame row, declares 2+ controls and is the script that was traced" \
+    || bad "a listed emulator gate must be re-traced or taken off tests/controls_concurrent_emu.txt (above)"
+echo "$out" | tail -1 | grep -Eq '^[1-9][0-9]* listed gate' && ok "the emulator list was read: $(echo "$out" | tail -1)" \
+    || bad "the census read no listed emulator gate: $(echo "$out" | tail -1)"
 
 echo "== 4. tools/controls_overlap.py's verdicts on synthetic traces (the freeze re-trace's scorer, ground truth)"
 T="$W/tr"; mkdir -p "$T/st" "$T/out"; : > "$T/done.tsv"
@@ -85,10 +95,17 @@ st g_tmp c2 '1 openat(AT_FDCWD, "x", O_WRONLY|O_CREAT, 0600) = 3</tmp/tmp.AbCdEf
 st g_split c1 '7 openat(AT_FDCWD, "a", O_WRONLY|O_CREAT <unfinished ...>' '7 <... openat resumed>) = 3</r/w/a>'; st g_split c2 "$W1"
 st g_hollow c1 "$W1"; st g_hollow c2 "$W2"
 for c in c1 c2; do echo "SKIP: no thing on this host" > "$T/out/g_hollow.$c.out"; done
+# RELATIVE rename targets (#321, 14z-210): placed by renameat's dirfd, else by the pid's last AT_FDCWD; never placed = shared
+st g_relsafe c1 '4 renameat2(AT_FDCWD</tmp/tmp.AbCdEf1x>, "z.tmp", AT_FDCWD</tmp/tmp.AbCdEf1x>, "vsavjw.zip", RENAME_NOREPLACE) = 0'
+st g_relsafe c2 '5 openat(AT_FDCWD</tmp/tmp.GhIjKl2y>, "q", O_RDONLY) = 3</tmp/tmp.GhIjKl2y/q>' '5 rename("z.tmp", "vsavjw.zip") = 0'
+st g_relshared c1 '4 renameat2(AT_FDCWD</r/w>, "z.tmp", AT_FDCWD</r/w>, "vsavjw.zip", RENAME_NOREPLACE) = 0'
+st g_relshared c2 '5 openat(AT_FDCWD</r/w>, "q", O_RDONLY) = 3</r/w/q>' '5 rename("z.tmp", "vsavjw.zip") = 0'
+st g_relunknown c1 '6 rename("z.tmp", "vsavjw.zip") = 0'; st g_relunknown c2 '7 rename("z.tmp", "vsavjw.zip") = 0'
 out="$(python3 tools/controls_overlap.py "$T" 2>&1)"
-for want in "g_safe SAFE" "g_shared SHARED" "g_wr SHARED" "g_tmp SAFE" "g_split SHARED" "g_hollow HOLLOW"; do
+for want in "g_safe SAFE" "g_shared SHARED" "g_wr SHARED" "g_tmp SAFE" "g_split SHARED" "g_hollow HOLLOW" \
+            "g_relsafe SAFE" "g_relshared SHARED" "g_relunknown SHARED"; do
     set -- $want
-    echo "$out" | grep -q "^== $1: .* -> $2\$" && ok "$1 reads $2" || bad "$1 did not read $2: $(echo "$out" | grep "^== $1:" | cut -c1-120)"
+    echo "$out" | grep >/dev/null "^== $1: .* -> $2\$" && ok "$1 reads $2" || bad "$1 did not read $2: $(echo "$out" | grep "^== $1:" | cut -c1-120)"
 done
 
 [ "$fail" = 0 ] && echo "PASS: test_controls_concurrent" || echo "FAIL: test_controls_concurrent"

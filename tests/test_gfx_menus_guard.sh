@@ -50,7 +50,7 @@ G=tests/test_gfx_menus.sh
 
 echo "== 1. a rompath that does not exist =="
 set +e; out=$("$REPO/$G" /nonexistent/rompath 2>&1); rc=$?; set -e
-if [ "$rc" != 0 ] && echo "$out" | grep -q "no vsavj.zip"; then
+if [ "$rc" != 0 ] && echo "$out" | grep >/dev/null "no vsavj.zip"; then
     echo "  ok: FAILs and names the missing set"
 else
     echo "FAIL: an absent rompath did not fail the gate (rc=$rc)"; fail=1
@@ -65,7 +65,7 @@ if [ ! -f "$WIDE_RP/vsavjw.zip" ] || [ -f "$WIDE_RP/vsavj.zip" ]; then
     WIDE_RP="$WIDE_TMP/rompath"; mkdir -p "$WIDE_RP"; : > "$WIDE_RP/vsavjw.zip"
 fi
 set +e; out=$("$REPO/$G" "$WIDE_RP" 2>&1); rc=$?; set -e
-if [ "$rc" != 0 ] && echo "$out" | grep -q "no vsavj.zip"; then
+if [ "$rc" != 0 ] && echo "$out" | grep >/dev/null "no vsavj.zip"; then
     echo "  ok: a vsavjw-only dir FAILs instead of falling through to \$ROMDIR"
 else
     echo "FAIL: a set-less rompath did not fail the gate (rc=$rc) — this is"
@@ -76,7 +76,7 @@ fi
 echo "== 3. POSITIVE CONTROL: the default invocation still passes =="
 if [ -f "$REPO/build/donovan6/rompath/vsavj.zip" ]; then
     set +e; out=$("$REPO/$G" 2>&1); rc=$?; set -e
-    if [ "$rc" = 0 ] && echo "$out" | grep -q "PASS: menu gfx gate"; then
+    if [ "$rc" = 0 ] && echo "$out" | grep >/dev/null "PASS: menu gfx gate"; then
         echo "  ok: default rompath still gates three frames pixel-exact"
     else
         echo "FAIL: the gate no longer passes on its default build (rc=$rc)"

@@ -62,13 +62,13 @@ set +e; got=$(enumerate_expectations "$F" "$WORK/repo"); rc=$?; set -e
 for want in "aa_masked|masked|EVAL" "bb_skip|skip|SKIP" "cc_sha1|sha1|N/A" \
             "dd_pending|pending|NOT-EVALUATED" "ee_bogus|bogus|UNKNOWN-KIND" \
             "ff_diverge|diverge|EVAL"; do
-    if printf '%s\n' "$got" | grep -qx "$want"; then
+    if printf '%s\n' "$got" | grep -x >/dev/null "$want"; then
         echo "  ok: $want"
     else
         echo "FAIL: missing dispatch line '$want'"; fail=1
     fi
 done
-if printf '%s\n' "$got" | grep -q "not_a_replay"; then
+if printf '%s\n' "$got" | grep >/dev/null "not_a_replay"; then
     echo "FAIL: a file whose stem is not a replay was enumerated"; fail=1
 else
     echo "  ok: non-replay files ignored"
@@ -109,7 +109,7 @@ fi
 echo "== 4. no-loophole: a set with no .pending returns 0 =="
 rm -f "$F/dd_pending.pending" "$F/ee_bogus.bogus"
 set +e; clean=$(enumerate_expectations "$F" "$WORK/repo"); crc=$?; set -e
-if [ "$crc" = 0 ] && ! printf '%s\n' "$clean" | grep -q "NOT-EVALUATED"; then
+if [ "$crc" = 0 ] && ! printf '%s\n' "$clean" | grep >/dev/null "NOT-EVALUATED"; then
     echo "  ok: a fully ratified set passes cleanly"
 else
     echo "FAIL: a clean set did not return 0 (rc=$crc)"; fail=1

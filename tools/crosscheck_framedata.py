@@ -421,7 +421,8 @@ def render_md(vanilla, cmp_, full=False):
     A("chain the rig recorded carries no attack window in its records — the hit is the MINE the")
     A("move spawns, confirmed by the maintainer (2026-10-05, GitHub #216): *\"the hit is the mine")
     A("spawned, it is technically a trap/projectile with a disjointed hitbox from the character's")
-    A("sprite\"*. Specials, supers, EX/ES moves and throws are not joined at all (the pursuits, 14z-194, and the ground throws, 14z-195, are measured in their own sections below).")
+    A("sprite\"*. The specials, supers, EX/ES moves, throws, pursuits and guard cancels are joined by rigs of their own")
+    A("and classified in their own sections below (#229), each frozen by its gate.")
     A("")
     A("## The headline: per-move agreement")
     A("")
@@ -623,8 +624,13 @@ def render_md(vanilla, cmp_, full=False):
         A("")
     A("## The pursuits — named and compared for all 15 characters (14z-194, #229)")
     A("")
-    A("Measured on vsavj on ERIS (scratch rigs of the #229 fork, not yet a gate; the per-move")
-    A("figures stay out of the tree with the rest of the frame data). **Scope first**: of the")
+    A("First measured on vsavj on ERIS with scratch rigs of the #229 fork (14z-194); the method was rebuilt as a gate")
+    A("(14z-205, registered 14z-209): `tests/audit_vanilla_pursuits.sh` (each event's frozen line and hashes")
+    A("`tests/expected/vanilla_pursuits.tsv`, the connect-band edges `tests/expected/vanilla_pursuit_bands.tsv`, the rigs")
+    A("`tools/vanilla_pursuit_rigs.py`; its row set equals the workbook's 30 pursuit rows). The column verdicts below are")
+    A("14z-194's reading as the Q2 rulings amended it, not re-classified from the gate's run (`tools/crosscheck_229.py`")
+    A("does not read the pursuits, Q2); the per-move figures stay out of the tree with the rest of the frame data.")
+    A("**Scope first**: of the")
     A("workbook's rows not joined above, the #229 fork grouped 440 by what each needs that the")
     A("vanilla join rig lacks — motion specials 166, guard-cancel rows 42, command throws and")
     A("grabs 54, ES specials 61, EX supers 50, ground throws 23, air throws 14, and the 30")
@@ -710,6 +716,7 @@ def render_md(vanilla, cmp_, full=False):
     A('| startup | **CONSTANT OFFSET**: sheet = ours +1 on all 14, as on the ground |')
     A('| recovery, throw tech | not measured |')
     A("")
+    render_specials_a(A)
     A('## The specials, LE LI MO QB SA VI ZA (14z-205, classified 14z-209, #229)')
     A('')
     A('Measured on vsavj; the gate is `tests/audit_vanilla_specials_b.sh` (its frozen identity map')
@@ -737,7 +744,8 @@ def render_md(vanilla, cmp_, full=False):
     A("input; a workbook input the engine reads differently joins under the engine's, Q4); 12 rows on 10 inputs are")
     A('UNRESOLVED and named with the reason in `tools/es_ex_rigs.py` UNRESOLVED (every timing tried enters a normal or pays')
     A('nothing on vsavj: BI 22PP / 236PP / 623PP, DE 623KK, FE 22PP and 236PP~PP, LE Tenraiha, QB SXP and air SXP, SA 720KK);')
-    A("Demitri's ES Demon Cradle GC is a guard cancel (the next family). **Identity**: the maintainer read F3's sheets")
+    A("Demitri's ES Demon Cradle GC is declared for the guard cancels (`NOT_HERE`), which do not run it (that section says")
+    A("why). **Identity**: the maintainer read F3's sheets")
     A('(Q1), and Jedah\'s re-rigged ES row is ES Ira Spinta, ES Ira Piano being `J.63214KK~PP` (*"both are correct"*,')
     A("2026-10-21). **Timing** in engine ticks from the field leg's pass counter, from the move's entry; a projectile or a")
     A('move with no attack node on P1 is uncomparable. Classified by `tools/crosscheck_229.py es`.')
@@ -775,13 +783,22 @@ def render_md(vanilla, cmp_, full=False):
     A('')
     A('Measured on vsavj; the gate is `tests/audit_guard_cancels.sh` (its 271-event table as a hash,')
     A('`tests/expected/guard_cancels.sha256`, the table outside the tree; the rigs `tools/gc_rigs.py`). **Scope**: the')
-    A("workbook's 42 guard-cancel rows on the 14 characters that have one (Demitri has none), joined by their 623+button set:")
+    A("workbook's 42 rows TYPED as a guard cancel (`special GC`, `es special GC`, `GC`, `es GC`: `tools/gc_rigs.py` GC_TYPES) on")
+    A("the 14 characters the rigs run, joined by their 623+button set:")
     A("53 buttons commit the game's own guard cancel (P1's `+0x3B5` := 6 by `PRG:0x029C6E`). **Identity**: the maintainer")
     A('read F5\'s sheets (Q1); Bulleta\'s guard cancel has no attack (*"this is indeed her correct GC"*). **Timing** is the')
     A('HIT\'s, the gc event\'s (Q6, *"(b) Keep the hit timing as the record. -> yes"*), in engine ticks; Bulleta\'s (no attack)')
     A("and Lei-Lei's (her hits come from another object) are uncomparable. **Damage** is what is DEALT on a defense-row -3")
     A("victim (Q5): Gallon, Zabel on Gallon's own rows, the first fall of P2's HP. **Gauge**: the whiff event's own gain, and")
     A("the hit cell as the page's 2b rule (the swing plus the record). Classified by `tools/crosscheck_229.py gc`.")
+    A('')
+    A("**Demitri's four Demon Cradle GC rows (LP, MP, HP and ES) are joined to nothing: NOT MEASURED** (#331). The workbook")
+    A("names them guard cancels but types them `special` and `es special`, so the type-keyed row set above never held them;")
+    A("the specials gate declares the three plain rows for this family (`tools/specials_a_rigs.py` NOT_RUN) and the ES/EX")
+    A("gate the ES one (`tools/es_ex_rigs.py` NOT_HERE); and no rig here puts Demitri on P1 (`tools/gc_rigs.py` TABS: he is")
+    A("P2, the attacker whose 5HP P1 blocks), so none performs his 623+P out of a block. `tools/crosscheck_229.py gc` prints the four rows as")
+    A("NOT RUN with that reason. Whether vsavj commits a guard cancel for Demitri is not measured here; joining the rows")
+    A("needs a rig with Demitri on P1 against another attacker.")
     A('')
     A('| column | verdict over the joined events (sheet - ours) |')
     A('|---|---|')
@@ -822,11 +839,12 @@ def render_md(vanilla, cmp_, full=False):
     A("  corpus and NOT yet measured:** mizuumi distinguishes NEUTRAL- from FORWARD-jump")
     A("  variants of the same button (`8J.LP` vs `9J.LP`) where our slot map carries ONE")
     A("  chain per aerial button. Needs a two-direction jump rig.")
-    A("- **Specials, supers, EX/ES moves and throws are not joined** (the command normals are,")
-    A("  since 14z-189; the pursuits, 14z-194, and the ground throws, 14z-195, are measured in their")
-    A("  own sections above). Each")
-    A("  needs its own measured naming rig on vsavj, the way `tools/name_moves.py` did for the")
-    A("  tenants. That is the bulk of the workbook's 820 rows and it is untouched here.")
+    A("- ~~**Specials, supers, EX/ES moves and throws are not joined**~~ **JOINED (#229, 14z-194 to")
+    A("  14z-209):** every family of the workbook's rows has its own measured rig on vsavj, its own gate and")
+    A("  its own section above. The rows with no measured event to compare are named in those sections")
+    A("  with the reason: Demitri's four Demon Cradle GC rows (not measured), the specials' declared rows")
+    A("  (Felicia's Toy Touch, Anakaris's Spell of Turning release, Bishamon's Kienzen), the ES/EX")
+    A("  family's UNRESOLVED rows, Bishamon's LP Kirisute Gomen, Victor's Graviton Knuckle.")
     A("- **Seven workbook columns have no counterpart in the tree**: `on hit`, `on block`,")
     A("  `renda on hit`, `renda on block`, `throw tech`, `cancel`, `Invuln`. Frame advantage")
     A("  needs the victim's stun beside the attacker's recovery; nothing computes it.")
@@ -850,6 +868,94 @@ def render_md(vanilla, cmp_, full=False):
     A("  Duplicate move names exist in `FE`, `BU` and `JE`; the join takes the first row.")
     A("")
     return "\n".join(L) + "\n"
+
+
+SPECIALS_A_VERDICTS = REPO / "tests/expected/vanilla_specials_a_verdicts.tsv"
+SPECIALS_A_TABS = ["FE", "AN", "AU", "BI", "BU", "DE", "GA", "JE"]
+
+
+def specials_a_rows(path=SPECIALS_A_VERDICTS):
+    """The frozen verdict file of tests/audit_vanilla_specials_a.sh -> (per (tab, column) (verdict, detail), per column
+    the OVERALL (verdict, detail), the TICKS-AGREE text, the VALUES-SHA256 count). Read, never re-derived: the page
+    shows what the gate froze (#331)."""
+    per, overall, agree, nvals, in_overall = {}, {}, "", "", False
+    for line in Path(path).read_text().splitlines():
+        if not line or line.startswith("#"):
+            continue
+        f = line.split("\t")
+        if f[0] == "OVERALL":
+            in_overall = True
+        elif f[0] == "TICKS-AGREE":
+            agree = f[1]
+        elif f[0] == "VALUES-SHA256":
+            nvals = f[1].split()[1]
+        elif in_overall:
+            overall[f[0]] = (f[1], f[2])
+        else:
+            per[(f[0], f[1])] = (f[2], f[3])
+    return per, overall, agree, nvals
+
+
+def render_specials_a(A, path=SPECIALS_A_VERDICTS):
+    """The specials FE AN AU BI BU DE GA JE section (#331): the table is RENDERED from the gate's frozen verdict file,
+    so a re-freeze of tests/audit_vanilla_specials_a.sh leaves this page stale until it is regenerated."""
+    per, overall, agree, nvals = specials_a_rows(path)
+    A('## The specials, FE AN AU BI BU DE GA JE (14z-205, frozen 14z-209, #229, page section #331)')
+    A('')
+    A('Measured on vsavj; the gate is `tests/audit_vanilla_specials_a.sh` (its frozen identity map')
+    A('`tests/expected/vanilla_specials_a.tsv`, its column verdicts, live-vs-derived tick agreement and a hash of the')
+    A("joined values `tests/expected/vanilla_specials_a_verdicts.tsv`, which the table below is rendered from; the rigs")
+    A("`tools/specials_a_rigs.py`). **Scope**: 80 workbook rows run on the eight characters (each named by the chains the")
+    A("engine entered and the projectile types it spawned, never by the input) and 6 declared for other families")
+    A("(`NOT_RUN`: Anakaris's two EX supers, Demitri's three Demon Cradle GC rows, Bishamon's `J.MP`). Rows with no")
+    A("comparable cell: the projectiles and movements (the fighter's walk has no attack node; a projectile's own frames")
+    A("are not counted), Bishamon's Kienzen `623P` (it never fires under five cadences: declared, open), and the two")
+    A("`UNJOINABLE` rows (Felicia's Toy Touch, an OTG move; Anakaris's Spell of Turning release, which needs an absorbed")
+    A("projectile). **Identity**: the maintainer read F1's capture sheets (Q1, `DECISIONS_HISTORY.md` \"Read 2026-10-25")
+    A("(14z-209) — #229 Q1\"). **Timing** in LIVE ENGINE TICKS from a write tap on P1's countdown (`PRG:0x027F70`); a")
+    A("move that connects even at the 332 px whiff pin reads its active and recovery UNCOMPARABLE. Red / white / gauge are")
+    A("summed over the move's hit runs; three moves were performed at contact to count their hits (Demitri's Demon")
+    A("Cradle and Gallon's Climb Razor land one, Bishamon's Iai Giri two at every strength). Classified by the gate itself")
+    A("(`tools/specials_a_rigs.py join`, under this page's classify), over the rows joined by ONE event.")
+    A('')
+    A('| column | verdict over the rows joined by one event (sheet - ours) |')
+    A('|---|---|')
+    names = {"gauge_hit": "gauge hit"}
+    for key, _, _ in COLUMNS:
+        if key not in overall:
+            continue
+        v, det = overall[key]
+        groups = {}
+        for tab in SPECIALS_A_TABS:
+            if (tab, key) not in per:
+                continue
+            tv, td = per[(tab, key)]
+            m = re.match(r"sheet = ours ([+-]\d+)", td)
+            label = f"{tv} {m.group(1)}" if tv == "CONSTANT OFFSET" and m else tv
+            groups.setdefault(label, []).append(tab)
+        order = sorted(groups, key=lambda g: (["EXACT", "CONSTANT OFFSET", "CONSTANT RATIO", "INCONSISTENT"].index(
+            g.split(" +")[0].split(" -")[0]) if g.split(" +")[0].split(" -")[0] in
+            ("EXACT", "CONSTANT OFFSET", "CONSTANT RATIO", "INCONSISTENT") else 9, g))
+        by = "; ".join(f"{g} {' '.join(groups[g])}" for g in order)
+        none = [t for t in SPECIALS_A_TABS if (t, key) not in per]
+        A(f"| {names.get(key, key)} | **{v}**: {det} — {by}" + (f"; no verdict {' '.join(none)}" if none else "") + " |")
+    A('')
+    if agree:
+        A("Live engine ticks equal the duration-byte derivation of the same node walk on")
+        A(f"{agree} joined row-events (a difference is game logic cutting a node short — a")
+        A(f"landing, a jump — which the bytes cannot see); the {nvals or '?'} joined values are frozen as one hash, never in the tree.")
+        A('')
+    A("**Jedah has no row in the table: every Jedah cell is UNCOMPARABLE as a column verdict.** Both of his workbook rows,")
+    A("Dio Sega (`236P`) and Ira Piano (`J.632[4]K~P`), write one value for every strength, so the rig runs all three")
+    A("strengths and each row joins THREE events; the per-character verdicts take only rows joined by one event, and a")
+    A("row joined by several is tested as a one-row claim instead (does the sheet's single value hold for every strength,")
+    A("the ground-throw rigs' rule). Dio Sega is a projectile: on every event the fighter's walk has no attack node and")
+    A("carries no attack record, so all six of its cells are uncomparable as well. Ira Piano's `active` is prose; its")
+    A("other five cells pair on every event (they are in the values hash), ours is the same for all three strengths on")
+    A("each, and the sheet equals ours on recovery, red, white and gauge. Its startup reads far above ours: the workbook")
+    A("counts from the K press that starts Ira Spinta, ours from Piano's own entry — a counting convention, measured")
+    A("14z-205b (`STATE_HISTORY.md`, \"Ira Piano's startup\"), not a disagreement.")
+    A('')
 
 
 def render_tsv(cmp_):

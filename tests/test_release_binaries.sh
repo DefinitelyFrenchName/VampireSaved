@@ -389,7 +389,8 @@ if [ "$rc" != 124 ]; then echo "FAIL: fbneo exited rc=$rc within 20 s (expected 
 # WHATEVER THE VERDICT, KEEP THE BOOT LOG READABLE: this ran on a host nobody
 # here has, and a red without its log is a dead end — the kept log is what
 # showed, on 2026-09-13, that the Windows boot was CORRECT and the check was not.
-cp "$W/fb_boot.log" "$REPO/build/fbneo_boot_$HOSTOS.log" 2>/dev/null || true
+# the kept copy is the plain run's record; a control mode keeps none (#321, 14z-210: modes side by side wrote one file)
+[ -n "${CONTROL:-}" ] || cp "$W/fb_boot.log" "$REPO/build/fbneo_boot_$HOSTOS.log" 2>/dev/null || true
 # THE LOG'S VERDICT is tests/lib/fbneo_boot_log.sh: every vsavjw member loaded
 # (OK) — which only the WIDE init performs — and the profile line wherever the
 # emulator core's messages reach the log at all. They never do on Windows

@@ -199,7 +199,8 @@ into `~/.claude/skills/mame-fbneo-instruments/`. Nothing in it depends on the or
 > 12 of 12 runs under a 24-way parallel load, 0 of 4 at 5-way); both now
 > read the END line or the dumps. Removing the superseded tap before
 > re-installing (`read_tap.lua`'s pattern) cut the rate to 5 of 12 but did
-> not remove it: the crash is not root-caused.
+> not remove it: the crash is not root-caused. **RESOLVED 14z-210 (#320):** the teardown crash is the change
+> notifier's, not the tap's — see "MAME 0.288's `add_change_notifier` KEEPS ITS CALLBACK ON THE CALLING LUA THREAD" below.
 
 **[MFI-13]** **Write taps must be WORD-aligned** on a 16-bit bus (tap the containing word, filter on mask/offset; byte writes arrive replicated across the word), and **bucket taps by BYTE LANE**, not word offset — a word-bucketed tap read a word's low-byte lane as "never written" while the code under test wrote it every run. A freeness claim from a word-bucketed tap is not evidence.
 
@@ -601,7 +602,7 @@ into `~/.claude/skills/mame-fbneo-instruments/`. Nothing in it depends on the or
 
 **[MFI-40]** **"Unknown system" is an EMULATOR problem, not a ROM problem** — renaming the zip to force a load is actively harmful (the wrong driver's descriptor loads the wrong regions and the failure moves downstream). Check the binary carries the driver first (`-listfull`, the banner string in the binary).
 
-> **Incident** (`HANDOFF.md` › *If it still will not start, in order*):
+> **Incident** (`docs/project/operations.md` › *From HANDOFF.md: «Running a CPS-2 WIDE build — if it still will not start, in order»*):
 >
 > **"Unknown system: vsavjw" is an EMULATOR problem, not a ROM problem, and
 > renaming `vsavjw.zip` to `vsavj.zip` to force it is actively harmful** — it

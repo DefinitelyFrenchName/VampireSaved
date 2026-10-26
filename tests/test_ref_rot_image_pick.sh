@@ -97,18 +97,18 @@ mkzip "$FR/build/plainx/rompath/a_other.zip" $STOCK_SHAPE
 echo "== 1. the real gate judges each rompath by the NAMED preference =="
 o1="$(cd "$FR" && sh "$RUN" 2>&1)" && s1=0 || s1=$?
 for d in build/stockx build/widex build/plainx; do
-    printf '%s' "$o1" | grep -qE "^  ok +$d " \
+    printf '%s' "$o1" | grep -E >/dev/null "^  ok +$d " \
         && echo "  ok: $d judged by its image, not the adversary" \
         || { fail "$d not judged ok:"; printf '%s' "$o1" | grep -E "$d" | sed 's/^/        /'; }
 done
-printf '%s' "$o1" | grep -qE '^  ROTTED ' && fail "an adversary was judged (a ROTTED row printed)" || true
+printf '%s' "$o1" | grep -E >/dev/null '^  ROTTED ' && fail "an adversary was judged (a ROTTED row printed)" || true
 [ "$s1" = 0 ] && echo "  ok: exit 0" || fail "the gate exited $s1 on a tree whose every image is current"
 
 echo "== 2. MUST-FIRE — prefer the adversary and both rompaths read ROTTED =="
 o2="$(cd "$FR" && sh tests/ref_rot_adv.sh 2>&1)" && s2=0 || s2=$?
 flipped=0
 for d in build/stockx build/widex; do
-    printf '%s' "$o2" | grep -qE "^  ROTTED +$d " \
+    printf '%s' "$o2" | grep -E >/dev/null "^  ROTTED +$d " \
         && { echo "  ok: $d read ROTTED under the adversarial preference"; flipped=$((flipped + 1)); } \
         || fail "$d did not flip to ROTTED — the preference is not load-bearing"
 done
@@ -119,7 +119,7 @@ done
 echo "== 3. the fallback is NAME order, not creation order =="
 # build/plainx has no preferred name; b_other.zip (rotted) was created before
 # a_other.zip (ok). Name order judges a_other.zip.
-printf '%s' "$o1" | grep -qE "^  ok +build/plainx " \
+printf '%s' "$o1" | grep -E >/dev/null "^  ok +build/plainx " \
     && echo "  ok: a_other.zip judged (first by name) though b_other.zip was created first" \
     || fail "the fallback did not pick the first image by name"
 

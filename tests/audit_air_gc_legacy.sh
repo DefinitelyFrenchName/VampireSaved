@@ -320,7 +320,7 @@ n="$(commits "$W/ctl_gc.rows" '^E0$')"
 if [ "$n" = 0 ]; then vs_ctl_fired ground-commit-removed "the stripped copy's E0 commits no guard cancel"
 else vs_ctl_dead ground-commit-removed "the stripped copy still shows $n E0 commit writes" || fail=1; fi
 
-if echo " $CHARS " | grep -q " phobos "; then
+if echo " $CHARS " | grep >/dev/null " phobos "; then
     strip_air_phobos "$W/phobos.vsav2.txt" > "$W/ctl_ps.tap"; reduce phobos vsav2 "$W/ctl_ps.tap" > "$W/ctl_ps.rows"
     ew="$(nonzero "$W/ctl_ps.rows" '^E1$' window158)"; ec="$(commits "$W/ctl_ps.rows" '^E1$')"
     if [ "$ew" = 0 ] && [ "$ec" = 0 ]; then vs_ctl_fired positive-stripped "the stripped copy of native Phobos's tap shows no E1 window and no E1 commit"

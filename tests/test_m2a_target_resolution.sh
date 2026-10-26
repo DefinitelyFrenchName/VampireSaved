@@ -91,14 +91,14 @@ out=$( . "$REPO/tests/lib/m2a_common.sh"
        m2a_legacy_gate_masked "$WORK/rompath;$ROMDIR" "$WORK" 2>&1 || true
        echo "gate_fail=$gate_fail" )
 for want in "not in tests/expected/registry.tsv" "rule 6" "gate_fail=1"; do
-    if printf '%s' "$out" | grep -q "$want"; then
+    if printf '%s' "$out" | grep >/dev/null "$want"; then
         echo "  ok: the stop names '$want'"
     else
         echo "FAIL: the stop did not mention '$want'"; fail=1
     fi
 done
 # It must stop BEFORE spending an emulator run on a build it cannot judge.
-if printf '%s' "$out" | grep -q "ok: 0"; then
+if printf '%s' "$out" | grep >/dev/null "ok: 0"; then
     echo "FAIL: it ran replays against an unresolvable target"; fail=1
 else
     echo "  ok: it stops before running any replay"
@@ -124,7 +124,7 @@ out=$( . "$REPO/tests/lib/m2a_common.sh"
        M2A_EXPSET=donovan-m8-stock
        M2A_MASKED_REQUIRED=""
        m2a_legacy_gate_masked "$WORK/rompath;$ROMDIR" "$WORK" 2>&1 || true )
-if printf '%s' "$out" | grep -q "PINNED BY NAME"; then
+if printf '%s' "$out" | grep >/dev/null "PINNED BY NAME"; then
     echo "  ok: M2A_EXPSET says so on every run"
 else
     echo "FAIL: M2A_EXPSET overrode the target silently"; fail=1

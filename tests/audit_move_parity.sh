@@ -636,7 +636,7 @@ _fe="$(python3 -c "import json;print(json.load(open('$_fj'))['events'][0]['frame
 if _fo="$(python3 "$REPO/tools/move_parity.py" events "$ct" "$cp" "$W/tr_${ct}_${cp}_native.txt" "$W/tr_${ct}_${cp}_ours.wdrop.txt" \
           "$BUILD/patch/placements.json" --first-event "$_fe" --events "$_fj" 2>&1)"; then
     echo "CONTROL DEAD: field-dropped — $CTL's trace without p2white was compared, not refused"; fail=1
-elif printf '%s\n' "$_fo" | command grep -q "lacks compared field(s) p2white"; then
+elif printf '%s\n' "$_fo" | command grep "lacks compared field(s) p2white" >/dev/null; then
     echo "CONTROL FIRED: field-dropped — $CTL's trace without p2white is refused: $(printf '%s\n' "$_fo" | command grep -m1 'lacks compared field' | cut -c1-100)"
 else
     echo "CONTROL DEAD: field-dropped — $CTL's trace without p2white failed for another reason: $(printf '%s\n' "$_fo" | tail -1 | cut -c1-120)"; fail=1

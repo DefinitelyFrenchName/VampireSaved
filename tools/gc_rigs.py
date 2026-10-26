@@ -153,7 +153,10 @@ def walk_signed(img, table):
     tables carry NEGATIVE offsets (chains below their index table) and tools/anim_nodes.py's walk_table reads them
     unsigned — it is not edited here (the #229 parallel run's brief); the defect is F2's to report. The same node
     rules: flags bit 7 = follow the link at +0x18, bit 6 = hold, else the next node; entries bounded by the smallest
-    positive offset. GC_UNSIGNED=1 reads them unsigned (the comparison that says which GC chains it changed)."""
+    positive offset. GC_UNSIGNED=1 reads them unsigned (the comparison that says which GC chains it changed).
+    RESOLVED #318 (14z-210): tools/anim_nodes.py's walk_table reads the offsets SIGNED too since #318, so the
+    "reads them unsigned" above describes the tool before it. This local walk stays: the frozen #229 identities
+    were measured with it, and its entry bound differs from the tool's (it skips odd words instead of ending)."""
     import os
     words, k = [], 0
     while k < 1024:

@@ -48,7 +48,7 @@ grep -E "^(CRASH|END)" "$W/run.txt" || { echo "FAIL: no guard output"; tail -5 "
 CR="$(grep -m1 "^CRASH" "$W/run.txt" || true)"
 case "$MODE" in
 defect)
-    echo "$CR" | grep -Eq "^CRASH 480[4-8] vec11 PC 422bac " \
+    echo "$CR" | grep -E >/dev/null "^CRASH 480[4-8] vec11 PC 422bac " \
         && { echo "PASS (defect mode): the captured crash fires as frozen — $CR"; exit 0; } \
         || { echo "FAIL (defect mode): expected 'CRASH 4806 vec11 PC 422bac', got '${CR:-none}'"; exit 1; } ;;
 clean)

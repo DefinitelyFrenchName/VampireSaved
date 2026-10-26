@@ -89,6 +89,7 @@ local function install()
     end)
 end
 install()
+do local r = debug.getregistry(); r.vs_notifier_threads = r.vs_notifier_threads or {}; r.vs_notifier_threads[#r.vs_notifier_threads + 1] = coroutine.running() end   -- #320: keep this Lua thread alive past teardown (docs/platform/gotchas.md)
 zsp:add_change_notifier(function() if tap then install() end end)
 
 emu.register_frame_done(function()

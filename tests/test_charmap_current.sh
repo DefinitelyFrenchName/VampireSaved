@@ -14,7 +14,7 @@
 #   controls change one value byte inside donovan's placed hitbox region (unattributed +1)
 #   and apply an override row.
 # EXPECTS: pages equal; the changed byte and the override each regenerate a different map.
-# MEASURES: charmap-anim-rows — 12922 the table rows of the three tenants' out-of-tree anim pages, summed (donovan 5258 + huitzil 4210 + pyron 3454 at the 14z-180 freeze of charmap_pages.sha256); a hashed page with no rows is what this floor refuses
+# MEASURES: charmap-anim-rows — 12921 the table rows of the three tenants' out-of-tree anim pages, summed (donovan 5258 + huitzil 4210 + pyron 3453 since #318; 12922 with pyron 3454 at the 14z-180 freeze of charmap_pages.sha256, the one row Pyron's a:0x41 read UNSIGNED — a garbage node 64 KiB past his table; read signed its target sits below the extracted anim region and the chain reads out_of_region); a hashed page with no rows is what this floor refuses
 #
 # MUST-FIRE: perturbed-copy: changed-built-byte — a copy of donovan's build with ONE value byte changed inside the placed hitbox region must regenerate a different map, its unattributed count up by one (mode: that copy is donovan's build in the main loop)
 # MUST-FIRE: perturbed-copy: empty-page-frozen — donovan's anim page emptied after generation and FREEZE=1 against a scratch copy of the frozen hashes must be REFUSED by the measurement floor and FAIL: the M19 shape, a frozen empty table (mode: the page is emptied and the freeze targets the scratch copy)

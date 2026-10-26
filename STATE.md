@@ -38,6 +38,14 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
+## Session 14z-210 — **#321 reopened and finished: the remaining knobs, controls, freeze/close tools, cross-host measurement; low tickets on the side.**
+
+### opened with
+The 14z-209 close's opener; the sweep CLEAN, `main` = `origin/main` at `688edef8`. The maintainer: *"Focus on finishing
+#321, low open tickets on the side. Ask me any question."* Ruled (`DECISIONS_HISTORY.md` "Ruled 2026-10-26 (14z-210) —
+#321 reopened"): #321 reopened (its "Done when" was not met at the 14z-209 closure), all four remaining avenues in scope;
+side tickets #328, #310, #327, #318, #320, #311.
+
 ## Session 14z-209 — **#229 closed done: the six vsavj family gates frozen and registered, every family classified; #321 phase 2 (with #305, #306, #323) and #244 done; #302 done; #327's fix applied; #328-#330 filed.**
 
 ### opened with

@@ -182,7 +182,10 @@ def walk_signed(img, table):
     68000 word add). COPIED from tools/specials_b_rigs.py walk_signed (#229 F2, 14z-205), which measured negative
     offsets on 11 characters; tools/anim_nodes.py's walk_table reads them unsigned and is not edited here (the #229
     parallel run's brief). Same node rules: flags bit 7 = link at +0x18, bit 6 = hold, else sequential; the entry
-    count bounded by the smallest POSITIVE offset."""
+    count bounded by the smallest POSITIVE offset.
+    RESOLVED #318 (14z-210): tools/anim_nodes.py's walk_table reads the offsets SIGNED too since #318, so the
+    "reads them unsigned" above describes the tool before it. This local walk stays: the frozen #229 identities
+    were measured with it, and its entry bound differs from the tool's (it skips odd words instead of ending)."""
     import anim_nodes
     words, k = [], 0
     while k < 1024:
@@ -458,7 +461,7 @@ def rows(sched_path, field_trace, probe_dir, img_path, probe_extra="", tap_path=
     lo_tab, hi_tab = gt.own_bounds(img, bank, cid)
     lo_pj, hi_pj = own_proj_bounds(img, bank, cid)
     members = chain_members(img, cid)
-    nmap = vj.node_map(img, cid)   # the UNSIGNED reader's label, kept only to report where the two differ
+    nmap = vj.node_map(img, cid, signed=False)   # the pre-#318 UNSIGNED reader's label (tools/anim_nodes.py signed=False), kept only to report where the two differ
     fr = trace(field_trace)
     log = Path(probe_dir) / "run.log"
     probes = gt._probes(str(log)) if log.exists() else []     # absent while the FIELD leg dates the snapshots
@@ -482,7 +485,7 @@ def rows(sched_path, field_trace, probe_dir, img_path, probe_extra="", tap_path=
         press = e["press"]
         t = tk.get(e["name"], {})
         # THE CHAIN the pursuit entered: the chain the node pointer sits in on the start frame, by the SIGNED walk;
-        # `chain_unsigned` is what tools/anim_nodes.py's unsigned walk names at that node
+        # `chain_unsigned` is what the pre-#318 unsigned walk (tools/anim_nodes.py signed=False) names at that node
         chain = chain_u = None
         if v["started"] is not None:
             n = (fr.get(press + v["started"], {}).get("node") or 0) & 0xFFFFFFFF

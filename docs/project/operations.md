@@ -656,6 +656,52 @@ census's three frozen classes (`declares` grows only, `header-only` and
 control section and the mode both call, so what the mode proves is what the
 control claims.
 
+## LONGEST FIRST, CONCURRENT CONTROLS AND THE SUITE'S JOBS (#321, 14z-210)
+
+- **`tests/run_all_emulator.sh --order <an earlier run>/results.tsv`** (ruled 2026-10-26, *"Yes, longest first
+  (Recommended)"*): a pooled lane starts its gates by the seconds that run spent on each gate and its control rows, the
+  most first; a gate with no row there starts first, in registry order; `--jobs 1` and the prereq lane keep their order.
+  Pass the previous run of the same shape — for a release, the previous release run, which has the control rows. Run
+  order only, never a verdict (`tests/test_emulator_runner.sh` section 19, control `order-ignored`).
+- **Concurrent controls:** under `--controls` in the pooled fbneo/mame lanes, a gate listed in
+  `tests/controls_concurrent_emu.txt` gives its slot back after its PASS and runs each control as a pool job of its own;
+  an unlisted gate runs them one after another in its slot. A gate is listed only from a PILOT write trace of its
+  control modes (the #315 method, ruled 2026-10-26, *"Write trace on PILOT, don't use PILOT for any other task to avoid
+  overlap"*); `tests/test_controls_concurrent.sh` holds each row to its traced blob (section 18, control
+  `concurrent-off`). Why: the 14z-208b release run on ERIS (`build/emu_rel208_eris`) spent 53,104 of its 60,228 s in
+  control rows and took 3 h 29 min, about 60% of its `--jobs 8` floor.
+- **An UNJUDGED control mode** (#310): a FAIL whose log carries a line starting `NOT JUDGED: ` measured nothing and is
+  not honoured (`tests/lib/classify.sh`; section 14c, control `unjudged-honoured`).
+- **`SUITE_JOBS=N tests/run_suite.sh`**: the suite's MAME runs made N at a time, its output the serial run's line for
+  line (`tests/test_suite_jobs.sh`, control `rc-ignored`); `tools/freeze_expectation_set.py` passes
+  max(1, min(8, CPUs // --jobs)) unless the caller sets it. Measured on the Mac, donovan-m27, 14z-210: 1,662 s serial,
+  425 s at 4, 290 s at 8, the three outputs byte-identical (`build/agent210/t321suite/`, local).
+- **`audit_merged_legacy`'s leg (a) queue, `MERGED_JOBS`** (ruled 2026-10-26, *"merged_legacy queue (Recommended)"*):
+  default min(6, CPUs/4), `test_mame_wide`'s rule. On the Mac 713 s serial against 432 s at 3, the output the same once
+  durations are normalised away (`build/agent210/book/mq/`, local).
+- **`RUN_JOBS`, never `JOBS`**, in both runners: a gate reads `JOBS` for its own legs, so an exported `JOBS` used to reach
+  every gate as the runner's `--jobs` (`test_emulator_runner` section 20, `test_static_runner` section 34, controls
+  `jobs-leak`).
+
+**WHAT #321 MEASURED AND RULED OUT (14z-210; evidence local under `build/agent210/`).**
+- **The emulator controls' write trace** (PILOT at `688edef8`, fork T): 200 controls of the 61 fbneo/mame gates with two
+  or more, 15,664 s + a 1,166 s re-trace; 51 SAFE, 5 SAFE once a relative rename is placed (the scorer places it since),
+  5 SHARED, each since given a private path in its control modes (`audit_merged_legacy`, `audit_phase_mode_cost`,
+  `test_release_binaries`, `audit_release_linux_desktop`, `audit_release_linux_cleanhost`). A cold clone that lacks
+  `build/hui32/extract` materialises it on its first run; in the runner's order the plain run does it before any control.
+- **The job knobs inside a tier** (ERIS freeze tier at `688edef8`, fork K, 4,361 s): busy 0.546 / 0.764 / 0.820 by
+  thirds and 0.074 over the serial prereq lane (565 s), so a gate's internal jobs raised inside the pool mostly add
+  contention; alone, `audit_tripwire_reach` 196 -> 110 s at 6, the six on-demand #229 gates 35-63% faster at 8,
+  `tools/freeze_masked_basis.sh` 321 -> 81 s at 8 with every masked-v3 `.sha1` the same — measured and NOT taken (ruled).
+  `test_mame_determinism`'s `JOBS` stays 1 (its sequential and parallel regimes test different hypotheses), and
+  `audit_ranking_tenant` / `audit_effect_class_rows` / `audit_merged_legacy` read `JOBS` only under `--freeze-clock`
+  (352 -> 353 s, 357 -> 357 s).
+- **The six SHARED static gates' controls** (the freeze tier of 14z-208b): at most 60 s per tier
+  (`test_emulator_staleness`, 10 controls, the longest 8 s); `test_close_tools` is on-demand. Not worth private copies.
+- **The freeze and close tools** (the Mac, 14z-210): snapshot setup 42 s, the staleness audit 39 s, the static-confirm
+  prediction 20 s, fingerprints and the ROM audit under a second — no change; the freeze's cost was `run_suite.sh`'s
+  serial MAME runs, now `SUITE_JOBS`.
+
 ## From HANDOFF.md: «THE EMULATOR-TIER COMMAND — what it costs, and the registry's columns (scope, ondemand, cadence, timeout, prereq, args)»
 
 *(Moved verbatim from HANDOFF.md 2026-10-14, #282 item B.)*
@@ -786,3 +832,44 @@ Their expectation sets are BATTERY-SCOPED and say so in their own READMEs.
 how it was measured, what it superseded) is verbatim in `HANDOFF_HISTORY.md`
 "Build registry narratives" and in the matching `docs/project/patch_notes.md`
 entry and STATE close. Newest first; the top row is the CURRENT freeze.**
+
+## From HANDOFF.md: «Running a CPS-2 WIDE build — if it still will not start, in order»
+
+*(Moved verbatim from HANDOFF.md 2026-10-26, 14z-210: the live budget, `tests/test_live_budget.sh`.)*
+
+
+1. **Is there a WIDE build to run?**
+   `ls build/m5w/rompath/vsavjw.zip`. If instead you have `vsavj.zip`, that
+   build was made without `--profile cps2-wide-v1` and there is nothing
+   WIDE to launch — rebuild:
+   `KEY_SET=vsavj GEN_FLAGS="--allow-plausible --tripwire-open --profile cps2-wide-v1" tools/build_donovan.sh 6 build/m5w`
+   **A `rompath.REJECTED` in place of `rompath` means the builder REJECTED that
+   build** (since 14z-155, #139: `tools/build_donovan.sh` and
+   `tools/build_merged.sh` move the packed `rompath` aside on any exit before
+   their final OK line). Read the build's own output for why; never rename it
+   back to run it.
+2. **Does the binary carry the profile?**
+   FBNeo: `strings -a emu/fbneo/fbneo | grep "CPS-2 WIDE v1"` (plain
+   `grep -q` on the binary is unreliable — GOTCHAS).
+   MAME: `~/.cache/vampire-saved/mame/cps2 -listfull vsavjw`.
+   Either silent → build it: `tools/setup_fbneo.sh` / `tools/setup_mame.sh`.
+3. **Is `ROMDIR` exported and clean?** `python3 tools/audit_roms.py "$ROMDIR"`.
+4. **Read the emulator's own load log.** A healthy FBNeo start prints
+   `CPS-2 WIDE v1 profile active`, `68K ROM size: 0x00600000`,
+   `Graphics data: 0x03000000`, `QSound data: 0x01000000`, then
+   `Loading program (vsw.41)... (OK)` through `vsw.44`. **31 members load
+   OK.** **On WINDOWS only the `(OK)` lines appear, and that is a correct
+   boot:** FBNeo's SDL frontend never connects the emulator core's message
+   function there, so every core line above them is dropped
+   (`docs/platform/gotchas.md`, the 2026-09-13 entry on FBNeo's Windows
+   frontend). A member reading `(OK)` is not proof by itself — FBNeo substitutes
+   0xFF fill on a CRC mismatch while still printing `(OK)` (GOTCHAS) — but
+   a *missing* line or a wrong region size localises the problem fast.
+
+**[CPE-40]** **[MFI-40]** **"Unknown system: vsavjw" is an EMULATOR problem, not a ROM problem, and
+renaming `vsavjw.zip` to `vsavj.zip` to force it is actively harmful** — it
+boots under the stock 4MB descriptor with the sfx helper live and the sound
+pointer aimed at the CPS2 register window, re-creating the music bug while
+looking fine. See GOTCHAS.
+
+

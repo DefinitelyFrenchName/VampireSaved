@@ -50,7 +50,8 @@
 # Section 0 is that proof, on this instrument, every run.
 #
 # Usage: ROMDIR=... [MAME_BIN=...] tests/test_shim_charid.sh [build] [id] [--freeze-clock]
-#   build defaults to build/m5_wide, id to 0x13 (donovan-m3a).
+#   build defaults to build/don_m27, the current donovan freeze build (the registry row passes %DON%; until #328,
+#   14z-210, a pre-M23 donovan-m3a build no clean clone has — its frozen clocks read the same here), id to 0x13.
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -86,7 +87,7 @@ set -- $_pos
 CLOCKS="tests/expected/instr_gameclock/test_shim_charid.tsv"
 [ "$FREEZE_CLOCK" = 1 ] && [ -n "$MODE" ] && { echo "REFUSED: --freeze-clock in control mode"; exit 3; }
 _clk=""; [ "$MODE" = drift-clock ] && _clk="INSTR_CLOCK=frame_done"
-BUILD="${1:-build/m5_wide}"
+BUILD="${1:-build/don_m27}"  # re-pointed 14z-210 (#328) <- build/m5_wide, a pre-M23 build no clean clone has
 TID="${2:-13}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN

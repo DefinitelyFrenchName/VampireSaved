@@ -5,7 +5,8 @@
 #
 # WHAT: no legacy character carries the same character data on vsavj and vsav2 (0 of 12),
 #   and which chains differ for each is frozen — the measurement behind choosing Demitri as
-#   the parity rigs' P2 (table a identical; b:0x10/0x71/0x74 and c:0x2e/0x2f differ).
+#   the parity rigs' P2 (table a identical; b:0x10/0x71/0x74 differ; c:0x2e/0x2f read the
+#   same on both since #318 — they are negative entries the unsigned walker read invalid on vsav2).
 # HOW: tools/audit_same_data_p2.py over both decrypted data views (the bank's value rows,
 #   every anim node's resolved boxes and attack record across tables a/a2/b/c/proj, the
 #   defense-curve row), never the indices vs2 renumbered; controls run vsavj's view on both
@@ -28,7 +29,9 @@
 # of every anim node in tables a/a2/b/c/proj, and the defense-curve row.
 # MEASURED 14z-164: 0 of 12 are SAME-DATA; "nearest for a victim role" means
 # table a identical first, then the fewest differing b chains (shared seqs):
-# Demitri (table a identical; b:0x10/0x71/0x74 and c:0x2e/0x2f differ) and
+# Demitri (table a identical; b:0x10/0x71/0x74 and c:0x2e/0x2f differ — RETRACTED for c by #318:
+# c:0x2e/0x2f are NEGATIVE index entries the pre-#318 unsigned walk read as garbage, invalid on vs2;
+# read signed they are live and the same on both games, so Demitri's differing set is b alone) and
 # Bishamon (a:0x1d/0x3e, b:0x10/0x74); Bulleta has the fewest b differences
 # (b:0x10 alone) but three table-a chains differ; b:0x10 differs for almost every
 # character (a push box vs2 gave a boxless held pose) and is engine-generation

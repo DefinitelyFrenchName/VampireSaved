@@ -7,7 +7,7 @@
 #   key, a damaged dump is refused by name.
 # HOW: headless Chrome drives page_test.html (the shipped file as a byte-prefix plus
 #   tests/lib/applier_driver.html) with the maintainer's dumps; an incomplete run is its own
-#   verdict, never a content verdict; controls starve the control leg's virtual-time budget
+#   verdict, never a content verdict; controls starve the control leg's wall-clock budget
 #   and flip a byte of the inlined set key.
 # EXPECTS: the three player paths as described; the starved control reads NOT JUDGED, the
 #   broken page fails. A stalled driver retries once for incompleteness only, never for a
@@ -43,7 +43,7 @@
 # BROWSER so the driver can hand the page its input; the page itself never reads a file
 # from disk, which is section 1 of the sibling gate.
 #
-# MUST-FIRE: perturbed-copy: starved-control-leg — the control leg run with a 1 ms virtual-time budget cannot complete, and the gate must report the control as NOT JUDGED (FAIL) — never as a page verdict, which is what it printed under 14z-176's loaded tier (mode: the gate starves its control leg)
+# MUST-FIRE: perturbed-copy: starved-control-leg — the control leg run with a 1 ms wall-clock budget cannot complete, and the gate must report the control as NOT JUDGED (FAIL) — never as a page verdict, which is what it printed under 14z-176's loaded tier (mode: the gate starves its control leg)
 # MUST-FIRE: perturbed-copy: broken-page — a copy of the page with one byte of its inlined manifest's declared set key changed must make the browser run FAIL, because the page would then build a set it cannot vouch for; if the run still passed, the gate would not be reading the page's verdict at all (mode: the gate drives that copy)
 #
 # Usage: ROMDIR=... tests/test_applier_page_browser.sh [release/merged-m23/fbneo]   # ci_static
@@ -67,7 +67,11 @@ if [ -z "$CHROME" ]; then
 fi
 [ -n "$CHROME" ] || { echo "SKIP: no Chrome/Chromium/Edge on this host (set CHROME_BIN); the page's node-side fidelity is tests/test_applier_page.sh"; exit 0; }
 
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
+# A SNAP Chromium (Ubuntu's) has a private /tmp, so it cannot open a page under the host's /tmp: the run then measured
+# nothing (net::ERR_FILE_NOT_FOUND), on PILOT before and after #311 (14z-210, fork R). Its files go under $HOME instead.
+_cp="$(command -v "$CHROME" 2>/dev/null || echo "$CHROME")"; _cr="$(readlink -f "$_cp" 2>/dev/null || echo "$_cp")"
+case "$_cp$_cr" in */snap/*) mkdir -p "$HOME/.cache"; W="$(mktemp -d "$HOME/.cache/vsav-applier.XXXXXX")" ;; *) W="$(mktemp -d)" ;; esac
+trap 'rm -rf "$W"' EXIT
 fails=0
 note() { echo "  $*"; }
 
@@ -143,16 +147,93 @@ with zipfile.ZipFile(dst, "w", zipfile.ZIP_DEFLATED) as zo:
 PY
 note "driving the page from file:// with $(basename "$CHROME")"
 
-# --virtual-time-budget is what makes --dump-dom wait for the page's async work; the
-# driver's waits are MutationObservers precisely so they do not spend that budget.
-# WARM THE READS FIRST: the driver fetches ~48 MB over file://, and virtual time
-# advances while the renderer waits on a cold cache. This does not make the race
-# impossible, which is why the retry below exists — it makes it rare.
+# THE RUN ENDS ON THE DRIVER'S OWN `DONE=` LINE, NOT ON A VIRTUAL-TIME BUDGET (#311, 14z-210).
+# Until 14z-210 the run was `--virtual-time-budget=1800000 --dump-dom`, and virtual time
+# JUMPS while the renderer waits on the PAGE's own `File.arrayBuffer()` reads of the dropped
+# dumps (a blob read, not a network fetch, so nothing pauses it): measured with the driver
+# logging performance.now(), one 48 MB read cost 103,000-1,260,000 virtual ms in 11-20 ms
+# of wall time unloaded (10 runs), while the builds cost 0; under load the budget ran out
+# inside that read in 8 of 10 runs (build/agent210/t311/s2_*/, local). No budget is safe:
+# a larger one also delays the dump after DONE. So the driver is now read over Chrome's
+# DevTools pipe (--remote-debugging-pipe, plain python): no virtual time, the verdict block
+# polled until it carries `DONE=` or BUDGET ms of WALL time pass, then the DOM serialised.
+# What is judged is unchanged: the same verdict block, the same DONE=1 rule, the same retry.
+# The reads are still warmed first; it costs nothing.
 for _z in "$W/run/roms"/*.zip "$W/run/broken"/*.zip; do [ -f "$_z" ] && cat "$_z" > /dev/null 2>&1 || true; done
-drive() {   # drive <dom-output> — one browser run
-    "$CHROME" --headless --disable-gpu --no-sandbox --allow-file-access-from-files \
-        --virtual-time-budget="${BUDGET:-1800000}" --dump-dom "file://$W/run/driver.html" \
-        > "$1" 2>"$W/chrome.err" || true
+drive() {   # drive <dom-output> — one browser run; BUDGET = wall-clock ms before an unfinished run is dumped
+    python3 - "$CHROME" "file://$W/run/driver.html" "$1" "${BUDGET:-300000}" "$W/chrome.err" "$W/profile" <<'PY' || true
+import json, os, select, signal, subprocess, sys, time
+chrome, url, dom_out, budget, err, profile = sys.argv[1:7]
+deadline = time.time() + int(budget) / 1000.0
+log = open(err, "w")
+to_r, to_w = os.pipe()          # Chrome reads DevTools commands on its fd 3 ...
+fr_r, fr_w = os.pipe()          # ... and writes replies on its fd 4, each message NUL-terminated
+def child():
+    a, b = os.dup(to_r), os.dup(fr_w)
+    os.dup2(a, 3); os.dup2(b, 4)
+p = subprocess.Popen([chrome, "--headless", "--disable-gpu", "--no-sandbox", "--allow-file-access-from-files",
+                      "--remote-debugging-pipe", "--user-data-dir=" + profile, "--no-first-run",
+                      "--no-default-browser-check", "--disable-background-networking", url],
+                     stdout=subprocess.DEVNULL, stderr=log, close_fds=False, preexec_fn=child,
+                     start_new_session=True)
+os.close(to_r); os.close(fr_w)
+buf, nid = b"", 0
+def call(method, params=None, session=None, wait=30.0):
+    global buf, nid
+    nid += 1
+    msg = {"id": nid, "method": method, "params": params or {}}
+    if session:
+        msg["sessionId"] = session
+    try:
+        os.write(to_w, json.dumps(msg).encode() + b"\0")
+    except OSError:
+        return None
+    until = time.time() + wait
+    while True:
+        while b"\0" in buf:
+            raw, buf = buf.split(b"\0", 1)
+            m = json.loads(raw)
+            if m.get("id") == nid:
+                return m.get("result")
+        if time.time() >= until or p.poll() is not None:
+            return None
+        if select.select([fr_r], [], [], 0.5)[0]:
+            chunk = os.read(fr_r, 1 << 20)
+            if not chunk:
+                return None
+            buf += chunk
+def value(r):
+    return ((r or {}).get("result") or {}).get("value") or ""
+dom, sess = "", None
+try:
+    while sess is None and p.poll() is None and time.time() < deadline + 30:
+        pages = [t for t in (call("Target.getTargets") or {}).get("targetInfos", []) if t.get("type") == "page"]
+        if pages:
+            sess = (call("Target.attachToTarget", {"targetId": pages[0]["targetId"], "flatten": True}) or {}).get("sessionId")
+        else:
+            time.sleep(0.05)
+    while sess:
+        txt = value(call("Runtime.evaluate", {"expression": "(document.getElementById('verdict')||{}).textContent||''",
+                                              "returnByValue": True}, sess))
+        # a page that did not load is Chrome's own error page: stop now, the run is incomplete (it used to wait out
+        # both budgets, 602 s on PILOT, 14z-210)
+        href = value(call("Runtime.evaluate", {"expression": "location.href", "returnByValue": True}, sess))
+        if href.startswith("chrome-error:"):
+            print("chrome could not load the page: " + url, file=log); break
+        if any(l.startswith("DONE=") for l in txt.splitlines()) or time.time() >= deadline or p.poll() is not None:
+            break
+        time.sleep(min(0.2, max(0.0, deadline - time.time())))
+    if sess:
+        dom = value(call("Runtime.evaluate", {"expression": "document.documentElement.outerHTML",
+                                              "returnByValue": True}, sess))
+    call("Browser.close", wait=5.0)
+finally:
+    open(dom_out, "w", encoding="utf-8").write(dom)
+    try:
+        p.wait(timeout=5)
+    except subprocess.TimeoutExpired:
+        os.killpg(p.pid, signal.SIGKILL); p.wait()
+PY
 }
 verdict_of() {   # pull the driver's <pre id="verdict"> block out of a dumped DOM
     python3 - "$1" <<'PY'
@@ -203,14 +284,16 @@ check() {   # label, got, want
 # during its 48 MB of file:// reads printed EIGHT content-shaped failures — "standalone
 # panel: got '', expected 'ok'" and so on — for a run that had measured no content at
 # all. That is a gate lying about what it saw, which is #171's own subject.
-# MECHANISM: --virtual-time-budget ADVANCES while the renderer sits idle waiting on
-# I/O, so a cold page cache lets the budget expire mid-load and Chrome dumps the DOM
-# early. The reads are warmed below and the run is retried once; twice incomplete is a
-# real failure, and it is reported as an INCOMPLETE RUN with no content verdict claimed.
+# MECHANISM (measured 14z-210, #311): under the old --virtual-time-budget run, virtual time
+# jumped while the page read the dropped dumps, so the budget expired mid-read and Chrome
+# dumped the DOM early; drive() above now waits on wall time instead. The run is still
+# retried once; twice incomplete is a real failure (BUDGET ms of wall time without DONE),
+# and it is reported as an INCOMPLETE RUN with no content verdict claimed.
 if [ "$(get DONE)" != "1" ]; then
     note "THE BROWSER RUN DID NOT COMPLETE — the driver stopped after: $(tail -1 "$W/verdict.txt" | cut -c1-60)"
     _de="$(get DRIVER_ERROR)"; note "  driver error: ${_de:-(none — it stalled silently)}"
     note "  NO CONTENT VERDICT IS CLAIMED from this run: the checks below are not evaluated."
+    echo "NOT JUDGED: the browser run did not complete (the page leg; #310 — a control mode ending here is UNJUDGED)"
     echo "FAIL: test_applier_page_browser (the browser run did not complete; page NOT judged)"
     exit 1
 fi
@@ -264,6 +347,8 @@ case "$_j" in
     incomplete*)
         note "THE CONTROL'S BROWSER RUN DID NOT COMPLETE (twice) — ${_j#incomplete }"
         note "  NO VERDICT ABOUT THE BROKEN PAGE IS CLAIMED; the control did not fire, which the contract reads as FAIL"
+        # starved-control-leg's mode starves this leg ON PURPOSE: there, ending here IS its honoured outcome (#310)
+        vs_ctl_is starved-control-leg || echo "NOT JUDGED: the control leg's browser run did not complete (#310)"
         echo "FAIL: test_applier_page_browser (the control's browser run did not complete; control NOT judged)"; exit 1 ;;
     fired*)
         vs_ctl_fired broken-page "a page declaring the wrong set key refuses instead of handing over a file: ${_j#fired }" ;;
@@ -273,7 +358,7 @@ case "$_j" in
 esac
 
 # starved-control-leg, in-gate: the same broken page with the control leg STARVED (a 1 ms
-# virtual-time budget cannot finish), read by the same judge_ctl — it must say INCOMPLETE.
+# wall-clock budget cannot finish), read by the same judge_ctl — it must say INCOMPLETE.
 # Reading it as `dead` or `fired` is the lie this gate told under 14z-176's loaded tier
 # (docs/platform/gotchas.md); the fix is only real if this path is exercised
 BUDGET=1 run_leg starved

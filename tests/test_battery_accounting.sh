@@ -98,12 +98,12 @@ out="$( cd "$T" && sh -c '
     bat_group_skip wide-mame 5
     echo "TALLY pass=$_bat_pass skip=$_bat_skip list=$_bat_skipped"
 ' 2>&1 )"
-if printf '%s' "$out" | grep -q "TALLY pass=1 skip=6"; then
+if printf '%s' "$out" | grep >/dev/null "TALLY pass=1 skip=6"; then
     echo "  ok: 1 pass, 1 self-skip + a 5-gate group skip = 6 skipped"
 else
     fail "wrong tally: $(printf '%s' "$out" | grep TALLY || echo '(none)')"
 fi
-printf '%s' "$out" | grep -q "wide-mame(x5)" \
+printf '%s' "$out" | grep >/dev/null "wide-mame(x5)" \
     && echo "  ok: the group skip names itself and its size" \
     || fail "the group skip is anonymous in the list"
 
@@ -147,7 +147,7 @@ out2="$( cd "$T" && sh -c '
     bat ./g_segv.sh
     if [ "$_bat_skip" = 0 ]; then echo "BATTERY GREEN — $_bat_pass gates, 0 skipped"; fi
 ' 2>&1 )"
-printf '%s' "$out2" | grep -q "BATTERY GREEN — 2 gates" \
+printf '%s' "$out2" | grep >/dev/null "BATTERY GREEN — 2 gates" \
     && echo "  ok: an all-pass run (incl. the teardown-segfault shape) still prints GREEN" \
     || { fail "a clean battery no longer reports GREEN:"; printf '%s\n' "$out2" | sed 's/^/        /'; }
 

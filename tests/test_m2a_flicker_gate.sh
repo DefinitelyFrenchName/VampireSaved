@@ -106,7 +106,7 @@ run_gate() {
 }
 
 want() {   # want <label> <pattern> <output>
-    if printf '%s' "$3" | grep -q "$2"; then
+    if printf '%s' "$3" | grep >/dev/null "$2"; then
         echo "  ok: $1"
     else
         echo "FAIL: $1 — expected output matching '$2'"
@@ -115,7 +115,7 @@ want() {   # want <label> <pattern> <output>
     fi
 }
 notwant() {
-    if printf '%s' "$3" | grep -q "$2"; then
+    if printf '%s' "$3" | grep >/dev/null "$2"; then
         echo "FAIL: $1 — output must NOT match '$2'"
         printf '%s\n' "$3" | sed 's/^/        /' | head -6
         fail=1

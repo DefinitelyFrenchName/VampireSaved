@@ -163,6 +163,10 @@ if python3 tools/checkdocshape.py --root "$ROOT" --no-pending $SELFTEST >"$W/tre
     ok "checkdocshape.py PASS on the tree ($(grep -o '[0-9]* still PENDING' "$W/tree.log" | head -1))"
 else
     bad "checkdocshape.py FAILS on the tree:"; sed 's/^/        /' "$W/tree.log" | head -30
+    # a mode run judges its OWN perturbation: a failure without its finding measured something else (#310, 14z-210)
+    if [ -n "$VS_CTL" ] && ! grep -q "$EXPECT" "$W/tree.log"; then
+        echo "NOT JUDGED: the perturbed copy failed without '$EXPECT' — the mode's own finding is absent"
+    fi
 fi
 
 # --- must-fire controls on a perturbed copy -------------------------------

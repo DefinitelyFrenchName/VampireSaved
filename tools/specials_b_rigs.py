@@ -216,10 +216,13 @@ def walk_signed(img, table):
     seqs at table + 0xF858 (garbage) and this rig's first pass read every Big Breath and Big Blow UNFIRED. This
     is a local walk with the SAME node rules (flags bit 7 = link at +0x18, bit 6 = hold, else sequential), the
     entry count bounded by the smallest POSITIVE offset as anim_nodes.py does; the shared tool is not edited
-    here (the #229 parallel run's brief) and the defect is reported."""
+    here (the #229 parallel run's brief) and the defect is reported.
+    RESOLVED #318 (14z-210): tools/anim_nodes.py's walk_table reads the offsets SIGNED too since #318, so the
+    "reads them unsigned" above describes the tool before it. This local walk stays: the frozen #229 identities
+    were measured with it, and its entry bound differs from the tool's (it skips odd words instead of ending)."""
     words, k = [], 0
     while k < 1024:
-        # SPECIALS_UNSIGNED=1 reads them UNSIGNED, as tools/anim_nodes.py does: the gate's known-bad control
+        # SPECIALS_UNSIGNED=1 reads them UNSIGNED, as tools/anim_nodes.py did before #318: the gate's known-bad control
         # `unsigned-offsets` (Sasquatch's Big Breath and Big Blow then read UNFIRED, as the first pass did)
         w = int.from_bytes(img[table + 2 * k:table + 2 * k + 2], "big", signed=os.environ.get("SPECIALS_UNSIGNED") != "1")
         pos = [x for x in words if x > 0]

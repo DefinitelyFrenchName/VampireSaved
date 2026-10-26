@@ -80,6 +80,7 @@ local function install()
     end)
 end
 install()
+do local r = debug.getregistry(); r.vs_notifier_threads = r.vs_notifier_threads or {}; r.vs_notifier_threads[#r.vs_notifier_threads + 1] = coroutine.running() end   -- #320: keep this Lua thread alive past teardown (docs/platform/gotchas.md)
 space:add_change_notifier(function() if tap then install() end end)
 -- POKES="frame:addr:hexbytes;..." (14z-82d): the forced-pick rig grammar,
 -- same as replay.lua/type_write_census.lua — without it no tenant replay

@@ -165,7 +165,7 @@ fresh_ok() {
 }
 # hit_in <summary> <window>: true when attribute_ramdiff's summary counts at least one byte in <window> —
 # the one copy of the count-aware test (the case verdict and the inline wrong-window control both call it)
-hit_in() { printf '%s' "$1" | grep -Eq "[;,] [1-9][0-9]* $2(,|\$)"; }
+hit_in() { printf '%s' "$1" | grep -E >/dev/null "[;,] [1-9][0-9]* $2(,|\$)"; }
 
 for c in $CASES; do
     rpl="${c%%:*}"; rest="${c#*:}"; frame="${rest%%:*}"; want="${rest##*:}"
@@ -200,7 +200,7 @@ for c in $CASES; do
     # frame it attributes; the verdict word is the one the branch below prints. Nothing decided changes.
     if sheet_on && [ -z "${VS_CTL:-}" ]; then
         if [ "$st" != 0 ]; then _sv="DIFF outside every named window"
-        elif printf '%s' "$out" | grep -qi "identical\|0 differing"; then _sv="identical (the rig no longer reproduces it)"
+        elif printf '%s' "$out" | grep -i >/dev/null "identical\|0 differing"; then _sv="identical (the rig no longer reproduces it)"
         elif hit_in "$out" "$want"; then _sv="attributed to $want"
         else _sv="nothing in $want"; fi
         sheet_new "$rpl.$frame" "$rpl f$frame: a frozen flicker frame, pristine vsavj above the merged build" - - \
@@ -226,7 +226,7 @@ for c in $CASES; do
     fi
     # a zero-diff would make the attribution vacuous: the frame is in the
     # spec BECAUSE it differs, so an identical pair means the rig moved.
-    if printf '%s' "$out" | grep -qi "identical\|0 differing"; then
+    if printf '%s' "$out" | grep -i >/dev/null "identical\|0 differing"; then
         echo "  FAIL: the two legs are identical at f$frame — this frame is a"
         echo "        frozen flicker frame, so an identical pair means the rig"
         echo "        no longer reproduces it, not that the build improved."

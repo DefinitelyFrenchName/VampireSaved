@@ -172,12 +172,12 @@ else grep -q "MISMATCH.*timer" "$T/o3" && { vs_ctl_fired perturbed-field "timer 
 # 5 the runner's rule-7 / scratch refusals
 out="$(ROMDIR="$T" "$REPO/tools/run_sim_jtcps2.sh" "$REPO/tests/replays/05_timeout_idle.rpl" \
         "$REPO/build/should_never_exist_14z107" 2>&1)"; st=$?
-[ $st != 0 ] && echo "$out" | grep -q "REFUSING" && ok "5a out-dir inside the repo refused (rule 7)" \
+[ $st != 0 ] && echo "$out" | grep >/dev/null "REFUSING" && ok "5a out-dir inside the repo refused (rule 7)" \
     || bad "5a in-repo out-dir was NOT refused (exit $st)"
 rmdir "$REPO/build/should_never_exist_14z107" 2>/dev/null
 out="$(ROMDIR="$T" JTSIM_SCRATCH="$REPO/emu/jtcores" "$REPO/tools/run_sim_jtcps2.sh" \
         "$REPO/tests/replays/05_timeout_idle.rpl" "$T/out" 2>&1)"; st=$?
-[ $st != 0 ] && echo "$out" | grep -q "REFUSING" && ok "5b JTSIM_SCRATCH inside the repo refused" \
+[ $st != 0 ] && echo "$out" | grep >/dev/null "REFUSING" && ok "5b JTSIM_SCRATCH inside the repo refused" \
     || bad "5b in-repo JTSIM_SCRATCH was NOT refused (exit $st)"
 
 # 6 the harness patch is inert unless the macro is defined. The checker is

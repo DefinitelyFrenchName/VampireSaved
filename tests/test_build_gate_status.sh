@@ -116,7 +116,7 @@ run_gate() {
 # exit 1, but "guarded soaks" REACHED. So assert on the marker.
 # assert_stopped <marker> <label>
 assert_stopped() {
-    if echo "$OUT_TXT" | grep -q "$1"; then
+    if echo "$OUT_TXT" | grep >/dev/null "$1"; then
         echo "FAIL: gate reached '$1' after a failed build ($2)"; fail=1
     else
         echo "  ok: gate stopped before '$1'"
@@ -130,7 +130,7 @@ echo "== 1. build rejects itself after packing =="
 run_gate test_m2b_stage6.sh reject_after_pack "$WORK/o1"
 if [ "$RC" != 0 ]; then echo "  ok: gate exited $RC"
 else echo "FAIL: gate exited 0 on a rejected build"; fail=1; fi
-if echo "$OUT_TXT" | grep -q "^PASS:"; then
+if echo "$OUT_TXT" | grep >/dev/null "^PASS:"; then
     echo "FAIL: gate printed PASS on a rejected build"; fail=1
 else echo "  ok: no PASS verdict printed"; fi
 assert_stopped "$SOAK_MARK" "rejected after packing"
@@ -150,7 +150,7 @@ echo "== 3. build dies early, no rompath at all =="
 run_gate test_m2b_stage6.sh die_before_pack "$WORK/o3"
 if [ "$RC" != 0 ]; then echo "  ok: gate exited $RC"
 else echo "FAIL: gate exited 0 with no build to measure"; fail=1; fi
-if echo "$OUT_TXT" | grep -q "guarded soaks"; then
+if echo "$OUT_TXT" | grep >/dev/null "guarded soaks"; then
     echo "FAIL: gate reached the soak stage with no rompath (would measure vanilla)"
     fail=1
 else echo "  ok: gate stopped before soaking"; fi
@@ -159,7 +159,7 @@ else echo "  ok: gate stopped before soaking"; fi
 # Without this, a gate that aborts unconditionally would pass 1-3.
 echo "== 4. positive control: a successful build proceeds =="
 run_gate test_m2b_stage6.sh ok "$WORK/o4"
-if echo "$OUT_TXT" | grep -q "guarded soaks"; then
+if echo "$OUT_TXT" | grep >/dev/null "guarded soaks"; then
     echo "  ok: gate proceeded past the build step"
 else
     echo "FAIL: gate did not reach the soak stage on a SUCCESSFUL build"

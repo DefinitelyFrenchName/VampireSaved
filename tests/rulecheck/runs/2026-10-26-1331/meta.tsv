@@ -1,0 +1,10 @@
+decision	expectation
+subject	#318: re-freeze four expectations moved by the signed anim-table walk
+session	14z-210
+model	rule-checker@163e4ce9cf7b
+claim	build/agent210/rc318/claim.txt
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	0 flag(s)

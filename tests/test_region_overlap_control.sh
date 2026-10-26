@@ -52,7 +52,7 @@ chmod +x "$COPY"
 grep -q 'CUR_BUILDS="build/m5_wide' "$COPY" || {
     echo "FAIL: could not rewrite CUR_BUILDS — the gate's shape moved"; fail=1; }
 set +e; out=$("$COPY" 2>&1); rc=$?; set -e
-if [ "$rc" != 0 ] && echo "$out" | grep -q "total conflicting bytes"; then
+if [ "$rc" != 0 ] && echo "$out" | grep >/dev/null "total conflicting bytes"; then
     echo "  ok: the stale trio is rejected by the current-trio assertion"
     echo "$out" | grep "total conflicting bytes" | head -1 | sed 's/^/      /'
 else
@@ -71,7 +71,7 @@ sed 's|^HIST_BUILDS="build/m5_wide build/hui30 build/pyron21"|HIST_BUILDS="build
     "$REPO/tests/test_region_overlap.sh" > "$COPY"
 chmod +x "$COPY"
 set +e; out=$("$COPY" 2>&1); rc=$?; set -e
-if [ "$rc" != 0 ] && echo "$out" | grep -q "stale"; then
+if [ "$rc" != 0 ] && echo "$out" | grep >/dev/null "stale"; then
     echo "  ok: a named-but-absent build FAILs loudly instead of skipping"
 else
     echo "FAIL: an absent named build did not fail the gate (rc=$rc)"

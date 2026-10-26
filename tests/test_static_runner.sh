@@ -66,6 +66,7 @@
 # MUST-FIRE: shadow-tool: runrec-controls-lost — a copy of run_all_static.sh whose RUNREC-KEEPS-CONTROLS copy is disabled must leave the run record without the control times, and section 26 must FAIL (mode: that copy drives section 26; section 27 fires it in-run; #276, 14z-205)
 # MUST-FIRE: shadow-tool: decrypt-warm-off — a copy of run_all_static.sh whose DECRYPT-WARM call is disabled must leave a stub that reads build/out directly on a cold cache, and section 28 must FAIL (mode: that copy drives section 28; section 29 fires it in-run; #299, 14z-206)
 # MUST-FIRE: shadow-tool: stray-blind — a copy of run_all_static.sh whose STRAY-CHECK comparison is disabled must read GREEN on a strict run whose stub leaves a file in the clone root, and section 30 must FAIL (mode: that copy drives section 30; section 31 fires it in-run; #324, 14z-208b)
+# MUST-FIRE: shadow-tool: jobs-leak — a copy of the runner whose own job count is named JOBS again must hand a caller-exported JOBS=7 to a gate as its --jobs 2, and section 34 must FAIL (mode: section 34 runs that copy; section 35 fires it in-run; #321, 14z-210)
 # MUST-FIRE: perturbed-copy: pipe-q — a copy of this gate with one builtin `printf | grep -q` line planted must be named by section 32's lint (mode: section 32 lints that copy and must FAIL; section 33 fires it in-run; #327, 14z-209)
 # MUST-FIRE: shadow-tool: prediction-off — a copy of tools/static_confirm.py whose plan marks nothing STALE must CARRY the stub whose input changed, and section 18 must FAIL (mode: that copy in the confirm repo)
 #
@@ -1250,6 +1251,41 @@ echo "== 33. MUST-FIRE: section 32's lint, given a planted line =="
 if ! vs_ctl_is pipe-q; then
     [ -n "$(s32 "$_planted")" ] && vs_ctl_fired pipe-q "a planted builtin-fed early-exit grep line is named by section 32's lint" \
         || { rc=1; vs_ctl_dead pipe-q "the lint did not name the planted line" || :; }
+fi
+
+echo "== 34. a caller's exported JOBS reaches the gate unchanged; the runner's --jobs is its own (#321, 14z-210) =="
+# fork K: the emulator runner's count was named JOBS, the name gates read for their own legs; this runner had the same
+# name, so an exported JOBS reached every gate as the runner's --jobs. A stub records the JOBS it saw (outside the clone).
+SHADOW_J="$T/run_all_static_jobsleak.sh"
+sed 's/RUN_JOBS/JOBS/g' "$RUNNER" > "$SHADOW_J"
+cmp -s "$RUNNER" "$SHADOW_J" && fail "could not restore the JOBS name — RUN_JOBS moved"
+FJ="$T/repo_jobs"; mkdir -p "$FJ/tests/lib" "$FJ/tools"
+for _l in classify controls measures static_job decrypt_cache; do ln -s "$REPO/tests/lib/$_l.sh" "$FJ/tests/lib/$_l.sh"; done
+ln -s "$REPO/tests/lib/static_pool.py" "$FJ/tests/lib/static_pool.py"
+[ ! -f "$REPO/tests/lib/collation.sh" ] || ln -s "$REPO/tests/lib/collation.sh" "$FJ/tests/lib/collation.sh"
+for _g in g_j1 g_j2; do
+    { echo "#!/bin/sh"; echo "# $_g.sh — a stub of section 34: records the JOBS it was handed"
+      echo "echo \"\${JOBS:-unset}\" > \"$T/jobs_seen_$_g\""; echo 'echo "PASS: j"'; echo "exit 0"; } > "$FJ/tests/$_g.sh"
+    chmod +x "$FJ/tests/$_g.sh"
+done
+printf 'g_j1\ng_j2\n' > "$FJ/tests/ci_portable.txt"; : > "$FJ/tests/ci_static.txt"
+(cd "$FJ" && git init -q && git add -A && git -c user.name=t -c user.email=t@t commit -qm base)
+s34() {   # s34 <runner> -> S34 (ok|bad): both stubs must see the caller's JOBS=7 under --jobs 2
+    rm -f "$FJ/tests/run_all_static.sh" "$T"/jobs_seen_*; ln -s "$1" "$FJ/tests/run_all_static.sh"
+    (cd "$FJ" && JOBS=7 STATIC_CHANGED_PATHS= sh tests/run_all_static.sh --tier portable --jobs 2 > /dev/null 2>&1) || true
+    _s1="$(cat "$T/jobs_seen_g_j1" 2>/dev/null)"; _s2="$(cat "$T/jobs_seen_g_j2" 2>/dev/null)"
+    if [ "$_s1" = 7 ] && [ "$_s2" = 7 ]; then S34=ok; else S34=bad; echo "    the stubs saw JOBS=${_s1:-none} and JOBS=${_s2:-none}"; fi
+}
+R34="$RUNNER"; vs_ctl_is jobs-leak && R34="$SHADOW_J"
+s34 "$R34"
+[ "$S34" = ok ] && echo "  ok: exported JOBS=7 with --jobs 2: both gates saw JOBS=7" \
+    || fail "section 34: a gate was handed the runner's --jobs as its JOBS (#321)"
+
+echo "== 35. MUST-FIRE: section 34's check, broken by its shadow =="
+if ! vs_ctl_is jobs-leak; then
+    s34 "$SHADOW_J" > /dev/null
+    [ "$S34" = bad ] && vs_ctl_fired jobs-leak "a runner whose count is named JOBS hands the gates JOBS=2 for an exported 7 — section 34 catches it" \
+        || { rc=1; vs_ctl_dead jobs-leak "the JOBS-named runner still handed the gates 7" || :; }
 fi
 
 [ "$rc" = 0 ] && echo "PASS: the runner's verdicts mean what they say." \

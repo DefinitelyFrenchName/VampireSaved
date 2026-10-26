@@ -48,7 +48,7 @@ echo "== 1. each guarded tool REFUSES under -O, and says why =="
 for t in $GUARDED; do
     if out=$(python3 -O "$t" --help 2>&1); then
         fail "$t ran under -O — its assertions would be stripped"
-    elif printf '%s' "$out" | grep -q "GitHub #79"; then
+    elif printf '%s' "$out" | grep >/dev/null "GitHub #79"; then
         echo "  ok: $(basename "$t") refused, naming the reason"
     else
         fail "$t failed under -O for an UNNAMED reason; this control would"

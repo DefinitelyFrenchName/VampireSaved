@@ -1,0 +1,16 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: #321 avenue 1: the job knobs from fork K's ERIS measurements
+Claim (the working agent's sentence): #321 avenue 1, recommended to the maintainer from fork K's ERIS measurements at 688edef8 (14z-210). (1) THE TIER: ERIS's freeze tier (--freeze --strict --jobs 8 --skip test_mame_parity) ran 4,361 s; the host was busy 0.710 overall, 0.546 / 0.764 / 0.820 by thirds, and 0.074 over the first 600 s, which is the serial prereq lane; so a gate's internal job count raised inside the pool mostly adds contention, and the waste is the prereq lane and the tail, which the longest-first --order already targets. (2) RAISE, each as a host-derived capped default and each to be re-measured with its output compared: audit_tripwire_reach JOBS 3 -> max(3, min(6, CPUs/4)) (196 -> 110 s alone at 6); the six ondemand #229 gates JOBS -> min(8, CPUs/3), with an env knob added to audit_vanilla_specials_b (which hard-codes 2) (40-60% faster at 8 alone, verdicts and outputs equal); tools/freeze_masked_basis.sh JOBS 1 -> min(8, CPUs/3) (321 -> 81 s at 8, all 14 masked-v3 sha1 equal to the frozen ones). (3) BUILD: a replay queue for audit_merged_legacy's leg (a), its 47 masked replays run one at a time (1,151 s alone at about one core, the tier's second-longest row), as test_mame_wide's WIDE_JOBS queue was built, its whole output compared with the serial run. (4) RULED OUT: test_mame_determinism's JOBS, because its header says the sequential and parallel regimes test different hypotheses; and the JOBS of audit_ranking_tenant, audit_effect_class_rows and audit_merged_legacy (and, by a grep census not verified per gate, 19 gates of that class), which only feeds the --freeze-clock path (build/agent210/t321k/jobs_use_census.tsv; ranking 352 -> 353 s, effect_class_rows 357 -> 357 s in build/agent210/t321k/s2/summary.tsv). (5) FOUND: audit_guard_cancels FAILs on any host without ../charpages (its judge diffs against an out-of-tree file and reads a missing one as 0 differing lines), to be filed as a ticket; and the emulator runner's own JOBS variable leaks into gates when a caller exports JOBS, to be fixed by a rename. Not tested: the raised defaults inside a tier (only alone), on the Mac and PILOT (only ERIS), and at --jobs 12.
+Artifacts (read every one, in full):
+  - build/agent210/t321k/s2/summary.tsv
+  - build/agent210/rc321a1/util.py
+  - build/agent210/rc321a1/util.out
+  - build/agent210/t321k/tier.meta
+  - build/agent210/t321k/results_tier.tsv
+  - build/agent210/t321k/jobs_use_census.tsv
+  - build/agent210/t321k/gc_diag.log
+  - tests/test_mame_determinism.sh.lines-70-80 (lines 70-80 of tests/test_mame_determinism.sh)
+  - tests/audit_merged_legacy.sh.lines-400-435 (lines 400-435 of tests/audit_merged_legacy.sh)
+  - tests/run_all_emulator.sh.lines-170-200 (lines 170-200 of tests/run_all_emulator.sh)

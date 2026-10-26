@@ -24,7 +24,8 @@
 -- mask 0xffff — measured raw, 14z-205) and reads no CPU state; TICK_MODE=pc takes it as a write by TICK_PC. The two
 -- give byte-identical tick lines (AN's rig: 4,775 of 4,775; the gate's ground truth runs it every time), but reading
 -- cpu.state inside the tap crashed MAME at teardown (exit 139, after every output was written) on 8 of the 13 rigs,
--- so mask is the default and pc is the ground truth only. The tap is
+-- so mask is the default and pc is the ground truth only (the crash's cause is the change notifier's Lua
+-- thread, #320, docs/platform/gotchas.md). The tap is
 -- re-installed on every write-handler change of the space (CPS-2 re-installs handlers after boot and a
 -- passthrough tap is dropped silently — tests/lua/tap_writes.lua's paid gotcha). A reference leg (INSTR_REFERENCE=1)
 -- installs no tap and logs no field, so its anchor is replay.lua's own game.
@@ -103,6 +104,7 @@ if f and tick_tap then
         installing = false
     end
     install()
+    do local r = debug.getregistry(); r.vs_notifier_threads = r.vs_notifier_threads or {}; r.vs_notifier_threads[#r.vs_notifier_threads + 1] = coroutine.running() end   -- #320: keep this Lua thread alive past teardown (docs/platform/gotchas.md)
     notifier = mem:add_change_notifier(function(mode)
         if not done and not installing and mode:find("w") then install() end
     end)

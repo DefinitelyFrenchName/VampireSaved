@@ -84,16 +84,16 @@ vs_ctl_read() {  # vs_ctl_read <script> <log>
     _vcr_dead="$(grep -aE '^CONTROL DEAD: [a-z0-9-]+' "$_vcr_l" 2>/dev/null | sed -E 's/^CONTROL DEAD: ([a-z0-9-]+).*/\1/')"
     for _vcr_n in $_vcr_decl; do
         VS_CTL_DECLARED=$((VS_CTL_DECLARED + 1))
-        if printf '%s\n' "$_vcr_dead" | grep -qx -- "$_vcr_n"; then
+        if printf '%s\n' "$_vcr_dead" | grep -x >/dev/null -- "$_vcr_n"; then
             VS_CTL_DEAD=$((VS_CTL_DEAD + 1)); VS_CTL_MISSING="$VS_CTL_MISSING $_vcr_n(dead)"
-        elif printf '%s\n' "$_vcr_fired" | grep -qx -- "$_vcr_n"; then
+        elif printf '%s\n' "$_vcr_fired" | grep -x >/dev/null -- "$_vcr_n"; then
             VS_CTL_FIRED=$((VS_CTL_FIRED + 1))
         else
             VS_CTL_DEAD=$((VS_CTL_DEAD + 1)); VS_CTL_MISSING="$VS_CTL_MISSING $_vcr_n(not fired)"
         fi
     done
     for _vcr_n in $_vcr_fired $_vcr_dead; do
-        printf '%s\n' "$_vcr_decl" | grep -qx -- "$_vcr_n" \
+        printf '%s\n' "$_vcr_decl" | grep -x >/dev/null -- "$_vcr_n" \
             || { VS_CTL_UNDECLARED=$((VS_CTL_UNDECLARED + 1)); VS_CTL_MISSING="$VS_CTL_MISSING $_vcr_n(undeclared)"; }
     done
     if [ "$VS_CTL_DEAD" != 0 ] || [ "$VS_CTL_UNDECLARED" != 0 ]; then

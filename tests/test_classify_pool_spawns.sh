@@ -49,7 +49,7 @@ fail=0
 mk() { printf '%s\n' "$2" > "$W/$1"; }
 ck() {   # ck <name> <want-rc> <want-substring> <what it proves>
     rc=0; out="$($CLS "$W/$1" 2>&1)" || rc=$?
-    if [ "$rc" = "$2" ] && (printf '%s' "$out" | grep -q -- "$3"); then
+    if [ "$rc" = "$2" ] && (printf '%s' "$out" | grep >/dev/null -- "$3"); then
         echo "  ok $1: $4"
     else
         echo "  FAIL $1: rc=$rc want $2; got [$out] want [$3] — $4"

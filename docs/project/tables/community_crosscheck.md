@@ -117,7 +117,8 @@ and compares nothing: the workbook types it `projectile` (as it types her `5HK`)
 chain the rig recorded carries no attack window in its records — the hit is the MINE the
 move spawns, confirmed by the maintainer (2026-10-05, GitHub #216): *"the hit is the mine
 spawned, it is technically a trap/projectile with a disjointed hitbox from the character's
-sprite"*. Specials, supers, EX/ES moves and throws are not joined at all (the pursuits, 14z-194, and the ground throws, 14z-195, are measured in their own sections below).
+sprite"*. The specials, supers, EX/ES moves, throws, pursuits and guard cancels are joined by rigs of their own
+and classified in their own sections below (#229), each frozen by its gate.
 
 ## The headline: per-move agreement
 
@@ -397,8 +398,13 @@ direction); startup 8 (+1 = the sheet's 9), red 16 = 8+8, white 8: EXACT.
 
 ## The pursuits — named and compared for all 15 characters (14z-194, #229)
 
-Measured on vsavj on ERIS (scratch rigs of the #229 fork, not yet a gate; the per-move
-figures stay out of the tree with the rest of the frame data). **Scope first**: of the
+First measured on vsavj on ERIS with scratch rigs of the #229 fork (14z-194); the method was rebuilt as a gate
+(14z-205, registered 14z-209): `tests/audit_vanilla_pursuits.sh` (each event's frozen line and hashes
+`tests/expected/vanilla_pursuits.tsv`, the connect-band edges `tests/expected/vanilla_pursuit_bands.tsv`, the rigs
+`tools/vanilla_pursuit_rigs.py`; its row set equals the workbook's 30 pursuit rows). The column verdicts below are
+14z-194's reading as the Q2 rulings amended it, not re-classified from the gate's run (`tools/crosscheck_229.py`
+does not read the pursuits, Q2); the per-move figures stay out of the tree with the rest of the frame data.
+**Scope first**: of the
 workbook's rows not joined above, the #229 fork grouped 440 by what each needs that the
 vanilla join rig lacks — motion specials 166, guard-cancel rows 42, command throws and
 grabs 54, ES specials 61, EX supers 50, ground throws 23, air throws 14, and the 30
@@ -484,6 +490,48 @@ rows above the same way and reproduces their verdicts (22 rows: startup, gauge, 
 | startup | **CONSTANT OFFSET**: sheet = ours +1 on all 14, as on the ground |
 | recovery, throw tech | not measured |
 
+## The specials, FE AN AU BI BU DE GA JE (14z-205, frozen 14z-209, #229, page section #331)
+
+Measured on vsavj; the gate is `tests/audit_vanilla_specials_a.sh` (its frozen identity map
+`tests/expected/vanilla_specials_a.tsv`, its column verdicts, live-vs-derived tick agreement and a hash of the
+joined values `tests/expected/vanilla_specials_a_verdicts.tsv`, which the table below is rendered from; the rigs
+`tools/specials_a_rigs.py`). **Scope**: 80 workbook rows run on the eight characters (each named by the chains the
+engine entered and the projectile types it spawned, never by the input) and 6 declared for other families
+(`NOT_RUN`: Anakaris's two EX supers, Demitri's three Demon Cradle GC rows, Bishamon's `J.MP`). Rows with no
+comparable cell: the projectiles and movements (the fighter's walk has no attack node; a projectile's own frames
+are not counted), Bishamon's Kienzen `623P` (it never fires under five cadences: declared, open), and the two
+`UNJOINABLE` rows (Felicia's Toy Touch, an OTG move; Anakaris's Spell of Turning release, which needs an absorbed
+projectile). **Identity**: the maintainer read F1's capture sheets (Q1, `DECISIONS_HISTORY.md` "Read 2026-10-25
+(14z-209) — #229 Q1"). **Timing** in LIVE ENGINE TICKS from a write tap on P1's countdown (`PRG:0x027F70`); a
+move that connects even at the 332 px whiff pin reads its active and recovery UNCOMPARABLE. Red / white / gauge are
+summed over the move's hit runs; three moves were performed at contact to count their hits (Demitri's Demon
+Cradle and Gallon's Climb Razor land one, Bishamon's Iai Giri two at every strength). Classified by the gate itself
+(`tools/specials_a_rigs.py join`, under this page's classify), over the rows joined by ONE event.
+
+| column | verdict over the rows joined by one event (sheet - ours) |
+|---|---|
+| startup | **INCONSISTENT**: most common delta +1 on 34/40; spread +0..+2 — EXACT AU; CONSTANT OFFSET +1 FE AN BI BU DE; INCONSISTENT GA; no verdict JE |
+| active | **INCONSISTENT**: most common delta +0 on 19/33; spread -2..+2 — EXACT AN BU GA; CONSTANT OFFSET +1 AU DE; INCONSISTENT FE BI; no verdict JE |
+| recovery | **INCONSISTENT**: most common delta +2 on 18/33; spread +0..+7 — EXACT AU; CONSTANT OFFSET +2 AN DE; CONSTANT OFFSET +3 GA; INCONSISTENT FE BI BU; no verdict JE |
+| white | **INCONSISTENT**: most common delta +0 on 24/40; spread -3..+24 — EXACT FE AU; CONSTANT OFFSET +4 DE GA; INCONSISTENT AN BI BU; no verdict JE |
+| gauge hit | **INCONSISTENT**: most common delta +0 on 34/40; spread -3..+3 — EXACT AN AU BU DE GA; INCONSISTENT FE BI; no verdict JE |
+| red | **INCONSISTENT**: most common delta +0 on 23/40; spread -8..+20 — EXACT FE AN AU; INCONSISTENT BI BU DE GA; no verdict JE |
+
+Live engine ticks equal the duration-byte derivation of the same node walk on
+startup 36/61, active 31/61, recovery 27/61 joined row-events (a difference is game logic cutting a node short — a
+landing, a jump — which the bytes cannot see); the 301 joined values are frozen as one hash, never in the tree.
+
+**Jedah has no row in the table: every Jedah cell is UNCOMPARABLE as a column verdict.** Both of his workbook rows,
+Dio Sega (`236P`) and Ira Piano (`J.632[4]K~P`), write one value for every strength, so the rig runs all three
+strengths and each row joins THREE events; the per-character verdicts take only rows joined by one event, and a
+row joined by several is tested as a one-row claim instead (does the sheet's single value hold for every strength,
+the ground-throw rigs' rule). Dio Sega is a projectile: on every event the fighter's walk has no attack node and
+carries no attack record, so all six of its cells are uncomparable as well. Ira Piano's `active` is prose; its
+other five cells pair on every event (they are in the values hash), ours is the same for all three strengths on
+each, and the sheet equals ours on recovery, red, white and gauge. Its startup reads far above ours: the workbook
+counts from the K press that starts Ira Spinta, ours from Piano's own entry — a counting convention, measured
+14z-205b (`STATE_HISTORY.md`, "Ira Piano's startup"), not a disagreement.
+
 ## The specials, LE LI MO QB SA VI ZA (14z-205, classified 14z-209, #229)
 
 Measured on vsavj; the gate is `tests/audit_vanilla_specials_b.sh` (its frozen identity map
@@ -511,7 +559,8 @@ to an event that FIRED (each named by the chain it entered and the stock it spen
 input; a workbook input the engine reads differently joins under the engine's, Q4); 12 rows on 10 inputs are
 UNRESOLVED and named with the reason in `tools/es_ex_rigs.py` UNRESOLVED (every timing tried enters a normal or pays
 nothing on vsavj: BI 22PP / 236PP / 623PP, DE 623KK, FE 22PP and 236PP~PP, LE Tenraiha, QB SXP and air SXP, SA 720KK);
-Demitri's ES Demon Cradle GC is a guard cancel (the next family). **Identity**: the maintainer read F3's sheets
+Demitri's ES Demon Cradle GC is declared for the guard cancels (`NOT_HERE`), which do not run it (that section says
+why). **Identity**: the maintainer read F3's sheets
 (Q1), and Jedah's re-rigged ES row is ES Ira Spinta, ES Ira Piano being `J.63214KK~PP` (*"both are correct"*,
 2026-10-21). **Timing** in engine ticks from the field leg's pass counter, from the move's entry; a projectile or a
 move with no attack node on P1 is uncomparable. Classified by `tools/crosscheck_229.py es`.
@@ -549,13 +598,22 @@ unmashed count); **gauge** is P1's meter at the event's end from 0; **startup** 
 
 Measured on vsavj; the gate is `tests/audit_guard_cancels.sh` (its 271-event table as a hash,
 `tests/expected/guard_cancels.sha256`, the table outside the tree; the rigs `tools/gc_rigs.py`). **Scope**: the
-workbook's 42 guard-cancel rows on the 14 characters that have one (Demitri has none), joined by their 623+button set:
+workbook's 42 rows TYPED as a guard cancel (`special GC`, `es special GC`, `GC`, `es GC`: `tools/gc_rigs.py` GC_TYPES) on
+the 14 characters the rigs run, joined by their 623+button set:
 53 buttons commit the game's own guard cancel (P1's `+0x3B5` := 6 by `PRG:0x029C6E`). **Identity**: the maintainer
 read F5's sheets (Q1); Bulleta's guard cancel has no attack (*"this is indeed her correct GC"*). **Timing** is the
 HIT's, the gc event's (Q6, *"(b) Keep the hit timing as the record. -> yes"*), in engine ticks; Bulleta's (no attack)
 and Lei-Lei's (her hits come from another object) are uncomparable. **Damage** is what is DEALT on a defense-row -3
 victim (Q5): Gallon, Zabel on Gallon's own rows, the first fall of P2's HP. **Gauge**: the whiff event's own gain, and
 the hit cell as the page's 2b rule (the swing plus the record). Classified by `tools/crosscheck_229.py gc`.
+
+**Demitri's four Demon Cradle GC rows (LP, MP, HP and ES) are joined to nothing: NOT MEASURED** (#331). The workbook
+names them guard cancels but types them `special` and `es special`, so the type-keyed row set above never held them;
+the specials gate declares the three plain rows for this family (`tools/specials_a_rigs.py` NOT_RUN) and the ES/EX
+gate the ES one (`tools/es_ex_rigs.py` NOT_HERE); and no rig here puts Demitri on P1 (`tools/gc_rigs.py` TABS: he is
+P2, the attacker whose 5HP P1 blocks), so none performs his 623+P out of a block. `tools/crosscheck_229.py gc` prints the four rows as
+NOT RUN with that reason. Whether vsavj commits a guard cancel for Demitri is not measured here; joining the rows
+needs a rig with Demitri on P1 against another attacker.
 
 | column | verdict over the joined events (sheet - ours) |
 |---|---|
@@ -596,11 +654,12 @@ per-move values, which stay outside the tree (`../charpages/framedata/crosscheck
   corpus and NOT yet measured:** mizuumi distinguishes NEUTRAL- from FORWARD-jump
   variants of the same button (`8J.LP` vs `9J.LP`) where our slot map carries ONE
   chain per aerial button. Needs a two-direction jump rig.
-- **Specials, supers, EX/ES moves and throws are not joined** (the command normals are,
-  since 14z-189; the pursuits, 14z-194, and the ground throws, 14z-195, are measured in their
-  own sections above). Each
-  needs its own measured naming rig on vsavj, the way `tools/name_moves.py` did for the
-  tenants. That is the bulk of the workbook's 820 rows and it is untouched here.
+- ~~**Specials, supers, EX/ES moves and throws are not joined**~~ **JOINED (#229, 14z-194 to
+  14z-209):** every family of the workbook's rows has its own measured rig on vsavj, its own gate and
+  its own section above. The rows with no measured event to compare are named in those sections
+  with the reason: Demitri's four Demon Cradle GC rows (not measured), the specials' declared rows
+  (Felicia's Toy Touch, Anakaris's Spell of Turning release, Bishamon's Kienzen), the ES/EX
+  family's UNRESOLVED rows, Bishamon's LP Kirisute Gomen, Victor's Graviton Knuckle.
 - **Seven workbook columns have no counterpart in the tree**: `on hit`, `on block`,
   `renda on hit`, `renda on block`, `throw tech`, `cancel`, `Invuln`. Frame advantage
   needs the victim's stun beside the attacker's recovery; nothing computes it.

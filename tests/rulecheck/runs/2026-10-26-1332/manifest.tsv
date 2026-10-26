@@ -1,0 +1,11 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent210/t321k/s2/summary.tsv	06e7a9560ff39c443f3f6c828a5927961cb93d97
+build/agent210/rc321a1/util.py	5017da0409f91a86ad15189b9b678adbffd2b88b
+build/agent210/rc321a1/util.out	aca27fc24af490cb259cbb3d42ab9f4e4e391d7f
+build/agent210/t321k/tier.meta	856308814630649121cd95269064cc9a374df936
+build/agent210/t321k/results_tier.tsv	fbd6082b1055887de7b426716bebc65d06a16beb
+build/agent210/t321k/jobs_use_census.tsv	e94735735c3d52152be49d163e4dad0d9cd12390
+build/agent210/t321k/gc_diag.log	d218c61807e709c3ddcb5a2685cd93febae2c185
+tests/test_mame_determinism.sh.lines-70-80 (lines 70-80 of tests/test_mame_determinism.sh)	3815bdc25129aa3e41fec66ba8cc002ed61761f7
+tests/audit_merged_legacy.sh.lines-400-435 (lines 400-435 of tests/audit_merged_legacy.sh)	3bfb56c24809d4dc6f2a3db93e21a76975f19b2d
+tests/run_all_emulator.sh.lines-170-200 (lines 170-200 of tests/run_all_emulator.sh)	343e31face21e4d0a701739be4bc0309c9f713d8

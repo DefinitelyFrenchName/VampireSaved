@@ -199,8 +199,9 @@ def gen(cid, dist, out_rpl, out_sched, pins=None):
     print(f"wrote {out_rpl} ({len(BUTTONS)} events, {dist}, ends {end}) and {out_sched}")
 
 
-def node_map(img, cid, detail=False):
-    """{node address: 'table:seq'}, or with detail {addr: (chain, index, hbA, dur)}."""
+def node_map(img, cid, detail=False, signed=True):
+    """{node address: 'table:seq'}, or with detail {addr: (chain, index, hbA, dur)}. The index tables' offsets are
+    read SIGNED (#318); signed=False is the pre-#318 unsigned read, for the #229 rigs' report columns only."""
     rows = vanilla_frames.bank_rows(Path(__file__).resolve().parent.parent / "build/manifest/bank_map.toml")
     out = {}
     # a2 FIRST (14z-145): a table-a chain without a terminator walks on into a2's
@@ -210,7 +211,7 @@ def node_map(img, cid, detail=False):
     # chain keeps only what nothing in a2 claims.
     for tn in ("a2", "a"):
         tbl = vanilla_frames.row_ptr(img, rows["anim_index_" + tn], cid)
-        w = anim_nodes.walk_table(img, 0, tbl, len(img))
+        w = anim_nodes.walk_table(img, 0, tbl, len(img), signed=signed)
         for seq, c in w["chains"].items():
             for i, n in enumerate(c.get("nodes") or []):
                 a = int(n["addr"], 16)

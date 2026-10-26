@@ -50,7 +50,7 @@ mk() { printf '%s\n' "$2" > "$W/$1"; }
 # ck <name> <want-rc> <want-substring> <what it proves>
 ck() {
     rc=0; out="$($CLS "$W/$1" 2>&1)" || rc=$?
-    if [ "$rc" = "$2" ] && (printf '%s' "$out" | grep -q -- "$3"); then
+    if [ "$rc" = "$2" ] && (printf '%s' "$out" | grep >/dev/null -- "$3"); then
         echo "  ok $1: $4"
     else
         echo "  FAIL $1: rc=$rc want $2; got [$out] want [$3] — $4"
@@ -160,7 +160,7 @@ ck vals 0 'vals=2,b' 'distinct indices are deduplicated and sorted for attributi
 # --bound is honoured: the same log judged against vs2's 80-entry ceiling
 # has no over-index at all. Guards against the bound being hardcoded twice.
 rc=0; out="$($CLS "$W/ext" --bound 80)" || rc=$?
-if [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ext=0'; then
+if [ "$rc" = 0 ] && printf '%s' "$out" | grep >/dev/null 'ext=0'; then
     echo "  ok bound: --bound is honoured (0x44 is inside vs2's 80 entries)"
 else
     echo "  FAIL bound: got [$out]"; fail=1

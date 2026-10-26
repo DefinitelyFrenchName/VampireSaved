@@ -1,7 +1,7 @@
 {
  "char": "0x11",
  "diff_summary": {
-  "anim_nodes": 2774,
+  "anim_nodes": 2773,
   "anim_nodes_differ_unattributed": 0,
   "bank_fields_unattributed": 1,
   "code_bytes_differ_out_of_scope": 81072,
@@ -39,7 +39,7 @@
    "_summary": {
     "attributed": 0,
     "differ": 0,
-    "nodes": 2774
+    "nodes": 2773
    },
    "_verified_by": "tests/test_anim_node_walk.sh (Donovan, native vs2: 3638/3638 node pointers on the graph, 14z-118)",
    "a": {
@@ -41493,63 +41493,12 @@
       "start": null
      },
      "0x41": {
-      "end": "hold",
-      "frames": 98,
-      "n": 1,
-      "nodes": [
-       {
-        "addr": "0x273fc6",
-        "diff": [],
-        "fields": {
-         "dur": {
-          "diff": false,
-          "ours": 98,
-          "vs2": 98
-         },
-         "flags": {
-          "diff": false,
-          "ours": 102,
-          "vs2": 102
-         },
-         "hb8": {
-          "diff": false,
-          "ours": 25193,
-          "vs2": 25193
-         },
-         "hbA": {
-          "diff": false,
-          "ours": 256,
-          "vs2": 256
-         },
-         "op": {
-          "diff": false,
-          "ours": "61ea00000002",
-          "vs2": "61ea00000002"
-         },
-         "sfx": {
-          "diff": false,
-          "ours": 0,
-          "vs2": 0
-         },
-         "shadow": {
-          "diff": false,
-          "ours": 609,
-          "vs2": 609
-         },
-         "sprite": {
-          "diff": false,
-          "expected_placed": null,
-          "ours": "0x61b50000",
-          "ours_source": "byte",
-          "vs2": "0x61b50000"
-         }
-        },
-        "off": "0xff40",
-        "ours_source": "byte"
-       }
-      ],
-      "ours_end": "hold",
-      "start": "0x273fc6"
+      "end": "out_of_region",
+      "frames": 0,
+      "n": 0,
+      "nodes": [],
+      "ours_end": "out_of_region",
+      "start": "0x263fc6"
      },
      "0x42": {
       "end": "unused",

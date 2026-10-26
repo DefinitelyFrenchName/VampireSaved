@@ -13,7 +13,10 @@ names:
 Each named row says: re-trace it or take it off the list. The declared controls are read as tests/lib/controls.sh's
 vs_ctl_declared reads them: `# MUST-FIRE: <shape>: <name> — ...` lines in the header block (the comment lines after the
 shebang, up to the first line that is not a comment). The blob is git's: sha1 of "blob <size>\\0" + the bytes.
-usage: controls_concurrent.py [--root DIR] [--list FILE]     exit 1 when any row is named
+With --emulator (#321, 14z-210) it reads tests/controls_concurrent_emu.txt instead: the EMULATOR gates whose controls
+tests/run_all_emulator.sh --controls --jobs N runs beside one another, registered when tests/ci_emulator.tsv has a row
+for the gate in the fbneo or mame lane (the only lanes whose pool honours the list).
+usage: controls_concurrent.py [--root DIR] [--list FILE] [--emulator]     exit 1 when any row is named
 Gate: tests/test_controls_concurrent.sh."""
 import argparse, hashlib, os, re, sys
 
@@ -53,13 +56,27 @@ def registered(root):
     return regs
 
 
+def registered_emulator(root):
+    regs = set()
+    p = os.path.join(root, "tests/ci_emulator.tsv")
+    if os.path.exists(p):
+        for line in open(p, encoding="utf-8"):
+            f = line.rstrip("\n").split("\t")
+            if len(f) >= 3 and f[0] and not f[0].startswith("#") and f[1] in ("fbneo", "mame"):
+                regs.add(f[0])
+    return regs
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", default=".")
     ap.add_argument("--list", default=None)
+    ap.add_argument("--emulator", action="store_true")
     a = ap.parse_args()
-    lst = a.list or os.path.join(a.root, "tests/controls_concurrent.txt")
-    regs = registered(a.root)
+    lst = a.list or os.path.join(a.root, "tests/controls_concurrent_emu.txt" if a.emulator else "tests/controls_concurrent.txt")
+    regs = registered_emulator(a.root) if a.emulator else registered(a.root)
+    where = ("no fbneo or mame row in tests/ci_emulator.tsv" if a.emulator
+             else "in neither tests/ci_portable.txt nor tests/ci_static.txt")
     named = rows = 0
     for n, line in enumerate(open(lst, encoding="utf-8"), 1):
         line = line.rstrip("\n")
@@ -77,7 +94,7 @@ def main():
             print("MISSING\t%s\ttests/%s.sh does not exist — re-trace it or take it off the list" % (g, g)); named += 1
             continue
         if g not in regs:
-            print("UNREGISTERED\t%s\tin neither tests/ci_portable.txt nor tests/ci_static.txt — re-trace it or take it off the list" % g)
+            print("UNREGISTERED\t%s\t%s — re-trace it or take it off the list" % (g, where))
             named += 1
         k = len(declared(s))
         if k < 2:

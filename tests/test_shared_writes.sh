@@ -227,7 +227,7 @@ else
     inv="$(python3 tools/audit_shared_writes.py "$CUR" 2>/dev/null || true)"
     miss=""
     for a in $HID; do
-        printf '%s' "$inv" | grep -q "\"$a " || miss="$miss $a"
+        printf '%s' "$inv" | grep >/dev/null "\"$a " || miss="$miss $a"
     done
     if [ -n "$miss" ]; then
         echo "  FAIL: on $CUR these capture-keyframe rows are NOT in the"

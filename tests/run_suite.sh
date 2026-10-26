@@ -14,7 +14,13 @@
 #   the authored replays under --freeze, or the legacy oracle has been replaced by a
 #   tautology.
 #
-# Usage: ROMDIR=... [MAME_ROMPATH="patched_dir;$ROMDIR"] tests/run_suite.sh [--freeze] [set]
+# Usage: ROMDIR=... [MAME_ROMPATH="patched_dir;$ROMDIR"] [SUITE_JOBS=N] tests/run_suite.sh [--freeze] [set]
+#
+# SUITE_JOBS=N (#321, 14z-210; default 1): the two MAME runs of every replay are made first, N at a time, each in its own
+# sandbox as before, and the loop below then classifies them in replay order from those logs, printing each run's own
+# output where the serial loop printed it — the output is the serial run's, line for line (tests/test_suite_jobs.sh).
+# Only the order the MAME runs are MADE in changes; what is compared, frozen or written is not. A freeze of four tracks
+# ran each track's ~97 replays twice, one MAME run at a time (tools/freeze_expectation_set.py passes it).
 #
 # The build under test is whatever the rompath resolves (vanilla by default;
 # set MAME_ROMPATH to front a patched build). Its program-image fingerprint
@@ -118,12 +124,38 @@ if [ -f "$EXPDIR/mask" ]; then
 fi
 
 fail=0
+SUITE_JOBS="${SUITE_JOBS:-1}"
+case "$SUITE_JOBS" in ''|*[!0-9]*|0) echo "SUITE_JOBS must be a positive integer, got '$SUITE_JOBS'" >&2; exit 2 ;; esac
 # SUITE_ONLY="<name> <name>..." (14z-105): run ONLY the named replays. An
 # AUTHORING aid for the freeze — the self-frozen .sha1 replays can be
 # re-frozen without the ~3 h full pass — and NEVER a verdict: a filtered
 # run prints FILTERED on its summary line and the acceptance of a freeze
 # remains the unfiltered verify run.
 [ -n "${SUITE_ONLY:-}" ] && echo "FILTERED RUN (SUITE_ONLY) — not a suite verdict"
+# THE MAME RUNS MADE FIRST (SUITE_JOBS > 1): one line per run — name, replay, mask (`-` for none), run number — for
+# every replay the loop below would run; each run's exit status and output kept beside its log.
+if [ "$SUITE_JOBS" -gt 1 ]; then   # SUITE-PRERUN
+    for rpl in "$REPO"/tests/replays/*.rpl; do
+        name="$(basename "$rpl" .rpl)"
+        if [ -n "${SUITE_ONLY:-}" ]; then case " $SUITE_ONLY " in *" $name "*) ;; *) continue ;; esac; fi
+        [ -f "$EXPDIR/$name.skip" ] && continue
+        [ -f "$EXPDIR/$name.pending" ] && continue
+        m=-; [ -f "$EXPDIR/$name.masked" ] && m="$MASK"
+        printf '%s %s %s 1\n%s %s %s 2\n' "$name" "$rpl" "$m" "$name" "$rpl" "$m"
+    done > "$WORK/prerun.list"
+    SET="$SET" WORK="$WORK" REPO="$REPO" xargs -P "$SUITE_JOBS" -n 4 sh -c '
+        m="$3"; [ "$m" = - ] && m=""
+        MASK_RANGES="$m" "$REPO/tools/run_replay_mame.sh" "$SET" "$2" "$WORK/$1.$4.log" "$WORK/$1.$4.sb" > "$WORK/$1.$4.out" 2>&1
+        echo "$?" > "$WORK/$1.$4.rc"' _ < "$WORK/prerun.list"
+fi
+suite_run() {  # suite_run <name> <rpl> <run number> — the run made now (serial), or read back (SUITE_JOBS > 1)
+    if [ "$SUITE_JOBS" -gt 1 ]; then
+        cat "$WORK/$1.$3.out" 2>/dev/null
+        [ "$(cat "$WORK/$1.$3.rc" 2>/dev/null)" = 0 ]
+    else
+        MASK_RANGES="$RUNMASK" "$REPO/tools/run_replay_mame.sh" "$SET" "$2" "$WORK/$1.$3.log" "$WORK/$1.$3.sb"
+    fi
+}
 for rpl in "$REPO"/tests/replays/*.rpl; do
     name="$(basename "$rpl" .rpl)"
     if [ -n "${SUITE_ONLY:-}" ]; then
@@ -151,8 +183,8 @@ for rpl in "$REPO"/tests/replays/*.rpl; do
     RUNMASK=""
     [ -f "$EXPDIR/$name.masked" ] && RUNMASK="$MASK"
     # each run its own sandbox inside the trapped WORK (#303: the runner's default sandbox outlives the suite)
-    MASK_RANGES="$RUNMASK" "$REPO/tools/run_replay_mame.sh" "$SET" "$rpl" "$WORK/$name.1.log" "$WORK/$name.1.sb" || { echo "RUN-FAIL"; fail=1; continue; }
-    MASK_RANGES="$RUNMASK" "$REPO/tools/run_replay_mame.sh" "$SET" "$rpl" "$WORK/$name.2.log" "$WORK/$name.2.sb" || { echo "RUN-FAIL"; fail=1; continue; }
+    suite_run "$name" "$rpl" 1 || { echo "RUN-FAIL"; fail=1; continue; }
+    suite_run "$name" "$rpl" 2 || { echo "RUN-FAIL"; fail=1; continue; }
     if ! cmp -s "$WORK/$name.1.log" "$WORK/$name.2.log"; then
         echo "NONDETERMINISTIC (first divergent frame below)"
         diff "$WORK/$name.1.log" "$WORK/$name.2.log" | head -3

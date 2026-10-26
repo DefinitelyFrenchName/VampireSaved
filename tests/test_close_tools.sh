@@ -152,11 +152,11 @@ nofold=""
 if vs_ctl_is case-fold-dropped; then nofold="--nofold"; echo "MODE: control case-fold-dropped — the matcher self-test runs WITHOUT case-folding"; fi
 if vs_ctl_is markup-dropped; then nofold="--nomarkup"; echo "MODE: control markup-dropped — the matcher self-test runs WITHOUT the #242 collapses"; fi
 out="$(python3 tools/retraction_grep.py --selftest $nofold 2>&1)"; rc=$?
-if [ "$rc" -eq 0 ] && printf '%s\n' "$out" | grep -q '^SELFTEST PASS'; then ok "$(printf '%s\n' "$out" | tail -1 | cut -c1-160)"
-elif printf '%s\n' "$out" | grep -q '^SELFTEST FAIL'; then
+if [ "$rc" -eq 0 ] && printf '%s\n' "$out" | grep >/dev/null '^SELFTEST PASS'; then ok "$(printf '%s\n' "$out" | tail -1 | cut -c1-160)"
+elif printf '%s\n' "$out" | grep >/dev/null '^SELFTEST FAIL'; then
     bad "$(printf '%s\n' "$out" | grep '^SELFTEST FAIL' | cut -c1-160)"
-    if vs_ctl_is case-fold-dropped && ! printf '%s\n' "$out" | grep -q '^SELFTEST FAIL:.*upper-case'; then echo "REFUSED: mode case-fold-dropped — the no-fold self-test failed but NOT on the upper-case case"; exit 3; fi
-    if vs_ctl_is markup-dropped && ! printf '%s\n' "$out" | grep -q '^SELFTEST FAIL:.*quote-wrapped'; then echo "REFUSED: mode markup-dropped — the no-markup self-test failed but NOT on the quote-wrapped case"; exit 3; fi
+    if vs_ctl_is case-fold-dropped && ! printf '%s\n' "$out" | grep >/dev/null '^SELFTEST FAIL:.*upper-case'; then echo "REFUSED: mode case-fold-dropped — the no-fold self-test failed but NOT on the upper-case case"; exit 3; fi
+    if vs_ctl_is markup-dropped && ! printf '%s\n' "$out" | grep >/dev/null '^SELFTEST FAIL:.*quote-wrapped'; then echo "REFUSED: mode markup-dropped — the no-markup self-test failed but NOT on the quote-wrapped case"; exit 3; fi
 else echo "REFUSED: the matcher self-test neither passed nor failed on its own line (exit $rc — a crash, not a verdict): $(printf '%s\n' "$out" | tail -1 | cut -c1-160)"; exit 3; fi
 fi
 
@@ -167,7 +167,7 @@ echo "== 1c. the address scan (tools/close_findings.py --selftest): a planted ad
 # address unread
 out="$(python3 tools/close_findings.py --selftest 2>&1)"; rc=$?
 if [ "$rc" -eq 0 ] && [ "$(printf '%s\n' "$out" | grep -c '^CONTROL FIRED:')" -eq 3 ]; then ok "close_findings self-test: planted-address, suffix-address and old-home-only all fire"
-elif printf '%s\n' "$out" | grep -q '^CONTROL DEAD:'; then bad "close_findings self-test: $(printf '%s\n' "$out" | grep '^CONTROL DEAD:' | cut -c1-140 | tr '\n' ' ')"
+elif printf '%s\n' "$out" | grep >/dev/null '^CONTROL DEAD:'; then bad "close_findings self-test: $(printf '%s\n' "$out" | grep '^CONTROL DEAD:' | cut -c1-140 | tr '\n' ' ')"
 else echo "REFUSED: tools/close_findings.py --selftest neither passed nor named a dead control (exit $rc — a crash, not a verdict): $(printf '%s\n' "$out" | tail -1 | cut -c1-160)"; exit 3; fi
 fi
 
@@ -178,12 +178,12 @@ if vs_ctl_is build-home-planted; then blind="--blind"; echo "MODE: control build
 if vs_ctl_is bare-name-silent; then blind="--nobare"; echo "MODE: control bare-name-silent — the self-test runs WITHOUT bare-name resolution (the pre-#205 tool): the plant must go uncaught and the gate FAIL"; fi
 if vs_ctl_is letter-unchecked; then blind="--noletters"; echo "MODE: control letter-unchecked — the self-test runs WITHOUT the per-letter home check: the plant must go uncaught and the gate FAIL"; fi
 out="$(python3 tools/homes_tracked.py --selftest $blind 2>&1)"; rc=$?
-if [ "$rc" -eq 0 ] && printf '%s\n' "$out" | grep -q '^SELFTEST PASS'; then ok "$(printf '%s\n' "$out" | tail -1)"
-elif printf '%s\n' "$out" | grep -q '^SELFTEST FAIL'; then
+if [ "$rc" -eq 0 ] && printf '%s\n' "$out" | grep >/dev/null '^SELFTEST PASS'; then ok "$(printf '%s\n' "$out" | tail -1)"
+elif printf '%s\n' "$out" | grep >/dev/null '^SELFTEST FAIL'; then
     bad "$(printf '%s\n' "$out" | grep '^SELFTEST FAIL' | cut -c1-160)"
-    if vs_ctl_is build-home-planted && ! printf '%s\n' "$out" | grep -q '^SELFTEST FAIL: (False, False'; then echo "REFUSED: mode build-home-planted — the blind self-test failed but NOT on the two build/ reads"; exit 3; fi
-    if vs_ctl_is bare-name-silent && ! printf '%s\n' "$out" | grep -q '^SELFTEST FAIL:.* bare=False'; then echo "REFUSED: mode bare-name-silent — the no-bare self-test failed but NOT on the bare names"; exit 3; fi
-    if vs_ctl_is letter-unchecked && ! printf '%s\n' "$out" | grep -q '^SELFTEST FAIL:.* letters=False'; then echo "REFUSED: mode letter-unchecked — the no-letters self-test failed but NOT on the letters"; exit 3; fi
+    if vs_ctl_is build-home-planted && ! printf '%s\n' "$out" | grep >/dev/null '^SELFTEST FAIL: (False, False'; then echo "REFUSED: mode build-home-planted — the blind self-test failed but NOT on the two build/ reads"; exit 3; fi
+    if vs_ctl_is bare-name-silent && ! printf '%s\n' "$out" | grep >/dev/null '^SELFTEST FAIL:.* bare=False'; then echo "REFUSED: mode bare-name-silent — the no-bare self-test failed but NOT on the bare names"; exit 3; fi
+    if vs_ctl_is letter-unchecked && ! printf '%s\n' "$out" | grep >/dev/null '^SELFTEST FAIL:.* letters=False'; then echo "REFUSED: mode letter-unchecked — the no-letters self-test failed but NOT on the letters"; exit 3; fi
 else echo "REFUSED: the self-test neither passed nor failed on its own line (exit $rc — a crash, not a verdict): $(printf '%s\n' "$out" | tail -1 | cut -c1-160)"; exit 3; fi
 fi
 
@@ -192,16 +192,16 @@ echo "== 2c. the reason check (tools/none_reasons.py --selftest): a finding whos
 lenient=""
 if vs_ctl_is bare-none-accepted; then lenient="--lenient"; echo "MODE: control bare-none-accepted — the self-test runs on the LENIENT variant (a bare none accepted): the plant must go uncaught and the gate FAIL"; fi
 out="$(python3 tools/none_reasons.py --selftest $lenient 2>&1)"; rc=$?
-if [ "$rc" -eq 0 ] && printf '%s\n' "$out" | grep -q '^SELFTEST PASS'; then ok "$(printf '%s\n' "$out" | tail -1)"
-elif printf '%s\n' "$out" | grep -q '^SELFTEST FAIL'; then bad "$(printf '%s\n' "$out" | grep '^SELFTEST FAIL' | head -1 | cut -c1-160)"
+if [ "$rc" -eq 0 ] && printf '%s\n' "$out" | grep >/dev/null '^SELFTEST PASS'; then ok "$(printf '%s\n' "$out" | tail -1)"
+elif printf '%s\n' "$out" | grep >/dev/null '^SELFTEST FAIL'; then bad "$(printf '%s\n' "$out" | grep '^SELFTEST FAIL' | head -1 | cut -c1-160)"
 else echo "REFUSED: tools/none_reasons.py --selftest neither passed nor failed on its own line (exit $rc — a crash, not a verdict): $(printf '%s\n' "$out" | tail -1 | cut -c1-160)"; exit 3; fi
 fi
 
 if [ -z "${VS_CTL:-}" ]; then
 echo "== 2e. the findings TSV reader (tools/findings_table.py --selftest, #282 item C): a pointer section reads as its row"
 out="$(python3 tools/findings_table.py --selftest 2>&1)"; rc=$?
-if [ "$rc" -eq 0 ] && printf '%s\n' "$out" | grep -q '^SELFTEST PASS'; then ok "$(printf '%s\n' "$out" | tail -1)"
-elif printf '%s\n' "$out" | grep -q '^SELFTEST FAIL'; then bad "$(printf '%s\n' "$out" | grep 'FAIL' | head -1 | cut -c1-160)"
+if [ "$rc" -eq 0 ] && printf '%s\n' "$out" | grep >/dev/null '^SELFTEST PASS'; then ok "$(printf '%s\n' "$out" | tail -1)"
+elif printf '%s\n' "$out" | grep >/dev/null '^SELFTEST FAIL'; then bad "$(printf '%s\n' "$out" | grep 'FAIL' | head -1 | cut -c1-160)"
 else echo "REFUSED: tools/findings_table.py --selftest neither passed nor failed on its own line (exit $rc — a crash, not a verdict): $(printf '%s\n' "$out" | tail -1 | cut -c1-160)"; exit 3; fi
 fi
 
@@ -226,7 +226,7 @@ b2() {  # b2 <state> [blind]: section 2b's reading of the newest findings row ->
     if _o="$(python3 tools/homes_tracked.py --newest --state "$1" 2>&1)"; then echo "ok $(printf '%s\n' "$_o" | head -1 | cut -c1-200)"
     elif [ "${2:-}" = blind ] || [ "$_o" = "no row starting with '| **--newest' in $1" ]; then   # NO-FINDINGS-TABLE (#300)
         echo "NOTE 2b had nothing to read: $1 holds no findings table (the close writes none since #288, 14z-202); it is judged again when one comes back (#289)"
-    elif printf '%s\n' "$_o" | grep -q '^FAIL'; then echo "FAIL $(printf '%s\n' "$_o" | grep '^FAIL' | head -3 | tr '\n' ' ') $(printf '%s\n' "$_o" | grep '^#' | head -2 | tr '\n' ' ')" | cut -c1-400
+    elif printf '%s\n' "$_o" | grep >/dev/null '^FAIL'; then echo "FAIL $(printf '%s\n' "$_o" | grep '^FAIL' | head -3 | tr '\n' ' ') $(printf '%s\n' "$_o" | grep '^#' | head -2 | tr '\n' ' ')" | cut -c1-400
     else echo "REFUSED tools/homes_tracked.py --newest exited non-zero with no FAIL line (a crash, not a verdict): $(printf '%s\n' "$_o" | tail -1 | cut -c1-160)"; fi
 }
 if [ -z "${VS_CTL:-}" ]; then

@@ -214,6 +214,9 @@ test_poked_legs
 test_same_data_p2
 test_df_field_readers
 test_reaction_classes
+# test_anim_signed_offsets — tools/anim_nodes.py reads the anim index tables' offsets SIGNED (#318);
+# ROMDIR or a warm decrypt cache, no build dir, no emulator.
+test_anim_signed_offsets
 test_defense_rows_census
 test_quote_font_window
 test_roulette_tag_rows

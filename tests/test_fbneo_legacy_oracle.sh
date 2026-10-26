@@ -211,7 +211,7 @@ for frac in (0.15, 0.35, 0.55, 0.75, 0.92):
 print(" ".join(str(f) for f in out))
 PY
 )"
-    [ -n "$FRAMES" ] && ! printf '%s' "$FRAMES" | grep -q unsafe || {
+    [ -n "$FRAMES" ] && ! printf '%s' "$FRAMES" | grep >/dev/null unsafe || {
         echo "  FAIL: $R — no safe sample frames ($FRAMES)"; fail=1; continue; }
 
     DUMPS=""

@@ -13,24 +13,24 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**480 of 480 gates described.**
+**482 of 482 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
-| [runner](#runner) | 52 | 52 | the suite runners and their own ground truth |
+| [runner](#runner) | 53 | 53 | the suite runners and their own ground truth |
 | [docs](#docs) | 27 | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 50 | 50 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 87 | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 90 | 90 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 91 | 91 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 38 | 38 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
 ## runner
 
-the suite runners and their own ground truth. 52 of 52 described.
+the suite runners and their own ground truth. 53 of 53 described.
 
 ### `run_all_emulator.sh` — run, emulator
 
@@ -172,7 +172,7 @@ the suite runners and their own ground truth. 52 of 52 described.
 
 **WHAT:** tools/controls_concurrent.py reads tests/controls_concurrent.txt, the gates whose must-fire controls tests/run_all_static.sh --jobs N runs beside one another (#312), and names every row whose gate is not registered (tests/ci_portable.txt, tests/ci_static.txt), declares fewer than two must-fire controls, or whose script's git blob differs from the blob that was write-traced. Each named row must be re-traced or taken off the list (ruled 2026-10-24: "Census gate + re-trace at freeze (Recommended)").
 
-**HOW:** the census over the tree; then on a copy of the tree's registries, list and gate scripts, three perturbations of the list's first row: its gate dropped from the registries, its script cut to one MUST-FIRE line, its script given one more line. Each must be named with its own tag, and the unperturbed copy must read clean. Then the freeze re-trace's scorer, tools/controls_overlap.py, on synthetic traces: distinct writes SAFE, a shared write, a write a sibling reads and a write split by strace SHARED, a control's own mktemp path and a bytecode cache SAFE, a gate whose every control SKIPped HOLLOW.
+**HOW:** the census over the tree; then on a copy of the tree's registries, list and gate scripts, three perturbations of the list's first row: its gate dropped from the registries, its script cut to one MUST-FIRE line, its script given one more line. Each must be named with its own tag, and the unperturbed copy must read clean. Then the freeze re-trace's scorer, tools/controls_overlap.py, on synthetic traces: distinct writes SAFE, a shared write, a write a sibling reads and a write split by strace SHARED, a control's own mktemp path and a bytecode cache SAFE, a gate whose every control SKIPped HOLLOW. Section 3b (#321, 14z-210) runs the same census over the EMULATOR list, tests/controls_concurrent_emu.txt (tools/controls_concurrent.py --emulator: a row's gate must have an fbneo or mame row in tests/ci_emulator.tsv).
 
 **EXPECTS:** 0 rows named on the tree. A red names the gate and says "re-trace it or take it off the list" — the #315 shape: 8 of lane S's 98 traced gates had changed before #312 landed and would have kept running their controls beside one another on a trace that no longer described them.
 
@@ -202,7 +202,7 @@ the suite runners and their own ground truth. 52 of 52 described.
 
 ### `test_emulator_runner.sh` — test, ci_portable
 
-**WHAT:** tests/run_all_emulator.sh's verdicts mean what they say: PASS / FAIL / SKIP counted apart, SKIP-in-prose read as PASS, a non-executable registry row MISSING, a timeout TIMEOUT, the anti-orphan check both ways, --strict, the prereq stop, --scope, placeholder expansion, the exported MAME_BIN, the controls reader, a --dry-run writing no commit of record (#219), and since 14z-209 (#321, #323, #305): a red prereq gate followed by a green one still STOPS, the fbneo and mame lanes share one pool, --skip leaves a host-covered gate out by name, and a cold decrypt cache is built before the tier.
+**WHAT:** tests/run_all_emulator.sh's verdicts mean what they say: PASS / FAIL / SKIP counted apart, SKIP-in-prose read as PASS, a non-executable registry row MISSING, a timeout TIMEOUT, the anti-orphan check both ways, --strict, the prereq stop, --scope, placeholder expansion, the exported MAME_BIN, the controls reader, a --dry-run writing no commit of record (#219), and since 14z-209 (#321, #323, #305): a red prereq gate followed by a green one still STOPS, the fbneo and mame lanes share one pool, --skip leaves a host-covered gate out by name, and a cold decrypt cache is built before the tier; since 14z-210 (#321): a listed gate's controls run beside one another in a pool (an unlisted gate's, and any gate's at --jobs 1, one after another) without deadlocking a full pool, and --order starts a pooled lane longest first; and a control mode that says `NOT JUDGED: ` reads UNJUDGED (#310).
 
 **HOW:** a synthetic repository of stub gates with KNOWN verdicts is driven through the REAL runner by symlink (never a copy of its logic), with stub tools so the runner's own preconditions run; the controls run copies of the runner (and, for #323, of the two readers) with a piece removed or restored (the export, the reader, an executable row, the --dry-run guard, the lane loop's own name, the decrypt warm-up).
 
@@ -423,6 +423,14 @@ the suite runners and their own ground truth. 52 of 52 described.
 **HOW:** plants a real fixture kind and removes it again; runs scratch COPIES of test_suite_dispatch.sh with the table rewritten (never an env override, which an operator could switch off) and checks each copy goes red naming the reason.
 
 **EXPECTS:** three reds, each with its reason; a green here on any of the three means the guard that keeps every expectation kind read by somebody has been loosened into prose.
+
+### `test_suite_jobs.sh` — test, ci_portable
+
+**WHAT:** tests/run_suite.sh's SUITE_JOBS=N makes every replay's two MAME runs first, N at a time, and then classifies them in replay order; its output, and what --freeze writes into the expectation set, must be the serial run's byte for byte — every verdict kind included (PASS, FAIL, SKIP, PENDING, RUN-FAIL, NONDETERMINISTIC, NO-EXPECTATION, frozen, an authored .masked left alone) — and it must actually run them beside one another.
+
+**HOW:** the REAL run_suite.sh symlinked into a fake repo (as tests/test_freeze_retires_diverge.sh does) with a stub MAME runner that prints a line, sleeps 0.4 s and writes a log carrying the replay, the run's MASK_RANGES and, for the replays built to, a run-number or a failure; the suite run at 1 and 8 jobs, verify and --freeze (each on its own copy of the expectations), outputs and expectation trees compared, and the 8-job wall time held under half the serial.
+
+**EXPECTS:** identical outputs and trees, and the pool faster than the serial loop; a red is a parallel suite whose verdicts or frozen files are not the serial suite's.
 
 ### `test_superseded_pins.sh` — test, ci_portable
 
@@ -708,7 +716,7 @@ the emulators and the ROM images as instruments — builds, decrypt, replay dete
 
 **WHAT:** the shipped applier page RUNS where a player runs it — opened from file:// in a real browser engine and driven through its own drop zone, radio and button: a build prints the manifest's set key, 'leave it out' stops the qsound demand and builds to the other key, a damaged dump is refused by name.
 
-**HOW:** headless Chrome drives page_test.html (the shipped file as a byte-prefix plus tests/lib/applier_driver.html) with the maintainer's dumps; an incomplete run is its own verdict, never a content verdict; controls starve the control leg's virtual-time budget and flip a byte of the inlined set key.
+**HOW:** headless Chrome drives page_test.html (the shipped file as a byte-prefix plus tests/lib/applier_driver.html) with the maintainer's dumps; an incomplete run is its own verdict, never a content verdict; controls starve the control leg's wall-clock budget and flip a byte of the inlined set key.
 
 **EXPECTS:** the three player paths as described; the starved control reads NOT JUDGED, the broken page fails. A stalled driver retries once for incompleteness only, never for a content failure.
 
@@ -2714,7 +2722,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 ## character-data
 
-the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 90 of 90 described.
+the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 91 of 91 described.
 
 ### `audit_air_dash_height.sh` — audit, emulator
 
@@ -2920,7 +2928,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **WHAT:** the victim facing rule 5 on our engine, frozen AS MEASURED (#159): vs2's facing resolver knows rule 5 and vsavj's does not. Until M21 a tenant attack record carrying it was XORed into the victim's +0x5D on our build, and Killshread Summon (ES)'s returning wave dragged Demitri toward Donovan on native and left him in place on ours. Since M21 (Design A, the `facing_rule5` [[site_thunk]] at 0x1886C) ours writes native's values.
 
-**HOW:** static: the compare chains of both resolvers read from the decrypted opcode images, and the legacy record census of +0xE (vsavj 0 of 1,085 carry rule 5, vs2 1 of 1,143); live: every write to Demitri's +0x5D over 3850-3960 and his x at 3924 and 3946 on the #136 rig donovan_3, both legs real cursor picks, on MAME; controls flip our writes' side bit and plant a `cmpi.b #5` into vsavj's image.
+**HOW:** static: the compare chains of both resolvers read from the decrypted opcode images, and the legacy record census of +0xE (vsavj 0 of 1,064 carry rule 5, vs2 1 of 1,129; 1,085 and 1,143 until #318's signed index read, 14z-210); live: every write to Demitri's +0x5D over 3850-3960 and his x at 3924 and 3946 on the #136 rig donovan_3, both legs real cursor picks, on MAME; controls flip our writes' side bit and plant a `cmpi.b #5` into vsavj's image.
 
 **EXPECTS:** the frozen rows AS FIXED at M21 (ours writes native's 1 1 1 0 0 0 from the thunk; x 755 on both legs) and static rows exact; both controls fail. Until M21 it froze the defect (ours wrote 4 at 0x1886C; x 835 against native's 755).
 
@@ -3244,6 +3252,14 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **EXPECTS:** 3638/3638 on-graph, every change an edge or a jump, countdowns exact or dur-1; the wrong-stride decode fails. Run after any change to the decoder or the node-format claims.
 
+### `test_anim_signed_offsets.sh` — test, ci_static
+
+**WHAT:** tools/anim_nodes.py's walk_table reads an anim index table's word offsets SIGNED, as the engine adds them (a sign-extended word add): a negative entry names a chain stored BELOW its table. On vsavj every negative entry of the 15 characters' five tables (a/a2/b/c/proj) starts at table + the sign-extended word, the per-character census of those entries is as frozen (71 on 11 characters), and a negative word neither ends a table nor bounds it (each case's entry count as frozen); one known entry per affected character lands on its frozen chain (start, node count, end), plus Pyron's a:0x41 on vsav2, the tenant entry that moved his map.
+
+**HOW:** one Python program over the decrypted vsavj and vsav2 data views (the bank rows from build/manifest/bank_map.toml), importing the walker from a directory it is given — the tree's tools/ normally; each control hands it a shadow copy of the walker under a throwaway root.
+
+**EXPECTS:** every case, census row and start check as frozen; a red means the walker lands a negative entry 64 KiB past the real chain (the pre-#318 unsigned read) or mis-bounds a table. Each control's shadow copy must FAIL.
+
 ### `test_charid_names.sh` — test, ci_portable
 
 **WHAT:** every Python dict under tools/ and tests/ that maps character ids to names (`0x0A: "Sasquatch"` or `"SA": (0x0A, "Sasquatch")`, at least four of its names characters of the table) names each id 0x00-0x0F (the random cell 0x0B excepted) as docs/game/atlas/character_tables.md's slot table does — and the census finds at least the frozen floor of such maps.
@@ -3262,7 +3278,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 ### `test_crosscheck_229.sh` — test, ci_portable
 
-**WHAT:** tools/crosscheck_229.py's join-and-classify code — the pure functions under each family's loader (classify_es, aggregate_ct, classify_gc, classify_gt) and the code they stand on (the page's classify in tools/crosscheck_framedata.py, command_throw_rigs.parse_series / match_series, specials_b_rigs.verdicts, gc_rigs.ours_cols / sheet_cols) — run on small synthetic fixtures (a fake workbook, fake gate rows), each built so its verdict is known by construction: EXACT, CONSTANT OFFSET, CONSTANT RATIO, INCONSISTENT and NO DATA from the page's classify; EXACT, IN RANGE (a mashed hit count inside the sheet's range), INCONSISTENT and UNCOMPARABLE (a prose cell) for a hit series; CONTACT rows kept out of a specials timing verdict; an UNRESOLVED ES/EX row and a projectile counted uncomparable with their reasons; a command-throw row that never grabs; the guard cancels' timing read from the HIT and never the whiff (#229 Q6) and their damage read as DEALT on the -3 victim, never from the Demitri event (Q5); the normal throws ground and air, the air rows joined on key AIR.
+**WHAT:** tools/crosscheck_229.py's join-and-classify code — the pure functions under each family's loader (classify_es, aggregate_ct, classify_gc, classify_gt) and the code they stand on (the page's classify in tools/crosscheck_framedata.py, command_throw_rigs.parse_series / match_series, specials_b_rigs.verdicts, gc_rigs.ours_cols / sheet_cols) — run on small synthetic fixtures (a fake workbook, fake gate rows), each built so its verdict is known by construction: EXACT, CONSTANT OFFSET, CONSTANT RATIO, INCONSISTENT and NO DATA from the page's classify; EXACT, IN RANGE (a mashed hit count inside the sheet's range), INCONSISTENT and UNCOMPARABLE (a prose cell) for a hit series; CONTACT rows kept out of a specials timing verdict; an UNRESOLVED ES/EX row and a projectile counted uncomparable with their reasons; a command-throw row that never grabs; the guard cancels' timing read from the HIT and never the whiff (#229 Q6) and their damage read as DEALT on the -3 victim, never from the Demitri event (Q5); a row NAMED a guard cancel but typed otherwise reported NOT RUN with its reason (#331: Demitri's four Demon Cradle GC rows); the normal throws ground and air, the air rows joined on key AIR.
 
 **HOW:** one Python program (below) builds every fixture, calls the functions and compares each got verdict with its expected one; `CONTROL=<name>` or the in-gate control loop re-runs it with that control's perturbation.
 
@@ -3398,7 +3414,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 ### `test_same_data_p2.sh` — test, ci_static
 
-**WHAT:** no legacy character carries the same character data on vsavj and vsav2 (0 of 12), and which chains differ for each is frozen — the measurement behind choosing Demitri as the parity rigs' P2 (table a identical; b:0x10/0x71/0x74 and c:0x2e/0x2f differ).
+**WHAT:** no legacy character carries the same character data on vsavj and vsav2 (0 of 12), and which chains differ for each is frozen — the measurement behind choosing Demitri as the parity rigs' P2 (table a identical; b:0x10/0x71/0x74 differ; c:0x2e/0x2f read the same on both since #318 — they are negative entries the unsigned walker read invalid on vsav2).
 
 **HOW:** tools/audit_same_data_p2.py over both decrypted data views (the bank's value rows, every anim node's resolved boxes and attack record across tables a/a2/b/c/proj, the defense-curve row), never the indices vs2 renumbered; controls run vsavj's view on both sides (every character must read SAME-DATA and fail the table) and drop Demitri's row.
 

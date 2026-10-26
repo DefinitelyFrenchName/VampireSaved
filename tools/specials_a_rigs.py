@@ -272,7 +272,10 @@ def node_map_signed(img, cid):
     0x42/0x56, DE c 0x2e-0x2f, FE b 0x6e). A local copy of F2's walk_signed (tools/specials_b_rigs.py: same node
     rules — flags bit 7 = link at +0x18, bit 6 = hold, else sequential; the entry count bounded by the smallest
     positive offset), never an edit of the shared tool. SPECIALS_A_UNSIGNED=1 reads the offsets unsigned (the
-    first pass's reading), so the two readings can be compared."""
+    first pass's reading), so the two readings can be compared.
+    RESOLVED #318 (14z-210): tools/anim_nodes.py's walk_table reads the offsets SIGNED too since #318, so the
+    "reads them unsigned" above describes the tool before it. This local walk stays: the frozen #229 identities
+    were measured with it, and its entry bound differs from the tool's (it skips odd words instead of ending)."""
     import anim_nodes, os
     rows = vanilla_frames.bank_rows(Path(__file__).resolve().parent.parent / "build/manifest/bank_map.toml")
     signed = os.environ.get("SPECIALS_A_UNSIGNED") != "1"

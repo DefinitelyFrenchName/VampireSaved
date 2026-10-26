@@ -82,7 +82,7 @@ FIXTURE="$REPO/tests/expected/vsavj/$STEM.bogus"
 [ -e "$FIXTURE" ] && { echo "FAIL: $FIXTURE already exists — refusing to clobber"; exit 1; }
 echo "planted by test_suite_dispatch_selftest.sh" > "$FIXTURE"
 set +e; out=$("$REPO/$GATE" 2>&1); rc=$?; set -e
-if [ "$rc" != 0 ] && echo "$out" | grep -q "not in the owner table"; then
+if [ "$rc" != 0 ] && echo "$out" | grep >/dev/null "not in the owner table"; then
     echo "  ok: unlisted kind '.bogus' -> RED, named"
 else
     echo "FAIL: an unlisted expectation kind did not turn the gate RED (rc=$rc)"
@@ -104,7 +104,7 @@ if ! grep -q "legacy-exempt:tests/run_suite.sh" "$COPY"; then
     echo "FAIL: could not rewrite the owner row — the table format moved"; fail=1
 fi
 set +e; out=$("$COPY" 2>&1); rc=$?; set -e
-if [ "$rc" != 0 ] && echo "$out" | grep -q "never reads the kind"; then
+if [ "$rc" != 0 ] && echo "$out" | grep >/dev/null "never reads the kind"; then
     echo "  ok: owner that does not read its kind -> RED, named"
 else
     echo "FAIL: a wrong owner did not turn the gate RED (rc=$rc)"
@@ -119,7 +119,7 @@ grep -q "audit_legacy_pairings.sh:battery" "$COPY" || {
     echo "FAIL: could not rewrite the chain field — the table format moved"; fail=1; }
 chmod +x "$COPY"
 set +e; out=$("$COPY" 2>&1); rc=$?; set -e
-if [ "$rc" != 0 ] && echo "$out" | grep -q "never invokes it"; then
+if [ "$rc" != 0 ] && echo "$out" | grep >/dev/null "never invokes it"; then
     echo "  ok: unearned battery-chain claim -> RED, named"
 else
     echo "FAIL: a false run-chain claim did not turn the gate RED (rc=$rc)"

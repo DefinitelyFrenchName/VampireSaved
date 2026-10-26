@@ -2,8 +2,9 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 331
+# issues: 332
 number	state	reason	closed	labels	title
+332	OPEN	-	-	bug,severity: low	audit_guard_cancels reads a missing out-of-tree table as 0 lines differing, so its node-shift control reads DEAD
 331	OPEN	-	-	evolution,severity: low	#229's remainder: Demitri's ES Demon Cradle GC unjoined; the FE..JE specials section and two stale lines on the cross-check page
 330	OPEN	-	-	evolution,severity: low	Throws: recovery and throw tech not measured for the normal and command throws (split from #229)
 329	OPEN	-	-	evolution,severity: low	The minimal half-circle inputs vsavj accepts are not measured from the command handlers (split from #229)
@@ -14,7 +15,7 @@ number	state	reason	closed	labels	title
 324	CLOSED	COMPLETED	2026-10-25	bug,severity: low,test-integrity	PILOT's clone root holds an untracked '-V' file ('stub patch', 2026-10-23): a stub xdelta3 leaking into the repository
 323	CLOSED	COMPLETED	2026-10-26	bug,severity: low,test-integrity	The emulator runner's prereq STOP applied unevenly: the freeze run went on past a red prereq row, the release run stopped on the same row
 322	CLOSED	COMPLETED	2026-10-25	bug,severity: medium,test-integrity	test_release_launcher_bat's Windows half: its gen_claims fixture writes the README in the host's default encoding (cp1252 on ERIS)
-321	CLOSED	COMPLETED	2026-10-26	evolution,performance,severity: medium	Parallelise the gates that run serially by default: test_mame_parity's PARITY_JOBS and the other job knobs, checks and controls
+321	OPEN	REOPENED	-	evolution,performance,severity: medium	Parallelise the gates that run serially by default: test_mame_parity's PARITY_JOBS and the other job knobs, checks and controls
 320	OPEN	-	-	bug,severity: low,test-integrity	MAME write taps exit 139 at teardown after every output is written; gates accept it only with full output
 319	CLOSED	COMPLETED	2026-10-25	bug	tests/expected/ground_throws.tsv holds per-move signatures in the clear (the 14z-126 frame-data ruling)
 318	OPEN	-	-	bug,correctness,severity: low	tools/anim_nodes.py reads the animation tables' offsets unsigned; the game sign-extends them (negative entries on 11 characters)

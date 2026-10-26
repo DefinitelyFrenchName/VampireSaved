@@ -85,7 +85,7 @@ for f in $real; do
         "FILE $f: PASS"*) ok "$f: $(printf '%s\n' "${v#"FILE $f: PASS — "}" | cut -c1-140)" ;;
         "") echo "REFUSED: $f has no verdict line in the scan's output"; exit 3 ;;
         *) bad "$(printf '%s\n' "$v" | cut -c1-220)"
-           if [ -n "${VS_CTL:-}" ] && [ "$f" = "$W/mode.tsv" ] && ! printf '%s\n' "$v" | grep -qF "$MODE_EXPECT"; then
+           if [ -n "${VS_CTL:-}" ] && [ "$f" = "$W/mode.tsv" ] && ! printf '%s\n' "$v" | grep -F >/dev/null "$MODE_EXPECT"; then
                echo "REFUSED: mode $VS_CTL — the grep failed WITHOUT naming the plant ($MODE_EXPECT)"; exit 3
            fi ;;
     esac
@@ -99,7 +99,7 @@ if [ -z "${VS_CTL:-}" ]; then
         case "$v" in
             *": PASS"*) vs_ctl_dead "$c" "the planted copy PASSED — the plant is not what the grep catches"; fail=1 ;;
             "") vs_ctl_dead "$c" "the planted copy has no verdict line"; fail=1 ;;
-            *) if printf '%s\n' "$v" | grep -qF "$want"; then vs_ctl_fired "$c" "the planted copy of $FIRST FAILS naming the plant: $(printf '%s\n' "$v" | grep -F "$want" | head -1 | sed 's/^FILE [^ ]*: //' | cut -c1-140)"
+            *) if printf '%s\n' "$v" | grep -F >/dev/null "$want"; then vs_ctl_fired "$c" "the planted copy of $FIRST FAILS naming the plant: $(printf '%s\n' "$v" | grep -F "$want" | head -1 | sed 's/^FILE [^ ]*: //' | cut -c1-140)"
                else vs_ctl_dead "$c" "the planted copy failed WITHOUT naming the plant ($want)"; fail=1; fi ;;
         esac
     done

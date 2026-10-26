@@ -1,0 +1,67 @@
+# tests/controls_concurrent_emu.txt — the EMULATOR gates whose must-fire controls may run BESIDE ONE ANOTHER (#321, 14z-210).
+# Read by tests/run_all_emulator.sh (the CONCURRENT-CONTROLS line): under --controls with --jobs N, in the pooled fbneo
+# and mame lanes, a listed gate that PASSed gives its slot back and runs each control as a pool job of its own; an
+# unlisted gate runs its controls one after another in its own slot, as before. A gate is listed only when a write trace
+# of each of its control modes on PILOT shows no path two of them write and none writes a path a sibling reads (each
+# control's own mktemp directories aside) — the #315 method, ruled for the emulator lanes 2026-10-26 (14z-210): "Write
+# trace on PILOT, don't use PILOT for any other task to avoid overlap". gate<TAB>traced blob<TAB>trace<TAB>reason
+# HELD BY tests/test_controls_concurrent.sh (tools/controls_concurrent.py --emulator): a script changed since its trace, a
+# gate with no fbneo/mame row, or one declaring fewer than two controls is named and must be re-traced or taken off.
+# TRACES: pilot:688edef8 = PILOT (Ubuntu 24.04), 14z-210 (fork T, #321): every control of the 61 fbneo/mame gates with 2+ controls, 200 runs, 15,664 s + a 1,166 s re-trace of 9 (strace 6.8 --seccomp-bpf); 51 SAFE, 5 SAFE once a relative rename is placed (listed since the scorer places it, re-scored 14z-210), 5 SHARED (local evidence build/agent210/t321trace/).
+# TRACES: pilot:eb6606fd = PILOT, 14z-210 (fork R, #321): the 7 SAFE gates whose scripts changed after pilot:688edef8, 30 control runs, 8,279 s, SAFE (local evidence build/agent210/t321retrace/).
+audit_air_gc_legacy	4293809dce1cd410066f2c660bd868755a5de826	pilot:eb6606fd	5 controls write-traced 14z-210 (fork R, #321): none writes a path a sibling writes or reads
+audit_chains174	9037fa556f2dbd78c451b70ad6ea1dd3592f14a7	pilot:688edef8	5 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_chains184	f99ab8888180c71d4de21cd63481fe388f5e2301	pilot:688edef8	7 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_column_flash_cause	68725e38d9a8044d0fd6bf8cf5d9080783d336f9	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_column_shock	f7dad1d83048005e5d6d4022dec27052dcbe7c91	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_defense_row_reads	5ebc7ec9207202af81a8fa1e5a1481dfe11fa212	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_defense_row_residue	74bb10ecada12275b2293c3b2d88ca3301bdff00	pilot:688edef8	3 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_df_field_readers_live	3aeba778ed0876c4a61fa596806bae0775e9ead7	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_df_moves	ca4e221384a1c77b1b52171a8ec63fe2fb62a9a8	pilot:688edef8	10 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_dmg_legacy_sweep	0dce235e8e8ac2115171614e50c42c9a934b9637	pilot:688edef8	6 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_effect_class_rows	0734b916e99f22883a45116cb4125732574154de	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_facing_hook_ab	15a12d4325a545479e82ec557893aaeceef3b13a	pilot:688edef8	4 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_facing_rule	01811206534381e37968645335dd2fd6e42535a0	pilot:eb6606fd	2 controls write-traced 14z-210 (fork R, #321): none writes a path a sibling writes or reads
+audit_facing_sweep	aa83073bd675723ee505dbefbe33f47f6f77ec22	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_flicker_attribution	2d83b2c1715b0c42ec4106a6c6a9e6e96715d3e4	pilot:eb6606fd	2 controls write-traced 14z-210 (fork R, #321): none writes a path a sibling writes or reads
+audit_forced_pick_fidelity	8659170834191d3fd1610a817580a8e8d6b6fd7b	pilot:688edef8	3 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_guard_mask_reads	b1af81b9de56d4867978fafbf457c492ea8175a9	pilot:688edef8	3 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_guard_reentry	3e275f3fd134d613a85f1d4444a3e93f95a72259	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_hitbox_parity	fe495ae122a2c608bb334de50dce0c2d31811ec5	pilot:688edef8	3 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_hitclass_map_cost	62fc53192a31982f5e3f3c2d2778875d025d275f	pilot:688edef8	3 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads, once each relative rename target is placed by strace's cwd (re-scored with tools/controls_overlap.py's placement, 14z-210)
+audit_latch_reads	2eea640914723a49710ff5ef87c4e2927be3bc72	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_merged_vec3	9039f01399ce86da2d3afd9c9ef710d5d6fc9b2a	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_move_parity	cf4fc252a0212bf71995abf9cd4470cccb519ddb	pilot:eb6606fd	7 controls write-traced 14z-210 (fork R, #321): none writes a path a sibling writes or reads
+audit_move_parity_attribution	fa5744cf04825216069b3064531ac2bd2cf01e92	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_objhook_owner_census	726f4c66b1f61c0c38e4cc8a5d497978b7058985	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_palette_seq_ids	806eee2b51e28e45ecf9ec88f6871d265f53ec3e	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_phobos_dmg_residual	86e804adc530f835f73641149a3af3c20e5c07bb	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_projectile_clash	38addc72c47a23060552641412f8923958f5870a	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_pursuit_flag	420c01c28f24e0fe1940c2a6e5a8a6aef1933473	pilot:688edef8	4 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_ranking_tenant	276d7356ca3eafdd69d9cd846ec470e808ae0ffc	pilot:688edef8	3 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_reaction_class_live	875fe1edee9a00f283e7b84d082834dae16c2bec	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_rig_opening	96a943fe97fa4e3047a0bc2fc04ec4b4cd8ff3e6	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_rng_draws	ad09f77e97fd13b53da5628fbe6edce42fb6416e	pilot:688edef8	5 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_rng_forms	f8881b85bc5a07b139cbe0e5007f05b9937d48c6	pilot:688edef8	3 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_shared_wall_push	a32ff99f897f5f035e887b8db547e0caea300281	pilot:eb6606fd	3 controls write-traced 14z-210 (fork R, #321): none writes a path a sibling writes or reads
+audit_tenant_continue_switch	0188a19ee932d09d8ad17f3dd992d53277e8e3de	pilot:688edef8	3 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_tenant_cpu_soak	ef7ac8f665379a75e20322a10a8241b808f6a740	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_tenant_throw_geometry	724f00a04f29f97c4f3e7f4e1e311abb1ba63283	pilot:eb6606fd	9 controls write-traced 14z-210 (fork R, #321): none writes a path a sibling writes or reads
+audit_throw_registration	1cdb38a5057a71cf6b85ab66dc020ca1144806c8	pilot:688edef8	4 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_tick_phase	74cd1368ad136e1deac6327ae38350b364a68fdb	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_trap_air_hit	1080d128906f71201c91d2c172db08d27b159495	pilot:688edef8	7 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_trap_airborne	a4bf21b42399ddba2d1531cc02694b7d18b2cb35	pilot:688edef8	3 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_victim_parity	d06da70e60839b64404debe021f09e8caed89252	pilot:688edef8	10 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_walker_ghost	57c4ede18b6ed61c9ac429de228ead9a48efdd4c	pilot:688edef8	5 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+audit_walker_repoint	578ffe30d96665a5e18897620b496c343db7536f	pilot:688edef8	3 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+test_beam_anim_walk	6a6bb30ca68ac722ef961d566f1fb6edcaf18765	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+test_don_immortal_native	7fa3bf4e51cda3473aa5def410ee78ec1b23aef6	pilot:688edef8	3 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+test_don_throw_mirror	a365db2d8180df257ad26e42756b63e323239ce7	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads, once each relative rename target is placed by strace's cwd (re-scored with tools/controls_overlap.py's placement, 14z-210)
+test_hitbox_encoding	5cd7da6fdba001f6ce95905297241c7707bc55e6	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+test_hui_boot	58265bc311ac2c847fb73ca6acd0899984e62feb	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads, once each relative rename target is placed by strace's cwd (re-scored with tools/controls_overlap.py's placement, 14z-210)
+test_ladder_tenant_vs_palette	7c3c1a905f8d85a8389493e7f1793f926d02dae4	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+test_readme_recording	bbd32c452244914db75e3924fd2321802cfa73b2	pilot:688edef8	5 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads
+test_shim_charid	f35bb0c5fd150fb1d120f7457151aed532d6180a	pilot:eb6606fd	2 controls write-traced 14z-210 (fork R, #321): none writes a path a sibling writes or reads
+test_tenant_select_records	9d2ec9e1ba66ffdc4285b9cf488e4bcd127bc73b	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads, once each relative rename target is placed by strace's cwd (re-scored with tools/controls_overlap.py's placement, 14z-210)
+test_wheel_bank5	b2fae8c38d2124bbc0aad10eea4eed1aaef6c2fe	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads, once each relative rename target is placed by strace's cwd (re-scored with tools/controls_overlap.py's placement, 14z-210)
+test_wide_profile	4c3fb79328bfd5a092fa643d012533f066ce50e7	pilot:688edef8	2 controls write-traced 14z-210 (fork T, #321): none writes a path a sibling writes or reads

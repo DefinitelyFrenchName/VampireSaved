@@ -23,15 +23,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3605 |
+| distinct program-space addresses named | 3632 |
 | named by a document or manifest only | 2288 |
 | named by both a document/manifest and code | 868 |
-| named by CODE ONLY (the gap list below) | 449 |
+| named by CODE ONLY (the gap list below) | 476 |
 | carried by atlas | 719 |
 | carried by engine_internals | 827 |
 | carried by other docs | 1061 |
 | carried by manifests | 1850 |
-| carried by code | 1317 |
+| carried by code | 1344 |
 
 ## Addresses
 
@@ -284,7 +284,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x00F85A` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] |
 | `PRG:0x00F8EE` | docs/game/engine_internals.md — The child companion's shadow — a remapped tile never copied (fixed 14z-69o) |
 | `PRG:0x00F954` | docs/game/engine_internals.md — The WIN-QUOTE TEXT SYSTEM — fully decoded (14z-76) [vs2]; docs/project/patch_index.md — DEFERRED BY MAINTAINER DECISION (14z-76) — the win-quote bank relocation [vs2]; tools/decode_win_quotes.py |
-| `PRG:0x010000` | docs/game/atlas/select_screen.md — The wheel DRAWER — object, bank word, and the bank-5 move (14z-63); docs/game/engine_internals.md — GFX ROM (sprite/tile) subsystem; docs/game/engine_internals.md — The QSound Z80 driver: id table, songs, streams, sample records (measured 14z-86, reader-traced on live vsavj, id 0x119); docs/game/engine_internals.md — The WIN-QUOTE TEXT SYSTEM — fully decoded (14z-76); docs/game/engine_internals.md — The Z80 command dispatch, the note-table array, the dead type-C song class and the alias bit (measured 14z-86, the voice batch); docs/platform/gotchas.md — A member's REGION layout is not its FILE layout — and the Z80 driver's own address space is a THIRD thing (14z-86); +51 more |
+| `PRG:0x010000` | docs/game/atlas/select_screen.md — The wheel DRAWER — object, bank word, and the bank-5 move (14z-63); docs/game/engine_internals.md — GFX ROM (sprite/tile) subsystem; docs/game/engine_internals.md — The QSound Z80 driver: id table, songs, streams, sample records (measured 14z-86, reader-traced on live vsavj, id 0x119); docs/game/engine_internals.md — The WIN-QUOTE TEXT SYSTEM — fully decoded (14z-76); docs/game/engine_internals.md — The Z80 command dispatch, the note-table array, the dead type-C song class and the alias bit (measured 14z-86, the voice batch); docs/platform/gotchas.md — A member's REGION layout is not its FILE layout — and the Z80 driver's own address space is a THIRD thing (14z-86); +53 more |
 | `PRG:0x0104C8` | docs/platform/gotchas.md — PC-relative reads are DECRYPTED reads on CPS-2 (paid: 2026-07-25, ~45min) |
 | `PRG:0x010A80` | docs/game/engine_internals.md — GFX ROM (sprite/tile) subsystem |
 | `PRG:0x010DFA` | docs/project/patch_notes.md — B. the obj_hook dispatch sites left VANILLA — the WALKER is relocated; build/manifest/donovan.toml — obj_hook; build/manifest/huitzil.toml — obj_hook; build/manifest/pyron.toml — obj_hook |
@@ -2818,7 +2818,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x257FFF` | docs/game/engine_internals.md — The QSound Z80 driver: id table, songs, streams, sample records (measured 14z-86, reader-traced on live vsavj, id 0x119) [vs2]; build/manifest/qs_songs.toml — (top) [vs2]; tests/test_qs_id_table.sh |
 | `PRG:0x2601EC` | docs/game/gotchas.md — The per-char strip zone interleaves the SHARED MUSIC POOL; tools/overlay_port.py |
 | `PRG:0x263186` | docs/project/gotchas.md — "the ported data is corrupt" (14z-75) |
-| `PRG:0x264086` | docs/game/atlas/character_tables.md — Animation index tables (bank extends below bank[0]); build/manifest/gfx_layout3.toml — pyron; build/manifest/pyron.toml — (top); tests/test_list_type_census.sh; tools/extract_char.py; tools/list_type_census.py; +1 more |
+| `PRG:0x264086` | docs/game/atlas/character_tables.md — Animation index tables (bank extends below bank[0]); build/manifest/gfx_layout3.toml — pyron; build/manifest/pyron.toml — (top); tests/test_anim_signed_offsets.sh; tests/test_list_type_census.sh; tools/extract_char.py; +2 more |
 | `PRG:0x2641EC` | docs/project/gotchas.md — "the ported data is corrupt" (14z-75) [vs2] |
 | `PRG:0x2650EC` | docs/project/gotchas.md — "the ported data is corrupt" (14z-75); build/manifest/pyron.toml — sprite [vs2] |
 | `PRG:0x26614C` | docs/project/gotchas.md — two traps from the #104 re-measurement — both produced a CONFIDENT WRONG ANSWER from a working instrument (paid: 14z-99); tests/audit_don_grab_pose.sh |
@@ -3334,6 +3334,8 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x02681E` | tests/test_advancing_guard.sh |
 | `PRG:0x026824` | tests/test_advancing_guard.sh |
 | `PRG:0x027090` | tests/test_advancing_guard.sh |
+| `PRG:0x027134` | tools/anim_nodes.py |
+| `PRG:0x027138` | tools/anim_nodes.py |
 | `PRG:0x027532` | tests/test_gfx_layout3.sh |
 | `PRG:0x0275D4` | tests/test_advancing_guard.sh |
 | `PRG:0x027606` | tests/audit_guard_mask_reads.sh; tests/test_advancing_guard.sh |
@@ -3561,21 +3563,45 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x0FD180` | tests/test_index_window_thunk.sh |
 | `PRG:0x0FFF00` | tests/test_map_table_readers.sh |
 | `PRG:0x102436` | tests/test_biased_list_inventory.sh |
+| `PRG:0x11632E` | tests/test_anim_signed_offsets.sh |
+| `PRG:0x116E62` | tests/test_anim_signed_offsets.sh |
 | `PRG:0x1201D0` | tests/audit_demitri_split.sh |
 | `PRG:0x123456` | tests/test_effect_placeholders.sh; tests/test_manifest_merge.sh; tests/test_rule5_census.sh; tests/test_type_stamp_census.sh; tools/audit_rule5.py; tools/checkskills.py |
+| `PRG:0x12C362` | tests/test_anim_signed_offsets.sh |
 | `PRG:0x12E592` | tests/audit_demitri_split.sh |
+| `PRG:0x1307B8` | tests/test_anim_signed_offsets.sh |
+| `PRG:0x13C8BA` | tests/test_anim_signed_offsets.sh |
+| `PRG:0x13C91A` | tests/test_anim_signed_offsets.sh |
+| `PRG:0x13D0C6` | tests/test_anim_signed_offsets.sh |
 | `PRG:0x13FAA2` | tests/audit_don_grab_pose.sh |
+| `PRG:0x15120C` | tests/test_anim_signed_offsets.sh |
+| `PRG:0x151B5C` | tests/test_anim_signed_offsets.sh |
 | `PRG:0x157A50` | tests/audit_don_grab_pose.sh |
 | `PRG:0x157F00` | tests/test_don_reactions.sh |
 | `PRG:0x1586FF` | tests/test_don_reactions.sh |
+| `PRG:0x167146` | tests/test_anim_signed_offsets.sh |
+| `PRG:0x167398` | tests/test_anim_signed_offsets.sh |
 | `PRG:0x179A0A` | tools/specials_b_rigs.py |
 | `PRG:0x180000` | tests/test_mister_page.sh; tools/audit_pointer_flow.py |
+| `PRG:0x18BE40` | tests/test_anim_signed_offsets.sh |
+| `PRG:0x18EFEE` | tests/test_anim_signed_offsets.sh |
 | `PRG:0x190000` | tests/test_qs_id_table.sh |
+| `PRG:0x1B19A8` | tests/test_anim_signed_offsets.sh |
+| `PRG:0x1B9430` | tests/test_anim_signed_offsets.sh |
 | `PRG:0x1C6EBE` | tools/tick_durations.py |
 | `PRG:0x1C6ED6` | tools/tick_durations.py |
 | `PRG:0x1D9888` | tools/gc_rigs.py |
 | `PRG:0x1D98E8` | tools/gc_rigs.py |
+| `PRG:0x1EE5D8` | tests/test_anim_signed_offsets.sh |
+| `PRG:0x1EED80` | tests/test_anim_signed_offsets.sh |
 | `PRG:0x1F9FC0` | tests/test_phasec_spaces.sh |
+| `PRG:0x1FD3D2` | tests/test_anim_signed_offsets.sh |
+| `PRG:0x1FD4C2` | tests/test_anim_signed_offsets.sh |
+| `PRG:0x1FE666` | tests/test_anim_signed_offsets.sh |
+| `PRG:0x21D79A` | tests/test_anim_signed_offsets.sh |
+| `PRG:0x21D932` | tests/test_anim_signed_offsets.sh |
+| `PRG:0x232614` | tests/test_anim_signed_offsets.sh |
+| `PRG:0x23273C` | tests/test_anim_signed_offsets.sh |
 | `PRG:0x248000` | tools/overlay_port.py |
 | `PRG:0x2499F0` | tests/test_biased_list_inventory.sh |
 | `PRG:0x249B18` | tests/test_biased_list_inventory.sh |
@@ -3584,6 +3610,7 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x25729A` | tests/test_biased_list_inventory.sh |
 | `PRG:0x258000` | tests/test_qs_id_table.sh |
 | `PRG:0x260200` | tools/overlay_port.py |
+| `PRG:0x263FC6` | tests/test_anim_signed_offsets.sh |
 | `PRG:0x264072` | tools/obj_records.py |
 | `PRG:0x2671E6` | tools/overlay_port.py |
 | `PRG:0x267224` | tools/overlay_port.py |

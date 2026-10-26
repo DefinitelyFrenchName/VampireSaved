@@ -135,7 +135,7 @@ echo "== 1. the freeze run: strict, GREEN, every gate and control run, its ident
 # the release-cadence stub's own script counts as changed, so the freeze pulls it in (a trigger, as a real freeze can):
 # its PASS is then in the freeze's results, and section 2 proves it is still never reused
 o1="$(STATIC_CHANGED_PATHS=tests/g_rel.sh st "$T/freeze.tsv" --strict --cadence freeze)" && s1=0 || s1=$?
-if [ "$s1" = 0 ] && printf '%s' "$o1" | grep -q '^GREEN' && [ "$(ran)" = "$ALL" ]; then ok "the freeze run is GREEN and ran: $(ran)"
+if [ "$s1" = 0 ] && printf '%s' "$o1" | grep >/dev/null '^GREEN' && [ "$(ran)" = "$ALL" ]; then ok "the freeze run is GREEN and ran: $(ran)"
 else fail "the freeze run (exit $s1) ran '$(ran)': $(printf '%s' "$o1" | tail -3 | tr '\n' '|')"; fi
 for _k in tree romdir 'instrument mame-wide' 'instrument python3' untracked; do
     grep -q "^# id $_k " "$T/freeze.tsv" && grep -q "^# id_end $_k " "$T/freeze.tsv" \
@@ -144,22 +144,22 @@ done
 
 echo "== 2. the release on the freeze's identity: the session and freeze gates REUSED, no control of theirs executed =="
 o2="$(st "$T/rel.tsv" --strict --cadence release --reuse "$T/freeze.tsv")" && s2=0 || s2=$?
-if [ "$s2" = 0 ] && printf '%s' "$o2" | grep -q '^GREEN' && [ "$(ran)" = "g_cad g_rel" ] \
-        && printf '%s' "$o2" | grep -qE '^  g_sess +PASS  reused' && printf '%s' "$o2" | grep -qE '^  g_frz +PASS  reused' \
-        && printf '%s' "$o2" | grep -q '^reused: 2 of the PASS'; then
+if [ "$s2" = 0 ] && printf '%s' "$o2" | grep >/dev/null '^GREEN' && [ "$(ran)" = "g_cad g_rel" ] \
+        && printf '%s' "$o2" | grep -E >/dev/null '^  g_sess +PASS  reused' && printf '%s' "$o2" | grep -E >/dev/null '^  g_frz +PASS  reused' \
+        && printf '%s' "$o2" | grep >/dev/null '^reused: 2 of the PASS'; then
     ok "reused g_sess and g_frz (their control not executed); ran only: $(ran)"
 else fail "the same-identity release (exit $s2) ran '$(ran)': $(printf '%s' "$o2" | grep -E '^  g_|^reused|GREEN' | tr '\n' '|')"; fi
 grep -q "^g_sess	PASS	0	1	1	1$" "$T/rel.tsv" && ok "the reused row carries the freeze's control counts (declared 1, fired 1, honoured 1)" \
     || fail "the reused g_sess row: $(grep '^g_sess' "$T/rel.tsv")"
 grep -q "^# reuse $T/freeze.tsv 2$" "$T/rel.tsv" && ok "the release results name the freeze run they reused and the count" \
     || fail "the release results lack '# reuse <file> 2'"
-printf '%s' "$o2" | grep -qE '^    run    g_rel +release cadence' && printf '%s' "$o2" | grep -qE '^    run    g_cad +its script reads VS_CADENCE' \
+printf '%s' "$o2" | grep -E >/dev/null '^    run    g_rel +release cadence' && printf '%s' "$o2" | grep -E >/dev/null '^    run    g_cad +its script reads VS_CADENCE' \
     && ok "the release-cadence gate and the VS_CADENCE reader are named as run, with the reason" \
     || fail "the reuse plan's RUN lines: $(printf '%s' "$o2" | grep '^    run' | tr '\n' '|')"
 
 refused() {  # refused <section label> <key> <output> <exit>
-    if [ "$4" = 0 ] && printf '%s' "$3" | grep -q 'REUSE REFUSED: the identity differs' \
-            && printf '%s' "$3" | grep -q "DIFFERS  $2" && [ "$(ran)" = "$ALL" ] && ! printf '%s' "$3" | grep -q 'reused'; then
+    if [ "$4" = 0 ] && printf '%s' "$3" | grep >/dev/null 'REUSE REFUSED: the identity differs' \
+            && printf '%s' "$3" | grep >/dev/null "DIFFERS  $2" && [ "$(ran)" = "$ALL" ] && ! printf '%s' "$3" | grep >/dev/null 'reused'; then
         ok "$1: REUSE REFUSED ($2 DIFFERS), every gate and control ran"
     else fail "$1 (exit $4) ran '$(ran)': $(printf '%s' "$3" | grep -E 'REFUSED|DIFFERS|reused|GREEN' | tr '\n' '|')"; fi
 }
@@ -179,14 +179,14 @@ refused "a ROMDIR file changed" romdir "$o5" "$s5"
 
 echo "== 6. --reuse is a release's: refused at --cadence freeze and beside --confirm =="
 o6="$(st "$T/rel6.tsv" --strict --cadence freeze --reuse "$T/freeze.tsv")" && s6=0 || s6=$?
-[ "$s6" = 2 ] && printf '%s' "$o6" | grep -q '^--reuse: only a --cadence release run' && ok "--reuse at --cadence freeze exits 2, nothing run" \
+[ "$s6" = 2 ] && printf '%s' "$o6" | grep >/dev/null '^--reuse: only a --cadence release run' && ok "--reuse at --cadence freeze exits 2, nothing run" \
     || fail "--reuse at --cadence freeze exited $s6 and ran '$(ran)'"
 o6b="$(st "$T/rel6b.tsv" --strict --cadence release --confirm "$T/freeze.tsv" --reuse "$T/freeze.tsv")" && s6b=0 || s6b=$?
 [ "$s6b" = 2 ] && ok "--reuse beside --confirm exits 2" || fail "--reuse beside --confirm exited $s6b"
 
 echo "== 7. a results file that is not a freeze's run of record is not reused =="
 o7="$(st "$T/rel7.tsv" --strict --cadence release --reuse "$T/rel.tsv")" && s7=0 || s7=$?
-if [ "$s7" = 0 ] && printf '%s' "$o7" | grep -q 'REUSE REFUSED: the freeze file cannot be reused' && [ "$(ran)" = "$ALL" ]; then
+if [ "$s7" = 0 ] && printf '%s' "$o7" | grep >/dev/null 'REUSE REFUSED: the freeze file cannot be reused' && [ "$(ran)" = "$ALL" ]; then
     ok "a release run's results offered as the freeze's: REFUSED, every gate ran"
 else fail "a non-freeze file (exit $s7) ran '$(ran)': $(printf '%s' "$o7" | grep -E 'REFUSED|reused' | tr '\n' '|')"; fi
 
@@ -206,7 +206,7 @@ if [ "$se2" = 0 ] && [ "$(ran)" = "e_b@flip" ] && [ "$(awk -F'\t' '$6 ~ /^reused
     ok "the --controls release reused e_a and e_b and executed e_b's control (e_b@flip PASS)"
 else fail "the emulator release (exit $se2) ran '$(ran)': $(printf '%s' "$e2" | grep -E 'reused|REFUSED|e_' | tr '\n' '|')"; fi
 e3="$(S_MAME_W="$T/mame_w2" em "$T/erel3" --controls --reuse "$T/efreeze")" && se3=0 || se3=$?
-if [ "$se3" = 0 ] && printf '%s' "$e3" | grep -q 'REUSE REFUSED: the identity differs' && printf '%s' "$e3" | grep -q 'DIFFERS  instrument mame-wide' \
+if [ "$se3" = 0 ] && printf '%s' "$e3" | grep >/dev/null 'REUSE REFUSED: the identity differs' && printf '%s' "$e3" | grep >/dev/null 'DIFFERS  instrument mame-wide' \
         && [ "$(ran)" = "e_a e_b e_b@flip" ]; then
     ok "a changed mame-wide binary: REUSE REFUSED, both gates and the control ran"
 else fail "the emulator release on a changed instrument (exit $se3) ran '$(ran)': $(printf '%s' "$e3" | grep -E 'reused|REFUSED|DIFFERS' | tr '\n' '|')"; fi
@@ -230,7 +230,7 @@ if [ -z "${VS_CTL:-}" ]; then
     else vs_ctl_dead release-reused "the shadow plan still runs g_rel"; rc=1; fi
     cp "$R/tests/run_all_static.sh" "$T/static_real.sh"; cp "$T/static_unchecked.sh" "$R/tests/run_all_static.sh"
     o9="$(S_ROMDIR="$T/roms2" st "$T/rel9.tsv" --strict --cadence release --reuse "$T/freeze.tsv")" || true
-    if printf '%s' "$o9" | grep -q '^reused: 2 of the PASS'; then vs_ctl_fired identity-unchecked "a changed ROMDIR is reused with the comparison disabled"
+    if printf '%s' "$o9" | grep >/dev/null '^reused: 2 of the PASS'; then vs_ctl_fired identity-unchecked "a changed ROMDIR is reused with the comparison disabled"
     else vs_ctl_dead identity-unchecked "the shadow runner still refused: $(printf '%s' "$o9" | grep -E 'REFUSED|reused' | tr '\n' '|')"; rc=1; fi
     cp "$T/static_anycadence.sh" "$R/tests/run_all_static.sh"
     o9b="$(st "$T/rel9b.tsv" --strict --cadence freeze --reuse "$T/freeze.tsv")" && s9b=0 || s9b=$?

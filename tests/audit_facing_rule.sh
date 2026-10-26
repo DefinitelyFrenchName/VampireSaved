@@ -7,7 +7,8 @@
 #   wave dragged Demitri toward Donovan on native and left him in place on ours. Since M21
 #   (Design A, the `facing_rule5` [[site_thunk]] at 0x1886C) ours writes native's values.
 # HOW: static: the compare chains of both resolvers read from the decrypted opcode images,
-#   and the legacy record census of +0xE (vsavj 0 of 1,085 carry rule 5, vs2 1 of 1,143);
+#   and the legacy record census of +0xE (vsavj 0 of 1,064 carry rule 5, vs2 1 of 1,129; 1,085 and 1,143 until #318's signed
+#   index read, 14z-210);
 #   live: every write to Demitri's +0x5D over 3850-3960 and his x at 3924 and 3946 on the
 #   #136 rig donovan_3, both legs real cursor picks, on MAME; controls flip our writes'
 #   side bit and plant a `cmpi.b #5` into vsavj's image.
@@ -42,7 +43,7 @@
 #   static  <game> <resolver addr> rules=<the cmpi.b #N values of the compare chain>
 #   legacy  <game> records=<reachable legacy attack records> rule5=<how many carry rule 5>
 #           rules=<the full +0xE histogram>  — tools/audit_facing_rules.py, the legacy control
-#           (added 14z-167b: vsavj 0 of 1,085, vsav2 1 of 1,143)
+#           (added 14z-167b: vsavj 0 of 1,085, vsav2 1 of 1,143; 1,064 and 1,129 since #318, 14z-210)
 #   facing  <leg> <frame> <writer PC> <+0x5D after the write>  — every write to
 #           Demitri's +0x5D from 3850 to 3960 on the #136 rig donovan_3 (event 5,
 #           Killshread Summon (ES) at 3840), both legs REAL cursor picks

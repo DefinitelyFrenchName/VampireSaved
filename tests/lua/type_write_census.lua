@@ -65,6 +65,7 @@ local function install_tap()
     installing = false
 end
 install_tap()
+do local r = debug.getregistry(); r.vs_notifier_threads = r.vs_notifier_threads or {}; r.vs_notifier_threads[#r.vs_notifier_threads + 1] = coroutine.running() end   -- #320: keep this Lua thread alive past teardown (docs/platform/gotchas.md)
 local notifier = space:add_change_notifier(function(mode)
     if not installing and mode:find("w") then install_tap() end
 end)

@@ -331,7 +331,7 @@ reduce "$first" "$a" "$W/ctl.tap" "$2" "$3" "$4" | grep '	flag148-set	' > "$W/ct
 if grep -q "^$first	$a	flag148-set	" "$W/want.tsv" && ! grep -qxF -f "$W/ctl.row" "$W/want.tsv"; then
     vs_ctl_fired flag-planted "one planted +0x148 store on $first $a adds $(cut -f5 "$W/ctl.row") to the flag row"
 else vs_ctl_dead flag-planted "the planted store did not change the $first $a flag row" || fail=1; fi
-if echo " $PARTS " | grep -q " legacy_lilith "; then
+if echo " $PARTS " | grep >/dev/null " legacy_lilith "; then
     plant_split "$W/legacy_lilith.vsav2.txt" 3100 > "$W/ctl_split.tap"
     split legacy_lilith "$W/legacy_lilith.vsavj.txt" "$W/ctl_split.tap" > "$W/ctl_split.row"
     if grep -q '	first-split	' "$W/want.tsv" && ! grep -qxF -f "$W/ctl_split.row" "$W/want.tsv"; then

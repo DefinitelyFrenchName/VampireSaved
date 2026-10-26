@@ -41,14 +41,14 @@ v=""; vs_ctl_is deliverable-ignored && { v="--deliverable-ignored"; echo "MODE: 
 vs_ctl_is tally-any-flag && { v="--tally-any-flag"; echo "MODE: control tally-any-flag — the self-test runs the tally that refuses on any flag kind"; }
 vs_ctl_is replay-unbound && { v="--replay-unbound"; echo "MODE: control replay-unbound — the self-test runs the replay that takes slot a by default and skips the manifest"; }
 out="$(python3 tools/packet_check.py --selftest $v 2>&1)"
-if printf '%s\n' "$out" | grep -q '^SELFTEST PASS'; then ok "SELFTEST PASS ($(printf '%s\n' "$out" | grep -c '^  ok ') cases)"
-elif printf '%s\n' "$out" | grep -q '^SELFTEST FAIL'; then
+if printf '%s\n' "$out" | grep >/dev/null '^SELFTEST PASS'; then ok "SELFTEST PASS ($(printf '%s\n' "$out" | grep -c '^  ok ') cases)"
+elif printf '%s\n' "$out" | grep >/dev/null '^SELFTEST FAIL'; then
     bad "$(printf '%s\n' "$out" | grep 'WRONG' | tr '\n' ' ' | cut -c1-200)"
-    if vs_ctl_is deliverable-ignored && ! printf '%s\n' "$out" | grep -q 'WRONG  D-ABSOLUTE and D-FIGURE'; then
+    if vs_ctl_is deliverable-ignored && ! printf '%s\n' "$out" | grep >/dev/null 'WRONG  D-ABSOLUTE and D-FIGURE'; then
         echo "REFUSED: mode deliverable-ignored — the self-test failed, but not on the deliverable case"; exit 3; fi
-    if vs_ctl_is replay-unbound && ! { printf '%s\n' "$out" | grep -q 'WRONG  replay: no slot in control.txt' && printf '%s\n' "$out" | grep -q 'WRONG  replay: a staged copy changed'; }; then
+    if vs_ctl_is replay-unbound && ! { printf '%s\n' "$out" | grep >/dev/null 'WRONG  replay: no slot in control.txt' && printf '%s\n' "$out" | grep >/dev/null 'WRONG  replay: a staged copy changed'; }; then
         echo "REFUSED: mode replay-unbound — the self-test failed, but not on the two replay cases"; exit 3; fi
-    if vs_ctl_is tally-any-flag && ! printf '%s\n' "$out" | grep -q 'WRONG  replay: the AS FILED tally refuses the OK run'; then
+    if vs_ctl_is tally-any-flag && ! printf '%s\n' "$out" | grep >/dev/null 'WRONG  replay: the AS FILED tally refuses the OK run'; then
         echo "REFUSED: mode tally-any-flag — the self-test failed, but not on the tally case"; exit 3; fi
 else echo "REFUSED: tools/packet_check.py --selftest printed no SELFTEST line (a crash, not a verdict): $(printf '%s\n' "$out" | tail -1 | cut -c1-160)"; exit 3; fi
 fi
@@ -101,16 +101,16 @@ fi
 if [ -z "${VS_CTL:-}" ]; then
 echo "== 3. MUST-FIRE CONTROLS (executed in-gate)"
 o="$(python3 tools/packet_check.py --selftest --deliverable-ignored 2>&1)"
-if printf '%s\n' "$o" | grep -q 'WRONG  D-ABSOLUTE and D-FIGURE' && printf '%s\n' "$o" | grep -q '^SELFTEST FAIL'; then
+if printf '%s\n' "$o" | grep >/dev/null 'WRONG  D-ABSOLUTE and D-FIGURE' && printf '%s\n' "$o" | grep >/dev/null '^SELFTEST FAIL'; then
     echo "CONTROL FIRED: deliverable-ignored — the self-test FAILs on the deliverable case"
 else echo "CONTROL DEAD: deliverable-ignored — the variant that reads no deliverable passed the self-test"; fail=1; fi
 o="$(python3 tools/packet_check.py --selftest --replay-unbound 2>&1)"
-if printf '%s\n' "$o" | grep -q 'WRONG  replay: no slot in control.txt' && printf '%s\n' "$o" | grep -q 'WRONG  replay: a staged copy changed' \
-        && printf '%s\n' "$o" | grep -q '^SELFTEST FAIL'; then
+if printf '%s\n' "$o" | grep >/dev/null 'WRONG  replay: no slot in control.txt' && printf '%s\n' "$o" | grep >/dev/null 'WRONG  replay: a staged copy changed' \
+        && printf '%s\n' "$o" | grep >/dev/null '^SELFTEST FAIL'; then
     echo "CONTROL FIRED: replay-unbound — the self-test FAILs on the unrecorded slot and the changed staged copy"
 else echo "CONTROL DEAD: replay-unbound — the unbound replay passed the self-test"; fail=1; fi
 o="$(python3 tools/packet_check.py --selftest --tally-any-flag 2>&1)"
-if printf '%s\n' "$o" | grep -q 'WRONG  replay: the AS FILED tally refuses the OK run' && printf '%s\n' "$o" | grep -q '^SELFTEST FAIL'; then
+if printf '%s\n' "$o" | grep >/dev/null 'WRONG  replay: the AS FILED tally refuses the OK run' && printf '%s\n' "$o" | grep >/dev/null '^SELFTEST FAIL'; then
     echo "CONTROL FIRED: tally-any-flag — the self-test FAILs on the AS FILED tally case"
 else echo "CONTROL DEAD: tally-any-flag — the tally refusing on any flag passed the self-test"; fail=1; fi
 unkept "$W/rulecheck_unkept.py" && g="$(prepare_probe "$W/rulecheck_unkept.py" "$W/root_ctl")" || g="SHADOW-NOT-BUILT"

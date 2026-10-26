@@ -19,7 +19,9 @@
   access to the iframe is what `--allow-file-access-from-files` buys the gate;
   the page itself never needs it.
 
-  Two mechanics that are not optional:
+  Two mechanics, written for the gate's old --virtual-time-budget run (since #311,
+  14z-210, the gate reads this page over the DevTools pipe on WALL time, so neither
+  reason binds any more; both stay, as they cost nothing):
   * WAITS ARE MutationObservers, NEVER setTimeout. Under --virtual-time-budget a
     timer advances virtual time instantly, so a polling loop exhausts the budget
     and Chrome dumps the DOM mid-run. Observing costs no virtual time.

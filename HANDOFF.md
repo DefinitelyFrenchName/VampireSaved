@@ -201,42 +201,7 @@ build's zips win) and runs the emulator from it. Passing `-rompath` to
 FBNeo is silently ignored — it does not error, it just looks in the wrong
 place and reports the set as missing.
 
-### If it still will not start, in order
-
-1. **Is there a WIDE build to run?**
-   `ls build/m5w/rompath/vsavjw.zip`. If instead you have `vsavj.zip`, that
-   build was made without `--profile cps2-wide-v1` and there is nothing
-   WIDE to launch — rebuild:
-   `KEY_SET=vsavj GEN_FLAGS="--allow-plausible --tripwire-open --profile cps2-wide-v1" tools/build_donovan.sh 6 build/m5w`
-   **A `rompath.REJECTED` in place of `rompath` means the builder REJECTED that
-   build** (since 14z-155, #139: `tools/build_donovan.sh` and
-   `tools/build_merged.sh` move the packed `rompath` aside on any exit before
-   their final OK line). Read the build's own output for why; never rename it
-   back to run it.
-2. **Does the binary carry the profile?**
-   FBNeo: `strings -a emu/fbneo/fbneo | grep "CPS-2 WIDE v1"` (plain
-   `grep -q` on the binary is unreliable — GOTCHAS).
-   MAME: `~/.cache/vampire-saved/mame/cps2 -listfull vsavjw`.
-   Either silent → build it: `tools/setup_fbneo.sh` / `tools/setup_mame.sh`.
-3. **Is `ROMDIR` exported and clean?** `python3 tools/audit_roms.py "$ROMDIR"`.
-4. **Read the emulator's own load log.** A healthy FBNeo start prints
-   `CPS-2 WIDE v1 profile active`, `68K ROM size: 0x00600000`,
-   `Graphics data: 0x03000000`, `QSound data: 0x01000000`, then
-   `Loading program (vsw.41)... (OK)` through `vsw.44`. **31 members load
-   OK.** **On WINDOWS only the `(OK)` lines appear, and that is a correct
-   boot:** FBNeo's SDL frontend never connects the emulator core's message
-   function there, so every core line above them is dropped
-   (`docs/platform/gotchas.md`, the 2026-09-13 entry on FBNeo's Windows
-   frontend). A member reading `(OK)` is not proof by itself — FBNeo substitutes
-   0xFF fill on a CRC mismatch while still printing `(OK)` (GOTCHAS) — but
-   a *missing* line or a wrong region size localises the problem fast.
-
-**[CPE-40]** **[MFI-40]** **"Unknown system: vsavjw" is an EMULATOR problem, not a ROM problem, and
-renaming `vsavjw.zip` to `vsavj.zip` to force it is actively harmful** — it
-boots under the stock 4MB descriptor with the sfx helper live and the sound
-pointer aimed at the CPS2 register window, re-creating the music bug while
-looking fine. See GOTCHAS.
-
+*(Moved 2026-10-26, the live budget: Running a CPS-2 WIDE build — «If it still will not start, in order» and the "Unknown system: vsavjw" note → `docs/project/operations.md`.)*
 
 ## THE NATIVE LEG IS REACHABLE FOR ANY TENANT SCREEN (14z-69)
 
@@ -313,7 +278,8 @@ ROMDIR=... tests/run_all_emulator.sh --scope ondemand --only 'audit_mizuumi_*'  
 ROMDIR=... tests/run_all_emulator.sh --lane all       # + the Verilator lane (--lane mister ALONE selects only that lane)
 ROMDIR=... tests/run_all_emulator.sh --lane all --jobs 4   # 14z-134: N Verilator runs at once, one scratch clone per slot
 ROMDIR=... tests/run_all_emulator.sh --strict         # SKIP and UNREGISTERED are failures too
-ROMDIR=... tests/run_all_emulator.sh --scope all --lane all --strict --controls   # THE RELEASE RUN (ruled 2026-09-10): every declared must-fire control executed as a `CONTROL=<name>` mode, rows `<gate>@<name>`; a REFUSED mode is a dead mode, not a pass
+ROMDIR=... tests/run_all_emulator.sh --scope all --lane all --strict --controls   # THE RELEASE RUN (ruled 2026-09-10): every declared must-fire control executed as a `CONTROL=<name>` mode, rows `<gate>@<name>`; a REFUSED or UNJUDGED (#310) mode is not a pass
+ROMDIR=... tests/run_all_emulator.sh ... --jobs 8 --order <an earlier run>/results.tsv   # longest first, concurrent controls (#321): `docs/project/operations.md` «LONGEST FIRST»
 ROMDIR=... tests/run_on_snapshot.sh -- tests/run_all_emulator.sh --freeze --lane all --strict   # the same tier on a SNAPSHOT at HEAD (#181, ruled 2026-09-27): the instrument cache under a private HOME, the Verilator scratch clones copied, tracked files at their commit's time, the run's build/emu_* copied back to the working tree (docs/project/snapshot_runs.md)
 tests/run_all_emulator.sh --list                      # the registry, as selected
 ROMDIR=... tests/run_all_emulator.sh --dry-run        # the resolved command per gate
@@ -396,6 +362,7 @@ cp tests/expected/<old>/*.masked tests/expected/<old>/*.skip \
 # 3. freeze, then verify (the second run is what makes it evidence)
 MAME_ROMPATH="$PWD/build/<dir>/rompath;$ROMDIR" tests/run_suite.sh --freeze vsavjw
 MAME_ROMPATH="$PWD/build/<dir>/rompath;$ROMDIR" tests/run_suite.sh vsavjw
+# SUITE_JOBS=N: N MAME runs at once, output unchanged (#321; operations.md «LONGEST FIRST»)
 ```
 
 **AND THE FREEZE'S WHOLE PROGRAM CHANGE, BYTE BY BYTE (#231, since 14z-193) — a step the gate makes

@@ -89,6 +89,7 @@ local function install()
     installing = false
 end
 install()
+do local r = debug.getregistry(); r.vs_notifier_threads = r.vs_notifier_threads or {}; r.vs_notifier_threads[#r.vs_notifier_threads + 1] = coroutine.running() end   -- #320: keep this Lua thread alive past teardown (docs/platform/gotchas.md)
 space:add_change_notifier(function()
     if installing then return end
     for _, t in ipairs(taps) do t:remove() end

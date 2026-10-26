@@ -104,6 +104,7 @@ test_s4_thresholds
 test_select_port_hygiene
 test_shell_portability
 test_static_runner
+test_suite_jobs
 test_tenant_id
 test_gfx_tile_codec
 test_jtsim_scratch_heal
