@@ -1,4 +1,4 @@
-# /home/koneko/x2out/gameclock_audit_guard_cancels.tsv.new — the game clock RAM:$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,
+# tests/expected/instr_gameclock/audit_guard_cancels.tsv — the game clock RAM:$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,
 # option A) by `tests/audit_guard_cancels.sh --freeze-clock`: pristine vsavj; leg trace (trace_writes.lua) and nostop
 # (replay_guard.lua) per rig; every reference leg held to replay.lua run live, every run to its reference leg's clock.
 # leg<TAB>replay<TAB>frames<TAB>gameclock
@@ -114,6 +114,14 @@ trace	gc_ZA_MK	3042	85
 trace	gc_ZA_HK	3042	85
 trace	gc_ZA_PP	3042	85
 trace	gc_ZA_KK	3042	85
+trace	gc_DE_LP	3042	85
+trace	gc_DE_MP	3042	85
+trace	gc_DE_HP	3042	85
+trace	gc_DE_LK	3042	85
+trace	gc_DE_MK	3042	85
+trace	gc_DE_HK	3042	85
+trace	gc_DE_PP	3042	85
+trace	gc_DE_KK	3042	85
 trace	noblock_FE_LK	3042	85
 trace	whiff_FE_LK	3090	b5
 trace	dealt_FE_LK	3042	85
@@ -273,6 +281,18 @@ trace	dealt_ZA_HK	3042	85
 trace	noblock_ZA_KK	3042	85
 trace	whiff_ZA_KK	3090	b5
 trace	dealt_ZA_KK	3042	85
+trace	noblock_DE_LP	3042	85
+trace	whiff_DE_LP	3090	b5
+trace	dealt_DE_LP	3042	85
+trace	noblock_DE_MP	3042	85
+trace	whiff_DE_MP	3090	b5
+trace	dealt_DE_MP	3042	85
+trace	noblock_DE_HP	3042	85
+trace	whiff_DE_HP	3090	b5
+trace	dealt_DE_HP	3042	85
+trace	noblock_DE_PP	3042	85
+trace	whiff_DE_PP	3090	b5
+trace	dealt_DE_PP	3042	85
 nostop	gc_FE_LK	3152	f3
 nostop	whiff_FE_LK	3200	23
 nostop	dealt_FE_LK	3152	f3
@@ -432,3 +452,15 @@ nostop	dealt_ZA_HK	3152	f3
 nostop	gc_ZA_KK	3152	f3
 nostop	whiff_ZA_KK	3200	23
 nostop	dealt_ZA_KK	3152	f3
+nostop	gc_DE_LP	3152	f3
+nostop	whiff_DE_LP	3200	23
+nostop	dealt_DE_LP	3152	f3
+nostop	gc_DE_MP	3152	f3
+nostop	whiff_DE_MP	3200	23
+nostop	dealt_DE_MP	3152	f3
+nostop	gc_DE_HP	3152	f3
+nostop	whiff_DE_HP	3200	23
+nostop	dealt_DE_HP	3152	f3
+nostop	gc_DE_PP	3152	f3
+nostop	whiff_DE_PP	3200	23
+nostop	dealt_DE_PP	3152	f3

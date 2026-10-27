@@ -11,12 +11,13 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**332 tickets** — status: open 14 · parked 7 · done 279 · declined 14 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 224 · cosmetic 17 · evolution 91 · **backfill debt: 0 rows**.
+**333 tickets** — status: open 15 · parked 7 · done 279 · declined 14 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 225 · cosmetic 17 · evolution 91 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#333](https://github.com/DefinitelyFrenchName/VampireSaved/issues/333) | bug | open | 106 gate scripts carry on after a failed mktemp -d; 8 then touch paths under / | `tests/` | `DECISIONS_HISTORY.md § Ruled 2026-10-27 (14z-210) — #321: a control mode's environment error is DIED; the emulator runner puts TMPDIR on disk; the unguarded mktemp sites are a ticket` | none | none | 14z-210 |
 | [#332](https://github.com/DefinitelyFrenchName/VampireSaved/issues/332) | bug | open | audit_guard_cancels reads a missing out-of-tree table as 0 lines differing, so its node-shift control reads DEAD | `tests/audit_guard_cancels.sh` | `DECISIONS_HISTORY.md § Ruled 2026-10-26 (14z-210) — #321 avenue 1` | none | none | 14z-210 |
 | [#331](https://github.com/DefinitelyFrenchName/VampireSaved/issues/331) | evolution | open | #229's remainder: Demitri's ES Demon Cradle GC unjoined; the FE..JE specials section and two stale lines on the cross-check page | `tests/audit_es_ex.sh` | `DECISIONS_HISTORY.md § Ruled 2026-10-26 (14z-209) — #229 split and closed` | none | none | 14z-209 |
 | [#330](https://github.com/DefinitelyFrenchName/VampireSaved/issues/330) | evolution | open | Throws: recovery and throw tech not measured for the normal and command throws (split from #229) | `tests/audit_ground_throws.sh` · `tests/audit_command_throws.sh` | none | none | none | 14z-209 |

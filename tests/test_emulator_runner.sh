@@ -10,7 +10,11 @@
 #   still STOPS, the fbneo and mame lanes share one pool, --skip leaves a host-covered gate out by name, and a cold
 #   decrypt cache is built before the tier; since 14z-210 (#321): a listed gate's controls run beside one another in a
 #   pool (an unlisted gate's, and any gate's at --jobs 1, one after another) without deadlocking a full pool, and
-#   --order starts a pooled lane longest first; and a control mode that says `NOT JUDGED: ` reads UNJUDGED (#310).
+#   --order starts a pooled lane longest first; and a control mode that says `NOT JUDGED: ` reads UNJUDGED (#310);
+#   and a control mode stopped by its host (a full disk, a failed mktemp, a refused write) reads DIED (#321); and with
+#   no TMPDIR from the caller a gate's temp files go to the run's own directory under build/tmp/, removed at the end,
+#   and a run with less free space there than it needs refuses to start (#321); and a selected gate whose worker
+#   died before writing its row is a FAIL of its own, never a GREEN on fewer rows (#321).
 # HOW: a synthetic repository of stub gates with KNOWN verdicts is driven through the REAL
 #   runner by symlink (never a copy of its logic), with stub tools so the runner's own
 #   preconditions run; the controls run copies of the runner (and, for #323, of the two readers) with a piece removed
@@ -30,9 +34,12 @@
 # MUST-FIRE: shadow-tool: lane-var-shared — copies of the runner and of tests/lib/controls.sh and measures.sh with the lane loop variable and the readers' log variable all named `_l` again (the #323 shape) must let a red prereq gate followed by a green one run on past the prereq lane (mode: those copies are what every section drives; section 5b must fail; 14z-209)
 # MUST-FIRE: shadow-tool: decrypt-warm-off — a copy of the runner whose DECRYPT-WARM call is disabled must leave a gate that reads build/out directly on a cold cache, and section 17 must FAIL (mode: that copy is the runner every section drives; #305, 14z-209)
 # MUST-FIRE: shadow-tool: unjudged-honoured — a copy of tests/lib/classify.sh whose NOT-JUDGED branch is disabled must read a control mode that FAILs after printing `NOT JUDGED: ` as an honoured PASS, and section 14c must FAIL (mode: that copy is the classifier every section's runner sources; #310, 14z-210)
+# MUST-FIRE: shadow-tool: env-honoured — a copy of tests/lib/classify.sh whose ENV-ERROR branch is disabled must read a control mode that FAILs on `mktemp: No space left on device` as an honoured PASS, and section 14k must FAIL (mode: that copy is the classifier every section's runner sources; #321, 14z-210)
 # MUST-FIRE: shadow-tool: jobs-leak — a copy of the runner whose own job count is named JOBS again must hand a caller-exported JOBS=7 to a gate as its --jobs 2, and section 20 must FAIL (mode: that copy is the runner every section drives; #321, 14z-210)
 # MUST-FIRE: shadow-tool: concurrent-off — a copy of the runner whose CONCURRENT-CONTROLS test is always false must run a listed gate's two controls one after another, and section 18 must FAIL (mode: that copy is the runner every section drives; #321, 14z-210)
 # MUST-FIRE: shadow-tool: order-ignored — a copy of the runner whose ORDER-SORT step is disabled must start a pooled lane's gates in registry order under --order, and section 19 must FAIL (mode: that copy is the runner every section drives; #321, 14z-210)
+# MUST-FIRE: shadow-tool: tmp-ignored — a copy of the runner whose DISK-TMPDIR test is always false must leave a gate with no TMPDIR from the caller writing its temp files in /tmp, and section 21 must FAIL (mode: that copy is the runner; #321, 14z-210)
+# MUST-FIRE: shadow-tool: lost-unread — a copy of the runner whose LOST-ROWS check is disabled must print GREEN for a pooled lane in which one gate's worker died before writing its row, and section 22 must FAIL (mode: that copy is the runner; #321, 14z-210: PILOT printed GREEN on PASS 1 of 3)
 # MUST-FIRE: perturbed-copy: row-not-executable — a farm of symlinks to the REAL scripts named by the REAL tests/ci_emulator.tsv, with ONE replaced by a non-executable copy, must make section 10b report it unrunnable (mode: that farm is what 10b checks; section 10b must fail)
 #
 # WHY A GATE FOR THE RUNNER, again. CLAUDE.md §4: "Verdict logic is itself
@@ -123,6 +130,12 @@ cmp -s "$RUNNER" "$T/runner_orderoff.sh" && fail "could not disable the longest-
 sed 's/RUN_JOBS/JOBS/g' "$RUNNER" > "$T/runner_jobsleak.sh"
 cmp -s "$RUNNER" "$T/runner_jobsleak.sh" && fail "could not restore the JOBS name — RUN_JOBS moved"
 chmod +x "$T/runner_jobsleak.sh"
+sed 's@    if \[ -z "${TMPDIR:-}" \]; then   # DISK-TMPDIR@    if false; then   # DISK-TMPDIR disabled@' "$RUNNER" > "$T/runner_tmpoff.sh"
+cmp -s "$RUNNER" "$T/runner_tmpoff.sh" && fail "could not disable the disk TMPDIR — the DISK-TMPDIR line moved"
+chmod +x "$T/runner_tmpoff.sh"
+sed 's@    if \[ "$DRY" = 0 \]; then   # LOST-ROWS@    if false; then   # LOST-ROWS disabled@' "$RUNNER" > "$T/runner_lostoff.sh"
+cmp -s "$RUNNER" "$T/runner_lostoff.sh" && fail "could not disable the lost-rows check — the LOST-ROWS line moved"
+chmod +x "$T/runner_lostoff.sh"
 chmod +x "$T/runner_noexport.sh" "$T/runner_unplugged.sh" "$T/runner_dryrecords.sh" "$T/runner_emptygreen.sh" "$T/runner_crashunread.sh" "$T/runner_lanevar.sh" "$T/runner_warmoff.sh" "$T/runner_ccoff.sh" "$T/runner_orderoff.sh"
 case "$VS_CTL" in
 empty-green)      ln -s "$T/runner_emptygreen.sh" "$FR/tests/run_all_emulator.sh" ;;
@@ -137,18 +150,26 @@ decrypt-warm-off) ln -s "$T/runner_warmoff.sh" "$FR/tests/run_all_emulator.sh" ;
 concurrent-off)   ln -s "$T/runner_ccoff.sh" "$FR/tests/run_all_emulator.sh" ;;
 jobs-leak)        ln -s "$T/runner_jobsleak.sh" "$FR/tests/run_all_emulator.sh" ;;
 order-ignored)    ln -s "$T/runner_orderoff.sh" "$FR/tests/run_all_emulator.sh" ;;
+tmp-ignored)      ln -s "$T/runner_tmpoff.sh" "$FR/tests/run_all_emulator.sh" ;;
+lost-unread)      ln -s "$T/runner_lostoff.sh" "$FR/tests/run_all_emulator.sh" ;;
 *)                ln -s "$RUNNER" "$FR/tests/run_all_emulator.sh" ;;
 esac
 # the runner sources THE ONE classifier relative to its repo (14z-139), so
 # the synthetic repo carries it too — the shipped lib, never a copy
 mkdir -p "$FR/tests/lib"
-if vs_ctl_is unjudged-honoured; then ln -s "$T/classify_unjudged.sh" "$FR/tests/lib/classify.sh"
-else ln -s "$REPO/tests/lib/classify.sh" "$FR/tests/lib/classify.sh"; fi
+# CLSLIB: the classifier this run's synthetic repo carries (a shadow copy under its mode); a section that swaps in a
+# shadow of its own restores THIS, never the shipped one (14z-210: 14c's restore undid env-honoured's copy)
+CLSLIB="$REPO/tests/lib/classify.sh"
+vs_ctl_is unjudged-honoured && CLSLIB="$T/classify_unjudged.sh"
+vs_ctl_is env-honoured && CLSLIB="$T/classify_env.sh"
+ln -s "$CLSLIB" "$FR/tests/lib/classify.sh"
 CTLLIB="$REPO/tests/lib/controls.sh"; MEASLIB="$REPO/tests/lib/measures.sh"
 if vs_ctl_is lane-var-shared; then CTLLIB="$T/controls_lanevar.sh"; MEASLIB="$T/measures_lanevar.sh"; fi
 # the classifier with its NOT-JUDGED branch disabled (#310, 14z-210)
 sed "s@        elif grep -qa '^NOT JUDGED: ' \"\$_clog\"; then   # NOT-JUDGED (#310)@        elif false; then   # NOT-JUDGED disabled@" "$REPO/tests/lib/classify.sh" > "$T/classify_unjudged.sh"
 cmp -s "$REPO/tests/lib/classify.sh" "$T/classify_unjudged.sh" && fail "could not disable the NOT-JUDGED branch — the line moved"
+sed "s@        elif grep -qaE \"\$VS_ENV_ERR\" \"\$_clog\"; then   # ENV-ERROR (#321)@        elif false; then   # ENV-ERROR disabled@" "$REPO/tests/lib/classify.sh" > "$T/classify_env.sh"
+cmp -s "$REPO/tests/lib/classify.sh" "$T/classify_env.sh" && fail "could not disable the ENV-ERROR branch — the line moved"
 ln -s "$CTLLIB" "$FR/tests/lib/controls.sh"   # the controls reader beside it (14z-147)
 ln -s "$MEASLIB" "$FR/tests/lib/measures.sh"   # the measurement reader too (14z-180): the runner must survive a gate that declares nothing
 
@@ -728,12 +749,42 @@ v14i="$(awk -F'\t' '$1=="g_cjudged@flip"{print $4}' "$T/l14g/results.tsv")"
 if ! vs_ctl_is unjudged-honoured; then
     rm -f "$FR/tests/lib/classify.sh"; ln -s "$T/classify_unjudged.sh" "$FR/tests/lib/classify.sh"
     run --lane mame --controls --log "$T/l14j" >/dev/null 2>&1 || true
-    rm -f "$FR/tests/lib/classify.sh"; ln -s "$REPO/tests/lib/classify.sh" "$FR/tests/lib/classify.sh"
+    rm -f "$FR/tests/lib/classify.sh"; ln -s "$CLSLIB" "$FR/tests/lib/classify.sh"
     v14j="$(awk -F'\t' '$1=="g_cunj@flip"{print $4}' "$T/l14j/results.tsv" 2>/dev/null)"
     [ "$v14j" = PASS ] && vs_ctl_fired unjudged-honoured "a classifier without the NOT-JUDGED branch reads a mode that measured nothing as an honoured PASS — section 14c catches it" \
         || { vs_ctl_dead unjudged-honoured "the classifier without the branch read g_cunj@flip '$v14j'"; fail "unjudged-honoured"; }
 fi
 rm -f "$FR/tests/g_cunj.sh" "$FR/tests/g_cunjdie.sh" "$FR/tests/g_cjudged.sh"
+
+echo "14k. a control mode stopped by its host is DIED, never honoured (#321, 14z-210)"
+# ERIS's 24 GB tmpfs /tmp filled under concurrent controls and 28 modes read HONOURED in 0-1 s, some logs holding only
+# `mktemp: No space left on device`; another printed the gate's own FAIL after a refused copy. A FAIL whose words merely
+# resemble those stays honoured.
+mkc g_cenv     'echo "mktemp: No space left on device (os error 28) at path \"/tmp/tmp.x\""; exit 1' "PASS: fine" "CONTROL FIRED: flip — caught"
+mkc g_cenvfail 'echo "cp: cannot create regular file \x27/tmp/t/vj_op.bin\x27: No space left on device"; echo "FAIL: views not delivered"; exit 1' "PASS: fine" "CONTROL FIRED: flip — caught"
+mkc g_cenvlike 'echo "FAIL: caught — no space between the two fields"; exit 1' "PASS: fine" "CONTROL FIRED: flip — caught"
+reg "$(row g_cenv mame release - '')" "$(row g_cenvfail mame release - '')" "$(row g_cenvlike mame release - '')"
+run --lane mame --controls --log "$T/l14k" >/dev/null 2>&1 || true
+v14k="$(awk -F'\t' '$1=="g_cenv@flip"{print $4"|"$6}' "$T/l14k/results.tsv")"
+case "$v14k" in
+    FAIL\|*DIED*environment*) ok "g_cenv@flip -> FAIL (DIED: an environment error is not a verdict)" ;;
+    PASS\|*) fail "g_cenv@flip -> '$v14k', expected FAIL / DIED"
+             vs_ctl_is env-honoured && vs_ctl_fired env-honoured "with the ENV-ERROR branch disabled, a mode stopped by a full disk reads an honoured PASS" ;;
+    *) fail "g_cenv@flip -> '$v14k', expected FAIL / DIED" ;;
+esac
+v14l="$(awk -F'\t' '$1=="g_cenvfail@flip"{print $4"|"$6}' "$T/l14k/results.tsv")"
+case "$v14l" in FAIL\|*DIED*environment*) ok "g_cenvfail@flip -> FAIL (DIED: the gate's own FAIL after a refused write is not the perturbation)" ;; *) fail "g_cenvfail@flip -> '$v14l', expected FAIL / DIED" ;; esac
+v14m="$(awk -F'\t' '$1=="g_cenvlike@flip"{print $4}' "$T/l14k/results.tsv")"
+[ "$v14m" = PASS ] && ok "g_cenvlike@flip -> PASS (a FAIL that only resembles the signatures stays honoured)" || fail "g_cenvlike@flip -> '$v14m', expected PASS"
+if ! vs_ctl_is env-honoured; then
+    rm -f "$FR/tests/lib/classify.sh"; ln -s "$T/classify_env.sh" "$FR/tests/lib/classify.sh"
+    run --lane mame --controls --log "$T/l14n" >/dev/null 2>&1 || true
+    rm -f "$FR/tests/lib/classify.sh"; ln -s "$CLSLIB" "$FR/tests/lib/classify.sh"
+    v14n="$(awk -F'\t' '$1=="g_cenv@flip"{print $4}' "$T/l14n/results.tsv" 2>/dev/null)"
+    [ "$v14n" = PASS ] && vs_ctl_fired env-honoured "a classifier without the ENV-ERROR branch reads a mode stopped by a full disk as an honoured PASS — section 14k catches it" \
+        || { vs_ctl_dead env-honoured "the classifier without the branch read g_cenv@flip '$v14n'"; fail "env-honoured"; }
+fi
+rm -f "$FR/tests/g_cenv.sh" "$FR/tests/g_cenvfail.sh" "$FR/tests/g_cenvlike.sh"
 
 echo "15. the commit of record and --stale (14z-180, GitHub #171 slice Q4)"
 # commit.txt: HEAD on its first line when the tree is a git checkout, `no-git` otherwise;
@@ -951,6 +1002,63 @@ if ! vs_ctl_is jobs-leak; then
         || { vs_ctl_dead jobs-leak "the JOBS-named runner handed the gate JOBS=$v20b"; fail "jobs-leak"; }
 fi
 rm -f "$FR/tests/g_jobs.sh"
+
+echo "21. with no TMPDIR from the caller a gate's temp files go to the run's own directory on disk (#321, 14z-210)"
+# ERIS: concurrent controls filled the 24 GB tmpfs /tmp and 28 modes read HONOURED in 0-1 s; TMPDIR on disk cured it
+{ echo '#!/bin/sh'; echo ': "${MAME_BIN:-}"'; echo 'echo "gate TMPDIR=${TMPDIR:-unset}"'; echo 'd="$(mktemp -d)" && echo "gate made $d"'; } > "$FR/tests/g_tmp.sh"; chmod +x "$FR/tests/g_tmp.sh"
+reg "$(row g_tmp mame release - '')"
+t21() {  # t21 <runner> <log> [env...] -> the TMPDIR the gate saw
+    _r="$1"; _l="$2"; shift 2
+    (cd "$FR" && env -u TMPDIR "$@" ROMDIR="$T/roms" MERGED=build/fake_merged sh "tests/$_r" --lane mame --log "$_l" > "$_l.out" 2>&1) || true
+    sed -n 's/^gate TMPDIR=//p' "$_l/g_tmp.log" 2>/dev/null | head -1
+}
+v21="$(t21 run_all_emulator.sh "$T/l21")"
+case "$v21" in
+    */build/tmp/emu_*) ok "no TMPDIR from the caller: the gate's TMPDIR is the run's own ($(basename "$v21"))"
+        [ -d "$v21" ] && fail "the run's temp directory $v21 is still there after the run" || ok "the run's temp directory is removed at the end" ;;
+    *) fail "no TMPDIR from the caller: the gate saw TMPDIR=$v21"; vs_ctl_is tmp-ignored && vs_ctl_fired tmp-ignored "with the DISK-TMPDIR test disabled the gate saw TMPDIR=$v21" ;;
+esac
+mkdir -p "$T/caller_tmp"; v21b="$(t21 run_all_emulator.sh "$T/l21b" TMPDIR="$T/caller_tmp")"
+[ "$v21b" = "$T/caller_tmp" ] && ok "a caller's TMPDIR is kept" || fail "a caller's TMPDIR=$T/caller_tmp reached the gate as $v21b"
+t21 run_all_emulator.sh "$T/l21c" VS_TMP_MIN_GB=999999 >/dev/null
+if grep -q 'this run needs 999999 GB' "$T/l21c.out" && [ ! -f "$T/l21c/g_tmp.log" ]; then ok "too little free temp space: the run refuses to start and names the shortfall"
+else fail "with VS_TMP_MIN_GB=999999 the run did not refuse at the start ($(tail -1 "$T/l21c.out" 2>/dev/null))"; fi
+if ! vs_ctl_is tmp-ignored; then
+    ln -s "$T/runner_tmpoff.sh" "$FR/tests/run_all_emulator_tmpoff.sh"
+    v21d="$(t21 run_all_emulator_tmpoff.sh "$T/l21d")"; rm -f "$FR/tests/run_all_emulator_tmpoff.sh"
+    [ "$v21d" = unset ] && vs_ctl_fired tmp-ignored "a runner without the disk TMPDIR leaves the gate on the default /tmp (TMPDIR unset) — section 21 catches it" \
+        || { vs_ctl_dead tmp-ignored "the runner without the disk TMPDIR handed the gate TMPDIR=$v21d"; fail "tmp-ignored"; }
+fi
+rm -f "$FR/tests/g_tmp.sh"
+
+echo "22. a selected gate whose worker died before writing its row is a FAIL, never a GREEN on fewer rows (#321, 14z-210)"
+# PILOT: tests/lib/measures.sh's scratch file was named by $$, which every pooled subshell shares; two stub gates
+# finishing together removed each other's, a worker died under set -e, and a lane of three printed GREEN on PASS 1.
+# g_lost kills the pooled worker that started it (its parent, or the timeout wrapper's parent), so no row is written.
+{ echo '#!/bin/sh'; echo ': "${MAME_BIN:-}"'; echo 'p=$PPID; case "$(ps -o comm= -p "$p" 2>/dev/null)" in *timeout*) p="$(ps -o ppid= -p "$p" | tr -d " ")" ;; esac'
+  echo 'kill -9 "$p"; echo "PASS: the worker is gone"; exit 0'; } > "$FR/tests/g_lost.sh"; chmod +x "$FR/tests/g_lost.sh"
+mk g_kept 0 "kept"
+reg "$(row g_lost mame release - '')" "$(row g_kept mame release - '')"
+l22() {  # l22 <runner> <log>
+    (cd "$FR" && ROMDIR="$T/roms" MERGED=build/fake_merged sh "tests/$1" --lane mame --jobs 2 --log "$2" > "$2.out" 2>&1) || true
+}
+l22 run_all_emulator.sh "$T/l22"
+v22="$(awk -F'\t' '$1=="g_lost"{print $4"|"$6}' "$T/l22/results.tsv" 2>/dev/null)"
+case "$v22" in
+    FAIL\|LOST:*) ok "g_lost -> FAIL (LOST: no verdict row was written)" ;;
+    *) fail "g_lost -> '$v22', expected FAIL / LOST"; vs_ctl_is lost-unread && vs_ctl_fired lost-unread "with the LOST-ROWS check disabled g_lost has no row ('$v22')" ;;
+esac
+grep -q '^GREEN' "$T/l22.out" && fail "a lane that lost a row printed GREEN" || ok "a lane that lost a row is NOT GREEN"
+v22k="$(awk -F'\t' '$1=="g_kept"{print $4}' "$T/l22/results.tsv" 2>/dev/null)"
+[ "$v22k" = PASS ] && ok "g_kept -> PASS beside it" || fail "g_kept -> '$v22k', expected PASS"
+if ! vs_ctl_is lost-unread; then
+    ln -s "$T/runner_lostoff.sh" "$FR/tests/run_all_emulator_lostoff.sh"
+    l22 run_all_emulator_lostoff.sh "$T/l22b"; rm -f "$FR/tests/run_all_emulator_lostoff.sh"
+    if grep -q '^GREEN' "$T/l22b.out" && ! awk -F'\t' '$1=="g_lost"' "$T/l22b/results.tsv" | grep -q .; then
+        vs_ctl_fired lost-unread "a runner without the lost-rows check prints GREEN with g_lost missing — section 22 catches it"
+    else vs_ctl_dead lost-unread "the runner without the check did not print GREEN on the lost row ($(tail -1 "$T/l22b.out"))"; fail "lost-unread"; fi
+fi
+rm -f "$FR/tests/g_lost.sh" "$FR/tests/g_kept.sh"
 
 echo
 [ "$rc" = 0 ] && echo "PASS: run_all_emulator.sh classifies every ground-truth case correctly" \

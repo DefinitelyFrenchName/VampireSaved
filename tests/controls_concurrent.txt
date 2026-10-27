@@ -20,6 +20,8 @@
 # OFF since 14z-208b (#278): test_charmap_current — its FREEZE=1 page-list write now sorts under LC_ALL=C, so its traced blob f618cc41 no longer matches; its three controls (8 s each in the 14z-208b freeze run) run one after another until the next freeze's re-trace.
 # TRACES: pilot:eb6606fd = PILOT, 14z-210 (fork R, #321, #327 and this session's other edits): 17 static gates re-traced, 98 control runs, 813 s, SAFE (local evidence build/agent210/t321retrace/).
 # OFF since 14z-210: test_applier_page_browser — snap Chromium refuses to start under strace on PILOT (snap-confine without cap_dac_override), so its controls never reached a browser and its pilot:bd004554 row was very likely never a real trace; its two controls run one after another. And, until re-traced at their current scripts: test_controls_concurrent, test_emulator_runner, test_static_runner.
+# TRACES: pilot:86d1ca10 = PILOT, 14z-210 (fork P, #321): test_controls_concurrent, test_emulator_runner, test_static_runner re-traced at their changed scripts, 43 runs, 3,053 s, SAFE — back on the list.
+# TRACES: pilot:f6ba8f02+r6 = PILOT, 14z-210 (#321): test_emulator_runner after the ENV-ERROR, DISK-TMPDIR and LOST-ROWS changes (the staged tree f6ba8f02 with this session's test_emulator_runner.sh, run_all_emulator.sh, lib/classify.sh and lib/measures.sh at their committed blobs), 17 controls, 1,133 s, SAFE; its plain run 3 of 3 PASS on Linux (local evidence build/agent210/t321r3/).
 audit_capture_matrix	30719e3e5a1f9d826f990e29638f4ecd0cd550eb	pilot:bd004554	2 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 audit_mister_map_fit	1a2aa94645e31f6c4ee1149948548796d6037043	pilot:bd004554	3 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_agent_defs	eefa59f4871955050c11a3d6502412f84b50d5e5	pilot:eb6606fd	7 controls write-traced 14z-210 (fork R, #321): none writes a path a sibling writes or reads
@@ -44,6 +46,7 @@ test_claim_lint	e79b6b2f769d1b36ded329c36e8ffde80cc95225	pilot:bd004554	4 contro
 test_close_checks	dec808c3a4ce928e2df0bea4d115253df09cc6ec	pilot:bd004554	2 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_close_loop_cost	35ed29b00b4d7d4f241129df2e60f4ca53d152a9	pilot:bd004554	3 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_close_standing	8cb536d7173936a1ea04c12b16050cad49bf364d	pilot:bd004554	9 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
+test_controls_concurrent	4fab7d208abfa6458df2dd3622a0914f436fd623	pilot:86d1ca10	3 controls write-traced 14z-210 (fork P, #321): none writes a path a sibling writes or reads
 test_controls_contract	85723d046b8aa8672dec0f344e1952f268f18751	pilot:eb6606fd	2 controls write-traced 14z-210 (fork R, #321): none writes a path a sibling writes or reads
 test_copy_flags	6233d72bdc5c1eeff69f1a967202ba98533e6458	pilot:bd004554	3 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_defense_rows_census	aa9d18f9c683a1c37cb1f07a9b54a2d8a6f8ea9d	pilot:bd004554	2 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
@@ -51,6 +54,7 @@ test_doc_anchor_census	b36f0488ef4305b1f6203fd86b3fb9399cbe63ee	pilot:bd004554	4
 test_docs_site	8eb794f38966cd8704776699b1067e1bd1061905	pilot:bd004554	5 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_docshape	3c87f8c306fec6247aaa7c6f728b9cbc6cb98d81	pilot:eb6606fd	15 controls write-traced 14z-210 (fork R, #321): none writes a path a sibling writes or reads
 test_emu_run_compare	ceacb0bc049d1de5591bcbd200f7b1d3cf19f911	pilot:bd004554	2 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
+test_emulator_runner	204e36344ddd6717d23b960ef91d3511245715b2	pilot:f6ba8f02+r6	17 controls write-traced 14z-210 (#321): none writes a path a sibling writes or reads
 test_entropy_tripwire	a82f6262ba8b8ce4e96038e004708d033a67e098	pilot:bd004554	2 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_expectation_provenance	b5f04141b82a2e57241ca9b901e848e2e24764f9	pilot:bd004554	2 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_fbneo_boot_log	4b08e262cc64272f9f9665bd4416ca571710cd96	pilot:bd004554	3 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
@@ -109,6 +113,7 @@ test_sim_wram_contract	b406c2fa2c491077361b29bf022ffdd8c273617b	pilot:eb6606fd	3
 test_skill_guides	f85f0746efaf9a22d3fab37bd7ea4c540ad26598	pilot:bd004554	3 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_state_open_lists	ce1f370ea7ba14e2d0b1ad4efd55f630dcf4ddf5	pilot:bd004554	7 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_static_confirm	8a9212e8a7154af86dd2568ae84aa865dbb8776c	pilot:bd004554	44 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
+test_static_runner	245970dc70462adbfd6cce0459da93e8e4cda288	pilot:86d1ca10	26 controls write-traced 14z-210 (fork P, #321): none writes a path a sibling writes or reads
 test_submodule_pins	2b6b6efafe65bb7e805fad83099d6e05c3c4e7a7	pilot:bd004554	2 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_superseded_pins	5c79a05e78f77af8f53e123e772abdc4f9ff7f0e	pilot:bd004554	2 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_tickets	9402d66e0fd0ea30c93c1eeebf5808f8ddc6a078	pilot:bd004554	6 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads

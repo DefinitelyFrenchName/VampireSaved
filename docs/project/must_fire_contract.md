@@ -77,9 +77,22 @@ The runner's verdict on a control run (`vs_classify_control`, one copy, in
 | LIES | exit 0, or a SKIP | the perturbation left the gate green — the control tests nothing |
 | REFUSED | the gate printed `REFUSED: CONTROL=` | declared in the header, never read by the gate |
 | DIED | the shell's own error line, or a traceback | a crash is not a verdict ([VSP-108]) |
+| DIED | an environment error anywhere in the log (`No space left on device`, `mktemp: `, `cannot create …`, `Permission denied`, `Read-only file system`, `Too many open files`, `Cannot allocate memory`, `Disk quota exceeded`: `tests/lib/classify.sh` `VS_ENV_ERR`) | the host stopped the run, not its perturbation (#321, 14z-210: 28 modes read HONOURED on a full `/tmp`) |
+| UNJUDGED | a FAIL whose log has a line starting `NOT JUDGED: ` | the mode run measured nothing (#310, 14z-210) |
 | TIMEOUT | the wrapper's exits | as for any gate |
 
 Anything but HONOURED is a failure of the run, named `<gate>(control:<name>:<verdict>)`.
+
+**WRITE `NOT JUDGED: <why>` ON EVERY PATH THAT ENDS A RUN WITHOUT A VERDICT ABOUT WHAT THE GATE MEASURES** (#310,
+14z-210): a browser run that did not complete, an instrument that never armed, an out-of-tree input that is absent, a
+mode whose failure lacks its own finding. Without it, any non-zero exit with no crash reads HONOURED — a control that
+measured nothing certified as caught (measured 14z-206: `test_applier_page_browser`'s `broken-page` stalled under load
+and read HONOURED). Print it at the start of a line, before the FAIL, and never on the path where the control is
+honoured; a control mode whose own outcome IS "not judged" (a starved leg) prints the words without the marker. Gates
+that carry it, as worked examples: `test_applier_page_browser`, `test_docshape`, `test_annotations_current`,
+`test_emulator_staleness@moved-input`, `audit_guard_cancels` (`table-absent`). The class is held by
+`tests/test_emulator_runner.sh` section 14c (control `unjudged-honoured`). #310's census of every control
+(`build/agent210/t310/`, local, and the ticket's comment) lists the paths in other gates that still lack it.
 
 ## The pattern that makes the mode cheap to write
 

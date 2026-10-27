@@ -46,6 +46,11 @@ The 14z-209 close's opener; the sweep CLEAN, `main` = `origin/main` at `688edef8
 #321 reopened"): #321 reopened (its "Done when" was not met at the 14z-209 closure), all four remaining avenues in scope;
 side tickets #328, #310, #327, #318, #320, #311.
 
+### (in progress) #321 AND THE SIDE TICKETS — committed `86d1ca10` (local, not pushed), strict static tier GREEN
+Working notes, open items and every evidence path: `build/agent210/STATUS.md` (local). Rulings this sitting:
+`DECISIONS_HISTORY.md` 14z-210 entries (#321 reopened; PILOT write trace + controls first + longest first; #310
+"Record and defer"; #321 avenue 1 "merged_legacy queue"; #332 "File and fix now").
+
 ## Session 14z-209 — **#229 closed done: the six vsavj family gates frozen and registered, every family classified; #321 phase 2 (with #305, #306, #323) and #244 done; #302 done; #327's fix applied; #328-#330 filed.**
 
 ### opened with

@@ -110,9 +110,11 @@ else
         [ -x "release/$NAME/${p%/*}/emulator/bin/linux-x86_64/${p#*/}" ] || {
             echo "SKIP: release/$NAME/${p%/*}/emulator/bin/linux-x86_64/ holds no binary on this host (copy the release's linux-x86_64 build there, or give ASSETS=<dir of zips>)"; exit 0; }
     done
-    tools/upload_release_assets.sh "freeze/$NAME" --dry-run > "$OUT/cut.log" 2>&1 || {
+    # the assets cut into this run's own dir, the uploader's git taking no index lock (#321, 14z-210: two runs side by
+    # side shared build/scratch/release_assets/<set> and .git/index.lock — fork P's PILOT write trace)
+    GIT_OPTIONAL_LOCKS=0 RELEASE_DRY_OUT="$W/assets" tools/upload_release_assets.sh "freeze/$NAME" --dry-run > "$OUT/cut.log" 2>&1 || {
         echo "FAIL: the uploader refused its own dry run:"; sed 's/^/      /' "$OUT/cut.log"; exit 1; }
-    AD="build/scratch/release_assets/$NAME"
+    AD="$W/assets"
 fi
 AD="$(cd "$AD" && pwd)"
 for e in fbneo mame; do

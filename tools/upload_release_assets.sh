@@ -107,7 +107,11 @@ n=0
 # them for what would ship today: the same trap the static runner's kept logs
 # were given ("stale ones reading as current is the same trap in a different
 # hat", 14z-150).
-[ "$DRY" = 0 ] || rm -rf "build/scratch/release_assets/$NAME"
+# RELEASE_DRY_OUT (#321, 14z-210): where a dry run keeps its zips, default build/scratch/release_assets/<set>; the two
+# Linux release gates pass a dir of their own, because two of them (or two of their control modes) cutting into the
+# one fixed dir at once wiped each other's zips (fork P's PILOT write trace: cleanhost@uninstalled-host-lib found no zip)
+DRY_OUT="${RELEASE_DRY_OUT:-build/scratch/release_assets/$NAME}"
+[ "$DRY" = 0 ] || rm -rf "$DRY_OUT"
 
 # ---- 0. the records, FIRST: the binary now travels inside its platform asset,
 #         so BINARY.txt is a member of that zip and has to be right before it is built.
@@ -203,8 +207,8 @@ while read -r asset platform kind; do
     if [ "$DRY" = 1 ]; then
         # A DRY RUN YOU CANNOT OPEN PROVES NOTHING: keep the zip and its list
         # where a human (or the next gate) can look at what would ship.
-        mkdir -p "build/scratch/release_assets/$NAME"
-        cp "$W/$asset" "$W/$asset.list" "build/scratch/release_assets/$NAME/"
+        mkdir -p "$DRY_OUT"
+        cp "$W/$asset" "$W/$asset.list" "$DRY_OUT/"
         continue
     fi
     if ! gh release view "$TAG" >/dev/null 2>&1 </dev/null; then
@@ -291,7 +295,7 @@ fi
 # <release URL>" though nothing was uploaded, and that line was read as a publish. The
 # zips a dry run keeps are where its last line says; nothing on GitHub changed.
 if [ "$DRY" = 1 ]; then
-    echo "dry run: $n asset(s) built in build/scratch/release_assets/$NAME/, nothing uploaded"
+    echo "dry run: $n asset(s) built in $DRY_OUT/, nothing uploaded"
 else
     echo "done: $n asset(s) on $URL"
 fi

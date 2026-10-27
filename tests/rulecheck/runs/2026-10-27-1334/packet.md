@@ -1,0 +1,24 @@
+THE PACKET
+
+Decision kind: expectation
+Subject: #331 item 1: Demitri on P1 joins the guard-cancel family; its table and clocks re-frozen
+Claim (the working agent's sentence): #331 item 1 (14z-210): add Demitri on P1 to the guard-cancel family and re-freeze its expectations, after the maintainer read the capture pages and ruled "Enough, integrate" (DECISIONS_HISTORY.md, "Read 2026-10-26 (14z-210) — #331").
+1. The rig change: tools/gc_rigs.py appends "DE" last to TABS and sets GC_BUTTONS["DE"] = "LP MP HP PP"; tests/audit_guard_cancels.sh adds DE to its TABS and its counts move 271 -> 291 rigs, 112 -> 120 gc events, 53 -> 57 committing buttons and 53 -> 57 each of noblock, whiff and dealt, 159 -> 171 nostop legs (build/agent210/rc331/tracked.diff; the run's own lines in build/agent210/t331b/cand/check.log, section 1 and 2).
+2. The legs: on the current frozen expectations every pre-existing leg meets its frozen clock and line; the two FAILs are the table hash (the 20-line addition) and 20 DE trace legs with no frozen game clock; the 12 DE nostop legs likewise have none (build/agent210/t331b/cand/check.log; build/agent210/t331b/cand/nostop_check.txt).
+3. tests/expected/guard_cancels.sha256 (to be re-frozen with FREEZE=1 tests/audit_guard_cancels.sh) moves 6f6f14a3...4383 -> 54947b5e...6ef0; the out-of-tree table gains 20 lines (8 gc, 4 each of noblock, whiff and dealt for DE) and loses or changes none (build/agent210/t331b/cand/table.diff: hunks 112a113,120 and 271a280,291 only).
+4. tests/expected/instr_gameclock/audit_guard_cancels.tsv gains 32 rows, 20 trace and 12 nostop, one per DE leg, and no existing row changes (build/agent210/t331b/cand/clocks_candidate.tsv).
+5. Re-read against the candidate table and clocks the gate PASSes with all its in-gate controls firing, and each of its 11 control modes run one at a time fails (build/agent210/t331b/cand/verify.log; build/agent210/t331b/cand/modes.out).
+6. The rows measured agree with the workbook's DE 27-30 by constant offsets or exactly: startup +1, active +1, recovery +2 on all 4; red, white, gauge whiff and gauge hit exact on all 4 (build/agent210/t331b/join.txt); tests/test_crosscheck_229.sh PASSes with the named-GC join rule that lets these rows join (build/agent210/rc331/tracked.diff).
+7. On screen the game draws its guard-cancel banner on all eight DE GC legs, f2818-f2821, and never on the plain 623P reference legs (build/agent210/t331b/mention.txt).
+What this rests on that is NOT tested: (a) the rig's own setup, shared by every DE leg and by the reference legs — P2's 5HP and Chaos Flare blockstring, the walk-in, and the 623+button input — so a defect in it would move all of them alike; that the setup produces the real event rests on the capture pages the maintainer read, not on a gate; (b) the kick verdicts ("no" on LK, MK, HK, KK) say only that 623+kick does not commit from this block, not that no kick guard cancel exists by another input; (c) the banner in item 7 was found by eye on the dumped frames, because the pixel detector tried first was too noisy to use (build/agent210/t331b/mention.txt), and the full words "GUARD CANCEL" are never on screen on these legs; (d) the out-of-tree table is host-local, so only its hash is in the tree; (e) the workbook's figures in item 6 are the community sheet's, not a measurement of ours. No vanilla or merged-build byte changes: the change is to a pristine-vsavj measurement rig, its frozen table, its clocks and the cross-check that reads them.
+Artifacts (read every one, in full):
+  - build/agent210/rc331/tracked.diff
+  - build/agent210/t331b/cand/check.log
+  - build/agent210/t331b/cand/nostop_check.txt
+  - build/agent210/t331b/cand/table.diff
+  - build/agent210/t331b/cand/clocks_candidate.tsv
+  - build/agent210/t331b/cand/verify.log
+  - build/agent210/t331b/cand/modes.out
+  - build/agent210/t331b/join.txt
+  - build/agent210/t331b/mention.txt
+  - DECISIONS_HISTORY.md.lines-8469-8481 (lines 8469-8481 of DECISIONS_HISTORY.md: its INDEX entry "## Read 2026-10-26 (14z-210) — #331: Demitri's Demon Cradle guard-cancel captures, then "Enough, int")

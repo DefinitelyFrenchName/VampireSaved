@@ -8,7 +8,8 @@
   python3 tools/gc_rigs.py rowset <workbook.xlsx>               the workbook's GC rows against GC_ROWS
 
 THE RIG (tools/ground_throw_rigs.py's walk-in, tools/name_moves.py's guard-cancel recipe gc_v): the character FORCED on
-P1 by the early-window poke, P2 DEMITRI (0x01; no GC row is Demitri's, so he is never P1 here); per EVENT both fighters
+P1 by the early-window poke, P2 DEMITRI (0x01; on Demitri's own rows, DE, a mirror: the same 5HP and Chaos Flare every
+rig blocks — #331, 14z-210, the maintainer: "Enough, integrate" on build/agent210/t331b/); per EVENT both fighters
 pinned to the far pair (552, 728) at t-230, P1 walks right t-190..t-40 to pushbox contact, a 40-frame pause, then:
   gc_<TAB>  — P2 presses HP at t..t+3; P1 holds BACK (L) from t-4 to t+11, then 623+button from t+12 (gc_v(b, 11, 12),
               the recipe that fired Phobos's Reflect Wall on native vsav2: tests/expected/move_naming_huitzil.txt part 7);
@@ -57,7 +58,8 @@ FIELDS = ("ff841c:l:node,ff8410:w:p1x,ff8414:w:p1y,ff840b:b:p1face,ff881c:l:p2no
 RTAP = "ff87b4,2;ff8558,2"
 COMMIT_PC = 0x029C6E
 KINDS = ("gc", "ref", "noblock")
-TABS = ["FE", "AN", "AU", "BI", "BU", "GA", "JE", "LE", "LI", "MO", "QB", "SA", "VI", "ZA"]
+TABS = ["FE", "AN", "AU", "BI", "BU", "GA", "JE", "LE", "LI", "MO", "QB", "SA", "VI", "ZA", "DE"]   # DE last (#331): the 14
+# characters' rigs, legs and table lines keep their order
 
 
 def gc_recipe(b):
@@ -86,11 +88,13 @@ def whiff_recipe(b):
 WHIFF_AT = 60
 WHIFF_PIN = (0x1F0, 0x340)       # P1 at 496 (the stage edge holds it at 471), P2 at 832: ~360 px apart
 RECIPES = {"gc": gc_recipe, "ref": ref_recipe, "noblock": noblock_recipe, "whiff": whiff_recipe, "dealt": gc_recipe}
-# THE COMMITTING BUTTONS, as measured 14z-205 (53 of 112 gc events commit; 0 of 112 noblock): DATA the gate checks the
+# THE COMMITTING BUTTONS, as measured 14z-205 (53 of 112 gc events commit; 0 of 112 noblock) and with Demitri on P1
+# 14z-210 (#331: 57 of 120; 0 of 57 noblock): DATA the gate checks the
 # measurement against, as tools/ground_throw_rigs.py's THROWS is. The whiff and noblock rigs are run for these only.
 GC_BUTTONS = {"FE": "LK MK HK KK", "AN": "PP", "AU": "LK MK HK KK", "BI": "LP MP HP PP", "BU": "LK MK HK KK",
               "GA": "LP MP HP PP", "JE": "LP MP HP PP", "LE": "LP MP HP PP", "LI": "LP MP HP PP", "MO": "LP MP HP PP",
-              "QB": "LK MK HK KK", "SA": "LK MK HK KK", "VI": "LK MK HK KK", "ZA": "LK MK HK KK"}
+              "QB": "LK MK HK KK", "SA": "LK MK HK KK", "VI": "LK MK HK KK", "ZA": "LK MK HK KK",
+              "DE": "LP MP HP PP"}   # DE: Demon Cradle, measured 14z-210 (#331, build/agent210/t331b/)
 # THE WHIFFS THAT CONNECT ANYWAY, as measured 14z-205 (the whiff rig's ~360 px is about as far apart as the camera lets
 # two fighters stand): Felicia's ES Delta Kick and Lei-Lei's four Senpuubu GCs travel and reach P2. Their ticks are
 # still a whiff's (a hit-freeze writes no tick); the gate holds the set to this data.
@@ -371,7 +375,16 @@ def rows(sched_path, trace, img_path, tap_path=None):
 # events of the buttons its INPUT names that COMMITTED a guard cancel; `623P` / `623K` name every strength (each is its
 # own pair, as tools/ground_throw_rigs.py ran both buttons of a "6MP or 6HP" row); `623KH` (Aulbath) is read as HK and
 # said so. A row whose buttons committed nothing is UNJOINED, with that reason.
+# THE ROW SET: a row TYPED as a guard cancel (GC_TYPES), or one whose MOVE is NAMED a guard cancel ("... GC") whatever
+# its type — the workbook types Demitri's four DEMON CRADLE GC rows `special` / `es special` (#331), so a type-keyed set
+# alone never held them.
 GC_TYPES = ("special gc", "es special gc", "gc", "es gc")
+GC_NAME = re.compile(r"\bGC\s*$", re.I)
+
+
+def is_gc_row(d):
+    """PURE: a workbook row (dict) belongs to the guard cancels' row set — typed one, or named one."""
+    return (d.get("type") or "").strip().lower() in GC_TYPES or bool(GC_NAME.search(str(d.get("move") or "").strip()))
 INPUT_BUTTONS = {"LP": ["LP"], "MP": ["MP"], "HP": ["HP"], "LK": ["LK"], "MK": ["MK"], "HK": ["HK"], "KH": ["HK"],
                  "P": ["LP", "MP", "HP"], "K": ["LK", "MK", "HK"], "PP": ["PP"], "KK": ["KK"]}
 
@@ -382,7 +395,7 @@ def wb_rows(xlsx):
     out = []
     for tab in wb.sheet_names:
         for i, d in enumerate(wb.rows(tab)):
-            if (d.get("type") or "").strip().lower() in GC_TYPES:
+            if is_gc_row(d):
                 out.append((tab, i, d))
     return out
 

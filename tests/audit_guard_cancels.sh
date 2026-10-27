@@ -4,10 +4,12 @@
 # whiff — for the community cross-check (GitHub #229, 14z-205, fork F5). Emulator tier, MAME lane, pristine vsavj.
 # Registered 14z-209: emulator tier, MAME lane, scope ondemand (pristine vsavj only).
 #
-# WHAT: for the 14 vanilla characters the workbook lists with a guard cancel (Demitri has none) and each of the eight
-#   623 buttons (LP MP HP LK MK HK, the ES pairs PP = LP+HP and KK = LK+HK): a GC event — P2 (Demitri) 5HP at pushbox
+# WHAT: for the 15 vanilla characters with a guard cancel — the 14 the workbook types one for, and Demitri, whose four
+#   Demon Cradle GC rows it types `special` / `es special` (#331, 14z-210: measured on build/agent210/t331b/, the
+#   maintainer: "Enough, integrate") — and each of the eight
+#   623 buttons (LP MP HP LK MK HK, the ES pairs PP = LP+HP and KK = LK+HK): a GC event — P2 (Demitri; a mirror on Demitri's own rigs) 5HP at pushbox
 #   contact, P1 holds back through the block and inputs 623+button from +12 (tools/name_moves.py's gc_v, the recipe
-#   that fired Phobos's Reflect Wall on native vsav2). For the 53 buttons that commit (tools/gc_rigs.py GC_BUTTONS,
+#   that fired Phobos's Reflect Wall on native vsav2). For the 57 buttons that commit (tools/gc_rigs.py GC_BUTTONS,
 #   the data this gate holds the measurement to): a NOBLOCK event (the same, P1 never holding back) and a WHIFF event
 #   (P2's Chaos Flare blocked from ~360 px, the 623+button from +60 inside its blockstun, so the GC reaches nothing),
 #   and a DEALT event (#229 Q5 (a), ruled 2026-10-24: the gc event with P2 a defense-row -3 victim — Gallon, Zabel for
@@ -17,11 +19,11 @@
 #   a stop at 0x029C74 with A6 = P1 — followed by a chain P1 was not in before the motion. The move is timed in ENGINE
 #   TICKS: the walker's tick 0x027F70 (`subq.b #1,$20(a6)`, one write = one tick) counted per node between the walker's
 #   node writes (0x027EEC, A0 = the node); a hit-freeze holds +0x20, so no freeze is counted. Each node's chain is
-#   P1's +0x1C mapped onto tables a2/a/b/c with SIGNED offsets (tools/gc_rigs.walk_signed). The table of the 271 events
+#   P1's +0x1C mapped onto tables a2/a/b/c with SIGNED offsets (tools/gc_rigs.walk_signed). The table of the 291 events
 #   (identity, chains, startup / active runs / recovery in ticks, every attack run's records with their power CLASS,
 #   the stock cost, the GC's first dealt fall on Demitri and on the dealt victim, the whiff's meter gain) is hashed; the values stay out of the tree
 #   (FRAMEDATA_OUT, default ../charpages/framedata/guard_cancels.tsv).
-# HOW: tools/gc_rigs.py gen2 builds 271 one-event rigs (one event per rig: a GC that hits can leave the next event's
+# HOW: tools/gc_rigs.py gen2 builds 291 one-event rigs (one event per rig: a GC that hits can leave the next event's
 #   fighters crossed). Every leg counts EMULATED frames (#228 option A): a TRACE leg per rig (tests/lua/trace_writes.lua,
 #   -debug: watchpoints on P1's +0x1C, +0x20 and +0x3B4 from 40 frames before the event, SAMPLE of +0x1C) and a NOSTOP
 #   leg per committing gc, whiff and dealt rig (tests/lua/replay_guard.lua without the debugger: DUMPS of P1's
@@ -29,8 +31,8 @@
 #   meter, and the chain sequence on the undisturbed timeline). Each leg's game clock RAM:$FF8080 at its last frame is
 #   held to CLOCKS (one row per rig and leg), frozen by --freeze-clock from REFERENCE legs held to replay.lua run live;
 #   one STAGING reference leg (the first trace run) is held to replay.lua on every run (tests/lib/instr_align.sh).
-# EXPECTS: every leg ended (END) with every window frame dumped; the gc legs commit on exactly GC_BUTTONS' 53 buttons
-#   and no other of the 112; no noblock event commits; every whiff event commits and enters the gc event's chain, and
+# EXPECTS: every leg ended (END) with every window frame dumped; the gc legs commit on exactly GC_BUTTONS' 57 buttons
+#   and no other of the 120; no noblock event commits; every whiff event commits and enters the gc event's chain, and
 #   P2's HP falls on a whiff exactly where WHIFF_CONNECTS says (5: moves that travel ~360 px reach him); every dealt event
 #   commits, enters the gc event's chain and lowers its victim's HP exactly where the gc event lowers Demitri's; on every committing event the two legs agree on the GC chain and the nostop leg's a2 chains are a subsequence of the trace's, every
 #   commit is by 0x029C6E, and every SAMPLE of +0x1C is a value the walker wrote (at that frame, or the last before it); the table hashes to EXP; every
@@ -43,18 +45,19 @@
 #
 # MUST-FIRE: known-bad: drift-clock — a trace leg under the OLD frame_done clock (INSTR_CLOCK=frame_done) must miss its frozen game clock (in-gate: one extra run; mode: every leg runs the old clock and the gate FAILs on the alignment)
 # MUST-FIRE: known-bad: first-frame-skip — the staging reference leg under the #213 first-frame skip (INSTR_CLOCK=skip_first) must miss replay.lua's checksum (in-gate; mode: the staging leg runs the skip and the gate FAILs on the alignment)
-# MUST-FIRE: known-bad: noblock — the same 623+button with P1 never holding back must commit no guard cancel on any of the 53 committing buttons (in-gate: the noblock legs read 0 commits; mode: the gc rows of the 53 are read from their noblock legs and the identity clause FAILs on all 53)
-# MUST-FIRE: perturbed-copy: commit-stripped — every commit stop removed from a copy of each trace must read every event no GC, and the identity clause must FAIL on all 53 and the dealt clause on all 53 dealt events (in-gate and mode)
-# MUST-FIRE: perturbed-copy: foreign-pc — every commit stop's PC moved off 0x029C74 in a copy of each trace must read every event no GC (the identity is the commit ROUTINE, not the mark's value), and the identity clause must FAIL on all 53 and the dealt clause on all 53 dealt events (in-gate and mode)
+# MUST-FIRE: known-bad: noblock — the same 623+button with P1 never holding back must commit no guard cancel on any of the 57 committing buttons (in-gate: the noblock legs read 0 commits; mode: the gc rows of the 57 are read from their noblock legs and the identity clause FAILs on all 57)
+# MUST-FIRE: perturbed-copy: commit-stripped — every commit stop removed from a copy of each trace must read every event no GC, and the identity clause must FAIL on all 57 and the dealt clause on all 57 dealt events (in-gate and mode)
+# MUST-FIRE: perturbed-copy: foreign-pc — every commit stop's PC moved off 0x029C74 in a copy of each trace must read every event no GC (the identity is the commit ROUTINE, not the mark's value), and the identity clause must FAIL on all 57 and the dealt clause on all 57 dealt events (in-gate and mode)
 # MUST-FIRE: perturbed-copy: node-shift — every walker node write moved one node (0x18) on in a copy of each trace must change the tick table (the ticks are segmented by the node writes, so the hash reads the walk, not a constant), and the gate must FAIL (in-gate and mode)
 # MUST-FIRE: known-bad: table-absent — node-shift judged with no frozen table on the host (FRAMEDATA_OUT an empty dir) must read NOT JUDGED, never "0 lines differ" (#332; in-gate: one extra judgement; mode: the gate runs with FRAMEDATA_OUT empty and FAILs naming the absent table)
+# MUST-FIRE: known-bad: rows-absent — the identity clause read on an EMPTY row set must name every one of the 291 rigs MISSING, never "0 of 120 commit" as ok (#331, 14z-210: a run whose legs all failed read that ok line; in-gate: one extra judgement; mode: the run's rows are emptied and the gate FAILs on the identity clause)
 # MUST-FIRE: known-bad: foreign-image — an image one byte off vsavj's data view must fail the provenance check (tests/lib/pristine_vsavj.sh; in-gate; mode: the check is handed that image and the gate FAILs)
 # MUST-FIRE: known-bad: foreign-romset — a ROMDIR whose vsavj.zip is vsav2.zip must fail the provenance check (in-gate; mode: the check audits that ROMDIR and the gate FAILs)
 # MUST-FIRE: known-bad: foreign-rompath — MAME_ROMPATH pointed away from the audited ROMDIR must fail the provenance check (in-gate; mode: the check runs with it set and the gate FAILs)
 # MUST-FIRE: known-bad: foreign-mame — a MAME_BIN that is not the pin's release must fail the provenance check (in-gate; mode: the check runs with it set and the gate FAILs)
 # A MODE exits 1 only when ITS perturbation made ITS clause fail (ctl_judge, the same predicate the control section
 # reads); otherwise it prints REFUSED and exits 3 (docs/project/must_fire_contract.md). LEGS_FROM=<a finished run's
-# OUT> reuses that run's legs instead of running all 430 (a mode that changes only what is READ — first-frame-skip,
+# OUT> reuses that run's legs instead of running all 462 (a mode that changes only what is READ — first-frame-skip,
 # noblock, the perturbed copies — or a re-reading after a reader fix); drift-clock always re-runs them. The verdict
 # of record (a normal run after any freeze) runs its own legs.
 # FOLLOWS: build/manifest/bank_map.toml tests/lib/controls.sh tests/lib/decrypt_cache.sh tests/lib/instr_align.sh
@@ -83,7 +86,10 @@ JOBS="${JOBS:-2}"
 EXP="${EXP:-tests/expected/guard_cancels.sha256}"
 FRAMEDATA_OUT="${FRAMEDATA_OUT:-$REPO/../charpages/framedata}"
 T=tools/gc_rigs.py
-W="${OUT:-$(mktemp -d "${TMPDIR:-/tmp}/gcancel.XXXXXX")}"; mkdir -p "$W"
+W="${OUT:-$(mktemp -d "${TMPDIR:-/tmp}/gcancel.XXXXXX")}"
+# absolute, since each leg runs from its own directory (a relative OUT failed every leg, 14z-210); an empty W (a failed
+# mktemp) must stop here, never resolve to the working directory that the trap below would then remove
+[ -n "$W" ] && mkdir -p "$W" && W="$(cd "$W" && pwd)" && [ -n "$W" ] || { echo "FAIL: audit_guard_cancels — no work directory (mktemp or OUT failed)"; exit 2; }
 [ -n "${OUT:-}" ] || trap 'rm -rf "$W"' EXIT
 # control table-absent's mode (#332): the out-of-tree table is made absent — an empty dir in its place, inside $W
 [ "${CONTROL:-}" = table-absent ] && { FRAMEDATA_OUT="$W/no_table_mode"; mkdir -p "$FRAMEDATA_OUT"; }
@@ -94,9 +100,9 @@ decrypt_view vsavj "$W/vsavj_op.bin" "$W/vsavj_data.bin" >/dev/null 2>&1 || { ec
 . "$REPO/tests/lib/pristine_vsavj.sh"
 vs_pristine_vsavj "$W/pv" "$W/vsavj_data.bin" || { echo "FAIL: audit_guard_cancels (the ROM or the analysed image is not pristine vsavj)"; exit 1; }
 if [ -z "$MODE" ]; then vs_pristine_vsavj_controls "$W/pv" || { echo "FAIL: audit_guard_cancels (a provenance control is dead)"; exit 1; }; fi
-GCB="$(python3 $T gcbuttons)"                 # TAB_BTN for the 53 committing buttons
+GCB="$(python3 $T gcbuttons)"                 # TAB_BTN for the 57 committing buttons
 WCX="$(python3 $T whiffconnects)"             # the whiffs measured to reach P2 anyway (data, tools/gc_rigs.py)
-TABS="FE AN AU BI BU GA JE LE LI MO QB SA VI ZA"; BTNS="LP MP HP LK MK HK PP KK"
+TABS="FE AN AU BI BU GA JE LE LI MO QB SA VI ZA DE"; BTNS="LP MP HP LK MK HK PP KK"
 if [ -n "${SUBSET:-}" ]; then   # a DRY RUN on some characters only (the counts the clauses expect are the full set's)
     TABS="$SUBSET"; _g=""; for tb in $GCB; do case " $SUBSET " in *" ${tb%_*} "*) _g="$_g $tb" ;; esac; done; GCB="$_g"
     _g=""; for tb in $WCX; do case " $SUBSET " in *" ${tb%_*} "*) _g="$_g $tb" ;; esac; done; WCX="$_g"
@@ -106,8 +112,8 @@ fi
 echo "== audit_guard_cancels: vsavj ($(python3 -c "import hashlib,sys;print(hashlib.sha1(open(sys.argv[1],'rb').read()).hexdigest()[:12])" "$ROMDIR/vsavj.zip")); tree $(git describe --always --dirty --abbrev=12 2>/dev/null); host $(hostname)"
 echo "== 1. the rigs"
 python3 $T gen2 "$W/rigs" > /dev/null && python3 $T gen2 "$W/rigs2" > /dev/null
-if diff -r "$W/rigs" "$W/rigs2" > /dev/null && [ "$(ls "$W/rigs"/*.rpl | wc -l | tr -d ' ')" = 271 ]; then ok "271 rigs, a pure function of (character, kind, button)"
-else bad "the rigs are not a pure function of their inputs, or not 271"; fi
+if diff -r "$W/rigs" "$W/rigs2" > /dev/null && [ "$(ls "$W/rigs"/*.rpl | wc -l | tr -d ' ')" = 291 ]; then ok "291 rigs, a pure function of (character, kind, button)"
+else bad "the rigs are not a pure function of their inputs, or not 291"; fi
 
 ALL_TRACE=""; ALL_NOSTOP=""
 for t in $TABS; do for b in $BTNS; do ALL_TRACE="$ALL_TRACE gc_${t}_$b"; done; done
@@ -130,7 +136,7 @@ leg() {  # leg <rig name> <trace|nostop>
             tools/run_replay_guarded.sh vsavj "$W/rigs/$1.rpl" "$_o/run.log" "$_o/sb" > "$_o/run.out" 2>&1; rm -rf "$_o/sb" ) </dev/null
     fi
 }
-echo "== 2. the legs (trace on all 271, nostop on the 159 committing gc, whiff and dealt rigs; JOBS=$JOBS)"
+echo "== 2. the legs (trace on all 291, nostop on the 171 committing gc, whiff and dealt rigs; JOBS=$JOBS)"
 if [ -n "${LEGS_FROM:-}" ] && [ "$MODE" != drift-clock ]; then
     rm -rf "$W/legs"; cp -R "$LEGS_FROM/legs" "$W/legs"
     echo "  NOTE  reading the legs of $LEGS_FROM (LEGS_FROM) — no leg is run here: a re-reading, not a fresh measurement"
@@ -187,12 +193,15 @@ r=json.loads(sys.stdin.read()); r['rig']='$r'; print(json.dumps(r))"
 }
 # THE ONE PREDICATE PER CLAUSE (a control section and a mode read the same function).
 identity() {  # identity <rows.jsonl> -> problems, one per line; and the committing gc count on the last line
-    python3 - "$1" "$GCB" "$WCX" <<'PY'
+    python3 - "$1" "$GCB" "$WCX" "$ALL_TRACE" <<'PY'
 import json, sys
 rows = [json.loads(l) for l in open(sys.argv[1])]
 want = set(sys.argv[2].split()); connects = set(sys.argv[3].split())
 gcs = {r["rig"]: r for r in rows if r["rig"].startswith("gc_")}
-bad = []
+# every rig must have a row: a leg whose reader failed leaves no row, and an absent row must never read as "no commit"
+# (#331, 14z-210: with every leg failed the clause printed ok on "0 of 120")
+have = {r["rig"] for r in rows}
+bad = [f"MISSING {rig}: no row (its legs were not read)" for rig in sys.argv[4].split() if rig not in have]
 for rig, r in sorted(gcs.items()):
     tb = rig[3:]
     if r["gc"] != (tb in want):
@@ -234,11 +243,15 @@ ctl_judge() {  # ctl_judge <control> <identity output> <table> ; 0 = fired
     case "$1" in
         noblock|commit-stripped|foreign-pc)
             _n="$(grep -c '^IDENTITY ' "$2")"; _c="$(sed -n 's/^COMMITTING //p' "$2")"; _w="$(echo $GCB | wc -w | tr -d ' ')"
-            # the perturbed copies strip or move the commit on the DEALT legs too, so the dealt clause must fail on all 53
+            # the perturbed copies strip or move the commit on the DEALT legs too, so the dealt clause must fail on all 57
             # (the noblock mode re-reads only the gc rows, so its dealt rows stay as measured)
             _dn="$(grep -c '^DEALT .*no guard cancel' "$2")"; _dw="$_w"; [ "$1" = noblock ] && _dw=0
             echo "$_n of $_w committing buttons fail the identity clause; $_c gc events commit; $_dn of $_dw dealt events read no guard cancel"
             [ "$_n" = "$_w" ] && [ "$_c" = 0 ] && [ "$_dn" = "$_dw" ] ;;
+        rows-absent)
+            _m="$(grep -c '^MISSING ' "$2")"; _a="$(echo $ALL_TRACE | wc -w | tr -d ' ')"
+            echo "$_m of $_a rigs read MISSING on the empty row set"
+            [ "$_m" = "$_a" ] && [ "$_a" -gt 0 ] ;;
         node-shift)
             # the frozen TABLE is out of tree (#332, 14z-210): a host without it cannot judge this clause — say so, and
             # never compare against nothing (diff 2>/dev/null read a missing table as "0 lines differ", so ERIS read DEAD)
@@ -262,9 +275,10 @@ case "$MODE" in commit-stripped) perturb strip "$W/p_strip"; LEGS="$W/p_strip/le
     node-shift) perturb shift "$W/p_shift"; LEGS="$W/p_shift/legs" ;;
     noblock) NBG=1 ;; esac
 rows_of "$LEGS" "$NBG" > "$W/rows.jsonl"
+[ "$MODE" = rows-absent ] && : > "$W/rows.jsonl"
 identity "$W/rows.jsonl" > "$W/identity.txt"
 _np="$(grep -vc '^COMMITTING ' "$W/identity.txt")"
-if [ "$_np" = 0 ]; then ok "$(sed -n 's/^COMMITTING //p' "$W/identity.txt") of 112 gc events commit, exactly GC_BUTTONS; 0 of 53 noblock; 53 of 53 whiffs commit into the gc chain, P2 hit only where WHIFF_CONNECTS says; 53 of 53 dealt events commit into the gc chain, the -3 victim's HP falling where Demitri's does; the legs agree; every window dumped; every +0x1C sample explained"
+if [ "$_np" = 0 ]; then ok "$(sed -n 's/^COMMITTING //p' "$W/identity.txt") of 120 gc events commit, exactly GC_BUTTONS; 0 of 57 noblock; 57 of 57 whiffs commit into the gc chain, P2 hit only where WHIFF_CONNECTS says; 57 of 57 dealt events commit into the gc chain, the -3 victim's HP falling where Demitri's does; the legs agree; every window dumped; every +0x1C sample explained"
 else bad "$_np problem(s):"; grep -v '^COMMITTING ' "$W/identity.txt" | head -12 | sed 's/^/        /'; fi
 python3 - "$W/rows.jsonl" <<'PY' > "$W/pcs.txt" && ok "every commit is a stop at 0x029C74 (the routine at 0x029C6E), A6 = P1" || bad "$(cat "$W/pcs.txt")"
 import json, sys
@@ -280,11 +294,11 @@ H="$(python3 -c 'import hashlib,sys; print(hashlib.sha256(open(sys.argv[1],"rb")
 if [ -n "${FREEZE:-}" ] && [ -z "$MODE" ]; then
     [ "$fail" = 0 ] || { echo "REFUSED: sections 1-3 failed — nothing frozen"; exit 1; }
     mkdir -p "$FRAMEDATA_OUT" "$(dirname "$EXP")"; cp "$W/table.tsv" "$FRAMEDATA_OUT/guard_cancels.tsv"
-    printf '%s  guard_cancels.tsv (271 events; tests/audit_guard_cancels.sh FREEZE=1)\n' "$H" > "$EXP"
+    printf '%s  guard_cancels.tsv (291 events; tests/audit_guard_cancels.sh FREEZE=1)\n' "$H" > "$EXP"
     echo "  FROZE $EXP; the table is $FRAMEDATA_OUT/guard_cancels.tsv (out of tree)"
 fi
 WANT="$(cut -d' ' -f1 "$EXP" 2>/dev/null)"
-if [ "$H" = "$WANT" ]; then ok "the 271-event table equals the frozen hash"
+if [ "$H" = "$WANT" ]; then ok "the 291-event table equals the frozen hash"
 else bad "the table's hash $H is not the frozen ${WANT:-<none>}"
     [ -f "$FRAMEDATA_OUT/guard_cancels.tsv" ] && diff "$FRAMEDATA_OUT/guard_cancels.tsv" "$W/table.tsv" | head -8 | sed 's/^/        /'; fi
 
@@ -325,6 +339,7 @@ echo "== 5. controls"
 judge() { if _ev="$(ctl_judge "$1" "$2" "${3:-}")"; then vs_ctl_fired "$1" "$_ev"
           else case "$_ev" in "NOT JUDGED: "*) bad "control $1 ${_ev#NOT JUDGED: }" ;; *) vs_ctl_dead "$1" "$_ev"; fail=1 ;; esac; fi; }   # #332
 rows_of "$W/legs" 1 > "$W/rows_nb.jsonl"; identity "$W/rows_nb.jsonl" > "$W/id_nb.txt"; judge noblock "$W/id_nb.txt"
+: > "$W/rows_none.jsonl"; identity "$W/rows_none.jsonl" > "$W/id_none.txt"; judge rows-absent "$W/id_none.txt"
 for c in strip:commit-stripped foreign:foreign-pc shift:node-shift; do k="${c%%:*}"; name="${c##*:}"
     perturb "$k" "$W/c_$k"; rows_of "$W/c_$k/legs" > "$W/rows_$k.jsonl"; identity "$W/rows_$k.jsonl" > "$W/id_$k.txt"
     python3 $T table2 "$W/rows_$k.jsonl" > "$W/table_$k.tsv"; judge "$name" "$W/id_$k.txt" "$W/table_$k.tsv"

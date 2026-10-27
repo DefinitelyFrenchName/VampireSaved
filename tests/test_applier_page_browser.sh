@@ -68,9 +68,14 @@ fi
 [ -n "$CHROME" ] || { echo "SKIP: no Chrome/Chromium/Edge on this host (set CHROME_BIN); the page's node-side fidelity is tests/test_applier_page.sh"; exit 0; }
 
 # A SNAP Chromium (Ubuntu's) has a private /tmp, so it cannot open a page under the host's /tmp: the run then measured
-# nothing (net::ERR_FILE_NOT_FOUND), on PILOT before and after #311 (14z-210, fork R). Its files go under $HOME instead.
+# nothing (net::ERR_FILE_NOT_FOUND), on PILOT before and after #311 (14z-210, fork R). Nor can it make its profile under
+# a hidden dir of $HOME ("Failed To Create Data Directory" under ~/.cache, fork P): its files go in the snap's own
+# writable dir, $HOME/snap/<name>/common (measured on PILOT, fork P: plain PASS, both modes on their own finding).
 _cp="$(command -v "$CHROME" 2>/dev/null || echo "$CHROME")"; _cr="$(readlink -f "$_cp" 2>/dev/null || echo "$_cp")"
-case "$_cp$_cr" in */snap/*) mkdir -p "$HOME/.cache"; W="$(mktemp -d "$HOME/.cache/vsav-applier.XXXXXX")" ;; *) W="$(mktemp -d)" ;; esac
+case "$_cp$_cr" in
+    */snap/*) _sn="$(basename "$_cp")"; mkdir -p "$HOME/snap/$_sn/common"; W="$(mktemp -d "$HOME/snap/$_sn/common/vsav-applier.XXXXXX")" ;;
+    *) W="$(mktemp -d)" ;;
+esac
 trap 'rm -rf "$W"' EXIT
 fails=0
 note() { echo "  $*"; }

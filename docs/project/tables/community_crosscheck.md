@@ -559,8 +559,8 @@ to an event that FIRED (each named by the chain it entered and the stock it spen
 input; a workbook input the engine reads differently joins under the engine's, Q4); 12 rows on 10 inputs are
 UNRESOLVED and named with the reason in `tools/es_ex_rigs.py` UNRESOLVED (every timing tried enters a normal or pays
 nothing on vsavj: BI 22PP / 236PP / 623PP, DE 623KK, FE 22PP and 236PP~PP, LE Tenraiha, QB SXP and air SXP, SA 720KK);
-Demitri's ES Demon Cradle GC is declared for the guard cancels (`NOT_HERE`), which do not run it (that section says
-why). **Identity**: the maintainer read F3's sheets
+Demitri's ES Demon Cradle GC is declared for the guard cancels (`NOT_HERE`), which measure it (#331, 14z-210).
+**Identity**: the maintainer read F3's sheets
 (Q1), and Jedah's re-rigged ES row is ES Ira Spinta, ES Ira Piano being `J.63214KK~PP` (*"both are correct"*,
 2026-10-21). **Timing** in engine ticks from the field leg's pass counter, from the move's entry; a projectile or a
 move with no attack node on P1 is uncomparable. Classified by `tools/crosscheck_229.py es`.
@@ -596,33 +596,28 @@ unmashed count); **gauge** is P1's meter at the event's end from 0; **startup** 
 
 ## The guard cancels (14z-205, classified 14z-209 on the Q5/Q6 basis, #229)
 
-Measured on vsavj; the gate is `tests/audit_guard_cancels.sh` (its 271-event table as a hash,
+Measured on vsavj; the gate is `tests/audit_guard_cancels.sh` (its 291-event table as a hash,
 `tests/expected/guard_cancels.sha256`, the table outside the tree; the rigs `tools/gc_rigs.py`). **Scope**: the
-workbook's 42 rows TYPED as a guard cancel (`special GC`, `es special GC`, `GC`, `es GC`: `tools/gc_rigs.py` GC_TYPES) on
-the 14 characters the rigs run, joined by their 623+button set:
-53 buttons commit the game's own guard cancel (P1's `+0x3B5` := 6 by `PRG:0x029C6E`). **Identity**: the maintainer
-read F5's sheets (Q1); Bulleta's guard cancel has no attack (*"this is indeed her correct GC"*). **Timing** is the
+workbook's 46 guard-cancel rows — the 42 TYPED as one (`special GC`, `es special GC`, `GC`, `es GC`: `tools/gc_rigs.py`
+GC_TYPES) and Demitri's four Demon Cradle GC rows, NAMED one but typed `special` / `es special` (`is_gc_row`, #331) —
+on the 15 characters the rigs run, joined by their 623+button set:
+57 buttons commit the game's own guard cancel (P1's `+0x3B5` := 6 by `PRG:0x029C6E`). **Identity**: the maintainer
+read F5's sheets (Q1); Bulleta's guard cancel has no attack (*"this is indeed her correct GC"*); Demitri's, on P1
+against a mirror Demitri and against Gallon, on 18-tile pages showing the game's guard-cancel banner (*"Enough,
+integrate"*, 14z-210, #331); his kicks commit none. **Timing** is the
 HIT's, the gc event's (Q6, *"(b) Keep the hit timing as the record. -> yes"*), in engine ticks; Bulleta's (no attack)
 and Lei-Lei's (her hits come from another object) are uncomparable. **Damage** is what is DEALT on a defense-row -3
 victim (Q5): Gallon, Zabel on Gallon's own rows, the first fall of P2's HP. **Gauge**: the whiff event's own gain, and
 the hit cell as the page's 2b rule (the swing plus the record). Classified by `tools/crosscheck_229.py gc`.
 
-**Demitri's four Demon Cradle GC rows (LP, MP, HP and ES) are joined to nothing: NOT MEASURED** (#331). The workbook
-names them guard cancels but types them `special` and `es special`, so the type-keyed row set above never held them;
-the specials gate declares the three plain rows for this family (`tools/specials_a_rigs.py` NOT_RUN) and the ES/EX
-gate the ES one (`tools/es_ex_rigs.py` NOT_HERE); and no rig here puts Demitri on P1 (`tools/gc_rigs.py` TABS: he is
-P2, the attacker whose 5HP P1 blocks), so none performs his 623+P out of a block. `tools/crosscheck_229.py gc` prints the four rows as
-NOT RUN with that reason. Whether vsavj commits a guard cancel for Demitri is not measured here; joining the rows
-needs a rig with Demitri on P1 against another attacker.
-
 | column | verdict over the joined events (sheet - ours) |
 |---|---|
-| startup | **INCONSISTENT**: +1 on 41 of 45 (spread +0..+1) — CONSTANT OFFSET +1 for 11 characters (the page's convention), EXACT for Aulbath, Bulleta and Lei-Lei no data |
-| active | **INCONSISTENT**: +0 on 28 of 45 (spread -12..+21); EXACT for AN BI JE MO QB SA VI, CONSTANT OFFSET +2 for FE, INCONSISTENT AU GA LI ZA |
-| recovery | **INCONSISTENT**: +3 on 15 of 45 (spread -23..+23); a CONSTANT OFFSET for 8 characters but not one value (+2 FE QB SA, +3 AN BI LI, +5 MO, -4 VI), INCONSISTENT AU GA JE ZA |
-| red / white (dealt, -3 victim) | **INCONSISTENT** but near: red +0 on 48 of 49 (Gallon's ES Diagonal Beast Cannon GC reads the sheet one above), white +0 on 48 of 49 (Q-Bee's ES R.M. one below); Bulleta's three deal nothing |
-| gauge whiff | **INCONSISTENT** but near: +0 on 46 of 47 (Sasquatch's HK Big Typhoon GC the one) |
-| gauge hit | **EXACT** on all 45 |
+| startup | **INCONSISTENT**: +1 on 45 of 49 (spread +0..+1) — CONSTANT OFFSET +1 for 12 characters (the page's convention), EXACT for Aulbath, Bulleta and Lei-Lei no data |
+| active | **INCONSISTENT**: +0 on 28 of 49 (spread -12..+21); EXACT for AN BI JE MO QB SA VI, CONSTANT OFFSET +1 for DE and +2 for FE, INCONSISTENT AU GA LI ZA |
+| recovery | **INCONSISTENT**: +2 on 16 of 49 (spread -23..+23); a CONSTANT OFFSET for 9 characters but not one value (+2 DE FE QB SA, +3 AN BI LI, +5 MO, -4 VI), INCONSISTENT AU GA JE ZA |
+| red / white (dealt, -3 victim) | **INCONSISTENT** but near: red +0 on 52 of 53 (Gallon's ES Diagonal Beast Cannon GC reads the sheet one above), white +0 on 52 of 53 (Q-Bee's ES R.M. one below); Bulleta's three deal nothing |
+| gauge whiff | **INCONSISTENT** but near: +0 on 50 of 51 (Sasquatch's HK Big Typhoon GC the one) |
+| gauge hit | **EXACT** on all 49 |
 
 **Not covered (the four families):** FBNeo; victims other than the rigs'; the characters as picked by the cursor (they
 are forced by poke);
@@ -657,7 +652,7 @@ per-move values, which stay outside the tree (`../charpages/framedata/crosscheck
 - ~~**Specials, supers, EX/ES moves and throws are not joined**~~ **JOINED (#229, 14z-194 to
   14z-209):** every family of the workbook's rows has its own measured rig on vsavj, its own gate and
   its own section above. The rows with no measured event to compare are named in those sections
-  with the reason: Demitri's four Demon Cradle GC rows (not measured), the specials' declared rows
+  with the reason: the specials' declared rows
   (Felicia's Toy Touch, Anakaris's Spell of Turning release, Bishamon's Kienzen), the ES/EX
   family's UNRESOLVED rows, Bishamon's LP Kirisute Gomen, Victor's Graviton Knuckle.
 - **Seven workbook columns have no counterpart in the tree**: `on hit`, `on block`,

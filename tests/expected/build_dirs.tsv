@@ -18,6 +18,7 @@ scratch	agent[0-9]*	session, fork and lane scratch (build/agent<N>/, N-D since 1
 scratch	rulecheck	tools/rulecheck.py's staged packets (N-D)
 scratch	static_runs	tests/run_all_static.sh's run records (N-D; test_session_metrics lists it, an R4 reader)
 scratch	snapshot_runs	tests/run_on_snapshot.sh's snapshots (N-D)
+scratch	tmp	tests/run_all_emulator.sh's per-run TMPDIR (#321, 14z-210): the gates' temp files under an emulator run, removed when it ends (N-D)
 scratch	sheets	tools/proof_sheets.py's pages and clean checkouts (N-D since #313)
 input	out	the decrypt cache (38 gates read it in the PILOT trace)
 input	manifest	the build manifests (tracked)

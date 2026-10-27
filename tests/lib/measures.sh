@@ -76,8 +76,11 @@ vs_meas_read() {  # vs_meas_read <script> <log>
     # expansion on a literal tab (an editor can silently turn it into spaces)
     # awk, not `grep -v`: an empty declaration list must not return 1 under a runner's set -e
     # (the first close tier of 14z-180 died on its first gate exactly there)
-    printf '%s\n' "$_vmr_decl" | awk 'NF' > "${TMPDIR:-/tmp}/vs_meas_$$.txt"
+    # NO SCRATCH FILE (#321, 14z-210): it was named by $$, which every pooled subshell of a runner shares, so two gates
+    # finishing together removed each other's and one worker died before writing its row. A here-document keeps the
+    # loop in this shell (its counters survive) with nothing on disk.
     while IFS= read -r _vmr_row; do
+        [ -n "$_vmr_row" ] || continue
         _vmr_n="$(printf '%s' "$_vmr_row" | cut -f1)"; _vmr_f="$(printf '%s' "$_vmr_row" | cut -f2)"
         VS_MEAS_DECLARED=$((VS_MEAS_DECLARED + 1))
         _vmr_v="$(printf '%s\n' "$_vmr_got" | awk -v n="$_vmr_n" '$1 == n {print $2; exit}')"
@@ -88,8 +91,9 @@ vs_meas_read() {  # vs_meas_read <script> <log>
         else
             VS_MEAS_OK=$((VS_MEAS_OK + 1))
         fi
-    done < "${TMPDIR:-/tmp}/vs_meas_$$.txt"
-    rm -f "${TMPDIR:-/tmp}/vs_meas_$$.txt"
+    done <<VMR_EOF
+$(printf '%s\n' "$_vmr_decl" | awk 'NF')
+VMR_EOF
     for _vmr_n in $(printf '%s\n' "$_vmr_got" | awk '{print $1}' | sort -u); do
         printf '%s\n' "$_vmr_decl" | cut -f1 | grep -qx -- "$_vmr_n" \
             || { VS_MEAS_UNDECLARED=$((VS_MEAS_UNDECLARED + 1)); VS_MEAS_NAMES="$VS_MEAS_NAMES $_vmr_n(undeclared)"; }

@@ -12,8 +12,9 @@
 #   prose cell) for a hit series; CONTACT rows kept out of a specials timing verdict; an UNRESOLVED ES/EX row and a
 #   projectile counted uncomparable with their reasons; a command-throw row that never grabs; the guard cancels'
 #   timing read from the HIT and never the whiff (#229 Q6) and their damage read as DEALT on the -3 victim, never
-#   from the Demitri event (Q5); a row NAMED a guard cancel but typed otherwise reported NOT RUN with its reason (#331:
-#   Demitri's four Demon Cradle GC rows); the normal throws ground and air, the air rows joined on key AIR.
+#   from the Demitri event (Q5); a row NAMED a guard cancel but typed otherwise held in the guard cancels' row set and
+#   joined (#331: Demitri's four Demon Cradle GC rows, tools/gc_rigs.py is_gc_row — until 14z-210 reported NOT RUN);
+#   the normal throws ground and air, the air rows joined on key AIR.
 # HOW: one Python program (below) builds every fixture, calls the functions and compares each got verdict with its
 #   expected one; CONTROL=<name> or the in-gate control loop re-runs it with that control's perturbation.
 # EXPECTS: every case's verdict equals its expected one (the case table below), and each control's perturbation makes
@@ -138,13 +139,17 @@ check("gc startup on the hit", cf.classify(pairs["startup"])[0], "CONSTANT OFFSE
 check("gc dealt red", cf.classify(pairs["red (dealt, -3 victim)"])[0], "EXACT")
 check("gc dealt white", cf.classify(pairs["white (dealt, -3 victim)"])[0], "EXACT")
 check("gc joined", st.get("JOINED"), 2)
-# 6b. #331: a row NAMED a guard cancel but typed `special` is reported NOT RUN with its reason, never silently dropped
-wbn = WB({"XX": [{"type": "special", "move": "LP FOO GC"}, {"type": "special GC", "move": "MP FOO GC"},
-                 {"type": "special", "move": "FOO"}],
+# 6b. #331: a row NAMED a guard cancel but typed `special` is in the row set (and joins), as a typed one is; a plain
+# special named otherwise is not
+import gc_rigs as gcr
+wbn = WB({"XX": [{"type": "special", "move": "LP FOO GC"}, {"type": "special GC", "move": "MP FOO"},
+                 {"type": "special", "move": "FOO"}, {"type": "special", "move": "GC FOO"}],
           "YY": [{"type": "es special", "move": "ES BAR GC "}]})
-nr = x.gc_named_untyped(wbn, ("special gc", "es special gc", "gc", "es gc"), ["YY"])
-check("gc named untyped rows", [(t, i) for t, i, *_ in nr], [("XX", 0), ("YY", 0)])
-check("gc named untyped no-rig reason", ["no guard-cancel rig" in w for *_, w in nr], [True, False])
+check("gc row set: named or typed", [(t, i) for t in wbn.sheet_names for i, d in enumerate(wbn.rows(t)) if gcr.is_gc_row(d)],
+      [("XX", 0), ("XX", 1), ("YY", 0)])
+named = [("XX", 0, dict(wbr[0][2], type="special", move="LP FOO GC"))]   # the 623LP row above, typed `special`
+_, _, nst, _ = x.classify_gc(named, rows)
+check("gc named row joins", nst.get("JOINED"), 1)
 
 # 7. the normal throws, ground and air
 def gtrow(key, inp, press_to_hold, recs, meter=9):

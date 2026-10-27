@@ -1,0 +1,11 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent210/rc331/tracked.diff	9e8e166cacf2383ce2ffe249363bb1a61bd60010
+build/agent210/t331b/cand/check.log	d4ddc2950c2d032b1b6fd2f1688ebafdc49315d6
+build/agent210/t331b/cand/nostop_check.txt	24d878f177d0db18b787ab4a6330fa39cab20c4e
+build/agent210/t331b/cand/table.diff	9d7a7ed8d7e00fa9e18677f0ccbc82ff726ea09b
+build/agent210/t331b/cand/clocks_candidate.tsv	1c859031aa3af626ca0d7d781fc1b3255dd3b4fd
+build/agent210/t331b/cand/verify.log	0e04998fbcd560e7fab5c1c1c1aae5bea5157812
+build/agent210/t331b/cand/modes.out	7f0012dc48d94683912b04579a135ac38fcc25a5
+build/agent210/t331b/join.txt	f4d026ce6413e2d23ae4689d004b4bfc56bdb585
+build/agent210/t331b/mention.txt	0cae6c2caad9fef89110fed6f5485cfab0ae2ca8
+DECISIONS_HISTORY.md.lines-8469-8481 (lines 8469-8481 of DECISIONS_HISTORY.md: its INDEX entry "## Read 2026-10-26 (14z-210) — #331: Demitri's Demon Cradle guard-cancel captures, then "Enough, int")	f3e9a77997868f6d2236aabff43f8921607b589b

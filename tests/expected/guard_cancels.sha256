@@ -1,1 +1,1 @@
-6f6f14a3ae429793acfdbcb7cad2977926fc965508d8cc578a857c2578584383  guard_cancels.tsv (271 events; tests/audit_guard_cancels.sh FREEZE=1)
+54947b5e49c682ef700b4b6a76738ff3d1da808ec01872e8798244064bee6ef0  guard_cancels.tsv (291 events; tests/audit_guard_cancels.sh FREEZE=1)

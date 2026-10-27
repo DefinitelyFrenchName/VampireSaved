@@ -130,6 +130,12 @@ vs_classify() {
 #             judged" in words, exited 1 and read HONOURED. A gate prints the marker on every path that ends a run
 #             without a verdict about what it measures; read after the crash classes (a crash stays DIED).
 #   TIMEOUT   the wrapper's exits, as for any gate
+# THE ENVIRONMENT FAILED, NOT THE GATE (#321, 14z-210; maintainer-ruled 2026-10-27, "Signatures -> DIED"): a control
+# mode whose log carries one of these was stopped by its host — a full or read-only disk, a failed mktemp, a refused
+# write, no memory or file handles — so its exit is not its perturbation firing. On ERIS's 24 GB tmpfs /tmp, filled by
+# concurrent controls, 28 modes that take 30-1,600 s read HONOURED in 0-1 s (some logs hold only the mktemp line); the
+# clean rerun's 227 control logs carry none of these (build/agent210/t321e2/env_signatures.txt).
+VS_ENV_ERR='No space left on device|^mktemp: |cannot create (regular file|directory) |: cannot create /|Permission denied|Read-only file system|Too many open files|Cannot allocate memory|Disk quota exceeded'
 vs_classify_control() {  # vs_classify_control <exit-status> <logfile> [<gate script as invoked>] [<control name>]
     _cst="$1"; _clog="$2"; _cgate="${3:-}"; _cname="${4:-}"
     if grep -qa '^REFUSED: CONTROL=' "$_clog"; then
@@ -152,6 +158,8 @@ vs_classify_control() {  # vs_classify_control <exit-status> <logfile> [<gate sc
         elif [ -n "$_cname" ] && grep -qa "^CONTROL DEAD: $_cname " "$_clog" \
                 && grep -qaE '^([a-z_][a-z0-9_]*\.)*[A-Z][A-Za-z0-9]*(Error|Exception): ' "$_clog"; then   # DEAD-BESIDE-CRASH
             VS_CTL_EXEC=DIED; VS_CTL_EXEC_DETAIL="its own control reported dead beside a crash: $(grep -aE '^([a-z_][a-z0-9_]*\.)*[A-Z][A-Za-z0-9]*(Error|Exception): ' "$_clog" | head -1 | cut -c1-80)"
+        elif grep -qaE "$VS_ENV_ERR" "$_clog"; then   # ENV-ERROR (#321)
+            VS_CTL_EXEC=DIED; VS_CTL_EXEC_DETAIL="an environment error is not a verdict (exit $_cst): $(grep -aE -m1 "$VS_ENV_ERR" "$_clog" | cut -c1-90)"
         elif grep -qa '^NOT JUDGED: ' "$_clog"; then   # NOT-JUDGED (#310)
             VS_CTL_EXEC=UNJUDGED; VS_CTL_EXEC_DETAIL="the mode run measured nothing: $(grep -a -m1 '^NOT JUDGED: ' "$_clog" | cut -c13-92)"
         else

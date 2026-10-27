@@ -2,8 +2,9 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 332
+# issues: 333
 number	state	reason	closed	labels	title
+333	OPEN	-	-	bug,severity: low	106 gate scripts carry on after a failed mktemp -d; 8 then touch paths under /
 332	OPEN	-	-	bug,severity: low	audit_guard_cancels reads a missing out-of-tree table as 0 lines differing, so its node-shift control reads DEAD
 331	OPEN	-	-	evolution,severity: low	#229's remainder: Demitri's ES Demon Cradle GC unjoined; the FE..JE specials section and two stale lines on the cross-check page
 330	OPEN	-	-	evolution,severity: low	Throws: recovery and throw tech not measured for the normal and command throws (split from #229)

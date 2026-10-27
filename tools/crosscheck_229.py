@@ -12,7 +12,8 @@ input (the rig tools' event tables carry the join); Q5 — guard-cancel damage i
 (Gallon, Zabel on Gallon's own rows: the gate's `dealt_*` events, their first fall); Q6 — a guard cancel's timing of
 record is the HIT (the gate's `gc_*` events, P2 Demitri), never the whiff; Q2 — nothing here re-reads the pursuits.
 #331 — a row the workbook NAMES a guard cancel ("... GC") but types otherwise (Demitri's four DEMON CRADLE GC rows,
-typed `special` / `es special`) is printed by the gc family as NOT RUN with its reason (gc_named_untyped), never dropped.
+typed `special` / `es special`) is in the guard cancels' row set (tools/gc_rigs.py is_gc_row) and joins like any other;
+until 14z-210 it was printed NOT RUN with its reason (gc_named_untyped, retired when the gate began running Demitri).
 
 Each family is a loader (fam_*: the files) over a PURE function (classify_es, aggregate_ct, classify_gc, classify_gt;
 specials B uses tools/specials_b_rigs.py verdicts) so the verdict logic runs on fixtures: tests/test_crosscheck_229.sh
@@ -289,36 +290,7 @@ def fam_gc(outdir, sheet, pairs_dir):
     out = emit("GC", pairs, unc, GC_COLS)
     out.append("ROWS\tGC\t" + ", ".join(f"{k} {v}" for k, v in sorted(st.items())) +
                "\tdealt victims " + ", ".join(f"{k} {v}" for k, v in sorted(victims.items())))
-    import xlsx_read
-    out += gc_named_lines(gc_named_untyped(xlsx_read.Workbook(sheet), gc.GC_TYPES, gc.TABS))
     return out + unc_lines("GC", unc)
-
-
-GC_NAME = re.compile(r"\bGC\s*$", re.I)
-
-
-def gc_named_untyped(wb, gc_types, tabs):
-    """PURE: the workbook rows whose MOVE is named a guard cancel ("... GC") but whose `type` is none of the guard-cancel
-    types the gate's row set selects by (tools/gc_rigs.py GC_TYPES) -> [(tab, row index, move, type, why)]. #331: the
-    workbook types Demitri's four DEMON CRADLE GC rows `special` / `es special`, so the type-keyed row set never held them
-    and no family joined them; they are reported here, NOT RUN, with the reason, instead of being lost."""
-    out = []
-    for tab in wb.sheet_names:
-        for i, d in enumerate(wb.rows(tab)):
-            mv, ty = str(d.get("move") or "").strip(), str(d.get("type") or "").strip().lower()
-            if GC_NAME.search(mv) and ty not in gc_types:
-                why = "typed `%s`, outside the guard cancels' type-keyed row set" % ty
-                if tab not in tabs:
-                    why += "; no guard-cancel rig puts this character on P1"
-                out.append((tab, i, mv, ty, why))
-    return out
-
-
-def gc_named_lines(rows):
-    c = collections.Counter(t for t, *_ in rows)
-    out = [f"ROWS\tGC\tNOT RUN (named GC, not typed one)\t{sum(c.values())}\t" + ", ".join(f"{t} {n}" for t, n in sorted(c.items()))]
-    out += [f"NOT RUN\tGC\t{t}\trow {i}\t{mv}\t{why}" for t, i, mv, _ty, why in rows]
-    return out
 
 
 GC_COLS = ["startup", "active", "recovery", "red (dealt, -3 victim)", "white (dealt, -3 victim)", "gauge_whiff", "gauge_hit"]

@@ -682,6 +682,17 @@ control claims.
 - **`RUN_JOBS`, never `JOBS`**, in both runners: a gate reads `JOBS` for its own legs, so an exported `JOBS` used to reach
   every gate as the runner's `--jobs` (`test_emulator_runner` section 20, `test_static_runner` section 34, controls
   `jobs-leak`).
+- **Temp files on disk** (ruled 2026-10-27, *"Runner sets disk TMPDIR (Recommended)"*): unless the caller set `TMPDIR`
+  (macOS always does, on disk), `tests/run_all_emulator.sh` points it at a directory of the run's own under
+  `build/tmp/`, removed when the run ends, and refuses to START with less free space there than 10 GB (controls on more
+  than one job; else 2 GB; `VS_TMP_MIN_GB` overrides), naming the shortfall. PILOT has about 12 GB free. Why: concurrent
+  controls filled ERIS's 24 GB tmpfs `/tmp` (section 21, control `tmp-ignored`).
+- **A control mode stopped by its host is DIED** (ruled 2026-10-27, *"Signatures -> DIED (Recommended)"*): a mode log
+  carrying `No space left on device`, `mktemp: `, `cannot create …`, `Permission denied`, `Read-only file system`, `Too
+  many open files`, `Cannot allocate memory` or `Disk quota exceeded` is a crash, never an honoured control
+  (`tests/lib/classify.sh` `VS_ENV_ERR`; section 14k, control `env-honoured`). On the full tmpfs, 28 modes that take
+  30-1,600 s read HONOURED in 0-1 s, some logs holding only the `mktemp` line; the clean rerun's 227 control logs carry
+  none of these signatures and the bad run's 226 carry 40. The gates' own unguarded `mktemp -d` sites are #333.
 
 **WHAT #321 MEASURED AND RULED OUT (14z-210; evidence local under `build/agent210/`).**
 - **The emulator controls' write trace** (PILOT at `688edef8`, fork T): 200 controls of the 61 fbneo/mame gates with two
@@ -698,6 +709,15 @@ control claims.
   (352 -> 353 s, 357 -> 357 s).
 - **The six SHARED static gates' controls** (the freeze tier of 14z-208b): at most 60 s per tier
   (`test_emulator_staleness`, 10 controls, the longest 8 s); `test_close_tools` is on-demand. Not worth private copies.
+- **The release shape across hosts** (ERIS at `86d1ca10`, fork E2, `build/agent210/t321e2/SUMMARY.md`): `--scope all
+  --strict --controls --jobs 8 --skip test_mame_parity --reuse <the freeze run> --order <14z-208b's results>` with
+  TMPDIR on disk took **7,947 s (2 h 12 min) against 14z-208b's 12,575 s (3 h 29 min)**. All 421 shared verdicts were
+  equal to 14z-208b's, the 227 control rows summed 56,682 s, no row came over half its cap (at most 0.47,
+  `audit_hitclass_map_cost`), the host ran 0.916 busy, and the sampled temp peak was 7.4 GB. The same run on the
+  default `/tmp` is not a measurement (above). The freeze tier at `86d1ca10` took 4,233 s (fork K's at `688edef8`,
+  4,361 s), and at `--jobs 12` 4,208 s with 33,399 s of gate time against 26,630, every verdict the same: 8 stays.
+  The 7.4 GB sample does not explain a full 24 GB tmpfs; the tmpfs's inode limit (`nr_inodes=1048576`) or a peak
+  between samples is unmeasured.
 - **The freeze and close tools** (the Mac, 14z-210): snapshot setup 42 s, the staleness audit 39 s, the static-confirm
   prediction 20 s, fingerprints and the ROM audit under a second — no change; the freeze's cost was `run_suite.sh`'s
   serial MAME runs, now `SUITE_JOBS`.

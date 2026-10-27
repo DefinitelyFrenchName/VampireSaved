@@ -346,6 +346,29 @@ if [ "$DRY" = 0 ] && [ ! -f "$LOGDIR/commit.txt" ]; then
         echo "no-git" > "$LOGDIR/commit.txt"
     fi
 fi
+# TEMP FILES ON DISK (#321, 14z-210; maintainer-ruled 2026-10-27, "Runner sets disk TMPDIR (Recommended)"): with
+# concurrent controls ERIS's /tmp, a 24 GB tmpfs, filled and 28 modes read HONOURED in 0-1 s (build/agent210/t321e2/);
+# with TMPDIR on disk the same run took 7,947 s, every verdict equal, its temp peak 7.4 GB by a 30 s sample. So unless
+# the caller set TMPDIR (macOS always does, on disk), every gate's mktemp lands in a directory of this run's under
+# build/tmp/, removed when the run ends; and the run refuses to START on less free space there than it needs (10 GB
+# with controls on more than one job, else 2; VS_TMP_MIN_GB overrides), naming the shortfall, rather than die midway.
+VS_RUN_TMP=""
+vs_tmp_clean() { [ -n "$VS_RUN_TMP" ] && [ -d "$VS_RUN_TMP" ] && rm -rf "$VS_RUN_TMP"; :; }
+if [ "$DRY" = 0 ]; then
+    if [ -z "${TMPDIR:-}" ]; then   # DISK-TMPDIR
+        VS_RUN_TMP="$REPO/build/tmp/emu_$STAMP.$$"
+        mkdir -p "$VS_RUN_TMP" && [ -d "$VS_RUN_TMP" ] || { echo "FAIL: could not create this run's temp directory $VS_RUN_TMP"; exit 1; }
+        export TMPDIR="$VS_RUN_TMP"
+        trap 'vs_tmp_clean' EXIT INT TERM
+    fi
+    _tmp_need=2; [ "$CONTROLS" = 1 ] && [ "$RUN_JOBS" -gt 1 ] && _tmp_need=10; _tmp_need="${VS_TMP_MIN_GB:-$_tmp_need}"
+    _tmp_free="$(df -Pk "${TMPDIR:-/tmp}" 2>/dev/null | awk 'NR==2{print $4}')"
+    if [ -n "$_tmp_free" ] && [ "$_tmp_free" -lt $((_tmp_need * 1048576)) ]; then
+        echo "FAIL: $((_tmp_free / 1048576)) GB free for temp files in ${TMPDIR:-/tmp}, this run needs $_tmp_need GB (#321; free space there, set TMPDIR elsewhere, or VS_TMP_MIN_GB)"
+        vs_tmp_clean; exit 1
+    fi
+fi
+
 # THE RUN RECORD (14z-185b, GitHub #189, maintainer-ruled 2026-09-29 "R-reach, both runners"):
 # beside commit.txt (kept: test_emulator_staleness.sh reads it), tools/run_record.py writes what
 # this run ran on — HEAD, the status WITH untracked files and their hashes, the submodules (SHA,
@@ -363,7 +386,7 @@ if [ "$DRY" = 0 ] && [ -f tools/run_record.py ] && git rev-parse --git-dir >/dev
             || echo "run record: the START record FAILED — see $LOGDIR/run_record_start.log"
     fi
     if [ -f "$LOGDIR/run_record_start.json" ]; then
-        trap 'python3 tools/run_record.py write "$LOGDIR/run_record_end.json" --phase end --start "$LOGDIR/run_record_start.json" -- tests/run_all_emulator.sh $_ORIG_ARGS > "$LOGDIR/run_record_end.log" 2>&1 || echo "run record: the END record FAILED — see $LOGDIR/run_record_end.log"' EXIT INT TERM
+        trap 'python3 tools/run_record.py write "$LOGDIR/run_record_end.json" --phase end --start "$LOGDIR/run_record_start.json" -- tests/run_all_emulator.sh $_ORIG_ARGS > "$LOGDIR/run_record_end.log" 2>&1 || echo "run record: the END record FAILED — see $LOGDIR/run_record_end.log"; vs_tmp_clean' EXIT INT TERM
     fi
 fi
 
@@ -389,6 +412,7 @@ fi
 echo "  jobs       $RUN_JOBS   timeout ${TMO}s (a row's 7th column overrides it)"
 JTSIM_BASE="${JTSIM_SCRATCH:-${TMPDIR:-/tmp}/vampire-saved-jtsim}"
 [ "$RUN_JOBS" -gt 1 ] && echo "  scratch    $JTSIM_BASE (mister slot 0), $JTSIM_BASE-slotN (slots 1..$((RUN_JOBS-1)))"
+echo "  temp       ${TMPDIR:-/tmp}${VS_RUN_TMP:+ (made for this run, removed at the end)}"
 echo "  log        $LOGDIR"
 echo "  ROMDIR     $ROMDIR"
 
@@ -663,6 +687,7 @@ for _lane_pool in $_POOLS; do
     # lane, and its result landed under the wrong heading. Reading from a file
     # keeps the loop — and `wait`, and `_running` — in the main shell.
     printf '%s\n' "$_rows" > "$LOGDIR/.lane_$_lane_pool"
+    _lanef="$LOGDIR/.lane_$_lane_pool"   # its rows, kept by path for the LOST-ROWS check after the lane's readers ran
     # LONGEST FIRST (--order, #321): a pooled lane's rows sorted by the seconds an earlier run spent on each gate and its
     # control rows, the most first; a gate absent there first of all (its cost is unknown), the sort stable so ties keep
     # registry order. A long gate started last is the tail every slot waits on.
@@ -757,6 +782,27 @@ for _lane_pool in $_POOLS; do
     done < "$LOGDIR/.lane_$_lane_pool"
     wait                       # the lane is not finished until its gates are
     if [ -n "$SLOTFIFO" ]; then exec 8>&-; rm -f "$SLOTFIFO"; SLOTFIFO=""; fi
+    # EVERY SELECTED GATE HAS A ROW (#321, 14z-210): a worker that dies between its gate's end and its row leaves no
+    # verdict, and the tally counted only rows — on PILOT a pooled lane of three printed GREEN on PASS 1, because
+    # tests/lib/measures.sh's scratch file was named by $$, which every pooled subshell shares. A selected gate with no
+    # row, or (under --controls) a passing gate's declared control with none, is a FAIL row of its own here.
+    if [ "$DRY" = 0 ]; then   # LOST-ROWS
+        while IFS="$(printf '\t')" read -r g lane scope _rest; do
+            [ -n "$g" ] || continue
+            if ! awk -F'\t' -v g="$g" 'NR > 1 && $1 == g {f = 1} END {exit !f}' "$RESULTS"; then
+                printf '%s\t%s\t%s\tFAIL\t0\tLOST: selected, but no verdict row was written (its worker died)\n' "$g" "$lane" "$scope" >> "$RESULTS"
+                printf '  %-34s %-7s        %s\n' "$g" FAIL "LOST: selected, but no verdict row was written"
+            elif [ "$CONTROLS" = 1 ] && [ -f "tests/$g.sh" ] \
+                    && awk -F'\t' -v g="$g" 'NR > 1 && $1 == g && $4 == "PASS" {f = 1} END {exit !f}' "$RESULTS"; then
+                for _cn in $(vs_ctl_declared "tests/$g.sh"); do
+                    if ! awk -F'\t' -v g="$g@$_cn" 'NR > 1 && $1 == g {f = 1} END {exit !f}' "$RESULTS"; then
+                        printf '%s\t%s\t%s\tFAIL\t0\tLOST: a declared control of a passing gate, but no row was written\n' "$g@$_cn" "$lane" "$scope" >> "$RESULTS"
+                        printf '  %-34s %-7s        %s\n' "$g@$_cn" FAIL "LOST: no control row was written"
+                    fi
+                done
+            fi
+        done < "$_lanef"
+    fi
     rm -f "$LOGDIR/.lane_$_lane_pool"
     # THE INSTRUMENT GATE. A red prereq means every later measurement is
     # measured with a moved instrument, so the run stops by default.
