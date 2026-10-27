@@ -1,0 +1,25 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent210/closures/final/c331.md	9a96ea8cc63425692c8984634c824bf889cc71ad
+build/agent210/closures/issues/331.md	a8ff1427d7d890f24ff3eb48339ac735cb87a502
+DECISIONS_HISTORY.md.lines-8460-8485 (lines 8460-8485 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-26 (14z-210) — #331's Demitri guard cancels get an emulator rig; #310's UNJUDGED cl", and the entries after it up to line 8485)	b2b9f0754aed543f8bb2681b5e350b858c66d4b3
+build/agent210/t331b/mention.txt	0cae6c2caad9fef89110fed6f5485cfab0ae2ca8
+build/agent210/t331b/join.txt	f4d026ce6413e2d23ae4689d004b4bfc56bdb585
+docs/project/tables/community_crosscheck.md.lines-597-624 (lines 597-624 of docs/project/tables/community_crosscheck.md)	14594b7c56d8d38125a4e6c36299058e1578906f
+docs/project/tables/community_crosscheck.md.lines-493-534 (lines 493-534 of docs/project/tables/community_crosscheck.md)	af1a7e4934f31eb233b32143844f86be1c1cc513
+docs/project/tables/community_crosscheck.md.lines-399-403 (lines 399-403 of docs/project/tables/community_crosscheck.md)	d1f86893f0fe207ed590f9862bbef6efad486a78
+docs/project/tables/community_crosscheck.md.lines-650-654 (lines 650-654 of docs/project/tables/community_crosscheck.md)	d747465869433e6cd3f7b0523d424085c7d63d0d
+tools/crosscheck_framedata.py.lines-627-627 (lines 627-627 of tools/crosscheck_framedata.py)	c7090cadd865b14329f7465830d140228fa87d01
+tools/crosscheck_framedata.py.lines-837-837 (lines 837-837 of tools/crosscheck_framedata.py)	41330029693c213e5a20be0102bc900b154e35f0
+tests/expected/vanilla_specials_a_verdicts.tsv	02a83e0bcdcd1cb984b50bc516542385f15fca98
+tests/rulecheck/ledger.tsv.lines-1200-1200 (lines 1200-1200 of tests/rulecheck/ledger.tsv)	4320aed6fed9dcdbb080d681e5d9750a5ba6c0df
+tests/rulecheck/runs/2026-10-27-1334/verdict_real.txt	0d62e5864afe248b6268cefd9cf75d74062550b7
+build/agent210/closures/final/e331.sh	91ecdefd1b1a7e64ad6dd51b62e4640fff1c3690
+build/agent210/closures/final/e331_check.txt	4c546b3d9816b0091f4622049caf4853aa7a179c
+build/agent210/t331f/freeze.log	cbd4e23ff9105a0f046c11b8664440b6e1011eab
+build/agent210/t331f/plain.log	6bd4016c31ac63760d3b437efac92f6efe5ce392
+build/agent210/t331f/modes.out	212252e73204bc02cac71c7a3ce21821f0d38f31
+build/agent210/rc331/page_freeze.log	71adfda421c3b92dc1966020134dde1396695f34
+build/agent210/rc331/test_crosscheck_229.log	fe424f03893201cdc5579877c50ef69ff5016365
+build/agent210/tier4/tier_results.tsv.lines-107-107 (lines 107-107 of build/agent210/tier4/tier_results.tsv)	b68693c8a3a5be4e61221a3fb2987c6ac7711e19
+build/agent210/tier4/tier_results.tsv.lines-120-120 (lines 120-120 of build/agent210/tier4/tier_results.tsv)	51fb175c1d3be2d513e0d3f5536c827c544eed7e
+build/agent210/tier4/tier.log.lines-455-460 (lines 455-460 of build/agent210/tier4/tier.log)	3cd52c6c091135dc5bacbce2b684785ae47464b9

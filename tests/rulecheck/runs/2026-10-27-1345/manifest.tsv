@@ -1,0 +1,40 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent210/closures/final/c311.md	779ae1bad704808c45c9023b167b6de028b2f6b1
+build/agent210/closures/issues/311.md	981e4aec4b265c9f9eedd2226b72b88d08780f51
+build/agent210/closures/final/e311_vt_unloaded.txt	c4a20ffae2d4acc54f5b826d91df0e521fe6c6c1
+build/agent210/closures/final/e311_vt_loaded.txt	e7eb6f35e2707524f140cdd62346c6c2f5ae69d3
+build/agent210/t311/rig/analyse.py	5a2c6fc9e191ccc48bfc289905c16627de389fe9
+docs/platform/gotchas.md.lines-3001-3038 (lines 3001-3038 of docs/platform/gotchas.md)	40b0df55b08ca2ea36b48c23978dedecd860abd2
+tests/test_applier_page_browser.sh.lines-44-47 (lines 44-47 of tests/test_applier_page_browser.sh)	8d80d6e0b1b2db913a09eef795cc65f690245f14
+tests/test_applier_page_browser.sh.lines-66-80 (lines 66-80 of tests/test_applier_page_browser.sh)	bdcdb071310438d73f2604382fcd18e91b21fc77
+tests/test_applier_page_browser.sh.lines-155-190 (lines 155-190 of tests/test_applier_page_browser.sh)	3aea2406816f40d1122252ceeb025143ed0ccc6e
+tests/test_applier_page_browser.sh.lines-256-275 (lines 256-275 of tests/test_applier_page_browser.sh)	5ad88414145b65b3512e961b3f20c8592da3127f
+tests/test_applier_page_browser.sh.lines-363-377 (lines 363-377 of tests/test_applier_page_browser.sh)	11094cec879c65edfb8dc43ef393b03784cd37d7
+build/agent210/closures/final/e311_removed_lines.txt	0fdb7bf010c2720107d469a4d12849f7f10881f3
+build/agent210/t311/before_unloaded/runs.txt	30548ef1f6c21192bf493e7e06ae3e4d84f3d417
+build/agent210/t311/before_loaded/runs.txt	88bd93543273e070f44cf2405a12297866a64857
+build/agent210/t311/after_unloaded/runs.txt	035a0f6c70015dd035d49bd07bee4d40ec034745
+build/agent210/t311/after_loaded/runs.txt	20c05898785db6108f9f1c8eeed808309c7ed6bc
+build/agent210/t311/batch.sh	1a791c4a75a4b8217d19ef722b2de0ca9d174765
+build/agent210/t311/controls.sh	33edfe14624fe4e84539d703b86e36b83fbf7712
+build/agent210/t311/ctl_after_loaded/controls.txt	b916eb2426a32e0e573b84f6fffa5793af75b1c7
+build/agent210/t311/ctl_after_unloaded/controls.txt	b916eb2426a32e0e573b84f6fffa5793af75b1c7
+build/agent210/closures/final/e311_blob.txt	da357327a68a1e157c4dce34979742ebc34d8c6d
+build/agent210/t321q/browser/results.tsv	7d3618fdc9513653285a08ebeaa0132c44c5b1f7
+build/agent210/t321q/browser/plain_1.log	13e950e3fab9217181193c86937f555f1c3b72ce
+build/agent210/t321q/browser/leftover_before.txt	da39a3ee5e6b4b0d3255bfef95601890afd80709
+build/agent210/t321q/browser/leftover_after.txt	da39a3ee5e6b4b0d3255bfef95601890afd80709
+build/agent210/t321q/q_all.sh	b437c695c0c40c2bef729fdd2836bad7add6a371
+docs/project/build_environments.md.lines-93-93 (lines 93-93 of docs/project/build_environments.md)	9c3c248be481a788228daa51c1983dab1b060c09
+build/agent210/t311load/summary.txt	ca0c2eb59773b9b714b6bdf676fd35909dc756d5
+build/agent210/t311load/out/results.tsv	2167beac6c46136794e8cb3f83d12d16b996a35a
+build/agent210/t311load/out/inside_head.txt	953674676590a3358e0d01574c691988c73efbb9
+build/agent210/t311load/inside_load_h.sh	6955ab8433f53af087b489b61e478221f2250b65
+build/agent206/t299/load/inside_load.sh	ac5f1d221700fc7dfd6af0f6050e84596b628030
+build/agent210/closures/final/e311_inside_load.diff	23cb09aaa311e8bd674ba8f11fc4d56ed2fe5e38
+build/agent210/t311load/outer.log	1c92db70e6c46d4d1973aef67d961a2fab15e4e8
+build/agent210/t311load/out/runner.log	82fd6f2abc24fb29571b423e96205f4728bfc790
+build/agent210/t311load/out/logs/test_applier_page_browser.out	19541175f201d986de2b1758165d33aa993656a4
+build/agent210/t311load/out/load.log	b9875888b990acd1d3cbaa4eb973f8031d2fbeb1
+build/agent206/t299/load/out/results.tsv	fc46afe851fff367a2c384a12546d2ef7d70753e
+build/agent206/t299/load/summary.txt	cf50f7fb0866fb054c00a7212c5c8a53b8db03ea

@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-209 CLOSE, 2026-10-26)
+# NEXT SESSION — orientation (rewritten at the 14z-210 CLOSE, 2026-10-27)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` (then `python3 tools/gen_history_index.py`
@@ -17,50 +17,49 @@ A plain **Opus 5.5 session at effort High** (the ruled orchestrator — STATE 'S
 - **Never edit a script while it runs** ([MJC-54]); the emulator runner reports a tracked file changed during its run.
 
 Say so at the opener. Never spawn any agent at `max`. A recommendation leans only on the maintainer's OWN words.
-**PILOT** (6 vCPU, 47 GB, Ubuntu 24.04) carries xdelta3 3.2.0 and Node v24.22.1 user-local (`~/.local/bin`, ruled
-2026-10-23) and has `strace`. Deletable scratch from 14z-209: `~/c229_gc5` (#229's guard-cancel lane), `~/e321s`, `~/e321s2`,
-`~/e321_trace*`, `~/e321_*.diff`, `~/e327c*` (#321, #327), `~/b209_306*`, `~/c209_*` (#306, #327); older: fork X2's `~/x2wt`,
-`~/x2out`, `~/x2.bundle`, `~/t229.tar`, `~/x2f5`. **ERIS** (WSL2 and MSYS2) has a source-built MAME at its pin; its freeze
-tier is now `tests/run_all_emulator.sh --freeze --strict --jobs 8 --skip test_mame_parity` (#321: parity runs on the Mac only,
-ruled 2026-10-26); deletable scratch `~/a209_*`, `~/e321`, `C:\Users\Chaton\a209*`, `C:\Users\Chaton\e321_*`. Neither profile
-sets ROMDIR (`ROMDIR=~/roms`). Work handed to either is a bundle of a COMMIT; a remote script goes over
-`ssh <host> 'wsl -e bash -s' < script` (nested quotes break).
+**PILOT** (6 vCPU, 47 GB, Ubuntu 24.04, disk at 95%, about 12 GB free) carries xdelta3, Node and `strace`; its
+checkout `~/t210_trace` sits at the 14z-210 staged tree `f6ba8f02` (detached) and is the write-trace clone. Deletable
+scratch: `~/t210_trace*`, `~/t210r_*`, `~/t210_*.bundle`, `~/q210_out`, `~/c229*`, `~/e321*`, `~/b209_*`, `~/c209_*`, and
+fork X2's `~/x2wt`, `~/x2out`, `~/x2.bundle`, `~/t229.tar`, `~/x2f5`. **ERIS** (WSL2) runs the release shape; deletable
+scratch `~/k210` (6.3 GB, at `86d1ca10`), `~/k210_out`, `~/e2_out`, `C:\Users\Chaton\k210.bundle`,
+`C:\Users\Chaton\c86d1ca1.bundle`, and 14z-209's `~/a209_*`, `~/e321`. Neither profile sets ROMDIR (`ROMDIR=~/roms`).
+Work handed to either is a bundle of a COMMIT (a bare commit-tree needs a temporary ref; delete it after); a remote
+script goes over `ssh <host> 'wsl -e bash -s' < script`.
 
-**THE SESSION CLOSE:** `docs/project/session_close.md`, run by `python3 tools/close.py` (`start --key … --row - --prev
-<results> --transcript <id>`, then `next`, `done`, `status`). The run of record is named in STATE 14z-209's CLOSE section.
-A red tier is re-run by the driver on THE RED RUN'S results, not `--prev` (#317); a snapshot's setup is about 25 s now (#304,
-#317), so a red costs the gates it re-runs, not a second copy.
+**THE SESSION CLOSE:** `docs/project/session_close.md`, run by `python3 tools/close.py`. The run of record is named in
+STATE 14z-210's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
 
-**A RELEASE ON A FREEZE'S COMMIT REUSES THE FREEZE'S RUNS (#316, measured 14z-208b, `docs/project/release_format.md`):**
-the controls still run, so the emulator tier stays hours; run the Mac's and PILOT's host gates AFTER ERIS's run ends
-(`docs/project/gotchas.md`), and ERIS at `--jobs 8` can push a long MAME control over half its cap (#321).
+**THE EMULATOR RUNNER SINCE 14z-210 (#321, `docs/project/operations.md`):**
+- **Concurrent controls:** a gate on `tests/controls_concurrent_emu.txt` (60 of 61, from a PILOT write trace) runs each
+  control as a pool job of its own; a listed gate whose script changed must be re-traced on PILOT before it stays listed
+  (`tests/test_controls_concurrent.sh`), and the static list `tests/controls_concurrent.txt` the same.
+- **`--order <an earlier run>/results.tsv`** starts a pooled lane longest first.
+- **Temp files on disk:** unless the caller set `TMPDIR`, a run's gates write under `build/tmp/emu_<stamp>.<pid>/`
+  (removed at the end); the run refuses to start with under 10 GB free there (`VS_TMP_MIN_GB`).
+- **Three verdict holes closed:** a control mode stopped by its host (full disk, failed mktemp) is DIED, never HONOURED;
+  a selected gate, or a passing gate's declared control, with no row is a FAIL ("LOST"); `tests/lib/measures.sh` no longer
+  shares a scratch file across pooled subshells. **Before trusting a runner change, run its gate on PILOT as well as the
+  Mac** — the `$$` race showed only on Linux.
+- **ERIS's release shape:** `--scope all --strict --controls --jobs 8 --skip test_mame_parity --reuse <freeze run>
+  --order <the previous release's results>`, about 2 h 12 min with TMPDIR on disk (7,947 s at `86d1ca10`). `--jobs 12`
+  gains nothing.
 
-**THE STATIC TIER (14z-207, #312, #315):** a gate's controls run as pool jobs of their own once the gate's run ends
-(`tests/lib/static_pool.py`); for the gates on `tests/controls_concurrent.txt` they run side by side, chosen from a write
-trace of every control on Linux; `tests/test_controls_concurrent.sh` fails a listed gate whose script changed since its
-trace. `test_release_reuse`, `test_static_runner` and `test_run_on_snapshot` were re-traced on PILOT at 14z-208c (their
-scripts changed: #326, #324, #325); `tools/trace_controls.sh` in a scratch clone at a bundled commit object does it.
-
-**A STRICT STATIC RUN NOW FAILS ON A FILE IT LEAVES BEHIND (#324):** the runner compares the untracked files outside
-`build/` before and after a run (`LEFT BEHIND`); a gate that writes into the clone instead of a temp dir turns a strict
-tier red. It does not see a file written outside a runner run, an ignored file, or `build/`.
-
-**THE SNAPSHOT LEAVES SCRATCH OUT (#304)** and `build/` keeps closed work only by the retention rule (#307,
-`docs/project/build_dir_triage.md`; the 84-tar archive is on files-hades). `tools/build_retention.py` plans a prune;
-the maintainer approves it before anything is deleted.
+**THE STATIC TIER:** unchanged since 14z-209 (#312, #315, #324, #304; `tests/lib/static_pool.py`). A strict run fails on a
+file it leaves behind outside `build/`, and `build/`'s top-level directories are classed in `tests/expected/build_dirs.tsv`
+(a new one fails `test_build_dirs`; `build/tmp/` was added as scratch this sitting).
 
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
 1. **Ask the maintainer for the order of work.** Open tickets (GitHub severity labels):
-   - low: #118, #310, #311, #318, #320, #327 (fix applied 14z-209; the 14z-208c red not reproduced, 183 sites of the form
-     remain elsewhere — its progress comment), #328 (two stale build defaults), #329 (minimal half-circle inputs), #330 (the
-     throws' recovery and throw tech), #331 (#229's remainder: Demitri's ES Demon Cradle GC, the FE..JE page section, two
-     stale page lines);
+   - medium: none.
+   - low: #118, #310 (the UNJUDGED census; deferred, ruled "Record and defer"), #329 (minimal half-circle inputs), #330
+     (the throws' recovery and throw tech), #333 (106 gate scripts carry on after a failed `mktemp -d`), #334 (#321's
+     remainder: the job knobs on PILOT and under load; the knob-less gates' survey);
    - parked: #123, #124, #125, #127, #128, #129, #162, #267, #294.
    - **Before planning any freeze or release, read each open ticket's comments for a step that runs AT it.**
-2. **The next freeze or release** runs the six #229 gates only on demand (`ondemand`, pristine vsavj); ERIS's tier takes
-   `--skip test_mame_parity` and the Mac runs parity (#321).
+2. **The next freeze or release** runs the six #229 gates only on demand, ERIS's tier takes `--skip test_mame_parity`,
+   and the Mac runs parity (#321).
 
 ## PARKED (not open work)
 
@@ -69,21 +68,27 @@ the maintainer approves it before anything is deleted.
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
-- **A pristine-vsavj gate proves which ROM, image, ROM path and MAME it measured** (`tests/lib/pristine_vsavj.sh`, four
-  controls): a new pristine gate sources it after `decrypt_view`.
-- **A sh function has no locals** (`docs/project/gotchas.md`, #323): a library's scratch variable can be its caller's loop
-  variable; prefix them.
-- **A ruled output format is checked by an oracle written from the ruling's words** (`docs/project/gotchas.md`, #244).
-- **A gate whose legs are "every replay with a basis log" goes red the day one is added** (`docs/project/gotchas.md`, #302).
-- **The rule-checker on six freezes and three closures** (runs `2026-10-25-1294` to `2026-10-26-1330`): it found the
-  provenance gap, clocks frozen before a re-rig, 71 rows never shown to the maintainer, eleven moves no answer named, a
-  row check comparing a tool with itself, and a workbook row joined nowhere. The maintainer ruled re-checks only on new
-  evidence for #229's freezes (2026-10-25).
+- **In `sh`, every pooled subshell shares the parent's `$$`** — a scratch file named by it is shared, and two workers
+  finishing together remove each other's (#321; `tests/lib/measures.sh`). Name scratch with `mktemp`, or keep it in a
+  here-document.
+- **A check that counts what is wrong reads "ok" on an empty input** (`docs/project/gotchas.md`, #331): hold a set to its
+  expected members first.
+- **A builtin `printf`/`echo` into `grep -q` can print the shell's write error** when SIGPIPE is ignored
+  (`docs/platform/gotchas.md`, #327).
+- **MAME 0.288's change-notifier teardown crash** is stopped by the committed pin (0 of 30 against 30 of 30 under forced
+  GC; `docs/platform/gotchas.md`, #320).
+- **`git describe --dirty` takes `.git/index.lock` even under `GIT_OPTIONAL_LOCKS=0`** (git 2.43); two control modes
+  running it at once collide (#321; `audit_release_linux_cleanhost`'s head line now lock-free).
+- **The rule-checker on eleven closures and one freeze** (runs `2026-10-27-1334` to `-1351`): it found a scratch pin
+  measured instead of the committed one, a lint whose census used the fix's own regex, "loaded" control runs that had no
+  load, carried tier rows read as executed, and a freeze checked only against its own hash. Each was answered with a
+  new measurement before the closure.
 
-## WHAT CLOSED THIS SITTING (14z-209)
+## WHAT CLOSED THIS SITTING (14z-210)
 
-- **Closed `done`:** #229 (split: #331), #244, #302, #305, #306, #321, #323 — each on its rule-checker run with its
-  closing comment. **Filed:** #328, #329, #330, #331. **#301** found closed by the maintainer, recorded declined.
-- **Ruled** (`DECISIONS_HISTORY.md`, 14z-209 entries): #321 phase 2 (all four speed-ups; parity on the Mac only; #305
-  with #306); #244 "Class + flags"; #229's freezes re-checked only on new evidence; the motion rows and the eleven
-  unnamed moves confirmed; #229 split and closed.
+- **Closed `done`:** #321 (remainder #334), #331, #318, #328, #320, #311, #327, #332 — each on its rule-checker run with
+  its closing comment. **Filed:** #332, #333, #334.
+- **Ruled** (`DECISIONS_HISTORY.md`, 14z-210 entries): #321 reopened with all four avenues; the PILOT write trace for
+  emulator controls; longest first; the merged-legacy queue; #310 "Record and defer"; #332 "File and fix now"; #331's rig
+  and "Enough, integrate"; "Signatures -> DIED"; "Runner sets disk TMPDIR"; #333 "File a ticket"; #320 closes on the 139
+  gates; #328 waits for a clean-clone run; #321 "Close; file the remainder".

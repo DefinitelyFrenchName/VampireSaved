@@ -1,0 +1,20 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent210/closures/final/c320.md	b595b7197ef9fe93eb2f4c5bd5bff07bcd86067e
+build/agent210/closures/issues/320.md	26db86ffd3f1ae50d5f979b0e09e4120514b9b8a
+DECISIONS_HISTORY.md.lines-8498-8507 (lines 8498-8507 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-27 (14z-210) — #320 closes on the two gates that test for 139; #328 waits for a cle")	8b10d901881ebf5089bccf75e2d3cae44c6a1668
+docs/platform/gotchas.md.lines-3477-3495 (lines 3477-3495 of docs/platform/gotchas.md)	6da27b91284e07f800970cd506e579d5b4e3cafc
+docs/platform/gotchas.md.lines-430-438 (lines 430-438 of docs/platform/gotchas.md)	bdf5a2d99a7e423f2a5ccb39cc7243eb35896faa
+build/agent210/t320/crash_stacks_batch1.txt	7fd89202f30b75dce8a8972b28740b6413c1adc6
+build/agent210/closures/final/e320_check.txt	aa3f424889ba6d5179b3db798dd114525f3c66b5
+build/agent210/closures/final/e320.sh	55fc63f1ac2a44ed06f13ecb3bfb92f325e1e7ad
+build/agent210/closures/final/e320_teardown.txt	f15f71ee2d4a6478e9855518998b403f5dff76d9
+build/agent210/closures/final/e320_teardown.sh	a75a2d0b0028c859e60195f1d74a8dfc292c66f8
+build/agent210/t320/lua/tap_writes_v.lua	42bb05e0da370edd0ea895f48c20cdbf38092c8a
+build/agent210/t320/batch.sh	c049a81c841cfa22422d95d960b48d73bd9ccd85
+build/agent210/t320/leg.sh	9ad4cb850459006dbf824b9dd1ac34f4ab9e76fa
+build/agent210/t320/apply_pin.py	c39ac2c22949720f29d5c0e9d8542b5f73ee63da
+tests/audit_vanilla_specials_a.sh.lines-222-238 (lines 222-238 of tests/audit_vanilla_specials_a.sh)	137a3c7e4c3912413f68bc67d1fea7565d46d0e6
+tests/audit_vanilla_pursuits.sh.lines-266-275 (lines 266-275 of tests/audit_vanilla_pursuits.sh)	bed2442443f5f21f0673bfedc8ed0f75d48d9d8b
+build/agent210/book/emu/results.tsv	003285f469c7b18d595cb6545c234a3f5c898b35
+build/agent210/book/run_emu.sh	b3f573b746d09f1be6071a88aa71ada60126132e
+build/agent210/book/lua_changed.txt	301ada846e40012294a9039ccdeda77d9e6d7b91

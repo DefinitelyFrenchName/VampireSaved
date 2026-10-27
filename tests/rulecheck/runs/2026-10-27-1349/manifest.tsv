@@ -1,0 +1,23 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent210/closures/final/c327.md	adb6ee8d8721f755c62de3cfb4c221939bec12b8
+build/agent210/closures/issues/327.md	8187e272a1129ada4722008cf301a43cc0f846cc
+build/agent210/closures/final/e327.sh	fabcd21b3abaadd8ca68151d10a4939d9cb36087
+build/agent210/closures/final/e327_check.txt	b9c7be716cf360df9c0f2061904efed3660db97e
+tests/test_static_runner.sh.lines-1218-1255 (lines 1218-1255 of tests/test_static_runner.sh)	a49bb560d6b746e858817af845ed49fcdf3394b7
+tests/controls_concurrent.txt.lines-116-116 (lines 116-116 of tests/controls_concurrent.txt)	9cf8504597aa2f504cf069145e34bfd818c18486
+build/agent210/t327/files.txt	a5f88a638a0f9446d1037b1fd25547a4cfee9d02
+build/agent210/t327/apply.log	f4f598829b781105bd9a7e13a42233096cde9fb5
+build/agent209/t327/fix327.py	ecc0cf308c62dcee907964edd85359b707851acf
+build/agent209/t327/before_plain.log	e06984279966026119104dbd8b35c044fbb2a998
+build/agent209/t327/after_plain.log	8fa341fbcc7a3c6a306e3935b76f7ffb10e90477
+build/agent209/t327/before_sigign.log	e06984279966026119104dbd8b35c044fbb2a998
+build/agent209/t327/after_sigign.log	8fa341fbcc7a3c6a306e3935b76f7ffb10e90477
+build/agent209/t327/evidence327.md	5ace389a2858826540339361473216467945949d
+build/agent210/t321p/static_done.tsv	74f771ae4fd84217912ee8930642e67ebccdcd02
+build/agent210/t321p/static_overlap.txt	76274eeb6ffbfbf14caef06dd8aa69650fb5e0f3
+build/agent210/t321p/head.txt	8aceaf4da38a273f1860fa3907c3ae022cab4b01
+build/agent210/tier3/tier_results.controls.tsv.lines-58-58 (lines 58-58 of build/agent210/tier3/tier_results.controls.tsv)	bc0ac3d72c54ed5bd3874c3bc4719b7dd54063bc
+build/agent210/tier4/tier_results.tsv.lines-1-8 (lines 1-8 of build/agent210/tier4/tier_results.tsv)	2e4c236f6474813b24603d13c50d023c3e637cf9
+build/agent210/tier4/tier_results.tsv.lines-26-26 (lines 26-26 of build/agent210/tier4/tier_results.tsv)	8a64259125b1645101d1ea78671862f7b1cbbd73
+build/agent210/tier4/tier_results.tsv.lines-49-49 (lines 49-49 of build/agent210/tier4/tier_results.tsv)	5b02e514dd3583fb225a98d5724ae0ed4a906bd3
+build/agent210/tier4/tier.log.lines-455-460 (lines 455-460 of build/agent210/tier4/tier.log)	3cd52c6c091135dc5bacbce2b684785ae47464b9

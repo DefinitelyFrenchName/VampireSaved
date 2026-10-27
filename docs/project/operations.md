@@ -675,10 +675,14 @@ control claims.
 - **`SUITE_JOBS=N tests/run_suite.sh`**: the suite's MAME runs made N at a time, its output the serial run's line for
   line (`tests/test_suite_jobs.sh`, control `rc-ignored`); `tools/freeze_expectation_set.py` passes
   max(1, min(8, CPUs // --jobs)) unless the caller sets it. Measured on the Mac, donovan-m27, 14z-210: 1,662 s serial,
-  425 s at 4, 290 s at 8, the three outputs byte-identical (`build/agent210/t321suite/`, local).
+  425 s at 4, 290 s at 8, the three outputs byte-identical (`build/agent210/t321suite/`, local); and `--freeze` at 1 job
+  (1,621 s) against 8 (228 s), in a snapshot of `e4aa32ee`, wrote byte-identical expectation sets, 99 files, the 8
+  replays a verify run cannot compare included (`build/agent210/t321sf/`, local).
 - **`audit_merged_legacy`'s leg (a) queue, `MERGED_JOBS`** (ruled 2026-10-26, *"merged_legacy queue (Recommended)"*):
   default min(6, CPUs/4), `test_mame_wide`'s rule. On the Mac 713 s serial against 432 s at 3, the output the same once
-  durations are normalised away (`build/agent210/book/mq/`, local).
+  durations are normalised away (`build/agent210/book/mq/`, local); on ERIS, in the freeze tier, 1,832 s at `688edef8`
+  (serial) against 971 s at `86d1ca10` (the default), PASS both (`build/agent210/t321k/results_tier.tsv`,
+  `build/agent210/t321e2/freeze_results.tsv`).
 - **`RUN_JOBS`, never `JOBS`**, in both runners: a gate reads `JOBS` for its own legs, so an exported `JOBS` used to reach
   every gate as the runner's `--jobs` (`test_emulator_runner` section 20, `test_static_runner` section 34, controls
   `jobs-leak`).
@@ -704,9 +708,17 @@ control claims.
   thirds and 0.074 over the serial prereq lane (565 s), so a gate's internal jobs raised inside the pool mostly add
   contention; alone, `audit_tripwire_reach` 196 -> 110 s at 6, the six on-demand #229 gates 35-63% faster at 8,
   `tools/freeze_masked_basis.sh` 321 -> 81 s at 8 with every masked-v3 `.sha1` the same — measured and NOT taken (ruled).
+  Three defaults WERE raised, in 14z-209 and each host-derived and capped (the gates' headers carry the rulings and the
+  ERIS figures): `audit_guard_corpus` `JOBS` min(8, CPUs/3), `test_mame_parity` `PARITY_JOBS` min(16, CPUs x 2/3) and
+  `test_mame_wide` `WIDE_JOBS`. On the Mac, alone (`build/agent210/t321mac/`), before and after: `audit_guard_corpus`
+  1,906 s at the old 2 against 984 s at its default 4, both 388 runs guard-clean; `test_mame_wide` 1,385 s serial
+  against 490 s at its default 3, the output the same; `test_mame_parity` 342 s at its default 8, PASS, against 1,749 s
+  serial (#321's body) (`build/agent210/t321par/`).
   `test_mame_determinism`'s `JOBS` stays 1 (its sequential and parallel regimes test different hypotheses), and
   `audit_ranking_tenant` / `audit_effect_class_rows` / `audit_merged_legacy` read `JOBS` only under `--freeze-clock`
   (352 -> 353 s, 357 -> 357 s).
+- **`test_mame_parity` on PILOT** (fork P, `build/agent210/t321p/parity/`): 2,067 s at one job against 548 s at its
+  default four, the outputs equal; PARTIAL there by design (PILOT has no reference MAME), so it stays a Mac row.
 - **The six SHARED static gates' controls** (the freeze tier of 14z-208b): at most 60 s per tier
   (`test_emulator_staleness`, 10 controls, the longest 8 s); `test_close_tools` is on-demand. Not worth private copies.
 - **The release shape across hosts** (ERIS at `86d1ca10`, fork E2, `build/agent210/t321e2/SUMMARY.md`): `--scope all

@@ -1,0 +1,28 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent210/closures/final/c332.md	90499f303edb201511387567104a874ac2f97409
+build/agent210/closures/issues/332.md	6141a300956c3f78ee70ff25f26809a4a74b53d0
+tests/audit_guard_cancels.sh.lines-20-28 (lines 20-28 of tests/audit_guard_cancels.sh)	dbf4cfaebc5db208acd6f4897f2f052c080f5db6
+tests/audit_guard_cancels.sh.lines-51-55 (lines 51-55 of tests/audit_guard_cancels.sh)	d0644f53ff98f1341d37194dff6925c816294c51
+tests/audit_guard_cancels.sh.lines-72-76 (lines 72-76 of tests/audit_guard_cancels.sh)	81252e920cd2f06562971df24498e0050aa94da2
+tests/audit_guard_cancels.sh.lines-94-98 (lines 94-98 of tests/audit_guard_cancels.sh)	bd93c2843e3a615142bf356324313435a308ed9c
+tests/audit_guard_cancels.sh.lines-257-268 (lines 257-268 of tests/audit_guard_cancels.sh)	f808e45387c99a6d0dee98d616de9d89ae1ebd43
+tests/audit_guard_cancels.sh.lines-302-311 (lines 302-311 of tests/audit_guard_cancels.sh)	82e07a8577dce6fd51431a8ae0d333aab31069ed
+tests/audit_guard_cancels.sh.lines-335-355 (lines 335-355 of tests/audit_guard_cancels.sh)	aa9adc36f1b5b0081830a2277453047a167be100
+build/agent210/closures/final/e332_diff.txt	7812a988f1ab49a3295204f5ec8f17dcb08ec337
+tests/lib/classify.sh.lines-120-131 (lines 120-131 of tests/lib/classify.sh)	3b3483335a9f41e08baffd4c4911bcb0f62cc5da
+tests/lib/classify.sh.lines-158-166 (lines 158-166 of tests/lib/classify.sh)	ff14b79876c1d2b98cf581c3f6e7742065a0c5b8
+build/agent210/t321k/gc_diag.log	d218c61807e709c3ddcb5a2685cd93febae2c185
+build/agent210/t332m/node-shift_no_table.log	07b36df013f1371c94e8ff0f066178b3acad2df6
+build/agent210/t332m/node-shift_no_table.rc	3b9c0653f92432c5ef69e459561e2403eed36ceb
+build/agent210/closures/final/e332_classify.sh	4ae08b6f4b92fefd44abe368bd2c22084835d51f
+build/agent210/closures/final/e332_classify.txt	80a07ff4e8b48c90ae711650fd557dd597239e7e
+build/agent210/book/verify2/results.tsv	96e47a42f676608ebffda6a025f31f38ecb54573
+build/agent210/book/run_verify2.sh	d76249c5770c081c3eb32d1a26e57e6e7dfc16d8
+build/agent210/book/verify2/audit_guard_cancels@plain.log	950bf82fa33705fea56fb81badead169b4b2569a
+build/agent210/book/verify2/audit_guard_cancels@node-shift.log	f66a7de3cba28eca9ee5c14616270c3480107615
+build/agent210/book/verify2/audit_guard_cancels@table-absent.log	5c5ea6809e8f3b01046f3aeb4bbf966a4f68593a
+build/agent210/t331f/plain.log	6bd4016c31ac63760d3b437efac92f6efe5ce392
+build/agent210/t331f/modes.out	212252e73204bc02cac71c7a3ce21821f0d38f31
+build/agent210/t331f/verify.sh	44f954aeafcba9c4a5fb4ac8929b8daea4212977
+build/agent210/t331f/mode_table-absent.log	a66b013b512da37f033d602a15fae5d021e2ec40
+build/agent210/t331f/mode_node-shift.log	ec269d331627a2c01f1038494e6d49e398fe4a91

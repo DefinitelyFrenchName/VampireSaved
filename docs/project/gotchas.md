@@ -7693,3 +7693,13 @@ added to an address is decoded with the sign the CPU gives it (the walker's word
 that only accepts offsets "past the table" must say what it does with a negative one — here a negative word is an
 entry and plays no part in the bound (`tests/test_anim_signed_offsets.sh`, controls `unsigned-read` and
 `negative-ends-table`).
+
+## A CHECK THAT COUNTS WHAT IS WRONG READS "OK" ON AN EMPTY INPUT — and a run whose every leg failed printed "0 of 120 commit, exactly GC_BUTTONS" as ok (paid: 14z-210, #331)
+
+`tests/audit_guard_cancels.sh`'s identity clause listed the rigs whose verdict was wrong and printed ok when that list
+was empty. A freeze run handed a RELATIVE `OUT` sent every leg into a directory it could not reach from its own working
+directory, every leg failed, the row file came out empty, and the clause printed its ok line over zero rows (the gate
+still failed overall on the legs; nothing was frozen). **The rule:** a clause that judges a set must first hold the set
+to its expected members — here every rig is named MISSING when it has no row (control `rows-absent`) — and a work
+directory a gate hands to subshells that change directory is made absolute, with an empty value refused first (an
+empty `W` resolved by `cd` is the current directory, which the gate's EXIT trap would then remove).

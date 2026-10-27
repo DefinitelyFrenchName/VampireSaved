@@ -38,93 +38,51 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
-## Session 14z-210 — **#321 reopened and finished: the remaining knobs, controls, freeze/close tools, cross-host measurement; low tickets on the side.**
+## Session 14z-210 — **#321 finished (concurrent emulator controls, longest first, SUITE_JOBS, the merged-legacy queue, disk TMPDIR; three runner verdict holes closed), its remainder #334; #331 (Demitri on P1 in the guard cancels, re-frozen); #318, #328, #320, #311, #327, #332 closed; #333 filed.**
 
 ### opened with
 The 14z-209 close's opener; the sweep CLEAN, `main` = `origin/main` at `688edef8`. The maintainer: *"Focus on finishing
 #321, low open tickets on the side. Ask me any question."* Ruled (`DECISIONS_HISTORY.md` "Ruled 2026-10-26 (14z-210) —
 #321 reopened"): #321 reopened (its "Done when" was not met at the 14z-209 closure), all four remaining avenues in scope;
-side tickets #328, #310, #327, #318, #320, #311.
+side tickets #328, #310, #327, #318, #320, #311. Working notes and every evidence path: `build/agent210/STATUS.md` (local).
 
-### (in progress) #321 AND THE SIDE TICKETS — committed `86d1ca10` (local, not pushed), strict static tier GREEN
-Working notes, open items and every evidence path: `build/agent210/STATUS.md` (local). Rulings this sitting:
-`DECISIONS_HISTORY.md` 14z-210 entries (#321 reopened; PILOT write trace + controls first + longest first; #310
-"Record and defer"; #321 avenue 1 "merged_legacy queue"; #332 "File and fix now").
+### (1) #321 — THE AVENUES MEASURED OR RULED OUT; CLOSED, ITS SURVEY GAPS #334
+`86d1ca10`: concurrent emulator controls from a PILOT write trace (`tests/controls_concurrent_emu.txt`, 60 of 61; ruled
+*"Write trace on PILOT …"*), `--order` longest first, `SUITE_JOBS`, the `MERGED_JOBS` queue, `RUN_JOBS` in both runners,
+private paths in the five SHARED gates. `e4aa32ee`, from ERIS's release-shape run (fork E2, `build/agent210/t321e2/`):
+concurrent controls filled ERIS's 24 GB tmpfs `/tmp` and 28 control modes read HONOURED in 0-1 s — ruled *"Signatures ->
+DIED"* (`tests/lib/classify.sh` `VS_ENV_ERR`) and *"Runner sets disk TMPDIR"* (`build/tmp/`, a free-space refusal); on
+PILOT a pooled lane of three printed GREEN on PASS 1 — `tests/lib/measures.sh` named its scratch file by `$$`, shared by
+every pooled subshell; fixed, and LOST-ROWS makes a selected gate with no row a FAIL (`test_emulator_runner` sections 14k,
+21, 22; controls `env-honoured`, `tmp-ignored`, `lost-unread`). ERIS's release shape with TMPDIR on disk: 7,947 s against
+14z-208b's 12,575 s, all 421 verdicts equal. Figures in `docs/project/operations.md`. Closed on its rule-checker run;
+ruled *"Close; file the remainder"* — #334 (the knobs on PILOT and under load; the knob-less gates' survey).
 
-## Session 14z-209 — **#229 closed done: the six vsavj family gates frozen and registered, every family classified; #321 phase 2 (with #305, #306, #323) and #244 done; #302 done; #327's fix applied; #328-#330 filed.**
+### (2) #331 — DEMITRI ON P1 JOINS THE GUARD CANCELS; CLOSED
+Ruled *"new emulator rig"*; the 18-tile pages showed the game's guard-cancel banner, the maintainer: *"Enough, integrate"*.
+`tests/audit_guard_cancels.sh` runs 15 characters, 291 events; re-frozen through rule-checker run `2026-10-27-1334`
+(resolved): the table +20 lines, the clocks +32 rows, none changed. The gate's identity clause read "ok" on an empty row
+set — now every rig without a row is MISSING (control `rows-absent`; project gotcha appended). The cross-check page
+regenerated. Closed on run `2026-10-27-1350` (resolved).
 
-### opened with
-Transcript `ebf842b3`. The 14z-208c close's opener (`docs/NEXT_SESSION_HISTORY.md`); the sweep CLEAN, `main` = `origin/main` at `2aacebe8`. The
-maintainer: *"do the one-line fix to the header of tests/replays/118_chain.rpl … The let's finish #229 and so #321 (maybe
-some low severity tickets can be done in parallel on PILOT or ERIS?)"*. Parallel tickets ruled: #302 and #306 on PILOT,
-#327 and #244 on the Mac; #305 and #323 folded into #321 (`DECISIONS_HISTORY.md` 14z-209 entries).
+### (3) THE SIDE TICKETS — #318, #328, #320, #311, #327, #332 CLOSED; #310 DEFERRED; #333 FILED
+Each closed on GitHub with its comment, on its own rule-checker run: #328 (`1346`, OK; a clean clone of `e4aa32ee` on
+ERIS built both builds and passed both gates, ruled *"Clean-clone run on ERIS"*), #332 (`1348`, OK), #320 (`1340`,
+resolved: the COMMITTED pin under forced GC 0 of 30 crashes against 30 of 30 without it, `build/agent210/t320c/`; ruled
+*"Close: the 2 are the 139 gates"*), #327 (`1349`, resolved: an independent census, `build/agent210/t327w/`; platform
+gotcha appended), #318 (`1347`, resolved: all 25 emulator and 8 static readers of `tools/anim_nodes.py` PASS after the
+change), #311 (`1345`, resolved: #299's loaded leg rerun and both modes beside 12 busy loops). #310: its census recorded
+on the ticket and the work deferred (ruled *"Record and defer"*); the UNJUDGED class kept and written into
+`docs/project/must_fire_contract.md`. #333 filed (ruled *"File a ticket"*): 106 unguarded `mktemp -d` sites.
 
-### (1) THE 118_chain HEADER (NEXT_SESSION item 3)
-`tests/replays/118_chain.rpl` line 2 names `tests/audit_mizuumi_attack.sh` (#118), not a leg of
-`audit_mizuumi_inputs`, which the gate never ran.
-
-### (2) #229 — THE SIX FAMILY GATES FROZEN, REGISTERED AND CLASSIFIED; #229 CLOSED DONE
-- **Provenance** (rule-checker run `2026-10-25-1294`, "no control fires if the analysed image or the romset is not
-  pristine vsavj"): `tests/lib/pristine_vsavj.sh` (new) — ROMDIR audited, the vsavj fingerprint = the registry row, the
-  analysed image = the data view decrypted afresh, `MAME_ROMPATH` unset or ROMDIR, the MAME the legs run named by
-  `vs_mame_ident`; four controls (foreign-image, -romset, -rompath, -mame) in every gate, in-gate and as modes.
-- **The six gates** (`tests/audit_{vanilla_specials_a,vanilla_specials_b,es_ex,command_throws,guard_cancels,vanilla_pursuits}.sh`,
-  their expectations, rigs and tools) registered `ondemand` in the MAME lane (`tests/ci_emulator.tsv`), `gate_index.tsv`,
-  `PROVENANCE.md`, `operations.md`; FOLLOWS completed where the follows census caught three (`build/agent209/book/`).
-  Each freeze through the rule-checker (23 runs, `build/agent209/closing/229_freeze_runs.txt`); the maintainer ruled
-  *"Re-check only new evidence (Recommended)"* for these freezes. The six plain runs on the tree as committed: all PASS,
-  0 dead controls (`build/agent209/t229/v10/`); every mode exits 1; stock and WIDE MAME both PASS.
-- **Found and fixed on the way:** stale "and air throws" header wording (gate, map, `SIG_HEADER`); a dangling header line
-  in guard cancels; the command-throw clocks frozen before the 15:50 re-rig — re-frozen on today's rigs, 111 rows
-  identical (`build/agent209/t229/v9/`); the 71 motion-test rows never shown — drawn at 9 tiles
-  (`build/agent209/t229/capM/out/sheets/`), the maintainer: *"Freeze them as they are"*; eleven moves no answer named —
-  the maintainer: *"They are right …"* (`DECISIONS_HISTORY.md` "Read 2026-10-26 (14z-209)" entries).
-- **Classified:** fork D's `tools/crosscheck_229.py` + `tests/test_crosscheck_229.sh`; `docs/project/tables/community_crosscheck.md`
-  sections per family. Run `2026-10-26-1330` found three gaps (Demitri's ES Demon Cradle GC joined nowhere; no page
-  section for the specials FE..JE, Jedah's cells all uncomparable; two stale lines the page generator prints); the
-  maintainer: *"Split and close"* — they are #331, and #229 is **closed done** on the run's written resolution. Follow-ups
-  #329 (minimal half-circle inputs) and #330 (throws' recovery and throw tech).
-
-### (3) #321 PHASE 2, WITH #305, #306 AND #323 — DONE
-Fork A measured (`build/agent209/t321/`): the 14z-208b freeze tier 8,784 s, 45% at one job. Rule-checker runs
-`2026-10-25-1316`..`-1318`; -1318 found that fixing #323 makes every ERIS freeze tier STOP at parity's PARTIAL. Ruled
-(`DECISIONS_HISTORY.md` "Ruled 2026-10-26 (14z-209) — #321 phase 2"): all four speed-ups, *"Parity only on the Mac
-(Recommended)"*, #305 *"Yes, with #306 (Recommended)"*. Fork E built it (`build/agent209/t321e/`, its report saved
-verbatim as `REPORT_handback.md`): the ERIS tier 4,364 s in one pass, 181 of 181 shared verdicts equal; parity at 8 jobs
-on the Mac, 121 lines identical; `--skip`; `decrypt_cache_warm`; the lane variable `_lane_pool`. Closed on run
-`2026-10-26-1328` (with #244); #306's leftovers are #328.
-
-### (4) #244 — THE POWER CLASS ON THE CHARMAP PAGES — DONE
-Ruled *"Class + flags (Recommended)"*. Runs `2026-10-26-1320`..`-1323` found the html dropping the raw byte, bit 6 named,
-and a row check comparing the tool with itself; the cells now follow the ruling's words, checked by an oracle written
-from them (`build/agent209/t244/v3`, `v4`); tables, pages and `charmap_pages.sha256` regenerated. Gotcha appended.
-
-### (5) #302 — DONE
-`tests/expected/marionette_cost.tsv` re-frozen with the eight 118_* replays (run `2026-10-25-1297`, OK, closure included).
-
-### (6) #327 — FIX APPLIED, TICKET STAYS OPEN (progress comment posted)
-Fork C's `fix327.diff` (every builtin-fed `grep -q` in `tests/test_static_runner.sh` made `grep >/dev/null`, sections 32/33)
-applied over phase 2; the combined script re-traced on PILOT. The 14z-208c red was not reproduced at gate scale, and 183
-sites of the same form remain in 50 other files (`build/agent209/t327/census_code.txt`), so #327 stays open.
-
-### (7) TICKETS AT THE CLOSE
-Closed done, each with its comment, on its rule-checker run: #229 (`2026-10-26-1330`), #244, #305, #306, #321, #323
-(`2026-10-26-1328`), #302 (`2026-10-25-1297`). Filed: #328 (two stale build defaults, from #306), #329, #330, #331
-(from #229). #301 found closed by the maintainer on 2026-10-25 (*"No request from the community … Let's reopen a ticket
-when the time is right."*), recorded declined. `tools/tickets.py refresh` saved GitHub's state.
-
-
-### CLOSE (14z-209, 2026-10-26)
-Driver `build/agent209/close/` (`--prev build/agent208/close208c/tier_results.tsv`, the 14z-208c close's run of record).
-Before it, each ticket closed on GitHub with its comment, on its rule-checker run: #229 (`2026-10-26-1330`, split to #331 on
-the maintainer's *"Split and close"*), #244, #305, #306, #321 and #323 (`2026-10-26-1328`), #302 (`2026-10-25-1297`); #328 to
-#331 filed; #327 a progress comment; #301 found closed by the maintainer; the snapshot refreshed (`tools/tickets.py refresh`).
-Steps: sections ((1)..(7)); next-session (the 14z-208c opener to `docs/NEXT_SESSION_HISTORY.md`); rollover (the 14z-208c group,
-142 lines, to `STATE_HISTORY.md` with its ledger line); indexes (the archives', the ticket page, the gotchas index;
-regenerated with the gate index, coverage, descriptions, follows and must-fire censuses, where their gates PASS);
-dashboard (14z-163..14z-209, 1,982 figures, 0 unclassed; datasets versions 18, 18, 19, 18) — done. The tier's results:
-`build/agent209/close/tier_results.tsv`, the next close's `--prev`. `tests/controls_concurrent.txt`'s `test_static_runner`
-row re-traced on PILOT for the combined script (#321 phase 2 and #327).
+### CLOSE (14z-210, 2026-10-27)
+Driver `build/agent210/close/` (`--prev build/agent210/tier4/tier_results.tsv`, the tier of record for `e4aa32ee`). Before it,
+each ticket closed on GitHub with its comment, on its own rule-checker run: #328 (`2026-10-27-1346`), #332 (`-1348`), #320
+(`-1340`), #327 (`-1349`), #318 (`-1347`), #311 (`-1345`), #331 (`-1350`), #321 (`-1351`); #333 and #334 filed; `origin/main`
+fetched before staging (nothing new). Steps: sections ((1)..(3)); next-session (the 14z-209 opener to
+`docs/NEXT_SESSION_HISTORY.md`); rollover (the 14z-209 group, 75 lines, to `STATE_HISTORY.md` with its ledger line); indexes (the archives', the ticket page,
+the gotchas index); dashboard (14z-163..14z-210, 2,029 figures, 0 unclassed; datasets versions 19, 19, 20, 19) — done. The
+tier's results: `build/agent210/close/tier_results.tsv`, the next close's `--prev`.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings

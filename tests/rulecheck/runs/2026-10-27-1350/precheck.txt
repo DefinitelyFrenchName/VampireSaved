@@ -1,0 +1,3 @@
+  FLAG D-ABSOLUTE: - Against the workbook's DE 27-30: startup +1, active +1, recovery +2 on all four (constant offsets), red, white and gauge exact.  [build/agent210/closures/final/c331.md]
+  FLAG D-ABSOLUTE: It says why Jedah has no row: every Jedah cell is UNCOMPARABLE as a column verdict.  [build/agent210/closures/final/c331.md]
+packet_check: 2 flag(s): D-ABSOLUTE 2

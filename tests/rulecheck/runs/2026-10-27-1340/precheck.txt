@@ -1,0 +1,4 @@
+  FLAG D-ABSOLUTE: Two gates do, and both name this ticket and require each leg's full output.  [build/agent210/closures/final/c320.md]
+  FLAG D-ABSOLUTE: - **The other gates that mention a MAME teardown segfault** ignore MAME's exit code and judge each leg by its own output (END line, FIELDSUMMARY, dumps or tr...  [build/agent210/closures/final/c320.md]
+  FLAG D-ABSOLUTE: - **Gates:** all 61 emulator gates touched this session PASS on the Mac.  [build/agent210/closures/final/c320.md]
+packet_check: 3 flag(s): D-ABSOLUTE 3

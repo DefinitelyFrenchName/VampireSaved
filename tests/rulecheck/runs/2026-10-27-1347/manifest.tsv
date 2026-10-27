@@ -1,0 +1,36 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent210/closures/final/c318.md	25a6e612b8c98463d3f809a825256167485d3365
+build/agent210/closures/issues/318.md	f2b0e57ff3bf6eeaa7cc6cf348bad0cc1235fab2
+tools/anim_nodes.py.lines-60-82 (lines 60-82 of tools/anim_nodes.py)	737e74e1adadc330c2cb496e11074fa9b7b9cb02
+build/agent210/rc318/equiv.out	c8498255a5c9fcad18b0149490634bd9764dea51
+build/agent210/t318/equiv.py	a8e961438f5e6766bb88f3954af1ee106be1fca3
+tests/rulecheck/ledger.tsv.lines-1198-1198 (lines 1198-1198 of tests/rulecheck/ledger.tsv)	137c7e4818de5b18c6d759c2b0d5714c335394fd
+build/agent210/t318/census_vsavj.txt.lines-445-470 (lines 445-470 of build/agent210/t318/census_vsavj.txt)	0a4dfe51dff71bcb3a27b55ba133b05f98fa47ab
+build/agent210/rc318/expectations.diff	2a91cc7f536ae106d1d9f26eee8668d443991b51
+build/agent210/t318/explain_sdp2.txt	031d91bfba3f6851a5dbfd52748bb1da24bbf9d6
+build/agent210/t318/explain_rc_vsavj.txt	76ab2429687bef995266792535809a267d8cc096
+build/agent210/t318/explain_rc_vsav2.txt	7bd814a39a721886f54e5d5156ee0cd430002751
+build/agent210/tier4/tier.log.lines-1-6 (lines 1-6 of build/agent210/tier4/tier.log)	2636f232b2a15c20efeb2249cc5d16fb35124523
+build/agent210/tier4/tier.log.lines-455-460 (lines 455-460 of build/agent210/tier4/tier.log)	3cd52c6c091135dc5bacbce2b684785ae47464b9
+build/agent210/tier4/tier_results.tsv.lines-131-131 (lines 131-131 of build/agent210/tier4/tier_results.tsv)	fcdef680c079ab430510db72e32f6ecc5bfd1e38
+build/agent210/t318od/rc.txt	8ab40c19bf18f2835c6e09fb409988c5373abc69
+build/agent210/t318od/gates.txt	81c337aa59b042bd2e40a62e965bee62be0d7e4d
+build/agent210/t318od/one.sh	04329e1944176661dbfe97fc4ee23d3a269df3ae
+build/agent210/t318od/audit_ground_throws/commit.txt	eba29dff42ff2fc7ccda9094d9eba79288e5cb22
+build/agent210/t318od/test_vanilla_frame_join/test_vanilla_frame_join.log	22ba79b5350725e8d20f77089586a40332dac9a1
+build/agent210/t318od/test_meter_gain/test_meter_gain.log	497b15fe787c88fc93b24d84cca203c27414b703
+build/agent210/closures/final/e318_readers.py	e066cd60ffab13cfaad875fd9808b8e5d4a74e5a
+build/agent210/closures/final/e318_readers.txt	052dd9947cdc8a14a5a94c7055777aee203f2f30
+tests/test_anim_signed_offsets.sh.lines-19-23 (lines 19-23 of tests/test_anim_signed_offsets.sh)	e3ab31d84c5ada38ea39ffa2b8bfc3369fb23278
+build/agent210/rc318/verify_test_anim_signed_offsets.log	984aefee3de5c4e4ab2acbcc5a090d5fa70d8536
+build/agent210/t318od/audit_vanilla_pursuits.out	be92e60d6b0d986c9fcd03d9b67e309bf699cb7e
+build/agent210/t318od/audit_vanilla_specials_a.out	7814c1fb05403a367db635672c26e6993de9bf5b
+build/agent210/t318od/audit_vanilla_specials_b.out	8cf3ae83c8670643f2e9ec9b6a7b94cc6dee347e
+build/agent210/t318od/audit_es_ex.out	57ffc8847aabb2da141276b98163cb688f4d6b4c
+build/agent210/t318od/audit_command_throws.out	e4cb423324a4e4515a7dcf375db732862839ce37
+build/agent210/t318od/audit_demitri_split.out	f853362ce748b5f6d2c3b2df3adca24086305468
+build/agent210/t318od/test_vanilla_aerial_join.out	d2c07ca871a587f8890872ff194f35b984a1ef46
+build/agent210/t318od/test_vanilla_command_join.out	18421f8395a73a2c8e4c3328cdb2b340fa8bdd6f
+build/agent210/t318od/test_vanilla_frame_join.out	c7f2ecdaf618e9c0b49a53418392bc77a4e0c6b7
+build/agent210/t318od/test_meter_gain.out	01de436b30cba8635b2819973e8dd511d013113e
+build/agent210/t318od/audit_ground_throws.out	2f8d9586d8fb318ccb93fe7de82f55ce66d6979d

@@ -22,7 +22,9 @@
 #   P1's +0x1C mapped onto tables a2/a/b/c with SIGNED offsets (tools/gc_rigs.walk_signed). The table of the 291 events
 #   (identity, chains, startup / active runs / recovery in ticks, every attack run's records with their power CLASS,
 #   the stock cost, the GC's first dealt fall on Demitri and on the dealt victim, the whiff's meter gain) is hashed; the values stay out of the tree
-#   (FRAMEDATA_OUT, default ../charpages/framedata/guard_cancels.tsv).
+#   (FRAMEDATA_OUT, default ../charpages/framedata/guard_cancels.tsv). A host without that table makes it with FREEZE=1
+#   (after the rule-checker, as any freeze) or copies it from a host whose table hashes as tests/expected/
+#   guard_cancels.sha256; without it the node-shift judgement says NOT JUDGED, never "0 lines differ" (#332).
 # HOW: tools/gc_rigs.py gen2 builds 291 one-event rigs (one event per rig: a GC that hits can leave the next event's
 #   fighters crossed). Every leg counts EMULATED frames (#228 option A): a TRACE leg per rig (tests/lua/trace_writes.lua,
 #   -debug: watchpoints on P1's +0x1C, +0x20 and +0x3B4 from 40 frames before the event, SAMPLE of +0x1C) and a NOSTOP

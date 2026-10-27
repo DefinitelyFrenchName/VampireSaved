@@ -1,0 +1,33 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent210/closures/final/c328.md	30df64bdc44a9820b08c5f99a604ad922add49dc
+build/agent210/closures/issues/328.md	1758f677c19f36b8755c5ffc56908431697a6a12
+DECISIONS_HISTORY.md.lines-8498-8507 (lines 8498-8507 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-27 (14z-210) — #320 closes on the two gates that test for 139; #328 waits for a cle")	8b10d901881ebf5089bccf75e2d3cae44c6a1668
+tests/ci_emulator.tsv.lines-162-162 (lines 162-162 of tests/ci_emulator.tsv)	9c1bee3fc696488e6ac436ed59611c5266ef53cf
+tests/ci_emulator.tsv.lines-273-273 (lines 273-273 of tests/ci_emulator.tsv)	0a426d65733edabcfe47adf0395c8cd5e2d156da
+tests/run_all_emulator.sh.lines-220-231 (lines 220-231 of tests/run_all_emulator.sh)	8bc7bf0b0897db3c0747144ae6bbb347683ebc3a
+tests/expected/registry.tsv.lines-186-187 (lines 186-187 of tests/expected/registry.tsv)	0ebecf210e7e83d0bfea4f030b63ad6815b23424
+tests/audit_trap_sound.sh.lines-36-66 (lines 36-66 of tests/audit_trap_sound.sh)	e7bc83f726c761bb1e1b82c63856050937d90c6d
+tests/test_shim_charid.sh.lines-50-91 (lines 50-91 of tests/test_shim_charid.sh)	8f685392255018387c9290a901c3e58fb1334eda
+HANDOFF.md.lines-14-18 (lines 14-18 of HANDOFF.md)	e8ad0bcb4177804d207a96f92dc7e1bf32e1e255
+HANDOFF.md.lines-144-150 (lines 144-150 of HANDOFF.md)	7045e60a0b865504d9f4edf8941a41e98dbcbb9e
+HANDOFF.md.lines-170-184 (lines 170-184 of HANDOFF.md)	0a188454bda3a7ec8758c092bbc1ceaa7c18c19f
+build/agent210/t328c/clone.sh	a3742c8ec5c407b1775902b3957380d13d2db4c4
+build/agent210/t328c/clone_state.txt	e9521ea39f99180a213c522a5938a7f03dbc56d2
+build/agent210/t328c/build.sh	c94a933cea1218ed1d9825b0149989e004fcfba7
+build/agent210/t328c/build_summary.txt	3e5472c610079fa0a89179a99395b2e254e0df08
+build/agent210/t328c/audit_roms.log	a773f5f380a5482cbaa53b7734da07c7a3221965
+build/agent210/t328c/gates.sh	041c2fcac64118f75e6f1e722589285fe1c3ecdf
+build/agent210/t328c/gates_summary.txt	f6ca145ba3be7d300cf83bdafb5aac1aace7a46b
+build/agent210/t328c/runner_audit_trap_sound.out	98cacb2ec4506cdff58ac79840f18342e5dd12a7
+build/agent210/t328c/runner_test_shim_charid.out	3e3b37f6470e16d5c769d278e404ebbaeb74a952
+build/agent210/t328c/c328_trap/build/c328_trap/results.tsv	c0475fde56cc24a9d9f660cec9b1f5566dee29d9
+build/agent210/t328c/c328_trap/build/c328_trap/commit.txt	2d32ecc8bda0454e776b6b81944ef2f0aaf2ffff
+build/agent210/t328c/c328_shim/build/c328_shim/results.tsv	85f0c1b1317ce2689562fbaf9f8d6c12e07721c1
+build/agent210/t328c/c328_shim/build/c328_shim/commit.txt	2d32ecc8bda0454e776b6b81944ef2f0aaf2ffff
+build/agent210/t328c/c328_shim/build/c328_shim/test_shim_charid.log	a6002f523b1e2d1421f6f43e21fcc028ccf8a111
+build/agent210/t328/summary.txt	d98db003067646da191ca32b2502d2cc44d84579
+build/agent210/t328/run.sh	521b33c7ac2bccb3f63652af345168543a7ea376
+build/agent210/t328/shim_don_m27.log	cdb1f48c33660ebb3d137443ddbf2ea5e779f273
+build/agent210/t328/shim_m5_wide.log	1cee459c3afee302ed4dee0a520a5609785b1ca2
+build/agent210/t328/trap_hui61.log	ae6040c347ecb7522616dd01d5af9e79c2468637
+tests/expected/instr_gameclock/test_shim_charid.tsv	088d574e31cb18b2f736c0110aafc0eadd5f434d

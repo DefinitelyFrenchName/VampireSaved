@@ -1,0 +1,5 @@
+  FLAG D-ABSOLUTE: Each avenue, measured or ruled out:**  [build/agent210/closures/final/c321.md]
+  FLAG D-ABSOLUTE: - **Avenue 1, the job knobs:** four defaults were raised, each host-derived and capped (item 2).  [build/agent210/closures/final/c321.md]
+  FLAG D-ABSOLUTE: The close tools' steps take seconds and were left alone.  [build/agent210/closures/final/c321.md]
+  FLAG D-ABSOLUTE: The gate defaults changed, each host-derived and capped (before against after):**  [build/agent210/closures/final/c321.md]
+packet_check: 4 flag(s): D-ABSOLUTE 4

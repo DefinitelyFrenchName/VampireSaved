@@ -1,0 +1,52 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: close #311 as done (14z-210): the browser gate on a wall-clock DevTools pipe; #299's loaded leg rerun
+Claim (the working agent's sentence): CLAIM: close #311 as done with the comment build/agent210/closures/final/c311.md (fixed in commit 86d1ca10; the snap-directory change in e4aa32ee). The ticket (build/agent210/closures/issues/311.md) has no "Done when" line; its "To do" list is taken as the done-when, item by item: "Measure what the driver is waiting on when a run stalls, loaded and unloaded." / "Make the gate's browser run complete under load without loosening what it judges: for example, a budget tied to the reads it must finish, not to virtual time alone." / "Add a control that fires if an incomplete run is ever read as a page verdict. The gate already refuses that, and `starved-control-leg` covers it in-gate." / "Then rerun the loaded leg."
+1. Measured: build/agent210/closures/final/e311_vt_unloaded.txt and e311_vt_loaded.txt (build/agent210/t311/rig/analyse.py over the kept driver logs build/agent210/t311/s2_unloaded and s2_loaded) give each run's virtual-time jumps and their wall time. Unloaded, 10 of 10 runs complete, and one step jumps virtual time by 102,914 to 1,259,831 ms in 11 to 20 ms of wall time against the 1,800,000 budget; loaded, 8 of 10 runs end done=False: seven with their last log at the page's "reading your files" step, and run 2 one log later, after a jump of 1,799,972 ms in 18 ms from that step. docs/platform/gotchas.md lines 3001-3038 record it as the read the page makes with File.arrayBuffer().
+2. Complete under load without loosening: tests/test_applier_page_browser.sh lines 155-190 drive Chrome over --remote-debugging-pipe with a wall-clock BUDGET; lines 256-275 keep the DONE=1 rule and the one retry. build/agent210/closures/final/e311_removed_lines.txt (every line 86d1ca10 removed from the gate and its driver) holds only the virtual-time run, its budget and their comments. Before and after, from build/agent210/t311/{before,after}_{unloaded,loaded}/runs.txt: unloaded 10/10 PASS both times; beside 12 busy loops 2/10 PASS before, 10/10 after with page=first and ctl=first on every run (the 12 pids: final/e311_blob.txt; the loop: t311/batch.sh).
+3. The control: the gate's MUST-FIRE line for `starved-control-leg` (line 46) and its in-gate leg (lines 365-375) read a run starved to a 1 ms wall budget as INCOMPLETE. It FIRED in 20 of the 20 after-runs (e311_blob.txt), and both modes, `broken-page` and `starved-control-leg`, are HONOURED loaded and unloaded (t311/ctl_after_loaded/controls.txt, t311/ctl_after_unloaded/controls.txt, run by t311/controls.sh).
+4. Rerun: the after_loaded leg above is the ticket's own "Reproduce" step rerun ten times. On the committed gate (blob 981256d5, the same at f6ba8f02, e4aa32ee and HEAD: e311_blob.txt), the Mac's static tier build/agent210/tier3 has the gate PASS with both modes HONOURED. On Linux, build/agent210/t321q/browser/results.tsv (by t321q/q_all.sh at f6ba8f02, PILOT, Ubuntu 24.04 per docs/project/build_environments.md line 93) has 5 plain PASS in 17-18 s and both modes HONOURED in 8 s and 10 s. plain_1.log shows the page under /home/koneko/snap/chromium/common, and leftover_before.txt and leftover_after.txt are empty, so no vsav-applier.* directory was left behind.
+5. #299's loaded leg rerun: build/agent210/t311load/summary.txt and out/results.tsv (head e4aa32ee, inside out/inside_head.txt). The same 18 gates ran at --jobs 8 beside 12 busy loops, by build/agent210/t311load/inside_load_h.sh, a copy of build/agent206/t299/load/inside_load.sh. build/agent210/closures/final/e311_inside_load.diff shows they differ only in a header comment and in the log-keeping patch being applied when its anchors are found rather than asserted; outer.log line 20 reads "log-keeping trap patch applied". test_applier_page_browser is PASS in 27 s (out/runner.log line 29; out/logs/test_applier_page_browser.out shows only the starved leg incomplete, as designed). The one FAIL, test_emulator_staleness, is FAIL in build/agent206/t299/load/out/results.tsv too. out/load.log samples the 1-minute load: median 25.94 and max 35.73 over 34 samples, against 14z-206's median 78.64 and max 133.36 over 67 samples (build/agent206/t299/load/summary.txt). The leg ran 07:45:19 to 07:50:29, against 20:14:37 to 20:25:09 in 14z-206.
+
+NOT TESTED: the rerun's load was about a third of 14z-206's (median 25.94 against 78.64), so it is a lighter leg than the one that went red. That the shorter run explains the lower load is an inference, not a measurement, and 14z-206's leg also started at a higher load (27.58 against 7.83 at its start line). The 40 Mac before/after runs and both control runs were made on the working tree before 86d1ca10 (and before e4aa32ee's snap edit), and no artifact ties that copy's blob to the committed one. Which page step a jump belongs to is read from the log line before it: in e311_vt_unloaded.txt three runs' largest jump follows "fetch body" or "dispatch drop", not "reading your files". The unloaded stalls of #299's whole-tier leg were not reproduced, and that the blob-read jump explains them is inferred from the unloaded jump sizes. The rerun is one run; Chrome is the Mac's.
+Artifacts (read every one, in full):
+  - build/agent210/closures/final/c311.md
+  - build/agent210/closures/issues/311.md
+  - build/agent210/closures/final/e311_vt_unloaded.txt
+  - build/agent210/closures/final/e311_vt_loaded.txt
+  - build/agent210/t311/rig/analyse.py
+  - docs/platform/gotchas.md.lines-3001-3038 (lines 3001-3038 of docs/platform/gotchas.md)
+  - tests/test_applier_page_browser.sh.lines-44-47 (lines 44-47 of tests/test_applier_page_browser.sh)
+  - tests/test_applier_page_browser.sh.lines-66-80 (lines 66-80 of tests/test_applier_page_browser.sh)
+  - tests/test_applier_page_browser.sh.lines-155-190 (lines 155-190 of tests/test_applier_page_browser.sh)
+  - tests/test_applier_page_browser.sh.lines-256-275 (lines 256-275 of tests/test_applier_page_browser.sh)
+  - tests/test_applier_page_browser.sh.lines-363-377 (lines 363-377 of tests/test_applier_page_browser.sh)
+  - build/agent210/closures/final/e311_removed_lines.txt
+  - build/agent210/t311/before_unloaded/runs.txt
+  - build/agent210/t311/before_loaded/runs.txt
+  - build/agent210/t311/after_unloaded/runs.txt
+  - build/agent210/t311/after_loaded/runs.txt
+  - build/agent210/t311/batch.sh
+  - build/agent210/t311/controls.sh
+  - build/agent210/t311/ctl_after_loaded/controls.txt
+  - build/agent210/t311/ctl_after_unloaded/controls.txt
+  - build/agent210/closures/final/e311_blob.txt
+  - build/agent210/t321q/browser/results.tsv
+  - build/agent210/t321q/browser/plain_1.log
+  - build/agent210/t321q/browser/leftover_before.txt
+  - build/agent210/t321q/browser/leftover_after.txt
+  - build/agent210/t321q/q_all.sh
+  - docs/project/build_environments.md.lines-93-93 (lines 93-93 of docs/project/build_environments.md)
+  - build/agent210/t311load/summary.txt
+  - build/agent210/t311load/out/results.tsv
+  - build/agent210/t311load/out/inside_head.txt
+  - build/agent210/t311load/inside_load_h.sh
+  - build/agent206/t299/load/inside_load.sh
+  - build/agent210/closures/final/e311_inside_load.diff
+  - build/agent210/t311load/outer.log
+  - build/agent210/t311load/out/runner.log
+  - build/agent210/t311load/out/logs/test_applier_page_browser.out
+  - build/agent210/t311load/out/load.log
+  - build/agent206/t299/load/out/results.tsv
+  - build/agent206/t299/load/summary.txt

@@ -3488,8 +3488,23 @@ Measured on vsavj (`build/agent210/t320/results_batch1.tsv`, `results_batch2.tsv
 interleaved, two at a time): forced GC 30/30 crashed; the same with the calling thread pinned 0/30; notifier only (no tap)
 30/30; tap only (no notifier) 0/30; `tap:remove()` + `notifier:unsubscribe()` before exit 30/30 (unsubscribing leaves the
 delegate in place, and the `remove()` itself fires the notifier on the dead thread). Natural rate: `specials_trace.lua`
-12 of 60, pinned 0 of 30; `tap_writes.lua` 0 of 30 on one rig (14z-205 saw 2 of 13).
+12 of 60, pinned 0 of 30; `tap_writes.lua` 0 of 30 on one rig (14z-205 saw 2 of 13). Those pinned legs used a scratch pin
+(one registry slot set at the script's top); the COMMITTED line was measured after (`build/agent210/t320c/`, local, rule-checker
+run `2026-10-27-1340`): the committed `specials_trace.lua` under the same forced GC exited 139 in 0 of 30 legs, and the same
+file with only that line removed in 30 of 30, the outputs byte-identical.
 
 **The rule:** pin the thread that calls `add_change_notifier`. Every instrument in `tests/lua/` carries the same line
 before the call (`debug.getregistry().vs_notifier_threads`, filled with `coroutine.running()`). Removing the tap or
 unsubscribing does not fix it. Gates still judge a leg by its full output (#320).
+
+## A BUILTIN `printf` OR `echo` PIPED INTO `grep -q` CAN PRINT THE SHELL'S WRITE ERROR — `grep -q` exits at its first match, and with SIGPIPE ignored the builtin's next write fails loudly (paid: 14z-208c/14z-210, #327)
+
+`grep -q` (and `-m`, `--quiet`) stops reading at its first match. A builtin `printf "%s" "$big"` still writing into that
+pipe then gets EPIPE; normally SIGPIPE ends it silently, but a parent that left SIGPIPE ignored makes the shell print
+`printf: write error: Broken pipe` to stderr — which a gate's own log carries, and which the classifier then reads. Measured
+in `tests/test_static_runner.sh` section 32 on every run: with SIGPIPE ignored, a capture of about 1 MB whose match is on
+its first line prints the write error through `grep -q` and never through `grep >/dev/null`, both forms finding the match.
+14z-208c's close tier read a control DIED that way under `--jobs 8`.
+
+**The rule:** feed a builtin's output to a grep that reads to EOF (`grep … >/dev/null`), or use a here-document. 52 files
+were rewritten in `86d1ca10`; section 32 lints the runner test and its control `pipe-q` plants a site.

@@ -1,0 +1,2 @@
+  FLAG D-ABSOLUTE: - **Measured:** on vsavj, 71 negative entries on the 11 legacy fighters that have any.  [build/agent210/closures/final/c318.md]
+packet_check: 1 flag(s): D-ABSOLUTE 1

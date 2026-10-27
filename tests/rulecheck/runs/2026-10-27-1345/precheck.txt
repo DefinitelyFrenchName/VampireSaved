@@ -1,0 +1,4 @@
+  FLAG D-ABSOLUTE: | run (10 each) | before | after | |---|---|---|  [build/agent210/closures/final/c311.md]
+  FLAG D-ABSOLUTE: | beside 12 busy loops | 2/10 PASS | 10/10 PASS, every leg first time |  [build/agent210/closures/final/c311.md]
+  FLAG D-ABSOLUTE: - **Controls:** both modes are still honoured, and the in-gate starved leg fired in all 20 runs.  [build/agent210/closures/final/c311.md]
+packet_check: 3 flag(s): D-ABSOLUTE 3

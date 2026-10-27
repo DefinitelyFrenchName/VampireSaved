@@ -1,0 +1,46 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent210/closures/final/c321.md	f190016b215aafcb3020ee1f1f62ef38c9217556
+build/agent210/closures/issues/321.md	6cb8d1809b55baa3068a439f8920a00d4af6b5f3
+DECISIONS_HISTORY.md.lines-8510-8517 (lines 8510-8517 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-27 (14z-210) — #321 closes on what is measured; its two survey gaps become a new ti")	882bcf9166c6d774ed4d05bed9447e137e75a23b
+DECISIONS_HISTORY.md.lines-8334-8351 (lines 8334-8351 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-26 (14z-209) — #321 phase 2: all four speed-ups, parity on the Mac only, #305 with ")	92e40aeefd53bb7ae4a8856b939af62ccac363a4
+DECISIONS_HISTORY.md.lines-8407-8422 (lines 8407-8422 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-26 (14z-210) — #321: emulator controls as pool jobs, proven by a PILOT write trace;")	6376f51c8e732f7e5cff417728b3f438f1dd6e29
+DECISIONS_HISTORY.md.lines-8439-8459 (lines 8439-8459 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-26 (14z-210) — #321 avenue 1: the merged-legacy queue only; the guard-cancel table ")	05abcb8219484817b584195cf280b8a202e58353
+DECISIONS_HISTORY.md.lines-8486-8498 (lines 8486-8498 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-27 (14z-210) — #321: a control mode's environment error is DIED; the emulator runne")	60f0187ed00567cf4379343f7573efd446d2a866
+docs/project/tickets.tsv.lines-74-74 (lines 74-74 of docs/project/tickets.tsv)	40b17690fcce42dabb513718c353e2e6afb54967
+docs/project/tickets_github.tsv.lines-7-7 (lines 7-7 of docs/project/tickets_github.tsv)	d0586596c3e4a31d9ede5cef129518a06564a330
+docs/project/tickets.md.lines-20-20 (lines 20-20 of docs/project/tickets.md)	652351cee256a837f9c9e47efcf83483d7e41087
+docs/project/operations.md.lines-659-697 (lines 659-697 of docs/project/operations.md)	f6fc8e91ce9b03910c8c06a3b0831fd905cdb2f6
+docs/project/operations.md.lines-699-734 (lines 699-734 of docs/project/operations.md)	ac04a2d2b6c03905f057f4885529e799148f9f98
+tests/audit_guard_corpus.sh.lines-49-56 (lines 49-56 of tests/audit_guard_corpus.sh)	b32b4dc2251431c4e9d9fe96b8a632e7a71e5d2e
+tests/audit_guard_corpus.sh.lines-88-92 (lines 88-92 of tests/audit_guard_corpus.sh)	786aed9f921ddcfc2c37c37a24bde196c99b2005
+tests/test_mame_parity.sh.lines-66-72 (lines 66-72 of tests/test_mame_parity.sh)	74254bc8d18eaa5f4831c1598e69eeab10cf97d9
+tests/test_mame_parity.sh.lines-98-100 (lines 98-100 of tests/test_mame_parity.sh)	52f4f6c78029afdf3f96b70a4c83205960cd9a3d
+tests/test_mame_wide.sh.lines-50-58 (lines 50-58 of tests/test_mame_wide.sh)	95e3ab0bfd9d9f9b326e78db9cddb7925eaf9c3b
+tests/test_mame_wide.sh.lines-93-96 (lines 93-96 of tests/test_mame_wide.sh)	222e991c66270af3033d50bbc6e7e02fd75bd71d
+tests/audit_merged_legacy.sh.lines-418-425 (lines 418-425 of tests/audit_merged_legacy.sh)	c52ff500fc621ba38a26b469606c0254b1d53652
+tests/controls_concurrent_emu.txt.lines-1-16 (lines 1-16 of tests/controls_concurrent_emu.txt)	003974ab965ba0c1c84cfc6927b450b6a5946755
+build/agent210/t321mac/times.tsv	849fad3009988afe5ab830e3ba8c13ae45300d21
+build/agent210/t321mac/run.sh	2785d965dcd74ae96edc70f4c5da4f2d9d1a47eb
+build/agent210/t321mac/outeq.out	0042824a078b091e095957dddcad60d174387a29
+build/agent210/t321mac/guard_corpus_j2.log	c1dcff6331d95705cc4a19069c7718d9ee7ee04d
+build/agent210/t321mac/guard_corpus_j4.log	fa90e38b9863e7979637be9ec8bca976bd67db24
+build/agent210/t321p/parity/times.tsv	999677662babc5ec863802fff3cbe58a0ca1519b
+build/agent210/t321par/ncpu.txt	ad552e6dc057d1d825bf49df79d6b98eba846ebe
+build/agent210/t321par/run/results.tsv	689f65a79eac58ac652510456626ed44c6861341
+build/agent210/t321par/run.out	899a6225c25676f1f75ab2a17afa558e471360c2
+build/agent210/t321par/run/test_mame_parity.log	b96b6bbc2191d7e45a49bbfeac0cc35b6357917c
+build/agent210/t321par/run/commit.txt	5f86d3636a83e077cfecdb7d09bee714fae4877a
+build/agent210/t321suite/times.tsv	3a0d92507bb65a4a908b83ae414577fd6bedbabe
+build/agent210/t321suite/measure.sh	691ba342cfdb37eede9007bf6d43c0a59459a46f
+build/agent210/closures/final/e321_suite_cmp.txt	1dc52c20c6bf31d8ec71f853a95d080c9a35e805
+build/agent210/book/mq/times.tsv	928855c105e519d0d553235f752345f7015a1b29
+build/agent210/book/mq/outeq.out	bb0d9e6c0989707d673109cbd00e801c2118e038
+build/agent210/book/run_mq.sh	fbefadb8f3a678298a5a3dba730719a3aecbcee6
+build/agent210/t321k/results_tier.tsv	fbd6082b1055887de7b426716bebc65d06a16beb
+build/agent210/t321k/tier.meta	856308814630649121cd95269064cc9a374df936
+build/agent210/t321k/k_setup.sh	779efe29399a9b34873cd543d03da298809412a4
+build/agent210/t321e2/freeze_results.tsv	63b854a33dbcac890a4774b92fda524ec66e9c13
+build/agent210/t321e2/SUMMARY.md	c883fe354f80d7d53968c4976982b816f2d8fe3f
+build/agent210/t321e2/compare2.txt	020a339bc64447f01117d4afa02d9eed68ca6e20
+build/agent210/closures/final/e321_commits.txt	671900e31fa280af16843fe1fb56912df38d31f6
+build/agent210/closures/final/e321_mktemp.txt	4337911bdc2b4e1ddaa9e04cd695f3459a5e083e
