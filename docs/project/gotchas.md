@@ -7703,3 +7703,20 @@ still failed overall on the legs; nothing was frozen). **The rule:** a clause th
 to its expected members — here every rig is named MISSING when it has no row (control `rows-absent`) — and a work
 directory a gate hands to subshells that change directory is made absolute, with an empty value refused first (an
 empty `W` resolved by `cd` is the current directory, which the gate's EXIT trap would then remove).
+
+## A REPLAY RANGE IS INCLUSIVE, SO TWO DIRECTIONS WRITTEN END-TO-START SHARE A FRAME — AND R THEN D FEEDS THE GAME A DR (paid: 14z-208b/14z-211, #229, #329)
+
+`tests/lua/replay.lua` holds a token on every frame from `a` to `b` INCLUSIVE (`for fr = a, b`), and lines OR together.
+#229's motion test wrote each direction as `t..t+2` and the next as `t+2..t+4` (`tools/command_throw_rigs.py`
+`motion()`, the encoding of `name_moves.hcb_cont`), so each boundary frame held both: its "624" was `R`, `R+D`, `D`,
+`D+L`, `L` — 63214 with one-frame diagonals — and "6324", "6214" and every half-circle-forward short spelling likewise.
+The rows froze "624 grabs, every diagonal optional", and the engine notes repeated it, while the grabs' step table is an
+exact-match 6 3 2 4 (the 3 required; #329 re-rigged the test with each direction on its own frames and kept one
+shared-frame 624 as the control). Between two directions that already share a component (R then DR) the OR changes
+nothing, which is why the full-motion rigs were right and the trap only bit the spellings that skip a diagonal.
+**The rule:** a rig that omits a direction writes the neighbours on their own frames (`a..a+1`, then `a+2..a+3`), never
+end-to-start, and a motion test is read from the frames the game was FED (the replay's per-frame OR), never from the
+spelling in its label. A census of every committed `.rpl` for frames whose OR is a direction no covering line names
+(14z-211): the command-throw 360/720 rigs (each boundary frame ORs two neighbouring cardinals into the diagonal between
+them; whether the rotation tracker, `PRG:0x02A1B4`, needs the cardinals alone is not measured) and the guard-cancel recipe `gc_v`, whose 623 starts with R inside the held L (L+R for two frames,
+`tests/replays/naming/huitzil_5.rpl`).

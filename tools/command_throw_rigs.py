@@ -69,11 +69,13 @@ def air_hcb(b):  # J.632[4]: jump, then 63214 + button on the way
 def air_qcf(b):  return nm.air_qcf(b)                     # J.236
 def air_hcf(b):  # J.41236: jump, then 4 1 2 3 6 + button on the way
     return [(0, 2, "U"), (12, 14, "L"), (14, 16, "DL"), (16, 18, "D"), (18, 20, "DR"), (20, 26, "R"), (22, 26, B[b])]
-def motion(dirs, b, start=0, pre=()):
-    """a motion as hcb_cont writes 63214 (THE MOTION TEST, #229, 14z-208b): each direction 2 frames with no release, the
-    last held 6 with the button from its third frame; `pre` (a jump) before it, the directions from `start`"""
+def motion(dirs, b, start=0, pre=(), shared=False):
+    """a motion (THE MOTION TEST, #229, 14z-208b; re-rigged #329, 14z-211): each direction its OWN 2 frames, the last
+    held 6 with the button from its third frame; `pre` (a jump) before it, the directions from `start`. replay.lua's
+    ranges are INCLUSIVE, so `shared=True` (hcb_cont's encoding, the 14z-208b motion test) ends each direction on the
+    frame the next one starts: that frame holds both, and R then D feeds the game a one-frame DR — its "624" was 63214"""
     toks, n = list(pre), len(dirs)
-    toks += [(start + 2 * i, start + 2 * i + 2, d) for i, d in enumerate(dirs[:-1])]
+    toks += [(start + 2 * i, start + 2 * i + (2 if shared else 1), d) for i, d in enumerate(dirs[:-1])]
     s = start + 2 * (n - 1)
     return toks + [(s, s + 6, dirs[-1]), (s + 2, s + 6, B[b])]
 
@@ -154,7 +156,8 @@ THROWS = {
     "GA": _str("WILD CIRCULAR", "632[4]", hcb, K3) + [("ES WILD CIRCULAR", "632[4]KK", hcb("KK"), True)],
     "JE": _str("NERO FATICA", "214", qcb, P3) + [("ES NERO FATICA", "214PP", qcb("PP"), True)]
           + _str("IRA SPINTA", "j.632[4]", air_hcb, ("LK", "MK"))
-          + [("IRA SPINTA", "j.632[4] HK at16", motion(HCB_SPELL["63214"], "HK", start=16, pre=[(0, 2, "U")]), False),
+          + [("IRA SPINTA", "j.632[4] HK at16", motion(HCB_SPELL["63214"], "HK", start=16, pre=[(0, 2, "U")],
+                                                     shared=True), False),
              ("ES IRA SPINTA", "j.632[4]KK", air_hcb("KK"), True)]
           + _str("SAN BASSALE", "632[4]", hcb, K3),
     "LE": _str("HOUTENGEKI", "632[4]", hcb, P3),
@@ -175,8 +178,9 @@ THROWS = {
     "ZA": _str("SKULL PUNISH", "632[4]", hcb, P3) + [("ES SKULL PUNISH", "632[4]PP", hcb("PP"), True)],
 }
 # THE MOTION TEST (the maintainer's third and fourteenth answers, 2026-10-25): every half-circle throw with the
-# spellings of HCB_SPELL / HCF_SPELL, one strength that grabs, in motion()'s encoding. The hcb sheets' full 63214 is
-# their own row (hcb_cont == motion(63214)); the hcf rows' full motion is added, their own rows using another cadence.
+# spellings of HCB_SPELL / HCF_SPELL, one strength that grabs, in motion()'s encoding (each direction its own frames since
+# #329). The hcb sheets' full 63214 is their own row (hcb_cont == motion(63214, shared=True)); the hcf rows' full motion
+# is added, their own rows using another cadence.
 MOTION_ROWS = [("AU", "CRYSTAL LANCER", "HP", 0, {}), ("AU", "GEMS ANGER", "HK", 0, {}), ("BI", "632[4]PP", "PP", 0, {}),
                ("BU", "SENTIMENTAL TYPHOON", "HP", 0, {}), ("FE", "HELL CAT", "HK", 0, {}),
                ("GA", "WILD CIRCULAR", "HK", 0, {}), ("JE", "SAN BASSALE", "HK", 0, {}),
@@ -190,7 +194,12 @@ for _tab, _row, _b, _fwd, _kw in MOTION_ROWS:
     for _name, _dirs in (HCF_SPELL if _fwd else HCB_SPELL).items():
         if _name == "63214":
             continue
-        THROWS[_tab].append((_row, f"motion {'j.' if _kw else ''}{_name}{_b}", motion(_dirs, _b, **_kw), _b in ("PP", "KK")))
+        # " minimal": the spelling the command handlers' tables make minimal (#329: 6 3 2 4 and 4 1 2 3, each step exact)
+        THROWS[_tab].append((_row, f"motion {'j.' if _kw else ''}{_name}{_b}{' minimal' if _name in ('6324', '4123') else ''}",
+                             motion(_dirs, _b, **_kw), _b in ("PP", "KK")))
+# THE SHARED-FRAME CONTROL (#329, 14z-211): the 14z-208b encoding of 624, whose boundary frames held R+D and D+L — the game
+# read 63214 and grabbed. It must still grab while the true 624 above does not, or the re-rig changed something else
+THROWS["AU"].append(("GEMS ANGER", "motion 624HK shared frames (=63214)", motion(HCB_SPELL["624"], "HK", shared=True), False))
 
 # Prova di Servo LAST on Jedah's sheet, so its two events open a rig (part 5, slots 1-2): a "far" event's position pins
 # (t-230) do not hold when the previous event is a throw still running — after San Bassale HK Jedah stood 64 px from
@@ -624,7 +633,10 @@ def join(trace_rows, records_path, xlsx):
                 continue
             mv = d.get("move")
             rid = (str(mv).strip() if mv not in (None, "None", "") else str(d.get("input")).strip()).upper()
-            evs = [r for r in tr if r["sheet"] == tab and r["row"].upper() == rid and not r["label"].startswith("control")]
+            # the motion test's events carry their row's name but test INPUTS (#329: since its re-rig a short spelling
+            # holds P2 with the NORMAL throw, which is not the row's move), so like the controls they are not the row's
+            evs = [r for r in tr if r["sheet"] == tab and r["row"].upper() == rid
+                   and not r["label"].startswith(("control", "motion "))]
             grabs = [r for r in evs if r["hold"] is not None]
             row = {"sheet": tab, "row": rid, "type": d.get("type"), "input": d.get("input"),
                    "events": [r["label"] for r in evs], "grabbed": [r["label"] for r in grabs]}

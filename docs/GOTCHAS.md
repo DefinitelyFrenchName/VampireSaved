@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-575 entries (48 game / 146 platform / 381 project), counted from the buckets at generation.
+576 entries (48 game / 146 platform / 382 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 48 entries
 
@@ -222,7 +222,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - MAME 0.288's `add_change_notifier` KEEPS ITS CALLBACK ON THE CALLING LUA THREAD — the GC frees that thread, and `~address_space` segfaults at teardown (exit 139 after every output) (paid: 14z-210, #320)
 - A BUILTIN `printf` OR `echo` PIPED INTO `grep -q` CAN PRINT THE SHELL'S WRITE ERROR — `grep -q` exits at its first match, and with SIGPIPE ignored the builtin's next write fails loudly (paid: 14z-208c/14z-210, #327)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 381 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 382 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -605,3 +605,4 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A GATE WHOSE LEGS ARE "EVERY REPLAY WITH A BASIS LOG" GOES RED THE DAY A BASIS LOG IS ADDED (paid: 14z-205c/14z-209, #302)
 - AN INDEX TABLE'S WORD OFFSET IS SIGNED, AND A DECODER THAT READS IT UNSIGNED STILL "WALKS" — 64 KiB PAST THE CHAIN, INTO WHATEVER IS THERE (paid: 14z-205/14z-210, #229, #318)
 - A CHECK THAT COUNTS WHAT IS WRONG READS "OK" ON AN EMPTY INPUT — and a run whose every leg failed printed "0 of 120 commit, exactly GC_BUTTONS" as ok (paid: 14z-210, #331)
+- A REPLAY RANGE IS INCLUSIVE, SO TWO DIRECTIONS WRITTEN END-TO-START SHARE A FRAME — AND R THEN D FEEDS THE GAME A DR (paid: 14z-208b/14z-211, #229, #329)

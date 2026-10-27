@@ -38,6 +38,37 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
+## Session 14z-211 — **#329 closed: the half circles' minimal inputs are 6324 and 4123, from the handlers and measured; #229's motion test was fed every diagonal (inclusive replay ranges) and is re-rigged; the old scratch cleared.**
+
+### opened with
+The 14z-210 close's opener; the sweep CLEAN, `main` = `origin/main` at `432d5c7e`. The old local refs and the remote
+scratch cleared on the maintainer's word (`DECISIONS_HISTORY.md` "Ruled 2026-10-27 (14z-211) — the opener: …"): 20 refs
+deleted, 27 kept (their commits are cited by hash); PILOT 95% -> 71% used, ERIS 82 -> 33 GB. #334 set aside and #333
+deferred (the Mac is partly the maintainer's; heavy runs go to PILOT); #329 first. Working evidence:
+`build/agent211/t329/` (local).
+
+### (1) #329 — THE HALF CIRCLES' MINIMAL INPUTS; #229'S MOTION TEST RE-RIGGED; CLOSED
+From the command handlers (vsavj's motion trackers, every `jsr` to the helpers): the grabs' half circle back is the
+exact-match table 6 3 2 4, the forward 4 1 2 3 — so 6324 and 4123 are minimal; vs2's are the full five steps. The 14z-208b
+motion test's "624 grabs" was its rig: `replay.lua`'s ranges are inclusive and each direction was written end-to-start,
+so the boundary frames fed every diagonal. Re-rigged (each direction on its own frames, one shared-frame 624 kept as the
+control) and re-frozen on PILOT: 6214, 624, 4126, 4236 and 426 enter no command move on any of the 14 grabs (most come
+out as the normal throw); 6324, 6321, 63214, 4123, 41236 unchanged; the control reproduces the old row's line. Three runs
+at `5baef1d5` (freeze, clock freeze, verify PASS with every control fired; five control counts re-derived from the
+frozen data). The command-throw join leaves the motion events out (they would have read 12 rows as "strengths
+differ"); the cross-check page's verdicts render unchanged. Engine notes corrected (the half-circle section, the
+punch/kick table pairs, the retune example, the trackers' flag bits); gotcha "A REPLAY RANGE IS INCLUSIVE", with a
+census of every committed rig (the 360/720 rigs, harmless to the rotation tracker; the guard-cancel recipe's L+R).
+Rule-checker run `2026-10-27-1353` stopped the closure on Q2 (a feel conclusion on numbers): capture sheets of the
+re-rigged events, nine tiles each, were put to the maintainer — *"Yes, they do"* — and the capture became the instrument
+`tools/command_throw_sheet.py` (its rerun on PILOT reproduced all 90 snapshots byte for byte). Runs 1354-1359 each found a
+real gap (Aulbath's 6214HK unshown, the thirteen 6324 rows whose INPUT changed, a vs2 scan that skipped helpers, a
+counting slip, code-derived 360 claims): each answered by a new capture the maintainer confirmed or a new measurement,
+and the 360 statements cut back to what was measured. Closed on run `2026-10-27-1360` (OK).
+The commit's tier then failed `test_tmp_hygiene` on the new tool (a `mkdtemp` never removed); fixed with an exit cleanup and
+re-verified on PILOT at the final blob: 90 snapshots byte-identical to the confirmed sheets, no work directory left
+behind (`build/agent211/t329/tool_reverify.txt`).
+
 ## Session 14z-210 — **#321 finished (concurrent emulator controls, longest first, SUITE_JOBS, the merged-legacy queue, disk TMPDIR; three runner verdict holes closed), its remainder #334; #331 (Demitri on P1 in the guard cancels, re-frozen); #318, #328, #320, #311, #327, #332 closed; #333 filed.**
 
 ### opened with

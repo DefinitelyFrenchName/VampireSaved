@@ -1,0 +1,7 @@
+  FLAG FIGURE: 324
+  FLAG FIGURE: 634
+  FLAG FIGURE: 423
+  FLAG D-ABSOLUTE: - 6214 and 624 enter the grab on none of the 14 half-circle-back grabs measured.  [build/agent211/t329/closure/c329.md]
+  FLAG D-ABSOLUTE: - Capture sheets, nine tiles per event, were put to the maintainer, who confirmed each set shows what its labels say:  [build/agent211/t329/closure/c329.md]
+  FLAG D-ABSOLUTE: Together they show every row whose outcome the re-rig changed.  [build/agent211/t329/closure/c329.md]
+packet_check: 6 flag(s): D-ABSOLUTE 3, FIGURE 3

@@ -1,0 +1,5 @@
+  FLAG FIGURE: 324
+  FLAG FIGURE: 634
+  FLAG FIGURE: 423
+  FLAG D-ABSOLUTE: - 6214 and 624 enter the grab on none of the 14 half-circle-back grabs measured.  [build/agent211/t329/closure/c329.md]
+packet_check: 4 flag(s): D-ABSOLUTE 1, FIGURE 3

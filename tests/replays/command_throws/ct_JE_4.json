@@ -31,7 +31,7 @@
   },
   {
    "row": "PROVA DI SERVO",
-   "label": "motion 4123KK",
+   "label": "motion 4123KK minimal",
    "meter": true,
    "frame": 4672,
    "press": 4680,

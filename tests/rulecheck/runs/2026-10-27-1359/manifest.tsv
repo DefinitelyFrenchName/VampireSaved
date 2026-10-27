@@ -1,0 +1,48 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent211/t329/closure/c329.md	1f0830ab8a4389a521a4f825ac11aee3dfc23cfb
+build/agent211/t329/closure/issue329.md	5ce544cf7dbcc3938807181b41352afe1619cbe7
+build/agent211/t329/closure/decode_tables.py	7fc63c0b27f404f83be9cdb736ed8b523c01c25f
+build/agent211/t329/closure/decode_tables.txt	0a775b1d7cd88ce3892d904ff4f77847012f91b0
+build/agent211/t329/closure/dispatcher.txt	68455932e4d2b6e148fc568f78faf7301dd9fa7e
+build/agent211/t329/closure/fed_frames.py	76ab330ff3d12b1ae05bea624f331cde4bd45139
+build/agent211/t329/closure/fed_frames.txt	63a285aa5f23d374b279fff812ef5ae18fe23044
+build/agent211/t329/closure/r1.log	437925976ec22edc97135c9b2382011cb03bca98
+build/agent211/t329/closure/r2.log	2b8b22386115d65e9c4661a718af933d74956ae1
+build/agent211/t329/closure/r3.log	4da947567948f82039b1c0ef8b81d4a2145027cd
+build/agent211/t329/closure/r4.log	5fbddc970ab8fc79a87eb1b29f8294ab9368e540
+build/agent211/t329/closure/r5.log	94ca7b5efaedfac68e176be0f4750336288186b6
+build/agent211/t329/closure/expect_diff.txt	77af0f693d2b1a83ee365ebb1c1b690ca64e52a9
+build/agent211/t329/closure/derive_counts.py	1c455bdc7d199b3a36bc1c42c6c56a2d0f83affe
+build/agent211/t329/closure/derive_counts.txt	df4d3fee7607c013e826861b3ed2774d158c6473
+build/agent211/t329/closure/full_old_14z208b.tsv	c346677d83368326a44baf4312d3a848e73fcb2a
+build/agent211/t329/closure/x_unsigned_r5.txt	36a711ddcaa6bfe2264c35c41e76610363c2006c
+build/agent211/t329/closure/code_diff.txt	53ee0f70f87c7db3b4918358d662c87c0bde0379
+build/agent211/t329/closure/xc_oldjoin.txt	096d0221a0786d1ac1a3b783a9c1e555431b2171
+build/agent211/t329/closure/xc_newjoin.txt	966663799057e88b26c856b70f9ead4e8fd6c5f1
+build/agent211/t329/closure/overlap_census.out	6bf35264d37b2ca9854b6622c0ca04bba0897692
+build/agent211/t329/closure/p211_snap.sh	1278a3bd528646d662ff27cdce37f51dc7188c8d
+build/agent211/t329/closure/sheet329.py	2337eabe77eaf997d3ce02d921b250149373abae
+build/agent211/t329/closure/sheets_manifest.txt	a37a5660d7f522f8cd94e7ed457799caa670f30b
+build/agent211/t329/closure/tool_p1.out	0d816f798a0401b4224994c794a680363508e70d
+build/agent211/t329/closure/tool_p2.out	001fe3503a48904a609980493a0af3474fb1b043
+build/agent211/t329/closure/tool_p3.out	9665a9545c42f102079fc608cad3e740f9ae892d
+build/agent211/t329/closure/tool_p4.out	c338aba56a8c586d6afcdd0c1c38c780e7af0a61
+build/agent211/t329/closure/tool_p5.out	655ef01e7a0b67e7a59b962ce558753e95161753
+build/agent211/t329/closure/tool_p6.out	4ba125819cee58d6c1ba34af15467737dbae3d80
+build/agent211/t329/closure/tool_p7.out	8525d7619aaeaf948adb2f01eb3a0407fc0848e5
+build/agent211/t329/closure/tool_cmp.txt	2e23c0f113d70787f15c553b7304eed8ab3c0e8b
+build/agent211/t329/closure/shown_census.py	96d7c8c5eea4b30f6bd08140742f2d7cdb94f04b
+build/agent211/t329/closure/shown.txt	fdab13c96b5264921ebfee50489e51f7a49bcca3
+build/agent211/t329/closure/shown_census.txt	846e4200d7a9c4e66d0a48ce6080e4abb4d46ac1
+build/agent211/t329/closure/shown_before.txt	6d70088a6b9634848b48ee34f6b53d7a023fa8c3
+build/agent211/t329/closure/shown_census_before.txt	db957f0aa695ce64721020f88a4d7064287045cc
+tools/command_throw_sheet.py	432006fc85d7ac2c16ae427aa4f222a95b8449e1
+build/agent205/t229/f4_throws/handlers.out	e0ccf1393b9913e9041ab27abc4620e363803f4d
+tests/lua/replay.lua.lines-105-131 (lines 105-131 of tests/lua/replay.lua)	355a0b4d3bbb7534b414a4f0cae065815c05cc81
+docs/project/tables/community_crosscheck.md.lines-589-596 (lines 589-596 of docs/project/tables/community_crosscheck.md)	cdd81626499c8cee37cc7ced969d3b03d6fdff9d
+docs/project/operations.md.lines-38-38 (lines 38-38 of docs/project/operations.md)	a5200900a83c7516b76e8268cc23c4d35a6f108a
+docs/game/engine_internals.md.lines-1514-1563 (lines 1514-1563 of docs/game/engine_internals.md)	444a16f568cf325079c2eed6d34a26ab43e3bd64
+docs/game/engine_internals.md.lines-1566-1618 (lines 1566-1618 of docs/game/engine_internals.md)	d25bd90b02fd74938f9da76f6c4a1a6ffed76f04
+docs/project/gotchas.md.lines-7707-7722 (lines 7707-7722 of docs/project/gotchas.md)	b58458699f40e50e397d0d3f47eaeacac6f9410f
+DECISIONS_HISTORY.md.lines-8537-8566 (lines 8537-8566 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-27 (14z-211) — #329: the motion test re-rigged, re-frozen on PILOT, the notes corre")	492f1f7dd644d626b7439dbaa30c4c5d92d087c2
+docs/project/tickets.tsv.lines-79-79 (lines 79-79 of docs/project/tickets.tsv)	5c3fcfa5bea7397631a9f9592ca1154dbf062834

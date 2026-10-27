@@ -1,0 +1,6 @@
+  FLAG FIGURE: 324
+  FLAG FIGURE: 634
+  FLAG FIGURE: 423
+  FLAG D-ABSOLUTE: - 6214 and 624 enter the grab on none of the 14 half-circle-back grabs measured.  [build/agent211/t329/closure/c329.md]
+  FLAG D-ABSOLUTE: - Capture sheets of the re-rigged events (Aulbath's half circle back, Q-Bee's half circle forward, nine tiles each) were put to the maintainer, who confirmed...  [build/agent211/t329/closure/c329.md]
+packet_check: 5 flag(s): D-ABSOLUTE 2, FIGURE 3

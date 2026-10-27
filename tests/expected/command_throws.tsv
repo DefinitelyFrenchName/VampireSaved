@@ -21,31 +21,32 @@ AU	1	6324 LK	no	0	-	4bd1209c4dc704ff
 AU	1	6324 MK	yes	0	special	9bd3a7e490bb997f
 AU	2	6324 HK	yes	0	special	9bd3a7e490bb997f
 AU	2	6324KK	yes	1	ES	35a7746a1ad270b0
-AU	2	motion 6324HP	yes	0	special	acbfd0852dc45066
+AU	2	motion 6324HP minimal	yes	0	special	acbfd0852dc45066
 AU	2	motion 6321HP	no	0	-	d9ba46d31d1911af
-AU	2	motion 6214HP	yes	0	special	acbfd0852dc45066
-AU	2	motion 624HP	yes	0	special	acbfd0852dc45066
-AU	3	motion 6324HK	yes	0	special	9bd3a7e490bb997f
+AU	2	motion 6214HP	yes	0	throw	13660a5b9d88fcb9
+AU	2	motion 624HP	yes	0	throw	13660a5b9d88fcb9
+AU	3	motion 6324HK minimal	yes	0	special	9bd3a7e490bb997f
 AU	3	motion 6321HK	no	0	-	e938facd8ffd09c7
-AU	3	motion 6214HK	yes	0	special	9bd3a7e490bb997f
-AU	3	motion 624HK	yes	0	special	9bd3a7e490bb997f
+AU	3	motion 6214HK	no	0	-	a8b364cb215ee949
+AU	3	motion 624HK	no	0	-	a8b364cb215ee949
+AU	3	motion 624HK shared frames (=63214)	yes	0	special	9bd3a7e490bb997f
 BI	1	KIRISUTE GOMEN 360LP	no	0	-	59a35fce059e159d
 BI	1	KIRISUTE GOMEN 360MP	yes	0	special	88233ab025819891
 BI	1	KIRISUTE GOMEN 360HP	yes	0	special	151c3e4a1c6f11e4
 BI	1	ES KIRISUTE GOMEN 360PP	yes	1	ES	b65b410c68b84d41
 BI	1	ONI KUBI HINERI 632[4]PP	yes	1	EX	3c1a413434fc9399
-BI	1	motion 6324PP	yes	1	EX	3c1a413434fc9399
+BI	1	motion 6324PP minimal	yes	1	EX	3c1a413434fc9399
 BI	2	motion 6321PP	no	0	-	85216a5ab54d2fd8
-BI	2	motion 6214PP	yes	1	EX	3c1a413434fc9399
-BI	2	motion 624PP	yes	1	EX	3c1a413434fc9399
+BI	2	motion 6214PP	no	0	-	128d969466956c8f
+BI	2	motion 624PP	no	0	-	128d969466956c8f
 BU	1	632[4] LP	no	0	special	6ebd30c916f5951a
 BU	1	632[4] MP	yes	0	special	f6e116a53d8e8d73
 BU	1	632[4] HP	yes	0	special	f6e116a53d8e8d73
 BU	1	632[4]PP	yes	1	ES	1195f0055cbfab89
-BU	1	motion 6324HP	yes	0	special	c8a13132a6728d84
+BU	1	motion 6324HP minimal	yes	0	special	c8a13132a6728d84
 BU	1	motion 6321HP	no	0	-	2fdc1c60749ac8ec
-BU	2	motion 6214HP	yes	0	special	c8a13132a6728d84
-BU	2	motion 624HP	yes	0	special	f6e116a53d8e8d73
+BU	2	motion 6214HP	no	0	special	6ebd30c916f5951a
+BU	2	motion 624HP	yes	0	throw	0fbe54f42490225a
 DE	1	360 LP	no	0	-	59a35fce059e159d
 DE	1	360 MP	yes	0	special	8e87065d3bc00b48
 DE	1	360 HP	yes	0	special	8e87065d3bc00b48
@@ -55,18 +56,18 @@ FE	1	632[4] LK	no	0	-	449ac9a17aa352eb
 FE	1	632[4] MK	yes	0	special	e7223d16813492be
 FE	1	632[4] HK	yes	0	special	e7223d16813492be
 FE	1	632[4]KK	yes	1	ES	745c3967aa18dfef
-FE	1	motion 6324HK	yes	0	special	e7223d16813492be
+FE	1	motion 6324HK minimal	yes	0	special	e7223d16813492be
 FE	1	motion 6321HK	no	0	-	c25f341ec1d42a0c
-FE	2	motion 6214HK	yes	0	special	e7223d16813492be
-FE	2	motion 624HK	yes	0	special	e7223d16813492be
+FE	2	motion 6214HK	yes	0	throw	0f74fb5f9950f527
+FE	2	motion 624HK	yes	0	throw	0f74fb5f9950f527
 GA	1	632[4] LK	no	0	-	cf269425649ad4b2
 GA	1	632[4] MK	yes	0	special	254aa99e359d4eb5
 GA	1	632[4] HK	yes	0	special	254aa99e359d4eb5
 GA	1	632[4]KK	yes	1	ES	b0c70f752f573adc
-GA	1	motion 6324HK	yes	0	special	254aa99e359d4eb5
+GA	1	motion 6324HK minimal	yes	0	special	254aa99e359d4eb5
 GA	1	motion 6321HK	no	0	-	cfde7472fa915cd9
-GA	2	motion 6214HK	yes	0	special	254aa99e359d4eb5
-GA	2	motion 624HK	yes	0	special	254aa99e359d4eb5
+GA	2	motion 6214HK	yes	0	throw	7a5386e457804554
+GA	2	motion 624HK	yes	0	throw	9c2b21e8ec8c1824
 JE	1	214 LP	yes	0	special	eddb2739b09fc0e6
 JE	1	214 MP	yes	0	special	eddb2739b09fc0e6
 JE	1	214 HP	yes	0	special	eddb2739b09fc0e6
@@ -78,45 +79,45 @@ JE	2	j.632[4]KK	yes	1	ES	1101e126f46b6023
 JE	2	632[4] LK	no	0	-	cf269425649ad4b2
 JE	2	632[4] MK	yes	0	special	f5b26fa06ef5dcbf
 JE	2	632[4] HK	yes	0	special	f5b26fa06ef5dcbf
-JE	2	motion 6324HK	yes	0	special	8a38c81b556bfda2
+JE	2	motion 6324HK minimal	yes	0	special	8a38c81b556bfda2
 JE	3	motion 6321HK	no	0	-	371cf36c3dd13baa
-JE	3	motion 6214HK	yes	0	special	8a38c81b556bfda2
-JE	3	motion 624HK	yes	0	special	f5b26fa06ef5dcbf
-JE	3	motion j.6324LK	yes	0	special	ab145663da8a176e
+JE	3	motion 6214HK	no	0	-	1836d4ff91a583f3
+JE	3	motion 624HK	no	0	-	ae589c1854ff3cb0
+JE	3	motion j.6324LK minimal	yes	0	special	ab145663da8a176e
 JE	3	motion j.6321LK	no	0	-	67bc35718e24b43d
-JE	3	motion j.6214LK	yes	0	special	ab145663da8a176e
-JE	4	motion j.624LK	yes	0	special	ab145663da8a176e
+JE	3	motion j.6214LK	no	0	-	67bc35718e24b43d
+JE	4	motion j.624LK	no	0	-	67bc35718e24b43d
 JE	4	motion 41236KK	no	1	EX	1d63142451dec89d
-JE	4	motion 4126KK	no	1	EX	1d63142451dec89d
-JE	4	motion 4123KK	no	1	EX	1d63142451dec89d
-JE	4	motion 4236KK	no	1	EX	1d63142451dec89d
-JE	4	motion 426KK	no	1	EX	1d63142451dec89d
+JE	4	motion 4126KK	no	0	-	cf269425649ad4b2
+JE	4	motion 4123KK minimal	no	1	EX	1d63142451dec89d
+JE	4	motion 4236KK	no	0	-	cf269425649ad4b2
+JE	4	motion 426KK	no	0	-	cf269425649ad4b2
 JE	5	4123KK ~HK+30 far	yes	1	EX	5f59def59e8ea4da
 JE	5	4123KK, no second K, far (control)	no	1	EX	1d63142451dec89d
 LE	1	632[4] LP	no	0	special	f7a0db9265f4e3e3
 LE	1	632[4] MP	yes	0	special	a647206484b8e318
 LE	1	632[4] HP	yes	0	special	2b1def7f642b7df3
-LE	1	motion 6324HP	yes	0	special	a647206484b8e318
+LE	1	motion 6324HP minimal	yes	0	special	a647206484b8e318
 LE	1	motion 6321HP	no	0	-	80a6170a3df0e301
-LE	1	motion 6214HP	yes	0	special	a647206484b8e318
-LE	2	motion 624HP	yes	0	special	a647206484b8e318
+LE	1	motion 6214HP	no	0	special	18a4a7f97d7be4bd
+LE	2	motion 624HP	yes	0	throw	46edc91cb73e4ad1
 LI	1	632[4] LP	yes	0	special	1dab3a66cd8f809b
 LI	1	632[4] MP	yes	0	special	1dab3a66cd8f809b
 LI	1	632[4] HP	yes	0	special	1dab3a66cd8f809b
 LI	1	632[4]PP	yes	1	ES	24d472f5b54dcf43
-LI	1	motion 6324HP	yes	0	special	9ebfb088fca4ebef
+LI	1	motion 6324HP minimal	yes	0	special	9ebfb088fca4ebef
 LI	1	motion 6321HP	no	0	-	eaf5e9296c9fb7fe
-LI	2	motion 6214HP	yes	0	special	9ebfb088fca4ebef
-LI	2	motion 624HP	yes	0	special	1dab3a66cd8f809b
+LI	2	motion 6214HP	yes	0	throw	d63b0b0af10f374e
+LI	2	motion 624HP	yes	0	throw	d63b0b0af10f374e
 MO	1	632[4] LP	no	0	-	0d59fbcd39f9759d
 MO	1	632[4] MP	yes	0	special	b7ad4e0ce06c82b8
 MO	1	632[4] HP	yes	0	special	b7ad4e0ce06c82b8
 MO	1	632[4]PP	yes	1	ES	2c598c46e589a5d5
 MO	1	6,HP,MP,LP,6 far	yes	1	EX	5d96fdc0ca1ffb03
-MO	1	motion 6324HP	yes	0	special	b7ad4e0ce06c82b8
+MO	1	motion 6324HP minimal	yes	0	special	b7ad4e0ce06c82b8
 MO	2	motion 6321HP	no	0	-	86290ca4d0c1b62e
-MO	2	motion 6214HP	yes	0	special	b7ad4e0ce06c82b8
-MO	2	motion 624HP	yes	0	special	b7ad4e0ce06c82b8
+MO	2	motion 6214HP	yes	0	throw	abe25295c303c28d
+MO	2	motion 624HP	yes	0	throw	2ebdd0af6e6b95e3
 QB	1	41236LP	yes	0	special	94290e0e160247de
 QB	1	41236MP	yes	0	special	253d24fc5d05e8ee
 QB	1	41236HP	yes	0	special	2f163f207ea293ad
@@ -129,20 +130,20 @@ QB	2	632[4] LP	no	0	-	2c07e20e5503a4fb
 QB	2	632[4] MP	yes	0	special	8aeca28e0149a129
 QB	2	632[4] HP	yes	0	special	8aeca28e0149a129
 QB	2	632[4]PP	yes	1	ES	8c449742c42098ce
-QB	3	motion 6324HP	yes	0	special	8aeca28e0149a129
+QB	3	motion 6324HP minimal	yes	0	special	8aeca28e0149a129
 QB	3	motion 6321HP	no	0	-	397129b830e056a0
-QB	3	motion 6214HP	yes	0	special	8aeca28e0149a129
-QB	3	motion 624HP	yes	0	special	8aeca28e0149a129
+QB	3	motion 6214HP	yes	0	throw	db9509434710494e
+QB	3	motion 624HP	yes	0	throw	db9509434710494e
 QB	3	motion 41236LP	yes	0	special	c33d616a7b16753f
-QB	3	motion 4126LP	yes	0	special	0d4d8850926b0a43
-QB	4	motion 4123LP	yes	0	special	0d4d8850926b0a43
-QB	4	motion 4236LP	yes	0	special	0d4d8850926b0a43
-QB	4	motion 426LP	yes	0	special	c33d616a7b16753f
+QB	3	motion 4126LP	no	0	-	2c07e20e5503a4fb
+QB	4	motion 4123LP minimal	yes	0	special	0d4d8850926b0a43
+QB	4	motion 4236LP	no	0	-	2c07e20e5503a4fb
+QB	4	motion 426LP	no	0	-	2c07e20e5503a4fb
 QB	4	motion j.41236LP	yes	0	special	93b6c619d6feca06
-QB	4	motion j.4126LP	yes	0	special	81538d918a22262f
-QB	4	motion j.4123LP	yes	0	special	81538d918a22262f
-QB	5	motion j.4236LP	yes	0	special	81538d918a22262f
-QB	5	motion j.426LP	yes	0	special	72c1fa4e00fdaa9b
+QB	4	motion j.4126LP	no	0	-	ae6db7edab56b320
+QB	4	motion j.4123LP minimal	yes	0	special	81538d918a22262f
+QB	5	motion j.4236LP	no	0	-	ae6db7edab56b320
+QB	5	motion j.426LP	no	0	-	a3db831960642d06
 SA	1	632[4] LP	yes	0	special	c2bc3d50f59494de
 SA	1	632[4] MP	yes	0	special	c2bc3d50f59494de
 SA	1	632[4] HP	yes	0	special	c2bc3d50f59494de
@@ -152,10 +153,10 @@ SA	1	360 MK	yes	0	special	38679315992b760b
 SA	2	360 HK	yes	0	special	38679315992b760b
 SA	2	360KK	yes	1	ES	f823977b0df99ca2
 SA	2	control: 360 HP (a punch reaches Big Brunch)	yes	0	special	c2bc3d50f59494de
-SA	2	motion 6324HP	yes	0	special	c2bc3d50f59494de
+SA	2	motion 6324HP minimal	yes	0	special	c2bc3d50f59494de
 SA	2	motion 6321HP	no	0	-	166a4fb283518504
-SA	2	motion 6214HP	yes	0	special	c2bc3d50f59494de
-SA	3	motion 624HP	yes	0	special	c2bc3d50f59494de
+SA	2	motion 6214HP	yes	0	throw	499bda39c95bac90
+SA	3	motion 624HP	yes	0	throw	499bda39c95bac90
 VI	1	236LK	yes	0	special	eb03435c652d4ee1
 VI	1	236HK	yes	0	special	eb03435c652d4ee1
 VI	1	j.720KK on landing	yes	1	EX	f221fb4373d9a883
@@ -167,7 +168,7 @@ ZA	1	632[4] LP	no	0	-	128d969466956c8f
 ZA	1	632[4] MP	yes	0	special	eccb558c8b42feab
 ZA	1	632[4] HP	yes	0	special	eccb558c8b42feab
 ZA	1	632[4]PP	yes	1	ES	2cb4f644c0efa9c3
-ZA	1	motion 6324HP	yes	0	special	1ea4434c0f15c467
+ZA	1	motion 6324HP minimal	yes	0	special	1ea4434c0f15c467
 ZA	1	motion 6321HP	no	0	-	a1a2a0e988889419
-ZA	2	motion 6214HP	yes	0	special	1ea4434c0f15c467
-ZA	2	motion 624HP	yes	0	special	eccb558c8b42feab
+ZA	2	motion 6214HP	yes	0	throw	213ba88274573282
+ZA	2	motion 624HP	yes	0	throw	213ba88274573282

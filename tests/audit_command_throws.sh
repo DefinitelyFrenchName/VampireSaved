@@ -3,9 +3,11 @@
 # the parallel run). Emulator tier, MAME lane, the vsavj ROM (the reference MAME build run_mame.sh pins for a stock set).
 #
 # WHAT: for every workbook row of type command throw / grab (every spelling, ES and EX included) — 54 rows, plus
-#   Victor's MEGA SPIKE, which the maintainer supplied (not in the workbook) — 167 events (a generic "P"/"K" row run
+#   Victor's MEGA SPIKE, which the maintainer supplied (not in the workbook) — 168 events (a generic "P"/"K" row run
 #   with all three strengths; since 14z-208b THE MOTION TEST: every half-circle throw with 6324/6321/6214/624 and the
-#   mirrors 41236/4126/4123/4236/426, 71 events; the air throws moved to tests/audit_ground_throws.sh), each
+#   mirrors 41236/4126/4123/4236/426, 71 events, each direction on its OWN frames since #329 (14z-211: replay.lua's
+#   ranges are inclusive, and the 14z-208b rig's shared boundary frames fed every diagonal, so its "624" was 63214),
+#   plus one shared-frame 624 kept as the control; the air throws moved to tests/audit_ground_throws.sh), each
 #   event's frozen line: in the clear, whether P2 is HELD (P1 +0x134 = 0x01 with P2's = 0xFF, RAM:$FF8534/$FF8934), the
 #   stock it spent, and the kind of the move's own state (+0x04: throw 0x0204xx, special 0x0E, ES 0x10, EX 0x12); and a
 #   16-hex SHA-256 of its numeric signature — press-to-hold, the move's start, the entered chain START (the anim index
@@ -20,13 +22,13 @@
 #   P0189EA / P02979A (tools/run_replay_guarded.sh, one logging breakpoint each, P2's HP dumped on every frame of each
 #   event: the staged records, each judged LANDED on that leg's OWN falls — a breakpoint stop skews its timeline,
 #   [VSP-129]) and CAP (the guard without -debug, SNAP_FRAMES at each event's first fall: the capture sheet).
-# EXPECTS: 167 events, every one judged and equal to its frozen line; the row set equal to the workbook's (54 rows).
+# EXPECTS: 168 events, every one judged and equal to its frozen line; the row set equal to the workbook's (54 rows).
 #   THE INSTRUMENT'S ALIGNMENT (#228 step 4, maintainer-ruled 2026-10-10 "option A"; tests/lib/instr_align.sh): the
 #   three replay_guard legs of every rig count EMULATED frames and end on their frozen game clock RAM:$FF8080
 #   (tests/expected/instr_gameclock/audit_command_throws.tsv, frozen by `--freeze-clock` from REFERENCE legs each held to
 #   replay.lua run live); one STAGING reference leg is held to replay.lua on every run. The TRACE leg is
 #   tests/lua/field_trace.lua (no debugger, frame_done — as tests/audit_vanilla_pursuits.sh's FIELD leg): it writes no
-#   ALIGN line, and is held instead to the aligned CAP leg — P2's HP equal at all 167 snap frames.
+#   ALIGN line, and is held instead to the aligned CAP leg — P2's HP equal at all 168 snap frames.
 # NOT TESTED: the characters are FORCED by the early-window poke; positions, P2's HP and P1's stock and meter are
 #   re-pinned before each event — the ROM is pristine, the RAM is not. The victim is Victor (Demitri for Victor)
 #   only; throw techs, mashed hit counts, active, recovery and invuln, FBNeo. Rows the engine never reached on these
@@ -107,11 +109,11 @@ unsigned_view() {  # unsigned_view <rigs dir> <legs root> <out root>: every leg 
 ctl_judge() {  # ctl_judge <control> <expect.txt>: did ITS perturbation make ITS clause fail? prints the evidence
     case "$1" in
         light-strength) _n=$(grep "^BAD ('BU', '1', '632\[4\] MP'): got" "$2" | awk -F'\t' '$4 == "no"' | wc -l | tr -d ' '); echo "Bulleta's 632[4]MP pressed with LP reads P2 not held: $_n (want 1)"; [ "$_n" = 1 ] ;;
-        foreign-record) _n=$(grep -c 'outside the thrower' "$2"); echo "$_n events fail the identity clause (want 157)"; [ "$_n" = 157 ] ;;
-        phantom-record) _n=$(grep -c 'damage the victim never took' "$2"); echo "$_n events read the planted record NOT LANDED (want 157)"; [ "$_n" = 157 ] ;;
-        stock-blind) _n=$(grep -c '^BAD' "$2"); echo "$_n events change the stock column (want 34)"; [ "$_n" = 34 ] ;;
-        cap-off-by-one) _n=$(grep -c "the capture leg's P2 HP" "$2"); echo "$_n events read the capture leg disagreeing (want 157)"; [ "$_n" = 157 ] ;;
-        unsigned-chain) _n=$(grep -c "^BAD ('SA'" "$2"); echo "$_n of Sasquatch's events change (want 12: all but motion 6321HP, a crouching normal)"; [ "$_n" = 12 ] ;;
+        foreign-record) _n=$(grep -c 'outside the thrower' "$2"); echo "$_n events fail the identity clause (want 159)"; [ "$_n" = 159 ] ;;
+        phantom-record) _n=$(grep -c 'damage the victim never took' "$2"); echo "$_n events read the planted record NOT LANDED (want 159)"; [ "$_n" = 159 ] ;;
+        stock-blind) _n=$(grep -c '^BAD' "$2"); echo "$_n events change the stock column (want 29)"; [ "$_n" = 29 ] ;;
+        cap-off-by-one) _n=$(grep -c "the capture leg's P2 HP" "$2"); echo "$_n events read the capture leg disagreeing (want 159)"; [ "$_n" = 159 ] ;;
+        unsigned-chain) _n=$(grep -c "^BAD ('SA'" "$2"); echo "$_n of Sasquatch's events change (want 10: all but motion 6321HP, a crouching normal, and 6214HP/624HP, normal throws since #329)"; [ "$_n" = 10 ] ;;
         *) echo "no such control: $1"; return 2 ;;
     esac
 }

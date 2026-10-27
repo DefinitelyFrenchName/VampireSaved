@@ -1,0 +1,30 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent211/t329/closure/c329.md	11be6c5c1e1db8b304fcdea5fdacc43b1f21933a
+build/agent211/t329/closure/issue329.md	5ce544cf7dbcc3938807181b41352afe1619cbe7
+build/agent211/t329/closure/decode_tables.py	a6f2a276a19b75f943fdea64c0adbee46cbac459
+build/agent211/t329/closure/decode_tables.txt	ee0e8987e22285879236453f78134cddf3a5322a
+build/agent211/t329/closure/dispatcher.txt	68455932e4d2b6e148fc568f78faf7301dd9fa7e
+build/agent211/t329/closure/fed_frames.py	76ab330ff3d12b1ae05bea624f331cde4bd45139
+build/agent211/t329/closure/fed_frames.txt	63a285aa5f23d374b279fff812ef5ae18fe23044
+build/agent211/t329/closure/r1.log	437925976ec22edc97135c9b2382011cb03bca98
+build/agent211/t329/closure/r2.log	2b8b22386115d65e9c4661a718af933d74956ae1
+build/agent211/t329/closure/r3.log	4da947567948f82039b1c0ef8b81d4a2145027cd
+build/agent211/t329/closure/r4.log	5fbddc970ab8fc79a87eb1b29f8294ab9368e540
+build/agent211/t329/closure/r5.log	94ca7b5efaedfac68e176be0f4750336288186b6
+build/agent211/t329/closure/expect_diff.txt	77af0f693d2b1a83ee365ebb1c1b690ca64e52a9
+build/agent211/t329/closure/derive_counts.py	59a923854aad86718426457f3207c8f313c3b657
+build/agent211/t329/closure/derive_counts.txt	9feee96a399ed0371240a156ed543205d5db63b9
+build/agent211/t329/closure/full_old_14z208b.tsv	c346677d83368326a44baf4312d3a848e73fcb2a
+build/agent211/t329/closure/x_unsigned_r5.txt	36a711ddcaa6bfe2264c35c41e76610363c2006c
+build/agent211/t329/closure/code_diff.txt	53ee0f70f87c7db3b4918358d662c87c0bde0379
+build/agent211/t329/closure/xc_oldjoin.txt	096d0221a0786d1ac1a3b783a9c1e555431b2171
+build/agent211/t329/closure/xc_newjoin.txt	966663799057e88b26c856b70f9ead4e8fd6c5f1
+build/agent211/t329/closure/overlap_census.out	6bf35264d37b2ca9854b6622c0ca04bba0897692
+build/agent205/t229/f4_throws/handlers.out	e0ccf1393b9913e9041ab27abc4620e363803f4d
+tests/lua/replay.lua.lines-105-131 (lines 105-131 of tests/lua/replay.lua)	355a0b4d3bbb7534b414a4f0cae065815c05cc81
+docs/project/tables/community_crosscheck.md.lines-589-596 (lines 589-596 of docs/project/tables/community_crosscheck.md)	cdd81626499c8cee37cc7ced969d3b03d6fdff9d
+docs/game/engine_internals.md.lines-1514-1563 (lines 1514-1563 of docs/game/engine_internals.md)	444a16f568cf325079c2eed6d34a26ab43e3bd64
+docs/game/engine_internals.md.lines-1566-1614 (lines 1566-1614 of docs/game/engine_internals.md)	bc52216071000b8d32ab8b00d7f8ef835ca7ead6
+docs/project/gotchas.md.lines-7707-7722 (lines 7707-7722 of docs/project/gotchas.md)	578c5a0e06ccaade8afd1b48fe3aebf656170aad
+DECISIONS_HISTORY.md.lines-8536-8542 (lines 8536-8542 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-27 (14z-211) — #329: the motion test re-rigged, re-frozen on PILOT, the notes corre")	aba2abd13b7aa87e9c83d100931df14a73f0313e
+docs/project/tickets.tsv.lines-79-79 (lines 79-79 of docs/project/tickets.tsv)	5c3fcfa5bea7397631a9f9592ca1154dbf062834

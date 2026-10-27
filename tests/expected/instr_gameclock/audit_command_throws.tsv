@@ -1,5 +1,5 @@
 # tests/expected/instr_gameclock/audit_command_throws.tsv — the game clock RAM:$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,
-# option A) by `tests/audit_command_throws.sh --freeze-clock` at 2aacebe8: pristine vsavj; legs p0189ea,
+# option A) by `tests/audit_command_throws.sh --freeze-clock` at 5baef1d5: pristine vsavj; legs p0189ea,
 # p02979a and cap per rig; every reference leg held to replay.lua run live, every guarded leg to its reference leg's game clock.
 # leg<TAB>replay<TAB>frames<TAB>gameclock
 p0189ea	ct_AN_1	6764	0f
@@ -14,9 +14,9 @@ cap	ct_AU_1	6764	0f
 p0189ea	ct_AU_2	6764	0f
 p02979a	ct_AU_2	6764	0f
 cap	ct_AU_2	6764	0f
-p0189ea	ct_AU_3	5516	2f
-p02979a	ct_AU_3	5516	2f
-cap	ct_AU_3	5516	2f
+p0189ea	ct_AU_3	6140	9f
+p02979a	ct_AU_3	6140	9f
+cap	ct_AU_3	6140	9f
 p0189ea	ct_BI_1	6764	0f
 p02979a	ct_BI_1	6764	0f
 cap	ct_BI_1	6764	0f

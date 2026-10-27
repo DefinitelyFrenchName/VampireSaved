@@ -1514,8 +1514,12 @@ vsavj and vs2; addresses vs2 / vsavj-twin):
 - **Motion helpers:** tiny routines, one per motion shape+facing:
   `lea <step-table>(pc),a3; bra <tracker-dispatcher>`. Families:
   vs2 0x29114-0x291EC (tables 0x29974-0x29A80), vsavj
-  0x29DC2-0x29F42 (tables 0x2A610-0x2A780). Right/left facing =
-  paired tables (terminators 0x0F00 / 0xF000). The step tables are
+  0x29DC2-0x29F42 (tables 0x2A610-0x2A780). Punch/kick = paired
+  tables: the terminator IS the button step, `& 0x7700` against
+  +0x1AC|+0x1AE — 0x0F00 any punch, 0xF000 any kick (CORRECTED 14z-211,
+  #329, read from the state-4 code at vsavj `0x029FD6`: this said
+  "Right/left facing"; the tables are already facing-relative, see
+  the direction codes below). The step tables are
   read via (a3,d0) = DATA-space (the pc-relative lea only computes
   the address): read them from data.bin, and any port must place
   them as raw data (the farm_port emitter does).
@@ -1526,8 +1530,15 @@ vsavj and vs2; addresses vs2 / vsavj-twin):
   low nibble vs the 4-bit direction code in the low byte (+0x12B) of the
   word read at obj+0x12A (corrected 14z-194, #118), flag bit 7
   = mask-mode — and (state 4) bitmask match — step word & 0x7700
-  vs obj+0x1AC|+0x1AE — plus flag bits (bit 4 = advance-and-
-  continue same frame, bits B/F = diagonal-leniency classes).
+  vs obj+0x1AC|+0x1AE — plus flag bits (bit 4 = the LAST direction:
+  advance to the button step in the same run; in the button word, bit 6
+  = every button of the class, then bit B = all three punches and bit F
+  all three kicks — CORRECTED 14z-211, #329, read at vsavj
+  `0x029F86`/`0x029FF4`: this said "bits B/F = diagonal-leniency
+  classes"; no table of the 0x29F4A kind sets bit 6). A direction that
+  does not match is WAITED THROUGH, not a failure; each step must arrive
+  before its `+4` counter runs out (14-19 passes, drawn per step: "The
+  motion trackers' timeout is where the two engines differ" above).
   Completion returns d0=1 to the char handler, which stamps the
   matched command id at obj+0x106 (+0x105 = trigger latch); the
   trigger dispatcher (0x21BFC / table 0xD7398[char]) then runs the
@@ -1538,30 +1549,72 @@ vsavj and vs2; addresses vs2 / vsavj-twin):
   button-sequence families. The state machines of corresponding
   kinds are proper twins ACROSS engines; only the TABLES differ.
 **[VSE-46]** - **Engine-generation retune (the 14z-48 trap):** VS2 changed some
-  motion TABLE definitions vs vsavj — e.g. 63214: vsavj
-  [1,5,4,16] (final step dir+flag fused) vs vs2 [1,5,4,6,12]
-  (final step split; extra required entry) — an input-leniency
-  retune. vsavj's own HC tables serve the vanilla cast (Morrigan/
+  motion TABLE definitions vs vsavj — e.g. the half circle forward:
+  vsavj [1,5,4,16] = 4 1 2 3 (the 3 carries the final flag) vs vs2
+  [1,5,4,6,12] = 4 1 2 3 6 (one more required step); and the half
+  circle back, vsavj [2,6,4,11] = 6 3 2 4 vs vs2 [2,6,4,5,11] =
+  6 3 2 1 4 — an input-leniency retune (CORRECTED 14z-211, #329:
+  this named the first pair "63214"; the step codes are toward 2,
+  back 1, down 4, up 8 — the +0x12B code after its facing swap —
+  read from vsavj `0x2A670`/`0x2A684` and vs2 `0x299CE`/`0x299E6`
+  in each set's data view). vsavj's own HC tables serve the vanilla cast (Morrigan/
   Lilith/Bulleta...; verified by caller scan). Ported newcomers
   should carry vs2's exact tables via farm_port rows (vs2 input
   feel); reconciliation of helper families MUST match by table
   content + dispatcher kind, never code similarity (GOTCHAS).
 
-### Which half-circle spellings vsavj accepts (14z-208b, MEASURED, #229)
+### Which half-circle spellings vsavj accepts (DERIVED from the command handlers and MEASURED, 14z-211, #329)
 
 Asked by the maintainer (2026-10-25: whether a half circle needs 63214, 6324, 6321, 6214 or 624, and its mirror —
-"it doesn't change the input on stick but it might change the input on leverless controlers"). Measured on pristine
-vsavj, P1 facing right, each direction 2 frames with no release, the last held 6 with the button from its third frame
-(`tools/command_throw_rigs.py` `motion`; the gate `tests/audit_command_throws.sh`, its `motion …` rows, #229):
+"it doesn't change the input on stick but it might change the input on leverless controlers").
 
-- **Half circle back (63214):** 63214, 6324, 6214 and 624 all enter the move — the same chain, hold and damage as the
-  full motion — on all 14 command grabs measured (13 on the ground, Bishamon's EX among them, and Jedah's air Ira Spinta). **6321 never
-  does**: the final BACK is required, every diagonal is optional. It matches the step table's last step being the back
-  direction (vsavj [1,5,4,16] above: 6, 3, 2, then 4 with its flag).
-- **Half circle forward (41236):** 41236, 4126, 4123, 4236 and 426 all enter Q-Bee's Catch and Release, on the ground
-  and in the air, and all start Jedah's Prova di Servo — the 6 is not needed and the diagonals are optional.
-- **360:** the rotation tracker takes the four cardinals 6 2 4 8 (`rot`, measured 14z-205 on Demitri and Bishamon).
-- **Not measured:** other cadences (slower steps, a release between directions), the left-facing tables, vs2.
+**From the handlers.** Every vsavj command grab's half circle runs through the motion trackers above (the eval handlers'
+calls, `build/agent205/t229/f4_throws/handlers.out`, and a scan of every `jsr` to the helpers): the half circle back is
+the 4-step table 6 3 2 4 (vsavj `0x2A684` punch / `0x2A68E` kick, 17 callers), the half circle forward 4 1 2 3
+(`0x2A670` / `0x2A67A`, 20 callers). Each step is an EXACT match and anything between steps is waited through, so the
+MINIMAL inputs are **6324** and **4123**: the 3 (resp. the 1) is required, the 1 (resp. the 6) is not, and the last
+direction carries the button. Two tables are the full five steps: `0x2A698` 6 3 2 1 4 (one caller, Morrigan's kick
+command) and `0x2A722` 4 1 2 3 6 (one caller, Sasquatch, a different dispatcher kind). every half-circle table vs2's helper family (`0x29114`-`0x291FF`, all 30 helpers) points at is five steps
+([VSE-46] above).
+
+**Measured** on pristine vsavj, P1 facing right, each direction on its OWN two frames, the last held 6 with the button
+from its third frame (`tools/command_throw_rigs.py` `motion`; the gate `tests/audit_command_throws.sh`, its `motion …`
+rows, re-frozen 14z-211; the rows of the two minimal spellings are labelled `minimal`):
+- **Half circle back:** 63214, 6324 enter the move on all 14 command grabs measured (13 on the ground, Bishamon's EX among
+  them, and Jedah's air Ira Spinta); 6321 never does; and **6214 and 624 never do** — close to the opponent they come
+  out as the character's NORMAL throw (back + the button: 8 of the 14 6214 events, 10 of the 14 624s), as another special
+  where the spelling contains one (Bulleta's and Lei-Lei's 6214, which holds a 214), or as nothing.
+- **Half circle forward:** 41236 and 4123 enter Q-Bee's Catch and Release, on the ground and in the air, and start
+  Jedah's Prova di Servo; **4126, 4236 and 426 do neither**.
+- **The control:** the 14z-208b encoding of 624 (below) still enters Gems Anger with the same frozen line as the old row.
+- **Seen:** the maintainer confirmed capture sheets, nine tiles each, of every motion-test row whose frozen line or fed
+  input the re-rig changed — the 37 short spellings that no longer grab, the 14 true-6324 rows and the control
+  (`tools/command_throw_sheet.py`; 2026-10-27). The rows fed the same as before (6321, 4123, 41236 and the full
+  motions) stand on the 14z-208b sheets.
+- **360:** the 14z-205 measurement (`rot`, Demitri and Bishamon: a 360 entered on the four cardinals 6 2 4 8) was fed
+  one-frame diagonals between the cardinals, the same inclusive-range overlap as the half circles' (#329's census,
+  `docs/project/gotchas.md` "A REPLAY RANGE IS INCLUSIVE"). Whether the rotation tracker (vsavj `0x02A1B4`) needs the
+  cardinals alone is NOT MEASURED, nor shown on a capture; the overlap there joins neighbouring cardinals, so the rigs
+  never fed a spelling missing a direction.
+- **Not measured:** other cadences (slower steps, a release between directions), the left-facing side, vs2 in-game.
+
+**RETRACTED (14z-211, #329) — the 14z-208b reading, kept as measured.** Its rig wrote each direction `t..t+2` and the next
+`t+2..t+4`; `replay.lua`'s ranges are inclusive, so every boundary frame held both directions and the game was fed every
+diagonal (`docs/project/gotchas.md` "A REPLAY RANGE IS INCLUSIVE"). What it recorded:
+
+> Asked by the maintainer (2026-10-25: whether a half circle needs 63214, 6324, 6321, 6214 or 624, and its mirror —
+> "it doesn't change the input on stick but it might change the input on leverless controlers"). Measured on pristine
+> vsavj, P1 facing right, each direction 2 frames with no release, the last held 6 with the button from its third frame
+> (`tools/command_throw_rigs.py` `motion`; the gate `tests/audit_command_throws.sh`, its `motion …` rows, #229):
+>
+> - **Half circle back (63214):** 63214, 6324, 6214 and 624 all enter the move — the same chain, hold and damage as the
+>   full motion — on all 14 command grabs measured (13 on the ground, Bishamon's EX among them, and Jedah's air Ira Spinta). **6321 never
+>   does**: the final BACK is required, every diagonal is optional. It matches the step table's last step being the back
+>   direction (vsavj [1,5,4,16] above: 6, 3, 2, then 4 with its flag).
+> - **Half circle forward (41236):** 41236, 4126, 4123, 4236 and 426 all enter Q-Bee's Catch and Release, on the ground
+>   and in the air, and all start Jedah's Prova di Servo — the 6 is not needed and the diagonals are optional.
+> - **360:** the rotation tracker takes the four cardinals 6 2 4 8 (`rot`, measured 14z-205 on Demitri and Bishamon).
+> - **Not measured:** other cadences (slower steps, a release between directions), the left-facing tables, vs2.
 
 ## In-fight HUD asset tables + the select-wheel record (session 14z-49, measured)
 

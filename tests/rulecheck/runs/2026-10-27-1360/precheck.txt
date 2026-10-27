@@ -1,0 +1,8 @@
+  FLAG FIGURE: 324
+  FLAG FIGURE: 634
+  FLAG FIGURE: 423
+  FLAG D-ABSOLUTE: In vs2, every motion helper of its helper family whose table is a half circle points at a five-step table (6 3 2 1 4, 4 1 2 3 6).  [build/agent211/t329/closure/c329.md]
+  FLAG D-ABSOLUTE: - 6214 and 624 enter the grab on none of the 14 half-circle-back grabs measured.  [build/agent211/t329/closure/c329.md]
+  FLAG D-ABSOLUTE: - Capture sheets, nine tiles per event, were put to the maintainer, who confirmed each set shows what its labels say:  [build/agent211/t329/closure/c329.md]
+  FLAG D-ABSOLUTE: Together they show every row whose outcome or input the re-rig changed.  [build/agent211/t329/closure/c329.md]
+packet_check: 7 flag(s): D-ABSOLUTE 4, FIGURE 3

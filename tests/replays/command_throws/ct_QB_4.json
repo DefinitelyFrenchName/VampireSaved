@@ -7,7 +7,7 @@
  "events": [
   {
    "row": "LP CATCH AND RELEASE",
-   "label": "motion 4123LP",
+   "label": "motion 4123LP minimal",
    "meter": false,
    "frame": 2800,
    "press": 2808,
@@ -47,7 +47,7 @@
   },
   {
    "row": "AIR LP CATCH AND RELEASE",
-   "label": "motion j.4123LP",
+   "label": "motion j.4123LP minimal",
    "meter": false,
    "frame": 5920,
    "press": 5934,

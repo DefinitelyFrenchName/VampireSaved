@@ -7,7 +7,7 @@
  "events": [
   {
    "row": "GEMS ANGER",
-   "label": "motion 6324HK",
+   "label": "motion 6324HK minimal",
    "meter": false,
    "frame": 2800,
    "press": 2808,
@@ -36,6 +36,14 @@
    "frame": 4672,
    "press": 4678,
    "end": 5018
+  },
+  {
+   "row": "GEMS ANGER",
+   "label": "motion 624HK shared frames (=63214)",
+   "meter": false,
+   "frame": 5296,
+   "press": 5302,
+   "end": 5642
   }
  ],
  "pokes": [
@@ -60,7 +68,11 @@
   "4442:ff8410:0228",
   "4442:ff8810:02d8",
   "4652:ff8850:01200120",
-  "4652:ff8509:000000"
+  "4652:ff8509:000000",
+  "5066:ff8410:0228",
+  "5066:ff8810:02d8",
+  "5276:ff8850:01200120",
+  "5276:ff8509:000000"
  ],
- "frames": 5446
+ "frames": 6070
 }

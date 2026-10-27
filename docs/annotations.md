@@ -23,13 +23,13 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3632 |
-| named by a document or manifest only | 2288 |
+| distinct program-space addresses named | 3643 |
+| named by a document or manifest only | 2299 |
 | named by both a document/manifest and code | 868 |
 | named by CODE ONLY (the gap list below) | 476 |
 | carried by atlas | 719 |
-| carried by engine_internals | 827 |
-| carried by other docs | 1061 |
+| carried by engine_internals | 838 |
+| carried by other docs | 1062 |
 | carried by manifests | 1850 |
 | carried by code | 1344 |
 
@@ -1358,7 +1358,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0290C4` | docs/game/engine_internals.md — THE GUARD WINDOW ON AN AIR BLOCK — vs2 opens it for Phobos alone (measured 14z-184, GitHub #174); build/manifest/reconciliation.toml — map |
 | `PRG:0x029104` | build/manifest/reconciliation.toml — map [vs2]; tools/rng_draws.py |
 | `PRG:0x02910C` | docs/project/patch_notes.md — 14z-65 (6) — the specials hunt: window widened, alias rule, farm verified (2026-08-07); build/manifest/reconciliation.toml — map [vs2] |
-| `PRG:0x029114` | docs/game/atlas/ram.md — Fighter + effect-pool fields (14z-67, measured on the H effect arc) [vs2]; docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) [vs2]; build/manifest/reconciliation.toml — map [vs2] |
+| `PRG:0x029114` | docs/game/atlas/ram.md — Fighter + effect-pool fields (14z-67, measured on the H effect arc) [vs2]; docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) [vs2]; docs/game/engine_internals.md — Which half-circle spellings vsavj accepts (DERIVED from the command handlers and MEASURED, 14z-211, #329) [vs2]; build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x02911C` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x029124` | docs/game/atlas/ram.md — Fighter + effect-pool fields (14z-67, measured on the H effect arc); docs/game/atlas/ram.md — Fighter + effect-pool fields (14z-67, measured on the H effect arc) [vs2]; build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x02912C` | build/manifest/reconciliation.toml — map [vs2] |
@@ -1373,6 +1373,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x02919C` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x0291D4` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x0291EC` | docs/game/atlas/ram.md — Fighter + effect-pool fields (14z-67, measured on the H effect arc) [vs2]; docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) [vs2]; tools/rng_draws.py |
+| `PRG:0x0291FF` | docs/game/engine_internals.md — Which half-circle spellings vsavj accepts (DERIVED from the command handlers and MEASURED, 14z-211, #329) [vs2] |
 | `PRG:0x02921C` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x02923A` | build/manifest/reconciliation.toml — map |
 | `PRG:0x029244` | build/manifest/reconciliation.toml — map [vs2] |
@@ -1404,6 +1405,8 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x029974` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) [vs2] |
 | `PRG:0x02997E` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x029984` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
+| `PRG:0x0299CE` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) [vs2] |
+| `PRG:0x0299E6` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) [vs2] |
 | `PRG:0x029A02` | build/manifest/reconciliation.toml — map |
 | `PRG:0x029A16` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); build/manifest/donovan.toml — port_patch; build/manifest/huitzil.toml — port_patch; build/manifest/pyron.toml — port_patch; build/manifest/reconciliation.toml — map; tests/audit_df_meter.sh |
 | `PRG:0x029A1A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
@@ -1433,12 +1436,14 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x029F4A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines); docs/game/engine_internals.md — Dark Force (measured 14z-69/69c/101, ruled 2026-08-21); docs/game/engine_internals.md — Huitzil's form is a FLIGHT mode; the purple was a palette-sequence collision (measured 14z-69e, fixed 14z-84); docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); build/manifest/huitzil.toml — pcrel_escape_fix; +1 more |
 | `PRG:0x029F60` | docs/game/engine_internals.md — Dark Force (measured 14z-69/69c/101, ruled 2026-08-21) |
 | `PRG:0x029F68` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
-| `PRG:0x029F86` | docs/game/engine_internals.md — Dark Force (measured 14z-69/69c/101, ruled 2026-08-21) |
+| `PRG:0x029F86` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines); docs/game/engine_internals.md — Dark Force (measured 14z-69/69c/101, ruled 2026-08-21) |
 | `PRG:0x029F90` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) |
 | `PRG:0x029F96` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) |
 | `PRG:0x029F9A` | docs/game/engine_internals.md — Dark Force (measured 14z-69/69c/101, ruled 2026-08-21) |
 | `PRG:0x029FD2` | docs/game/engine_internals.md — Dark Force (measured 14z-69/69c/101, ruled 2026-08-21) |
+| `PRG:0x029FD6` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) |
 | `PRG:0x029FDA` | docs/game/engine_internals.md — Dark Force (measured 14z-69/69c/101, ruled 2026-08-21) |
+| `PRG:0x029FF4` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) |
 | `PRG:0x02A030` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) |
 | `PRG:0x02A0BA` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) [vs2]; tests/audit_column_flash.sh |
 | `PRG:0x02A0C8` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) |
@@ -1447,7 +1452,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x02A108` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) [vs2]; tests/audit_column_flash_cause.sh; tools/audit_charid_masks.py |
 | `PRG:0x02A128` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) |
 | `PRG:0x02A142` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink) [vs2] |
-| `PRG:0x02A1B4` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines); tools/command_throw_rigs.py |
+| `PRG:0x02A1B4` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines); docs/game/engine_internals.md — Which half-circle spellings vsavj accepts (DERIVED from the command handlers and MEASURED, 14z-211, #329); docs/project/gotchas.md — A REPLAY RANGE IS INCLUSIVE, SO TWO DIRECTIONS WRITTEN END-TO-START SHARE A FRAME — AND R THEN D FEEDS THE GAME A DR (paid: 14z-208b/14z-211, #229, #329); tools/command_throw_rigs.py |
 | `PRG:0x02A2EA` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) |
 | `PRG:0x02A42E` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) |
 | `PRG:0x02A528` | docs/game/engine_internals.md — Dark Force (measured 14z-69/69c/101, ruled 2026-08-21); docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) |
@@ -1459,6 +1464,12 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x02A582` | docs/game/engine_internals.md — Dark Force (measured 14z-69/69c/101, ruled 2026-08-21) |
 | `PRG:0x02A606` | build/manifest/reconciliation.toml — map |
 | `PRG:0x02A610` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines); docs/game/engine_internals.md — Dark Force (measured 14z-69/69c/101, ruled 2026-08-21) |
+| `PRG:0x02A670` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines); docs/game/engine_internals.md — Which half-circle spellings vsavj accepts (DERIVED from the command handlers and MEASURED, 14z-211, #329) |
+| `PRG:0x02A67A` | docs/game/engine_internals.md — Which half-circle spellings vsavj accepts (DERIVED from the command handlers and MEASURED, 14z-211, #329) |
+| `PRG:0x02A684` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines); docs/game/engine_internals.md — Which half-circle spellings vsavj accepts (DERIVED from the command handlers and MEASURED, 14z-211, #329) |
+| `PRG:0x02A68E` | docs/game/engine_internals.md — Which half-circle spellings vsavj accepts (DERIVED from the command handlers and MEASURED, 14z-211, #329) |
+| `PRG:0x02A698` | docs/game/engine_internals.md — Which half-circle spellings vsavj accepts (DERIVED from the command handlers and MEASURED, 14z-211, #329) |
+| `PRG:0x02A722` | docs/game/engine_internals.md — Which half-circle spellings vsavj accepts (DERIVED from the command handlers and MEASURED, 14z-211, #329) |
 | `PRG:0x02A780` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines); docs/game/engine_internals.md — Dark Force (measured 14z-69/69c/101, ruled 2026-08-21) |
 | `PRG:0x02A7C8` | docs/game/engine_internals.md — The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink); docs/project/patch_notes.md — donovan-m2 stage 4 — +0x14E state hook, sound stubs, anim_index_a2 (2026-07-27, session 9); build/manifest/donovan.toml — port_patch; build/manifest/donovan.toml — state_hook; build/manifest/shared_writes.toml — donovan; tests/lua/upload_tap.lua; +1 more |
 | `PRG:0x02A7CE` | build/manifest/donovan.toml — state_hook |
