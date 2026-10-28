@@ -7720,3 +7720,49 @@ spelling in its label. A census of every committed `.rpl` for frames whose OR is
 (14z-211): the command-throw 360/720 rigs (each boundary frame ORs two neighbouring cardinals into the diagonal between
 them; whether the rotation tracker, `PRG:0x02A1B4`, needs the cardinals alone is not measured) and the guard-cancel recipe `gc_v`, whose 623 starts with R inside the held L (L+R for two frames,
 `tests/replays/naming/huitzil_5.rpl`).
+
+## A STATE THE ENGINE PASSES THROUGH IS NOT "THE FIGHTER CAN ACT" — the throw mode byte returned to 00 up to 11 ticks early on 22 of 42 throws (paid: 14z-211, #330)
+
+#330's pilot (Felicia's 6MP on Victor) found the first accepted one-frame LP one tick after `+0x05` (the mode byte of the
+`+0x04` long) first read 00, on both fighters, thrown and teched, and generalised it. Re-proved on all 42 ground throws
+(an LP at A-1 must never start the normal, one at A must, on its press frame), the thrower failed on 22: the throw ends
+in a ONE-pass `0x02000000` the engine leaves for a landing seq (`0x020008xx`: Felicia's and Gallon's K throws, Q-Bee),
+or holds `0x02000000` 2-12 passes (Jedah, Zabel, Demitri's K throw, Victor's 12). Standing neutral (`0x02000002`) is no
+better: 4-25 ticks LATE on 24 of 168 cases, where the thrower attacks from the air or the landing. **The rule:** "can
+act" is measured by what the game ACCEPTS (`tools/throw_recovery_rigs.py`: a one-frame LP at A-1 and A, the normal's
+seq `0x0A` on the press frame), and a predicate read from a state is a PREDICTION to be checked that way, on every event
+it is used for — a pilot's agreement on one throw is one throw.
+
+## A RIG'S FIRST EVENT STANDS AT ANOTHER STAGE X — and Morrigan's K throw behaved differently there (paid: 14z-211, #330)
+
+The rigs pin both fighters at `t-230` and walk in, but the first event walks in from the round start: in
+`tools/ground_throw_rigs.py`'s rigs P1 stood at x `0x37F` against `0x3B5` for every later event (the same gap between the
+fighters). Most throws do not notice; Morrigan's K throw recovered 6 ticks later on the first event, and every odd
+departure of #330's acceptance scan was a first event — read at first as "the tech's timing matters at k = 1". **The
+rule:** a measurement compared across events of one rig puts a SACRIFICIAL event first (`tools/throw_recovery_rigs.py`
+does), and a difference seen only on an event's slot is checked against its slot before it is read as the event's.
+
+## A RIG TIMED IN FRAMES AT ONE SPEED LEVEL DOES SOMETHING ELSE AT ANOTHER — an air throw pressed at +14 frames did not connect at level 0 (paid: 14z-211, #330)
+
+`tools/ground_throw_rigs.py`'s air rigs press 14 frames after the jump at vsavj's default speed level (6), where that is
+17 engine ticks (`RAM:$FF8081`). Pinned to level 0 (one pass per frame), +14 frames is 14 ticks: several throws no longer
+held, and the tech presses first timed from the jump made P2 attack in the air. Pressing at the TICK count (17; 22 and
+19 for Bulleta and Victor) with P2's lead at 3 reproduced every fighter's y and the pair's dx at the commit exactly.
+Command-throw rigs timed across a long stretch (Pit of Blame's sweep set-up, Victor's air 720) needed the same 17/14
+scaling. And a GATE run per family must pass the family to EVERY tool call: `tests/audit_throw_recovery.sh` first
+passed `TR_FAMILY` to `gen` and `expect` but not `rows`, so the command family's rigs were read as ground rows (164
+bad) — a freeze run had passed only because the variable was exported for it. **The rule:** a rig moved to another speed
+level is re-timed in TICKS and checked against the original by the state at its commit, and a per-family setting is
+exported once for the family's whole run, never passed call by call.
+
+## OUT OF RANGE A RANGE-CHECKED GRAB'S INPUT IS A NORMAL — a "whiff" measured from far away was a normal on 28 of 82 command events (paid: 14z-211, #330)
+
+#330 measured the command throws' whiff recovery by doing each grab from pins 150 px wider each, where nothing can be
+grabbed. A capture sheet that printed the presser's state under every tile showed `0x02000a02` (the NORMAL's seq 0x0A)
+on Hell Cat's press frame: the half-circle grabs of Aulbath, Felicia, Gallon, Jedah (San Bassale), Morrigan, Q-Bee (O.M.)
+and Zabel, and Morrigan's Cryptic Needle, check the distance and, out of range, start the button's normal. Their frozen
+"whiff" was that normal's recovery, and the per-button, per-distance spread it produced had been read as a property of the
+grabs. **The rule:** a rig that means to perform a move checks, on the press frame, that the move it names STARTED (its
+state, not the inputs fed), and a whiff of a range-checked grab is made in range against a victim that cannot be grabbed.
+A sheet that prints the game's state under each picture also settles "is this the frame it says?" (the picture lags the
+state by 2-4 frames).

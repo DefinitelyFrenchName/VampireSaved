@@ -4,7 +4,7 @@
 # verdicts are trusted). ci_static, portable: no ROM, no emulator, no workbook; ~1 s.
 #
 # WHAT: tools/crosscheck_229.py's join-and-classify code — the pure functions under each family's loader
-#   (classify_es, aggregate_ct, classify_gc, classify_gt) and the code they stand on (the page's classify in
+#   (classify_es, aggregate_ct, classify_gc, classify_gt, classify_tr, classify_tr_air, classify_tr_cmd) and the code they stand on (the page's classify in
 #   tools/crosscheck_framedata.py, command_throw_rigs.parse_series / match_series, specials_b_rigs.verdicts,
 #   gc_rigs.ours_cols / sheet_cols) — run on small synthetic fixtures (a fake workbook, fake gate rows), each built so
 #   its verdict is known by construction: EXACT, CONSTANT OFFSET, CONSTANT RATIO, INCONSISTENT and NO DATA from the
@@ -14,7 +14,11 @@
 #   timing read from the HIT and never the whiff (#229 Q6) and their damage read as DEALT on the -3 victim, never
 #   from the Demitri event (Q5); a row NAMED a guard cancel but typed otherwise held in the guard cancels' row set and
 #   joined (#331: Demitri's four Demon Cradle GC rows, tools/gc_rigs.py is_gc_row — until 14z-210 reported NOT RUN);
-#   the normal throws ground and air, the air rows joined on key AIR.
+#   the normal throws ground and air, the air rows joined on key AIR; the ground throws' recovery and throw tech
+#   (#330, classify_tr: EXACT, a "+ landing 1" cell counted in, INSIDE / OUTSIDE the sheet's range, OFF, INSIDE THE
+#   VICTIM RANGE, INCONSISTENT, a prose cell and a row whose events differ UNCOMPARABLE); the air throws against heights
+#   (classify_tr_air: a summed cell, INSIDE THE HEIGHT RANGE, a prose cell) and the command whiffs (classify_tr_cmd: the
+#   profile 2 + 1(5)1 + 41 against the whiff tick, no whiff, a prose active cell, the tech window counted).
 # HOW: one Python program (below) builds every fixture, calls the functions and compares each got verdict with its
 #   expected one; CONTROL=<name> or the in-gate control loop re-runs it with that control's perturbation.
 # EXPECTS: every case's verdict equals its expected one (the case table below), and each control's perturbation makes
@@ -27,6 +31,10 @@
 # MUST-FIRE: perturbed-copy: flipped-expectation — the case table with the ES/EX red case's expected EXACT flipped to INCONSISTENT must fail that case (in-gate; mode: the gate compares against the flipped table and FAILs)
 # MUST-FIRE: perturbed-copy: whiff-for-hit — the guard cancels classified with the WHIFF events as their timing (classify_gc timing_kind="whiff") must change the startup verdict from CONSTANT OFFSET (in-gate; mode: the gate's guard-cancel case runs on the whiff and FAILs)
 # MUST-FIRE: perturbed-copy: record-for-dealt — the guard cancels' damage read from the gc (Demitri) event instead of the dealt (-3 victim) event must change the dealt red verdict from EXACT (in-gate; mode: the gate's guard-cancel case reads the gc event and FAILs)
+# MUST-FIRE: perturbed-copy: landing-ignored — the throws' recovery cells read without their "+ landing 1" (the base alone) must change the recovery verdicts of the recovery case (in-gate; mode: the gate's recovery case reads the bare base and FAILs)
+# MUST-FIRE: perturbed-copy: victim-range-dropped — the ground throws classified against the gate's victim alone must lose the INSIDE THE VICTIM RANGE verdict of the throw-tech case (in-gate; mode: the gate's ground case drops the range and FAILs)
+# MUST-FIRE: perturbed-copy: height-range-dropped — the air rows classified against the rig's height alone must lose the INSIDE THE HEIGHT RANGE verdict of the air recovery case (in-gate; mode: the gate's air case drops the range and FAILs)
+# MUST-FIRE: perturbed-copy: active-gap-dropped — the command profile's active cell "1(5)1" read as its first number alone must move the command whiff case off CONSTANT OFFSET (in-gate; mode: the gate's command case misreads the cell and FAILs)
 # MUST-FIRE: perturbed-copy: contact-counted — the specials' CONTACT rows classified as if they had not touched P2 must change the startup verdict from CONSTANT OFFSET (in-gate; mode: the gate's specials case counts them and FAILs)
 #
 # Usage: tests/test_crosscheck_229.sh            # static tier, ROM-free
@@ -38,7 +46,7 @@ fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 
 cases() {  # cases <perturbation or ""> -> one line per case: OK|DIFF <case> got=<..> want=<..>; exit 0
     python3 - "$1" <<'PY'
-import sys, collections
+import sys, collections, re
 sys.path.insert(0, "tools")
 import crosscheck_framedata as cf
 import crosscheck_229 as x
@@ -169,6 +177,53 @@ for scope, held, never in (("ground", 1, 1), ("air", 1, None)):
     check(f"gt {scope} red", dict(series["red"]), {"EXACT": 1})
     check(f"gt {scope} gauge", dict(series["gauge"]), {"EXACT": 1})
     check(f"gt {scope} startup", cf.classify(pairs["startup (press to hold)"])[0], "CONSTANT OFFSET")
+
+# 8. the ground throws' recovery and throw tech (#330): three victims, the gate's own first
+import ground_throw_rigs as gtr
+gtr.THROWS["XX"] = [("P", "6MP", []), ("K", "6MK", []), ("MP", "6MP", []), ("HP", "6HP", []), ("PB", "4MP", []), ("PB", "4HP", [])]
+def tr(rec, adv, vic_thrown=200): return {"thr_thrown": rec, "vic_thrown": vic_thrown, "thr_tech": 50, "vic_tech": 50 + adv}
+v0 = {("XX", "P", "6MP"): tr(54, 21), ("XX", "K", "6MK"): tr(98, 2), ("XX", "MP", "6MP"): tr(131, -19),
+      ("XX", "HP", "6HP"): tr(248, 5), ("XX", "PB", "4MP"): tr(54, 21), ("XX", "PB", "4HP"): tr(55, 21)}
+v1 = {**v0, ("XX", "K", "6MK"): tr(98, 1), ("XX", "MP", "6MP"): tr(131, -18)}
+v2 = {**v0, ("XX", "K", "6MK"): tr(98, 3)}
+if P == "landing-ignored":     # the sheet's "+ landing 1" read as its base alone
+    _cell = x._tr_cell
+    x._tr_cell = lambda c: _cell(str(c).split("+")[0]) if c is not None and "landing" in str(c) else _cell(c)
+wb = WB({"XX": [{"type": "ground throw", "move": "P THROW", "recovery": "54.0", "throw tech": "21.0"},
+                {"type": "k ground throw", "move": "K THROW", "recovery": "97 + landing 1", "throw tech": "0.0"},
+                {"type": "ground throw", "move": "MP THROW", "recovery": "131-150", "throw tech": "-18.0"},
+                {"type": "ground throw", "move": "HP THROW", "recovery": "250.0", "throw tech": "varies"},
+                {"type": "ground throw", "move": "P THROW BACK", "recovery": "78.0", "throw tech": "21.0"}]})
+# the control victim-range-dropped: the ground throws classified against the gate's victim alone (the range dropped)
+_, verdicts, st, _ = x.classify_tr(wb, [("v0", v0)] if P == "victim-range-dropped" else [("v0", v0), ("v1", v1), ("v2", v2)])
+check("tr recovery", dict(verdicts[x.TR_COLS[0]]), {"EXACT": 2, "INSIDE THE SHEET'S RANGE": 1, "OFF": 1, "UNCOMPARABLE": 1})
+check("tr throw tech", dict(verdicts[x.TR_COLS[1]]), {"EXACT": 1, "INCONSISTENT": 1, "INSIDE THE VICTIM RANGE": 1, "UNCOMPARABLE": 2})
+check("tr rows", dict(st), {"COMPARED": 4, "EVENTS DIFFER": 1})
+
+# 9. the air throws against heights (#330: the cell's terms summed; the rig's height first) and the command whiffs
+gtr.AIR["XX"] = [("AIR", "j.6MP", []), ("AIR", "j.6HP", [])]
+gtr.AIR["YY"] = [("AIR", "j.6MP", []), ("AIR", "j.6HP", [])]
+h0 = {("XX", "AIR", "j.6MP"): tr(64, 14), ("XX", "AIR", "j.6HP"): tr(64, 14), ("YY", "AIR", "j.6MP"): tr(60, 3), ("YY", "AIR", "j.6HP"): tr(60, 3)}
+h1 = {**h0, ("YY", "AIR", "j.6MP"): tr(63, 5), ("YY", "AIR", "j.6HP"): tr(63, 5)}
+wba = WB({"XX": [{"type": "air throw", "recovery": "40 + 23 + landing 1", "throw tech": "14.0"}],
+          "YY": [{"type": "air throw", "recovery": "62", "throw tech": "variable"}]})
+# the control height-range-dropped: the air rows classified against the rig's height alone (the range dropped)
+av, ast, _ = x.classify_tr_air(wba, [("h0", h0)] if P == "height-range-dropped" else [("h0", h0), ("h1", h1)])
+check("tr air recovery", dict(av[x.TR_COLS[0]]), {"EXACT": 1, "INSIDE THE HEIGHT RANGE": 1})
+check("tr air tech", dict(av[x.TR_COLS[1]]), {"EXACT": 1, "UNCOMPARABLE": 1})
+check("tr air summed cell", x._tr_sum("72+45+landing 12+turning 1"), 130)
+check("tr air prose cell", x._tr_sum("variable + landing 1"), None)
+wbc = WB({"XX": [{"move": "GRAB", "startup": "2", "active": "1(5)1", "recovery": "41", "throw tech": ""},
+                 {"move": "SLOW GRAB", "startup": "2", "active": "until landing", "recovery": "2", "throw tech": ""},
+                 {"move": "QUICK GRAB", "startup": "2", "active": "3", "recovery": "20", "throw tech": ""}]})
+if P == "active-gap-dropped":   # the command profile's active "1(5)1" read as its first number alone
+    x._tr_active = lambda c: int(str(c).split("(")[0]) if c is not None and re.match(r"\s*\d", str(c)) else None
+cp, cst, cw = x.classify_tr_cmd(wbc, {("XX", "GRAB", "MK"): {"whiff": 49, "window": "none"}, ("XX", "GRAB", "HK"): {"whiff": 49, "window": "1-7"},
+                                      ("XX", "SLOW GRAB", "LK"): {"whiff": 30, "window": "none"}, ("XX", "GRAB", "KK"): {"whiff": None, "window": "none"},
+                                      ("XX", "QUICK GRAB", "LP"): {"whiff": 24, "window": "none"}})
+check("tr command whiff", cf.classify(cp["whiff (startup + active + recovery)"])[0], "CONSTANT OFFSET")
+check("tr command rows", dict(cst), {"JOINED": 3, "NO WHIFF (the input draws no move)": 1, "UNCOMPARABLE (a prose startup / active / recovery)": 1, "THROW TECH CELL EMPTY": 3})
+check("tr command window", dict(cw), {"none": 4, "1-7": 1})
 print("\n".join(out))
 PY
 }
@@ -185,7 +240,7 @@ echo "== 2. must-fire controls"
 if [ -n "${VS_CTL:-}" ]; then
     echo "  (control mode $VS_CTL: section 1 ran with its perturbation; the gate must FAIL)"
 else
-    for c in "flipped-expectation:es red" "whiff-for-hit:gc startup on the hit" "record-for-dealt:gc dealt red" "contact-counted:sb startup"; do
+    for c in "flipped-expectation:es red" "whiff-for-hit:gc startup on the hit" "record-for-dealt:gc dealt red" "contact-counted:sb startup" "landing-ignored:tr recovery" "height-range-dropped:tr air recovery" "active-gap-dropped:tr command whiff" "victim-range-dropped:tr throw tech"; do
         name="${c%%:*}"; target="${c#*:}"
         d="$(cases "$name" 2>&1 | grep '^DIFF ')"
         if echo "$d" | grep >/dev/null "^DIFF $target got="; then vs_ctl_fired "$name" "$(echo "$d" | grep "^DIFF $target got=" | head -1)"

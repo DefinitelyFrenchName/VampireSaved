@@ -111,6 +111,7 @@ declares	audit_tenant_downwin
 declares	audit_tenant_throw_geometry
 declares	audit_tenant_throws
 declares	audit_tenant_timeout
+declares	audit_throw_recovery
 declares	audit_throw_registration
 declares	audit_throw_tech
 declares	audit_tick_cadence

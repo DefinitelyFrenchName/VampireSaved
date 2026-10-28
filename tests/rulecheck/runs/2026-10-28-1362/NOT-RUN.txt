@@ -1,0 +1,6 @@
+Run 2026-10-28-1362 was prepared (14z-211) but never recorded: its first pair of readers died on a network error
+("Can't reach the API server", ENOTFOUND) and `rulecheck.py record` refused the run for those failed spawns ("2 reader(s)
+failed the spawn check"). The readers spawned again on the same prompts answered (kept under
+build/agent211/t330/closure/rc2/, local): reader a VIOLATED Q1 Q2 Q4 (the sheet's victim rows captioned with the
+thrower's state, the stale notes copy, the unprinted air height), the control plant VIOLATED as it must. Each finding was
+answered before run 2026-10-28-1363, prepared fresh on the corrected packet.

@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-210 CLOSE, 2026-10-27)
+# NEXT SESSION — orientation (rewritten at the 14z-211 CLOSE, 2026-10-28)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` (then `python3 tools/gen_history_index.py`
@@ -27,7 +27,7 @@ Work handed to either is a bundle of a COMMIT (a bare commit-tree needs a tempor
 script goes over `ssh <host> 'wsl -e bash -s' < script`.
 
 **THE SESSION CLOSE:** `docs/project/session_close.md`, run by `python3 tools/close.py`. The run of record is named in
-STATE 14z-210's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
+STATE 14z-211's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
 
 **THE EMULATOR RUNNER SINCE 14z-210 (#321, `docs/project/operations.md`):**
 - **Concurrent controls:** a gate on `tests/controls_concurrent_emu.txt` (60 of 61, from a PILOT write trace) runs each
@@ -51,14 +51,37 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
-1. **Ask the maintainer for the order of work.** Open tickets (GitHub severity labels):
+1. **THE WORKING TREE CARRIES UNCOMMITTED WORK: #333 and #334** (STATE 14z-211 (3); the maintainer: *"Commit #330
+   only"*). Confirm PILOT and ERIS are reachable from the Mac (14z-211 lost both when the Mac moved to 10.200.0.89).
+   Then:
+   - **re-trace the stale concurrent-controls rows on PILOT:** 46 static and 22 emulator gates whose scripts changed
+     (`build/agent211/t334/cc_static.txt`, `cc_emu.txt`). Use `tools/trace_controls.sh`, scored by
+     `tools/controls_overlap.py`; 14z-210's scripts are in `build/agent210/t321retrace/`.
+   - update both lists' blobs and TRACES lines;
+   - read ERIS's #333 release-shape run (finished: 417 PASS, 4 host-environment SKIPs; `build/agent211/t333/eris/`);
+   - time #334 item 2's edited gates before and after on ERIS;
+   - time `test_mame_parity` under a tier's load on the Mac (#334 item 1's one remaining leg);
+   - then one strict GREEN tier on the staged tree, the commit, and the #333 and #334 closures on their rule-checker
+     runs.
+   `git status` shows the edited gates; `git stash` is never the way to set them aside.
+2. **#330 IS OPEN: ITS COMMAND THROWS AND TWO VICTIMS NEXT** (STATE 14z-211 (2); the normal throws are in the tree; the maintainer: *"Commit ground+air, rest next"*).
+   - **The command throws:** re-measure their whiffs IN range against a victim that cannot be grabbed. From the wide
+     pins, 28 of the 82 events started a plain normal (state seq `0x0A`; `docs/project/gotchas.md` "OUT OF RANGE A
+     RANGE-CHECKED GRAB'S INPUT IS A NORMAL"); check every whiff's state on its press frame. The first measurement's
+     tool code is `TR_FAMILY=command` in `tools/throw_recovery_rigs.py`, its scratch in `build/agent211/t330/`
+     (`cmd_*.py`, `held/`).
+   - **The air and command throws on Demitri and Lilith:** the maintainer's *"Measure them too"*. The first runs failed
+     (`air_victims.out`: empty states on Lilith's air rigs; `cmd_victims.out`: grabs that never hold on the other
+     victims).
+   - **The sheets** (`tools/throw_recovery_sheet.py`, the state printed under every tile) for what is added. Then
+     #330's closure on a fresh rule-checker run (run `2026-10-28-1361` stopped the first one).
+3. **Ask the maintainer for the order of work.** Open tickets (GitHub severity labels):
    - medium: none.
-   - low: #118, #310 (the UNJUDGED census; deferred, ruled "Record and defer"), #329 (minimal half-circle inputs), #330
-     (the throws' recovery and throw tech), #333 (106 gate scripts carry on after a failed `mktemp -d`), #334 (#321's
-     remainder: the job knobs on PILOT and under load; the knob-less gates' survey);
+   - low: #118, #310 (the UNJUDGED census; deferred, ruled "Record and defer"), #330 (above), #333 (106 gate scripts carry
+     on after a failed `mktemp -d`; done in the tree), #334 (#321's remainder; done in the tree but item 1's Mac leg);
    - parked: #123, #124, #125, #127, #128, #129, #162, #267, #294.
    - **Before planning any freeze or release, read each open ticket's comments for a step that runs AT it.**
-2. **The next freeze or release** runs the six #229 gates only on demand, ERIS's tier takes `--skip test_mame_parity`,
+4. **The next freeze or release** runs the six #229 gates only on demand, ERIS's tier takes `--skip test_mame_parity`,
    and the Mac runs parity (#321).
 
 ## PARKED (not open work)
@@ -68,27 +91,24 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
-- **In `sh`, every pooled subshell shares the parent's `$$`** — a scratch file named by it is shared, and two workers
-  finishing together remove each other's (#321; `tests/lib/measures.sh`). Name scratch with `mktemp`, or keep it in a
-  here-document.
-- **A check that counts what is wrong reads "ok" on an empty input** (`docs/project/gotchas.md`, #331): hold a set to its
-  expected members first.
-- **A builtin `printf`/`echo` into `grep -q` can print the shell's write error** when SIGPIPE is ignored
-  (`docs/platform/gotchas.md`, #327).
-- **MAME 0.288's change-notifier teardown crash** is stopped by the committed pin (0 of 30 against 30 of 30 under forced
-  GC; `docs/platform/gotchas.md`, #320).
-- **`git describe --dirty` takes `.git/index.lock` even under `GIT_OPTIONAL_LOCKS=0`** (git 2.43); two control modes
-  running it at once collide (#321; `audit_release_linux_cleanhost`'s head line now lock-free).
-- **The rule-checker on eleven closures and one freeze** (runs `2026-10-27-1334` to `-1351`): it found a scratch pin
-  measured instead of the committed one, a lint whose census used the fix's own regex, "loaded" control runs that had no
-  load, carried tier rows read as executed, and a freeze checked only against its own hash. Each was answered with a
-  new measurement before the closure.
+- **A state the engine passes through is not "the fighter can act"** (`docs/project/gotchas.md`, #330). Measure it by
+  what the game accepts, and check a state-read predicate on every event it is used for.
+- **A rig's first event stands at another stage x** (#330): put a sacrificial event first when comparing events.
+- **A rig timed in frames at one speed level does something else at another** (#330): re-time it in ticks, and check it
+  against the original by the state at its commit. Export a per-family setting once for the whole run.
+- **`tests/audit_throw_recovery.sh` keeps its ticks outside the tree** (`../charpages/framedata/throw_recovery*_full*.tsv`,
+  #319): a host without them SKIPs; on-demand sets via `TR_VICTIM`, `TR_FAMILY=air TR_HEIGHT`.
+- **The replay range is inclusive** (#329): two directions written end to start share a frame.
 
-## WHAT CLOSED THIS SITTING (14z-210)
+## WHAT CLOSED THIS SITTING (14z-211)
 
-- **Closed `done`:** #321 (remainder #334), #331, #318, #328, #320, #311, #327, #332 — each on its rule-checker run with
-  its closing comment. **Filed:** #332, #333, #334.
-- **Ruled** (`DECISIONS_HISTORY.md`, 14z-210 entries): #321 reopened with all four avenues; the PILOT write trace for
-  emulator controls; longest first; the merged-legacy queue; #310 "Record and defer"; #332 "File and fix now"; #331's rig
-  and "Enough, integrate"; "Signatures -> DIED"; "Runner sets disk TMPDIR"; #333 "File a ticket"; #320 closes on the 139
-  gates; #328 waits for a clean-clone run; #321 "Close; file the remainder".
+- **Closed `done`:** #329 (the half circles' minimal inputs), on its rule-checker run with its closing comment.
+- **Landed, ticket open:** #330's normal throws, ground and air: `tests/audit_throw_recovery.sh`, classified on the
+  cross-check page, the captures read by the maintainer. #333 and #334 stay open, done in the tree and waiting for PILOT.
+- **Ruled** (`DECISIONS_HISTORY.md`, 14z-211 entries):
+  - the opener's cleanup; #329's re-rig;
+  - #334 item 1 "All 35 on PILOT", #333 "Re-trace after #334", #334 item 2 "All 62";
+  - #330: "First accepted input", "New gate, Victor only", "Against the 3-victim range", "Against a height range",
+    "Whiff recovery + techability";
+  - the close "Commit #330 only"; the captures "Now, before the close"; "Measure them too"; "Commit ground+air, rest
+    next"; the maintainer's reading of the sheets, "Yes, commit them".

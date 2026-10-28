@@ -1,0 +1,38 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: close #330 as done (14z-211): throw recovery and the throw tech measured for the normal and command throws, gated (tests/audit_throw_recovery.sh) and classified on the cross-check page
+Claim (the working agent's sentence): CLAIM: close #330 as done with the comment build/agent211/t330/closure/c330.md, landing the new gate tests/audit_throw_recovery.sh, its tool tools/throw_recovery_rigs.py and its frozen hash sets (tests/expected/throw_recovery*.tsv, eight files), the classifiers (tools/crosscheck_229.py tr-ground / tr-air / tr-command) and the cross-check page's rows (docs/project/tables/community_crosscheck.md) in the 14z-211 commit that marks the row done (docs/project/tickets.tsv:78). The ticket's done-when (issue330.json): "recovery and the throw-tech window are measured on vsavj for those rows and classified against the workbook on that page, or ruled out of scope". It rests on:
+1. THE RULINGS: DECISIONS_HISTORY.md.lines-8579-8659 — "actionable" first ruled the engine's return to neutral, then, measured that no single state matches, "First accepted input (Recommended)"; "New gate, Victor only"; the ground tech column "Against the 3-victim range"; the air rows "Against a height range"; the command throws "Whiff recovery + techability".
+2. THE MEASUREMENT AND ITS CORRECTIONS: notes.md, probes 1-7b, the air sections and the command section — the pilot's mode-byte predicate refused on 22 of 42 events (probe 5) and replaced by acceptance scans (probe 6), the first-event artifact, the level-0 re-timing of the air rigs (y and dx at the commit equal the level-6 rigs'), the command feasibility (82 grabbing events, the 14 others the strengths #229 froze as never grabbing), the whiff scans and the distance probe.
+3. THE GATE'S DEFAULT RUN AND MODES: gate_run4.log — ground 42, air 28, command 82 events, every clause on every event ("0 bad" three times), every full line equal to its in-tree hash, the in-gate controls FIRED (tick-early, lp-tech, late-window; late-window not run on the command family, which has no k = 8 slot), PASS; the three modes FIRED on every applicable event (gate_mode4_*.log).
+4. THE ON-DEMAND FROZEN SETS: verify_ground_v03.log, verify_ground_v01.log, verify_ground_v0e.log (the ground throws on Victor, Demitri, Lilith) and verify_air_h-3.log, verify_air_h3.log, verify_air_h6.log (the air heights), each PASS with its controls fired.
+5. THE CLASSIFICATION: xc_tr_ground.txt, xc_tr_air.txt, xc_tr_command.txt (tools/crosscheck_229.py over the full lines outside the tree), carried onto the page: docs/project/tables/community_crosscheck.md.lines-441-515 (ground and air) and .lines-599-620 (command); the classifiers' fixtures, tests/test_crosscheck_229.sh (48 cases, five controls fired).
+6. THE RECORDS: docs/game/engine_internals.md.lines-3613-3639 (the engine facts), docs/project/gotchas.md.lines-7724-7756 (three gotchas paid).
+NOT TESTED: FBNeo; speed levels other than 0 for the gate (the pilot measured the window and recovery level-independent in ticks on one throw, probe 2); mashed throws; the command throws' whiff at distances other than the gate's wide pins (the distance probe measured six grabs at three distances); the air throws at heights other than the four; the characters picked by the cursor (forced by poke). The workbook's command-throw recovery is compared as its whiff profile (startup + active + recovery), and 33 of the 65 whiffing events do not show the +1 convention — the page states the distance dependence measured on the travelling grabs rather than reading it as our error; Aulbath's back throw (sheet 78 against 54) and the sheet's two-hit back throw are unexplained (our rig's 4P is the forward throw in every field). The static tier on the staged tree has not run yet: it runs after this check, before the commit.
+Artifacts (read every one, in full):
+  - build/agent211/t330/closure/c330.md
+  - build/agent211/t330/closure/issue330.json
+  - build/agent211/t330/closure/notes.md
+  - build/agent211/t330/closure/gate_run4.log
+  - build/agent211/t330/closure/gate_mode4_tick-early.log
+  - build/agent211/t330/closure/gate_mode4_lp-tech.log
+  - build/agent211/t330/closure/gate_mode4_late-window.log
+  - build/agent211/t330/closure/verify_ground_v03.log
+  - build/agent211/t330/closure/verify_ground_v01.log
+  - build/agent211/t330/closure/verify_ground_v0e.log
+  - build/agent211/t330/closure/verify_air_h-3.log
+  - build/agent211/t330/closure/verify_air_h3.log
+  - build/agent211/t330/closure/verify_air_h6.log
+  - build/agent211/t330/closure/xc_tr_ground.txt
+  - build/agent211/t330/closure/xc_tr_air.txt
+  - build/agent211/t330/closure/xc_tr_command.txt
+  - DECISIONS_HISTORY.md.lines-8579-8659 (lines 8579-8659 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-27 (14z-211) — #330: "actionable" is the engine's return to its neutral state; the ", and the entries after it up to line 8659)
+  - docs/project/tables/community_crosscheck.md.lines-441-515 (lines 441-515 of docs/project/tables/community_crosscheck.md)
+  - docs/project/tables/community_crosscheck.md.lines-599-620 (lines 599-620 of docs/project/tables/community_crosscheck.md)
+  - docs/game/engine_internals.md.lines-3613-3639 (lines 3613-3639 of docs/game/engine_internals.md)
+  - docs/project/gotchas.md.lines-7724-7756 (lines 7724-7756 of docs/project/gotchas.md)
+  - tests/audit_throw_recovery.sh
+  - tools/throw_recovery_rigs.py
+  - tests/test_crosscheck_229.sh
+  - docs/project/tickets.tsv.lines-78-78 (lines 78-78 of docs/project/tickets.tsv)

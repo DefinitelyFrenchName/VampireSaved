@@ -38,7 +38,7 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
-## Session 14z-211 — **#329 closed: the half circles' minimal inputs are 6324 and 4123, from the handlers and measured; #229's motion test was fed every diagonal (inclusive replay ranges) and is re-rigged; the old scratch cleared.**
+## Session 14z-211 — **#329 closed (the half circles' minimal inputs 6324 and 4123; #229's motion test re-rigged); #330's normal throws measured, gated and classified (the tech window 7 ticks; actionable = the first accepted input), its command throws next; #333 and #334 done in the tree, waiting for PILOT.**
 
 ### opened with
 The 14z-210 close's opener; the sweep CLEAN, `main` = `origin/main` at `432d5c7e`. The old local refs and the remote
@@ -69,51 +69,90 @@ The commit's tier then failed `test_tmp_hygiene` on the new tool (a `mkdtemp` ne
 re-verified on PILOT at the final blob: 90 snapshots byte-identical to the confirmed sheets, no work directory left
 behind (`build/agent211/t329/tool_reverify.txt`).
 
-## Session 14z-210 — **#321 finished (concurrent emulator controls, longest first, SUITE_JOBS, the merged-legacy queue, disk TMPDIR; three runner verdict holes closed), its remainder #334; #331 (Demitri on P1 in the guard cancels, re-frozen); #318, #328, #320, #311, #327, #332 closed; #333 filed.**
+### (2) #330 — THE NORMAL THROWS' RECOVERY AND THROW TECH MEASURED, GATED AND CLASSIFIED; THE COMMAND THROWS NEXT
+On vsavj at speed level 0 (one engine pass per frame), RNG pinned. **The tech window is 7 engine ticks**:
+- all 42 ground throws on three victims;
+- 26 of 28 air throws (Lei-Lei's air throw has no tech);
+- the pilot's window was the same at level 6.
 
-### opened with
-The 14z-209 close's opener; the sweep CLEAN, `main` = `origin/main` at `688edef8`. The maintainer: *"Focus on finishing
-#321, low open tickets on the side. Ask me any question."* Ruled (`DECISIONS_HISTORY.md` "Ruled 2026-10-26 (14z-210) —
-#321 reopened"): #321 reopened (its "Done when" was not met at the 14z-209 closure), all four remaining avenues in scope;
-side tickets #328, #310, #327, #318, #320, #311. Working notes and every evidence path: `build/agent210/STATUS.md` (local).
+**ACTIONABLE IS THE FIRST ACCEPTED INPUT**, the maintainer's *"First accepted input (Recommended)"*, measured because no
+engine state marks it:
+- the mode byte `+0x05` back to 00 is up to 11 ticks early on 22 of 42 ground throws;
+- standing neutral is up to 25 ticks late on 24 of 168 cases.
 
-### (1) #321 — THE AVENUES MEASURED OR RULED OUT; CLOSED, ITS SURVEY GAPS #334
-`86d1ca10`: concurrent emulator controls from a PILOT write trace (`tests/controls_concurrent_emu.txt`, 60 of 61; ruled
-*"Write trace on PILOT …"*), `--order` longest first, `SUITE_JOBS`, the `MERGED_JOBS` queue, `RUN_JOBS` in both runners,
-private paths in the five SHARED gates. `e4aa32ee`, from ERIS's release-shape run (fork E2, `build/agent210/t321e2/`):
-concurrent controls filled ERIS's 24 GB tmpfs `/tmp` and 28 control modes read HONOURED in 0-1 s — ruled *"Signatures ->
-DIED"* (`tests/lib/classify.sh` `VS_ENV_ERR`) and *"Runner sets disk TMPDIR"* (`build/tmp/`, a free-space refusal); on
-PILOT a pooled lane of three printed GREEN on PASS 1 — `tests/lib/measures.sh` named its scratch file by `$$`, shared by
-every pooled subshell; fixed, and LOST-ROWS makes a selected gate with no row a FAIL (`test_emulator_runner` sections 14k,
-21, 22; controls `env-honoured`, `tmp-ignored`, `lost-unread`). ERIS's release shape with TMPDIR on disk: 7,947 s against
-14z-208b's 12,575 s, all 421 verdicts equal. Figures in `docs/project/operations.md`. Closed on its rule-checker run;
-ruled *"Close; file the remainder"* — #334 (the knobs on PILOT and under load; the knob-less gates' survey).
+The pilot's mode-byte rule had been generalised from one throw and was refused there. The ticks were found by
+acceptance scans and are re-proved by acceptance at A-1 and A. An air throw's recovery moves with its height.
 
-### (2) #331 — DEMITRI ON P1 JOINS THE GUARD CANCELS; CLOSED
-Ruled *"new emulator rig"*; the 18-tile pages showed the game's guard-cancel banner, the maintainer: *"Enough, integrate"*.
-`tests/audit_guard_cancels.sh` runs 15 characters, 291 events; re-frozen through rule-checker run `2026-10-27-1334`
-(resolved): the table +20 lines, the clocks +32 rows, none changed. The gate's identity clause read "ok" on an empty row
-set — now every rig without a row is MISSING (control `rows-absent`; project gotcha appended). The cross-check page
-regenerated. Closed on run `2026-10-27-1350` (resolved).
+**The new gate**, `tests/audit_throw_recovery.sh` with `tools/throw_recovery_rigs.py`, on demand:
+- ground 42 and air 28 events on Victor as victim, about 2.5 min on the Mac;
+- frozen sets on demand: the ground throws on Demitri and Lilith, the air throws at three more heights;
+- the ticks live outside the tree (#319), their hashes in it;
+- controls tick-early, lp-tech and late-window fired in the gate and as modes.
 
-### (3) THE SIDE TICKETS — #318, #328, #320, #311, #327, #332 CLOSED; #310 DEFERRED; #333 FILED
-Each closed on GitHub with its comment, on its own rule-checker run: #328 (`1346`, OK; a clean clone of `e4aa32ee` on
-ERIS built both builds and passed both gates, ruled *"Clean-clone run on ERIS"*), #332 (`1348`, OK), #320 (`1340`,
-resolved: the COMMITTED pin under forced GC 0 of 30 crashes against 30 of 30 without it, `build/agent210/t320c/`; ruled
-*"Close: the 2 are the 139 gates"*), #327 (`1349`, resolved: an independent census, `build/agent210/t327w/`; platform
-gotcha appended), #318 (`1347`, resolved: all 25 emulator and 8 static readers of `tools/anim_nodes.py` PASS after the
-change), #311 (`1345`, resolved: #299's loaded leg rerun and both modes beside 12 busy loops). #310: its census recorded
-on the ticket and the work deferred (ruled *"Record and defer"*); the UNJUDGED class kept and written into
-`docs/project/must_fire_contract.md`. #333 filed (ruled *"File a ticket"*): 106 unguarded `mktemp -d` sites.
+**Classified** on the cross-check page: ground recovery EXACT on 17 of 21, the ground throw tech EXACT on 10 and inside
+the three-victim range on 5, the air rows against the height range.
 
-### CLOSE (14z-210, 2026-10-27)
-Driver `build/agent210/close/` (`--prev build/agent210/tier4/tier_results.tsv`, the tier of record for `e4aa32ee`). Before it,
-each ticket closed on GitHub with its comment, on its own rule-checker run: #328 (`2026-10-27-1346`), #332 (`-1348`), #320
-(`-1340`), #327 (`-1349`), #318 (`-1347`), #311 (`-1345`), #331 (`-1350`), #321 (`-1351`); #333 and #334 filed; `origin/main`
-fetched before staging (nothing new). Steps: sections ((1)..(3)); next-session (the 14z-209 opener to
-`docs/NEXT_SESSION_HISTORY.md`); rollover (the 14z-209 group, 75 lines, to `STATE_HISTORY.md` with its ledger line); indexes (the archives', the ticket page,
-the gotchas index); dashboard (14z-163..14z-210, 2,029 figures, 0 unclassed; datasets versions 19, 19, 20, 19) — done. The
-tier's results: `build/agent210/close/tier_results.tsv`, the next close's `--prev`.
+**THE CAPTURES** (`tools/throw_recovery_sheet.py`, rule-checker run `2026-10-28-1361` Q2) were read by the maintainer
+(`DECISIONS_HISTORY.md` "Read 2026-10-28 (14z-211) — #330"):
+- the techs show TECH. HIT;
+- Giga Shock is a tech, not the escape I had written;
+- the air page was redrawn from the jump;
+- the LP pairs now carry each tile's dumped state, which flips exactly at A (the picture lags 2-4 frames). *"Yes, commit
+  them"*.
+
+**THE COMMAND THROWS ARE NOT FROZEN** (*"Commit ground+air, rest next"*): the state captions showed that the wide
+"whiff" was a plain normal on 28 of 82 events. That is the range-checked grabs' input out of range, and it is
+re-measured in range next session. Also next session:
+- the air and command throws on Demitri and Lilith (the first runs failed: `build/agent211/t330/air_victims.out`,
+  `cmd_victims.out`);
+- #330's closure on a fresh check. #330 stays OPEN.
+
+Engine notes: `engine_internals.md` "THE THROW TECH WINDOW, …". Gotchas paid: the state is not the input; the first
+event's stage x; timing in ticks; out of range a grab's input is a normal. Rulings: `DECISIONS_HISTORY.md`, the 14z-211
+#330 entries. Working evidence: `build/agent211/t330/` (local).
+
+### (3) #333 AND #334 — DONE IN THE TREE, NOT COMMITTED: THE PILOT RE-TRACE WAITS
+**What is done, uncommitted in the working tree:**
+- #333's `mktemp -d` guards;
+- #334 item 2: `tests/lib/jobs.sh` and about 60 pooled gates, every knob named `JOBS`;
+- #334 item 1's PILOT timings, recorded in `operations.md` «WHAT #321 MEASURED AND RULED OUT».
+
+**Why it is not committed:** the Mac moved to another network mid-session (10.200.0.89), and PILOT and ERIS became
+unreachable. The concurrent-controls lists' rows for the 46 static and 22 emulator gates whose scripts changed must be
+re-traced on PILOT (`build/agent211/t334/cc_static.txt`, `cc_emu.txt`), so `test_controls_concurrent` stays red on the
+whole tree. The maintainer: *"Commit #330 only (Recommended)"*. Only `tests/lib/jobs.sh` rides this commit, because the
+new gate sources it.
+
+**Still to do next session:**
+- the re-trace on PILOT;
+- ERIS's before/after timings for item 2;
+- `test_mame_parity` under a tier's load on the Mac;
+- read ERIS's #333 release-shape run: it finished in the maintainer's WSL window, 417 PASS and 4 SKIP, the SKIPs host
+  environment (no release binaries there, no `pw-record`, no `podman`); copied to `build/agent211/t333/eris/results.tsv`;
+- then one strict tier, the commit, and the two closures.
+
+### CLOSE (14z-211, 2026-10-28)
+Driver `build/agent211/close/` (`--prev build/agent211/tier/tier_results2.tsv`, the GREEN tier of record for `e68f8842`).
+**What the commit carries** (the maintainer: *"Commit #330 only"*, then *"Commit ground+air, rest next"*):
+- #330's normal throws: the gate, tool, sheets, frozen sets, page and records;
+- `tests/lib/jobs.sh`, which the gate sources;
+- this sitting's records.
+
+**What it does not carry:** #333's and #334's gate edits, which stay in the working tree for the PILOT re-trace (3), and
+the command family's and the victims' unfinished sets (`build/agent211/t330/held/`).
+
+**The rule-checker before landing the expectations:**
+- run `2026-10-28-1361` stopped #330's closure (Q1, Q2, Q4); the captures followed;
+- run `-1362` could not be recorded: its first pair of readers died on a network error;
+- its readers' findings were still answered: the sheet's victim captions, the stale notes, the unprinted height;
+- run `-1363` (Q1, Q4) was resolved by naming the stage position and correcting the Demitri air run, re-running the
+  modes on the landed gate, and adding the victim-range control.
+
+`origin/main` was fetched before staging. The generated indexes were regenerated in a clean worktree of the staged tree,
+and the bookkeeping gates ran there. Steps: sections (1)..(3); next-session (the 14z-210 opener to
+`docs/NEXT_SESSION_HISTORY.md`); rollover (the 14z-210 group, 46 lines, to `STATE_HISTORY.md` with its ledger line);
+indexes; dashboard (14z-163..14z-211, 2,066 figures, 0 unclassed; datasets versions 20, 20, 21, 20). The tier's results:
+`build/agent211/close/tier_results.tsv`, the next close's `--prev`.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings

@@ -1,0 +1,47 @@
+# tests/expected/throw_recovery.tsv — the vsavj ground throws' recovery and throw tech (#330, 14z-211), FROZEN by
+# `tools/throw_recovery_rigs.py freeze`. Columns: sheet key input sig — `sig` is the first 16 hex of SHA-256 over the
+# event's full line (thrower/victim ticks thrown and teched, the controls' +0x04 there, the victim's losses). The
+# per-move numbers are NOT in the tree (the 14z-126 frame-data ruling, #319): the full lines live outside it (TR_FULL).
+# The victim: 0e (TR_VICTIM; the thrower's own id -> 0x01).
+AU	P	6MP	c3619fb7c94523a2
+AU	P	6HP	2191679c0cd68e55
+AU	PB	4MP	69a625bbed29dcaa
+AU	PB	4HP	68aa05f3f2c416c3
+BI	P	6MP	1c5da23d35dc403a
+BI	P	6HP	731fd853f16c536a
+BU	P	6MP	b725f7c2a5f73b7b
+BU	P	6HP	8a61b1ced871ba45
+DE	P	6MP	35703a43c6c0fcef
+DE	P	6HP	09927b32ac35395e
+DE	K	6MK	196710aa331d5c0e
+DE	K	6HK	b40d18044668c45b
+FE	P	6MP	2fe92fe26c2fdc70
+FE	P	6HP	01a6dab2a0317269
+FE	K	6MK	affc93f82f035f95
+FE	K	6HK	df8812cf5c7cf2ff
+GA	P	6MP	aeb7b2d7ce32ff68
+GA	P	6HP	ceccddaf698f3a13
+GA	K	6MK	98d848473cbae990
+GA	K	6HK	6816a83c6263c37a
+JE	P	6MP	63aee476c06287b4
+JE	P	6HP	0d6a12cafe83f2f8
+LE	P	6MP	208254c40ca7744a
+LE	P	6HP	42cad41378afd763
+LI	P	6MP	05676fc397ea4dd0
+LI	P	6HP	c4828dff237731e8
+MO	P	6MP	edb05fb8021d7e93
+MO	P	6HP	d3911ae06d2822f4
+MO	K	6MK	95e4c55e0e53fcc1
+MO	K	6HK	43f33c4b1e3be7ad
+QB	P	6MP	887a24c7cd2541e6
+QB	P	6HP	d3c656a3805bfd66
+SA	P	6MP	d97fd2cee620c4cf
+SA	P	6HP	5f5539fc953c433f
+VI	MP	6MP	f3a2854c42a37bbf
+VI	HP	6HP	5a84ff4b9151e806
+VI	K	6MK	a2a9a892e631e7dc
+VI	K	6HK	2f7c5c2b60daff2e
+ZA	P	6MP	b6070f73549845c3
+ZA	P	6HP	025ee718af1d8f6f
+ZA	K	6MK	f6fabe0ea2656a01
+ZA	K	6HK	f145b8b762a05a61

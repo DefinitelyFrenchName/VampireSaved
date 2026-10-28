@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**482 scripts** — 146 ci_portable, 93 ci_static, 243 emulator-tier (run by name).
+**483 scripts** — 146 ci_portable, 93 ci_static, 244 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -27,7 +27,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 91 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 92 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 38 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -475,6 +475,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/audit_rng_forms.sh` | audit | emulator | MAME, FBNeo, a build dir, ~8 min | THE PARITY GATES UNDER THREE RNG FORMS: what the 0000 pin (the RNG's fixed point) hides, measured against the gates' own pin (GitHub #183, 14z-186). | 14z-186 |
 | `tests/audit_shared_wall_push.sh` | audit | emulator | MAME, a build dir, ~20 s | WHO KEEPS A SHARED CORNER: the two engines' push-apart differs when both fighters are clamped against the same wall edge in the same frame (14z-184, GitHub #179). | 14z-184 |
 | `tests/audit_tenant_throw_geometry.sh` | audit | emulator | MAME, a build dir | THE TENANTS AS THROWERS, OURS vs NATIVE VS2 (14z-131, maintainer-directed 2026-09-04; Pyron and Donovan joined and the level pinned 14z-193, #230; Pyron's air throw joined 14z-194, #235). | 14z-131 |
+| `tests/audit_throw_recovery.sh` | audit | emulator | MAME, the vsavj ROM, ~2.5 min at JOBS=12 | THE VSAVJ THROWS' RECOVERY AND THROW TECH, MEASURED: when each fighter can act again after every ground and air throw, thrown and teched, the tech window, and every command throw's whiff and techability — for the community cross-check (GitH… | 14z-211 (#330) |
 | `tests/audit_throw_registration.sh` | audit | emulator | MAME, a build dir | THE HIT-REGISTRATION PAIR AT A TENANT THROW, ours vs native, frozen: on every tenant throw contact native's throw code writes the engine's (attacker, victim) registration pair right before the generic hit stager awards meter. | 14z-166 |
 | `tests/audit_tick_cadence.sh` | audit | emulator | MAME, ~1.5 min | THE EXTRA LOGIC PASS IS DECIDED BY THE SPEED LEVEL, and on vanilla content each game's DEFAULT play mode sets a different one: | 14z-156 |
 | `tests/audit_tick_phase.sh` | audit | emulator | MAME, a build dir, ~60 s | THE ENGINE'S DOUBLE-PASS CADENCE IS PERIODIC IN FRAMES, AND ITS PERIOD IS WHAT tools/name_moves.py QUANTISES ITS SCHEDULE SHIFT TO (14z-172, GitHub #168). | 14z-172 |

@@ -125,6 +125,7 @@ tests/test_classify_hitclass_probe.sh	oracle
 tests/test_classify_pool_spawns.sh	oracle
 tests/test_community_crosscheck.sh	character-data
 tests/audit_ground_throws.sh	character-data
+tests/audit_throw_recovery.sh	character-data	MAME, the vsavj ROM, ~2.5 min at JOBS=12	14z-211 (#330)
 tests/test_power_decode.sh	character-data
 tests/test_map_table_readers.sh	character-data
 tests/audit_ranking_tenant.sh	character-data

@@ -1,0 +1,28 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent211/t330/closure/notes.md	2ebbb5a0c6afb7f56fbfd8c5237cb96ba28dad29
+build/agent211/t330/closure/gate_run5.log	4a9f86052b191ce8493d0ce546bff209001ee7f5
+build/agent211/t330/closure/gate_mode4_tick-early.log	0bde58ad180a837eeeaf63fdbc88ff5a2b3427a0
+build/agent211/t330/closure/gate_mode4_lp-tech.log	87e5fb0a21e352d38851a9a30d304582fc283574
+build/agent211/t330/closure/gate_mode4_late-window.log	79d4070ca96094beb51c1295ad3fd8b851c51ccb
+build/agent211/t330/closure/verify_ground_v03.log	3c73d0f0d936cad4efc32ddc1da5230e99465504
+build/agent211/t330/closure/verify_ground_v01.log	927d98f6f176f2e139468e1bd694b184f17b6ddb
+build/agent211/t330/closure/verify_ground_v0e.log	45b7effee0ed58a432dca2bd50a7df93b5f92478
+build/agent211/t330/closure/verify_air_h-3.log	344f29f20785ce1c0f28f60e4e0418055422b1f2
+build/agent211/t330/closure/verify_air_h3.log	5352e2df4a608c75fd7e17567c1f6b355dc73063
+build/agent211/t330/closure/verify_air_h6.log	54312a171148172bdf5f31182f5aa65607fa13b4
+build/agent211/t330/closure/xc_tr_ground.txt	c9ae36b4ac250b4272add35b7b8f13a93f468cbd
+build/agent211/t330/closure/xc_tr_air.txt	08b2ba473fb497725244b78df2590153f48a40cc
+build/agent211/t330/closure/test_crosscheck_229.log	ae4dc0a5707239b814410a8ed57c2201506ba0b5
+build/agent211/t330/closure/throw_recovery_tech.png	4262acc30a60479c2ee13cfe5cda02997240976a
+build/agent211/t330/closure/throw_recovery_ground.png	d574023af3e874c23f33ab8069980093003db4b8
+build/agent211/t330/closure/throw_recovery_air-lp.png	425c0ecb77de4f9d8c30724d51efac384a3a2e34
+build/agent211/t330/closure/throw_recovery_air-throw.png	db6879e0cc585846c6191fdd5673f7fbbece1337
+DECISIONS_HISTORY.md.lines-8582-8696 (lines 8582-8696 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-27 (14z-211) — #330: "actionable" is the engine's return to its neutral state; the ", and the entries after it up to line 8696)	54c2d69bc2778be0b62468376d6d27dd40feb7b8
+docs/project/tables/community_crosscheck.md.lines-441-517 (lines 441-517 of docs/project/tables/community_crosscheck.md)	ff8f9ed37321288634ef17c47757ee9206eefba2
+docs/project/tables/community_crosscheck.md.lines-601-621 (lines 601-621 of docs/project/tables/community_crosscheck.md)	c305d27033d2b681e587d653482e1fb8f326d3ae
+docs/game/engine_internals.md.lines-3613-3642 (lines 3613-3642 of docs/game/engine_internals.md)	665b4f03ca2066c70b9a83897498c08eb7f598f5
+docs/project/gotchas.md.lines-7724-7768 (lines 7724-7768 of docs/project/gotchas.md)	ae5c8519ea76e71a9b53c2ffc3cc3f2ede23b0ed
+tests/audit_throw_recovery.sh	11ecd625edff4e3d4984a3b481f398e37669194f
+tools/throw_recovery_rigs.py	e8534d93e1608eb538063d7d1f6347d0a38f1841
+tools/throw_recovery_sheet.py	2060a3b46d0ac6b24ebbf569b162092f7e78b852
+build/agent211/t330/air_victims.out	97a4ba885d3b56374be957a33568fa70485ce2da

@@ -1,0 +1,8 @@
+  FLAG D-ABSOLUTE: - **Actionable is the first accepted input:** the first tick at which a one-frame LP starts the normal, the tick before never.  [build/agent211/t330/closure/c330.md]
+  FLAG D-ABSOLUTE: Their workbook recovery is the whiff profile, and their tech cell is empty on every row.  [build/agent211/t330/closure/c330.md]
+  FLAG D-ABSOLUTE: - **What it re-proves every run:**  [build/agent211/t330/closure/c330.md]
+  FLAG D-ABSOLUTE: - every frozen tick, by acceptance (a one-frame LP at A−1 refused, at A accepted);  [build/agent211/t330/closure/c330.md]
+  FLAG D-ABSOLUTE: - **Must-fire controls:** tick-early, lp-tech and late-window, fired in the gate and as modes on every applicable event.  [build/agent211/t330/closure/c330.md]
+  FLAG D-ABSOLUTE: At speed level 0 it holds on all 42 ground events on each of three victims, and on 26 of 28 air events; Lei-Lei's air throw has no tech.  [build/agent211/t330/closure/c330.md]
+  FLAG D-ABSOLUTE: - **The pilot's predicate was wrong.** On Felicia's 6MP, "the tick after the mode byte returns to 00" was generalised to every throw, and it failed on 22 of ...  [build/agent211/t330/closure/c330.md]
+packet_check: 7 flag(s): D-ABSOLUTE 7

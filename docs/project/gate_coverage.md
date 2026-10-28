@@ -13,7 +13,7 @@ remainder so it only shrinks. Regenerate with `python3 tools/gen_gate_coverage.p
 `docs/project/gate_header_contract.md`; the technical index (tier, needs, the header's
 first sentence) is `gate_index.md`.
 
-**482 of 482 gates described.**
+**483 of 483 gates described.**
 
 | family | described | of | what the family is |
 |---|---|---|---|
@@ -24,7 +24,7 @@ first sentence) is `gate_index.md`.
 | [oracle](#oracle) | 29 | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 87 | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 91 | 91 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 92 | 92 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 38 | 38 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -2722,7 +2722,7 @@ tenant content — per-character gates and on-demand audits on the ported charac
 
 ## character-data
 
-the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 91 of 91 described.
+the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics. 92 of 92 described.
 
 ### `audit_air_dash_height.sh` — audit, emulator
 
@@ -3172,6 +3172,14 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 **EXPECTS:** identical ordered states per throw on every victim that holds (18/18, or 13/18 on Pyron's air throw with 00 05 06 0d 0e declared no-hold), tail (0,0) on every throw, the Sasquatch damage residue cells as frozen (vanilla's own defense row); a red is a state missing, reordered, a tail or a damage cell moved, a declared victim that holds, or a declared victim's leg not proven live or its throw not attempted.
 
+### `audit_throw_recovery.sh` — audit, emulator
+
+**WHAT:** the normal throws of tools/ground_throw_rigs.py — the 42 GROUND events (the workbook's 22 ground-throw rows, each "6MP or 6HP" row with both buttons) and the 28 AIR events (its 14 air-throw rows, j.6MP and j.6HP), victim Victor (Demitri for Victor): (1) ACTIONABLE, the maintainer's "First accepted input" (2026-10-28): for the thrower and the victim, thrown and teched, the frozen tick from the throw's commit (P1's press frame, where the hold starts) at which a ONE-frame LP starts the normal, the tick before never doing so; (2) the TECH WINDOW: P2's back + the throw's own button one frame at k ticks after the commit techs (the victim's red loss changes, or its recovery moves more than 10 ticks) at k = 1 and k = 7 alike, at k = 8 not; the window frozen per event (`1-7`, or `none` where no tech exists — Lei-Lei's air throw); (3) each event's full line — the four ticks, the controls' +0x04 at them, the victim's red/white HP loss thrown and teched, the window — equals its frozen line: in the tree as a 16-hex SHA-256 per event (tests/expected/throw_recovery.tsv, throw_recovery_air.tsv), the line itself outside it (../charpages/framedata/throw_recovery[_air]_full.tsv, TR_FULL; the 14z-126 frame-data ruling, #319). THE COMMAND THROWS (family `command`, the maintainer's "Whiff recovery + techability", 2026-10-28): the 82 non-motion events of tools/command_throw_rigs.py that hold in #229's frozen expectation — the WHIFF from pins 150 px wider each (the first accepted input from the press, the tick before never; Pit of Blame has none: its input draws no move without a knocked-down victim) and the TECH at contact (the victim's back + HP and + HK at 1 and 7 ticks after the hold, alike). THE COMMAND FAMILY IS NOT FROZEN (ruled 2026-10-28, "Commit ground+air, rest next"): its first measurement's wide "whiff" was a plain NORMAL on 28 of 82 events (the range-checked grabs' input out of range, state seq 0x0A on the press frame); it is re-measured in range next session (#330, open). TR_FAMILY=command runs it and FAILS section 1 (no frozen set) until then.
+
+**HOW:** tools/throw_recovery_rigs.py gen makes, from the full lines' ticks, per event a THROWN rig (a sacrificial first event — a rig's first event stands at another stage x —, the control, k = 8, P1 LP at A-1 and A, P2 LP at A-1 and A) and a TECHED rig (the same with the tech at k = 1, and k = 7), at speed level 0 (RAM:$FF8116 = 00: one engine pass per frame, so ticks are frames) with the RNG pinned (RAM:$FF80D4 = 0000), events 624 frames apart; the air rigs press at the TICK the level-6 rigs reach it (tools/throw_recovery_rigs.py air_l0: every y and dx at the commit equal the level-6 rig's). The rigs are made at run time and never committed (their press offsets ARE the per-move ticks). Each rig runs once under tools/run_mame.sh with tests/lua/field_trace.lua (both fighters' +0x04, both +0x134, both HP words, x, the pass counter), JOBS at a time; a press is ACCEPTED when the presser's +0x04 departs from its no-LP control ON the press frame into seq 0x0A, mode 00. The header prints the tree's commit and the host.
+
+**EXPECTS:** per family 2 rigs per event, every trace complete; on every event every A-1 press refused and every A press accepted (four ticks), k = 1 and 7 alike, k = 8 not teching, every control holding on its press frame, every line equal to its frozen hash; the full lines present and each equal to its in-tree hash.
+
 ### `audit_throw_registration.sh` — audit, emulator
 
 **WHAT:** the hit-registration pair at a tenant throw, ours vs native: native's throw code writes the engine's (attacker, victim) pair before the generic hit stager awards meter. Through M19 our placed copies wrote vs2's displacements (dead on vsavj), so the stager read the collision pass's leftover pair reversed — the attacker got the flat 8 and the victim the record's meter (#136's meter family, #157); the legacy control shows both engines register the pair, so it was a port defect. Since M20 (14z-183) the stores are re-pointed at vsavj's live pair. Since 14z-184 (#180) the KO branch too: the copy's THIRD pair store (vs2 0x028B5A/5E) is written only when the object-hit applier's own damage leaves the victim's +0x52 negative, which the donovan_2_ko part makes happen.
@@ -3278,7 +3286,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 
 ### `test_crosscheck_229.sh` — test, ci_portable
 
-**WHAT:** tools/crosscheck_229.py's join-and-classify code — the pure functions under each family's loader (classify_es, aggregate_ct, classify_gc, classify_gt) and the code they stand on (the page's classify in tools/crosscheck_framedata.py, command_throw_rigs.parse_series / match_series, specials_b_rigs.verdicts, gc_rigs.ours_cols / sheet_cols) — run on small synthetic fixtures (a fake workbook, fake gate rows), each built so its verdict is known by construction: EXACT, CONSTANT OFFSET, CONSTANT RATIO, INCONSISTENT and NO DATA from the page's classify; EXACT, IN RANGE (a mashed hit count inside the sheet's range), INCONSISTENT and UNCOMPARABLE (a prose cell) for a hit series; CONTACT rows kept out of a specials timing verdict; an UNRESOLVED ES/EX row and a projectile counted uncomparable with their reasons; a command-throw row that never grabs; the guard cancels' timing read from the HIT and never the whiff (#229 Q6) and their damage read as DEALT on the -3 victim, never from the Demitri event (Q5); a row NAMED a guard cancel but typed otherwise held in the guard cancels' row set and joined (#331: Demitri's four Demon Cradle GC rows, tools/gc_rigs.py is_gc_row — until 14z-210 reported NOT RUN); the normal throws ground and air, the air rows joined on key AIR.
+**WHAT:** tools/crosscheck_229.py's join-and-classify code — the pure functions under each family's loader (classify_es, aggregate_ct, classify_gc, classify_gt, classify_tr, classify_tr_air, classify_tr_cmd) and the code they stand on (the page's classify in tools/crosscheck_framedata.py, command_throw_rigs.parse_series / match_series, specials_b_rigs.verdicts, gc_rigs.ours_cols / sheet_cols) — run on small synthetic fixtures (a fake workbook, fake gate rows), each built so its verdict is known by construction: EXACT, CONSTANT OFFSET, CONSTANT RATIO, INCONSISTENT and NO DATA from the page's classify; EXACT, IN RANGE (a mashed hit count inside the sheet's range), INCONSISTENT and UNCOMPARABLE (a prose cell) for a hit series; CONTACT rows kept out of a specials timing verdict; an UNRESOLVED ES/EX row and a projectile counted uncomparable with their reasons; a command-throw row that never grabs; the guard cancels' timing read from the HIT and never the whiff (#229 Q6) and their damage read as DEALT on the -3 victim, never from the Demitri event (Q5); a row NAMED a guard cancel but typed otherwise held in the guard cancels' row set and joined (#331: Demitri's four Demon Cradle GC rows, tools/gc_rigs.py is_gc_row — until 14z-210 reported NOT RUN); the normal throws ground and air, the air rows joined on key AIR; the ground throws' recovery and throw tech (#330, classify_tr: EXACT, a "+ landing 1" cell counted in, INSIDE / OUTSIDE the sheet's range, OFF, INSIDE THE VICTIM RANGE, INCONSISTENT, a prose cell and a row whose events differ UNCOMPARABLE); the air throws against heights (classify_tr_air: a summed cell, INSIDE THE HEIGHT RANGE, a prose cell) and the command whiffs (classify_tr_cmd: the profile 2 + 1(5)1 + 41 against the whiff tick, no whiff, a prose active cell, the tech window counted).
 
 **HOW:** one Python program (below) builds every fixture, calls the functions and compares each got verdict with its expected one; `CONTROL=<name>` or the in-gate control loop re-runs it with that control's perturbation.
 

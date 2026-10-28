@@ -1,0 +1,32 @@
+# tests/expected/throw_recovery.tsv — the vsavj ground throws' recovery and throw tech (#330, 14z-211), FROZEN by
+# `tools/throw_recovery_rigs.py freeze`. Columns: sheet key input sig — `sig` is the first 16 hex of SHA-256 over the
+# event's full line (thrower/victim ticks thrown and teched, the controls' +0x04 there, the victim's losses). The
+# per-move numbers are NOT in the tree (the 14z-126 frame-data ruling, #319): the full lines live outside it (TR_FULL).
+AU	AIR	j.6MP	be84d79f8de2e1b9
+AU	AIR	j.6HP	98774a68c5da63b4
+BI	AIR	j.6MP	90675dfe64f55a7d
+BI	AIR	j.6HP	65059f2985daa438
+BU	AIR	j.6MP at 18	b24971ad030023e8
+BU	AIR	j.6HP at 18	b36cf31ec9fa88cf
+DE	AIR	j.6MP	714ade8f4dc3c299
+DE	AIR	j.6HP	2c982c541a3a31be
+FE	AIR	j.6MP	e7b356e598b8b191
+FE	AIR	j.6HP	f961aaf77a8a802f
+GA	AIR	j.6MP	e01cfeb949f1f4c4
+GA	AIR	j.6HP	7752576bad73521c
+JE	AIR	j.6MP	368664fe194fef01
+JE	AIR	j.6HP	3c129c9deee91929
+LE	AIR	j.6MP	c00fada3b417cbe9
+LE	AIR	j.6HP	1fb0dc135c99d182
+LI	AIR	j.6MP	18dd34638b0578f1
+LI	AIR	j.6HP	c25d4ec669594728
+MO	AIR	j.6MP	fd74132980c8671e
+MO	AIR	j.6HP	95683d835ec496df
+QB	AIR	j.6MP	b496bd55de6195f1
+QB	AIR	j.6HP	9d65750283f733d8
+SA	AIR	j.6MP	7028b5f2e99cc6c0
+SA	AIR	j.6HP	1626a108cbfd51a3
+VI	AIR	j.6MP converging	4df94de7acc3c109
+VI	AIR	j.6HP converging	b49386f6326c3966
+ZA	AIR	j.6MP	95d7961722e89950
+ZA	AIR	j.6HP	7b51711c0b8725e6

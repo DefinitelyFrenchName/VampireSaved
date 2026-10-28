@@ -734,6 +734,23 @@ control claims.
 - **The freeze and close tools** (the Mac, 14z-210): snapshot setup 42 s, the staleness audit 39 s, the static-confirm
   prediction 20 s, fingerprints and the ROM audit under a second — no change; the freeze's cost was `run_suite.sh`'s
   serial MAME runs, now `SUITE_JOBS`.
+- **#334 item 1: every job setting on PILOT** (33 gates and 3 freeze tools; 14z-211, at `e68f8842`, PILOT otherwise quiet, one run at a time through
+  `tests/run_all_emulator.sh --only`; evidence `build/agent211/t334/pilot/`; the maintainer: *"All 35 on PILOT"*, the
+  Mac's under-load leg ruled out but for `test_mame_parity`). Seconds at the gate's default against a higher value,
+  every verdict the same at both (PILOT has 6 vCPUs, so the host-derived defaults are `audit_guard_corpus` 2,
+  `test_mame_wide` 1, `audit_merged_legacy` 1). **Large gains** where the default is low: `audit_guard_corpus` 2,512 ->
+  1,182 s at 6, `test_mame_wide` 1,873 -> 347, `audit_merged_legacy` 945 -> 494, `audit_tripwire_reach` 158 -> 84 (3 ->
+  6), `test_mame_determinism` 86 -> 17 (its 1 stays, above); on-demand, `audit_command_throws` 976 -> 469 (2 -> 6),
+  `audit_es_ex` 577 -> 250, `audit_guard_cancels` 1,243 -> 544 (FAIL at both: its out-of-tree table is absent on PILOT),
+  `audit_vanilla_pursuits` 985 -> 629 (1 -> 6), `audit_vanilla_specials_a` 102 -> 63, `audit_marionette_cost` 433 -> 344
+  (4 -> 6), `audit_ground_throws` 245 -> 215 (5 -> 6). **No gain** where the default is already 6 or more and is doubled:
+  `audit_defense_row_reads` 556 -> 472, `audit_hitclass_map_cost` 949 -> 891, `audit_reaction_class_live` 353 -> 322,
+  `audit_legacy_pairings` 311 -> 290, `audit_dispatch_census` 361 -> 342 (8 -> 16), `audit_walker_ghost` 531 -> 515,
+  `audit_tenant_throw_geometry` 515 -> 521, `audit_dmg_legacy_sweep` 178 -> 193, `audit_roster_pairings` 178 -> 188,
+  `audit_move_parity_attribution` 228 -> 238, and eleven more within ±15 s (`knobs.tsv`). **The freeze tools:**
+  `tools/freeze_masked_basis.sh` 251 s at `JOBS` 1 against 78 s at 6, the bases identical; `tools/propose_masked_specs.sh`
+  39 s at 6 against 33 s at 12, the output identical; `tests/run_suite.sh` 2,163 s at `SUITE_JOBS` 1 against 396 s at 6,
+  the verdict lines identical (70 NO-EXPECTATION — the suite's standing shape on pristine vsavj — 24 PASS, 3 SKIP).
 
 ## From HANDOFF.md: «THE EMULATOR-TIER COMMAND — what it costs, and the registry's columns (scope, ondemand, cadence, timeout, prereq, args)»
 

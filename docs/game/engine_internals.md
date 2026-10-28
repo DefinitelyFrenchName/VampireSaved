@@ -3610,6 +3610,36 @@ attack state (seq 0a.xx grounded, 06.06 airborne) and never hold a victim, on bo
 whether that state is a normal by name is not checked. Not covered: Donovan's back throw (4+P), other leads and
 press offsets, FBNeo and MiSTer.
 
+### THE THROW TECH WINDOW, AND WHEN A FIGHTER CAN ACT AGAIN AFTER A THROW (measured 14z-211, #330, on pristine vsavj)
+
+**Atlas rows this section depends on:** `atlas/ram.md` (`+0x04` the fighter state long, `+0x05` its mode byte, `+0x134`
+the throw indicator; `RAM:$FF8116` the speed level, `RAM:$FF8081` the pass counter). **Gate:**
+`tests/audit_throw_recovery.sh` (the ticks outside the tree, #319; `tools/throw_recovery_rigs.py`).
+
+- **THE TECH WINDOW IS 7 ENGINE TICKS:** the victim's back + a throw button for ONE frame, first read 1 to 7 ticks after
+  the commit (the thrower's press frame, where the hold starts), techs; read at 8 it does not. Measured on all 42 ground
+  throws on three victims (Victor, Demitri, Lilith) and 26 of 28 air throws (pressed 1-7 ticks after the air press), at
+  speed level 0; on the pilot throw (Felicia's 6MP on Victor) the same at level 6 and at two pass phases (the community's
+  "7 frames (turbo 0)" — level 0 is one tick a frame). The input is latched early and acted on later: a teched run is byte-alike with the thrown one until the tech
+  resolves. A tech lowers the damage except on Aulbath's and Morrigan's P throws; Lei-Lei's air throw has NO tech;
+  Victor's air tech lowers the damage and moves neither fighter's recovery. A press at k = 8..10 during Demitri's K
+  throw is MASH (the throw two ticks shorter, the same damage), not a tech.
+- **"CAN ACT AGAIN" IS NO SINGLE STATE** (the first tick a one-frame LP starts the normal, the tick before never): the
+  mode byte `+0x05` back to 00 is up to 11 ticks early on 22 of 42 ground throws (a one-pass `0x02000000` before a
+  landing seq `0x020008xx`, or `0x02000000` held 2-12 passes — Victor's 12); standing neutral `0x02000002` is up to 25
+  ticks late on 24 of 168 cases (the thrower attacks from the air `0x020006xx` or the landing). A one-frame press is not
+  buffered: refused before that tick, accepted from it. Victim and thrower alike.
+- **AN AIR THROW'S RECOVERY MOVES WITH ITS HEIGHT:** pressed 3 ticks earlier, 3 or 6 later in the jump, it moves by up
+  to 9 ticks on 10 of 14 characters (not Bulleta, Demitri, Gallon, Morrigan); some heights do not throw at all.
+- **THE COMMAND THROWS (not yet frozen):** no tech on 80 of 82 grabbing events (the victim's back + HP or HK at 1 and 7
+  ticks into the hold); Victor's Giga Shock IS techable: the victim's press ends the hold after its first hit and the game
+  shows TECH. HIT (captured 14z-211). **A RANGE-CHECKED GRAB'S INPUT OUT OF RANGE IS A NORMAL:** from pins 476 px apart
+  the 632[4] / 6324 grabs of Aulbath, Felicia, Gallon, Jedah (San Bassale), Morrigan, Q-Bee (O.M.) and Zabel, and
+  Morrigan's Cryptic Needle, start a plain normal (state seq 0x0A on the press frame) — a whiff of one is made in range
+  against a victim that cannot be grabbed. (~~A travelling grab's whiff moves with distance~~ — RETRACTED 14z-211: that
+  was the normal.) Anakaris's Pit of Blame input with no knocked-down victim draws no move: an LP one tick after it
+  starts the normal.
+
 ## The DAMAGE pipeline: two appliers, one scaler chain (14z-85e/85f,
 ## measured on Phobos' FINAL GUARDIAN; twins verified in both engines)
 
