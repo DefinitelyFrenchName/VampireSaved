@@ -1,0 +1,23 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent213/t337/closure/closing_comment.md	ca781454253f09986bb3d5fc60eeac9178f56da2
+build/agent213/t337/closure/ticket_row_337.tsv	dbed12e426682466a0aaf8f589470546324a9dce
+build/agent213/t337/closure/issue_337_body.md	08ab74d66c3502b1b29b88cec1ee2951de3bfe27
+build/agent213/t337/closure/fix.diff	0dc8cd9317d863cbf5d63ad6dc7de8ecd1442825
+build/agent213/t337/closure/records.diff	138a206f3afb49bc0d428e5e09a6895bd0b28e53
+build/agent213/t337/closure/census_now.txt	5122bf9f35f6385a0f69014d88af319552f3cbda
+build/agent213/t337/closure/pairs.py	227200cc610e4541d0cce6a5e5f341f40e27723b
+build/agent213/t337/closure/pairs.txt	9542df9048d2792372be1292d70d3696576bac34
+build/agent213/t337/closure/trap_calls.py	51b216a0d5f8aad5bd3f8cd35e58f7f502bb77a5
+build/agent213/t337/closure/trap_calls.txt	1f00325e4013bc58b43d0ec6cee21e68d5b4b758
+build/agent213/t337/closure/trap_words.sh	7d9a26f5ee1be3120a72a3b805db2d9e254ee06f
+build/agent213/t337/closure/trap_account.py	7bf052979f6a4bbada0f27874f022921e96b843c
+build/agent213/t337/closure/trap_account.txt	8358d3e81d8a3d25285522427432b700fa3ca672
+build/agent213/t337/closure/trap_account_byeye.txt	0c85feb8fe09e2cc4c358393a442f0001220829b
+build/agent213/t337/closure/gate_mac.log	f55798930af8b7ac9f0c0574e3431a588aafd727
+build/agent213/t337/closure/control_modes_mac.log	282ad21930ac67c6597d6bd950537a74e321a534
+build/agent213/t337/closure/pilot_tmp_hygiene.log	be3e0b1bb1178dc153e5c79b7fd95bbc6428635d
+build/agent213/t337/closure/pilot_retrace.sh	54589be66540bf49f06cbc510c7c9a6572e51869
+build/agent213/t337/closure/pilot_state.txt	92303005301bc909b8c1cb8b96076277aae789da
+build/agent213/t337/closure/pilot_overlap.txt	57fc514f68174ad92c146beedc37638116715541
+build/agent213/t337/closure/pilot_classes.tsv	ea2d89711c4e9f97ab0e2e85937042d2e0b52ae9
+DECISIONS_HISTORY.md.lines-9030-9045 (lines 9030-9045 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-30 (14z-212) — #333: EXIT-trap order is stated as a limit, its measures best-effort")	f6325ec07b5bcfc9453ba63c62909ffbd5914b46

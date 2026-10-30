@@ -371,32 +371,44 @@ else
     echo "  FAIL  it failed for another reason: $(tail -1 "$W/msys_nocyg/out.txt")"; fail=1
 fi
 
-# ---- must-fire controls ----------------------------------------------------
-# (1) empty-closure is section 2, run above against $TOOLS: under the mode the
-#     refusal is gone from the copy, section 2 reports SUCCESS-on-empty and the
-#     gate fails there. Here it is only reported.
-if run_bundler bundle_elf_libs.py fbneo silent "$W/ctl1" ; then
-    vs_ctl_dead empty-closure "the linux bundler accepted an empty closure"; fail=1
-else
-    vs_ctl_fired empty-closure "both bundlers exit non-zero with 'REFUSING: the tools reported NO …' (section 2)"
-fi
-# (2) unbundled-leftover: the stub readelf reports a NEEDED nobody bundles.
+echo "== 4c. a NEEDED library that is neither bundled nor a host library is refused (LEFTOVER)"
+# A CHECK, not only a control (#310, 14z-213): until then it ran only in the in-gate control block, so the
+# unbundled-leftover mode failed only on that block's own CONTROL DEAD line and tested nothing.
 if run_bundler bundle_elf_libs.py fbneo leftover "$W/ctl2"; then
-    vs_ctl_dead unbundled-leftover "a NEEDED library that is neither bundled nor a host library passed the artifact check"
-    fail=1
+    echo "  FAIL  a NEEDED library that is neither bundled nor a host library passed the artifact check"; fail=1; _leftover=passed
 elif grep -q 'LEFTOVER:.*libghost.so.9' "$W/ctl2/out.txt"; then
-    vs_ctl_fired unbundled-leftover "$(grep -m1 'LEFTOVER:' "$W/ctl2/out.txt")"
+    echo "  ok    a leftover NEEDED library is refused: $(grep -m1 'LEFTOVER:' "$W/ctl2/out.txt" | cut -c1-90)"; _leftover=caught
 else
-    vs_ctl_dead unbundled-leftover "the bundler failed for another reason: $(tail -1 "$W/ctl2/out.txt")"
-    fail=1
+    echo "  FAIL  the bundler failed for another reason: $(tail -1 "$W/ctl2/out.txt")"; fail=1; _leftover=other
 fi
-# (3) msys-path-untranslated: section 4 above runs against $TOOLS, so under the
-#     mode the copy's winpath() is a no-op and section 4's first half fails.
-if run_bundler bundle_win_dlls.py fbneo.exe msyspath "$W/ctl3"; then
-    vs_ctl_fired msys-path-untranslated "an MSYS path resolves only because winpath() translates it (section 4)"
-else
-    vs_ctl_dead msys-path-untranslated "the unmodified bundler could not resolve a translatable path" || true
-    fail=1
+
+# ---- must-fire controls ----------------------------------------------------
+# In-gate only: in a CONTROL= mode $TOOLS is the perturbed copy, so these copies would run against the
+# perturbation and print CONTROL DEAD beside the mode's real FAIL (#310, 14z-213: the classifier reads its own
+# CONTROL DEAD as LIES). The mode's verdict is the section that fails above.
+if [ -z "${VS_CTL:-}" ]; then
+    # (1) empty-closure is section 2, run above against $TOOLS: under the mode the
+    #     refusal is gone from the copy, section 2 reports SUCCESS-on-empty and the
+    #     gate fails there. Here it is only reported.
+    if run_bundler bundle_elf_libs.py fbneo silent "$W/ctl1" ; then
+        vs_ctl_dead empty-closure "the linux bundler accepted an empty closure"; fail=1
+    else
+        vs_ctl_fired empty-closure "both bundlers exit non-zero with 'REFUSING: the tools reported NO …' (section 2)"
+    fi
+    # (2) unbundled-leftover: the check itself runs above (section 4c), in a mode too; here it is only reported.
+    case "$_leftover" in
+    caught) vs_ctl_fired unbundled-leftover "$(grep -m1 'LEFTOVER:' "$W/ctl2/out.txt")" ;;
+    passed) vs_ctl_dead unbundled-leftover "a NEEDED library that is neither bundled nor a host library passed the artifact check" ;;
+    *) vs_ctl_dead unbundled-leftover "the bundler failed for another reason: $(tail -1 "$W/ctl2/out.txt")" ;;
+    esac
+    # (3) msys-path-untranslated: section 4 above runs against $TOOLS, so under the
+    #     mode the copy's winpath() is a no-op and section 4's first half fails.
+    if run_bundler bundle_win_dlls.py fbneo.exe msyspath "$W/ctl3"; then
+        vs_ctl_fired msys-path-untranslated "an MSYS path resolves only because winpath() translates it (section 4)"
+    else
+        vs_ctl_dead msys-path-untranslated "the unmodified bundler could not resolve a translatable path" || true
+        fail=1
+    fi
 fi
 
 [ "$fail" = 0 ] && echo "PASS: test_bundle_parsers" || { echo "FAIL: test_bundle_parsers"; exit 1; }

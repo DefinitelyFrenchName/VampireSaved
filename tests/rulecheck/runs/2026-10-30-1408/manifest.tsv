@@ -1,0 +1,28 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent213/t337/closure/closing_comment.md	d9631945743ef0037acf583c6f1c8958013262ab
+build/agent213/t337/closure/ticket_row_337.tsv	dbed12e426682466a0aaf8f589470546324a9dce
+build/agent213/t337/closure/issue_337_body.md	08ab74d66c3502b1b29b88cec1ee2951de3bfe27
+build/agent213/t337/closure/fix.diff	34488c0e4c2a8ca7f21c3eb7b00dc9691bf1aa25
+build/agent213/t337/closure/records.diff	b0a42a2ce5b086e5737e9645c67bad5405bc5166
+build/agent213/t337/closure/census_now.txt	b135bb3dd0332dc03d5c84cad79418cb5312018a
+build/agent213/t337/closure/pairs.py	994a7ccec31f20ced2e9b4d072266ba646967c2e
+build/agent213/t337/closure/pairs.txt	de6e738e3f1584f8bf535831cc82d8739fa3b973
+build/agent213/t337/closure/trap_order_indep.py	7ee5ee74264be044cc4eb23ebb257f5544b997fc
+build/agent213/t337/closure/trap_order_indep.txt	7c535b5b0a9a0f044c4762a32880be0d816ec13c
+build/agent213/t337/closure/trap_order_indep_fixtures.txt	82d69da8fe9fe680eba4cb15b0e23fb4b2fca842
+build/agent213/t337/closure/fixtures/trap_forms.sh	c4f8a6782001214be9f995217699b79d1bf7e996
+build/agent213/t337/closure/fixtures/trap_safe.sh	9acb1ca4d49a2e3cba2e3a6723e9a6b41b1c5de0
+build/agent213/t337/closure/trap_calls.py	51b216a0d5f8aad5bd3f8cd35e58f7f502bb77a5
+build/agent213/t337/closure/trap_calls.txt	1f00325e4013bc58b43d0ec6cee21e68d5b4b758
+build/agent213/t337/closure/trap_words.sh	7d9a26f5ee1be3120a72a3b805db2d9e254ee06f
+build/agent213/t337/closure/trap_account.py	7bf052979f6a4bbada0f27874f022921e96b843c
+build/agent213/t337/closure/trap_account.txt	28443d4985d31bf709d8cd30fdba55f839e3c8d9
+build/agent213/t337/closure/trap_account_byeye.txt	608c10a33a4c3f9ff9e1ac304482ddfb68db666b
+build/agent213/t337/closure/gate_mac.log	1e58d99d750f2344aa19f45cfd8c080eae48c09f
+build/agent213/t337/closure/control_modes_mac.log	14f5b5746e6b114b146714590c335132e9095c60
+build/agent213/t337/closure/pilot_tmp_hygiene.log	50682140ad8dc140304ae8dc2c745e7c9f77f78f
+build/agent213/t337/closure/pilot_retrace.sh	4fdf07ab5e1e7b92998cf54d2489a3c1c3390a72
+build/agent213/t337/closure/pilot_state.txt	7b2be67e953b7fe75a0ffd5d9ee7f722597a3e43
+build/agent213/t337/closure/pilot_overlap.txt	57fc514f68174ad92c146beedc37638116715541
+build/agent213/t337/closure/pilot_classes.tsv	ea2d89711c4e9f97ab0e2e85937042d2e0b52ae9
+DECISIONS_HISTORY.md.lines-9030-9045 (lines 9030-9045 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-30 (14z-212) — #333: EXIT-trap order is stated as a limit, its measures best-effort")	f6325ec07b5bcfc9453ba63c62909ffbd5914b46

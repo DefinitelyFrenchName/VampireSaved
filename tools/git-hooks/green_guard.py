@@ -14,6 +14,12 @@ HOW: tests/run_all_static.sh writes, at its end, its scope and verdict into its 
   confirm without controls").
 EXPECTS: exit 0 to allow, 1 to refuse (the reason on stderr names the tree, the newest row for it and the command that
   makes one).
+THE LEDGER PAGE (#267, ruled 2026-10-30, 14z-212: "the guard skips refs/heads/gh-pages (or publish_ledger pushes in
+  a way the guard knows), with a gate control for it, then publish ... nothing bypasses #290"): a push to
+  refs/heads/gh-pages of ONE parentless commit whose tree is exactly tools/publish_ledger.sh's page (.nojekyll,
+  index.html, ledger.css, ledger.js, plain files) is not judged — the page is derived data, not a repository tree, so no
+  tier can cover it. Both halves are checked: any other commit pushed to gh-pages, and the page pushed anywhere else, are
+  judged like any push.
 OVERRIDE: the maintainer's own `! git commit --no-verify` / `! git push --no-verify`. There is no override file or
   variable on purpose.
 NOT HELD: a commit git makes without the pre-commit hook (a clean merge, cherry-pick, rebase, revert, --no-verify;
@@ -31,6 +37,8 @@ import time
 
 FIELDS = ("tree", "verdict", "strict", "tier", "romdir", "cadence", "exec_controls", "results", "utc")
 COUNTED_CADENCES = ("session", "freeze", "release")
+LEDGER_REF = "refs/heads/gh-pages"
+LEDGER_FILES = (".nojekyll", "index.html", "ledger.css", "ledger.js")   # tools/publish_ledger.sh's orphan commit
 ZERO = "0" * 40
 MAKE_ONE = ("ROMDIR=... tests/run_on_snapshot.sh --commit <a commit of this tree> -- tests/run_all_static.sh --strict "
             "--exec-controls none   (or --strict --confirm <newest results.tsv>, with or without --exec-controls none)")
@@ -92,12 +100,27 @@ def check_commit(root):
     return 0 if ok else 1
 
 
+def ledger_page(root, sha, ref):
+    """-> True when the push is the ledger page (#267): to gh-pages, one parentless commit, exactly the page's files."""
+    if ref != LEDGER_REF:   # GUARD-PAGE-REF
+        return False
+    if git("rev-list", "--parents", "-n", "1", sha, cwd=root).split()[1:]:   # GUARD-PAGE-ORPHAN
+        return False
+    entries = [line.split(None, 3) for line in git("ls-tree", "-r", sha, cwd=root).splitlines()]
+    return (all(e[0] == "100644" and e[1] == "blob" for e in entries)
+            and tuple(sorted(e[3] for e in entries)) == LEDGER_FILES)   # GUARD-PAGE-SHAPE
+
+
 def check_push(root, stdin):
     all_rows = rows(index_path(root))
     rc = 0
     for line in stdin.read().splitlines():
         parts = line.split()
         if len(parts) != 4 or parts[1] == ZERO:     # a deletion pushes no tree
+            continue
+        if ledger_page(root, parts[1], parts[2]):
+            print(f"{parts[0]} -> {parts[2]}: green guard: the ledger page (#267), one parentless commit of "
+                  f"{', '.join(LEDGER_FILES)}: derived data, no tier covers it — not judged", file=sys.stderr)
             continue
         tree = git("rev-parse", parts[1] + "^{tree}", cwd=root)
         ok, msg = judge(tree, all_rows)

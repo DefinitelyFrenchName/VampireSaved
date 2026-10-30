@@ -3540,6 +3540,26 @@ Measured over each round's tree: 120 unguarded sites before #333, 11 after the f
 finds were guarded; after that no unguarded site in the census's directories — later forms occur in real code (prose, a
 contained `{ set +e; …; set -e; }`) without exposing one — and 2 outside them (#333 run 2026-10-29-1389). Such a census states its limit — it reads shell text, it does not interpret it —
 and measures each named form, rather than chase every form a shell allows.
+**And the guard's own stop runs the EXIT trap already set (#337, 14z-213).** `|| exit` and a `set -e` stop both run the
+EXIT trap in force, with X still empty: a trap set BEFORE the guard's stop — the site's line, or a later
+`[ -n "$X" ] || exit` test's line, so a trap set between the two counts — whose action names `"$X/<sub>"` or `"$X"/*`
+(any `${X...}` too: `"${X%/}/sub"`; an `rm -rf`, or a `cp -R "$X"/. "$KEEP"/`, which copies `/`), directly or through a
+cleanup function, acts on a path under `/`. **The rule:** set a site's trap after its guard (`W="$(mktemp -d)" || { ...; exit 2; }; trap 'rm -rf "$W"' EXIT`),
+or let an earlier trap name only `"$X"`, which on an empty X removes nothing. The census names such a site TRAPPED
+(`tools/tmp_hygiene.py` `sh_trap_order`; fifteen known forms and eight safe ones in `tests/test_tmp_hygiene.sh`, control
+`planted-trapped`). A trap's action must be read as the shell reads its words: a regex over one line missed a quoted
+action across lines, `trap -- '...' EXIT` and the `'\''` idiom (rule-checker run 2026-10-30-1406), and a list of
+"command positions" missed a case arm's `pat) trap ...` (run -1409). The census reads a trap's words with shlex, takes
+EVERY word `trap` that does not follow an ordinary word as a command (so `sheet_new trap` is an argument and anything
+else is a trap), and names UNREADTRAP any `trap` it cannot read (an action that is only a variable, an unbalanced
+quote) rather than skip it. A comment starts at a `#` after a blank only OUTSIDE quotes: a cut at the first ` #` hid
+everything after `echo "a #b";` on its line, trap or site (run -1410). The census pairs a trap with a site in the SAME
+file only; a sourced library's site and its caller's trap are not paired — measured 14z-213: no tests/lib library sets
+a trap, and no trap names the three library sites' variables (`_dv_dir`, `_dv_tmp`, `_mc_tmp`). Measured on the tree at 14z-213: 487 guarded sites, 7 with an EXIT trap set before them,
+none of those traps naming the site's variable — and a second reader sharing no census code, taking every word
+`trap` wherever it stands, agrees (0 hits on 18 pairs); 481 EXIT traps read, and every one of the 744 lines holding the
+word `trap` accounted for occurrence by occurrence (154 comments, 478 lines with every occurrence read, 112 text, by
+eye). Not read: an EXIT trap spelled other than `EXIT` or `0` (`exit`, `SIGEXIT`) — a stated limit (run -1411).
 
 ## A SHELL'S WRITE-ERROR TEXT IS ITS OWN — bash says `write error: Broken pipe`, dash (Ubuntu's `sh`) `printf: I/O error` (paid: 14z-212, PILOT; #336)
 

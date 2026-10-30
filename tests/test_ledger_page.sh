@@ -9,8 +9,10 @@
 # HOW: synthetic datasets (a private figure of each kind beside ordinary ones) -> the page; its embedded data is
 #   extracted (`ledger_page.py --extract`) and compared with the datasets less the private figures; the page's text is
 #   searched for any way to fetch (a URL, src=, <link, @import, url(, fetch(, XMLHttpRequest); then the publish script
-#   runs twice against a throwaway bare repository (one more figure the second time) and the branch must hold one
-#   parentless commit whose index.html is the page built, the second replacing the first;
+#   runs twice against a throwaway bare repository (one more figure the second time), from a scratch repository with
+#   the REAL pre-push hook and green guard and no tier row (#267: the 14z-212 close's publish was refused by the guard,
+#   which this gate never met), and the guard must say it let the page through; the branch must hold one parentless
+#   commit whose index.html is the page built, the second replacing the first;
 #   every curated worked example (tests/rulecheck/catches.tsv) is embedded. Four controls.
 # EXPECTS: data equal; 0 private figures; 0 fetch constructs; gh-pages a single parentless commit holding exactly
 #   index.html, ledger.css, ledger.js and .nojekyll, the page equal to the build, after the second publish too; no
@@ -115,8 +117,16 @@ export GIT_AUTHOR_NAME=test GIT_AUTHOR_EMAIL=test@test GIT_COMMITTER_NAME=test G
 git init -q --bare "$W/remote.git"
 git -C "$W" init -q pub
 git -C "$W/pub" remote add origin "$W/remote.git"
+# THROUGH THE REAL GIT HOOKS (#267, 14z-213): the 14z-212 close's publish was refused by the pre-push green guard (#290),
+# which this gate never met because its scratch repository had no hooks. The guard must let the page through with no
+# tier row at all, and say it did.
+mkdir -p "$W/pub/tools/git-hooks"
+cp tools/git-hooks/pre-push tools/git-hooks/green_guard.py "$W/pub/tools/git-hooks/"
+chmod +x "$W/pub/tools/git-hooks/pre-push"
+git -C "$W/pub" config core.hooksPath tools/git-hooks
 pub_ok() {  # pub_ok <n> — publish, then the branch must be one parentless commit: the page's three files (= the build) + .nojekyll
     sh tools/publish_ledger.sh --data "$W/data" --out "$W/out" --repo "$W/pub" --push > "$W/pub$1.log" 2>&1 || { echo "the publish failed: $(tail -1 "$W/pub$1.log")"; return 1; }
+    grep -q 'green guard: the ledger page (#267)' "$W/pub$1.log" || { echo "the push did not pass through the green guard"; return 1; }
     _c="$(git -C "$W/remote.git" rev-parse refs/heads/gh-pages)" || { echo "no gh-pages"; return 1; }
     [ "$(git -C "$W/remote.git" rev-list --count "$_c")" = 1 ] || { echo "gh-pages is not one parentless commit"; return 1; }
     [ "$(git -C "$W/remote.git" ls-tree --name-only "$_c" | tr '\n' ' ')" = ".nojekyll index.html ledger.css ledger.js " ] || { echo "files: $(git -C "$W/remote.git" ls-tree --name-only "$_c" | tr '\n' ' ')"; return 1; }
@@ -129,7 +139,7 @@ pub_ok() {  # pub_ok <n> — publish, then the branch must be one parentless com
 more() { python3 -c "
 import json, sys; p = sys.argv[1] + '/figures.json'; r = json.load(open(p)); r.append(dict(r[0], metric='more')); json.dump(r, open(p, 'w'))" "$W/data"; }
 if c1="$(pub_ok 1)" && more && c2="$(pub_ok 2)" && [ "$c1" != "$c2" ]; then
-    echo "  ok    published twice: gh-pages is one parentless commit holding the page, replaced under a lease"
+    echo "  ok    published twice through the real green guard: gh-pages is one parentless commit holding the page, replaced under a lease"
 else echo "  FAIL  publishing: ${c2:-${c1:-}}"; fail=1; fi
 
 # ---- the own-site upload: to a local folder standing for the webroot; refused with no DEPLOY_TARGET

@@ -124,6 +124,7 @@ tests/test_checkskills.sh	docs
 tests/test_classify_hitclass_probe.sh	oracle
 tests/test_classify_pool_spawns.sh	oracle
 tests/test_community_crosscheck.sh	character-data
+tests/test_mizuumi_candidates.sh	character-data
 tests/audit_ground_throws.sh	character-data
 tests/audit_throw_recovery.sh	character-data	MAME, the vsavj ROM, ~2.5 min at JOBS=12	14z-211 (#330)
 tests/test_power_decode.sh	character-data
@@ -488,6 +489,8 @@ tests/test_session_close.sh	docs
 tests/test_green_guard.sh	review-triage
 tests/test_sheet_census.sh	runner
 tests/test_proof_sheets.sh	runner
+tests/test_proof_sheets_web.sh	runner
+tests/test_control_classifier.sh	runner
 tests/test_submodule_pins.sh	review-triage
 tests/test_build_retention.sh	runner
 tests/test_release_reuse.sh	runner

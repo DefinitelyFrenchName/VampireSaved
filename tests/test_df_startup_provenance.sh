@@ -134,12 +134,16 @@ if MERGED:
             print(f"  merged build row {i:02x} -> 0x{mrows[i]:06x} arms 0x{want:02x} (the vs2 value, carried)")
 else:
     print("  (no BUILD verify_op.bin — the built-image leg skipped; the ROM legs still assert)")
-# must-fire control
-ctl = []
-bad = dict(TENANT); bad[0x13] = 0x41
-bad[0x13] = 0x41 if TENANT[0x13] != 0x41 else 0x40
-if check_tenants(bad, ctl): errs.append("CONTROL: a perturbed expected value was NOT caught"); print("CONTROL DEAD: perturbed-expectation — a perturbed expected value was NOT caught")
-else: print("CONTROL FIRED: perturbed-expectation — a perturbed expected value is caught against vs2 and vh2")
+# must-fire control — in-gate only: in a CONTROL= mode TENANT already carries the perturbation, so this copy would
+# perturb the perturbed value and print DEAD beside the mode's real FAIL (#310, 14z-213: the classifier reads its own
+# CONTROL DEAD as LIES)
+import os
+if not os.environ.get("CONTROL"):
+    ctl = []
+    bad = dict(TENANT); bad[0x13] = 0x41
+    bad[0x13] = 0x41 if TENANT[0x13] != 0x41 else 0x40
+    if check_tenants(bad, ctl): errs.append("CONTROL: a perturbed expected value was NOT caught"); print("CONTROL DEAD: perturbed-expectation — a perturbed expected value was NOT caught")
+    else: print("CONTROL FIRED: perturbed-expectation — a perturbed expected value is caught against vs2 and vh2")
 for e in errs: print("  FAIL:", e)
 sys.exit(1 if errs else 0)
 PY

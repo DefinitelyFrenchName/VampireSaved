@@ -12,11 +12,18 @@
 #   tier static, ROMDIR unset, cadence ondemand, another tree) and the counting rows (session; --exec-controls none;
 #   freeze). Section 4 drives `record` on results files (tree moved, fields missing). Section 5 runs the REAL runner
 #   in the scratch repository (one stub gate) and commits on the row it wrote; a --tier portable run's row is refused.
+#   Section 7 pushes the LEDGER PAGE (#267, ruled 2026-10-30: the guard lets tools/publish_ledger.sh's page through,
+#   "nothing bypasses #290") with no row at all: the page's parentless commit to gh-pages is pushed; the page with a
+#   file more, a file less or an executable mode, the page with a parent, and the page to another branch are refused.
 # EXPECTS: every refusal case refused (exit non-zero, the commit absent); every counting row lets the commit land; the
-#   uncovered tip refused and the covered tip pushed; the runner's row carries the tested tree.
+#   uncovered tip refused and the covered tip pushed; the runner's row carries the tested tree; the ledger page alone
+#   pushed, each near-page refused.
 #
 # MUST-FIRE: shadow-tool: guard-ignores-tree — a copy of green_guard.py whose GUARD-TREE line keeps every row whatever its tree must let section 1's other-tree commit through, and the gate must FAIL (mode: that copy is the guard every section runs; section 6 fires it in-run)
 # MUST-FIRE: shadow-tool: guard-ignores-strict — a copy of green_guard.py whose GUARD-SCOPE line drops the strict check must let section 1's non-strict commit through, and the gate must FAIL (mode: that copy is the guard every section runs; section 6 fires it in-run)
+# MUST-FIRE: shadow-tool: guard-page-any-ref — a copy of green_guard.py whose GUARD-PAGE-REF line passes the ledger page on every ref must let section 7's page pushed to another branch through, and the gate must FAIL (mode: that copy is the guard every section runs; section 6 fires it in-run)
+# MUST-FIRE: shadow-tool: guard-page-any-shape — a copy of green_guard.py whose GUARD-PAGE-SHAPE line accepts any tree must let section 7's page with an extra file through, and the gate must FAIL (mode: that copy is the guard every section runs; section 6 fires it in-run)
+# MUST-FIRE: shadow-tool: guard-page-any-parent — a copy of green_guard.py whose GUARD-PAGE-ORPHAN line accepts a commit with a parent must let section 7's page with a parent through, and the gate must FAIL (mode: that copy is the guard every section runs; section 6 fires it in-run)
 #
 # WHY: #288 found the class three times among the procedure check's real catches (rule-checker runs 2026-10-13-1016,
 # 2026-10-13-1028, 2026-10-15-1091): a red tier read as green, a close tier called green, a commit made without its
@@ -37,10 +44,19 @@ sed 's|    mine = \[r for r in all_rows if r\["tree"\] == tree\]   # GUARD-TREE|
 cmp -s "$GUARD" "$W/shadow/tree.py" && bad "could not blind the tree comparison — the GUARD-TREE line moved"
 sed 's|(("verdict", "GREEN"), ("strict", "1"), ("tier", "all"), ("romdir", "set"))   # GUARD-SCOPE|(("verdict", "GREEN"), ("tier", "all"), ("romdir", "set"))   # GUARD-SCOPE disabled|' "$GUARD" > "$W/shadow/strict.py"
 cmp -s "$GUARD" "$W/shadow/strict.py" && bad "could not drop the strict check — the GUARD-SCOPE line moved"
+sed 's|    if ref != LEDGER_REF:   # GUARD-PAGE-REF|    if False:   # GUARD-PAGE-REF disabled|' "$GUARD" > "$W/shadow/page-ref.py"
+cmp -s "$GUARD" "$W/shadow/page-ref.py" && bad "could not blind the page's ref check — the GUARD-PAGE-REF line moved"
+sed 's|            and tuple(sorted(e\[3\] for e in entries)) == LEDGER_FILES)   # GUARD-PAGE-SHAPE|            or True)   # GUARD-PAGE-SHAPE disabled|' "$GUARD" > "$W/shadow/page-shape.py"
+cmp -s "$GUARD" "$W/shadow/page-shape.py" && bad "could not blind the page's shape check — the GUARD-PAGE-SHAPE line moved"
+sed 's|    if git("rev-list", "--parents", "-n", "1", sha, cwd=root).split()\[1:\]:   # GUARD-PAGE-ORPHAN|    if False:   # GUARD-PAGE-ORPHAN disabled|' "$GUARD" > "$W/shadow/page-parent.py"
+cmp -s "$GUARD" "$W/shadow/page-parent.py" && bad "could not blind the page's parent check — the GUARD-PAGE-ORPHAN line moved"
 USE="$GUARD"
 case "${VS_CTL:-}" in
 guard-ignores-tree)   USE="$W/shadow/tree.py" ;;
 guard-ignores-strict) USE="$W/shadow/strict.py" ;;
+guard-page-any-ref)    USE="$W/shadow/page-ref.py" ;;
+guard-page-any-shape)  USE="$W/shadow/page-shape.py" ;;
+guard-page-any-parent) USE="$W/shadow/page-parent.py" ;;
 esac
 
 # THE SCRATCH REPOSITORY: the real hooks, the guard under test, a bare remote
@@ -152,6 +168,30 @@ grep -q '^GREEN' "$W/run2.out" || bad "the --tier portable stub run did not read
 _h0="$(git -C "$F" rev-parse HEAD)"; $G -C "$F" commit -q -m "on a portable row" > "$W/commit.out" 2>&1
 [ "$(git -C "$F" rev-parse HEAD)" = "$_h0" ] && ok "a strict GREEN --tier portable run: refused (it ran no static gate)" || bad "a --tier portable run let the commit land"
 
+echo "== 7. pre-push: the ledger page (#267) — only tools/publish_ledger.sh's page, only to gh-pages, needs no row"
+PAGE=".nojekyll index.html ledger.css ledger.js"
+pg_commit() {  # pg_commit <repo> <parent|-> <mode> <file>... — a commit whose tree holds the named files
+    _r="$1"; _p="$2"; _m="$3"; shift 3
+    _t="$(for _f; do printf '%s blob %s\t%s\n' "$_m" "$(printf '%s\n' "$_f" | git -C "$_r" hash-object -w --stdin)" "$_f"; done | git -C "$_r" mktree)"
+    if [ "$_p" = - ]; then echo page | $G -C "$_r" commit-tree "$_t"; else echo page | $G -C "$_r" commit-tree "$_t" -p "$_p"; fi
+}
+page_push() {  # page_push <repo> <label> pushed|refused <ref> <commit> — the push judged with NO row in the index
+    : > "$1/.git/green_index.tsv"
+    if git -C "$1" push -q -f origin "$5:$4" > "$W/push.out" 2>&1; then _got=pushed; else _got=refused; fi
+    if [ "$_got" = refused ] && ! grep -q 'green guard: REFUSED' "$W/push.out"; then
+        bad "$2: the push failed for another reason"; tail -3 "$W/push.out" | sed 's/^/        /'; return 1; fi
+    if [ "$_got" = "$3" ]; then ok "$2: $3"; return 0; fi
+    bad "$2: $_got, expected $3"; return 1
+}
+P1="$(pg_commit "$R" - 100644 $PAGE)"
+page_push "$R" "the page, one parentless commit, to gh-pages" pushed refs/heads/gh-pages "$P1"
+page_push "$R" "the page with a file more"              refused refs/heads/gh-pages "$(pg_commit "$R" - 100644 $PAGE extra.txt)"
+page_push "$R" "the page with a file less"              refused refs/heads/gh-pages "$(pg_commit "$R" - 100644 .nojekyll index.html ledger.css)"
+page_push "$R" "the page's files executable"            refused refs/heads/gh-pages "$(pg_commit "$R" - 100755 $PAGE)"
+page_push "$R" "the page with a parent"                 refused refs/heads/gh-pages "$(pg_commit "$R" "$P1" 100644 $PAGE)"
+page_push "$R" "a repository commit to gh-pages"        refused refs/heads/gh-pages "$(git -C "$R" rev-parse HEAD)"
+page_push "$R" "the page to another branch"             refused refs/heads/elsewhere "$P1"
+
 if [ -z "${VS_CTL:-}" ]; then
     echo "== 6. controls: each shadow guard must let its section's refused commit through"
     S="$W/srepo"
@@ -165,6 +205,19 @@ if [ -z "${VS_CTL:-}" ]; then
         if [ "$(git -C "$S" rev-parse HEAD)" != "$_h0" ]; then
             vs_ctl_fired "guard-ignores-$c" "the shadow guard let the commit land — section 1 would have failed on it"
         else vs_ctl_dead "guard-ignores-$c" "the shadow guard still refused"; fail=1; fi
+    done
+    for c in ref shape parent; do
+        rm -rf "$S" "$W/sremote.git"; mkrepo "$S" "$W/shadow/page-$c.py"
+        git init -q --bare "$W/sremote.git"; git -C "$S" remote add origin "$W/sremote.git"
+        : > "$S/.git/green_index.tsv"
+        case "$c" in
+        ref)    _c="$(pg_commit "$S" - 100644 $PAGE)"; _ref=refs/heads/elsewhere ;;
+        shape)  _c="$(pg_commit "$S" - 100644 $PAGE extra.txt)"; _ref=refs/heads/gh-pages ;;
+        parent) _c="$(pg_commit "$S" "$(git -C "$S" rev-parse HEAD)" 100644 $PAGE)"; _ref=refs/heads/gh-pages ;;
+        esac
+        if git -C "$S" push -q -f origin "$_c:$_ref" > "$W/push.out" 2>&1; then
+            vs_ctl_fired "guard-page-any-$c" "the shadow guard let the near-page through — section 7 would have failed on it"
+        else vs_ctl_dead "guard-page-any-$c" "the shadow guard still refused"; fail=1; fi
     done
 fi
 

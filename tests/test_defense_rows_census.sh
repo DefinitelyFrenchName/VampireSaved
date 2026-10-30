@@ -8,13 +8,13 @@
 #   table by absolute long or pc-relative lea/pea.
 # HOW: static over the decrypted views and the build's data and opcode images (~2 s): row
 #   compares per id and a raw scan at every even offset for table addresses; controls
-#   overwrite Phobos's row with his vs2 row and plant two reader instructions into the
+#   overwrite Phobos's row with his shell's (Bulleta's) row and plant two reader instructions into the
 #   opcode image.
 # EXPECTS: the frozen census equal (base rows, variant copies, tenant classes, exactly the
 #   two host readers on vsavj and ours); both plants change rows and fail. Not covered: a
 #   base computed at run time or reached through a data pointer.
 #
-# MUST-FIRE: perturbed-copy: tenant-row-moved — a copy of our build's data view with Phobos's row 0x10 overwritten by his vs2 row (what the ruled fix will do) must FAIL the frozen compare, so the frozen rows are read from the build under test and the fix re-freezes this file deliberately (in-gate: the perturbed view must census differently; mode: the gate censuses the perturbed view and FAILs)
+# MUST-FIRE: perturbed-copy: tenant-row-moved — a copy of our build's data view with Phobos's row 0x10 overwritten by his shell Bulleta's vsavj row (the pre-fix state; until 14z-213 it was his vs2 row, a no-op since the ruled fix, #310) must FAIL the frozen compare, so the frozen rows are read from the build under test and the fix re-freezes this file deliberately (in-gate: the perturbed view must census differently; mode: the gate censuses the perturbed view and FAILs)
 #
 # MUST-FIRE: perturbed-copy: reader-planted — a copy of our build's opcode image with an absolute load of an address INSIDE the curve (`movea.l #$000B8980,a1`, 0x100 bytes before the image's end) and a `lea d16(pc),a0` landing on the threshold table must add one reader row per arm and FAIL the frozen compare, so both arms of the reader census read the image they are given (in-gate: the planted copy must add exactly those two rows; mode: the gate censuses the planted copy and FAILs)
 #
@@ -110,11 +110,14 @@ for g, img, end in imgs:
 PY
 }
 # ONE perturbation, shared by the in-gate control and the mode ([VSP-181])
-move_row() {  # move_row <ours view in> <out>: Phobos's row 0x10 given his vs2 row
-    python3 - "$1" "$W/v2_da.bin" "$2" <<'PY'
+move_row() {  # move_row <ours view in> <out>: Phobos's row 0x10 given his shell Bulleta's (0x00) vsavj row
+    # (#310, 14z-213: it used to give him his vs2 row — what the ruled fix did, so since the fix the move changed nothing
+    # and the mode read HONOURED on its own CONTROL DEAD exit. His shell's row is the pre-fix state the frozen compare
+    # must refuse.)
+    python3 - "$1" "$W/vj_da.bin" "$2" <<'PY'
 import sys
-o = bytearray(open(sys.argv[1], "rb").read()); v2 = open(sys.argv[2], "rb").read()
-o[0xB8940 + 0x10 * 32: 0xB8940 + 0x11 * 32] = v2[0xD2ABE + 0x10 * 32: 0xD2ABE + 0x11 * 32]
+o = bytearray(open(sys.argv[1], "rb").read()); vj = open(sys.argv[2], "rb").read()
+o[0xB8940 + 0x10 * 32: 0xB8940 + 0x11 * 32] = vj[0xB8940 + 0x00 * 32: 0xB8940 + 0x01 * 32]
 open(sys.argv[3], "wb").write(o)
 PY
 }
@@ -180,12 +183,13 @@ _arms="$(grep '^reader' "$W/got.tsv" | diff - "$W/ctl_r.tsv" | sed -n 's/^> //p'
 if [ "$_add" = 2 ] && [ "$_arms" = "abs-long lea-pc " ]; then echo "CONTROL FIRED: reader-planted — both planted arms read as rows: $(grep '^reader' "$W/got.tsv" | diff - "$W/ctl_r.tsv" | sed -n 's/^> //p' | tr '\t' ' ' | tr '\n' ';')"
 else echo "CONTROL DEAD: reader-planted — the planted copy added $_add reader rows ($_arms), not one per arm"; fail=1; fi
 if [ "$CONTROL" = tenant-row-moved ]; then
-    if [ "$fail" = 1 ]; then echo "CONTROL FIRED: tenant-row-moved — Phobos given his vs2 row loses the frozen rows"; echo "FAIL: test_defense_rows_census (control mode)"; exit 1
+    if [ "$fail" = 1 ]; then echo "CONTROL FIRED: tenant-row-moved — Phobos given his shell's row loses the frozen rows"; echo "FAIL: test_defense_rows_census (control mode)"; exit 1
     else echo "CONTROL DEAD: tenant-row-moved — the moved row changed nothing"; echo "FAIL: test_defense_rows_census"; exit 1; fi
 fi
 move_row "$W/ours_da.bin" "$W/ctl_da.bin"
 census "$W/vj_da.bin" "$W/v2_da.bin" "$W/ctl_da.bin" > "$W/ctl.tsv" 2>/dev/null || true
-if diff -q "$W/got.tsv" "$W/ctl.tsv" > /dev/null; then echo "CONTROL DEAD: tenant-row-moved — the census did not see the moved row"; fail=1
-else echo "CONTROL FIRED: tenant-row-moved — Phobos given his vs2 row reads '$(awk -F'\t' '$1=="tenant" && $3=="Phobos" {print $4}' "$W/ctl.tsv")'"; fi
+grep -v '^reader' "$W/got.tsv" > "$W/got_census.tsv"   # like with like: ctl.tsv holds no reader rows (#310, 14z-213)
+if diff -q "$W/got_census.tsv" "$W/ctl.tsv" > /dev/null; then echo "CONTROL DEAD: tenant-row-moved — the census did not see the moved row"; fail=1
+else echo "CONTROL FIRED: tenant-row-moved — Phobos given his shell's row reads '$(awk -F'\t' '$1=="tenant" && $3=="Phobos" {print $4}' "$W/ctl.tsv")'"; fi
 
 if [ "$fail" = 0 ]; then echo "PASS: test_defense_rows_census"; else echo "FAIL: test_defense_rows_census"; exit 1; fi

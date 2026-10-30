@@ -200,6 +200,7 @@ declares	test_compare_composite
 declares	test_compare_fields_selfcheck
 declares	test_compare_flicker
 declares	test_compare_window
+declares	test_control_classifier
 declares	test_controls_concurrent
 declares	test_controls_contract
 declares	test_copy_flags
@@ -358,6 +359,7 @@ declares	test_mister_sim_anchor
 declares	test_mister_tenant_oracle
 declares	test_mister_wide_gate
 declares	test_mister_wide_inert
+declares	test_mizuumi_candidates
 declares	test_module_refs
 declares	test_movability_liveness
 declares	test_move_naming
@@ -390,6 +392,7 @@ declares	test_projectile_census
 declares	test_projectile_params
 declares	test_promise_check
 declares	test_proof_sheets
+declares	test_proof_sheets_web
 declares	test_py_escapes
 declares	test_pyron_blink
 declares	test_pyron_cosmo

@@ -424,3 +424,12 @@ test_runner_collation
 # test_crosscheck_229.sh — #229 (14z-209): tools/crosscheck_229.py's join and classification on synthetic fixtures with
 # known verdicts (36 cases: every verdict class, the Q5 dealt and Q6 hit bases); four controls. ROM-free, ~1 s.
 test_crosscheck_229
+# test_proof_sheets_web.sh — #338 (14z-213): tools/proof_sheets.py's web build of the proof sheets on a synthetic run:
+# reduced tiles and clips, credits on every page, the intro, no local path, log or PNG; five controls. ROM-free, ~5 s.
+test_proof_sheets_web
+# test_mizuumi_candidates.sh — #118 (14z-213): docs/game/atlas/mizuumi_candidates.tsv's derived columns equal what
+# docs/game/atlas/ram.md says (tools/mizuumi_candidates.py check); the verdict rules on known answers; two controls. ~1 s.
+test_mizuumi_candidates
+# test_control_classifier.sh — #310 (14z-213): tests/lib/classify.sh's rules for a mode run that FAILs without judging
+# (its own CONTROL DEAD, a SKIP exit, its own exit-3 REFUSED, a hidden crash) on known answers; four controls. ~1 s.
+test_control_classifier

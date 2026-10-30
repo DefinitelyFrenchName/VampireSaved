@@ -1,0 +1,1 @@
+WITHDRAWN 2026-10-30 (14z-213), never spawned: the PACKET CHECK flagged the closing comment's "Every trap set before the site counts", which predates run 1407's resolution (the comparison is with the guard's stop, not the site). The sentence was corrected and the packet re-prepared as the next run.

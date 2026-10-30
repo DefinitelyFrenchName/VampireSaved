@@ -12,6 +12,8 @@
 #   Since #333 (14z-211) also every shell `X="$(mktemp -d ...)"` statement in tests/*.sh, tests/lib/*.sh and tools/*.sh
 #   STOPS when mktemp fails (an `||` after the substitution, a `[ -n "$X" ] ... ||` test on one of the next three lines,
 #   or `set -e`): one that carries on runs with $X empty, and "$X/<sub>" is then a path under / (UNGUARDED).
+#   Since #337 (14z-213) also no EXIT trap set BEFORE a guarded site names "$X/..." or "$X"/* in its action or a function
+#   it calls (TRAPPED): the guard's stop runs that trap with $X empty.
 # HOW: the census over the tree; then known answers on a synthetic tree: five clean forms (atexit, a finally rmtree, a
 #   shell EXIT trap set in an `if`, a trap calling a cleanup function, a directory made inside a trapped one) must not
 #   be named, and an uncleaned python mkdtemp and an untrapped shell mktemp must be; three sandboxed runner calls (a
@@ -33,6 +35,9 @@
 #   a `mktemp` that fails put first on PATH: a synthetic unguarded script must carry on under it (the shim bites), four
 #   real guarded gates must stop under it with their own "mktemp -d failed" line and a non-zero exit inside 60 s, and the
 #   shared library's m2a_diverge must return non-zero with its line.
+#   #337: fifteen trap-order forms (tests/trap_forms.sh) must each be named TRAPPED, two traps the reader cannot read
+#   (tests/trap_unread.sh) must be named UNREADTRAP, eight safe ones (tests/trap_safe.sh) must not be named, and the
+#   census must count the forms' fifteen EXIT traps.
 # EXPECTS: 0 uncleaned on the tree. A red names the file, the line, the function and the temp variable — the #303
 #   shape: six static gates left python tempfile directories behind on every run (up to 145 entries a run,
 #   test_poke_readback), measured by running every static gate and each of its controls in a fresh TMPDIR on PILOT.
@@ -40,7 +45,9 @@
 # MUST-FIRE: perturbed-copy: planted-mkdtemp — a python file whose function makes a tempfile.mkdtemp() and never removes it must be named UNCLEANED and FAIL the gate (mode: the census reads that file with the tree)
 # MUST-FIRE: perturbed-copy: planted-unsandboxed — a shell gate that calls tools/run_replay_mame.sh with three arguments (no [sandbox]) must be named UNSANDBOXED and FAIL the gate (#303's emulator half) (mode: the census reads that script with the tree)
 # MUST-FIRE: perturbed-copy: planted-mktemp — a shell gate whose W="$(mktemp -d)" has no EXIT trap and no rm must be named UNCLEANED and FAIL the gate (mode: the census reads that script with the tree)
-# MUST-FIRE: perturbed-copy: planted-unguarded — a shell gate whose W="$(mktemp -d)" is trapped but carries on when mktemp fails, and the thirty-seven unguarded forms of tests/unguarded_forms.sh, tests/setetoggle.sh, tests/unguarded_forms2.sh, tests/unguarded_forms3.sh and tests/unguarded_forms4.sh, must each be named UNGUARDED and FAIL the gate (#333) (mode: the census reads that script with the tree)
+# MUST-FIRE: perturbed-copy: planted-unguarded — a shell gate whose W="$(mktemp -d)" is trapped but carries on when mktemp fails, and the thirty-eight unguarded forms of tests/unguarded_forms.sh, tests/setetoggle.sh, tests/unguarded_forms2.sh, tests/unguarded_forms3.sh and tests/unguarded_forms4.sh, must each be named UNGUARDED and FAIL the gate (#333) (mode: the census reads that script with the tree)
+# MUST-FIRE: perturbed-copy: planted-trapped — a shell gate whose `trap 'rm -rf "$A/sub"' EXIT` is set before its guarded A="$(mktemp -d)" || exit 2, with the fourteen other trap-order forms of tests/trap_forms.sh, must be named TRAPPED and FAIL the gate (#337) (mode: the census reads that script with the tree)
+# MUST-FIRE: perturbed-copy: planted-unread-trap — a shell gate whose `trap "$CMD" EXIT` (an action that is only a variable) and an unbalanced-quote trap the trap-order reader cannot read must be named UNREADTRAP and FAIL the gate (#337, rule-checker run 2026-10-30-1406) (mode: the census reads that script with the tree)
 # MUST-FIRE: known-bad: shim-blind — the dynamic check with the failing mktemp left OFF the PATH: the synthetic unguarded script then carries on with a real W, and the guarded gates run past their mktemp, so the check names its own shim dead and FAILs (in-gate: the unguarded script must carry on with W EMPTY under the shim; mode: the shim is left off and the gate FAILs)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
@@ -160,7 +167,8 @@ X34="$(mktemp -d)"
 set -e
 case "${1:-}" in *) set +e ;; esac
 X35="$(mktemp -d)"
-trap 'rm -rf "$X27" "$X28" "$X29" "$X30" "$X31" "$X32" "$X33" "$X34" "$X35"' EXIT
+echo "a #b"; X36="$(mktemp -d)"
+trap 'rm -rf "$X27" "$X28" "$X29" "$X30" "$X31" "$X32" "$X33" "$X34" "$X35" "$X36"' EXIT
 SH
 # rule-checker run 2026-10-29-1382: a conditional `set +e` turns set -e off (line 14), a conditional `set -e` turns
 # nothing on (line 16), a case arm's `set +e` turns it off (line 19); `{ set -e; }` runs in this shell: read guarded
@@ -205,11 +213,96 @@ MASK_RANGES=x "$REPO/tools/run_replay_mame.sh" vsavj r.rpl "$A/o.log" \
 MAME_SANDBOX="$A/sb2" MAME_ROMPATH=x tools/run_mame.sh vsavj -autoboot_script x.lua > /dev/null
 timeout 60 tools/run_replay_guarded.sh vsavj r.rpl "$A/g.log" "$A/g.sb" && echo ok
 SH
+# #337: EXIT traps set BEFORE a guarded site's stop that name "$X/..." (fifteen forms that must each be named TRAPPED;
+# a quoted action across lines, `trap --` and the '\'' idiom since rule-checker run 2026-10-30-1406, a trap between the
+# site and its later-line [ -n ] guard and ${N%/}/ since run -1407, a case arm's trap and `command trap` since run
+# -1409, a trap after a quoted " #" on its line since run -1410), two that the reader cannot read and must NAME (UNREADTRAP), and eight that must not be named (a later trap,
+# "$M" alone, another variable, trap text in quotes, an INT-only trap, a heredoc, a trap after a later-line guard, the
+# word trap as an argument)
+cat > "$W/t/tests/trap_forms.sh" <<'SH'
+#!/bin/sh
+trap 'rm -rf "$A/sub"' EXIT
+A="$(mktemp -d)" || exit 2
+cleanup() { rm -rf "$B"/*; }
+trap cleanup EXIT
+B="$(mktemp -d)" || { echo "FAIL: x"; exit 2; }
+trap 'rm -rf "$C/sub"' \
+    EXIT INT
+C="$(mktemp -d)" || exit 2
+trap 'rm -rf "${D}/x"' EXIT; D="$(mktemp -d)" || exit 2
+outer() { inner; }
+inner() {
+    cp -R "$E"/. "$KEEP"/
+}
+trap outer EXIT
+E="$(mktemp -d)" || exit 2
+trap 'rm -rf "$F/x"' 0
+F="$(mktemp -d)" || exit 2
+trap 'rm -rf "${G:-}/x"' EXIT
+G="$(mktemp -d)" || exit 2
+trap '
+    rm -rf "$H/sub"
+' EXIT
+H="$(mktemp -d)" || exit 2
+trap -- 'rm -rf "$I/sub"' EXIT
+I="$(mktemp -d)" || exit 2
+trap 'echo '\''bye'\''; rm -rf "$J"/*' EXIT
+J="$(mktemp -d)" || exit 2
+cleanup_k() { rm -rf "$K/sub"; }
+K="$(mktemp -d)"
+trap cleanup_k EXIT
+[ -n "$K" ] || { echo "FAIL: x"; exit 2; }
+trap 'rm -rf "${N%/}/sub"' EXIT
+N="$(mktemp -d)" || exit 2
+case "${KEEP:-}" in
+    "") trap 'rm -rf "$S2/sub"' EXIT ;;
+esac
+S2="$(mktemp -d)" || exit 2
+command trap 'rm -rf "$T2/sub"' EXIT
+T2="$(mktemp -d)" || exit 2
+echo "a #b"; trap 'rm -rf "$V2/sub"' EXIT
+V2="$(mktemp -d)" || exit 2
+rm -rf "$V2"
+SH
+cat > "$W/t/tests/trap_unread.sh" <<'SH'
+#!/bin/sh
+CMD='rm -rf "$K/sub"'
+trap "$CMD" EXIT
+K="$(mktemp -d)" || exit 2
+trap 'rm -rf "$L/sub" EXIT
+L="$(mktemp -d)" || exit 2
+rm -rf "$K" "$L"
+SH
+cat > "$W/t/tests/trap_safe.sh" <<'SH'
+#!/bin/sh
+L="$(mktemp -d)" || exit 2
+trap 'rm -rf "$L/sub"' EXIT
+trap 'rm -rf "$M"' EXIT
+M="$(mktemp -d)" || exit 2
+trap 'rm -rf "$OTHER/sub" "$N"' EXIT
+N="$(mktemp -d)" || exit 2
+echo 'trap "rm -rf $P/x" EXIT'
+P="$(mktemp -d)" || exit 2
+trap 'rm -rf "$Q/x"' INT TERM
+Q="$(mktemp -d)" || exit 2
+cat <<EOF
+trap 'rm -rf "\$R/x"' EXIT
+EOF
+R="$(mktemp -d)" || exit 2
+O="$(mktemp -d)"
+[ -n "$O" ] || { echo "FAIL: x"; exit 2; }
+trap 'rm -rf "$O/sub"' EXIT
+say() { :; }
+say trap 'rm -rf "$U/sub"' EXIT
+U="$(mktemp -d)" || exit 2
+SH
 echo "== 1. the tree"
 EXTRA=""
 vs_ctl_is planted-mkdtemp && EXTRA="tools/planted.py"
 vs_ctl_is planted-mktemp && EXTRA="tests/planted.sh"
 vs_ctl_is planted-unsandboxed && EXTRA="tests/unsandboxed.sh"
+vs_ctl_is planted-trapped && EXTRA="tests/trap_forms.sh"
+vs_ctl_is planted-unread-trap && EXTRA="tests/trap_unread.sh"
 vs_ctl_is planted-unguarded && EXTRA="tests/unguarded.sh tests/unguarded_forms.sh tests/setetoggle.sh tests/unguarded_forms2.sh tests/unguarded_forms3.sh tests/unguarded_forms4.sh"
 out="$(python3 tools/tmp_hygiene.py 2>&1)"; rc=$?
 [ -z "$EXTRA" ] || out="$out
@@ -217,7 +310,7 @@ $(python3 tools/tmp_hygiene.py --root "$W/t" $EXTRA 2>&1)"   # the mode: the pla
 echo "$out" | sed 's/^/  /' | tail -12
 if [ -z "$EXTRA" ]; then [ "$rc" = 0 ] && ok "no uncleaned temporary in the tree" || bad "an uncleaned temporary (above)"
 else
-    echo "$out" | grep >/dev/null '^UNCLEANED\|^UNSANDBOXED\|^UNGUARDED' && { echo "FAIL: test_tmp_hygiene (control mode: the planted site was named)"; exit 1; }
+    echo "$out" | grep >/dev/null '^UNCLEANED\|^UNSANDBOXED\|^UNGUARDED\|^TRAPPED\|^UNREADTRAP' && { echo "FAIL: test_tmp_hygiene (control mode: the planted site was named)"; exit 1; }
     echo "FAIL: test_tmp_hygiene — the planted site was not named"; exit 1
 fi
 
@@ -227,15 +320,33 @@ if echo "$out" | grep >/dev/null '^UNCLEANED\|^UNSANDBOXED'; then bad "a clean f
 else ok "five clean forms and three sandboxed runner calls read clean ($(echo "$out" | tail -1))"; fi
 echo "$out" | tail -1 | grep -q ' 3 emulator-runner call(s) read' && ok "the three runner calls were read" || bad "the synthetic runner calls were not all read: $(echo "$out" | tail -1)"
 out="$(python3 tools/tmp_hygiene.py --root "$W/t" tests/guarded.sh tests/sete.sh tests/sete2.sh tests/sete3.sh tests/lib/srcd.sh 2>&1)"
-if echo "$out" | grep >/dev/null '^UNGUARDED'; then bad "a guarded form was named: $(echo "$out" | grep -m1 UNGUARDED)"
+if echo "$out" | grep >/dev/null '^UNGUARDED\|^TRAPPED\|^UNREADTRAP'; then bad "a guarded form was named: $(echo "$out" | grep -m1 'UNGUARDED\|TRAPPED\|UNREADTRAP')"
 else ok "twenty guarded mktemp -d forms read guarded: $(echo "$out" | tail -1 | sed 's/.*carrying on after a failed mktemp -d //')"; fi
-FORMS="tests/unguarded_forms.sh:2 tests/unguarded_forms.sh:3 tests/unguarded_forms.sh:4 tests/unguarded_forms.sh:5 tests/unguarded_forms.sh:6 tests/unguarded_forms.sh:7 tests/unguarded_forms.sh:8 tests/unguarded_forms.sh:9 tests/unguarded_forms.sh:11 tests/unguarded_forms.sh:12 tests/unguarded_forms.sh:13 tests/unguarded_forms.sh:14 tests/setetoggle.sh:2 tests/setetoggle.sh:8 tests/unguarded_forms2.sh:2 tests/unguarded_forms2.sh:3 tests/unguarded_forms2.sh:6 tests/unguarded_forms2.sh:8 tests/unguarded_forms2.sh:10 tests/unguarded_forms2.sh:11 tests/unguarded_forms2.sh:12 tests/unguarded_forms2.sh:13 tests/unguarded_forms2.sh:15 tests/unguarded_forms3.sh:2 tests/unguarded_forms3.sh:3 tests/unguarded_forms3.sh:4 tests/unguarded_forms3.sh:5 tests/unguarded_forms3.sh:7 tests/unguarded_forms4.sh:2 tests/unguarded_forms4.sh:4 tests/unguarded_forms4.sh:6 tests/unguarded_forms4.sh:7 tests/unguarded_forms4.sh:8 tests/unguarded_forms4.sh:11 tests/unguarded_forms4.sh:14 tests/unguarded_forms4.sh:16 tests/unguarded_forms4.sh:19"
+FORMS="tests/unguarded_forms.sh:2 tests/unguarded_forms.sh:3 tests/unguarded_forms.sh:4 tests/unguarded_forms.sh:5 tests/unguarded_forms.sh:6 tests/unguarded_forms.sh:7 tests/unguarded_forms.sh:8 tests/unguarded_forms.sh:9 tests/unguarded_forms.sh:11 tests/unguarded_forms.sh:12 tests/unguarded_forms.sh:13 tests/unguarded_forms.sh:14 tests/setetoggle.sh:2 tests/setetoggle.sh:8 tests/unguarded_forms2.sh:2 tests/unguarded_forms2.sh:3 tests/unguarded_forms2.sh:6 tests/unguarded_forms2.sh:8 tests/unguarded_forms2.sh:10 tests/unguarded_forms2.sh:11 tests/unguarded_forms2.sh:12 tests/unguarded_forms2.sh:13 tests/unguarded_forms2.sh:15 tests/unguarded_forms3.sh:2 tests/unguarded_forms3.sh:3 tests/unguarded_forms3.sh:4 tests/unguarded_forms3.sh:5 tests/unguarded_forms3.sh:7 tests/unguarded_forms4.sh:2 tests/unguarded_forms4.sh:4 tests/unguarded_forms4.sh:6 tests/unguarded_forms4.sh:7 tests/unguarded_forms4.sh:8 tests/unguarded_forms4.sh:11 tests/unguarded_forms4.sh:14 tests/unguarded_forms4.sh:16 tests/unguarded_forms4.sh:19 tests/unguarded_forms4.sh:20"
 got="$(python3 tools/tmp_hygiene.py --root "$W/t" tests/unguarded_forms.sh tests/setetoggle.sh tests/unguarded_forms2.sh tests/unguarded_forms3.sh tests/unguarded_forms4.sh 2>&1 | awk -F'\t' '$1 == "UNGUARDED" {print $2}' | sort | tr '\n' ' ' | sed 's/ $//')"
 want="$(echo $FORMS | tr ' ' '\n' | sort | tr '\n' ' ' | sed 's/ $//')"
-[ "$got" = "$want" ] && ok "thirty-seven unguarded forms (after a conditional set +e, a conditional set -e, a case arm's set +e, || (exit 2), after set +o errexit, a top-level || return, a subshell's set -e, after an escaped quote's set -e, exit only in quotes; TMPDIR= / command / /usr/bin/ / cd && before mktemp, after a quoted set -e; an else arm, [ -n ] ||, a case arm, an inline argument, after ;, local, an env prefix, -dt, after an arithmetic <<, export ||, || true, [ -n ] || true, before set -e, after set +e; an || true arm with a later exit, a commented-out test, after a here-string, after (( << )), after a quoted <<, backticks, --directory, a continuation, a test after a use) each named, and none of the set -e ones" \
+[ "$got" = "$want" ] && ok "thirty-eight unguarded forms (a site after a quoted \" #\" on its line (#337, run 2026-10-30-1410: the comment cut once ended the line there), after a conditional set +e, a conditional set -e, a case arm's set +e, || (exit 2), after set +o errexit, a top-level || return, a subshell's set -e, after an escaped quote's set -e, exit only in quotes; TMPDIR= / command / /usr/bin/ / cd && before mktemp, after a quoted set -e; an else arm, [ -n ] ||, a case arm, an inline argument, after ;, local, an env prefix, -dt, after an arithmetic <<, export ||, || true, [ -n ] || true, before set -e, after set +e; an || true arm with a later exit, a commented-out test, after a here-string, after (( << )), after a quoted <<, backticks, --directory, a continuation, a test after a use) each named, and none of the set -e ones" \
     || bad "the unguarded forms named: [$got], want [$want]"
+got="$(python3 tools/tmp_hygiene.py --root "$W/t" tests/trap_forms.sh 2>&1 | awk -F'\t' '$1 == "TRAPPED" {print $2 ":" $5}' | tr '\n' ' ' | sed 's/ $//')"
+want="tests/trap_forms.sh:3:A tests/trap_forms.sh:6:B tests/trap_forms.sh:9:C tests/trap_forms.sh:10:D tests/trap_forms.sh:16:E tests/trap_forms.sh:18:F tests/trap_forms.sh:20:G tests/trap_forms.sh:24:H tests/trap_forms.sh:26:I tests/trap_forms.sh:28:J tests/trap_forms.sh:30:K tests/trap_forms.sh:34:N tests/trap_forms.sh:38:S2 tests/trap_forms.sh:40:T2 tests/trap_forms.sh:42:V2"
+[ "$got" = "$want" ] && ok "fifteen trap-order forms named TRAPPED (#337: a trap on an earlier line, through a cleanup function, across a continuation, earlier on the site's line, two functions deep with cp -R \"\$E\"/., trap ... 0, \${G:-}/, a quoted action across lines, trap --, the quote-escape idiom, a trap through a cleanup function set between the site and its later [ -n ] guard, \${N%/}/, a trap in a case arm, command trap, a trap after a quoted \" #\")" \
+    || bad "the trap-order forms named: [$got], want [$want]"
+out="$(python3 tools/tmp_hygiene.py --root "$W/t" tests/trap_safe.sh 2>&1)"
+if echo "$out" | grep >/dev/null '^TRAPPED'; then bad "a safe trap form was named: $(echo "$out" | grep -m1 TRAPPED)"
+else ok "eight safe trap forms not named (a later trap, \"\$M\" alone, another variable, trap text in quotes, an INT-only trap, a heredoc, a trap after a later-line [ -n ] guard, the word trap as an argument)"; fi
+python3 tools/tmp_hygiene.py --root "$W/t" tests/trap_forms.sh 2>&1 | tail -1 | grep -q ' 15 EXIT trap(s) read' \
+    && ok "the census counts the EXIT traps it read (15 in the forms)" || bad "the EXIT trap count is not the forms' 15"
+got="$(python3 tools/tmp_hygiene.py --root "$W/t" tests/trap_unread.sh 2>&1 | awk -F'\t' '$1 == "UNREADTRAP" {print $2}' | tr '\n' ' ' | sed 's/ $//')"
+[ "$got" = "tests/trap_unread.sh:3 tests/trap_unread.sh:5" ] && ok "two traps the reader cannot read are named UNREADTRAP (an action that is only a variable, an unbalanced quote)" \
+    || bad "the unreadable traps named: [$got], want [tests/trap_unread.sh:3 tests/trap_unread.sh:5]"
 
 echo "== 3. controls"
+out="$(python3 tools/tmp_hygiene.py --root "$W/t" tests/trap_forms.sh 2>&1)"
+if echo "$out" | grep >/dev/null '^TRAPPED	tests/trap_forms.sh:3	shell	mktemp -d	A	'; then vs_ctl_fired planted-trapped "$(echo "$out" | grep -m1 TRAPPED | cut -f1-5)"
+else vs_ctl_dead planted-trapped "the trap set before a guarded site was not named"; fail=1; fi
+out="$(python3 tools/tmp_hygiene.py --root "$W/t" tests/trap_unread.sh 2>&1)"
+if echo "$out" | grep >/dev/null '^UNREADTRAP	tests/trap_unread.sh:3	'; then vs_ctl_fired planted-unread-trap "$(echo "$out" | grep -m1 UNREADTRAP | cut -f1-2,6)"
+else vs_ctl_dead planted-unread-trap "a trap the reader cannot read was not named"; fail=1; fi
 out="$(python3 tools/tmp_hygiene.py --root "$W/t" tools/planted.py 2>&1)"
 if echo "$out" | grep >/dev/null '^UNCLEANED	tools/planted.py:3	f	mkdtemp	d$'; then vs_ctl_fired planted-mkdtemp "$(echo "$out" | grep -m1 UNCLEANED)"
 else vs_ctl_dead planted-mkdtemp "the uncleaned python mkdtemp was not named"; fail=1; fi
@@ -248,8 +359,8 @@ else vs_ctl_dead planted-unsandboxed "the 3-argument replay call was not named";
 
 out="$(python3 tools/tmp_hygiene.py --root "$W/t" tests/unguarded.sh tests/unguarded_forms.sh tests/setetoggle.sh tests/unguarded_forms2.sh tests/unguarded_forms3.sh tests/unguarded_forms4.sh 2>&1)"
 _nf="$(echo "$out" | grep -c '^UNGUARDED	tests/unguarded_forms.sh:\|^UNGUARDED	tests/setetoggle.sh:\|^UNGUARDED	tests/unguarded_forms2.sh:\|^UNGUARDED	tests/unguarded_forms3.sh:\|^UNGUARDED	tests/unguarded_forms4.sh:')"
-if echo "$out" | grep >/dev/null '^UNGUARDED	tests/unguarded.sh:2	shell	mktemp -d	W	' && [ "$_nf" = 37 ]; then vs_ctl_fired planted-unguarded "$(echo "$out" | grep -m1 UNGUARDED | cut -f1-5); and $_nf of the 37 unguarded forms"
-else vs_ctl_dead planted-unguarded "the planted unguarded mktemp -d sites were not all named ($_nf of the 37 forms)"; fail=1; fi
+if echo "$out" | grep >/dev/null '^UNGUARDED	tests/unguarded.sh:2	shell	mktemp -d	W	' && [ "$_nf" = 38 ]; then vs_ctl_fired planted-unguarded "$(echo "$out" | grep -m1 UNGUARDED | cut -f1-5); and $_nf of the 38 unguarded forms"
+else vs_ctl_dead planted-unguarded "the planted unguarded mktemp -d sites were not all named ($_nf of the 38 forms)"; fail=1; fi
 
 echo "== 4. the dynamic check: a mktemp that fails, first on PATH (#333)"
 mkdir -p "$W/shim"; printf '#!/bin/sh\necho "mktemp: test_tmp_hygiene shim: failing on purpose" >&2\nexit 1\n' > "$W/shim/mktemp"; chmod +x "$W/shim/mktemp"

@@ -1,0 +1,3 @@
+  FLAG D-ABSOLUTE: - The data is gzip-embedded and nothing is fetched.  [build/agent213/t267/closure/closing_comment.md]
+  FLAG D-ABSOLUTE: Nothing on the project's side remains.  [build/agent213/t267/closure/closing_comment.md]
+packet_check: 2 flag(s): D-ABSOLUTE 2

@@ -38,6 +38,78 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
+## Session 14z-213 — **#267's green guard admits the ledger page (patch applied by the maintainer) and the page is on gh-pages; #335's dashboard panel built; the remote scratch cleared; #337 closed done (the mktemp census checks EXIT-trap order, five rule-checker rounds); #338's web build begun; #118's branches settled by ruling.**
+
+### opened with
+The 14z-212 close's opener; the sweep CLEAN, `main` = `origin/main` at `d6393610`. The maintainer: **"Let's start with item
+1,2 and 3"**, then the order #337, #338, #310, and PILOT/ERIS for #118 and light parked tickets (`DECISIONS_HISTORY.md`,
+14z-213). Working evidence: `build/agent213/` (local).
+
+### (1) #267 — THE GREEN GUARD ADMITS THE LEDGER PAGE; PUBLISHED
+The guard (`tools/git-hooks/green_guard.py`, edit-locked) lets ONE push through with no tier row: a parentless commit of
+exactly `.nojekyll index.html ledger.css ledger.js` to `refs/heads/gh-pages`; any other commit to gh-pages, or the page to
+another branch, is judged as before. Drafted and proven in a worktree (`build/agent213/t267/`), applied by the maintainer
+(*"guard part applied for item 1"*). `tests/test_green_guard.sh` section 7 (seven cases) and three controls
+(`guard-page-any-ref`, `-shape`, `-parent`); `tests/test_ledger_page.sh` now publishes through the real hooks (it FAILs on
+the unpatched guard). `test_green_guard` re-traced on PILOT (SAFE); `test_ledger_page` is not on the concurrent-controls
+list, so it needs none. Published `12a87ea0` to gh-pages; the maintainer switched Pages to it (**"I switched GH pages
+deploy from a branch to gh-pages branch"**); live and byte-identical to the commit, all 11 sections rendered; the own-site
+leg SKIPPED (`DEPLOY_TARGET` unset, as ruled). **Closed done** on rule-checker run 2026-10-30-1416 (after -1412, -1415).
+
+### (2) #335 — THE DASHBOARD'S ACTIONS PANEL
+"Actions: OK at the first check" added to the dashboard page (store version 2): tiles, per-decision first-run OK rate and
+questions on first runs (selected session or all), the per-session trend, the actions table; the two not-counted kinds
+shown apart. Two `dash.calc`s; every calculated value equals the collector's own figure (635 checked; the 171 session
+totals equal their decision rows' sums). The maintainer: **"The dashboard new sections are fine"** (`DECISIONS_HISTORY.md`).
+**Closed done** on rule-checker run 2026-10-30-1425, after nine VIOLATED runs (-1413, -1417 to -1424), each a real gap: the
+charts' notes now state the collector's class (ESTIMATED, store version 6); `tests/test_session_metrics.sh` gained five
+controls (`lowest-question`, `later-run-questions`, `calibration-counted`, `not-run-ignored`, `void-only-dropped`) and a
+VOID-only action in its synthetic ledger, re-traced on PILOT (12 runs, SAFE); the collector as gated reproduces the
+page's dataset (306 actions, 816 action figures identical). Found on the way and filed as **#339**: 37 ledger rows carry
+session `-` and both ledger pages drop them without a word.
+
+### (3) THE REMOTE SCRATCH
+PILOT: 76 entries of 14z-211/212 removed (50 -> 65 GB free); ERIS: four dirs, 13 GB. The cited evidence is local under
+`build/agent212/`.
+
+### (4) #337 — EXIT-TRAP ORDER CHECKED; CLOSED DONE
+`tools/tmp_hygiene.py`: TRAPPED (an EXIT trap set before a guarded site's stop naming `"$X/..."`), UNREADTRAP, a shlex
+trap reader, every `trap` word not an argument read, a quote-aware comment cut (shared with #333's check). Fifteen trapped
+forms, eight safe, two unreadable; controls `planted-trapped`, `planted-unread-trap`. On the tree: 487 guarded sites, 481
+EXIT traps, 0 TRAPPED; a second reader sharing no census code agrees; every one of 744 `trap` lines accounted for.
+Rule-checker runs 2026-10-30-1406, -1407, -1409, -1410 each caught a real gap; the maintainer then ruled **"Fix (b), state
+(a)"** (cross-file pairing a stated limit, measured 0), and run -1411's last form (EXIT spelled `exit`) was stated as a
+limit. Closed with its comment. Re-traced on PILOT five times; `tests/controls_concurrent.txt` refreshed.
+
+### (5) #338 — THE PROOF SHEETS' WEB BUILD
+`tools/proof_sheets.py web <local run> --to <dir> --release <tag>` and `webcheck`, and `tools/publish_sheets.sh` (webcheck,
+then `<DEPLOY_TARGET>vs-proof-sheets/`). The maintainer, 14z-213: the clips **"Keep, reduced, add a short description to
+explain that it is short and down sampled"**; the path **"vs-proof-sheets/ (Recommended)"**. The credits were read off the
+three games' own title screens (MAME captures, `build/agent213/t338/titles/`). Trial on 14z-207's full run: 102 pages,
+23,183 tiles, 152 clips in 1 min 41 s, 306 MB, webcheck PASS; headless-Chrome screenshots of the index and a gate page
+(`build/agent213/t338/shots/`) led to one more scrub (session build paths). Gate `tests/test_proof_sheets_web.sh`
+(ondemand; five controls); `docs/project/release_format.md` «The proof sheets' web build». The maintainer on the
+screenshots: **"looks good to me"** (`DECISIONS_HISTORY.md`). Drawn and published at the next tagged release.
+
+### (6) #118 — THE BRANCHES SETTLED, THE CLASSIFICATION IN THE TREE
+Ruled (`DECISIONS_HISTORY.md`, 14z-213): t118-196 dropped and t118-196-struct deleted, both kept as `archive/` tags (41
+and 5 citations on main); the struct worktree removed after its local evidence was copied in. The classification
+re-derived from `ram.md` as `docs/game/atlas/mizuumi_candidates.tsv` (89 offsets: CONSISTENT 35, NOT ADOPTED 19, NO ROW 12,
+OWNER ONLY 11, COVERED 5, NOT OBSERVED 4, CROSS-CHECKED 1, REFUTED 1, REFUTED IN PART 1), its derived columns held by
+`tools/mizuumi_candidates.py check` in `tests/test_mizuumi_candidates.sh` (the rules on eleven known answers, two
+controls). Two `ram.md` errors the derivation found were corrected (`+0x119`'s check is A4; seven rows the inputs gate
+covers said "not yet gated"). The remaining measurement is batched (B1 Anakaris rig .. B7, static decode) for PILOT/ERIS.
+
+### (7) #310 — THE CLASSIFIER'S RULES 1-4
+The 14z-210 census comment, drafted and never posted, posted on the issue. Ruled **"Classifier rules 1-4 (Recommended)"**.
+`tests/lib/classify.sh`: its own `CONTROL DEAD` -> LIES; a SKIP exit with no FAIL -> UNJUDGED; its own exit-3 `REFUSED:`
+-> UNJUDGED; an indented traceback or a `tests/lib` abort -> DIED. Measured on #299's 14z-206 legs (413 honoured controls
+each): exactly five rows move. Read one by one: `test_defense_rows_census@tenant-row-moved` and
+`test_bundle_parsers@unbundled-leftover` had tested NOTHING (the row move a no-op since the ruled fix; the leftover case only
+in the in-gate block), now real; the other three printed an in-gate DEAD beside a real FAIL, the in-gate copies now skip a
+mode. Known answers and four controls in `tests/test_control_classifier.sh`. Both changed gates re-traced on PILOT. The
+emulator tier's controls are not yet re-read under the new rules (their logs were on ERIS).
+
 ## Session 14z-212 — **#330, #333, #334 and #336 closed done on their rule-checker runs (the command throws measured, every family on three victims; the mktemp census read every `mktemp -d` form and 0 sites carry on, EXIT-trap order a stated limit filed as #337; #321's remainder, 61 gates 7,648 -> 4,163 s on ERIS; dash's write-error wording); #335 built (actions linked, first-run OK rate per decision); #267 unparked and built (the ledger as a public page, published at this close).**
 
 ### opened with
@@ -188,6 +260,10 @@ datasets versions 21, 21, 22, 21 and the new `actions` 1) — done. The tier's r
 The first tier was NOT GREEN (165 PASS, 4 FAIL): the gate index, gate coverage and annotations pages not regenerated,
 and `build/ledger_page/` (`tools/publish_ledger.sh`'s output) unclassed. Regenerated in a clean worktree of the staged
 tree, `ledger_page` classed `scratch` in `tests/expected/build_dirs.tsv`, and the tier re-run on the red run's results.
+The re-run read GREEN (169 PASS); committed `d6393610`; pins and sweep done; pushed `33f85438..d6393610`. **`ledger-page`
+NOT PUBLISHED:** the page built, the own site SKIPPED (`DEPLOY_TARGET` unset), and the `gh-pages` push REFUSED by the
+pre-push green guard (#290; the page's tree has no tier). The maintainer: "Fix the guard next session (Recommended)"
+(`DECISIONS_HISTORY.md`, 14z-212). This paragraph and that entry were written after the push and ride the next close.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings

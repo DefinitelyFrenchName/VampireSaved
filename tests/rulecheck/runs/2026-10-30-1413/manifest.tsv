@@ -1,0 +1,16 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent213/t335/closure/closing_comment.md	b23b164db6902e5fa1219e3cff3dd02c2379906e
+build/agent213/t335/closure/ticket_row_335.tsv	109b5392e7b9c081035f4de0c0acf5e6bb9b901c
+build/agent213/t335/closure/issue_335.md	71094044821f4021db84206563867438bb095db6
+build/agent213/t335/closure/gate_mac.log	1179bc76a3a7248ed38f2fc96db0783814efc866
+build/agent213/t335/closure/control_modes_mac.txt	535d673a611a4089f0c90eeb38bf9ff323923b44
+build/agent213/t335/closure/live_page_check.txt	d4c153f49bb906288115a198ad01fc3475fa8204
+build/agent213/t335/closure/s0.js	7135051b7ad2ebf7979659d79f0872b2dd67ff4a
+build/agent213/t335/closure/calc_check.js	23779286e078f2f158694d560a8d9bbe8fa6f96e
+build/agent213/t335/closure/calc_check.txt	c9757f52d81322ef5c1364baeb6fd3024104fcb1
+build/agent213/t335/closure/actions_window.txt	3c22eb6c4ecdbb7fb5cb9204f6f958eedba039ac
+DECISIONS_HISTORY.md.lines-8786-8800 (lines 8786-8800 of DECISIONS_HISTORY.md: its INDEX entry "## Filed 2026-10-28 (14z-212) — #335: the session ledger's first-run OK rate per action, and which q", and the entries after it up to line 8800)	5aaa81994db2764971e277d8ec79f155b003d667
+DECISIONS_HISTORY.md.lines-8860-8875 (lines 8860-8875 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-29 (14z-212) — #335: an action's first run, the questions it fails, and what is sho")	5afe509a4d43750b46a8ae4821ed29db27a18b70
+DECISIONS_HISTORY.md.lines-9158-9164 (lines 9158-9164 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-30 (14z-213) — #335's dashboard sections and #338's web pages accepted on their loo")	7110dff1eb62f71a93023fdd79b576691717f02e
+docs/project/rule_checker.md.lines-109-122 (lines 109-122 of docs/project/rule_checker.md)	d73902177755f0e8eabcefbf44e551ac2dfd6045
+tools/rc_actions.py.lines-1-30 (lines 1-30 of tools/rc_actions.py)	a1ca767d0860c4e447be6c9bd5034423aeb398aa

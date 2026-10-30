@@ -7,6 +7,9 @@ A static census, read without running anything:
     same statement line, or removed (shutil.rmtree / os.remove / os.unlink / .unlink()) in the same function, or the
     site is in ALLOW below with the reason it outlives its maker. A context-managed TemporaryDirectory() is clean.
   SHELL (tests/*.sh, tools/*.sh): every `X="$(mktemp ...)"` must be removed by a trap on EXIT in the same script that names "$X".
+  Every `mktemp -d` site in tests/*.sh, tests/lib/*.sh and tools/*.sh must STOP when mktemp fails (UNGUARDED, #333; see
+  sh_scan), and no EXIT trap set BEFORE a site may name "$X/..." or "$X"/* (TRAPPED, #337; see sh_trap_order): the
+  guard's stop runs that trap with $X empty.
 The census that found the leaks ran every static gate and each of its controls in a fresh TMPDIR on PILOT (14z-207,
 build/agent207/P/ on the maintainer's Mac): six gates left Python tempfile directories (up to 145 per run).
 
@@ -196,7 +199,40 @@ def _blank_quotes(code):
     return "".join(out)
 
 
-def sh_scan(src, sourced=False):
+def _code_lines(src):
+    """(line, code) per LOGICAL line (a `\\` continuation joined; the line is the first physical one), its comment cut
+    off, heredoc bodies left out (they are text, not code)"""
+    phys = src.split("\n")
+    logical, k = [], 0
+    while k < len(phys):
+        start, text = k + 1, phys[k]
+        while text.rstrip().endswith("\\") and k + 1 < len(phys) and not text.lstrip().startswith("#"):
+            k += 1; text = text.rstrip()[:-1] + " " + phys[k].lstrip()
+        logical.append((start, text)); k += 1
+    def code_of(raw):
+        # a `#` opens a comment at a line's start or after a blank, and only OUTSIDE quotes (rule-checker run
+        # 2026-10-30-1410: `echo "a #b"; trap ... EXIT` was cut at the quoted ` #`, hiding the trap and any site after it)
+        if raw.lstrip().startswith("#"):
+            return ""
+        for m in re.finditer(r"(?:^|(?<=\s))#", raw):
+            if _quote_at(raw, m.start()) == "":
+                return raw[:m.start()]
+        return raw
+    codes, here = [], None
+    for start, raw in logical:
+        if here is not None:
+            if raw.strip() == here:
+                here = None
+            continue
+        code = code_of(raw)
+        codes.append((start, code))
+        h = _heredoc_opener(code)
+        if h:
+            here = h
+    return codes
+
+
+def sh_scan(src, sourced=False, stops=None):
     """(line, var, guarded) per `mktemp -d` substitution — `$( ... )` or backticks, `-d` alone or combined (`-dt`) or
     `--directory` — read on LOGICAL lines (a `\\` continuation joined; the line is the first physical one). An
     ASSIGNMENT `X="$(mktemp -d ...)"` (at a line's start or after `;`, `&&`, `||`, `then`, `else`, `do`, a `case` arm's
@@ -217,27 +253,8 @@ def sh_scan(src, sourced=False):
     is a lint over shell TEXT, not a shell interpreter — a form outside the known answers of tests/test_tmp_hygiene.sh
     (a multi-line `if` around `set -e`, a function's `set -e` read where the function is called, `eval`) is not
     read as the shell would run it."""
-    phys = src.split("\n")
-    logical, k = [], 0
-    while k < len(phys):
-        start, text = k + 1, phys[k]
-        while text.rstrip().endswith("\\") and k + 1 < len(phys) and not text.lstrip().startswith("#"):
-            k += 1; text = text.rstrip()[:-1] + " " + phys[k].lstrip()
-        logical.append((start, text)); k += 1
-    def code_of(raw):
-        return "" if raw.lstrip().startswith("#") else re.split(r"(?:^|\s)#", raw, 1)[0]
-    out, here, sete = [], None, False
-    codes = []                                          # (line, code) of the code lines, heredoc bodies left out
-    for start, raw in logical:
-        if here is not None:
-            if raw.strip() == here:
-                here = None
-            continue
-        code = code_of(raw)
-        codes.append((start, code))
-        h = _heredoc_opener(code)
-        if h:
-            here = h
+    codes = _code_lines(src)
+    out, sete = [], False
     depth, fns = 0, []                                 # brace depth over code lines; [start depth, opened] per function
     FN_HEAD = re.compile(r"^\s*(?:function\s+[A-Za-z_][A-Za-z0-9_]*(?:\s*\(\))?|[A-Za-z_][A-Za-z0-9_]*\s*\(\))\s*(?:\{|$)")
     for n, (start, code) in enumerate(codes):
@@ -295,7 +312,10 @@ def sh_scan(src, sourced=False):
             for _l, nxt in codes[n + 1:n + 4]:          # `[ -n "$X" ] || exit` before X is used
                 t = re.search(r'\[\s+-n\s+"?\$\{?' + re.escape(v) + r'\b[^\]]*\]\s*(\|\|.*)', nxt)
                 if t:
-                    tested = _arm_stops(t.group(1), can_return); break
+                    tested = _arm_stops(t.group(1), can_return)
+                    if tested and stops is not None:   # #337 (run 2026-10-30-1407): the stop is on THIS later line
+                        stops[(start, v)] = (_l, t.start(1))
+                    break
                 if re.search(r"\$\{?" + re.escape(v) + r"\b", nxt):
                     break
             if tested:
@@ -303,6 +323,143 @@ def sh_scan(src, sourced=False):
             plain = rest == "" or rest.startswith((";", "fi", "done", "esac", ")"))
             out.append((start, v, bool(sete and plain)))
     return out
+
+
+SH_TRAP_WORD = re.compile(r"(?<![A-Za-z0-9_\-.])(trap)(?![A-Za-z0-9_\-.])")
+SH_ARG_BEFORE = re.compile(r"[A-Za-z0-9_\-.$}\]\"'/=:,@%+]$")   # the word before `trap` ends an ordinary word
+SH_CMD_WORDS = ("then", "do", "else", "elif", "if", "while", "until", "time", "builtin", "command", "exec", "!")
+
+
+def _trap_positions(text):
+    """every `trap` word of text (quotes already blanked) that is not an ARGUMENT: rule-checker run 2026-10-30-1409 found
+    a whitelist of command positions (line start, ; & | ( { !, then, do, else) blind to a case arm's `pat) trap`, so the
+    rule is inverted — a `trap` is a command unless the text before it ends an ordinary word that is not a shell keyword
+    or command prefix (then, do, else, elif, if, while, until, time, builtin, command, exec)"""
+    out = []
+    for m in SH_TRAP_WORD.finditer(text):
+        before = text[:m.start()].rstrip()
+        last = re.search(r"([A-Za-z_!][A-Za-z0-9_]*)$", before)
+        if before and SH_ARG_BEFORE.search(before) and not (last and last.group(1) in SH_CMD_WORDS
+                                                             and not re.search(r"[A-Za-z0-9_\-.$]$", before[:last.start()])):
+            continue
+        out.append(m.start(1))
+    return out
+FN_DEF = re.compile(r"^\s*(?:function\s+([A-Za-z_][A-Za-z0-9_]*)(?:\s*\(\))?|([A-Za-z_][A-Za-z0-9_]*)\s*\(\))\s*\{?")
+
+
+def _functions(codes):
+    """{name: body text} per shell function: from its `name() {` / `function name {` line to the brace that closes it
+    (quoted braces are text), a one-line body included"""
+    out = {}
+    for n, (_l, code) in enumerate(codes):
+        m = FN_DEF.match(_blank_quotes(code))
+        if not m:
+            continue
+        name, depth, opened, body = m.group(1) or m.group(2), 0, False, []
+        for _l2, c2 in codes[n:]:
+            body.append(c2)
+            for ch in _blank_quotes(c2):
+                if ch in "{}":
+                    depth += 1 if ch == "{" else -1; opened = True
+            if opened and depth <= 0:
+                break
+        out[name] = "\n".join(body)
+    return out
+
+
+def sh_trap_order(src, sourced=False):
+    """(site line, var, trap line) per GUARDED `mktemp -d` site (sh_scan) that an EXIT trap set BEFORE ITS GUARD'S STOP
+    could hurt (#337): a guard's `|| exit` / `set -e` stop runs the EXIT trap in force, and with the site's variable
+    empty an action naming "$X/<sub>" or "$X"/* (an `rm`, or a `cp -R "$X"/.`: X, or any `${X...}` expansion such as
+    `${X%/}` or `${X:-}`, followed by `/` or `*`) acts on a path under /. The action is the trap's own text plus the body
+    of each function of the same file it names, followed through the functions those name (sh_exit_traps). The STOP is
+    the site's own line (`|| exit`, `set -e`), or the later `[ -n "$X" ] ||` test's line when that is the guard
+    (rule-checker run 2026-10-30-1407: a trap set between the two is in force when the test exits); a trap counts when
+    it stands before the stop — an earlier line, or earlier on the stop's line. Every such trap counts, not only the last
+    (which one is in force can hang on a branch the text does not decide), and a trap inside a function body counts at
+    the place the function is written (the cautious side). A `|| return` guard is read like an exit (also cautious: a
+    return runs no trap). The census's limit holds: a lint over shell TEXT, so a trap set through `eval`, or an action
+    reaching X through another variable, is not read."""
+    traps = sh_exit_traps(src)
+    codes = _code_lines(src)
+    out, stops = [], {}
+    for site, v, guarded in sh_scan(src, sourced, stops):
+        if not guarded or v == "-":
+            continue
+        # the guard's STOP: the site's own line (`|| exit`, `set -e`), or the later `[ -n "$X" ] ||` test's line (run
+        # 2026-10-30-1407: a trap set between the site and that test is in force when the test exits)
+        stop = stops.get((site, v)) or (site, next((c.find(v + "=") for l, c in codes if l == site), 0))
+        ref = re.compile(r"\$(?:" + re.escape(v) + r"\b|\{" + re.escape(v) + r"(?:[^A-Za-z0-9_}][^}]*)?\})\"?(?:/|\*)")
+        for tl, tc, text in traps:
+            if (tl, tc) < stop and ref.search(text):   # TRAP-BEFORE
+                out.append((site, v, tl))
+    return out
+
+
+def _trap_cmds(src):
+    """-> (reads, unread). reads: (line, column, action, signals) per `trap` command — every word `trap` outside quotes,
+    comments and heredoc bodies that is not an argument (_trap_positions: after a separator, a case arm's `)`, a line's
+    start, a keyword or `builtin` / `command` / `exec`) — whose words shlex reads from the source text itself (rule-checker run 2026-10-30-1406: a quoted
+    action across physical lines, `trap -- ...`, the `'\\''` idiom); a `trap` alone, `-p` / `-l` or a `-` reset are
+    reads that set nothing. unread: (line, why) per such `trap` whose action cannot be read — an unbalanced quote,
+    an action that is only a variable (`trap "$CMD" EXIT`), no signal after the action — so THOSE forms are named, not
+    skipped. Not named: an EXIT trap whose signal is spelled other than `EXIT` or `0` (`exit`, `SIGEXIT`), read as a
+    trap of another signal (rule-checker run 2026-10-30-1411; a stated limit)."""
+    phys = src.split("\n")
+    codes = _code_lines(src)
+    starts = [l for l, _c in codes] + [len(phys) + 1]
+    reads, unread = [], []
+    for n, (start, code) in enumerate(codes):
+        if not re.search(r"\btrap\b", code):
+            continue
+        end = starts[n + 1] - 1
+        span = "\n".join(phys[start - 1:max(end, start)])
+        for pos in _trap_positions(_blank_quotes(span.replace("\\\n", "  "))):
+            line = start + span.count("\n", 0, pos)
+            text = (span[pos:] + "\n" + "\n".join(phys[end:end + 40])).replace("\\\n", " ")
+            lx = shlex.shlex(text, posix=True, punctuation_chars=";&|()\n")
+            lx.whitespace, lx.whitespace_split = " \t\r", True
+            words = []
+            try:
+                for tok in lx:
+                    if tok and set(tok) <= set(";&|()\n"):
+                        break
+                    words.append(tok)
+            except ValueError as e:
+                unread.append((line, "the trap's words cannot be read (%s)" % e)); continue
+            args = words[1:]
+            if args[:1] == ["--"]:
+                args = args[1:]
+            if not args or args[0] in ("-p", "-l") or args[0] == "-":
+                reads.append((line, pos, "", args[1:])); continue
+            act, sigs = args[0], args[1:]
+            if not sigs:
+                unread.append((line, "a trap action with no signal after it")); continue
+            if re.fullmatch(r"\$\{?[A-Za-z_][A-Za-z0-9_]*\}?", act.strip()):
+                unread.append((line, "the trap's action is only a variable (%s)" % act.strip())); continue
+            reads.append((line, pos, act, sigs))
+    return reads, unread
+
+
+def sh_exit_traps(src):
+    """(line, column, action text) per EXIT trap (`EXIT` or `0` among its signals, _trap_cmds); the action text is the
+    trap's own plus the body of each function DEFINED IN THE SAME FILE that it names, followed through the functions
+    those name (a sourced library's function is not followed)"""
+    fns = _functions(_code_lines(src))
+    traps = []
+    for line, col, act, sigs in _trap_cmds(src)[0]:
+        if not act or not ({"EXIT", "0"} & set(sigs)):   # a `trap - EXIT` reset, a listing: no action runs
+            continue
+        seen, text = set(), [act]
+        todo = [w for w in re.findall(r"[A-Za-z_][A-Za-z0-9_]*", act) if w in fns]
+        while todo:
+            f = todo.pop()
+            if f in seen:
+                continue
+            seen.add(f); text.append(fns[f])
+            todo += [w for w in re.findall(r"[A-Za-z_][A-Za-z0-9_]*", fns[f]) if w in fns and w not in seen]
+        traps.append((line, col, "\n".join(text)))
+    return traps
 
 
 def sh_unguarded(src, sourced=False):
@@ -406,7 +563,7 @@ def main():
     files = a.files or sorted(
         [os.path.join(d, f) for d in ("tools", "tests", "tests/lib") if os.path.isdir(os.path.join(a.root, d))
          for f in os.listdir(os.path.join(a.root, d)) if f.endswith((".py", ".sh"))])
-    bad = n = calls = mk = 0
+    bad = n = calls = mk = nt = 0
     for rel in files:
         p = rel if os.path.isabs(rel) else os.path.join(a.root, rel)
         src = open(p, encoding="utf-8", errors="replace").read()
@@ -423,8 +580,14 @@ def main():
             if os.path.basename(os.path.dirname(p)) in ("tests", "tools", "lib"):
                 lib = os.path.basename(os.path.dirname(p)) == "lib"   # a sourced library: its top-level `return` returns
                 mk += len(sh_scan(src, lib))   # the substitutions the scan READ (a file it is blinded in shows here)
+                nt += len(sh_exit_traps(src))  # and the EXIT traps the trap-order check read (#337)
+                for line, why in _trap_cmds(src)[1]:
+                    bad += 1; print(f"UNREADTRAP\t{rel}:{line}\tshell\ttrap\t-\t{why}: the trap-order check cannot see it (#337)")
                 for line, var in sh_unguarded(src, lib):
                     bad += 1; print(f"UNGUARDED\t{rel}:{line}\tshell\tmktemp -d\t{var}\ta failed mktemp carries on with ${var} empty (#333)")
+                for line, var, tl in sh_trap_order(src, lib):
+                    bad += 1; print(f"TRAPPED\t{rel}:{line}\tshell\tmktemp -d\t{var}\tthe EXIT trap set at line {tl}, before the "
+                                    f"site, names \"${var}/...\": a failed mktemp stops into it with ${var} empty (#337)")
             if os.path.basename(os.path.dirname(p)) in ("tests", "tools"):
                 for line, var, cleaned in sh_sites(p, src):
                     n += 1
@@ -437,7 +600,8 @@ def main():
                 if not sandboxed and not any(rel + ":" + str(line) == k for k in ALLOW_CALLS):
                     bad += 1; print(f"UNSANDBOXED\t{rel}:{line}\t{runner}\tthe call passes no sandbox, so the runner's default outlives it")
     print(f"{n} temp maker(s) and {calls} emulator-runner call(s) read; {bad} not removed at exit, passing no sandbox or "
-          f"carrying on after a failed mktemp -d ({mk} mktemp -d substitution(s) read)")
+          f"carrying on after a failed mktemp -d or stopping into an EXIT trap set before it ({mk} mktemp -d "
+          f"substitution(s) and {nt} EXIT trap(s) read)")
     return 1 if bad else 0
 
 

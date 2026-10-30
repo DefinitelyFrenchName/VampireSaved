@@ -16,7 +16,7 @@
 #   THE ACTIONS (#335, ruled 2026-10-29; tools/rc_actions.py): 14z-9's re-check names the run it follows ("after
 #   run 01", NAMED); 14z-10 holds a re-check linked only by its wording (WORDING), one whose wording shares nothing
 #   but whose meta.tsv records its action (RECORDED), a VOID run before an OK re-check (the VOID run is never the
-#   first), a calibration row (not an action) and a packet marked NOT-RUN (shown apart).
+#   first), a calibration row (not an action), a packet marked NOT-RUN and a lone freeze whose plant died (an action of VOID runs only), the last two shown apart.
 # EXPECTS: 14z-9: 4 rule-checker runs (one keyed by its transcript id), 2 VIOLATED, Q1/Q4/QP3 1 each, 3 packets,
 #   1 re-check, longest 2; 1 commit (14z-9b's not counted); 3 findings; 2 retracted wordings; 2 tickets;
 #   2 maintainer messages; reply median 10.0 min; 700 output tokens; 1 worker; 1 tier run, 0.03 h, 1 FAIL.
@@ -32,6 +32,11 @@
 # MUST-FIRE: shadow-tool: meta-ignored — a copy of tools/rc_actions.py that never reads the action a run's meta.tsv records must split 14z-10's build into two actions, and the comparison must FAIL (mode: the gate reads that copy)
 # MUST-FIRE: shadow-tool: same-run-hours — a copy of tools/session_metrics.py that times an action from its LAST packet to itself must read 14z-10's build as passing in 0.0 h, and the comparison must FAIL (mode: the gate reads that copy)
 # MUST-FIRE: shadow-tool: void-first — a copy of tools/rc_actions.py that takes a VOID run as an action's first run must read 14z-10's recommendation as not OK on its first run, and the comparison must FAIL (mode: the gate reads that copy)
+# MUST-FIRE: shadow-tool: lowest-question — a copy of tools/session_metrics.py that counts only the lowest-numbered question a first run VIOLATED (not every question, as ruled) must drop 14z-9's first_q_Q4, and the comparison must FAIL (mode: the gate reads that copy)
+# MUST-FIRE: shadow-tool: later-run-questions — a copy of tools/rc_actions.py that takes an action's questions from its LAST run, not its first, must drop 14z-9's first_q_Q4 (its re-check passed), and the comparison must FAIL (mode: the gate reads that copy)
+# MUST-FIRE: shadow-tool: calibration-counted — a copy of tools/rc_actions.py that keeps calibration rows must count 14z-10's calibration as an action (4 actions), and the comparison must FAIL (mode: the gate reads that copy)
+# MUST-FIRE: shadow-tool: not-run-ignored — a copy of tools/rc_actions.py that never reads a run directory's NOT-RUN.txt must drop 14z-10's not_run figure (the packet never run, shown apart), and the comparison must FAIL (mode: the gate reads that copy)
+# MUST-FIRE: shadow-tool: void-only-dropped — a copy of tools/session_metrics.py that never writes the actions-of-VOID-runs-only figure must drop 14z-10's (its lone freeze, whose plant died), and the comparison must FAIL (mode: the gate reads that copy)
 #
 # Usage: tests/test_session_metrics.sh      # ci_portable, ~2 s
 set -eu
@@ -83,7 +88,8 @@ printf '%s\n' "# retractions" "old wording	why	retracted" "older wording	why	gon
   printf '2026-01-02-04\t2026-01-02\t14z-10\tbuild\trebuilt under a new name\tp\tCAUGHT\tOK\t-\t-\tm\n'
   printf '2026-01-02-05\t2026-01-02\t14z-10\trecommendation\tclose #7\tp\tDEAD\tVOID\tQ1\t-\tm\n'
   printf '2026-01-02-06\t2026-01-02\t14z-10\trecommendation\tclose #7 again\tp\tCAUGHT\tOK\t-\t-\tm\n'
-  printf '2026-01-02-07\t2026-01-02\t14z-10\tcalibration\tfx\tfx\tCAUGHT\tVIOLATED\tQ1\t-\tm\n'; } > "$R/tests/rulecheck/ledger.tsv"
+  printf '2026-01-02-07\t2026-01-02\t14z-10\tcalibration\tfx\tfx\tCAUGHT\tVIOLATED\tQ1\t-\tm\n'
+  printf '2026-01-02-09\t2026-01-02\t14z-10\tfreeze\ta lone freeze, its plant dead\tp\tDEAD\tVOID\tQ2\t-\tm\n'; } > "$R/tests/rulecheck/ledger.tsv"
 RD="$R/tests/rulecheck/runs"; mkdir -p "$RD/2026-01-02-03" "$RD/2026-01-02-04" "$RD/2026-01-02-08"
 printf 'decision\tbuild\nsession\t14z-10\naction\t2026-01-02-03\n' > "$RD/2026-01-02-03/meta.tsv"
 printf 'decision\tbuild\nsession\t14z-10\naction\t2026-01-02-03\nredoes\t2026-01-02-03\n' > "$RD/2026-01-02-04/meta.tsv"
@@ -148,6 +154,13 @@ edits = {
     "unnamed-link": ("rc_actions.py", 'for x in named_runs(r["subject"], seen):', 'for x in []:'),
     "meta-ignored": ("rc_actions.py", 'if m and m.get("action"):', 'if False:'),
     "void-first": ("rc_actions.py", 'if a["first"] is None and r["verdict"] != "VOID":', 'if a["first"] is None:'),
+    "lowest-question": ("session_metrics.py", 'for q in x["violated"]:', 'for q in sorted(x["violated"], key=lambda q: (len(q), q))[:1]:'),
+    "later-run-questions": ("rc_actions.py", 'a["final"] = r["verdict"]',
+                            'a["final"] = r["verdict"]; a["violated"] = [] if r["violated"] == "-" else r["violated"].split()'),
+    "calibration-counted": ("rc_actions.py", 'rows = sorted((r for r in rows if r["decision"] != "calibration")',
+                            'rows = sorted((r for r in rows if True)'),
+    "not-run-ignored": ("rc_actions.py", 'if os.path.exists(os.path.join(d, rid, "NOT-RUN.txt")):', 'if False:'),
+    "void-only-dropped": ("session_metrics.py", "            if vo:\n", "            if False:\n"),
     "same-run-hours": ("session_metrics.py", 't0, t1 = ptimes.get(x["run_ids"][0]), ptimes.get(x["run_ids"][-1])',
                        't0, t1 = ptimes.get(x["run_ids"][-1]), ptimes.get(x["run_ids"][-1])'),
 }
@@ -212,6 +225,7 @@ EXPECT='14z-9 rc_runs 4 MEASURED
 14z-10 first_q_Q2 1 ESTIMATED
 14z-10 first_q_Q4 1 ESTIMATED
 14z-10 not_run 1 MEASURED
+14z-10 actions_void_only 1 MEASURED
 14z-10 pass_h_n 1 MEASURED
 14z-10 pass_h_median 0.5 DERIVED'
 compare() {  # compare <figures.txt> — 0 when every expected line is present
@@ -241,7 +255,8 @@ rows.append(dict(rows[0], metric='planted', **{'class': 'GUESSED'})); json.dump(
     if grep -qx '14z-9 rc_runs 5 MEASURED' "$W/plant.txt"; then echo "  ok    PLANT: a planted ledger row moves 14z-9's runs 4 -> 5"
     else echo "  FAIL  PLANT: $(grep '^14z-9 rc_runs' "$W/plant.txt" || echo 'no rc_runs line')"; fail=1; fi
     sed -i.bak '$d' "$R/tests/rulecheck/ledger.tsv"
-    for c in usage-per-record key-prefix key-only-ledger unnamed-link meta-ignored void-first same-run-hours; do
+    for c in usage-per-record key-prefix key-only-ledger unnamed-link meta-ignored void-first same-run-hours lowest-question later-run-questions calibration-counted not-run-ignored void-only-dropped; do
+        nowant=
         case "$c" in
         usage-per-record) want='^14z-9 out_tok 1000 MEASURED$' ;;
         key-prefix)       want='^14z-9 commits 2 MEASURED$' ;;
@@ -250,10 +265,16 @@ rows.append(dict(rows[0], metric='planted', **{'class': 'GUESSED'})); json.dump(
         meta-ignored)     want='^14z-10 actions_build 2 ESTIMATED$' ;;
         void-first)       want='^14z-10 first_ok_recommendation 0 ESTIMATED$' ;;
         same-run-hours)   want='^14z-10 pass_h_median 0.0 DERIVED$' ;;
+        lowest-question)  want='^14z-9 first_q_Q1 1 ESTIMATED$'; nowant='^14z-9 first_q_Q4 ' ;;
+        later-run-questions) want='^14z-9 first_q_QP3 1 ESTIMATED$'; nowant='^14z-9 first_q_Q4 ' ;;
+        calibration-counted) want='^14z-10 actions 4 ESTIMATED$' ;;
+        not-run-ignored)  want='^14z-10 actions 3 ESTIMATED$'; nowant='^14z-10 not_run ' ;;
+        void-only-dropped) want='^14z-10 actions 3 ESTIMATED$'; nowant='^14z-10 actions_void_only ' ;;
         esac
         if figures "$(shadow "$c")" "$W/ctl_$c" && compare "$W/ctl_$c.txt" > /dev/null; then
             vs_ctl_dead "$c" "the perturbed copy still read every figure as expected" || fail=1
-        elif grep -qE "$want" "$W/ctl_$c.txt" 2>/dev/null; then vs_ctl_fired "$c" "$(grep -m1 -E "$want" "$W/ctl_$c.txt")"
+        elif grep -qE "$want" "$W/ctl_$c.txt" 2>/dev/null && { [ -z "$nowant" ] || ! grep -qE "$nowant" "$W/ctl_$c.txt"; }; then
+            vs_ctl_fired "$c" "$(grep -m1 -E "$want" "$W/ctl_$c.txt")${nowant:+, and no line matches $nowant}"
         else vs_ctl_dead "$c" "the copy failed, but not for its reason: $(tail -1 "$W/ctl_$c.log")" || fail=1; fi
     done
 fi

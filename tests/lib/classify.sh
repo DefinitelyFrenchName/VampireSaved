@@ -153,13 +153,21 @@ vs_classify_control() {  # vs_classify_control <exit-status> <logfile> [<gate sc
     FAIL)
         if [ -n "$_cself" ]; then
             VS_CTL_EXEC=DIED; VS_CTL_EXEC_DETAIL="a crash is not a verdict (exit $_cst): $_cself"
-        elif [ "$_cst" = 0 ] || grep -qa '^Traceback' "$_clog"; then
-            VS_CTL_EXEC=DIED; VS_CTL_EXEC_DETAIL="a crash is not a verdict: $(grep -aE '\.sh: line [0-9]+: [A-Za-z_][A-Za-z0-9_]*: |^Traceback|Error' "$_clog" | head -1 | cut -c1-90)"
+        elif [ "$_cst" = 0 ] || grep -qaE '^[[:space:]]*Traceback \(most recent call last\)' "$_clog"; then   # #310 rule 4: indented too
+            VS_CTL_EXEC=DIED; VS_CTL_EXEC_DETAIL="a crash is not a verdict: $(grep -aE '\.sh: line [0-9]+: [A-Za-z_][A-Za-z0-9_]*: |^[[:space:]]*Traceback|Error' "$_clog" | head -1 | cut -c1-90)"
+        elif grep -qaE 'tests/lib/[A-Za-z0-9_.-]+\.sh: (line )?[0-9]+: [^0-9 ]' "$_clog"; then   # #310 rule 4: a shared library's abort
+            VS_CTL_EXEC=DIED; VS_CTL_EXEC_DETAIL="a crash in a shared library is not a verdict: $(grep -aE -m1 'tests/lib/[A-Za-z0-9_.-]+\.sh: (line )?[0-9]+: [^0-9 ]' "$_clog" | cut -c1-90)"
         elif [ -n "$_cname" ] && grep -qa "^CONTROL DEAD: $_cname " "$_clog" \
                 && grep -qaE '^([a-z_][a-z0-9_]*\.)*[A-Z][A-Za-z0-9]*(Error|Exception): ' "$_clog"; then   # DEAD-BESIDE-CRASH
             VS_CTL_EXEC=DIED; VS_CTL_EXEC_DETAIL="its own control reported dead beside a crash: $(grep -aE '^([a-z_][a-z0-9_]*\.)*[A-Z][A-Za-z0-9]*(Error|Exception): ' "$_clog" | head -1 | cut -c1-80)"
         elif grep -qaE "$VS_ENV_ERR" "$_clog"; then   # ENV-ERROR (#321)
             VS_CTL_EXEC=DIED; VS_CTL_EXEC_DETAIL="an environment error is not a verdict (exit $_cst): $(grep -aE -m1 "$VS_ENV_ERR" "$_clog" | cut -c1-90)"
+        elif [ -n "$_cname" ] && grep -qa "^CONTROL DEAD: $_cname " "$_clog"; then   # #310 rule 1: its own control dead
+            VS_CTL_EXEC=LIES; VS_CTL_EXEC_DETAIL="the gate reports this control dead, then exits $_cst: $(grep -a -m1 "^CONTROL DEAD: $_cname " "$_clog" | cut -c1-90)"
+        elif [ "$_cst" = 3 ] && grep -qa '^REFUSED: ' "$_clog"; then   # #310 rule 3: the gate's own refusal (exit 3), not a tool's REFUSED quoted in a FAIL
+            VS_CTL_EXEC=UNJUDGED; VS_CTL_EXEC_DETAIL="the gate refused to run, so it judged nothing: $(grep -a -m1 '^REFUSED: ' "$_clog" | cut -c1-90)"
+        elif grep -qaE '^ *SKIP' "$_clog" && ! grep -qaE '(^|[[:space:]])FAIL\b' "$_clog"; then   # #310 rule 2: a SKIP exit
+            VS_CTL_EXEC=UNJUDGED; VS_CTL_EXEC_DETAIL="a SKIP with exit $_cst is not a verdict: $(grep -aE -m1 '^ *SKIP' "$_clog" | cut -c1-90)"
         elif grep -qa '^NOT JUDGED: ' "$_clog"; then   # NOT-JUDGED (#310)
             VS_CTL_EXEC=UNJUDGED; VS_CTL_EXEC_DETAIL="the mode run measured nothing: $(grep -a -m1 '^NOT JUDGED: ' "$_clog" | cut -c13-92)"
         else

@@ -1,0 +1,9 @@
+  FLAG D-ABSOLUTE: A one-line regex missed all three; rule-checker run 2026-10-30-1406 found them.  [build/agent213/t337/closure/closing_comment.md]
+  FLAG D-ABSOLUTE: Its action text is the trap's own text plus the body of each function defined in the same file that it names, followed through the functions those name.  [build/agent213/t337/closure/closing_comment.md]
+  FLAG D-ABSOLUTE: - Every trap set before the guard's stop counts, not only the last one, and a trap inside a function body counts where the function is written.  [build/agent213/t337/closure/closing_comment.md]
+  FLAG D-ABSOLUTE: - 7 sites have an EXIT trap set before their guard's stop, and none of those 7 traps names its site's variable at all.  [build/agent213/t337/closure/closing_comment.md]
+  FLAG D-ABSOLUTE: It names all fifteen trapped forms.  [build/agent213/t337/closure/closing_comment.md]
+  FLAG D-ABSOLUTE: On the safe forms its extra hits come only from that cautious reading.  [build/agent213/t337/closure/closing_comment.md]
+  FLAG D-ABSOLUTE: - The gate's controls were re-traced on PILOT: 7 runs, SAFE, every run HONOURED.  [build/agent213/t337/closure/closing_comment.md]
+  FLAG D-ABSOLUTE: - a trap and a site in DIFFERENT files: it pairs them within one file, so a sourced library's site and its caller's trap are never paired.  [build/agent213/t337/closure/closing_comment.md]
+packet_check: 8 flag(s): D-ABSOLUTE 8

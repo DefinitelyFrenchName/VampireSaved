@@ -133,6 +133,7 @@ declares	test_close_standing
 declares	test_close_tools
 declares	test_commit_subject
 declares	test_community_crosscheck
+declares	test_control_classifier
 declares	test_controls_concurrent
 declares	test_controls_contract
 declares	test_copy_flags
@@ -202,6 +203,7 @@ declares	test_mister_prg_window
 declares	test_mister_sdram_census
 declares	test_mister_tenant_oracle
 declares	test_mister_wide_gate
+declares	test_mizuumi_candidates
 declares	test_module_refs
 declares	test_mra_build_line
 declares	test_mra_parts
@@ -217,6 +219,7 @@ declares	test_pokes_ranges
 declares	test_power_decode
 declares	test_promise_check
 declares	test_proof_sheets
+declares	test_proof_sheets_web
 declares	test_py_escapes
 declares	test_pyron_medallion_2p
 declares	test_quote_font_window

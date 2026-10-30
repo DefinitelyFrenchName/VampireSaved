@@ -126,6 +126,7 @@ history twins and are listed last. Level-0 files are the entry points above.
 
 **`game/`**
 - [`atlas/`](game/atlas/) — **REFERENCE** · the verified ROM/RAM map: `README.md`, `ram.md`, `character_tables.md`, `id_space.md`, `select_screen.md`, `sprite_lists.md`, `venue_assets.md`
+- [`atlas/mizuumi_candidates.tsv`](game/atlas/mizuumi_candidates.tsv) — **INDEX** · #118: the mizuumi community's player-struct candidates against `ram.md`, each verdict derived by `tools/mizuumi_candidates.py` and held by `tests/test_mizuumi_candidates.sh`
 - [`engine_internals.md`](game/engine_internals.md) — **REFERENCE** · how the engine works, by subsystem. The document a stranger reads to understand the game. Read the relevant section before touching any subsystem. · history: `game/engine_internals_history.md`
 - [`preserved_data.md`](game/preserved_data.md) — **REFERENCE** · data and code a shipped ROM carries but never reaches, measured — the class the port keeps finding it has restored rather than authored (opened 14z-126)
 - [`gotchas.md`](game/gotchas.md) — **REGISTER** · traps in the game itself

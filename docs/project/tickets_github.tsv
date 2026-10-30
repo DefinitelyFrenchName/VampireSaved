@@ -2,11 +2,13 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 337
+# issues: 339
 number	state	reason	closed	labels	title
-337	OPEN	-	-	evolution,severity: low,test-integrity	The mktemp census does not check EXIT-trap order: a trap installed before a guarded site runs on the guard's stop
+339	OPEN	-	-	-	The rule-checker ledger has 37 rows with session '-' (14z-187/187b/188); both ledger pages drop them without saying so
+338	OPEN	-	-	evolution,severity: low	Proof sheets: a web build for the community — half-size WebP tiles, credits on every page, a plain-language intro, no local paths
+337	CLOSED	COMPLETED	2026-10-30	evolution,severity: low,test-integrity	The mktemp census does not check EXIT-trap order: a trap installed before a guarded site runs on the guard's stop
 336	CLOSED	COMPLETED	2026-10-30	bug,severity: low,test-integrity	test_static_runner section 32 FAILs on every Linux host: dash words its write error 'I/O error', the premise counted only bash's 'Broken pipe'
-335	OPEN	-	-	evolution,severity: low	The session ledger: the rule-checker's first-run OK rate per action, and which question fails first
+335	CLOSED	COMPLETED	2026-10-30	evolution,severity: low	The session ledger: the rule-checker's first-run OK rate per action, and which question fails first
 334	CLOSED	COMPLETED	2026-10-30	evolution,performance,severity: medium	#321's remainder: the job knobs on PILOT and under load, and the knob-less gates' survey
 333	CLOSED	COMPLETED	2026-10-30	bug,severity: low	106 gate scripts carry on after a failed mktemp -d; 8 then touch paths under /
 332	CLOSED	COMPLETED	2026-10-27	bug,severity: low	audit_guard_cancels reads a missing out-of-tree table as 0 lines differing, so its node-shift control reads DEAD
@@ -74,7 +76,7 @@ number	state	reason	closed	labels	title
 270	CLOSED	COMPLETED	2026-10-13	evolution	The close's documentation packet asks only what the deterministic close checks do not cover; presentation fixes re-checked deterministically
 269	CLOSED	COMPLETED	2026-10-14	evolution	Static tier turned around: a session runs the gates whose followed paths changed plus a core, controls only for changed gates; freeze and release run everything
 268	CLOSED	COMPLETED	2026-10-13	evolution	test_close_tools cut back: session runs self-tests only, one-pass retraction scan at freeze/release, section-scoped control modes, retraction-file audit
-267	OPEN	-	-	evolution	Session ledger as a static page generated into docs/site/ at each close (hosting and what to publish are the maintainer's calls)
+267	CLOSED	COMPLETED	2026-10-30	evolution	Session ledger as a static page generated into docs/site/ at each close (hosting and what to publish are the maintainer's calls)
 266	CLOSED	COMPLETED	2026-10-25	bug	PILOT's GNOME Shell segfaults under Wayland since 2026-10-09, so audit_release_linux_desktop cannot run
 265	CLOSED	COMPLETED	2026-10-13	evolution	audit_mask_window_ff42a2 at a release: an instrument with no default subject SKIPs, and the staleness audit now FAILs that SKIP
 264	CLOSED	COMPLETED	2026-10-12	evolution	A session dashboard: time per activity, checks and re-checks and why, tier cost and quality signals, each figure labelled measured, derived, estimated, inferred or extrapolated

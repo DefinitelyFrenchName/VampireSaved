@@ -1,0 +1,19 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent213/t337/closure/closing_comment.md	ec5ba1a76567229c944e0bb92189166cb68d69d4
+build/agent213/t337/closure/ticket_row_337.tsv	dbed12e426682466a0aaf8f589470546324a9dce
+build/agent213/t337/closure/issue_337_body.md	08ab74d66c3502b1b29b88cec1ee2951de3bfe27
+build/agent213/t337/closure/fix.diff	066d7adc445adc42de880981194a9519627d06b0
+build/agent213/t337/closure/records.diff	d80e266a9638f479fa90aab81d63347695953f1d
+build/agent213/t337/closure/census_now.txt	83d6bf405988748196a05e44856e3db9d6859427
+build/agent213/t337/closure/pairs.py	227200cc610e4541d0cce6a5e5f341f40e27723b
+build/agent213/t337/closure/pairs.txt	9542df9048d2792372be1292d70d3696576bac34
+build/agent213/t337/closure/trap_calls.py	0c2d9896134f64ca12c230c5b7e155ada79d8372
+build/agent213/t337/closure/trap_calls.txt	8008afbf97ce241a939978faa6181e6292adf191
+build/agent213/t337/closure/gate_mac.log	3b45dcc84e87aa0c402f64dbb801b918fbe20162
+build/agent213/t337/closure/control_modes_mac.log	fd8a178844e7357773acdb4ba06c5f1fdb109596
+build/agent213/t337/closure/pilot_t213r1_tmp_hygiene.log	083b549af55e931fd2d26d93e162095409878eb5
+build/agent213/t337/closure/pilot_retrace.sh	974941e964c1e796efbe4b9e9e1351f43fe191de
+build/agent213/t337/closure/pilot_state.txt	8b572372ae6159df4105bd1e27e07743d91d2ecf
+build/agent213/t337/closure/pilot_overlap.txt	6e12b8a900357179cdc6dc155317ed45b8c7ca6e
+build/agent213/t337/closure/pilot_classes.tsv	522f562905c1042792f472b25fb038b3efa1fcd4
+DECISIONS_HISTORY.md.lines-9030-9045 (lines 9030-9045 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-30 (14z-212) — #333: EXIT-trap order is stated as a limit, its measures best-effort")	f6325ec07b5bcfc9453ba63c62909ffbd5914b46

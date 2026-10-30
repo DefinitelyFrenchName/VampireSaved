@@ -51,9 +51,14 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
 1. **THE LEDGER PAGE (#267) AND THE DASHBOARD'S ACTIONS (#335): CHECK THEM LIVE, THEN CLOSE EACH ON ITS RULE-CHECKER RUN.**
-   - #267: this close published the page to `origin`'s `gh-pages` (STATE 14z-212 CLOSE says whether the own-site leg ran;
-     `DEPLOY_TARGET` was unset). Ask the maintainer whether Pages is on (Settings → Pages, `gh-pages`; the session
-     account has no admin), then read the live page.
+   - #267: the close's `ledger-page` push was REFUSED by the pre-push green guard (#290): the page's orphan commit is not
+     a repository tree, so no tier covers it. The maintainer: "Fix the guard next session (Recommended)" — the guard
+     skips `refs/heads/gh-pages` (or `publish_ledger.sh` pushes in a way the guard knows), with a gate control
+     (`tests/test_green_guard.sh`, and `tests/test_ledger_page.sh` pushing through the hook); nothing bypasses #290. Then
+     publish (`tools/publish_ledger.sh --push --own-site-if-set`; `DEPLOY_TARGET` was unset), ask the maintainer to
+     switch Pages on (Settings → Pages, `gh-pages`; the session account has no admin), and read the live page.
+   - **THE WORKING TREE CARRIES UNCOMMITTED RECORDS** written after the 14z-212 push: this ruling's
+     `DECISIONS_HISTORY.md` entry, this bullet, STATE 14z-212's CLOSE note, and #338's entry and ticket row. They ride this session's close.
    - #335: this close uploaded `actions.json` to the dashboard (artifact `RVSkG4CZX44wgJaJT2vDag`) as a fifth dataset,
      `datasets/actions`, but the dashboard's page (`index.html` in its store) has no panel reading it yet: add one (the
      first-run OK rate per decision, the questions on first runs), check it renders, then close #335.
@@ -62,6 +67,7 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
    - medium: none.
    - low: #118, #310 (the UNJUDGED census; deferred, ruled "Record and defer"), #337 (the mktemp census does not check
      EXIT-trap order; split from #333).
+   - low, filed after the push: #338 (a web build of the proof sheets for the community; the design ruled 14z-212).
    - evolution, unlabelled: #267, #335 (item 1).
    - parked: #123, #124, #125, #127, #128, #129, #162, #294.
    - **Before planning any freeze or release, read each open ticket's comments for a step that runs AT it.** #333's
@@ -87,7 +93,8 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 - **A new `DECISIONS_HISTORY.md` entry shifts every cited line range by one** once `tools/gen_history_index.py` adds its
   index line: re-cite a packet's ranges after regenerating.
 - **The census is a lint over shell text** (`tools/tmp_hygiene.py`; the maintainer: "Fix these + state the limit"); a
-  form outside its known answers is untested, and EXIT-trap order is #337.
+  form outside its known answers is untested. EXIT-trap order is checked since 14z-213 (#337: TRAPPED, an EXIT trap set
+  before a guarded site that names "$X/...").
 
 ## WHAT CLOSED THIS SITTING (14z-212)
 

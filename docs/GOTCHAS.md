@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-584 entries (48 game / 148 platform / 388 project), counted from the buckets at generation.
+585 entries (48 game / 148 platform / 389 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 48 entries
 
@@ -224,7 +224,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A FAILED `X="$(mktemp -d)"` LEAVES X EMPTY AND THE SCRIPT RUNS ON — `"$X/sub"` IS THEN A PATH UNDER `/` (paid: 14z-210, ERIS; fixed 14z-211/212, #333)
 - A SHELL'S WRITE-ERROR TEXT IS ITS OWN — bash says `write error: Broken pipe`, dash (Ubuntu's `sh`) `printf: I/O error` (paid: 14z-212, PILOT; #336)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 388 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 389 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -614,3 +614,4 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - OUT OF RANGE A RANGE-CHECKED GRAB'S INPUT IS A NORMAL — a far "whiff" was not the grab's own move on 28 of 78 command whiffs (paid: 14z-211, corrected 14z-212, #330)
 - A FRESH CLONE'S `build/` IS NOT THE MAIN TREE'S — dirs holding tracked files miss their untracked ROMs, and a fresh patch's mtime defeats a reference check (paid: 14z-212, #333/#334)
 - A POOLED GATE THAT GLOBS ITS OUTPUTS CANNOT SEE A LOST RUN — name every leg the pool starts, and fail on one that wrote nothing (paid: 14z-212, #334)
+- A PUBLISH TEST THAT PUSHES TO A HOOKLESS SCRATCH REMOTE NEVER MEETS THE REPOSITORY'S OWN GUARD — the ledger page's first push was refused at the close (paid: 14z-212/14z-213, #267)

@@ -30,7 +30,8 @@
 #   job has ended; a gate listed in tests/controls_concurrent.txt has its controls run beside one another, any other gate has
 #   them run one after another, and either way the readout and the results tables are the serial run's.
 #   Since #299 (14z-205c, section 12d): a control mode whose gate prints its OWN `CONTROL DEAD` beside a Python
-#   exception line is DIED; its own DEAD alone, and an exception beside ANOTHER control's DEAD, stay honoured.
+#   exception line is DIED; an exception beside ANOTHER control's DEAD stays honoured, and since #310 (14z-213) its own
+#   DEAD alone reads LIES (tests/test_control_classifier.sh holds #310's rules on their own known answers).
 #   Since #276 (14z-205, section 26): a run given STATIC_RESULTS_OUT also leaves a byte-identical copy of its results
 #   and control times in its own run record (build/static_runs/<stamp>), where tools/session_metrics.py reads them.
 #   Since #299 (14z-206, section 28): with ROMDIR set and a cold decrypt cache, the runner builds the reference sets'
@@ -49,7 +50,7 @@
 # MUST-FIRE: shadow-tool: ondemand-triggered — a copy of run_all_static.sh whose ONDEMAND-NO-TRIGGER line is disabled must let a change to an ondemand gate's own script pull it into a session run; section 14i must catch it (in-gate in section 16; as a mode the gate FAILs)
 # MUST-FIRE: shadow-tool: order-ignored — a copy of run_all_static.sh whose `# ORDER: last` test is disabled must run the marked stub FIRST, and section 16 must FAIL (mode: that copy drives every section; section 17 fires it in-run; 14z-185b, #188)
 # MUST-FIRE: shadow-tool: crash-unread — a copy of run_all_static.sh that hands the CONTROL classifier no gate script must read a control mode that dies of `command not found` (exit 127) as HONOURED, and section 12b must FAIL (mode: that copy drives every section; section 12b fires it in-run; 14z-196, #254)
-# MUST-FIRE: shadow-tool: dead-crash-unread — a copy of tests/lib/classify.sh whose DEAD-BESIDE-CRASH branch is disabled must read a control mode that prints `CONTROL DEAD: <its own name>` beside a Python exception line as HONOURED, and section 12d must FAIL (mode: section 12d runs its stubs once more on that copy and must FAIL; section 12d fires it in-run; #299, 14z-205c)
+# MUST-FIRE: shadow-tool: dead-crash-unread — a copy of tests/lib/classify.sh whose DEAD-BESIDE-CRASH branch is disabled must read a control mode that prints `CONTROL DEAD: <its own name>` beside a Python exception line as something other than DIED (HONOURED before #310, LIES since its rule 1), and section 12d must FAIL (mode: section 12d runs its stubs once more on that copy and must FAIL; section 12d fires it in-run; #299, 14z-205c)
 # MUST-FIRE: shadow-tool: results-inherited — a copy of run_all_static.sh whose RESULTS-OUT-PRIVATE unset is disabled must hand its STATIC_RESULTS_OUT to the gates it runs, and section 12c must FAIL (mode: that copy drives every section; section 12c fires it in-run; 14z-199)
 # MUST-FIRE: shadow-tool: core-carried — a copy of tools/static_confirm.py whose plan ignores `# CONFIRM: always` (its CORE-ALWAYS line disabled) must CARRY the unchanged core stub g_e, and section 20 must FAIL (mode: that copy in the confirm repo; section 21 fires it in-run; #269, 14z-200)
 # MUST-FIRE: shadow-tool: controls-carried — a copy of tools/static_confirm.py whose plan ignores a base row's unexecuted controls (its CONTROLS-UNEXECUTED line disabled) must CARRY g_d from a run made with --exec-controls none, and section 20 must FAIL (mode: that copy in the confirm repo; section 21 fires it in-run; #269, 14z-200)
@@ -568,9 +569,10 @@ echo "== 12d. a control mode whose gate calls its OWN control dead beside a cras
 # On PILOT the jtsim scratch collision made test_mra_build_line's foreign-rompath mode fail for a
 # reason that was not the perturbation; the gate said so ("CONTROL DEAD: foreign-rompath — generator
 # failed for another reason", a FileNotFoundError quoted from the generator) and the run read HONOURED.
-# The two look-alikes that must stay honoured are measured gates' shapes: a mode defined as its own
-# control dying (test_df_startup_provenance), and a child's exception beside ANOTHER control's DEAD
-# line while the mode's own control fired (audit_victim_parity@no-translation).
+# The look-alike that must stay honoured is a measured gate's shape: a child's exception beside ANOTHER
+# control's DEAD line while the mode's own control fired (audit_victim_parity@no-translation). Its own DEAD
+# alone was the other (test_df_startup_provenance's mode); since #310 (14z-213, ruled "Classifier rules
+# 1-4") that reads LIES, and the gates that printed it beside a real FAIL no longer run their in-gate copy in a mode.
 mkx g_xdeadcrash 'echo "  FAIL: generation failed"; echo "CONTROL DEAD: flip — generator failed for another reason:"; echo "FileNotFoundError: [Errno 2] No such file or directory: /tmp/x"; exit 1'
 mkx g_xdeadown   'echo "CONTROL DEAD: flip — a flipped byte was NOT caught"; echo "FAIL: the gate"; exit 1'
 mkx g_xdeadother 'echo "  FAIL  other-planted could not build its copy: Traceback (most recent call last):"; echo "ValueError: not enough values to unpack"; echo "CONTROL FIRED: flip — caught"; echo "CONTROL DEAD: other — passed"; echo "FAIL: the gate (control mode)"; exit 1'
@@ -579,28 +581,30 @@ o12g="$(cd "$FR" && STATIC_RESULTS_OUT="$T/r12g.tsv" sh tests/run_all_static.sh 
 printf '%s' "$o12g" | grep -E >/dev/null "^  g_xdeadcrash +CONTROL DIED: flip — its own control reported dead beside a crash: FileNotFoundError" \
     && echo "  ok: its own CONTROL DEAD beside a Python exception -> CONTROL DIED" \
     || { fail "a mode whose own control died beside a crash was not DIED:"; printf '%s' "$o12g" | grep -E '^  g_xdeadcrash' | sed 's/^/        /'; }
-for g in g_xdeadown g_xdeadother; do
-    printf '%s' "$o12g" | grep -E >/dev/null "^  $g +CONTROL" && fail "$g read as a crash: $(printf '%s' "$o12g" | grep -E "^  $g")" \
-        || echo "  ok: $g stays honoured"
-done
-printf '%s' "$o12g" | grep >/dev/null 'executed: 3  honoured 2  lies 0  refused 0  died 1' \
-    && echo "  ok: readout — executed 3, honoured 2, died 1" \
+printf '%s' "$o12g" | grep -E >/dev/null "^  g_xdeadown +CONTROL LIES: flip — the gate reports this control dead" \
+    && echo "  ok: its own CONTROL DEAD alone -> CONTROL LIES (#310 rule 1)" \
+    || fail "g_xdeadown was not LIES: $(printf '%s' "$o12g" | grep -E "^  g_xdeadown")"
+printf '%s' "$o12g" | grep -E >/dev/null "^  g_xdeadother +CONTROL" && fail "g_xdeadother read as a crash: $(printf '%s' "$o12g" | grep -E "^  g_xdeadother")" \
+    || echo "  ok: g_xdeadother stays honoured"
+printf '%s' "$o12g" | grep >/dev/null 'executed: 3  honoured 1  lies 1  refused 0  died 1' \
+    && echo "  ok: readout — executed 3, honoured 1, lies 1, died 1" \
     || fail "12d readout wrong: $(printf '%s' "$o12g" | grep 'executed:' || echo '(none)')"
-# the shadow: the classifier with its DEAD-BESIDE-CRASH branch disabled reads all three honoured
+# the shadow: the classifier with its DEAD-BESIDE-CRASH branch disabled no longer reads g_xdeadcrash DIED (since #310
+# rule 1 it falls to LIES on its own DEAD line)
 SHADOW_K="$T/classify_deadcrashunread.sh"
 sed 's|^        elif \[ -n "$_cname" \] \&\& grep -qa "^CONTROL DEAD: $_cname " "$_clog" \\$|        elif false \\|' "$REPO/tests/lib/classify.sh" > "$SHADOW_K"
 cmp -s "$REPO/tests/lib/classify.sh" "$SHADOW_K" && fail "could not disable DEAD-BESIDE-CRASH — the branch moved"
 rm -f "$FR/tests/lib/classify.sh"; ln -s "$SHADOW_K" "$FR/tests/lib/classify.sh"
 o12h="$(cd "$FR" && STATIC_RESULTS_OUT="$T/r12h.tsv" sh tests/run_all_static.sh --tier portable 2>&1)" || true
 rm -f "$FR/tests/lib/classify.sh"; ln -s "$REPO/tests/lib/classify.sh" "$FR/tests/lib/classify.sh"
-if printf '%s' "$o12h" | grep >/dev/null 'executed: 3  honoured 3'; then
-    vs_ctl_fired dead-crash-unread "with DEAD-BESIDE-CRASH disabled, the mode whose own control died beside a FileNotFoundError reads HONOURED"
+if printf '%s' "$o12h" | grep >/dev/null 'executed: 3  honoured 1  lies 2  refused 0  died 0'; then
+    vs_ctl_fired dead-crash-unread "with DEAD-BESIDE-CRASH disabled, the mode whose own control died beside a FileNotFoundError is no longer DIED"
 else
-    vs_ctl_dead dead-crash-unread "the copy without DEAD-BESIDE-CRASH did not read all three honoured: $(printf '%s' "$o12h" | grep -E '^  g_xdead|executed:' | tr '\n' ' ')"; rc=1
+    vs_ctl_dead dead-crash-unread "the copy without DEAD-BESIDE-CRASH still read a crash: $(printf '%s' "$o12h" | grep -E '^  g_xdead|executed:' | tr '\n' ' ')"; rc=1
 fi
 if vs_ctl_is dead-crash-unread; then rm -f "$FR/tests/lib/classify.sh"; ln -s "$SHADOW_K" "$FR/tests/lib/classify.sh"
     o12i="$(cd "$FR" && STATIC_RESULTS_OUT="$T/r12i.tsv" sh tests/run_all_static.sh --tier portable 2>&1)" || true
-    printf '%s' "$o12i" | grep -E >/dev/null "^  g_xdeadcrash +CONTROL DIED" || fail "MODE dead-crash-unread: the dead-beside-crash mode read HONOURED"
+    printf '%s' "$o12i" | grep -E >/dev/null "^  g_xdeadcrash +CONTROL DIED" || fail "MODE dead-crash-unread: the dead-beside-crash mode was not DIED"
 fi
 rm -f "$FR/tests/g_xdeadcrash.sh" "$FR/tests/g_xdeadown.sh" "$FR/tests/g_xdeadother.sh"
 

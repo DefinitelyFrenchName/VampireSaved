@@ -1,0 +1,47 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent213/t335/closure/closing_comment.md	92475d339a849f2286d6ec7fca6c8cdb94d27c16
+build/agent213/t335/closure/ticket_row_335.tsv	109b5392e7b9c081035f4de0c0acf5e6bb9b901c
+build/agent213/t335/closure/issue_335.md	71094044821f4021db84206563867438bb095db6
+build/agent213/t335/closure/ledger_rows.txt	0a1c8d2f48e3b865ca0808602604571a80f3920b
+build/agent213/t335/closure/gate.diff	1de60c75ddecd19df5916ee6a45c6ce00c9a029c
+build/agent213/t335/closure/gate_mac.log	c9115b2700f69abc064ecb1992b11c149a7a9017
+build/agent213/t335/closure/control_modes_mac.txt	9cdcbe0858c85e70c4b8dd0e9c533ce9ec30e01f
+build/agent213/t335/closure/mode_lowest-question.log	609812e4c6214102693d9bfc6d91dd24c88e6f65
+build/agent213/t335/closure/mode_later-run-questions.log	1e530724569df1d164144b4e789e79deefceb3e9
+build/agent213/t335/closure/mode_calibration-counted.log	22006505364db6cdfa79fb44726285c0c2eebe37
+build/agent213/t335/closure/mode_not-run-ignored.log	a20468387219a50e01ad63ef68bec6f0e96b623b
+build/agent213/t335/closure/mode_void-only-dropped.log	834ec18d70fbe049ec867f21c9bbc9e593f49c48
+build/agent213/t335/closure/pilot_overlap.txt	9f5e7460558b1391fb2101e5c186ed159facfee9
+build/agent213/t335/closure/pilot_classes.tsv	2e95fa7073e70dccba1dbeea2f7533adf51be7a0
+build/agent213/t335/closure/index_live_v6.json	583dc9eab49d1d00378863b9b0810cac34bb612f
+build/agent213/t335/closure/live_v2_check.txt	2fe621e13937ec361f56b5d3acd2d670b96e5114
+build/agent213/t335/closure/v2_v6.diff	f4a3e540554035e39164d2ea74ca896ac9cdbb5f
+build/agent213/t335/closure/page_checks.py	df23a580f945f886cc256396931025448f076c7e
+build/agent213/t335/closure/page_checks.txt	e38acdb4c440bf4bdd97bc46cd080bc7cce94f5d
+build/agent213/t335/closure/void_rows.txt	1c8637abc01f8f56f8fc5a5445b2e226c151a0e8
+build/agent213/t335/closure/not_run_dirs.txt	a828e0d55ac3c250616caf99db5544c9729b9032
+build/agent213/t335/closure/recollect.sh	5d4ce18ef431f90a9d62746f4213536cc2e7b1eb
+build/agent213/t335/closure/recollect_run.txt	61067a5d778f6764ed7da625447febafd494fde8
+build/agent213/t335/closure/recollect_collect.log	a2faf9fd1a3f37e7ec4ec7113ada3b369e02691f
+build/agent213/t335/closure/recollect_compare.py	53618add01b0b80e1fe7b91efa59d909ca174147
+build/agent213/t335/closure/recollect_control.txt	59d844bd0dd7f77f71f81be9d6ddfa4e1da0276b
+build/agent213/t335/closure/live_page_check.txt	a69adb6dff17dee193b5f140175a3f3aa249f524
+build/agent213/t335/closure/s0.js	7135051b7ad2ebf7979659d79f0872b2dd67ff4a
+build/agent213/t335/closure/calc_check.js	23779286e078f2f158694d560a8d9bbe8fa6f96e
+build/agent213/t335/closure/calc_check.txt	c9757f52d81322ef5c1364baeb6fd3024104fcb1
+build/agent213/t335/closure/calc_control.sh	ffce7a00c3ff73da99d8caec49f652e046f22414
+build/agent213/t335/closure/calc_control.txt	f2f0f66c2fa31c46b3bcaaab8d6c88257afbd33d
+build/agent213/t335/closure/all_rows_indep.py	24c4ae0623964c2623eb930355b994ea9e3200e2
+build/agent213/t335/closure/all_rows_indep.txt	a3f9a6a0f417da72e4b830725de40562a52e6018
+build/agent213/t335/closure/all_rows_control.txt	08ebe8d4ca71e49e3bbf612cbafcc8c894b651a1
+build/agent213/t335/closure/actions_window.txt	3c22eb6c4ecdbb7fb5cb9204f6f958eedba039ac
+build/agent213/t335/closure/nonkey_rows.txt	57f9f488bf3e731fea52ff0ca4cdfae35ccb0fe4
+build/agent213/t335/closure/new_ticket_body.md	b3f810dbef3a5f12da17fa9117820bbe04ff4827
+build/agent213/t335/closure/issue_339_filed.txt	6aa57845c3e821fd95d4ff200436a40421b1aa04
+build/agent213/t335/closure/issue_339_body_live.md	dc412ff0cf488e21e925d1a4e43491e697fb9be5
+build/agent213/t335/closure/public_page_exclusion.txt	f33dcd733119bb6c03c0f4894ca78f8c55c47651
+DECISIONS_HISTORY.md.lines-8787-8801 (lines 8787-8801 of DECISIONS_HISTORY.md: its INDEX entry "## Filed 2026-10-28 (14z-212) — #335: the session ledger's first-run OK rate per action, and which q", and the entries after it up to line 8801)	5aaa81994db2764971e277d8ec79f155b003d667
+DECISIONS_HISTORY.md.lines-8861-8876 (lines 8861-8876 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-29 (14z-212) — #335: an action's first run, the questions it fails, and what is sho")	5afe509a4d43750b46a8ae4821ed29db27a18b70
+DECISIONS_HISTORY.md.lines-9159-9165 (lines 9159-9165 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-30 (14z-213) — #335's dashboard sections and #338's web pages accepted on their loo")	99891c091721e67f9d01bbb32832139a7d0c3d8a
+docs/project/rule_checker.md.lines-109-122 (lines 109-122 of docs/project/rule_checker.md)	d73902177755f0e8eabcefbf44e551ac2dfd6045
+tools/rc_actions.py.lines-1-30 (lines 1-30 of tools/rc_actions.py)	a1ca767d0860c4e447be6c9bd5034423aeb398aa

@@ -1,0 +1,24 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent213/t338/closure/awaiting_comment.md	86c82c263a9513fc7e9ee9d87283a0084c4292bf
+build/agent213/t338/closure/ticket_row_338.tsv	eb6279f0f347db6f912eef3c62aaded8a8edcbbc
+build/agent213/t338/closure/issue_338.md	263e7d5e8adb66d138b32f91e092161b493910df
+build/agent213/t338/closure/change.diff	c2ce77bb449b8a9f54e10929e03c0aaf3cd7ba76
+build/agent213/t338/closure/records.diff	dd09b92276f43eeb8b6d88f2c05525413b470d5e
+build/agent213/t338/closure/gate_mac.log	ad70f18acbd1a756d97c8f9196b3d859059ca8e2
+build/agent213/t338/closure/control_modes_mac.txt	2b216df8b1c1d4baf7c197cd2119b234398556ca
+build/agent213/t338/closure/mode_missing-credits.log	10647c212758b4cd9c8099b324f604822d346058
+build/agent213/t338/closure/mode_full-size-tile.log	163e930b2fc78d84ec729e3b98d6768fe6790e8f
+build/agent213/t338/closure/mode_log-shipped.log	e584667258d1eba2f170eaa291b48e2f23434653
+build/agent213/t338/closure/mode_local-path.log	84d4205fb9f9088946b296ba6d2b702f7523437b
+build/agent213/t338/closure/mode_unreduced-clip.log	835d4c46928a6222a35e9bd808f5643b06dd55ce
+build/agent213/t338/closure/web_trial_tail.txt	1010544ad9ce3d113d9f6759a8e3f508544b815c
+build/agent213/t338/closure/webcheck_trial.txt	90c419e4c456d58c8b0d78ae007c59ba1aed660c
+build/agent213/t338/closure/indep_web.py	08f4ab00001ba3bbe612ac32f8e04573c19e4d6e
+build/agent213/t338/closure/indep_web.txt	701e354f4a3970c0b11d993b57c77b086d7f998e
+build/agent213/t338/closure/titles_READING.md	e08d612469240d84e9e4624b1cc41deb5fc375c8
+build/agent213/t338/closure/titles_copyrights.png	961644af2f6ae451e3c9086752aa3bc356559672
+build/agent213/t338/closure/index.html.png	57ce8698366a12127356be35580f54c355c244b3
+build/agent213/t338/closure/g_audit_landing_sound.html.png	701d5199b81da7ad659c86a58e288da14f97fb0d
+DECISIONS_HISTORY.md.lines-9081-9097 (lines 9081-9097 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-30 (14z-212) — the proof sheets get a web build for the community: half-size WebP, ")	f40949bb86bc28250ccad3792d2aa12bc34626c5
+DECISIONS_HISTORY.md.lines-9109-9115 (lines 9109-9115 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-30 (14z-213) — #338: the clips are kept, reduced and described; the web build goes ")	0e546f2b29f99d9a1b0e8687fbe479a3bd19247c
+DECISIONS_HISTORY.md.lines-9158-9164 (lines 9158-9164 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-30 (14z-213) — #335's dashboard sections and #338's web pages accepted on their loo")	7110dff1eb62f71a93023fdd79b576691717f02e

@@ -1,0 +1,16 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent213/t267/closure/closing_comment.md	1f76c662fe38c0107269ab943eecada1cbb93f39
+build/agent213/t267/closure/ticket_row_267.tsv	351cf55e5a35ce63251bbaa77a4dbaf085547423
+build/agent213/t267/closure/issue_267.md	a703907d79f250a70385dd3265db7353b040fa49
+build/agent213/t267/closure/fix.diff	79974e10ebe400b22cb42b097f24fce5c88fae02
+build/agent213/t267/closure/records.diff	fd8069de96292045bfdc1efb408ddbbd918a4c37
+build/agent213/t267/closure/test_green_guard.mac.log	20c0304855208b95aa6926484ca5317d051979b8
+build/agent213/t267/closure/test_ledger_page.mac.log	63b84889026b2e023199f85688e462a71b512856
+build/agent213/t267/closure/pilot_classes.tsv	2f689faf29187ffa634911af298a67ec4b7455aa
+build/agent213/t267/closure/pilot_overlap.txt	6ff94ab3d701e47e7d5bb8c7fd27963a2f765c16
+build/agent213/t267/closure/pilot_head.txt	7bc37b5637e5acbdba644f4b6299f7fa727f0220
+build/agent213/t267/closure/live_site.txt	74473664365c07313e72fd863ae47e321d156cf8
+build/agent213/t267/closure/live_render.png	02ead8984ee53e4799c326f0d1dbaba1963ab264
+DECISIONS_HISTORY.md.lines-8876-8922 (lines 8876-8922 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-29 (14z-212) — #267 unparked: the session ledger as a public page on gh-pages, the ", and the entries after it up to line 8922)	84418bdd7e56dde69de1155a1cc88b8864fd88ec
+DECISIONS_HISTORY.md.lines-9065-9080 (lines 9065-9080 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-30 (14z-212) — #267: the first gh-pages publish waits for the green guard to admit ")	e0a43865f870e28188944e817d5e132873f71751
+DECISIONS_HISTORY.md.lines-9098-9108 (lines 9098-9108 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-30 (14z-213) — the opener: items 1-3 first, then #337, #338, #310; PILOT and ERIS m")	4c561183363b2f9da2199cdd68ab54ee58671a8c

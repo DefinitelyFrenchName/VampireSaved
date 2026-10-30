@@ -1148,11 +1148,23 @@ def legend_html(gate_words=None):
 
 
 def cell_html(gid, sid, lg, cell, name, pics, big=False):
-    """One picture with its frame and status. The picture is MOVED into pics/ (#291 S4-F: one copy, not two)."""
+    """One picture with its frame and status. The picture is MOVED into pics/ (#291 S4-F: one copy, not two). In the web
+    build (#338, WEB set) it is READ from the local build's pics/ and written reduced (web_tile / web_clip), unlinked."""
     img = ""
     ext = os.path.splitext(cell["pic"] or "")[1].lower() or ".png"
     name = name + ext
-    if cell["pic"] and (os.path.exists(cell["pic"]) or (pics / name).exists()):
+    if WEB is not None:
+        src = WEB["src"] / "pics" / name
+        if cell["pic"] and src.exists():
+            if ext in (".wav", ".ogg", ".mp3"):
+                web_clip(src, pics / name)
+                img = ('<audio controls preload="none" src="../pics/%s"></audio><div class="mut">%s</div>'
+                       % (html.escape(name), html.escape(WEB_CLIP_NOTE)))
+            else:
+                web_tile(src, pics / (name[:-len(ext)] + ".webp"))
+                img = '<img loading="lazy" src="../pics/%s" alt="%s f%s">' % (
+                    html.escape(name[:-len(ext)] + ".webp"), html.escape(lg["role"]), cell["frame"])
+    elif cell["pic"] and (os.path.exists(cell["pic"]) or (pics / name).exists()):
         if os.path.exists(cell["pic"]) and not (pics / name).exists():
             shutil.move(cell["pic"], pics / name)
         if ext in (".wav", ".ogg", ".mp3"):
@@ -1295,7 +1307,13 @@ def page(out_dir, meta):
                 for tk in s["tickets"] + g.get("tickets", []):
                     by_ticket.setdefault(tk.lstrip("#"), []).append("g/%s#%s" % (files[i], anchor))
                 body.append(h)
-            (gdir / files[i]).write_text(page_doc("%s — Proof Sheets" % gid, meta, "".join(body)))
+            if WEB is not None:
+                mine = [e.split(" / ", 1)[1] for e in empty if e.startswith(gid + " / ")]
+                if mine and i == 0:
+                    body.insert(1, '<div class="nc">No picture shows the fighters on %d sheet(s) of this test: %s</div>'
+                                % (len(mine), html.escape(", ".join(mine))))
+                body.append(WEB_FOOTER)
+            (gdir / files[i]).write_text(web_scrub(page_doc("%s — Proof Sheets" % gid, meta, "".join(body))))
     idx = ['<div class="idx"><b>By test:</b> ' + "".join('<span class="it"><a href="g/%s">%s</a>%s</span> ' % (f, html.escape(t), (" (%d parts)" % k) if k > 1 else "")
                                                        for t, f, _, k in by_test) + "</div>"]
     if by_char:
@@ -1310,7 +1328,7 @@ def page(out_dir, meta):
     top, rest = [], []
     if undefined:
         top.append('<h2 class="st NOTJUDGED">Undefined tags — %d</h2><ul>%s</ul>' % (len(undefined), "".join("<li>%s</li>" % html.escape(u) for u in undefined)))
-    if empty:
+    if empty and WEB is None:   # the web build names them on each gate's page instead (#338)
         top.append('<h2>Sheets where no picture shows the fighters — %d</h2><div class="mut">%s</div>' % (len(empty), html.escape(", ".join(empty))))
     for key, title in (("no_reference_leg", "No reference leg (listed, not drawn)"), ("no_picture", "No picture: compares legs, judges nothing a proven picture can show (listed, not drawn)"),
                        ("debt", "Not yet declared (the retrofit's debt)")):
@@ -1318,13 +1336,175 @@ def page(out_dir, meta):
             rest.append("<h2>%s — %d</h2><div class=\"mut\">%s</div>" % (title, len(meta[key]), html.escape(", ".join(meta[key]))))
     builds = "".join("<li>%s: %s</li>" % (html.escape(k), html.escape(v)) for k, v in meta.get("builds", {}).items())
     builds += "".join("<li>%s</li>" % html.escape(v) for v in meta.get("provenance", []))
-    body = ('<h1>Comparative capture sheets</h1><div class="mut">commit %s · run %s · each picture proven against what its gate '
-            'logged (#291)</div><ul class="mut">%s</ul>%s%s%s<h2>The gates</h2><table class="grid">%s</table>%s') % (
-                html.escape(meta["commit"]), html.escape(meta["date"]), builds, "".join(top), legend_html(), "".join(idx),
-                verdicts, "".join(rest))
-    (out_dir / "index.html").write_text(page_doc("Proof Sheets", meta, body))
+    if WEB is not None:   # #338: the provenance block (local paths, per-build hashes) stays in the local build
+        head = web_intro(meta)
+    else:
+        head = ('<h1>Comparative capture sheets</h1><div class="mut">commit %s · run %s · each picture proven against what '
+                'its gate logged (#291)</div><ul class="mut">%s</ul>') % (html.escape(meta["commit"]), html.escape(meta["date"]), builds)
+    body = '%s%s%s%s<h2>The gates</h2><table class="grid">%s</table>%s%s' % (
+        head, "".join(top), legend_html(), "".join(idx), verdicts, "".join(rest), WEB_FOOTER if WEB is not None else "")
+    (out_dir / "index.html").write_text(web_scrub(page_doc("Proof Sheets", meta, body)))
     meta["undefined_tags"] = undefined
     return out_dir / "index.html"
+
+
+# ---- #338: THE WEB BUILD (ruled 2026-10-30, 14z-212: DECISIONS_HISTORY.md "the proof sheets get a web build for the
+# community"; the clips 14z-213: "Keep, reduced, add a short description to explain that it is short and down sampled")
+WEB = None                 # set by cmd_web: {"src": the local build's dir, "release": tag, "commit_url": url}
+WEB_TILE_SCALE = 2         # each dimension halved (384x224 -> 192x112), Lanczos, WebP quality 85 (measured 14z-212)
+WEB_TILE_QUALITY = 85
+WEB_CLIP_RATE = 24000      # mono, 16-bit, at most this rate (48 kHz halved by averaging sample pairs)
+WEB_CREDIT = ("Vampire Savior — The Lord of Vampire, Vampire Savior 2 — The Lord of Vampire, and Vampire Hunter 2 — "
+              "Darkstalkers Revenge: (C)CAPCOM CO., LTD. 1997 ALL RIGHTS RESERVED. (each line as the game's own title "
+              "screen shows it). QSound, Virtual Audio and the QSound logo are trademarks of QSound Labs, Inc. Vampire "
+              "Saved is an unofficial, fan-made project, not affiliated with or endorsed by Capcom. These are reduced "
+              "screenshots and short, down-sampled sound clips for comparing emulation accuracy; no game data is included.")
+WEB_CLIP_NOTE = "short clip, down-sampled to mono %d kHz for comparison" % (WEB_CLIP_RATE // 1000)
+WEB_FOOTER = '<footer id="credits" class="mut"><hr>%s</footer>' % html.escape(WEB_CREDIT)
+WEB_LOCAL_PATH = re.compile(r"(?:/Users/|/home/|/private/|/var/folders/|/tmp/|[A-Za-z]:\\\\|(?<![\w/])build/agent\d)[^\s<>\"')]*")
+WEB_FILES = (".html", ".webp", ".wav")
+
+
+def web_scrub(text):
+    """the web build's pages never carry a local path: the checkout's root becomes relative, any other absolute local
+    path becomes "(local path)"; outside the web build the text is returned as it is"""
+    if WEB is None:
+        return text
+    text = text.replace(str(ROOT) + "/", "").replace(str(WEB["src"]) + "/", "")
+    return WEB_LOCAL_PATH.sub("(local path)", text).replace("((local path))", "(local path)")   # a path in brackets
+
+
+def web_tile(src, dst):
+    """one picture, each dimension halved by Lanczos, WebP quality 85, the credit in its EXIF (ImageDescription and
+    Copyright)"""
+    from PIL import Image
+    im = Image.open(src).convert("RGB")
+    im = im.resize((max(1, im.width // WEB_TILE_SCALE), max(1, im.height // WEB_TILE_SCALE)), Image.LANCZOS)
+    ex = Image.Exif()
+    ex[0x010E] = WEB_CREDIT
+    ex[0x8298] = "(C)CAPCOM CO., LTD. 1997 ALL RIGHTS RESERVED."
+    im.save(dst, "WEBP", quality=WEB_TILE_QUALITY, exif=ex.tobytes())
+
+
+def web_clip(src, dst):
+    """one sound clip, mixed to mono and halved in rate (averaging sample pairs) while above WEB_CLIP_RATE, 16-bit WAV,
+    the credit in a LIST/INFO chunk (ICOP, ICMT); its length is kept, so nothing the gate judged is cut"""
+    import array, struct, wave
+    with wave.open(str(src)) as w:
+        ch, rate, width, n = w.getnchannels(), w.getframerate(), w.getsampwidth(), w.getnframes()
+        raw = w.readframes(n)
+    if width != 2:
+        raise SystemExit("web_clip: %s is %d-byte audio; only 16-bit is read" % (src, width))
+    a = array.array("h"); a.frombytes(raw)
+    if sys.byteorder == "big":
+        a.byteswap()
+    mono = [sum(a[i:i + ch]) // ch for i in range(0, len(a), ch)] if ch > 1 else list(a)
+    while rate > WEB_CLIP_RATE and rate % 2 == 0:
+        mono = [(mono[i] + mono[i + 1]) // 2 for i in range(0, len(mono) - 1, 2)]
+        rate //= 2
+    out = array.array("h", mono)
+    if sys.byteorder == "big":
+        out.byteswap()
+    with wave.open(str(dst), "wb") as w:
+        w.setnchannels(1); w.setsampwidth(2); w.setframerate(rate); w.writeframes(out.tobytes())
+    def sub(cid, text):
+        b = text.encode("ascii", "replace") + b"\0"
+        b += b"\0" * (len(b) % 2)
+        return cid + struct.pack("<I", len(b)) + b
+    info = b"INFO" + sub(b"ICOP", "(C)CAPCOM CO., LTD. 1997 ALL RIGHTS RESERVED.") + sub(b"ICMT", WEB_CREDIT)
+    data = Path(dst).read_bytes() + b"LIST" + struct.pack("<I", len(info)) + info
+    Path(dst).write_bytes(data[:4] + struct.pack("<I", len(data) - 8) + data[8:])
+
+
+def web_intro(meta):
+    """the web index's opening: the agreed plain-language intro (#338 design point 4) in place of the provenance block"""
+    sha = meta["commit"]
+    legend = "".join("<dt>%s</dt><dd>%s</dd>" % (html.escape(k), html.escape(v)) for k, v in (
+        ("PROVEN", "the game's memory at that frame is identical to the test's record"),
+        ("EVENT-PROVEN", "the events the test recorded around that frame happen again, exactly; the rest of memory isn't compared"),
+        ("JUDGED FILE", "the test compares this exact image"),
+        ("NOT THE JUDGED RUN", "couldn't be matched to the test's own run; shown and flagged, never hidden")))
+    return ('<div id="intro"><h1>Vampire Saved — the visual test ledger</h1>'
+            '<div class="mut">release %s · commit <a href="%s">%s</a> · drawn %s</div>'
+            "<p>Vampire Saved is an unofficial, fan-made modification of Capcom's <i>Vampire Savior</i> (CPS-2, Japan "
+            "970519) that makes all 18 characters selectable: Donovan, Phobos (Huitzil) and Pyron come from <i>Vampire "
+            "Savior 2</i> and <i>Vampire Hunter 2</i>, and the original's own content is unchanged.</p>"
+            "<p>This page is the human-readable side of its automated tests. Each test plays the same inputs on our build "
+            "and on Capcom's original and compares them; here the original is on top and ours underneath, by test, by "
+            "character or by ticket.</p><dl class=\"lg\">%s</dl>"
+            "<p>Every build matched its frozen reference. Pictures are reduced to the size shown here, and sound clips are "
+            "short and down-sampled. No game data is included.</p></div>") % (
+                html.escape(WEB["release"]), html.escape(WEB["commit_url"] % sha), html.escape(sha[:12]),
+                html.escape(meta["date"]), legend)
+
+
+def web_check(web_dir):
+    """-> the problems of a web build (empty when it may ship): every page carries the credits footer; only .html,
+    .webp and .wav files; every tile at most the reduced size (200x120) with the credit in its EXIF; every clip mono at
+    most WEB_CLIP_RATE with its credit chunk; no local path, no .png and no .log named in any page; the index carries
+    the intro and not the local provenance block. tests/test_proof_sheets_web.sh plants each fault."""
+    from PIL import Image
+    import wave
+    web_dir, out = Path(web_dir), []
+    pages = sorted(web_dir.rglob("*.html"))
+    if not (web_dir / "index.html").exists():
+        out.append("no index.html")
+    for f in sorted(p for p in web_dir.rglob("*") if p.is_file()):
+        rel = f.relative_to(web_dir)
+        if f.suffix.lower() not in WEB_FILES:
+            out.append("%s: a %s file ships (only %s may)" % (rel, f.suffix or "suffix-less", ", ".join(WEB_FILES)))
+        elif f.suffix.lower() == ".webp":
+            im = Image.open(f)
+            if im.width > 200 or im.height > 120:
+                out.append("%s: %dx%d, larger than the reduced size" % (rel, im.width, im.height))
+            if "CAPCOM" not in str(im.getexif().get(0x8298, "")):
+                out.append("%s: no credit in its EXIF" % rel)
+        elif f.suffix.lower() == ".wav":
+            with wave.open(str(f)) as w:
+                if w.getnchannels() != 1 or w.getframerate() > WEB_CLIP_RATE:
+                    out.append("%s: %d channel(s) at %d Hz, not reduced" % (rel, w.getnchannels(), w.getframerate()))
+            if b"ICOP" not in f.read_bytes()[-2048:]:
+                out.append("%s: no credit chunk" % rel)
+    for f in pages:
+        t, rel = f.read_text(errors="replace"), f.relative_to(web_dir)
+        if 'id="credits"' not in t or "(C)CAPCOM CO., LTD. 1997" not in t:
+            out.append("%s: no credits footer" % rel)
+        m = WEB_LOCAL_PATH.search(t)
+        if m:
+            out.append("%s: a local path: %s" % (rel, m.group(0)[:60]))
+        for bad in re.findall(r'(?:src|href)="([^"]+\.(?:png|log))"', t):
+            out.append("%s: names %s" % (rel, bad))
+    idx = (web_dir / "index.html").read_text(errors="replace") if (web_dir / "index.html").exists() else ""
+    if idx and 'id="intro"' not in idx:
+        out.append("index.html: no plain-language intro")
+    if "built in a clean checkout" in idx:
+        out.append("index.html: carries the local provenance block")
+    return out
+
+
+def cmd_web(a):
+    global WEB
+    src, dst = Path(a.dir).resolve(), Path(a.to).resolve()
+    if dst.exists() and any(dst.iterdir()):
+        print("FAIL: %s is not empty" % dst); return 1
+    meta = json.loads((src / "meta.json").read_text())
+    WEB = {"src": src, "release": a.release, "commit_url": a.commit_url}
+    dst.mkdir(parents=True, exist_ok=True)
+    page(dst, meta)
+    probs = web_check(dst)
+    for p in probs:
+        print("WEB-PROBLEM %s" % p)
+    print("%s %s: %d pages, %d tiles, %d clips, %d problem(s)" % ("WROTE" if not probs else "FAIL:", dst / "index.html",
+          len(list(dst.rglob("*.html"))), len(list(dst.rglob("*.webp"))), len(list(dst.rglob("*.wav"))), len(probs)))
+    return 1 if probs else 0
+
+
+def cmd_webcheck(a):
+    probs = web_check(a.dir)
+    for p in probs:
+        print("WEB-PROBLEM %s" % p)
+    print("%s: %d problem(s) in %s" % ("PASS" if not probs else "FAIL", len(probs), a.dir))
+    return 1 if probs else 0
 
 
 def build_key(rompath, set_):
@@ -1940,13 +2120,22 @@ def main(argv):
     k.add_argument("tree")
     g = sub.add_parser("page")
     g.add_argument("dir")
+    w = sub.add_parser("web", help="#338: a web build of a finished local run, for the community")
+    w.add_argument("dir", help="the local build (its meta.json and pics/)")
+    w.add_argument("--to", required=True, help="the web build's directory (new or empty)")
+    w.add_argument("--release", default="(not a release)", help="the release tag the run was drawn at")
+    w.add_argument("--commit-url", default=REPO_URL.replace("/issues/", "/commit/") + "%s",
+                   help="the commit link, %%s = the full sha")
+    wc = sub.add_parser("webcheck", help="#338: the problems of a web build (exit 1 on any)")
+    wc.add_argument("dir")
     c = sub.add_parser("census")
     c.add_argument("--tests", default=str(ROOT / "tests"))
     c.add_argument("--registry", default=str(ROOT / "tests/ci_emulator.tsv"))
     c.add_argument("--debt", default=str(ROOT / "tests/expected/sheet_debt.txt"))
     c.add_argument("--span-debt", default=str(ROOT / "tests/expected/sheet_span_debt.txt"))
     a = ap.parse_args(argv)
-    return {"run": cmd_run, "prove": cmd_prove, "page": cmd_page, "commitcheck": cmd_commitcheck, "census": cmd_census}[a.cmd](a)
+    return {"run": cmd_run, "prove": cmd_prove, "page": cmd_page, "commitcheck": cmd_commitcheck, "census": cmd_census,
+            "web": cmd_web, "webcheck": cmd_webcheck}[a.cmd](a)
 
 
 if __name__ == "__main__":

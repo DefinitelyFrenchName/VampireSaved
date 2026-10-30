@@ -1,0 +1,5 @@
+  FLAG D-ABSOLUTE: Its action text is the trap's own text plus the body of every function it names, followed through the functions those name.  [build/agent213/t337/closure/closing_comment.md]
+  FLAG D-ABSOLUTE: - Every trap set before the site counts, not only the last one, and a trap inside a function body counts where the function is written.  [build/agent213/t337/closure/closing_comment.md]
+  FLAG D-ABSOLUTE: 7 have an EXIT trap set before them, and none of those 7 traps names its site's variable at all.  [build/agent213/t337/closure/closing_comment.md]
+  FLAG D-ABSOLUTE: - The gate's controls were re-traced on PILOT: 6 runs, SAFE, every run HONOURED.  [build/agent213/t337/closure/closing_comment.md]
+packet_check: 4 flag(s): D-ABSOLUTE 4

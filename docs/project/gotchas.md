@@ -7799,3 +7799,14 @@ and PASSED. A serial gate has the same blind spot — a run that dies before wri
 had ever lost one to show it. **The rule:** a gate whose verdict reads its runs' outputs names every leg it starts and
 FAILs on one with no output (`missing`, both gates now); `tests/audit_pool_drop.sh` (ondemand, `harness:`) runs every
 pooled gate with a run dropped and requires it to FAIL — run it when `jobs.sh` changes or a gate starts pooling.
+
+## A PUBLISH TEST THAT PUSHES TO A HOOKLESS SCRATCH REMOTE NEVER MEETS THE REPOSITORY'S OWN GUARD — the ledger page's first push was refused at the close (paid: 14z-212/14z-213, #267)
+
+`tests/test_ledger_page.sh` proved `tools/publish_ledger.sh --push` against a scratch bare remote with no hooks, so it
+PASSED while the real push could never succeed: the repository's pre-push green guard (#290) requires a strict GREEN tier
+row for every pushed tree, and the page's orphan tree is not a repository tree, so no tier can ever cover it. The 14z-212
+close's push was refused (`refs/heads/gh-pages: green guard: REFUSED — tree a935aac2eec1 has no strict GREEN run`).
+**The rule:** a test of anything that pushes, commits or publishes runs it through the hooks the real repository runs
+(`tests/test_ledger_page.sh` now copies the real `pre-push` hook and `green_guard.py` into its publishing repo and sets `core.hooksPath`, so it FAILs on the unpatched guard); the
+guard's exception is as narrow as the thing it admits (one parentless commit of exactly the page's four plain files to
+`refs/heads/gh-pages`, three controls in `tests/test_green_guard.sh`).

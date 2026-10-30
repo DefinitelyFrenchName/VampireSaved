@@ -16,18 +16,18 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**485 scripts** — 147 ci_portable, 93 ci_static, 245 emulator-tier (run by name).
+**488 scripts** — 150 ci_portable, 93 ci_static, 245 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 55 | the suite runners and their own ground truth |
+| [runner](#runner) | 57 | the suite runners and their own ground truth |
 | [docs](#docs) | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 50 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 92 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 93 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 38 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -55,6 +55,7 @@ the suite runners and their own ground truth.
 | `tests/test_close_checks.sh` | test | ci_portable | — | the close's check runner times every check, re-runs one alone, and never lets a partial run read as the run of record (`tools/close_checks.py`, 14z-185b, GitHub #187). | 14z-185b |
 | `tests/test_close_loop_cost.sh` | test | ci_portable | — | the close-loop cost reader counts every pass of a close's check runner and the packet's span, whatever interpreter ran the runner and however a prepare's output was cut (`tools/agent/close_loop_cost.py`, 14z-187b, GitHub #187). | 14z-187b |
 | `tests/test_close_standing.sh` | test | ci_portable | — | the standing close-check set renders with every list derived and every plant generated, its claim comes from the run of record, and a finding is appended in the table's form (GitHub #204, #206, #207; 14z-189). | 14z-189 |
+| `tests/test_control_classifier.sh` | test | ci_portable | — | THE CONTROL CLASSIFIER'S #310 RULES ON KNOWN ANSWERS (14z-213). ci_portable: no ROM, ~1 s. | 14z-213 |
 | `tests/test_controls_concurrent.sh` | test | ci_portable | — | THE CONCURRENT-CONTROLS LIST STILL DESCRIBES THE GATES IT NAMES (#315, 14z-207). ci_portable: no ROM, ~2 s. | 14z-207 |
 | `tests/test_controls_contract.sh` | test | ci_portable | — | ground truth for THE MUST-FIRE CONTRACT'S READER, tests/lib/controls.sh: the four regexes of the R10 grammar, the leading comment block as the header (a bare `#` continues it, a non-comment line ends it), the declared-vs-fired readback the… | 14z-147 |
 | `tests/test_demand_after_trap.sh` | test | ci_portable | — | no gate carries a `${VAR:?msg}` DEMAND after its EXIT trap (14z-134). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-134 |
@@ -74,6 +75,7 @@ the suite runners and their own ground truth.
 | `tests/test_poke_readback.sh` | test | ci_portable | — | EVERY GATE THAT SAMPLES AN ADDRESS ITS OWN RIG POKES IS ON THE TABLE, and the table's classification is the maintainer's, not the tool's (GitHub #171 slice Q6, shape 4 of docs/project/gate_qualification_scope.md). ci_portable: | 14z-180 |
 | `tests/test_promise_check.sh` | test | ci_portable | — | every promise a sitting's record makes is classed FULFILLED, CARRIED or NOT A PROMISE, and each class holds (`tools/promise_check.py`, 14z-187b, GitHub #190 P3). | 14z-187b |
 | `tests/test_proof_sheets.sh` | test | emulator | MAME, a build dir, ~17 s | THE COMPARATIVE SHEETS' PROOF IS ITSELF TESTED ([VSP-19]; GitHub #291 slice S1, 14z-204). | 14z-204 |
+| `tests/test_proof_sheets_web.sh` | test | ci_portable | — | THE PROOF SHEETS' WEB BUILD SHIPS NOTHING THE RULING FORBIDS (GitHub #338, 14z-213). ci_portable: no ROM, no emulator, ~5 s. | 14z-213 |
 | `tests/test_py_escapes.sh` | test | ci_portable | — | NO TRACKED PYTHON FILE CARRIES AN INVALID STRING ESCAPE (14z-191). ci_portable: no ROM, ~3 s. | 14z-191 |
 | `tests/test_release_reuse.sh` | test | ci_portable | — | A RELEASE REUSES THE FREEZE'S TIER ONLY ON THE FREEZE'S IDENTITY (#316, 14z-208). | 14z-208 |
 | `tests/test_rule_checker.sh` | test | ci_portable | — | the adversarial RULE-CHECKER's record is sound: every run in tests/rulecheck/ledger.tsv is complete and structured, every planted violation was caught, every fixture is calibrated, every VIOLATED resolved, and every freeze since the checker… | 14z-163 |
@@ -500,6 +502,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/test_latch_readers.sh` | test | ci_static | ROMDIR | WHO CAN READ THE SELECT-CONFIRM LATCH: the static census of every instruction naming a fighter block's +0x3BC/+0x3BD/+0x3C2/+0x3E0/+0x3E3 on vsav2, vsavj and the ported image, frozen (GitHub #151 step 3, 14z-161). | 14z-161 |
 | `tests/test_map_table_readers.sh` | test | ci_static | ROMDIR | WHO READS THE MAP'S NAME, PORTRAIT AND POOL TABLES (14z-195, GitHub #124). ci_static: needs the vsavj decrypted views (the build/out cache, else ROMDIR) and, for section 3, the merged build's verify_op.bin; no emulator, ~2 s. | 14z-195 |
 | `tests/test_meter_gain.sh` | test | emulator | MAME, ~4 min | THE GAUGE COLUMN ARBITRATED: what a vanilla normal pays its attacker in METER, read off the engine on a CONNECT (14z-146). | 14z-146 |
+| `tests/test_mizuumi_candidates.sh` | test | ci_portable | — | #118's CLASSIFICATION OF THE MIZUUMI CANDIDATES EQUALS WHAT docs/game/atlas/ram.md SAYS (14z-213). ci_portable: no ROM, ~1 s. | 14z-213 |
 | `tests/test_move_naming.sh` | test | emulator | MAME, a build dir, ~1 min | THE MOVE LIST'S CHAIN IDS ARE WHAT NATIVE VS2 ENTERS (character-data map, phase 1 naming step; 14z-120). | 14z-120 |
 | `tests/test_poked_legs.sh` | test | ci_static | ROMDIR | THE CENSUS OF EVERY FORCED-PICK LEG in tests/ and tools/, classified by what the poke leaves latched, frozen shrink-only; a new CROSS-FLAVOR pairing fails until it is measured and accepted (GitHub #151 step 3, 14z-161). | 14z-161 |
 | `tests/test_power_decode.sh` | test | ci_static | ROMDIR | AN ATTACK RECORD'S POWER BYTE IS DECODED AS THE ENGINE DECODES IT (14z-195, GitHub #241). ci_static: needs the vsavj and vsav2 decrypted views (the build/out cache, else ROMDIR); no emulator, ~3 s. | 14z-195 |

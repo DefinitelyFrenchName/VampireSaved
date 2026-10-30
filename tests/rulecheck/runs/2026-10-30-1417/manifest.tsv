@@ -1,0 +1,25 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent213/t335/closure/closing_comment.md	904ffb3974319b72d6cb5772f0ebe65d8bc5ebf4
+build/agent213/t335/closure/ticket_row_335.tsv	109b5392e7b9c081035f4de0c0acf5e6bb9b901c
+build/agent213/t335/closure/issue_335.md	71094044821f4021db84206563867438bb095db6
+build/agent213/t335/closure/gate.diff	74db353b0a89c5bb5dd72ea73f22f576f08cd3ab
+build/agent213/t335/closure/gate_mac.log	51fbcf86039e45c9521973ff4895b0e18e049017
+build/agent213/t335/closure/control_modes_mac.txt	73c7155190e3b5d63356d211864f7c7d72af5651
+build/agent213/t335/closure/mode_lowest-question.log	cc9cde28a0a1844934be1214372357f56595d3a4
+build/agent213/t335/closure/mode_later-run-questions.log	2774587e5a58c4c373c09bdbe3ccd3b6d271949a
+build/agent213/t335/closure/mode_calibration-counted.log	b7cb1e5f3740e16dd89a61c65517520a4fe033d2
+build/agent213/t335/closure/live_page_check.txt	457b8367121c576953ca616147ca80507de8596c
+build/agent213/t335/closure/s0.js	7135051b7ad2ebf7979659d79f0872b2dd67ff4a
+build/agent213/t335/closure/calc_check.js	23779286e078f2f158694d560a8d9bbe8fa6f96e
+build/agent213/t335/closure/calc_check.txt	c9757f52d81322ef5c1364baeb6fd3024104fcb1
+build/agent213/t335/closure/calc_control.sh	ffce7a00c3ff73da99d8caec49f652e046f22414
+build/agent213/t335/closure/calc_control.txt	f2f0f66c2fa31c46b3bcaaab8d6c88257afbd33d
+build/agent213/t335/closure/all_rows_indep.py	24c4ae0623964c2623eb930355b994ea9e3200e2
+build/agent213/t335/closure/all_rows_indep.txt	a3f9a6a0f417da72e4b830725de40562a52e6018
+build/agent213/t335/closure/actions_window.txt	3c22eb6c4ecdbb7fb5cb9204f6f958eedba039ac
+build/agent213/t335/closure/public_page_exclusion.txt	f33dcd733119bb6c03c0f4894ca78f8c55c47651
+DECISIONS_HISTORY.md.lines-8787-8801 (lines 8787-8801 of DECISIONS_HISTORY.md: its INDEX entry "## Filed 2026-10-28 (14z-212) — #335: the session ledger's first-run OK rate per action, and which q", and the entries after it up to line 8801)	5aaa81994db2764971e277d8ec79f155b003d667
+DECISIONS_HISTORY.md.lines-8861-8876 (lines 8861-8876 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-29 (14z-212) — #335: an action's first run, the questions it fails, and what is sho")	5afe509a4d43750b46a8ae4821ed29db27a18b70
+DECISIONS_HISTORY.md.lines-9159-9165 (lines 9159-9165 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-30 (14z-213) — #335's dashboard sections and #338's web pages accepted on their loo")	99891c091721e67f9d01bbb32832139a7d0c3d8a
+docs/project/rule_checker.md.lines-109-122 (lines 109-122 of docs/project/rule_checker.md)	d73902177755f0e8eabcefbf44e551ac2dfd6045
+tools/rc_actions.py.lines-1-30 (lines 1-30 of tools/rc_actions.py)	a1ca767d0860c4e447be6c9bd5034423aeb398aa

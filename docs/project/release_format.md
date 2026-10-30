@@ -423,6 +423,29 @@ release-cadence stub is never reused; seven must-fire controls).
   - A release at `--jobs 8` on ERIS can push a long MAME control over half its cap. `audit_hitclass_map_cost@drift-clock`
     took 2,921 s of 5,400 s; re-run alone at `--jobs 4` on the same commit it took 1,122 s (#321).
 
+## The proof sheets' web build — drawn at the release, published on the maintainer's site (#338)
+
+The comparative capture sheets (#291, `tools/proof_sheets.py run`) are local by default: full-size pictures, local
+paths, per-build provenance. The web build for the community (ruled 2026-10-30, 14z-212, DECISIONS_HISTORY.md "the proof
+sheets get a web build for the community"; the clips and the site path ruled 14z-213) is drawn from a finished local run
+OF THE RELEASE'S COMMIT, so the page names a tagged release and every gate it shows:
+
+```sh
+ROMDIR=... python3 tools/proof_sheets.py run <the release commit> [--host pilot]   # the local run: build/sheets/<commit>/
+python3 tools/proof_sheets.py web build/sheets/<commit> --to build/sheets_web/<tag> --release <tag>
+tools/publish_sheets.sh build/sheets_web/<tag>        # webcheck, then <DEPLOY_TARGET>vs-proof-sheets/, replacing it
+```
+
+What `web` does: every picture halved by Lanczos into WebP quality 85 with the © line in its EXIF, unlinked; every sound
+clip mixed to mono at 24 kHz with a credit chunk and a "short, down-sampled" caption; a credits footer on every page (each
+game's `(C)CAPCOM CO., LTD. 1997 ALL RIGHTS RESERVED.` as its own title screen shows it, read 14z-213 —
+build/agent213/t338/titles/READING.md, local); the index's provenance block replaced by the plain-language intro; the
+"no picture shows the fighters" list moved onto each gate's page; every local path scrubbed. `webcheck` refuses a build
+with any full-size picture, unreduced clip, page without credits, log, PNG or local path, and `publish_sheets.sh` runs it
+first. Gate: `tests/test_proof_sheets_web.sh` (ondemand, with the sheet gates). Measured 14z-213 on 14z-207's full run
+(23,183 tiles, 152 clips): 1 min 41 s to draw; tiles 223 MB, clips 34 MB, pages 9 MB (306 MB on disk). It is hosted on
+the maintainer's own site, as the #338 design ruled (GitHub Pages' 1 GB limit and the artifact limits judged too small).
+
 ## Where a release's history is
 
 The registry row in `HANDOFF.md` "Build registry", the annotated tag

@@ -31,6 +31,15 @@
 # TRACES: pilot:38fe3b27 = PILOT, 14z-212 (#333 after rule-checker run 2026-10-29-1379): test_tmp_hygiene, 5 control runs, SAFE, every run HONOURED; the gate PASSed there first (local evidence build/agent212/t333/closure/pilot_t212r7_*)
 # TRACES: pilot:2e80a79e = PILOT, 14z-212 (#333 after rule-checker run 2026-10-29-1380): test_tmp_hygiene, 5 control runs, SAFE, every run HONOURED; the gate PASSed there first (local evidence build/agent212/t333/closure/pilot_t212r8*)
 # TRACES: pilot:94323897 = PILOT, 14z-212 (#333 after rule-checker run 2026-10-29-1382): test_tmp_hygiene, 5 control runs, SAFE, every run HONOURED; the gate PASSed there first (local evidence build/agent212/t333/closure/pilot_t212r9*)
+# TRACES: pilot:669ca6ca = PILOT, 14z-213 (#337: the EXIT-trap order check in tools/tmp_hygiene.py): test_tmp_hygiene, 6 control runs, SAFE, every run HONOURED; the gate PASSed there first, on dash (local evidence build/agent213/t337/pilot/)
+# TRACES: pilot:669ca6ca = PILOT, 14z-213 (#267: the green guard lets the ledger page through): test_green_guard, 5 control runs, SAFE, every run HONOURED; the gate PASSed there first, on dash (local evidence build/agent213/t337/pilot/t213r2_*)
+# TRACES: pilot:4eb25f40 = PILOT, 14z-213 (#337 after rule-checker run 2026-10-30-1406: the shlex trap reader, UNREADTRAP, control planted-unread-trap): test_tmp_hygiene, 7 control runs, SAFE, every run HONOURED; the gate PASSed there first, on dash (local evidence build/agent213/t337/pilot/t213r2b_*)
+# TRACES: pilot:858dcd2a = PILOT, 14z-213 (#337 after rule-checker run 2026-10-30-1407: the guard's stop line, any ${X...} expansion): test_tmp_hygiene, 7 control runs, SAFE, every run HONOURED; the gate PASSed there first, on dash (local evidence build/agent213/t337/pilot/t213r3_*)
+# TRACES: pilot:f716d4c7 = PILOT, 14z-213 (#337 after rule-checker run 2026-10-30-1409: trap positions inverted, every trap word not an argument): test_tmp_hygiene, 7 control runs, SAFE, every run HONOURED; the gate PASSed there first, on dash (local evidence build/agent213/t337/pilot/t213r4_*)
+# TRACES: pilot:715e46b8 = PILOT, 14z-213 (#337 after rule-checker run 2026-10-30-1410: the quoted-# comment cut): test_tmp_hygiene, 7 control runs, SAFE, every run HONOURED; the gate PASSed there first, on dash (local evidence build/agent213/t337/pilot/t213r5_*)
+# TRACES: pilot:fddb78a8 = PILOT, 14z-213 (#310: classifier rules 1-4; test_bundle_parsers' leftover check and in-gate controls, test_defense_rows_census' shell-row move): test_bundle_parsers and test_defense_rows_census, 5 control runs, SAFE, every run HONOURED under the new rules; both gates PASSed there first, on dash (local evidence build/agent213/t310/pilot/)
+# TRACES: pilot:25ac580e = PILOT, 14z-213 (#310: test_static_runner section 12d read under classifier rules 1-4): test_static_runner, 26 control runs, SAFE, every run HONOURED; the gate PASSed there first, on dash (local evidence build/agent213/t310/pilot/t213r7_static)
+# TRACES: pilot:b3544de0 = PILOT, 14z-213 (#335 after rule-checker runs 2026-10-30-1413 to -1421: five controls for the action figures): test_session_metrics, 12 control runs, SAFE, every run HONOURED; the gate PASSed there first, on dash (local evidence build/agent213/t335/pilot/t213r8_static)
 audit_capture_matrix	30719e3e5a1f9d826f990e29638f4ecd0cd550eb	pilot:bd004554	2 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 audit_mister_map_fit	1a2aa94645e31f6c4ee1149948548796d6037043	pilot:bd004554	3 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_agent_defs	eefa59f4871955050c11a3d6502412f84b50d5e5	pilot:eb6606fd	7 controls write-traced 14z-210 (fork R, #321): none writes a path a sibling writes or reads
@@ -44,7 +53,7 @@ test_applier_page	499dcdd5e08b95d392d2c480a601b4873d08fa31	pilot:bd004554	6 cont
 test_build_dirs	7f27fa9f3caa750c802f9872b1b0102b1fb14eed	pilot:bd004554	5 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_build_environment_entry	53d6e131f0360a44f768145a0fba28792d7144a9	pilot:bd004554	2 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_build_retention	657b2cf1a5981fe745d68844062eb3bf1dcc993c	pilot:bd004554	5 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
-test_bundle_parsers	6fffa5217edb881bd9175030b76c4161c9bdeebd	pilot:bd004554	3 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
+test_bundle_parsers	fa1adb5cd8418cf83e45032a7778b664b7454ee0	pilot:fddb78a8	3 controls write-traced 14z-213 (#310: the in-gate controls skip a mode; the gate's own checks): none writes a path a sibling writes or reads
 test_capture_kf_ownership	3b2d998e1f4cf140432ec11472c3eaef5bd53b1d	pilot:bd004554	3 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_charid_names	535cc7d24168111f8b253f4cb11661b38d678734	pilot:eb6606fd	2 controls write-traced 14z-210 (fork R, #321): none writes a path a sibling writes or reads
 test_charmap_overrides	1ef9971ed9a65174b9bf83bc8854cbce7a51938f	pilot:6829e446	3 controls write-traced 14z-212 (#333, #334): none writes a path a sibling writes or reads
@@ -58,7 +67,7 @@ test_close_standing	8cb536d7173936a1ea04c12b16050cad49bf364d	pilot:bd004554	9 co
 test_controls_concurrent	dba28972ece0c8496f19c0b0d5d3a2633ac141e3	pilot:6829e446	3 controls write-traced 14z-212 (#333, #334): none writes a path a sibling writes or reads
 test_controls_contract	698e30ea8b99ddacc2fd5d4590e454d8ee03999e	pilot:6829e446	2 controls write-traced 14z-212 (#333, #334): none writes a path a sibling writes or reads
 test_copy_flags	6233d72bdc5c1eeff69f1a967202ba98533e6458	pilot:bd004554	3 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
-test_defense_rows_census	aa9d18f9c683a1c37cb1f07a9b54a2d8a6f8ea9d	pilot:bd004554	2 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
+test_defense_rows_census	36a6056e93a556171b5ad8f2cea0444b215c5588	pilot:fddb78a8	2 controls write-traced 14z-213 (#310: the in-gate controls skip a mode; the gate's own checks): none writes a path a sibling writes or reads
 test_doc_anchor_census	5a11fc1bbb4f9c6465f5259ee09fe8d78064c7b0	pilot:6829e446	4 controls write-traced 14z-212 (#333, #334): none writes a path a sibling writes or reads
 test_docs_site	3c667923727fefa01aa3fbb8c28299aadbf0603f	pilot:6829e446	5 controls write-traced 14z-212 (#333, #334): none writes a path a sibling writes or reads
 test_docshape	75f5001bfeddcf48fb778acbbacc46a34459e39c	pilot:6829e446	15 controls write-traced 14z-212 (#333, #334): none writes a path a sibling writes or reads
@@ -76,7 +85,7 @@ test_gate_descriptions	30c20607151d91a7cbc55b3f91ce87fba71035d2	pilot:6829e446	2
 test_gate_follows	7b2783043d5d630d325e3674b412988d72bc8042	pilot:6829e446	5 controls write-traced 14z-212 (#333, #334): none writes a path a sibling writes or reads
 test_gate_index_current	c4bccd0aae6a144803b637e59e34bfba2ae8ff81	pilot:6829e446	3 controls write-traced 14z-212 (#333, #334): none writes a path a sibling writes or reads
 test_gotchas_index_current	a045431f860a1cc968ebfeaf26a8f45d3b945446	pilot:6829e446	2 controls write-traced 14z-212 (#333, #334): none writes a path a sibling writes or reads
-test_green_guard	437d0dcd532469415c75752a7c58d954f6fcd1d9	pilot:6829e446	2 controls write-traced 14z-212 (#333, #334): none writes a path a sibling writes or reads
+test_green_guard	ed5bfe1866bae30648f42bfb834a8eb70c995d2d	pilot:669ca6ca	5 controls write-traced 14z-213 (#267: the ledger page's three new controls): none writes a path a sibling writes or reads
 test_history_index	1f972a81ed7dcb29859955b297d96bf1bfc50699	pilot:6829e446	3 controls write-traced 14z-212 (#333, #334): none writes a path a sibling writes or reads
 test_host_libs	07e33e0245a5069e859f7e46856602f4955e8365	pilot:bd004554	2 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_host_text_opens	f17d4566affa2b49e98f6f44aa8a37cad1763b4c	pilot:6829e446	4 controls write-traced 14z-212 (#333, #334): none writes a path a sibling writes or reads
@@ -115,18 +124,18 @@ test_run_record	02af6e1e6d885e74c23a94dbd185439ff537430d	pilot:bd004554	3 contro
 test_same_data_p2	e9fa92805a09aedd69cdf67c6f8678ea014871eb	pilot:eb6606fd	2 controls write-traced 14z-210 (fork R, #321): none writes a path a sibling writes or reads
 test_scratch_census	335581ff018dc7619368015fa8bbbe0dba6427be	pilot:bd004554	7 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_session_close	b627370770a059834cbf976e3f542fdc85059406	pilot:6829e446	5 controls write-traced 14z-212 (#333, #334): none writes a path a sibling writes or reads
-test_session_metrics	e6d1cafd850f82d346cc099d131f1722cea7dfc5	pilot:e1b87efa	7 controls write-traced 14z-212 (#335 (actions, hours to pass)): none writes a path a sibling writes or reads
+test_session_metrics	6a8afa4db099a73a631aa9ea11577317cb27bb49	pilot:b3544de0	12 controls write-traced 14z-213 (#335: lowest-question, later-run-questions, calibration-counted, not-run-ignored, void-only-dropped added): none writes a path a sibling writes or reads
 test_sheet_census	e7c09d12416709081babda678d970cb55c25e718	pilot:6829e446	7 controls write-traced 14z-212 (#333, #334): none writes a path a sibling writes or reads
 test_shell_portability	90d9992766527599600367649b03854e922b70c2	pilot:bd004554	2 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_sim_wram_contract	135cf28197892f4ae7fee4471604f09513168d0f	pilot:6829e446	3 controls write-traced 14z-212 (#333, #334): none writes a path a sibling writes or reads
 test_skill_guides	f8c8ee93ea9f0ca7aeaa5cb92eace2eafeb2a405	pilot:6829e446	3 controls write-traced 14z-212 (#333, #334): none writes a path a sibling writes or reads
 test_state_open_lists	d6c0887ebb38881c00fe16b77e401cf6f936bbfb	pilot:6829e446	7 controls write-traced 14z-212 (#333, #334): none writes a path a sibling writes or reads
 test_static_confirm	8a9212e8a7154af86dd2568ae84aa865dbb8776c	pilot:bd004554	44 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
-test_static_runner	c909cf06a667f8d5c94a58394d3edadbded128a0	pilot:ad206269	26 controls write-traced 14z-212 (#336: section 32 counts dash's write error too): none writes a path a sibling writes or reads
+test_static_runner	2bc0c7f504ceaff80d0e2bd88493aef2c27ef280	pilot:25ac580e	26 controls write-traced 14z-213 (#310: section 12d under the classifier's rules 1-4): none writes a path a sibling writes or reads
 test_submodule_pins	2b6b6efafe65bb7e805fad83099d6e05c3c4e7a7	pilot:bd004554	2 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_superseded_pins	5c79a05e78f77af8f53e123e772abdc4f9ff7f0e	pilot:bd004554	2 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_tickets	fb708c956e71a81659fe50fe44bcda81a7cd0361	pilot:e1b87efa	7 controls write-traced 14z-212 (the parked-label check (control parked-disagrees)): none writes a path a sibling writes or reads
-test_tmp_hygiene	2669ce5d3ff7aab6bf7cd91b7fbc90e18a22817d	pilot:94323897	5 controls write-traced 14z-212 (#333's eighth round, after rule-checker run 2026-10-29-1382): none writes a path a sibling writes or reads
+test_tmp_hygiene	383d12e639615aefb1f4e294f392e636f1f7e85b	pilot:715e46b8	7 controls write-traced 14z-213 (#337 after rule-checker run 2026-10-30-1410): none writes a path a sibling writes or reads
 test_trace_static_reads	b5d2058de210dcd093995acf4c49b32d4b8430c7	pilot:6829e446	6 controls write-traced 14z-212 (#333, #334): none writes a path a sibling writes or reads
 test_win_quote_decode	3641cda34515ac0bd93ca1e99480534ea1af2f90	pilot:bd004554	2 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_win_stdout_utf8	7634fbb50655502a4188f33372c30dec15d083fd	pilot:6829e446	3 controls write-traced 14z-212 (#333, #334): none writes a path a sibling writes or reads

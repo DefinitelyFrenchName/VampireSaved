@@ -1,0 +1,30 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: close #337 as done (14z-213): the mktemp census checks EXIT-trap order (TRAPPED), seven known forms and six safe ones, control planted-trapped, re-traced on PILOT
+Claim (the working agent's sentence): CLAIM: close #337 as done (14z-213): the closing comment closing_comment.md and the row ticket_row_337.tsv state the resolution. The ticket (issue_337_body.md) asked to teach the mktemp census to check EXIT-trap order itself, with known answers in tests/test_tmp_hygiene.sh (a trap before a site naming "$X/…", through a cleanup function, across a continuation, a later trap that must not count) and a planted control, then re-trace the gate on PILOT. It rests on:
+1. THE CHANGE: fix.diff — tools/tmp_hygiene.py gains _code_lines (the logical-line reader sh_scan already used, moved out unchanged), _functions, sh_exit_traps and sh_trap_order, a TRAPPED report line, and an EXIT-trap count in the summary; tests/test_tmp_hygiene.sh gains tests/trap_forms.sh (seven forms that must each be named TRAPPED), tests/trap_safe.sh (six that must not be), the count check (7 EXIT traps read in the forms) and the control planted-trapped. records.diff: tests/controls_concurrent.txt (test_tmp_hygiene's row and a TRACES line; the same file's test_green_guard row belongs to #267), docs/platform/gotchas.md (the mktemp entry's new paragraph), docs/NEXT_SESSION.md (the instrument note).
+2. THE TREE: census_now.txt — the census over the tree exits 0, 0 TRAPPED, "487 mktemp -d substitution(s) and 482 EXIT trap(s) read". pairs.py / pairs.txt — over the census's own file list (tests/*.sh, tests/lib/*.sh, tools/*.sh, 552 files), 487 guarded sites, 7 with an EXIT trap set on an earlier line (each named with its lines), and 0 of those 7 traps (their text plus the functions they reach) name the site's variable at all.
+3. THE GATE ON BOTH HOSTS: gate_mac.log (the Mac, bash as /bin/sh, the session's working tree with the sitting's other uncommitted edits, blob 76e50317) PASS, every known-answer line ok; control_modes_mac.log: all six control modes (planted-trapped, planted-unguarded, planted-mktemp, planted-mkdtemp, planted-unsandboxed, shim-blind) exit 1. pilot_tmp_hygiene log (pilot_t213r1_tmp_hygiene.log): PASS on PILOT; pilot_retrace.sh made the clone fresh (rm -rf, git clone --no-checkout of PILOT's checkout, fetch of the bundle, checkout 669ca6ca, a commit object of the Mac's tracked working tree, never on main); pilot_state.txt: /bin/sh -> dash, HEAD 669ca6ca, tests/test_tmp_hygiene.sh and tools/tmp_hygiene.py at the Mac's blobs (76e50317, b5461713) on disk and at HEAD, 0 tracked changes.
+4. THE RE-TRACE (the #315 method): pilot_overlap.txt "SAFE 1: test_tmp_hygiene", pilot_classes.tsv the six control runs, each HONOURED.
+5. THE RULING: DECISIONS_HISTORY.md lines 9030-9045, "State it as a limit + ticket" (this ticket's origin).
+NOT TESTED: the census reads shell text and does not interpret it — a trap set through eval or a variable, a function the trap calls that is defined in another file (sh_exit_traps follows the same file's functions only; trap_calls.py / trap_calls.txt: of the tree's 482 EXIT traps none calls a function defined only in another file the census reads — its 2 word matches, record and run, are arguments to a python3 command), an action that reaches X through another variable (rm -rf "$p" where p was built from X), and an rm whose path is assembled elsewhere are not read; which of several earlier traps is in force is not decided (every earlier trap counts, the cautious side), nor is a trap inside a function body read where the function is called (it counts where it is written); a || return guard is read like an exit (cautious: a return runs no trap); the PILOT re-trace traced the gate's controls, not the census over PILOT's own tree beyond the gate's section 1; shells other than bash (the Mac) and dash (PILOT) did not run the gate.
+Artifacts (read every one, in full):
+  - build/agent213/t337/closure/closing_comment.md
+  - build/agent213/t337/closure/ticket_row_337.tsv
+  - build/agent213/t337/closure/issue_337_body.md
+  - build/agent213/t337/closure/fix.diff
+  - build/agent213/t337/closure/records.diff
+  - build/agent213/t337/closure/census_now.txt
+  - build/agent213/t337/closure/pairs.py
+  - build/agent213/t337/closure/pairs.txt
+  - build/agent213/t337/closure/trap_calls.py
+  - build/agent213/t337/closure/trap_calls.txt
+  - build/agent213/t337/closure/gate_mac.log
+  - build/agent213/t337/closure/control_modes_mac.log
+  - build/agent213/t337/closure/pilot_t213r1_tmp_hygiene.log
+  - build/agent213/t337/closure/pilot_retrace.sh
+  - build/agent213/t337/closure/pilot_state.txt
+  - build/agent213/t337/closure/pilot_overlap.txt
+  - build/agent213/t337/closure/pilot_classes.tsv
+  - DECISIONS_HISTORY.md.lines-9030-9045 (lines 9030-9045 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-30 (14z-212) — #333: EXIT-trap order is stated as a limit, its measures best-effort")

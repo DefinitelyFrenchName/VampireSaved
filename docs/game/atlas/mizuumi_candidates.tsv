@@ -1,0 +1,118 @@
+# docs/game/atlas/mizuumi_candidates.tsv — #118: the mizuumi community's player-struct candidates (the 89 offsets of
+# 14z-189's working list) against docs/game/atlas/ram.md. offset and batch are MAINTAINED; name, verdict and evidence
+# are DERIVED from ram.md by tools/mizuumi_candidates.py (`write`; its docstring holds the rules) and held to it by
+# tests/test_mizuumi_candidates.sh — never hand-edited. Seeded 14z-213 (ruled 2026-10-30: "Re-derive, beside atlas").
+# The community text stays outside the tree: a name here is only what ram.md itself quotes.
+#
+# columns: offset	name	verdict	evidence	batch
+#   offset    the byte offset in the player block (P1 RAM:$FF8400, P2 RAM:$FF8800), +0xNNN as ram.md writes it
+#   name      the community name exactly as ram.md quotes it (`mizuumi's "..."`), "-" when ram.md quotes none
+#   verdict   one of the vocabulary below
+#   evidence  the ram.md row the verdict rests on; every tests/*.sh gate it cites with check ids; "ungated per
+#             ram.md" when it says "not yet gated"; the PRG: addresses it cites (no counts: ram.md gives none per PC)
+#   batch     the remaining measurement that would move the verdict (B-numbered rig batches, "static
+#             decode"); "-" = no source assigns one (not "nothing left to learn"); UNDECIDED = no rule could
+#
+# verdicts:
+#   CONSISTENT       ram.md: "consistent with mizuumi's ..." — measured behaviour agrees; adopted only as
+#                    "consistent with", never as the definition
+#   OWNER ONLY       ram.md: "consistent with mizuumi's ... as to OWNER only" — the named character's own
+#                    code writes the slot; the meaning itself not tested
+#   CROSS-CHECKED    ram.md maps the community name onto a byte of one of its own (range) rows
+#   COVERED          a ram.md RANGE row documents the byte under its own meaning; the name not compared
+#   NOT OBSERVED     ram.md: "mizuumi's ... not observed" — the named owner never wrote it, or wrote only 0
+#   NOT ADOPTED      ram.md: "RECORDED; mizuumi's ... NOT adopted" — behaviour recorded, name not established
+#   REFUTED IN PART  ram.md refutes part of the community text and finds the rest consistent
+#   REFUTED          ram.md: the name REFUTED by measurement
+#   NO ROW           ram.md has no row owning or covering the offset — still unmeasured
+#   UNDECIDED        a row exists but no rule decides it (never guessed)
+offset	name	verdict	evidence	batch
++0x34	Character Specific Ram slot. Things like Lilith Dark Force Flag, MO Throw Direction Indicator, MO Jet	OWNER ONLY	row "+0x34.b"; ungated per ram.md	-
++0x35	Character Specific Ram slot. Things like MO Jet Dash Indicator, DI Hit Indicator	OWNER ONLY	row "+0x35.b"; ungated per ram.md	-
++0x36	WORD previous X Location for scenarios that need it. Select pursuits, MO DF Needle Clone, Etc.	NOT ADOPTED	row "+0x36.w"; ungated per ram.md	-
++0x4A	-	COVERED	row "+0x48.l / +0x4C.l"	-
++0x4B	-	COVERED	row "+0x48.l / +0x4C.l"	-
++0x6D	Received Hit Flag	CROSS-CHECKED	row "+0x6C..+0x6F (4 × .b)"; gate tests/test_rehit_ring.sh; gate tests/audit_mizuumi_struct.sh; PRG:0x018064,PRG:0x0180C2,PRG:0x0180D0,PRG:0x01827C,PRG:0x022268	-
++0x95	-	COVERED	row "+0x94..0x97"	-
++0x96	-	COVERED	row "+0x94..0x97"	-
++0x97	-	COVERED	row "+0x94..0x97"	-
++0xA6	Anakaris Projectile - Projectile *11	NOT ADOPTED	row "+0xA6.b"; ungated per ram.md; PRG:0x03E546	-
++0xA8	Anakaris Projectile - Opponent ID	NOT ADOPTED	row "+0xA8.b"; ungated per ram.md; PRG:0x03E54E	-
++0xAA	WORD Anakaris Projectile - Color Palette	NOT ADOPTED	row "+0xAA.w"; ungated per ram.md; PRG:0x03E556	-
++0xAC	Projectiles Indicator, for activating Proxy-Block	CONSISTENT	row "+0xAC.b"; ungated per ram.md; PRG:0x03018A,PRG:0x026F1E,PRG:0x0276F8	-
++0xB2	-	NO ROW	no ram.md row	UNDECIDED
++0x101	Punch or Kick normal-attack indicator. 2 = Kicks	CONSISTENT	row "+0x101.b"; gate tests/audit_mizuumi_attack.sh A1; PRG:0x02757E,PRG:0x028ED8	-
++0x103	Towards or back + attack Indicator - Logic for throw direction	CONSISTENT	row "+0x103.b"; ungated per ram.md; PRG:0x02758C,PRG:0x026F5A	-
++0x119	Chain Flag	CONSISTENT	row "+0x119.b"; gate tests/audit_mizuumi_attack.sh A4; PRG:0x028ED0,PRG:0x028ED8	-
++0x11B	Disable Ground-Roll Flag	NOT ADOPTED	row "+0x11B.b"; ungated per ram.md; PRG:0x023BEA,PRG:0x0239CC,PRG:0x023A32,PRG:0x02568E	-
++0x11D	throw range enabled	CONSISTENT	row "+0x11D.b"; gate tests/audit_mizuumi_struct.sh; PRG:0x019272,PRG:0x019276,PRG:0x019312,PRG:0x019316	-
++0x124	button pressed value	CONSISTENT	row "+0x124.b"; gate tests/audit_mizuumi_inputs.sh I5; PRG:0x022114	-
++0x125	direction pressed value	CONSISTENT	row "+0x125.b"; gate tests/audit_mizuumi_inputs.sh I10	-
++0x127	Mash to Escape - Direction Indicator	CONSISTENT	row "+0x127.b"; gate tests/audit_mizuumi_inputs.sh I4; PRG:0x0221B4,PRG:0x029930	-
++0x12B	direction pressed value	CONSISTENT	row "+0x12B.b"; gate tests/audit_mizuumi_inputs.sh I2; PRG:0x029F68,PRG:0x029F4A,PRG:0x02A610	-
++0x12C	button pressed value	CONSISTENT	row "+0x12C.b"; gate tests/audit_mizuumi_inputs.sh I3	-
++0x12D	direction pressed value	CONSISTENT	row "+0x12D.b"; gate tests/audit_mizuumi_inputs.sh I3	-
++0x130	X Distance from Opponent	NOT ADOPTED	row "+0x130.w"; gate tests/audit_mizuumi_struct.sh; PRG:0x02221C,PRG:0x022262	-
++0x136	Flag to unlock the camera for specific moves, like MO K-Throw	CONSISTENT	row "+0x136.b"; ungated per ram.md; PRG:0x03B37A,PRG:0x051194,PRG:0x0373BC,PRG:0x04ECD8,PRG:0x04ED84	-
++0x146	Poison Gas Timer	NOT ADOPTED	row "+0x146.b"; ungated per ram.md; PRG:0x023BF0,PRG:0x0248EA,PRG:0x0239C8	-
++0x149	Projectile is active - used to limit numerous projectiles	CONSISTENT	row "+0x149.b"; ungated per ram.md; PRG:0x05475A,PRG:0x054770	-
++0x14B	Sasquatch Penguin Count, Lei-Lei Knife Super Flag & Aqua Spread Active Flag	NOT ADOPTED	row "+0x14B.b"; ungated per ram.md; PRG:0x05475A,PRG:0x054770	-
++0x14C	-	NO ROW	no ram.md row	B5 Lilith rig
++0x151	Anakaris remaining Jumps	NOT ADOPTED	row "+0x151.b"; ungated per ram.md	-
++0x152	-	NO ROW	no ram.md row	B1 Anakaris rig
++0x154	Specific Special/Super is active - used for enabling proxy-block on select attacks	CONSISTENT	row "+0x154.b"; ungated per ram.md; PRG:0x044ECC,PRG:0x046F08,PRG:0x047086,PRG:0x0472FC,PRG:0x0276E2	-
++0x156	-	NO ROW	no ram.md row	B1 Anakaris rig
++0x15A	-	REFUTED	row "+0x15A.b"; gate tests/audit_mizuumi_struct.sh; PRG:0x000D34,PRG:0x000D3A,PRG:0x000DD8,PRG:0x016E4C,PRG:0x016E4E,PRG:0x0222DA,PRG:0x026F06	-
++0x15C	WORD - Dizzy / Mash to Escape - Timer	CONSISTENT	row "+0x15C.w"; ungated per ram.md; PRG:0x029930,PRG:0x029984,PRG:0x02997E	-
++0x167	Special Move Cancel Timer (includes Kara Cancels)	CONSISTENT	row "+0x167.b"; ungated per ram.md; PRG:0x0274EC,PRG:0x027EA2,PRG:0x0BE89A,PRG:0x0224DA,PRG:0x027E8C	-
++0x168	EX Cancel Timer	CONSISTENT	row "+0x168.b"; ungated per ram.md; PRG:0x0BEC5A,PRG:0x0274F0,PRG:0x0224E4,PRG:0x0274EC,PRG:0x027E8C,PRG:0x0224DA	-
++0x169	Chain Timer	CONSISTENT	row "+0x169.b"; gate tests/audit_mizuumi_attack.sh A5; PRG:0x018262,PRG:0x023974	-
++0x18A	Pursuit & OTG Restriction Timer	NOT ADOPTED	row "+0x18A.b"; ungated per ram.md; PRG:0x027B32,PRG:0x0290B2,PRG:0x02253C	-
++0x18D	Win Pose Value	NOT ADOPTED	row "+0x18D.b"; gate tests/audit_mizuumi_struct.sh; PRG:0x027CCC,PRG:0x031206	-
++0x190	Dark Force Properties Aulbath - Sting Ray state	NOT ADOPTED	row "+0x190.b"; ungated per ram.md; PRG:0x0239C0,PRG:0x023A26,PRG:0x024B50,PRG:0x024C1C,PRG:0x023B96,PRG:0x024D4A,PRG:0x023FBC	-
++0x192	Infinite Prevention ﬂag, Chaos Flare	CONSISTENT	row "+0x192.b"; ungated per ram.md; PRG:0x0243C2	-
++0x197	Double-Jump State	NOT ADOPTED	row "+0x197.b"; ungated per ram.md; PRG:0x022A80,PRG:0x022C16	-
++0x19A	Unique Throw State Flag, set on the opponent (MO K-Throw, Etc.)	CONSISTENT	row "+0x19A.b"; ungated per ram.md; PRG:0x03B2DA,PRG:0x03B3B0	-
++0x1A0	-	NO ROW	no ram.md row	B1 Anakaris rig
++0x1A2	Dark Force Properties Gallon/Lilith/Demitri	CONSISTENT	row "+0x1A2.b"; ungated per ram.md	-
++0x1A3	Lei-Lei Pendulum count	NOT ADOPTED	row "+0x1A3.b"; ungated per ram.md	-
++0x1AA	-	NO ROW	no ram.md row	B1 Anakaris rig
++0x1B6	Attack Hit counter	CONSISTENT	row "+0x1B6.w"; gate tests/audit_mizuumi_struct.sh; PRG:0x018430	-
++0x1B8	WORD Attack Whiff counter (bp d352) counter number of total attacks	REFUTED IN PART	row "+0x1B8.w"; gate tests/audit_mizuumi_attack.sh A2/A2b/A2c; PRG:0x0274D6,PRG:0x02757E,PRG:0x028F18,PRG:0x028ED8	-
++0x1BB	Anak's special-Taunt State (START+PPP)	CONSISTENT	row "+0x1BB.b"; ungated per ram.md; PRG:0x03D912	-
++0x1BC	Anak's Air-Attacks Counter	NOT ADOPTED	row "+0x1BC.b"; ungated per ram.md	-
++0x316	-	NO ROW	no ram.md row	B7 charge-input rig
++0x354	-	NO ROW	no ram.md row	static decode
++0x360	Beast Canon/Hell Dunk/Bricks Unknown variable	OWNER ONLY	row "+0x360.b"; ungated per ram.md	-
++0x364	Beast Canon/Hell Dunk/Jet Dash Unknown variable	OWNER ONLY	row "+0x364.b"; ungated per ram.md	-
++0x366	Beast Canon/Vertical Dash Timer	NOT OBSERVED	row "+0x366.b"; ungated per ram.md; PRG:0x032E62,PRG:0x032EC0	B4 Gallon rig
++0x368	Beast Canon/Hell Dunk Unknown variable	OWNER ONLY	row "+0x368.b"; ungated per ram.md	-
++0x369	Beast Canon/Hell Dunk Unknown variable	OWNER ONLY	row "+0x369.b"; ungated per ram.md	-
++0x36A	Beast Canon Facing Direction	OWNER ONLY	row "+0x36A.b"; ungated per ram.md	-
++0x36B	Beast Canon Count	OWNER ONLY	row "+0x36B.b"; ungated per ram.md	-
++0x36C	Sasquatch Penguin Count	NOT OBSERVED	row "+0x36C.b"; ungated per ram.md	B6 Sasquatch rig
++0x36E	Pursuit Indicator	NOT ADOPTED	row "+0x36E.b"; ungated per ram.md	-
++0x370	Character Specific Ram slot -Anakaris Coffin Drop Locations, ObaaChan	OWNER ONLY	row "+0x370.b"; ungated per ram.md	-
++0x371	Character Specific Ram slot - Q-Bee +B Indicator	OWNER ONLY	row "+0x371.b"; ungated per ram.md	-
++0x372	Character Specific Ram slot - DE Dashing	CONSISTENT	row "+0x372.b"; ungated per ram.md; PRG:0x030EF4	-
++0x373	Character Specific Ram slot	NOT ADOPTED	row "+0x373.b"; ungated per ram.md	-
++0x374	Anakaris Mummy Drop Unknown Variable	NOT OBSERVED	row "+0x374.b"; ungated per ram.md	B1 Anakaris rig
++0x378	WORD - Bishamon Karame Dama Indicator	OWNER ONLY	row "+0x378.w"; ungated per ram.md	-
++0x37F	Felicia Head Ride Restriction Timer	NOT OBSERVED	row "+0x37F.b"; ungated per ram.md; PRG:0x041040	B3 Felicia rig
++0x380	Playing, No Continue-Prompt Flag	CONSISTENT	row "+0x380.b"; gate tests/audit_mizuumi_struct.sh; PRG:0x0058CC,PRG:0x00900E,PRG:0x009BF2,PRG:0x008A56,PRG:0x009B88,PRG:0x009B8C	-
++0x384	-	NO ROW	no ram.md row	static decode
++0x390	LONGWORD Player Score	CONSISTENT	row "+0x390.l"; gate tests/audit_mizuumi_struct.sh C13	-
++0x394	Button Input = RAM Values	CONSISTENT	row "+0x394.b"; gate tests/audit_mizuumi_inputs.sh I1 I6	-
++0x395	Direction Input = RAM Values	CONSISTENT	row "+0x395.b"; ungated per ram.md	-
++0x397	Direction Input = RAM Values	CONSISTENT	row "+0x397.b"; ungated per ram.md; PRG:0x014E52	-
++0x39F	Win-Streak Counter	CONSISTENT	row "+0x39F.b / +0x3F0.b"; gate tests/audit_mizuumi_struct.sh; PRG:0x00991C,PRG:0x009924,PRG:0x009920,PRG:0x009C8E	-
++0x3A8	-	NO ROW	no ram.md row	static decode + palette read
++0x3B0	Lose a bat Flag	NOT ADOPTED	row "+0x3B0.b"; gate tests/audit_mizuumi_struct.sh C9 C14; PRG:0x00A6A0	-
++0x3B2	Auto-Guard Flag	CONSISTENT	row "+0x3B2.b"; gate tests/audit_mizuumi_struct.sh C11 C14; PRG:0x020FB6	-
++0x3B6	Deathblow Type Notification *12	NOT ADOPTED	row "+0x3B6.b"; gate tests/audit_mizuumi_struct.sh C10 C14; PRG:0x019152,PRG:0x019128	-
++0x3BE	-	NO ROW	no ram.md row	B2 finishes rig
++0x3BF	-	NO ROW	no ram.md row	B2 finishes rig
++0x3C1	CHAR-Sel = Random Flag	CONSISTENT	row "+0x3C1.b"; ungated per ram.md; PRG:0x020AA0,PRG:0x020A94	-
++0x3E1	Character Palette	CONSISTENT	row "+0x3E1.b"; gate tests/audit_mizuumi_struct.sh C12 C12b C14; PRG:0x02101A	-
++0x3E2	Auto-Guard Flag	CONSISTENT	row "+0x3E2.b"; gate tests/audit_mizuumi_struct.sh C11 C14; PRG:0x020FBA	-
++0x3F0	Win-Streak Counter	CONSISTENT	row "+0x39F.b / +0x3F0.b"; gate tests/audit_mizuumi_struct.sh; PRG:0x00991C,PRG:0x009924,PRG:0x009920,PRG:0x009C8E	-
