@@ -1,0 +1,59 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent213/t338/closure/awaiting_comment.md	db961fcb51dfafcabdfdfe04c9d52756af9f02ac
+build/agent213/t338/closure/ticket_row_338.tsv	eb6279f0f347db6f912eef3c62aaded8a8edcbbc
+build/agent213/t338/closure/issue_338.md	263e7d5e8adb66d138b32f91e092161b493910df
+build/agent213/t338/closure/ledger_rows.txt	6608235448760b20d810faa96861fcd9464f1eab
+build/agent213/t338/closure/change.diff	eca1a9583efe0e00cb31d0a0a90efdd8e545713f
+build/agent213/t338/closure/records.diff	48108edc334cab2670b29551b0aabb22cc81acf4
+build/agent213/t338/closure/blobs.txt	3978ae37c16d1f36c907b6accf90431fc6c0fc30
+build/agent213/t338/closure/gate_mac.log	732fe55da4dbd3327532d58bf7b4bbf301a5a76e
+build/agent213/t338/closure/control_modes_mac.txt	e6473c628daa36286ef64023d278c87a68652cdd
+build/agent213/t338/closure/mode_missing-credits.log	1cc441c5cdb159d3388af7182a731775a4eca346
+build/agent213/t338/closure/mode_full-size-tile.log	ba64f5b6d3c77981fddd99566812472197e1ed53
+build/agent213/t338/closure/mode_log-shipped.log	cca87a27bbe29e1c43b9b81f63614382a8c97d94
+build/agent213/t338/closure/mode_local-path.log	979d97a5f555b37d570f10e271cb625ebe3a3679
+build/agent213/t338/closure/mode_unreduced-clip.log	e9f59ba42090a29b5fdab335e6080d877c4c4605
+build/agent213/t338/closure/mode_inline-style.log	8d50b29caa97547094528afc76a2cef873c70e04
+build/agent213/t338/closure/mode_style-attribute.log	b241c0733ca3d0e2310687e06eaaa9391b68196c
+build/agent213/t338/closure/mode_inline-script.log	e8521d9dc6ac0a6b545c396c14a1b6c2d1360e3c
+build/agent213/t338/closure/mode_event-handler.log	5e70b7443791662da4dc03d66b807551c1aef620
+build/agent213/t338/closure/mode_missing-stylesheet.log	de5e9e109d82099fe1e834503352ed2b2250f192
+build/agent213/t338/closure/mode_builds-sentence.log	cb96e787e65f51422f2ce32717298a3d78beabeb
+build/agent213/t338/closure/old_scrub_on_fixture.txt	8bdafaee11c23a18ddf3a3250f49c251f74fe01f
+build/agent213/t338/closure/judged_old_tool.txt	8ed890322a6bf3f5910a7b617a9711eab04a97ba
+build/agent213/t338/closure/test_proof_sheets_mac.log	63f477a5b2ff2f8f18f987fb35d316d2a7308956
+build/agent213/t338/closure/trial2.sh	28d8bcaf9d329daa84c4d41eb46dab429656ae0d
+build/agent213/t338/closure/trial2.log	128d138f76d47cce17ff4e553b2c7d9a1178746d
+build/agent213/t338/closure/trial2_d84a7eb1.log	1a32d4f0b16e464f3225a5cf6b5a9bb743cb7939
+build/agent213/t338/closure/indep_web.py	08f4ab00001ba3bbe612ac32f8e04573c19e4d6e
+build/agent213/t338/closure/indep_web_final.txt	c00b32f308bc39323d14bb05f8786accc8408157
+build/agent213/t338/closure/indep_builds.py	f9ec5af6406673231ad106f7f7a29e2f2f29e1dc
+build/agent213/t338/closure/indep_builds.txt	3db00d7058a5cb43995299a412dfa8e34bcd20f2
+build/agent213/t338/closure/indep_builds_control.txt	7c58b377bfb5c82c86ba8c5178d906413030d495
+build/agent213/t338/closure/captions_check.txt	a68d7baab4594f7aac62c72f3ea9ae9a9e9721da
+build/agent213/t338/closure/web2_sizes.txt	65d175110fbdcbcf071dd721eaf0036c4c8b3cd1
+build/agent213/t338/closure/csp_render.sh	49fb1757083ab8169e333f253be686424c25f68a
+build/agent213/t338/closure/csp_render.txt	a3b56ae970222a0f054ab6b626a68dd682a2fac3
+build/agent213/t338/closure/csp_web2.index.html.png	803849da64417e6f287a27b8ce55c081163b5006
+build/agent213/t338/closure/csp_render_control.txt	317e09994a7c6af366ab9d885b0cca8d5917f38b
+build/agent213/t338/closure/csp_render_all.sh	0579be232144d3c9283dce2d8a0174129fc55e9b
+build/agent213/t338/closure/csp_render_all.txt	86b20e2f06499a6b6aea542b9da7591d0d79089c
+build/agent213/t338/closure/csp_render_all_control.txt	f48d764abc30afdb90eee6b8f3f92fd8f3f31a21
+build/agent213/t338/closure/draws_equal.py	272485b281112902b4a8e8837d2904051ca0bd2f
+build/agent213/t338/closure/draws_equal.txt	162b210fc69e465905407e3d1e0e03c610dd91f1
+build/agent213/t338/closure/draws_equal_control.txt	22a49f983a83590593adabd29711dc9e75565523
+build/agent213/t338/closure/render_compare.txt	156e0a4ed418efa6e75a0aadb97d237180e12164
+build/agent213/t338/closure/titles_READING.md	e08d612469240d84e9e4624b1cc41deb5fc375c8
+build/agent213/t338/closure/titles_copyrights.png	961644af2f6ae451e3c9086752aa3bc356559672
+build/agent213/t338/closure/index.html.png	966f649415eeb07b15e205eef523d631d19c5d52
+build/agent213/t338/closure/g_audit_landing_sound.html.png	2999464f7af5158fac337c4ddca1fc655a12cfa8
+build/agent213/t338/closure/footer_index.png	4bb6c20fe920375cccb0bd3a8b3f5d9c513ef2d4
+build/agent213/t338/closure/footer_gate.png	7af9925f125a349f70d356a4398616e88dcc207e
+build/agent213/t338/closure/shots3_bottoms.txt	6d0685ebf89929784aada8bb0ead4a672ab4c2b5
+DECISIONS_HISTORY.md.lines-9086-9102 (lines 9086-9102 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-30 (14z-212) — the proof sheets get a web build for the community: half-size WebP, ")	f40949bb86bc28250ccad3792d2aa12bc34626c5
+DECISIONS_HISTORY.md.lines-9114-9120 (lines 9114-9120 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-30 (14z-213) — #338: the clips are kept, reduced and described; the web build goes ")	0e546f2b29f99d9a1b0e8687fbe479a3bd19247c
+DECISIONS_HISTORY.md.lines-9163-9169 (lines 9163-9169 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-30 (14z-213) — #335's dashboard sections and #338's web pages accepted on their loo")	99891c091721e67f9d01bbb32832139a7d0c3d8a
+DECISIONS_HISTORY.md.lines-9177-9182 (lines 9177-9182 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-30 (14z-213) — #338: the re-shot web pages accepted")	0a9eddebf7e0d165daeafc50b040e10014c4be86
+DECISIONS_HISTORY.md.lines-9184-9189 (lines 9184-9189 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-30 (14z-213) — #338: the credits footers accepted; a sound clip's caption no longer")	a5924f8787c885bb7ca079007e2dd461418dc3cf
+DECISIONS_HISTORY.md.lines-9191-9197 (lines 9191-9197 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-30 (14z-213) — #338: the web intro's JUDGED FILE line names sound clips too")	e8160fa57bf528b3309ecdb0797a36c4e4dc582f
+DECISIONS_HISTORY.md.lines-9199-9206 (lines 9199-9206 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-30 (14z-213) — #338: the web intro counts its builds from the run")	0b44503ca06eb1134478bab01a99c5dfdd1219d8

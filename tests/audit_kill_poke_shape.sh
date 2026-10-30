@@ -138,7 +138,7 @@ case "$A" in
 STALL*|UNRESOLVED*) echo "  ok: the 2-byte shape manufactures the unjudgeable state (frozen)"
    vs_ctl_fired two-byte-flowed "the 2-byte shape STALLS ($A) because the judge reads white's sign; the mode forces FLOWED and the gate FAILs" ;;
 NO-KO) echo "FAIL: 2-byte leg produced no KO — the rig did not make the event"; fail=1 ;;
-*) echo "CONTROL DEAD: two-byte-flowed — the 2-byte leg FLOWED ($A), so the judge no longer reads white's sign alone"
+*) [ -z "$MODE" ] && echo "CONTROL DEAD: two-byte-flowed — the 2-byte leg FLOWED ($A), so the judge no longer reads white's sign alone"   # in its mode the FLOWED is forced: the gate's FAIL below is the control honoured (#310 rule 1)
    echo "FAIL: the 2-byte leg FLOWED ($A) — the judge no longer reads white's"
    echo "      sign alone; engine_internals \"THE ROUND JUDGE\" needs re-derivation"
    fail=1 ;;

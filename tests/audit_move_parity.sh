@@ -586,6 +586,12 @@ fi
 
 
 echo "== 3. must-fire controls"
+# NOT UNDER A MODE (#310 rule 1, 14z-213): a mode perturbs EVERY verdict_for comparison, these in-gate controls among
+# them, so they cannot discriminate and printed their own CONTROL DEAD (ERIS, build/emu_e213c: four modes read LIES);
+# every mode FAILs in section 2 or 2b, which is that run's verdict.
+if [ -n "$CONTROL" ]; then
+    echo "  not run under CONTROL=$CONTROL: the mode perturbs every comparison, so section 2 is this run's verdict"
+else
 CTL="$(echo $SET | awk '{print $1}')"
 ct="${CTL%_*}"; cp="${CTL##*_}"
 
@@ -701,5 +707,6 @@ if [ "$base" -gt 0 ] && [ "$up" -lt "$base" ]; then
 else
     echo "CONTROL DEAD: unpinned-level — $CTL still reads $up IDENT events with the native leg at its default play mode ($base pinned)"; fail=1
 fi
+fi   # NOT UNDER A MODE
 
 if [ "$fail" = 0 ]; then echo "PASS: audit_move_parity"; else echo "FAIL: audit_move_parity"; exit 1; fi

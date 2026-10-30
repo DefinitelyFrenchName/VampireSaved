@@ -1,0 +1,1 @@
+WITHDRAWN 2026-10-30 (14z-213), never spawned: the claim said the maintainer's footer look was at an '8c0b18a2-era' draw; the footers sent were shot from the d84a7eb1 draw, before the caption fix. Corrected and re-prepared as the next run.

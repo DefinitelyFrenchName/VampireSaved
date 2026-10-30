@@ -621,7 +621,8 @@ def prove(at, lg, cap, sheet_dir):
     """-> (status, why). status: PROVEN | NOT THE JUDGED RUN | JUDGED FILE | UNPROVEN."""
     fr, basis, exp = at["frame"], at["basis"], at["expect"]
     if basis == "file":
-        return "JUDGED FILE", "the picture the gate itself compared (%s)" % exp
+        what = "recording" if exp.lower().endswith(".wav") else "picture"   # a tap gate's clip is a sound file (#338)
+        return "JUDGED FILE", "the %s the gate itself compared (%s)" % (what, exp)
     if basis == "none":
         return "UNPROVEN", "the gate logged nothing that can prove this picture"
     if fr not in cap["S"]:
@@ -1054,7 +1055,7 @@ STATUS_LEGEND = [
                "log, a checksum, or the RAM fields it compared — this picture is of the run the gate judged"),
     ("EVENT-PROVEN", "the re-run, under the gate's own tap instrument, logged exactly the event lines the gate logged in "
                      "the window around this frame; weaker than PROVEN: work RAM outside the tapped addresses is not proven"),
-    ("JUDGED FILE", "the picture the gate itself compared (a frozen golden), shown as it is"),
+    ("JUDGED FILE", "the file the gate itself compared (a frozen golden picture, or a sound clip), shown as it is"),
     ("UNPROVEN", "the gate logged nothing that can prove this picture; shown, never claimed"),
     ("NOT THE JUDGED RUN", "the re-run differs from what the gate judged at this frame (or ran on a build that is not "
                            "the commit's): the picture is NOT evidence; red dashed border"),
@@ -1249,9 +1250,12 @@ def sheet_html(gid, s, pics):
     return "".join(out), n
 
 
-def page_doc(title, meta, body, css_extra=""):
+def page_doc(title, meta, body, css_href=None):
+    """one page; the web build links its one stylesheet (css_href) instead of an inline <style>, which a site whose
+    Content-Security-Policy is style-src 'self' would refuse (#338, rule-checker run 2026-10-30-1429)"""
+    style = ('<link rel="stylesheet" href="%s">' % css_href) if css_href else "<style>%s</style>" % CSS
     return ('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
-            '<title>%s</title><style>%s%s</style></head><body>%s</body></html>') % (html.escape(title), CSS, css_extra, body)
+            '<title>%s</title>%s</head><body>%s</body></html>') % (html.escape(title), style, body)
 
 
 def page(out_dir, meta):
@@ -1313,7 +1317,8 @@ def page(out_dir, meta):
                     body.insert(1, '<div class="nc">No picture shows the fighters on %d sheet(s) of this test: %s</div>'
                                 % (len(mine), html.escape(", ".join(mine))))
                 body.append(WEB_FOOTER)
-            (gdir / files[i]).write_text(web_scrub(page_doc("%s — Proof Sheets" % gid, meta, "".join(body))))
+            (gdir / files[i]).write_text(web_scrub(page_doc("%s — Proof Sheets" % gid, meta, "".join(body),
+                                                            "../" + WEB_CSS if WEB is not None else None)))
     idx = ['<div class="idx"><b>By test:</b> ' + "".join('<span class="it"><a href="g/%s">%s</a>%s</span> ' % (f, html.escape(t), (" (%d parts)" % k) if k > 1 else "")
                                                        for t, f, _, k in by_test) + "</div>"]
     if by_char:
@@ -1343,7 +1348,9 @@ def page(out_dir, meta):
                 'its gate logged (#291)</div><ul class="mut">%s</ul>') % (html.escape(meta["commit"]), html.escape(meta["date"]), builds)
     body = '%s%s%s%s<h2>The gates</h2><table class="grid">%s</table>%s%s' % (
         head, "".join(top), legend_html(), "".join(idx), verdicts, "".join(rest), WEB_FOOTER if WEB is not None else "")
-    (out_dir / "index.html").write_text(web_scrub(page_doc("Proof Sheets", meta, body)))
+    (out_dir / "index.html").write_text(web_scrub(page_doc("Proof Sheets", meta, body, WEB_CSS if WEB is not None else None)))
+    if WEB is not None:
+        (out_dir / WEB_CSS).write_text(CSS)
     meta["undefined_tags"] = undefined
     return out_dir / "index.html"
 
@@ -1362,15 +1369,32 @@ WEB_CREDIT = ("Vampire Savior — The Lord of Vampire, Vampire Savior 2 — The 
 WEB_CLIP_NOTE = "short clip, down-sampled to mono %d kHz for comparison" % (WEB_CLIP_RATE // 1000)
 WEB_FOOTER = '<footer id="credits" class="mut"><hr>%s</footer>' % html.escape(WEB_CREDIT)
 WEB_LOCAL_PATH = re.compile(r"(?:/Users/|/home/|/private/|/var/folders/|/tmp/|[A-Za-z]:\\\\|(?<![\w/])build/agent\d)[^\s<>\"')]*")
-WEB_FILES = (".html", ".webp", ".wav")
+# webcheck's own detector (rule-checker runs 2026-10-30-1435, -1437), shared with no part of the scrub, so a path form the
+# scrub's pattern misses still fails the check; web_path_leak() also asks the scrub's own pattern (run -1438), so whatever
+# that pattern knows fails too, by construction rather than by sampled forms. The detector matches any
+# absolute path of two or more parts outside a URL, a ~/ path, a drive path, a session scratch dir, a path after a colon
+# too (rompath:/Users/...), while a URL's own slashes never match (each follows a slash or a word character). A
+# repo-relative name (build/m3b_merged31, tests/...) names the repository's own directory and is allowed.
+WEB_PATH_LEAK = re.compile(r"(?<![\w./~-])/[\w.@-]+(?:/[\w.@-]+)+|(?<!\w)~/|(?<!\w)[A-Za-z]:[\\/]|(?<![\w/.-])build/agent")
+WEB_FILES = (".html", ".webp", ".wav", ".css")
+
+
+def web_path_leak(text):
+    """-> the first local path in a web page's text, or None: the scrub's own pattern OR webcheck's own detector"""
+    m = WEB_LOCAL_PATH.search(text) or WEB_PATH_LEAK.search(text)
+    return m.group(0) if m else None
+WEB_CSS = "sheets.css"   # the web build's one stylesheet: no inline style or script, so a strict CSP serves the pages
+WEB_JUDGED_CLIP = re.compile(r"the picture (the gate itself compared \([^)]*\.wav\))")
 
 
 def web_scrub(text):
     """the web build's pages never carry a local path: the checkout's root becomes relative, any other absolute local
-    path becomes "(local path)"; outside the web build the text is returned as it is"""
+    path becomes "(local path)", and a judged sound clip a run drew before 14z-213 called a picture is named a recording;
+    outside the web build the text is returned as it is"""
     if WEB is None:
         return text
     text = text.replace(str(ROOT) + "/", "").replace(str(WEB["src"]) + "/", "")
+    text = WEB_JUDGED_CLIP.sub(r"the recording \1", text)   # a run drawn before 14z-213 calls a judged clip a picture
     return WEB_LOCAL_PATH.sub("(local path)", text).replace("((local path))", "(local path)")   # a path in brackets
 
 
@@ -1422,7 +1446,7 @@ def web_intro(meta):
     legend = "".join("<dt>%s</dt><dd>%s</dd>" % (html.escape(k), html.escape(v)) for k, v in (
         ("PROVEN", "the game's memory at that frame is identical to the test's record"),
         ("EVENT-PROVEN", "the events the test recorded around that frame happen again, exactly; the rest of memory isn't compared"),
-        ("JUDGED FILE", "the test compares this exact image"),
+        ("JUDGED FILE", "the test compares this exact image or sound clip"),
         ("NOT THE JUDGED RUN", "couldn't be matched to the test's own run; shown and flagged, never hidden")))
     return ('<div id="intro"><h1>Vampire Saved — the visual test ledger</h1>'
             '<div class="mut">release %s · commit <a href="%s">%s</a> · drawn %s</div>'
@@ -1432,17 +1456,32 @@ def web_intro(meta):
             "<p>This page is the human-readable side of its automated tests. Each test plays the same inputs on our build "
             "and on Capcom's original and compares them; here the original is on top and ours underneath, by test, by "
             "character or by ticket.</p><dl class=\"lg\">%s</dl>"
-            "<p>Every build matched its frozen reference. Pictures are reduced to the size shown here, and sound clips are "
+            "<p>%s Pictures are reduced to the size shown here, and sound clips are "
             "short and down-sampled. No game data is included.</p></div>") % (
                 html.escape(WEB["release"]), html.escape(WEB["commit_url"] % sha), html.escape(sha[:12]),
-                html.escape(meta["date"]), legend)
+                html.escape(meta["date"]), legend, html.escape(web_builds_sentence(meta)))
 
 
-def web_check(web_dir):
-    """-> the problems of a web build (empty when it may ship): every page carries the credits footer; only .html,
-    .webp and .wav files; every tile at most the reduced size (200x120) with the credit in its EXIF; every clip mono at
-    most WEB_CLIP_RATE with its credit chunk; no local path, no .png and no .log named in any page; the index carries
-    the intro and not the local provenance block. tests/test_proof_sheets_web.sh plants each fault."""
+def web_builds_sentence(meta):
+    """the intro's sentence on the run's builds, counted from meta["builds"] (ruled 2026-10-30, 14z-213: "Count from the
+    run"): every build registered against a frozen reference, or how many were not and which tests used them. It states
+    only what meta records: whether a build is registered, and which drawn tests name its path."""
+    builds = meta.get("builds", {})
+    unreg = sorted(k for k, v in builds.items() if not str(v).startswith("registered"))
+    if not unreg:
+        return "Every build matched its frozen reference."
+    users = sorted({g["gate"] for k in unreg for g in meta.get("gates", []) if k.split(" on ", 1)[-1] in json.dumps(g)})
+    return ("%d of the %d builds matched their frozen reference; %d had no frozen reference to match (used by %s)."
+            % (len(builds) - len(unreg), len(builds), len(unreg), ", ".join(users) or "no drawn test"))
+
+
+def web_check(web_dir, meta=None):
+    """-> the problems of a web build (empty when it may ship): every page carries the credits footer; only .html, .webp,
+    .wav and its one .css; no inline style, script or event handler (a strict CSP serves the pages); every tile at most
+    the reduced size (200x120) with the credit in its EXIF; every clip mono at most WEB_CLIP_RATE with its credit chunk;
+    no local path (web_path_leak: the scrub's pattern or webcheck's own), no .png and no .log named in any page, every relative link
+    resolving to a file inside the build; the index carries the intro and not the local provenance
+    block. tests/test_proof_sheets_web.sh plants each fault."""
     from PIL import Image
     import wave
     web_dir, out = Path(web_dir), []
@@ -1469,16 +1508,36 @@ def web_check(web_dir):
         t, rel = f.read_text(errors="replace"), f.relative_to(web_dir)
         if 'id="credits"' not in t or "(C)CAPCOM CO., LTD. 1997" not in t:
             out.append("%s: no credits footer" % rel)
-        m = WEB_LOCAL_PATH.search(t)
-        if m:
-            out.append("%s: a local path: %s" % (rel, m.group(0)[:60]))
+        leak = web_path_leak(t) or next((s for s in (str(Path.home()), str(ROOT)) if s in t), None)
+        if leak:
+            out.append("%s: a local path: %s" % (rel, leak[:60]))
         for bad in re.findall(r'(?:src|href)="([^"]+\.(?:png|log))"', t):
             out.append("%s: names %s" % (rel, bad))
+        # every relative link resolves to a file INSIDE the build, so none can reach a full-size picture: none ships, and
+        # a link out of the build to a file on the drawing machine is refused too (rule-checker runs 2026-10-30-1436, -1437)
+        root = web_dir.resolve()
+        for ref in re.findall(r'(?:src|href)="([^"#?]+)', t):
+            if re.match(r"[a-z][a-z0-9+.-]*:", ref):
+                continue
+            tgt = (f.parent / ref).resolve()
+            if root not in tgt.parents:
+                out.append("%s: links %s, outside the build" % (rel, ref))
+            elif not tgt.is_file():
+                out.append("%s: links %s, which the build does not hold" % (rel, ref))
+        for what, rx in (("an inline <style>", r"<style\b"), ("a style= attribute", r"\sstyle\s*="),
+                         ("a <script>", r"<script\b"), ("an inline event handler", r"\son[a-z]+\s*=")):
+            if re.search(rx, t, re.I):
+                out.append("%s: %s (a strict Content-Security-Policy refuses it)" % (rel, what))
+        for css in re.findall(r'<link rel="stylesheet" href="([^"]+)"', t):
+            if not (f.parent / css).is_file():
+                out.append("%s: its stylesheet %s does not exist" % (rel, css))
     idx = (web_dir / "index.html").read_text(errors="replace") if (web_dir / "index.html").exists() else ""
     if idx and 'id="intro"' not in idx:
         out.append("index.html: no plain-language intro")
     if "built in a clean checkout" in idx:
         out.append("index.html: carries the local provenance block")
+    if meta is not None and idx and html.escape(web_builds_sentence(meta)) not in idx:
+        out.append("index.html: its builds sentence does not match the run (%s)" % web_builds_sentence(meta))
     return out
 
 
@@ -1491,7 +1550,7 @@ def cmd_web(a):
     WEB = {"src": src, "release": a.release, "commit_url": a.commit_url}
     dst.mkdir(parents=True, exist_ok=True)
     page(dst, meta)
-    probs = web_check(dst)
+    probs = web_check(dst, meta)
     for p in probs:
         print("WEB-PROBLEM %s" % p)
     print("%s %s: %d pages, %d tiles, %d clips, %d problem(s)" % ("WROTE" if not probs else "FAIL:", dst / "index.html",
@@ -1500,7 +1559,7 @@ def cmd_web(a):
 
 
 def cmd_webcheck(a):
-    probs = web_check(a.dir)
+    probs = web_check(a.dir, json.loads((Path(a.run) / "meta.json").read_text()) if a.run else None)
     for p in probs:
         print("WEB-PROBLEM %s" % p)
     print("%s: %d problem(s) in %s" % ("PASS" if not probs else "FAIL", len(probs), a.dir))
@@ -2128,6 +2187,7 @@ def main(argv):
                    help="the commit link, %%s = the full sha")
     wc = sub.add_parser("webcheck", help="#338: the problems of a web build (exit 1 on any)")
     wc.add_argument("dir")
+    wc.add_argument("--run", help="the local run the build was drawn from: its builds sentence is checked against it")
     c = sub.add_parser("census")
     c.add_argument("--tests", default=str(ROOT / "tests"))
     c.add_argument("--registry", default=str(ROOT / "tests/ci_emulator.tsv"))

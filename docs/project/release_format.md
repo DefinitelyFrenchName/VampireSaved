@@ -437,13 +437,19 @@ tools/publish_sheets.sh build/sheets_web/<tag>        # webcheck, then <DEPLOY_T
 ```
 
 What `web` does: every picture halved by Lanczos into WebP quality 85 with the © line in its EXIF, unlinked; every sound
-clip mixed to mono at 24 kHz with a credit chunk and a "short, down-sampled" caption; a credits footer on every page (each
-game's `(C)CAPCOM CO., LTD. 1997 ALL RIGHTS RESERVED.` as its own title screen shows it, read 14z-213 —
-build/agent213/t338/titles/READING.md, local); the index's provenance block replaced by the plain-language intro; the
-"no picture shows the fighters" list moved onto each gate's page; every local path scrubbed. `webcheck` refuses a build
-with any full-size picture, unreduced clip, page without credits, log, PNG or local path, and `publish_sheets.sh` runs it
-first. Gate: `tests/test_proof_sheets_web.sh` (ondemand, with the sheet gates). Measured 14z-213 on 14z-207's full run
-(23,183 tiles, 152 clips): 1 min 41 s to draw; tiles 223 MB, clips 34 MB, pages 9 MB (306 MB on disk). It is hosted on
+clip mixed to mono at 24 kHz with a credit chunk and a "short, down-sampled" caption; a credits footer on every page
+(each game's `(C)CAPCOM CO., LTD. 1997 ALL RIGHTS RESERVED.` as its own title screen shows it, read 14z-213 —
+build/agent213/t338/titles/READING.md, local); the index's provenance block replaced by the plain-language intro, whose
+sentence on the builds is counted from the run (how many matched a frozen reference, which tests used the rest; `web`
+and `webcheck --run <run>` check it); the "no picture shows the fighters" list moved onto each gate's page; every absolute
+or session-scratch path scrubbed (a repo-relative name such as `build/m3b_merged31` stays: it names the repository's own
+directory); the CSS in one `sheets.css` that every page links, with no inline style or script, so the site's
+`style-src 'self'` policy serves it. `webcheck` refuses a build with any full-size picture, unreduced clip, page without
+credits, log, PNG or local path (by the scrub's own pattern and, beside it, a detector of its own, so a form that
+pattern misses still fails), or a relative link to anything but a file inside the build (so no page reaches a
+full-size picture), and `publish_sheets.sh` runs it first. Gate: `tests/test_proof_sheets_web.sh`
+(ondemand, with the sheet gates). Measured 14z-213 on 14z-207's full run (23,183 tiles, 152 clips): about 1 min 40 s to
+draw (1 min 39.0 s and 1 min 42.5 s on two runs); tiles 223 MB, clips 34 MB, pages 9 MB (306 MB on disk). It is hosted on
 the maintainer's own site, as the #338 design ruled (GitHub Pages' 1 GB limit and the artifact limits judged too small).
 
 ## Where a release's history is

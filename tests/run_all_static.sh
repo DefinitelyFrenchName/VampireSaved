@@ -683,11 +683,13 @@ import glob, os, re, sys
 # cleanhost_libs.py (14z-195, #226) runs the RELEASE emulators' PLAY.command inside a clean
 # container: the same class again (14z-196: without it audit_release_linux_cleanhost read as
 # emulator-free here and as a DEAD ROW in run_all_emulator.sh, and test_bbh_fidelity went red).
+# tests/ci_emulator.tsv (14z-213): audit_pool_drop (14z-212, #334) runs the emulator registry's own gates and named no
+# wrapper, so it read the same way, and every strict emulator run was NOT GREEN on that dead row.
 EMU = re.compile(r'run_(replay_)?(mame|fbneo)\.sh|run_replay_guarded\.sh'
                  r'|MAME_BIN|FBNEO_BIN|autoboot_script|emu/fbneo/fbneo'
                  r'|run_battery|run_sim_jtcps2\.sh'
                  r'|run_inp_probe\.sh|run_inp_guarded\.sh'
-                 r'|desktop_session_play\.py|cleanhost_libs\.py')
+                 r'|desktop_session_play\.py|cleanhost_libs\.py|tests/ci_emulator\.tsv')
 SRC = re.compile(r'^\s*\.\s+"?\$(?:REPO|\{REPO\})"?/(tests/lib/[a-z0-9_]+\.sh)',
                  re.M)
 

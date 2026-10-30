@@ -11,14 +11,15 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**339 tickets** — status: open 4 · parked 8 · done 295 · declined 14 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 226 · cosmetic 17 · evolution 96 · **backfill debt: 0 rows**.
+**340 tickets** — status: open 5 · parked 8 · done 295 · declined 14 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 227 · cosmetic 17 · evolution 96 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#340](https://github.com/DefinitelyFrenchName/VampireSaved/issues/340) | bug | open | Every strict emulator run read NOT GREEN: audit_pool_drop is a DEAD ROW to the runners' emulator-tier classifier | `tests/run_all_emulator.sh` · `tests/run_all_static.sh` · `tests/test_emulator_runner.sh` | none | none | none | 14z-213 |
 | [#339](https://github.com/DefinitelyFrenchName/VampireSaved/issues/339) | bug | open | The rule-checker ledger has 37 rows with session '-' (14z-187/187b/188); both ledger pages drop them without saying so | `tests/rulecheck/ledger.tsv` | none | none | none | 14z-213 |
-| [#338](https://github.com/DefinitelyFrenchName/VampireSaved/issues/338) | evolution | open | Proof sheets: a web build for the community — half-size WebP tiles, credits on every page, a plain-language intro, no local paths | `tools/proof_sheets.py` | `DECISIONS_HISTORY.md § the proof sheets get a web build for the community` | none | none | 14z-212 |
+| [#338](https://github.com/DefinitelyFrenchName/VampireSaved/issues/338) | evolution | open | Proof sheets: a web build for the community — half-size WebP tiles, credits on every page, a plain-language intro, no local paths | `tools/proof_sheets.py` | `DECISIONS_HISTORY.md § the proof sheets get a web build for the community` | none | none | 14z-212,14z-213 |
 | [#310](https://github.com/DefinitelyFrenchName/VampireSaved/issues/310) | bug | open | An executed control whose mode run FAILs without judging anything reads HONOURED | `tests/lib/classify.sh` · `tests/test_applier_page_browser.sh` | none | none | none | 14z-206 |
 | [#294](https://github.com/DefinitelyFrenchName/VampireSaved/issues/294) | cosmetic | parked | Killshread's shock/electrocuted aura is red instead of yellow (accepted tradeoff, parked) | none | `DECISIONS_HISTORY.md § Ruled 2026-10-18 (14z-205) — #294` | none | none | - |
 | [#162](https://github.com/DefinitelyFrenchName/VampireSaved/issues/162) | cosmetic | parked | The deity above Donovan flashes orange as the Killshread Lightning column ends — an extra palette-sequence upload of row 11 native does not make | `tests/audit_column_flash.sh` | `DECISIONS_HISTORY.md § the orange flash on the column's deity is a cosmetic ticket` · `DECISIONS_HISTORY.md § Ruled 2026-09-20 (14z-171) — #162 is parked, not closed` · `DECISIONS_HISTORY.md § Ruled 2026-10-04 (14z-190) — #162: the column flash stays parked` | `docs/game/engine_internals.md § Port note — Donovan's Killshread Lightning column` | `docs/platform/gotchas.md § PAID AGAIN 14z-170` | 14z-170,14z-171,14z-189,14z-190 |

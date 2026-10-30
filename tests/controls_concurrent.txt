@@ -40,6 +40,7 @@
 # TRACES: pilot:fddb78a8 = PILOT, 14z-213 (#310: classifier rules 1-4; test_bundle_parsers' leftover check and in-gate controls, test_defense_rows_census' shell-row move): test_bundle_parsers and test_defense_rows_census, 5 control runs, SAFE, every run HONOURED under the new rules; both gates PASSed there first, on dash (local evidence build/agent213/t310/pilot/)
 # TRACES: pilot:25ac580e = PILOT, 14z-213 (#310: test_static_runner section 12d read under classifier rules 1-4): test_static_runner, 26 control runs, SAFE, every run HONOURED; the gate PASSed there first, on dash (local evidence build/agent213/t310/pilot/t213r7_static)
 # TRACES: pilot:b3544de0 = PILOT, 14z-213 (#335 after rule-checker runs 2026-10-30-1413 to -1421: five controls for the action figures): test_session_metrics, 12 control runs, SAFE, every run HONOURED; the gate PASSed there first, on dash (local evidence build/agent213/t335/pilot/t213r8_static)
+# TRACES: pilot:7172e62d = PILOT, 14z-213 (#340): test_emulator_runner after §3 gained the registry-reading gate case (both sides), on a fresh clone of the working tree (a commit-tree on 0a1b9233), 17 control runs, 1,148 s, SAFE (local evidence build/agent213/t310/pilot_r11/).
 audit_capture_matrix	30719e3e5a1f9d826f990e29638f4ecd0cd550eb	pilot:bd004554	2 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 audit_mister_map_fit	1a2aa94645e31f6c4ee1149948548796d6037043	pilot:bd004554	3 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_agent_defs	eefa59f4871955050c11a3d6502412f84b50d5e5	pilot:eb6606fd	7 controls write-traced 14z-210 (fork R, #321): none writes a path a sibling writes or reads
@@ -72,7 +73,7 @@ test_doc_anchor_census	5a11fc1bbb4f9c6465f5259ee09fe8d78064c7b0	pilot:6829e446	4
 test_docs_site	3c667923727fefa01aa3fbb8c28299aadbf0603f	pilot:6829e446	5 controls write-traced 14z-212 (#333, #334): none writes a path a sibling writes or reads
 test_docshape	75f5001bfeddcf48fb778acbbacc46a34459e39c	pilot:6829e446	15 controls write-traced 14z-212 (#333, #334): none writes a path a sibling writes or reads
 test_emu_run_compare	ceacb0bc049d1de5591bcbd200f7b1d3cf19f911	pilot:bd004554	2 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
-test_emulator_runner	a12b5be15c3913e0c6ae4acd7a495e616e1f195a	pilot:e1b87efa	17 controls write-traced 14z-212 (#334 (the harness: keyword)): none writes a path a sibling writes or reads
+test_emulator_runner	81a12e905a7ca2901503330de418c8fdbc64ce5f	pilot:7172e62d	17 controls write-traced 14z-213 (#340, the registry-reading gate case): none writes a path a sibling writes or reads
 test_entropy_tripwire	a6412432017e5fa7124633efc4bd51daf95b34bb	pilot:6829e446	2 controls write-traced 14z-212 (#333, #334): none writes a path a sibling writes or reads
 test_expectation_provenance	b5f04141b82a2e57241ca9b901e848e2e24764f9	pilot:bd004554	2 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads
 test_fbneo_boot_log	4b08e262cc64272f9f9665bd4416ca571710cd96	pilot:bd004554	3 controls write-traced 14z-208b (the freeze re-trace): none writes a path a sibling writes or reads

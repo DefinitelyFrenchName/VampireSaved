@@ -425,7 +425,7 @@ test_runner_collation
 # known verdicts (36 cases: every verdict class, the Q5 dealt and Q6 hit bases); four controls. ROM-free, ~1 s.
 test_crosscheck_229
 # test_proof_sheets_web.sh — #338 (14z-213): tools/proof_sheets.py's web build of the proof sheets on a synthetic run:
-# reduced tiles and clips, credits on every page, the intro, no local path, log or PNG; five controls. ROM-free, ~5 s.
+# reduced tiles and clips, credits on every page, the intro, no local path, log or PNG, no inline style or script; fourteen controls. ROM-free, ~5 s.
 test_proof_sheets_web
 # test_mizuumi_candidates.sh — #118 (14z-213): docs/game/atlas/mizuumi_candidates.tsv's derived columns equal what
 # docs/game/atlas/ram.md says (tools/mizuumi_candidates.py check); the verdict rules on known answers; two controls. ~1 s.

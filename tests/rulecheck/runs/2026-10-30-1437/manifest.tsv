@@ -1,0 +1,63 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent213/t338/closure/awaiting_comment.md	b5e0e2d3b3e64df8104c3ce6952d066b88834336
+build/agent213/t338/closure/ticket_row_338.tsv	eb6279f0f347db6f912eef3c62aaded8a8edcbbc
+build/agent213/t338/closure/issue_338.md	263e7d5e8adb66d138b32f91e092161b493910df
+build/agent213/t338/closure/ledger_rows.txt	82071ba900e834d55e7429edde1e8dbb0d3264b3
+build/agent213/t338/closure/change.diff	f54f91622d3a3cffd1c8638c01b3dc1b758a23bf
+build/agent213/t338/closure/records.diff	760bd4815332dbbd7fa084a73bcfd18fdee01035
+build/agent213/t338/closure/blobs.txt	4363baddcaf0c8df4b77f990fded0bdc78caca59
+build/agent213/t338/closure/gate_mac.log	52c0061159829010428cae5ac3dcc71053170f23
+build/agent213/t338/closure/control_modes_mac.txt	587269b488f83381a700aac19165966a6b621ee1
+build/agent213/t338/closure/mode_missing-credits.log	1cc441c5cdb159d3388af7182a731775a4eca346
+build/agent213/t338/closure/mode_full-size-tile.log	ba64f5b6d3c77981fddd99566812472197e1ed53
+build/agent213/t338/closure/mode_full-size-link.log	f5d849862fa199f42abf7e42d1afe4873e38b193
+build/agent213/t338/closure/mode_log-shipped.log	cca87a27bbe29e1c43b9b81f63614382a8c97d94
+build/agent213/t338/closure/mode_local-path.log	979d97a5f555b37d570f10e271cb625ebe3a3679
+build/agent213/t338/closure/mode_unscrubbed-path.log	8e065080b9dd1a1e317568a83f9d29e11f199ec7
+build/agent213/t338/closure/mode_unreduced-clip.log	e9f59ba42090a29b5fdab335e6080d877c4c4605
+build/agent213/t338/closure/mode_inline-style.log	8d50b29caa97547094528afc76a2cef873c70e04
+build/agent213/t338/closure/mode_style-attribute.log	b241c0733ca3d0e2310687e06eaaa9391b68196c
+build/agent213/t338/closure/mode_inline-script.log	1931f4ef5ac3e94b8eec8b13e37f508ef0de4d6d
+build/agent213/t338/closure/mode_event-handler.log	5e70b7443791662da4dc03d66b807551c1aef620
+build/agent213/t338/closure/mode_missing-stylesheet.log	3566f9d07cdd33248423b63984b4e547a3fb4ccb
+build/agent213/t338/closure/mode_builds-sentence.log	cb96e787e65f51422f2ce32717298a3d78beabeb
+build/agent213/t338/closure/old_scrub_on_fixture.txt	8bdafaee11c23a18ddf3a3250f49c251f74fe01f
+build/agent213/t338/closure/judged_old_tool.txt	8ed890322a6bf3f5910a7b617a9711eab04a97ba
+build/agent213/t338/closure/test_proof_sheets_mac.log	4e3c7f0649ec60b2b34b46f10a16de8d896dbd52
+build/agent213/t338/closure/trial2.sh	28d8bcaf9d329daa84c4d41eb46dab429656ae0d
+build/agent213/t338/closure/trial2.log	e393daca7dbfe450a7195a99aadffd0b51fdfbca
+build/agent213/t338/closure/trial2_d84a7eb1.log	1a32d4f0b16e464f3225a5cf6b5a9bb743cb7939
+build/agent213/t338/closure/indep_web.py	a8bad747a4d02629a75a2020340e1cef65bff145
+build/agent213/t338/closure/indep_web_final.txt	7d5bc05e07aeb63596b42f9db6d6882759f9a639
+build/agent213/t338/closure/indep_web_control.txt	8790b443cd1ff2c201f94416b112c1f5060a5166
+build/agent213/t338/closure/raw_bytes_paths.txt	e95183e6d5570d94c5f95aa013c662b2830c6a14
+build/agent213/t338/closure/indep_builds.py	f9ec5af6406673231ad106f7f7a29e2f2f29e1dc
+build/agent213/t338/closure/indep_builds.txt	d2a5bb3b763b5d236c66409bb3ae57c507dfb5b1
+build/agent213/t338/closure/indep_builds_control.txt	6052898fffef373f0f0a555c70916305a1e6db38
+build/agent213/t338/closure/captions_check.txt	f8a6a246aec2ee9e8f260b7dce3aa90ef244dafa
+build/agent213/t338/closure/web2_sizes.txt	65d175110fbdcbcf071dd721eaf0036c4c8b3cd1
+build/agent213/t338/closure/csp_render.sh	49fb1757083ab8169e333f253be686424c25f68a
+build/agent213/t338/closure/csp_render.txt	3d1b34ba6c64f96ac2e59e30b26396dd469995e2
+build/agent213/t338/closure/csp_web2.index.html.png	803849da64417e6f287a27b8ce55c081163b5006
+build/agent213/t338/closure/csp_render_control.txt	317e09994a7c6af366ab9d885b0cca8d5917f38b
+build/agent213/t338/closure/csp_render_all.sh	0579be232144d3c9283dce2d8a0174129fc55e9b
+build/agent213/t338/closure/csp_render_all.txt	7c0a22c6058bcce6aee4d26ac59b7ad02326a4c8
+build/agent213/t338/closure/csp_render_all_control.txt	f48d764abc30afdb90eee6b8f3f92fd8f3f31a21
+build/agent213/t338/closure/draws_equal.py	272485b281112902b4a8e8837d2904051ca0bd2f
+build/agent213/t338/closure/draws_equal.txt	b21eac56ae31f2214011e379675290024d37446b
+build/agent213/t338/closure/draws_equal_control.txt	8e8eb9063984d392ebfa14ec12cd813ab094cdbf
+build/agent213/t338/closure/render_compare.txt	bfafdd5d9758a10f3d3cc31e9d1995a733968473
+build/agent213/t338/closure/titles_READING.md	e08d612469240d84e9e4624b1cc41deb5fc375c8
+build/agent213/t338/closure/titles_copyrights.png	961644af2f6ae451e3c9086752aa3bc356559672
+build/agent213/t338/closure/index.html.png	966f649415eeb07b15e205eef523d631d19c5d52
+build/agent213/t338/closure/g_audit_landing_sound.html.png	2999464f7af5158fac337c4ddca1fc655a12cfa8
+build/agent213/t338/closure/footer_index.png	4bb6c20fe920375cccb0bd3a8b3f5d9c513ef2d4
+build/agent213/t338/closure/footer_gate.png	7af9925f125a349f70d356a4398616e88dcc207e
+build/agent213/t338/closure/shots3_bottoms.txt	69aa38f9206861fc7f268231d32e3575a17dc66a
+DECISIONS_HISTORY.md.lines-9086-9102 (lines 9086-9102 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-30 (14z-212) — the proof sheets get a web build for the community: half-size WebP, ")	f40949bb86bc28250ccad3792d2aa12bc34626c5
+DECISIONS_HISTORY.md.lines-9114-9120 (lines 9114-9120 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-30 (14z-213) — #338: the clips are kept, reduced and described; the web build goes ")	0e546f2b29f99d9a1b0e8687fbe479a3bd19247c
+DECISIONS_HISTORY.md.lines-9163-9169 (lines 9163-9169 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-30 (14z-213) — #335's dashboard sections and #338's web pages accepted on their loo")	99891c091721e67f9d01bbb32832139a7d0c3d8a
+DECISIONS_HISTORY.md.lines-9177-9182 (lines 9177-9182 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-30 (14z-213) — #338: the re-shot web pages accepted")	0a9eddebf7e0d165daeafc50b040e10014c4be86
+DECISIONS_HISTORY.md.lines-9184-9189 (lines 9184-9189 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-30 (14z-213) — #338: the credits footers accepted; a sound clip's caption no longer")	a5924f8787c885bb7ca079007e2dd461418dc3cf
+DECISIONS_HISTORY.md.lines-9191-9197 (lines 9191-9197 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-30 (14z-213) — #338: the web intro's JUDGED FILE line names sound clips too")	e8160fa57bf528b3309ecdb0797a36c4e4dc582f
+DECISIONS_HISTORY.md.lines-9199-9206 (lines 9199-9206 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-30 (14z-213) — #338: the web intro counts its builds from the run")	0b44503ca06eb1134478bab01a99c5dfdd1219d8

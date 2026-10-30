@@ -849,12 +849,14 @@ for line in open(reg_path):
 # The tier classifier is run_all_static.sh's, kept deliberately identical: a
 # gate is emulator-tier when it reaches an emulator wrapper, transitively
 # through tests/lib/*.sh. If the two ever disagree, a gate belongs to neither
-# runner and that is exactly the orphan class both exist to end.
+# runner and that is exactly the orphan class both exist to end. A gate that runs the emulator registry's own gates
+# (tests/ci_emulator.tsv: audit_pool_drop, 14z-212) is emulator-tier too: without it that gate read as a DEAD ROW here,
+# so every strict run was NOT GREEN, and as an emulator-free gate in neither registry there (14z-213).
 EMU = re.compile(r'run_(replay_)?(mame|fbneo)\.sh|run_replay_guarded\.sh'
                  r'|MAME_BIN|FBNEO_BIN|autoboot_script|emu/fbneo/fbneo'
                  r'|run_battery|run_sim_jtcps2\.sh'
                  r'|run_inp_probe\.sh|run_inp_guarded\.sh'
-                 r'|desktop_session_play\.py|cleanhost_libs\.py')
+                 r'|desktop_session_play\.py|cleanhost_libs\.py|tests/ci_emulator\.tsv')
 SRC = re.compile(r'^\s*\.\s+"?\$(?:REPO|\{REPO\})"?/(tests/lib/[a-z0-9_]+\.sh)', re.M)
 def uncomment(path):
     try:

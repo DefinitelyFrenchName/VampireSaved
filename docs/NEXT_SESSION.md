@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-212 CLOSE, 2026-10-30)
+# NEXT SESSION — orientation (rewritten at the 14z-213 CLOSE, 2026-10-30)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` (then `python3 tools/gen_history_index.py`
@@ -17,19 +17,21 @@ A plain **Opus 5.5 session at effort High** (the ruled orchestrator — STATE 'S
 - **Never edit a script while it runs** ([MJC-54]); the emulator runner reports a tracked file changed during its run.
 
 Say so at the opener. Never spawn any agent at `max`. A recommendation leans only on the maintainer's OWN words.
-**PILOT** (6 vCPU, 47 GB, Ubuntu 24.04, disk at 80%, 50 GB free; checked 14z-212 close) carries xdelta3, Node and
-`strace`. Its checkout `~/vampire-saved` sits at `e68f8842`. Deletable scratch, 16 GB in 72 entries: 14z-212's
-`~/t212*` (bundles, re-trace clones `~/t212_tr*`, `~/t212_trace`, `~/t212r*`) and `~/t336*` (#336's fresh clone), and
-14z-211's `~/t334`, `~/p334_knobs.*`, `~/p334_tools.*`. **ERIS** (WSL2, 5% used) runs the release shape; its scratch
-`~/e212*` and `~/e333` is deletable. Neither profile sets ROMDIR (`ROMDIR=~/roms`). Work handed to either is a bundle of a
-COMMIT (a bare commit-tree needs a temporary ref; delete it after); a remote script goes over `ssh <host> 'wsl -e bash -s'
-< script`.
+**PILOT** (6 vCPU, 47 GB, Ubuntu 24.04, 56 GB free, 77% used; checked 14z-213 close) carries xdelta3, Node and `strace`. Its
+checkout `~/vampire-saved` sits at `e68f8842`. Deletable scratch, 9.1 GB in 75 entries: 14z-213's `~/t213*` (bundles
+`t213a`..`t213j`, re-trace clones `~/t213_tr*`, logs `~/t213r*`) and `~/pilot_retrace*.sh`, `~/t213_score*.sh`. **ERIS**
+(WSL2, 922 GB free) runs the release shape; its checkout sits at the scratch commit `3117828a` (move it to `main` before
+the next run); its scratch `~/e213*` and `~/vampire-saved/build/emu_e213`, `emu_e213c` is deletable. Neither profile sets
+ROMDIR (`ROMDIR=~/roms`). Work handed to either is a bundle of a COMMIT (a bare commit-tree needs a temporary ref; delete
+it after); a remote script goes over `ssh <host> 'wsl -e bash -s' < script` (ERIS) or `ssh pilot 'bash -s' < script`,
+never as a quoted command line (Windows' shell splits it at a pipe), and a remote `pkill -f <pattern>` matches its own
+shell: kill by PID from a stdin script.
 
 **THE SESSION CLOSE:** `docs/project/session_close.md`, run by `python3 tools/close.py`. The run of record is named in
-STATE 14z-212's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
+STATE 14z-213's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
 
 **THE EMULATOR RUNNER SINCE 14z-210 (#321, `docs/project/operations.md`):**
-- **Concurrent controls:** a gate on `tests/controls_concurrent_emu.txt` (60 of 61, from a PILOT write trace) runs each
+- **Concurrent controls:** a gate on `tests/controls_concurrent_emu.txt` (from a PILOT write trace) runs each
   control as a pool job of its own; a listed gate whose script changed must be re-traced on PILOT before it stays listed
   (`tests/test_controls_concurrent.sh`), and the static list `tests/controls_concurrent.txt` the same.
 - **`--order <an earlier run>/results.tsv`** starts a pooled lane longest first.
@@ -42,6 +44,12 @@ STATE 14z-212's CLOSE section. A red tier is re-run on THE RED RUN'S results (#3
 - **ERIS's release shape:** `--scope all --strict --controls --jobs 8 --skip test_mame_parity --reuse <freeze run>
   --order <the previous release's results>`, about 2 h 12 min with TMPDIR on disk (7,947 s at `86d1ca10`). `--jobs 12`
   gains nothing.
+- **A fresh run gets a fresh `--log` directory** (14z-213, `docs/project/gotchas.md`): the runner keeps an existing
+  `results.tsv` and `commit.txt`, so a reused directory mixes the old run's rows and commit of record with the new.
+- **The registry check reads 240 of 240** since #340 (14z-213): a gate that reads `tests/ci_emulator.tsv` counts as
+  emulator-tier, so `audit_pool_drop` is no longer a DEAD ROW and a strict run can read GREEN again.
+- **A PILOT write trace of an emulator gate needs `CMDS=`** (gate, expanded registry arguments, timeout; `tools/trace_controls.sh`),
+  and the clone's build dirs that hold tracked files (`build/don_m5`) topped up with `cp -Rn`, never linked into.
 
 **THE STATIC TIER:** unchanged since 14z-209 (#312, #315, #324, #304; `tests/lib/static_pool.py`). A strict run fails on a
 file it leaves behind outside `build/`, and `build/`'s top-level directories are classed in `tests/expected/build_dirs.tsv`
@@ -50,30 +58,26 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
-1. **THE LEDGER PAGE (#267) AND THE DASHBOARD'S ACTIONS (#335): CHECK THEM LIVE, THEN CLOSE EACH ON ITS RULE-CHECKER RUN.**
-   - #267: the close's `ledger-page` push was REFUSED by the pre-push green guard (#290): the page's orphan commit is not
-     a repository tree, so no tier covers it. The maintainer: "Fix the guard next session (Recommended)" — the guard
-     skips `refs/heads/gh-pages` (or `publish_ledger.sh` pushes in a way the guard knows), with a gate control
-     (`tests/test_green_guard.sh`, and `tests/test_ledger_page.sh` pushing through the hook); nothing bypasses #290. Then
-     publish (`tools/publish_ledger.sh --push --own-site-if-set`; `DEPLOY_TARGET` was unset), ask the maintainer to
-     switch Pages on (Settings → Pages, `gh-pages`; the session account has no admin), and read the live page.
-   - **THE WORKING TREE CARRIES UNCOMMITTED RECORDS** written after the 14z-212 push: this ruling's
-     `DECISIONS_HISTORY.md` entry, this bullet, STATE 14z-212's CLOSE note, and #338's entry and ticket row. They ride this session's close.
-   - #335: this close uploaded `actions.json` to the dashboard (artifact `RVSkG4CZX44wgJaJT2vDag`) as a fifth dataset,
-     `datasets/actions`, but the dashboard's page (`index.html` in its store) has no panel reading it yet: add one (the
-     first-run OK rate per decision, the questions on first runs), check it renders, then close #335.
-2. **Clear PILOT's and ERIS's scratch** (the list above) once nothing cites it.
-3. **Ask the maintainer for the order of work.** Open tickets (GitHub severity labels):
-   - medium: none.
-   - low: #118, #310 (the UNJUDGED census; deferred, ruled "Record and defer"), #337 (the mktemp census does not check
-     EXIT-trap order; split from #333).
-   - low, filed after the push: #338 (a web build of the proof sheets for the community; the design ruled 14z-212).
-   - evolution, unlabelled: #267, #335 (item 1).
+1. **#118 — THE RIGS.** The batch plan (`build/agent213/t118/batch_plan_draft.md`, local) and its static pass S0
+   (`build/agent213/t118/s0/S0_REPORT.md`, local: leads, not facts) are done. Next: the emulator batches, B6 first (B4
+   droppable), on PILOT/ERIS, each with a capture sheet for the maintainer before any conclusion. S0 flags
+   `docs/game/atlas/character_tables.md:76` ("14 tables", 15 measured): unchecked.
+2. **The `archive/` tags** `archive/t118-196` and `archive/t118-196-struct` exist locally but not on `origin` (checked
+   14z-213 close); the hook refuses the session's tag push, so the maintainer pushes them:
+   `! git push --no-verify origin archive/t118-196 archive/t118-196-struct`.
+3. **Clear PILOT's and ERIS's scratch** (the list above) once nothing cites it, and move ERIS's checkout to `main`.
+4. **Ask the maintainer for the order of work.** Open tickets (GitHub severity labels):
+   - low: #118 (item 1), #310 (kept open 14z-213, **"Keep open (Recommended)"**: classifier rules 1-4 in and the emulator
+     tier read 222 honoured; the 14z-210 census's other shapes, deferred as "Record and defer", are its remaining work),
+     #339 (37 ledger rows with session `-` dropped by both ledger pages), #340 (found and fixed 14z-213, the fix in the close commit; close it on its rule-checker run).
+   - awaiting release: #338 (the proof sheets' web build; drawn and published at the next tagged release, which closes it;
+     its comment says so).
    - parked: #123, #124, #125, #127, #128, #129, #162, #294.
    - **Before planning any freeze or release, read each open ticket's comments for a step that runs AT it.** #333's
      closing comment names one: the 11 sites guarded after run 1366 have not yet run in a release-shape emulator tier.
-4. **The next freeze or release** runs the six #229 gates only on demand, ERIS's tier takes `--skip test_mame_parity`,
-   and the Mac runs parity (#321).
+5. **The next freeze or release** runs the six #229 gates only on demand, ERIS's tier takes `--skip test_mame_parity`,
+   and the Mac runs parity (#321); it draws the proof sheets' web build (#338, `docs/project/release_format.md` «The proof
+   sheets' web build»).
 
 ## PARKED (not open work)
 
@@ -82,29 +86,22 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
-- **A fresh clone's `build/` is not the main tree's** (`docs/project/gotchas.md`): tracked files under build dirs
-  (`hui30`, `merged1`) and `emu/jtcores` must be topped up, and a patch's mtime differs, before a clone's gate result
-  means anything.
-- **A pooled gate that globs its outputs cannot see a lost run** (`docs/project/gotchas.md`): name every leg and fail on a
-  missing one; `tests/audit_pool_drop.sh` (ondemand, `harness:`) drops each pool's first run to prove it.
-- **A shell's write-error text is its own** (`docs/platform/gotchas.md`, #336): dash says `I/O error`, bash `Broken pipe`.
-- **`git ls-files "tools/*.sh"` matches subdirectories** (its `*` matches `/`): an evidence script must list files the
-  way the instrument it checks does (#333 found two real sites this way).
-- **A new `DECISIONS_HISTORY.md` entry shifts every cited line range by one** once `tools/gen_history_index.py` adds its
-  index line: re-cite a packet's ranges after regenerating.
-- **The census is a lint over shell text** (`tools/tmp_hygiene.py`; the maintainer: "Fix these + state the limit"); a
-  form outside its known answers is untested. EXIT-trap order is checked since 14z-213 (#337: TRAPPED, an EXIT trap set
-  before a guarded site that names "$X/...").
+- **A fresh run pointed at an old `--log` directory inherits that run's rows and commit of record**
+  (`docs/project/gotchas.md`): #310's ERIS rerun still showed the LIES it was run to clear.
+- **Two readers that "share no code" can still share a pattern**: #338's independent reader once carried the tool's own
+  path regex verbatim; an independent check is written by a different method (14z-213, rule-checker run 2026-10-30-1439).
+- **A rule-checker artifact over 25,000 tokens is read in part**: `prepare` refuses it; split it (one diff per file).
+- **A control's gate can print its own `CONTROL DEAD` under its mode** when in-gate copies of the controls run on the
+  mode's perturbed data: `audit_move_parity` now skips its in-gate controls under a mode, and two gates print their main
+  check's DEAD only outside it (#310 rule 1).
 
-## WHAT CLOSED THIS SITTING (14z-212)
+## WHAT CLOSED THIS SITTING (14z-213)
 
-- **Closed `done`**, each on its rule-checker run with its closing comment: #330 (run `2026-10-29-1370`), #334
-  (`-1378`), #336 (`-1393`), #333 (`2026-10-30-1404`, after 21 earlier runs).
-- **Filed:** #336 (found and fixed), #337 (from #333's trap-order limit).
-- **Built:** #335 (the ledger's actions) and #267 (the ledger as a public page; the close's new `ledger-page` step).
-- **Ruled** (`DECISIONS_HISTORY.md`, 14z-212 entries): #333 "Finish it now", "Fix when back", "Fix all four now", "Fix both
-  forms, name (c)", "Fix these + state the limit", "Restate + name", "Guard both, name scope", "Ruling stands, fix record",
-  "Stands, use exact wording", "Keep checking, then close", "State it as a limit + ticket"; #334 "Ondemand, new 'harness:'";
-  #330 "No whiff", "Yes, it is the whiff", "Yes, it stands"; #335 "Link, else wording", "Every question", "Excluded, shown
-  apart"; #267 "Unpark #267 and build it", "gh-pages is fine", "All but your own figures", "Keep both for now", "both is
-  good", "At the close", "The close uploads it"; the deploy "Fail or ignore the deploy".
+- **Closed `done`** with their closing comments: #267 (rule-checker run `2026-10-30-1416`, OK), #335 (`-1425`, OK), #337
+  (after runs `-1406` to `-1411`, the last resolved by stating its remaining form a limit).
+- **Done, awaiting release:** #338 (run `2026-10-30-1440`, after thirteen VIOLATED runs).
+- **Filed:** #339, #340.
+- **Ruled** (`DECISIONS_HISTORY.md`, 14z-213 entries): the order; #267 the guard patch and "I switched GH pages deploy";
+  #335 "The dashboard new sections are fine"; #337 "Fix (b), state (a)"; #338 the clips, "vs-proof-sheets/", the looks,
+  "do it", the JUDGED FILE line, "Count from the run"; #118 the branches; #310 "Classifier rules 1-4", "Keep open"; the
+  close "Start the close now".

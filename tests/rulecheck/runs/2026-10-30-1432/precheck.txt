@@ -1,0 +1,14 @@
+  FLAG FIGURE: 57306
+  FLAG FIGURE: 598609
+  FLAG D-ABSOLUTE: - every picture halved by Lanczos into WebP quality 85, with the © line in its EXIF and no link to a full-size file;  [build/agent213/t338/closure/awaiting_comment.md]
+  FLAG D-ABSOLUTE: - every sound clip mixed to mono at 24 kHz, with a credit chunk and a "short, down-sampled" caption (the maintainer, 14z-213: *"Keep, reduced, add a short de...  [build/agent213/t338/closure/awaiting_comment.md]
+  FLAG D-ABSOLUTE: - a credits footer on every page, naming each game's `(C)CAPCOM CO., LTD.  [build/agent213/t338/closure/awaiting_comment.md]
+  FLAG D-ABSOLUTE: 1997 ALL RIGHTS RESERVED.` as its own title screen shows it (read off MAME captures of vsavj, vsav2 and vhunt2), plus "unofficial, not affiliated with Capcom";  [build/agent213/t338/closure/awaiting_comment.md]
+  FLAG D-ABSOLUTE: - the "no picture shows the fighters" list moved onto each gate's page;  [build/agent213/t338/closure/awaiting_comment.md]
+  FLAG D-ABSOLUTE: - every WebP 192x112, each with a CAPCOM credit in its metadata;  [build/agent213/t338/closure/awaiting_comment.md]
+  FLAG D-ABSOLUTE: - every WAV mono, 24 kHz, 16-bit, with its credit;  [build/agent213/t338/closure/awaiting_comment.md]
+  FLAG D-ABSOLUTE: - all 102 pages carrying both "CAPCOM" and "not affiliated";  [build/agent213/t338/closure/awaiting_comment.md]
+  FLAG D-ABSOLUTE: Those shots stopped above each page's credits footer, so both pages were shot whole and their footers sent: *"they do"*.  [build/agent213/t338/closure/awaiting_comment.md]
+  FLAG D-ABSOLUTE: That draw was compared with a redraw of the one the maintainer saw (the same commit's tool on the same run; the draw they saw was overwritten).  [build/agent213/t338/closure/awaiting_comment.md]
+  FLAG D-ABSOLUTE: Rendered, the gate page's top is pixel-identical to the redraw's, and the index's differs only in its two legend lines.  [build/agent213/t338/closure/awaiting_comment.md]
+packet_check: 13 flag(s): D-ABSOLUTE 11, FIGURE 2

@@ -7810,3 +7810,13 @@ close's push was refused (`refs/heads/gh-pages: green guard: REFUSED — tree a9
 (`tests/test_ledger_page.sh` now copies the real `pre-push` hook and `green_guard.py` into its publishing repo and sets `core.hooksPath`, so it FAILs on the unpatched guard); the
 guard's exception is as narrow as the thing it admits (one parentless commit of exactly the page's four plain files to
 `refs/heads/gh-pages`, three controls in `tests/test_green_guard.sh`).
+
+## A FRESH RUN POINTED AT AN OLD `--log` DIRECTORY INHERITS THAT RUN'S ROWS AND ITS COMMIT OF RECORD — #310's ERIS rerun still showed the LIES it was run to clear (paid: 14z-213, #310)
+
+`tests/run_all_emulator.sh` creates `results.tsv` only when it is missing and writes `commit.txt` only when it is missing
+(lines 334-350), and `--resume` only decides whether gates already in `results.tsv` are skipped. So a run WITHOUT
+`--resume` into a log directory an earlier run used appends its rows under the earlier run's, and keeps the earlier run's
+HEAD as the commit of record. 14z-213's #310 rerun on ERIS (the `audit_kill_poke_shape` rule-1 fix at scratch commit
+`3117828a`) reused the first run's `build/emu_e213`: its `results.tsv` held the `0a1b9233` run's LIES row for
+`audit_kill_poke_shape@two-byte-flowed` beside the new run's honoured one, and its `commit.txt` still named `0a1b9233`. **The rule:** every fresh run gets a fresh `--log` directory (`build/emu_e213c` here);
+reuse a directory only to `--resume` the run that wrote it, and read `commit.txt` before trusting a results file.

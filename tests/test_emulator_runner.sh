@@ -283,6 +283,21 @@ out3="$(run --log "$T/l3" || true)"
 printf '%s\n' "$out3" | grep >/dev/null "DEAD ROW" \
     && ok "a row whose script is gone is reported DEAD" \
     || fail "a dead registry row was not reported"
+# A gate that runs the registry's own gates and names no emulator wrapper (audit_pool_drop, 14z-212, #334) is emulator-tier:
+# it read as a DEAD ROW, so every strict run was NOT GREEN (14z-213). Both sides: with the registry named it is not dead;
+# the same stub without that line is.
+dead_lists() { printf '%s\n' "$1" | awk '/DEAD ROW/ {d = 1; next} /UNREGISTERED|^  ok|^[^ ]/ {d = 0} d' | grep -qw "$2"; }
+{ echo "#!/bin/sh"; echo 'awk -F "\t" "NR > 1" tests/ci_emulator.tsv > /dev/null'; echo "exit 0"; } > "$FR/tests/g_harness.sh"
+chmod +x "$FR/tests/g_harness.sh"
+reg "$(row g_pass mame release - '')" "$(row g_harness mame ondemand - '')"
+out3b="$(run --log "$T/l3b" || true)"
+dead_lists "$out3b" g_harness && fail "a gate that runs the registry's gates was reported as a DEAD ROW" \
+    || ok "a gate that runs the registry's gates (and names no wrapper) is emulator-tier, not a DEAD ROW"
+{ echo "#!/bin/sh"; echo "exit 0"; } > "$FR/tests/g_harness.sh"
+out3c="$(run --log "$T/l3c" || true)"
+dead_lists "$out3c" g_harness && ok "the same stub without the registry line is a DEAD ROW (the case discriminates)" \
+    || fail "the stub without the registry line was not reported DEAD: the case above proves nothing"
+rm -f "$FR/tests/g_harness.sh"
 
 echo "4. --strict makes SKIP and an unregistered gate fatal"
 reg "$(row g_pass mame release - '')" "$(row g_skip mame release - '')"

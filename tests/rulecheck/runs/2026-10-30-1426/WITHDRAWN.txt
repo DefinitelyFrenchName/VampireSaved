@@ -1,0 +1,1 @@
+WITHDRAWN 2026-10-30 (14z-213), never spawned: the comment's drawing time (1 min 43 s) was the first re-draw's; the trial it cites (trial2.log) took 1 min 39 s. The sentence was corrected and the packet re-prepared as the next run.

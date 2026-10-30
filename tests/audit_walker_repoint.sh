@@ -164,7 +164,7 @@ for s in $(echo "$OLD" | tr ',' ' '); do
         echo "  ok: vanilla $s never reached ($h hits)"
         vs_ctl_fired vanilla-walker-reached "vanilla walker $s is never reached (0 hits); the mode forces a hit and the gate FAILs"
     else
-        echo "CONTROL DEAD: vanilla-walker-reached — vanilla walker $s reached $h time(s)"
+        [ -z "$MODE" ] && echo "CONTROL DEAD: vanilla-walker-reached — vanilla walker $s reached $h time(s)"   # in its mode the hit is forced: the FAIL below is the control honoured (#310 rule 1)
         echo "  FAIL: vanilla walker $s still reached $h time(s) — a caller was"
         echo "        MISSED. Legacy stays bit-identical (it is vanilla), but a"
         echo "        tenant object dispatched there over-indexes the vanilla"
