@@ -24,14 +24,14 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | figure | count |
 |---|---|
 | distinct program-space addresses named | 3643 |
-| named by a document or manifest only | 2299 |
-| named by both a document/manifest and code | 868 |
+| named by a document or manifest only | 2298 |
+| named by both a document/manifest and code | 869 |
 | named by CODE ONLY (the gap list below) | 476 |
 | carried by atlas | 719 |
-| carried by engine_internals | 838 |
-| carried by other docs | 1062 |
+| carried by engine_internals | 839 |
+| carried by other docs | 1063 |
 | carried by manifests | 1850 |
-| carried by code | 1344 |
+| carried by code | 1345 |
 
 ## Addresses
 
@@ -1383,7 +1383,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x02938A` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) [vs2]; build/manifest/reconciliation.toml — map |
 | `PRG:0x0293A8` | docs/game/atlas/id_space.md — Which ids vanilla ever assigns (measured over the corpus); tests/audit_id_writers.sh |
 | `PRG:0x0293BE` | build/manifest/reconciliation.toml — map |
-| `PRG:0x029406` | build/manifest/reconciliation.toml — map |
+| `PRG:0x029406` | docs/game/engine_internals.md — THE THROW TECH WINDOW, AND WHEN A FIGHTER CAN ACT AGAIN AFTER A THROW (measured 14z-211, #330, on pristine vsavj); docs/project/gotchas.md — OUT OF RANGE A RANGE-CHECKED GRAB'S INPUT IS A NORMAL — a far "whiff" was not the grab's own move on 28 of 78 command whiffs (paid: 14z-211, corrected 14z-212, #330); build/manifest/reconciliation.toml — map; tools/throw_recovery_rigs.py |
 | `PRG:0x02941E` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x029422` | docs/game/engine_internals.md — Command-input / motion-tracker subsystem (session 14z-48, measured both engines) [vs2] |
 | `PRG:0x02947E` | build/manifest/reconciliation.toml — map |

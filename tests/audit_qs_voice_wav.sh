@@ -46,7 +46,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"; export REPO
 ROMDIR="${ROMDIR:?set ROMDIR}"; export ROMDIR
 WIDE_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 [ -x "$WIDE_BIN" ] || { echo "SKIP: no WIDE MAME binary"; exit 0; }
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
+W="$(mktemp -d)" || { echo "FAIL: audit_qs_voice_wav — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT
 fail() { echo "FAIL: $*"; exit 1; }
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 

@@ -49,7 +49,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 # VARIABLE (forks set their own); only made absolute, and only if it exists,
 # so a gate that means to SKIP on a missing ROMDIR still does.
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
+W="$(mktemp -d)" || { echo "FAIL: test_qs_id_table — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT
 fail() { echo "FAIL: $*"; exit 1; }
 
 python3 "$REPO/tools/audit_qs_id_table.py" "$ROMDIR/vsav.zip:vm3" \

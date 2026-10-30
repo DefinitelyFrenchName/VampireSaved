@@ -1,0 +1,86 @@
+# tests/expected/throw_recovery.tsv — the vsavj ground throws' recovery and throw tech (#330, 14z-211), FROZEN by
+# `tools/throw_recovery_rigs.py freeze`. Columns: sheet key input sig — `sig` is the first 16 hex of SHA-256 over the
+# event's full line (thrower/victim ticks thrown and teched, the controls' +0x04 there, the victim's losses). The
+# per-move numbers are NOT in the tree (the 14z-126 frame-data ruling, #319): the full lines live outside it (TR_FULL).
+AN	AN_cmd_0	236LP walk20	07f0fb7cbade0392
+AN	AN_cmd_1	236MP far	21c227a56ce71b81
+AN	AN_cmd_2	236HP far	45d366382e78d40e
+AN	AN_cmd_3	236PP walk20	98ed7956c0e88a4f
+AN	AN_cmd_4	P2 sweep ~623HK+20, P2 walk +41..+61, pursuit +62	f4e66400dfe2f23d
+AN	AN_cmd_5	P2 sweep ~623HK+20, P2 jumps toward +50	7344e4627aea64e4
+AN	AN_cmd_6	P2 sweep ~623KK+20, P2 walk +41..+61, pursuit +62	510d14b46a601c6d
+AN	AN_cmd_7	P2 sweep ~623KK+20, P2 jumps toward +50	da84959f7a2c1548
+AU	AU_cmd_1	6324 MP	6aefa2b8e69c0299
+AU	AU_cmd_2	6324 HP	e06e0c03be68fd9e
+AU	AU_cmd_3	6324PP	ab3b21db0921d334
+AU	AU_cmd_5	6324 MK	42d260540710b56c
+AU	AU_cmd_6	6324 HK	d4e5c940c0f4e98d
+AU	AU_cmd_7	6324KK	179b4048cc352ab8
+BI	BI_cmd_1	KIRISUTE GOMEN 360MP	5d03407f14b64776
+BI	BI_cmd_2	KIRISUTE GOMEN 360HP	34963d1691bc4338
+BI	BI_cmd_3	ES KIRISUTE GOMEN 360PP	ee67f1cb94691381
+BI	BI_cmd_4	ONI KUBI HINERI 632[4]PP	633309881f389b0d
+BU	BU_cmd_1	632[4] MP	72041e72db3ce18c
+BU	BU_cmd_2	632[4] HP	ac3c9899e619edc9
+BU	BU_cmd_3	632[4]PP	c4ece7a0e630e9ee
+DE	DE_cmd_1	360 MP	4c3cf1bd4ccb2d4b
+DE	DE_cmd_2	360 HP	239c6d626be0d668
+DE	DE_cmd_3	263PP	5819fd01d4a0c6de
+DE	DE_cmd_4	LP,MP,6,MK,MK	350279f62bfe1fcc
+FE	FE_cmd_1	632[4] MK	ca160214685bf67d
+FE	FE_cmd_2	632[4] HK	88fc3cfff4163194
+FE	FE_cmd_3	632[4]KK	b995401d04b386c2
+GA	GA_cmd_1	632[4] MK	5b9cf48afb0be2a4
+GA	GA_cmd_2	632[4] HK	3165026cebc5954e
+GA	GA_cmd_3	632[4]KK	68ed268efc28fc93
+JE	JE_cmd_0	214 LP	02052aa1ac5ea98d
+JE	JE_cmd_1	214 MP	d47c2ef4aeb31b41
+JE	JE_cmd_10	632[4] HK	49b0847162a596ea
+JE	JE_cmd_11	4123KK ~HK+30 far	63fb5b07d8b3ed19
+JE	JE_cmd_2	214 HP	990d156c73eeb9d0
+JE	JE_cmd_3	214PP	d412029a369c1be5
+JE	JE_cmd_4	j.632[4] LK	2a74ea3da798d006
+JE	JE_cmd_5	j.632[4] MK	f820d820c7a38378
+JE	JE_cmd_6	j.632[4] HK at16	6bc531fbc5c7914d
+JE	JE_cmd_7	j.632[4]KK	5f93cdaa9d7643c9
+JE	JE_cmd_9	632[4] MK	8568bdc0af08c311
+LE	LE_cmd_1	632[4] MP	958fb045f38686a5
+LE	LE_cmd_2	632[4] HP	7985538d9b12b8c4
+LI	LI_cmd_0	632[4] LP	06ffb61e7d4d466f
+LI	LI_cmd_1	632[4] MP	1e1a0a8169aaf965
+LI	LI_cmd_2	632[4] HP	f65ab21271d66af4
+LI	LI_cmd_3	632[4]PP	b152b931894daf34
+MO	MO_cmd_1	632[4] MP	3cefc4ea152054e6
+MO	MO_cmd_2	632[4] HP	d7c400ba49485267
+MO	MO_cmd_3	632[4]PP	a5db2c23dfd61d7e
+MO	MO_cmd_4	6,HP,MP,LP,6 far	ed8e6a7feee4b7f6
+QB	QB_cmd_0	41236LP	bea89fbf060bc88c
+QB	QB_cmd_1	41236MP	fce85f9b2da10f22
+QB	QB_cmd_10	632[4] HP	f6b0ff183a3b65fa
+QB	QB_cmd_11	632[4]PP	e2518d413d9c8f50
+QB	QB_cmd_2	41236HP	ff862a19be303760
+QB	QB_cmd_3	41236PP	46b0f424c3378542
+QB	QB_cmd_4	j.41236LP p2 jumps	2ca33507a0ca3408
+QB	QB_cmd_5	j.41236MP p2 jumps	b7489c8e64e65758
+QB	QB_cmd_6	j.41236HP p2 jumps	5082678f357c587b
+QB	QB_cmd_7	j.41236PP p2 jumps	2528c9f82d8c9f6e
+QB	QB_cmd_9	632[4] MP	b1b29ad8de739bd9
+SA	SA_cmd_0	632[4] LP	6fecbe1dfcec82c8
+SA	SA_cmd_1	632[4] MP	3fc748c31a192e5e
+SA	SA_cmd_2	632[4] HP	901deb65fdbc79b9
+SA	SA_cmd_3	632[4]PP	ac9dd02c3d55a5b7
+SA	SA_cmd_4	360 LK	aff8b0031fce55cc
+SA	SA_cmd_5	360 MK	57ce5869c8992689
+SA	SA_cmd_6	360 HK	a159c3f9c45067a1
+SA	SA_cmd_7	360KK	a83adcdf42d20a46
+SA	SA_cmd_8	control: 360 HP (a punch reaches Big Brunch)	c69c734b1de787a4
+VI	VI_cmd_0	236LK	bf62967b3930bd2d
+VI	VI_cmd_1	236HK	04a54393af9ace4d
+VI	VI_cmd_2	j.720KK on landing	8f4c63b64d0afd98
+VI	VI_cmd_3	360LP	d78f231684017298
+VI	VI_cmd_4	360MP	75178f05790f605a
+VI	VI_cmd_5	360HP	d387f0152665dbbe
+VI	VI_cmd_6	360PP	4deacc486cc8e07b
+ZA	ZA_cmd_1	632[4] MP	8296c750369b942d
+ZA	ZA_cmd_2	632[4] HP	404736fc1007e0bc
+ZA	ZA_cmd_3	632[4]PP	5fa0bbe5f45d9308

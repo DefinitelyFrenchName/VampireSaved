@@ -82,7 +82,7 @@ JOBS="${JOBS:-5}"
 RIGS=tests/replays/ground_throws
 EXP=tests/expected/ground_throws.tsv
 WB="${SHEET:-$REPO/../community/vsav-framedata.xlsx}"
-W="${OUT:-$(mktemp -d "${TMPDIR:-/tmp}/gthrow.XXXXXX")}"; mkdir -p "$W"
+W="${OUT:-$(mktemp -d "${TMPDIR:-/tmp}/gthrow.XXXXXX")}" || { echo "FAIL: audit_ground_throws — mktemp -d failed (W)"; exit 2; }; mkdir -p "$W"
 [ -n "${OUT:-}" ] || trap 'rm -rf "$W"' EXIT
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 

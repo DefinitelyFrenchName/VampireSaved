@@ -12,7 +12,7 @@
 #   offset inventory is the expectation, FBNEO_ORACLE_EXPECT=exact demands bit-identity.
 # EXPECTS: equal outside the frozen offsets; a byte inside a window but outside the
 #   inventory FAILS as GROWTH — stop and root-cause, never widen ([VSP-26]).
-# FOLLOWS: build/manifest/ emu/fbneo-patches/ emu/fbneo/ tests/expected/ tests/replays/
+# FOLLOWS: build/manifest/ emu/fbneo-patches/ emu/fbneo/ tests/expected/ tests/replays/ tests/lib/jobs.sh
 #   tools/build_fingerprint.py tools/run_replay_fbneo.sh tools/setup_fbneo.sh
 #
 # SHEET: no-picture — its legs run on FBNeo, whose harness the capture does not drive; they log full-RAM dumps, not pictures
@@ -82,7 +82,7 @@
 # expectation. 05_timeout_idle takes its slot (a long legacy replay with a
 # full timeout match). Passing 26 explicitly still runs it, and still fails.
 #
-# Usage: ROMDIR=... tests/test_fbneo_legacy_oracle.sh [build] [replays...]
+# Usage: ROMDIR=... [JOBS=N] tests/test_fbneo_legacy_oracle.sh [build] [replays...]
 #   env FBNEO_REF  optional reference (WIDE=0) fbneo binary for leg A
 # ~5 min.
 #
@@ -146,12 +146,29 @@ WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 fail=0
 
+# JOBS (#334 item 2, 14z-211): the replays' van/new leg pairs are independent — each leg writes only its own
+# $WORK/<R>_<leg>.{log,run}, its dumps beside that log and its own sandbox $WORK/sb_<R>_<leg> — so the gate runs in
+# three passes: PLAN (serial: each replay's sample frames, or the FAIL line it would print, kept in $WORK/<R>.plan
+# or <R>.planfail), RUN (both legs of every planned replay through tests/lib/jobs.sh's pool, JOBS at a time; default
+# min(4, CPUs/6)) and JUDGE (serial, in REPLAYS order, printing exactly what the serial loop printed).
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+leg_van() {  # leg_van <R> <dumps>
+    FBNEO_BIN="${FBNEO_REF:-$FB}" FBNEO_DUMPS="$2" \
+        tools/run_replay_fbneo.sh vsavj "tests/replays/$1.rpl" "$WORK/${1}_van.log" \
+        "$WORK/sb_${1}_van" > "$WORK/${1}_van.run" 2>&1 || true
+}
+leg_new() {  # leg_new <R> <dumps>
+    FBNEO_BIN="$FB" FBNEO_ROMPATH="$REPO/$BUILD/rompath" FBNEO_DUMPS="$2" \
+        tools/run_replay_fbneo.sh vsavjw "tests/replays/$1.rpl" "$WORK/${1}_new.log" \
+        "$WORK/sb_${1}_new" > "$WORK/${1}_new.run" 2>&1 || true
+}
+vs_pool_start "$JOBS"
 for R in $REPLAYS; do
     RPL="tests/replays/$R.rpl"
     SPEC="tests/expected/$SET/$R.masked"
     BASE="tests/expected/vsavj/masked-v2/logs/$R.log"
     [ -f "$RPL" ] && [ -f "$SPEC" ] && [ -f "$BASE" ] || {
-        echo "  FAIL: $R — missing replay, spec or basis log"; fail=1; continue; }
+        echo "  FAIL: $R — missing replay, spec or basis log" > "$WORK/$R.planfail"; continue; }
 
     # FRAME_OVERRIDE (14z-110b): measured-clean frames on don_m13; see header.
     case "$R" in
@@ -210,20 +227,25 @@ for frac in (0.15, 0.35, 0.55, 0.75, 0.92):
         out.append(f)
 print(" ".join(str(f) for f in out))
 PY
-)"
+)" || {  # under set -e the serial loop ended here; the JUDGE pass ends at this replay with the same status
+        echo "$?" > "$WORK/$R.planexit"; break; }
     [ -n "$FRAMES" ] && ! printf '%s' "$FRAMES" | grep >/dev/null unsafe || {
-        echo "  FAIL: $R — no safe sample frames ($FRAMES)"; fail=1; continue; }
+        echo "  FAIL: $R — no safe sample frames ($FRAMES)" > "$WORK/$R.planfail"; continue; }
 
     DUMPS=""
     for f in $FRAMES; do DUMPS="$DUMPS;$f:ff0000-ffffff"; done
     DUMPS="${DUMPS#;}"
+    printf '%s\n' "$FRAMES" > "$WORK/$R.plan"
 
-    FBNEO_BIN="${FBNEO_REF:-$FB}" FBNEO_DUMPS="$DUMPS" \
-        tools/run_replay_fbneo.sh vsavj "$RPL" "$WORK/${R}_van.log" \
-        "$WORK/sb_${R}_van" > "$WORK/${R}_van.run" 2>&1 || true
-    FBNEO_BIN="$FB" FBNEO_ROMPATH="$REPO/$BUILD/rompath" FBNEO_DUMPS="$DUMPS" \
-        tools/run_replay_fbneo.sh vsavjw "$RPL" "$WORK/${R}_new.log" \
-        "$WORK/sb_${R}_new" > "$WORK/${R}_new.run" 2>&1 || true
+    vs_pool_run leg_van "$R" "$DUMPS"
+    vs_pool_run leg_new "$R" "$DUMPS"
+done
+vs_pool_wait
+
+for R in $REPLAYS; do
+    [ -f "$WORK/$R.planexit" ] && exit "$(cat "$WORK/$R.planexit")"
+    [ -f "$WORK/$R.planfail" ] && { cat "$WORK/$R.planfail"; fail=1; continue; }
+    FRAMES="$(cat "$WORK/$R.plan")"
 
     R="$R" FRAMES="$FRAMES" MASK="$MASK" W="$WORK" \
     FBNEO_ORACLE_EXPECT="${FBNEO_ORACLE_EXPECT:-phase-ratified}" \

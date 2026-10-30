@@ -40,7 +40,7 @@ set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: test_trace_static_reads — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 
 R="$W/r"; mkdir -p "$R/tools" "$R/tests" "$R/docs" "$R/build/m1" "$R/tests/rulecheck/runs/r1"
 cp tools/static_confirm.py tools/battery_reach.py tools/build_dirs.py tests/expected/build_dirs.tsv tools/trace_static_reads.py "$R/tools/"

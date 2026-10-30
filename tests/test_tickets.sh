@@ -19,6 +19,7 @@
 #
 # MUST-FIRE: perturbed-copy: row-missing — a ticket row deleted from a copy of the index must fail (a saved issue with no row)
 # MUST-FIRE: perturbed-copy: state-disagrees — a row whose status says the opposite of the saved GitHub state must fail
+# MUST-FIRE: perturbed-copy: parked-disagrees — an open row whose status says parked where the saved issue has no parked label (or open where it has one) must fail (14z-212: #129 and #267 drifted unseen)
 # MUST-FIRE: perturbed-copy: link-unresolved — an answer linking text no line of its file contains must fail
 # MUST-FIRE: perturbed-copy: learned-in-archive — a `learned` answer pointing at STATE_HISTORY.md must fail (learnings live in live documents)
 # MUST-FIRE: perturbed-copy: debt-grows — a row carrying `?` whose issue is not in the backfill debt must fail
@@ -53,7 +54,7 @@ fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: test_tickets — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 
 FILES="docs/project/tickets.tsv docs/project/tickets_github.tsv docs/project/tickets.md tests/expected/tickets_debt.txt"
 mkcopy() {  # mkcopy <dir>
@@ -80,6 +81,8 @@ if name == "row-missing":
     del lines[first]
 elif name == "state-disagrees":
     row["status"] = "done" if state.get(row["issue"]) == "OPEN" else "open"
+elif name == "parked-disagrees":
+    row["status"] = "parked" if row["status"] == "open" else "open"
 elif name == "link-unresolved":
     row["repro"] = "STATE.md § a heading no document carries, planted by the control"
 elif name == "learned-in-archive":
@@ -102,6 +105,7 @@ PY
     case "$1" in
     row-missing)        EXPECT="has no row in" ;;
     state-disagrees)    EXPECT="on GitHub" ;;
+    parked-disagrees)   EXPECT="labelled parked on GitHub" ;;
     link-unresolved)    EXPECT="which no line of" ;;
     learned-in-archive) EXPECT="is not a live document" ;;
     debt-grows)         EXPECT="is not in the backfill debt" ;;

@@ -14,7 +14,7 @@
 # EXPECTS: 18/18 totals equal with no tolerance; the perturbed total fails. The header
 #   records two paid traps: the tap range must be even and word-aligned, and counting over a
 #   rig window measures the crouch idle.
-# FOLLOWS: emu/mame-patches/ tests/lib/controls.sh tests/lua/tap_writes.lua
+# FOLLOWS: emu/mame-patches/ tests/lib/controls.sh tests/lua/tap_writes.lua tests/lib/jobs.sh
 #   tools/cps2_decrypt.py tools/run_mame.sh tools/setup_mame.sh tools/tick_durations.py
 #   tools/vanilla_frames.py tools/vanilla_join_rig.py
 #
@@ -49,7 +49,7 @@
 #     Counting ticks over a rig window measures the crouch IDLE instead and
 #     reports ~365 for every move -- identical numbers are the tell.
 #
-# Usage: ROMDIR=... tests/test_tick_durations.sh   (~22 min, 6 MAME runs)
+# Usage: ROMDIR=... [JOBS=N] tests/test_tick_durations.sh   (~22 min, 6 MAME runs)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
@@ -80,16 +80,37 @@ open(p, "w").writelines(out)
 PY
 }
 
+# JOBS (#334 item 2, 14z-211): the six tap runs are independent — each writes only its own sandbox $W/sb_<ch>, tap
+# $W/<ch>.tap and output $W/<ch>.out — so they go through tests/lib/jobs.sh's pool, JOBS at a time; default
+# min(4, CPUs/6). The rigs are generated first, serially (each run's replay, pokes and length come from its own rig);
+# every section then reads its runs' taps in the original order and prints what it did.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+tap_run() {  # tap_run <ch> <pokes> <frames>
+    MAME_BIN="$BIN" MAME_SANDBOX="$W/sb_$1" REPLAY="$W/$1.rpl" POKES="$2" \
+        TAP=ff841c,8 WINDOW=2400,"$3" FRAMES="$3" TRACE_OUT="$W/$1.tap" \
+        tools/run_mame.sh vsavj -autoboot_script "$REPO/tests/lua/tap_writes.lua" \
+        > "$W/$1.out" 2>&1 || true
+}
+rig_pokes() {  # rig_pokes <rig json> — the rig's pokes as one POKES string
+    python3 -c "
+import json,sys;d=json.load(open(sys.argv[1]));p=d.get('pokes') or []
+print(';'.join(p) if isinstance(p,list) else p)" "$1"
+}
+vs_pool_start "$JOBS"
+for pair in "0x0f JE crouch" "0x0e LI crouch" "0x01 DE crouch" "0x08 BI far" "0x09 AU far" "0x0d LE jump"; do
+    set -- $pair; id=$1; ch=$2; st=$3
+    python3 tools/vanilla_join_rig.py gen "$id" "$st" "$W/$ch.rpl" "$W/$ch.json" >/dev/null
+    P="$(rig_pokes "$W/$ch.json")"
+    case "$ch" in
+        AU|LE) FR="$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['frames'])" "$W/$ch.json")" ;;
+        *) FR=4600 ;;
+    esac
+    vs_pool_run tap_run "$ch" "$P" "$FR"
+done
+vs_pool_wait
+
 for pair in "0x0f JE" "0x0e LI" "0x01 DE"; do
     id=${pair%% *}; ch=${pair##* }
-    python3 tools/vanilla_join_rig.py gen "$id" crouch "$W/$ch.rpl" "$W/$ch.json" >/dev/null
-    P="$(python3 -c "
-import json,sys;d=json.load(open(sys.argv[1]));p=d.get('pokes') or []
-print(';'.join(p) if isinstance(p,list) else p)" "$W/$ch.json")"
-    MAME_BIN="$BIN" MAME_SANDBOX="$W/sb_$ch" REPLAY="$W/$ch.rpl" POKES="$P" \
-        TAP=ff841c,8 WINDOW=2400,4600 FRAMES=4600 TRACE_OUT="$W/$ch.tap" \
-        tools/run_mame.sh vsavj -autoboot_script "$REPO/tests/lua/tap_writes.lua" \
-        > "$W/$ch.out" 2>&1 || true
     python3 tools/vanilla_frames.py "$DATA" --char "$ch" --json "$W/${ch}_d.json" >/dev/null
     python3 tools/tick_durations.py "$W/$ch.tap" "$W/${ch}_d.json" "$ch" --prefix 2 > "$W/$ch.txt"
     # THE EXECUTABLE MODE: bump JE's first crouch total so section 1's compare fails.
@@ -118,14 +139,6 @@ done
 # before the first attack node (frame_data.first). Asserted equal to the
 # derived startup for all six standing normals — if 5MK's node 0 spends other
 # than 5 ticks, the derivation is what is wrong; if it spends 5, the sheet is.
-python3 tools/vanilla_join_rig.py gen 0x08 far "$W/BI.rpl" "$W/BI.json" >/dev/null
-P="$(python3 -c "
-import json,sys;d=json.load(open(sys.argv[1]));p=d.get('pokes') or []
-print(';'.join(p) if isinstance(p,list) else p)" "$W/BI.json")"
-MAME_BIN="$BIN" MAME_SANDBOX="$W/sb_BI" REPLAY="$W/BI.rpl" POKES="$P" \
-    TAP=ff841c,8 WINDOW=2400,4600 FRAMES=4600 TRACE_OUT="$W/BI.tap" \
-    tools/run_mame.sh vsavj -autoboot_script "$REPO/tests/lua/tap_writes.lua" \
-    > "$W/BI.out" 2>&1 || true
 python3 tools/vanilla_frames.py "$DATA" --char BI --json "$W/BI_d.json" >/dev/null
 python3 tools/tick_durations.py "$W/BI.tap" "$W/BI_d.json" BI --prefix 5 --nodes > "$W/BI.txt"
 python3 - "$W/BI.txt" <<'PY' || fail=1
@@ -157,15 +170,6 @@ PY
 # on the attack nodes say whether the sheet's 11 is a landing cut of the data's 12.
 for pair in "0x09 AU far 5" "0x0d LE jump J."; do
     set -- $pair; id=$1; ch=$2; st=$3; pfx=$4
-    python3 tools/vanilla_join_rig.py gen "$id" "$st" "$W/$ch.rpl" "$W/$ch.json" >/dev/null
-    P="$(python3 -c "
-import json,sys;d=json.load(open(sys.argv[1]));p=d.get('pokes') or []
-print(';'.join(p) if isinstance(p,list) else p)" "$W/$ch.json")"
-    FR="$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['frames'])" "$W/$ch.json")"
-    MAME_BIN="$BIN" MAME_SANDBOX="$W/sb_$ch" REPLAY="$W/$ch.rpl" POKES="$P" \
-        TAP=ff841c,8 WINDOW=2400,"$FR" FRAMES="$FR" TRACE_OUT="$W/$ch.tap" \
-        tools/run_mame.sh vsavj -autoboot_script "$REPO/tests/lua/tap_writes.lua" \
-        > "$W/$ch.out" 2>&1 || true
     python3 tools/vanilla_frames.py "$DATA" --char "$ch" --json "$W/${ch}_d.json" >/dev/null
     python3 tools/tick_durations.py "$W/$ch.tap" "$W/${ch}_d.json" "$ch" --prefix "$pfx" --nodes > "$W/$ch.txt"
 done

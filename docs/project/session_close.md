@@ -57,6 +57,7 @@ Placeholders: `{KEY}` the session key; `{RUN}` the run directory (absolute); `{R
 | pins | auto | `python3 tools/submodule_pins.py` | exit 0 | every submodule pin in HEAD, the commit the push sends, is served by the remote its `.gitmodules` names: a fetch by sha into an empty repository, what a fresh clone's `git submodule update` does (2.3 to 2.9 s, measured 2026-10-19). A MISSING pin is pushed to its own remote first, then the step re-run; an ERROR (the remote could not be asked) is never passed by hand without that remote's answer | #260, ruled 2026-10-19 (14z-205) |
 | sweep | auto | `python3 tools/agent/sweep.py` | exit 0 | CLEAN, as the last command before the push: every survivor killed, leaves first, or declared with `--declare PID "REASON"` and named in the CLOSE section | C0.3, #172 S2 |
 | push | manual | `git push origin main` | - | pushed; anything red, skipped or unresolved leaves the commits local and the CLOSE section says so | ruled 2026-09-10, [VSP-17] |
+| ledger-page | manual | `tools/publish_ledger.sh --push --own-site-if-set` | - | the session ledger page rebuilt from every session and published, only after main's push went through: one orphan commit on `origin`'s `gh-pages`, and the same three files rsynced to the maintainer's site (`<DEPLOY_TARGET>vs-swarm-ledger/`, alexrichard.org/vs-swarm-ledger/) — or, with no `DEPLOY_TARGET` set, the own site SKIPPED and the CLOSE section saying so (the maintainer: "Fail or ignore the deploy") | #267, ruled 2026-10-29 |
 <!-- /CLOSE STEPS -->
 
 ## What the table settled

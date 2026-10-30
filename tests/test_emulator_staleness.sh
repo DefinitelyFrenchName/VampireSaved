@@ -59,7 +59,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 TOOL=tools/audit_emulator_staleness.py
 CAD="${VS_CADENCE:-session}"
-W="$(mktemp -d "${TMPDIR:-/tmp}/estale.XXXXXX")"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d "${TMPDIR:-/tmp}/estale.XXXXXX")" || { echo "FAIL: test_emulator_staleness — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 
 # THE SCRATCH REPOSITORY: two gates in the registry, one declaring, one not; a run that

@@ -20,6 +20,7 @@ scratch	static_runs	tests/run_all_static.sh's run records (N-D; test_session_met
 scratch	snapshot_runs	tests/run_on_snapshot.sh's snapshots (N-D)
 scratch	tmp	tests/run_all_emulator.sh's per-run TMPDIR (#321, 14z-210): the gates' temp files under an emulator run, removed when it ends (N-D)
 scratch	sheets	tools/proof_sheets.py's pages and clean checkouts (N-D since #313)
+scratch	ledger_page	tools/publish_ledger.sh's page output, written then published (#267, 14z-212); no gate reads it (N-D)
 input	out	the decrypt cache (38 gates read it in the PILOT trace)
 input	manifest	the build manifests (tracked)
 input	wide0	the WIDE profile's rompath (3 gates in the PILOT trace)

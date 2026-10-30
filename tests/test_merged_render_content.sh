@@ -14,7 +14,7 @@
 #   sets).
 # EXPECTS: band equivalence, pristine bank 2, distinctness, the poison control, liveness.
 #   H's and P's FIRST render gate.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/gfx_region_dump.lua
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/gfx_region_dump.lua tests/lib/jobs.sh
 #   tests/lua/replay.lua tests/replays/ tools/audit_romset_identity.py tools/build_merged.sh
 #   tools/run_mame.sh tools/setup_mame.sh
 #
@@ -58,7 +58,7 @@
 #   4. LIVENESS: the three real pick replays (36 D / 37 H / 40 P) each
 #      complete on the merged build with a live framebuffer stream.
 #
-# Usage: ROMDIR=... tests/test_merged_render_content.sh [merged_rompath]
+# Usage: ROMDIR=... [JOBS=N] tests/test_merged_render_content.sh [merged_rompath]
 #   env MAME_WIDE_BIN (default ~/.cache/vampire-saved/mame/cps2)
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
@@ -132,38 +132,63 @@ else
 fi
 
 echo "== 2. band equivalence: merged vs the frozen solo builds =="
-band() {  # band <tag> <rompath> <window>
+# JOBS (#334 item 2, 14z-211): the gate's 17 emulator runs are independent — each writes only its own files ($WORK/<tag>.gfx
+# + .gfxrun + gsb_<tag>; $WORK/<replay>.ram/.vid/.run + sbx_<replay>) — so they go through tests/lib/jobs.sh's pool, JOBS
+# at a time (default min(4, CPUs/6)): section 2's ten dumps and section 4's three pick replays here, section 3's four
+# poisoned dumps once its poisoned set exists. Each section then reads its artifacts in the serial order.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+band_run() {  # band_run <tag> <rompath> <window>
     MAME_BIN="$MAME_WIDE_BIN" MAME_ROMPATH="$2;$ROMDIR" \
     MAME_SANDBOX="$WORK/gsb_$1" GFX_WINDOWS="$3" TRACE_OUT="$WORK/$1.gfx" \
         tools/run_mame.sh vsavjw \
         -autoboot_script "$REPO/tests/lua/gfx_region_dump.lua" \
-        > "$WORK/$1.gfxrun" 2>&1
-    grep -q "^GFXDUMPSUMMARY" "$WORK/$1.gfx" || {
-        echo "  dump $1 did not complete" >&2; return 1; }
-    awk '/^GFX /{print $5}' "$WORK/$1.gfx"
+        > "$WORK/$1.gfxrun" 2>&1 || true
 }
 # pristine group-B window needs a stock set; use the vanilla vsavj
-bp() {  # pristine bank-2 window via stock vsavj
+bp_run() {  # bp_run <tag> <window>: pristine bank-2 window via stock vsavj
     MAME_BIN="$MAME_WIDE_BIN" MAME_ROMPATH="$ROMDIR" \
     MAME_SANDBOX="$WORK/gsb_$1" GFX_WINDOWS="$2" TRACE_OUT="$WORK/$1.gfx" \
         tools/run_mame.sh vsavj \
         -autoboot_script "$REPO/tests/lua/gfx_region_dump.lua" \
-        > "$WORK/$1.gfxrun" 2>&1
+        > "$WORK/$1.gfxrun" 2>&1 || true
+}
+band() {  # band <tag> — a dump's verdict, read from its artifact (band_run / bp_run ran it)
     grep -q "^GFXDUMPSUMMARY" "$WORK/$1.gfx" || {
         echo "  dump $1 did not complete" >&2; return 1; }
     awk '/^GFX /{print $5}' "$WORK/$1.gfx"
 }
+pick_run() {  # pick_run <replay>
+    MAME_BIN="$MAME_WIDE_BIN" MAME_ROMPATH="$MERGED;$ROMDIR" \
+    MAME_SANDBOX="$WORK/sbx_$1" REPLAY="$REPO/tests/replays/$1.rpl" \
+    CHECKSUM_OUT="$WORK/$1.ram" VIDEO_OUT="$WORK/$1.vid" \
+        tools/run_mame.sh vsavjw -autoboot_script "$REPO/tests/lua/replay.lua" \
+        > "$WORK/$1.run" 2>&1 || true
+}
+PICKS="36_pick_tenant_cell 37_pick_huitzil_cell 40_pick_pyron_cell"
+vs_pool_start "$JOBS"
+vs_pool_run band_run m_d "$MERGED" 4ad8f:16
+vs_pool_run band_run m_h "$MERGED" 40af6:16
+vs_pool_run band_run m_p "$MERGED" 45000:16
+vs_pool_run band_run m_s "$MERGED" 486a0:16
+vs_pool_run band_run m_b2 "$MERGED" 2ad8f:16
+vs_pool_run band_run s_d "$D_RP" 4ad8f:16
+vs_pool_run band_run s_h "$H_RP" 40af6:16
+vs_pool_run band_run s_p "$P_RP" 45000:16
+vs_pool_run band_run s_s "$H_RP" 486a0:16
+vs_pool_run bp_run prist 2ad8f:16
+for r in $PICKS; do vs_pool_run pick_run "$r"; done
+vs_pool_wait
 
-m_d="$(band m_d "$MERGED" 4ad8f:16)"     || fail=1
-m_h="$(band m_h "$MERGED" 40af6:16)"     || fail=1
-m_p="$(band m_p "$MERGED" 45000:16)"     || fail=1
-m_s="$(band m_s "$MERGED" 486a0:16)"     || fail=1
-m_b2="$(band m_b2 "$MERGED" 2ad8f:16)"   || fail=1
-s_d="$(band s_d "$D_RP" 4ad8f:16)"       || fail=1
-s_h="$(band s_h "$H_RP" 40af6:16)"       || fail=1
-s_p="$(band s_p "$P_RP" 45000:16)"       || fail=1
-s_s="$(band s_s "$H_RP" 486a0:16)"       || fail=1
-prist="$(bp prist 2ad8f:16)"             || fail=1
+m_d="$(band m_d)"     || fail=1
+m_h="$(band m_h)"     || fail=1
+m_p="$(band m_p)"     || fail=1
+m_s="$(band m_s)"     || fail=1
+m_b2="$(band m_b2)"   || fail=1
+s_d="$(band s_d)"     || fail=1
+s_h="$(band s_h)"     || fail=1
+s_p="$(band s_p)"     || fail=1
+s_s="$(band s_s)"     || fail=1
+prist="$(band prist)" || fail=1
 
 chk() {  # chk <label> <got> <want>
     # 14z-92: a DEAD LEG and a real mismatch must not look alike. An empty
@@ -218,9 +243,14 @@ if python3 tools/audit_romset_identity.py "$WORK/poison" --quiet >/dev/null 2>&1
 else
     echo "  ok: the member-identity audit rejects the shadow"
 fi
+vs_pool_start "$JOBS"
+for w in 4ad8f:D 40af6:H 45000:P 486a0:strip; do
+    vs_pool_run band_run "poi_${w#*:}" "$WORK/poison" "${w%%:*}:16"
+done
+vs_pool_wait
 for w in 4ad8f:D 40af6:H 45000:P 486a0:strip; do
     win="${w%%:*}"; tag="${w#*:}"
-    pz="$(band "poi_$tag" "$WORK/poison" "$win:16")" || true
+    pz="$(band "poi_$tag")" || true
     case "$tag" in D) mv="$m_d";; H) mv="$m_h";; P) mv="$m_p";; strip) mv="$m_s";; esac
     if [ -n "$pz" ] && [ "$pz" != "$mv" ]; then
         echo "  ok: poisoned $tag window differs — instrument live"
@@ -230,12 +260,7 @@ for w in 4ad8f:D 40af6:H 45000:P 486a0:strip; do
 done
 
 echo "== 4. liveness: the three real pick replays on the merged build =="
-for r in 36_pick_tenant_cell 37_pick_huitzil_cell 40_pick_pyron_cell; do
-    MAME_BIN="$MAME_WIDE_BIN" MAME_ROMPATH="$MERGED;$ROMDIR" \
-    MAME_SANDBOX="$WORK/sbx_$r" REPLAY="$REPO/tests/replays/$r.rpl" \
-    CHECKSUM_OUT="$WORK/$r.ram" VIDEO_OUT="$WORK/$r.vid" \
-        tools/run_mame.sh vsavjw -autoboot_script "$REPO/tests/lua/replay.lua" \
-        > "$WORK/$r.run" 2>&1 || true
+for r in $PICKS; do   # (each ran in section 2's pool)
     if grep -q "^END " "$WORK/$r.vid" 2>/dev/null; then
         dis="$(awk '{print $2}' "$WORK/$r.vid" | sort -u | wc -l | tr -d ' ')"
         if [ "$dis" -gt 100 ]; then

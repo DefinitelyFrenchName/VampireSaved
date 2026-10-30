@@ -13,7 +13,7 @@
 #   canonical content (phase-free: the legs run ~5-6 frames apart).
 # EXPECTS: ours-only 0, native-only 0, no blank explosion tile; a non-empty ours-only tile
 #   is a real divergence.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/obj_records_dump.lua
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/jobs.sh tests/lua/obj_records_dump.lua
 #   tests/replays/hui/83d_hui_grenade_ground.rpl tools/gfx_tiles.py tools/run_mame.sh
 #   tools/setup_mame.sh tests/lib/sheet.sh
 #
@@ -46,7 +46,7 @@
 # (ours-only == 0 AND native-only == 0). A non-empty ours-only tile is a
 # REAL divergence (our build drawing art native does not) and fails.
 #
-# Usage: ROMDIR=... [BUILD=build/m3b_merged31] tests/audit_grenade_ground_tiles.sh
+# Usage: ROMDIR=... [BUILD=build/m3b_merged31] [JOBS=N] tests/audit_grenade_ground_tiles.sh
 #        2 MAME runs (~4 min). Needs the WIDE MAME binary and a gfx build.
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
@@ -79,18 +79,31 @@ PK="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10;1400:ff8b82:03;1450:ff8b82:03;1
 FR="$(python3 -c 'print(",".join(str(f) for f in range(3400,3521)))')"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 
+# JOBS (#334 item 2, 14z-211): the two legs are independent — each runs in its own folder $W/<set><out> (cwd, sandbox,
+# trace) — so they go through tests/lib/jobs.sh's pool, JOBS at a time; default min(4, CPUs/6). Each leg's exit status
+# lands in <folder>/rc; leg_out then judges the legs in the order they always ran, ours first.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
 run() {  # <set> <rompath-or-empty> <out>
     d="$W/$1$3"; mkdir -p "$d/s"
     RP="$BUILD/rompath;$ROMDIR"; [ -n "$2" ] || RP="$ROMDIR"
+    _lrc=0
     ( cd "$d" && REPLAY="$REPO/$RPL" POKES="$PK" DUMP_FRAMES="$FR" FRAMES=3521 \
         TRACE_OUT="$d/obj.txt" MAME_SANDBOX="$d/s" MAME_ROMPATH="$RP" \
         "$REPO/tools/run_mame.sh" "$1" \
-        -autoboot_script "$REPO/tests/lua/obj_records_dump.lua" >"$d/run" 2>&1 ) \
-      || { echo "FAIL: $1 leg died"; tail -5 "$d/run"; exit 1; }
+        -autoboot_script "$REPO/tests/lua/obj_records_dump.lua" >"$d/run" 2>&1 ) || _lrc=$?
+    echo "$_lrc" > "$d/rc"
+}
+leg_out() {  # <set> <out> — the leg's trace path, or the leg's death as the inline run reported it
+    d="$W/$1$2"
+    [ "$(cat "$d/rc" 2>/dev/null)" = 0 ] || { echo "FAIL: $1 leg died"; tail -5 "$d/run"; exit 1; }
     echo "$d/obj.txt"
 }
-OURS="$(run vsavjw x "_o")"
-NATIVE="$(run vsav2 "" "_n")"
+vs_pool_start "$JOBS"
+vs_pool_run run vsavjw x "_o"
+vs_pool_run run vsav2 "" "_n"
+vs_pool_wait
+OURS="$(leg_out vsavjw "_o")"
+NATIVE="$(leg_out vsav2 "_n")"
 
 python3 - "$OURS" "$NATIVE" "$BUILD" "$ROMDIR" <<'PY' && _rc=0 || _rc=$?
 import sys, re, zipfile, hashlib, importlib.util, collections

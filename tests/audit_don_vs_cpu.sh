@@ -15,7 +15,7 @@
 # EXPECTS: each leg's opponent is the one selected (a wrong opponent is a DEAD leg, never a
 #   pass) and the run ends clean. A clean pass is COVERAGE of the pairing, not proof the #99
 #   crash is absent — the header records that it does not reproduce here.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay_guard.lua
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay_guard.lua tests/lib/jobs.sh
 #   tests/replays/110_don_arcade_mash.rpl tools/run_mame.sh tools/run_replay_guarded.sh
 #   tools/setup_mame.sh
 #
@@ -46,7 +46,7 @@
 # reachability; the #99 fix is verified elsewhere (fsm_census + the ported fix).
 #
 # Usage: ROMDIR=... [BUILD=build/m3b_merged31] [FRAMES=40700]
-#        [LEGS="phobos bishamon pyron"] tests/audit_don_vs_cpu.sh
+#        [LEGS="phobos bishamon pyron"] [JOBS=N] tests/audit_don_vs_cpu.sh
 # ~18 min per leg (one guarded marathon each). On-demand.
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
@@ -97,21 +97,38 @@ fail=0
 ok()  { echo "  ok: $1"; }
 bad() { echo "FAIL: $1"; fail=1; }
 
-for leg in $LEGS; do
-    V="$(venue_of "$leg")"
-    [ -n "$V" ] || { bad "unknown leg $leg"; continue; }
-    echo "== leg: Donovan P1 vs CPU-$leg (venue 0x$V)"
-    d="$W/$leg"; mkdir -p "$d/sbx"
+# JOBS (#334 item 2, 14z-211): the legs' guarded marathons are independent — each writes only its own $W/<leg>
+# (out.log, g.log, sbx, dumps) — so they go through tests/lib/jobs.sh's pool, JOBS at a time (default min(4, CPUs/6)).
+# A leg's runner status lands in $W/<leg>/rc; the loop below then judges each leg in order, as it did serially.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+run_leg() {  # run_leg <leg> <venue>
+    d="$W/$1"; mkdir -p "$d/sbx"
     # force P1=Donovan at the wheel commit; steer the venue before match-1 draw;
     # dump P2's block at match start for the liveness check.
     PK="1704:ff8782:13;1760:ff8782:13;1900:ff8782:13;2100:ff8782:13;2400:ff8782:13"
-    VP="$(python3 -c "print(';'.join(f'{f}:ff8121:$V' for f in range(1750,2860,20)))")"
+    VP="$(python3 -c "print(';'.join(f'{f}:ff8121:$2' for f in range(1750,2860,20)))")"
     DF="$(python3 -c "print(';'.join(f'{f}:ff8800-ff8870' for f in range(2900,3400,20)))")"
     rc=0
     GUARD_DEBUG=1 POKES="$PK;$VP" DUMPS="$DF" \
       MAME_ROMPATH="$REPO/$BUILD/rompath;$ROMDIR" \
       tools/run_replay_guarded.sh vsavjw tests/replays/110_don_arcade_mash.rpl \
       "$d/out.log" "$d/sbx" > "$d/g.log" 2>&1 || rc=$?
+    echo "$rc" > "$d/rc"
+}
+vs_pool_start "$JOBS"
+for leg in $LEGS; do
+    V="$(venue_of "$leg")"
+    [ -n "$V" ] || continue
+    vs_pool_run run_leg "$leg" "$V"
+done
+vs_pool_wait
+
+for leg in $LEGS; do
+    V="$(venue_of "$leg")"
+    [ -n "$V" ] || { bad "unknown leg $leg"; continue; }
+    echo "== leg: Donovan P1 vs CPU-$leg (venue 0x$V)"
+    d="$W/$leg"
+    rc="$(cat "$d/rc" 2>/dev/null || echo 1)"
 
     # liveness: P2 base at match start == the venue-selected opponent
     python3 - "$d" "$BUILD" "$(id_of "$leg")" "$leg" <<'PY' || fail=1

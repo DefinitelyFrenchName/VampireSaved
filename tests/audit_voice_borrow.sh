@@ -12,7 +12,7 @@
 # EXPECTS: static facts hold, exactly the expected writer (none mid-match for own-class),
 #   the window's ids all in the authored voice range, and the foreign-id control fails. The
 #   fired id itself is never frozen — it is a lottery on the QSound-latch phase.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/read_tap.lua
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/read_tap.lua tests/lib/jobs.sh
 #   tests/lua/ring_tap.lua tests/replays/don/90_don_plant.rpl tools/run_mame.sh
 #   tools/setup_mame.sh
 #
@@ -66,7 +66,7 @@
 # known-bad reference): run
 #   VOICE_BORROW_EXPECT=lottery tests/audit_voice_borrow.sh build/don_m4
 #
-# Usage: ROMDIR=... [MAME_BIN=...] tests/audit_voice_borrow.sh [builddir]
+# Usage: ROMDIR=... [MAME_BIN=...] [JOBS=N] tests/audit_voice_borrow.sh [builddir]
 # Default build: build/don_m27. ~6 min (2 MAME runs).
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
@@ -140,12 +140,29 @@ open(sys.argv[1]+'/candidates','w').write(row3.hex())
 print("  static facts hold; node-13 family:", ' '.join(f'{x:04x}' for x in sorted(fam)))
 EOF
 
-echo "== section 1: serialized borrow write + dispatcher read (one run)"
+# JOBS (#334 item 2, 14z-211): section 1's read-tap run and section 2's ring-tap run are independent — each writes
+# only its own trace, log and sandbox ($WORK/rt.txt + run1.log + sbx1; $WORK/ring.txt + run2.log + sbx2) — so both
+# go through tests/lib/jobs.sh's pool here, JOBS at a time (default min(4, CPUs/6)); sections 1 and 2 judge them below.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+run_read_tap() {
 REPLAY="$RPL" POKES="$PK" RTAP="ff8782,2" WINDOW="3984,4004" FRAMES=4050 \
 TRACE_OUT="$WORK/rt.txt" MAME_SANDBOX="$WORK/sbx1" \
 MAME_ROMPATH="$PWD/$BUILD/rompath;$ROMDIR" \
   tools/run_mame.sh vsavjw -autoboot_script tests/lua/read_tap.lua \
   > "$WORK/run1.log" 2>&1 || true
+}
+run_ring_tap() {
+REPLAY="$RPL" POKES="$PK" FULL=1 FRAMES=4100 TRACE_OUT="$WORK/ring.txt" \
+MAME_SANDBOX="$WORK/sbx2" MAME_ROMPATH="$PWD/$BUILD/rompath;$ROMDIR" \
+  tools/run_mame.sh vsavjw -autoboot_script tests/lua/ring_tap.lua \
+  > "$WORK/run2.log" 2>&1 || true
+}
+vs_pool_start "$JOBS"
+vs_pool_run run_read_tap
+vs_pool_run run_ring_tap
+vs_pool_wait
+
+echo "== section 1: serialized borrow write + dispatcher read (one run)"
 grep -q "^END " "$WORK/rt.txt" || fail "read_tap run did not complete"
 python3 - "$WORK" "$EXPECT" <<'EOF' || exit 1
 import re,sys
@@ -193,10 +210,7 @@ EOF
 # old lower bound 3975 — which is what made section 2 report "rig dead".
 # The window WIDTHS are unchanged; only the origin moved.
 echo "== section 2: output level — ring window membership"
-REPLAY="$RPL" POKES="$PK" FULL=1 FRAMES=4100 TRACE_OUT="$WORK/ring.txt" \
-MAME_SANDBOX="$WORK/sbx2" MAME_ROMPATH="$PWD/$BUILD/rompath;$ROMDIR" \
-  tools/run_mame.sh vsavjw -autoboot_script tests/lua/ring_tap.lua \
-  > "$WORK/run2.log" 2>&1 || true
+# (its ring-tap run ran in the pool above section 1)
 python3 - "$WORK" "$EXPECT" "$MODE" <<'EOF' || exit 1
 import re,sys,struct
 work,expect=sys.argv[1],sys.argv[2]

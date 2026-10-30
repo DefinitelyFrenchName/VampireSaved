@@ -1,0 +1,1 @@
+NOT RUN — see build/rulecheck/2026-10-29-1367/NOT-RUN.txt: prepared with a stale figure (502 against census_now.txt's 515), no reader spawned.

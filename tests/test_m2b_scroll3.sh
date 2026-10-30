@@ -17,7 +17,7 @@
 #   scroll3 codes.
 # EXPECTS: zero frames with a scroll3 code inside the placement window; a red names the
 #   frame and code.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/scroll3_watch.lua tests/replays/
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/jobs.sh tests/lua/scroll3_watch.lua tests/replays/
 #   tools/run_mame.sh tools/setup_mame.sh
 #
 # SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
@@ -26,7 +26,7 @@
 # Jedah's own demo), the arcade-mode marathon (stage rotation), and the
 # standard match replays.
 #
-# Usage: ROMDIR=... tests/test_m2b_scroll3.sh [rompath_dir]
+# Usage: ROMDIR=... [JOBS=N] tests/test_m2b_scroll3.sh [rompath_dir]
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"
@@ -45,17 +45,28 @@ WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 cd "$REPO"
 
-fail=0
-for r in 01_attract_long 26_don_arcade_mash 12_donovan_vs_cpu 21_don_mash; do
-    SB="$WORK/${r}box"; mkdir -p "$SB"
-    SCROLL3_OUT="$WORK/$r.s3" \
-    REPLAY="$REPO/tests/replays/$r.rpl" \
-    CHECKSUM_OUT="$WORK/$r.log" \
+# JOBS (#334 item 2, 14z-211): the four runs are independent — each writes only its own sandbox, scroll3 report and
+# checksum log — so they go through tests/lib/jobs.sh's pool, JOBS at a time; default min(4, CPUs/6). The verdicts are
+# read after, in replay order.
+REPLAYS="01_attract_long 26_don_arcade_mash 12_donovan_vs_cpu 21_don_mash"
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+one_run() {  # one_run <replay>
+    SB="$WORK/${1}box"; mkdir -p "$SB"
+    SCROLL3_OUT="$WORK/$1.s3" \
+    REPLAY="$REPO/tests/replays/$1.rpl" \
+    CHECKSUM_OUT="$WORK/$1.log" \
     MAME_SANDBOX="$SB" \
     MAME_ROMPATH="$RPDIR;$ROMDIR" \
         tools/run_mame.sh vsavj \
         -autoboot_script "$REPO/tests/lua/scroll3_watch.lua" \
         > "$SB/mame.log" 2>&1 || true
+}
+vs_pool_start "$JOBS"
+for r in $REPLAYS; do vs_pool_run one_run "$r"; done
+vs_pool_wait
+
+fail=0
+for r in $REPLAYS; do
     if [ ! -f "$WORK/$r.s3" ]; then
         echo "FAIL: $r produced no scroll3 report"; fail=1; continue
     fi

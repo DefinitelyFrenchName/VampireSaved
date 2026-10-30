@@ -13,7 +13,7 @@
 #   position by 1 px and corrupt a glyph tile.
 # EXPECTS: static and runtime exact, both controls failing; the snapshot check is what
 #   caught the tile codec's half-mirror.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/obj_records_dump.lua
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/obj_records_dump.lua tests/lib/jobs.sh
 #   tests/lua/snapshot_frames.lua tools/run_mame.sh tools/setup_mame.sh
 #
 # SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
@@ -46,7 +46,7 @@
 #   3  VERDICT CONTROLS — a shifted expectation (x+1) must NOT pixel-match;
 #      a corrupted glyph tile must be refused by section 1.
 #
-# Usage: ROMDIR=... tests/test_version_string.sh [outbase]
+# Usage: ROMDIR=... [JOBS=N] tests/test_version_string.sh [outbase]
 #   default build/m3b_merged31. Reads the knobs from the manifest the build
 #   names (donovan.toml — identical in all three tenant manifests, asserted).
 #
@@ -173,10 +173,27 @@ cat > "$WORK/sel.rpl" <<'EOF'
 800-803 sys=S1
 1300 wait
 EOF
-REPLAY="$WORK/sel.rpl" DUMP_FRAMES=1150,1151 TRACE_OUT="$WORK/obj.txt" \
-    MAME_SANDBOX="$WORK/objbox" MAME_ROMPATH="$PWD/$OUT/rompath;$ROMDIR" \
-    tools/run_mame.sh vsavjw -autoboot_script tests/lua/obj_records_dump.lua \
-    > "$WORK/obj_mame.log" 2>&1 || { echo "FAIL: OBJ dump run"; tail -3 "$WORK/obj_mame.log"; fail=1; }
+# JOBS (#334 item 2, 14z-211): the OBJ-dump run and the snapshot run are independent — each writes only its own trace,
+# log and sandbox, and its exit status to <name>.rc — so they go through tests/lib/jobs.sh's pool, JOBS at a time;
+# default min(4, CPUs/6). Sections 2 and 3 read them after, in the original order.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+run_obj() {
+    if REPLAY="$WORK/sel.rpl" DUMP_FRAMES=1150,1151 TRACE_OUT="$WORK/obj.txt" \
+        MAME_SANDBOX="$WORK/objbox" MAME_ROMPATH="$PWD/$OUT/rompath;$ROMDIR" \
+        tools/run_mame.sh vsavjw -autoboot_script tests/lua/obj_records_dump.lua \
+        > "$WORK/obj_mame.log" 2>&1; then echo 0 > "$WORK/obj.rc"; else echo $? > "$WORK/obj.rc"; fi
+}
+run_snap() {
+    if REPLAY="$WORK/sel.rpl" SNAP_FRAMES=1150 TRACE_OUT="$WORK/snap.txt" \
+        MAME_SANDBOX="$WORK/snapbox" MAME_ROMPATH="$PWD/$OUT/rompath;$ROMDIR" \
+        tools/run_mame.sh vsavjw -autoboot_script tests/lua/snapshot_frames.lua \
+        > "$WORK/snap_mame.log" 2>&1; then echo 0 > "$WORK/snap.rc"; else echo $? > "$WORK/snap.rc"; fi
+}
+vs_pool_start "$JOBS"
+vs_pool_run run_obj
+vs_pool_run run_snap
+vs_pool_wait
+[ "$(cat "$WORK/obj.rc" 2>/dev/null)" = 0 ] || { echo "FAIL: OBJ dump run"; tail -3 "$WORK/obj_mame.log"; fail=1; }
 python3 - "$WORK/obj.txt" "$WORK/want.json" <<'PY' || fail=1
 import json, re, sys
 w = json.load(open(sys.argv[2])); n, base, pal = w["n"], w["base"], w["pal"]
@@ -200,10 +217,7 @@ for fr, es in sorted(ents.items()):
 if not ents or not ok:
     print("FAIL: no glyph sprite in the live OBJ list" if not ents else "FAIL: OBJ list"); sys.exit(1)
 PY
-REPLAY="$WORK/sel.rpl" SNAP_FRAMES=1150 TRACE_OUT="$WORK/snap.txt" \
-    MAME_SANDBOX="$WORK/snapbox" MAME_ROMPATH="$PWD/$OUT/rompath;$ROMDIR" \
-    tools/run_mame.sh vsavjw -autoboot_script tests/lua/snapshot_frames.lua \
-    > "$WORK/snap_mame.log" 2>&1 || { echo "FAIL: snapshot run"; tail -3 "$WORK/snap_mame.log"; fail=1; }
+[ "$(cat "$WORK/snap.rc" 2>/dev/null)" = 0 ] || { echo "FAIL: snapshot run"; tail -3 "$WORK/snap_mame.log"; fail=1; }
 PNG="$(find "$WORK/snapbox" -name '0000.png' | head -1)"
 [ -n "$PNG" ] || { echo "FAIL: no snapshot"; fail=1; }
 pixcheck() { # pixcheck <png> <dx> -> prints mismatches

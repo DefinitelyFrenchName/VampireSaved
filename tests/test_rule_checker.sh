@@ -16,7 +16,9 @@
 #   LIMIT section (#258, 14z-204) proves prepare refuses a text artifact a reader cannot read whole in one Read and
 #   a whole indexed archive (listing its entries' ranges), refuses an archive range that starts off its INDEX, and
 #   tells the reader which entry a range holds; the PLANT ROTATION section (#258, 14z-204) draws every rotation
-#   position and proves each plant is one a reader can read whole (the gate prepared once, so it saw one plant).
+#   position and proves each plant is one a reader can read whole (the gate prepared once, so it saw one plant); the
+#   PREPARE REDOES section (#335, 14z-212) proves a re-check prepared with --redoes records its action, and that
+#   --redoes of an OK run, of another decision's run or of an unknown id is refused leaving no run directory.
 # EXPECTS: PASS with every control fired; a red names the run or fixture and the shape in
 #   which the checker could look alive while asserting nothing.
 #
@@ -28,6 +30,7 @@
 # MUST-FIRE: shadow-tool: counted-id — a copy of rulecheck.py numbering prepare's auto id by a COUNT (the pre-#160 line) must collide with a run directory that has no ledger row, and the PREPARE IDS section must FAIL: the auto id is the next free number above every run directory and ledger id (GitHub #160, 14z-185)
 # MUST-FIRE: shadow-tool: late-validate — a copy of rulecheck.py with prepare's early artifact check removed must leave a run directory with no ledger row behind when an artifact is missing, and the PREPARE IDS section must FAIL: prepare checks every artifact before it creates anything (GitHub #160, 14z-185)
 # MUST-FIRE: shadow-tool: keyless-prepare — a copy of rulecheck.py whose prepare takes no session key (the pre-#209 line, `session = a.session or "-"`) must prepare a run whose meta.tsv says `session -`, and the PREPARE SESSION KEY section must FAIL: prepare requires the sitting's 14z-N key and refuses a transcript prefix (GitHub #209, 14z-189)
+# MUST-FIRE: shadow-tool: ok-redone — a copy of rulecheck.py whose prepare takes --redoes of an OK run must prepare it as a re-check, and the PREPARE REDOES section must FAIL: an action is a run and its re-checks until one passes, so an OK run is never redone (#335, 14z-212; mode: the section runs that copy)
 # MUST-FIRE: shadow-tool: unchecked-cite — a copy of rulecheck.py whose prepare takes every --cites at its word must prepare a merge packet citing an unresolved fork run, and the PREPARE CITES section must FAIL: a cited fork run counts only if its plant was caught, it is OK or resolved, and its artifacts are unchanged (#217, 14z-193)
 # MUST-FIRE: shadow-tool: blame-unticketed — a copy of rulecheck.py whose resolve takes an instrument-blaming answer ("no slip", "the plant's reader", "W# hint", a reader's misreading) with no open ticket named (the pre-#271 resolve, BLAME_CHECKED off) must record it, and the RESOLVE BLAME section must FAIL: an instrument defect answered run by run is how the plant readers' 2550/2560 recurred from 14z-179 to 14z-198 unaggregated (#271, 14z-199; mode: the section runs that copy)
 # MUST-FIRE: shadow-tool: recheck-unchecked — a copy of rulecheck.py whose resolve takes any --recheck at its word (RECHECK_CHECKED off: no checks run) must resolve a documentation-packet finding whose fix was never made, beside a forged all-OK run record, and the RESOLVE RECHECK section must FAIL: resolve runs the close's standing checks itself and a presentation finding is never certified by the working agent alone (#270, 14z-199, runs 968-970 Q4; mode: the section runs that copy)
@@ -68,7 +71,7 @@ W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 # a copy of everything `rulecheck check` reads, under a throwaway root
 mkcopy() {  # mkcopy <root>
     mkdir -p "$1/docs/project" "$1/tests/expected" "$1/tools"
-    cp tools/claim_lint.py "$1/tools/"   # prepare imports it beside itself (#185 item 3)
+    cp tools/claim_lint.py tools/rc_actions.py "$1/tools/"   # prepare imports them beside itself (#185 item 3; #335)
     cp tools/packet_check.py "$1/tools/"; cp -R tools/agent "$1/tools/agent"   # and the pre-prepare check (#272)
     cp tools/close_checks.py tools/close_standing.py tools/findings_table.py "$1/tools/"   # resolve --recheck runs a close render with them (#270; findings_table, #282 item C)
     _doc=docs/project/rule_checker.md; cp "$_doc" "$1"/docs/project/
@@ -304,6 +307,53 @@ unlimited() {  # unlimited <out> — the shadow tool: prepare with no read limit
     sed -e 's/^READ_MAX_BYTES = 256 \* 1024$/READ_MAX_BYTES = 10 ** 12/' -e 's/^READ_MAX_TOKENS = 25000$/READ_MAX_TOKENS = 10 ** 12/' tools/rulecheck.py > "$1"
     [ "$(grep -c '^READ_MAX_[A-Z]* = 10 \*\* 12$' "$1")" = 2 ] || { echo "the READ_MAX lines were not found to lift" >&2; return 1; }
 }
+# SECTION PREPARE REDOES's probe (#335, 14z-212): on a throwaway root, a VIOLATED recommendation run and an OK one
+# (each with a meta.tsv naming its own action); a re-check prepared with --redoes of the VIOLATED run must record that
+# run's action and `redoes`; --redoes of the OK run, of a run of another decision and of an unrecorded id must each
+# be refused leaving no run directory; and a packet prepared without --redoes whose subject reads like a re-check of
+# the open action must prepare as a NEW action and print the NOTE. Prints REDOES-OK or the way it was not.
+prepare_redoes() {  # prepare_redoes <rulecheck.py to test> <root>
+    rm -rf "$2"; mkcopy "$2"; cp "$1" "$2/tools/rulecheck.py"
+    echo art > "$2/art.txt"
+    python3 - "$2" <<'PY' || { echo "NO-FIXTURE-RUNS"; return; }
+import sys
+from pathlib import Path
+root = Path(sys.argv[1]); sys.path.insert(0, str(root / "tools")); import rulecheck as r
+for rid, subj, v, vi in (("2099-07-07-01", "close #9 as done", "VIOLATED", "Q1"), ("2099-07-07-02", "an unrelated thing", "OK", "-")):
+    d = root / r.RUNS / rid; d.mkdir(parents=True)
+    (d / "meta.tsv").write_text(f"decision\trecommendation\nsubject\t{subj}\nsession\t14z-0\naction\t{rid}\n")
+    r.append_ledger(root, dict(id=rid, date="2099-07-07", session="14z-0", decision="recommendation", subject=subj,
+                               control="fx", control_verdict="CAUGHT", verdict=v, violated=vi, resolution="fixed" if vi != "-" else "-", model="m"))
+PY
+    ROOT="$2"
+    _runs() { ls "$ROOT/tests/rulecheck/runs" | wc -l | tr -d ' '; }
+    _prep() {  # _prep <id> <decision> <subject> [--redoes RUN]
+        _id="$1"; _d="$2"; _s="$3"; shift 3
+        ( cd "$ROOT" && python3 tools/rulecheck.py prepare --decision "$_d" --subject "$_s" --claim "the claim" \
+            --artifact art.txt --session 14z-0 --id "$_id" "$@" ) > "$ROOT/r_$_id.log" 2>&1
+    }
+    _prep 2099-07-08-01 recommendation "close #9 as done, corrected" --redoes 2099-07-07-01 \
+        || { echo "REFUSED-A-GOOD-REDO: $(tail -1 "$2/r_2099-07-08-01.log")"; return; }
+    grep -qx "action	2099-07-07-01" "$2/tests/rulecheck/runs/2099-07-08-01/meta.tsv" || { echo "ACTION-NOT-CARRIED"; return; }
+    grep -qx "redoes	2099-07-07-01" "$2/tests/rulecheck/runs/2099-07-08-01/meta.tsv" || { echo "REDOES-NOT-IN-META"; return; }
+    _before="$(_runs)"
+    for bad in "2:recommendation:2099-07-07-02:it is OK" "3:build:2099-07-07-01:a different action" "4:recommendation:2099-07-07-09:no run directory"; do
+        _n="${bad%%:*}"; _r="${bad#*:}"; _d="${_r%%:*}"; _r="${_r#*:}"; _bid="${_r%%:*}"; _why="${_r#*:}"
+        if _prep "2099-07-08-0$_n" "$_d" "close #9 as done, again" --redoes "$_bid"; then echo "PREPARED-REDOING-$_bid-AS-$_d"; return; fi
+        grep -q -- "$_why" "$2/r_2099-07-08-0$_n.log" || { echo "REFUSED-$_bid-FOR-ANOTHER-REASON: $(tail -1 "$2/r_2099-07-08-0$_n.log")"; return; }
+    done
+    [ "$(_runs)" = "$_before" ] || { echo "LEFT-A-RUN-DIRECTORY"; return; }
+    # the NOTE: the open action is now 2099-07-07-01 through its re-check 2099-07-08-01 (prepared, not recorded); a
+    # subject like the recorded VIOLATED run's, prepared without --redoes, starts a new action and is pointed out
+    _prep 2099-07-08-05 recommendation "close #9 as done again" || { echo "REFUSED-A-NEW-ACTION: $(tail -1 "$2/r_2099-07-08-05.log")"; return; }
+    grep -qx "action	2099-07-08-05" "$2/tests/rulecheck/runs/2099-07-08-05/meta.tsv" || { echo "NEW-ACTION-NOT-ITS-OWN"; return; }
+    grep -q "NOTE (#335): this subject reads like a re-check of action 2099-07-07-01" "$2/r_2099-07-08-05.log" || { echo "NO-NOTE"; return; }
+    echo REDOES-OK
+}
+okredo() {  # okredo <out> — the shadow tool: prepare takes --redoes of an OK run
+    sed 's/            if prev and prev\["verdict"\] == "OK":/            if False:/' tools/rulecheck.py > "$1"
+    [ "$(grep -c '^            if False:$' "$1")" = 1 ] || { echo "the OK refusal was not found to remove" >&2; return 1; }
+}
 # SECTION PREPARE CITES's probe (#217, 14z-193): on a throwaway root, four hand-made fork runs — OK, VIOLATED
 # and resolved (one of its artifacts a line range), VIOLATED and unresolved, OK with its plant MISSED — then
 # a merge packet citing the first two must prepare (its meta.tsv and packet name them); citing the unresolved
@@ -532,6 +582,14 @@ if [ "${VS_CTL:-}" = unchecked-cite ]; then
     echo "FAIL: rule-checker prepare cites (control mode unchecked-cite — $got)"; exit 1
 fi
 
+if [ "${VS_CTL:-}" = ok-redone ]; then
+    okredo "$W/okredo.py" || exit 3
+    got="$(prepare_redoes "$W/okredo.py" "$W/prmode")"
+    echo "MODE: control ok-redone — the shadow copy reads: $got"
+    case "$got" in PREPARED-REDOING-*) ;; *) echo "REFUSED: the shadow copy did not redo an OK run ($got)"; exit 3;; esac
+    echo "FAIL: rule-checker prepare redoes (control mode ok-redone — $got)"; exit 1
+fi
+
 if [ "${VS_CTL:-}" = blame-unticketed ]; then
     unblame "$W/unblamed.py" || exit 3
     got="$(resolve_blame "$W/unblamed.py" "$W/rbl_mode")"
@@ -662,6 +720,11 @@ got="$(prepare_cites tools/rulecheck.py "$W/pcites")"
 echo "  $got"
 [ "$got" = CITES-OK ] || { echo "FAIL: prepare's citations ($got)"; fail=1; }
 
+echo "== PREPARE REDOES: a re-check carries its action, and only a VIOLATED, VOID or not-run packet is redone (#335) =="
+got="$(prepare_redoes tools/rulecheck.py "$W/predo")"
+echo "  $got"
+[ "$got" = REDOES-OK ] || { echo "FAIL: prepare's --redoes ($got)"; fail=1; }
+
 echo "== MODE VERDICT: a mode is honoured only on its own finding (runs 2026-10-13-952/953) =="
 printf '  FAIL: 2026-10-13-950: VIOLATED with no resolution — the action it stopped is still stopped\n' > "$W/mv_other.log"
 { cat "$W/mv_other.log"; printf '  FAIL: 2026-09-17-01: %s (reads VIOLATED)\n' "$(expect_msg quiet-control)"; } > "$W/mv_own.log"
@@ -731,6 +794,16 @@ if uncite "$W/uncited_c.py"; then
     esac
 else
     vs_ctl_dead unchecked-cite "the citation check was not found to remove"; fail=1
+fi
+
+if okredo "$W/okredo_c.py"; then
+    got="$(prepare_redoes "$W/okredo_c.py" "$W/prc")"
+    case "$got" in
+        PREPARED-REDOING-*) vs_ctl_fired ok-redone "the copy without the OK refusal: $got";;
+        *) vs_ctl_dead ok-redone "the shadow copy read $got"; fail=1;;
+    esac
+else
+    vs_ctl_dead ok-redone "the OK refusal was not found to remove"; fail=1
 fi
 
 if unblame "$W/unblamed_c.py"; then
@@ -833,7 +906,7 @@ for c in counted-id late-validate; do
 done
 
 if [ "$fail" -eq 0 ]; then
-    echo "PASS: the rule-checker's record is sound, record binds the spawn check, prepare's ids hold, prepare requires the session key, a merge packet's cited fork runs are checked, resolve refuses unticketed instrument blame and takes a re-check only from a full run of the standing close checks it makes itself, prepare hands a reader nothing it cannot read whole and every plant rotation position is readable (#258), and its nineteen controls fire"
+    echo "PASS: the rule-checker's record is sound, record binds the spawn check, prepare's ids hold, prepare requires the session key, a merge packet's cited fork runs are checked, resolve refuses unticketed instrument blame and takes a re-check only from a full run of the standing close checks it makes itself, prepare hands a reader nothing it cannot read whole and every plant rotation position is readable (#258), a re-check carries its action and an OK run is never redone (#335), and its twenty controls fire"
 else
     echo "FAIL: rule-checker record"
     exit 1

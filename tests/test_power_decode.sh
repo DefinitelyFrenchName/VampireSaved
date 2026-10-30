@@ -28,7 +28,7 @@
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
-W="$(mktemp -d "${TMPDIR:-/tmp}/powdec.XXXXXX")"; trap 'rm -rf "$W"' EXIT
+W="$(mktemp -d "${TMPDIR:-/tmp}/powdec.XXXXXX")" || { echo "FAIL: test_power_decode — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 
 if [ -f build/out/vsavj_opcodes.bin ] && [ -f build/out/vsav2_opcodes.bin ] && [ -f build/out/vsavj_data.bin ]; then

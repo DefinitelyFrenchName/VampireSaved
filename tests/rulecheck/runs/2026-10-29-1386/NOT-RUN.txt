@@ -1,0 +1,1 @@
+NOT RUN (14z-212): prepare's packet check flagged two QUOTE spans made by the claim's own shell quoting (an escaped double quote in item 1, and the trap-order text's nested "$X" forms pairing across words) — reworded without bare double quotes and re-prepared.

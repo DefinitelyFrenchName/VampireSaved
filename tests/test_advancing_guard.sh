@@ -89,7 +89,7 @@
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 : "${ROMDIR:?set ROMDIR}"
-W="$(mktemp -d "${TMPDIR:-/tmp}/advg.XXXXXX")"; trap 'rm -rf "$W"' EXIT
+W="$(mktemp -d "${TMPDIR:-/tmp}/advg.XXXXXX")" || { echo "FAIL: test_advancing_guard — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 EXP="tests/expected/advancing_guard.txt"
 . "$REPO/tests/lib/decrypt_cache.sh"

@@ -2,13 +2,16 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 334
+# issues: 337
 number	state	reason	closed	labels	title
-334	OPEN	-	-	evolution,performance,severity: low	#321's remainder: the job knobs on PILOT and under load, and the knob-less gates' survey
-333	OPEN	-	-	bug,severity: low	106 gate scripts carry on after a failed mktemp -d; 8 then touch paths under /
+337	OPEN	-	-	evolution,severity: low,test-integrity	The mktemp census does not check EXIT-trap order: a trap installed before a guarded site runs on the guard's stop
+336	CLOSED	COMPLETED	2026-10-30	bug,severity: low,test-integrity	test_static_runner section 32 FAILs on every Linux host: dash words its write error 'I/O error', the premise counted only bash's 'Broken pipe'
+335	OPEN	-	-	evolution,severity: low	The session ledger: the rule-checker's first-run OK rate per action, and which question fails first
+334	CLOSED	COMPLETED	2026-10-30	evolution,performance,severity: medium	#321's remainder: the job knobs on PILOT and under load, and the knob-less gates' survey
+333	CLOSED	COMPLETED	2026-10-30	bug,severity: low	106 gate scripts carry on after a failed mktemp -d; 8 then touch paths under /
 332	CLOSED	COMPLETED	2026-10-27	bug,severity: low	audit_guard_cancels reads a missing out-of-tree table as 0 lines differing, so its node-shift control reads DEAD
 331	CLOSED	COMPLETED	2026-10-27	evolution,severity: low	#229's remainder: Demitri's ES Demon Cradle GC unjoined; the FE..JE specials section and two stale lines on the cross-check page
-330	OPEN	-	-	evolution,severity: low	Throws: recovery and throw tech not measured for the normal and command throws (split from #229)
+330	CLOSED	COMPLETED	2026-10-30	evolution,severity: low	Throws: recovery and throw tech not measured for the normal and command throws (split from #229)
 329	CLOSED	COMPLETED	2026-10-27	evolution,severity: low	The minimal half-circle inputs vsavj accepts are not measured from the command handlers (split from #229)
 328	CLOSED	COMPLETED	2026-10-27	bug,severity: low,test-integrity	Two emulator gates default to builds a clean clone lacks: audit_trap_sound (build/hui30), test_shim_charid (build/m5_wide)
 327	CLOSED	COMPLETED	2026-10-27	bug,severity: low,test-integrity	test_static_runner: 'printf | grep -q' races (SIGPIPE) and a control reads DIED under load
@@ -71,7 +74,7 @@ number	state	reason	closed	labels	title
 270	CLOSED	COMPLETED	2026-10-13	evolution	The close's documentation packet asks only what the deterministic close checks do not cover; presentation fixes re-checked deterministically
 269	CLOSED	COMPLETED	2026-10-14	evolution	Static tier turned around: a session runs the gates whose followed paths changed plus a core, controls only for changed gates; freeze and release run everything
 268	CLOSED	COMPLETED	2026-10-13	evolution	test_close_tools cut back: session runs self-tests only, one-pass retraction scan at freeze/release, section-scoped control modes, retraction-file audit
-267	OPEN	-	-	evolution,parked	Session ledger as a static page generated into docs/site/ at each close (hosting and what to publish are the maintainer's calls)
+267	OPEN	-	-	evolution	Session ledger as a static page generated into docs/site/ at each close (hosting and what to publish are the maintainer's calls)
 266	CLOSED	COMPLETED	2026-10-25	bug	PILOT's GNOME Shell segfaults under Wayland since 2026-10-09, so audit_release_linux_desktop cannot run
 265	CLOSED	COMPLETED	2026-10-13	evolution	audit_mask_window_ff42a2 at a release: an instrument with no default subject SKIPs, and the staleness audit now FAILs that SKIP
 264	CLOSED	COMPLETED	2026-10-12	evolution	A session dashboard: time per activity, checks and re-checks and why, tier cost and quality signals, each figure labelled measured, derived, estimated, inferred or extrapolated
@@ -211,7 +214,7 @@ number	state	reason	closed	labels	title
 130	CLOSED	COMPLETED	2026-10-03	bug	bundle_win_dlls.py prints a broken character for its em dash on MSYS2 (build logs only)
 129	OPEN	-	-	evolution,parked,severity: low	Tenant CPU AI looks lackluster (unproven; first question: are the ported script blocks complete?)
 128	OPEN	-	-	evolution,parked	Marionette: parked until further notice
-127	OPEN	-	-	cosmetic,parked	fix Press of Death by making its effect own its palette row (scope first) [#112's option (B)]
+127	OPEN	-	-	cosmetic,parked	fix Press of Death palette swap by making its effect own its palette row (scope first) [#112's option (B)]
 126	CLOSED	COMPLETED	2026-10-01	cosmetic,parked	Select-wheel look-and-feel polish
 125	OPEN	-	-	cosmetic,parked	Arcade-ladder map: for the three tenants the next opponent's name and small portrait are wrong (the VS screen that follows is correct)
 124	OPEN	-	-	cosmetic,parked	Arcade-ladder map tag shows the base/shell character for a VS2 tenant opponent

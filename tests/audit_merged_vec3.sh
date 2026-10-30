@@ -20,7 +20,7 @@
 #   renumbering (pair any change with donovan/12_vs_cpu staying guard-clean). Both probe runs on emulated time at
 #   their frozen game clocks, the staging leg on replay.lua's checksum.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/audit_merged_legacy.sh tests/expected/instr_gameclock/
-#   tests/lib/controls.sh tests/lib/instr_align.sh tests/lua/emu_clock.lua tests/lua/replay.lua
+#   tests/lib/controls.sh tests/lib/instr_align.sh tests/lib/jobs.sh tests/lua/emu_clock.lua tests/lua/replay.lua
 #   tests/lua/replay_guard.lua tests/replays/hui/70_hui_mash.rpl
 #   tests/test_type_stamp_census.sh tools/run_mame.sh tools/run_replay_guarded.sh
 #   tools/setup_mame.sh
@@ -79,7 +79,7 @@
 # donovan/12_vs_cpu staying guard-clean — the replay that caught the
 # withdrawn design.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] tests/audit_merged_vec3.sh [merged_build] [--freeze-clock]
+# Usage: ROMDIR=... [MAME_BIN=...] [JOBS=N] tests/audit_merged_vec3.sh [merged_build] [--freeze-clock]
 # Default merged build: build/merged1 (rebuild it with
 # tests/audit_merged_legacy.sh). ~4 min: two guarded MAME runs.
 #
@@ -131,12 +131,21 @@ HUI_POKES="1704:ff8782:10;1760:ff8782:10;1900:ff8782:10;2100:ff8782:10;2400:ff87
 # matches an instruction start, so a bp there reads as a clean zero — the
 # dead-instrument trap, measured 14z-81.
 COND="a6==0xffb800"
-probe() {  # probe <build> <out> <leg>
+# JOBS (#334 item 2, 14z-211): the two probe runs are independent — each writes only its own log, align file and
+# sandbox, and the merged run reads nothing of the reference run (the reference A0 only JUDGES it) — so both go through
+# tests/lib/jobs.sh's pool, JOBS at a time; default min(4, CPUs/6), and the sections below read them after. probe_note
+# writes each run's manifest row in the order the runs always had (ref = row 1, the staging leg). The --freeze-clock
+# pool keeps its own default of 4 (FZ_JOBS, taken before vs_jobs sets JOBS); a JOBS the caller sets reaches both.
+FZ_JOBS="${JOBS:-4}"
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+probe() {  # probe <build> <out>
     # shellcheck disable=SC2086
     env $_clk POKES="$HUI_POKES" MAME_ROMPATH="$(abspath "$1")/rompath;$ROMDIR" ALIGN_OUT="$2.align" \
     GUARD_PROBE=15084 GUARD_PROBE_COND="$COND" GUARD_PROBE_MAX=20000 \
         tools/run_replay_guarded.sh vsavjw tests/replays/hui/70_hui_mash.rpl \
         "$2" "$W/box_$(basename "$2")" >/dev/null 2>&1 || true
+}
+probe_note() {  # probe_note <build> <out> <leg>
     ia_note_run "$W/manifest.tsv" "$3" 70_hui_mash vsavjw "$(abspath "$1")/rompath;$ROMDIR" \
         "$REPO/tests/replays/hui/70_hui_mash.rpl" \
         "MAME_BIN=$MAME_BIN POKES=$HUI_POKES GUARD_PROBE=15084 GUARD_PROBE_COND=$COND GUARD_PROBE_MAX=20000" "$2.align"
@@ -164,8 +173,14 @@ a0_first() {   # "<frame> <A0>" of the FIRST PROBE on the satellite's slot whose
          }' "$1"
 }
 
+vs_pool_start "$JOBS"
+vs_pool_run probe "$REF" "$W/ref.log"
+vs_pool_run probe "$MERGED" "$W/new.log"
+vs_pool_wait
+probe_note "$REF" "$W/ref.log" ref
+probe_note "$MERGED" "$W/new.log" merged
+
 echo "== the healthy reference (hui29) =="
-probe "$REF" "$W/ref.log" ref
 RF="$(a0_first "$W/ref.log")"; R="${RF#* }"
 [ -n "$RF" ] || { echo "FAIL: rig dead — no satellite walk on $REF (the replay"; \
                  echo "      or pokes moved; fix the rig before reading verdicts)"; exit 1; }
@@ -183,7 +198,6 @@ PY
 )"
 
 echo "== the build under test ($MERGED) =="
-probe "$MERGED" "$W/new.log" merged
 MF="$(a0_first "$W/new.log")"; M="${MF#* }"
 CRASH="$(grep -m1 '^CRASH' "$W/new.log" || true)"
 [ -n "$MF" ] || { echo "FAIL: rig dead on $MERGED — no satellite walk"; exit 1; }
@@ -199,7 +213,7 @@ echo "== the instrument's alignment (#228 step 4, option A) =="
 afail=0
 if [ "$FREEZE_CLOCK" = 1 ]; then
     [ "$vfail" = 0 ] || { echo "REFUSED: the verdict failed — nothing frozen"; exit 1; }
-    ia_freeze "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" "$W/fz" "${JOBS:-4}" "$W/clocks.tsv" \
+    ia_freeze "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" "$W/fz" "$FZ_JOBS" "$W/clocks.tsv" \
         > "$W/fz.txt" || { sed 's/^/  /' "$W/fz.txt"; echo "REFUSED: the alignment does not hold — nothing frozen"; exit 1; }
     mkdir -p "$(dirname "$CLOCKS")"
     { echo "# $CLOCKS — the game clock RAM:\$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,"

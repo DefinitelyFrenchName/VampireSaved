@@ -496,9 +496,10 @@ for line in open("tests/ci_emulator.tsv"):
         sys.exit(1)
     # 14z-196 (ruled): an ondemand row's subject is pristine content only, and says so; 14z-199 (ruled, #265): or it
     # is an instrument with no default subject, run by hand with its operands; 14z-206 (ruled 2026-10-23, #291): or its
-    # subject is the comparative capture sheets themselves
-    if c[2] == "ondemand" and c[5].split(":")[0] not in ("pristine", "instrument", "sheets"):
-        print(f"  FAIL: ondemand row {c[0]} needs the reason keyword pristine:, instrument: or sheets:, got {c[5][:40]!r}")
+    # subject is the comparative capture sheets themselves; 14z-212 (ruled 2026-10-29, #334): or its subject is the
+    # test harness itself
+    if c[2] == "ondemand" and c[5].split(":")[0] not in ("pristine", "instrument", "sheets", "harness"):
+        print(f"  FAIL: ondemand row {c[0]} needs the reason keyword pristine:, instrument:, sheets: or harness:, got {c[5][:40]!r}")
         sys.exit(1)
     if c[0] in rows:
         print(f"  FAIL: duplicate row {c[0]}"); sys.exit(1)

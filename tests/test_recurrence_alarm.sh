@@ -28,7 +28,7 @@
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
-W="$(mktemp -d "${TMPDIR:-/tmp}/recur.XXXXXX")"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d "${TMPDIR:-/tmp}/recur.XXXXXX")" || { echo "FAIL: test_recurrence_alarm — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 : > "$W/empty.tsv"
 

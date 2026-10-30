@@ -94,7 +94,7 @@ expect() {  # expect <name> -> the substring the rejection must carry
 echo "== test_md_subset: the corpus parses inside the declared subset =="
 [ -f "$TOOL" ] || { echo "FAIL: $TOOL is absent"; exit 1; }
 
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: test_md_subset — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 
 # --- 1. the tool's own self-tests -------------------------------------------
 if python3 "$TOOL" > "$W/self.log" 2>&1; then

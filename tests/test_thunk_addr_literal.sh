@@ -59,7 +59,7 @@ if [ ! -d "$EXTRACT" ]; then
     exit 0
 fi
 
-WORK="$(mktemp -d)"
+WORK="$(mktemp -d)" || { echo "FAIL: test_thunk_addr_literal — mktemp -d failed (WORK)"; exit 2; }
 trap 'rm -rf "$WORK"' EXIT INT TERM
 fail=0
 

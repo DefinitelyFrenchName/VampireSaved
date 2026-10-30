@@ -506,15 +506,16 @@ rows above the same way and reproduces their verdicts (22 rows: startup, gauge, 
 | white | **EXACT** on 13 of 14 — Morrigan's row writes the same figure in its white cell as in its red, where ours stages a white part of that total |
 | startup | **CONSTANT OFFSET**: sheet = ours +1 on all 14, as on the ground |
 | recovery (#330) | the cell's terms summed (`40 + 23 + landing 1`) against the thrower's first accepted tick when thrown, per row against FOUR heights — the rig's, and pressed 3 ticks earlier, 3 and 6 later, every height that still throws (the maintainer: *"Against a height range"*): **EXACT** on 2 of 14 at the rig's height, **inside the height range** on 4, **INCONSISTENT** on 8 (sheet - ours at the rig's height, -4..+4) |
-| throw tech (#330) | the advantage after a tech, the same way: **EXACT** on 5 of 12, **inside the height range** on 4, **INCONSISTENT** on 3; Lei-Lei's and Victor's cells are empty — Lei-Lei's air throw has no tech, Victor's tech lowers the damage and moves neither fighter's recovery |
+| throw tech (#330) | the advantage after a tech, the same way, and against the three victims at the rig's height too (the maintainer: *"Measure them too"*): **EXACT** on 5 of 12, **inside the height range** on 4, **inside the victim range** on 1 (Bulleta: Lilith's figure), **INCONSISTENT** on 2 (Jedah, Q-Bee: 1 from the nearest figure); Lei-Lei's and Victor's cells are empty — Lei-Lei's air throw has no tech, Victor's tech lowers the damage and moves neither fighter's recovery |
 
 **Recovery and the throw tech in the air (#330, 14z-211; the same gate, `tests/audit_throw_recovery.sh`, family `air`).**
 Measured at speed level 0 like the ground throws; the air rigs press at the TICK the level-6 rig reaches its press in
 (every fighter's height and the pair's distance at the commit equal the level-6 rig's). The tech techs at k = 1..7
 ticks after the air press on 26 of 28 events, not at 8. An air throw's recovery moves with the HEIGHT it is made at
-(by up to 9 ticks on 10 of 14 characters), and the sheet's heights are unknown: hence the range. **Not covered:**
-other victims — the air throws are in the tree on Victor (Demitri for Victor) only (a run on Demitri froze and was
-held back with Lilith's failed one), while the ground throws' tech advantage moves with the victim by up to 4 ticks.
+(by up to 9 ticks on 10 of 14 characters), and the sheet's heights are unknown: hence the range. **Other victims**
+(14z-212): the air throws are also frozen on Demitri (28 events) and Lilith (20: the air throws of Aulbath, Gallon,
+Jedah and Victor never hold on her at the rig's height and are left out, as a height that does not throw is); the
+throw tech is classified against their figures too. The command throws are frozen on all three victims as well.
 
 ## The specials, FE AN AU BI BU DE GA JE (14z-205, frozen 14z-209, #229, page section #331)
 
@@ -618,7 +619,8 @@ unmashed count); **gauge** is P1's meter at the event's end from 0; **startup** 
 | white (hit series) | **EXACT** on 47, **IN RANGE** on 5, **INCONSISTENT** on 1: Anakaris's ES Mummy Drop |
 | gauge | **EXACT** on 47, **INCONSISTENT** on 5 (Anakaris's Pit of Blame and ES Pit of Blame, Gallon's Wild Circular, Morrigan's Cryptic Needle, Victor's Giga Shock), **UNCOMPARABLE** on 1 (Midnight Pleasure: its input's own normals land first) |
 | startup (press to hold) | **INCONSISTENT**: +1 on 19 of 53 (spread -44..+8); CONSTANT OFFSET +1 for BU FE GA LE SA VI ZA (the ground throws' offset), +8 for LI, INCONSISTENT for AN AU BI DE JE MO QB — what the sheet counts for a motion grab is open |
-| recovery, throw tech | not measured yet (#330, open): a first measurement's whiffs from wide pins were a plain normal on 28 of 82 events — the range-checked grabs' input out of range — so the family is re-measured in range, a victim that cannot be grabbed, before it is classified; the workbook's throw tech cell is empty on all 53 rows |
+| recovery (whiff, #330) | the WHIFF profile summed (startup + active + recovery, a `1(5)1` bracket counted) against our whiff tick — the first accepted input after the button press, each grab made to whiff from pins 150 px wider each (the maintainer: *"Whiff recovery + techability"*): sheet = ours **+1** on 32 of 41 compared events — **CONSTANT OFFSET +1** for Anakaris, Demitri, Lilith, Q-Bee, Sasquatch, Victor and Zabel (the ground throws' offset); **INCONSISTENT** for Aulbath's ES grabs (-27, -22), Bishamon (+1..+7), Bulleta (-34..-18), Jedah (-29..+1) and Lei-Lei (-1..+6); 9 rows' cells are prose (UNCOMPARABLE). **No whiff exists on 28 events** (the maintainer: *"No whiff"*, 2026-10-28): Pit of Blame draws no move without a knocked-down victim, and 24 grabs start their move only when the engine's throw check passes — out of range, or against a victim it refuses, the 632[4] / 6324 grabs of Aulbath, Felicia, Gallon, Jedah, Morrigan, Q-Bee and Zabel give the button's plain normal and Bishamon's and Demitri's 360 MP / HP a jump, so the sheet's whiff cells on those rows describe nothing vsavj does (their ES versions do whiff: *"Yes, it is the whiff"*) |
+| throw tech (#330) | the workbook's cell is empty on all 53 rows; measured (the victim's back + HP and back + HK at 1 and 7 ticks into the hold), the hold techs on 2 of 82 events — Victor's Giga Shock, both strengths, where the game shows TECH. HIT — and on none of the other 80 |
 
 ## The guard cancels (14z-205, classified 14z-209 on the Q5/Q6 basis, #229)
 

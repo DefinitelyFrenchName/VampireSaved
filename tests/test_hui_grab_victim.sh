@@ -10,7 +10,7 @@
 #   controls.
 # EXPECTS: with GRAB_VICTIM_EXPECT=matches (the default) ours tracks native through the hold
 #   (peak delta 0); a leg without seq 0x0E and 0x13 damage is refused; the controls fail.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/field_trace.lua
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/field_trace.lua tests/lib/jobs.sh
 #   tests/replays/hui/80_hui_grab_2p.rpl tools/check_grab_victim.py tools/run_mame.sh
 #   tools/setup_mame.sh tests/lib/sheet.sh
 #
@@ -49,7 +49,7 @@
 #      refused, proving the connect gate works. (The 14z-71 lesson: a dead
 #      instrument and a real result are the same shape from outside.)
 #
-# Usage: ROMDIR=... [GRAB_VICTIM_EXPECT=differs|matches] \
+# Usage: ROMDIR=... [GRAB_VICTIM_EXPECT=differs|matches] [JOBS=N] \
 #            tests/test_hui_grab_victim.sh [wide-builddir]
 #        (defaults to build/hui61)
 #
@@ -98,23 +98,32 @@ PK="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10;1400:ff8b82:03;1450:ff8b82:03;1
 # seq +0x06, hp +0x50.w (docs/game/atlas/ram.md).
 FIELDS="ff8410:w:p1x,ff8414:w:p1y,ff840b:b:p1face,ff8406:b:p1seq,ff8450:w:p1hp,ff8810:w:p2x,ff8814:w:p2y,ff880b:b:p2face,ff8806:b:p2seq,ff8850:w:p2hp,ff8832:w:p2link"
 
+# JOBS (#334 item 2, 14z-211): the two legs are independent — each writes only $WORK/<tag> — so they go through
+# tests/lib/jobs.sh's pool, JOBS at a time; default min(4, CPUs/6). A pooled leg records its runner's exit status in
+# $WORK/<tag>/rc, and the legs are judged after the pool, in their old order, with the old FAIL lines.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
 leg() {   # $1 tag  $2 set  $3 rompath-or-empty
     tag=$1; set_=$2; rp=$3
     d="$WORK/$tag"; mkdir -p "$d/s1"
     if [ -n "$rp" ]; then MAME_ROMPATH="$rp;$ROMDIR"; export MAME_ROMPATH
     else unset MAME_ROMPATH || true; fi
-    ( cd "$d" && REPLAY="$RPL" POKES="$PK" FIELDS="$FIELDS" \
+    if ( cd "$d" && REPLAY="$RPL" POKES="$PK" FIELDS="$FIELDS" \
       FIELD_OUT="$d/field.txt" FIELD_FROM=3130 FIELD_TO=3300 FRAMES=3400 \
       MAME_SANDBOX="$d/s1" \
       "$REPO/tools/run_mame.sh" "$set_" \
       -autoboot_script "$REPO/tests/lua/field_trace.lua" \
-      > "$d/run.out" 2>&1 ) || { tail -6 "$d/run.out"; echo "FAIL: $tag leg"; exit 1; }
+      > "$d/run.out" 2>&1 ); then echo 0 > "$d/rc"; else echo 1 > "$d/rc"; fi
 }
 
+vs_pool_start "$JOBS"
 echo "== native leg (vsav2)"
-leg native vsav2 ""
+vs_pool_run leg native vsav2 ""
 echo "== build leg ($BUILD)"
-leg ours vsavjw "$BUILD/rompath"
+vs_pool_run leg ours vsavjw "$BUILD/rompath"
+vs_pool_wait
+for tag in native ours; do
+    [ "$(cat "$WORK/$tag/rc" 2>/dev/null)" = 0 ] || { tail -6 "$WORK/$tag/run.out"; echo "FAIL: $tag leg"; exit 1; }
+done
 
 # THE SHEET (#291): with SHEET_OUT set, the two legs as this run played them, at the grab onset and through the hold
 # the checker judges (each leg anchored on its own onset), proven on the eleven fields this run traced there. Nothing

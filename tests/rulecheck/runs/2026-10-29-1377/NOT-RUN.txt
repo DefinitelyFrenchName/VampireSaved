@@ -1,0 +1,1 @@
+NOT RUN (14z-212): prepare's packet check flagged the closing comment's absolutes; one was an unverified universal ("Each gate's own END-line and completeness checks cover that") and "every setting" hid the count (36 timed, the question said 35). Caught before any reader was spawned; re-prepared.

@@ -11,7 +11,7 @@
 #   fixture-override and shock-window rows.
 # EXPECTS: identical accent uploads every phase, Victor's bytes untouched and cycling, the
 #   shock-window rows vanilla; a red is a palette regression no RAM oracle would see.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua tests/lib/jobs.sh tests/replays/
 #   tests/replays/31_don_6hp_vsavj.rpl tests/replays/34_victor_5hp_vsavj.rpl
 #   tools/run_mame.sh tools/setup_mame.sh
 #
@@ -29,7 +29,7 @@
 # legacy gate is blind here — this static+pixel-adjacent gate is the
 # only guard.
 #
-# Usage: ROMDIR=... tests/test_don_accent.sh [rompath_dir]
+# Usage: ROMDIR=... [JOBS=N] tests/test_don_accent.sh [rompath_dir]
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -68,14 +68,31 @@ assert d[0x1B040:0x1B080] == swap(van[0x39B040:0x39B080]), \
 print("  ok: static — T0==T1==vs2 rowC, rowD slot, Victor accent pristine")
 EOF
 
-# ── 2. behavioral: replay 31 idle window, palette RAM per frame ──────
-DUMPS=$(python3 -c "print(';'.join(f'{f}:90c180-90c23f' for f in range(2440,2480)))")
-DUMPS="$DUMPS" REPLAY="$REPO/tests/replays/31_don_6hp_vsavj.rpl" \
-    CHECKSUM_OUT="$WORK/c.log" MAME_SANDBOX="$WORK" \
-    MAME_ROMPATH="$RPDIR;$ROMDIR" tools/run_mame.sh vsavj \
-    -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
+# JOBS (#334 item 2, 14z-211): sections 2 and 3's runs are independent, so they go through tests/lib/jobs.sh's pool,
+# JOBS at a time; default min(4, CPUs/6). Each writes only its own sandbox ($WORK/idle — it was $WORK itself, the
+# parent of section 3's, until this change — and $WORK/shock), its dumps there and its exit status to $WORK/<sub>.rc;
+# each section then judges its run in the original order, exiting with the run's status where a failed run used to
+# stop the gate (set -e).
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+run_replay() {  # run_replay <sub> <replay> <dumps>
+    if DUMPS="$3" REPLAY="$REPO/tests/replays/$2.rpl" \
+        CHECKSUM_OUT="$WORK/$1/c.log" MAME_SANDBOX="$WORK/$1" \
+        MAME_ROMPATH="$RPDIR;$ROMDIR" tools/run_mame.sh vsavj \
+        -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1; then echo 0 > "$WORK/$1.rc"; else echo $? > "$WORK/$1.rc"; fi
+}
+run_status() { _rs="$(cat "$WORK/$1.rc" 2>/dev/null || echo 1)"; [ "$_rs" = 0 ] || exit "$_rs"; }
+mkdir -p "$WORK/idle" "$WORK/shock"
+vs_pool_start "$JOBS"
+vs_pool_run run_replay idle 31_don_6hp_vsavj \
+    "$(python3 -c "print(';'.join(f'{f}:90c180-90c23f' for f in range(2440,2480)))")"
+vs_pool_run run_replay shock 34_victor_5hp_vsavj \
+    "$(python3 -c "print(';'.join(f'{f}:90c000-90c1ff' for f in range(2655,2696)))")"
+vs_pool_wait
 
-python3 - "$WORK" <<'EOF'
+# ── 2. behavioral: replay 31 idle window, palette RAM per frame ──────
+run_status idle
+
+python3 - "$WORK/idle" <<'EOF'
 import glob, os, sys
 work = sys.argv[1]
 dumps = {}
@@ -132,12 +149,7 @@ EOF
 # and the fixture-override rows must hold native content under effect
 # load. Frozen from a vanilla run, session 14z-20 (arc values are
 # global, so they freeze char-independently).
-DUMPS=$(python3 -c "print(';'.join(f'{f}:90c000-90c1ff' for f in range(2655,2696)))")
-mkdir -p "$WORK/shock"
-DUMPS="$DUMPS" REPLAY="$REPO/tests/replays/34_victor_5hp_vsavj.rpl" \
-    CHECKSUM_OUT="$WORK/shock/c.log" MAME_SANDBOX="$WORK/shock" \
-    MAME_ROMPATH="$RPDIR;$ROMDIR" tools/run_mame.sh vsavj \
-    -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
+run_status shock
 
 python3 - "$WORK/shock" <<'EOF'
 import glob, os, sys

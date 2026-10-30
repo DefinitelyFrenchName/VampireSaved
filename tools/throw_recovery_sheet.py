@@ -10,7 +10,7 @@ throw's press), at speed level 0 a tick a frame.
 
 THE PAGES (rows_for below): air-throw — the air throw itself from the jump, the #229 level-6 rig against the gate's
 level-0 one; air-lp — the air and command LP pairs, larger; tech — a throw untouched against the same throw teched at k = 1, and the window's edge (k = 7
-teched, k = 8 not); ground / air-lp — a one-frame LP pressed one tick BEFORE the frozen tick (it must never come out)
+teched, k = 8 not); ground / air-lp / command-lp (a grab's whiff) — a one-frame LP pressed one tick BEFORE the frozen tick (it must never come out)
 against one pressed ON it (it must); giga — Victor's Giga Shock untouched against the victim's press 1 tick into the hold
 (the command family's ticks, outside the tree and not yet frozen in it).
 
@@ -82,7 +82,16 @@ def rows_for(page):
         for o, tag in ((a - 1, "one tick BEFORE"), (a, "ON the tick")):
             out.append(("air", "FE_air_0", "thrown", f"p1 LP@+{o} A={a}", f"Felicia (thrower), j.6MP thrown: LP {tag} (A={a})",
                         [a - 1, a, a + 1, a + 2, a + 3, a + 4, a + 5, a + 7, a + 10]))
-        # (the command whiffs are not on this page: their frozen whiff was a NORMAL on 28 of 82 events — #330, not frozen)
+        # (the command whiffs are not on this page: build/agent212/t330's capture pages showed the 8 that are not plain)
+        return out
+    if page == "command-lp":
+        # a command grab's WHIFF: a one-frame LP one tick before the frozen tick against one on it (14z-212, #330) — a
+        # constant-offset row (Sasquatch) and an ES grab's own whiff (Aulbath, seq 0x12: "Yes, it is the whiff")
+        out = []
+        for rig, name in (("SA_cmd_1", "Sasquatch 632[4] MP, whiffed"), ("AU_cmd_3", "Aulbath ES 6324PP, whiffed")):
+            a = ticks("command", rig)[1]
+            for o, tag in ((a - 1, "one tick BEFORE"), (a, "ON the tick")):
+                out.append(("command", rig, "whiff", f"whiff p1 LP@+{o} A={a}", f"{name}: LP {tag} (A={a})", lp_offs(a)))
         return out
     if page == "giga":
         h = ticks("command", "VI_cmd_0")[0]
@@ -96,7 +105,7 @@ def main(argv):
     if not argv or not os.environ.get("ROMDIR"):
         sys.exit(__doc__.split("Usage:")[1].rstrip() + "\n(ROMDIR must be set)")
     out = Path(argv[0]).resolve(); out.mkdir(parents=True, exist_ok=True)
-    pages = argv[1:] or ["tech", "ground", "air-throw", "air-lp", "giga"]
+    pages = argv[1:] or ["tech", "ground", "air-throw", "air-lp", "command-lp", "giga"]
     if os.environ.get("KEEP"):
         work = Path(os.environ["KEEP"]).resolve()
     else:   # the runs are scratch unless KEEP names a place for them (#303: every temporary removed at exit)

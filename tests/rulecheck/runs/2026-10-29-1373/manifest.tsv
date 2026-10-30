@@ -1,0 +1,48 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent212/t333/closure/closing_comment.md	ba124d323bb26a4083537daac5a1f952dec6a8ce
+build/agent212/t333/closure/ticket_row_333.tsv	cfcac3fba2aaa603b515b84c718c8d9b7ef16c61
+build/agent212/t333/closure/rulecheck_1366_reader_a.txt	0e8191315400e9dc4e90721c591cd076e0e1c179
+build/agent212/t333/closure/rulecheck_1368_reader_b.txt	539aa6d852d107f4ba7ade551b13e14b07d19f50
+build/agent212/t333/closure/rulecheck_1371_reader_a.txt	58b8cfe068fa2419fc0d29833e73af15a135b628
+build/agent212/t333/closure/census_before.txt	8f5fe35c4ec247c874b1cbb9f92acb649b464a48
+build/agent212/t333/closure/census_now.txt	aed2f1b562235050fed7f97d4cc86fa5b1da9e6f
+build/agent212/t333/closure/census_reach.txt	70a9778e5308e7be1826b3aac6673ab37b5187a8
+build/agent212/t333/closure/test_tmp_hygiene.log	c18cdc72602be8cfc71f5a80b67d5dd133c7c04e
+build/agent212/t333/closure/mode_planted-unguarded.log	454cca3000351a2c647a6f43a64e10772e0a8bfe
+build/agent212/t333/closure/mode_shim-blind.log	a67b95399e9d48d16d6c429768ff07dd1c85464b
+build/agent212/t333/closure/pilot_head.txt	d50beb32ad40bce643f878b47a57a2d76176cb42
+build/agent212/t333/closure/pilot_head2.txt	b386c1b4caa483a9601c5a0d997a1d8c620949dc
+build/agent212/t333/closure/pilot_head3.txt	27f8e2c4deefe4113f62e8e93b048e63d4b7cf47
+build/agent212/t333/closure/pilot_t212r4_static_head.txt	9a090da5136ba74acecd4b0ebce2ad0a46befb0b
+build/agent212/t333/closure/pilot_t212r_static_out_overlap.txt	a21f58d44033cb24bd43f12d5eda764aec87c9aa
+build/agent212/t333/closure/pilot_t212r_static_out_classes.tsv	0602e875a39855646aa0eae757139e1bada2c110
+build/agent212/t333/closure/pilot_t212r_emu_out_overlap.txt	0dc18f3664f52fd95e6f247931e1abae820de004
+build/agent212/t333/closure/pilot_t212r_emu_out_classes.tsv	94789598a2db2aa2c28b93ece3f1dc5e4b894c07
+build/agent212/t333/closure/pilot_t212r_fix_static_overlap.txt	8d7eb8187c94ee6ed98068d49a6e764a4e20e228
+build/agent212/t333/closure/pilot_t212r_fix_static_classes.tsv	d3e5a71795d83f9417dc5a50b543496ba9911cca
+build/agent212/t333/closure/pilot_t212r_fix_emu_overlap.txt	82f0ee52f27e3c893d351ae8984331cb5c7daa9d
+build/agent212/t333/closure/pilot_t212r_fix_emu_classes.tsv	1c8b2a61f4d54c2e98e325348f6cc2e76db0a84b
+build/agent212/t333/closure/pilot_t212r2_static_overlap.txt	17f8db14fcd9ffb4d8855f603c13a0a6242076c4
+build/agent212/t333/closure/pilot_t212r2_static_classes.tsv	e26fea3ee90d5e9c3c79d5f465432d1c8daa532a
+build/agent212/t333/closure/pilot_t212r2_emu_overlap.txt	ff39277580bd3d01e0703927c881ece1355d50e3
+build/agent212/t333/closure/pilot_t212r2_emu_classes.tsv	34816011f558f5e6815ff48bbfcc637b04aed239
+build/agent212/t333/closure/pilot_t212r3_static_overlap.txt	ee9d7fadf94a5aa61cf852763ed1318fa5653857
+build/agent212/t333/closure/pilot_t212r3_static_classes.tsv	28c09def24c78a549cd3767b5911388d78155718
+build/agent212/t333/closure/pilot_t212r4_static_overlap.txt	03953fdac08fb313660e60583fcc40e48acf5e98
+build/agent212/t333/closure/pilot_t212r4_static_classes.tsv	4dc2d9e22f0b237219fcf952380b8571571d93b3
+build/agent212/t333/closure/cc_static_census.txt	6af80a8b8a1f626793ed676dec91acccb87ac3f2
+build/agent212/t333/closure/cc_emu_census.txt	cd23a2fc40181962bcf2f9133e6825de8eaaae03
+build/agent212/t333/closure/eris_run2_results.tsv	04ef0c03e15324cd5d38ba754d1f8da5ee880a62
+build/agent212/t333/closure/eris_times.tsv	43c32867b7ec7132e2aaccc5e7f4adb0c07e6000
+build/agent212/t333/closure/eris_setup.out	4b05fe1ae50a88c8ef17e7d517141c4098326c20
+build/agent212/t333/closure/mtime_readers.txt	ff1532c1a5bd152e2fc17eb9e3f836c83059ca15
+build/agent212/t333/closure/eris_run2_record_start.json.lines-1-52 (lines 1-52 of build/agent212/t333/closure/eris_run2_record_start.json)	7f2e150a41214e319d210afede9a90b20eb0feaf
+tests/controls_concurrent.txt	af36b1668b1cffd59469e790ad978fe5faecdabc
+tests/controls_concurrent_emu.txt	462e69a6056012baa0c968d16dabb3e711d99579
+docs/platform/gotchas.md.lines-3512-3530 (lines 3512-3530 of docs/platform/gotchas.md)	001c32ccb3add50da316d4b4bdd5fde5c105e31f
+docs/project/gotchas.md.lines-7778-7790 (lines 7778-7790 of docs/project/gotchas.md)	7a2128833555831faa7660fb61bd118472835087
+DECISIONS_HISTORY.md.lines-8505-8542 (lines 8505-8542 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-27 (14z-210) — #321: a control mode's environment error is DIED; the emulator runne", and the entries after it up to line 8542)	5f626fc7646b5d812dbb51e09c71f16f32091960
+DECISIONS_HISTORY.md.lines-8598-8607 (lines 8598-8607 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-28 (14z-211) — #334 item 1: all 35 settings timed on PILOT; #333's re-trace waits f")	475eb41bdbe48f69536e07d44baf253ac0b3d74d
+DECISIONS_HISTORY.md.lines-8792-8816 (lines 8792-8816 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-29 (14z-212) — #333: finish it now — every mktemp -d form read and guarded, the sta", and the entries after it up to line 8816)	efca5c059b27ca8e0fdab7049ca085980a16790c
+tools/tmp_hygiene.py	b3983b16efd3bea8af917a9b3dd574ff62d7e3e9
+tests/test_tmp_hygiene.sh	e47206073b895f4c1efdec3e9004bf00fb200af3

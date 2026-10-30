@@ -93,7 +93,7 @@ MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
 DON="${DON:-build/don_m27}"; HUI="${HUI:-build/hui61}"; PYR="${PYR:-build/pyron46}"   # the vs2 EXTRACTS (anim region + index pointers)
 TENANTS="${TENANTS:-donovan pyron huitzil}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: test_move_naming — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }

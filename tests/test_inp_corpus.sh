@@ -10,7 +10,7 @@
 #   each).
 # EXPECTS: no exception on any recording without a DEFECT file, the declared crash exact on
 #   any with one, OPEN ones listed loudly.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/inp/ tests/lua/inp_guard.lua
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/inp/ tests/lua/inp_guard.lua tests/lib/jobs.sh
 #   tools/run_inp_guarded.sh tools/setup_mame.sh
 #
 # SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
@@ -38,7 +38,7 @@
 # <pc6>" — the gate then asserts that exact crash instead (so the capture
 # cannot rot) and lists it loudly as OPEN.
 #
-# Usage: ROMDIR=... [BUILD=build/m3b_merged31] [ONLY=name] tests/test_inp_corpus.sh  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+# Usage: ROMDIR=... [BUILD=build/m3b_merged31] [ONLY=name] [JOBS=N] tests/test_inp_corpus.sh  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 # Emulator tier (MAME, ~1 min per recording). NOT ci_static.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
@@ -75,15 +75,38 @@ live_why() {
     echo "END $(grep -m1 '^END' "$1" | awk '{print $2}')/PLAYBACK $(grep -m1 '^PLAYBACK' "$1" | awk '{print $2}') — zero frames played"
 }
 
+# JOBS (#334 item 2, 14z-211): the playbacks are independent, so they go through tests/lib/jobs.sh's pool, JOBS at a
+# time; default min(4, CPUs/6). Concurrency is safe although HOME=$W is shared: HOME is read by
+# tools/run_inp_guarded.sh only to find $HOME/.cache/vampire-saved/inp/<name> (each run its own copy, made below
+# before any run starts, and only READ by the playback); MAME's home, cfg, nvram, diff, snapshot and state dirs are a
+# per-run mktemp sandbox (-homepath), its cwd and outputs the per-run $W/out_<name>, its log $W/run_<name>.txt. The
+# verdict loop below then reads every run's log in the original order and prints exactly what the serial loop did.
+# The binary's default is resolved HERE, against the caller's HOME: bash 3.2 (macOS /bin/sh) can expand
+# "${MAME_BIN:-$HOME/...}" after a same-command HOME="$W" assignment once an earlier command carried one, and then
+# names $W/.cache/... — no binary, every playback a dead run (seen 14z-211 on the pooled loop with MAME_BIN unset; the
+# registry runner always exports it, tests/run_all_emulator.sh).
+INP_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+play() {  # play <name>
+    HOME="$W" MAME_BIN="$INP_BIN" \
+        STOP_AFTER=5 MAX_FRAMES="${MAX_FRAMES:-6000}" \
+        tools/run_inp_guarded.sh "$BUILD" "$1" "$W/out_$1" > "$W/run_$1.txt" 2>&1 || true
+}
+vs_pool_start "$JOBS"
+for d in tests/inp/*/; do
+    name="$(basename "$d")"
+    [ -n "${ONLY:-}" ] && [ "$name" != "$ONLY" ] && continue
+    [ -f "$d/$name.inp" ] || continue          # reported by the verdict loop, in its place
+    cp -R "$d" "$W/inp/$name"
+    vs_pool_run play "$name"
+done
+vs_pool_wait
 n=0; fail=0; open=0
 for d in tests/inp/*/; do
     name="$(basename "$d")"
     [ -n "${ONLY:-}" ] && [ "$name" != "$ONLY" ] && continue
     [ -f "$d/$name.inp" ] || { echo "  FAIL: $d has no $name.inp"; fail=1; continue; }
-    n=$((n+1)); cp -R "$d" "$W/inp/$name"
-    HOME="$W" MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}" \
-        STOP_AFTER=5 MAX_FRAMES="${MAX_FRAMES:-6000}" \
-        tools/run_inp_guarded.sh "$BUILD" "$name" "$W/out_$name" > "$W/run_$name.txt" 2>&1 || true
+    n=$((n+1))
     CR="$(grep -m1 '^CRASH' "$W/run_$name.txt" || true)"
     live_run "$W/run_$name.txt" || { echo "  FAIL: $name — dead run ($(live_why "$W/run_$name.txt"))"; tail -3 "$W/run_$name.txt"; fail=1; continue; }
     if [ -f "$d/DEFECT" ]; then

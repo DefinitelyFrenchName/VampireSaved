@@ -44,7 +44,7 @@ set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 EXP=tests/expected/gate_follows.tsv
-W="$(mktemp -d "${TMPDIR:-/tmp}/gfol.XXXXXX")"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d "${TMPDIR:-/tmp}/gfol.XXXXXX")" || { echo "FAIL: test_gate_follows — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 
 census() { python3 tools/gate_follows.py --root "$1" 2>/dev/null | cut -f1,2 | sort; }

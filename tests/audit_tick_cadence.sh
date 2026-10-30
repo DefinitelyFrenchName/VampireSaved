@@ -15,7 +15,7 @@
 # EXPECTS: the frozen tick, double-tick and freeze counts per game, one activation per
 #   frame, the pass prediction matching every frame from $FF8081 and the level; each control
 #   fails its section. Levels other than 6 and 8 are not asserted.
-# FOLLOWS: emu/mame-patches/ tests/lib/controls.sh tests/lib/decrypt_cache.sh
+# FOLLOWS: emu/mame-patches/ tests/lib/controls.sh tests/lib/decrypt_cache.sh tests/lib/jobs.sh
 #   tests/lua/replay.lua tests/lua/tap_writes.lua tests/replays/48_don_immortal_ko.rpl
 #   tools/run_mame.sh tools/setup_mame.sh
 #
@@ -110,7 +110,7 @@
 #      same frames over 2560..2899; vsavj with $FF812D forced 0 has no double-tick frame.
 # THE CROSS-GAME DIFFERENCE SECTION A FREEZES IS THE PLAY MODE, NOT THE ENGINE ([VSE-84]).
 #
-# Usage: ROMDIR=... [MAME_BIN=<reference binary, default ~/.cache/vampire-saved/mame-ref/cps2>] tests/audit_tick_cadence.sh
+# Usage: ROMDIR=... [MAME_BIN=<reference binary, default ~/.cache/vampire-saved/mame-ref/cps2>] [JOBS=N] tests/audit_tick_cadence.sh
 # Runtime: ~1.5 min (90 s measured 14z-158 with section C's 16 legs; 49 s before them, measured solo at the 14z-156 close check: ten MAME legs at ~25x speed plus
 # the section B searches; MAME's "Average speed ... (48 seconds)" is EMULATED time, and a
 # runtime once read from it came out ~10x too long), emulator tier.
@@ -131,61 +131,96 @@ grep -v '^#' "$REPO/tests/replays/48_don_immortal_ko.rpl" \
   | sed 's/^2620-2624 p1=.*/2620-2624 p1=3/' | grep -v '^261[048]' > "$W/van.rpl"
 grep -q '^2620-2624 p1=3$' "$W/van.rpl" || { echo "FAIL: the mirror replay was not derived (the activation line is missing)"; exit 1; }
 
-for g in vsav2 vsavj; do
-    for t in "p1:ff841c,8" "p2:ff881c,8" "frz:ff885c,2" "tasks:ff025c,512"; do
-        n=${t%%:*}; tap=${t#*:}
-        MAME_BIN="$BIN" MAME_SANDBOX="$W/sb_${g}_$n" MAME_ROMPATH="$ROMDIR" \
-            REPLAY="$W/van.rpl" POKES="$VPOKE" TAP="$tap" WINDOW=2300,2900 FRAMES=2900 \
-            TRACE_OUT="$W/${g}_$n.tap" \
-            tools/run_mame.sh "$g" -autoboot_script "$REPO/tests/lua/tap_writes.lua" \
-            > "$W/${g}_$n.out" 2>&1 || true
-        grep -q '^END 2900 ' "$W/${g}_$n.tap" 2>/dev/null \
-            || { echo "FAIL: leg $g/$n did not reach frame 2900 (see its MAME output)"; tail -3 "$W/${g}_$n.out"; exit 1; }
-    done
-    # section B's dumps: all work RAM every frame 2560..2760 (they land beside CHECKSUM_OUT)
-    DSPEC="$(python3 -c "print(';'.join(f'{f}:ff0000-ffffff' for f in range(2560, 2761)))")"
-    mkdir -p "$W/dump_$g"
-    MAME_BIN="$BIN" MAME_SANDBOX="$W/sbd_$g" MAME_ROMPATH="$ROMDIR" DUMPS="$DSPEC" \
-        REPLAY="$W/van.rpl" POKES="$VPOKE" CHECKSUM_OUT="$W/dump_$g/c.log" \
-        tools/run_mame.sh "$g" -autoboot_script "$REPO/tests/lua/replay.lua" > "$W/dump_$g/mame.out" 2>&1 || true
-    nd="$(ls "$W/dump_$g"/dump_*_ff0000.bin 2>/dev/null | wc -l | tr -d ' ')"
-    [ "$nd" = 201 ] || { echo "FAIL: leg $g/dumps wrote $nd of 201 work-RAM dumps (see its MAME output)"; tail -3 "$W/dump_$g/mame.out"; exit 1; }
-done
-
+# JOBS (#334 item 2, 14z-211): the 26 MAME legs (section A's 4 taps + 1 dump leg per game, section C's 16 taps) are
+# independent — each writes only its own files ($W/<g>_<n>.tap/.out + sb_<g>_<n>; $W/dump_<g>/ + sbd_<g>;
+# $W/<name>.tap/.out + sbc_<name>) and all read the one derived $W/van.rpl — so they go through tests/lib/jobs.sh's
+# pool, JOBS at a time (default min(4, CPUs/6)). Each leg's END / dump-count check then runs in the serial order, with
+# the decrypt views between sections A and C where they were.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+aleg() {  # aleg <set> <name> <tap>: a section A tap leg
+    MAME_BIN="$BIN" MAME_SANDBOX="$W/sb_${1}_$2" MAME_ROMPATH="$ROMDIR" \
+        REPLAY="$W/van.rpl" POKES="$VPOKE" TAP="$3" WINDOW=2300,2900 FRAMES=2900 \
+        TRACE_OUT="$W/${1}_$2.tap" \
+        tools/run_mame.sh "$1" -autoboot_script "$REPO/tests/lua/tap_writes.lua" \
+        > "$W/${1}_$2.out" 2>&1 || true
+}
+# section B's dumps: all work RAM every frame 2560..2760 (they land beside CHECKSUM_OUT)
+DSPEC="$(python3 -c "print(';'.join(f'{f}:ff0000-ffffff' for f in range(2560, 2761)))")"
+dleg() {  # dleg <set>: a section A dump leg
+    mkdir -p "$W/dump_$1"
+    MAME_BIN="$BIN" MAME_SANDBOX="$W/sbd_$1" MAME_ROMPATH="$ROMDIR" DUMPS="$DSPEC" \
+        REPLAY="$W/van.rpl" POKES="$VPOKE" CHECKSUM_OUT="$W/dump_$1/c.log" \
+        tools/run_mame.sh "$1" -autoboot_script "$REPO/tests/lua/replay.lua" > "$W/dump_$1/mame.out" 2>&1 || true
+}
 # ---- SECTION C's legs (14z-158): the decider's static facts need both decrypted
 # views; the stack chain, the play-mode writes and the causal pairs are taps on the
 # same Victor mirror. The causal pairs pin the RNG ($FF80D4-D5) on both games, which
 # otherwise pick the fighters' update order differently ([VSE-84]).
-. "$REPO/tests/lib/decrypt_cache.sh"
-decrypt_view vsavj "$W/vsavj_op.bin" "$W/vsavj_dat.bin" || { echo "FAIL: vsavj decrypt view"; exit 1; }
-decrypt_view vsav2 "$W/vsav2_op.bin" "$W/vsav2_dat.bin" || { echo "FAIL: vsav2 decrypt view"; exit 1; }
 seq_pokes() { python3 -c "import sys; a, b, s = sys.argv[1:4]; print(';'.join(f'{f}:{s}' for f in range(int(a), int(b))))" "$1" "$2" "$3"; }
-cleg() {  # cleg <name> <set> <tap> <frames> <window> <pokes> [VAR=value ...]
+cleg_run() {  # cleg_run <name> <set> <tap> <frames> <window> <pokes> [VAR=value ...]
     _n="$1"; _g="$2"; _t="$3"; _fr="$4"; _wi="$5"; _pk="$6"; shift 6
     env "$@" MAME_BIN="$BIN" MAME_SANDBOX="$W/sbc_$_n" MAME_ROMPATH="$ROMDIR" \
         REPLAY="$W/van.rpl" POKES="$_pk" TAP="$_t" WINDOW="$_wi" FRAMES="$_fr" TRACE_OUT="$W/$_n.tap" \
         tools/run_mame.sh "$_g" -autoboot_script "$REPO/tests/lua/tap_writes.lua" > "$W/$_n.out" 2>&1 || true
     rm -rf "$W/sbc_$_n"
-    grep -q "^END $_fr " "$W/$_n.tap" 2>/dev/null \
-        || { echo "FAIL: section C leg $_n did not reach frame $_fr (see its MAME output)"; tail -3 "$W/$_n.out"; exit 1; }
+}
+cleg() {  # cleg <name> <frames>: a section C leg's END check (cleg_run ran it)
+    grep -q "^END $2 " "$W/$1.tap" 2>/dev/null \
+        || { echo "FAIL: section C leg $1 did not reach frame $2 (see its MAME output)"; tail -3 "$W/$1.out"; exit 1; }
 }
 RNG="$(seq_pokes 2400 2901 ff80d4:0000)"
 L8="$(seq_pokes 2000 2901 ff8116:08)"
 CUR0="$(seq_pokes 1900 1960 ff8407:00)"
 OFF="$(seq_pokes 2400 2901 ff812d:00)"
+
+vs_pool_start "$JOBS"
 for g in vsav2 vsavj; do
-    cleg "${g}_stk"   "$g" ff8820,4 2760 2560,2760 "$VPOKE" STACKLOG=1 STACKLOG_DEPTH=8
-    cleg "${g}_lvl"   "$g" ff8116,2 2000 800,2000  "$VPOKE" REGLOG=1
-    cleg "${g}_cur"   "$g" ff8406,2 1965 1200,1965 "$VPOKE"
-    cleg "c8_${g}_p1" "$g" ff841c,8 2900 2300,2900 "$VPOKE;$L8;$RNG"
-    cleg "c8_${g}_p2" "$g" ff881c,8 2900 2300,2900 "$VPOKE;$L8;$RNG"
+    for t in "p1:ff841c,8" "p2:ff881c,8" "frz:ff885c,2" "tasks:ff025c,512"; do
+        vs_pool_run aleg "$g" "${t%%:*}" "${t#*:}"
+    done
+    vs_pool_run dleg "$g"
 done
-cleg c6_vsav2_p1  vsav2 ff841c,8 2900 2300,2900 "$VPOKE;$CUR0;$RNG"
-cleg c6_vsav2_p2  vsav2 ff881c,8 2900 2300,2900 "$VPOKE;$CUR0;$RNG"
-cleg c6_vsav2_lvl vsav2 ff8116,2 2000 800,2000  "$VPOKE;$CUR0" REGLOG=1
-cleg c6_vsavj_p1  vsavj ff841c,8 2900 2300,2900 "$VPOKE;$RNG"
-cleg c6_vsavj_p2  vsavj ff881c,8 2900 2300,2900 "$VPOKE;$RNG"
-cleg off_vsavj_p2 vsavj ff881c,8 2900 2300,2900 "$VPOKE;$OFF"
+for g in vsav2 vsavj; do
+    vs_pool_run cleg_run "${g}_stk"   "$g" ff8820,4 2760 2560,2760 "$VPOKE" STACKLOG=1 STACKLOG_DEPTH=8
+    vs_pool_run cleg_run "${g}_lvl"   "$g" ff8116,2 2000 800,2000  "$VPOKE" REGLOG=1
+    vs_pool_run cleg_run "${g}_cur"   "$g" ff8406,2 1965 1200,1965 "$VPOKE"
+    vs_pool_run cleg_run "c8_${g}_p1" "$g" ff841c,8 2900 2300,2900 "$VPOKE;$L8;$RNG"
+    vs_pool_run cleg_run "c8_${g}_p2" "$g" ff881c,8 2900 2300,2900 "$VPOKE;$L8;$RNG"
+done
+vs_pool_run cleg_run c6_vsav2_p1  vsav2 ff841c,8 2900 2300,2900 "$VPOKE;$CUR0;$RNG"
+vs_pool_run cleg_run c6_vsav2_p2  vsav2 ff881c,8 2900 2300,2900 "$VPOKE;$CUR0;$RNG"
+vs_pool_run cleg_run c6_vsav2_lvl vsav2 ff8116,2 2000 800,2000  "$VPOKE;$CUR0" REGLOG=1
+vs_pool_run cleg_run c6_vsavj_p1  vsavj ff841c,8 2900 2300,2900 "$VPOKE;$RNG"
+vs_pool_run cleg_run c6_vsavj_p2  vsavj ff881c,8 2900 2300,2900 "$VPOKE;$RNG"
+vs_pool_run cleg_run off_vsavj_p2 vsavj ff881c,8 2900 2300,2900 "$VPOKE;$OFF"
+vs_pool_wait
+
+for g in vsav2 vsavj; do
+    for t in "p1:ff841c,8" "p2:ff881c,8" "frz:ff885c,2" "tasks:ff025c,512"; do
+        n=${t%%:*}
+        grep -q '^END 2900 ' "$W/${g}_$n.tap" 2>/dev/null \
+            || { echo "FAIL: leg $g/$n did not reach frame 2900 (see its MAME output)"; tail -3 "$W/${g}_$n.out"; exit 1; }
+    done
+    nd="$(ls "$W/dump_$g"/dump_*_ff0000.bin 2>/dev/null | wc -l | tr -d ' ')"
+    [ "$nd" = 201 ] || { echo "FAIL: leg $g/dumps wrote $nd of 201 work-RAM dumps (see its MAME output)"; tail -3 "$W/dump_$g/mame.out"; exit 1; }
+done
+
+. "$REPO/tests/lib/decrypt_cache.sh"
+decrypt_view vsavj "$W/vsavj_op.bin" "$W/vsavj_dat.bin" || { echo "FAIL: vsavj decrypt view"; exit 1; }
+decrypt_view vsav2 "$W/vsav2_op.bin" "$W/vsav2_dat.bin" || { echo "FAIL: vsav2 decrypt view"; exit 1; }
+for g in vsav2 vsavj; do
+    cleg "${g}_stk" 2760
+    cleg "${g}_lvl" 2000
+    cleg "${g}_cur" 1965
+    cleg "c8_${g}_p1" 2900
+    cleg "c8_${g}_p2" 2900
+done
+cleg c6_vsav2_p1  2900
+cleg c6_vsav2_p2  2900
+cleg c6_vsav2_lvl 2000
+cleg c6_vsavj_p1  2900
+cleg c6_vsavj_p2  2900
+cleg off_vsavj_p2 2900
 
 python3 - "$W" "$MODE" <<'PY'
 import os, sys

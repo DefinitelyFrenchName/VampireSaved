@@ -35,7 +35,7 @@
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
+W="$(mktemp -d)" || { echo "FAIL: test_mame_sandbox_log — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT
 # #303 (ruled 2026-10-23, "Callers pass a sandbox"): tools/run_mame.sh makes a mktemp sandbox when MAME_SANDBOX is
 # unset and then execs MAME, so nothing removes it. This gate's subject IS that default (its first run logs a mktemp
 # sandbox as fresh), so instead of passing a sandbox it contains the default: TMPDIR inside $W, and a `mktemp` shim

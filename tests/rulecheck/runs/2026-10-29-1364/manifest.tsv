@@ -1,0 +1,43 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent212/t330/closure/closing_comment.md	943598d2d521d7c9ffde9f81eb25f862be0b105b
+build/agent212/t330/closure/ticket_row_330.tsv	a9a519271ccf5b4d33dc8e621febf6702bd93666
+build/agent212/t330/closure/notes.md	b253fc95223eea93fa86b735c7c192a8b13b21e5
+build/agent212/t330/closure/press_states.tsv	af0fdbbb36d6153ba93c6f6a9bd7c4247fc60258
+build/agent212/t330/closure/whiff_vs_grab.tsv	c294c2b5f3c89a5decc21f0c2779f7c3a0d00b6a
+build/agent212/t330/closure/feas.tsv	6e0770c2178420eff963abc93746cb1e09b09f05
+build/agent212/t330/closure/feas8.tsv	49c5fe5cb5c2dc3d679d4ffb6a32db857e41db5d
+build/agent212/t330/closure/probe_FE_cmd_1.txt	6173b93ccfb8a8339a4171e18fb47929d18f9490
+build/agent212/t330/closure/probe_AU_cmd_1.txt	0981d5224b0548b9fa75d34406e3442f3cad9d0d
+build/agent212/t330/closure/inrange_feas_gen.py	a3e89bc517a60f3e29d31e6a9b9b476127b51f35
+build/agent212/t330/closure/check_probe_gen.py	c039f0a50d6b89d209d9a6af8ebeebcbb06923bf
+build/agent212/t330/closure/es_sheet.py	cf5ffeb09925ee05e9138773ec5d4750566afeb9
+build/agent212/t330/closure/es_page1.png	433de9f0fcba3ffaa8caac50a8accada88ecc8f7
+build/agent212/t330/closure/es_page2.png	3b505a8b70735e8694fe4ccde7dd02f63740cfb1
+build/agent212/t330/closure/es_page3.png	d5eb1f05f6d96fb4ae5f1ef2fa928419649f131a
+build/agent212/t330/closure/throw_recovery_command-lp.png	42912bc57159b3a667e9a5d63887ef75b747b0cb
+build/agent212/t330/closure/freeze_cmd.log	6c589bed2ae91d58314c732d12faa283c9472709
+build/agent212/t330/closure/verify_cmd.log	3db3e175511298bd0c2f427c5346bd5fc8e36069
+build/agent212/t330/closure/verify_default.log	a3d04ca837e271b781c72b149b7f762f9fb302c8
+build/agent212/t330/closure/verify_v01.log	49298af7afa0dc41063e05775eec7354186c6df3
+build/agent212/t330/closure/verify_v0e.log	fe10e44d6ac5f54249f14877b946c12bdfae5cbc
+build/agent212/t330/closure/verify_mode_tick-early.log	e15ba54f24e02f0ab58075d9188ce9bd596e8f56
+build/agent212/t330/closure/verify_mode_lp-tech.log	f6ac848a10d66137ade16db26a34aab072f9c51b
+build/agent212/t330/closure/verify_mode_late-window.log	aadc8675be6a581e5b0871c2685360f62e31cd5d
+build/agent212/t330/closure/verify_mode_gated-whiff.log	63149d9cefd900f73d29b92b70528f92673f68b0
+build/agent212/t330/closure/vic_verify_air_v01.log	ed4e4eb62305aaf370e4d7b57b35dda6e4bae7ad
+build/agent212/t330/closure/vic_air_hv0e.log	674a69bdf6e17e46fffa97921be3eb9a191e2125
+build/agent212/t330/closure/vic_cmd_v01.log	06812a9dd47bb1dbb008e1246182ac88b31feea4
+build/agent212/t330/closure/vic_cmd_v0e.log	755718b064d632900b970e2ad0cce01ef1bf3c94
+build/agent212/t330/closure/xc_tr_command.txt	4db39b7082dab192840de0dd03f44d7ccb5b3baf
+build/agent212/t330/closure/xc_tr_air.txt	9c09aeaa24d3b9cefdbb590e41d636eaea8f35a7
+build/agent212/t330/closure/test_crosscheck_229.log	7a0c2440abccb93ced98588fca3c38dae28a0738
+DECISIONS_HISTORY.md.lines-8605-8775 (lines 8605-8775 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-28 (14z-211) — #330: "actionable" is the first accepted input; a new gate on Victor", and the entries after it up to line 8775)	2f0cdf5d6c38819bf13715515e3843def1a8d33c
+docs/project/tables/community_crosscheck.md.lines-460-520 (lines 460-520 of docs/project/tables/community_crosscheck.md)	4d5f140831e4186e90dfb7b628d6b43cb89ac975
+docs/project/tables/community_crosscheck.md.lines-600-625 (lines 600-625 of docs/project/tables/community_crosscheck.md)	895e2b3b73cb3bec9da3cb222c5918d28ae3195d
+docs/game/engine_internals.md.lines-3613-3648 (lines 3613-3648 of docs/game/engine_internals.md)	19f11dc74b4c1cb1b1582edc6ec875e5ef8ab168
+docs/project/gotchas.md.lines-7724-7777 (lines 7724-7777 of docs/project/gotchas.md)	7b97d450d8573552005e317349b23d6d7e1c3c98
+tests/expected/PROVENANCE.md.lines-93-104 (lines 93-104 of tests/expected/PROVENANCE.md)	7d29340e97a3184ea8875960ae0ddb58139eff9a
+tests/audit_throw_recovery.sh	f68765270d25c85276064f92f3bc83ab37d620a2
+tools/throw_recovery_rigs.py	a182525e5e258349750b85ba26049c2959087baf
+tools/throw_recovery_sheet.py	6765999e8053f8ee62773f2e8271198c562a6d1c
+tools/crosscheck_229.py	277ba611baa36e04bdf49372966fa385dfe9a568

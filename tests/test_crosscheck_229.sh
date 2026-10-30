@@ -32,7 +32,7 @@
 # MUST-FIRE: perturbed-copy: whiff-for-hit — the guard cancels classified with the WHIFF events as their timing (classify_gc timing_kind="whiff") must change the startup verdict from CONSTANT OFFSET (in-gate; mode: the gate's guard-cancel case runs on the whiff and FAILs)
 # MUST-FIRE: perturbed-copy: record-for-dealt — the guard cancels' damage read from the gc (Demitri) event instead of the dealt (-3 victim) event must change the dealt red verdict from EXACT (in-gate; mode: the gate's guard-cancel case reads the gc event and FAILs)
 # MUST-FIRE: perturbed-copy: landing-ignored — the throws' recovery cells read without their "+ landing 1" (the base alone) must change the recovery verdicts of the recovery case (in-gate; mode: the gate's recovery case reads the bare base and FAILs)
-# MUST-FIRE: perturbed-copy: victim-range-dropped — the ground throws classified against the gate's victim alone must lose the INSIDE THE VICTIM RANGE verdict of the throw-tech case (in-gate; mode: the gate's ground case drops the range and FAILs)
+# MUST-FIRE: perturbed-copy: victim-range-dropped — the ground throws (and, since 14z-212, the air throw tech) classified against the gate's victim alone must lose the INSIDE THE VICTIM RANGE verdict of the throw-tech case (in-gate; mode: the gate's ground case drops the range and FAILs)
 # MUST-FIRE: perturbed-copy: height-range-dropped — the air rows classified against the rig's height alone must lose the INSIDE THE HEIGHT RANGE verdict of the air recovery case (in-gate; mode: the gate's air case drops the range and FAILs)
 # MUST-FIRE: perturbed-copy: active-gap-dropped — the command profile's active cell "1(5)1" read as its first number alone must move the command whiff case off CONSTANT OFFSET (in-gate; mode: the gate's command case misreads the cell and FAILs)
 # MUST-FIRE: perturbed-copy: contact-counted — the specials' CONTACT rows classified as if they had not touched P2 must change the startup verdict from CONSTANT OFFSET (in-gate; mode: the gate's specials case counts them and FAILs)
@@ -213,6 +213,14 @@ check("tr air recovery", dict(av[x.TR_COLS[0]]), {"EXACT": 1, "INSIDE THE HEIGHT
 check("tr air tech", dict(av[x.TR_COLS[1]]), {"EXACT": 1, "UNCOMPARABLE": 1})
 check("tr air summed cell", x._tr_sum("72+45+landing 12+turning 1"), 130)
 check("tr air prose cell", x._tr_sum("variable + landing 1"), None)
+# the air throw tech against the other VICTIMS too (14z-212, the maintainer's "Measure them too"): a cell outside the
+# heights' figures but within heights and victims together is INSIDE THE VICTIM RANGE, outside both INCONSISTENT; the
+# control victim-range-dropped drops the victims here too
+gtr.AIR["ZZ"] = [("AIR", "j.6MP", [])]
+wbz = WB({"ZZ": [{"type": "air throw", "recovery": "70", "throw tech": "6.0"}, {"type": "air throw", "recovery": "70", "throw tech": "9.0"}]})
+zv, _, _ = x.classify_tr_air(wbz, [("h0", {("ZZ", "AIR", "j.6MP"): tr(70, 3)}), ("h1", {("ZZ", "AIR", "j.6MP"): tr(70, 4)})],
+                             [] if P == "victim-range-dropped" else [("v1", {("ZZ", "AIR", "j.6MP"): tr(70, 6)})])
+check("tr air tech victims", dict(zv[x.TR_COLS[1]]), {"INSIDE THE VICTIM RANGE": 1, "INCONSISTENT": 1})
 wbc = WB({"XX": [{"move": "GRAB", "startup": "2", "active": "1(5)1", "recovery": "41", "throw tech": ""},
                  {"move": "SLOW GRAB", "startup": "2", "active": "until landing", "recovery": "2", "throw tech": ""},
                  {"move": "QUICK GRAB", "startup": "2", "active": "3", "recovery": "20", "throw tech": ""}]})
@@ -222,7 +230,7 @@ cp, cst, cw = x.classify_tr_cmd(wbc, {("XX", "GRAB", "MK"): {"whiff": 49, "windo
                                       ("XX", "SLOW GRAB", "LK"): {"whiff": 30, "window": "none"}, ("XX", "GRAB", "KK"): {"whiff": None, "window": "none"},
                                       ("XX", "QUICK GRAB", "LP"): {"whiff": 24, "window": "none"}})
 check("tr command whiff", cf.classify(cp["whiff (startup + active + recovery)"])[0], "CONSTANT OFFSET")
-check("tr command rows", dict(cst), {"JOINED": 3, "NO WHIFF (the input draws no move)": 1, "UNCOMPARABLE (a prose startup / active / recovery)": 1, "THROW TECH CELL EMPTY": 3})
+check("tr command rows", dict(cst), {"JOINED": 3, "NO WHIFF (Pit of Blame draws no move; the 24 gated grabs' input is a normal or a jump)": 1, "UNCOMPARABLE (a prose startup / active / recovery)": 1, "THROW TECH CELL EMPTY": 3})
 check("tr command window", dict(cw), {"none": 4, "1-7": 1})
 print("\n".join(out))
 PY

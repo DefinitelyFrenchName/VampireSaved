@@ -120,7 +120,7 @@ if [ -n "${CENSUS_KEEP:-}" ]; then
     case "$W/" in "$REPO"/*) echo "REFUSING: CENSUS_KEEP is inside the repo (rule 7)"; exit 2 ;; esac
     echo "note: CENSUS_KEEP=$W — legs whose banks already exist are NOT re-simulated"
 else
-    W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+    W="$(mktemp -d)" || { echo "FAIL: test_mister_sdram_census — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 fi
 
 # leg <name> <core> <stock|wide>

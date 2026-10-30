@@ -13,7 +13,7 @@
 # EXPECTS: the three band equalities as designed, the poison rejected and visible, liveness.
 #   Donovan rendered as garbage for two sessions with every RAM gate green — this is the
 #   missing gate.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/gfx_region_dump.lua
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/gfx_region_dump.lua tests/lib/jobs.sh
 #   tests/lua/replay.lua tests/replays/36_pick_tenant_cell.rpl
 #   tools/audit_romset_identity.py tools/build_donovan.sh tools/run_mame.sh
 #   tools/setup_mame.sh
@@ -56,7 +56,7 @@
 #      WIDE build with a live framebuffer stream (the render path is
 #      exercised end to end, not just the tile memory).
 #
-# Usage: ROMDIR=... tests/test_wide_render_content.sh [stock_rompath] [wide_rompath]
+# Usage: ROMDIR=... [JOBS=N] tests/test_wide_render_content.sh [stock_rompath] [wide_rompath]
 #   env MAME_WIDE_BIN  WIDE-patched MAME (default ~/.cache/vampire-saved/mame/cps2)
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
@@ -109,18 +109,43 @@ echo "== 2. band equivalence: the emulator's decoded tiles at Donovan's band =="
 # is 0xAD8F; the composed address = code | bank<<16. Stock = bank 2
 # (y-word 0x4000) -> 0x2AD8F. WIDE (m3a, variant id) = bank 4 (y-word
 # 0x1000, the bit-12 promote) -> 0x4AD8F.
-band() {  # band <tag> <set> <rompath> <window>
+band_run() {  # band_run <tag> <set> <rompath> <window> — the emulator run alone
     MAME_BIN="$MAME_WIDE_BIN" MAME_ROMPATH="$3;$ROMDIR" MAME_SANDBOX="$WORK/gsb_$1" \
     GFX_WINDOWS="$4" TRACE_OUT="$WORK/$1.gfx" \
         tools/run_mame.sh "$2" -autoboot_script "$REPO/tests/lua/gfx_region_dump.lua" \
         > "$WORK/$1.gfxrun" 2>&1
+}
+band_read() {  # band_read <tag> — the run's verdict and hash, from its artifact
     grep -q "^GFXDUMPSUMMARY" "$WORK/$1.gfx" || { echo "  dump $1 did not complete"; return 1; }
     awk '/^GFX /{print $5}' "$WORK/$1.gfx"      # the fnv=<hash> field
 }
-b_stock="$(band bstock vsavj  "$STOCK"  2ad8f:16)"  || fail=1
-b_wide4="$(band bwide4 vsavjw "$WIDE"   4ad8f:16)"  || fail=1
-b_wide2="$(band bwide2 vsavjw "$WIDE"   2ad8f:16)"  || fail=1
-b_prist="$(band bpri   vsavj  "$ROMDIR" 2ad8f:16)"  || fail=1
+band() {  # band <tag> <set> <rompath> <window>
+    band_run "$@"
+    band_read "$1"
+}
+live_run() {  # section 4's replay-36 liveness run
+    MAME_BIN="$MAME_WIDE_BIN" MAME_ROMPATH="$WIDE;$ROMDIR" \
+    MAME_SANDBOX="$WORK/sbx_live" REPLAY="$REPO/tests/replays/36_pick_tenant_cell.rpl" \
+    CHECKSUM_OUT="$WORK/live.ram" VIDEO_OUT="$WORK/live.vid" \
+        tools/run_mame.sh vsavjw -autoboot_script "$REPO/tests/lua/replay.lua" \
+        > "$WORK/live.run" 2>&1 || true
+}
+# JOBS (#334 item 2, 14z-211): section 2's four band dumps and section 4's liveness run are independent — each writes
+# only its own sandbox and trace ($WORK/gsb_<tag>, <tag>.gfx; $WORK/sbx_live, live.*) — so they go through
+# tests/lib/jobs.sh's pool, JOBS at a time; default min(4, CPUs/6), and sections 2 and 4 read their artifacts in place.
+# Section 3's poisoned band still runs alone, after its set is made.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+vs_pool_start "$JOBS"
+vs_pool_run band_run bstock vsavj  "$STOCK"  2ad8f:16
+vs_pool_run band_run bwide4 vsavjw "$WIDE"   4ad8f:16
+vs_pool_run band_run bwide2 vsavjw "$WIDE"   2ad8f:16
+vs_pool_run band_run bpri   vsavj  "$ROMDIR" 2ad8f:16
+vs_pool_run live_run
+vs_pool_wait
+b_stock="$(band_read bstock)"  || fail=1
+b_wide4="$(band_read bwide4)"  || fail=1
+b_wide2="$(band_read bwide2)"  || fail=1
+b_prist="$(band_read bpri)"    || fail=1
 
 if [ -n "$b_wide4" ] && [ "$b_wide4" = "$b_stock" ]; then
     echo "  ok: WIDE bank 4 serves the same Donovan tiles as stock bank 2 ($b_wide4)"
@@ -175,11 +200,6 @@ else
 fi
 
 echo "== 4. liveness: the real cell-0x13 pick renders on the WIDE build =="
-MAME_BIN="$MAME_WIDE_BIN" MAME_ROMPATH="$WIDE;$ROMDIR" \
-MAME_SANDBOX="$WORK/sbx_live" REPLAY="$REPO/tests/replays/36_pick_tenant_cell.rpl" \
-CHECKSUM_OUT="$WORK/live.ram" VIDEO_OUT="$WORK/live.vid" \
-    tools/run_mame.sh vsavjw -autoboot_script "$REPO/tests/lua/replay.lua" \
-    > "$WORK/live.run" 2>&1 || true
 if grep -q "^END " "$WORK/live.vid" 2>/dev/null; then
     dis="$(awk '{print $2}' "$WORK/live.vid" | sort -u | wc -l | tr -d ' ')"
     if [ "$dis" -gt 100 ]; then

@@ -88,7 +88,7 @@ RIGS=tests/replays/vanilla_pursuits
 EXP=tests/expected/vanilla_pursuits.tsv
 T=tools/vanilla_pursuit_rigs.py
 WB="${SHEET:-$REPO/../community/vsav-framedata.xlsx}"
-W="${OUT:-$(mktemp -d "${TMPDIR:-/tmp}/vpursuit.XXXXXX")}"; mkdir -p "$W"
+W="${OUT:-$(mktemp -d "${TMPDIR:-/tmp}/vpursuit.XXXXXX")}" || { echo "FAIL: audit_vanilla_pursuits — mktemp -d failed (W)"; exit 2; }; mkdir -p "$W"
 [ -n "${OUT:-}" ] || trap 'rm -rf "$W"' EXIT
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 

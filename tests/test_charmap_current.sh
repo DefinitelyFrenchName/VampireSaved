@@ -59,7 +59,7 @@ PYR="${PYR:-build/pyron46}"  # re-pointed 14z-119 (physics-port freeze) <- 14z-1
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: test_charmap_current — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 . "$REPO/tests/lib/measures.sh"
 # THE M19 SHAPE AS A MODE (rule-checker run 2026-09-24-143, Q4): one anim page emptied after

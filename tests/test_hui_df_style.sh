@@ -14,7 +14,7 @@
 # EXPECTS: with DF_STYLE_EXPECT=differs (the default since the palette fix was withdrawn)
 #   ours differs from native as recorded; the three controls fail. Do not re-fix by
 #   restoring the withdrawn palette-seq row — it was Bulleta's block.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/obj_records_dump.lua
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/obj_records_dump.lua tests/lib/jobs.sh
 #   tests/lua/replay.lua tests/replays/hui/85_hui_df_vs2.rpl tools/check_df_style.py
 #   tools/run_mame.sh tools/run_replay_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
 #
@@ -70,7 +70,7 @@
 # full native equality, which is NOT the target here (the two games run
 # different DF systems, so their palettes are one ramp step apart).
 #
-# Usage: ROMDIR=... [DF_STYLE_EXPECT=differs|matches] \
+# Usage: ROMDIR=... [DF_STYLE_EXPECT=differs|matches] [JOBS=N] \
 #            tests/test_hui_df_style.sh [wide-builddir]
 #        (defaults to build/hui61. NOTE 14z-71: the default USED to be
 #        build/hui11, which PREDATES the 14z-69p palette fix that the
@@ -136,25 +136,48 @@ print(';'.join(['%s:ff8400-ff87ff'%f for f in a]      # P1 fighter block
               + ['%s:90c140-90c15f'%f for f in p]))")"
 OBJ_CSV="$(echo "$OBJFR" | tr ' ' ',')"
 
-leg() {   # $1 tag  $2 set  $3 rompath-or-empty
-    tag=$1; set_=$2; rp=$3
-    d="$WORK/$tag"; mkdir -p "$d/s1" "$d/s2"
-    if [ -n "$rp" ]; then MAME_ROMPATH="$rp;$ROMDIR"; export MAME_ROMPATH
+# JOBS (#334 item 2, 14z-211): the four emulator runs (each leg's replay run and obj run, native and ours) are
+# independent — each writes only its own files ($WORK/<tag>/ram.log + ram.out + dumps + s1; $WORK/<tag>/obj.txt +
+# obj.out + s2) — so they go through tests/lib/jobs.sh's pool, JOBS at a time (default min(4, CPUs/6)). A run's nonzero
+# status lands in $WORK/<tag>/<ram|obj>.rc; the legs are then judged in the serial order, printing what they printed.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+leg_rp() {   # $1 rompath-or-empty: the MAME_ROMPATH a leg runs with (exported, as the serial leg did)
+    if [ -n "$1" ]; then MAME_ROMPATH="$1;$ROMDIR"; export MAME_ROMPATH
     else unset MAME_ROMPATH || true; fi
+}
+leg_ram() {  # $1 tag  $2 set  $3 rompath-or-empty
+    d="$WORK/$1"; leg_rp "$3"
     ( cd "$d" && POKES="$PK" DUMPS="$DUMPS" \
-      "$REPO/tools/run_replay_mame.sh" "$set_" "$RPL" "$d/ram.log" "$d/s1" \
-      > "$d/ram.out" 2>&1 ) || { tail -5 "$d/ram.out"; echo "FAIL: $tag replay leg"; exit 1; }
+      "$REPO/tools/run_replay_mame.sh" "$2" "$RPL" "$d/ram.log" "$d/s1" \
+      > "$d/ram.out" 2>&1 ) || echo "$?" > "$d/ram.rc"
+}
+leg_obj() {  # $1 tag  $2 set  $3 rompath-or-empty
+    d="$WORK/$1"; leg_rp "$3"
     ( cd "$d" && REPLAY="$RPL" POKES="$PK" DUMP_FRAMES="$OBJ_CSV" FRAMES=3700 \
       TRACE_OUT="$d/obj.txt" MAME_SANDBOX="$d/s2" \
-      "$REPO/tools/run_mame.sh" "$set_" \
+      "$REPO/tools/run_mame.sh" "$2" \
       -autoboot_script "$REPO/tests/lua/obj_records_dump.lua" \
-      > "$d/obj.out" 2>&1 ) || { tail -5 "$d/obj.out"; echo "FAIL: $tag obj leg"; exit 1; }
+      > "$d/obj.out" 2>&1 ) || echo "$?" > "$d/obj.rc"
+}
+leg() {   # $1 tag — judge a leg's two runs, in the order and words of the serial leg
+    tag=$1; d="$WORK/$tag"
+    [ ! -f "$d/ram.rc" ] || { tail -5 "$d/ram.out"; echo "FAIL: $tag replay leg"; exit 1; }
+    [ ! -f "$d/obj.rc" ] || { tail -5 "$d/obj.out"; echo "FAIL: $tag obj leg"; exit 1; }
 }
 
+mkdir -p "$WORK/native/s1" "$WORK/native/s2" "$WORK/ours/s1" "$WORK/ours/s2"
+vs_pool_start "$JOBS"
+vs_pool_run leg_ram native vsav2 ""
+vs_pool_run leg_obj native vsav2 ""
+vs_pool_run leg_ram ours vsavjw "$BUILD/rompath"
+vs_pool_run leg_obj ours vsavjw "$BUILD/rompath"
+vs_pool_wait
+leg_rp "$BUILD/rompath"   # the shell's MAME_ROMPATH as the serial build leg left it
+
 echo "== native leg (vsav2)"
-leg native vsav2 ""
+leg native
 echo "== build leg ($BUILD)"
-leg ours vsavjw "$BUILD/rompath"
+leg ours
 
 echo
 echo "== 1. the A/B (expect: $EXPECT)"

@@ -16,12 +16,13 @@
 #   (../charpages/framedata/throw_recovery[_air]_full.tsv, TR_FULL; the 14z-126 frame-data ruling, #319). THE COMMAND
 #   THROWS (family `command`, the maintainer's "Whiff recovery + techability", 2026-10-28): the 82 non-motion events of
 #   tools/command_throw_rigs.py that hold in #229's frozen expectation — the WHIFF from pins 150 px wider each (the
-#   first accepted input from the press, the tick before never; Pit of Blame has none: its input draws no move without
-#   a knocked-down victim) and the TECH at contact (the victim's back + HP and + HK at 1 and 7 ticks after the hold,
-#   alike). THE COMMAND FAMILY IS NOT FROZEN (ruled 2026-10-28, "Commit ground+air, rest next"): its first measurement's
-#   wide "whiff" was a plain NORMAL on 28 of 82 events (the range-checked grabs' input out of range, state seq 0x0A on the
-#   press frame); it is re-measured in range next session (#330, open). TR_FAMILY=command runs it and FAILS section 1
-#   (no frozen set) until then.
+#   first accepted input from the press, the tick before never; the whiff must START THE GRAB'S OWN MOVE: on the press
+#   frame or the five after, the state seq the same input starts when it connects, the whiff control never holding — the four ES grabs, ruled to whiff
+#   into their own seq 0x12, that seq — never standing, walking, a jump or the button's normal) and the TECH at contact (the
+#   victim's back + HP and + HK at 1 and 7 ticks after the hold, alike). 28 EVENTS HAVE NO WHIFF (ruled 2026-10-28,
+#   14z-212, "No whiff"): Pit of Blame (its input draws no move without a knocked-down victim) and the 24 grabs the
+#   engine's throw check gates (tools/throw_recovery_rigs.py CMD_GATED): out of range, or against a victim the check
+#   refuses, their input is the button's plain normal or a jump — a first measurement had frozen that as their "whiff".
 # HOW: tools/throw_recovery_rigs.py gen makes, from the full lines' ticks, per event a THROWN rig (a sacrificial first
 #   event — a rig's first event stands at another stage x —, the control, k = 8, P1 LP at A-1 and A, P2 LP at A-1 and
 #   A) and a TECHED rig (the same with the tech at k = 1, and k = 7), at speed level 0 (RAM:$FF8116 = 00: one engine
@@ -30,25 +31,31 @@
 #   equal the level-6 rig's). The rigs are made at run time and never committed (their press offsets ARE the per-move
 #   ticks). Each rig runs once under tools/run_mame.sh with tests/lua/field_trace.lua (both fighters' +0x04, both
 #   +0x134, both HP words, x, the pass counter), JOBS at a time; a press is ACCEPTED when the presser's +0x04 departs
-#   from its no-LP control ON the press frame into seq 0x0A, mode 00. The header prints the tree's commit and the host.
+#   from its no-LP control ON the press frame into seq 0x0A, mode 00. The header prints the tree's commit, the script's own blob (every log names the script it ran) and the host.
 # EXPECTS: per family 2 rigs per event, every trace complete; on every event every A-1 press refused and every A press
 #   accepted (four ticks), k = 1 and 7 alike, k = 8 not teching, every control holding on its press frame, every line
 #   equal to its frozen hash; the full lines present and each equal to its in-tree hash.
 # NOT TESTED: the air throws' other heights by default (TR_FAMILY=air TR_HEIGHT=-3 / 3 / 6 run their own frozen sets, the
-#   cross-check page's height range, ruled 2026-10-28); other victims by default (TR_VICTIM=01 / 0e run Demitri and Lilith against their own frozen sets, the
-#   cross-check page's three-victim range for the ground throw tech, ruled 2026-10-28 — not the gate's default, ruled
-#   "New gate, Victor only") — and the air and command families have NO other victim in the tree (only the ground throws
-#   have TR_VICTIM sets: the air throws on Demitri were frozen once, 14z-211, and held back with Lilith's failed run),
-#   though the ground tech advantage moves with the victim by up to 4 ticks; other STAGE POSITIONS (every event at the
-#   rig's one walk-in place; a rig's first event at another stage x moved Morrigan's K throw by 6 ticks), the corner; the
-#   command throws (not frozen, above), mashing (Morrigan's and Demitri's K throws, the
+#   cross-check page's height range, ruled 2026-10-28); other victims by default (TR_VICTIM=01 / 0e run Demitri and
+#   Lilith against their own frozen sets, every family — the ground throw tech's three-victim range on the cross-check
+#   page, ruled 2026-10-28, and the maintainer's "Measure them too" for the air and command families; not the gate's
+#   default, ruled "New gate, Victor only"). On another victim an event whose control never holds there is LEFT OUT of
+#   that victim's set (tools/throw_recovery_rigs.py AIR_NOHOLD_VICTIM, CMD_NOHOLD_VICTIM: on Lilith the air throws of
+#   Aulbath, Gallon, Jedah and Victor; Anakaris's and Jedah's grabs listed there), as a height that does not throw is;
+#   other STAGE POSITIONS (every event at the rig's one walk-in place; a rig's first event at another stage x moved
+#   Morrigan's K throw by 6 ticks), the corner; the command throws' tech with any other input or tick (only the victim's
+#   back + HP and back + HK at k = 1 and 7: Giga Shock's window `1-7` is read from those two, its edges unprobed); a
+#   blocking or hit-stunned victim against the 24 gated grabs; mashing (Morrigan's and Demitri's K throws, the
 #   multi-hit throws are measured unmashed), speed levels other than 0 (the window and the recovery in ticks were
 #   measured level-independent on the pilot, probe 2), the characters picked by the cursor (forced by poke), FBNeo.
-#   The ticks are MEASURED by build/agent211/t330's scans and only RE-PROVED here: a tick that moved fails, but the gate
+#   The ticks are MEASURED by build/agent211/t330's and build/agent212/t330's scans and only RE-PROVED here: a tick that moved fails, but the gate
 #   does not find the new one. A host without the full lines (TR_FULL) SKIPs that family, saying so.
 #
-# MUST-FIRE: perturbed-copy: tick-early — every frozen tick moved one EARLIER in a copy (the true A-1 read as A) must find the press on it refusing to start the normal, on every tick of every event (in-gate: Felicia's 6MP alone; mode: every event of every family)
+# MUST-FIRE: perturbed-copy: tick-early — every frozen tick moved one EARLIER in a copy (the true A-1 read as A) must find the press on it refusing to start the normal, on every tick of every event (in-gate: Felicia's 6MP and j.6MP alone, and the command family's first whiffing event, Anakaris's — every Felicia grab is gated; mode: every event of every family)
 # MUST-FIRE: known-bad: lp-tech — the tech press made with LP (back + LP, not a throw input) must read no tech on every event whose frozen window is 1-7 (in-gate: each family's first techable event; mode: every techable event)
+# MUST-FIRE: known-bad: gated-whiff — a whiff rig made for a grab with NO whiff (CMD_GATED) must read "the whiff started no move" (in-gate: Felicia's 632[4] MK alone; mode: all 24; command family only, the others are not judged)
+# MUST-FIRE: perturbed-copy: es-exemption-dropped — the four ES grabs judged WITHOUT their ruled whiff seq 0x12 (as every other whiff is: the seq the input starts when it connects, 0x10) must each read "the whiff started seq 12, not the grab's own" (in-gate: Aulbath's 6324PP alone; mode: all four; command family only, the others are not judged)
+# MUST-FIRE: known-bad: whiff-at-contact — every whiff rig made at CONTACT, where the grab connects, must read "the whiff control HOLDS" (in-gate: the command family's first whiffing event; mode: all 54; command family only, the others are not judged)
 # MUST-FIRE: perturbed-copy: late-window — the thrown rig's k = 8 press moved to k = 7 must read the k = 8 slot TECHING on every techable event (in-gate: Felicia's 6MP alone; mode: every techable event; the command family has no k = 8 slot and is not judged)
 # A MODE exits 1 only when ITS perturbation made ITS clause fail (ctl_judge, the same predicate the control section
 # reads); otherwise it prints REFUSED and exits 3 (docs/project/must_fire_contract.md).
@@ -56,7 +63,9 @@
 #   tools/vanilla_frames.py tools/run_mame.sh tools/setup_mame.sh tests/lua/field_trace.lua tests/lib/controls.sh
 #   tests/lib/jobs.sh tests/expected/throw_recovery.tsv tests/expected/throw_recovery_v01.tsv
 #   tests/expected/throw_recovery_v0e.tsv tests/expected/throw_recovery_air.tsv tests/expected/throw_recovery_air_h-3.tsv
-#   tests/expected/throw_recovery_air_h+3.tsv tests/expected/throw_recovery_air_h+6.tsv
+#   tests/expected/throw_recovery_air_h+3.tsv tests/expected/throw_recovery_air_h+6.tsv tests/expected/throw_recovery_air_v01.tsv
+#   tests/expected/throw_recovery_air_v0e.tsv tests/expected/throw_recovery_command.tsv tests/expected/throw_recovery_command_v01.tsv
+#   tests/expected/throw_recovery_command_v0e.tsv
 #   tests/expected/command_throws.tsv tools/command_throw_rigs.py emu/mame-patches/
 #
 # SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
@@ -81,7 +90,7 @@ W="${OUT:-$(mktemp -d "${TMPDIR:-/tmp}/trec.XXXXXX")}" || { echo "FAIL: audit_th
 W="$(cd "$W" && pwd)"   # absolute: every run cds into its own directory
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 F="ff8404:l:p1st,ff8804:l:p2st,ff8534:b:p1thr,ff8934:b:p2thr,ff8850:w:p2red,ff8852:w:p2wht,ff8450:w:p1red,ff8452:w:p1wht,ff8410:w:p1x,ff8810:w:p2x,ff8081:b:pass"
-FAMS="${TR_FAMILY:-ground air}"   # the command family is NOT FROZEN yet (#330 open: see the header)
+FAMS="${TR_FAMILY:-ground air command}"
 [ -n "${FREEZE:-}" ] && [ -z "${TR_FAMILY:-}" ] && { echo "REFUSED: FREEZE needs TR_FAMILY=ground|air|command (one family's ticks)"; exit 3; }
 [ -n "${FREEZE:-}" ] && [ -n "$MODE" ] && { echo "REFUSED: FREEZE in control mode"; exit 3; }
 tr_py() { TR_FAMILY="$1" python3 -c "import sys;sys.path.insert(0,'tools');import throw_recovery_rigs as t;print($2)"; }
@@ -93,6 +102,12 @@ ctl_judge() {  # ctl_judge <control> <expect.txt> <n> [ticks per event, 4; the c
                     echo "$_n of $3 events refuse the press on all ${4:-4} shifted tick(s)"; [ "$_n" = "$3" ] ;;
         lp-tech) _n=$(grep -c 'the tech window reads none, frozen 1-7' "$2"); echo "$_n of $3 techable events read no tech"; [ "$_n" = "$3" ] ;;
         late-window) _n=$(grep -c 'k = 8 TECHS' "$2"); echo "$_n of $3 techable events read the k = 8 slot teching"; [ "$_n" = "$3" ] ;;
+        gated-whiff) _n=$(grep 'the whiff started no move' "$2" | sed 's/: .*//' | sort -u | wc -l | tr -d ' ')
+                     echo "$_n of $3 gated grabs read their whiff as no move"; [ "$_n" = "$3" ] ;;
+        whiff-at-contact) _n=$(grep 'the whiff control HOLDS' "$2" | sed 's/: .*//' | sort -u | wc -l | tr -d ' ')
+                     echo "$_n of $3 whiffs made at contact read the grab connecting"; [ "$_n" = "$3" ] ;;
+        es-exemption-dropped) _n=$(grep "the whiff started seq 12, not the grab's own" "$2" | sed 's/: .*//' | sort -u | wc -l | tr -d ' ')
+                     echo "$_n of $3 ES grabs read their whiff as not the grab's own move"; [ "$_n" = "$3" ] ;;
         *) echo "no such control: $1"; return 2 ;;
     esac
 }
@@ -117,14 +132,19 @@ measure() {  # measure <family> <ticks source> <expected> <out dir> [gen options
     TR_FAMILY="$_f" python3 "$TOOL" expect "$_d/rows.jsonl" "$_e" > "$_d/expect.txt" 2>&1
 }
 
-echo "== audit_throw_recovery: the vsavj ROM ($(python3 -c "import hashlib,sys;print(hashlib.sha1(open(sys.argv[1],'rb').read()).hexdigest()[:12])" "$ROMDIR/vsavj.zip")); tree $(git -C "$REPO" describe --always --dirty --abbrev=40 2>/dev/null || echo 'no git'); host $(hostname); JOBS=$JOBS; families: $FAMS${TR_VICTIM:+; victim $TR_VICTIM}${TR_HEIGHT:+; air height $TR_HEIGHT}"
+echo "== audit_throw_recovery: the vsavj ROM ($(python3 -c "import hashlib,sys;print(hashlib.sha1(open(sys.argv[1],'rb').read()).hexdigest()[:12])" "$ROMDIR/vsavj.zip")); tree $(git -C "$REPO" describe --always --dirty --abbrev=40 2>/dev/null || echo 'no git'); script blob $(git -C "$REPO" hash-object tests/audit_throw_recovery.sh 2>/dev/null || echo '?'); host $(hostname); JOBS=$JOBS; families: $FAMS${TR_VICTIM:+; victim $TR_VICTIM}${TR_HEIGHT:+; air height $TR_HEIGHT}"
 ran=0; mode_fired=0; mode_ev=""
 for FAM in $FAMS; do
     EXP="$(tr_py "$FAM" 't.exp_path()')"; FULL="$(tr_py "$FAM" 't.full_path()')"
     NEV="$(tr_py "$FAM" 'sum(1 for _ in t.events())')"; CTL_RIG="$(tr_py "$FAM" 'next(r for r, *_ in t.events() if r.startswith("FE_"))')"
     # the command family: one whiff tick per event (none for Pit of Blame), no k = 8 slot; its techable grabs are few
     K=4; NT="$NEV"; WI=14
-    [ "$FAM" = command ] && { K=1; NT="$(tr_py "$FAM" 'sum(1 for r, *_ in t.cmd_events() if not t.cmd_no_whiff(_[2]))')"; WI=8; }
+    [ "$FAM" = command ] && { K=1; NT="$(tr_py "$FAM" 'sum(1 for r, tab, row, lab, ev in t.cmd_events() if not t.cmd_no_whiff(lab, tab))')"; WI=8
+        NG="$(tr_py "$FAM" 'len(t.CMD_GATED)')"   # every Felicia command event is gated: the controls take the first whiffing one
+        CTL_RIG="$(tr_py "$FAM" 'next(r for r, tab, row, lab, ev in t.cmd_events() if not t.cmd_no_whiff(lab, tab))')"
+        GW_RIG="$(tr_py "$FAM" 'next(r for r, tab, row, lab, ev in t.cmd_events() if (tab, lab) in t.CMD_GATED)')"
+        NE="$(tr_py "$FAM" 'sum(1 for r, tab, row, lab, ev in t.cmd_events() if (tab, lab) in t.CMD_ES_WHIFF)')"
+        ES_RIG="$(tr_py "$FAM" 'next(r for r, tab, row, lab, ev in t.cmd_events() if (tab, lab) in t.CMD_ES_WHIFF)')"; }
     D="$W/$FAM"; mkdir -p "$D"
     echo "== $FAM 1. the frozen ticks (the full lines outside the tree, each against its in-tree hash)"
     SRC="$FULL"
@@ -153,7 +173,8 @@ PY
     NR=$((NEV + NT))   # a teched and a thrown (or whiff) rig per event; Pit of Blame has no whiff rig
     echo "== $FAM 2. the rigs ($NR, made from the ticks; JOBS=$JOBS)"
     t0=$(date +%s); mkdir -p "$D/m"
-    G=""; vs_ctl_is tick-early && G="--shift -1"; vs_ctl_is lp-tech && G="--tech-token 1"; vs_ctl_is late-window && G="--late-tech 7"
+    G=""; vs_ctl_is tick-early && G="--shift -1"; vs_ctl_is lp-tech && G="--tech-token 1"; vs_ctl_is late-window && G="--late-tech 7"; vs_ctl_is gated-whiff && G="--gated-whiff"; vs_ctl_is whiff-at-contact && G="--whiff-contact"
+    vs_ctl_is es-exemption-dropped && export TR_CTL_ES_DROPPED=1   # the clause judges the ES grabs as every other whiff
     # shellcheck disable=SC2086
     measure "$FAM" "$SRC" "$EXP" "$D/m" $G; _rc=$?
     _nt=$(ls "$D/m/traces"/*.txt 2>/dev/null | wc -l | tr -d ' ')
@@ -173,7 +194,8 @@ PY
     _tch="$(awk -F'\t' -v i="$WI" '!/^#/ && $i == "1-7"' "$FULL" | wc -l | tr -d ' ')"
     if [ -n "$MODE" ]; then   # THE MODE: judged per family; exit 1 below only if ITS clause failed in every family run
         if [ "$MODE" = late-window ] && [ "$FAM" = command ]; then ran=$((ran - 1)); mode_ev="$mode_ev $FAM: no k = 8 slot (not applicable);"; continue; fi
-        _want="$NT"; [ "$MODE" != tick-early ] && _want="$_tch"
+        if { [ "$MODE" = gated-whiff ] || [ "$MODE" = es-exemption-dropped ] || [ "$MODE" = whiff-at-contact ]; } && [ "$FAM" != command ]; then ran=$((ran - 1)); mode_ev="$mode_ev $FAM: no command grabs (not applicable);"; continue; fi
+        _want="$NT"; [ "$MODE" != tick-early ] && _want="$_tch"; [ "$MODE" = gated-whiff ] && _want="$NG"; [ "$MODE" = es-exemption-dropped ] && _want="$NE"; [ "$MODE" = whiff-at-contact ] && _want="$NT"
         if _ev="$(ctl_judge "$MODE" "$D/m/expect.txt" "$_want" "$K")"; then mode_fired=$((mode_fired + 1)); fi
         mode_ev="$mode_ev $FAM: $_ev;"
         continue
@@ -186,12 +208,14 @@ import sys; sys.path.insert(0, 'tools'); import throw_recovery_rigs as t
 k = sys.argv[1].split('\t')
 print(next((r for r, tab, key, inp, *_ in t.events() if (tab, key if '$FAM' != 'command' else r, inp) == tuple(k)), ''))" "$TCH_RIG")"
     echo "== $FAM 4. controls ($CTL_RIG; lp-tech on ${TCH_RIG:-none}, each perturbed)"
-    for c in "tick-early:--shift -1" "lp-tech:--tech-token 1" "late-window:--late-tech 7"; do
+    for c in "tick-early:--shift -1" "lp-tech:--tech-token 1" "late-window:--late-tech 7" "gated-whiff:--gated-whiff" "es-exemption-dropped:" "whiff-at-contact:--whiff-contact"; do
         _c="${c%%:*}"; [ "$FAM" = command ] && [ "$_c" = late-window ] && continue
-        _r="$CTL_RIG"; [ "$_c" = lp-tech ] && _r="$TCH_RIG"
+        [ "$FAM" != command ] && { [ "$_c" = gated-whiff ] || [ "$_c" = es-exemption-dropped ] || [ "$_c" = whiff-at-contact ]; } && continue
+        _r="$CTL_RIG"; [ "$_c" = lp-tech ] && _r="$TCH_RIG"; [ "$_c" = gated-whiff ] && _r="$GW_RIG"; [ "$_c" = es-exemption-dropped ] && _r="$ES_RIG"
         mkdir -p "$D/c_$_c"
         # shellcheck disable=SC2086
-        measure "$FAM" "$SRC" "$EXP" "$D/c_$_c" --only "$_r" ${c#*:}
+        if [ "$_c" = es-exemption-dropped ]; then ( export TR_CTL_ES_DROPPED=1; measure "$FAM" "$SRC" "$EXP" "$D/c_$_c" --only "$_r" )
+        else measure "$FAM" "$SRC" "$EXP" "$D/c_$_c" --only "$_r" ${c#*:}; fi
         if _ev="$(ctl_judge "$_c" "$D/c_$_c/expect.txt" 1 "$K")"; then vs_ctl_fired "$_c" "$FAM: $_ev"
         else vs_ctl_dead "$_c" "$FAM: $_ev"; fail=1; fi
     done

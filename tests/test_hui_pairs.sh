@@ -3,7 +3,7 @@
 # (14z-66, playtest round-1 items 6/7 — the coverage half of item 5).
 # Both sections assert the NATIVE-MATCHED signatures measured on the
 # A/B of record (replay headers), not just no-crash.
-# Usage: ROMDIR=... tests/test_hui_pairs.sh [builddir]   (default build/hui61)
+# Usage: ROMDIR=... [JOBS=N] tests/test_hui_pairs.sh [builddir]   (default build/hui61)
 #
 # THE BUILD IS build/hui61 BY DEFAULT since 14z-197 (maintainer-ruled 2026-10-11, the four Huitzil stage gates "Move to
 # hui61, re-time 2"; DECISIONS_HISTORY.md). Until then it self-built STAGE 4. Once replay_guard.lua counts emulated
@@ -19,7 +19,7 @@
 #   bytes read from dumps at the measured frames.
 # EXPECTS: both signatures present; a red is either mechanism dead or changed, not merely a
 #   crash.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay_guard.lua
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay_guard.lua tests/lib/jobs.sh
 #   tests/replays/hui/81_hui_rw_gc.rpl tests/replays/hui/82_hui_df_2p.rpl
 #   tools/build_donovan.sh tools/run_mame.sh tools/run_replay_guarded.sh tools/setup_mame.sh
 #
@@ -57,12 +57,26 @@ case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 export MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 PK="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10"
 
+# JOBS (#334 item 2, 14z-211): the two guarded runs (replay 81 into $WORK/rw, replay 82 into $WORK/df) are
+# independent — neither reads the other's output — so they go through tests/lib/jobs.sh's pool, JOBS at a time;
+# default min(4, CPUs/6). Each records its runner's exit status in <dir>/rc; the sections below judge them after the
+# pool, in their old order, with their old lines.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+one_run() {  # one_run <dir> <dumps> <replay file>
+    mkdir -p "$1"
+    if ( cd "$1" && POKES="$PK" DUMPS="$2" \
+      MAME_ROMPATH="$BUILD/rompath;$ROMDIR" \
+      "$REPO/tools/run_replay_guarded.sh" vsavjw "$3" \
+          "$1/g.log" "$1/box" > "$1/g.out" 2>&1 ); then echo 0 > "$1/rc"; else echo 1 > "$1/rc"; fi
+}
+vs_pool_start "$JOBS"
+vs_pool_run one_run "$WORK/rw" "3225:ff8400-ff8420;3240:ff8800-ff8820" "$REPO/tests/replays/hui/81_hui_rw_gc.rpl"
+vs_pool_run one_run "$WORK/df" "3110:ff8400-ff8420;4210:ff8400-ff8420" "$REPO/tests/replays/hui/82_hui_df_2p.rpl"
+vs_pool_wait
+
 echo "== Reflect Wall guard cancel (replay 81)"
-d="$WORK/rw"; mkdir -p "$d"
-( cd "$d" && POKES="$PK" DUMPS="3225:ff8400-ff8420;3240:ff8800-ff8820" \
-  MAME_ROMPATH="$BUILD/rompath;$ROMDIR" \
-  "$REPO/tools/run_replay_guarded.sh" vsavjw "$REPO/tests/replays/hui/81_hui_rw_gc.rpl" \
-      "$d/g.log" "$d/box" > "$d/g.out" 2>&1 ) || {
+d="$WORK/rw"
+[ "$(cat "$d/rc" 2>/dev/null)" = 0 ] || {
     echo "FAIL: RW guard tripped:"; grep -m2 -E "CRASH|REGS" "$d/g.log"; exit 1; }
 python3 - "$d" <<'PYEOF'
 import struct, sys
@@ -90,11 +104,8 @@ echo "  ok: guard cancel fires, attacker blown back"
 # downgrade path — both games take it identically at both presses — so
 # it stays, under its true name.
 echo "== pair-press downgrade path, empty meter (replay 82) — NOT Dark Force"
-d="$WORK/df"; mkdir -p "$d"
-( cd "$d" && POKES="$PK" DUMPS="3110:ff8400-ff8420;4210:ff8400-ff8420" \
-  MAME_ROMPATH="$BUILD/rompath;$ROMDIR" \
-  "$REPO/tools/run_replay_guarded.sh" vsavjw "$REPO/tests/replays/hui/82_hui_df_2p.rpl" \
-      "$d/g.log" "$d/box" > "$d/g.out" 2>&1 ) || {
+d="$WORK/df"
+[ "$(cat "$d/rc" 2>/dev/null)" = 0 ] || {
     echo "FAIL: pair-press guard tripped:"; grep -m2 -E "CRASH|REGS" "$d/g.log"; exit 1; }
 python3 - "$d" <<'PYEOF'
 import sys

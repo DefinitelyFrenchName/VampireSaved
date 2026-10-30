@@ -16,7 +16,7 @@
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: test_entropy_tripwire — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 rc=0
 python3 -c 'import os,sys; open(sys.argv[1],"wb").write(os.urandom(65536))' "$W/planted.bin"
 
@@ -47,7 +47,7 @@ fi
 
 # section2 <tool> — prints one line per wrong verdict, exit 1 if any
 section2() {
-    R="$(mktemp -d "$W/repo.XXXXXX")"
+    R="$(mktemp -d "$W/repo.XXXXXX")" || { echo "FAIL: test_entropy_tripwire — mktemp -d failed (R)"; exit 2; }
     git -C "$R" init -q
     printf 'plain text, well below the threshold\n%.0s' $(seq 1 60) > "$R/notes.txt"
     git -C "$R" add notes.txt

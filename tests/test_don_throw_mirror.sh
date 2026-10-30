@@ -17,7 +17,7 @@
 # EXPECTS: the word present and the walker reading only the fixed block. SKIPs on variant-id
 #   builds, where the mirror is tenant-vs-tenant at 0x13 and correct by construction. Both tap runs on emulated
 #   time at the frozen game clock, the staging leg on replay.lua's checksum.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/instr_gameclock/ tests/lib/controls.sh
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/instr_gameclock/ tests/lib/controls.sh tests/lib/jobs.sh
 #   tests/lib/instr_align.sh tests/lua/emu_clock.lua tests/lua/replay.lua tests/lua/trace_writes.lua
 #   tests/replays/65_don_mirror_throw.rpl tools/build_donovan.sh tools/run_mame.sh
 #   tools/setup_mame.sh
@@ -45,7 +45,7 @@
 # vanilla and the mirror flavor is tenant-vs-tenant at 0x13, correct by
 # construction — the gate SKIPs on those builds).
 #
-# Usage: ROMDIR=... tests/test_don_throw_mirror.sh [outbase] [--freeze-clock]
+# Usage: ROMDIR=... [JOBS=N] tests/test_don_throw_mirror.sh [outbase] [--freeze-clock]
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -118,18 +118,31 @@ echo "== 2. runtime: the mirror throw walks the fixed block =="
 if [ "${SKIP_RUNTIME:-0}" = 1 ]; then
     echo "  SKIPPED (SKIP_RUNTIME=1)"
 else
-    for w in b2780 b2528; do
-        ia_note "$WORK/manifest.tsv" base 65_don_mirror_throw vsavj "$OUTBASE/rompath;$ROMDIR" \
-            "$REPO/tests/replays/65_don_mirror_throw.rpl" 4400 "WATCH=$w,32,r" "$WORK/w_$w.align"
+    # JOBS (#334 item 2, 14z-211):
+    # the two watch runs are independent — each writes only $WORK/w_<w>.{txt,align} and its own sandbox
+    # $WORK/sbx_<w> — so they go through tests/lib/jobs.sh's pool, JOBS at a time; default min(4, CPUs/6).
+    # Their manifest rows are written first, serially, in the old order; the counts below read the traces after.
+    FZ_JOBS="${JOBS:-4}"   # --freeze-clock's ia_freeze width, its default (4) kept as it was before the pool
+    . "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+    one_watch() {  # one_watch <watch address>
         # shellcheck disable=SC2086
-        env $_clk WATCH="$w,32,r" TRACE_OUT="$WORK/w_$w.txt" FRAMES=4400 ALIGN_OUT="$WORK/w_$w.align" \
+        env $_clk WATCH="$1,32,r" TRACE_OUT="$WORK/w_$1.txt" FRAMES=4400 ALIGN_OUT="$WORK/w_$1.align" \
         REPLAY="$REPO/tests/replays/65_don_mirror_throw.rpl" \
-        MAME_SANDBOX="$WORK/sbx_$w" \
+        MAME_SANDBOX="$WORK/sbx_$1" \
         MAME_ROMPATH="$OUTBASE/rompath;$ROMDIR" \
             tools/run_mame.sh vsavj -debug -debugger none \
             -autoboot_script tests/lua/trace_writes.lua \
             > /dev/null 2>&1 || true
+    }
+    for w in b2780 b2528; do
+        ia_note "$WORK/manifest.tsv" base 65_don_mirror_throw vsavj "$OUTBASE/rompath;$ROMDIR" \
+            "$REPO/tests/replays/65_don_mirror_throw.rpl" 4400 "WATCH=$w,32,r" "$WORK/w_$w.align"
     done
+    vs_pool_start "$JOBS"
+    for w in b2780 b2528; do
+        vs_pool_run one_watch "$w"
+    done
+    vs_pool_wait
     NEW=$(($(grep -c '^frame' "$WORK/w_b2780.txt") - 1))
     OLD=$(($(grep -c '^frame' "$WORK/w_b2528.txt") - 1))
     if [ "$NEW" -ge 50 ] && [ "$OLD" -eq 0 ]; then
@@ -142,7 +155,7 @@ else
     echo "== 3. the instrument's alignment (#228 step 4, option A) =="
     if [ "$FREEZE_CLOCK" = 1 ]; then
         [ "$fail" = 0 ] || { echo "REFUSED: sections 1-2 failed — nothing frozen"; exit 1; }
-        ia_freeze "$REPO/tests/lua/trace_writes.lua" "$WORK/manifest.tsv" "$WORK/fz" "${JOBS:-4}" "$WORK/clocks.tsv" \
+        ia_freeze "$REPO/tests/lua/trace_writes.lua" "$WORK/manifest.tsv" "$WORK/fz" "$FZ_JOBS" "$WORK/clocks.tsv" \
             > "$WORK/fz.txt" || { sed 's/^/  /' "$WORK/fz.txt"; echo "REFUSED: the alignment does not hold — nothing frozen"; exit 1; }
         mkdir -p "$(dirname "$CLOCKS")"
         { echo "# $CLOCKS — the game clock RAM:\$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,"

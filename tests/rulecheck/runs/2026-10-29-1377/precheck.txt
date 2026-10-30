@@ -1,0 +1,7 @@
+  FLAG D-ABSOLUTE: - Every setting was timed on PILOT at its default and at a higher value in 14z-211.  [build/agent212/t334/closure/closing_comment.md]
+  FLAG D-ABSOLUTE: - Every verdict is the same at both settings.  [build/agent212/t334/closure/closing_comment.md]
+  FLAG D-ABSOLUTE: That tier was itself NOT GREEN: five FAILs from that mid-session tree's own content, none a timing.  [build/agent212/t334/closure/closing_comment.md]
+  FLAG D-ABSOLUTE: - **Each still FAILs when the pool loses a run.** On a Mac snapshot, each of the 61 ran as is and again with the pool's first run dropped.  [build/agent212/t334/closure/closing_comment.md]
+  FLAG D-ABSOLUTE: - Parity at 12 under a full load for its whole run.  [build/agent212/t334/closure/closing_comment.md]
+  FLAG D-ABSOLUTE: Each gate's own END-line and completeness checks cover that, not the pool-drop check, which drops only each shell's first run.  [build/agent212/t334/closure/closing_comment.md]
+packet_check: 6 flag(s): D-ABSOLUTE 6

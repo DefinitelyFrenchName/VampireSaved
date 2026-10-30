@@ -65,7 +65,7 @@ JOBS="${JOBS:-2}"
 EXP=tests/expected/es_ex.tsv
 T=tools/es_ex_rigs.py
 WB="${SHEET:-$REPO/../community/vsav-framedata.xlsx}"
-W="${OUT:-$(mktemp -d "${TMPDIR:-/tmp}/esex.XXXXXX")}"; mkdir -p "$W"; W="$(cd "$W" && pwd)"   # absolute: each leg cds into its own dir
+W="${OUT:-$(mktemp -d "${TMPDIR:-/tmp}/esex.XXXXXX")}" || { echo "FAIL: audit_es_ex — mktemp -d failed (W)"; exit 2; }; mkdir -p "$W"; W="$(cd "$W" && pwd)"   # absolute: each leg cds into its own dir
 [ -n "${OUT:-}" ] || trap 'rm -rf "$W"' EXIT
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 . "$REPO/tests/lib/decrypt_cache.sh"

@@ -77,7 +77,7 @@ if [ "$present" = 0 ]; then
     exit 0
 fi
 
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: test_tenant_anim_relocation — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 . "$(dirname "$0")/lib/controls.sh"; vs_ctl_mode "$0"
 # THE EXECUTABLE FORM: under CONTROL=planted-pointer the first present tenant is
 # audited on a planted COPY instead of its build dir, and this run must FAIL.

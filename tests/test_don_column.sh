@@ -6,7 +6,7 @@
 #   alias remaps proven by vs2's own dispatch.
 # HOW: the exact crash replay run GUARDED on MAME.
 # EXPECTS: END clean; a vec3 reset or exception is the crash back.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua tests/lua/replay_guard.lua
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua tests/lua/replay_guard.lua tests/lib/jobs.sh
 #   tests/replays/50_don_column_ko.rpl tools/run_mame.sh tools/run_replay_guarded.sh
 #   tools/setup_mame.sh
 #
@@ -19,7 +19,7 @@
 # (0x52==type 6, 0x50==type 0x0F). This gate replays the exact crash
 # sequence GUARDED and requires an END-clean run.
 #
-# Usage: ROMDIR=... tests/test_don_column.sh [rompath_dir]
+# Usage: ROMDIR=... [JOBS=N] tests/test_don_column.sh [rompath_dir]
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that
@@ -36,16 +36,16 @@ WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 cd "$REPO"
 
-if POKES="2890:ff8850:00010001" MAME_ROMPATH="$RPDIR;$ROMDIR" \
-    tools/run_replay_guarded.sh vsavj \
-    "$REPO/tests/replays/50_don_column_ko.rpl" \
-    "$WORK/g.log" "$WORK/box" > "$WORK/out.txt" 2>&1; then
-    grep -q "^END " "$WORK/g.log" || { echo "FAIL: no END in guard log"; exit 1; }
-    echo "  ok: column KO END-clean under guard (no vec3)"
-else
-    echo "FAIL: guard tripped on the column KO:"; grep -A3 "GUARD TRIPPED" "$WORK/out.txt" | head -6
-    exit 1
-fi
+# JOBS (#334 item 2, 14z-211): the guarded run and the palette run are independent — each writes only its own log and
+# sandbox ($WORK/g.log + box + out.txt; $WORK/pal) — so both go through tests/lib/jobs.sh's pool, JOBS at a time
+# (default min(4, CPUs/6)); a run's nonzero status lands in $WORK/<name>.rc and is judged below where the run used to be.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+run_guard() {
+    POKES="2890:ff8850:00010001" MAME_ROMPATH="$RPDIR;$ROMDIR" \
+        tools/run_replay_guarded.sh vsavj \
+        "$REPO/tests/replays/50_don_column_ko.rpl" \
+        "$WORK/g.log" "$WORK/box" > "$WORK/out.txt" 2>&1 || echo "$?" > "$WORK/guard.rc"
+}
 # ── 14z-46: swordless-deity palette lock (rounds 41/55 arc). The
 #    summon's seq-state stub must upload vs2's record 0x2D4 -> P1
 #    rows 0x0B/0x0C at f2913 (the per-stub seq_ids map; the old
@@ -53,12 +53,28 @@ fi
 #    Frozen from native vs2 (plant_vs2 replay, f2960). No poke — the
 #    palette beat is pre-KO and poke-free frames are choreography-
 #    identical to the gate's guarded run history.
-mkdir -p "$WORK/pal"
-DUMPS="2960:90c160-90c1a0" \
-    REPLAY="$REPO/tests/replays/50_don_column_ko.rpl" \
-    CHECKSUM_OUT="$WORK/pal/c.log" MAME_SANDBOX="$WORK/pal" \
-    MAME_ROMPATH="$RPDIR;$ROMDIR" tools/run_mame.sh vsavj \
-    -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
+run_pal() {
+    mkdir -p "$WORK/pal"
+    DUMPS="2960:90c160-90c1a0" \
+        REPLAY="$REPO/tests/replays/50_don_column_ko.rpl" \
+        CHECKSUM_OUT="$WORK/pal/c.log" MAME_SANDBOX="$WORK/pal" \
+        MAME_ROMPATH="$RPDIR;$ROMDIR" tools/run_mame.sh vsavj \
+        -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1 || echo "$?" > "$WORK/pal.rc"
+}
+vs_pool_start "$JOBS"
+vs_pool_run run_guard
+vs_pool_run run_pal
+vs_pool_wait
+
+if [ ! -f "$WORK/guard.rc" ]; then
+    grep -q "^END " "$WORK/g.log" || { echo "FAIL: no END in guard log"; exit 1; }
+    echo "  ok: column KO END-clean under guard (no vec3)"
+else
+    echo "FAIL: guard tripped on the column KO:"; grep -A3 "GUARD TRIPPED" "$WORK/out.txt" | head -6
+    exit 1
+fi
+# the palette run's status, judged where the run used to stand (set -e exited on it)
+[ ! -f "$WORK/pal.rc" ] || exit "$(cat "$WORK/pal.rc")"
 python3 - "$WORK/pal" <<'EOF2'
 import sys, os
 FROZEN = "ff00f55cf66ef78ff8aff9bffadffcfffffff0aff0cff0effafffdfff111f007f000fffffdfffcdff9adf87af635ffeafdb8fa86f864f653fbcef88bfe00f002"

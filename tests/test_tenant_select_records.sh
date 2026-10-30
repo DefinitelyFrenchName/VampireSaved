@@ -22,7 +22,7 @@
 #   replay.lua's checksum.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/donovan-m5/mask tests/expected/instr_gameclock/
 #   tests/expected/vsavj/masked-v2/logs/11_pick_donovan.log tests/lib/controls.sh tests/lib/decrypt_cache.sh
-#   tests/lib/instr_align.sh tests/lib/tenant_build.sh tests/lua/emu_clock.lua tests/lua/replay.lua
+#   tests/lib/instr_align.sh tests/lib/jobs.sh tests/lib/tenant_build.sh tests/lua/emu_clock.lua tests/lua/replay.lua
 #   tests/lua/trace_writes.lua tests/replays/
 #   tools/build_donovan.sh tools/check_tenant_select.py tools/compare_window.py
 #   tools/run_mame.sh tools/run_replay_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
@@ -56,7 +56,7 @@
 #      for all three UI pieces, ending on the tenant's composed records —
 #      read through $1C(a6)+4 at the record walker, the 14z-61 method.
 #
-# Usage: ROMDIR=... tests/test_tenant_select_records.sh [outbase] [--freeze-clock]
+# Usage: ROMDIR=... [JOBS=N] tests/test_tenant_select_records.sh [outbase] [--freeze-clock]
 #   outbase: an existing variant-id build (default: builds one fresh into a
 #   temp dir with --tenant-id 0x13 --profile cps2-wide-v1).
 # Env: MAME_WIDE_BIN overrides the WIDE MAME binary
@@ -97,6 +97,14 @@ for a in "$@"; do [ "$a" = "--freeze-clock" ] && FREEZE_CLOCK=1; done
 CLOCKS="tests/expected/instr_gameclock/test_tenant_select_records.tsv"
 [ "$FREEZE_CLOCK" = 1 ] && [ -n "$MODE" ] && { echo "REFUSED: --freeze-clock in control mode"; exit 3; }
 _clk=""; [ "$MODE" = drift-clock ] && _clk="INSTR_CLOCK=frame_done"
+# JOBS (#334 item 2, 14z-211): section 3's eight tap runs and section 4's legacy replay are independent — each writes
+# only its own trace, align file, log and sandbox ($WORK/<tag>.*, $WORK/sbx_<tag>, $WORK/11_legacy.*) — so all nine go
+# through tests/lib/jobs.sh's pool at the top of section 3, JOBS at a time; default min(4, CPUs/6). Each run's exit
+# status lands in $WORK/<tag>.rc, and sections 3 and 4 judge them after, in the order they always ran, writing the
+# manifest rows in that same order. The --freeze-clock pool keeps its own default of 4 (FZ_JOBS, taken before vs_jobs
+# sets JOBS); a JOBS the caller sets reaches both.
+FZ_JOBS="${JOBS:-4}"
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
 
 # The build shape lives in tests/lib/tenant_build.sh (GitHub #71): stage,
 # profile and tenant id were inline in five gates and all three have moved
@@ -172,18 +180,43 @@ else
         '$1=="ROW" && $2==p && $3==s {print $NF}' "$WORK/static.txt" \
         | sed 's/0x/00/'; }
     WHEEL="$(awk '$1=="WHEELPTR"{print $2}' "$WORK/static.txt" | sed 's/0x/00/')"
-    runtime() {  # runtime <tag> <replay> <watch> <expected sequence> [filter]
-        _leg=t13; [ "${RT_FRAMES:-1400}" = 1400 ] || _leg="t13_${RT_FRAMES}"
-        ia_note "$WORK/manifest.tsv" "$_leg" "${2%.rpl}" vsavjw "$OUTBASE/rompath;$ROMDIR" "$REPO/tests/replays/$2" \
-            "${RT_FRAMES:-1400}" "MAME_BIN=$WIDE_BIN WATCH=$3" "$WORK/$1.align"
+    rt_run() {  # rt_run <tag> <replay> <watch> <frames> — one tap run; its exit status into $WORK/<tag>.rc
+        _rrc=0
         # shellcheck disable=SC2086
-        env $_clk WATCH="$3" TRACE_OUT="$WORK/$1.txt" FRAMES="${RT_FRAMES:-1400}" ALIGN_OUT="$WORK/$1.align" \
+        env $_clk WATCH="$3" TRACE_OUT="$WORK/$1.txt" FRAMES="$4" ALIGN_OUT="$WORK/$1.align" \
         REPLAY="$REPO/tests/replays/$2" \
         MAME_SANDBOX="$WORK/sbx_$1" MAME_BIN="$WIDE_BIN" \
         MAME_ROMPATH="$OUTBASE/rompath;$ROMDIR" \
             tools/run_mame.sh vsavjw -debug -debugger none \
             -autoboot_script "$REPO/tests/lua/trace_writes.lua" \
-            > "$WORK/$1.log" 2>&1 || {
+            > "$WORK/$1.log" 2>&1 || _rrc=$?
+        echo "$_rrc" > "$WORK/$1.rc"
+    }
+    legacy_run() {  # section 4's replay 11 on the masked basis; its exit status into $WORK/11_legacy.rc
+        _rrc=0
+        MASK_RANGES="$(cat tests/expected/donovan-m5/mask)" MAME_BIN="$WIDE_BIN" \
+        MAME_ROMPATH="$OUTBASE/rompath;$ROMDIR" \
+            tools/run_replay_mame.sh vsavjw tests/replays/11_pick_donovan.rpl \
+            "$WORK/11_legacy.log" "$WORK/11_legacy.sb" > "$WORK/11_legacy.out" 2>&1 || _rrc=$?   # its own sandbox in the trapped WORK (#303)
+        echo "$_rrc" > "$WORK/11_legacy.rc"
+    }
+    vs_pool_start "$JOBS"
+    vs_pool_run rt_run big_portrait 36_pick_tenant_cell.rpl "267380,140,r" 1400
+    vs_pool_run rt_run name_banner 36_pick_tenant_cell.rpl "2675a0,100,r" 1400
+    vs_pool_run rt_run highlight 36_pick_tenant_cell.rpl "268a00,120,r" 1400
+    vs_pool_run rt_run p2_portrait 37_p2_pick_tenant.rpl "2674aa,80,r" 1400
+    vs_pool_run rt_run p2_highlight 37_p2_pick_tenant.rpl "268a82,80,r" 1400
+    vs_pool_run rt_run p2_name_via_p1 37_p2_pick_tenant.rpl "2675a0,100,r" 1400
+    vs_pool_run rt_run splash 36_pick_tenant_cell.rpl "2672aa,100,r" 2800
+    vs_pool_run rt_run p2name_neg 37_p2_pick_tenant.rpl "26762a,80,r" 1400
+    vs_pool_run legacy_run
+    vs_pool_wait
+    runtime() {  # runtime <tag> <replay> <watch> <expected sequence> [filter]
+        _leg=t13; [ "${RT_FRAMES:-1400}" = 1400 ] || _leg="t13_${RT_FRAMES}"
+        ia_note "$WORK/manifest.tsv" "$_leg" "${2%.rpl}" vsavjw "$OUTBASE/rompath;$ROMDIR" "$REPO/tests/replays/$2" \
+            "${RT_FRAMES:-1400}" "MAME_BIN=$WIDE_BIN WATCH=$3" "$WORK/$1.align"
+        # the run itself went through the pool above (rt_run, with the same FRAMES)
+        [ "$(cat "$WORK/$1.rc" 2>/dev/null)" = 0 ] || {
             echo "  FAIL: the $1 tap run did not complete"
             tail -5 "$WORK/$1.log"; fail=1; return; }
         # dedupe mode: consecutive (default) for single-cursor windows;
@@ -269,14 +302,8 @@ else
     # so the gate speaks up if some path DOES start reading it.
     ia_note "$WORK/manifest.tsv" t13 37_p2_pick_tenant vsavjw "$OUTBASE/rompath;$ROMDIR" \
         "$REPO/tests/replays/37_p2_pick_tenant.rpl" 1400 "MAME_BIN=$WIDE_BIN WATCH=26762a,80,r" "$WORK/p2name_neg.align"
-    # shellcheck disable=SC2086
-    env $_clk WATCH="26762a,80,r" TRACE_OUT="$WORK/p2name_neg.txt" FRAMES=1400 ALIGN_OUT="$WORK/p2name_neg.align" \
-    REPLAY="$REPO/tests/replays/37_p2_pick_tenant.rpl" \
-    MAME_SANDBOX="$WORK/sbx_p2name_neg" MAME_BIN="$WIDE_BIN" \
-    MAME_ROMPATH="$OUTBASE/rompath;$ROMDIR" \
-        tools/run_mame.sh vsavjw -debug -debugger none \
-        -autoboot_script "$REPO/tests/lua/trace_writes.lua" \
-        > "$WORK/p2name_neg.log" 2>&1 || {
+    # the run itself went through the pool above (rt_run p2name_neg)
+    [ "$(cat "$WORK/p2name_neg.rc" 2>/dev/null)" = 0 ] || {
         echo "  FAIL: the p2-name negative tap run did not complete"
         tail -5 "$WORK/p2name_neg.log"; fail=1; }
     # (a frame-1 boot-scan hit with A0=00000000 is expected — the same
@@ -328,10 +355,8 @@ echo "== 4. de-substitution acceptance: picking the HOST re-converges =="
 if [ "${SKIP_RUNTIME:-0}" = 1 ]; then
     echo "  SKIPPED (SKIP_RUNTIME=1)"
 else
-    MASK_RANGES="$(cat tests/expected/donovan-m5/mask)" MAME_BIN="$WIDE_BIN" \
-    MAME_ROMPATH="$OUTBASE/rompath;$ROMDIR" \
-        tools/run_replay_mame.sh vsavjw tests/replays/11_pick_donovan.rpl \
-        "$WORK/11_legacy.log" "$WORK/11_legacy.sb" > "$WORK/11_legacy.out" 2>&1 || {   # its own sandbox in the trapped WORK (#303)
+    # the run itself went through section 3's pool (legacy_run)
+    [ "$(cat "$WORK/11_legacy.rc" 2>/dev/null)" = 0 ] || {
         echo "  FAIL: replay 11 did not complete"; fail=1; }
     if [ -f "$WORK/11_legacy.log" ]; then
         if python3 tools/compare_window.py \
@@ -351,7 +376,7 @@ if [ "${SKIP_RUNTIME:-0}" != 1 ]; then
     echo "== 5. the instrument's alignment (#228 step 4, option A) =="
     if [ "$FREEZE_CLOCK" = 1 ]; then
         [ "$fail" = 0 ] || { echo "REFUSED: sections 1-4 failed — nothing frozen"; exit 1; }
-        ia_freeze "$REPO/tests/lua/trace_writes.lua" "$WORK/manifest.tsv" "$WORK/fz" "${JOBS:-4}" "$WORK/clocks.tsv" \
+        ia_freeze "$REPO/tests/lua/trace_writes.lua" "$WORK/manifest.tsv" "$WORK/fz" "$FZ_JOBS" "$WORK/clocks.tsv" \
             > "$WORK/fz.txt" || { sed 's/^/  /' "$WORK/fz.txt"; echo "REFUSED: the alignment does not hold — nothing frozen"; exit 1; }
         mkdir -p "$(dirname "$CLOCKS")"
         { echo "# $CLOCKS — the game clock RAM:\$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,"

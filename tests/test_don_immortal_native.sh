@@ -13,7 +13,7 @@
 #   three controls fail as they must. Testimony has no place here: every constant is
 #   measured in the run.
 # POKE READ-BACK (ruled 2026-09-25 (14z-181), tests/expected/poke_readback.tsv): the f2600 ff8400-ff8600 dump is read at +0x60 only (who was selected); ff8509, the ES stock poke, lies inside the range and is never read (READS-BACK, a rig record).
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/roster_pairings/bases.tsv
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/roster_pairings/bases.tsv tests/lib/jobs.sh
 #   tests/lib/controls.sh tests/lua/replay.lua tests/lua/tap_writes.lua tests/replays/
 #   tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
 #
@@ -106,7 +106,7 @@
 #     instrument (a write tap fires per write, so it sees every tick); it is
 #     PC-pinned to vsavj and needs vs2's twin PCs for a cross-game run.
 #
-# Usage: ROMDIR=... tests/test_don_immortal_native.sh [rompath_dir]
+# Usage: ROMDIR=... [JOBS=N] tests/test_don_immortal_native.sh [rompath_dir]
 #   The rompath's pack picks the track: a `vsavjw.zip` runs the WIDE leg
 #   (replay don/114 + the WIDE MAME binary), anything else the stock leg.
 # Runtime: ~4 min (42 MAME legs), emulator tier.
@@ -163,7 +163,13 @@ open(out, 'w').write("\n".join(body) + "\n")
 EOP
     grep -q "^2620-2624 p1=$2\$" "$3" || { echo "FAIL: ceiling replay $3 malformed"; exit 1; }
 }
-run() {   # run <name> <set> <rompath> <rpl file> <pokes> [mame_bin]
+# JOBS (#334 item 2, 14z-211): the 42 legs are independent — each writes only $WORK/<name> and its own sandbox
+# $WORK/<name>/sb — so run and tapleg queue them on tests/lib/jobs.sh's pool, JOBS at a time; default min(4, CPUs/6),
+# and remember the order. After the pool every leg's artefact is checked in that order with its old FAIL line, before
+# anything reads it.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+_legs=""
+run_one() {   # run_one <name> <set> <rompath> <rpl file> <pokes> [mame_bin]
     mkdir -p "$WORK/$1"
     _mb_had="${MAME_BIN+x}"; _mb_val="${MAME_BIN-}"   # #196 (14z-188): restore the caller's MAME_BIN, never unset it — measured identical on ERIS and the Mac
     [ -n "${6:-}" ] && { MAME_BIN="$6"; export MAME_BIN; }
@@ -172,10 +178,15 @@ run() {   # run <name> <set> <rompath> <rpl file> <pokes> [mame_bin]
         -autoboot_script "$REPO/tests/lua/replay.lua" > "$WORK/$1/mame.log" 2>&1 || true   # a teardown segfault (MFI-12): the dumps decide
     if [ -n "$_mb_had" ]; then MAME_BIN="$_mb_val"; export MAME_BIN; else unset MAME_BIN; fi
     rm -rf "$WORK/$1/sb"
+}
+run_check() {   # run_check <name>
     [ "$(ls "$WORK/$1"/dump_*_ff8800.bin 2>/dev/null | wc -l)" -ge 150 ] \
         || { echo "FAIL: leg $1 produced no dumps (see $WORK/$1/mame.log)"; exit 1; }
 }
-tapleg() {   # tapleg <name> <set> <rompath> <rpl file> <pokes> [mame_bin] — the attacker's freeze writes, frames 2655..2668
+run() {   # run <name> <set> <rompath> <rpl file> <pokes> [mame_bin]
+    _legs="$_legs run:$1"; vs_pool_run run_one "$@"
+}
+tapleg_one() {   # tapleg_one <name> <set> <rompath> <rpl file> <pokes> [mame_bin] — the attacker's freeze writes, frames 2655..2668
     mkdir -p "$WORK/$1"
     _mb_had="${MAME_BIN+x}"; _mb_val="${MAME_BIN-}"   # #196 (14z-188): restore the caller's MAME_BIN, never unset it — measured identical on ERIS and the Mac
     [ -n "${6:-}" ] && { MAME_BIN="$6"; export MAME_BIN; }
@@ -184,8 +195,13 @@ tapleg() {   # tapleg <name> <set> <rompath> <rpl file> <pokes> [mame_bin] — t
         -autoboot_script "$REPO/tests/lua/tap_writes.lua" > "$WORK/$1/mame.log" 2>&1 || true   # a teardown segfault (MFI-12): the END line decides
     if [ -n "$_mb_had" ]; then MAME_BIN="$_mb_val"; export MAME_BIN; else unset MAME_BIN; fi
     rm -rf "$WORK/$1/sb"
+}
+tapleg_check() {   # tapleg_check <name>
     grep -q '^END 2668 ' "$WORK/$1/tap.log" 2>/dev/null \
         || { echo "FAIL: tap leg $1 did not reach frame 2668 (see $WORK/$1/mame.log)"; exit 1; }
+}
+tapleg() {   # tapleg <name> <set> <rompath> <rpl file> <pokes> [mame_bin]
+    _legs="$_legs tap:$1"; vs_pool_run tapleg_one "$@"
 }
 # THE TWO PINS — one function each, used by every leg. The unmatched-modes mode
 # withholds the level from the native legs (vsav2 stays at its default, 8); the
@@ -217,6 +233,7 @@ for s in LP:1 MP:2 HP:3 ES:13; do
     mkceil "$OURS_BASE"               "$b" "$WORK/our_${st}_ceil.rpl"
 done
 R="$(rng_pokes)"; [ "$MODE" = unpinned-rng ] && R=""
+vs_pool_start "$JOBS"
 for lv in 06 08; do
     L="$(level_pokes "$lv")"
     NL="$L"; [ "$MODE" = unmatched-modes ] && NL=""
@@ -240,6 +257,10 @@ run nat_MP_L06_unpinned vsav2       "$ROMDIR"        "$WORK/nat_MP.rpl" "$L6"
 run our_MP_L06_unpinned "$OURS_SET" "$RPDIR;$ROMDIR" "$WORK/our_MP.rpl" "$L6" "$OURS_BIN"
 tapleg tap_nat_MP_L06_unpinned vsav2       "$ROMDIR"        "$WORK/nat_MP.rpl" "$L6"
 tapleg tap_our_MP_L06_unpinned "$OURS_SET" "$RPDIR;$ROMDIR" "$WORK/our_MP.rpl" "$L6" "$OURS_BIN"
+vs_pool_wait
+for _e in $_legs; do
+    case "$_e" in run:*) run_check "${_e#run:}" ;; tap:*) tapleg_check "${_e#tap:}" ;; esac
+done
 
 python3 - "$WORK" "$BASES" "$MODE" <<'EOF2' && _py=0 || _py=$?
 import sys, os, struct

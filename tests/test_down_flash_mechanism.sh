@@ -11,7 +11,7 @@
 #   frames), which must fail.
 # EXPECTS: 4/4 swaps each followed by white, the region all ffff, the control failing. WHY
 #   Capcom flashes is not established — mechanism only.
-# FOLLOWS: emu/mame-patches/ tests/lib/controls.sh tests/lua/inp_probe.lua
+# FOLLOWS: emu/mame-patches/ tests/lib/controls.sh tests/lib/jobs.sh tests/lua/inp_probe.lua
 #   tests/lua/tap_writes.lua tests/replays/104_1p_auto_ko_win.rpl tools/run_mame.sh
 #   tools/setup_mame.sh
 #
@@ -52,7 +52,7 @@
 #   * a tap's MECHANISM being control-proven at one address does NOT prove
 #     another address is meaningful. Check that the range is written at all.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] tests/test_down_flash_mechanism.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [JOBS=N] tests/test_down_flash_mechanism.sh
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
@@ -65,12 +65,23 @@ export SDL_VIDEODRIVER="${SDL_VIDEODRIVER:-dummy}"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 RPL="$REPO/tests/replays/104_1p_auto_ko_win.rpl"
 
+# JOBS (#334 item 2, 14z-211): the two legs are independent — each writes only its own sandbox, trace and output — so
+# they go through tests/lib/jobs.sh's pool, JOBS at a time; default min(4, CPUs/6). The analysis reads them after.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+leg_tap() {
 MAME_BIN="$BIN" MAME_SANDBOX="$W/sb1" REPLAY="$RPL" \
   TAP=80410a,2 WINDOW=0,6700 FRAMES=6700 TRACE_OUT="$W/base.txt" \
   tools/run_mame.sh vsavj -autoboot_script "$REPO/tests/lua/tap_writes.lua" > "$W/o1" 2>&1 || true
+}
+leg_probe() {
 MAME_BIN="$BIN" MAME_SANDBOX="$W/sb2" REPLAY="$RPL" MAX_FRAMES=6700 \
   CHECKSUM_OUT="$W/probe.log" DUMP_FRAMES=6645 PAL_BASE=924000 PAL_ROWS=00,01,02 \
   tools/run_mame.sh vsavj -autoboot_script "$REPO/tests/lua/inp_probe.lua" > "$W/o2" 2>&1 || true
+}
+vs_pool_start "$JOBS"
+vs_pool_run leg_tap
+vs_pool_run leg_probe
+vs_pool_wait
 
 python3 - "$W/base.txt" "$W/probe.log" "$MODE" <<'PY'
 import sys

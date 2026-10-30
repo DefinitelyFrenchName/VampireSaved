@@ -31,7 +31,7 @@ rc=0
 fail() { echo "  FAIL: $*"; rc=1; }
 ok()   { echo "  ok: $*"; }
 
-T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
+T="$(mktemp -d)" || { echo "FAIL: test_release_reuse — mktemp -d failed (T)"; exit 2; }; trap 'rm -rf "$T"' EXIT INT TERM
 R="$T/repo"
 mkdir -p "$R/tests/lib" "$R/tools" "$R/tests/expected" "$T/roms" "$T/roms2"
 unset STATIC_JOBS STATIC_RESULTS_OUT MAME_BIN MERGED DON HUI PYR STOCK CONTROL 2>/dev/null || true

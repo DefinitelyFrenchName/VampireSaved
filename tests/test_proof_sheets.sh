@@ -85,7 +85,7 @@ vs_ctl_mode "$0"
 LOG=tests/expected/vsavj/masked-v2/logs/02_demitri_vs_cpu.log
 MASK="$(cat tests/expected/merged1/mask)"
 RPL=tests/replays/02_demitri_vs_cpu.rpl
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
+W="$(mktemp -d)" || { echo "FAIL: test_proof_sheets — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT
 bad=0; ok() { echo "  ok    $1"; }; nope() { echo "  FAIL  $1"; bad=$((bad + 1)); }
 
 # THE SHADOW (one function, the in-gate control and the mode): checksum proof by membership, not by frame
@@ -232,7 +232,7 @@ echo "== 3b. a SHEET_OUT named by a relative path ($TOOL, from the repository ro
 # "..": with "$W/rel" the name climbs out of the repo, and when the repo path is at least as deep as the capture's
 # work dir the surplus ".." stop at / and the UNRESOLVED name still reaches the replay (ERIS, 14z-206: repo depth 5,
 # /tmp/tmp.X/rel/capture/gt.v depth 5), which left relative-unresolved dead there while it fired on the Mac.
-mkdir -p "$REPO/build"; R3="$(mktemp -d "$REPO/build/.proof_rel.XXXXXX")"; trap 'rm -rf "$W" "$R3"' EXIT
+mkdir -p "$REPO/build"; R3="$(mktemp -d "$REPO/build/.proof_rel.XXXXXX")" || { echo "FAIL: test_proof_sheets — mktemp -d failed (R3)"; exit 2; }; trap 'rm -rf "$W" "$R3"' EXIT
 mkdir -p "$R3/legs"; cp "$S/legs/gt.v.rpl" "$S/legs/gt.v.log" "$R3/legs/"
 command grep -v -e '	shift	' -e '	ram950	' -e '	fields	' -e '	fieldoff	' -e '	none	' "$S/sheet.tsv" > "$R3/sheet.tsv"
 RREL="$(python3 -c 'import os, sys; print(os.path.relpath(sys.argv[1], sys.argv[2]))' "$R3" "$REPO")"

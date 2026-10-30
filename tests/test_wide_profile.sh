@@ -11,7 +11,7 @@
 #   point FBNEO_REF at the WIDE binary and stub `strings` to find nothing.
 # EXPECTS: both invariants hold on both checksums; the superset leg skips LOUDLY without
 #   FBNEO_REF; both controls fail at the guard.
-# FOLLOWS: build/manifest/ emu/fbneo-patches/ emu/fbneo/ tests/lib/controls.sh
+# FOLLOWS: build/manifest/ emu/fbneo-patches/ emu/fbneo/ tests/lib/controls.sh tests/lib/jobs.sh
 #   tests/replays/ tools/build_fingerprint.py tools/build_wide_romset.py
 #   tools/run_replay_fbneo.sh tools/setup_fbneo.sh
 #
@@ -44,7 +44,7 @@
 # byte-identical RAM logs whether it works or is catastrophically broken.
 #
 # Usage:
-#   ROMDIR=... [FBNEO_REF=/path/to/pre-wide/fbneo] tests/test_wide_profile.sh
+#   ROMDIR=... [FBNEO_REF=/path/to/pre-wide/fbneo] [JOBS=N] tests/test_wide_profile.sh
 #   FBNEO_REF defaults to ~/.cache/vampire-saved/fbneo_ref and is REFUSED
 #   when it is older than emu/fbneo-patches/0001-*.patch.
 #
@@ -75,6 +75,39 @@ CORPUS="${*:-01_attract_long 02_demitri_vs_cpu 03_two_player_vs 04_select_fuzz \
 10_midattract_start 29_felicia_walljump 30_demitri_throw}"
 
 fail=0
+
+# JOBS (#334 item 2, 14z-211): within each section the runs are independent — each writes only its own
+# $WORK/<leg>_<replay>.{log,vid} and its own sandbox — so each section's runs go through tests/lib/jobs.sh's pool, JOBS
+# at a time (default min(4, CPUs/6)), and the section then compares them replay by replay, in the serial order. A run's
+# nonzero status lands in $WORK/<leg>_<replay>.rc and exits the gate where set -e exited on it serially.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+pooled() { _pn="$1"; shift; "$@" || echo "$?" > "$WORK/$_pn.rc"; }
+ran() { for _pn in "$@"; do [ ! -f "$WORK/$_pn.rc" ] || exit "$(cat "$WORK/$_pn.rc")"; done; }
+fb_ref() {   # fb_ref <replay>: section 1, the reference binary on stock vsavj
+    FBNEO_HVIDEO="$WORK/ref_$1.vid" FBNEO_BIN="$FBNEO_REF" tools/run_replay_fbneo.sh vsavj \
+        "$REPO/tests/replays/$1.rpl" "$WORK/ref_$1.log" "$WORK/sb_ref_$1" >/dev/null 2>&1
+}
+fb_new() {   # fb_new <replay>: section 1, the WIDE binary on stock vsavj
+    FBNEO_HVIDEO="$WORK/new_$1.vid" tools/run_replay_fbneo.sh vsavj \
+        "$REPO/tests/replays/$1.rpl" "$WORK/new_$1.log" "$WORK/sb_new_$1" >/dev/null 2>&1
+}
+fb_stock() { # fb_stock <replay>: section 2, the stock set
+    FBNEO_HVIDEO="$WORK/stock_$1.vid" tools/run_replay_fbneo.sh vsavj \
+        "$REPO/tests/replays/$1.rpl" "$WORK/stock_$1.log" "$WORK/sb_s_$1" >/dev/null 2>&1
+}
+fb_wide() {  # fb_wide <replay>: section 2, the WIDE set
+    FBNEO_HVIDEO="$WORK/wide_$1.vid" FBNEO_ROMPATH="$WIDE_ROMPATH" tools/run_replay_fbneo.sh vsavjw \
+        "$REPO/tests/replays/$1.rpl" "$WORK/wide_$1.log" "$WORK/sb_w_$1" >/dev/null 2>&1
+}
+fb_cs() {    # fb_cs <replay>: section 3, the stock set
+    FBNEO_HVIDEO="$WORK/cs_$1.vid" tools/run_replay_fbneo.sh vsavj \
+        "$REPO/tests/replays/$1.rpl" "$WORK/cs_$1.log" "$WORK/csb_$1" >/dev/null 2>&1
+}
+fb_cw() {    # fb_cw <replay>: section 3, the canary set with sprites relocated into banks 4/5
+    CPS2_WIDE_CANARY=1 FBNEO_HVIDEO="$WORK/cw_$1.vid" FBNEO_ROMPATH="$CANARY_ROMPATH" \
+        tools/run_replay_fbneo.sh vsavjw \
+        "$REPO/tests/replays/$1.rpl" "$WORK/cw_$1.log" "$WORK/cwb_$1" >/dev/null 2>&1
+}
 
 echo "== 0. build identity (the dispatch fingerprint cannot see this) =="
 python3 tools/build_fingerprint.py "$WIDE_ROMPATH;$ROMDIR" --set vsavjw --full \
@@ -173,11 +206,14 @@ elif [ -n "${FBNEO_REF:-}" ] && [ -x "${FBNEO_REF}" ] && carries_profile "${FBNE
     fail=1
     vs_ctl_is contaminated-ref && { echo "FAIL: CPS-2 WIDE profile gate"; exit 1; }
 elif [ -n "${FBNEO_REF:-}" ] && [ -x "${FBNEO_REF}" ]; then
+    vs_pool_start "$JOBS"
     for rp in $CORPUS; do
-        FBNEO_HVIDEO="$WORK/ref_$rp.vid" FBNEO_BIN="$FBNEO_REF" tools/run_replay_fbneo.sh vsavj \
-            "$REPO/tests/replays/$rp.rpl" "$WORK/ref_$rp.log" "$WORK/sb_ref_$rp" >/dev/null 2>&1
-        FBNEO_HVIDEO="$WORK/new_$rp.vid" tools/run_replay_fbneo.sh vsavj \
-            "$REPO/tests/replays/$rp.rpl" "$WORK/new_$rp.log" "$WORK/sb_new_$rp" >/dev/null 2>&1
+        vs_pool_run pooled "ref_$rp" fb_ref "$rp"
+        vs_pool_run pooled "new_$rp" fb_new "$rp"
+    done
+    vs_pool_wait
+    for rp in $CORPUS; do
+        ran "ref_$rp" "new_$rp"
         if cmp -s "$WORK/ref_$rp.log" "$WORK/new_$rp.log" \
            && cmp -s "$WORK/ref_$rp.vid" "$WORK/new_$rp.vid"; then
             echo "  ok: $rp bit-identical (RAM + framebuffer)"
@@ -201,11 +237,14 @@ else
 fi
 
 echo "== 2. profile inertness (WIDE set vs stock set, same binary) =="
+vs_pool_start "$JOBS"
 for rp in $CORPUS; do
-    FBNEO_HVIDEO="$WORK/stock_$rp.vid" tools/run_replay_fbneo.sh vsavj \
-        "$REPO/tests/replays/$rp.rpl" "$WORK/stock_$rp.log" "$WORK/sb_s_$rp" >/dev/null 2>&1
-    FBNEO_HVIDEO="$WORK/wide_$rp.vid" FBNEO_ROMPATH="$WIDE_ROMPATH" tools/run_replay_fbneo.sh vsavjw \
-        "$REPO/tests/replays/$rp.rpl" "$WORK/wide_$rp.log" "$WORK/sb_w_$rp" >/dev/null 2>&1
+    vs_pool_run pooled "stock_$rp" fb_stock "$rp"
+    vs_pool_run pooled "wide_$rp" fb_wide "$rp"
+done
+vs_pool_wait
+for rp in $CORPUS; do
+    ran "stock_$rp" "wide_$rp"
     if cmp -s "$WORK/stock_$rp.log" "$WORK/wide_$rp.log" \
        && cmp -s "$WORK/stock_$rp.vid" "$WORK/wide_$rp.vid"; then
         echo "  ok: $rp bit-identical on the grown regions (RAM + framebuffer)"
@@ -248,12 +287,14 @@ sys.exit(0 if ok and "vsw.31m" in z.namelist() else 1)
 PYEOF
 then
     echo "== 3. B4 canary: sprites served from the appended gfx banks =="
+    vs_pool_start "$JOBS"
     for rp in $CORPUS; do
-        FBNEO_HVIDEO="$WORK/cs_$rp.vid" tools/run_replay_fbneo.sh vsavj \
-            "$REPO/tests/replays/$rp.rpl" "$WORK/cs_$rp.log" "$WORK/csb_$rp" >/dev/null 2>&1
-        CPS2_WIDE_CANARY=1 FBNEO_HVIDEO="$WORK/cw_$rp.vid" FBNEO_ROMPATH="$CANARY_ROMPATH" \
-            tools/run_replay_fbneo.sh vsavjw \
-            "$REPO/tests/replays/$rp.rpl" "$WORK/cw_$rp.log" "$WORK/cwb_$rp" >/dev/null 2>&1
+        vs_pool_run pooled "cs_$rp" fb_cs "$rp"
+        vs_pool_run pooled "cw_$rp" fb_cw "$rp"
+    done
+    vs_pool_wait
+    for rp in $CORPUS; do
+        ran "cs_$rp" "cw_$rp"
         if cmp -s "$WORK/cs_$rp.log" "$WORK/cw_$rp.log" \
            && cmp -s "$WORK/cs_$rp.vid" "$WORK/cw_$rp.vid"; then
             echo "  ok: $rp identical with sprites fetched from banks 4/5"

@@ -16,7 +16,7 @@
 #   -debug, the same POKES) held to replay.lua run live; one STAGING reference leg is held to replay.lua on every run
 #   (tests/lib/instr_align.sh). The stage-4 build is built fresh, so a manifest change that moves its game clock
 #   FAILs the gate until re-frozen.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/donovan-m5/mask tests/expected/instr_gameclock/
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/donovan-m5/mask tests/expected/instr_gameclock/ tests/lib/jobs.sh
 #   tests/expected/vsavj/masked-v2/logs/02_demitri_vs_cpu.log tests/lib/controls.sh tests/lib/instr_align.sh
 #   tests/lua/emu_clock.lua tests/lua/replay.lua
 #   tests/lua/replay_guard.lua tests/replays/02_demitri_vs_cpu.rpl tools/build_donovan.sh
@@ -42,7 +42,7 @@
 # stubbed_sound rows (ids 0x72a-0x74a — vsavj same-id keys different
 # music-class content) — see STATE 14z-65.
 #
-# Usage: ROMDIR=... tests/test_hui_boot.sh [--freeze-clock]
+# Usage: ROMDIR=... [JOBS=N] tests/test_hui_boot.sh [--freeze-clock]
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -86,15 +86,41 @@ PY
 )"
 [ -n "$EXPECT_BASE" ] || { echo "FAIL: no hitbox_base[0x10] op in the patch"; exit 1; }
 
-echo "== forced-pick boot (id 0x10)"
 # the build packs as vsavjw when any allocation reaches wide_ext — run
 # the set that was actually packed (14z-65: a vsavj-set probe against a
 # vsavjw rompath silently falls back to the PRISTINE ROM: false greens)
 if [ -f "$WORK/hui4/rompath/vsavjw.zip" ]; then
     export SET=vsavjw MAME_BIN="$HOME/.cache/vampire-saved/mame/cps2"
 fi
-# shellcheck disable=SC2086
-env $_clk ALIGN_OUT="$WORK/probe.align" tools/force_pick_probe.sh "$WORK/hui4/rompath" 10 "$WORK/probe" > "$WORK/probe.txt"
+# JOBS (#334 item 2, 14z-211): the probe's guarded run and the legacy replay are independent — each writes only its own
+# files ($WORK/probe + probe.txt + probe.align; $WORK/r02.log + r02box) — so both go through tests/lib/jobs.sh's pool,
+# JOBS at a time (default min(4, CPUs/6)). A run's nonzero status lands in $WORK/<name>.rc and the probe's stderr in
+# $WORK/probe.err; each is judged below where its run used to stand, so set -e's serial exit points are kept.
+FZ_JOBS="${JOBS:-4}"   # --freeze-clock's ia_freeze width, its default (4) kept as it was before the pool
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+run_probe() {
+    # shellcheck disable=SC2086
+    env $_clk ALIGN_OUT="$WORK/probe.align" tools/force_pick_probe.sh "$WORK/hui4/rompath" 10 "$WORK/probe" \
+        > "$WORK/probe.txt" 2> "$WORK/probe.err" || echo "$?" > "$WORK/probe.rc"
+}
+# stage 4 carries the obj_hook engine thunks, so the whole-RAM bit-identity
+# of the ladder gate no longer applies (CLAUDE.md §4 hooked-build basis).
+# Measured 14z-65: EXACT under the v2 mask — frozen as EXACT; any future
+# flicker must be measured and ratified per doctrine, never tolerated here.
+run_r02() {
+    MASK_RANGES="$(cat "$REPO/tests/expected/donovan-m5/mask")" \
+    MAME_ROMPATH="$WORK/hui4/rompath;$ROMDIR" MAME_BIN="${MAME_BIN:-mame}" \
+        tools/run_replay_mame.sh "${SET:-vsavj}" tests/replays/02_demitri_vs_cpu.rpl \
+        "$WORK/r02.log" "$WORK/r02box" > /dev/null 2>&1 || echo "$?" > "$WORK/r02.rc"
+}
+vs_pool_start "$JOBS"
+vs_pool_run run_probe
+vs_pool_run run_r02
+vs_pool_wait
+
+echo "== forced-pick boot (id 0x10)"
+cat "$WORK/probe.err" >&2
+[ ! -f "$WORK/probe.rc" ] || exit "$(cat "$WORK/probe.rc")"
 ia_note_run "$WORK/manifest.tsv" hui4 pick "${SET:-vsavj}" "$WORK/hui4/rompath;$ROMDIR" "$WORK/probe/pick.rpl" \
     "$(cat "$WORK/probe/guard_env")" "$WORK/probe.align"
 cat "$WORK/probe.txt" | sed 's/^/  /'
@@ -104,14 +130,8 @@ grep -q "guard        : clean" "$WORK/probe.txt" \
     || { echo "FAIL: guard not clean"; exit 1; }
 
 echo "== legacy replay under the v2 masked basis (hooked build)"
-# stage 4 carries the obj_hook engine thunks, so the whole-RAM bit-identity
-# of the ladder gate no longer applies (CLAUDE.md §4 hooked-build basis).
-# Measured 14z-65: EXACT under the v2 mask — frozen as EXACT; any future
-# flicker must be measured and ratified per doctrine, never tolerated here.
-MASK_RANGES="$(cat "$REPO/tests/expected/donovan-m5/mask")" \
-MAME_ROMPATH="$WORK/hui4/rompath;$ROMDIR" MAME_BIN="${MAME_BIN:-mame}" \
-    tools/run_replay_mame.sh "${SET:-vsavj}" tests/replays/02_demitri_vs_cpu.rpl \
-    "$WORK/r02.log" "$WORK/r02box" > /dev/null 2>&1
+# (its run ran in the pool above; the masked-basis note is there)
+[ ! -f "$WORK/r02.rc" ] || exit "$(cat "$WORK/r02.rc")"
 python3 "$REPO/tools/compare_flicker.py" "$WORK/r02.log" \
     "$REPO/tests/expected/vsavj/masked-v2/logs/02_demitri_vs_cpu.log" \
     | grep -q "^EXACT" \
@@ -120,7 +140,7 @@ echo "  ok: masked-v2 EXACT vs the frozen vanilla log"
 
 echo "== the instrument's alignment (#228 step 4, option A)"
 if [ "$FREEZE_CLOCK" = 1 ]; then
-    ia_freeze "$REPO/tests/lua/replay_guard.lua" "$WORK/manifest.tsv" "$WORK/fz" "${JOBS:-4}" "$WORK/clocks.tsv" \
+    ia_freeze "$REPO/tests/lua/replay_guard.lua" "$WORK/manifest.tsv" "$WORK/fz" "$FZ_JOBS" "$WORK/clocks.tsv" \
         > "$WORK/fz.txt" || { sed 's/^/  /' "$WORK/fz.txt"; echo "REFUSED: the alignment does not hold — nothing frozen"; exit 1; }
     mkdir -p "$(dirname "$CLOCKS")"
     { echo "# $CLOCKS — the game clock RAM:\$FF8080 at the probe run's last frame, frozen from a REFERENCE leg (#228 step 4,"

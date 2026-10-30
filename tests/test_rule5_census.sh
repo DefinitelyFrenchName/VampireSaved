@@ -45,7 +45,7 @@ FROZEN=tests/expected/rule5_baked.tsv
 echo "== test_rule5_census: the rule-5 census is classified and frozen =="
 [ -f "$TOOL" ]   || { echo "FAIL: $TOOL is absent"; exit 1; }
 [ -f "$FROZEN" ] || { echo "FAIL: $FROZEN is absent — run --freeze"; exit 1; }
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: test_rule5_census — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 
 # The copy lives outside the repo on purpose: `git ls-files` inside the tree

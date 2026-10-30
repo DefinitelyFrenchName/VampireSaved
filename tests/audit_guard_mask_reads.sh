@@ -91,7 +91,7 @@ MERGED="${MERGED:-build/m3b_merged31}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
 [ -x "$MAME_BIN" ] || { echo "FAIL: MAME_BIN=$MAME_BIN is not executable (tools/setup_mame.sh)"; exit 1; }
 [ -f "$MERGED/rompath/vsavjw.zip" ] || { echo "FAIL: no $MERGED/rompath/vsavjw.zip — set MERGED to the current merged build"; exit 1; }
-W="$(mktemp -d "${TMPDIR:-/tmp}/gmask.XXXXXX")"
+W="$(mktemp -d "${TMPDIR:-/tmp}/gmask.XXXXXX")" || { echo "FAIL: audit_guard_mask_reads — mktemp -d failed (W)"; exit 2; }
 if [ -n "${KEEP:-}" ]; then mkdir -p "$KEEP"; trap 'cp -R "$W"/. "$KEEP"/ 2>/dev/null; rm -rf "$W"' EXIT; else trap 'rm -rf "$W"' EXIT; fi
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"

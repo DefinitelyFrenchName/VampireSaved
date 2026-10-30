@@ -196,7 +196,7 @@ if [ -z "$LOG" ]; then
     [ -n "${ROMDIR:-}" ] || { echo "SKIP: ROMDIR unset (this instrument runs the real romset)"; exit 77; }
     command -v verilator >/dev/null 2>&1 || { echo "SKIP: verilator not installed (docs/platform/mister.md Recipe)"; exit 77; }
     [ -e "$REPO/emu/jtcores/.git" ] || { echo "SKIP: emu/jtcores not initialised (tools/setup_jtcores.sh)"; exit 77; }
-    if [ -z "$OUTDIR" ]; then OUTDIR="$(mktemp -d)"; fi
+    if [ -z "$OUTDIR" ]; then OUTDIR="$(mktemp -d)" || { echo "FAIL: audit_sdram_bank_load — mktemp -d failed (OUTDIR)"; exit 2; }; fi
     echo "== sim leg (core $CORE under Verilator, ${WIDEBUILD:+WIDE romset, }-stats; ~50 min) =="
     # --frame-output off is the default, and is passed explicitly because this
     # instrument READS THE LOG: jtframe's frame writer forks a child per

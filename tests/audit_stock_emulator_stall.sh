@@ -13,7 +13,7 @@
 #   control runs the 'stock' leg on the WIDE binary, where the divergence must be absent.
 # EXPECTS: the frozen divergence frame and no crash; the control fails. A build that
 #   crashed, garbled or played on a stock emulator would falsify the README and fail here.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lib/jobs.sh
 #   tests/lua/replay_guard.lua tests/replays/16_xemu_2p.rpl tools/run_mame.sh
 #   tools/run_replay_guarded.sh tools/setup_mame.sh
 #
@@ -28,7 +28,7 @@
 # would be false and this fails. The frozen divergence frame is where the stock descriptor's
 # missing extension first reaches RAM; it moves only if boot-time code moves.
 #
-# Usage: ROMDIR=... [MERGED=build/m3b_merged31] [MAME_REF_BIN=~/.cache/vampire-saved/mame-ref/cps2]
+# Usage: ROMDIR=... [MERGED=build/m3b_merged31] [MAME_REF_BIN=~/.cache/vampire-saved/mame-ref/cps2] [JOBS=N]
 #        tests/audit_stock_emulator_stall.sh
 #   defaults build/m3b_merged31 (re-pointed 14z-148 at M18, 14z-170 at M19); the reference binary is the
 #   WIDE=0 build of tools/setup_mame.sh. MAME_BIN (the WIDE binary) as every MAME gate.
@@ -49,21 +49,26 @@ RPL=tests/replays/16_xemu_2p.rpl
 FROZEN_DIVERGE=469     # measured 2026-09-11 on merged-m18, identical on three replays
 mkdir -p "$W/rp"; cp "$MERGED/rompath/vsavjw.zip" "$W/rp/vsavj.zip"
 
+# JOBS (#334 item 2, 14z-211): the three legs are independent — each writes only its own log, output and sandbox — so
+# they go through tests/lib/jobs.sh's pool, JOBS at a time; default min(4, CPUs/6). The comparison below reads them after.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+leg() {  # leg <name> <set> <rompath> <binary>
+    MAME_BIN="$4" MAME_ROMPATH="$3" GUARD_DEBUG=0 \
+        tools/run_replay_guarded.sh "$2" "$RPL" "$W/$1.log" "$W/sb_$1" > "$W/$1.out" 2>&1 || true
+}
+vs_pool_start "$JOBS"
 # leg A: the real WIDE run (patched binary, the real set)
-MAME_BIN="$WIDE" MAME_ROMPATH="$REPO/$MERGED/rompath;$ROMDIR" GUARD_DEBUG=0 \
-    tools/run_replay_guarded.sh vsavjw "$RPL" "$W/wide.log" "$W/sb_wide" > "$W/wide.out" 2>&1 || true
+vs_pool_run leg wide vsavjw "$REPO/$MERGED/rompath;$ROMDIR" "$WIDE"
 # leg B: the STOCK binary on the renamed set (under the mode: the WIDE binary on the real set,
 # so B == A and the divergence the gate demands is ABSENT — its own FAIL)
 if vs_ctl_is wide-binary-no-stall; then
-    MAME_BIN="$WIDE" MAME_ROMPATH="$REPO/$MERGED/rompath;$ROMDIR" GUARD_DEBUG=0 \
-        tools/run_replay_guarded.sh vsavjw "$RPL" "$W/stock.log" "$W/sb_stock" > "$W/stock.out" 2>&1 || true
+    vs_pool_run leg stock vsavjw "$REPO/$MERGED/rompath;$ROMDIR" "$WIDE"
 else
-    MAME_BIN="$REF" MAME_ROMPATH="$W/rp;$ROMDIR" GUARD_DEBUG=0 \
-        tools/run_replay_guarded.sh vsavj "$RPL" "$W/stock.log" "$W/sb_stock" > "$W/stock.out" 2>&1 || true
+    vs_pool_run leg stock vsavj "$W/rp;$ROMDIR" "$REF"
 fi
 # the control leg, always: the WIDE binary on the real set, a second time
-MAME_BIN="$WIDE" MAME_ROMPATH="$REPO/$MERGED/rompath;$ROMDIR" GUARD_DEBUG=0 \
-    tools/run_replay_guarded.sh vsavjw "$RPL" "$W/ctl.log" "$W/sb_ctl" > "$W/ctl.out" 2>&1 || true
+vs_pool_run leg ctl vsavjw "$REPO/$MERGED/rompath;$ROMDIR" "$WIDE"
+vs_pool_wait
 
 fail=0
 python3 - "$W/wide.log" "$W/stock.log" "$W/ctl.log" "$FROZEN_DIVERGE" <<'PY' || fail=1

@@ -9,7 +9,7 @@
 #   MAME against their frozen expectations.
 # EXPECTS: every stage's invariant holds, the probe loads his id, legacy identical on both
 #   bases; a red names the stage and op or replay.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/donovan-m5/mask
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/donovan-m5/mask tests/lib/jobs.sh
 #   tests/expected/vsavj/02_demitri_vs_cpu.sha1
 #   tests/expected/vsavj/masked-v2/logs/02_demitri_vs_cpu.log tests/lua/replay.lua
 #   tests/lua/replay_guard.lua tests/replays/02_demitri_vs_cpu.rpl
@@ -40,7 +40,7 @@
 #   3. A legacy replay on the stage-3 build is BIT-IDENTICAL to the frozen
 #      vanilla expectation (whole-RAM, unmasked).
 #
-# Usage: ROMDIR=... tests/test_pyr_ladder.sh
+# Usage: ROMDIR=... [JOBS=N] tests/test_pyr_ladder.sh
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -238,7 +238,36 @@ echo "== stage-6 boot probe (forced pick, id 0x11)"
 WIDE_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 [ -x "$WIDE_BIN" ] || { echo "FAIL: no WIDE MAME binary at $WIDE_BIN"; \
     echo "      build it: tools/setup_mame.sh"; exit 1; }
-MAME_BIN="$WIDE_BIN" SET=vsavjw tools/force_pick_probe.sh "$WORK/pyr6/rompath" 11 "$WORK/probe" > "$WORK/probe.txt" 2>&1 || {
+# JOBS (#334 item 2, 14z-211): the boot probe and the two legacy replays are independent — each writes only its own
+# out dir or log and box ($WORK/probe + probe.txt, r02.log + r02box, r02m.log + r02mbox) and its exit status to
+# $WORK/<name>.rc — so they go through tests/lib/jobs.sh's pool, JOBS at a time; default min(4, CPUs/6). The three
+# sections then judge them in the original order with the original exits (a legacy run's failure still stops the gate
+# with its status, as set -e did); on a red the later runs have merely run for nothing.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+run_probe() {
+    if MAME_BIN="$WIDE_BIN" SET=vsavjw tools/force_pick_probe.sh "$WORK/pyr6/rompath" 11 "$WORK/probe" > "$WORK/probe.txt" 2>&1
+    then echo 0 > "$WORK/probe.rc"; else echo $? > "$WORK/probe.rc"; fi
+}
+run_r02() {  # stage 3, whole-RAM unmasked
+    if MAME_ROMPATH="$WORK/pyr3/rompath;$ROMDIR" \
+        tools/run_replay_mame.sh vsavj tests/replays/02_demitri_vs_cpu.rpl \
+        "$WORK/r02.log" "$WORK/r02box" > /dev/null 2>&1
+    then echo 0 > "$WORK/r02.rc"; else echo $? > "$WORK/r02.rc"; fi
+}
+run_r02m() {  # stage 4, masked v2 basis
+    if MASK_RANGES="$(cat "$REPO/tests/expected/donovan-m5/mask")" \
+        MAME_ROMPATH="$WORK/pyr4/rompath;$ROMDIR" \
+        tools/run_replay_mame.sh vsavj tests/replays/02_demitri_vs_cpu.rpl \
+        "$WORK/r02m.log" "$WORK/r02mbox" > /dev/null 2>&1
+    then echo 0 > "$WORK/r02m.rc"; else echo $? > "$WORK/r02m.rc"; fi
+}
+run_status() { _rs="$(cat "$WORK/$1.rc" 2>/dev/null || echo 1)"; [ "$_rs" = 0 ] || exit "$_rs"; }
+vs_pool_start "$JOBS"
+vs_pool_run run_probe
+vs_pool_run run_r02
+vs_pool_run run_r02m
+vs_pool_wait
+[ "$(cat "$WORK/probe.rc" 2>/dev/null)" = 0 ] || {
     cat "$WORK/probe.txt"; echo "FAIL: boot probe errored"; exit 1; }
 grep -q 'id-hold @2600: \$FF8782 = 0x11' "$WORK/probe.txt" || {
     cat "$WORK/probe.txt"; echo "FAIL: forced id did not hold"; exit 1; }
@@ -249,9 +278,7 @@ grep -q 'guard        : clean' "$WORK/probe.txt" || {
 echo "  ok: id holds, his data loads, guard clean"
 
 echo "== legacy bit-identity on stage 3 (whole-RAM, unmasked — hook-free)"
-MAME_ROMPATH="$WORK/pyr3/rompath;$ROMDIR" \
-    tools/run_replay_mame.sh vsavj tests/replays/02_demitri_vs_cpu.rpl \
-    "$WORK/r02.log" "$WORK/r02box" > /dev/null 2>&1
+run_status r02
 sha=$(shasum "$WORK/r02.log" | cut -d' ' -f1)
 exp=$(cat "$REPO/tests/expected/vsavj/02_demitri_vs_cpu.sha1")
 [ "$sha" = "$exp" ] \
@@ -259,10 +286,7 @@ exp=$(cat "$REPO/tests/expected/vsavj/02_demitri_vs_cpu.sha1")
 echo "  ok: bit-identical to the frozen vanilla expectation"
 
 echo "== legacy under the v2 masked basis on stage 4 (hooked build)"
-MASK_RANGES="$(cat "$REPO/tests/expected/donovan-m5/mask")" \
-MAME_ROMPATH="$WORK/pyr4/rompath;$ROMDIR" \
-    tools/run_replay_mame.sh vsavj tests/replays/02_demitri_vs_cpu.rpl \
-    "$WORK/r02m.log" "$WORK/r02mbox" > /dev/null 2>&1
+run_status r02m
 python3 "$REPO/tools/compare_flicker.py" "$WORK/r02m.log" \
     "$REPO/tests/expected/vsavj/masked-v2/logs/02_demitri_vs_cpu.log" \
     | grep -q "^EXACT" \

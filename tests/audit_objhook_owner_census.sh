@@ -17,7 +17,7 @@
 #   tests/expected/instr_gameclock/audit_objhook_owner_census.tsv, frozen by `--freeze-clock` from REFERENCE legs (the
 #   guard without -debug, the same POKES) each held to replay.lua run live; one STAGING reference leg is held to
 #   replay.lua on every run (tests/lib/instr_align.sh).
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/instr_gameclock/ tests/lib/controls.sh
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/instr_gameclock/ tests/lib/controls.sh tests/lib/jobs.sh
 #   tests/lib/instr_align.sh tests/lua/emu_clock.lua tests/lua/replay.lua tests/lua/replay_guard.lua tests/replays/
 #   tools/run_mame.sh tools/run_replay_guarded.sh tools/setup_mame.sh
 #
@@ -45,7 +45,7 @@
 #             that assumes their shape is guessing; extend the replay list
 #             when one of them matters.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] tests/audit_objhook_owner_census.sh [build] [--freeze-clock]
+# Usage: ROMDIR=... [MAME_BIN=...] [JOBS=N] tests/audit_objhook_owner_census.sh [build] [--freeze-clock]
 # Default build: build/hui30. ~6 min: two guarded runs. REPORT-ONLY (exit 0
 # unless the rig is dead): this is a measurement, not a gate.
 #
@@ -98,18 +98,31 @@ THUNK="$(sed -n 's/^code *0x0*\([0-9a-f]*\) obj_hook thunk .*/\1/p' \
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 abspath() { case "$1" in /*) echo "$1";; *) echo "$PWD/$1";; esac; }
 
-run() {  # run <replay-rel> <pokes> <out>
+run() {  # run <replay-rel> <pokes> <out> — the guarded probe run alone
     # shellcheck disable=SC2086
     env $_clk POKES="$2" MAME_ROMPATH="$(abspath "$BUILD")/rompath;$ROMDIR" ALIGN_OUT="$3.align" \
     GUARD_PROBE="$THUNK" GUARD_PROBE_COND="d0>=0x1c8" \
     GUARD_PROBE_MAX=20000 GUARD_PROBE_MEM=A6+30 \
         tools/run_replay_guarded.sh vsavjw "tests/replays/$1.rpl" \
         "$3" "$W/box_$(basename "$3")" >/dev/null 2>&1 || true
+}
+note() {  # note <replay-rel> <pokes> <out> — the run's manifest row, from its ALIGN line
     ia_note_run "$W/manifest.tsv" build "$(basename "$1")" vsavjw "$(abspath "$BUILD")/rompath;$ROMDIR" "$REPO/tests/replays/$1.rpl" \
         "MAME_BIN=$MAME_BIN POKES=$2 GUARD_PROBE=$THUNK GUARD_PROBE_COND=d0>=0x1c8 GUARD_PROBE_MAX=20000 GUARD_PROBE_MEM=A6+30" "$3.align"
 }
-run hui/70_hui_mash "1704:ff8782:10;1760:ff8782:10;1900:ff8782:10;2100:ff8782:10;2400:ff8782:10" "$W/mash.log"
-run hui/83_hui_fx   "1400:ff8782:10;1450:ff8782:10;1500:ff8782:10" "$W/fx.log"
+MASH_PK="1704:ff8782:10;1760:ff8782:10;1900:ff8782:10;2100:ff8782:10;2400:ff8782:10"
+FX_PK="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10"
+# JOBS (#334 item 2, 14z-211): the two probe runs are independent — each writes only its own log, align file and box —
+# so they go through tests/lib/jobs.sh's pool, JOBS at a time; default min(4, CPUs/6). Their rows are appended to the
+# shared manifest AFTER both finish, serially and in the original order (ia_stage stages the manifest's line 1).
+FZ_JOBS="${JOBS:-4}"   # --freeze-clock's ia_freeze width, its default (4) kept as it was before the pool
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+vs_pool_start "$JOBS"
+vs_pool_run run hui/70_hui_mash "$MASH_PK" "$W/mash.log"
+vs_pool_run run hui/83_hui_fx   "$FX_PK"   "$W/fx.log"
+vs_pool_wait
+note hui/70_hui_mash "$MASH_PK" "$W/mash.log"
+note hui/83_hui_fx   "$FX_PK"   "$W/fx.log"
 
 python3 - "$W/mash.log" "$W/fx.log" <<'PY'
 import re, sys, collections
@@ -140,7 +153,7 @@ if total == 0:
 PY
 echo "== the instrument's alignment (#228 step 4, option A)"
 if [ "$FREEZE_CLOCK" = 1 ]; then
-    ia_freeze "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" "$W/fz" "${JOBS:-4}" "$W/clocks.tsv" \
+    ia_freeze "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" "$W/fz" "$FZ_JOBS" "$W/clocks.tsv" \
         > "$W/fz.txt" || { sed 's/^/  /' "$W/fz.txt"; echo "REFUSED: the alignment does not hold — nothing frozen"; exit 1; }
     mkdir -p "$(dirname "$CLOCKS")"
     { echo "# $CLOCKS — the game clock RAM:\$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,"

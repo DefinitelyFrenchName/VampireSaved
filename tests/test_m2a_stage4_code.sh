@@ -9,7 +9,7 @@
 #   suite through the registry.
 # EXPECTS: veto, bring-up and superset all green; an unregistered fingerprint stops the gate
 #   as a rule-6 signal.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/lib/m2a_common.sh
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/lib/m2a_common.sh tests/lib/jobs.sh
 #   tests/lib/masked_compare.sh tests/lua/replay.lua tests/lua/replay_guard.lua
 #   tests/replays/ tools/build_donovan.sh tools/build_fingerprint.py tools/check_diverge.py
 #   tools/compare_composite.py tools/compare_flicker.py tools/compare_window.py
@@ -37,7 +37,7 @@
 #      What the stage-4 set says, and why 04_select_fuzz is a `diverge`
 #      rather than a flicker: tests/expected/donovan-m8-stage4/README.md.
 #
-# Usage: ROMDIR=... tests/test_m2a_stage4_code.sh [outbase]
+# Usage: ROMDIR=... [JOBS=N] tests/test_m2a_stage4_code.sh [outbase]
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -107,10 +107,25 @@ print("  ok: all 7 known operand-pair sites byte-identical to source")
 EOF
 
 echo "== 2. guarded replays (full length, -debug guard) =="
-for gr in 12_donovan_vs_cpu 19_don_dp_spam 20_don_round2 21_don_mash; do
+# JOBS (#334 item 2, 14z-211): the four guarded runs are independent — each writes only its own log, sandbox,
+# captured output and exit status — so they go through tests/lib/jobs.sh's pool, JOBS at a time; default
+# min(4, CPUs/6). The verdicts below read them after, in the same order and with the same lines as before.
+GUARDED="12_donovan_vs_cpu 19_don_dp_spam 20_don_round2 21_don_mash"
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+guard_run() {  # guard_run <replay>: the guarded run; output to $WORK/<r>_guard.out, exit status to <r>.rc
     if MAME_ROMPATH="$RP" tools/run_replay_guarded.sh vsavj \
-        "tests/replays/$gr.rpl" "$WORK/$gr.log" "$WORK/${gr}box" \
-        > "$WORK/${gr}_guard.out" 2>&1; then
+        "tests/replays/$1.rpl" "$WORK/$1.log" "$WORK/${1}box" \
+        > "$WORK/${1}_guard.out" 2>&1; then
+        echo 0 > "$WORK/$1.rc"
+    else
+        echo "$?" > "$WORK/$1.rc"
+    fi
+}
+vs_pool_start "$JOBS"
+for gr in $GUARDED; do vs_pool_run guard_run "$gr"; done
+vs_pool_wait
+for gr in $GUARDED; do
+    if [ "$(cat "$WORK/$gr.rc" 2>/dev/null)" = 0 ]; then
         echo "  ok: $gr END-clean under guard"
     else
         echo "FAIL: guard tripped on $gr:"

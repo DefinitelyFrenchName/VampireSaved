@@ -72,7 +72,7 @@
 #   move and cannot — that replay scripts no direction token, which is also
 #   why the sim anchor could not move
 set -u
-REPO="$(cd "$(dirname "$0")/.." && pwd)"; T="$(mktemp -d)"; fail=0
+REPO="$(cd "$(dirname "$0")/.." && pwd)"; T="$(mktemp -d)" || { echo "FAIL: test_rpl2siminputs — mktemp -d failed (T)"; exit 2; }; fail=0
 ok(){ echo "  PASS $1"; }; bad(){ echo "  FAIL $1"; fail=1; }
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 P="python3 $REPO/tools/rpl2siminputs.py"

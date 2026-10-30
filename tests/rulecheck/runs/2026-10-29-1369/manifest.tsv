@@ -1,0 +1,52 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent212/t330/closure3/closing_comment.md	01b85bc4079ee51e23cfc04e615eb1937c8ec810
+build/agent212/t330/closure3/ticket_row_330.tsv	a9a519271ccf5b4d33dc8e621febf6702bd93666
+build/agent212/t330/closure3/rulecheck_1365_reader_a.txt	fc473ca41a98a042366f0accf3239e584c3e1a82
+build/agent212/t330/closure3/notes.md	72809b7a879bf5b1c1a4162144d6bcb91ac53b7d
+build/agent212/t330/closure3/press_states.tsv	af0fdbbb36d6153ba93c6f6a9bd7c4247fc60258
+build/agent212/t330/closure3/whiff_vs_grab.tsv	c294c2b5f3c89a5decc21f0c2779f7c3a0d00b6a
+build/agent212/t330/closure3/feas.tsv	6e0770c2178420eff963abc93746cb1e09b09f05
+build/agent212/t330/closure3/feas8.tsv	49c5fe5cb5c2dc3d679d4ffb6a32db857e41db5d
+build/agent212/t330/closure3/probe_FE_cmd_1.txt	6173b93ccfb8a8339a4171e18fb47929d18f9490
+build/agent212/t330/closure3/probe_AU_cmd_1.txt	0981d5224b0548b9fa75d34406e3442f3cad9d0d
+build/agent212/t330/closure3/inrange_feas_gen.py	a3e89bc517a60f3e29d31e6a9b9b476127b51f35
+build/agent212/t330/closure3/check_probe_gen.py	c039f0a50d6b89d209d9a6af8ebeebcbb06923bf
+build/agent212/t330/closure3/gated_sheet.py	1df0d7eb3262c25c851d035e74527c7e999fb386
+build/agent212/t330/closure3/es_sheet.py	cf5ffeb09925ee05e9138773ec5d4750566afeb9
+build/agent212/t330/closure3/gated_page1.png	7b9825a7792a842f534386ffb0c88b924ad5ccc4
+build/agent212/t330/closure3/gated_page2.png	82a33de0ed3d2eecd32272bc648e5fe07d78bad1
+build/agent212/t330/closure3/es_page1.png	433de9f0fcba3ffaa8caac50a8accada88ecc8f7
+build/agent212/t330/closure3/es_page2.png	3b505a8b70735e8694fe4ccde7dd02f63740cfb1
+build/agent212/t330/closure3/es_page3.png	d5eb1f05f6d96fb4ae5f1ef2fa928419649f131a
+build/agent212/t330/closure3/throw_recovery_command-lp.png	42912bc57159b3a667e9a5d63887ef75b747b0cb
+build/agent212/t330/closure3/verify_battery.sh	da1289e831fa6dc7168765f4161a0b1bccc3f5bf
+build/agent212/t330/closure3/battery_blobs.txt	04b5371c8e120d081044231b12ea9770a9b113b4
+build/agent212/t330/closure3/battery_default.log	cc39cb7af35c809b431ae6bd96d914f385cde3d8
+build/agent212/t330/closure3/battery_v01.log	a0d771789f8e7c389f8efaa24c9c4cc537133ac9
+build/agent212/t330/closure3/battery_v0e.log	a4cb9e9da3073394870035329986919f18740079
+build/agent212/t330/closure3/battery_mode_tick-early.log	58fbd353e29781dea11f3f6e74bd1e2a26afebf0
+build/agent212/t330/closure3/battery_mode_lp-tech.log	37389874861b3a80a8164cce6b711442772958d2
+build/agent212/t330/closure3/battery_mode_late-window.log	8b5458874b9a2b98ef41f7e6f151e45ed11b4671
+build/agent212/t330/closure3/battery_mode_gated-whiff.log	5a633c4882798515cf687845343d8b88636f4015
+build/agent212/t330/closure3/battery_mode_es-exemption-dropped.log	d9729a87870ea25487b37588d2d1dc55c6cbdb9e
+build/agent212/t330/closure3/battery_mode_whiff-at-contact.log	3ebb3f25322e1c47d30a28e2727ca94a709ec5ea
+build/agent212/t330/closure3/whiff_at_contact_first_try.log	56ab5cbb6cb5256b3a457cfcafb3734012841950
+build/agent212/t330/closure3/freeze_cmd.log	6c589bed2ae91d58314c732d12faa283c9472709
+build/agent212/t330/closure3/vic_verify_air_v01.log	ed4e4eb62305aaf370e4d7b57b35dda6e4bae7ad
+build/agent212/t330/closure3/vic_air_hv0e.log	674a69bdf6e17e46fffa97921be3eb9a191e2125
+build/agent212/t330/closure3/vic_air_hv0e_counts.txt	bf121d633121ca0b93c32135035428f9f3357760
+build/agent212/t330/closure3/vic_cmd_v01.log	06812a9dd47bb1dbb008e1246182ac88b31feea4
+build/agent212/t330/closure3/vic_cmd_v0e.log	755718b064d632900b970e2ad0cce01ef1bf3c94
+build/agent212/t330/closure3/xc_tr_command.txt	4db39b7082dab192840de0dd03f44d7ccb5b3baf
+build/agent212/t330/closure3/xc_tr_air.txt	9c09aeaa24d3b9cefdbb590e41d636eaea8f35a7
+build/agent212/t330/closure3/test_crosscheck_229.log	7a0c2440abccb93ced98588fca3c38dae28a0738
+DECISIONS_HISTORY.md.lines-8607-8790 (lines 8607-8790 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-28 (14z-211) — #330: "actionable" is the first accepted input; a new gate on Victor", and the entries after it up to line 8790)	7e245d32db88384de0d9b4066963e6761e1a8ce5
+docs/project/tables/community_crosscheck.md.lines-460-520 (lines 460-520 of docs/project/tables/community_crosscheck.md)	4d5f140831e4186e90dfb7b628d6b43cb89ac975
+docs/project/tables/community_crosscheck.md.lines-600-625 (lines 600-625 of docs/project/tables/community_crosscheck.md)	895e2b3b73cb3bec9da3cb222c5918d28ae3195d
+docs/game/engine_internals.md.lines-3613-3648 (lines 3613-3648 of docs/game/engine_internals.md)	19f11dc74b4c1cb1b1582edc6ec875e5ef8ab168
+docs/project/gotchas.md.lines-7724-7777 (lines 7724-7777 of docs/project/gotchas.md)	cffd6e41e97471d847e007186ba41bd3c76ba4b9
+tests/expected/PROVENANCE.md.lines-93-104 (lines 93-104 of tests/expected/PROVENANCE.md)	7d29340e97a3184ea8875960ae0ddb58139eff9a
+tests/audit_throw_recovery.sh	82bf3df768b158eb0e46974a2f560e9e43cf3a6a
+tools/throw_recovery_rigs.py	3c97d0412329431cb5ee6677b490348bdfe02ab3
+tools/throw_recovery_sheet.py	6765999e8053f8ee62773f2e8271198c562a6d1c
+tools/crosscheck_229.py	277ba611baa36e04bdf49372966fa385dfe9a568

@@ -50,7 +50,7 @@ CLOCKS=tests/expected/instr_gameclock/audit_vanilla_specials_b.tsv
 INSTR="$REPO/tests/lua/specials_b_trace.lua"
 IMG="${IMG:-build/out/vsavj_data.bin}"
 JOBS=2
-W="$(mktemp -d)"
+W="$(mktemp -d)" || { echo "FAIL: audit_vanilla_specials_b — mktemp -d failed (W)"; exit 2; }
 if [ -n "${KEEP:-}" ]; then mkdir -p "$KEEP"; trap 'cp -R "$W"/. "$KEEP"/ 2>/dev/null; rm -rf "$W"' EXIT; else trap 'rm -rf "$W"' EXIT; fi
 bad=0
 ok()  { echo "  ok    $1"; }

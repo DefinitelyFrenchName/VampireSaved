@@ -9,7 +9,7 @@
 #   measured on vsav2 (replay 43).
 # EXPECTS: both replays' rows equal the frozen native rows; a red is a palette or table
 #   change regressing either path.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua tests/replays/
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua tests/replays/ tests/lib/jobs.sh
 #   tools/run_mame.sh tools/setup_mame.sh
 #
 # SHEET: no-reference-leg — our build against frozen vs2 values, with no vs2 rig in the gate (ruled 2026-10-17: listed, not drawn)
@@ -29,7 +29,7 @@
 #      0x0A-0x0F + P2 rows 0x10-0x13 == frozen native mirror rows
 #      (vs2 ground truth via replay 43 on vsav2).
 #
-# Usage: ROMDIR=... tests/test_don_colors.sh [rompath_dir]
+# Usage: ROMDIR=... [JOBS=N] tests/test_don_colors.sh [rompath_dir]
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that
@@ -55,8 +55,29 @@ run_case() { # $1=replay $2=outsub
         -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
 }
 
-run_case 41_don_altcolor_vsavj.rpl alt
-run_case 42_don_mirror_vsavj.rpl mirror
+# JOBS (#334 item 2, 14z-211): the gate's four runs (alt, mirror, pc, sel) are independent — each writes only its own
+# $WORK/<sub> (sandbox, c.log, dumps) — so they go through tests/lib/jobs.sh's pool here, JOBS at a time (default
+# min(4, CPUs/6)). A run's nonzero status lands in $WORK/<sub>.rc and is judged where that run used to stand, so set -e's
+# serial exit points are kept.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+run_dumps() { # $1=replay $2=outsub $3=DUMPS spec
+    mkdir -p "$WORK/$2"
+    DUMPS="$3" REPLAY="$REPO/tests/replays/$1" \
+        CHECKSUM_OUT="$WORK/$2/c.log" MAME_SANDBOX="$WORK/$2" \
+        MAME_ROMPATH="$RPDIR;$ROMDIR" tools/run_mame.sh vsavj \
+        -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
+}
+pooled() { _pn="$1"; shift; "$@" || echo "$?" > "$WORK/$_pn.rc"; }
+ran() { [ ! -f "$WORK/$1.rc" ] || exit "$(cat "$WORK/$1.rc")"; }
+vs_pool_start "$JOBS"
+vs_pool_run pooled alt run_case 41_don_altcolor_vsavj.rpl alt
+vs_pool_run pooled mirror run_case 42_don_mirror_vsavj.rpl mirror
+vs_pool_run pooled pc run_dumps 58_don_select_confirm.rpl pc \
+    "1500:90c140-90c1c0;1501:90c140-90c1c0;1502:90c140-90c1c0;1500:90c280-90c2a0;1500:708000-708500"
+vs_pool_run pooled sel run_dumps 44_don_select_hover.rpl sel "1290:708000-709000"
+vs_pool_wait
+ran alt
+ran mirror
 
 python3 - "$WORK" <<'EOF'
 import os, sys
@@ -109,12 +130,8 @@ EOF
 #      Replay 58 confirms with HK; rows 0x0A-0x0D must be steady
 #      across consecutive frames AND equal the frozen native vs2 set
 #      (select R,R + confirm 6, f1500).
-mkdir -p "$WORK/pc"
-DUMPS="1500:90c140-90c1c0;1501:90c140-90c1c0;1502:90c140-90c1c0;1500:90c280-90c2a0;1500:708000-708500" \
-    REPLAY="$REPO/tests/replays/58_don_select_confirm.rpl" \
-    CHECKSUM_OUT="$WORK/pc/c.log" MAME_SANDBOX="$WORK/pc" \
-    MAME_ROMPATH="$RPDIR;$ROMDIR" tools/run_mame.sh vsavj \
-    -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
+# (its run, replay 58 with the f1500-1502 accent/row-14/wheel-record dumps, ran in the pool above)
+ran pc
 python3 - "$WORK/pc" <<'EOF2'
 import sys, os
 work = sys.argv[1]
@@ -162,11 +179,8 @@ echo "PASS: Donovan color-set gate (alt + mirror native-locked)"
 # present, drawn BEHIND the body (all sword-band entries precede all
 # body-band entries in the OBJ list — the owner +0x3C draw-behind flag,
 # vs2-only instruction ported via the resolve thunks).
-mkdir -p "$WORK/sel"
-DUMPS="1290:708000-709000" REPLAY="$REPO/tests/replays/44_don_select_hover.rpl" \
-    CHECKSUM_OUT="$WORK/sel/c.log" MAME_SANDBOX="$WORK/sel" \
-    MAME_ROMPATH="$RPDIR;$ROMDIR" tools/run_mame.sh vsavj \
-    -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
+# (its run, replay 44 with the f1290 OBJ-list dump, ran in the pool above)
+ran sel
 
 python3 - "$WORK/sel/dump_1290_708000.bin" <<'EOF2'
 import sys

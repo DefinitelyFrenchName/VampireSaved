@@ -64,8 +64,9 @@ awk '{ l=$0; sub(/#.*/,"",l)
        else print }' tests/replays/11_pick_donovan.rpl > "$T/short.rpl"
 
 run() { # run <tag> <mask> — each run its own sandbox inside the trapped T (#303)
+    _sb="$(mktemp -d "$T/sb.XXXXXX")" || { echo "FAIL: test_mask_ranges_reader — mktemp -d failed (sandbox)"; return 2; }
     MASK_RANGES="$2" MAME_ROMPATH="$RP" \
-      tools/run_replay_mame.sh vsavjw "$T/short.rpl" "$T/$1.log" "$(mktemp -d "$T/sb.XXXXXX")" \
+      tools/run_replay_mame.sh vsavjw "$T/short.rpl" "$T/$1.log" "$_sb" \
       > "$T/$1.out" 2>&1 && return 0 || return $?
 }
 

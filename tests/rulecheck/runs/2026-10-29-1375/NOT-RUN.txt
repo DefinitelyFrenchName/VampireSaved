@@ -1,0 +1,1 @@
+NOT RUN (14z-212): the claim said #333's later guards changed 11 timed gates' scripts after ERIS's timings; measured, only audit_phase_mode_cost changed. Caught before any reader was spawned; re-prepared.

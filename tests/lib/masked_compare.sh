@@ -101,7 +101,7 @@ masked_check() {
         # NO-BASE-LOG. run_suite.sh's inline version wrote "$WORK/$name.mdiverge"
         # for exactly this reason; caught here by tests/test_masked_compare.sh
         # while lifting the code out.
-        _mc_tmp="$(mktemp -d)"
+        _mc_tmp="$(mktemp -d)" || { echo "masked_compare: mktemp -d failed (_mc_tmp)" >&2; return 1; }
         printf '%s %s' "$_mc_base" "$_mc_args" > "$_mc_tmp/$_mc_name.mdiverge"
         _mc_out=$(python3 "$REPO/tools/check_diverge.py" "$_mc_log" \
                     "$_mc_tmp/$_mc_name.mdiverge" "$_mc_root") && _mc_rc=0 || _mc_rc=1

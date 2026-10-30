@@ -25,7 +25,7 @@ fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: test_history_index — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 
 FILES="$(python3 -c "import sys; sys.path.insert(0, 'tools'); import gen_history_index as g; print(' '.join(sorted(set(g.archives('.')) | set(g.ENTRY))))")"
 mkcopy() { for f in $FILES; do [ -f "$f" ] || continue; mkdir -p "$1/$(dirname "$f")"; cp "$f" "$1/$f"; done; }

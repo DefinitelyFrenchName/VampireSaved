@@ -11,7 +11,7 @@
 # EXPECTS: 0x18 / base 0x0B3450 where the hook applies, 0x08 / 0x0A6418 without the hold and
 #   on the stock twin, 0x01 on Demitri's cell, P2 independent, FBNeo agreeing. A leg proving
 #   a byte without the base is not a pass.
-# FOLLOWS: build/manifest/ emu/fbneo-patches/ emu/fbneo/ emu/mame-patches/
+# FOLLOWS: build/manifest/ emu/fbneo-patches/ emu/fbneo/ emu/mame-patches/ tests/lib/jobs.sh
 #   tests/lua/replay.lua tools/run_mame.sh tools/run_replay_fbneo.sh tools/setup_fbneo.sh
 #   tools/setup_mame.sh
 #
@@ -47,7 +47,7 @@
 # loaded hitbox base (+0x60 in-match), so a passing leg proves the pick
 # produced the CHARACTER, not just a byte.
 #
-# Usage: ROMDIR=... tests/test_oboro_select.sh [wide_rompath] [stock_rompath]
+# Usage: ROMDIR=... [JOBS=N] tests/test_oboro_select.sh [wide_rompath] [stock_rompath]
 #   defaults: build/m3b_merged31/rompath, build/m5_stock22/rompath
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
@@ -116,12 +116,38 @@ cat > "$WORK/p2.rpl" <<'EOF'
 3400 wait
 EOF
 
-run() { # run <label> <rompath> <set> <replay> <confirm_frame>
+# JOBS (#334 item 2, 14z-211): the five MAME runs (A-E) and the two FBNeo legs (F) are independent — each writes only
+# $WORK/<label> or $WORK/fb_<replay>, with its own sandbox — so they all go through tests/lib/jobs.sh's pool, JOBS at
+# a time; default min(4, CPUs/6). A pooled run records its exit status in its dir's rc; run() and leg F judge each
+# after the pool, in the old section order, with the old lines.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+run_one() { # run_one <label> <rompath> <set> <replay> <confirm_frame>
     mkdir -p "$WORK/$1"
-    DUMPS="$5:ff8400-ff8c00;3000:ff8400-ff8c00" REPLAY="$4" \
+    if DUMPS="$5:ff8400-ff8c00;3000:ff8400-ff8c00" REPLAY="$4" \
         CHECKSUM_OUT="$WORK/$1/c.log" MAME_SANDBOX="$WORK/$1/box" \
         MAME_ROMPATH="$2;$ROMDIR" tools/run_mame.sh "$3" \
-        -autoboot_script tests/lua/replay.lua > "$WORK/$1/mame.log" 2>&1 || {
+        -autoboot_script tests/lua/replay.lua > "$WORK/$1/mame.log" 2>&1; then
+        echo 0 > "$WORK/$1/rc"; else echo 1 > "$WORK/$1/rc"; fi
+}
+fb_one() { # fb_one <replay name>
+    mkdir -p "$WORK/fb_$1"
+    if ( cd "$WORK/fb_$1" && FBNEO_DUMPS="1210:ff8400-ff8800;3000:ff8400-ff8800" \
+        FBNEO_ROMPATH="$WIDE" "$REPO/tools/run_replay_fbneo.sh" vsavjw \
+        "$WORK/$1.rpl" "$WORK/fb_$1/c.log" "$WORK/fb_$1/box" > run.log 2>&1 ); then
+        echo 0 > "$WORK/fb_$1/rc"; else echo 1 > "$WORK/fb_$1/rc"; fi
+}
+vs_pool_start "$JOBS"
+vs_pool_run run_one A "$WIDE" vsavjw "$WORK/p1.rpl" 1210
+vs_pool_run run_one B "$WIDE" vsavjw "$WORK/p1_nohold.rpl" 1210
+vs_pool_run run_one C "$WIDE" vsavjw "$WORK/p1_demitri.rpl" 1210
+vs_pool_run run_one D "$WIDE" vsavjw "$WORK/p2.rpl" 1260
+vs_pool_run run_one E "$STOCK" vsavj "$WORK/p1.rpl" 1210
+if [ -x "$REPO/emu/fbneo/fbneo" ]; then
+    for r in p1 p1_nohold; do vs_pool_run fb_one "$r"; done
+fi
+vs_pool_wait
+run() { # run <label> <rompath> <set> <replay> <confirm_frame> — judges the pooled run <label>
+    [ "$(cat "$WORK/$1/rc" 2>/dev/null)" = 0 ] || {
             echo "FAIL: $1 — MAME run failed"; tail -5 "$WORK/$1/mame.log"; fail=1; return; }
     grep -q '^END ' "$WORK/$1/c.log" || { echo "FAIL: $1 — no END"; fail=1; return; }
 }
@@ -171,8 +197,7 @@ echo "== F: dual-emulator agreement — the same pick on FBNeo (CLAUDE.md §4) =
 if [ -x "$REPO/emu/fbneo/fbneo" ]; then
     for leg in p1:0x18:0xb3450 p1_nohold:0x08:0xa6418; do
         r="${leg%%:*}"; rest="${leg#*:}"; wi="${rest%%:*}"; wb="${rest#*:}"
-        mkdir -p "$WORK/fb_$r"
-        ( cd "$WORK/fb_$r" && FBNEO_DUMPS="1210:ff8400-ff8800;3000:ff8400-ff8800"             FBNEO_ROMPATH="$WIDE" "$REPO/tools/run_replay_fbneo.sh" vsavjw             "$WORK/$r.rpl" "$WORK/fb_$r/c.log" "$WORK/fb_$r/box" > run.log 2>&1 ) || {
+        [ "$(cat "$WORK/fb_$r/rc" 2>/dev/null)" = 0 ] || {
             echo "FAIL: FBNeo leg $r did not run"; fail=1; continue; }
         fi_="$(fbfield "$WORK/fb_$r/c.log.dump_1210_ff8400.bin" id)"
         fb_="$(fbfield "$WORK/fb_$r/c.log.dump_3000_ff8400.bin" base)"

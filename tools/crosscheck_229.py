@@ -29,7 +29,7 @@ there (sheet, ours, delta per move), outside the repository; stdout carries verd
   python3 tools/crosscheck_229.py gt-ground|gt-air <ground_throws OUT dir> [--sheet X] [--pairs DIR]
   python3 tools/crosscheck_229.py tr-ground <full lines> [<full lines, another victim> ...] [--sheet X] [--pairs DIR]
                                    (#330: tests/audit_throw_recovery.sh's full lines, the gate's own victim first)
-  python3 tools/crosscheck_229.py tr-air <full lines> [<full lines, another height> ...] [--sheet X] [--pairs DIR]
+  python3 tools/crosscheck_229.py tr-air <full lines> [<full lines, another height> ...] [--sheet X] [--pairs DIR] [--victims <full lines, another victim> ...]
   python3 tools/crosscheck_229.py tr-command <full lines> [--sheet X] [--pairs DIR]
 
 Output: one line per (family, scope, column): `FAMILY<TAB>scope<TAB>column<TAB>verdict<TAB>detail<TAB>compared N<TAB>
@@ -555,12 +555,15 @@ def _tr_sum(c):
     return sum(vals)
 
 
-def classify_tr_air(wb, heights):
+def classify_tr_air(wb, heights, victims=()):
     """PURE: the workbook's air-throw rows against the gate's air full lines at several HEIGHTS — heights is [(tag, {(sheet,
     key, input): row})], the rig's own height FIRST (the maintainer, 2026-10-28: "Against a height range"). recovery (the
     cell's terms summed) against the thrower's first accepted tick when thrown; throw tech against the advantage after a
     tech: EXACT at the rig's height, INSIDE THE HEIGHT RANGE within the heights' figures, otherwise INCONSISTENT; a prose
-    or empty cell UNCOMPARABLE; a height a character does not throw at is absent from its range."""
+    or empty cell UNCOMPARABLE; a height a character does not throw at is absent from its range. victims (the same shape,
+    other victims at the rig's height; the maintainer, 2026-10-28: "Measure them too", the air tech against the victim
+    range too, 14z-212): a throw tech outside the height range but within heights and victims together is INSIDE THE
+    VICTIM RANGE; a victim on whom a character's air throw never holds is absent from its range."""
     import ground_throw_rigs as gtr
     verdicts, st, deltas = {c: collections.Counter() for c in TR_COLS}, collections.Counter(), {c: [] for c in TR_COLS}
     for tab in wb.sheet_names:
@@ -588,8 +591,15 @@ def classify_tr_air(wb, heights):
                     verdicts[c]["UNCOMPARABLE"] += 1; continue
                 allv = [o[ci] for o in ours]
                 deltas[c].append(cell - allv[0])
+                vic = []
+                if ci == 1:   # the throw tech only: the victims' advantage after a tech, where their events agree
+                    for _tag, rows in victims:
+                        vv = {rows[e]["vic_tech"] - rows[e]["thr_tech"] for e in evs if e in rows}
+                        if len(vv) == 1:
+                            vic.append(next(iter(vv)))
+                both = allv + vic
                 verdicts[c]["EXACT" if cell == allv[0] else "INSIDE THE HEIGHT RANGE" if min(allv) <= cell <= max(allv)
-                           else "INCONSISTENT"] += 1
+                           else "INSIDE THE VICTIM RANGE" if min(both) <= cell <= max(both) else "INCONSISTENT"] += 1
     return verdicts, st, deltas
 
 
@@ -629,7 +639,7 @@ def classify_tr_cmd(wb, rows):
             for (t_, rid, inp), v in evs:
                 win[v["window"]] += 1
                 if v["whiff"] is None:
-                    st["NO WHIFF (the input draws no move)"] += 1; continue
+                    st["NO WHIFF (Pit of Blame draws no move; the 24 gated grabs' input is a normal or a jump)"] += 1; continue
                 if None in (s, a, r):
                     st["UNCOMPARABLE (a prose startup / active / recovery)"] += 1; continue
                 pairs["whiff (startup + active + recovery)"].append((f"{tab} {rid} ({inp})", s + a + r, v["whiff"]))
@@ -638,8 +648,18 @@ def classify_tr_cmd(wb, rows):
     return pairs, st, win
 
 
-def fam_tr_air(full_paths, sheet, pairs_dir):
+def fam_tr_air(full_paths, sheet, pairs_dir, victim_paths=()):
     import xlsx_read
+
+    def load(p):
+        rows = {}
+        for line in open(p):
+            if line.startswith("#") or not line.strip():
+                continue
+            f = line.rstrip("\n").split("\t")
+            rows[(f[0], f[1], f[2])] = dict(zip(("thr_thrown", "vic_thrown", "thr_tech", "vic_tech"), map(int, f[3:7])))
+        return rows
+    victims = [(Path(p).stem, load(p)) for p in victim_paths]
     heights = []
     for p in full_paths:
         rows = {}
@@ -649,7 +669,7 @@ def fam_tr_air(full_paths, sheet, pairs_dir):
             f = line.rstrip("\n").split("\t")
             rows[(f[0], f[1], f[2])] = dict(zip(("thr_thrown", "vic_thrown", "thr_tech", "vic_tech"), map(int, f[3:7])))
         heights.append((Path(p).stem, rows))
-    verdicts, st, deltas = classify_tr_air(xlsx_read.Workbook(sheet), heights)
+    verdicts, st, deltas = classify_tr_air(xlsx_read.Workbook(sheet), heights, victims)
     out = []
     for c in TR_COLS:
         sp = collections.Counter(deltas[c])
@@ -657,6 +677,8 @@ def fam_tr_air(full_paths, sheet, pairs_dir):
                    "\tsheet - ours at the rig's height: " + ", ".join(f"{k:+d} x{v}" for k, v in sorted(sp.items())))
     out.append("ROWS\tTR-AIR\t" + ", ".join(f"{k} {v}" for k, v in sorted(st.items())))
     out.append(f"HEIGHTS\tTR-AIR\t{len(heights)}: " + ", ".join(t for t, _ in heights))
+    if victims:
+        out.append(f"VICTIMS\tTR-AIR\t{len(victims)}: " + ", ".join(t for t, _ in victims))
     return out
 
 
@@ -702,7 +724,10 @@ def main():
     elif a[:1] == ["tr-ground"] and len(a) >= 2:
         out = fam_tr(a[1:], sheet, pairs_dir)
     elif a[:1] == ["tr-air"] and len(a) >= 2:
-        out = fam_tr_air(a[1:], sheet, pairs_dir)
+        vp = []
+        if "--victims" in a:
+            i = a.index("--victims"); vp = a[i + 1:]; a = a[:i]
+        out = fam_tr_air(a[1:], sheet, pairs_dir, vp)
     elif a[:1] == ["tr-command"] and len(a) == 2:
         out = fam_tr_cmd(a[1], sheet, pairs_dir)
     else:

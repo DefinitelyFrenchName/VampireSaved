@@ -59,7 +59,7 @@ EXPECT="$REPO/tests/expected/trap_airborne.tsv"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 [ -f "$ROMDIR/vsav2.zip" ] || { echo "SKIP: no vsav2.zip in $ROMDIR"; exit 0; }
 [ -f "$MERGED/rompath/vsavjw.zip" ] || { echo "SKIP: no merged build at $MERGED"; exit 0; }
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: audit_trap_airborne — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0; ok() { printf '  ok    %s\n' "$1"; }; bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
 JUMP=3490
 SWEEP_JUMPS="${SWEEP_JUMPS:-3466 3470 3474 3480 3486}"   # override to re-run the 14z-181 census: every press 3440-3499 (build/agent181/trap_airborne_sweep_14z181.txt)

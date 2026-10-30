@@ -60,7 +60,7 @@ MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
 DON="${DON:-build/don_m27}"; HUI="${HUI:-build/hui61}"; PYR="${PYR:-build/pyron46}"
 TENANTS="${TENANTS:-donovan pyron huitzil}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: test_reactions — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
 FIELDS="ff8414:w:y,ff840b:b:face,ff841c:l:node,ff8782:b:id,ff8814:w:p2y,ff880b:b:p2face,ff881c:l:p2node,ff8820:b:p2cnt,ff8821:b:p2flags,ff8854:b:p2cls,ff8850:w:p2hp,ff8852:w:p2white,ff885c:b:p2frz,ff8b82:b:p2id,ff8840:l:p2xv,ff8844:l:p2yv"

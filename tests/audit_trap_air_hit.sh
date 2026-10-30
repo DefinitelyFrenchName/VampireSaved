@@ -71,7 +71,7 @@ EXPECT="$REPO/tests/expected/trap_air_hit.tsv"
 [ -f "$ROMDIR/vsav2.zip" ] || { echo "SKIP: no vsav2.zip in $ROMDIR"; exit 0; }
 [ -f "$MERGED/rompath/vsavjw.zip" ] || { echo "SKIP: no merged build at $MERGED"; exit 0; }
 [ -f "$REPO/build/out/vsav2_data.bin" ] && [ -f "$REPO/build/out/vsavj_data.bin" ] || { echo "SKIP: no build/out/vsav2_data.bin / vsavj_data.bin (tools/cps2_decrypt.py)"; exit 0; }
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: audit_trap_air_hit — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0; ok() { printf '  ok    %s\n' "$1"; }; bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
 
 echo "== 0. THE DATA FILES ARE THE ROMSETS THE LEGS RUN (rule-checker run 2026-09-25-221 Q1/Q4)"

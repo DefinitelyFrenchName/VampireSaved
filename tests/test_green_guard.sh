@@ -26,7 +26,7 @@ set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 GUARD="$REPO/tools/git-hooks/green_guard.py"
-W="$(mktemp -d "${TMPDIR:-/tmp}/gguard.XXXXXX")"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d "${TMPDIR:-/tmp}/gguard.XXXXXX")" || { echo "FAIL: test_green_guard — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 G="git -c user.name=t -c user.email=t@t -c commit.gpgsign=false"
 

@@ -20,7 +20,7 @@
 # Prints one PASS/FAIL line per probe and exits non-zero on any FAIL.
 # Needs: the `claude` CLI and python3. Writes only under SCRATCH_DIR (default: a mktemp dir).
 set -u
-S=${1:-$(mktemp -d "${TMPDIR:-/tmp}/hookprobe.XXXXXX")}
+S=${1:-$(mktemp -d "${TMPDIR:-/tmp}/hookprobe.XXXXXX")} || { echo "FAIL: probe_hooks — mktemp -d failed (S)"; exit 2; }
 rm -rf "$S"; mkdir -p "$S/.claude" "$S/hooks" || exit 2
 cd "$S" || exit 2
 git init -q . 2>/dev/null

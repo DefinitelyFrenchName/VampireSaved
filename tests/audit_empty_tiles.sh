@@ -10,7 +10,7 @@
 # EXPECTS: zero blank tiles drawn; a hit names the code to add to
 #   build/manifest/extra_tiles/<char>.json. Ground-truthed: passes on hui14, fails on hui12
 #   naming both shadow tiles.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/obj_records_dump.lua tests/replays/
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/obj_records_dump.lua tests/replays/ tests/lib/jobs.sh
 #   tools/gfx_tiles.py tools/run_mame.sh tools/setup_mame.sh
 #
 # SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
@@ -33,7 +33,7 @@
 # FIXING a hit: add the code to build/manifest/extra_tiles/<char>.json,
 # which build_donovan.sh merges into the copy inventory.
 #
-# Usage: ROMDIR=... tests/audit_empty_tiles.sh <builddir> [replay...]
+# Usage: ROMDIR=... [JOBS=N] tests/audit_empty_tiles.sh <builddir> [replay...]
 #        default replays: the DF/2P rig and the effect showcase.
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
@@ -65,21 +65,35 @@ W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 PK="${EMPTY_TILE_POKES:-1400:ff8782:10;1450:ff8782:10;1500:ff8782:10}"
 
 rc=0
-for r in $REPLAYS; do
-    rp="$REPO/tests/replays/$r.rpl"
-    [ -f "$rp" ] || { echo "  skip $r (no such replay)"; continue; }
-    d="$W/$(basename "$r")"; mkdir -p "$d/s"
-    # EVERY frame, not every 25th (14z-70f). The 25-frame stride reported
-    # only 10 of the 113 missing ground-explosion tiles: an effect animation
-    # turns over faster than the sample, so a sparse sweep is "complete" over
-    # the frames it looks at and blind between them.
-    FR=$(python3 -c "print(','.join(str(f) for f in range(3100,3610)))")
-    ( cd "$d" && REPLAY="$rp" POKES="$PK" DUMP_FRAMES="$FR" FRAMES=3610 \
+# JOBS (#334 item 2, 14z-211): one run per replay, each in its own $W/<name> (cwd, sandbox, obj.txt, output, exit
+# status) and reading nothing another writes — so they go through tests/lib/jobs.sh's pool first, JOBS at a time
+# (default min(4, CPUs/6)), and the loop below judges them in REPLAYS order with the same lines.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+# EVERY frame, not every 25th (14z-70f). The 25-frame stride reported
+# only 10 of the 113 missing ground-explosion tiles: an effect animation
+# turns over faster than the sample, so a sparse sweep is "complete" over
+# the frames it looks at and blind between them.
+FR=$(python3 -c "print(','.join(str(f) for f in range(3100,3610)))")
+et_run() {  # et_run <replay>: the dump run in $W/<basename>; exit status to <dir>/rc
+    d="$W/$(basename "$1")"; mkdir -p "$d/s"
+    if ( cd "$d" && REPLAY="$REPO/tests/replays/$1.rpl" POKES="$PK" DUMP_FRAMES="$FR" FRAMES=3610 \
       TRACE_OUT="$d/obj.txt" MAME_SANDBOX="$d/s" \
       MAME_ROMPATH="$BUILD/rompath;$ROMDIR" \
       "$REPO/tools/run_mame.sh" vsavjw \
       -autoboot_script "$REPO/tests/lua/obj_records_dump.lua" \
-      > "$d/out" 2>&1 ) || { echo "  FAIL: $r did not run"; rc=1; continue; }
+      > "$d/out" 2>&1 ); then echo 0 > "$d/rc"; else echo "$?" > "$d/rc"; fi
+}
+vs_pool_start "$JOBS"
+for r in $REPLAYS; do
+    if [ -f "$REPO/tests/replays/$r.rpl" ]; then vs_pool_run et_run "$r"; fi
+done
+vs_pool_wait
+for r in $REPLAYS; do
+    rp="$REPO/tests/replays/$r.rpl"
+    [ -f "$rp" ] || { echo "  skip $r (no such replay)"; continue; }
+    d="$W/$(basename "$r")"
+    # (the run itself ran in the pool, et_run)
+    [ "$(cat "$d/rc" 2>/dev/null)" = 0 ] || { echo "  FAIL: $r did not run"; rc=1; continue; }
     python3 - "$BUILD" "$d/obj.txt" "$r" <<'PYEOF' || rc=1
 import sys, re, zipfile, hashlib, importlib.util, collections
 build, objtxt, name = sys.argv[1], sys.argv[2], sys.argv[3]

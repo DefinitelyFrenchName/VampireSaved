@@ -108,6 +108,208 @@ def sh_sites(path, src):
     return sorted(out)
 
 
+# EVERY `$(mktemp ... -d ...)` substitution, wherever it stands on a line (rule-checker run 2026-10-29-1366 Q4: the
+# line-start form alone left ~33 sites unread — an `else` arm, `[ -n "$O" ] || O=...`, a `case` arm, an inline argument,
+# an assignment after `;`, `-dt`); a -d flag alone or combined (`-dt`, `-td`)
+# mktemp need not be the substitution's first word (`$(TMPDIR=... mktemp -d)`, `$(command mktemp -d)`,
+# `$(/usr/bin/mktemp -d)`, `$(cd "$A" && mktemp -d)`: rule-checker run 2026-10-29-1374)
+SH_SUBST_D = re.compile(r'\$\((?:[^()]*?[\s;&|/"])?mktemp\b(?:[^)]*?\s)?(?:-[A-Za-z]*d[A-Za-z]*\b|--directory\b)')
+STOPS = re.compile(r"\b(?:exit|return)\b")
+SH_ASSIGN_END = re.compile(r'(?:^\s*|[;&|({]\s*|\b(?:then|else|do)\s+|\)\s*)(?:(local|export|readonly)\s+)?'
+                           r'([A-Za-z_][A-Za-z_0-9]*)="?(?:\$\{[A-Za-z_0-9]+:-)?$')
+
+
+def _quote_at(code, pos):
+    """the quoting in force at code[pos]: 'sq', 'dq' or '' (text inside quotes is never a heredoc opener; single-quoted
+    text is never run here)"""
+    sq = dq = False
+    k = 0
+    while k < pos:
+        ch = code[k]
+        if ch == "\\" and not sq:
+            k += 2; continue
+        if ch == "'" and not dq:
+            sq = not sq
+        elif ch == '"' and not sq:
+            dq = not dq
+        k += 1
+    return "sq" if sq else "dq" if dq else ""
+
+
+def _in_single_quotes(code, pos):
+    return _quote_at(code, pos) == "sq"
+
+
+def _arm_stops(rest, can_return=True):
+    """rest starts with `||`: does THAT arm stop the script — an `exit` or `return` in its own `{ ... }` block, or
+    before the next `;`, `&&` or `|` (rule-checker run 2026-10-29-1371: `|| true; ... || exit` is not a guard). The word
+    counts only outside quotes (`|| echo "cannot exit"` does not stop), and `return` only where it returns: inside a
+    function body or at a sourced library's top level (`can_return`); at an executed script's top level bash prints an
+    error and runs on (rule-checker run 2026-10-29-1379)"""
+    a = rest[2:].lstrip()
+    if a.startswith("{"):
+        depth, k = 0, 0
+        while k < len(a):
+            depth += {"{": 1, "}": -1}.get(a[k], 0)
+            if depth == 0:
+                break
+            k += 1
+        seg = a[:k + 1]
+    else:
+        seg = re.split(r";|&&|(?<!\|)\|(?!\|)", a, 1)[0]
+    words, d = [], 0                                   # only words outside any `( ... )` the arm opens: in a
+    for ch in _blank_quotes(seg):                      # subshell `|| (exit 2)` only the subshell exits (run 1380)
+        d += {"(": 1, ")": -1}.get(ch, 0)
+        words.append(ch if d <= 0 and ch not in "()" else " ")
+    words = "".join(words)
+    return bool(re.search(r"\bexit\b", words) or (can_return and re.search(r"\breturn\b", words)))
+
+
+def _heredoc_opener(code):
+    """the word a heredoc opener on this code line names, or None: never a here-string `<<<`, a `<<` inside quotes, or
+    the shift inside `(( ... ))` / `$(( ... ))` (each once could hide a whole file's rest)"""
+    flat = re.sub(r"\(\(.*?\)\)", "", code)
+    for h in re.finditer(r"(?<!<)<<-?(?!<)\s*['\"]?([A-Za-z_][A-Za-z_0-9]*)['\"]?", flat):
+        if _quote_at(flat, h.start()) == "":
+            return h.group(1)
+    return None
+
+
+SH_BACKTICK_D = re.compile(r"`(?:[^`]*?[\s;&|/\"])?mktemp\b[^`]*?(?:\s-[A-Za-z]*d[A-Za-z]*\b|\s--directory\b)[^`]*`")
+
+
+def _blank_quotes(code):
+    """code with every quoted character turned into a space: a `set -e` inside quotes (`sh -c 'x; set -e'`,
+    `echo "a; set -e"`) is text, never this script's own set -e (rule-checker run 2026-10-29-1374)"""
+    out, sq, dq, k = [], False, False, 0
+    while k < len(code):
+        ch = code[k]
+        if ch == "\\" and not sq:                     # one backslash (it compared with two until run 2026-10-29-1379)
+            out.append("  " if (sq or dq) else code[k:k + 2]); k += 2; continue
+        if ch == "'" and not dq:
+            sq = not sq; out.append(ch)
+        elif ch == '"' and not sq:
+            dq = not dq; out.append(ch)
+        else:
+            out.append(" " if (sq or dq) else ch)
+        k += 1
+    return "".join(out)
+
+
+def sh_scan(src, sourced=False):
+    """(line, var, guarded) per `mktemp -d` substitution — `$( ... )` or backticks, `-d` alone or combined (`-dt`) or
+    `--directory` — read on LOGICAL lines (a `\\` continuation joined; the line is the first physical one). An
+    ASSIGNMENT `X="$(mktemp -d ...)"` (at a line's start or after `;`, `&&`, `||`, `then`, `else`, `do`, a `case` arm's
+    `)`, `${X:-...}` included) is guarded by a `||` whose own arm stops (`exit` / `return`), by a `[ -n "$X" ] || ...`
+    test whose arm stops on one of the next three code lines before X is used, or — a plain statement only — by
+    `set -e` in force AT the line (the last `set -e` / `set +e` among the code lines before it; a function body is
+    read where it stands, not where it is called). NEVER guarded: `local` / `export` / `readonly X="$(...)"` (the
+    builtin's own status 0 hides the failure), an assignment that prefixes a command (`X="$(...)" cmd`), an inline
+    argument (`cmd "$(mktemp -d)"`, var `-`). Not code, so not read: a heredoc body (see _heredoc_opener) and text in
+    single quotes. Widened after rule-checker runs 2026-10-29-1366, -1368 and -1371. Since run 2026-10-29-1379: a
+    `set -e` inside an open `( ... )` / `$( ... )` on its line is the subshell's, not the script's; a `|| return` stops
+    only inside a function body (tracked by its braces: `name() {` / `function name {` to the brace that closes it) or
+    at the top level of a SOURCED file (`sourced`, the census passes it for tests/lib/); an arm's `exit` / `return`
+    counts only outside quotes; `\\"` no longer flips the quote state. Since run 2026-10-29-1380: an arm's stop inside
+    a `( ... )` it opens is the subshell's (`|| (exit 2)` runs on), and `set -o errexit` / `set +o errexit` are read as
+    `set -e` / `set +e`. Since run 2026-10-29-1382: a `set -e` behind `&&`, `||`, `then`, `do`, `else` or a case arm
+    is conditional and never read as in force, and a `set +e` there (or after `{`) still turns it off. THE LIMIT: this
+    is a lint over shell TEXT, not a shell interpreter — a form outside the known answers of tests/test_tmp_hygiene.sh
+    (a multi-line `if` around `set -e`, a function's `set -e` read where the function is called, `eval`) is not
+    read as the shell would run it."""
+    phys = src.split("\n")
+    logical, k = [], 0
+    while k < len(phys):
+        start, text = k + 1, phys[k]
+        while text.rstrip().endswith("\\") and k + 1 < len(phys) and not text.lstrip().startswith("#"):
+            k += 1; text = text.rstrip()[:-1] + " " + phys[k].lstrip()
+        logical.append((start, text)); k += 1
+    def code_of(raw):
+        return "" if raw.lstrip().startswith("#") else re.split(r"(?:^|\s)#", raw, 1)[0]
+    out, here, sete = [], None, False
+    codes = []                                          # (line, code) of the code lines, heredoc bodies left out
+    for start, raw in logical:
+        if here is not None:
+            if raw.strip() == here:
+                here = None
+            continue
+        code = code_of(raw)
+        codes.append((start, code))
+        h = _heredoc_opener(code)
+        if h:
+            here = h
+    depth, fns = 0, []                                 # brace depth over code lines; [start depth, opened] per function
+    FN_HEAD = re.compile(r"^\s*(?:function\s+[A-Za-z_][A-Za-z0-9_]*(?:\s*\(\))?|[A-Za-z_][A-Za-z0-9_]*\s*\(\))\s*(?:\{|$)")
+    for n, (start, code) in enumerate(codes):
+        blank = _blank_quotes(code)
+        if FN_HEAD.match(blank):
+            fns.append([depth, False])
+        in_fn = bool(fns)
+        peak = depth
+        for ch in blank:
+            if ch in "{}":
+                depth += 1 if ch == "{" else -1; peak = max(peak, depth)
+        for f in fns:
+            f[1] = f[1] or peak > f[0]
+        while fns and fns[-1][1] and depth <= fns[-1][0]:
+            fns.pop()
+        can_return = in_fn or sourced
+        for se in re.finditer(r"(^|[;&|({)]|\bthen|\bdo|\belse)\s*set\s+([-+])(?:[a-zA-Z]*e|o\s+errexit\b)", blank):
+            pre = blank[:se.start() + (1 if blank[se.start()] == "(" else 0)]
+            if pre.count("(") - pre.count(")") > 0:    # inside a subshell opened on this line: not this script's
+                continue
+            # run 2026-10-29-1382: a `set -e` behind `&&`, `||`, `then`, `do`, `else` or a case arm's `)` runs only when
+            # its condition holds, so it is never read as in force; a `set +e` anywhere turns it off (the cautious side)
+            cond = se.group(1) in ("&", "|", ")", "then", "do", "else")
+            if se.group(2) == "+":
+                sete = False
+            elif not cond:
+                sete = True                            # the LAST unconditional `set -e` / any `set +e` on the line wins
+        found = [(m.start(), "paren") for m in SH_SUBST_D.finditer(code)] + \
+                [(m.start(), "tick") for m in SH_BACKTICK_D.finditer(code)]
+        for pos, kind in sorted(found):
+            if _in_single_quotes(code, pos):
+                continue
+            mk = code.find("mktemp", pos + 1)          # the word itself, quoted inside its own substitution, is text
+            if _quote_at(code[pos + 2:mk], mk - pos - 2) != "":
+                continue
+            if kind == "paren":
+                j, depth = pos + 1, 0
+                while j < len(code):                   # the substitution's own closing parenthesis
+                    depth += {"(": 1, ")": -1}.get(code[j], 0)
+                    if depth == 0:
+                        break
+                    j += 1
+            else:
+                j = code.find("`", pos + 1)
+            a = SH_ASSIGN_END.search(code[:pos])
+            rest = code[j + 1:].lstrip('"}').lstrip()
+            if a is None:                              # an inline argument: the command runs with an empty one
+                out.append((start, "-", False)); continue
+            kw, v = a.group(1), a.group(2)
+            if kw in ("local", "export", "readonly"):   # the builtin's own status, 0, is what `||` and set -e see
+                out.append((start, v, False)); continue
+            if rest.startswith("||") and _arm_stops(rest, can_return):
+                out.append((start, v, True)); continue
+            tested = False
+            for _l, nxt in codes[n + 1:n + 4]:          # `[ -n "$X" ] || exit` before X is used
+                t = re.search(r'\[\s+-n\s+"?\$\{?' + re.escape(v) + r'\b[^\]]*\]\s*(\|\|.*)', nxt)
+                if t:
+                    tested = _arm_stops(t.group(1), can_return); break
+                if re.search(r"\$\{?" + re.escape(v) + r"\b", nxt):
+                    break
+            if tested:
+                out.append((start, v, True)); continue
+            plain = rest == "" or rest.startswith((";", "fi", "done", "esac", ")"))
+            out.append((start, v, bool(sete and plain)))
+    return out
+
+
+def sh_unguarded(src, sourced=False):
+    """(line, var) per `mktemp -d` substitution that carries on when mktemp FAILS (#333): see sh_scan"""
+    return [(i, v) for i, v, g in sh_scan(src, sourced) if not g]
+
+
 RUNNERS_ARG = ("run_replay_mame.sh", "run_replay_guarded.sh")   # [sandbox] is their 4th positional argument
 RUNNERS_ENV = {"run_mame.sh": "MAME_SANDBOX", "run_fbneo.sh": "FBNEO_SANDBOX"}
 CMD_START = {"&&", "||", ";", "|", "(", "{", "then", "do", "else", "!", "if", "while", "until", "elif"}
@@ -204,7 +406,7 @@ def main():
     files = a.files or sorted(
         [os.path.join(d, f) for d in ("tools", "tests", "tests/lib") if os.path.isdir(os.path.join(a.root, d))
          for f in os.listdir(os.path.join(a.root, d)) if f.endswith((".py", ".sh"))])
-    bad = n = calls = 0
+    bad = n = calls = mk = 0
     for rel in files:
         p = rel if os.path.isabs(rel) else os.path.join(a.root, rel)
         src = open(p, encoding="utf-8", errors="replace").read()
@@ -218,6 +420,11 @@ def main():
                 if not cleaned and f"{rel}:{fn}" not in ALLOW:
                     bad += 1; print(f"UNCLEANED\t{rel}:{line}\t{fn}\t{kind}\t{var or '?'}")
         elif p.endswith(".sh"):
+            if os.path.basename(os.path.dirname(p)) in ("tests", "tools", "lib"):
+                lib = os.path.basename(os.path.dirname(p)) == "lib"   # a sourced library: its top-level `return` returns
+                mk += len(sh_scan(src, lib))   # the substitutions the scan READ (a file it is blinded in shows here)
+                for line, var in sh_unguarded(src, lib):
+                    bad += 1; print(f"UNGUARDED\t{rel}:{line}\tshell\tmktemp -d\t{var}\ta failed mktemp carries on with ${var} empty (#333)")
             if os.path.basename(os.path.dirname(p)) in ("tests", "tools"):
                 for line, var, cleaned in sh_sites(p, src):
                     n += 1
@@ -229,7 +436,8 @@ def main():
                 calls += 1
                 if not sandboxed and not any(rel + ":" + str(line) == k for k in ALLOW_CALLS):
                     bad += 1; print(f"UNSANDBOXED\t{rel}:{line}\t{runner}\tthe call passes no sandbox, so the runner's default outlives it")
-    print(f"{n} temp maker(s) and {calls} emulator-runner call(s) read; {bad} not removed at exit or passing no sandbox")
+    print(f"{n} temp maker(s) and {calls} emulator-runner call(s) read; {bad} not removed at exit, passing no sandbox or "
+          f"carrying on after a failed mktemp -d ({mk} mktemp -d substitution(s) read)")
     return 1 if bad else 0
 
 

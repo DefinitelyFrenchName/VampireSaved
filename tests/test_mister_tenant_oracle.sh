@@ -120,7 +120,7 @@ command -v verilator >/dev/null 2>&1 || { echo "SKIP: verilator not installed"; 
 [ -d "$REPO/$BUILD" ] || { echo "SKIP: no $BUILD (build the WIDE romset first)"; exit 77; }
 [ -e "$REPO/emu/jtcores/.git" ] || { echo "SKIP: emu/jtcores not initialised"; exit 77; }
 
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: test_mister_tenant_oracle — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 cf(){ python3 "$REPO/tools/compare_fields.py" "$@"; }
 
 echo "== MAME leg (WIDE romset vsavjw, whole 68k work RAM, frames $MAME_LO-$MAME_HI) =="

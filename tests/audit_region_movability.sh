@@ -10,7 +10,7 @@
 #   tests/test_movability_liveness.sh's.
 # EXPECTS: every measured region runs. Scope stated: one tenant's regions; Huitzil's and
 #   Pyron's anim are unmeasured here.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay_guard.lua
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/jobs.sh tests/lua/replay_guard.lua
 #   tests/replays/12_donovan_vs_cpu.rpl tests/test_thunk_addr_literal.sh
 #   tools/build_donovan.sh tools/run_mame.sh tools/run_replay_guarded.sh tools/setup_mame.sh
 #
@@ -112,7 +112,7 @@
 # decimal ints and the checker parsed them as hex — 888256 read as 0x888256.
 # The control did its job: an unproven leg is `dead`, never `runs`.)
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [CASES="anim aux4 codereg hitboxes hui_anim pyron_anim"]
+# Usage: ROMDIR=... [MAME_BIN=...] [CASES="anim aux4 codereg hitboxes hui_anim pyron_anim"] [JOBS=N]
 #        tests/audit_region_movability.sh
 # On-demand: one build + one guarded replay per case (~10 min for the four
 # Donovan cases, ~8 min per tenant case).
@@ -158,12 +158,22 @@ GUARDED="${GUARDED_RUNNER:-tools/run_replay_guarded.sh}"
 BUILDER="${BUILDER_CMD:-tools/build_donovan.sh}"
 
 WORK="$(mktemp -d)"
-trap 'rm -rf "$WORK" build/manifest/_movability.toml' EXIT
+trap 'rm -rf "$WORK"' EXIT
 POK="1400:ff8782:13;1450:ff8782:13;1500:ff8782:13"
 fail=0
 
-case_probe() {  # case_probe <label> <spec> <expect: crash|runs>
-    python3 - "$2" <<'PY'
+# JOBS (#334 item 2, 14z-211): the cases are independent, so each case's RUN half (write its manifest, build, one
+# guarded run) goes through tests/lib/jobs.sh's pool, JOBS at a time; default min(4, CPUs/6). Every case now writes
+# only paths of its own: its manifest copy is $WORK/<label>.toml (all six used to rewrite build/manifest/_movability.toml,
+# which the builder reads, and the EXIT trap deleted), and its guarded log is $WORK/<label>.box/<label>.rl, inside its
+# own sandbox, so the fighter-block dumps the runner writes beside the log are its own too (they all landed in $WORK
+# under the same names). The EVALUATE half (case_probe / case_tenant) then judges each case's statuses and artifacts in
+# the order the cases always ran; a manifest step that fails stops the gate there, as set -e did inline.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+case_probe_run() {  # case_probe_run <label> <spec>
+    mkdir -p "$WORK/$1.box"
+    _mrc=0
+    python3 - "$2" "$WORK/$1.toml" > "$WORK/$1.man" 2>&1 <<'PY' || _mrc=$?
 import sys, pathlib
 man = pathlib.Path("build/manifest/donovan.toml").read_text()
 anchor = 'hole_b_regions = "aux0_4,hitbox"'
@@ -186,16 +196,15 @@ if m:
     out = man[:m.start()] + merged + man[m.end():]
 else:
     out = man.replace(anchor, anchor + '\nregion_space = "%s"' % sys.argv[1], 1)
-pathlib.Path("build/manifest/_movability.toml").write_text(out)
+pathlib.Path(sys.argv[2]).write_text(out)
 PY
-    if ! KEY_SET=vsavj TENANT_MANIFEST=build/manifest/_movability.toml \
+    echo "$_mrc" > "$WORK/$1.manrc"; [ "$_mrc" = 0 ] || return 0
+    _brc=0
+    KEY_SET=vsavj TENANT_MANIFEST="$WORK/$1.toml" \
          TENANT_CHAR=0x13 WIDE_ROMSET="$WIDE_ZIP" \
          GEN_FLAGS="--allow-plausible --tripwire-open --profile cps2-wide-v1" \
-         "$BUILDER" 6 "$WORK/$1" > "$WORK/$1.build" 2>&1; then
-        echo "  FAIL: $1 — the BUILD errored, so runtime says nothing"
-        tail -5 "$WORK/$1.build"
-        fail=1; return
-    fi
+         "$BUILDER" 6 "$WORK/$1" > "$WORK/$1.build" 2>&1 || _brc=$?
+    echo "$_brc" > "$WORK/$1.brc"; [ "$_brc" = 0 ] || return 0
     # 14z-90 (issue #5): the verdict used to derive from the ABSENCE of a crash
     # string, with the runner's status thrown away by `|| true`. Every way of
     # producing no output therefore scored `runs`: an empty log, a missing log
@@ -207,11 +216,26 @@ PY
     rc=0
     POKES="$POK" MAME_ROMPATH="$WORK/$1/rompath;$ROMDIR" \
         "$GUARDED" vsavjw \
-        tests/replays/12_donovan_vs_cpu.rpl "$WORK/$1.rl" "$WORK/$1.box" \
+        tests/replays/12_donovan_vs_cpu.rpl "$WORK/$1.box/$1.rl" "$WORK/$1.box" \
         >/dev/null 2>&1 || rc=$?
-    if grep -qE '^(CRASH|PCWEEDS|SOFTRESET)' "$WORK/$1.rl" 2>/dev/null; then
+    echo "$rc" > "$WORK/$1.rc"
+}
+case_built() {  # case_built <label> — the run half's manifest and build statuses, judged as they were inline
+    _mrc="$(cat "$WORK/$1.manrc" 2>/dev/null || echo 1)"
+    [ "$_mrc" = 0 ] || { cat "$WORK/$1.man" >&2; exit "$_mrc"; }
+    if [ "$(cat "$WORK/$1.brc" 2>/dev/null || echo 1)" != 0 ]; then
+        echo "  FAIL: $1 — the BUILD errored, so runtime says nothing"
+        tail -5 "$WORK/$1.build"
+        fail=1; return 1
+    fi
+    rl="$WORK/$1.box/$1.rl"
+    rc="$(cat "$WORK/$1.rc" 2>/dev/null || echo 1)"
+}
+case_probe() {  # case_probe <label> <spec> <expect: crash|runs>
+    case_built "$1" || return 0
+    if grep -qE '^(CRASH|PCWEEDS|SOFTRESET)' "$rl" 2>/dev/null; then
         got=crash
-    elif [ "$rc" = 0 ] && grep -q '^END ' "$WORK/$1.rl" 2>/dev/null; then
+    elif [ "$rc" = 0 ] && grep -q '^END ' "$rl" 2>/dev/null; then
         got=runs
     else
         # matches neither expectation, so the case always FAILs — a dead rig
@@ -220,7 +244,7 @@ PY
     fi
     if [ "$got" = "$3" ]; then
         detail=""
-        [ "$got" = crash ] && detail="  ($(grep -m1 '^CRASH' "$WORK/$1.rl"))"
+        [ "$got" = crash ] && detail="  ($(grep -m1 '^CRASH' "$rl"))"
         echo "  ok: $1 -> $got$detail"
     else
         echo "  FAIL: $1 -> $got, expected $3"
@@ -235,7 +259,7 @@ PY
         [ "$got" = crash ] && echo "        REGRESSION: this region moved as of" \
             "14z-78. Suspect a placement-dependent" && echo "        reference the" \
             "thunk guard cannot see; see tests/test_thunk_addr_literal.sh"
-        grep -m1 '^CRASH' "$WORK/$1.rl" 2>/dev/null || true
+        grep -m1 '^CRASH' "$rl" 2>/dev/null || true
         fail=1
     fi
 }
@@ -245,8 +269,10 @@ PY
 # recipe, run replay 12 with the tenant forced, then the liveness control:
 # +0x60.l == the build's table row, and +0x1C.l inside the placed anim range
 # (>= 0x400000). Anything short of both is `dead`, never `runs`.
-case_tenant() {  # case_tenant <label> <manifest> <char 0xNN> <region> <expect>
-    python3 - "$2" "$3" "$4" <<'PY'
+case_tenant_run() {  # case_tenant_run <label> <manifest> <char 0xNN> <region>
+    mkdir -p "$WORK/$1.box"
+    _mrc=0
+    python3 - "$2" "$3" "$4" "$WORK/$1.toml" > "$WORK/$1.man" 2>&1 <<'PY' || _mrc=$?
 import sys, pathlib, re
 man = pathlib.Path(sys.argv[1]).read_text()
 anchor = "\nid = %s\n" % sys.argv[2]
@@ -257,27 +283,30 @@ if m:
     out = man[:m.start()] + merged + man[m.end():]
 else:
     out = man.replace(anchor, anchor + 'region_space = "%s=wide_ext"\n' % sys.argv[3], 1)
-pathlib.Path("build/manifest/_movability.toml").write_text(out)
+pathlib.Path(sys.argv[4]).write_text(out)
 PY
-    if ! TENANT_MANIFEST=build/manifest/_movability.toml TENANT_CHAR="$3" \
+    echo "$_mrc" > "$WORK/$1.manrc"; [ "$_mrc" = 0 ] || return 0
+    _brc=0
+    TENANT_MANIFEST="$WORK/$1.toml" TENANT_CHAR="$3" \
          WIDE_ROMSET="$WIDE_ZIP" \
          GEN_FLAGS="--profile cps2-wide-v1 --allow-plausible --tripwire-open" \
-         "$BUILDER" 6 "$WORK/$1" > "$WORK/$1.build" 2>&1; then
-        echo "  FAIL: $1 — the BUILD errored, so runtime says nothing"
-        tail -5 "$WORK/$1.build"
-        fail=1; return
-    fi
+         "$BUILDER" 6 "$WORK/$1" > "$WORK/$1.build" 2>&1 || _brc=$?
+    echo "$_brc" > "$WORK/$1.brc"; [ "$_brc" = 0 ] || return 0
     tid="$(printf '%02x' "$3")"
     rc=0
     POKES="1400:ff8782:$tid;1450:ff8782:$tid;1500:ff8782:$tid" \
     DUMPS="3000:ff8400-ff847f;3300:ff8400-ff847f;3600:ff8400-ff847f" \
     MAME_ROMPATH="$WORK/$1/rompath;$ROMDIR" \
         "$GUARDED" vsavjw \
-        tests/replays/12_donovan_vs_cpu.rpl "$WORK/$1.rl" "$WORK/$1.box" \
+        tests/replays/12_donovan_vs_cpu.rpl "$WORK/$1.box/$1.rl" "$WORK/$1.box" \
         >/dev/null 2>&1 || rc=$?
-    if grep -qE '^(CRASH|PCWEEDS|SOFTRESET)' "$WORK/$1.rl" 2>/dev/null; then
+    echo "$rc" > "$WORK/$1.rc"
+}
+case_tenant() {  # case_tenant <label> <manifest> <char 0xNN> <region> <expect>
+    case_built "$1" || return 0
+    if grep -qE '^(CRASH|PCWEEDS|SOFTRESET)' "$rl" 2>/dev/null; then
         got=crash
-    elif [ "$rc" = 0 ] && grep -q '^END ' "$WORK/$1.rl" 2>/dev/null; then
+    elif [ "$rc" = 0 ] && grep -q '^END ' "$rl" 2>/dev/null; then
         # END alone is the 14z-90 control (the emulator ran). The region
         # verdict needs the two block facts:
         if live="$(python3 - "$WORK/$1" "$3" "$4" <<'PY'
@@ -326,7 +355,7 @@ PY
         echo "  FAIL: $1 -> $got, expected $5"
         [ "$got" = dead ] && echo "        DEAD RIG or UNPROVEN: the runner exited $rc," \
             "or the block facts did not hold — this leg is evidence for neither verdict"
-        grep -m1 '^CRASH' "$WORK/$1.rl" 2>/dev/null || true
+        grep -m1 '^CRASH' "$rl" 2>/dev/null || true
         fail=1
     fi
 }
@@ -335,6 +364,14 @@ CASES="${CASES:-anim aux4 codereg hitboxes hui_anim pyron_anim}"
 want() { case " $CASES " in *" $1 "*) return 0;; *) return 1;; esac; }
 
 echo "== can a region live in wide_ext? (frozen 14z-78; H/P anim 14z-123) =="
+vs_pool_start "$JOBS"
+want anim       && vs_pool_run case_probe_run  anim       "anim=wide_ext"
+want aux4       && vs_pool_run case_probe_run  aux4       "aux0_4=wide_ext"
+want codereg    && vs_pool_run case_probe_run  codereg    "x06717c=wide_ext"
+want hitboxes   && vs_pool_run case_probe_run  hitboxes   "hitbox=wide_ext,hitbox_proj=wide_ext"
+want hui_anim   && vs_pool_run case_tenant_run hui_anim   build/manifest/huitzil.toml 0x10 anim
+want pyron_anim && vs_pool_run case_tenant_run pyron_anim build/manifest/pyron.toml   0x11 anim
+vs_pool_wait
 want anim     && case_probe anim     "anim=wide_ext"                          runs
 want aux4     && case_probe aux4     "aux0_4=wide_ext"                        runs
 want codereg  && case_probe codereg  "x06717c=wide_ext"                       runs

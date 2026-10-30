@@ -36,7 +36,7 @@ MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
 [ -x "$MAME_BIN" ] || { echo "FAIL: no MAME binary at $MAME_BIN (tools/setup_mame.sh)"; exit 1; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "FAIL: no $BUILD/rompath/vsavjw.zip"; exit 1; }
 [ -f "$CTL_RP/vsavjw.zip" ] || { echo "FAIL: no $CTL_RP/vsavjw.zip (the control build)"; exit 1; }
-W="${KEEP:-$(mktemp -d)}"; mkdir -p "$W"
+W="${KEEP:-$(mktemp -d)}" || { echo "FAIL: audit_landing_sound — mktemp -d failed (W)"; exit 2; }; mkdir -p "$W"
 [ -n "${KEEP:-}" ] || trap 'rm -rf "$W"' EXIT INT TERM
 echo "== audit_landing_sound (#223): build $BUILD ($(python3 tools/build_fingerprint.py "$BUILD/rompath" --set vsavjw --sha-only 2>/dev/null | cut -c1-8))"
 cur() { awk -v p="$2" '/^1104-1106 p2=R$/ && !done { t=1100; n=split(p, m, " "); for (i=1;i<=n;i++){ printf "%d-%d p1=%s\n", t, t+2, m[i]; t+=60 }; done=1 }

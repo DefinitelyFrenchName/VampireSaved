@@ -1,0 +1,25 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent212/t336/closure/closing_comment.md	a187fab033b11c38bc686533f4aab00326a937e9
+build/agent212/t336/closure/ticket_row_336.tsv	ad3c37804db755bb5e215975f69af0450ba9e20c
+build/agent212/t336/closure/fix.diff	079e4d7dcf0593f1350bd65cae45fa8e9700fd66
+build/agent212/t336/closure/wording.py	f4231ca9200425c569081316eb614419073f7185
+build/agent212/t336/closure/wording_mac.txt	7ade60b91a0f9b150403cacd701da4b3f0e1c75a
+build/agent212/t336/closure/wording_pilot.txt	d4509c99638678c59befa9addb5f31ff0f6557e5
+build/agent212/t336/closure/test_static_runner_pilot2.log	3b637d13fe0d26f8b5918454252d4366d556bcdf
+build/agent212/t336/closure/test_static_runner_mac2.log	9be62973ef3c8941f4f33d8d6f24ba5ea5d69df8
+build/agent212/t336/closure/pilot_tsr.sh	e3bb319c0e2db6341709f6328093d6fc31b1274f
+build/agent212/t336/closure/pilot_tr7_state.txt	934ed83cdf95c46d794a96f1dfd5f577ebf4d384
+build/agent212/t336/closure/pilot_retrace9.sh	cc89b98cc19381a044a93323b1cf516797b011e1
+build/agent212/t336/closure/test_static_runner_mac.log	e24a044ef2ff31a63914937c95e826a324ccd438
+build/agent212/t336/closure/test_static_runner_pilot.log	e24a044ef2ff31a63914937c95e826a324ccd438
+build/agent212/t336/closure/pilot_head6.txt	8ef577dec4f2daf883b8b2f00ed72a643a11ef43
+build/agent212/t336/closure/pilot_retrace6.sh	1d6f3322358180b45876c7459765fb14628b36b6
+build/agent212/t336/closure/pilot_r6_blob.txt	32c370045ade40c2e670d62915a9029fc5038579
+build/agent212/t336/closure/pilot_t212r6_static_runner.log	e24a044ef2ff31a63914937c95e826a324ccd438
+build/agent212/t336/closure/pilot_t212r6_static_overlap.txt	ee9c5cc2d9c3110b21de921ddd1153f9fdfb5f78
+build/agent212/t336/closure/pilot_t212r6_static_classes.tsv	50736beb146dc79c610dd4b8d5c0e600904c8c3a
+build/agent212/t336/closure/other_readers.txt	dd62cb5c5bd0365b993bcb6e403ea98543653599
+build/agent212/t336/closure/verdict_a_1388.txt	9d659d6bee1b95d98f233791fdad40d2e331d2a7
+tests/controls_concurrent.txt	20ea49fb3e6bf9f929e534ec53574cd47edf8527
+docs/platform/gotchas.md.lines-3542-3552 (lines 3542-3552 of docs/platform/gotchas.md)	7d92a67352bdc80de2c42fc985f310cfe23bbcc5
+tests/test_static_runner.sh.lines-1217-1262 (lines 1217-1262 of tests/test_static_runner.sh)	b53873eb1fc7a4943cd3f47de06a456111016a4e

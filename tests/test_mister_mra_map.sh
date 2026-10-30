@@ -104,7 +104,7 @@ command -v go >/dev/null 2>&1 || {
     JTF="${JTSIM_SCRATCH:-${TMPDIR:-/tmp}/vampire-saved-jtsim}/modules/jtframe/src/jtframe/jtframe"
     [ -x "$JTF" ] || { echo "SKIP: no go toolchain and no prebuilt jtframe"; exit 0; }; }
 
-WORK="$(mktemp -d "${TMPDIR:-/tmp}/mister_mra_map.XXXXXX")"
+WORK="$(mktemp -d "${TMPDIR:-/tmp}/mister_mra_map.XXXXXX")" || { echo "FAIL: test_mister_mra_map — mktemp -d failed (WORK)"; exit 2; }
 trap 'rm -rf "$WORK"' EXIT INT TERM
 MRA="$REPO/tools/mister_mra.sh"
 SRC="$REPO/emu/jtcores"

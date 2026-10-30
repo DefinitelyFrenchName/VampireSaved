@@ -70,7 +70,7 @@ TOOL=tools/mk_docs_site.py
 
 echo "== test_docs_site: the corpus renders, resolves and is deterministic =="
 [ -f "$TOOL" ] || { echo "FAIL: $TOOL is absent"; exit 1; }
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: test_docs_site — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 
 # --- 1. everything parses and every reference resolves ----------------------
 # THE EXECUTABLE FORM: under CONTROL=<name> the perturbation is applied to a

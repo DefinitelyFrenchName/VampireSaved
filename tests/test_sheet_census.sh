@@ -38,7 +38,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 vs_ctl_mode "$0"
 REG=tests/ci_emulator.tsv
 DEBT=tests/expected/sheet_debt.txt
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
+W="$(mktemp -d)" || { echo "FAIL: test_sheet_census — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT
 bad=0; ok() { echo "  ok    $1"; }; nope() { echo "  FAIL  $1"; bad=$((bad + 1)); }
 
 SPAN_DEBT=tests/expected/sheet_span_debt.txt

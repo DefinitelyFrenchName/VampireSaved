@@ -10,7 +10,7 @@
 # EXPECTS: zero music-range ids and every inventory exact. The `SET=vsavjw` mode is VOID
 #   (the replays select Jedah on a WIDE wheel) — the header says so; WIDE coverage needs
 #   re-authored twins.
-# FOLLOWS: build/manifest/ docs/project/gotchas.md emu/mame-patches/ tests/lua/ring_tap.lua
+# FOLLOWS: build/manifest/ docs/project/gotchas.md emu/mame-patches/ tests/lib/jobs.sh tests/lua/ring_tap.lua
 #   tests/replays/ tools/run_mame.sh tools/setup_mame.sh
 #
 # SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
@@ -29,7 +29,7 @@
 # loud failure, not a silent behavior change (sound is invisible to every
 # RAM/pixel gate we have, so this is the only detector).
 #
-# Usage: ROMDIR=... tests/test_don_sound.sh [rompath_dir]
+# Usage: ROMDIR=... [JOBS=N] tests/test_don_sound.sh [rompath_dir]
 #
 # ** THE `SET=vsavjw` MODE THIS LINE USED TO ADVERTISE IS VOID (14z-127,
 #    GitHub #114). DO NOT USE IT WITHOUT RE-AUTHORING THE REPLAYS. ** Three of
@@ -79,7 +79,25 @@ WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 cd "$REPO"
 
-for rp in 12_donovan_vs_cpu 19_don_dp_spam 25_don_darkforce 56_don_es_ls; do
+# JOBS (#334 item 2, 14z-211): the four runs are independent — each writes only its own sandbox $WORK/<replay> and
+# trace $WORK/<replay>.txt — so they go through tests/lib/jobs.sh's pool, JOBS at a time; default min(4, CPUs/6). Each
+# run's exit status lands in $WORK/<replay>.rc and is judged after, in replay order, exactly as it was inline.
+REPLAYS="12_donovan_vs_cpu 19_don_dp_spam 25_don_darkforce 56_don_es_ls"
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+one_run() {  # one_run <replay>
+    _rc=0
+    REPLAY="$REPO/tests/replays/$1.rpl" FRAMES=3400 \
+        TRACE_OUT="$WORK/$1.txt" MAME_SANDBOX="$WORK/$1" \
+        CHECKSUM_OUT="$WORK/$1/c.log" MAME_ROMPATH="$RPDIR;$ROMDIR" \
+        tools/run_mame.sh "${SET:-vsavj}" \
+        -autoboot_script "$REPO/tests/lua/ring_tap.lua" > /dev/null 2>&1 || _rc=$?
+    echo "$_rc" > "$WORK/$1.rc"
+}
+vs_pool_start "$JOBS"
+for rp in $REPLAYS; do vs_pool_run one_run "$rp"; done
+vs_pool_wait
+
+for rp in $REPLAYS; do
     # A TEARDOWN SEGFAULT IS TOLERATED ONLY BEHIND THE INSTRUMENT'S OWN
     # COMPLETION MARKER (14z-99). ring_tap writes "END" and closes its
     # trace BEFORE calling manager.machine:exit(); MAME's exit path can
@@ -88,12 +106,7 @@ for rp in 12_donovan_vs_cpu 19_don_dp_spam 25_don_darkforce 56_don_es_ls; do
     # the same replay exits clean — an emulator teardown race, not a
     # measurement defect; the 14z-96/97 batteries ran this loop clean).
     # A crash WITHOUT the END marker is a mid-run death and still fails.
-    rc=0
-    REPLAY="$REPO/tests/replays/$rp.rpl" FRAMES=3400 \
-        TRACE_OUT="$WORK/$rp.txt" MAME_SANDBOX="$WORK/$rp" \
-        CHECKSUM_OUT="$WORK/$rp/c.log" MAME_ROMPATH="$RPDIR;$ROMDIR" \
-        tools/run_mame.sh "${SET:-vsavj}" \
-        -autoboot_script "$REPO/tests/lua/ring_tap.lua" > /dev/null 2>&1 || rc=$?
+    rc="$(cat "$WORK/$rp.rc" 2>/dev/null || echo 1)"
     if [ "$rc" -ne 0 ]; then
         if [ -f "$WORK/$rp.txt" ] && grep -q "^END$" "$WORK/$rp.txt"; then
             echo "  note: $rp — MAME teardown crash (rc=$rc) AFTER the"

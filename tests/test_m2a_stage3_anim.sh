@@ -10,7 +10,7 @@
 #   guard, the cheap-guard round, the legacy suite.
 # EXPECTS: as listed; a crash here is a waived-mixture artifact only with crash-stack
 #   evidence AND a passing stage 4.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/lib/m2a_common.sh
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/lib/m2a_common.sh tests/lib/jobs.sh
 #   tests/lib/masked_compare.sh tests/lua/replay.lua tests/lua/replay_guard.lua
 #   tests/replays/ tools/build_donovan.sh tools/build_fingerprint.py tools/check_diverge.py
 #   tools/compare_composite.py tools/compare_flicker.py tools/compare_window.py
@@ -31,7 +31,7 @@
 # evidence (Jedah handler PC reading Donovan anim data) AND stage 4 later
 # passing — otherwise it is a real relocation bug (see docs/project/patch_notes.md).
 #
-# Usage: ROMDIR=... tests/test_m2a_stage3_anim.sh
+# Usage: ROMDIR=... [JOBS=N] tests/test_m2a_stage3_anim.sh
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"
@@ -69,11 +69,47 @@ print(f"{p['dst']:x} {p['dst'] + p['len']:x}")
 PY
 )
 
-# --- 1+2. anim engagement + guarded idle window --------------------------
+cat > "$WORK/round.rpl" <<'EOF'
+300-305 sys=C1
+800-803 sys=S1
+1000-1002 p1=U
+1040-1042 p1=U
+1080-1082 p1=R
+1700-1702 p1=1
+9300 wait
+EOF
+
+# JOBS (#334 item 2, 14z-211): this gate's own three runs — the guarded idle window, the full round and the pick
+# replay — are independent (each writes only its own log, .out and sandbox under $WORK; only the idle run dumps), so
+# they go through tests/lib/jobs.sh's pool, JOBS at a time; default min(4, CPUs/6). Each records its exit status in
+# $WORK/<name>.rc and is judged below, after the pool, in the old order. The superset gate's runs stay in the shared
+# helper m2a_legacy_gate (tests/lib/m2a_common.sh), run serially where they always were.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
 SPEC=$(python3 -c "print(';'.join(f'{f}:ff841c-ff8420' for f in range(3000,3600,40)))")
-if DUMPS="$SPEC" MAME_ROMPATH="$RP" "$REPO/tools/run_replay_guarded.sh" vsavj \
+run_idle() {
+    if DUMPS="$SPEC" MAME_ROMPATH="$RP" "$REPO/tools/run_replay_guarded.sh" vsavj \
         "$REPO/tests/replays/11_pick_donovan.rpl" "$WORK/idle.log" \
-        "$WORK/idlebox" > "$WORK/idle.out" 2>&1; then
+        "$WORK/idlebox" > "$WORK/idle.out" 2>&1; then echo 0 > "$WORK/idle.rc"; else echo 1 > "$WORK/idle.rc"; fi
+}
+run_round() {
+    if GUARD_DEBUG=0 GUARD_MATCH="3000-3600" MAME_ROMPATH="$RP" \
+        "$REPO/tools/run_replay_guarded.sh" vsavj "$WORK/round.rpl" \
+        "$WORK/round.log" "$WORK/roundbox" > "$WORK/round.out" 2>&1; then echo 0 > "$WORK/round.rc"; else echo 1 > "$WORK/round.rc"; fi
+}
+run_pick() {  # its output was the gate's own, unredirected: kept in $WORK/pick.out and replayed at its old place
+    _rc=0
+    MAME_ROMPATH="$RP" "$REPO/tools/run_replay_mame.sh" vsavj \
+        "$REPO/tests/replays/11_pick_donovan.rpl" "$WORK/pick.log" "$WORK/pickbox2" > "$WORK/pick.out" 2>&1 || _rc=$?
+    echo "$_rc" > "$WORK/pick.rc"
+}
+vs_pool_start "$JOBS"
+vs_pool_run run_idle
+vs_pool_run run_round
+vs_pool_run run_pick
+vs_pool_wait
+
+# --- 1+2. anim engagement + guarded idle window --------------------------
+if [ "$(cat "$WORK/idle.rc" 2>/dev/null)" = 0 ]; then
     echo "  ok: 600-frame idle window exception-free (-debug guard)"
 else
     echo "FAIL: guard tripped during idle (mixture artifact or relocation bug):"
@@ -99,18 +135,7 @@ else
     echo "FAIL: anim cursor not (fully) in relocated region"; fail=1
 fi
 
-cat > "$WORK/round.rpl" <<'EOF'
-300-305 sys=C1
-800-803 sys=S1
-1000-1002 p1=U
-1040-1042 p1=U
-1080-1082 p1=R
-1700-1702 p1=1
-9300 wait
-EOF
-if GUARD_DEBUG=0 GUARD_MATCH="3000-3600" MAME_ROMPATH="$RP" \
-        "$REPO/tools/run_replay_guarded.sh" vsavj "$WORK/round.rpl" \
-        "$WORK/round.log" "$WORK/roundbox" > "$WORK/round.out" 2>&1; then
+if [ "$(cat "$WORK/round.rc" 2>/dev/null)" = 0 ]; then
     echo "  ok: full round with Donovan anim completes (cheap guard clean)"
 else
     echo "FAIL: round run tripped the guard:"; cat "$WORK/round.out"; fail=1
@@ -119,8 +144,9 @@ fi
 # --- 3. superset gate ----------------------------------------------------
 m2a_legacy_gate "$RP" "$WORK"
 [ "$gate_fail" = 0 ] || fail=1
-MAME_ROMPATH="$RP" "$REPO/tools/run_replay_mame.sh" vsavj \
-    "$REPO/tests/replays/11_pick_donovan.rpl" "$WORK/pick.log" "$WORK/pickbox2"
+cat "$WORK/pick.out"
+_pick_rc="$(cat "$WORK/pick.rc" 2>/dev/null || echo 1)"
+[ "$_pick_rc" = 0 ] || exit "$_pick_rc"
 if m2a_diverge "$WORK/pick.log" 11_pick_donovan "$PICK_DIVERGE" > /dev/null; then
     echo "  ok: pick replay diverges exactly at $PICK_DIVERGE"
 else

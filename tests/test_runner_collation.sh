@@ -30,7 +30,7 @@
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: test_runner_collation — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0
 PIN='[ ! -f "$REPO/tests/lib/collation.sh" ] || { . "$REPO/tests/lib/collation.sh"; vs_pin_collation; }'
 RUNNERS="tests/run_all_static.sh tests/run_all_emulator.sh tests/run_battery_m2.sh"

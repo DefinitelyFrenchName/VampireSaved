@@ -80,7 +80,7 @@ RIGS=tests/replays/command_throws
 EXP=tests/expected/command_throws.tsv
 T=tools/command_throw_rigs.py
 WB="${SHEET:-$REPO/../community/vsav-framedata.xlsx}"
-W="${OUT:-$(mktemp -d "${TMPDIR:-/tmp}/cthrow.XXXXXX")}"; mkdir -p "$W"
+W="${OUT:-$(mktemp -d "${TMPDIR:-/tmp}/cthrow.XXXXXX")}" || { echo "FAIL: audit_command_throws — mktemp -d failed (W)"; exit 2; }; mkdir -p "$W"
 [ -n "${OUT:-}" ] || trap 'rm -rf "$W"' EXIT
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 

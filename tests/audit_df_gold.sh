@@ -12,7 +12,7 @@
 # EXPECTS: leg 1 (Phobos) has at least one row byte-equal to a gold-block row; leg 2
 #   (Bulleta) has zero. A red on leg 1 is a dead upload, on leg 2 a leak into a vanilla
 #   character's DF.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/jobs.sh tests/lua/replay.lua
 #   tests/replays/hui/85_hui_df_vs2.rpl tools/run_mame.sh tools/setup_mame.sh
 #
 # SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
@@ -29,7 +29,7 @@
 #   leg 2  P1 = Bulleta (0x00): DF on; ZERO rows equal any gold row
 #          (the anti-leak control — her purple stays hers).
 #
-# Usage: ROMDIR=... tests/audit_df_gold.sh [builddir]   (default hui32)
+# Usage: ROMDIR=... [JOBS=N] tests/audit_df_gold.sh [builddir]   (default hui32)
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -60,18 +60,32 @@ export MAME_BIN
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail=0
 
-for leg in phobos:10 bulleta:00; do
-    name="${leg%%:*}"; id="${leg##*:}"
+# JOBS (#334 item 2, 14z-211): the two legs are independent — each runs in its own folder $W/<name> (cwd, sandbox,
+# dumps) — so they go through tests/lib/jobs.sh's pool, JOBS at a time; default min(4, CPUs/6). Each leg's exit status
+# lands in $W/<name>/rc and is read after, in leg order.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+one_leg() {  # one_leg <name> <id>
+    name="$1"; id="$2"
     d="$W/$name"; mkdir -p "$d"
     PK="1400:ff8782:$id;1450:ff8782:$id;1500:ff8782:$id;1400:ff8b82:05;1450:ff8b82:05;1500:ff8b82:05;3100:ff8509:03;3120:ff8509:03"
+    _rc=0
     ( cd "$d" && MAME_ROMPATH="$REPO/$BUILD/rompath;$ROMDIR" \
       MAME_SANDBOX="$d/sb" POKES="$PK" \
       REPLAY="$REPO/tests/replays/hui/85_hui_df_vs2.rpl" \
       DUMPS="3400:ff8020-ff805f;3400:90c000-90c400;3500:90c000-90c400" \
       FRAMES=3520 CHECKSUM_OUT="$d/c.ram" \
       "$REPO/tools/run_mame.sh" vsavjw \
-      -autoboot_script "$REPO/tests/lua/replay.lua" > "$d/out" 2>&1 ) \
-        || { echo "FAIL: $name leg did not run"; fail=1; }
+      -autoboot_script "$REPO/tests/lua/replay.lua" > "$d/out" 2>&1 ) || _rc=$?
+    echo "$_rc" > "$d/rc"
+}
+vs_pool_start "$JOBS"
+for leg in phobos:10 bulleta:00; do
+    vs_pool_run one_leg "${leg%%:*}" "${leg##*:}"
+done
+vs_pool_wait
+for leg in phobos:10 bulleta:00; do
+    name="${leg%%:*}"
+    [ "$(cat "$W/$name/rc" 2>/dev/null)" = 0 ] || { echo "FAIL: $name leg did not run"; fail=1; }
 done
 
 python3 - "$W" "$BUILD" <<'PY' || fail=1

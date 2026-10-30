@@ -12,7 +12,7 @@
 # EXPECTS: morph to 0x13 with record 0x003FA9D0 in section 1; nothing armed or morphed in
 #   section 2. Only the first morph is deterministic — the arcade draw is a lottery past
 #   ~8500.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/replay.lua
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/replay.lua tests/lib/jobs.sh
 #   tests/replays/113_shadow_vs_tenant.rpl tools/run_mame.sh tools/setup_mame.sh
 #
 # SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
@@ -46,7 +46,7 @@
 #            clear, and P1 must NOT morph. Without this leg section 1 would
 #            pass just as well on a build where the flag did nothing.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged31] tests/test_shadow_tenant.sh  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged31] [JOBS=N] tests/test_shadow_tenant.sh  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -94,13 +94,25 @@ RPL="$REPO/tests/replays/113_shadow_vs_tenant.rpl"
 sed 's/^1360-1362 sys=S1/# CONTROL: FOUR presses — must NOT arm/' "$RPL" > "$W/four.rpl"
 cmp -s "$RPL" "$W/four.rpl" && { echo "FAIL: the control edit matched nothing — the replay's 5th press line moved"; exit 1; }
 
-run() { # run <tag> <replay>
+# JOBS (#334 item 2, 14z-211): the two runs (armed, four) are independent — each writes only $W/<tag> and its own
+# sandbox — so they go through tests/lib/jobs.sh's pool, JOBS at a time; default min(4, CPUs/6). run_one records the
+# MAME exit status in $W/<tag>/rc; run() judges a run after the pool, with its old lines, in the old section order.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+run_one() { # run_one <tag> <replay>
     mkdir -p "$W/$1"
-    DUMPS="1420:ff8400-ff8c00;${MORPH_FRAME}:ff8400-ff8c00" REPLAY="$2" \
+    if DUMPS="1420:ff8400-ff8c00;${MORPH_FRAME}:ff8400-ff8c00" REPLAY="$2" \
         CHECKSUM_OUT="$W/$1/c.log" MAME_SANDBOX="$W/$1/box" \
         MAME_ROMPATH="$BUILD/rompath;$ROMDIR" \
         "$REPO/tools/run_mame.sh" vsavjw \
-        -autoboot_script "$REPO/tests/lua/replay.lua" > "$W/$1/mame.log" 2>&1 || {
+        -autoboot_script "$REPO/tests/lua/replay.lua" > "$W/$1/mame.log" 2>&1; then
+        echo 0 > "$W/$1/rc"; else echo 1 > "$W/$1/rc"; fi
+}
+vs_pool_start "$JOBS"
+vs_pool_run run_one armed "$RPL"
+vs_pool_run run_one four "$W/four.rpl"
+vs_pool_wait
+run() { # run <tag> <replay> — judges the pooled run <tag> (the replay was given to run_one)
+    [ "$(cat "$W/$1/rc" 2>/dev/null)" = 0 ] || {
             echo "FAIL: $1 — MAME run failed"; tail -5 "$W/$1/mame.log"; fail=1; return 1; }
     # RH-25 / CPE-9: assert the run COMPLETED before reading any value from
     # it — an aborted run leaves dumps that look like a measurement.

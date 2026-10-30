@@ -28,7 +28,7 @@
 # EXPECTS: gfx checks green, every soak END clean, the legacy leg EXACT against the frozen
 #   generation; a red on the last means the pipeline built fresh no longer reproduces the
 #   freeze.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/lib/m2a_common.sh
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/lib/m2a_common.sh tests/lib/jobs.sh
 #   tests/lib/masked_compare.sh tests/lua/replay.lua tests/lua/replay_guard.lua
 #   tests/replays/ tests/test_gfx_menus.sh tools/build_donovan.sh tools/build_fingerprint.py
 #   tools/check_diverge.py tools/compare_composite.py tools/compare_flicker.py
@@ -38,7 +38,7 @@
 #
 # SHEET: none — the subject is a development-stage build of the M2a/tenant ladder, not a release set; its comparison with vsavj is outside #291's scope (census class S)
 #
-# Usage: ROMDIR=... tests/test_m2b_stage6.sh [outbase]
+# Usage: ROMDIR=... [JOBS=N] tests/test_m2b_stage6.sh [outbase]
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"
@@ -79,10 +79,25 @@ tail -3 "$WORK/build.log"
 RP="$OUTBASE/rompath;$ROMDIR"
 
 echo "== 1. guarded soaks on stage 6 =="
-for gr in 12_donovan_vs_cpu 19_don_dp_spam 20_don_round2 21_don_mash \
-          26_don_arcade_mash; do
+# JOBS (#334 item 2, 14z-211): the five soaks are independent — each writes only its own log, sandbox, captured
+# output and exit status — so they go through tests/lib/jobs.sh's pool, JOBS at a time; default min(4, CPUs/6). The
+# verdicts below read them after, in the same order and with the same lines as the serial loop printed.
+SOAKS="12_donovan_vs_cpu 19_don_dp_spam 20_don_round2 21_don_mash 26_don_arcade_mash"
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+soak_run() {  # soak_run <replay>: the guarded run; its stdout+stderr to $WORK/<r>.gout, its exit status to <r>.rc
     if MAME_ROMPATH="$RP" tools/run_replay_guarded.sh vsavj \
-        "$REPO/tests/replays/$gr.rpl" "$WORK/$gr.log" "$WORK/${gr}box"; then
+        "$REPO/tests/replays/$1.rpl" "$WORK/$1.log" "$WORK/${1}box" > "$WORK/$1.gout" 2>&1; then
+        echo 0 > "$WORK/$1.rc"
+    else
+        echo "$?" > "$WORK/$1.rc"
+    fi
+}
+vs_pool_start "$JOBS"
+for gr in $SOAKS; do vs_pool_run soak_run "$gr"; done
+vs_pool_wait
+for gr in $SOAKS; do
+    cat "$WORK/$gr.gout"
+    if [ "$(cat "$WORK/$gr.rc" 2>/dev/null)" = 0 ]; then
         echo "  ok: $gr END-clean under guard"
     else
         echo "FAIL: guard tripped on $gr:"; tail -5 "$WORK/$gr.log"; fail=1

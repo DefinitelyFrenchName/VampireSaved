@@ -59,7 +59,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"
 vs_ctl_mode "$0"
 EXP=tests/expected/must_fire_census.tsv
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
+W="$(mktemp -d)" || { echo "FAIL: test_must_fire_census — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT
 bad=0; ok() { echo "  ok    $1"; }; nope() { echo "  FAIL  $1"; bad=$((bad + 1)); }
 
 # The census as ONE function over a tests dir, so the controls run the real thing.

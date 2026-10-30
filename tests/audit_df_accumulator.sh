@@ -84,7 +84,7 @@ EXP="tests/expected/df_accumulator.txt"
 RPL="$REPO/tests/replays/df/105_df_sas_armor.rpl"
 [ -f "$ROMDIR/vsavj.zip" ] || { echo "SKIP: no $ROMDIR/vsavj.zip"; exit 0; }
 command -v mame >/dev/null || { echo "SKIP: no mame on PATH"; exit 0; }
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: audit_df_accumulator — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 FIELDS="ff802e:b:df,ff855e:w:p1_15e,ff8561:b:p1_161,ff8562:b:p1_162,ff858f:b:p1_18f,ff8454:b:p1_54,ff8450:w:p1_hp,ff8406:b:p1seq,ff8407:b:p1_sub,ff8522:w:p1_122"
 PKB="1400:ff8782:0a;1450:ff8782:0a;1500:ff8782:0a;1400:ff8b82:03;1450:ff8b82:03;1500:ff8b82:03"

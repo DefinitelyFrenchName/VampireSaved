@@ -32,7 +32,7 @@
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
-W="$(mktemp -d "${TMPDIR:-/tmp}/pcheck.XXXXXX")"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d "${TMPDIR:-/tmp}/pcheck.XXXXXX")" || { echo "FAIL: test_packet_check — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 
 if [ -z "${VS_CTL:-}" ] || vs_ctl_is deliverable-ignored || vs_ctl_is replay-unbound || vs_ctl_is tally-any-flag; then
@@ -56,7 +56,7 @@ fi
 # PREPARE on a throwaway copy of what prepare reads
 prepare_probe() {  # prepare_probe <rulecheck.py to test> <root> — prints PRECHECK-OK or what went wrong
     mkdir -p "$2/docs/project" "$2/tests/expected" "$2/tools" "$2/.claude/agents" "$2/build/pc"
-    cp "$1" "$2/tools/rulecheck.py"; cp tools/claim_lint.py tools/packet_check.py "$2/tools/"
+    cp "$1" "$2/tools/rulecheck.py"; cp tools/claim_lint.py tools/packet_check.py tools/rc_actions.py "$2/tools/"
     cp -R tools/agent "$2/tools/agent"; _doc=docs/project/rule_checker.md; cp "$_doc" "$2/docs/project/"
     cp tests/expected/registry.tsv "$2/tests/expected/"; cp -R tests/rulecheck "$2/tests/rulecheck"
     cp .claude/agents/rule-checker.md "$2/.claude/agents/"

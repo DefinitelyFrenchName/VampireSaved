@@ -10,7 +10,7 @@
 #   -debug guard over the pick window, the legacy suite.
 # EXPECTS: coherence and provenance hold; behaviour correctness is deliberately not gated at
 #   this mixture.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/lib/m2a_common.sh
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/lib/m2a_common.sh tests/lib/jobs.sh
 #   tests/lib/masked_compare.sh tests/lua/replay.lua tests/lua/replay_guard.lua
 #   tests/replays/ tools/build_donovan.sh tools/build_fingerprint.py tools/check_diverge.py
 #   tools/compare_composite.py tools/compare_flicker.py tools/compare_window.py
@@ -32,7 +32,7 @@
 #   3. Superset invariant: legacy gate green; pick replay still first
 #      diverges exactly at 2886.
 #
-# Usage: ROMDIR=... tests/test_m2a_stage2_data.sh
+# Usage: ROMDIR=... [JOBS=N] tests/test_m2a_stage2_data.sh
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"
@@ -71,20 +71,12 @@ print(f"{p['dst'] + (0x0C8BB8 - p['src']):08x}")
 PY
 )
 
-# --- 1. live effect ------------------------------------------------------
-DUMPS="3600:ff8460-ff8468" MAME_ROMPATH="$RP" \
-    REPLAY="$REPO/tests/replays/11_pick_donovan.rpl" \
-    CHECKSUM_OUT="$WORK/pick.log" MAME_SANDBOX="$WORK/pickbox" \
-    "$REPO/tools/run_mame.sh" vsavj \
-    -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
-GOT=$(xxd -p "$WORK/dump_3600_ff8460.bin")
-case "$GOT" in
-    ${WANT_BASE}${WANT_COMP}*)
-        echo "  ok: slot 0x0F loads Donovan relocated base 0x$WANT_BASE comp 0x$WANT_COMP" ;;
-    *) echo "FAIL: +0x60/+0x64 = $GOT (want $WANT_BASE $WANT_COMP)"; fail=1 ;;
-esac
-
-# --- 2. coherence --------------------------------------------------------
+# JOBS (#334 item 2, 14z-211): this gate's own three runs (the pick dump, the round, the pick-window guard) are
+# independent — each writes only its own files ($WORK/pick.log + pickbox + dump_3600_ff8460.bin; $WORK/round.* +
+# roundbox; $WORK/guard.* + guardbox) — so they go through tests/lib/jobs.sh's pool, JOBS at a time (default
+# min(4, CPUs/6)). A run's nonzero status lands in $WORK/<name>.rc and is judged below in the serial order. The 8 legacy
+# runs of section 3 are the shared helper's (m2a_legacy_gate, tests/lib/m2a_common.sh) and stay as they are.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
 cat > "$WORK/round.rpl" <<'EOF'
 300-305 sys=C1
 800-803 sys=S1
@@ -94,16 +86,45 @@ cat > "$WORK/round.rpl" <<'EOF'
 1700-1702 p1=1
 9300 wait
 EOF
-if GUARD_DEBUG=0 GUARD_MATCH="3000-3600" MAME_ROMPATH="$RP" \
+run_pick() {
+    DUMPS="3600:ff8460-ff8468" MAME_ROMPATH="$RP" \
+        REPLAY="$REPO/tests/replays/11_pick_donovan.rpl" \
+        CHECKSUM_OUT="$WORK/pick.log" MAME_SANDBOX="$WORK/pickbox" \
+        "$REPO/tools/run_mame.sh" vsavj \
+        -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1 || echo "$?" > "$WORK/pick.rc"
+}
+run_round() {
+    GUARD_DEBUG=0 GUARD_MATCH="3000-3600" MAME_ROMPATH="$RP" \
         "$REPO/tools/run_replay_guarded.sh" vsavj "$WORK/round.rpl" \
-        "$WORK/round.log" "$WORK/roundbox" > "$WORK/round.out" 2>&1; then
+        "$WORK/round.log" "$WORK/roundbox" > "$WORK/round.out" 2>&1 || echo "$?" > "$WORK/round.rc"
+}
+run_guard() {
+    MAME_ROMPATH="$RP" "$REPO/tools/run_replay_guarded.sh" vsavj \
+        "$REPO/tests/replays/11_pick_donovan.rpl" "$WORK/guard.log" \
+        "$WORK/guardbox" > "$WORK/guard.out" 2>&1 || echo "$?" > "$WORK/guard.rc"
+}
+vs_pool_start "$JOBS"
+vs_pool_run run_pick
+vs_pool_run run_round
+vs_pool_run run_guard
+vs_pool_wait
+
+# --- 1. live effect ------------------------------------------------------
+[ ! -f "$WORK/pick.rc" ] || exit "$(cat "$WORK/pick.rc")"
+GOT=$(xxd -p "$WORK/dump_3600_ff8460.bin")
+case "$GOT" in
+    ${WANT_BASE}${WANT_COMP}*)
+        echo "  ok: slot 0x0F loads Donovan relocated base 0x$WANT_BASE comp 0x$WANT_COMP" ;;
+    *) echo "FAIL: +0x60/+0x64 = $GOT (want $WANT_BASE $WANT_COMP)"; fail=1 ;;
+esac
+
+# --- 2. coherence --------------------------------------------------------
+if [ ! -f "$WORK/round.rc" ]; then
     echo "  ok: full round with Donovan data completes (cheap guard clean)"
 else
     echo "FAIL: round run tripped the guard:"; cat "$WORK/round.out"; fail=1
 fi
-if MAME_ROMPATH="$RP" "$REPO/tools/run_replay_guarded.sh" vsavj \
-        "$REPO/tests/replays/11_pick_donovan.rpl" "$WORK/guard.log" \
-        "$WORK/guardbox" > "$WORK/guard.out" 2>&1; then
+if [ ! -f "$WORK/guard.rc" ]; then
     echo "  ok: pick window exception-free (-debug guard)"
 else
     echo "FAIL: -debug guard tripped:"; cat "$WORK/guard.out"; fail=1

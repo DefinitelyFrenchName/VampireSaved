@@ -1,0 +1,2 @@
+  FLAG D-FIGURE: 502  [build/agent212/t333/closure/closing_comment.md]
+packet_check: 1 flag(s): D-FIGURE 1

@@ -12,7 +12,7 @@
 #   compared with the frozen vanilla logs.
 # EXPECTS: the new base loaded, legacy identical, the attract divergence exactly at 4278 —
 #   the superset invariant specified, not weakened.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/vsavj/ tests/lua/replay.lua
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/vsavj/ tests/lua/replay.lua tests/lib/jobs.sh
 #   tests/replays/ tools/pack_build.sh tools/patch_prg.py tools/run_mame.sh
 #   tools/setup_mame.sh
 #
@@ -25,7 +25,7 @@
 #   3. the attract replay is bit-identical up to frame 4277 and diverges at
 #      4278 — exactly where its CPU demo shows Jedah (char id 0x0F verified).
 #
-# Usage: ROMDIR=... tests/test_m2_repoint.sh
+# Usage: ROMDIR=... [JOBS=N] tests/test_m2_repoint.sh
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"
@@ -65,9 +65,34 @@ cat > "$WORK/pick_jedah.rpl" <<'EOF'
 1080-1082 p1=R
 1700-1702 p1=1
 EOF
-DUMPS="3600:ff8460-ff8464" MAME_ROMPATH="$RP" REPLAY="$WORK/pick_jedah.rpl" \
-    CHECKSUM_OUT="$WORK/pj.log" MAME_SANDBOX="$WORK/pjbox" "$REPO/tools/run_mame.sh" vsavj \
-    -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
+# JOBS (#334 item 2, 14z-211): the nine runs — the pick_jedah probe, the six legacy replays, the patched and the
+# vanilla attract — are independent: each writes only its own checksum log and sandbox (only the probe dumps), plus
+# its own exit status. So they go through tests/lib/jobs.sh's pool first, JOBS at a time (default min(4, CPUs/6)),
+# and the sections below read them in the serial order. A run that failed ends the gate where the serial run would
+# have (set -e then, an explicit exit with its status now), with the same output.
+LEGACY="02_demitri_vs_cpu 03_two_player_vs 05_timeout_idle 06_test_mode 07_mash_storm 10_midattract_start"
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+rp_run() {  # rp_run <tag> <cmd...>: run it; its exit status to $WORK/<tag>.rc
+    _t="$1"; shift
+    if "$@"; then echo 0 > "$WORK/$_t.rc"; else echo "$?" > "$WORK/$_t.rc"; fi
+}
+rp_pj() {
+    DUMPS="3600:ff8460-ff8464" MAME_ROMPATH="$RP" REPLAY="$WORK/pick_jedah.rpl" \
+        CHECKSUM_OUT="$WORK/pj.log" MAME_SANDBOX="$WORK/pjbox" "$REPO/tools/run_mame.sh" vsavj \
+        -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
+}
+rp_van() {  # fresh vanilla attract (same sandboxed runner, ROMDIR only) for frame-level compare
+    MAME_ROMPATH="$ROMDIR" REPLAY="$REPO/tests/replays/01_attract_long.rpl" \
+        CHECKSUM_OUT="$WORK/van_attract.log" MAME_SANDBOX="$WORK/vanbox" "$REPO/tools/run_mame.sh" vsavj \
+        -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
+}
+vs_pool_start "$JOBS"
+vs_pool_run rp_run pj rp_pj
+for r in $LEGACY 01_attract_long; do vs_pool_run rp_run "$r" run "$r"; done
+vs_pool_run rp_run van_attract rp_van
+vs_pool_wait
+rp_rc() { _rc="$(cat "$WORK/$1.rc" 2>/dev/null || echo 1)"; [ "$_rc" = 0 ] || exit "$_rc"; }
+rp_rc pj   # (ran in the pool above)
 # RAM dumps land next to CHECKSUM_OUT
 HB=$(xxd -p "$(dirname "$WORK/pj.log")/dump_3600_ff8460.bin")
 case "$HB" in
@@ -78,19 +103,16 @@ esac
 
 # --- 2. superset: non-Jedah replays bit-identical ---
 fail=0
-for r in 02_demitri_vs_cpu 03_two_player_vs 05_timeout_idle 06_test_mode 07_mash_storm 10_midattract_start; do
-    run "$r"
+for r in $LEGACY; do
+    rp_rc "$r"   # (ran in the pool above)
     got=$(shasum "$WORK/$r.log" | cut -d' ' -f1)
     exp=$(cat "$REPO/tests/expected/vsavj/$r.sha1")
     if [ "$got" = "$exp" ]; then echo "  ok: $r bit-identical"; else echo "FAIL: $r diverged"; fail=1; fi
 done
 
 # --- 3. attract identical until Jedah appears (frame 4278) ---
-run 01_attract_long
-# fresh vanilla attract (same sandboxed runner, ROMDIR only) for frame-level compare
-MAME_ROMPATH="$ROMDIR" REPLAY="$REPO/tests/replays/01_attract_long.rpl" \
-    CHECKSUM_OUT="$WORK/van_attract.log" MAME_SANDBOX="$WORK/vanbox" "$REPO/tools/run_mame.sh" vsavj \
-    -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
+rp_rc 01_attract_long   # (both attract runs ran in the pool above)
+rp_rc van_attract
 DIV=$(python3 - "$WORK/van_attract.log" "$WORK/01_attract_long.log" <<'PY'
 import sys
 a=[l.split() for l in open(sys.argv[1]) if not l.startswith("END")]

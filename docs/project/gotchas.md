@@ -7755,14 +7755,47 @@ bad) — a freeze run had passed only because the variable was exported for it. 
 level is re-timed in TICKS and checked against the original by the state at its commit, and a per-family setting is
 exported once for the family's whole run, never passed call by call.
 
-## OUT OF RANGE A RANGE-CHECKED GRAB'S INPUT IS A NORMAL — a "whiff" measured from far away was a normal on 28 of 82 command events (paid: 14z-211, #330)
+## OUT OF RANGE A RANGE-CHECKED GRAB'S INPUT IS A NORMAL — a far "whiff" was not the grab's own move on 28 of 78 command whiffs (paid: 14z-211, corrected 14z-212, #330)
 
 #330 measured the command throws' whiff recovery by doing each grab from pins 150 px wider each, where nothing can be
 grabbed. A capture sheet that printed the presser's state under every tile showed `0x02000a02` (the NORMAL's seq 0x0A)
-on Hell Cat's press frame: the half-circle grabs of Aulbath, Felicia, Gallon, Jedah (San Bassale), Morrigan, Q-Bee (O.M.)
-and Zabel, and Morrigan's Cryptic Needle, check the distance and, out of range, start the button's normal. Their frozen
-"whiff" was that normal's recovery, and the per-button, per-distance spread it produced had been read as a property of the
-grabs. **The rule:** a rig that means to perform a move checks, on the press frame, that the move it names STARTED (its
-state, not the inputs fed), and a whiff of a range-checked grab is made in range against a victim that cannot be grabbed.
-A sheet that prints the game's state under each picture also settles "is this the frame it says?" (the picture lags the
-state by 2-4 frames).
+on Hell Cat's press frame. Measured on every whiff (14z-212: the far whiff's state on the press frame and the five after,
+against the state the same grab starts when it connects), 28 of 78 far whiffs were NOT the grab's move: **20 a plain
+normal** (the 632[4] / 6324 P and K grabs of Aulbath, Felicia, Gallon, Jedah, Morrigan, Q-Bee and Zabel), **4 a jump**
+(Bishamon's and Demitri's 360 MP / HP: the motion's Up becomes a plain jump), and **4 the ES grab's own seq 0x12**
+(Aulbath's 6324PP / KK, Bishamon's ES 360PP, Zabel's 632[4]PP; 0x10 when they connect) — the last four ARE their whiff
+(the maintainer, from capture pages). The 24 plain ones have NO whiff at all: at contact against a victim the throw check
+refuses (Victor jumping, four timings) the input is the same normal or jump, and a breakpoint on the check (CPU:$029406)
+shows the input consulting it — the move starts only when the check passes (`engine_internals.md` "THE COMMAND THROWS").
+Their frozen "whiff" had been that normal's or that jump's recovery, and the per-button, per-distance spread it produced
+had been read as a property of the grabs. (~~"a normal on 28 of 82 events … and Morrigan's Cryptic Needle"~~ — RETRACTED
+14z-212: the 28 were three kinds, and Cryptic Needle's far whiff is its own move: seq 0x12 from 3 frames after its last
+input, as when it connects.) **The rule:** a rig that means to perform a move checks that the move it names STARTED —
+against the state the same input starts when it succeeds, not merely "not a normal" — and a whiff is looked for in range
+against a victim that cannot be grabbed before it is declared to exist. A sheet that prints the game's state under each
+picture also settles "is this the frame it says?" (the picture lags the state by 2-4 frames).
+
+## A FRESH CLONE'S `build/` IS NOT THE MAIN TREE'S — dirs holding tracked files miss their untracked ROMs, and a fresh patch's mtime defeats a reference check (paid: 14z-212, #333/#334)
+
+The remote clones made for a write trace or a timing (PILOT's `~/t212_trace`, ERIS's `~/e212b`/`~/e212a`) copied each
+`build/<dir>` from the host's main checkout only when the clone did NOT already have it. `build/hui30` and
+`build/merged1` hold TRACKED files, so the clone had them and their untracked `rompath/` was never copied: four gates
+SKIPped every control on PILOT (`audit_merged_vec3`, `audit_objhook_owner_census`; with `emu/jtcores` never initialised,
+`test_jtcores_twin`, `test_mister_wide_gate`), which the overlap scorer reads as HOLLOW, not as a failure. Second trap:
+a fresh checkout's `emu/fbneo-patches/0001-vampire-saved-harness.patch` is NEWER than the host's FBNeo reference binary,
+so `test_wide_profile` refuses the reference ("OLDER than the harness patch") and skips its superset section on BOTH sides
+of a before/after timing — a verdict that does not move, timing work that is not done. **The rule:** after cloning, top
+every `build/<dir>` up with `rsync -a --ignore-existing` (adds, never overwrites), initialise every submodule a listed gate
+reads, give byte-identical patches the main checkout's mtime (`touch -r`), and read a HOLLOW or a two-sided FAIL as a
+setup question before anything else (`build/agent212/t334/pilot_fix_retrace.sh`, `eris_topup.sh`).
+
+## A POOLED GATE THAT GLOBS ITS OUTPUTS CANNOT SEE A LOST RUN — name every leg the pool starts, and fail on one that wrote nothing (paid: 14z-212, #334)
+
+`tests/lib/jobs.sh`'s pool does not collect a run's exit status: a pooled gate judges each run by its artifact. Two of the
+61 gates #334 pooled read their traces with `glob(out + "/*.txt")` and judged only the files they found, so a run that
+never wrote one vanished from the verdict: with the pool's first run dropped (`VS_POOL_DROP_FIRST=1`),
+`audit_type_writes` printed "tap logs complete: 6/6" from five traces and PASSED, and `audit_id_writers` read 21 of its 22
+and PASSED. A serial gate has the same blind spot — a run that dies before writing is skipped the same way — but nothing
+had ever lost one to show it. **The rule:** a gate whose verdict reads its runs' outputs names every leg it starts and
+FAILs on one with no output (`missing`, both gates now); `tests/audit_pool_drop.sh` (ondemand, `harness:`) runs every
+pooled gate with a run dropped and requires it to FAIL — run it when `jobs.sh` changes or a gate starts pooling.

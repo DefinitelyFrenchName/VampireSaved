@@ -327,8 +327,11 @@ test_close_standing
 test_close_loop_cost
 # 14z-198 (#264): the session dashboard's collector (tools/session_metrics.py) reads the ledger, tier runs, git,
 # STATE, retractions, tickets and transcripts by their rules and labels every figure with its class; three controls
-# and a plant. ~1 s.
+# and a plant. ~1 s. 14z-212 (#335): its actions — first-run OK per decision, the questions on first runs — three more.
 test_session_metrics
+# 14z-212 (#267): the public session ledger page (tools/ledger_page.py) carries the datasets whole, withholds the
+# maintainer's own figures, fetches nothing, and tools/publish_ledger.sh makes it one orphan gh-pages commit; two controls. ~2 s.
+test_ledger_page
 # 14z-187b (#190 P3): every promise a sitting's record makes is classed FULFILLED / CARRIED / NOT-A-PROMISE and
 # each class holds (tools/promise_check.py; the timing leg: fulfilment text absent at the base); three controls. ~3 s.
 test_promise_check

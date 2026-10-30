@@ -12,7 +12,7 @@
 # EXPECTS: row 0x1A Pyron's palette throughout leg 1, row 0x17 receiving the accent in leg
 #   2, the control failing. The trade (the P2 sword drawn in medallion colours) is the
 #   board-confirmed, recorded cost.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lib/jobs.sh
 #   tests/lib/decrypt_cache.sh tests/lua/replay.lua tools/run_mame.sh tools/setup_mame.sh
 #
 # SHEET: no-reference-leg — our build against frozen vs2 values, with no vs2 rig in the gate (ruled 2026-10-17: listed, not drawn)
@@ -58,7 +58,7 @@
 #      must-fire half: it fails if someone "fixes" leg 1 by disabling the
 #      whole thunk, which would silently undo 14z-62k.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged31] tests/test_pyron_medallion_2p.sh  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged31] [JOBS=N] tests/test_pyron_medallion_2p.sh  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -120,11 +120,23 @@ cat > "$W/p1.rpl" <<'EOF'
 EOF
 
 DF="$(python3 -c "print(';'.join(f'{f}:90c000-90c37f' for f in (1200,1400,1800,2400,2900)))")"
-run() { # run <tag> <replay>
+# JOBS (#334 item 2, 14z-211): the two runs (p2, p1) are independent — each writes only its own $W/<tag>/ (log,
+# sandbox, dumps, MAME output, exit status) — so they go through tests/lib/jobs.sh's pool first, JOBS at a time
+# (default min(4, CPUs/6)); run() below then judges each in the serial order with the same lines.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+run_exec() { # run_exec <tag> <replay>: the MAME run; exit status to $W/<tag>/rc
     mkdir -p "$W/$1"
-    DUMPS="$DF" REPLAY="$2" CHECKSUM_OUT="$W/$1/c.log" MAME_SANDBOX="$W/$1/box" \
+    if DUMPS="$DF" REPLAY="$2" CHECKSUM_OUT="$W/$1/c.log" MAME_SANDBOX="$W/$1/box" \
         MAME_ROMPATH="$BUILD/rompath;$ROMDIR" "$REPO/tools/run_mame.sh" vsavjw \
-        -autoboot_script "$REPO/tests/lua/replay.lua" > "$W/$1/mame.log" 2>&1 || {
+        -autoboot_script "$REPO/tests/lua/replay.lua" > "$W/$1/mame.log" 2>&1; then
+        echo 0 > "$W/$1/rc"; else echo "$?" > "$W/$1/rc"; fi
+}
+vs_pool_start "$JOBS"
+vs_pool_run run_exec p2 "$W/p2.rpl"
+vs_pool_run run_exec p1 "$W/p1.rpl"
+vs_pool_wait
+run() { # run <tag> <replay> — judges the pooled run_exec's artifacts
+    [ "$(cat "$W/$1/rc" 2>/dev/null)" = 0 ] || {
             echo "FAIL: $1 — MAME run failed"; tail -5 "$W/$1/mame.log"; fail=1; return 1; }
     grep -q '^END ' "$W/$1/c.log" || { echo "FAIL: $1 — no END line"; fail=1; return 1; }
 }

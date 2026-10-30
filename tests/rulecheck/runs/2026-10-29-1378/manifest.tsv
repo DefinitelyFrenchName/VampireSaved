@@ -1,0 +1,29 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent212/t334/closure/closing_comment.md	62cd1fdde15ed15d9d9849533cfbe739a4a0070f
+build/agent212/t334/closure/ticket_row_334.tsv	fc02236b4d52d73aea5e00b68d9edd29556696de
+build/agent212/t334/closure/pilot_knobs.tsv	8a6e3f463f89e5b9141fdd6c36a5110357565521
+build/agent212/t334/closure/pilot_tools.tsv	5b6b601d41ff17bab7c76c5726cdb3949c5d1c9d
+build/agent212/t334/closure/guard_cancels_mac.tsv	324442f03b319d880a10a652719985aa16908502
+build/agent212/t334/closure/guard_cancels_mac_j2.log	3090151aa8d7b07030bdaea0d80a0f409f4ab7b6
+build/agent212/t334/closure/guard_cancels_mac_j6.log	6ccaa35491be6eb240ee6b35d4b545fab28f8c17
+build/agent212/t334/closure/mac_parity_under_load.txt	767acd00fc708f9b3c01bfa242580ac9b6267ee2
+build/agent212/t334/closure/parity_default_results.tsv	dcd387225f1b979d2323a4076f197f3e655bbdc6
+build/agent212/t334/closure/parity_12_results.tsv	dcd387225f1b979d2323a4076f197f3e655bbdc6
+build/agent212/t334/closure/mac_load_tier_fails.txt	d318796fd944691af6ea50423e9b99236c2655f9
+build/agent212/t334/closure/survey.md	6280ed222e437550a97c940d2ee7c7092ea62315
+build/agent212/t334/closure/shared_path_gates.diff	c9deb012bea1bd9ff8617ac3097a2aa916165aec
+build/agent212/t334/closure/eris_times.tsv	43c32867b7ec7132e2aaccc5e7f4adb0c07e6000
+build/agent212/t334/closure/eris_setup.out	4b05fe1ae50a88c8ef17e7d517141c4098326c20
+build/agent212/t334/closure/mtime_readers.txt	ff1532c1a5bd152e2fc17eb9e3f836c83059ca15
+build/agent212/t334/closure/mac_pairs_report.tsv	2c4a3f4e591a2ed045337c75c77d85d3a0c6239e
+build/agent212/t334/closure/changed_after_6829e446.txt	a15a8af6bb72aca9482f9a3dccea6f81f6d90a2a
+tests/lib/jobs.sh	219dad2a3f0b12c756138b75193654cf24da761b
+build/agent212/t334/closure/pool_drop_report.tsv	e2b17ad59472f712bcd37595fc926ae462d478c1
+tests/audit_type_writes.sh	e4d6a071ce1ba7fff0fd3c517d3ef4ab2ec05a15
+tests/audit_id_writers.sh	70a71b371b0a9d7eab886fd277c3820d5ee25cfb
+tests/audit_pool_drop.sh	49e653075f41d392b93012ef6201e6a84eb0cfe3
+docs/project/gotchas.md.lines-7792-7801 (lines 7792-7801 of docs/project/gotchas.md)	9668db6a331e65d6f266577330d9509f606f71e1
+DECISIONS_HISTORY.md.lines-8599-8610 (lines 8599-8610 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-28 (14z-211) — #334 item 1: all 35 settings timed on PILOT; #333's re-trace waits f")	8f1558324cd54241bdad472799415a0495243b6d
+DECISIONS_HISTORY.md.lines-8714-8726 (lines 8714-8726 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-28 (14z-211) — #334 item 2: every one of the 62 knob-less gates takes a setting, ti")	2684f8667e9c6c79fa34b40c457e53233f56d974
+DECISIONS_HISTORY.md.lines-8821-8835 (lines 8821-8835 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-29 (14z-212) — #334: the pool-drop audit is an ondemand gate, under a new reason ke")	d1564df2ba7abe5cec4a09e6cb7dfce96a99e666
+docs/project/operations.md.lines-703-783 (lines 703-783 of docs/project/operations.md)	6fe76b57350237a67fa57fc62503e8049071caa5

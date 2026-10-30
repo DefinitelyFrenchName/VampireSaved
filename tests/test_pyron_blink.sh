@@ -12,7 +12,7 @@
 #   bit-for-bit; =blinks reproduces the pre-fix two-value alternation on build/pyron15. This
 #   gate sees the IN-MATCH instance only; the select and route-map tables are
 #   test_variant_dispatch's.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/decrypt_cache.sh tests/lua/replay.lua
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/decrypt_cache.sh tests/lua/replay.lua tests/lib/jobs.sh
 #   tests/replays/pyron/76_pyron_blink_vs2.rpl tools/check_pyron_blink.py tools/run_mame.sh
 #   tools/run_replay_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
 #
@@ -65,7 +65,7 @@
 # Measured 14z-123 on build/pyron36: native 0x0c75fe, ours 0x0fc6ac, both ==
 # their tables' row 0x11.
 #
-# Usage: ROMDIR=... tests/test_pyron_blink.sh [outbase]
+# Usage: ROMDIR=... [JOBS=N] tests/test_pyron_blink.sh [outbase]
 #        outbase default: build/pyron46 (the current freeze; the dated
 #        figure in the verbatim note below is 14z-103's)
 # Env: MAME_BIN, PYRON_BLINK_EXPECT, SKIP_RUNTIME=1 (controls only).
@@ -157,7 +157,13 @@ else
         echo "FAIL: no $BUILD/rompath/vsavjw.zip (WIDE tenant build required)"
         exit 1; }
     echo "== 1. native (vsav2) vs ours ($BUILD), replay 76, expect: $EXPECT"
-    for tag in native ours; do
+    # JOBS (#334 item 2, 14z-211): the two legs are independent — each writes only $WORK/<tag> and its own sandbox
+    # $WORK/<tag>/s1 — so they go through tests/lib/jobs.sh's pool, JOBS at a time; default min(4, CPUs/6). A pooled
+    # leg records its runner's exit status in $WORK/<tag>/rc; the legs are judged after the pool, in their old order,
+    # with the old FAIL line, and the ours leg's MAME_ROMPATH export is restored in this shell as the serial loop left it.
+    . "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+    one_leg() {  # one_leg <native|ours>
+        tag=$1
         d="$WORK/$tag"; mkdir -p "$d/s1"
         if [ "$tag" = native ]; then
             set_=vsav2; unset MAME_ROMPATH || true
@@ -165,12 +171,22 @@ else
             set_=vsavjw; MAME_ROMPATH="$BUILD/rompath;$ROMDIR"
             export MAME_ROMPATH
         fi
-        ( cd "$d" && POKES="$PK" DUMPS="$DUMPS" \
+        if ( cd "$d" && POKES="$PK" DUMPS="$DUMPS" \
           "$REPO/tools/run_replay_mame.sh" "$set_" "$RPL" "$d/ram.log" \
-          "$d/s1" > "$d/out" 2>&1 ) || {
+          "$d/s1" > "$d/out" 2>&1 ); then echo 0 > "$d/rc"; else echo 1 > "$d/rc"; fi
+    }
+    vs_pool_start "$JOBS"
+    for tag in native ours; do
+        vs_pool_run one_leg "$tag"
+    done
+    vs_pool_wait
+    for tag in native ours; do
+        d="$WORK/$tag"
+        [ "$(cat "$d/rc" 2>/dev/null)" = 0 ] || {
             tail -5 "$d/out"; echo "FAIL: $tag leg did not complete"
             exit 1; }
     done
+    MAME_ROMPATH="$BUILD/rompath;$ROMDIR"; export MAME_ROMPATH
     python3 tools/check_pyron_blink.py "$WORK/native" "$WORK/ours" "$VAN" \
         "$LO" "$HI" --expect "$EXPECT" --expect-base "$EXPECT_BASE" || fail=1
     # THE SHEET (#291): with SHEET_OUT set, both legs, each proven on its own checksum log, at three frames of the

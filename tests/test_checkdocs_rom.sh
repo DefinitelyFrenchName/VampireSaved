@@ -76,7 +76,7 @@
 set -u
 REPO=$(cd "$(dirname "$0")/.." && pwd)
 cd "$REPO" || exit 1
-W=$(mktemp -d); trap 'rm -rf "$W"' EXIT INT TERM
+W=$(mktemp -d) || { echo "FAIL: test_checkdocs_rom — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0
 ok()  { echo "  ok   $1"; }
 bad() { echo "  FAIL $1"; fail=1; }

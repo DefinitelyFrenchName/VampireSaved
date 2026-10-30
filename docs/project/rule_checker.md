@@ -106,6 +106,21 @@ did not hold: a flagged figure sat on a reader's finding in one of those thirtee
 flags only and closed on this replay by the maintainer (`DECISIONS_HISTORY.md` "Ruled 2026-10-13 (14z-199) — #272").
 Gate: `tests/test_packet_check.sh`.
 
+**The action a run belongs to (#335, ruled 2026-10-29, 14z-212).** An ACTION is one thing put to the checker and
+every re-check of it until one passes. Since 14z-212 `prepare` records it in the run's `meta.tsv`: `action <the id of
+the action's first run>` on every run, and `redoes <run>` on a re-check prepared with `--redoes <run>`. `--redoes`
+takes a VIOLATED or VOID run of the same decision, or a packet marked `NOT-RUN.txt`; it refuses an OK run (a new
+packet after an OK run is a new action), a run of another decision and an unknown id, leaving no run directory.
+Without `--redoes`, a subject that reads like a re-check of an open action of the same session and decision prints a
+NOTE naming it; it never refuses. The ledger rows before 14z-212 carry no action, so `tools/rc_actions.py` links them
+by the first rule that holds (the maintainer: "Link, else wording"): the action `meta.tsv` records; else a run of the
+same decision that the subject names ("after run 682"); else the open action of the same session and decision whose
+subject shares at least half its words (ESTIMATED); else a new action. Calibration rows are not actions, a VOID run
+is never an action's first run, and a packet never run is no run — each shown apart. The session dashboard
+(`tools/session_metrics.py`) reads this as each session's first-run OK rate per decision and the questions VIOLATED
+on first runs, every question counted ("Every question"). Gates: `tests/test_rule_checker.sh` (PREPARE REDOES),
+`tests/test_session_metrics.sh`.
+
 **What goes in.** The packet is the decision kind, a SUBJECT, ONE claim
 sentence written by the working agent — what is claimed, what it rests on,
 and what was NOT tested — and the ARTIFACTS by repo-relative path: the diff,

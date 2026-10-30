@@ -1,0 +1,51 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent212/t330/closure2/closing_comment.md	e955e00d529c19157e1b30dbac1b7edcfffce969
+build/agent212/t330/closure2/ticket_row_330.tsv	a9a519271ccf5b4d33dc8e621febf6702bd93666
+build/agent212/t330/closure2/rulecheck_1364_reader_b.txt	7e4e3f60a1798930e8df53b7f4ce2fd1e5713516
+build/agent212/t330/closure2/notes.md	df7fb5d3d6445c5843ef11a634da2de7332981a5
+build/agent212/t330/closure2/press_states.tsv	af0fdbbb36d6153ba93c6f6a9bd7c4247fc60258
+build/agent212/t330/closure2/whiff_vs_grab.tsv	c294c2b5f3c89a5decc21f0c2779f7c3a0d00b6a
+build/agent212/t330/closure2/feas.tsv	6e0770c2178420eff963abc93746cb1e09b09f05
+build/agent212/t330/closure2/feas8.tsv	49c5fe5cb5c2dc3d679d4ffb6a32db857e41db5d
+build/agent212/t330/closure2/probe_FE_cmd_1.txt	6173b93ccfb8a8339a4171e18fb47929d18f9490
+build/agent212/t330/closure2/probe_AU_cmd_1.txt	0981d5224b0548b9fa75d34406e3442f3cad9d0d
+build/agent212/t330/closure2/inrange_feas_gen.py	a3e89bc517a60f3e29d31e6a9b9b476127b51f35
+build/agent212/t330/closure2/check_probe_gen.py	c039f0a50d6b89d209d9a6af8ebeebcbb06923bf
+build/agent212/t330/closure2/gated_sheet.py	1df0d7eb3262c25c851d035e74527c7e999fb386
+build/agent212/t330/closure2/es_sheet.py	cf5ffeb09925ee05e9138773ec5d4750566afeb9
+build/agent212/t330/closure2/gated_page1.png	7b9825a7792a842f534386ffb0c88b924ad5ccc4
+build/agent212/t330/closure2/gated_page2.png	82a33de0ed3d2eecd32272bc648e5fe07d78bad1
+build/agent212/t330/closure2/es_page1.png	433de9f0fcba3ffaa8caac50a8accada88ecc8f7
+build/agent212/t330/closure2/es_page2.png	3b505a8b70735e8694fe4ccde7dd02f63740cfb1
+build/agent212/t330/closure2/es_page3.png	d5eb1f05f6d96fb4ae5f1ef2fa928419649f131a
+build/agent212/t330/closure2/throw_recovery_command-lp.png	42912bc57159b3a667e9a5d63887ef75b747b0cb
+build/agent212/t330/closure2/gate_blob.txt	62a31ae284241f35115841fa1f175cfdc04a2b3c
+build/agent212/t330/closure2/verify_default.log	3e3db4b5ca8d2355b1ad4d45d165dc473c01cee3
+build/agent212/t330/closure2/verify_ga_v01.log	7046c127d26b67a5e9cfbadb37819ccf97923048
+build/agent212/t330/closure2/verify_ga_v0e.log	887b5122a2d4baca5538500f5a782e09511a8a74
+build/agent212/t330/closure2/verify_cmd_v01.log	0c75cfac2c502171476b173286c2921245c25696
+build/agent212/t330/closure2/verify_cmd_v0e.log	63dc64dafd35de456e1a3634e094eba545de6355
+build/agent212/t330/closure2/verify_mode_tick-early.log	bb537d8386c75c0502d4490ae0ca0ba63028fa95
+build/agent212/t330/closure2/verify_mode_lp-tech.log	a855bb5f401df3ed92309484e09c37835f3caaab
+build/agent212/t330/closure2/verify_mode_late-window.log	c68dbb195f16230434f5eab0e4a77f9c25dabf54
+build/agent212/t330/closure2/verify_mode_gated-whiff.log	3189c8d60e1e607f04dfa16d6b2fe44f03702715
+build/agent212/t330/closure2/verify_mode_es-exemption-dropped.log	53a380a1b3c08609a89fa621b5e8391fb487c7ae
+build/agent212/t330/closure2/freeze_cmd.log	6c589bed2ae91d58314c732d12faa283c9472709
+build/agent212/t330/closure2/vic_verify_air_v01.log	ed4e4eb62305aaf370e4d7b57b35dda6e4bae7ad
+build/agent212/t330/closure2/vic_air_hv0e.log	674a69bdf6e17e46fffa97921be3eb9a191e2125
+build/agent212/t330/closure2/vic_air_hv0e_counts.txt	bf121d633121ca0b93c32135035428f9f3357760
+build/agent212/t330/closure2/vic_cmd_v01.log	06812a9dd47bb1dbb008e1246182ac88b31feea4
+build/agent212/t330/closure2/vic_cmd_v0e.log	755718b064d632900b970e2ad0cce01ef1bf3c94
+build/agent212/t330/closure2/xc_tr_command.txt	4db39b7082dab192840de0dd03f44d7ccb5b3baf
+build/agent212/t330/closure2/xc_tr_air.txt	9c09aeaa24d3b9cefdbb590e41d636eaea8f35a7
+build/agent212/t330/closure2/test_crosscheck_229.log	7a0c2440abccb93ced98588fca3c38dae28a0738
+DECISIONS_HISTORY.md.lines-8606-8788 (lines 8606-8788 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-28 (14z-211) — #330: "actionable" is the first accepted input; a new gate on Victor", and the entries after it up to line 8788)	5961374aa79812b08d64dd74b95d075bd214488d
+docs/project/tables/community_crosscheck.md.lines-460-520 (lines 460-520 of docs/project/tables/community_crosscheck.md)	4d5f140831e4186e90dfb7b628d6b43cb89ac975
+docs/project/tables/community_crosscheck.md.lines-600-625 (lines 600-625 of docs/project/tables/community_crosscheck.md)	895e2b3b73cb3bec9da3cb222c5918d28ae3195d
+docs/game/engine_internals.md.lines-3613-3648 (lines 3613-3648 of docs/game/engine_internals.md)	19f11dc74b4c1cb1b1582edc6ec875e5ef8ab168
+docs/project/gotchas.md.lines-7724-7777 (lines 7724-7777 of docs/project/gotchas.md)	7b97d450d8573552005e317349b23d6d7e1c3c98
+tests/expected/PROVENANCE.md.lines-93-104 (lines 93-104 of tests/expected/PROVENANCE.md)	7d29340e97a3184ea8875960ae0ddb58139eff9a
+tests/audit_throw_recovery.sh	f7d3d107f6ecb491c6de2c6552056ccc8b33839d
+tools/throw_recovery_rigs.py	31dde507e33af53a571095ff529beafd2943b169
+tools/throw_recovery_sheet.py	6765999e8053f8ee62773f2e8271198c562a6d1c
+tools/crosscheck_229.py	277ba611baa36e04bdf49372966fa385dfe9a568

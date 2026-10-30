@@ -130,7 +130,7 @@ if [ -z "$POSLOG" ] || [ -z "$NEGLOG" ]; then
     [ -n "${ROMDIR:-}" ] || { echo "SKIP: ROMDIR unset"; exit 77; }
     command -v verilator >/dev/null 2>&1 || { echo "SKIP: verilator not installed"; exit 77; }
     [ -d "$REPO/$BUILD" ] || { echo "SKIP: no $BUILD"; exit 77; }
-    [ -n "$OUTDIR" ] || OUTDIR="$(mktemp -d)"; mkdir -p "$OUTDIR"
+    [ -n "$OUTDIR" ] || OUTDIR="$(mktemp -d)" || { echo "FAIL: test_mister_qsound_ext — mktemp -d failed (OUTDIR)"; exit 2; }; mkdir -p "$OUTDIR"
     case "$OUTDIR/" in "$REPO"/*) echo "REFUSING: OUTDIR inside the repo (rule 7)"; exit 2 ;; esac
     POSLOG="$OUTDIR/pos"; NEGLOG="$OUTDIR/neg"
     SCRATCH="${JTSIM_SCRATCH:-${TMPDIR:-/tmp}/vampire-saved-jtsim}"

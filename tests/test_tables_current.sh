@@ -52,7 +52,7 @@ PYR="${PYR:-build/pyron46}"  # re-pointed 14z-130 (M13 boot-title freeze) <- 14z
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: test_tables_current — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 
 for b in "$DON" "$HUI" "$PYR"; do

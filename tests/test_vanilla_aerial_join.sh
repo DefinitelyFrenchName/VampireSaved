@@ -62,7 +62,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 EXP=tests/expected/vanilla_aerial_slots.tsv
 IMG="${IMG:-build/out/vsavj_data.bin}"
-W="$(mktemp -d)"
+W="$(mktemp -d)" || { echo "FAIL: test_vanilla_aerial_join — mktemp -d failed (W)"; exit 2; }
 if [ -n "${KEEP:-}" ]; then mkdir -p "$KEEP"; trap 'cp -R "$W"/. "$KEEP"/ 2>/dev/null; rm -rf "$W"' EXIT; else trap 'rm -rf "$W"' EXIT; fi
 bad=0
 ok()  { echo "  ok    $1"; }

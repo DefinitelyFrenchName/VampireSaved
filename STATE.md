@@ -38,121 +38,156 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
-## Session 14z-211 — **#329 closed (the half circles' minimal inputs 6324 and 4123; #229's motion test re-rigged); #330's normal throws measured, gated and classified (the tech window 7 ticks; actionable = the first accepted input), its command throws next; #333 and #334 done in the tree, waiting for PILOT.**
+## Session 14z-212 — **#330, #333, #334 and #336 closed done on their rule-checker runs (the command throws measured, every family on three victims; the mktemp census read every `mktemp -d` form and 0 sites carry on, EXIT-trap order a stated limit filed as #337; #321's remainder, 61 gates 7,648 -> 4,163 s on ERIS; dash's write-error wording); #335 built (actions linked, first-run OK rate per decision); #267 unparked and built (the ledger as a public page, published at this close).**
 
 ### opened with
-The 14z-210 close's opener; the sweep CLEAN, `main` = `origin/main` at `432d5c7e`. The old local refs and the remote
-scratch cleared on the maintainer's word (`DECISIONS_HISTORY.md` "Ruled 2026-10-27 (14z-211) — the opener: …"): 20 refs
-deleted, 27 kept (their commits are cited by hash); PILOT 95% -> 71% used, ERIS 82 -> 33 GB. #334 set aside and #333
-deferred (the Mac is partly the maintainer's; heavy runs go to PILOT); #329 first. Working evidence:
-`build/agent211/t329/` (local).
+The 14z-211 close's opener; the sweep CLEAN, `main` = `origin/main` at `33f85438`; PILOT and ERIS reachable again. The
+maintainer agreed the order (#333/#334 first, #330 beside) and ruled the other low-priority tickets "can be considered to
+be done when a machine is available" (`DECISIONS_HISTORY.md`, 14z-212). Working evidence: `build/agent212/` (local).
 
-### (1) #329 — THE HALF CIRCLES' MINIMAL INPUTS; #229'S MOTION TEST RE-RIGGED; CLOSED
-From the command handlers (vsavj's motion trackers, every `jsr` to the helpers): the grabs' half circle back is the
-exact-match table 6 3 2 4, the forward 4 1 2 3 — so 6324 and 4123 are minimal; vs2's are the full five steps. The 14z-208b
-motion test's "624 grabs" was its rig: `replay.lua`'s ranges are inclusive and each direction was written end-to-start,
-so the boundary frames fed every diagonal. Re-rigged (each direction on its own frames, one shared-frame 624 kept as the
-control) and re-frozen on PILOT: 6214, 624, 4126, 4236 and 426 enter no command move on any of the 14 grabs (most come
-out as the normal throw); 6324, 6321, 63214, 4123, 41236 unchanged; the control reproduces the old row's line. Three runs
-at `5baef1d5` (freeze, clock freeze, verify PASS with every control fired; five control counts re-derived from the
-frozen data). The command-throw join leaves the motion events out (they would have read 12 rows as "strengths
-differ"); the cross-check page's verdicts render unchanged. Engine notes corrected (the half-circle section, the
-punch/kick table pairs, the retune example, the trackers' flag bits); gotcha "A REPLAY RANGE IS INCLUSIVE", with a
-census of every committed rig (the 360/720 rigs, harmless to the rotation tracker; the guard-cancel recipe's L+R).
-Rule-checker run `2026-10-27-1353` stopped the closure on Q2 (a feel conclusion on numbers): capture sheets of the
-re-rigged events, nine tiles each, were put to the maintainer — *"Yes, they do"* — and the capture became the instrument
-`tools/command_throw_sheet.py` (its rerun on PILOT reproduced all 90 snapshots byte for byte). Runs 1354-1359 each found a
-real gap (Aulbath's 6214HK unshown, the thirteen 6324 rows whose INPUT changed, a vs2 scan that skipped helpers, a
-counting slip, code-derived 360 claims): each answered by a new capture the maintainer confirmed or a new measurement,
-and the 360 statements cut back to what was measured. Closed on run `2026-10-27-1360` (OK).
-The commit's tier then failed `test_tmp_hygiene` on the new tool (a `mkdtemp` never removed); fixed with an exit cleanup and
-re-verified on PILOT at the final blob: 90 snapshots byte-identical to the confirmed sheets, no work directory left
-behind (`build/agent211/t329/tool_reverify.txt`).
+### (1) #333 AND #334 — THE PILOT RE-TRACE, ERIS'S TIMINGS
+**The concurrent-controls re-trace** (PILOT, a fresh clone of the working tree as a commit-tree, `6829e446`): 46 static and
+22 emulator gates SAFE, none SHARED. Four first read HOLLOW: the clone setup skipped build dirs that hold tracked files
+(`hui30`, `merged1`: no `rompath/`) and never initialised `emu/jtcores`; topped up and re-traced SAFE (gotcha "A FRESH
+CLONE'S `build/` IS NOT THE MAIN TREE'S").
 
-### (2) #330 — THE NORMAL THROWS' RECOVERY AND THROW TECH MEASURED, GATED AND CLASSIFIED; THE COMMAND THROWS NEXT
-On vsavj at speed level 0 (one engine pass per frame), RNG pinned. **The tech window is 7 engine ticks**:
-- all 42 ground throws on three victims;
-- 26 of 28 air throws (Lei-Lei's air throw has no tech);
-- the pilot's window was the same at level 6.
+**#334 item 2** ("All 62", 14z-211; its entry was never written and is recovered verbatim from 14z-211's transcript): each
+gate alone on ERIS, HEAD's script against the #334 tree, one at a time. 61 edited gates: **7,648 s -> 4,163 s, every verdict
+PASS on both sides, none slower by more than 5 s**; `test_release_binaries` ruled out (each step needs the one before).
+`test_wide_profile` first FAILed on both sides on a fresh clone's patch mtime (gotcha above), re-timed after `touch -r`:
+352 -> 122 s. `audit_id_writers` had been edited but left out of the batch reports; timed: 174 -> 59 s.
+`operations.md` «WHAT #321 MEASURED AND RULED OUT».
 
-**ACTIONABLE IS THE FIRST ACCEPTED INPUT**, the maintainer's *"First accepted input (Recommended)"*, measured because no
-engine state marks it:
-- the mode byte `+0x05` back to 00 is up to 11 ticks early on 22 of 42 ground throws;
-- standing neutral is up to 25 ticks late on 24 of 168 cases.
+**#334 closed done** (run 2026-10-29-1378 OK). Run 1376 had stopped it (Q1, Q4, Q5):
+- **Q5:** the Mac leg's ruling was a gloss. The picked option's own text is now quoted: *"Rule out the Mac-under-load leg
+  except parity, because the Mac runs no other knob gate in any tier."*
+- **Q1:** `audit_guard_cancels` had FAILed at both settings on PILOT (its table is absent there). On the Mac it PASSes at 2
+  and 6. The load tier's five FAILs are named.
+- **Q4:** could an edited gate still FAIL when its pool loses a run? Each of the 61 was run on a Mac snapshot, as is and
+  with the pool's first run dropped. 59 FAILed; `audit_type_writes` and `audit_id_writers` PASSED (each globbed the
+  traces it found). Both now name their legs and fail on a missing one, so all 61 fail.
+- Kept as **`tests/audit_pool_drop.sh`**, with the hook `VS_POOL_DROP_FIRST` in `tests/lib/jobs.sh`. It is ondemand under
+  a new reason keyword `harness:`; the maintainer: **"Ondemand, new 'harness:' (Recommended)"**.
+- New gotcha: "A POOLED GATE THAT GLOBS ITS OUTPUTS CANNOT SEE A LOST RUN".
 
-The pilot's mode-byte rule had been generalised from one throw and was refused there. The ticks were found by
-acceptance scans and are re-proved by acceptance at A-1 and A. An air throw's recovery moves with its height.
+### (2) #330 — THE COMMAND THROWS RE-MEASURED; THE VICTIMS; CLOSED DONE
+**24 grabs have no whiff** (the maintainer: "No whiff (Recommended)", then "Yes, no whiff (Recommended)" for the 360s): the
+632[4] / 6324 grabs of AU FE GA JE MO QB ZA and BI/DE's 360 MP/HP start their move only when the throw check
+(CPU:$029406) passes; far, or at contact on a jumping Victor (4 timings), the input is the plain normal or a jump. The
+four ES grabs' own seq 0x12 is their whiff ("Yes, it is the whiff"). My "20, not 28" to the maintainer was wrong (28 of 78
+far whiffs were three kinds) and was corrected before the next question. Cryptic Needle's far whiff is its own move.
+**The gate**: CMD_GATED, CMD_ES_WHIFF; a whiff must start the seq its input starts when it connects and never hold; new
+controls gated-whiff, es-exemption-dropped, whiff-at-contact; the command family in the default run; the script blob in
+every log header. **Victims**: air on Demitri (28) verified, Lilith (20: AU GA JE VI never hold on her, left out), command on
+Demitri (78) and Lilith (76). **Classified**: command whiffs sheet = ours +1 on 32 of 41; the air tech against the victim
+range (Bulleta inside it). **Captures** read: ES/360 pages, gated pages ("Yes, it stands"), the command-whiff LP page ("Yes").
+Rule-checker runs 1364 (Q1 Q2 Q4), 1365 (Q1 Q4), 1369 (Q1) stopped it, each answered; **1370 OK**. Two edits to the gate
+while a run read it broke that run ([MJC-54]; re-run on the unchanged script both times).
 
-**The new gate**, `tests/audit_throw_recovery.sh` with `tools/throw_recovery_rigs.py`, on demand:
-- ground 42 and air 28 events on Victor as victim, about 2.5 min on the Mac;
-- frozen sets on demand: the ground throws on Demitri and Lilith, the air throws at three more heights;
-- the ticks live outside the tree (#319), their hashes in it;
-- controls tick-early, lp-tech and late-window fired in the gate and as modes.
+### (3) #333 — THE CENSUS'S REACH, ROUND BY ROUND; CLOSED DONE
+Run 1366: the census read only line-start `X="$(mktemp -d …)"`; widened (else arms, `[ -n ] ||`, case arms, inline
+arguments, after `;`, `-dt`), an arithmetic `<<` no longer read as a heredoc; 10 more sites guarded. The maintainer: "Finish
+it now (Recommended)". Run 1368: `export`/`readonly` never guarded, `|| true` not a guard, `set -e` by position (one real
+site found: `test_rompath_reject.sh`, before its `set -eu`). Run 1371: here-strings, quoted `<<`, `(( << ))`, backticks,
+`--directory`, continuations, `||` arm scoping, `[ -n ]` from code; the maintainer: "Fix when back (Recommended)". Run 1374
+(NOT RUN: the Mac slept mid-reader; its findings taken): a mktemp not first in its substitution, quoted `set -e`.
+- **Rounds six to eight** (runs 1379, 1380, 1382): quoted `exit`, `return` outside a function, a subshell's `set -e`, the
+  escaped-quote test, `|| (exit 2)`, `set ±o errexit`, a conditional `set -e`. The maintainer: **"Fix all four now"**,
+  **"Fix both forms, name (c)"**, then **"Fix these + state the limit"**: the census is a lint over shell text, not an
+  interpreter.
+- **The record, measured** (`rounds_census.txt`: today's census over each round's tree): 120 unguarded before #333
+  (`33f85438`), 11 after the first-round edits, 1 after run 1366's fixes, 0 from run 1368's on. Two questions to the
+  maintainer had stated it inexactly ("none ever occurred", "0 real instances"); both corrected in `DECISIONS_HISTORY.md`
+  and asked again on the exact record: **"Ruling stands, fix record"**, then **"Stands, use exact wording"**.
+- **Runs 1385 to 1403 found gaps in the EVIDENCE**, each measured and answered:
+  - the mtime search's idioms widened twice; still `test_wide_profile` alone;
+  - a `-d` after a nested substitution hides from the census and its reach check alike: 0 on the tree, named;
+  - the reach check listed files with `git ls-files "tools/*.sh"`, whose `*` matches `/`. That exposed the **two real
+    unguarded sites outside the census**: `tools/agent/probe_agents.sh` and `probe_hooks.sh`. The maintainer: **"Guard
+    both, name scope"**. Both guarded and checked live; every evidence script re-run over the census's own file list.
+  - **EXIT-trap order** (a trap installed before a guarded site runs on the guard's stop): six successive readings, the
+    last order-free (`rm_any.py`: every `rm` of the variable with a suffix, 183 pairs, 11 trap-reachable, 0 real), each
+    with a planted control, and each stopped on a premise of its own. The maintainer: **"State it as a limit + ticket"** —
+    a stated limit, its readings best-effort evidence, every premise named; **#337 filed** to have the census check it.
+- **Closed done** on run 2026-10-30-1404 OK (22 runs; the closing comment and row in `build/agent212/t333/closure/`).
+  Today: 0 unguarded of 487 read; thirty-seven unguarded and twenty guarded known answers; `test_tmp_hygiene` re-traced
+  on PILOT after each round of its own changes.
 
-**Classified** on the cross-check page: ground recovery EXACT on 17 of 21, the ground throw tech EXACT on 10 and inside
-the three-victim range on 5, the air rows against the height range.
+### (4) #335 — THE LEDGER'S ACTIONS: FIRST-RUN OK RATE, AND WHICH QUESTION FAILS
+Filed at the maintainer's word (the side chat's analysis recorded as a hypothesis, not agreed), then built while the Mac
+was off the network.
+- **The rulings:** the first run by **"Link, else wording"** (with *"Is it possible to implement an action id in the
+  future?"*, built now), **"Every question (Recommended)"** and **"Excluded, shown apart (Recommended)"**.
+- **`tools/rc_actions.py`** decides which runs are one action: the action `meta.tsv` records, else a same-decision run
+  the subject names, else wording (ESTIMATED).
+- **`prepare --redoes <run>`** and an `action` line in every run's `meta.tsv`; a reworded re-check without it gets a NOTE.
+- **The dashboard collector** emits per-session actions, first-run OK and rate per decision, questions on first runs,
+  packets not run, and `actions.json`.
+- **Measured over the whole ledger:** 337 actions, 21 OK on their first run. On first runs Q1 264 and Q4 222 lead;
+  Q2 35 is the rarest.
+- **Gates:** `test_session_metrics` (three new controls) and `test_rule_checker` (PREPARE REDOES, control `ok-redone`).
+- **At the close:** `actions.json` uploaded as a fifth dataset (`datasets/actions`); the dashboard's page has no panel
+  reading it yet, so #335 stays open (NEXT_SESSION START HERE).
 
-**THE CAPTURES** (`tools/throw_recovery_sheet.py`, rule-checker run `2026-10-28-1361` Q2) were read by the maintainer
-(`DECISIONS_HISTORY.md` "Read 2026-10-28 (14z-211) — #330"):
-- the techs show TECH. HIT;
-- Giga Shock is a tech, not the escape I had written;
-- the air page was redrawn from the jump;
-- the LP pairs now carry each tile's dumped state, which flips exactly at A (the picture lags 2-4 frames). *"Yes, commit
-  them"*.
+### (5) #267 UNPARKED AND BUILT — THE SESSION LEDGER AS A PUBLIC PAGE
+The maintainer: **"Unpark #267 and build it"**; *"Claude hosting comes with limitations, including on visibility that
+will become a problem."*
+- **Rulings:** **"gh-pages is fine"** (their personal website the alternative), **"All but your own figures"**, **"Keep
+  both for now"**.
+- **`tools/ledger_page.py`:** one self-contained page, the datasets gzip-embedded, no fetch; checked by hand in headless
+  Chrome over the real 61 sessions, 275 KB.
+- **`tools/publish_ledger.sh --push`:** one orphan commit on `gh-pages`, force-pushed under a lease.
+- **The close:** a new step `ledger-page` after main's push. **Gate:** `tests/test_ledger_page.sh` (two controls).
+- **Waiting on the maintainer:** switch Pages on for `gh-pages` (Settings → Pages; the session account has no admin).
+  The first publish is this close's.
+- **Rewritten for its audience.** The maintainer: *"the audience was people interested in how the self-checking swarm
+  performs … the ledger should be understandable"*; then **"yes to all of that"** for three additions.
+  - **For a newcomer:** what the swarm is, how a check works, a glossary, every question's own text (read from the
+    spec's checklists).
+  - **Figures:** headline tiles, the trend per session, time to pass in hours (from each run's "prepared run"
+    transcript result), and which questions fail together.
+  - **Five worked examples** (`tests/rulecheck/catches.tsv`), quoted from their runs.
+  - **Gates:** `test_ledger_page` (three controls); `test_session_metrics` (seventh control, `same-run-hours`).
+- **#129 and the guard:** #129 parked (and kind `evolution`) as its GitHub labels say. `tools/tickets.py check` now
+  compares `parked` with the GitHub label (control `parked-disagrees`); its first run found #129 and #267.
+- **Hosting** (the maintainer: **"both is good"**; **"At the close"**; **"The close uploads it"**):
+  - GitHub Pages from `gh-pages`, and alexrichard.org/vs-swarm-ledger/.
+  - The page is now three files, so the site's strict policy serves it (`tools/ledger_csp_check.sh`: 0 refusals under
+    it).
+  - `publish_ledger.sh --own-site` rsyncs it there.
+  - **The maintainer:** set `DEPLOY_TARGET` (and `DEPLOY_PORT`) in `~/.zshrc`, key-based ssh from the Mac, and switch
+    Pages on after the first push.
 
-**THE COMMAND THROWS ARE NOT FROZEN** (*"Commit ground+air, rest next"*): the state captions showed that the wide
-"whiff" was a plain normal on 28 of 82 events. That is the range-checked grabs' input out of range, and it is
-re-measured in range next session. Also next session:
-- the air and command throws on Demitri and Lilith (the first runs failed: `build/agent211/t330/air_victims.out`,
-  `cmd_victims.out`);
-- #330's closure on a fresh check. #330 stays OPEN.
+### (6) BACK ON THE NETWORK — THE RE-TRACES; #336 FOUND AND FIXED
+- **Seven static gates re-traced on PILOT** (tree `e1b87efa`, 64 control runs, SAFE, every run HONOURED):
+  `test_claim_lint`, `test_emulator_runner`, `test_packet_check`, `test_rule_checker`, `test_session_metrics`,
+  `test_tickets`, `test_tmp_hygiene`.
+- **PILOT's pre-tier** (on `293c988d`) was NOT GREEN:
+  - the expected generated indexes and tickets page;
+  - `test_jtsim_scratch_heal`: the trace clone's `fx68k` submodule was never initialised (the clone trap);
+  - **`test_static_runner`, section 32**, on unchanged code. It reproduced on today's tree.
+- **#336, filed and fixed.** #327's premise check counted only bash's `write error: Broken pipe`. Ubuntu's `sh` is
+  dash, which writes `printf: I/O error`, so the section FAILed on every Linux host since 14z-209.
+  - The fix counts either wording, and the gate now passes on the Mac and on PILOT.
+  - New platform gotcha: "A SHELL'S WRITE-ERROR TEXT IS ITS OWN".
+  - Its row was re-traced on PILOT (tree `ad206269`).
+  - **Closed done** (run 2026-10-29-1393 OK). Runs 1388, 1390 and 1391 stopped it on the evidence: the traced
+    script's blob not shown, the PILOT clone not fresh, the gate's own `sh` not shown. Answered with
+    `pilot_r6_blob.txt`, a fresh-clone run with its status recorded (`test_static_runner_pilot3.log`) and
+    `pilot_sh_env.txt` (`/usr/bin/sh` -> dash in that run's environment).
 
-Engine notes: `engine_internals.md` "THE THROW TECH WINDOW, …". Gotchas paid: the state is not the input; the first
-event's stage x; timing in ticks; out of range a grab's input is a normal. Rulings: `DECISIONS_HISTORY.md`, the 14z-211
-#330 entries. Working evidence: `build/agent211/t330/` (local).
-
-### (3) #333 AND #334 — DONE IN THE TREE, NOT COMMITTED: THE PILOT RE-TRACE WAITS
-**What is done, uncommitted in the working tree:**
-- #333's `mktemp -d` guards;
-- #334 item 2: `tests/lib/jobs.sh` and about 60 pooled gates, every knob named `JOBS`;
-- #334 item 1's PILOT timings, recorded in `operations.md` «WHAT #321 MEASURED AND RULED OUT».
-
-**Why it is not committed:** the Mac moved to another network mid-session (10.200.0.89), and PILOT and ERIS became
-unreachable. The concurrent-controls lists' rows for the 46 static and 22 emulator gates whose scripts changed must be
-re-traced on PILOT (`build/agent211/t334/cc_static.txt`, `cc_emu.txt`), so `test_controls_concurrent` stays red on the
-whole tree. The maintainer: *"Commit #330 only (Recommended)"*. Only `tests/lib/jobs.sh` rides this commit, because the
-new gate sources it.
-
-**Still to do next session:**
-- the re-trace on PILOT;
-- ERIS's before/after timings for item 2;
-- `test_mame_parity` under a tier's load on the Mac;
-- read ERIS's #333 release-shape run: it finished in the maintainer's WSL window, 417 PASS and 4 SKIP, the SKIPs host
-  environment (no release binaries there, no `pw-record`, no `podman`); copied to `build/agent211/t333/eris/results.tsv`;
-- then one strict tier, the commit, and the two closures.
-
-### CLOSE (14z-211, 2026-10-28)
-Driver `build/agent211/close/` (`--prev build/agent211/tier/tier_results2.tsv`, the GREEN tier of record for `e68f8842`).
-**What the commit carries** (the maintainer: *"Commit #330 only"*, then *"Commit ground+air, rest next"*):
-- #330's normal throws: the gate, tool, sheets, frozen sets, page and records;
-- `tests/lib/jobs.sh`, which the gate sources;
-- this sitting's records.
-
-**What it does not carry:** #333's and #334's gate edits, which stay in the working tree for the PILOT re-trace (3), and
-the command family's and the victims' unfinished sets (`build/agent211/t330/held/`).
-
-**The rule-checker before landing the expectations:**
-- run `2026-10-28-1361` stopped #330's closure (Q1, Q2, Q4); the captures followed;
-- run `-1362` could not be recorded: its first pair of readers died on a network error;
-- its readers' findings were still answered: the sheet's victim captions, the stale notes, the unprinted height;
-- run `-1363` (Q1, Q4) was resolved by naming the stage position and correcting the Demitri air run, re-running the
-  modes on the landed gate, and adding the victim-range control.
-
-`origin/main` was fetched before staging. The generated indexes were regenerated in a clean worktree of the staged tree,
-and the bookkeeping gates ran there. Steps: sections (1)..(3); next-session (the 14z-210 opener to
-`docs/NEXT_SESSION_HISTORY.md`); rollover (the 14z-210 group, 46 lines, to `STATE_HISTORY.md` with its ledger line);
-indexes; dashboard (14z-163..14z-211, 2,066 figures, 0 unclassed; datasets versions 20, 20, 21, 20). The tier's results:
-`build/agent211/close/tier_results.tsv`, the next close's `--prev`.
+### CLOSE (14z-212, 2026-10-30)
+Driver `build/agent212/close/` (`--prev build/agent211/close/tier_results.tsv`). Before it, each ticket closed on GitHub
+with its comment, on its own rule-checker run: #330 (`2026-10-29-1370`), #334 (`-1378`), #336 (`-1393`), #333
+(`2026-10-30-1404`); #337 filed; `origin/main` fetched before staging (nothing new).
+Steps: sections ((1)..(6)); next-session (the 14z-211 opener to `docs/NEXT_SESSION_HISTORY.md`); rollover (the 14z-211
+group, 115 lines, to `STATE_HISTORY.md` with its ledger line); indexes (the archives', the ticket page, the gotchas index;
+the GitHub snapshot refreshed, `tools/tickets.py check` PASS); dashboard (14z-163..14z-212, 2,969 figures, 0 unclassed;
+datasets versions 21, 21, 22, 21 and the new `actions` 1) — done. The tier's results:
+`build/agent212/close/tier_results.tsv`, the next close's `--prev`.
+The first tier was NOT GREEN (165 PASS, 4 FAIL): the gate index, gate coverage and annotations pages not regenerated,
+and `build/ledger_page/` (`tools/publish_ledger.sh`'s output) unclassed. Regenerated in a clean worktree of the staged
+tree, `ledger_page` classed `scratch` in `tests/expected/build_dirs.tsv`, and the tier re-run on the red run's results.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings

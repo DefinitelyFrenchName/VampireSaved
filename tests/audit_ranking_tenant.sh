@@ -51,7 +51,7 @@ RPL=tests/replays/26_don_arcade_mash.rpl
 [ -n "${ROMDIR:-}" ] || { echo "SKIP: ROMDIR not set"; exit 0; }
 [ -x "$MAME_BIN" ] || { echo "SKIP: no WIDE MAME binary at $MAME_BIN"; exit 0; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no $BUILD/rompath/vsavjw.zip"; exit 0; }
-W="${OUT:-$(mktemp -d "${TMPDIR:-/tmp}/ranktenant.XXXXXX")}"; mkdir -p "$W"
+W="${OUT:-$(mktemp -d "${TMPDIR:-/tmp}/ranktenant.XXXXXX")}" || { echo "FAIL: audit_ranking_tenant — mktemp -d failed (W)"; exit 2; }; mkdir -p "$W"
 [ -n "${OUT:-}" ] || trap 'rm -rf "$W"' EXIT
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 FORCE="1400:ff8782:13;1450:ff8782:13;1500:ff8782:13"

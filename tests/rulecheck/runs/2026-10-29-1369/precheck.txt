@@ -1,0 +1,8 @@
+  FLAG D-ABSOLUTE: Actionable is the maintainer's *"First accepted input"*: the first tick a one-frame LP starts the normal, the tick before never.  [build/agent212/t330/closure3/closing_comment.md]
+  FLAG D-ABSOLUTE: - **The tech window is 7 engine ticks** on every ground throw (three victims) and on 26 of 28 air throws (Lei-Lei's air throw has no tech).  [build/agent212/t330/closure3/closing_comment.md]
+  FLAG D-ABSOLUTE: Of the command throws, probed with the victim's back + HP and back + HK at 1 and 7 ticks into the hold, only Victor's Giga Shock techs (the game shows TECH. ...  [build/agent212/t330/closure3/closing_comment.md]
+  FLAG D-ABSOLUTE: - **The command throws' whiff.** 24 grabs have NO whiff (the maintainer's *"No whiff"*): the 632[4] / 6324 P and K grabs of Aulbath, Felicia, Gallon, Jedah, ...  [build/agent212/t330/closure3/closing_comment.md]
+  FLAG D-ABSOLUTE: Each is required to start the move its own input starts when it connects, and never to hold.  [build/agent212/t330/closure3/closing_comment.md]
+  FLAG D-ABSOLUTE: - **Other victims.** Events whose control never holds on a victim are left out of that victim's set, as heights that do not throw are: on Lilith the air thro...  [build/agent212/t330/closure3/closing_comment.md]
+  FLAG D-ABSOLUTE: - The command throws' tech with any other input or tick: only back + HP and back + HK at k = 1 and 7.  [build/agent212/t330/closure3/closing_comment.md]
+packet_check: 7 flag(s): D-ABSOLUTE 7

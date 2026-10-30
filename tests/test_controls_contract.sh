@@ -30,7 +30,7 @@ set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"
 vs_ctl_mode "$0"
-T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
+T="$(mktemp -d)" || { echo "FAIL: test_controls_contract — mktemp -d failed (T)"; exit 2; }; trap 'rm -rf "$T"' EXIT INT TERM
 rc=0; ok() { echo "  ok: $*"; }; bad() { echo "  FAIL: $*"; rc=1; }
 
 mkgate() {  # mkgate <path> <header lines...>  — a stub whose header is the argument list

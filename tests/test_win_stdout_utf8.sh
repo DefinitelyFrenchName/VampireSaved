@@ -39,7 +39,7 @@ set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 TOOLS="tools/bundle_win_dlls.py"
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
+W="$(mktemp -d)" || { echo "FAIL: test_win_stdout_utf8 — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT
 fail=0
 
 # counts <tool path> -> "<utf8 em dashes> <0x97 bytes>"

@@ -39,7 +39,10 @@ Usage:
   python3 tools/rulecheck.py fixtures
   python3 tools/rulecheck.py prepare --decision KIND --subject TEXT --claim "..." \
           --artifact PATH[:FIRST-LAST] ... --session 14z-N [--model NAME] [--id ID] [--cites RUN-ID ...]
-          [--deliverable PATH[:FIRST-LAST] ...]
+          [--deliverable PATH[:FIRST-LAST] ...] [--redoes RUN-ID]
+                                       # --redoes (#335, ruled 2026-10-29): the run this packet re-checks; meta.tsv records
+                                       # `action` (the action's first run) on every run, and `redoes`; without it a subject
+                                       # that reads like a re-check of an open action gets a NOTE
                                        # every evidence packet is run through tools/packet_check.py first (#272): its
                                        # FLAGS are printed and kept as the run's precheck.txt; it never refuses
                                        # --cites (#217, ruled 2026-10-05): a MERGE packet cites each fork's run; prepare
@@ -582,6 +585,36 @@ def cmd_prepare(a):
             die(f"no positive {family} fixture CALIBRATED under the current checklist to plant — run `prepare --calibrate <fixture>` first")
         control_name = eligible[len(ledger_rows) % len(eligible)]
 
+    # THE ACTION (#335, ruled 2026-10-29): a run and its re-checks are one action, named by the id of its first run and
+    # recorded in meta.tsv. --redoes names the run this one re-checks (a VIOLATED or VOID run, or a packet marked
+    # NOT-RUN); without it the run starts a new action, and a subject that reads like a re-check is pointed out.
+    action = None
+    if not a.calibrate:
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        import rc_actions
+        if a.redoes:
+            rd = root / RUNS / a.redoes
+            prev = next((r for r in ledger_rows if r["id"] == a.redoes), None)
+            pm = read_kv(rd / "meta.tsv") if (rd / "meta.tsv").is_file() else {}
+            if not rd.is_dir():
+                die(f"--redoes {a.redoes}: no run directory {RUNS}/{a.redoes}")
+            if prev is None and not (rd / "NOT-RUN.txt").is_file():
+                die(f"--redoes {a.redoes}: it has no ledger row and no NOT-RUN.txt — record it, or mark it not run, first")
+            if (prev or pm).get("decision") != decision:
+                die(f"--redoes {a.redoes}: it checked a {(prev or pm).get('decision')}, not a {decision} — a different action")
+            if prev and prev["verdict"] == "OK":
+                die(f"--redoes {a.redoes}: it is OK — a new packet after an OK run is a new action; prepare it without --redoes")
+            action = pm.get("action") or rc_actions.link(ledger_rows).get(a.redoes, (a.redoes, ""))[0]
+        else:
+            links = rc_actions.link(ledger_rows, rc_actions.metas(str(root), ledger_rows))
+            last = {}
+            for r in sorted(ledger_rows, key=lambda r: rc_actions.run_order(r["id"])):
+                if r["id"] in links and r["session"] == session and r["decision"] == decision:
+                    last[links[r["id"]][0]] = r
+            for aid, r in last.items():
+                if r["verdict"] in ("VIOLATED", "VOID") and rc_actions.similarity(subject, r["subject"]) >= rc_actions.SIMILAR:
+                    print(f"NOTE (#335): this subject reads like a re-check of action {aid} (its last run {r['id']}, "
+                          f"{r['verdict']}); if it is one, prepare it again with --redoes {r['id']}")
     if not a.calibrate:   # #258: an artifact no reader can read whole is refused BEFORE the run directory exists
         with tempfile.TemporaryDirectory() as _pre:   # (a MISSING artifact stays the early check's: control late-validate)
             stage_artifacts(root, [x for x in a.artifact if (root / x.partition(":")[0]).is_file()], Path(_pre),
@@ -648,7 +681,8 @@ def cmd_prepare(a):
         + (f"untied_ok\t{a.untied_ok}\n" if getattr(a, "untied_ok", None) else "")
         + ("" if a.calibrate else f"precheck\t{pc_summary}\n")
         + (f"deliverables\t{' '.join(a.deliverable)}\n" if getattr(a, "deliverable", None) else "")
-        + (f"cites\t{' '.join(c for c, _, _, _ in cited)}\n" if cited else ""))
+        + (f"cites\t{' '.join(c for c, _, _, _ in cited)}\n" if cited else "")
+        + ("" if a.calibrate else f"action\t{action or rid}\n" + (f"redoes\t{a.redoes}\n" if a.redoes else "")))
     if not a.calibrate:
         (rdir / "precheck.txt").write_text("\n".join(pc_lines + [f"packet_check: {pc_summary}"]) + "\n")
     print(f"prepared run {rid}")
@@ -1522,6 +1556,7 @@ def main():
     p.add_argument("--artifact", action="append")
     p.add_argument("--calibrate"); p.add_argument("--session"); p.add_argument("--model"); p.add_argument("--id")
     p.add_argument("--cites", action="append", metavar="RUN-ID", help="#217: a fork's run this merge packet cites")
+    p.add_argument("--redoes", metavar="RUN-ID", help="#335: the run this packet re-checks (its action carries over)")
     p.add_argument("--untied-ok", help="#185 item 3: why an untied universal/definite stands (recorded in meta.tsv)")
     p.add_argument("--deliverable", action="append", metavar="PATH[:A-B]",
                    help="#272: an --artifact that IS what the packet puts forward (a report, a row, a comment): packet_check reads it too")

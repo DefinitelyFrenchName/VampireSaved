@@ -20,7 +20,8 @@ question about a ticket ONE source of truth: the LIST is
 `docs/project/tickets.tsv` (its header is the spec of record), the STORY is the
 GitHub issue, the FACTS are the subject documents, and what a session did is
 STATE. This tool makes the list checkable: every saved GitHub issue has exactly
-one row, a row's open/closed agrees with GitHub's, and every row answers the
+one row, a row's open/closed agrees with GitHub's (and an open row's `parked`
+with the issue's `parked` label, since 14z-212), and every row answers the
 four local questions — how to reproduce it, what was decided, what was learned,
 what went wrong — with links that RESOLVE or an explicit `none`.
 
@@ -203,6 +204,11 @@ def check(tree, index, snapshot, debt):
         elif st in OPEN_STATUSES + CLOSED_STATUSES and (st in OPEN_STATUSES) != (g["state"] == "OPEN"):
             fails.append(f"{where}: status `{st}` but the issue is {g['state']} on GitHub — "
                          f"closed means nothing is left to do; reconcile one side")
+        elif st in OPEN_STATUSES and (st == "parked") != ("parked" in g.get("labels", "").split(",")):
+            # 14z-212: #129 and #267 were parked by their GitHub label while their rows still read `open`, unseen
+            # because only open/closed was compared
+            fails.append(f"{where}: status `{st}` but the issue is {'' if 'parked' in g.get('labels', '').split(',') else 'not '}"
+                         f"labelled parked on GitHub — parked is the label's; reconcile one side")
         for c in ANSWERS:
             v = r[c]
             if v in ("none", DEBT_MARK):

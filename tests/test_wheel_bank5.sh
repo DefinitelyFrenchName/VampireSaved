@@ -16,7 +16,7 @@
 #   replay.lua's checksum at the trace's last frame, and the trace leg's game clock RAM:$FF8080 equals the
 #   reference leg's. One replay, so the staging reference leg IS that replay's reference: the trace leg is held
 #   to it live rather than to a frozen value.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lib/decrypt_cache.sh
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lib/decrypt_cache.sh tests/lib/jobs.sh
 #   tests/lib/tenant_build.sh tests/lua/obj_record_bank_trace.lua tests/lua/replay.lua
 #   tests/replays/ tools/build_donovan.sh tools/check_wheel_bank5.py tools/gfx_tiles.py
 #   tools/run_mame.sh tools/setup_mame.sh tests/lua/emu_clock.lua
@@ -49,7 +49,7 @@
 #      fmt-2 handler sees OBJ $FFB800 with bank word 0x3000 and A0 at
 #      the relocated record (obj_record_bank_trace, replay 36).
 #
-# Usage: ROMDIR=... tests/test_wheel_bank5.sh [outbase]
+# Usage: ROMDIR=... [JOBS=N] tests/test_wheel_bank5.sh [outbase]
 #   outbase: an existing variant-id WIDE build (default: builds fresh at
 #   --tenant-id 0x13 --profile cps2-wide-v1).
 # Env: MAME_WIDE_BIN overrides the WIDE MAME binary
@@ -208,14 +208,44 @@ PY
     anc() { awk '{for (i = 1; i < NF; i++) if ($i == "anchor") {print $(i + 2); exit}}' "$WORK/$1.align" 2>/dev/null; }
     TCLOCK=""; vs_ctl_is drift-clock && TCLOCK="INSTR_CLOCK=frame_done"
     RCLOCK=""; vs_ctl_is first-frame-skip && RCLOCK="INSTR_CLOCK=skip_first"
+    rl_leg() {
+        CHECKSUM_OUT="$WORK/rl/cks.log" REPLAY="$REPO/tests/replays/36_pick_tenant_cell.rpl" \
+        MAME_SANDBOX="$WORK/sbx_rl" MAME_BIN="$WIDE_BIN" MAME_ROMPATH="$OUTBASE/rompath;$ROMDIR" \
+            sh -c 'mkdir -p "$(dirname "$CHECKSUM_OUT")" && tools/run_mame.sh vsavjw -autoboot_script tests/lua/replay.lua' \
+            > /dev/null 2>&1 || true
+    }
+    # run_stab (3b's runs) is defined here so the pool below can start them with the others.
+    run_stab() {  # run_stab <tag> <replay> <dumpspec> <frames>
+        mkdir -p "$WORK/$1"
+        DUMPS="$3" CHECKSUM_OUT="$WORK/$1/cks.log" FRAMES="$4" \
+        REPLAY="$REPO/tests/replays/$2" \
+        MAME_SANDBOX="$WORK/sbx_$1" MAME_BIN="$WIDE_BIN" \
+        MAME_ROMPATH="$OUTBASE/rompath;$ROMDIR" \
+            tools/run_mame.sh vsavjw \
+            -autoboot_script tests/lua/replay.lua > /dev/null 2>&1 || true
+    }
+    # JOBS (#334 item 2, 14z-211): the section's seven runs — trace, ref, the replay.lua yardstick, the ctl_drift and
+    # ctl_skip control legs and 3b's stab and mash — are independent: every input is fixed before any of them runs,
+    # and each writes only its own $WORK/<tag>.{txt,align} or $WORK/<tag>/ and its own sandbox $WORK/sbx_<tag>. So
+    # they go through tests/lib/jobs.sh's pool here, JOBS at a time (default min(4, CPUs/6)), and the verdicts below
+    # read their artifacts in the serial order. A control mode stops after the first three verdicts, so it runs only
+    # those three legs, as it did serially.
+    . "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+    vs_pool_start "$JOBS"
     # shellcheck disable=SC2086
-    trace_leg trace $TCLOCK
+    vs_pool_run trace_leg trace $TCLOCK
     # shellcheck disable=SC2086
-    ref_leg ref $RCLOCK
-    CHECKSUM_OUT="$WORK/rl/cks.log" REPLAY="$REPO/tests/replays/36_pick_tenant_cell.rpl" \
-    MAME_SANDBOX="$WORK/sbx_rl" MAME_BIN="$WIDE_BIN" MAME_ROMPATH="$OUTBASE/rompath;$ROMDIR" \
-        sh -c 'mkdir -p "$(dirname "$CHECKSUM_OUT")" && tools/run_mame.sh vsavjw -autoboot_script tests/lua/replay.lua' \
-        > /dev/null 2>&1 || true
+    vs_pool_run ref_leg ref $RCLOCK
+    vs_pool_run rl_leg
+    if ! vs_ctl_is drift-clock && ! vs_ctl_is first-frame-skip; then
+        vs_pool_run trace_leg ctl_drift INSTR_CLOCK=frame_done
+        vs_pool_run ref_leg ctl_skip INSTR_CLOCK=skip_first
+        vs_pool_run run_stab stab 63_idle_select.rpl \
+            "1900:90c000-90c35f;2800:90c000-90c35f;3600:90c000-90c35f" 3650
+        vs_pool_run run_stab mash 64_select_mashright.rpl \
+            "1400:90c000-90c35f;2300:90c000-90c35f" 2350
+    fi
+    vs_pool_wait
     RL="$(awk -v n=$T '$1==n {print $2}' "$WORK/rl/cks.log" 2>/dev/null)"
     ra="$(anc ref)"; rg="$(al ref gameclock)"
     tf="$(al trace frames)"; te="$(al trace emulated)"; tg="$(al trace gameclock)"
@@ -244,13 +274,13 @@ PY
         [ "$fail" -ne 0 ] && { echo "FAIL: wheel bank-5 gate (control mode: $VS_CTL)"; exit 1; }
         echo "FAIL: wheel bank-5 gate — control mode $VS_CTL left it green"; exit 1
     fi
-    trace_leg ctl_drift INSTR_CLOCK=frame_done
+    # (ctl_drift ran in the pool above)
     de="$(al ctl_drift emulated)"; dg="$(al ctl_drift gameclock)"
     if [ -z "$de" ]; then vs_ctl_dead drift-clock "the drift leg wrote no ALIGN line" || fail=1
     elif [ "$de" -lt "$T" ] || [ "$dg" != "$rg" ]; then
         vs_ctl_fired drift-clock "under the frame_done clock the trace leg covered $de emulated frames of $T counted, game clock $dg where the reference leg's reads $rg"
     else vs_ctl_dead drift-clock "the frame_done clock covered $de of $T frames with game clock $dg (reference $rg)" || fail=1; fi
-    ref_leg ctl_skip INSTR_CLOCK=skip_first
+    # (ctl_skip ran in the pool above)
     sa="$(anc ctl_skip)"
     if [ -z "$sa" ]; then vs_ctl_dead first-frame-skip "the skip leg wrote no anchor" || fail=1
     elif [ "$sa" != "$RL" ]; then vs_ctl_fired first-frame-skip "under the first-frame skip the reference leg reads $sa at frame $T where replay.lua reads $RL"
@@ -273,19 +303,7 @@ PY
     # neither hovers a tenant with P2, which is why it stayed green
     # through every freeze. The P2 half is
     # tests/test_pyron_medallion_2p.sh; run both.
-    run_stab() {  # run_stab <tag> <replay> <dumpspec> <frames>
-        mkdir -p "$WORK/$1"
-        DUMPS="$3" CHECKSUM_OUT="$WORK/$1/cks.log" FRAMES="$4" \
-        REPLAY="$REPO/tests/replays/$2" \
-        MAME_SANDBOX="$WORK/sbx_$1" MAME_BIN="$WIDE_BIN" \
-        MAME_ROMPATH="$OUTBASE/rompath;$ROMDIR" \
-            tools/run_mame.sh vsavjw \
-            -autoboot_script tests/lua/replay.lua > /dev/null 2>&1 || true
-    }
-    run_stab stab 63_idle_select.rpl \
-        "1900:90c000-90c35f;2800:90c000-90c35f;3600:90c000-90c35f" 3650
-    run_stab mash 64_select_mashright.rpl \
-        "1400:90c000-90c35f;2300:90c000-90c35f" 2350
+    # (run_stab's stab and mash ran in the pool above)
     python3 - "$WORK/stab" "$WORK/mash" <<'PY' || fail=1
 import sys, glob
 vs2 = open("build/out/vsav2_data.bin", "rb").read()

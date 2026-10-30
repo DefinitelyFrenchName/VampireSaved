@@ -64,7 +64,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 EXP=tests/expected/vanilla_normal_slots.tsv
 IMG="${IMG:-build/out/vsavj_data.bin}"
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
+W="$(mktemp -d)" || { echo "FAIL: test_vanilla_frame_join — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT
 bad=0
 ok()  { echo "  ok    $1"; }
 nope() { echo "  FAIL  $1"; bad=$((bad + 1)); }

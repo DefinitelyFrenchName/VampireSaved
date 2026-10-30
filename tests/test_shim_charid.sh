@@ -18,7 +18,7 @@
 #   section 0 is a dead rig. Every probe run on emulated time at its frozen game clock, the staging leg on
 #   replay.lua's checksum.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/instr_gameclock/ tests/lib/controls.sh
-#   tests/lib/instr_align.sh tests/lua/emu_clock.lua tests/lua/replay.lua tests/lua/replay_guard.lua tests/replays/
+#   tests/lib/instr_align.sh tests/lib/jobs.sh tests/lua/emu_clock.lua tests/lua/replay.lua tests/lua/replay_guard.lua tests/replays/
 #   tools/run_mame.sh tools/run_replay_guarded.sh tools/setup_mame.sh
 #
 # SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
@@ -49,7 +49,7 @@
 # negative result from a rig is a fact about the RIG until proven otherwise).
 # Section 0 is that proof, on this instrument, every run.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] tests/test_shim_charid.sh [build] [id] [--freeze-clock]
+# Usage: ROMDIR=... [MAME_BIN=...] [JOBS=N] tests/test_shim_charid.sh [build] [id] [--freeze-clock]
 #   build defaults to build/don_m27, the current donovan freeze build (the registry row passes %DON%; until #328,
 #   14z-210, a pre-M23 donovan-m3a build no clean clone has — its frozen clocks read the same here), id to 0x13.
 #
@@ -117,11 +117,26 @@ export POKES="1400:ff8782:$TID;1450:ff8782:$TID;1500:ff8782:$TID;\
 1400:ff8b82:$TID;1450:ff8b82:$TID;1500:ff8b82:$TID"
 fail=0
 
-probe() {  # probe <addr> <memspec> <replay> -> log path on stdout
+# JOBS (#334 item 2, 14z-211): the four probe runs are independent — each writes only its own log, align file and
+# sandbox ($WORK/<addr>_<mem>_<replay>.*) — so they all go through tests/lib/jobs.sh's pool up front, JOBS at a time;
+# default min(4, CPUs/6). probe() then only records each run's manifest row and names its log, in the order the
+# sections always used (the arming run = row 1, the staging leg). The --freeze-clock pool keeps its own default of 4
+# (FZ_JOBS, taken before vs_jobs sets JOBS); a JOBS the caller sets reaches both.
+FZ_JOBS="${JOBS:-4}"
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+probe_run() {  # probe_run <addr> <memspec> <replay>
     # shellcheck disable=SC2086
     env $_clk GUARD_PROBE="$1" GUARD_PROBE_MEM="$2" ALIGN_OUT="$WORK/$1_$2_$3.align" \
     tools/run_replay_guarded.sh vsavjw "tests/replays/$3.rpl" \
         "$WORK/$1_$2_$3.log" "$WORK/box_$1_$2_$3" >/dev/null 2>&1 || true
+}
+vs_pool_start "$JOBS"
+vs_pool_run probe_run 016c64 A6+382 03_two_player_vs
+vs_pool_run probe_run "$SHIM" A6+382 03_two_player_vs
+vs_pool_run probe_run "$SHIM" A6+382 16_xemu_2p
+vs_pool_run probe_run "$SHIM" A6+0 03_two_player_vs
+vs_pool_wait
+probe() {  # probe <addr> <memspec> <replay> -> log path on stdout (the run itself went through the pool above)
     ia_note_run "$WORK/manifest.tsv" build "$3" vsavjw "$MAME_ROMPATH" "$REPO/tests/replays/$3.rpl" \
         "MAME_BIN=$MAME_BIN POKES=$POKES GUARD_PROBE=$1 GUARD_PROBE_MEM=$2" "$WORK/$1_$2_$3.align"
     echo "$WORK/$1_$2_$3.log"
@@ -176,7 +191,7 @@ fi
 echo "== 3: the instrument's alignment (#228 step 4, option A) =="
 if [ "$FREEZE_CLOCK" = 1 ]; then
     [ "$fail" = 0 ] || { echo "REFUSED: sections 0-2 failed — nothing frozen"; exit 1; }
-    ia_freeze "$REPO/tests/lua/replay_guard.lua" "$WORK/manifest.tsv" "$WORK/fz" "${JOBS:-4}" "$WORK/clocks.tsv" \
+    ia_freeze "$REPO/tests/lua/replay_guard.lua" "$WORK/manifest.tsv" "$WORK/fz" "$FZ_JOBS" "$WORK/clocks.tsv" \
         > "$WORK/fz.txt" || { sed 's/^/  /' "$WORK/fz.txt"; echo "REFUSED: the alignment does not hold — nothing frozen"; exit 1; }
     mkdir -p "$(dirname "$CLOCKS")"
     { echo "# $CLOCKS — the game clock RAM:\$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,"

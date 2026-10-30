@@ -41,7 +41,7 @@ cd "$REPO"
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: test_charmap_overrides — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 # THE KNOWN-BAD OVERRIDE FILES, built up front from the real donovan extract;
 # under CONTROL=<name> the named one replaces donovan's override file in the

@@ -13,7 +13,7 @@
 # EXPECTS: one source colour, one destination colour, the frozen count; the neighbour
 #   control fails. WHY the entry holds f111 at that moment is measured elsewhere (a hit
 #   re-requests the body palette).
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/inp/ tests/lib/controls.sh
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/inp/ tests/lib/controls.sh tests/lib/jobs.sh
 #   tests/lua/inp_probe.lua tools/run_inp_probe.sh tools/setup_mame.sh
 #
 # SHEET: none — compares builds of ours with each other (A/B, merged vs solo, stock vs WIDE), not with a reference set
@@ -57,7 +57,7 @@
 # build/m3b_merged27, kept by the build-dir policy while this line names it. A
 # freeze's re-point sweep must leave the default alone.
 #
-# Usage: ROMDIR=... tests/test_pod_black_foot_palette.sh   (~2.5 min, 3 MAME runs — 145 s measured 2026-09-15; it said ~7 min, 2 runs until then)
+# Usage: ROMDIR=... [JOBS=N] tests/test_pod_black_foot_palette.sh   (~2.5 min, 3 MAME runs — 145 s measured 2026-09-15; it said ~7 min, 2 runs until then)
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
@@ -70,12 +70,19 @@ BUILD="${BUILD:-build/m3b_merged27}"   # PINNED to merged-m19 (maintainer-ruled 
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 mk() { python3 -c "import sys;a=sys.argv[1];print(';'.join('%d:%s:fcff'%(f,a) for f in range(14355,14376)))" "$1"; }
 
-SNAP_FRAMES=14370 MAX_FRAMES=14376 \
-  tools/run_inp_probe.sh "$BUILD" pod-black-m14-01 "$W/base" >/dev/null 2>&1 || true
-SNAP_FRAMES=14370 MAX_FRAMES=14376 POKES="$(mk 90c17c)" \
-  tools/run_inp_probe.sh "$BUILD" pod-black-m14-01 "$W/fix" >/dev/null 2>&1 || true
-SNAP_FRAMES=14370 MAX_FRAMES=14376 POKES="$(mk 90c17a)" \
-  tools/run_inp_probe.sh "$BUILD" pod-black-m14-01 "$W/ctl" >/dev/null 2>&1 || true
+# JOBS (#334 item 2, 14z-211): the three playbacks are independent — each writes only its own out dir ($W/<leg>) and
+# its own mktemp sandbox (tools/run_inp_probe.sh), and all three only READ the recording — so they go through
+# tests/lib/jobs.sh's pool, JOBS at a time; default min(4, CPUs/6). The pixel compare below reads them after.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+probe() {  # probe <leg> [pokes]
+    SNAP_FRAMES=14370 MAX_FRAMES=14376 POKES="${2:-}" \
+      tools/run_inp_probe.sh "$BUILD" pod-black-m14-01 "$W/$1" >/dev/null 2>&1 || true
+}
+vs_pool_start "$JOBS"
+vs_pool_run probe base
+vs_pool_run probe fix "$(mk 90c17c)"
+vs_pool_run probe ctl "$(mk 90c17a)"
+vs_pool_wait
 
 python3 - "$W" "$MODE" <<'PY'
 import sys, os

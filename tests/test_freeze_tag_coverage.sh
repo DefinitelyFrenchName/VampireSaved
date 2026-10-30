@@ -70,7 +70,7 @@ fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
 . "$(dirname "$0")/lib/controls.sh"; vs_ctl_mode "$0"
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: test_freeze_tag_coverage — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 perturb() {  # perturb <name> <out> — a COPY of the registry
     case "$1" in
     untagged-row) cp "$REGISTRY" "$2"; printf 'deadbeefdeadbeefdeadbeefdeadbeefdeadbeef\tdonovan-m99\tsynthetic control row\n' >> "$2" ;;

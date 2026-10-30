@@ -13,7 +13,7 @@
 # EXPECTS: the frozen per-leg inventories (Phobos real 00, over Donovan 01, no reader for
 #   Donovan or Pyron in these rigs, ours only the float fork seeing the shim's 00); the
 #   real-path swap reads 00 where the row says 01 and fails, the moved windows read VOID.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/latch_reads.tsv
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/latch_reads.tsv tests/lib/jobs.sh
 #   tests/lua/read_tap.lua tests/replays/ tests/test_latch_readers.sh tools/run_mame.sh
 #   tools/setup_mame.sh tools/tap_latch_reads.sh
 #
@@ -58,7 +58,7 @@
 # (0x007254 / vsavj 0x008A86) are the pre-match readers and are excluded by the
 # frame floor.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged31] [LEGS="..."] [FREEZE=1] tests/audit_latch_reads.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged31] [LEGS="..."] [FREEZE=1] [JOBS=N] tests/audit_latch_reads.sh
 #   emulator tier, MAME; ~2 min for the seven legs (two tap runs each).
 set -eu
 [ -n "${ROMDIR:-}" ] || { echo "FAIL: set ROMDIR"; exit 1; }
@@ -108,18 +108,32 @@ leg() {
 
 echo "== 1. the legs under the read tap (both blocks' latch windows)"
 : > "$W/got.tsv"
+# JOBS (#334 item 2, 14z-211): the legs are independent — each tap_latch_reads.sh call makes its own mktemp dir and
+# writes only $W/<leg>.{tsv,log} — so they go through tests/lib/jobs.sh's pool, JOBS at a time; default
+# min(4, CPUs/6). The legs' arguments (and the control's perturbed tap script, written once before any leg runs)
+# are made serially first; a pooled leg records its exit status in $W/<leg>.rc; the rows are read after the pool,
+# in the old order, with the old lines.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+one_leg() {  # one_leg <name> <set> <replay> <pokes> <frames> [rompath]
+    _n="$1"; shift
+    if [ "$CONTROL" = tap-window-moved ]; then _tap="$W/tap_moved.sh"; else _tap="$REPO/tools/tap_latch_reads.sh"; fi
+    if "$_tap" "$@" > "$W/$_n.log" 2>&1; then echo 0 > "$W/$_n.rc"; else echo 1 > "$W/$_n.rc"; fi
+}
+vs_pool_start "$JOBS"
 for name in $LEGS; do
     set -- $(leg "$name")
     rp="$5"; [ "$rp" = "-" ] && rp=""
-    if [ "$CONTROL" = tap-window-moved ]; then
+    if [ "$CONTROL" = tap-window-moved ] && [ ! -f "$W/tap_moved.sh" ]; then
         # the perturbation: watch +0x3E4.. instead of +0x3BC.. — nothing latched is inside
         sed -e 's/RTAP="\$blk,40"/RTAP="$(printf %x $((0x$blk + 40))),40"/' -e "s|^REPO=.*|REPO=\"$REPO\"|" \
             "$REPO/tools/tap_latch_reads.sh" > "$W/tap_moved.sh"; chmod +x "$W/tap_moved.sh"
         grep -q 'printf %x' "$W/tap_moved.sh" || { echo "FAIL: the tap-window-moved perturbation did not apply"; exit 1; }
-        "$W/tap_moved.sh" "$1" "$2" "$3" "$4" "$W/$name.tsv" $rp > "$W/$name.log" 2>&1 || { bad "$name: $(tail -1 "$W/$name.log")"; continue; }
-    else
-        "$REPO/tools/tap_latch_reads.sh" "$1" "$2" "$3" "$4" "$W/$name.tsv" $rp > "$W/$name.log" 2>&1 || { bad "$name: $(tail -1 "$W/$name.log")"; continue; }
     fi
+    vs_pool_run one_leg "$name" "$1" "$2" "$3" "$4" "$W/$name.tsv" $rp
+done
+vs_pool_wait
+for name in $LEGS; do
+    [ "$(cat "$W/$name.rc" 2>/dev/null)" = 0 ] || { bad "$name: $(tail -1 "$W/$name.log")"; continue; }
     # in-play rows only: side, offset, pc, values (reads and frames are reported, not frozen)
     awk -F'\t' -v n="$name" -v fl="$FLOOR" 'NR>1 && $9+0 >= fl {print n"\t"$2"\t"$4"\t"$6"\t"$10}' "$W/$name.tsv" | sort > "$W/$name.rows"
     [ -s "$W/$name.rows" ] || printf '%s\t-\t-\t-\t-\n' "$name" > "$W/$name.rows"

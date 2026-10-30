@@ -74,7 +74,7 @@
 # A13's memory index, created under ~/.claude/projects/<the scratch project>/memory/ only if absent and
 # deleted after the leg.
 set -u
-S=${1:-$(mktemp -d "${TMPDIR:-/tmp}/agentprobe.XXXXXX")}
+S=${1:-$(mktemp -d "${TMPDIR:-/tmp}/agentprobe.XXXXXX")} || { echo "FAIL: probe_agents — mktemp -d failed (S)"; exit 2; }
 rm -rf "$S"; mkdir -p "$S/.claude/agents" "$S/hooks" || exit 2
 cd "$S" || exit 2
 S=$(pwd -P)

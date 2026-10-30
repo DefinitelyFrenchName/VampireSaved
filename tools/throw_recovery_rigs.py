@@ -92,6 +92,19 @@ AIR_AT = {"BU": 22, "VI": 19}
 # measured, these do not hold at all and are left out of that height (build/agent211/t330 air_height_gen.py, pah/)
 AIR_HEIGHTS = (-3, 3, 6)
 AIR_NOHOLD = {-3: {"DE", "LE", "LI", "MO"}, 3: {"VI"}, 6: {"VI"}}
+# ON ANOTHER VICTIM (the maintainer's "Measure them too", 2026-10-28: the air and command families on Demitri and Lilith):
+# the rigs are Victor's, and an event whose thrown control never holds on that victim is left out of that victim's set, as
+# a height that does not throw is. Measured: on Lilith every air-throw event of AU GA JE VI never holds (80 of 280 probe
+# events, build/agent211/t330 p4air_hv0e; Demitri 0 of 280); the command grabs below never hold at contact (14z-211
+# cmd_victims.out, re-checked by each victim's freeze, which refuses any other event that does not hold).
+AIR_NOHOLD_VICTIM = {0x0E: {"AU", "GA", "JE", "VI"}}
+CMD_NOHOLD_VICTIM = {0x01: {"AN_cmd_0", "AN_cmd_2", "JE_cmd_6", "JE_cmd_7"},
+                     0x0E: {"AN_cmd_0", "AN_cmd_2", "AN_cmd_5", "AN_cmd_7", "JE_cmd_6", "JE_cmd_7"}}
+
+
+def victim_id():
+    v = os.environ.get("TR_VICTIM", "")
+    return int(v, 16) if v else None
 
 
 def height():
@@ -115,7 +128,7 @@ def events(family=None):
         return
     if fam == "air":
         for tab, evs in gtr.AIR.items():
-            if tab in AIR_NOHOLD.get(height(), ()):
+            if tab in AIR_NOHOLD.get(height(), ()) or tab in AIR_NOHOLD_VICTIM.get(victim_id(), ()):
                 continue
             for n, (key, inp, _rec) in enumerate(evs):
                 b = re.search(r"6(MP|HP)", inp).group(1)
@@ -333,6 +346,24 @@ def clauses(r):
 # alternate slots (a landed grab swaps the sides, and the next air 720 misses), so its tech rig puts every measured
 # event on a grabbing slot (fillers between).
 CMD_WIDE = (402, 878)
+# THE CHECK-GATED GRABS HAVE NO WHIFF (the maintainer, 2026-10-28, 14z-212: "No whiff (Recommended)", for the 20 and then
+# for the four 360s): these 24 start their move only when the engine's throw check passes. Out of range, AND at contact
+# against a victim it refuses (Victor jumping, U 3/5/8/12 frames before the press), the input is the button's plain NORMAL
+# (seq 0x0A: the 632[4] / 6324 grabs) or a JUMP (seq 0x06: Bishamon's and Demitri's 360 MP/HP); a breakpoint on the check
+# (CPU:$029406) shows the grab's input consulting it in both cases, the commit following only on a grounded victim
+# (build/agent212/t330: feas/, feas8/, probe/). Their ES versions (Aulbath 6324PP/KK, Bishamon 360PP, Zabel 632[4]PP)
+# start their own seq 0x12 instead and DO whiff (the maintainer, from the capture pages: "Yes, it is the whiff").
+CMD_GATED = {("AU", "6324 MP"), ("AU", "6324 HP"), ("AU", "6324 MK"), ("AU", "6324 HK"), ("BI", "KIRISUTE GOMEN 360MP"),
+             ("BI", "KIRISUTE GOMEN 360HP"), ("DE", "360 MP"), ("DE", "360 HP"), ("FE", "632[4] MK"), ("FE", "632[4] HK"),
+             ("FE", "632[4]KK"), ("GA", "632[4] MK"), ("GA", "632[4] HK"), ("GA", "632[4]KK"), ("JE", "632[4] HK"),
+             ("JE", "632[4] MK"), ("MO", "632[4] MP"), ("MO", "632[4] HP"), ("MO", "632[4]PP"), ("QB", "632[4] HP"),
+             ("QB", "632[4]PP"), ("QB", "632[4] MP"), ("ZA", "632[4] MP"), ("ZA", "632[4] HP")}
+# THE FOUR ES GRABS WHIFF INTO THEIR OWN SEQ 0x12 (0x10 when they connect; the maintainer, from the capture pages: "Yes, it
+# is the whiff"); every other whiff must start the seq its input starts when it connects
+CMD_ES_WHIFF = {("AU", "6324PP"), ("AU", "6324KK"), ("BI", "ES KIRISUTE GOMEN 360PP"), ("ZA", "632[4]PP")}
+CMD_ES_WHIFF_SEQ = 0x12
+# a whiff must START A MOVE: within the press frame and the five after, P1 reaches a seq that is none of these
+NOT_A_MOVE = {0x00: "standing", 0x04: "walking", 0x06: "a jump", 0x0A: "the button's normal"}
 
 
 def cmd_events():
@@ -344,7 +375,7 @@ def cmd_events():
     out = []
     for tab, evs in ctr.THROWS.items():
         for i, e in enumerate([e for e in evs if not e[1].startswith("motion ")]):
-            if (tab, e[1]) in held:
+            if (tab, e[1]) in held and f"{tab}_cmd_{i}" not in CMD_NOHOLD_VICTIM.get(victim_id(), ()):
                 out.append((f"{tab}_cmd_{i}", tab, e[0], e[1], e))
     return out
 
@@ -363,8 +394,8 @@ def cmd_recipe(tab, ev, ver):
     return rec, (ctr._press_off(rec) if poff is None else poff), walk, meter
 
 
-def cmd_no_whiff(label):
-    return "sweep" in label
+def cmd_no_whiff(label, tab):
+    return "sweep" in label or (tab, label) in CMD_GATED
 
 
 def _cmd_write(path, tab, meta, items):
@@ -412,7 +443,10 @@ def cmd_read_ticks(path):
     return out
 
 
-def cmd_gen(ticks_path, out_dir, shift=0, tech_token=None, only=None):
+def cmd_gen(ticks_path, out_dir, shift=0, tech_token=None, only=None, gated_whiff=False, whiff_contact=False):
+    """gated_whiff (the control gated-whiff): a whiff rig (no LP pair) for every gated grab too — each must read
+    'the whiff started no move'. whiff_contact (the control whiff-at-contact): every whiff rig made at CONTACT, where
+    the grab connects — each must read 'the whiff control HOLDS'"""
     ticks = cmd_read_ticks(ticks_path)
     out = Path(out_dir); out.mkdir(parents=True, exist_ok=True)
     n = 0
@@ -434,13 +468,18 @@ def cmd_gen(ticks_path, out_dir, shift=0, tech_token=None, only=None):
             items = base + meas
         _cmd_write(out / f"tr_{rig}_teched", tab, dict(meta, case="teched"), items)
         n += 1
-        if a is not None and not cmd_no_whiff(label):
-            rec, poff, walk, meter = cmd_recipe(tab, ev, "wide")
-            a += shift
-            items = [(f"{label} sacrificial first event", "wide", rec, poff, walk, meter),
-                     (f"{label} whiff control", "wide", rec, poff, walk, meter)]
-            items += [(f"{label} whiff p1 LP@+{o} A={a}", "wide", rec + [(poff + o, poff + o, "1")], poff, walk, meter)
-                      for o in (a - 1, a)]
+        gated = (tab, label) in CMD_GATED
+        if (a is not None and not cmd_no_whiff(label, tab)) or (gated_whiff and gated):
+            ver = "contact" if whiff_contact else "wide"
+            rec, poff, walk, meter = cmd_recipe(tab, ev, ver)
+            items = [(f"{label} sacrificial first event", ver, rec, poff, walk, meter)]
+            if whiff_contact and tab == "VI" and "720" in label:   # the control on a grabbing slot (alternate slots, above)
+                items.append((f"{label} filler", ver, rec, poff, walk, meter))
+            items.append((f"{label} whiff control", ver, rec, poff, walk, meter))
+            if not gated:
+                a += shift
+                items += [(f"{label} whiff p1 LP@+{o} A={a}", ver, rec + [(poff + o, poff + o, "1")], poff, walk, meter)
+                          for o in (a - 1, a)]
             _cmd_write(out / f"tr_{rig}_whiff", tab, dict(meta, case="whiff"), items)
             n += 1
     print(f"wrote {n} rigs to {out}")
@@ -469,6 +508,9 @@ def cmd_rows(rigs_dir, traces_dir):
                 r["hold"] = hold
                 if hold is None:
                     r["problems"].append("the contact control never holds")
+                # the move the input starts when it CONNECTS (the contact control): the whiff must start the same seq
+                r["grab_seq"] = next((s for s in ((_st(tr, c + d, "p1") >> 8) & 0xFF for d in range(6) if c + d in tr)
+                                      if s not in NOT_A_MOVE), None)
 
                 def sig(p):
                     return _loss(tr, p), next((f - p for f in range(p + 1, p + L) if _st(tr, f, "p2") == 0x02000002), None)
@@ -485,6 +527,11 @@ def cmd_rows(rigs_dir, traces_dir):
                 r["window"] = {"k1": any(w.get(1, [])), "k7": any(w.get(7, [])),
                                "k7_as_k1": w.get(1) == w.get(7), "k8": False}
             else:
+                # a whiff must NOT CONNECT (rule-checker run 2026-10-29-1365 Q4): the contact rig's hold test, inverted
+                r["whiff_holds"] = any(tr[f]["p1thr"] == 1 for f in range(c - 5, c + 150) if f in tr)
+                seqs = [(_st(tr, c + d, "p1") >> 8) & 0xFF for d in range(6) if c + d in tr]
+                r["whiff_seq"] = next((s for s in seqs if s not in NOT_A_MOVE), None)
+                r["whiff_seqs"] = sorted(set(seqs))
                 for e in ev:
                     m = re.search(r" p1 LP@\+(\d+) A=(\d+)$", e["input"])
                     if m:
@@ -499,12 +546,26 @@ def cmd_rows(rigs_dir, traces_dir):
 def cmd_full_line(r):
     lo = r.get("loss") or ["-", "-"]
     return "\t".join(str(v) for v in (r.get("sheet"), r.get("rig"), r.get("input"), r.get("hold", "-"), r.get("whiff", "-"),
-                                      r.get("state", "-"), f"{lo[0]}/{lo[1]}", window(r)))
+                                      r.get("state", "-"), f"{lo[0]}/{lo[1]}", window(r),
+                                      "-" if r.get("whiff_seq") is None else f"{r['whiff_seq']:02x}"))
 
 
 def cmd_clauses(r):
     bad = list(r.get("problems", []))
     acc = r.get("accept", {})
+    if r.get("whiff_holds"):
+        bad.append("the whiff control HOLDS: the grab connected, so it is no whiff")
+    if "whiff_seqs" in r and r.get("whiff_seq") is None:
+        bad.append("the whiff started no move: P1 shows only " +
+                   ", ".join(NOT_A_MOVE[s] for s in r["whiff_seqs"]) + " on the press frame and the five after")
+    elif r.get("whiff_seq") is not None:
+        # THE WHIFF IS THE GRAB'S OWN MOVE (rule-checker run 2026-10-29-1364 Q4): the seq the same input starts when it
+        # connects — or, for the four ES grabs ruled to whiff into their own seq 0x12, that seq
+        es = (r.get("sheet"), r.get("input")) in CMD_ES_WHIFF and os.environ.get("TR_CTL_ES_DROPPED") != "1"
+        want = CMD_ES_WHIFF_SEQ if es else r.get("grab_seq")
+        if r["whiff_seq"] != want:
+            bad.append(f"the whiff started seq {r['whiff_seq']:02x}, not the grab's own "
+                       f"({'-' if want is None else f'{want:02x}'}{', the ruled ES whiff' if es else ', as when it connects'})")
     if "whiff" in r:
         if acc.get("whiff@A-1") is not False:
             bad.append("whiff: the LP one tick before the frozen tick STARTED the normal")
@@ -578,17 +639,19 @@ def main():
     if not a:
         print(__doc__); return 2
     if a[0] == "gen":
-        opts = {"shift": 0, "tech_token": None, "late_tech": NOTECH_K, "only": None}
+        opts = {"shift": 0, "tech_token": None, "late_tech": NOTECH_K, "only": None, "gated_whiff": False, "whiff_contact": False}
         pos, i = [], 1
         while i < len(a):
             if a[i] == "--shift": opts["shift"] = int(a[i + 1]); i += 2
+            elif a[i] == "--gated-whiff": opts["gated_whiff"] = True; i += 1
+            elif a[i] == "--whiff-contact": opts["whiff_contact"] = True; i += 1
             elif a[i] == "--tech-token": opts["tech_token"] = a[i + 1]; i += 2
             elif a[i] == "--late-tech": opts["late_tech"] = int(a[i + 1]); i += 2
             elif a[i] == "--only": opts["only"] = set(a[i + 1].split(",")); i += 2
             else: pos.append(a[i]); i += 1
         if os.environ.get("TR_FAMILY") == "command":
             opts.pop("late_tech"); cmd_gen(pos[0], pos[1], **opts); return 0
-        gen(pos[0], pos[1], **opts); return 0
+        opts.pop("gated_whiff"); opts.pop("whiff_contact"); gen(pos[0], pos[1], **opts); return 0
     if a[0] == "rows":
         (cmd_rows if os.environ.get("TR_FAMILY") == "command" else rows)(a[1], a[2]); return 0
     if a[0] == "freeze":

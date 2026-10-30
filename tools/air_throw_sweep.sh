@@ -24,7 +24,7 @@ set -u
 ROMDIR="${ROMDIR:?set ROMDIR}"; REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
 PYR="${PYR:-build/pyron46}"; EX="$PYR/extract"
-MODE="${1:?mode: lead|phase|press|xpin}"; OUT="${2:-$(mktemp -d)}"; case "$OUT" in /*) ;; *) OUT="$REPO/$OUT" ;; esac; mkdir -p "$OUT/chains"
+MODE="${1:?mode: lead|phase|press|xpin}"; OUT="${2:-$(mktemp -d)}" || { echo "FAIL: air_throw_sweep — mktemp -d failed (OUT)"; exit 2; }; case "$OUT" in /*) ;; *) OUT="$REPO/$OUT" ;; esac; mkdir -p "$OUT/chains"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN"; exit 0; }
 [ -f "$EX/regions.json" ] || { echo "SKIP: no extract at $EX"; exit 0; }
 python3 - "$EX" "$OUT/chains" <<'PY'

@@ -63,7 +63,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 # so a gate that means to SKIP on a missing ROMDIR still does.
 if [ -d "$ROMDIR" ]; then ROMDIR="$(cd "$ROMDIR" && pwd)"; fi
 . "$REPO/tests/lib/decrypt_cache.sh"
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
+W="$(mktemp -d)" || { echo "FAIL: test_kernel_voice_tables — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT
 fail() { echo "FAIL: $*"; exit 1; }
 
 decrypt_view vsavj "$W/vj_op.bin" || fail "vsavj decrypt view"

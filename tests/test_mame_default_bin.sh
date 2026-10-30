@@ -21,7 +21,7 @@
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
+W="$(mktemp -d)" || { echo "FAIL: test_mame_default_bin — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT
 # #303 (ruled 2026-10-23, "Callers pass a sandbox"): tools/run_mame.sh makes a mktemp sandbox when MAME_SANDBOX is
 # unset and then execs MAME, so nothing removes it; this gate tests MAME_BIN's default, not the sandbox's, so run()
 # passes each run its own sandbox inside $W (TMPDIR alone does not: macOS's mktemp -d with no template ignores it)
@@ -49,8 +49,9 @@ open(sys.argv[2], "w").write(s)
 PY
 }
 run() {  # run <wrapper> <root> <set> [MAME_BIN] -> the stub's RAN line, or "EXIT <rc>: <stderr head>"
+    _sb="$(mktemp -d "$W/sb.XXXXXX")" || { echo "EXIT 2: test_mame_default_bin — mktemp -d failed (sandbox)"; return 2; }
     _o="$(cd "$2" && env -u MAME_BIN HOME="$2/home" PATH="$2/bin:$PATH" ROMDIR="$2/roms" ${4:+MAME_BIN="$4"} \
-        MAME_SANDBOX="$(mktemp -d "$W/sb.XXXXXX")" sh "$1" "$3" 2>"$2/err")"; _rc=$?
+        MAME_SANDBOX="$_sb" sh "$1" "$3" 2>"$2/err")"; _rc=$?
     case "$_o" in RAN*) echo "$_o" | cut -d' ' -f1-2 ;; *) echo "EXIT $_rc: $(head -1 "$2/err")" ;; esac
 }
 check() {  # check <wrapper> <root> — the assertions; returns 1 on any FAIL

@@ -1,0 +1,167 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent212/t333/closure/closing_comment.md	9c6b2fa7d9eb7c6fb50876d519fb00ff4f468c1f
+build/agent212/t333/closure/ticket_row_333.tsv	cfcac3fba2aaa603b515b84c718c8d9b7ef16c61
+build/agent212/t333/closure/rulecheck_1366_reader_a.txt	0e8191315400e9dc4e90721c591cd076e0e1c179
+build/agent212/t333/closure/rulecheck_1368_reader_b.txt	539aa6d852d107f4ba7ade551b13e14b07d19f50
+build/agent212/t333/closure/rulecheck_1371_reader_a.txt	58b8cfe068fa2419fc0d29833e73af15a135b628
+build/agent212/t333/closure/verdict_a_1374.txt	192dbc873f00357f880b716ea7ba48cff0e1fce2
+build/agent212/t333/closure/verdict_b_1379.txt	dbf82272ceb7cc2d62263e82e9be638357f9e11d
+build/agent212/t333/closure/verdict_a_1380.txt	361eb432189e63b0c5a99eed705234b7ae0615f5
+build/agent212/t333/closure/verdict_b_1382.txt	51c63b14d05fc4129c3f7d60af634c68ffe23855
+build/agent212/t333/closure/census_before.txt	8f5fe35c4ec247c874b1cbb9f92acb649b464a48
+build/agent212/t333/closure/census_now.txt	d2608fbf02194cbd4b9471c1bd35b8dc81bb49a7
+build/agent212/t333/closure/census_reach.txt	3875a2669f1f7ab9a3f37a17253a20d9cf307b08
+build/agent212/t333/closure/census_reach.py	e77fc08e19dd20932970214c9747ac417b543132
+build/agent212/t333/closure/census_reach_indep.txt	577c43c462bb6d027ca08dba00f448c5e42a0626
+build/agent212/t333/closure/census_reach_indep.py	d9690e8abfe0c4a16cea748e48cb8da6ce67c06a
+build/agent212/t333/closure/return_sites.txt	1e5e2ad05274c5e42118b87b071a682debd0c002
+build/agent212/t333/closure/return_sites.py	e999a8af4af2c566238ccb56bff543abaf5ce5b5
+build/agent212/t333/closure/forms_measured.txt	bd40e66d81ec12907c4af2ccbdeb467f77635801
+build/agent212/t333/closure/forms_measured.py	402662c991386c6ca84fd657ee5121fcbd55843b
+build/agent212/t333/closure/test_tmp_hygiene.log	6c93a3e90a141797294c0d6ee374825889c21f98
+build/agent212/t333/closure/mode_planted-unguarded.log	b50be2aff9f1c441f32a87cb549c2e0d85f37168
+build/agent212/t333/closure/mode_shim-blind.log	e769841aca1ef8750e6cb50af6dbd3205a35e6ca
+build/agent212/t333/closure/pilot_head.txt	d50beb32ad40bce643f878b47a57a2d76176cb42
+build/agent212/t333/closure/pilot_head2.txt	b386c1b4caa483a9601c5a0d997a1d8c620949dc
+build/agent212/t333/closure/pilot_head3.txt	27f8e2c4deefe4113f62e8e93b048e63d4b7cf47
+build/agent212/t333/closure/pilot_t212r4_static_head.txt	9a090da5136ba74acecd4b0ebce2ad0a46befb0b
+build/agent212/t333/closure/pilot_head5.txt	f191ed88efe3fe4db90a0fa2f506b1076eb49b79
+build/agent212/t333/closure/pilot_t212r7.out	85a2ecc64d5a9c394258f1c934cf1bd6369b316f
+build/agent212/t333/closure/pilot_t212r8.out	d36279a35fc2f7a7c4a3e3f653b1331def223156
+build/agent212/t333/closure/pilot_t212r9.out	4e21d0026e70e88ac87db4d1d6b36a88d57cb427
+build/agent212/t333/closure/pilot_t212r_static_out_overlap.txt	a21f58d44033cb24bd43f12d5eda764aec87c9aa
+build/agent212/t333/closure/pilot_t212r_static_out_classes.tsv	0602e875a39855646aa0eae757139e1bada2c110
+build/agent212/t333/closure/pilot_t212r_emu_out_overlap.txt	0dc18f3664f52fd95e6f247931e1abae820de004
+build/agent212/t333/closure/pilot_t212r_emu_out_classes.tsv	94789598a2db2aa2c28b93ece3f1dc5e4b894c07
+build/agent212/t333/closure/pilot_t212r_fix_static_overlap.txt	8d7eb8187c94ee6ed98068d49a6e764a4e20e228
+build/agent212/t333/closure/pilot_t212r_fix_static_classes.tsv	d3e5a71795d83f9417dc5a50b543496ba9911cca
+build/agent212/t333/closure/pilot_t212r_fix_emu_overlap.txt	82f0ee52f27e3c893d351ae8984331cb5c7daa9d
+build/agent212/t333/closure/pilot_t212r_fix_emu_classes.tsv	1c8b2a61f4d54c2e98e325348f6cc2e76db0a84b
+build/agent212/t333/closure/pilot_t212r2_static_overlap.txt	17f8db14fcd9ffb4d8855f603c13a0a6242076c4
+build/agent212/t333/closure/pilot_t212r2_static_classes.tsv	e26fea3ee90d5e9c3c79d5f465432d1c8daa532a
+build/agent212/t333/closure/pilot_t212r2_emu_overlap.txt	ff39277580bd3d01e0703927c881ece1355d50e3
+build/agent212/t333/closure/pilot_t212r2_emu_classes.tsv	34816011f558f5e6815ff48bbfcc637b04aed239
+build/agent212/t333/closure/pilot_t212r3_static_overlap.txt	ee9d7fadf94a5aa61cf852763ed1318fa5653857
+build/agent212/t333/closure/pilot_t212r3_static_classes.tsv	28c09def24c78a549cd3767b5911388d78155718
+build/agent212/t333/closure/pilot_t212r4_static_overlap.txt	03953fdac08fb313660e60583fcc40e48acf5e98
+build/agent212/t333/closure/pilot_t212r4_static_classes.tsv	4dc2d9e22f0b237219fcf952380b8571571d93b3
+build/agent212/t333/closure/pilot_t212r5_static_overlap.txt	cf9978421e77128c868845226eb785c484d7cd6a
+build/agent212/t333/closure/pilot_t212r5_static_classes.tsv	228ec430545fdafd9aed238d29a7c4079c592c96
+build/agent212/t333/closure/pilot_t212r7_static_overlap.txt	03953fdac08fb313660e60583fcc40e48acf5e98
+build/agent212/t333/closure/pilot_t212r7_static_classes.tsv	e3da6fc78bcf1cea9cb985040a40bfb6683e064d
+build/agent212/t333/closure/pilot_t212r8_static_overlap.txt	03953fdac08fb313660e60583fcc40e48acf5e98
+build/agent212/t333/closure/pilot_t212r8_static_classes.tsv	4e299eac10823cb5ec50759daf58e3d85d991beb
+build/agent212/t333/closure/pilot_t212r9_static_overlap.txt	03953fdac08fb313660e60583fcc40e48acf5e98
+build/agent212/t333/closure/pilot_t212r9_static_classes.tsv	e3da6fc78bcf1cea9cb985040a40bfb6683e064d
+build/agent212/t333/closure/cc_static_census.txt	6af80a8b8a1f626793ed676dec91acccb87ac3f2
+build/agent212/t333/closure/cc_emu_census.txt	cd23a2fc40181962bcf2f9133e6825de8eaaae03
+build/agent212/t333/closure/eris_run2_results.tsv	04ef0c03e15324cd5d38ba754d1f8da5ee880a62
+build/agent212/t333/closure/eris_head_505c3257.txt	2d1ad981bb666c79b7954ff4750d40300749d1a2
+build/agent212/t333/closure/eris_times.tsv	43c32867b7ec7132e2aaccc5e7f4adb0c07e6000
+build/agent212/t333/closure/eris_setup.out	4b05fe1ae50a88c8ef17e7d517141c4098326c20
+build/agent212/t333/closure/mtime_readers.txt	ff1532c1a5bd152e2fc17eb9e3f836c83059ca15
+build/agent212/t333/closure/mtime_readers2.txt	44ab33f8a41c91040a3c5bb143c0cffb0d49b3d2
+build/agent212/t333/closure/eris_run2_record_start.json.lines-1-52 (lines 1-52 of build/agent212/t333/closure/eris_run2_record_start.json)	7f2e150a41214e319d210afede9a90b20eb0feaf
+tests/controls_concurrent.txt	20ea49fb3e6bf9f929e534ec53574cd47edf8527
+tests/controls_concurrent_emu.txt	2348624e8735cde860523410d50b7081205017b9
+docs/project/gotchas.md.lines-7778-7791 (lines 7778-7791 of docs/project/gotchas.md)	0b06193bf2e8e201732be81b0818971bfb179231
+tools/tmp_hygiene.py	7c7b946c8553cfbf7995cbd38cea890f2a67a48d
+tests/test_tmp_hygiene.sh	d83b16672429534de7c5ab3dadb4b6b85d121612
+build/agent212/t333/closure/verdict_b_1385.txt	f50f84be1f166ec7398945c28971723d521d8fb3
+build/agent212/t333/closure/trap_order.py	b5713ebd207ab14545008d5bccc92578325b8c6d
+build/agent212/t333/closure/trap_order.txt	f09233cf85c02b36ea738ae21ebfba48f383c8aa
+build/agent212/t333/closure/trap_unparsed.txt	b2ee2d35f39a9c272723e58ad68b238e1a646496
+build/agent212/t333/closure/trap_order_plant.txt	b114c039f9f9aa092a2c0672976f3f88265c5892
+build/agent212/t333/closure/trap_plant/tests/plant.sh	129130e54e79fd3bd770d1345b1502d59563fae6
+build/agent212/t333/closure/mtime_union_files.txt	6320ef111b3223e5d47ada1f09007017c73cf090
+build/agent212/t333/closure/mtime_union_lines.txt	63e0b9c2e49035f2fb482fdd5306cdc15ec7e812
+build/agent212/t333/closure/mtime_code_readers.txt	160e072aa851d34a5301b3324a9f39c9d7669cd8
+build/agent212/t333/closure/mtime_reach.py	306fbbda12bd92087d40f261891a443dcb0f913b
+build/agent212/t333/closure/mtime_reach.txt	411853f4406f062933f1007c32ab5d808956b241
+build/agent212/t333/closure/mtime_reach2.py	a8c334d8481ac6fbf25df37712e802c5e3d0df25
+build/agent212/t333/closure/mtime_reach2.txt	d84dc3812d80658c02c23785cbb929213f740b71
+build/agent212/t333/closure/mtime_reach2_control_readers.txt	90b53366215632cb3e4571614c2203a9ede3395f
+build/agent212/t333/closure/mtime_reach2_control.txt	52ce69b94cd29535e4858bda05d67e76ee245e78
+build/agent212/t333/closure/verdict_b_1387.txt	b737a1d0b98c7c744162ccdef041099a1c5d3c98
+build/agent212/t333/closure/trap_order2.py	79324d7bc8f6bd95900e6be0ea22ad6cd7b06c17
+build/agent212/t333/closure/trap_order2.txt	34b6823ef36a5379798181aa4354fa7db3cdfdeb
+build/agent212/t333/closure/trap_order2_plant.txt	2d9396e842c8263ad41df9be0434f1493d0d15a6
+build/agent212/t333/closure/trap_plant2/tests/plant2.sh	a64a946f3ff06c890af6d7346ef97e7311819f9b
+build/agent212/t333/closure/reconcile_sites.py	654d077d457ed6366fa85bc1a1fb76b6a79613ba
+build/agent212/t333/closure/reconcile_sites.txt	97629ea63908da1fe26510140dc5350d9eabd137
+build/agent212/t333/closure/reconcile_byeye.txt	6cd57b845a25c121ae4a1f7a8a70844e75af3f14
+build/agent212/t333/closure/reconcile_B_control.txt	32bed9eb4616cdf56484c9bebb034ebde9b6a6e0
+build/agent212/t333/closure/untracked_scripts.txt	f8584c64ef2e1f42dd91e2bd0cdfb1ff0a9298a6
+build/agent212/t333/closure/guard_exits.txt	a6360575ca2834e029c10118da650a53159d695b
+build/agent212/t333/closure/verdict_b_1389.txt	6ec52c2457ff87fa858137ce2e2f84e0028f1de8
+build/agent212/t333/closure/census_reach_indep2.py	66825f0eaea9f7a3972ea90051b047f7a6514eb0
+build/agent212/t333/closure/census_reach_indep2.txt	b50997880c8b53e278f14994d44ef5526fbe7083
+build/agent212/t333/closure/census_now2.txt	d2608fbf02194cbd4b9471c1bd35b8dc81bb49a7
+build/agent212/t333/closure/outside_scope.txt	9b6df965a5e5e90a1e12ff82c5339d560edf7a04
+build/agent212/t333/closure/probe_guard_check.txt	682fcc258a21db10e993f50cf36fffdfd02c45f1
+tools/agent/probe_agents.sh.lines-70-80 (lines 70-80 of tools/agent/probe_agents.sh)	07bf67cb45d573d74accec66d3b9d43c49ba4285
+tools/agent/probe_hooks.sh.lines-17-26 (lines 17-26 of tools/agent/probe_hooks.sh)	3ed9e863ce17025107da020cdc161fbd01b36449
+build/agent212/t333/closure/verdict_a_1392.txt	f6810afcb88327f2b8dd4bbe4975808e01fd970c
+build/agent212/t333/closure/file_lists.txt	0b2542646122847b6661aa0f14cead2ed040bcbc
+build/agent212/t333/closure/census_reach_v2.py	0c3fa45273a7eb5827d6e973175d4f8de0ba2106
+build/agent212/t333/closure/census_reach_v2.txt	3875a2669f1f7ab9a3f37a17253a20d9cf307b08
+build/agent212/t333/closure/forms_measured_v2.py	122c9ec6e9673293d3bd2bba4c31c6c6a3c302a9
+build/agent212/t333/closure/forms_measured_v2.txt	f4a3d6a475eee68be9bad5e8fedde359f1e1219f
+build/agent212/t333/closure/return_sites_v2.py	f42ce5edc610418e79d0682546b05c0b133932a4
+build/agent212/t333/closure/return_sites_v2.txt	1e5e2ad05274c5e42118b87b071a682debd0c002
+build/agent212/t333/closure/untracked_sites_lines.txt	2ed3ad78d22814a17d7e51d99b706c90611cba9f
+build/agent212/t333/closure/verdict_b_1394.txt	f724e155cb2f577cf096c45b58d8e856064f018c
+build/agent212/t333/closure/mtime_union2_files.txt	8d9033c466d8b2fbd73d0bdd8f7009e4e4fa5e55
+build/agent212/t333/closure/mtime_union2_byeye.txt	33ecb479ca26b272f69ea08da384b24987d3bb21
+build/agent212/t333/closure/mtime_code_readers2.txt	df7b327443b9e0d7db462d25134ed6fb4096fc34
+build/agent212/t333/closure/mtime_reach3.txt	d84dc3812d80658c02c23785cbb929213f740b71
+tools/run_wide.sh.lines-36-46 (lines 36-46 of tools/run_wide.sh)	2ca78dfb8ce8d2d22878bebe0148d455a74fc2c5
+build/agent212/t333/closure/verdict_a_1395.txt	7a6cd53cd78a84a166ce0d34944c087a7e7bdbf3
+build/agent212/t333/closure/verdict_a_1396.txt	974fbd1e9ac9f3e010f666ab4af408f4559ffb7f
+build/agent212/t333/closure/rounds_census.txt	bd317550261dba034a8c40928db4b8a967b36320
+build/agent212/t333/closure/forms_1374.txt	1b408a3dbbc212296e63c30037fdd3bc269dc093
+build/agent212/t333/closure/forms_1374_control.txt	4152dba052ebddf742dc82f8a180ad954a48680f
+docs/platform/gotchas.md.lines-3512-3543 (lines 3512-3543 of docs/platform/gotchas.md)	6acf1526bca00d2b956b4222d5c10c3f9d18b1ad
+DECISIONS_HISTORY.md.lines-8518-8530 (lines 8518-8530 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-27 (14z-210) — #321: a control mode's environment error is DIED; the emulator runne")	60f0187ed00567cf4379343f7573efd446d2a866
+DECISIONS_HISTORY.md.lines-8611-8622 (lines 8611-8622 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-28 (14z-211) — #334 item 1: all 35 settings timed on PILOT; #333's re-trace waits f")	8f1558324cd54241bdad472799415a0495243b6d
+DECISIONS_HISTORY.md.lines-8807-8832 (lines 8807-8832 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-29 (14z-212) — #333: finish it now — every mktemp -d form read and guarded, the sta", and the entries after it up to line 8832)	fbc5296e503ea472c0a85e7fdf919efbc42c4422
+DECISIONS_HISTORY.md.lines-8912-8927 (lines 8912-8927 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-29 (14z-212) — #333: the census's four logic gaps fixed now (round six)")	cb2899b63a456b2313324e91ccc921dac455ffb1
+DECISIONS_HISTORY.md.lines-8928-8939 (lines 8928-8939 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-29 (14z-212) — #333: `|| (exit)` and `set ±o errexit` read right; a caller ignoring")	3eb598cf6c7755ea711e7c66be1de061c74badda
+DECISIONS_HISTORY.md.lines-8940-8953 (lines 8940-8953 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-29 (14z-212) — #333 ends on its known answers and a stated limit: the census is a l")	ce49db3fdb169f9c41e2c6166fd3b7349681ab2e
+DECISIONS_HISTORY.md.lines-8955-8967 (lines 8955-8967 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-29 (14z-212) — #333: an EXIT trap installed before a guarded site is named and meas")	b06a719190c86450d9b1452a3df1e9cebf71fcd2
+DECISIONS_HISTORY.md.lines-8969-8979 (lines 8969-8979 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-29 (14z-212) — #333: the two tools/agent probes guarded; the census keeps its three")	e372ca6900d589bec838e1732cbf0223cfdf9d32
+DECISIONS_HISTORY.md.lines-8981-9004 (lines 8981-9004 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-29 (14z-212) — #333: the round-eight ruling's premise corrected; the ruling stands ")	3c09231327113220a40a2b7d1cd13fbe7474f904
+DECISIONS_HISTORY.md.lines-9006-9024 (lines 9006-9024 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-30 (14z-212) — #333: the limit stands on the exact, measured record")	04c269e69f900c586dbd97f887a13d076dd791d8
+build/agent212/t333/closure/verdict_b_1398.txt	9a2f45816fec6793b622046f9750deef9e7ad735
+build/agent212/t333/closure/rounds_reconcile.txt	0b25c5487314b7eefb9e650b5b85f578ba1b14e2
+build/agent212/t333/closure/forms_1374_control2.txt	ad5ad708bf5c61afb55e3a230f46f9bd550e748d
+build/agent212/t333/closure/verdict_a_1399.txt	a826dccaa8bea5422de447f01a81d02f85d8c746
+build/agent212/t333/closure/trap_order3.py	43ed95b87f561c25ad5c31bb394f5c3d8a86bfb0
+build/agent212/t333/closure/trap_order3.txt	34b6823ef36a5379798181aa4354fa7db3cdfdeb
+build/agent212/t333/closure/trap_order3_plant.txt	f8a8c40039fb068917e39a1ee0d0cf6570ca9001
+build/agent212/t333/closure/trap_plant3/tests/plant3.sh	444463a7e13cb7fc5c6b530591f94868c1a14b53
+build/agent212/t333/closure/trap_lines3.txt	e1ff98c74f66fc632eb2f36cceefdfeff65cb508
+build/agent212/t333/closure/nested_before_mktemp.txt	629edb0d8e316743d80e4eee0f56924c63a4cdfd
+build/agent212/t333/closure/verdict_a_1400.txt	0505c4113a2ae491cc231a5464cc75f5de261667
+build/agent212/t333/closure/nonsh_mktemp.txt	13935b04c439de0d17e24a6c2ce8e0192cd1d634
+build/agent212/t333/closure/trap_order4.py	f6fe101508d588a870eef82452df204ee546d44a
+build/agent212/t333/closure/trap_order4.txt	043f016fa9e2a3a4fe3934d63b2cbed2fa4272ac
+build/agent212/t333/closure/trap_order4_plant.txt	4bdfdf71849f5338f35d1f96985e5185139c86d2
+build/agent212/t333/closure/trap_plant4/tests/plant4.sh	425412c7eb6983ae3a1eea2669bc180662a8c5fc
+build/agent212/t333/closure/mtime_code_readers3.txt	653a9b9e13669c0fff37410884bdcc8bc6a39d35
+build/agent212/t333/closure/mtime_reach4.txt	8f0d36d61f5412971511af254b5049afdc734608
+build/agent212/t333/closure/verdict_a_1401.txt	a7d7626a435dbefed55b624826fb70b0f1071a91
+build/agent212/t333/closure/trap_any.py	f0e4079157f3e3ac7d290f4a042f994ddb0badb5
+build/agent212/t333/closure/trap_any.txt	af19948e1b8ab6d2ade6c67e1d00629e94cdfe98
+build/agent212/t333/closure/trap_any_byeye.txt	f30b1a633cd59b173a15595d53fb8734da253662
+build/agent212/t333/closure/trap_any_plant.txt	ad7c070c56ecd8dc7eb2a16e9eabe71bb4e2c405
+build/agent212/t333/closure/trap_plant5/tests/plant5.sh	ffc7f34259cfb93d10dd7feec599aa75b167d98b
+build/agent212/t333/closure/untracked_nonsh_mktemp.txt	b52a67cea08dfb64331156fbc1994b4621bc6d9f
+build/agent212/t333/closure/verdict_b_1402.txt	30b0d5e7edf746fcd1ccd7c6b8abf8f413371a6c
+build/agent212/t333/closure/rm_any.py	7e5228db3002a3c6fa061c478f1416cdda9abfcc
+build/agent212/t333/closure/rm_any.txt	5920056acf187734025b4cfb6d08409a772a0764
+build/agent212/t333/closure/rm_any_class.py	379a4b797c7b236656f4ff7012c5cbc41023fe55
+build/agent212/t333/closure/rm_any_class.txt	0b7b94dd259e22bd27dd6998ac77270f3c7d59fa
+build/agent212/t333/closure/rm_any_plant.txt	507e8697a8f65643f1e43e432c48a19be9ae9510
+build/agent212/t333/closure/trap_plant6/tests/plant6.sh	1217dd052efac59afa6e27e040616ee45cf8d712
+build/agent212/t333/closure/census_before_4.txt	b82edb7dfa14c8cfa1a79368be423e9e2bc59784

@@ -58,7 +58,7 @@ cd "$REPO"
 REL="${1:-release/merged-m23}"
 [ -d "$REL" ] || { echo "FAIL: no release tree at $REL (the package-text check needs one)"; exit 1; }
 NAME="$(basename "$REL")"
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
+W="$(mktemp -d)" || { echo "FAIL: test_release_launcher_bat — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT
 fail=0
 ok()  { echo "  ok: $*"; }
 bad() { echo "FAIL: $*"; fail=1; }

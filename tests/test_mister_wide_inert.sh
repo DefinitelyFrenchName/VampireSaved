@@ -71,7 +71,7 @@ FIRST="${WINDOW_FIRST:-540}"
 LAST="${WINDOW_LAST:-640}"
 FRAMES=$((LAST + 1))
 
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: test_mister_wide_inert — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 for core in cps2 cps2w; do
     echo "== $core, stock vsavj, frames $FIRST-$LAST =="
     "$REPO/tools/run_sim_jtcps2.sh" "$RPL" "$W/$core" --core "$core" \

@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-211 CLOSE, 2026-10-28)
+# NEXT SESSION — orientation (rewritten at the 14z-212 CLOSE, 2026-10-30)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` (then `python3 tools/gen_history_index.py`
@@ -17,17 +17,16 @@ A plain **Opus 5.5 session at effort High** (the ruled orchestrator — STATE 'S
 - **Never edit a script while it runs** ([MJC-54]); the emulator runner reports a tracked file changed during its run.
 
 Say so at the opener. Never spawn any agent at `max`. A recommendation leans only on the maintainer's OWN words.
-**PILOT** (6 vCPU, 47 GB, Ubuntu 24.04, disk at 95%, about 12 GB free) carries xdelta3, Node and `strace`; its
-checkout `~/t210_trace` sits at the 14z-210 staged tree `f6ba8f02` (detached) and is the write-trace clone. Deletable
-scratch: `~/t210_trace*`, `~/t210r_*`, `~/t210_*.bundle`, `~/q210_out`, `~/c229*`, `~/e321*`, `~/b209_*`, `~/c209_*`, and
-fork X2's `~/x2wt`, `~/x2out`, `~/x2.bundle`, `~/t229.tar`, `~/x2f5`. **ERIS** (WSL2) runs the release shape; deletable
-scratch `~/k210` (6.3 GB, at `86d1ca10`), `~/k210_out`, `~/e2_out`, `C:\Users\Chaton\k210.bundle`,
-`C:\Users\Chaton\c86d1ca1.bundle`, and 14z-209's `~/a209_*`, `~/e321`. Neither profile sets ROMDIR (`ROMDIR=~/roms`).
-Work handed to either is a bundle of a COMMIT (a bare commit-tree needs a temporary ref; delete it after); a remote
-script goes over `ssh <host> 'wsl -e bash -s' < script`.
+**PILOT** (6 vCPU, 47 GB, Ubuntu 24.04, disk at 80%, 50 GB free; checked 14z-212 close) carries xdelta3, Node and
+`strace`. Its checkout `~/vampire-saved` sits at `e68f8842`. Deletable scratch, 16 GB in 72 entries: 14z-212's
+`~/t212*` (bundles, re-trace clones `~/t212_tr*`, `~/t212_trace`, `~/t212r*`) and `~/t336*` (#336's fresh clone), and
+14z-211's `~/t334`, `~/p334_knobs.*`, `~/p334_tools.*`. **ERIS** (WSL2, 5% used) runs the release shape; its scratch
+`~/e212*` and `~/e333` is deletable. Neither profile sets ROMDIR (`ROMDIR=~/roms`). Work handed to either is a bundle of a
+COMMIT (a bare commit-tree needs a temporary ref; delete it after); a remote script goes over `ssh <host> 'wsl -e bash -s'
+< script`.
 
 **THE SESSION CLOSE:** `docs/project/session_close.md`, run by `python3 tools/close.py`. The run of record is named in
-STATE 14z-211's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
+STATE 14z-212's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
 
 **THE EMULATOR RUNNER SINCE 14z-210 (#321, `docs/project/operations.md`):**
 - **Concurrent controls:** a gate on `tests/controls_concurrent_emu.txt` (60 of 61, from a PILOT write trace) runs each
@@ -51,36 +50,22 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
-1. **THE WORKING TREE CARRIES UNCOMMITTED WORK: #333 and #334** (STATE 14z-211 (3); the maintainer: *"Commit #330
-   only"*). Confirm PILOT and ERIS are reachable from the Mac (14z-211 lost both when the Mac moved to 10.200.0.89).
-   Then:
-   - **re-trace the stale concurrent-controls rows on PILOT:** 46 static and 22 emulator gates whose scripts changed
-     (`build/agent211/t334/cc_static.txt`, `cc_emu.txt`). Use `tools/trace_controls.sh`, scored by
-     `tools/controls_overlap.py`; 14z-210's scripts are in `build/agent210/t321retrace/`.
-   - update both lists' blobs and TRACES lines;
-   - read ERIS's #333 release-shape run (finished: 417 PASS, 4 host-environment SKIPs; `build/agent211/t333/eris/`);
-   - time #334 item 2's edited gates before and after on ERIS;
-   - time `test_mame_parity` under a tier's load on the Mac (#334 item 1's one remaining leg);
-   - then one strict GREEN tier on the staged tree, the commit, and the #333 and #334 closures on their rule-checker
-     runs.
-   `git status` shows the edited gates; `git stash` is never the way to set them aside.
-2. **#330 IS OPEN: ITS COMMAND THROWS AND TWO VICTIMS NEXT** (STATE 14z-211 (2); the normal throws are in the tree; the maintainer: *"Commit ground+air, rest next"*).
-   - **The command throws:** re-measure their whiffs IN range against a victim that cannot be grabbed. From the wide
-     pins, 28 of the 82 events started a plain normal (state seq `0x0A`; `docs/project/gotchas.md` "OUT OF RANGE A
-     RANGE-CHECKED GRAB'S INPUT IS A NORMAL"); check every whiff's state on its press frame. The first measurement's
-     tool code is `TR_FAMILY=command` in `tools/throw_recovery_rigs.py`, its scratch in `build/agent211/t330/`
-     (`cmd_*.py`, `held/`).
-   - **The air and command throws on Demitri and Lilith:** the maintainer's *"Measure them too"*. The first runs failed
-     (`air_victims.out`: empty states on Lilith's air rigs; `cmd_victims.out`: grabs that never hold on the other
-     victims).
-   - **The sheets** (`tools/throw_recovery_sheet.py`, the state printed under every tile) for what is added. Then
-     #330's closure on a fresh rule-checker run (run `2026-10-28-1361` stopped the first one).
+1. **THE LEDGER PAGE (#267) AND THE DASHBOARD'S ACTIONS (#335): CHECK THEM LIVE, THEN CLOSE EACH ON ITS RULE-CHECKER RUN.**
+   - #267: this close published the page to `origin`'s `gh-pages` (STATE 14z-212 CLOSE says whether the own-site leg ran;
+     `DEPLOY_TARGET` was unset). Ask the maintainer whether Pages is on (Settings → Pages, `gh-pages`; the session
+     account has no admin), then read the live page.
+   - #335: this close uploaded `actions.json` to the dashboard (artifact `RVSkG4CZX44wgJaJT2vDag`) as a fifth dataset,
+     `datasets/actions`, but the dashboard's page (`index.html` in its store) has no panel reading it yet: add one (the
+     first-run OK rate per decision, the questions on first runs), check it renders, then close #335.
+2. **Clear PILOT's and ERIS's scratch** (the list above) once nothing cites it.
 3. **Ask the maintainer for the order of work.** Open tickets (GitHub severity labels):
    - medium: none.
-   - low: #118, #310 (the UNJUDGED census; deferred, ruled "Record and defer"), #330 (above), #333 (106 gate scripts carry
-     on after a failed `mktemp -d`; done in the tree), #334 (#321's remainder; done in the tree but item 1's Mac leg);
-   - parked: #123, #124, #125, #127, #128, #129, #162, #267, #294.
-   - **Before planning any freeze or release, read each open ticket's comments for a step that runs AT it.**
+   - low: #118, #310 (the UNJUDGED census; deferred, ruled "Record and defer"), #337 (the mktemp census does not check
+     EXIT-trap order; split from #333).
+   - evolution, unlabelled: #267, #335 (item 1).
+   - parked: #123, #124, #125, #127, #128, #129, #162, #294.
+   - **Before planning any freeze or release, read each open ticket's comments for a step that runs AT it.** #333's
+     closing comment names one: the 11 sites guarded after run 1366 have not yet run in a release-shape emulator tier.
 4. **The next freeze or release** runs the six #229 gates only on demand, ERIS's tier takes `--skip test_mame_parity`,
    and the Mac runs parity (#321).
 
@@ -91,24 +76,28 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
-- **A state the engine passes through is not "the fighter can act"** (`docs/project/gotchas.md`, #330). Measure it by
-  what the game accepts, and check a state-read predicate on every event it is used for.
-- **A rig's first event stands at another stage x** (#330): put a sacrificial event first when comparing events.
-- **A rig timed in frames at one speed level does something else at another** (#330): re-time it in ticks, and check it
-  against the original by the state at its commit. Export a per-family setting once for the whole run.
-- **`tests/audit_throw_recovery.sh` keeps its ticks outside the tree** (`../charpages/framedata/throw_recovery*_full*.tsv`,
-  #319): a host without them SKIPs; on-demand sets via `TR_VICTIM`, `TR_FAMILY=air TR_HEIGHT`.
-- **The replay range is inclusive** (#329): two directions written end to start share a frame.
+- **A fresh clone's `build/` is not the main tree's** (`docs/project/gotchas.md`): tracked files under build dirs
+  (`hui30`, `merged1`) and `emu/jtcores` must be topped up, and a patch's mtime differs, before a clone's gate result
+  means anything.
+- **A pooled gate that globs its outputs cannot see a lost run** (`docs/project/gotchas.md`): name every leg and fail on a
+  missing one; `tests/audit_pool_drop.sh` (ondemand, `harness:`) drops each pool's first run to prove it.
+- **A shell's write-error text is its own** (`docs/platform/gotchas.md`, #336): dash says `I/O error`, bash `Broken pipe`.
+- **`git ls-files "tools/*.sh"` matches subdirectories** (its `*` matches `/`): an evidence script must list files the
+  way the instrument it checks does (#333 found two real sites this way).
+- **A new `DECISIONS_HISTORY.md` entry shifts every cited line range by one** once `tools/gen_history_index.py` adds its
+  index line: re-cite a packet's ranges after regenerating.
+- **The census is a lint over shell text** (`tools/tmp_hygiene.py`; the maintainer: "Fix these + state the limit"); a
+  form outside its known answers is untested, and EXIT-trap order is #337.
 
-## WHAT CLOSED THIS SITTING (14z-211)
+## WHAT CLOSED THIS SITTING (14z-212)
 
-- **Closed `done`:** #329 (the half circles' minimal inputs), on its rule-checker run with its closing comment.
-- **Landed, ticket open:** #330's normal throws, ground and air: `tests/audit_throw_recovery.sh`, classified on the
-  cross-check page, the captures read by the maintainer. #333 and #334 stay open, done in the tree and waiting for PILOT.
-- **Ruled** (`DECISIONS_HISTORY.md`, 14z-211 entries):
-  - the opener's cleanup; #329's re-rig;
-  - #334 item 1 "All 35 on PILOT", #333 "Re-trace after #334", #334 item 2 "All 62";
-  - #330: "First accepted input", "New gate, Victor only", "Against the 3-victim range", "Against a height range",
-    "Whiff recovery + techability";
-  - the close "Commit #330 only"; the captures "Now, before the close"; "Measure them too"; "Commit ground+air, rest
-    next"; the maintainer's reading of the sheets, "Yes, commit them".
+- **Closed `done`**, each on its rule-checker run with its closing comment: #330 (run `2026-10-29-1370`), #334
+  (`-1378`), #336 (`-1393`), #333 (`2026-10-30-1404`, after 21 earlier runs).
+- **Filed:** #336 (found and fixed), #337 (from #333's trap-order limit).
+- **Built:** #335 (the ledger's actions) and #267 (the ledger as a public page; the close's new `ledger-page` step).
+- **Ruled** (`DECISIONS_HISTORY.md`, 14z-212 entries): #333 "Finish it now", "Fix when back", "Fix all four now", "Fix both
+  forms, name (c)", "Fix these + state the limit", "Restate + name", "Guard both, name scope", "Ruling stands, fix record",
+  "Stands, use exact wording", "Keep checking, then close", "State it as a limit + ticket"; #334 "Ondemand, new 'harness:'";
+  #330 "No whiff", "Yes, it is the whiff", "Yes, it stands"; #335 "Link, else wording", "Every question", "Excluded, shown
+  apart"; #267 "Unpark #267 and build it", "gh-pages is fine", "All but your own figures", "Keep both for now", "both is
+  good", "At the close", "The close uploads it"; the deploy "Fail or ignore the deploy".

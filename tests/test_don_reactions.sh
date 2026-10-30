@@ -9,7 +9,7 @@
 # EXPECTS: multi-hit, no knockdown, the death chain complete, damage within bound; the
 #   knockdown control fails. The two-sided native comparison is test_don_immortal_native's;
 #   this gate keeps the one-sided locks honest.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/replay.lua
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/controls.sh tests/lua/replay.lua tests/lib/jobs.sh tests/replays/
 #   tests/replays/48_don_immortal_ko.rpl tests/replays/54_don_matchend_ko.rpl tests/replays/56_don_es_ls.rpl tests/replays/59_don_blizzard_hcf.rpl tests/replays/60_don_grapple_hcb.rpl tools/run_mame.sh tools/setup_mame.sh
 #
 # SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
@@ -85,7 +85,7 @@
 # extension verified native-equal separately (3 -> 4 loop
 # iterations on both games, session 14z-42).
 #
-# Usage: ROMDIR=... tests/test_don_reactions.sh [rompath_dir]
+# Usage: ROMDIR=... [JOBS=N] tests/test_don_reactions.sh [rompath_dir]
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 # 14z-132: ABSOLUTE. Gates `cd` into work dirs and then compose paths that
@@ -103,13 +103,36 @@ trap 'rm -rf "$WORK"' EXIT
 cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 
-DUMPS=$(python3 -c "print(';'.join(f'{f}:ff8850-ff8854;{f}:ff8800-ff8830' for f in range(2630,2760,10)))")
-DUMPS="$DUMPS" REPLAY="$REPO/tests/replays/48_don_immortal_ko.rpl" \
-    CHECKSUM_OUT="$WORK/c.log" MAME_SANDBOX="$WORK" \
-    MAME_ROMPATH="$RPDIR;$ROMDIR" tools/run_mame.sh vsavj \
-    -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
+# JOBS (#334 item 2, 14z-211): the seven runs are independent (no run reads another's output), so they go through
+# tests/lib/jobs.sh's pool, JOBS at a time; default min(4, CPUs/6). Each writes only its own sandbox $WORK/<sub> —
+# section 1's is $WORK/hp, where it was $WORK itself, the parent of the others', until this change — its dumps there
+# and its exit status to $WORK/<sub>.rc. Every section then judges its run(s) in the original order, exiting with the
+# run's status where a failed run used to stop the gate (set -e), and a section's red still stops the gate before the
+# next section is judged.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+run_replay() {  # run_replay <sub> <replay> <pokes> <dumps>  (empty pokes = none; replay.lua reads "" as unset)
+    if POKES="$3" DUMPS="$4" REPLAY="$REPO/tests/replays/$2.rpl" \
+        CHECKSUM_OUT="$WORK/$1/c.log" MAME_SANDBOX="$WORK/$1" \
+        MAME_ROMPATH="$RPDIR;$ROMDIR" tools/run_mame.sh vsavj \
+        -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1; then echo 0 > "$WORK/$1.rc"; else echo $? > "$WORK/$1.rc"; fi
+}
+run_status() { _rs="$(cat "$WORK/$1.rc" 2>/dev/null || echo 1)"; [ "$_rs" = 0 ] || exit "$_rs"; }
+mkdir -p "$WORK/hp" "$WORK/ko" "$WORK/me" "$WORK/es" "$WORK/esko" "$WORK/hc1" "$WORK/hc2"
+vs_pool_start "$JOBS"
+vs_pool_run run_replay hp 48_don_immortal_ko "" \
+    "$(python3 -c "print(';'.join(f'{f}:ff8850-ff8854;{f}:ff8800-ff8830' for f in range(2630,2760,10)))")"
+vs_pool_run run_replay ko 48_don_immortal_ko "2600:ff8850:00010001" "2950:ff8800-ff8830;3030:ff8800-ff8830"
+vs_pool_run run_replay me 54_don_matchend_ko "2400:ff8850:00080008;3100:ff8850:00080008" \
+    "3420:ff8800-ff8830;3650:ff8800-ff8830;4100:90c2a0-90c340;4100:708020-708028"
+vs_pool_run run_replay es 56_don_es_ls "2550:ff8509:09" \
+    "2600:708000-708200;$(python3 -c "print(';'.join(f'{f}:ff8850-ff8854' for f in range(2625,2745,10)))")"
+vs_pool_run run_replay esko 56_don_es_ls "2550:ff8509:09;2600:ff8850:00010001" "2950:ff8800-ff8830;3030:ff8800-ff8830"
+vs_pool_run run_replay hc1 59_don_blizzard_hcf "" "2632:ff8400-ff8430;2640:ff8400-ff8430"
+vs_pool_run run_replay hc2 60_don_grapple_hcb "" "2780:ff8400-ff8430;2800:ff8400-ff8430"
+vs_pool_wait
 
-python3 - "$WORK" "$MODE" <<'EOF2'
+run_status hp
+python3 - "$WORK/hp" "$MODE" <<'EOF2'
 import sys, os, glob
 work = sys.argv[1]
 MODE = sys.argv[2] if len(sys.argv) > 2 else ""
@@ -157,13 +180,7 @@ print(f"  ok: 421P multi-hits ({hits} steps, {total} total, last at "
       f"f{last_hit_frame}) native-class, no knockdown on a standing opponent")
 EOF2
 # ── 2. fatal: the full native electric death chain ───────────────────
-mkdir -p "$WORK/ko"
-POKES="2600:ff8850:00010001" \
-DUMPS="2950:ff8800-ff8830;3030:ff8800-ff8830" \
-    REPLAY="$REPO/tests/replays/48_don_immortal_ko.rpl" \
-    CHECKSUM_OUT="$WORK/ko/c.log" MAME_SANDBOX="$WORK/ko" \
-    MAME_ROMPATH="$RPDIR;$ROMDIR" tools/run_mame.sh vsavj \
-    -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
+run_status ko
 
 python3 - "$WORK/ko" <<'EOF2'
 import sys, os
@@ -181,13 +198,7 @@ EOF2
 #      (14z-25 round 38) is match-end-specific. Replay 54 wins round 1 with
 #      the deity, then kills again in round 2 (match over) — the victim
 #      must still chain to the grounded death node.
-mkdir -p "$WORK/me"
-POKES="2400:ff8850:00080008;3100:ff8850:00080008" \
-DUMPS="3420:ff8800-ff8830;3650:ff8800-ff8830;4100:90c2a0-90c340;4100:708020-708028" \
-    REPLAY="$REPO/tests/replays/54_don_matchend_ko.rpl" \
-    CHECKSUM_OUT="$WORK/me/c.log" MAME_SANDBOX="$WORK/me" \
-    MAME_ROMPATH="$RPDIR;$ROMDIR" tools/run_mame.sh vsavj \
-    -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
+run_status me
 
 python3 - "$WORK/me" <<'EOF2'
 import sys, os
@@ -221,14 +232,7 @@ EOF2
 #      tests +0x109 for pair presses). Native datums in the replay
 #      header. Guards the ES record-type remaps (0x4E->0x06 x7) and
 #      the round-52 ES-finish neutral-pose bug.
-mkdir -p "$WORK/es"
-DUMPS=$(python3 -c "print(';'.join(f'{f}:ff8850-ff8854' for f in range(2625,2745,10)))")
-DUMPS="2600:708000-708200;$DUMPS"
-POKES="2550:ff8509:09" DUMPS="$DUMPS" \
-    REPLAY="$REPO/tests/replays/56_don_es_ls.rpl" \
-    CHECKSUM_OUT="$WORK/es/c.log" MAME_SANDBOX="$WORK/es" \
-    MAME_ROMPATH="$RPDIR;$ROMDIR" tools/run_mame.sh vsavj \
-    -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
+run_status es
 
 python3 - "$WORK/es" <<'EOF2'
 import sys, os, glob
@@ -268,13 +272,7 @@ assert (144, 40, 0xBE8C, 0x0202) in ents, \
     "HUD name plate entry (0xBE8C 3x1 pal 02 at 144,40) missing — name-table aux_poke drift?"
 print("  ok: HUD mugshot + name plate ride the 14z-49 cells (0x3DC8 / 0xBE8C)")
 EOF2
-mkdir -p "$WORK/esko"
-POKES="2550:ff8509:09;2600:ff8850:00010001" \
-DUMPS="2950:ff8800-ff8830;3030:ff8800-ff8830" \
-    REPLAY="$REPO/tests/replays/56_don_es_ls.rpl" \
-    CHECKSUM_OUT="$WORK/esko/c.log" MAME_SANDBOX="$WORK/esko" \
-    MAME_ROMPATH="$RPDIR;$ROMDIR" tools/run_mame.sh vsavj \
-    -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
+run_status esko
 
 python3 - "$WORK/esko" <<'EOF2'
 import sys, os
@@ -294,9 +292,8 @@ EOF2
 #      move CHAIN is entered (P1 node in the move's ported range)
 #      shortly after the input; the pre-fix build fell back to
 #      normals (nodes elsewhere).
-mkdir -p "$WORK/hc1" "$WORK/hc2"
-DUMPS="2632:ff8400-ff8430;2640:ff8400-ff8430"     REPLAY="$REPO/tests/replays/59_don_blizzard_hcf.rpl"     CHECKSUM_OUT="$WORK/hc1/c.log" MAME_SANDBOX="$WORK/hc1"     MAME_ROMPATH="$RPDIR;$ROMDIR" tools/run_mame.sh vsavj     -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
-DUMPS="2780:ff8400-ff8430;2800:ff8400-ff8430"     REPLAY="$REPO/tests/replays/60_don_grapple_hcb.rpl"     CHECKSUM_OUT="$WORK/hc2/c.log" MAME_SANDBOX="$WORK/hc2"     MAME_ROMPATH="$RPDIR;$ROMDIR" tools/run_mame.sh vsavj     -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
+run_status hc1
+run_status hc2
 python3 - "$WORK" <<'EOF2'
 import sys, os
 work = sys.argv[1]

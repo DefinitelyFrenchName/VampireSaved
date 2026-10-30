@@ -81,7 +81,7 @@ SHEET="${SHEET:-$REPO/../community/vsav-framedata.xlsx}"
 JOBS="${JOBS:-2}"
 INSTR="$REPO/tests/lua/specials_trace.lua"
 T=tools/specials_a_rigs.py
-W="$(mktemp -d)"
+W="$(mktemp -d)" || { echo "FAIL: audit_vanilla_specials_a — mktemp -d failed (W)"; exit 2; }
 if [ -n "${KEEP:-}" ]; then mkdir -p "$KEEP"; trap 'cp -R "$W"/. "$KEEP"/ 2>/dev/null; rm -rf "$W"' EXIT; else trap 'rm -rf "$W"' EXIT; fi
 bad=0; FAILED=""
 ok()  { echo "  ok    $1"; }

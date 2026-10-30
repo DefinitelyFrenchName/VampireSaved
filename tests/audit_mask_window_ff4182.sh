@@ -11,7 +11,7 @@
 # EXPECTS: (1) vanilla row 14 in vanilla's slot, (2) the ported row in the build's, (3)
 #   identical outside the window. A (3) failure is stop-and-root-cause, never a mask
 #   widening.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay.lua tests/lib/jobs.sh
 #   tests/replays/05_timeout_idle.rpl tools/run_mame.sh tools/setup_mame.sh tests/lib/sheet.sh
 #
 # SHEET: legs vsavj,ours — moments: f9126, the match-to-win fade after the round-1 timeout, where the gate compares the $FF4140-$FF41DF staging dump — not comparable: the palette-fade staging slot $FF4182-$FF41A1 (select block-A row 14), recoloured by design (14z-49)
@@ -42,7 +42,7 @@
 # a new divergence near $FF41xx, a row-14 retune, or before extending
 # the window family for a new palette-block port (Huitzil/Pyron).
 #
-# Usage: ROMDIR=... tests/audit_mask_window_ff4182.sh [rompath_dir]
+# Usage: ROMDIR=... [JOBS=N] tests/audit_mask_window_ff4182.sh [rompath_dir]
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -73,8 +73,16 @@ run_side() { # $1=rompath $2=outsub
         -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
 }
 
-run_side "$ROMDIR" van
-run_side "$RPDIR;$ROMDIR" pat
+# JOBS (#334 item 2, 14z-211): the two sides are independent — each writes only its own $WORK/<side> (sandbox, c.log,
+# dump) — so both go through tests/lib/jobs.sh's pool, JOBS at a time (default min(4, CPUs/6)). A side's nonzero status
+# lands in $WORK/<side>.rc and exits the gate after the pool, in the order set -e exited on it serially.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+pooled_side() { run_side "$1" "$2" || echo "$?" > "$WORK/$2.rc"; }
+vs_pool_start "$JOBS"
+vs_pool_run pooled_side "$ROMDIR" van
+vs_pool_run pooled_side "$RPDIR;$ROMDIR" pat
+vs_pool_wait
+for _side in van pat; do [ ! -f "$WORK/$_side.rc" ] || exit "$(cat "$WORK/$_side.rc")"; done
 
 # THE SHEET (#291): with SHEET_OUT set, the two legs, each proven on its own checksum log, at the one frame the gate
 # compares. The verdict there is re-read from the same dumps (outside the window equal); nothing decided changes.

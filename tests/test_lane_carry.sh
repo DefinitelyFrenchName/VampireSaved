@@ -27,7 +27,7 @@ set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 TOOL="$REPO/tools/audit_lane_carry.py"
-W="$(mktemp -d "${TMPDIR:-/tmp}/lcarry.XXXXXX")"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d "${TMPDIR:-/tmp}/lcarry.XXXXXX")" || { echo "FAIL: test_lane_carry — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 
 # THE SHADOW TOOLS, built from the real tool by one substitution each; a substitution

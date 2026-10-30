@@ -9,7 +9,7 @@
 # EXPECTS: guard clean end to end and a stock consumed per section. Without the decrement a
 #   timing drift that stopped the move would leave the gate green — the silent coverage-loss
 #   mechanism.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay_guard.lua tests/replays/hui/
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay_guard.lua tests/replays/hui/ tests/lib/jobs.sh
 #   tools/build_donovan.sh tools/run_mame.sh tools/run_replay_guarded.sh tools/setup_mame.sh
 #
 # SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
@@ -30,7 +30,7 @@
 #      if input timing drift stopped the move from coming out at all
 #      (the 14z-44 "silent soak coverage loss" mechanism).
 #
-# Usage: ROMDIR=... tests/test_hui_ex.sh [existing-stage4-builddir]
+# Usage: ROMDIR=... [JOBS=N] tests/test_hui_ex.sh [existing-stage4-builddir]
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -66,17 +66,38 @@ fi
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "FAIL: no vsavjw.zip (WIDE build required)"; exit 1; }
 export MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 
-# frame:file pairs chosen per replay: a dump before the first possible
-# fire (stock must read the poked 9) and the final dump (must be < 9).
-run_ex() {
+# JOBS (#334 item 2, 14z-211): the four guarded runs (es, fg, fgw, fgc) are independent — each runs in its own
+# $WORK/<label> (cwd, log, sandbox, dumps, captured output, exit status) — so they go through tests/lib/jobs.sh's
+# pool first, JOBS at a time (default min(4, CPUs/6)); the sections below read them in the serial order, with the
+# same lines and the same first-failure exit.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+ex_exec() {  # ex_exec <rpl> <label> <lastdump>: the guarded run in $WORK/<label>; exit status to <label>/rc
     rpl="$1"; label="$2"; lastdump="$3"
     dir="$WORK/$label"; mkdir -p "$dir"
-    ( cd "$dir" && \
+    if ( cd "$dir" && \
       POKES="1704:ff8782:10;1760:ff8782:10;1900:ff8782:10;2100:ff8782:10;2400:ff8782:10;3000:ff8509:09" \
       DUMPS="3200:ff8500-ff8510;$lastdump:ff8500-ff8510" \
       MAME_ROMPATH="$BUILD/rompath;$ROMDIR" \
       "$REPO/tools/run_replay_guarded.sh" vsavjw "$REPO/tests/replays/hui/$rpl" \
-          "$dir/g.log" "$dir/box" > "$dir/g.out" 2>&1 ) || {
+          "$dir/g.log" "$dir/box" > "$dir/g.out" 2>&1 ); then echo 0 > "$dir/rc"; else echo "$?" > "$dir/rc"; fi
+}
+fgc_exec() {  # replay 78's run (its own second stock poke at 4000 and its 3900 dump), as ex_exec
+    dir="$WORK/fgc"; mkdir -p "$dir"
+    if ( cd "$dir" && \
+      POKES="1704:ff8782:10;1760:ff8782:10;1900:ff8782:10;2100:ff8782:10;2400:ff8782:10;3000:ff8509:09;4000:ff8509:09" \
+      DUMPS="3200:ff8500-ff8510;3900:ff8500-ff8510" \
+      MAME_ROMPATH="$BUILD/rompath;$ROMDIR" \
+      "$REPO/tools/run_replay_guarded.sh" vsavjw "$REPO/tests/replays/hui/78_hui_fg_chaos.rpl" \
+          "$dir/g.log" "$dir/box" > "$dir/g.out" 2>&1 ); then echo 0 > "$dir/rc"; else echo "$?" > "$dir/rc"; fi
+}
+ex_ok() { [ "$(cat "$WORK/$1/rc" 2>/dev/null)" = 0 ]; }
+
+# frame:file pairs chosen per replay: a dump before the first possible
+# fire (stock must read the poked 9) and the final dump (must be < 9).
+run_ex() {
+    rpl="$1"; label="$2"; lastdump="$3"
+    dir="$WORK/$label"
+    ex_ok "$label" || {   # (the run itself ran in the pool, ex_exec)
         echo "FAIL: $label guard tripped:"
         grep -m2 -E "CRASH|REGS" "$dir/g.log" || tail -5 "$dir/g.out"
         exit 1
@@ -94,6 +115,13 @@ run_ex() {
 # case-sensitivity note: BUILD may be absolute already
 case "$BUILD" in /*) BUILD_ABS="$BUILD" ;; *) BUILD_ABS="$REPO/$BUILD" ;; esac
 BUILD="$BUILD_ABS"
+
+vs_pool_start "$JOBS"
+vs_pool_run ex_exec 72_hui_ex_es.rpl es 4400
+vs_pool_run ex_exec 73_hui_ex_fg_close.rpl fg 4600
+vs_pool_run ex_exec 77_hui_fg_whiff.rpl fgw 4400
+vs_pool_run fgc_exec
+vs_pool_wait
 
 echo "== Erasing Sphere 421+2K (replay 72)"
 run_ex 72_hui_ex_es.rpl es 4400
@@ -113,13 +141,8 @@ run_ex 77_hui_fg_whiff.rpl fgw 4400
 # draw, so single casts sometimes survived). The data_in_code reroutes
 # are the fix; this section soaks the FG + post-capture aftermath.
 echo "== Final Guardian + post-capture chaos (replay 78)"
-dir="$WORK/fgc"; mkdir -p "$dir"
-( cd "$dir" && \
-  POKES="1704:ff8782:10;1760:ff8782:10;1900:ff8782:10;2100:ff8782:10;2400:ff8782:10;3000:ff8509:09;4000:ff8509:09" \
-  DUMPS="3200:ff8500-ff8510;3900:ff8500-ff8510" \
-  MAME_ROMPATH="$BUILD/rompath;$ROMDIR" \
-  "$REPO/tools/run_replay_guarded.sh" vsavjw "$REPO/tests/replays/hui/78_hui_fg_chaos.rpl" \
-      "$dir/g.log" "$dir/box" > "$dir/g.out" 2>&1 ) || {
+dir="$WORK/fgc"
+ex_ok fgc || {   # (the run itself ran in the pool, ex_exec)
     echo "FAIL: fg-chaos guard tripped:"
     grep -m2 -E "CRASH|REGS" "$dir/g.log" || tail -5 "$dir/g.out"
     exit 1

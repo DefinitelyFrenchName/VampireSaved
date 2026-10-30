@@ -1,0 +1,1 @@
+NOT RUN (14z-212): the claim said both 'ten' and 'thirteen' guarded forms (an edit left the old phrase); caught on reading the prompt before any reader was spawned. Re-prepared.

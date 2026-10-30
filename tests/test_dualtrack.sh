@@ -11,7 +11,7 @@
 # EXPECTS: every onset equal to its frozen value, no growth outside the offsets; an onset
 #   moving earlier is the failure (CLAUDE.md [VSP-25]).
 # FOLLOWS: build/manifest/ docs/game/atlas/ram.md emu/fbneo-patches/ emu/fbneo/
-#   tests/lib/controls.sh tests/replays/ tools/run_replay_fbneo.sh tools/setup_fbneo.sh
+#   tests/lib/controls.sh tests/lib/jobs.sh tests/replays/ tools/run_replay_fbneo.sh tools/setup_fbneo.sh
 #
 # SHEET: none — compares builds of ours with each other (A/B, merged vs solo, stock vs WIDE), not with a reference set
 #
@@ -124,7 +124,7 @@
 #          had taken a different BRANCH would show a different writer set,
 #          and that is what would mean the profile leaked into engine flow.
 #
-# Usage: ROMDIR=... tests/test_dualtrack.sh [stock_rompath] [wide_rompath]
+# Usage: ROMDIR=... [JOBS=N] tests/test_dualtrack.sh [stock_rompath] [wide_rompath]
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -172,9 +172,25 @@ LEGACY_ONSETS="02_demitri_vs_cpu:890 03_two_player_vs:890 04_select_fuzz:890 \
 30_demitri_throw:890"
 DONOVAN="01_attract_long 12_donovan_vs_cpu 19_don_dp_spam 25_don_darkforce 56_don_es_ls"
 
+# JOBS (#334 item 2, 14z-211): the emulator runs go through tests/lib/jobs.sh's pool, JOBS at a time; default
+# min(4, CPUs/6), in three phases, each judged after its runs finish, in the order the sections always ran: (A) the 32
+# base runs of sections 1 and 2 and section 4's two tap runs, none of which reads another's output; (B) every replay's
+# dump runs, whose candidate frames come from that replay's own phase-A logs (so_dumps); (C) section 3's two onset
+# runs, which need section 2's onset. Every run writes only its own log and sandbox (per tag, per batch). A run whose
+# failure stopped the gate inline under set -e (prun records its status) stops it at the same point (prc); the dump
+# runs' statuses were never read and still are not.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+prun() {  # prun <rcfile> <command...> — one emulator run, output discarded, its exit status into <rcfile>
+    _prf="$1"; shift; _prc=0
+    "$@" >/dev/null 2>&1 || _prc=$?
+    echo "$_prc" > "$_prf"
+}
+prc() {  # prc <rcfile> — stop the gate, as set -e did inline, if that run failed
+    _prr="$(cat "$1" 2>/dev/null || echo 1)"; [ "$_prr" = 0 ] || exit "$_prr"
+}
 run() {  # run <tag> <set> <rompath> <replay>
-    FBNEO_ROMPATH="$3" tools/run_replay_fbneo.sh "$2" \
-        "$REPO/tests/replays/$4.rpl" "$WORK/$1.log" "$WORK/sb_$1" >/dev/null 2>&1
+    prun "$WORK/$1.rc" env FBNEO_ROMPATH="$3" tools/run_replay_fbneo.sh "$2" \
+        "$REPO/tests/replays/$4.rpl" "$WORK/$1.log" "$WORK/sb_$1"
 }
 
 # THE INSTRUMENT, BROUGHT IN LINE WITH THE RULING (maintainer, 2026-09-05,
@@ -225,22 +241,20 @@ print("STATE_ONSET", onset if onset is not None else "none")
 print("FLICKER", flick, ",".join(f"{o:04x}" for o in sorted(seen)))
 if stray: print("STRAY", stray[0], ",".join(f"{o:04x}" for o in stray[1][:8]))
 PYC
-dump_batch() {  # dump_batch <spec> <tag_s> <set_s> <rp_s> <tag_w> <set_w> <rp_w> <replay> <k>
+dump_one() {  # dump_one <spec> <tag> <set> <rp> <replay> <k> — one leg of one dump batch
     FBNEO_DUMPS="$1" FBNEO_ROMPATH="$4" tools/run_replay_fbneo.sh "$3" \
-        "$REPO/tests/replays/$8.rpl" "$WORK/d_$2_$9.log" "$WORK/sbd_$2_$9" >/dev/null 2>&1
-    FBNEO_DUMPS="$1" FBNEO_ROMPATH="$7" tools/run_replay_fbneo.sh "$6" \
-        "$REPO/tests/replays/$8.rpl" "$WORK/d_$5_$9.log" "$WORK/sbd_$5_$9" >/dev/null 2>&1
+        "$REPO/tests/replays/$5.rpl" "$WORK/d_$2_$6.log" "$WORK/sbd_$2_$6" >/dev/null 2>&1 || true
 }
-state_onset() {  # state_onset <tag_s> <tag_w> <set_s> <rp_s> <set_w> <rp_w> <replay> <limit|none>
+dump_batch() {  # dump_batch <spec> <tag_s> <set_s> <rp_s> <tag_w> <set_w> <rp_w> <replay> <k> — both legs, pooled
+    vs_pool_run dump_one "$1" "$2" "$3" "$4" "$8" "$9"
+    vs_pool_run dump_one "$1" "$5" "$6" "$7" "$8" "$9"
+}
+so_dumps() {  # so_dumps <tag_s> <tag_w> <set_s> <rp_s> <set_w> <rp_w> <replay> <limit|none> — phase B: queue the dumps
     # frames whose checksums differ, up to and including the frozen onset
     diff "$WORK/$1.log" "$WORK/$2.log" | awk '/^< [0-9]/{print $2}' > "$WORK/$1.diffs"
     if [ "$8" = none ]; then cp "$WORK/$1.diffs" "$WORK/$1.cand"
     else awk -v L="$8" '$1 <= L' "$WORK/$1.diffs" > "$WORK/$1.cand"; fi
-    if [ ! -s "$WORK/$1.cand" ]; then
-        # nothing differs up to the frozen onset: the state onset is the first
-        # later differing frame (a LATER onset is itself a failure), or none
-        so="$(head -1 "$WORK/$1.diffs")"; echo "STATE_ONSET ${so:-none}"; echo "FLICKER 0 "; return
-    fi
+    [ -s "$WORK/$1.cand" ] || return 0
     k=0; spec=""; n=0
     while IFS= read -r fr; do
         spec="$spec$fr:ff0000-ffffff;"; n=$((n + 1))
@@ -249,6 +263,14 @@ state_onset() {  # state_onset <tag_s> <tag_w> <set_s> <rp_s> <set_w> <rp_w> <re
         fi
     done < "$WORK/$1.cand"
     [ -n "$spec" ] && dump_batch "$spec" "$1" "$3" "$4" "$2" "$5" "$6" "$7" "$k"
+    return 0
+}
+state_onset() {  # state_onset <tag_s> <tag_w> — judged once so_dumps' runs have finished
+    if [ ! -s "$WORK/$1.cand" ]; then
+        # nothing differs up to the frozen onset: the state onset is the first
+        # later differing frame (a LATER onset is itself a failure), or none
+        so="$(head -1 "$WORK/$1.diffs")"; echo "STATE_ONSET ${so:-none}"; echo "FLICKER 0 "; return
+    fi
     # THE EXECUTABLE MODE: flip a byte at $FF8000 (outside the six frozen offsets)
     # in the WIDE dump of the first pre-onset candidate frame, so the classifier
     # reports a STATE onset earlier than the frozen one and section 1 FAILs. Done
@@ -264,12 +286,45 @@ state_onset() {  # state_onset <tag_s> <tag_w> <set_s> <rp_s> <set_w> <rp_w> <re
     python3 "$WORK/classify.py" "$WORK" "$1" "$2" "$(printf '%s' "$FROZEN_FLICKER" | tr ' ' ',')" "$WORK/$1.cand"
 }
 
+# phase A: the base runs of sections 1 and 2, and section 4's two tap runs
+vs_pool_start "$JOBS"
+for spec in $LEGACY_ONSETS; do
+    rp="${spec%%:*}"
+    vs_pool_run run "s_$rp" vsavj  "$STOCK" "$rp"
+    vs_pool_run run "w_$rp" vsavjw "$WIDE"  "$rp"
+done
+for rp in $DONOVAN; do
+    vs_pool_run run "sd_$rp" vsavj  "$STOCK" "$rp"
+    vs_pool_run run "wd_$rp" vsavjw "$WIDE"  "$rp"
+done
+vs_pool_run prun "$WORK/tp_s.rc" env FBNEO_HTAP="ff87a4-ff87a7" FBNEO_HTAP_OUT="$WORK/s.tap" FBNEO_ROMPATH="$STOCK" \
+    tools/run_replay_fbneo.sh vsavj "$REPO/tests/replays/01_attract_long.rpl" \
+    "$WORK/tp_s.log" "$WORK/sb_tp_s"
+vs_pool_run prun "$WORK/tp_w.rc" env FBNEO_HTAP="ff87a4-ff87a7" FBNEO_HTAP_OUT="$WORK/w.tap" FBNEO_ROMPATH="$WIDE" \
+    tools/run_replay_fbneo.sh vsavjw "$REPO/tests/replays/01_attract_long.rpl" \
+    "$WORK/tp_w.log" "$WORK/sb_tp_w"
+vs_pool_wait
+# phase B: each replay's dump runs (none past the first replay whose base run failed: the gate stops there)
+vs_pool_start "$JOBS"
+for spec in $LEGACY_ONSETS; do
+    rp="${spec%%:*}"; want="${spec##*:}"
+    [ "$(cat "$WORK/s_$rp.rc" 2>/dev/null)" = 0 ] && [ "$(cat "$WORK/w_$rp.rc" 2>/dev/null)" = 0 ] || break
+    so_dumps "s_$rp" "w_$rp" vsavj "$STOCK" vsavjw "$WIDE" "$rp" "$want"
+done
+for rp in $DONOVAN; do
+    [ "$(cat "$WORK/sd_$rp.rc" 2>/dev/null)" = 0 ] && [ "$(cat "$WORK/wd_$rp.rc" 2>/dev/null)" = 0 ] || break
+    cmp -s "$WORK/sd_$rp.log" "$WORK/wd_$rp.log" && continue
+    lim=none; [ "$rp" = 01_attract_long ] && lim=4267
+    so_dumps "sd_$rp" "wd_$rp" vsavj "$STOCK" vsavjw "$WIDE" "$rp" "$lim"
+done
+vs_pool_wait
+
 echo "== 1. LEGACY must be identical UP TO select entry =="
 for spec in $LEGACY_ONSETS; do
     rp="${spec%%:*}"; want="${spec##*:}"
-    run "s_$rp" vsavj  "$STOCK" "$rp"
-    run "w_$rp" vsavjw "$WIDE"  "$rp"
-    state_onset "s_$rp" "w_$rp" vsavj "$STOCK" vsavjw "$WIDE" "$rp" "$want" > "$WORK/so_$rp.txt" || { echo "  FAIL: $rp — dump/classify error"; cat "$WORK/so_$rp.txt"; fail=1; continue; }
+    prc "$WORK/s_$rp.rc"
+    prc "$WORK/w_$rp.rc"
+    state_onset "s_$rp" "w_$rp" > "$WORK/so_$rp.txt" || { echo "  FAIL: $rp — dump/classify error"; cat "$WORK/so_$rp.txt"; fail=1; continue; }
     got="$(awk '$1=="STATE_ONSET"{print $2}' "$WORK/so_$rp.txt")"
     nfl="$(awk '$1=="FLICKER"{print $2}' "$WORK/so_$rp.txt")"; ofl="$(awk '$1=="FLICKER"{print $3}' "$WORK/so_$rp.txt")"
     fltxt=""; [ "${nfl:-0}" != 0 ] && fltxt=" (+$nfl flicker frame(s) at frozen offsets ${ofl} before it)"
@@ -327,15 +382,14 @@ fi
 
 echo "== 2. patched-slot content must differ (else it does nothing) =="
 for rp in $DONOVAN; do
-    run "sd_$rp" vsavj  "$STOCK" "$rp"
-    run "wd_$rp" vsavjw "$WIDE"  "$rp"
+    prc "$WORK/sd_$rp.rc"
+    prc "$WORK/wd_$rp.rc"
     if cmp -s "$WORK/sd_$rp.log" "$WORK/wd_$rp.log"; then
         echo "  FAIL: $rp identical — the live sfx helper changes NOTHING"
         fail=1
     else
         # the STATE onset (frozen offsets before it are flickers, not the helper)
-        lim=none; [ "$rp" = 01_attract_long ] && lim=4267
-        state_onset "sd_$rp" "wd_$rp" vsavj "$STOCK" vsavjw "$WIDE" "$rp" "$lim" > "$WORK/so2_$rp.txt" || true
+        state_onset "sd_$rp" "wd_$rp" > "$WORK/so2_$rp.txt" || true
         fr="$(awk '$1=="STATE_ONSET"{print $2}' "$WORK/so2_$rp.txt")"; nfl="$(awk '$1=="FLICKER"{print $2}' "$WORK/so2_$rp.txt")"
         echo "  ok: $rp diverges from frame $fr (sfx helper live on WIDE; $nfl flicker frame(s) at frozen offsets before it)"
     fi
@@ -367,12 +421,17 @@ else
 fi
 
 if [ -n "$onset" ]; then
-    FBNEO_DUMPS="$onset:ff0000-ffffff" FBNEO_ROMPATH="$STOCK" \
+    # phase C: the two onset dumps
+    vs_pool_start "$JOBS"
+    vs_pool_run prun "$WORK/on_s.rc" env FBNEO_DUMPS="$onset:ff0000-ffffff" FBNEO_ROMPATH="$STOCK" \
         tools/run_replay_fbneo.sh vsavj "$REPO/tests/replays/01_attract_long.rpl" \
-        "$WORK/on_s.log" "$WORK/sb_on_s" >/dev/null 2>&1
-    FBNEO_DUMPS="$onset:ff0000-ffffff" FBNEO_ROMPATH="$WIDE" \
+        "$WORK/on_s.log" "$WORK/sb_on_s"
+    vs_pool_run prun "$WORK/on_w.rc" env FBNEO_DUMPS="$onset:ff0000-ffffff" FBNEO_ROMPATH="$WIDE" \
         tools/run_replay_fbneo.sh vsavjw "$REPO/tests/replays/01_attract_long.rpl" \
-        "$WORK/on_w.log" "$WORK/sb_on_w" >/dev/null 2>&1
+        "$WORK/on_w.log" "$WORK/sb_on_w"
+    vs_pool_wait
+    prc "$WORK/on_s.rc"
+    prc "$WORK/on_w.rc"
     python3 - "$WORK" "$onset" "$ONSET_WINDOW_LO" "$ONSET_WINDOW_HI" "$(printf '%s' "$FROZEN_FLICKER" | tr ' ' ',')" <<'PY' || fail=1
 import sys
 W, fr, lo, hi = sys.argv[1], int(sys.argv[2]), int(sys.argv[3], 16), int(sys.argv[4], 16)
@@ -411,12 +470,9 @@ echo "== 4. and it must be DATA, not a different code path =="
 # ran the SAME engine code and fed it a different record; a different writer
 # set would mean the profile changed engine control flow, which is what
 # Rule 1 exists to prevent.
-FBNEO_HTAP="ff87a4-ff87a7" FBNEO_HTAP_OUT="$WORK/s.tap" FBNEO_ROMPATH="$STOCK" \
-    tools/run_replay_fbneo.sh vsavj "$REPO/tests/replays/01_attract_long.rpl" \
-    "$WORK/tp_s.log" "$WORK/sb_tp_s" >/dev/null 2>&1
-FBNEO_HTAP="ff87a4-ff87a7" FBNEO_HTAP_OUT="$WORK/w.tap" FBNEO_ROMPATH="$WIDE" \
-    tools/run_replay_fbneo.sh vsavjw "$REPO/tests/replays/01_attract_long.rpl" \
-    "$WORK/tp_w.log" "$WORK/sb_tp_w" >/dev/null 2>&1
+# (the two tap runs went through phase A's pool)
+prc "$WORK/tp_s.rc"
+prc "$WORK/tp_w.rc"
 if [ ! -s "$WORK/s.tap" ] || [ ! -s "$WORK/w.tap" ]; then
     echo "  FAIL: the write tap produced nothing — a dead instrument, not a"
     echo "        clean result (FBNEO_HTAP)"

@@ -1,0 +1,3 @@
+  FLAG D-ABSOLUTE: Every substitution not read is fixture text, a heredoc body or single-quoted, in four gates.  [build/agent212/t333/closure/closing_comment.md]
+  FLAG D-ABSOLUTE: - The edited gates' concurrent-controls rows were re-traced on PILOT (the #315 method): 46 static and 22 emulator gates, then the 4 the widened census change...  [build/agent212/t333/closure/closing_comment.md]
+packet_check: 2 flag(s): D-ABSOLUTE 2

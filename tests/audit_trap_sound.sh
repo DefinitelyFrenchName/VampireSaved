@@ -9,7 +9,7 @@
 # EXPECTS: a mine spawned and ring activity continuing to the end; a crashing trap dies
 #   before any further ring activity. Sound parity is audit_trap_parity's question, not this
 #   gate's.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/ring_tap.lua
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/ring_tap.lua tests/lib/jobs.sh
 #   tests/lua/type_write_census.lua tests/replays/hui/87_hui_plasma_trap.rpl
 #   tools/run_mame.sh tools/setup_mame.sh
 #
@@ -36,7 +36,7 @@
 # THE PARITY GATE is tests/audit_trap_parity.sh (frozen per-attempt
 # inventories, ours vs native; forbids 0739/073a on ours).
 #
-# Usage: ROMDIR=... tests/audit_trap_sound.sh [builddir]   (2 runs; 9 s on the Mac at 14z-210, ~10 min at 14z-82d)
+# Usage: ROMDIR=... [JOBS=N] tests/audit_trap_sound.sh [builddir]   (2 runs; 9 s on the Mac at 14z-210, ~10 min at 14z-82d)
 #   builddir defaults to the current huitzil freeze build, made by the four-track recipe (HANDOFF "Running a CPS-2
 #   WIDE build"); the registry row passes %HUI% (#328, 14z-210: it defaulted to build/hui30 until then).
 #
@@ -70,13 +70,31 @@ abspath() { case "$1" in /*) echo "$1";; *) echo "$PWD/$1";; esac; }
 
 PK="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10;1400:ff8b82:03;1450:ff8b82:03;1500:ff8b82:03"
 
+# JOBS (#334 item 2, 14z-211): the two runs are independent — each writes only its own trace and sandbox — so they go
+# through tests/lib/jobs.sh's pool, JOBS at a time; default min(4, CPUs/6). Sections 1 and 2 read them after, in order:
+# section 1's red still exits before section 2 is judged (on a red, run 2 has merely run for nothing).
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+run_spawn() {  # section 1's run: the type-69 write tap
+    REPLAY="$PWD/tests/replays/hui/87_hui_plasma_trap.rpl" TAP="ff9400,3c00" \
+    FRAMES=5000 POKES="$PK" TRACE_OUT="$W/w.txt" MAME_SANDBOX="$W/sbx1" \
+    MAME_ROMPATH="$(abspath "$BUILD")/rompath;$ROMDIR" \
+        tools/run_mame.sh vsavjw \
+        -autoboot_script "$PWD/tests/lua/type_write_census.lua" >/dev/null 2>&1 || true
+}
+run_ring() {  # section 2's run: the ring tap
+    REPLAY="$PWD/tests/replays/hui/87_hui_plasma_trap.rpl" FRAMES=5000 \
+    POKES="$PK" TRACE_OUT="$W/ring.txt" MAME_SANDBOX="$W/sbx2" \
+    MAME_ROMPATH="$(abspath "$BUILD")/rompath;$ROMDIR" \
+        tools/run_mame.sh vsavjw \
+        -autoboot_script "$PWD/tests/lua/ring_tap.lua" >/dev/null 2>&1 || true
+}
+vs_pool_start "$JOBS"
+vs_pool_run run_spawn
+vs_pool_run run_ring
+vs_pool_wait
+
 # ── 1: the mine SPAWNS (rig liveness — a silent run with no spawn would
 #       read as regression-free while measuring nothing) ────────────────
-REPLAY="$PWD/tests/replays/hui/87_hui_plasma_trap.rpl" TAP="ff9400,3c00" \
-FRAMES=5000 POKES="$PK" TRACE_OUT="$W/w.txt" MAME_SANDBOX="$W/sbx1" \
-MAME_ROMPATH="$(abspath "$BUILD")/rompath;$ROMDIR" \
-    tools/run_mame.sh vsavjw \
-    -autoboot_script "$PWD/tests/lua/type_write_census.lua" >/dev/null 2>&1 || true
 SPAWNS="$(grep "^W" "$W/w.txt" | awk 'substr($9,5,2)=="45"' | wc -l | tr -d ' ')"
 if [ "${SPAWNS:-0}" -ge 1 ]; then
     echo "  PASS  1: mine spawned (type-69 pool write x$SPAWNS)"
@@ -90,11 +108,6 @@ fi
 # ── 2: the ring is LIVE across the trap window (ambient id 0x049A
 #       present — a crash would cut the cadence; NOT the detonation id,
 #       see the header retraction) ─────────────────────────────────────
-REPLAY="$PWD/tests/replays/hui/87_hui_plasma_trap.rpl" FRAMES=5000 \
-POKES="$PK" TRACE_OUT="$W/ring.txt" MAME_SANDBOX="$W/sbx2" \
-MAME_ROMPATH="$(abspath "$BUILD")/rompath;$ROMDIR" \
-    tools/run_mame.sh vsavjw \
-    -autoboot_script "$PWD/tests/lua/ring_tap.lua" >/dev/null 2>&1 || true
 DET="$(grep -c "id 049a" "$W/ring.txt" || true)"
 if [ "${DET:-0}" -ge 1 ]; then
     echo "  PASS  2: ring live across the trap window (ambient 049a x$DET)"

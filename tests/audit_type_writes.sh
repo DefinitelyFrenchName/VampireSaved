@@ -12,7 +12,7 @@
 #   appear (rig liveness); the 59-75 range is reported per writer class, not gated.
 # EXPECTS: every observed writer in the inventory (else extend the inventory FIRST); the
 #   liveness stamp seen. Measured 14z-82: 118/120 not observed.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/type_write_census.lua tests/replays/
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lib/jobs.sh tests/lua/type_write_census.lua tests/replays/
 #   tools/audit_roms.py tools/run_mame.sh tools/setup_mame.sh
 #
 # SHEET: none — runs our build only, judged on its own; no reference leg and no frozen reference values
@@ -42,7 +42,7 @@
 # on the hui29 legs — a census that observes nothing reads exactly like a
 # clean result (list_type_census.py's lesson).
 #
-# Usage: ROMDIR=... tests/audit_type_writes.sh [outdir]
+# Usage: ROMDIR=... [JOBS=N] tests/audit_type_writes.sh [outdir]
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -87,6 +87,9 @@ PYR_SOAK="1704:ff8782:11;1760:ff8782:11;1900:ff8782:11;2100:ff8782:11;2400:ff878
 PYR_COSMO="1400:ff8782:11;1450:ff8782:11;1500:ff8782:11;1400:ff8b82:03;1450:ff8b82:03;1500:ff8b82:03;3300:ff8509:03;3700:ff8509:03;4100:ff8509:03"
 POK13="1400:ff8782:13;1450:ff8782:13;1500:ff8782:13;1400:ff8b82:13;1450:ff8b82:13;1500:ff8b82:13"
 
+# JOBS (#334 item 2, 14z-211): the six legs are independent — each writes only its own trace, log and sandbox — so
+# they go through tests/lib/jobs.sh's pool, JOBS at a time; default min(4, CPUs/6). The analysis below reads them after.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
 run_leg() {  # run_leg <name> <build> <replay> <pokes>
     name="$1"; build="$2"; rpl="$3"; pk="$4"
     # exit code deliberately ignored: MAME can die in TEARDOWN after the
@@ -102,13 +105,15 @@ run_leg() {  # run_leg <name> <build> <replay> <pokes>
 }
 
 echo "running 6 tap legs (~8 min):"
-run_leg hui_70  build/hui30   hui/70_hui_mash        "$HUI_SOAK"
-run_leg hui_83  build/hui30   hui/83_hui_fx          "$HUI_FX"
-run_leg pyr_70  build/pyron21 pyron/70_pyron_mash    "$PYR_SOAK"
-run_leg pyr_72  build/pyron21 pyron/72_pyron_cosmo_2p "$PYR_COSMO"
-run_leg don_12  build/m5_wide 12_donovan_vs_cpu      "$POK13"
-run_leg don_20  build/m5_wide 20_don_round2          "$POK13"
-echo
+vs_pool_start "$JOBS"
+vs_pool_run run_leg hui_70  build/hui30   hui/70_hui_mash        "$HUI_SOAK"
+vs_pool_run run_leg hui_83  build/hui30   hui/83_hui_fx          "$HUI_FX"
+vs_pool_run run_leg pyr_70  build/pyron21 pyron/70_pyron_mash    "$PYR_SOAK"
+vs_pool_run run_leg pyr_72  build/pyron21 pyron/72_pyron_cosmo_2p "$PYR_COSMO"
+vs_pool_run run_leg don_12  build/m5_wide 12_donovan_vs_cpu      "$POK13"
+vs_pool_run run_leg don_20  build/m5_wide 20_don_round2          "$POK13"
+vs_pool_wait
+echo " (JOBS=$JOBS)"
 
 python3 - "$OUT" <<'PY'
 import glob, json, os, sys, collections
@@ -152,6 +157,10 @@ for name, r in placed["hui"].items():
     if name == "x088512":
         H117 = r["dst"] + 0x27CE
 
+# every leg the pool started must have left its trace: a leg that wrote none is MISSING, never silently skipped
+# (#334, rule-checker run 2026-10-29-1376 Q4: with one pooled leg dropped, the glob read five and the gate passed)
+LEGS = ["hui_70", "hui_83", "pyr_70", "pyr_72", "don_12", "don_20"]
+missing = [l for l in LEGS if not os.path.exists(f"{out}/{l}.txt")]
 for f in sorted(glob.glob(out + "/*.txt")):
     leg = os.path.basename(f)[:-4]
     tag = leg[:3]
@@ -174,7 +183,9 @@ for f in sorted(glob.glob(out + "/*.txt")):
             if src is None or src not in stamps:
                 unknown_high.append((leg, pc, region, src, tt, addr))
 
-print("tap logs complete: %d/6" % (6 - len(incomplete)))
+print("tap logs complete: %d/%d" % (len(LEGS) - len(missing) - len(incomplete), len(LEGS)))
+if missing:
+    print("FAIL: legs that wrote no trace: %s" % " ".join(missing)); fail = 1
 if incomplete:
     print("FAIL: legs with no END line: %s" % " ".join(incomplete)); fail = 1
 

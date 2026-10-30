@@ -13,7 +13,7 @@
 # EXPECTS: a decision line per section consistent with the approved WIDE plan
 #   (docs/project/cps2_wide.md); a section whose instrument cannot see its own positive
 #   control is not a null.
-# FOLLOWS: emu/mame-patches/ tests/lua/ tests/replays/ tools/audit_z80_space.py
+# FOLLOWS: emu/mame-patches/ tests/lua/ tests/replays/ tools/audit_z80_space.py tests/lib/jobs.sh
 #   tools/run_mame.sh tools/setup_mame.sh
 #
 # SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
@@ -25,7 +25,7 @@
 #   A4  Z80 driver ROM free space    -> is there room for new sample rows?
 #
 # Full rationale: the approved WIDE plan + docs/project/cps2_wide.md.
-# Usage: ROMDIR=... tests/audit_wide_phase_a.sh [corpus...]
+# Usage: ROMDIR=... [JOBS=N] tests/audit_wide_phase_a.sh [corpus...]
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -67,15 +67,36 @@ run_one() { # $1=script $2=replay $3=outfile $4=frames  (extra env passed throug
         -autoboot_script "$REPO/tests/lua/$1" > /dev/null 2>&1 || true
 }
 
+# JOBS (#334 item 2, 14z-211): the 1 + 3 x |CORPUS| runs — A1's control window and, per replay, the A1/A2/A3 probes
+# — are independent: every one boots its own sandbox ($WORK/ctl, $WORK/<script>_<replay>) and writes only its own
+# trace ($WORK/a1_control.txt, a{1,2}_<rp>.txt, a3_<rp>.txt + a3_t_<rp>.txt). So they all go through
+# tests/lib/jobs.sh's pool first, JOBS at a time (default min(4, CPUs/6)), and the sections below read the traces
+# in the serial order with the same lines and exits. The control run's exit status is kept: set -e ended the gate
+# on it, and the A1 section still does, with that status.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+a1_ctl_run() {
+    mkdir -p "$WORK/ctl"
+    if PROBE_CONTROL=1 REPLAY="$REPO/tests/replays/02_demitri_vs_cpu.rpl" FRAMES=600 \
+        TRACE_OUT="$WORK/a1_control.txt" CHECKSUM_OUT="$WORK/ctl/c.log" \
+        MAME_SANDBOX="$WORK/ctl" MAME_ROMPATH="$ROMDIR" tools/run_mame.sh vsavj \
+        -autoboot_script "$REPO/tests/lua/unmapped_probe.lua" > /dev/null 2>&1; then
+        echo 0 > "$WORK/a1_control.rc"; else echo "$?" > "$WORK/a1_control.rc"; fi
+}
+a3_run() {  # a3_run <replay>
+    SCROLL3_OUT="$WORK/a3_$1.txt" run_one scroll3_watch.lua "$1" "$WORK/a3_t_$1.txt" 3600 || true
+}
+vs_pool_start "$JOBS"
+vs_pool_run a1_ctl_run
+for rp in $CORPUS; do vs_pool_run run_one unmapped_probe.lua "$rp" "$WORK/a1_$rp.txt" 3600; done
+for rp in $CORPUS; do vs_pool_run run_one objy_bits.lua "$rp" "$WORK/a2_$rp.txt" 3600; done
+for rp in $CORPUS; do vs_pool_run a3_run "$rp"; done
+vs_pool_wait
+
 echo "== A1: unmapped 68k address space (decides PRG growth cost) =="
 # Ground-truth the instrument first: a null result is only evidence if the
 # probe can demonstrably see a real access (CLAUDE.md §4 — verdict logic is
-# itself tested).
-mkdir -p "$WORK/ctl"
-PROBE_CONTROL=1 REPLAY="$REPO/tests/replays/02_demitri_vs_cpu.rpl" FRAMES=600 \
-    TRACE_OUT="$WORK/a1_control.txt" CHECKSUM_OUT="$WORK/ctl/c.log" \
-    MAME_SANDBOX="$WORK/ctl" MAME_ROMPATH="$ROMDIR" tools/run_mame.sh vsavj \
-    -autoboot_script "$REPO/tests/lua/unmapped_probe.lua" > /dev/null 2>&1
+# itself tested). (The control run ran in the pool above, a1_ctl_run.)
+_rc="$(cat "$WORK/a1_control.rc" 2>/dev/null || echo 1)"; [ "$_rc" = 0 ] || exit "$_rc"
 ctl=$(grep UNMAPPEDSUMMARY "$WORK/a1_control.txt" 2>/dev/null \
       | sed -E 's/.*CONTROL_workram=([0-9]+).*/\1/')
 if [ -z "${ctl:-}" ] || [ "$ctl" -eq 0 ]; then
@@ -86,7 +107,7 @@ fi
 echo "  ok: instrument ground-truthed (control window saw $ctl work-RAM reads)"
 a1_total=0
 for rp in $CORPUS; do
-    run_one unmapped_probe.lua "$rp" "$WORK/a1_$rp.txt" 3600
+    # (run_one unmapped_probe.lua ran in the pool above)
     line=$(grep UNMAPPEDSUMMARY "$WORK/a1_$rp.txt" || echo "MISSING")
     [ "$line" = MISSING ] && { echo "  FAIL $rp: no summary"; exit 1; }
     n=$(echo "$line" | sed -E 's/.*total=([0-9]+).*/\1/')
@@ -104,7 +125,7 @@ fi
 echo "== A2: OBJ y-word bit 12 (decides the 19th tile-address bit) =="
 a2_bad=0
 for rp in $CORPUS; do
-    run_one objy_bits.lua "$rp" "$WORK/a2_$rp.txt" 3600
+    # (run_one objy_bits.lua ran in the pool above)
     line=$(grep OBJYSUMMARY "$WORK/a2_$rp.txt" || echo "MISSING")
     [ "$line" = MISSING ] && { echo "  FAIL $rp: no summary"; exit 1; }
     b=$(echo "$line" | sed -E 's/.*bit12=([0-9]+).*/\1/')
@@ -137,7 +158,7 @@ a3_seen=0
 a3_want=0
 for rp in $CORPUS; do a3_want=$((a3_want + 1)); done
 for rp in $CORPUS; do
-    SCROLL3_OUT="$WORK/a3_$rp.txt" run_one scroll3_watch.lua "$rp" "$WORK/a3_t_$rp.txt" 3600 || true
+    # (a3_run — run_one scroll3_watch.lua — ran in the pool above)
     line=$(grep SCROLL3SUMMARY "$WORK/a3_$rp.txt" 2>/dev/null || echo "")
     [ -n "$line" ] || { echo "  FAIL $rp: no scroll3 summary — the probe produced"
                         echo "        no measurement, which is not the same as a zero"; exit 1; }

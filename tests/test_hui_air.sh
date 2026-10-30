@@ -11,7 +11,7 @@
 # EXPECTS: Y pinned >= 100px over f3350-f3370; seq 0x14 AIRBORNE (Y >= 100px) with X moving
 #   >= 30px at near-constant height over f3322-f3337. A red is the float or dash dead again,
 #   the dash on the ground, or a rise-speed change moving the sample window.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay_guard.lua
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/lua/replay_guard.lua tests/lib/jobs.sh
 #   tests/replays/hui/75_hui_air.rpl tests/replays/hui/79_hui_airdash.rpl
 #   tests/lib/controls.sh tools/build_donovan.sh tools/run_mame.sh tools/run_replay_guarded.sh tools/setup_mame.sh
 #
@@ -50,7 +50,7 @@
 #   is an air dash: seq 0x14 over f3321-3340 at Y=121.1, X moving -116.3 px over f3322-3337 at dy 0
 #   (build/agent197/t228/s3/air/).
 #
-# Usage: ROMDIR=... tests/test_hui_air.sh [builddir]   (default build/hui61)
+# Usage: ROMDIR=... [JOBS=N] tests/test_hui_air.sh [builddir]   (default build/hui61)
 #
 # THE BUILD IS build/hui61 BY DEFAULT since 14z-197 (maintainer-ruled 2026-10-11, the four Huitzil stage gates "Move to
 # hui61, re-time 2"; DECISIONS_HISTORY.md). Until then it self-built STAGE 4. Once replay_guard.lua counts emulated
@@ -98,13 +98,43 @@ export MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 
 PK="1704:ff8782:10;1760:ff8782:10;1900:ff8782:10;2100:ff8782:10;2400:ff8782:10"
 
+# The ground-dash copy of replay 79: every input from f3050 on moved +5 frames,
+# the re-time tried 14z-197. Its FIRST attempt dashes ON THE GROUND (seq 0x14 at
+# Y=40 over f3186-3196, measured; sampled at f3186/f3195, inside it) — exactly the dash the
+# section once passed with no height check.
+GROUND="$WORK/79_ground.rpl"
+awk '{ if (match($0, /^[0-9]+(-[0-9]+)?/)) { r = substr($0, 1, RLENGTH); rest = substr($0, RLENGTH + 1)
+         n = split(r, a, "-"); if (a[1] + 0 >= 3050) { r = (a[1] + 5) ""; if (n == 2) r = r "-" (a[2] + 5) }
+         print r rest } else print }' tests/replays/hui/79_hui_airdash.rpl > "$GROUND"
+
+# JOBS (#334 item 2, 14z-211): the three guarded runs — float, the air dash (or, in the ground-dash mode, the
+# ground-dash copy) and the ground-dash control — are independent: each runs in its own $WORK/{float,ad,gd} (cwd,
+# log, sandbox, dumps, captured output, exit status). So they go through tests/lib/jobs.sh's pool first, JOBS at a
+# time (default min(4, CPUs/6)); the sections below judge them in the serial order with the same lines and exits.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+air_exec() {  # air_exec <rpl> <dir> <dumps>: the guarded run in <dir>; exit status to <dir>/rc
+    mkdir -p "$2"
+    if ( cd "$2" && POKES="$PK" \
+      DUMPS="$3" \
+      MAME_ROMPATH="$BUILD/rompath;$ROMDIR" \
+      "$REPO/tools/run_replay_guarded.sh" vsavjw "$1" \
+          "$2/g.log" "$2/box" > "$2/g.out" 2>&1 ); then echo 0 > "$2/rc"; else echo "$?" > "$2/rc"; fi
+}
+air_ok() { [ "$(cat "$1/rc" 2>/dev/null)" = 0 ]; }
+vs_pool_start "$JOBS"
+vs_pool_run air_exec "$REPO/tests/replays/hui/75_hui_air.rpl" "$WORK/float" \
+    "3350:ff8400-ff8420;3360:ff8400-ff8420;3370:ff8400-ff8420"
+if vs_ctl_is ground-dash; then
+    vs_pool_run air_exec "$GROUND" "$WORK/ad" "3186:ff8400-ff8420;3195:ff8400-ff8420"
+else
+    vs_pool_run air_exec "$REPO/tests/replays/hui/79_hui_airdash.rpl" "$WORK/ad" "3322:ff8400-ff8420;3337:ff8400-ff8420"
+fi
+vs_pool_run air_exec "$GROUND" "$WORK/gd" "3186:ff8400-ff8420;3195:ff8400-ff8420"
+vs_pool_wait
+
 echo "== float (replay 75)"
-d="$WORK/float"; mkdir -p "$d"
-( cd "$d" && POKES="$PK" \
-  DUMPS="3350:ff8400-ff8420;3360:ff8400-ff8420;3370:ff8400-ff8420" \
-  MAME_ROMPATH="$BUILD/rompath;$ROMDIR" \
-  "$REPO/tools/run_replay_guarded.sh" vsavjw "$REPO/tests/replays/hui/75_hui_air.rpl" \
-      "$d/g.log" "$d/box" > "$d/g.out" 2>&1 ) || {
+d="$WORK/float"
+air_ok "$d" || {   # (the run itself ran in the pool, air_exec)
     echo "FAIL: float replay guard tripped:"
     grep -m2 -E "CRASH|REGS" "$d/g.log" || tail -5 "$d/g.out"
     exit 1
@@ -128,13 +158,9 @@ echo "  ok: float hovers (mover bypassed, Y pinned)"
 # dash_run <rpl> <dir> <f0> <f1>: run the rig, dump the body at f0 and f1 (15 frames
 # apart), print the measured signature and every criterion that missed; exit 0 when
 # all hold, 1 when one misses, 2 when the guard tripped
+# (since #334 item 2 the run itself is air_exec's, in the pool above; dash_run judges it)
 dash_run() {
-    mkdir -p "$2"
-    ( cd "$2" && POKES="$PK" \
-      DUMPS="$3:ff8400-ff8420;$4:ff8400-ff8420" \
-      MAME_ROMPATH="$BUILD/rompath;$ROMDIR" \
-      "$REPO/tools/run_replay_guarded.sh" vsavjw "$1" \
-          "$2/g.log" "$2/box" > "$2/g.out" 2>&1 ) || {
+    air_ok "$2" || {
         echo "FAIL: air-dash replay guard tripped:"
         grep -m2 -E "CRASH|REGS" "$2/g.log" || tail -5 "$2/g.out"
         return 2
@@ -164,15 +190,7 @@ if missed:
 EOF
 }
 
-# The ground-dash copy of replay 79: every input from f3050 on moved +5 frames,
-# the re-time tried 14z-197. Its FIRST attempt dashes ON THE GROUND (seq 0x14 at
-# Y=40 over f3186-3196, measured; sampled at f3186/f3195, inside it) — exactly the dash the
-# section once passed with no height check.
-GROUND="$WORK/79_ground.rpl"
-awk '{ if (match($0, /^[0-9]+(-[0-9]+)?/)) { r = substr($0, 1, RLENGTH); rest = substr($0, RLENGTH + 1)
-         n = split(r, a, "-"); if (a[1] + 0 >= 3050) { r = (a[1] + 5) ""; if (n == 2) r = r "-" (a[2] + 5) }
-         print r rest } else print }' tests/replays/hui/79_hui_airdash.rpl > "$GROUND"
-
+# (GROUND, the ground-dash copy of replay 79, is made above, before the pool)
 echo "== air dash (replay 79)"
 if vs_ctl_is ground-dash; then
     echo "  CONTROL MODE: the section reads the ground-dash copy's first attempt (f3186/f3195)"

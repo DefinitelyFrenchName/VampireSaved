@@ -10,7 +10,7 @@
 #   legacy suite, the attract and pick divergence frames, the crash guard.
 # EXPECTS: every gate as listed; any failure is allocator/copy/repoint/encrypt tooling,
 #   nothing else.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/fields_m2a.tsv
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/ tests/fields_m2a.tsv tests/lib/jobs.sh
 #   tests/lib/m2a_common.sh tests/lib/masked_compare.sh tests/lua/replay.lua
 #   tests/lua/replay_guard.lua tests/replays/ tools/build_donovan.sh
 #   tools/build_fingerprint.py tools/check_diverge.py tools/compare_composite.py
@@ -38,7 +38,7 @@
 #      (where slot-0x0F pointers first land in RAM — measured, pinned).
 #   4. Crash guard (-debug) clean on the pick replay.
 #
-# Usage: ROMDIR=... tests/test_m2a_stage1_nullreloc.sh
+# Usage: ROMDIR=... [JOBS=N] tests/test_m2a_stage1_nullreloc.sh
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"
@@ -65,12 +65,46 @@ ROMDIR="$ROMDIR" "$REPO/tools/build_donovan.sh" 1 "$WORK/donovan" \
 tail -2 "$WORK/build.log"
 RP="$WORK/donovan/rompath;$ROMDIR"
 
+# JOBS (#334 item 2, 14z-211): this file's own four runs — the pick (section 1), the vanilla and stage-1 field pair
+# (section 2) and the guarded run (section 4) — are independent: each writes only its own log, sandbox and dumps
+# (the pick's dump in $WORK, the pair's in $WORK/fv and $WORK/fs), plus its own captured output and exit status. So
+# they go through tests/lib/jobs.sh's pool first, JOBS at a time (default min(4, CPUs/6)), and the sections below
+# read them in the serial order. A run that failed ends the gate where the serial run would have (set -e then, an
+# explicit exit with its status now), with the same output. m2a_legacy_gate (section 3) stays the shared helper's.
+SPEC=$(python3 -c "print(';'.join(f'{f}:ff8000-ff8300;{f}:ff8400-ff8c00' for f in range(2900,3140,10)))")
+mkdir -p "$WORK/fv" "$WORK/fs"
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+st1_run() {  # st1_run <tag> <cmd...>: run it; its exit status to $WORK/<tag>.rc
+    _t="$1"; shift
+    if "$@"; then echo 0 > "$WORK/$_t.rc"; else echo "$?" > "$WORK/$_t.rc"; fi
+}
+st1_pick() {
+    DUMPS="3600:ff8460-ff8464" MAME_ROMPATH="$RP" \
+        REPLAY="$REPO/tests/replays/11_pick_donovan.rpl" \
+        CHECKSUM_OUT="$WORK/pick.log" MAME_SANDBOX="$WORK/pickbox" \
+        "$REPO/tools/run_mame.sh" vsavj \
+        -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
+}
+st1_fv() {
+    DUMPS="$SPEC" "$REPO/tools/run_replay_mame.sh" vsavj \
+        "$REPO/tests/replays/11_pick_donovan.rpl" "$WORK/fv/out.log" "$WORK/fvbox" > "$WORK/fv.out" 2>&1
+}
+st1_fs() {
+    DUMPS="$SPEC" MAME_ROMPATH="$RP" "$REPO/tools/run_replay_mame.sh" vsavj \
+        "$REPO/tests/replays/11_pick_donovan.rpl" "$WORK/fs/out.log" "$WORK/fsbox" > "$WORK/fs.out" 2>&1
+}
+st1_guard() {
+    MAME_ROMPATH="$RP" "$REPO/tools/run_replay_guarded.sh" vsavj \
+        "$REPO/tests/replays/11_pick_donovan.rpl" "$WORK/guard.log" \
+        "$WORK/guardbox" > "$WORK/guard.out" 2>&1
+}
+vs_pool_start "$JOBS"
+for _r in pick fv fs guard; do vs_pool_run st1_run "$_r" "st1_$_r"; done
+vs_pool_wait
+st1_rc() { cat "$WORK/$1.rc" 2>/dev/null || echo 1; }
+
 # --- 1. live effect ------------------------------------------------------
-DUMPS="3600:ff8460-ff8464" MAME_ROMPATH="$RP" \
-    REPLAY="$REPO/tests/replays/11_pick_donovan.rpl" \
-    CHECKSUM_OUT="$WORK/pick.log" MAME_SANDBOX="$WORK/pickbox" \
-    "$REPO/tools/run_mame.sh" vsavj \
-    -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
+_rc="$(st1_rc pick)"; [ "$_rc" = 0 ] || exit "$_rc"
 HB=$(xxd -p "$WORK/dump_3600_ff8460.bin")
 case "$HB" in
     ${RELOC_BASE}*) echo "  ok: slot 0x0F loads relocated base 0x0BF7A0" ;;
@@ -78,12 +112,9 @@ case "$HB" in
 esac
 
 # --- 2. behavior-identical (field trace vs vanilla, frame-exact) ---------
-SPEC=$(python3 -c "print(';'.join(f'{f}:ff8000-ff8300;{f}:ff8400-ff8c00' for f in range(2900,3140,10)))")
-mkdir -p "$WORK/fv" "$WORK/fs"
-DUMPS="$SPEC" "$REPO/tools/run_replay_mame.sh" vsavj \
-    "$REPO/tests/replays/11_pick_donovan.rpl" "$WORK/fv/out.log" "$WORK/fvbox"
-DUMPS="$SPEC" MAME_ROMPATH="$RP" "$REPO/tools/run_replay_mame.sh" vsavj \
-    "$REPO/tests/replays/11_pick_donovan.rpl" "$WORK/fs/out.log" "$WORK/fsbox"
+# (the field pair ran in the pool above; its output is shown here, where the serial gate printed it)
+cat "$WORK/fv.out"; _rc="$(st1_rc fv)"; [ "$_rc" = 0 ] || exit "$_rc"
+cat "$WORK/fs.out"; _rc="$(st1_rc fs)"; [ "$_rc" = 0 ] || exit "$_rc"
 if python3 "$REPO/tools/compare_fields.py" "$WORK/fv" "$WORK/fs" \
         --fields "$REPO/tests/fields_m2a.tsv" --exact \
         --skip-fields p1_hitbox_base,p1_ptr64 \
@@ -105,9 +136,8 @@ else
 fi
 
 # --- 4. crash guard ------------------------------------------------------
-if MAME_ROMPATH="$RP" "$REPO/tools/run_replay_guarded.sh" vsavj \
-        "$REPO/tests/replays/11_pick_donovan.rpl" "$WORK/guard.log" \
-        "$WORK/guardbox" > "$WORK/guard.out" 2>&1; then
+# (the guarded run ran in the pool above)
+if [ "$(st1_rc guard)" = 0 ]; then
     echo "  ok: guarded run clean (both trampolines executed, no exceptions)"
 else
     echo "FAIL: crash guard tripped:"; cat "$WORK/guard.out"; fail=1

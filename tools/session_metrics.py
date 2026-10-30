@@ -18,7 +18,9 @@ A figure the sources do not hold is ABSENT, never filled in (a session with no t
 has no transcript figures; a worker transcript with no usage field adds no tokens).
 
 THE SOURCES (each figure names its own):
-  tests/rulecheck/ledger.tsv                every rule-checker run, keyed by its `session` column
+  tests/rulecheck/ledger.tsv                every rule-checker run, keyed by its `session` column; its ACTIONS (#335) —
+                                            a run and its re-checks — linked by tools/rc_actions.py, which reads
+  tests/rulecheck/runs/*/meta.tsv           the action a run records (prepare, since 14z-212), and NOT-RUN.txt
   build/static_runs/<UTC>_<pid>/            each static tier run: results.tsv, results.controls.tsv,
                                             run_record_start/end.json (untracked; present on the host that ran it)
   git log                                   commits whose subject starts with the key and ':' or ' '
@@ -36,8 +38,8 @@ THE SOURCES (each figure names its own):
 Usage:
   python3 tools/session_metrics.py collect --keys 14z-188..14z-197 --out DIR
         [--repo .] [--projects DIR] [--transcript KEY=PATH ...] [--static-runs DIR]
-      writes DIR/figures.json, DIR/rc_runs.json, DIR/tiers.json, DIR/costly.json (row objects, the
-      dashboard's datasets) and prints one line per session. --keys takes a range (A..B, by the
+      writes DIR/figures.json, DIR/rc_runs.json, DIR/tiers.json, DIR/costly.json, DIR/actions.json (row objects,
+      the dashboard's datasets; actions.json, #335: one row per rule-checker action, its first run and verdict) and prints one line per session. --keys takes a range (A..B, by the
       number then the suffix) or a comma list; a range spans every key the ledger, git or STATE
       knows in it.
   python3 tools/session_metrics.py check DIR
@@ -55,6 +57,7 @@ sys.path.insert(0, HERE)
 from findings_table import read_state   # a TSV-backed findings section reads as its row (#282 item C)
 from rulings_verbatim import own_words  # noqa: E402  the maintainer-message reader the close already trusts
 from transcript_gaps import subagents  # noqa: E402  the worker reader the close's --cap already trusts
+import rc_actions  # noqa: E402  which rule-checker runs are one action, and its first run (#335)
 
 CLASSES = ("MEASURED", "DERIVED", "ESTIMATED", "INFERRED", "EXTRAPOLATED")
 ACTIVE_GAP_S = 300          # ESTIMATED active time: a gap between two records counts only up to this
@@ -302,6 +305,31 @@ def map_transcripts(keys, sections, commits, projects):
     return {k: v for k, v in out.items() if v[0] not in shared or v[1] == "MEASURED"}, shared, spans
 
 
+PREPARED = re.compile(r"prepared run (\d{4}-\d\d-\d\d-\d+)")
+
+
+def prepare_times(projects):
+    """-> {run id: UTC time} — when `rulecheck prepare` printed "prepared run <id>", read from every session transcript
+    and worker transcript under `projects` (#335 item, 14z-212: hours to pass). A run prepared twice keeps its first."""
+    out = {}
+    for f in glob.glob(os.path.join(projects, "*.jsonl")) + glob.glob(os.path.join(projects, "*", "subagents", "*.jsonl")):
+        for line in open(f, encoding="utf-8", errors="replace"):
+            if "prepared run 20" not in line:
+                continue
+            try:
+                d = json.loads(line)
+            except ValueError:
+                continue
+            if d.get("type") != "user" or not d.get("timestamp"):
+                continue
+            c = d.get("message", {}).get("content")
+            for m in PREPARED.finditer(c if isinstance(c, str) else json.dumps(c)):
+                t = utc(d["timestamp"])
+                if m.group(1) not in out or t < out[m.group(1)]:
+                    out[m.group(1)] = t
+    return out
+
+
 def keys_in(spec, known):
     if ".." in spec:
         a, b = spec.split("..")
@@ -325,7 +353,13 @@ def collect(a):
     keys = keys_in(a.keys, {k for k in known if KEY_RE.match(k)})
     tmap = {k: (p, "MEASURED") for k, p in (x.split("=", 1) for x in a.transcript)}
     mapped, shared, _ = map_transcripts([k for k in keys if k not in tmap], sections, commits, a.projects)
-    figures, rc_rows, tier_rows, costly = [], [], [], []
+    figures, rc_rows, tier_rows, costly, act_rows = [], [], [], [], []
+    acts = rc_actions.actions(ledger, rc_actions.metas(repo, ledger))   # over the WHOLE ledger: a link may cross sessions
+    notrun = rc_actions.not_run(repo)
+    ptimes = prepare_times(a.projects)
+    for x in acts:   # hours from the action's first packet to the one that passed (both prepare times on record)
+        t0, t1 = ptimes.get(x["run_ids"][0]), ptimes.get(x["run_ids"][-1])
+        x["hours"] = round((ts(t1) - ts(t0)).total_seconds() / 3600, 2) if x["final"] == "OK" and t0 and t1 else None
     tickets = []
     tp = os.path.join(repo, "docs/project/tickets.tsv")
     if os.path.exists(tp):
@@ -409,10 +443,61 @@ def collect(a):
                 F("checks", "rechecks", "Re-check runs (runs beyond each packet's first)", sum(lens) - len(lens), "",
                   "ESTIMATED", src, rule)
                 F("checks", "longest_packet", "Longest packet (runs until it stopped)", max(lens), "", "ESTIMATED", src, rule)
+            # #335 (ruled 2026-10-29): per ACTION, its first run's verdict and the questions it violated
+            A = [x for x in acts if not x["void_only"] and x.get("session") in (key, tid)]
+            if A:
+                exact = all(x["hows"] == {"RECORDED"} for x in A)
+                acls = "DERIVED" if exact else "ESTIMATED"
+                arule = ("an action is a run and its re-checks; its first run is its first non-VOID run; calibration rows "
+                         "are not actions. " + ("Every run here records its action in its meta.tsv (prepare, since 14z-212)."
+                         if exact else "Linked by tools/rc_actions.py: the action a run's meta.tsv records, else a run of "
+                         "the same decision its subject names ('after run N'), else an open VIOLATED action of the same "
+                         "session and decision whose subject shares at least half its words, else a new action."))
+                asrc = src + "; tests/rulecheck/runs/*/meta.tsv"
+                F("checks", "actions", "Actions checked", len(A), "", acls, asrc, arule)
+                n_ok = sum(x["verdict"] == "OK" for x in A)
+                F("checks", "first_ok", "Actions OK on their first run", n_ok, "", acls, asrc, arule)
+                F("checks", "first_ok_pct", "First-run OK rate", round(100 * n_ok / len(A)), "%", acls, asrc,
+                  "OK first runs / actions. " + arule)
+                for d in sorted({x["decision"] for x in A}):
+                    D = [x for x in A if x["decision"] == d]
+                    k_ok = sum(x["verdict"] == "OK" for x in D)
+                    F("checks", f"actions_{d}", f"Actions: {d}", len(D), "", acls, asrc, arule)
+                    F("checks", f"first_ok_{d}", f"First-run OK: {d}", k_ok, "", acls, asrc, arule)
+                    F("checks", f"first_ok_pct_{d}", f"First-run OK rate: {d}", round(100 * k_ok / len(D)), "%", acls, asrc,
+                      "OK first runs / actions of this decision. " + arule)
+                fq = {}
+                for x in A:
+                    for q in x["violated"]:
+                        fq[q] = fq.get(q, 0) + 1
+                for q in sorted(fq, key=lambda q: (len(q), q)):
+                    F("checks", f"first_q_{q}", f"{q} {QUESTIONS.get(q, '')} violated on a first run".replace("  ", " "),
+                      fq[q], "", acls, asrc, "every question VIOLATED on an action's first run counts once (ruled "
+                      "2026-10-29, \"Every question\"). " + arule)
+                H = sorted(x["hours"] for x in A if x["hours"] is not None)
+                if H:
+                    hsrc, hrule = ("the session transcripts (main and workers): each run's 'prepared run <id>' tool result",
+                                   "an action passed when its last run is OK; its hours run from its first packet's "
+                                   "preparation to the preparation of the packet that passed; a passed action without "
+                                   "both times on record is left out")
+                    F("checks", "pass_h_n", "Passed actions with both preparation times", len(H), "", "MEASURED", hsrc)
+                    F("checks", "pass_h_median", "Median hours from first packet to the one that passed",
+                      round(statistics.median(H), 2), "h", "DERIVED", hsrc, hrule)
+                for x in A:
+                    act_rows.append({"action": x["id"], "session": key, "decision": x["decision"], "first": x["first"],
+                                     "verdict": x["verdict"], "final": x["final"], "violated": " ".join(x["violated"]), "runs": x["runs"], "hours": x["hours"],
+                                     "links": " ".join(sorted(x["hows"]))})
+            vo = [x for x in acts if x["void_only"] and x["id"] in {r["id"] for r in L}]
+            if vo:
+                F("checks", "actions_void_only", "Actions of VOID runs only (not counted)", len(vo), "", "MEASURED", src)
             for r in L:
                 rc_rows.append({"id": r["id"], "session": key, "decision": r["decision"], "verdict": r["verdict"],
                                 "plant": r["control_verdict"], "violated": r["violated"] if r["violated"] != "-" else "",
                                 "subject": r["subject"][:160], "resolution": (r["resolution"] if r["resolution"] != "-" else "")[:400]})
+        NR = [x for x in notrun if x[1] in (key, tid)]
+        if NR:
+            F("checks", "not_run", "Packets prepared and never run (not counted)", len(NR), "", "MEASURED",
+              "tests/rulecheck/runs/*/NOT-RUN.txt, by the session in its meta.tsv")
         # -- commits
         C = [c for c in commits if c[0] == key]
         if C:
@@ -475,7 +560,8 @@ def collect(a):
     for p in sorted(shared):
         print(f"transcript {os.path.basename(p)[:8]}: claimed by more than one session's commits, so none of them is given it")
     os.makedirs(a.out, exist_ok=True)
-    for name, rows in (("figures", figures), ("rc_runs", rc_rows), ("tiers", tier_rows), ("costly", costly)):
+    for name, rows in (("figures", figures), ("rc_runs", rc_rows), ("tiers", tier_rows), ("costly", costly),
+                       ("actions", act_rows)):
         with open(os.path.join(a.out, name + ".json"), "w") as f:
             json.dump(rows, f, indent=0, sort_keys=True)
     return 0

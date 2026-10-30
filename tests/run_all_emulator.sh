@@ -66,6 +66,8 @@
 # selects an instrument row in NO scope, `--scope ondemand` included: it would pass the
 # registry's bare args and only SKIP. Since 14z-206 (maintainer-ruled 2026-10-23, #291) it also holds the gates whose
 # subject is the comparative capture sheets — reason keyword `sheets:` (test_proof_sheets) — selected by --scope ondemand.
+# Since 14z-212 (maintainer-ruled 2026-10-29, #334) it also holds the gates whose subject is the test harness itself —
+# reason keyword `harness:` (audit_pool_drop) — selected by --scope ondemand.
 # A pristine-only gate guarding a case KNOWN to have broken before (a
 # tenant change that once moved vsavj characters) stays `release`.
 #

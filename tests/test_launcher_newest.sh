@@ -16,7 +16,7 @@
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: test_launcher_newest — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 rc=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; rc=1; }
 
 case "$(uname -s)" in Darwin) OS=macos ;; Linux) OS=linux ;; *) echo "SKIP: PLAY.command is the macOS/Linux launcher; $(uname -s) runs PLAY.bat"; exit 0 ;; esac

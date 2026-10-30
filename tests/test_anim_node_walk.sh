@@ -63,7 +63,7 @@ MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
 BUILD="${BUILD:-build/don_m27}"  # re-pointed 14z-119 (physics-port freeze) <- 14z-117b
 EX="$BUILD/extract"
 [ -f "$EX/regions.json" ] || { echo "SKIP: no $EX/regions.json"; exit 0; }
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: test_anim_node_walk — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }

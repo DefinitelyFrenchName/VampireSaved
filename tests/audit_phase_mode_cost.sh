@@ -17,7 +17,7 @@
 #   guard without -debug, the same POKES) held to replay.lua run live; one STAGING reference leg is held to replay.lua
 #   on every run (tests/lib/instr_align.sh). The phase build is built fresh, so a manifest change that moves its game
 #   clock FAILs the gate until re-frozen.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/instr_gameclock/ tests/lib/controls.sh
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/instr_gameclock/ tests/lib/controls.sh tests/lib/jobs.sh
 #   tests/lib/instr_align.sh tests/lua/emu_clock.lua tests/lua/replay.lua tests/lua/replay_guard.lua
 #   tests/replays/ tools/build_donovan.sh tools/build_wide_romset.py tools/run_mame.sh
 #   tools/run_replay_guarded.sh tools/run_replay_mame.sh tools/setup_mame.sh
@@ -65,7 +65,7 @@
 # runs at all and every replay compares identical — a green that measures
 # nothing. Section 0 proves the shim executed before any verdict is read.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] tests/audit_phase_mode_cost.sh [--freeze-clock]
+# Usage: ROMDIR=... [MAME_BIN=...] [JOBS=N] tests/audit_phase_mode_cost.sh [--freeze-clock]
 # On-demand: builds a probe variant and runs 14 replay legs (~15 min).
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
@@ -160,8 +160,9 @@ POK="1400:ff8782:13;1450:ff8782:13;1500:ff8782:13;\
 abspath() { case "$1" in /*) echo "$1";; *) echo "$PWD/$1";; esac; }
 
 run() {  # run <build> <replay> <out> [pokes] — each run its own sandbox inside the trapped WORK (#303)
+    _sb="$(mktemp -d "$WORK/sb.XXXXXX")" || { echo "FAIL: audit_phase_mode_cost — mktemp -d failed (sandbox)"; return 2; }
     POKES="${4:-}" MAME_ROMPATH="$(abspath "$1")/rompath;$ROMDIR" \
-        tools/run_replay_mame.sh vsavjw "tests/replays/$2.rpl" "$3" "$(mktemp -d "$WORK/sb.XXXXXX")" \
+        tools/run_replay_mame.sh vsavjw "tests/replays/$2.rpl" "$3" "$_sb" \
         >/dev/null 2>&1 || true
 }
 
@@ -182,10 +183,25 @@ else
     exit 1
 fi
 
+# JOBS (#334 item 2, 14z-211): the
+# 14 runs of sections 1 and 2 are independent — each writes only its own $WORK/{l,d}_<replay>_{ref,new} and its own
+# mktemp sandbox — so they go through tests/lib/jobs.sh's pool, JOBS at a time; default min(4, CPUs/6), after
+# section 0 has proven the rig forms the match. Both sections read the outputs after the pool, in the old order.
+FZ_JOBS="${JOBS:-4}"   # --freeze-clock's ia_freeze width, its default (4) kept as it was before the pool
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+vs_pool_start "$JOBS"
+for R in 02_demitri_vs_cpu 05_timeout_idle 03_two_player_vs 01_attract_long; do
+    vs_pool_run run "$REF"        "$R" "$WORK/l_${R}_ref"
+    vs_pool_run run "$WORK/phase" "$R" "$WORK/l_${R}_new"
+done
+for R in 12_donovan_vs_cpu 19_don_dp_spam 20_don_round2; do
+    vs_pool_run run "$REF"        "$R" "$WORK/d_${R}_ref" "$POK"
+    vs_pool_run run "$WORK/phase" "$R" "$WORK/d_${R}_new" "$POK"
+done
+vs_pool_wait
+
 echo "== 1: LEGACY must be bit-identical (the superset invariant) =="
 for R in 02_demitri_vs_cpu 05_timeout_idle 03_two_player_vs 01_attract_long; do
-    run "$REF"        "$R" "$WORK/l_${R}_ref"
-    run "$WORK/phase" "$R" "$WORK/l_${R}_new"
     if cmp -s "$WORK/l_${R}_ref" "$WORK/l_${R}_new"; then
         echo "  ok: $R bit-identical ($(wc -l < "$WORK/l_${R}_ref" | tr -d ' ') frames)"
     else
@@ -197,8 +213,6 @@ done
 
 echo "== 2: DONOVAN's own content — bounded and RE-CONVERGENT =="
 for R in 12_donovan_vs_cpu 19_don_dp_spam 20_don_round2; do
-    run "$REF"        "$R" "$WORK/d_${R}_ref" "$POK"
-    run "$WORK/phase" "$R" "$WORK/d_${R}_new" "$POK"
     python3 - "$WORK/d_${R}_ref" "$WORK/d_${R}_new" "$R" <<'PY' || fail=1
 import sys
 a = [l.rstrip() for l in open(sys.argv[1])]
@@ -232,7 +246,7 @@ done
 echo "== 3: the instrument's alignment (#228 step 4, option A) =="
 if [ "$FREEZE_CLOCK" = 1 ]; then
     [ "$fail" = 0 ] || { echo "REFUSED: sections 0-2 failed — nothing frozen"; exit 1; }
-    ia_freeze "$REPO/tests/lua/replay_guard.lua" "$WORK/manifest.tsv" "$WORK/fz" "${JOBS:-4}" "$WORK/clocks.tsv" \
+    ia_freeze "$REPO/tests/lua/replay_guard.lua" "$WORK/manifest.tsv" "$WORK/fz" "$FZ_JOBS" "$WORK/clocks.tsv" \
         > "$WORK/fz.txt" || { sed 's/^/  /' "$WORK/fz.txt"; echo "REFUSED: the alignment does not hold — nothing frozen"; exit 1; }
     mkdir -p "$(dirname "$CLOCKS")"
     { echo "# $CLOCKS — the game clock RAM:\$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,"

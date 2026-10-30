@@ -86,6 +86,7 @@ declares	audit_palette_seq_ids
 declares	audit_pass_overrun
 declares	audit_phase_mode_cost
 declares	audit_phobos_dmg_residual
+declares	audit_pool_drop
 declares	audit_pool_free_byte
 declares	audit_projectile_clash
 declares	audit_pursuit_flag
@@ -307,6 +308,7 @@ declares	test_ladder_tenant_vs_palette
 declares	test_lane_carry
 declares	test_latch_readers
 declares	test_launcher_newest
+declares	test_ledger_page
 declares	test_list_type_census
 declares	test_live_budget
 declares	test_m2_repoint

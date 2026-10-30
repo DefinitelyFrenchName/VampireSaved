@@ -14,7 +14,7 @@
 # EXPECTS: the five writers and the block writers as frozen per leg, $FF8131's writers never
 #   on the $FF8130 lane; the one-form scan fails the inventory and the lane-blind read fails
 #   the lane assertion.
-# FOLLOWS: emu/mame-patches/ tests/lib/controls.sh tests/lib/decrypt_cache.sh
+# FOLLOWS: emu/mame-patches/ tests/lib/controls.sh tests/lib/decrypt_cache.sh tests/lib/jobs.sh
 #   tests/lua/tap_writes.lua tests/replays/ tools/run_mame.sh tools/setup_mame.sh
 #
 # SHEET: none — measures pristine vsavj and/or native vsav2 only; no leg of our build
@@ -63,7 +63,7 @@
 # In none of the three does any of the five direct writers fire, and 0x02033E /
 # 0x020AE8 never touch the $FF8130 lane.
 #
-# Usage: ROMDIR=... [MAME_BIN=<reference binary, default ~/.cache/vampire-saved/mame-ref/cps2>] tests/audit_ff8130_writers.sh
+# Usage: ROMDIR=... [MAME_BIN=<reference binary, default ~/.cache/vampire-saved/mame-ref/cps2>] [JOBS=N] tests/audit_ff8130_writers.sh
 # Runtime: ~1 min (three MAME legs of 4 s, 7 s and 35 s measured 14z-157, plus the
 # first-MB decode), emulator tier.
 set -eu
@@ -88,17 +88,28 @@ export SDL_VIDEODRIVER="${SDL_VIDEODRIVER:-dummy}"
 . "$REPO/tests/lib/decrypt_cache.sh"
 decrypt_view vsavj "$W/vj_op.bin" "$W/vj_dat.bin" || { echo "FAIL: vsavj decrypt view"; exit 1; }
 
+# JOBS (#334 item 2, 14z-211): the three legs are independent — each writes only its own sandbox, tap and output — so
+# they go through tests/lib/jobs.sh's pool, JOBS at a time; default min(4, CPUs/6). leg_check then judges each leg's END
+# line in the order they always ran.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
 leg() { # <name> <replay> <frames>
     MAME_BIN="$BIN" MAME_SANDBOX="$W/sb_$1" MAME_ROMPATH="$ROMDIR" \
         REPLAY="$REPO/tests/replays/$2.rpl" TAP=ff8130,2 FRAMES="$3" TRACE_OUT="$W/$1.tap" \
         tools/run_mame.sh vsavj -autoboot_script "$REPO/tests/lua/tap_writes.lua" \
         > "$W/$1.out" 2>&1 < /dev/null || true
+}
+leg_check() { # <name> <replay> <frames>
     grep -q "^END $3 " "$W/$1.tap" 2>/dev/null \
         || { echo "FAIL: leg $1 ($2) did not reach frame $3 (see its MAME output)"; tail -3 "$W/$1.out"; exit 1; }
 }
-leg r11 11_pick_donovan 3600
-leg attract 01_attract_long 7200
-leg arcade 26_don_arcade_mash 40500
+vs_pool_start "$JOBS"
+vs_pool_run leg r11 11_pick_donovan 3600
+vs_pool_run leg attract 01_attract_long 7200
+vs_pool_run leg arcade 26_don_arcade_mash 40500
+vs_pool_wait
+leg_check r11 11_pick_donovan 3600
+leg_check attract 01_attract_long 7200
+leg_check arcade 26_don_arcade_mash 40500
 
 python3 - "$W/vj_op.bin" "$W" "$MODE" <<'PY'
 import hashlib

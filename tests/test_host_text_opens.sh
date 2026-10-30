@@ -26,7 +26,7 @@
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: test_host_text_opens — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 FILES="tools/package_release.py tools/package_release_platforms.py tools/gen_applier_page.py tools/apply_release.py"
 # the two perturbed copies: the first match of each pattern only
 python3 - "$W" <<'PY'

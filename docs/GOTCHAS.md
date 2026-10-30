@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-580 entries (48 game / 146 platform / 386 project), counted from the buckets at generation.
+584 entries (48 game / 148 platform / 388 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 48 entries
 
@@ -73,7 +73,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A POKED KO NEEDS THE VICTIM ON ITS LAST BAR, AND THE KO MUST COME FROM THE PATH YOU MEAN TO TEST — a low HP alone rallies (paid: 14z-184, GitHub #180)
 - A MOTION THAT LEAVES A NEUTRAL FRAME BETWEEN BACK AND DOWN-BACK IS TWO TAPS TOWARD BACK, AND A CHARACTER WITH A BACKDASH DASHES — the press then lands in the hop (paid: 14z-205, #229, forks F3 and P1)
 
-## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 146 entries
+## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 148 entries
 
 - LINUX CAPS ONE ENVIRONMENT STRING AT 128 KiB; `/bin/sh` IS DASH; THE PINNED MAME'S VERBOSITY IS A BUILD FACT — three macOS facts the first Linux emulator tier paid for (paid: 2026-10-01, ERIS WSL2 Ubuntu, GitHub #201)
 - `spctl -a` REPORTS THE SIGNING-POLICY VERDICT, NOT WHETHER A LAUNCH IS BLOCKED — and `unzip` DOES propagate com.apple.quarantine (measured: 2026-09-20, macOS 26.0 arm64, #144)
@@ -221,8 +221,10 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - UNDER `-debug`, A STOP THAT LANDS AS THE SCREEN FRAME ADVANCES MAKES THAT FRAME'S SAMPLE READ ONE ENGINE PASS EARLY — and the game clock cannot see it (paid: 14z-205b, #229)
 - MAME 0.288's `add_change_notifier` KEEPS ITS CALLBACK ON THE CALLING LUA THREAD — the GC frees that thread, and `~address_space` segfaults at teardown (exit 139 after every output) (paid: 14z-210, #320)
 - A BUILTIN `printf` OR `echo` PIPED INTO `grep -q` CAN PRINT THE SHELL'S WRITE ERROR — `grep -q` exits at its first match, and with SIGPIPE ignored the builtin's next write fails loudly (paid: 14z-208c/14z-210, #327)
+- A FAILED `X="$(mktemp -d)"` LEAVES X EMPTY AND THE SCRIPT RUNS ON — `"$X/sub"` IS THEN A PATH UNDER `/` (paid: 14z-210, ERIS; fixed 14z-211/212, #333)
+- A SHELL'S WRITE-ERROR TEXT IS ITS OWN — bash says `write error: Broken pipe`, dash (Ubuntu's `sh`) `printf: I/O error` (paid: 14z-212, PILOT; #336)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 386 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 388 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -609,4 +611,6 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A STATE THE ENGINE PASSES THROUGH IS NOT "THE FIGHTER CAN ACT" — the throw mode byte returned to 00 up to 11 ticks early on 22 of 42 throws (paid: 14z-211, #330)
 - A RIG'S FIRST EVENT STANDS AT ANOTHER STAGE X — and Morrigan's K throw behaved differently there (paid: 14z-211, #330)
 - A RIG TIMED IN FRAMES AT ONE SPEED LEVEL DOES SOMETHING ELSE AT ANOTHER — an air throw pressed at +14 frames did not connect at level 0 (paid: 14z-211, #330)
-- OUT OF RANGE A RANGE-CHECKED GRAB'S INPUT IS A NORMAL — a "whiff" measured from far away was a normal on 28 of 82 command events (paid: 14z-211, #330)
+- OUT OF RANGE A RANGE-CHECKED GRAB'S INPUT IS A NORMAL — a far "whiff" was not the grab's own move on 28 of 78 command whiffs (paid: 14z-211, corrected 14z-212, #330)
+- A FRESH CLONE'S `build/` IS NOT THE MAIN TREE'S — dirs holding tracked files miss their untracked ROMs, and a fresh patch's mtime defeats a reference check (paid: 14z-212, #333/#334)
+- A POOLED GATE THAT GLOBS ITS OUTPUTS CANNOT SEE A LOST RUN — name every leg the pool starts, and fail on one that wrote nothing (paid: 14z-212, #334)

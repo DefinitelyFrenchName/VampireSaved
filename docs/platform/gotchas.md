@@ -3508,3 +3508,45 @@ its first line prints the write error through `grep -q` and never through `grep 
 
 **The rule:** feed a builtin's output to a grep that reads to EOF (`grep … >/dev/null`), or use a here-document. 52 files
 were rewritten in `86d1ca10`; section 32 lints the runner test and its control `pipe-q` plants a site.
+
+## A FAILED `X="$(mktemp -d)"` LEAVES X EMPTY AND THE SCRIPT RUNS ON — `"$X/sub"` IS THEN A PATH UNDER `/` (paid: 14z-210, ERIS; fixed 14z-211/212, #333)
+
+With no `set -e` and no `||`, a command substitution that fails only leaves its variable empty: the shell runs the
+next line. When ERIS's 24 GB tmpfs `/tmp` filled during a release-shape run, gates went on with `W=""` and wrote
+`mkdir: cannot create directory ''` and `cannot create /none/run.out`; 8 of the 106 unguarded sites then ran
+`rm -rf "$W/<sub>"` or `mkdir -p "$W/<sub>"`, which name paths directly under `/` (a normal user's permissions stopped
+them). A second trap waits in the obvious fix: `W="$(cd "$W" && pwd)"` on an empty `W` resolves to the WORKING
+DIRECTORY, and a `trap 'rm -rf "$W"' EXIT` then removes it. **The rule:** every `X="$(mktemp -d ...)"` stops on failure
+(`|| { echo "FAIL: <gate> — mktemp -d failed (X)"; exit 2; }`, or `set -e`), and a later `cd "$X"` is guarded by
+`[ -n "$X" ]`. `tools/tmp_hygiene.py` names every unguarded site (`tests/test_tmp_hygiene.sh`, its control
+`planted-unguarded`, and a dynamic check that puts a failing `mktemp` first on `PATH`).
+**Ways to look guarded and not be (14z-212, rule-checker runs 2026-10-29-1366 and -1368):** `local`, `export` or
+`readonly X="$(mktemp -d)" || exit` never exits — the builtin's own status, 0, is what `||` sees; `X="$(mktemp -d)" cmd`
+runs `cmd` with X empty (an env prefix); `cmd "$(mktemp -d)"` passes an empty argument; `|| true` swallows the failure.
+`set -e` stops a failed PLAIN assignment, also inside an `if` or `else` body, but none of those, and only on lines AFTER
+it: `tests/test_rompath_reject.sh` made its work dir 33 lines before its `set -eu`, and a reader that took `set -e`
+anywhere in the file as covering the whole file counted it guarded. And a scanner that finds heredocs by `<<` must skip an arithmetic `$((1 << N))`: the
+census once took one for a heredoc opener and read nothing for the rest of that file; so do a here-string `<<<`, a `<<`
+inside quotes and the shift in a bash `(( a << b ))` (5 here-strings and 5 such lines in the tree, 14z-212, run 1371).
+A `set -e` inside quotes (`sh -c 'x; set -e'`) is the child's, not the script's, and `mktemp` need not open its
+substitution (`$(TMPDIR=... mktemp -d)`, `$(command mktemp -d)`, `$(cd ... && mktemp -d)`): a reader keyed on `$(mktemp`
+misses those (run 2026-10-29-1374). And a `|| return` stops only inside a function or at a SOURCED file's top level —
+at an executed script's top level bash prints an error and runs on; a `set -e` inside `( ... )` or `$( ... )` is the
+subshell's; a word `exit` inside the arm's quotes (`|| echo "cannot exit"`) stops nothing (run 2026-10-29-1379); nor
+does `|| (exit 2)`, which exits only its own subshell, and `set -o errexit` / `set +o errexit` are `set -e` / `set +e`
+spelled long (run 2026-10-29-1380). A `set -e` behind `&&`, `||`, `then` or a case arm runs only when its condition holds,
+so it guards nothing for certain (run 2026-10-29-1382). Round after round, review found shell forms a text lint misreads.
+Measured over each round's tree: 120 unguarded sites before #333, 11 after the first edits, 0 once runs 1366 and 1368's
+finds were guarded; after that no unguarded site in the census's directories — later forms occur in real code (prose, a
+contained `{ set +e; …; set -e; }`) without exposing one — and 2 outside them (#333 run 2026-10-29-1389). Such a census states its limit — it reads shell text, it does not interpret it —
+and measures each named form, rather than chase every form a shell allows.
+
+## A SHELL'S WRITE-ERROR TEXT IS ITS OWN — bash says `write error: Broken pipe`, dash (Ubuntu's `sh`) `printf: I/O error` (paid: 14z-212, PILOT; #336)
+
+With SIGPIPE ignored, a builtin `printf` writing into a pipe whose reader has gone (`printf ... | grep -q`) fails and
+reports it on stderr, but in the shell's own words: bash prints `bash: line 1: printf: write error: Broken pipe`, dash
+`dash: 1: printf: printf: I/O error` (measured on PILOT, 5 runs each; both exit 0). `tests/test_static_runner.sh`
+section 32 measured #327's premise by counting `Broken pipe` lines only, so on every Linux host, where `/bin/sh` is dash,
+it read 0 and FAILed on unchanged code from 14z-209 until 14z-212. **The rule:** a check that reads a shell's or a
+tool's message must name every wording the hosts it runs on produce (here `Broken pipe` or `I/O error`), and a gate
+that passes on the Mac is run on PILOT before it is trusted on Linux.

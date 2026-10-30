@@ -3631,14 +3631,20 @@ the throw indicator; `RAM:$FF8116` the speed level, `RAM:$FF8081` the pass count
   buffered: refused before that tick, accepted from it. Victim and thrower alike.
 - **AN AIR THROW'S RECOVERY MOVES WITH ITS HEIGHT:** pressed 3 ticks earlier, 3 or 6 later in the jump, it moves by up
   to 9 ticks on 10 of 14 characters (not Bulleta, Demitri, Gallon, Morrigan); some heights do not throw at all.
-- **THE COMMAND THROWS (not yet frozen):** no tech on 80 of 82 grabbing events (the victim's back + HP or HK at 1 and 7
-  ticks into the hold); Victor's Giga Shock IS techable: the victim's press ends the hold after its first hit and the game
-  shows TECH. HIT (captured 14z-211). **A RANGE-CHECKED GRAB'S INPUT OUT OF RANGE IS A NORMAL:** from pins 476 px apart
-  the 632[4] / 6324 grabs of Aulbath, Felicia, Gallon, Jedah (San Bassale), Morrigan, Q-Bee (O.M.) and Zabel, and
-  Morrigan's Cryptic Needle, start a plain normal (state seq 0x0A on the press frame) — a whiff of one is made in range
-  against a victim that cannot be grabbed. (~~A travelling grab's whiff moves with distance~~ — RETRACTED 14z-211: that
-  was the normal.) Anakaris's Pit of Blame input with no knocked-down victim draws no move: an LP one tick after it
-  starts the normal.
+- **THE COMMAND THROWS:** no tech on 80 of 82 grabbing events (the victim's back + HP or HK at 1 and 7 ticks into the
+  hold); Victor's Giga Shock IS techable: the victim's press ends the hold after its first hit and the game shows TECH.
+  HIT (captured 14z-211). **THE THROW CHECK GATES 24 GRABS (14z-212):** the 632[4] / 6324 P and K grabs of Aulbath,
+  Felicia, Gallon, Jedah (San Bassale), Morrigan, Q-Bee (O.M.) and Zabel, and Bishamon's and Demitri's 360 MP / HP, start
+  their move only when the engine's throw check (CPU:$029406) passes: out of range, or at contact against a victim it
+  refuses (Victor jumping, four timings), the input is the button's plain normal (seq 0x0A) or, for the 360s, a plain
+  jump (seq 0x06). A logging breakpoint shows the grab's input calling the check in both outcomes and the commit's call
+  following only on a grounded victim. So these 24 have NO whiff. Their ES versions (Aulbath 6324PP / KK, Bishamon ES
+  360PP, Zabel 632[4]PP) start their own seq 0x12 when the check fails (0x10 when they connect): that IS their whiff
+  (the maintainer, from capture pages). (~~"from pins 476 px apart … and Morrigan's Cryptic Needle, start a plain normal"~~
+  — RETRACTED 14z-212: Cryptic Needle's far whiff is its own move, seq 0x12 from 3 frames after its last input, as when it
+  connects. ~~A travelling grab's whiff moves with distance~~ — RETRACTED 14z-211: that was the normal.) Anakaris's Pit
+  of Blame input with no knocked-down victim draws no move: an LP one tick after it starts the normal. The 54 whiffs that
+  exist are frozen by `tests/audit_throw_recovery.sh` (family `command`).
 
 ## The DAMAGE pipeline: two appliers, one scaler chain (14z-85e/85f,
 ## measured on Phobos' FINAL GUARDIAN; twins verified in both engines)

@@ -10,7 +10,7 @@
 # EXPECTS: every written value is a base id 0x00-0x0F from the known writer sites (attract,
 #   init, CPU opponent, challenger, select). Known gap stated in the header: Oboro's 0x18 IS
 #   a vanilla variant id no replay here reaches, so the proof is about THIS corpus.
-# FOLLOWS: build/manifest/ docs/game/atlas/id_space.md emu/mame-patches/ tests/lib/controls.sh tests/lua/tap_writes.lua
+# FOLLOWS: build/manifest/ docs/game/atlas/id_space.md emu/mame-patches/ tests/lib/controls.sh tests/lua/tap_writes.lua tests/lib/jobs.sh
 #   tests/expected/registry.tsv tests/replays/ tools/audit_roms.py tools/build_fingerprint.py tools/run_mame.sh
 #   tools/setup_mame.sh
 #
@@ -46,7 +46,7 @@
 # So this audit proves "no legacy replay HERE writes the variant half", not
 # "vanilla cannot". A tenant must still avoid 0x18.
 #
-# Usage: ROMDIR=... [BUILD=build/<merged dir>] tests/audit_id_writers.sh [outdir]
+# Usage: ROMDIR=... [BUILD=build/<merged dir>] [JOBS=N] tests/audit_id_writers.sh [outdir]
 #   BUILD (14z-192): run the same legacy replays on OUR build (set vsavjw from BUILD/rompath)
 #   instead of pristine vsavj — the "on our builds" half of #223's ruling.
 #
@@ -104,21 +104,30 @@ REPLAYS="01_attract_long 02_demitri_vs_cpu 03_two_player_vs 04_select_fuzz
 python3 tools/audit_roms.py "$ROMDIR" >/dev/null || {
     echo "ROM audit FAILED — stop (CLAUDE.md §3)"; exit 1; }
 
+# JOBS (#334 item 2, 14z-211): the 22 runs are independent — each writes only its own trace, log and sandbox — so they
+# go through tests/lib/jobs.sh's pool, JOBS at a time; default min(4, CPUs/6). The analysis below reads them after.
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+one_run() {  # one_run <replay> <p1|p2> <addr>
+    # NOTE: the exit code is deliberately ignored. MAME can segfault in
+    # TEARDOWN after the log is complete (docs/GOTCHAS.md); the END
+    # summary line below is the artifact that decides validity.
+    REPLAY="tests/replays/$1.rpl" TAP="$3,2" FRAMES=7000 \
+        TRACE_OUT="$OUT/$1.$2.txt" MAME_SANDBOX="$OUT/sbx_${1}_$2" MAME_ROMPATH="$RP" \
+        tools/run_mame.sh $SET \
+        -autoboot_script tests/lua/tap_writes.lua \
+        >"$OUT/$1.$2.log" 2>&1 || true
+    printf '.'
+}
+vs_pool_start "$JOBS"
+: > "$OUT/legs.list"  # every trace the pool must leave (not a .txt: the analysis globs those)
 for r in $REPLAYS; do
     for who in p1:ff8782 p2:ff8b82; do
-        tag=${who%%:*}; addr=${who##*:}
-        # NOTE: the exit code is deliberately ignored. MAME can segfault in
-        # TEARDOWN after the log is complete (docs/GOTCHAS.md); the END
-        # summary line below is the artifact that decides validity.
-        REPLAY="tests/replays/$r.rpl" TAP="$addr,2" FRAMES=7000 \
-            TRACE_OUT="$OUT/$r.$tag.txt" MAME_SANDBOX="$OUT/sbx_${r}_$tag" MAME_ROMPATH="$RP" \
-            tools/run_mame.sh $SET \
-            -autoboot_script tests/lua/tap_writes.lua \
-            >"$OUT/$r.$tag.log" 2>&1 || true
-        printf '.'
+        echo "$r.${who%%:*}.txt" >> "$OUT/legs.list"
+        vs_pool_run one_run "$r" "${who%%:*}" "${who##*:}"
     done
 done
-echo
+vs_pool_wait
+echo " (JOBS=$JOBS)"
 
 plant() {  # plant <dir> <a|b> — (a) a word write of id 0x13; (b) a byte write of 0x13 to +0x383 alone
     case "$2" in
@@ -134,6 +143,9 @@ BOOT = {0x000D34, 0x000D3A, 0x000DD8, 0x016E4C, 0x016E4E}
 bypc = collections.defaultdict(set)
 incomplete = []
 files = sorted(glob.glob(out + "/*.txt"))
+# every leg the pool started must have left its trace: one that wrote none is MISSING, never silently skipped
+# (#334, rule-checker run 2026-10-29-1376 Q4: with one pooled run dropped, the glob read 21 and the gate passed)
+missing = [l.strip() for l in open(sys.argv[2]) if l.strip() and not os.path.exists(os.path.join(out, l.strip()))]
 for f in files:
     body = open(f).read()
     if "\nEND " not in body and not body.startswith("END "):
@@ -148,6 +160,8 @@ for f in files:
         bypc[pc].add((data >> 8) & 0xFF)
 
 print("tap logs: %d, complete: %d" % (len(files), len(files) - len(incomplete)))
+if missing:
+    print("MISSING (no trace written): %s" % " ".join(missing))
 if incomplete:
     print("INCOMPLETE (no END line): %s" % " ".join(incomplete))
 
@@ -163,6 +177,9 @@ print("\nunion of gameplay-written ids: %s"
 bad = sorted(v for v in gp if 0x10 <= v <= 0x1F)
 
 fail = 0
+if missing:
+    print("\nFAIL: %d leg(s) wrote no trace" % len(missing))
+    fail = 1
 if incomplete:
     print("\nFAIL: %d tap log(s) lack an END summary line" % len(incomplete))
     fail = 1
@@ -178,14 +195,14 @@ if not fail:
     print("  (caveat in the header: 0x18/Oboro is unexercised by this corpus)")
 sys.exit(fail)
 PY
-rc=0; python3 "$OUT/analyze.py" "$OUT" || rc=$?
+rc=0; python3 "$OUT/analyze.py" "$OUT" "$OUT/legs.list" || rc=$?
 # THE IN-GATE CONTROL: plant (a), on a copy of the real logs, must FAIL naming id 13; plant
 # (b), on another copy, must leave the verdict PASS (the +0x383 byte is not the id).
 if [ -z "${VS_CTL:-}" ]; then
     for k in a b; do
         C="$OUT/ctl_$k"; mkdir -p "$C"; cp "$OUT"/*.txt "$C"/ 2>/dev/null || true; plant "$C" $k
         # the output goes BESIDE the plant directory: a file inside it would be read as a tap log
-        eval "crc_$k=0"; python3 "$OUT/analyze.py" "$C" > "$OUT/ctl_$k.out" 2>&1 || eval "crc_$k=\$?"
+        eval "crc_$k=0"; python3 "$OUT/analyze.py" "$C" "$OUT/legs.list" > "$OUT/ctl_$k.out" 2>&1 || eval "crc_$k=\$?"
     done
     if [ "$crc_a" != 0 ] && grep -q 'VARIANT-HALF id: 13$' "$OUT/ctl_a.out" && [ "$crc_b" = 0 ]; then
         vs_ctl_fired word-write-variant "plant (a), a word write of 0x1300 to +0x382, FAILs naming id 13; plant (b), a byte write of 0x13 to +0x383 alone, leaves the verdict PASS"

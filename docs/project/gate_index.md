@@ -16,11 +16,11 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**483 scripts** — 146 ci_portable, 93 ci_static, 244 emulator-tier (run by name).
+**485 scripts** — 147 ci_portable, 93 ci_static, 245 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 53 | the suite runners and their own ground truth |
+| [runner](#runner) | 55 | the suite runners and their own ground truth |
 | [docs](#docs) | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 50 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
@@ -37,6 +37,7 @@ the suite runners and their own ground truth.
 
 | gate | kind | tier | needs | locks (the script's own header) | since |
 |---|---|---|---|---|---|
+| `tests/audit_pool_drop.sh` | audit | emulator | a build dir, ~100 s | EVERY GATE THAT POOLS ITS EMULATOR RUNS STILL FAILS WHEN THE POOL LOSES ONE (#334, 14z-212). | 14z-212 |
 | `tests/run_all_emulator.sh` | run | emulator | Verilator, MAME, FBNeo, a build dir | THE EMULATOR-TIER GATE CHAIN. One command, every gate that needs MAME, FBNeo or the Verilator simulator. (14z-128.) | 14z-128 |
 | `tests/run_all_static.sh` | run | emulator | FBNeo, a build dir | THE PRE-COMMIT GATE CHAIN. One command, every gate that does not need an emulator. (14z-94, GitHub #30.) | 14z-94 |
 | `tests/run_battery_m2.sh` | run | emulator | MAME, FBNeo, a build dir, ~15 min | the M2 deliverable battery: the EXACT gate chain a stage-6 dev build must pass before any commit that touches the build (CLAUDE.md rule 2 / persistent-suite doctrine). One command, no chat-memory chain. Sections: 0. | M2 |
@@ -65,6 +66,7 @@ the suite runners and their own ground truth.
 | `tests/test_gate_follows.sh` | test | ci_portable | — | EVERY EMULATOR-TIER GATE DECLARES WHAT IT FOLLOWS, and no declaration is narrower than what the gate's own text reads (GitHub #171 slice Q3, ruled 2026-09-24 "Header line" — DECISIONS_HISTORY.md "Ruled 2026-09-24 (14z-180) — #171 gate quali… | 2026-09-24 |
 | `tests/test_header_defaults.sh` | test | ci_portable | — | a gate's HEADER must state the default its CODE actually uses (14z-128). ROM-free, ~2 s. | 14z-128 |
 | `tests/test_lane_carry.sh` | test | ci_portable | — | ground truth for tools/audit_lane_carry.py: a lane's carry verdict is derived from its gates' `# FOLLOWS:` declarations and fails when one moved or one is missing (GitHub #171 slice Q3; the tool itself 14z-174). ci_portable: | 14z-174 |
+| `tests/test_ledger_page.sh` | test | ci_portable | — | the public session ledger page carries the datasets whole, withholds the maintainer's own figures, fetches nothing, and is published as one orphan commit on gh-pages (GitHub #267, 14z-212). | 14z-212 |
 | `tests/test_mame_bin_pinned.sh` | test | ci_portable | — | a gate that boots `vsavjw` through a MAME wrapper must PIN the MAME binary (14z-133). ROM-free, ~1 s. | 14z-133 |
 | `tests/test_measures_contract.sh` | test | ci_portable | — | ground truth for THE MEASUREMENT CONTRACT'S READER, tests/lib/measures.sh: the `# MEASURES: <name> — <floor>` header grammar, the `MEASURED: | 2026-09-24 |
 | `tests/test_module_refs.sh` | test | ci_portable | — | EVERY CROSS-MODULE PYTHON NAME THE TOOLS AND GATES REFERENCE STILL EXISTS (GitHub #171 slice Q1, ruled 2026-09-24 — DECISIONS_HISTORY.md "Ruled 2026-09-24 (14z-180) — #171 gate qualification", "Land it now"). ci_portable: | 2026-09-24 |

@@ -32,7 +32,7 @@ EXPECT="${EXPECT:-same}"   # 14z-192: gap until M23, same since
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
 [ -x "$MAME_BIN" ] || { echo "FAIL: no MAME binary at $MAME_BIN (tools/setup_mame.sh)"; exit 1; }
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "FAIL: no $BUILD/rompath/vsavjw.zip"; exit 1; }
-W="${KEEP:-$(mktemp -d)}"; mkdir -p "$W"
+W="${KEEP:-$(mktemp -d)}" || { echo "FAIL: audit_air_dash_height — mktemp -d failed (W)"; exit 2; }; mkdir -p "$W"
 [ -n "${KEEP:-}" ] || trap 'rm -rf "$W"' EXIT INT TERM
 echo "== audit_air_dash_height (#222): build $BUILD ($(python3 tools/build_fingerprint.py "$BUILD/rompath" --set vsavjw --sha-only 2>/dev/null | cut -c1-8))"
 python3 tools/air_dash_rigs.py gen "$W" > /dev/null || { echo "FAIL: rig generation"; exit 1; }

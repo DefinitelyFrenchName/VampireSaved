@@ -217,7 +217,7 @@ MAME_LO=2100; MAME_HI=2400
 # which is why it is a window and not the whole run.
 SIM_FRAMES=2800; SIM_LO=2400; SIM_HI=2800
 
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: test_mister_sim_anchor — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 cf() { python3 "$REPO/tools/compare_fields.py" "$@"; }
 
 echo "== MAME leg (stock vsavj, whole 68k work RAM, frames $MAME_LO-$MAME_HI) =="

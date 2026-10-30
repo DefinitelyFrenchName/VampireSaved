@@ -119,7 +119,7 @@ if [ -z "$POSLOG" ] || [ -z "$NEGLOG" ]; then
     command -v verilator >/dev/null 2>&1 || { echo "SKIP: verilator not installed"; exit 77; }
     [ -d "$REPO/$BUILD" ] || { echo "SKIP: no $BUILD (build the WIDE romset first)"; exit 77; }
     [ -e "$REPO/emu/jtcores/.git" ] || { echo "SKIP: emu/jtcores not initialised"; exit 77; }
-    [ -n "$OUTDIR" ] || OUTDIR="$(mktemp -d)"
+    [ -n "$OUTDIR" ] || OUTDIR="$(mktemp -d)" || { echo "FAIL: test_mister_prg_window — mktemp -d failed (OUTDIR)"; exit 2; }
     mkdir -p "$OUTDIR"
     case "$OUTDIR/" in "$REPO"/*) echo "REFUSING: OUTDIR is inside the repo (rule 7)"; exit 2 ;; esac
     POSLOG="$OUTDIR/pos"; NEGLOG="$OUTDIR/neg"

@@ -64,7 +64,7 @@
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 DON="${DON:-build/don_m27}"; PYR="${PYR:-build/pyron46}"; HUI="${HUI:-build/hui61}"
-W="$(mktemp -d "${TMPDIR:-/tmp}/projparams.XXXXXX")"; trap 'rm -rf "$W"' EXIT
+W="$(mktemp -d "${TMPDIR:-/tmp}/projparams.XXXXXX")" || { echo "FAIL: test_projectile_params — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 EXP="tests/expected/projectile_params.txt"
 . "$REPO/tests/lib/decrypt_cache.sh"

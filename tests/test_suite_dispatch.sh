@@ -27,7 +27,7 @@
 # EXPECTS: every dispatch case gives the designed answer; a red names the piece. The
 #   emulator-side behaviours these pieces gate are proven by test_m2_repoint.sh and the
 #   suite itself.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/audit_legacy_pairings.sh tests/expected/ tests/lib/m2a_common.sh
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/audit_legacy_pairings.sh tests/expected/ tests/lib/m2a_common.sh tests/lib/jobs.sh
 #   tests/lua/replay.lua tools/propose_masked_specs.sh tools/run_mame.sh tools/run_replay_mame.sh tools/setup_mame.sh
 #   tests/lib/controls.sh tests/lib/masked_compare.sh tests/replays/ tests/run_battery_m2.sh
 #   tests/run_suite.sh tools/build_fingerprint.py tools/check_diverge.py

@@ -58,7 +58,7 @@ SHEET="${SHEET:-$REPO/../community/vsav-framedata.xlsx}"
 IMG="${IMG:-build/out/vsavj_data.bin}"
 EXP=tests/expected/community_crosscheck.txt
 PAGE=docs/project/tables/community_crosscheck.md
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
+W="$(mktemp -d)" || { echo "FAIL: test_community_crosscheck — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT
 bad=0
 ok()  { echo "  ok    $1"; }
 nope() { echo "  FAIL  $1"; bad=$((bad + 1)); }

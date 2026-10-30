@@ -16,7 +16,7 @@
 #   STAGING reference leg (ours) is held to replay.lua on every run (tests/lib/instr_align.sh).
 # EXPECTS: ported nodes, native walked, ours walked; =absent reproduces the pre-fix state on
 #   an older build. Both legs on emulated time at their frozen game clocks, the staging leg on replay.lua's checksum.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/instr_gameclock/ tests/lib/controls.sh
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/instr_gameclock/ tests/lib/controls.sh tests/lib/jobs.sh
 #   tests/lib/instr_align.sh tests/lua/emu_clock.lua tests/lua/replay.lua tests/lua/trace_writes.lua
 #   tests/replays/hui/83b_hui_ray_2p.rpl tools/run_mame.sh tools/setup_mame.sh
 #
@@ -80,7 +80,7 @@
 # row makes the build enter the animation. BEAM_WALK_EXPECT=absent still
 # reproduces the pre-fix state on an older build (build/hui17).
 #
-# Usage: ROMDIR=... [BEAM_WALK_EXPECT=absent|walks] \
+# Usage: ROMDIR=... [BEAM_WALK_EXPECT=absent|walks] [JOBS=N] \
 #            tests/test_beam_anim_walk.sh [wide-builddir] [--freeze-clock]
 #        (defaults to build/hui61; needs a build carrying H's real art)
 #
@@ -206,28 +206,49 @@ count_hits() {
         '$1=="frame" && $2+0>=lo && $2+0<=hi {n++} END{print n+0}' "$1"
 }
 
-run_leg() {  # run_leg <tag> <set> <watch> <mamebin> [rompath]
+# JOBS (#334 item 2, 14z-211): the
+# two legs are independent — each writes only $WORK/<tag>.{txt,align,log} and its own sandbox $WORK/sbx_<tag> — so
+# they go through tests/lib/jobs.sh's pool, JOBS at a time; default min(4, CPUs/6). Their manifest rows are
+# written first, serially, in the old order (native, ours); run_leg_one records the run's exit status in
+# $WORK/<tag>.rc; run_leg judges a leg after the pool, with its old lines, in the old section order.
+FZ_JOBS="${JOBS:-4}"   # --freeze-clock's ia_freeze width, its default (4) kept as it was before the pool
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+note_leg() {  # note_leg <tag> <set> <watch> <mamebin> [rompath] — the leg's manifest row
+    _tag=$1; _set=$2; _watch=$3; _bin=$4; _rp=${5:-}
+    ia_note "$WORK/manifest.tsv" "$_tag" 83b_hui_ray_2p "$_set" "${_rp:--}" "$RPL" "$FRAMES" \
+        "MAME_BIN=$_bin POKES=$PK WATCH=$_watch,2,r" "$WORK/$_tag.align"
+}
+run_leg_one() {  # run_leg_one <tag> <set> <watch> <mamebin> [rompath]
     _tag=$1; _set=$2; _watch=$3; _bin=$4; _rp=${5:-}
     if [ -n "$_rp" ]; then MAME_ROMPATH="$_rp"; export MAME_ROMPATH
     else unset MAME_ROMPATH || true; fi
-    ia_note "$WORK/manifest.tsv" "$_tag" 83b_hui_ray_2p "$_set" "${_rp:--}" "$RPL" "$FRAMES" \
-        "MAME_BIN=$_bin POKES=$PK WATCH=$_watch,2,r" "$WORK/$_tag.align"
     # shellcheck disable=SC2086
-    env $_clk WATCH="$_watch,2,r" TRACE_OUT="$WORK/$_tag.txt" FRAMES="$FRAMES" ALIGN_OUT="$WORK/$_tag.align" \
-    REPLAY="$RPL" POKES="$PK" MAME_SANDBOX="$WORK/sbx_$_tag" \
-    MAME_BIN="$_bin" \
+    if env $_clk WATCH="$_watch,2,r" TRACE_OUT="$WORK/$_tag.txt" FRAMES="$FRAMES" ALIGN_OUT="$WORK/$_tag.align" \
+        REPLAY="$RPL" POKES="$PK" MAME_SANDBOX="$WORK/sbx_$_tag" \
+        MAME_BIN="$_bin" \
         tools/run_mame.sh "$_set" -debug -debugger none \
         -autoboot_script "$REPO/tests/lua/trace_writes.lua" \
-        > "$WORK/$_tag.log" 2>&1 || {
+        > "$WORK/$_tag.log" 2>&1; then echo 0 > "$WORK/$_tag.rc"; else echo 1 > "$WORK/$_tag.rc"; fi
+}
+run_leg() {  # run_leg <tag> — judges the pooled leg <tag>
+    _tag=$1
+    [ "$(cat "$WORK/$_tag.rc" 2>/dev/null)" = 0 ] || {
         echo "  FAIL: the $_tag run did not complete"; tail -5 "$WORK/$_tag.log"
         fail=1; return 1; }
     return 0
 }
+_nat_bin="${MAME_REF_BIN:-$HOME/.cache/vampire-saved/mame-ref/cps2}"
+_our_bin="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
+note_leg native vsav2 "$NODE_NAT" "$_nat_bin" || true
+note_leg ours vsavjw "$NODE_OUR" "$_our_bin" "$BUILD/rompath;$ROMDIR" || true
+vs_pool_start "$JOBS"
+vs_pool_run run_leg_one native vsav2 "$NODE_NAT" "$_nat_bin"
+vs_pool_run run_leg_one ours vsavjw "$NODE_OUR" "$_our_bin" "$BUILD/rompath;$ROMDIR"
+vs_pool_wait
 
 # --- 2. native leg ------------------------------------------------------
 echo "2. native vsav2 walks the node inside the beam window"
-if run_leg native vsav2 "$NODE_NAT" \
-        "${MAME_REF_BIN:-$HOME/.cache/vampire-saved/mame-ref/cps2}"; then
+if run_leg native; then
     nat=$(count_hits "$WORK/native.txt")
     if [ "$nat" -gt 0 ]; then
         echo "  ok: $nat read(s) of $NODE_NAT in f$WIN_LO-$WIN_HI"
@@ -240,9 +261,7 @@ fi
 
 # --- 3. our leg ---------------------------------------------------------
 echo "3. the build's placed twin, same replay and window"
-if run_leg ours vsavjw "$NODE_OUR" \
-        "${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}" \
-        "$BUILD/rompath;$ROMDIR"; then
+if run_leg ours; then
     our=$(count_hits "$WORK/ours.txt")
     case "$EXPECT" in
     absent)
@@ -288,7 +307,7 @@ echo "5. the instrument's alignment (#228 step 4, option A)"
 unset MAME_ROMPATH || true
 if [ "$FREEZE_CLOCK" = 1 ]; then
     [ "$fail" = 0 ] || { echo "REFUSED: sections 1-4 failed — nothing frozen"; exit 1; }
-    ia_freeze "$REPO/tests/lua/trace_writes.lua" "$WORK/manifest.tsv" "$WORK/fz" "${JOBS:-4}" "$WORK/clocks.tsv" \
+    ia_freeze "$REPO/tests/lua/trace_writes.lua" "$WORK/manifest.tsv" "$WORK/fz" "$FZ_JOBS" "$WORK/clocks.tsv" \
         > "$WORK/fz.txt" || { sed 's/^/  /' "$WORK/fz.txt"; echo "REFUSED: the alignment does not hold — nothing frozen"; exit 1; }
     mkdir -p "$(dirname "$CLOCKS")"
     { echo "# $CLOCKS — the game clock RAM:\$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,"

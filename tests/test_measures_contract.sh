@@ -33,7 +33,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 . "$REPO/tests/lib/measures.sh"
 . "$REPO/tests/lib/classify.sh"
-T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
+T="$(mktemp -d)" || { echo "FAIL: test_measures_contract — mktemp -d failed (T)"; exit 2; }; trap 'rm -rf "$T"' EXIT INT TERM
 rc=0; n_checks=0; ok() { n_checks=$((n_checks + 1)); echo "  ok: $*"; }; bad() { n_checks=$((n_checks + 1)); echo "  FAIL: $*"; rc=1; }
 
 mkgate() {  # mkgate <path> <header lines...>

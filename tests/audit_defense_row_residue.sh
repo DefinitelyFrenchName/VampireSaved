@@ -102,7 +102,7 @@ CLOCKS="tests/expected/instr_gameclock/audit_defense_row_residue.tsv"
 _clk=""; [ "$MODE" = drift-clock ] && _clk="INSTR_CLOCK=frame_done"
 VICTIMS="${VICTIMS:-10 13 0a 03}"     # the three residue victims + Victor (row identical in both games)
 ATT=10                                # Phobos, the attacker of the geometry gate
-W="$(mktemp -d "${TMPDIR:-/tmp}/defrow.XXXXXX")"
+W="$(mktemp -d "${TMPDIR:-/tmp}/defrow.XXXXXX")" || { echo "FAIL: audit_defense_row_residue — mktemp -d failed (W)"; exit 2; }
 if [ -n "${KEEP:-}" ]; then mkdir -p "$KEEP"; trap 'cp -R "$W"/. "$KEEP"/ 2>/dev/null; rm -rf "$W"' EXIT; else trap 'rm -rf "$W"' EXIT; fi
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 RPL=tests/replays/hui/80_hui_grab_2p.rpl

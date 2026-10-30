@@ -50,7 +50,7 @@ EXPECT="$REPO/tests/expected/hitbox_parity.tsv"
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no WIDE build at $BUILD"; exit 0; }
 [ -f "$BUILD/patch/placements.json" ] || { echo "SKIP: no placements.json at $BUILD"; exit 0; }
 [ -f "$BUILD/verify_data.bin" ] || { echo "SKIP: no verify_data.bin at $BUILD"; exit 0; }
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: audit_hitbox_parity — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0; ok() { printf '  ok    %s\n' "$1"; }; bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
 HP="python3 $REPO/tools/hitbox_parity.py"
 FIELDS="ff841c:l:node,ff8480:l:t0,ff8484:l:t1,ff8488:l:t2,ff848c:l:t3,ff8490:l:t4,ff8460:l:hbase,ff8464:l:hcomp,ff8494:l:boxes,ff8782:b:id,ff8b82:b:p2id"

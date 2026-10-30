@@ -97,7 +97,7 @@
 #   with a flipped-default control and the shape of fork patch 0008
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
-T="$(mktemp -d)"; fail=0
+T="$(mktemp -d)" || { echo "FAIL: test_sim_wram_contract — mktemp -d failed (T)"; exit 2; }; fail=0
 ok(){ echo "  PASS $1"; }; bad(){ echo "  FAIL $1"; fail=1; }
 cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"

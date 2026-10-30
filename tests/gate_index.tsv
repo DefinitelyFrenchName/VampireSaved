@@ -492,3 +492,5 @@ tests/test_submodule_pins.sh	review-triage
 tests/test_build_retention.sh	runner
 tests/test_release_reuse.sh	runner
 tests/test_runner_collation.sh	runner
+tests/audit_pool_drop.sh	runner
+tests/test_ledger_page.sh	runner

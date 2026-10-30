@@ -72,7 +72,7 @@ set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 fail=0; ok(){ echo "  PASS $1"; }; bad(){ echo "  FAIL $1"; fail=1; }
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: test_mister_prg_probe — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 
 PATCH="$REPO/emu/jtcores-patches/0016-cps2w-prg-read-probe.patch"
 HDL="$REPO/emu/jtcores/cores/cps2w/hdl/jtcps2_main.v"

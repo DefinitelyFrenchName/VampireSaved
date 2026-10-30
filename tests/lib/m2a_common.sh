@@ -10,7 +10,7 @@ m2a_run() {
 # m2a_diverge <log> <name> <frame> — log must match the frozen vanilla full
 # log for <name> through <frame>-1 and first diverge exactly at <frame>
 m2a_diverge() {
-    _dv_dir="$(mktemp -d)"
+    _dv_dir="$(mktemp -d)" || { echo "m2a_common: mktemp -d failed (_dv_dir)" >&2; return 1; }
     printf 'vsavj %s' "$3" > "$_dv_dir/$2.diverge"
     _dv_out=$(python3 "$REPO/tools/check_diverge.py" "$1" "$_dv_dir/$2.diverge" \
         "$REPO/tests/expected") && _dv_rc=0 || _dv_rc=1
@@ -29,9 +29,17 @@ M2A_ATTRACT_DIVERGE=4278
 m2a_legacy_gate() {
     _lg_rp="$1"; _lg_w="$2"
     gate_fail=0
+    # #334 item 2 (14z-211): the runs are independent (each its own log and sandbox), so they go through
+    # tests/lib/jobs.sh's pool, JOBS at a time (the caller's JOBS, else min(4, CPUs/6)); then judged in order, serially.
+    . "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6; vs_pool_start "$JOBS"
     for _lg_r in $M2A_EXACT_REPLAYS; do
-        m2a_run "$_lg_rp" "$REPO/tests/replays/$_lg_r.rpl" \
+        vs_pool_run m2a_run "$_lg_rp" "$REPO/tests/replays/$_lg_r.rpl" \
             "$_lg_w/$_lg_r.log" "$_lg_w/${_lg_r}box"
+    done
+    vs_pool_run m2a_run "$_lg_rp" "$REPO/tests/replays/01_attract_long.rpl" \
+        "$_lg_w/01_attract_long.log" "$_lg_w/01box"
+    vs_pool_wait
+    for _lg_r in $M2A_EXACT_REPLAYS; do
         _lg_got=$(shasum "$_lg_w/$_lg_r.log" | cut -d' ' -f1)
         _lg_exp=$(cat "$REPO/tests/expected/vsavj/$_lg_r.sha1")
         if [ "$_lg_got" = "$_lg_exp" ]; then
@@ -40,8 +48,6 @@ m2a_legacy_gate() {
             echo "FAIL: $_lg_r diverged from vanilla"; gate_fail=1
         fi
     done
-    m2a_run "$_lg_rp" "$REPO/tests/replays/01_attract_long.rpl" \
-        "$_lg_w/01_attract_long.log" "$_lg_w/01box"
     if m2a_diverge "$_lg_w/01_attract_long.log" 01_attract_long "$M2A_ATTRACT_DIVERGE" > /dev/null; then
         echo "  ok: attract bit-identical through $((M2A_ATTRACT_DIVERGE - 1)), diverges at $M2A_ATTRACT_DIVERGE (Jedah demo)"
     else
@@ -217,9 +223,14 @@ m2a_legacy_gate_masked() {
     done
     [ "$gate_fail" = 0 ] || return
 
+    # #334 item 2 (14z-211): the runs through the pool first (each its own log and sandbox), then judged in order
+    . "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6; vs_pool_start "$JOBS"
     for _mg_r in $M2A_MASKED_REQUIRED; do
-        m2a_run_masked "$_mg_rp" "$REPO/tests/replays/$_mg_r.rpl" \
+        vs_pool_run m2a_run_masked "$_mg_rp" "$REPO/tests/replays/$_mg_r.rpl" \
             "$_mg_w/$_mg_r.log" "$_mg_w/${_mg_r}box"
+    done
+    vs_pool_wait
+    for _mg_r in $M2A_MASKED_REQUIRED; do
         if _mg_v=$(masked_check "$_mg_exp" "$_mg_r" \
                     "$(cat "$_mg_exp/$_mg_r.masked")" "$M2A_MASK" \
                     "$_mg_w/$_mg_r.log"); then

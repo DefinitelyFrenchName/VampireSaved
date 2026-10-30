@@ -22,7 +22,7 @@
 # EXPECTS: 0 / used / used as measured, the fallback inventory exact; a blind instrument
 #   cannot pass as a clean result. Every section 1-3 run on emulated time at its frozen game clock, the staging leg
 #   on replay.lua's checksum.
-# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/instr_gameclock/ tests/lib/controls.sh
+# FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/instr_gameclock/ tests/lib/controls.sh tests/lib/jobs.sh
 #   tests/lib/instr_align.sh tests/lua/emu_clock.lua tests/lua/replay.lua tests/lua/trace_writes.lua tests/replays/
 #   tools/run_mame.sh tools/setup_mame.sh
 #
@@ -62,7 +62,7 @@
 # POSITIVE CONTROL taken with the same instrument on the same leg, so a
 # blind instrument cannot pass as a clean result.
 #
-# Usage: ROMDIR=... [REPLAYS="02_demitri_vs_cpu 07_mash_storm ..."] \
+# Usage: ROMDIR=... [REPLAYS="02_demitri_vs_cpu 07_mash_storm ..."] [JOBS=N] \
 #            tests/audit_effect_class_rows.sh [--freeze-clock | --freeze]
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
@@ -115,23 +115,46 @@ frames_for() {
     echo $((_last + 120))
 }
 
-# watch <replay> <addr> <len> <mode-space> <tag> -> prints the hit count
-watch() {
+# watch_run <replay> <addr> <len> <mode-space> <tag> — the watch run alone; its exit status to $WORK/<tag>.rc
+watch_run() {
     _r=$1; _a=$2; _l=$3; _ms=$4; _tag=$5
     unset MAME_ROMPATH || true
-    ia_note "$WORK/manifest.tsv" vsavj "$_r" vsavj - "$REPO/tests/replays/$_r.rpl" "$(frames_for "$_r")" \
-        "MAME_BIN=$MAME_REF WATCH=$_a,$_l,$_ms" "$WORK/$_tag.align"
     # shellcheck disable=SC2086
-    env $_clk WATCH="$_a,$_l,$_ms" TRACE_OUT="$WORK/$_tag.txt" FRAMES="$(frames_for "$_r")" ALIGN_OUT="$WORK/$_tag.align" \
+    if env $_clk WATCH="$_a,$_l,$_ms" TRACE_OUT="$WORK/$_tag.txt" FRAMES="$(frames_for "$_r")" ALIGN_OUT="$WORK/$_tag.align" \
     REPLAY="$REPO/tests/replays/$_r.rpl" MAME_SANDBOX="$WORK/sbx_$_tag" \
     MAME_BIN="$MAME_REF" \
         tools/run_mame.sh vsavj -debug -debugger none \
         -autoboot_script "$REPO/tests/lua/trace_writes.lua" \
-        > "$WORK/$_tag.log" 2>&1 || { echo "RUNFAIL"; return; }
+        > "$WORK/$_tag.log" 2>&1; then echo 0 > "$WORK/$_tag.rc"; else echo $? > "$WORK/$_tag.rc"; fi
+}
+# watch <replay> <addr> <len> <mode-space> <tag> -> notes the run in the manifest, prints the hit count of its
+# (already finished) watch run
+watch() {
+    _r=$1; _a=$2; _l=$3; _ms=$4; _tag=$5
+    ia_note "$WORK/manifest.tsv" vsavj "$_r" vsavj - "$REPO/tests/replays/$_r.rpl" "$(frames_for "$_r")" \
+        "MAME_BIN=$MAME_REF WATCH=$_a,$_l,$_ms" "$WORK/$_tag.align"
+    [ "$(cat "$WORK/$_tag.rc" 2>/dev/null)" = 0 ] || { echo "RUNFAIL"; return; }
     # frame 1 with all-zero registers is the watchpoint ARMING artefact,
     # logged on every run — never a real access.
     awk '$1=="frame" && $2>1' "$WORK/$_tag.txt" | wc -l | tr -d ' '
 }
+
+# JOBS (#334 item 2, 14z-211): sections 1-3's nineteen watch runs are independent — each writes only its own trace,
+# align file, log and sandbox ($WORK/<tag>.*, $WORK/sbx_<tag>) — so they go through tests/lib/jobs.sh's pool, JOBS at
+# a time; default min(4, CPUs/6). The sections below then note each run in the manifest and read its trace in the
+# original order (the manifest's line order is the serial one: ia_stage stages its line 1), printing what they did.
+# Section 4's runs are pooled the same way once its breakpoint is derived.
+FZ_JOBS="${JOBS:-4}"   # --freeze-clock's ia_freeze width, its default (4) kept as it was before the pool
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+vs_pool_start "$JOBS"
+for r in $REPLAYS; do vs_pool_run watch_run "$r" 80aec 4 r,o "row16_$r"; done
+vs_pool_run watch_run 02_demitri_vs_cpu 80b40 4 r,o ctl_row37
+for r in $REPLAYS; do vs_pool_run watch_run "$r" ff3578 a rw "scratch_$r"; done
+for ts in 0:1afba 2:1afbc 4:1afbe 6:1afc0 8:1afc2; do
+    vs_pool_run watch_run 02_demitri_vs_cpu "${ts#*:}" 2 r,o "type${ts%%:*}"
+done
+vs_pool_run watch_run 02_demitri_vs_cpu 1afc4 2 r,o type10
+vs_pool_wait
 
 fail=0
 
@@ -261,18 +284,36 @@ PY
         echo "  (thunk at 0x$THUNK, fallback entry +$(printf '0x%x' "$FB_OFF") -> breakpoint 0x$BP)"
         got=""
         S4_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
+        trip_run() {  # trip_run <replay> — section 4's breakpoint run alone; its exit status to $WORK/trip_<r>.rc
+            # shellcheck disable=SC2086
+            if env $_clk MAME_ROMPATH="$BUILD/rompath;$ROMDIR" ALIGN_OUT="$WORK/trip_$1.align" \
+            WATCH="$BP,1,b" TRACE_OUT="$WORK/trip_$1.txt" FRAMES="$(frames_for "$1")" \
+            REPLAY="$REPO/tests/replays/$1.rpl" MAME_SANDBOX="$WORK/sbx_trip_$1" \
+            MAME_BIN="$S4_BIN" \
+                tools/run_mame.sh vsavjw -debug -debugger none \
+                -autoboot_script "$REPO/tests/lua/trace_writes.lua" \
+                > "$WORK/trip_$1.log" 2>&1; then echo 0 > "$WORK/trip_$1.rc"; else echo $? > "$WORK/trip_$1.rc"; fi
+        }
+        ctl_run() {  # ctl_run <replay> — the instrument control below, alone
+            MAME_ROMPATH="$BUILD/rompath;$ROMDIR" \
+            WATCH="d36,1,b" TRACE_OUT="$WORK/ctl.txt" FRAMES=200 \
+            REPLAY="$REPO/tests/replays/$1.rpl" MAME_SANDBOX="$WORK/sbx_ctl" \
+            MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}" \
+                tools/run_mame.sh vsavjw -debug -debugger none \
+                -autoboot_script "$REPO/tests/lua/trace_writes.lua" \
+                > "$WORK/ctl.log" 2>&1 || true
+        }
+        cr="$(echo "$REPLAYS" | awk '{print $1}')"
+        # the per-replay runs and the control are independent: pooled as sections 1-3's (JOBS above)
+        vs_pool_start "$JOBS"
+        for r in $REPLAYS; do vs_pool_run trip_run "$r"; done
+        vs_pool_run ctl_run "$cr"
+        vs_pool_wait
         for r in $REPLAYS; do
             # each run is held to its frozen game clock in section 5, as sections 1-3 are (#261, ruled 2026-10-17)
             ia_note "$WORK/manifest.tsv" merged "$r" vsavjw "$BUILD/rompath;$ROMDIR" "$REPO/tests/replays/$r.rpl" \
                 "$(frames_for "$r")" "MAME_BIN=$S4_BIN WATCH=$BP,1,b" "$WORK/trip_$r.align"
-            # shellcheck disable=SC2086
-            env $_clk MAME_ROMPATH="$BUILD/rompath;$ROMDIR" ALIGN_OUT="$WORK/trip_$r.align" \
-            WATCH="$BP,1,b" TRACE_OUT="$WORK/trip_$r.txt" FRAMES="$(frames_for "$r")" \
-            REPLAY="$REPO/tests/replays/$r.rpl" MAME_SANDBOX="$WORK/sbx_trip_$r" \
-            MAME_BIN="$S4_BIN" \
-                tools/run_mame.sh vsavjw -debug -debugger none \
-                -autoboot_script "$REPO/tests/lua/trace_writes.lua" \
-                > "$WORK/trip_$r.log" 2>&1 || { echo "  FAIL: $r run did not complete"; fail=1; continue; }
+            [ "$(cat "$WORK/trip_$r.rc" 2>/dev/null)" = 0 ] || { echo "  FAIL: $r run did not complete"; fail=1; continue; }
             n=$(awk -v p="$BP" '$1=="frame" && $3=="PC" && tolower($4)==tolower(p)' \
                 "$WORK/trip_$r.txt" | grep -c '^' || true)
             got="$got $r:$n"
@@ -302,14 +343,6 @@ PY
         # hits — otherwise "0 entries" and "bpset silently did nothing" are
         # the same observation. 0x000D36 is one of the boot RAM-test PCs the
         # old design had to filter OUT; here it is the liveness proof.
-        cr="$(echo "$REPLAYS" | awk '{print $1}')"
-        MAME_ROMPATH="$BUILD/rompath;$ROMDIR" \
-        WATCH="d36,1,b" TRACE_OUT="$WORK/ctl.txt" FRAMES=200 \
-        REPLAY="$REPO/tests/replays/$cr.rpl" MAME_SANDBOX="$WORK/sbx_ctl" \
-        MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}" \
-            tools/run_mame.sh vsavjw -debug -debugger none \
-            -autoboot_script "$REPO/tests/lua/trace_writes.lua" \
-            > "$WORK/ctl.log" 2>&1 || true
         cn=$(awk '$1=="frame" && $3=="PC"' "$WORK/ctl.txt" 2>/dev/null | grep -c '^' || true)
         if [ "${cn:-0}" -gt 0 ]; then
             echo "  ok: instrument control — bpset arms under this romset ($cn hits at 0x000d36)"
@@ -346,7 +379,7 @@ fi
 echo "5. the instrument's alignment, sections 1-3 and section 4's runs (#228 step 4, option A; #261)"
 if [ "$FREEZE_CLOCK" = 1 ]; then
     [ "$fail" = 0 ] || { echo "REFUSED: sections 1-4 failed — nothing frozen"; exit 1; }
-    ia_freeze "$REPO/tests/lua/trace_writes.lua" "$WORK/manifest.tsv" "$WORK/fz" "${JOBS:-4}" "$WORK/clocks.tsv" \
+    ia_freeze "$REPO/tests/lua/trace_writes.lua" "$WORK/manifest.tsv" "$WORK/fz" "$FZ_JOBS" "$WORK/clocks.tsv" \
         > "$WORK/fz.txt" || { sed 's/^/  /' "$WORK/fz.txt"; echo "REFUSED: the alignment does not hold — nothing frozen"; exit 1; }
     mkdir -p "$(dirname "$CLOCKS")"
     { echo "# $CLOCKS — the game clock RAM:\$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,"

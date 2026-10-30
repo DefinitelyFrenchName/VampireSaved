@@ -73,7 +73,7 @@ decrypt_cache_ensure() {
         # mv is a rename on one filesystem (#299, 14z-206): from $TMPDIR on another
         # filesystem mv copies, and a concurrent direct reader can open a part-written
         # file. Two callers racing on a cold set each rename a full image; the last wins.
-        _dv_tmp="$(mktemp -d "$_dv_repo/build/out/.decrypt.XXXXXX")"
+        _dv_tmp="$(mktemp -d "$_dv_repo/build/out/.decrypt.XXXXXX")" || { echo "decrypt_cache: mktemp -d failed (_dv_tmp)" >&2; return 1; }
         if ! python3 "$_dv_repo/tools/cps2_decrypt.py" "$ROMDIR/${_dv_set}.zip" \
                 "$_dv_tmp/op.bin" --data-out "$_dv_tmp/dat.bin" >/dev/null 2>&1; then
             echo "decrypt_view: cps2_decrypt failed for $_dv_set" >&2

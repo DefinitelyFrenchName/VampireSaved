@@ -24,7 +24,7 @@
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: test_controls_concurrent — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 G1="$(awk -F'\t' '!/^#/ && NF {print $1; exit}' tests/controls_concurrent.txt)"
 mkcopy() {  # mkcopy <dir> <perturbation|clean>: the registries, the list and the listed gates' scripts, one row perturbed

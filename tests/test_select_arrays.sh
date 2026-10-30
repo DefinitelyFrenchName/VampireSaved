@@ -17,7 +17,7 @@
 # EXPECTS: the model holds, the corruption fails, the engine fetches the predicted rows. A
 #   tenant at 0x13 costs six longs. Every tap run on emulated time at its frozen game clock, the staging leg on
 #   replay.lua's checksum.
-# FOLLOWS: emu/mame-patches/ tests/expected/instr_gameclock/ tests/lib/controls.sh tests/lib/decrypt_cache.sh
+# FOLLOWS: emu/mame-patches/ tests/expected/instr_gameclock/ tests/lib/controls.sh tests/lib/decrypt_cache.sh tests/lib/jobs.sh
 #   tests/lib/instr_align.sh tests/lua/emu_clock.lua tests/lua/replay.lua tests/lua/trace_writes.lua
 #   tests/replays/11_pick_donovan.rpl tools/run_mame.sh tools/select_arrays.py
 #   tools/setup_mame.sh
@@ -45,7 +45,7 @@
 #      $1C(a6)+4 at the record walker PRG:0x01AFA6. Static row arithmetic is
 #      a claim until the engine agrees with it (the house lesson).
 #
-# Usage: ROMDIR=... tests/test_select_arrays.sh [--freeze-clock]
+# Usage: ROMDIR=... [JOBS=N] tests/test_select_arrays.sh [--freeze-clock]
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -138,16 +138,33 @@ echo "== 3. runtime: the engine fetches the rows the model predicts =="
 # The highlight stream additionally interleaves a CONSTANT record: the wheel
 # record pointer at PRG:0x2689FE sits immediately before that array. Filter
 # it rather than pretend it is not there.
-runtime() {  # runtime <tag> <watch> <expected sequence> [filter]
-    ia_note "$WORK/manifest.tsv" vsavj 11_pick_donovan vsavj - "$REPO/tests/replays/11_pick_donovan.rpl" 1200 \
-        "MAME_BIN=$REFBIN WATCH=$2" "$WORK/$1.align"
+# JOBS (#334 item 2, 14z-211): the
+# three tap runs are independent — each writes only $WORK/<tag>.{txt,align,log} and its own sandbox $WORK/sbx_<tag> —
+# so they go through tests/lib/jobs.sh's pool, JOBS at a time; default min(4, CPUs/6). Their manifest rows are
+# written first, serially, in the old order; tap_one records the run's exit status in $WORK/<tag>.rc; runtime() judges
+# each after the pool, with its old lines, in the old order.
+FZ_JOBS="${JOBS:-4}"   # --freeze-clock's ia_freeze width, its default (4) kept as it was before the pool
+. "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+tap_one() {  # tap_one <tag> <watch>
     # shellcheck disable=SC2086
-    env $_clk WATCH="$2" TRACE_OUT="$WORK/$1.txt" FRAMES=1200 ALIGN_OUT="$WORK/$1.align" \
+    if env $_clk WATCH="$2" TRACE_OUT="$WORK/$1.txt" FRAMES=1200 ALIGN_OUT="$WORK/$1.align" \
     REPLAY="$REPO/tests/replays/11_pick_donovan.rpl" MAME_SANDBOX="$WORK/sbx_$1" \
     MAME_BIN="$REFBIN" \
         tools/run_mame.sh vsavj -debug -debugger none \
         -autoboot_script "$REPO/tests/lua/trace_writes.lua" \
-        > "$WORK/$1.log" 2>&1 || {
+        > "$WORK/$1.log" 2>&1; then echo 0 > "$WORK/$1.rc"; else echo 1 > "$WORK/$1.rc"; fi
+}
+for _t in big_portrait:267380,140,r name_banner:2675a0,100,r highlight:268a00,120,r; do
+    ia_note "$WORK/manifest.tsv" vsavj 11_pick_donovan vsavj - "$REPO/tests/replays/11_pick_donovan.rpl" 1200 \
+        "MAME_BIN=$REFBIN WATCH=${_t#*:}" "$WORK/${_t%%:*}.align"
+done
+vs_pool_start "$JOBS"
+for _t in big_portrait:267380,140,r name_banner:2675a0,100,r highlight:268a00,120,r; do
+    vs_pool_run tap_one "${_t%%:*}" "${_t#*:}"
+done
+vs_pool_wait
+runtime() {  # runtime <tag> <watch> <expected sequence> [filter] — judges the pooled tap run <tag>
+    [ "$(cat "$WORK/$1.rc" 2>/dev/null)" = 0 ] || {
         echo "  FAIL: the $1 tap run did not complete"; tail -5 "$WORK/$1.log"
         fail=1; return; }
     got=$(awk -v skip="${4:-}" '
@@ -173,7 +190,7 @@ runtime highlight    "268a00,120,r" "002725dc 00272594 00272532 002724a2 " \
 echo "== 4. the instrument's alignment (#228 step 4, option A) =="
 if [ "$FREEZE_CLOCK" = 1 ]; then
     [ "$fail" = 0 ] || { echo "REFUSED: sections 1-3 failed — nothing frozen"; exit 1; }
-    ia_freeze "$REPO/tests/lua/trace_writes.lua" "$WORK/manifest.tsv" "$WORK/fz" "${JOBS:-4}" "$WORK/clocks.tsv" \
+    ia_freeze "$REPO/tests/lua/trace_writes.lua" "$WORK/manifest.tsv" "$WORK/fz" "$FZ_JOBS" "$WORK/clocks.tsv" \
         > "$WORK/fz.txt" || { sed 's/^/  /' "$WORK/fz.txt"; echo "REFUSED: the alignment does not hold — nothing frozen"; exit 1; }
     mkdir -p "$(dirname "$CLOCKS")"
     { echo "# $CLOCKS — the game clock RAM:\$FF8080 at each run's last frame, frozen from REFERENCE legs (#228 step 4,"

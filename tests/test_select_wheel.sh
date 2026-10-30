@@ -13,7 +13,7 @@
 # EXPECTS: decode as documented in select_screen.md, every pair measured as predicted, the
 #   controls failing, 16 cell positions measured. WHEEL_STATIC_ONLY=1 skips the emulator
 #   sections.
-# FOLLOWS: docs/checksums.txt emu/mame-patches/ tests/lib/decrypt_cache.sh
+# FOLLOWS: docs/checksums.txt emu/mame-patches/ tests/lib/decrypt_cache.sh tests/lib/jobs.sh
 #   tests/lua/replay.lua tests/lua/tap_writes.lua tools/audit_roms.py
 #   tools/check_wheel_walk.py tools/run_mame.sh tools/select_wheel.py tools/setup_mame.sh
 #   tools/wheel_layout.py tools/wheel_positions.py
@@ -46,7 +46,7 @@
 #
 # Sections 3-4 need a working MAME; set WHEEL_STATIC_ONLY=1 to skip them.
 #
-# Usage: ROMDIR=... tests/test_select_wheel.sh
+# Usage: ROMDIR=... [JOBS=N] tests/test_select_wheel.sh
 #
 # HANDOFF's gate-index note, moved into this header 14z-123 (verbatim; the
 # documentation pass ruled a gate's WHY lives in the gate):
@@ -119,10 +119,35 @@ note "== section 3: MEASURED — the walk, tapped in MAME =="
 if [ "${WHEEL_STATIC_ONLY:-0}" = "1" ]; then
     note "  SKIP  (WHEEL_STATIC_ONLY=1)"
 else
-    REPLAY="$WORK/walk.rpl" TAP=ff8402,2 FRAMES=1450 \
-        TRACE_OUT="$WORK/tap.txt" MAME_SANDBOX="$WORK/sandbox" \
-        tools/run_mame.sh vsavj -autoboot_script tests/lua/tap_writes.lua \
-        >"$WORK/mame.txt" 2>&1 || true   # MAME can segfault at TEARDOWN after the log is written (MFI-12; 12/12 runs on Linux, 14z-188): the tap's END line decides
+    # JOBS (#334 item 2, 14z-211): this section's walk tap and section 4's tour run are independent — the walk reads
+    # the generated walk.rpl and writes tap.txt, mame.txt and $WORK/sandbox; the tour reads tour.rpl and writes
+    # tour_ck.log (its dumps beside it), tour_run.log and $WORK/tour_sbx — so both go through tests/lib/jobs.sh's
+    # pool here, JOBS at a time (default min(4, CPUs/6)). Section 4's tour generation (silent) moves up to feed it;
+    # a failure there still ends the gate at section 4 with its status, as set -e did. Judged below as before.
+    . "$REPO/tests/lib/jobs.sh"; vs_jobs JOBS 4 6
+    sw_walk() {
+        REPLAY="$WORK/walk.rpl" TAP=ff8402,2 FRAMES=1450 \
+            TRACE_OUT="$WORK/tap.txt" MAME_SANDBOX="$WORK/sandbox" \
+            tools/run_mame.sh vsavj -autoboot_script tests/lua/tap_writes.lua \
+            >"$WORK/mame.txt" 2>&1 || true   # MAME can segfault at TEARDOWN after the log is written (MFI-12; 12/12 runs on Linux, 14z-188): the tap's END line decides
+    }
+    sw_tour() {
+        if REPLAY="$WORK/tour.rpl" DUMPS="$TDUMPS" CHECKSUM_OUT="$WORK/tour_ck.log" \
+            MAME_SANDBOX="$WORK/tour_sbx" \
+            tools/run_mame.sh vsavj -autoboot_script tests/lua/replay.lua \
+            >"$WORK/tour_run.log" 2>&1; then echo 0 > "$WORK/tour.rc"; else echo "$?" > "$WORK/tour.rc"; fi
+    }
+    # Positions cannot be read statically (section 4 says why); the tour that measures them:
+    TOUR_RC=0
+    python3 tools/wheel_positions.py --data "$WORK/vsavj_dat.bin" \
+        --tour "$WORK/tour.rpl" --meta "$WORK/tour.json" >/dev/null 2>&1 || TOUR_RC=$?
+    if [ "$TOUR_RC" = 0 ]; then
+        TDUMPS=$(python3 -c "import json;print(json.load(open('$WORK/tour.json'))['dumps'])") || TOUR_RC=$?
+    fi
+    vs_pool_start "$JOBS"
+    vs_pool_run sw_walk
+    if [ "$TOUR_RC" = 0 ]; then vs_pool_run sw_tour; fi
+    vs_pool_wait
     grep -q '^END 1450 ' "$WORK/tap.txt" 2>/dev/null || {
         note "  FAIL  MAME run (the tap never wrote END 1450)"; tail -12 "$WORK/mame.txt"; exit 1; }
     check "measured walk reproduces TABLE B (all 128 pairs)" 0 \
@@ -159,13 +184,9 @@ else
     # entries in DRAWING order, not cell order. Measured instead by parking
     # the cursor on each cell and reading the palette-0x1E ring out of OBJ
     # RAM. Needed to place three new cells relative to the existing ones.
-    python3 tools/wheel_positions.py --data "$WORK/vsavj_dat.bin" \
-        --tour "$WORK/tour.rpl" --meta "$WORK/tour.json" >/dev/null 2>&1
-    TDUMPS=$(python3 -c "import json;print(json.load(open('$WORK/tour.json'))['dumps'])")
-    REPLAY="$WORK/tour.rpl" DUMPS="$TDUMPS" CHECKSUM_OUT="$WORK/tour_ck.log" \
-        MAME_SANDBOX="$WORK/tour_sbx" \
-        tools/run_mame.sh vsavj -autoboot_script tests/lua/replay.lua \
-        >"$WORK/tour_run.log" 2>&1 || {
+    # (the tour is generated and run in section 3's pool, #334 item 2)
+    [ "$TOUR_RC" = 0 ] || exit "$TOUR_RC"
+    [ "$(cat "$WORK/tour.rc" 2>/dev/null)" = 0 ] || {
         note "  FAIL  tour run"; tail -8 "$WORK/tour_run.log"; fail=1; }
     python3 tools/wheel_positions.py --meta "$WORK/tour.json" \
         --extract "$WORK" >"$WORK/pos.txt" 2>&1 || {

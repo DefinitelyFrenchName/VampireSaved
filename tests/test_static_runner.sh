@@ -1217,7 +1217,9 @@ fi
 
 echo "== 32. no builtin printf/echo feeds an early-exit grep -q (#327) =="
 # The premise, measured: with SIGPIPE ignored (as a parent may leave it), a builtin printf of ~1 MB into `grep -q`
-# prints the shell's write error; the same pipe into `grep >/dev/null`, which reads to EOF, does not.
+# prints the shell's write error; the same pipe into `grep >/dev/null`, which reads to EOF, does not. The error's
+# wording is the shell's: bash says "write error: Broken pipe", dash (Ubuntu's sh) "printf: I/O error" — counting only
+# bash's made this section FAIL on every Linux host (14z-212, PILOT).
 _big="$T/big327.txt"; { echo "  re-run g_f STALE"; i=0; while [ $i -lt 20000 ]; do echo "padding line $i of a captured runner output"; i=$((i+1)); done; } > "$_big"
 s32p() {   # s32p <old|new> -> the number of stderr lines over 5 runs with SIGPIPE ignored
     python3 - "$1" "$_big" <<'EOF'
@@ -1229,7 +1231,7 @@ c = 'printf "%s" "$(cat "$1")" | grep ' + q + ' "^  re-run g_f +STALE"' if sys.a
 n = 0
 for _ in range(5):
     r = subprocess.run(['sh', '-c', c, 'sh', sys.argv[2]], capture_output=True, text=True, restore_signals=False)
-    n += len([l for l in r.stderr.splitlines() if 'Broken pipe' in l]) + (0 if r.returncode == 0 else 100)
+    n += len([l for l in r.stderr.splitlines() if 'Broken pipe' in l or 'I/O error' in l]) + (0 if r.returncode == 0 else 100)
 print(n)
 EOF
 }

@@ -71,7 +71,7 @@ mkroot() {  # mkroot <root> <rulecheck.py to install>
     mkdir -p "$1/docs/project" "$1/tests/expected" "$1/tools" "$1/.claude/agents"
     _doc=docs/project/rule_checker.md; cp "$_doc" "$1"/docs/project/; cp tests/expected/registry.tsv "$1/tests/expected/"
     cp -R tests/rulecheck "$1/tests/rulecheck"; cp .claude/agents/rule-checker.md "$1/.claude/agents/"
-    cp "$2" "$1/tools/rulecheck.py"; cp tools/claim_lint.py "$1/tools/"
+    cp "$2" "$1/tools/rulecheck.py"; cp tools/claim_lint.py tools/rc_actions.py "$1/tools/"   # rc_actions: prepare's --redoes (#335)
     cp tools/packet_check.py "$1/tools/"; cp -R tools/agent "$1/tools/agent"   # prepare's pre-prepare check (#272)
     echo "an artifact" > "$1/art.txt"
 }

@@ -8,6 +8,9 @@
 #   the last batch. A pooled command's exit status is not collected: a gate judges each run by its ARTIFACT (its log's
 #   END line, its output file), as it did serially. Every pooled run must write only paths of its own (its own sandbox,
 #   its own log names) — nothing a sibling writes or reads.
+# VS_POOL_DROP_FIRST=1 (the pool-drop control, tests/audit_pool_drop.sh; #334, 14z-212): vs_pool_run DROPS the first
+#   command of each shell unrun, appending "POOL-DROP pid <pid>: dropped: <cmd>" to $VS_POOL_DROP_LOG, so a gate whose
+#   verdict cannot see a lost run (it globs the outputs it finds) PASSES where it must FAIL. Unset, the pool is unchanged.
 
 vs_jobs() {
     eval "_vj=\${$1:-}"
@@ -20,6 +23,9 @@ vs_jobs() {
 
 vs_pool_start() { VS_POOL_N="${1:-1}"; _vp_k=0; }
 vs_pool_run() {
+    if [ -n "${VS_POOL_DROP_FIRST:-}" ] && [ -z "${_vp_dropped:-}" ]; then
+        _vp_dropped=1; echo "POOL-DROP pid $$: dropped: $*" >> "${VS_POOL_DROP_LOG:-/dev/null}"; return 0
+    fi
     "$@" &
     _vp_k=$(( _vp_k + 1 ))
     [ $(( _vp_k % VS_POOL_N )) -ne 0 ] || wait

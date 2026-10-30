@@ -146,7 +146,7 @@ note(){ echo "  note: $1"; }
 [ -f "$SRC/.gitmodules" ] || { echo "SKIP: emu/jtcores not initialised (tools/setup_jtcores.sh)"; exit 77; }
 HDL="$SRC/cores/cps2w/hdl"
 TOML="$SRC/cores/cps2w/cfg/mame2mra.toml"
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: test_mister_wide_gate — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 
 # ── 1. the frozen RTL delta ────────────────────────────────────────────────
 # PYTHON's difflib, not the system `diff`, ON PURPOSE: two diff

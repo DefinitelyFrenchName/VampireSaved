@@ -119,7 +119,7 @@ EXP="tests/expected/ladder_tenant_vs_palette.txt"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no WIDE MAME binary at $MAME_BIN"; exit 0; }
 python3 -c "import PIL" 2>/dev/null || { echo "SKIP: python3 PIL not available"; exit 0; }
 
-W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
+W="$(mktemp -d)" || { echo "FAIL: test_ladder_tenant_vs_palette — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 FREEZE_CLOCK=0; [ "${1:-}" = "--freeze-clock" ] && FREEZE_CLOCK=1
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"; MODE="${VS_CTL:-}"
 . "$REPO/tests/lib/instr_align.sh"

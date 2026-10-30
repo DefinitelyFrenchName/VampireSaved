@@ -1,0 +1,104 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: close #333 as done (14z-212), after runs 2026-10-29-1366, -1368, -1371, -1374, -1379, -1380, -1382 and -1385: every mktemp -d substitution in tests/, tests/lib/ and tools/ read by the census and stopping on failure, the census's limit and EXIT-trap order stated, the changed gates re-traced on PILOT
+Claim (the working agent's sentence): CLAIM: close #333 as done (14z-212), after runs 2026-10-29-1366, -1368, -1371, -1374 (not run: its reader's findings taken), -1379, -1380, -1382 and -1385: the closing comment closing_comment.md and the row ticket_row_333.tsv state the resolution. Every `mktemp -d` substitution in tests/*.sh, tests/lib/*.sh and tools/*.sh (`$( )` or backticks, -d, -dt or --directory) now stops when mktemp fails, or is a plain assignment on a line where `set -e` is in force, AS A LINT OVER SHELL TEXT READS IT (THE LIMIT, ruled "Fix these + state the limit": tools/tmp_hygiene.py reads shell text, it does not interpret it; a form outside the gate's known answers is untested; the forms runs 1379, 1380 and 1382 named were each measured on the tree (forms_measured.txt: 0 instances, or each hit contained, read by eye there) — the earlier reviews' forms had 11 real sites, guarded since): tools/tmp_hygiene.py sh_scan reads each one wherever it stands (census_now.txt: 0 carrying on, 487 substitutions read; census_reach.txt: every substitution not read is fixture text in a heredoc body or single quotes, in four gates; census_reach_indep.txt, a check sharing none of the census's patterns — per line, the mktemp -d COMMANDS (a token search, the guards' own message text removed) against the sites the census read: 564 commands on 563 lines, the 78 it did not read all on lines of the same four files — text, not code: fixture text in heredoc bodies, printf arguments or single quotes (a comment in a heredoc'd Python block among them, test_demand_after_trap.sh:60), and the gate's own double-quoted message and grep-pattern strings, test_tmp_hygiene.sh:231 and 251-273), held by tests/test_tmp_hygiene.sh; the edits land in this session's commit with #334's. It rests on:
+1. THE CENSUS: census_before.txt (14z-211's line-start census: 440 assignments, 106 unguarded, 8 that also rm -rf or mkdir -p "$X/<sub>"); census_now.txt (the widened census on today's tree). Its reading, in tools/tmp_hygiene.py sh_scan, on logical lines with `\` continuations joined: an assignment (at a line's start or after `;`, `&&`, `||`, `then`, `else`, `do`, a case arm's `)`) is guarded by a `||` whose own arm exits or returns (its `{ ... }` block or up to the next `;`, `&&` or `|` — not `|| true`), by a `[ -n "$X" ] ||` test whose arm stops, on one of the next three CODE lines before X is used, or by `set -e` in force at the line (the last `set -e` / `set +e` among the code lines before it, the last on a line winning) for a plain statement; `local`, `export`, `readonly`, an env prefix and an inline argument never are; heredoc bodies and single-quoted text are not read; an opener is never a here-string `<<<`, a quoted `<<` or the shift in `(( ))` / `$(( ))`. Since run 1379: an arm's `exit` / `return` counts only outside quotes; `return` stops only inside a function body (`name() {` / `function name {` to its closing brace) or at a sourced library's top level (tests/lib/); a `set -e` inside an open `( ... )` / `$( ... )` on its line is not the script's; an escaped double quote no longer flips the quote state (the escape test compared one character with two). Since run 1380: an arm's stop inside a `( ... )` it opens is the subshell's (`|| (exit 2)` runs on), and `set -o errexit` / `set +o errexit` are read as `set -e` / `set +e`. Since run 1382: a `set -e` behind `&&`, `||`, `then`, `do`, `else` or a case arm is conditional and never read as in force; a `set +e` there or after `{` turns it off.
+2. THE GATE: test_tmp_hygiene.log (PASS on today's tree: thirty-seven unguarded forms named — among them after a conditional `set +e`, after a conditional `set -e`, after a case arm's `set +e`, `|| (exit 2)`, after `set +o errexit`, a top-level `|| return`, after a subshell's `set -e`, after an escaped quote's `set -e`, `exit` only in quotes, an else arm, `[ -n ] ||`, a case arm, an inline argument, after `;`, local, an env prefix, `-dt`, after an arithmetic `<<`, `export ||`, `|| true`, before `set -e`, after `set +e`, after a quoted `set -e`, after a here-string, after `(( << ))`, after a quoted `<<`, backticks, `--directory`, a continuation, a test after a use, and a mktemp that is not the substitution's first word — twenty guarded forms read guarded (among them after `{ set -e; }`, after `set -o errexit`, and `|| return` in a one-line and a multi-line function and at a sourced library's top level), every control FIRED, the dynamic check with a failing mktemp first on PATH); mode_planted-unguarded.log (the planted gate and all thirty-seven forms named, FAIL) and mode_shim-blind.log (the dynamic check without the shim FAILs).
+3. THE RE-TRACE (the #315 method): pilot_t212r_*_overlap.txt / _classes.tsv (PILOT, tree 6829e446 per pilot_head.txt, emu/fbneo's patched working tree dirty as on every host: 46 static and 22 emulator gates SAFE, none SHARED; four gates' first pass SKIPped every control on clone setup — two emulator gates whose runs are classed LIES, two static gates whose exit-77 SKIPs the classifier read HONOURED — all four re-traced SAFE in pilot_t212r_fix_*); pilot_t212r2_* (tree 9aad2bae per pilot_head2.txt: the 3 gates run 1366's widening changed, SAFE, every run HONOURED); pilot_t212r3_static_* (tree 786dc723 per pilot_head3.txt: test_rompath_reject and test_tmp_hygiene after run 1368, SAFE, every run HONOURED); pilot_t212r4_static_* (tree b91b558d per its head.txt: test_tmp_hygiene after run 1371, SAFE, every run HONOURED); pilot_t212r5_static_* (tree e1b87efa per pilot_head5.txt, the census's fifth round and the sitting's other edits: test_tmp_hygiene and six more static gates, 64 control runs, SAFE, every run HONOURED); pilot_t212r7_static_* (tree 38fe3b27 per pilot_t212r7.out, which also shows the gate's exit 0 there first: test_tmp_hygiene after run 1379, SAFE, every run HONOURED); pilot_t212r8_static_* (tree 2e80a79e per pilot_t212r8.out, the gate's exit 0 there first: test_tmp_hygiene after run 1380, SAFE, every run HONOURED); pilot_t212r9_static_* (tree 94323897 per pilot_t212r9.out, the gate's exit 0 there first: test_tmp_hygiene after run 1382, SAFE, every run HONOURED); cc_static_census.txt and cc_emu_census.txt (0 rows named of 99 and 60 on today's tree); tests/controls_concurrent.txt, tests/controls_concurrent_emu.txt.
+4. THE RELEASE SHAPE: eris_run2_record_start.json lines 1-52 and eris_run2_results.tsv (ERIS: the run's own record, head 505c3257 — the first-round tree, before #334's knobs and before the widened census: eris_head_505c3257.txt, 112 guard exits in 108 files against 124 now, its census without SH_SUBST_D — argv `--scope all --strict --controls --jobs 8 --skip test_mame_parity`; 194 gate rows and 227 control rows, 417 PASS, 4 SKIP — release binaries not built on that host, no pw-record, no podman). eris_times.tsv, eris_setup.out and mtime_readers.txt (the 61 gates #334 changed, timed on ERIS on the #333/#334 tree 6829e446 against 33f85438 — eris_setup.out's HEAD lines — before the widened census, PASS both sides; of them only test_wide_profile reads a file's mtime, re-timed after the clone fix; mtime_readers2.txt widened the file list to tools/ but DROPPED the first search's `-nt`/`-ot` and `harness patch` idioms and named tools per gate script only; both are superseded by mtime_union_files.txt (every idiom of both searches plus `-mmin`, `-mtime` and `date -r`, over tests/*.sh, tests/lib/*, tools/*.py and tools/*.sh: 24 files, their matching lines in mtime_union_lines.txt; read by eye there, 14 read or set an mtime in code, listed in mtime_code_readers.txt — package_release_platforms.py's and test_launcher_newest.sh's `-nt` is launcher text they write or patch, counted as readers to widen the reach — the other 10 only in comments, echoed strings, `time.gmtime` or a gzip header's fixed `mtime=0`) and mtime_reach2.txt (mtime_reach2.py: each of the 61 gates followed through every tests/lib or tools file its non-comment text names, transitively: only test_wide_profile reaches one, itself; mtime_reach.txt, the same with comments counted, reaches release tools from every gate through a comment in tests/lib/host_env.sh; the control mtime_reach2_control.txt, with tests/lib/m2a_common.sh and tools/run_replay_mame.sh as the readers, finds 11 gates reaching them, through the library). test_launcher_newest and test_sim_wram_contract, in the first search, are not among the 61.
+5. THE TRAP ORDER (run 1385): trap_order.py / trap_order.txt — a guard's stop (`|| exit`, `set -e`) runs any EXIT trap already installed; of 534 `mktemp -d` assignment sites, none has an EXIT trap installed earlier in its file (inline, or the body of the function it calls) naming the site's variable with a suffix or glob (X followed by /<sub> or /*), 10 name it bare (an rm -rf of X alone, which removes nothing when X is empty), all fixture text in test_tmp_hygiene.sh and test_demand_after_trap.sh; trap_unparsed.txt: 8 of 493 trap lines its pattern does not parse, all fixture text or a regex; the control trap_order_plant.txt (a planted file) names both bad orders and not a trap set after its site.
+6. THE RECORDS: docs/platform/gotchas.md.lines-3512-3541, docs/project/gotchas.md.lines-7778-7791; the rulings DECISIONS_HISTORY.md.lines-8515-8527, .lines-8608-8619, .lines-8804-8829, .lines-8909-8924, .lines-8925-8936, .lines-8937-8950 and .lines-8952-8964; tools/tmp_hygiene.py, tests/test_tmp_hygiene.sh; rulecheck_1366_reader_a.txt, rulecheck_1368_reader_b.txt, rulecheck_1371_reader_a.txt, verdict_a_1374.txt (run 1374, not run: its reader A's answer, taken), verdict_b_1379.txt, verdict_a_1380.txt, verdict_b_1382.txt and verdict_b_1385.txt (the stopping runs).
+NOT TESTED: scripts outside tests/, tests/lib/ and tools/; a Python tempfile failure (the census reads Python makers for clean-up only); a real full disk on every gate — the dynamic check fails mktemp for one synthetic script and four guarded gates; a `mktemp -d` built by eval or by a variable holding the command (`$MK -d`), or with `-d` as a separately expanded word, which the census cannot see; a heredoc whose closing word is indented under `<<-` with tabs is read as the census reads the word (stripped); `set -e` read where a function body stands, not where it is called, and a `set -e` change and a site on the same line read with the line's final state; the 11 sites guarded after run 1366 have not run in a release-shape emulator tier (the static tier on the staged tree runs before the commit, the emulator ones at the next release); the combined tree's emulator tier; a `set -e` inside a subshell that spans lines (`(` on one line, `set -e` on a later one) is read as the script's; a function written as a subshell (`name() ( ... )`) is not tracked as a function, so its `|| return` reads unguarded; the brace count assumes `${...}` and `{ ...; }` balance on their line; a function's `|| return` is read as a stop whatever its caller does with the status — measured instead (return_sites.txt): each of the 6 real `|| return` sites' variable is used only inside its own function, and none of the 77, 7 and 3 files sourcing the three libraries uses theirs, so nothing uses the empty path after the return; a multi-line `if` around `set -e` (its `set -e` on a line of its own is read as in force), and any other form outside the gate's known answers (THE LIMIT above); EXIT-trap order — the census and the gate do not check whether a trap installed before a site names its variable with a suffix, measured instead (THE TRAP ORDER above: 0 on the tree; a trap installed in another file, or naming a variable copied from X, is not followed; a script added later is not checked); the mtime reach follows files by name in code or strings, so a file reached through a computed path or from outside tests/lib/ and tools/ is not followed, and the 24-to-14 split is by eye.
+Artifacts (read every one, in full):
+  - build/agent212/t333/closure/closing_comment.md
+  - build/agent212/t333/closure/ticket_row_333.tsv
+  - build/agent212/t333/closure/rulecheck_1366_reader_a.txt
+  - build/agent212/t333/closure/rulecheck_1368_reader_b.txt
+  - build/agent212/t333/closure/rulecheck_1371_reader_a.txt
+  - build/agent212/t333/closure/verdict_a_1374.txt
+  - build/agent212/t333/closure/verdict_b_1379.txt
+  - build/agent212/t333/closure/verdict_a_1380.txt
+  - build/agent212/t333/closure/verdict_b_1382.txt
+  - build/agent212/t333/closure/census_before.txt
+  - build/agent212/t333/closure/census_now.txt
+  - build/agent212/t333/closure/census_reach.txt
+  - build/agent212/t333/closure/census_reach.py
+  - build/agent212/t333/closure/census_reach_indep.txt
+  - build/agent212/t333/closure/census_reach_indep.py
+  - build/agent212/t333/closure/return_sites.txt
+  - build/agent212/t333/closure/return_sites.py
+  - build/agent212/t333/closure/forms_measured.txt
+  - build/agent212/t333/closure/forms_measured.py
+  - build/agent212/t333/closure/test_tmp_hygiene.log
+  - build/agent212/t333/closure/mode_planted-unguarded.log
+  - build/agent212/t333/closure/mode_shim-blind.log
+  - build/agent212/t333/closure/pilot_head.txt
+  - build/agent212/t333/closure/pilot_head2.txt
+  - build/agent212/t333/closure/pilot_head3.txt
+  - build/agent212/t333/closure/pilot_t212r4_static_head.txt
+  - build/agent212/t333/closure/pilot_head5.txt
+  - build/agent212/t333/closure/pilot_t212r7.out
+  - build/agent212/t333/closure/pilot_t212r8.out
+  - build/agent212/t333/closure/pilot_t212r9.out
+  - build/agent212/t333/closure/pilot_t212r_static_out_overlap.txt
+  - build/agent212/t333/closure/pilot_t212r_static_out_classes.tsv
+  - build/agent212/t333/closure/pilot_t212r_emu_out_overlap.txt
+  - build/agent212/t333/closure/pilot_t212r_emu_out_classes.tsv
+  - build/agent212/t333/closure/pilot_t212r_fix_static_overlap.txt
+  - build/agent212/t333/closure/pilot_t212r_fix_static_classes.tsv
+  - build/agent212/t333/closure/pilot_t212r_fix_emu_overlap.txt
+  - build/agent212/t333/closure/pilot_t212r_fix_emu_classes.tsv
+  - build/agent212/t333/closure/pilot_t212r2_static_overlap.txt
+  - build/agent212/t333/closure/pilot_t212r2_static_classes.tsv
+  - build/agent212/t333/closure/pilot_t212r2_emu_overlap.txt
+  - build/agent212/t333/closure/pilot_t212r2_emu_classes.tsv
+  - build/agent212/t333/closure/pilot_t212r3_static_overlap.txt
+  - build/agent212/t333/closure/pilot_t212r3_static_classes.tsv
+  - build/agent212/t333/closure/pilot_t212r4_static_overlap.txt
+  - build/agent212/t333/closure/pilot_t212r4_static_classes.tsv
+  - build/agent212/t333/closure/pilot_t212r5_static_overlap.txt
+  - build/agent212/t333/closure/pilot_t212r5_static_classes.tsv
+  - build/agent212/t333/closure/pilot_t212r7_static_overlap.txt
+  - build/agent212/t333/closure/pilot_t212r7_static_classes.tsv
+  - build/agent212/t333/closure/pilot_t212r8_static_overlap.txt
+  - build/agent212/t333/closure/pilot_t212r8_static_classes.tsv
+  - build/agent212/t333/closure/pilot_t212r9_static_overlap.txt
+  - build/agent212/t333/closure/pilot_t212r9_static_classes.tsv
+  - build/agent212/t333/closure/cc_static_census.txt
+  - build/agent212/t333/closure/cc_emu_census.txt
+  - build/agent212/t333/closure/eris_run2_results.tsv
+  - build/agent212/t333/closure/eris_head_505c3257.txt
+  - build/agent212/t333/closure/eris_times.tsv
+  - build/agent212/t333/closure/eris_setup.out
+  - build/agent212/t333/closure/mtime_readers.txt
+  - build/agent212/t333/closure/mtime_readers2.txt
+  - build/agent212/t333/closure/eris_run2_record_start.json.lines-1-52 (lines 1-52 of build/agent212/t333/closure/eris_run2_record_start.json)
+  - tests/controls_concurrent.txt
+  - tests/controls_concurrent_emu.txt
+  - docs/platform/gotchas.md.lines-3512-3541 (lines 3512-3541 of docs/platform/gotchas.md)
+  - docs/project/gotchas.md.lines-7778-7791 (lines 7778-7791 of docs/project/gotchas.md)
+  - tools/tmp_hygiene.py
+  - tests/test_tmp_hygiene.sh
+  - DECISIONS_HISTORY.md.lines-8515-8527 (lines 8515-8527 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-27 (14z-210) — #321: a control mode's environment error is DIED; the emulator runne")
+  - DECISIONS_HISTORY.md.lines-8608-8619 (lines 8608-8619 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-28 (14z-211) — #334 item 1: all 35 settings timed on PILOT; #333's re-trace waits f")
+  - DECISIONS_HISTORY.md.lines-8804-8829 (lines 8804-8829 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-29 (14z-212) — #333: finish it now — every mktemp -d form read and guarded, the sta", and the entries after it up to line 8829)
+  - DECISIONS_HISTORY.md.lines-8909-8924 (lines 8909-8924 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-29 (14z-212) — #333: the census's four logic gaps fixed now (round six)")
+  - DECISIONS_HISTORY.md.lines-8925-8936 (lines 8925-8936 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-29 (14z-212) — #333: `|| (exit)` and `set ±o errexit` read right; a caller ignoring")
+  - DECISIONS_HISTORY.md.lines-8937-8950 (lines 8937-8950 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-29 (14z-212) — #333 ends on its known answers and a stated limit: the census is a l")
+  - DECISIONS_HISTORY.md.lines-8952-8964 (lines 8952-8964 of DECISIONS_HISTORY.md: its INDEX entry "## Ruled 2026-10-29 (14z-212) — #333: an EXIT trap installed before a guarded site is named and meas")
+  - build/agent212/t333/closure/verdict_b_1385.txt
+  - build/agent212/t333/closure/trap_order.py
+  - build/agent212/t333/closure/trap_order.txt
+  - build/agent212/t333/closure/trap_unparsed.txt
+  - build/agent212/t333/closure/trap_order_plant.txt
+  - build/agent212/t333/closure/trap_plant/tests/plant.sh
+  - build/agent212/t333/closure/mtime_union_files.txt
+  - build/agent212/t333/closure/mtime_union_lines.txt
+  - build/agent212/t333/closure/mtime_code_readers.txt
+  - build/agent212/t333/closure/mtime_reach.py
+  - build/agent212/t333/closure/mtime_reach.txt
+  - build/agent212/t333/closure/mtime_reach2.py
+  - build/agent212/t333/closure/mtime_reach2.txt
+  - build/agent212/t333/closure/mtime_reach2_control_readers.txt
+  - build/agent212/t333/closure/mtime_reach2_control.txt
