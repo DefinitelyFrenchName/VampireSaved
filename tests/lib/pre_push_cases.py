@@ -59,6 +59,7 @@ def main():
             p = subprocess.run([sys.executable, os.path.join(repo, "tools", "agent", "hooks", "pre_push.py")],
                                input=ev, capture_output=True, text=True, env=dict(os.environ, CLAUDE_PROJECT_DIR=repo))
             if p.returncode != 0:
+                sys.stdout.write(p.stderr)   # a hook that crashed: its traceback kept for the gate's vs_ctl_show_err (#310 group 5)
                 return f"exit{p.returncode}"
             return json.loads(p.stdout)["hookSpecificOutput"]["permissionDecision"] if p.stdout.strip() else "allow"
 

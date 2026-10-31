@@ -56,11 +56,11 @@ MERGED="$REPO/tools/build_merged.sh"
 # CONTROL=<name> mode call the same function.
 perturb_rename_disabled() {  # <out> — the rename condition can never run mv
     sed 's/if mv "\$_rr_dir" "\$_rr_dir.REJECTED"; then/if false; then/' "$HELPER" > "$1"
-    cmp -s "$HELPER" "$1" && { echo "perturbation rename-disabled matched nothing"; exit 3; }
+    cmp -s "$HELPER" "$1" && { echo "REFUSED: rename-disabled — the perturbation matched nothing (the line it replaces moved): the mode judged nothing"; exit 3; }   # #310 group 6
     return 0
 }
 perturb_disarm_early() {  # <out> — the disarm moved above the member-identity audit
-    python3 - "$DONOVAN" "$1" <<'PY' || { echo "perturbation disarm-early failed"; exit 3; }
+    python3 - "$DONOVAN" "$1" <<'PY' || { echo "REFUSED: disarm-early — the perturbation failed (its target moved): the mode judged nothing"; exit 3; }   # #310 group 6
 import sys
 src = open(sys.argv[1]).read().split("\n")
 code = lambda l: not l.lstrip().startswith("#")

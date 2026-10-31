@@ -53,8 +53,10 @@ EOF
 V2OP="$W/v2_op.bin"
 vs_ctl_is emitter-base && V2OP="$W/v2_op_bad.bin"
 
-run() { python3 tools/audit_quote_font_window.py "$W/vj_op.bin" "$W/vj_data.bin" "$1" "$W/v2_data.bin" "$ROMDIR" 2>/dev/null; }
-run "$V2OP" > "$W/out.txt" || { note "  FAIL: the audit tool errored"; fail=1; }
+# the tool's stderr is kept (#310 group 5): the tool has no exit of its own, so a non-zero exit is a crash, never a finding
+run() { python3 tools/audit_quote_font_window.py "$W/vj_op.bin" "$W/vj_data.bin" "$1" "$W/v2_data.bin" "$ROMDIR" 2>"$W/run_err.txt"; }
+run "$V2OP" > "$W/out.txt" || { note "  FAIL: the audit tool errored"; fail=1; vs_ctl_show_err "$W/run_err.txt" || true
+    if vs_ctl_is emitter-base; then note "NOT JUDGED: emitter-base — the audit tool errored on the perturbed image, so the census was not judged"; fi; }
 cat "$W/out.txt" | grep -v '^#' | sed 's/^/    /'
 row() { grep "^$1" "$W/out.txt" | tr '\n' ';' | sed 's/;$//'; }
 
@@ -72,9 +74,12 @@ chk "absent at blank slots" "ABSENT-AT-BLANK-SLOT 39/39 (vsavj's tile at the sam
 
 note "4. verdict control (must fire)"
 if [ -z "${VS_CTL:-}" ]; then
-    run "$W/v2_op_bad.bin" > "$W/bad.txt" || true
+    brc=0; run "$W/v2_op_bad.bin" > "$W/bad.txt" || brc=$?
     if grep -q '^CENSUS codes 331 SAME 289 ' "$W/bad.txt"; then
         vs_ctl_dead emitter-base "the census did not move with vs2's base immediate"; fail=1
+    elif [ "$brc" != 0 ] || ! grep -q '^CENSUS codes ' "$W/bad.txt"; then   # a positive CENSUS line first (#310 group 5)
+        vs_ctl_show_err "$W/run_err.txt" || true
+        vs_ctl_dead emitter-base "the tool gave no CENSUS line on the perturbed image (exit $brc) — not the census moving" || true; fail=1
     else
         vs_ctl_fired emitter-base "$(grep '^CENSUS codes' "$W/bad.txt")"
     fi

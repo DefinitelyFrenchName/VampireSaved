@@ -1,0 +1,4 @@
+  FLAG D-FIGURE: 145  [build/agent215/t343/pr/question_draft.md]
+  FLAG D-ABSOLUTE: audit_tenant_downwin ff8450 FIELDS:p1hp — OBSERVES (Recommended): the game changes P1's HP (p2win's KO from 1, fd1's 145 -> 144, the next match's refill); p1...  [build/agent215/t343/pr/question_draft.md]
+  FLAG D-ABSOLUTE: And two ruled rows whose class stays but whose note cites the retracted round-2 line: row 48 (downwin p2hp, ":121 round 2 spawns with p2hp == 0x120") and row...  [build/agent215/t343/pr/question_draft.md]
+packet_check: 3 flag(s): D-ABSOLUTE 2, D-FIGURE 1

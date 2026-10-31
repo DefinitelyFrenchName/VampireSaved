@@ -158,22 +158,24 @@ who_swapped() {  # who_swapped <out.py> — the shadow whose who() reads P2 as P
     [ "$(command grep -c '# shadow$' "$1")" = 1 ] || { echo "the who() read was not found to swap" >&2; return 1; }
 }
 TOOL=tools/proof_sheets.py
-if vs_ctl_is who-swapped; then who_swapped "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
-if vs_ctl_is fighters-blind; then fighters_blind "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
-if vs_ctl_is intro-blind; then intro_blind "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
-if vs_ctl_is span-blind; then span_blind "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
-if vs_ctl_is inputs-unbounded; then inputs_unbounded "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
-if vs_ctl_is undefined-tag; then undefined_tag "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
-if vs_ctl_is no-split; then no_split "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
-if vs_ctl_is strip-ignored; then strip_ignored "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
-if vs_ctl_is rompath-unresolved; then rompath_unresolved "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
-if vs_ctl_is tag-key-blind; then tag_key_blind "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
-if vs_ctl_is build-blind; then build_blind "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
-if vs_ctl_is fingerprint-blind; then fingerprint_blind "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
-if vs_ctl_is count-only; then count_only "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
-if vs_ctl_is relative-unresolved; then relative_unresolved "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
-if vs_ctl_is frame-blind; then frame_blind "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
-if vs_ctl_is cap-ignored; then cap_ignored "$W/shadow.py" || exit 3; TOOL="$W/shadow.py"; fi
+# #310 group 6 (14z-215): a shadow whose target line moved did not apply — say REFUSED (exit 3, read UNJUDGED), never a bare exit 3
+shadow_refused() { echo "REFUSED: $VS_CTL — its shadow of tools/proof_sheets.py could not be built (the line it replaces moved): the mode judged nothing"; exit 3; }
+if vs_ctl_is who-swapped; then who_swapped "$W/shadow.py" || shadow_refused; TOOL="$W/shadow.py"; fi
+if vs_ctl_is fighters-blind; then fighters_blind "$W/shadow.py" || shadow_refused; TOOL="$W/shadow.py"; fi
+if vs_ctl_is intro-blind; then intro_blind "$W/shadow.py" || shadow_refused; TOOL="$W/shadow.py"; fi
+if vs_ctl_is span-blind; then span_blind "$W/shadow.py" || shadow_refused; TOOL="$W/shadow.py"; fi
+if vs_ctl_is inputs-unbounded; then inputs_unbounded "$W/shadow.py" || shadow_refused; TOOL="$W/shadow.py"; fi
+if vs_ctl_is undefined-tag; then undefined_tag "$W/shadow.py" || shadow_refused; TOOL="$W/shadow.py"; fi
+if vs_ctl_is no-split; then no_split "$W/shadow.py" || shadow_refused; TOOL="$W/shadow.py"; fi
+if vs_ctl_is strip-ignored; then strip_ignored "$W/shadow.py" || shadow_refused; TOOL="$W/shadow.py"; fi
+if vs_ctl_is rompath-unresolved; then rompath_unresolved "$W/shadow.py" || shadow_refused; TOOL="$W/shadow.py"; fi
+if vs_ctl_is tag-key-blind; then tag_key_blind "$W/shadow.py" || shadow_refused; TOOL="$W/shadow.py"; fi
+if vs_ctl_is build-blind; then build_blind "$W/shadow.py" || shadow_refused; TOOL="$W/shadow.py"; fi
+if vs_ctl_is fingerprint-blind; then fingerprint_blind "$W/shadow.py" || shadow_refused; TOOL="$W/shadow.py"; fi
+if vs_ctl_is count-only; then count_only "$W/shadow.py" || shadow_refused; TOOL="$W/shadow.py"; fi
+if vs_ctl_is relative-unresolved; then relative_unresolved "$W/shadow.py" || shadow_refused; TOOL="$W/shadow.py"; fi
+if vs_ctl_is frame-blind; then frame_blind "$W/shadow.py" || shadow_refused; TOOL="$W/shadow.py"; fi
+if vs_ctl_is cap-ignored; then cap_ignored "$W/shadow.py" || shadow_refused; TOOL="$W/shadow.py"; fi
 
 echo "== test_proof_sheets: a picture is proven only on the run its gate judged (#291) =="
 echo "== 1. the field values, live (tests/lua/field_trace.lua on the same inputs)"

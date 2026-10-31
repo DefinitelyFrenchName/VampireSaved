@@ -1,0 +1,1 @@
+WITHDRAWN unspawned (14z-215): the closing comment quotes figures (60/70/110, 45/52/82, 1.34, the multipliers) from docs/game/atlas/ram.md rows not in the packet; re-prepared with those rows extracted.

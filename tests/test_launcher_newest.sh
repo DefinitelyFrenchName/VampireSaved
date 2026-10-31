@@ -87,7 +87,7 @@ case1 "$GEN" "$W/s1" > "$W/s1.txt" 2>&1
 
 if vs_ctl_is first-found; then
     [ "$rc" = 1 ] && { echo "FAIL: test_launcher_newest (control mode: first-found)"; exit 1; }
-    echo "FAIL: test_launcher_newest — control mode first-found left the gate green"; exit 1
+    vs_ctl_left_green "first-found" "FAIL: test_launcher_newest — control mode first-found left the gate green"
 fi
 
 echo "== 2. control"

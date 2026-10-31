@@ -288,6 +288,19 @@ fi
 wait
 echo "== ran $_n legs ($(echo $THROWERS | wc -w | tr -d ' ') throwers x $(echo $VICTIMS | wc -w | tr -d ' ') victims; pinned level 06 and RNG 0000 on both legs$( [ -n "$UNPIN_ALL" ] && echo ' — EXCEPT the native level, CONTROL unpinned-level')), JOBS=$JOBS"
 
+# A LEG THAT DID NOT REACH ITS LAST FRAME MEASURED NOTHING (#310 group 4, 14z-215): replay.lua writes `END <n>` as its
+# last line, and a leg without it (MAME died, a stall killed it) classed `void` or `declared-dead` below — the same
+# FAIL as a real no-hold, so under any mode it read as that control caught. Such a run says NOT JUDGED and stops: the
+# verdict below reads every leg, and an empty one crashes it (measured 14z-215 with MAME_BIN=/usr/bin/false:
+# `ValueError: min() arg is an empty sequence`).
+_dead=""; for _d in "$W"/*_ours "$W"/*_native; do
+    [ -d "$_d" ] || continue; command grep -q '^END ' "$_d/out.log" 2>/dev/null || _dead="$_dead $(basename "$_d")"
+done
+if [ -n "$_dead" ]; then
+    echo "  FAIL: $(echo $_dead | wc -w | tr -d ' ') leg(s) wrote no END line:$(echo $_dead | cut -c1-200)"
+    echo "NOT JUDGED: $(echo $_dead | wc -w | tr -d ' ') leg(s) did not reach their last frame (no END line), so no victim was judged (#310)"
+    echo "FAIL: tenant throw geometry (a leg did not complete)"; exit 1
+fi
 VS_CTL="${VS_CTL:-}" python3 - "$W" "$VICTIMS" "$BUILD" "$THROWERS" <<'PY' > "$W/verdict.txt" || fail=1
 import glob, re, struct, sys, json, os
 W, VICTIMS, BUILD, THROWERS = sys.argv[1], sys.argv[2].split(), sys.argv[3], sys.argv[4].split()

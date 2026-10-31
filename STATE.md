@@ -138,7 +138,98 @@ PILOT's and ERIS's 14z-214 scratch deleted (PILOT's came to about 2.9 GB, not th
 with no open row left; the first measurement ran in a tree with `STATE.md` edited). Fixed: `parked-disagrees` takes the
 first open or parked row whose saved issue is OPEN, and says `NOT JUDGED:` when none qualifies; run in clean worktrees
 over three index states (`build/agent215/t341/recheck/`); `docs/project/gotchas.md`'s entry updated; re-traced on PILOT
-(`pilot:3ccc77fd`, 7 controls HONOURED, SAFE). **Closed `done`** with its closing comment after run `2026-10-31-1466` (OK).
+(`pilot:3ccc77fd`, 7 controls HONOURED, SAFE). **Closed `done`** with its closing comment after run `2026-10-31-1466` (OK). Committed
+`be2ecabc` on its strict GREEN tier (the first tier read RED on `test_rule_checker`: the two run directories the ledger's
+new rows name were untracked, so `git add -u` left them out of the snapshot; added, the gate PASSed in a clean worktree,
+and the re-run, confirmed on the red run's results, read GREEN 103/0/0).
+
+### (2) #118 — THE REMAINING RIGS, IN PARALLEL
+Five rig workers on pristine vsavj (`build/agent215/t118/`, local; the common brief `COMMON_BRIEF.md`), each with a draft
+gate (unregistered) whose run passed with every control fired: +0x354 and +0x3A8 (`s354_3a8/`), B5 Lilith +0x14C and B7
+Bishamon +0x316 (`b5b7/`), B3 Felicia +0x37F, B4 Gallon +0x366 and +0xB2 (`b3b4b2/`), B1 Anakaris +0x152, +0x156, +0x1A0,
++0x1AA, +0x374 (`b1/`); B2 (the finish types, on the win screen's banner) running. Every sheet was checked, then sent to
+the maintainer with its question; no atlas row changes before the answers.
+
+### (3) #310 — GROUPS 1-4 NOW
+A read-only worker scoped the remaining work at HEAD (`build/agent215/t310/REMAINING.md`, local); the question went
+through runs `2026-10-31-1468` to `-1470` (each caught a miscount). The maintainer: **"Groups 1-4, then re-census 5-7
+(Recommended)"** (`DECISIONS_HISTORY.md`, 14z-215). Groups 1-4 in an isolated worktree.
+
+### (4) #342 FILED — `$FF8120` IS THE WINNER'S PERFECT FLAG, NOT THE SIDE
+B2's legs read 0xFF after P2-won downs; a write tap (`build/agent215/t118/b2/ff8120/`, local) and the static read of
+`PRG:0x0098DC-0x0098FC` show 0xFF when the winner's white HP is full and 0x01 when the winner was hurt; the side is
+`$FF8105`. ram.md's row (14z-104) and three gates' winner checks rest on legs that confounded side with damage; none is
+falsely green on these facts. Filed **#342**; its fix (retraction, gates judging the side by `$FF8105`, the confound's
+legs as controls) in an isolated worktree. The fix came back (`build/agent215/t342/`, local): all three gates judge the side by `$FF8105`
+and name `$FF8120` the perfect flag, each with the two confound legs and a `side-by-perfect`/`perfect-by-side` control
+pair (plain PASS, six modes HONOURED); no frozen value changed; no gate had been green on the misreading. Applied to the
+main tree beside #310's change; one poke read-back finding (`audit_tenant_downwin ff8450 FIELDS:p1hp`) awaits a class.
+
+### (5) #343 FILED — THE TIMEOUT GATE'S "ROUND 2 LIVE" IS THE NEXT MATCH
+#342's worker noticed `audit_tenant_timeout` reports "round 2 live at f4990", after `$FF810E` = 0xFF (match end) at f4934.
+Traced on the ctl rig (`build/agent215/t342/round2/`, local): identical on pristine vsavj and our merged build, so no
+regression; the round byte returns to 0 at f4082 with no refill and the timer at 0, both HP read 0 from f4107, the match
+ends at f4934, and the refill the check counts is the next match's. Filed **#343**; its capture comes first. The capture
+(`build/agent215/t343/sheets/`, local) showed the time over ending the 2P match; the maintainer: **"on standard dip switch
+settings, you need two downs to win HOWEVER, there is only one timer so TIME OVER ends the match, not the round. Think of
+Vampire savior as having only one round but you get a new full life bar after your first down"**. The downwin rig's single
+KO also ended the match: measured, the rig's HP-only poke leaves the spare bar unused (`+0x138` 144, the bat `+0x3B0` 1), so
+the KO skips the first-down band and is a death natural play cannot reach (DIPs standard: a natural match needs two downs).
+Fixed in worktrees and applied: the timeout gate checks the time over ending the match and the next match spawning live;
+downwin's KO legs poke the victim onto its last bar (bat 0 -> 0xFF at the KO), first-down legs added (the §4 life-marker
+transition); `audit_edge_cases`' throw-KO and double-KO legs the same — the double KO still reads the draw on real last
+bars, and **14z-104's "Phobos' throw cannot finish an opponent, restores HP to half" is RETRACTED**: it was a first down
+made by the HP-only poke (native vsav2 the same, 7 frames earlier). Every gate PASS, every control HONOURED. The
+retraction was then shown on captures and re-measured on a last bar the game made itself (a real first down from 145, then
+HP alone lowered): the throw KOs on our build and native vsav2; the maintainer: **"yes"**. The 24 poke read-back findings of
+#342/#343/#118's gates classed by the maintainer after runs `2026-10-31-1471` to `-1475` (each caught a real error in the
+proposal): **"As proposed (Recommended)"**, **"OBSERVES"** (the reads after a one-frame poke), row 36 **"Re-rule to OBSERVES
+(Recommended)"**, the notes **"Approve the notes (Recommended)"**. **#342 and #343 closed `done`** with their comments after
+run `2026-10-31-1478` (OK; `-1476` withdrawn unspawned, `-1477` VIOLATED and resolved by work).
+
+### (6) #118 PROMOTED
+The seven draft gates moved to `tests/` (six gates, all PASS fresh, 50 control modes HONOURED), the atlas rows written from
+the measurements and the maintainer's answers (`build/agent215/t118/ANSWERS.md`, local), `character_tables.md`'s 15 tables;
+the candidates table: no NO ROW, no NOT OBSERVED, no batch left (CONSISTENT 44, NOT ADOPTED 23, OWNER ONLY 11, COVERED 5,
+REFUTED IN PART 4, CROSS-CHECKED 1, REFUTED 1). 24 poke read-back findings across the new and changed gates await the
+maintainer's classes.
+
+### (7) #118 CLOSED DONE ON GITHUB
+On the maintainer's **"Close #118"** (`DECISIONS_HISTORY.md` "Ruled 2026-10-31 (14z-215) — #118 closes"), after rule-checker
+runs `2026-10-31-1480` to `-1484` (each VIOLATED on a real gap: the batch "-" read as "nothing left"; the table and ram.md
+never compared after the test; "these gates do not read" #310's files, when they follow `tests/lib/controls.sh`; the logs'
+count of 85 against the snapshot's 84 — the `emu/fbneo` submodule, which `git stash create` cannot record; the portable-tier
+control and the 15-table count unshown) and `-1485` OK. Commented and closed 2026-10-31T15:07:31Z; row 118 `done`.
+
+### (8) #310 GROUPS 1-4 RE-TRACED; GROUPS 5-7 CENSUSED; GROUPS 5 AND 6 DONE
+Groups 1-4's stale concurrent-controls rows all re-traced on PILOT (15 emulator rows at `pilot:69321107`, three of them
+re-run with the hui30/don_m5 rompaths copied INTO the clone) and ERIS's batch of the four long gates PASS with every control
+honoured. A read-only census of groups 5-7 on the working tree (`build/agent215/t310/census57/`, local) went to the maintainer
+after rule-checker runs `2026-10-31-1486` to `-1493` (each VIOLATED on a real gap) and `-1494` OK; the maintainer: **"5 and 6
+now, 7 in batches (Recommended)"** (`DECISIONS_HISTORY.md`). Two worktree workers built group 5 (`tests/lib/controls.sh`
+`vs_ctl_show_err`, ~23 gates, proof gate `tests/test_ctl_show_err.sh`) and group 6 (four gates' plant/refusal paths,
+`tools/dead_exit_census.py`'s P4/P5 patterns and the gates they named, proof gate `tests/test_plants_not_applied.sh`); applied,
+the census and proof gates PASS on the main tree, and PILOT re-traced the 25 rows the edits staled (all SAFE, 176 controls
+HONOURED; `pilot:42e7f251`) and ran `audit_release_linux_cleanhost` on Linux (PASS, both controls honoured). Run `-1498` found
+the per-gate planted proofs missing for most changed modes; the maintainer: **"Next session, first batch (Recommended)"** — a
+crash-injection sweep gate opens next session, before group 7's first batch. Runs `-1500` to `-1512` each named a further
+gap. In order:
+- the claim lists the six planted modes exactly and names every other changed mode as unplanted;
+- `test_ctl_show_err`'s own mode runs ended an unplantable plant in the old plain FAIL, now a refusal proved by case (e) and the new known-bad control `refusal-reverted` (run `-1510`);
+- `test_rule_checker` and `test_poked_legs` were re-traced on PILOT from a tree whose plain runs pass (`pilot:6c9598b3`);
+- `test_rule_checker`, the fourth group-5 unknown, is now MEASURED with a crash planted where each mode's probe runs: the pre-fix gate reads HONOURED for exactly the three modes the reading named, and the fixed gate reads HONOURED for none (`build/agent215/t310/rcmeas/`, local; the seed of next session's sweep gate) — measured after its fix, not first as the chosen option's text says, a departure stated on #310.
+
+### (9) #129 — CAPTURES, TWO READS, AND A GATE
+On the maintainer's *"if at some point a machine is idle, the analysis part of #129 is ok to work on"*, ERIS captured
+Behaviours A and B natively and on ours (`build/agent215/t129/`, local). Read: A *"test is correct, behaviour is different but
+seems somewhat consistent"*; B *"starting positions is entirely different ... I fail to see how we can compare things"* — so a
+matched-start B capture (same venue, positions, facing, RNG, CPU state; `build/agent215/t129/b2/`) followed, read *"seems like
+our build is similar to vs2 from what I see"*. `0x416312` IS reached on ours (`docs/game/engine_internals.md` corrected). The
+measurements are kept as `tests/audit_tenant_cpu_ai.sh` (release scope, as `audit_tenant_cpu_soak`; its four pins READS-BACK on
+the maintainer's word), after rule-checker runs `2026-10-31-1495` to `-1501` (a formula read as the routine's return; the
+registry scope; a run made before the rescope; truncated evidence) and `-1502` OK. Recommended (B not ported; A as A1, both of Phobos's calls repointed) after rule-checker runs `2026-10-31-1515` (VIOLATED:
+A1 named one of the two calls) and `-1516` (OK). The maintainer: **"Neither, close #129"**. #129 closed `declined`
+(`DECISIONS_HISTORY.md`).
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings
@@ -194,7 +285,6 @@ One line per ruling that still constrains work: the rule and where its full entr
 - **Don't assume; measure first; ask if necessary (2026-09-15, clarified 2026-09-16)** — `DECISIONS_HISTORY.md` "Ruled 2026-09-15 (14z-157)" and "Ruled 2026-09-16 (14z-158b)".
 - **Pipeline-image registry rows (2026-09-15, #96):** the M2 battery dispatches on the build's fingerprint; each freeze rebuilds both pipeline images and records whether they moved — `DECISIONS_HISTORY.md` "Ruled 2026-09-15 (14z-157)".
 - **The merged set carries no tenant expectations (2026-09-15, #111)** — `DECISIONS_HISTORY.md` "Ruled 2026-09-15 (14z-157)".
-- **#129 is the lowest priority of the open tickets, and its decision waits for captures (2026-10-08, 14z-196)** — `DECISIONS_HISTORY.md` "Ruled 2026-10-08 (14z-196) — #129: captures first; the ticket stays the lowest priority of the open tickets".
 - **bbh is its own project (2026-10-09, 14z-196; links settled 2026-10-10):** a Vampire Saved session makes no change in it and runs none of its tests — `DECISIONS_HISTORY.md` "Ruled 2026-10-09 (14z-196) — bbh is its own project: …" and "Ruled 2026-10-10 (14z-197) — bbh's remaining links: …".
 - **A fixed ticket is commented and labelled `done unshipped`, not closed (2026-10-10, 14z-197)** — `DECISIONS_HISTORY.md` "Ruled 2026-10-10 (14z-197) — a fixed ticket is commented and labelled `done unshipped`, not closed".
 - **#248: the launcher prefers the newest set, always, and the shipped PLAY.bat equals the generator at release only (2026-10-10, 14z-197)** — `DECISIONS_HISTORY.md` "Ruled 2026-10-10 (14z-197) — #248: the launcher prefers the newest set, always".

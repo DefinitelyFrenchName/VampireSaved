@@ -62,7 +62,7 @@ mkcopy() {  # mkcopy <dir>
 # THE PERTURBATIONS, one per declared control; the control section and the
 # CONTROL=<name> mode call the same function. EXPECT = the failure's substring.
 perturb() {  # perturb <name> <dir>
-    python3 - "$1" "$2" <<'PY' || { echo "no such perturbation: $1"; exit 3; }
+    python3 - "$1" "$2" <<'PY' || { echo "REFUSED: $1 — the perturbation could not be planted (no such perturbation, or its target moved): the mode judged nothing"; exit 3; }   # #310 group 6
 import sys
 from pathlib import Path
 name, root = sys.argv[1], Path(sys.argv[2])

@@ -296,7 +296,7 @@ else
     echo "  FAIL  differs from the frozen expectation:"; sed 's/^/        /' "$W/diff.txt" | head -20; fail=1
 fi
 if [ "$fail" = 0 ]; then
-    if [ -n "${VS_CTL:-}" ]; then echo "FAIL: audit_marionette_cost (control mode $VS_CTL passed — the control is dead)"; exit 1; fi
+    if [ -n "${VS_CTL:-}" ]; then vs_ctl_left_green "$VS_CTL" "FAIL: audit_marionette_cost (control mode $VS_CTL passed — the control is dead)"; fi
     echo "PASS: audit_marionette_cost"
 else
     [ -n "${VS_CTL:-}" ] && { echo "FAIL: audit_marionette_cost (control mode)"; exit 1; }

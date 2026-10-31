@@ -1,0 +1,5 @@
+  FLAG D-ABSOLUTE: - group 6, plants that did not apply: 3 gates PRESENT, and 5 more held only by their plain run, to add to the dead-exit census;  [build/agent215/t310/census57/question.txt]
+  FLAG D-ABSOLUTE: - group 7, dead legs read as findings (a leg that never finished counted as the control firing): 104 gates PRESENT (82 listed + 22 new), 8 cannot tell (7 by ...  [build/agent215/t310/census57/question.txt]
+  FLAG D-ABSOLUTE: My estimate: 3-4 hours more before the one commit (15 static-list and 2 emulator-list rows to re-trace on PILOT, one more static-list row if test_rule_checke...  [build/agent215/t310/census57/question.txt]
+  FLAG D-ABSOLUTE: Group 7 (104 gates) in later sessions, batched by family, each batch proven by MAME_BIN=/usr/bin/false reading UNJUDGED; the classifier-order trap (a gate's ...  [build/agent215/t310/census57/question.txt]
+packet_check: 4 flag(s): D-ABSOLUTE 4

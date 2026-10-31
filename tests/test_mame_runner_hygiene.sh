@@ -86,7 +86,7 @@ e="$(run "$WRAP" good "$d")"
 
 if vs_ctl_is no-clear; then
     [ "$rc" = 1 ] && { echo "FAIL: test_mame_runner_hygiene (control mode: no-clear)"; exit 1; }
-    echo "FAIL: test_mame_runner_hygiene — control mode no-clear left the gate green"; exit 1
+    vs_ctl_left_green "no-clear" "FAIL: test_mame_runner_hygiene — control mode no-clear left the gate green"
 fi
 
 echo "== 4. control"

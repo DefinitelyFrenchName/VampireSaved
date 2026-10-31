@@ -1,0 +1,1 @@
+WITHDRAWN unspawned (14z-215): proposal.md quotes maintainer rulings by DECISIONS_HISTORY.md line (e.g. line 7890, 'OBSERVES, 3511 noted') that were not in the packet; re-prepared with each cited line's entry extracted.

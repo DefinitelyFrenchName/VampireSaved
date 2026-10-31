@@ -158,6 +158,7 @@ for line in open(fix):
     got = "allow"
     if p.returncode != 0:
         got = f"exit{p.returncode}"
+        sys.stdout.write(p.stderr)   # a hook that crashed: its traceback kept for vs_ctl_show_err (#310 group 5)
     elif p.stdout.strip():
         got = json.loads(p.stdout)["hookSpecificOutput"]["permissionDecision"]
     if got != row["expect"]:
@@ -180,7 +181,7 @@ if vs_ctl_is blind-classifier || vs_ctl_is blind-bypass || vs_ctl_is greedy-here
 replay "$AG" "$W/replay.txt"
 sed -n '/^MISMATCH/p' "$W/replay.txt" | head -12 | sed 's/^/  /'
 tail -1 "$W/replay.txt" | sed 's/^/  /'
-grep -q ' MISMATCHES 0$' "$W/replay.txt" || { echo "FAIL: the hook's decisions disagree with the fixture"; fail=1; }
+grep -q ' MISMATCHES 0$' "$W/replay.txt" || { echo "FAIL: the hook's decisions disagree with the fixture"; fail=1; vs_ctl_show_err "$W/replay.txt" || true; }
 
 # the fail-open path: a malformed event is allowed, and the error is recorded
 E="$W/errroot"; mkdir -p "$E"
@@ -244,13 +245,13 @@ cat "$W/wiring.txt"
 python3 tests/lib/pre_agent_cases.py "$AG/hooks/pre_agent.py" > "$W/agentgate.txt" 2>&1 || true
 sed -n '/^  BAD /p' "$W/agentgate.txt" | head -8
 tail -1 "$W/agentgate.txt" | sed 's/^/  call gate: /'
-grep -q ' wrong 0$' "$W/agentgate.txt" || { echo "FAIL: the call gate's decisions disagree with its cases"; fail=1; }
+grep -q ' wrong 0$' "$W/agentgate.txt" || { echo "FAIL: the call gate's decisions disagree with its cases"; fail=1; vs_ctl_show_err "$W/agentgate.txt" || true; }
 
 # C1's push hook over its 18 cases (the installed hook, or the control's perturbed copy)
 python3 tests/lib/pre_push_cases.py "$AG/hooks/pre_push.py" > "$W/push.txt" 2>&1 || true
 sed -n '/^  BAD /p' "$W/push.txt" | head -8
 tail -1 "$W/push.txt" | sed 's/^/  push hook: /'
-grep -q -- '-> PASS$' "$W/push.txt" || { echo "FAIL: the push hook's decisions disagree with its cases"; fail=1; }
+grep -q -- '-> PASS$' "$W/push.txt" || { echo "FAIL: the push hook's decisions disagree with its cases"; fail=1; vs_ctl_show_err "$W/push.txt" || true; }
 
 # THE REAL LEDGER (rule-checker run 2026-09-23-107, Q1/Q3/Q4): the 18 cases write their
 # own ledger in the hook's assumed layout, so they cannot see the hook MISREAD the real one.

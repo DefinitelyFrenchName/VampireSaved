@@ -81,9 +81,14 @@ table):
 
 **[VSE-9]** Semantic skeleton (from disassembly of every vsavj consumer site):
 
-- **bank +0x000..+0x700 (0xBD0FA-0xBD7FA, 14 tables): per-character CODE
+- **bank +0x000..+0x700 (0xBD0FA-0xBD7FA, ~~14 tables~~ 15 tables): per-character CODE
   dispatch** — `movea.l (a0,d0.w),a0; jmp/jsr (a0)`. Each table = one
   engine event (state handlers); entries = per-character routines.
+  **[CORRECTED 14z-215, #118: 15, not 14 — +0x000 through +0x700 at stride 0x80 is 0x700 / 0x80 + 1 = 15
+  tables, and on vsavj's data view each of the 15 holds code pointers (even, into the program's code region) in all
+  16 of its rows 0x00-0x0F and is named by a `movea.l #imm,a0` in the opcode view (+0x500's at five sites);
+  the next table, +0x780, holds them in 8 of 16 (the parameter table below). Counts and addresses only, by a
+  scratch reader (`build/agent215/t118/b2/bankcount.py`, `bankcount.log`, local, not gated).]**
 - +0x780 (0xBD87A), 0xBE2FA: per-char 32-bit parameter values (loaded to
   D0, not pointers).
 - +0x880/+0x900 (0xBD97A/0xBD9FA): hitbox base + companion ptr (player

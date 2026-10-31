@@ -62,27 +62,29 @@ echo "1 wait" > "$R/tests/replays/x.rpl"; echo "print(1)" > "$R/tools/t.py"; ech
 ( cd "$R" && git init -q && git -c user.name=t -c user.email=t@t add -A && git -c user.name=t -c user.email=t@t commit -q -m base ) || { echo "FAIL: could not make the scratch repository"; exit 1; }
 BASE="$(cd "$R" && git rev-parse HEAD)"
 run() { python3 "$TOOL" "$1" --since "$BASE" --repo "$R" > "$W/out.txt" 2>&1; echo $?; }
+# a FAIL below re-prints a crash of the tool (or its shadow) with tests/lib/controls.sh vs_ctl_show_err (#310 group 5):
+# a traceback exits 1 like MUST RE-RUN, and the indented tail cut its header
 
 echo "== 1. unchanged: the mame lane MAY CARRY"
 rc="$(run mame)"
-[ "$rc" = 0 ] && grep -q '^MAY CARRY' "$W/out.txt" && ok "MAY CARRY, exit 0" || { bad "expected MAY CARRY exit 0, got exit $rc"; sed 's/^/        /' "$W/out.txt" | tail -4; }
+[ "$rc" = 0 ] && grep -q '^MAY CARRY' "$W/out.txt" && ok "MAY CARRY, exit 0" || { bad "expected MAY CARRY exit 0, got exit $rc"; sed 's/^/        /' "$W/out.txt" | tail -4; vs_ctl_show_err "$W/out.txt" || true; }
 grep -q 'tests/replays/x.rpl\|3 path prefix' "$W/out.txt" || true
 
 echo "== 2. an unrelated file changed: still MAY CARRY"
 echo "changed" >> "$R/tools/other.py"
 rc="$(run mame)"
-[ "$rc" = 0 ] && ok "an undeclared, unrelated path does not move the verdict" || { bad "an unrelated change made the lane MUST RE-RUN (exit $rc)"; sed 's/^/        /' "$W/out.txt" | tail -4; }
+[ "$rc" = 0 ] && ok "an undeclared, unrelated path does not move the verdict" || { bad "an unrelated change made the lane MUST RE-RUN (exit $rc)"; sed 's/^/        /' "$W/out.txt" | tail -4; vs_ctl_show_err "$W/out.txt" || true; }
 
 echo "== 3. a declared replay edited in the working tree: MUST RE-RUN, the path named"
 echo "2 wait" >> "$R/tests/replays/x.rpl"
 rc="$(run mame)"
 if [ "$rc" = 1 ] && grep -q '^MUST RE-RUN' "$W/out.txt" && grep -q 'tests/replays/x.rpl' "$W/out.txt"; then ok "MUST RE-RUN naming tests/replays/x.rpl"
-else bad "expected MUST RE-RUN naming the replay, got exit $rc"; sed 's/^/        /' "$W/out.txt" | tail -5; fi
+else bad "expected MUST RE-RUN naming the replay, got exit $rc"; sed 's/^/        /' "$W/out.txt" | tail -5; vs_ctl_show_err "$W/out.txt" || true; fi
 
 echo "== 4. the lane whose gate declares nothing: MUST RE-RUN, the gate named"
 rc="$(run fbneo)"
 if [ "$rc" = 1 ] && grep -q 'g_undeclared' "$W/out.txt" && grep -q '^MUST RE-RUN' "$W/out.txt"; then ok "the undeclared gate refuses the carry"
-else bad "expected MUST RE-RUN naming g_undeclared, got exit $rc"; sed 's/^/        /' "$W/out.txt" | tail -5; fi
+else bad "expected MUST RE-RUN naming g_undeclared, got exit $rc"; sed 's/^/        /' "$W/out.txt" | tail -5; vs_ctl_show_err "$W/out.txt" || true; fi
 
 if [ -z "$VS_CTL" ]; then
     echo "== 5. controls: each shadow tool must read the opposite on its section"

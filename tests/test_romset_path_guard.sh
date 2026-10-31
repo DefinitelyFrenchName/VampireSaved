@@ -249,8 +249,13 @@ else
     fail "a relative romdir gave an unusable overlay:"; sed 's/^/    /' "$T/s9.txt"
 fi
 
+# #310 group 6 (14z-215): the mode exits 1 on ITS finding only — a dangling link in section 8; a gate left green is this
+# control dead (LIES), a red elsewhere is NOT JUDGED
 if vs_ctl_is relative-link; then
-    echo; echo "FAIL: control mode relative-link (see above)"; exit 1
+    if grep -q 'the link DANGLES' "$T/s9.txt"; then echo; echo "FAIL: control mode relative-link (see above)"; exit 1; fi
+    [ "$rc" = 0 ] && vs_ctl_left_green relative-link "FAIL: control mode relative-link — the pre-#250 overlay left every link resolving"
+    echo "NOT JUDGED: relative-link — the gate is red, but section 8 shows no dangling link: $(head -1 "$T/s9.txt")"
+    echo "FAIL: control mode relative-link (see above)"; exit 1
 fi
 if ! vs_ctl_is old-write; then
     echo "== 9. controls =="

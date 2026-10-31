@@ -41,23 +41,32 @@ previous_only() {
 }
 UP="tools/upload_release_assets.sh"
 if vs_ctl_is previous-only; then previous_only || exit 1; UP="$SH/tools/upload_release_assets.sh"; fi
-plan() { VS_PRUNE_PROBE="$1" sh "$2" freeze/merged-m22 --prune-plan 2>&1 | sed -n 's/^prune plan for freeze\/merged-m22: //p' | sed 's/ *$//'; }
+# the uploader's whole output is kept in plan_raw.txt (#310 group 5): an empty plan is a run that printed no plan line
+plan() { VS_PRUNE_PROBE="$1" sh "$2" freeze/merged-m22 --prune-plan > "$SH/plan_raw.txt" 2>&1; sed -n 's/^prune plan for freeze\/merged-m22: //p' "$SH/plan_raw.txt" | sed 's/ *$//'; }
+noplan() {  # noplan <uploader as invoked> — no plan line: the copy's own shell error surfaced; under the mode, not judged
+    vs_ctl_show_err "$SH/plan_raw.txt" - "$1" || true
+    if vs_ctl_is previous-only; then echo "NOT JUDGED: previous-only — the uploader printed no plan line, so its walk was not judged"; fi
+}
 
 echo "== 1. two earlier releases hold zips, with never-released freezes between (the #221 shape)"
 got="$(plan "$SH/probe_some.sh" "$UP")"
+[ -n "$got" ] || noplan "$UP"
 [ "$got" = "freeze/merged-m19 freeze/merged-m16" ] && ok "plan: $got" || bad "plan: '$got', want 'freeze/merged-m19 freeze/merged-m16'"
 echo "== 2. no earlier release holds a zip"
 got="$(plan "$SH/probe_none.sh" "$UP")"
+[ -n "$got" ] || noplan "$UP"
 [ "$got" = "none" ] && ok "plan: none" || bad "plan: '$got', want 'none'"
 
 if vs_ctl_is previous-only; then
     [ "$fail" = 1 ] && { echo "FAIL: test_release_prune (control mode: the one-tag walk was caught)"; exit 1; }
-    echo "FAIL: test_release_prune — the one-tag walk passed section 1"; exit 1
+    vs_ctl_left_green "previous-only" "FAIL: test_release_prune — the one-tag walk passed section 1"
 fi
 echo "== 3. controls"
 if previous_only; then
     got="$(plan "$SH/probe_some.sh" "$SH/tools/upload_release_assets.sh")"
-    if [ "$got" != "freeze/merged-m19 freeze/merged-m16" ]; then vs_ctl_fired previous-only "the one-tag walk plans '$got' for freeze/merged-m22"
+    if [ -z "$got" ]; then vs_ctl_show_err "$SH/plan_raw.txt" - "$SH/tools/upload_release_assets.sh" || true   # #310 group 5
+        vs_ctl_dead previous-only "the one-tag walk printed no plan line — not a plan of its own"; fail=1
+    elif [ "$got" != "freeze/merged-m19 freeze/merged-m16" ]; then vs_ctl_fired previous-only "the one-tag walk plans '$got' for freeze/merged-m22"
     else vs_ctl_dead previous-only "the one-tag walk planned the full set"; fail=1; fi
 else vs_ctl_dead previous-only "could not build the shadow"; fail=1; fi
 

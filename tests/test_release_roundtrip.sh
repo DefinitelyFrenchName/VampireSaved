@@ -99,6 +99,9 @@ echo "== 0. the packager refuses an xdelta3 older than the one measured clean (#
 # a fake xdelta3 that reports apt's 3.0.11 (PILOT), first on PATH: the packager must stop before any work, naming #279
 mkdir -p "$W/oldx"; printf '#!/bin/sh\necho "Xdelta version 3.0.11, Copyright (C) Joshua MacDonald"\nexit 0\n' > "$W/oldx/xdelta3"; chmod +x "$W/oldx/xdelta3"
 sed 's/^    if xv is None or xv < XDELTA_MIN:$/    if False:/' tools/package_release.py > "$W/pkg_nocheck.py"
+# #310 group 6 (14z-215): under the mode, a copy the sed did not change is a plant that did not apply — REFUSED (exit 3, UNJUDGED)
+vs_ctl_is encoder-check-removed && cmp -s tools/package_release.py "$W/pkg_nocheck.py" \
+    && { echo "REFUSED: encoder-check-removed — the encoder check is not where this control expects it: the mode judged nothing"; exit 3; }
 cmp -s tools/package_release.py "$W/pkg_nocheck.py" && { echo "  the encoder check is not where this control expects it"; fail=1; }
 refuses_old() {  # refuses_old <packager> <out>: exit 0 when it stops on the old encoder before any work, naming #279
     PATH="$W/oldx:$PATH" timeout 300 python3 "$1" "$RP" "$2" --romdir "$ROMDIR" --name "$NAME" > "$2.log" 2>&1 && return 1
@@ -109,9 +112,13 @@ vs_ctl_is encoder-check-removed && PKG="$W/pkg_nocheck.py"
 if refuses_old "$PKG" "$W/rel_oldx"; then
     echo "  ok: refused before any work: $(grep -m1 '#279' "$W/rel_oldx.log" | cut -c1-110)"
 else
-    echo "  the packager did not refuse xdelta3 3.0.11: $(tail -1 "$W/rel_oldx.log" | cut -c1-110)"; fail=1
+    echo "  the packager did not refuse xdelta3 3.0.11: $(tail -1 "$W/rel_oldx.log" | cut -c1-110)"; fail=1; _noref=1
 fi
-if vs_ctl_is encoder-check-removed; then echo "FAIL: release package (control mode: the encoder check removed)"; exit 1; fi
+# #310 group 6 (14z-215): the mode exits 1 only on ITS finding (the copy did not refuse 3.0.11); a copy that still refused is this control dead
+if vs_ctl_is encoder-check-removed; then
+    [ "${_noref:-}" = 1 ] && { echo "FAIL: release package (control mode: the encoder check removed)"; exit 1; }
+    vs_ctl_left_green encoder-check-removed "FAIL: release package — control mode encoder-check-removed: the packager without its check still refused 3.0.11"
+fi
 # must-fire control: the packager without its check does not refuse the old encoder
 if refuses_old "$W/pkg_nocheck.py" "$W/rel_nocheck"; then
     vs_ctl_dead encoder-check-removed "the packager without its version check still refused 3.0.11"; fail=1

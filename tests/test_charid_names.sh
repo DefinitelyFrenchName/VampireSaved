@@ -30,14 +30,14 @@ case "$floor" in ''|*[!0-9]*) echo "FAIL: $FLOOR_FILE carries no integer floor";
 if vs_ctl_is shifted-map; then
     echo "== MODE shifted-map: the census with #218's shift planted"
     $TOOL --plant --floor "$floor"; rc=$?
-    [ "$rc" -eq 0 ] && { echo "FAIL: the planted shift passed"; exit 1; }
+    [ "$rc" -eq 0 ] && vs_ctl_left_green shifted-map "FAIL: the planted shift passed"
     echo "FAIL (mode): as required — the planted shift was reported"; exit 1
 fi
 if vs_ctl_is blind-floor; then
     echo "== MODE blind-floor: the census held to one map more than it finds"
     n="$($TOOL --floor 0 | sed -n 's/.* \([0-9]*\) character maps,.*/\1/p')"
     $TOOL --floor "$((n + 1))"; rc=$?
-    [ "$rc" -eq 0 ] && { echo "FAIL: a census below its floor passed"; exit 1; }
+    [ "$rc" -eq 0 ] && vs_ctl_left_green blind-floor "FAIL: a census below its floor passed"
     echo "FAIL (mode): as required — the census below its floor failed"; exit 1
 fi
 

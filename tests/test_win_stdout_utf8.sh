@@ -38,6 +38,7 @@
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
+. "$REPO/tests/lib/controls.sh"   # vs_ctl_show_err (#310 group 5); this gate reads CONTROL itself
 TOOLS="tools/bundle_win_dlls.py"
 W="$(mktemp -d)" || { echo "FAIL: test_win_stdout_utf8 — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT
 fail=0
@@ -66,6 +67,7 @@ for t in $TOOLS; do
         echo "  ok: $t — $1 UTF-8 em dash(es), 0 cp1252 0x97 bytes under PYTHONIOENCODING=cp1252"
     else
         echo "  FAIL: $t — $1 UTF-8 em dash(es), $2 cp1252 0x97 bytes under PYTHONIOENCODING=cp1252"; fail=1
+        vs_ctl_show_err "$W/out" || true   # a copy that crashed wrote no dash at all: surfaced (#310 group 5)
     fi
 done
 
@@ -112,12 +114,17 @@ if [ "$1" -eq 0 ] && [ "$2" -ge 1 ] && [ "$4" -eq 0 ] && [ -f "$W/out_cp932/out.
     echo "  ok: tools/apply_release.py — exit 0 under PYTHONIOENCODING=cp932, $2 UTF-8 em dash(es), set written"
 else
     echo "  FAIL: tools/apply_release.py — exit $1 under PYTHONIOENCODING=cp932, $2 UTF-8 em dash(es), $4 UnicodeEncodeError line(s)"; fail=1
+    # #310 group 5: under the mode the honoured cp932 outcome IS the stripped copy's UnicodeEncodeError; any other end
+    # is NOT JUDGED. Outside it, a crash is surfaced.
+    if [ "${CONTROL:-}" = "applier-reconfigure-removed" ]; then vs_ctl_show_err "$W/apply_cp932.txt" UnicodeEncodeError || true
+    else vs_ctl_show_err "$W/apply_cp932.txt" || true; fi
 fi
 set -- $(apply "$APPLIER" cp1252)
 if [ "$1" -eq 0 ] && [ "$2" -ge 1 ] && [ "$3" -eq 0 ]; then
     echo "  ok: tools/apply_release.py — exit 0 under PYTHONIOENCODING=cp1252, $2 UTF-8 em dash(es), 0 cp1252 0x97 bytes"
 else
     echo "  FAIL: tools/apply_release.py — exit $1 under PYTHONIOENCODING=cp1252, $2 UTF-8 em dash(es), $3 cp1252 0x97 bytes"; fail=1
+    vs_ctl_show_err "$W/apply_cp1252.txt" || true   # the copy's cp1252 leg must write 0x97, not crash (#310 group 5)
 fi
 # the must-fire control: the unfixed applier must crash under cp932 after writing
 strip_reconfigure tools/apply_release.py "$W/apply_ctl.py"

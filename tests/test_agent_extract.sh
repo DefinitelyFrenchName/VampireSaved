@@ -124,7 +124,8 @@ fixture_check() {
 echo "-- #208: the real hand-back fixture (tests/agent/handback_fixture/)"
 r="$(fixture_check "$EX" "$W/fx")"
 echo "  $(echo "$r" | tr '\n' ' ')"
-case "$r" in *WRONG*) echo "FAIL: the hand-back fixture: $(echo "$r" | tr '\n' ' ')"; grep -E ' (WX|W ) ' "$W/fx.full" | head -3 | cut -c1-140; fail=1 ;; esac
+case "$r" in *WRONG*) echo "FAIL: the hand-back fixture: $(echo "$r" | tr '\n' ' ')"; grep -E ' (WX|W ) ' "$W/fx.full" | head -3 | cut -c1-140; fail=1
+    vs_ctl_show_err "$W/fx.full" || true; vs_ctl_show_err "$W/fx.nohb.out" || true ;; esac   # a crash on the fixture, surfaced (#310 group 5)
 
 if [ -z "${VS_CTL:-}" ]; then
     for c in loose-launch blind-figures judge-prompt-unsourced rounding-off cut-cites-off prelude-off mid-turn-blind cited-lines-off cites-in-word said-global rounding-far rounding-version reads-merged; do
@@ -134,7 +135,10 @@ if [ -z "${VS_CTL:-}" ]; then
     done
     HX="$(make_copy handback-ignored)"
     r="$(fixture_check "$HX" "$W/ctl_hb")"
-    case "$r" in delivered-WRONG*) vs_ctl_fired handback-ignored "the copy that ignores the session's hand-backs shows the fixture's worker as: $(grep -m1 ' WX ' "$W/ctl_hb.full" | cut -c1-110 | sed 's/^\[[^]]*\] //')" ;;
+    # a positive WX line first: a copy that crashed on the fixture is delivered-WRONG too (#310 group 5)
+    if ! grep -q ' WX ' "$W/ctl_hb.full"; then vs_ctl_show_err "$W/ctl_hb.full" || true; r="crashed $r"; fi
+    case "$r" in crashed*) vs_ctl_dead handback-ignored "the copy printed no WX line on the fixture — not the hand-back ignored ($(echo "$r" | tr '\n' ' '))" || fail=1 ;;
+                 delivered-WRONG*) vs_ctl_fired handback-ignored "the copy that ignores the session's hand-backs shows the fixture's worker as: $(grep -m1 ' WX ' "$W/ctl_hb.full" | cut -c1-110 | sed 's/^\[[^]]*\] //')" ;;
                  *) vs_ctl_dead handback-ignored "the copy that ignores the session's hand-backs still showed the delivered verdict ($(echo "$r" | tr '\n' ' '))" || fail=1 ;; esac
 fi
 

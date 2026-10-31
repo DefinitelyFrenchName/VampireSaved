@@ -94,6 +94,25 @@ that carry it, as worked examples: `test_applier_page_browser`, `test_docshape`,
 `tests/test_emulator_runner.sh` section 14c (control `unjudged-honoured`). #310's census of every control
 (`build/agent210/t310/`, local, and the ticket's comment) lists the paths in other gates that still lack it.
 
+**A MODE THAT LEAVES THE GATE GREEN SAYS `CONTROL DEAD: <its name>`, NEVER ONLY WORDS** (#310, 14z-215): a mode run
+that reaches the gate's green end calls `vs_ctl_left_green <mode> <FAIL line>` (`tests/lib/controls.sh`), which prints
+the DEAD line the classifier reads LIES and exits 1. "Control mode X left the gate green" in words with `exit 1` read
+HONOURED in 44 gates until then. `tests/test_dead_exit_census.sh` (`tools/dead_exit_census.py`) names any new one in
+the copied shapes; a dead branch phrased otherwise is its stated known gap. The instrument-alignment library prints
+`NOT JUDGED:` for a dead leg under a mode (`tests/lib/instr_align.sh`, held by `tests/test_instr_align_unjudged.sh`), and
+a runner test's wall-clock checks count only in its plain run and under the mode they belong to.
+
+**A PERTURBED COPY THAT CRASHED IS NOT ITS PERTURBATION CAUGHT** (#310 group 5, 14z-215): a gate whose mode (or in-gate
+twin) runs a copy of a tool or script keeps the copy's whole output and, when the run did not give the expected answer,
+calls `vs_ctl_show_err <output> [<expected exception>|-] [<copy script>]` (`tests/lib/controls.sh`): a traceback is
+re-printed at column 0 (the mode reads DIED), a SyntaxError or the shell's own error line about the copy prints
+`NOT JUDGED:` (UNJUDGED); where a crash IS the honoured outcome only that exception passes. A twin reads absence as
+fired only after a positive line from the copy. Printing `tail -N`, a joined excerpt or nothing of the copy's output read
+a crash HONOURED in the 21 gates #310's group-5 census found, and in the three runner tests it could not tell
+(test_static_runner, test_emulator_runner, test_release_reuse: a planted shadow crash read HONOURED, 14z-215), whose
+shadow runners' stderr is now handed to the helper under a mode; `tests/test_ctl_show_err.sh` holds the helper on planted
+copies.
+
 ## The pattern that makes the mode cheap to write
 
 Write each perturbation as ONE function the control section and the mode both

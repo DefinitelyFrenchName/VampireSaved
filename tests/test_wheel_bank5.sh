@@ -249,6 +249,10 @@ PY
     RL="$(awk -v n=$T '$1==n {print $2}' "$WORK/rl/cks.log" 2>/dev/null)"
     ra="$(anc ref)"; rg="$(al ref gameclock)"
     tf="$(al trace frames)"; te="$(al trace emulated)"; tg="$(al trace gameclock)"
+    # #310: under a control mode a leg that read nothing is not the perturbation caught
+    if [ -n "${VS_CTL:-}" ] && { [ -z "$ra" ] || [ -z "$RL" ] || [ -z "$tf" ] || [ -z "$rg" ]; }; then
+        echo "NOT JUDGED: control mode $VS_CTL: a leg read nothing (reference ${ra:-nothing}, replay.lua ${RL:-nothing}, trace frames ${tf:-none}, reference clock ${rg:-none})"
+    fi
     if [ -n "$RL" ] && [ "$ra" = "$RL" ]; then
         echo "  ok: the reference leg reproduces replay.lua at frame $T ($ra)"
     else
@@ -272,7 +276,7 @@ PY
     fi
     if vs_ctl_is drift-clock || vs_ctl_is first-frame-skip; then
         [ "$fail" -ne 0 ] && { echo "FAIL: wheel bank-5 gate (control mode: $VS_CTL)"; exit 1; }
-        echo "FAIL: wheel bank-5 gate — control mode $VS_CTL left it green"; exit 1
+        vs_ctl_left_green "$VS_CTL" "FAIL: wheel bank-5 gate — control mode $VS_CTL left it green"
     fi
     # (ctl_drift ran in the pool above)
     de="$(al ctl_drift emulated)"; dg="$(al ctl_drift gameclock)"

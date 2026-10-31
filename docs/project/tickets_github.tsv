@@ -2,8 +2,10 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 341
+# issues: 343
 number	state	reason	closed	labels	title
+343	CLOSED	COMPLETED	2026-10-31	bug,severity: low,test-integrity	audit_tenant_timeout's 'round 2 spawns live' check passes on the next match's refill (after $FF810E = 0xFF), not on a round 2
+342	CLOSED	COMPLETED	2026-10-31	bug,severity: low,test-integrity	$FF8120 is the winner's PERFECT flag, not the round winner's side: ram.md row wrong, three gates' winner checks measure 'winner unhurt'
 341	CLOSED	COMPLETED	2026-10-31	bug,severity: low,test-integrity	test_tickets' parked-disagrees control went DEAD once the newest ticket was closed (it perturbs the first row whatever its state)
 340	CLOSED	COMPLETED	2026-10-30	bug,severity: low,test-integrity	Every strict emulator run read NOT GREEN: audit_pool_drop is a DEAD ROW to the runners' emulator-tier classifier
 339	CLOSED	COMPLETED	2026-10-30	-	The rule-checker ledger has 37 rows with session '-' (14z-187/187b/188); both ledger pages drop them without saying so
@@ -51,7 +53,7 @@ number	state	reason	closed	labels	title
 297	CLOSED	COMPLETED	2026-10-25	evolution,performance	Static tier scope: six families (109 gates) to freeze cadence, triggered by their own code (@code)
 296	CLOSED	COMPLETED	2026-10-22	evolution,severity: medium,test-integrity	run_mame.sh: refuse a run whose MAME_SANDBOX already holds an earlier run's state (#293's class, at run time)
 295	CLOSED	COMPLETED	2026-10-19	evolution,severity: medium,test-integrity	audit_dmg_legacy_sweep never runs Demitri's legacy hits on our build: add an exact vsavj-vs-ours leg (superset coverage)
-294	OPEN	-	-	cosmetic,parked	Killshread's shock/electrocuted state has wrong palette (currently accepted tradeoff) - parked
+294	OPEN	-	-	cosmetic,parked	Killshread's shock/electrocuted state has wrong palette (currently accepted tradeoff)
 293	CLOSED	COMPLETED	2026-10-18	bug,severity: medium,test-integrity	Two gates hand one MAME sandbox to several runs, so a later run boots on carried nvram (audit_flicker_attribution, audit_legacy_pairings)
 292	CLOSED	NOT_PLANNED	2026-10-20	bug,performance,severity: high	static_confirm: a tool's self-test strings count as a direct read (battery_reach names STATE.md), so 22 gates re-run with controls at every commit
 291	CLOSED	COMPLETED	2026-10-23	evolution	On demand, at a given tag or commit: comparative capture sheets (ours vs vsavj and/or vs2) for every comparing test, as a visual proof of accuracy for humans
@@ -216,7 +218,7 @@ number	state	reason	closed	labels	title
 132	CLOSED	NOT_PLANNED	2026-09-25	bug	release/merged-m15 was never packaged
 131	CLOSED	NOT_PLANNED	2026-09-29	evolution	audit_mask_window_ff42a2: deprecate it, or keep it as a case-specific gate?
 130	CLOSED	COMPLETED	2026-10-03	bug	bundle_win_dlls.py prints a broken character for its em dash on MSYS2 (build logs only)
-129	OPEN	-	-	evolution,parked,severity: low	Tenant CPU AI looks lackluster (unproven; first question: are the ported script blocks complete?)
+129	CLOSED	NOT_PLANNED	2026-10-31	evolution,severity: low	Tenant CPU AI looks lackluster (unproven; first question: are the ported script blocks complete?)
 128	OPEN	-	-	evolution,parked	Marionette: parked until further notice
 127	OPEN	-	-	cosmetic,parked	fix Press of Death palette swap by making its effect own its palette row (scope first) [#112's option (B)]
 126	CLOSED	COMPLETED	2026-10-01	cosmetic,parked	Select-wheel look-and-feel polish
@@ -227,7 +229,7 @@ number	state	reason	closed	labels	title
 121	CLOSED	COMPLETED	2026-10-25	evolution	Linux release binaries built on dedicated server, plus clean-machine check at release
 120	CLOSED	COMPLETED	2026-10-18	evolution	The rebuild-from-docs option after MiSTer (a possibility to preserve, not a commitment)
 119	CLOSED	COMPLETED	2026-10-11	contested,evolution	The living-documentation framework as an independent sibling of bbh (ruled at the plan stage, not scheduled)
-118	OPEN	-	-	evolution,severity: low	Community cross-check: the ~90 unadopted mizuumi player-struct candidates, each adopted only once measured
+118	CLOSED	COMPLETED	2026-10-31	evolution,severity: low	Community cross-check: the ~90 unadopted mizuumi player-struct candidates, each adopted only once measured
 117	CLOSED	COMPLETED	2026-10-05	evolution	Community cross-check: naming rigs on vsavj for specials, supers, throws, the CL. rows and the 6-prefixed rows
 116	CLOSED	COMPLETED	2026-10-05	evolution	Capture matrix: widen the in-emulator anchors from 3 cells to a sampled row per tenant
 115	CLOSED	COMPLETED	2026-10-05	contested,evolution,parked	{}Zabel j.LK proximity guard: a surgical legacy patch for vanilla and WIDE, its own session, recording first

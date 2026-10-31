@@ -118,7 +118,7 @@ if sheet_on && [ -z "${VS_CTL:-}" ]; then
 fi
 if vs_ctl_is pre-swap-build; then
     [ "$fail" = 1 ] && { echo "FAIL: audit_landing_sound (control mode: the pre-swap build's landing stands out)"; exit 1; }
-    echo "FAIL: audit_landing_sound — the pre-swap build read as the same landing"; exit 1
+    vs_ctl_left_green "pre-swap-build" "FAIL: audit_landing_sound — the pre-swap build read as the same landing"
 fi
 echo "== 3. control: the build before the swap must FAIL the same check, for both tenants"
 cf=0

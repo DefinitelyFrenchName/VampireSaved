@@ -1,0 +1,4 @@
+  FLAG D-ABSOLUTE: Groups 1-6 are named gate by gate (about 60 files: one shared library fix reaching the 30 instr_align callers, 14 word-only dead exits, the two runner tests'...  [build/agent215/t310/rc/question_draft.md]
+  FLAG D-ABSOLUTE: "Groups 1-6, then re-census 7 (Recommended)" — groups 1-6 with each group's proving control; then group 7 is measured at HEAD (which of its paths still exist...  [build/agent215/t310/rc/question_draft.md]
+  FLAG D-ABSOLUTE: "All seven now" — every group including the ~93 per-gate edits, from the census lists, re-read gate by gate.  [build/agent215/t310/rc/question_draft.md]
+packet_check: 3 flag(s): D-ABSOLUTE 3

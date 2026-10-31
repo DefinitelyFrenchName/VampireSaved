@@ -41,9 +41,24 @@ ia_field() { awk -v k="$2" '{for (i = 1; i < NF; i++) if ($i == k) {print $(i + 
 ia_anchor() { awk '{for (i = 1; i < NF; i++) if ($i == "anchor") {print $(i + 2); exit}}' "$1" 2>/dev/null || true; }
 ia_anchor_frame() { awk '{for (i = 1; i < NF; i++) if ($i == "anchor") {print $(i + 1); exit}}' "$1" 2>/dev/null || true; }
 ia_frozen() { awk -F'\t' -v l="$2" -v r="$3" '!/^#/ && $1 == l && $2 == r {print $3, $4; exit}' "$1" 2>/dev/null || true; }
+# NOT JUDGED (#310, 14z-215; maintainer-ruled 2026-10-31 "Groups 1-4, then re-census 5-7"): under a CONTROL= mode, a
+# run that measured nothing — an instrument leg with no ALIGN line (ia_check), a staging leg or a replay.lua yardstick
+# that read nothing, or no staging run at all (ia_stage) — prints `NOT JUDGED: <why>` at column 0 on STDERR (callers
+# send ia_check's stdout to a file they print indented, where the classifier would not see it), so tests/lib/classify.sh
+# reads the mode run UNJUDGED, not HONOURED: until then a stalled leg under drift-clock or first-frame-skip read as the
+# control firing. Outside a mode nothing is printed (the plain run FAILs on its own). IA_NJ=0 silences it around a run
+# that is a control's own leg, not the mode's measurement (ia_stage's drift leg). MEASURED before it was written: none
+# of the 24 drift-clock and 22 first-frame-skip logs honoured on ERIS at 14z-213 (build/agent213/t310/eris/e213c_out,
+# local) carries "no ALIGN line" or "reads nothing", and tests/lua/emu_clock.lua appends the ALIGN line under every
+# INSTR_CLOCK, so drift-clock's honoured path does not produce it and is not exempted.
+# Ground truth: tests/test_instr_align_unjudged.sh.
+IA_NJ=1
+_ia_nj() { [ -n "${VS_CTL:-${CONTROL:-}}" ] && [ "${IA_NJ:-1}" = 1 ] || return 0; echo "NOT JUDGED: under control mode ${VS_CTL:-${CONTROL:-}}, $1" >&2; }
 ia_check() {
     _ia_t="$1"; _ia_l="$2"; _ia_r="$3"; _ia_a="$4"
-    if [ ! -s "$_ia_a" ]; then echo "$_ia_l/$_ia_r: no ALIGN line (the run did not reach its last frame)"; return 1; fi
+    if [ ! -s "$_ia_a" ]; then echo "$_ia_l/$_ia_r: no ALIGN line (the run did not reach its last frame)"
+        _ia_nj "$_ia_l/$_ia_r wrote no ALIGN line: the run did not reach its last frame"   # #310 NJ-check
+        return 1; fi
     _ia_f="$(ia_field "$_ia_a" frames)"; _ia_e="$(ia_field "$_ia_a" emulated)"; _ia_g="$(ia_field "$_ia_a" gameclock)"
     _ia_bad=0
     [ "$_ia_f" = "$_ia_e" ] || { echo "$_ia_l/$_ia_r: counted $_ia_f frames over $_ia_e emulated"; _ia_bad=1; }
@@ -180,7 +195,8 @@ ia_stage() {
     _g="$1"; _t="$2"; _i="$3"; _m="$4"; _ln="$5"; _d="$6"; _mode="$7"; _dln="${8:-$5}"; _ist_bad=0
     IA_DRIFT=dead; IA_DRIFT_MSG="the drift control did not run"; IA_SKIP=dead; IA_SKIP_MSG="the first-frame-skip control did not run"
     _line="$(sed -n "${_ln}p" "$_m")"
-    [ -n "$_line" ] || { echo "  FAIL: $_g: no run $_ln in the manifest for the staging leg"; return 1; }
+    [ -n "$_line" ] || { echo "  FAIL: $_g: no run $_ln in the manifest for the staging leg"
+        _ia_nj "$_g: no run $_ln in the manifest, so no staging leg ran"; return 1; }   # #310 NJ-manifest
     IFS="$(printf '\t')" read -r _l _r _s _p _f _n _e _a <<EOT
 $_line
 EOT
@@ -190,13 +206,15 @@ EOT
     wait
     _sa="$(ia_anchor "$_d/stage/align")"; _rl="$(ia_replaylua_read "$_d/rl" "$_n")"
     if [ -n "$_rl" ] && [ "$_sa" = "$_rl" ]; then echo "  ok: the staging reference leg ($_l/$_r) reproduces replay.lua at frame $_n ($_sa)"
-    else echo "  FAIL: the staging reference leg ($_l/$_r) reads ${_sa:-nothing} at frame $_n, replay.lua ${_rl:-nothing}"; _ist_bad=1; fi
+    else echo "  FAIL: the staging reference leg ($_l/$_r) reads ${_sa:-nothing} at frame $_n, replay.lua ${_rl:-nothing}"; _ist_bad=1
+        [ -n "$_sa" ] && [ -n "$_rl" ] || _ia_nj "the staging leg ($_l/$_r) read ${_sa:-nothing}, replay.lua ${_rl:-nothing}: a leg that read nothing compared nothing"   # #310 NJ-stage
+    fi
     case "$_mode" in drift-clock|first-frame-skip) return $_ist_bad ;; esac
     IFS="$(printf '\t')" read -r _dl _dr _ds _dp _df _dn _de _da <<EOT
 $(sed -n "${_dln}p" "$_m")
 EOT
     _ia_leg "$_i" "$_ds" "$_dp" "$_df" "$_dn" "$_de" "$_d/cdrift" 1 INSTR_CLOCK=frame_done
-    ia_check "$_t" "$_dl" "$_dr" "$_d/cdrift/align" > "$_d/cdrift.txt" || true
+    IA_NJ=0; ia_check "$_t" "$_dl" "$_dr" "$_d/cdrift/align" > "$_d/cdrift.txt" || true; IA_NJ=1   # a control's own leg (#310)
     # fired = the FROZEN comparison caught it: ia_check's "game clock <x> at frame <n>, frozen <y>" line (a missing row
     # or a missing ALIGN line is not that comparison firing)
     if grep -q "game clock [0-9a-f]* at frame [0-9]*, frozen" "$_d/cdrift.txt"; then IA_DRIFT=fired; IA_DRIFT_MSG="$(grep "game clock [0-9a-f]* at frame" "$_d/cdrift.txt" | head -1) (under the frame_done clock: $(grep -v "game clock [0-9a-f]* at frame" "$_d/cdrift.txt" | head -1))"

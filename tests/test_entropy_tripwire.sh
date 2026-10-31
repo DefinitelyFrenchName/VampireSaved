@@ -87,7 +87,7 @@ fi
 
 if vs_ctl_is planted-blob || vs_ctl_is old-selector; then
     [ "$rc" = 1 ] && { echo "FAIL: test_entropy_tripwire (control mode: $VS_CTL)"; exit 1; }
-    echo "FAIL: test_entropy_tripwire — control mode $VS_CTL left the gate green"; exit 1
+    vs_ctl_left_green "$VS_CTL" "FAIL: test_entropy_tripwire — control mode $VS_CTL left the gate green"
 fi
 
 echo "== 3. controls"

@@ -311,7 +311,7 @@ echo "$out" | sed 's/^/  /' | tail -12
 if [ -z "$EXTRA" ]; then [ "$rc" = 0 ] && ok "no uncleaned temporary in the tree" || bad "an uncleaned temporary (above)"
 else
     echo "$out" | grep >/dev/null '^UNCLEANED\|^UNSANDBOXED\|^UNGUARDED\|^TRAPPED\|^UNREADTRAP' && { echo "FAIL: test_tmp_hygiene (control mode: the planted site was named)"; exit 1; }
-    echo "FAIL: test_tmp_hygiene — the planted site was not named"; exit 1
+    vs_ctl_left_green "$VS_CTL" "FAIL: test_tmp_hygiene — the planted site was not named"
 fi
 
 echo "== 2. known answers on a synthetic tree"
@@ -369,7 +369,7 @@ under() { env -u CONTROL PATH="$SHIM$PATH" timeout 60 sh "$@" 2>&1; }   # CONTRO
 if vs_ctl_is shim-blind; then   # the mode: no shim, so the guarded gates must run past their mktemp and the gate FAILs
     o="$(under tests/test_live_budget.sh)"; rc=$?
     [ "$rc" = 0 ] && { echo "FAIL: test_tmp_hygiene (control mode: without the shim test_live_budget ran past its mktemp -d)"; exit 1; }
-    echo "FAIL: test_tmp_hygiene — control mode shim-blind: test_live_budget stopped without the shim (exit $rc)"; exit 1
+    vs_ctl_left_green "shim-blind" "FAIL: test_tmp_hygiene — control mode shim-blind: test_live_budget stopped without the shim (exit $rc)"
 fi
 o="$(under "$W/t/tests/unguarded.sh")"
 if echo "$o" | grep -qF 'carried-on with W=[]'; then vs_ctl_fired shim-blind "the unguarded script carried on with W empty: the shim makes mktemp fail"

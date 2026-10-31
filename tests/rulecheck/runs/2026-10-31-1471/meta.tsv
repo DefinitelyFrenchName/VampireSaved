@@ -1,0 +1,12 @@
+decision	recommendation
+subject	recommend poke read-back classes for #342/#343's twelve new findings (OBSERVES; READS-BACK the alternative for nb1/nb2) and re-worded notes for rows 48 and 50
+session	14z-215
+model	rule-checker@163e4ce9cf7b
+claim	CLAIM (a recommendation to put to the maintainer, question_draft.md): for the twelve UNCLASSIFIED poke read-back rows #342's and #343's gate changes derived (tests/expected/poke_readback.tsv; the class vocabulary at its head, in poke_readback_defs_and_precedents.txt), recommend OBSERVES for each, with READS-BACK offered as the alternative for nb1/nb2; and recommend re-wording rows 48 and 50's notes, class unchanged. It rests on findings_lines.txt: for each finding, the gate lines that POKE the address and the lines that READ the sampled field (a grep of the working tree, with a supplementary grep for keys the downwin gate builds at runtime, line 204's f"wh{v}"/f"nb{v}"/f"bat{v}"), and on the ruled precedent in poke_readback_defs_and_precedents.txt (audit_trap_airborne's id rows, OBSERVES, "the guard is what the poke is for"). NOT TESTED: the grep finds reads by key name only — a read through another alias would be missed; that the game writes each value I name (144 -> 0, 0 -> 0xFF, 145 -> 144, the loser's id replaced) rests on the #343 worker's runs (build/agent215/t343/fix/RESULTS.tsv and logs, not in this packet) and the gates' PASS, not on a new measurement here; the timeout gate's inv/p2full legs' +0x138 was not traced. No class is written: the classes are the maintainer's.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	3 flag(s): D-ABSOLUTE 2, D-FIGURE 1
+deliverables	build/agent215/t343/pr/question_draft.md
+action	2026-10-31-1471

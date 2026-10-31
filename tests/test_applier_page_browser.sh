@@ -11,7 +11,9 @@
 #   and flip a byte of the inlined set key.
 # EXPECTS: the three player paths as described; the starved control reads NOT JUDGED, the
 #   broken page fails. A stalled driver retries once for incompleteness only, never for a
-#   content failure.
+#   content failure. A page leg that ends with no verdict, or an incomplete one, prints
+#   `NOT JUDGED:` (#310), so a mode run ending there reads UNJUDGED; VS_PAGE_BUDGET_MS starves
+#   the page leg to prove it (`CONTROL=broken-page VS_PAGE_BUDGET_MS=1` must read UNJUDGED).
 #
 # ORDER: last
 # (14z-185b, #188: tests/run_all_static.sh runs this gate and its controls after every other
@@ -270,10 +272,15 @@ run_leg() {
         fi
     fi
 }
+# VS_PAGE_BUDGET_MS (#310 group 4, 14z-215): the page leg's wall-clock budget, for the proof that a STARVED page leg
+# under a mode reads UNJUDGED (`CONTROL=broken-page VS_PAGE_BUDGET_MS=1`); unset, the leg has drive()'s default.
+BUDGET="${VS_PAGE_BUDGET_MS:-}"
 run_leg verdict
+BUDGET=
 if [ ! -s "$W/verdict.txt" ]; then
     note "the browser produced no verdict at all"
     tail -5 "$W/chrome.err" | sed 's/^/    /'
+    echo "NOT JUDGED: the browser produced no verdict at all (the page leg; #310 — a control mode ending here is UNJUDGED)"
     echo "FAIL: test_applier_page_browser"; exit 1
 fi
 sed 's/^/    /' "$W/verdict.txt"

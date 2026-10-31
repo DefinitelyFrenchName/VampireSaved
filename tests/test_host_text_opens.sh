@@ -93,7 +93,7 @@ if check $FILES $EXTRA; then fail=0; echo "  ok    every text open names its enc
 else fail=1; echo "  FAIL  a text open without its keyword (above)"; fi
 if [ -n "$EXTRA" ]; then
     [ "$fail" = 1 ] && { echo "FAIL: test_host_text_opens (control mode: the perturbed copy was named)"; exit 1; }
-    echo "FAIL: test_host_text_opens — the perturbed copy passed"; exit 1
+    vs_ctl_left_green "$VS_CTL" "FAIL: test_host_text_opens — the perturbed copy passed"
 fi
 echo "== 2. controls"
 if check "$W/unencoded.py" > "$W/c1.txt" 2>&1; then vs_ctl_dead unencoded-open "the copy without encoding= passed"; fail=1

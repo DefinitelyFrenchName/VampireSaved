@@ -68,14 +68,16 @@ BPCLOCK="";  vs_ctl_is drift-clock && BPCLOCK="INSTR_CLOCK=frame_done"
 
 echo "== 1. the reference leg reproduces replay.lua (pristine vsavj, $RPL, frame $N)"
 leg ref 0 INSTR_REFERENCE=1 $REFCLOCK
-[ -s "$W/ref.align" ] || { echo "FAIL: the reference leg wrote no ALIGN line:"; tail -5 "$W/ref.log"; exit 1; }
+[ -s "$W/ref.align" ] || { [ -n "${VS_CTL:-}" ] && echo "NOT JUDGED: the reference leg wrote no ALIGN line, so control mode $VS_CTL measured nothing (#310)"
+    echo "FAIL: the reference leg wrote no ALIGN line:"; tail -5 "$W/ref.log"; exit 1; }
 ra="$(anchor ref)"; rg="$(field ref gameclock)"
 [ "$ra" = "$WANT" ] && ok "anchor $ra = the frozen basis at frame $N (game clock $rg)" \
     || bad "anchor $ra, the frozen basis reads $WANT: the clock or the staging is off replay.lua's"
 
 echo "== 2. a breakpoint leg stays on emulated time and on the reference's game clock"
 leg bp 1 REC_LO=0 REC_HI=ffffff $BPCLOCK
-[ -s "$W/bp.align" ] || { echo "FAIL: the breakpoint leg wrote no ALIGN line:"; tail -5 "$W/bp.log"; exit 1; }
+[ -s "$W/bp.align" ] || { [ -n "${VS_CTL:-}" ] && echo "NOT JUDGED: the breakpoint leg wrote no ALIGN line, so control mode $VS_CTL measured nothing (#310)"
+    echo "FAIL: the breakpoint leg wrote no ALIGN line:"; tail -5 "$W/bp.log"; exit 1; }
 bf="$(field bp frames)"; be="$(field bp emulated)"; bu="$(field bp uiframes)"; bg="$(field bp gameclock)"
 [ "$bf" = "$N" ] && [ "$be" = "$N" ] && ok "counted $bf, emulated $be" || bad "counted $bf frames over $be emulated"
 [ "${bu:-0}" -gt 0 ] && ok "$bu stop frames skipped (the breakpoints stopped the CPU)" \
@@ -86,7 +88,7 @@ bf="$(field bp frames)"; be="$(field bp emulated)"; bu="$(field bp uiframes)"; b
 
 if vs_ctl_is first-frame-skip || vs_ctl_is drift-clock; then
     [ "$rc" = 1 ] && { echo "FAIL: test_emu_clock (control mode: $VS_CTL)"; exit 1; }
-    echo "FAIL: test_emu_clock — control mode $VS_CTL left the gate green"; exit 1
+    vs_ctl_left_green "$VS_CTL" "FAIL: test_emu_clock — control mode $VS_CTL left the gate green"
 fi
 
 echo "== 3. controls"

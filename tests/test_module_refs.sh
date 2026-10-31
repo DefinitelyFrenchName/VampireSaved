@@ -39,13 +39,13 @@ if vs_ctl_is planted-prologue; then
     echo "== MODE planted-prologue: the historical caller through the extractor"
     $TOOL --plant --floor "$floor"; rc=$?
     # the tool's own exit is the verdict: 1 means the plant was reported (the control fired)
-    [ "$rc" -eq 0 ] && { echo "FAIL: the planted reference passed"; exit 1; }
+    [ "$rc" -eq 0 ] && vs_ctl_left_green planted-prologue "FAIL: the planted reference passed"
     echo "FAIL (mode): as required — the plant was reported"; exit 1
 fi
 if vs_ctl_is empty-census; then
     echo "== MODE empty-census: no files through the census"
     $TOOL --plant-empty --floor "$floor"; rc=$?
-    [ "$rc" -eq 0 ] && { echo "FAIL: an empty census passed the floor"; exit 1; }
+    [ "$rc" -eq 0 ] && vs_ctl_left_green empty-census "FAIL: an empty census passed the floor"
     echo "FAIL (mode): as required — the empty census failed its floor"; exit 1
 fi
 

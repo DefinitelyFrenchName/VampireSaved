@@ -1,0 +1,5 @@
+  FLAG D-ABSOLUTE: All three gates now test what the game does: one round, two downs to win, one timer.  [build/agent215/closure342_343/closing_comment_343.md]
+  FLAG D-ABSOLUTE: Think of Vampire savior as having only one round but you get a new full life bar after your first down"*.  [build/agent215/closure342_343/closing_comment_343.md]
+  FLAG D-ABSOLUTE: The throw opens with a 0-damage grab hit, and on the HP-only rig that left the victim's untouched 2 HP inside the first-down band, so the game ran an ordinar...  [build/agent215/closure342_343/closing_comment_343.md]
+  FLAG D-ABSOLUTE: **What was learned:** a poked KO that leaves the spare bar unused is a state the game never reaches in play; the gotcha "A POKED KO NEEDS THE VICTIM ON ITS L...  [build/agent215/closure342_343/closing_comment_343.md]
+packet_check: 4 flag(s): D-ABSOLUTE 4

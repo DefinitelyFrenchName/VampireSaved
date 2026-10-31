@@ -14,7 +14,9 @@
 #   and a control mode stopped by its host (a full disk, a failed mktemp, a refused write) reads DIED (#321); and with
 #   no TMPDIR from the caller a gate's temp files go to the run's own directory under build/tmp/, removed at the end,
 #   and a run with less free space there than it needs refuses to start (#321); and a selected gate whose worker
-#   died before writing its row is a FAIL of its own, never a GREEN on fewer rows (#321).
+#   died before writing its row is a FAIL of its own, never a GREEN on fewer rows (#321). Since 14z-215 (#310 group 3)
+#   the gate's own wall-clock checks (sections 9 and 18) count only in the plain run and under the mode they belong to,
+#   so a loaded host cannot turn another mode's run into its FAIL (section 23 holds the rule on known answers).
 # HOW: a synthetic repository of stub gates with KNOWN verdicts is driven through the REAL
 #   runner by symlink (never a copy of its logic), with stub tools so the runner's own
 #   preconditions run; the controls run copies of the runner (and, for #323, of the two readers) with a piece removed
@@ -80,12 +82,49 @@ cd "$REPO"
 rc=0
 fail() { echo "  FAIL: $*"; rc=1; }
 ok()   { echo "  ok: $*"; }
+# TIMING CHECKS ARE NOT A MODE'S VERDICT (#310 group 3, 14z-215; maintainer-ruled 2026-10-31 "Groups 1-4, then
+# re-census 5-7"). Every section runs under every control mode and `fail` sets the one rc the mode exits with, so a
+# wall-clock check — section 9's start order against a `sleep 3`, section 18's one-second start gap and its 60 s
+# deadlock watchdog — failing under `--jobs 8` load turned ANY mode's run into its FAIL, read HONOURED. timing_fail
+# <owning modes|-> <message>: in the plain run, and under a mode the check belongs to (section 18's gap is
+# concurrent-off's own catch), it is `fail`; under any other mode it prints a note and leaves rc alone.
+# Two knobs exist only for the proof of this rule: VS_TIMING_SQUEEZE=1 makes section 18's gap check impossible (red on any host), and VS_TEST_NOOP_MODE=1 runs the
+# jobs-leak mode on the REAL runner (a mode that perturbs nothing). Under both the gate must exit 0 — LIES.
+timing_fail() {
+    case " $1 " in *" ${VS_CTL:-} "*) _tf_own=1 ;; *) _tf_own=0 ;; esac
+    if [ -n "${VS_CTL:-}" ] && [ "$_tf_own" = 0 ]; then echo "  note: TIMING, not judged under control mode $VS_CTL: $2"
+    else fail "$2"; fi
+}
 
 RUNNER="$REPO/tests/run_all_emulator.sh"
 [ -x "$RUNNER" ] || { echo "FAIL: $RUNNER is not executable"; exit 1; }
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 
 T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
+
+# A SHADOW RUNNER THAT ABORTED IS NOT ITS PERTURBATION CAUGHT (#310 group 5, 14z-215). Under a control mode the shadow
+# drives every section, and each section captures the runner's output and prints only what it greps, so the shell's own
+# error line about the shadow (`tests/<runner>.sh: line N: …`) never reached the log — and classify.sh's own-script
+# branch would not have matched it there (it names the runner, not this gate): a planted abort read HONOURED. Under a mode
+# only, `sh` is a function: a run_all_* invocation's stderr is kept, and the shell's own error lines about the script as
+# invoked are handed to tests/lib/controls.sh vs_ctl_show_err; what that prints is kept in $T/shadow_err.log and printed
+# by the EXIT trap, so the mode reads UNJUDGED. ONLY those lines: the runner's stderr legitimately carries a Python
+# traceback in some ground-truth cases (a --confirm plan that fails on a bad timestamp prints static_confirm.py's
+# ValueError), which would read every mode DIED. The plain run is untouched. The stderr goes through a FIFO and `tee`, so
+# it still streams as the runner writes it (the --confirm plan's progress lines, #259).
+if [ -n "${VS_CTL:-}" ]; then
+    : > "$T/shadow_err.log"
+    trap 'cat "$T/shadow_err.log" 2>/dev/null; rm -rf "$T"' EXIT INT TERM
+    sh() {
+        _she_t="$T/she.$(command sh -c 'echo "$PPID"')"; _she_s=0   # unique per live caller; inside $T, which the trap removes
+        mkfifo "$_she_t.f"; tee "$_she_t" < "$_she_t.f" >&2 & _she_p=$!
+        command sh "$@" 2>"$_she_t.f" || _she_s=$?
+        wait "$_she_p" || :
+        case "${1:-}" in *run_all_*) grep -a "^$1: " "$_she_t" > "$_she_t.own" || :
+            vs_ctl_show_err "$_she_t.own" - "$1" >> "$T/shadow_err.log" || : ;; esac
+        rm -f "$_she_t" "$_she_t.f" "$_she_t.own"; return "$_she_s"
+    }
+fi
 FR="$T/fakerepo"
 mkdir -p "$FR/tests/lib" "$FR/tools" "$FR/build/fake_merged/rompath" "$T/roms"
 # THE SHADOW TOOLS (built from the real runner, never through the symlink):
@@ -148,7 +187,8 @@ instrument-run)   ln -s "$T/runner_instrumentrun.sh" "$FR/tests/run_all_emulator
 lane-var-shared)  ln -s "$T/runner_lanevar.sh" "$FR/tests/run_all_emulator.sh" ;;
 decrypt-warm-off) ln -s "$T/runner_warmoff.sh" "$FR/tests/run_all_emulator.sh" ;;
 concurrent-off)   ln -s "$T/runner_ccoff.sh" "$FR/tests/run_all_emulator.sh" ;;
-jobs-leak)        ln -s "$T/runner_jobsleak.sh" "$FR/tests/run_all_emulator.sh" ;;
+jobs-leak)        if [ "${VS_TEST_NOOP_MODE:-0}" = 1 ]; then ln -s "$RUNNER" "$FR/tests/run_all_emulator.sh"   # the no-op knob (above)
+                  else ln -s "$T/runner_jobsleak.sh" "$FR/tests/run_all_emulator.sh"; fi ;;
 order-ignored)    ln -s "$T/runner_orderoff.sh" "$FR/tests/run_all_emulator.sh" ;;
 tmp-ignored)      ln -s "$T/runner_tmpoff.sh" "$FR/tests/run_all_emulator.sh" ;;
 lost-unread)      ln -s "$T/runner_lostoff.sh" "$FR/tests/run_all_emulator.sh" ;;
@@ -456,7 +496,7 @@ mist_line="$(printf '%s\n' "$out12" | grep -n '== mister lane' | head -1 | cut -
 if [ -n "$slow_line" ] && [ -n "$mist_line" ] && [ "$slow_line" -lt "$mist_line" ]; then
     ok "a pool's gates finish before the next lane is announced"
 else
-    fail "pool boundary crossed: g_slow3 at line ${slow_line:-none}, mister lane at ${mist_line:-none}"
+    timing_fail - "pool boundary crossed: g_slow3 at line ${slow_line:-none}, mister lane at ${mist_line:-none}"
 fi
 # ONE POOL: the slow fbneo gate is queued first, and the mame gate beside it finishes before it — which only a shared
 # pool allows (lane by lane, the mame lane would not start until g_slow3 had ended)
@@ -468,7 +508,7 @@ if [ -n "$slow_b" ] && [ -n "$pass_b" ] && [ "$pass_b" -lt "$slow_b" ] \
         && printf '%s\n' "$out12b" | grep >/dev/null '== fbneo lane (1 gates; one pool of 2 with the mame lane'; then
     ok "the fbneo and mame lanes ran as one pool: g_pass (mame) finished while g_slow3 (fbneo, queued first) still ran"
 else
-    fail "the fbneo and mame lanes did not share a pool: g_slow3 at line ${slow_b:-none}, g_pass at ${pass_b:-none}"
+    timing_fail - "the fbneo and mame lanes did not share a pool: g_slow3 at line ${slow_b:-none}, g_pass at ${pass_b:-none}"
 fi
 if awk -F'\t' 'NR>1 && $1=="g_slow3" && $2=="fbneo"' "$T/l12b/results.tsv" | grep -q . \
         && awk -F'\t' 'NR>1 && $1=="g_pass" && $2=="mame"' "$T/l12b/results.tsv" | grep -q .; then
@@ -937,9 +977,10 @@ honoured18() {  # honoured18 <log dir> <gate> -> true when both control rows are
 reg "$(row g_cc mame release - '')"
 printf '# a fake list\ng_cc\t%s\tfake\ttest\n' "$(printf '%040d' 0)" > "$FR/tests/controls_concurrent_emu.txt"
 rm -f "$T"/cc_*; run --lane mame --controls --jobs 4 --log "$T/l18a" >/dev/null 2>&1 || true
-g18a="$(gap18 g_cc)"
-if [ "$g18a" -le 1 ] && honoured18 "$T/l18a" g_cc; then ok "listed, --jobs 4: the two controls started ${g18a}s apart, both honoured"
-else fail "listed, --jobs 4: the controls started ${g18a}s apart (want <= 1), or a row is not an honoured PASS"
+g18a="$(gap18 g_cc)"; w18=1; [ "${VS_TIMING_SQUEEZE:-0}" = 1 ] && w18=-1   # the squeeze knob: no gap passes
+if ! honoured18 "$T/l18a" g_cc; then fail "listed, --jobs 4: a control row is not an honoured PASS"
+elif [ "$g18a" -le "$w18" ]; then ok "listed, --jobs 4: the two controls started ${g18a}s apart, both honoured"
+else timing_fail concurrent-off "listed, --jobs 4: the controls started ${g18a}s apart (want <= $w18)"
      vs_ctl_is concurrent-off && vs_ctl_fired concurrent-off "with the test always false the listed gate's controls ran one after another (${g18a}s apart)"; fi
 rm -f "$T"/cc_*; run --lane mame --controls --jobs 1 --log "$T/l18b" >/dev/null 2>&1 || true
 g18b="$(gap18 g_cc)"
@@ -957,7 +998,7 @@ printf 'g_cc\t%s\tfake\ttest\ng_cc2\t%s\tfake\ttest\n' "$(printf '%040d' 0)" "$(
 rm -f "$T"/cc_*
 ( cd "$FR" && ROMDIR="$T/roms" MERGED=build/fake_merged sh tests/run_all_emulator.sh --lane mame --controls --jobs 2 --log "$T/l18d" > "$T/l18d.out" 2>&1 ) &
 _p18=$!; _w=0; while kill -0 "$_p18" 2>/dev/null && [ "$_w" -lt 60 ]; do sleep 1; _w=$((_w + 1)); done
-if kill -0 "$_p18" 2>/dev/null; then kill "$_p18" 2>/dev/null; pkill -P "$_p18" 2>/dev/null; fail "two listed gates in a pool of two did not finish in 60 s (a deadlock)"
+if kill -0 "$_p18" 2>/dev/null; then kill "$_p18" 2>/dev/null; pkill -P "$_p18" 2>/dev/null; timing_fail - "two listed gates in a pool of two did not finish in 60 s (a deadlock)"
 else wait "$_p18" 2>/dev/null || true
      honoured18 "$T/l18d" g_cc && honoured18 "$T/l18d" g_cc2 && ok "two listed gates, two slots: all four controls ran and were honoured, in ${_w}s" \
          || fail "two listed gates, two slots: a control row is missing or not honoured"; fi
@@ -1075,6 +1116,13 @@ if ! vs_ctl_is lost-unread; then
     else vs_ctl_dead lost-unread "the runner without the check did not print GREEN on the lost row ($(tail -1 "$T/l22b.out"))"; fail "lost-unread"; fi
 fi
 rm -f "$FR/tests/g_lost.sh" "$FR/tests/g_kept.sh"
+
+echo "23. a timing check is no mode's verdict but its owner's (#310, 14z-215)"
+_tf() { ( VS_CTL="$1"; rc=0; timing_fail "$2" "known answer" >/dev/null; echo "$rc" ); }
+if [ "$(_tf "" -)" = 1 ] && [ "$(_tf export-removed -)" = 0 ] && [ "$(_tf export-removed concurrent-off)" = 0 ] \
+        && [ "$(_tf concurrent-off concurrent-off)" = 1 ]; then
+    ok "timing_fail fails the plain run and its owner's mode, and leaves every other mode's rc alone"
+else fail "timing_fail: plain $(_tf "" -), another mode $(_tf export-removed -), owner $(_tf concurrent-off concurrent-off) (want 1 0 1)"; fi
 
 echo
 [ "$rc" = 0 ] && echo "PASS: run_all_emulator.sh classifies every ground-truth case correctly" \

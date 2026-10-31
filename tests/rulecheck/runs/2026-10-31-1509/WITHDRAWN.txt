@@ -1,0 +1,1 @@
+withdrawn unspawned 2026-10-31 (14z-215): the claim misdescribed rc_modes_main.txt ('CONTROL FIRED: <mode>' lines; the file shows each mode's 'MODE: control' or FAIL lines); re-prepared after the fix

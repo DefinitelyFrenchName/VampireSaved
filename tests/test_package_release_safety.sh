@@ -123,7 +123,7 @@ fi
 
 if vs_ctl_is name-unchecked || vs_ctl_is delete-first; then
     [ "$rc" = 1 ] && { echo "FAIL: test_package_release_safety (control mode: $VS_CTL)"; exit 1; }
-    echo "FAIL: test_package_release_safety — control mode $VS_CTL left the gate green"; exit 1
+    vs_ctl_left_green "$VS_CTL" "FAIL: test_package_release_safety — control mode $VS_CTL left the gate green"
 fi
 
 echo "== 4. controls"

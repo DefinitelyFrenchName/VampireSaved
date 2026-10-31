@@ -433,3 +433,16 @@ test_mizuumi_candidates
 # test_control_classifier.sh — #310 (14z-213): tests/lib/classify.sh's rules for a mode run that FAILs without judging
 # (its own CONTROL DEAD, a SKIP exit, its own exit-3 REFUSED, a hidden crash) on known answers; four controls. ~1 s.
 test_control_classifier
+# test_instr_align_unjudged.sh — #310 group 1 (14z-215): tests/lib/instr_align.sh's NOT JUDGED lines and
+# tests/lib/controls.sh vs_ctl_left_green on stub drift-family gates classified as the runners do; five controls. ~2 s.
+test_instr_align_unjudged
+# test_dead_exit_census.sh — #310 group 2 (14z-215): no tests/*.sh prints a control mode's dead branch in words only
+# (tools/dead_exit_census.py), its stubs classified as the runners do, its known gap stated; two controls. ~2 s.
+test_dead_exit_census
+# test_plants_not_applied.sh — #310 group 6 (14z-215): a control mode whose plant did not apply, or whose partial copy is
+# red on another finding (audit_latch_reads, test_gate_follows, test_poke_readback), reads UNJUDGED or DIED, and test_rule_checker's
+# shadow modes whose shadow raised read DIED (group 5); four controls. ~45 s.
+test_plants_not_applied
+# test_ctl_show_err.sh — #310 group 5 (14z-215): tests/lib/controls.sh vs_ctl_show_err on stub gates running a crashing
+# perturbed copy (Python main path, shell syntax error, an expected exception) classified as the runners do; three controls. ~2 s.
+test_ctl_show_err

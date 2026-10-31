@@ -186,7 +186,12 @@ prun() {  # prun <rcfile> <command...> — one emulator run, output discarded, i
     echo "$_prc" > "$_prf"
 }
 prc() {  # prc <rcfile> — stop the gate, as set -e did inline, if that run failed
-    _prr="$(cat "$1" 2>/dev/null || echo 1)"; [ "$_prr" = 0 ] || exit "$_prr"
+    # #310 (14z-215): it stopped SILENTLY with the run's status, so a stalled FBNeo leg under stray-byte-growth read as
+    # that control caught (HONOURED); the run measured nothing past this point, and says so
+    _prr="$(cat "$1" 2>/dev/null || echo 1)"; [ "$_prr" = 0 ] && return 0
+    echo "NOT JUDGED: the FBNeo run $(basename "$1" .rc) did not complete (exit $_prr: no END line, or the emulator died), so nothing past it was judged (#310)"
+    echo "FAIL: test_dualtrack — the FBNeo run $(basename "$1" .rc) did not complete"
+    exit "$_prr"
 }
 run() {  # run <tag> <set> <rompath> <replay>
     prun "$WORK/$1.rc" env FBNEO_ROMPATH="$3" tools/run_replay_fbneo.sh "$2" \
@@ -324,7 +329,8 @@ for spec in $LEGACY_ONSETS; do
     rp="${spec%%:*}"; want="${spec##*:}"
     prc "$WORK/s_$rp.rc"
     prc "$WORK/w_$rp.rc"
-    state_onset "s_$rp" "w_$rp" > "$WORK/so_$rp.txt" || { echo "  FAIL: $rp — dump/classify error"; cat "$WORK/so_$rp.txt"; fail=1; continue; }
+    state_onset "s_$rp" "w_$rp" > "$WORK/so_$rp.txt" || { echo "  FAIL: $rp — dump/classify error"; cat "$WORK/so_$rp.txt"; fail=1
+        echo "NOT JUDGED: $rp's onset could not be classified ($(head -1 "$WORK/so_$rp.txt"): a dump run wrote no dump), so its onset was not judged (#310)"; continue; }
     got="$(awk '$1=="STATE_ONSET"{print $2}' "$WORK/so_$rp.txt")"
     nfl="$(awk '$1=="FLICKER"{print $2}' "$WORK/so_$rp.txt")"; ofl="$(awk '$1=="FLICKER"{print $3}' "$WORK/so_$rp.txt")"
     fltxt=""; [ "${nfl:-0}" != 0 ] && fltxt=" (+$nfl flicker frame(s) at frozen offsets ${ofl} before it)"

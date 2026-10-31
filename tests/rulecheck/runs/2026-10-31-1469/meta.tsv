@@ -1,0 +1,13 @@
+decision	recommendation
+subject	recommend for #310: groups 1-4 of the 14z-215 scoping now, each with its proving control; groups 5-7 re-censused at HEAD before any edit
+session	14z-215
+model	rule-checker@163e4ce9cf7b
+claim	CLAIM (a recommendation to put to the maintainer, question_draft.md), after run 2026-10-31-1468: for #310, recommend option 1 — groups 1-4 of REMAINING.md section 4, each with the proving control that section names, then a measured re-census of groups 5-7 at HEAD before any edit to them. It rests on: (a) REMAINING.md (a read-only worker's scoping at HEAD b68922a6: section 0's precondition that a runner executes a gate's controls only after its plain run PASSes; section 1's per-shape reading against classify.sh rules 1-4, where groups 1-2's lists were checked by grep at HEAD (deadexit_head.txt) and groups 3-4's named lines were read at HEAD; section 4's groups and counts; section 5's unsettled points); (b) the maintainer's rulings in rulings_310.txt and today's word in STATE.md lines 126-133 ("The goal is to address all the non-parked tickets"); (c) measurer_recount.txt (152 census gates changed since the census tree; 72 of the 123 NONDET gates changed; group 7 = 93 gates / 282 controls, of which 6 gates / 52 controls are groups 3-4's, leaving 87 gates / 230 controls, 42 of them changed). Why option 1: REMAINING.md section 5 says the NONDET, MODE-INDUCED and HIDDEN-TB lists (groups 7, 6 and 5) are the census's words bucketed by regex on the 14z-210 tree, re-read at HEAD only for named examples; editing from them would edit from a stale reading. NOT TESTED: every bucket count is the worker's regex over census wording (roughly ten per cent at best, its own words); no gate or control was run; groups 5 and 6's counts are estimates ("about 10-15", "about 8-10"); group 1's 28 and group 2's 14 rest on the worker's grep at HEAD, not re-run by me; whether the runner tests' timing thresholds ever fail under --jobs 8 was never observed; whether ia_check can print "no ALIGN line" on drift-clock's honoured path is unmeasured; the group (iv) "nothing needed" exclusion rests on the precondition and leaves test_proof_sheets' other 15 builders and test_rompath_reject's in-gate use untraced (REMAINING.md section 5); rule 3's UNJUDGED-vs-LIES choice for a gate's own dead-mode REFUSED is left to the maintainer and is not part of this question. Option 1 does not close #310: groups 5-7 remain.
+checklist	62514a98c3e7
+family	evidence
+questions	Q1 Q2 Q3 Q4 Q5
+reader	rule-checker@163e4ce9cf7b
+precheck	2 flag(s): D-ABSOLUTE 2
+deliverables	build/agent215/t310/rc/question_draft.md
+action	2026-10-31-1468
+redoes	2026-10-31-1468

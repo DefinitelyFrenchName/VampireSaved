@@ -20,9 +20,9 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-589 entries (48 game / 148 platform / 393 project), counted from the buckets at generation.
+591 entries (49 game / 148 platform / 394 project), counted from the buckets at generation.
 
-## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 48 entries
+## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 49 entries
 
 - (the 14z-90 onset-frame entry that opened this file was RE-FILED to `docs/project/gotchas.md` at 14z-118 — it is a VERIFICATION-CLASS fact, not a game fact; S-C12 flagged it)
 - OBJ record formats differ in ENTRY STRIDE, not just header meaning
@@ -72,6 +72,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A RECORD'S CLASS BYTE IS NOT THE VICTIM'S REACTION CLASS — the guard reads it first and the stager rewrites it (paid: 14z-169)
 - A POKED KO NEEDS THE VICTIM ON ITS LAST BAR, AND THE KO MUST COME FROM THE PATH YOU MEAN TO TEST — a low HP alone rallies (paid: 14z-184, GitHub #180)
 - A MOTION THAT LEAVES A NEUTRAL FRAME BETWEEN BACK AND DOWN-BACK IS TWO TAPS TOWARD BACK, AND A CHARACTER WITH A BACKDASH DASHES — the press then lands in the hop (paid: 14z-205, #229, forks F3 and P1)
+- THE GAME HAS ONE ROUND: A DOWN THAT ENDS THE MATCH IS NEVER FOLLOWED BY A ROUND 2, AND A KO POKED WITH HP ALONE ENDS THE MATCH WITH THE SPARE BAR UNUSED (paid: 14z-215, GitHub #343)
 
 ## Platform — CPS-2, MAME, FBNeo ([`platform/gotchas.md`](platform/gotchas.md)) — 148 entries
 
@@ -224,7 +225,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A FAILED `X="$(mktemp -d)"` LEAVES X EMPTY AND THE SCRIPT RUNS ON — `"$X/sub"` IS THEN A PATH UNDER `/` (paid: 14z-210, ERIS; fixed 14z-211/212, #333)
 - A SHELL'S WRITE-ERROR TEXT IS ITS OWN — bash says `write error: Broken pipe`, dash (Ubuntu's `sh`) `printf: I/O error` (paid: 14z-212, PILOT; #336)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 393 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 394 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -619,3 +620,4 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A GATE THAT REACHES AN EMULATOR THROUGH SOMETHING THE TIER CLASSIFIER DOES NOT NAME IS A DEAD ROW — every strict emulator run read NOT GREEN with every row PASS (paid: 14z-196 and 14z-213, #340)
 - A COLLECTOR THAT GROUPS RECORDS BY A KEY DROPS A RECORD WITH NO KEY, AND SAYS NOTHING — 132 rule-checker runs missing from both ledger pages (paid: 14z-213/14z-214, #339)
 - A CONTROL THAT PERTURBS "THE FIRST ROW" DEPENDS ON THAT ROW'S STATE — test_tickets' parked-disagrees went DEAD the day the newest ticket closed (paid: 14z-214, #341)
+- A CRASH PLANTED ON EVERY CALL PROVES NOTHING ABOUT WHERE A GATE HIDES ONE — and a census counting `# MUST-FIRE:` lines anywhere counts a heredoc stub's header (paid: 14z-215, #310)

@@ -7,8 +7,9 @@
 #   is CLEAN (and, in cheap mode, checksum-identical to the frozen expectation), a planted
 #   ILLEGAL opcode trips vec4, a planted odd jump address trips vec3.
 # HOW: four MAME runs: the negative control in cheap and -debug modes (each compared with the
-#   frozen vanilla log; the -debug one also run-to-run), then the 14 dispatch tables'
-#   slot-0x0F entries pointed at a planted ILLEGAL and at an odd address.
+#   frozen vanilla log; the -debug one also run-to-run), then the slot-0x0F entries of 14 of
+#   the bank's 15 dispatch tables (+0x000..+0x680; +0x700 is not planted) pointed at a planted
+#   ILLEGAL and at an odd address.
 # EXPECTS: CLEAN on the negatives, both checksum-identical to frozen vanilla, CRASH vec4 and
 #   vec3 on the positives; a guard that misses either plant is not trusted.
 # FOLLOWS: build/manifest/ emu/mame-patches/ tests/expected/vsavj/02_demitri_vs_cpu.sha1
@@ -32,7 +33,7 @@
 #       was the debugger's boot halt counted as a frame. A breakpoint STOP can
 #       still move the game, so a run whose probes stop the CPU stays its own
 #       timeline; this run's breakpoints (the exception vectors) never stop it.
-#   2. Positive vec4: all 14 dispatch tables' slot-0x0F entries -> a planted
+#   2. Positive vec4: the slot-0x0F entries of 14 of the 15 dispatch tables (+0x000..+0x680) -> a planted
 #      ILLEGAL (0x4AFC) opcode in the free hole; picking Jedah must trip
 #      "CRASH ... vec4".
 #   3. Positive vec3: same entries -> an odd address; must trip vec3
@@ -91,7 +92,14 @@ if [ "$(shasum "$WORK/neg1.log" | cut -d' ' -f1)" = "$exp" ]; then
 else
     echo "FAIL: the -debug guard's log is not the frozen vanilla log ($(diff "$WORK/negc.log" "$WORK/neg1.log" | head -2 | tr '\n' ' '))"; fail=1
 fi
+# #310 group 6 (14z-215): the mode exits 1 on ITS finding only — 1b's -debug log under the old clock differs from frozen
+# vanilla while 1a's cheap log is frozen vanilla; a gate left green is this control dead (LIES), any other red NOT JUDGED
 if vs_ctl_is drift-clock; then
+    if [ "$got" = "$exp" ] && [ "$(shasum "$WORK/neg1.log" | cut -d' ' -f1)" != "$exp" ]; then
+        echo "FAIL: test_crash_guard (control mode: drift-clock)"; exit 1
+    fi
+    [ "$fail" = 0 ] && vs_ctl_left_green drift-clock "FAIL: test_crash_guard — control mode drift-clock: the frame_done clock still reproduced frozen vanilla"
+    echo "NOT JUDGED: drift-clock — the gate is red, but not with 1b's log differing from frozen vanilla on a clean 1a"
     echo "FAIL: test_crash_guard (control mode: drift-clock)"; exit 1
 fi
 INSTR_CLOCK=frame_done "$REPO/tools/run_replay_guarded.sh" vsavj \
@@ -112,7 +120,8 @@ cat > "$WORK/pick_jedah.rpl" <<'EOF'
 3600 wait
 EOF
 
-# All 14 dispatch tables (bank[0]=0x0BD0FA, stride 0x80), slot 0x0F entry at
+# 14 of the bank's 15 dispatch tables (bank[0]=0x0BD0FA, stride 0x80: +0x000..+0x680; the 15th, +0x700, is not
+# planted — docs/game/atlas/character_tables.md [VSE-9], corrected 14z-215), slot 0x0F entry at
 # +0x3C in each. Whichever the engine calls first trips the guard.
 gen_patch() { # $1 = target value for every dispatch entry, $2 = out json
     python3 - "$1" "$2" <<'PY'

@@ -34,6 +34,13 @@
 #   vs_ctl_fired <name> <evidence>     print the FIRED line
 #   vs_ctl_dead <name> <what>          print the DEAD line (returns 1 so a
 #                                      caller can `|| fail=1`)
+#   vs_ctl_left_green <name> <line>    a mode run at the gate's green end: the
+#                                      DEAD line, then <line>, then exit 1
+#   vs_ctl_show_err <out> [<exc>|-] [<script>]
+#                                      a perturbed copy's captured output: a
+#                                      crash in it is re-printed so the run
+#                                      reads DIED / UNJUDGED (returns 1), none
+#                                      returns 0 silently
 #   vs_ctl_read <script> <log>         declared vs fired for one run; sets
 #                                      VS_CTL_DECLARED/FIRED/DEAD/UNDECLARED
 #                                      (counts), VS_CTL_MISSING (names),
@@ -71,6 +78,56 @@ vs_ctl_is() { [ "${VS_CTL:-}" = "$1" ]; }
 
 vs_ctl_fired() { echo "CONTROL FIRED: $1 — $2"; }
 vs_ctl_dead()  { echo "CONTROL DEAD: $1 — $2"; return 1; }
+# vs_ctl_left_green <mode> <the gate's FAIL line> — a mode run that reached the gate's GREEN end (#310, 14z-215): prints
+# `CONTROL DEAD: <mode> — …` (tests/lib/classify.sh rule 1 reads its own DEAD line as LIES) and the FAIL line, and
+# exits 1. Until then 42 gates printed "control mode X left the gate green" in WORDS and exited 1, which read HONOURED:
+# the dead control certified as caught. Ground truth: tests/test_instr_align_unjudged.sh (control dead-close-honoured).
+vs_ctl_left_green() {
+    echo "CONTROL DEAD: $1 — the control mode left the gate green: its perturbation changed no verdict"   # #310 DEAD-close
+    echo "$2"; exit 1
+}
+# vs_ctl_show_err <output file> [<expected exception>|-] [<copy script path>] — A PERTURBED COPY'S CRASH IS NOT ITS FINDING
+# (#310 group 5, 14z-215; maintainer-ruled 2026-10-31). A control mode runs a copy of a tool or script with one
+# perturbation; when the copy CRASHED, the gate used to print only `tail -N` of its output, an indented or joined excerpt,
+# or nothing, and read the non-zero exit as the perturbation caught — tests/lib/classify.sh then saw no crash and read
+# HONOURED. Call this on the copy's captured output (stdout and stderr) whenever its run did not give the expected answer:
+#   a Python traceback          -> `NOT JUDGED:` and the traceback re-printed at column 0 (classify.sh rule 4a: DIED);
+#   a headerless SyntaxError /  -> `NOT JUDGED:` (UNJUDGED): the copy never ran;
+#     IndentationError / TabError
+#   the shell's own error line about <copy script path> (bash `<path>: line N: x`, dash `<path>: N: x`), which
+#     classify.sh's own-script branch never matches because it names the copy, not the gate -> `NOT JUDGED:` (UNJUDGED).
+# Each prints and returns 1 (so a caller can `|| fail=1`, and a twin can print CONTROL DEAD); no crash returns 0 and
+# prints nothing. WHERE A CRASH IS THE HONOURED OUTCOME (test_attribute_patch_delta's FileNotFoundError, the stripped
+# applier's UnicodeEncodeError) pass its class as <expected> (an ERE alternative list, e.g. `FileNotFoundError`): the
+# output must then END in that exception — it returns 0 silently; any other exception, a shell error, or no exception at
+# all prints `NOT JUDGED:` with the traceback quoted behind `  | ` (so rule 4a does not read the expected firing DIED) and
+# returns 1. Ground truth: tests/test_ctl_show_err.sh.
+vs_ctl_show_err() {
+    _vse_f="$1"; _vse_x="${2:--}"; _vse_s="${3:-}"; _vse_sh=""
+    [ -f "$_vse_f" ] || { echo "NOT JUDGED: the perturbed copy left no output to judge ($_vse_f)"; return 1; }
+    _vse_exc="$(grep -aE '^([A-Za-z_][A-Za-z0-9_]*\.)*[A-Z][A-Za-z0-9]*(Error|Exception|Interrupt|Exit)(: |$)' "$_vse_f" | tail -1)"
+    _vse_syn="$(grep -aE '^(SyntaxError|IndentationError|TabError): ' "$_vse_f" | head -1)"
+    _vse_tb="$(grep -anE -m1 '^[[:space:]]*Traceback \(most recent call last\)' "$_vse_f" | cut -d: -f1)"
+    if [ -n "$_vse_s" ]; then
+        _vse_sh="$(grep -aE "^$(printf '%s' "$_vse_s" | sed 's/[.[\*^$/]/\\&/g'): (line )?[0-9]+: [^0-9 ]" "$_vse_f" | head -1)"
+    fi
+    if [ "$_vse_x" != - ]; then   # the honoured outcome IS a crash: that one exception, nothing else
+        if [ -z "$_vse_sh" ] && [ -n "$_vse_exc" ] && printf '%s\n' "$_vse_exc" | grep -qE "^([A-Za-z_][A-Za-z0-9_]*\.)*($_vse_x)(: |$)"; then return 0; fi   # VSE-EXPECTED
+        echo "NOT JUDGED: the perturbed copy did not end in the expected $_vse_x — got: $(printf '%s' "${_vse_sh:-${_vse_exc:-no exception}}" | cut -c1-100)"
+        tail -12 "$_vse_f" | sed 's/^/  | /'
+        return 1
+    fi
+    if [ -n "$_vse_tb" ]; then   # VSE-TB
+        echo "NOT JUDGED: the perturbed copy crashed, so this run judged nothing — ${_vse_exc:-a traceback}"
+        sed -n "${_vse_tb}p" "$_vse_f" | sed 's/^[[:space:]]*//'; tail -n +"$((_vse_tb + 1))" "$_vse_f" | tail -12
+        return 1
+    fi
+    if [ -n "$_vse_syn" ] || [ -n "$_vse_sh" ]; then   # VSE-SH
+        echo "NOT JUDGED: the perturbed copy could not run, so this run judged nothing — $(printf '%s' "${_vse_sh:-$_vse_syn}" | cut -c1-110)"
+        return 1
+    fi
+    return 0
+}
 
 vs_ctl_read() {  # vs_ctl_read <script> <log>
     # ITS SCRATCH NAMES ARE PREFIXED (14z-209, #323): a sh function has no locals, and this one ran in the runner's

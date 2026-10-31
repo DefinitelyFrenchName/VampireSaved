@@ -38,7 +38,7 @@ echo "== 1. every tracked Python file under tools/ and tests/"
 if check $FILES $EXTRA; then fail=0; echo "  ok    no invalid escape"; else fail=1; echo "  FAIL  an invalid escape (above)"; fi
 if vs_ctl_is planted-escape; then
     [ "$fail" = 1 ] && { echo "FAIL: test_py_escapes (control mode: the planted escape was named)"; exit 1; }
-    echo "FAIL: test_py_escapes — the planted escape passed"; exit 1
+    vs_ctl_left_green "planted-escape" "FAIL: test_py_escapes — the planted escape passed"
 fi
 echo "== 2. control"
 if check "$W/planted.py" > "$W/c.txt" 2>&1; then vs_ctl_dead planted-escape "the planted escape compiled clean"; fail=1

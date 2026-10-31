@@ -194,7 +194,8 @@ if grep -q '^HOST-TEXT:' "$W/gen1.txt"; then
     sed 's/^/  /' "$W/gen1.txt"
     echo "FAIL: the page generator wrote host-dependent text (the host-text guard, #314)"; exit 1
 fi
-vs_ctl_is unencoded-page && { echo "FAIL: test_applier_page — the shadow generator wrote its page: the host-text guard did not refuse it"; exit 1; }
+# #310 group 6 (14z-215): reached only when the guard printed no HOST-TEXT line above — this mode's control is dead (LIES)
+vs_ctl_is unencoded-page && vs_ctl_left_green unencoded-page "FAIL: test_applier_page — the shadow generator wrote its page: the host-text guard did not refuse it"
 for c in page-with-fetch page-without-csp; do
     vs_ctl_is "$c" || continue
     if [ "$gen_rc" = 0 ]; then

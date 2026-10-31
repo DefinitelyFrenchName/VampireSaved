@@ -945,6 +945,20 @@ tap proves which writer set `$FFFF` before the result is read as the branch unde
 (`tests/audit_throw_registration.sh`, part `donovan_2_ko`; `docs/game/engine_internals.md`, "THE THIRD PAIR
 STORE IS THE APPLIER'S KO BRANCH").
 
+**Not every path rallies (14z-215, #343):** on vsavj a JAB on a victim poked to HP 1 with `+0x138` left at 144 did not
+rally — the HP was already below the threshold, so the jab crossed none — it KILLED (HP -1, `+0x3B0` 1 -> 0, `+0x138`
+still 144) and ENDED THE MATCH (next entry). The rule above stands for the opposite reason: poke `+0x138` (and `+0x3B0`)
+to 0 too, or the death is not the last bar's.
+
+**A path that does stop at the bar was frozen as a character property (14z-215, #343):** `tests/audit_edge_cases.sh`
+poked the throw-KO victims' HP alone from 14z-104. Every throw killed (bat 1 -> 0) except Phobos', which left Victor at
+HP/white 144 with `+0x138` 144 -> 0 and the bat 1 -> 0, the match going on: a FIRST DOWN. 14z-104 froze it as "Phobos'
+throw cannot finish an opponent, it restores HP to half" because native vsav2 showed the same frames, but the native leg
+had the same HP-only poke. With `+0x138` and `+0x3B0` poked to 0 the same throw kills on both games
+(`docs/game/atlas/ram.md` `+0x138`). The rule: an outcome a poked KO gives on one character and not on the others is
+re-measured on the last bar before it is called that character's, and a native leg poked the same way does not count
+as an independent check.
+
 ## A MOTION THAT LEAVES A NEUTRAL FRAME BETWEEN BACK AND DOWN-BACK IS TWO TAPS TOWARD BACK, AND A CHARACTER WITH A BACKDASH DASHES — the press then lands in the hop (paid: 14z-205, #229, forks F3 and P1)
 
 `tools/name_moves.py`'s `hcf` (41236) holds each direction for a few frames with a one-frame gap between them: back on
@@ -958,3 +972,20 @@ Dama (`a2:0x45`) on 6 of 6 tight variants, all three strengths (4123, mizuumi's 
 motion that starts toward back is scripted with no neutral frame between its directions, unless the gap is the thing
 measured; a rig that "never fires" a back-start motion is checked for a backdash (an airborne chain within a few frames
 of the first direction) before the move is called missing.
+
+## THE GAME HAS ONE ROUND: A DOWN THAT ENDS THE MATCH IS NEVER FOLLOWED BY A ROUND 2, AND A KO POKED WITH HP ALONE ENDS THE MATCH WITH THE SPARE BAR UNUSED (paid: 14z-215, GitHub #343)
+
+The maintainer (2026-10-31): *"on standard dip switch settings, you need two downs to win HOWEVER, there is only one
+timer so TIME OVER ends the match, not the round. Think of Vampire savior as having only one round but you get a new full
+life bar after your first down"*. `tests/audit_tenant_timeout.sh` and `tests/audit_tenant_downwin.sh` asserted "round 2
+spawns live" from 14z-104 to 14z-215 on the first frame with `$FF810E` >= 1 and both HP 0x120 — and `$FF810E` reads 0xFF
+at the match's end, so the refill they passed on was the NEXT MATCH's (`f4990` after the end at `f4934` on the timeout
+rig; `f4415` after `f4359` on the downwin rig). The downwin rig's KO was not even a last-bar death: HP alone poked to 1
+killed with the bat going 1 -> 0, not 0 -> 0xFF, and the match ended on that one down. What a down does, measured on
+pristine vsavj (`docs/game/atlas/ram.md` `$FF810E`, `+0x138`, `+0x3B0`): the FIRST down sets HP and white HP to 144,
+`+0x138` 144 -> 0 and `+0x3B0` 1 -> 0, and leaves `$FF810E` at 0 with the fight going on; the down that ends the match
+(the second, a time over, or a death that skips the spare bar) moves `$FF810E` 0 -> 1, then 0 (the post-match screens),
+0xFF (the match's end) and 1 at the next match's refill. **The rule:** a check that means "the match goes on" reads a
+frame BEFORE `$FF810E` = 0xFF; a refill after it is the next match; a down is not a round. Both gates now assert the
+match end and the next match (control `round2-before-end`), and the downwin gate pokes the last bar and gates the first
+down itself (legs `fd`, `fd1`; control `ko-without-last-bar`).

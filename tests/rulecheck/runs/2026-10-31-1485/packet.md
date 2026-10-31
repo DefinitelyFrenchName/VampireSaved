@@ -1,0 +1,35 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: close #118 as done (14z-215) on the maintainer's 'Close #118': every candidate has a verdict; the OWNER ONLY meanings and ungated rows are recorded limits; six new gates PASS with all 50 controls HONOURED; their inputs and the candidate table unchanged since the runs
+Claim (the working agent's sentence): CLAIM: close #118 as done (14z-215), on the maintainer's word, after runs 2026-10-31-1479 (withdrawn unspawned), -1480, -1481, -1482, -1483 and -1484. The closing comment closing_comment_118.md and the row ticket_row_118.tsv state the resolution; the ticket is issue_118.md. It rests on: ruling_close_118.txt (asked whether #118 is done given 11 OWNER ONLY rows and 41 ungated rows, the maintainer: "Close #118", whose text read "Every candidate has a verdict. The OWNER ONLY meanings and the ungated rows stay as recorded limits in ram.md."); mizuumi_candidates.tsv (the 89 candidates, verdicts derived from docs/game/atlas/ram.md by tools/mizuumi_candidates.py, the rows for every offset the comment names in ram_rows.txt; no row NO ROW or NOT OBSERVED; the hand-maintained batch column "-" on every row, which the table's header defines as "no source assigns one", not "nothing left to learn") and histogram.txt; test_mizuumi_candidates.log (the table equal to ram.md, PASS with its controls) and, after run -1482, test_mizuumi_candidates_now.log with table_now.txt (the same test re-run on the tree as it stands, PASS with both controls fired; the blobs of every file it reads — mizuumi_candidates.tsv, ram.md, tools/mizuumi_candidates.py and tests/test_mizuumi_candidates.sh — taken before and after the re-run, identical, and the table and ram.md blobs equal to those test_mizuumi_candidates.log line 1 pins); issues_342_343.txt (#342 and #343 CLOSED COMPLETED on GitHub); combined_tree.txt (of the 84 tracked files the run's snapshot changes from HEAD, the only one under a path the six gates follow is tests/lib/controls.sh); answers_118.md and ruling_118.txt (the maintainer's sheet reads, verbatim, the float's sheets named); ruling_ondemand.txt (the maintainer's 2026-10-09 words on pristine-only gates); identity.txt (each of the six gates' blobs at the run, and a git stash create snapshot of the working tree), blobs_now.txt (each gate equal to the file now), inputs_since_run.txt (every path the six gates' FOLLOWS lines name, tracked, diffed between the run's snapshot and one taken now: no difference; and the untracked inputs — the six gates and tests/lua/pal_hash.lua — each last modified before the run started), the six plain logs (each PASS) with logs_tree.txt (after run -1483: each log's head line reads be2ecabc-dirty and, in five, 'tracked files modified 85' = the snapshot's 84 tracked files plus the emu/fbneo submodule, whose worktree carries the FBNeo driver patch since 2026-09-30 and which git stash create cannot record; each log last written 13:07-13:14Z, after the snapshot at 13:06:54Z), registry_rows.txt (the six gates' tests/ci_emulator.tsv rows, scope ondemand), portable_row.txt (after run -1484: test_mizuumi_candidates' row in tests/ci_portable.txt, run_all_static.sh reading that list, and the pre-commit hook refusing a tree with no strict GREEN whole-tier run), tables15.txt (character_tables.md's 15-table correction and the scratch reader's log it cites) and modes.tsv (their 50 control modes, each HONOURED). NOT TESTED: the commit does not exist yet (no hash in the comment); the candidate SET is a hand-maintained offset column (the table's header) seeded 14z-213 from 14z-189's working list, and no artifact checks the 89 offsets against that list or the community page (issue_118.md's comment says the tree could not then say which candidates remained); inputs a gate reads that its FOLLOWS line does not name are not compared; the plain logs record neither their gate's blob nor a snapshot id or start time — the tie to the snapshot is identity.txt taken at the run's start, the gates unchanged after (blobs_now.txt), the logs' mtimes after it and their count of 85 accounted for (logs_tree.txt); a log written from a different tree with the same count and a later mtime would not be caught; the comment's 'the bank holds 15 tables, not 14' rests on character_tables.md's corrected line and an ungated scratch reader (tables15.txt: 15 tables at +0x000..+0x700 each 16/16 code pointers and named by a movea.l), not on a gate; the the batch column is maintained by hand and no control fires if a batch is cleared without a measurement; the 11 OWNER ONLY meanings and the 41 ungated rows are left as recorded limits (the maintainer's ruling), and the rows earlier sessions measured (with audit_mizuumi_struct, audit_mizuumi_rows_b, audit_mizuumi_attack, audit_mizuumi_inputs, audit_sas_penguin_count and others, or ungated) were not re-run here; the items named under "Not done here" were not measured; the combined tree also carries #310 groups 1-4, #342 and #343; the six gates DO read one of their files, tests/lib/controls.sh (#310 changed it), and it was in place at the run and unchanged since (combined_tree.txt, inputs_since_run.txt), so the PASS and the 50 HONOURED modes were measured with it — the gates were not run on the tree without it; the table or ram.md could still change between table_now.txt and the commit — test_mizuumi_candidates is in the portable tier (tests/ci_portable.txt) that the commit's strict tier runs, which is the control for that, and the commit does not exist yet.
+Artifacts (read every one, in full):
+  - build/agent215/closure118/closing_comment_118.md
+  - build/agent215/closure118/ticket_row_118.tsv
+  - build/agent215/closure118/issue_118.md
+  - build/agent215/closure118/ruling_close_118.txt
+  - build/agent215/closure118/mizuumi_candidates.tsv
+  - build/agent215/closure118/histogram.txt
+  - build/agent215/closure118/test_mizuumi_candidates.log
+  - build/agent215/closure118/test_mizuumi_candidates_now.log
+  - build/agent215/closure118/table_now.txt
+  - build/agent215/closure118/issues_342_343.txt
+  - build/agent215/closure118/combined_tree.txt
+  - build/agent215/closure118/logs_tree.txt
+  - build/agent215/closure118/registry_rows.txt
+  - build/agent215/closure118/portable_row.txt
+  - build/agent215/closure118/tables15.txt
+  - build/agent215/closure118/answers_118.md
+  - build/agent215/closure118/ruling_118.txt
+  - build/agent215/closure118/ruling_ondemand.txt
+  - build/agent215/closure118/ram_rows.txt
+  - build/agent215/closure118/identity.txt
+  - build/agent215/closure118/blobs_now.txt
+  - build/agent215/closure118/inputs_since_run.txt
+  - build/agent215/closure118/modes.tsv
+  - build/agent215/closure118/audit_lilith_gps_counter.plain.log
+  - build/agent215/closure118/audit_bishamon_charge_316.plain.log
+  - build/agent215/closure118/audit_mizuumi_finishes.plain.log
+  - build/agent215/closure118/audit_anakaris_rows.plain.log
+  - build/agent215/closure118/audit_mizuumi_rows_c.plain.log
+  - build/agent215/closure118/audit_mizuumi_354_3a8.plain.log

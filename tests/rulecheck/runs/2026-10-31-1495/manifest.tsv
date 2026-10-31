@@ -1,0 +1,16 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent215/t129/packet/claim.txt	b47e1c868c5965f081d2e5cff1df4767ae72531c
+tests/audit_tenant_cpu_ai.sh	1220eb208c313048e2a93a1103c0f3c2d8bf21c3
+tests/expected/tenant_cpu_ai.txt	dd86478cfee1755268e230dd5cc064bd77e0a946
+tests/lua/tenant_ai_tap.lua	02ee42359aed971574ba7d9d0c4c560572e6f454
+build/agent215/t129/packet/plain.log	e028bd67b965fe6368bc4601d770307059a8fd78
+build/agent215/t129/packet/plain_results.tsv	c6a985d6920f37f0d034f29c3850fe200c28f083
+build/agent215/t129/packet/controls_results.tsv	6b9a03d694f45e2c292f547abe2dc004e6aec2ef
+build/agent215/t129/packet/ctl_guard-tap-shifted.log	5086eb85c7e037fc0565cb12f1167ace54e8f0e8
+build/agent215/t129/packet/ctl_shadow-class-removed.log	3d92bb0b44dd366e8ad71b23882897f24a91b761
+build/agent215/t129/packet/ctl_wrong-build.log	b0ec941f0cd3e570caef2cf9b386378508428383
+build/agent215/t129/packet/identity.txt	4c949056ca399ad3b66e39584b67a889f484d5a0
+build/agent215/t129/packet/rulings.txt	f9e395d3292cc0f362b66fa7fd4f590f020dfc25
+build/agent215/t129/packet/poke_rows.txt	806a5b95b473f7e0ece4458d5dd0746e9c8f39d5
+build/agent215/t129/packet/registry_row.txt	61b42aba21f52d861ca9f7fc7f9a5647570f9a9b
+build/agent215/t129/REPORT.md	285a344628e7b4fe74c493bda7e661b5483f698c

@@ -65,6 +65,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 CONTROL="${CONTROL:-}"
 case "$CONTROL" in ""|blind-census|dropped-reader|nearest-decode) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
+. "$REPO/tests/lib/controls.sh"   # vs_ctl_show_err (#310 group 5)
 MERGED="${MERGED:-$REPO/build/m3b_merged31/verify_op.bin}"
 [ -f "$MERGED" ] || { echo "SKIP: no ported opcode view at $MERGED"; exit 0; }
 EXPECT="$REPO/tests/expected/latch_readers.tsv"
@@ -105,7 +106,10 @@ if [ "$CONTROL" = nearest-decode ]; then
     else echo "CONTROL DEAD: nearest-decode — the pre-#197 scan found the immediate store"; echo "FAIL: test_latch_readers"; exit 1; fi
 fi
 if [ "$CONTROL" = blind-census ]; then
-    if [ "$fail" = 1 ]; then echo "CONTROL FIRED: blind-census — the shadow tool fails its positive controls"; echo "FAIL: test_latch_readers (control mode)"; exit 1
+    # #310 group 5: the shadow's failure counts only as a positive-control FAIL line; a crash prints none
+    if [ "$fail" = 1 ] && grep -q '^  FAIL  control ' "$W/vs2.log" "$W/vsavj.log"; then echo "CONTROL FIRED: blind-census — the shadow tool fails its positive controls"; echo "FAIL: test_latch_readers (control mode)"; exit 1
+    elif [ "$fail" = 1 ]; then for _l in vs2 vsavj merged; do vs_ctl_show_err "$W/$_l.log" || true; done
+        echo "NOT JUDGED: blind-census — the shadow tool failed without a positive-control FAIL line, so nothing was judged"; echo "FAIL: test_latch_readers (control mode)"; exit 1
     else echo "CONTROL DEAD: blind-census — the shadow tool passed its positive controls"; echo "FAIL: test_latch_readers"; exit 1; fi
 fi
 [ "$fail" = 0 ] || { echo "FAIL: test_latch_readers"; exit 1; }
@@ -165,6 +169,9 @@ echo "== 4. must-fire controls (in-gate)"
 sed 's/if val == off and f"\${off:x}(a" in o:/if False:/; s/elif val != off and f"\${val:x}(a5)" in o:/elif False:/' "$REPO/tools/audit_latch_readers.py" > "$W/shadow_tool.py"
 if python3 "$W/shadow_tool.py" "$W/vsav2.op" --selftest vs2 > "$W/shadow.log" 2>&1; then
     echo "CONTROL DEAD: blind-census — a tool blind to the (d16,An) form passed its positive controls"; fail=1
+elif ! grep -q '^  FAIL  control ' "$W/shadow.log"; then   # a positive FAIL line first: a crash prints none (#310 group 5)
+    vs_ctl_show_err "$W/shadow.log" || true
+    echo "CONTROL DEAD: blind-census — the shadow tool failed without a positive-control FAIL line (not the (d16,An) form missed)"; fail=1
 else
     echo "CONTROL FIRED: blind-census — the (d16,An)-blind shadow tool fails $(grep -c '^  FAIL  control' "$W/shadow.log") of its positive controls"
 fi

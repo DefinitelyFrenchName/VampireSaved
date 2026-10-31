@@ -1,0 +1,12 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: recommend for #310: groups 1-6 of the 14z-215 scoping now, each with its proving control; group 7 re-censused at HEAD before any per-gate edit
+Claim (the working agent's sentence): CLAIM (a recommendation to put to the maintainer, question_draft.md): for #310, recommend option 1 — groups 1-6 of REMAINING.md section 4, each with the proving control that section names, then a measured re-census of group 7 at HEAD before any per-gate edit. It rests on: (a) REMAINING.md (a read-only worker's scoping at HEAD b68922a6: section 0's precondition that a runner executes a gate's controls only after its plain run PASSes, with the runner lines it cites; section 1's per-shape reading against classify.sh rules 1-4; section 4's seven groups with file counts; section 5's unsettled points); (b) the maintainer's rulings on #310 in rulings_310.txt ("Record and defer" 14z-210; "Classifier rules 1-4 (Recommended)" whose text said "Shapes 5-6 stay deferred"; "Keep open (Recommended)" whose text said "the deferred census shapes stay its remaining work") and today's word in STATE.md lines 126-133 ("The goal is to address all the non-parked tickets"); (c) changed_census_gates.txt (160 of 273 census gates changed since the census tree) and nondet_other.txt (group 7's list). Why option 1 over 2: group 7's lists are the 14z-210 census's words bucketed by regex, and REMAINING.md section 5 says 72 of the 123 stalled-leg gates changed since and only the named examples were re-read at HEAD, so editing ~93 gates from them would edit from a stale reading. NOT TESTED: every bucket count is the worker's regex over census wording (it states roughly ten per cent at best); no gate or control was run; the file counts per group are estimates for groups 5 and 6 ("about 10-15", "about 8-10"); whether the runner tests' timing thresholds ever fail under --jobs 8 was never observed; whether ia_check can print "no ALIGN line" on drift-clock's honoured path is unmeasured; rule 3's UNJUDGED-vs-LIES choice for a gate's own dead-mode REFUSED is left to the maintainer and is not part of this question. Option 1 does not close #310: group 7 would remain.
+Artifacts (read every one, in full):
+  - build/agent215/t310/rc/question_draft.md
+  - build/agent215/t310/REMAINING.md
+  - build/agent215/t310/rc/rulings_310.txt
+  - STATE.md.lines-126-133 (lines 126-133 of STATE.md)
+  - build/agent215/t310/changed_census_gates.txt
+  - build/agent215/t310/nondet_other.txt

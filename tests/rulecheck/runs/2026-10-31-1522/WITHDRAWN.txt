@@ -1,0 +1,1 @@
+withdrawn unspawned 2026-10-31 (14z-215): gate_scope.txt's column-header line came out empty (a grep -P miss); re-prepared with ci_emulator.tsv's COLUMNS line (:14)

@@ -47,7 +47,7 @@ out="$(python3 tools/controls_concurrent.py --root "$ROOT" 2>&1)"; rc=$?
 echo "$out" | sed 's/^/  /' | tail -12
 if [ "$ROOT" != "$REPO" ]; then
     [ "$rc" != 0 ] && { echo "FAIL: test_controls_concurrent (control mode: the perturbed row was named)"; exit 1; }
-    echo "FAIL: test_controls_concurrent — the perturbed row was not named"; exit 1
+    vs_ctl_left_green "$VS_CTL" "FAIL: test_controls_concurrent — the perturbed row was not named"
 fi
 [ "$rc" = 0 ] && ok "every listed gate is registered, declares 2+ controls and is the script that was traced" \
     || bad "a listed gate must be re-traced or taken off the list (above)"

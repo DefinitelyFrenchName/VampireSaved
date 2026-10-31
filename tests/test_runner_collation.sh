@@ -111,7 +111,7 @@ else
 fi
 if [ -n "$VS_CTL" ]; then
     [ "$fail" = 1 ] && { echo "FAIL: test_runner_collation (control mode: the perturbed copy was caught)"; exit 1; }
-    echo "FAIL: test_runner_collation — the perturbed copy passed"; exit 1
+    vs_ctl_left_green "$VS_CTL" "FAIL: test_runner_collation — the perturbed copy passed"
 fi
 
 echo "== 4. controls"

@@ -113,10 +113,11 @@ for pair in "$DON:donovan" "$HUI:huitzil" "$PYR:pyron"; do
     b="${pair%%:*}"; n="${pair##*:}"
     gen_args=""; [ "$n" = donovan ] && gen_args="$GEN_DON_ARGS"
     python3 tools/charmap_gen.py "$b" "$W/$n.json" $gen_args >"$W/$n.gen.log" 2>&1 \
-        || { bad "$n: charmap_gen failed on $b"; sed 's/^/        /' "$W/$n.gen.log" | tail -5; continue; }
-    python3 tools/charmap_md.py "$W/$n.json" "$W/$n.md" --anim "$W/${n}_anim.md" >/dev/null 2>&1 \
-        || { bad "$n: charmap_md failed"; continue; }
-    python3 tools/charmap_html.py "$n" "$b" "$W/$n.html" >/dev/null 2>&1 || { bad "$n: charmap_html failed"; continue; }
+        || { bad "$n: charmap_gen failed on $b"; sed 's/^/        /' "$W/$n.gen.log" | tail -5; vs_ctl_show_err "$W/$n.gen.log" || true; continue; }
+    # their output is kept (#310 group 5): a crash on the mode's perturbed build or override is surfaced, not read as drift
+    python3 tools/charmap_md.py "$W/$n.json" "$W/$n.md" --anim "$W/${n}_anim.md" >"$W/$n.md.log" 2>&1 \
+        || { bad "$n: charmap_md failed"; vs_ctl_show_err "$W/$n.md.log" || true; continue; }
+    python3 tools/charmap_html.py "$n" "$b" "$W/$n.html" >"$W/$n.html.log" 2>&1 || { bad "$n: charmap_html failed"; vs_ctl_show_err "$W/$n.html.log" || true; continue; }
     # THE FRAME-DATA RULE (maintainer, 2026-08-31, STATE 14z-126): the per-move pages
     # <tenant>_anim.md and <tenant>.html stay OUT of the tree (tools/framedata_pages.sh
     # regenerates them under ../charpages/framedata/); their currency is locked by

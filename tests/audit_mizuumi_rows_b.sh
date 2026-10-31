@@ -5,7 +5,8 @@
 #
 # WHAT: on pristine vsavj, over six corpus replays: +0x3A8 is written only by PRG:0x01BEE2, 0x01C186 and 0x01C692 (each seen storing; the
 #   engine's clears and the boot RAM test aside) and always as a LONG (both words in one frame), and reads only 0, 0x0090C140 on P1 or
-#   0x0090C200 on P2 — S0's $FF80D0 (0x0090C000) + 0x140 / + 0x200 (that it is the fighter's palette block is S0's inference, not judged); the byte +0x384 is
+#   0x0090C200 on P2 — S0's $FF80D0 (0x0090C000) + 0x140 / + 0x200 (that it is the fighter's palette block is S0's inference, not judged here; measured since 14z-215 by
+#   tests/audit_mizuumi_354_3a8.sh A2-A3); the byte +0x384 is
 #   a per-player state index: each side's sequence of values (0, 2, 6, 8 and 10 seen) is frozen per replay (P1 0, 6 in all six;
 #   P2 0 in 02 and 26 and 2, 0, 2, 6 in 03, 37, 105 and 128, human or CPU not traced; five sides ending 8, 10, 0 — no game state judged), +0x385 a second-level index (0, 2, 4, 6 seen) and
 #   +0x386..+0x387 always 0; every write by PRG:0x009A2C sets bit 7 of the
@@ -51,9 +52,10 @@
 # MUST-FIRE: perturbed-copy: writer-unseen — T1 with PRG:0x01BEE4 (a PC the tap never reports storing +0x3A8) added to the writer list must fail, so every listed writer is an observed one (in-gate; as a mode T1 lists it and the gate FAILs)
 #
 # NOT COVERED: only finish types 0, 1 and 3 occur in these replays: that 3 counts and 0 and 1 do not is measured; that 4
-#   and 6 count and 2, 5 and 7 do not is S0's static rule, not an observation; the +0x3BF raise (type 4) is never seen; whether $FF80D0 alternating with 0x0091C000 on some legs
+#   and 6 count and 2, 5 and 7 do not is S0's static rule, not an observation here; the +0x3BF raise (type 4) is never seen
+#   here (both measured since 14z-215, on human winners, by tests/audit_mizuumi_finishes.sh E4); whether $FF80D0 alternating with 0x0091C000 on some legs
 #   (01, 10, 21, 26 in the 14z-214 PILOT census) ever moves +0x3A8 is not judged; +0x354 (Jedah's child-slot word) needs a
-#   slot-ownership rig and is not here.
+#   slot-ownership rig and is not here (measured since 14z-215 by tests/audit_mizuumi_354_3a8.sh J1-J5).
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [KEEP=<dir>] tests/audit_mizuumi_rows_b.sh
 #   emulator tier, MAME; ~1 min (twelve legs in parallel; 26_don_arcade_mash is 40,600 frames)

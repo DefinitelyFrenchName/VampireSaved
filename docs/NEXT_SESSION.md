@@ -77,7 +77,7 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
      census's other shapes, deferred as "Record and defer", are its remaining work).
    - awaiting release: #338 (the proof sheets' web build; drawn and published at the next tagged release, which closes it;
      its comment says so).
-   - parked: #123, #124, #125, #127, #128, #129, #162, #294.
+   - parked: #123, #124, #125, #127, #128, #162, #294.
    - **Before planning any freeze or release, read each open ticket's comments for a step that runs AT it.** #333's
      step (the 11 sites guarded after run 1366 in a release-shape emulator tier) ran on ERIS this sitting at `550958ad`:
      417 PASS, 0 FAIL, the 4 SKIPs the host's environment (STATE 14z-214 (5)).

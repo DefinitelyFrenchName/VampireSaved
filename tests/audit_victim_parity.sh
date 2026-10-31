@@ -249,7 +249,8 @@ PY
         if vs_ctl_is chains-planted; then OURS_IMG="$W/planted_data.bin"; echo "MODE: chains-planted — $(cat "$W/chains_plant.log")"; fi
     fi
     if $VP chains-identical "$EX" "$OURS_IMG" "$BUILD/patch/placements.json" "$TENANT" > "$W/chains_$TENANT.txt" 2>&1; then ok "chains identical in shape on our build and the vs2 extract: $(tr '\n' ';' < "$W/chains_$TENANT.txt")"
-    else bad "the tenant's chains differ in shape between our build and the vs2 extract: $(tr '\n' ';' < "$W/chains_$TENANT.txt")"; fi
+    else bad "the tenant's chains differ in shape between our build and the vs2 extract: $(tr '\n' ';' < "$W/chains_$TENANT.txt")"
+        vs_ctl_show_err "$W/chains_$TENANT.txt" || true; fi   # the joined line hid a crash's header (#310 group 5)
     [ "$fail" = "$fail0" ] || { echo "FAIL: audit_victim_parity ($TENANT: rigs)"; exit 1; }
     echo "== 2. the legs (real picks, level + RNG pinned, one HP pin per event)"
     for p in $PARTS; do
@@ -279,7 +280,7 @@ PY
             $VP plant-p1 "$T" "$img" "$lay" "$W/planted.ft" --same "$SAME" > "$W/plant.log" && T="$W/planted.ft"; echo "MODE: p1-planted — $(cat "$W/plant.log")"
         fi
         if $VP p1check "$T" "$img" "$lay" "$ID" --same "$SAME" --from 2300 > "$W/p1_${p}_$leg.txt" 2>&1; then ok "part $p $leg: $(sed -n 1p "$W/p1_${p}_$leg.txt"); differing attack chains run: $(grep -c '^P1DIFF' "$W/p1_${p}_$leg.txt" | tr -d ' ') span(s) $(grep '^P1DIFF' "$W/p1_${p}_$leg.txt" | cut -d' ' -f2- | tr '\n' ' ')"
-        else bad "part $p $leg: $(grep FAIL "$W/p1_${p}_$leg.txt" | head -2 | tr '\n' ' ')"; fi
+        else bad "part $p $leg: $(grep FAIL "$W/p1_${p}_$leg.txt" | head -2 | tr '\n' ' ')"; vs_ctl_show_err "$W/p1_${p}_$leg.txt" || true; fi   # #310 group 5
     done; done
     if [ "$TENANT" = "$FIRST_T" ]; then
         p="${PARTS%% *}"

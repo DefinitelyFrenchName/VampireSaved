@@ -7866,3 +7866,20 @@ OPEN); when no record qualifies it says `NOT JUDGED:` and fails, never a crash o
 once the data around it has moved (14z-215: the tree as it is, every open issue closed — the parked->open branch — and
 no open issue left, in clean worktrees, `build/agent215/t341/recheck/`). `tests/test_tickets.sh` (control
 `parked-disagrees`) holds it.
+
+## A CRASH PLANTED ON EVERY CALL PROVES NOTHING ABOUT WHERE A GATE HIDES ONE — and a census counting `# MUST-FIRE:` lines anywhere counts a heredoc stub's header (paid: 14z-215, #310)
+
+#310 group 5's fourth unknown, test_rule_checker, was a question of whether a crash inside a mode's shadow copy reads
+HONOURED. The first measurement inserted a module-level `raise` into every shadow copy. It read DIED on the PRE-FIX
+gate too: one helper call whose stderr the probe does not capture put the traceback at column 0 regardless of the fix,
+so the measurement could not tell the two gates apart. Planted only where the probes capture output (a raise when the
+shadow runs as prepare/record/resolve, when the record modes' checker runs as check), the pre-fix gate read HONOURED for
+exactly the three modes the reading had named, and the fixed gate for none. Separately, a per-gate count of column-0
+`# MUST-FIRE:` lines ANYWHERE in a file counted test_ctl_show_err's heredoc stub header as a mode of that gate. The
+contract's reader, `vs_ctl_declared`, reads only the leading comment block, and `CONTROL=copy-mode` is REFUSED there.
+The same session found a moved-line control whose `re.subn` pattern still matched as a PREFIX of the renamed marker
+(`# VSE-TB` inside `# VSE-TB-MOVED`). **The rule:** a crash measurement is validated like any verdict ([VSP-19]): it
+must read HONOURED on the known-bad (pre-fix) leg before its clean reading on the fixed leg counts; plant the crash
+where the gate's own probe captures, not everywhere. Declared modes are counted with the contract's reader, never a grep
+of the whole file. A "moved line" plant removes the target, it does not rename it. Evidence:
+`build/agent215/t310/rcmeas/` (local); `tests/test_ctl_show_err.sh` case (e) holds the moved-line refusal.

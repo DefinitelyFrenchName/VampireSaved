@@ -32,6 +32,32 @@ fail() { echo "  FAIL: $*"; rc=1; }
 ok()   { echo "  ok: $*"; }
 
 T="$(mktemp -d)" || { echo "FAIL: test_release_reuse — mktemp -d failed (T)"; exit 2; }; trap 'rm -rf "$T"' EXIT INT TERM
+
+# A SHADOW RUNNER THAT ABORTED IS NOT ITS PERTURBATION CAUGHT (#310 group 5, 14z-215). Under a control mode the shadow
+# drives every section, and each section captures the runner's output and prints only what it greps, so the shell's own
+# error line about the shadow (`tests/<runner>.sh: line N: …`) never reached the log — and classify.sh's own-script
+# branch would not have matched it there (it names the runner, not this gate): a planted abort read HONOURED. Under a mode
+# only, `sh` is a function: a run_all_* invocation's stderr is kept, and the shell's own error lines about the script as
+# invoked are handed to tests/lib/controls.sh vs_ctl_show_err; what that prints is kept in $T/shadow_err.log and printed
+# by the EXIT trap, so the mode reads UNJUDGED. ONLY those lines: the runner's stderr legitimately carries a Python
+# traceback in some ground-truth cases (a --confirm plan that fails on a bad timestamp prints static_confirm.py's
+# ValueError), which would read every mode DIED. The plain run is untouched. The stderr goes through a FIFO and `tee`, so
+# it still streams as the runner writes it (the --confirm plan's progress lines, #259).
+# The identity tool's shadow is Python and its output stays inside the runner's files: under its modes the copy
+# carries an excepthook (TB-HOOK below) writing any traceback to $T/shadow_tb.log, which the EXIT trap re-prints.
+if [ -n "${VS_CTL:-}" ]; then
+    : > "$T/shadow_err.log"
+    trap 'cat "$T/shadow_err.log" 2>/dev/null; [ -s "$T/shadow_tb.log" ] && { vs_ctl_show_err "$T/shadow_tb.log" || :; }; rm -rf "$T"' EXIT INT TERM
+    sh() {
+        _she_t="$T/she.$(command sh -c 'echo "$PPID"')"; _she_s=0   # unique per live caller; inside $T, which the trap removes
+        mkfifo "$_she_t.f"; tee "$_she_t" < "$_she_t.f" >&2 & _she_p=$!
+        command sh "$@" 2>"$_she_t.f" || _she_s=$?
+        wait "$_she_p" || :
+        case "${1:-}" in *run_all_*) grep -a "^$1: " "$_she_t" > "$_she_t.own" || :
+            vs_ctl_show_err "$_she_t.own" - "$1" >> "$T/shadow_err.log" || : ;; esac
+        rm -f "$_she_t" "$_she_t.f" "$_she_t.own"; return "$_she_s"
+    }
+fi
 R="$T/repo"
 mkdir -p "$R/tests/lib" "$R/tools" "$R/tests/expected" "$T/roms" "$T/roms2"
 unset STATIC_JOBS STATIC_RESULTS_OUT MAME_BIN MERGED DON HUI PYR STOCK CONTROL 2>/dev/null || true
@@ -85,6 +111,19 @@ blind-romdir)     cp "$T/ri_blind_romdir.py" "$R/tools/reuse_identity.py" ;;
 release-reused)   cp "$T/ri_release_reused.py" "$R/tools/reuse_identity.py" ;;
 *)                cp tools/reuse_identity.py "$R/tools/reuse_identity.py" ;;
 esac
+if vs_ctl_is blind-tree || vs_ctl_is blind-instrument || vs_ctl_is blind-romdir || vs_ctl_is release-reused; then   # TB-HOOK
+    VS_SHADOW_TB="$T/shadow_tb.log"; export VS_SHADOW_TB
+    python3 - "$R/tools/reuse_identity.py" <<'PYX' || fail "could not give the shadow its excepthook"
+import sys
+p = sys.argv[1]; s = open(p).read()
+i = s.index('"""', s.index('"""') + 3) + 3   # after the module docstring (the tool has no __future__ import)
+hook = ("\nimport os as _tb_os, sys as _tb_sys, traceback as _tb_tb   # TB-HOOK (#310 group 5): a crash of this shadow is logged\n"
+        "def _tb_hook(*a, _h=_tb_sys.excepthook):\n"
+        "    open(_tb_os.environ['VS_SHADOW_TB'], 'a').write(''.join(_tb_tb.format_exception(*a))); _h(*a)\n"
+        "_tb_sys.excepthook = _tb_hook\n")
+open(p, "w").write(s[:i] + hook + s[i:])
+PYX
+fi
 printf '#!/usr/bin/env python3\nimport sys\n' > "$R/tools/audit_roms.py"
 printf '#!/usr/bin/env python3\nprint("deadbeefcafe")\n' > "$R/tools/build_fingerprint.py"
 chmod +x "$R/tests/run_all_static.sh" "$R/tests/run_all_emulator.sh" "$R/tools/audit_roms.py" "$R/tools/build_fingerprint.py"

@@ -76,7 +76,8 @@ perturb() {  # perturb NAME ROOT — a copy of the tree with one gate perturbed;
 root="."
 if [ -n "$VS_CTL" ]; then
     g="$(perturb "$VS_CTL" "$W/mode" | tail -1)"; root="$W/mode"
-    [ "$g" != NONE ] || { echo "FAIL: the perturbation could not be planted"; exit 1; }
+    # #310 group 6 (14z-215): a plant that did not apply is a REFUSAL (exit 3, read UNJUDGED), never the gate's FAIL
+    [ "$g" != NONE ] || { echo "REFUSED: $VS_CTL — the perturbation could not be planted (its target moved), so the mode judged nothing"; exit 3; }
     echo "MODE: control $VS_CTL — the census runs on a copy where $g.sh is perturbed"
 fi
 
@@ -109,9 +110,46 @@ moved="$(comm -3 "$W/live_leg.tsv" "$W/got_leg.tsv" | awk -F'\t' '{print $1":"$2
 echo "== 2. the known case: test_killshread_es samples ff8509 (stock) over the rig's poke, classed READS-BACK"
 if grep -qx "test_killshread_es	ff8509	FIELDS:stock" "$W/got.tsv"; then
     cls="$(awk -F'\t' '$1=="test_killshread_es" && $2=="ff8509" && $3=="FIELDS:stock" {print $4}' "$EXP")"
-    [ "$cls" = READS-BACK ] && ok "derived and classed READS-BACK" || bad "derived but classed '$cls' — the ruled case must read READS-BACK"
-else bad "the known case did NOT derive — the census is blind to its positive control"; fi
+    [ "$cls" = READS-BACK ] && ok "derived and classed READS-BACK" || { bad "derived but classed '$cls' — the ruled case must read READS-BACK"; known_red=1; }
+else bad "the known case did NOT derive — the census is blind to its positive control"; known_red=1; known_lost=1; fi
 for c in UNCLASSIFIED OBSERVES READS-BACK CONTROL-PLANT CROSS-LEG RETIRED; do printf '  %-13s %s\n' "$c" "$(awk -F'\t' -v c="$c" '!/^#/ && $4==c' "$EXP" | wc -l | tr -d ' ')"; done
+
+# THE MODE'S VERDICT (#310 group 6, 14z-215): the census ran on a PARTIAL copy of the tree, so a red counts as this
+# mode's finding only when it is EXACTLY its own — known-case-blind: the one stale row test_killshread_es:ff8509:stock and
+# the known case lost; the three synthetic gates: the one new row of $g — and nothing else is red. Any other row, a rig
+# that failed to generate or an empty census is NOT JUDGED (UNJUDGED); a crash's stderr is shown at column 0 (DIED); a
+# copy left green is this control dead (LIES). Until then any red on the copy read HONOURED.
+if [ -n "$VS_CTL" ]; then
+    grep -q 'Traceback' "$W/census.err" && cat "$W/census.err"
+    case "$VS_CTL" in
+        known-case-blind) want_new=""; want_stale="test_killshread_es	ff8509	FIELDS:stock" ;;
+        rig-poke-width)   want_new="$g	ff8850	FIELDS:p2white"; want_stale="" ;;
+        *)                want_new="$g	ff8782	FIELDS:id"; want_stale="" ;;
+    esac
+    other=""
+    [ "$n" -gt 0 ] || other="; the census on the copy derived nothing"
+    grep -q FAILED "$W/census.err" && other="$other; a rig failed to generate"
+    _x="$(printf '%s\n' "$new" | grep -vxF -e "$want_new" | grep . | tr '\t\n' ': ')"; [ -z "$_x" ] || other="$other; another new finding: $_x"
+    _x="$(printf '%s\n' "$stale" | grep -vxF -e "$want_stale" | grep . | tr '\t\n' ': ')"; [ -z "$_x" ] || other="$other; another stale row: $_x"
+    for _m in $moved; do case "$_m" in "$g:"*|":$g:"*) ;; *) other="$other; another row's leg: $_m" ;; esac; done
+    [ "$VS_CTL" = known-case-blind ] || [ -z "${known_red:-}" ] || other="$other; the known case is red"
+    if [ "$VS_CTL" = known-case-blind ]; then
+        [ "$stale" = "$want_stale" ] && [ -n "${known_lost:-}" ] && own="the known finding is gone (stale row and section 2)" || own=""
+    else
+        [ "$new" = "$want_new" ] && own="$g derives $(printf '%s' "$want_new" | cut -f2,3 | tr '\t' ' ') with no row" || own=""
+    fi
+    other="${other#; }"
+    if [ -n "$other" ]; then
+        echo "NOT JUDGED: $VS_CTL — the copy is red on something that is not this mode's own finding ($other), so its FAIL is not the perturbation caught"
+        echo "FAIL"; exit 1
+    elif [ -n "$own" ]; then
+        vs_ctl_fired "$VS_CTL" "$own, and nothing else on the copy is red (mode)"; echo "FAIL"; exit 1
+    elif [ "$fail" = 0 ]; then
+        vs_ctl_left_green "$VS_CTL" "FAIL: test_poke_readback — control mode $VS_CTL: the perturbed copy derived no finding of $g"
+    else
+        echo "NOT JUDGED: $VS_CTL — the copy is red, but not with this mode's own finding"; echo "FAIL"; exit 1
+    fi
+fi
 
 if [ -z "$VS_CTL" ]; then
     echo "== 3. controls"

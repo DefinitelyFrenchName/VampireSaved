@@ -60,6 +60,7 @@ EXPECT="$REPO/tests/expected/defense_rows_census.tsv"
 CONTROL="${CONTROL:-}"
 [ -f "$BUILD/verify_data.bin" ] || { echo "SKIP: no verify_data.bin in $BUILD"; exit 0; }
 case "$CONTROL" in ""|tenant-row-moved|reader-planted) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
+. "$REPO/tests/lib/controls.sh"   # vs_ctl_show_err (#310 group 5)
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0
 ok()  { printf '  ok    %s\n' "$1"; }
@@ -144,8 +145,9 @@ for t, n in ((0x10, "Phobos"), (0x11, "Pyron"), (0x13, "Donovan")):
     print(f"tenant\t{t:#04x}\t{n}\tours={cls(row(ou, DJ, t), vj, DJ)}\tthr={ou[TJ + t]:#04x}\tnative={cls(row(v2, D2, t), v2, D2)}\tthr={v2[T2 + t]:#04x}")
 PY
 }
-census "$W/vj_da.bin" "$W/v2_da.bin" "$W/ours_da.bin" > "$W/got.tsv" 2> "$W/sha.txt" || { bad "census: $(tail -1 "$W/sha.txt")"; }
-readers "$W/vj_op.bin" "$W/v2_op.bin" "$W/ours_op.bin" >> "$W/got.tsv" 2>> "$W/sha.txt" || { bad "reader census: $(tail -1 "$W/sha.txt")"; }
+# a census that CRASHED on the mode's perturbed view is not the perturbation caught (#310 group 5): its traceback is shown
+census "$W/vj_da.bin" "$W/v2_da.bin" "$W/ours_da.bin" > "$W/got.tsv" 2> "$W/sha.txt" || { bad "census: $(tail -1 "$W/sha.txt")"; vs_ctl_show_err "$W/sha.txt" || true; }
+readers "$W/vj_op.bin" "$W/v2_op.bin" "$W/ours_op.bin" >> "$W/got.tsv" 2>> "$W/sha.txt" || { bad "reader census: $(tail -1 "$W/sha.txt")"; vs_ctl_show_err "$W/sha.txt" || true; }
 [ "$fail" = 0 ] || { echo "FAIL: test_defense_rows_census"; exit 1; }
 sed 's/^/  /' "$W/sha.txt"
 echo "== 2. the census"
@@ -187,9 +189,12 @@ if [ "$CONTROL" = tenant-row-moved ]; then
     else echo "CONTROL DEAD: tenant-row-moved — the moved row changed nothing"; echo "FAIL: test_defense_rows_census"; exit 1; fi
 fi
 move_row "$W/ours_da.bin" "$W/ctl_da.bin"
-census "$W/vj_da.bin" "$W/v2_da.bin" "$W/ctl_da.bin" > "$W/ctl.tsv" 2>/dev/null || true
+census "$W/vj_da.bin" "$W/v2_da.bin" "$W/ctl_da.bin" > "$W/ctl.tsv" 2>"$W/ctl.err" || true
 grep -v '^reader' "$W/got.tsv" > "$W/got_census.tsv"   # like with like: ctl.tsv holds no reader rows (#310, 14z-213)
-if diff -q "$W/got_census.tsv" "$W/ctl.tsv" > /dev/null; then echo "CONTROL DEAD: tenant-row-moved — the census did not see the moved row"; fail=1
+if ! grep -q '^tenant	0x10	Phobos	' "$W/ctl.tsv"; then   # a positive Phobos row first: a crashed census gives none (#310 group 5)
+    vs_ctl_show_err "$W/ctl.err" || true
+    echo "CONTROL DEAD: tenant-row-moved — the census of the moved view printed no Phobos row (not the row seen moving)"; fail=1
+elif diff -q "$W/got_census.tsv" "$W/ctl.tsv" > /dev/null; then echo "CONTROL DEAD: tenant-row-moved — the census did not see the moved row"; fail=1
 else echo "CONTROL FIRED: tenant-row-moved — Phobos given his shell's row reads '$(awk -F'\t' '$1=="tenant" && $3=="Phobos" {print $4}' "$W/ctl.tsv")'"; fi
 
 if [ "$fail" = 0 ]; then echo "PASS: test_defense_rows_census"; else echo "FAIL: test_defense_rows_census"; exit 1; fi

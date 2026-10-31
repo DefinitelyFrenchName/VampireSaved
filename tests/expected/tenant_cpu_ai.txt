@@ -1,0 +1,40 @@
+# tests/expected/tenant_cpu_ai.txt — written by tests/audit_tenant_cpu_ai.sh FREEZE=1 (GitHub #129, 14z-215).
+# Evidence class: in-emulator (MAME -debug, logging breakpoints). Per leg: the build's whole-set key, each leg's
+# live window, Behaviour A (class-0x10 continuation-check calls, +0x1BC != 0, native refusals, returns of 1 with
+# +0x1BC != 0, continuations by +0x1BC before the increment and the frames of the 01 bucket), R (state 0x14 entries,
+# the ported caller's reaches, +0x1BC and d0 at each), B (native: entries of 0x2CD38, entries with no return read,
+# shadow-vs-return disagreements, real 1s at the return by class, exit-site formula mismatches, entries per return
+# address, the live (real, opponent +0x121) table and event frames; ours: crouch-block stops by (shadow, opponent
+# +0x121) and event frames — B's event counts are per leg, never compared between the builds).
+# Counts, frames and addresses only, no ROM bytes. VERIFY by re-running.
+BUILD f601342d7ec2d3f0fb7d06475856867c9dbfb633
+LIVE pa_native vsav2 window=2900-22880
+LIVE pa_ours vsavjw window=2900-22880
+LIVE pp_native vsav2 window=2900-22880
+LIVE pp_ours vsavjw window=2900-22880
+LIVE p2_native vsav2 window=2900-22880
+LIVE p2_ours vsavjw window=2900-22880
+LIVE lw_native vsav2 window=2900-15788
+LIVE lw_ours vsavjw window=2900-15068
+LIVE da_native vsav2 window=2900-22880
+A pa_native calls=585 nz=297 refused=297 ret1nz=0 cont={'00':17} cont1=[]
+R pa_native entries=[] reach=0 c1bc={} d0={}
+A pa_ours calls=473 nz=263 refused=- ret1nz=3 cont={'00':14,'01':3} cont1=[11797,14104,16929]
+R pa_ours entries=[] reach=0 c1bc={} d0={}
+A pp_native calls=386 nz=156 refused=156 ret1nz=0 cont={'00':14} cont1=[]
+R pp_native entries=[14976] reach=11 c1bc={'00':11} d0={0:10,1:1}
+A pp_ours calls=421 nz=156 refused=- ret1nz=0 cont={'00':18} cont1=[]
+R pp_ours entries=[] reach=0 c1bc={} d0={}
+A p2_native calls=1093 nz=425 refused=425 ret1nz=0 cont={'00':23} cont1=[]
+R p2_native entries=[18250] reach=31 c1bc={'00':31} d0={0:31}
+A p2_ours calls=710 nz=278 refused=- ret1nz=4 cont={'00':16,'01':4} cont1=[17488,18391,20218,20974]
+R p2_ours entries=[3493,11351,17430] reach=53 c1bc={'00':53} d0={0:51,1:2}
+B pa_native calls=34 unread=0 disagree=0 real1=3 real1_class={'02':3} xchk=0 rets={'021a72':5,'021b52':2,'021be0':3,'022516':2,'0236fe':22} live={(0,'00'):31,(1,'01'):3} event=[]
+B pa_ours blocks=48 live={('0','00'):48} event=[]
+B pp_native calls=0 unread=0 disagree=0 real1=0 real1_class={} xchk=0 rets={} live={} event=[]
+B pp_ours blocks=0 live={} event=[]
+B p2_native calls=117 unread=0 disagree=0 real1=6 real1_class={'02':6} xchk=0 rets={'021a72':17,'021b52':2,'021be0':9,'022516':7,'0236fe':82} live={(0,'00'):97,(0,'01'):14,(1,'01'):6} event=[]
+B p2_ours blocks=66 live={('0','00'):46,('0','01'):14,('1','01'):6} event=[]
+B lw_native calls=185 unread=0 disagree=0 real1=6 real1_class={'02':6} xchk=0 rets={'021a72':49,'021b52':14,'021be0':4,'022516':11,'0236fe':103,'02cd18':4} live={(0,'00'):11,(1,'00'):6} event=[8446,8447,8455,8456,8457,8457]
+B lw_ours blocks=9 live={('0','00'):7,('1','00'):2} event=[9358,9358]
+B da_native calls=158 unread=0 disagree=0 real1=24 real1_class={'02':24} xchk=0 rets={'021a72':56,'021be0':9,'022516':9,'0236fe':84} live={(0,'00'):89,(0,'01'):45,(1,'01'):24} event=[]

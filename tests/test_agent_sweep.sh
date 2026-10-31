@@ -260,6 +260,17 @@ print(f"SUMMARY named {len(rows)} (want {1 + len(want_sig)}) mismatches {len(bad
 PY
 }
 
+# swept <world dir> — A SWEEP THAT CRASHED REPORTED NOTHING (#310 group 5, 14z-215): true when the sweep (or its copy)
+# reached its verdict line (SURVIVORS / CLEAN) in phase 1 and no phase crashed; a crash is re-printed at column 0 by
+# tests/lib/controls.sh vs_ctl_show_err. Every planted item mismatches on a crashed sweep, which the mode read as its
+# finding and the in-gate twin as the control firing.
+swept() {
+    _sw_ok=0
+    for _sw_k in r1 r2 r3; do [ -f "$1/$_sw_k.txt" ] && { vs_ctl_show_err "$1/$_sw_k.txt" || _sw_ok=1; }; done
+    grep -qE '^(SURVIVORS |CLEAN)' "$1/r1.txt" 2>/dev/null || _sw_ok=1
+    return "$_sw_ok"
+}
+
 echo "== test_agent_sweep: #172 slice S2 — C0.3 against a planted process world =="
 fail=0
 SW=tools/agent/sweep.py
@@ -267,7 +278,8 @@ if vs_ctl_is blind-orphans || vs_ctl_is blind-cwd || vs_ctl_is blind-leaders || 
 world "$SW" "$W/main" > "$W/main.txt"
 sed -n '/^MISMATCH/p' "$W/main.txt" | head -12 | sed 's/^/  /'
 tail -1 "$W/main.txt" | sed 's/^/  /'
-grep -q ' mismatches 0$' "$W/main.txt" || { echo "FAIL: the sweep's report disagrees with the planted world"; sed 's/^/    | /' "$W/main/r1.txt" 2>/dev/null | head -30; fail=1; }
+grep -q ' mismatches 0$' "$W/main.txt" || { echo "FAIL: the sweep's report disagrees with the planted world"; sed 's/^/    | /' "$W/main/r1.txt" 2>/dev/null | head -30; fail=1
+    swept "$W/main" || { [ -n "${VS_CTL:-}" ] && echo "NOT JUDGED: $VS_CTL — the sweep copy reached no verdict line, so the planted world was not judged"; } || true; }
 
 # THE PLATFORM FACT THE DESIGN RESTS ON (macOS only; rule-checker run 2026-09-23-105, Q1):
 # an inherited variable is READABLE (`ps -E`) for a CLT Python and HIDDEN for Apple's own
@@ -304,7 +316,8 @@ if [ -z "${VS_CTL:-}" ]; then
     for c in blind-orphans blind-cwd blind-leaders zombie-named; do
         world "$(make_copy "$c")" "$W/ctl_$c" > "$W/ctl_$c.txt"
         k=$(grep -c '^MISMATCH' "$W/ctl_$c.txt" || true)
-        if [ "${k:-0}" -gt 0 ]; then vs_ctl_fired "$c" "$k mismatches on the perturbed copy, e.g. $(grep -m1 '^MISMATCH' "$W/ctl_$c.txt" | cut -c10-110)"
+        if ! swept "$W/ctl_$c"; then vs_ctl_dead "$c" "the perturbed copy reached no verdict line — not the planted world misread" || fail=1
+        elif [ "${k:-0}" -gt 0 ]; then vs_ctl_fired "$c" "$k mismatches on the perturbed copy, e.g. $(grep -m1 '^MISMATCH' "$W/ctl_$c.txt" | cut -c10-110)"
         else vs_ctl_dead "$c" "the perturbed copy matched the planted world — the gate cannot see this failure" || fail=1; fi
     done
 fi

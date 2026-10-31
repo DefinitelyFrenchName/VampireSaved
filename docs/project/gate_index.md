@@ -16,18 +16,18 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**490 scripts** — 150 ci_portable, 93 ci_static, 247 emulator-tier (run by name).
+**501 scripts** — 154 ci_portable, 93 ci_static, 254 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
-| [runner](#runner) | 57 | the suite runners and their own ground truth |
+| [runner](#runner) | 61 | the suite runners and their own ground truth |
 | [docs](#docs) | 27 | the documentation locks — docs, skills, indexes, tables follow the tree |
 | [platform](#platform) | 50 | the emulators and the ROM images as instruments — builds, decrypt, replay determinism, harness hygiene |
 | [pipeline](#pipeline) | 62 | the build pipeline — manifests, patch ops, extraction/reconciliation/generation law, static censuses |
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
-| [tenant](#tenant) | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 95 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [tenant](#tenant) | 88 | tenant content — per-character gates and on-demand audits on the ported characters |
+| [character-data](#character-data) | 101 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 38 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -58,6 +58,8 @@ the suite runners and their own ground truth.
 | `tests/test_control_classifier.sh` | test | ci_portable | — | THE CONTROL CLASSIFIER'S #310 RULES ON KNOWN ANSWERS (14z-213). ci_portable: no ROM, ~1 s. | 14z-213 |
 | `tests/test_controls_concurrent.sh` | test | ci_portable | — | THE CONCURRENT-CONTROLS LIST STILL DESCRIBES THE GATES IT NAMES (#315, 14z-207). ci_portable: no ROM, ~2 s. | 14z-207 |
 | `tests/test_controls_contract.sh` | test | ci_portable | — | ground truth for THE MUST-FIRE CONTRACT'S READER, tests/lib/controls.sh: the four regexes of the R10 grammar, the leading comment block as the header (a bare `#` continues it, a non-comment line ends it), the declared-vs-fired readback the… | 14z-147 |
+| `tests/test_ctl_show_err.sh` | test | ci_portable | — | A PERTURBED COPY THAT CRASHED IS NOT THE CONTROL FIRING (#310 group 5, 14z-215). ci_portable: no ROM, ~3 s. | 14z-215 |
+| `tests/test_dead_exit_census.sh` | test | ci_portable | — | NO CONTROL MODE'S DEAD BRANCH IS PRINTED IN WORDS ONLY (#310 group 2, 14z-215). ci_portable: no ROM, ~2 s. | 14z-215 |
 | `tests/test_demand_after_trap.sh` | test | ci_portable | — | no gate carries a `${VAR:?msg}` DEMAND after its EXIT trap (14z-134). ci_portable: no ROM, no build dir, no emulator, ~1 s. | 14z-134 |
 | `tests/test_emu_run_compare.sh` | test | ci_portable | — | two emulator-tier runs are compared per row over what BOTH ran and BOTH passed (`tools/emu_run_compare.py`, 14z-193, GitHub #122). | 14z-193 |
 | `tests/test_emulator_runner.sh` | test | ci_portable | — | ground truth for tests/run_all_emulator.sh (14z-128). ROM-free, ~72 s (measured 14z-210 on the Mac; ~26 s at 14z-162, before sections 18-19). | 14z-128 |
@@ -66,12 +68,14 @@ the suite runners and their own ground truth.
 | `tests/test_freeze_set_shape.sh` | test | ci_portable | — | every numbered expectation set LOSES NOTHING its predecessor held, and the committed freeze driver carries, pins, verifies and cleans up in that order (`tools/freeze_set_shape.py`, `tools/freeze_expectation_set.py`; 14z-185b, GitHub #150). | 14z-185b |
 | `tests/test_gate_follows.sh` | test | ci_portable | — | EVERY EMULATOR-TIER GATE DECLARES WHAT IT FOLLOWS, and no declaration is narrower than what the gate's own text reads (GitHub #171 slice Q3, ruled 2026-09-24 "Header line" — DECISIONS_HISTORY.md "Ruled 2026-09-24 (14z-180) — #171 gate quali… | 2026-09-24 |
 | `tests/test_header_defaults.sh` | test | ci_portable | — | a gate's HEADER must state the default its CODE actually uses (14z-128). ROM-free, ~2 s. | 14z-128 |
+| `tests/test_instr_align_unjudged.sh` | test | ci_portable | — | A DRIFT-FAMILY MODE RUN THAT MEASURED NOTHING, OR TESTED NOTHING, IS NOT HONOURED (#310 group 1, 14z-215). ci_portable: no ROM, ~2 s. | 14z-215 |
 | `tests/test_lane_carry.sh` | test | ci_portable | — | ground truth for tools/audit_lane_carry.py: a lane's carry verdict is derived from its gates' `# FOLLOWS:` declarations and fails when one moved or one is missing (GitHub #171 slice Q3; the tool itself 14z-174). ci_portable: | 14z-174 |
 | `tests/test_ledger_page.sh` | test | ci_portable | — | the public session ledger page carries the datasets whole, withholds the maintainer's own figures, fetches nothing, and is published as one orphan commit on gh-pages (GitHub #267, 14z-212). | 14z-212 |
 | `tests/test_mame_bin_pinned.sh` | test | ci_portable | — | a gate that boots `vsavjw` through a MAME wrapper must PIN the MAME binary (14z-133). ROM-free, ~1 s. | 14z-133 |
 | `tests/test_measures_contract.sh` | test | ci_portable | — | ground truth for THE MEASUREMENT CONTRACT'S READER, tests/lib/measures.sh: the `# MEASURES: <name> — <floor>` header grammar, the `MEASURED: | 2026-09-24 |
 | `tests/test_module_refs.sh` | test | ci_portable | — | EVERY CROSS-MODULE PYTHON NAME THE TOOLS AND GATES REFERENCE STILL EXISTS (GitHub #171 slice Q1, ruled 2026-09-24 — DECISIONS_HISTORY.md "Ruled 2026-09-24 (14z-180) — #171 gate qualification", "Land it now"). ci_portable: | 2026-09-24 |
 | `tests/test_must_fire_census.sh` | test | ci_portable | — | THE MUST-FIRE DOCTRINE, MACHINE-READ under the R10 grammar: which gates DECLARE a must-fire control (`# MUST-FIRE: <shape>: | 14z-145 |
+| `tests/test_plants_not_applied.sh` | test | ci_portable | — | A CONTROL MODE WHOSE PLANT DID NOT APPLY, OR WHOSE COPY IS RED ON ANOTHER FINDING, NEVER READS HONOURED (#310 group 6, 14z-215). ci_portable: no ROM, no emulator, ~45 s. | 14z-215 |
 | `tests/test_poke_readback.sh` | test | ci_portable | — | EVERY GATE THAT SAMPLES AN ADDRESS ITS OWN RIG POKES IS ON THE TABLE, and the table's classification is the maintainer's, not the tool's (GitHub #171 slice Q6, shape 4 of docs/project/gate_qualification_scope.md). ci_portable: | 14z-180 |
 | `tests/test_promise_check.sh` | test | ci_portable | — | every promise a sitting's record makes is classed FULFILLED, CARRIED or NOT A PROMISE, and each class holds (`tools/promise_check.py`, 14z-187b, GitHub #190 P3). | 14z-187b |
 | `tests/test_proof_sheets.sh` | test | emulator | MAME, a build dir, ~17 s | THE COMPARATIVE SHEETS' PROOF IS ITSELF TESTED ([VSP-19]; GitHub #291 slice S1, 14z-204). | 14z-204 |
@@ -359,10 +363,11 @@ tenant content — per-character gates and on-demand audits on the ported charac
 | `tests/audit_stage_sweep.sh` | audit | emulator | MAME, a build dir, ~6 min | EVERY TENANT ON EVERY STAGE (14z-104, the §4 "each stage" cell — no stage sweep existed anywhere before this). | 14z-104 |
 | `tests/audit_tech_roll.sh` | audit | emulator | MAME, a build dir, ~1 min | THE TECH ROLL (moving recovery), both directions per tenant, plus the pursuit-vs-roll counter (14z-104 (3); coverage matrix gap 1, maintainer-described mechanic 2026-08-22). | 14z-104 (3) |
 | `tests/audit_tenant_continue_switch.sh` | audit | emulator | MAME, FBNeo, a build dir, ~1.5 min | A TENANT CPU OPPONENT SURVIVES A CONTINUE-AND-SWITCH (GitHub #202, 14z-189): lose to CPU Phobos as Donovan, continue, answer NO to "same character?" and pick Aulbath, and the ladder's re-pick is SKIPPED by the 14z-87 keep-tenant thunk — Aul… | 14z-189 |
+| `tests/audit_tenant_cpu_ai.sh` | audit | emulator | MAME, vsav2 and a build dir, ~1 min at JOBS=5 | THE TENANT CPU-AI DECISION POINTS, COUNTED AT THEIR BREAKPOINTS: PHOBOS'S CONTINUATION GUARD (BEHAVIOUR A), HIS PORTED CALLER 0x416312, AND VS2'S LOW-ATTACK CROUCH TEST (BEHAVIOUR B), OURS AGAINST NATIVE VSAV2 (GitHub #129, 14z-215; | 14z-215 (#129) |
 | `tests/audit_tenant_cpu_soak.sh` | audit | emulator | MAME, FBNeo, a build dir | THE TENANT CPU SOAK: what each tenant does as a CPU opponent on our build, against the same character's CPU on native vsav2, as DISTRIBUTIONS over a long round (GitHub #129, 14z-189) | 14z-189 |
-| `tests/audit_tenant_downwin.sh` | audit | emulator | MAME, a build dir, ~1.5 min | THE LIFE-MARKER TRANSITION (KO-path judge), both directions per tenant (14z-104). | 14z-104 |
+| `tests/audit_tenant_downwin.sh` | audit | emulator | MAME, a build dir, ~1.5 min | THE LIFE-MARKER TRANSITION (KO-path judge), both directions per tenant (14z-104; the KO a true last-bar death and the first down added, 14z-215, GitHub #343). | 14z-104 |
 | `tests/audit_tenant_throws.sh` | audit | emulator | MAME, a build dir, ~1 min | NORMAL THROWS, both directions per tenant (14z-104, coverage matrix). | 14z-104 |
-| `tests/audit_tenant_timeout.sh` | audit | emulator | MAME, a build dir, ~2 min | THE TIMEOUT JUDGE, per tenant (14z-104). | 14z-104 |
+| `tests/audit_tenant_timeout.sh` | audit | emulator | MAME, a build dir, ~2 min | THE TIMEOUT JUDGE, per tenant (14z-104; the side of the down read from $FF8105 since 14z-215, GitHub #342; the time over read as the MATCH's end since 14z-215, GitHub #343). | 14z-104 |
 | `tests/audit_throw_tech.sh` | audit | emulator | MAME, a build dir, ~1 min | THE THROW TECH-HIT (escape), both directions per tenant (14z-104 (3); coverage matrix gap 1's second half). | 14z-104 (3) |
 | `tests/audit_trap_air_hit.sh` | audit | emulator | MAME, a build dir, ~2 min | THE PLASMA TRAP DOME HITS AN AIRBORNE VICTIM, native vs2 and ours alike (14z-182, GitHub #175): Felicia's j.HP, whose node 4 carries a hurtbox reaching below her feet, meets the dome's flat box on her last descent frame (y 42) and is hit IN… | 14z-182 |
 | `tests/audit_trap_airborne.sh` | audit | emulator | MAME, a build dir, ~1 min | THE PLASMA TRAP DOME AND A JUMPING VICTOR, native vs merged (14z-181, GitHub #163's last open item): the dome NEVER connects with the victim in the air — he jumps over the active dome to apex 127 and is hit on the frame he lands (y back to… | 14z-181 |
@@ -425,6 +430,8 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 |---|---|---|---|---|---|
 | `tests/audit_air_dash_height.sh` | audit | emulator | MAME, a build dir, ~2 min | PHOBOS'S AIR DASH UNDER vs2's MINIMUM HEIGHT: native refuses it, and since M23 ours does too (GitHub #222, measured in play 14z-191, closed 14z-192). Emulator tier (MAME), ~2 min. | 14z-191 |
 | `tests/audit_air_gc_legacy.sh` | audit | emulator | MAME, FBNeo, a build dir, ~7 s | THE LEGACY CONTROL FOR #182: no original character's AIR block opens the guard window or commits a guard cancel, on pristine vsavj, native vs2 or ours (14z-185, GitHub #182). | 14z-185 |
+| `tests/audit_anakaris_rows.sh` | audit | emulator | MAME, ~3 min | FIVE MIZUUMI PLAYER-STRUCT CANDIDATES ON ANAKARIS, MEASURED ON PRISTINE VSAVJ: +0x152 IS HIS HOVER TIMER, +0x156 AND +0x1A0 THE VICTIM'S CURSE TIMER AND FLAG, +0x1AA THE LOSER'S FLAG THAT PICKS HIS WIN POSE, +0x374 THE X OF HIS MUMMY DROP H… | 14z-215 |
+| `tests/audit_bishamon_charge_316.sh` | audit | emulator | MAME, ~2 min | BISHAMON'S [CHARGE]6+K ON PRISTINE VSAVJ: +0x316 COUNTS THE LOGIC PASSES BACK (OR DOWN-BACK) IS HELD, AND ITS VALUE WHEN 6+K COMPLETES PICKS THE IAI GIRI LOW'S LEVEL (0 BELOW 70, 1 BELOW 110, ELSE 2) (measured 14z-215, GitHub #118 batch B7;… | 14z-215 |
 | `tests/audit_chains174.sh` | audit | emulator | MAME, a build dir, ~2 min | THE TENANTS' ONCE NEVER-ENTERED a2 ATTACK CHAINS, ENTERED ON NATIVE AND COMPARED WITH OURS (GitHub #174, 14z-184). | 14z-184 |
 | `tests/audit_chains184.sh` | audit | emulator | MAME, FBNeo, a build dir, ~3 min | THE TENANTS' ONCE NEVER-ENTERED a2 CHAINS WITH NO ATTACK RECORD, ENTERED ON NATIVE AND COMPARED WITH OURS (GitHub #184, 14z-186). | 14z-186 |
 | `tests/audit_column_flash.sh` | audit | emulator | MAME, FBNeo, a build dir | THE ORANGE FLASH ON THE DEITY AS DONOVAN'S KILLSHREAD LIGHTNING COLUMN ENDS, frozen AS MEASURED (14z-170, the maintainer's capture read): | 14z-170 |
@@ -462,10 +469,14 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/audit_lag_budget.sh` | audit | emulator | MAME, FBNeo, a build dir | A FIX SET ADDS NO FRAME OF LAG: over every #136 naming part (the three tenants' moves, and legacy attackers against each tenant), the build under test has no zero-pass frame that the reference build — the one before the fixes — does not hav… | 14z-170 |
 | `tests/audit_landing_sound.sh` | audit | emulator | MAME, a build dir, ~5 min | THE TENANTS' LANDING SOUND, ours against native vs2 (GitHub #223). Emulator tier (MAME), ~5 min. | 14z-192 |
 | `tests/audit_latch_reads.sh` | audit | emulator | MAME, a build dir, ~2 min | WHO READS THE SELECT-CONFIRM LATCH IN PLAY, per leg shape, with the VALUE each reader saw: the measured half of the #151 step-3 sweep, frozen (14z-161). | 14z-161 |
+| `tests/audit_lilith_gps_counter.sh` | audit | emulator | MAME, ~1 min | LILITH'S GLOOMY PUPPET SHOW ON PRISTINE VSAVJ: +0x14C IS 1 EXACTLY WHILE THE THROWN HAT (A TYPE-0x36 PROJECTILE) IS LIVE, RAISED AT ITS SPAWN AND LOWERED AT ITS DEATH; | 14z-215 |
 | `tests/audit_marionette_cost.sh` | audit | emulator | MAME, FBNeo, ~8 min | WHAT A MARIONETTE PORT WOULD COST vsavj: every place vs2 touches her flag +0x3C3, the vsavj instruction a port would have to hook there, how often LEGACY content executes each one, and her assets' size (14z-189, GitHub #128 — the maintainer… | 14z-189 |
+| `tests/audit_mizuumi_354_3a8.sh` | audit | emulator | MAME, ~2.5 min | TWO MIZUUMI PLAYER-STRUCT CANDIDATES ON EXISTING REPLAYS — +0x354 IS JEDAH'S CHILD-OBJECT POINTER WORD (AND DEMITRI'S X-HISTORY WORD), +0x3A8 THE GFX-RAM ADDRESS OF THE FIGHTER'S OWN PALETTE ROW | — |
 | `tests/audit_mizuumi_attack.sh` | audit | emulator | MAME, FBNeo, ~2 min | THE ATTACK-START FIELDS OF THE FIGHTER BLOCK, MEASURED (14z-195, promoted from the #118 pilot of 14z-194, GitHub #118; HOMING item 3, in part — see NOT COVERED) | 14z-195 |
+| `tests/audit_mizuumi_finishes.sh` | audit | emulator | MAME, ~2.5 min | THE FINISH TYPE IN THE KO WINNER'S +0x3B6, ONE KIND PER LEG, AND THE TWO COUNTERS IT FEEDS: +0x3BE COUNTS FINISH TYPES 3, 4 AND 6, +0x3BF TYPE 4 ONLY, ON EITHER SIDE, HUMAN WINNERS (measured 14z-215, GitHub #118 batch B2; | 14z-215 |
 | `tests/audit_mizuumi_inputs.sh` | audit | emulator | MAME, FBNeo, ~2 min | THE INPUT WORDS OF THE FIGHTER BLOCK, PREDICTED EXACTLY FROM THEIR STATIC MECHANISM (14z-195, promoted from the #118 pilot of 14z-194, GitHub #118; HOMING item 1) | 14z-195 |
 | `tests/audit_mizuumi_rows_b.sh` | audit | emulator | MAME, ~1 min | THREE MORE MIZUUMI PLAYER-STRUCT CANDIDATES, MEASURED ON EXISTING REPLAYS: +0x3A8 IS A LONG (A GFX-RAM ADDRESS), +0x384 A PER-PLAYER STATE INDEX, AND +0x3BE COUNTS ONLY THE KOs WHOSE FINISH TYPE IS 3, 4 OR 6 (measured 14z-214, GitHub #118: | 14z-214 |
+| `tests/audit_mizuumi_rows_c.sh` | audit | emulator | MAME, a build dir, ~25 s | THREE MORE MIZUUMI PLAYER-STRUCT CANDIDATES ON RIGS: +0x37F IS FELICIA'S 8-TICK HEADSIT LOCKOUT, SET WHEN SHE LEAVES A HEADSIT; +0x366 IS THE ZERO LOW WORD OF GALLON'S +0x364 LONG; | 14z-215 |
 | `tests/audit_mizuumi_struct.sh` | audit | emulator | MAME, FBNeo, a build dir, ~4 min | THE MIZUUMI PLAYER-STRUCT CANDIDATES, MEASURED: the offsets adopted into atlas/ram.md from the community's Reverse Engineering page, each held by a check whose CONTROL would disagree (14z-189, GitHub #118) | 14z-189 |
 | `tests/audit_move_parity.sh` | audit | emulator | MAME, a build dir | EVERY TENANT MOVE, OURS vs NATIVE vsav2, AT A MATCHED SPEED LEVEL AND A PINNED RNG (GitHub #136, 14z-159). | 14z-159 |
 | `tests/audit_move_parity_attribution.sh` | audit | emulator | MAME, a build dir, ~5 min | EVERY DIFF ROW OF THE #136 MOVE-PARITY TABLE HAS A MEASURED CAUSE, frozen (14z-168, GitHub #136): each root found by ablation (its event's inputs removed, both legs re-run, the rows that vanish are its) and named by a measured signature; | 14z-168 |

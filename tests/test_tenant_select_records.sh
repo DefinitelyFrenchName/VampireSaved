@@ -397,7 +397,7 @@ if [ "${SKIP_RUNTIME:-0}" != 1 ]; then
     ia_stage test_tenant_select_records "$CLOCKS" "$REPO/tests/lua/trace_writes.lua" "$WORK/manifest.tsv" 1 "$WORK/st" "$MODE" 3 || fail=1
     if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
         [ "$fail" = 1 ] && { echo "FAIL: tenant select-records gate (control mode: $MODE)"; exit 1; }
-        echo "FAIL: tenant select-records gate — control mode $MODE left the gate green"; exit 1
+        vs_ctl_left_green "$MODE" "FAIL: tenant select-records gate — control mode $MODE left the gate green"
     fi
     if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || fail=1; fi
     if [ "$IA_SKIP" = fired ]; then vs_ctl_fired first-frame-skip "$IA_SKIP_MSG"; else vs_ctl_dead first-frame-skip "$IA_SKIP_MSG" || fail=1; fi

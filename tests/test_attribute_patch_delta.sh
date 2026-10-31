@@ -50,6 +50,8 @@ if [ "$rc" = 0 ] && grep -q '^NOTE: no .*gen.log' "$W/solo.txt" && grep -q '^ali
     echo "  ok: exit 0, $(grep -c 'EDIT op' "$W/solo.txt" | tr -d ' ') EDIT line(s), the absent notes named"
 else
     echo "  FAIL: rc=$rc"; tail -3 "$W/solo.txt" | sed 's/^/      /'; fail=1
+    # #310 group 5: under the mode the honoured outcome IS the copy's FileNotFoundError; any other end is NOT JUDGED
+    if vs_ctl_is gen-log-required; then vs_ctl_show_err "$W/solo.txt" FileNotFoundError || true; fi
 fi
 
 echo "-- 2. the merged pair $MRG_OLD -> $MRG_NEW (gen.log present)"
@@ -63,7 +65,7 @@ fi
 if [ -z "${VS_CTL:-}" ]; then
     echo "-- 3. control: the unconditional open must stop on the solo pair"
     rc=0; python3 "$(make_copy)" "$SOLO_OLD" "$SOLO_NEW" > "$W/ctl.txt" 2>&1 || rc=$?
-    if [ "$rc" != 0 ] && grep -q 'FileNotFoundError' "$W/ctl.txt"; then
+    if [ "$rc" != 0 ] && grep -q 'FileNotFoundError' "$W/ctl.txt" && vs_ctl_show_err "$W/ctl.txt" FileNotFoundError; then
         vs_ctl_fired gen-log-required "the pre-#231 copy stops (rc=$rc, FileNotFoundError on $SOLO_NEW/gen.log)"
     else
         vs_ctl_dead gen-log-required "the pre-#231 copy did not stop (rc=$rc)" || fail=1

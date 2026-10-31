@@ -1,0 +1,1 @@
+WITHDRAWN unspawned (14z-215): closing_comment_343.md said 'The 24 poke read-back findings the changed gates derived' (these three gates derived 16 of the 24; #118's gates the other 8), and the three patches the claim cites were not artifacts. Re-prepared.

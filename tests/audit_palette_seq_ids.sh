@@ -279,7 +279,7 @@ if [ "$CORPUS" = 0 ]; then
     ia_stage audit_palette_seq_ids "$CLOCKS" "$REPO/tests/lua/replay_guard.lua" "$W/manifest.tsv" 1 "$W/st" "$MODE" || afail=1
     if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
         [ "$afail" = 1 ] && { echo "FAIL: audit_palette_seq_ids (control mode: $MODE)"; exit 1; }
-        echo "FAIL: audit_palette_seq_ids — control mode $MODE left the gate green"; exit 1
+        vs_ctl_left_green "$MODE" "FAIL: audit_palette_seq_ids — control mode $MODE left the gate green"
     fi
     if [ "$IA_DRIFT" = fired ]; then vs_ctl_fired drift-clock "$IA_DRIFT_MSG"; else vs_ctl_dead drift-clock "$IA_DRIFT_MSG" || afail=1; fi
     if [ "$IA_SKIP" = fired ]; then vs_ctl_fired first-frame-skip "$IA_SKIP_MSG"; else vs_ctl_dead first-frame-skip "$IA_SKIP_MSG" || afail=1; fi

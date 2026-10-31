@@ -138,13 +138,15 @@ judge() {
         r="$(python3 tools/cleanhost_libs.py "$f" "/work/$e" tests/expected/linux_host_provided.tsv "$@" 2>&1)" && rc=0 || rc=1
         s="$(echo "$r" | tail -1)"; echo "      $(basename "$f"): $s"
         echo "$r" | grep -E 'UNLISTED|UNRESOLVED' | sed 's/^/        /' || true
-        [ "$rc" = 0 ] || C1_OK=0
+        # a tool that CRASHED exits 1 like an UNLISTED finding; its traceback is re-printed and CRASH set (#310 group 5)
+        [ "$rc" = 0 ] || { C1_OK=0; printf '%s\n' "$r" > "$d/cleanhost.out"; vs_ctl_show_err "$d/cleanhost.out" || CRASH=1; }
         case "$s" in "CLEANHOST asked=0 "*) ;; "CLEANHOST asked="*) RAN=1 ;; esac
     done
 }
 
 DROP=""; vs_ctl_is list-minus-one && DROP="--drop libGL.so.1"
 P="$PKGS"; vs_ctl_is uninstalled-host-lib && P="$(echo $PKGS | tr ' ' '\n' | grep -vx libasound2t64 | tr '\n' ' ')"
+CRASH=0
 for e in fbneo mame; do
     echo "== $e: a stock $IMAGE, the list's packages only"
     crun "$e" real "$P"
@@ -158,6 +160,7 @@ for e in fbneo mame; do
 done
 
 if [ -n "${VS_CTL:-}" ]; then
+    [ "$fail" = 1 ] && [ "$CRASH" = 1 ] && { echo "NOT JUDGED: $VS_CTL — tools/cleanhost_libs.py crashed on the perturbed run (above), so C1/C2 judged nothing"; echo "FAIL: audit_release_linux_cleanhost (control mode)"; exit 1; }
     [ "$fail" = 1 ] && { vs_ctl_fired "$VS_CTL" "the perturbed run failed (mode)"; echo "FAIL: audit_release_linux_cleanhost (control mode)"; exit 1; }
     echo "REFUSED: CONTROL=$VS_CTL — the perturbation did not make the gate fail: a dead mode, not a verdict"; exit 3
 fi
@@ -166,10 +169,10 @@ echo "== controls"
 # list-minus-one, in-gate on the real runs' logs
 got=""; dead=""
 for e in fbneo mame; do
-    judge "$e" real --drop libGL.so.1 > "$OUT/$e.real/ctl_list.txt"
-    [ "$C1_OK" = 0 ] && got="$got $e" || dead="$dead $e"
+    CRASH=0; judge "$e" real --drop libGL.so.1 > "$OUT/$e.real/ctl_list.txt"
+    [ "$C1_OK" = 0 ] && [ "$CRASH" = 0 ] && got="$got $e" || dead="$dead $e"   # a crash is not C1 failing (#310 group 5)
 done
-[ -z "$dead" ] && vs_ctl_fired list-minus-one "C1 failed on$got with libGL.so.1 dropped from the list" || { vs_ctl_dead list-minus-one "C1 passed on:$dead" || fail=1; }
+[ -z "$dead" ] && vs_ctl_fired list-minus-one "C1 failed on$got with libGL.so.1 dropped from the list" || { vs_ctl_dead list-minus-one "C1 passed (or its tool crashed) on:$dead" || fail=1; }
 # uninstalled-host-lib: one container without libasound2t64 (the FBNeo package)
 crun fbneo noasound "$(echo $PKGS | tr ' ' '\n' | grep -vx libasound2t64 | tr '\n' ' ')"
 judge fbneo noasound > "$OUT/fbneo.noasound/judge.txt"

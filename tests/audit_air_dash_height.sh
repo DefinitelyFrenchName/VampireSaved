@@ -59,7 +59,7 @@ python3 tools/air_dash_rigs.py compare "$J" "$W/tr_native.txt" "$W/tr_ours.txt" 
 [ "$rc" = 0 ] || fail=1
 if vs_ctl_is native-dash-planted; then
     [ "$fail" = 1 ] && { echo "FAIL: audit_air_dash_height (control mode: the planted native dash broke the compare)"; exit 1; }
-    echo "FAIL: audit_air_dash_height — the planted native dash still passed"; exit 1
+    vs_ctl_left_green "native-dash-planted" "FAIL: audit_air_dash_height — the planted native dash still passed"
 fi
 echo "== 2. control"
 python3 tools/air_dash_rigs.py compare "$J" "$W/tr_native.txt" "$W/tr_ours.txt" --expect "$EXPECT" --plant-native-dash > "$W/ctl.txt" 2>&1

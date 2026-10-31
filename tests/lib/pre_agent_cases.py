@@ -59,6 +59,7 @@ def run_hook(event, base):
     p = subprocess.run([sys.executable, HOOK], input=event if isinstance(event, str) else json.dumps(event),
                        capture_output=True, text=True, env=env, timeout=20)
     if p.returncode != 0:
+        sys.stdout.write(p.stderr)   # a hook that crashed: its traceback kept for the gate's vs_ctl_show_err (#310 group 5)
         return f"exit{p.returncode}"
     out = p.stdout.strip()
     return json.loads(out)["hookSpecificOutput"]["permissionDecision"] if out else "allow"

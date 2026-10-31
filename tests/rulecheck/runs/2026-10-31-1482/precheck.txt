@@ -1,0 +1,6 @@
+  FLAG D-ABSOLUTE: Asked whether that is done, given 11 OWNER ONLY rows (the named character writes the byte; the meaning never tested) and 41 rows no gate holds (16 CONSISTENT...  [build/agent215/closure118/closing_comment_118.md]
+  FLAG D-ABSOLUTE: No row reads NO ROW or NOT OBSERVED, and no row's batch column names a remaining measurement ("-" there means no source assigns one, not that nothing is left...  [build/agent215/closure118/closing_comment_118.md]
+  FLAG D-ABSOLUTE: **This sitting's measurements** (all on pristine vsavj with the reference MAME; each conclusion a player could see went to the maintainer on captures first):  [build/agent215/closure118/closing_comment_118.md]
+  FLAG D-ABSOLUTE: - **NOT ADOPTED, mechanism recorded:** +0x1AA ("Bloody Tears"; the flag selects Anakaris's win pose 4 and its pose sound), +0x366 (always 0, the low word of ...  [build/agent215/closure118/closing_comment_118.md]
+  FLAG D-ABSOLUTE: None of them leaves a candidate without a verdict.  [build/agent215/closure118/closing_comment_118.md]
+packet_check: 5 flag(s): D-ABSOLUTE 5

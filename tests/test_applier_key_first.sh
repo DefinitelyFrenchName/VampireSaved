@@ -92,7 +92,7 @@ section2 "$APPLY" "$W/s2" > "$W/s2.txt" 2>&1
 
 if vs_ctl_is write-first; then
     [ "$rc" = 1 ] && { echo "FAIL: test_applier_key_first (control mode: write-first)"; exit 1; }
-    echo "FAIL: test_applier_key_first — control mode write-first left the gate green"; exit 1
+    vs_ctl_left_green "write-first" "FAIL: test_applier_key_first — control mode write-first left the gate green"
 fi
 
 echo "== 3. control"

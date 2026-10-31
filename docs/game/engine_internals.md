@@ -2488,9 +2488,9 @@ recording replays at every freeze), `tests/audit_don_vs_cpu.sh`.
   **Behaviour A, Phobos's guard in the in-move continuation check:** vs2 `PRG:0x2CB50` returns 0 when the
   fighter's id is `0x10` and `+0x1BC != 0`; vsavj's twin `PRG:0x2D374` has only the id-6 test *(the 14z-192
   entry called `0x2D374` vs2's — it is vsavj's)*. The check has 43 callers in our build, 32 legacy and 11 ported;
-  on ours Phobos reaches it ONLY through `PRG:0x41D406`, inside his private copy of vs2's `0x02592A` (natively
-  through vs2's engine site `0x025AA0`), and no legacy fighter id reached any ported caller in any leg or replay.
-  Options, measured reach and STATIC cost: **A1** a private clone for Phobos (repoint the `jsr` at `0x41D406`, 4
+  on ours Phobos reaches it ~~ONLY~~ through `PRG:0x41D406`, inside his private copy of vs2's `0x02592A` (natively
+  through vs2's engine site `0x025AA0`) *(and also through `0x416312`: see the 14z-215 correction below)*, and no legacy fighter id reached any ported caller in any leg or replay.
+  Options, measured reach and STATIC cost: **A1** a private clone for Phobos (repoint the `jsr` at `0x41D406` *(and, after the 14z-215 correction, the one at `0x416312`)*, 4
   bytes in a vs2-ported region): 0 legacy bytes, 0 legacy executions, Phobos at most ~92 cycles a frame
   (~0.05%); **A2** the guard inside the shared routine (a 6-byte hook at `PRG:0x2D374`): every caller pays, at
   most ~76 cycles a frame (~0.04%), legacy timing moves in every 1P-vs-CPU match and the attract demo (calls in
@@ -2505,9 +2505,20 @@ recording replays at every freeze), `tests/audit_don_vs_cpu.sh`.
   legacy bytes) gated on a tenant CPU id plus ~0x64 bytes of new tenant code, legacy paying ~80 cycles a pass (a
   static estimate of an unbuilt thunk). **Not measured:** what either behaviour changes in play (captures), the
   real cost of any built hook, whether vsavj opponents' `+0x8C` record and its `+0x17` class byte carry vs2's
-  meaning (the ported test would read them), why Phobos's ported caller `0x416312` is never hit on ours (native
-  reaches its twin 11 times, passive), coverage beyond these legs, FBNeo and MiSTer. These are CPU-AI gameplay
+  meaning (the ported test would read them), ~~why Phobos's ported caller `0x416312` is never hit on ours (native
+  reaches its twin 11 times, passive)~~, coverage beyond these legs, FBNeo and MiSTer. These are CPU-AI gameplay
   differences: the port is the maintainer's to rule ([VSP-10]); nothing is built.
+  **[RULED 14z-215, #129: neither behaviour is ported** — after the captures were read, the maintainer: "Neither,
+  close #129" (`DECISIONS_HISTORY.md` "Ruled 2026-10-31 (14z-215) — #129: neither behaviour ported"). A and B stay as
+  measured, differences from vs2 by decision; `tests/audit_tenant_cpu_ai.sh` keeps both behaviours' measurements.]**
+  **[CORRECTED 14z-215, #129: `0x416312` IS reached on ours** — it is the `jsr 0x2D374` inside Phobos's handler for
+  state family `+0x06 = 0x14` (handler `0x416234`; vs2 twins `0x56D84` / `0x56E62`), run only in sub-state 4 with
+  `+0x3B4` set. Over 15 CPU-Phobos legs per side (the soak rig plus confirm-shifted variants and a P1 sweep, on ERIS,
+  merged build m3b_merged31 against vsav2): native entered state 0x14 6 times and reached `0x56E62` 11, 31, 11, 11,
+  11 and 11 times; ours entered it 6 times and reached `0x416312` 53, 11, 31 and 11 times, every call with
+  `+0x1BC = 0`. The 14z-194 "never hit" came from the soak's own two legs only, where ours never entered the state.
+  Captures of Behaviours A and B were made the same sitting and put to the maintainer (`build/agent215/t129/`,
+  local: REPORT.md, sheets/).]**
 - **The #99 crash (RESOLVED 14z-111):** a tenant class read the aliased row
   (Phobos 0x10 -> Demitri's scripts), Demitri's jump command reached Phobos's
   5-entry table at index 7, the displacement read from code landed in

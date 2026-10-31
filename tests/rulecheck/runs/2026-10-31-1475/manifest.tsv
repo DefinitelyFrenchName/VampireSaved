@@ -1,0 +1,16 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent215/pr/proposal.md	3760528215984f49af3202c3fe2fcecf88613066
+build/agent215/pr/reads.tsv.lines-1-70 (lines 1-70 of build/agent215/pr/reads.tsv)	a2f191d47d6a8c5fb73a0250909703fcc5cb9e8e
+build/agent215/pr/reads.tsv.lines-71-140 (lines 71-140 of build/agent215/pr/reads.tsv)	00e16c85921bacf602c1201163903d0f9621cd43
+build/agent215/pr/reads.tsv.lines-141-204 (lines 141-204 of build/agent215/pr/reads.tsv)	ba8300df4242a4bcf583569c96b8182f18bad646
+build/agent215/pr/derive_classes.py	0d93f3d786dfbef984de2825aeb1ebcdff623ca9
+build/agent215/pr/derive_classes.out	7b5d4a04492ee8b7b0a317e86ca885854e2f6924
+build/agent215/pr/derive_classes_control.out	4437a451d79807a4e0acf99aca1cc30e7218185d
+build/agent215/pr/check_reads.py	71fa2b82aed939f9fe335f6852f96a73a230c191
+build/agent215/pr/check_reads.out	4f8721291b7689223b23fb04901a9ea20b028f47
+build/agent215/pr/check_reads_control.out	497aeedca888d36632f76e82d64a59e509f23ada
+build/agent215/pr/check_proposal_quotes.py	285ff47ddc712235e0df0fd7816a0be5a6e61d6f
+build/agent215/pr/check_proposal_quotes.out	2a44a5f8ce980f4578b7271b91495ccd41f635be
+build/agent215/pr/check_proposal_quotes_control.out	675eef60fb250c7ad7546b6a44697eab6b2c392e
+build/agent215/pr/ruling_14z181.txt	83e91df4c05e3559557fe20d9bbe854899a5df13
+build/agent215/pr/decisions_cited.txt	a40184124d2365a3035d8553efc11bfb1cfaa16f

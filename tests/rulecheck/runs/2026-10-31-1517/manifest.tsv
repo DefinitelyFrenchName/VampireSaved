@@ -1,0 +1,8 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent215/closure129/claim.txt	d9f51a96a01b4d5553c6bffb410fc421ce492d70
+build/agent215/closure129/ruling_close_129.txt	71232ee824b3e4f2e504102dc00d7a8f9ff7e3ce
+build/agent215/closure129/issue_129.md	a38ab7ee3c4411532e3735ef60a2c19db6402293
+build/agent215/closure129/closing_comment_129.md	518fb627d3ad5887d843b31e7cda6f0c2c30f315
+build/agent215/closure129/ticket_row_129.tsv	730026860212d7ac2b060fd2dc0b249ddd253bb1
+build/agent215/closure129/doc_edits.txt	287e42745cb1c16024a6d250adb2653ceb320111
+build/agent215/closure129/test_tickets.log	4a60df81ba37853e62fc211360381782acc3529b

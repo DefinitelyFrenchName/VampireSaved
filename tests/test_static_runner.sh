@@ -43,6 +43,8 @@
 #   its first match, and a builtin still writing a capture larger than the pipe buffer, with SIGPIPE ignored, prints
 #   `printf: write error: Broken pipe`, which the classifier reads as a crash (the 14z-208c close's DIED control);
 #   the premise is measured in the same section, the old form printing the error and `grep >/dev/null` not.
+#   Since #310 (14z-215, section 36): section 24's wall-clock check S24e counts only in the plain run and under the
+#   modes it belongs to, so a loaded host cannot turn another mode's run into its FAIL.
 #
 # MUST-FIRE: shadow-tool: reader-unplugged — a copy of run_all_static.sh that hands the classifier no gate script must let a stub with a declared-but-unfired control read PASS (mode: that copy is the runner every section drives, and section 11 must fail)
 # MUST-FIRE: shadow-tool: trigger-blind — a copy of run_all_static.sh with its cadence TRIGGER match disabled must leave a freeze-cadence gate deferred although a path it depends on changed; section 14's triggered case must FAIL under it
@@ -99,10 +101,48 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 rc=0
 fail() { echo "  FAIL: $*"; rc=1; }
+# TIMING CHECKS ARE NOT A MODE'S VERDICT (#310 group 3, 14z-215; maintainer-ruled 2026-10-31 "Groups 1-4, then
+# re-census 5-7"). Every section runs under every control mode and `fail` sets the one rc the mode exits with, so a
+# wall-clock check — section 24's S24e, three controls overlapping on one-second stamps — failing under `--jobs 8`
+# load turned ANY mode's run into its FAIL, read HONOURED. timing_fail <owning modes|-> <message>: in the plain run,
+# and under a mode the check belongs to (S24e is pool-concurrency-off's and pool-controls-early's own catch), it is
+# `fail`; under any other mode it prints a note and leaves rc alone (section 36 holds the rule on known answers).
+# Two knobs exist only for the proof of this rule: VS_TIMING_SQUEEZE=1 makes S24e impossible (red on any host), and
+# VS_TEST_NOOP_MODE=1 runs the jobs-leak mode on the REAL runner (a mode that perturbs nothing). Under both the gate
+# must exit 0 — LIES.
+timing_fail() {
+    case " $1 " in *" ${VS_CTL:-} "*) _tf_own=1 ;; *) _tf_own=0 ;; esac
+    if [ -n "${VS_CTL:-}" ] && [ "$_tf_own" = 0 ]; then echo "  note: TIMING, not judged under control mode $VS_CTL: $2"
+    else fail "$2"; fi
+}
 
 RUNNER="$REPO/tests/run_all_static.sh"
 . "$REPO/tests/lib/controls.sh"; vs_ctl_mode "$0"
 T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
+
+# A SHADOW RUNNER THAT ABORTED IS NOT ITS PERTURBATION CAUGHT (#310 group 5, 14z-215). Under a control mode the shadow
+# drives every section, and each section captures the runner's output and prints only what it greps, so the shell's own
+# error line about the shadow (`tests/<runner>.sh: line N: …`) never reached the log — and classify.sh's own-script
+# branch would not have matched it there (it names the runner, not this gate): a planted abort read HONOURED. Under a mode
+# only, `sh` is a function: a run_all_* invocation's stderr is kept, and the shell's own error lines about the script as
+# invoked are handed to tests/lib/controls.sh vs_ctl_show_err; what that prints is kept in $T/shadow_err.log and printed
+# by the EXIT trap, so the mode reads UNJUDGED. ONLY those lines: the runner's stderr legitimately carries a Python
+# traceback in some ground-truth cases (a --confirm plan that fails on a bad timestamp prints static_confirm.py's
+# ValueError), which would read every mode DIED. The plain run is untouched. The stderr goes through a FIFO and `tee`, so
+# it still streams as the runner writes it (the --confirm plan's progress lines, #259).
+if [ -n "${VS_CTL:-}" ]; then
+    : > "$T/shadow_err.log"
+    trap 'cat "$T/shadow_err.log" 2>/dev/null; rm -rf "$T"' EXIT INT TERM
+    sh() {
+        _she_t="$T/she.$(command sh -c 'echo "$PPID"')"; _she_s=0   # unique per live caller; inside $T, which the trap removes
+        mkfifo "$_she_t.f"; tee "$_she_t" < "$_she_t.f" >&2 & _she_p=$!
+        command sh "$@" 2>"$_she_t.f" || _she_s=$?
+        wait "$_she_p" || :
+        case "${1:-}" in *run_all_*) grep -a "^$1: " "$_she_t" > "$_she_t.own" || :
+            vs_ctl_show_err "$_she_t.own" - "$1" >> "$T/shadow_err.log" || : ;; esac
+        rm -f "$_she_t" "$_she_t.f" "$_she_t.own"; return "$_she_s"
+    }
+fi
 FR="$T/fakerepo"
 mkdir -p "$FR/tests"
 # THE SHADOW TOOL: the runner with the classifier's 4th argument (the gate
@@ -1047,10 +1087,11 @@ s24() {   # s24 <runner> <static_job.sh> <static_pool.py> [confirm] -> sets S24a
     # its gate's run ended
     # (one awk, never a shell number test: a shadow that runs g_k twice logs two gate_end lines, and a shell error line
     # would turn every control mode of this gate into DIED — paid on ERIS, 14z-207)
-    if awk '$1 == "start" {n++; if (!(fs) || $3 < fs) fs = $3; if ($3 > ls) ls = $3}
+    _sq=0; [ "${VS_TIMING_SQUEEZE:-0}" = 1 ] && _sq=100000   # the squeeze knob (above): no overlap passes
+    if awk -v sq="$_sq" '$1 == "start" {n++; if (!(fs) || $3 < fs) fs = $3; if ($3 > ls) ls = $3}
             $1 == "end" {if (!(fe) || $3 < fe) fe = $3}
             $1 == "gate_end" {g++; ge = $2}
-            END {exit !(n == 3 && g == 1 && ls < fe && fs >= ge)}' "$T/k.log" 2>/dev/null; then S24e=ok
+            END {exit !(n == 3 && g == 1 && ls + sq < fe && fs >= ge)}' "$T/k.log" 2>/dev/null; then S24e=ok
     else S24e=bad; echo "    at --jobs 4 g_k's controls did not run beside one another after its gate: $(tr '\n' '|' < "$T/k.log" 2>/dev/null)"; fi
     [ -n "${4:-}" ] || return 0
     # --confirm on the serial run, after a change to the data g_f's code reads directly (R2: g_f re-runs, its control CARRIED, #298)
@@ -1072,7 +1113,7 @@ s24 "$R24" "$J24" "$P24" confirm
 [ "$S24b" = ok ] && echo "  ok: at --jobs 4 each of the 6 stubs ran once and each of the 2 controls ran once (the pool's results are the ones read)" || fail "section 24: the parallel run ran a gate or a control twice, or not at all"
 [ "$S24c" = ok ] && echo "  ok: at --jobs 4 the ORDER: last stub ran after the pool" || fail "section 24: ORDER: last did not run after the pool"
 [ "$S24d" = ok ] && echo "  ok: --confirm at --jobs 4 reads as at --jobs 1; g_f re-runs (R2) and the pool does not run the control the plan carries" || fail "section 24: --confirm under --jobs differs, or the pool ran a carried control"
-[ "$S24e" = ok ] && echo "  ok: at --jobs 4 the concurrent-listed stub's three controls ran beside one another, each started after its gate's run ended (#312)" || fail "section 24: a concurrent gate's controls ran one after another, or before their gate ended (#312)"
+[ "$S24e" = ok ] && echo "  ok: at --jobs 4 the concurrent-listed stub's three controls ran beside one another, each started after its gate's run ended (#312)" || timing_fail "pool-concurrency-off pool-controls-early" "section 24: a concurrent gate's controls ran one after another, or before their gate ended (#312)"
 
 echo "== 25. MUST-FIRE: section 24's properties, each broken by its shadow =="
 if ! vs_ctl_is pool-blind && ! vs_ctl_is pool-order-ignored && ! vs_ctl_is job-carry-blind && ! vs_ctl_is pool-concurrency-off && ! vs_ctl_is pool-controls-early; then
@@ -1282,7 +1323,7 @@ s34() {   # s34 <runner> -> S34 (ok|bad): both stubs must see the caller's JOBS=
     _s1="$(cat "$T/jobs_seen_g_j1" 2>/dev/null)"; _s2="$(cat "$T/jobs_seen_g_j2" 2>/dev/null)"
     if [ "$_s1" = 7 ] && [ "$_s2" = 7 ]; then S34=ok; else S34=bad; echo "    the stubs saw JOBS=${_s1:-none} and JOBS=${_s2:-none}"; fi
 }
-R34="$RUNNER"; vs_ctl_is jobs-leak && R34="$SHADOW_J"
+R34="$RUNNER"; vs_ctl_is jobs-leak && [ "${VS_TEST_NOOP_MODE:-0}" != 1 ] && R34="$SHADOW_J"   # the no-op knob (above)
 s34 "$R34"
 [ "$S34" = ok ] && echo "  ok: exported JOBS=7 with --jobs 2: both gates saw JOBS=7" \
     || fail "section 34: a gate was handed the runner's --jobs as its JOBS (#321)"
@@ -1293,6 +1334,13 @@ if ! vs_ctl_is jobs-leak; then
     [ "$S34" = bad ] && vs_ctl_fired jobs-leak "a runner whose count is named JOBS hands the gates JOBS=2 for an exported 7 — section 34 catches it" \
         || { rc=1; vs_ctl_dead jobs-leak "the JOBS-named runner still handed the gates 7" || :; }
 fi
+
+echo "== 36. a timing check is no mode's verdict but its owner's (#310, 14z-215) =="
+_tf() { ( VS_CTL="$1"; rc=0; timing_fail "$2" "known answer" >/dev/null; echo "$rc" ); }
+if [ "$(_tf "" -)" = 1 ] && [ "$(_tf jobs-leak -)" = 0 ] && [ "$(_tf jobs-leak "pool-concurrency-off pool-controls-early")" = 0 ] \
+        && [ "$(_tf pool-controls-early "pool-concurrency-off pool-controls-early")" = 1 ]; then
+    echo "  ok: timing_fail fails the plain run and its owners' modes, and leaves every other mode's rc alone"
+else fail "timing_fail: plain $(_tf "" -), another mode $(_tf jobs-leak -), an owner $(_tf pool-controls-early "pool-concurrency-off pool-controls-early") (want 1 0 1)"; fi
 
 [ "$rc" = 0 ] && echo "PASS: the runner's verdicts mean what they say." \
              || echo "FAIL: see above."

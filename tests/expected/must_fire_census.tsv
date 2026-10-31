@@ -5,6 +5,8 @@
 # class<TAB>gate
 declares	audit_air_dash_height
 declares	audit_air_gc_legacy
+declares	audit_anakaris_rows
+declares	audit_bishamon_charge_316
 declares	audit_capture_matrix
 declares	audit_chains174
 declares	audit_chains184
@@ -26,6 +28,7 @@ declares	audit_df_moves
 declares	audit_df_startup_invuln
 declares	audit_dispatch_census
 declares	audit_dmg_legacy_sweep
+declares	audit_edge_cases
 declares	audit_effect_class_rows
 declares	audit_entrance_draw
 declares	audit_es_ex
@@ -53,13 +56,17 @@ declares	audit_lag_budget
 declares	audit_landing_sound
 declares	audit_latch_reads
 declares	audit_legacy_pairings
+declares	audit_lilith_gps_counter
 declares	audit_marionette_cost
 declares	audit_merged_legacy
 declares	audit_merged_vec3
 declares	audit_mister_map_fit
+declares	audit_mizuumi_354_3a8
 declares	audit_mizuumi_attack
+declares	audit_mizuumi_finishes
 declares	audit_mizuumi_inputs
 declares	audit_mizuumi_rows_b
+declares	audit_mizuumi_rows_c
 declares	audit_mizuumi_struct
 declares	audit_move_parity
 declares	audit_move_parity_attribution
@@ -85,8 +92,11 @@ declares	audit_shared_wall_push
 declares	audit_stock_emulator_stall
 declares	audit_tech_roll
 declares	audit_tenant_continue_switch
+declares	audit_tenant_cpu_ai
 declares	audit_tenant_cpu_soak
+declares	audit_tenant_downwin
 declares	audit_tenant_throw_geometry
+declares	audit_tenant_timeout
 declares	audit_throw_recovery
 declares	audit_throw_registration
 declares	audit_tick_cadence
@@ -141,6 +151,8 @@ declares	test_controls_contract
 declares	test_copy_flags
 declares	test_crash_guard
 declares	test_crosscheck_229
+declares	test_ctl_show_err
+declares	test_dead_exit_census
 declares	test_defense_rows_census
 declares	test_demand_after_trap
 declares	test_df_field_readers
@@ -180,6 +192,7 @@ declares	test_host_libs
 declares	test_host_text_opens
 declares	test_hui_air
 declares	test_hui_boot
+declares	test_instr_align_unjudged
 declares	test_jtcores_twin
 declares	test_jtsim_scratch_heal
 declares	test_ladder_tenant_vs_palette
@@ -214,6 +227,7 @@ declares	test_obj_records
 declares	test_package_release_safety
 declares	test_packet_check
 declares	test_pcrel_escapes
+declares	test_plants_not_applied
 declares	test_pod_black_foot_palette
 declares	test_poke_readback
 declares	test_poked_legs

@@ -155,7 +155,9 @@ merged-m5, all poke-generic (legs choose characters by the replay-85
 doctrine) with legacy controls + discriminating negative controls:
 `audit_df_framework.sh` (the ruled DF table: cost 1 stock, durations
 360/360/377/360); `audit_tenant_timeout.sh` (the timeout judge awards
-the down to the HP leader — $FF8120/$FF810E, atlas rows added);
+the down to the HP leader — ~~$FF8120~~/$FF810E, atlas rows added;
+$FF8120 RETRACTED 14z-215 (#342): the side is $FF8105, $FF8120 the
+winner's perfect flag);
 `audit_tenant_downwin.sh` (KO-path life-marker transition, every tenant
 as winner AND victim — the direct #103-class lock);
 `audit_tenant_throws.sh` (normal throw both directions; the throw

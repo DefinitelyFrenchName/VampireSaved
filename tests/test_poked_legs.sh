@@ -38,6 +38,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 [ -d "$ROMDIR" ] && ROMDIR="$(cd "$ROMDIR" && pwd)"
 CONTROL="${CONTROL:-}"
 case "$CONTROL" in ""|new-flavor-leg|dropped-row) ;; *) echo "REFUSED: no control named '$CONTROL' is declared by this gate"; exit 3 ;; esac
+. "$REPO/tests/lib/controls.sh"   # vs_ctl_show_err (#310 group 5)
 WIDE_DATA="${WIDE_DATA:-$REPO/build/m3b_merged31/verify_data.bin}"
 [ -f "$WIDE_DATA" ] || { echo "SKIP: no WIDE data view at $WIDE_DATA"; exit 0; }
 EXPECT="$REPO/tests/expected/poked_legs.tsv"
@@ -73,7 +74,10 @@ else
     bad "the census reports an unaccepted CROSS-FLAVOR pairing: $(grep '^NEW' "$W/census.log" | head -3 | tr '\n' ' ')"
 fi
 if [ "$CONTROL" = new-flavor-leg ]; then
-    if [ "$fail" = 1 ]; then echo "CONTROL FIRED: new-flavor-leg — the fixture's Phobos-over-Donovan leg is reported NEW"; echo "FAIL: test_poked_legs (control mode)"; exit 1
+    # #310 group 5: a census that crashed reports no NEW line — its failure is not the fixture caught
+    if [ "$fail" = 1 ] && grep -q '^NEW' "$W/census.log"; then echo "CONTROL FIRED: new-flavor-leg — the fixture's Phobos-over-Donovan leg is reported NEW"; echo "FAIL: test_poked_legs (control mode)"; exit 1
+    elif [ "$fail" = 1 ]; then vs_ctl_show_err "$W/census.log" || true
+        echo "NOT JUDGED: new-flavor-leg — the census failed without a NEW line, so the fixture was not judged"; echo "FAIL: test_poked_legs (control mode)"; exit 1
     else echo "CONTROL DEAD: new-flavor-leg — the fixture went unreported"; echo "FAIL: test_poked_legs"; exit 1; fi
 fi
 grep '^accepted CROSS-FLAVOR leg no longer poked' "$W/census.log" | while read -r l; do echo "  note  $l"; done
@@ -102,8 +106,11 @@ fi
 echo "== 4. must-fire controls (in-gate)"
 if python3 "$REPO/tools/audit_poked_legs.py" --vsav2 "$W/wheel_vsav2.json" --wide "$W/wheel_wide.json" --repo "$REPO" --accepted "$ACCEPT" --extra-script "$W/fixture_gate.sh" > "$W/ctl1.log" 2>&1; then
     echo "CONTROL DEAD: new-flavor-leg — the fixture's Phobos-over-Donovan leg was not reported"; fail=1
-else
+elif grep -q '^NEW' "$W/ctl1.log"; then   # a positive line first: a crash reports none (#310 group 5)
     echo "CONTROL FIRED: new-flavor-leg — $(grep -c '^NEW' "$W/ctl1.log") NEW pairing(s) reported for the fixture"
+else
+    vs_ctl_show_err "$W/ctl1.log" || true
+    echo "CONTROL DEAD: new-flavor-leg — the census failed on the fixture without a NEW line (not the pairing reported)"; fail=1
 fi
 sed '2d' "$W/want.rows" > "$W/minus.rows"
 if diff "$W/want.rows" "$W/minus.rows" > /dev/null; then echo "CONTROL DEAD: dropped-row — removing a row went unseen"; fail=1

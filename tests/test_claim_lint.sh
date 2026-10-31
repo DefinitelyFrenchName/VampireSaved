@@ -64,7 +64,8 @@ claim="$(awk -F'\t' '$1=="claim"{print substr($0, index($0,$2))}' tests/rulechec
 python3 "$T" --claim "$claim" > "$W/r518.txt" 2>&1 || true
 if grep -q '^UNTIED \[every\]: Three expectation changes rest on measured data swaps, each both ways with every byte write verified and an own-value poke inert\.$' "$W/r518.txt"; then
     echo "  ok    the sentence holding run 2026-10-01-518's violated universal is reported UNTIED (by its \"every\"; the violated \"each\" is not read)"
-else echo "  FAIL  run 2026-10-01-518's violated universal is not reported: $(head -2 "$W/r518.txt")"; fail=1; fi
+else echo "  FAIL  run 2026-10-01-518's violated universal is not reported: $(head -2 "$W/r518.txt")"; fail=1
+    vs_ctl_show_err "$W/r518.txt" || true; fi   # the head joined into the line cut a crash's header (#310 group 5)
 
 # THE WIRING (after rule-checker run 2026-10-02-530 Q1/Q4): prepare itself, on a throwaway root
 mkroot() {  # mkroot <root> <rulecheck.py to install>

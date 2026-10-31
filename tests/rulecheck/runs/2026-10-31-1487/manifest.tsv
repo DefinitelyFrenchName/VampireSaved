@@ -1,0 +1,17 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent215/t310/census57/question.txt	9973e07ebf35fdd06ae1ef07bd462fe56b4655d7
+build/agent215/t310/census57/SUMMARY.md	be78c3758cc5503fb3a9df02d984866553900f64
+build/agent215/t310/census57/counts.txt	3ff1e97c6c5c0df4e3c79afac193e5bef85ed3f8
+build/agent215/t310/census57/tiers56.txt	1dafa3762b2c8b058b6cc346d3b2e5cbca61f36e
+build/agent215/t310/census57/ruling_310.txt	a50afec62460377834dfedfc23e28e80a0166460
+build/agent215/t310/census57/group5.tsv.lines-1-64 (lines 1-64 of build/agent215/t310/census57/group5.tsv)	8abb5459f5ed4b884e47913673e569c30c80a339
+build/agent215/t310/census57/group5.tsv.lines-65-127 (lines 65-127 of build/agent215/t310/census57/group5.tsv)	3620cf5f7df1134991efa9f6827600fca847683e
+build/agent215/t310/census57/group6.tsv.lines-1-56 (lines 1-56 of build/agent215/t310/census57/group6.tsv)	4e126ba12a6c699817115a77cfd7701f9c8bef2d
+build/agent215/t310/census57/group6.tsv.lines-57-112 (lines 57-112 of build/agent215/t310/census57/group6.tsv)	1a12ba44056a35086987aa2364cf823ffa2f0ae2
+build/agent215/t310/census57/group7.tsv.lines-1-95 (lines 1-95 of build/agent215/t310/census57/group7.tsv)	bacf48a0ff16ae59c9bc0f3d20af0ca2284b63d0
+build/agent215/t310/census57/group7.tsv.lines-96-190 (lines 96-190 of build/agent215/t310/census57/group7.tsv)	02d7c9ac88327274e03555e1567a9fb02ba3b839
+build/agent215/t310/census57/group7.tsv.lines-191-283 (lines 191-283 of build/agent215/t310/census57/group7.tsv)	fff4d709dd6cef43df3c090b00475ddb8b9c957a
+build/agent215/t310/census57/new_instances.tsv.lines-1-113 (lines 1-113 of build/agent215/t310/census57/new_instances.tsv)	b5a45c996f84902c58abe002398b45ec18b01956
+build/agent215/t310/census57/new_instances.tsv.lines-114-226 (lines 114-226 of build/agent215/t310/census57/new_instances.tsv)	619e88d5ab7f72057ac2e68c94ce0441bf97d297
+build/agent215/t310/census57/new_instances.tsv.lines-227-337 (lines 227-337 of build/agent215/t310/census57/new_instances.tsv)	5b0ec3508bd034ab24234b2e28fe0d7e2095aafb
+build/agent215/t310/census57/void_producers.tsv	8589acf4a3fd38b094a0bcbbf9ec34f7610598f7

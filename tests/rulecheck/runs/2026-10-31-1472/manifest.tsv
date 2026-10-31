@@ -1,0 +1,8 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent215/pr/proposal.md	f4804c3796d8644f011b50bee2f8d16f628a174c
+build/agent215/pr/reads.tsv.lines-1-102 (lines 1-102 of build/agent215/pr/reads.tsv)	83ab935c756daf48ceadb6fa71cc0b68baef00fb
+build/agent215/pr/reads.tsv.lines-103-204 (lines 103-204 of build/agent215/pr/reads.tsv)	37e001be0b9b9a69ff041162335d144c64c0c78e
+build/agent215/pr/check_reads.py	614fc0912f0da3fa16bdc84fefd03369246be0c8
+build/agent215/pr/check_reads.out	4f8721291b7689223b23fb04901a9ea20b028f47
+build/agent215/pr/check_reads_control.out	df1b7f1510feb0154dfa33d80537cbbb72aa2451
+build/agent215/pr/ruling_14z181.txt	83e91df4c05e3559557fe20d9bbe854899a5df13

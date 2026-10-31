@@ -103,7 +103,7 @@ note "3. every reachable line walks clean, all four regions"
 for r in 0 1 2 3; do
     out="$W/dump_$r.txt"
     python3 "$DEC" dump "$WALK" --opcodes "$W/vsavj_op.bin" \
-        --region "$r" > "$out" 2>&1 || { note "  FAIL: dump region $r"; fail=1; continue; }
+        --region "$r" > "$out" 2>&1 || { note "  FAIL: dump region $r"; fail=1; vs_ctl_show_err "$out" || true; continue; }   # a crash is surfaced (#310 group 5)
     n=$(grep -c '^winner' "$out" || true)
     bad=$(grep -c '!!' "$out" || true)
     chk "region $r: 33 winners, 0 malformed" "33 0" "$n $bad"

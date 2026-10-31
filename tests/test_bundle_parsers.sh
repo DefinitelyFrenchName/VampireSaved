@@ -271,7 +271,11 @@ run_bundler() {  # run_bundler <tool> <exe-name> <stub-mode> <outdir>  -> exit s
     rm -rf "$4"; mkdir -p "$4"
     printf 'stub executable\n' > "$4/$2"
     chmod +x "$4/$2"
-    ( PATH="$W/stub_$3:$PATH" python3 "$TOOLS/$1" "$4" "$4/$2" ) > "$4/out.txt" 2>&1
+    _rb=0; ( PATH="$W/stub_$3:$PATH" python3 "$TOOLS/$1" "$4" "$4/$2" ) > "$4/out.txt" 2>&1 || _rb=$?
+    # a bundler (or the mode's shadow) that CRASHED exits non-zero like a REFUSING one, and the sections below print
+    # only its tail: the crash is re-printed here (tests/lib/controls.sh vs_ctl_show_err, #310 group 5)
+    [ "$_rb" = 0 ] || vs_ctl_show_err "$4/out.txt" || true
+    return "$_rb"
 }
 
 # ---- section 2: an EMPTY closure is REFUSED by both bundlers ---------------
@@ -369,6 +373,7 @@ elif grep -q "REFUSING:.*does not exist" "$W/msys_nocyg/out.txt"; then
     echo "  ok    with no translator the same path REFUSES, naming the file ($(grep -o 'imports [^ ]*' "$W/msys_nocyg/out.txt" | head -1))"
 else
     echo "  FAIL  it failed for another reason: $(tail -1 "$W/msys_nocyg/out.txt")"; fail=1
+    vs_ctl_show_err "$W/msys_nocyg/out.txt" || true   # #310 group 5
 fi
 
 echo "== 4c. a NEEDED library that is neither bundled nor a host library is refused (LEFTOVER)"

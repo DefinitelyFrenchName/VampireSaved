@@ -70,7 +70,7 @@ grep -q '^SELFTEST PASS$' "$W/self.txt" || { echo "FAIL: the tool's selftest"; f
 python3 "$BD" census --root . --plant $LISTARG > "$W/census.txt" 2>&1 && crc=0 || crc=$?
 grep -E '^(PROBLEM|census:)' "$W/census.txt" | sed 's/^/  /'
 echo "  $(grep -c '^  code ' "$W/census.txt") code name(s), $(grep -c '^  tree ' "$W/census.txt") director(ies) of this tree, $(grep -c '^  plant ' "$W/census.txt") planted path(s)"
-[ "$crc" = 0 ] || { echo "FAIL: the census of this tree"; fail=1; }
+[ "$crc" = 0 ] || { echo "FAIL: the census of this tree"; fail=1; vs_ctl_show_err "$W/census.txt" || true; }   # a crash is surfaced (#310 group 5)
 
 if [ -z "${VS_CTL:-}" ]; then
     for c in $CTLS; do
@@ -81,7 +81,9 @@ if [ -z "${VS_CTL:-}" ]; then
     make_copy drop-class > /dev/null
     if python3 tools/build_dirs.py census --root . --list "$W/drop-class/tests/expected/build_dirs.tsv" > "$W/ctl_drop-class.txt" 2>&1; then
         vs_ctl_dead drop-class "the census passed with the input rows gone" || fail=1
-    else vs_ctl_fired drop-class "$(grep -m1 '^PROBLEM' "$W/ctl_drop-class.txt")"; fi
+    elif grep -q '^PROBLEM' "$W/ctl_drop-class.txt"; then vs_ctl_fired drop-class "$(grep -m1 '^PROBLEM' "$W/ctl_drop-class.txt")"
+    else vs_ctl_show_err "$W/ctl_drop-class.txt" || true   # a positive PROBLEM line first (#310 group 5)
+        vs_ctl_dead drop-class "the census failed with no PROBLEM line — not the unclassed directories named" || fail=1; fi
 fi
 
 if [ "$fail" = 0 ]; then echo "PASS: every build/ top-level directory named or present is classed, and the generated scratch forms agree"

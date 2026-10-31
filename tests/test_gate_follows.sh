@@ -47,7 +47,7 @@ EXP=tests/expected/gate_follows.tsv
 W="$(mktemp -d "${TMPDIR:-/tmp}/gfol.XXXXXX")" || { echo "FAIL: test_gate_follows — mktemp -d failed (W)"; exit 2; }; trap 'rm -rf "$W"' EXIT INT TERM
 fail=0; ok() { echo "  ok    $*"; }; bad() { echo "  FAIL  $*"; fail=1; }
 
-census() { python3 tools/gate_follows.py --root "$1" 2>/dev/null | cut -f1,2 | sort; }
+census() { python3 tools/gate_follows.py --root "$1" 2>"$W/census.err" | cut -f1,2 | sort; }   # stderr kept: a mode prints a crash's (#310)
 cls() { awk -F'\t' -v c="$1" '$1==c{print $2}' "$2" | sort; }
 
 # perturb NAME ROOT — a copy of the tree's scripts under ROOT with one defect planted;
@@ -122,7 +122,8 @@ PY
 root="."
 if [ -n "$VS_CTL" ]; then
     g="$(perturb "$VS_CTL" "$W/mode" | tail -1)"; root="$W/mode"
-    [ "$g" != NONE ] || { echo "FAIL: no declaring gate in the tree to perturb — the control cannot run"; exit 1; }
+    # #310 group 6 (14z-215): a plant that did not apply is a REFUSAL (exit 3, read UNJUDGED), never the gate's FAIL
+    [ "$g" != NONE ] || { echo "REFUSED: $VS_CTL — no gate in the tree to perturb for this control, so the plant did not apply and the mode judged nothing"; exit 3; }
     echo "MODE: control $VS_CTL — the checks run on a copy where $g.sh is perturbed"
 fi
 
@@ -152,16 +153,54 @@ fi
 
 echo "== 2b. no gate declares all of tests/replays/ without composing a path there (#243: every new replay staled all such gates)"
 if python3 tools/gate_follows.py --root "$root" --overwide > "$W/ow.txt" 2> "$W/ow.err"; then
-    ok "$(cat "$W/ow.err")"
+    ok "$(cat "$W/ow.err")"; ow_red=""
 else
-    bad "$(cat "$W/ow.err")"; sed 's/^/        /' "$W/ow.txt" | head -12
+    bad "$(cat "$W/ow.err")"; sed 's/^/        /' "$W/ow.txt" | head -12; ow_red=1
 fi
 
 echo "== 2. the reconciliation: no declaration narrower than its gate's text, its widening rules or its own description"
 if python3 tools/gate_follows.py --root "$root" --reconcile > "$W/rec.txt" 2> "$W/rec.err"; then
-    ok "$(cat "$W/rec.err")"
+    ok "$(cat "$W/rec.err")"; rec_red=""
 else
-    bad "$(cat "$W/rec.err")"; sed 's/^/        /' "$W/rec.txt" | head -12
+    bad "$(cat "$W/rec.err")"; sed 's/^/        /' "$W/rec.txt" | head -12; rec_red=1
+fi
+
+# THE MODE'S VERDICT (#310 group 6, 14z-215): the checks ran on a PARTIAL copy of the tree, so a red counts as this
+# mode's finding only when it is EXACTLY its own — $g, in its own check and class — and nothing else is red: any other
+# row (another gate's, another check's) or an empty census is NOT JUDGED (UNJUDGED), a crash's stderr is shown at column
+# 0 (DIED), and a copy left green is this control dead (LIES). Until then any red on the copy read HONOURED.
+if [ -n "$VS_CTL" ]; then
+    [ -s "$W/census.err" ] && cat "$W/census.err"
+    own=""; other=""
+    [ "$nd" -gt 0 ] || other="the census on the copy is empty"
+    rows_of() { awk -F'\t' -v g="$g" -v k="$2" 'NF >= 2 && $1 != g {printf " %s: %s %s", k, $1, $2}' "$1"; }   # another gate's rows
+    case "$VS_CTL" in
+    dropped-declaration)
+        [ "$lost" = "$g" ] && own="$g lost its declaration on the copy"
+        [ -z "$lost" ] || [ "$lost" = "$g" ] || other="$other; lost: $(echo "$lost" | tr '\n' ' ')"
+        [ -z "$rec_red$ow_red" ] || other="$other; --reconcile or --overwide is red on the copy:$(cut -f1,2 "$W/rec.txt" "$W/ow.txt" | tr '\t\n' '  ')" ;;
+    replays-rewidened)
+        grep -q "^$g	OVERWIDE	tests/replays/" "$W/ow.txt" && own="$g named OVERWIDE on the copy"
+        [ -z "$(rows_of "$W/ow.txt" ow)" ] || other="$other;$(rows_of "$W/ow.txt" ow)"
+        [ -z "$lost$rec_red" ] || other="$other; the census or --reconcile is red (lost: $(echo "$lost" | tr '\n' ' '))" ;;
+    *)
+        case "$VS_CTL" in narrow-declaration) _mc=text ;; rule-unwidened) _mc=rule ;; *) _mc=prose ;; esac
+        grep "^$g	UNCOVERED	" "$W/rec.txt" | grep -q "$_mc:" && own="$g named UNCOVERED (class $_mc) on the copy"
+        [ -z "$(rows_of "$W/rec.txt" rec)" ] || other="$other;$(rows_of "$W/rec.txt" rec)"
+        [ -z "$lost$ow_red" ] || other="$other; the census or --overwide is red (lost: $(echo "$lost" | tr '\n' ' '))" ;;
+    esac
+    [ -z "$new$grew" ] || other="$other; the census grew on the copy: $(echo "$new $grew" | tr '\n' ' ')"
+    other="${other#; }"
+    if [ -n "$other" ]; then
+        echo "NOT JUDGED: $VS_CTL — the copy is red on something that is not this mode's own finding ($other), so its FAIL is not the perturbation caught"
+        echo "FAIL"; exit 1
+    elif [ -n "$own" ]; then
+        vs_ctl_fired "$VS_CTL" "$own, and nothing else on the copy is red (mode)"; echo "FAIL"; exit 1
+    elif [ "$fail" = 0 ]; then
+        vs_ctl_left_green "$VS_CTL" "FAIL: test_gate_follows — control mode $VS_CTL: the perturbed $g.sh was not named"
+    else
+        echo "NOT JUDGED: $VS_CTL — the copy is red, but not with $g's own finding for this mode"; echo "FAIL"; exit 1
+    fi
 fi
 
 if [ "${FREEZE:-0}" = 1 ] && [ -z "$VS_CTL" ]; then

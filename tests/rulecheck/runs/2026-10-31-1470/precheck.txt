@@ -1,0 +1,5 @@
+  FLAG D-ABSOLUTE: Groups 1-4 were checked at HEAD (about 51 files: the instr_align library fix with the 28 drift-family gates and a new gate, 14 word-only dead exits with a ce...  [build/agent215/t310/rc/question_draft.md]
+  FLAG D-ABSOLUTE: Groups 5-7 rest on the 14z-210 census's wording, not re-read at HEAD: a hidden-traceback helper with about 10-15 gates, about 8-10 plants that did not apply,...  [build/agent215/t310/rc/question_draft.md]
+  FLAG D-ABSOLUTE: "Groups 1-4, then re-census 5-7 (Recommended)" — groups 1-4, each with a proving control (a planted case that must read UNJUDGED, LIES or DIED instead of HON...  [build/agent215/t310/rc/question_draft.md]
+  FLAG D-ABSOLUTE: "All seven now" — every group, groups 5-7 re-read gate by gate from the census lists as they are edited.  [build/agent215/t310/rc/question_draft.md]
+packet_check: 4 flag(s): D-ABSOLUTE 4

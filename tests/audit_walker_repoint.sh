@@ -256,11 +256,14 @@ run_leg stage "$BUILD" "$OLD,$NEW" "INSTR_REFERENCE=1 $_skip" "$SR"
 RL="$(ia_replaylua_at vsavjw "$PWD/$BUILD/rompath;$ROMDIR" "$PWD/tests/replays/$SR.rpl" "$SF" "$W/rl")"
 sa="$(ia_anchor "$W/stage_$SR.align")"
 if [ -n "$RL" ] && [ "$sa" = "$RL" ]; then echo "  ok: the staging reference leg reproduces replay.lua at frame $SF ($sa)"
-else echo "  FAIL: the staging reference leg reads ${sa:-nothing} at frame $SF, replay.lua ${RL:-nothing}"; fail=1; fi
+else echo "  FAIL: the staging reference leg reads ${sa:-nothing} at frame $SF, replay.lua ${RL:-nothing}"; fail=1
+    if [ -n "$MODE" ] && { [ -z "$sa" ] || [ -z "$RL" ]; }; then echo "NOT JUDGED: control mode $MODE: the staging leg read ${sa:-nothing}, replay.lua ${RL:-nothing} (#310)"; fi
+fi
 if [ "$MODE" = drift-clock ] || [ "$MODE" = first-frame-skip ]; then
     [ "$fail" = 1 ] && { echo "FAIL: audit_walker_repoint (control mode: $MODE)"; exit 1; }
-    echo "FAIL: audit_walker_repoint — control mode $MODE left the gate green"; exit 1
+    vs_ctl_left_green "$MODE" "FAIL: audit_walker_repoint — control mode $MODE left the gate green"
 fi
+IA_NJ=0   # #310: the legs below are the controls' own, not a mode's measurement
 run_leg cdrift "$BUILD" "$OLD,$NEW" "INSTR_CLOCK=frame_done" "$SR"
 if ia_check "$CLOCKS" new "$SR" "$W/cdrift_$SR.align" > "$W/cdrift.txt"; then
     vs_ctl_dead drift-clock "the frame_done clock still met the frozen game clock" || fail=1

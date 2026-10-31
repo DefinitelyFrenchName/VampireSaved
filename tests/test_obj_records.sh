@@ -102,7 +102,15 @@ if [ "$MODE" = flipped-tile-code ]; then
 fi
 PWARGS=""
 if [ "$MODE" = wrong-page-geometry ]; then PWARGS="--first-page 0x40000"; fi
-python3 "$TOOL" "$DUMP" --frame "$FRAME" $PWARGS > "$W/py_f.txt" 2>/dev/null || true
+# the walk's stderr is kept (#310 group 5): a walker that CRASHED on the mode's input gives no records too, and that
+# disagreement is not the perturbation caught — only wrong-page-geometry's own REFUSING exit is
+pyrc=0; python3 "$TOOL" "$DUMP" --frame "$FRAME" $PWARGS > "$W/py_f.txt" 2>"$W/py_f.err" || pyrc=$?
+if [ "$pyrc" != 0 ]; then
+    if [ "$MODE" = wrong-page-geometry ] && grep -q "REFUSING" "$W/py_f.err"; then :
+    else vs_ctl_show_err "$W/py_f.err" || true
+        if [ -n "$MODE" ]; then echo "NOT JUDGED: $MODE — the section-1 walk exited $pyrc without its REFUSING line, so the records were not judged"; fi
+    fi
+fi
 LN=$(wc -l < "$W/lua_f.txt"); PN=$(wc -l < "$W/py_f.txt")
 [ "$LN" -gt 0 ] || bad "1z the lua produced NO records — the rig is not reaching the list"
 if diff -q "$W/lua_f.txt" "$W/py_f.txt" >/dev/null 2>&1; then
@@ -133,8 +141,11 @@ off = 0x8000 + 4 * 8 + 4
 d[off] ^= 0x01
 open(sys.argv[2], 'wb').write(bytes(d))
 PY
-python3 "$TOOL" "$W/bad.bin" --frame "$FRAME" > "$W/py_bad.txt"
-if diff -q "$W/py_f.txt" "$W/py_bad.txt" >/dev/null 2>&1; then
+brc=0; python3 "$TOOL" "$W/bad.bin" --frame "$FRAME" > "$W/py_bad.txt" 2>"$W/py_bad.err" || brc=$?
+if [ "$brc" != 0 ] || [ ! -s "$W/py_bad.txt" ]; then   # a positive record list first: a crash gives none (#310 group 5)
+    vs_ctl_show_err "$W/py_bad.err" || true
+    vs_ctl_dead flipped-tile-code "the walker gave no records on the flipped dump (exit $brc) — not the records changing" || fail=1
+elif diff -q "$W/py_f.txt" "$W/py_bad.txt" >/dev/null 2>&1; then
     vs_ctl_dead flipped-tile-code "a flipped code bit produced IDENTICAL output — the walker is blind" || fail=1
 else
     vs_ctl_fired flipped-tile-code "a one-bit change in a tile code changes the records (the mode flips a byte of the real dump and the section-1 walkers disagree)"

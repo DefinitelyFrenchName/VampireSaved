@@ -154,8 +154,11 @@ echo "== 2. liveness"
 for d in "$W"/*/*/; do
     [ -f "$d/rc" ] || continue
     run="$(basename "$(dirname "$d")")/$(basename "$d")"; tap="$d/t.tap"
-    fr="$(awk '$1=="END" { print $2 }' "$tap" 2>/dev/null)"
-    [ -n "$fr" ] || { bad "$run: no END line (exit $(cat "$d/rc")) — a dead tap is not evidence"; continue; }
+    # `|| true` (#310, 14z-215): a run that wrote no tap at all made this awk exit 2, and `set -e` ended the gate there
+    # SILENTLY with exit 2 — read HONOURED under either mode (measured with MAME_BIN=/usr/bin/false)
+    fr="$(awk '$1=="END" { print $2 }' "$tap" 2>/dev/null || true)"
+    [ -n "$fr" ] || { bad "$run: no END line (exit $(cat "$d/rc")) — a dead tap is not evidence"
+        echo "NOT JUDGED: the tap run $run wrote no END line, so it measured nothing (#310: a control mode ending here is UNJUDGED)"; continue; }
     if [ "$CONTROL" = range-silent ]; then silence_p2 "$tap" "$tap.sil" && mv "$tap.sil" "$tap"; fi
     _dw="$(dead_windows "$tap" "$fr")"
     [ -z "$_dw" ] || bad "$run: ${_dw}— that window is dead"

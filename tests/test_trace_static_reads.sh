@@ -114,6 +114,18 @@ open(sys.argv[2], "w").write(s.replace(a, "    judge = lambda root, rch, blob, c
 PY
 }
 
+# A COPY'S RUN WITH NO SUMMARY JUDGED NOTHING (#310 group 5, 14z-215): a scorer copy that crashed prints no MISSES line and
+# no MISS line, which the modes read as the miss caught and the twins of section 5 read as the miss lost. scored <mode>:
+# true when $out carries the scorer's `MISSES n in m gates` summary; otherwise the copy's crash is surfaced and, under
+# <mode>, the run says it judged nothing.
+scored() {
+    printf '%s\n' "$out" > "$W/scored_out.txt"
+    grep >/dev/null '^MISSES [0-9]* in [0-9]* gates$' "$W/scored_out.txt" && return 0
+    vs_ctl_show_err "$W/scored_out.txt" || true
+    if vs_ctl_is "$1"; then echo "NOT JUDGED: $1 — the scorer copy printed no MISSES summary, so no read was judged"; fi
+    return 1
+}
+
 echo "== 1. the clean traces: no miss"
 T1="$W/clean"; vs_ctl_is planted-miss && T1="$W/planted"
 out="$(python3 "$TOOL" score --root "$RR" --traces "$T1" --jobs 2 2>&1)"; rc=$?
@@ -131,21 +143,21 @@ SU="$RR/tools"; if vs_ctl_is scratch-unscored; then scratch_unscored "$W/tools_s
 out="$(cd "$R/tools" && python3 "$TOOL" score --root "$RR" --traces "$W/scratch" --tools "$SU" --jobs 2 2>&1)"; rc=$?
 if [ "$rc" = 1 ] && [ "$(echo "$out" | grep -c '^MISS	')" = 1 ] && echo "$out" | grep >/dev/null '^MISS	g_tmpl	build/agent7/x.txt$'; then
     ok "MISS g_tmpl build/agent7/x.txt (its template names it, the change set drops it); g_whole's read is no miss; exit 1"
-else bad "the scratch traces: exit $rc, $(echo "$out" | grep '^MISS' | tr '\n' ' ')"; fi
+else bad "the scratch traces: exit $rc, $(echo "$out" | grep '^MISS' | tr '\n' ' ')"; scored scratch-unscored || :; fi
 
 echo "== 2c. a read strace SPLIT around another process's line is scored (#283)"
 SP="$TOOL"; if vs_ctl_is split-unread; then split_unread "$W/tool_sp.py"; SP="$W/tool_sp.py"; fi
 out="$(cd "$R/tools" && python3 "$SP" score --root "$RR" --traces "$W/split" --jobs 2 2>&1)"; rc=$?
 if [ "$rc" = 1 ] && [ "$(echo "$out" | grep -c '^MISS	')" = 1 ] && echo "$out" | grep >/dev/null '^MISS	g_named	docs/hidden.md$'; then
     ok "MISS g_named docs/hidden.md from the split lines, exit 1"
-else bad "the split read: exit $rc, $(echo "$out" | grep '^MISS' | tr '\n' ' ')"; fi
+else bad "the split read: exit $rc, $(echo "$out" | grep '^MISS' | tr '\n' ' ')"; scored split-unread || :; fi
 
 echo "== 2d. a run-record read N-F-CHANGE carries is a miss (14z-206, #286): the scorer judges as predict() does"
 NF="$TOOL"; if vs_ctl_is nf-change-unscored; then nf_change_unscored "$W/tool_nf.py"; NF="$W/tool_nf.py"; fi
 out="$(cd "$R/tools" && python3 "$NF" score --root "$RR" --traces "$W/runs" --jobs 2 2>&1)"; rc=$?
 if [ "$rc" = 1 ] && [ "$(echo "$out" | grep -c '^MISS	')" = 1 ] && echo "$out" | grep >/dev/null '^MISS	g_runs	tests/rulecheck/runs/r1/verdict.txt$'; then
     ok "MISS g_runs tests/rulecheck/runs/r1/verdict.txt (R2 names it, N-F-CHANGE carries it), exit 1"
-else bad "the run-record read: exit $rc, $(echo "$out" | grep '^MISS' | tr '\n' ' ')"; fi
+else bad "the run-record read: exit $rc, $(echo "$out" | grep '^MISS' | tr '\n' ' ')"; scored nf-change-unscored || :; fi
 
 echo "== 2e. every scored verdict equals predict()'s for that one read"
 out="$(cd "$RR" && python3 - "$RR" "$W" <<'PY' 2>&1
@@ -225,15 +237,15 @@ if echo "$out" | grep >/dev/null '^MISS	g_named	docs/hidden.md$'; then vs_ctl_fi
 else vs_ctl_dead planted-miss "the planted read was not reported"; fail=1; fi
 scratch_unscored "$W/tools_su"
 out="$(cd "$R/tools" && python3 "$TOOL" score --root "$RR" --traces "$W/scratch" --tools "$W/tools_su" --jobs 2 2>&1)"
-if ! echo "$out" | grep >/dev/null '^MISS	g_tmpl	build/agent7/x.txt$'; then vs_ctl_fired scratch-unscored "a predictor that keeps the scratch leaves g_tmpl's scratch read flagged — section 2b is what catches it"
+if scored - && ! echo "$out" | grep >/dev/null '^MISS	g_tmpl	build/agent7/x.txt$'; then vs_ctl_fired scratch-unscored "a predictor that keeps the scratch leaves g_tmpl's scratch read flagged — section 2b is what catches it"
 else vs_ctl_dead scratch-unscored "the predictor copy keeping the scratch still let the miss be reported"; fail=1; fi
 nf_change_unscored "$W/tool_nf.py"
 out="$(cd "$R/tools" && python3 "$W/tool_nf.py" score --root "$RR" --traces "$W/runs" --jobs 2 2>&1)"
-if ! echo "$out" | grep >/dev/null '^MISS	g_runs	tests/rulecheck/runs/r1/verdict.txt$'; then vs_ctl_fired nf-change-unscored "the scorer of before 14z-206 counts g_runs' run-record read as flagged — section 2d is what catches it"
+if scored - && ! echo "$out" | grep >/dev/null '^MISS	g_runs	tests/rulecheck/runs/r1/verdict.txt$'; then vs_ctl_fired nf-change-unscored "the scorer of before 14z-206 counts g_runs' run-record read as flagged — section 2d is what catches it"
 else vs_ctl_dead nf-change-unscored "the pre-14z-206 judgment still reported the run-record miss"; fail=1; fi
 split_unread "$W/tool_sp.py"
 out="$(cd "$R/tools" && python3 "$W/tool_sp.py" score --root "$RR" --traces "$W/split" --jobs 2 2>&1)"
-if ! echo "$out" | grep >/dev/null '^MISS	g_named	docs/hidden.md$'; then vs_ctl_fired split-unread "a scorer reading strace's lines raw misses the split read — section 2c is what catches it"
+if scored - && ! echo "$out" | grep >/dev/null '^MISS	g_named	docs/hidden.md$'; then vs_ctl_fired split-unread "a scorer reading strace's lines raw misses the split read — section 2c is what catches it"
 else vs_ctl_dead split-unread "the copy without re-joining still reported the split read"; fail=1; fi
 no_narrowing "$W/tool_nn.py"
 out="$(cd "$R/tools" && python3 "$W/tool_nn.py" control --root "$RR" --traces "$W/clean" --jobs 2 2>&1)"

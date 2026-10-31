@@ -5,6 +5,8 @@
 # with FREEZE=1 after review. class<TAB>gate
 declares	audit_air_dash_height
 declares	audit_air_gc_legacy
+declares	audit_anakaris_rows
+declares	audit_bishamon_charge_316
 declares	audit_capture_matrix
 declares	audit_chains174
 declares	audit_chains184
@@ -70,15 +72,19 @@ declares	audit_lag_budget
 declares	audit_landing_sound
 declares	audit_latch_reads
 declares	audit_legacy_pairings
+declares	audit_lilith_gps_counter
 declares	audit_marionette_cost
 declares	audit_mask_window_ff4182
 declares	audit_mask_window_ff42a2
 declares	audit_merged_legacy
 declares	audit_merged_vec3
 declares	audit_mister_map_fit
+declares	audit_mizuumi_354_3a8
 declares	audit_mizuumi_attack
+declares	audit_mizuumi_finishes
 declares	audit_mizuumi_inputs
 declares	audit_mizuumi_rows_b
+declares	audit_mizuumi_rows_c
 declares	audit_mizuumi_struct
 declares	audit_move_parity
 declares	audit_move_parity_attribution
@@ -113,6 +119,7 @@ declares	audit_stage_sweep
 declares	audit_stock_emulator_stall
 declares	audit_tech_roll
 declares	audit_tenant_continue_switch
+declares	audit_tenant_cpu_ai
 declares	audit_tenant_cpu_soak
 declares	audit_tenant_downwin
 declares	audit_tenant_throw_geometry
@@ -209,6 +216,8 @@ declares	test_copy_flags
 declares	test_crash_guard
 declares	test_crosscheck_229
 declares	test_crypt_boundary
+declares	test_ctl_show_err
+declares	test_dead_exit_census
 declares	test_decode_stage_banners
 declares	test_decrypt_cache
 declares	test_decrypt_oracle
@@ -303,6 +312,7 @@ declares	test_index_window_thunk
 declares	test_inp_corpus
 declares	test_inp_crash_merged_m8_01
 declares	test_input_integrity
+declares	test_instr_align_unjudged
 declares	test_jtcores_twin
 declares	test_jtsim_scratch_heal
 declares	test_kernel_voice_tables
@@ -384,6 +394,7 @@ declares	test_pcrel_escapes
 declares	test_phasea_a3_liveness
 declares	test_phasec_image
 declares	test_phasec_spaces
+declares	test_plants_not_applied
 declares	test_pod_black_foot_palette
 declares	test_pointer_flow
 declares	test_poke_readback

@@ -3,6 +3,11 @@
 # Frozen 14z-161 with FREEZE=1; a new row is a new poked leg — classify it (and tap it if CROSS-FLAVOR) before re-freezing.
 #--
 script	leg	replay	side	route	cell	poke	class	note
+tests/audit_anakaris_rows.sh	native	replays/df/105_df_sas_armor.rpl	P1	-	01 Demitri	06	CROSS-INERT	
+tests/audit_anakaris_rows.sh	native	replays/df/105_df_sas_armor.rpl	P2	R R	03 Victor	03	SAME	
+tests/audit_bishamon_charge_316.sh	native	replays/df/105_df_sas_armor.rpl	P1	-	01 Demitri	08	CROSS-INERT	
+tests/audit_bishamon_charge_316.sh	native	replays/df/105_df_sas_armor.rpl	P1	-	01 Demitri	0e	CROSS-INERT	
+tests/audit_bishamon_charge_316.sh	native	replays/df/105_df_sas_armor.rpl	P2	R R	03 Victor	03	SAME	
 tests/audit_clone_beam_lines.sh	ours	replays/df/100_df_clone_beams.rpl	P1	-	01 Demitri	10	CROSS-INERT	
 tests/audit_clone_beam_lines.sh	ours	replays/df/100_df_clone_beams.rpl	P2	R R	03 Victor	03	SAME	
 tests/audit_continue_ladder.sh	ours	replays/26_don_arcade_mash.rpl	P1	U U R	0f Jedah	03	CROSS-INERT	
@@ -188,12 +193,16 @@ tests/audit_latch_reads.sh	native	(replay not named in the script)	P2	-	-	$2	PAR
 tests/audit_latch_reads.sh	ours	(replay not named in the script)	P1	-	-	$1	PARAM	no id is CROSS-FLAVOR here
 tests/audit_latch_reads.sh	ours	(replay not named in the script)	P2	-	-	$2	PARAM	no id is CROSS-FLAVOR here
 tests/audit_legacy_pairings.sh	ours	replays/16_xemu_2p.rpl	P1	-	01 Demitri	$id	PARAM	no id is CROSS-FLAVOR here
+tests/audit_lilith_gps_counter.sh	native	replays/df/105_df_sas_armor.rpl	P1	-	01 Demitri	0e	CROSS-INERT	
+tests/audit_lilith_gps_counter.sh	native	replays/df/105_df_sas_armor.rpl	P2	R R	03 Victor	03	SAME	
 tests/audit_merged_legacy.sh	ours	replays/03_two_player_vs.rpl	P1	-	01 Demitri	$1	PARAM	no id is CROSS-FLAVOR here
 tests/audit_merged_legacy.sh	ours	replays/03_two_player_vs.rpl	P1	-	01 Demitri	10	CROSS-INERT	
 tests/audit_merged_legacy.sh	ours	replays/03_two_player_vs.rpl	P1	-	01 Demitri	11	CROSS-INERT	
 tests/audit_merged_legacy.sh	ours	replays/03_two_player_vs.rpl	P2	R R	03 Victor	$1	PARAM	no id is CROSS-FLAVOR here
 tests/audit_merged_legacy.sh	ours	replays/03_two_player_vs.rpl	P2	R R	03 Victor	03	SAME	
 tests/audit_merged_vec3.sh	ours	replays/hui/70_hui_mash.rpl	P1	-	01 Demitri	10	CROSS-INERT	
+tests/audit_mizuumi_rows_c.sh	native	replays/df/105_df_sas_armor.rpl	P1	-	01 Demitri	$1	PARAM	CROSS-FLAVOR if id in 0x13
+tests/audit_mizuumi_rows_c.sh	native	replays/df/105_df_sas_armor.rpl	P2	R R	03 Victor	03	SAME	
 tests/audit_objhook_owner_census.sh	ours	(replay not named in the script)	P1	-	-	10	?	
 tests/audit_phase_mode_cost.sh	ours	replays/03_two_player_vs.rpl	P1	-	01 Demitri	13	CROSS-INERT	
 tests/audit_phase_mode_cost.sh	ours	replays/03_two_player_vs.rpl	P2	R R	03 Victor	13	CROSS-INERT	

@@ -127,13 +127,25 @@ for name in $LEGS; do
         # the perturbation: watch +0x3E4.. instead of +0x3BC.. — nothing latched is inside
         sed -e 's/RTAP="\$blk,40"/RTAP="$(printf %x $((0x$blk + 40))),40"/' -e "s|^REPO=.*|REPO=\"$REPO\"|" \
             "$REPO/tools/tap_latch_reads.sh" > "$W/tap_moved.sh"; chmod +x "$W/tap_moved.sh"
-        grep -q 'printf %x' "$W/tap_moved.sh" || { echo "FAIL: the tap-window-moved perturbation did not apply"; exit 1; }
+        # #310 group 6 (14z-215): a plant that did not apply is a REFUSAL (exit 3, rule 3 reads it UNJUDGED), never a FAIL
+        grep -q 'printf %x' "$W/tap_moved.sh" && ! grep -q 'RTAP="\$blk,40"' "$W/tap_moved.sh" \
+            || { echo "REFUSED: tap-window-moved — the perturbation did not apply (tools/tap_latch_reads.sh no longer carries RTAP=\"\$blk,40\"): the mode judged nothing"; exit 3; }
     fi
     vs_pool_run one_leg "$name" "$1" "$2" "$3" "$4" "$W/$name.tsv" $rp
 done
 vs_pool_wait
 for name in $LEGS; do
-    [ "$(cat "$W/$name.rc" 2>/dev/null)" = 0 ] || { bad "$name: $(tail -1 "$W/$name.log")"; continue; }
+    if [ "$(cat "$W/$name.rc" 2>/dev/null)" != 0 ]; then
+        bad "$name: $(tail -1 "$W/$name.log")"
+        # #310 groups 5-6 (14z-215): under tap-window-moved the leg ran the perturbed COPY of the tap, and the mode's
+        # finding is a COMPLETED leg whose rows differ — a leg that did not complete is not it. The copy's own output
+        # at column 0 (a traceback reads DIED), then NOT JUDGED (a shell error or a VOID reads UNJUDGED), never HONOURED.
+        if [ "$CONTROL" = tap-window-moved ]; then
+            head -60 "$W/$name.log"
+            echo "NOT JUDGED: tap-window-moved — leg $name did not complete on the perturbed tap copy (its output above), so the run measured nothing"
+        fi
+        continue
+    fi
     # in-play rows only: side, offset, pc, values (reads and frames are reported, not frozen)
     awk -F'\t' -v n="$name" -v fl="$FLOOR" 'NR>1 && $9+0 >= fl {print n"\t"$2"\t"$4"\t"$6"\t"$10}' "$W/$name.tsv" | sort > "$W/$name.rows"
     [ -s "$W/$name.rows" ] || printf '%s\t-\t-\t-\t-\n' "$name" > "$W/$name.rows"
