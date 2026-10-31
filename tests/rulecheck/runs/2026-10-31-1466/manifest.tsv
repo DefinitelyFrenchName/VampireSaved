@@ -1,0 +1,21 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent215/t341/closure/closing_comment.md	68c0a6778fedaa0298d04ba982cd7b91a4ba1d0e
+build/agent215/t341/closure/ticket_row_341.tsv	041b7c1845d479d57c0a2277371d67bdc50c3535
+build/agent215/t341/closure/issue_341.md	465b5585801c47b87b779f011bcdb572fb3422c3
+build/agent215/t341/closure/fix.diff	0571cb6a97ee01a08263898428b9485f1645a05b
+build/agent215/t341/recheck/fix2.diff	da01d7407aedc8ae394c278f46644ad7fe1757de
+build/agent215/t341/closure/red_and_green_rows.txt	66305b0a8e723bf9cd2a1a162afd4d913b82031c
+build/agent215/t341/recheck/sim341.sh	efab6c61c858062e31cd999ee6e7bb1f64c93d48
+build/agent215/t341/recheck/sim341.out	bf7b5da51379d0fb484dde37089035e0c347c357
+build/agent215/t341/recheck/A_tree_as_is.mode.log	0725ad1abf47eae2c60191452ad9fdad9aff767a
+build/agent215/t341/recheck/B_every_open_closed.mode.log	445f6a980fee3033347c1247a321de845a76e1a3
+build/agent215/t341/recheck/C_no_open_issue.plain.log	7ef25bc7ac411a3acd397463447c1029e1f72a71
+build/agent215/t341/recheck/C_no_open_issue.mode.log	9ca99a7cda6bfd7754cbc4ba4f1175eef4e4aa65
+build/agent215/t341/recheck/Cold_no_open_issue_b68922a6_gate.mode.log	8f8bf1fd080855026574985097801c5a885deb6d
+build/agent215/pilot_t215a/retrace_head.txt	c55ddddb2d5403b231747878fd4eba97d37853a5
+build/agent215/pilot_t215a/tt.log	2263a09b7d48343c18e8e70bcc0749923de8e494
+build/agent215/pilot_t215a/overlap.txt	ec73f653b44c0297b08ba131bebaaa02f6d5e00e
+build/agent215/pilot_t215a/classes.tsv	277ed2df93dbadd942d4ec2bde3eb201d68a9eab
+build/agent215/t341/recheck/controls_concurrent.diff	dc286289e230591e7ddb6053edadd056d52918b4
+build/agent215/t341/recheck/gotcha.diff	2e64bf007094138e461d9bfbf96bc8da54e813a6
+build/agent215/t341/recheck/run1465_verdict_real.txt	f22d2ed62419b9fb7b3389735322412f3456edf7

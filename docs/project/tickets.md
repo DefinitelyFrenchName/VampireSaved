@@ -11,13 +11,12 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**341 tickets** — status: open 4 · parked 8 · done 297 · declined 14 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 228 · cosmetic 17 · evolution 96 · **backfill debt: 0 rows**.
+**341 tickets** — status: open 3 · parked 8 · done 298 · declined 14 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 228 · cosmetic 17 · evolution 96 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
-| [#341](https://github.com/DefinitelyFrenchName/VampireSaved/issues/341) | bug | open | test_tickets' parked-disagrees control went DEAD once the newest ticket was closed (it perturbs the first row whatever its state) | `tests/test_tickets.sh` | none | `docs/project/gotchas.md § A CONTROL THAT PERTURBS "THE FIRST ROW" DEPENDS ON THAT ROW'S STATE` | none | 14z-214 |
 | [#338](https://github.com/DefinitelyFrenchName/VampireSaved/issues/338) | evolution | open | Proof sheets: a web build for the community — half-size WebP tiles, credits on every page, a plain-language intro, no local paths | `tools/proof_sheets.py` | `DECISIONS_HISTORY.md § the proof sheets get a web build for the community` | none | none | 14z-212,14z-213 |
 | [#310](https://github.com/DefinitelyFrenchName/VampireSaved/issues/310) | bug | open | An executed control whose mode run FAILs without judging anything reads HONOURED | `tests/lib/classify.sh` · `tests/test_applier_page_browser.sh` | none | none | none | 14z-206 |
 | [#294](https://github.com/DefinitelyFrenchName/VampireSaved/issues/294) | cosmetic | parked | Killshread's shock/electrocuted aura is red instead of yellow (accepted tradeoff, parked) | none | `DECISIONS_HISTORY.md § Ruled 2026-10-18 (14z-205) — #294` | none | none | - |
@@ -34,6 +33,7 @@ backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py pag
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#341](https://github.com/DefinitelyFrenchName/VampireSaved/issues/341) | bug | done | test_tickets' parked-disagrees control went DEAD once the newest ticket was closed (it perturbs the first row whatever its state) | `tests/test_tickets.sh` | none | `docs/project/gotchas.md § A CONTROL THAT PERTURBS "THE FIRST ROW" DEPENDS ON THAT ROW'S STATE` | `docs/project/gotchas.md § A CONTROL THAT PERTURBS "THE FIRST ROW" DEPENDS ON THAT ROW'S STATE` | 14z-214,14z-215 |
 | [#340](https://github.com/DefinitelyFrenchName/VampireSaved/issues/340) | bug | done | Every strict emulator run read NOT GREEN: audit_pool_drop is a DEAD ROW to the runners' emulator-tier classifier | `tests/run_all_emulator.sh` · `tests/run_all_static.sh` · `tests/test_emulator_runner.sh` | none | `docs/project/gotchas.md § A GATE THAT REACHES AN EMULATOR THROUGH SOMETHING THE TIER CLASSIFIER DOES NOT NAME` | `docs/project/gotchas.md § A GATE THAT REACHES AN EMULATOR THROUGH SOMETHING THE TIER CLASSIFIER DOES NOT NAME` | 14z-213,14z-214 |
 | [#339](https://github.com/DefinitelyFrenchName/VampireSaved/issues/339) | bug | done | The rule-checker ledger has 37 rows with session '-' (14z-187/187b/188); both ledger pages drop them without saying so | `tests/test_session_metrics.sh` | `DECISIONS_HISTORY.md § #339: the 37 unkeyed ledger rows` | `docs/project/gotchas.md § A COLLECTOR THAT GROUPS RECORDS BY A KEY DROPS A RECORD WITH NO KEY` | `docs/project/gotchas.md § A COLLECTOR THAT GROUPS RECORDS BY A KEY DROPS A RECORD WITH NO KEY` | 14z-213,14z-214 |
 | [#337](https://github.com/DefinitelyFrenchName/VampireSaved/issues/337) | evolution | done | The mktemp census does not check EXIT-trap order: a trap installed before a guarded site runs on the guard's stop | `tests/test_tmp_hygiene.sh` | `DECISIONS_HISTORY.md § #333: EXIT-trap order is stated as a limit` · `DECISIONS_HISTORY.md § #337: fix the quoted-# comment cut` | `docs/platform/gotchas.md § And the guard's own stop runs the EXIT trap already set` | none | 14z-212,14z-213 |

@@ -1,0 +1,16 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent215/t341/closure/closing_comment.md	39cdfc95d110a8e2f9fa5a796f05f1dfd38e117a
+build/agent215/t341/closure/ticket_row_341.tsv	041b7c1845d479d57c0a2277371d67bdc50c3535
+build/agent215/t341/closure/issue_341.md	465b5585801c47b87b779f011bcdb572fb3422c3
+build/agent215/t341/closure/fix.diff	0571cb6a97ee01a08263898428b9485f1645a05b
+build/agent215/t341/closure/red_and_green_rows.txt	66305b0a8e723bf9cd2a1a162afd4d913b82031c
+build/agent215/t341/closure/identity_14z215.txt	8266c5fb7e1b8ec2c315a2c4ebf8807698aabddb
+build/agent215/t341/closure/test_tickets.head.log	d274179d0d9604d2cb25999a7a273b387436b25a
+build/agent215/t341/closure/test_tickets.control_parked.head.log	c9ac01bf96a8d8643d1c284aa8bb1b83cb34f7d7
+build/agent215/t341/closure/after_closure_sim.log	8bdb6e037f19ee3f0463e667987e392536d03b0c
+build/agent215/t341/closure/row_change.diff	f20493d37a1985cb42b45ff3d5ec3a378dc34555
+build/agent215/t341/closure/pilot_t214c/retrace_head.txt	bd96095a659991e9dcc89b4c94eb16a82ebb2314
+build/agent215/t341/closure/pilot_t214c/tt.log	6d273ce308705c041f0d7df33277ad066633b5e7
+build/agent215/t341/closure/pilot_t214c/classes.tsv	753e2267aa5d14030f4e65581b399d0548f57a19
+build/agent215/t341/closure/controls_concurrent_rows.txt	e3e4abac70442ce97b1ba4cb614cb9599bb8759b
+build/agent215/t341/closure/gotcha_341.md	ca5858580c9e2daccfc49c984e4c160d85024c89

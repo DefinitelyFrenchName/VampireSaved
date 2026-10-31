@@ -7858,6 +7858,11 @@ Every perturbation in `tests/test_tickets.sh` edits the first ticket row of a co
 flips `open` to `parked` and anything else to `open`. It fired while the newest ticket happened to be open; once #340
 closed `done`, the flip wrote `open` over a CLOSED issue, `tools/tickets.py check` failed on the open/closed rule
 instead of the parked label, and the control was judged DEAD — the 14z-214 close's tier went red on data no one
-controls. **The rule:** a control that perturbs a record picks one the perturbation is MEANINGFUL for (here the first
-open or parked row), never a position whose content changes with the data; and its mode is run once the data around it
-has moved. `tests/test_tickets.sh` (control `parked-disagrees`) holds it.
+controls. **The rule:** a control that perturbs a record picks one the perturbation is MEANINGFUL for, never a position
+whose content changes with the data; it reads every input that decides "meaningful" (the first fix, 14z-214, read only
+the row's status; rule-checker run `2026-10-31-1465` found it would still pick a parked row whose issue had closed, and
+crash with a traceback once no open row was left — 14z-215 picks the first open or parked row whose SAVED ISSUE is
+OPEN); when no record qualifies it says `NOT JUDGED:` and fails, never a crash or a silent pass; and its mode is run
+once the data around it has moved (14z-215: the tree as it is, every open issue closed — the parked->open branch — and
+no open issue left, in clean worktrees, `build/agent215/t341/recheck/`). `tests/test_tickets.sh` (control
+`parked-disagrees`) holds it.

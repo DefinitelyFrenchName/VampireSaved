@@ -118,6 +118,27 @@ its control `parked-disagrees` DEAD for the wrong reason. Every perturbation edi
 or parked row (the plain run PASS, seven controls fired; as a mode it fails on #338 written `parked`); re-traced on
 PILOT; `docs/project/gotchas.md` "A CONTROL THAT PERTURBS "THE FIRST ROW" DEPENDS ON THAT ROW'S STATE". #341 stays open,
 to close on its rule-checker run.
+The re-run (staged tree `db6cc5b7`, `--confirm` on the red run's results) read GREEN: 107 PASS, 0 FAIL, 0 SKIP. Committed
+`b68922a6`; pins and sweep done; `origin/main` fetched again (nothing new) and pushed `550958ad..b68922a6`. `ledger-page`:
+published `a3294742` on `gh-pages`, the own site SKIPPED (`DEPLOY_TARGET` unset). **These lines were written after the
+push and ride the next session's close.**
+
+## Session 14z-215 — **in progress: #341 closed done after its re-check; #118's remaining rigs; #310's remaining shapes scoped.**
+
+### opened with
+The 14z-214 close's opener; the sweep CLEAN, `main` = `origin/main` at `b68922a6`, the 14z-214 CLOSE section's last four
+lines uncommitted as it said. The maintainer, on the proposed order (#341's closure and the remote scratch, then #118's
+rigs): **"the order you propose i agree, don't hesitate to parallelize what you can. The goal is to address all the
+non-parked tickets"**. Working evidence: `build/agent215/` (local).
+
+### (1) THE REMOTE SCRATCH; #341
+PILOT's and ERIS's 14z-214 scratch deleted (PILOT's came to about 2.9 GB, not the 1.6 GB the opener said: the three
+`t214_tr*` traces were about 950 MB each). **#341:** rule-checker run `2026-10-31-1465` VIOLATED the first closure packet
+(the first step's selection read only the row's status, so it could still pick a row whose issue had closed and crashed
+with no open row left; the first measurement ran in a tree with `STATE.md` edited). Fixed: `parked-disagrees` takes the
+first open or parked row whose saved issue is OPEN, and says `NOT JUDGED:` when none qualifies; run in clean worktrees
+over three index states (`build/agent215/t341/recheck/`); `docs/project/gotchas.md`'s entry updated; re-traced on PILOT
+(`pilot:3ccc77fd`, 7 controls HONOURED, SAFE). **Closed `done`** with its closing comment after run `2026-10-31-1466` (OK).
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings

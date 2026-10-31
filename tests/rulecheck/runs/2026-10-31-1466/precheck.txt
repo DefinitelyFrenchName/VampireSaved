@@ -1,0 +1,5 @@
+  FLAG D-ABSOLUTE: It no longer depends on the state of the newest ticket, and when there is nothing it can perturb it says so instead of crashing.  [build/agent215/t341/closure/closing_comment.md]
+  FLAG D-ABSOLUTE: The control now takes the first open or parked row whose saved GitHub issue is OPEN; only there does the parked label mean anything.  [build/agent215/t341/closure/closing_comment.md]
+  FLAG D-ABSOLUTE: Its 7 controls were write-traced: every run HONOURED, and no path is written by two of them or written by one and read by another (SAFE).  [build/agent215/t341/closure/closing_comment.md]
+  FLAG D-ABSOLUTE: Whether each stays meaningful whatever that row's state was not re-checked; their modes were run only in the three index states above.  [build/agent215/t341/closure/closing_comment.md]
+packet_check: 4 flag(s): D-ABSOLUTE 4

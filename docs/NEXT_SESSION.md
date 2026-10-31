@@ -60,6 +60,8 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
+   **THE WORKING TREE CARRIES UNCOMMITTED RECORDS** written after the 14z-214 push: the CLOSE section's last lines and
+   this note. They ride this session's close.
    **#341** (test_tickets' `parked-disagrees` went DEAD once the newest ticket closed) is fixed in the 14z-214 close commit
    and re-traced on PILOT: close it on its rule-checker run.
 1. **#118 — THE REMAINING RIGS.** Done this sitting: B6 (Sasquatch's penguins, +0x36C) and rows B (+0x384, +0x3A8,

@@ -1,0 +1,3 @@
+  FLAG D-ABSOLUTE: **What was learned:** a control that perturbs a record must pick one the perturbation means something for, never a position whose content changes with the data.  [build/agent215/t341/closure/closing_comment.md]
+  FLAG D-ABSOLUTE: Whether each stays meaningful whatever that row's state was not re-checked; no mode was run with the first row in each possible state.  [build/agent215/t341/closure/closing_comment.md]
+packet_check: 2 flag(s): D-ABSOLUTE 2

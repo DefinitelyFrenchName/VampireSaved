@@ -62,10 +62,13 @@ mkcopy() {  # mkcopy <dir>
 }
 # THE PERTURBATIONS, one per declared control; the control section and the
 # CONTROL=<name> mode call the same function. EXPECT = the failure's substring.
-# Each edits the FIRST ticket row of the copy (parked-disagrees the first open or parked one: a closed row carries
-# no parked label to disagree with, 14z-214); links still resolve in this tree.
+# Each edits the FIRST ticket row of the copy (parked-disagrees the first open or parked row whose saved GitHub issue
+# is OPEN: the parked-label check reads only an open issue, and a closed one fails on the open/closed rule instead —
+# #341, 14z-214, and its re-check 14z-215); links still resolve in this tree. A perturbation with no row it can mean
+# anything for prints NOT JUDGED and fails, which the control classifier reads as UNJUDGED, never HONOURED (#310).
 perturb() {  # perturb <name> <dir>
-    python3 - "$1" "$2" <<'PY' || { echo "no such perturbation: $1"; exit 3; }
+    _prc=0
+    python3 - "$1" "$2" <<'PY' || _prc=$?
 import sys
 from pathlib import Path
 name, root = sys.argv[1], Path(sys.argv[2])
@@ -74,12 +77,16 @@ debt, page = root / "tests/expected/tickets_debt.txt", root / "docs/project/tick
 cols = ["issue", "kind", "status", "title", "repro", "decided", "learned", "wrong", "sessions"]
 lines = idx.read_text().splitlines()
 data = [i for i, l in enumerate(lines) if l and not l.startswith("#") and not l.startswith("issue\t")]
-first = data[0]
-if name == "parked-disagrees":  # a closed row has no parked label to disagree with: take the first open or parked row
-    first = next(i for i in data if lines[i].split("\t")[2] in ("open", "parked"))
-row = dict(zip(cols, lines[first].split("\t")))
 state = {l.split("\t")[0]: l.split("\t")[1] for l in snap.read_text().splitlines()
          if l and not l.startswith("#") and not l.startswith("number\t")}
+first = data[0]
+if name == "parked-disagrees":  # only an OPEN issue's parked label is checked: take the first open/parked row of one
+    pick = [i for i in data if lines[i].split("\t")[2] in ("open", "parked")
+            and state.get(lines[i].split("\t")[0]) == "OPEN"]
+    if not pick:
+        sys.exit(2)
+    first = pick[0]
+row = dict(zip(cols, lines[first].split("\t")))
 if name == "row-missing":
     del lines[first]
 elif name == "state-disagrees":
@@ -105,6 +112,12 @@ if name not in ("row-missing", "page-stale"):
     lines[first] = "\t".join(row[c] for c in cols)
 idx.write_text("\n".join(lines) + "\n")
 PY
+    case "$_prc" in
+    0) ;;
+    2) echo "NOT JUDGED: $1 — the index holds no open or parked row of an OPEN saved issue, so there is nothing to perturb"
+       echo "FAIL"; exit 1 ;;
+    *) echo "no such perturbation: $1"; exit 3 ;;
+    esac
     case "$1" in
     row-missing)        EXPECT="has no row in" ;;
     state-disagrees)    EXPECT="on GitHub" ;;
