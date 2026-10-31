@@ -23,15 +23,15 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 
 | figure | count |
 |---|---|
-| distinct program-space addresses named | 3643 |
-| named by a document or manifest only | 2298 |
-| named by both a document/manifest and code | 869 |
-| named by CODE ONLY (the gap list below) | 476 |
-| carried by atlas | 719 |
+| distinct program-space addresses named | 3658 |
+| named by a document or manifest only | 2301 |
+| named by both a document/manifest and code | 880 |
+| named by CODE ONLY (the gap list below) | 477 |
+| carried by atlas | 733 |
 | carried by engine_internals | 839 |
 | carried by other docs | 1063 |
 | carried by manifests | 1850 |
-| carried by code | 1345 |
+| carried by code | 1357 |
 
 ## Addresses
 
@@ -173,11 +173,14 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0075FE` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) [vs2] |
 | `PRG:0x00763A` | docs/game/atlas/ram.md — System / match globals [vs2]; docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) [vs2]; tests/audit_tick_cadence.sh; tests/test_don_immortal_native.sh |
 | `PRG:0x007A78` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] [vs2] |
+| `PRG:0x008728` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] |
 | `PRG:0x00895C` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; tools/audit_latch_readers.py |
 | `PRG:0x00896A` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] |
 | `PRG:0x008A56` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x008A5C` | docs/game/atlas/select_screen.md — SHADOW vs A TENANT — the static pass (14z-116, the maintainer's question) |
+| `PRG:0x008A70` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] |
 | `PRG:0x008A86` | docs/game/atlas/id_space.md — The arcade-opponent path (a fourth roster work item); docs/game/atlas/id_space.md — Which ids vanilla ever assigns (measured over the corpus); docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; tests/audit_latch_reads.sh |
+| `PRG:0x008DB0` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] |
 | `PRG:0x008E0C` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/audit_extra_pass.sh; tests/audit_tick_cadence.sh |
 | `PRG:0x008E10` | docs/game/atlas/ram.md — System / match globals; tests/audit_extra_pass.sh; tests/lua/specials_b_trace.lua; tools/specials_b_rigs.py |
 | `PRG:0x008E14` | docs/platform/gotchas.md — UNDER '-debug', A STOP THAT LANDS AS THE SCREEN FRAME ADVANCES MAKES THAT FRAME'S SAMPLE READ ONE ENGINE PASS EARLY — and the game clock cannot see it (paid: 14z-205b, #229); tools/specials_b_rigs.py |
@@ -192,6 +195,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x00900E` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x009030` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) [vs2]; tests/audit_tick_cadence.sh |
 | `PRG:0x009074` | docs/game/atlas/ram.md — System / match globals; docs/project/doc_audit_14z118.md — 4. Log of the pass (one line per commit) |
+| `PRG:0x0090A0` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] |
 | `PRG:0x0090B2` | docs/game/atlas/select_screen.md — SHADOW vs A TENANT — the static pass (14z-116, the maintainer's question) |
 | `PRG:0x009436` | docs/project/patch_notes.md — B. the obj_hook dispatch sites left VANILLA — the WALKER is relocated; build/manifest/donovan.toml — obj_hook; build/manifest/huitzil.toml — obj_hook; build/manifest/pyron.toml — obj_hook; tests/audit_walker_ghost.sh |
 | `PRG:0x009438` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
@@ -207,6 +211,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x009920` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x009924` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x009996` | docs/game/atlas/character_tables.md — Slot→character map, vsavj (COMPLETE; select-name/HUD verified picks) |
+| `PRG:0x009A2C` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; tests/audit_mizuumi_rows_b.sh |
 | `PRG:0x009B88` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x009B8C` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x009BB2` | docs/game/atlas/character_tables.md — Slot→character map, vsavj (COMPLETE; select-name/HUD verified picks); docs/game/atlas/select_screen.md — SHADOW vs A TENANT — the static pass (14z-116, the maintainer's question); docs/game/atlas/select_screen.md — The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path; tests/audit_marionette_cost.sh; tests/test_copy_flags.sh; tests/test_shadow_tenant.sh |
@@ -225,6 +230,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x00A6A0` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; tests/audit_mizuumi_struct.sh |
 | `PRG:0x00A77C` | docs/game/atlas/select_screen.md — SHADOW vs A TENANT — the static pass (14z-116, the maintainer's question) |
 | `PRG:0x00A782` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] [vs2]; tests/test_latch_readers.sh; tools/audit_latch_readers.py |
+| `PRG:0x00A79C` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; tests/audit_mizuumi_rows_b.sh |
 | `PRG:0x00A7F0` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix); tests/audit_tick_cadence.sh |
 | `PRG:0x00A804` | docs/project/patch_notes.md — B. the obj_hook dispatch sites left VANILLA — the WALKER is relocated; build/manifest/donovan.toml — obj_hook; build/manifest/huitzil.toml — obj_hook; build/manifest/pyron.toml — obj_hook |
 | `PRG:0x00A806` | build/manifest/shared_writes.toml — donovan; build/manifest/shared_writes.toml — huitzil; build/manifest/shared_writes.toml — pyron |
@@ -418,8 +424,8 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x016DE4` | docs/game/engine_internals.md — The object-script state dispatcher at 'PRG:0x018508' (14z-109) [vs2]; docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) [vs2]; docs/project/patch_index.md — Named patches and windows — the per-session sections, folded (14z-122) [vs2]; docs/project/patch_notes.md — A. '[reaction_hook]' d2 extension (donovan.toml; singleton, merged inherits); build/manifest/donovan.toml — reaction_hook; tests/test_reaction_hook_d2.sh; +2 more |
 | `PRG:0x016DFC` | docs/game/atlas/ram.md — System / match globals; docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100); tests/audit_ff8130_writers.sh |
 | `PRG:0x016E04` | build/manifest/huitzil.toml — beam_effect_class31; tests/audit_effect_class_rows.sh |
-| `PRG:0x016E4C` | docs/game/atlas/id_space.md — Which ids vanilla ever assigns (measured over the corpus); docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; tests/audit_id_writers.sh |
-| `PRG:0x016E4E` | docs/game/atlas/id_space.md — Which ids vanilla ever assigns (measured over the corpus); docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; tests/audit_id_writers.sh |
+| `PRG:0x016E4C` | docs/game/atlas/id_space.md — Which ids vanilla ever assigns (measured over the corpus); docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; tests/audit_id_writers.sh; tests/audit_mizuumi_rows_b.sh |
+| `PRG:0x016E4E` | docs/game/atlas/id_space.md — Which ids vanilla ever assigns (measured over the corpus); docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; tests/audit_id_writers.sh; tests/audit_mizuumi_rows_b.sh |
 | `PRG:0x016E98` | docs/game/engine_internals.md — The reaction-class dispatch is THREE dispatchers, and vs2 widened their window (the 14z-110 fix) [vs2] |
 | `PRG:0x016EB6` | docs/game/engine_internals.md — The object-script state dispatcher at 'PRG:0x018508' (14z-109); tools/audit_fsm_census.py; tools/audit_reaction_classes.py |
 | `PRG:0x016F56` | docs/game/engine_internals.md — The anim walker reads the sprite list from node+4 (measured 14z-70) |
@@ -693,6 +699,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x01BC9C` | docs/game/atlas/ram.md — Masked windows for hooked-build legacy comparison (CLAUDE.md §4 amendment, 2026-07-25) |
 | `PRG:0x01BE8C` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 |
 | `PRG:0x01BE8E` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6 |
+| `PRG:0x01BEE2` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; tests/audit_mizuumi_rows_b.sh |
 | `PRG:0x01BF12` | build/manifest/donovan.toml — weapon_accent_rowd_slot |
 | `PRG:0x01BF56` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; tools/gen_donovan_patch.py; tools/select_port.py |
 | `PRG:0x01BF5E` | docs/game/atlas/ram.md — System / match globals; docs/game/engine_internals.md — the #92 crash; decoded end to end and confirmed on screen); tools/decode_stage_banners.py |
@@ -701,6 +708,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x01BFEE` | docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100) |
 | `PRG:0x01C076` | docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100) |
 | `PRG:0x01C0E4` | docs/game/atlas/venue_assets.md — §2 addendum: the fold path is dormant in every flow the audit measured — and a tenant-visible screen outside them shows its signature (#100) |
+| `PRG:0x01C186` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; tests/audit_mizuumi_rows_b.sh; tests/test_dualtrack.sh |
 | `PRG:0x01C1B6` | build/manifest/donovan.toml — weapon_accent_rowd_slot |
 | `PRG:0x01C1FA` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; tools/gen_donovan_patch.py; tools/select_port.py |
 | `PRG:0x01C21E` | docs/game/engine_internals.md — Sprite palette pipeline (session 14b, playtest-driven); docs/project/gotchas.md — A READER CENSUS BY BASE ADDRESS, OR A BREAKPOINT ON THE KNOWN READERS, CANNOT SHOW A SCREEN DOES NOT READ A TABLE (paid: 14z-195, #124, rule-checker run 2026-10-08-743) |
@@ -719,6 +727,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x01C5CE` | docs/project/patch_notes.md — Stage 4 progress — sessions 5-6; tools/gen_donovan_patch.py; tools/select_port.py |
 | `PRG:0x01C670` | build/manifest/donovan.toml — hit_class_props_ext_lo |
 | `PRG:0x01C68E` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; build/manifest/donovan.toml — hit_class_props_ext_lo |
+| `PRG:0x01C692` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; tests/audit_mizuumi_rows_b.sh |
 | `PRG:0x01C6E4` | docs/game/engine_internals.md — LIFETIME HAZARD (measured 14z-126b, 2026-09-02) |
 | `PRG:0x01C806` | docs/game/gotchas.md — THE BOOT NAME SCREEN'S DISPLAY SCRIPT TAKES AN EVEN COLUMN — an odd one is a 68k ADDRESS ERROR that soft-boots the machine (paid: 14z-127); docs/project/patch_index.md — Romset patch bundles (program + gfx content); docs/project/patch_notes.md — 14z-127 — THE BOOT NAME SCREEN: "VAMPIRE SAVIOR" -> "VAMPIRE SAVED"; build/manifest/donovan.toml — facing_rule5; build/manifest/huitzil.toml — air_block_guard_window; build/manifest/pyron.toml — random_select_roster; +3 more |
 | `PRG:0x01C822` | docs/project/patch_index.md — Romset patch bundles (program + gfx content); docs/project/patch_notes.md — 14z-127 — THE BOOT NAME SCREEN: "VAMPIRE SAVIOR" -> "VAMPIRE SAVED"; build/manifest/donovan.toml — boot_title_saved_1; build/manifest/huitzil.toml — boot_title_saved_1; build/manifest/pyron.toml — boot_title_saved_1; build/manifest/shared_writes.toml — (top); +7 more |
@@ -1763,7 +1772,9 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0472FC` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
 | `PRG:0x047E60` | docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3); docs/project/inferred_claims.md — G1 (9) — the atlas commits; tests/audit_df_accumulator.sh |
 | `PRG:0x047EDA` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; docs/game/engine_internals.md — The attack record's fields, by their READERS (14z-121, static on vs2 '0x16930-0x175F6', the hit-apply code that holds the record in A3) [vs2] |
+| `PRG:0x047F14` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; tests/audit_sas_penguin_count.sh |
 | `PRG:0x047FB6` | docs/project/tables/reconciliation.md — Twin-choice case law; build/manifest/reconciliation.toml — map; tests/audit_tripwire_reach.sh; tests/test_tenant_loop.sh |
+| `PRG:0x04800E` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; tests/audit_sas_penguin_count.sh |
 | `PRG:0x0486D0` | docs/project/patch_notes.md — 14z-102 — #109 THE CLONE-BEAM FIX (row 31) — FROZEN as huitzil-m19/merged-m5 (bit-for-bit the probes), field-confirmed, #109 CLOSED |
 | `PRG:0x048790` | docs/project/patch_notes.md — 14z-102 — #109 THE CLONE-BEAM FIX (row 31) — FROZEN as huitzil-m19/merged-m5 (bit-for-bit the probes), field-confirmed, #109 CLOSED |
 | `PRG:0x0489DE` | docs/game/engine_internals.md — Shadow / reflection servants (14z-66; premise CORRECTED 14z-68f); docs/game/engine_internals.md — system (session 14z-66, measured on the Huitzil port); docs/project/patch_notes.md — (round-2 report; the capture-anim shadow over-index); build/manifest/huitzil.toml — obj_hook |
@@ -1807,8 +1818,8 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x0545DC` | docs/project/hardening_register.md — 5. Known-uncovered DYNAMIC surfaces (H4); tests/audit_projectile_clash.sh |
 | `PRG:0x0545DE` | build/manifest/reconciliation.toml — map |
 | `PRG:0x0546E6` | docs/game/atlas/character_tables.md — The full per-character table BANK — layout identical in all three sets |
-| `PRG:0x05475A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
-| `PRG:0x054770` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T] |
+| `PRG:0x05475A` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; tests/audit_sas_penguin_count.sh |
+| `PRG:0x054770` | docs/game/atlas/ram.md — Combat struct (player block +0x000) [C, verified D/T]; tests/audit_sas_penguin_count.sh |
 | `PRG:0x054776` | build/manifest/reconciliation.toml — map |
 | `PRG:0x054C04` | build/manifest/reconciliation.toml — map |
 | `PRG:0x054C90` | docs/project/patch_notes.md — 14z-65 (6) — the specials hunt: window widened, alias rule, farm verified (2026-08-07); tests/test_extract_hp.sh |
@@ -2005,6 +2016,7 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x05DA70` | build/manifest/type_stamps.toml — reader |
 | `PRG:0x05DC74` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x05DCD6` | build/manifest/type_stamps.toml — reader |
+| `PRG:0x05DD0E` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; tests/audit_mizuumi_rows_b.sh |
 | `PRG:0x05DD64` | build/manifest/type_stamps.toml — reader |
 | `PRG:0x05DE74` | build/manifest/type_stamps.toml — reader |
 | `PRG:0x05DE84` | build/manifest/type_stamps.toml — reader |
@@ -2015,6 +2027,8 @@ RAM addresses are not here: `docs/game/atlas/ram.md` is the RAM stream
 | `PRG:0x05E0EC` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x05E194` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x05E256` | build/manifest/reconciliation.toml — map [vs2] |
+| `PRG:0x05E2D8` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected] |
+| `PRG:0x05E2DC` | docs/game/atlas/ram.md — Player blocks — P1 '$FF8400', P2 '$FF8800' (0x400 apart) [D, corrected]; tests/audit_mizuumi_rows_b.sh |
 | `PRG:0x05E504` | build/manifest/reconciliation.toml — map [vs2] |
 | `PRG:0x05E52A` | docs/game/atlas/ram.md — Fighter + effect-pool fields (14z-67, measured on the H effect arc); docs/game/engine_internals.md — measured 14z-68d on the Huitzil effect arc); docs/project/patch_index.md — Mechanism inventory (generator vocabulary); docs/project/patch_notes.md — B. the obj_hook dispatch sites left VANILLA — the WALKER is relocated; build/manifest/donovan.toml — obj_hook; build/manifest/huitzil.toml — obj_hook; +8 more |
 | `PRG:0x05E542` | docs/game/engine_internals.md — Per-tenant TYPE NUMBERS on multi-tenant builds (14z-82); docs/game/engine_internals.md — measured 14z-68d on the Huitzil effect arc); docs/project/patch_index.md — Mechanism inventory (generator vocabulary); docs/project/patch_notes.md — 14z-82 — per-tenant TYPE NUMBERS (the merged obj_hook vec3 fix) + the F2 merged shim; docs/project/patch_notes.md — 14z-85 — the spawn-time OWNER TAG (site 0x54470's 59-75 family; maintainer option (a)); docs/project/patch_notes.md — B. the obj_hook dispatch sites left VANILLA — the WALKER is relocated; +19 more |
@@ -3223,6 +3237,7 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x008E6A` | tests/audit_extra_pass.sh |
 | `PRG:0x00941E` | tests/audit_tick_cadence.sh |
 | `PRG:0x009910` | tests/test_roulette_tag_rows.sh |
+| `PRG:0x0099E0` | tests/audit_mizuumi_rows_b.sh |
 | `PRG:0x009B2A` | tests/audit_tenant_cpu_soak.sh |
 | `PRG:0x00AEE2` | tests/test_voice_row_range.sh |
 | `PRG:0x00B090` | tests/test_map_table_readers.sh |
@@ -3288,7 +3303,7 @@ Named by a tool, gate or Lua instrument and by NO document or manifest. A row le
 | `PRG:0x01B6AE` | tests/test_beam_list_type6.sh |
 | `PRG:0x01B6B0` | tests/test_beam_list_type6.sh |
 | `PRG:0x01BAF0` | tests/test_quote_font_window.sh |
-| `PRG:0x01C186` | tests/test_dualtrack.sh |
+| `PRG:0x01BEE4` | tests/audit_mizuumi_rows_b.sh |
 | `PRG:0x01C3BA` | tests/audit_mask_window_ff42a2.sh |
 | `PRG:0x01C424` | tools/gen_donovan_patch.py; tools/select_port.py |
 | `PRG:0x01C800` | tools/audit_rule5.py |

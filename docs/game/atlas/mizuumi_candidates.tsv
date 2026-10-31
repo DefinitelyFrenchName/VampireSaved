@@ -56,7 +56,7 @@ offset	name	verdict	evidence	batch
 +0x136	Flag to unlock the camera for specific moves, like MO K-Throw	CONSISTENT	row "+0x136.b"; ungated per ram.md; PRG:0x03B37A,PRG:0x051194,PRG:0x0373BC,PRG:0x04ECD8,PRG:0x04ED84	-
 +0x146	Poison Gas Timer	NOT ADOPTED	row "+0x146.b"; ungated per ram.md; PRG:0x023BF0,PRG:0x0248EA,PRG:0x0239C8	-
 +0x149	Projectile is active - used to limit numerous projectiles	CONSISTENT	row "+0x149.b"; ungated per ram.md; PRG:0x05475A,PRG:0x054770	-
-+0x14B	Sasquatch Penguin Count, Lei-Lei Knife Super Flag & Aqua Spread Active Flag	NOT ADOPTED	row "+0x14B.b"; ungated per ram.md; PRG:0x05475A,PRG:0x054770	-
++0x14B	Sasquatch Penguin Count, Lei-Lei Knife Super Flag & Aqua Spread Active Flag	NOT ADOPTED	row "+0x14B.b"; gate tests/audit_sas_penguin_count.sh S4 S7; PRG:0x05475A,PRG:0x054770	-
 +0x14C	-	NO ROW	no ram.md row	B5 Lilith rig
 +0x151	Anakaris remaining Jumps	NOT ADOPTED	row "+0x151.b"; ungated per ram.md	-
 +0x152	-	NO ROW	no ram.md row	B1 Anakaris rig
@@ -90,7 +90,7 @@ offset	name	verdict	evidence	batch
 +0x369	Beast Canon/Hell Dunk Unknown variable	OWNER ONLY	row "+0x369.b"; ungated per ram.md	-
 +0x36A	Beast Canon Facing Direction	OWNER ONLY	row "+0x36A.b"; ungated per ram.md	-
 +0x36B	Beast Canon Count	OWNER ONLY	row "+0x36B.b"; ungated per ram.md	-
-+0x36C	Sasquatch Penguin Count	NOT OBSERVED	row "+0x36C.b"; ungated per ram.md	B6 Sasquatch rig
++0x36C	Sasquatch Penguin Count	CONSISTENT	row "+0x36C.b"; gate tests/audit_sas_penguin_count.sh S1; PRG:0x047F14,PRG:0x04800E	-
 +0x36E	Pursuit Indicator	NOT ADOPTED	row "+0x36E.b"; ungated per ram.md	-
 +0x370	Character Specific Ram slot -Anakaris Coffin Drop Locations, ObaaChan	OWNER ONLY	row "+0x370.b"; ungated per ram.md	-
 +0x371	Character Specific Ram slot - Q-Bee +B Indicator	OWNER ONLY	row "+0x371.b"; ungated per ram.md	-
@@ -100,18 +100,18 @@ offset	name	verdict	evidence	batch
 +0x378	WORD - Bishamon Karame Dama Indicator	OWNER ONLY	row "+0x378.w"; ungated per ram.md	-
 +0x37F	Felicia Head Ride Restriction Timer	NOT OBSERVED	row "+0x37F.b"; ungated per ram.md; PRG:0x041040	B3 Felicia rig
 +0x380	Playing, No Continue-Prompt Flag	CONSISTENT	row "+0x380.b"; gate tests/audit_mizuumi_struct.sh; PRG:0x0058CC,PRG:0x00900E,PRG:0x009BF2,PRG:0x008A56,PRG:0x009B88,PRG:0x009B8C	-
-+0x384	-	NO ROW	no ram.md row	static decode
++0x384	Scene Pointer	NOT ADOPTED	row "+0x384.b"; gate tests/audit_mizuumi_rows_b.sh T4 T4b; PRG:0x008728,PRG:0x008DB0	-
 +0x390	LONGWORD Player Score	CONSISTENT	row "+0x390.l"; gate tests/audit_mizuumi_struct.sh C13	-
 +0x394	Button Input = RAM Values	CONSISTENT	row "+0x394.b"; gate tests/audit_mizuumi_inputs.sh I1 I6	-
 +0x395	Direction Input = RAM Values	CONSISTENT	row "+0x395.b"; ungated per ram.md	-
 +0x397	Direction Input = RAM Values	CONSISTENT	row "+0x397.b"; ungated per ram.md; PRG:0x014E52	-
 +0x39F	Win-Streak Counter	CONSISTENT	row "+0x39F.b / +0x3F0.b"; gate tests/audit_mizuumi_struct.sh; PRG:0x00991C,PRG:0x009924,PRG:0x009920,PRG:0x009C8E	-
-+0x3A8	-	NO ROW	no ram.md row	static decode + palette read
++0x3A8	WORD Palette RAM Pointer	NOT ADOPTED	row "+0x3A8.l"; gate tests/audit_mizuumi_rows_b.sh T1 T2 T3 T3b; PRG:0x01BEE2,PRG:0x01C186,PRG:0x01C692	palette read (is 0x0090C140 the fighter's palette block?)
 +0x3B0	Lose a bat Flag	NOT ADOPTED	row "+0x3B0.b"; gate tests/audit_mizuumi_struct.sh C9 C14; PRG:0x00A6A0	-
 +0x3B2	Auto-Guard Flag	CONSISTENT	row "+0x3B2.b"; gate tests/audit_mizuumi_struct.sh C11 C14; PRG:0x020FB6	-
-+0x3B6	Deathblow Type Notification *12	NOT ADOPTED	row "+0x3B6.b"; gate tests/audit_mizuumi_struct.sh C10 C14; PRG:0x019152,PRG:0x019128	-
-+0x3BE	-	NO ROW	no ram.md row	B2 finishes rig
-+0x3BF	-	NO ROW	no ram.md row	B2 finishes rig
++0x3B6	Deathblow Type Notification *12	NOT ADOPTED	row "+0x3B6.b"; gate tests/audit_mizuumi_struct.sh C10 C14; gate tests/audit_mizuumi_rows_b.sh T5 T9 T12; PRG:0x019152,PRG:0x019128,PRG:0x009A2C,PRG:0x05DD0E	-
++0x3BE	EX Finishes Counter	NOT ADOPTED	row "+0x3BE.b"; gate tests/audit_mizuumi_rows_b.sh T5 T6 T7 T7b T8 T10 T12; PRG:0x05E2DC,PRG:0x009A2C,PRG:0x016E4E,PRG:0x016E4C,PRG:0x008A70,PRG:0x0090A0,PRG:0x00A79C	B2 finish-type mapping (which types are EX)
++0x3BF	Unique Finishes Counter	NOT OBSERVED	row "+0x3BF.b"; gate tests/audit_mizuumi_rows_b.sh T11; PRG:0x05E2D8	B2 type-4 finish rig
 +0x3C1	CHAR-Sel = Random Flag	CONSISTENT	row "+0x3C1.b"; ungated per ram.md; PRG:0x020AA0,PRG:0x020A94	-
 +0x3E1	Character Palette	CONSISTENT	row "+0x3E1.b"; gate tests/audit_mizuumi_struct.sh C12 C12b C14; PRG:0x02101A	-
 +0x3E2	Auto-Guard Flag	CONSISTENT	row "+0x3E2.b"; gate tests/audit_mizuumi_struct.sh C11 C14; PRG:0x020FBA	-

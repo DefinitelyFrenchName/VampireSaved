@@ -1,0 +1,3 @@
+  FLAG D-ABSOLUTE: It refuses a correction aimed at a keyed row or at no row, and it **stops** on any ledger row still unkeyed, naming it.  [build/agent214/t339/closure/closing_comment.md]
+  FLAG D-ABSOLUTE: A correction to an append-only record is kept beside it with its evidence.  [build/agent214/t339/closure/closing_comment.md]
+packet_check: 2 flag(s): D-ABSOLUTE 2

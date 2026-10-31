@@ -497,3 +497,5 @@ tests/test_release_reuse.sh	runner
 tests/test_runner_collation.sh	runner
 tests/audit_pool_drop.sh	runner
 tests/test_ledger_page.sh	runner
+tests/audit_sas_penguin_count.sh	character-data
+tests/audit_mizuumi_rows_b.sh	character-data

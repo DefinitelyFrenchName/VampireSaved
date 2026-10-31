@@ -7820,3 +7820,44 @@ HEAD as the commit of record. 14z-213's #310 rerun on ERIS (the `audit_kill_poke
 `3117828a`) reused the first run's `build/emu_e213`: its `results.tsv` held the `0a1b9233` run's LIES row for
 `audit_kill_poke_shape@two-byte-flowed` beside the new run's honoured one, and its `commit.txt` still named `0a1b9233`. **The rule:** every fresh run gets a fresh `--log` directory (`build/emu_e213c` here);
 reuse a directory only to `--resume` the run that wrote it, and read `commit.txt` before trusting a results file.
+
+## A GATE THAT REACHES AN EMULATOR THROUGH SOMETHING THE TIER CLASSIFIER DOES NOT NAME IS A DEAD ROW — every strict emulator run read NOT GREEN with every row PASS (paid: 14z-196 and 14z-213, #340)
+
+Both runners decide that a gate is emulator-tier by a regular expression over its code (comments stripped, sourced
+`tests/lib/*.sh` followed two deep) that names the emulator wrappers (`run_mame.sh`, `MAME_BIN`, `autoboot_script` and
+others; `EMU` in `tests/run_all_emulator.sh` and `tests/run_all_static.sh`, kept identical). A gate that reaches an emulator
+only through something the pattern does not name is classed emulator-free: `tests/run_all_emulator.sh` then calls its
+registry row a DEAD ROW (`--strict` makes that a failure), and `tests/run_all_static.sh` lists it as an "emulator-free gate
+in NEITHER registry", which it does not fail. Paid twice: 14z-196, `audit_release_linux_cleanhost` through
+`tools/cleanhost_libs.py`; 14z-213, `audit_pool_drop` (14z-212, #334), which runs the registry's own gates as
+`tests/$gate.sh` from `tests/ci_emulator.tsv`, so every strict emulator run from 14z-212 on read NOT GREEN. **The rule:** a
+new gate that drives an emulator through a helper, a tool or other gates adds that name to BOTH runners' `EMU` pattern in
+the commit that registers it, and the runner's own registry line (`N emulator-tier gates; N registered`, `ok: every
+emulator-tier gate has exactly one registry row`) is read on a `--dry-run` of the new row's scope before the gate is
+called registered. `tests/test_emulator_runner.sh` §3 holds the registry-reading case both ways.
+
+## A COLLECTOR THAT GROUPS RECORDS BY A KEY DROPS A RECORD WITH NO KEY, AND SAYS NOTHING — 132 rule-checker runs missing from both ledger pages (paid: 14z-213/14z-214, #339)
+
+`tools/session_metrics.py` counts the rule-checker ledger per session by its `session` column, or by the transcript id
+the collect gives that session. Rows written before #209 made `prepare` require the sitting's key carry `-` (37) or a
+transcript id (`record`'s old prefix, 233); a `-` row and a row under a transcript id no single session is given (95:
+`dd342b19` 64, `a67e2668` 16, `152495c2` 14, `038cb80d` 1) belonged to no session and vanished from the dashboard and the
+public ledger page, with no line saying so: the 14z-213 close's datasets counted 1,130 runs over 14z-163..14z-213
+against 1,262 ledger rows. A transcript shared by a session and its continuation also misattributed: `d33b9bfe`'s 51 rows all went to 14z-183,
+11 of them 14z-183b's. The ledger is append-only and written by `tools/rulecheck.py` alone, so every row without a 14z key
+is keyed beside it, in `tests/rulecheck/session_corrections.tsv` (run id, session, evidence; each run's own
+`manifest.tsv` the first witness, cross-checked against the collector's transcript mapping, 104 agreeing). **The rule:**
+a reader that groups records by a key STOPS on a record it cannot key, naming it, rather than leaving it out; a key that
+depends on what happens to be on the machine (a transcript file) is not a key; a correction to an append-only record is
+kept beside it with its evidence, never written into it. `tests/test_session_metrics.sh` (UNKEYED, control
+`unkeyed-dropped`) holds it.
+
+## A CONTROL THAT PERTURBS "THE FIRST ROW" DEPENDS ON THAT ROW'S STATE — test_tickets' parked-disagrees went DEAD the day the newest ticket closed (paid: 14z-214, #341)
+
+Every perturbation in `tests/test_tickets.sh` edits the first ticket row of a copy of the index; `parked-disagrees`
+flips `open` to `parked` and anything else to `open`. It fired while the newest ticket happened to be open; once #340
+closed `done`, the flip wrote `open` over a CLOSED issue, `tools/tickets.py check` failed on the open/closed rule
+instead of the parked label, and the control was judged DEAD — the 14z-214 close's tier went red on data no one
+controls. **The rule:** a control that perturbs a record picks one the perturbation is MEANINGFUL for (here the first
+open or parked row), never a position whose content changes with the data; and its mode is run once the data around it
+has moved. `tests/test_tickets.sh` (control `parked-disagrees`) holds it.

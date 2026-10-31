@@ -38,116 +38,86 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
-## Session 14z-213 — **#267 and #335 closed done (the green guard admits the ledger page, published to gh-pages; the dashboard's actions panel); #337 closed done (EXIT-trap order); #338 done, awaiting release (the proof sheets' web build, fourteen controls, after thirteen rule-checker rounds); #310's classifier rules 1-4 and the whole emulator tier read on ERIS (222 honoured, five LIES fixed; kept open); #340 found and fixed (a dead registry row turned every strict emulator run red); #339 filed; #118's branches settled and its static pass S0 run.**
+## Session 14z-214 — **#340 and #339 closed done on their rule-checker runs (#339 extended by the maintainer to every ledger row without a 14z key: 270 corrections, 1,262 runs counted); #118's B6 read on close-range captures with the maintainer (Sasquatch's penguin chain; +0x36C recorded) and gated; #118's rows B (+0x384, +0x3A8, +0x3BE/+0x3BF, +0x3B6's bit 7) recorded and gated on the twelfth rule-checker run; ERIS's release-shape tier read 417 PASS, 0 FAIL; ERIS's and PILOT's 14z-213 scratch cleared; #341 filed and fixed at the close (the tier's one red).**
 
 ### opened with
-The 14z-212 close's opener; the sweep CLEAN, `main` = `origin/main` at `d6393610`. The maintainer: **"Let's start with item
-1,2 and 3"**, then the order #337, #338, #310, and PILOT/ERIS for #118 and light parked tickets (`DECISIONS_HISTORY.md`,
-14z-213). Working evidence: `build/agent213/` (local).
+The 14z-213 close's opener; the sweep CLEAN, `main` = `origin/main` at `550958ad`, the 14z-213 CLOSE section's last four
+lines uncommitted as it said. The maintainer, after pushing the `archive/` tags: **"Start with #340 closure and remote
+cleanup then start #118 and any non-parked ticket"**; later **"While I look at the sheets, please launch others tasks on
+the adequate and available machines"** (`DECISIONS_HISTORY.md`, 14z-214). Working evidence: `build/agent214/` (local).
 
-### (1) #267 — THE GREEN GUARD ADMITS THE LEDGER PAGE; PUBLISHED
-The guard (`tools/git-hooks/green_guard.py`, edit-locked) lets ONE push through with no tier row: a parentless commit of
-exactly `.nojekyll index.html ledger.css ledger.js` to `refs/heads/gh-pages`; any other commit to gh-pages, or the page to
-another branch, is judged as before. Drafted and proven in a worktree (`build/agent213/t267/`), applied by the maintainer
-(*"guard part applied for item 1"*). `tests/test_green_guard.sh` section 7 (seven cases) and three controls
-(`guard-page-any-ref`, `-shape`, `-parent`); `tests/test_ledger_page.sh` now publishes through the real hooks (it FAILs on
-the unpatched guard). `test_green_guard` re-traced on PILOT (SAFE); `test_ledger_page` is not on the concurrent-controls
-list, so it needs none. Published `12a87ea0` to gh-pages; the maintainer switched Pages to it (**"I switched GH pages
-deploy from a branch to gh-pages branch"**); live and byte-identical to the commit, all 11 sections rendered; the own-site
-leg SKIPPED (`DEPLOY_TARGET` unset, as ruled). **Closed done** on rule-checker run 2026-10-30-1416 (after -1412, -1415).
+### (1) #340 CLOSED DONE; THE REMOTE SCRATCH
+**#340** closed `done` with its closing comment after rule-checker run `2026-10-30-1443` (OK; `-1441` caught after-fix logs
+that named no commit, `-1442` one log older than the fix). The emulator runner's registry check reads 240 of 240, no dead
+row. The second gate to reach an emulator through a path the classifier does not name: `docs/project/gotchas.md` "A GATE
+THAT REACHES AN EMULATOR THROUGH SOMETHING THE TIER CLASSIFIER DOES NOT NAME IS A DEAD ROW". **The remote scratch:** ERIS's
+and PILOT's 14z-213 scratch deleted and both checkouts moved to `main` at `550958ad` (PILOT was unreachable until the
+maintainer started the VM). PILOT's older `p211_*` scripts and two `refs/tmp` refs were not on the list and stay.
 
-### (2) #335 — THE DASHBOARD'S ACTIONS PANEL
-"Actions: OK at the first check" added to the dashboard page (store version 2): tiles, per-decision first-run OK rate and
-questions on first runs (selected session or all), the per-session trend, the actions table; the two not-counted kinds
-shown apart. Two `dash.calc`s; every calculated value equals the collector's own figure (635 checked; the 171 session
-totals equal their decision rows' sums). The maintainer: **"The dashboard new sections are fine"** (`DECISIONS_HISTORY.md`).
-**Closed done** on rule-checker run 2026-10-30-1425, after nine VIOLATED runs (-1413, -1417 to -1424), each a real gap: the
-charts' notes now state the collector's class (ESTIMATED, store version 6); `tests/test_session_metrics.sh` gained five
-controls (`lowest-question`, `later-run-questions`, `calibration-counted`, `not-run-ignored`, `void-only-dropped`) and a
-VOID-only action in its synthetic ledger, re-traced on PILOT (12 runs, SAFE); the collector as gated reproduces the
-page's dataset (306 actions, 816 action figures identical). Found on the way and filed as **#339**: 37 ledger rows carry
-session `-` and both ledger pages drop them without a word.
+### (2) #118 B6 — SASQUATCH'S PENGUINS, READ ON THE CAPTURES; +0x36C RECORDED
+The first sheet (nine tiles, Sasquatch at the left wall) could not show the chain: the maintainer **"no. … only 9 captures
+is hardly enough to be sure of such a chain of events"**. The rig moved to close range (the camera then shows the row)
+and the evidence became a clip of every frame plus a page per link (`build/agent214/t118/b6/`, local). The maintainer read
+**"1st punch -> farthest penguin walks forward 2nd punch -> penguin walking explodes rinse and repeat until no
+penguins"** and **"the distance the penguin crosses seems to be linked to the strength of the punch"**; measured next, one
+punch alone still explodes its penguin 56 f later (the next punch does not detonate it), and the travel is LP 175 / MP 256
+/ HP 351 px; asked whether that matched: **"yes"**. Recorded in `docs/game/atlas/ram.md`: +0x36C consistent with mizuumi's
+"Sasquatch Penguin Count" (set to 8 at PRG:0x047F14, lowered per punch at PRG:0x04800E), +0x14B's Sasquatch use.
+**The gate** `tests/audit_sas_penguin_count.sh` (pristine vsavj, MAME, thirteen legs; S1-S10 and R1; seven controls; S8's
+travel frozen) on rule-checker run `2026-10-30-1445` (after `-1444`). Its two poke read-back findings ruled
+**"CONTROL-PLANT (Recommended)"** and **"CROSS-LEG (Recommended)"** (`tests/expected/poke_readback.tsv`). The lesson, a
+chain of events gets a clip of every frame and a page per link, is in the maintainer-capture memory.
 
-### (3) THE REMOTE SCRATCH
-PILOT: 76 entries of 14z-211/212 removed (50 -> 65 GB free); ERIS: four dirs, 13 GB. The cited evidence is local under
-`build/agent212/`.
+### (3) #339 — EVERY LEDGER ROW KEYED; CLOSED DONE
+The maintainer on the 37 `-` rows: **"either is fine, just make it future proof"** and **"no"** (no separate display); the
+rule-checker then found 95 more rows dropped the same way, under transcript ids no single session claims, and the
+maintainer chose **"Extend #339 now (Recommended)"**. `tests/rulecheck/session_corrections.tsv` keys all 270 ledger rows
+without a 14z key from each run's manifest (the ledger stays append-only); `tools/session_metrics.py` applies a correction
+only to an unkeyed row and stops on any row no session claims; `tests/test_session_metrics.sh` gains the UNKEYED section
+and the control `unkeyed-dropped`. Effect at the 14z-213 datasets: 1,130 -> 1,262 runs, actions 310 -> 339, eleven of
+14z-183b's runs moved off 14z-183. Closed `done` with its comment after run `2026-10-30-1450` (`-1446`, `-1448`, `-1449`
+VIOLATED, `-1447` not run). `docs/project/gotchas.md` "A COLLECTOR THAT GROUPS RECORDS BY A KEY DROPS A RECORD WITH NO
+KEY, AND SAYS NOTHING". PILOT re-traced the gate's 13 controls on blob `b6c71388`: SAFE (`tests/controls_concurrent.txt`).
 
-### (4) #337 — EXIT-TRAP ORDER CHECKED; CLOSED DONE
-`tools/tmp_hygiene.py`: TRAPPED (an EXIT trap set before a guarded site's stop naming `"$X/..."`), UNREADTRAP, a shlex
-trap reader, every `trap` word not an argument read, a quote-aware comment cut (shared with #333's check). Fifteen trapped
-forms, eight safe, two unreadable; controls `planted-trapped`, `planted-unread-trap`. On the tree: 487 guarded sites, 481
-EXIT traps, 0 TRAPPED; a second reader sharing no census code agrees; every one of 744 `trap` lines accounted for.
-Rule-checker runs 2026-10-30-1406, -1407, -1409, -1410 each caught a real gap; the maintainer then ruled **"Fix (b), state
-(a)"** (cross-file pairing a stated limit, measured 0), and run -1411's last form (EXIT spelled `exit`) was stated as a
-limit. Closed with its comment. Re-traced on PILOT five times; `tests/controls_concurrent.txt` refreshed.
+### (4) #118 ROWS B — +0x384, +0x3A8, +0x3BE/+0x3BF AND +0x3B6'S BIT 7, RECORDED AND GATED
+PILOT traced S0's leads over existing replays (84 s); the Mac gate `tests/audit_mizuumi_rows_b.sh` (pristine vsavj, MAME,
+six corpus replays, a field leg and a write-tap leg each; T1-T12; nine controls; `ondemand` by the 2026-10-09 pristine-only
+ruling) records in `docs/game/atlas/ram.md`: +0x3A8 a LONG (0x0090C140 on P1, 0x0090C200 on P2; its three writers each
+seen storing it, 30, 12 and 24 long stores); +0x384 a per-player state index, each side's sequence frozen per replay, no
+game state judged; +0x3BE raised 0 -> 1 at PRG:0x05E2DC in the frame PRG:0x009A2C sets bit 7 of the KO winner's +0x3B6,
+after finish type 3 and never after 0 or 1 (types 2 and 4-7 occur in no replay; both raises are a CPU winner's and on
+P2, so neither confound is separated); +0x3BF never non-zero (type 4 unseen). The candidates table re-derived: four NO
+ROW offsets now NOT ADOPTED (3) and NOT OBSERVED (1). Rule-checker run `2026-10-31-1464` OK after `2026-10-30-1451`,
+`-1453` to `-1456`, `2026-10-31-1458` to `-1463` (each caught an overstatement, all fixed: unnamed confounds, 1P/2P
+labels the gate never measured, a clear routine named as fact, a listed writer never checked to write; T1 now requires
+each, control `writer-unseen`); `-1452` and `-1457` not run. **Still open in #118:** +0x354 (needs a slot-ownership rig),
+B1, B5, B7; S0's `character_tables.md:76` ("14 tables", 15 measured) unchecked.
 
-### (5) #338 — THE PROOF SHEETS' WEB BUILD; DONE, AWAITING RELEASE
-`tools/proof_sheets.py web <local run> --to <dir> --release <tag>` and `webcheck`, and `tools/publish_sheets.sh` (webcheck,
-then `<DEPLOY_TARGET>vs-proof-sheets/`). The maintainer, 14z-213: the clips **"Keep, reduced, add a short description to
-explain that it is short and down sampled"**; the path **"vs-proof-sheets/ (Recommended)"**; on the screenshots **"looks
-good to me"**, **"they look good"**, on the footers **"they do"**, on the clip caption **"do it"**, on the intro's JUDGED
-FILE line **"…this exact image or sound clip” has my preference"**, on the builds sentence **"Count from the run
-(Recommended)"** (`DECISIONS_HISTORY.md`). The credits were read off the three games' own title screens (MAME captures).
-Every page links one `sheets.css` with no inline style or script, so the site's `style-src 'self'` serves it (all 102 pages
-rendered under that policy, 0 refusals). webcheck finds a local path by the scrub's own pattern and a detector of its own,
-and refuses any link to anything but a file inside the build. Gate `tests/test_proof_sheets_web.sh` (ondemand; fourteen
-controls). Trial on 14z-207's full run with the final tool (`93b75d9b`): 102 pages, 23,183 tiles, 152 clips, 1 min 42.5 s
-(1 min 39.0 s at `d84a7eb1`), webcheck PASS; a second reader sharing no code with the tool (its own token-based path
-detector, 16 known answers) and a raw-bytes search of every file agree; the final draw equals the one the maintainer saw
-after exactly the intended substitutions. **Done, awaiting release** on rule-checker run 2026-10-30-1440, after
-thirteen VIOLATED runs (-1414, -1427 to -1429, -1431 to -1439), each a real gap fixed (`build/agent213/t338/closure/`,
-local); its comment is posted after the close commit. Drawn and published at the next tagged release, which closes it.
+### (5) THE IDLE BOXES
+**ERIS:** the release-shape emulator tier at `550958ad`, every control executed (`build/agent214/eris/e214_results.tsv`,
+local; started 20:35:56Z): **417 PASS, 0 FAIL, 4 SKIP**, the SKIPs the host's environment as at 14z-211's like run (no
+Linux release binaries, no `pw-record`, no release MAME, no `podman`), so NOT GREEN under `--strict`; must-fire 227 fired
+of 227; registry 240 of 240. It is the strict run #340's closure listed as not yet done, and the release-shape run of
+#333's 11 guarded sites. **PILOT:** the #339 re-trace (above) and two static dry runs of the close's tier on scratch
+snapshots; the second's four reds were `test_controls_concurrent` and `test_gate_coverage_current` (both fixed since),
+`test_tickets` (it needed this group) and `test_emulator_staleness` (PILOT's own host history; PASS on the Mac).
 
-### (6) #118 — THE BRANCHES SETTLED, THE CLASSIFICATION IN THE TREE
-Ruled (`DECISIONS_HISTORY.md`, 14z-213): t118-196 dropped and t118-196-struct deleted, both kept as `archive/` tags (41
-and 5 citations on main); the struct worktree removed after its local evidence was copied in. The classification
-re-derived from `ram.md` as `docs/game/atlas/mizuumi_candidates.tsv` (89 offsets: CONSISTENT 35, NOT ADOPTED 19, NO ROW 12,
-OWNER ONLY 11, COVERED 5, NOT OBSERVED 4, CROSS-CHECKED 1, REFUTED 1, REFUTED IN PART 1), its derived columns held by
-`tools/mizuumi_candidates.py check` in `tests/test_mizuumi_candidates.sh` (the rules on eleven known answers, two
-controls). Two `ram.md` errors the derivation found were corrected (`+0x119`'s check is A4; seven rows the inputs gate
-covers said "not yet gated"). The remaining measurement is batched (B1 Anakaris rig .. B7, static decode) for PILOT/ERIS.
-The batch plan was drafted (`build/agent213/t118/batch_plan_draft.md`, local) and, on the maintainer's word (**"Run S0 of the
-#118 plan now, we're waiting anyway"**), its static pass S0 run on the Mac (`build/agent213/t118/s0/S0_REPORT.md`, local; no
-emulator): a census of the 16 offsets in every addressing form, its known-answer control +0x3BD equal to the 44 frozen
-rows of `tests/expected/latch_readers.tsv`. Its readings are static leads, not ram.md facts (the plan: a row changes only
-after the measurement): among them +0xB2 a damage scaler, +0x316 Bishamon's charge counter, Gallon's tables never making
-+0x366 non-zero, +0x3A8 a long. It flags `docs/game/atlas/character_tables.md:76` ("14 tables", 15 measured) — unchecked.
-
-### (7) #310 — THE CLASSIFIER'S RULES 1-4
-The 14z-210 census comment, drafted and never posted, posted on the issue. Ruled **"Classifier rules 1-4 (Recommended)"**.
-`tests/lib/classify.sh`: its own `CONTROL DEAD` -> LIES; a SKIP exit with no FAIL -> UNJUDGED; its own exit-3 `REFUSED:`
--> UNJUDGED; an indented traceback or a `tests/lib` abort -> DIED. Measured on #299's 14z-206 legs (413 honoured controls
-each): exactly five rows move. Read one by one: `test_defense_rows_census@tenant-row-moved` and
-`test_bundle_parsers@unbundled-leftover` had tested NOTHING (the row move a no-op since the ruled fix; the leftover case only
-in the in-gate block), now real; the other three printed an in-gate DEAD beside a real FAIL, the in-gate copies now skip a
-mode. Known answers and four controls in `tests/test_control_classifier.sh`. Both changed gates re-traced on PILOT. The
-emulator tier's controls run on ERIS at the session commit `0a1b9233`: the prereq lane stopped the run at once on
-`audit_kill_poke_shape@two-byte-flowed`, read LIES by rule 1 — its forced-FLOWED mode reached the gate's own FAIL branch,
-which also printed `CONTROL DEAD: two-byte-flowed` (the same in-gate DEAD shape as the three gates above). The DEAD line now
-prints only outside a mode; on the Mac the gate PASSes and its mode is read HONOURED (`build/agent213/t310/killpoke/`).
-Re-run on ERIS at scratch commit `3117828a` (0a1b9233 + that line), in a fresh log directory (a reused one kept the old
-run's rows and commit of record: new gotcha): the whole emulator tier, every control executed, 3 h 21 min — 222 HONOURED,
-5 LIES, no DIED or UNJUDGED (`build/agent213/t310/eris/e213c_out/`). The five are the same in-gate shape:
-`audit_move_parity`'s mode perturbs every comparison, so section 3's in-gate controls printed their own DEAD (four modes;
-section 3 now does not run under a mode, every mode still FAILing in section 2 or 2b, read in the ERIS logs), and
-`audit_walker_repoint`'s main check printed its own DEAD beside its FAIL (now only outside its mode). Mac: both gates'
-12 rows PASS or honoured; PILOT re-traced both, 10 controls HONOURED, SAFE (`pilot:dd0c9357`). **#340 found and fixed:**
-`audit_pool_drop` (14z-212) names no emulator wrapper, so the emulator runner called its registry row DEAD and every
-strict emulator run read NOT GREEN; both runners' classifier now counts a gate that reads `tests/ci_emulator.tsv` (240 of
-240), `test_emulator_runner` §3 gains both sides of the case (PASS on the Mac and on PILOT; its 17 controls re-traced on PILOT, SAFE, `pilot:7172e62d`). #310's census shapes beyond rules
-1-4 stay as ruled "Record and defer". The maintainer: **"Keep open (Recommended)"** — rules 1-4 and the ERIS census are progress, the deferred
-shapes #310's remaining work.
-
-### CLOSE (14z-213, 2026-10-30)
-Opened on the maintainer's **"Start the close now (Recommended)"**. Driver `build/agent213/close/` (`--prev
-build/agent212/close/tier_results.tsv`). Before it, within the sitting: #267 and #335 closed on GitHub with their comments
-(runs `2026-10-30-1416`, `-1425`), #337 closed with its comment (after runs `-1406` to `-1411`); #338 done, awaiting release
-on run `-1440` (its comment is posted after the close commit); #339 and #340 filed; `origin/main` fetched before staging
-(nothing new; HEAD `0a1b9233` one commit ahead).
-Steps: sections ((1)..(7), the group retitled); next-session (the 14z-212 opener to `docs/NEXT_SESSION_HISTORY.md`, L110);
-rollover (the 14z-212 group, 154 lines, to `STATE_HISTORY.md` with its ledger line); indexes (the archives', the ticket
-page, the gotchas index); dashboard (14z-163..14z-213, 3,023 figures, 0 unclassed; datasets versions 22, 23, 22, 22 and
-`actions` 2) — done. The tier's results: `build/agent213/close/tier_results.tsv`, the next close's `--prev`.
+### CLOSE (14z-214, 2026-10-31)
+Opened on the maintainer's **"Both"** (the #118 rows first, then the close once ERIS finished). Driver
+`build/agent214/close/` (`--prev build/agent213/close/tier_results.tsv`). Before it, within the sitting: #340 and #339
+closed on GitHub with their comments (runs `2026-10-30-1443`, `-1450`); `origin/main` fetched before staging (nothing
+new). The 14z-213 CLOSE section's four post-push lines ride this commit, inside the group rolled to `STATE_HISTORY.md`.
+Steps: sections ((1)..(5)); next-session (the 14z-213 opener to `docs/NEXT_SESSION_HISTORY.md`, L110); rollover (the
+14z-213 group, 114 lines, to `STATE_HISTORY.md` with its ledger line; no `STATE.md §` citation into it); indexes (the
+archives', the ticket page, the gotchas index; the ticket snapshot refreshed, 340 issues); dashboard (14z-163..14z-214,
+3,185 figures, 0 unclassed; datasets versions 23, 23, 24, 23 and `actions` 3) — done. The tier's results:
+`build/agent214/close/tier_results.tsv`, the next close's `--prev`.
+**The tier's first run** (staged tree `3c32f61b`, `--confirm` on 14z-213's) read RED: 106 PASS, 1 FAIL — `test_tickets`,
+its control `parked-disagrees` DEAD for the wrong reason. Every perturbation edits the copy's first ticket row; with
+#340 now closed, the flip wrote `open` over a closed issue. Filed **#341** and fixed: the control takes the first open
+or parked row (the plain run PASS, seven controls fired; as a mode it fails on #338 written `parked`); re-traced on
+PILOT; `docs/project/gotchas.md` "A CONTROL THAT PERTURBS "THE FIRST ROW" DEPENDS ON THAT ROW'S STATE". #341 stays open,
+to close on its rule-checker run.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings

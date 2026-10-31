@@ -24,6 +24,12 @@
 #   14z-10 3 (build 1, expectation 1, recommendation 1 OK first; Q1, Q2, Q4 1 each), 1 packet not run; all ESTIMATED;
 #   its build passed 0.5 h after its first packet (the two "prepared run" results in its transcript, 07:10 and 07:40).
 #   check: 0 bad. The plant: 5 runs. Each control FIRES.
+#   #339 (14z-214): a ledger row with no 14z key — `-`, or a transcript id no session in the collect claims — is keyed
+#   by tests/rulecheck/session_corrections.tsv (the synthetic rows 2026-01-01-07 `-` and 2026-01-01-08 `eeeeffff`, both
+#   to 14z-8: a 14z-8..14z-10 collect counts 2 runs for 14z-8); without its correction the collector STOPS naming the
+#   row (it used to drop it from both ledger pages without a word) — the `-` row and, alone, the unclaimed transcript-id
+#   row; a correction aimed at a keyed row, or at no ledger row, is refused; the row keyed by 14z-9's own transcript id
+#   stays counted by it.
 #
 # MUST-FIRE: shadow-tool: usage-per-record — a copy that sums usage per transcript record, not per message id, must count 1,000 output tokens, and the comparison must FAIL (mode: the gate reads that copy)
 # MUST-FIRE: shadow-tool: key-prefix — a copy that reads a commit's session key without its letter suffix must count 14z-9b's commit as 14z-9's, and the comparison must FAIL (mode: the gate reads that copy)
@@ -36,6 +42,7 @@
 # MUST-FIRE: shadow-tool: later-run-questions — a copy of tools/rc_actions.py that takes an action's questions from its LAST run, not its first, must drop 14z-9's first_q_Q4 (its re-check passed), and the comparison must FAIL (mode: the gate reads that copy)
 # MUST-FIRE: shadow-tool: calibration-counted — a copy of tools/rc_actions.py that keeps calibration rows must count 14z-10's calibration as an action (4 actions), and the comparison must FAIL (mode: the gate reads that copy)
 # MUST-FIRE: shadow-tool: not-run-ignored — a copy of tools/rc_actions.py that never reads a run directory's NOT-RUN.txt must drop 14z-10's not_run figure (the packet never run, shown apart), and the comparison must FAIL (mode: the gate reads that copy)
+# MUST-FIRE: shadow-tool: unkeyed-dropped — a copy of tools/session_metrics.py that never stops on a row no session claims (#339's defect) must collect with the rows' corrections gone, silently, and the UNKEYED section must FAIL (mode: the section runs that copy)
 # MUST-FIRE: shadow-tool: void-only-dropped — a copy of tools/session_metrics.py that never writes the actions-of-VOID-runs-only figure must drop 14z-10's (its lone freeze, whose plant died), and the comparison must FAIL (mode: the gate reads that copy)
 #
 # Usage: tests/test_session_metrics.sh      # ci_portable, ~2 s
@@ -89,7 +96,10 @@ printf '%s\n' "# retractions" "old wording	why	retracted" "older wording	why	gon
   printf '2026-01-02-05\t2026-01-02\t14z-10\trecommendation\tclose #7\tp\tDEAD\tVOID\tQ1\t-\tm\n'
   printf '2026-01-02-06\t2026-01-02\t14z-10\trecommendation\tclose #7 again\tp\tCAUGHT\tOK\t-\t-\tm\n'
   printf '2026-01-02-07\t2026-01-02\t14z-10\tcalibration\tfx\tfx\tCAUGHT\tVIOLATED\tQ1\t-\tm\n'
-  printf '2026-01-02-09\t2026-01-02\t14z-10\tfreeze\ta lone freeze, its plant dead\tp\tDEAD\tVOID\tQ2\t-\tm\n'; } > "$R/tests/rulecheck/ledger.tsv"
+  printf '2026-01-02-09\t2026-01-02\t14z-10\tfreeze\ta lone freeze, its plant dead\tp\tDEAD\tVOID\tQ2\t-\tm\n'
+  printf '2026-01-01-07\t2026-01-01\t-\texpectation\ta row keyed only by its correction\tq\tCAUGHT\tOK\t-\t-\tm\n'
+  printf '2026-01-01-08\t2026-01-01\teeeeffff\texpectation\ta row under a transcript id no session claims\tq\tCAUGHT\tOK\t-\t-\tm\n'; } > "$R/tests/rulecheck/ledger.tsv"
+printf '# corrections\nid\tsession\tevidence\n2026-01-01-07\t14z-8\tsynthetic: keyed by its correction\n2026-01-01-08\t14z-8\tsynthetic: keyed by its correction\n' > "$R/tests/rulecheck/session_corrections.tsv"
 RD="$R/tests/rulecheck/runs"; mkdir -p "$RD/2026-01-02-03" "$RD/2026-01-02-04" "$RD/2026-01-02-08"
 printf 'decision\tbuild\nsession\t14z-10\naction\t2026-01-02-03\n' > "$RD/2026-01-02-03/meta.tsv"
 printf 'decision\tbuild\nsession\t14z-10\naction\t2026-01-02-03\nredoes\t2026-01-02-03\n' > "$RD/2026-01-02-04/meta.tsv"
@@ -160,6 +170,7 @@ edits = {
     "calibration-counted": ("rc_actions.py", 'rows = sorted((r for r in rows if r["decision"] != "calibration")',
                             'rows = sorted((r for r in rows if True)'),
     "not-run-ignored": ("rc_actions.py", 'if os.path.exists(os.path.join(d, rid, "NOT-RUN.txt")):', 'if False:'),
+    "unkeyed-dropped": ("session_metrics.py", "unkeyed = unclaimed_rows(ledger, claimed)", "unkeyed = []"),
     "void-only-dropped": ("session_metrics.py", "            if vo:\n", "            if False:\n"),
     "same-run-hours": ("session_metrics.py", 't0, t1 = ptimes.get(x["run_ids"][0]), ptimes.get(x["run_ids"][-1])',
                        't0, t1 = ptimes.get(x["run_ids"][-1]), ptimes.get(x["run_ids"][-1])'),
@@ -239,6 +250,43 @@ if [ -n "${VS_CTL:-}" ]; then T="$(shadow "$VS_CTL")"; fi
 if figures "$T" "$W/real" && compare "$W/real.txt" > "$W/real.cmp"; then
     echo "  ok    every expected figure, with its class ($(echo "$EXPECT" | wc -l | tr -d ' ') lines)"
 else echo "  FAIL  the collector's figures on the synthetic tree:"; cat "$W/real.cmp" "$W/real.log" 2>/dev/null | sed 's/^/        /'; fail=1; fi
+
+# UNKEYED (#339, 14z-214): the '-' row and the unclaimed transcript-id row are keyed by their corrections; with a
+# correction gone the collector must STOP naming the row
+U="$TOOL"; [ "${VS_CTL:-}" = unkeyed-dropped ] && U="$T"
+k8() { python3 "$1" collect --keys 14z-8..14z-10 --repo "$R" --projects "$P" --static-runs "$R/build/static_runs" --out "$2" > "$2.log" 2>&1; }
+if [ "${VS_CTL:-}" != unkeyed-dropped ]; then
+    if k8 "$TOOL" "$W/k8" && python3 -c "
+import json, sys; sys.exit(0 if any(r['session'] == '14z-8' and r['metric'] == 'rc_runs' and r['value'] == 2 for r in json.load(open(sys.argv[1]))) else 1)
+" "$W/k8/figures.json"; then echo "  ok    UNKEYED: the '-' row and the unclaimed transcript-id row are keyed 14z-8 by their corrections (14z-8 rc_runs 2)"
+    else echo "  FAIL  UNKEYED: the corrected row is not counted under 14z-8: $(tail -1 "$W/k8.log")"; fail=1; fi
+    cp "$R/tests/rulecheck/session_corrections.tsv" "$W/corr.keep"
+    printf 'id\tsession\tevidence\n2026-01-01-01\t14z-8\taimed at a keyed row\n' > "$R/tests/rulecheck/session_corrections.tsv"
+    if k8 "$TOOL" "$W/k8m"; then echo "  FAIL  UNKEYED: a correction aimed at a keyed row was applied"; fail=1
+    elif grep -q "keyed '14z-9' already" "$W/k8m.log"; then echo "  ok    UNKEYED: a correction aimed at a keyed row is refused"
+    else echo "  FAIL  UNKEYED: refused, but not for its reason: $(tail -1 "$W/k8m.log")"; fail=1; fi
+    printf 'id\tsession\tevidence\n2099-01-01-99\t14z-8\taimed at no ledger row\n' > "$R/tests/rulecheck/session_corrections.tsv"
+    if k8 "$TOOL" "$W/k8x"; then echo "  FAIL  UNKEYED: a correction aimed at no ledger row was accepted"; fail=1
+    elif grep -q "2099-01-01-99 is no ledger row" "$W/k8x.log"; then echo "  ok    UNKEYED: a correction aimed at no ledger row is refused"
+    else echo "  FAIL  UNKEYED: refused, but not for its reason: $(tail -1 "$W/k8x.log")"; fail=1; fi
+    grep -v '^2026-01-01-08' "$W/corr.keep" > "$R/tests/rulecheck/session_corrections.tsv"
+    if k8 "$TOOL" "$W/k8t"; then echo "  FAIL  UNKEYED: the row under a transcript id no session claims was collected silently (#339)"; fail=1
+    elif grep -q "row(s) with no session that claims them (2026-01-01-08)" "$W/k8t.log"; then echo "  ok    UNKEYED: with its correction gone the row under an unclaimed transcript id stops the collector, named alone"
+    else echo "  FAIL  UNKEYED: stopped, but not for its reason: $(tail -1 "$W/k8t.log")"; fail=1; fi
+    cp "$W/corr.keep" "$R/tests/rulecheck/session_corrections.tsv"
+fi
+mv "$R/tests/rulecheck/session_corrections.tsv" "$W/corr.away"
+if k8 "$U" "$W/k8n"; then echo "  FAIL  UNKEYED: with the corrections gone the rows were collected silently (#339)"; fail=1
+elif grep -q "row(s) with no session that claims them (2026-01-01-07, 2026-01-01-08)" "$W/k8n.log"; then echo "  ok    UNKEYED: with the corrections gone the collector stops, naming the '-' row and the unclaimed transcript-id row"
+else echo "  FAIL  UNKEYED: stopped, but not for its reason: $(tail -1 "$W/k8n.log")"; fail=1; fi
+mv "$W/corr.away" "$R/tests/rulecheck/session_corrections.tsv"
+if [ -z "${VS_CTL:-}" ]; then
+    shadow unkeyed-dropped > /dev/null
+    mv "$R/tests/rulecheck/session_corrections.tsv" "$W/corr.away"
+    if k8 "$W/unkeyed-dropped/tools/session_metrics.py" "$W/k8s"; then vs_ctl_fired unkeyed-dropped "the copy collected with both rows unclaimed and no correction, silently"
+    else vs_ctl_dead unkeyed-dropped "the copy stopped: $(tail -1 "$W/k8s.log")" || fail=1; fi
+    mv "$W/corr.away" "$R/tests/rulecheck/session_corrections.tsv"
+fi
 
 if [ -z "${VS_CTL:-}" ]; then
     if python3 "$TOOL" check "$W/real" > "$W/check.txt" 2>&1; then echo "  ok    check: $(tail -1 "$W/check.txt")"

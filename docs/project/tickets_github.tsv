@@ -2,10 +2,11 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 340
+# issues: 341
 number	state	reason	closed	labels	title
-340	OPEN	-	-	bug,severity: low,test-integrity	Every strict emulator run read NOT GREEN: audit_pool_drop is a DEAD ROW to the runners' emulator-tier classifier
-339	OPEN	-	-	-	The rule-checker ledger has 37 rows with session '-' (14z-187/187b/188); both ledger pages drop them without saying so
+341	OPEN	-	-	bug,severity: low,test-integrity	test_tickets' parked-disagrees control went DEAD once the newest ticket was closed (it perturbs the first row whatever its state)
+340	CLOSED	COMPLETED	2026-10-30	bug,severity: low,test-integrity	Every strict emulator run read NOT GREEN: audit_pool_drop is a DEAD ROW to the runners' emulator-tier classifier
+339	CLOSED	COMPLETED	2026-10-30	-	The rule-checker ledger has 37 rows with session '-' (14z-187/187b/188); both ledger pages drop them without saying so
 338	OPEN	-	-	evolution,severity: low	Proof sheets: a web build for the community — half-size WebP tiles, credits on every page, a plain-language intro, no local paths
 337	CLOSED	COMPLETED	2026-10-30	evolution,severity: low,test-integrity	The mktemp census does not check EXIT-trap order: a trap installed before a guarded site runs on the guard's stop
 336	CLOSED	COMPLETED	2026-10-30	bug,severity: low,test-integrity	test_static_runner section 32 FAILs on every Linux host: dash words its write error 'I/O error', the premise counted only bash's 'Broken pipe'

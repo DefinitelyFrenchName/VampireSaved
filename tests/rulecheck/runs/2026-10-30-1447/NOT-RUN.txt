@@ -1,0 +1,1 @@
+NOT RUN: prepared, then its deliverable closing_comment.md was found still citing transcript dd342b19 (the premise run 2026-10-30-1446 Q1 refused); re-prepared as the next run after the comment's fix

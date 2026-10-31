@@ -62,7 +62,8 @@ mkcopy() {  # mkcopy <dir>
 }
 # THE PERTURBATIONS, one per declared control; the control section and the
 # CONTROL=<name> mode call the same function. EXPECT = the failure's substring.
-# Each edits the FIRST ticket row of the copy; links still resolve in this tree.
+# Each edits the FIRST ticket row of the copy (parked-disagrees the first open or parked one: a closed row carries
+# no parked label to disagree with, 14z-214); links still resolve in this tree.
 perturb() {  # perturb <name> <dir>
     python3 - "$1" "$2" <<'PY' || { echo "no such perturbation: $1"; exit 3; }
 import sys
@@ -74,6 +75,8 @@ cols = ["issue", "kind", "status", "title", "repro", "decided", "learned", "wron
 lines = idx.read_text().splitlines()
 data = [i for i, l in enumerate(lines) if l and not l.startswith("#") and not l.startswith("issue\t")]
 first = data[0]
+if name == "parked-disagrees":  # a closed row has no parked label to disagree with: take the first open or parked row
+    first = next(i for i in data if lines[i].split("\t")[2] in ("open", "parked"))
 row = dict(zip(cols, lines[first].split("\t")))
 state = {l.split("\t")[0]: l.split("\t")[1] for l in snap.read_text().splitlines()
          if l and not l.startswith("#") and not l.startswith("number\t")}

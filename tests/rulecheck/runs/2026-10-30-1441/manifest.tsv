@@ -1,0 +1,16 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent214/t340/closure/closing_comment.md	409ab3d4173f9e8fc9aabca089dcd59d2871517e
+build/agent214/t340/closure/ticket_row_340.tsv	e9eec87449bd9143ec0c441d9730eba6976ac195
+build/agent214/t340/closure/issue_340.md	730f291fc46819dbea60ec6a703a78d17409d6e2
+build/agent214/t340/closure/fix.diff	424d520a7f2e05e917132c7aaced1880e2f4f7e8
+build/agent214/t340/closure/before_fix_mac_mp.out	20d7e3dad3e2fcdddfed500c1f897e20b595fe7d
+build/agent214/t340/closure/tier_diff.py	243cfd652a7d749e1a02be2d84426d19378c811d
+build/agent214/t340/closure/tier_diff.out	7b754f1b992b55da444df87128aa46c05708a276
+build/agent214/t340/closure/emu_dryrun_ondemand_head.log	4817ccc99384b4f876bf4795f3d40cc4abf3d37d
+build/agent214/t340/closure/emu_dryrun_head.log	85c76e221e197c24693958bc90b0402092da29f8
+build/agent214/t340/closure/test_emulator_runner.head.log	493b96ea492ef2808be19e9690c16cce5f67deba
+build/agent214/t340/closure/pilot_r11/t213r11.out	6a89fe21a04381e641758f2010eb8f439febb355
+build/agent214/t340/closure/pilot_r11/t213r11_static/classes.tsv	7405344ee5a9c398d95daa209f1ee3bb38274be4
+build/agent214/t340/closure/controls_concurrent_rows.txt	9f9ce615662fc6c7a1681f07b522a44ba4868e89
+build/agent214/t340/closure/records.diff	b82285f3118e81145a2be2a19a60f091f791f3f7
+tests/run_all_emulator.sh.lines-820-900 (lines 820-900 of tests/run_all_emulator.sh)	7a813b8139952722811b14a9be7801d090ee5d67

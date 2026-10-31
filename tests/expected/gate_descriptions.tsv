@@ -78,6 +78,7 @@ declares	audit_merged_vec3
 declares	audit_mister_map_fit
 declares	audit_mizuumi_attack
 declares	audit_mizuumi_inputs
+declares	audit_mizuumi_rows_b
 declares	audit_mizuumi_struct
 declares	audit_move_parity
 declares	audit_move_parity_attribution
@@ -104,6 +105,7 @@ declares	audit_rig_opening
 declares	audit_rng_draws
 declares	audit_rng_forms
 declares	audit_roster_pairings
+declares	audit_sas_penguin_count
 declares	audit_sdram_bank_load
 declares	audit_select_bank_gates
 declares	audit_shared_wall_push

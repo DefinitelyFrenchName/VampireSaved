@@ -1,0 +1,17 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent214/t339/closure/closing_comment.md	797e1676f988db0d69ca87d0d2d2427f60d39601
+build/agent214/t339/closure/ticket_row_339.tsv	aa15378c570c61634ff5b98677a224cf777fc5bf
+build/agent214/t339/closure/issue_339.md	2d08a53485d78ca8a481f9500a58c695022df9f5
+build/agent214/t339/closure/fix.diff	17dfade098bb75deffc02b3541b51a93e761d0d5
+build/agent214/t339/closure/session_corrections.tsv.lines-1-140 (lines 1-140 of build/agent214/t339/closure/session_corrections.tsv)	8836271e8b9f2ac6e5ee2db3c53900e761e81d68
+build/agent214/t339/closure/session_corrections.tsv.lines-141-281 (lines 141-281 of build/agent214/t339/closure/session_corrections.tsv)	8c32576b18b8b308c846ef7d3d78f21c2b2b4d5b
+build/agent214/t339/closure/manifest_dirs.txt	7c9a1e49375f8d0006a0adf0a3a468267d118798
+build/agent214/t339/closure/key_tid_rows.py.txt	34f4e66c0ceeaa933b8d3e55361d5aeb86327869
+build/agent214/t339/closure/tid_check.txt	970dcd3c252945788eacaa4f47176f75fef783ff
+build/agent214/t339/closure/state_history_cites.txt	017f70eabfb7b15e566b1dc306dc28f567795fcb
+build/agent214/t339/closure/test_session_metrics.log	40c925bf65df296e9bd461cae15e6140d1c01553
+build/agent214/t339/closure/mode_unkeyed-dropped.log	b43cda335531037d8358d771c3650bd42db3ae56
+build/agent214/t339/closure/collect_now.log	f29b1273c47c2dbf350e47bae62541048411a32a
+build/agent214/t339/closure/datasets_compare.txt	ccfecdc9d9b7dc63bc6cd3c40ea74d7698f057ff
+build/agent214/t339/closure/rulecheck_session_key.txt	cb4081f8e0679409350e4f3d489130ae4e7b2c8f
+build/agent214/t339/closure/records.diff	ac9e829d8b32ee77c130b2daf61d61da82eeb99c

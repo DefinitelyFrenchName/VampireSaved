@@ -16,7 +16,7 @@ when this file is stale or a script has no family row.
 audits are run by name with the `needs` shown here. HANDOFF's former per-gate
 fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 
-**488 scripts** — 150 ci_portable, 93 ci_static, 245 emulator-tier (run by name).
+**490 scripts** — 150 ci_portable, 93 ci_static, 247 emulator-tier (run by name).
 
 | family | scripts | what the family is |
 |---|---|---|
@@ -27,7 +27,7 @@ fence (as of 14z-123) is verbatim in `HANDOFF_HISTORY.md`.
 | [oracle](#oracle) | 29 | the CLAUDE.md §4 oracle classes — masked legacy, flicker/window/composite, dual-track, the recording corpus |
 | [gfx](#gfx) | 25 | tiles, OBJ records, sprite lists, render-layer verdicts |
 | [tenant](#tenant) | 87 | tenant content — per-character gates and on-demand audits on the ported characters |
-| [character-data](#character-data) | 93 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
+| [character-data](#character-data) | 95 | the character-data map — move naming, hitboxes, reactions, projectiles, measured mechanics |
 | [review-triage](#review-triage) | 38 | the 14z-94 adversarial-review closures (GitHub #74's index) — every one a guard the review asked for |
 | [mister](#mister) | 20 | the MiSTer lane — the jtcps2w core, the simulation oracles, MRA/.rom generation |
 
@@ -465,6 +465,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/audit_marionette_cost.sh` | audit | emulator | MAME, FBNeo, ~8 min | WHAT A MARIONETTE PORT WOULD COST vsavj: every place vs2 touches her flag +0x3C3, the vsavj instruction a port would have to hook there, how often LEGACY content executes each one, and her assets' size (14z-189, GitHub #128 — the maintainer… | 14z-189 |
 | `tests/audit_mizuumi_attack.sh` | audit | emulator | MAME, FBNeo, ~2 min | THE ATTACK-START FIELDS OF THE FIGHTER BLOCK, MEASURED (14z-195, promoted from the #118 pilot of 14z-194, GitHub #118; HOMING item 3, in part — see NOT COVERED) | 14z-195 |
 | `tests/audit_mizuumi_inputs.sh` | audit | emulator | MAME, FBNeo, ~2 min | THE INPUT WORDS OF THE FIGHTER BLOCK, PREDICTED EXACTLY FROM THEIR STATIC MECHANISM (14z-195, promoted from the #118 pilot of 14z-194, GitHub #118; HOMING item 1) | 14z-195 |
+| `tests/audit_mizuumi_rows_b.sh` | audit | emulator | MAME, ~1 min | THREE MORE MIZUUMI PLAYER-STRUCT CANDIDATES, MEASURED ON EXISTING REPLAYS: +0x3A8 IS A LONG (A GFX-RAM ADDRESS), +0x384 A PER-PLAYER STATE INDEX, AND +0x3BE COUNTS ONLY THE KOs WHOSE FINISH TYPE IS 3, 4 OR 6 (measured 14z-214, GitHub #118: | 14z-214 |
 | `tests/audit_mizuumi_struct.sh` | audit | emulator | MAME, FBNeo, a build dir, ~4 min | THE MIZUUMI PLAYER-STRUCT CANDIDATES, MEASURED: the offsets adopted into atlas/ram.md from the community's Reverse Engineering page, each held by a check whose CONTROL would disagree (14z-189, GitHub #118) | 14z-189 |
 | `tests/audit_move_parity.sh` | audit | emulator | MAME, a build dir | EVERY TENANT MOVE, OURS vs NATIVE vsav2, AT A MATCHED SPEED LEVEL AND A PINNED RNG (GitHub #136, 14z-159). | 14z-159 |
 | `tests/audit_move_parity_attribution.sh` | audit | emulator | MAME, a build dir, ~5 min | EVERY DIFF ROW OF THE #136 MOVE-PARITY TABLE HAS A MEASURED CAUSE, frozen (14z-168, GitHub #136): each root found by ablation (its event's inputs removed, both legs re-run, the rows that vanish are its) and named by a measured signature; | 14z-168 |
@@ -477,6 +478,7 @@ the character-data map — move naming, hitboxes, reactions, projectiles, measur
 | `tests/audit_rig_opening.sh` | audit | emulator | MAME, a build dir, ~5 s | THE NAMING RIGS' OPENING: the two legs draw DIFFERENT round-start entrances, and the rig no longer samples across the difference (14z-167, rewritten 14z-172 for GitHub #168). | 14z-167 |
 | `tests/audit_rng_draws.sh` | audit | emulator | MAME, FBNeo, a build dir, ~1 min | THE ENGINE RNG'S DRAWS, BY CALLER: ours against native vs2 for the three tenants, and legacy content on ours against pristine vsavj (GitHub #176, 14z-185). | 14z-185 |
 | `tests/audit_rng_forms.sh` | audit | emulator | MAME, FBNeo, a build dir, ~8 min | THE PARITY GATES UNDER THREE RNG FORMS: what the 0000 pin (the RNG's fixed point) hides, measured against the gates' own pin (GitHub #183, 14z-186). | 14z-186 |
+| `tests/audit_sas_penguin_count.sh` | audit | emulator | MAME, ~15 s | SASQUATCH'S PENGUIN DARK FORCE ON PRISTINE VSAVJ: +0x36C IS THE COUNT OF PENGUINS STILL TO THROW AND +0x14B THE COUNT ON SCREEN; EACH PUNCH RELEASES ONE, WHICH TRAVELS FARTHER THE STRONGER THE PUNCH (measured 14z-214, GitHub #118 batch B6; | 14z-214 |
 | `tests/audit_shared_wall_push.sh` | audit | emulator | MAME, a build dir, ~20 s | WHO KEEPS A SHARED CORNER: the two engines' push-apart differs when both fighters are clamped against the same wall edge in the same frame (14z-184, GitHub #179). | 14z-184 |
 | `tests/audit_tenant_throw_geometry.sh` | audit | emulator | MAME, a build dir | THE TENANTS AS THROWERS, OURS vs NATIVE VS2 (14z-131, maintainer-directed 2026-09-04; Pyron and Donovan joined and the level pinned 14z-193, #230; Pyron's air throw joined 14z-194, #235). | 14z-131 |
 | `tests/audit_throw_recovery.sh` | audit | emulator | MAME, the vsavj ROM, ~2.5 min at JOBS=12 | THE VSAVJ THROWS' RECOVERY AND THROW TECH, MEASURED: when each fighter can act again after every ground and air throw, thrown and teched, the tech window, and every command throw's whiff and techability — for the community cross-check (GitH… | 14z-211 (#330) |

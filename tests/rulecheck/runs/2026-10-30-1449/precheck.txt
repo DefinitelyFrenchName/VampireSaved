@@ -1,0 +1,8 @@
+  FLAG D-ABSOLUTE: It **stops** on any ledger row no session claims: neither a 14z key nor a transcript id this collect gives a session.  [build/agent214/t339/closure/closing_comment.md]
+  FLAG D-ABSOLUTE: - with one correction gone, the collector stops naming that row alone;  [build/agent214/t339/closure/closing_comment.md]
+  FLAG D-ABSOLUTE: - On the real ledger, every row in 14z-163..14z-213 is now counted: 1,262 rows, 1,262 runs.  [build/agent214/t339/closure/closing_comment.md]
+  FLAG D-ABSOLUTE: The only rows outside that range are 14z-214's own.  [build/agent214/t339/closure/closing_comment.md]
+  FLAG D-ABSOLUTE: | 14z-183b | none | 12 |  [build/agent214/t339/closure/closing_comment.md]
+  FLAG D-ABSOLUTE: | 14z-185b | none | 9 |  [build/agent214/t339/closure/closing_comment.md]
+  FLAG D-ABSOLUTE: - A correction to an append-only record is kept beside it with its evidence.  [build/agent214/t339/closure/closing_comment.md]
+packet_check: 7 flag(s): D-ABSOLUTE 7

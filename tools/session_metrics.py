@@ -63,6 +63,11 @@ CLASSES = ("MEASURED", "DERIVED", "ESTIMATED", "INFERRED", "EXTRAPOLATED")
 ACTIVE_GAP_S = 300          # ESTIMATED active time: a gap between two records counts only up to this
 KEY_RE = re.compile(r"^(14z-(\d+)([a-z]?))$")
 LEDGER = "tests/rulecheck/ledger.tsv"
+# #339 (14z-214): the ledger is append-only, so a row whose `session` is not a 14z key — `-` (37 rows of 2026-09-28 and
+# 2026-10-02, before #209 made prepare require the key) or a transcript id (233 rows, record's old prefix) — is keyed
+# HERE, by run id, with its evidence; and a row no session claims stops the collector, because such a row used to vanish
+# from both ledger pages without a word (132 of them: the 37, and 95 under transcript ids no single session claims).
+CORRECTIONS = "tests/rulecheck/session_corrections.tsv"
 # the rule-checker's questions, named as docs/project/rule_checker.md words them (Q1-Q5 "evidence", QP1-QP5 "procedure")
 QUESTIONS = {"Q1": "stated basis", "Q2": "capture", "Q3": "shared premise", "Q4": "control for this failure",
              "Q5": "decision source", "QP1": "said vs done", "QP2": "claimed vs run", "QP3": "measured, not inferred",
@@ -338,6 +343,39 @@ def keys_in(spec, known):
     return [k.strip() for k in spec.split(",") if k.strip()]
 
 
+def read_corrections(repo):
+    """-> {run id: session} from CORRECTIONS (#339): columns id, session, evidence; `#` lines are comments."""
+    out, p = {}, os.path.join(repo, CORRECTIONS)
+    if not os.path.exists(p):
+        return out
+    for line in open(p, encoding="utf-8"):
+        if line.startswith("#") or not line.strip() or line.startswith("id\t"):
+            continue
+        f = line.rstrip("\n").split("\t")
+        if len(f) < 3 or not KEY_RE.match(f[1]) or not f[2].strip():
+            sys.exit(f"{CORRECTIONS}: a row needs an id, a 14z-N session and its evidence: {line.strip()!r}")
+        out[f[0]] = f[1]
+    return out
+
+
+def key_rows(ledger, corr):
+    """#339: key each ledger row whose session is not a 14z key (`-`, or a transcript id) from its correction, in
+    place; refuse a correction aimed at a row that has a 14z key, or at no row."""
+    ids = {r["id"]: r for r in ledger}
+    for rid, key in corr.items():
+        r = ids.get(rid)
+        if r is None or KEY_RE.match(r.get("session", "")):
+            sys.exit(f"{CORRECTIONS}: {rid} is " + ("no ledger row" if r is None else f"keyed {r['session']!r} already")
+                     + ": a correction keys only a row whose session is not a 14z key")
+        r["session"] = key
+
+
+def unclaimed_rows(ledger, claimed):
+    """#339: the ids of the ledger rows no session claims — a session that is neither a 14z key nor one of `claimed`,
+    the transcript ids this collect gives a session (the caller stops on any)."""
+    return [r["id"] for r in ledger if not KEY_RE.match(r.get("session", "")) and r.get("session") not in claimed]
+
+
 def chain_key(subject):
     s = re.split(r" — | -- ", subject, 1)[0]
     return re.sub(r"\b(?:run|runs) [\d\-–, ]+|\(.*?\)", "", s).strip().lower()[:80]
@@ -346,6 +384,7 @@ def chain_key(subject):
 def collect(a):
     repo = a.repo
     ledger = read_ledger(repo)
+    key_rows(ledger, read_corrections(repo))
     commits = git_commits(repo)
     sections = state_sections(repo)
     runs = static_runs(a.static_runs)
@@ -353,6 +392,12 @@ def collect(a):
     keys = keys_in(a.keys, {k for k in known if KEY_RE.match(k)})
     tmap = {k: (p, "MEASURED") for k, p in (x.split("=", 1) for x in a.transcript)}
     mapped, shared, _ = map_transcripts([k for k in keys if k not in tmap], sections, commits, a.projects)
+    claimed = {os.path.basename(p)[:8] for p, _ in list(tmap.values()) + list(mapped.values()) if p and os.path.exists(p)}
+    unkeyed = unclaimed_rows(ledger, claimed)
+    if unkeyed:
+        sys.exit(f"{LEDGER}: {len(unkeyed)} row(s) with no session that claims them ({', '.join(unkeyed[:5])}"
+                 f"{' ...' if len(unkeyed) > 5 else ''}): key each in {CORRECTIONS} with its evidence (#339); "
+                 f"a row no session claims would vanish from the pages")
     figures, rc_rows, tier_rows, costly, act_rows = [], [], [], [], []
     acts = rc_actions.actions(ledger, rc_actions.metas(repo, ledger))   # over the WHOLE ledger: a link may cross sessions
     notrun = rc_actions.not_run(repo)

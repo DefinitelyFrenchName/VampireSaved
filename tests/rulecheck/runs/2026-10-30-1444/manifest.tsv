@@ -1,0 +1,14 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent214/t118/b6/closure/gate.sh.txt	fe1e5eb0a33edfe9c625e7c78a299c6eeffb7414
+build/agent214/t118/b6/closure/blobs.txt	4821a7112b5b0d3e5d78a15509910fd9004e9dfa
+build/agent214/t118/b6/closure/plain.log	88d66355ab1544ceb7472173007d88d6330b9698
+build/agent214/t118/b6/closure/mode_hold-as-toss.log	40337c49ee951df4fbbb1e7e59191c1ad4bdac8d
+build/agent214/t118/b6/closure/mode_taps-shifted.log	6663ef9ba9d11cfae23dbf34a699106f9a137add
+build/agent214/t118/b6/closure/mode_p2-side.log	b822e8e9bd4edab8f1fa83b60246ed758308e7b1
+build/agent214/t118/b6/closure/mode_readback-unpoked.log	36efb66a344522b4cbe0bd3e9cf1577179ae3e77
+build/agent214/t118/b6/closure/mode_strength-swapped.log	aec0b15ef5d2e8b703cebf28c05dacebb2410bb3
+build/agent214/t118/b6/closure/records.diff	e52b59b666fb3882033b3d44e314f16da0a7c293
+build/agent214/t118/b6/closure/decisions_added.txt	40a9c890341fe6408e355183a111927d54e60ee7
+build/agent214/t118/b6/closure/capture_activation.jpg	134b35e872e943ecc835444b8c1d131c21175654
+build/agent214/t118/b6/closure/capture_one_punch.jpg	aa094225b493f540acb8ca2da2dc60e7eadb1f9a
+build/agent214/t118/b6/closure/capture_strength.jpg	aa5b8bbc73563b536c88d00d59ebf496a51cf0f1

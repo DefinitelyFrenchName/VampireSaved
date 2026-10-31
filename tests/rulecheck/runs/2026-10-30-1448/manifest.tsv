@@ -1,0 +1,15 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent214/t339/closure/closing_comment.md	4c15954926d35135b896e55a5ff2b1dc2a7095c4
+build/agent214/t339/closure/ticket_row_339.tsv	aa15378c570c61634ff5b98677a224cf777fc5bf
+build/agent214/t339/closure/issue_339.md	2d08a53485d78ca8a481f9500a58c695022df9f5
+build/agent214/t339/closure/fix.diff	53f435a499d1c3f07db013de7acc232bbfbe90c2
+build/agent214/t339/closure/session_corrections.tsv	e83f75765b7919f2bfb4d787904b0e2072e1e9bb
+build/agent214/t339/closure/manifest_dirs.txt	7c9a1e49375f8d0006a0adf0a3a468267d118798
+build/agent214/t339/closure/ledger_rows.txt	ddbf7337b693a1a5d80c6d8cce64a7719a747061
+build/agent214/t339/closure/state_history_cites.txt	017f70eabfb7b15e566b1dc306dc28f567795fcb
+build/agent214/t339/closure/test_session_metrics.log	533467e3230d17495ff7c136a8ee54012b4fd2c7
+build/agent214/t339/closure/mode_unkeyed-dropped.log	4e6b7a584d531268f8155406f04fb4cd0c82b427
+build/agent214/t339/closure/collect_now.log	f507417a2c82c0f0756e35653c66de2f9591b232
+build/agent214/t339/closure/datasets_compare.txt	fe01c1130ccf02ef79ac7afd05f764d46ddeb5e3
+build/agent214/t339/closure/rulecheck_session_key.txt	cb4081f8e0679409350e4f3d489130ae4e7b2c8f
+build/agent214/t339/closure/records.diff	ef23ea6b2e81cb4d3251cd72c0b6bfe9c848e256

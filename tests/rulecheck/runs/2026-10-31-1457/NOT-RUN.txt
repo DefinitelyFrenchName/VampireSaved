@@ -1,0 +1,1 @@
+NOT RUN: prepared from a claim whose update had aborted (it still said 'previous value + 1' without naming the 0 -> 1 gap run 2026-10-30-1456 found); re-prepared after the claim's fix

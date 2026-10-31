@@ -1,0 +1,14 @@
+# artifact	sha1 (of the staged copy, at prepare time)
+build/agent214/t118/rowsb/closure/gate.sh.txt	216cc5ae0b0c5188d499f006147a6fa043b5675b
+build/agent214/t118/rowsb/closure/blobs.txt	dde210cdbc1ad2dd78aa21c2f9f9b24574bbfeb9
+build/agent214/t118/rowsb/closure/plain.log	0eca67556da8f549d24ece6b6805d2b70218d973
+build/agent214/t118/rowsb/closure/mode_sides-swapped.log	15255c9939854269e892e76abea159db740431ec
+build/agent214/t118/rowsb/closure/mode_offset-swapped.log	7377a65231d1874896493a1c187833473a8d71bd
+build/agent214/t118/rowsb/closure/mode_lowbits-shifted.log	5bf58441e5b308d0da7ac823fbdfb90b51348634
+build/agent214/t118/rowsb/closure/mode_bit7-kept.log	d27cc106a1ea03843a394ccebd530cddd92d96b5
+build/agent214/t118/rowsb/closure/mode_loser-side.log	c28cf093e1b3bc03c1657901de00eae22d00ac74
+build/agent214/t118/rowsb/closure/mode_raises-forgotten.log	23ab7920fc19a952ba6db7dba842514933fa180c
+build/agent214/t118/rowsb/closure/mode_byte-shifted.log	6435ae15412c543861aef683f3a8afb5f16e5be7
+build/agent214/t118/rowsb/closure/mode_word-only.log	66d4a24af93762453496357153ebd02a3b8377f8
+build/agent214/t118/rowsb/closure/records.diff	27666b6f716d6b4a67cf9a8f2534fc3d268678b3
+build/agent214/t118/rowsb/closure/ruling_ondemand_2026-10-09.txt	d9bb8ec4f5ca88c211f8a8f794448bd726614d7d

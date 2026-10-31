@@ -1,0 +1,28 @@
+THE PACKET
+
+Decision kind: recommendation
+Subject: close #339 as done (14z-214), after runs 2026-10-30-1446, -1448 and -1449: every ledger row without a 14z key (the 37 '-' rows and the 233 under transcript ids) keyed beside the append-only ledger with its evidence, and the collector stopping on any row no session claims; gated with the control unkeyed-dropped
+Claim (the working agent's sentence): CLAIM: close #339 as done (14z-214). The closing comment closing_comment.md and the row ticket_row_339.tsv state the resolution. The ticket (issue_339.md) reported 37 ledger rows with session '-' dropped silently by both ledger pages; the maintainer ruled "either is fine, just make it future proof" and "no", then, on the rule-checker finding 95 more rows dropped the same way, "Extend #339 now (Recommended)" (records.diff, the DECISIONS_HISTORY entry quoting them). It rests on:
+1. THE FIX: fix.diff (550958ad..working tree: tools/session_metrics.py read_corrections, key_rows applying a correction only to a row without a 14z key and refusing one aimed at a keyed row or no row, unclaimed_rows and the stop after the transcript mapping on any row neither a 14z key nor a transcript id this collect gives a session; tests/test_session_metrics.sh the UNKEYED section with a synthetic '-' row and a synthetic unclaimed transcript-id row, the control unkeyed-dropped) and session_corrections.tsv (270 rows: the 37 '-' rows and the 233 transcript-id rows, each with its evidence).
+2. THE EVIDENCE FOR EACH KEY: for the 37, each run's manifest.tsv (every artifact staged from a sitting's working directory is the keyed sitting's) and the cited chains (as in run 2026-10-30-1446's resolution); for the 233, key_tid_rows.py.txt and its report tid_check.txt: 210 keyed by the one build/agentNNN/ directory their manifest stages from (build/agent172/, #172's extract directory, excluded), cross-checked against the collector's own transcript mapping where it gives the id to one session (104 agree, 11 disagree: d33b9bfe's runs 265-275, whose manifests are build/agent183b/ while the mapping gives the transcript to 14z-183; the manifest is taken), 95 with no mapping; 21 with no agentNNN directory keyed on the session their subject names or the session number of their build directory, each agreeing with the mapping; 2 procedure checks (runs 146, 224) keyed by hand to the sitting whose transcript they check, as the mapping does.
+3. THE GATE AND ITS CONTROL: test_session_metrics.log (PASS; UNKEYED: both synthetic rows counted under 14z-8 by their corrections, a correction aimed at a keyed row and one aimed at no ledger row both refused, the unclaimed transcript-id row alone stopping the collector by name when its correction is gone, both named when both are gone; every control fired) and mode_unkeyed-dropped.log (the control as a mode: the copy collects silently, the gate FAILs); each log opens with HEAD, host and blobs.
+4. THE REAL LEDGER: collect_now.log (exit 0) and datasets_compare.txt (the 14z-213 close's datasets: 1,130 runs counted over 14z-163..14z-213; now 1,262, every one of the 1,262 ledger rows in that range, the 7 outside being 14z-214's; the raw session forms; the eight sessions whose counts change; actions 310 -> 339).
+5. THAT NO NEW ROW CAN LACK A 14z KEY: rulecheck_session_key.txt (tools/rulecheck.py unchanged since 550958ad: prepare requires a 14z-N --session (#209) and writes it into the run's meta.tsv; record builds the ledger row's session from that meta.tsv, never from its own --session, which only finds the transcript; the tool's only session assignments, by grep).
+NOT TESTED: the published pages are not refreshed here (the close's dashboard and ledger-page steps); the action count's rise of 29 is not itemised; the keys rest on the run manifests read by the project's directory naming (build/agentNNN/ is sitting 14z-NNN's working directory; build/agent172/ is not a sitting's; build/rcNNN/ and build/gatequalNNN/ carry the session number) and on the collector's transcript mapping, not on a reading of each sitting's transcript; for the 11 d33b9bfe rows the manifest is preferred over the mapping, which no third witness decides; readers of the ledger other than session_metrics (close_findings, packet_check, recurrence_alarm and the rest) do not apply the corrections; a hand edit to the ledger writing a row without a 14z key would be refused by the collector, not prevented; the collector's stop depends on this collect's transcript mapping only for a transcript-id row without a correction, and every such row in the ledger today has one.
+Artifacts (read every one, in full):
+  - build/agent214/t339/closure/closing_comment.md
+  - build/agent214/t339/closure/ticket_row_339.tsv
+  - build/agent214/t339/closure/issue_339.md
+  - build/agent214/t339/closure/fix.diff
+  - build/agent214/t339/closure/session_corrections.tsv.lines-1-140 (lines 1-140 of build/agent214/t339/closure/session_corrections.tsv)
+  - build/agent214/t339/closure/session_corrections.tsv.lines-141-281 (lines 141-281 of build/agent214/t339/closure/session_corrections.tsv)
+  - build/agent214/t339/closure/manifest_dirs.txt
+  - build/agent214/t339/closure/key_tid_rows.py.txt
+  - build/agent214/t339/closure/tid_check.txt
+  - build/agent214/t339/closure/state_history_cites.txt
+  - build/agent214/t339/closure/test_session_metrics.log
+  - build/agent214/t339/closure/mode_unkeyed-dropped.log
+  - build/agent214/t339/closure/collect_now.log
+  - build/agent214/t339/closure/datasets_compare.txt
+  - build/agent214/t339/closure/rulecheck_session_key.txt
+  - build/agent214/t339/closure/records.diff
