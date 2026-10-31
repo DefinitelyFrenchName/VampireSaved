@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-591 entries (49 game / 148 platform / 394 project), counted from the buckets at generation.
+592 entries (49 game / 148 platform / 395 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 49 entries
 
@@ -225,7 +225,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A FAILED `X="$(mktemp -d)"` LEAVES X EMPTY AND THE SCRIPT RUNS ON — `"$X/sub"` IS THEN A PATH UNDER `/` (paid: 14z-210, ERIS; fixed 14z-211/212, #333)
 - A SHELL'S WRITE-ERROR TEXT IS ITS OWN — bash says `write error: Broken pipe`, dash (Ubuntu's `sh`) `printf: I/O error` (paid: 14z-212, PILOT; #336)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 394 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 395 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -621,3 +621,4 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A COLLECTOR THAT GROUPS RECORDS BY A KEY DROPS A RECORD WITH NO KEY, AND SAYS NOTHING — 132 rule-checker runs missing from both ledger pages (paid: 14z-213/14z-214, #339)
 - A CONTROL THAT PERTURBS "THE FIRST ROW" DEPENDS ON THAT ROW'S STATE — test_tickets' parked-disagrees went DEAD the day the newest ticket closed (paid: 14z-214, #341)
 - A CRASH PLANTED ON EVERY CALL PROVES NOTHING ABOUT WHERE A GATE HIDES ONE — and a census counting `# MUST-FIRE:` lines anywhere counts a heredoc stub's header (paid: 14z-215, #310)
+- A `timeout` ON A REMOTE RUNNER KILLS THE RUNNER, NOT ITS EMULATORS — three MAME legs spun 10 h on ERIS after their batch's bound (paid: 14z-215, #310)

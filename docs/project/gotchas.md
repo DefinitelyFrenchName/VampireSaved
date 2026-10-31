@@ -7883,3 +7883,13 @@ must read HONOURED on the known-bad (pre-fix) leg before its clean reading on th
 where the gate's own probe captures, not everywhere. Declared modes are counted with the contract's reader, never a grep
 of the whole file. A "moved line" plant removes the target, it does not rename it. Evidence:
 `build/agent215/t310/rcmeas/` (local); `tests/test_ctl_show_err.sh` case (e) holds the moved-line refusal.
+
+## A `timeout` ON A REMOTE RUNNER KILLS THE RUNNER, NOT ITS EMULATORS — three MAME legs spun 10 h on ERIS after their batch's bound (paid: 14z-215, #310)
+
+The first ERIS batch of #310's gates ran under a 4-hour `timeout`; it fired on the runner, but three `cps2 vsavj` legs
+(`audit_command_throws`, `audit_es_ex`) were reparented to `/init` and kept running at 99% CPU with `-nothrottle`, their
+temp directories already deleted, for 10 h, until the maintainer asked what a waiter was waiting on. That waiter, a
+subagent's `until` loop on a results file's line count, had no deadline and a guessed target (59 lines; the run finished
+at 58). **The rule:** bound a remote run's whole process group (`setsid` plus `timeout --kill-after`, or kill the group),
+never the parent alone; a local waiter waits on the producer's own end marker AND a deadline, never on a guessed count;
+and the close lists each remote host's processes older than the session's last remote run and kills the session's own.

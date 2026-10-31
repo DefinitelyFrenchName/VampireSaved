@@ -38,92 +38,7 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
-## Session 14z-214 — **#340 and #339 closed done on their rule-checker runs (#339 extended by the maintainer to every ledger row without a 14z key: 270 corrections, 1,262 runs counted); #118's B6 read on close-range captures with the maintainer (Sasquatch's penguin chain; +0x36C recorded) and gated; #118's rows B (+0x384, +0x3A8, +0x3BE/+0x3BF, +0x3B6's bit 7) recorded and gated on the twelfth rule-checker run; ERIS's release-shape tier read 417 PASS, 0 FAIL; ERIS's and PILOT's 14z-213 scratch cleared; #341 filed and fixed at the close (the tier's one red).**
-
-### opened with
-The 14z-213 close's opener; the sweep CLEAN, `main` = `origin/main` at `550958ad`, the 14z-213 CLOSE section's last four
-lines uncommitted as it said. The maintainer, after pushing the `archive/` tags: **"Start with #340 closure and remote
-cleanup then start #118 and any non-parked ticket"**; later **"While I look at the sheets, please launch others tasks on
-the adequate and available machines"** (`DECISIONS_HISTORY.md`, 14z-214). Working evidence: `build/agent214/` (local).
-
-### (1) #340 CLOSED DONE; THE REMOTE SCRATCH
-**#340** closed `done` with its closing comment after rule-checker run `2026-10-30-1443` (OK; `-1441` caught after-fix logs
-that named no commit, `-1442` one log older than the fix). The emulator runner's registry check reads 240 of 240, no dead
-row. The second gate to reach an emulator through a path the classifier does not name: `docs/project/gotchas.md` "A GATE
-THAT REACHES AN EMULATOR THROUGH SOMETHING THE TIER CLASSIFIER DOES NOT NAME IS A DEAD ROW". **The remote scratch:** ERIS's
-and PILOT's 14z-213 scratch deleted and both checkouts moved to `main` at `550958ad` (PILOT was unreachable until the
-maintainer started the VM). PILOT's older `p211_*` scripts and two `refs/tmp` refs were not on the list and stay.
-
-### (2) #118 B6 — SASQUATCH'S PENGUINS, READ ON THE CAPTURES; +0x36C RECORDED
-The first sheet (nine tiles, Sasquatch at the left wall) could not show the chain: the maintainer **"no. … only 9 captures
-is hardly enough to be sure of such a chain of events"**. The rig moved to close range (the camera then shows the row)
-and the evidence became a clip of every frame plus a page per link (`build/agent214/t118/b6/`, local). The maintainer read
-**"1st punch -> farthest penguin walks forward 2nd punch -> penguin walking explodes rinse and repeat until no
-penguins"** and **"the distance the penguin crosses seems to be linked to the strength of the punch"**; measured next, one
-punch alone still explodes its penguin 56 f later (the next punch does not detonate it), and the travel is LP 175 / MP 256
-/ HP 351 px; asked whether that matched: **"yes"**. Recorded in `docs/game/atlas/ram.md`: +0x36C consistent with mizuumi's
-"Sasquatch Penguin Count" (set to 8 at PRG:0x047F14, lowered per punch at PRG:0x04800E), +0x14B's Sasquatch use.
-**The gate** `tests/audit_sas_penguin_count.sh` (pristine vsavj, MAME, thirteen legs; S1-S10 and R1; seven controls; S8's
-travel frozen) on rule-checker run `2026-10-30-1445` (after `-1444`). Its two poke read-back findings ruled
-**"CONTROL-PLANT (Recommended)"** and **"CROSS-LEG (Recommended)"** (`tests/expected/poke_readback.tsv`). The lesson, a
-chain of events gets a clip of every frame and a page per link, is in the maintainer-capture memory.
-
-### (3) #339 — EVERY LEDGER ROW KEYED; CLOSED DONE
-The maintainer on the 37 `-` rows: **"either is fine, just make it future proof"** and **"no"** (no separate display); the
-rule-checker then found 95 more rows dropped the same way, under transcript ids no single session claims, and the
-maintainer chose **"Extend #339 now (Recommended)"**. `tests/rulecheck/session_corrections.tsv` keys all 270 ledger rows
-without a 14z key from each run's manifest (the ledger stays append-only); `tools/session_metrics.py` applies a correction
-only to an unkeyed row and stops on any row no session claims; `tests/test_session_metrics.sh` gains the UNKEYED section
-and the control `unkeyed-dropped`. Effect at the 14z-213 datasets: 1,130 -> 1,262 runs, actions 310 -> 339, eleven of
-14z-183b's runs moved off 14z-183. Closed `done` with its comment after run `2026-10-30-1450` (`-1446`, `-1448`, `-1449`
-VIOLATED, `-1447` not run). `docs/project/gotchas.md` "A COLLECTOR THAT GROUPS RECORDS BY A KEY DROPS A RECORD WITH NO
-KEY, AND SAYS NOTHING". PILOT re-traced the gate's 13 controls on blob `b6c71388`: SAFE (`tests/controls_concurrent.txt`).
-
-### (4) #118 ROWS B — +0x384, +0x3A8, +0x3BE/+0x3BF AND +0x3B6'S BIT 7, RECORDED AND GATED
-PILOT traced S0's leads over existing replays (84 s); the Mac gate `tests/audit_mizuumi_rows_b.sh` (pristine vsavj, MAME,
-six corpus replays, a field leg and a write-tap leg each; T1-T12; nine controls; `ondemand` by the 2026-10-09 pristine-only
-ruling) records in `docs/game/atlas/ram.md`: +0x3A8 a LONG (0x0090C140 on P1, 0x0090C200 on P2; its three writers each
-seen storing it, 30, 12 and 24 long stores); +0x384 a per-player state index, each side's sequence frozen per replay, no
-game state judged; +0x3BE raised 0 -> 1 at PRG:0x05E2DC in the frame PRG:0x009A2C sets bit 7 of the KO winner's +0x3B6,
-after finish type 3 and never after 0 or 1 (types 2 and 4-7 occur in no replay; both raises are a CPU winner's and on
-P2, so neither confound is separated); +0x3BF never non-zero (type 4 unseen). The candidates table re-derived: four NO
-ROW offsets now NOT ADOPTED (3) and NOT OBSERVED (1). Rule-checker run `2026-10-31-1464` OK after `2026-10-30-1451`,
-`-1453` to `-1456`, `2026-10-31-1458` to `-1463` (each caught an overstatement, all fixed: unnamed confounds, 1P/2P
-labels the gate never measured, a clear routine named as fact, a listed writer never checked to write; T1 now requires
-each, control `writer-unseen`); `-1452` and `-1457` not run. **Still open in #118:** +0x354 (needs a slot-ownership rig),
-B1, B5, B7; S0's `character_tables.md:76` ("14 tables", 15 measured) unchecked.
-
-### (5) THE IDLE BOXES
-**ERIS:** the release-shape emulator tier at `550958ad`, every control executed (`build/agent214/eris/e214_results.tsv`,
-local; started 20:35:56Z): **417 PASS, 0 FAIL, 4 SKIP**, the SKIPs the host's environment as at 14z-211's like run (no
-Linux release binaries, no `pw-record`, no release MAME, no `podman`), so NOT GREEN under `--strict`; must-fire 227 fired
-of 227; registry 240 of 240. It is the strict run #340's closure listed as not yet done, and the release-shape run of
-#333's 11 guarded sites. **PILOT:** the #339 re-trace (above) and two static dry runs of the close's tier on scratch
-snapshots; the second's four reds were `test_controls_concurrent` and `test_gate_coverage_current` (both fixed since),
-`test_tickets` (it needed this group) and `test_emulator_staleness` (PILOT's own host history; PASS on the Mac).
-
-### CLOSE (14z-214, 2026-10-31)
-Opened on the maintainer's **"Both"** (the #118 rows first, then the close once ERIS finished). Driver
-`build/agent214/close/` (`--prev build/agent213/close/tier_results.tsv`). Before it, within the sitting: #340 and #339
-closed on GitHub with their comments (runs `2026-10-30-1443`, `-1450`); `origin/main` fetched before staging (nothing
-new). The 14z-213 CLOSE section's four post-push lines ride this commit, inside the group rolled to `STATE_HISTORY.md`.
-Steps: sections ((1)..(5)); next-session (the 14z-213 opener to `docs/NEXT_SESSION_HISTORY.md`, L110); rollover (the
-14z-213 group, 114 lines, to `STATE_HISTORY.md` with its ledger line; no `STATE.md §` citation into it); indexes (the
-archives', the ticket page, the gotchas index; the ticket snapshot refreshed, 340 issues); dashboard (14z-163..14z-214,
-3,185 figures, 0 unclassed; datasets versions 23, 23, 24, 23 and `actions` 3) — done. The tier's results:
-`build/agent214/close/tier_results.tsv`, the next close's `--prev`.
-**The tier's first run** (staged tree `3c32f61b`, `--confirm` on 14z-213's) read RED: 106 PASS, 1 FAIL — `test_tickets`,
-its control `parked-disagrees` DEAD for the wrong reason. Every perturbation edits the copy's first ticket row; with
-#340 now closed, the flip wrote `open` over a closed issue. Filed **#341** and fixed: the control takes the first open
-or parked row (the plain run PASS, seven controls fired; as a mode it fails on #338 written `parked`); re-traced on
-PILOT; `docs/project/gotchas.md` "A CONTROL THAT PERTURBS "THE FIRST ROW" DEPENDS ON THAT ROW'S STATE". #341 stays open,
-to close on its rule-checker run.
-The re-run (staged tree `db6cc5b7`, `--confirm` on the red run's results) read GREEN: 107 PASS, 0 FAIL, 0 SKIP. Committed
-`b68922a6`; pins and sweep done; `origin/main` fetched again (nothing new) and pushed `550958ad..b68922a6`. `ledger-page`:
-published `a3294742` on `gh-pages`, the own site SKIPPED (`DEPLOY_TARGET` unset). **These lines were written after the
-push and ride the next session's close.**
-
-## Session 14z-215 — **in progress: #341 closed done after its re-check; #118's remaining rigs; #310's remaining shapes scoped.**
+## Session 14z-215 — **#341, #342, #343 and #118 closed done; #129 closed declined on the maintainer's word; #310 groups 1-6 done (groups 5-6 after rule-checker run -1514), kept open for next session's crash-injection sweep and group 7; the strict tier's six reds fixed; two orphaned waits found and killed.**
 
 ### opened with
 The 14z-214 close's opener; the sweep CLEAN, `main` = `origin/main` at `b68922a6`, the 14z-214 CLOSE section's last four
@@ -148,12 +63,12 @@ Five rig workers on pristine vsavj (`build/agent215/t118/`, local; the common br
 gate (unregistered) whose run passed with every control fired: +0x354 and +0x3A8 (`s354_3a8/`), B5 Lilith +0x14C and B7
 Bishamon +0x316 (`b5b7/`), B3 Felicia +0x37F, B4 Gallon +0x366 and +0xB2 (`b3b4b2/`), B1 Anakaris +0x152, +0x156, +0x1A0,
 +0x1AA, +0x374 (`b1/`); B2 (the finish types, on the win screen's banner) running. Every sheet was checked, then sent to
-the maintainer with its question; no atlas row changes before the answers.
+the maintainer with its question; no atlas row changes before the answers. *[Resolved: (6), (7).]*
 
 ### (3) #310 — GROUPS 1-4 NOW
 A read-only worker scoped the remaining work at HEAD (`build/agent215/t310/REMAINING.md`, local); the question went
 through runs `2026-10-31-1468` to `-1470` (each caught a miscount). The maintainer: **"Groups 1-4, then re-census 5-7
-(Recommended)"** (`DECISIONS_HISTORY.md`, 14z-215). Groups 1-4 in an isolated worktree.
+(Recommended)"** (`DECISIONS_HISTORY.md`, 14z-215). Groups 1-4 in an isolated worktree. *[Continued: (8).]*
 
 ### (4) #342 FILED — `$FF8120` IS THE WINNER'S PERFECT FLAG, NOT THE SIDE
 B2's legs read 0xFF after P2-won downs; a write tap (`build/agent215/t118/b2/ff8120/`, local) and the static read of
@@ -192,7 +107,7 @@ The seven draft gates moved to `tests/` (six gates, all PASS fresh, 50 control m
 the measurements and the maintainer's answers (`build/agent215/t118/ANSWERS.md`, local), `character_tables.md`'s 15 tables;
 the candidates table: no NO ROW, no NOT OBSERVED, no batch left (CONSISTENT 44, NOT ADOPTED 23, OWNER ONLY 11, COVERED 5,
 REFUTED IN PART 4, CROSS-CHECKED 1, REFUTED 1). 24 poke read-back findings across the new and changed gates await the
-maintainer's classes.
+maintainer's classes. *[Classed: (5).]*
 
 ### (7) #118 CLOSED DONE ON GITHUB
 On the maintainer's **"Close #118"** (`DECISIONS_HISTORY.md` "Ruled 2026-10-31 (14z-215) — #118 closes"), after rule-checker
@@ -217,7 +132,7 @@ gap. In order:
 - the claim lists the six planted modes exactly and names every other changed mode as unplanted;
 - `test_ctl_show_err`'s own mode runs ended an unplantable plant in the old plain FAIL, now a refusal proved by case (e) and the new known-bad control `refusal-reverted` (run `-1510`);
 - `test_rule_checker` and `test_poked_legs` were re-traced on PILOT from a tree whose plain runs pass (`pilot:6c9598b3`);
-- `test_rule_checker`, the fourth group-5 unknown, is now MEASURED with a crash planted where each mode's probe runs: the pre-fix gate reads HONOURED for exactly the three modes the reading named, and the fixed gate reads HONOURED for none (`build/agent215/t310/rcmeas/`, local; the seed of next session's sweep gate) — measured after its fix, not first as the chosen option's text says, a departure stated on #310.
+- `test_rule_checker`, the fourth group-5 unknown, is now MEASURED with a crash planted where each mode's probe runs: the pre-fix gate reads HONOURED for exactly the three modes the reading named, and the fixed gate reads HONOURED for none (`build/agent215/t310/rcmeas/`, local; the seed of next session's sweep gate) — measured after its fix, not first as the chosen option's text says, a departure stated on #310. Runs `-1513` (the census's own naming of the three unknowns) and `-1514` OK; committed `5fad1c92`.
 
 ### (9) #129 — CAPTURES, TWO READS, AND A GATE
 On the maintainer's *"if at some point a machine is idle, the analysis part of #129 is ok to work on"*, ERIS captured
@@ -230,6 +145,27 @@ the maintainer's word), after rule-checker runs `2026-10-31-1495` to `-1501` (a 
 registry scope; a run made before the rescope; truncated evidence) and `-1502` OK. Recommended (B not ported; A as A1, both of Phobos's calls repointed) after rule-checker runs `2026-10-31-1515` (VIOLATED:
 A1 named one of the two calls) and `-1516` (OK). The maintainer: **"Neither, close #129"**. #129 closed `declined`
 (`DECISIONS_HISTORY.md`).
+
+### (10) TWO ORPHANED WAITS, FOUND ON THE MAINTAINER'S QUESTION
+The maintainer asked whether a background task, "wait for the s354 re-run results", was still progressing after 10 h 43 min.
+It was not: the #118 promotion subagent's `until` loop on `build/agent215/t118/promote/RESULTS.tsv` reaching 59 lines had no
+deadline, and the run had finished at 58 lines at 12:23 (all six gates PASS, all 50 modes HONOURED; the +0x354 re-run's
+row went to another file). Killed; the subagent then finished, and its worktree holds nothing main lacks. On ERIS, three
+`cps2 vsavj` legs of the first #310 batch (`audit_command_throws`, `audit_es_ex`) had outlived the batch's 4-hour bound by
+10 h at 99% CPU, reparented to `/init`, their temp dirs deleted; both gates had since passed on the re-run (13/13, 10/10).
+Killed on the maintainer's **"Kill all three (Recommended)"**. The rule: `docs/project/gotchas.md` ("A `timeout` ON A REMOTE
+RUNNER KILLS THE RUNNER, NOT ITS EMULATORS").
+
+### CLOSE (14z-215, 2026-10-31)
+- **The work commit:** `5fad1c92` on the strict tier GREEN at `95eb69b3` (`build/agent215/t310/tier2/tier_results.tsv`;
+  the first tier, at `448722ab`, NOT GREEN on six reds from this sitting's edits, all fixed before it — section (8)'s commit
+  message lists them). #310's progress comment posted (the departure on its fourth unknown stated there).
+- **The close** (`python3 tools/close.py`, run `build/agent215/close/`, `--prev` the work commit's GREEN tier): sections;
+  next-session (the 14z-214 opener moved verbatim, quoted, to `docs/NEXT_SESSION_HISTORY.md`'s top; START HERE: #310's
+  crash-injection sweep first); rollover (14z-214's group to `STATE_HISTORY.md`, its ledger line at the top; no citation
+  pointed into it); indexes; dashboard (14z-163..14z-215, 3,266 figures, 0 unclassed; five assets uploaded; datasets
+  figures 24, rc_runs 24, tiers 25, costly 24, actions 4). The tier's results: `build/agent215/close/tier_results.tsv`,
+  the next close's `--prev`.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings

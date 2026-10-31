@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-214 CLOSE, 2026-10-31)
+# NEXT SESSION — orientation (rewritten at the 14z-215 CLOSE, 2026-10-31)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` (then `python3 tools/gen_history_index.py`
@@ -17,20 +17,19 @@ A plain **Opus 5.5 session at effort High** (the ruled orchestrator — STATE 'S
 - **Never edit a script while it runs** ([MJC-54]); the emulator runner reports a tracked file changed during its run.
 
 Say so at the opener. Never spawn any agent at `max`. A recommendation leans only on the maintainer's OWN words.
-**PILOT** (6 vCPU, 47 GB, Ubuntu 24.04, 64 GB free, 73% used; checked 14z-214 close) carries xdelta3, Node and `strace`. Its
-checkout `~/vampire-saved` sits at `550958ad`. Deletable scratch, 1.6 GB: 14z-214's `~/t214a.bundle`, `~/t214b.bundle`,
-`~/t214a_out`, `~/t214b_out`, `~/t214_tr`, `~/t214_tr2`, `~/t214s`, `~/t214s.tgz`, `~/t214_score.sh`, and the close's
-`~/t214c.bundle`, `~/t214c_out`, `~/t214_tr3`, `~/t214c_score.sh`; older, not on any
-list and left alone: `~/p211_*` and the refs `refs/tmp/f207-286rec`, `refs/tmp/f207-313`. **ERIS** (WSL2, 922 GB free)
-runs the release shape; its checkout sits at `550958ad`; its scratch `~/e214_out`, `~/e214_order.tsv` and
-`~/vampire-saved/build/emu_e214` is deletable. Neither profile sets
+**PILOT** (6 vCPU, 47 GB, Ubuntu 24.04) carries xdelta3, Node and `strace`. Its checkout `~/vampire-saved` sits at
+`550958ad`. Deletable scratch: 14z-214's (`~/t214*`) and 14z-215's (`~/t215*`, the bundles `~/t215*.bundle`, the clones
+`~/t215*_tr`, the outputs `~/t215*_out`); older, not on any list and left alone: `~/p211_*` and the refs
+`refs/tmp/f207-286rec`, `refs/tmp/f207-313`. **ERIS** (WSL2) runs the release shape; its checkout sits at `550958ad`; its
+14z-214 scratch (`~/e214_out`, `~/e214_order.tsv`, `~/vampire-saved/build/emu_e214`) and 14z-215's #129 capture trees
+(`~/t129`, `~/t129b`, `~/t129w`) are deletable. Neither profile sets
 ROMDIR (`ROMDIR=~/roms`). Work handed to either is a bundle of a COMMIT (a bare commit-tree needs a temporary ref; delete
 it after); a remote script goes over `ssh <host> 'wsl -e bash -s' < script` (ERIS) or `ssh pilot 'bash -s' < script`,
 never as a quoted command line (Windows' shell splits it at a pipe), and a remote `pkill -f <pattern>` matches its own
 shell: kill by PID from a stdin script.
 
 **THE SESSION CLOSE:** `docs/project/session_close.md`, run by `python3 tools/close.py`. The run of record is named in
-STATE 14z-214's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
+STATE 14z-215's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
 
 **THE EMULATOR RUNNER SINCE 14z-210 (#321, `docs/project/operations.md`):**
 - **Concurrent controls:** a gate on `tests/controls_concurrent_emu.txt` (from a PILOT write trace) runs each
@@ -60,30 +59,25 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 ## START HERE
 
 0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
-   **THE WORKING TREE CARRIES UNCOMMITTED RECORDS** written after the 14z-214 push: the CLOSE section's last lines and
-   this note. They ride this session's close.
-   **#341** (test_tickets' `parked-disagrees` went DEAD once the newest ticket closed) is fixed in the 14z-214 close commit
-   and re-traced on PILOT: close it on its rule-checker run.
-1. **#118 — THE REMAINING RIGS.** Done this sitting: B6 (Sasquatch's penguins, +0x36C) and rows B (+0x384, +0x3A8,
-   +0x3BE/+0x3BF, +0x3B6's bit 7), each gated. Left, by the batch plan (`build/agent213/t118/batch_plan_draft.md`, local)
-   and S0 (`build/agent213/t118/s0/S0_REPORT.md`, local: leads, not facts): +0x354 (Jedah's child-slot words; needs a
-   slot-ownership rig), B1, B5, B7; and what rows B could not separate: a type-3 KO won by P1, a human winner's type-3
-   KO, and finish types 2 and 4-7 (type 4 would show +0x3BF). S0 flags `docs/game/atlas/character_tables.md:76`
-   ("14 tables", 15 measured): unchecked. Every conclusion a player could see goes to the maintainer on captures first;
-   a chain of events gets a clip of every frame and a page per link.
-2. **Clear PILOT's and ERIS's 14z-214 scratch** (the list above).
-3. **Ask the maintainer for the order of work.** Open tickets (GitHub severity labels):
-   - low: #341 (item 0), #118 (item 1), #310 (kept open 14z-213, **"Keep open (Recommended)"**: classifier rules 1-4 in; the 14z-210
-     census's other shapes, deferred as "Record and defer", are its remaining work).
-   - awaiting release: #338 (the proof sheets' web build; drawn and published at the next tagged release, which closes it;
-     its comment says so).
+1. **#310 — THE CRASH-INJECTION SWEEP, FIRST** (the maintainer, 14z-215: **"Next session, first batch (Recommended)"**,
+   `DECISIONS_HISTORY.md`). A sweep gate that forces each changed gate's perturbed copies to crash and requires DIED or
+   UNJUDGED, never HONOURED: the ~20 other group-5 gates (`vs_ctl_show_err`), every changed control mode outside the six
+   planted ones, and group 6's edits in the eight gates the extended census named (STATE 14z-215 (8)). Its seed is
+   `build/agent215/t310/rcmeas/measure.sh` (local): it planted a raise only where a mode's probe captures output, and was
+   validated by reading HONOURED on the pre-fix gate for exactly the three modes the census named before reading none on
+   the fixed gate (`docs/project/gotchas.md`, "A CRASH PLANTED ON EVERY CALL PROVES NOTHING"). Copy it into the tree as
+   the gate's start, never as a scratch check. Then group 7's first batch (the classifier-order fix first).
+   **For the maintainer, on #310's comment:** the chosen option read "the 4 group-5 unknowns are measured first";
+   `test_rule_checker`, the fourth, was measured after its fix, not first.
+2. **#118 is closed; #129 is closed `declined`.** Nothing to carry for either.
+3. **Clear PILOT's and ERIS's scratch** (the list above).
+4. **Ask the maintainer for the order of work.** Open tickets (GitHub severity labels):
+   - low: #310 (item 1).
+   - awaiting release: #338 (the proof sheets' web build; drawn and published at the next tagged release, which closes it).
    - parked: #123, #124, #125, #127, #128, #162, #294.
-   - **Before planning any freeze or release, read each open ticket's comments for a step that runs AT it.** #333's
-     step (the 11 sites guarded after run 1366 in a release-shape emulator tier) ran on ERIS this sitting at `550958ad`:
-     417 PASS, 0 FAIL, the 4 SKIPs the host's environment (STATE 14z-214 (5)).
-4. **The next freeze or release** runs the six #229 gates only on demand, ERIS's tier takes `--skip test_mame_parity`,
-   and the Mac runs parity (#321); it draws the proof sheets' web build (#338, `docs/project/release_format.md` «The proof
-   sheets' web build»).
+   - **Before planning any freeze or release, read each open ticket's comments for a step that runs AT it.**
+5. **The next freeze or release** runs the six #229 gates only on demand, ERIS's tier takes `--skip test_mame_parity`,
+   and the Mac runs parity (#321); it draws the proof sheets' web build (#338).
 
 ## PARKED (not open work)
 
@@ -92,23 +86,25 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
-- **A collector that groups records by a key drops a record with no key, silently** (`docs/project/gotchas.md`, #339):
-  `tools/session_metrics.py` now stops on any ledger row no session claims; a correction to the append-only ledger goes
-  in `tests/rulecheck/session_corrections.tsv` with its evidence.
-- **A camera-follow rig can hide the subject:** Sasquatch at the left wall put his penguins off screen; check the camera
-  shows the subject before the sheet goes out (B6, 14z-214).
-- **The boot RAM test at PRG:0x000D34 fills work RAM at f15** (`docs/platform/gotchas.md`): a write tap over any
-  work-RAM field sees it, so judge "no other writer" after the boot, as rows B's T3/T3b do.
-- **The rule-checker's rounds on a RAM record catch wording the gate never measured** (1P/2P labels, a routine named as
-  fact, a listed writer never checked to write, a confound by side): rows B took twelve runs.
+- **A crash measurement is validated like a verdict** (`docs/project/gotchas.md`, 14z-215): it must read HONOURED on the
+  known-bad (pre-fix) leg before its clean reading on the fixed leg counts; a raise on every call leaked through an
+  uncaptured helper call and read DIED on both.
+- **Declared control modes are counted with `vs_ctl_declared`** (the leading comment block), never a grep of the file:
+  a heredoc stub's column-0 `# MUST-FIRE:` line is not a mode of its gate.
+- **A "moved line" plant removes its target**; renaming a marker left an `re.subn` prefix match standing.
+- **A new declared control needs its in-gate twin** in the plain run, or the tier reads `controls RED: <name>(not fired)`.
+- **A `${VAR:?}` written literally in a gate's text** (even a label or a printf for a stub) is read by
+  `test_demand_after_trap`; write it through `%s`.
+- **A range bound written in an atlas ROM-tier document counts toward `test_checkdocs_rom`'s ruled denominator**; and a
+  literal `*` in a quoted community name breaks the docs site — put it in a code span (and regenerate
+  `docs/game/atlas/mizuumi_candidates.tsv`).
+- **A PILOT re-trace needs a tree whose plain run passes:** a scratch commit lacks untracked rule-checker run dirs, so
+  `git add` them into the scratch index before bundling.
 
-## WHAT CLOSED THIS SITTING (14z-214)
+## WHAT CLOSED THIS SITTING (14z-215)
 
-- **Closed `done`** with their closing comments: #340 (rule-checker run `2026-10-30-1443`, OK, after `-1441`, `-1442`),
-  #339 (`-1450`, OK, after `-1446`, `-1448`, `-1449`).
-- **Filed and fixed in the close commit:** #341 (the close tier's one red).
-- **Recorded and gated under #118** (kept open): B6 (`tests/audit_sas_penguin_count.sh`, run `2026-10-30-1445`) and rows B
-  (`tests/audit_mizuumi_rows_b.sh`, run `2026-10-31-1464`).
-- **Ruled** (`DECISIONS_HISTORY.md`, 14z-214 entries): the order; B6's first sheet "no", the chain as read, "yes"; #339
-  "either is fine, just make it future proof", "no", "Extend #339 now"; the B6 read-back findings "CONTROL-PLANT",
-  "CROSS-LEG"; the close "Both".
+- **Closed `done`:** #341 (its re-check), #342, #343, #118 (rule-checker run `2026-10-31-1485`).
+- **Closed `declined`:** #129 (the maintainer: "Neither, close #129"; run `2026-10-31-1524`).
+- **#310:** groups 1-4 re-traced, groups 5 and 6 done (run `2026-10-31-1514`), kept open for the sweep and group 7.
+- **Ruled** (`DECISIONS_HISTORY.md`, 14z-215 entries): #310 "5 and 6 now, 7 in batches"; the #129 gate's rows
+  "READS-BACK"; #310's per-gate proofs "Next session, first batch"; #129 "Neither, close #129".
