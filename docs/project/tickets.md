@@ -11,12 +11,15 @@ what lets the tree be understood without GitHub. `?` marks a row not yet backfil
 backfill debt, which only shrinks. Regenerate with `python3 tools/tickets.py page`;
 `tests/test_tickets.sh` fails on drift.
 
-**346 tickets** — status: open 8 · parked 4 · done 301 · declined 15 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 231 · cosmetic 19 · evolution 96 · **backfill debt: 0 rows**.
+**349 tickets** — status: open 11 · parked 4 · done 301 · declined 15 · not-ours 7 · invalid 9 · duplicate 2 · kind: bug 233 · cosmetic 19 · evolution 97 · **backfill debt: 0 rows**.
 
 ## Open and parked
 
 | # | kind | status | ticket | repro | decided | learned | wrong | sessions |
 |---|---|---|---|---|---|---|---|---|
+| [#349](https://github.com/DefinitelyFrenchName/VampireSaved/issues/349) | bug | open | controls_overlap.py reads a gate SAFE when all its control runs were REFUSED (only SKIP reads HOLLOW) | `tools/controls_overlap.py` · `tests/test_controls_concurrent.sh` | none | none | none | 14z-216 |
+| [#348](https://github.com/DefinitelyFrenchName/VampireSaved/issues/348) | evolution | open | No gate checks a tracked release/‹name› is the package of its build; the Linux release gates do not follow release/‹name› | `tests/test_release_roundtrip.sh` · `tests/audit_release_linux_desktop.sh` · `tests/audit_release_linux_cleanhost.sh` | none | none | none | 14z-216 |
+| [#347](https://github.com/DefinitelyFrenchName/VampireSaved/issues/347) | bug | open | run_all_emulator.sh --stale --freeze refuses when any stale gate is outside a freeze (the audit names at its default cadence) | `tests/run_all_emulator.sh` · `tools/audit_emulator_staleness.py` | none | none | none | 14z-216 |
 | [#346](https://github.com/DefinitelyFrenchName/VampireSaved/issues/346) | cosmetic | open | Donovan's Blizzard Sword snowflake drags a blue ice streak on our build that native vs2 does not draw | `tools/naming_pair_sheet.sh` | `DECISIONS_HISTORY.md § Ruled 2026-11-01 (14z-216) — the Blizzard Sword ice streak: a ticket for investigation (#346)` | `docs/game/engine_internals.md § Blizzard Sword's snowflake: ours draws an ice streak behind it that native vs2 does not (seen 14z-216, #346)` | none | 14z-216 |
 | [#345](https://github.com/DefinitelyFrenchName/VampireSaved/issues/345) | bug | open | Donovan's Blizzard Sword overruns its frame at different frames than native vs2: two move-parity events differ (donovan_2:2, donovan_11:12) | `tests/audit_move_parity.sh` · `tests/audit_pass_overrun.sh` · `tests/audit_move_parity_attribution.sh` · `tests/audit_rng_forms.sh` | `DECISIONS_HISTORY.md § Ruled 2026-11-01 (14z-216) — the remaining move-parity differences: a ticket, and one per character where a difference is the character's own` | `docs/game/engine_internals.md § A DOUBLE PASS CAN OVERRUN ITS FRAME` | none | 14z-216 |
 | [#344](https://github.com/DefinitelyFrenchName/VampireSaved/issues/344) | cosmetic | open | Donovan's body and sword colours inside Dark Force differ from vs2's (palette rows 0x0A/0x0C, P1) | `tests/audit_don_row0c.sh` | `DECISIONS_HISTORY.md § Ruled 2026-11-01 (14z-216) — Donovan's Dark Force colours: ticketed (#344)` | `docs/game/engine_internals.md § Donovan's colours inside Dark Force differ from vs2's` | `docs/game/engine_internals.md § Donovan's colours inside Dark Force differ from vs2's` | 14z-216 |

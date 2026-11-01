@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-215 CLOSE, 2026-10-31)
+# NEXT SESSION — orientation (rewritten at the 14z-216 CLOSE, 2026-11-01)
 
 > Rewritten at every session close ([VSP-17]). ROLLOVER: the previous opener
 > moves VERBATIM to the top of `NEXT_SESSION_HISTORY.md` (then `python3 tools/gen_history_index.py`
@@ -17,19 +17,22 @@ A plain **Opus 5.5 session at effort High** (the ruled orchestrator — STATE 'S
 - **Never edit a script while it runs** ([MJC-54]); the emulator runner reports a tracked file changed during its run.
 
 Say so at the opener. Never spawn any agent at `max`. A recommendation leans only on the maintainer's OWN words.
-**PILOT** (6 vCPU, 47 GB, Ubuntu 24.04) carries xdelta3, Node and `strace`. Its checkout `~/vampire-saved` sits at
-`550958ad`. Deletable scratch: 14z-214's (`~/t214*`) and 14z-215's (`~/t215*`, the bundles `~/t215*.bundle`, the clones
-`~/t215*_tr`, the outputs `~/t215*_out`); older, not on any list and left alone: `~/p211_*` and the refs
-`refs/tmp/f207-286rec`, `refs/tmp/f207-313`. **ERIS** (WSL2) runs the release shape; its checkout sits at `550958ad`; its
-14z-214 scratch (`~/e214_out`, `~/e214_order.tsv`, `~/vampire-saved/build/emu_e214`) and 14z-215's #129 capture trees
-(`~/t129`, `~/t129b`, `~/t129w`) are deletable. Neither profile sets
+**PILOT** (6 vCPU, 47 GB, Ubuntu 24.04) carries xdelta3, Node, `strace`, podman and the GNOME session the desktop gate
+drives (the maintainer logs in). Its checkout `~/vampire-saved` sits at S4 `d1aed6a8` with a SCRATCH tag
+`freeze/merged-m24` (S4, never pushed): **delete it before PILOT fetches tags** (`git tag -d freeze/merged-m24`), then move the
+checkout to `main`. Deletable scratch (14z-216): `~/rt216*` (12 GB, the re-trace), `~/m24_*`, `~/pilot_m24*.sh`,
+`~/pilot_emu*.sh`, `~/pilot_rows216.sh`, `~/rows216*`, `~/t216_*`, `~/vampire-saved/build/emu_p216_*` (copied to the Mac).
+**ERIS** (WSL2, 24 threads, 47 GB) runs the release shape; its checkout sits at the freeze commit `be40e6f3`, RUNNING the M24
+release emulator tier (below) — leave `~/rel216_out` and `~/vampire-saved/build/emu_rel216_eris` until the release is
+recorded. Deletable (14z-216): `~/rt216*`, `~/psw216*`, `~/lad216*`, `~/e216*`, `~/eris_*216.sh`, `~/s5.bundle`,
+`~/freeze216.bundle`, `~/c329c.bundle`, `~/c333a.bundle`, `~/t215b.bundle`. Neither profile sets
 ROMDIR (`ROMDIR=~/roms`). Work handed to either is a bundle of a COMMIT (a bare commit-tree needs a temporary ref; delete
 it after); a remote script goes over `ssh <host> 'wsl -e bash -s' < script` (ERIS) or `ssh pilot 'bash -s' < script`,
-never as a quoted command line (Windows' shell splits it at a pipe), and a remote `pkill -f <pattern>` matches its own
-shell: kill by PID from a stdin script.
+never as a quoted command line (Windows' shell splits it at a pipe and mangles quotes), and a remote `pkill -f <pattern>`
+matches its own shell: kill by PID, or by session (`pkill -KILL -s <sid>`), from a stdin script.
 
 **THE SESSION CLOSE:** `docs/project/session_close.md`, run by `python3 tools/close.py`. The run of record is named in
-STATE 14z-215's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
+STATE 14z-216's CLOSE section. A red tier is re-run on THE RED RUN'S results (#317).
 
 **THE EMULATOR RUNNER SINCE 14z-210 (#321, `docs/project/operations.md`):**
 - **Concurrent controls:** a gate on `tests/controls_concurrent_emu.txt` (from a PILOT write trace) runs each
@@ -42,9 +45,10 @@ STATE 14z-215's CLOSE section. A red tier is re-run on THE RED RUN'S results (#3
   a selected gate, or a passing gate's declared control, with no row is a FAIL ("LOST"); `tests/lib/measures.sh` no longer
   shares a scratch file across pooled subshells. **Before trusting a runner change, run its gate on PILOT as well as the
   Mac** — the `$$` race showed only on Linux.
-- **ERIS's release shape:** `--scope all --strict --controls --jobs 8 --skip test_mame_parity --reuse <freeze run>
-  --order <the previous release's results>`, about 2 h 12 min with TMPDIR on disk (7,947 s at `86d1ca10`). `--jobs 12`
-  gains nothing.
+- **ERIS's release shape:** `--scope all --strict --controls --jobs 6 --skip test_mame_parity [--reuse <freeze run>]
+  --order <the previous release's results>` (14z-208b: about 2 h 12 min at `--jobs 8` with reuse; `--jobs 8` pushed one
+  MAME control past half its cap, #321). A write trace may be SPLIT across Linux machines, each running nothing else
+  (the maintainer, 14z-216, DECISIONS_HISTORY).
 - **A fresh run gets a fresh `--log` directory** (14z-213, `docs/project/gotchas.md`): the runner keeps an existing
   `results.tsv` and `commit.txt`, so a reused directory mixes the old run's rows and commit of record with the new.
 - **The registry check reads 240 of 240** since #340 (14z-213): a gate that reads `tests/ci_emulator.tsv` counts as
@@ -58,55 +62,62 @@ file it leaves behind outside `build/`, and `build/`'s top-level directories are
 
 ## START HERE
 
-0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.**
-   **THE WORKING TREE CARRIES UNCOMMITTED RECORDS** written after the 14z-215 push: the CLOSE section's last lines and
-   this note. They ride this session's close.
-1. **#310 — THE CRASH-INJECTION SWEEP, FIRST** (the maintainer, 14z-215: **"Next session, first batch (Recommended)"**,
-   `DECISIONS_HISTORY.md`). A sweep gate that forces each changed gate's perturbed copies to crash and requires DIED or
-   UNJUDGED, never HONOURED: the ~20 other group-5 gates (`vs_ctl_show_err`), every changed control mode outside the six
-   planted ones, and group 6's edits in the eight gates the extended census named (STATE 14z-215 (8)). Its seed is
-   `build/agent215/t310/rcmeas/measure.sh` (local): it planted a raise only where a mode's probe captures output, and was
-   validated by reading HONOURED on the pre-fix gate for exactly the three modes the census named before reading none on
-   the fixed gate (`docs/project/gotchas.md`, "A CRASH PLANTED ON EVERY CALL PROVES NOTHING"). Copy it into the tree as
-   the gate's start, never as a scratch check. Then group 7's first batch (the classifier-order fix first).
-   **For the maintainer, on #310's comment:** the chosen option read "the 4 group-5 unknowns are measured first";
-   `test_rule_checker`, the fourth, was measured after its fix, not first.
-2. **#118 is closed; #129 is closed `declined`.** Nothing to carry for either.
-3. **Clear PILOT's and ERIS's scratch** (the list above).
+0. **AT THE OPENER, RUN `python3 tools/agent/sweep.py`.** ERIS's release tier (item 1) is this session's own process,
+   left running on purpose: declare it, never kill it.
+1. **THE M24 RELEASE, FIRST** (the maintainer, 14z-216: close first, then release — *"plan accepted. proceeed"*). M24 is
+   frozen at `be40e6f3` (tags `freeze/donovan-m28`, `huitzil-m35`, `pyron-m29`, `merged-m24`; STATE 14z-216 (1b)). The
+   release's tiers run on THAT commit (ruled 14z-208, `docs/project/release_format.md` "The release run on the freeze's
+   tree"), through `tests/run_on_snapshot.sh --commit be40e6f3…`, whatever the close committed after it. In order:
+   1. **ERIS's emulator tier**, started 2026-11-01 22:24 CET: `~/rel216_out/meta.txt` (its end line), `~/rel216_out/run.log`
+      (the GREEN line), results in `~/vampire-saved/build/emu_rel216_eris/`. Read every red; bring the run dir to the Mac.
+   2. **THEN the host-covered gates** (never before ERIS ends: the newest row wins): the Mac's `test_mame_parity`,
+      `test_release_binaries`, `test_readme_recording` and its MiSTer lane with `--controls`; PILOT's
+      `audit_release_linux_desktop` (the maintainer logged in) and `audit_release_linux_cleanhost`, one after the other,
+      `RELEASE=merged-m24`, on a checkout of `be40e6f3`.
+   3. **The static release tier** on a snapshot of `be40e6f3`: `--strict --cadence release --reuse
+      build/agent216/m24/static_freeze_results_s5.tsv` (the freeze run of record, the same tree).
+   4. **The Windows half of `test_release_launcher_bat`** on ERIS (release cadence).
+   5. **The proof sheets (#338):** a local run of `be40e6f3` (`tools/proof_sheets.py run`), `web`, then
+      `tools/publish_sheets.sh --dry-run` and, on the maintainer's word, the real publish (by hand: ssh asks for the
+      password; `DEPLOY_TARGET` is the maintainer's site deploy's).
+   6. **Publish** on the maintainer's word: the assets (`tools/upload_release_assets.sh freeze/merged-m24`), the GitHub
+      release; then close #127, #162, #294 and #338 with the release (each has its done-awaiting-release comment).
+   **Before it, read each open ticket's comments for a step that runs AT a release.**
+2. **#310 — THE CRASH-INJECTION SWEEP** (the maintainer, 14z-215: **"Next session, first batch (Recommended)"**). Discovery
+   ran over the 20 static gates this sitting (STATE 14z-216 (2), `build/agent216/t310/FINDINGS.md`, local: every runner mode
+   PROVEN but one LIES; F1 `test_agent_hooks`' twins); the gate is not built. Its seed is
+   `build/agent215/t310/rcmeas/measure.sh` (local). Then group 7's first batch.
+3. **Clear PILOT's and ERIS's scratch** (the lists above), PILOT's scratch tag first.
 4. **Ask the maintainer for the order of work.** Open tickets (GitHub severity labels):
-   - low: #310 (item 1).
-   - awaiting release: #338 (the proof sheets' web build; drawn and published at the next tagged release, which closes it).
-   - parked: #123, #124, #125, #127, #128, #162, #294.
-   - **Before planning any freeze or release, read each open ticket's comments for a step that runs AT it.**
-5. **The next freeze or release** runs the six #229 gates only on demand, ERIS's tier takes `--skip test_mame_parity`,
-   and the Mac runs parity (#321); it draws the proof sheets' web build (#338).
+   - awaiting release: #127, #162, #294, #338 (item 1).
+   - bugs: #345 (Blizzard Sword overrun), #347 (`--stale --freeze` refuses NOTE-class names), #349 (REFUSED control runs
+     read SAFE); evolution: #348 (no tracked-release-vs-build gate); cosmetic: #344 (Donovan's Dark Force colours),
+     #346 (the Blizzard Sword ice streak); low: #310 (item 2).
+   - parked: #123, #124, #125, #128.
 
 ## PARKED (not open work)
 
-- #124 and #294 (Killshread's aura palette, filed parked by the maintainer 2026-10-18).
+- #124 (Killshread's aura palette), #123, #125, #128 (Marionette, parked again 14z-216).
 - **VampireSaved-Rebuilt#1** holds what is left of #120, closed 14z-205.
 
 ## INSTRUMENT FACTS LEARNED THIS SITTING (read before the work they bear on)
 
-- **A crash measurement is validated like a verdict** (`docs/project/gotchas.md`, 14z-215): it must read HONOURED on the
-  known-bad (pre-fix) leg before its clean reading on the fixed leg counts; a raise on every call leaked through an
-  uncaptured helper call and read DIED on both.
-- **Declared control modes are counted with `vs_ctl_declared`** (the leading comment block), never a grep of the file:
-  a heredoc stub's column-0 `# MUST-FIRE:` line is not a mode of its gate.
-- **A "moved line" plant removes its target**; renaming a marker left an `re.subn` prefix match standing.
-- **A new declared control needs its in-gate twin** in the plain run, or the tier reads `controls RED: <name>(not fired)`.
-- **A `${VAR:?}` written literally in a gate's text** (even a label or a printf for a stub) is read by
-  `test_demand_after_trap`; write it through `%s`.
-- **A range bound written in an atlas ROM-tier document counts toward `test_checkdocs_rom`'s ruled denominator**; and a
-  literal `*` in a quoted community name breaks the docs site — put it in a code span (and regenerate
-  `docs/game/atlas/mizuumi_candidates.tsv`).
-- **A PILOT re-trace needs a tree whose plain run passes:** a scratch commit lacks untracked rule-checker run dirs, so
-  `git add` them into the scratch index before bundling.
+- **GNOME 46's first `xwininfo -tree` line naming a window is its FRAME** (`docs/platform/gotchas.md`): focusing it takes
+  focus from the game since mutter `.18` (FBNeo pauses); `tools/desktop_session_play.py` targets the client window.
+- **A byte-plant control that writes a constant is dead where the byte already holds it** (`docs/project/gotchas.md`):
+  invert, and `cmp` the copy before reading DEAD.
+- **A re-point sweep rewrites quoted records**, and the attribution tool's 8-byte window misses straddling pointers
+  (`docs/project/gotchas.md`, 14z-216).
+- **The concurrent-controls scorer reads an all-REFUSED gate SAFE** (#349): classify every traced log with
+  `tests/lib/classify.sh` and certify only HONOURED runs.
+- **`run_all_emulator.sh --stale --freeze`** refuses on NOTE-class names (#347): `--skip` each one meanwhile.
+- **No gate ties a tracked release to its build** (#348): for M24 it was checked directly,
+  `build/agent216/m24/rc_freeze/relid/` (local).
 
-## WHAT CLOSED THIS SITTING (14z-215)
+## WHAT CLOSED THIS SITTING (14z-216)
 
-- **Closed `done`:** #341 (its re-check), #342, #343, #118 (rule-checker run `2026-10-31-1485`).
-- **Closed `declined`:** #129 (the maintainer: "Neither, close #129"; run `2026-10-31-1524`).
-- **#310:** groups 1-4 re-traced, groups 5 and 6 done (run `2026-10-31-1514`), kept open for the sweep and group 7.
-- **Ruled** (`DECISIONS_HISTORY.md`, 14z-215 entries): #310 "5 and 6 now, 7 in batches"; the #129 gate's rows
-  "READS-BACK"; #310's per-gate proofs "Next session, first batch"; #129 "Neither, close #129".
+- **Frozen:** M24 at `be40e6f3` ((M) for #127/#162, #294's per-frame routine); freeze rule-checker run `2026-11-01-1560`.
+- **Ruled** (`DECISIONS_HISTORY.md`, 14z-216 entries): (M) and #294's implementations; #294's lag frame accepted, then
+  re-confirmed as a tradeoff; #345's rows exempt; the 45-row re-trace; the ERIS half accepted and the split clarified;
+  #338's publisher by hand.
+- **Filed:** #344, #345, #346, #347, #348, #349.

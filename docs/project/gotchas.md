@@ -7914,3 +7914,13 @@ differs". M24 listed 617 such targets in Phobos's anim region (moved +0xF80); ev
 was widened by 4 bytes (`build/agent216/m24/apd_straddle.py`, a scratch copy). An alarming count is a report about
 the instrument first ([VSP-148]'s mirror). The same straddle explains the pointer-flow WEAK rows that come and go
 at a freeze (a relocated pointer's low word read as the next long).
+
+## A BYTE-PLANT CONTROL THAT WRITES A CONSTANT IS DEAD WHEREVER THE BYTE ALREADY HOLDS IT — a "one byte flipped" control read CONTROL DEAD on both Linux binary dirs (paid: 14z-216, the M24 freeze)
+
+To show that a sha256 check of the release's Linux emulator binaries could fail, a scratch copy of the last file in each dir
+had one byte "flipped" by writing `\x00` at offset 100 (`printf '\x00' | dd ... seek=100 conv=notrunc`). Both controls read
+DEAD: offset 100 of `libxkbcommon.so.0` and `libz.so.1` already held `00` (an ELF header's padding), so the copy was
+unchanged and passed. Before reading DEAD as "the check is blind", the real files were re-verified: no symlink in either dir,
+so the write had not reached them. **The rule:** a planted change INVERTS what is there (`b[i] ^= 0xFF`), never writes a
+constant; and a control that reads DEAD is first asked whether the plant changed anything (`cmp` the copy against the
+original). The fixed control is `build/agent216/m24/rc_freeze/relid/pilot_binaries.sh` (local); both dirs then read FIRED.

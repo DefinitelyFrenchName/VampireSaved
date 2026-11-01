@@ -20,7 +20,7 @@ This index is ONE LINE PER BUCKET ENTRY, generated (14z-122) — the
 hand-written index it replaced, including the per-session digests it had
 accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 
-594 entries (49 game / 149 platform / 396 project), counted from the buckets at generation.
+595 entries (49 game / 149 platform / 397 project), counted from the buckets at generation.
 
 ## Game — Vampire Savior ([`game/gotchas.md`](game/gotchas.md)) — 49 entries
 
@@ -226,7 +226,7 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A SHELL'S WRITE-ERROR TEXT IS ITS OWN — bash says `write error: Broken pipe`, dash (Ubuntu's `sh`) `printf: I/O error` (paid: 14z-212, PILOT; #336)
 - ON GNOME 46, THE FIRST `xwininfo -tree` LINE NAMING A WINDOW IS ITS FRAME, OWNED BY `mutter-x11-frames` — focus that frame through Xlib and, since mutter 46.2-1ubuntu0.24.04.18, the client LOSES focus (FBNeo pauses) (paid: 14z-216, PILOT)
 
-## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 396 entries
+## Project — our pipeline and method ([`project/gotchas.md`](project/gotchas.md)) — 397 entries
 
 - A DISASSEMBLY ANCHORED ON AN EXTENSION WORD STOPS AT THE FIRST DECODE THAT NAMES IT, NOT THE FIRST THAT DECODES — and a census's positive controls cover every operand form it claims (paid: 14z-187b, GitHub #197)
 - A CAPTURE COVERS EVERY EVENT THE FREEZE RESTS ON, AND EACH SHEET NAMES ITS EVENT — one event's sheet is not the read of the other (paid: 14z-187b, GitHub #192, rule-checker runs 2026-10-01-518/519)
@@ -624,3 +624,4 @@ accreted, is verbatim in [`GOTCHAS_history.md`](GOTCHAS_history.md).
 - A CRASH PLANTED ON EVERY CALL PROVES NOTHING ABOUT WHERE A GATE HIDES ONE — and a census counting `# MUST-FIRE:` lines anywhere counts a heredoc stub's header (paid: 14z-215, #310)
 - A `timeout` ON A REMOTE RUNNER KILLS THE RUNNER, NOT ITS EMULATORS — three MAME legs spun 10 h on ERIS after their batch's bound (paid: 14z-215, #310)
 - A RE-POINT SWEEP REWRITES A QUOTED RULING — and an attribution window misses a pointer that straddles its end (paid: 14z-216, the M24 freeze)
+- A BYTE-PLANT CONTROL THAT WRITES A CONSTANT IS DEAD WHEREVER THE BYTE ALREADY HOLDS IT — a "one byte flipped" control read CONTROL DEAD on both Linux binary dirs (paid: 14z-216, the M24 freeze)

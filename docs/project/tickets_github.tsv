@@ -2,9 +2,12 @@
 # (network; a session-close step). GENERATED — never hand-edited. tools/tickets.py check
 # compares each ticket row's open/closed against it OFFLINE (CLAUDE.md [VSP-182]).
 # repo: DefinitelyFrenchName/VampireSaved
-# issues: 346
+# issues: 349
 number	state	reason	closed	labels	title
-346	OPEN	-	-	cosmetic	Donovan's Blizzard Sword snowflake drags a blue ice streak on our build that native vs2 does not draw
+349	OPEN	-	-	bug	controls_overlap.py reads a gate SAFE when all its control runs were REFUSED (only SKIP reads HOLLOW)
+348	OPEN	-	-	evolution	No gate checks a tracked release/<name> is the package of its build; the Linux release gates do not follow release/<name>
+347	OPEN	-	-	bug	run_all_emulator.sh --stale --freeze refuses when any stale gate is outside a freeze (the audit names at its default cadence)
+346	OPEN	-	-	bug,cosmetic	Donovan's Blizzard Sword snowflake drags a blue ice streak on our build that native vs2 does not draw
 345	OPEN	-	-	bug,severity: medium	Donovan's Blizzard Sword overruns its frame at different frames than native vs2: two move-parity events differ (donovan_2:2, donovan_11:12)
 344	OPEN	-	-	cosmetic	Donovan's body and sword colours inside Dark Force differ from vs2's (rows 0x0A/0x0C)
 343	CLOSED	COMPLETED	2026-10-31	bug,severity: low,test-integrity	audit_tenant_timeout's 'round 2 spawns live' check passes on the next match's refill (after $FF810E = 0xFF), not on a round 2
@@ -188,7 +191,7 @@ number	state	reason	closed	labels	title
 165	CLOSED	COMPLETED	2026-09-19	bug	The tenants' vs2 EX inputs entered Dark Force through a placed copy of vs2's Change entry — a second, longer route into the mode
 164	CLOSED	COMPLETED	2026-09-19	bug	Phobos and Donovan took damage and rallied through their shells' defense rows (vsavj's copies for ids 0x10/0x13), not vs2's own
 163	CLOSED	COMPLETED	2026-09-25	bug	The Killshread Lightning column and the Plasma Trap ran vsavj's shock remap instead of vs2's class-0x52 rule — the victim's freeze and the attacker's hit-freeze differed from native
-162	OPEN	-	-	cosmetic	The deity above Donovan flashes orange as the Killshread Lightning column ends — an extra palette-sequence upload of row 11 native does not make
+162	OPEN	-	-	bug,cosmetic	The deity above Donovan flashes orange as the Killshread Lightning column ends — an extra palette-sequence upload of row 11 native does not make
 161	CLOSED	NOT_PLANNED	2026-09-25	bug	Phobos takes one more HP than native from Demitri's 5HP with his defense rows already vs2's (12 against 11)
 160	CLOSED	COMPLETED	2026-09-28	bug,severity: low	rulecheck.py: prepare's auto id collides with a run directory that has no ledger row
 159	CLOSED	COMPLETED	2026-09-28	bug,needs-maintainer-ruling,severity: medium	Tenant attack records with facing rule 5 are XORed into the victim's facing by vsavj's hit code (Killshread Summon (ES) pushes Demitri away where native drags him in)
@@ -223,7 +226,7 @@ number	state	reason	closed	labels	title
 130	CLOSED	COMPLETED	2026-10-03	bug	bundle_win_dlls.py prints a broken character for its em dash on MSYS2 (build logs only)
 129	CLOSED	NOT_PLANNED	2026-10-31	evolution,severity: low	Tenant CPU AI looks lackluster (unproven; first question: are the ported script blocks complete?)
 128	OPEN	-	-	evolution,parked	Marionette: parked until further notice
-127	OPEN	-	-	cosmetic	fix Press of Death palette swap by making its effect own its palette row (scope first) [#112's option (B)]
+127	OPEN	-	-	bug,cosmetic	fix Press of Death palette swap by making its effect own its palette row (scope first) [#112's option (B)]
 126	CLOSED	COMPLETED	2026-10-01	cosmetic,parked	Select-wheel look-and-feel polish
 125	OPEN	-	-	cosmetic,out-of-scope,parked	Arcade-ladder map: for the three tenants the next opponent's name and small portrait are wrong (the VS screen that follows is correct)
 124	OPEN	-	-	cosmetic,out-of-scope,parked	Arcade-ladder map tag shows the base/shell character for a VS2 tenant opponent

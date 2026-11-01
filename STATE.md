@@ -38,7 +38,7 @@ How to work with it:
   The rollover rule, the six-step close checklist, the close loop's cost rules and the push rule that stood here
   moved there on 2026-10-15.
 
-## Session 14z-216 — **in progress: #310's crash-injection sweep; #127, #128, #162 and #294 unparked, under analysis.**
+## Session 14z-216 — **M24 FROZEN at `be40e6f3` ((M) for #127 and #162, vs2's per-frame routine for #294; tags donovan-m28, huitzil-m35, pyron-m29, merged-m24) after freeze rule-checker run -1560 and a GREEN static freeze tier; #128 parked again; #338's publisher by hand; #344-#349 filed; the release's emulator tier started on ERIS; #310's crash-injection sweep in discovery.**
 
 ### opened with
 The 14z-215 close's opener; the sweep CLEAN, `main` = `origin/main` at `3979abea`, the CLOSE section's last lines and the
@@ -153,11 +153,33 @@ denominator 394 -> 407 (the 13 addresses of this session's #128 paragraph, `deno
 instruments `--skip`ped: the runner's `--stale` names them at the audit's default cadence and refuses — a ticket to file)
 PASS 29 SKIP 4 FAIL 1 (`build/emu_e216s4`); the red, `audit_ladder_selector`, was M24's timeline shift (match 2's selection
 960 frames earlier) moving its frame-pinned saturation window past the selection — window moved 7100-7290 -> 6140-6330,
-PASS on merged-m24 with merged-m23's original reading. **Open, in order**: the Mac's runner rows on S4 for
-`test_release_binaries`, `test_readme_recording`, `test_mister_prg_window` (running); PILOT's runner rows for the desktop and
-clean-host gates after the trace; the freeze rule-checker run; snapshot S5 and the static freeze tier on it; commit; re-cut
-the four tags; comments on #127/#162/#294. #344, #345, #346 stay open. #338's publisher: `BatchMode=yes` dropped and
-`--dry-run` passed through (the maintainer, 14z-216: "That's fine by me"; DEPLOY_TARGET is their site deploy's).
+PASS on merged-m24 with merged-m23's original reading. **Then, to the commit**: the Mac's runner rows on S4 PASS
+(`test_release_binaries`, `test_readme_recording`, `build/emu_m24_rel_s4`; `test_mister_prg_window` 3,406 s,
+`build/emu_m24_prgwin_s4`). **The emulator concurrent-controls re-trace** ran at about 850 s a control on PILOT (load 15.7 on 6
+vCPUs, ~10 h left), so the 35 unstarted gates went to ERIS from the list's end with PILOT's settings (`cmds.tsv`, strace
+`--seccomp-bpf`, ×2 timeout); a first ERIS launch without them was killed and discarded. The maintainer accepted the ERIS half
+(*"Accept ERIS (Recommended)"*) and clarified the 14z-210 ruling: *"concurrent is possible but other tasks per machine should
+be avoided to avoid overlap or interference. But splitting the load between machines is perfectly fine"* (DECISIONS_HISTORY).
+164 runs (PILOT 54, ERIS 110; the two release gates REFUSED or SKIPped on ERIS and were re-traced on PILOT — the scorer had
+read the REFUSED ones SAFE, #349): 45 SAFE, all HONOURED; `test_proof_sheets_web` re-traced on ERIS after #338's change; both
+lists written, `test_controls_concurrent` PASS (`build/agent216/m24/rt216_emu/`). **PILOT's runner rows at S4**:
+`audit_release_linux_desktop` PASS 334 s, `audit_release_linux_cleanhost` PASS 93 s, both GREEN (`build/emu_p216_desk`,
+`build/emu_p216_clean`); freeze-cadence staleness at S4 PASS (228). **The freeze rule-checker**: `-1555` to `-1559` VIOLATED,
+each resolved — the set key 8a6366c2 tied to build 43505a12 by the manifest; the rulings quoted; the runner logs; the ladder
+sentence corrected (only match 2's selection moved 960; the later changes 1020 and 1500); NO GATE ties a tracked release to its
+build (#348), so checked directly (`rc_freeze/relid/`): every platform dir's manifest, applier and 20 patches equal a fresh
+package of `m3b_merged32`, the `mb_294` control differing (keys, 2 of 20 patches); PILOT's Linux binaries equal their
+`BINARY.txt` rows (a first control wrote 0x00 over a 0x00 byte, dead, fixed to invert); the applier computes its key from the
+bytes it built — **`-1560` OK** (the plant caught). `audit_ladder_selector`'s runner row on S5 PASS (ERIS, `build/emu_e216s5`).
+**Snapshot S5** `a7fab7d6` (the staged tree): the static freeze tier **GREEN, PASS 237, SKIP 0, FAIL 0**
+(`build/agent216/m24/static_freeze_results_s5.tsv`). **FROZEN: commit `be40e6f3`**; the four tags re-cut on it; #127, #162 and
+#294 commented done-awaiting-release; #344, #345, #346 stay open. Tickets filed from the freeze: #347 (`--stale --freeze`
+refuses NOTE-class names), #348 (no tracked-release-vs-build gate), #349 (REFUSED control runs read SAFE). #338's publisher:
+`BatchMode=yes` dropped and `--dry-run` passed through (the maintainer, 14z-216: "That's fine by me"; DEPLOY_TARGET is their
+site deploy's). **The release** (the maintainer chose to close first, then release next session — *"plan accepted"*): its
+emulator tier started on ERIS at the freeze commit itself, `--scope all --strict --controls --jobs 6 --skip test_mame_parity`
+(`~/rel216_out`, `build/emu_rel216_eris` there), 2026-11-01 22:24 CET; no `--reuse` (the freeze battery ran on S2, a different
+tree). PILOT still carries a SCRATCH tag `freeze/merged-m24` at S4 (never pushed): delete it before PILOT fetches tags.
 
 ### (2) #310 — THE CRASH-INJECTION SWEEP, DISCOVERY
 A python3/sh shim crashes the commands a mode runs (a 30-frame Python stack; a syntax error in an untracked shell copy, a
@@ -167,6 +189,18 @@ mode PROVEN but one LIES; first finding F1, `test_agent_hooks`' twins read a cop
 plain run PASSes (`build/agent216/t310/FINDINGS.md`). Two defects of the session's own rig caught and fixed: a shell shim
 resolving only a symlink's directory (would have written through a mirror's link into a tracked script; nothing was
 written) and a relative shim dir on PATH. The gate is not built yet.
+
+### CLOSE (14z-216, 2026-11-01)
+- **The freeze commit:** `be40e6f3` on the static freeze tier GREEN on snapshot S5 `a7fab7d6`, its tree
+  (`build/agent216/m24/static_freeze_results_s5.tsv`, PASS 237); section (1b). The release's emulator tier runs on ERIS on that
+  commit (the maintainer: *"plan accepted. proceeed"* — close now, release next session).
+- **The close** (`python3 tools/close.py`, run `build/agent216/close/`, `--prev` 14z-215's close tier
+  `build/agent215/close/tier_results.tsv`): sections; next-session (the 14z-215 opener moved verbatim to
+  `docs/NEXT_SESSION_HISTORY.md`'s top; START HERE: the M24 release first); rollover (nothing to move: 14z-215's group was rolled
+  at this sitting's opening); indexes; dashboard (14z-163..14z-216, 3,332 figures, 0 unclassed; five assets uploaded; datasets
+  figures 25, rc_runs 25, tiers 26, costly 25, actions 5). A gotcha paid this sitting added (`docs/project/gotchas.md`, the
+  byte-plant control that wrote a constant). The tier's results: `build/agent216/close/tier_results.tsv`, the next close's
+  `--prev`.
 
 # STANDING SECTIONS (current state — never archived)
 ## Standing rulings
